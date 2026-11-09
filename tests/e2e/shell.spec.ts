@@ -1,3 +1,6 @@
+// decision:one-main-one-h1
+// decision:wcag-aa
+// decision:no-sideways-scroll
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 

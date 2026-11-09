@@ -1,3 +1,5 @@
+// decision:labels
+// decision:tone-position
 import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";

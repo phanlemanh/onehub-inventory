@@ -1,3 +1,4 @@
+// decision:label-lookup
 import { describe, expect, it } from "vitest";
 
 import { label } from "../src/modules/company-config/index";

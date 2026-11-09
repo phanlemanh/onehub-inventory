@@ -9,7 +9,7 @@ sources: [docs/design-standard-proposal.md]
 
 ## Status
 
-Accepted, 2026-11-09. Thay phần «chuyển toàn bộ» trong 0008 và 0010.
+Accepted cho chặng 0, 2026-11-09; đề xuất tổng thể còn chờ chủ kho duyệt. Thay phần «chuyển toàn bộ» trong 0008 và 0010.
 
 ## Context
 

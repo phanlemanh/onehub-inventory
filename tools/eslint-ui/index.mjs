@@ -9,6 +9,8 @@ import noBannedMotion from "./rules/no-banned-motion.mjs";
 import noAsChild from "./rules/no-aschild.mjs";
 import noEmojiIcons from "./rules/no-emoji-icons.mjs";
 import requireDisableReason from "./rules/require-disable-reason.mjs";
+import noOffScaleSpacing from "./rules/no-off-scale-spacing.mjs";
+import noPartialClass from "./rules/no-partial-class.mjs";
 
 export default {
   meta: { name: "onehub-ui" },
@@ -23,5 +25,7 @@ export default {
     "no-aschild": noAsChild,
     "no-emoji-icons": noEmojiIcons,
     "require-disable-reason": requireDisableReason,
+    "no-off-scale-spacing": noOffScaleSpacing,
+    "no-partial-class": noPartialClass,
   },
 };

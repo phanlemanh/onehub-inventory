@@ -4,12 +4,15 @@
   python3 tools/design_check.py [--root DIR]
 
 Determinism ratio = decisions with an automatic check / all decisions. A `check` is one of
-`test:<path>`, `e2e:<path>`, `tool:<path>`, or `eslint:<rule>`, and what it names must exist.
+`test:<path>`, `e2e:<path>`, `tool:<path>`, or `eslint:<rule>`. A check counts only when it can fail:
+a test names its decision with `decision:<id>`, browser tests are in the kit's suite, a tool is run by
+make. tests/design-check.test.ts proves that every lint rule named here is switched on.
 """
 
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
@@ -17,13 +20,44 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from repo_ontology import load_yaml_file
 
 KINDS = {"standard", "formula", "closed", "judgment"}
-CORE_RULES = {"no-restricted-imports"}
+KEYS = {"id", "layer", "kind", "source", "check", "note"}
+CORE_RULES = {
+    "no-restricted-imports",
+    "shadcn/no-restyle",
+    "shadcn/no-arbitrary-values",
+    "shadcn/no-inline-styles",
+}
 
 
-def check_exists(root: Path, check: str) -> str | None:
+def has_tag(path: Path, ident: str) -> bool:
+    pattern = rf"decision:{re.escape(ident)}(?![\w-])"
+    return re.search(pattern, path.read_text("utf-8")) is not None
+
+
+def tool_is_run(root: Path, value: str) -> bool:
+    if not value.startswith("tools/"):
+        return False
+    makefiles = [root / "Makefile", *sorted((root / "mk").glob("*.mk"))]
+    return any(p.exists() and value in p.read_text("utf-8") for p in makefiles)
+
+
+def e2e_in_gate(root: Path) -> bool:
+    config = root / "_acceptance" / "config.yaml"
+    return config.exists() and "- executors.script.e2e" in config.read_text("utf-8")
+
+
+def check_problem(root: Path, ident: str, check: str) -> str | None:
     prefix, _, value = check.partition(":")
-    if prefix in ("test", "e2e", "tool"):
-        return None if (root / value).exists() else f"{check}: no such file"
+    if prefix in ("test", "e2e", "tool") and not (root / value).exists():
+        return f"{check}: no such file"
+    if prefix in ("test", "e2e"):
+        if not has_tag(root / value, ident):
+            return f"{check}: the file does not name decision:{ident}"
+        if prefix == "e2e" and not e2e_in_gate(root):
+            return f"{check}: browser tests are not in the kit's suite_keys"
+        return None
+    if prefix == "tool":
+        return None if tool_is_run(root, value) else f"{check}: not run by make"
     if prefix == "eslint":
         if value in CORE_RULES:
             return None
@@ -44,6 +78,8 @@ def evaluate(root: Path) -> tuple[list[str], int, int]:
         if ident in seen:
             errors.append(f"{ident}: duplicate id")
         seen.add(ident)
+        for key in set(item) - KEYS:
+            errors.append(f"{ident}: unknown key '{key}'")
         for key in ("layer", "kind", "source"):
             if not item.get(key):
                 errors.append(f"{ident}: missing {key}")
@@ -51,7 +87,7 @@ def evaluate(root: Path) -> tuple[list[str], int, int]:
             errors.append(f"{ident}: unknown kind '{item.get('kind')}'")
         check = item.get("check")
         if check:
-            problem = check_exists(root, str(check))
+            problem = check_problem(root, ident, str(check))
             if problem:
                 errors.append(f"{ident}: {problem}")
             else:

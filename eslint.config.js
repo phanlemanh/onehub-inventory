@@ -5,6 +5,8 @@ import nextTs from "eslint-config-next/typescript";
 import prettier from "eslint-config-prettier/flat";
 import globals from "globals";
 
+import { plugin as shadcn } from "@shadcn/lint";
+
 import onehubUi from "./tools/eslint-ui/index.mjs";
 
 const UI_FILES = [
@@ -42,6 +44,23 @@ export default defineConfig([
     rules: { "import/no-anonymous-default-export": "off" },
   },
   { files: UI_FILES, ignores: VENDOR, plugins: { "onehub-ui": onehubUi }, rules: UI_RULES },
+  {
+    files: UI_FILES,
+    ignores: VENDOR,
+    plugins: { shadcn },
+    rules: {
+      "shadcn/no-restyle": [
+        "error",
+        {
+          contracts: [
+            { pattern: "^Button$", allow: ["w-full", "mt-*", "mb-*", "ml-*", "mr-*", "self-*"] },
+          ],
+        },
+      ],
+      "shadcn/no-arbitrary-values": "error",
+      "shadcn/no-inline-styles": "error",
+    },
+  },
   {
     files: ["src/components/templates/**/*.{ts,tsx}"],
     rules: noImports(
