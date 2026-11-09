@@ -1,6 +1,6 @@
 {
   "name": "onehub-inventory",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "SaaS quản lý hàng cho sàn môi giới bất động sản — bản chuẩn hoá của Quỹ hàng (onehub-quy-hang)",
   "private": true,
   "license": "UNLICENSED",
