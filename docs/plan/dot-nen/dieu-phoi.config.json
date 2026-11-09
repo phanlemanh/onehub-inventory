@@ -1,0 +1,56 @@
+{
+  "nhanh_chinh": "main",
+  "tick_giay": 5,
+  "han_thue_phut": {
+    "s4": 90,
+    "ghim-lai": 40,
+    "duong-nen": 40,
+    "merge": 120
+  },
+  "nhip_cu_phut": 10,
+  "suc_khoe": {
+    "swap_gb": 8,
+    "ap_luc_muc": 2,
+    "rss_gb": 8
+  },
+  "s4_tran_gom_phut": 60,
+  "bao_ve": [
+    "db/migrations/**",
+    "package-lock.json",
+    "docs/plan/lo-trinh.json",
+    "_acceptance/config.yaml",
+    "ontology/**",
+    "architecture/modules.yaml",
+    "design/decisions.yaml",
+    "design/component-registry.json",
+    "src/generated/**",
+    "PRODUCT-INVARIANTS.md",
+    "PRODUCT-MAP.md",
+    "LO-TRINH.html",
+    ".env.example",
+    ".github/workflows/**",
+    ".claude/settings.json",
+    ".claude/hooks/**",
+    "eslint.config.js",
+    "tsconfig.json",
+    "tsconfig.strict.json"
+  ],
+  "nguon_hang": [
+    "docs/plan/lo-trinh.json:1a",
+    "docs/plan/lo-trinh.json:1b",
+    "docs/plan/lo-trinh.json:1c",
+    "docs/plan/lo-trinh.json:2",
+    "docs/plan/lo-trinh.json:1",
+    "docs/plan/lo-trinh.json:3",
+    "docs/plan/lo-trinh.json:6",
+    "docs/plan/lo-trinh.json:7",
+    "docs/plan/lo-trinh.json:8",
+    "docs/plan/lo-trinh.json:9"
+  ],
+  "han_muc": {
+    "bao_truoc_pct": 80,
+    "ban_giao_pct": 90,
+    "cho_ban_giao_phut": 20,
+    "cho_dat_lai_phut": 45
+  }
+}

@@ -1,6 +1,6 @@
 # Đề xuất chuẩn hoá thiết kế — lấy onehub-inventory làm ca thật
 
-Trạng thái: **Đề xuất**, 09/11/2026, chưa dựng. Đầu vào: phiên «Design system audit», `docs/plan/kien-truc-he-design-da-repo.md`
+Trạng thái: **Đề xuất**, 09/11/2026. Chặng 0 đã dựng, các chặng sau chưa dựng. Đầu vào: phiên «Design system audit», `docs/plan/kien-truc-he-design-da-repo.md`
 và `docs/plan/ma-tran-kiem-ke-design-claude-code.md` của Quỹ hàng, Acceptance Gate Kit v2.38.0, bộ OneHub Platform DS (10/2026). Đã qua một vòng phản biện độc lập và một vòng rà điều kiện kỹ thuật.
 
 **Chưa xác minh:** toàn bộ lợi ích dưới đây là dự kiến. Số gốc đo trên một màn giả định, ở mức lập phương án. Ngưỡng ở mục 7 là đề
@@ -30,7 +30,7 @@ Mọi quyết định đi theo đúng thứ tự, dừng ở bậc đầu tiên 
 
 Mỗi quyết định là một dòng trong `design/decisions.yaml`: mã, tầng, loại, nguồn, lệnh kiểm. Đi lệch chuẩn phải có một dòng ngoại lệ kèm lý do.
 
-**Chỉ số chính: tỉ lệ tất định = số quyết định có lệnh kiểm tự động ÷ tổng số quyết định.** Gốc ở Quỹ hàng theo ma trận kiểm kê: 17/49, tức 35 %.
+**Chỉ số chính: tỉ lệ tất định = số quyết định có lệnh kiểm tự động ÷ tổng số quyết định.** Gốc ở Quỹ hàng theo ma trận kiểm kê: 17/49, tức 35 %; số này chỉ để tham khảo vì mẫu số khác. Một lệnh kiểm chỉ được tính khi nó đỏ được, theo quyết định 0015.
 
 | Quyết định                                                         | Dùng chuẩn                                     | Ghi chú                                                        |
 | ------------------------------------------------------------------ | ---------------------------------------------- | -------------------------------------------------------------- |
@@ -64,39 +64,40 @@ Mỗi quyết định là một dòng trong `design/decisions.yaml`: mã, tầng
 
 **Giới hạn của chữ «hiệu quả»:** Quỹ hàng chưa có số dùng thật. Chưa phiên nghiệm thu nào mở được, và số liệu sống chưa đọc được (`docs/plan/mvp-mo-dan.md`). Vì vậy việc chọn dưới đây dựa trên ba căn cứ gián tiếp: thuộc đợt 1 của MVP hay giữ bất biến, có bằng chứng kiểm được, và độ ổn định của mã. Tỉ lệ vá tính theo tiêu đề commit, chỉ để định hướng.
 
-| Quyết định               | Gồm                                                                                                                                                                                              | Căn cứ                                                                                |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
-| **Mang nguyên**          | Luật nghiệp vụ thuần của các nhóm đợt 1; bốn bất biến, bộ kiểm cách ly, bộ kiểm rò rỉ, một cửa truy vấn, lớp dữ liệu và trần; 14 luật lint; từ vựng và ADR còn hiệu lực; kết luận của ba bài thử | `packages/core`: 139 tệp, không tệp nào phụ thuộc web hay cơ sở dữ liệu, 114 tệp test |
-| **Viết lại theo chuẩn**  | Bảng hàng, Hồ sơ căn, Hôm nay, luồng Gửi, trang khách, Đã gửi; API đưa vào `server.ts` của mô-đun; nhập Excel không AI                                                                           | Audit: hở ở giữa. Tỉ lệ vá cao: nhập 47 %, hồ sơ căn 37 %, bảng hàng 29 %             |
-| **Để sau, theo đợt MVP** | Cửa lead và nhà Liên hệ (đợt 2); phát rộng, sàn tự cấu hình trừ Người dùng và Thuế phí, nhập có AI (đợt 3); thấp tầng; xác nhận danh mục                                                         | `mvp-mo-dan.md`; cửa lead là đoạn yếu nhất                                            |
-| **Không mang**           | Đội, Lịch xem (mới là trang giữ chỗ); 168 hồ sơ nghiệm thu; lộ trình và bản đồ cũ; mã bài thử; cơ chế ghim lại                                                                                   | 13 % commit chỉ để ghim và vẽ lại                                                     |
+| Quyết định               | Gồm                                                                                                                                                                                  | Căn cứ                                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| **Mang nguyên**          | Luật nghiệp vụ thuần của các nhóm đợt 1; ba bất biến, bộ kiểm cách ly, bộ kiểm rò rỉ, một cửa truy vấn; 10 luật lint đã chuyển; từ vựng và ADR còn hiệu lực; kết luận của ba bài thử | `packages/core`: 139 tệp, không tệp nào phụ thuộc web hay cơ sở dữ liệu, 114 tệp test |
+| **Viết lại theo chuẩn**  | Bảng hàng, Hồ sơ căn, Hôm nay, luồng Gửi, trang khách, Đã gửi; API đưa vào `server.ts` của mô-đun; nhập Excel không AI                                                               | Audit: hở ở giữa. Tỉ lệ vá cao: nhập 47 %, hồ sơ căn 37 %, bảng hàng 29 %             |
+| **Để sau, theo đợt MVP** | Cửa lead và nhà Liên hệ (đợt 2); phát rộng, sàn tự cấu hình trừ Người dùng và Thuế phí, nhập có AI (đợt 3); thấp tầng; xác nhận danh mục                                             | `mvp-mo-dan.md`; cửa lead là đoạn yếu nhất                                            |
+| **Không mang**           | Đội, Lịch xem (mới là trang giữ chỗ); 168 hồ sơ nghiệm thu; lộ trình và bản đồ cũ; mã bài thử; cơ chế ghim lại                                                                       | 13 % commit chỉ để ghim và vẽ lại                                                     |
 
 **Hệ quả:**
 
-- Mô-đun `leads`, `exports`, `notifications`, `sync` rút khỏi bản đồ tới khi tới đợt của chúng; còn lại chín mô-đun.
+- Mô-đun `leads`, `exports`, `notifications` rút khỏi bản đồ tới khi tới đợt của chúng; `sync` (chế độ ngoại tuyến) chỉ quay lại sau MVP; còn lại chín mô-đun.
 - Mỗi phần mang sang ghi commit nguồn. Sao chép một chiều nên **không cần đóng băng** Quỹ hàng.
 - Chỉ chuyển test của phần được mang, và test phải đỏ được khi phá.
-- **Dữ liệu:** dùng lược đồ mới, gọn theo phạm vi, thay vì chép 47 migration. Quỹ hàng mới có khoảng 3 sàn nên chuyển dữ liệu bằng lệnh một lần còn rẻ, và là lúc sửa tên chồng nghĩa (Lead, Cơ hội) cùng các chỗ lệch RESO. Số chủ nhà phải giữ đúng khoá mã hoá hoặc mã hoá lại.
-- **Quỹ hàng dừng thêm tính năng từ bây giờ, chỉ vá lỗi**, rồi được thay khi kho mới ra MVP. Số dùng thật của đợt đầu là bằng chứng còn thiếu để xác nhận hay sửa bảng trên.
+- **Dữ liệu:** dùng lược đồ mới, gọn theo phạm vi, thay vì chép 47 migration. Quỹ hàng mới có khoảng 3 sàn nên chuyển dữ liệu bằng lệnh một lần còn rẻ, và là lúc sửa tên chồng nghĩa (Lead, Cơ hội) cùng các chỗ lệch RESO. Số chủ nhà đang mã hoá ở Quỹ hàng được giải mã trong lệnh chuyển và lưu dạng rõ ở MVP, theo quyết định 0014.
+- **Quỹ hàng dừng thêm tính năng từ 09/11/2026, chỉ vá lỗi** (chủ kho đã xác nhận), rồi được thay khi kho mới ra MVP. Số dùng thật của đợt đầu là bằng chứng còn thiếu để xác nhận hay sửa bảng trên.
 
 ## Cắt gọn cho MVP
 
 Đề xuất để chủ kho gạch một lần. Đích là đợt «bỏ Sheet, gửi link» của `mvp-mo-dan.md`: một sàn, một khu căn hộ.
 
-| Nhóm             | Giữ                                                        | Cắt hoặc để sau                                    |
-| ---------------- | ---------------------------------------------------------- | -------------------------------------------------- |
-| Đăng nhập        | Mã qua email, mời người                                    | Mật khẩu, mật khẩu tạm                             |
-| Vai              | Đầu chủ, Đầu khách, Trưởng nhóm, Quản trị sàn              | Telesales                                          |
-| Dữ liệu trên máy | Bản đọc nhanh                                              | Ghi khi mất mạng, thay đổi chờ gửi, «Cần xem»      |
-| Đưa hàng vào     | Excel có xem trước và hoàn tác, gõ mã căn, tạo căn tay     | Nhớ mẫu, nhập có AI, thấp tầng                     |
-| Bảng hàng        | Bảng, sửa ô, dán từ Excel, hồ sơ cạnh bảng, thẻ điện thoại | Góc nhìn lưu, sửa hàng loạt, đổi đầu chủ hàng loạt |
-| Giữ tươi         | Hôm nay một danh sách việc, kết quả gọi, Sẵn sàng bán, ảnh | Gọi điều chỉnh giá, ba màn Hôm nay riêng theo vai  |
-| Phát cho khách   | Gửi, trang khách, Đã gửi, lưu khách                        | Xuất bảng, nhóm môi giới, mẫu bài                  |
-| Cấu hình sàn     | Người dùng, Thuế phí; còn lại là hằng số trong mã          | Cách gọi, trạng thái riêng, trường riêng, từ điển  |
-| Thoả thuận       | Chỉ nguồn danh mục                                         | Các loại kết nối khác                              |
-| Mở dần           | Không cần cờ: phần chưa làm không có trong mã              | Ba cờ, trang `/ops` đầy đủ; giữ một lệnh đọc số đo |
+| Nhóm             | Giữ                                                        | Cắt hoặc để sau                                                                                              |
+| ---------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Đăng nhập        | Mã qua email, mời người                                    | Mật khẩu, mật khẩu tạm                                                                                       |
+| Vai              | Đầu chủ, Đầu khách, Trưởng nhóm, Quản trị sàn              | Telesales                                                                                                    |
+| Dữ liệu trên máy | Không có, mọi màn đọc từ máy chủ                           | Toàn bộ chế độ ngoại tuyến, chỉ làm sau MVP: bản đọc trên máy, ghi khi mất mạng, thay đổi chờ gửi, «Cần xem» |
+| Giao diện        | Sáng và tối; điện thoại dùng thanh bên thu gọn             | Đổi sàn trong ứng dụng, thanh dưới trên điện thoại                                                           |
+| Đưa hàng vào     | Excel có xem trước và hoàn tác, gõ mã căn, tạo căn tay     | Nhớ mẫu, nhập có AI, thấp tầng                                                                               |
+| Bảng hàng        | Bảng, sửa ô, dán từ Excel, hồ sơ cạnh bảng, thẻ điện thoại | Góc nhìn lưu, sửa hàng loạt, đổi đầu chủ hàng loạt                                                           |
+| Giữ tươi         | Hôm nay một danh sách việc, kết quả gọi, Sẵn sàng bán, ảnh | Gọi điều chỉnh giá, ba màn Hôm nay riêng theo vai                                                            |
+| Phát cho khách   | Gửi, trang khách, Đã gửi, lưu khách                        | Xuất bảng, nhóm môi giới, mẫu bài                                                                            |
+| Cấu hình sàn     | Người dùng, Thuế phí; còn lại là hằng số trong mã          | Cách gọi, trạng thái riêng, trường riêng, từ điển                                                            |
+| Thoả thuận       | Chỉ nguồn danh mục                                         | Các loại kết nối khác                                                                                        |
+| Mở dần           | Không cần cờ: phần chưa làm không có trong mã              | Ba cờ, trang `/ops` đầy đủ; giữ một lệnh đọc số đo                                                           |
 
-Kiến trúc vẫn giữ chỗ cho phần bị cắt: bốn bất biến, cách ly theo sàn, API một cửa, ranh giới mô-đun và khoá `display` đều có từ đầu.
+Kiến trúc vẫn giữ chỗ cho phần bị cắt: ba bất biến, cách ly theo sàn, API một cửa, ranh giới mô-đun và khoá `display` đều có từ đầu.
 
 ## Nhận diện: OneHub DS kết hợp ReUI Pro và shadcn
 
@@ -347,7 +348,7 @@ Bảng quyết định và cách phân loại khoá trước ở chặng A. Ngư
 
 | Nhóm | Thước đo                                                      | Gốc                                      | Ngưỡng                   | Căn cứ ngưỡng                                   |
 | ---- | ------------------------------------------------------------- | ---------------------------------------- | ------------------------ | ----------------------------------------------- |
-| H    | Tỉ lệ tất định                                                | 35 % (17/49)                             | Từ 70 %                  | Audit: 70 % mục tự đoán đáng ra hệ phải trả lời |
+| H    | Tỉ lệ tất định                                                | 26/44 tại kho mới, không so với Quỹ hàng | Từ 70 %                  | Audit: 70 % mục tự đoán đáng ra hệ phải trả lời |
 | P    | Đồng thuận giữa các tác tử (Fleiss κ) trên bảng đã khoá       | 76 % đồng thuận thô (16/21), chưa tính κ | κ từ 0,81                | Thang Landis và Koch                            |
 | P    | Quyết định giống nhau nhưng mang lỗi                          | 6/21                                     | 0                        | Mỗi điểm là một lỗi                             |
 | P    | Mục hệ đáng ra phải trả lời mà máy tự đoán, mỗi tác tử        | 12–15                                    | Tối đa 4                 | 30 % số gốc, theo tỉ lệ audit                   |

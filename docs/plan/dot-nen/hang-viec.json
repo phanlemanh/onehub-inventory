@@ -1,0 +1,130 @@
+{
+  "dot": "nen",
+  "muc_tieu": "Dựng nền thiết kế, Bảng hàng trên dữ liệu mẫu và nền thật gồm cách ly sàn, đăng nhập, mời người, để các màn MVP đứng trên một chuẩn",
+  "day": [
+    {
+      "id": "G",
+      "worktree": "/CHUA-CO-WORKTREE/G",
+      "link": ""
+    },
+    {
+      "id": "D",
+      "worktree": "/CHUA-CO-WORKTREE/D",
+      "link": ""
+    },
+    {
+      "id": "N",
+      "worktree": "/CHUA-CO-WORKTREE/N",
+      "link": ""
+    }
+  ],
+  "hang": [
+    {
+      "ma": "1a",
+      "tep": "docs/plan/lo-trinh.json",
+      "slug": "khung-va-giao-dien",
+      "day": "G",
+      "uu_tien": 0,
+      "s4": "local",
+      "ranh_gioi": [
+        "_acceptance/khung-va-giao-dien/**",
+        "src/components/templates/**",
+        "src/styles/**"
+      ]
+    },
+    {
+      "ma": "1b",
+      "tep": "docs/plan/lo-trinh.json",
+      "slug": "luoi-va-o-theo-kieu",
+      "day": "G",
+      "uu_tien": 1,
+      "s4": "local",
+      "ranh_gioi": ["_acceptance/luoi-va-o-theo-kieu/**", "src/components/candidate/**"]
+    },
+    {
+      "ma": "1c",
+      "tep": "docs/plan/lo-trinh.json",
+      "slug": "cong-chon-khoi-ba-loi",
+      "day": "G",
+      "uu_tien": 2,
+      "s4": "local",
+      "ranh_gioi": [
+        "_acceptance/cong-chon-khoi-ba-loi/**",
+        "tools/design_blocks/**",
+        ".claude/skills/inventory-ui/**"
+      ]
+    },
+    {
+      "ma": "2",
+      "tep": "docs/plan/lo-trinh.json",
+      "slug": "bang-hang-ban-doc",
+      "day": "G",
+      "uu_tien": 3,
+      "s4": "local",
+      "ranh_gioi": ["_acceptance/bang-hang-ban-doc/**", "src/modules/listings/ui/**"]
+    },
+    {
+      "ma": "1",
+      "tep": "docs/plan/lo-trinh.json",
+      "slug": "du-lieu-mau",
+      "day": "D",
+      "uu_tien": 0,
+      "s4": "local",
+      "ranh_gioi": ["_acceptance/du-lieu-mau/**", "src/modules/listings/**"]
+    },
+    {
+      "ma": "3",
+      "tep": "docs/plan/lo-trinh.json",
+      "slug": "ho-so-can",
+      "day": "D",
+      "uu_tien": 1,
+      "s4": "local",
+      "ranh_gioi": ["_acceptance/ho-so-can/**", "src/modules/listings/ui/**"]
+    },
+    {
+      "ma": "6",
+      "tep": "docs/plan/lo-trinh.json",
+      "slug": "da-gui-tren-luoi",
+      "day": "D",
+      "uu_tien": 2,
+      "s4": "local",
+      "ranh_gioi": [
+        "_acceptance/da-gui-tren-luoi/**",
+        "src/modules/sharing/ui/**",
+        "src/components/candidate/**"
+      ]
+    },
+    {
+      "ma": "7",
+      "tep": "docs/plan/lo-trinh.json",
+      "slug": "cach-ly-moi-san",
+      "day": "N",
+      "uu_tien": 0,
+      "s4": "local",
+      "ranh_gioi": ["_acceptance/cach-ly-moi-san/**", "src/modules/identity/**", "db/migrations/**"]
+    },
+    {
+      "ma": "8",
+      "tep": "docs/plan/lo-trinh.json",
+      "slug": "dang-nhap-ma-email",
+      "day": "N",
+      "uu_tien": 1,
+      "s4": "local",
+      "ranh_gioi": ["_acceptance/dang-nhap-ma-email/**", "src/modules/identity/**"]
+    },
+    {
+      "ma": "9",
+      "tep": "docs/plan/lo-trinh.json",
+      "slug": "moi-nguoi-gan-vai",
+      "day": "N",
+      "uu_tien": 2,
+      "s4": "local",
+      "ranh_gioi": [
+        "_acceptance/moi-nguoi-gan-vai/**",
+        "src/modules/identity/**",
+        "src/modules/company-config/**"
+      ]
+    }
+  ],
+  "ngoai_hang_merge": []
+}

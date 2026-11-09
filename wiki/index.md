@@ -39,6 +39,8 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0011 Quyền của agent](decisions/0011-agent-governance.md)
 - [0012 Chuẩn ngôn ngữ của sản phẩm](decisions/0012-product-language-standard.md)
 - [0013 Phạm vi chọn lọc và nền thiết kế](decisions/0013-selective-scope-and-design-foundation.md)
+- [0014 Ba luật sản phẩm cho MVP](decisions/0014-mvp-product-rules.md)
+- [0015 Rào thiết kế phải đỏ được](decisions/0015-measurable-design-gate.md)
 
 ## Incidents
 

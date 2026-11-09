@@ -53,7 +53,7 @@ Tính năng MVP, kho GitHub, job cổng trong CI, ánh xạ thang rủi ro, tri�
 - SaaS API-first: /api/v1 có OpenAPI là đường ghi duy nhất; thêm bước so bản mô tả API để phát hiện thay đổi phá vỡ, vì bộ khung chỉ có bước này ở archetype service-api.
 - Chuyển phần che số chủ nhà trước khi gửi cho mô hình và hai bộ kiểm rò rỉ của đường AI cùng lúc với lời gọi. Đoạn mã này xếp mức rủi ro cao.
 - Bộ khung dùng Vitest, kho cũ dùng node:test với 417 tệp: đổi dòng import bằng codemod khi chuyển từng mô-đun, giữ nguyên node:assert. Test chạm cơ sở dữ liệu chạy tuần tự trong một cấu hình Vitest riêng.
-- Lược đồ mới, gọn theo phạm vi MVP, thay vì chép 47 migration của Quỹ hàng; chuyển dữ liệu bằng lệnh một lần, giữ đúng khoá mã hoá số chủ nhà.
+- Lược đồ mới, gọn theo phạm vi MVP, thay vì chép 47 migration của Quỹ hàng; chuyển dữ liệu bằng lệnh một lần; số chủ nhà được giải mã và lưu dạng rõ ở MVP (quyết định 0014).
 - Mang từ Quỹ hàng từ vựng và các ADR còn hiệu lực, mỗi phần ghi commit nguồn.
 - Sửa khi chuyển: LeaseAmountMax dựng trên LeaseAmount, mà RESO định nghĩa là tiền thuê mặt bằng doanh nghiệp đang trả, không phải giá cho thuê của căn; các tên *Min/*Max của tiêu chí tìm là tên suy ra, không phải trường RESO.
 - Chốt khi chuyển mô-đun catalog: toà ánh xạ tài nguyên Building mới có ở 2.1; căn cho thuê có dùng PropertyType Residential Lease hay không; ngăn ảnh internal ánh xạ giá trị Permission nào vì RESO không có giá trị Internal.

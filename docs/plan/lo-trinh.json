@@ -24,14 +24,83 @@
       "du_lieu": "sinh-gia"
     },
     {
+      "ma": "1a",
+      "cau_giao": "Nhân viên sàn mở ứng dụng ở giao diện sáng hoặc tối, luôn biết mình đang ở màn nào và được báo đúng chỗ khi có sự cố",
+      "vai": "Nhân viên sàn",
+      "tieu_chi": 12,
+      "vi_sao": "Khung, định dạng và thông báo là phần mọi màn đều đứng trên",
+      "slug": "khung-va-giao-dien",
+      "hang": "T2",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "F5"
+      ],
+      "vung": [
+        "src/components/templates/**",
+        "src/styles/**"
+      ],
+      "ghi_chu": "Chủ kho duyệt gộp phần khung, định dạng và thông báo vào một hàng; cỡ 12 nằm trong mức cho phép"
+    },
+    {
+      "ma": "1b",
+      "cau_giao": "Mọi vùng dữ liệu dùng chung Lưới, ô theo kiểu, đầu vùng và đủ trạng thái",
+      "vai": "nen",
+      "tieu_chi": 10,
+      "vi_sao": "Khoá đúng chỗ các tác tử từng làm lệch nhau ở Quỹ hàng",
+      "hang": "T2",
+      "dung_tren": [
+        "1a"
+      ],
+      "slug": "luoi-va-o-theo-kieu",
+      "bat_khi": "Hai cột cùng kiểu luôn ra cùng canh lề, bề rộng và định dạng; mỗi trạng thái vùng có bài kiểm đỏ được khi phá",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "F6",
+        "F7"
+      ],
+      "vung": [
+        "src/components/candidate/**"
+      ]
+    },
+    {
+      "ma": "1c",
+      "cau_giao": "Vòng giao diện có ô chưa có khuôn phải trình đủ ba lối Trong kho, ReUI, Vẽ mới trước khi dựng",
+      "vai": "nen",
+      "tieu_chi": 10,
+      "vi_sao": "Không có cổng này thì agent tự chọn giữa khối ReUI và vẽ tay mà không ai thấy; chuyển từ cổng chọn khối của Quỹ hàng, ghi commit nguồn",
+      "hang": "T3",
+      "dung_tren": [
+        "1b"
+      ],
+      "slug": "cong-chon-khoi-ba-loi",
+      "bat_khi": "Vòng có ô chưa có khuôn mà thiếu trang ba lối thì bài chấm đỏ; chỗ vẽ mới thiếu điều đã tra, lý do hoặc hạn xem lại thì bài kiểm đỏ; khối đã cài mà thiếu dòng trong danh mục thì đỏ",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "F8"
+      ],
+      "vung": [
+        "tools/design_blocks/**",
+        ".claude/skills/inventory-ui/**"
+      ]
+    },
+    {
       "ma": "2",
       "cau_giao": "Đầu chủ mở Bảng hàng và thấy các căn của sàn trên Lưới, đủ trạng thái màn, ở bốn khổ màn hình",
       "vai": "Đầu chủ",
-      "tieu_chi": 10,
+      "tieu_chi": 8,
       "vi_sao": "Lát cắt đầu, là màn mẫu cho các màn sau",
       "hang": "T2",
       "dung_tren": [
-        "1"
+        "1",
+        "1b",
+        "1c"
       ],
       "slug": "bang-hang-ban-doc",
       "nhom": "bang-hang",
@@ -40,8 +109,7 @@
         "B1"
       ],
       "vung": [
-        "src/modules/listings/ui/**",
-        "src/components/candidate/**"
+        "src/modules/listings/ui/**"
       ],
       "du_lieu": "gia"
     },
@@ -70,7 +138,7 @@
       "ma": "4",
       "cau_giao": "Đầu chủ sửa giá và trạng thái ngay trên ô, thấy lỗi ngay tại ô đó",
       "vai": "Đầu chủ",
-      "tieu_chi": 9,
+      "tieu_chi": 10,
       "vi_sao": "Thay thao tác sửa trên Sheet",
       "hang": "T2",
       "dung_tren": [
@@ -80,7 +148,8 @@
       "nhom": "bang-hang",
       "dot": "mvp-dot-1",
       "phu": [
-        "B4"
+        "B4",
+        "B6"
       ],
       "vung": [
         "src/modules/listings/ui/**",
@@ -154,7 +223,7 @@
       "ma": "8",
       "cau_giao": "Nhân viên sàn nhập mã gửi qua email và vào đúng sàn của mình",
       "vai": "Nhân viên sàn",
-      "tieu_chi": 9,
+      "tieu_chi": 10,
       "vi_sao": "Đăng nhập là lớp khó đảo, tách riêng khỏi quyền",
       "hang": "T3",
       "dung_tren": [
@@ -164,7 +233,8 @@
       "nhom": "nen",
       "dot": "mvp-dot-1",
       "phu": [
-        "N2"
+        "N2",
+        "N6"
       ],
       "vung": [
         "src/modules/identity/**"
@@ -325,7 +395,7 @@
       "ma": "16",
       "cau_giao": "Đầu khách chọn căn, tạo link và tự bấm gửi qua bảng chia sẻ của thiết bị",
       "vai": "Đầu khách",
-      "tieu_chi": 9,
+      "tieu_chi": 10,
       "vi_sao": "Luật SP-3: người luôn là người bấm gửi",
       "hang": "T3",
       "dung_tren": [
@@ -335,7 +405,8 @@
       "nhom": "phat-khach",
       "dot": "mvp-dot-1",
       "phu": [
-        "K1"
+        "K1",
+        "K7"
       ],
       "vung": [
         "src/modules/sharing/**"
@@ -345,7 +416,7 @@
       "ma": "17",
       "cau_giao": "Khách mở link trên điện thoại, kể cả trong Zalo, và chỉ thấy các căn được gửi với thông tin công khai",
       "vai": "Khách",
-      "tieu_chi": 10,
+      "tieu_chi": 11,
       "vi_sao": "Luật SP-4: dữ liệu công khai dựng từ luật ẩn",
       "hang": "T3",
       "dung_tren": [
@@ -356,12 +427,14 @@
       "dot": "mvp-dot-1",
       "phu": [
         "K2",
-        "K3"
+        "K3",
+        "K8"
       ],
       "vung": [
         "src/app/s/**",
         "src/modules/sharing/**"
-      ]
+      ],
+      "ghi_chu": "Trang khách và các trạng thái của link là một kết quả, tách ra thì không giao được riêng"
     },
     {
       "ma": "18",
@@ -564,6 +637,16 @@
         "L11"
       ],
       "mo_lai_khi": "Có sàn không nhận được email ổn định"
+    },
+    {
+      "ma": "H12",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Nhân viên làm cho hai sàn đổi sàn ngay trong ứng dụng",
+      "ly_do": "Đợt 1 chỉ có một sàn, chủ kho đồng ý chưa làm",
+      "phu": [
+        "L12"
+      ],
+      "mo_lai_khi": "Có người thật làm cho hai sàn"
     }
   ],
   "da_bac": [
