@@ -2,7 +2,8 @@
 # Enforced by tools/boundaries.py in `make check`. Changing this file is a design decision:
 # record it in wiki/decisions/.
 #
-# MVP scope. leads, exports, notifications and sync return when their release comes (docs/design-standard-proposal.md).
+# MVP scope. leads, exports and notifications return when their release comes; sync (offline mode) only after the MVP
+# (docs/design-standard-proposal.md).
 # Dependencies are left empty and are added as each module is built.
 modules:
   - name: identity
@@ -14,7 +15,7 @@ modules:
     owns: []
     depends_on: []
   - name: agreements
-    description: Connection kinds, data classes and their ceilings, agreements
+    description: Connection kinds and agreements
     owns: [Agreement]
     depends_on: []
   - name: catalog

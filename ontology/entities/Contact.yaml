@@ -9,10 +9,6 @@ properties:
   contactTypes: { type: string, required: true, display: select, reso: ContactType }
   ownerMemberKey: { type: string }
 
-rules:
-  - id: source-stays-in-company
-    description: Owner details belong to the source data class and never leave the company.
-
 code:
   model: src/modules/contacts/
   tests: tests/

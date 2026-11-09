@@ -14,7 +14,7 @@ Cho phép một loại kết nối chảy theo một chiều, cho các lớp d�
 
 ## Rules
 
-Không thoả thuận nào được chứa lớp `source`; chặn ở cả luật lõi và cơ sở dữ liệu. Mọi kết nối là một thoả thuận, không
+Ở MVP, thoả thuận chỉ dùng cho nguồn danh mục, xem [0014](../decisions/0014-mvp-product-rules.md). Mọi kết nối là một thoả thuận, không
 viết mã riêng cho từng bên.
 
 ## Where in the code
@@ -23,4 +23,4 @@ viết mã riêng cho từng bên.
 
 ## History
 
-Lấy từ từ vựng của Quỹ hàng khi dựng kho, 09/11/2026.
+Lấy từ từ vựng của Quỹ hàng khi dựng kho, 09/11/2026. Bỏ luật chặn lớp `source` cho MVP cùng ngày.

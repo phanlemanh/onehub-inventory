@@ -3,22 +3,23 @@ description: A physical apartment, house or plot in the shared catalog; shared b
 reso: none as a resource; fields follow RESO Property (UnitNumber, BuildingName, SubdivisionName, LivingArea, BedroomsTotal, DirectionFaces, PropertyType, PropertySubType)
 
 properties:
-  upi: { type: string, required: true, unique: true }
-  subdivisionKey: { type: string, required: true }
-  buildingKey: { type: string, required: true }
-  buildingName: { type: string, required: true }
-  unitNumber: { type: string, required: true }
-  stack: { type: string }
+  upi: { type: string, required: true, unique: true, display: none }
+  subdivisionKey: { type: string, required: true, display: none }
+  buildingKey: { type: string, required: true, display: none }
+  buildingName: { type: string, required: true, display: text }
+  unitNumber: { type: string, required: true, display: text }
+  stack: { type: string, display: text }
   floor: { type: integer, display: count }
   livingArea: { type: number, min: 0, display: area, reso: LivingArea }
   bedroomsTotal: { type: integer, min: 0, display: count, reso: BedroomsTotal }
-  directionFaces: { type: string }
-  propertyType: { type: enum, values: [Residential, Land], required: true }
+  directionFaces: { type: string, display: text }
+  propertyType: { type: enum, values: [Residential, Land], required: true, display: select }
   propertySubType:
     {
       type: enum,
       values: [Condominium, Townhouse, Single Family Residence, Unimproved Land],
       required: true,
+      display: select,
     }
 
 code:

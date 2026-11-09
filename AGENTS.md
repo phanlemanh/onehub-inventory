@@ -10,10 +10,8 @@ Playwright. This repo replaces onehub-quy-hang for the MVP and takes only select
 1. **Companies are isolated.** Every company table has `company_id` and forced row level security. All queries go
    through one door, `withCompany`, under a role that does not own the tables. Only the `identity` module is exempt,
    because one person can belong to several companies.
-2. **Owner information never leaves the company.** The `source` data class is capped at `never_leaves_company` in code
-   and in a database constraint.
-3. **A person always presses send.** No sending through personal Zalo, no posting to groups, no automatic replies.
-4. **Internal data never reaches the customer page.** Public data is built from the redaction rule, not hidden in the UI.
+2. **A person always presses send.** No sending through personal Zalo, no posting to groups, no automatic replies.
+3. **Internal data never reaches the customer page.** Public data is built from the redaction rule, not hidden in the UI.
 
 ## SaaS and domain rules
 
@@ -23,6 +21,7 @@ Playwright. This repo replaces onehub-quy-hang for the MVP and takes only select
 - Per-company differences are data in `company-config`, within the limits of ADR-0018: no custom objects, no formulas,
   no general rules or workflow engine. A connection is an `Agreement`, never code written for one party.
 - `/api/v1` is the only write path.
+- Offline mode comes after the MVP. Until then: no copy of company data kept on the device, no writes while offline.
 - Schema changes are new numbered migrations in `db/migrations/`. A committed migration is never edited.
 - No real personal data in the repo: tests, fixtures and docs use `[Tên]` and `0900 000 0xx`.
 
@@ -45,6 +44,7 @@ Playwright. This repo replaces onehub-quy-hang for the MVP and takes only select
 - `make ontology` — check `ontology/` + `wiki/` consistency and generated code
 - `make check` — everything CI runs. **Run it before you say a task is done.**
 - `make e2e` — browser tests at four screen sizes, for visible changes
+- `make db-up` / `make db-down` — disposable Postgres for one lane (`DB_LANE`, `DB_PORT`)
 
 ## Before you change code
 

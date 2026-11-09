@@ -22,7 +22,7 @@ properties:
   withdrawnReason:
     { type: enum, values: [sold_elsewhere, owner_changed_mind, unreachable], display: select }
   lastConfirmedAt: { type: datetime, display: datetime }
-  version: { type: integer, min: 1, required: true }
+  version: { type: integer, min: 1, required: true, display: none }
 
 rules:
   - id: closed-needs-price-and-date

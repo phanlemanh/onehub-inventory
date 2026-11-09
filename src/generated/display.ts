@@ -14,8 +14,14 @@ export const FIELD_DISPLAY = {
   "Listing.unitNumber": "text",
   "Listing.withdrawnReason": "select",
   "Unit.bedroomsTotal": "count",
+  "Unit.buildingName": "text",
+  "Unit.directionFaces": "text",
   "Unit.floor": "count",
   "Unit.livingArea": "area",
+  "Unit.propertySubType": "select",
+  "Unit.propertyType": "select",
+  "Unit.stack": "text",
+  "Unit.unitNumber": "text",
 } as const satisfies Record<string, DisplayKind>;
 
 export const RIGHT_ALIGNED_KINDS: readonly DisplayKind[] = ["money", "area", "count"];
