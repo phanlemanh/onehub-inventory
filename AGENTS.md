@@ -26,6 +26,14 @@ moved from onehub-quy-hang; this repo is a scaffold until then.
 - Schema changes are new numbered migrations, and until cutover onehub-quy-hang is the only repo that writes them.
 - No real personal data in the repo: tests, fixtures and docs use `[Tên]` and `0900 000 0xx`.
 
+## Product language
+
+- User-facing words come from `ontology/labels.yaml`, by concept. Never hard-code a label in `src/`; `make check` fails.
+- Keep three concepts apart: transaction side (`ListSide`, `BuyerSide`), agent (`ListAgent`, `BuyerAgent`), party
+  (`Seller`, `Landlord`, `Buyer`, `Tenant`). "Bên bán" and "Bên mua" are legal parties, not agents.
+- Internal labels never reach the customer page. Legal text uses the words of the law.
+- Rules for choosing a label and for writing Vietnamese: `design/language.md`.
+
 ## Commands (always use these, never ad-hoc tool invocations)
 
 - `make setup` — install dependencies from the lockfile

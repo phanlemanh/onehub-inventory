@@ -1,0 +1,194 @@
+# Display labels of the product, one entry per concept. Model: SKOS (one preferred label, many alternatives).
+# Rules and how to change them: design/language.md. Checked by tests/language.test.ts.
+#
+#   kind   entity | role | side | party | status | surface | action | field
+#   reso   RESO Data Dictionary 2.1 name. A concept with no RESO name sets `own: true` instead.
+#   pref   preferred label, the default everywhere
+#   lease  label used when the listing is for lease, for labels that say "bán"
+#   alt    alternative labels: searchable, and a company may choose one
+#   en     English display label
+#   avoid  words that must not be used for this concept
+version: 1
+concepts:
+  Company:
+    kind: entity
+    own: true
+    pref: Sàn
+    en: Brokerage
+  Unit:
+    kind: entity
+    own: true
+    pref: Căn
+    en: Unit
+  Listing:
+    kind: entity
+    reso: Property
+    pref: Hàng
+    en: Listing
+    avoid: [Tin]
+  Contact:
+    kind: entity
+    reso: Contacts
+    pref: Liên hệ
+    en: Contact
+    avoid: [Danh bạ]
+  Agreement:
+    kind: entity
+    own: true
+    pref: Thoả thuận
+    en: Agreement
+    avoid: [Tích hợp]
+  Subdivision:
+    kind: entity
+    reso: SubdivisionName
+    pref: Khu
+    en: Subdivision
+    avoid: [Dự án]
+  Building:
+    kind: entity
+    reso: BuildingName
+    pref: Toà
+    en: Building
+  ListSide:
+    kind: side
+    own: true
+    pref: Phía chủ
+    alt: [Bên bán]
+    en: Listing side
+  BuyerSide:
+    kind: side
+    own: true
+    pref: Phía khách
+    alt: [Bên mua]
+    en: Buyer side
+  ListAgent:
+    kind: role
+    reso: ListAgent
+    pref: Đầu chủ
+    alt: [Môi giới bên bán]
+    en: Listing agent
+    avoid: [Selling agent]
+  BuyerAgent:
+    kind: role
+    reso: BuyerAgent
+    pref: Đầu khách
+    alt: [Môi giới bên mua]
+    en: "Buyer's agent"
+    avoid: [Selling agent]
+  TeamLead:
+    kind: role
+    own: true
+    pref: Trưởng nhóm
+    en: Team lead
+  CompanyAdmin:
+    kind: role
+    own: true
+    pref: Quản trị sàn
+    en: Company admin
+  OwnerMember:
+    kind: role
+    reso: OwnerMemberKey
+    pref: Người giữ
+    en: Owner member
+    avoid: [Chủ sở hữu]
+  Seller:
+    kind: party
+    reso: ContactType.Seller
+    pref: Chủ bán
+    alt: [Chủ nhà]
+    en: Seller
+  Landlord:
+    kind: party
+    reso: ContactType.Landlord
+    pref: Chủ cho thuê
+    alt: [Chủ nhà]
+    en: Landlord
+  Buyer:
+    kind: party
+    reso: ContactType.Buyer
+    pref: Người mua
+    alt: [Khách mua]
+    en: Buyer
+  Tenant:
+    kind: party
+    reso: ContactType.Tenant
+    pref: Người thuê
+    alt: [Khách thuê]
+    en: Tenant
+  StatusIncomplete:
+    kind: status
+    reso: StandardStatus.Incomplete
+    pref: Chưa đủ để rao
+    en: Incomplete
+  StatusActive:
+    kind: status
+    reso: StandardStatus.Active
+    pref: Đang bán
+    lease: Đang cho thuê
+    en: Active
+  StatusPending:
+    kind: status
+    reso: StandardStatus.Pending
+    pref: Đang giao dịch
+    en: Pending
+  StatusClosed:
+    kind: status
+    reso: StandardStatus.Closed
+    pref: Đã bán
+    lease: Đã cho thuê
+    en: Closed
+  StatusHold:
+    kind: status
+    reso: StandardStatus.Hold
+    pref: Tạm ngừng
+    en: Hold
+  StatusWithdrawn:
+    kind: status
+    reso: StandardStatus.Withdrawn
+    pref: Ngừng hẳn
+    en: Withdrawn
+  Today:
+    kind: surface
+    own: true
+    pref: Hôm nay
+    en: Today
+  Inventory:
+    kind: surface
+    own: true
+    pref: Bảng hàng
+    en: Inventory
+    avoid: [Quỹ hàng]
+  Sent:
+    kind: surface
+    own: true
+    pref: Đã gửi
+    en: Sent
+  CustomerPage:
+    kind: surface
+    own: true
+    pref: Trang khách
+    en: Customer page
+  ReadyToList:
+    kind: action
+    own: true
+    pref: Sẵn sàng bán
+    lease: Sẵn sàng cho thuê
+    en: Ready to list
+    avoid: [Duyệt]
+  ClosePrice:
+    kind: field
+    reso: ClosePrice
+    pref: Giá chốt
+    en: Close price
+  CloseDate:
+    kind: field
+    reso: CloseDate
+    pref: Ngày bán
+    lease: Ngày cho thuê
+    en: Close date
+  LoginCode:
+    kind: field
+    own: true
+    pref: Mã đăng nhập
+    en: Login code
+    avoid: [Mật khẩu]
