@@ -16,7 +16,11 @@ nguon: wiki/dot/mvp-dot-1.md#7f664a75f65a948e220323281b15ca00c9353c93
 - `F5` — giao diện sáng và tối
 - `F6` — thành phần trạng thái vùng dữ liệu: chờ tải, trống, tìm không ra, lỗi
 - `F7` — ô theo kiểu, đầu vùng, Lưới, tìm lọc và chia trang, luật ô chỉ đọc
-- `F8` — cổng chọn khối ba lối ở Cổng Phạm vi: Trong kho, ReUI, Vẽ mới, có bài chấm, luật vẽ mới và danh mục khối đã chuyển thể
+- `F8` — cổng chứng minh ở Cổng Phạm vi: bản thật đặt cạnh màn mẫu, bảng lệch có căn cứ, thang Trong kho → ReUI → Vẽ tay, họ màn mới trình hai đến ba hướng, bản đồ khuôn
+- `F9` — hồ sơ cạnh bảng, lọc rỗng, chờ tải, lỗi, lưu và hoàn tác chỉ có một cách dựng, màn chỉ khai mình cần gì
+- `F10` — bộ bài kiểm trạng thái sinh từ sổ màn, kèm bài phá thử
+- `F11` — danh mục ReUI Pro máy đọc được, ghim theo phiên bản
+- `F12` — bản số đo mỗi vòng giao diện, báo theo tầng, và mốc đối chứng ba agent
 - `N1` — mỗi sàn chỉ đọc và ghi được dữ liệu của mình, mọi truy vấn đi qua một cửa
 - `N2` — đăng nhập bằng mã qua email
 - `N3` — Quản trị sàn mời người và gán bốn vai Đầu chủ, Đầu khách, Trưởng nhóm, Quản trị sàn

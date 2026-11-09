@@ -4,7 +4,7 @@
 2. Bảng mới bật cách ly theo dòng trong cùng migration, tạo bằng `/new-migration`. Bộ kiểm cách ly xanh trên Postgres của dãy trước khi trình Cổng Bằng chứng.
 3. Migration lấy số kế tiếp tính trên `origin/main` lúc tạo. Trước khi gộp, gộp `origin/main` vào nhánh; trùng số thì đổi số của mình. Migration đã vào `main` thì không sửa.
 4. Dữ liệu cá nhân thật không vào kho, kể cả dữ liệu mẫu: `[Tên]`, `0900 000 0xx`, mọi bản ghi mang nhãn MAU.
-5. Cổng 3470 là của chủ kho. Mỗi dãy chạy dev và Postgres riêng: G → `PORT=3481`, D → `PORT=3483`, N → `PORT=3485` và `make db-up DB_LANE=n DB_PORT=5563`. Kiểm trình duyệt tự có cổng riêng theo từng worktree. Đầu mỗi lần thức, phiên giám sát kiểm Docker còn chạy trước khi cấp lượt `s4`.
+5. Cổng 3470 là của chủ kho. Mỗi dãy chạy dev và Postgres riêng: K → `PORT=3481`, H → `PORT=3487`, D → `PORT=3483`, N → `PORT=3485` và `make db-up DB_LANE=n DB_PORT=5563`. Kiểm trình duyệt tự có cổng riêng theo từng worktree. Đầu mỗi lần thức, phiên giám sát kiểm Docker còn chạy trước khi cấp lượt `s4`.
 6. Cấm `pkill -f`, `pkill -P`, `killall` lên `node`, `next`. Chỉ `kill <PID>` đúng tiến trình mình đã ghi lại. Cấm `docker rm` container không phải của dãy mình.
 7. Gộp `main` mà có đổi `package.json` hay `package-lock.json` thì chạy `npm ci` trước khi lên làn đo.
 8. Không bao giờ `gh pr merge --auto`. Gộp chỉ qua lệnh `gop` của đợt, dưới khoá `merge`.

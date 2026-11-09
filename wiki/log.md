@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-10 — Tối ưu hệ design theo số lần làm lại: thêm các hàng 1e, 1f, 1g, 1h, đổi hàng 1c, đợt nen còn bốn dãy — [0019](decisions/0019-measurable-design-system-pilot.md)
 - 2026-11-10 — Thử khối Vai × Màn ở mỗi vòng, thêm các hàng 1d, 9b vào lộ trình và đợt nen — [0017](decisions/0017-actor-surface-coverage-pilot.md)
 - 2026-11-10 — Chốt cơ chế thao tác và phân quyền của MVP, thêm các hàng 9a, 18a, 18b, 19a vào lộ trình — [0016](decisions/0016-permission-model.md)
 - 2026-11-09 — Prepared the first orchestrated batch: per-checkout test ports, lane databases, commit-message check for kit commits, verify and migration skills — [batch](../docs/plan/dot-nen/README.md).

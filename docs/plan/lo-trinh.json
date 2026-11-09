@@ -44,7 +44,10 @@
         "src/components/templates/**",
         "src/styles/**"
       ],
-      "ghi_chu": "Chủ kho duyệt gộp phần khung, định dạng và thông báo vào một hàng; cỡ 12 nằm trong mức cho phép"
+      "ghi_chu": "Chủ kho duyệt gộp phần khung, định dạng và thông báo vào một hàng; cỡ 12 nằm trong mức cho phép",
+      "dung_tren": [
+        "1h"
+      ]
     },
     {
       "ma": "1b",
@@ -69,24 +72,51 @@
       ]
     },
     {
-      "ma": "1c",
-      "cau_giao": "Vòng giao diện có ô chưa có khuôn phải trình đủ ba lối Trong kho, ReUI, Vẽ mới trước khi dựng",
-      "vai": "nen",
+      "ma": "1e",
+      "cau_giao": "Hồ sơ cạnh bảng, lọc rỗng, chờ tải, lỗi, lưu và hoàn tác chỉ có một cách dựng, màn chỉ khai mình cần gì",
       "tieu_chi": 10,
-      "vi_sao": "Không có cổng này thì agent tự chọn giữa khối ReUI và vẽ tay mà không ai thấy; chuyển từ cổng chọn khối của Quỹ hàng, ghi commit nguồn",
-      "hang": "T3",
+      "vi_sao": "Quyết định 0019: trạng thái và hành vi chiếm 36% số lần làm lại có đổi sản phẩm ở Quỹ hàng, đúng chỗ Bảng hàng lệch Liên hệ",
+      "hang": "T2",
       "dung_tren": [
         "1b"
       ],
-      "slug": "cong-chon-khoi-ba-loi",
-      "bat_khi": "Vòng có ô chưa có khuôn mà thiếu trang ba lối thì bài chấm đỏ; chỗ vẽ mới thiếu điều đã tra, lý do hoặc hạn xem lại thì bài kiểm đỏ; khối đã cài mà thiếu dòng trong danh mục thì đỏ",
+      "slug": "hanh-vi-trong-luoi-khung",
+      "bat_khi": "Sáu quyết định tầng hành vi đều có bài kiểm đỏ được; một màn tự dựng lại các hành vi này thì kiểm tra đỏ",
+      "phu": [
+        "F9"
+      ],
+      "vung": [
+        "src/components/candidate/**",
+        "src/components/templates/**",
+        "design/behaviors.md",
+        "design/states.md"
+      ],
+      "vai": "nen",
+      "nhom": "nen",
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "1c",
+      "cau_giao": "Vòng dựng màn phải chứng minh giải được và đồng nhất với màn mẫu trước khi trình, rời khỏi thang Trong kho, ReUI, Vẽ tay thì phải nêu căn cứ",
+      "vai": "nen",
+      "tieu_chi": 10,
+      "vi_sao": "Quyết định 0019: thay cổng chọn khối của Quỹ hàng, vốn chấm đồng nhất theo tên thành phần",
+      "hang": "T3",
+      "dung_tren": [
+        "1b",
+        "1d",
+        "1g"
+      ],
+      "slug": "cong-chung-minh-man-mau",
+      "bat_khi": "Màn thuộc họ đã có mà thiếu ảnh cạnh màn mẫu hoặc còn chỗ lệch vô cớ thì đỏ; họ mới thiếu hai hướng thì đỏ; rơi xuống bậc dưới mà thiếu căn cứ thì đỏ; phát lại ca màn Liên hệ của Quỹ hàng thì bị gắn cờ",
       "nhom": "nen",
       "dot": "mvp-dot-1",
       "phu": [
         "F8"
       ],
       "vung": [
-        "tools/design_blocks/**",
+        "design/patterns/**",
+        "tools/proof_gate/**",
         ".claude/skills/inventory-ui/**"
       ]
     },
@@ -114,6 +144,68 @@
       ]
     },
     {
+      "ma": "1f",
+      "cau_giao": "Mỗi màn trong sổ có sẵn bộ bài kiểm trạng thái sinh ra từ sổ, kèm bài phá thử chứng minh bài kiểm đỏ được",
+      "tieu_chi": 8,
+      "vi_sao": "Quyết định 0019: 55% số lần làm lại ở Quỹ hàng là bài kiểm và hạ tầng",
+      "hang": "T2",
+      "dung_tren": [
+        "1d",
+        "1e"
+      ],
+      "slug": "bo-bai-kiem-tu-so-man",
+      "bat_khi": "Thêm một màn vào sổ thì có bộ bài kiểm mà không viết tay; phá từng trạng thái thì bài kiểm tương ứng đỏ",
+      "phu": [
+        "F10"
+      ],
+      "vung": [
+        "tests/e2e/**",
+        "tools/e2e_templates/**"
+      ],
+      "vai": "nen",
+      "nhom": "nen",
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "1g",
+      "cau_giao": "Agent tra được danh mục ReUI Pro ngay trong kho theo phiên bản đã ghim, không phụ thuộc kết nối ngoài",
+      "tieu_chi": 6,
+      "vi_sao": "Quyết định 0019: thang ưu tiên chỉ đáng tin khi tra được thật",
+      "hang": "T2",
+      "slug": "danh-muc-reui",
+      "bat_khi": "Một lệnh sinh lại danh mục từ bản ReUI đã ghim; khối có trong danh mục mà tra không ra thì đỏ; danh mục chỉ có tên và mô tả, không có mã nguồn hay licence",
+      "phu": [
+        "F11"
+      ],
+      "vung": [
+        "design/reui-catalog.json",
+        "tools/reui_catalog/**"
+      ],
+      "ghi_chu": "Không gộp vào hàng 1c vì hàng đó đã 10 tiêu chí, và đây là phần ít rủi ro",
+      "vai": "nen",
+      "nhom": "nen",
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "1h",
+      "cau_giao": "Mỗi vòng giao diện máy ghi một bản số đo, một lệnh gộp theo tầng, và có mốc đối chứng trước khi dựng nền",
+      "tieu_chi": 8,
+      "vi_sao": "Quyết định 0019: đợt này là đợt chạy thật cho kit, cần số so được với mốc",
+      "hang": "T2",
+      "slug": "so-do-moi-vong",
+      "bat_khi": "Thiếu bản số đo ở vòng giao diện thì đỏ; báo cáo tách theo tầng thay cho một tỉ lệ chung; ba agent độc lập lập phương án một màn chưa có mẫu và ghi mốc trước khi hàng 1a gộp",
+      "phu": [
+        "F12"
+      ],
+      "vung": [
+        "tools/round_metrics/**",
+        "docs/plan/do-he-design/**"
+      ],
+      "vai": "nen",
+      "nhom": "nen",
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "2",
       "cau_giao": "Đầu chủ mở Bảng hàng và thấy các căn của sàn trên Lưới, đủ trạng thái màn, ở bốn khổ màn hình",
       "vai": "Đầu chủ",
@@ -124,7 +216,10 @@
         "1",
         "1b",
         "1c",
-        "1d"
+        "1d",
+        "1e",
+        "1f",
+        "1h"
       ],
       "slug": "bang-hang-ban-doc",
       "nhom": "bang-hang",
