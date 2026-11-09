@@ -1,0 +1,16 @@
+name: Company
+description: A brokerage using the product; the tenant that owns one isolated area of data.
+reso: none (tenant concept; RESO Office is an MLS roster and OUID is an exchange identifier)
+
+properties:
+  id: { type: uuid, required: true, unique: true }
+  name: { type: string, required: true }
+
+rules:
+  - id: tenant-isolation
+    description: Every company table has company_id and forced row level security; a request sees one company only.
+
+code:
+  model: src/modules/identity/
+  tests: tests/
+wiki: wiki/entities/company.md

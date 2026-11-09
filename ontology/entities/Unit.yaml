@@ -1,0 +1,27 @@
+name: Unit
+description: A physical apartment, house or plot in the shared catalog; shared by every company, so it has no company_id.
+reso: none as a resource; fields follow RESO Property (UnitNumber, BuildingName, SubdivisionName, LivingArea, BedroomsTotal, DirectionFaces, PropertyType, PropertySubType)
+
+properties:
+  upi: { type: string, required: true, unique: true }
+  subdivisionKey: { type: string, required: true }
+  buildingKey: { type: string, required: true }
+  buildingName: { type: string, required: true }
+  unitNumber: { type: string, required: true }
+  stack: { type: string }
+  floor: { type: integer }
+  livingArea: { type: number, min: 0 }
+  bedroomsTotal: { type: integer, min: 0 }
+  directionFaces: { type: string }
+  propertyType: { type: enum, values: [Residential, Land], required: true }
+  propertySubType:
+    {
+      type: enum,
+      values: [Condominium, Townhouse, Single Family Residence, Unimproved Land],
+      required: true,
+    }
+
+code:
+  model: src/modules/catalog/
+  tests: tests/
+wiki: wiki/entities/unit.md

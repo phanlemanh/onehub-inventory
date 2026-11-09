@@ -1,0 +1,29 @@
+# Relations between entities.
+# from / to must be names of files in ontology/entities/.
+# cardinality: one-to-one | one-to-many | many-to-one | many-to-many
+relations:
+  - from: Company
+    name: offers
+    to: Listing
+    cardinality: one-to-many
+    description: A company holds its own listings.
+  - from: Unit
+    name: offered_as
+    to: Listing
+    cardinality: one-to-many
+    description: One unit can be offered by several companies, or several times.
+  - from: Company
+    name: works_with
+    to: Contact
+    cardinality: one-to-many
+    description: A contact belongs to one company; the same person at two companies is two contacts.
+  - from: Contact
+    name: owns
+    to: Listing
+    cardinality: many-to-many
+    description: RESO ContactListings links contacts and listings.
+  - from: Company
+    name: signs
+    to: Agreement
+    cardinality: one-to-many
+    description: Every connection a company enables is one agreement.

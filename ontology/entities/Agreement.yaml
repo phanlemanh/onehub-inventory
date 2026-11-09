@@ -1,0 +1,40 @@
+name: Agreement
+description: Permission for one kind of connection to flow in one direction, for given data classes, for a period of time.
+reso: none; not the RESO ListingAgreement lookup, which is the type of listing contract
+
+properties:
+  id: { type: uuid, required: true, unique: true }
+  companyId: { type: ref, target: Company, required: true }
+  kind:
+    type: enum
+    values:
+      [
+        catalog_source,
+        listing_channel,
+        lead_source,
+        spreadsheet,
+        company_partnership,
+        company_api,
+        ai_processing,
+        catalog_confirmation,
+      ]
+    required: true
+  direction: { type: enum, values: [inbound, outbound], required: true }
+  counterparty: { type: string, required: true }
+  dataClasses: { type: string, required: true }
+  validFrom: { type: datetime, required: true }
+  validUntil: { type: datetime }
+  status: { type: enum, values: [active, paused, ended], required: true }
+  approvedBy: { type: string, required: true }
+  specialTerms: { type: boolean, default: false }
+
+rules:
+  - id: never-source
+    description: No agreement may include the source data class; enforced in the core rules and in the database.
+  - id: every-connection-is-an-agreement
+    description: A connection is enabled by an agreement, never by code written for one party.
+
+code:
+  model: src/modules/agreements/
+  tests: tests/
+wiki: wiki/entities/agreement.md

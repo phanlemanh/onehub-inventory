@@ -1,0 +1,137 @@
+version: 1
+status: applied
+depth: design
+conversation_language: vi
+docs_language: vi
+layers:
+  context:
+    status: decided
+    source: user
+    automation: automated
+    choice:
+      {
+        project_name: onehub-inventory,
+        description: "SaaS quản lý hàng cho sàn môi giới bất động sản — bản chuẩn hoá của Quỹ hàng (onehub-quy-hang)",
+        owner: phanlemanh,
+      }
+    why: "Người dùng muốn dựng kho mới từ đầu như một đợt refactor của onehub-quy-hang. Tên lấy từ thư mục, chủ lấy từ remote của kho cũ. Sản phẩm giữ nguyên, người dùng không đổi: bốn bất biến của kho cũ (cách ly giữa công ty, thông tin chủ nhà không rời công ty, người luôn bấm gửi, phần nội bộ không ra trang khách) là ràng buộc của kho mới."
+    rejected:
+      - {
+          option: "Chỉ tên và một câu",
+          why: "Kho cũ đang chạy thật trên quyhang.onehub.center và có bốn bất biến; bỏ qua thì các lớp sau đề xuất sai",
+        }
+  repo:
+    status: decided
+    source: proposed
+    automation: automated
+    choice: { license: Proprietary }
+    why: "Một kho, một gói, một lần triển khai. Kho cũ tách gói theo tầng (core, api, connect) chứ không phải theo nhịp phát hành: cả ba chạy trong cùng một app Next.js và không kho nào khác dùng packages/connect. Kho riêng tư nên giấy phép Proprietary. Nhánh ngắn, squash merge, Conventional Commits như kho cũ."
+    rejected:
+      - {
+          option: "Giữ npm workspaces như kho cũ",
+          why: "Bộ khung chỉ sinh một gói, phần còn lại làm tay; giữ gói theo tầng là giữ nguyên cái cần refactor",
+        }
+      - { option: "Nhiều kho", why: "Các phần luôn đổi cùng nhau" }
+  architecture:
+    status: decided
+    source: proposed
+    automation: partial
+    choice: { archetype: modular-monolith }
+    why: "Kho cũ có khoảng 30 miền nghiệp vụ, mỗi miền bị xé làm hai nửa ở core và api, và các miền trong api gọi chéo tự do (auth 67 lần, owners 12, routing 10). Mô-đun theo chiều dọc với ranh giới có máy kiểm là lợi ích chính của đợt refactor."
+    rejected:
+      - { option: "Không có archetype", why: "Nhiều miền nghiệp vụ, ranh giới phải được máy giữ" }
+      - {
+          option: "service-api",
+          why: "Cần stack Fastify; kho cũ đã có API Hono + OpenAPI gắn trong app Next.js, một cửa duy nhất",
+        }
+    manual_steps:
+      - "SaaS đa công ty: một cửa truy vấn duy nhất withCompany đặt app.company_id và vai không phải chủ bảng, kèm bộ kiểm cấm mở kết nối ngoài cửa; chỉ mô-đun identity được ngoại lệ vì một người thuộc nhiều sàn. Mọi khái niệm của sàn ghi rõ phạm vi company trong ontology."
+      - "SaaS cấu hình theo sàn (ADR-0018): mô-đun company-config giữ cấu hình của sàn, nhãn và trạng thái riêng, trường riêng, từ điển giá trị, mẫu; chuyển Sổ điểm biến thiên cùng bộ kiểm khớp giữa sổ và mã. Giữ nguyên giới hạn đã chốt: không đối tượng tự tạo, không công thức, không rules engine hay workflow engine tổng quát."
+      - "SaaS API-first: /api/v1 có OpenAPI là đường ghi duy nhất; thêm bước so bản mô tả API để phát hiện thay đổi phá vỡ, vì bộ khung chỉ có bước này ở archetype service-api."
+      - "Tầng vận hành SaaS (mở sàn, gói dịch vụ, hợp đồng, thanh toán): kho cũ chỉ có lệnh mở sàn, chưa có gói cước hay thanh toán. Chuyển lệnh mở sàn; phần còn lại ngoài phạm vi refactor."
+  ai:
+    status: decided
+    source: proposed
+    automation: partial
+    choice: { ai_tier: call }
+    why: "Kho cũ có gọi Claude ở đường nhập dữ liệu (đề xuất cách nhập, đọc ô lạ): mỗi đường một lần gọi, đầu ra theo khuôn JSON, mã thực thi kế hoạch (ADR-0011). Mức call khớp đúng cách làm này và thêm khung đánh giá tách khỏi make check."
+    rejected:
+      - { option: "Không có AI", why: "Kho cũ đã có tính năng này, bỏ đi là mất tính năng" }
+      - {
+          option: "ai_tier: workflow hoặc agent",
+          why: "Kho cũ không có nhiều bước do mô hình quyết định; thêm là mở rộng phạm vi của một đợt refactor",
+        }
+    manual_steps:
+      - "Chuyển phần che số chủ nhà trước khi gửi cho mô hình và hai bộ kiểm rò rỉ của đường AI cùng lúc với lời gọi. Đoạn mã này xếp mức rủi ro cao."
+  stack:
+    status: decided
+    source: user
+    automation: partial
+    choice: { preset: ts-node }
+    why: "Giữ TypeScript vì toàn bộ mã cũ là TypeScript. ts-node là bộ khung gần nhất có thể ghép archetype modular-monolith và lớp AI; không có bộ khung Next.js nên phần web làm tay."
+    rejected:
+      - {
+          option: "ts-api (Fastify)",
+          why: "Thêm một máy chủ thứ hai, trái ADR-0001 là API gắn trong app Next.js",
+        }
+      - {
+          option: "react-vite",
+          why: "Không giữ được bí mật phía máy chủ, trang khách cần dựng phía máy chủ cho ảnh xem trước trên Zalo",
+        }
+    manual_steps:
+      - "Thêm Next.js 16, React 19, Tailwind 4, ReUI, Hono + zod-openapi, better-auth, pg khi chuyển mã; build đổi từ tsc sang next build. Chuyển kèm máy chủ MCP reui và shadcn dùng lúc phát triển, và REUI_LICENSE_KEY."
+      - "Bộ khung dùng Vitest, kho cũ dùng node:test với 417 tệp: đổi dòng import bằng codemod khi chuyển từng mô-đun, giữ nguyên node:assert. Test chạm cơ sở dữ liệu chạy tuần tự trong một cấu hình Vitest riêng."
+  domain:
+    status: decided
+    source: proposed
+    automation: partial
+    choice: { seed: [Company, Unit, Listing, Contact, Agreement], database: postgres }
+    why: "Năm khái niệm có nghĩa đã ổn định trong CONTEXT.md của kho cũ, và tên theo RESO. Lead cố ý chưa đưa vào vì tên đang chồng nghĩa: dấu trên người và việc với người. Chuẩn đối chiếu là RESO Data Dictionary 2.1 (đã tra dd.reso.org ngày 09/11/2026). Listing ứng với tài nguyên Property, Contact ứng với Contacts (2.1 vẫn dùng số nhiều); Company, Unit, Agreement không có tài nguyên RESO tương đương và phải ghi rõ là đặc trưng riêng. Đã xem lại sau khi lớp AI đổi: không ảnh hưởng."
+    rejected:
+      - {
+          option: "Bắt đầu trống",
+          why: "Từ vựng đã có sẵn và đã qua nhiều lần chốt, để trống là đánh mất",
+        }
+    manual_steps:
+      - "Sửa khi chuyển: LeaseAmountMax dựng trên LeaseAmount, mà RESO định nghĩa là tiền thuê mặt bằng doanh nghiệp đang trả, không phải giá cho thuê của căn; các tên *Min/*Max của tiêu chí tìm là tên suy ra, không phải trường RESO."
+      - "Chốt khi chuyển mô-đun catalog: toà ánh xạ tài nguyên Building mới có ở 2.1; căn cho thuê có dùng PropertyType Residential Lease hay không; ngăn ảnh internal ánh xạ giá trị Permission nào vì RESO không có giá trị Internal."
+      - "Giữ Postgres và lược đồ hiện có. Kho cũ là nơi DUY NHẤT ghi migration và áp lên bản thật cho đến lúc chuyển; kho mới chỉ chép nguyên văn các tệp đã gộp, không tự thêm migration, và không bao giờ áp lên bản thật trước lúc chuyển."
+      - "Chuyển CONTEXT.md, 27 ADR và docs/product/tham-chieu.md sang wiki của kho mới. Lịch sử _acceptance ở lại kho cũ."
+  quality:
+    status: decided
+    source: proposed
+    automation: partial
+    choice: { level: team }
+    why: "Kho sống lâu, nhiều phiên agent chạy song song (2.270 commit từ 02/11, 35 worktree). Kho cũ đã có quét bí mật và hook; mức starter sẽ là bước lùi."
+    rejected:
+      - { option: starter, why: "Không có pre-commit và quét bí mật trong khi kho cũ đã có" }
+    manual_steps:
+      - "Chuyển các rào riêng của sản phẩm: bộ kiểm rò rỉ và luật giao diện quy-hang-ui vào make check; bộ kiểm cách ly thành lệnh make check-db và job CI riêng có Postgres, vì make check chạy không có cơ sở dữ liệu."
+      - "Chuyển hook chặn sửa migration đã commit, skill verify và new-migration, skill giao diện reui và quy-hang-ui. Người sửa các tệp workflow CI vì agent bị chặn ở đó."
+  delivery:
+    status: decided
+    source: proposed
+    automation: manual
+    choice: {}
+    why: "Đích là Vercel và Supabase vùng Singapore như kho cũ. Bộ khung chỉ có container cho ts-api và fastapi, nên phần này chỉ ghi lại, không được dựng. Chưa có bí mật của bản thật trong kho mới nên pipeline sinh ra không chạm được bản thật. Đã xem lại sau khi lớp AI đổi: thêm ANTHROPIC_API_KEY vào danh sách bí mật lúc chuyển."
+    rejected:
+      - { option: container, why: "Không áp được cho ts-node, và kho cũ không chạy container" }
+    manual_steps:
+      - "Trước lúc chuyển: dựng dự án Vercel mới và một Supabase thử riêng, không dùng chung cơ sở dữ liệu của bản thật. Kho cũ tiếp tục là bản chạy thật."
+      - "Thay deploy.yml và release.yml do bộ khung sinh bằng trình tự của kho cũ: áp migration, kiểm nhanh chỉ đọc, gọi hook Vercel."
+      - "Trong lúc chuyển từng mô-đun: đóng băng phần tương ứng ở kho cũ để hai bên không lệch nhau."
+      - "Lúc chuyển: dừng ghi ở kho cũ, kho mới nhận quyền ghi migration, dùng chung OWNER_PHONE_KEY, BETTER_AUTH_SECRET, JOB_SECRET, ANTHROPIC_API_KEY, đổi đích của lịch pg_cron lead-tick, rồi đổi tên miền quyhang.onehub.center."
+      - "Đường lùi: giữ dự án Vercel cũ sống và không đổi lược đồ trong giai đoạn quan sát sau khi chuyển, để trỏ tên miền lại được ngay."
+  governance:
+    status: decided
+    source: proposed
+    automation: partial
+    choice: { capabilities: [] }
+    why: "Chỉ Claude Code tại máy, người duyệt. Không bật agent trên GitHub vì người dùng không yêu cầu, không bật MCP của sản phẩm vì không có agent nào cần thao tác vào sản phẩm. Đã xem lại sau khi lớp AI đổi: AI trong sản phẩm chỉ là lời gọi, không cần quyền mới."
+    rejected:
+      - { option: github-agents, why: "Không được yêu cầu" }
+      - { option: "mcp (của sản phẩm)", why: "Không có nhu cầu" }
+    manual_steps:
+      - "Cài Acceptance-Gate Kit bằng acceptance-init và ánh xạ T1/T2/T3 của kit vào governance/autonomy.yaml để chỉ có một thang rủi ro. Người sửa tệp này vì agent bị chặn ở governance/."
+      - "Trong ánh xạ đó, xếp mức cao cho bộ kiểm rò rỉ, che dữ liệu, trần lớp dữ liệu, thoả thuận, migration; bản mẫu để test ở mức agent tự gộp được."
+      - "Bảo vệ nhánh như kho cũ: chỉ bắt buộc check xanh, chưa bắt buộc code owner duyệt vì kho chỉ có một chủ và GitHub không cho tự duyệt. Việc ký duyệt nằm ở Acceptance-Gate Kit."

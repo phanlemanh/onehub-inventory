@@ -1,0 +1,58 @@
+# Business modules (bounded contexts) and who may depend on whom.
+# Enforced by tools/boundaries.py in `make check`. Changing this file is a design decision:
+# record it in wiki/decisions/.
+#
+# First cut: dependencies are left empty and are added as each module is moved from onehub-quy-hang.
+modules:
+  - name: identity
+    description: Accounts, sessions, companies, members and roles
+    owns: [Company]
+    depends_on: []
+  - name: company-config
+    description: Per-company settings, labels, custom statuses and fields, value aliases, templates
+    owns: []
+    depends_on: []
+  - name: agreements
+    description: Connection kinds, data classes and their ceilings, agreements
+    owns: [Agreement]
+    depends_on: []
+  - name: catalog
+    description: Shared catalog of subdivisions, buildings and units
+    owns: [Unit]
+    depends_on: []
+  - name: listings
+    description: Listings, status, pricing and fees, freshness, events, photos
+    owns: [Listing]
+    depends_on: []
+  - name: contacts
+    description: Contacts, phones and duplicate detection
+    owns: [Contact]
+    depends_on: []
+  - name: leads
+    description: Owner leads, routing, deadlines and alerts; buyer needs
+    owns: []
+    depends_on: []
+  - name: sharing
+    description: Share links, the public customer page and redaction
+    owns: []
+    depends_on: []
+  - name: imports
+    description: Data import, including the AI-assisted planning call
+    owns: []
+    depends_on: []
+  - name: exports
+    description: Data export
+    owns: []
+    depends_on: []
+  - name: notifications
+    description: Push subscriptions and outbox
+    owns: []
+    depends_on: []
+  - name: workspace
+    description: Today queues, navigation and team views
+    owns: []
+    depends_on: []
+  - name: sync
+    description: Offline store and pending changes
+    owns: []
+    depends_on: []

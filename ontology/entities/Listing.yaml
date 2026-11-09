@@ -1,0 +1,31 @@
+name: Listing
+description: One offer by a company to sell or lease one unit.
+reso: Property (StandardStatus, ListPrice, ClosePrice, CloseDate)
+
+properties:
+  id: { type: uuid, required: true, unique: true }
+  companyId: { type: ref, target: Company, required: true }
+  subdivisionName: { type: string }
+  buildingName: { type: string, required: true }
+  unitNumber: { type: string }
+  standardStatus:
+    { type: enum, values: [Incomplete, Active, Pending, Closed, Hold, Withdrawn], required: true }
+  listPrice: { type: integer, min: 1 }
+  closePrice: { type: integer, min: 1 }
+  closeDate: { type: date }
+  withdrawnReason: { type: enum, values: [sold_elsewhere, owner_changed_mind, unreachable] }
+  lastConfirmedAt: { type: datetime }
+  version: { type: integer, min: 1, required: true }
+
+rules:
+  - id: closed-needs-price-and-date
+    description: A Closed listing must have closePrice and closeDate.
+  - id: withdrawn-needs-reason
+    description: A Withdrawn listing must have withdrawnReason.
+  - id: no-seventh-status
+    description: Companies add labels anchored to the six standard values; they never add a seventh value.
+
+code:
+  model: src/modules/listings/
+  tests: tests/
+wiki: wiki/entities/listing.md
