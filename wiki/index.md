@@ -41,6 +41,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0013 Phạm vi chọn lọc và nền thiết kế](decisions/0013-selective-scope-and-design-foundation.md)
 - [0014 Ba luật sản phẩm cho MVP](decisions/0014-mvp-product-rules.md)
 - [0015 Rào thiết kế phải đỏ được](decisions/0015-measurable-design-gate.md)
+- [0016 Cơ chế thao tác và phân quyền của MVP](decisions/0016-permission-model.md)
 
 ## Incidents
 

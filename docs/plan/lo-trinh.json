@@ -262,6 +262,30 @@
       ]
     },
     {
+      "ma": "9a",
+      "cau_giao": "Mọi thao tác đọc và ghi đều được quyết định từ một bảng quyền theo vai, phạm vi và trạng thái",
+      "vai": "nen",
+      "tieu_chi": 9,
+      "vi_sao": "Quyết định 0016: không có bảng chung thì từng hàng tự đặt quyền, như lỗi ai đọc được hàng là sửa được giá ở Quỹ hàng",
+      "hang": "T3",
+      "dung_tren": [
+        "9"
+      ],
+      "slug": "bang-quyen-theo-vai",
+      "bat_khi": "Bài kiểm gọi từng thao tác bằng từng vai ở API và cơ sở dữ liệu, khớp đủ 100% ô của bảng; thêm một thao tác ghi không có dòng trong bảng thì bài kiểm đỏ",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "N7"
+      ],
+      "vung": [
+        "ontology/roles.yaml",
+        "ontology/actions.yaml",
+        "src/modules/identity/**",
+        "db/migrations/**"
+      ]
+    },
+    {
       "ma": "10",
       "cau_giao": "Đầu chủ đăng nhập và thấy, sửa được hàng thật của sàn mình trên Bảng hàng",
       "vai": "Đầu chủ",
@@ -271,7 +295,8 @@
       "dung_tren": [
         "4",
         "7",
-        "9"
+        "9",
+        "9a"
       ],
       "slug": "bang-hang-du-lieu-that",
       "nhom": "bang-hang",
@@ -460,6 +485,54 @@
       ]
     },
     {
+      "ma": "18a",
+      "cau_giao": "Quản trị sàn khoá người đã nghỉ và Trưởng nhóm bàn giao căn, khách của người đó cho người khác, không còn căn hay khách nào bỏ trống",
+      "vai": "Quản trị sàn",
+      "tieu_chi": 9,
+      "vi_sao": "Quyết định 0016: chủ sàn cần dữ liệu ở lại khi nhân viên rời đi",
+      "dung_tren": [
+        "9a",
+        "13",
+        "18"
+      ],
+      "slug": "khoa-nguoi-ban-giao",
+      "phu": [
+        "N8"
+      ],
+      "vung": [
+        "src/modules/identity/**",
+        "src/modules/listings/**",
+        "src/modules/contacts/**"
+      ],
+      "ghi_chu": "Bàn giao ghi thành sự kiện và hoàn tác được, nên hàng chỉ chạm một lớp khó đảo là quyền",
+      "hang": "T3",
+      "nhom": "quan-tri",
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "18b",
+      "cau_giao": "Đầu chủ sửa được liên hệ và gỡ căn tạo nhầm, còn yêu cầu xoá dữ liệu cá nhân của một người được xử lý xong mà lịch sử vẫn đúng",
+      "vai": "Đầu chủ",
+      "tieu_chi": 10,
+      "vi_sao": "Quyết định 0016 và Nghị định 356 Điều 5: sửa và xoá theo yêu cầu có thời hạn; đứng sau hàng 18 để phủ cả chủ nhà lẫn khách",
+      "dung_tren": [
+        "9a",
+        "13",
+        "18"
+      ],
+      "slug": "sua-go-xoa-du-lieu",
+      "phu": [
+        "N9"
+      ],
+      "vung": [
+        "src/modules/contacts/**",
+        "src/modules/listings/**"
+      ],
+      "hang": "T3",
+      "nhom": "quan-tri",
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "19",
       "cau_giao": "Quản trị sàn đặt Thuế phí và thấy Bảng hàng tính theo mức đó",
       "vai": "Quản trị sàn",
@@ -467,7 +540,8 @@
       "vi_sao": "Phải đặt trước khi nhập tệp của sàn",
       "hang": "T3",
       "dung_tren": [
-        "9"
+        "9",
+        "9a"
       ],
       "slug": "thue-phi",
       "nhom": "cau-hinh",
@@ -478,6 +552,29 @@
       "vung": [
         "src/modules/company-config/**"
       ]
+    },
+    {
+      "ma": "19a",
+      "cau_giao": "Quản trị sàn xem vai nào làm được gì và tra được ai đã đổi vai, đổi cấu hình, mở số",
+      "vai": "Quản trị sàn",
+      "tieu_chi": 9,
+      "vi_sao": "Quyết định 0016: chủ sàn cần thấy và kiểm được quyền; trang sinh từ bảng quyền nên không lệch với luật thật",
+      "dung_tren": [
+        "9a",
+        "13",
+        "19"
+      ],
+      "slug": "bang-quyen-va-nhat-ky",
+      "phu": [
+        "N10"
+      ],
+      "vung": [
+        "src/modules/company-config/**",
+        "src/modules/identity/**"
+      ],
+      "hang": "T3",
+      "nhom": "quan-tri",
+      "dot": "mvp-dot-1"
     },
     {
       "ma": "20",
@@ -512,7 +609,10 @@
       "dung_tren": [
         "14",
         "18",
-        "19"
+        "19",
+        "18a",
+        "18b",
+        "19a"
       ],
       "slug": "chuyen-du-lieu",
       "bat_khi": "Chạy hai lần trên bản dựng từ dữ liệu mẫu, số bản ghi không đổi; đối chiếu đủ số căn, số liên hệ; khoá và dữ liệu đã giải mã không nằm trong kho",

@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-10 — Chốt cơ chế thao tác và phân quyền của MVP, thêm các hàng 9a, 18a, 18b, 19a vào lộ trình — [0016](decisions/0016-permission-model.md)
 - 2026-11-09 — Prepared the first orchestrated batch: per-checkout test ports, lane databases, commit-message check for kit commits, verify and migration skills — [batch](../docs/plan/dot-nen/README.md).
 - 2026-11-09 — Enabled the kit knowledge layer in this repository and recorded the sources of MVP release 1 — [page](../docs/tri-thuc/wiki/dot/mvp-dot-1.md).
 - 2026-11-09 — Added the three-way block selection gate to the roadmap, ahead of the Bảng hàng reference screen — [scope](../docs/plan/pham-vi-mvp-dot-1.md).

@@ -20,6 +20,10 @@ nguon: wiki/dot/mvp-dot-1.md#7f664a75f65a948e220323281b15ca00c9353c93
 - `N1` — mỗi sàn chỉ đọc và ghi được dữ liệu của mình, mọi truy vấn đi qua một cửa
 - `N2` — đăng nhập bằng mã qua email
 - `N3` — Quản trị sàn mời người và gán bốn vai Đầu chủ, Đầu khách, Trưởng nhóm, Quản trị sàn
+- `N7` — một bảng quyền theo vai, thao tác, phạm vi và trạng thái; API, cơ sở dữ liệu và màn hình cùng đọc từ bảng
+- `N8` — Quản trị sàn khoá người đã nghỉ, Trưởng nhóm bàn giao căn và khách của người đó
+- `N9` — sửa liên hệ, gỡ căn tạo nhầm, xoá dữ liệu cá nhân theo yêu cầu của chính người đó
+- `N10` — trang chỉ đọc vai nào làm được gì và nhật ký đổi vai, đổi cấu hình, mở số
 - `N4` — một sàn mẫu có dữ liệu nhãn MAU đủ để dựng và đo các màn
 - `N5` — Bảng hàng đọc và ghi dữ liệu thật của sàn qua /api/v1
 - `N6` — menu tài khoản và đăng xuất
