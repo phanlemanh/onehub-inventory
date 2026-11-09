@@ -24,6 +24,8 @@ nguon: wiki/dot/mvp-dot-1.md#7f664a75f65a948e220323281b15ca00c9353c93
 - `N8` — Quản trị sàn khoá người đã nghỉ, Trưởng nhóm bàn giao căn và khách của người đó
 - `N9` — sửa liên hệ, gỡ căn tạo nhầm, xoá dữ liệu cá nhân theo yêu cầu của chính người đó
 - `N10` — trang chỉ đọc vai nào làm được gì và nhật ký đổi vai, đổi cấu hình, mở số
+- `N11` — khai danh sách vai và sổ màn cho máy đọc; trang chưa khai hay hợp đồng thiếu vai thì kiểm tra đỏ
+- `N12` — bài kiểm trình duyệt chạy theo sổ màn, đủ mọi cặp vai và màn, gồm đường bị từ chối
 - `N4` — một sàn mẫu có dữ liệu nhãn MAU đủ để dựng và đo các màn
 - `N5` — Bảng hàng đọc và ghi dữ liệu thật của sàn qua /api/v1
 - `N6` — menu tài khoản và đăng xuất

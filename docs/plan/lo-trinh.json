@@ -91,6 +91,29 @@
       ]
     },
     {
+      "ma": "1d",
+      "cau_giao": "Mọi màn và mọi vai được khai cho máy đọc, màn chưa khai hay hợp đồng thiếu vai thì kiểm tra báo đỏ",
+      "vai": "nen",
+      "tieu_chi": 8,
+      "vi_sao": "Quyết định 0017: máy của kit chỉ kiểm mục Độ phủ có mặt; đặt trước hàng 2 để có số đo từ vòng giao diện đầu tiên",
+      "hang": "T3",
+      "dung_tren": [
+        "1a"
+      ],
+      "slug": "khai-vai-va-man",
+      "bat_khi": "Thêm một trang chưa khai thì đỏ; bỏ một vai khỏi khối Vai × Màn của hợp đồng thì đỏ; một lệnh in số vòng đủ ô, thiếu ô và số ô ghi không liên quan",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "N11"
+      ],
+      "vung": [
+        "ontology/roles.yaml",
+        "design/screens.yaml",
+        "tools/coverage_matrix/**"
+      ]
+    },
+    {
       "ma": "2",
       "cau_giao": "Đầu chủ mở Bảng hàng và thấy các căn của sàn trên Lưới, đủ trạng thái màn, ở bốn khổ màn hình",
       "vai": "Đầu chủ",
@@ -100,7 +123,8 @@
       "dung_tren": [
         "1",
         "1b",
-        "1c"
+        "1c",
+        "1d"
       ],
       "slug": "bang-hang-ban-doc",
       "nhom": "bang-hang",
@@ -269,7 +293,8 @@
       "vi_sao": "Quyết định 0016: không có bảng chung thì từng hàng tự đặt quyền, như lỗi ai đọc được hàng là sửa được giá ở Quỹ hàng",
       "hang": "T3",
       "dung_tren": [
-        "9"
+        "9",
+        "1d"
       ],
       "slug": "bang-quyen-theo-vai",
       "bat_khi": "Bài kiểm gọi từng thao tác bằng từng vai ở API và cơ sở dữ liệu, khớp đủ 100% ô của bảng; thêm một thao tác ghi không có dòng trong bảng thì bài kiểm đỏ",
@@ -286,6 +311,28 @@
       ]
     },
     {
+      "ma": "9b",
+      "cau_giao": "Mỗi màn được kiểm bằng từng vai ở bốn khổ màn hình, vai không được vào thấy đúng Không đủ quyền và không lộ dữ liệu",
+      "vai": "nen",
+      "tieu_chi": 8,
+      "vi_sao": "Quyết định 0017: bài chấm giao diện hiện không đăng nhập theo vai; cần đăng nhập thật và bảng quyền nên đứng sau hàng 9a",
+      "hang": "T3",
+      "dung_tren": [
+        "9a"
+      ],
+      "slug": "kiem-vai-theo-man",
+      "bat_khi": "Bộ kiểm trình duyệt đi đủ mọi cặp vai và màn trong sổ; gỡ chặn một cặp không được vào thì bộ kiểm đỏ",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "N12"
+      ],
+      "vung": [
+        "tests/e2e/**",
+        "design/screens.yaml"
+      ]
+    },
+    {
       "ma": "10",
       "cau_giao": "Đầu chủ đăng nhập và thấy, sửa được hàng thật của sàn mình trên Bảng hàng",
       "vai": "Đầu chủ",
@@ -296,7 +343,8 @@
         "4",
         "7",
         "9",
-        "9a"
+        "9a",
+        "9b"
       ],
       "slug": "bang-hang-du-lieu-that",
       "nhom": "bang-hang",

@@ -55,11 +55,25 @@
       ]
     },
     {
+      "ma": "1d",
+      "tep": "docs/plan/lo-trinh.json",
+      "slug": "khai-vai-va-man",
+      "day": "G",
+      "uu_tien": 3,
+      "s4": "local",
+      "ranh_gioi": [
+        "_acceptance/khai-vai-va-man/**",
+        "ontology/roles.yaml",
+        "design/screens.yaml",
+        "tools/coverage_matrix/**"
+      ]
+    },
+    {
       "ma": "2",
       "tep": "docs/plan/lo-trinh.json",
       "slug": "bang-hang-ban-doc",
       "day": "G",
-      "uu_tien": 3,
+      "uu_tien": 4,
       "s4": "local",
       "ranh_gioi": ["_acceptance/bang-hang-ban-doc/**", "src/modules/listings/ui/**"]
     },
