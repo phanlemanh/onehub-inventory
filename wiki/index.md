@@ -38,6 +38,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0010 Triển khai và chuyển kho](decisions/0010-delivery-and-cutover.md)
 - [0011 Quyền của agent](decisions/0011-agent-governance.md)
 - [0012 Chuẩn ngôn ngữ của sản phẩm](decisions/0012-product-language-standard.md)
+- [0013 Phạm vi chọn lọc và nền thiết kế](decisions/0013-selective-scope-and-design-foundation.md)
 
 ## Incidents
 

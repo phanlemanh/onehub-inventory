@@ -5,8 +5,8 @@ reso: Contacts (ContactKey, FullName, ContactType, OwnerMemberKey); DD 2.1 keeps
 properties:
   id: { type: uuid, required: true, unique: true }
   companyId: { type: ref, target: Company, required: true }
-  fullName: { type: string, pii: true }
-  contactTypes: { type: string, required: true }
+  fullName: { type: string, pii: true, display: person, reso: FullName }
+  contactTypes: { type: string, required: true, display: select, reso: ContactType }
   ownerMemberKey: { type: string }
 
 rules:

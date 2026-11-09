@@ -2,12 +2,19 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
-      "Bash(make:*)",
+      "Bash(make check)",
+      "Bash(make test)",
+      "Bash(make lint)",
+      "Bash(make typecheck)",
+      "Bash(make format)",
+      "Bash(make gen)",
+      "Bash(make ontology)",
+      "Bash(make e2e)",
+      "Bash(make build)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
-      "Bash(git show:*)",
-      "Bash(python3 tools/:*)"
+      "Bash(git show:*)"
     ],
     "deny": [
       "Read(./.env)",
@@ -42,5 +49,30 @@
         "repo": "phanlemanh/acceptance-gate-kit"
       }
     }
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel 2>/dev/null || echo \"$CLAUDE_PROJECT_DIR\")\"/.claude/hooks/guard-edits.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel 2>/dev/null || echo \"$CLAUDE_PROJECT_DIR\")\"/.claude/hooks/check-changed.sh",
+            "timeout": 180
+          }
+        ]
+      }
+    ]
   }
 }

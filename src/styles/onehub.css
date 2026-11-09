@@ -1,0 +1,10 @@
+/* Brand exceptions only: everything else follows the Tailwind and shadcn defaults (design/language.md, decisions.yaml). */
+:root {
+  --onehub-blue: #0246ff;
+  --onehub-cyan: #02d8ff;
+  --onehub-apricot: #ffba72;
+  --onehub-orange: #ff885c;
+  --onehub-pink: #f56883;
+  --onehub-celeste: #38f1d1;
+  --onehub-blue-tint: color-mix(in oklch, var(--onehub-blue) 8%, white);
+}

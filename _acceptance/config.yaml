@@ -9,7 +9,13 @@ executors:
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
+    e2e: "make e2e"                  # suy từ: mk/design.mk — cần trình duyệt Playwright
     product_map: "node \"${CLAUDE_PLUGIN_ROOT}/scripts/product-map.mjs\" --root . --check"   # suy từ: mẫu của kit, cách viết của Quỹ hàng
+  design:
+    floor: "node \"${CLAUDE_PLUGIN_ROOT}/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
+    khuon: "node \"${CLAUDE_PLUGIN_ROOT}/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists
+    gate: "node \"${CLAUDE_PLUGIN_ROOT}/scripts/design-gate.mjs\""
+    ui_check: "${CLAUDE_PLUGIN_ROOT}/scripts/design-scan.js"
 risk_tiers:
   t1_skip_globs:
     - "docs/**"                      # suy từ: tài liệu, như Quỹ hàng
@@ -42,3 +48,21 @@ risk_tiers:
 signoff:
   required_for: [T2, T3]
   approvers: ["Manh Phan"]           # suy từ: git config user.name
+design:
+  surface_globs:
+    - "src/app/**"
+    - "src/components/candidate/**"
+    - "src/components/templates/**"
+    - "src/modules/*/ui/**"
+design_pass:
+  proto_route: http://127.0.0.1:3470/proto/{slug}
+  ds_skill: inventory-ui
+  dev_cmd: "npm run dev"
+feature_loop:
+  ui_standards_skill: inventory-ui
+  suite_keys:
+    - executors.script.check
+    - executors.script.build
+dev_server:
+  start: "npm run dev"
+  url: "http://127.0.0.1:3470"

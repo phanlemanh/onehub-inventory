@@ -2,8 +2,8 @@
 
 SaaS quản lý hàng cho sàn môi giới bất động sản — bản chuẩn hoá của Quỹ hàng (onehub-quy-hang)
 
-Stack: TypeScript on Node.js 24 — npm, ESLint, Prettier, Vitest. The web layer (Next.js, Hono) is added when code is
-moved from onehub-quy-hang; this repo is a scaffold until then.
+Stack: TypeScript on Node.js 24, Next.js 16, React 19, Tailwind 4, shadcn on Base UI, ReUI; npm, ESLint, Prettier, Vitest,
+Playwright. This repo replaces onehub-quy-hang for the MVP and takes only selected parts of it, each with its source commit.
 
 ## Product invariants: no agreement, setting or request may open these
 
@@ -23,7 +23,7 @@ moved from onehub-quy-hang; this repo is a scaffold until then.
 - Per-company differences are data in `company-config`, within the limits of ADR-0018: no custom objects, no formulas,
   no general rules or workflow engine. A connection is an `Agreement`, never code written for one party.
 - `/api/v1` is the only write path.
-- Schema changes are new numbered migrations, and until cutover onehub-quy-hang is the only repo that writes them.
+- Schema changes are new numbered migrations in `db/migrations/`. A committed migration is never edited.
 - No real personal data in the repo: tests, fixtures and docs use `[Tên]` and `0900 000 0xx`.
 
 ## Product language
@@ -44,6 +44,7 @@ moved from onehub-quy-hang; this repo is a scaffold until then.
 - `make gen` — regenerate types from `ontology/` (never edit generated files)
 - `make ontology` — check `ontology/` + `wiki/` consistency and generated code
 - `make check` — everything CI runs. **Run it before you say a task is done.**
+- `make e2e` — browser tests at four screen sizes, for visible changes
 
 ## Before you change code
 
@@ -79,7 +80,9 @@ moved from onehub-quy-hang; this repo is a scaffold until then.
 
 ## Project map
 
-- `src/` — application code
+- `src/app/` — routes and screens; `src/components/` — vendor `ui`, `reui`, shared `candidate`, `templates`
+- `src/modules/` — business modules
+- `design/` — determinism ledger, behaviours, states, language, generated component registry
 - `tests/` — tests
 - `ontology/` — domain model (source of truth for business concepts)
 - `wiki/` — decisions, incidents, entity notes
@@ -100,8 +103,8 @@ moved from onehub-quy-hang; this repo is a scaffold until then.
 
 - Business code lives in modules under `src/**/modules/<name>/` (one per bounded context).
   `architecture/modules.yaml` lists them, which entities each owns, and who may depend on whom.
-- A module has two public doors: `index.ts` (types and pure rules, safe in the browser) and `server.ts` (server code,
-  starts with `import "server-only"`). Another module uses it **only** through these, and only if `depends_on` allows
+- A module has three public doors: `index.ts` (types and pure rules, safe in the browser), `server.ts` (server code,
+  starts with `import "server-only"`), and `ui` (its React components). Another module uses it **only** through these, and only if `depends_on` allows
   it. `src/app` also goes through these doors, and a `"use client"` file may never import `server.ts`. `make check`
   fails otherwise (`tools/boundaries.py`), for relative imports and `@/` imports alike.
 - Put a new rule in the module that owns the entity. Need a new dependency between modules?
@@ -130,3 +133,13 @@ Changes are classified low / medium / high by `governance/autonomy.yaml`.
   need a human: get approval before you start, and the PR needs a code owner.
 - Do not edit `.github/workflows/` or `governance/`: humans own them.
 - Never delete or weaken a test to get green.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

@@ -1,0 +1,167 @@
+# Determinism ledger: one line per design decision. Rules: docs/design-standard-proposal.md.
+#   kind   standard | formula | closed | judgment
+#   check  test:<path> | e2e:<path> | tool:<path> | eslint:<rule>. Leave empty until a check exists.
+version: 1
+decisions:
+  - {
+      id: color-role,
+      layer: foundations,
+      kind: standard,
+      source: shadcn variables,
+      check: "eslint:onehub-ui/no-hardcoded-color",
+    }
+  - {
+      id: color-palette,
+      layer: foundations,
+      kind: standard,
+      source: Tailwind neutral and status,
+      check: "eslint:onehub-ui/no-raw-palette",
+    }
+  - {
+      id: type-scale,
+      layer: foundations,
+      kind: standard,
+      source: Tailwind 4 defaults,
+      check: "eslint:onehub-ui/no-arbitrary-text-size",
+    }
+  - {
+      id: motion,
+      layer: foundations,
+      kind: standard,
+      source: Tailwind 4 defaults,
+      check: "eslint:onehub-ui/no-banned-motion",
+    }
+  - { id: spacing, layer: foundations, kind: standard, source: Tailwind 4 defaults }
+  - { id: radius, layer: foundations, kind: standard, source: shadcn radius variable }
+  - { id: brand-exceptions, layer: foundations, kind: closed, source: src/styles/onehub.css }
+  - {
+      id: raw-controls,
+      layer: core,
+      kind: standard,
+      source: shadcn on Base UI,
+      check: "eslint:onehub-ui/no-raw-controls",
+    }
+  - {
+      id: raw-table,
+      layer: core,
+      kind: standard,
+      source: TanStack Table via ReUI data-grid,
+      check: "eslint:onehub-ui/no-raw-table",
+    }
+  - {
+      id: native-dialogs,
+      layer: core,
+      kind: standard,
+      source: shadcn on Base UI,
+      check: "eslint:onehub-ui/no-native-dialogs",
+    }
+  - {
+      id: no-aschild,
+      layer: core,
+      kind: standard,
+      source: Base UI render prop,
+      check: "eslint:onehub-ui/no-aschild",
+    }
+  - {
+      id: icons,
+      layer: core,
+      kind: standard,
+      source: Lucide defaults,
+      check: "eslint:onehub-ui/no-emoji-icons",
+    }
+  - {
+      id: lint-exceptions,
+      layer: governance,
+      kind: closed,
+      source: reason required,
+      check: "eslint:onehub-ui/require-disable-reason",
+    }
+  - {
+      id: component-level,
+      layer: core,
+      kind: formula,
+      source: import depth,
+      check: "tool:tools/design_registry.mjs",
+    }
+  - {
+      id: tier-direction,
+      layer: templates,
+      kind: closed,
+      source: pages to organisms to atoms,
+      check: "eslint:no-restricted-imports",
+    }
+  - {
+      id: module-doors,
+      layer: architecture,
+      kind: closed,
+      source: index,
+      server,
+      ui,
+      check: "tool:tools/boundaries.py",
+    }
+  - {
+      id: display-kind,
+      layer: semantics,
+      kind: closed,
+      source: ontology display key,
+      check: "tool:tools/design_codegen.py",
+    }
+  - {
+      id: labels,
+      layer: content,
+      kind: closed,
+      source: ontology/labels.yaml,
+      check: "test:tests/language.test.ts",
+    }
+  - {
+      id: label-lookup,
+      layer: content,
+      kind: formula,
+      source: company label else preferred,
+      check: "test:tests/label.test.ts",
+    }
+  - {
+      id: tone-position,
+      layer: content,
+      kind: closed,
+      source: design/language.md,
+      check: "test:tests/language.test.ts",
+    }
+  - {
+      id: one-main-one-h1,
+      layer: templates,
+      kind: standard,
+      source: HTML and axe,
+      check: "e2e:tests/e2e/shell.spec.ts",
+    }
+  - {
+      id: wcag-aa,
+      layer: conformance,
+      kind: standard,
+      source: WCAG 2.2 AA via axe,
+      check: "e2e:tests/e2e/shell.spec.ts",
+    }
+  - {
+      id: no-sideways-scroll,
+      layer: templates,
+      kind: formula,
+      source: four screen sizes,
+      check: "e2e:tests/e2e/shell.spec.ts",
+    }
+  - { id: format-number-date, layer: content, kind: standard, source: Intl vi-VN }
+  - { id: column-align, layer: core, kind: formula, source: display kind }
+  - { id: column-width, layer: core, kind: formula, source: label and sample length }
+  - { id: table-density, layer: core, kind: formula, source: total minimum width }
+  - { id: edit-in-cell, layer: patterns, kind: formula, source: display kind }
+  - { id: undo-or-confirm, layer: patterns, kind: formula, source: reversibility }
+  - { id: feedback-by-delay, layer: patterns, kind: standard, source: 0.1, 1 and 10 second limits }
+  - { id: target-size, layer: conformance, kind: standard, source: WCAG 2.5.8 }
+  - { id: focus-not-obscured, layer: conformance, kind: standard, source: WCAG 2.4.11 }
+  - { id: paste-login-code, layer: conformance, kind: standard, source: WCAG 3.3.8 }
+  - { id: web-vitals, layer: conformance, kind: standard, source: Core Web Vitals }
+  - { id: error-copy, layer: content, kind: closed, source: three-part sentence }
+  - { id: state-matrix, layer: patterns, kind: closed, source: design/states.md }
+  - { id: test-screen-sizes, layer: conformance, kind: formula, source: StatCounter top six }
+  - { id: primary-task, layer: product, kind: judgment, source: user research }
+  - { id: information-order, layer: product, kind: judgment, source: user research }
+  - { id: copy-content, layer: product, kind: judgment, source: reviewer }

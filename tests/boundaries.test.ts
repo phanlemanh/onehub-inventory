@@ -65,6 +65,14 @@ describe("module boundaries", () => {
     expect(errors.join()).toContain("may not use");
   });
 
+  it("allows the ui door of a module from src/app", () => {
+    expect(
+      errorsOrFailure({
+        "src/app/page.tsx": 'import { x } from "@/modules/contacts/ui";\n',
+      }),
+    ).toEqual([]);
+  });
+
   it("rejects internal module files imported from src/app", () => {
     const errors = errorsOrFailure({
       "src/app/page.tsx": 'import { x } from "@/modules/contacts/phones";\n',

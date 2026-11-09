@@ -2,7 +2,8 @@
 # Enforced by tools/boundaries.py in `make check`. Changing this file is a design decision:
 # record it in wiki/decisions/.
 #
-# First cut: dependencies are left empty and are added as each module is moved from onehub-quy-hang.
+# MVP scope. leads, exports, notifications and sync return when their release comes (docs/design-standard-proposal.md).
+# Dependencies are left empty and are added as each module is built.
 modules:
   - name: identity
     description: Accounts, sessions, companies, members and roles
@@ -28,10 +29,6 @@ modules:
     description: Contacts, phones and duplicate detection
     owns: [Contact]
     depends_on: []
-  - name: leads
-    description: Owner leads, routing, deadlines and alerts; buyer needs
-    owns: []
-    depends_on: []
   - name: sharing
     description: Share links, the public customer page and redaction
     owns: []
@@ -40,19 +37,7 @@ modules:
     description: Data import, including the AI-assisted planning call
     owns: []
     depends_on: []
-  - name: exports
-    description: Data export
-    owns: []
-    depends_on: []
-  - name: notifications
-    description: Push subscriptions and outbox
-    owns: []
-    depends_on: []
   - name: workspace
     description: Today queues, navigation and team views
-    owns: []
-    depends_on: []
-  - name: sync
-    description: Offline store and pending changes
     owns: []
     depends_on: []

@@ -5,16 +5,23 @@ reso: Property (StandardStatus, ListPrice, ClosePrice, CloseDate)
 properties:
   id: { type: uuid, required: true, unique: true }
   companyId: { type: ref, target: Company, required: true }
-  subdivisionName: { type: string }
-  buildingName: { type: string, required: true }
-  unitNumber: { type: string }
+  subdivisionName: { type: string, display: text, reso: SubdivisionName }
+  buildingName: { type: string, required: true, display: text, reso: BuildingName }
+  unitNumber: { type: string, display: text, reso: UnitNumber }
   standardStatus:
-    { type: enum, values: [Incomplete, Active, Pending, Closed, Hold, Withdrawn], required: true }
-  listPrice: { type: integer, min: 1 }
-  closePrice: { type: integer, min: 1 }
-  closeDate: { type: date }
-  withdrawnReason: { type: enum, values: [sold_elsewhere, owner_changed_mind, unreachable] }
-  lastConfirmedAt: { type: datetime }
+    {
+      type: enum,
+      values: [Incomplete, Active, Pending, Closed, Hold, Withdrawn],
+      required: true,
+      display: status,
+      reso: StandardStatus,
+    }
+  listPrice: { type: integer, min: 1, display: money, reso: ListPrice }
+  closePrice: { type: integer, min: 1, display: money, reso: ClosePrice }
+  closeDate: { type: date, display: date, reso: CloseDate }
+  withdrawnReason:
+    { type: enum, values: [sold_elsewhere, owner_changed_mind, unreachable], display: select }
+  lastConfirmedAt: { type: datetime, display: datetime }
   version: { type: integer, min: 1, required: true }
 
 rules:

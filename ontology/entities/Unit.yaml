@@ -9,9 +9,9 @@ properties:
   buildingName: { type: string, required: true }
   unitNumber: { type: string, required: true }
   stack: { type: string }
-  floor: { type: integer }
-  livingArea: { type: number, min: 0 }
-  bedroomsTotal: { type: integer, min: 0 }
+  floor: { type: integer, display: count }
+  livingArea: { type: number, min: 0, display: area, reso: LivingArea }
+  bedroomsTotal: { type: integer, min: 0, display: count, reso: BedroomsTotal }
   directionFaces: { type: string }
   propertyType: { type: enum, values: [Residential, Land], required: true }
   propertySubType:

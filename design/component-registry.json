@@ -1,0 +1,697 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "name": "AppShell",
+      "file": "src/components/templates/app-shell.tsx",
+      "level": "template",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "Button",
+      "file": "src/components/ui/button.tsx",
+      "level": "atom",
+      "variants": {
+        "variant": [
+          "default",
+          "outline",
+          "secondary",
+          "ghost",
+          "destructive",
+          "link"
+        ],
+        "size": [
+          "default",
+          "xs",
+          "sm",
+          "lg",
+          "icon",
+          "icon-xs",
+          "icon-sm",
+          "icon-lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "Empty",
+      "file": "src/components/ui/empty.tsx",
+      "level": "atom",
+      "variants": {
+        "variant": [
+          "default",
+          "icon"
+        ]
+      },
+      "defaults": {
+        "variant": "default"
+      }
+    },
+    {
+      "name": "EmptyContent",
+      "file": "src/components/ui/empty.tsx",
+      "level": "atom",
+      "variants": {
+        "variant": [
+          "default",
+          "icon"
+        ]
+      },
+      "defaults": {
+        "variant": "default"
+      }
+    },
+    {
+      "name": "EmptyDescription",
+      "file": "src/components/ui/empty.tsx",
+      "level": "atom",
+      "variants": {
+        "variant": [
+          "default",
+          "icon"
+        ]
+      },
+      "defaults": {
+        "variant": "default"
+      }
+    },
+    {
+      "name": "EmptyHeader",
+      "file": "src/components/ui/empty.tsx",
+      "level": "atom",
+      "variants": {
+        "variant": [
+          "default",
+          "icon"
+        ]
+      },
+      "defaults": {
+        "variant": "default"
+      }
+    },
+    {
+      "name": "EmptyMedia",
+      "file": "src/components/ui/empty.tsx",
+      "level": "atom",
+      "variants": {
+        "variant": [
+          "default",
+          "icon"
+        ]
+      },
+      "defaults": {
+        "variant": "default"
+      }
+    },
+    {
+      "name": "EmptyTitle",
+      "file": "src/components/ui/empty.tsx",
+      "level": "atom",
+      "variants": {
+        "variant": [
+          "default",
+          "icon"
+        ]
+      },
+      "defaults": {
+        "variant": "default"
+      }
+    },
+    {
+      "name": "Input",
+      "file": "src/components/ui/input.tsx",
+      "level": "atom",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "Separator",
+      "file": "src/components/ui/separator.tsx",
+      "level": "atom",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "Sheet",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "SheetClose",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "SheetContent",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "SheetDescription",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "SheetFooter",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "SheetHeader",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "SheetTitle",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "SheetTrigger",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "Sidebar",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarContent",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarFooter",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarGroup",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarGroupAction",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarGroupContent",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarGroupLabel",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarHeader",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarInput",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarInset",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarMenu",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarMenuAction",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarMenuBadge",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarMenuButton",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarMenuItem",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarMenuSkeleton",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarMenuSub",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarMenuSubButton",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarMenuSubItem",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarProvider",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarRail",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarSeparator",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarTrigger",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "variants": {
+        "variant": [
+          "default",
+          "outline"
+        ],
+        "size": [
+          "default",
+          "sm",
+          "lg"
+        ]
+      },
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "Skeleton",
+      "file": "src/components/ui/skeleton.tsx",
+      "level": "atom",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "Toaster",
+      "file": "src/components/ui/sonner.tsx",
+      "level": "atom",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "Tooltip",
+      "file": "src/components/ui/tooltip.tsx",
+      "level": "atom",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "TooltipContent",
+      "file": "src/components/ui/tooltip.tsx",
+      "level": "atom",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "TooltipProvider",
+      "file": "src/components/ui/tooltip.tsx",
+      "level": "atom",
+      "variants": {},
+      "defaults": {}
+    },
+    {
+      "name": "TooltipTrigger",
+      "file": "src/components/ui/tooltip.tsx",
+      "level": "atom",
+      "variants": {},
+      "defaults": {}
+    }
+  ]
+}
