@@ -14,7 +14,9 @@
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
-      "Bash(git show:*)"
+      "Bash(git show:*)",
+      "Bash(npm run build)",
+      "Bash(node tools/kit-root.mjs)"
     ],
     "deny": [
       "Read(./.env)",
@@ -35,20 +37,6 @@
       "Bash(git push origin HEAD:main:*)"
     ],
     "ask": ["Bash(gh pr merge:*)", "Bash(gh pr review --approve:*)", "Bash(gh release create:*)"]
-  },
-  "enabledPlugins": {
-    "acceptance-gate@acceptance-gate-kit": true,
-    "feature-loop@acceptance-gate-kit": true,
-    "diagram-design@acceptance-gate-kit": true,
-    "superpowers@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "acceptance-gate-kit": {
-      "source": {
-        "source": "github",
-        "repo": "phanlemanh/acceptance-gate-kit"
-      }
-    }
   },
   "hooks": {
     "PreToolUse": [
@@ -74,5 +62,22 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "acceptance-gate@acceptance-gate-kit": true,
+    "feature-loop@acceptance-gate-kit": true,
+    "diagram-design@acceptance-gate-kit": true,
+    "superpowers@claude-plugins-official": true,
+    "road-map@acceptance-gate-kit": true,
+    "tri-thuc@acceptance-gate-kit": true,
+    "dieu-phoi@acceptance-gate-kit": true
+  },
+  "extraKnownMarketplaces": {
+    "acceptance-gate-kit": {
+      "source": {
+        "source": "github",
+        "repo": "phanlemanh/acceptance-gate-kit"
+      }
+    }
   }
 }

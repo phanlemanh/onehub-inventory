@@ -10,12 +10,12 @@ root=$(git -C "${cwd:-.}" rev-parse --show-toplevel 2>/dev/null)
 cd "${root:-${CLAUDE_PROJECT_DIR:-.}}" || exit 0
 
 changed=$( { git diff --name-only HEAD 2>/dev/null; git ls-files --others --exclude-standard 2>/dev/null; } \
-  | grep -E '\.(ts|tsx|mjs)$' | sort -u)
+  | grep -E '\.(ts|tsx|mjs)$' | grep -vE '^src/components/(ui|reui)/' | sort -u)
 [ -z "$changed" ] && exit 0
 [ -x node_modules/.bin/tsc ] || exit 0
 
 report=""
-out=$(node_modules/.bin/tsc --noEmit 2>&1)
+out=$(node_modules/.bin/tsc -p tsconfig.strict.json --noEmit 2>&1)
 while read -r f; do
   hit=$(grep -F "$f(" <<<"$out")
   [ -n "$hit" ] && report+="$hit"$'\n'

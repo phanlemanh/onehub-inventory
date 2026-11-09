@@ -7,7 +7,7 @@ description: Project UI standard. Use for any UI work in src/app, src/components
 
 Read only what the task needs, in this order:
 
-1. `design/component-registry.json`: what exists, its level, variants and defaults. Do not read component source to find this out.
+1. `design/component-registry.json`: what exists, its level, and each part's props, variants and defaults. Do not read component source to find this out.
 2. The reference screen of the screen type, declared in `design/patterns/`.
 3. `design/behaviors.md` and `design/states.md`: closed answers. Do not choose row height, alignment, column width or formats.
 4. `design/language.md` and `ontology/labels.yaml`: words.
@@ -28,5 +28,8 @@ Brand (logo, colours, type, tone): OneHub DS. Behaviour and accessibility: shadc
 ## Before you finish
 
 - `make check`, then `make e2e` for visible changes.
+- Every new screen is added to the axe test in `tests/e2e/`, in light and dark.
+- One frame family per screen: Frame on workspace screens, card on the customer page, never one inside the other.
+- Adapting a ReUI block changes its data, text and props only.
 - A UI test must be shown to fail when the thing it measures is broken.
 - A new decision gets a line in `design/decisions.yaml`. An escaped bug gets a line in `design/escapes.md`.
