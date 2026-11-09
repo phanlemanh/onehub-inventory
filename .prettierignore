@@ -15,3 +15,6 @@ test-results/
 playwright-report/
 design/component-registry.json
 .claude/skills/reui/
+PRODUCT-INVARIANTS.md
+LO-TRINH.html
+docs/plan/lo-trinh.json
