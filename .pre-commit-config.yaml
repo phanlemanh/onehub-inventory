@@ -29,8 +29,10 @@ repos:
         pass_filenames: false
         files: \.(ts|tsx|js|mjs|cjs|json|md|ya?ml)$
 
-  - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v4.5.0
+  - repo: local
     hooks:
-      - id: conventional-pre-commit
+      - id: commit-message
+        name: Commit message
+        entry: python3 tools/commit_msg.py
+        language: system
         stages: [commit-msg]
