@@ -42,6 +42,8 @@ TANG = (
 # Layers that are not a product change, left out of the second percentage, as in the audit table.
 NGOAI_SAN_PHAM = ("bai-kiem-ha-tang", "hop-dong-yeu-cau")
 TRANG_THAI_DOI = ("verified", "machine-cleared", "signed-off", "da-cham-boi-thuc-te")
+# Statuses a record reaches only after the Evidence Gate.
+QUA_CONG = ("machine-cleared", "signed-off", "da-cham-boi-thuc-te")
 MAT_GIAO_DIEN = ("ui", "web", "web-ui")
 TEP_SO_DO = "so-do-vong.json"
 LENH = "python3 tools/round_metrics/round_metrics.py"
@@ -279,7 +281,7 @@ def kiem_moc(root: Path) -> tuple[list[str], list[str]]:
             loi.append(f"commit khong co: {commit}")
         return loi, ghi_chu
     khung = git(root, "show", f"{commit}:{KHUNG_1A}")
-    if khung.returncode == 0 and re.search(r"^status:\s*(signed-off|machine-cleared)\b", khung.stdout, re.M):
+    if khung.returncode == 0 and re.search(rf"^status:\s*({'|'.join(QUA_CONG)})\s*$", khung.stdout, re.M):
         loi.append("do sau khi 1a gop")
     if git(root, "cat-file", "-e", f"{commit}:{THU_MUC_MOC}/{thu_muc.name}").returncode == 0:
         loi.append("ban kho co san phuong an")

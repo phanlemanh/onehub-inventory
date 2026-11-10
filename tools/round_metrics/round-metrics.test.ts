@@ -468,6 +468,22 @@ describe("kiem-moc", () => {
         },
       ],
       [
+        "do sau khi 1a gop",
+        (c) => {
+          mkdirSync(join(c.root, "_acceptance/khung-va-giao-dien"), { recursive: true });
+          writeFileSync(
+            join(c.root, "_acceptance/khung-va-giao-dien/contract.md"),
+            "---\nstatus: da-cham-boi-thuc-te\n---\n",
+          );
+          git(c.root, "add", ".");
+          git(c.root, "commit", "-qm", "1a shipped");
+          writeFileSync(
+            c.mocPath,
+            JSON.stringify({ ...c.moc, commit: git(c.root, "rev-parse", "HEAD") }),
+          );
+        },
+      ],
+      [
         "ban kho co san phuong an",
         (c) =>
           writeFileSync(
@@ -483,6 +499,29 @@ describe("kiem-moc", () => {
       const r = run(c.root, "kiem-moc");
       expect(r.status, message).toBe(1);
       expect(r.stdout, message).toContain(message);
+    }
+  });
+
+  it("kiem-moc: 1a còn trước Cổng Bằng chứng thì xanh", () => {
+    for (const status of ["draft", "approved", "implemented", "verified"]) {
+      const root = mkdtempSync(join(tmpdir(), "round-metrics-1a-"));
+      git(root, "init", "-q");
+      mkdirSync(join(root, "_acceptance/khung-va-giao-dien"), { recursive: true });
+      writeFileSync(
+        join(root, "_acceptance/khung-va-giao-dien/contract.md"),
+        `---\nstatus: ${status}\n---\n`,
+      );
+      git(root, "add", ".");
+      git(root, "commit", "-qm", "1a in progress");
+      const base = git(root, "rev-parse", "HEAD");
+      cpSync(join(ROOT, MOC), join(root, MOC), { recursive: true });
+      const mocPath = join(root, MOC, latestMoc(root), "moc.json");
+      writeFileSync(
+        mocPath,
+        JSON.stringify({ ...JSON.parse(readFileSync(mocPath, "utf8")), commit: base }),
+      );
+      const r = run(root, "kiem-moc");
+      expect(r.status, `${status}: ${r.stdout}`).toBe(0);
     }
   });
 

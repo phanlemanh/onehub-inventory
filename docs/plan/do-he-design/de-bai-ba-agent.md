@@ -41,4 +41,14 @@ chọn của từng agent và một trong ba kết quả:
 - **Giống, mang lỗi**: ba agent cùng lựa chọn và lựa chọn trái một luật đã ghi trong kho (ghi tệp luật).
 - **Lệch**: ít nhất hai lựa chọn khác nhau.
 
+Ba luật áp dụng khi xếp dòng:
+
+- Một agent không nêu quyết định mà agent khác có nêu thì dòng đó là **Lệch**: «không nêu» được tính là một lựa chọn khác.
+- **Giống, mang lỗi** chỉ dùng khi ít nhất một phương án tự trích luật bị trái. Người lập bảng không tự suy luật.
+- Mỗi dòng xét riêng theo đúng quyết định của dòng đó. Một khác biệt đã tính ở dòng khác vẫn được tính lại nếu nó cũng nằm trong
+  quyết định của dòng này.
+
+Hai luật đầu đã có trong câu giao cho agent lập bảng của lần đo đầu, trước khi có kết quả. Luật thứ ba được thêm sau lượt chấm
+đầu, khi người chấm chỉ ra dòng «Điện thoại» đã bỏ khác biệt về ghim cột.
+
 Cuối bảng đếm cho từng agent: số quyết định tự đoán, trong đó bao nhiêu hệ lẽ ra phải trả lời sẵn, bao nhiêu cần người quyết.
