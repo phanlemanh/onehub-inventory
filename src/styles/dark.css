@@ -1,0 +1,34 @@
+/* Dark theme (design/behaviors.md: light and dark, both pass the contrast check). Values are the shadcn neutral dark
+   defaults; the primary is a tint of OneHub blue mixed in OKLCH, because the brand blue itself is too dark to read on a
+   dark background. `:root.dark` outranks the `:root` block of globals.css, which comes later in the cascade. */
+:root.dark {
+  --background: var(--color-neutral-950);
+  --foreground: var(--color-neutral-50);
+  --card: var(--color-neutral-900);
+  --card-foreground: var(--color-neutral-50);
+  --popover: var(--color-neutral-900);
+  --popover-foreground: var(--color-neutral-50);
+  --primary: color-mix(in oklch, var(--onehub-blue) 60%, white);
+  --primary-foreground: var(--color-neutral-950);
+  --secondary: var(--color-neutral-800);
+  --secondary-foreground: var(--color-neutral-50);
+  --muted: var(--color-neutral-800);
+  --muted-foreground: var(--color-neutral-400);
+  --accent: var(--color-neutral-800);
+  --accent-foreground: var(--color-neutral-50);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: color-mix(in oklch, var(--onehub-blue) 60%, white);
+  --sidebar: var(--color-neutral-900);
+  --sidebar-foreground: var(--color-neutral-50);
+  --sidebar-primary: color-mix(in oklch, var(--onehub-blue) 60%, white);
+  --sidebar-primary-foreground: var(--color-neutral-950);
+  --sidebar-accent: var(--color-neutral-800);
+  --sidebar-accent-foreground: var(--color-neutral-50);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: color-mix(in oklch, var(--onehub-blue) 60%, white);
+  /* Status tones read on a dark surface: the 500 and 600 steps fall under 4.5:1 there. */
+  --info: var(--color-violet-400);
+  --destructive: var(--color-red-400);
+  color-scheme: dark;
+}

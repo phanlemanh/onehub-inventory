@@ -8,6 +8,8 @@ import { FRAME_COPY } from "./frame-copy";
 
 /** A screen-wide problem shown as a banner above the screen (design/behaviors.md, notification channel). */
 export interface ScreenBannerState {
+  /** `offline` leaves by itself when the network returns; anything else stays until it is resolved. */
+  kind?: "offline" | "save-failed" | "other";
   title: string;
   detail: string;
   retry?: () => void;
@@ -55,6 +57,7 @@ export async function saveWithBanner(save: () => Promise<void>): Promise<boolean
   } catch (error) {
     if (typeof navigator !== "undefined" && navigator.onLine === false) {
       showScreenBanner({
+        kind: "save-failed",
         ...FRAME_COPY.saveFailedOffline,
         retry: () => void saveWithBanner(save),
       });
@@ -64,11 +67,19 @@ export async function saveWithBanner(save: () => Promise<void>): Promise<boolean
   }
 }
 
-/** Shows the offline banner while the device has no network and clears it when the network returns. */
+/**
+ * Shows the offline banner while the device has no network and clears it when the network returns. A save that
+ * failed offline keeps its banner after the network returns: the change is still not saved until «Thử lại».
+ */
 export function ConnectionWatcher() {
   useEffect(() => {
-    const offline = () => showScreenBanner({ ...FRAME_COPY.offline });
-    const online = () => clearScreenBanner();
+    const offline = () => {
+      if (current?.kind !== "save-failed")
+        showScreenBanner({ kind: "offline", ...FRAME_COPY.offline });
+    };
+    const online = () => {
+      if (current?.kind === "offline") clearScreenBanner();
+    };
     if (navigator.onLine === false) offline();
     window.addEventListener("offline", offline);
     window.addEventListener("online", online);
