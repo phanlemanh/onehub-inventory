@@ -5,7 +5,7 @@ slug: go-hoi-khi-gop
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config]
-status: implemented
+status: verified
 approved_by: Manh Phan
 approved_at: 2026-11-10
 design_doc: docs/superpowers/specs/2026-11-10-go-hoi-khi-gop-design.md
