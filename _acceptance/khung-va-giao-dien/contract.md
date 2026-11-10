@@ -5,7 +5,7 @@ slug: khung-va-giao-dien
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
-status: implemented
+status: verified
 approved_by:
 approved_at:
 veto_state: mo
@@ -67,3 +67,10 @@ Thước đối chiếu: năm mã F1–F5 của `docs/plan/pham-vi-mvp-dot-1.md`
 - Mọi câu chữ của khung (câu lỗi, nút, băng, lối nhảy, tên giao diện) nằm trong một tệp `src/components/templates/frame-copy.ts`; tên màn vẫn đi qua `label()`.
 - Bảng màu sáu trạng thái lấy từ Quỹ hàng, `apps/web/src/lib/mau-trang-thai.ts` ở commit `e89c6ab8`.
 - Bài trình duyệt chạy trên `next dev`; trang lỗi được kích bằng bản mẫu `/proto/khung-va-giao-dien`, chỉ có ở bản phát triển.
+- Ngoài-2 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Người dùng cuối không bị ảnh hưởng. Tên tài khoản máy của người làm lộ trong kho mã, và các tệp tham số này không chạy lại được trên máy khác. — `_acceptance/khung-va-giao-dien/s4-args.json`
+- Ngoài-4 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Sau khi lưu hỏng do mất mạng, nếu nhân viên sang màn khác thì băng báo vẫn còn và nút «Thử lại» gửi lại việc của màn cũ mà họ không còn nhìn thấy. — `src/components/templates/screen-banner.tsx`
+- Ngoài-5 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Sau khi mất mạng rồi bấm «Thử lại» và lưu được, người dùng không thấy thông báo thành công và không có nút «Hoàn tác». Nếu lần thử lại gặp lỗi khác thì băng báo mất mạng vẫn nằm đó dù mạng đã có lại. — `src/components/templates/screen-banner.tsx`
+- Ngoài-6 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Nếu một ô trạng thái hay ô đúng/sai đi qua bộ định dạng chung, người dùng sẽ thấy mã tiếng Anh như «Active» hoặc «true» thay vì chữ tiếng Việt. — `src/lib/format/index.ts`
+- Ngoài-7 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Trên trang mẫu chỉ có ở bản phát triển, nếu lưu hỏng khi vẫn có mạng thì người dùng không thấy báo gì và không biết là chưa lưu. — `src/app/(app)/proto/[slug]/frame-showcase.tsx`
+- Ngoài-8 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Bài kiểm tra có thể vẫn xanh dù trang không tìm thấy lộ nhãn nội bộ, nên một lỗi lộ nhãn sau này có thể lọt qua mà không ai biết. — `tests/e2e/frame.spec.ts`
+- Ngoài-9 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Bài kiểm tra không chứng minh chắc rằng khung chờ chỉ hiện sau 1 giây, nên nếu sau này nó hiện sớm hoặc muộn thì có thể không bị phát hiện. — `tests/e2e/frame.spec.ts`
