@@ -30,6 +30,7 @@ jobs:
       - run: npm audit --omit=dev --audit-level=high
 
   codeql:
+    if: github.event.repository.private == false
     runs-on: ubuntu-latest
     permissions:
       contents: read
