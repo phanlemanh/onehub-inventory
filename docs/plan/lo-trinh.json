@@ -6,20 +6,22 @@
   "hang": [
     {
       "ma": "1",
-      "cau_giao": "Dựng một sàn mẫu có dữ liệu nhãn MAU đủ cho các màn",
+      "cau_giao": "Dựng một sàn mẫu trên Vinhomes Ocean Park 1, 2, 3, căn và liên hệ nối sẵn với nhau, nhãn MAU đủ cho các màn",
       "vai": "nen",
-      "tieu_chi": 8,
-      "vi_sao": "Các màn dựng trên dữ liệu mẫu trước khi có dữ liệu thật",
+      "tieu_chi": 10,
+      "vi_sao": "Các màn dựng trên dữ liệu mẫu trước khi có dữ liệu thật. Quyết định 0020: Bảng hàng và Liên hệ dùng chung dữ liệu từ đầu",
       "hang": "T2",
       "slug": "du-lieu-mau",
-      "bat_khi": "Dựng lại hai lần ra cùng dữ liệu; mọi bản ghi mang nhãn MAU; không có tên hay số thật",
+      "bat_khi": "Dựng lại hai lần ra cùng dữ liệu; mọi bản ghi mang nhãn MAU; không có tên hay số thật; đủ ca một chủ nhiều căn, một căn nhiều chủ, một người vừa là chủ vừa là khách, căn chưa có chủ; đổi số của một liên hệ thì mọi căn của người đó cùng thấy số mới",
       "nhom": "nen",
       "dot": "mvp-dot-1",
       "phu": [
         "N4"
       ],
       "vung": [
-        "src/modules/listings/**"
+        "src/modules/listings/**",
+        "src/modules/catalog/**",
+        "src/modules/contacts/**"
       ],
       "du_lieu": "sinh-gia"
     },
@@ -81,7 +83,7 @@
         "1b"
       ],
       "slug": "hanh-vi-trong-luoi-khung",
-      "bat_khi": "Sáu quyết định tầng hành vi đều có bài kiểm đỏ được; một màn tự dựng lại các hành vi này thì kiểm tra đỏ",
+      "bat_khi": "Sáu quyết định tầng hành vi đều có bài kiểm đỏ được; một màn tự dựng lại các hành vi này thì kiểm tra đỏ; hồ sơ cạnh bảng nhận được cả căn lẫn người, đi qua lại mà không đổi khung",
       "phu": [
         "F9"
       ],
@@ -131,7 +133,7 @@
         "1a"
       ],
       "slug": "khai-vai-va-man",
-      "bat_khi": "Thêm một trang chưa khai thì đỏ; bỏ một vai khỏi khối Vai × Màn của hợp đồng thì đỏ; một lệnh in số vòng đủ ô, thiếu ô và số ô ghi không liên quan",
+      "bat_khi": "Thêm một trang chưa khai thì đỏ; bỏ một vai khỏi khối Vai × Màn của hợp đồng thì đỏ; một lệnh in số vòng đủ ô, thiếu ô và số ô ghi không liên quan; màn Liên hệ dù làm sau vẫn được khai trước vào họ Lưới",
       "nhom": "nen",
       "dot": "mvp-dot-1",
       "phu": [
@@ -513,7 +515,8 @@
       "vung": [
         "src/modules/contacts/**",
         "src/modules/listings/ui/**"
-      ]
+      ],
+      "bat_khi": "Số chủ nhà ghi vào liên hệ, không ghi vào căn; một người có nhiều căn chỉ có một liên hệ"
     },
     {
       "ma": "14",

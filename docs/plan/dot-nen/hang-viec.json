@@ -144,7 +144,12 @@
       "day": "D",
       "uu_tien": 0,
       "s4": "local",
-      "ranh_gioi": ["_acceptance/du-lieu-mau/**", "src/modules/listings/**"]
+      "ranh_gioi": [
+        "_acceptance/du-lieu-mau/**",
+        "src/modules/listings/**",
+        "src/modules/catalog/**",
+        "src/modules/contacts/**"
+      ]
     },
     {
       "ma": "3",
