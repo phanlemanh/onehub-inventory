@@ -7,7 +7,7 @@ Một sàn, một khu căn hộ. Lấy từ các chặng 1, 2, 4, 5 và bảng �
 ```
 dot: mvp-dot-1
 dang: chuoi
-nguon: wiki/dot/mvp-dot-1.md#7f664a75f65a948e220323281b15ca00c9353c93
+nguon: wiki/dot/mvp-dot-1.md#adb1cba497edd0ad0fd877ee7bf608aeabd4d83e
 
 - `F1` — khung ứng dụng đầy đủ: mục đang chọn, lối nhảy tới nội dung chính, tiêu đề tab theo màn, nút chính trên header, điều hướng theo vai, thanh bên thu gọn trên điện thoại
 - `F2` — trạng thái toàn trang: lỗi, không tìm thấy, chờ tải, phiên hết hạn
