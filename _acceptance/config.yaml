@@ -9,6 +9,8 @@ executors:
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
+    quyen_kho: "bash -c 'out=$(npx vitest run tests/permissions.test.ts --coverage.enabled=false 2>&1); rc=$?; printf \"%s\\n\" \"$out\"; [ $rc -eq 0 ] && printf \"%s\" \"$out\" | grep -qE \"Tests +47 passed \\(47\\)\"'"
+    quyen_kho_ban_goc: "node -e \"const a=JSON.parse(require('child_process').execSync('git show 84a2d597:.claude/settings.json')).permissions,b=JSON.parse(require('fs').readFileSync('.claude/settings.json')).permissions;for(const k of ['deny','allow'])if(JSON.stringify(a[k])!==JSON.stringify(b[k])){console.error(k+' list changed');process.exit(1)}console.log('deny and allow identical to 84a2d597')\""
     e2e: "make e2e"                  # suy từ: mk/design.mk — cần trình duyệt Playwright
     product_map: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/product-map.mjs\" --root . --check"   # suy từ: mẫu của kit, cách viết của Quỹ hàng
   design:
