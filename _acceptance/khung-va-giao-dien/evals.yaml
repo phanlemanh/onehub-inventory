@@ -1,0 +1,137 @@
+schema_version: 1
+feature_slug: khung-va-giao-dien
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: ["src/app/(app)/**", src/app/layout.tsx, src/components/templates/**, tests/e2e/frame.spec.ts]
+    expected: "exit 0; ở cả bốn khổ, ca 'frame › marks the current screen and names the tab' đạt cho Hôm nay, Bảng hàng, Đã gửi: đúng một phần tử aria-current=page và nó là mục của màn, hai mục còn lại không mang aria-current (ca không được bật), một main, một h1 bằng tên màn, document.title bằng '<tên màn> · OneHub'; ca đối chứng 'frame › current-screen check fails when the mark is moved' gỡ aria-current trên trang thật rồi gắn sang mục khác và khẳng định bộ kiểm ném lỗi chứa 'current screen mark'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/templates/**, tests/e2e/frame.spec.ts]
+    expected: "exit 0; ca 'frame › first Tab reaches the skip link and it moves focus to main' đạt ở bốn khổ: phần tử có tiêu điểm sau Tab đầu là liên kết 'Bỏ qua tới nội dung chính', bấm Enter thì document.activeElement là main; ca đối chứng 'frame › skip-link check fails without a target' gỡ id của main trên trang thật và khẳng định bộ kiểm ném lỗi chứa 'skip link target'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/templates/page-header.tsx, tests/frame.test.tsx]
+    expected: "exit 0; trong tests/frame.test.tsx, ca 'PageHeader puts the primary action beside the heading' thấy đúng một h1 và đúng một nút chính trong cùng phần tử đầu màn; ca 'PageHeader without an action renders no action slot' thấy không có phần tử data-slot=page-header-action; ca đối chứng dựng đầu màn với hai nút chính và khẳng định bộ kiểm báo 'more than one primary action'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/templates/nav-menu.tsx, src/components/templates/app-shell.tsx, tests/frame.test.tsx]
+    expected: "exit 0; trong tests/frame.test.tsx, thanh bên của khung được dựng thật (NavMenu trong SidebarProvider) với 4 mục mẫu: 2 mục không giới hạn, 1 mục chỉ CompanyAdmin, 1 mục cho TeamLead và CompanyAdmin; ma trận viết trước 4 vai × 4 mục cho đúng 16 kết quả hiện/ẩn đọc từ DOM, giữ thứ tự khai, bộ kiểm khẳng định ma trận có đúng 16 ô; không truyền vai thì chỉ 2 mục không giới hạn hiện; ca đối chứng dựng cùng thanh bên với vai CompanyAdmin rồi khẳng định với kỳ vọng của ListAgent và thấy thông điệp 'role filter leaked: <mục>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/templates/**, "src/app/(app)/**", tests/e2e/frame.spec.ts, tests/e2e/shell.spec.ts]
+    expected: "exit 0; ở khổ 360 và 414, ca 'frame › phone sidebar opens as a sheet and closes after choosing' đạt: thanh bên không hiện khi mở, bấm nút thanh bên thì tấm phủ hiện, bấm mục Bảng hàng thì URL thành /inventory và tấm phủ đóng; ở khổ 1024 và 1440 ca này bỏ qua có lý do 'desktop'; ca 'does not scroll sideways' đạt ở cả bốn khổ cho Hôm nay, Bảng hàng, Đã gửi, bản mẫu khung và trang lỗi; ca đối chứng chèn một phần tử rộng 2000px vào trang thật và khẳng định bộ kiểm báo 'sideways scroll'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: ["src/app/(app)/error.tsx", src/components/templates/page-state.tsx, tests/e2e/frame.spec.ts]
+    expected: "exit 0; ca 'frame › a broken screen keeps the frame and offers retry' mở /proto/khung-va-giao-dien?state=error: thanh bên còn, h1 là câu lỗi, có ba đoạn chuyện gì xảy ra, vì sao, làm gì tiếp, có nút 'Thử lại'; bấm 'Thử lại' sau khi bỏ cờ hỏng thì màn bản mẫu hiện lại; ca đối chứng chạy cùng bộ kiểm trên màn bản mẫu không hỏng và khẳng định nó báo 'error state not shown'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/app/not-found.tsx, src/components/templates/page-state.tsx, tests/e2e/frame.spec.ts]
+    expected: "exit 0; ca 'frame › an unknown address says not found without the internal frame' mở /no-such-page: trả 404, h1 'Không tìm thấy trang', có liên kết về '/', document.title bắt đầu bằng 'Không tìm thấy trang', không có phần tử data-sidebar và không chuỗi nhãn nào của ontology/labels.yaml (đọc từ tệp, không chép tay) trong văn bản trang; ca đối chứng chạy cùng bộ kiểm trên /inventory và khẳng định nó báo 'internal frame found' vì thấy data-sidebar và nhãn 'Bảng hàng'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: ["src/app/(app)/loading.tsx", src/components/templates/page-skeleton.tsx, src/components/templates/page-state.tsx, tests/e2e/frame.spec.ts]
+    expected: "exit 0; ca 'frame › slow screen shows no indicator before 1s and a skeleton after' mở /proto/khung-va-giao-dien?state=slow: ở 500 ms không có data-slot=page-skeleton hiện, ở 1500 ms có và thanh bên vẫn hiện; ca đối chứng mở màn không chậm và khẳng định bộ kiểm báo 'no skeleton after 1s'; ca 'frame › session expiry offers sign-in back to the same place' mở ?state=session-expired: liên kết 'Đăng nhập lại' có href đúng bằng '/login?next=' nối encodeURIComponent của địa chỉ hiện tại gồm cả tham số"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/lib/format/**, tests/format.test.ts]
+    expected: "exit 0; trong tests/format.test.ts, ma trận viết trước đúng 32 ô, bộ kiểm khẳng định 32 bằng một hằng viết trong expected này chứ không đếm lại mảng: money 12 ô (4850000000 → '4,85 tỷ', 4856000000 → '4,86 tỷ', 5000000000 → '5 tỷ', 1000000000 → '1 tỷ', 999999999 → '1 tỷ', 320000000 → '320 triệu', 15500000 → '15,5 triệu', 1000000 → '1 triệu', 999999 → '999.999 ₫', 0 → '0 ₫', -5 → '—', null → '—'); area 4 ô (75.5 → '75,5 m²', 100 → '100 m²', 75.456 → '75,46 m²', null → '—'); count 4 ô (2418 → '2.418', 0 → '0', 12 → '12', null → '—'); date 4 ô ('2026-11-05' → '05/11/2026', Date của cùng ngày → '05/11/2026', 'abc' → '—', null → '—'); datetime 3 ô ('2026-11-05T07:30:00Z' → '14:30 05/11/2026' theo giờ Việt Nam, 'abc' → '—', null → '—'); phone 5 ô ('0900000001' → '0900 000 001', '0900 000 001' → '0900 000 001', '+84900000001' → '0900 000 001', '09000001' → '09000001', null → '—'); so sánh sau khi đổi khoảng trắng không ngắt thành khoảng trắng; formatByKind chọn đúng hàm cho từng khoá FIELD_DISPLAY có kiểu money, area, count, date, datetime; ca đối chứng chạy ma trận trên bộ định dạng bỏ bước đổi đơn vị sau làm tròn và khẳng định thông điệp 'format mismatch: money 999999999'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/lib/format/**, tests/format.test.ts]
+    expected: "exit 0; statusTone cho đúng 6 trạng thái: Incomplete warning-light, Active success-light, Pending info-light, Closed primary-light, Hold warning-light, Withdrawn destructive-light; bộ kiểm khẳng định đủ 6 khoá của ListingStandardStatus; statusLabel cho 'Đang cho thuê' và 'Đã cho thuê' khi giao dịch là cho thuê"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: ["src/app/(app)/proto/**", src/styles/**, tests/e2e/frame.spec.ts]
+    expected: "exit 0; ca 'frame › status badges pass contrast in light and dark' mở /proto/khung-va-giao-dien, thấy đủ 6 huy hiệu trạng thái, axe với luật color-contrast cho 0 vi phạm ở sáng và ở tối; ca đối chứng ghi đè màu chữ một huy hiệu trên trang thật thành màu nền và khẳng định axe báo color-contrast"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-11
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/templates/notify.ts, src/components/templates/screen-banner.tsx, tests/frame.test.tsx]
+    expected: "exit 0; channelFor cho field → inline, result → toast, screen → banner, bộ kiểm khẳng định đủ 3 loại sự việc; notifyResult có undo thì toast mang hành động 'Hoàn tác', không undo thì không; saveWithBanner khi lời lưu ném lỗi và navigator.onLine là false thì đặt băng có retry, khi trực tuyến thì không đặt băng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/templates/screen-banner.tsx, src/components/templates/app-shell.tsx, tests/e2e/frame.spec.ts]
+    expected: "exit 0; ca 'frame › losing the network shows a banner that leaves when it is back' dùng context.setOffline(true): băng role=alert hiện câu mất kết nối và thay đổi chưa lưu được; setOffline(false) thì băng đi; ca 'frame › a save that fails offline keeps the input and offers retry' gõ chữ vào ô mẫu của bản mẫu khung, ngắt mạng, bấm lưu: băng có 'Thử lại', ô vẫn giữ chữ đã gõ; có mạng lại rồi bấm 'Thử lại' thì băng đi; ca đối chứng khẳng định bộ kiểm băng báo 'banner missing' trên trang khi còn mạng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-12
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/templates/theme.tsx, src/app/layout.tsx, src/styles/**, tests/e2e/frame.spec.ts, tests/e2e/shell.spec.ts]
+    expected: "exit 0; ca 'frame › follows the device theme first' với colorScheme dark thấy html có lớp dark, với light thì không; ca 'frame › chosen theme survives a reload' chọn Tối ở nút giao diện, tải lại, html vẫn có lớp dark; ca 'frame › no serious accessibility violations on every frame screen' quét danh sách viết trước đúng 9 màn — '/', '/inventory', '/sent', '/proto/khung-va-giao-dien', '?state=error', '?state=session-expired', '/no-such-page', '/inventory' khi mất mạng có băng, '/inventory' với tấm phủ thanh bên mở ở khổ 360 và 414 (ở khổ máy tính màn này thay bằng thanh bên mở rộng) — ở cả sáng và tối, bộ kiểm khẳng định đã quét 9 × 2 = 18 lượt; ca đối chứng ghi đè màu chữ của nút 'Thử lại' trên trang lỗi thật thành màu nền và khẳng định axe báo color-contrast"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-12
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/components/templates/**, "src/app/(app)/**", src/app/not-found.tsx, src/styles/**]
+    steps:
+      - "Start dev server per config dev_server.start with PORT=3481"
+      - "Navigate {url}/inventory at 1440x900, light → screenshot evidence/E15-step1.png"
+      - "Same page, dark (emulate prefers-color-scheme dark) → screenshot evidence/E15-step2.png"
+      - "Navigate {url}/proto/khung-va-giao-dien at 1440x900, light → screenshot evidence/E15-step3.png"
+      - "Navigate {url}/proto/khung-va-giao-dien?state=error at 360x800 → screenshot evidence/E15-step4.png"
+      - "Navigate {url}/inventory at 360x800, open the sidebar sheet → screenshot evidence/E15-step5.png"
+      - "Navigate {url}/no-such-page at 1440x900 → screenshot evidence/E15-step6.png"
+    expected: "khung có thanh bên, mục Bảng hàng được đánh dấu, đầu màn có h1 Bảng hàng; tối đổi nền và chữ, đọc được; bản mẫu bày đủ sáu huy hiệu trạng thái và bảng định dạng; trang lỗi ở 360 có câu ba phần và nút Thử lại, không cuộn ngang; tấm phủ thanh bên trên điện thoại mở; trang không tìm thấy không có thanh bên"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
+
+  - id: E16
+    criterion: AC-6
+    executor: judgment
+    question: "Trả lời bốn câu có/không, mỗi câu dựa trên các hằng chữ trong frame-copy.ts: (a) câu của trang lỗi có đủ ba phần chuyện gì xảy ra, vì sao, làm gì tiếp; (b) câu của trang không tìm thấy có đủ ba phần; (c) câu của trang hết phiên có đủ ba phần; (d) câu của băng mất mạng và băng lưu hỏng có đủ ba phần. Với cả bốn: người dùng được gọi là «bạn» theo design/language.md, không có dấu chấm than, và không chuỗi nào trùng một nhãn pref, lease hay alt trong ontology/labels.yaml."
+    inputs: [src/components/templates/frame-copy.ts, design/language.md, ontology/labels.yaml]
+    evidence_required: [judged_by, verdict, rationale]
