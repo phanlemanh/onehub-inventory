@@ -30,3 +30,6 @@ __pycache__/
 next-env.d.ts
 test-results/
 playwright-report/
+
+# Run logs of the acceptance kit and batches
+.acceptance-runs/
