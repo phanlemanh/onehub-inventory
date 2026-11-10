@@ -35,7 +35,8 @@ export const FRAME_COPY = {
   },
   offline: {
     title: "Mất kết nối mạng",
-    detail: "Thay đổi mới chưa lưu được cho tới khi có mạng lại.",
+    detail:
+      "Thiết bị đang không có mạng nên thay đổi mới chưa lưu được. Bạn kiểm tra wifi hoặc dữ liệu di động; khi có mạng lại, băng này tự tắt và bạn lưu tiếp.",
   },
   saveFailedOffline: {
     title: "Chưa lưu được vì mất kết nối mạng",
