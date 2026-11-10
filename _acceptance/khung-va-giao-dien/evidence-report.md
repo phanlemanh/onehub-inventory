@@ -77,7 +77,7 @@ human_signoff:
   run_id: minted-khung-va-giao-dien-E15-r2
   exit_code: 0
   baseline: n-a
-  verifier: ui-check
+  verifier: config:capture.ui
   verified_at: 2026-11-10T23:30:19Z
   screenshot: evidence/E15-step1.png
   observed: |
