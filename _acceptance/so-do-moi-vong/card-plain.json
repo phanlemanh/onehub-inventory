@@ -1,0 +1,120 @@
+{
+ "feature_plain": "Mỗi vòng làm màn để lại một bản số đo làm lại theo tầng, một lệnh gộp các bản đó cạnh mốc Quỹ hàng, và một mốc đo ba agent trước khi khung giao diện vào nhánh chính.",
+ "will_do": [
+  {
+   "id": "AC-2",
+   "p": "Sẽ giữ tầng đã khai khi ghi lại, và chỉ ra lượt mới chưa khai tầng."
+  },
+  {
+   "id": "AC-3",
+   "p": "Sẽ từ chối tầng lạ hoặc lượt không có thật, nói rõ danh sách tầng hợp lệ, không đụng bản đã ghi."
+  },
+  {
+   "id": "AC-4",
+   "p": "Sẽ báo đỏ khi một vòng làm màn đã qua chấm mà thiếu bản số đo, còn lượt chưa khai tầng, hoặc bản số đo cũ hơn sổ chấm — và in đúng lệnh cần chạy."
+  },
+  {
+   "id": "AC-5",
+   "p": "Sẽ chạy lưới đó trong bộ kiểm hằng ngày của kho, nên vòng thiếu số đo không vào được nhánh chính."
+  },
+  {
+   "id": "AC-6",
+   "p": "Sẽ in báo cáo làm lại theo 11 tầng, mỗi tầng đặt cạnh tỉ lệ của Quỹ hàng, thay cho một tỉ lệ chung."
+  },
+  {
+   "id": "AC-7",
+   "p": "Sẽ in tỉ lệ quyết định thiết kế có kiểm theo từng tầng, đếm bằng đúng luật kiểm đang có, cộng lại khớp tỉ lệ chung."
+  },
+  {
+   "id": "AC-8",
+   "p": "Sẽ báo đỏ khi mốc ba agent thiếu agent, câu giao khác đề bài, hay đo sau khi khung giao diện đã vào nhánh chính; bản lấy nông của CI chỉ bỏ phần cần lịch sử."
+  },
+  {
+   "id": "AC-9",
+   "p": "Sẽ có một người chấm độc lập xác nhận bảng so khớp đúng điều ba agent viết."
+  }
+ ],
+ "wont_do": [
+  {
+   "id": "AC-1",
+   "p": "Sẽ ghi cho mỗi vòng số lượt chấm, mỗi lượt không qua tính vào tầng nào và giờ máy; KHÔNG tính làm lại cho lượt chấm lại cùng lượt rồi qua, hay lượt chờ người chấm."
+  },
+  {
+   "id": "OOS-1",
+   "p": "Không ghi số đo ngược cho các vòng đã xong, không đo các vòng ở Quỹ hàng."
+  },
+  {
+   "id": "OOS-2",
+   "p": "Không sửa bộ kiểm sổ thiết kế, Makefile hay cấu hình kit — các tệp đó ngoài phần việc của hàng này."
+  },
+  {
+   "id": "OOS-3",
+   "p": "Chưa gửi số về kit; việc đó làm sau 10 vòng."
+  },
+  {
+   "id": "OOS-4",
+   "p": "Không kiểm tầng agent khai có đúng không — chỉ kiểm có khai."
+  },
+  {
+   "id": "OOS-5",
+   "p": "Không đo lại mốc trong vòng này; đo lại là việc sau đợt nền."
+  }
+ ],
+ "scope_plain": "Năm thứ cố ý để ngoài vòng này:",
+ "coverage_plain": [
+  {
+   "i": 0,
+   "p": "Mọi kết quả một lượt chấm (qua, chờ người, không qua, chặn, ghim lại đỏ) đều có ca riêng — AC-1, AC-2 (cách tính làm lại)."
+  },
+  {
+   "i": 1,
+   "p": "Ghi lần đầu, ghi lại, và đầu vào sai đều có tiêu chí — AC-1, AC-2, AC-3 (ghi bản số đo)."
+  },
+  {
+   "i": 2,
+   "p": "Ba cách nhận ra vòng làm màn (khai mặt giao diện, có buổi soi thiết kế, không phải màn) đều được kiểm — AC-4 (lưới thiếu số đo)."
+  },
+  {
+   "i": 3,
+   "p": "Bảy trạng thái của hồ sơ được kê đủ: ba trạng thái đầu không bị đòi, bốn trạng thái sau khi chấm thì bị đòi — AC-4."
+  },
+  {
+   "i": 4,
+   "p": "Bốn tình trạng của bản số đo (thiếu, chưa khai tầng, cũ, hợp lệ) đều có ca — AC-4."
+  },
+  {
+   "i": 5,
+   "p": "Ba khối của báo cáo đều có tiêu chí — AC-6, AC-7, AC-8 (báo cáo theo tầng)."
+  },
+  {
+   "i": 6,
+   "p": "Sáu cách mốc có thể hỏng đều có bản phá thử — AC-8, AC-9 (mốc ba agent)."
+  },
+  {
+   "i": 7,
+   "p": "Lưới được kiểm cả trên kho mẫu lẫn trên chính kho trong bộ kiểm hằng ngày — AC-4, AC-5."
+  }
+ ],
+ "gap_probe_plain": [
+  {
+   "i": 0,
+   "p": "Hai lựa chọn (khung 11 tầng, màn Liên hệ) bị ghi là máy tự quyết nhưng câu căn cứ không thật sự quyết; đã chuyển thành hai câu hỏi cho anh ở cổng này, và thêm bảng nối từng hàng 1c, 1e, 1f, 1g với tầng nó nhắm giảm."
+  },
+  {
+   "i": 1,
+   "p": "Chưa nói vòng cũ có được miễn lưới không; đã ghi rõ không có miễn, vì kho chưa có vòng làm màn nào qua chấm."
+  },
+  {
+   "i": 2,
+   "p": "Bài kiểm mẫu thiếu ca chấm lại cùng lượt và ca chờ người, và chỉ ghim một số của mốc Quỹ hàng; đã thêm hai ca, chép dòng mẫu từ sổ chấm thật, ghim đủ 11 tầng và tổng 199."
+  },
+  {
+   "i": 3,
+   "p": "Tính độc lập của ba agent chỉ dựa lời tự khai; nay máy so câu đã gửi với đề bài và chứng bản kho agent đọc chưa có phương án nào."
+  },
+  {
+   "i": 4,
+   "p": "CI lấy mã nông nên không thấy commit của mốc; nay lệnh kiểm mốc bỏ riêng phần cần lịch sử khi kho nông, các phần khác vẫn kiểm."
+  }
+ ]
+}

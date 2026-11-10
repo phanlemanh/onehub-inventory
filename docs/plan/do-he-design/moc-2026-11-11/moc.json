@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "ngay": "2026-11-11",
+  "commit": "c706223901220e35f8095854249c171294b79739",
+  "ban_kho": "/private/tmp/claude-501/-Users-manhphan-dev-onehub-inventory--claude-worktrees-recursing-herschel-c4214a/b5157e36-b8ad-4efc-9799-b32ee3ccb9a4/scratchpad/moc-tree",
+  "man": "Liên hệ (danh sách)",
+  "de_bai": "docs/plan/do-he-design/de-bai-ba-agent.md",
+  "bang_so": "docs/plan/do-he-design/moc-2026-11-11/so-sanh.md",
+  "agent": [
+    {
+      "so": 1,
+      "tep": "docs/plan/do-he-design/moc-2026-11-11/agent-1.md",
+      "token": 205372,
+      "luot_cong_cu": 20,
+      "giay": 315,
+      "tong": 44,
+      "du": 15,
+      "mot_phan": 14,
+      "tu_doan_he": 6,
+      "tu_doan_san_pham": 12,
+      "tep_doc": 58
+    },
+    {
+      "so": 2,
+      "tep": "docs/plan/do-he-design/moc-2026-11-11/agent-2.md",
+      "token": 189965,
+      "luot_cong_cu": 23,
+      "giay": 293,
+      "tong": 47,
+      "du": 15,
+      "mot_phan": 15,
+      "tu_doan_he": 7,
+      "tu_doan_san_pham": 10,
+      "tep_doc": 53
+    },
+    {
+      "so": 3,
+      "tep": "docs/plan/do-he-design/moc-2026-11-11/agent-3.md",
+      "token": 210639,
+      "luot_cong_cu": 21,
+      "giay": 336,
+      "tong": 65,
+      "du": 23,
+      "mot_phan": 28,
+      "tu_doan_he": 23,
+      "tu_doan_san_pham": 13,
+      "tep_doc": 53
+    }
+  ],
+  "ket_qua": {
+    "bat_buoc": { "dong": 21, "giong": 13, "giong_mang_loi": 0, "lech": 8 },
+    "toan_bang": { "dong": 52, "giong": 30, "giong_mang_loi": 0, "lech": 22 }
+  },
+  "ghi_chu": "token, luot_cong_cu, giay: số harness đo cho từng agent. tong, du, mot_phan, tu_doan_*, tep_doc: số agent tự tổng kết, chép qua bảng so; agent 3 gộp dòng một phần vào tự đoán nên tu_doan không so thẳng giữa ba agent."
+}
