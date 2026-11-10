@@ -5,7 +5,7 @@ slug: go-hoi-khi-gop
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-10
 design_doc: docs/superpowers/specs/2026-11-10-go-hoi-khi-gop-design.md
@@ -53,3 +53,7 @@ Thước đối chiếu: bảng cờ của lệnh `gh pr merge --help`, đọc n
 - Lệnh gộp có chữ `--squash` nằm trong phần tiêu đề commit sẽ bị hỏi nhầm. Việc này chỉ thêm một lần hỏi, không mở rào.
 - Phép cho phép gộp nằm ở cấu hình cấp máy của chủ kho. Máy khác chưa có phép đó thì lệnh gộp vẫn xin phép theo mặc định.
 - Bộ kiểm chỉ đọc nội dung tệp. Hộp xin phép có thật sự hết hay không chỉ thấy ở lần gộp thật đầu tiên sau khi vòng này vào `main`.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-10:
+  - Ngoài-1: Máy có thể gộp thay đổi hạng cao mà không có người bấm duyệt, trong khi chính sách của kho ghi là người phải duyệt; chủ kho sẽ tự chỉnh câu chính sách.
+  - Ngoài-3: Một vài cách viết lệnh duyệt PR có thể không bị hỏi, và bộ kiểm chưa đo các cách viết đó.
+  - Ngoài-4: Bộ kiểm chứng minh luật khớp theo cách hiểu của người viết, công cụ thật chỉ được xác nhận ở lần gộp thật đầu tiên.
