@@ -284,7 +284,10 @@ test.describe("frame", () => {
     await expect(page.locator('[data-slot="status-badges"] [data-status]')).toHaveCount(6);
     await page.evaluate(() => {
       const badge = document.querySelector<HTMLElement>('[data-status="Active"]');
-      if (badge) badge.style.color = getComputedStyle(badge).backgroundColor;
+      if (!badge) return;
+      badge.style.transition = "none";
+      badge.style.backgroundColor = "rgb(255, 255, 255)";
+      badge.style.color = "rgb(250, 250, 250)";
     });
     const { violations } = await new AxeBuilder({ page })
       .include('[data-slot="status-badges"]')
@@ -394,9 +397,13 @@ test.describe("frame", () => {
     await page.goto(`${PROTO}?state=error`);
     const retry = page.getByRole("button", { name: "Thử lại" });
     await expect(retry).toBeVisible();
+    // No transition, fixed colours: axe must read the broken pair, not a colour half-way through the button's fade.
     await retry.evaluate((el) => {
-      el.style.color = getComputedStyle(el).backgroundColor;
+      el.style.transition = "none";
+      el.style.backgroundColor = "rgb(255, 255, 255)";
+      el.style.color = "rgb(250, 250, 250)";
     });
+    await expect(retry).toHaveCSS("color", "rgb(250, 250, 250)");
     expect(await seriousViolations(page)).toContain("color-contrast");
   });
 });
