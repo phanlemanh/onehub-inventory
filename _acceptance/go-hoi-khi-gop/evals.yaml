@@ -1,0 +1,42 @@
+schema_version: 1
+feature_slug: go-hoi-khi-gop
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.quyen_kho
+    paths: [.claude/settings.json, tests/permissions.test.ts]
+    expected: "exit 0; bộ so khớp áp mẫu luật lên đúng 6 chuỗi lệnh: 'gh pr merge 6 --merge', 'gh pr merge --merge 6', 'gh pr merge 6 --repo phanlemanh/onehub-inventory --merge --match-head-commit abc', 'gh pr merge 6 --merge --delete-branch', 'gh pr merge 6 -m', 'gh pr merge 6'; không luật hỏi hay cấm nào khớp; chiều đỏ ở E5 ghim thông điệp 'plain merge still asks'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.quyen_kho
+    paths: [.claude/settings.json, tests/permissions.test.ts]
+    expected: "exit 0; ma trận toàn phần viết trước 16 chuỗi lệnh (4 cờ × 4 chỗ: 'gh pr merge CỜ 6', 'gh pr merge 6 CỜ --repo x/y', 'gh pr merge 6 --repo x/y CỜ', 'gh pr merge 6 --merge CỜ') đều khớp luật hỏi; bộ kiểm khẳng định ma trận đúng 16 phần tử; chiều đỏ ở E5 ghim thông điệp 'off-policy merge not asked: <cờ>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.quyen_kho
+    paths: [.claude/settings.json, tests/permissions.test.ts]
+    expected: "exit 0; 'gh pr review 6 --approve' và 'gh release create v1.0.0' khớp luật hỏi; chiều đỏ ở E5 ghim thông điệp 'kept ask rule missing: <lệnh>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.quyen_kho_ban_goc
+    paths: [.claude/settings.json]
+    expected: "exit 0; đọc danh sách cấm và cho phép từ git show 84a2d597:.claude/settings.json và từ tệp hiện tại, so toàn bộ theo thứ tự, in 'deny and allow identical to 84a2d597'; lệch thì exit 1 và in 'deny list changed' hoặc 'allow list changed'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.quyen_kho
+    paths: [.claude/settings.json, tests/permissions.test.ts]
+    expected: "exit 0; dữ liệu đọc từ tệp thật, đường dẫn suy từ vị trí bộ kiểm; tệp lành cho 0 vi phạm; đúng 12 bản sao bị phá cho đúng thông điệp: thêm lại dòng 'Bash(gh pr merge:*)' như ở commit 84a2d597 ('plain merge still asks'), bớt từng luật của 4 cờ ('off-policy merge not asked: --auto', '--admin', '--squash', '--rebase'), bớt từng luật hỏi giữ lại ('kept ask rule missing: gh pr review', 'gh release create'), bớt một dòng cấm và sửa tại chỗ một dòng cấm ('deny list changed'), thêm, bớt và sửa tại chỗ một dòng cho phép ('allow list changed'); bộ so khớp có bảng đối chứng 8 cặp luật và lệnh gồm cả dạng ':*' và '*'; lệnh in đúng 47 ca đạt, 0 bỏ qua"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
