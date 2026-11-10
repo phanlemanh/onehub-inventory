@@ -5,3 +5,17 @@ package-lock.json
 CHANGELOG.md
 src/generated/
 contracts/openapi.json
+_acceptance/
+PRODUCT-MAP.md
+.next/
+next-env.d.ts
+src/components/ui/
+src/components/reui/
+test-results/
+playwright-report/
+design/component-registry.json
+.claude/skills/reui/
+PRODUCT-INVARIANTS.md
+LO-TRINH.html
+docs/plan/lo-trinh.json
+docs/tri-thuc/

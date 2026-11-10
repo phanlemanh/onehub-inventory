@@ -30,6 +30,7 @@ lint: ## Lint and check formatting
 
 typecheck: ## Strict type check
 	npm run typecheck
+	node tools/typecheck_own.mjs
 
 test: ## Run tests
 	npm test

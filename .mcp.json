@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "reui": {
+      "type": "http",
+      "url": "https://mcp.reui.io",
+      "headers": {
+        "X-Reui-Style": "base-nova",
+        "Authorization": "Bearer ${REUI_LICENSE_KEY:-}"
+      }
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    }
+  }
+}

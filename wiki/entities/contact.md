@@ -14,8 +14,7 @@ của RESO; DD 2.1 vẫn dùng tên số nhiều.
 
 ## Rules
 
-Chủ nhà, người mua, người thuê là loại của liên hệ, không phải bản ghi riêng. Thông tin chủ nhà thuộc lớp nguồn và không
-rời công ty.
+Chủ nhà, người mua, người thuê là loại của liên hệ, không phải bản ghi riêng.
 
 ## Where in the code
 
@@ -23,4 +22,4 @@ rời công ty.
 
 ## History
 
-Lấy từ từ vựng của Quỹ hàng khi dựng kho, 09/11/2026.
+Lấy từ từ vựng của Quỹ hàng khi dựng kho, 09/11/2026. Bỏ luật giữ thông tin chủ nhà trong công ty cho MVP, xem [0014](../decisions/0014-mvp-product-rules.md).

@@ -1,0 +1,84 @@
+# 2-space indentation REQUIRED — the kit's hook parses this file line-by-line.
+schema_version: 1
+enforcement: strict     # suy từ: _acceptance/config.yaml của Quỹ hàng
+gap_probe: required     # suy từ: Quỹ hàng (mặc định của kit là advisory)
+recheck: strict         # suy từ: kho mới, chưa có báo cáo cũ
+executors:
+  test:
+    unit: "make test"                # suy từ: Makefile
+  script:
+    check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
+    build: "npm run build"           # suy từ: package.json, ci.yml
+    e2e: "make e2e"                  # suy từ: mk/design.mk — cần trình duyệt Playwright
+    product_map: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/product-map.mjs\" --root . --check"   # suy từ: mẫu của kit, cách viết của Quỹ hàng
+  design:
+    floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
+    khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists
+    # No `gate` key: it needs a captured page and cannot read Tailwind 4 colours. Contrast is covered by axe in `make e2e`.
+    ui_check: "${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}/scripts/design-scan.js"
+risk_tiers:
+  t1_skip_globs:
+    - "docs/**"                      # suy từ: tài liệu, như Quỹ hàng
+    - "wiki/**"                      # suy từ: AGENTS.md (quyết định, sự cố, ghi chép)
+    - "README.md"
+    - "CHANGELOG.md"
+    - "AGENTS.md"
+    - "CLAUDE.md"
+    - "setup-blueprint.yaml"         # suy từ: bản ghi lần dựng kho, không chạy
+    - ".github/workflows/ci.yml"     # suy từ: Quỹ hàng — tệp chứa job cổng, ghi đích danh
+    - "PRODUCT-MAP.md"               # suy từ: mẫu của kit — máy sinh, commit cùng chữ ký
+    - "LO-TRINH.html"
+    - "docs/tri-thuc/**"
+  t3_paths:
+    - "PRODUCT-INVARIANTS.md"        # product invariants; only the owner edits this file
+    - "db/**"                        # suy từ: bất biến 1 — chỗ đặt migration khi chuyển mã
+    - "src/modules/identity/**"      # suy từ: modules.yaml — đăng nhập, cửa truy vấn theo sàn
+    - "src/modules/agreements/**"    # suy từ: bất biến 2 — trần lớp dữ liệu, thoả thuận
+    - "src/modules/sharing/**"       # suy từ: bất biến 4 — luật ẩn, trang khách
+    - "src/modules/imports/ai/**"    # suy từ: blueprint — che số chủ nhà trước khi gửi mô hình
+    - "ontology/**"                  # suy từ: governance/autonomy.yaml mức high
+    - "architecture/modules.yaml"    # suy từ: AGENTS.md — đổi ranh giới là quyết định thiết kế
+    - "governance/**"                # suy từ: autonomy.yaml
+    - "tools/**"                     # suy từ: autonomy.yaml — gồm rào ranh giới
+    - "mk/**"
+    - "Makefile"
+    - ".claude/settings.json"        # suy từ: Quỹ hàng — quyền cấm của agent
+    - ".claude/hooks/**"
+    - ".pre-commit-config.yaml"      # suy từ: autonomy.yaml — quét bí mật
+    - ".gitleaks.toml"
+    - ".github/workflows/deploy.yml" # suy từ: Quỹ hàng — đường ra bản thật
+    - ".github/workflows/release.yml"
+signoff:
+  required_for: [T2, T3]
+  approvers: ["Manh Phan"]           # suy từ: git config user.name
+design:
+  surface_globs:
+    - "src/app/**"
+    - "src/components/candidate/**"
+    - "src/components/templates/**"
+    - "src/modules/*/ui/**"
+design_floor:
+  sinh_lai:
+    - "make gen"                     # S3 regenerates derived files inside the round
+design_pass:
+  proto_route: http://127.0.0.1:3470/proto/{slug}
+  ds_skill: inventory-ui
+  dev_cmd: "npm run dev"
+feature_loop:
+  ui_standards_skill: inventory-ui
+  ngoai_n_tu_dinh_tuyen: true   # same as onehub-quy-hang: the machine routes out-of-contract items on clean T2 records
+  suite_keys:
+    - executors.script.check
+    - executors.script.build
+    - executors.script.e2e
+dev_server:
+  start: "npm run dev"
+  url: "http://127.0.0.1:3470"
+capture:
+  ui: "npx playwright screenshot"   # <url> <out.png>, for the Gate 2 slideshow
+dieu_phoi:
+  goi_dot: docs/plan/dot-{ten}   # batch package; open with /dieu-phoi:mo-dot <name>
+tri_thuc:
+  noi: docs/tri-thuc   # in this repo; public since 2026-11-10 and the owner chose to keep raw sources here
+lo_trinh:
+  tep: docs/plan/lo-trinh.json

@@ -24,3 +24,12 @@ npm-debug.log*
 # Bytecode of the Python tools in tools/
 __pycache__/
 *.pyc
+
+# Next.js and browser tests
+.next/
+next-env.d.ts
+test-results/
+playwright-report/
+
+# Run logs of the acceptance kit and batches
+.acceptance-runs/

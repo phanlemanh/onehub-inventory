@@ -1,0 +1,904 @@
+{
+  "schema": 1,
+  "ten": "Lộ trình onehub-inventory",
+  "ghi_chu": "Thêm việc bằng skill cắt lượt (/acceptance-gate:cat-luot), hoặc viết hàng theo khuôn skills/acceptance/references/lo-trinh-template.json của gói acceptance-gate; mở vòng bằng /feature-loop:feature-loop <mã>.",
+  "moc": [],
+  "hang": [
+    {
+      "ma": "1",
+      "cau_giao": "Dựng một sàn mẫu trên Vinhomes Ocean Park 1, 2, 3, căn và liên hệ nối sẵn với nhau, nhãn MAU đủ cho các màn",
+      "vai": "nen",
+      "tieu_chi": 10,
+      "vi_sao": "Các màn dựng trên dữ liệu mẫu trước khi có dữ liệu thật. Quyết định 0020: Bảng hàng và Liên hệ dùng chung dữ liệu từ đầu",
+      "hang": "T2",
+      "slug": "du-lieu-mau",
+      "bat_khi": "Dựng lại hai lần ra cùng dữ liệu; mọi bản ghi mang nhãn MAU; không có tên hay số thật; đủ ca một chủ nhiều căn, một căn nhiều chủ, một người vừa là chủ vừa là khách, căn chưa có chủ; đổi số của một liên hệ thì mọi căn của người đó cùng thấy số mới",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "N4"
+      ],
+      "vung": [
+        "src/modules/listings/**",
+        "src/modules/catalog/**",
+        "src/modules/contacts/**"
+      ],
+      "du_lieu": "sinh-gia"
+    },
+    {
+      "ma": "1a",
+      "cau_giao": "Nhân viên sàn mở ứng dụng ở giao diện sáng hoặc tối, luôn biết mình đang ở màn nào và được báo đúng chỗ khi có sự cố",
+      "vai": "Nhân viên sàn",
+      "tieu_chi": 12,
+      "vi_sao": "Khung, định dạng và thông báo là phần mọi màn đều đứng trên",
+      "slug": "khung-va-giao-dien",
+      "hang": "T2",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "F1",
+        "F2",
+        "F3",
+        "F4",
+        "F5"
+      ],
+      "vung": [
+        "src/components/templates/**",
+        "src/styles/**"
+      ],
+      "ghi_chu": "Chủ kho duyệt gộp phần khung, định dạng và thông báo vào một hàng; cỡ 12 nằm trong mức cho phép",
+      "dung_tren": [
+        "1h"
+      ]
+    },
+    {
+      "ma": "1b",
+      "cau_giao": "Mọi vùng dữ liệu dùng chung Lưới, ô theo kiểu, đầu vùng và đủ trạng thái",
+      "vai": "nen",
+      "tieu_chi": 10,
+      "vi_sao": "Khoá đúng chỗ các tác tử từng làm lệch nhau ở Quỹ hàng",
+      "hang": "T2",
+      "dung_tren": [
+        "1a"
+      ],
+      "slug": "luoi-va-o-theo-kieu",
+      "bat_khi": "Hai cột cùng kiểu luôn ra cùng canh lề, bề rộng và định dạng; mỗi trạng thái vùng có bài kiểm đỏ được khi phá",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "F6",
+        "F7"
+      ],
+      "vung": [
+        "src/components/candidate/**"
+      ]
+    },
+    {
+      "ma": "1e",
+      "cau_giao": "Hồ sơ cạnh bảng, lọc rỗng, chờ tải, lỗi, lưu và hoàn tác chỉ có một cách dựng, màn chỉ khai mình cần gì",
+      "tieu_chi": 10,
+      "vi_sao": "Quyết định 0019: trạng thái và hành vi chiếm 36% số lần làm lại có đổi sản phẩm ở Quỹ hàng, đúng chỗ Bảng hàng lệch Liên hệ",
+      "hang": "T2",
+      "dung_tren": [
+        "1b"
+      ],
+      "slug": "hanh-vi-trong-luoi-khung",
+      "bat_khi": "Sáu quyết định tầng hành vi đều có bài kiểm đỏ được; một màn tự dựng lại các hành vi này thì kiểm tra đỏ; hồ sơ cạnh bảng nhận được cả căn lẫn người, đi qua lại mà không đổi khung",
+      "phu": [
+        "F9"
+      ],
+      "vung": [
+        "src/components/candidate/**",
+        "src/components/templates/**",
+        "design/behaviors.md",
+        "design/states.md"
+      ],
+      "vai": "nen",
+      "nhom": "nen",
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "1c",
+      "cau_giao": "Vòng dựng màn phải chứng minh giải được và đồng nhất với màn mẫu trước khi trình, rời khỏi thang Trong kho, ReUI, Vẽ tay thì phải nêu căn cứ",
+      "vai": "nen",
+      "tieu_chi": 10,
+      "vi_sao": "Quyết định 0019: thay cổng chọn khối của Quỹ hàng, vốn chấm đồng nhất theo tên thành phần",
+      "hang": "T3",
+      "dung_tren": [
+        "1b",
+        "1d",
+        "1g"
+      ],
+      "slug": "cong-chung-minh-man-mau",
+      "bat_khi": "Màn thuộc họ đã có mà thiếu ảnh cạnh màn mẫu hoặc còn chỗ lệch vô cớ thì đỏ; họ mới thiếu hai hướng thì đỏ; rơi xuống bậc dưới mà thiếu căn cứ thì đỏ; phát lại ca màn Liên hệ của Quỹ hàng thì bị gắn cờ",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "F8"
+      ],
+      "vung": [
+        "design/patterns/**",
+        "tools/proof_gate/**",
+        ".claude/skills/inventory-ui/**"
+      ]
+    },
+    {
+      "ma": "1d",
+      "cau_giao": "Mọi màn và mọi vai được khai cho máy đọc, màn chưa khai hay hợp đồng thiếu vai thì kiểm tra báo đỏ",
+      "vai": "nen",
+      "tieu_chi": 8,
+      "vi_sao": "Quyết định 0017: máy của kit chỉ kiểm mục Độ phủ có mặt; đặt trước hàng 2 để có số đo từ vòng giao diện đầu tiên",
+      "hang": "T3",
+      "dung_tren": [
+        "1a"
+      ],
+      "slug": "khai-vai-va-man",
+      "bat_khi": "Thêm một trang chưa khai thì đỏ; bỏ một vai khỏi khối Vai × Màn của hợp đồng thì đỏ; một lệnh in số vòng đủ ô, thiếu ô và số ô ghi không liên quan; màn Liên hệ dù làm sau vẫn được khai trước vào họ Lưới",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "N11"
+      ],
+      "vung": [
+        "ontology/roles.yaml",
+        "design/screens.yaml",
+        "tools/coverage_matrix/**"
+      ]
+    },
+    {
+      "ma": "1f",
+      "cau_giao": "Mỗi màn trong sổ có sẵn bộ bài kiểm trạng thái sinh ra từ sổ, kèm bài phá thử chứng minh bài kiểm đỏ được",
+      "tieu_chi": 8,
+      "vi_sao": "Quyết định 0019: 55% số lần làm lại ở Quỹ hàng là bài kiểm và hạ tầng",
+      "hang": "T2",
+      "dung_tren": [
+        "1d",
+        "1e"
+      ],
+      "slug": "bo-bai-kiem-tu-so-man",
+      "bat_khi": "Thêm một màn vào sổ thì có bộ bài kiểm mà không viết tay; phá từng trạng thái thì bài kiểm tương ứng đỏ",
+      "phu": [
+        "F10"
+      ],
+      "vung": [
+        "tests/e2e/**",
+        "tools/e2e_templates/**"
+      ],
+      "vai": "nen",
+      "nhom": "nen",
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "1g",
+      "cau_giao": "Agent tra được danh mục ReUI Pro ngay trong kho theo phiên bản đã ghim, không phụ thuộc kết nối ngoài",
+      "tieu_chi": 6,
+      "vi_sao": "Quyết định 0019: thang ưu tiên chỉ đáng tin khi tra được thật",
+      "hang": "T2",
+      "slug": "danh-muc-reui",
+      "bat_khi": "Một lệnh sinh lại danh mục từ bản ReUI đã ghim; khối có trong danh mục mà tra không ra thì đỏ; danh mục chỉ có tên và mô tả, không có mã nguồn hay licence",
+      "phu": [
+        "F11"
+      ],
+      "vung": [
+        "design/reui-catalog.json",
+        "tools/reui_catalog/**"
+      ],
+      "ghi_chu": "Không gộp vào hàng 1c vì hàng đó đã 10 tiêu chí, và đây là phần ít rủi ro",
+      "vai": "nen",
+      "nhom": "nen",
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "1h",
+      "cau_giao": "Mỗi vòng giao diện máy ghi một bản số đo, một lệnh gộp theo tầng, và có mốc đối chứng trước khi dựng nền",
+      "tieu_chi": 8,
+      "vi_sao": "Quyết định 0019: đợt này là đợt chạy thật cho kit, cần số so được với mốc",
+      "hang": "T2",
+      "slug": "so-do-moi-vong",
+      "bat_khi": "Thiếu bản số đo ở vòng giao diện thì đỏ; báo cáo tách theo tầng thay cho một tỉ lệ chung; ba agent độc lập lập phương án một màn chưa có mẫu và ghi mốc trước khi hàng 1a gộp",
+      "phu": [
+        "F12"
+      ],
+      "vung": [
+        "tools/round_metrics/**",
+        "docs/plan/do-he-design/**"
+      ],
+      "vai": "nen",
+      "nhom": "nen",
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "2",
+      "cau_giao": "Đầu chủ mở Bảng hàng và thấy các căn của sàn trên Lưới, đủ trạng thái màn, ở bốn khổ màn hình",
+      "vai": "Đầu chủ",
+      "tieu_chi": 8,
+      "vi_sao": "Lát cắt đầu, là màn mẫu cho các màn sau",
+      "hang": "T2",
+      "dung_tren": [
+        "1",
+        "1b",
+        "1c",
+        "1d",
+        "1e",
+        "1f",
+        "1h"
+      ],
+      "slug": "bang-hang-ban-doc",
+      "nhom": "bang-hang",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "B1"
+      ],
+      "vung": [
+        "src/modules/listings/ui/**"
+      ],
+      "du_lieu": "gia"
+    },
+    {
+      "ma": "3",
+      "cau_giao": "Đầu chủ bấm một căn và thấy hồ sơ căn cạnh bảng, trên điện thoại thấy thẻ căn",
+      "vai": "Đầu chủ",
+      "tieu_chi": 9,
+      "vi_sao": "Hồ sơ và thẻ là hai dạng xem của cùng một căn",
+      "hang": "T2",
+      "dung_tren": [
+        "2"
+      ],
+      "slug": "ho-so-can",
+      "nhom": "bang-hang",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "B2",
+        "B3"
+      ],
+      "vung": [
+        "src/modules/listings/ui/**"
+      ]
+    },
+    {
+      "ma": "4",
+      "cau_giao": "Đầu chủ sửa giá và trạng thái ngay trên ô, thấy lỗi ngay tại ô đó",
+      "vai": "Đầu chủ",
+      "tieu_chi": 10,
+      "vi_sao": "Thay thao tác sửa trên Sheet",
+      "hang": "T2",
+      "dung_tren": [
+        "2"
+      ],
+      "slug": "sua-tren-o",
+      "nhom": "bang-hang",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "B4",
+        "B6"
+      ],
+      "vung": [
+        "src/modules/listings/ui/**",
+        "src/components/candidate/**"
+      ]
+    },
+    {
+      "ma": "5",
+      "cau_giao": "Đầu chủ dán một vùng từ Excel vào bảng và thấy trước những ô sẽ đổi",
+      "vai": "Đầu chủ",
+      "tieu_chi": 8,
+      "vi_sao": "Giữ thói quen dán từ Sheet",
+      "hang": "T2",
+      "dung_tren": [
+        "4"
+      ],
+      "slug": "dan-tu-excel",
+      "nhom": "bang-hang",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "B5"
+      ],
+      "vung": [
+        "src/modules/listings/ui/**",
+        "src/components/candidate/**"
+      ]
+    },
+    {
+      "ma": "6",
+      "cau_giao": "Đầu khách mở Đã gửi và thấy các link đã gửi trên cùng Lưới với Bảng hàng",
+      "vai": "Đầu khách",
+      "tieu_chi": 8,
+      "vi_sao": "Màn thứ hai chứng Lưới dùng lại được mà không thêm prop kiểu dáng",
+      "hang": "T2",
+      "dung_tren": [
+        "1",
+        "2"
+      ],
+      "slug": "da-gui-tren-luoi",
+      "nhom": "phat-khach",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "K4"
+      ],
+      "vung": [
+        "src/modules/sharing/ui/**",
+        "src/components/candidate/**"
+      ],
+      "du_lieu": "gia"
+    },
+    {
+      "ma": "7",
+      "cau_giao": "Mỗi sàn chỉ đọc và ghi được dữ liệu của mình, mọi truy vấn đi qua một cửa",
+      "vai": "nen",
+      "tieu_chi": 9,
+      "vi_sao": "Luật SP-1, là nền của mọi dữ liệu thật",
+      "hang": "T3",
+      "slug": "cach-ly-moi-san",
+      "bat_khi": "Bộ kiểm cách ly chạy dưới vai không sở hữu bảng: mọi bảng công ty đều chặn đọc và ghi chéo sàn",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "N1"
+      ],
+      "vung": [
+        "src/modules/identity/**",
+        "db/migrations/**"
+      ]
+    },
+    {
+      "ma": "8",
+      "cau_giao": "Nhân viên sàn nhập mã gửi qua email và vào đúng sàn của mình",
+      "vai": "Nhân viên sàn",
+      "tieu_chi": 10,
+      "vi_sao": "Đăng nhập là lớp khó đảo, tách riêng khỏi quyền",
+      "hang": "T3",
+      "dung_tren": [
+        "7"
+      ],
+      "slug": "dang-nhap-ma-email",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "N2",
+        "N6"
+      ],
+      "vung": [
+        "src/modules/identity/**"
+      ]
+    },
+    {
+      "ma": "9",
+      "cau_giao": "Quản trị sàn mời người vào sàn và gán một trong bốn vai",
+      "vai": "Quản trị sàn",
+      "tieu_chi": 9,
+      "vi_sao": "Quyền là lớp khó đảo, tách riêng khỏi đăng nhập",
+      "hang": "T3",
+      "dung_tren": [
+        "8"
+      ],
+      "slug": "moi-nguoi-gan-vai",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "N3"
+      ],
+      "vung": [
+        "src/modules/identity/**",
+        "src/modules/company-config/**"
+      ]
+    },
+    {
+      "ma": "9a",
+      "cau_giao": "Mọi thao tác đọc và ghi đều được quyết định từ một bảng quyền theo vai, phạm vi và trạng thái",
+      "vai": "nen",
+      "tieu_chi": 9,
+      "vi_sao": "Quyết định 0016: không có bảng chung thì từng hàng tự đặt quyền, như lỗi ai đọc được hàng là sửa được giá ở Quỹ hàng",
+      "hang": "T3",
+      "dung_tren": [
+        "9",
+        "1d"
+      ],
+      "slug": "bang-quyen-theo-vai",
+      "bat_khi": "Bài kiểm gọi từng thao tác bằng từng vai ở API và cơ sở dữ liệu, khớp đủ 100% ô của bảng; thêm một thao tác ghi không có dòng trong bảng thì bài kiểm đỏ",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "N7"
+      ],
+      "vung": [
+        "ontology/roles.yaml",
+        "ontology/actions.yaml",
+        "src/modules/identity/**",
+        "db/migrations/**"
+      ]
+    },
+    {
+      "ma": "9b",
+      "cau_giao": "Mỗi màn được kiểm bằng từng vai ở bốn khổ màn hình, vai không được vào thấy đúng Không đủ quyền và không lộ dữ liệu",
+      "vai": "nen",
+      "tieu_chi": 8,
+      "vi_sao": "Quyết định 0017: bài chấm giao diện hiện không đăng nhập theo vai; cần đăng nhập thật và bảng quyền nên đứng sau hàng 9a",
+      "hang": "T3",
+      "dung_tren": [
+        "9a"
+      ],
+      "slug": "kiem-vai-theo-man",
+      "bat_khi": "Bộ kiểm trình duyệt đi đủ mọi cặp vai và màn trong sổ; gỡ chặn một cặp không được vào thì bộ kiểm đỏ",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "N12"
+      ],
+      "vung": [
+        "tests/e2e/**",
+        "design/screens.yaml"
+      ]
+    },
+    {
+      "ma": "10",
+      "cau_giao": "Đầu chủ đăng nhập và thấy, sửa được hàng thật của sàn mình trên Bảng hàng",
+      "vai": "Đầu chủ",
+      "tieu_chi": 10,
+      "vi_sao": "Chặng 4: nối màn đã dựng với lược đồ và API thật",
+      "hang": "T3",
+      "dung_tren": [
+        "4",
+        "7",
+        "9",
+        "9a",
+        "9b"
+      ],
+      "slug": "bang-hang-du-lieu-that",
+      "nhom": "bang-hang",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "N5"
+      ],
+      "vung": [
+        "src/modules/listings/**",
+        "src/modules/catalog/**"
+      ]
+    },
+    {
+      "ma": "11",
+      "cau_giao": "Đầu chủ nạp tệp Excel, xem trước kết quả, áp vào bảng và hoàn tác được",
+      "vai": "Đầu chủ",
+      "tieu_chi": 10,
+      "vi_sao": "Đường chính để bỏ Sheet",
+      "hang": "T3",
+      "dung_tren": [
+        "10"
+      ],
+      "slug": "nhap-excel",
+      "nhom": "dua-hang",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "V1"
+      ],
+      "vung": [
+        "src/modules/imports/**"
+      ]
+    },
+    {
+      "ma": "12",
+      "cau_giao": "Đầu chủ gõ mã căn để thêm căn, hoặc tạo căn tay khi danh mục chưa có",
+      "vai": "Đầu chủ",
+      "tieu_chi": 8,
+      "vi_sao": "Đưa từng căn vào ngoài đường nhập tệp",
+      "hang": "T2",
+      "dung_tren": [
+        "10"
+      ],
+      "slug": "them-can",
+      "nhom": "dua-hang",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "V2",
+        "V3"
+      ],
+      "vung": [
+        "src/modules/catalog/**",
+        "src/modules/listings/ui/**"
+      ]
+    },
+    {
+      "ma": "13",
+      "cau_giao": "Đầu chủ ghi và mở số chủ nhà trên hồ sơ căn",
+      "vai": "Đầu chủ",
+      "tieu_chi": 8,
+      "vi_sao": "Cần cho việc gọi giữ tươi. Dữ liệu cá nhân, lưu dạng rõ theo quyết định 0014; ai được thấy số chốt ở Cổng Phạm vi của hàng",
+      "hang": "T3",
+      "dung_tren": [
+        "10"
+      ],
+      "slug": "so-chu-nha",
+      "nhom": "giu-tuoi",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "G1"
+      ],
+      "vung": [
+        "src/modules/contacts/**",
+        "src/modules/listings/ui/**"
+      ],
+      "bat_khi": "Số chủ nhà ghi vào liên hệ, không ghi vào căn; một người có nhiều căn chỉ có một liên hệ"
+    },
+    {
+      "ma": "14",
+      "cau_giao": "Đầu chủ mở Hôm nay, thấy một danh sách việc và ghi kết quả cuộc gọi",
+      "vai": "Đầu chủ",
+      "tieu_chi": 10,
+      "vi_sao": "Giữ hàng luôn tươi",
+      "hang": "T3",
+      "dung_tren": [
+        "13"
+      ],
+      "slug": "hom-nay",
+      "nhom": "giu-tuoi",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "G2",
+        "G3"
+      ],
+      "vung": [
+        "src/modules/workspace/**",
+        "src/modules/listings/**"
+      ]
+    },
+    {
+      "ma": "15",
+      "cau_giao": "Đầu chủ tải ảnh lên hồ sơ căn và thấy căn thành Sẵn sàng bán khi đủ điều kiện",
+      "vai": "Đầu chủ",
+      "tieu_chi": 10,
+      "vi_sao": "Chỉ căn Sẵn sàng bán mới được gửi cho khách",
+      "hang": "T3",
+      "dung_tren": [
+        "10"
+      ],
+      "slug": "anh-va-san-sang-ban",
+      "nhom": "giu-tuoi",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "G4",
+        "G5"
+      ],
+      "vung": [
+        "src/modules/listings/**",
+        "src/modules/listings/ui/**"
+      ]
+    },
+    {
+      "ma": "16",
+      "cau_giao": "Đầu khách chọn căn, tạo link và tự bấm gửi qua bảng chia sẻ của thiết bị",
+      "vai": "Đầu khách",
+      "tieu_chi": 10,
+      "vi_sao": "Luật SP-3: người luôn là người bấm gửi",
+      "hang": "T3",
+      "dung_tren": [
+        "15"
+      ],
+      "slug": "gui-link",
+      "nhom": "phat-khach",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "K1",
+        "K7"
+      ],
+      "vung": [
+        "src/modules/sharing/**"
+      ]
+    },
+    {
+      "ma": "17",
+      "cau_giao": "Khách mở link trên điện thoại, kể cả trong Zalo, và chỉ thấy các căn được gửi với thông tin công khai",
+      "vai": "Khách",
+      "tieu_chi": 11,
+      "vi_sao": "Luật SP-4: dữ liệu công khai dựng từ luật ẩn",
+      "hang": "T3",
+      "dung_tren": [
+        "16"
+      ],
+      "slug": "trang-khach",
+      "nhom": "phat-khach",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "K2",
+        "K3",
+        "K8"
+      ],
+      "vung": [
+        "src/app/s/**",
+        "src/modules/sharing/**"
+      ],
+      "ghi_chu": "Trang khách và các trạng thái của link là một kết quả, tách ra thì không giao được riêng"
+    },
+    {
+      "ma": "18",
+      "cau_giao": "Đầu khách thấy link đã gửi với lượt mở thật và lưu khách để gửi tiếp",
+      "vai": "Đầu khách",
+      "tieu_chi": 9,
+      "vi_sao": "Nối màn Đã gửi với dữ liệu thật",
+      "hang": "T3",
+      "dung_tren": [
+        "6",
+        "17"
+      ],
+      "slug": "da-gui-va-luu-khach",
+      "nhom": "phat-khach",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "K5",
+        "K6"
+      ],
+      "vung": [
+        "src/modules/sharing/**",
+        "src/modules/contacts/**"
+      ]
+    },
+    {
+      "ma": "18a",
+      "cau_giao": "Quản trị sàn khoá người đã nghỉ và Trưởng nhóm bàn giao căn, khách của người đó cho người khác, không còn căn hay khách nào bỏ trống",
+      "vai": "Quản trị sàn",
+      "tieu_chi": 9,
+      "vi_sao": "Quyết định 0016: chủ sàn cần dữ liệu ở lại khi nhân viên rời đi",
+      "dung_tren": [
+        "9a",
+        "13",
+        "18"
+      ],
+      "slug": "khoa-nguoi-ban-giao",
+      "phu": [
+        "N8"
+      ],
+      "vung": [
+        "src/modules/identity/**",
+        "src/modules/listings/**",
+        "src/modules/contacts/**"
+      ],
+      "ghi_chu": "Bàn giao ghi thành sự kiện và hoàn tác được, nên hàng chỉ chạm một lớp khó đảo là quyền",
+      "hang": "T3",
+      "nhom": "quan-tri",
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "18b",
+      "cau_giao": "Đầu chủ sửa được liên hệ và gỡ căn tạo nhầm, còn yêu cầu xoá dữ liệu cá nhân của một người được xử lý xong mà lịch sử vẫn đúng",
+      "vai": "Đầu chủ",
+      "tieu_chi": 10,
+      "vi_sao": "Quyết định 0016 và Nghị định 356 Điều 5: sửa và xoá theo yêu cầu có thời hạn; đứng sau hàng 18 để phủ cả chủ nhà lẫn khách",
+      "dung_tren": [
+        "9a",
+        "13",
+        "18"
+      ],
+      "slug": "sua-go-xoa-du-lieu",
+      "phu": [
+        "N9"
+      ],
+      "vung": [
+        "src/modules/contacts/**",
+        "src/modules/listings/**"
+      ],
+      "hang": "T3",
+      "nhom": "quan-tri",
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "19",
+      "cau_giao": "Quản trị sàn đặt Thuế phí và thấy Bảng hàng tính theo mức đó",
+      "vai": "Quản trị sàn",
+      "tieu_chi": 8,
+      "vi_sao": "Phải đặt trước khi nhập tệp của sàn",
+      "hang": "T3",
+      "dung_tren": [
+        "9",
+        "9a"
+      ],
+      "slug": "thue-phi",
+      "nhom": "cau-hinh",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "C1"
+      ],
+      "vung": [
+        "src/modules/company-config/**"
+      ]
+    },
+    {
+      "ma": "19a",
+      "cau_giao": "Quản trị sàn xem vai nào làm được gì và tra được ai đã đổi vai, đổi cấu hình, mở số",
+      "vai": "Quản trị sàn",
+      "tieu_chi": 9,
+      "vi_sao": "Quyết định 0016: chủ sàn cần thấy và kiểm được quyền; trang sinh từ bảng quyền nên không lệch với luật thật",
+      "dung_tren": [
+        "9a",
+        "13",
+        "19"
+      ],
+      "slug": "bang-quyen-va-nhat-ky",
+      "phu": [
+        "N10"
+      ],
+      "vung": [
+        "src/modules/company-config/**",
+        "src/modules/identity/**"
+      ],
+      "hang": "T3",
+      "nhom": "quan-tri",
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "20",
+      "cau_giao": "Một lệnh đọc được số đo của đợt bỏ Sheet và Core Web Vitals theo từng sàn",
+      "vai": "nen",
+      "tieu_chi": 8,
+      "vi_sao": "Đọc kết quả đợt, thay trang vận hành đầy đủ",
+      "hang": "T2",
+      "dung_tren": [
+        "18"
+      ],
+      "slug": "so-do-dot-bo-sheet",
+      "bat_khi": "Lệnh in đúng số trên dữ liệu mẫu có đáp án; số chỉ là tổng hợp, không có tên hay số điện thoại",
+      "nhom": "ra-mat",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "R2",
+        "R3"
+      ],
+      "vung": [
+        "tools/**",
+        "src/app/**"
+      ]
+    },
+    {
+      "ma": "21",
+      "cau_giao": "Lệnh một lần chuyển dữ liệu của một sàn từ Quỹ hàng sang kho này, chạy lại không nhân đôi",
+      "vai": "nen",
+      "tieu_chi": 10,
+      "vi_sao": "Chặng 5: thay Quỹ hàng. Giải mã số chủ nhà theo quyết định 0014",
+      "hang": "T3",
+      "dung_tren": [
+        "14",
+        "18",
+        "19",
+        "18a",
+        "18b",
+        "19a"
+      ],
+      "slug": "chuyen-du-lieu",
+      "bat_khi": "Chạy hai lần trên bản dựng từ dữ liệu mẫu, số bản ghi không đổi; đối chiếu đủ số căn, số liên hệ; khoá và dữ liệu đã giải mã không nằm trong kho",
+      "nhom": "ra-mat",
+      "dot": "mvp-dot-1",
+      "phu": [
+        "R1"
+      ],
+      "vung": [
+        "tools/**",
+        "db/migrations/**"
+      ]
+    }
+  ],
+  "chan_troi": [
+    {
+      "ma": "H1",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Đầu chủ tiếp tục làm việc khi mất mạng",
+      "ly_do": "Chủ kho chốt chế độ ngoại tuyến chỉ làm sau MVP",
+      "phu": [
+        "L1"
+      ],
+      "mo_lai_khi": "MVP đã chạy thật và chủ kho mở lại"
+    },
+    {
+      "ma": "H2",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Telesales nhận lead và chia cho Đầu chủ",
+      "ly_do": "Đợt 2 của kế hoạch mở dần; cửa lead là đoạn yếu nhất",
+      "phu": [
+        "L2"
+      ],
+      "mo_lai_khi": "Đợt 1 đạt ngưỡng đã ký"
+    },
+    {
+      "ma": "H3",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Đầu khách xuất bảng và gửi cho nhóm môi giới",
+      "ly_do": "Đợt 3 của kế hoạch mở dần",
+      "phu": [
+        "L3"
+      ],
+      "mo_lai_khi": "Đợt 2 đạt ngưỡng đã ký"
+    },
+    {
+      "ma": "H4",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Quản trị sàn tự đặt cách gọi, trạng thái và trường riêng",
+      "ly_do": "Đợt 3; MVP dùng hằng số trong mã",
+      "phu": [
+        "L4"
+      ],
+      "mo_lai_khi": "Có sàn thứ hai cần khác đi"
+    },
+    {
+      "ma": "H5",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Đầu chủ nhập tệp có AI đề xuất cột",
+      "ly_do": "Đợt 3; nhập không AI đủ cho một sàn",
+      "phu": [
+        "L5"
+      ],
+      "mo_lai_khi": "Đợt 2 đạt ngưỡng đã ký"
+    },
+    {
+      "ma": "H6",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Đầu chủ quản lý hàng thấp tầng",
+      "ly_do": "MVP chỉ một khu căn hộ",
+      "phu": [
+        "L6"
+      ],
+      "mo_lai_khi": "Có sàn cần bán thấp tầng trong đợt đang mở"
+    },
+    {
+      "ma": "H7",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Đầu chủ lưu góc nhìn và sửa hàng loạt",
+      "ly_do": "Cắt khỏi MVP để giữ Bảng hàng đơn giản",
+      "phu": [
+        "L7"
+      ],
+      "mo_lai_khi": "Buổi thử cho thấy người dùng cần"
+    },
+    {
+      "ma": "H8",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Đầu chủ gọi điều chỉnh giá theo màn riêng",
+      "ly_do": "Cắt khỏi MVP, Hôm nay chỉ một danh sách",
+      "phu": [
+        "L8"
+      ],
+      "mo_lai_khi": "Đợt 1 cho thấy một danh sách không đủ"
+    },
+    {
+      "ma": "H9",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Vận hành bật tắt nhóm tính năng theo sàn",
+      "ly_do": "Phần chưa làm không có trong mã nên chưa cần cờ",
+      "phu": [
+        "L9"
+      ],
+      "mo_lai_khi": "Có sàn thứ hai dùng đợt khác nhau"
+    },
+    {
+      "ma": "H10",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Sàn kết nối thêm các nguồn ngoài danh mục",
+      "ly_do": "MVP chỉ thoả thuận nguồn danh mục; phải xét lại việc chặn thông tin chủ nhà khi mở",
+      "phu": [
+        "L10"
+      ],
+      "mo_lai_khi": "Có đối tác thật cần kết nối"
+    },
+    {
+      "ma": "H11",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Nhân viên sàn đăng nhập bằng mật khẩu",
+      "ly_do": "Mã qua email đủ cho MVP",
+      "phu": [
+        "L11"
+      ],
+      "mo_lai_khi": "Có sàn không nhận được email ổn định"
+    },
+    {
+      "ma": "H12",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Nhân viên làm cho hai sàn đổi sàn ngay trong ứng dụng",
+      "ly_do": "Đợt 1 chỉ có một sàn, chủ kho đồng ý chưa làm",
+      "phu": [
+        "L12"
+      ],
+      "mo_lai_khi": "Có người thật làm cho hai sàn"
+    }
+  ],
+  "da_bac": [
+    {
+      "ma": "x1",
+      "ly_do": "Đội và Lịch xem không mang sang: bên Quỹ hàng mới là trang giữ chỗ"
+    }
+  ]
+}

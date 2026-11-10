@@ -4,7 +4,7 @@ One line per business term. If two people could understand a word differently,
 it belongs here. Code, docs and agents must use these exact names.
 
 Reference standard: [RESO Data Dictionary 2.1](https://dd.reso.org/DD2.1/). Field and value names follow it where it
-defines the concept; anything else is marked as our own.
+defines the concept; anything else is marked as our own. Every display label and its variants: `labels.yaml`.
 
 | Term (code name) | Definition                                                                                            | Not to be confused with                                             | Display name |
 | ---------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------ |

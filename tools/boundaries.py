@@ -71,7 +71,7 @@ def ts_target(src: Path, spec: str, modules_root: Path) -> tuple[str, bool] | No
         return None
     rest = [p for p in parts[1:] if p]
     public = not rest or (
-        len(rest) == 1 and re.fullmatch(r"(index|server)(\.[jt]sx?)?", rest[0]) is not None
+        len(rest) == 1 and re.fullmatch(r"(index|server|ui)(\.[jt]sx?)?", rest[0]) is not None
     )
     return parts[0], public
 

@@ -2,12 +2,21 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
-      "Bash(make:*)",
+      "Bash(make check)",
+      "Bash(make test)",
+      "Bash(make lint)",
+      "Bash(make typecheck)",
+      "Bash(make format)",
+      "Bash(make gen)",
+      "Bash(make ontology)",
+      "Bash(make e2e)",
+      "Bash(make build)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
       "Bash(git show:*)",
-      "Bash(python3 tools/:*)"
+      "Bash(npm run build)",
+      "Bash(node tools/kit-root.mjs)"
     ],
     "deny": [
       "Read(./.env)",
@@ -28,5 +37,47 @@
       "Bash(git push origin HEAD:main:*)"
     ],
     "ask": ["Bash(gh pr merge:*)", "Bash(gh pr review --approve:*)", "Bash(gh release create:*)"]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel 2>/dev/null || echo \"$CLAUDE_PROJECT_DIR\")\"/.claude/hooks/guard-edits.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel 2>/dev/null || echo \"$CLAUDE_PROJECT_DIR\")\"/.claude/hooks/check-changed.sh",
+            "timeout": 180
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "acceptance-gate@acceptance-gate-kit": true,
+    "feature-loop@acceptance-gate-kit": true,
+    "diagram-design@acceptance-gate-kit": true,
+    "superpowers@claude-plugins-official": true,
+    "road-map@acceptance-gate-kit": true,
+    "tri-thuc@acceptance-gate-kit": true,
+    "dieu-phoi@acceptance-gate-kit": true
+  },
+  "extraKnownMarketplaces": {
+    "acceptance-gate-kit": {
+      "source": {
+        "source": "github",
+        "repo": "phanlemanh/acceptance-gate-kit"
+      }
+    }
   }
 }

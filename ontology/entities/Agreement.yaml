@@ -29,8 +29,6 @@ properties:
   specialTerms: { type: boolean, default: false }
 
 rules:
-  - id: never-source
-    description: No agreement may include the source data class; enforced in the core rules and in the database.
   - id: every-connection-is-an-agreement
     description: A connection is enabled by an agreement, never by code written for one party.
 

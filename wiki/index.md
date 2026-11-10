@@ -37,6 +37,14 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0009 Mức kiểm tra team](decisions/0009-quality-level-team.md)
 - [0010 Triển khai và chuyển kho](decisions/0010-delivery-and-cutover.md)
 - [0011 Quyền của agent](decisions/0011-agent-governance.md)
+- [0012 Chuẩn ngôn ngữ của sản phẩm](decisions/0012-product-language-standard.md)
+- [0013 Phạm vi chọn lọc và nền thiết kế](decisions/0013-selective-scope-and-design-foundation.md)
+- [0014 Ba luật sản phẩm cho MVP](decisions/0014-mvp-product-rules.md)
+- [0015 Rào thiết kế phải đỏ được](decisions/0015-measurable-design-gate.md)
+- [0016 Cơ chế thao tác và phân quyền của MVP](decisions/0016-permission-model.md)
+- [0017 Thử khối Vai × Màn ở mỗi vòng](decisions/0017-actor-surface-coverage-pilot.md)
+- [0019 Tối ưu hệ design theo số lần làm lại, thử thật cho kit](decisions/0019-measurable-design-system-pilot.md)
+- [0020 Dữ liệu mẫu theo Vinhomes Ocean Park, căn và liên hệ nối từ đầu](decisions/0020-linked-sample-data-ocean-park.md)
 
 ## Incidents
 
