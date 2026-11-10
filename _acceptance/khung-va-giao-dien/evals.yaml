@@ -135,3 +135,11 @@ evals:
     question: "Trả lời bốn câu có/không, mỗi câu dựa trên các hằng chữ trong frame-copy.ts: (a) câu của trang lỗi có đủ ba phần chuyện gì xảy ra, vì sao, làm gì tiếp; (b) câu của trang không tìm thấy có đủ ba phần; (c) câu của trang hết phiên có đủ ba phần; (d) câu của băng mất mạng và băng lưu hỏng có đủ ba phần. Với cả bốn: người dùng được gọi là «bạn» theo design/language.md, không có dấu chấm than, và không chuỗi nào trùng một nhãn pref, lease hay alt trong ontology/labels.yaml."
     inputs: [src/components/templates/frame-copy.ts, design/language.md, ontology/labels.yaml]
     evidence_required: [judged_by, verdict, rationale]
+
+  - id: E17
+    criterion: AC-12
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/components/templates/**, "src/app/(app)/**", src/app/not-found.tsx, src/app/global-error.tsx, src/styles/**]
+    expected: "exit 0; sàn thiết kế bậc M1 không thấy mã màu hex thô nào trên các tệp giao diện mà vòng này chạm, nên mọi màu của khung đi qua token và đổi theo giao diện sáng hoặc tối; chiều đỏ là bộ kiểm của kit (design-floor-s4.mjs) báo hex thô khi một tệp giao diện chứa '#0246ff' viết thẳng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
