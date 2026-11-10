@@ -1258,8 +1258,94 @@
           "name": "AppShell",
           "props": [
             "nav",
-            "title"
+            "role"
           ]
+        },
+        {
+          "name": "MAIN_ID"
+        },
+        {
+          "name": "NavItem"
+        }
+      ]
+    },
+    {
+      "name": "NavMenu",
+      "file": "src/components/templates/nav-menu.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "NavMenu",
+          "props": [
+            "items",
+            "role"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PageHeader",
+      "file": "src/components/templates/page-header.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "PageHeader",
+          "props": [
+            "title",
+            "action"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PageSkeleton",
+      "file": "src/components/templates/page-skeleton.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "PageSkeleton"
+        }
+      ]
+    },
+    {
+      "name": "PageState",
+      "file": "src/components/templates/page-state.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "PageState",
+          "props": [
+            "kind",
+            "onRetry",
+            "returnTo",
+            "homeHref"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ScreenBanner",
+      "file": "src/components/templates/screen-banner.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "ConnectionWatcher"
+        },
+        {
+          "name": "ScreenBanner"
+        }
+      ]
+    },
+    {
+      "name": "ThemeProvider",
+      "file": "src/components/templates/theme.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "ThemeProvider"
+        },
+        {
+          "name": "ThemeSwitch"
         }
       ]
     },
