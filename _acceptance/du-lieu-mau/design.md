@@ -53,7 +53,8 @@ Ba mô-đun không gọi nhau: `depends_on` đang rỗng và đổi nó là quy�
 ### Liên hệ (contacts)
 
 - 40 chủ nhà, 10 khách. Hai chủ nhà vừa là khách (`contactTypes` = `Seller, Buyer`).
-- Tên `[Tên] Chủ nhà 01 · MAU`, `[Tên] Khách 01 · MAU`. Số `0900 000 0xx`; ba chủ nhà có hai số.
+- Tên `[Tên] Chủ bán 01 · MAU`, `[Tên] Người mua 01 · MAU` — chữ «Chủ bán», «Người mua», «Sàn», «Toà» lấy từ bảng nhãn
+  sinh từ `ontology/labels.yaml`, không gõ cứng trong mã. Số `0900 000 0xx`; ba chủ nhà có hai số.
 - Liên kết chủ nhà → lần chào `{ id, companyId, contactId, listingId, contactType: "Seller" }` (quan hệ `Contact owns
   Listing`), 60 bản: 56 lần chào có một chủ chính, bốn lần chào có thêm chủ thứ hai, bốn lần chào chưa có chủ.
   Đủ bốn ca: một chủ nhiều căn, một căn hai chủ, một người vừa chủ vừa khách, căn chưa có chủ.
