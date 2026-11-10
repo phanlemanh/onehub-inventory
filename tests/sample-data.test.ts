@@ -51,7 +51,7 @@ function labelErrors(s: Sample): string[] {
   ];
 }
 
-function linkErrors(s: Sample): string[] {
+function checkSampleLinks(s: Sample): string[] {
   const offered = { listings: s.listings, listingUnits: s.listingUnits };
   return [
     ...listings.checkListingLinks(offered, new Set(s.units.map((u) => u.upi)), s.company.id),
@@ -385,7 +385,7 @@ describe("AC-8 the three modules link up", () => {
   const s = buildSample();
 
   it("every link points at a real unit, listing or contact, and every record belongs to the sample company", () => {
-    expect(linkErrors(s)).toEqual([]);
+    expect(checkSampleLinks(s)).toEqual([]);
     const typed = s.contacts satisfies readonly Contact[];
     expect(typed.every((c) => c.companyId === listings.SAMPLE_COMPANY.id)).toBe(true);
     expect(contacts.SAMPLE_ID_PREFIX).toBe(listings.SAMPLE_ID_PREFIX);
@@ -396,27 +396,29 @@ describe("AC-8 the three modules link up", () => {
 
     const unit = clone(s);
     nth(unit.listingUnits, 0).upi = "urn:onehub:upi:mau:op1:s1.01:9999";
-    expect(linkErrors(unit)).toEqual([
+    expect(checkSampleLinks(unit)).toEqual([
       "liên kết căn trỏ căn không có: urn:onehub:upi:mau:op1:s1.01:9999",
     ]);
 
     const listing = clone(s);
     nth(listing.owners, 0).listingId = other;
-    expect(linkErrors(listing)).toEqual([`liên kết chủ trỏ lần chào không có: ${other}`]);
+    expect(checkSampleLinks(listing)).toEqual([`liên kết chủ trỏ lần chào không có: ${other}`]);
 
     const contact = clone(s);
     nth(contact.owners, 1).contactId = other;
-    expect(linkErrors(contact)).toEqual([`liên kết chủ trỏ liên hệ không có: ${other}`]);
+    expect(checkSampleLinks(contact)).toEqual([`liên kết chủ trỏ liên hệ không có: ${other}`]);
 
     const elsewhere = clone(s);
     nth(elsewhere.contacts, 3).companyId = other;
     nth(elsewhere.owners, 4).companyId = other;
     nth(elsewhere.listingUnits, 5).companyId = other;
-    expect(linkErrors(elsewhere).sort()).toEqual(
+    nth(elsewhere.listings, 6).companyId = other;
+    expect(checkSampleLinks(elsewhere).sort()).toEqual(
       [
         `bản ghi khác sàn: liên hệ ${nth(s.contacts, 3).id}`,
         `bản ghi khác sàn: liên kết chủ ${nth(s.owners, 4).id}`,
         `bản ghi khác sàn: liên kết căn ${nth(s.listingUnits, 5).id}`,
+        `bản ghi khác sàn: lần chào ${nth(s.listings, 6).id}`,
       ].sort(),
     );
   });
