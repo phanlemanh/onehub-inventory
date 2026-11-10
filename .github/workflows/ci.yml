@@ -36,3 +36,42 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: make e2e
+
+  # Acceptance gate of the kit, run from a pinned tag so no kit file is copied here.
+  # Raising the kit version is a deliberate change of KIT_TAG; this file is in t1_skip_globs.
+  gate:
+    runs-on: ubuntu-latest
+    env:
+      KIT_TAG: v2.38.0
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the gate reads history: verified commits, signatures and the PR diff
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - name: Fetch the kit by tag, outside the repository
+        run: |
+          git init -q "$RUNNER_TEMP/kit"
+          git -C "$RUNNER_TEMP/kit" fetch -q --depth 1 https://github.com/phanlemanh/acceptance-gate-kit "refs/tags/$KIT_TAG"
+          git -C "$RUNNER_TEMP/kit" checkout -q FETCH_HEAD
+          echo "CLAUDE_PLUGIN_ROOT=$RUNNER_TEMP/kit" >> "$GITHUB_ENV"
+      - name: pre-merge-check
+        run: |
+          if [ -n "${GITHUB_BASE_REF:-}" ]; then
+            args=(--base "origin/$GITHUB_BASE_REF")
+          else
+            args=(--base HEAD~1 --no-t1-escape)
+          fi
+          set +e
+          out="$(bash "$CLAUDE_PLUGIN_ROOT/scripts/pre-merge-check.sh" . "${args[@]}" 2>&1)"; st=$?
+          set -e
+          printf '%s\n' "$out"
+          # Exit 0 with no rule line means no rule ran: wrong folder or wrong kit version.
+          if [ "$st" -eq 0 ] && ! printf '%s\n' "$out" | grep -q '^pre-merge-check: rules ran='; then
+            echo "the gate exited 0 without running any rule"
+            exit 1
+          fi
+          exit $st
+      - name: product-map --check
+        run: node "$CLAUDE_PLUGIN_ROOT/scripts/product-map.mjs" --root . --check
