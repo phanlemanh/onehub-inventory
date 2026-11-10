@@ -34,3 +34,32 @@ wall: 184s
 - **claude-opus-5-5**: 3 agent · 28 calls · out 25,492 · in 60 · cache_read 1,056,591 · cache_create 173,072
 - **claude-sonnet-5-5**: 6 agent · 13 calls · out 15,441 · in 26 · cache_read 110,554 · cache_create 121,704
 - **claude-haiku-5-5**: 4 agent · 8 calls · out 5,577 · in 16 · cache_read 55,280 · cache_create 52,263
+### S4 round 2 — wf_939f8f0e-45f (10 agent, 27,870 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| review:invariants | claude-opus-5-5 | 12 | 11,050 | 26 | 516,187 | 131 |
+| synthesize:report | claude-sonnet-5-5 | 2 | 4,282 | 4 | 22,032 | 26 |
+| review:measurement | claude-opus-5-5 | 6 | 2,772 | 12 | 137,168 | 31 |
+| triage | claude-sonnet-5-5 | 2 | 2,608 | 4 | 14,089 | 22 |
+| machine:make e2e | claude-haiku-5-5 | 2 | 1,820 | 4 | 14,481 | 13 |
+| review:bugs | claude-opus-5-5 | 6 | 1,736 | 12 | 165,808 | 21 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,322 | 4 | 14,477 | 15 |
+| machine:make test | claude-haiku-5-5 | 2 | 1,174 | 4 | 14,477 | 8 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 765 | 4 | 14,481 | 7 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 341 | 4 | 9,992 | 5 |
+
+
+wall: 185s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| machine | 4 | 5,081 | 57,916 | 36 | 23:36:10 | 23:36:47 |
+| review | 3 | 15,558 | 819,163 | 131 | 23:36:10 | 23:38:22 |
+| triage | 1 | 2,608 | 14,089 | 22 | 23:38:22 | 23:38:44 |
+| capture | 1 | 341 | 9,992 | 5 | 23:38:44 | 23:38:49 |
+| synthesize | 1 | 4,282 | 22,032 | 26 | 23:38:50 | 23:39:15 |
+
+- **claude-opus-5-5**: 3 agent · 24 calls · out 15,558 · in 50 · cache_read 819,163 · cache_create 153,174
+- **claude-sonnet-5-5**: 3 agent · 6 calls · out 7,231 · in 12 · cache_read 46,113 · cache_create 67,547
+- **claude-haiku-5-5**: 4 agent · 8 calls · out 5,081 · in 16 · cache_read 57,916 · cache_create 48,029

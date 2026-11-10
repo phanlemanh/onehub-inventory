@@ -5,7 +5,7 @@ slug: du-lieu-mau
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [data]
-status: implemented
+status: verified
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: _acceptance/du-lieu-mau/design.md
@@ -70,3 +70,14 @@ Ngưỡng của ô cơ hội là ngưỡng bật của hàng; số đo đến t�
 - Nhãn MAU đi hai lớp: tiền tố mã của từng bản ghi và mã sàn mẫu (Hỏi-3 ở Cổng Phạm vi).
 - Nhiều số của một liên hệ nối bằng `", "` trong một chuỗi `phones`, vì ontology chưa có kiểu danh sách.
 - Thuộc tính `phones` của `Contact` là đổi ontology duy nhất của vòng, giám sát đợt duyệt (tin D-1011-2); mô tả PR có mục «Đổi ontology — chủ kho soi».
+- Ngoài-1 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Một dãy số trông giống số điện thoại di động thật nằm trong bài kiểm và tài liệu của kho. Nếu trùng số của người thật thì số đó lộ ra ở kho công khai. — `tests/sample-data.test.ts`
+- Ngoài-3 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Cách đánh mã cho dữ liệu mẫu được viết ở hai nơi, nên sau này sửa một nơi mà quên nơi kia có thể làm hai loại bản ghi trùng mã. — `src/modules/contacts/sample.ts`
+- Ngoài-4 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Vài chữ như tầng, trục và một số thông báo lỗi của dữ liệu mẫu được viết cứng, nên nếu đổi cách gọi thì phải sửa tay thay vì đổi ở một chỗ. — `src/modules/catalog/sample.ts`
+- Ngoài-5 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Mã ví dụ của Ocean Park 1 đọc ra đúng toà, tầng, trục nhưng không có căn nào mang mã đó, nên nếu ai gõ thử mã này để tìm căn sẽ không thấy gì. — `src/modules/catalog/sample.ts`
+- Ngoài-6 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Trong bài kiểm và tài liệu có một số điện thoại trông như số thật, và kho đang công khai. Nếu số đó thuộc về một người thật thì người đó bị lộ số trong lịch sử kho. — `tests/sample-data.test.ts`
+- Ngoài-8 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Quy tắc gắn nhãn MAU được viết lặp ở hai nơi. Nếu sau này sửa một nơi mà quên nơi kia thì nhãn có thể lệch nhau, nhưng bài kiểm hiện đã bắt trường hợp này. — `src/modules/contacts/sample.ts`
+- Ngoài-9 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Trường số điện thoại của liên hệ gộp nhiều số nhưng lại mượn tên chuẩn ngành vốn chỉ dành cho từng số có vai riêng. Việc này dễ gây hiểu sai khi đối chiếu với chuẩn hoặc trao đổi dữ liệu sau này. — `ontology/entities/Contact.yaml`
+- Ngoài-10 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Nếu sau này một liên kết chủ nhà bị nhân đôi nhầm, bộ kiểm có thể báo đủ ca nối dù thực tế chưa đủ. Dữ liệu mẫu hiện nay không bị ảnh hưởng. — `src/modules/contacts/sample.ts`
+- Ngoài-11 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Tài liệu đánh giá nhắc tên một bước kiểm không tồn tại, nên người đối chiếu có thể không tìm thấy bằng chứng đúng chữ. Sản phẩm không bị ảnh hưởng. — `_acceptance/du-lieu-mau/evals.yaml`
+- Ngoài-12 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Một số lỗi của lần chào, như thiếu ngày chốt hay lần chào không có căn, chưa có bài kiểm chứng minh bộ kiểm sẽ bắt. Nếu bước kiểm đó bị lỡ xoá thì không ai biết. — `tests/sample-data.test.ts`
+- Ngoài-13 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Bài kiểm nói không bản ghi nào mang số điện thoại chưa có ca đối chứng cho thấy nó sẽ bắt khi có số lọt vào. Hiện dữ liệu vẫn đúng. — `tests/sample-data.test.ts`
