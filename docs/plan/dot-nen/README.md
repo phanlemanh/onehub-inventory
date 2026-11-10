@@ -4,7 +4,7 @@
 
 ## Điều kiện trước khi mở
 
-1. Gói này và toàn bộ nền đã vào `main` trên kho GitHub riêng tư.
+1. Gói này và toàn bộ nền đã vào `main` trên GitHub.
 2. Bản vá T1-escape của kit đã phát hành và kho đã nâng bản.
 3. Lộ trình đã chốt.
 4. Docker đang chạy.

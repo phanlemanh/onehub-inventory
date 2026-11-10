@@ -79,6 +79,6 @@ capture:
 dieu_phoi:
   goi_dot: docs/plan/dot-{ten}   # batch package; open with /dieu-phoi:mo-dot <name>
 tri_thuc:
-  noi: docs/tri-thuc   # knowledge root in this private repo; a public repo must move raw sources out first
+  noi: docs/tri-thuc   # in this repo; public since 2026-11-10 and the owner chose to keep raw sources here
 lo_trinh:
   tep: docs/plan/lo-trinh.json
