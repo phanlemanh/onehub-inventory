@@ -93,9 +93,12 @@ def dong_cuoi(rows: list[dict], kind: str) -> dict | None:
 
 
 def frontmatter(path: Path) -> dict[str, str]:
-    if not path.exists():
-        return {}
-    m = re.match(r"^---\r?\n(.*?)\r?\n---", path.read_text("utf-8"), re.S)
+    return frontmatter_text(path.read_text("utf-8")) if path.exists() else {}
+
+
+def frontmatter_text(text: str) -> dict[str, str]:
+    """Top-level keys of a contract frontmatter, with trailing `# comments` removed."""
+    m = re.match(r"^---\r?\n(.*?)\r?\n---", text, re.S)
     if not m:
         return {}
     out = {}
@@ -281,7 +284,7 @@ def kiem_moc(root: Path) -> tuple[list[str], list[str]]:
             loi.append(f"commit khong co: {commit}")
         return loi, ghi_chu
     khung = git(root, "show", f"{commit}:{KHUNG_1A}")
-    if khung.returncode == 0 and re.search(rf"^status:\s*({'|'.join(QUA_CONG)})\s*$", khung.stdout, re.M):
+    if khung.returncode == 0 and frontmatter_text(khung.stdout).get("status") in QUA_CONG:
         loi.append("do sau khi 1a gop")
     if git(root, "cat-file", "-e", f"{commit}:{THU_MUC_MOC}/{thu_muc.name}").returncode == 0:
         loi.append("ban kho co san phuong an")

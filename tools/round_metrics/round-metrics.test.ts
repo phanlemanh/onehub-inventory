@@ -37,6 +37,9 @@ const TANG = [
   "truy-cap",
 ];
 const MOC = "docs/plan/do-he-design";
+const POST_GATE = ["machine-cleared", "signed-off", "da-cham-boi-thuc-te"];
+// The status line comment of the kit contract template (acceptance-gate 2.38.1 contract-template.md).
+const TEMPLATE_COMMENT = "            # draft | approved | implemented | verified | signed-off";
 
 type Ban = {
   vong_cham: number;
@@ -467,22 +470,25 @@ describe("kiem-moc", () => {
           );
         },
       ],
-      [
-        "do sau khi 1a gop",
-        (c) => {
-          mkdirSync(join(c.root, "_acceptance/khung-va-giao-dien"), { recursive: true });
-          writeFileSync(
-            join(c.root, "_acceptance/khung-va-giao-dien/contract.md"),
-            "---\nstatus: da-cham-boi-thuc-te\n---\n",
-          );
-          git(c.root, "add", ".");
-          git(c.root, "commit", "-qm", "1a shipped");
-          writeFileSync(
-            c.mocPath,
-            JSON.stringify({ ...c.moc, commit: git(c.root, "rev-parse", "HEAD") }),
-          );
-        },
-      ],
+      // Every post-gate status, bare and with the trailing comment the kit's contract template carries.
+      ...POST_GATE.flatMap((status) =>
+        ["", TEMPLATE_COMMENT].map((comment): [string, (c: ReturnType<typeof mocRepo>) => void] => [
+          "do sau khi 1a gop",
+          (c) => {
+            mkdirSync(join(c.root, "_acceptance/khung-va-giao-dien"), { recursive: true });
+            writeFileSync(
+              join(c.root, "_acceptance/khung-va-giao-dien/contract.md"),
+              `---\nslug: khung-va-giao-dien\nstatus: ${status}${comment}\napproved_by:\n---\n`,
+            );
+            git(c.root, "add", ".");
+            git(c.root, "commit", "-qm", `1a ${status}`);
+            writeFileSync(
+              c.mocPath,
+              JSON.stringify({ ...c.moc, commit: git(c.root, "rev-parse", "HEAD") }),
+            );
+          },
+        ]),
+      ),
       [
         "ban kho co san phuong an",
         (c) =>
@@ -503,7 +509,11 @@ describe("kiem-moc", () => {
   });
 
   it("kiem-moc: 1a còn trước Cổng Bằng chứng thì xanh", () => {
-    for (const status of ["draft", "approved", "implemented", "verified"]) {
+    const cases = ["draft", "approved", "implemented", "verified"].flatMap((s) =>
+      ["", TEMPLATE_COMMENT].map((comment) => `${s}${comment}`),
+    );
+    expect(cases.length).toBe(8);
+    for (const status of cases) {
       const root = mkdtempSync(join(tmpdir(), "round-metrics-1a-"));
       git(root, "init", "-q");
       mkdirSync(join(root, "_acceptance/khung-va-giao-dien"), { recursive: true });
