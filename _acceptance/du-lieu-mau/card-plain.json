@@ -1,0 +1,38 @@
+{
+  "feature_plain": "Các màn Bảng hàng, hồ sơ căn, Đã gửi có sẵn một sàn mẫu trên Vinhomes Ocean Park 1, 2, 3 để dựng và đo trước khi có dữ liệu thật — căn, lần chào và liên hệ đã nối với nhau, ai nhìn cũng biết là dữ liệu mẫu.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ dựng ra đúng cùng một bộ dữ liệu mỗi lần dựng lại, ở múi giờ nào cũng vậy."},
+    {"id": "AC-2", "p": "Sẽ có ba dự án Ocean Park, bốn toà thật của Ocean Park 1, và mã căn kiểu «S1.05-1208» đọc ngược ra đúng toà, tầng, trục."},
+    {"id": "AC-3", "p": "Sẽ có 60 căn đang chào phủ đủ sáu trạng thái, căn đã bán có giá và ngày chốt, căn đã rút có lý do, mỗi lần chào trỏ đúng một căn."},
+    {"id": "AC-4", "p": "Sẽ gắn nhãn MAU lên mọi bản ghi của cả sáu loại, và báo đích danh bản ghi nào thiếu nhãn."},
+    {"id": "AC-5", "p": "Sẽ không có tên hay số điện thoại thật nào: số chỉ dạng 0900 000 0xx, tên chỉ dạng [Tên], số giấu trong chữ cũng bị bắt."},
+    {"id": "AC-6", "p": "Sẽ có đủ bốn ca: một chủ nhiều căn, một căn hai chủ, một người vừa là chủ vừa là khách, căn chưa có chủ."},
+    {"id": "AC-7", "p": "Sẽ cho đổi số của một chủ nhà một lần là mọi căn của người đó thấy số mới, vì số chỉ nằm ở liên hệ."},
+    {"id": "AC-8", "p": "Sẽ nối căn, lần chào và liên hệ không sót liên kết nào trỏ vào chỗ trống, mọi bản ghi cùng thuộc sàn mẫu."},
+    {"id": "AC-9", "p": "Sẽ thêm số điện thoại vào khái niệm Liên hệ của sản phẩm, đánh dấu là dữ liệu cá nhân (đổi từ vựng — chủ kho soi)."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "Không nạp dữ liệu mẫu vào cơ sở dữ liệu — kho chưa có, việc của hàng sau."},
+    {"id": "OOS-2", "p": "Không dựng màn nào — Bảng hàng, hồ sơ căn, Đã gửi là các hàng sau."},
+    {"id": "OOS-3", "p": "Không có căn cho thuê và nhà thấp tầng."},
+    {"id": "OOS-4", "p": "Không có người dùng mẫu hay vai trong sàn mẫu."},
+    {"id": "OOS-5", "p": "Không tự hiện nhãn mẫu trên màn hay trang khách — các hàng dựng màn lo việc đó."}
+  ],
+  "scope_plain": "Hàng này chỉ dựng dữ liệu; mọi thứ người dùng nhìn thấy để các hàng màn làm.",
+  "coverage_plain": [
+    {"i": 0, "p": "Dựng lại ra cùng dữ liệu — AC-1 (tất định), đủ khi hai lần dựng trùng từng byte và trùng dấu vân tay đã ghim."},
+    {"i": 1, "p": "Nhãn MAU trên mọi bản ghi — AC-4 (nhãn mẫu), đủ khi số bản ghi thiếu nhãn bằng 0 ở cả sáu loại."},
+    {"i": 2, "p": "Không tên hay số thật — AC-5 (không dữ liệu thật), đủ khi quét mọi chữ không còn số lạ nào."},
+    {"i": 3, "p": "Bốn ca nối chủ và căn — AC-6 (đủ ca nối), đủ khi cả bốn ca đều có và bỏ ca nào là bị báo ca đó."},
+    {"i": 4, "p": "Đổi số thấy ở mọi căn — AC-7 (số nằm ở liên hệ), đủ khi không căn nào còn đọc số cũ."},
+    {"i": 5, "p": "Ba dự án Ocean Park, căn và liên hệ nối sẵn — AC-2 (danh mục), AC-3 (lần chào), AC-8 (liên kết đủ)."},
+    {"i": 6, "p": "Số chủ nhà ghi vào liên hệ theo quyết định 0020 — AC-7 (đổi số) và AC-9 (số trong khái niệm Liên hệ)."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Hai loại liên kết (căn ↔ lần chào, chủ ↔ lần chào) chưa có nhãn, chưa có mã sàn và chưa có phép thử phá — đã thêm cả ba, kèm số bản ghi viết trước cho từng loại."},
+    {"i": 1, "p": "Chưa nói một người nhiều số thì lưu ra sao — đã chốt nối bằng dấu phẩy, đếm đúng 53 số, và kiểm dữ liệu khớp đúng kiểu Liên hệ."},
+    {"i": 2, "p": "Phép quét số thật chỉ phá thử ở liên hệ — đã mở ra cả căn và lần chào, số toàn khổ đặt trong tên toà."},
+    {"i": 3, "p": "Tất định chỉ đo ở một múi giờ — đã đo dưới hai múi giờ."},
+    {"i": 4, "p": "Cách gắn nhãn MAU bị ghi là lối duy nhất trong khi còn lối chỉ dùng mã sàn — đã chuyển thành câu hỏi cho anh (Hỏi-3)."}
+  ]
+}
