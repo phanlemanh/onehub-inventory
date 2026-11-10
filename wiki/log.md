@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-10 — Gộp PR thường không còn hỏi người, bốn kiểu gộp trái nếp vẫn hỏi; luật hỏi khi duyệt PR bắt được cờ ở mọi chỗ trong lệnh — user, 2026-11-10
 - 2026-11-10 — Kho chuyển sang công khai theo quyết định của chủ kho; bật luật bảo vệ main, quét bí mật và cảnh báo lỗ hổng — user, 2026-11-10
 - 2026-11-10 — Dữ liệu mẫu theo Vinhomes Ocean Park, căn và liên hệ nối từ đầu — [0020](decisions/0020-linked-sample-data-ocean-park.md)
 - 2026-11-10 — Tối ưu hệ design theo số lần làm lại: thêm các hàng 1e, 1f, 1g, 1h, đổi hàng 1c, đợt nen còn bốn dãy — [0019](decisions/0019-measurable-design-system-pilot.md)
