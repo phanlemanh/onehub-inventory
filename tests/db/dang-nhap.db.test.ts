@@ -195,7 +195,10 @@ async function checkIdentityRoleNarrow(w: World): Promise<number> {
     )
   ).rows;
   for (const g of grants) {
-    if (!["companies", "company_members"].includes(g.t) || g.p !== "SELECT") {
+    // Row 9 (migration 003, owner's choice at its scope gate, Hỏi-4): the identity role also inserts and updates
+    // company_members through the four member functions. Nothing else, and no DELETE anywhere.
+    const allowed = g.t === "company_members" ? ["SELECT", "INSERT", "UPDATE"] : ["SELECT"];
+    if (!["companies", "company_members"].includes(g.t) || !allowed.includes(g.p)) {
       throw new Error(`vai-ham-danh-tinh-hep: ${g.t}`);
     }
   }
@@ -430,10 +433,10 @@ describe("dang-nhap (Postgres của dãy)", () => {
     expect(await res.json()).toEqual({ error: "no-company" });
     expect(res.headers.get("set-cookie")).toBeNull();
     expect(await sessions(w)).toBe(before);
-    await w.db.owner.query("insert into company_members (company_id, user_id) values ($1, $2)", [
-      w.fx.companies.A,
-      w.fx.users.one,
-    ]);
+    await w.db.owner.query(
+      "insert into company_members (company_id, user_id, name, roles) values ($1, $2, '[Tên]', '{CompanyAdmin}')",
+      [w.fx.companies.A, w.fx.users.one],
+    );
     await w.db.owner.query("delete from identity.code_requests");
   });
 
@@ -478,10 +481,10 @@ describe("dang-nhap (Postgres của dãy)", () => {
       company: unknown;
     };
     expect(me.company).toBeNull();
-    await w.db.owner.query("insert into company_members (company_id, user_id) values ($1, $2)", [
-      w.fx.companies.A,
-      w.fx.users.one,
-    ]);
+    await w.db.owner.query(
+      "insert into company_members (company_id, user_id, name, roles) values ($1, $2, '[Tên]', '{CompanyAdmin}')",
+      [w.fx.companies.A, w.fx.users.one],
+    );
     await w.db.owner.query("delete from identity.code_requests");
   });
 
@@ -566,7 +569,8 @@ describe("dang-nhap (Postgres của dãy)", () => {
   });
 
   it("vai-ham-danh-tinh-hep", async () => {
-    expect(await checkIdentityRoleNarrow(w)).toBe(6);
+    // Six sign-in functions of row 8 and four member functions of row 9 (migration 003).
+    expect(await checkIdentityRoleNarrow(w)).toBe(10);
   });
 });
 

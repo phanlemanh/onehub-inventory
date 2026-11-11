@@ -169,6 +169,16 @@ describe("page states", () => {
     );
   });
 
+  it("the forbidden state says why, offers the way home and shows nothing else", () => {
+    const { container } = render(<PageState kind="forbidden" homeHref="/" />);
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(FRAME_COPY.forbidden.title);
+    expect(screen.getByRole("link", { name: FRAME_COPY.goHome }).getAttribute("href")).toBe("/");
+    expect(container.querySelector('[data-part="why"]')?.textContent).toBe(
+      FRAME_COPY.forbidden.why,
+    );
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
   it("the error state offers retry and calls it", () => {
     const retry = vi.fn();
     render(<PageState kind="error" onRetry={retry} />);

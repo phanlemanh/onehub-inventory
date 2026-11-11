@@ -212,3 +212,19 @@ concepts:
     own: true
     pref: Đăng xuất
     en: Sign out
+  Member:
+    kind: entity
+    reso: Member
+    pref: Thành viên
+    en: Member
+    avoid: [Nhân viên, User]
+  Invite:
+    kind: action
+    own: true
+    pref: Mời người
+    en: Invite
+  ChangeRoles:
+    kind: action
+    own: true
+    pref: Đổi vai
+    en: Change roles

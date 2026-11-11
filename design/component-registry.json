@@ -32,6 +32,29 @@
       ]
     },
     {
+      "name": "FormDialog",
+      "file": "src/components/candidate/form-dialog.tsx",
+      "level": "organism",
+      "parts": [
+        {
+          "name": "FormDialog",
+          "props": [
+            "trigger",
+            "title",
+            "description",
+            "submitLabel",
+            "busyLabel",
+            "busy",
+            "open",
+            "onOpenChange",
+            "onSubmit",
+            "formError",
+            "slot"
+          ]
+        }
+      ]
+    },
+    {
       "name": "RecordPanel",
       "file": "src/components/candidate/record-panel.tsx",
       "level": "molecule",
