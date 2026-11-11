@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "hanh-vi-trong-luoi-khung",
-  "ghi_luc": "2026-11-11T06:25:55Z",
-  "vong_cham": 3,
+  "ghi_luc": "2026-11-11T07:06:42Z",
+  "vong_cham": 4,
   "luot": [
     {
       "vong": 1,
@@ -26,6 +26,11 @@
       "tang": [
         "bai-kiem-ha-tang"
       ]
+    },
+    {
+      "vong": 4,
+      "verdict": "PASS",
+      "tang": []
     }
   ],
   "lam_lai": [
@@ -66,8 +71,8 @@
   "chua_phan": [],
   "thuoc_vat": {
     "vat": [
-      309,
-      58
+      418,
+      61
     ],
     "thuoc": [
       3,
@@ -76,8 +81,8 @@
     "nhat": 0
   },
   "gio_may": {
-    "gio_may": 6.63,
+    "gio_may": 7.31,
     "gio_cho": 1.09,
-    "phan_tram_tuan": 18.03
+    "phan_tram_tuan": 19.09
   }
 }

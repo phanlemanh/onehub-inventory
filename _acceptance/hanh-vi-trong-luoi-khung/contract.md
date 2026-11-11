@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: []
-status: implemented
+status: verified
 approved_by:
 approved_at:
 veto_state: mo
@@ -73,3 +73,10 @@ Vòng này dựng thành phần dùng chung (hồ sơ cạnh bảng, cửa lưu,
 - Câu chữ mới ở `src/components/candidate/grid-copy.ts` (vùng, hồ sơ) và `src/components/templates/frame-copy.ts` (xác nhận).
 - Giám sát đã cho phép thêm dòng `check` vào sáu quyết định tầng hành vi và một mục mới `record-panel` trong `design/decisions.yaml` (yêu cầu K-4): chỉ thêm dòng, mục mới nêu trong mô tả PR.
 - Hồ sơ cạnh bảng do Lưới giữ: màn khai cách dựng nội dung một dòng, Lưới đưa thứ tự dòng đang hiện (sau tìm lọc) cho khung.
+- Ngoài-1 (máy định tuyến 2026-11-11, đề xuất S4 known-limits): Bài kiểm vẫn báo đỏ khi một màn tự dựng hộp thoại từ thư viện chung, nhưng chưa chứng minh được là nó nêu đúng tên tệp và thành phần phải dùng thay. Nếu sau này có người sửa nhầm, thông báo cho lập trình viên có thể kém rõ hoặc sai, người dùng cuối không thấy gì. — `tests/behavior-guard.test.ts`
+- Ngoài-2 (máy định tuyến 2026-11-11, đề xuất S4 known-limits): Rào chắn không đọc một cách viết nhập cũ hiếm gặp, nên một màn dùng đúng cách viết đó có thể tự dựng lại hành vi mà không bị bắt. Người dùng cuối không bị ảnh hưởng trực tiếp, chỉ là rào chắn có một kẽ hở nhỏ. — `tests/behavior-guard.test.ts`
+- Ngoài-3 (máy định tuyến 2026-11-11, đề xuất S4 known-limits): Một màn nhân viên có thể tự gắn thêm khung hiển thị thông báo của riêng mình mà bài kiểm của kho không báo đỏ, nên có nguy cơ thông báo hiện lệch nhau giữa các màn. Hiện chưa có màn thật nào làm vậy. — `tests/behavior-guard.test.ts`
+- Ngoài-5 (máy định tuyến 2026-11-11, đề xuất S4 known-limits): Người dùng cuối không thấy gì khác; chỉ là người làm màn sau này dễ nhầm hai thứ cùng tên khi nối báo lỗi ở trường. — `src/components/candidate/use-change.tsx`
+- Ngoài-6 (máy định tuyến 2026-11-11, đề xuất S4 known-limits): Khi đang mất mạng mà giá trị nhập bị kiểm tra là sai, người dùng thấy băng báo chưa lưu vì mất mạng thay vì câu báo ngay tại ô sai, và bấm thử lại sẽ lặp lại lỗi đó. — `src/components/candidate/use-change.tsx`
+- Ngoài-11 (máy định tuyến 2026-11-11, đề xuất S4 known-limits): Sau khi đóng hồ sơ, bấm Quay lại của trình duyệt có thể mở lại hồ sơ, và đi qua nhiều dòng thì phải bấm Quay lại nhiều lần mới thoát. — `src/components/candidate/record-panel.tsx`
+- Ngoài-13 (máy định tuyến 2026-11-11, đề xuất S4 known-limits): Bài kiểm ô khóa có thể vẫn xanh dù ô khóa thật mất lý do hiển thị, nên lỗi này có thể lọt qua mà không ai biết. — `tests/behavior.test.tsx`
