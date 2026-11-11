@@ -6,7 +6,7 @@ failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 71dcd6a22b8f2761d31fb828bc701cb4de7fc4e2
+verified_commit: b442656365478c819a079277a3cc9c5dfa4ec185
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -183,3 +183,7 @@ Round 2: ba lệnh suite (make check, npm run build, make e2e) xanh; các eval m
 ### Re-pin lần 1 — 2026-11-11, do gộp origin/main (hàng 1a) vào nhánh trước khi trình Cổng Bằng chứng
 run_id: repin-20261111T021712Z-49571
 sha: 71dcd6a22b8f2761d31fb828bc701cb4de7fc4e2 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E9 (E9 không khai paths)
+
+### Re-pin lần 2 — 2026-11-11, do gộp origin/main (hàng 1, hàng 1i/1j) sau chữ ký
+run_id: repin-20261111T031619Z-63250
+sha: b442656365478c819a079277a3cc9c5dfa4ec185 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E9 (E9 không khai paths)
