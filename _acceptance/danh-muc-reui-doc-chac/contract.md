@@ -5,9 +5,7 @@ slug: danh-muc-reui-doc-chac
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
-status: verified
-approved_by: Manh Phan
-approved_at: 2026-11-11
+status: draft
 design_doc: _acceptance/danh-muc-reui-doc-chac/design.md
 ---
 
@@ -48,6 +46,8 @@ chụp, mỗi tệp ở dòng 3 và dòng cuối có chữ — tổng 27 chỗ. 
 - AC-8: Given bản sao kho bị chèn một dạng chuỗi cấm vào một chỗ, When chạy lệnh kiểm của bản sao, Then lệnh thoát 1 và stderr có đúng thông điệp ghim của AC-5 cho chỗ và dạng ấy — 10 cặp chỗ–dạng kê trước, mỗi dạng đúng một lần, phủ cả bốn lớp chỗ (gốc, nhóm, mục, ảnh chụp).
 - AC-9: Given kho sau vòng này, When sinh lại danh mục hai lần dưới bộ chặn mạng và chạy bộ kiểm của kho, Then danh mục giống từng byte với bản đã commit, tệp kiểm cũ của hàng 1g vẫn đủ 33 ca xanh, và tệp kiểm mới đủ 320 ca khai trước và không tên ca nào mang chuỗi `E<số> ·` mà hồ sơ 1g đếm; Given tệp kiểm mới không được bộ kiểm của kho nhặt, When chạy bộ kiểm, Then số ca khác 320 và phép đo đỏ.
 - AC-10: Given tệp hướng dẫn của thư mục công cụ, When một agent chưa biết danh mục đọc mục ghim lại (judgment), Then agent biết lệnh ghim lại dừng và gọi tên nhóm khi nguồn đổi cách ghi tiêu đề, và phải làm gì khi gặp lỗi ấy.
+- AC-11: Given danh mục đã commit và ma trận viết trước 10 dạng chuỗi cấm × 3 chỗ tên khoá (khoá trong `pin`, khoá trong một tệp của `pin.files`, khoá trong `counts`; 30 ca), When đặt dạng ấy làm TÊN một khoá ở chỗ ấy rồi chạy hàm quét, Then hàm quét trả đúng một lỗi `forbidden in pin: <nhãn>` hay `forbidden in counts: <nhãn>` — như hàm quét bắt được trước khi làm hàng này.
+- AC-12: Given người bảo trì đổi tiêu đề nhóm thành phần gốc ở một chỗ trong mã (danh sách nhóm bắt buộc), When ghim lại từ nguồn có tiêu đề mới, Then danh mục ghim đủ 27 thành phần gốc; When nguồn vẫn tiêu đề cũ, Then lệnh dừng và gọi tên nhóm; Given nguồn có tiêu đề một nhóm bắt buộc với số khai 0 và không mục nào, When ghim lại, Then lệnh dừng với `section empty in <tệp>: <tiêu đề> (<loại>)` — với cả ba nhóm; và hướng dẫn nói tiêu đề chỉ khai ở một chỗ ấy.
 
 ## Coverage
 
@@ -64,6 +64,7 @@ thường thật); danh sách `FORBIDDEN`, `ALLOWED_FIELDS`, `SOURCES` của `to
   kiểm đi AC-8. Không thoái lui đi AC-9.
 - Ô nhóm × sáu dạng còn lại × {sinh lại, kiểm} không có ca riêng: cùng một hàm đọc với AC-1, và AC-3 chứng hai lệnh ấy
   đi qua hàm đó.
+- Tên khoá × dạng chuỗi cấm đi AC-11 (30 ô). Đổi nhãn ở mã × nguồn đổi hay không, và nhóm rỗng × ba nhóm, đi AC-12.
 - Ô dạng chuỗi cấm × chỗ × lệnh kiểm chỉ có 10 ô: 270 ô đo trên hàm quét trong tiến trình (AC-5), AC-8 chứng lệnh
   kiểm gọi hàm ấy ở cả bốn lớp chỗ.
 
@@ -92,3 +93,8 @@ nghiệm thu giá trị trong đợt. Không có thước nào để nối.
   vòng này thêm `counts` vào phần quét chữ; đây là sửa trong phạm vi «phủ đủ», không thêm dạng cấm mới.
 - Hồ sơ đã ký `danh-muc-reui` đếm ca theo tên mở đầu `E<số> ·` và theo tệp `catalog.test.mjs` (đúng 33), không eval nào
   của nó so tổng số ca của cả thư mục; ca mới mở đầu `DC<số> ·` nên không lọt vào phép đếm nào của hồ sơ ấy (AC-9).
+- Mở lại ở Cổng Bằng chứng 2026-11-11 (chủ kho trả lời ở phiên giám sát, nguyên văn «sửa ngay»): Ngoài-3 thành AC-11, Ngoài-5 thành AC-12; hợp đồng có 12 tiêu chí.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-1: Hướng dẫn sửa khi ReUI đổi tên mục thành phần gốc từng chưa nêu đủ chỗ phải đổi (AC-12 thu tiêu đề về một chỗ).
+  - Ngoài-2: Thẻ Cổng Phạm vi xếp tiêu chí đối chứng AC-7 vào nhóm việc không làm.
+  - Ngoài-4: Hướng dẫn sửa lỗi từng chưa nêu đủ mọi chỗ phải đổi khi ReUI đổi tên mục thành phần gốc.

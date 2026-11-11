@@ -84,7 +84,7 @@ evals:
     executor: script
     cmd: config:executors.test.unit
     paths: [tools/reui_catalog/**, design/reui-catalog.json]
-    expected: "exit 0; bộ kiểm của kho chạy tools/reui_catalog/catalog.test.mjs đủ 33 ca và tools/reui_catalog/doc-chac.test.mjs đủ 320 ca, 0 bỏ qua; không tên ca nào của doc-chac.test.mjs khớp /E[0-9]+ ·/ (chuỗi mà hồ sơ danh-muc-reui đếm); số ca của doc-chac.test.mjs khác 320 (tệp không được nhặt, hay ca bị bỏ) thì eval KHÔNG đạt."
+    expected: "exit 0; bộ kiểm của kho chạy tools/reui_catalog/catalog.test.mjs đủ 33 ca và tools/reui_catalog/doc-chac.test.mjs đủ 356 ca, 0 bỏ qua; không tên ca nào của doc-chac.test.mjs khớp /E[0-9]+ ·/ (chuỗi mà hồ sơ danh-muc-reui đếm); số ca của doc-chac.test.mjs khác 356 (tệp không được nhặt, hay ca bị bỏ) thì eval KHÔNG đạt."
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E11
@@ -93,4 +93,28 @@ evals:
     inputs: [tools/reui_catalog/README.md]
     question: "Một agent chưa biết danh mục chỉ đọc tệp này, mục ghim lại. Tệp có nói rõ: (1) khi nguồn ReUI đổi cách ghi tiêu đề một nhóm, lệnh ghim lại dừng, không ghi tệp nào và gọi tên nhóm bị mất; (2) khi gặp lỗi ấy agent phải làm gì (không tự sửa ảnh chụp, sửa bộ đọc trong một PR có người duyệt)? Có điều nào tự mâu thuẫn với phần còn lại của tệp không?"
     expected: "PASS khi cả hai điều được nói rõ và tệp không tự mâu thuẫn; hành vi thật của lệnh do E1, E3, E4 đo"
+    evidence_required: [run_id, verdict, judges, verified_at]
+
+  - id: E12
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.reui_catalog_test
+    paths: [tools/reui_catalog/**, design/reui-catalog.json]
+    expected: "exit 0; đúng 31 ca 'DC11 ·' đạt. Ca 'DC11 · matrix is 10 forms x 3 key places' khẳng định mười dạng là đúng mười dạng của DC5 và ma trận có 30 phần tử. 30 ca 'DC11 · <chỗ> · <dạng>' với chỗ ∈ {pin, pin.files[0], counts}: trên bản sao trong bộ nhớ của danh mục đã commit, thêm một khoá mang tên là chuỗi ấy (giá trị 'x') vào đúng chỗ, khẳng định khoá đã có, gọi scanCatalog: trả mảng đúng một lỗi 'forbidden in pin: <nhãn>' (hai chỗ trong pin) hay 'forbidden in counts: <nhãn>'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-12
+    executor: script
+    cmd: config:executors.script.reui_catalog_test
+    paths: [tools/reui_catalog/**]
+    expected: "exit 0; đúng 5 ca 'DC12 ·' đạt, mỗi ca trên bản sao, lệnh của bản sao dưới bộ chặn mạng: 'DC12 · label renamed in code and source re-pins all 27 components' (catalog.mjs của bản sao đổi 'ReUI Primitives' thành 'ReUI primitives' trong REQUIRED_SECTIONS, nguồn đổi đúng tiêu đề ấy; '--refresh --from' thoát 0, stdout chứa '27 components' và không dòng 'removed:'); 'DC12 · label renamed in code only stops and names the section' (cùng sửa mã, nguồn giữ tiêu đề cũ; thoát 1, stderr chứa 'section missing in llms.txt: ReUI primitives (component)'); ba ca 'DC12 · <tiêu đề> · empty section' cho Pro blocks, Free examples, ReUI Primitives (nguồn đổi số khai thành 0 và bỏ mọi dòng mục của nhóm; thoát 1, stderr chứa 'section empty in <tệp>: <tiêu đề> (<loại>)', ảnh chụp, pin.json, danh mục của bản sao giữ nguyên byte)."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-12
+    executor: judgment
+    inputs: [tools/reui_catalog/README.md]
+    question: "Một người bảo trì chỉ đọc tệp này khi ReUI đổi tiêu đề một nhóm. Tệp có nói rõ tiêu đề các nhóm bắt buộc chỉ khai ở MỘT chỗ trong mã (đổi ở đó là đủ), và lệnh dừng khi một nhóm bắt buộc không đọc được mục nào? Có câu nào khiến họ phải sửa thêm chỗ khác hay tự mâu thuẫn không?"
+    expected: "PASS khi cả hai điều được nói rõ và không câu nào bảo sửa thêm chỗ khác; hành vi thật do E13 đo"
     evidence_required: [run_id, verdict, judges, verified_at]
