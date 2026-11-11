@@ -66,6 +66,20 @@ function assertSheetClosed(visibleLinks: number): void {
   if (visibleLinks > 0) throw new Error("sheet stayed open after choosing");
 }
 
+type Box = { x: number; width: number } | null;
+
+/** The open sheet lies wholly inside the screen and is wide enough to hold both columns. */
+function assertSheetInView(box: Box, viewportWidth: number): void {
+  if (!box || box.width < 200 || box.x < -1 || box.x + box.width > viewportWidth + 1)
+    throw new Error("sheet frame does not show the open sheet");
+}
+
+async function sheetBox(page: Page): Promise<Box> {
+  const el = page.locator('[data-slot="sidebar"][data-mobile="true"]').first();
+  if ((await el.count()) === 0) return null;
+  return el.boundingBox();
+}
+
 /** SHOTS_DIR=<dir> saves the frames E10 looks at (one per named state). */
 async function shot(page: Page, name: string) {
   const dir = process.env["SHOTS_DIR"];
@@ -199,15 +213,37 @@ test.describe("App Shell on a phone", () => {
     for (const name of SECOND_COLUMN["/inventory"]!) {
       await expect(sheet.getByRole("link", { name, exact: true }).first()).toBeVisible();
     }
-    // The sheet slides in; shoot only once its animations have finished, so the frame shows it open.
+    // The sheet slides in; shoot only once it lies wholly on screen, so the frame shows it open.
+    const width = page.viewportSize()!.width;
     await expect
-      .poll(() => sheet.first().evaluate((el) => el.getAnimations({ subtree: true }).length))
-      .toBe(0);
-    if (page.viewportSize()?.width === 360) await shot(page, "sheet-360-light");
+      .poll(async () => {
+        try {
+          assertSheetInView(await sheetBox(page), width);
+          return "in view";
+        } catch (e) {
+          return (e as Error).message;
+        }
+      })
+      .toBe("in view");
+    if (width === 360) await shot(page, "sheet-360-light");
     await sheet.getByRole("link", { name: LABELS.Sent.pref, exact: true }).click();
     await expect(page.locator("h1")).toHaveText(LABELS.Sent.pref);
     await expect(sheet).toHaveCount(0);
     assertSheetClosed(await page.locator('[data-mobile="true"] a').count());
+  });
+
+  test("the in-view check fails on a closed sheet and on a sheet still off screen", async ({
+    page,
+  }) => {
+    await page.goto("/inventory");
+    const width = page.viewportSize()!.width;
+    expect(() => assertSheetInView(null, width)).toThrow(
+      "sheet frame does not show the open sheet",
+    );
+    expect(await sheetBox(page)).toBeNull();
+    expect(() => assertSheetInView({ x: -288, width: 288 }, width)).toThrow(
+      "sheet frame does not show the open sheet",
+    );
   });
 
   test("the sheet check fails while the sheet is still open", async ({ page }) => {

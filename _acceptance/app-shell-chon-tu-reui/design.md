@@ -27,6 +27,17 @@ bấm, thấy băng báo khi mất mạng hay lưu hỏng, đổi sáng tối, �
 
 ## Vùng của khối → lấy, bỏ, thêm
 
+**Chủ kho đã trả lời năm câu (Cổng Phạm vi, 2026-11-11, «duyệt» trên thẻ khuyên A cả năm):** câu 1 cột thứ hai là lối
+tắt theo trạng thái · câu 2 chưa có ô gõ mã căn · câu 3 chưa có chuông · câu 4 tên sàn ở đầu thanh trên · câu 5 điện
+thoại dùng thanh bên thu gọn. Phép đếm dưới tính theo đúng các câu trả lời này.
+
+**Nguồn danh sách vùng:** mã của khối `app-shell-8` lấy từ kho ReUI ngày 2026-11-11 (20 tệp:
+`app-shell.tsx`, `app-shell-content.tsx`, `app-sidebar.tsx`, `nav-main.tsx`, `logo.tsx`, `nav-user.tsx`,
+`inner-sidebar.tsx`, `inner-sidebar-content.tsx`, `inner-sidebar-nav.tsx`, `inner-sidebar-rail-toggle.tsx`, năm thẻ
+chân cột `inner-sidebar-stats/storage/news/security/upgrade.tsx`, `app-header.tsx` với ba bộ chọn Org, App, Env và nút
+Create, `search-dialog.tsx`, `notifications-drawer.tsx`, `data.tsx`, `page.tsx`). Mỗi dòng bảng dưới ứng với một phần
+của các tệp ấy; ảnh khối gốc nằm ở `evidence/design-pass/anh/khoi-goc.jpg`.
+
 Thang của quyết định 0023: thành phần giữ nguyên như ReUI và shadcn giao; khối là điểm xuất phát cho cách xếp; nhu cầu
 con kho đã có lời giải thì dùng của kho.
 
