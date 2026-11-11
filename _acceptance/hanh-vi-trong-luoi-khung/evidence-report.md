@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 9b1d97a36624f02154a26cb48747ac11ca9bed12
+verified_commit: ea0a8d4b53b7314825e206cf2d09bca47b066ab2
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -206,3 +206,7 @@ none — mọi eval chạy một lần, kết quả đồng nhất (runs: 1, kh�
 Round 1-2: chạy đủ bộ eval, ghi vào sổ chạy; các lỗi tìm được đã sửa ở các commit sau.
 Round 3: E1-E8, E11-E14, E16 chạy lại và xanh (sẽ được carry-forward ở round 4).
 Round 4: sửa đọc đường nhập bằng cây cú pháp TypeScript (9b1d97a); chạy lại E9, E10 và hai lệnh suite, tất cả xanh; các eval còn lại carry-forward từ round 3.
+
+### Re-pin lần 1 — 2026-11-11, do gộp nhánh chính tới lượt gộp
+run_id: repin-20261111T072021Z-61204
+sha: ea0a8d4b53b7314825e206cf2d09bca47b066ab2 · suites: 3 lệnh exit 0 · evals: 14/14 eval máy đạt kỳ vọng · ngoài làn máy: E14, E15 (E15 không khai paths)
