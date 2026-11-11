@@ -50,25 +50,22 @@ begin
   raise exception 'HỎNG %: câu chạy được — %', ca, cau;
 end $f$;
 
--- A policy expression filters by company when every OR-term is exactly `<column> = app.current_company_id()`.
--- Reads may also match a partner column (one ending in company_id); writes may only match the table's own company
--- column. Anything else — `true`, `<>`, `is not null`, an extra `or …`, an `and …` — fails closed.
-create function pg_temp.loc_theo_san(bieu_thuc text, cot text, chi_cot_san boolean) returns boolean
-language plpgsql immutable as $f$
-declare phan text; m text[]; co_cot_san boolean := false;
-begin
-  foreach phan in array string_to_array(bieu_thuc, ' OR ') loop
-    -- Strips the deparser's parentheses, including the call's own `()`.
-    m := regexp_match(btrim(phan, ' ()'), '^(\w+) = app\.current_company_id$');
-    if m is null then return false; end if;
-    if m[1] = cot then
-      co_cot_san := true;
-    elsif chi_cot_san or m[1] !~ 'company_id$' then
-      return false;
-    end if;
-  end loop;
-  return co_cot_san;
-end $f$;
+-- Allowed policy shapes (allow-list, not a search for bad shapes). A policy expression of a company table must be
+-- exactly the standard form `(<company column> = app.current_company_id())` as Postgres prints it, or a named read
+-- exception listed here. Write policies (INSERT, UPDATE, DELETE, ALL) have no exception. Anything else fails, so a new
+-- shape needs a deliberate line in this list.
+create temp table luat_cho_phep (bang name not null, luat name not null, bieu_thuc text not null);
+insert into luat_cho_phep values
+  -- 001_nen_cong_ty.sql: the company on the other side of a partnership may read the agreement.
+  ('agreements', 'agreements_read',
+   '((company_id = app.current_company_id()) OR (counterparty_company_id = app.current_company_id()))');
+
+create function pg_temp.dung_dang(bang name, luat name, lenh text, bieu_thuc text, cot text) returns boolean
+language sql stable as $f$
+  select bieu_thuc = format('(%s = app.current_company_id())', cot)
+      or (lenh = 'SELECT' and exists (select from pg_temp.luat_cho_phep l
+                                      where l.bang = $1 and l.luat = $2 and l.bieu_thuc = $4));
+$f$;
 
 -- Tables in scope: every ordinary or partitioned table in schema public with a company_id column, plus companies.
 create function pg_temp.bang_cong_ty() returns table (oid oid, ten name, cot text) language sql as $f$
@@ -281,7 +278,7 @@ begin
   raise notice 'ok moi-bang-cong-ty-ep-luat-theo-dong — % bảng', n;
 end $$;
 
--- 13. Every policy of every company table filters by company (pg_temp.loc_theo_san); reads exist; inserts and updates
+-- 13. Every policy of every company table has an allowed shape (pg_temp.dung_dang); reads exist; inserts and updates
 --     have a check.
 do $$
 declare b record; p record; n int := 0;
@@ -293,11 +290,11 @@ begin
       raise exception 'HỎNG luat-doc-ghi-theo-san: % không có luật đọc', b.ten;
     end if;
     for p in select * from pg_policies where schemaname = 'public' and tablename = b.ten loop
-      if p.qual is not null and not pg_temp.loc_theo_san(p.qual, b.cot, false) then
-        raise exception 'HỎNG luat-doc-ghi-theo-san: % — luật % không lọc theo sàn: %', b.ten, p.policyname, p.qual;
+      if p.qual is not null and not pg_temp.dung_dang(b.ten, p.policyname, p.cmd, p.qual, b.cot) then
+        raise exception 'HỎNG luat-doc-ghi-theo-san: % — luật % không đúng dạng cho phép: %', b.ten, p.policyname, p.qual;
       end if;
-      if p.with_check is not null and not pg_temp.loc_theo_san(p.with_check, b.cot, true) then
-        raise exception 'HỎNG luat-doc-ghi-theo-san: % — luật % kiểm không theo sàn: %',
+      if p.with_check is not null and not pg_temp.dung_dang(b.ten, p.policyname, p.cmd, p.with_check, b.cot) then
+        raise exception 'HỎNG luat-doc-ghi-theo-san: % — luật % kiểm không đúng dạng cho phép: %',
           b.ten, p.policyname, p.with_check;
       end if;
       if p.cmd in ('INSERT', 'UPDATE') and p.with_check is null then
