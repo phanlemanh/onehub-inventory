@@ -8,9 +8,8 @@ import {
   DataGridContainer,
   dataGridFeatures,
 } from "@/components/reui/data-grid/data-grid";
-import { DataGridPagination } from "@/components/reui/data-grid/data-grid-pagination";
 import { DataGridScrollArea } from "@/components/reui/data-grid/data-grid-scroll-area";
-import { DataGridTable } from "@/components/reui/data-grid/data-grid-table";
+import { DataGridTableVirtual } from "@/components/reui/data-grid/data-grid-table-virtual";
 import { Frame, FrameHeader, FramePanel } from "@/components/reui/frame";
 import { Button } from "@/components/ui/button";
 
@@ -48,7 +47,17 @@ export type GridRow = {
 
 export type RegionStatus = "ready" | "loading" | "error" | "partial" | "forbidden";
 
-export const DEFAULT_PAGE_SIZE = 50;
+/** Row heights of the two densities (h-10, h-12), for the virtual body to place rows before measuring them. */
+const ROW_HEIGHT_PX = { dense: 40, normal: 48 } as const;
+
+/** Viewport height of the grid: rows scroll inside it in one run, like a sheet; the page itself does not scroll. */
+const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-screen";
+
+/** Id of the row-number column, the first frozen column. */
+export const ROW_NUMBER_ID = "row-number";
+
+/** How many leading data columns stay put while the grid scrolls sideways, after the row numbers. */
+export const FROZEN_COLUMNS = 2;
 
 /** The region's working button and whether the viewer may use it; a button without permission never shows. */
 export interface RegionAction {
@@ -148,7 +157,7 @@ function useWidthInCh() {
 }
 
 /**
- * The shared grid of every data region: header, typed columns, search, pagination and the region states
+ * The shared grid of every data region: header, typed columns, search, one continuous run of rows and the region states
  * (design/states.md). Screens give columns by field and rows; alignment, width, format and density follow the kind.
  */
 export function DataRegion({
@@ -163,7 +172,6 @@ export function DataRegion({
   action,
   record,
   editable = false,
-  pageSize = DEFAULT_PAGE_SIZE,
 }: {
   title: string;
   columns: readonly TypedColumn[];
@@ -181,7 +189,6 @@ export function DataRegion({
   record?: RegionRecord;
   /** Cells say where they are edited: in the cell or in the record panel, by kind. */
   editable?: boolean;
-  pageSize?: number;
 }) {
   const searchId = useId();
   const [query, setQuery] = useState("");
@@ -238,8 +245,27 @@ export function DataRegion({
   });
 
   const columnDefs = useMemo(
-    () =>
-      columns.map((column, index) =>
+    () => [
+      helper.display({
+        id: ROW_NUMBER_ID,
+        header: GRID_COPY.rowNumberHeader,
+        size: Math.floor((String(rows.length).length + 3) * chPx),
+        cell: (info) => (
+          <span
+            data-slot="row-number"
+            data-row-number={info.row.index + 1}
+            className="text-muted-foreground tabular-nums"
+          >
+            {info.row.index + 1}
+          </span>
+        ),
+        meta: {
+          headerTitle: GRID_COPY.rowNumberLabel,
+          headerClassName: "text-right",
+          cellClassName: "text-right",
+        },
+      }),
+      ...columns.map((column, index) =>
         helper.accessor((row: GridRow) => row[column.field], {
           id: column.field,
           header: column.header,
@@ -274,7 +300,8 @@ export function DataRegion({
           },
         }),
       ),
-    [columns, chPx, editable, opensRecord, widths],
+    ],
+    [columns, chPx, editable, opensRecord, widths, rows.length],
   );
 
   const table = useTable({
@@ -282,7 +309,14 @@ export function DataRegion({
     data: shown as GridRow[],
     columns: columnDefs,
     getRowId: (row: GridRow) => row.id,
-    initialState: { pagination: { pageIndex: 0, pageSize } },
+    // One continuous run: every row is on the single page, the virtual body mounts only the rows in view.
+    initialState: {
+      pagination: { pageIndex: 0, pageSize: Number.MAX_SAFE_INTEGER },
+      columnPinning: {
+        start: [ROW_NUMBER_ID, ...columns.slice(0, FROZEN_COLUMNS).map((column) => column.field)],
+        end: [],
+      },
+    },
   });
 
   // The grid scrolls sideways inside its own viewport; keyboard users must be able to reach and scroll it
@@ -313,24 +347,26 @@ export function DataRegion({
         table={table}
         recordCount={shown.length}
         i18n={GRID_I18N}
-        tableLayout={{ headerSticky: true, width: "fixed", dense: density === "dense" }}
+        tableLayout={{
+          headerSticky: true,
+          columnsPinnable: true,
+          width: "fixed",
+          dense: density === "dense",
+        }}
         tableClassNames={{ bodyRow: DENSITY_ROW_CLASS[density] }}
       >
         <DataGridContainer>
-          <DataGridScrollArea>
-            <DataGridTable />
+          <DataGridScrollArea className={VIEWPORT_HEIGHT_CLASS}>
+            <DataGridTableVirtual estimateSize={ROW_HEIGHT_PX[density]} />
           </DataGridScrollArea>
         </DataGridContainer>
-        {shown.length > pageSize ? (
-          <div data-slot="region-footer" className="border-t px-3 py-2">
-            <DataGridPagination
-              sizes={[pageSize]}
-              rowsPerPageLabel={GRID_I18N.labels?.rowsPerPage}
-              previousPageLabel={GRID_I18N.labels?.previousPage}
-              nextPageLabel={GRID_I18N.labels?.nextPage}
-            />
-          </div>
-        ) : null}
+        <div data-slot="region-footer" className="border-t px-3 py-2">
+          <span data-slot="region-count" className="text-sm text-muted-foreground">
+            {query
+              ? GRID_COPY.filteredCount(shown.length, rows.length)
+              : GRID_COPY.rowCount(rows.length)}
+          </span>
+        </div>
       </DataGrid>
     );
 
@@ -353,6 +389,7 @@ export function DataRegion({
               onQuery={setQuery}
               action={action?.allowed && status !== "forbidden" ? action.node : undefined}
               searchId={searchId}
+              showCount={false}
             />
           </div>
           {status === "partial" && rows.length > 0 ? (

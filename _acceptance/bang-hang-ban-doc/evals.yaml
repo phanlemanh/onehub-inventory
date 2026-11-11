@@ -14,7 +14,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/inventory.test.tsx]
-    expected: "exit 0; InventoryGrid dựng với 60 dòng mẫu: đúng tám đầu cột theo thứ tự, chữ mỗi đầu cột bằng label() của khái niệm Unit, Building, Subdivision, StandardStatus, ListPrice, LivingArea, BedroomsTotal, LastConfirmedAt (đọc từ bảng nhãn đã sinh) VÀ bằng chuỗi đã duyệt viết sẵn trong tệp kiểm: 'Căn', 'Toà', 'Khu', 'Trạng thái', 'Giá chào', 'Diện tích', 'Phòng ngủ', 'Xác nhận lúc'; đầu vùng '60 dòng'; thân bảng 25 dòng và có thanh chia trang; một ô giá hiện dạng 'x,xx tỷ', một ô diện tích có 'm²', ô trạng thái là huy hiệu data-status đúng trạng thái; ca đối chứng dựng vùng với cỡ trang mặc định 50 và khẳng định thông điệp 'page size: 50 != 25'"
+    expected: "exit 0; InventoryGrid dựng với 60 dòng mẫu: cột số dòng rồi đúng tám đầu cột theo thứ tự, chữ mỗi đầu cột bằng label() của khái niệm Unit, Building, Subdivision, StandardStatus, ListPrice, LivingArea, BedroomsTotal, LastConfirmedAt VÀ bằng chuỗi đã duyệt viết sẵn: 'Căn', 'Toà', 'Khu', 'Trạng thái', 'Giá chào', 'Diện tích', 'Phòng ngủ', 'Xác nhận lúc'; cả 60 dòng trong một lần cuộn, số dòng 1..60 không hở, không thanh chia trang, chân bảng '60 dòng'; cột số dòng, Căn, Toà được ghim đầu (trạng thái ghim của bảng); một ô giá dạng 'x,xx tỷ', một ô diện tích có 'm²', ô trạng thái là huy hiệu data-status đúng trạng thái; ca đối chứng xoá một dòng khỏi lần cuộn cho 'run broken at row <n>' và chèn lại thanh chia trang cho 'pager present'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3
@@ -22,7 +22,7 @@ evals:
     executor: script
     cmd: config:executors.script.e2e
     paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", src/components/candidate/**, tools/e2e_templates/**, tests/e2e/screens/screens.spec.ts]
-    expected: "exit 0; trong báo cáo Playwright của tests/e2e/screens/screens.spec.ts, ở cả bốn khổ 360/414/1024/1440, mọi ca dưới 'man inventory › vung' (cho-tai, trong, tim-khong-ra, loi, mot-phan-hong, chu-dai, khong-du-quyen, tim) và mọi ca 'pha vung …' của chúng ĐƯỢC CHẠY và xanh — không ca nào bị bỏ qua với lý do 'chua co vung du lieu'; bốn ca khung của inventory và các ca 'pha khung …' xanh; ca phá xanh nghĩa là chính hàm kiểm của ca chính đã ném đúng thông điệp ghim trên Bảng hàng"
+    expected: "exit 0; trong báo cáo Playwright của tests/e2e/screens/screens.spec.ts, ở cả bốn khổ 360/414/1024/1440, mọi ca dưới 'man inventory › vung' (cho-tai, trong, tim-khong-ra, loi, mot-phan-hong, chu-dai, khong-du-quyen, tim) và mọi ca 'pha vung …' của chúng (gồm 'tim: chi con khung dau') ĐƯỢC CHẠY và xanh — không ca nào bị bỏ qua với lý do 'chua co vung du lieu'; bốn ca khung của inventory và các ca 'pha khung …' xanh; ca phá xanh nghĩa là chính hàm kiểm của ca chính đã ném đúng thông điệp ghim trên Bảng hàng"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E4
@@ -38,7 +38,7 @@ evals:
     executor: script
     cmd: config:executors.script.man_mau
     paths: [tools/e2e_templates/**, src/modules/listings/**, src/modules/catalog/**]
-    expected: "exit 0; trên 60 dòng chữ dựng từ dữ liệu mẫu bằng chính inventoryRows (không chép tay), pickNeedle(rows, 25) trả một chuỗi khác null mà số dòng khớp > 25, < 60 và trải ít nhất hai trang 25; pickNeedle(rows, 50) trả null (chứng vì sao phải đọc cỡ thật); trên 120 dòng của đích hiệu chuẩn pickNeedle với cỡ 50 trả cùng chuỗi như trước khi sửa; bài tìm đọc cỡ trang từ vùng trên trang (ca kiểm hàm đọc cỡ với vùng 25 và 50); ca đối chứng truyền cỡ ghi cứng 50 cho bài tìm trên dòng của Bảng hàng và khẳng định thông điệp 'tim: khong du du lieu de thu'"
+    expected: "exit 0; trong tools/e2e_templates: pickNeedle trên 60 dòng chữ dựng từ dữ liệu mẫu bằng chính inventoryRows với khung đầu bằng số dòng khung cuộn dựng sẵn (ca kiểm với 24 và 25) trả chuỗi khác null mà số dòng khớp lớn hơn khung đầu, nhỏ hơn 60 và có dòng ngoài khung đầu; pickNeedle(rows, 50) trả null; trên 120 dòng của đích hiệu chuẩn với cỡ 50 vẫn chọn như cũ; bài tìm trên trình duyệt đọc mọi dòng bằng lăn chuột qua khung cuộn; ca phá 'chi con khung dau' (khoá cuộn) và 'go mot dong khop' (ẩn dòng kết quả số 1) cho 'tim: bo sot dong khop'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E6
@@ -103,7 +103,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/components/candidate/column-kind.ts, src/components/candidate/data-region.tsx, tests/grid.test.tsx]
-    expected: "exit 0; trong tests/grid.test.tsx khối 'content-fitted width of text columns': ma trận viết trước 5 ô (mã ngắn '0905' → 7ch, nhãn dài hơn giá trị → 10ch, chuỗi dài bị chặn ở độ dài đọc → 19ch, kể cả 1ch dư cho đệm thật; cột không giá trị giữ 18ch, kiểu không phải chữ giữ độ dài mẫu) khẳng định hằng 5; hai ca đối chứng: bộ tính bỏ chặn độ dài đọc cho 'fitted width: long text capped at reading length', luật cũ cho 'fitted width: short code'; vùng 60 dòng cỡ trang 25 giữ nguyên bề rộng mọi đầu cột sau khi gõ tìm và sau khi sang trang; ca đối chứng đo trên các dòng còn lại sau tìm cho 'width follows the shown rows: search'"
+    expected: "exit 0; trong tests/grid.test.tsx khối 'content-fitted width of text columns': ma trận viết trước 5 ô (mã ngắn '0905' → 7ch, nhãn dài hơn giá trị → 10ch, chuỗi dài bị chặn ở độ dài đọc → 19ch, kể cả 1ch dư cho đệm thật; cột không giá trị giữ 18ch, kiểu không phải chữ giữ độ dài mẫu) khẳng định hằng 5; hai ca đối chứng: bộ tính bỏ chặn độ dài đọc cho 'fitted width: long text capped at reading length', luật cũ cho 'fitted width: short code'; vùng 60 dòng cỡ trang 25 giữ nguyên bề rộng mọi đầu cột sau khi gõ tìm và sau khi xoá tìm; ca đối chứng đo trên các dòng còn lại sau tìm cho 'width follows the shown rows: search'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E14

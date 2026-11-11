@@ -24,8 +24,10 @@ import { RegionHeader } from "../src/components/candidate/region-header";
 import { TypedCell } from "../src/components/candidate/typed-cell";
 import { FIELD_DISPLAY, type DisplayKind } from "../src/generated/display";
 import { formatArea, formatCount, formatMoney, statusLabel } from "../src/lib/format";
+import { tallGridViewport } from "./virtual-viewport";
 
 beforeAll(() => {
+  tallGridViewport();
   globalThis.ResizeObserver ??= class {
     observe() {}
     unobserve() {}
@@ -283,7 +285,7 @@ describe("region header", () => {
   });
 });
 
-describe("pagination and read-only cells", () => {
+describe("continuous run and read-only cells", () => {
   const columns = [
     typedColumn({ field: "Listing.unitNumber", header: "Mã" }),
     typedColumn({ field: "Listing.listPrice", header: "Giá" }),
@@ -295,37 +297,48 @@ describe("pagination and read-only cells", () => {
       "Listing.listPrice": 2_000_000_000 + i,
     }));
 
-  function checkPager(container: HTMLElement): void {
-    if (!/Số dòng mỗi trang/.test(container.textContent ?? ""))
-      throw new Error("pagination missing");
+  // Row 2 (Bảng hàng, «đọc như Sheet»): the grid is one continuous run instead of pages. Equivalent measure of the 1b
+  // pager cases: every row is reachable in the one run, numbered 1..n without a gap, the footer counts them, no pager.
+  function checkRun(container: HTMLElement, n: number): void {
+    if (/Số dòng mỗi trang/.test(container.textContent ?? "")) throw new Error("pager present");
+    const numbers = [...container.querySelectorAll('tbody [data-slot="row-number"]')].map((el) =>
+      Number(el.textContent),
+    );
+    numbers.forEach((num, i) => {
+      if (num !== i + 1) throw new Error(`run broken at row ${i + 1}`);
+    });
+    if (numbers.length !== n) throw new Error(`run broken at row ${numbers.length + 1}`);
+    const footer = container.querySelector(
+      '[data-slot="region-footer"] [data-slot="region-count"]',
+    );
+    if (footer?.textContent !== `${n} dòng`) throw new Error("footer count missing");
   }
 
-  it("shows at most one page of rows and a Vietnamese pager beyond the page size", () => {
+  it("shows every row in one numbered run, counted in the footer, with no pager", () => {
     const { container } = render(
       <DataRegion title="Vùng" columns={columns} rows={rowsOf(120)} emptyWhy="x" />,
     );
-    expect(container.querySelectorAll("tbody tr").length).toBe(50);
-    expect(() => checkPager(container)).not.toThrow();
+    expect(() => checkRun(container, 120)).not.toThrow();
+    expect(container.querySelectorAll('[data-slot="data-grid-pagination"]').length).toBe(0);
     expect(container.textContent).not.toMatch(/Rows per page|Go to next page/);
   });
 
-  it("has no pager at exactly one page", () => {
-    const { container } = render(
-      <DataRegion title="Vùng" columns={columns} rows={rowsOf(50)} emptyWhy="x" />,
-    );
-    expect(container.querySelectorAll("tbody tr").length).toBe(50);
-    expect(container.textContent).not.toMatch(/Số dòng mỗi trang/);
-  });
-
-  it("fails when the pager is missing beyond one page", () => {
+  it("fails when a row drops out of the run", () => {
     const { container } = render(
       <DataRegion title="Vùng" columns={columns} rows={rowsOf(51)} emptyWhy="x" />,
     );
-    container.querySelector('[data-slot="data-grid-pagination"]')?.remove();
-    for (const node of container.querySelectorAll("*")) {
-      if (node.textContent === "Số dòng mỗi trang") node.remove();
-    }
-    expect(() => checkPager(container)).toThrow("pagination missing");
+    container.querySelectorAll("tbody tr")[20]?.remove();
+    expect(() => checkRun(container, 51)).toThrow("run broken at row 21");
+  });
+
+  it("fails when a pager comes back", () => {
+    const { container } = render(
+      <DataRegion title="Vùng" columns={columns} rows={rowsOf(51)} emptyWhy="x" />,
+    );
+    const pager = document.createElement("div");
+    pager.textContent = "Số dòng mỗi trang";
+    container.append(pager);
+    expect(() => checkRun(container, 51)).toThrow("pager present");
   });
 
   function checkLocked(root: HTMLElement): void {
@@ -477,8 +490,9 @@ describe("alignment on the rendered grid", () => {
 
   /** Header cell and body cell of each column must sit on the same side, the side of the kind. */
   function checkPairs(container: HTMLElement): void {
-    const headers = [...container.querySelectorAll("thead th")];
-    const cells = [...container.querySelectorAll("tbody tr:first-child td")];
+    // The first column is the frozen row-number column (row 2); the typed columns follow it.
+    const headers = [...container.querySelectorAll("thead th")].slice(1);
+    const cells = [...container.querySelectorAll("tbody tr:first-child td")].slice(1);
     columns.forEach((column, i) => {
       const want = column.align;
       if (side(headers[i]) !== want || side(cells[i]) !== want) {
@@ -489,14 +503,14 @@ describe("alignment on the rendered grid", () => {
 
   it("aligns header and body of every column to its kind, pair by pair", () => {
     const { container } = render(<DataRegion title="Vùng" columns={columns} rows={rows} />);
-    expect(container.querySelectorAll("thead th").length).toBe(4);
+    expect(container.querySelectorAll("thead th").length).toBe(5);
     expect(() => checkPairs(container)).not.toThrow();
     expect(columns.map((column) => column.align)).toEqual(["right", "right", "left", "left"]);
   });
 
   it("fails when one header drifts from its cells", () => {
     const { container } = render(<DataRegion title="Vùng" columns={columns} rows={rows} />);
-    const header = container.querySelectorAll("thead th")[1]!;
+    const header = container.querySelectorAll("thead th")[2]!;
     header.classList.replace("text-right", "text-left");
     expect(() => checkPairs(container)).toThrow("alignment drift: Listing.closePrice");
   });
@@ -565,29 +579,24 @@ describe("content-fitted width of text columns", () => {
     }
   }
 
-  it("keeps column widths while searching and paging: widths come from every row the region holds", () => {
-    const { container } = render(
-      <DataRegion title="Vùng" columns={columns} rows={rows} pageSize={25} />,
-    );
+  it("keeps column widths while searching: widths come from every row the region holds", () => {
+    const { container } = render(<DataRegion title="Vùng" columns={columns} rows={rows} />);
     const before = widthsOf(container);
     expect(before.every((w) => w !== "")).toBe(true);
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "E1" } });
     checkSteady(before, widthsOf(container), "search");
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "" } });
-    fireEvent.click(screen.getByRole("button", { name: "Trang sau" }));
-    checkSteady(before, widthsOf(container), "next page");
+    checkSteady(before, widthsOf(container), "search cleared");
   });
 
   it("fails when widths are measured on the rows a search leaves", () => {
-    const all = render(<DataRegion title="Vùng" columns={columns} rows={rows} pageSize={25} />);
+    const all = render(<DataRegion title="Vùng" columns={columns} rows={rows} />);
     const before = widthsOf(all.container);
     cleanup();
     const leftAfterSearch = rows.filter(
       (r) => r["Listing.buildingName"] === "E1" && r["Listing.subdivisionName"] === "Ocean Park",
     );
-    const some = render(
-      <DataRegion title="Vùng" columns={columns} rows={leftAfterSearch} pageSize={25} />,
-    );
+    const some = render(<DataRegion title="Vùng" columns={columns} rows={leftAfterSearch} />);
     expect(() => checkSteady(before, widthsOf(some.container), "search")).toThrow(
       "width follows the shown rows: search",
     );

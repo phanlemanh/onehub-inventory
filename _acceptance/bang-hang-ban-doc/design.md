@@ -25,11 +25,12 @@ Bản đọc: không sửa ô (B4), không hồ sơ căn cạnh bảng (hàng 3)
   trong cột chữ 18ch ở mọi khổ: đó là trạng thái «chữ dài» thật, không cần dữ liệu giả.
 - **Nhãn.** Căn, Toà, Khu (khái niệm Subdivision, nhãn đã có, tránh «Dự án») đã có trong `ontology/labels.yaml`. Năm nhãn cột còn lại chưa có — thêm năm khái niệm loại
   `field` (chỉ thêm dòng) rồi `make gen` (Hỏi-2, đã hỏi giám sát K-1111-15).
-- **Cỡ trang.** `design/behaviors.md` để «Chia trang — chốt ở lát cắt Bảng hàng». Khuyến nghị 25 dòng một trang (Hỏi-1,
-  đã hỏi giám sát K-1111-14): với 60 lần chào và cỡ 50, bài «tìm» của bộ bài sinh từ sổ màn không tìm được chuỗi thử
-  (cần khớp quá một trang mà không khớp hết), nên đỏ «không đủ dữ liệu» dù màn đúng. Với 25 thì có chuỗi đạt (đã thử
-  bằng chính hàm chọn chuỗi của bộ bài). Bài «tìm» sửa để đọc cỡ trang thật của vùng thay cho số 50 ghi cứng; mọi ca phá
-  giữ nguyên.
+- **Đọc như Sheet (chủ kho đổi trước Cổng Phạm vi).** Không chia trang: lưới cuộn liền một mạch bằng bảng cuộn ảo ReUI đã
+  cài (`DataGridTableVirtual`, giữ nguyên thành phần), tiêu đề cột đứng yên khi cuộn dọc, cột số dòng (đầu cột «#») cùng
+  Căn và Toà ghim bên trái khi cuộn ngang, chân bảng ghi số dòng. Mật độ dòng giữ luật cũ của khuôn (dày khi cột tràn).
+  Bài «tìm» của bộ bài sinh từ sổ màn đọc mọi dòng bằng lăn chuột qua khung cuộn và chọn chuỗi theo khung đầu. «Dùng tay
+  như Sheet» (phím mũi tên, bôi vùng, sắp, lọc, nhóm, ẩn hiện cột) là hàng sau; ngưỡng 5.000 dòng đo ở hàng nối dữ liệu
+  thật.
 - **Trạng thái vùng.** Ở bản phát triển và bản chạy thử, trang nhận `?state=loading|empty|error|partial|forbidden` như
   bản mẫu Lưới — đây là cách bộ bài sinh từ sổ màn bật từng trạng thái trên màn thật (`tools/e2e_templates/recipes.ts`).
   Ở bản thật (`NODE_ENV=production`) tham số bị bỏ qua và vùng luôn ở trạng thái có dữ liệu. «Thử lại» ở lỗi và một phần
@@ -79,11 +80,12 @@ khối lấy hay bỏ:
 | Thanh công cụ: ô tìm bên trái, số dòng ngay cạnh | lấy | đúng việc tìm mã căn; số dòng đứng cạnh ô tìm như khối |
 | Hoàn tác, làm lại | bỏ | bản đọc không sửa |
 | Nút Lọc, Cột, Cài đặt, Xuất | bỏ | chưa có chức năng (lọc, chọn cột là hàng sau) |
-| Cột số thứ tự dòng, ô chọn dòng, chữ cái tên cột | bỏ | không chọn dòng, không công thức |
+| Cột số thứ tự dòng | lấy | «đọc như Sheet» |
+| Ô chọn dòng, chữ cái tên cột | bỏ | không chọn dòng, không công thức |
 | Chân bảng: dòng tổng | bỏ | chưa có dòng tổng |
-| Chân bảng trong khung, có viền trên | lấy | chỗ của thanh chia trang 25 dòng (Hỏi-1) |
+| Chân bảng trong khung, có viền trên | lấy | ghi số dòng như chân khối («đọc như Sheet»: cuộn liền, không chia trang) |
 | Thanh gợi ý «chọn ô để xem» | bỏ | không chọn ô |
-| Cuộn liền thay chia trang | bỏ | cỡ trang chốt ở Hỏi-1 |
+| Cuộn liền thay chia trang | lấy | chủ kho đổi hàng 2 thành «đọc như Sheet» |
 
 Bề rộng: cột Toà rộng 15 ký tự ở mọi khổ vì tên toà mẫu của Ocean Park 2, 3 là «[MAU] Toà E1» (nhãn mẫu bắt buộc), nằm ở
 trang 3; bề rộng tính trên mọi dòng nên không nhảy khi sang trang. Tên khu dài bị cắt ở 1440 chỉ khi không còn chỗ thừa:
@@ -110,7 +112,7 @@ bắt đăng nhập, gắn vai thật, màn Đã gửi.
 
 - Suôn sẻ: thanh bên «Bảng hàng» → đầu màn «Bảng hàng» → vùng nêu tên và «60 dòng» → đọc 8 cột theo kiểu → gõ mã căn
   vào ô tìm → dòng lọc ngay qua mọi trang, số dòng thành «k / 60 dòng» (điểm ra: căn cần tìm).
-- Biên: sàn chưa có căn nào → câu vì sao trống và việc làm tiếp; tìm không ra → «Xoá lọc»; quá 25 dòng → chia trang;
+- Biên: sàn chưa có căn nào → câu vì sao trống và việc làm tiếp; tìm không ra → «Xoá lọc»; nhiều dòng → cuộn liền trong khung, tiêu đề đứng yên;
   cột rộng hơn khổ → lưới dày, cuộn ngang trong vùng, trang không cuộn ngang; tên khu dài → cắt, đọc đủ khi rê hay
   tới bằng phím.
 - Lỗi & quay lại: tải vùng hỏng → câu ba phần + «Thử lại», thanh bên vẫn dùng được; tải hỏng một phần → các dòng đã tải
@@ -127,7 +129,7 @@ bắt đăng nhập, gắn vai thật, màn Đã gửi.
 <!-- <<<UX-STATE-TABLE -->
 | Trạng thái | Màn | Hiển thị gì | Người làm gì tiếp |
 |---|---|---|---|
-| ST-inventory-du-lieu | Bảng hàng | đầu vùng «Bảng hàng» + «60 dòng» + ô tìm + 8 cột, 25 dòng một trang | đọc, tìm, sang trang |
+| ST-inventory-du-lieu | Bảng hàng | tên vùng + ô tìm + cột số dòng và 8 cột cuộn liền, chân bảng «60 dòng» | đọc, tìm, cuộn |
 | ST-inventory-cho-tai | Bảng hàng | dưới 1 giây không gì; từ 1 giây dòng khung chờ đúng 8 cột | chờ |
 | ST-inventory-trong | Bảng hàng | «Chưa có dữ liệu ở đây» + vì sao: sàn chưa có căn nào đang chào | chờ đầu chủ nhập hàng (nhập là hàng sau) |
 | ST-inventory-khong-ra | Bảng hàng | «Không có dòng nào khớp» + «Xoá lọc» | xoá lọc |
@@ -140,7 +142,7 @@ bắt đăng nhập, gắn vai thật, màn Đã gửi.
 ### 4. Hành vi
 
 - Canh lề, bề rộng, mật độ, định dạng, ô chỉ đọc theo `design/behaviors.md`; màn chỉ khai cột.
-- Chia trang 25 dòng (chốt ở hàng này, ghi vào `design/behaviors.md`); tìm lọc trên mọi dòng, không chỉ trang đang hiện.
+- Cuộn liền, không chia trang; tiêu đề và cột số dòng, Căn, Toà đứng yên (ghi vào `design/behaviors.md`); tìm lọc trên mọi dòng.
 - Trang không cuộn ngang ở 360, 414, 1024, 1440.
 
 ### 5. Xuất xứ component

@@ -3,9 +3,6 @@ import { typedColumn, type TypedColumn } from "@/components/candidate/column-kin
 import type { GridRow, RegionStatus } from "@/components/candidate/data-region";
 import type { Listing, ListingUnit, Unit } from "@/generated/ontology";
 
-/** Rows per page of the inventory grid (design/behaviors.md, pagination: decided at this slice). */
-export const INVENTORY_PAGE_SIZE = 25;
-
 /** Region states a development build may open with `?state=`; anything else is the loaded grid. */
 const STATE_PARAMS = ["loading", "empty", "error", "partial", "forbidden"] as const;
 export type InventoryState = RegionStatus | "empty";

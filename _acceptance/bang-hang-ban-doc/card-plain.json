@@ -7,7 +7,7 @@
     },
     {
       "id": "AC-2",
-      "p": "Sẽ cho Đầu chủ thấy đầu màn «Bảng hàng», tám cột Căn · Toà · Khu · Trạng thái · Giá chào · Diện tích · Phòng ngủ · Xác nhận lúc, «60 dòng», 25 dòng một trang, giá viết kiểu tiền, diện tích theo m²."
+      "p": "Sẽ cho Đầu chủ đọc Bảng hàng như Sheet: cả 60 căn trong một lần cuộn liền, cột số dòng bên trái, tiêu đề cột đứng yên khi cuộn dọc, số dòng cùng Căn và Toà đứng yên khi cuộn ngang, chân bảng ghi «60 dòng»; tám cột Căn · Toà · Khu · Trạng thái · Giá chào · Diện tích · Phòng ngủ · Xác nhận lúc, giá kiểu tiền, diện tích theo m²."
     },
     {
       "id": "AC-3",
@@ -15,7 +15,7 @@
     },
     {
       "id": "AC-5",
-      "p": "Sẽ sửa bài «tìm» của bộ bài kiểm cho đọc đúng số dòng một trang của màn đang đo, để nó chạy được trên 60 căn mẫu."
+      "p": "Sẽ sửa bài «tìm» của bộ bài kiểm cho đọc mọi dòng bằng cách cuộn (không còn trang), và vẫn đỏ khi kết quả bỏ sót dòng hay không cuộn được quá khung đầu."
     },
     {
       "id": "AC-6",
@@ -49,30 +49,38 @@
     },
     {
       "id": "OOS-1",
-      "p": "KHÔNG sửa trên ô, KHÔNG mở hồ sơ căn cạnh bảng, KHÔNG lọc hay sắp xếp theo cột, KHÔNG chọn dòng; khung xếp theo khối Quỹ hàng chọn nhưng chưa thêm nút lọc, chọn cột, xuất hay dòng tổng."
+      "p": "KHÔNG «dùng tay như Sheet» ở hàng này: phím mũi tên giữa các ô, bôi vùng và chép, sắp xếp, lọc từng cột, nhóm theo toà, ẩn hiện cột là hàng mới sau hàng 2; sửa trên ô là hàng 4, 5."
     },
     {
       "id": "OOS-2",
-      "p": "KHÔNG có nút thêm dòng hay nhập tệp khi bảng trống — chỉ nói vì sao trống."
+      "p": "KHÔNG đo ngưỡng 5.000 dòng của Quỹ hàng ở hàng này; đo ở hàng nối dữ liệu thật."
     },
     {
       "id": "OOS-3",
-      "p": "KHÔNG đọc dữ liệu thật của sàn, KHÔNG bắt đăng nhập, KHÔNG gắn vai thật."
+      "p": "KHÔNG sửa trên ô, KHÔNG mở hồ sơ căn cạnh bảng, KHÔNG chọn dòng; khung xếp theo khối Quỹ hàng chọn nhưng chưa thêm nút lọc, chọn cột, xuất hay dòng tổng."
     },
     {
       "id": "OOS-4",
-      "p": "KHÔNG làm màn Đã gửi."
+      "p": "KHÔNG có nút thêm dòng hay nhập tệp khi bảng trống — chỉ nói vì sao trống."
     },
     {
       "id": "OOS-5",
-      "p": "KHÔNG làm bảng thẻ trên điện thoại: chủ kho chốt đó là hàng riêng sau hàng 3 («Đúng ý.»); trên điện thoại hàng này là lưới cuộn ngang trong vùng."
+      "p": "KHÔNG đọc dữ liệu thật của sàn, KHÔNG bắt đăng nhập, KHÔNG gắn vai thật."
     },
     {
       "id": "OOS-6",
+      "p": "KHÔNG làm màn Đã gửi."
+    },
+    {
+      "id": "OOS-7",
+      "p": "KHÔNG làm bảng thẻ trên điện thoại: chủ kho chốt đó là hàng riêng sau hàng 3 («Đúng ý.»); trên điện thoại hàng này là lưới cuộn trong vùng."
+    },
+    {
+      "id": "OOS-8",
       "p": "KHÔNG sửa hai lỗi nhỏ đã biết của bản chạy chậm của bộ bài kiểm; gặp đỏ giả ở đó thì báo giám sát."
     }
   ],
-  "scope_plain": "Từ Quỹ hàng: Bảng hàng đích là bảng kiểu Sheet (khối data-grid-editing-6, nhóm theo toà, lọc từng cột, góc nhìn lưu) trên máy tính và bảng thẻ trên điện thoại. Chủ kho đã chốt («Đúng ý.»): giữ khuôn Lưới của kho, xếp khung theo khối ấy, chưa thêm chức năng; thẻ điện thoại là hàng riêng sau hàng 3.",
+  "scope_plain": "Chủ kho đổi hàng 2 thành «đọc như Sheet» (giữ thói quen Sheet của Đầu chủ): cuộn liền, tiêu đề và hai cột đầu đứng yên, cột số dòng. Từ Quỹ hàng: khung xếp theo khối data-grid-editing-6, chưa thêm chức năng; «dùng tay như Sheet» và thẻ điện thoại là các hàng sau.",
   "coverage_plain": [
     {
       "i": 0,

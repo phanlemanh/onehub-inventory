@@ -30,10 +30,11 @@ số đo), `design/behaviors.md` dòng «Chia trang — chốt ở lát cắt B�
   Then có đúng 60 dòng, mỗi dòng mang id của lần chào, mã căn, toà, khu, trạng thái, giá chào và lúc xác nhận của lần chào,
   cùng diện tích và số phòng ngủ của ĐÚNG căn mà liên kết căn của lần chào ấy trỏ tới; và When một liên kết trỏ căn
   không có trong danh mục, Then dòng ấy hiện diện tích và phòng ngủ trống, không lấy số của căn khác.
-- AC-2: Given mở Bảng hàng ở bốn khổ, When trang sẵn sàng, Then đầu màn là «Bảng hàng», vùng dữ liệu có đúng tám cột theo
-  thứ tự Căn · Toà · Khu · Trạng thái · Giá chào · Diện tích · Phòng ngủ · Xác nhận lúc với nhãn lấy từ
-  `ontology/labels.yaml`, đầu vùng ghi «60 dòng», trang 1 có 25 dòng và thanh chia trang, giá hiện theo kiểu tiền, diện
-  tích theo m², trạng thái là huy hiệu chữ của trạng thái ấy.
+- AC-2: Given mở Bảng hàng ở bốn khổ, When trang sẵn sàng, Then đầu màn là «Bảng hàng», vùng dữ liệu có cột số dòng rồi đúng
+  tám cột theo thứ tự Căn · Toà · Khu · Trạng thái · Giá chào · Diện tích · Phòng ngủ · Xác nhận lúc với nhãn lấy từ
+  `ontology/labels.yaml`; cả 60 dòng nằm trong một lần cuộn liền (không chia trang), đánh số 1 đến 60 không hở; tiêu đề cột
+  đứng yên khi cuộn dọc, cột số dòng cùng Căn và Toà đứng yên khi cuộn ngang; chân bảng ghi «60 dòng»; giá hiện theo kiểu
+  tiền, diện tích theo m², trạng thái là huy hiệu chữ của trạng thái ấy.
 - AC-3: Given bộ bài sinh từ sổ màn (hàng 1f), When chạy bộ khung và bộ vùng trên Bảng hàng ở bốn khổ, Then màn có vùng nên
   không còn bị bỏ qua: bốn bài khung (đầu màn đúng nhãn, không cuộn ngang, không lỗi trình duyệt, axe sáng và tối) và bảy
   trạng thái vùng (chờ tải, trống, tìm không ra, lỗi, một phần hỏng, chữ dài, không đủ quyền) cùng bài tìm đều xanh, và mỗi
@@ -41,10 +42,10 @@ số đo), `design/behaviors.md` dòng «Chia trang — chốt ở lát cắt B�
 - AC-4: Given danh sách «chưa có vùng» của bộ công thức, When Bảng hàng đã có vùng, Then danh sách không còn `inventory`
   (Đã gửi vẫn còn với lý do cũ); và Given một bản sao danh sách thêm lại `inventory`, When xếp loại Bảng hàng, Then đỏ
   «da co vung, go khoi danh sach: inventory».
-- AC-5: Given bài «tìm» của bộ công thức, When chọn chuỗi thử, Then nó dùng cỡ trang thật của vùng đang đo thay cho số
-  ghi cứng: trên 60 dòng của Bảng hàng với cỡ 25 thì có chuỗi đạt (khớp quá một trang, ít hơn mọi dòng, nằm trên ít nhất
-  hai trang trước khi tìm), trên đích hiệu chuẩn 120 dòng cỡ 50 thì vẫn chọn như cũ; và When đo bằng cỡ ghi cứng 50 trên
-  60 dòng của Bảng hàng, Then không có chuỗi nào (chứng vì sao phải đọc cỡ thật).
+- AC-5: Given bài «tìm» của bộ công thức và lưới cuộn liền, When đọc dòng và chọn chuỗi thử, Then bài đọc mọi dòng bằng cách
+  lăn chuột cuộn khung lưới từ đầu tới cuối (không dựa vào trang), và chọn chuỗi theo số dòng khung đầu dựng sẵn: trên 60 dòng
+  của Bảng hàng có chuỗi đạt (khớp nhiều hơn khung đầu, ít hơn mọi dòng, có dòng khớp nằm ngoài khung đầu); và When phá bằng
+  ẩn một dòng kết quả, hay khoá khung cuộn để kết quả không cuộn được quá khung đầu, Then bài đỏ «tim: bo sot dong khop».
 - AC-6 (cross-layer): Given bản thật (`NODE_ENV=production`), When mở Bảng hàng với `?state=error` (hay `loading`, `empty`, `partial`,
   `forbidden`), Then vùng ở trạng thái có dữ liệu; Given bản phát triển hay bản chạy thử, When mở với từng tham số ấy, Then
   vùng ở đúng trạng thái ấy, và tham số lạ thì có dữ liệu; đo ở chính trang Bảng hàng (trang đọc tham số và môi trường), không chỉ ở bộ đọc thuần, và trang có dữ liệu thì dòng của một lần chào biết trước mang diện tích và phòng ngủ của đúng căn liên kết.
@@ -72,7 +73,7 @@ Bản khai vai nói Quản trị sàn không thấy hàng theo mặc định. H�
 
 | Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
 |---|---|---|---|---|
-| inventory | được — đọc và tìm mọi căn của sàn | được — đọc và tìm mọi căn của sàn | được — đọc và tìm mọi căn của sàn | không — vùng báo không đủ quyền theo bản khai vai; bảng quyền của hàng 9a quyết |
+| inventory | được — đọc và tìm mọi căn của sàn | được — đọc và tìm mọi căn của sàn | được — đọc và tìm mọi căn của sàn | chặn — vùng báo không đủ quyền theo bản khai vai; bảng quyền của hàng 9a quyết |
 
 ## Coverage
 
@@ -96,6 +97,10 @@ có phép đo — vai thật chưa nối vào khung.
 
 ## Out of scope
 
+- Không «dùng tay như Sheet» ở hàng này (hàng mới sau hàng 2): đi giữa các ô bằng phím mũi tên, bôi vùng và chép, sắp xếp,
+  lọc từng cột, nhóm theo toà, ẩn hiện cột; sửa trên ô là hàng 4, 5.
+- Không đo ngưỡng 5.000 dòng của Quỹ hàng ở hàng này: đo ở hàng nối dữ liệu thật; hàng này có 60 dòng mẫu.
+
 - Không sửa trên ô (B4), không hồ sơ căn cạnh bảng (hàng 3), không lọc hay sắp xếp theo cột, không chọn dòng; khung xếp
   theo `data-grid-editing-6` mà chưa thêm chức năng nào của nó (Hỏi-4): không nút lọc, chọn cột, xuất, không dòng tổng.
 - Không nút «Thêm dòng» hay nhập tệp ở trạng thái trống: chưa có lối nhập; câu trống chỉ nói vì sao.
@@ -107,5 +112,5 @@ có phép đo — vai thật chưa nối vào khung.
 
 ## Notes
 
-- Hỏi-1 (cỡ trang 25 và bài «tìm» đọc cỡ thật) và Hỏi-2 (năm nhãn cột) đã hỏi giám sát đợt; lời đáp ghi vào sổ quyết
+- Hỏi-1 (cỡ trang 25) hết hiệu lực: chủ kho đổi hàng này thành «đọc như Sheet» (cuộn liền). Hỏi-2 (năm nhãn cột) đã hỏi giám sát đợt; lời đáp ghi vào sổ quyết
   định.

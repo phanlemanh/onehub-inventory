@@ -28,6 +28,7 @@ export function RegionToolbar({
   onQuery,
   action,
   searchId,
+  showCount = true,
 }: {
   /** Rows in the region; absent when the viewer may not see the region, so no count is shown. */
   total?: number;
@@ -37,9 +38,11 @@ export function RegionToolbar({
   onQuery: (query: string) => void;
   action?: ReactNode;
   searchId: string;
+  /** False when the count sits elsewhere (the grid's footer, row 2), so the region shows it once. */
+  showCount?: boolean;
 }) {
-  const count = countText(total, shown);
-  if (count === null && !action) return null;
+  const count = showCount ? countText(total, shown) : null;
+  if (count === null && total === undefined && !action) return null;
   return (
     <div data-slot="region-toolbar" className="flex flex-wrap items-center gap-x-3 gap-y-2">
       {total !== undefined ? (

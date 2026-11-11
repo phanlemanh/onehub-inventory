@@ -7,9 +7,6 @@
       "level": "organism",
       "parts": [
         {
-          "name": "DEFAULT_PAGE_SIZE"
-        },
-        {
           "name": "DataRegion",
           "props": [
             "title",
@@ -22,12 +19,17 @@
             "emptyAction",
             "action",
             "record",
-            "editable",
-            "pageSize"
+            "editable"
           ]
         },
         {
+          "name": "FROZEN_COLUMNS"
+        },
+        {
           "name": "GRID_COPY"
+        },
+        {
+          "name": "ROW_NUMBER_ID"
         }
       ]
     },
@@ -56,15 +58,24 @@
       "level": "molecule",
       "parts": [
         {
-          "name": "RegionHeader",
+          "name": "RegionHeader"
+        },
+        {
+          "name": "RegionTitle",
           "props": [
-            "title",
+            "title"
+          ]
+        },
+        {
+          "name": "RegionToolbar",
+          "props": [
             "total",
             "shown",
             "query",
             "onQuery",
             "action",
-            "searchId"
+            "searchId",
+            "showCount"
           ]
         }
       ]

@@ -2,7 +2,6 @@
 export { InventoryGrid } from "./inventory-grid";
 export {
   INVENTORY_FIELDS,
-  INVENTORY_PAGE_SIZE,
   inventoryColumns,
   inventoryRows,
   inventoryStateFrom,

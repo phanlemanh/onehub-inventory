@@ -103,12 +103,23 @@ describe("danh sách chưa có vùng", () => {
     );
   });
   it("a listed screen without a region is skipped with its reason", () => {
-    const v = classifyGrid("inventory", { hasRegion: false, hasTable: false });
-    expect(v).toEqual({ run: false, skip: `chua co vung du lieu — ${NO_REGION_YET["inventory"]}` });
+    const v = classifyGrid("sent", { hasRegion: false, hasTable: false });
+    expect(v).toEqual({ run: false, skip: `chua co vung du lieu — ${NO_REGION_YET["sent"]}` });
   });
   it("a listed screen that has a region must leave the list", () => {
-    expect(() => classifyGrid("inventory", { hasRegion: true, hasTable: true })).toThrow(
-      "go khoi danh sach: inventory",
+    expect(() => classifyGrid("sent", { hasRegion: true, hasTable: true })).toThrow(
+      "go khoi danh sach: sent",
+    );
+  });
+  // Row 2 (Bảng hàng): the inventory screen built its region, so it left the list and its region suite runs.
+  it("inventory has left the list and its region suite runs", () => {
+    expect(Object.keys(NO_REGION_YET)).toEqual(["sent"]);
+    expect(classifyGrid("inventory", { hasRegion: true, hasTable: true })).toEqual({ run: true });
+  });
+  it("putting inventory back on the list is red", () => {
+    const back = { ...NO_REGION_YET, inventory: "tra lai" };
+    expect(() => classifyGrid("inventory", { hasRegion: true, hasTable: true }, back)).toThrow(
+      "da co vung, go khoi danh sach: inventory",
     );
   });
   it("a table outside the shared region is red", () => {

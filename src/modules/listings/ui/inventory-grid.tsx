@@ -4,12 +4,7 @@ import { useState } from "react";
 
 import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
 
-import {
-  INVENTORY_PAGE_SIZE,
-  inventoryColumns,
-  type InventoryField,
-  type InventoryState,
-} from "./inventory-rows";
+import { inventoryColumns, type InventoryField, type InventoryState } from "./inventory-rows";
 
 /** Rows kept when part of the load fails: the first page and a half, so the partial state still spans two pages. */
 const PARTIAL_ROWS = 40;
@@ -40,7 +35,6 @@ export function InventoryGrid({
       status={status}
       onRetry={() => setCurrent("ready")}
       emptyWhy={emptyWhy}
-      pageSize={INVENTORY_PAGE_SIZE}
     />
   );
 }
