@@ -5,7 +5,7 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader } from "@/components
 
 import { FRAME_COPY, LOGIN_PATH } from "./frame-copy";
 
-export type PageStateKind = "error" | "not-found" | "session-expired";
+export type PageStateKind = "error" | "not-found" | "session-expired" | "forbidden";
 
 /** The sign-in address that brings the person back to `returnTo` afterwards. */
 export function loginHref(returnTo: string): string {
@@ -16,6 +16,7 @@ const COPY = {
   error: FRAME_COPY.error,
   "not-found": FRAME_COPY.notFound,
   "session-expired": FRAME_COPY.sessionExpired,
+  forbidden: FRAME_COPY.forbidden,
 } as const;
 
 /**
@@ -44,7 +45,7 @@ export function PageState({
       </EmptyHeader>
       <EmptyContent>
         {kind === "error" && onRetry ? <Button onClick={onRetry}>{FRAME_COPY.retry}</Button> : null}
-        {kind === "not-found" ? (
+        {kind === "not-found" || kind === "forbidden" ? (
           <Link href={homeHref} className={buttonVariants()}>
             {FRAME_COPY.goHome}
           </Link>

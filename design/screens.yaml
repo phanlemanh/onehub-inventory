@@ -48,3 +48,9 @@ screens:
     family: null
     audience: staff
     status: built
+  - id: members
+    route: /members
+    title: Member
+    family: null
+    audience: staff
+    status: built
