@@ -5,7 +5,7 @@ slug: khai-vai-va-man
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: _acceptance/khai-vai-va-man/design.md
@@ -67,3 +67,8 @@ Thước đối chiếu: câu «bật khi» của hàng 1d (`docs/plan/lo-trinh.
 - Đổi ontology — chủ kho soi: tệp mới `ontology/roles.yaml` (bốn vai, `holds: many`); `src/generated/ontology.ts` sinh lại bằng `make gen`, kiểu `Role` từ `string` thành hợp của bốn tên.
 - Vòng chạm giao diện đang chạy ở dãy khác (như 1b) sẽ cần khối khi gộp nhánh chính sau hàng này; giám sát được báo trước.
 - Mốc Quỹ hàng 33/98 là ước lượng theo từ khoá (0017); lệnh số đo in nó làm mốc, không tính lại.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-1: Câu mô tả vai còn nói Trưởng nhóm thấy gì và Quản trị sàn không thấy gì, nên có thể lệch khi bảng quyền của hàng 9a được chốt.
+  - Ngoài-2: Bốn vai chưa có mục trong bảng thuật ngữ; người đọc tài liệu chưa tra được nghĩa chính thức tới hàng 9a.
+  - Ngoài-3: Đầu ra số đo dạng máy đọc dùng khoá tiếng Việt, trái quy ước đặt tên tiếng Anh của kho.
+  - Ngoài-4: Hai ca thử báo lỗi ô của bảng Vai × Màn chỉ kiểm có lỗi, chưa kiểm lỗi gọi đúng màn và đúng vai.

@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: khai-vai-va-man
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: b279c517dd5df41b8c716ce2090b96ff933aca53
-human_signoff:
+human_signoff: Manh Phan 2026-11-11
 ---
 
 # Evidence Report: khai-vai-va-man
@@ -151,7 +151,7 @@ human_signoff:
     - domain-correctness: PASS — roles.yaml liệt kê đúng bốn vai cố định ListAgent, BuyerAgent, TeamLead, CompanyAdmin, khớp quyết định 0016 và mục N3. Các vai không lẫn bên giao dịch (ListSide, BuyerSide), bên pháp lý (Seller, Buyer...) hay OwnerMember, là những khái niệm chỉ nằm trong labels.yaml. File có `holds: many`, ghi quyền cộng dồn, không vai nào kế thừa vai khác, quyền nằm ở bảng quyền riêng. screens.yaml có màn `contacts` (family grid, status planned, title Contact đã có nhãn) và màn `proto` mang audience dev, title null, đúng như chú thích của sổ.
     - operational-feasibility: PASS — roles.yaml có đúng 4 vai cố định cho nhân viên sàn, không có bên giao dịch hay người giữ hàng. Đầu tệp ghi `holds: many`, "permissions add up" và "no role inherits another", và trỏ quyền sang bảng quyền, khớp 0016. Trong screens.yaml, màn `contacts` thuộc họ `grid` với `status: planned`, và `proto` có `audience: dev`.
     - spec-alignment: PASS — roles.yaml có đúng bốn vai nhân viên sàn, khớp bốn vai Đầu chủ, Đầu khách, Trưởng nhóm, Quản trị sàn trong N3 và có nhãn tương ứng ở labels.yaml. Danh sách không có bên giao dịch và không có OwnerMember (Người giữ), vai này vẫn nằm trong labels.yaml. File ghi `holds: many`, "permissions add up" và "no role inherits another", không khai quyền, đúng với 0016. Màn contacts (/contacts) thuộc family grid với status planned, nên đã khai trước. Màn proto có audience dev và title null.
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-11
 
 ## Known limits
 
