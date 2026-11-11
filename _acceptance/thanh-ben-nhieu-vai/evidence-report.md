@@ -7,11 +7,13 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 7c69826eae8af09aecf6d5871c4fab13b421ac52
+verified_commit: ed73dccdc073888c170cff64bf08c6767809db78
 human_signoff:
 ---
 
 # Evidence Report: thanh-ben-nhieu-vai
+
+Vòng 2. Lệnh `make check` (eval E4) dừng ở bước chạy kiểm thử vì thư mục báo cáo coverage đang bị một tiến trình Vitest khác giữ. Các bước lint, định dạng và kiểm kiểu chạy trước đó đều qua. Eval E4 vẫn tính là chưa đạt vì lệnh không thoát sạch.
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
@@ -25,74 +27,73 @@ human_signoff:
 ## Evidence
 
 - eval: E1
-  run_id: minted-thanh-ben-nhieu-vai-E1-r1
+  run_id: minted-thanh-ben-nhieu-vai-E1-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-11T03:50:48Z
+  verified_at: 2026-11-11T03:55:15Z
   output: |
-    make test chạy xanh (lệnh chung với E2, E3, E5).
+    make test chạy một lần, đạt (chung cho E1, E2, E3, E5).
 
 - eval: E2
-  run_id: minted-thanh-ben-nhieu-vai-E2-r1
+  run_id: minted-thanh-ben-nhieu-vai-E2-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-11T03:50:48Z
+  verified_at: 2026-11-11T03:55:15Z
   output: |
-    make test chạy xanh (lệnh chung với E1, E3, E5).
+    make test chạy một lần, đạt (chung cho E1, E2, E3, E5).
 
 - eval: E3
-  run_id: minted-thanh-ben-nhieu-vai-E3-r1
+  run_id: minted-thanh-ben-nhieu-vai-E3-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-11T03:50:48Z
+  verified_at: 2026-11-11T03:55:15Z
   output: |
-    make test chạy xanh (lệnh chung với E1, E2, E5).
+    make test chạy một lần, đạt (chung cho E1, E2, E3, E5).
 
 - eval: E4
-  run_id: minted-thanh-ben-nhieu-vai-E4-r1
+  run_id: minted-thanh-ben-nhieu-vai-E4-r2
   exit_code: 2
-  baseline: green
+  baseline: n-a
   verifier: config:executors.script.check
-  verified_at: 2026-11-11T03:50:48Z
+  verified_at: 2026-11-11T03:55:15Z
   output: |
-    make check dừng ở bước lint: 200 problems (189 errors, 11 warnings).
-    Lỗi chủ yếu dạng no-undef: 'args' is not defined, 'log' is not defined, 'phase' is not defined.
-    Cảnh báo: '_' is defined but never used (@typescript-eslint/no-unused-vars).
-    make: *** [lint] Error 1
-    Đuôi log không nêu tên tệp bị lint; bước kiểm kiểu trên tests/nav-roles.test.tsx không được chạy tới nên E4 chưa có bằng chứng.
+    npm run lint: eslint và prettier đều qua.
+    npm run typecheck: tsc --noEmit và tools/typecheck_own.mjs đều qua.
+    npm test: Unhandled Error — thư mục báo cáo coverage đang được một tiến trình Vitest khác (pid 67400) dùng; Vitest đề nghị mỗi lần chạy một reportsDirectory riêng hoặc chạy tuần tự.
+    make: lệnh test của Makefile báo lỗi, make check dừng.
 
 - eval: E5
-  run_id: minted-thanh-ben-nhieu-vai-E5-r1
+  run_id: minted-thanh-ben-nhieu-vai-E5-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-11T03:50:48Z
+  verified_at: 2026-11-11T03:55:15Z
   output: |
-    make test chạy xanh (lệnh chung với E1, E2, E3).
+    make test chạy một lần, đạt (chung cho E1, E2, E3, E5).
 
 - eval: E6
-  run_id: minted-thanh-ben-nhieu-vai-E6-r1
+  run_id: minted-thanh-ben-nhieu-vai-E6-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.design.floor
-  verified_at: 2026-11-11T03:50:48Z
+  verified_at: 2026-11-11T03:55:15Z
   output: |
-    design-floor-s4.mjs --root . hoàn tất, không thấy mã màu hex thô trong nav-menu.tsx và app-shell.tsx.
+    design-floor-s4.mjs --root . chạy một lần, đạt.
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-thanh-ben-nhieu-vai-SUITE-build-r1
+  run_id: minted-thanh-ben-nhieu-vai-SUITE-build-r2
   exit_code: 0
-  verified_at: 2026-11-11T03:50:48Z
+  verified_at: 2026-11-11T03:55:15Z
 
 - cmd: make e2e
-  run_id: minted-thanh-ben-nhieu-vai-SUITE-make_e2e-r1
+  run_id: minted-thanh-ben-nhieu-vai-SUITE-make_e2e-r2
   exit_code: 0
-  verified_at: 2026-11-11T03:50:48Z
+  verified_at: 2026-11-11T03:55:15Z
 
 ## Known limits
 
@@ -100,11 +101,13 @@ human_signoff:
 
 ## Analyst
 
-Eval không phân biệt (xanh cả trên code hiện tại lẫn baseline; chứng minh harness chứ chưa chứng minh feature, nên viết lại để assert hành vi mới hoặc xác nhận là regression-guard có chủ ý):
-- make test, phủ E1, E2, E3, E5
-- design-floor-s4.mjs --root ., phủ E6
+carried tu round 1 — baseline khong do lai round nay
 
-Lệnh make check (E4) không có lệnh fail nào ngoài E4; không có lệnh fail không gắn eval.
+Baseline khong do: round này không đo lại baseline vì evals.yaml không đổi từ lần đo cuối ở round 1; mọi eval ghi `baseline: n-a`.
+
+Eval không phân biệt (pass trên cả HEAD lẫn baseline, theo danh sách máy đã chuyển): lệnh `make test` (E1, E2, E3, E5) và lệnh design-floor-s4.mjs (E6). Cần viết lại để khẳng định hành vi mới, hoặc xác nhận là regression-guard có chủ ý.
+
+Lệnh fail không gắn riêng eval nào: không có. Lệnh `make check` gắn với E4 và thoát khác 0 do tranh chấp thư mục coverage, không do lỗi kiểu hay lỗi lint. Cần chạy lại khi không có tiến trình Vitest khác song song.
 
 ## Variance
 
@@ -112,4 +115,5 @@ none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: E4 failed — make check dừng ở bước lint (no-undef cho 'args', 'log', 'phase' ở một tệp script nhiều nghìn dòng), nên kiểm kiểu của AC-4 chưa chạy tới. Returned to implementation.
+Round 1: S4 bị từ chối — một tệp script chấm lạc bị lint quét vào.
+Round 2: E4 chưa đạt — make check dừng ở bước test vì thư mục coverage đang bị tiến trình Vitest khác giữ. Trả về để chạy lại tuần tự.
