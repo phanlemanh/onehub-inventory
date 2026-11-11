@@ -1,38 +1,3 @@
 {
-  "feature_plain": "Khi thêm một màn vào sổ màn, màn ấy tự có bộ bài kiểm trạng thái, và mỗi bài có ca phá chứng minh nó biết báo đỏ.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ cho mỗi màn đã dựng của nhân viên hay của khách một bộ bài kiểm khung mà không ai phải viết tay; thêm màn vào sổ là có bộ."},
-    {"id": "AC-3", "p": "Sẽ kiểm mỗi màn ở bốn khổ: đúng tiêu đề, không trượt ngang, không lỗi trên trình duyệt, đọc được ở nền sáng và nền tối."},
-    {"id": "AC-4", "p": "Sẽ phá từng bài khung trên chính màn ấy và đòi bài báo đỏ đúng lời, gọi tên màn."},
-    {"id": "AC-5", "p": "Sẽ báo đỏ khi sổ trạng thái có một trạng thái vùng mà bộ bài chưa có công thức, hay công thức thiếu ca phá."},
-    {"id": "AC-6", "p": "Sẽ kiểm đủ bảy trạng thái vùng (chờ tải, trống, tìm không ra, lỗi, hỏng một phần, chữ dài, không đủ quyền) trên bản mẫu Lưới và trên mọi màn Lưới đã có vùng; màn Lưới chưa có vùng chỉ được bỏ qua khi có tên trong danh sách cho phép."},
-    {"id": "AC-7", "p": "Sẽ báo đỏ rõ ràng trong 15 giây khi khung chờ tải không hiện, thay vì treo tới hết giờ; và báo đỏ khi chỉ báo chờ hiện sớm hơn 1 giây."},
-    {"id": "AC-8", "p": "Sẽ bắt được ô tìm bỏ sót dòng đúng: so đủ các dòng khớp qua mọi trang với kết quả tìm."},
-    {"id": "AC-9", "p": "Sẽ vẫn xanh khi máy chậm gấp bốn, và chứng được máy thật sự đã chậm."},
-    {"id": "AC-10", "p": "Sẽ lấy danh sách vai từ bản khai vai; thêm vai thứ năm thì bảng Vai × Màn tự thêm cột."}
-  ],
-  "wont_do": [
-    {"id": "AC-2", "p": "Sẽ KHÔNG dựng bài cho màn chưa làm hay trang thử, nhưng in tên từng màn bị bỏ kèm lý do; sổ màn ghi sai thì báo đỏ đúng lỗi, không chạy bài nào."},
-    {"id": "OOS-1", "p": "Chưa chạy bài theo từng vai trên trình duyệt (chờ bảng quyền và đăng nhập không cần cơ sở dữ liệu)."},
-    {"id": "OOS-2", "p": "Chưa kiểm các trạng thái cần lưu thật hay đăng nhập: xung đột khi lưu, mất mạng, hết phiên, link hết hạn."},
-    {"id": "OOS-3", "p": "Không sửa bài kiểm cũ của hàng khác; bốn lỗ của bài Lưới cũ được đóng trong bộ mới."},
-    {"id": "OOS-4", "p": "Không thêm cách đưa màn thật vào từng trạng thái — màn tự làm khi dựng vùng (hàng 2)."},
-    {"id": "OOS-5", "p": "Chưa kiểm việc che dữ liệu nội bộ trên trang khách — thuộc hàng trang khách."}
-  ],
-  "scope_plain": "Vòng này chỉ dựng bộ bài kiểm; mọi phần dưới đây để cho hàng sau.",
-  "coverage_plain": [
-    {"i": 0, "p": "Loại màn trong sổ — đã dựng, chưa làm, trang thử, sổ ghi sai: mỗi loại có cách xử riêng và có bài chứng (AC-1, AC-2 sinh bộ và bỏ có tên)."},
-    {"i": 1, "p": "Họ màn — không họ, Lưới có vùng, Lưới chưa vùng, Lưới dựng ngoài khuôn: mỗi nhánh có bài (AC-6 bộ vùng)."},
-    {"i": 2, "p": "Trạng thái — bốn bài khung và bảy trạng thái vùng của sổ trạng thái; đủ là khi mọi trạng thái trong sổ có công thức (AC-5)."},
-    {"i": 3, "p": "Chiều đo — mỗi bài có ca xanh và ca phá đỏ đúng lời (AC-4, AC-6, AC-7, AC-8)."},
-    {"i": 4, "p": "Môi trường — bốn khổ màn và máy chậm gấp bốn (AC-3, AC-9)."},
-    {"i": 5, "p": "Vai — bốn vai đã khai và vai thứ năm thêm sau (AC-10 bảng vai theo bản khai)."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Màn Lưới mới quên dựng vùng có thể lặng lẽ được bỏ qua — đã sửa: chỉ màn có tên trong danh sách cho phép mới được bỏ qua, màn khác báo đỏ."},
-    {"i": 1, "p": "Ca phá chỉ chạy ở màn rộng nên có thể không lộ lỗi ở điện thoại — đã sửa: ca phá chạy đủ bốn khổ."},
-    {"i": 2, "p": "Bài máy chậm chỉ tự in rằng đã hãm, không chứng máy chậm thật — đã sửa: đo tốc độ trong từng trang trước và sau khi hãm."},
-    {"i": 3, "p": "Số bài kỳ vọng tự đếm từ chính sổ nên luôn khớp — đã sửa: viết sẵn danh sách màn và tên bài, và đòi mọi màn đã dựng có bộ hoặc có dòng bỏ qua."},
-    {"i": 4, "p": "Bài tìm có thể chỉ thử một dòng trên một trang — đã sửa: đòi ít nhất hai dòng khớp trên hai trang, thêm ca phá chỉ còn trang đầu."}
-  ]
+  "feature_plain": "Khi thêm một màn vào sổ màn, màn ấy tự có bộ bài kiểm trạng thái, và mỗi bài có ca phá chứng minh nó biết báo đỏ."
 }
