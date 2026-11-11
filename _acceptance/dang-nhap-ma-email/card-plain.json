@@ -1,39 +1,4 @@
 {
   "feature_plain": "Nhân viên sàn gõ email, nhận mã 6 số qua thư, gõ mã là vào đúng sàn mình làm việc; đầu khung có menu tài khoản để đổi sàn và đăng xuất.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ chỉ gửi mã cho email đã có tài khoản và thuộc một sàn; email lạ nhận đúng câu trả lời như email thật, nên không ai dò được email nào có tài khoản. Bản thật thiếu cấu hình gửi thư thì không chạy lên."},
-    {"id": "AC-2", "p": "Sẽ cho người thuộc một sàn gõ đúng mã trong thư là vào thẳng sàn ấy, về đúng trang định mở, thấy tên sàn trên menu tài khoản."},
-    {"id": "AC-3", "p": "Sẽ từ chối mã sai, mã gõ sai đủ 3 lần, mã quá 5 phút, mã đã dùng, mã cũ sau khi xin mã mới — tất cả cùng một câu báo."},
-    {"id": "AC-4", "p": "Sẽ chặn xin mã quá 5 lần trong 15 phút cho mỗi email, kể cả email lạ."},
-    {"id": "AC-5", "p": "Sẽ cho người thuộc nhiều sàn chọn sàn trong đúng các sàn của mình, đổi sàn ngay trên menu; người bị gỡ khỏi mọi sàn thì được báo «chưa thuộc sàn nào» và không vào được."},
-    {"id": "AC-6", "p": "Sẽ cho mọi truy vấn sau khi đăng nhập chỉ thấy dữ liệu của sàn đang làm; người bị gỡ khỏi sàn thì lần mở kế mất sàn ấy ngay."},
-    {"id": "AC-7", "p": "Sẽ giữ người đăng nhập 30 ngày, tự gia hạn khi còn dùng; hết hạn thì mời đăng nhập lại rồi đưa về đúng trang đang mở."},
-    {"id": "AC-8", "p": "Sẽ có menu tài khoản (tên, email, sàn đang làm, đổi sàn, đăng xuất); đăng xuất là phiên chết hẳn ở máy chủ. Chưa đăng nhập thì đầu khung có nút «Đăng nhập»."},
-    {"id": "AC-9", "p": "Sẽ giữ cách ly sàn: bộ kiểm cách ly của hàng 7 vẫn xanh với bảng thành viên mới; mã và phiên chỉ lưu dạng băm; phần đọc tài khoản chỉ đi qua vài lối hẹp, có bài kiểm phá thử."},
-    {"id": "AC-10", "p": "Sẽ cho màn đăng nhập dán được mã, để điện thoại và trình quản lý mật khẩu tự điền, Enter để gửi, đủ câu cho từng trạng thái, qua kiểm tra khả năng tiếp cận ở bốn khổ màn, sáng và tối."}
-  ],
-  "wont_do": [
-    {"id": "OOS-1", "p": "KHÔNG bắt đăng nhập ở Hôm nay, Bảng hàng, Đã gửi lúc này (còn chạy dữ liệu mẫu) — làm cùng hàng nối dữ liệu thật (Hỏi-3)."},
-    {"id": "OOS-2", "p": "KHÔNG mời người, gán vai hay khoá người — việc của hàng 9, 9a và N8."},
-    {"id": "OOS-3", "p": "KHÔNG có mật khẩu, số điện thoại, Google hay đăng nhập thay người."},
-    {"id": "OOS-4", "p": "KHÔNG mở sàn thật và tài khoản đầu tiên — giữ lối vận hành hiện tại."},
-    {"id": "OOS-5", "p": "KHÔNG chạy bài kiểm có cơ sở dữ liệu trên CI — cần anh thêm Postgres vào tệp CI."},
-    {"id": "OOS-6", "p": "KHÔNG gửi thư thật trong bài kiểm — anh nhận mã thật một lần ở Cổng Bằng chứng."}
-  ],
-  "scope_plain": "Sáu thứ cố ý để ngoài hàng này:",
-  "coverage_plain": [
-    {"i": 0, "p": "Đủ năm bước của luồng — xin mã, đổi mã lấy phiên, chọn sàn, dùng phiên, đăng xuất (AC-1 đến AC-8); thước là hai mã N2, N6 của bản phạm vi."},
-    {"i": 1, "p": "Đủ sáu kiểu người — email lạ, tài khoản chưa có sàn, một sàn, nhiều sàn, bị gỡ trước khi gõ mã, bị gỡ sau khi vào (AC-1, AC-2, AC-5, AC-6); thước là OWASP và quyết định đăng nhập của Quỹ hàng."},
-    {"i": 2, "p": "Đủ tám tình huống của mã — đúng, sai, sai lần ba, hết hạn, đã dùng, bị thay, email lạ, xin quá nhiều (AC-3, AC-4); thước là chuẩn NIST về mã một lần."},
-    {"i": 3, "p": "Luật được giữ ở cả bốn lớp — cơ sở dữ liệu, đường ghi, màn, khung (AC-9 cho lớp dữ liệu, các AC khác cho đường ghi và màn)."},
-    {"i": 4, "p": "Năm con số của đăng nhập đang giả định giữ như Quỹ hàng — anh xác nhận ở Hỏi-2."},
-    {"i": 5, "p": "Ô cố ý bỏ: bắt đăng nhập ở màn mẫu, đăng nhập thay người, mật khẩu, số điện thoại, thu phiên khi khoá người."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Một lựa chọn dính tới luật cách ly sàn bị máy ghi là tự quyết — đã chuyển thành một phần câu Hỏi-1 cho anh, ghi rõ chạm luật SP-1, thiết kế nêu vai riêng cho phần đọc tài khoản và thêm bài kiểm giữ vai ấy hẹp."},
-    {"i": 1, "p": "Thiếu ca người bị gỡ khỏi sàn giữa lúc xin mã và gõ mã, và chưa ghim câu báo «quá giới hạn», «chưa thuộc sàn» — đã thêm vào tiêu chí, bài kiểm và ảnh chụp."},
-    {"i": 2, "p": "Bài kiểm chưa bảo đảm mã trong thư chính là mã đăng nhập được — đã sửa: bài kiểm lấy mã từ chính thư và thử một mã khác phải bị từ chối."},
-    {"i": 3, "p": "Câu hỏi về gửi thư nói «không khởi động» mà thiết kế làm khác — đã thống nhất: bản thật thiếu cấu hình thì không khởi động, lọt thì báo lỗi, không gửi thư."},
-    {"i": 4, "p": "Phần màn của «vào thẳng sàn» và «quay về đúng trang» chưa có bài kiểm màn — đã thêm."}
-  ]
+  "scope_plain": "Sáu thứ đã cố ý để ngoài hàng này từ Cổng Phạm vi:"
 }
