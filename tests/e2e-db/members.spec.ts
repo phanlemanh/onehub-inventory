@@ -101,7 +101,7 @@ async function signIn(page: Page, email: string, next = "/") {
   const code = page.getByLabel("Mã đăng nhập");
   await code.fill(await codeFor(email, before + 1));
   await code.press("Enter");
-  await expect(page).toHaveURL(new RegExp(`${next.replace(/\//g, "\\/")}$`));
+  await page.waitForURL((u) => u.pathname === next && u.search === "");
 }
 
 const mobile = (info: TestInfo) => Number(info.project.name) < 768;

@@ -17,9 +17,14 @@ const MAIL: InviteMail = {
   origin: "https://vi-du.test/",
 };
 
+/** The links in a mail, each parsed: the sign-in link must be exactly the origin's /login, not a substring of one. */
+function links(text: string): URL[] {
+  return (text.match(/https?:\/\/\S+/g) ?? []).map((l) => new URL(l));
+}
+
 function assertHasLogin(text: string): void {
-  if (!text.includes("https://vi-du.test/login"))
-    throw new Error("thu-moi-noi-dung: thiếu đường đăng nhập");
+  const ok = links(text).some((u) => u.origin === "https://vi-du.test" && u.pathname === "/login");
+  if (!ok) throw new Error("thu-moi-noi-dung: thiếu đường đăng nhập");
 }
 
 describe("invite mail", () => {
