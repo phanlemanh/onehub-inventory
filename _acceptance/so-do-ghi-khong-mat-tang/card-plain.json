@@ -1,29 +1,80 @@
 {
-  "feature_plain": "Khi bản số đo cũ của một vòng bị hỏng, lệnh ghi số đo dừng lại và nói rõ chỗ hỏng thay vì lặng lẽ xoá các tầng làm lại người đã khai.",
+  "feature_plain": "Khi bản số đo cũ của một vòng bị hỏng, lệnh ghi số đo dừng lại, gọi tên chỗ hỏng và chỉ đường gỡ, thay vì lặng lẽ xoá các tầng làm lại người đã khai.",
   "will_do": [
-    {"id": "AC-4", "p": "Sẽ nói «không ghi đè» và chỉ hai đường gỡ mỗi lần dừng: lấy lại bản cũ từ lịch sử, hoặc xoá tệp rồi khai lại tầng; xoá xong chạy lại là ghi được (AC-4)."},
-    {"id": "AC-5", "p": "Sẽ giữ nguyên cách làm cũ khi bản cũ lành hoặc chưa có: giữ tầng đã khai, tầng khai mới thắng tầng cũ (AC-5)."}
+    {
+      "id": "AC-4",
+      "p": "Sẽ nói «không ghi đè» và chỉ hai đường gỡ mỗi lần dừng: lấy lại bản cũ từ lịch sử, hoặc xoá tệp rồi khai lại tầng; xoá xong chạy lại là ghi được (AC-4)."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ giữ nguyên cách làm cũ khi bản cũ lành hoặc chưa có: giữ tầng đã khai, tầng khai mới thắng tầng cũ (AC-5)."
+    }
   ],
   "wont_do": [
-    {"id": "AC-1", "p": "Chặn ghi khi chỗ của bản số đo không đọc được: dừng, báo rõ, không đổi gì (AC-1)."},
-    {"id": "AC-2", "p": "Chặn ghi khi bản số đo không phải JSON (rác, rỗng, byte lạ): dừng, báo rõ, tệp giữ nguyên (AC-2)."},
-    {"id": "AC-3", "p": "Chặn ghi khi bản số đo sai hình dạng ở một trong chín chỗ, kể cả thiếu khoá: dừng, gọi đúng chỗ sai, tệp giữ nguyên (AC-3)."},
-    {"id": "OOS-1", "p": "KHÔNG sửa lệnh gộp bỏ qua bản hỏng — vẫn là giới hạn đã biết anh đã chọn ở hàng 1h."},
-    {"id": "OOS-2", "p": "KHÔNG thêm cờ ghi đè bản hỏng — máy khuyên vậy, anh quyết ở Hỏi-1."},
-    {"id": "OOS-3", "p": "KHÔNG tự sửa hay tự khôi phục bản hỏng — lệnh chỉ dừng và chỉ đường."},
-    {"id": "OOS-4", "p": "KHÔNG đổi lệnh kiểm, vốn đã báo bản số đo hỏng."}
+    {
+      "id": "AC-1",
+      "p": "Chặn ghi khi chỗ của bản số đo không đọc được: dừng, báo rõ, không đổi gì (AC-1)."
+    },
+    {
+      "id": "AC-2",
+      "p": "Chặn ghi khi bản số đo không phải JSON (rác, rỗng, byte lạ): dừng, báo rõ, tệp giữ nguyên (AC-2)."
+    },
+    {
+      "id": "AC-3",
+      "p": "Chặn ghi khi bản số đo sai hình dạng ở một trong chín chỗ, kể cả thiếu khoá: dừng, gọi đúng chỗ sai, tệp giữ nguyên (AC-3)."
+    },
+    {
+      "id": "OOS-1",
+      "p": "KHÔNG sửa lệnh gộp bỏ qua bản hỏng — vẫn là giới hạn đã biết anh đã chọn ở hàng 1h."
+    },
+    {
+      "id": "OOS-2",
+      "p": "KHÔNG thêm cờ ghi đè bản hỏng — máy khuyên vậy, anh quyết ở Hỏi-1."
+    },
+    {
+      "id": "OOS-3",
+      "p": "KHÔNG tự sửa hay tự khôi phục bản hỏng — lệnh chỉ dừng và chỉ đường."
+    },
+    {
+      "id": "OOS-4",
+      "p": "KHÔNG đổi lệnh kiểm, vốn đã báo bản số đo hỏng."
+    }
   ],
   "scope_plain": "Đúng một lỗi: lệnh ghi không bao giờ ghi đè bản số đo hỏng.",
   "coverage_plain": [
-    {"i": 0, "p": "Trục bản cũ: chưa có, lành có tầng, lành rỗng, không đọc được, không phải JSON (ba kiểu), sai hình dạng (chín kiểu) — AC-1 tới AC-5."},
-    {"i": 1, "p": "Trục cách gọi: có hay không khai tầng mới kèm lệnh — mọi ô đều chạy cả hai."},
-    {"i": 2, "p": "Đủ nghĩa là mỗi ô có một khẳng định trong bài kiểm; ô dừng khẳng định thêm tệp không đổi một byte."}
+    {
+      "i": 0,
+      "p": "Trục bản cũ: chưa có, lành có tầng, lành rỗng, không đọc được, không phải JSON (ba kiểu), sai hình dạng (chín kiểu) — AC-1 tới AC-5."
+    },
+    {
+      "i": 1,
+      "p": "Trục cách gọi: có hay không khai tầng mới kèm lệnh — mọi ô đều chạy cả hai."
+    },
+    {
+      "i": 2,
+      "p": "Đủ nghĩa là mỗi ô có một khẳng định trong bài kiểm; ô dừng khẳng định thêm tệp không đổi một byte."
+    }
   ],
   "gap_probe_plain": [
-    {"i": 0, "p": "Ba lựa chọn máy ghi «không còn lối khác» thật ra còn lối: cờ ghi đè thành câu hỏi Hỏi-1 cho anh; bài thử quyền đọc thêm ca bị cấm quyền; lý do bỏ khung hình viết lại cho đúng hồ sơ này."},
-    {"i": 1, "p": "Bài sai hình dạng chỉ dò chữ có mặt nên có thể xanh giả: đã ghim nguyên dòng báo lỗi theo từng chỗ, cấm nhãn của chỗ khác, mẫu lấy từ bản ghi thật, đếm 18 ô."},
-    {"i": 2, "p": "Đường gỡ chỉ được kiểm ở một kiểu hỏng: nay mọi ô dừng đều đòi lời «không ghi đè» và hai đường gỡ, và thử xoá-rồi-ghi cho cả ba nhóm."},
-    {"i": 3, "p": "Thiếu ca bản cũ thiếu khoá — đúng kiểu mất tầng đang sửa: đã thêm ba ca, thành chín dạng."},
-    {"i": 4, "p": "Ô lành chỉ có một khẳng định: nay đủ sáu ô (ba trạng thái × hai cách gọi), có ô chứng tầng khai mới thắng tầng cũ."}
+    {
+      "i": 0,
+      "p": "Ba lựa chọn máy ghi «không còn lối khác» thật ra còn lối: cờ ghi đè thành câu hỏi Hỏi-1 cho anh; bài thử quyền đọc thêm ca bị cấm quyền; lý do bỏ khung hình viết lại cho đúng hồ sơ này."
+    },
+    {
+      "i": 1,
+      "p": "Bài sai hình dạng chỉ dò chữ có mặt nên có thể xanh giả: đã ghim nguyên dòng báo lỗi theo từng chỗ, cấm nhãn của chỗ khác, mẫu lấy từ bản ghi thật, đếm 18 ô."
+    },
+    {
+      "i": 2,
+      "p": "Đường gỡ chỉ được kiểm ở một kiểu hỏng: nay mọi ô dừng đều đòi lời «không ghi đè» và hai đường gỡ, và thử xoá-rồi-ghi cho cả ba nhóm."
+    },
+    {
+      "i": 3,
+      "p": "Thiếu ca bản cũ thiếu khoá — đúng kiểu mất tầng đang sửa: đã thêm ba ca, thành chín dạng."
+    },
+    {
+      "i": 4,
+      "p": "Ô lành chỉ có một khẳng định: nay đủ sáu ô (ba trạng thái × hai cách gọi), có ô chứng tầng khai mới thắng tầng cũ."
+    }
   ]
 }
