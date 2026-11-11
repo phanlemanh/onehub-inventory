@@ -5,7 +5,7 @@ slug: thang-chon-khoi-vao-cong
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: _acceptance/thang-chon-khoi-vao-cong/design.md
@@ -124,3 +124,10 @@ Quét trục tại chỗ theo khuôn quét hình thái (không gọi skill: khô
 - Khuôn bọc: chỉ id có trong `tools/proof_gate/khuon-boc.yaml` (mở bằng `app-shell`); thêm id là sửa `tools/**`, hạng T3.
 - Chuyển tiếp: `chuyen-tiep.yaml` kê ba hồ sơ đã qua Cổng Phạm vi (1o, 9, 1m) — chúng giữ luật 1c. Hàng 2 (`bang-hang-ban-doc`,
   `draft`) chịu luật 0023 từ khi qua Cổng Phạm vi. Bảng chuyển tiếp ở mục 11 của thiết kế; giám sát nhận bản BÁO.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-12:
+  - Ngoài-1: Một hồ sơ có thể trỏ tới ảnh ứng viên nằm ở nơi khác trên máy mà cổng vẫn cho qua.
+  - Ngoài-2: Một vòng có thể cài nguyên một khối ReUI lớn vào thư mục nhà cung cấp rồi ghi là đã có trong kho, nên cổng không đòi ứng viên, lý do vùng hay dòng sổ cho khối đó.
+  - Ngoài-3: Báo cáo số đo gửi về kit đếm thiếu các vòng dựng có dùng khuôn bọc như App Shell.
+  - Ngoài-4: Hồ sơ có thể dẫn tới ảnh ứng viên ở ngoài thư mục của vòng mà cổng vẫn xanh, nên ảnh có thể không đi kèm hồ sơ khi người khác mở lại.
+  - Ngoài-5: Một bài kiểm về việc cổng đọc được sổ khối của kho thật không báo đỏ được; bài kho thật khác vẫn đỏ khi sổ hỏng.
+  - Ngoài-6: Bảng thử mục nào bị đòi lúc nào chỉ ghim hai nấc hồ sơ (đã duyệt phạm vi, đã dựng), chưa ghim cả năm nấc.

@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: thang-chon-khoi-vao-cong
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: cdc11154ce1c0923f34bdb3b1710573ea0f67ae4
-human_signoff:
+human_signoff: Manh Phan 2026-11-12
 ---
 
 # Evidence Report: thang-chon-khoi-vao-cong
@@ -160,7 +160,7 @@ Panel đề xuất cho E10: PASS (đề xuất, chưa phải quyết định c�
     - spec-alignment: PASS — Thang ba bậc, ba tầng, nhập kho bằng một dòng sổ khối, trang sổ bối cảnh trước rồi mới tới onehub-quy-hang, bảng Đòi từ và lối khuôn bọc đều khớp quyết định 0023; các con trỏ tới check.py, khuon-chung-minh.md, chung-minh-man.md và tools/reui_catalog còn nguyên.
   required_evidence:
     - (judge không nêu bằng-chứng-thiếu)
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-12 — Đạt
 
 ## Known limits
 
