@@ -1,32 +1,6 @@
 {
  "feature_plain": "Từ nay, vòng nào dựng màn phải chứng minh màn của mình giống màn mẫu của họ (ảnh đặt cạnh nhau, từng chỗ khác có lý do), hoặc đưa đủ hướng nếu là họ mới, và nêu căn cứ khi không dùng khối có sẵn — thiếu thì kiểm chung của kho đỏ trước khi trình.",
- "will_do": [
-  {"id":"AC-1","p":"Sẽ chỉ đòi chứng minh ở vòng đang mở có màn thật, từ lúc màn đã dựng xong; vòng đã ký và vòng chỉ có trang thử thì để yên, và có một bản đếm số cho bộ công cụ."},
-  {"id":"AC-2","p":"Sẽ đỏ khi màn theo mẫu thiếu ảnh đặt cạnh màn mẫu ở một khổ màn hình, hay ảnh giả (sai khổ, trùng nhau, không phải ảnh)."},
-  {"id":"AC-3","p":"Sẽ đỏ khi bảng so thiếu một mặt của họ, hay ghi «giống» mà không chỉ chỗ thấy trên ảnh; ghi giống chỉ vì cùng tên thành phần thì bị gắn cờ."},
-  {"id":"AC-4","p":"Sẽ đỏ và đếm số chỗ lệch vô cớ; chỗ lệch ghi có lý do thì lý do phải trỏ tới tài liệu hay quyết định có thật."},
-  {"id":"AC-5","p":"Sẽ bắt được ca màn Liên hệ của Quỹ hàng khi phát lại: cả lời «khớp vì cùng DataGrid» lẫn bảng thật 25 chỗ vô cớ đều đỏ."},
-  {"id":"AC-6","p":"Sẽ chỉ cho một màn làm màn mẫu khi nó đạt đủ ma trận trạng thái của kho, và đòi chứng lại khi sửa chính màn mẫu."},
-  {"id":"AC-7","p":"Sẽ đòi họ màn mới có ít nhất hai hướng thật sự khác nhau, mỗi hướng một ảnh, động cơ, đánh đổi, và đúng một hướng được chọn — từ lúc phạm vi đã duyệt."},
-  {"id":"AC-8","p":"Sẽ đỏ khi màn không kê khối đã dùng, hay dùng ReUI hoặc vẽ tay mà không nêu đã tra gì, ứng viên gần nhất và vì sao không dùng."},
-  {"id":"AC-9","p":"Sẽ khai họ Lưới (triết lý thay Sheet và Excel cho Đầu chủ, 12 mặt so, bốn khổ) và chạy kiểm này trong kiểm chung của kho trên chính kho."},
-  {"id":"AC-10","p":"Sẽ hướng dẫn agent dựng màn biết lối nào áp cho màn mình, làm tệp chứng minh nào, rơi bậc ghi gì, chạy lệnh nào tự kiểm."}
- ],
- "wont_do": [
-  {"id":"OOS-1","p":"KHÔNG in ảnh và bảng so lên thẻ cổng — người mở trong hồ sơ, chờ bộ công cụ có khối ảnh."},
-  {"id":"OOS-2","p":"KHÔNG tự chụp hay so ảnh từng điểm ảnh; bảng so do vòng lập, người soi ở cổng."},
-  {"id":"OOS-3","p":"KHÔNG gán họ cho màn Hôm nay và các màn chưa có họ — mỗi màn gán khi tới vòng của nó."},
-  {"id":"OOS-4","p":"KHÔNG sửa tệp cấu hình chung, tệp lệnh make hay công cụ danh mục ReUI."},
-  {"id":"OOS-5","p":"KHÔNG bắt các màn đã có chứng minh ngược."}
- ],
- "coverage_plain": [
-  {"i":0,"p":"Ba lối của một màn — họ mới, màn mẫu mới, theo mẫu — mỗi lối có tiêu chí riêng (AC-7, AC-6, AC-2 tới AC-4); khối dùng chung mọi lối (AC-8)."},
-  {"i":1,"p":"Mọi trạng thái của vòng, từ nháp tới đã ký, đều có ca kiểm (AC-1, AC-7)."},
-  {"i":2,"p":"Vòng khai màn thật, chỉ trang thử, hay không khai màn (AC-1)."},
-  {"i":3,"p":"Mọi cách làm giả hay làm thiếu chứng minh theo mẫu: ảnh, bảng mặt so, chỗ lệch (AC-2 tới AC-4)."},
-  {"i":4,"p":"Bốn bậc của thang: trong kho, ReUI, vẽ tay, bậc lạ (AC-8)."},
-  {"i":5,"p":"Màn mẫu chưa có, chính là màn đang sửa, là màn khác đã đạt hay chưa đạt (AC-6)."},
-  {"i":6,"p":"Kiểm trên kho mẫu, trên ca phát lại, và trên chính kho trong kiểm chung (AC-5, AC-9)."},
-  {"i":7,"p":"Người đọc là agent dựng màn (AC-10)."}
+ "decisions": [
+  {"id":"E11","q":"Hướng dẫn trong skill giao diện có đủ để agent tự chứng minh màn không?","why":"Ba người chấm độc lập đều đề xuất đạt; mục chấm bằng đánh giá nên chờ anh chốt."}
  ]
 }
