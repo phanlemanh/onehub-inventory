@@ -2,6 +2,123 @@
   "version": 2,
   "components": [
     {
+      "name": "DataRegion",
+      "file": "src/components/candidate/data-region.tsx",
+      "level": "organism",
+      "parts": [
+        {
+          "name": "DEFAULT_PAGE_SIZE"
+        },
+        {
+          "name": "DataRegion",
+          "props": [
+            "title",
+            "columns",
+            "rows",
+            "status",
+            "onRetry",
+            "emptyWhy",
+            "emptyAction",
+            "action",
+            "pageSize"
+          ]
+        },
+        {
+          "name": "GRID_COPY"
+        }
+      ]
+    },
+    {
+      "name": "RegionHeader",
+      "file": "src/components/candidate/region-header.tsx",
+      "level": "molecule",
+      "parts": [
+        {
+          "name": "RegionHeader",
+          "props": [
+            "title",
+            "total",
+            "shown",
+            "query",
+            "onQuery",
+            "action",
+            "searchId"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RegionEmpty",
+      "file": "src/components/candidate/region-state.tsx",
+      "level": "molecule",
+      "parts": [
+        {
+          "name": "RegionEmpty",
+          "props": [
+            "why",
+            "action"
+          ]
+        },
+        {
+          "name": "RegionError",
+          "props": [
+            "onRetry"
+          ]
+        },
+        {
+          "name": "RegionForbidden"
+        },
+        {
+          "name": "RegionNoMatch",
+          "props": [
+            "onClear"
+          ]
+        },
+        {
+          "name": "RegionPartial",
+          "props": [
+            "onRetry"
+          ]
+        },
+        {
+          "name": "RegionSkeleton",
+          "props": [
+            "columns",
+            "rows"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TruncatedText",
+      "file": "src/components/candidate/truncated-text.tsx",
+      "level": "atom",
+      "parts": [
+        {
+          "name": "TruncatedText",
+          "props": [
+            "text"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TypedCell",
+      "file": "src/components/candidate/typed-cell.tsx",
+      "level": "molecule",
+      "parts": [
+        {
+          "name": "TypedCell",
+          "props": [
+            "kind",
+            "value",
+            "transaction",
+            "lockedReason"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Badge",
       "file": "src/components/reui/badge.tsx",
       "level": "atom",

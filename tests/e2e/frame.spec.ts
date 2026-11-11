@@ -21,6 +21,15 @@ const SCREENS = [
 ] as const;
 const PHONE = new Set(["360", "414"]);
 
+/**
+ * A slow server streams the page: until React swaps it in, a hidden copy (`<div hidden id="S:0">`) sits next to the
+ * shown one. Wait for the swap, then for the one page heading.
+ */
+async function pageReady(page: Page): Promise<void> {
+  await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  await expect(page.locator("h1")).toBeVisible();
+}
+
 /** Every displayed and alternative label of the dictionary, read from the file, not copied by hand. */
 function dictionaryTerms(): string[] {
   const script = [
@@ -148,7 +157,7 @@ test.describe("frame", () => {
 
   test("current-screen check fails when the mark is moved", async ({ page }, info) => {
     await page.goto("/inventory");
-    await expect(page.locator("h1")).toBeVisible();
+    await pageReady(page);
     if (PHONE.has(info.project.name)) await openSheet(page);
     await page.evaluate(() => {
       document.querySelector('[aria-current="page"]')?.removeAttribute("aria-current");
@@ -161,7 +170,7 @@ test.describe("frame", () => {
 
   test("first Tab reaches the skip link and it moves focus to main", async ({ page }) => {
     await page.goto("/inventory");
-    await expect(page.locator("h1")).toBeVisible();
+    await pageReady(page);
     await assertSkipLink(page);
     await page.keyboard.press("Tab");
     await expect(page.locator(":focus")).toHaveText("Bỏ qua tới nội dung chính");
@@ -171,7 +180,7 @@ test.describe("frame", () => {
 
   test("skip-link check fails without a target", async ({ page }) => {
     await page.goto("/inventory");
-    await expect(page.locator("h1")).toBeVisible();
+    await pageReady(page);
     await page.evaluate(() => document.querySelector("main")?.removeAttribute("id"));
     await expect(assertSkipLink(page)).rejects.toThrow("skip link target");
   });
@@ -179,7 +188,7 @@ test.describe("frame", () => {
   test("phone sidebar opens as a sheet and closes after choosing", async ({ page }, info) => {
     test.skip(!PHONE.has(info.project.name), "desktop");
     await page.goto("/");
-    await expect(page.locator("h1")).toBeVisible();
+    await pageReady(page);
     await expect(page.getByRole("link", { name: "Bảng hàng" })).toBeHidden();
     await openSheet(page);
     const sheet = page.locator('[data-mobile="true"]');
@@ -191,14 +200,14 @@ test.describe("frame", () => {
   test("does not scroll sideways", async ({ page }) => {
     for (const href of ["/", "/inventory", "/sent", PROTO, `${PROTO}?state=error`]) {
       await page.goto(href);
-      await expect(page.locator("h1")).toBeVisible();
+      await pageReady(page);
       await assertNoSidewaysScroll(page);
     }
   });
 
   test("sideways check fails on a page wider than the screen", async ({ page }) => {
     await page.goto("/inventory");
-    await expect(page.locator("h1")).toBeVisible();
+    await pageReady(page);
     await page.evaluate(() => {
       const wide = document.createElement("div");
       wide.style.width = "2000px";
@@ -235,7 +244,7 @@ test.describe("frame", () => {
 
   test("not-found check fails on a screen in the internal frame", async ({ page }) => {
     await page.goto("/inventory");
-    await expect(page.locator("h1")).toBeVisible();
+    await pageReady(page);
     await expect(assertNoInternalFrame(page, dictionaryTerms())).rejects.toThrow(
       "internal frame found",
     );
@@ -243,7 +252,7 @@ test.describe("frame", () => {
 
   test("slow screen shows no indicator before 1s and a skeleton after", async ({ page }) => {
     await page.goto(PROTO);
-    await expect(page.locator("h1")).toBeVisible();
+    await pageReady(page);
     await page.goto(`${PROTO}?state=slow`, { waitUntil: "commit" });
     await page.waitForTimeout(500);
     await expect(page.locator('[data-slot="page-skeleton"]')).toBeHidden();
@@ -306,7 +315,7 @@ test.describe("frame", () => {
     context,
   }) => {
     await page.goto("/inventory");
-    await expect(page.locator("h1")).toBeVisible();
+    await pageReady(page);
     await context.setOffline(true);
     await expect(page.getByRole("alert").filter({ hasText: "Mất kết nối mạng" })).toBeVisible();
     await assertBanner(page, "chưa lưu được");
@@ -316,7 +325,7 @@ test.describe("frame", () => {
 
   test("banner check fails while the network is up", async ({ page }) => {
     await page.goto("/inventory");
-    await expect(page.locator("h1")).toBeVisible();
+    await pageReady(page);
     await expect(assertBanner(page, "Mất kết nối mạng")).rejects.toThrow("banner missing");
   });
 
@@ -348,7 +357,7 @@ test.describe("frame", () => {
   test("chosen theme survives a reload", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
-    await expect(page.locator("h1")).toBeVisible();
+    await pageReady(page);
     await page.getByRole("button", { name: "Đổi giao diện" }).click();
     await page.getByRole("menuitemradio", { name: "Tối" }).click();
     await expect(page.locator("html")).toHaveClass(/\bdark\b/);
@@ -382,7 +391,7 @@ test.describe("frame", () => {
       await page.emulateMedia({ colorScheme });
       for (const screen of SCAN_LIST) {
         await page.goto(screen.href);
-        await expect(page.locator("h1")).toBeVisible();
+        await pageReady(page);
         if (screen.offline) {
           await context.setOffline(true);
           await expect(page.locator('[data-slot="screen-banner"]')).toBeVisible();

@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 21d95e42e52bdce22735c7bef2f5c529ed720f5f
+verified_commit: c3b1473948c9267fb0eac0389ba8e36af07cf456
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -256,3 +256,7 @@ sha: f253f9ebec43a7f4a22fa76666c4a8fe704fc761 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 2 — 2026-11-11, do mở tấm phủ thanh bên bấm lại tới khi hiện, lượt quét axe có trần thời gian riêng (CI chậm)
 run_id: repin-20261111T001409Z-26026
 sha: 21d95e42e52bdce22735c7bef2f5c529ed720f5f · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng · ngoài làn máy: E15, E16 (E16 không khai paths)
+
+### Re-pin lần 3 — 2026-11-11, do hồ sơ vào phạm vi PR 1h khi 1h ghi bản số đo của vòng
+run_id: repin-20261111T041922Z-28802
+sha: c3b1473948c9267fb0eac0389ba8e36af07cf456 · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng · ngoài làn máy: E15, E16 (E16 không khai paths) · diff chạm vật đo ngoài làn máy: E15 — chưa chứng lại, đi vòng S4 delta

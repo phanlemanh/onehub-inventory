@@ -9,6 +9,9 @@ export default defineConfig({
     coverage: {
       enabled: true,
       provider: "v8",
+      // One folder per run: two test runs in the same checkout (a gate round runs the suite and the
+      // test evals side by side) otherwise fight over one report folder and the second run aborts.
+      reportsDirectory: `coverage/run-${process.pid}`,
       include: ["src/**"],
       // Entry points, generated code, vendor components and screens are covered by other means.
       exclude: [
