@@ -5,7 +5,8 @@ slug: luoi-va-o-theo-kieu
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
-status: approved
+screens: []
+status: implemented
 approved_by:
 approved_at:
 veto_state: mo
@@ -48,6 +49,10 @@ Thước đối chiếu: mã F6 và F7 của `docs/plan/pham-vi-mvp-dot-1.md`, c
 
 - Thước: hai cột cùng kiểu cùng canh lề, bề rộng và định dạng · số từ: ma trận kiểu × thuộc tính trong `tests/grid.test.tsx`, dựng từ chính hàm của Lưới · bảo đảm bởi: AC-1, AC-2, AC-3
 - Thước: mỗi trạng thái vùng có bài kiểm đỏ được khi phá · số từ: các ca đối chứng có thông điệp ghim trong `tests/grid.test.tsx` và `tests/e2e/grid.spec.ts` · bảo đảm bởi: AC-6, AC-8
+
+## Vai × Màn
+
+Vòng này dựng thành phần dùng chung (Lưới, ô theo kiểu, đầu vùng, trạng thái vùng) và chỉ chạm bản mẫu dành cho người phát triển, chưa chạm màn nào của nhân viên sàn; bảng Vai × Màn thuộc hàng đầu tiên đặt Lưới lên một màn (hàng 2, Bảng hàng).
 
 ## Out of scope
 
