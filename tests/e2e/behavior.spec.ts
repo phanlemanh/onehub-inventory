@@ -40,6 +40,21 @@ async function seriousViolations(page: Page): Promise<string[]> {
     .map((v) => v.id);
 }
 
+/**
+ * Waits until nothing on the page is moving: a dialog that is still fading in has see-through text, and axe would
+ * measure that half-drawn colour instead of the real one.
+ */
+async function settled(page: Page): Promise<void> {
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
+        .map((a) => a.finished.catch(() => undefined)),
+    ),
+  );
+}
+
 // ---- checks shared by a case and its break --------------------------------------------------------------------
 
 async function assertFocusReturned(page: Page, id: string): Promise<void> {
@@ -225,6 +240,7 @@ test.describe("behavior", () => {
             "visible",
           );
         }
+        await settled(page);
         const ids = await seriousViolations(page);
         if (ids.length > 0) found[`${colorScheme} ${scene}`] = ids;
         scans += 1;

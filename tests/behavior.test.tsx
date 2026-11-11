@@ -765,6 +765,34 @@ describe("save and undo", () => {
     expect(getScreenBanner()).toBeNull();
   });
 
+  it("hands a failed confirmed change back to the screen, a field error by the field channel", async () => {
+    render(<Screen />);
+    for (const thrown of [
+      new FieldError("Listing.listPrice", "Giá phải lớn hơn 0"),
+      new Error("Máy chủ không trả lời"),
+    ]) {
+      let done: Promise<boolean> = Promise.resolve(false);
+      act(() => {
+        done = runChange({
+          verb: "Gỡ căn",
+          what: "Căn sẽ bị gỡ.",
+          done: "Đã gỡ.",
+          reversible: false,
+          apply: () => {
+            throw thrown;
+          },
+        });
+      });
+      await screen.findByRole("dialog");
+      fireEvent.click(screen.getByRole("button", { name: "Gỡ căn" }));
+      const error = await done.catch((e: unknown) => e);
+      expect(error, thrown.message).toBe(thrown);
+      if (thrown instanceof FieldError) expect(thrown.channel).toBe("inline");
+      await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    }
+    expect(toastMock).not.toHaveBeenCalled();
+  });
+
   it("sends a result to a toast and a screen problem to the banner", () => {
     expect(notify("result", { message: "Đã lưu." })).toBe("toast");
     expect(toastMock).toHaveBeenCalledWith("Đã lưu.");

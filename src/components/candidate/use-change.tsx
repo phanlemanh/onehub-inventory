@@ -65,7 +65,11 @@ export function needsConfirmation(change: Pick<Change, "reversible" | "leavesCom
  */
 export function useChange(): { run: (change: Change) => Promise<boolean>; dialog: ReactNode } {
   const [pending, setPending] = useState<Change | null>(null);
-  const settle = useRef<((ran: boolean) => void) | null>(null);
+  /** The pending `run` call: it settles when the person confirms (with the save's own outcome) or cancels. */
+  const settle = useRef<{
+    resolve: (ran: boolean) => void;
+    reject: (error: unknown) => void;
+  } | null>(null);
 
   const apply = useCallback(async (change: Change): Promise<boolean> => {
     let saved: boolean;
@@ -86,8 +90,8 @@ export function useChange(): { run: (change: Change) => Promise<boolean>; dialog
   const run = useCallback(
     (change: Change): Promise<boolean> => {
       if (!needsConfirmation(change)) return apply(change);
-      return new Promise<boolean>((resolve) => {
-        settle.current = resolve;
+      return new Promise<boolean>((resolve, reject) => {
+        settle.current = { resolve, reject };
         setPending(change);
       });
     },
@@ -96,12 +100,14 @@ export function useChange(): { run: (change: Change) => Promise<boolean>; dialog
 
   const close = (confirmed: boolean) => {
     const change = pending;
-    const resolve = settle.current;
+    const pendingRun = settle.current;
     settle.current = null;
     setPending(null);
-    if (!change || !resolve) return;
-    if (!confirmed) resolve(false);
-    else void apply(change).then(resolve, () => resolve(false));
+    if (!change || !pendingRun) return;
+    if (!confirmed) pendingRun.resolve(false);
+    // A failed save after confirming goes back to the screen exactly like one that ran at once: a field error has
+    // taken the `field` channel, anything else is the screen's to report. Cancel alone resolves to false.
+    else void apply(change).then(pendingRun.resolve, pendingRun.reject);
   };
 
   const dialog = (
