@@ -64,6 +64,31 @@ export interface Listing {
   version: number;
 }
 
+export type ListingOwnerContactType = "Seller" | "Landlord";
+
+/** One contact linked to one listing as its owner, in a stated role, inside one company. */
+export interface ListingOwner {
+  id: string;
+  /** id of Company */
+  companyId: string;
+  /** id of Contact */
+  contactId: string;
+  /** id of Listing */
+  listingId: string;
+  contactType: ListingOwnerContactType;
+}
+
+/** The link between one listing and the shared-catalog unit it offers, inside one company. */
+export interface ListingUnit {
+  id: string;
+  /** id of Company */
+  companyId: string;
+  /** id of Listing */
+  listingId: string;
+  /** id of Unit */
+  upi: string;
+}
+
 export type UnitPropertyType = "Residential" | "Land";
 
 export type UnitPropertySubType = "Condominium" | "Townhouse" | "Single Family Residence" | "Unimproved Land";

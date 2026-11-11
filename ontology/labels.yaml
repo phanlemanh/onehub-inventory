@@ -38,6 +38,16 @@ concepts:
     pref: Thoả thuận
     en: Agreement
     avoid: [Tích hợp]
+  ListingOwner:
+    kind: entity
+    own: true
+    pref: Chủ của hàng
+    en: Listing owner
+  ListingUnit:
+    kind: entity
+    own: true
+    pref: Căn của hàng
+    en: Listing unit
   Subdivision:
     kind: entity
     reso: SubdivisionName

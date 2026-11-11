@@ -1,0 +1,22 @@
+name: ListingOwner
+description: One contact linked to one listing as its owner, in a stated role, inside one company.
+reso: none (our own; RESO ContactListings is the list of listings an agent sends a contact to view, a different meaning)
+
+properties:
+  id: { type: uuid, required: true, unique: true }
+  companyId: { type: ref, target: Company, required: true }
+  contactId: { type: ref, target: Contact, required: true }
+  listingId: { type: ref, target: Listing, required: true }
+  contactType: { type: enum, values: [Seller, Landlord], required: true }
+
+rules:
+  - id: same-company
+    description: The link, its contact and its listing belong to the same company.
+    implemented_in: src/modules/contacts/sample.ts
+  - id: owner-role
+    description: The role on the link is Seller or Landlord; buyers and tenants are not owners of a listing.
+
+code:
+  model: src/modules/contacts/
+  tests: tests/
+wiki: wiki/entities/listing-owner.md
