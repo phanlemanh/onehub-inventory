@@ -425,6 +425,13 @@ describe("theo mẫu: chỗ lệch", () => {
     const r = runWith(["| Bảng | khác — có lý do | decision:D-999 |"]);
     expect(codes(r.stdout)).toEqual(["ly-do-khong-can-cu"]);
   });
+  it("lý do trỏ thư mục, hay một tệp thật kèm một tệp không có → ly-do-khong-can-cu", () => {
+    for (const grounds of ["design/", "tests/region.test.ts docs/khong-co.md"]) {
+      expect(codes(runWith([`| Bảng | khác — có lý do | ${grounds} |`]).stdout), grounds).toEqual([
+        "ly-do-khong-can-cu",
+      ]);
+    }
+  });
   it("đối chứng: tệp có thật, mã quyết định có thật, quyết định wiki có thật thì im", () => {
     const r = runWith([
       "| Bảng | khác — có lý do | `tests/region.test.ts` |",
@@ -499,6 +506,16 @@ describe("màn mẫu mới: ma trận trạng thái", () => {
       "| Lỗi | đạt | tests/region.test.ts |",
     ]);
     expect(codes(r.stdout)).toEqual(["bai-kiem-khong-co"]);
+  });
+  it("đạt mà căn cứ là thư mục, hay kèm một tệp không có cạnh tệp thật → bai-kiem-khong-co", () => {
+    for (const grounds of ["tests/", "tests/region.test.ts tests/khong-co.test.ts"]) {
+      const r = runWith([
+        `| Chờ tải | đạt | ${grounds} |`,
+        "| Trống | đạt | tests/region.test.ts |",
+        "| Lỗi | đạt | tests/region.test.ts |",
+      ]);
+      expect(codes(r.stdout), grounds).toEqual(["bai-kiem-khong-co"]);
+    }
   });
   it("không áp thiếu lý do → khong-ap-thieu-ly-do", () => {
     const r = runWith([

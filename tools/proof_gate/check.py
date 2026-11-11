@@ -105,19 +105,30 @@ def product_screens(repo: Repo, c: Contract) -> list[str]:
 
 
 def grounds_exist(repo: Repo, text: str) -> bool:
-    """True when the text points at a file in the repo, a ledger decision (`decision:<id>`) or a numbered wiki decision."""
-    for num in re.findall(r"(?:wiki/decisions/|ADR-)(\d{4})", text):
-        if list((repo.root / "wiki/decisions").glob(f"{num}-*.md")):
-            return True
+    """True when the text names at least one reference and every reference it names resolves.
+
+    A reference is a file path in the repo (a folder does not count), a ledger decision `decision:<id>`, or a numbered
+    wiki decision (`wiki/decisions/NNNN`, `ADR-NNNN`). One missing reference fails the whole cell: a real path next to
+    a missing test file is not grounds for the missing one.
+    """
+    refs = 0
     for tok in re.findall(r"[^\s`,;()«»·]+", text):
         tok = tok.rstrip(".:")
-        if tok.startswith("decision:") and tok.split(":", 1)[1] in repo.decision_ids:
-            return True
-        if "/" in tok:
+        wiki = re.fullmatch(r"(?:wiki/decisions/|ADR-)(\d{4})(?:-[\w.-]*)?", tok)
+        if wiki:
+            refs += 1
+            if not list((repo.root / "wiki/decisions").glob(f"{wiki.group(1)}-*.md")):
+                return False
+        elif tok.startswith("decision:"):
+            refs += 1
+            if tok.split(":", 1)[1] not in repo.decision_ids:
+                return False
+        elif "/" in tok:
+            refs += 1
             path = re.split(r"#|:(?=\d)", tok)[0]
-            if path and not path.startswith("/") and ".." not in path and (repo.root / path).exists():
-                return True
-    return False
+            if not path or path.startswith("/") or ".." in path or not (repo.root / path).is_file():
+                return False
+    return refs > 0
 
 
 def component_names_in(repo: Repo, text: str) -> list[str]:
