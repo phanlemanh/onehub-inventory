@@ -1,0 +1,120 @@
+schema_version: 1
+feature_slug: luoi-va-o-theo-kieu
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/typed-cell.tsx, src/components/candidate/column-kind.ts, tests/grid.test.tsx]
+    expected: "exit 0; trong tests/grid.test.tsx, ma trận viết trước đúng 24 ô, bộ kiểm khẳng định hằng 24 viết trong tệp: 11 kiểu × một giá trị mẫu và một ô trống (22 ô) cộng hai giá trị falsy hợp lệ count 0 → '0' và boolean false → 'Không'; money 4850000000 → '4,85 tỷ', area 75.5 → '75,5 m²', count 2418 → '2.418', date '2026-11-05' → '05/11/2026', datetime '2026-11-05T07:30:00Z' → '14:30 05/11/2026', phone '0900000001' → '0900 000 001', status 'Active' → huy hiệu data-status=Active chữ 'Đang bán', boolean true → 'Có', text/person/select hiện nguyên chuỗi; mọi kiểu với null → '—'; hai ca đối chứng: bộ hiện bỏ nhánh status cho thông điệp 'typed cell mismatch: status', bộ hiện coi giá trị falsy là trống cho thông điệp 'falsy rendered as empty: count'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/column-kind.ts, src/components/candidate/data-region.tsx, tests/grid.test.tsx]
+    expected: "exit 0; typedColumn nhận field là khoá của FIELD_DISPLAY và kiểu cột bằng FIELD_DISPLAY[field] cho mọi khoá (bộ kiểm khẳng định đủ số khoá của bảng); tests/grid.test.tsx có ca @ts-expect-error gọi typedColumn với kind, align và width, nên make typecheck đỏ nếu kiểu tham số nhận các khoá ấy; ma trận 11 kiểu cho canh phải đúng money, area, count và canh trái 8 kiểu còn lại; Lưới dựng thật với hai cột Listing.listPrice và Listing.closePrice và hai cột chữ cho đầu cột và ô cùng canh lề theo cặp; ca đối chứng đổi canh lề của một cột trên DOM đã dựng và khẳng định thông điệp 'alignment drift: <cột>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/column-kind.ts, src/components/candidate/typed-cell.tsx, tests/grid.test.tsx]
+    expected: "exit 0; bảng mẫu viết trước nguyên văn 11 kiểu: money '999,99 tỷ', area '9.999,99 m²', count '99.999', date '05/11/2026', datetime '14:30 05/11/2026', phone '0900 000 001', status 'Chưa đủ để rao', boolean 'Không', text 16 ký tự, person 20 ký tự, select 14 ký tự; bề rộng = max(độ dài nhãn, độ dài mẫu) + 2 tính bằng ch, kiểm trên 11 kiểu với nhãn ngắn và nhãn dài hơn mẫu (22 ô) so với số ch viết sẵn; với mỗi kiểu số và ngày, đầu ra của bộ định dạng 1a cho giá trị biên (1.000 tỷ, 999.999.999, 9.999,99 m², 99.999, mọi nhãn trạng thái kể cả cho thuê) không dài hơn mẫu; ô chữ dài có lớp truncate và title bằng chuỗi đầy đủ; ca đối chứng dùng bộ tính chỉ theo nhãn và khẳng định thông điệp 'width formula: <kiểu>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/column-kind.ts, tests/grid.test.tsx]
+    expected: "exit 0; densityFor cho 'dense' khi tổng tối thiểu lớn hơn vùng một đơn vị, 'normal' khi bằng đúng vùng và khi nhỏ hơn một đơn vị (ca không được bật ở mép); lớp dòng của dày là h-10 text-sm, của thường là h-12 text-base; ca đối chứng dùng phép so >= thay > và khẳng định thông điệp 'density edge'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/region-header.tsx, tests/grid.test.tsx]
+    expected: "exit 0; RegionHeader dựng đúng một h2 tên vùng, số dòng '12 dòng', ô tìm có nhãn đọc được, chỗ nút chính khi có và không có ô trống khi không; khi lọc thì số dòng là '3 / 12 dòng'; ca đối chứng dựng đầu vùng thiếu h2 và khẳng định thông điệp 'region header: heading'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/**, "src/app/(app)/proto/**", tests/e2e/grid.spec.ts]
+    expected: "exit 0; ở bốn khổ, ca 'grid › search filters rows and the count follows' gõ một mã căn có trong dữ liệu giả, còn đúng các dòng khớp và số dòng là '<khớp> / <tổng> dòng'; ca 'grid › no match offers clear filter and it restores every row' gõ chuỗi không khớp, thấy 'Không có dòng nào khớp' và nút 'Xoá lọc', bấm thì đủ dòng; ca đối chứng gỡ nút Xoá lọc trên trang thật và khẳng định bộ kiểm báo 'no-match exit missing'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/data-region.tsx, src/components/candidate/grid-copy.ts, tests/grid.test.tsx]
+    expected: "exit 0; DataRegion với 120 dòng và cỡ trang 50 dựng đúng 50 dòng thân bảng và thanh chia trang có nhãn tiếng Việt từ grid-copy.ts (không còn chuỗi 'Rows per page' hay 'Go to next page'); với 50 dòng không có thanh chia trang (ca không được bật ở mép); ca đối chứng dựng 51 dòng cỡ 50 và khẳng định bộ kiểm báo 'pagination missing' khi thanh bị gỡ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/region-state.tsx, src/components/candidate/data-region.tsx, "src/app/(app)/proto/**", tests/e2e/grid.spec.ts]
+    expected: "exit 0; ca 'grid › loading shows nothing before 1s then skeleton rows' mở ?state=loading: phần tử khung chờ vùng có mặt từ đầu nhưng ở 500 ms có visibility hidden, từ 1 giây hiện với đúng số cột; đối chứng gỡ lớp trễ trên trang thật và khẳng định thông điệp 'skeleton shown before 1s'; ca 'grid › error explains and retries' mở ?state=error: câu ba phần, bấm 'Thử lại' thì vùng có dữ liệu, thanh bên vẫn dùng được; ca 'grid › empty says why and offers the next step' mở ?state=empty; ca 'grid › partial failure keeps loaded rows and offers retry' mở ?state=partial: các dòng đã tải hiện, băng trong vùng nói phần chưa tải và có 'Thử lại'; ca 'grid › forbidden shows no rows and no count' mở ?state=forbidden: câu không đủ quyền, không dòng nào, không số dòng; mỗi ca có đối chứng chạy cùng bộ kiểm trên vùng có dữ liệu và khẳng định thông điệp 'region state not shown: <trạng thái>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/typed-cell.tsx, tests/grid.test.tsx]
+    expected: "exit 0; ô không có quyền sửa dựng như chữ thường, không có phần tử biểu tượng sửa hay khoá và không có aria-description; ô tạm khoá có biểu tượng khoá, aria-description bằng lý do và title bằng lý do; ca đối chứng dựng ô khoá không lý do và khẳng định thông điệp 'locked cell without reason'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/**, "src/app/(app)/proto/**", src/styles/**, tests/e2e/grid.spec.ts]
+    expected: "exit 0; ca 'grid › no serious accessibility violations in every region state' quét danh sách viết trước đúng 7 trạng thái (dữ liệu, chờ tải sau 1 giây, trống, lỗi, tìm không ra, một phần hỏng, không đủ quyền) ở sáng và tối, bộ kiểm khẳng định 14 lượt; ca 'grid › the page never scrolls sideways' đạt ở bốn khổ với lưới nhiều cột; ca đối chứng ghi đè màu chữ một ô trên trang thật (tắt chuyển màu, cặp màu cố định) và khẳng định axe báo color-contrast"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-10
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/components/candidate/**, "src/app/(app)/proto/**"]
+    steps:
+      - "Use the dev server at the URL given (lane port); do not start one on port 3470"
+      - "Navigate {url}/proto/luoi-va-o-theo-kieu at 1440x900, light → screenshot evidence/E11-step1.png"
+      - "Same page, dark (emulate prefers-color-scheme dark) → screenshot evidence/E11-step2.png"
+      - "Navigate {url}/proto/luoi-va-o-theo-kieu at 360x800 → screenshot evidence/E11-step3.png"
+      - "Type a string with no match into the search box at 1440x900 → screenshot evidence/E11-step4.png"
+      - "Navigate {url}/proto/luoi-va-o-theo-kieu?state=error at 1440x900 → screenshot evidence/E11-step5.png"
+    expected: "lưới có đầu vùng với tên, số dòng và ô tìm; cột tiền, diện tích, số đếm canh phải, cột chữ canh trái; ô trạng thái là huy hiệu màu chữ tiếng Việt; tối đọc được; ở 360 lưới cuộn trong vùng, trang không tràn; tìm không ra có 'Xoá lọc'; lỗi có câu ba phần và 'Thử lại'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
+
+  - id: E12
+    criterion: AC-8
+    executor: judgment
+    question: "Trả lời ba câu có/không dựa trên các hằng chữ trong grid-copy.ts: (a) câu của trạng thái lỗi vùng có đủ ba phần chuyện gì xảy ra, vì sao, làm gì tiếp; (b) câu của trạng thái trống nói vì sao trống; (c) câu của trạng thái tìm không ra có lối thoát 'Xoá lọc'. Với cả ba: người dùng được gọi là «bạn» theo design/language.md, không có dấu chấm than, và không chuỗi nào trùng một nhãn pref, lease hay alt trong ontology/labels.yaml."
+    inputs: [src/components/candidate/grid-copy.ts, design/language.md, ontology/labels.yaml]
+    evidence_required: [judged_by, verdict, rationale]
+
+  - id: E13
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/components/candidate/**, "src/app/(app)/proto/**"]
+    expected: "exit 0; sàn thiết kế bậc M1 không thấy mã màu hex thô nào trên các tệp giao diện của vòng; chiều đỏ là bộ kiểm của kit (design-floor-s4.mjs) báo hex thô khi một tệp giao diện chứa '#0246ff' viết thẳng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/data-region.tsx, src/components/candidate/column-kind.ts, "src/app/(app)/proto/**", tests/e2e/grid.spec.ts]
+    expected: "exit 0; ca 'grid › many columns on a phone render dense' ở khổ 360 và 414 đo trên lưới thật của bản mẫu: dòng thân bảng cao 40px và cỡ chữ 14px tính từ style thật; ca 'grid › few columns on a wide screen render normal' ở khổ 1440 với ?columns=few: dòng 48px và chữ 16px (ca không được bật); ca đối chứng ép lớp mật độ thường lên lưới dày trên trang thật và khẳng định thông điệp 'density not applied'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
