@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api, config]
 screens: [sign-in, today, inventory, sent]
-status: implemented
+status: verified
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: docs/superpowers/specs/2026-11-11-dang-nhap-ma-email-design.md
