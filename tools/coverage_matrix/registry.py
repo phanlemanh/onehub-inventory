@@ -34,7 +34,8 @@ class Registry:
         return [self.role_labels[n] for n in self.role_names if n in self.role_labels]
 
 
-def _load(root: Path, rel: str, errors: list[str]) -> Any:
+def _load(root: Path, rel: str, errors: list[str]) -> dict[str, Any] | None:
+    """The file as a mapping; anything else is recorded as a problem and returns None."""
     try:
         data = load_yaml_file(root / rel)
     except YamlError as exc:
@@ -42,6 +43,10 @@ def _load(root: Path, rel: str, errors: list[str]) -> Any:
         return None
     if data is None:
         errors.append(f"{rel}: missing or empty")
+        return None
+    if not isinstance(data, dict):
+        errors.append(f"{rel}: must be a mapping at the top level, found {type(data).__name__}")
+        return None
     return data
 
 
@@ -74,11 +79,13 @@ def find_pages(root: Path) -> dict[str, str]:
 def load_registry(root: Path) -> Registry:
     reg = Registry()
     labels_doc = _load(root, LABELS_FILE, reg.errors) or {}
-    concepts = labels_doc.get("concepts") if isinstance(labels_doc, dict) else None
+    concepts = labels_doc.get("concepts")
+    if labels_doc and not isinstance(concepts, dict):
+        reg.errors.append(f"{LABELS_FILE}: has no concepts mapping")
     concepts = concepts if isinstance(concepts, dict) else {}
 
     roles_doc = _load(root, ROLES_FILE, reg.errors)
-    if isinstance(roles_doc, dict):
+    if roles_doc is not None:
         if roles_doc.get("holds") != "many":
             reg.errors.append(f"{ROLES_FILE}: holds must be 'many' (a person may hold several roles)")
         for item in roles_doc.get("roles") or []:
@@ -100,8 +107,12 @@ def load_registry(root: Path) -> Registry:
 
     screens_doc = _load(root, SCREENS_FILE, reg.errors)
     reg.pages = find_pages(root)
-    if isinstance(screens_doc, dict):
+    if screens_doc is not None:
         _check_screens(screens_doc, concepts, reg)
+    else:
+        # Without a register every page is undeclared: say so rather than pass with zero screens.
+        for route, page in reg.pages.items():
+            reg.errors.append(f"page '{route}' is not in {SCREENS_FILE} ({page})")
     return reg
 
 

@@ -582,3 +582,54 @@ describe("make", () => {
     expect(roleRun.stdout).toContain("missing role column 'Quản trị sàn'");
   });
 });
+
+describe("review round 1", () => {
+  // Surfaces as the kit reads them: a list or a comma string, any case (contract template of the kit).
+  const SURFACE_FORMS = ["[UI]", "ui, config", '"web-ui"', "[Web, config]"];
+
+  it("surfaces written the way the kit reads them still need the block", SLOW, () => {
+    expect(SURFACE_FORMS).toHaveLength(4);
+    for (const surfaces of SURFACE_FORMS) {
+      const root = copyRepo();
+      writeContract(root, "r", { status: "draft", surfaces });
+      const r = run(root);
+      expect(r.status, surfaces).toBe(1);
+      expect(r.out, surfaces).toContain(`${REL}: touches the UI but declares no screens`);
+      writeContract(
+        root,
+        "r",
+        { status: "draft", surfaces, screens: "[inventory, sent]" },
+        block(goodMatrix()),
+      );
+      expect(run(root).status, `${surfaces}: full block`).toBe(0);
+    }
+    const root = copyRepo();
+    writeContract(root, "r", { status: "draft", surfaces: "config, api" });
+    expect(run(root).status, "no UI surface").toBe(0);
+  });
+
+  it("a register that is not a mapping is red", () => {
+    const screens = copyRepo();
+    mkdirSync(join(screens, "src/app/(app)/ghost"), { recursive: true });
+    writeFileSync(
+      join(screens, "src/app/(app)/ghost/page.tsx"),
+      "export default function P() {}\n",
+    );
+    edit(screens, "design/screens.yaml", (t) =>
+      t.replace(/^[\s\S]*?^screens:\n/m, "").replace(/^ {2}/gm, ""),
+    );
+    let r = run(screens);
+    expect(r.status).toBe(1);
+    expect(r.out).toContain("design/screens.yaml: must be a mapping at the top level");
+    expect(r.out).toContain("page '/ghost' is not in design/screens.yaml");
+
+    const roles = copyRepo();
+    expect(run(roles).status).toBe(0);
+    edit(roles, "ontology/roles.yaml", (t) =>
+      t.replace(/^[\s\S]*?^roles:\n/m, "").replace(/^ {2}/gm, ""),
+    );
+    r = run(roles);
+    expect(r.status).toBe(1);
+    expect(r.out).toContain("ontology/roles.yaml: must be a mapping at the top level");
+  });
+});

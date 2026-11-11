@@ -46,6 +46,13 @@ class Record:
     unrelated: int = 0
 
 
+def surface_tokens(value: Any) -> set[str]:
+    """Surfaces as the kit reads them: a list or a comma string, brackets and quotes stripped, lowercased."""
+    items = value if isinstance(value, list) else [value]
+    text = ",".join("" if v is None else str(v) for v in items)
+    return {t.strip().strip("[]\"'").strip().lower() for t in text.split(",")} - {""}
+
+
 def _nfc(text: str) -> str:
     return unicodedata.normalize("NFC", text).strip()
 
@@ -118,9 +125,7 @@ def check_contract(path: Path, root: Path, reg: Registry) -> Record:
         return rec
 
     status = fm.get("status")
-    surfaces = fm.get("surfaces") or []
-    surfaces = surfaces if isinstance(surfaces, list) else [surfaces]
-    touches_ui = any(str(s) in UI_SURFACES for s in surfaces)
+    touches_ui = bool(surface_tokens(fm.get("surfaces")) & UI_SURFACES)
     has_screens = "screens" in fm
     body = _section(text)
 
