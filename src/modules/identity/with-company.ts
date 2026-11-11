@@ -3,8 +3,10 @@
 // so Postgres row level security always applies. The company may be empty: listing a person's companies happens
 // before one is chosen.
 //
-// Copied from packages/api/src/db.ts of onehub-quy-hang (commit 1729b11f); only the types changed. The repo has no
-// Postgres driver yet, so the door is typed against the smallest shape of a pool; pg.Pool fits it as is.
+// Copied from packages/api/src/db.ts of onehub-quy-hang (commit 1729b11f); only the types changed. The door is typed
+// against the smallest shape of a pool, so tests can pass a fake one; pg.Pool fits it as is. This file is the only
+// one that loads the Postgres driver (one-door.test.ts).
+import pg from "pg";
 
 /** The API role. It owns no table, is not a superuser and cannot bypass row level security. */
 export const APP_ROLE = "quy_hang_app";
@@ -23,6 +25,15 @@ export interface DbClient {
 
 export interface DbPool {
   connect(): Promise<DbClient>;
+}
+
+/** A pool of connections to `url`. Every statement on it still goes through `withCompany`. */
+export function createPool(url: string): DbPool {
+  const pool = new pg.Pool({ connectionString: url, max: 10 });
+  // An idle connection the server closes (restart, failover) must not take the process down; the next query
+  // opens a new one.
+  pool.on("error", (err) => console.error("[co-so-du-lieu] kết nối rảnh bị đóng:", err.message));
+  return pool;
 }
 
 export interface CompanyContext {

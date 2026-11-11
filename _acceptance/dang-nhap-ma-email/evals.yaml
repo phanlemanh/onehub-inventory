@@ -1,0 +1,185 @@
+schema_version: 1
+feature_slug: dang-nhap-ma-email
+# Ma trận ca viết trước. Bài kiểm cơ sở dữ liệu (tests/db/dang-nhap.db.test.ts, chạy bằng
+# config:executors.script.dang_nhap_db trên Postgres của dãy, cơ sở nháp dang_nhap_*) — 16 ca, mỗi ca một `it` mang
+# đúng tên dưới đây, reporter verbose in tên từng ca:
+#   xin-ma-ba-email-cung-cau · ban-that-loi-may-chu · doi-ma-mot-san · ma-hong-cung-mot-loi · ma-moi-van-dung ·
+#   gioi-han-xin-ma · nhieu-san-chon-dung-san · go-truoc-khi-doi-ma · phien-dua-sang-qua-cua · go-khoi-san-mat-san ·
+#   phien-truot-va-het-han · dang-xuat-xoa-phien · vai-api-khong-cham-danh-tinh · chi-luu-bam · ham-hep-khong-lo ·
+#   vai-ham-danh-tinh-hep
+# Ca phá thử (cùng tệp, mỗi bản phá một cơ sở nháp riêng, bài kiểm của ca phải đỏ với thông điệp ghim):
+#   pha-thu-ds-san-khong-loc (hàm danh sách sàn trả mọi sàn) → «ham-hep-khong-lo: lộ sàn không thuộc người»
+#   pha-thu-khong-dem-sai (hàm đổi mã không tăng số lần sai) → «ma-hong-cung-mot-loi: sai lần ba vẫn dùng được mã»
+#   pha-thu-cap-quyen-bang (cấp select trên identity.users cho vai API) → «vai-api-khong-cham-danh-tinh: identity.users»
+#   pha-thu-vai-ham-doc-them (cấp select trên agreements cho quy_hang_identity) → «vai-ham-danh-tinh-hep: agreements»
+# Bài trình duyệt có cơ sở dữ liệu (tests/e2e-db/login.spec.ts, config:executors.script.dang_nhap_e2e) — 8 ca × 4 khổ:
+#   mot-san-vao-thang · nhieu-san-chon-va-doi · ma-sai-va-gui-lai · qua-gioi-han · chua-thuoc-san ·
+#   next-quay-ve-dung-trang · dang-xuat · axe-sang-toi (mọi trạng thái của bảng trạng thái, sáng và tối)
+# Bài trình duyệt chung (tests/e2e/account.spec.ts, make e2e, không cơ sở dữ liệu) — 3 ca × 4 khổ:
+#   khung-chua-dang-nhap · login-buoc-email · login-loi-may-chu
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.dang_nhap_db
+    paths: [src/modules/identity/**, src/app/api/v1/auth/**, db/migrations/002_dang_nhap_ma_email.sql, tests/db/**]
+    expected: "exit 0; ca 'xin-ma-ba-email-cung-cau' gọi bộ xử lý POST /api/v1/auth/code với ba email (có tài khoản và sàn, có tài khoản không sàn, không tài khoản): ba phản hồi cùng mã trạng thái 200 và cùng thân JSON từng byte; bộ gửi giữ thư nhận đúng một thư, tới email thứ nhất, thân thư chứa đúng một chuỗi 6 chữ số khớp /^\\d{6}$/ sau khi tách. Đối chứng dương trong cùng ca: bộ gửi giữ thư có đúng một thư (không phải 0 — ca hỏng nếu bộ gửi không được gọi). Chiều đỏ: thay bộ gửi bằng bộ gửi cho mọi email thì ca in 'email lạ nhận thư'. Ca 'ban-that-loi-may-chu': NODE_ENV=production thiếu RESEND_API_KEY thì POST /api/v1/auth/code trả 500, bộ gửi giữ thư rỗng, console bị theo dõi không chứa chuỗi 6 chữ số nào; đối chứng dương cùng ca: đủ cấu hình (fetch giả) thì trả 200"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/identity/**]
+    expected: "exit 0; src/modules/identity/config.test.ts ca 'ban-that-thieu-cau-hinh': với NODE_ENV=production và lần lượt thiếu RESEND_API_KEY, MAIL_FROM, AUTH_SECRET, DATABASE_URL, hàm kiểm cấu hình mà src/instrumentation.ts gọi lúc khởi động ném lỗi gọi đúng tên biến thiếu (một ca kiểm instrumentation.ts gọi đúng hàm ấy khi NODE_ENV=production); console.log và console.error bị theo dõi không chứa mã; đối chứng dương: đủ bốn biến thì trả bộ gửi Resend gọi fetch tới https://api.resend.com/emails đúng một lần với 'to' là email người xin. Chiều đỏ: bản dev in mã ra nhật ký chỉ khi NODE_ENV khác production — ca kiểm cả chiều production không bao giờ dùng bộ gửi in nhật ký"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.dang_nhap_db
+    paths: [src/modules/identity/**, src/app/api/v1/auth/**, db/migrations/002_dang_nhap_ma_email.sql, tests/db/**]
+    layer: backend-effect
+    expected: "exit 0; ca 'doi-ma-mot-san': người thuộc đúng sàn A xin mã; mã dùng để đổi được RÚT TỪ THÂN THƯ trong bộ gửi giữ thư của chính lần POST code (không lấy từ fixture); đối chứng: một mã 6 số khác mã trong thư trả 400 code-invalid; POST /api/v1/auth/session với mã trong thư trả 200, phần thân có company.id = A và next; Set-Cookie đặt ohi_session với HttpOnly, SameSite=Lax, Path=/; GET /api/v1/auth/session với cookie ấy trả user.email đúng và company.name của A. Chiều đỏ: mã đúng mà Set-Cookie thiếu HttpOnly thì ca in 'cookie phiên đọc được từ trình duyệt'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.dang_nhap_db
+    paths: [src/modules/identity/**, src/app/api/v1/auth/**, db/migrations/002_dang_nhap_ma_email.sql, tests/db/**]
+    expected: "exit 0; ca 'ma-hong-cung-mot-loi' đi bảy tình huống (sai; sai lần ba rồi đúng; hết hạn — đồng hồ của hàm đổi mã đẩy qua 5 phút; dùng lại mã đã đổi; mã cũ sau khi xin mã mới; email lạ; mã không phải 6 chữ số): mỗi tình huống trả 400 với code 'code-invalid' và cùng thân JSON từng byte, không Set-Cookie, bảng identity.sessions không thêm dòng (đếm bằng vai chủ trước và sau). Ca 'ma-moi-van-dung': sau khi xin lại, mã mới đổi được phiên. Đối chứng dương: một mã đúng trong hạn đổi được phiên trong cùng tệp. Chiều đỏ: bản phá pha-thu-khong-dem-sai làm ca in 'ma-hong-cung-mot-loi: sai lần ba vẫn dùng được mã'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.dang_nhap_db
+    paths: [src/modules/identity/**, src/app/api/v1/auth/**, db/migrations/002_dang_nhap_ma_email.sql, tests/db/**]
+    expected: "exit 0; ca 'gioi-han-xin-ma': với một email có tài khoản và một email lạ, năm lần xin đầu trả 200, lần sáu trả 429 code 'rate-limited'; số thư của email có tài khoản là đúng 5; identity.code_requests có đúng 5 dòng cho mỗi email (lần bị từ chối không ghi dòng); đẩy đồng hồ qua 15 phút thì lần xin kế trả 200. Chiều đỏ: lần sáu mà trả 200 thì ca in 'xin mã lần sáu vẫn được'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.dang_nhap_db
+    layer: backend-effect
+    paths: [src/modules/identity/**, src/app/api/v1/auth/**, db/migrations/002_dang_nhap_ma_email.sql, tests/db/**]
+    expected: "exit 0; ca 'nhieu-san-chon-dung-san': người thuộc A, B (cơ sở có thêm sàn C người không thuộc) đổi mã: phản hồi có company = null và companies là đúng tập {A, B} (so tập id và tên, không chỉ đếm); PUT /api/v1/auth/session/company với A trả 200 và GET session cho company A; PUT với C trả 403 code 'not-member' và GET session vẫn là A; PUT với B đổi sang B. Chiều đỏ: bản phá pha-thu-ds-san-khong-loc làm ca 'ham-hep-khong-lo' in 'ham-hep-khong-lo: lộ sàn không thuộc người'. Ca 'go-truoc-khi-doi-ma': người một sàn xin mã, vai chủ xoá dòng thành viên, người gõ đúng mã trong thư thì trả 403 code 'no-company', không Set-Cookie, identity.sessions không thêm dòng; đối chứng dương: cùng người còn sàn thì đổi được"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.dang_nhap_e2e
+    layer: ui
+    paths: [src/app/login/**, "src/app/(app)/account-menu.tsx", src/components/templates/app-shell.tsx, tests/e2e-db/**]
+    expected: "exit 0; ca 'nhieu-san-chon-va-doi' ở cả bốn khổ: sau khi gõ mã, màn hiện danh sách đúng hai nút mang tên sàn A và B (getByRole button, không có C); bấm A thì về trang Hôm nay và menu tài khoản ghi tên A; mở menu, «Đổi sàn», chọn B thì menu ghi tên B. Chiều đỏ: ca kiểm số nút sàn bằng toHaveCount(2) và tên C không xuất hiện"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.dang_nhap_db
+    layer: backend-effect
+    paths: [src/modules/identity/**, db/migrations/002_dang_nhap_ma_email.sql, tests/db/**]
+    expected: "exit 0; ca 'phien-dua-sang-qua-cua': với phiên gắn A, hàm đọc phiên của mô-đun identity trả { userId, companyId: A }; withCompany(pool, ngữ cảnh ấy) đọc companies và agreements chỉ thấy dòng của A (so tập id), và đọc company_members chỉ thấy thành viên của A. Ca 'go-khoi-san-mat-san': vai chủ xoá dòng thành viên (người, A) thì lần đọc phiên kế trả companyId null và GET session có company null. Chiều đỏ: nếu hàm đọc phiên trả sàn mà không kiểm thành viên thì ca thứ hai in 'phiên giữ sàn đã bị gỡ'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.dang_nhap_db
+    paths: [src/modules/identity/**, src/app/api/v1/auth/**, db/migrations/002_dang_nhap_ma_email.sql, tests/db/**]
+    layer: backend-effect
+    expected: "exit 0; ca 'phien-truot-va-het-han': đẩy đồng hồ 25 giờ rồi đọc phiên thì expires_at của dòng phiên = thời điểm đọc + 30 ngày (sai số dưới 1 giây); đọc lại trong cùng ngày không đổi expires_at; phiên quá hạn và cookie bịa (32 byte ngẫu nhiên) đều làm GET session trả 401 code 'unauthenticated'. Chiều đỏ: bỏ trượt hạn thì ca in 'hạn phiên không trượt'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.dang_nhap_e2e
+    layer: ui
+    paths: [src/app/login/**, tests/e2e-db/**]
+    expected: "exit 0; ca 'next-quay-ve-dung-trang' ở bốn khổ: mở /login?next=/inventory, đăng nhập người một sàn, URL cuối là /inventory; next trỏ ra ngoài (https://example.com hoặc //example.com) thì về / — không bao giờ rời trang của ứng dụng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.dang_nhap_db
+    layer: backend-effect
+    paths: [src/modules/identity/**, src/app/api/v1/auth/**, tests/db/**]
+    expected: "exit 0; ca 'dang-xuat-xoa-phien': DELETE /api/v1/auth/session với cookie hợp lệ trả 200, Set-Cookie xoá ohi_session (Max-Age=0), dòng phiên biến mất khỏi identity.sessions (vai chủ đếm); gửi lại cookie cũ thì GET session trả 401. Chiều đỏ: đăng xuất chỉ xoá cookie mà giữ dòng phiên thì ca in 'phiên còn sống sau đăng xuất'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.dang_nhap_e2e
+    layer: ui
+    paths: [src/app/login/**, "src/app/(app)/account-menu.tsx", "src/app/(app)/layout.tsx", src/components/templates/app-shell.tsx, tests/e2e-db/**]
+    expected: "exit 0; ca 'dang-xuat' ở bốn khổ: người một sàn mở menu tài khoản thấy tên, email, tên sàn, không có «Đổi sàn», có «Đăng xuất»; bấm «Đăng xuất» về /login, đầu khung trang Hôm nay hiện nút «Đăng nhập». Ca 'nhieu-san-chon-va-doi' thấy «Đổi sàn» với người hai sàn"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.e2e
+    layer: ui
+    paths: ["src/app/(app)/account-menu.tsx", "src/app/(app)/layout.tsx", src/components/templates/app-shell.tsx, src/app/login/**, tests/e2e/account.spec.ts]
+    expected: "exit 0; tests/e2e/account.spec.ts ca 'khung-chua-dang-nhap' ở bốn khổ (không cơ sở dữ liệu): trang Hôm nay có link «Đăng nhập» trỏ /login?next=%2F; ca 'login-buoc-email' có ô email autocomplete=email và nút «Gửi mã»; ca 'login-loi-may-chu': gửi mã khi máy dev không có cơ sở dữ liệu thì hiện câu lỗi ba phần có nút «Thử lại» và ô email giữ chữ đã gõ. Các bài cũ của make e2e vẫn xanh"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.cach_ly
+    paths: [db/migrations/**]
+    expected: "exit 0; dòng tổng 'cach-ly: 19 ca đạt, vai quy_hang_app'; dòng 'ok luat-doc-ghi-theo-san — 3 bảng' (agreements, companies, company_members — bảng thành viên lọt vào tập quét của hàng 7, số bảng tăng từ 2 lên 3); 'ok ap-hai-lan' với hai tệp migration. Bộ kiểm không bị sửa ở hàng này"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.dang_nhap_db
+    paths: [db/migrations/002_dang_nhap_ma_email.sql, src/modules/identity/**, tests/db/**]
+    expected: "exit 0; ca 'vai-api-khong-cham-danh-tinh': dưới vai quy_hang_app, select, insert, update, delete trên từng bảng của schema identity (danh sách lấy từ pg_class, không liệt kê tay; in số bảng = 4) đều lỗi 'permission denied'; ca 'chi-luu-bam': sau một lần xin mã và đổi phiên, không cột nào của identity.login_codes, identity.sessions chứa chuỗi mã 6 số hay mã phiên rõ (so mọi cột kiểu text); ca 'ham-hep-khong-lo': mỗi hàm security definer của migration có search_path ghim, không cấp cho public, và với phiên của người X chỉ trả sàn và thông tin của X. Ca 'vai-ham-danh-tinh-hep': đọc pg_roles — quy_hang_identity có rolcanlogin false, rolsuper false; quy_hang_app không là thành viên của nó; mọi hàm security definer của migration 002 (lấy từ pg_proc, in số hàm = 6) có chủ là quy_hang_identity; tập bảng public mà quy_hang_identity có bất kỳ quyền nào đúng bằng {companies, company_members} và chỉ quyền SELECT; nó không sở hữu bảng nào của public. Bốn bản phá (pha-thu-ds-san-khong-loc, pha-thu-khong-dem-sai, pha-thu-cap-quyen-bang, pha-thu-vai-ham-doc-them) đều làm đúng ca của chúng đỏ với thông điệp ghim ở đầu tệp này"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E16
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.check
+    paths: [src/**]
+    expected: "exit 0; trong make check, src/modules/identity/one-door.test.ts xanh với tập miễn không đổi (tệp cửa và tệp bài quét) — gói pg chỉ được nạp ở with-company.ts"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E17
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.dang_nhap_e2e
+    layer: ui
+    paths: [src/app/login/**, tests/e2e-db/**]
+    expected: "exit 0; ca 'mot-san-vao-thang' ở bốn khổ: ô email có autocomplete=email; ô mã có inputmode=numeric, autocomplete=one-time-code, là đúng một ô; dán '123 456' hay '123-456' vào ô cho giá trị '123456'; Enter ở ô email gửi mã, Enter ở ô mã đăng nhập; ca 'ma-sai-va-gui-lai': câu «Mã không đúng hoặc đã hết hạn» hiện và gắn aria-describedby vào ô mã, «Gửi mã mới» gửi mã mới; ca 'qua-gioi-han' ghim nguyên văn «Đã xin mã quá nhiều lần. Thử lại sau 15 phút.»; ca 'chua-thuoc-san' ghim nguyên văn «Tài khoản chưa thuộc sàn nào. Nhờ quản trị sàn mời bạn.»; ca 'axe-sang-toi': axe không lỗi ở mỗi trạng thái của bảng trạng thái, sáng và tối. Chiều đỏ: bài axe đã từng đỏ trên một nút không nhãn (ghi trong tệp)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E18
+    criterion: AC-10
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/app/login/**, "src/app/(app)/account-menu.tsx", src/components/templates/app-shell.tsx]
+    steps:
+      - "Run config:executors.script.dang_nhap_e2e with SHOTS_DIR=_acceptance/dang-nhap-ma-email/evidence (DB_LANE=n DB_PORT=5563); the spec saves one frame per state as E18-step<n>.png"
+      - "Read every evidence/E18-step*.png frame: email step 1440 light, code step 1440 light, code invalid 360 light, choose company 360 dark, rate limited 414 light, no company 1024 dark, account menu open 1440 dark, signed-out shell 360 light"
+    expected: "khối đăng nhập giữa màn, rộng vừa, không cuộn ngang ở 360; bước mã nói rõ mã đã gửi tới email nào; câu lỗi dưới ô mã đọc được; bước chọn sàn có một nút cho mỗi sàn; câu quá giới hạn và câu chưa thuộc sàn hiện đúng chữ; menu tài khoản có tên, email, tên sàn, Đổi sàn, Đăng xuất; tối đổi nền và chữ, đọc được; khung chưa đăng nhập có nút Đăng nhập ở đầu trang"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
+
+  - id: E19
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.dang_nhap_e2e
+    layer: ui
+    paths: [src/app/login/**, "src/app/(app)/account-menu.tsx", src/components/templates/app-shell.tsx, tests/e2e-db/**]
+    expected: "exit 0; ca 'mot-san-vao-thang' ở bốn khổ: người một sàn gõ email, lấy mã từ hộp thư thử của máy dev, gõ mã; URL cuối là / và nút menu tài khoản mở ra có tên sàn A (getByText chính xác); không có bước chọn sàn"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

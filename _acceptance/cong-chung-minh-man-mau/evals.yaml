@@ -1,0 +1,101 @@
+schema_version: 1
+feature_slug: cong-chung-minh-man-mau
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/proof_gate/**, tools/coverage_matrix/**]
+    expected: "exit 0; bài 'áp khi nào: trạng thái × khai màn' trong tools/proof_gate/proof-gate.test.ts dựng kho mẫu với ma trận viết trước 6 trạng thái × 3 loại khai màn, khẳng định số phần tử bằng 18 và lưới đỏ đúng 2 ô (implemented, verified × màn Lưới thiếu chứng minh), mỗi ô đỏ có dòng chứa tên hồ sơ, 'inventory' và 'thieu-chung-minh'; 16 ô còn lại không xuất hiện trong đầu ra; đối chứng dương: thêm tệp chứng minh đủ cho hai ô ấy thì lưới thoát 0; bài '--report' thấy thoát 0 ở cả kho đỏ lẫn kho xanh và bản --json đếm 'truoc_cong' bằng số hồ sơ đã đóng có màn; trên kho mẫu có một màn mỗi lối, 2 chỗ có lý do, 3 vô cớ và 1 khối reui, bản --json ghi theo_loi {ho_moi: 1, man_mau_moi: 1, theo_mau: 1}, lech {co_ly_do: 2, vo_co: 3}, roi_bac 1"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'theo mẫu: ảnh cạnh màn mẫu' đạt: từ một tệp chứng minh lành (lưới thoát 0, PNG sinh trong bài với bề ngang bằng khổ), mỗi lần phá đúng một chỗ trên bản sao thì lưới thoát 1 với mã ghim: bỏ dòng khổ 360 → 'thieu-anh-kho' kèm '360'; trỏ ảnh không có → 'anh-khong-co'; ảnh là tệp chữ → 'anh-khong-phai-png'; ảnh 1440 bề ngang 1200 → 'anh-lech-kho'; hai ảnh một khổ trùng byte → 'anh-trung'; nhãn dữ liệu rỗng → 'thieu-du-lieu'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'theo mẫu: mặt so' đạt trên cùng tệp lành: xoá dòng mặt 'Phím tắt' → thoát 1 với 'thieu-mat' và 'Phím tắt'; đổi căn cứ một dòng giống thành 'đúng như mẫu' → 'giong-khong-anh'; đổi căn cứ một dòng giống thành 'cùng DataRegion, DataGrid' → 'ten-thanh-phan'; đối chứng: căn cứ 'ảnh 1440, cùng DataGrid' (có chỉ ảnh) thì im"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'theo mẫu: chỗ lệch' đạt: thêm hai dòng 'khác — vô cớ' → thoát 1, mã 'lech-vo-co' và dòng tổng chứa '2 chỗ lệch vô cớ'; dòng 'khác — có lý do' căn cứ 'docs/khong-co.md' → 'ly-do-khong-can-cu'; căn cứ mã 'D-999' không có trong design/decisions.yaml của kho mẫu → 'ly-do-khong-can-cu'; đối chứng dương: căn cứ trỏ tệp có thật, mã quyết định có thật trong design/decisions.yaml, hay wiki/decisions/0019 có thật thì im"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'phát lại Liên hệ: lời cổng cũ' chép tools/proof_gate/fixtures/lien-he-quy-hang/cong-cu.md vào hồ sơ implemented khai màn contacts của kho mẫu (họ Lưới, Màn: inventory, 12 mặt) và thấy thoát 1, đúng 12 dòng 'ten-thanh-phan' (một mỗi mặt) và 'thieu-anh-kho'; bài 'phát lại Liên hệ: bảng kiểm thật' với tools/proof_gate/fixtures/lien-he-quy-hang/ban-kiem.md thấy thoát 1 và '25 chỗ lệch vô cớ'; bài đếm rằng ban-kiem.md có 43 dòng lệch, 18 'có lý do', 25 'vô cớ', mỗi dòng mang mã L1–L43 không trùng và một mục gốc §1–§12; đầu cả hai tệp có dòng nguồn ghi 'onehub-quy-hang', đường 'docs/plan/dong-nhat-bang-hang-lien-he.md' và commit 40 ký tự hex 'fed33adc2c13231c3a8ab9432a8cb2b82c0bb0d4'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'màn mẫu mới: ma trận trạng thái' đạt với họ ghi 'Màn: chưa có' và states.md mẫu: ma trận đủ (đạt kèm tệp bài kiểm có thật, không áp kèm lý do) → thoát 0; bỏ một trạng thái → 'thieu-trang-thai' kèm tên trạng thái; 'đạt' trỏ tệp không có → 'bai-kiem-khong-co'; 'không áp' rỗng lý do → 'khong-ap-thieu-ly-do'; bài 'màn mẫu đã khai mà chưa đạt' với họ ghi 'Màn: inventory' và không tệp chứng minh nào chứng đủ ma trận cho inventory → 'man-mau-chua-dat'; đối chứng: hồ sơ đóng có ma trận đủ cho inventory thì im, và hồ sơ còn mở (implemented) có ma trận đủ cho inventory cũng im; bài 'sửa chính màn mẫu' với họ ghi 'Màn: inventory' và hồ sơ implemented khai inventory: tệp chứng minh chỉ có ảnh cạnh màn mẫu mà không ma trận → 'thieu-trang-thai', không có mã 'anh-trung'; có ma trận đủ → thoát 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'họ mới: hướng' đạt cho màn family null ở hồ sơ approved: hai hướng ảnh khác byte, đủ động cơ, đánh đổi, một hướng chọn → thoát 0; một hướng → 'thieu-huong'; hai hướng cùng byte ảnh → 'huong-trung'; xoá đánh đổi một hướng → 'huong-thieu-truong'; không hướng nào chọn hay hai hướng chọn → 'chon-khac-mot'; cùng tệp một hướng ở hồ sơ draft thì im; họ có trong screens.yaml mà chưa có tệp design/patterns/<họ>.md cũng đi lối họ mới"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'thang: trong kho, ReUI, vẽ tay' đạt: 'DataRegion' bậc trong-kho có trong registry mẫu → im; 'BangTuVe' bậc trong-kho không có → 'khoi-khong-co'; 'data-grid' bậc reui có trong catalog mẫu kèm đủ ba cột → im; bậc reui thiếu 'Vì sao không dùng' → 'roi-bac-thieu-can-cu'; bậc ve-tay ứng viên 'KhongCo' không có trong registry lẫn catalog → 'roi-bac-thieu-can-cu'; bậc 'tu-che' → 'bac-la'; xoá hẳn mục Khối → 'thieu-bang-khoi'; mục Khối có đầu bảng mà không dòng nào → 'thieu-bang-khoi'; đối chứng: thêm lại một dòng DataRegion trong-kho thì im"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/proof_gate/**, design/patterns/**, design/screens.yaml, design/states.md, _acceptance/**]
+    expected: "exit 0; bài 'kho thật xanh' chạy lưới với --root suy từ vị trí tệp bài kiểm (không ghi cứng đường) và thấy thoát 0; bài 'kho thật thêm vòng thiếu chứng minh thì đỏ' chép design/ và _acceptance/ của kho thật sang thư mục tạm, thêm hồ sơ implemented khai screens [inventory] không tệp chứng minh, và thấy thoát 1 với 'thieu-chung-minh'; bài 'họ Lưới' đọc design/patterns/luoi.md của kho thật và thấy câu triết lý chứa 'Sheet' và 'Excel', 'Màn: chưa có', khổ so đúng [360, 414, 1024, 1440], đúng 12 mặt so"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: [design/patterns/**]
+    expected: "exit 0; bộ đọc bản đồ khuôn của kit đọc design/patterns/luoi.md không lỗi lược đồ (nhóm luoi, khuôn DataRegion, tệp màn mẫu đang chạy có thật)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-10
+    executor: judgment
+    inputs:
+      - .claude/skills/inventory-ui/SKILL.md
+      - tools/proof_gate/khuon-chung-minh.md
+      - design/patterns/luoi.md
+    question: "Đặt mình là một agent sắp dựng màn mới trong kho này, chỉ đọc ba tệp được đưa: (1) có xác định được lối nào áp cho màn của mình (họ mới, màn mẫu mới, theo mẫu) và lối ấy suy từ đâu không; (2) có biết phải làm tệp chứng minh nào, ở đâu, mỗi lối gồm bảng gì, trước bước nào không; (3) có biết rơi khỏi bậc «trong kho» xuống ReUI hay vẽ tay thì phải ghi ba thứ gì không; (4) có lệnh nào để tự kiểm trước khi trình không; (5) SKILL.md còn dòng trỏ lệnh tra danh mục ReUI tại máy (tools/reui_catalog) không; (6) ba tệp có chỗ nào nói trái nhau về tên mục, tên bảng hay giá trị Kết quả không?"
+    expected: "PASS khi (1)–(5) có và (6) không có chỗ trái nhau; mỗi ý thiếu hay mỗi chỗ trái nhau là FAIL kèm câu trích"
+    evidence_required: [run_id, verdict, verifier, verified_at, rationale]
+
+  - id: E12
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/proof_gate/**, .claude/skills/inventory-ui/SKILL.md]
+    expected: "exit 0; bài 'khuôn tệp chứng minh qua được lưới' điền khuôn tools/proof_gate/khuon-chung-minh.md theo đúng chỗ trống (không đổi tên mục, tên bảng, giá trị Kết quả) cho mỗi lối trên kho mẫu và thấy lưới thoát 0; chiều đỏ: đổi một tên mục của khuôn thì lưới đỏ; bài 'skill trỏ đúng' thấy .claude/skills/inventory-ui/SKILL.md chứa 'tools/proof_gate/check.py', 'tools/proof_gate/khuon-chung-minh.md', 'chung-minh-man.md' và 'tools/reui_catalog'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

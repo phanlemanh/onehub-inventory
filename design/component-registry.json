@@ -1408,7 +1408,8 @@
           "name": "AppShell",
           "props": [
             "nav",
-            "roles"
+            "roles",
+            "account"
           ]
         },
         {

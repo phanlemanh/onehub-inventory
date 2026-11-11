@@ -1,0 +1,6 @@
+{
+ "feature_plain": "Từ nay, vòng nào dựng màn phải chứng minh màn của mình giống màn mẫu của họ (ảnh đặt cạnh nhau, từng chỗ khác có lý do), hoặc đưa đủ hướng nếu là họ mới, và nêu căn cứ khi không dùng khối có sẵn — thiếu thì kiểm chung của kho đỏ trước khi trình.",
+ "decisions": [
+  {"id":"E11","q":"Hướng dẫn trong skill giao diện có đủ để agent tự chứng minh màn không?","why":"Ba người chấm độc lập đều đề xuất đạt; mục chấm bằng đánh giá nên chờ anh chốt."}
+ ]
+}
