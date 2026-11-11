@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-11 — Khai hai khái niệm liên kết vào mô hình nghiệp vụ: Chủ của hàng (ListingOwner, có sàn và vai bên bán) và Căn của hàng (ListingUnit); mã dữ liệu mẫu dùng kiểu sinh — [khai-lien-ket-chao-can](../_acceptance/khai-lien-ket-chao-can/design.md)
 - 2026-11-11 — Nền cách ly mỗi sàn: lược đồ nền chép từ Quỹ hàng, cửa truy vấn `withCompany`, bộ quét một cửa và bộ kiểm cách ly 19 ca có phá thử — [cach-ly-moi-san](../_acceptance/cach-ly-moi-san/contract.md)
 - 2026-11-11 — Thanh bên nhận danh sách vai một người giữ và hiện mục của mọi vai ấy (người kiêm nhiều vai được cộng, theo 0016); kiểu vai của mục lấy từ bản khai vai — hàng 1i, [0016](decisions/0016-permission-model.md), `_acceptance/thanh-ben-nhieu-vai/`
 - 2026-11-11 — Lưới dùng chung: ô theo kiểu (canh lề, bề rộng, định dạng suy từ kiểu của trường), mật độ, đầu vùng, tìm, chia trang, bảy trạng thái vùng, ô chỉ đọc — hàng 1b, `_acceptance/luoi-va-o-theo-kieu/`
