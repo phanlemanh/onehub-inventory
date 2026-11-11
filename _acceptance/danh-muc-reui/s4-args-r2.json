@@ -1,0 +1,569 @@
+{
+  "generated_at": "2026-11-11T02:00:21Z",
+  "generated_sha": "3c038b32e6c675861194c799f1b6820b4c7a1dde",
+  "mainBranchInfo": {
+    "branch": "main",
+    "source": "remote"
+  },
+  "slug": "danh-muc-reui",
+  "round": 2,
+  "riskTier": "T3",
+  "evals": [
+    {
+      "id": "E1",
+      "criterion": "AC-1",
+      "cmd": "node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs && node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs && git diff --exit-code -- design/reui-catalog.json && echo 'reui catalog regenerated twice offline, identical to commit'",
+      "expected": "\"exit 0; lệnh sinh lại chạy hai lần dưới bộ chặn mạng, git diff trên tệp danh mục rỗng, in 'reui catalog regenerated twice offline, identical to commit'; đối chứng rằng bộ chặn thật sự chặn nằm ở E8 (4 ca 'E8 · blocker')\"",
+      "executor": "script",
+      "expectedExit": 0,
+      "paths": [
+        "tools/reui_catalog/**",
+        "design/reui-catalog.json"
+      ],
+      "evidence_required": [
+        "run_id",
+        "exit_code",
+        "verifier",
+        "verified_at",
+        "output"
+      ],
+      "ref": "config:executors.script.reui_catalog_offline"
+    },
+    {
+      "id": "E2",
+      "criterion": "AC-2",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose",
+      "expected": "\"exit 0; đúng 3 ca 'E2 ·' đạt: 'E2 · intact copy regenerates and checks green' (đối chứng dương, cùng bản sao), 'E2 · flipped byte in llms-full.txt is refused' và 'E2 · flipped byte in llms.txt is refused' — mỗi ca đỏ khẳng định lệnh sinh lại và lệnh kiểm đều thoát 1, thông điệp chứa đúng 'snapshot hash mismatch: <tệp>', tệp danh mục của bản sao không đổi byte nào\"",
+      "executor": "script",
+      "expectedExit": 0,
+      "paths": [
+        "tools/reui_catalog/**"
+      ],
+      "evidence_required": [
+        "run_id",
+        "exit_code",
+        "verifier",
+        "verified_at",
+        "output"
+      ],
+      "ref": "config:executors.script.reui_catalog_test"
+    },
+    {
+      "id": "E3",
+      "criterion": "AC-3",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose",
+      "expected": "\"exit 0; đúng 4 ca 'E3 ·' đạt: 'E3 · committed catalog has 678 blocks, 27 components, 1264 examples and the pin' (đếm mục thật bằng counts và bằng pin.json), 'E3 · missing block row stops the build' ('count mismatch: Application: App Shell declares 36, read 35'), 'E3 · missing component row stops the build' ('count mismatch: ReUI Primitives declares 27, read 26'), 'E3 · unreadable item line stops the build' ('unreadable item line <số dòng>'); ba ca đỏ khẳng định không ghi tệp danh mục\"",
+      "executor": "script",
+      "expectedExit": 0,
+      "paths": [
+        "tools/reui_catalog/**",
+        "design/reui-catalog.json"
+      ],
+      "evidence_required": [
+        "run_id",
+        "exit_code",
+        "verifier",
+        "verified_at",
+        "output"
+      ],
+      "ref": "config:executors.script.reui_catalog_test"
+    },
+    {
+      "id": "E4",
+      "criterion": "AC-4",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose",
+      "expected": "\"exit 0; đúng 5 ca 'E4 ·' đạt, mỗi ca chạy tra.mjs như tiến trình con dưới bộ chặn mạng: 'E4 · kanban lists 10 ranked items with the pin date' (dòng đầu 'ReUI catalog pinned <ngày trong pin.json>', đúng 10 dòng kết quả, kết quả đầu '@reui/kanban'), 'E4 · same query twice gives the same output', 'E4 · --loai block lists only blocks', 'E4 · --json returns name, kind, category, title, url', 'E4 · no match exits 1 with the pin date' (in 'không có mục nào khớp «zzqxw»' và ngày ghim)\"",
+      "executor": "script",
+      "expectedExit": 0,
+      "paths": [
+        "tools/reui_catalog/**",
+        "design/reui-catalog.json"
+      ],
+      "evidence_required": [
+        "run_id",
+        "exit_code",
+        "verifier",
+        "verified_at",
+        "output"
+      ],
+      "ref": "config:executors.script.reui_catalog_test"
+    },
+    {
+      "id": "E5",
+      "criterion": "AC-5",
+      "cmd": "node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs --check",
+      "expected": "\"exit 0; in 'snapshot hashes match pin', 'catalog identical to regenerated', 'findable by name: 1969/1969', 'findable by title: 1969/1969 within top 10', 'forbidden: 0'\"",
+      "executor": "script",
+      "expectedExit": 0,
+      "paths": [
+        "tools/reui_catalog/**",
+        "design/reui-catalog.json"
+      ],
+      "evidence_required": [
+        "run_id",
+        "exit_code",
+        "verifier",
+        "verified_at",
+        "output"
+      ],
+      "ref": "config:executors.script.reui_catalog_check"
+    },
+    {
+      "id": "E5b",
+      "criterion": "AC-5",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose",
+      "expected": "\"exit 0; đúng 3 ca 'E5 ·' đạt trên cùng một bản sao: 'E5 · every entry is findable' (đối chứng dương, 1969 mục), 'E5 · entry unreachable by name is red' (sửa tên trong danh mục của bản sao thành một tên mà tra không ra chính nó; --check thoát 1 với 'not findable by name: <tên>'), 'E5 · entry pushed out of top 10 by title is red' (chèn 10 mục cùng nhóm và tiêu đề trước mục đích; --check thoát 1 với 'not findable by title: <tên>')\"",
+      "executor": "script",
+      "expectedExit": 0,
+      "paths": [
+        "tools/reui_catalog/**",
+        "design/reui-catalog.json"
+      ],
+      "evidence_required": [
+        "run_id",
+        "exit_code",
+        "verifier",
+        "verified_at",
+        "output"
+      ],
+      "ref": "config:executors.script.reui_catalog_test"
+    },
+    {
+      "id": "E6",
+      "criterion": "AC-6",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose",
+      "expected": "\"exit 0; đúng 11 ca 'E6 ·' đạt; ca 'E6 · matrix has 9 injections' khẳng định ma trận viết trước có đúng 9 phần tử; 'E6 · committed catalog and snapshots are clean' (đối chứng dương); 9 ca đỏ, mỗi ca một bản sao bị chèn đúng một thứ, --check thoát 1 với thông điệp ghim: trường 'source' ('forbidden field in <tên mục>: source'), trường 'files' ('forbidden field in <tên mục>: files'), dấu ba backtick, 'import x from \\\"y\\\"', 'export default', 'Bearer', 'REUI_LICENSE' (mỗi thứ 'forbidden in <tên mục>: <thứ>'), dấu ba backtick trong snapshot/llms-full.txt và 'Bearer' trong snapshot/llms.txt (mỗi thứ 'forbidden in snapshot <tệp> line <số>: <thứ>')\"",
+      "executor": "script",
+      "expectedExit": 0,
+      "paths": [
+        "tools/reui_catalog/**",
+        "design/reui-catalog.json"
+      ],
+      "evidence_required": [
+        "run_id",
+        "exit_code",
+        "verifier",
+        "verified_at",
+        "output"
+      ],
+      "ref": "config:executors.script.reui_catalog_test"
+    },
+    {
+      "id": "E7",
+      "criterion": "AC-7",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose",
+      "expected": "\"exit 0; đúng 2 ca 'E7 ·' đạt trên bản sao, nguồn mới dựng bằng cách chép ảnh chụp thật rồi sửa: 'E7 · refresh --from reports added and removed' (thêm khối 'app-shell-999' vào App Shell và sửa số khai thành 37, bớt 'c-accordion-1' và sửa số khai thành 10; dưới bộ chặn mạng lệnh thoát 0, in 'added: app-shell-999' và 'removed: c-accordion-1', pin.json của bản sao mang SHA-256 bằng băm tính lại của tệp nguồn mới, danh mục của bản sao có app-shell-999 và không có c-accordion-1), 'E7 · refresh refuses a source with forbidden text' (nguồn mới có dấu ba backtick; lệnh thoát 1, ảnh chụp, pin.json và danh mục của bản sao giữ nguyên byte)\"",
+      "executor": "script",
+      "expectedExit": 0,
+      "paths": [
+        "tools/reui_catalog/**"
+      ],
+      "evidence_required": [
+        "run_id",
+        "exit_code",
+        "verifier",
+        "verified_at",
+        "output"
+      ],
+      "ref": "config:executors.script.reui_catalog_test"
+    },
+    {
+      "id": "E8",
+      "criterion": "AC-8",
+      "cmd": "make test",
+      "expected": "\"exit 0; bộ kiểm của kho chạy tệp tools/reui_catalog/catalog.test.mjs, tệp ấy đạt đủ 33 ca, 0 bỏ qua (số ca của tệp khác 33 thì eval KHÔNG đạt); trong đó 4 ca 'E8 · blocker' cho thấy bộ chặn mạng ném 'network blocked' với fetch, http.get, https.request (gọi qua import có tên của ESM) và net.connect\"",
+      "executor": "script",
+      "expectedExit": 0,
+      "paths": [
+        "tools/reui_catalog/**",
+        "design/reui-catalog.json"
+      ],
+      "evidence_required": [
+        "run_id",
+        "exit_code",
+        "verifier",
+        "verified_at",
+        "output"
+      ],
+      "ref": "config:executors.test.unit"
+    },
+    {
+      "id": "E9",
+      "criterion": "AC-9",
+      "expected": "\"PASS khi cả ba điều được nói rõ và tệp không tự mâu thuẫn; việc lệnh có chạy thật không do E10 đo\"",
+      "question": "\"Một agent chưa biết danh mục chỉ đọc tệp này. Tệp có nói đủ ba điều không: (1) lệnh tra danh mục ReUI tại máy và cách lọc theo loại; (2) câu nào chép vào bằng chứng khi tra không ra, gồm cả ngày ghim; (3) khi nào và bằng lệnh nào thì ghim lại, và ghim lại cần mạng. Có điều nào tệp tự mâu thuẫn hoặc để agent phải đoán không?\"",
+      "executor": "judgment",
+      "expectedExit": 0,
+      "inputs": [
+        "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/vibrant-cartwright-7a2f87/tools/reui_catalog/README.md"
+      ],
+      "evidence_required": [
+        "run_id",
+        "verdict",
+        "judges",
+        "verified_at"
+      ],
+      "inputsHash": "38b68d4cbcbfbc7b6a7d7f814843ac62155769b945575ba33fbe69e158cfd143"
+    },
+    {
+      "id": "E10",
+      "criterion": "AC-9",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose",
+      "expected": "\"exit 0; đúng 1 ca 'E10 · README commands run as documented' đạt: trích mọi dòng lệnh trong khối bash của README, chạy từng dòng dưới bộ chặn mạng từ gốc kho (dòng có --refresh chạy trên bản sao với --from, dòng --refresh không --from thì kiểm đúng chú thích 'cần mạng' mà không chạy), mỗi dòng thoát đúng mã README ghi; câu bằng chứng README dạy chép trùng từng chữ với đầu ra của tra 'zzqxw' sau khi thay ngày ghim\"",
+      "executor": "script",
+      "expectedExit": 0,
+      "paths": [
+        "tools/reui_catalog/**"
+      ],
+      "evidence_required": [
+        "run_id",
+        "exit_code",
+        "verifier",
+        "verified_at",
+        "output"
+      ],
+      "ref": "config:executors.script.reui_catalog_test"
+    }
+  ],
+  "suiteCommands": [
+    "make check",
+    "npm run build",
+    "make e2e"
+  ],
+  "diffBase": "93859864c5ddeb33be6e51b73907a1a22ae4e8bb",
+  "repoRoot": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/vibrant-cartwright-7a2f87",
+  "personasPath": "/Users/manhphan/.claude/plugins/cache/acceptance-gate-kit/acceptance-gate/2.38.1/skills/acceptance/references/judge-personas.md",
+  "templatePath": "/Users/manhphan/.claude/plugins/cache/acceptance-gate-kit/acceptance-gate/2.38.1/skills/acceptance/references/evidence-report-template.md",
+  "toolKillRule": "# TOOL-KILL-RULE — lệnh bị công cụ ngắt KHÔNG phải lệnh fail\n\n**Nguồn duy nhất** của luật «hết giờ không phải trượt» cho MỌI đường chạy lệnh\nkiểm của kit. Hai đường tiêu thụ, cùng đọc khối marker dưới đây, không chép tay:\n\n- **Vòng lặp tính năng** (plugin feature-loop): skill `feature-loop` đọc file này\n  (resolve qua `resolve-plugin.mjs --require skills/acceptance/references/tool-kill-rule.md`)\n  và truyền NGUYÊN VĂN vào `args.toolKillRule` của workflow\n  `acceptance-verify.js`; workflow rút khối marker và nội suy vào prompt của mọi\n  agent chạy lệnh (machine · ui-check · baseline). Thiếu args hoặc không rút\n  được marker → workflow trả BLOCKED có tên, không chạy không luật.\n- **Đường VERIFY độc lập** (skill `acceptance` Phase 3): phiên điều phối chép khối\n  marker VERBATIM vào prompt của phiên tươi VERIFY, cùng nếp «Network truth».\n\nVì sao có luật: verifier chạy lệnh qua Bash tool có trần thời gian mặc định\n(~120 s) NGẮN hơn nhiều suite; lệnh bị công cụ giết trả exit code CỦA CÔNG CỤ,\nkhông phải của lệnh (vấp thật release-2-2-0 S4 r5: suite 108 s đơn lẻ, dưới tải\nbị giết ở 118 s → REJECT giả 4 eval). Nhận diện là việc AGENT (nó thấy tool\nresult thật); phần máy chỉ phòng thủ trên field cấu trúc `killedByTool` —\nKHÔNG grep nội dung output trong engine (chuỗi tổng kết là của suite từng repo).\n\nLệnh dài hơn trần 600 s của công cụ thì KHÔNG bị giết: công cụ **đẩy nó sang\nnền** và nó chạy tiếp. Tệp đầu ra nền trống tới phút chót, vì khung bọc lệnh của\nkit chỉ in khi lệnh xong — đọc trống thành «bị giết» là đúng sự cố crm 07/10/2026\n(hồ sơ `lenh-dai-chay-rieng`: hai lượt BLOCKED giả). Dòng «chuyển sang nền» trong\nkhối dưới là lối LỜI cho mọi lệnh. Lối MÁY: eval khai `long_running: <phút>`\ntrong `evals.yaml` thì lượt chấm feature-loop tự chạy lệnh nền, ghi nhật ký ở\n`.acceptance-runs/<slug>/s4-lenh-dai/` và chờ bằng lệnh nó sinh ra\n(`eval-executors.md`, mục `long_running`).\n\n<!-- <<<TOOL-KILL-RULE -->\nTRAN THOI GIAN CONG CU: khi goi Bash chay lenh, LUON dat tham so timeout >= 600000 (ms) — tran mac dinh cua cong cu (~120s) NGAN hon nhieu suite; lenh vuot tran se bi CONG CU giet va exit code luc do la cua cong cu, KHONG phai cua lenh. Neu lenh van bi cong cu dung (tool result bao timeout/killed, hoac output bi CAT giua chung truoc dong tong ket cuoi cua lenh) → DO KHONG PHAI ket qua that: khai cannotRun=true + killedByTool=true + reason \"bi cong cu giet o <so giay> giay\" kem dau hieu (timeout tool / output cat). TUYET DOI khong bao exitCode nhu the lenh tu fail va khong doan PASS/FAIL tu output cut.\nDAU RA DAI: harness co the CAT DAU RA RA TEP (\"Output too large … saved to <tep>\") va chi hien doan DAU — do KHONG phai bi cong cu giet: doc DUOI tep do (tail) de lay dong tong ket va ma thoat; chi khai killedByTool khi tool result bao timeout/killed that.\nCHUYEN SANG NEN KHONG PHAI BI GIET: tool result bao lenh chua xong trong timeout va da duoc CHUYEN SANG NEN (\"moved to the background\", kem ID + tep dau ra) → lenh VAN DANG CHAY: KHONG khai killedByTool, KHONG ket luan tu tep dau ra luc do. Tep dau ra nen TRONG la binh thuong — khung boc lenh chi in duoi dau ra + dong __EXIT=<n> khi lenh XONG. Cho bang lenh Bash co gioi han (moi lan goi ≤ 100 giay, duoi tran mac dinh 120 giay cua cong cu; vd vong lap kiem tep do co dong __EXIT= chua, sleep vai giay, het 100 giay thi thoat) va goi lai toi khi tep co dong __EXIT=<n> → doc ma tu dong do nhu binh thuong. Tong thoi gian cho toi da = so phut eval khai o long_running (vang thi 30 phut), tinh tu luc chay lenh; qua ma chua co dong __EXIT → cannotRun=true + reason \"lenh chay qua <so> phut chua xong — khai long_running: <phut> cho eval trong evals.yaml\" (KHONG killedByTool), va dung tac vu nen neu cong cu cho phep.\n<!-- TOOL-KILL-RULE>>> -->\n\n## Hồ sơ cho lượt bị ngắt (đường độc lập)\n\nPhiên tươi VERIFY gặp lệnh bị công cụ ngắt thì:\n\n- dòng run-log của eval đó: `\"exit_code\": null, \"killed_by_tool\": true` (không\n  ghi mã thoát của công cụ như mã thoát của lệnh);\n- verdict báo cáo `BLOCKED`, `reason: bi cong cu giet o <so giay> giay — <eval ids>`\n  (kèm dấu hiệu: timeout tool / output cắt trước dòng tổng kết); `failed_evals`\n  rỗng — người đọc hồ sơ thấy đây là sự cố hạ tầng, chữa bằng chạy lại với trần\n  công cụ đủ dài, không phải sửa sản phẩm.\n\nLệnh bị đẩy sang nền rồi QUÁ trần chờ (`long_running`, vắng thì 30 phút) cũng\nlà sự cố hạ tầng chứ không phải lệnh hỏng: dòng run-log `\"exit_code\": null`,\n`\"cannot_run\": true` (KHÔNG `killed_by_tool` — công cụ không giết nó), verdict\n`BLOCKED`, reason gọi tên việc cần làm (khai `long_running: <phút>` cho eval).\n",
+  "contractPath": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/vibrant-cartwright-7a2f87/_acceptance/danh-muc-reui/contract.md",
+  "invokedAt": "2026-11-11T02:00:21Z",
+  "invokedSha": "3c038b32e6c675861194c799f1b6820b4c7a1dde",
+  "vungVat": [
+    "_acceptance/config.yaml",
+    "_acceptance/danh-muc-reui/card-plain.json",
+    "_acceptance/danh-muc-reui/card.html",
+    "_acceptance/danh-muc-reui/design-floor.json",
+    "_acceptance/danh-muc-reui/evals.yaml",
+    "_acceptance/danh-muc-reui/figures/luong-ghim.html",
+    "_acceptance/danh-muc-reui/figures/luong-ghim.png",
+    "design/reui-catalog.json",
+    "tools/reui_catalog/README.md",
+    "tools/reui_catalog/build.mjs",
+    "tools/reui_catalog/catalog.mjs",
+    "tools/reui_catalog/catalog.test.mjs",
+    "tools/reui_catalog/no-network.cjs",
+    "tools/reui_catalog/pin.json",
+    "tools/reui_catalog/snapshot/llms-full.txt",
+    "tools/reui_catalog/snapshot/llms.txt",
+    "tools/reui_catalog/tra.mjs"
+  ],
+  "ngoaiVatGlobs": [
+    "docs/**",
+    "wiki/**",
+    "README.md",
+    "CHANGELOG.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "setup-blueprint.yaml",
+    ".github/workflows/ci.yml",
+    "PRODUCT-MAP.md",
+    "LO-TRINH.html",
+    "docs/tri-thuc/**",
+    "_acceptance/*/**/*.md",
+    "_acceptance/*/**/*.jsonl"
+  ],
+  "ngoaiVatFiles": [
+    "LO-TRINH.html",
+    "PRODUCT-MAP.md",
+    "_acceptance/danh-muc-reui/contract.md",
+    "_acceptance/danh-muc-reui/decisions.jsonl",
+    "_acceptance/danh-muc-reui/design.md",
+    "_acceptance/danh-muc-reui/duong-nen.md",
+    "_acceptance/danh-muc-reui/figures/index.md",
+    "_acceptance/danh-muc-reui/gap-probe.md",
+    "_acceptance/danh-muc-reui/plan.md",
+    "_acceptance/danh-muc-reui/usage-report.md",
+    "wiki/log.md"
+  ],
+  "diffFiles": [
+    "LO-TRINH.html",
+    "PRODUCT-MAP.md",
+    "_acceptance/config.yaml",
+    "_acceptance/danh-muc-reui/card-plain.json",
+    "_acceptance/danh-muc-reui/card.html",
+    "_acceptance/danh-muc-reui/contract.md",
+    "_acceptance/danh-muc-reui/decisions.jsonl",
+    "_acceptance/danh-muc-reui/design-floor.json",
+    "_acceptance/danh-muc-reui/design.md",
+    "_acceptance/danh-muc-reui/duong-nen.md",
+    "_acceptance/danh-muc-reui/evals.yaml",
+    "_acceptance/danh-muc-reui/figures/index.md",
+    "_acceptance/danh-muc-reui/figures/luong-ghim.html",
+    "_acceptance/danh-muc-reui/figures/luong-ghim.png",
+    "_acceptance/danh-muc-reui/gap-probe.md",
+    "_acceptance/danh-muc-reui/plan.md",
+    "_acceptance/danh-muc-reui/usage-report.md",
+    "design/reui-catalog.json",
+    "tools/reui_catalog/README.md",
+    "tools/reui_catalog/build.mjs",
+    "tools/reui_catalog/catalog.mjs",
+    "tools/reui_catalog/catalog.test.mjs",
+    "tools/reui_catalog/no-network.cjs",
+    "tools/reui_catalog/pin.json",
+    "tools/reui_catalog/snapshot/llms-full.txt",
+    "tools/reui_catalog/snapshot/llms.txt",
+    "tools/reui_catalog/tra.mjs",
+    "wiki/log.md"
+  ],
+  "fileDoTrongDiff": [
+    "_acceptance/config.yaml",
+    "_acceptance/danh-muc-reui/card-plain.json",
+    "_acceptance/danh-muc-reui/card.html",
+    "_acceptance/danh-muc-reui/design-floor.json",
+    "_acceptance/danh-muc-reui/evals.yaml",
+    "_acceptance/danh-muc-reui/figures/luong-ghim.html",
+    "_acceptance/danh-muc-reui/figures/luong-ghim.png",
+    "design/reui-catalog.json",
+    "tools/reui_catalog/README.md",
+    "tools/reui_catalog/build.mjs",
+    "tools/reui_catalog/catalog.mjs",
+    "tools/reui_catalog/catalog.test.mjs",
+    "tools/reui_catalog/no-network.cjs",
+    "tools/reui_catalog/pin.json",
+    "tools/reui_catalog/snapshot/llms-full.txt",
+    "tools/reui_catalog/snapshot/llms.txt",
+    "tools/reui_catalog/tra.mjs"
+  ],
+  "coverageFiles": [
+    "design/reui-catalog.json",
+    "tools/reui_catalog/README.md",
+    "tools/reui_catalog/build.mjs",
+    "tools/reui_catalog/catalog.mjs",
+    "tools/reui_catalog/catalog.test.mjs",
+    "tools/reui_catalog/no-network.cjs",
+    "tools/reui_catalog/pin.json",
+    "tools/reui_catalog/snapshot/llms-full.txt",
+    "tools/reui_catalog/snapshot/llms.txt",
+    "tools/reui_catalog/tra.mjs"
+  ],
+  "coEvalPaths": true,
+  "evalsHash": "97c7811831fb7ae0f16f7bdb9543827bdd0dd9d2f23b909d64f888c55eb3407e",
+  "runBaseline": false,
+  "carriedAnalyst": {
+    "fromRound": 1,
+    "nonDiscriminating": [
+      {
+        "cmd": "make test",
+        "evals": [
+          "E8"
+        ]
+      }
+    ]
+  },
+  "carriedEvals": [
+    {
+      "id": "E1",
+      "runId": "minted-danh-muc-reui-E1-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-11T01:47:13Z",
+      "cmd": "node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs && node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs && git diff --exit-code -- design/reui-catalog.json && echo 'reui catalog regenerated twice offline, identical to commit'"
+    },
+    {
+      "id": "E2",
+      "runId": "minted-danh-muc-reui-E2-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-11T01:47:13Z",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose"
+    },
+    {
+      "id": "E3",
+      "runId": "minted-danh-muc-reui-E3-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-11T01:47:13Z",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose"
+    },
+    {
+      "id": "E4",
+      "runId": "minted-danh-muc-reui-E4-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-11T01:47:13Z",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose"
+    },
+    {
+      "id": "E5",
+      "runId": "minted-danh-muc-reui-E5-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-11T01:47:13Z",
+      "cmd": "node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs --check"
+    },
+    {
+      "id": "E5b",
+      "runId": "minted-danh-muc-reui-E5b-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-11T01:47:13Z",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose"
+    },
+    {
+      "id": "E6",
+      "runId": "minted-danh-muc-reui-E6-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-11T01:47:13Z",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose"
+    },
+    {
+      "id": "E7",
+      "runId": "minted-danh-muc-reui-E7-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-11T01:47:13Z",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose"
+    },
+    {
+      "id": "E8",
+      "runId": "minted-danh-muc-reui-E8-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-11T01:47:13Z",
+      "cmd": "make test"
+    },
+    {
+      "id": "E10",
+      "runId": "minted-danh-muc-reui-E10-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-11T01:47:13Z",
+      "cmd": "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose"
+    }
+  ],
+  "carriedFindings": [
+    {
+      "file": "tools/reui_catalog/tra.mjs",
+      "title": "File name, CLI flags and an output line are in Vietnamese, which breaks the repo language rule",
+      "severity": "medium",
+      "plain": "Công cụ tra có tên tệp và tên cờ bằng tiếng Việt, trái quy ước tiếng Anh của kho. Người dùng vẫn tra được bình thường, chỉ là kho chưa nhất quán về cách đặt tên.",
+      "can_cu": "Hậu quả nhẹ, không mất hay lộ dữ liệu, tra vẫn đúng; đổi tên sau này rẻ nhưng phải sửa cả hướng dẫn và các ca kiểm, và thiết kế đã được chủ kho duyệt với các tên này.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "tools/reui_catalog/catalog.test.mjs",
+      "title": "The README test runs the regenerate command against the real repo and can overwrite an uncommitted catalog",
+      "severity": "medium",
+      "plain": "Nếu ai đó đang sửa dở danh mục chưa lưu vào lịch sử, chạy bộ kiểm có thể ghi đè mất bản sửa đó. Trường hợp thường ngày với kho sạch thì không bị ảnh hưởng.",
+      "can_cu": "Chỉ gây mất việc khi người dùng đang sửa tay danh mục, hiếm gặp, và tệp này sinh lại được từ nguồn nên mất mát nhỏ; sửa sau cũng rẻ.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "tools/reui_catalog/tra.mjs",
+      "title": "The lookup CLI ignores `--loai` when it has no value, and `--refresh --from` with no folder crashes",
+      "severity": "low",
+      "plain": "Gõ thiếu giá trị cho bộ lọc loại thì lệnh vẫn trả kết quả của mọi loại mà không báo lỗi. Ghim lại mà quên chỉ thư mục thì lệnh báo lỗi khó hiểu.",
+      "can_cu": "Chỉ xảy ra khi gõ sai lệnh, người dùng thấy ngay kết quả lẫn loại và gõ lại được; không mất hay lộ dữ liệu.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "_acceptance/config.yaml",
+      "title": "The offline executor compares against the index, not the commit, and changes the tracked file",
+      "severity": "low",
+      "plain": "Phép kiểm sinh lại ngoại tuyến có thể báo giống bản đã lưu trong khi thực ra chỉ giống bản đang chuẩn bị lưu. Kết quả báo xanh có thể sai trong trường hợp hiếm đó.",
+      "can_cu": "Chỉ sai khi có thay đổi danh mục đã chuẩn bị mà chưa lưu, hiếm; chạy lại trên cây sạch là rõ ngay và sửa dòng kiểm rất rẻ.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "tools/reui_catalog/catalog.mjs",
+      "title": "Đọc llms-full.txt bỏ im lặng cả mục Pro blocks hoặc Free examples khi tiêu đề mục đổi dạng; ghim lại vẫn thoát 0 và --check vẫn xanh",
+      "severity": "medium",
+      "plain": "Nếu ReUI đổi chữ ở tiêu đề một nhóm, lần ghim lại sau có thể lặng lẽ mất cả nhóm khối mà vẫn báo thành công. Agent khi đó sẽ tra «không có» cho những khối thật ra có.",
+      "can_cu": "Hậu quả khá nặng vì danh mục sai mà không ai biết và agent có thể chép bằng chứng sai, nhưng chỉ xảy ra khi ghim lại sau thay đổi nguồn, và sửa đi kèm một ca kiểm không đắt.",
+      "proposal": "new-contract",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "tools/reui_catalog/tra.mjs",
+      "title": "tra.mjs bỏ qua im lặng bộ lọc --loai khi thiếu giá trị và trả kết quả mọi loại với mã thoát 0",
+      "severity": "low",
+      "plain": "Khi gõ thiếu giá trị cho bộ lọc loại, lệnh vẫn trả kết quả lẫn mọi loại như thể không lọc. Người tra có thể hiểu nhầm đó là kết quả đã lọc.",
+      "can_cu": "Dễ nhận ra vì kết quả lẫn loại, tự gõ lại được và không đụng dữ liệu nào; hậu quả nhẹ.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "tools/reui_catalog/catalog.test.mjs",
+      "title": "Ca E10 chạy lệnh sinh lại trên kho thật, nên khi danh mục lệch nó ghi đè design/reui-catalog.json thật",
+      "severity": "low",
+      "plain": "Khi danh mục đang lệch so với nguồn, chạy bộ kiểm sẽ tự sửa danh mục trên đĩa mà không ai chủ ý, làm lần chạy sau xanh dù độ lệch chưa được xem xét.",
+      "can_cu": "Chỉ xảy ra khi danh mục lệch, hiếm; kết quả là danh mục được sinh lại đúng từ nguồn nên ít hại, và dấu vết vẫn hiện trong thay đổi chưa lưu.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "tools/reui_catalog/catalog.test.mjs",
+      "title": "Hình dạng 5: tuyên quét LỚP nhưng chỉ có điểm-case. Ma trận E6 không phủ hết lớp chuỗi cấm × hai bề mặt mà AC-6 hứa",
+      "severity": "medium",
+      "plain": "Bộ kiểm chỉ thử chèn một phần các chuỗi cấm vào ảnh chụp, nên một số loại chuỗi cấm chưa được chứng minh là bị bắt. Nội dung cấm có thể lọt vào kho công khai mà không ai hay nếu bộ quét hỏng ở những loại đó.",
+      "can_cu": "Rủi ro là lộ nội dung có bản quyền hay khoá vào kho công khai, khó đảo, nhưng hiện chưa có bằng chứng bộ quét hỏng và bổ sung ca kiểm sau này rẻ.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "tools/reui_catalog/catalog.test.mjs",
+      "title": "Hình dạng 3: lời hứa là quan hệ (xếp hạng, cùng kết quả ở hai định dạng) nhưng E4 chỉ kiểm có mặt hoặc đếm số",
+      "severity": "low",
+      "plain": "Thứ tự các kết quả tra và việc hai kiểu in cho cùng kết quả chưa được bộ kiểm khẳng định chặt. Nếu sau này thứ tự đổi hay hai kiểu lệch nhau, bộ kiểm có thể không báo.",
+      "can_cu": "Hậu quả nhẹ vì chỉ là xếp thứ tự hay lệch định dạng, không mất hay lộ dữ liệu, người tra thấy được và bổ sung ca kiểm sau rẻ.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    }
+  ],
+  "thuocChup": {
+    "sha": "3c038b32e6c675861194c799f1b6820b4c7a1dde",
+    "n": 30,
+    "digest": "b932f9ed03c9d307d88b4cdbadfb0b30d95c6e1fbfe7331cfe04663959c59c35",
+    "tep": {
+      "_acceptance/config.yaml": "f70571c259fa0d0756c27f2ec186cc23b153545ab3ac5317fc7d20449f4f172a",
+      "_acceptance/danh-muc-reui/evals.yaml": "97c7811831fb7ae0f16f7bdb9543827bdd0dd9d2f23b909d64f888c55eb3407e",
+      "tests/boundaries.test.ts": "7dac702c9e9811451f8d3741412eef9352348fffd7705b24990367aae24c9ed4",
+      "tests/commit-msg.test.ts": "8276578b01a42d0894f90f68f26d7f42a2ac95c2a845d6278a38dbe202ed611c",
+      "tests/design-check.test.ts": "e75b30023ffe2c9603d3d518265c118525d7bc3431c808a1116b879b372e3a85",
+      "tests/design-registry.test.ts": "77690e33a822e0bca7c54594b290337182adf50b0cc99fb2efde22b5eb9f7869",
+      "tests/e2e/shell.spec.ts": "1b2d500c6cb8ee17da92a6fba5e485f3ef36853474174c964e19b7f102b94b2b",
+      "tests/eslint-ui/no-arbitrary-text-size.test.mjs": "e26da07130ebda5c6028605b747f5bb01cce731022b333508001cdc57271995d",
+      "tests/eslint-ui/no-aschild.test.mjs": "d0d93674c33ccfff57ecc88d5aa73142ba1fe42cb0c7bb30db6b3190491c7766",
+      "tests/eslint-ui/no-banned-motion.test.mjs": "7dff75fe5912362d8e43bd6b093cb84d3fb49a48285501cc123cc679dd9ea401",
+      "tests/eslint-ui/no-emoji-icons.test.mjs": "e1e396b759bb027b38f9ac0a2f0de03ea1a53a532f8942d26b7e33375f09ad6d",
+      "tests/eslint-ui/no-hardcoded-color.test.mjs": "4b4e2cff0314ac20046dafc924704a652484fadea787d7603b17f0e49c67734e",
+      "tests/eslint-ui/no-native-dialogs.test.mjs": "1bc99d37addbc63ece7a51adf4c5f52f00be55fbd25c6673fc6410038c8d6a8b",
+      "tests/eslint-ui/no-off-scale-spacing.test.mjs": "eca3291bfea1b0bb1f0460a6e66fe125d22aece1517652220e7075c771305a83",
+      "tests/eslint-ui/no-partial-class.test.mjs": "61d329f197be1de6873ca1eeac36b73dda24ecdccff31626fdfec68e18d2bab6",
+      "tests/eslint-ui/no-raw-controls.test.mjs": "1a177095c89821090569d694f9b02e62220d14ea2683513b6fece27c79037977",
+      "tests/eslint-ui/no-raw-palette.test.mjs": "f52f15164f9c9853eb1d667d8556e41a3838df5ae579cc693fdb672ab0fffd8f",
+      "tests/eslint-ui/no-raw-table.test.mjs": "effca8d2f4ecf271ec2c0ecb2c38bdab0a937c37a27ee93d5ba7d73a72bdd52d",
+      "tests/eslint-ui/require-disable-reason.test.mjs": "baf8ec8240bc7b33a40c013db91378e7fba7869b16e574efa173949e7edcda9f",
+      "tests/hooks.test.ts": "fd9daa0597cc88ebf42924e2e166b7100863066e5ffa2b61ff54fe9b1b99ed7d",
+      "tests/kit-root.test.ts": "35e67ab3b8dcc753081f600ef59ecbc606b2a11d3804088d475cded52f7a9348",
+      "tests/label.test.ts": "d1c11c558348a0bafbb5ffa1abf9ed92bdb126a0fad52eac26316015059b1a70",
+      "tests/language.test.ts": "fb481c43c49cf1e9545c782ddaa84f50a60a498f0640e04671c18ed3faf0879d",
+      "tests/lint-floor.test.ts": "70f10d4d2c2685354b774202422f6dc05037c7a952e03558744718802aa2d273",
+      "tests/llm.test.ts": "2deac85903d84e8468814448c2ff76ca7134a6f376a1cc65acecf5332dc1cac7",
+      "tests/permissions.test.ts": "cc9ef9b071aad1767cc094b66bd77964bb6fb7059c906aa43037951e72e7a915",
+      "tests/product-invariants.test.ts": "f8eb84cda9b9a276e855e5d792ef8ee8f74ef321b378363f36cda06a0850b3af",
+      "tests/test-utils.mjs": "2ffed2abf743cbc02f23a09b078166b7cecaa67864627aff1b07962710609eca",
+      "tests/typecheck-own.test.mjs": "a2bdc9bbcd83751a1b3c39cde07f516df377dbdd58dc0de23cf490bce1aad9cf",
+      "tools/reui_catalog/catalog.test.mjs": "7de81daad09eb237d910230f660a32305cf76d8832bd3ba6d37e8e9908b2cbc8"
+    }
+  },
+  "cayChup": {
+    "sha": "3c038b32e6c675861194c799f1b6820b4c7a1dde",
+    "ban": {},
+    "chuaTheoDoi": []
+  }
+}
