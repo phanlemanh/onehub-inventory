@@ -5,9 +5,9 @@ slug: cong-chung-minh-man-mau
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-11
 design_doc: _acceptance/cong-chung-minh-man-mau/design.md
 ---
 
