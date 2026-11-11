@@ -117,8 +117,14 @@ async function assertBanner(page: Page, text: string): Promise<void> {
 }
 
 async function openSheet(page: Page): Promise<void> {
-  await page.getByRole("button", { name: "Mở hoặc đóng thanh bên" }).click();
-  await page.locator('[data-mobile="true"]').waitFor({ state: "visible" });
+  // A click that lands before the page hydrates does nothing: press again until the sheet shows.
+  const sheet = page.locator('[data-mobile="true"]');
+  await expect(async () => {
+    if (!(await sheet.isVisible())) {
+      await page.getByRole("button", { name: "Mở hoặc đóng thanh bên" }).click();
+    }
+    await expect(sheet).toBeVisible({ timeout: 2000 });
+  }).toPass({ timeout: 20_000 });
   // Wait for the slide-in to finish: a half-faded sheet is not what the person reads.
   await page.waitForFunction(() =>
     document.getAnimations().every((a) => a.playState !== "running"),
@@ -175,9 +181,8 @@ test.describe("frame", () => {
     await page.goto("/");
     await expect(page.locator("h1")).toBeVisible();
     await expect(page.getByRole("link", { name: "Bảng hàng" })).toBeHidden();
-    await page.getByRole("button", { name: "Mở hoặc đóng thanh bên" }).click();
+    await openSheet(page);
     const sheet = page.locator('[data-mobile="true"]');
-    await expect(sheet).toBeVisible();
     await sheet.getByRole("link", { name: "Bảng hàng" }).click();
     await expect(page).toHaveURL(/\/inventory$/);
     await expect(sheet).toBeHidden();
@@ -355,6 +360,8 @@ test.describe("frame", () => {
     page,
     context,
   }, info) => {
+    // 18 scans with axe: slower CI runners need more than the suite default.
+    test.setTimeout(240_000);
     const phone = PHONE.has(info.project.name);
     /** Written before the code: 9 screens, each scanned in light and in dark. */
     const SCAN_LIST = [
