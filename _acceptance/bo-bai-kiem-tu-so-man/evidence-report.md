@@ -1,15 +1,13 @@
 ---
 schema_version: 2
 feature_slug: bo-bai-kiem-tu-so-man
-verdict: BLOCKED
-failed_evals: []
-reason: |
-  E9: lệnh chạy thật (không bị công cụ giết, không timeout) nhưng Playwright dừng ngay lúc khởi động webServer vì cổng 127.0.0.1:3892 đã bị một tiến trình khác chiếm. Không suite nào được chạy, nên không có kết quả PASS hay FAIL. Cần người dùng đóng tiến trình đang giữ cổng 3892 (hoặc giải phóng cổng) rồi chạy lại lệnh đã ghim. Lệnh: E2E_CPU_THROTTLE=4 npx playwright test tests/e2e/screens --project=1440 --retries=0
-  Lệnh suite make e2e: không khởi động được bài nào, vì webServer của Playwright báo http://127.0.0.1:3892 đã được dùng bởi tiến trình khác; chưa có kết quả e2e hợp lệ cho tới khi cổng được giải phóng hoặc đặt reuseExistingServer.
+verdict: REJECT
+failed_evals: ["E3","E4","E6","E7","E8","E9"]
+reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: eb9f7a1c9cd3fbb4e4829312ed71205a070376ff
+verified_commit: 2f71ee542aea79afda5170c2d6f6efc5e20990d4
 human_signoff:
 ---
 
@@ -19,136 +17,137 @@ human_signoff:
 |---|---|---|---|
 | E1 | AC-1 | script | PASS |
 | E2 | AC-2 | script | PASS |
-| E3 | AC-3 | script | PASS |
-| E4 | AC-4 | script | PASS |
+| E3 | AC-3 | script | FAIL |
+| E4 | AC-4 | script | FAIL |
 | E5 | AC-5 | test | PASS |
-| E6 | AC-6 | script | PASS |
-| E7 | AC-7 | script | PASS |
-| E8 | AC-8 | script | PASS |
-| E9 | AC-9 | script | BLOCKED |
+| E6 | AC-6 | script | FAIL |
+| E7 | AC-7 | script | FAIL |
+| E8 | AC-8 | script | FAIL |
+| E9 | AC-9 | script | FAIL |
 | E10 | AC-10 | script | PASS |
+
+Lệnh `make e2e` (phủ E3, E4, E6, E7, E8, E9) thoát khác 0: 511 bài đạt, 1 bài đỏ, 472 bài bị bỏ qua. Bài đỏ duy nhất là `tests/e2e/screens/screens.spec.ts:136` — vùng hiệu chuẩn, ca `cho-tai`, khổ 414, thông điệp "cho-tai: khong co khung cho sau 1 giay" (recipes.ts:50, gọi từ recipes.ts:312). Vì cả sáu eval dùng chung một lệnh, cả sáu bị tính đỏ. Không có lệnh fail nào ngoài `make e2e`.
 
 ## Evidence
 
 - eval: E1
-  run_id: minted-bo-bai-kiem-tu-so-man-E1-r1
+  run_id: minted-bo-bai-kiem-tu-so-man-E1-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.man_mau
-  verified_at: 2026-11-11T08:28:26Z
+  verified_at: 2026-11-11T08:45:41Z
   output: |
     npx vitest run tools/e2e_templates --coverage.enabled=false --reporter=verbose
-    runs: 1, passes: 1
+    (lệnh chung với E2 và E10, một lượt chạy, toàn bộ đạt)
 
 - eval: E2
-  run_id: minted-bo-bai-kiem-tu-so-man-E2-r1
+  run_id: minted-bo-bai-kiem-tu-so-man-E2-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.man_mau
-  verified_at: 2026-11-11T08:28:26Z
+  verified_at: 2026-11-11T08:45:41Z
   output: |
     npx vitest run tools/e2e_templates --coverage.enabled=false --reporter=verbose
-    runs: 1, passes: 1
+    (lệnh chung với E1 và E10, một lượt chạy, toàn bộ đạt)
 
 - eval: E3
-  run_id: minted-bo-bai-kiem-tu-so-man-E3-r1
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.man_e2e
-  verified_at: 2026-11-11T08:28:26Z
+  run_id: minted-bo-bai-kiem-tu-so-man-E3-r2
+  exit_code: 2
+  baseline: red
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-11T08:45:41Z
   output: |
-    npx playwright test tests/e2e/screens
-    208 passed (47.5s)
+    1) [414] › tests/e2e/screens/screens.spec.ts:136:7 › vung hieu-chuan › vung › vung cho-tai
+       Error: cho-tai: khong co khung cho sau 1 giay
+       at ../../tools/e2e_templates/recipes.ts:50
+    1 failed, 472 skipped, 511 passed (3.8m)
+    make: *** [e2e] Error 1
 
 - eval: E4
-  run_id: minted-bo-bai-kiem-tu-so-man-E4-r1
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.man_e2e
-  verified_at: 2026-11-11T08:28:26Z
+  run_id: minted-bo-bai-kiem-tu-so-man-E4-r2
+  exit_code: 2
+  baseline: red
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-11T08:45:41Z
   output: |
-    npx playwright test tests/e2e/screens
-    208 passed (47.5s)
+    (cùng lượt make e2e với E3)
+    1 failed, 472 skipped, 511 passed (3.8m)
+    make: *** [e2e] Error 1
 
 - eval: E5
-  run_id: minted-bo-bai-kiem-tu-so-man-E5-r1
+  run_id: minted-bo-bai-kiem-tu-so-man-E5-r2
   exit_code: 0
   baseline: green
   verifier: config:executors.test.unit
-  verified_at: 2026-11-11T08:28:26Z
+  verified_at: 2026-11-11T08:45:41Z
   output: |
-    make test
-    runs: 1, passes: 1
+    make test: toàn bộ đạt
 
 - eval: E6
-  run_id: minted-bo-bai-kiem-tu-so-man-E6-r1
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.man_e2e
-  verified_at: 2026-11-11T08:28:26Z
+  run_id: minted-bo-bai-kiem-tu-so-man-E6-r2
+  exit_code: 2
+  baseline: red
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-11T08:45:41Z
   output: |
-    npx playwright test tests/e2e/screens
-    208 passed (47.5s)
+    (cùng lượt make e2e với E3)
+    Bài đỏ: vung hieu-chuan › vung › vung cho-tai, khổ 414
+    make: *** [e2e] Error 1
 
 - eval: E7
-  run_id: minted-bo-bai-kiem-tu-so-man-E7-r1
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.man_e2e
-  verified_at: 2026-11-11T08:28:26Z
+  run_id: minted-bo-bai-kiem-tu-so-man-E7-r2
+  exit_code: 2
+  baseline: red
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-11T08:45:41Z
   output: |
-    npx playwright test tests/e2e/screens
-    208 passed (47.5s)
+    (cùng lượt make e2e với E3)
+    Bài đỏ: cho-tai: khong co khung cho sau 1 giay
+    make: *** [e2e] Error 1
 
 - eval: E8
-  run_id: minted-bo-bai-kiem-tu-so-man-E8-r1
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.man_e2e
-  verified_at: 2026-11-11T08:28:26Z
+  run_id: minted-bo-bai-kiem-tu-so-man-E8-r2
+  exit_code: 2
+  baseline: red
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-11T08:45:41Z
   output: |
-    npx playwright test tests/e2e/screens
-    208 passed (47.5s)
+    (cùng lượt make e2e với E3)
+    1 failed, 472 skipped, 511 passed (3.8m)
+    make: *** [e2e] Error 1
 
 - eval: E9
-  run_id: minted-bo-bai-kiem-tu-so-man-E9-r1
-  exit_code: 1
-  baseline: n-a
-  verifier: config:executors.script.man_e2e_cham
-  verified_at: 2026-11-11T08:28:26Z
+  run_id: minted-bo-bai-kiem-tu-so-man-E9-r2
+  exit_code: 2
+  baseline: red
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-11T08:45:41Z
   output: |
-    E2E_CPU_THROTTLE=4 npx playwright test tests/e2e/screens --project=1440 --retries=0
-    Error: http://127.0.0.1:3892 is already used, make sure that nothing is running on the port/url or set reuseExistingServer:true in config.webServer.
-    BLOCKED: không suite nào chạy; cổng 3892 bị tiến trình khác chiếm.
+    (cùng lượt make e2e với E3)
+    bản chậm 'cham' ở khổ 1440 đạt các bài đã chạy; lượt lệnh vẫn đỏ vì bài cho-tai khổ 414
+    make: *** [e2e] Error 1
 
 - eval: E10
-  run_id: minted-bo-bai-kiem-tu-so-man-E10-r1
+  run_id: minted-bo-bai-kiem-tu-so-man-E10-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.man_mau
-  verified_at: 2026-11-11T08:28:26Z
+  verified_at: 2026-11-11T08:45:41Z
   output: |
     npx vitest run tools/e2e_templates --coverage.enabled=false --reporter=verbose
-    runs: 1, passes: 1
+    (lệnh chung với E1 và E2, một lượt chạy, toàn bộ đạt)
 
 ### Lệnh suite (hồi quy)
 
 - cmd: make check
-  run_id: minted-bo-bai-kiem-tu-so-man-SUITE-make_check-r1
-  exit_code: 2
-  verified_at: 2026-11-11T08:28:26Z
-  note: không gắn eval nào; bước lint báo 200 vấn đề (189 lỗi, 11 cảnh báo), phần lớn là no-undef ('args', 'log', 'phase' chưa khai báo) ở một tệp có hơn 2000 dòng; make dừng ở bước lint.
+  run_id: minted-bo-bai-kiem-tu-so-man-SUITE-make_check-r2
+  exit_code: 0
+  verified_at: 2026-11-11T08:45:41Z
 
 - cmd: npm run build
-  run_id: minted-bo-bai-kiem-tu-so-man-SUITE-build-r1
+  run_id: minted-bo-bai-kiem-tu-so-man-SUITE-build-r2
   exit_code: 0
-  verified_at: 2026-11-11T08:28:26Z
-
-- cmd: make e2e
-  run_id: minted-bo-bai-kiem-tu-so-man-SUITE-make_e2e-r1
-  exit_code: 1
-  verified_at: 2026-11-11T08:28:26Z
-  note: không gắn eval nào; webServer của Playwright báo cổng 127.0.0.1:3892 đã bị chiếm, chưa chạy bài nào.
+  verified_at: 2026-11-11T08:45:41Z
 
 ## Known limits
 
@@ -156,19 +155,16 @@ human_signoff:
 
 ## Analyst
 
-Eval không phân biệt (xanh ở cả code hiện tại lẫn baseline): E5 (make test), nên xem là regression-guard có chủ ý hoặc viết lại để khẳng định hành vi mới.
+Eval không phân biệt (xanh cả trên HEAD lẫn baseline): E5 (`make test`) — hồi quy giữ nguyên, cần xác nhận là regression-guard có chủ ý hoặc viết lại để khẳng định hành vi mới.
 
 Baseline khong do
 - npx vitest run tools/e2e_templates --coverage.enabled=false --reporter=verbose: bo qua baseline: tep tools/e2e_templates co o cay dang kiem nhung chua co o merge-base 90ad801c5bc2b93cff0b408cd37533bb7cd48347 — eval moi, chay tren code cu khong phan biet gi
-- npx playwright test tests/e2e/screens: bo qua baseline: tep tests/e2e/screens co o cay dang kiem nhung chua co o merge-base 90ad801c5bc2b93cff0b408cd37533bb7cd48347 — eval moi, chay tren code cu khong phan biet gi
-- E2E_CPU_THROTTLE=4 npx playwright test tests/e2e/screens --project=1440 --retries=0: bo qua baseline: tep tests/e2e/screens co o cay dang kiem nhung chua co o merge-base 90ad801c5bc2b93cff0b408cd37533bb7cd48347 — eval moi, chay tren code cu khong phan biet gi
-
-Judge panels: không có eval nào thuộc loại judgment; không có panel nào cần đề xuất.
 
 ## Variance
 
-none — every multi-run eval is uniform
+none — mọi eval chạy một lần, không có phương sai.
 
 ## Iterations
 
-Round 1: E9 bị chặn (BLOCKED) vì cổng 3892 đang bị tiến trình khác chiếm; make check dừng ở bước lint (200 vấn đề, chủ yếu no-undef); make e2e không khởi động được vì cùng lý do cổng. Chờ người giải phóng cổng rồi chạy lại.
+Round 1: lịch sử round 1 không nằm trong dữ liệu của round này.
+Round 2: E3, E4, E6, E7, E8, E9 failed — một bài đỏ duy nhất trong `make e2e`: vùng `cho-tai` ở khổ 414 không thấy khung chờ trong 1 giây (recipes.ts:312). Returned to implementation.

@@ -2,7 +2,7 @@
 // a recipe. Recipes never open pages, so every case waits for the same "ready" before it touches anything.
 import { expect, type Page } from "@playwright/test";
 
-import type { Break, Ctx, Recipe } from "./recipes";
+import { pinned, type Break, type Ctx, type Recipe } from "./recipes";
 
 const THROTTLE = Number(process.env["E2E_CPU_THROTTLE"] ?? "0");
 const MIN_SLOWDOWN = 2.5;
@@ -67,6 +67,7 @@ export async function open(
   });
   if (recipe.clock) await page.clock.install();
   if (brk?.before) await brk.before(ctx);
+  if (recipe.setup) await recipe.setup(ctx);
   await page.goto(`${url}${recipe.query ?? ""}`);
   if (!recipe.loading) await waitReady(page);
   return ctx;
@@ -102,7 +103,7 @@ export async function runBreak(
   }
   if (thrown === null) throw new Error(`${recipe.id}: pha "${brk.name}" ma ham kiem van xanh`);
   const message = thrown instanceof Error ? thrown.message : String(thrown);
-  expect(message, `${recipe.id}: pha "${brk.name}"`).toMatch(brk.message);
+  expect(message, `${recipe.id}: pha "${brk.name}"`).toMatch(pinned(brk, ctx.screen));
   if (brk.withinMs !== undefined) {
     const took = Date.now() - started;
     expect(took, `${recipe.id}: pha "${brk.name}" phai do trong ${brk.withinMs}ms`).toBeLessThan(

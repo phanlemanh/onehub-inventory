@@ -1,6 +1,6 @@
 // Structure check of the recipe set (roadmap row 1f): every region state of design/states.md has exactly one recipe,
 // and every recipe can be proven red. Pure functions; the unit test reads the real files and edited copies.
-import type { Recipe } from "./recipes";
+import { pinned, type Recipe } from "./recipes";
 
 const LIST = /Các trạng thái vùng \(([^)]*)\)/;
 
@@ -35,7 +35,8 @@ export function checkRecipes(recipes: readonly Recipe[], statesMd: string): stri
     ids.add(r.id);
     if (r.breaks.length === 0) problems.push(`cong thuc ${r.id}: thieu cach pha`);
     for (const b of r.breaks) {
-      if (!(b.message instanceof RegExp) || b.message.source.length < 4) {
+      const message = pinned(b, "man-thu");
+      if (!(message instanceof RegExp) || message.source.length < 4) {
         problems.push(`cong thuc ${r.id}: cach pha "${b.name}" thieu thong diep ghim`);
       }
       if (!b.before && !b.apply)

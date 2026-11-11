@@ -19,8 +19,8 @@ export interface Ctx {
 
 export interface Break {
   name: string;
-  /** The check must throw an error whose message matches this. */
-  message: RegExp;
+  /** The check must throw an error whose message matches this; a function gets the screen id (frame recipes). */
+  message: RegExp | ((screen: string) => RegExp);
   /** Runs before the page opens (init scripts). */
   before?: (ctx: Ctx) => Promise<void>;
   /** Runs after the page is ready, before the check. */
@@ -37,6 +37,8 @@ export interface Recipe {
   query?: string;
   /** Install Playwright's clock before opening. */
   clock?: boolean;
+  /** Runs before the page opens, after a break's `before` (so it sees what the page asks, before a break changes it). */
+  setup?: (ctx: Ctx) => Promise<void>;
   /** Region recipes open on a page that may still be loading; the runner then skips the region-ready wait. */
   loading?: boolean;
   check: (ctx: Ctx) => Promise<void>;
@@ -45,6 +47,16 @@ export interface Recipe {
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const SHORT = 5_000;
+
+/** A string as a literal inside a regular expression. */
+export function escapeRe(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/** The pinned message of a break for this screen. */
+export function pinned(brk: Break, screen: string): RegExp {
+  return typeof brk.message === "function" ? brk.message(screen) : brk.message;
+}
 
 function fail(message: string): never {
   throw new Error(message);
@@ -64,7 +76,7 @@ export const FRAME: Recipe[] = [
     breaks: [
       {
         name: "doi chu h1",
-        message: /: tieu-de — /,
+        message: (id) => new RegExp(`^${escapeRe(id)}: tieu-de — `),
         apply: async ({ page }) => {
           await page
             .locator("h1")
@@ -87,7 +99,7 @@ export const FRAME: Recipe[] = [
     breaks: [
       {
         name: "chen phan tu rong 2000px",
-        message: /: cuon-ngang — /,
+        message: (id) => new RegExp(`^${escapeRe(id)}: cuon-ngang — `),
         apply: async ({ page }) => {
           await page.evaluate(() => {
             const wide = document.createElement("div");
@@ -109,7 +121,7 @@ export const FRAME: Recipe[] = [
     breaks: [
       {
         name: "nem loi tren trang",
-        message: /: loi-trinh-duyet — .*pha thu/,
+        message: (id) => new RegExp(`^${escapeRe(id)}: loi-trinh-duyet — .*pha thu`),
         apply: async ({ page }) => {
           await page.evaluate(() => {
             setTimeout(() => {
@@ -143,7 +155,7 @@ export const FRAME: Recipe[] = [
     breaks: [
       {
         name: "chu trang tren nen trang",
-        message: /: axe .*color-contrast/,
+        message: (id) => new RegExp(`^${escapeRe(id)}: axe .*color-contrast`),
         apply: async ({ page }) => {
           await page.addStyleTag({
             content:
@@ -296,12 +308,34 @@ export const REGION: Recipe[] = [
     query: "?state=loading",
     clock: true,
     loading: true,
+    setup: async ({ page }) => {
+      // Note when the page arms a timer of about one second (the region's loading step, region-state.tsx).
+      await page.addInitScript(() => {
+        const original = window.setTimeout;
+        window.setTimeout = ((fn: TimerHandler, ms?: number, ...rest: unknown[]) => {
+          if (ms !== undefined && ms >= 900 && ms <= 1100) {
+            (window as unknown as { __henGio1s?: boolean }).__henGio1s = true;
+          }
+          return original(fn, ms, ...rest);
+        }) as typeof setTimeout;
+      });
+    },
     async check({ page }) {
       const skeleton = page.locator('[data-slot="region-skeleton"]');
       try {
         await skeleton.waitFor({ state: "attached", timeout: SHORT });
       } catch {
         fail("cho-tai: khung cho khong hien");
+      }
+      // The region arms its 1 s timer once hydrated; on a busy machine that is after the skeleton is attached. Wait,
+      // in real time, until it is armed, so the fake clock never runs ahead of it.
+      for (let waited = 0; ; waited += 100) {
+        const armed = await page.evaluate(
+          () => (window as unknown as { __henGio1s?: boolean }).__henGio1s === true,
+        );
+        if (armed) break;
+        if (waited >= 15_000) fail("cho-tai: vung khong hen gio 1 giay");
+        await page.waitForTimeout(100);
       }
       await page.clock.runFor(500);
       if ((await skeleton.evaluate((el) => getComputedStyle(el).visibility)) !== "hidden") {

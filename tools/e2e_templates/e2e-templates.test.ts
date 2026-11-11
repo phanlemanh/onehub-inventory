@@ -8,7 +8,15 @@ import { dirname, join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { FRAME, NO_REGION_YET, REGION, classifyGrid, compareRows, pickNeedle } from "./recipes";
+import {
+  FRAME,
+  NO_REGION_YET,
+  REGION,
+  classifyGrid,
+  compareRows,
+  pickNeedle,
+  pinned,
+} from "./recipes";
 import { REPO_ROOT } from "./register";
 import { checkRecipes, regionStates } from "./structure";
 
@@ -62,6 +70,27 @@ describe("công thức phủ bảng trạng thái", () => {
       },
     } as unknown as (typeof REGION)[number];
     expect(checkRecipes([...REGION, opener], STATES_MD)).toEqual(["cong thuc tu-mo: tu mo trang"]);
+  });
+});
+
+// ---- pinned messages name the screen (E4) ----------------------------------------------------------------------
+
+describe("thông điệp ghim gọi tên màn", () => {
+  /** Written before the code: each frame break and the message its check throws on screen "sign-in". */
+  const CASES: [string, string][] = [
+    ["tieu-de", 'sign-in: tieu-de — mong "Đăng nhập", thay []'],
+    ["khong-cuon-ngang", "sign-in: cuon-ngang — trang rộng hơn màn 1640px"],
+    ["khong-loi-trinh-duyet", "sign-in: loi-trinh-duyet — pha thu"],
+    ["axe-sang-toi", "sign-in: axe color-contrast (light)"],
+  ];
+  it("matches the screen it ran on and no other", () => {
+    expect(CASES.map(([id]) => id)).toEqual(FRAME.map((r) => r.id));
+    for (const [id, thrown] of CASES) {
+      const brk = FRAME.find((r) => r.id === id)!.breaks[0]!;
+      expect(thrown, id).toMatch(pinned(brk, "sign-in"));
+      expect(thrown.replace("sign-in", "today"), id).not.toMatch(pinned(brk, "sign-in"));
+      expect(thrown.replace("sign-in", "null"), id).not.toMatch(pinned(brk, "sign-in"));
+    }
   });
 });
 
