@@ -49,6 +49,7 @@ TEP_SO_DO = "so-do-vong.json"
 LENH = "python3 tools/round_metrics/round_metrics.py"
 KHUNG_1A = "_acceptance/khung-va-giao-dien/contract.md"
 THU_MUC_MOC = "docs/plan/do-he-design"
+CAU_GIAO_DA_GUI = "## Câu giao đã gửi (nguyên văn, đường dẫn máy đã lược)"
 
 
 class LoiDauVao(Exception):
@@ -263,14 +264,16 @@ def kiem_moc(root: Path) -> tuple[list[str], list[str]]:
         loi.append("tep phuong an trung")
     de_bai_path = root / str(moc.get("de_bai", ""))
     de_bai = cau_giao(de_bai_path.read_text("utf-8"), "## Câu giao (chép nguyên văn cho cả ba agent)") if de_bai_path.is_file() else ""
-    mong = de_bai.replace("<bản kho>", str(moc.get("ban_kho", "")))
+    # The sent brief is kept with the machine path elided back to the brief's own placeholder,
+    # so it must equal the fixed brief exactly, placeholder included.
+    mong = de_bai
     for a in agents:
         tep = root / str(a.get("tep", ""))
         text = tep.read_text("utf-8") if tep.is_file() else ""
         if not text.strip():
             loi.append(f"tep phuong an rong: agent {a.get('so')}")
             continue
-        if not mong or cau_giao(text, "## Câu giao đã gửi (nguyên văn)") != mong:
+        if not mong or cau_giao(text, CAU_GIAO_DA_GUI) != mong:
             loi.append(f"cau giao khac de bai: agent {a.get('so')}")
     bang = root / str(moc.get("bang_so", ""))
     if not bang.is_file() or not bang.read_text("utf-8").strip():

@@ -29,7 +29,8 @@ Cách đo chép từ phép đo ba tác tử ở Quỹ hàng (`onehub-quy-hang` `
 >
 > Trả lời bằng tiếng Việt, toàn bộ phương án trong câu trả lời cuối (dạng markdown).
 
-`<bản kho>` là đường tuyệt đối tới bản kho sạch của lần đo, ghi trong `moc.json`. Agent chạy với kiểu agent `general-purpose`,
+`<bản kho>` là đường tuyệt đối tới bản kho sạch của lần đo, một worktree tạm tại commit ghi trong `moc.json`. Tệp phương án
+giữ câu đã gửi với đường ấy lược về lại `<bản kho>`, vì kho công khai. Agent chạy với kiểu agent `general-purpose`,
 mô hình của phiên giao việc, không có ngữ cảnh khác.
 
 ## Danh sách quyết định của bảng so

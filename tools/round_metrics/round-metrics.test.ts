@@ -520,6 +520,31 @@ describe("kiem-moc", () => {
           ),
       ],
       ["moc.json hong", (c) => writeFileSync(c.mocPath, "{khong phai json")],
+      [
+        "cau giao khac de bai: agent 1",
+        (c) => {
+          // A machine path written back into the sent brief no longer equals the fixed brief.
+          const p = join(c.root, c.moc.agent[0].tep);
+          writeFileSync(
+            p,
+            readFileSync(p, "utf8").replace("ở thư mục `<bản kho>`", "ở thư mục `/tmp/moc-tree`"),
+          );
+        },
+      ],
+      [
+        "cau giao khac de bai: agent 3",
+        (c) => {
+          // The old heading claimed a verbatim brief; only the elided heading is read.
+          const p = join(c.root, c.moc.agent[2].tep);
+          writeFileSync(
+            p,
+            readFileSync(p, "utf8").replace(
+              "## Câu giao đã gửi (nguyên văn, đường dẫn máy đã lược)",
+              "## Câu giao đã gửi (nguyên văn)",
+            ),
+          );
+        },
+      ],
     ];
     for (const [message, breakIt] of cases) {
       const c = mocRepo();

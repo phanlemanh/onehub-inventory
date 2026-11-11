@@ -78,8 +78,8 @@ tệp `agent-N.md` chép nguyên văn câu đã gửi cho agent, rút máy từ 
 Lệnh `round_metrics.py kiem-moc` kiểm `moc.json`:
 
 - đủ ba agent với ba tệp phương án khác nhau và không rỗng, có bảng so;
-- câu đã gửi trong mỗi `agent-N.md` bằng đúng câu giao của `de-bai-ba-agent.md` sau khi thay `<bản kho>` bằng đường bản kho của
-  `moc.json`, và ba câu bằng nhau;
+- câu đã gửi trong mỗi `agent-N.md` (mục «nguyên văn, đường dẫn máy đã lược», đường bản kho để lại là `<bản kho>`) bằng đúng câu
+  giao của `de-bai-ba-agent.md`, kể cả chỗ trống ấy, và ba câu bằng nhau;
 - commit có thật; ở commit đó hồ sơ `khung-va-giao-dien` chưa có hoặc chưa qua Cổng Bằng chứng; và thư mục mốc
   `docs/plan/do-he-design/moc-*/` chưa có ở commit đó (bản kho agent đọc là một worktree sạch tại commit, nên không agent nào đọc
   được phương án của agent khác).
