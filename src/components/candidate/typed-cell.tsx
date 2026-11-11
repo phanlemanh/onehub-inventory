@@ -7,6 +7,7 @@ import { EMPTY, STATUS_TONE, formatByKind, statusLabel, statusTone } from "@/lib
 
 import { alignFor } from "./column-kind";
 import { GRID_COPY } from "./grid-copy";
+import { TruncatedText } from "./truncated-text";
 
 const TEXT_KINDS: readonly DisplayKind[] = ["text", "person", "select"];
 
@@ -34,14 +35,7 @@ function CellValue({
     );
   }
   if (kind === "boolean") return <>{value ? GRID_COPY.yes : GRID_COPY.no}</>;
-  if (TEXT_KINDS.includes(kind)) {
-    const text = String(value);
-    return (
-      <span className="block truncate" title={text}>
-        {text}
-      </span>
-    );
-  }
+  if (TEXT_KINDS.includes(kind)) return <TruncatedText text={String(value)} />;
   return <>{formatByKind(kind, value)}</>;
 }
 

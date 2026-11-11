@@ -26,7 +26,10 @@ function sampleRows(): GridRow[] {
       id: `mau-${i + 1}`,
       "Listing.unitNumber": `${building}-${String(floor).padStart(2, "0")}${String((i % 12) + 1).padStart(2, "0")}`,
       "Listing.buildingName": building,
-      "Listing.subdivisionName": `Ocean Park ${(i % 3) + 1}`,
+      "Listing.subdivisionName":
+        i % 4 === 0
+          ? `Ocean Park ${(i % 3) + 1}, dãy căn hộ ven hồ phía đông gần cổng chính`
+          : `Ocean Park ${(i % 3) + 1}`,
       "Listing.standardStatus": STATUSES[i % STATUSES.length],
       "Listing.listPrice": 1_800_000_000 + ((i * 137_000_000) % 6_400_000_000),
       "Unit.livingArea": 32 + ((i * 7.5) % 110),

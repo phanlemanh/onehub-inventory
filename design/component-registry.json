@@ -90,6 +90,19 @@
       ]
     },
     {
+      "name": "TruncatedText",
+      "file": "src/components/candidate/truncated-text.tsx",
+      "level": "atom",
+      "parts": [
+        {
+          "name": "TruncatedText",
+          "props": [
+            "text"
+          ]
+        }
+      ]
+    },
+    {
       "name": "TypedCell",
       "file": "src/components/candidate/typed-cell.tsx",
       "level": "molecule",

@@ -189,6 +189,44 @@ test.describe("grid", () => {
     });
   }
 
+  async function assertLongTextReadable(page: Page): Promise<void> {
+    const cut = page.locator('[data-slot="truncated-text"][data-cut="true"]').first();
+    if ((await cut.getAttribute("tabindex")) !== "0")
+      throw new Error("long text not reachable by keyboard");
+    await cut.focus();
+    const shown = await cut.evaluate((el) => ({
+      wraps: getComputedStyle(el).whiteSpace !== "nowrap",
+      fits: el.scrollWidth <= el.clientWidth,
+      full: el.textContent,
+      title: el.getAttribute("title"),
+    }));
+    if (!shown.wraps || !shown.fits || shown.full !== shown.title) {
+      throw new Error("long text not readable on focus");
+    }
+  }
+
+  test("long text is cut but reads in full on keyboard focus", async ({ page }) => {
+    await openGrid(page);
+    await expect(
+      page.locator('[data-slot="truncated-text"][data-cut="true"]').first(),
+    ).toBeAttached();
+    await page.keyboard.press("Tab"); // keyboard modality, so :focus-visible applies to focus() below
+    await assertLongTextReadable(page);
+    // A short value that fits takes no Tab stop.
+    const short = page.locator('[data-slot="truncated-text"]:not([data-cut])').first();
+    await expect(short).not.toHaveAttribute("tabindex", "0");
+  });
+
+  test("long-text check fails when the cut cell cannot take focus", async ({ page }) => {
+    await openGrid(page);
+    const cut = page.locator('[data-slot="truncated-text"][data-cut="true"]').first();
+    await expect(cut).toBeAttached();
+    await cut.evaluate((el) => el.removeAttribute("tabindex"));
+    await expect(assertLongTextReadable(page)).rejects.toThrow(
+      "long text not reachable by keyboard",
+    );
+  });
+
   test("many columns on a phone render dense", async ({ page }, info) => {
     test.skip(!PHONE.has(info.project.name), "desktop");
     await openGrid(page);
