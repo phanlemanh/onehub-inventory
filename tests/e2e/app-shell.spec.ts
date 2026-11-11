@@ -2,6 +2,9 @@
 // (_acceptance/app-shell-chon-tu-reui/evals.yaml E1, E3, E4, E5). Signed out, the person holds no role, so the rail
 // shows the three entries open to everyone. Each check has a twin that feeds it a wrong expectation and must fail with
 // the pinned message, so a check that never runs cannot pass silently.
+import { mkdirSync } from "node:fs";
+import { join } from "node:path";
+
 import { expect, test, type Page } from "@playwright/test";
 
 import { LABELS } from "../../src/generated/labels";
@@ -63,6 +66,14 @@ function assertSheetClosed(visibleLinks: number): void {
   if (visibleLinks > 0) throw new Error("sheet stayed open after choosing");
 }
 
+/** SHOTS_DIR=<dir> saves the frames E10 looks at (one per named state). */
+async function shot(page: Page, name: string) {
+  const dir = process.env["SHOTS_DIR"];
+  if (!dir) return;
+  mkdirSync(dir, { recursive: true });
+  await page.screenshot({ path: join(dir, `E10-${name}.png`) });
+}
+
 async function noSideways(page: Page) {
   return page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -84,6 +95,8 @@ test.describe("App Shell on a computer", () => {
         assertCurrent(state, s.href);
         await expect(column(page)).toBeVisible();
         await expect(page.locator('[data-slot="app-shell-top-bar"]')).toBeVisible();
+        if (s.href === "/inventory" && page.viewportSize()?.width === 1440)
+          await shot(page, `inventory-1440-${colorScheme}`);
       }
     });
   }
@@ -170,6 +183,8 @@ test.describe("App Shell on a phone", () => {
         await expect(column(page)).toBeHidden();
         await expect(rail(page)).toHaveCount(0);
         expect(await noSideways(page)).toBeLessThanOrEqual(0);
+        if (s.href === "/inventory" && page.viewportSize()?.width === 360)
+          await shot(page, `inventory-360-${colorScheme}`);
       }
     });
   }
@@ -184,6 +199,7 @@ test.describe("App Shell on a phone", () => {
     for (const name of SECOND_COLUMN["/inventory"]!) {
       await expect(sheet.getByRole("link", { name, exact: true }).first()).toBeVisible();
     }
+    if (page.viewportSize()?.width === 360) await shot(page, "sheet-360-light");
     await sheet.getByRole("link", { name: LABELS.Sent.pref, exact: true }).click();
     await expect(page.locator("h1")).toHaveText(LABELS.Sent.pref);
     await expect(sheet).toHaveCount(0);

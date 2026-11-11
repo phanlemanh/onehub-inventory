@@ -76,10 +76,12 @@ evals:
     criterion: AC-1
     executor: ui-check
     layer: ui-observed
-    cmd: config:executors.design.ui_check
-    paths: [src/components/templates/app-shell/**]
-    expected: "ảnh 1440 sáng và 360 tối của Bảng hàng trong App Shell mới: cột biểu tượng, cột thứ hai, thanh trên đúng vị trí như bản đã duyệt ở Cổng Phạm vi; chữ đọc được trên nền"
-    evidence_required: [screenshot, observed, verdict]
+    paths: [src/components/templates/app-shell.tsx, src/components/templates/app-shell/**, tests/e2e/app-shell.spec.ts]
+    steps:
+      - "Run SHOTS_DIR=_acceptance/app-shell-chon-tu-reui/evidence npx playwright test tests/e2e/app-shell.spec.ts; the spec saves E10-inventory-1440-light.png, E10-inventory-1440-dark.png, E10-inventory-360-light.png, E10-inventory-360-dark.png and E10-sheet-360-light.png"
+      - "Read every evidence/E10-*.png frame and compare with the approved prototype frames in _acceptance/app-shell-chon-tu-reui/evidence/design-pass/anh/ (inventory-1440-light.jpg, inventory-360-dark.jpg, q5-a.jpg)"
+    expected: "ở 1440: cột biểu tượng hẹp bên trái có dấu OneHub và các biểu tượng màn, cột thứ hai có «Tất cả hàng» và sáu trạng thái không mang số, thanh trên có nút đổi giao diện và góc tài khoản, cách xếp như ảnh đã duyệt ở Cổng Phạm vi; ở 360 không cột nào chiếm màn và ngăn trượt mở ra có cả biểu tượng màn lẫn mục của cột thứ hai; tối đổi nền và chữ, đọc được"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
 
   - id: E11
     criterion: AC-4
