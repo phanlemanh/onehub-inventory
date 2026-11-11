@@ -2,7 +2,7 @@
 // A phone number lives only on the contact, so changing it once changes it for every listing of that person.
 // The real-data scan is taken from onehub-quy-hang commit 1f8a6edd (quetChuoi in packages/db/seed/du-lieu-mau.mjs).
 import { LABELS } from "../../generated/labels";
-import type { Contact } from "../../generated/ontology";
+import type { Contact, ListingOwner, ListingOwnerContactType } from "../../generated/ontology";
 
 /** Ids of sample records start with "MAU" written in hex — the same prefix the listings module uses. */
 export const SAMPLE_ID_PREFIX = "4d415500-";
@@ -25,14 +25,11 @@ export const SAMPLE_BUYER_COUNT = 10;
 /** Listings at the end of the list that get no owner. */
 export const SAMPLE_UNOWNED_COUNT = 4;
 
-/** The link between an owner and a listing (relation `Contact owns Listing`). */
-export interface OwnerLink {
-  id: string;
-  companyId: string;
-  contactId: string;
-  listingId: string;
-  contactType: "Seller";
-}
+/** The link between an owner and a listing: the generated ontology concept `ListingOwner`, under its earlier name. */
+export type OwnerLink = ListingOwner;
+
+/** The roles an owner link may carry; buyers and tenants are not owners of a listing. */
+export const OWNER_ROLES: readonly ListingOwnerContactType[] = ["Seller", "Landlord"];
 
 export interface SampleContacts {
   contacts: Contact[];
@@ -147,15 +144,30 @@ export function checkLinkCases(data: SampleContacts, listingIds: readonly string
   return errors;
 }
 
-/** Owner links point at contacts and listings that exist; every contact and link belongs to the given company. */
+/**
+ * Owner links point at contacts and listings that exist, carry an owner role, and belong to the given company. With
+ * the company of each listing, also checks that a link, its contact and its listing share one company.
+ */
 export function checkOwnerLinks(
   data: SampleContacts,
   listingIds: ReadonlySet<string>,
   companyId: string,
+  listingCompanies?: ReadonlyMap<string, string>,
 ): string[] {
   const errors: string[] = [];
   const contactIds = new Set(data.contacts.map((c) => c.id));
+  const contactCompany = new Map(data.contacts.map((c) => [c.id, c.companyId]));
   for (const o of data.owners) {
+    if (!OWNER_ROLES.includes(o.contactType))
+      errors.push(`vai không hợp lệ trên liên kết chủ: ${o.id}`);
+    if (listingCompanies) {
+      const ofContact = contactCompany.get(o.contactId);
+      if (ofContact !== undefined && ofContact !== o.companyId)
+        errors.push(`liên kết chủ khác sàn với liên hệ: ${o.id}`);
+      const ofListing = listingCompanies.get(o.listingId);
+      if (ofListing !== undefined && ofListing !== o.companyId)
+        errors.push(`liên kết chủ khác sàn với lần chào: ${o.id}`);
+    }
     if (!listingIds.has(o.listingId))
       errors.push(`liên kết chủ trỏ lần chào không có: ${o.listingId}`);
     if (!contactIds.has(o.contactId))

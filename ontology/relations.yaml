@@ -27,3 +27,33 @@ relations:
     to: Agreement
     cardinality: one-to-many
     description: Every connection a company enables is one agreement.
+  - from: Company
+    name: holds_owner_link
+    to: ListingOwner
+    cardinality: one-to-many
+    description: A company holds the owner links of its own listings.
+  - from: Contact
+    name: owns_through
+    to: ListingOwner
+    cardinality: one-to-many
+    description: A contact owns listings through owner links; this is how Contact owns Listing is stored.
+  - from: Listing
+    name: owned_through
+    to: ListingOwner
+    cardinality: one-to-many
+    description: A listing has zero or more owner links.
+  - from: Company
+    name: holds_unit_link
+    to: ListingUnit
+    cardinality: one-to-many
+    description: A company holds the unit links of its own listings.
+  - from: Listing
+    name: placed_on
+    to: ListingUnit
+    cardinality: one-to-one
+    description: Each listing points at exactly one catalog unit.
+  - from: Unit
+    name: offered_through
+    to: ListingUnit
+    cardinality: one-to-many
+    description: One unit can be offered by several listings; this is how Unit offered_as Listing is stored.

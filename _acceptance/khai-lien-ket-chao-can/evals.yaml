@@ -1,0 +1,58 @@
+schema_version: 1
+feature_slug: khai-lien-ket-chao-can
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [ontology/entities/**, src/generated/ontology.ts, tests/link-types.test.ts]
+    expected: "exit 0; tests/link-types.test.ts đạt; ca 'AC-1' đọc ontology/entities/ListingOwner.yaml và ListingUnit.yaml (đường suy từ vị trí tệp kiểm) và khẳng định ma trận viết trước bảy trường tham chiếu (ListingOwner.companyId→Company, ListingOwner.contactId→Contact, ListingOwner.listingId→Listing, ListingUnit.companyId→Company, ListingUnit.listingId→Listing, ListingUnit.upi→Unit) cùng ListingOwner.contactType là enum đúng [Seller, Landlord], mọi trường required: true; đọc src/generated/ontology.ts khẳng định interface ListingOwner có đúng năm trường bắt buộc và dòng 'export type ListingOwnerContactType = \"Seller\" | \"Landlord\";', interface ListingUnit đúng bốn trường bắt buộc; chiều đỏ trên bản sao: đổi đích upi thành Listing → 'tham chiếu sai: ListingUnit.upi → Listing', bỏ required của contactType → 'trường không bắt buộc: ListingOwner.contactType'; đối chứng dương: companyId → Company không bị báo"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [ontology/relations.yaml, tests/link-types.test.ts]
+    expected: "exit 0; ca 'AC-2' đọc ontology/relations.yaml, khẳng định ma trận viết trước sáu quan hệ mới kèm cardinality (Company holds_owner_link ListingOwner one-to-many, Contact owns_through ListingOwner one-to-many, Listing owned_through ListingOwner one-to-many, Company holds_unit_link ListingUnit one-to-many, Listing placed_on ListingUnit one-to-one, Unit offered_through ListingUnit one-to-many), hai quan hệ cũ 'Contact owns Listing' và 'Unit offered_as Listing' còn nguyên, mọi đầu from/to là tên một tệp trong ontology/entities; chiều đỏ trên bản sao: bỏ 'Listing placed_on ListingUnit' → 'thiếu quan hệ: Listing placed_on ListingUnit', đổi cardinality của nó thành one-to-many → 'sai cardinality: Listing placed_on ListingUnit', đổi đích thành 'Lead' → 'đầu quan hệ không có: Lead'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/**, src/modules/contacts/**, tests/link-types.test.ts]
+    expected: "exit 0; ca 'AC-3' khẳng định bằng kiểu: expectTypeOf<OwnerLink>().toEqualTypeOf<ListingOwner>() và kiểu phần tử listingUnits của buildSampleListings bằng ListingUnit sinh ra (typecheck trong make check cũng bắt); quét mọi tệp .ts của src/modules/listings và src/modules/contacts không có 'interface ListingUnit', 'interface OwnerLink', 'interface ListingOwner', 'type ListingUnit = {', 'type OwnerLink = {', 'type ListingOwner = {'; chiều đỏ trên bản sao văn bản chèn 'export type OwnerLink = {' → 'khai lại kiểu bằng tay: OwnerLink', chèn 'export interface ListingUnit {' → 'khai lại kiểu bằng tay: ListingUnit'; đối chứng dương: 'export type OwnerLink = ListingOwner;' không bị báo"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/contacts/**, tests/link-types.test.ts]
+    expected: "exit 0; ca 'AC-4': mọi liên kết chủ của sàn mẫu có contactType thuộc {Seller, Landlord}; checkOwnerLinks trên vật lành trả 0 lỗi; chiều đỏ trên bản sao đổi contactType một liên kết thành 'Buyer' → 'vai không hợp lệ trên liên kết chủ: <mã>'; đối chứng dương: bản sao đổi thành 'Landlord' không bị báo"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/catalog/**, src/modules/listings/**, src/modules/contacts/**, tests/link-types.test.ts]
+    expected: "exit 0; ca 'AC-5' của tests/link-types.test.ts tự dựng sàn mẫu qua cửa index.ts của ba mô-đun, tính SHA-256 của JSON và so với hằng '16f9b15b3465b3f16b9a2e9ccfef6d00f0656a88f3b9d23f5492df128ece6ca0' viết trong chính tệp kiểm mới; chiều đỏ: bản sao đổi vai một liên kết cho băm khác hằng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.check
+    paths: [ontology/**, wiki/entities/**, wiki/index.md, architecture/modules.yaml, src/generated/**, tests/link-types.test.ts]
+    expected: "exit 0; make check xanh: 'wiki-lint: 7 entities, 0 errors, 0 warnings', 'boundaries: 0 errors, 0 warnings', 'src/generated/ontology.ts is up to date', bài kiểm ngôn ngữ đạt; ca 'AC-6' của tests/link-types.test.ts khẳng định ontology/glossary.md có dòng '`ListingOwner`' và '`ListingUnit`', architecture/modules.yaml cho contacts sở hữu ListingOwner và listings sở hữu ListingUnit, depends_on của mọi mô-đun vẫn rỗng; chiều đỏ trên bản sao modules.yaml bỏ ListingOwner khỏi owns của contacts → 'không mô-đun nào sở hữu: ListingOwner'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/**, src/modules/contacts/**, tests/link-types.test.ts]
+    expected: "exit 0; ca 'AC-7': checkOwnerLinks nhận thêm sàn của từng lần chào và báo 0 lỗi trên sàn mẫu; checkListingLinks báo 0 lỗi; chiều đỏ trên bản sao: một liên hệ đổi companyId sang sàn khác (liên kết giữ sàn mẫu) → 'liên kết chủ khác sàn với liên hệ: <mã liên kết>', một lần chào đổi companyId → 'liên kết chủ khác sàn với lần chào: <mã liên kết>', thêm liên kết căn thứ hai cho một lần chào → 'lần chào có 2 căn: <mã lần chào>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

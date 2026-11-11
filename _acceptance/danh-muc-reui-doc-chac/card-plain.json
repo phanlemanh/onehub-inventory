@@ -1,0 +1,7 @@
+{
+  "feature_plain": "Khi nguồn ReUI đổi cách ghi tiêu đề một nhóm, lệnh ghim lại danh mục dừng và nói rõ nhóm nào mất; lưới chặn mã nguồn và khoá bản quyền được thử ở mọi chỗ, kể cả tên trường; tiêu đề các nhóm chỉ khai ở một chỗ.",
+  "decisions": [
+    {"id": "E11", "q": "Hướng dẫn đã nói đủ khi nào ghim lại dừng và phải làm gì chưa?", "why": "Ba người chấm đều thấy đạt; hành vi thật của lệnh do máy đo riêng."},
+    {"id": "E14", "q": "Hướng dẫn đã nói tiêu đề nhóm chỉ cần sửa ở một chỗ chưa?", "why": "Ba người chấm đều thấy đạt; việc đổi một chỗ là đủ đã được máy chạy thử trên bản sao."}
+  ]
+}

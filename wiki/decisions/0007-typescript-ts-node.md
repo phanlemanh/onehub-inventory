@@ -32,3 +32,8 @@ Tự động: partial. Các việc làm tay còn lại:
 
 - Thêm Next.js 16, React 19, Tailwind 4, ReUI, Hono + zod-openapi, better-auth, pg khi chuyển mã; build đổi từ tsc sang next build. Chuyển kèm máy chủ MCP reui và shadcn dùng lúc phát triển, và REUI_LICENSE_KEY.
 - Bộ khung dùng Vitest, kho cũ dùng node:test với 417 tệp: đổi dòng import bằng codemod khi chuyển từng mô-đun, giữ nguyên node:assert. Test chạm cơ sở dữ liệu chạy tuần tự trong một cấu hình Vitest riêng.
+
+## Bổ sung 2026-11-11 — đăng nhập không dùng better-auth
+
+Hàng 8 (`dang-nhap-ma-email`) tự viết phần đăng nhập và chỉ thêm gói `pg`; better-auth không còn là gói sẽ thêm. Lý do
+và chi tiết: [0021](0021-dang-nhap-ma-email.md). Chữ ở trên giữ nguyên làm sử liệu.

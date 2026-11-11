@@ -17,3 +17,5 @@ Mỗi vùng dữ liệu phải khai đủ các trạng thái dưới đây, ở 
 | Link hết hạn     | Trang khách nói rõ link không còn dùng và cách liên hệ người gửi, không lộ dữ liệu | Bài kiểm của trang khách   |
 
 Mỗi bài kiểm giao diện phải chứng minh được là đỏ khi phá đúng chỗ nó đo.
+
+Các trạng thái vùng (chờ tải, trống, tìm không ra, lỗi, một phần hỏng, chữ dài, không đủ quyền) dựng sẵn trong `DataRegion`; bài kiểm của vùng là `tests/grid.test.tsx` và `tests/behavior.test.tsx`, bài trình duyệt là `tests/e2e/grid.spec.ts` và `tests/e2e/behavior.spec.ts`. Khi vùng đang tải, lỗi hay không đủ quyền, đầu vùng chỉ có tên vùng: không số dòng, không ô tìm.

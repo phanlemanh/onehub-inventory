@@ -11,6 +11,8 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
+import type { Role } from "@/generated/ontology";
+
 import { FRAME_COPY } from "./frame-copy";
 import { NavMenu, type NavItem } from "./nav-menu";
 import { ConnectionWatcher, ScreenBanner } from "./screen-banner";
@@ -27,11 +29,15 @@ export const MAIN_ID = "main-content";
  */
 export function AppShell({
   nav,
-  role,
+  roles,
+  account,
   children,
 }: {
   nav: readonly NavItem[];
-  role?: string;
+  /** Every role the signed-in person holds; the sidebar shows the entries of all of them. */
+  roles?: readonly Role[];
+  /** The account corner of the top bar: sign-in link or account menu (row 8). */
+  account?: ReactNode;
   children?: ReactNode;
 }) {
   return (
@@ -54,14 +60,17 @@ export function AppShell({
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <NavMenu items={nav} role={role} />
+            <NavMenu items={nav} roles={roles} />
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
       <SidebarInset id={MAIN_ID} tabIndex={-1}>
         <div className="flex h-14 items-center justify-between gap-2 border-b px-4">
           <SidebarTrigger aria-label={FRAME_COPY.openSidebar} />
-          <ThemeSwitch />
+          <div className="flex items-center gap-2">
+            <ThemeSwitch />
+            {account}
+          </div>
         </div>
         <ConnectionWatcher />
         <ScreenBanner />

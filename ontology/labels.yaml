@@ -38,6 +38,16 @@ concepts:
     pref: Thoả thuận
     en: Agreement
     avoid: [Tích hợp]
+  ListingOwner:
+    kind: entity
+    own: true
+    pref: Chủ của hàng
+    en: Listing owner
+  ListingUnit:
+    kind: entity
+    own: true
+    pref: Căn của hàng
+    en: Listing unit
   Subdivision:
     kind: entity
     reso: SubdivisionName
@@ -192,3 +202,13 @@ concepts:
     pref: Mã đăng nhập
     en: Login code
     avoid: [Mật khẩu]
+  SignIn:
+    kind: action
+    own: true
+    pref: Đăng nhập
+    en: Sign in
+  SignOut:
+    kind: action
+    own: true
+    pref: Đăng xuất
+    en: Sign out
