@@ -11,7 +11,7 @@ import {
 
 const MAIL: InviteMail = {
   email: "moi@example.test",
-  companyName: "[Sàn A]",
+  companyName: "[Công ty A]",
   inviterName: "[Tên] P",
   roles: ["TeamLead", "ListAgent"],
   origin: "https://vi-du.test/",
@@ -26,7 +26,7 @@ describe("invite mail", () => {
   it("thu-moi-noi-dung", () => {
     const { subject, text } = inviteEmail(MAIL);
     expect(subject).toContain("[Tên] P");
-    expect(subject).toContain("[Sàn A]");
+    expect(subject).toContain("[Công ty A]");
     assertHasLogin(text);
     expect(text).toContain(`${LABELS.ListAgent.pref}, ${LABELS.TeamLead.pref}`);
     expect(text).toContain(LABELS.SignIn.pref);
