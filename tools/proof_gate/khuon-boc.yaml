@@ -1,0 +1,5 @@
+# Templates that wrap screens (decision 0023). A contract that declares `khuon_boc: <id>` proves the template in
+# `## Khuôn <id>` instead of proving every screen it lists. Only ids here count; adding one is a high-tier change.
+khuon:
+  - id: app-shell
+    ly_do: App Shell bọc mọi màn của nhân viên; chủ kho chốt app-shell-8 ngày 2026-11-11 (hàng 1o).

@@ -1,0 +1,17 @@
+# Block ledger — decision 0023 «Chọn trước, tạo sau — kho lớn dần» (wiki/decisions/0023-chon-truoc-tao-sau.md).
+# One line per thing taken into the store, chosen from ReUI or made by hand, after the owner saw it at the scope gate.
+# tools/proof_gate/check.py reads this file: the rung `trong-kho` looks a block up here, and every block a round
+# takes in (rung `reui` or `ve-tay`) needs its line here. While this file exists, decision 0023 is on for the gate.
+#
+#   ten       name of the store template (as written in the «Khối» table)
+#   tep       its code file
+#   nguon     the ReUI block it started from (a name in design/reui-catalog.json), or tao-tay
+#   nhu_cau   need key, lowercase with dashes — one need, one solution: two lines with the same key fail
+#   mo_ta     the need in one plain sentence
+#   ho_so     the round that took it in (_acceptance/<ho_so>/)
+#   duyet     the day the owner approved that round's scope gate (YYYY-MM-DD, equal to its approved_at)
+#
+# Empty on purpose: per decision 0023 nothing is in the store yet in the full sense. App Shell, sign-in, Members and
+# the form dialog are chosen again in rows 1o, 1p and 9c; the grid template is arranged in row 2.
+version: 1
+khoi: []

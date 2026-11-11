@@ -1,0 +1,9 @@
+# Rounds that had passed the scope gate when row 1n (decision 0023) merged. They keep the rules of row 1c.
+# The list only shrinks: tools/proof_gate/proof-gate-0023.test.ts pins it to a subset of these three names.
+ho_so:
+  - slug: app-shell-chon-tu-reui
+    ly_do: Hàng 1o đã qua Cổng Phạm vi trước khi luật 0023 vào cổng; giám sát đồng ý ở tin G-1111-20.
+  - slug: moi-nguoi-gan-vai
+    ly_do: Hàng 9 đã qua Cổng Phạm vi và đang chờ ký Cổng Bằng chứng; màn Thành viên chọn lại ở hàng 9c.
+  - slug: va-dang-nhap
+    ly_do: Hàng 1m đã qua Cổng Phạm vi và đang chờ ký Cổng Bằng chứng; màn đăng nhập chọn lại ở hàng 1p.
