@@ -100,10 +100,10 @@ describe("navigation by role", () => {
     CompanyAdmin: [true, true, true, true],
   };
 
-  function renderedTitles(role?: string): string[] {
+  function renderedTitles(role?: (typeof ROLES)[number]): string[] {
     const { container, unmount } = render(
       <SidebarProvider>
-        <NavMenu items={ITEMS} role={role} />
+        <NavMenu items={ITEMS} roles={role ? [role] : undefined} />
       </SidebarProvider>,
     );
     const titles = [...container.querySelectorAll("a")].map((a) => a.textContent ?? "");
