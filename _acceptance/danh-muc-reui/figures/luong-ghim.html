@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Luồng bản ghim ReUI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Lora:ital,wght@0,400;1,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #eb6c36;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', 'Lora', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1400px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 900px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Sơ đồ luồng · Cổng Phạm vi · danh mục ReUI</p>
+    <h1>Bản ghim ReUI: một đường mạng duy nhất, mọi việc khác tại máy</h1>
+
+    <svg viewBox="0 0 1352 504" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- ===== Arrows (drawn first, behind nodes) ===== -->
+      <!-- reui.io → ảnh chụp: chỉ khi ghim lại (dashed, network) -->
+      <line x1="168" y1="208" x2="352" y2="208" stroke="#2e5aa8" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow-link)"/>
+      <!-- ảnh chụp → lệnh sinh lại -->
+      <line x1="552" y1="208" x2="600" y2="208" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- lệnh sinh lại → danh mục -->
+      <line x1="744" y1="208" x2="792" y2="208" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- danh mục → lệnh tra (split, upper) -->
+      <path d="M992 192 H1024 Q1032 192 1032 184 V96 Q1032 88 1040 88 H1072" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- danh mục → bộ kiểm (split, lower) -->
+      <path d="M992 224 H1024 Q1032 224 1032 232 V336 Q1032 344 1040 344 H1072" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+      <!-- Edge label above the network edge (8px gap to the line) -->
+      <rect x="176" y="168" width="168" height="32" rx="2" fill="#f5f5f5"/>
+      <text x="260" y="181" fill="#2e5aa8" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">chỉ khi người chạy ghim lại</text>
+      <text x="260" y="195" fill="#2e5aa8" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">— đường mạng duy nhất</text>
+      <!-- Criterion reference below the network edge (8px gap) -->
+      <rect x="240" y="216" width="40" height="16" rx="2" fill="#f5f5f5"/>
+      <text x="260" y="228" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-7</text>
+
+      <!-- ===== Nodes ===== -->
+      <!-- N1: reui.io (external source, oval) -->
+      <rect x="40" y="176" width="128" height="64" rx="32" fill="#f5f5f5"/>
+      <rect x="40" y="176" width="128" height="64" rx="32" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="104" y="208" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">reui.io</text>
+      <text x="104" y="224" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">mạng</text>
+
+      <!-- N2: ảnh chụp + tệp ghim (focal, store) -->
+      <rect x="352" y="160" width="200" height="96" rx="6" fill="#f5f5f5"/>
+      <rect x="352" y="160" width="200" height="96" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <rect x="360" y="168" width="36" height="16" rx="2" fill="transparent" stroke="rgba(235,108,54,0.40)" stroke-width="0.8"/>
+      <text x="378" y="180" fill="#ba4513" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-2</text>
+      <text x="452" y="208" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Ảnh chụp trong kho</text>
+      <text x="452" y="224" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">+ tệp ghim</text>
+      <text x="452" y="244" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">SHA-256 · ngày ghim</text>
+
+      <!-- N3: lệnh sinh lại (step) -->
+      <rect x="600" y="160" width="144" height="96" rx="6" fill="#f5f5f5"/>
+      <rect x="600" y="160" width="144" height="96" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="608" y="168" width="36" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="626" y="180" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-1</text>
+      <text x="672" y="216" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Lệnh sinh lại</text>
+      <text x="672" y="234" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">không mạng</text>
+
+      <!-- N4: danh mục trong kho (store) -->
+      <rect x="792" y="160" width="200" height="96" rx="6" fill="#f5f5f5"/>
+      <rect x="792" y="160" width="200" height="96" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+      <rect x="800" y="168" width="36" height="16" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+      <text x="818" y="180" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-3</text>
+      <text x="892" y="216" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Danh mục trong kho</text>
+      <text x="892" y="234" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">tên · tiêu đề · mô tả</text>
+
+      <!-- N5a: lệnh tra (step) -->
+      <rect x="1072" y="52" width="240" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="1072" y="52" width="240" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="1080" y="60" width="36" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="1098" y="72" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-4</text>
+      <text x="1192" y="96" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Lệnh tra</text>
+      <text x="1192" y="112" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">agent dùng</text>
+
+      <!-- N5b: bộ kiểm trong make check (focal, step) -->
+      <rect x="1072" y="288" width="240" height="112" rx="6" fill="#f5f5f5"/>
+      <rect x="1072" y="288" width="240" height="112" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <rect x="1080" y="296" width="76" height="16" rx="2" fill="transparent" stroke="rgba(235,108,54,0.40)" stroke-width="0.8"/>
+      <text x="1118" y="308" fill="#ba4513" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-5 · AC-6</text>
+      <text x="1192" y="336" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Bộ kiểm trong <tspan font-family="'Geist Mono', monospace" font-weight="500">make check</tspan></text>
+      <text x="1192" y="360" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">băm khớp · sinh lại trùng byte</text>
+      <text x="1192" y="376" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">mọi mục tra ra · không chuỗi cấm</text>
+
+      <!-- ===== Note ===== -->
+      <text x="40" y="432" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif"><tspan fill="#ba4513" font-weight="600">Ô đỏ khi:</tspan> băm lệch · số mục lệch số khai · mục tra không ra · có mã hay khoá</text>
+
+      <!-- ===== Legend ===== -->
+      <line x1="40" y1="456" x2="1312" y2="456" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
+      <text x="40" y="484" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.18em">CHÚ GIẢI</text>
+
+      <rect x="132" y="474" width="24" height="12" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="164" y="484" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Nguồn ngoài kho</text>
+
+      <rect x="280" y="474" width="24" height="12" rx="2" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="1"/>
+      <text x="312" y="484" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Tệp trong kho</text>
+
+      <rect x="416" y="474" width="24" height="12" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="448" y="484" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Lệnh chạy tại máy, không mạng</text>
+
+      <line x1="616" y1="480" x2="644" y2="480" stroke="#2e5aa8" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow-link)"/>
+      <text x="652" y="484" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Đường mạng, chỉ khi ghim lại</text>
+
+      <rect x="824" y="474" width="24" height="12" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <text x="856" y="484" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Viền cam: nơi bản ghim được giữ và được kiểm</text>
+
+      <text x="1312" y="484" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.06em">AC-n: tiêu chí liên quan</text>
+    </svg>
+  </div>
+</body>
+</html>
