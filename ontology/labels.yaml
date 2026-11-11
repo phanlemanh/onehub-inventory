@@ -202,3 +202,13 @@ concepts:
     pref: Mã đăng nhập
     en: Login code
     avoid: [Mật khẩu]
+  SignIn:
+    kind: action
+    own: true
+    pref: Đăng nhập
+    en: Sign in
+  SignOut:
+    kind: action
+    own: true
+    pref: Đăng xuất
+    en: Sign out

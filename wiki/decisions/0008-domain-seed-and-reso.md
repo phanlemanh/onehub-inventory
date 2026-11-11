@@ -33,3 +33,9 @@ Tự động: partial. Các việc làm tay còn lại:
 - Chốt khi chuyển mô-đun catalog: toà ánh xạ tài nguyên Building mới có ở 2.1; căn cho thuê có dùng PropertyType Residential Lease hay không; ngăn ảnh internal ánh xạ giá trị Permission nào vì RESO không có giá trị Internal.
 - Giữ Postgres và lược đồ hiện có. Kho cũ là nơi DUY NHẤT ghi migration và áp lên bản thật cho đến lúc chuyển; kho mới chỉ chép nguyên văn các tệp đã gộp, không tự thêm migration, và không bao giờ áp lên bản thật trước lúc chuyển.
 - Chuyển CONTEXT.md, 27 ADR và docs/product/tham-chieu.md sang wiki của kho mới. Lịch sử _acceptance ở lại kho cũ.
+
+## Bổ sung 2026-11-11 — migration viết mới trong kho này
+
+Kho này đã viết migration của riêng mình từ hàng 8: `002_dang_nhap_ma_email.sql` không chép từ Quỹ hàng (bản Quỹ hàng
+làm bộ kiểm cách ly của hàng 7 đỏ). Migration 001 vẫn là bản chép nguyên văn. Lý do và chi tiết:
+[0021](0021-dang-nhap-ma-email.md). Chữ ở trên giữ nguyên làm sử liệu.

@@ -1,0 +1,23 @@
+{
+ "ban": "8ee15fdf20865e117d188e4fcb9769b2318e98e0",
+ "base": "d8f6667f126ffe6f72d732be4020b1273b81b76d",
+ "den": "e4829d9735098c43fb39ab51a62eb130bf226366",
+ "sua_tep_luat": {
+  "may": [],
+  "nguoi": []
+ },
+ "cham": [
+  {
+   "ma": "SP-1",
+   "tep": "db/migrations/002_dang_nhap_ma_email.sql",
+   "dong": 11,
+   "chu": "    create role quy_hang_identity nologin nosuperuser nocreatedb nocreaterole bypassrls;"
+  },
+  {
+   "ma": "SP-1",
+   "tep": "src/modules/identity/with-company.ts",
+   "dong": 32,
+   "chu": "  const pool = new pg.Pool({ connectionString: url, max: 10 });"
+  }
+ ]
+}

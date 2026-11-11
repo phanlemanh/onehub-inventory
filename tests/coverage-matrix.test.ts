@@ -183,7 +183,9 @@ describe("screens", () => {
       (m) => m[1],
     );
     expect(new Set(routes)).toEqual(new Set(built));
-    expect(new Set(built)).toEqual(new Set(["/", "/inventory", "/sent", "/proto/[slug]"]));
+    expect(new Set(built)).toEqual(
+      new Set(["/", "/inventory", "/sent", "/proto/[slug]", "/login"]),
+    );
   });
 
   it("an undeclared page is red", () => {

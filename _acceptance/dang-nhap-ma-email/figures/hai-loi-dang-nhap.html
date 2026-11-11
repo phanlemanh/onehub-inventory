@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hai lối đăng nhập</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Lora:ital,wght@0,400;1,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-soft:    #636b80;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', 'Lora', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1240px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+      color: var(--color-ink);
+      margin-bottom: 0.5rem;
+    }
+    .sub { color: var(--color-muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+    svg { width: 100%; min-width: 960px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Hình tại điểm quyết định · dang-nhap-ma-email</p>
+    <h1>Hai lối đăng nhập: tự viết hay better-auth</h1>
+    <p class="sub">Hỏi-1 của thiết kế · AC-6, AC-9</p>
+
+    <svg viewBox="0 0 1200 620" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="arrow-red" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#c0392b"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- Lane headers -->
+      <text x="408" y="68" fill="#ba4513" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" letter-spacing="0.18em">LỐI A · TỰ VIẾT · KHUYẾN NGHỊ</text>
+      <text x="408" y="332" fill="#4f5d75" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" letter-spacing="0.18em">LỐI B · BETTER-AUTH</text>
+      <line x1="400" y1="304" x2="968" y2="304" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+
+      <!-- ===== Arrows (drawn before boxes) ===== -->
+      <!-- start -> route -->
+      <line x1="184" y1="252" x2="206" y2="252" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- route -> lane A / lane B (fanned attach points) -->
+      <path d="M360 240 H372 Q380 240 380 232 V132 Q380 124 388 124 H406" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <path d="M360 264 H372 Q380 264 380 272 V372 Q380 380 388 380 H406" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- lane A steps -->
+      <line x1="576" y1="124" x2="598" y2="124" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="768" y1="124" x2="790" y2="124" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- lane B steps -->
+      <line x1="576" y1="380" x2="598" y2="380" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="768" y1="380" x2="790" y2="380" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- consequences (dashed) -->
+      <line x1="876" y1="160" x2="876" y2="190" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <line x1="684" y1="416" x2="684" y2="454" stroke="#c0392b" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow-red)"/>
+      <line x1="876" y1="416" x2="876" y2="454" stroke="#c0392b" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow-red)"/>
+      <!-- lanes -> end (fanned attach points) -->
+      <path d="M960 124 H976 Q984 124 984 132 V236 Q984 244 992 244 H1022" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <path d="M960 380 H992 Q1000 380 1000 372 V268 Q1000 260 1008 260 H1022" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+      <!-- ===== Shared start ===== -->
+      <rect x="40" y="220" width="144" height="64" rx="20" fill="#f5f5f5"/>
+      <rect x="40" y="220" width="144" height="64" rx="20" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="112" y="248" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Trình duyệt</text>
+      <text x="112" y="266" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">gửi email + mã</text>
+
+      <rect x="208" y="220" width="152" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="208" y="220" width="152" height="64" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="284" y="248" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Đường đăng nhập</text>
+      <text x="284" y="266" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">/api/v1/auth</text>
+
+      <!-- ===== Lane A ===== -->
+      <rect x="408" y="88" width="168" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="408" y="88" width="168" height="72" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <text x="492" y="118" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Qua cửa withCompany</text>
+      <text x="492" y="136" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">vai quy_hang_app</text>
+
+      <rect x="600" y="88" width="168" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="600" y="88" width="168" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="684" y="112" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Hàm hẹp của vai riêng</text>
+      <text x="684" y="130" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">quy_hang_identity</text>
+      <text x="684" y="144" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">chỉ đọc 2 bảng sàn</text>
+
+      <rect x="792" y="88" width="168" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="792" y="88" width="168" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="876" y="118" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Schema identity</text>
+      <text x="876" y="136" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">chỉ chủ đọc</text>
+
+      <rect x="792" y="192" width="168" height="80" rx="6" fill="#f5f5f5"/>
+      <rect x="792" y="192" width="168" height="80" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="876" y="218" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Bộ kiểm cách ly xanh</text>
+      <text x="876" y="236" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">giữ nguyên, không miễn</text>
+      <text x="876" y="248" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">thành viên lọc theo sàn</text>
+      <text x="876" y="260" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">+ ca kiểm vai riêng (SP-1)</text>
+
+      <!-- ===== Lane B ===== -->
+      <rect x="408" y="344" width="168" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="408" y="344" width="168" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="492" y="374" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Thư viện better-auth</text>
+      <text x="492" y="392" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">tự giữ kết nối riêng</text>
+
+      <rect x="600" y="344" width="168" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="600" y="344" width="168" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="684" y="374" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Kết nối chủ thứ hai</text>
+      <text x="684" y="392" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">đi ngoài cửa</text>
+
+      <rect x="792" y="344" width="168" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="792" y="344" width="168" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="876" y="374" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Schema identity</text>
+      <text x="876" y="392" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">chép từ Quỹ hàng</text>
+
+      <!-- red consequences -->
+      <rect x="600" y="456" width="168" height="64" rx="6" fill="#f5f5f5"/>
+      <rect x="600" y="456" width="168" height="64" rx="6" fill="rgba(192,57,43,0.08)" stroke="#c0392b" stroke-width="1.4"/>
+      <text x="684" y="482" fill="#9c2a1f" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Thêm tệp miễn</text>
+      <text x="684" y="500" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">bài quét một cửa</text>
+
+      <rect x="792" y="456" width="168" height="80" rx="6" fill="#f5f5f5"/>
+      <rect x="792" y="456" width="168" height="80" rx="6" fill="rgba(192,57,43,0.08)" stroke="#c0392b" stroke-width="1.4"/>
+      <text x="876" y="482" fill="#9c2a1f" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Bộ kiểm cách ly đỏ</text>
+      <text x="876" y="500" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">thành viên đọc theo người</text>
+      <text x="876" y="516" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">phải thêm danh sách cho phép</text>
+
+      <!-- ===== Shared end ===== -->
+      <rect x="1024" y="220" width="144" height="64" rx="20" fill="#f5f5f5"/>
+      <rect x="1024" y="220" width="144" height="64" rx="20" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="1096" y="248" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Truy vấn của sàn</text>
+      <text x="1096" y="266" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">qua withCompany</text>
+
+      <!-- AC tags -->
+      <rect x="1068" y="296" width="56" height="16" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+      <text x="1096" y="308" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-6</text>
+      <rect x="976" y="476" width="56" height="16" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+      <text x="1004" y="488" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-9</text>
+      <rect x="728" y="216" width="56" height="16" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+      <text x="756" y="228" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-9</text>
+
+      <!-- ===== Legend ===== -->
+      <line x1="40" y1="568" x2="1160" y2="568" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
+      <text x="40" y="588" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.18em">CHÚ GIẢI</text>
+
+      <rect x="40" y="600" width="14" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="60" y="608" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Bước</text>
+
+      <rect x="112" y="600" width="14" height="10" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.2"/>
+      <text x="132" y="608" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Lối khuyến nghị đi qua cửa</text>
+
+      <rect x="284" y="600" width="14" height="10" rx="2" fill="rgba(192,57,43,0.08)" stroke="#c0392b" stroke-width="1.2"/>
+      <text x="304" y="608" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Cái giá phải trả</text>
+
+      <line x1="404" y1="604" x2="432" y2="604" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <text x="440" y="608" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Luồng</text>
+
+      <line x1="488" y1="604" x2="516" y2="604" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <text x="524" y="608" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Hệ quả</text>
+
+      <rect x="580" y="598" width="28" height="12" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+      <text x="616" y="608" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Tiêu chí nghiệm thu</text>
+    </svg>
+  </div>
+</body>
+</html>

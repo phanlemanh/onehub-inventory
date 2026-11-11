@@ -30,11 +30,14 @@ export const MAIN_ID = "main-content";
 export function AppShell({
   nav,
   roles,
+  account,
   children,
 }: {
   nav: readonly NavItem[];
   /** Every role the signed-in person holds; the sidebar shows the entries of all of them. */
   roles?: readonly Role[];
+  /** The account corner of the top bar: sign-in link or account menu (row 8). */
+  account?: ReactNode;
   children?: ReactNode;
 }) {
   return (
@@ -64,7 +67,10 @@ export function AppShell({
       <SidebarInset id={MAIN_ID} tabIndex={-1}>
         <div className="flex h-14 items-center justify-between gap-2 border-b px-4">
           <SidebarTrigger aria-label={FRAME_COPY.openSidebar} />
-          <ThemeSwitch />
+          <div className="flex items-center gap-2">
+            <ThemeSwitch />
+            {account}
+          </div>
         </div>
         <ConnectionWatcher />
         <ScreenBanner />
