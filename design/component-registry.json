@@ -1375,7 +1375,7 @@
           "name": "AppShell",
           "props": [
             "nav",
-            "role"
+            "roles"
           ]
         },
         {
@@ -1395,7 +1395,7 @@
           "name": "NavMenu",
           "props": [
             "items",
-            "role"
+            "roles"
           ]
         }
       ]
