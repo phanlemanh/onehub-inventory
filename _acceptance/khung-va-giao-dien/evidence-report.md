@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 5463021943e1a8a9fbf0fd2b8d8566cc7e441598
+verified_commit: f253f9ebec43a7f4a22fa76666c4a8fe704fc761
 human_signoff:
 ---
 
@@ -248,3 +248,7 @@ none — every multi-run eval is uniform
 
 Round 1: lệnh suite make check đỏ ở vòng đầu; trả về triển khai.
 Round 2: chạy lại E1, E2, E5, E15, E17 và hai lệnh suite, tất cả xanh; các eval còn lại carry-forward từ round 1.
+
+### Re-pin lần 1 — 2026-11-11, do bài kiểm đối chứng tương phản bỏ phụ thuộc hiệu ứng chuyển màu (CI chậm đọc màu giữa chừng)
+run_id: repin-20261111T000514Z-40115
+sha: f253f9ebec43a7f4a22fa76666c4a8fe704fc761 · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng · ngoài làn máy: E15, E16 (E16 không khai paths)
