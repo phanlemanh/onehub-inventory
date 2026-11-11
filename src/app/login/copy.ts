@@ -23,4 +23,8 @@ export const LOGIN_COPY = {
   switchCompany: "Đổi sàn",
   currentCompany: "Đang làm ở",
   noCurrentCompany: "Chưa chọn sàn",
+  signOutFailed: (signOut: string) =>
+    `Chưa đăng xuất được. Bạn vẫn đang đăng nhập trên máy này — kiểm tra mạng rồi bấm «${signOut}» lại.`,
+  noCompanySession:
+    "Tài khoản của bạn không còn thuộc sàn nào. Nhờ quản trị sàn mời lại, hoặc đăng xuất để dùng email khác.",
 } as const;
