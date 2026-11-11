@@ -7,6 +7,8 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-11 — Vá phần đăng nhập: đường trở về sau đăng nhập kiểm bằng danh sách cho phép và bộ đọc địa chỉ của trình duyệt (14 dạng lách, mỗi dạng một ca); đăng xuất lỗi mạng hay máy chủ báo rõ «chưa thoát» và giữ người ở trang; người hết sàn mà còn phiên có nút Đăng xuất thay cho danh sách sàn trống — hàng 1m, `_acceptance/va-dang-nhap/`
+
 - 2026-11-11 — Cổng chứng minh màn mẫu: máy suy lối của từng màn (họ mới, màn mẫu mới, theo mẫu) từ sổ màn và bản đồ khuôn; `make test` đỏ khi vòng khai màn sản phẩm mà thiếu ảnh cạnh màn mẫu, còn chỗ lệch vô cớ, họ mới dưới hai hướng, hay rơi bậc thang thiếu căn cứ; khai họ Lưới trong `design/patterns/luoi.md` — hàng 1c, [0019](decisions/0019-measurable-design-system-pilot.md), `_acceptance/cong-chung-minh-man-mau/`
 - 2026-11-11 — Đăng nhập bằng mã email: mã 6 số qua thư, phiên 30 ngày trượt, chọn và đổi sàn, menu tài khoản, đăng xuất; schema danh tính chỉ chủ đọc, bảng thành viên lọc theo sàn, sáu hàm hẹp của vai riêng; thêm gói `pg` — hàng 8, [0021](decisions/0021-dang-nhap-ma-email.md), `_acceptance/dang-nhap-ma-email/`
 - 2026-11-11 — Hành vi nằm trong Lưới và khung: hồ sơ cạnh bảng một khung cho căn và người (địa chỉ riêng, Esc trả tiêu điểm, toàn màn trên điện thoại, đi qua lại theo dòng đang hiện), chờ tải ba nấc, lỗi không còn nút «Thử lại» chết, đầu vùng chỉ tên khi lỗi, nút làm việc theo quyền, cửa lưu chung có hoàn tác hay xác nhận; sáu quyết định tầng hành vi có bài kiểm đỏ được, bài rào đỏ khi màn tự dựng lại — hàng 1e, `_acceptance/hanh-vi-trong-luoi-khung/`

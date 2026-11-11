@@ -128,6 +128,29 @@ async function clickSignOutInMenu(page: Page) {
   await page.getByRole("menu").getByRole("menuitem", { name: "Đăng xuất" }).click();
 }
 
+/**
+ * Records every in-app navigation from now on. A failed sign-out that still goes to /login is bounced straight back
+ * by the sign-in page, so the final URL alone cannot see it — the recorded visits can.
+ */
+async function recordVisits(page: Page) {
+  await page.evaluate(() => {
+    const w = window as unknown as { __visits: string[] };
+    w.__visits = [];
+    for (const key of ["pushState", "replaceState"] as const) {
+      const original = history[key].bind(history);
+      history[key] = (state: unknown, unused: string, url?: string | URL | null) => {
+        if (url != null) w.__visits.push(String(url));
+        original(state, unused, url);
+      };
+    }
+  });
+}
+
+async function leftForLogin(page: Page): Promise<boolean> {
+  const visits = await page.evaluate(() => (window as unknown as { __visits: string[] }).__visits);
+  return visits.some((u) => u.includes("/login"));
+}
+
 function deleteResponse(page: Page) {
   return page.waitForResponse(
     (r) => r.url().endsWith(SESSION_PATH) && r.request().method() === "DELETE",
@@ -241,8 +264,11 @@ test("dang-xuat-mang-dut", async ({ page }, info) => {
   await page.route(`**${SESSION_PATH}`, (route) =>
     route.request().method() === "DELETE" ? route.abort("internetdisconnected") : route.continue(),
   );
+  await recordVisits(page);
   await clickSignOutInMenu(page);
   await expect(page.getByText(SIGN_OUT_FAILED, { exact: true })).toBeVisible();
+  await page.waitForTimeout(500);
+  expect(await leftForLogin(page), "đăng xuất lỗi mà rời trang").toBe(false);
   await expect(page, "đăng xuất lỗi mà rời trang").toHaveURL(/127\.0\.0\.1:\d+\/$/);
   await shot(page, info, 4, "1440");
   await shot(page, info, 5, "360", true);
@@ -260,12 +286,15 @@ test("dang-xuat-may-chu-loi", async ({ page }, info) => {
   await signIn(page, email);
   await breakSignOut();
   try {
+    await recordVisits(page);
     const answer = deleteResponse(page);
     await clickSignOutInMenu(page);
     const res = await answer;
     expect(res.status()).toBe(500);
     expect(clearsCookie(res), "máy chủ xoá cookie khi chưa xoá phiên").toBe(false);
     await expect(page.getByText(SIGN_OUT_FAILED, { exact: true })).toBeVisible();
+    await page.waitForTimeout(500);
+    expect(await leftForLogin(page), "đăng xuất lỗi mà rời trang").toBe(false);
     await expect(page, "đăng xuất lỗi mà rời trang").toHaveURL(/127\.0\.0\.1:\d+\/$/);
     expect(await hasCookie(page), "máy chủ xoá cookie khi chưa xoá phiên").toBe(true);
     expect(await sessions(email)).toBe(1);
