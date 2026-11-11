@@ -1,7 +1,8 @@
 // Every sentence the frame shows, in one file for the reviewer (design/language.md: buttons and error sentences
 // are checked by a person). Screen names are not here: they come from label() through props.
+import { LABELS } from "@/generated/labels";
 
-/** Where «Đăng nhập lại» goes; the login screen is built by row 8 of lane N. */
+/** Where «sign in again» goes: the login screen of row 8. */
 export const LOGIN_PATH = "/login";
 
 export const FRAME_COPY = {
@@ -10,7 +11,7 @@ export const FRAME_COPY = {
   brand: "OneHub",
   retry: "Thử lại",
   undo: "Hoàn tác",
-  signInAgain: "Đăng nhập lại",
+  signInAgain: `${LABELS.SignIn.pref} lại`,
   goHome: "Về trang đầu",
   theme: {
     button: "Đổi giao diện",

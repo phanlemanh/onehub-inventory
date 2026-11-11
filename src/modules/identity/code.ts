@@ -38,15 +38,4 @@ export function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
 
-/** A page to return to after signing in: only a path of this site, never another host. */
-export function safeNext(next: unknown): string {
-  if (
-    typeof next !== "string" ||
-    !next.startsWith("/") ||
-    next.startsWith("//") ||
-    next.startsWith("/\\")
-  ) {
-    return "/";
-  }
-  return next;
-}
+export { safeNext } from "./next-path";

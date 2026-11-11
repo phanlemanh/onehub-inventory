@@ -32,6 +32,8 @@ export const LABELS = {
   ClosePrice: {"pref": "Giá chốt"},
   CloseDate: {"pref": "Ngày bán", "lease": "Ngày cho thuê"},
   LoginCode: {"pref": "Mã đăng nhập"},
+  SignIn: {"pref": "Đăng nhập"},
+  SignOut: {"pref": "Đăng xuất"},
 } as const;
 
 export type ConceptCode = keyof typeof LABELS;
