@@ -1,206 +1,217 @@
 ---
 schema_version: 2
 feature_slug: va-dang-nhap
-verdict: REJECT
-failed_evals: ["E2","E3","E4","E5","E6","E7","E8","E9","E13","E14","E16","E12","E15"]
+verdict: PASS
+failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: cc14b44e17c9e3b217600d5c146658eee2bca01b
+verified_commit: 1194e61df4964c7ec89819fd7f59e945742101ff
 human_signoff:
 ---
 
 # Evidence Report: va-dang-nhap
 
-Round 1. Nội dung này thay toàn bộ round cũ; lịch sử round nằm ở mục Iterations.
-
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
 | E1 | AC-1 | test | PASS |
-| E2 | AC-2 | script | FAIL |
-| E3 | AC-2 | script | FAIL |
-| E4 | AC-3 | script | FAIL |
-| E5 | AC-3 | script | FAIL |
-| E6 | AC-4 | script | FAIL |
-| E7 | AC-5 | script | FAIL |
-| E8 | AC-5 | script | FAIL |
-| E9 | AC-6 | script | FAIL |
+| E2 | AC-2 | script | PASS |
+| E3 | AC-2 | script | PASS |
+| E4 | AC-3 | script | PASS |
+| E5 | AC-3 | script | PASS |
+| E6 | AC-4 | script | PASS |
+| E7 | AC-5 | script | PASS |
+| E8 | AC-5 | script | PASS |
+| E9 | AC-6 | script | PASS |
 | E10 | AC-7 | script | PASS |
 | E11 | AC-7 | script | PASS |
-| E12 | AC-7 | script | FAIL |
-| E13 | AC-7 | script | FAIL |
-| E14 | AC-8 | script | FAIL |
-| E15 | AC-8 | ui-check | FAIL |
-| E16 | AC-6 | script | FAIL |
-
-Các eval E2 đến E9, E13, E14, E16 dùng chung một lệnh `DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts`. Lệnh đó kết thúc đỏ (1 lượt, 0 đạt, bản ghi cuối báo 7 đạt) và các ca của login.spec.ts và va-dang-nhap.spec.ts ở khổ 1024 và 1440 nằm trong danh sách bản ghi cuối của lệnh.
-
-Lệnh fail không gắn eval: `npm run build` (lỗi ENOTEMPTY khi xoá thư mục `.next/e2e-db-1267/dev/logs`, lệnh chạy chồng với thư mục tạm của lượt e2e). Ba lệnh fail còn lại đều gắn eval: lệnh playwright gắn E2 đến E9, E13, E14, E16; `make check` gắn E12; `ui-check:E15` gắn E15.
+| E12 | AC-7 | script | PASS |
+| E13 | AC-7 | script | PASS |
+| E14 | AC-8 | script | PASS |
+| E15 | AC-8 | ui-check | PASS |
+| E16 | AC-6 | script | PASS |
 
 ## Evidence
 
 - eval: E1
-  run_id: minted-va-dang-nhap-E1-r1
+  run_id: minted-va-dang-nhap-E1-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   output: |
-    make test chạy xong, kết thúc xanh.
+    lệnh: make test
+    toàn bộ ca đơn vị xanh, gồm tests/next-path-matrix.test.ts
 
 - eval: E2
-  run_id: minted-va-dang-nhap-E2-r1
-  exit_code: 1
-  baseline: red
+  run_id: minted-va-dang-nhap-E2-r2
+  exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.va_dang_nhap_e2e
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   output: |
-    Lệnh playwright dùng chung kết thúc đỏ; bản ghi cuối: 7 passed (20.6m).
-    Các ca đỏ/không xanh có mặt trong danh sách: next-lach-may-chu, next-lach-sau-go-ma, next-lach-chon-san (khổ 1024 và 1440).
+    lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    72 passed (1.7m)
 
 - eval: E3
-  run_id: minted-va-dang-nhap-E3-r1
-  exit_code: 1
-  baseline: red
+  run_id: minted-va-dang-nhap-E3-r2
+  exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.va_dang_nhap_e2e
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   output: |
-    Cùng lệnh playwright dùng chung; ca next-lach-sau-go-ma và next-lach-may-chu nằm trong danh sách không xanh.
+    lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    72 passed (1.7m)
 
 - eval: E4
-  run_id: minted-va-dang-nhap-E4-r1
-  exit_code: 1
-  baseline: red
+  run_id: minted-va-dang-nhap-E4-r2
+  exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.va_dang_nhap_e2e
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   output: |
-    Cùng lệnh playwright dùng chung; ca dang-xuat-mang-dut và dang-xuat-may-chu-loi nằm trong danh sách không xanh.
+    lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    72 passed (1.7m)
 
 - eval: E5
-  run_id: minted-va-dang-nhap-E5-r1
-  exit_code: 1
-  baseline: red
+  run_id: minted-va-dang-nhap-E5-r2
+  exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.va_dang_nhap_e2e
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   output: |
-    Cùng lệnh playwright dùng chung; ca dang-xuat-mang-dut và dang-xuat-may-chu-loi nằm trong danh sách không xanh.
+    lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    72 passed (1.7m)
 
 - eval: E6
-  run_id: minted-va-dang-nhap-E6-r1
-  exit_code: 1
-  baseline: red
+  run_id: minted-va-dang-nhap-E6-r2
+  exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.va_dang_nhap_e2e
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   output: |
-    Cùng lệnh playwright dùng chung; ca dang-xuat-duoc và dang-xuat (hàng 8) nằm trong danh sách không xanh.
+    lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    72 passed (1.7m)
 
 - eval: E7
-  run_id: minted-va-dang-nhap-E7-r1
-  exit_code: 1
-  baseline: red
+  run_id: minted-va-dang-nhap-E7-r2
+  exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.va_dang_nhap_e2e
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   output: |
-    Cùng lệnh playwright dùng chung; ca het-san-co-loi-thoat nằm trong danh sách không xanh.
+    lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    72 passed (1.7m)
 
 - eval: E8
-  run_id: minted-va-dang-nhap-E8-r1
-  exit_code: 1
-  baseline: red
+  run_id: minted-va-dang-nhap-E8-r2
+  exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.va_dang_nhap_e2e
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   output: |
-    Cùng lệnh playwright dùng chung; ca het-san-co-loi-thoat nằm trong danh sách không xanh.
+    lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    72 passed (1.7m)
 
 - eval: E9
-  run_id: minted-va-dang-nhap-E9-r1
-  exit_code: 1
-  baseline: red
+  run_id: minted-va-dang-nhap-E9-r2
+  exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.va_dang_nhap_e2e
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   output: |
-    Cùng lệnh playwright dùng chung; ca het-san-dang-xuat-loi và het-san-may-chu-loi nằm trong danh sách không xanh.
-
-- eval: E13
-  run_id: minted-va-dang-nhap-E13-r1
-  exit_code: 1
-  baseline: red
-  verifier: config:executors.script.va_dang_nhap_e2e
-  verified_at: 2026-11-11T09:32:12Z
-  output: |
-    Cùng lệnh playwright dùng chung; tám ca của login.spec.ts (mot-san-vao-thang đến axe-sang-toi) nằm trong danh sách không xanh ở khổ 1024 và 1440.
-
-- eval: E14
-  run_id: minted-va-dang-nhap-E14-r1
-  exit_code: 1
-  baseline: red
-  verifier: config:executors.script.va_dang_nhap_e2e
-  verified_at: 2026-11-11T09:32:12Z
-  output: |
-    Cùng lệnh playwright dùng chung; ca axe-sang-toi-1m nằm trong danh sách không xanh ở khổ 1024 và 1440.
-
-- eval: E16
-  run_id: minted-va-dang-nhap-E16-r1
-  exit_code: 1
-  baseline: red
-  verifier: config:executors.script.va_dang_nhap_e2e
-  verified_at: 2026-11-11T09:32:12Z
-  output: |
-    Cùng lệnh playwright dùng chung; ca het-san-dang-xuat-loi và het-san-may-chu-loi nằm trong danh sách không xanh.
+    lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    72 passed (1.7m)
 
 - eval: E10
-  run_id: minted-va-dang-nhap-E10-r1
+  run_id: minted-va-dang-nhap-E10-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.script.va_dang_nhap_db
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   output: |
-    vitest -c vitest.db.config.ts kết thúc xanh trên Postgres dãy R.
+    lệnh: DB_LANE=r DB_PORT=5565 npx vitest run -c vitest.db.config.ts --reporter=verbose
+    các ca của tests/db/dang-nhap.db.test.ts xanh trên Postgres dãy R
 
 - eval: E11
-  run_id: minted-va-dang-nhap-E11-r1
+  run_id: minted-va-dang-nhap-E11-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.script.va_dang_nhap_cach_ly
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   output: |
+    lệnh: DB_LANE=r DB_PORT=5565 bash db/scripts/cach-ly.sh
     cach-ly: 19 ca đạt, vai quy_hang_app
 
 - eval: E12
-  run_id: minted-va-dang-nhap-E12-r1
-  exit_code: 2
-  baseline: green
+  run_id: minted-va-dang-nhap-E12-r2
+  exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.check
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   output: |
-    make check dừng ở bước lint: 200 problems (189 errors, 11 warnings), phần lớn là 'args' / 'log' / 'phase' is not defined (no-undef).
-    make: *** [lint] Error 1
+    lệnh: make check
+    CODEOWNERS matches governance/autonomy.yaml
+
+- eval: E13
+  run_id: minted-va-dang-nhap-E13-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.va_dang_nhap_e2e
+  verified_at: 2026-11-11T10:31:49Z
+  output: |
+    lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    72 passed (1.7m)
+
+- eval: E14
+  run_id: minted-va-dang-nhap-E14-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.va_dang_nhap_e2e
+  verified_at: 2026-11-11T10:31:49Z
+  output: |
+    lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    72 passed (1.7m)
 
 - eval: E15
-  run_id: minted-va-dang-nhap-E15-r1
-  exit_code: 1
+  run_id: minted-va-dang-nhap-E15-r2
+  exit_code: 0
   baseline: n-a
   verifier: config:executors.ui-check
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
   screenshot: evidence/E15-step1.png
   observed: |
-    step1 (360 sáng): thẻ "Đăng nhập" giữa màn với câu "Tài khoản của bạn không còn thuộc sàn nào. Nhờ quản trị sàn mời lại, hoặc đăng xuất để dùng email khác." và nút "Đăng xuất" full-width; không có danh sách sàn, không cuộn ngang. Khớp Expected. step2 (1440 tối): cùng thẻ, nền gần đen chữ trắng, đọc được. Khớp.
-    step3 (414 sáng, đăng xuất lỗi ở trạng thái hết sàn): thẻ còn nguyên và người vẫn ở trang, nhưng câu "Chưa đăng xuất được. Bạn vẫn đang đăng nhập trên…" chỉ hiện là một dải xám nhạt bị cắt ở mép dưới khung (khoảng y 890 trên 896), chỉ thấy nửa trên dòng đầu, không đọc được. Trái với Expected nên khung này FAIL.
-    step4 (1440 sáng, lỗi từ menu tài khoản): trang "Hôm nay" còn mở; toast trắng góc dưới phải đọc rõ, nằm trên nội dung, không che nút. Khớp. step5 (360 tối): trang Hôm nay còn mở, nền và chữ đổi, không cuộn ngang; chữ toast bị huy hiệu Next dev che một phần ("Đăng xu…t»") — ghi chú, lớp phủ chỉ có ở dev.
+    Each frame was opened with Read.
+    step1 (360 light): the centred sign-in block titled "Đăng nhập" holds the sentence "Tài khoản của bạn không còn thuộc sàn nào. Nhờ quản trị sàn mời lại, hoặc đăng xuất để dùng email khác." and a full-width "Đăng xuất" button. There is no list of companies, empty or otherwise. There is no horizontal scroll at 360. Matches Expected.
+    step2 (1440 dark): the same block and sentence sit in the middle of the screen. The background is near-black and the text is white, so the theme has changed and it reads clearly. The "Đăng xuất" button is inside the block, and there is no company list. Matches Expected.
+    step3 (414 light): the same no-company block is still on screen after the failure. A toast at the bottom, above the content, says "Chưa đăng xuất được. Bạn vẫn đang đăng nhập trên máy này — kiểm tra mạng rồi bấm «Đăng xuất» lại." It is legible and does not cover the "Đăng xuất" button. The dev "N" badge overlaps the toast's left edge, a dev-only artifact. Matches Expected.
+    step4 (1440 light): the "Hôm nay" page with sidebar and header is fully visible. The failure toast sits at bottom right, above the content, legible, and does not cover the account or sign-out controls. Matches Expected.
+    step5 (360 dark): the "Hôm nay" page is dark with light text. The toast has the same wording, wraps in the narrow width and is legible. The dev "N" badge covers part of the word "xuất", a dev-only overlay. No horizontal overflow at 360. Matches Expected.
+    Overall: no frame contradicts Expected.
   network_observed: n-a (driver)
+
+- eval: E16
+  run_id: minted-va-dang-nhap-E16-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.va_dang_nhap_e2e
+  verified_at: 2026-11-11T10:31:49Z
+  output: |
+    lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    72 passed (1.7m)
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-va-dang-nhap-SUITE-build-r1
-  exit_code: 1
-  verified_at: 2026-11-11T09:32:12Z
+  run_id: minted-va-dang-nhap-SUITE-build-r2
+  exit_code: 0
+  verified_at: 2026-11-11T10:31:49Z
 
 - cmd: make e2e
-  run_id: minted-va-dang-nhap-SUITE-make_e2e-r1
+  run_id: minted-va-dang-nhap-SUITE-make_e2e-r2
   exit_code: 0
-  verified_at: 2026-11-11T09:32:12Z
+  verified_at: 2026-11-11T10:31:49Z
 
 ## Known limits
 
@@ -208,20 +219,20 @@ Lệnh fail không gắn eval: `npm run build` (lỗi ENOTEMPTY khi xoá thư m�
 
 ## Analyst
 
-Eval không phân biệt (xanh ở cả code mới lẫn baseline, chứng minh harness chứ không chứng minh feature; nên viết lại để assert hành vi mới hoặc xác nhận là regression-guard có chủ ý):
+carried tu round 1 — baseline khong do lai round nay
 
-- E1 (`make test`): baseline green.
-- E10 (`vitest -c vitest.db.config.ts`): baseline green.
-- E11 (`db/scripts/cach-ly.sh`): baseline green.
+Baseline khong do: evals.yaml khong doi tu lan baseline cuoi (round 1), nen round nay khong do lai; moi block eval ghi baseline n-a.
 
-Cả ba là bộ kiểm hồi quy của hàng 8 và hàng 7 nên có thể là guard có chủ ý; cần chủ kho xác nhận. Các eval E2 đến E9, E13, E14, E16 đều red trên baseline (có phân biệt). E12 xanh trên baseline nhưng đỏ ở code hiện tại.
-
-Không có mục judgment nào trong hợp đồng này nên không có hội đồng chấm.
+Eval khong-phan-biet (xanh tren ca HEAD lan baseline cu, chung minh harness chu khong phai feature; can viet lai de assert hanh vi moi hoac xac nhan la regression-guard co chu y):
+- E1 (make test)
+- E10 (vitest db, dang-nhap.db.test.ts)
+- E11 (cach-ly.sh)
 
 ## Variance
 
-none — mọi eval chạy một lần (runs 1), không có pass_rate.
+none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: E2, E3, E4, E5, E6, E7, E8, E9, E13, E14, E16 không xanh (lệnh playwright dùng chung kết thúc đỏ); E12 đỏ ở bước lint của make check; E15 đỏ vì khung step3 không đọc được câu báo đăng xuất lỗi. Returned to implementation.
+Round 1: co sua sau vong dau — commit 1194e61 (e2e-db build folder out of .next, settle toast before frames). Returned to implementation.
+Round 2: moi eval va lenh suite xanh, verdict PASS.

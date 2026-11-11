@@ -1,43 +1,35 @@
-# Review findings: va-dang-nhap (round 1)
-
 ## Trong hợp đồng
 
-Không có finding nào map được vào AC.
+- **E15 step 3 screenshot does not show the sign-out failure message in readable form**
+  file: `_acceptance/va-dang-nhap/evidence/E15-step3.png`
+  severity: medium
+  AC: AC-8
+  source: bugs
+  detail: I looked at the committed frame. E15 expects this frame (414 light, sign-out failed on the no-company screen) to show «Chưa đăng xuất được…» readable, above the content and not covering the button. In the frame the toast is only a faint, cut-off line at the very bottom edge (about y≈895 of 896). The text is mostly transparent and runs past the bottom of the image, so nobody can read it. Commit 1194e61 ('settle toast before frames') added an 800 ms wait in shot() and re-committed this file, but the new frame still catches the toast mid-entrance or off-screen. So this proof of AC-8/E15 for the no-company state does not show what it claims. The code (sign-out.ts → notify('result') → Toaster in the root layout) does surface the message, and the e2e test checks it with toBeVisible. The gap is in the evidence, not the behaviour: an E15 grade passed on this frame would be passing on a picture that does not show the state.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
 - **Tier: auth change classified below high (review-change step 10)**
-  Người dùng thấy gì: Thay đổi đăng nhập này được hệ thống xếp vào mức rủi ro vừa chứ không phải cao, nên có thể bị duyệt ít chặt hơn mức nó đáng được. Người dùng không thấy khác biệt nào; rủi ro nằm ở việc các thay đổi đăng nhập sau này cũng lọt qua mức duyệt nhẹ.
-  Căn cứ: Không ảnh hưởng người dùng ngay, không mất hay lộ dữ liệu, chủ kho đã tự tay duyệt thay đổi này; chỉ cần ghi lại và nhờ chủ kho bổ sung quy tắc phân hạng sau.
+  Người dùng thấy gì: Thay đổi đăng nhập và đăng xuất bị dán nhãn rủi ro thấp hơn thực tế, nên có thể được duyệt nhẹ tay hơn mức nó đáng được. Người dùng cuối không thấy gì khác đi.
+  Căn cứ: Không ảnh hưởng người dùng và không mất dữ liệu; hiện người duyệt ở các mức là cùng một người, còn sửa quy tắc phân mức là việc riêng của chủ kho.
   file: `src/modules/identity/next-path.ts`
-  severity: high
+  severity: medium
   Đề xuất: known-limits
 
-- **Product language: concept labels hard-coded in src (AGENTS.md 'Never hard-code a label in src/')**
-  Người dùng thấy gì: Câu báo «không còn thuộc sàn nào» đang viết cứng chữ «đăng xuất» và «sàn». Nếu sau này đổi tên các khái niệm này, câu ấy có thể lệch với nút bên cạnh.
-  Căn cứ: Hiện tại người dùng thấy đúng chữ như hợp đồng, không mất dữ liệu; chỉ có thể lệch chữ khi đổi tên về sau và sửa lúc đó rẻ.
-  file: `src/app/login/copy.ts`
-  severity: low
-  Đề xuất: known-limits
-
-- **Evidence: make check red locally (not caused by this diff)**
-  Người dùng thấy gì: Bộ kiểm tổng báo đỏ trên máy này chỉ vì một tệp tạm của lần nghiệm thu còn sót lại; mã của tính năng không có lỗi. Người dùng không bị ảnh hưởng.
-  Căn cứ: Không ảnh hưởng người dùng và không mất dữ liệu; xoá thư mục tạm là hết, trên bản sạch bộ kiểm vẫn xanh.
-  file: `.acceptance-runs/va-dang-nhap/acceptance-verify.js`
-  severity: low
-  Đề xuất: known-limits
-
-- **Hình dạng 4 (assertion âm tính đứng một mình, không có đối chứng dương): clearsCookie(res) luôn trả false, vì Response.headers() của Playwright không bao giờ trả về Set-Cookie**
-  Người dùng thấy gì: Khi Đăng xuất lỗi, một bước kiểm xem máy chủ có lỡ xoá phiên không đang không đo được gì. Nếu sau này có lỗi làm người dùng bị đăng xuất ngầm dù được báo vẫn đăng nhập, bài kiểm có thể không báo đúng chỗ.
-  Căn cứ: Hành vi cho người dùng hiện không sai và vẫn còn một bước kiểm gián tiếp bắt được phần lớn trường hợp; chỉ là lưới an toàn yếu hơn và sửa bài kiểm sau khá rẻ.
+- **Hình dạng 4 (assertion âm tính một mình): bộ ghi lượt rời trang chưa bao giờ được chứng là bắt được /login**
+  Người dùng thấy gì: Bài kiểm có thể không phát hiện được trường hợp đăng xuất hỏng mà người dùng vẫn bị đưa qua trang đăng nhập rồi dội ngược vào ứng dụng. Hôm nay hành vi vẫn đúng, chỉ là lưới an toàn có thể có lỗ.
+  Căn cứ: Không ảnh hưởng người dùng hiện tại và không mất dữ liệu; rủi ro chỉ xuất hiện nếu sau này hành vi hỏng mà bài kiểm vẫn xanh, và thêm một khẳng định đối chứng thì rẻ.
   file: `tests/e2e-db/va-dang-nhap.spec.ts`
-  severity: high
+  severity: medium
   Đề xuất: known-limits
 
-## Chưa adversarial-verify (refuter chết)
-
-Không có.
+- **Hình dạng 4 (assertion âm tính một mình): `clearsCookie` chỉ được khẳng định là false, không có ca nào chứng nó trả true**
+  Người dùng thấy gì: Bài kiểm có thể không nhận ra nếu sau này cách máy chủ xoá phiên đổi định dạng, nên có thể xanh giả. Hiện đăng xuất vẫn hoạt động đúng.
+  Căn cứ: Không ảnh hưởng người dùng hôm nay và không mất dữ liệu; một kiểm tra khác đã đỡ gián tiếp ý này nên mức nguy hại thấp.
+  file: `tests/e2e-db/va-dang-nhap.spec.ts`
+  severity: low
+  Đề xuất: known-limits
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
