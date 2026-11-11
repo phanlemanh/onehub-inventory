@@ -5,7 +5,7 @@ slug: khai-lien-ket-chao-can
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: _acceptance/khai-lien-ket-chao-can/design.md
@@ -60,3 +60,11 @@ Bỏ quét không gian — câu giao của hàng kê đủ: hai liên kết × (
 - Tên `ListingOwner` là riêng của ta; RESO `ContactListings` mang nghĩa khác (Hỏi-2 ở Cổng Phạm vi).
 
 - Đổi ontology: hai thực thể mới, quan hệ mới, nhãn và dòng thuật ngữ mới; mô tả PR có mục «Đổi ontology — chủ kho soi».
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-1: Kiểm dữ liệu mẫu chung chưa tự so sàn của liên kết chủ với liên hệ; chỉ bài kiểm mới truyền đủ dữ liệu để so.
+  - Ngoài-3: Luật vai chủ nhà trong mô hình chưa chỉ ra chỗ thực hiện trong mã.
+  - Ngoài-4: Thay đổi mô hình nghiệp vụ cần chủ kho soi khi gộp PR.
+  - Ngoài-5: Phép so sàn giữa liên kết chủ và liên hệ bị bỏ qua khi người gọi không truyền sàn của từng lần chào.
+  - Ngoài-6: Chưa có ca thử cố ý sai giá trị vai hay dòng kiểu vai sinh ra.
+  - Ngoài-7: Chưa có ca thử cố ý làm mất một quan hệ cũ.
+  - Ngoài-8: Chưa có ca thử cố ý làm mất dòng thuật ngữ hay thêm phụ thuộc giữa mô-đun.
