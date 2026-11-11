@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cửa và bộ kiểm cách ly</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Lora:ital,wght@0,400;1,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-soft:    #636b80;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', 'Lora', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1200px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+      color: var(--color-ink);
+      margin-bottom: 0.5rem;
+    }
+    .sub { color: var(--color-muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+    svg { width: 100%; min-width: 900px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Hình tại điểm quyết định · cach-ly-moi-san</p>
+    <h1>Cửa truy vấn và bộ kiểm cách ly</h1>
+    <p class="sub">Lựa chọn 2 và 4 của thiết kế · AC-1 đến AC-9</p>
+
+    <svg viewBox="0 0 1000 592" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- Lane headers and dividers -->
+      <text x="40" y="40" fill="#4f5d75" font-size="9" font-weight="500" font-family="'Geist Mono', monospace" letter-spacing="0.18em">MỘT TRUY VẤN ĐI QUA CỬA</text>
+      <text x="520" y="40" fill="#4f5d75" font-size="9" font-weight="500" font-family="'Geist Mono', monospace" letter-spacing="0.18em">BỘ KIỂM CÁCH LY CHỨNG MINH CỬA GIỮ</text>
+      <line x1="40" y1="56" x2="960" y2="56" stroke="rgba(45,49,66,0.22)" stroke-width="1"/>
+      <line x1="500" y1="56" x2="500" y2="512" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+
+      <!-- ===== Arrows (drawn before boxes) ===== -->
+      <!-- Left lane -->
+      <line x1="260" y1="136" x2="260" y2="166" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="260" y1="240" x2="260" y2="270" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="180" y1="328" x2="180" y2="374" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="340" y1="328" x2="340" y2="374" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <!-- Branches rejoin -->
+      <path d="M180 432 V448 Q180 456 188 456 H256" fill="none" stroke="#4f5d75" stroke-width="1.2"/>
+      <path d="M340 432 V448 Q340 456 332 456 H264" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4"/>
+
+      <!-- Right lane -->
+      <line x1="740" y1="136" x2="740" y2="166" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="740" y1="240" x2="740" y2="270" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="740" y1="344" x2="740" y2="374" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+      <!-- Cross-lane: the same two statements -->
+      <line x1="380" y1="204" x2="578" y2="204" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+
+      <!-- ===== Arrow labels (masked, gap from line) ===== -->
+      <rect x="432" y="180" width="96" height="16" rx="2" fill="#f5f5f5"/>
+      <text x="480" y="192" fill="#ba4513" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">CÙNG HAI CÂU</text>
+
+      <rect x="104" y="344" width="68" height="16" rx="2" fill="#f5f5f5"/>
+      <text x="138" y="356" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">THÀNH CÔNG</text>
+
+      <rect x="348" y="344" width="32" height="16" rx="2" fill="#f5f5f5"/>
+      <text x="364" y="356" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">LỖI</text>
+
+      <!-- ===== Left lane: one query through the door ===== -->
+      <!-- L1 -->
+      <rect x="140" y="80" width="240" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="140" y="80" width="240" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="260" y="104" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Mã nghiệp vụ gọi cửa</text>
+      <text x="260" y="122" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">withCompany(bể, {người, sàn}, việc)</text>
+
+      <!-- L2 focal -->
+      <rect x="140" y="168" width="240" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="140" y="168" width="240" height="72" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <text x="260" y="192" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Đổi vai, đặt người và sàn</text>
+      <text x="260" y="210" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">begin · set local role quy_hang_app</text>
+      <text x="260" y="226" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">set_config(…, true) · chỉ giao dịch này</text>
+
+      <!-- L3 -->
+      <rect x="140" y="272" width="240" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="140" y="272" width="240" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="260" y="296" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Luật theo dòng lọc theo sàn</text>
+      <text x="260" y="314" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">việc(client) chạy trên Postgres</text>
+
+      <!-- L4a commit -->
+      <rect x="116" y="376" width="128" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="116" y="376" width="128" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="180" y="400" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Ghi</text>
+      <text x="180" y="418" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">commit</text>
+
+      <!-- L4b rollback -->
+      <rect x="276" y="376" width="128" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="276" y="376" width="128" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="340" y="400" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Huỷ, ném lại lỗi</text>
+      <text x="340" y="418" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">rollback</text>
+
+      <!-- Merge dot + release -->
+      <circle cx="260" cy="456" r="4" fill="#2d3142"/>
+      <text x="260" y="484" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Kết nối luôn trả về bể</text>
+      <text x="260" y="500" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">release()</text>
+
+      <!-- Left AC tags -->
+      <rect x="72" y="100" width="52" height="16" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+      <text x="98" y="112" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-8</text>
+      <rect x="72" y="196" width="52" height="16" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+      <text x="98" y="208" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-7</text>
+
+      <!-- ===== Right lane: isolation suite proves the door holds ===== -->
+      <!-- R1 -->
+      <rect x="580" y="80" width="320" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="580" y="80" width="320" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="740" y="104" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Cơ sở nháp mới, áp migration hai lần</text>
+      <text x="740" y="122" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">cach_ly_* · lần hai không áp gì</text>
+
+      <!-- R2 -->
+      <rect x="580" y="168" width="320" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="580" y="168" width="320" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="740" y="192" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">14 ca SQL dưới vai của API</text>
+      <text x="740" y="210" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">sàn A, B · đọc, ghi chéo sàn · quét danh mục</text>
+      <text x="740" y="226" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">đổi vai, đặt sàn bằng đúng câu của cửa</text>
+
+      <!-- R3 -->
+      <rect x="580" y="272" width="320" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="580" y="272" width="320" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="740" y="296" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Bốn bản phá, mỗi bản phải đỏ</text>
+      <text x="740" y="314" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">đúng thông điệp: tên ca và tên bảng</text>
+      <text x="740" y="330" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">mỗi bản trên một cơ sở nháp riêng</text>
+
+      <!-- R4 end -->
+      <rect x="580" y="376" width="320" height="72" rx="20" fill="#f5f5f5"/>
+      <rect x="580" y="376" width="320" height="72" rx="20" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="740" y="400" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">19 ca đạt</text>
+      <text x="740" y="418" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">14 ca SQL + 5 ca của lệnh</text>
+      <text x="740" y="434" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">cach-ly: 19 ca đạt, vai quy_hang_app</text>
+
+      <!-- Right AC tags -->
+      <rect x="916" y="100" width="52" height="16" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+      <text x="942" y="112" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-1</text>
+      <rect x="916" y="196" width="52" height="16" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+      <text x="942" y="208" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-2..6</text>
+      <rect x="916" y="300" width="52" height="16" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+      <text x="942" y="312" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-9</text>
+
+      <!-- ===== Legend ===== -->
+      <line x1="40" y1="532" x2="960" y2="532" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
+      <text x="40" y="552" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.18em">CHÚ GIẢI</text>
+
+      <rect x="40" y="564" width="14" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="60" y="572" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Bước</text>
+
+      <rect x="120" y="564" width="14" height="10" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.2"/>
+      <text x="140" y="572" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Câu của cửa</text>
+
+      <rect x="236" y="564" width="20" height="10" rx="5" fill="#ffffff" stroke="#2d3142" stroke-width="1.2"/>
+      <text x="264" y="572" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Kết quả của lệnh</text>
+
+      <line x1="368" y1="568" x2="396" y2="568" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <text x="404" y="572" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Luồng</text>
+
+      <line x1="448" y1="568" x2="476" y2="568" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+      <text x="484" y="572" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Nhánh lỗi</text>
+
+      <line x1="548" y1="568" x2="576" y2="568" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+      <text x="584" y="572" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Bộ kiểm dùng nguyên văn</text>
+
+      <circle cx="712" cy="568" r="4" fill="#2d3142"/>
+      <text x="724" y="572" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Hai nhánh gặp lại</text>
+
+      <rect x="824" y="562" width="28" height="12" rx="2" fill="transparent" stroke="rgba(79,93,117,0.40)" stroke-width="0.8"/>
+      <text x="860" y="572" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Tiêu chí nghiệm thu</text>
+    </svg>
+  </div>
+</body>
+</html>

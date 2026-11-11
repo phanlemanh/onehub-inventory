@@ -1,0 +1,37 @@
+{
+  "feature_plain": "Dựng nền cách ly dữ liệu giữa các sàn: mỗi sàn chỉ đọc và ghi được dữ liệu của mình, mọi truy vấn đi qua một cửa duy nhất, kèm bộ kiểm chứng minh điều đó trên cơ sở dữ liệu thật.",
+  "will_do": [
+    { "id": "AC-1", "p": "Sẽ dựng lược đồ nền (sàn, thoả thuận) chép nguyên văn từ Quỹ hàng; áp lại lần hai không đổi gì." },
+    { "id": "AC-2", "p": "Sẽ trả về rỗng khi truy vấn chưa chọn sàn, chọn sàn trống, hay chạy trên kết nối vừa dùng cho sàn khác." },
+    { "id": "AC-3", "p": "Sẽ chỉ cho sàn A thấy chính mình và các thoả thuận của mình, cộng thoả thuận hợp tác sàn B mở với A." },
+    { "id": "AC-4", "p": "Sẽ chặn sàn A thêm dòng đứng tên sàn B, sửa dòng của B, hay chuyển dòng của mình sang B." },
+    { "id": "AC-5", "p": "Sẽ không cho ứng dụng tạo sàn, đổi tên sàn hay xoá thoả thuận — những việc đó không thuộc quyền của nó." },
+    { "id": "AC-6", "p": "Sẽ soi mọi bảng của sàn, kể cả bảng thêm về sau: luật phải lọc theo sàn thật sự, không luật nào mở cho mọi dòng." },
+    { "id": "AC-7", "p": "Sẽ có một cửa truy vấn duy nhất: mỗi lần gọi là một giao dịch đã khoá theo sàn, lỗi thì huỷ sạch; bộ kiểm dùng đúng câu của cửa." },
+    { "id": "AC-9", "p": "Sẽ chứng minh bộ kiểm biết đỏ: bốn bản cơ sở dữ liệu bị phá cố ý, bản nào cũng bị gọi đúng tên chỗ hỏng." }
+  ],
+  "wont_do": [
+    { "id": "AC-8", "p": "Chặn mọi đoạn mã mở kết nối cơ sở dữ liệu ngoài cửa truy vấn duy nhất." },
+    { "id": "OOS-1", "p": "Chưa chạy cửa trên cơ sở dữ liệu thật bằng trình điều khiển — hàng nối dữ liệu thật đầu tiên thêm cả hai." },
+    { "id": "OOS-2", "p": "Chưa chạy bộ kiểm cách ly trên CI — việc thêm job có cơ sở dữ liệu là của chủ kho." },
+    { "id": "OOS-3", "p": "Chưa có người dùng, thành viên, vai trong sàn hay đăng nhập — hàng 8 và 9." },
+    { "id": "OOS-4", "p": "Chưa có màn hay đường API nào dùng cửa." },
+    { "id": "OOS-5", "p": "Không sửa lược đồ chép từ Quỹ hàng — muốn đổi thì thêm bước mới." }
+  ],
+  "scope_plain": "Hàng này chỉ dựng nền và bộ kiểm; mọi thứ người dùng thấy đến ở các hàng sau.",
+  "coverage_plain": [
+    { "i": 0, "p": "Loại bảng: bảng sàn và bảng thoả thuận được thử đọc ghi thật (AC-2 đến AC-5); mọi bảng của sàn, kể cả bảng sau này, được soi luật (AC-6)." },
+    { "i": 1, "p": "Sàn của truy vấn: chưa chọn, sàn trống, kết nối vừa dùng, sàn mình, sàn khác, sàn đối tác — đủ sáu trạng thái (AC-2, AC-3, AC-4)." },
+    { "i": 2, "p": "Kiểu hỏng của luật: bốn kiểu hỏng đều được phá thử và phải bị bắt (AC-9 bộ kiểm biết đỏ)." },
+    { "i": 3, "p": "Thao tác: đọc, thêm, sửa, chuyển sàn, xoá, tạo sàn đều có ca (AC-3, AC-4, AC-5)." },
+    { "i": 4, "p": "Lớp giữ luật: cơ sở dữ liệu, cửa truy vấn, mã nguồn và bản thân bộ kiểm đều có ca; riêng cửa mới đo bằng kết nối giả (AC-7) — chưa đối chiếu thật." },
+    { "i": 5, "p": "Hai ô bỏ có tên: xoá dòng sàn khác (vai không có quyền xoá, đã nằm trong AC-5) và chạy cửa trên cơ sở dữ liệu thật (ngoài phạm vi)." }
+  ],
+  "gap_probe_plain": [
+    { "i": 0, "p": "Bộ kiểm chỉ xem luật có mặt, không xem luật có lọc theo sàn không — một luật «mở cho tất cả» vẫn lọt. Đã sửa: soi nội dung từng luật, thêm hai bản phá thử luật mở." },
+    { "i": 1, "p": "Lý do chọn cách quét bảng ghi là «suy từ mục tiêu» nhưng câu trích không quyết lựa chọn, phạm vi quét chưa rõ. Đã sửa: ghi lại lý do đúng và nêu rõ phạm vi quét." },
+    { "i": 2, "p": "Chưa thử hai trạng thái thật của cửa (sàn trống, kết nối vừa dùng) và chưa ràng câu của bộ kiểm với câu của cửa. Đã sửa: thêm hai ca và một bài kiểm ràng câu." },
+    { "i": 3, "p": "Số ca trong dòng tổng không khớp danh sách tên ca. Đã sửa: kê sẵn đủ 19 ca, mỗi ca phải đạt đúng một lần." },
+    { "i": 4, "p": "Bộ quét mã sẽ tự bắt chính bài kiểm của nó, và hợp đồng chưa kê hết chỗ chạm luật cách ly có chủ đích. Đã sửa: khai tập miễn hai tệp và kê ba chỗ chạm." }
+  ]
+}
