@@ -1,37 +1,7 @@
 {
-  "feature_plain": "Mọi màn nội bộ đứng trong App Shell mới dựng từ khối app-shell-8 của ReUI: cột biểu tượng bên trái, cột thứ hai theo màn, thanh trên — giữ nguyên băng báo, trạng thái toàn trang, đổi sáng tối, menu tài khoản và lọc mục theo mọi vai.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ hiện cột biểu tượng (dấu OneHub, mỗi màn một biểu tượng có tên), cột thứ hai và thanh trên ở 1024 và 1440, sáng và tối; màn đang mở được đánh dấu, bấm biểu tượng khác thì sang màn đó."},
-    {"id": "AC-2", "p": "Sẽ hiện đủ mục của mọi vai người ấy giữ, mỗi mục một lần, đúng thứ tự — cùng luật lọc theo vai đang dùng."},
-    {"id": "AC-3", "p": "Sẽ có cột thứ hai theo màn (theo câu 1), gập và mở bằng tay nắm, tải lại trang vẫn giữ; lối tắt trạng thái chưa có số, bấm vào mở Bảng hàng."},
-    {"id": "AC-4", "p": "Sẽ có tên sàn ở thanh trên (theo câu 4), nút đổi giao diện và menu tài khoản; đổi sàn ở đó thì phiên chuyển hẳn sang sàn mới, Bảng hàng chỉ còn hàng của sàn mới."},
-    {"id": "AC-6", "p": "Sẽ giữ nguyên lối nhảy tới nội dung, băng báo mất mạng hay lưu hỏng và các trạng thái lỗi toàn trang của kho, hiện trong vùng màn, App Shell vẫn đứng quanh."},
-    {"id": "AC-7", "p": "Sẽ để mọi màn đang có qua bộ bài kiểm chung ở 360, 414, 1024, 1440, sáng và tối, không lỗi trợ năng nặng."},
-    {"id": "AC-8", "p": "Sẽ ghi từng vùng của khối là lấy, bỏ hay thêm kèm lý do, ghi dòng nhập kho cho App Shell, và giữ thành phần đúng như nhà cung cấp giao."}
+  "feature_plain": "Mọi màn nội bộ nay đứng trong App Shell dựng từ khối app-shell-8: cột biểu tượng lọc theo mọi vai, cột thứ hai theo màn (Bảng hàng có lối tắt trạng thái), tên sàn ở đầu thanh trên đổi được sàn, điện thoại dùng thanh bên thu gọn.",
+  "decisions": [
+    {"id": "E8", "q": "Bảng lấy, bỏ, thêm của khối đủ rõ để nhập App Shell vào kho chưa?", "why": "Cả ba người chấm thấy đủ 15 vùng và phép đếm khớp; còn lấn cấn vài lý do nói «kho đã có» thay vì việc của nhân viên, và tên một thẻ chân cột chưa kể riêng."}
   ],
-  "wont_do": [
-    {"id": "AC-5", "p": "Sẽ KHÔNG để cột nào chiếm màn điện thoại (360, 414) và không cuộn ngang; nút ở thanh trên mở ngăn có cả hai cột, chọn xong thì ngăn đóng (theo câu 5)."},
-    {"id": "OOS-1", "p": "KHÔNG làm góc nhìn đã lưu, không đếm và không lọc khi bấm lối tắt trạng thái — tới cùng bộ lọc của Bảng hàng."},
-    {"id": "OOS-2", "p": "KHÔNG làm ô gõ mã căn và chuông nếu anh chọn «chưa»."},
-    {"id": "OOS-3", "p": "KHÔNG đổi ai được vào màn nào, không thêm màn mới."},
-    {"id": "OOS-4", "p": "KHÔNG làm bốn tab dưới cho điện thoại nếu anh chọn thanh bên thu gọn."},
-    {"id": "OOS-5", "p": "KHÔNG đổi màn đăng nhập, chọn sàn và trang khách — các màn ấy không có App Shell."}
-  ],
-  "coverage_plain": [
-    {"i": 0, "p": "Đủ năm vùng của App Shell: cột biểu tượng (AC-1, AC-2), cột thứ hai (AC-3), thanh trên (AC-4), ngăn trên điện thoại (AC-5), vùng màn (AC-6, AC-7)."},
-    {"i": 1, "p": "Đủ bốn khổ: điện thoại 360, 414 (AC-5, AC-7) và máy tính 1024, 1440 (AC-1, AC-3, AC-4, AC-7)."},
-    {"i": 2, "p": "Cả sáng và tối (AC-1, AC-5, AC-7)."},
-    {"i": 3, "p": "Người một vai, nhiều vai, chưa rõ vai (AC-2 lọc mục theo vai)."},
-    {"i": 4, "p": "Đủ sáu tình huống: bình thường, mất mạng, lưu hỏng, lỗi, không tìm thấy, hết phiên (AC-6 các phần của kho)."},
-    {"i": 5, "p": "Nhập kho: bảng vùng, dòng nhập kho, thành phần nguyên bản (AC-8)."},
-    {"i": 6, "p": "Để sau: góc nhìn đã lưu, ô gõ mã căn khi có hồ sơ căn, chuông khi có nguồn thông báo."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Máy tự bỏ một số phần của khối mà anh chưa thấy. Đã sửa: trang ảnh có mục «Khối gốc và phần máy đã bỏ» cạnh ảnh khối gốc, anh gạch phần nào muốn giữ."},
-    {"i": 1, "p": "Lối tắt trạng thái có số đếm mà tiêu chí không nói. Đã sửa: hàng này chưa có số và chưa lọc, bấm vào mở Bảng hàng."},
-    {"i": 2, "p": "Đổi sàn ở thanh trên chỉ được kiểm là có danh sách. Đã sửa: thêm bài đo phiên thật sự sang sàn mới và Bảng hàng chỉ còn hàng sàn ấy."},
-    {"i": 3, "p": "Phép đếm vùng lấy và bỏ chưa tính theo từng phương án. Đã sửa: đếm theo từng câu trả lời, nói rõ khi nào phải gọi là «ghép từ thành phần»."},
-    {"i": 4, "p": "Ngưỡng của ô cơ hội chưa có đường đo. Đã sửa: thêm đường đo; ngưỡng «bày hai đến ba App Shell» bỏ vì anh đã chốt app-shell-8."}
-  ],
-  "scope_plain": "Những việc hàng này cố ý không làm:"
+  "analyst_plain": "Hai bài kiểm đơn vị xanh cả trước lẫn sau thay đổi, tức chúng giữ hành vi cũ chứ không chứng thêm điều mới; phần mới được bài trình duyệt và bài đổi sàn đo."
 }
