@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
 screens: []
-status: approved
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: _acceptance/bo-bai-kiem-tu-so-man/design.md
