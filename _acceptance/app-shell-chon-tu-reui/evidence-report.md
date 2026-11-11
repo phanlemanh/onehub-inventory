@@ -2,18 +2,18 @@
 schema_version: 2
 feature_slug: app-shell-chon-tu-reui
 verdict: REJECT
-failed_evals: ["E9","E10"]
+failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 4072a4bd8bc1847931e7baced8f6e18ea5870e8a
+verified_commit: 177e95a1b34e44353480b165696b81329e4b31e3
 human_signoff:
 ---
 
 # Evidence Report: app-shell-chon-tu-reui
 
-Round 1. Hai eval máy đỏ: E9 (lint của `make check`) và E10 (khung ngăn trượt ở 360 không mở). E8 là mục judgment, hội đồng đề xuất FAIL, người quyết ở Cổng 2.
+Vòng 2. Nội dung thay toàn bộ báo cáo vòng cũ; lịch sử các vòng nằm ở mục Iterations.
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
@@ -22,146 +22,140 @@ Round 1. Hai eval máy đỏ: E9 (lint của `make check`) và E10 (khung ngăn 
 | E3 | AC-3 | script | PASS |
 | E4 | AC-4 | script | PASS |
 | E5 | AC-5 | script | PASS |
-| E6 | AC-6 | test | PASS |
+| E6 | AC-6 | test | PASS (carried từ round 1) |
 | E7 | AC-7 | script | PASS |
-| E8 | AC-8 | judgment | đề xuất FAIL, chờ người quyết |
-| E9 | AC-8 | script | FAIL |
-| E10 | AC-1 | ui-check | FAIL |
+| E8 | AC-8 | judgment | UNCERTAIN |
+| E9 | AC-8 | script | PASS |
+| E10 | AC-1 | ui-check | PASS (máy) — xem ghi chú bên dưới về khung ngăn trượt |
 | E11 | AC-4 | script | PASS |
+
+Lý do verdict tổng là REJECT: các lệnh máy đều chạy xanh, nhưng khung ngăn trượt E10-sheet-360-light.png đã commit ở 177e95a trùng từng byte với khung ngăn đóng E10-inventory-360-light.png (xem review-findings.md, ba mục trong hợp đồng, AC-5). Bằng chứng đã commit không cho thấy ngăn mở. Bản trong cây làm việc (chưa commit, git báo đã sửa) khi mở ra thì cho thấy ngăn mở có cột biểu tượng và cột thứ hai; bản đó cần được chạy lại có kiểm và commit.
 
 ## Evidence
 
 - eval: E1
-  run_id: minted-app-shell-chon-tu-reui-E1-r1
+  run_id: minted-app-shell-chon-tu-reui-E1-r2
   exit_code: 0
-  baseline: red
+  baseline: n-a
   verifier: config:executors.script.e2e
-  verified_at: 2026-11-11T17:45:03Z
+  verified_at: 2026-11-11T17:59:43Z
   output: |
-    lệnh: make e2e (gộp cho E1, E3, E4, E5, E7)
-    536 passed (3.6m)
+    make e2e
+    536 passed (3.5m)
 
 - eval: E3
-  run_id: minted-app-shell-chon-tu-reui-E3-r1
+  run_id: minted-app-shell-chon-tu-reui-E3-r2
   exit_code: 0
-  baseline: red
+  baseline: n-a
   verifier: config:executors.script.e2e
-  verified_at: 2026-11-11T17:45:03Z
+  verified_at: 2026-11-11T17:59:43Z
   output: |
-    lệnh: make e2e (gộp)
-    536 passed (3.6m)
+    make e2e
+    536 passed (3.5m)
 
 - eval: E4
-  run_id: minted-app-shell-chon-tu-reui-E4-r1
+  run_id: minted-app-shell-chon-tu-reui-E4-r2
   exit_code: 0
-  baseline: red
+  baseline: n-a
   verifier: config:executors.script.e2e
-  verified_at: 2026-11-11T17:45:03Z
+  verified_at: 2026-11-11T17:59:43Z
   output: |
-    lệnh: make e2e (gộp)
-    536 passed (3.6m)
+    make e2e
+    536 passed (3.5m)
 
 - eval: E5
-  run_id: minted-app-shell-chon-tu-reui-E5-r1
+  run_id: minted-app-shell-chon-tu-reui-E5-r2
   exit_code: 0
-  baseline: red
+  baseline: n-a
   verifier: config:executors.script.e2e
-  verified_at: 2026-11-11T17:45:03Z
+  verified_at: 2026-11-11T17:59:43Z
   output: |
-    lệnh: make e2e (gộp)
-    536 passed (3.6m)
+    make e2e
+    536 passed (3.5m)
 
 - eval: E7
-  run_id: minted-app-shell-chon-tu-reui-E7-r1
+  run_id: minted-app-shell-chon-tu-reui-E7-r2
   exit_code: 0
-  baseline: red
+  baseline: n-a
   verifier: config:executors.script.e2e
-  verified_at: 2026-11-11T17:45:03Z
+  verified_at: 2026-11-11T17:59:43Z
   output: |
-    lệnh: make e2e (gộp)
-    536 passed (3.6m)
+    make e2e
+    536 passed (3.5m)
 
 - eval: E2
-  run_id: minted-app-shell-chon-tu-reui-E2-r1
+  run_id: minted-app-shell-chon-tu-reui-E2-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-11T17:45:03Z
+  verified_at: 2026-11-11T17:59:43Z
   output: |
-    lệnh: make test (gộp cho E2, E6)
-    chạy xong, không ca nào đỏ
+    make test
+    suite passed
+
+- eval: E9
+  run_id: minted-app-shell-chon-tu-reui-E9-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.check
+  verified_at: 2026-11-11T17:59:43Z
+  output: |
+    make check
+    CODEOWNERS matches governance/autonomy.yaml
+
+- eval: E11
+  run_id: minted-app-shell-chon-tu-reui-E11-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.dang_nhap_e2e
+  verified_at: 2026-11-11T17:59:43Z
+  output: |
+    playwright test -c playwright.db.config.ts (lane Postgres)
+    64 passed (2.1m)
+
+- eval: E10
+  run_id: minted-app-shell-chon-tu-reui-E10-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: ui-check:E10
+  verified_at: 2026-11-11T17:59:43Z
+  screenshot: evidence/E10-inventory-1440-light.png
+  observed: |
+    E10-inventory-1440-light.png: narrow icon rail at left with OneHub mark on top and three screen icons (middle one highlighted), avatar at bottom; second column with "Bảng hàng" group, "Tất cả hàng" highlighted, and "Theo trạng thái" with six statuses (Chưa đủ để rao, Đang bán, Đang giao dịch, Đã bán, Tạm ngừng, Ngừng hẳn), none with numbers; top bar with panel toggle, theme (sun) button and "Đăng nhập" account corner; page title "Bảng hàng". Layout matches approved prototype inventory-1440-light.jpg (which has demo counts, company switcher, a 4th rail icon and a data table; the evidence frame is the logged-out empty shell, consistent with "không mang số"). E10-inventory-1440-dark.png: same layout on near-black background with white text, selected item dark grey, moon icon; fully readable. E10-inventory-360-light.png: no rail or second column on screen, only top bar (panel toggle, theme, Đăng nhập) and title "Bảng hàng", no overflow. E10-inventory-360-dark.png: same on dark background, white text readable; matches prototype inventory-360-dark.jpg layout. E10-sheet-360-light.png: sliding sheet open from left containing both the icon rail (mark, three screen icons, avatar) and the second column ("Tất cả hàng" highlighted plus six statuses without numbers) over a dimmed page; matches q5-a.jpg arrangement minus counts and the 4th icon. No contradiction with Expected.
+  network_observed: n-a (driver)
+  note: Bản E10-sheet-360-light.png trong cây làm việc hiện cho thấy ngăn mở (cột biểu tượng và cột thứ hai trên nền mờ), nhưng bản đã commit ở 177e95a trùng từng byte với khung ngăn đóng; bản trong cây chưa được commit.
 
 - eval: E6
   run_id: minted-app-shell-chon-tu-reui-E6-r1
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.test.unit
   verified_at: 2026-11-11T17:45:03Z
-  output: |
-    lệnh: make test (gộp)
-    chạy xong, không ca nào đỏ
-
-- eval: E9
-  run_id: minted-app-shell-chon-tu-reui-E9-r1
-  exit_code: 2
-  baseline: green
-  verifier: config:executors.script.check
-  verified_at: 2026-11-11T17:45:03Z
-  output: |
-    lệnh: make check, dừng ở bước lint
-    200 problems (189 errors, 11 warnings)
-    phần cuối nhật ký toàn lỗi no-undef: 'args', 'log', 'phase' is not defined, cùng cảnh báo no-unused-vars cho '_'
-    make: *** [lint] Error 1
-    Ghi chú: phần đuôi nhật ký không nêu tên tệp bị lint nên chưa quy được lỗi vào App Shell hay vào tệp khác; cần đọc nhật ký đầy đủ.
-
-- eval: E11
-  run_id: minted-app-shell-chon-tu-reui-E11-r1
-  exit_code: 0
-  baseline: red
-  verifier: config:executors.script.dang_nhap_e2e
-  verified_at: 2026-11-11T17:45:03Z
-  output: |
-    lệnh: playwright test -c playwright.db.config.ts (Postgres của dãy)
-    64 passed (2.1m)
-
-- eval: E10
-  run_id: minted-app-shell-chon-tu-reui-E10-r1
-  exit_code: 1
-  baseline: n-a
-  verifier: config:executors.ui-check.default
-  verified_at: 2026-11-11T17:45:03Z
-  screenshot: evidence/E10-inventory-1440-light.png
-  observed: |
-    E10-inventory-1440-light.png: cột biểu tượng hẹp bên trái có dấu OneHub, ba biểu tượng màn (biểu tượng lưới được tô), nút tài khoản tròn ở dưới. Cột thứ hai có «Bảng hàng», «Tất cả hàng» được tô, nhóm «Theo trạng thái» với sáu trạng thái, không số. Thanh trên có nút bảng, nút đổi giao diện và «Đăng nhập». Cách xếp khớp ảnh đã duyệt inventory-1440-light.jpg.
-    E10-inventory-1440-dark.png: cùng bố cục trên nền gần đen, chữ sáng, đọc được. E10-inventory-360-light.png và E10-inventory-360-dark.png: không cột nào chiếm màn, chỉ có thanh trên, tiêu đề «Bảng hàng», nút tài khoản tròn; không cuộn ngang; khớp cấu trúc ảnh đã duyệt.
-    E10-sheet-360-light.png: giống hệt E10-inventory-360-light.png (cùng md5 9098e6970cf290739b5de652d92f76b8), ngăn trượt không hiện. Ảnh đã duyệt q5-a.jpg cho thấy ngăn mở có biểu tượng màn ở trái và mục cột thứ hai bên cạnh; khung lưu không cho thấy điều đó. Phần «ngăn trượt mở ra có cả biểu tượng màn lẫn mục của cột thứ hai» chưa được chứng minh bằng ảnh, dù các assertion DOM của bài đã qua.
-  network_observed: n-a (driver)
-  output: |
-    spec chạy 24 passed, 24 skipped (skip là các dự án khổ khác); cổng 3815 ban đầu bị một lần chạy playwright khác trong cùng thư mục giữ, đã chờ rồi chạy lại
-    khung lưu: E10-inventory-1440-light, E10-inventory-1440-dark, E10-inventory-360-light, E10-inventory-360-dark, E10-sheet-360-light; ghi chú driver E10-network.txt
-    bốn khung đầu đạt; khung E10-sheet-360-light không đạt vì trùng khung đóng
+  carried_from_round: 1
+  note: carry-forward tu round 1 — delta khong cham paths cua eval
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-app-shell-chon-tu-reui-SUITE-build-r1
+  run_id: minted-app-shell-chon-tu-reui-SUITE-build-r2
   exit_code: 0
-  verified_at: 2026-11-11T17:45:03Z
+  verified_at: 2026-11-11T17:59:43Z
 
 ### Judgment
 
 - eval: E8
-  judged_by: hội đồng ba lăng kính (fresh context), đề xuất của máy, human_override để trống
-  proposal: FAIL
+  judged_by: panel đề xuất, ba góc nhìn (fresh context)
+  verdict: UNCERTAIN
+  rationale: Phần đếm khớp bảng (15 dòng; theo khuyên của máy lấy 8 bỏ 7, còn phương án câu 4 «trong menu tài khoản» lấy 7 bỏ 8), nhưng design.md không cho đối chiếu được bảng có đủ mọi vùng của `app-shell-8` không, và chủ kho thực sự chọn gì ở câu 2, 3, 4.
   votes:
-    - domain-correctness: FAIL — Bảng có đủ 15 vùng, phép đếm khớp (mặc định lấy 8, bỏ 7; đổi câu 4 thì lấy 7, bỏ 8 là quá nửa và có gọi tên «ghép từ thành phần»). Phần «Thêm» chỉ dùng thành phần của kho, dòng nhập kho có đủ khối, nhu cầu, ngày 2026-11-11. Nhưng dòng «Vùng nội dung mẫu (thẻ gạch đứt)» để trống cột «Vì sao», nên không phải dòng nào cũng có lý do trỏ vào việc của người dùng. Dòng đầu chỉ ghi «Chủ kho chốt giữ cả hai cột», đó là một quyết định chứ không phải việc của người dùng.
-    - operational-feasibility: FAIL — Bảng có 15 dòng, phần đếm 8 lấy/7 bỏ và 7 lấy/8 bỏ khớp bảng, «Thêm» chỉ dùng thành phần của kho, dòng nhập kho có đủ khối, nhu cầu và ngày duyệt 2026-11-11. Nhưng dòng «Vùng nội dung mẫu (thẻ gạch đứt)» để trống cột «Vì sao (việc của người dùng)». Dòng «Thanh bên trong ngăn trượt…» chỉ nêu lý do kỹ thuật («một mã, một cách điều hướng»), và phép đếm 8/7 chỉ đúng nếu coi dòng này là «lấy» khi chưa có câu trả lời cho câu 5.
-    - spec-alignment: FAIL — Bảng đủ 15 vùng, phép đếm 8 lấy/7 bỏ và 7/8 khớp bảng, «Thêm» chỉ dùng thành phần của kho, dòng nhập kho có đủ khối, nhu cầu, ngày 2026-11-11. Nhưng dòng «Vùng nội dung mẫu (thẻ gạch đứt)» để trống cột «Vì sao». Dòng «SidebarProvider» chỉ ghi «Chủ kho chốt giữ cả hai cột», đó là một quyết định chứ không phải việc của người dùng.
+    - domain-correctness: UNCERTAIN — Phần đếm khớp bảng: 15 dòng, theo khuyên của máy lấy 8 bỏ 7 (chưa quá nửa), còn phương án câu 4 «trong menu tài khoản» lấy 7 bỏ 8 (quá nửa, gọi là «ghép từ thành phần»). Phần «Thêm» chỉ dùng thành phần của kho, và dòng nhập kho có đủ khối, nhu cầu, ngày 2026-11-11. design.md không cho đối chiếu được hai điều: bảng có đủ mọi vùng của `app-shell-8` không, và chủ kho thực sự chọn gì ở câu 2, 3, 4. Ngoài ra vài lý do (dòng «Kho đã có…», «Một nguồn mục») trỏ vào việc sẵn có của kho hơn là việc của người dùng.
+    - operational-feasibility: UNCERTAIN — Bảng có 15 dòng, phần đếm (lấy 8/bỏ 7, hoặc 7/8 nếu câu 4 chọn menu tài khoản) khớp với bảng, mỗi dòng có lý do trỏ vào việc người dùng, phần «Thêm» chỉ dùng thành phần của kho, và dòng nhập kho có đủ khối, nhu cầu, ngày 2026-11-11. Nhưng design.md không ghi câu trả lời thật của chủ kho cho câu 2, 3, 4 (đếm chỉ theo «khuyên của máy», «phương án A» không giải thích), và danh sách vùng của `app-shell-8` không có nguồn trong input để đối chiếu cho đủ.
+    - spec-alignment: UNCERTAIN — Trong design.md, bảng có 15 dòng. Mỗi dòng có lý do gắn với việc của người dùng. Phần "Thêm" chỉ dùng thành phần của kho. Dòng nhập kho nêu đủ khối `app-shell-8`, nhu cầu và ngày 2026-11-11. Phép đếm 8 lấy/7 bỏ (và 7/8 nếu câu 4 chọn menu tài khoản) khớp bảng theo khuyên của máy, và trường hợp quá nửa bị bỏ đã được gọi là "ghép từ thành phần". Không xác nhận được hai điểm: một là bảng có đủ mọi vùng của khối gốc không, vì mã nguồn khối nằm ngoài danh sách input; hai là phương án chủ kho thực sự chọn cho câu 2, 3 và 4, vì tài liệu chỉ ghi chủ kho chốt câu 5 và "nhận năm phương án A" mà không nói A gồm những gì.
   required_evidence:
-    - Trong `_acceptance/app-shell-chon-tu-reui/design.md`, bảng «Vùng của khối → lấy, bỏ, thêm», dòng «Vùng nội dung mẫu (thẻ gạch đứt)» phải có lý do ở cột «Vì sao» trỏ vào việc của người dùng (ví dụ: người dùng thấy dữ liệu thật của sàn mình chứ không thấy dữ liệu giả).
-    - Cùng bảng, dòng «SidebarProvider với cột hẹp và cột thứ hai» phải có lý do bằng việc của người dùng (ví dụ: chuyển màn một lần bấm mà vẫn còn chỗ cho bảng hàng), không chỉ viện dẫn quyết định của chủ kho.
-    - Sửa lý do của dòng «Thanh bên trong ngăn trượt trên điện thoại…» để nêu việc của người dùng thay vì lý do kỹ thuật, và ghi rõ phép đếm 8 lấy/7 bỏ tính dòng này vào nhóm nào khi câu 5 chưa trả lời, hoặc ghi câu trả lời của chủ kho.
-    - Câu trả lời của chủ kho cho câu 2 đến 5 ở Cổng Phạm vi (phương án A) được ghi trong design.md, để kiểm số «lấy 8, bỏ 7» có đúng là phương án đã chọn hay chỉ là mặc định theo khuyên của máy.
+    - Danh sách vùng thật của khối `app-shell-8` (mã nguồn khối từ ReUI, hoặc ảnh khối gốc trên trang ảnh cạnh /proto/app-shell), để đối chiếu với 15 dòng của bảng. Nút mở thanh bên (SidebarTrigger) và tên sàn / breadcrumb trên thanh trên hiện chỉ xuất hiện ở mục «Bản đã dựng», chưa có dòng trong bảng.
+    - Bản ghi câu trả lời của chủ kho cho câu 2, 3, 4 ở Cổng Phạm vi (phán quyết trong sổ đợt hoặc `_acceptance/app-shell-chon-tu-reui/` gate record), để xác nhận «nhận năm phương án A» đúng là phương án lấy 8 bỏ 7 và đúng là «đầu thanh trên» ở câu 4.
+    - Viết lại lý do ở các dòng NavUser, đổi sáng tối và `NAV_ITEMS` thành việc của người dùng (ví dụ «đổi sàn và đăng xuất ngay từ thanh trên»), thay vì chỉ ghi «kho đã có».
+    - Danh sách vùng gốc của khối `app-shell-8` đối chiếu từng vùng với 15 dòng của bảng, và bản ghi quyết định của chủ kho ở Cổng Phạm vi ngày 2026-11-11 cho câu 2, 3, 4 (nếu khác khuyên của máy thì phần đếm phải tính lại).
   human_override:  # chi nguoi ghi
 
 ## Known limits
@@ -170,14 +164,17 @@ Round 1. Hai eval máy đỏ: E9 (lint của `make check`) và E10 (khung ngăn 
 
 ## Analyst
 
-Eval không phân biệt (pass trên cả HEAD lẫn baseline): E2, E6 (lệnh `make test`). Cần viết lại để assert hành vi App Shell mới, hoặc xác nhận đây là lưới hồi quy có chủ ý.
+carried tu round 1 — baseline khong do lai round nay
 
-Baseline: E1, E3, E4, E5, E7, E11 là red trên code cũ (có phân biệt). E9 là green trên code cũ, nay đỏ trên HEAD. E10 baseline là n-a (ui-check không chạy trên code cũ).
+Baseline khong do: round này không đo lại (evals.yaml không đổi từ lần baseline cuối, round 1); mọi block eval ghi baseline n-a.
+
+Eval không-phân-biệt (xanh cả trên HEAD lẫn baseline, chứng minh harness chứ không phải feature; nên viết lại để assert hành vi mới hoặc xác nhận là lưới hồi quy có chủ ý): E2 và E6 (lệnh make test).
 
 ## Variance
 
-none — mọi eval nhiều lần chạy đều đồng nhất (mọi eval chạy một lần, không có lệnh nào dao động).
+none — mọi eval đều chạy một lần, không có eval nhiều lần
 
 ## Iterations
 
-Round 1: E9 đỏ (lint trong `make check` báo 189 lỗi no-undef cho args, log, phase, nguồn tệp chưa xác định) và E10 đỏ (khung ngăn trượt ở 360 trùng khung đóng, không chứng minh ngăn mở); E8 được đề xuất FAIL vì bảng thiết kế thiếu lý do ở các dòng nêu trên. Trả về khâu triển khai.
+Round 1: E9 (make check) và E10 (khung ngăn trượt) không đạt — E10 vì khung ngăn trượt không cho thấy ngăn mở. Returned to implementation.
+Round 2: mọi lệnh máy xanh, E8 còn UNCERTAIN chờ người; verdict REJECT vì khung ngăn trượt đã commit trùng từng byte với khung ngăn đóng (bản trong cây làm việc chưa commit cho thấy ngăn mở). Returned to implementation.
