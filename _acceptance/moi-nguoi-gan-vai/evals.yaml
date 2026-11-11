@@ -152,11 +152,12 @@ evals:
     criterion: AC-9
     executor: ui-check
     layer: ui-observed
-    cmd: config:executors.design.ui_check
-    paths: ["src/app/(app)/members/**"]
-    inputs: [_acceptance/moi-nguoi-gan-vai/evidence/]
-    expected: "Ảnh màn Thành viên ở 1440 và 360, sáng và tối, trạng thái bảng có dữ liệu và hộp Mời đang mở: bảng đọc được, nhãn vai là nhãn chữ không phải mã, nút «Mời người» ở đầu màn, hộp thoại không tràn khổ 360, không chữ đè chữ"
-    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot, observed]
+    paths: ["src/app/(app)/members/**", src/components/candidate/form-dialog.tsx]
+    steps:
+      - "Run config:executors.script.moi_nguoi_e2e with SHOTS_DIR=_acceptance/moi-nguoi-gan-vai/evidence (DB_LANE=n DB_PORT=5563); the spec saves the eight pinned frames members-ready-{1440,360}-{sang,toi}.png and members-invite-open-{1440,360}-{sang,toi}.png, plus one ST-*.png per state at 1440"
+      - "Read the eight pinned frames and the ST-*.png frames"
+    expected: "Ảnh màn Thành viên ở 1440 và 360, sáng và tối, trạng thái có dữ liệu và hộp Mời đang mở: danh sách đọc được, nhãn vai là nhãn chữ không phải mã, nút «Mời người» ở đầu màn, hộp thoại không tràn khổ 360, không chữ đè chữ; ảnh từng trạng thái hiện đúng câu của bảng trạng thái"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
 
   - id: E15
     criterion: AC-8
