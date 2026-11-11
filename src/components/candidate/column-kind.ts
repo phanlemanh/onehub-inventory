@@ -102,7 +102,7 @@ export function densityFor(totalMinCh: number, containerCh: number): Density {
 }
 
 export const DENSITY_ROW_CLASS: Readonly<Record<Density, string>> = {
-  dense: "h-10 text-sm",
+  dense: "h-8 text-sm",
   normal: "h-12 text-base",
 };
 

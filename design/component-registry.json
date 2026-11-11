@@ -55,7 +55,7 @@
     {
       "name": "RegionHeader",
       "file": "src/components/candidate/region-header.tsx",
-      "level": "molecule",
+      "level": "organism",
       "parts": [
         {
           "name": "RegionHeader"
@@ -1798,6 +1798,57 @@
       ]
     },
     {
+      "name": "InputGroup",
+      "file": "src/components/ui/input-group.tsx",
+      "level": "molecule",
+      "parts": [
+        {
+          "name": "InputGroup"
+        },
+        {
+          "name": "InputGroupAddon",
+          "variants": {
+            "align": [
+              "inline-start",
+              "inline-end",
+              "block-start",
+              "block-end"
+            ]
+          },
+          "defaults": {
+            "align": "inline-start"
+          }
+        },
+        {
+          "name": "InputGroupButton",
+          "props": [
+            "type",
+            "variant"
+          ],
+          "variants": {
+            "size": [
+              "xs",
+              "sm",
+              "icon-xs",
+              "icon-sm"
+            ]
+          },
+          "defaults": {
+            "size": "xs"
+          }
+        },
+        {
+          "name": "InputGroupInput"
+        },
+        {
+          "name": "InputGroupText"
+        },
+        {
+          "name": "InputGroupTextarea"
+        }
+      ]
+    },
+    {
       "name": "Input",
       "file": "src/components/ui/input.tsx",
       "level": "atom",
@@ -2118,6 +2169,16 @@
       "parts": [
         {
           "name": "Spinner"
+        }
+      ]
+    },
+    {
+      "name": "Textarea",
+      "file": "src/components/ui/textarea.tsx",
+      "level": "atom",
+      "parts": [
+        {
+          "name": "Textarea"
         }
       ]
     },

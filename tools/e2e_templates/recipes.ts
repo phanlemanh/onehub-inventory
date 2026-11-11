@@ -181,13 +181,36 @@ const viewport = (page: Page) =>
 /** Kinds whose shown text is the searched value (column-kind.ts SEARCHABLE_KINDS, without `select`, which shows a label). */
 const TEXT_KINDS = ["text", "person"];
 
+/** How many data rows a person sees in the grid's viewport at the top of the run (not the extra rows mounted ahead). */
+async function visibleRows(page: Page): Promise<number> {
+  return viewport(page).evaluate((el) => {
+    const box = el.getBoundingClientRect();
+    return [...el.querySelectorAll("tbody tr")].filter((tr) => {
+      if (!tr.querySelector('[data-slot="row-number"]')) return false;
+      const r = tr.getBoundingClientRect();
+      return r.bottom > box.top && r.top < box.bottom;
+    }).length;
+  });
+}
+
+/** Puts the mouse over the visible part of the grid's viewport, so the wheel scrolls the grid, not the page. */
+async function pointAtGrid(page: Page): Promise<void> {
+  const box = viewport(page);
+  await box.scrollIntoViewIfNeeded();
+  const b = await box.boundingBox();
+  const size = page.viewportSize();
+  if (!b || !size) return;
+  const top = Math.max(b.y, 0);
+  const bottom = Math.min(b.y + b.height, size.height);
+  await page.mouse.move(b.x + b.width / 2, top + (bottom - top) / 2);
+}
+
 /** Scrolls the grid's run with the mouse wheel until `done` holds or the run ends. */
 async function scrollUntil(page: Page, done: () => Promise<boolean>): Promise<void> {
   if (await done()) return;
   const box = viewport(page);
   if ((await box.count()) === 0) return;
-  const bounds = await box.boundingBox();
-  if (bounds) await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+  await pointAtGrid(page);
   let still = 0;
   for (let guard = 0; guard < 400 && still < 3; guard += 1) {
     const before = await box.evaluate((el) => el.scrollTop);
@@ -222,7 +245,7 @@ async function mountedRows(page: Page): Promise<[number, string[]][]> {
 /**
  * Every row's searchable texts in the one continuous run, read the way a person reads it: the mouse wheel scrolls the
  * grid's viewport from top to bottom while the virtual body mounts the rows in view. Back at the top afterwards.
- * Also returns how many rows were mounted before any scrolling (the first window).
+ * Also returns how many rows a person sees in the viewport before any scrolling (the first window).
  */
 async function allRowsWithWindow(page: Page): Promise<{ rows: string[][]; window: number }> {
   await bodyRows(page).first().waitFor({ state: "attached", timeout: SHORT });
@@ -234,8 +257,8 @@ async function allRowsWithWindow(page: Page): Promise<{ rows: string[][]; window
   await box.evaluate((el) => (el.scrollTop = 0));
   const first = await mountedRows(page);
   for (const [n, texts] of first) add(n, texts);
-  const bounds = await box.boundingBox();
-  if (bounds) await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+  const window = await visibleRows(page);
+  await pointAtGrid(page);
   let still = 0;
   for (let guard = 0; guard < 400 && still < 3; guard += 1) {
     const before = await box.evaluate((el) => el.scrollTop);
@@ -247,7 +270,7 @@ async function allRowsWithWindow(page: Page): Promise<{ rows: string[][]; window
   }
   await box.evaluate((el) => (el.scrollTop = 0));
   const rows = [...seen.values()].sort(([a], [b]) => a - b).map(([, texts]) => texts);
-  return { rows, window: first.length };
+  return { rows, window };
 }
 
 async function allRows(page: Page): Promise<string[][]> {
@@ -261,7 +284,7 @@ const PAGE_SIZE = 50;
 /**
  * A search string from the data whose matches lie beyond the first window before the search AND fill more than one window
  * after it, so both "filters only the rows in view" and "keeps only the first window of results" show as dropped rows.
- * `pageSize` is the first window: the rows the grid mounts before any scrolling (row 2: continuous run, no pages).
+ * `pageSize` is the first window: the rows a person sees before any scrolling (row 2: continuous run, no pages).
  */
 export function pickNeedle(rows: string[][], pageSize = PAGE_SIZE): string | null {
   const seen = new Set<string>();
@@ -621,12 +644,10 @@ export const REGION: Recipe[] = [
         // the first window, so rows below it never mount.
         name: "chi con khung dau",
         message: /tim: bo sot dong khop — /,
-        // Hides every result row numbered past the first window (the rows the grid mounts before any scrolling),
+        // Hides every result row numbered past the first window (the rows a person sees before any scrolling),
         // re-applied on every re-render: the results never reach past that window.
         apply: async ({ page }) => {
-          const window = await bodyRows(page).evaluateAll(
-            (trs) => trs.filter((tr) => tr.querySelector('[data-slot="row-number"]')).length,
-          );
+          const window = await visibleRows(page);
           await onResult(
             page,
             `const box = document.querySelector('[data-slot="data-region"] input[type="search"]');

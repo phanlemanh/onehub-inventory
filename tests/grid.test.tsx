@@ -235,7 +235,8 @@ describe("density", () => {
 
   it("goes dense only when the columns are wider than the area", () => {
     expect(() => checkEdge(densityFor)).not.toThrow();
-    expect(DENSITY_ROW_CLASS).toEqual({ dense: "h-10 text-sm", normal: "h-12 text-base" });
+    // Row 2 (owner, «Duyệt»): dense rows drop to 32px like data-grid-editing-6 and a sheet; normal rows unchanged.
+    expect(DENSITY_ROW_CLASS).toEqual({ dense: "h-8 text-sm", normal: "h-12 text-base" });
   });
 
   it("fails on a density rule that is dense at the edge", () => {
@@ -308,9 +309,7 @@ describe("continuous run and read-only cells", () => {
       if (num !== i + 1) throw new Error(`run broken at row ${i + 1}`);
     });
     if (numbers.length !== n) throw new Error(`run broken at row ${numbers.length + 1}`);
-    const footer = container.querySelector(
-      '[data-slot="region-footer"] [data-slot="region-count"]',
-    );
+    const footer = container.querySelector('[data-slot="region-footer-count"]');
     if (footer?.textContent !== `${n} dòng`) throw new Error("footer count missing");
   }
 

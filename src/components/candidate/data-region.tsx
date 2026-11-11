@@ -47,8 +47,8 @@ export type GridRow = {
 
 export type RegionStatus = "ready" | "loading" | "error" | "partial" | "forbidden";
 
-/** Row heights of the two densities (h-10, h-12), for the virtual body to place rows before measuring them. */
-const ROW_HEIGHT_PX = { dense: 40, normal: 48 } as const;
+/** Row heights of the two densities (h-8, h-12, plus the 1px row border), for the virtual body to place rows before measuring them. */
+const ROW_HEIGHT_PX = { dense: 33, normal: 49 } as const;
 
 /** Viewport height of the grid: rows scroll inside it in one run, like a sheet; the page itself does not scroll. */
 const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-screen";
@@ -362,6 +362,8 @@ export function DataRegion({
         i18n={GRID_I18N}
         tableLayout={{
           headerSticky: true,
+          headerBackground: true,
+          cellBorder: true,
           columnsPinnable: true,
           width: "fixed",
           dense: density === "dense",
@@ -370,11 +372,13 @@ export function DataRegion({
       >
         <DataGridContainer>
           <DataGridScrollArea className={VIEWPORT_HEIGHT_CLASS}>
-            <DataGridTableVirtual estimateSize={ROW_HEIGHT_PX[density]} />
+            {/* Keyed by density: the virtual body keeps the estimate it started with for rows it has not measured, so a
+                switch from normal to dense rows must start it again or the run's height (and its last rows) go wrong. */}
+            <DataGridTableVirtual key={density} estimateSize={ROW_HEIGHT_PX[density]} />
           </DataGridScrollArea>
         </DataGridContainer>
         <div data-slot="region-footer" className="border-t px-3 py-2">
-          <span data-slot="region-count" className="text-sm text-muted-foreground">
+          <span data-slot="region-footer-count" className="text-sm text-muted-foreground">
             {query
               ? GRID_COPY.filteredCount(shown.length, rows.length)
               : GRID_COPY.rowCount(rows.length)}
@@ -405,7 +409,6 @@ export function DataRegion({
               onQuery={setQuery}
               action={action?.allowed && status !== "forbidden" ? action.node : undefined}
               searchId={searchId}
-              showCount={false}
             />
           </div>
           {status === "partial" && rows.length > 0 ? (

@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 
-import { Input } from "@/components/ui/input";
+import { SearchIcon } from "lucide-react";
+
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 
 import { GRID_COPY } from "./grid-copy";
 
@@ -14,7 +16,7 @@ function countText(total?: number, shown?: number): string | null {
 
 /** The region's name, alone on the frame's header strip (arrangement after data-grid-editing-6). */
 export function RegionTitle({ title }: { title: string }) {
-  return <h2 className="text-base font-semibold">{title}</h2>;
+  return <h2 className="text-sm font-semibold">{title}</h2>;
 }
 
 /**
@@ -47,14 +49,19 @@ export function RegionToolbar({
     <div data-slot="region-toolbar" className="flex flex-wrap items-center gap-x-3 gap-y-2">
       {total !== undefined ? (
         <div className="w-full sm:w-64">
-          <Input
-            id={searchId}
-            type="search"
-            aria-label={GRID_COPY.searchLabel}
-            placeholder={GRID_COPY.searchPlaceholder}
-            value={query}
-            onChange={(event) => onQuery(event.target.value)}
-          />
+          <InputGroup>
+            <InputGroupAddon>
+              <SearchIcon aria-hidden="true" />
+            </InputGroupAddon>
+            <InputGroupInput
+              id={searchId}
+              type="search"
+              aria-label={GRID_COPY.searchLabel}
+              placeholder={GRID_COPY.searchPlaceholder}
+              value={query}
+              onChange={(event) => onQuery(event.target.value)}
+            />
+          </InputGroup>
         </div>
       ) : null}
       {count ? (

@@ -12,7 +12,7 @@ ds_skill: inventory-ui
 states: [co-du-lieu, cho-tai, trong, tim-khong-ra, loi]
 breakpoints: [mobile-360, mobile-414, desktop-1024, desktop-1440]
 themes: [light, dark]
-patched: 5
+patched: 10
 deferred: 2
 ---
 # design-pass — bang-hang-ban-doc
@@ -81,6 +81,7 @@ trang cho tới khi chủ kho duyệt nhãn (Hỏi-2). Trang ảnh tự chứa (
 
 ### Nhóm 1 — vá-được-trong-từ-vựng-token (đã vá tại chỗ)
 
+- So lại với data-grid-editing-6, chủ kho «Duyệt» sửa năm chỗ: kẻ dọc giữa cột, dòng dày 32px, ô tìm có kính lúp kèm số dòng, hàng tiêu đề một màu, tên vùng chữ nhỏ (ảnh so: evidence/design-pass/so-sanh-editing-6.png).
 - Đọc như Sheet (việc G-1111-16, lời chủ kho): cuộn liền bằng bảng cuộn ảo ReUI, cột số dòng, tiêu đề và số dòng · Căn · Toà đứng yên, chân bảng ghi số dòng; trạng thái trống thêm «Tải lại».
 - Khi cột tràn, lưới dày dùng chữ nhỏ và bề rộng cột tính theo cỡ chữ ấy (cột số dòng vào phép tính tràn): 1440 lại đủ tám cột.
 - Khung vùng xếp theo data-grid-editing-6 bằng Frame của ReUI: dải tên, thanh công cụ ô tìm + số dòng, chân bảng chia trang (việc G-1111-14, Hỏi-4 chủ kho «Đúng ý.»).
