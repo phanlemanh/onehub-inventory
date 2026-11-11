@@ -67,3 +67,43 @@ wall: 182s
 - **claude-opus-5-5**: 3 agent · 25 calls · out 9,792 · in 50 · cache_read 666,898 · cache_create 92,945
 - **claude-sonnet-5-5**: 6 agent · 12 calls · out 9,364 · in 24 · cache_read 90,010 · cache_create 117,683
 - **claude-haiku-5-5**: 3 agent · 6 calls · out 3,890 · in 12 · cache_read 44,546 · cache_create 38,488
+### S4 round 3 — wf_38bb5cfc-74a (19 agent, 41,354 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| synthesize:report | claude-sonnet-5-5 | 2 | 6,267 | 4 | 23,262 | 36 |
+| review:invariants | claude-opus-5-5 | 8 | 5,250 | 16 | 188,621 | 54 |
+| review:bugs | claude-opus-5-5 | 15 | 4,670 | 30 | 446,797 | 123 |
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 4,018 | 6 | 38,682 | 69 |
+| review:measurement | claude-opus-5-5 | 7 | 3,662 | 14 | 136,384 | 42 |
+| machine:npx vitest run tools/reui_catalog --cove | claude-haiku-5-5 | 2 | 2,854 | 4 | 14,900 | 32 |
+| machine:make e2e | claude-haiku-5-5 | 2 | 2,685 | 4 | 14,857 | 61 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,515 | 4 | 11,553 | 37 |
+| machine:make test | claude-haiku-5-5 | 2 | 1,368 | 4 | 14,853 | 28 |
+| triage | claude-sonnet-5-5 | 3 | 1,345 | 6 | 34,206 | 12 |
+| judge:E11:spec-alignment | claude-sonnet-5-5 | 2 | 1,106 | 4 | 14,798 | 12 |
+| judge:E14:domain-correctness | claude-sonnet-5-5 | 2 | 1,028 | 4 | 14,765 | 10 |
+| judge:E11:domain-correctness | claude-sonnet-5-5 | 2 | 953 | 4 | 11,182 | 10 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 890 | 4 | 14,857 | 9 |
+| judge:E11:operational-feasibility | claude-sonnet-5-5 | 2 | 879 | 4 | 14,800 | 10 |
+| judge:E14:spec-alignment | claude-sonnet-5-5 | 2 | 872 | 4 | 14,765 | 10 |
+| machine:node --require ./tools/reui_catalog/no-n | claude-haiku-5-5 | 2 | 838 | 4 | 14,988 | 7 |
+| judge:E14:operational-feasibility | claude-sonnet-5-5 | 2 | 812 | 4 | 14,767 | 9 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 342 | 4 | 10,366 | 6 |
+
+
+wall: 187s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| baseline | 1 | 4,018 | 38,682 | 69 | 05:31:33 | 05:32:42 |
+| review | 3 | 13,582 | 771,802 | 132 | 05:31:33 | 05:33:45 |
+| machine | 6 | 10,150 | 86,008 | 108 | 05:31:33 | 05:33:21 |
+| judge | 6 | 5,650 | 85,077 | 14 | 05:31:33 | 05:31:47 |
+| triage | 1 | 1,345 | 34,206 | 12 | 05:33:45 | 05:33:57 |
+| capture | 1 | 342 | 10,366 | 6 | 05:33:58 | 05:34:04 |
+| synthesize | 1 | 6,267 | 23,262 | 36 | 05:34:04 | 05:34:40 |
+
+- **claude-sonnet-5-5**: 10 agent · 22 calls · out 17,622 · in 44 · cache_read 191,593 · cache_create 182,449
+- **claude-opus-5-5**: 3 agent · 30 calls · out 13,582 · in 60 · cache_read 771,802 · cache_create 116,875
+- **claude-haiku-5-5**: 6 agent · 12 calls · out 10,150 · in 24 · cache_read 86,008 · cache_create 79,995
