@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api, config]
 screens: [sign-in, today, inventory, sent]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: docs/superpowers/specs/2026-11-11-dang-nhap-ma-email-design.md
@@ -115,3 +115,14 @@ nào (bảng quyền 9a).
   thêm thực thể: tài khoản, phiên, mã là phần kỹ thuật của mô-đun danh tính; thành viên sàn có vai là của hàng 9.
 - Thêm gói `pg` vào `package.json` và `package-lock.json` (giám sát duyệt N-1111-3). Các dãy khác chạy cài lại sau khi
   hàng này gộp.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - SP-1: chấp nhận có tên — vai riêng của các hàm danh tính được vượt luật cách ly theo dòng (chỉ đọc bảng sàn và bảng thành viên, chỉ qua sáu hàm hẹp), và tệp cửa nạp trình điều khiển Postgres.
+  - Ngoài-5: Việc một người thuộc sàn nào chưa được ghi vào bộ khái niệm nghiệp vụ chung. Người dùng không thấy khác biệt, chỉ là tài liệu mô hình chưa đầy đủ cho tới hàng sau.
+  - Ngoài-6: Khi đổi sàn gặp lỗi mạng hoặc bị từ chối, menu có thể bị kẹt không bấm được hoặc không báo gì. Người dùng vẫn ở sàn cũ và phải tải lại trang.
+  - Ngoài-7: Kiểm tra khả năng tiếp cận chưa chạy ở màn chưa thuộc sàn và màn lỗi máy chủ, nên lỗi tiếp cận ở đó có thể lọt qua. Người dùng dùng trình đọc màn hình có thể gặp khó ở hai màn này.
+  - Ngoài-8: Một số dòng nhật ký máy chủ viết bằng tiếng Việt thay vì tiếng Anh. Người dùng không thấy gì, chỉ người vận hành đọc nhật ký mới gặp.
+  - Ngoài-9: Màn đăng nhập ghi cứng số phút hết hạn mã và thời gian chờ. Nếu sau này đổi số, màn hình có thể nói khác với thư gửi đi.
+  - Ngoài-10: Tiêu đề thư gửi mã dùng chữ tự gõ thay vì lấy từ bảng nhãn chung. Người nhận vẫn thấy tiêu đề đúng.
+  - Ngoài-11: Gõ email sai định dạng thì màn hình báo lỗi máy chủ kèm nút Thử lại thay vì nói email không hợp lệ. Người dùng thử lại vẫn lỗi và có thể bối rối.
+  - Ngoài-12: Nếu cấu hình máy chủ thiếu sau khi chạy, mọi trang hiện như chưa đăng nhập mà không có dấu vết nào trong nhật ký. Người vận hành khó tìm nguyên nhân.
+  - Ngoài-13: Bài kiểm chứng minh mã đăng nhập không bị in ra nhật ký chưa đủ chặt, nên nếu sau này mã bị lộ vào nhật ký thì bài kiểm có thể vẫn xanh. Hiện chưa có dấu hiệu mã đang bị lộ.
