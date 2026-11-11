@@ -18,6 +18,9 @@ executors:
     reui_catalog_offline: "node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs && node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs && git diff --exit-code -- design/reui-catalog.json && echo 'reui catalog regenerated twice offline, identical to commit'"   # danh-muc-reui (1g)
     reui_catalog_check: "node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs --check"   # danh-muc-reui (1g)
     reui_catalog_test: "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose"   # danh-muc-reui (1g)
+    man_mau: "npx vitest run tools/e2e_templates --coverage.enabled=false --reporter=verbose"   # bo-bai-kiem-tu-so-man (1f): register-driven suite, unit level
+    man_e2e: "npx playwright test tests/e2e/screens"   # bo-bai-kiem-tu-so-man (1f): register-driven browser suite, four sizes
+    man_e2e_cham: "E2E_CPU_THROTTLE=4 npx playwright test tests/e2e/screens --project=1440 --retries=0"   # bo-bai-kiem-tu-so-man (1f): same suite, CPU slowed 4x
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists
