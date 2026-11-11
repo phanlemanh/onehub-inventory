@@ -1,0 +1,90 @@
+schema_version: 1
+feature_slug: khai-vai-va-man
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.vai_man
+    paths: [ontology/roles.yaml, ontology/labels.yaml, src/generated/ontology.ts, tools/coverage_matrix/**, tests/coverage-matrix.test.ts]
+    expected: "exit 0; trong tests/coverage-matrix.test.ts, ca 'roles › the repo declares the four assignable roles' đọc ontology/roles.yaml thật và thấy đúng danh sách viết trước [ListAgent, BuyerAgent, TeamLead, CompanyAdmin] theo thứ tự, holds = many, và src/generated/ontology.ts chứa đúng dòng 'export type Role = \"ListAgent\" | \"BuyerAgent\" | \"TeamLead\" | \"CompanyAdmin\";'; ca 'roles › a role without a role label is red' dựng bản sao có thêm vai Ghost không có nhãn và khẳng định máy kiểm thoát 1 với thông điệp chứa \"role 'Ghost' has no role label\"; ca đối chứng dương cùng bản sao không có Ghost thoát 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.vai_man
+    paths: [design/screens.yaml, "src/app/**/page.tsx", tools/coverage_matrix/**, tests/coverage-matrix.test.ts]
+    expected: "exit 0; ca 'screens › the repo register matches every page' chạy máy kiểm trên kho thật, thoát 0, và tập đường dẫn đọc từ các page.tsx dưới src/app (bỏ nhóm '(x)') bằng đúng tập route của các màn built trong design/screens.yaml — gồm /, /inventory, /sent, /proto/[slug]; ca 'screens › an undeclared page is red' thêm src/app/(app)/ghost/page.tsx vào bản sao và khẳng định thoát 1 với thông điệp chứa \"page '/ghost' is not in design/screens.yaml\"; đối chứng dương: cùng bản sao trước khi thêm trang thoát 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.vai_man
+    paths: [tools/coverage_matrix/**, tests/coverage-matrix.test.ts]
+    expected: "exit 0; bảng ca viết trước 'screens › register errors' có đúng 8 dòng, mỗi dòng sửa một chỗ trên cùng bản sao lành rồi khẳng định thoát 1 với thông điệp ghim: (1) built không trang → \"screen 'x' is built but has no page\"; (2) planned có trang → \"screen 'x' is planned but has a page\"; (3) trùng mã → \"duplicate screen id 'x'\"; (4) trùng đường dẫn → \"duplicate route '/x'\"; (5) họ lạ → \"screen 'x': unknown family 'y'\"; (6) đối tượng lạ → \"screen 'x': unknown audience 'y'\"; (7) trạng thái lạ → \"screen 'x': unknown status 'y'\"; (8) nhãn không có → \"screen 'x': title label 'Nope' is not in ontology/labels.yaml\"; bộ kiểm khẳng định bảng có đúng 8 dòng trước khi chạy; đối chứng dương: bản sao lành thoát 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.vai_man
+    paths: [design/screens.yaml, tests/coverage-matrix.test.ts]
+    expected: "exit 0; ca 'screens › contacts is declared ahead in the grid family' đọc design/screens.yaml thật: màn có id contacts có status planned, family grid, title Contact, route /contacts; màn inventory và sent có family grid; không tồn tại tệp page.tsx nào khớp /contacts dưới src/app; đối chứng âm trên bản sao: đổi family của contacts thành null thì hàm đọc sổ trả family khác grid và ca khẳng định 'contacts must be in grid' sẽ đỏ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.vai_man
+    paths: [tools/coverage_matrix/**, tests/coverage-matrix.test.ts]
+    expected: "exit 0; ca 'contracts › an open UI round needs the block' quét đúng bốn trạng thái mở viết trước [draft, approved, implemented, verified] (bộ kiểm khẳng định danh sách có 4 phần tử) × ba mặt [ui, web, web-ui]: hồ sơ thiếu khoá screens → thoát 1 với \"_acceptance/r/contract.md: touches the UI but declares no screens\"; có screens [inventory] nhưng thiếu mục → \"_acceptance/r/contract.md: missing section '## Vai × Màn'\"; screens [] và mục rỗng → \"_acceptance/r/contract.md: screens is empty, give the reason under '## Vai × Màn'\"; ca 'contracts › declared screens need the block without a UI surface' dùng hồ sơ draft surfaces [config] screens [inventory] không mục → thoát 1 với \"missing section '## Vai × Màn'\"; ca 'contracts › unknown status is red' với status 'dang-lam' → \"_acceptance/r/contract.md: unknown status 'dang-lam'\"; đối chứng dương: mỗi hồ sơ trên thêm đủ khối thì thoát 0, và screens [] kèm một dòng lý do thoát 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.vai_man
+    paths: [tools/coverage_matrix/**, tests/coverage-matrix.test.ts]
+    expected: "exit 0; bảng ca viết trước 'contracts › block errors' có đúng 8 dòng, mỗi dòng phá một chỗ trên cùng một hồ sơ lành có khối hai màn × bốn vai, rồi khẳng định thoát 1 với thông điệp ghim gồm tên hồ sơ, màn và vai: bỏ cột Quản trị sàn → \"missing role column 'Quản trị sàn'\"; thêm cột Khách → \"column 'Khách' is not a role\"; ô trống → \"screen 'inventory', role 'Đầu khách': empty cell\"; ô 'có' → \"must start with được, chặn or không liên quan\"; ô 'không liên quan' không lý do → \"'không liên quan' needs a reason\"; thiếu dòng sent → \"missing row for screen 'sent'\"; dòng contacts không có trong screens → \"row 'contacts' is not in screens\"; screens chứa ghost → \"screen 'ghost' is not in design/screens.yaml\"; bộ kiểm khẳng định bảng có đúng 8 dòng; đối chứng dương: hồ sơ lành thoát 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.vai_man
+    paths: [tools/coverage_matrix/**, tests/coverage-matrix.test.ts, "_acceptance/*/contract.md"]
+    expected: "exit 0; ca 'contracts › closed records' quét đúng ba trạng thái đóng viết trước [signed-off, machine-cleared, da-cham-boi-thuc-te] (bộ kiểm khẳng định 3 phần tử): hồ sơ surfaces [ui] không mục → thoát 0 và --report --json đếm truoc_khoi = 1; cùng hồ sơ có khối bỏ cột Đầu chủ → thoát 1 với \"missing role column 'Đầu chủ'\"; hồ sơ draft surfaces [config] không screens → thoát 0 và không được đếm là vòng chạm màn; ca 'contracts › the repo records pass' chạy trên kho thật (hồ sơ khung-va-giao-dien do bộ ghi của kit ký thật) và thấy khung-va-giao-dien trong danh sách truoc_khoi của --report --json, máy kiểm thoát 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.vai_man
+    paths: [tools/coverage_matrix/**, mk/coverage.mk, tests/coverage-matrix.test.ts]
+    expected: "exit 0; ca 'report › counts match a hand-written tally' dựng bộ hồ sơ mẫu viết trước: 2 vòng đủ ô (một có 1 ô không liên quan trên 8 ô, một có 0 trên 4 ô), 1 vòng thiếu ô, 1 vòng trước khối, 1 vòng screens [] có lý do, 1 vòng không chạm giao diện; chạy 'make -s coverage-report COVERAGE_ROOT=<bản sao>' và khẳng định thoát 0 dù có vòng thiếu ô, đầu ra chứa đúng các dòng 'vòng chạm màn: 5', 'đủ ô: 2', 'thiếu ô: 1', 'trước khối: 1', 'không khai màn: 1', 'ô không liên quan: 1/12 (8%)', 'mốc Quỹ hàng: 33/98'; đối chứng: thêm một ô không liên quan vào vòng thứ hai thì dòng thành '2/12 (17%)'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.vai_man
+    paths: [mk/coverage.mk, Makefile, tools/coverage_matrix/**, tests/coverage-matrix.test.ts]
+    expected: "exit 0; ca 'make › check depends on the matrix and keeps its exit code' đọc cơ sở dữ liệu của make ('make -pn check') và khẳng định coverage-matrix là phụ thuộc trực tiếp của check, công thức của coverage-matrix không mở đầu bằng '-' và không chứa '|| true'; 'make -s coverage-matrix' trên kho thật thoát 0 và in 'coverage-matrix: ok'; trên hai bản sao phá — một có trang /ghost, một có hồ sơ draft surfaces [ui] thiếu cột Quản trị sàn — 'make -s coverage-matrix COVERAGE_ROOT=<bản sao>' thoát khác 0 với thông điệp ghim \"page '/ghost' is not in design/screens.yaml\" và \"missing role column 'Quản trị sàn'\"; đối chứng dương: bản sao lành thoát 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["**"]
+    expected: "exit 0; make check xanh trên kho, gồm đích coverage-matrix in 'coverage-matrix: ok'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-1
+    executor: judgment
+    inputs: [ontology/roles.yaml, design/screens.yaml, ontology/labels.yaml, docs/plan/pham-vi-mvp-dot-1.md, wiki/decisions/0016-permission-model.md, wiki/decisions/0017-actor-surface-coverage-pilot.md]
+    question: "Đặt cạnh quyết định 0016 và 0017, danh sách vai trong roles.yaml có đúng là các vai cố định giao được cho nhân viên sàn (không lẫn bên giao dịch hay người giữ hàng), có ghi luật một người giữ nhiều vai cộng quyền mà không tự khai quyền hay kế thừa thay bảng quyền, và sổ màn có màn Liên hệ khai trước trong họ Lưới, bản mẫu mang đối tượng dev không?"
+    pass_criteria: "PASS khi cả ba: bốn vai trùng các vai giao được của 0016 và labels.yaml (không có OwnerMember, Seller, Buyer), roles.yaml không có inherits hay quyền theo màn, sổ màn có Liên hệ planned trong grid và bản mẫu mang đối tượng dev"
+    evidence_required: [run_id, verdict, judges, rationale]
