@@ -6,7 +6,7 @@ failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 3c038b32e6c675861194c799f1b6820b4c7a1dde
+verified_commit: 71dcd6a22b8f2761d31fb828bc701cb4de7fc4e2
 human_signoff:
 ---
 
@@ -179,3 +179,7 @@ none — every multi-run eval is uniform
 
 Round 1: make check đỏ ở lệnh suite; các eval máy đã chạy và đạt. Trả về triển khai.
 Round 2: ba lệnh suite (make check, npm run build, make e2e) xanh; các eval máy mang từ round 1 vì delta không chạm paths của eval; E9 chờ người ở Cổng 2. Verdict PENDING-JUDGMENT.
+
+### Re-pin lần 1 — 2026-11-11, do gộp origin/main (hàng 1a) vào nhánh trước khi trình Cổng Bằng chứng
+run_id: repin-20261111T021712Z-49571
+sha: 71dcd6a22b8f2761d31fb828bc701cb4de7fc4e2 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E9 (E9 không khai paths)
