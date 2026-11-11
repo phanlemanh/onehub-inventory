@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-12 — Cổng chứng minh màn theo quyết định 0023: sổ khối `design/so-khoi.yaml` (mở rỗng), bậc «trong kho» tra sổ, ứng viên ReUI kèm ảnh, vùng lấy bỏ thêm, mục «Từ Quỹ hàng» và «Họ», lối khuôn bọc cho App Shell; ba hồ sơ đã qua Cổng Phạm vi giữ luật cũ; luật giao diện thay câu «chuyển thể chỉ đổi dữ liệu» bằng luật ba tầng — [0023](decisions/0023-chon-truoc-tao-sau.md), hàng 1n.
 - 2026-11-11 — Recorded the reuse ladder set by the owner (choose before making; repo, then repo with ReUI Pro, then hand-made; three layers of "keep as is") and added roadmap rows 1n, 1o, 1p, 9c — [0023](decisions/0023-chon-truoc-tao-sau.md).
 - 2026-11-11 — Bộ bài kiểm sinh từ sổ màn: `tests/e2e/screens` đọc sổ màn và bản khai vai lúc chạy (qua bộ đọc của hàng 1d), mỗi màn đã dựng có bốn bài khung ở bốn khổ, màn Lưới có vùng và bản mẫu Lưới có bảy trạng thái vùng; mỗi bài có ca phá gọi đúng hàm kiểm ấy; đóng bốn lỗ bài kiểm của 1b (chờ tải treo, đối chứng chờ tải, tìm bỏ sót dòng, đỏ giả khi máy chậm) — hàng 1f, [0019](decisions/0019-measurable-design-system-pilot.md), `_acceptance/bo-bai-kiem-tu-so-man/`
 
