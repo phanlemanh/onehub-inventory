@@ -5,7 +5,7 @@ slug: cong-chung-minh-man-mau
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: _acceptance/cong-chung-minh-man-mau/design.md
@@ -101,3 +101,18 @@ Quét trục tại chỗ theo khuôn quét hình thái (không gọi skill: khô
 - Hạng T3 theo `risk_tiers.t3_paths` (`tools/**`).
 - Lúc thiết kế, nhánh chính và các nhánh đang mở không có hồ sơ còn mở nào khai màn sản phẩm, nên gộp hàng này không làm đỏ
   vòng nào đang chạy. Từ khi gộp, vòng nào khai màn sản phẩm phải có tệp chứng minh trước lượt chấm.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-1: Khi người dựng màn viết lý do lệch có một tệp thật và một tệp không tồn tại đặt trong ngoặc kép kiểu văn bản, cổng vẫn cho qua.
+  - Ngoài-2: Nếu lý do lệch trỏ tới một trang quyết định đúng số nhưng sai tên tệp, cổng vẫn cho qua.
+  - Ngoài-3: Một ô lý do hợp lệ có nhắc cụm như TypeScript/Node.js có thể bị cổng báo đỏ nhầm.
+  - Ngoài-4: Chưa có bài thử chứng minh một ô lý do có hai căn cứ thật thì cổng im.
+  - Ngoài-5: Căn cứ mã quyết định hay trang wiki không có thật, đặt cạnh một căn cứ thật, chưa có bài thử riêng.
+  - Ngoài-6: Hai công cụ kiểm có thể hiểu khác nhau về một màn hay một hồ sơ đã đóng, nên có lúc một vòng qua cổng này mà bị bên kia đếm khác.
+  - Ngoài-7: Một vòng có thể qua cổng bằng cách trỏ tới ảnh nằm ngoài hồ sơ, nên người soi ở cổng có thể không thấy đúng ảnh đặt cạnh màn mẫu.
+  - Ngoài-8: Nếu bảng trạng thái của kho bị đổi tên hay hỏng, cổng im lặng bỏ qua việc kiểm trạng thái và mọi màn mẫu mới đều qua.
+  - Ngoài-9: Khi danh sách trạng thái không đọc được, cổng báo xanh cho mọi màn mẫu mới mà không cảnh báo gì, nên màn thiếu trạng thái có thể được trình.
+  - Ngoài-10: Hồ sơ gõ sai trạng thái hoặc hỏng phần đầu sẽ bị cổng bỏ qua và vẫn báo xanh, dù công cụ khác trong bộ kiểm chung có thể đỏ.
+  - Ngoài-11: Bài thử ca Liên hệ cũ dùng bản viết tay nên chưa chắc chứng minh lưới bắt được đúng lời cổng cũ thật.
+  - Ngoài-12: Nếu bản chép tay bảng kiểm Liên hệ chép sai hay sót dòng thì không bài thử nào phát hiện, nên con số 25 chỗ lệch có thể không khớp bản gốc.
+  - Ngoài-13: Ba loại lỗi của cổng chưa có bài thử riêng nên nếu chúng hỏng thì không ai biết ngay.
+  - Ngoài-14: Bài thử toàn phần chưa kê hết các lối của màn, nên tổ hợp trạng thái hồ sơ với lối họ mới chỉ được thử rời.
