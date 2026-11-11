@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 7c5dae9643cfeaf84dc79d4140a8e49f442b69dc
+verified_commit: 9d1dc0cce8cee9bbbdd03eed577c00789bbaf91b
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -203,3 +203,7 @@ Round 3: sua cho chu dai doc duoc khi tieu diem vao o; E1, E3, E6, E8, E9, E10, 
 ### Re-pin lần 1 — 2026-11-11, do gộp nhánh chính (hàng 1d) và sửa ca e2e chờ trang tải xong
 run_id: repin-20261111T033949Z-60343
 sha: 7c5dae9643cfeaf84dc79d4140a8e49f442b69dc · suites: 3 lệnh exit 0 · evals: 12/12 eval máy đạt kỳ vọng · ngoài làn máy: E11, E12 (E12 không khai paths)
+
+### Re-pin lần 2 — 2026-11-11, do sửa ca e2e khung chờ trang tải xong
+run_id: repin-20261111T034858Z-39933
+sha: 9d1dc0cce8cee9bbbdd03eed577c00789bbaf91b · suites: 3 lệnh exit 0 · evals: 12/12 eval máy đạt kỳ vọng · ngoài làn máy: E11, E12 (E12 không khai paths)
