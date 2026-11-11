@@ -8,6 +8,9 @@ title: Change log of the wiki and notable code changes
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
 - 2026-11-11 — Lệnh ghi số đo của vòng dừng và chỉ đường gỡ khi bản số đo cũ không đọc được, không phải JSON hay sai hình dạng, thay vì lặng lẽ bỏ tầng đã khai rồi ghi đè — hàng 1l, `_acceptance/so-do-ghi-khong-mat-tang/`
+- 2026-11-11 — Khai hai khái niệm liên kết vào mô hình nghiệp vụ: Chủ của hàng (ListingOwner, có sàn và vai bên bán) và Căn của hàng (ListingUnit); mã dữ liệu mẫu dùng kiểu sinh — [khai-lien-ket-chao-can](../_acceptance/khai-lien-ket-chao-can/design.md)
+- 2026-11-11 — Nền cách ly mỗi sàn: lược đồ nền chép từ Quỹ hàng, cửa truy vấn `withCompany`, bộ quét một cửa và bộ kiểm cách ly 19 ca có phá thử — [cach-ly-moi-san](../_acceptance/cach-ly-moi-san/contract.md)
+- 2026-11-11 — Thanh bên nhận danh sách vai một người giữ và hiện mục của mọi vai ấy (người kiêm nhiều vai được cộng, theo 0016); kiểu vai của mục lấy từ bản khai vai — hàng 1i, [0016](decisions/0016-permission-model.md), `_acceptance/thanh-ben-nhieu-vai/`
 - 2026-11-11 — Lưới dùng chung: ô theo kiểu (canh lề, bề rộng, định dạng suy từ kiểu của trường), mật độ, đầu vùng, tìm, chia trang, bảy trạng thái vùng, ô chỉ đọc — hàng 1b, `_acceptance/luoi-va-o-theo-kieu/`
 - 2026-11-11 — Khai bốn vai và sổ màn cho máy đọc; `make check` đỏ khi có trang chưa khai hay hợp đồng của vòng giao diện thiếu khối Vai × Màn, `make coverage-report` in số đo của đợt thử — hàng 1d, [0017](decisions/0017-actor-surface-coverage-pilot.md), `_acceptance/khai-vai-va-man/`
 - 2026-11-11 — Danh mục ReUI (678 khối Pro, 27 thành phần gốc, 1.264 ví dụ) ghim theo bản chụp có băm, tra được tại máy không cần mạng; kiểm trong `make check` đỏ khi có mục tra không ra hoặc lọt mã, khoá — [tools/reui_catalog](../tools/reui_catalog/README.md), hàng 1g

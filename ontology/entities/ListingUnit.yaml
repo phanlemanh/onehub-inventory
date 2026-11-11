@@ -1,0 +1,19 @@
+name: ListingUnit
+description: The link between one listing and the shared-catalog unit it offers, inside one company.
+reso: none (our own; the shared catalog has no RESO resource)
+
+properties:
+  id: { type: uuid, required: true, unique: true }
+  companyId: { type: ref, target: Company, required: true }
+  listingId: { type: ref, target: Listing, required: true }
+  upi: { type: ref, target: Unit, required: true }
+
+rules:
+  - id: one-unit-per-listing
+    description: A listing has exactly one ListingUnit, of the same company.
+    implemented_in: src/modules/listings/sample.ts
+
+code:
+  model: src/modules/listings/
+  tests: tests/
+wiki: wiki/entities/listing-unit.md

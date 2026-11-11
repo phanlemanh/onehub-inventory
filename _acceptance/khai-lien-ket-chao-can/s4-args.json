@@ -1,0 +1,335 @@
+{
+ "generated_at": "2026-11-11T03:42:20Z",
+ "generated_sha": "a1b8f0cc902026313a384e916d3b00f739739127",
+ "mainBranchInfo": {
+  "branch": "main",
+  "source": "remote"
+ },
+ "slug": "khai-lien-ket-chao-can",
+ "round": 1,
+ "riskTier": "T3",
+ "evals": [
+  {
+   "id": "E1",
+   "criterion": "AC-1",
+   "cmd": "make test",
+   "expected": "\"exit 0; tests/link-types.test.ts đạt; ca 'AC-1' đọc ontology/entities/ListingOwner.yaml và ListingUnit.yaml (đường suy từ vị trí tệp kiểm) và khẳng định ma trận viết trước bảy trường tham chiếu (ListingOwner.companyId→Company, ListingOwner.contactId→Contact, ListingOwner.listingId→Listing, ListingUnit.companyId→Company, ListingUnit.listingId→Listing, ListingUnit.upi→Unit) cùng ListingOwner.contactType là enum đúng [Seller, Landlord], mọi trường required: true; đọc src/generated/ontology.ts khẳng định interface ListingOwner có đúng năm trường bắt buộc và dòng 'export type ListingOwnerContactType = \\\"Seller\\\" | \\\"Landlord\\\";', interface ListingUnit đúng bốn trường bắt buộc; chiều đỏ trên bản sao: đổi đích upi thành Listing → 'tham chiếu sai: ListingUnit.upi → Listing', bỏ required của contactType → 'trường không bắt buộc: ListingOwner.contactType'; đối chứng dương: companyId → Company không bị báo\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "ontology/entities/**",
+    "src/generated/ontology.ts",
+    "tests/link-types.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E2",
+   "criterion": "AC-2",
+   "cmd": "make test",
+   "expected": "\"exit 0; ca 'AC-2' đọc ontology/relations.yaml, khẳng định ma trận viết trước sáu quan hệ mới kèm cardinality (Company holds_owner_link ListingOwner one-to-many, Contact owns_through ListingOwner one-to-many, Listing owned_through ListingOwner one-to-many, Company holds_unit_link ListingUnit one-to-many, Listing placed_on ListingUnit one-to-one, Unit offered_through ListingUnit one-to-many), hai quan hệ cũ 'Contact owns Listing' và 'Unit offered_as Listing' còn nguyên, mọi đầu from/to là tên một tệp trong ontology/entities; chiều đỏ trên bản sao: bỏ 'Listing placed_on ListingUnit' → 'thiếu quan hệ: Listing placed_on ListingUnit', đổi cardinality của nó thành one-to-many → 'sai cardinality: Listing placed_on ListingUnit', đổi đích thành 'Lead' → 'đầu quan hệ không có: Lead'\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "ontology/relations.yaml",
+    "tests/link-types.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E3",
+   "criterion": "AC-3",
+   "cmd": "make test",
+   "expected": "\"exit 0; ca 'AC-3' khẳng định bằng kiểu: expectTypeOf<OwnerLink>().toEqualTypeOf<ListingOwner>() và kiểu phần tử listingUnits của buildSampleListings bằng ListingUnit sinh ra (typecheck trong make check cũng bắt); quét mọi tệp .ts của src/modules/listings và src/modules/contacts không có 'interface ListingUnit', 'interface OwnerLink', 'interface ListingOwner', 'type ListingUnit = {', 'type OwnerLink = {', 'type ListingOwner = {'; chiều đỏ trên bản sao văn bản chèn 'export type OwnerLink = {' → 'khai lại kiểu bằng tay: OwnerLink', chèn 'export interface ListingUnit {' → 'khai lại kiểu bằng tay: ListingUnit'; đối chứng dương: 'export type OwnerLink = ListingOwner;' không bị báo\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "src/modules/listings/**",
+    "src/modules/contacts/**",
+    "tests/link-types.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E4",
+   "criterion": "AC-4",
+   "cmd": "make test",
+   "expected": "\"exit 0; ca 'AC-4': mọi liên kết chủ của sàn mẫu có contactType thuộc {Seller, Landlord}; checkOwnerLinks trên vật lành trả 0 lỗi; chiều đỏ trên bản sao đổi contactType một liên kết thành 'Buyer' → 'vai không hợp lệ trên liên kết chủ: <mã>'; đối chứng dương: bản sao đổi thành 'Landlord' không bị báo\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "src/modules/contacts/**",
+    "tests/link-types.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E5",
+   "criterion": "AC-5",
+   "cmd": "make test",
+   "expected": "\"exit 0; ca 'AC-5' của tests/link-types.test.ts tự dựng sàn mẫu qua cửa index.ts của ba mô-đun, tính SHA-256 của JSON và so với hằng '16f9b15b3465b3f16b9a2e9ccfef6d00f0656a88f3b9d23f5492df128ece6ca0' viết trong chính tệp kiểm mới; chiều đỏ: bản sao đổi vai một liên kết cho băm khác hằng\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "src/modules/catalog/**",
+    "src/modules/listings/**",
+    "src/modules/contacts/**",
+    "tests/link-types.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E6",
+   "criterion": "AC-6",
+   "cmd": "make check",
+   "expected": "\"exit 0; make check xanh: 'wiki-lint: 7 entities, 0 errors, 0 warnings', 'boundaries: 0 errors, 0 warnings', 'src/generated/ontology.ts is up to date', bài kiểm ngôn ngữ đạt; ca 'AC-6' của tests/link-types.test.ts khẳng định ontology/glossary.md có dòng '`ListingOwner`' và '`ListingUnit`', architecture/modules.yaml cho contacts sở hữu ListingOwner và listings sở hữu ListingUnit, depends_on của mọi mô-đun vẫn rỗng; chiều đỏ trên bản sao modules.yaml bỏ ListingOwner khỏi owns của contacts → 'không mô-đun nào sở hữu: ListingOwner'\"",
+   "executor": "script",
+   "expectedExit": 0,
+   "paths": [
+    "ontology/**",
+    "wiki/entities/**",
+    "wiki/index.md",
+    "architecture/modules.yaml",
+    "src/generated/**",
+    "tests/link-types.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.script.check"
+  },
+  {
+   "id": "E7",
+   "criterion": "AC-7",
+   "cmd": "make test",
+   "expected": "\"exit 0; ca 'AC-7': checkOwnerLinks nhận thêm sàn của từng lần chào và báo 0 lỗi trên sàn mẫu; checkListingLinks báo 0 lỗi; chiều đỏ trên bản sao: một liên hệ đổi companyId sang sàn khác (liên kết giữ sàn mẫu) → 'liên kết chủ khác sàn với liên hệ: <mã liên kết>', một lần chào đổi companyId → 'liên kết chủ khác sàn với lần chào: <mã liên kết>', thêm liên kết căn thứ hai cho một lần chào → 'lần chào có 2 căn: <mã lần chào>'\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "src/modules/listings/**",
+    "src/modules/contacts/**",
+    "tests/link-types.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  }
+ ],
+ "suiteCommands": [
+  "make check",
+  "npm run build",
+  "make e2e"
+ ],
+ "diffBase": "3c4e8e829c2683ad668f1d46d0820f4d244dfa4f",
+ "repoRoot": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/hopeful-hertz-1d3fe0",
+ "personasPath": "/Users/manhphan/.claude/plugins/cache/acceptance-gate-kit/acceptance-gate/2.38.1/skills/acceptance/references/judge-personas.md",
+ "templatePath": "/Users/manhphan/.claude/plugins/cache/acceptance-gate-kit/acceptance-gate/2.38.1/skills/acceptance/references/evidence-report-template.md",
+ "toolKillRule": "# TOOL-KILL-RULE — lệnh bị công cụ ngắt KHÔNG phải lệnh fail\n\n**Nguồn duy nhất** của luật «hết giờ không phải trượt» cho MỌI đường chạy lệnh\nkiểm của kit. Hai đường tiêu thụ, cùng đọc khối marker dưới đây, không chép tay:\n\n- **Vòng lặp tính năng** (plugin feature-loop): skill `feature-loop` đọc file này\n  (resolve qua `resolve-plugin.mjs --require skills/acceptance/references/tool-kill-rule.md`)\n  và truyền NGUYÊN VĂN vào `args.toolKillRule` của workflow\n  `acceptance-verify.js`; workflow rút khối marker và nội suy vào prompt của mọi\n  agent chạy lệnh (machine · ui-check · baseline). Thiếu args hoặc không rút\n  được marker → workflow trả BLOCKED có tên, không chạy không luật.\n- **Đường VERIFY độc lập** (skill `acceptance` Phase 3): phiên điều phối chép khối\n  marker VERBATIM vào prompt của phiên tươi VERIFY, cùng nếp «Network truth».\n\nVì sao có luật: verifier chạy lệnh qua Bash tool có trần thời gian mặc định\n(~120 s) NGẮN hơn nhiều suite; lệnh bị công cụ giết trả exit code CỦA CÔNG CỤ,\nkhông phải của lệnh (vấp thật release-2-2-0 S4 r5: suite 108 s đơn lẻ, dưới tải\nbị giết ở 118 s → REJECT giả 4 eval). Nhận diện là việc AGENT (nó thấy tool\nresult thật); phần máy chỉ phòng thủ trên field cấu trúc `killedByTool` —\nKHÔNG grep nội dung output trong engine (chuỗi tổng kết là của suite từng repo).\n\nLệnh dài hơn trần 600 s của công cụ thì KHÔNG bị giết: công cụ **đẩy nó sang\nnền** và nó chạy tiếp. Tệp đầu ra nền trống tới phút chót, vì khung bọc lệnh của\nkit chỉ in khi lệnh xong — đọc trống thành «bị giết» là đúng sự cố crm 07/10/2026\n(hồ sơ `lenh-dai-chay-rieng`: hai lượt BLOCKED giả). Dòng «chuyển sang nền» trong\nkhối dưới là lối LỜI cho mọi lệnh. Lối MÁY: eval khai `long_running: <phút>`\ntrong `evals.yaml` thì lượt chấm feature-loop tự chạy lệnh nền, ghi nhật ký ở\n`.acceptance-runs/<slug>/s4-lenh-dai/` và chờ bằng lệnh nó sinh ra\n(`eval-executors.md`, mục `long_running`).\n\n<!-- <<<TOOL-KILL-RULE -->\nTRAN THOI GIAN CONG CU: khi goi Bash chay lenh, LUON dat tham so timeout >= 600000 (ms) — tran mac dinh cua cong cu (~120s) NGAN hon nhieu suite; lenh vuot tran se bi CONG CU giet va exit code luc do la cua cong cu, KHONG phai cua lenh. Neu lenh van bi cong cu dung (tool result bao timeout/killed, hoac output bi CAT giua chung truoc dong tong ket cuoi cua lenh) → DO KHONG PHAI ket qua that: khai cannotRun=true + killedByTool=true + reason \"bi cong cu giet o <so giay> giay\" kem dau hieu (timeout tool / output cat). TUYET DOI khong bao exitCode nhu the lenh tu fail va khong doan PASS/FAIL tu output cut.\nDAU RA DAI: harness co the CAT DAU RA RA TEP (\"Output too large … saved to <tep>\") va chi hien doan DAU — do KHONG phai bi cong cu giet: doc DUOI tep do (tail) de lay dong tong ket va ma thoat; chi khai killedByTool khi tool result bao timeout/killed that.\nCHUYEN SANG NEN KHONG PHAI BI GIET: tool result bao lenh chua xong trong timeout va da duoc CHUYEN SANG NEN (\"moved to the background\", kem ID + tep dau ra) → lenh VAN DANG CHAY: KHONG khai killedByTool, KHONG ket luan tu tep dau ra luc do. Tep dau ra nen TRONG la binh thuong — khung boc lenh chi in duoi dau ra + dong __EXIT=<n> khi lenh XONG. Cho bang lenh Bash co gioi han (moi lan goi ≤ 100 giay, duoi tran mac dinh 120 giay cua cong cu; vd vong lap kiem tep do co dong __EXIT= chua, sleep vai giay, het 100 giay thi thoat) va goi lai toi khi tep co dong __EXIT=<n> → doc ma tu dong do nhu binh thuong. Tong thoi gian cho toi da = so phut eval khai o long_running (vang thi 30 phut), tinh tu luc chay lenh; qua ma chua co dong __EXIT → cannotRun=true + reason \"lenh chay qua <so> phut chua xong — khai long_running: <phut> cho eval trong evals.yaml\" (KHONG killedByTool), va dung tac vu nen neu cong cu cho phep.\n<!-- TOOL-KILL-RULE>>> -->\n\n## Hồ sơ cho lượt bị ngắt (đường độc lập)\n\nPhiên tươi VERIFY gặp lệnh bị công cụ ngắt thì:\n\n- dòng run-log của eval đó: `\"exit_code\": null, \"killed_by_tool\": true` (không\n  ghi mã thoát của công cụ như mã thoát của lệnh);\n- verdict báo cáo `BLOCKED`, `reason: bi cong cu giet o <so giay> giay — <eval ids>`\n  (kèm dấu hiệu: timeout tool / output cắt trước dòng tổng kết); `failed_evals`\n  rỗng — người đọc hồ sơ thấy đây là sự cố hạ tầng, chữa bằng chạy lại với trần\n  công cụ đủ dài, không phải sửa sản phẩm.\n\nLệnh bị đẩy sang nền rồi QUÁ trần chờ (`long_running`, vắng thì 30 phút) cũng\nlà sự cố hạ tầng chứ không phải lệnh hỏng: dòng run-log `\"exit_code\": null`,\n`\"cannot_run\": true` (KHÔNG `killed_by_tool` — công cụ không giết nó), verdict\n`BLOCKED`, reason gọi tên việc cần làm (khai `long_running: <phút>` cho eval).\n",
+ "contractPath": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/hopeful-hertz-1d3fe0/_acceptance/khai-lien-ket-chao-can/contract.md",
+ "invokedAt": "2026-11-11T03:42:20Z",
+ "invokedSha": "a1b8f0cc902026313a384e916d3b00f739739127",
+ "vungVat": [
+  "_acceptance/khai-lien-ket-chao-can/card-plain.json",
+  "_acceptance/khai-lien-ket-chao-can/card.html",
+  "_acceptance/khai-lien-ket-chao-can/evals.yaml",
+  "architecture/modules.yaml",
+  "ontology/entities/ListingOwner.yaml",
+  "ontology/entities/ListingUnit.yaml",
+  "ontology/glossary.md",
+  "ontology/labels.yaml",
+  "ontology/relations.yaml",
+  "src/generated/labels.ts",
+  "src/generated/ontology.ts",
+  "src/modules/contacts/sample.ts",
+  "src/modules/listings/sample.ts",
+  "tests/link-types.test.ts",
+  "wiki/entities/listing-owner.md",
+  "wiki/entities/listing-unit.md",
+  "wiki/index.md"
+ ],
+ "ngoaiVatGlobs": [
+  "docs/**",
+  "wiki/**",
+  "README.md",
+  "CHANGELOG.md",
+  "AGENTS.md",
+  "CLAUDE.md",
+  "setup-blueprint.yaml",
+  ".github/workflows/ci.yml",
+  "PRODUCT-MAP.md",
+  "LO-TRINH.html",
+  "docs/tri-thuc/**",
+  "_acceptance/*/**/*.md",
+  "_acceptance/*/**/*.jsonl"
+ ],
+ "ngoaiVatFiles": [
+  "LO-TRINH.html",
+  "PRODUCT-MAP.md",
+  "_acceptance/khai-lien-ket-chao-can/contract.md",
+  "_acceptance/khai-lien-ket-chao-can/decisions.jsonl",
+  "_acceptance/khai-lien-ket-chao-can/design.md",
+  "_acceptance/khai-lien-ket-chao-can/duong-nen.md",
+  "_acceptance/khai-lien-ket-chao-can/figures/index.md",
+  "_acceptance/khai-lien-ket-chao-can/gap-probe.md",
+  "_acceptance/khai-lien-ket-chao-can/plan.md",
+  "wiki/log.md"
+ ],
+ "diffFiles": [
+  "LO-TRINH.html",
+  "PRODUCT-MAP.md",
+  "_acceptance/khai-lien-ket-chao-can/card-plain.json",
+  "_acceptance/khai-lien-ket-chao-can/card.html",
+  "_acceptance/khai-lien-ket-chao-can/contract.md",
+  "_acceptance/khai-lien-ket-chao-can/decisions.jsonl",
+  "_acceptance/khai-lien-ket-chao-can/design.md",
+  "_acceptance/khai-lien-ket-chao-can/duong-nen.md",
+  "_acceptance/khai-lien-ket-chao-can/evals.yaml",
+  "_acceptance/khai-lien-ket-chao-can/figures/index.md",
+  "_acceptance/khai-lien-ket-chao-can/gap-probe.md",
+  "_acceptance/khai-lien-ket-chao-can/plan.md",
+  "architecture/modules.yaml",
+  "ontology/entities/ListingOwner.yaml",
+  "ontology/entities/ListingUnit.yaml",
+  "ontology/glossary.md",
+  "ontology/labels.yaml",
+  "ontology/relations.yaml",
+  "src/generated/labels.ts",
+  "src/generated/ontology.ts",
+  "src/modules/contacts/sample.ts",
+  "src/modules/listings/sample.ts",
+  "tests/link-types.test.ts",
+  "wiki/entities/listing-owner.md",
+  "wiki/entities/listing-unit.md",
+  "wiki/index.md",
+  "wiki/log.md"
+ ],
+ "fileDoTrongDiff": [
+  "_acceptance/khai-lien-ket-chao-can/card-plain.json",
+  "_acceptance/khai-lien-ket-chao-can/card.html",
+  "_acceptance/khai-lien-ket-chao-can/evals.yaml",
+  "architecture/modules.yaml",
+  "ontology/entities/ListingOwner.yaml",
+  "ontology/entities/ListingUnit.yaml",
+  "ontology/glossary.md",
+  "ontology/labels.yaml",
+  "ontology/relations.yaml",
+  "src/generated/labels.ts",
+  "src/generated/ontology.ts",
+  "src/modules/contacts/sample.ts",
+  "src/modules/listings/sample.ts",
+  "tests/link-types.test.ts",
+  "wiki/entities/listing-owner.md",
+  "wiki/entities/listing-unit.md",
+  "wiki/index.md"
+ ],
+ "coverageFiles": [
+  "architecture/modules.yaml",
+  "ontology/entities/ListingOwner.yaml",
+  "ontology/entities/ListingUnit.yaml",
+  "ontology/glossary.md",
+  "ontology/labels.yaml",
+  "ontology/relations.yaml",
+  "src/generated/labels.ts",
+  "src/generated/ontology.ts",
+  "src/modules/contacts/sample.ts",
+  "src/modules/listings/sample.ts",
+  "tests/link-types.test.ts",
+  "wiki/entities/listing-owner.md",
+  "wiki/entities/listing-unit.md",
+  "wiki/index.md"
+ ],
+ "coEvalPaths": true,
+ "evalsHash": "4599ab3dd47df0c65a4cfc1d2ce543f2ae315147750d888e811814e3ecae60de",
+ "runBaseline": true,
+ "thuocChup": {
+  "sha": "a1b8f0cc902026313a384e916d3b00f739739127",
+  "n": 34,
+  "digest": "3b7645b04d2fd36c9f84a05d5d1c8a05e6a429c034c9f3d54319d3fe517363ce",
+  "tep": {
+   "_acceptance/config.yaml": "decc848ff57bd2bce080682eb5eef4b2651088fe6a1b116b4b58e0b801bf0bb6",
+   "_acceptance/khai-lien-ket-chao-can/evals.yaml": "4599ab3dd47df0c65a4cfc1d2ce543f2ae315147750d888e811814e3ecae60de",
+   "tests/boundaries.test.ts": "7dac702c9e9811451f8d3741412eef9352348fffd7705b24990367aae24c9ed4",
+   "tests/commit-msg.test.ts": "8276578b01a42d0894f90f68f26d7f42a2ac95c2a845d6278a38dbe202ed611c",
+   "tests/design-check.test.ts": "e75b30023ffe2c9603d3d518265c118525d7bc3431c808a1116b879b372e3a85",
+   "tests/design-registry.test.ts": "77690e33a822e0bca7c54594b290337182adf50b0cc99fb2efde22b5eb9f7869",
+   "tests/e2e/frame.spec.ts": "14615da7d98da27edac39a5d18f68497bce648a7f2481bd57e9e6ee3e45b9ee4",
+   "tests/e2e/shell.spec.ts": "1b2d500c6cb8ee17da92a6fba5e485f3ef36853474174c964e19b7f102b94b2b",
+   "tests/eslint-ui/no-arbitrary-text-size.test.mjs": "e26da07130ebda5c6028605b747f5bb01cce731022b333508001cdc57271995d",
+   "tests/eslint-ui/no-aschild.test.mjs": "d0d93674c33ccfff57ecc88d5aa73142ba1fe42cb0c7bb30db6b3190491c7766",
+   "tests/eslint-ui/no-banned-motion.test.mjs": "7dff75fe5912362d8e43bd6b093cb84d3fb49a48285501cc123cc679dd9ea401",
+   "tests/eslint-ui/no-emoji-icons.test.mjs": "e1e396b759bb027b38f9ac0a2f0de03ea1a53a532f8942d26b7e33375f09ad6d",
+   "tests/eslint-ui/no-hardcoded-color.test.mjs": "4b4e2cff0314ac20046dafc924704a652484fadea787d7603b17f0e49c67734e",
+   "tests/eslint-ui/no-native-dialogs.test.mjs": "1bc99d37addbc63ece7a51adf4c5f52f00be55fbd25c6673fc6410038c8d6a8b",
+   "tests/eslint-ui/no-off-scale-spacing.test.mjs": "eca3291bfea1b0bb1f0460a6e66fe125d22aece1517652220e7075c771305a83",
+   "tests/eslint-ui/no-partial-class.test.mjs": "61d329f197be1de6873ca1eeac36b73dda24ecdccff31626fdfec68e18d2bab6",
+   "tests/eslint-ui/no-raw-controls.test.mjs": "1a177095c89821090569d694f9b02e62220d14ea2683513b6fece27c79037977",
+   "tests/eslint-ui/no-raw-palette.test.mjs": "f52f15164f9c9853eb1d667d8556e41a3838df5ae579cc693fdb672ab0fffd8f",
+   "tests/eslint-ui/no-raw-table.test.mjs": "effca8d2f4ecf271ec2c0ecb2c38bdab0a937c37a27ee93d5ba7d73a72bdd52d",
+   "tests/eslint-ui/require-disable-reason.test.mjs": "baf8ec8240bc7b33a40c013db91378e7fba7869b16e574efa173949e7edcda9f",
+   "tests/format.test.ts": "1472c1061117457d4307fdb15ef7cf9e8b9f3e3d6d063f5361af9d781aa89eba",
+   "tests/frame.test.tsx": "0572d2de1696cfbb1c5839c48d85b3740e2e539f6c8abdf8a2cb5ec19c9c3425",
+   "tests/hooks.test.ts": "fd9daa0597cc88ebf42924e2e166b7100863066e5ffa2b61ff54fe9b1b99ed7d",
+   "tests/kit-root.test.ts": "35e67ab3b8dcc753081f600ef59ecbc606b2a11d3804088d475cded52f7a9348",
+   "tests/label.test.ts": "d1c11c558348a0bafbb5ffa1abf9ed92bdb126a0fad52eac26316015059b1a70",
+   "tests/language.test.ts": "fb481c43c49cf1e9545c782ddaa84f50a60a498f0640e04671c18ed3faf0879d",
+   "tests/link-types.test.ts": "f3bbe7e35d1c067d4f373ccaf24ef1e69491f2c3543b64ccbc0b7117195320be",
+   "tests/lint-floor.test.ts": "70f10d4d2c2685354b774202422f6dc05037c7a952e03558744718802aa2d273",
+   "tests/llm.test.ts": "2deac85903d84e8468814448c2ff76ca7134a6f376a1cc65acecf5332dc1cac7",
+   "tests/permissions.test.ts": "cc9ef9b071aad1767cc094b66bd77964bb6fb7059c906aa43037951e72e7a915",
+   "tests/product-invariants.test.ts": "f8eb84cda9b9a276e855e5d792ef8ee8f74ef321b378363f36cda06a0850b3af",
+   "tests/sample-data.test.ts": "32f24c025c4fbb3bbc5489636baa261c492e7de3f8953aa953306e4bd04b00bb",
+   "tests/test-utils.mjs": "2ffed2abf743cbc02f23a09b078166b7cecaa67864627aff1b07962710609eca",
+   "tests/typecheck-own.test.mjs": "a2bdc9bbcd83751a1b3c39cde07f516df377dbdd58dc0de23cf490bce1aad9cf"
+  }
+ },
+ "cayChup": {
+  "sha": "a1b8f0cc902026313a384e916d3b00f739739127",
+  "ban": {},
+  "chuaTheoDoi": []
+ },
+ "reviewSkillPath": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/hopeful-hertz-1d3fe0/.claude/skills/review-change/SKILL.md"
+}
