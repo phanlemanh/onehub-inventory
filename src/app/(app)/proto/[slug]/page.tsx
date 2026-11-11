@@ -5,8 +5,10 @@ import { PageHeader } from "@/components/templates/page-header";
 import { PageState } from "@/components/templates/page-state";
 
 import { BrokenOnClient, FrameShowcase } from "./frame-showcase";
+import { GridShowcase } from "./grid-showcase";
 
 const FRAME_SLUG = "khung-va-giao-dien";
+const GRID_SLUG = "luoi-va-o-theo-kieu";
 const SLOW_MS = 4000;
 
 type Props = {
@@ -22,9 +24,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProtoPage({ params, searchParams }: Props) {
   if (process.env.NODE_ENV === "production") notFound();
   const { slug } = await params;
+  const { state, columns } = await searchParams;
+  if (slug === GRID_SLUG) {
+    return (
+      <>
+        <PageHeader title="Bản mẫu Lưới" />
+        <GridShowcase
+          state={typeof state === "string" ? state : undefined}
+          few={columns === "few"}
+        />
+      </>
+    );
+  }
   if (slug !== FRAME_SLUG) return <PageHeader title={slug} />;
 
-  const { state } = await searchParams;
   if (state === "slow") await new Promise((resolve) => setTimeout(resolve, SLOW_MS));
   if (state === "session-expired") {
     return <PageState kind="session-expired" returnTo={`/proto/${slug}?state=session-expired`} />;

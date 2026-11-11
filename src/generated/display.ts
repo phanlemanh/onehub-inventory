@@ -4,6 +4,7 @@ export type DisplayKind = "money" | "area" | "count" | "date" | "datetime" | "pe
 export const FIELD_DISPLAY = {
   "Contact.contactTypes": "select",
   "Contact.fullName": "person",
+  "Contact.phones": "phone",
   "Listing.buildingName": "text",
   "Listing.closeDate": "date",
   "Listing.closePrice": "money",

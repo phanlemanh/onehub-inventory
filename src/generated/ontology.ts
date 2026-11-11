@@ -37,6 +37,7 @@ export interface Contact {
   companyId: string;
   fullName?: string;
   contactTypes: string;
+  phones?: string;
   ownerMemberKey?: string;
 }
 
@@ -85,9 +86,13 @@ export interface Unit {
 
 // ---- Roles, actions and personal data (ontology/roles.yaml, actions.yaml)
 
-export type Role = string;
+export type Role = "ListAgent" | "BuyerAgent" | "TeamLead" | "CompanyAdmin";
 
 export const ROLE_INHERITS: Readonly<Record<string, readonly Role[]>> = {
+  "ListAgent": [],
+  "BuyerAgent": [],
+  "TeamLead": [],
+  "CompanyAdmin": [],
 };
 
 /** Who runs an action, and as which role. */
@@ -131,7 +136,7 @@ export function can(role: Role, action: ActionSpec): boolean {
 
 /** Personal-data properties per entity (`pii: true` in the ontology). */
 export const PII_FIELDS: Readonly<Record<string, readonly string[]>> = {
-  Contact: ["fullName"],
+  Contact: ["fullName", "phones"],
 };
 
 /** Copy of `record` with personal data replaced: use before logging or agent output. */
