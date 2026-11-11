@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: f253f9ebec43a7f4a22fa76666c4a8fe704fc761
+verified_commit: 21d95e42e52bdce22735c7bef2f5c529ed720f5f
 human_signoff:
 ---
 
@@ -252,3 +252,7 @@ Round 2: chạy lại E1, E2, E5, E15, E17 và hai lệnh suite, tất cả xanh
 ### Re-pin lần 1 — 2026-11-11, do bài kiểm đối chứng tương phản bỏ phụ thuộc hiệu ứng chuyển màu (CI chậm đọc màu giữa chừng)
 run_id: repin-20261111T000514Z-40115
 sha: f253f9ebec43a7f4a22fa76666c4a8fe704fc761 · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng · ngoài làn máy: E15, E16 (E16 không khai paths)
+
+### Re-pin lần 2 — 2026-11-11, do mở tấm phủ thanh bên bấm lại tới khi hiện, lượt quét axe có trần thời gian riêng (CI chậm)
+run_id: repin-20261111T001409Z-26026
+sha: 21d95e42e52bdce22735c7bef2f5c529ed720f5f · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng · ngoài làn máy: E15, E16 (E16 không khai paths)
