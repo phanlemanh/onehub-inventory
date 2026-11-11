@@ -7,6 +7,7 @@ properties:
   companyId: { type: ref, target: Company, required: true }
   fullName: { type: string, pii: true, display: person, reso: FullName }
   contactTypes: { type: string, required: true, display: select, reso: ContactType }
+  phones: { type: string, pii: true, display: phone, reso: "MobilePhone, HomePhone, OtherPhone" }
   ownerMemberKey: { type: string }
 
 code:

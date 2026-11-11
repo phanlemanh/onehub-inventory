@@ -37,6 +37,7 @@ export interface Contact {
   companyId: string;
   fullName?: string;
   contactTypes: string;
+  phones?: string;
   ownerMemberKey?: string;
 }
 
@@ -135,7 +136,7 @@ export function can(role: Role, action: ActionSpec): boolean {
 
 /** Personal-data properties per entity (`pii: true` in the ontology). */
 export const PII_FIELDS: Readonly<Record<string, readonly string[]>> = {
-  Contact: ["fullName"],
+  Contact: ["fullName", "phones"],
 };
 
 /** Copy of `record` with personal data replaced: use before logging or agent output. */

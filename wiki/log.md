@@ -8,6 +8,7 @@ title: Change log of the wiki and notable code changes
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
 - 2026-11-11 — Khai bốn vai và sổ màn cho máy đọc; `make check` đỏ khi có trang chưa khai hay hợp đồng của vòng giao diện thiếu khối Vai × Màn, `make coverage-report` in số đo của đợt thử — hàng 1d, [0017](decisions/0017-actor-surface-coverage-pilot.md), `_acceptance/khai-vai-va-man/`
+- 2026-11-11 — Sàn mẫu MAU trên Vinhomes Ocean Park 1, 2, 3: danh mục căn, 60 lần chào, 50 liên hệ nối sẵn; Liên hệ có thêm số điện thoại — [du-lieu-mau](../_acceptance/du-lieu-mau/design.md)
 - 2026-11-11 — Khung ứng dụng đầy đủ: mục đang chọn, lối nhảy, tiêu đề tab, trạng thái lỗi, không tìm thấy, chờ tải, hết phiên, bộ định dạng Intl vi-VN, màu sáu trạng thái, băng trên màn khi mất mạng, giao diện sáng và tối — hàng 1a, `_acceptance/khung-va-giao-dien/`
 - 2026-11-10 — Gộp PR thường không còn hỏi người, bốn kiểu gộp trái nếp vẫn hỏi; luật hỏi khi duyệt PR bắt được cờ ở mọi chỗ trong lệnh — user, 2026-11-10
 - 2026-11-10 — Kho chuyển sang công khai theo quyết định của chủ kho; bật luật bảo vệ main, quét bí mật và cảnh báo lỗ hổng — user, 2026-11-10
