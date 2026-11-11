@@ -13,6 +13,9 @@ executors:
     quyen_kho_ban_goc: "node -e \"const a=JSON.parse(require('child_process').execSync('git show 84a2d597:.claude/settings.json')).permissions,b=JSON.parse(require('fs').readFileSync('.claude/settings.json')).permissions;for(const k of ['deny','allow'])if(JSON.stringify(a[k])!==JSON.stringify(b[k])){console.error(k+' list changed');process.exit(1)}console.log('deny and allow identical to 84a2d597')\""
     e2e: "make e2e"                  # suy từ: mk/design.mk — cần trình duyệt Playwright
     product_map: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/product-map.mjs\" --root . --check"   # suy từ: mẫu của kit, cách viết của Quỹ hàng
+    reui_catalog_offline: "node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs && node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs && git diff --exit-code -- design/reui-catalog.json && echo 'reui catalog regenerated twice offline, identical to commit'"   # danh-muc-reui (1g)
+    reui_catalog_check: "node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs --check"   # danh-muc-reui (1g)
+    reui_catalog_test: "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose"   # danh-muc-reui (1g)
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists
