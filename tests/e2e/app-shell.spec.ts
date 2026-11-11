@@ -88,6 +88,22 @@ async function shot(page: Page, name: string) {
   await page.screenshot({ path: join(dir, `E10-${name}.png`) });
 }
 
+/**
+ * Opens the phone sheet the way the shared frame suite does: a click that lands before the page hydrates does
+ * nothing, so press again until the sheet shows, then wait for the slide-in to finish.
+ */
+async function openSheet(page: Page): Promise<void> {
+  const sheet = page.locator('[data-mobile="true"]');
+  await expect(async () => {
+    if (!(await sheet.isVisible()))
+      await page.getByRole("button", { name: OPEN_SHEET }).first().click();
+    await expect(sheet).toBeVisible({ timeout: 2000 });
+  }).toPass({ timeout: 20_000 });
+  await page.waitForFunction(() =>
+    document.getAnimations().every((a) => a.playState !== "running"),
+  );
+}
+
 async function noSideways(page: Page) {
   return page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -207,7 +223,7 @@ test.describe("App Shell on a phone", () => {
     page,
   }) => {
     await page.goto("/inventory");
-    await page.getByRole("button", { name: OPEN_SHEET }).first().click();
+    await openSheet(page);
     const sheet = page.locator('[data-mobile="true"]');
     await expect(sheet.getByRole("link", { name: LABELS.Sent.pref, exact: true })).toBeVisible();
     for (const name of SECOND_COLUMN["/inventory"]!) {
@@ -248,7 +264,7 @@ test.describe("App Shell on a phone", () => {
 
   test("the sheet check fails while the sheet is still open", async ({ page }) => {
     await page.goto("/inventory");
-    await page.getByRole("button", { name: OPEN_SHEET }).first().click();
+    await openSheet(page);
     const open = await page.locator('[data-mobile="true"] a').count();
     expect(() => assertSheetClosed(open)).toThrow("sheet stayed open after choosing");
   });

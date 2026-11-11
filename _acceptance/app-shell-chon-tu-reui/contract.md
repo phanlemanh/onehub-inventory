@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: [proto]
-status: signed-off
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-11T14:19:02Z
 design_doc: _acceptance/app-shell-chon-tu-reui/design.md
