@@ -1,96 +1,124 @@
-# Review findings: cach-ly-moi-san (round 2)
+# Review findings: cach-ly-moi-san (round 3)
 
 ## Trong hợp đồng
-
-- **Authorization/isolation (SP-1, AC-6): ca luat-doc-ghi-theo-san cho qua luật FOR ALL hoặc DELETE mở theo cột đối tác, bảng mới ghi chéo sàn mà bộ kiểm vẫn xanh**
-  AC: AC-6
-  file: `db/tests/cach-ly.sql:296`
-  severity: high
-  source: invariants
-  detail: Phần qual của mọi luật đều được kiểm với chi_cot_san=false, nên chấp nhận cả cột đối tác (`*_company_id`). Ca 'luật thêm và sửa phải có điều kiện kiểm' ở dòng 303 chỉ xét cmd INSERT và UPDATE. Một luật `for all using (company_id = app.current_company_id() or partner_company_id = app.current_company_id())` không có WITH CHECK vì thế qua cả hai bước. Khi đó Postgres dùng chính biểu thức USING làm điều kiện ghi, tức điều kiện ghi nhận cột đối tác, trái với lời AC-6 'luật thêm và sửa có điều kiện kiểm'. Luật DELETE có cột đối tác cũng lọt theo đường này. Đã thử trên Postgres của dãy n, trong một cơ sở nháp đã xoá sau khi thử: thêm bảng bang_doi_tac có luật nói trên rồi chạy cach-ly.sql, kết quả cả 14 ca in ok ('luat-doc-ghi-theo-san — 3 bảng'). Cũng trên cơ sở đó, dưới vai quy_hang_app với sàn A, câu `insert ... (company_id=B, partner_company_id=A)` thành công. Với bảng công ty thêm về sau, ca quét danh mục là lưới duy nhất, vì các ca hành vi 2-11 chỉ chạm companies và agreements. Cách sửa: khi cmd là ALL, INSERT, UPDATE hoặc DELETE, kiểm qual với chi_cot_san=true, vì chỉ luật SELECT mới được nhắc cột đối tác. Coi ALL không có with_check là luật ghi lấy qual làm điều kiện kiểm. Thêm một bản phá thử 'for all … or partner_company_id' vào pha-thu.
-
-- **Criteria/AC-8 (SP-1): bộ quét một cửa đọc từng dòng nên Prettier của chính kho làm nó mù trước chuỗi gọi bị ngắt dòng**
-  AC: AC-8
-  file: `src/modules/identity/one-door.test.ts:40`
-  severity: medium
-  source: invariants
-  detail: POOL_CALL được thử trên từng dòng, và phải thấy tên bể và `.query(`/`.connect(` trên cùng một dòng. Prettier của kho ngắt các chuỗi gọi dài thành nhiều dòng. Đã chạy thử `npx prettier`: `await appPool.query("select … from agreements …", [1]).then(...).catch(...)` được định dạng thành `await appPool` rồi xuống dòng `.query("select …")`, và không dòng nào khớp POOL_CALL. Như vậy một truy vấn vòng qua withCompany và chạy bằng vai đăng nhập của bể, nằm ngoài quy_hang_app và luật theo dòng, vẫn để make check xanh chỉ vì `make format`. Các lỗ đặt tên khác như `db.query`, bí danh hay tệp .js/.mjs đã có trong vòng 1. Riêng lỗ này do định dạng tự động gây ra, không cần ai cố tình né. Cách sửa: quét trên cả tệp với regex cho phép khoảng trắng và xuống dòng trước `.` (ví dụ `[Pp]ool\s*\??\.\s*(query|connect)`), hoặc chặn import 'pg' ngoài tệp cửa. Thêm một tệp mẫu đã qua Prettier vào phần đối chứng.
-
-- **Catalog case checks a policy's USING clause with the read rule even when the policy governs writes (ALL / UPDATE / DELETE), so a partner column can slip into a write policy**
-  AC: AC-6
-  file: `db/tests/cach-ly.sql:296`
-  severity: medium
-  source: bugs
-  detail: Case 13 always calls `pg_temp.loc_theo_san(p.qual, b.cot, false)`, whatever `p.cmd` is. With `false`, any column ending in `company_id` is accepted, as the read rule allows. The 'must have a with_check' guard only covers `cmd in ('INSERT','UPDATE')`, not `ALL`. Postgres uses USING as the write check when an ALL policy has no WITH CHECK. USING is also the row filter for UPDATE and DELETE. Three policies therefore pass case 13 even though they let the partner write: `create policy x on t for all using (company_id = app.current_company_id() or counterparty_company_id = app.current_company_id())` (no with_check), an UPDATE policy with that USING plus `with check (company_id = app.current_company_id())` (the partner can take over the row with `set company_id = <own>`), and a DELETE policy with that USING. This contradicts the rule written at line 53: 'writes may only match the table's own company column'. For `agreements`, the dynamic cases 7, 8 and 11 still turn red, but only because of the current fixtures and grants. For a new company table, where only the catalog case runs (see bang-moi-luat-mo), there is no backstop. Fix: pass `chi_cot_san := p.cmd <> 'SELECT'` for qual, and require with_check for `ALL` as well, or check the qual of ALL with the write rule.
-
-- **One-door scanner still misses pool calls with nested type arguments**
-  AC: AC-8
-  file: `src/modules/identity/one-door.test.ts:21`
-  severity: low
-  source: bugs
-  detail: The new POOL_CALL claims that 'Type arguments (`query<Row>(`) … count too', but `(?:<[^>]*>)?` stops at the first `>`. `pool.query<Array<Row>>('…')`, `pool.query<QueryResult<Row>>(…)` and `new Pool<Foo<Bar>>({})` therefore do not match, and the guard passes even though a query bypasses withCompany. Nested generics are common with `pg` (`QueryResultRow`, `Record<string, …>`). Use `(?:<.*?>+)?`, or simply allow any characters between the method name and `(`, e.g. `(?:<[^(]*>)?`. Add a control line with a nested generic to the 'typed and optional calls' test.
-
-- **Shape 5 (claims a whole class, covers only one point): the 'writes only match the company's own column' rule is checked only on WITH CHECK, so a FOR ALL policy that lets the partner company write passes check 13**
-  AC: AC-6
-  file: `db/tests/cach-ly.sql:296`
-  severity: medium
-  source: measurement
-  detail: Comment lines 54-55 state the rule for the whole class: 'writes may only match the table's own company column'. Line 296 checks every p.qual with chi_cot_san=false, whatever p.cmd is, so the USING clause of an UPDATE, DELETE or ALL policy may name a partner column. Line 303 asks for with_check only when cmd is INSERT or UPDATE. When an ALL policy has no WITH CHECK, Postgres uses its USING expression as the write check. So `create policy x on t for all using (company_id = app.current_company_id() or partner_company_id = app.current_company_id())` passes line 296 (partner column allowed), skips line 299 (with_check is null) and skips line 303 (cmd is ALL). The partner company could then insert or update rows that belong to another company. Break file luat-them-khong-kiem-doi-tac.sql proves only one point: the explicit `for insert with check (... or counterparty_company_id = ...)` form. No break file covers ALL without WITH CHECK, and none covers a partner column in an UPDATE's USING. On agreements, behaviour case 8 happens to go red, through an unpinned error. A new company table has no behaviour cases and relies only on checks 12-14, as bang-moi-luat-mo shows, so this gap passes the suite with nothing red.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Authorization/isolation (SP-1): cửa withCompany giao client thô, việc bên trong tự thoát được vai không sở hữu bảng**
+- **Domain: the agreements table disagrees with ontology/entities/Agreement.yaml**
+  Người dùng thấy gì: Một số loại thoả thuận hợp lệ theo mô hình nghiệp vụ sẽ bị cơ sở dữ liệu từ chối khi lưu, và mô hình chưa ghi hai luật mà cơ sở dữ liệu đang áp.
+  Căn cứ: Chưa có tính năng nào lưu các loại thoả thuận đó nên chưa ai gặp lỗi, nhưng sẽ vướng ngay khi nối dữ liệu thật và sửa về sau phải qua một đợt riêng có người duyệt.
+  file: `db/migrations/001_nen_cong_ty.sql`
+  severity: high
+  Đề xuất: new-contract
+
+- **Migration comments point to files and an ADR that do not exist in this repo (the migration is permanent once merged)**
+  Người dùng thấy gì: Các ghi chú trong tệp nền chỉ người viết mã về sau sang chỉ dẫn nhầm nơi, người dùng cuối không bị ảnh hưởng gì.
+  Căn cứ: Chỉ là ghi chú sai chỗ, không làm mất hay lộ dữ liệu, và có thể bù bằng một ghi chú đúng ở nơi khác thay vì sửa tệp đã chốt.
+  file: `db/migrations/001_nen_cong_ty.sql`
+  severity: medium
+  Đề xuất: known-limits
+
+- **SP-1: the isolation suite is not run by make check or CI**
+  Người dùng thấy gì: Bộ kiểm cách ly giữa các sàn chưa tự chạy mỗi lần gộp mã, nên một thay đổi làm hở dữ liệu giữa các sàn có thể lọt nếu không ai chạy tay.
+  Căn cứ: Rủi ro lộ dữ liệu giữa sàn là nặng nhưng chỉ xảy ra khi có thay đổi lược đồ mới, và việc thêm bước tự chạy đã được ghi là việc của chủ kho.
+  file: `db/scripts/cach-ly.sh`
+  severity: medium
+  Đề xuất: known-limits
+
+- **SP-1: the isolation suite misses views, SECURITY DEFINER functions and TRUNCATE grants**
+  Người dùng thấy gì: Bộ kiểm hiện không bắt được ba kiểu thay đổi về sau có thể làm một sàn đọc hoặc xoá dữ liệu của sàn khác mà bộ kiểm vẫn báo xanh.
+  Căn cứ: Hậu quả nếu xảy ra là lộ hoặc mất dữ liệu nhiều sàn, nhưng hiện chưa có view hay hàm nào như vậy và thêm ca kiểm sau này rẻ.
+  file: `db/tests/cach-ly.sql`
+  severity: medium
+  Đề xuất: new-contract
+
+- **One door: code inside withCompany can switch company or role, and the scan does not catch it**
+  Người dùng thấy gì: Mã nghiệp vụ viết sai về sau có thể tự đổi sang sàn khác ngay trong cửa truy vấn mà bộ quét không phát hiện.
+  Căn cứ: Cần người viết mã cố ý hoặc vô ý làm vậy nên khả năng thấp, nhưng nếu xảy ra thì lộ dữ liệu giữa sàn; thêm luật quét về sau khá rẻ.
+  file: `src/modules/identity/one-door.test.ts`
+  severity: low
+  Đề xuất: new-contract
+
+- **The isolation suite never checks TRUNCATE (or other table privileges), and Postgres row security does not apply to TRUNCATE**
+  Người dùng thấy gì: Nếu một thay đổi về sau cấp quyền xoá sạch bảng cho vai của API, một sàn có thể xoá dữ liệu của mọi sàn và bộ kiểm vẫn xanh.
+  Căn cứ: Hậu quả là mất dữ liệu của tất cả các sàn nên nặng, nhưng hiện chưa có quyền đó được cấp và thêm một ca kiểm là việc nhỏ.
+  file: `db/tests/cach-ly.sql`
+  severity: medium
+  Đề xuất: new-contract
+
+- **Hinh dang 5 (tuyen quet LOP nhung chi co diem-case): ma tran lenh x dang cua danh sach cho phep thieu o UPDATE va o ngoai le doc sai bang/sai ten**
+  Người dùng thấy gì: Bộ kiểm tự đỏ chưa thử hết các kiểu phá luật, nên một lỗi trong chính bộ kiểm có thể không bị phát hiện.
+  Căn cứ: Bộ kiểm vẫn bắt đúng bốn kiểu phá đã cam kết và không có dữ liệu nào bị ảnh hưởng, nên chấp nhận và bổ sung dần khi có ca thật.
+  file: `db/scripts/cach-ly.sh`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Hinh dang 5 (tuyen 'moi loai tep nguon' nhung chi co diem-case): ca nap driver phu 5/8 duoi tep va 4/6 driver**
+  Người dùng thấy gì: Bài kiểm của bộ quét một cửa chưa thử đủ mọi loại tệp và mọi thư viện kết nối, nên nếu ai làm hỏng một phần bộ quét thì có thể không bị phát hiện ngay.
+  Căn cứ: Rủi ro chỉ nằm ở việc bộ quét suy yếu âm thầm, không đụng dữ liệu người dùng, và bổ sung sau rất rẻ nếu cần.
+  file: `src/modules/identity/one-door.test.ts`
+  severity: medium
+  Đề xuất: wont-fix
+
+- **Hinh dang 2 (fixture khong lay tu writer that): ca Prettier goi format() voi tuy chon mac dinh thay vi cau hinh cua repo**
+  Người dùng thấy gì: Một bài kiểm dùng cấu hình định dạng mặc định thay vì cấu hình thật của dự án, người dùng cuối không bị ảnh hưởng gì.
+  Căn cứ: Chỉ là độ chính xác của một ca thử, ví dụ hiện tại vẫn cho kết quả đúng, và không có hậu quả với dữ liệu hay người dùng.
+  file: `src/modules/identity/one-door.test.ts`
+  severity: low
+  Đề xuất: wont-fix
+
+- **Authorization/isolation (SP-1): cửa withCompany giao client thô, việc bên trong tự thoát được vai không sở hữu bảng (r2)**
   Người dùng thấy gì: Mã nghiệp vụ viết sai hoặc cố ý có thể tự thoát khỏi vai hạn chế và nhìn thấy dữ liệu của sàn khác. Hiện chưa có mã nào làm vậy, nhưng nền chưa chặn được.
   Căn cứ: Chỉ xảy ra khi có người viết mã cố tình vòng qua cửa, hiện chưa có mã nghiệp vụ nào, và sửa sau vẫn rẻ khi cửa được dùng thật.
   file: `src/modules/identity/with-company.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Authorization/isolation (SP-1): rollback lỗi thì kết nối vẫn được trả về bể như kết nối lành**
+- **Authorization/isolation (SP-1): rollback lỗi thì kết nối vẫn được trả về bể như kết nối lành (r2)**
   Người dùng thấy gì: Khi một lần huỷ giao dịch cũng lỗi, kết nối nửa chừng có thể quay lại bể và một yêu cầu sau dùng nhầm trạng thái của sàn trước. Trường hợp này hiếm.
   Căn cứ: Hiếm gặp, chỉ khi kết nối đã hỏng, người dùng tự khắc phục được bằng thử lại, và sửa sau không tốn kém.
   file: `src/modules/identity/with-company.ts`
   severity: low
   Đề xuất: known-limits
 
-- **Domain (AGENTS: rule/relation phải có trong ontology) và quyết định 0014: migration mở đường đọc chéo sàn qua thoả thuận hợp tác mà ontology và MVP không có**
+- **Domain (AGENTS: rule/relation phải có trong ontology) và quyết định 0014: migration mở đường đọc chéo sàn qua thoả thuận hợp tác mà ontology và MVP không có (r2)**
   Người dùng thấy gì: Sàn đối tác đọc được cả dòng thoả thuận của sàn kia, gồm tên người duyệt và điều khoản riêng, dù mô hình nghiệp vụ chưa mô tả quyền này.
   Căn cứ: Quyền đọc này chỉ áp cho thoả thuận hợp tác mà MVP chưa dùng, nên chưa có dữ liệu thật bị lộ, và đóng lại sau bằng một bước nâng cấp mới là đủ.
   file: `db/migrations/001_nen_cong_ty.sql`
   severity: medium
   Đề xuất: known-limits
 
-- **Tier (governance/autonomy.yaml): cửa và lưới của SP-1 nằm ở đường mức thấp hoặc trung bình**
+- **Tier (governance/autonomy.yaml): cửa và lưới của SP-1 nằm ở đường mức thấp hoặc trung bình (r2 · tệp đã đổi)**
   Người dùng thấy gì: Về sau một thay đổi chỉ chạm cửa truy vấn hoặc bộ kiểm cách ly có thể được gộp mà không cần chủ kho duyệt, làm yếu luật cách ly giữa các sàn.
   Căn cứ: Đợt này vẫn cần chủ kho duyệt nên chưa mất gì; rủi ro chỉ về sau và chủ kho tự thêm đường vào mức cao là xong.
   file: `src/modules/identity/one-door.test.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Criteria/AC-6: ca quét danh mục bỏ sót view, hàm SECURITY DEFINER và schema khác, trong khi chủ bảng là superuser**
+- **Criteria/AC-6: ca quét danh mục bỏ sót view, hàm SECURITY DEFINER và schema khác, trong khi chủ bảng là superuser (r2 · tệp đã đổi)**
   Người dùng thấy gì: Nếu sau này có người thêm một dạng xem hoặc hàm đặc quyền, nó có thể trả dữ liệu của mọi sàn mà bộ kiểm vẫn báo xanh.
   Căn cứ: Hiện chưa có dạng xem hay hàm nào như vậy nên chưa lộ gì, nhưng nếu xảy ra thì lộ chéo sàn khá nặng nên đáng làm thành việc riêng.
   file: `db/tests/cach-ly.sql`
   severity: medium
   Đề xuất: new-contract
 
-- **Records: phần expected của AC-6 trong evals.yaml còn mô tả phép dò chuỗi cũ, và thẻ Cổng 1 vẫn để AC-8 ở mục «Sẽ KHÔNG làm»**
+- **Records: phần expected của AC-6 trong evals.yaml còn mô tả phép dò chuỗi cũ, và thẻ Cổng 1 vẫn để AC-8 ở mục «Sẽ KHÔNG làm» (r2)**
   Người dùng thấy gì: Hồ sơ nghiệm thu mô tả sai cách giữ luật cách ly và xếp nhầm một việc đã làm vào mục không làm, người duyệt có thể hiểu sai.
   Căn cứ: Không ảnh hưởng người dùng hay dữ liệu, chỉ gây hiểu lầm cho người duyệt, sửa lại hồ sơ rất rẻ.
   file: `_acceptance/cach-ly-moi-san/evals.yaml`
   severity: low
   Đề xuất: known-limits
 
-- **Shape 5 (claims a whole class, covers only some points): loc_theo_san says five forms fail closed, but only some have a break file, and the function has no direct test matrix**
+- **Shape 5 (claims a whole class, covers only some points): loc_theo_san says five forms fail closed, but only some have a break file, and the function has no direct test matrix (r2 · tệp đã đổi)**
   Người dùng thấy gì: Một vài dạng luật mở quá rộng chưa có ca thử chứng minh bộ kiểm sẽ báo đỏ, nên chưa chắc chặn được.
   Căn cứ: Không có dữ liệu thật bị lộ và các dạng chính đã được thử, bổ sung ca thử sau rẻ.
   file: `db/tests/cach-ly.sql`
   severity: low
   Đề xuất: known-limits
 
-- **Shape 5 / Shape 4: the break list is hand-written and not matched against the folder, and a case with no files is still counted as passing**
+- **Shape 5 / Shape 4: the break list is hand-written and not matched against the folder, and a case with no files is still counted as passing (r2 · tệp đã đổi)**
   Người dùng thấy gì: Một bản phá thử thêm sau có thể quên đăng ký mà không ai biết, nên bộ kiểm có thể báo đạt dù thực ra chưa được thử.
   Căn cứ: Hiện cả bảy tệp đều đã đăng ký đúng, rủi ro chỉ về sau và người dùng không bị ảnh hưởng.
   file: `db/scripts/cach-ly.sh`
