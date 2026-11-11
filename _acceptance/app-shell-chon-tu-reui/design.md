@@ -60,7 +60,9 @@ Phần máy đã bỏ (thẻ chân cột, nút Create, bộ chọn ứng dụng 
 bày trên trang ảnh cạnh ảnh khối gốc; chủ kho muốn giữ phần nào thì gạch ở Cổng Phạm vi.
 
 **Dòng nhập kho (ghi khi chủ kho duyệt):** App Shell · từ khối ReUI `app-shell-8` · cho nhu cầu «khung bọc mọi màn nội
-bộ, điều hướng hai tầng theo vai» · chủ kho duyệt ngày ___. Chuyển sang sổ khối `design/so-khoi.yaml` khi hàng 1n gộp.
+bộ, điều hướng hai tầng theo vai» · chủ kho duyệt ngày 2026-11-11 (Cổng Phạm vi, nhận năm phương án A). Sổ khối `design/so-khoi.yaml` chưa có trên nhánh chính lúc hàng này gộp; dòng này chuyển sang sổ khi hàng 1n gộp.
+
+**Bản đã dựng:** `src/components/templates/app-shell.tsx` (khung), `src/components/templates/app-shell/second-column.tsx` (cột thứ hai, nhớ gập bằng cookie đọc ở máy chủ), `src/app/(app)/company-switch.tsx` (tên sàn, cùng lối đổi sàn với menu tài khoản). Cột thứ hai đánh dấu chỗ đang mở bằng `aria-current="true"`; chỉ cột biểu tượng mang `aria-current="page"`. Nút mở thanh bên giữ ở mọi khổ (chỗ móc của bộ bài kiểm chung); trên máy tính nó mở rộng cột biểu tượng kèm tên màn.
 
 ## Thành phần cần cài thêm
 

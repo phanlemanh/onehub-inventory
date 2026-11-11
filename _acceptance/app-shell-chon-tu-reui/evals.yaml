@@ -86,6 +86,6 @@ evals:
     executor: script
     layer: backend-effect
     cmd: config:executors.script.dang_nhap_e2e
-    paths: [src/components/templates/app-shell/**, src/app/(app)/account-menu.tsx, tests/e2e-db/app-shell-doi-san.spec.ts]
-    expected: "exit 0; trên Postgres của dãy, người thuộc hai sàn mẫu (mỗi sàn một hàng mẫu riêng mang nhãn MAU) đăng nhập, bấm tên sàn ở thanh trên, chọn sàn thứ hai: thanh trên đổi tên, tải lại trang vẫn là sàn thứ hai, Bảng hàng có hàng của sàn thứ hai và không có hàng của sàn đầu; ca đối chứng khẳng định hàng của sàn đầu vẫn hiện sau khi đổi thì đỏ với thông điệp 'company switch did not reach the session'"
+    paths: [src/app/(app)/company-switch.tsx, src/app/(app)/account-menu.tsx, src/app/(app)/layout.tsx, tests/e2e-db/app-shell-doi-san.spec.ts]
+    expected: "exit 0; trong tests/e2e-db/app-shell-doi-san.spec.ts trên Postgres của dãy, ở bốn khổ: một quản trị thuộc hai sàn mẫu (mỗi sàn có thêm một thành viên chỉ sàn ấy có, nhãn MAU) đăng nhập vào sàn A; bấm tên sàn ở thanh trên, chọn sàn B; tải lại trang thì thanh trên ghi sàn B và màn Thành viên có người riêng của sàn B, không có người riêng của sàn A; ca đối chứng kiểm sàn B ngay khi còn ở sàn A thì đỏ với thông điệp 'company switch did not reach the session'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
