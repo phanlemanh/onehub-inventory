@@ -1,49 +1,84 @@
-# Review findings: so-do-moi-vong (round 4)
+# Review findings: so-do-moi-vong (round 5)
 
 ## Trong hợp đồng
 
-- **Criteria and tests: bằng chứng cũ hơn HEAD và còn REJECT, E9 còn phiếu FAIL chưa ai chốt**
-  file: `_acceptance/so-do-moi-vong/evidence-report.md:4`
-  severity: medium
-  AC: AC-9
-  source: invariants
-  detail: Báo cáo bằng chứng ghi verdict REJECT và verified_commit 788bdc2. Sau đó commit 56013b1 còn sửa round_metrics.py, round-metrics.test.ts, agent-1/2/3.md và moc.json nhưng chưa ai chấm lại. Riêng E9 (AC-9) chỉ là đề xuất PASS, phiếu operational-feasibility vẫn FAIL với ba dòng của bảng so: dòng 1 Bố cục (mật độ), dòng 6 Cách nạp dữ liệu (bước tạm đọc MAU của agent 2) và dòng 33 Che số và mở số («Hiện số» khác «Mở số»). Các số đếm 10/0/11 trong moc.json mà lệnh gop báo làm mốc đều phụ thuộc ba dòng này. Lúc review tôi đã chạy make check trên HEAD: xanh, 296 bài. Dù vậy hồ sơ chưa qua Cổng Bằng chứng, nên chưa gộp được. Cách sửa: chạy lại lượt chấm tuần tự trên HEAD, và chủ kho chốt luật xếp dòng thứ ba hoặc ghi human_override cho E9.
-  rationale: Phiếu E9 của AC-9 còn FAIL ở ba dòng bảng so không khớp lựa chọn trong phương án, nên AC-9 chưa đạt.
-
-- **The 'sent prompt (verbatim)' section of the three baseline plans is no longer verbatim, so the prompt-match check and E9 item (1) now pass against a rewritten copy**
-  file: `docs/plan/do-he-design/moc-2026-11-11/agent-1.md:7`
-  severity: low
-  AC: AC-9
-  source: bugs
-  detail: Commit 56013b1 replaced the real temporary checkout path with `/tmp/moc-tree` in two places: the section headed 'Câu giao đã gửi (nguyên văn)' in agent-1.md, agent-2.md and agent-3.md, and `ban_kho` in moc.json. The agents never received `/tmp/moc-tree`. kiem_moc() (round_metrics.py:265-274) builds the expected prompt as de_bai with `<bản kho>` replaced by moc.json `ban_kho`, then compares it with that section. Both sides were rewritten together, so the check still passes (kiem-moc: moc hop le). That pass now proves only that the rewritten copies agree with each other, not that the three agents got the same prompt. E9 question (1) asks for the same verbatim match and has the same blind spot. The change is disclosed in moc.json `ghi_chu` and in decision d-…-21. The agent-N.md files are not: they still carry the heading 'nguyên văn' and the line 'Bản kho: `/tmp/moc-tree`' with no note that the path was substituted, so anyone reading only the plan file takes the edited text for the original. A one-line note under each heading would fix it, or an explicit placeholder such as `<bản kho>` instead of a real-looking path.
-  rationale: AC-9 đòi câu giao nguyên văn; tiêu đề vẫn ghi nguyên văn nhưng nội dung đã bị thay đường dẫn, nên điều kiện này không đạt.
+Không có.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Authorization and input: --slug và các đường trong moc.json không bị giới hạn trong kho**
+- **Check 6 (Authorization and input): --slug is not validated at the CLI boundary (path traversal)**
+  Người dùng thấy gì: Người dùng gõ nhầm hoặc cố ý đưa một tên hồ sơ lạ có thể làm lệnh ghi tệp số đo ra ngoài thư mục nghiệm thu. Đây là công cụ chạy trên máy lập trình viên nên hậu quả nhỏ.
+  Căn cứ: Chỉ chạy tay trên máy của chính người dùng, không mất dữ liệu của ai khác, và dễ sửa sau với chi phí rẻ.
+  file: `tools/round_metrics/round_metrics.py`
+  severity: low
+  Đề xuất: known-limits
+
+- **Check 1 (Intent / one concern per PR): the coverage-folder fix from another branch is bundled into the so-do-moi-vong round**
+  Người dùng thấy gì: Một thay đổi về nơi lưu báo cáo độ phủ đi kèm vào vòng này; mỗi lần chạy kiểm thử sẽ để lại thêm một thư mục báo cáo cũ không tự dọn. Người dùng sản phẩm không bị ảnh hưởng.
+  Căn cứ: Không ảnh hưởng người dùng cuối, không mất dữ liệu, thư mục thừa tự xoá được bằng lệnh dọn, và chủ kho đã duyệt cổng đầu.
+  file: `vitest.config.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Bảng so bảo bỏ 'luật thứ ba' của đề bài, nhưng luật thứ ba của đề bài bây giờ lại chính là luật đang được áp**
+  Người dùng thấy gì: Người đo lại mốc theo lời hướng dẫn đầu bảng so sẽ bỏ nhầm một luật đã chốt, nên số Giống/Lệch mới không so được với mốc cũ.
+  Căn cứ: Chỉ làm sai lần đo lại sau này, không mất dữ liệu, và sửa lại một câu chữ trong tài liệu là xong.
+  file: `docs/plan/do-he-design/moc-2026-11-11/so-sanh.md`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Thẻ cổng xếp AC-1 vào mục 'không làm', mục 'sẽ làm' mất AC-1**
+  Người dùng thấy gì: Chủ kho nhìn thẻ duyệt sẽ thấy tiêu chí chính nằm ở phần 'không làm' và không có ở phần 'sẽ làm', dễ hiểu sai phạm vi khi ký.
+  Căn cứ: Làm người ký đọc nhầm phạm vi nhưng không mất dữ liệu, dựng lại thẻ là hết, sửa rẻ.
+  file: `_acceptance/so-do-moi-vong/card-plain.json`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Thẻ cổng và trang bằng chứng cũ hơn quyết định d-24: vẫn hỏi E9 dù chủ kho đã chốt**
+  Người dùng thấy gì: Chủ kho bị hỏi lại một câu đã trả lời và thấy số đếm quyết định cũ trên trang bằng chứng.
+  Căn cứ: Chỉ gây phiền và nhầm số đếm, không mất dữ liệu, dựng lại hai tệp là sửa xong.
+  file: `_acceptance/so-do-moi-vong/card-plain.json`
+  severity: low
+  Đề xuất: known-limits
+
+- **Lệnh ghi lặng lẽ bỏ tầng đã khai khi bản số đo cũ đọc không được, rồi ghi đè**
+  Người dùng thấy gì: Nếu bản số đo cũ bị hỏng, chạy lại lệnh ghi sẽ lặng lẽ mất các tầng người đã khai mà không báo gì, người dùng phải khai lại.
+  Căn cứ: Mất công khai tầng đã làm và không có cảnh báo, nhưng chỉ xảy ra khi tệp hỏng và dữ liệu còn khôi phục được từ lịch sử git.
+  file: `tools/round_metrics/round_metrics.py`
+  severity: low
+  Đề xuất: new-contract
+
+- **Lệnh gop lặng lẽ bỏ bản số đo hỏng và mốc Quỹ hàng hỏng hoặc thiếu**
+  Người dùng thấy gì: Báo cáo gộp có thể đếm thiếu vòng hoặc để trống cột so với Quỹ hàng mà không cảnh báo, nên người đọc tin nhầm số.
+  Căn cứ: Chỉ sai số trong báo cáo khi tệp hỏng, không mất dữ liệu, người dùng đọc lại và chạy lại được, sửa sau rẻ.
+  file: `tools/round_metrics/round_metrics.py`
+  severity: low
+  Đề xuất: known-limits
+
+- **Authorization and input: --slug và các đường trong moc.json không bị giới hạn trong kho (r4 · tệp đã đổi)**
   Người dùng thấy gì: Một lệnh gõ sai tên hồ sơ có thể ghi tệp số đo ra ngoài thư mục hồ sơ, hoặc đọc tệp ngoài kho, nhưng chỉ khi người chạy tự gõ đường lạ trên máy mình.
   Căn cứ: Hậu quả nhẹ vì chỉ người dùng máy cục bộ mới gặp, không mất hay lộ dữ liệu của khách, và người chạy tự tránh được bằng cách gõ đúng tên.
   file: `tools/round_metrics/round_metrics.py`
   severity: low
   Đề xuất: known-limits
 
-- **Design: lưới kiem chỉ nhận surfaces viết dạng [a, b]**
+- **Design: lưới kiem chỉ nhận surfaces viết dạng [a, b] (r4 · tệp đã đổi)**
   Người dùng thấy gì: Nếu ai đó viết danh sách giao diện của hồ sơ theo kiểu nhiều dòng, hồ sơ giao diện đó sẽ lọt khỏi lưới kiểm mà không báo gì.
   Căn cứ: Chưa xảy ra vì khuôn hiện tại dùng đúng dạng một dòng; nếu xảy ra thì chỉ làm lưới bỏ sót lặng lẽ, người chấm vẫn phát hiện được ở lượt sau.
   file: `tools/round_metrics/round_metrics.py`
   severity: low
   Đề xuất: known-limits
 
-- **Tests: bài kiểm để lại thư mục tạm và bản clone kho sau mỗi lần chạy**
+- **Tests: bài kiểm để lại thư mục tạm và bản clone kho sau mỗi lần chạy (r4 · tệp đã đổi)**
   Người dùng thấy gì: Mỗi lần chạy bài kiểm, máy người chạy tích thêm các thư mục tạm chiếm dung lượng đĩa dần dần.
   Căn cứ: Chỉ tốn chỗ đĩa trên máy phát triển, không ảnh hưởng người dùng hay dữ liệu, và hệ điều hành tự dọn thư mục tạm.
   file: `tools/round_metrics/round-metrics.test.ts`
   severity: low
   Đề xuất: wont-fix
 
-- **Tests: mẫu BLOCKED và PASS thật trong fixture không được dùng**
+- **Tests: mẫu BLOCKED và PASS thật trong fixture không được dùng (r4 · tệp đã đổi)**
   Người dùng thấy gì: Bài kiểm dùng dòng dựng sẵn thay vì dòng chép từ sổ chạy thật, nên có thể bỏ sót lệch giữa mẫu và thực tế.
   Căn cứ: Không ảnh hưởng người dùng cuối, chỉ làm bài kiểm kém sát thực tế hơn; có thể bổ sung sau với chi phí rẻ.
   file: `tools/round_metrics/round-metrics.test.ts`
@@ -85,7 +120,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Check 11 / measurement integrity: the baseline's scoring rule was changed after the results were seen, with no human decision (r2)**
+- **Check 11 / measurement integrity: the baseline's scoring rule was changed after the results were seen, with no human decision (r2 · tệp đã đổi)**
   Người dùng thấy gì: The first baseline's same-versus-different count (10 vs 11) comes from rules written after the results were seen, so a reader may trust the baseline less than a version fixed in advance. The owner has not yet chosen between this version and the grader's smaller correction (12 vs 9).
   Căn cứ: No user data is affected, but the baseline is the reference all later rounds are compared against. Recording the open choice for the owner is cheap and keeps the comparison honest.
   file: `docs/plan/do-he-design/de-bai-ba-agent.md`

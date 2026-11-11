@@ -120,8 +120,8 @@
   "decisions": [
     {
       "id": "E9",
-      "q": "Năm dòng bảng so người chấm hỏi nên xếp Giống hay Lệch?",
-      "why": "Một người chấm nói đạt; hai người chấm cần người giữ đề bài quyết cách xếp các dòng bố cục, cách nạp dữ liệu, nút mở số, dữ liệu thử, khung bọc. Số toàn bảng có thể đổi từ 24/28 sang 23/29."
+      "q": "Bảng so có xếp dòng 23 và dòng 20 đúng luật đã chốt không?",
+      "why": "Người chấm thấy đề bài đã ghi luật 1 rộng hơn chữ chủ kho (bỏ một phần cũng tính Lệch), nên dòng 23 chủ kho chốt Giống lại trái luật; đầu bảng so còn gọi sai số thứ tự luật."
     }
   ]
 }
