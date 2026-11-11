@@ -1,0 +1,83 @@
+schema_version: 1
+feature_slug: cach-ly-moi-san
+# Ma trận ca của bộ kiểm cách ly, viết trước (19 ca, mỗi ca in «ok <ca>» đúng một lần ở bản lành):
+#   14 ca SQL (db/tests/cach-ly.sql): doi-chung-vai-chu-thay-du, chua-dat-san-khong-thay-gi, san-rong-khong-thay-gi,
+#     ket-noi-da-dung-khong-thay-gi, a-chi-thay-chinh-minh, a-thay-thoa-thuan-cua-minh-va-hop-tac,
+#     a-khong-them-dong-ten-b, a-khong-sua-dong-cua-b, a-khong-chuyen-dong-sang-b, vai-api-khong-tao-sua-san,
+#     vai-api-khong-xoa-thoa-thuan, moi-bang-cong-ty-ep-luat-theo-dong, luat-doc-ghi-theo-san,
+#     vai-api-khong-so-huu-khong-vuot
+#   5 ca của lệnh (db/scripts/cach-ly.sh): ap-hai-lan, pha-thu-bo-ep-luat, pha-thu-luat-them-khong-kiem,
+#     pha-thu-luat-doc-mo, pha-thu-bang-moi-luat-mo
+# Dòng tổng của bản lành: «cach-ly: 19 ca đạt, vai quy_hang_app».
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.cach_ly
+    paths: [db/migrations/**, db/scripts/**]
+    expected: "exit 0; đường tệp suy từ vị trí script, không ghi cứng gốc kho; trên cơ sở nháp mới, lần áp một in 'đã áp 001_nen_cong_ty.sql' và sổ public.schema_migrations có đúng một dòng 001_nen_cong_ty.sql; lần áp hai in 'xong — 0 migration mới' và sổ vẫn đúng một dòng; in 'ok ap-hai-lan'. Chiều đỏ: số dòng sổ khác số tệp migration thì in 'HỎNG ap-hai-lan: sổ có <n> dòng' và exit khác 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.cach_ly
+    paths: [db/migrations/**, db/tests/**, db/scripts/**]
+    expected: "exit 0; đối chứng dương: trong cùng giao dịch, vai chủ đếm 2 sàn và 3 thoả thuận trước khi đổi vai ('ok doi-chung-vai-chu-thay-du'); dưới vai quy_hang_app (ca khẳng định current_user = 'quy_hang_app') đếm 0 dòng ở companies và 0 dòng ở agreements, không lỗi, ở ba trạng thái: chưa đặt app.company_id ('ok chua-dat-san-khong-thay-gi'), đặt chuỗi rỗng bằng đúng câu đặt sàn của cửa ('ok san-rong-khong-thay-gi'), và giao dịch sau trên cùng kết nối mà giao dịch trước đã đặt sàn A rồi commit ('ok ket-noi-da-dung-khong-thay-gi'). Chiều đỏ ở E9: bản luật đọc mở làm 'chua-dat-san-khong-thay-gi' in 'HỎNG chua-dat-san-khong-thay-gi: agreements'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.cach_ly
+    paths: [db/migrations/**, db/tests/**, db/scripts/**]
+    expected: "exit 0; dưới vai quy_hang_app với sàn A: companies trả đúng tập {sàn A} ('ok a-chi-thay-chinh-minh'); agreements trả đúng tập hai cặp (company_id, kind) = {(A, catalog_source), (B, company_partnership)}, không có (B, listing_channel) ('ok a-thay-thoa-thuan-cua-minh-va-hop-tac'). Ca so tập dòng đầy đủ, không chỉ đếm. Chiều đỏ ở E9: bản luật đọc mở làm ca thứ hai in 'HỎNG a-thay-thoa-thuan-cua-minh-va-hop-tac'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.cach_ly
+    paths: [db/migrations/**, db/tests/**, db/scripts/**]
+    expected: "exit 0; dưới vai quy_hang_app với sàn A: thêm thoả thuận company_id = B bị từ chối với lỗi chứa 'violates row-level security policy' ('ok a-khong-them-dong-ten-b'); update counterparty của thoả thuận B trả 0 dòng và sau khi đổi lại vai chủ, dòng của B vẫn giữ counterparty cũ ('ok a-khong-sua-dong-cua-b'); update company_id thoả thuận của A sang B bị từ chối với lỗi chứa 'violates row-level security policy' ('ok a-khong-chuyen-dong-sang-b'). Lỗi khác (ví dụ quyền) không được tính là đạt. Chiều đỏ ở E9: bản luật thêm không kiểm sàn làm ca đầu in 'HỎNG a-khong-them-dong-ten-b'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.cach_ly
+    paths: [db/migrations/**, db/tests/**, db/scripts/**]
+    expected: "exit 0; dưới vai quy_hang_app với sàn A: insert vào companies và update tên sàn A đều bị từ chối với lỗi chứa 'permission denied for table companies' ('ok vai-api-khong-tao-sua-san'); delete thoả thuận của A bị từ chối với lỗi chứa 'permission denied for table agreements' ('ok vai-api-khong-xoa-thoa-thuan'). Ca ghim chữ 'permission denied' — lỗi luật theo dòng cùng mã 42501 không được tính là đạt"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.cach_ly
+    paths: [db/migrations/**, db/tests/**, db/scripts/**]
+    expected: "exit 0; tập bảng lấy từ pg_class và pg_attribute (bảng relkind r hoặc p ở schema public có cột company_id, cộng companies), không liệt kê tay; ca in số bảng đã quét — với 001 là 2. Mỗi bảng relrowsecurity và relforcerowsecurity đều true ('ok moi-bang-cong-ty-ep-luat-theo-dong'); mỗi bảng có ít nhất một luật select hoặc all; mọi luật trong pg_policies của bảng có biểu thức using và with check (khi có) chứa 'current_company_id()' và chứa tên cột sàn (company_id, với companies là id); luật insert và update có with_check khác null ('ok luat-doc-ghi-theo-san'); quy_hang_app không sở hữu bảng nào trong tập, rolsuper và rolbypassrls đều false ('ok vai-api-khong-so-huu-khong-vuot'). Chiều đỏ ở E9 ghim 'HỎNG moi-bang-cong-ty-ep-luat-theo-dong: agreements' và 'HỎNG luat-doc-ghi-theo-san: bang_mau_cach_ly'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/identity/**, db/tests/**]
+    expected: "exit 0; bài kiểm src/modules/identity/with-company.test.ts dùng bể giả ghi lại mọi câu: (1) việc thành công — dãy câu đúng thứ tự 'begin', hằng câu đổi vai 'set local role quy_hang_app', hằng câu đặt người và sàn với tham số [người, sàn], các câu của việc, 'commit'; kết quả của việc được trả về; release gọi đúng một lần; (2) việc ném lỗi — câu cuối là 'rollback', không có 'commit', đúng vật lỗi gốc được ném lại, release gọi đúng một lần; (3) sàn null — tham số sàn là chuỗi rỗng; (4) câu đổi vai lỗi — việc không chạy, có 'rollback', release vẫn gọi; (5) đọc db/tests/cach-ly.sql (đường suy từ vị trí bài kiểm) và khẳng định nó chứa nguyên văn hằng câu đổi vai và 'prepare dat_san(text, text) as ' nối hằng câu đặt người và sàn — đối chứng: một chuỗi SQL đã đổi một ký tự trong câu đặt sàn thì hàm so trả sai. Mỗi ca ghim thông điệp assert riêng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/**]
+    expected: "exit 0; bài kiểm src/modules/identity/one-door.test.ts quét thư mục src thật (đường suy từ vị trí bài kiểm) và trả danh sách vi phạm rỗng; tập miễn khai tường minh đúng hai tệp: modules/identity/with-company.ts và modules/identity/one-door.test.ts. Đối chứng trên thư mục tạm: tệp gọi qua withCompany cho 0 vi phạm; tệp 'appPool.query(' và tệp 'new Pool(' bị gọi đúng đường tương đối và số dòng; dòng chú thích không bị tính; một tệp ngoài tập miễn chép nguyên nội dung tệp bài kiểm thì bị báo. Thông điệp ghim: 'có truy vấn ngoài cửa withCompany'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.cach_ly
+    paths: [db/migrations/**, db/tests/**, db/scripts/**]
+    expected: "exit 0 của lệnh tổng; cùng tệp ca db/tests/cach-ly.sql chạy trên bốn cơ sở nháp riêng, mỗi bản áp một tệp db/tests/pha-thu/*.sql sau migration, và mỗi lượt phải exit khác 0 với dòng ghim: (a) gỡ ép luật theo dòng của agreements → 'HỎNG moi-bang-cong-ty-ep-luat-theo-dong: agreements' ('ok pha-thu-bo-ep-luat'); (b) luật thêm của agreements thành with check (true) → 'HỎNG a-khong-them-dong-ten-b' và 'HỎNG luat-doc-ghi-theo-san: agreements' ('ok pha-thu-luat-them-khong-kiem'); (c) luật đọc của agreements thành using (true) → 'HỎNG chua-dat-san-khong-thay-gi' và 'HỎNG luat-doc-ghi-theo-san: agreements' ('ok pha-thu-luat-doc-mo'); (d) bảng bang_mau_cach_ly có company_id, ép luật theo dòng, luật using (true) with check (true) → 'HỎNG luat-doc-ghi-theo-san: bang_mau_cach_ly' ('ok pha-thu-bang-moi-luat-mo'). Bản lành: mỗi ca trong ma trận 19 ca in ok đúng một lần, không dòng HỎNG, dòng tổng 'cach-ly: 19 ca đạt, vai quy_hang_app'; thiếu hay thừa ca thì in tên ca và exit khác 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

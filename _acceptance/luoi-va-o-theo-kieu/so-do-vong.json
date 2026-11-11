@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "slug": "luoi-va-o-theo-kieu",
+  "ghi_luc": "2026-11-11T04:00:03Z",
+  "vong_cham": 3,
+  "luot": [
+    {
+      "vong": 1,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang",
+        "truy-cap",
+        "trang-thai-hanh-vi"
+      ]
+    },
+    {
+      "vong": 2,
+      "verdict": "PASS",
+      "tang": []
+    },
+    {
+      "vong": 3,
+      "verdict": "PASS",
+      "tang": []
+    }
+  ],
+  "lam_lai": [
+    {
+      "nguon": "r1",
+      "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "r1",
+      "tang": "truy-cap"
+    },
+    {
+      "nguon": "r1",
+      "tang": "trang-thai-hanh-vi"
+    },
+    {
+      "nguon": "repin-do:repin-20261111T033814Z-65168",
+      "tang": "bai-kiem-ha-tang"
+    }
+  ],
+  "theo_tang": {
+    "bai-kiem-ha-tang": 2,
+    "trang-thai-hanh-vi": 1,
+    "du-lieu-api": 0,
+    "nghiep-vu": 0,
+    "thanh-phan": 0,
+    "bo-cuc": 0,
+    "hop-dong-yeu-cau": 0,
+    "link": 0,
+    "chu-dinh-dang": 0,
+    "mau-token": 0,
+    "truy-cap": 1
+  },
+  "chua_phan": [],
+  "thuoc_vat": {
+    "vat": [
+      203,
+      25
+    ],
+    "thuoc": [
+      0,
+      0
+    ],
+    "nhat": 0
+  },
+  "gio_may": {
+    "gio_may": 3.77,
+    "gio_cho": 0.87,
+    "phan_tram_tuan": 10.12
+  }
+}

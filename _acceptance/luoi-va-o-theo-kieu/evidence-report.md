@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 9d1dc0cce8cee9bbbdd03eed577c00789bbaf91b
+verified_commit: c3b1473948c9267fb0eac0389ba8e36af07cf456
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -207,3 +207,7 @@ sha: 7c5dae9643cfeaf84dc79d4140a8e49f442b69dc · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 2 — 2026-11-11, do sửa ca e2e khung chờ trang tải xong
 run_id: repin-20261111T034858Z-39933
 sha: 9d1dc0cce8cee9bbbdd03eed577c00789bbaf91b · suites: 3 lệnh exit 0 · evals: 12/12 eval máy đạt kỳ vọng · ngoài làn máy: E11, E12 (E12 không khai paths)
+
+### Re-pin lần 3 — 2026-11-11, do hồ sơ vào phạm vi PR 1h khi 1h ghi bản số đo của vòng
+run_id: repin-20261111T041922Z-28802
+sha: c3b1473948c9267fb0eac0389ba8e36af07cf456 · suites: 3 lệnh exit 0 · evals: 12/12 eval máy đạt kỳ vọng · ngoài làn máy: E11, E12 (E12 không khai paths)

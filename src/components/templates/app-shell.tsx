@@ -11,6 +11,8 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
+import type { Role } from "@/generated/ontology";
+
 import { FRAME_COPY } from "./frame-copy";
 import { NavMenu, type NavItem } from "./nav-menu";
 import { ConnectionWatcher, ScreenBanner } from "./screen-banner";
@@ -27,11 +29,12 @@ export const MAIN_ID = "main-content";
  */
 export function AppShell({
   nav,
-  role,
+  roles,
   children,
 }: {
   nav: readonly NavItem[];
-  role?: string;
+  /** Every role the signed-in person holds; the sidebar shows the entries of all of them. */
+  roles?: readonly Role[];
   children?: ReactNode;
 }) {
   return (
@@ -54,7 +57,7 @@ export function AppShell({
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <NavMenu items={nav} role={role} />
+            <NavMenu items={nav} roles={roles} />
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
