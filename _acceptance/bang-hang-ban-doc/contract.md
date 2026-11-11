@@ -100,6 +100,8 @@ có phép đo — vai thật chưa nối vào khung.
 - Không nút «Thêm dòng» hay nhập tệp ở trạng thái trống: chưa có lối nhập; câu trống chỉ nói vì sao.
 - Không đọc cơ sở dữ liệu, không bắt đăng nhập, không gắn vai thật vào vùng (hàng 8, 9a).
 - Không màn Đã gửi: vẫn trong danh sách «chưa có vùng».
+- Không bảng thẻ trên điện thoại (khối Quỹ hàng `product-grid-4`): Hỏi-5 quyết hàng nào làm; hàng này trên điện thoại là lưới
+  cuộn ngang trong vùng.
 - Không sửa hai lỗi nhỏ đã biết của bản chạy chậm của bộ bài (1f): gặp đỏ giả ở đó thì báo giám sát.
 
 ## Notes

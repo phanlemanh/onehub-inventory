@@ -45,6 +45,27 @@ Bản đọc: không sửa ô (B4), không hồ sơ căn cạnh bảng (hàng 3)
   thật lưới đọc đủ mười một trạng thái, hợp đồng này nằm trong diện được chấm, và xoá một dòng ma trận của Bảng hàng thì
   lưới đỏ gọi tên trạng thái thiếu.
 
+## Từ Quỹ hàng
+
+Nguồn (chỉ đọc, không chép mã): kho Quỹ hàng commit `1729b11f` — `docs/design/vo-va-ia.md` §2 (dòng Bảng hàng máy tính và
+Bảng hàng thẻ điện thoại), `design/patterns/bang-hang.md`, ADR-0004 (lưới dữ liệu ReUI qua bài thử 5.000 dòng), hồ sơ đã
+ký `bang-hang-kieu-sheet` (hàng 14) và `bang-hang-dang-the` (hàng 32).
+
+- **Khối đích Quỹ hàng đã chọn.** Máy tính: `data-grid-editing-6` (bảng kiểu Sheet: hàng lọc theo cột bật khi cần, dòng
+  tổng ở chân, sửa trên ô), nhóm dòng toà → loại căn theo `data-grid-grouping-2`, bố cục danh sách–chi tiết (hồ sơ căn là
+  cột kéo chia cạnh bảng). Điện thoại: bảng thẻ `product-grid-4` (thẻ ngang: ảnh trái, mã căn + giá, ba thông số Diện
+  tích · Phòng ngủ · Hướng) kèm ngăn lọc `filter-sidebar-5` thành ngăn kéo đáy, cùng địa chỉ `/inventory`.
+- **Bản đọc MVP này giữ:** đọc trên lưới dữ liệu ReUI (cùng thành phần ADR-0004 đã đo), giá dạng «x,xx tỷ», trạng thái là
+  nhãn có màu, tìm mã căn, đủ trạng thái tải · trống · tìm không ra · lỗi, một địa chỉ `/inventory`.
+- **Bỏ ở hàng này, vì sao:** lọc theo từng cột, nhóm toà → loại căn, dòng tổng, góc nhìn lưu — lộ trình kho này chưa có
+  hàng cho chúng và hàng 2 là bản đọc; sửa trên ô — hàng B4; hồ sơ căn cạnh bảng — hàng 3; đọc từ kho trên máy (lọc
+  không gọi mạng) — luật kho: chưa giữ dữ liệu sàn trên máy trước khi xong MVP; mười sáu cột — dữ liệu mẫu hàng 1 chưa có
+  loại căn, phí, nội thất, pháp lý, tài chính, mức đủ; bảng thẻ điện thoại — Hỏi-5.
+- **Khuôn Lưới (hàng 1b) khác `data-grid-editing-6` ở đâu:** cùng lưới ReUI bên dưới. Khuôn Lưới có đầu vùng tên + số
+  dòng, một ô tìm chung, chia trang và bảy trạng thái vùng đã có bài kiểm; `data-grid-editing-6` có hàng lọc theo cột,
+  dòng tổng, số thứ tự dòng, ô chọn, nút cột · cài đặt · xuất, cuộn liền thay chia trang, và không có trạng thái vùng.
+  Dựng theo nó thì phải đổi khuôn đã ký cho mọi màn Lưới (Hỏi-4).
+
 ## Vai × Màn
 
 Bản khai vai (`ontology/roles.yaml`) nói Quản trị sàn «không thấy hàng theo mặc định». Hôm nay chưa có vai thật của người
