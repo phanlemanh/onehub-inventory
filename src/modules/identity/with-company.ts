@@ -29,7 +29,11 @@ export interface DbPool {
 
 /** A pool of connections to `url`. Every statement on it still goes through `withCompany`. */
 export function createPool(url: string): DbPool {
-  return new pg.Pool({ connectionString: url, max: 10 });
+  const pool = new pg.Pool({ connectionString: url, max: 10 });
+  // An idle connection the server closes (restart, failover) must not take the process down; the next query
+  // opens a new one.
+  pool.on("error", (err) => console.error("[co-so-du-lieu] kết nối rảnh bị đóng:", err.message));
+  return pool;
 }
 
 export interface CompanyContext {

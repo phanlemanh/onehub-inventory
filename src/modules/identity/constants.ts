@@ -14,6 +14,11 @@ export const CODE_REQUEST_WINDOW_SEC = 15 * 60;
 export const SESSION_TTL_SEC = 30 * 24 * 60 * 60;
 export const SESSION_REFRESH_AFTER_SEC = 24 * 60 * 60;
 
+/**
+ * The cookie outlives any session (400 days, the most browsers keep): the database expiry, which slides, is the only
+ * clock. A cookie tied to the first 30 days would end a session that is still being used.
+ */
+export const SESSION_COOKIE_MAX_AGE_SEC = 400 * 24 * 60 * 60;
 /** The session cookie. Only the server reads it (HttpOnly). */
 export const SESSION_COOKIE = "ohi_session";
 /** Where every sign-in write goes (`/api/v1` is the only write path). */

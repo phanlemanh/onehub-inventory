@@ -15,4 +15,4 @@ export { assertProductionConfig, AuthConfigError, PRODUCTION_VARS } from "./conf
 export { authHandlers, currentSession, type CurrentSession } from "./runtime";
 export { createAuthHandlers, type AuthHandlers } from "./http";
 export { sessionContext, type CompanyRef, type Session } from "./login";
-export { captureSender, codeEmail, type CodeSender } from "./sender";
+export { captureSender, codeEmail, type CodeSender, type SentMail } from "./sender";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -9,6 +9,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { AUTH_BASE_PATH } from "@/modules/identity";
 
 import { LOGIN_COPY as COPY } from "./copy";
+
+/** Nothing to subscribe to: the value only differs between the server render and the browser. */
+const noSubscribe = () => () => {};
 
 interface CompanyRef {
   id: string;
@@ -64,6 +67,12 @@ export function LoginForm({
   const [problem, setProblem] = useState<Problem>(null);
   const [retry, setRetry] = useState<(() => void) | null>(null);
   const codeRef = useRef<HTMLInputElement>(null);
+  // Set once the form runs in the browser: before that, Enter would submit a plain form and reload the page.
+  const ready = useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false,
+  );
 
   useEffect(() => {
     if (step === "code") codeRef.current?.focus();
@@ -270,6 +279,7 @@ export function LoginForm({
     <form
       className="flex flex-col gap-4"
       data-state="email"
+      data-ready={ready || undefined}
       noValidate
       onSubmit={(e: FormEvent) => {
         e.preventDefault();

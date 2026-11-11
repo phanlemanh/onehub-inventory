@@ -3,7 +3,7 @@
 import { LogInIcon, LogOutIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 import { loginHref } from "@/components/templates/page-state";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,9 @@ import {
 import { AUTH_BASE_PATH } from "@/modules/identity";
 
 import { LOGIN_COPY as COPY } from "../login/copy";
+
+/** Nothing to subscribe to: the value only differs between the server render and the browser. */
+const noSubscribe = () => () => {};
 
 interface CompanyRef {
   id: string;
@@ -57,6 +60,13 @@ export function AccountMenu({
   const pathname = usePathname();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [open, setOpen] = useState(false);
+  // Set once the menu runs in the browser: before that, a click on the button opens nothing.
+  const ready = useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false,
+  );
 
   if (!account) {
     return (
@@ -74,6 +84,7 @@ export function AccountMenu({
   }
 
   async function switchTo(companyId: string) {
+    setOpen(false);
     if (companyId === account?.company?.id) return;
     setBusy(true);
     const res = await fetch(`${AUTH_BASE_PATH}/session/company`, {
@@ -93,7 +104,7 @@ export function AccountMenu({
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger
         render={
           <Button
@@ -101,6 +112,7 @@ export function AccountMenu({
             size="icon-sm"
             aria-label={COPY.account}
             data-slot="account-menu"
+            data-ready={ready || undefined}
           />
         }
       >
@@ -111,7 +123,7 @@ export function AccountMenu({
           <DropdownMenuLabel>
             <span className="flex flex-col gap-0.5">
               <span className="text-sm font-medium text-foreground">{account.name}</span>
-              <span>{account.email}</span>
+              <span className="break-all">{account.email}</span>
             </span>
           </DropdownMenuLabel>
           <DropdownMenuLabel>

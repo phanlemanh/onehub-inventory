@@ -10,10 +10,8 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import pg from "pg";
 
-import { OUTBOX } from "../../playwright.db.config";
+import { DB_URL, OUTBOX } from "../../playwright.db.config";
 
-const DB_PORT = process.env["DB_PORT"] ?? "5563";
-const DB_URL = `postgres://postgres:local-only@127.0.0.1:${DB_PORT}/dang_nhap_e2e`;
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 let owner: pg.Client;
@@ -54,14 +52,19 @@ async function person(
   return { email, ids };
 }
 
+/** Codes from the mails the dev server built for `email`, read from each mail's text. */
 function mailsTo(email: string): string[] {
   if (!existsSync(OUTBOX)) return [];
   return readFileSync(OUTBOX, "utf8")
     .split("\n")
     .filter(Boolean)
-    .map((line) => JSON.parse(line) as { email: string; code: string })
+    .map((line) => JSON.parse(line) as { email: string; text: string })
     .filter((m) => m.email === email)
-    .map((m) => m.code);
+    .map((m) => {
+      const found = m.text.match(/\b\d{6}\b/g) ?? [];
+      if (found.length !== 1) throw new Error(`thư tới ${email} không mang đúng một mã 6 số`);
+      return found[0]!;
+    });
 }
 
 async function codeFor(email: string, count = 1): Promise<string> {
@@ -77,9 +80,15 @@ async function shot(page: Page, info: TestInfo, step: number, size: string) {
 }
 
 async function askCode(page: Page, email: string) {
+  await expect(page.locator('[data-state="email"][data-ready]')).toBeVisible();
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Email").press("Enter");
   await expect(page.locator('[data-state="code"]')).toBeVisible();
+}
+
+async function openAccountMenu(page: Page) {
+  await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
+  await page.getByRole("button", { name: "Tài khoản" }).click();
 }
 
 async function typeCode(page: Page, code: string) {
@@ -134,7 +143,7 @@ test("mot-san-vao-thang", async ({ page }, info) => {
   }
   await typeCode(page, await codeFor(email));
   await expect(page).toHaveURL(/\/$/);
-  await page.getByRole("button", { name: "Tài khoản" }).click();
+  await openAccountMenu(page);
   await expect(page.getByText("Đang làm ở [Sàn Một]", { exact: true })).toBeVisible();
   await expect(page.getByText("Đổi sàn")).toHaveCount(0);
 });
@@ -157,7 +166,7 @@ test("nhieu-san-chon-va-doi", async ({ page }, info) => {
   }
   await choose.getByRole("button", { name: "[Sàn A]" }).click();
   await expect(page).toHaveURL(/\/$/);
-  await page.getByRole("button", { name: "Tài khoản" }).click();
+  await openAccountMenu(page);
   await expect(page.getByText("Đang làm ở [Sàn A]", { exact: true })).toBeVisible();
   await page.getByRole("menuitem", { name: "Đổi sàn" }).click();
   if (info.project.name === "1440") {
@@ -166,7 +175,9 @@ test("nhieu-san-chon-va-doi", async ({ page }, info) => {
     await page.emulateMedia({ colorScheme: "light" });
   }
   await page.getByRole("menuitemradio", { name: "[Sàn B]" }).click();
-  await page.getByRole("button", { name: "Tài khoản" }).click();
+  // Choosing a company closes the menu; reopened, it names the new company.
+  await expect(page.getByRole("menu")).toHaveCount(0);
+  await openAccountMenu(page);
   await expect(page.getByText("Đang làm ở [Sàn B]", { exact: true })).toBeVisible();
 });
 
@@ -196,6 +207,7 @@ test("qua-gioi-han", async ({ page }, info) => {
     expect(res.status()).toBe(200);
   }
   await page.goto("/login");
+  await expect(page.locator('[data-state="email"][data-ready]')).toBeVisible();
   await page.getByLabel("Email").fill(email);
   await page.getByRole("button", { name: "Gửi mã" }).click();
   await expect(
@@ -242,7 +254,7 @@ test("dang-xuat", async ({ page }, info) => {
   await askCode(page, email);
   await typeCode(page, await codeFor(email));
   await expect(page).toHaveURL(/\/$/);
-  await page.getByRole("button", { name: "Tài khoản" }).click();
+  await openAccountMenu(page);
   const menu = page.getByRole("menu");
   await expect(menu.getByText("[Tên]")).toBeVisible();
   await expect(menu.getByText(email)).toBeVisible();
@@ -268,7 +280,7 @@ test("axe-sang-toi", async ({ page }, info) => {
   await axeClean(page, "code-invalid");
   await typeCode(page, code);
   await expect(page).toHaveURL(/\/$/);
-  await page.getByRole("button", { name: "Tài khoản" }).click();
+  await openAccountMenu(page);
   await axeClean(page, "account-menu");
   await page.context().clearCookies();
   await page.goto("/login");
@@ -280,6 +292,7 @@ test("axe-sang-toi", async ({ page }, info) => {
   for (let i = 0; i < 5; i++)
     await page.request.post("/api/v1/auth/code", { data: { email: two.email } });
   await page.goto("/login");
+  await expect(page.locator('[data-state="email"][data-ready]')).toBeVisible();
   await page.getByLabel("Email").fill(two.email);
   await page.getByRole("button", { name: "Gửi mã" }).click();
   await expect(page.locator('[data-state="rate-limited"]')).toBeVisible();

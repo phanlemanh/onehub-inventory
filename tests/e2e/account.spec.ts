@@ -29,6 +29,7 @@ test.describe("tai khoan khong co co so du lieu", () => {
 
   test("login-loi-may-chu", async ({ page }) => {
     await page.goto("/login");
+    await expect(page.locator('[data-state="email"][data-ready]')).toBeVisible();
     await page.getByLabel("Email").fill("nhan-vien@example.test");
     await page.getByRole("button", { name: "Gửi mã" }).click();
     const alert = page.locator('[data-state="server-error"]');

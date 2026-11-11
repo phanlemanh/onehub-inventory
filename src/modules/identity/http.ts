@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import { safeNext } from "./code";
-import { SESSION_COOKIE, SESSION_TTL_SEC } from "./constants";
+import { SESSION_COOKIE, SESSION_COOKIE_MAX_AGE_SEC } from "./constants";
 import {
   chooseCompany,
   endSession,
@@ -64,7 +64,7 @@ export function sessionCookie(token: string, isSecure: boolean): string {
     "Path=/",
     "HttpOnly",
     "SameSite=Lax",
-    `Max-Age=${SESSION_TTL_SEC}`,
+    `Max-Age=${SESSION_COOKIE_MAX_AGE_SEC}`,
     ...(isSecure ? ["Secure"] : []),
   ].join("; ");
 }

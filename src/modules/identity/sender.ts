@@ -14,6 +14,13 @@ export interface CodeMail {
 
 export type CodeSender = (mail: CodeMail) => Promise<void>;
 
+/** A mail as it leaves: who, subject, body. */
+export interface SentMail {
+  email: string;
+  subject: string;
+  text: string;
+}
+
 /** The email: the code and how long it lives, no link — a code typed on any device works. */
 export function codeEmail(code: string): { subject: string; text: string } {
   const minutes = Math.round(CODE_TTL_SEC / 60);
@@ -40,17 +47,19 @@ export function resendSender(o: {
   };
 }
 
-/** Development only: prints the code; with an outbox path, also appends one JSON line per mail. */
+/** Development only: prints the code; with an outbox path, also appends the built mail as one JSON line. */
 export function devSender(outbox?: string): CodeSender {
   return async ({ email, code }) => {
     console.log(`[ma-dang-nhap] ${email} ${code}`);
-    if (outbox)
-      appendFileSync(outbox, `${JSON.stringify({ email, code, at: new Date().toISOString() })}\n`);
+    if (outbox) {
+      const mail: SentMail = { email, ...codeEmail(code) };
+      appendFileSync(outbox, `${JSON.stringify({ ...mail, at: new Date().toISOString() })}\n`);
+    }
   };
 }
 
-/** Tests: keeps every mail in memory. */
-export function captureSender(): { sender: CodeSender; sent: CodeMail[] } {
-  const sent: CodeMail[] = [];
-  return { sent, sender: async (mail) => void sent.push(mail) };
+/** Tests: keeps every built mail in memory. */
+export function captureSender(): { sender: CodeSender; sent: SentMail[] } {
+  const sent: SentMail[] = [];
+  return { sent, sender: async ({ email, code }) => void sent.push({ email, ...codeEmail(code) }) };
 }

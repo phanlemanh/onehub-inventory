@@ -8,23 +8,25 @@ import {
   CODE_MAX_ATTEMPTS,
   CODE_REQUEST_LIMIT,
   SESSION_COOKIE,
+  SESSION_TTL_SEC,
 } from "@/modules/identity/constants";
 import { createAuthHandlers, type AuthHandlers } from "@/modules/identity/http";
 import type { LoginDeps } from "@/modules/identity/login";
 import { readSession, sessionContext } from "@/modules/identity/login";
 import { readAuthConfig } from "@/modules/identity/config";
-import { captureSender, type CodeMail } from "@/modules/identity/sender";
+import { captureSender, type SentMail } from "@/modules/identity/sender";
 import { createPool, withCompany, type DbPool } from "@/modules/identity/with-company";
 
 import { count, scratchDb, seed, type Fixture, type ScratchDb } from "./helpers";
 
 const BASE = "http://127.0.0.1:3485/api/v1/auth";
+const INVALID_BODY = '{"error":"code-invalid"}';
 
 interface World {
   db: ScratchDb;
   pool: DbPool & { end?: () => Promise<void> };
   fx: Fixture;
-  mail: CodeMail[];
+  mail: SentMail[];
   h: AuthHandlers;
   deps: LoginDeps;
 }
@@ -55,13 +57,15 @@ function get(path: string, cookie?: string, method = "GET"): Request {
   return new Request(`${BASE}${path}`, { method, headers: cookie ? { cookie } : {} });
 }
 
-/** The code inside the last mail to `email` — always read from the mail itself, never from a fixture. */
+/** The code inside the last mail to `email`, read from the mail's own text — never from a fixture or argument. */
 function codeFromMail(w: World, email: string): string {
   const mail = [...w.mail].reverse().find((m) => m.email === email);
   if (!mail) throw new Error(`không có thư nào tới ${email}`);
-  const found = mail.code.match(/^\d{6}$/);
-  if (!found) throw new Error(`thư tới ${email} không mang mã 6 số`);
-  return found[0];
+  const found = mail.text.match(/\b\d{6}\b/g) ?? [];
+  if (found.length !== 1 || !mail.subject.includes(found[0]!)) {
+    throw new Error(`thư tới ${email} không mang đúng một mã 6 số trong thân và tiêu đề`);
+  }
+  return found[0]!;
 }
 
 function cookieOf(res: Response): string {
@@ -102,25 +106,42 @@ async function checkThirdWrongKills(w: World): Promise<void> {
   await w.h.requestCode(post("/code", { email }));
   const good = codeFromMail(w, email);
   const wrong = good === "000000" ? "111111" : "000000";
-  for (let i = 0; i < CODE_MAX_ATTEMPTS; i++)
-    await w.h.verifyCode(post("/session", { email, code: wrong }));
+  for (let i = 0; i < CODE_MAX_ATTEMPTS; i++) {
+    const res = await w.h.verifyCode(post("/session", { email, code: wrong }));
+    if (
+      res.status !== 400 ||
+      (await res.text()) !== INVALID_BODY ||
+      res.headers.get("set-cookie")
+    ) {
+      throw new Error(`ma-hong-cung-mot-loi: lần sai ${i + 1} không trả code-invalid`);
+    }
+  }
   const after = await w.h.verifyCode(post("/session", { email, code: good }));
   if (after.ok) throw new Error("ma-hong-cung-mot-loi: sai lần ba vẫn dùng được mã");
+  if (
+    after.status !== 400 ||
+    (await after.text()) !== INVALID_BODY ||
+    after.headers.get("set-cookie")
+  ) {
+    throw new Error("ma-hong-cung-mot-loi: mã đã chết không trả code-invalid");
+  }
 }
 
-async function checkApiCannotTouchIdentity(w: World): Promise<number> {
+/** Every table of the identity schema × select, insert, update, delete — 16 cells, each must be denied. */
+async function checkApiCannotTouchIdentity(w: World): Promise<{ tables: number; cells: number }> {
   const tables = (
     await w.db.owner.query<{ t: string }>(
       "select c.relname as t from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'identity' and c.relkind = 'r' order by 1",
     )
   ).rows.map((r) => r.t);
+  const column = (t: string) => (t === "sessions" ? "token_hash" : t === "users" ? "id" : "email");
+  let cells = 0;
   for (const t of tables) {
     for (const sql of [
       `select * from identity.${t} limit 1`,
+      `insert into identity.${t} default values`,
+      `update identity.${t} set ${column(t)} = ${column(t)} where false`,
       `delete from identity.${t} where false`,
-      `update identity.${t} set ${t === "code_requests" ? "email" : t === "sessions" ? "token_hash" : "email"} = ${
-        t === "sessions" ? "token_hash" : "email"
-      } where false`,
     ]) {
       let denied = false;
       try {
@@ -128,10 +149,12 @@ async function checkApiCannotTouchIdentity(w: World): Promise<number> {
       } catch (err) {
         denied = /permission denied/.test(String((err as Error).message));
       }
-      if (!denied) throw new Error(`vai-api-khong-cham-danh-tinh: identity.${t}`);
+      if (!denied)
+        throw new Error(`vai-api-khong-cham-danh-tinh: identity.${t} (${sql.split(" ")[0]})`);
+      cells += 1;
     }
   }
-  return tables.length;
+  return { tables: tables.length, cells };
 }
 
 async function checkIdentityRoleNarrow(w: World): Promise<number> {
@@ -216,7 +239,7 @@ describe("dang-nhap (Postgres của dãy)", () => {
     // Positive control: the sender was called, exactly once, for the only email that should get a code.
     expect(w.mail.length, "email lạ nhận thư").toBe(1);
     expect(w.mail[0]!.email).toBe(w.fx.emails.one);
-    expect(w.mail[0]!.code).toMatch(/^\d{6}$/);
+    expect(codeFromMail(w, w.fx.emails.one)).toMatch(/^\d{6}$/);
   });
 
   it("ban-that-loi-may-chu", async () => {
@@ -268,6 +291,10 @@ describe("dang-nhap (Postgres của dãy)", () => {
     expect(set, "cookie phiên đọc được từ trình duyệt").toContain("HttpOnly");
     expect(set).toContain("SameSite=Lax");
     expect(set).toContain("Path=/");
+    // The cookie outlives the 30-day session, so a sliding session is never cut by the browser.
+    expect(Number(/Max-Age=(\d+)/.exec(set)?.[1]), "cookie hết trước phiên trượt").toBeGreaterThan(
+      SESSION_TTL_SEC,
+    );
     const me = await w.h.getSession(get("/session", cookieOf(res)));
     const meBody = (await me.json()) as { user: { email: string }; company: { name: string } };
     expect(meBody.user.email).toBe(email);
@@ -416,13 +443,24 @@ describe("dang-nhap (Postgres của dãy)", () => {
     expect(session).not.toBeNull();
     const ctx = sessionContext(session!);
     expect(ctx).toEqual({ userId: w.fx.users.one, companyId: w.fx.companies.A });
+    // Each company has an agreement of its own; the session's door must show only A's.
+    const agreement = (company: string) =>
+      w.db.owner.query<{ id: string }>(
+        "insert into agreements (company_id, kind, direction, counterparty, data_classes, valid_from, approved_by) values ($1, 'catalog_source', 'inbound', '[Đối tác]', array['catalog'], now(), '[Tên]') returning id",
+        [company],
+      );
+    const ownAgreement = (await agreement(w.fx.companies.A)).rows[0]!.id;
+    await agreement(w.fx.companies.B);
+    await agreement(w.fx.companies.C);
     const seen = await withCompany(w.pool, ctx, async (c) => ({
+      agreements: (await c.query("select id from agreements")).rows as { id: string }[],
       companies: (await c.query("select id from companies")).rows as { id: string }[],
       members: (await c.query("select company_id from company_members")).rows as {
         company_id: string;
       }[],
     }));
     expect(seen.companies.map((r) => r.id)).toEqual([w.fx.companies.A]);
+    expect(seen.agreements.map((r) => r.id)).toEqual([ownAgreement]);
     expect(new Set(seen.members.map((r) => r.company_id))).toEqual(new Set([w.fx.companies.A]));
     // Company A cannot read the members of B or C either.
     expect(seen.members).toHaveLength(2);
@@ -501,7 +539,7 @@ describe("dang-nhap (Postgres của dãy)", () => {
   });
 
   it("vai-api-khong-cham-danh-tinh", async () => {
-    expect(await checkApiCannotTouchIdentity(w)).toBe(4);
+    expect(await checkApiCannotTouchIdentity(w)).toEqual({ tables: 4, cells: 16 });
   });
 
   it("chi-luu-bam", async () => {

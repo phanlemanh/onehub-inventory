@@ -1,9 +1,9 @@
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AuthConfigError, PRODUCTION_VARS, assertProductionConfig, readAuthConfig } from "./config";
+
+// The start hook loads the module's server door; outside Next.js its "server-only" guard has nothing to guard.
+vi.mock("server-only", () => ({}));
 
 const FULL = {
   NODE_ENV: "production",
@@ -33,7 +33,15 @@ describe("production configuration", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("https://api.resend.com/emails");
-    expect(JSON.parse(String(init.body)).to).toEqual(["nhan-vien@example.test"]);
+    const sentBody = JSON.parse(String(init.body)) as {
+      to: string[];
+      subject: string;
+      text: string;
+    };
+    expect(sentBody.to).toEqual(["nhan-vien@example.test"]);
+    // The code travels in the mail itself: subject and text, exactly once in the text.
+    expect(sentBody.subject).toContain("123456");
+    expect(sentBody.text.match(/\b\d{6}\b/g)).toEqual(["123456"]);
     const logged = [...log.mock.calls, ...err.mock.calls].flat().join(" ");
     expect(logged).not.toMatch(/\d{6}/);
   });
@@ -58,12 +66,23 @@ describe("production configuration", () => {
     expect(log.mock.calls.flat().join(" ")).toContain("111222");
   });
 
-  it("the server start checks production configuration", () => {
-    const source = readFileSync(
-      fileURLToPath(new URL("../../instrumentation.ts", import.meta.url)),
-      "utf8",
-    );
-    expect(source).toContain("assertProductionConfig(process.env)");
-    expect(source).toContain('process.env.NEXT_RUNTIME !== "nodejs"');
+  it("the server start refuses production without its configuration", async () => {
+    const { register } = await import("../../instrumentation");
+    vi.stubEnv("NEXT_RUNTIME", "nodejs");
+    vi.stubEnv("NEXT_PHASE", "");
+    vi.stubEnv("NODE_ENV", "production");
+    for (const [name, value] of Object.entries(FULL)) vi.stubEnv(name, value);
+    // Positive control: complete production configuration starts.
+    await expect(register()).resolves.toBeUndefined();
+    for (const name of PRODUCTION_VARS) {
+      vi.stubEnv(name, "");
+      await expect(register(), name).rejects.toThrow(name);
+      vi.stubEnv(name, FULL[name]);
+    }
+    // A development server starts without any of it.
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("RESEND_API_KEY", "");
+    await expect(register()).resolves.toBeUndefined();
+    vi.unstubAllEnvs();
   });
 });
