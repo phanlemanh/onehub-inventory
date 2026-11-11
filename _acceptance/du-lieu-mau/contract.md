@@ -5,7 +5,7 @@ slug: du-lieu-mau
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [data]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: _acceptance/du-lieu-mau/design.md
@@ -81,3 +81,15 @@ Ngưỡng của ô cơ hội là ngưỡng bật của hàng; số đo đến t�
 - Ngoài-11 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Tài liệu đánh giá nhắc tên một bước kiểm không tồn tại, nên người đối chiếu có thể không tìm thấy bằng chứng đúng chữ. Sản phẩm không bị ảnh hưởng. — `_acceptance/du-lieu-mau/evals.yaml`
 - Ngoài-12 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Một số lỗi của lần chào, như thiếu ngày chốt hay lần chào không có căn, chưa có bài kiểm chứng minh bộ kiểm sẽ bắt. Nếu bước kiểm đó bị lỡ xoá thì không ai biết. — `tests/sample-data.test.ts`
 - Ngoài-13 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Bài kiểm nói không bản ghi nào mang số điện thoại chưa có ca đối chứng cho thấy nó sẽ bắt khi có số lọt vào. Hiện dữ liệu vẫn đúng. — `tests/sample-data.test.ts`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-1: Bài kiểm và tài liệu dùng một dãy số trông giống số di động thật để thử phá bộ quét số.
+  - Ngoài-3: Cách đánh mã dữ liệu mẫu được viết ở hai mô-đun, chỉ có bài kiểm giữ tiền tố khớp nhau.
+  - Ngoài-4: Chữ «tầng», «trục» và các thông báo lỗi của dữ liệu mẫu được viết cứng, chưa lấy từ bảng nhãn.
+  - Ngoài-5: Mã ví dụ của Ocean Park 1 đọc đúng toà, tầng, trục nhưng không trỏ tới căn nào có thật.
+  - Ngoài-6: Dãy số trông như số thật trong bài kiểm (cùng việc với Ngoài-1, ghi từ lượt chấm trước).
+  - Ngoài-8: Quy tắc gắn nhãn MAU lặp ở hai nơi (cùng việc với Ngoài-3, ghi từ lượt chấm trước).
+  - Ngoài-9: Trường số điện thoại gộp nhiều số nhưng mượn tên chuẩn ngành dành cho từng số có vai riêng.
+  - Ngoài-10: Bộ kiểm ca nối đếm liên kết chứ không đếm người, nên một liên kết nhân đôi có thể qua mặt hai ca.
+  - Ngoài-11: Tài liệu đánh giá gọi tên một bước kiểm theo tên hàm trong bài kiểm, không phải tên hàm của mô-đun.
+  - Ngoài-12: Vài luật của lần chào (thiếu ngày chốt, lần chào không có căn) chưa có bài kiểm phá thử.
+  - Ngoài-13: Lời khẳng định «không bản ghi nào mang số» chưa có ca đối chứng cho thấy nó bắt được số lọt vào.
