@@ -135,6 +135,59 @@ def doc_phan(values: list[str]) -> dict[int, list[str]]:
     return phan
 
 
+def doc_ban_cu(root: Path, tep: Path) -> dict[int, list[str]]:
+    """Layers already declared in the old measurement file, by round.
+
+    A missing file declares nothing. A file that exists but cannot be read, is not JSON, or does not have the
+    shape ghi writes stops the command: overwriting it would silently drop the layers it declares.
+    """
+    if not tep.exists() and not tep.is_symlink():
+        return {}
+    ten = tep.relative_to(root) if tep.is_relative_to(root) else tep
+    go = (
+        f"khong ghi de. Go: khoi phuc ban cu tu git (git checkout -- {ten}), "
+        f"hoac xoa tep roi chay lai ghi va khai lai tang bang --phan"
+    )
+    try:
+        raw = tep.read_bytes()
+    except OSError as e:
+        raise LoiDauVao(f"ban so do cu khong doc duoc: {ten} ({e.strerror or e})\n{go}") from None
+    try:
+        data = json.loads(raw.decode("utf-8"))
+    except ValueError:
+        raise LoiDauVao(f"ban so do cu khong phai JSON: {ten}\n{go}") from None
+
+    def sai(cho: str) -> LoiDauVao:
+        return LoiDauVao(f"ban so do cu sai hinh dang: {ten}\nsai hinh dang: {cho}\n{go}")
+
+    if not isinstance(data, dict):
+        raise sai("goc")
+    if "luot" not in data:
+        raise sai("thieu luot")
+    if not isinstance(data["luot"], list):
+        raise sai("luot")
+    cu: dict[int, list[str]] = {}
+    for item in data["luot"]:
+        if not isinstance(item, dict):
+            raise sai("muc")
+        if "vong" not in item:
+            raise sai("thieu vong")
+        vong = item["vong"]
+        if not isinstance(vong, int) or isinstance(vong, bool):
+            raise sai("vong")
+        if "tang" not in item:
+            raise sai("thieu tang")
+        tangs = item["tang"]
+        if not isinstance(tangs, list) or not all(isinstance(x, str) for x in tangs):
+            raise sai("tang")
+        for x in tangs:
+            if x not in TANG:
+                raise sai(f"tang la: {x}")
+        if tangs:
+            cu[vong] = list(tangs)
+    return cu
+
+
 def ghi(root: Path, slug: str, phan: dict[int, list[str]]) -> dict:
     ho_so = root / "_acceptance" / slug
     if not ho_so.is_dir():
@@ -147,15 +200,7 @@ def ghi(root: Path, slug: str, phan: dict[int, list[str]]) -> dict:
         if luot[so] != "REJECT":
             raise LoiDauVao(f"r{so}: luot nay la {luot[so]}, chi khai tang cho luot REJECT")
 
-    cu: dict[int, list[str]] = {}
-    tep = ho_so / TEP_SO_DO
-    if tep.exists():
-        try:
-            for item in json.loads(tep.read_text("utf-8")).get("luot", []):
-                if item.get("tang"):
-                    cu[int(item["vong"])] = list(item["tang"])
-        except (ValueError, KeyError, TypeError, AttributeError):
-            cu = {}
+    cu = doc_ban_cu(root, ho_so / TEP_SO_DO)
 
     ds_luot, lam_lai, chua_phan = [], [], []
     for so, verdict in luot.items():
