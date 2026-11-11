@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api]
 screens: [sign-in, today]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: docs/superpowers/specs/2026-11-11-va-dang-nhap-design.md
@@ -98,3 +98,7 @@ tab, LF, CR và khoảng trắng đầu], [NGÀNH: OWASP Session Management — 
 - Tệp chạm ngoài ranh giới giao, giám sát đã duyệt (R-1111-15): menu tài khoản của khung, chỉ phần Đăng xuất. Tệp chạm
   trong mô-đun danh tính (hàng 9 giữ mô-đun): chỉ `src/modules/identity/next-path.ts`.
 - Bài kiểm có cơ sở dữ liệu chạy trên Postgres của dãy R (cổng 5565), ba lệnh riêng thêm vào cấu hình nghiệm thu.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-12:
+  - Ngoài-1: Thay đổi đăng nhập và đăng xuất được hệ thống xếp mức rủi ro vừa thay vì cao, vì quy tắc phân mức chưa tính thư mục đăng nhập; người dùng không thấy khác biệt, sửa quy tắc là việc của chủ kho.
+  - Ngoài-2: Bài kiểm đăng xuất chưa chứng được bộ ghi lượt chuyển trang bắt được trang đăng nhập; nếu sau này đăng xuất hỏng theo kiểu dội ngược, bài kiểm có thể vẫn xanh.
+  - Ngoài-3: Bài kiểm chưa chứng được phép dò «máy chủ xoá cookie» khớp khi đăng xuất thành công; nếu máy chủ đổi cách xoá cookie, chỗ này có thể xanh giả.
