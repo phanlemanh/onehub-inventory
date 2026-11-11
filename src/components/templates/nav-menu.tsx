@@ -85,7 +85,8 @@ export function NavMenu({ items, roles }: { items: readonly NavItem[]; roles?: r
               }
             >
               {item.icon ?? <CircleDotIcon aria-hidden />}
-              <span>{item.title}</span>
+              {/* In the phone sheet the rail stays icon-only (as app-shell-8 does) so the second column keeps its width. */}
+              <span className={isMobile ? "sr-only" : undefined}>{item.title}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         );

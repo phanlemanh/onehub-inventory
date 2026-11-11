@@ -199,6 +199,10 @@ test.describe("App Shell on a phone", () => {
     for (const name of SECOND_COLUMN["/inventory"]!) {
       await expect(sheet.getByRole("link", { name, exact: true }).first()).toBeVisible();
     }
+    // The sheet slides in; shoot only once its animations have finished, so the frame shows it open.
+    await expect
+      .poll(() => sheet.first().evaluate((el) => el.getAnimations({ subtree: true }).length))
+      .toBe(0);
     if (page.viewportSize()?.width === 360) await shot(page, "sheet-360-light");
     await sheet.getByRole("link", { name: LABELS.Sent.pref, exact: true }).click();
     await expect(page.locator("h1")).toHaveText(LABELS.Sent.pref);

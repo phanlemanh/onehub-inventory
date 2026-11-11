@@ -32,7 +32,7 @@ con kho đã có lời giải thì dùng của kho.
 
 | Vùng của `app-shell-8` | Làm gì | Vì sao (việc của người dùng) |
 | --- | --- | --- |
-| `SidebarProvider` với cột hẹp và cột thứ hai | Lấy | Chủ kho chốt giữ cả hai cột |
+| `SidebarProvider` với cột hẹp và cột thứ hai | Lấy | Nhân viên chuyển màn bằng cột biểu tượng mà vẫn thấy mục con của màn đang mở ngay bên cạnh, không phải mở thêm menu (chủ kho chốt giữ cả hai cột) |
 | Logo ở đầu cột biểu tượng | Lấy, thay dấu OneHub | Người dùng nhận ra sản phẩm; dấu lấy từ `public/brand/logo-mark.svg` |
 | Cột biểu tượng (`NavMain`), chú thích khi rê chuột | Lấy | Chuyển màn bằng một lần bấm, chiếm ít chỗ cho bảng hàng |
 | Mục của cột biểu tượng (`NAV_ITEMS`) | Lấy, nạp từ bảng điều hướng của kho | Một nguồn mục, lọc theo mọi vai người giữ (hàng 1i, quyết định 0016) |
@@ -45,8 +45,8 @@ con kho đã có lời giải thì dùng của kho.
 | Chuông và ngăn thông báo của khối | Theo câu hỏi 3; nếu có thì ngăn dùng `Sheet` và trạng thái trống của kho | Ngăn mẫu của khối mang dữ liệu đơn hàng, không phải của sàn |
 | Menu người dùng ở chân cột (`NavUser`) | Bỏ, dùng menu tài khoản của kho ở thanh trên | Kho đã có menu tài khoản kèm đổi sàn và đăng xuất (hàng 8) |
 | Đổi sáng tối trong menu người dùng | Bỏ, dùng nút đổi giao diện của kho | Kho đã có (hàng 1a) |
-| Vùng nội dung mẫu (thẻ gạch đứt) | Bỏ, thay bằng màn thật | |
-| Thanh bên trong ngăn trượt trên điện thoại, cột thứ hai đi kèm | Lấy nếu câu hỏi 5 chọn thanh bên | Một mã, một cách điều hướng ở mọi khổ |
+| Vùng nội dung mẫu (thẻ gạch đứt) | Bỏ, thay bằng màn thật | Nhân viên cần thấy màn làm việc thật của mình (Hôm nay, Bảng hàng, Đã gửi) trong App Shell, không phải khung giữ chỗ trống |
+| Thanh bên trong ngăn trượt trên điện thoại, cột thứ hai đi kèm | Lấy (câu 5 chủ kho chọn thanh bên thu gọn) | Nhân viên dùng điện thoại tìm màn và mục con ở cùng một chỗ, cùng cách như trên máy tính, nên không phải học hai cách điều hướng |
 
 **Thêm bằng thành phần của kho:** lối nhảy tới nội dung (hàng 1a), băng báo trên màn và theo dõi mất mạng (hàng 1a),
 trạng thái toàn trang lỗi, không tìm thấy, hết phiên (hàng 1a, 1e), thông báo kết quả (hàng 1e).
