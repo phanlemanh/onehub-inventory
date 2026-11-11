@@ -1,5 +1,6 @@
 // What sign-in needs from the environment. Production never falls back to the development sender or secret: a
 // missing variable stops the server at start (src/instrumentation.ts) and, if it slips through, fails the request.
+import { devInviteSender, resendInviteSender, type InviteSender } from "./invite-mail";
 import { devSender, resendSender, type CodeSender } from "./sender";
 
 export type Env = Readonly<Record<string, string | undefined>>;
@@ -26,6 +27,8 @@ export interface AuthConfig {
   databaseUrl: string | null;
   secret: string;
   sender: CodeSender;
+  /** Sends the invitation mail of row 9, with the same Resend key and sender address. */
+  inviteSender: InviteSender;
   production: boolean;
 }
 
@@ -53,6 +56,11 @@ export function readAuthConfig(env: Env, fetchImpl?: typeof fetch): AuthConfig {
         from: env["MAIL_FROM"] as string,
         ...(fetchImpl ? { fetch: fetchImpl } : {}),
       }),
+      inviteSender: resendInviteSender({
+        apiKey: env["RESEND_API_KEY"] as string,
+        from: env["MAIL_FROM"] as string,
+        ...(fetchImpl ? { fetch: fetchImpl } : {}),
+      }),
     };
   }
   return {
@@ -60,5 +68,8 @@ export function readAuthConfig(env: Env, fetchImpl?: typeof fetch): AuthConfig {
     databaseUrl: present(env, "DATABASE_URL") ? (env["DATABASE_URL"] as string) : null,
     secret: present(env, "AUTH_SECRET") ? (env["AUTH_SECRET"] as string) : DEV_SECRET,
     sender: devSender(present(env, "LOGIN_CODE_OUTBOX") ? env["LOGIN_CODE_OUTBOX"] : undefined),
+    inviteSender: devInviteSender(
+      present(env, "LOGIN_CODE_OUTBOX") ? env["LOGIN_CODE_OUTBOX"] : undefined,
+    ),
   };
 }

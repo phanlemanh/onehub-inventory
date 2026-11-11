@@ -1,0 +1,160 @@
+schema_version: 1
+feature_slug: va-dang-nhap
+# Ma trận ca viết trước.
+# Bài kiểm đường trở về (tests/next-path-matrix.test.ts, make test) — 18 ca dạng, mỗi dạng một `it` mang đúng mã dạng
+# của design doc: L1..L14 (dạng lách) · H1..H4 (dạng hợp lệ); cộng hai ca quan hệ: 'quan-he-cung-goc' (mọi dạng, kết quả
+# đọc bằng new URL(kết quả, https://app.test) có origin https://app.test) và 'doi-chung-ban-cu' (bản safeNext cũ chép
+# nguyên trong tệp: tập dạng bản cũ cho qua đúng bằng {L6, L7, L8, L9, L11, L12, L13}, tập dạng bản cũ đưa sang gốc
+# khác đúng bằng {L6, L7, L8}).
+# Bài trình duyệt có cơ sở dữ liệu (tests/e2e-db/va-dang-nhap.spec.ts, chạy chung với tests/e2e-db/login.spec.ts của
+# hàng 8 bằng config:executors.script.va_dang_nhap_e2e trên Postgres của dãy R) — 10 ca × 4 khổ:
+#   next-lach-may-chu · next-lach-sau-go-ma · next-lach-chon-san · dang-xuat-mang-dut · dang-xuat-may-chu-loi ·
+#   dang-xuat-duoc · het-san-co-loi-thoat · het-san-dang-xuat-loi · het-san-may-chu-loi · axe-sang-toi-1m
+# Lỗi máy chủ THẬT (không giả ở trình duyệt): vai chủ thu quyền chạy hàm xoá phiên của vai API
+# (revoke execute on function app.session_end(text) from quy_hang_app) trong ca, trả lại ở finally.
+# Ca phá thử (chạy tay một lần, ghi kết quả ở đầu tệp kiểm): trả lại hàm đăng xuất bỏ qua kết quả thì
+# 'dang-xuat-mang-dut' đỏ với «đăng xuất lỗi mà rời trang»; trả lại safeNext cũ thì L6 đỏ với «L6 tab giữa hai gạch»
+# và 'next-lach-may-chu' đỏ với «máy chủ chuyển sang trang lạ»; máy chủ xoá cookie khi xoá phiên lỗi thì
+# 'dang-xuat-may-chu-loi' đỏ với «máy chủ xoá cookie khi chưa xoá phiên».
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/identity/next-path.ts, tests/next-path-matrix.test.ts]
+    expected: "exit 0; tests/next-path-matrix.test.ts có đúng 18 ca dạng mang mã L1..L14, H1..H4 (đếm theo tên, số ca bằng số dạng của design doc) và hai ca quan hệ; mỗi ca lách khẳng định safeNext trả '/' với thông điệp ghim '<mã> <tên dạng>'; mỗi ca hợp lệ khẳng định trả nguyên chuỗi; ca 'quan-he-cung-goc' khẳng định với mọi dạng new URL(safeNext(x), 'https://app.test').origin === 'https://app.test'; ca 'doi-chung-ban-cu' chạy cùng ma trận trên bản cũ chép trong tệp và khẳng định tập dạng bản cũ cho qua (khác '/') đúng bằng {L6, L7, L8, L9, L11, L12, L13} và tập dạng bản cũ đưa sang gốc khác đúng bằng {L6, L7, L8} — chiều đỏ của ma trận trên đúng fixture ấy"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_e2e
+    layer: ui
+    paths: [src/modules/identity/next-path.ts, src/app/login/**, tests/e2e-db/va-dang-nhap.spec.ts]
+    expected: "exit 0; ở bốn khổ: ca 'next-lach-may-chu' — người một sàn đã đăng nhập mở /login?next=%2F%09%2Fexample.com và /login?next=%2F%0A%2Fexample.com: URL cuối có origin của máy chủ thử và pathname '/'; ca 'next-lach-sau-go-ma' — người một sàn chưa đăng nhập mở /login?next=%2F%09%2Fexample.com, gõ mã từ hộp thư thử: URL cuối có origin của máy chủ thử và pathname '/'; ca 'next-lach-chon-san' — người hai sàn mở /login?next=%2F%09%2Fexample.com, gõ mã, chọn sàn A: URL cuối có origin của máy chủ thử và pathname '/'. Đối chứng dương trong mỗi ca: next=%2Finventory đưa về /inventory. Chiều đỏ ghi ở đầu tệp: trả lại safeNext cũ thì 'next-lach-may-chu' đỏ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_e2e
+    layer: backend-effect
+    paths: [src/modules/identity/next-path.ts, src/modules/identity/http.ts, src/app/api/v1/auth/**, tests/e2e-db/va-dang-nhap.spec.ts]
+    expected: "exit 0; ca 'next-lach-sau-go-ma' bắt phản hồi của POST /api/v1/auth/session: thân JSON có next === '/' khi trang gửi next mang tab; ca 'next-lach-may-chu' bắt phản hồi của GET /login?next=…: phản hồi chuyển hướng (mã 3xx) với Location '/' (không phải chuỗi lách)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_e2e
+    layer: ui
+    paths: ["src/app/(app)/account-menu.tsx", src/app/login/**, src/components/templates/notify.ts, tests/e2e-db/va-dang-nhap.spec.ts]
+    expected: "exit 0; ở bốn khổ: ca 'dang-xuat-mang-dut' — đường DELETE /api/v1/auth/session bị cắt mạng (page.route abort); bấm «Đăng xuất» trong menu tài khoản thì URL không đổi (vẫn trang Hôm nay), câu «Chưa đăng xuất được. Bạn vẫn đang đăng nhập trên máy này — kiểm tra mạng rồi bấm «Đăng xuất» lại.» hiện nguyên văn; gỡ chặn mạng, mở menu, bấm «Đăng xuất» lại thì về /login bước email. Ca 'dang-xuat-may-chu-loi' — máy chủ thật lỗi khi xoá phiên (vai chủ thu quyền chạy hàm xoá phiên của vai API): cùng câu, URL không đổi. Chiều đỏ ghi ở đầu tệp: hàm đăng xuất bỏ qua kết quả làm ca in «đăng xuất lỗi mà rời trang»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_e2e
+    layer: backend-effect
+    paths: ["src/app/(app)/account-menu.tsx", src/app/login/**, src/app/api/v1/auth/**, tests/e2e-db/va-dang-nhap.spec.ts]
+    expected: "exit 0; ca 'dang-xuat-mang-dut' và 'dang-xuat-may-chu-loi': sau lần đăng xuất lỗi, vai chủ đếm identity.sessions của người còn đúng 1 dòng và GET /api/v1/auth/session với cookie trong trình duyệt trả 200; sau lần bấm lại thành công (đã trả quyền / gỡ chặn mạng), số dòng là 0. Riêng 'dang-xuat-may-chu-loi' bắt phản hồi DELETE thật của máy chủ: mã 500, không có Set-Cookie xoá ohi_session, và cookie ohi_session vẫn còn trong trình duyệt (context.cookies). Chiều đỏ ghi ở đầu tệp: máy chủ xoá cookie khi xoá phiên lỗi thì ca in «máy chủ xoá cookie khi chưa xoá phiên»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_e2e
+    layer: backend-effect
+    paths: ["src/app/(app)/account-menu.tsx", src/app/login/**, src/app/api/v1/auth/**, tests/e2e-db/**]
+    expected: "exit 0; ca 'dang-xuat-duoc' ở bốn khổ: bấm «Đăng xuất» về /login, ô email hiện; vai chủ đếm identity.sessions của người là 0; gửi lại cookie cũ (lưu trước khi bấm) thì GET /api/v1/auth/session trả 401. Ca 'dang-xuat' của hàng 8 vẫn xanh trong cùng lượt"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_e2e
+    layer: ui
+    paths: [src/app/login/**, tests/e2e-db/va-dang-nhap.spec.ts]
+    expected: "exit 0; ở bốn khổ: ca 'het-san-co-loi-thoat' — người một sàn đăng nhập, vai chủ xoá dòng thành viên, mở /login: câu «Tài khoản của bạn không còn thuộc sàn nào. Nhờ quản trị sàn mời lại, hoặc đăng xuất để dùng email khác.» hiện nguyên văn, không có danh sách sàn (data-state choose-company không có mặt), có đúng một nút «Đăng xuất»; bấm nút thì ô email hiện"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_e2e
+    layer: backend-effect
+    paths: [src/app/login/**, src/app/api/v1/auth/**, tests/e2e-db/va-dang-nhap.spec.ts]
+    expected: "exit 0; ca 'het-san-co-loi-thoat': trước khi bấm, vai chủ đếm identity.sessions của người là 1; sau khi bấm «Đăng xuất» là 0, và GET /api/v1/auth/session với cookie cũ trả 401"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_e2e
+    layer: ui
+    paths: [src/app/login/**, tests/e2e-db/va-dang-nhap.spec.ts]
+    expected: "exit 0; ở bốn khổ: ca 'het-san-dang-xuat-loi' (DELETE /api/v1/auth/session bị cắt mạng) và ca 'het-san-may-chu-loi' (máy chủ thật lỗi khi xoá phiên, như E5): bấm «Đăng xuất» thì câu «Chưa đăng xuất được…» hiện nguyên văn, câu «không còn thuộc sàn nào» vẫn hiện, ô email không hiện, nút «Đăng xuất» bấm được lại (enabled)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_db
+    paths: [src/modules/identity/**, src/app/api/v1/auth/**, tests/db/**]
+    expected: "exit 0; 16 ca của tests/db/dang-nhap.db.test.ts (hàng 8) xanh trên Postgres của dãy R, kể cả 'dang-xuat-xoa-phien' và bốn bản phá"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_cach_ly
+    paths: [db/**, src/modules/identity/with-company.ts]
+    expected: "exit 0; dòng tổng 'cach-ly: 19 ca đạt, vai quy_hang_app' — bộ kiểm cách ly của hàng 7 không đổi và xanh"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.check
+    paths: [src/**, tests/**]
+    expected: "exit 0; trong make check: src/modules/identity/one-door.test.ts (bài quét một cửa) xanh với tập miễn không đổi; tests/behavior-guard.test.ts xanh — tệp màn không nhập thẳng toast, hộp thoại hay vòng xoay; tests/label.test.ts xanh — không nhãn khái niệm gõ cứng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_e2e
+    layer: ui
+    paths: [src/app/login/**, "src/app/(app)/account-menu.tsx", tests/e2e-db/login.spec.ts]
+    expected: "exit 0; tám ca của tests/e2e-db/login.spec.ts (hàng 8: mot-san-vao-thang, nhieu-san-chon-va-doi, ma-sai-va-gui-lai, qua-gioi-han, chua-thuoc-san, next-quay-ve-dung-trang, dang-xuat, axe-sang-toi) xanh ở bốn khổ trong cùng lượt"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_e2e
+    layer: ui
+    paths: [src/app/login/**, "src/app/(app)/account-menu.tsx", tests/e2e-db/va-dang-nhap.spec.ts]
+    expected: "exit 0; ca 'axe-sang-toi-1m': axe (wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa) không lỗi ở trạng thái hết sàn khi còn phiên và khi câu «Chưa đăng xuất được…» đang hiện, sáng và tối; ở 360 scrollWidth không vượt clientWidth; nút «Đăng xuất» khi đang chờ có disabled và chữ không đổi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-8
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/app/login/**, "src/app/(app)/account-menu.tsx"]
+    steps:
+      - "Run config:executors.script.va_dang_nhap_e2e with SHOTS_DIR=_acceptance/va-dang-nhap/evidence; the spec saves one frame per state as E15-step<n>.png"
+      - "Read every evidence/E15-step*.png frame: no company with a session 360 light, same 1440 dark, sign-out failed on the no-company state 414 light, sign-out failed from the account menu 1440 light, same 360 dark"
+    expected: "câu «không còn thuộc sàn nào» và nút Đăng xuất nằm trong khối đăng nhập giữa màn, không danh sách sàn trống; câu «Chưa đăng xuất được…» đọc được, nằm trên nội dung, không che nút; người vẫn thấy trang đang mở; tối đổi nền và chữ, đọc được; không cuộn ngang ở 360"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
+
+  - id: E16
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.va_dang_nhap_e2e
+    layer: backend-effect
+    paths: [src/app/login/**, src/app/api/v1/auth/**, tests/e2e-db/va-dang-nhap.spec.ts]
+    expected: "exit 0; ca 'het-san-dang-xuat-loi' và 'het-san-may-chu-loi': sau lần đăng xuất lỗi, vai chủ đếm identity.sessions của người vẫn là 1 và GET /api/v1/auth/session với cookie trong trình duyệt trả 200 (company null); riêng 'het-san-may-chu-loi' phản hồi DELETE thật là 500 và không có Set-Cookie xoá ohi_session"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

@@ -43,10 +43,10 @@ async function person(
         name,
       ])
     ).rows[0]!.id;
-    await owner.query("insert into company_members (company_id, user_id) values ($1, $2)", [
-      id,
-      user,
-    ]);
+    await owner.query(
+      "insert into company_members (company_id, user_id, name, roles) values ($1, $2, '[Tên]', '{CompanyAdmin}')",
+      [id, user],
+    );
     ids.push(id);
   }
   return { email, ids };

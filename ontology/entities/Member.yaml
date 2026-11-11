@@ -1,0 +1,30 @@
+name: Member
+description: A person who works in one company, with the roles that company gave them and the name it knows them by.
+reso: Member (RESO 2.1 resource for a person who belongs to an office)
+
+properties:
+  companyId: { type: uuid, required: true }
+  userId: { type: uuid, required: true }
+  name: { type: string, required: true, pii: true, display: person }
+  roles: { type: string, required: true }
+  invitedBy: { type: uuid }
+  invitedAt: { type: datetime }
+
+rules:
+  - id: roles-from-register
+    description: Roles are a non-empty set taken from ontology/roles.yaml, without repeats.
+    implemented_in: db/migrations/003_moi_nguoi_gan_vai.sql
+  - id: company-admin-manages-people
+    description: Only a CompanyAdmin of the current company lists, invites and changes the roles of its members (until the permission table of row 9a).
+    implemented_in: db/migrations/003_moi_nguoi_gan_vai.sql
+  - id: one-admin-left
+    description: A company always keeps at least one CompanyAdmin.
+    implemented_in: db/migrations/003_moi_nguoi_gan_vai.sql
+  - id: name-per-company
+    description: Each company keeps its own name for the person; another company never sees it.
+    implemented_in: db/migrations/003_moi_nguoi_gan_vai.sql
+
+code:
+  model: src/modules/identity/
+  tests: tests/db/
+wiki: wiki/entities/member.md

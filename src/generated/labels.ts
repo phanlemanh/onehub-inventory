@@ -36,6 +36,9 @@ export const LABELS = {
   LoginCode: {"pref": "Mã đăng nhập"},
   SignIn: {"pref": "Đăng nhập"},
   SignOut: {"pref": "Đăng xuất"},
+  Member: {"pref": "Thành viên"},
+  Invite: {"pref": "Mời người"},
+  ChangeRoles: {"pref": "Đổi vai"},
 } as const;
 
 export type ConceptCode = keyof typeof LABELS;
