@@ -1,71 +1,7 @@
 {
-  "feature_plain": "Khi nguồn ReUI đổi cách ghi tiêu đề một nhóm, lệnh ghim lại danh mục dừng và nói rõ nhóm nào mất; lưới chặn mã nguồn và khoá bản quyền được thử ở mọi chỗ, mọi dạng đã kê. Lần mở lại này thêm hai lỗ chủ kho chọn sửa ngay.",
-  "will_do": [
-    {
-      "id": "AC-1",
-      "p": "Sẽ dừng lệnh ghim lại và gọi đúng tên nhóm khi tiêu đề nhóm đổi theo bất kỳ dạng nào trong bảy dạng đã kê, không ghi tệp nào."
-    },
-    {
-      "id": "AC-2",
-      "p": "Sẽ ghim lại bình thường từ nguồn nguyên vẹn (đối chứng)."
-    },
-    {
-      "id": "AC-3",
-      "p": "Sẽ làm lệnh sinh lại và lệnh kiểm cũng dừng, gọi tên nhóm, khi ảnh chụp bị sửa tay mất một nhóm."
-    },
-    {
-      "id": "AC-4",
-      "p": "Sẽ gọi tên mọi nhóm mất trong một lần chạy và chỉ ra dòng tiêu đề gần giống."
-    },
-    {
-      "id": "AC-5",
-      "p": "Sẽ thử lưới chặn với 10 dạng × 27 chỗ, neo vào chính danh sách trong mã."
-    },
-    {
-      "id": "AC-6",
-      "p": "Sẽ thử trường lạ ở cả ba cấp của danh mục."
-    },
-    {
-      "id": "AC-7",
-      "p": "Sẽ KHÔNG báo nhầm câu thường như «Import data from a CSV file» là mã (đối chứng của lưới chặn)."
-    },
-    {
-      "id": "AC-8",
-      "p": "Sẽ chứng lệnh kiểm thật bắt được chuỗi cấm ở cả bốn lớp chỗ."
-    },
-    {
-      "id": "AC-9",
-      "p": "Sẽ giữ danh mục hôm nay y từng byte và bộ kiểm của hàng danh mục ReUI vẫn xanh."
-    },
-    {
-      "id": "AC-11",
-      "p": "Sẽ bắt lại mã khoá hay chuỗi bí mật viết làm tên trường trong phần ghim hay phần đếm, như trước khi làm hàng này (mới — Ngoài-3)."
-    },
-    {
-      "id": "AC-12",
-      "p": "Sẽ để tiêu đề các nhóm chỉ khai ở một chỗ: đổi ở đó là ghim đủ 27 thành phần gốc; đổi sai chỗ hay nhóm rỗng thì lệnh dừng và gọi tên nhóm (mới — Ngoài-5)."
-    }
-  ],
-  "wont_do": [
-    {
-      "id": "OOS-1",
-      "p": "KHÔNG tự nới cách đọc để nhận tiêu đề kiểu mới."
-    },
-    {
-      "id": "OOS-2",
-      "p": "KHÔNG sửa bộ kiểm hay hồ sơ đã ký của hàng danh mục ReUI."
-    },
-    {
-      "id": "OOS-3",
-      "p": "KHÔNG mở rộng danh sách dạng cấm."
-    },
-    {
-      "id": "OOS-4",
-      "p": "KHÔNG làm các lỗi nhỏ khác của hàng danh mục ReUI đã ghi là hạn chế đã biết."
-    },
-    {
-      "id": "OOS-5",
-      "p": "KHÔNG bắt trường hợp một nhóm xuất hiện hai lần trong cùng tệp nguồn."
-    }
+  "feature_plain": "Khi nguồn ReUI đổi cách ghi tiêu đề một nhóm, lệnh ghim lại danh mục dừng và nói rõ nhóm nào mất; lưới chặn mã nguồn và khoá bản quyền được thử ở mọi chỗ, kể cả tên trường; tiêu đề các nhóm chỉ khai ở một chỗ.",
+  "decisions": [
+    {"id": "E11", "q": "Hướng dẫn đã nói đủ khi nào ghim lại dừng và phải làm gì chưa?", "why": "Ba người chấm đều thấy đạt; hành vi thật của lệnh do máy đo riêng."},
+    {"id": "E14", "q": "Hướng dẫn đã nói tiêu đề nhóm chỉ cần sửa ở một chỗ chưa?", "why": "Ba người chấm đều thấy đạt; việc đổi một chỗ là đủ đã được máy chạy thử trên bản sao."}
   ]
 }
