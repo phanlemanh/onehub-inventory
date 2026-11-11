@@ -3,6 +3,7 @@
 // decision:column-width
 // decision:table-density
 // decision:read-only-cell
+// decision:grid-continuous-run
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";

@@ -810,7 +810,7 @@ describe("kho thật", () => {
     const section = (h: string) => text.split(`## ${h}\n`)[1]?.split("\n## ")[0] ?? "";
     expect(section("Triết lý")).toMatch(/Sheet/);
     expect(section("Triết lý")).toMatch(/Excel/);
-    expect(section("Màn mẫu")).toContain("Màn: chưa có");
+    expect(section("Màn mẫu")).toContain("Màn: inventory");
     expect(section("Khổ so").match(/\d+/g)?.map(Number)).toEqual([360, 414, 1024, 1440]);
     expect(
       section("Mặt so")

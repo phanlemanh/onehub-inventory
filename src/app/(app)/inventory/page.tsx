@@ -13,17 +13,16 @@ import {
 
 export const metadata: Metadata = { title: label("Inventory") };
 
-// Design pass before the scope gate: five headers wait for the owner's answer on new labels (Hỏi-2). Once approved
-// they move to ontology/labels.yaml and these literals go (tests/language.test.ts then flags any left behind).
+/** Headers of the eight inventory columns, from the label table (approved at the scope gate, Hỏi-2). */
 const HEADERS: Record<InventoryField, string> = {
   "Listing.unitNumber": label("Unit"),
   "Listing.buildingName": label("Building"),
   "Listing.subdivisionName": label("Subdivision"),
-  "Listing.standardStatus": "Trạng thái",
-  "Listing.listPrice": "Giá chào",
-  "Unit.livingArea": "Diện tích",
-  "Unit.bedroomsTotal": "Phòng ngủ",
-  "Listing.lastConfirmedAt": "Xác nhận lúc",
+  "Listing.standardStatus": label("StandardStatus"),
+  "Listing.listPrice": label("ListPrice"),
+  "Unit.livingArea": label("LivingArea"),
+  "Unit.bedroomsTotal": label("BedroomsTotal"),
+  "Listing.lastConfirmedAt": label("LastConfirmedAt"),
 };
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };

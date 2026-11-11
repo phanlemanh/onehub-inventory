@@ -18,6 +18,9 @@ import {
   pinned,
 } from "./recipes";
 import { REPO_ROOT } from "./register";
+import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
+import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings";
+import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { checkRecipes, regionStates } from "./structure";
 
 const STATES_MD = readFileSync(join(REPO_ROOT, "design/states.md"), "utf8");
@@ -126,6 +129,41 @@ describe("danh sách chưa có vùng", () => {
     expect(() => classifyGrid("sent", { hasRegion: false, hasTable: true })).toThrow(
       "sent: luoi dung ngoai khuon",
     );
+  });
+});
+
+// ---- search on the inventory run (row 2, E5) ----------------------------------------------------------------------
+
+describe("bai tim tren Bang hang cuon lien (hang 2)", () => {
+  // The texts the search recipe reads (text cells: unit, building, project), built by the screen's own row builder.
+  const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
+  const sample = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
+  const rows = inventoryRows({ ...sample, units }).map((r) =>
+    ["Listing.unitNumber", "Listing.buildingName", "Listing.subdivisionName"].map((f) =>
+      String(r[f as keyof typeof r] ?? ""),
+    ),
+  );
+
+  for (const window of [24, 25, 27]) {
+    it(`finds a needle past the first window of ${window} visible rows`, () => {
+      const needle = pickNeedle(rows, window);
+      expect(needle).not.toBeNull();
+      const hits = rows
+        .map((r, i) => (r.some((t) => t.toLocaleLowerCase("vi").includes(needle!)) ? i : -1))
+        .filter((i) => i >= 0);
+      expect(hits.length).toBeGreaterThan(window);
+      expect(hits.length).toBeLessThan(rows.length);
+      expect(hits.some((i) => i >= window)).toBe(true);
+    });
+  }
+
+  it("has no needle with the old hard-coded page of 50 (why the window is read from the screen)", () => {
+    expect(rows).toHaveLength(60);
+    expect(pickNeedle(rows, 50)).toBeNull();
+  });
+
+  it("fails as before on the calibration grid when its rows hold no needle", () => {
+    expect(pickNeedle(rows.slice(0, 20), 25)).toBeNull();
   });
 });
 

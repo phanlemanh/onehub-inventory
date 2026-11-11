@@ -7,6 +7,8 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-12 — Bảng hàng bản đọc, «đọc như Sheet»: `/inventory` đọc 60 lần chào mẫu trên khuôn Lưới; khuôn Lưới cuộn liền một mạch (bảng cuộn ảo ReUI) thay chia trang, tiêu đề và cột số dòng · Căn · Toà đứng yên, khung xếp theo `data-grid-editing-6` (kẻ dọc giữa cột, dòng dày 32px, ô tìm kèm số dòng), cột chữ rộng theo nội dung; năm nhãn cột mới; Bảng hàng thành màn mẫu của họ Lưới — hàng 2, `_acceptance/bang-hang-ban-doc/`
+
 - 2026-11-11 — Bộ bài kiểm sinh từ sổ màn: `tests/e2e/screens` đọc sổ màn và bản khai vai lúc chạy (qua bộ đọc của hàng 1d), mỗi màn đã dựng có bốn bài khung ở bốn khổ, màn Lưới có vùng và bản mẫu Lưới có bảy trạng thái vùng; mỗi bài có ca phá gọi đúng hàm kiểm ấy; đóng bốn lỗ bài kiểm của 1b (chờ tải treo, đối chứng chờ tải, tìm bỏ sót dòng, đỏ giả khi máy chậm) — hàng 1f, [0019](decisions/0019-measurable-design-system-pilot.md), `_acceptance/bo-bai-kiem-tu-so-man/`
 
 - 2026-11-11 — Cổng chứng minh màn mẫu: máy suy lối của từng màn (họ mới, màn mẫu mới, theo mẫu) từ sổ màn và bản đồ khuôn; `make test` đỏ khi vòng khai màn sản phẩm mà thiếu ảnh cạnh màn mẫu, còn chỗ lệch vô cớ, họ mới dưới hai hướng, hay rơi bậc thang thiếu căn cứ; khai họ Lưới trong `design/patterns/luoi.md` — hàng 1c, [0019](decisions/0019-measurable-design-system-pilot.md), `_acceptance/cong-chung-minh-man-mau/`

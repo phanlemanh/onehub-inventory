@@ -185,6 +185,31 @@ concepts:
     lease: Sẵn sàng cho thuê
     en: Ready to list
     avoid: [Duyệt]
+  ListPrice:
+    kind: field
+    reso: ListPrice
+    pref: Giá chào
+    en: List price
+  StandardStatus:
+    kind: field
+    reso: StandardStatus
+    pref: Trạng thái
+    en: Status
+  LivingArea:
+    kind: field
+    reso: LivingArea
+    pref: Diện tích
+    en: Living area
+  BedroomsTotal:
+    kind: field
+    reso: BedroomsTotal
+    pref: Phòng ngủ
+    en: Bedrooms
+  LastConfirmedAt:
+    kind: field
+    own: true
+    pref: Xác nhận lúc
+    en: Last confirmed at
   ClosePrice:
     kind: field
     reso: ClosePrice

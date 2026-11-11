@@ -46,7 +46,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: ["src/app/(app)/inventory/**", src/modules/listings/ui/**, tests/inventory.test.tsx]
-    expected: "exit 0; ma trận viết trước 6 tham số (loading, empty, error, partial, forbidden, lạ) × 2 môi trường (production, development) = 12 ô: production cho 'ready' ở cả 6, development cho đúng trạng thái ở 5 ô và 'ready' cho tham số lạ; bộ kiểm khẳng định hằng 12 viết trong tệp; ca đối chứng dùng bộ đọc bỏ qua môi trường và khẳng định thông điệp 'production honours state: error'"
+    expected: "exit 0; ma trận viết trước 6 tham số (loading, empty, error, partial, forbidden, lạ) × 2 môi trường (production, development) = 12 ô: production cho 'ready' ở cả 6, development cho đúng trạng thái ở 5 ô và 'ready' cho tham số lạ; bộ kiểm khẳng định hằng 12 viết trong tệp; ca đối chứng dùng bộ đọc bỏ qua môi trường và khẳng định thông điệp 'production honours state: loading' (ô đầu của ma trận)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E7
