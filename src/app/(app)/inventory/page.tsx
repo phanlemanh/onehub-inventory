@@ -45,6 +45,7 @@ export default async function Page({ searchParams }: Props) {
           process.env.NODE_ENV,
         )}
         emptyWhy={`${label("Company")} chưa có căn nào đang chào trên ${label("Inventory")}.`}
+        reloadLabel="Tải lại"
       />
     </>
   );

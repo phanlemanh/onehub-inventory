@@ -1,8 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
+import { Button } from "@/components/ui/button";
 
 import { inventoryColumns, type InventoryField, type InventoryState } from "./inventory-rows";
 
@@ -16,13 +18,17 @@ export function InventoryGrid({
   rows,
   state,
   emptyWhy,
+  reloadLabel,
 }: {
   title: string;
   headers: Readonly<Record<InventoryField, string>>;
   rows: readonly GridRow[];
   state: InventoryState;
   emptyWhy: string;
+  /** The empty state's next step: load the list again (someone may have added units meanwhile). */
+  reloadLabel: string;
 }) {
+  const router = useRouter();
   const [current, setCurrent] = useState<InventoryState>(state);
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
@@ -35,6 +41,11 @@ export function InventoryGrid({
       status={status}
       onRetry={() => setCurrent("ready")}
       emptyWhy={emptyWhy}
+      emptyAction={
+        <Button variant="outline" onClick={() => router.refresh()}>
+          {reloadLabel}
+        </Button>
+      }
     />
   );
 }

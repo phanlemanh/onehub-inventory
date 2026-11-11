@@ -181,7 +181,24 @@ const viewport = (page: Page) =>
 /** Kinds whose shown text is the searched value (column-kind.ts SEARCHABLE_KINDS, without `select`, which shows a label). */
 const TEXT_KINDS = ["text", "person"];
 
-/** The texts of the rows mounted now, keyed by their row number; hidden rows are left out. */
+/** Scrolls the grid's run with the mouse wheel until `done` holds or the run ends. */
+async function scrollUntil(page: Page, done: () => Promise<boolean>): Promise<void> {
+  if (await done()) return;
+  const box = viewport(page);
+  if ((await box.count()) === 0) return;
+  const bounds = await box.boundingBox();
+  if (bounds) await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+  let still = 0;
+  for (let guard = 0; guard < 400 && still < 3; guard += 1) {
+    const before = await box.evaluate((el) => el.scrollTop);
+    await page.mouse.wheel(0, 400);
+    await page.waitForTimeout(60);
+    if (await done()) return;
+    still = (await box.evaluate((el) => el.scrollTop)) === before ? still + 1 : 0;
+  }
+}
+
+/** The texts of the rows mounted now, with their row number; hidden rows are left out. */
 async function mountedRows(page: Page): Promise<[number, string[]][]> {
   return bodyRows(page).evaluateAll(
     (trs, kinds) =>
@@ -208,12 +225,15 @@ async function mountedRows(page: Page): Promise<[number, string[]][]> {
  * Also returns how many rows were mounted before any scrolling (the first window).
  */
 async function allRowsWithWindow(page: Page): Promise<{ rows: string[][]; window: number }> {
-  await bodyRows(page).first().waitFor({ timeout: SHORT });
-  const seen = new Map<number, string[]>();
+  await bodyRows(page).first().waitFor({ state: "attached", timeout: SHORT });
+  // Keyed by number AND texts: windows overlap (same row seen twice), but a row that is not in the data (an extra row
+  // sharing a number) stays a row of its own.
+  const seen = new Map<string, [number, string[]]>();
+  const add = (n: number, texts: string[]) => seen.set(`${n}|${key(texts)}`, [n, texts]);
   const box = viewport(page);
   await box.evaluate((el) => (el.scrollTop = 0));
   const first = await mountedRows(page);
-  for (const [n, texts] of first) seen.set(n, texts);
+  for (const [n, texts] of first) add(n, texts);
   const bounds = await box.boundingBox();
   if (bounds) await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
   let still = 0;
@@ -221,12 +241,12 @@ async function allRowsWithWindow(page: Page): Promise<{ rows: string[][]; window
     const before = await box.evaluate((el) => el.scrollTop);
     await page.mouse.wheel(0, 400);
     await page.waitForTimeout(60);
-    for (const [n, texts] of await mountedRows(page)) seen.set(n, texts);
+    for (const [n, texts] of await mountedRows(page)) add(n, texts);
     const after = await box.evaluate((el) => el.scrollTop);
     still = after === before ? still + 1 : 0;
   }
   await box.evaluate((el) => (el.scrollTop = 0));
-  const rows = [...seen.entries()].sort(([a], [b]) => a - b).map(([, texts]) => texts);
+  const rows = [...seen.values()].sort(([a], [b]) => a - b).map(([, texts]) => texts);
   return { rows, window: first.length };
 }
 
@@ -510,7 +530,9 @@ export const REGION: Recipe[] = [
     state: "Chữ dài",
     async check({ page }) {
       const cut = page.locator('[data-slot="truncated-text"][data-cut="true"]').first();
-      // The grid marks a cell cut only after it has measured its width.
+      // The grid marks a cell cut only after it has measured its width. Row 2: the run is virtual, so a long value
+      // may sit below the first window — scroll the run until one is mounted.
+      await scrollUntil(page, async () => (await cut.count()) > 0);
       await cut
         .waitFor({ state: "attached", timeout: SHORT })
         .catch(() => fail("chu-dai: khong co o chu dai bi cat"));
@@ -599,10 +621,21 @@ export const REGION: Recipe[] = [
         // the first window, so rows below it never mount.
         name: "chi con khung dau",
         message: /tim: bo sot dong khop — /,
+        // Hides every result row numbered past the first window (the rows the grid mounts before any scrolling),
+        // re-applied on every re-render: the results never reach past that window.
         apply: async ({ page }) => {
-          await page.addStyleTag({
-            content: `${SEARCHING} [data-slot="scroll-area-viewport"] { overflow: hidden !important; }`,
-          });
+          const window = await bodyRows(page).evaluateAll(
+            (trs) => trs.filter((tr) => tr.querySelector('[data-slot="row-number"]')).length,
+          );
+          await onResult(
+            page,
+            `const box = document.querySelector('[data-slot="data-region"] input[type="search"]');
+             if (!box || !box.value) return;
+             document.querySelectorAll('[data-slot="data-region-body"] tbody tr').forEach((tr) => {
+               const n = Number(tr.querySelector('[data-slot="row-number"]')?.textContent ?? '0');
+               if (n > ${window}) tr.style.display = 'none';
+             });`,
+          );
         },
       },
       {
@@ -614,7 +647,7 @@ export const REGION: Recipe[] = [
             page,
             `const box = document.querySelector('[data-slot="data-region"] input[type="search"]');
              if (!box || !box.value || document.querySelector('tr[data-pha]')) return;
-             const row = document.querySelector('[data-slot="data-region-body"] tbody tr');
+             const row = document.querySelector('[data-slot="data-region-body"] tbody tr:has([data-slot="row-number"])');
              if (!row) return;
              const extra = row.cloneNode(true);
              extra.setAttribute('data-pha', '1');

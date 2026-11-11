@@ -137,8 +137,10 @@ function matches(row: GridRow, columns: readonly TypedColumn[], query: string): 
 function useWidthInCh() {
   const boxRef = useRef<HTMLDivElement>(null);
   const chRef = useRef<HTMLSpanElement>(null);
+  const denseChRef = useRef<HTMLSpanElement>(null);
   const [widthCh, setWidthCh] = useState<number | null>(null);
   const [chPx, setChPx] = useState(8);
+  const [denseChPx, setDenseChPx] = useState(7);
   useEffect(() => {
     const box = boxRef.current;
     const ch = chRef.current;
@@ -146,6 +148,7 @@ function useWidthInCh() {
     const measure = () => {
       const one = ch.getBoundingClientRect().width || 8;
       setChPx(one);
+      setDenseChPx(denseChRef.current?.getBoundingClientRect().width || one);
       setWidthCh(box.getBoundingClientRect().width / one);
     };
     measure();
@@ -153,7 +156,7 @@ function useWidthInCh() {
     observer.observe(box);
     return () => observer.disconnect();
   }, []);
-  return { boxRef, chRef, widthCh, chPx };
+  return { boxRef, chRef, denseChRef, widthCh, chPx, denseChPx };
 }
 
 /**
@@ -192,7 +195,7 @@ export function DataRegion({
 }) {
   const searchId = useId();
   const [query, setQuery] = useState("");
-  const { boxRef, chRef, widthCh, chPx } = useWidthInCh();
+  const { boxRef, chRef, denseChRef, widthCh, chPx: baseChPx, denseChPx } = useWidthInCh();
 
   const shown = useMemo(
     () => rows.filter((row) => matches(row, columns, query)),
@@ -219,12 +222,22 @@ export function DataRegion({
       ),
     [columns, rows],
   );
-  const totalMinCh = fitted.reduce((sum, w) => sum + w, 0);
+  // The row-number column counts too: digits of the last row number plus padding.
+  const rowNumberCh = String(rows.length).length + 3;
+  const totalMinCh = rowNumberCh + fitted.reduce((sum, w) => sum + w, 0);
   const density = widthCh === null ? "normal" : densityFor(totalMinCh, widthCh);
+  // Dense rows use the smaller text, so their columns are sized in the smaller text's ch: a grid that overflows in
+  // normal text shrinks with its text instead of keeping normal-text widths. Density itself is decided in normal ch.
+  const chPx = density === "dense" ? denseChPx : baseChPx;
   // Spare room on a wide screen goes to columns that cut their text (a long project name), never below the fit.
   const widths = useMemo(
-    () => spreadSpareCh(fitted, full, widthCh === null ? null : widthCh - 1),
-    [fitted, full, widthCh],
+    () =>
+      spreadSpareCh(
+        fitted,
+        full,
+        widthCh === null ? null : (widthCh * baseChPx) / chPx - rowNumberCh - 1,
+      ),
+    [fitted, full, widthCh, baseChPx, chPx, rowNumberCh],
   );
 
   const recordAddress = record?.address;
@@ -249,7 +262,7 @@ export function DataRegion({
       helper.display({
         id: ROW_NUMBER_ID,
         header: GRID_COPY.rowNumberHeader,
-        size: Math.floor((String(rows.length).length + 3) * chPx),
+        size: Math.floor(rowNumberCh * chPx),
         cell: (info) => (
           <span
             data-slot="row-number"
@@ -301,7 +314,7 @@ export function DataRegion({
         }),
       ),
     ],
-    [columns, chPx, editable, opensRecord, widths, rows.length],
+    [columns, chPx, editable, opensRecord, widths, rowNumberCh],
   );
 
   const table = useTable({
@@ -372,7 +385,10 @@ export function DataRegion({
 
   return (
     <section data-slot="data-region" className="flex min-w-0 flex-col">
-      <span ref={chRef} aria-hidden="true" className="invisible absolute">
+      <span ref={chRef} aria-hidden="true" className="invisible absolute text-base">
+        0
+      </span>
+      <span ref={denseChRef} aria-hidden="true" className="invisible absolute text-sm">
         0
       </span>
       {/* Arrangement after data-grid-editing-6: name on the frame's header strip; toolbar, table and pages in one panel. */}
