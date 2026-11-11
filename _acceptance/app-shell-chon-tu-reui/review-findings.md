@@ -1,10 +1,17 @@
-# Review findings: app-shell-chon-tu-reui (round 3)
-
 ## Trong hợp đồng
+
+Không có.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
+
+- **Hàm mở ngăn trên điện thoại bị chép nguyên từ bộ kiểm khung chung thay vì dùng chung một chỗ**
+  Người dùng thấy gì: Người dùng không thấy khác gì. Chỉ là cách mở ngăn trượt trên điện thoại trong bài kiểm có hai bản giống nhau, nên sau này sửa một bên mà quên bên kia thì bài kiểm có thể báo sai.
+  Căn cứ: Không ảnh hưởng người dùng và không mất dữ liệu; chỉ làm việc bảo trì bài kiểm về sau dễ lệch, gom lại lúc nào cũng rẻ và không gấp.
+  file: `tests/e2e/app-shell.spec.ts`
+  severity: low
+  Đề xuất: known-limits
 
 - **luat-cham.json 'den' points at the commit before the round-1 fix, not HEAD (r2 · tệp đã đổi)**
   Người dùng thấy gì: The grading record may stop one commit early, so the last small fixes to the phone menu might not be reviewed in the next round. Staff using the app see no difference.
@@ -54,7 +61,5 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   file: `tests/app-shell.test.tsx`
   severity: low
   Đề xuất: known-limits
-
-## Chưa adversarial-verify (refuter chết)
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
