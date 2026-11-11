@@ -281,6 +281,26 @@
       ]
     },
     {
+      "ma": "1m",
+      "cau_giao": "Sau khi đăng nhập người dùng không bao giờ bị đưa sang trang ngoài, bấm Đăng xuất mà lỗi thì được báo rõ, và người không còn thuộc sàn nào có lối thoát khỏi màn chọn sàn",
+      "vai": "Nhân viên sàn",
+      "tieu_chi": 4,
+      "vi_sao": "Bốn mục ngoài hợp đồng của hàng 8, ba lỗ an toàn của phần đăng nhập. Chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng ngày 11/11/2026. Phải xong trước hàng đầu tiên đọc dữ liệu thật",
+      "slug": "va-dang-nhap",
+      "hang": "T3",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "vung": [
+        "src/app/login/**",
+        "src/app/api/v1/auth/**",
+        "src/modules/identity/next-path.ts",
+        "src/modules/identity/http.ts"
+      ],
+      "dung_tren": [
+        "8"
+      ]
+    },
+    {
       "ma": "2",
       "cau_giao": "Đầu chủ mở Bảng hàng và thấy các căn của sàn trên Lưới, đủ trạng thái màn, ở bốn khổ màn hình",
       "vai": "Đầu chủ",
@@ -515,7 +535,8 @@
         "9",
         "9a",
         "9b",
-        "1j"
+        "1j",
+        "1m"
       ],
       "slug": "bang-hang-du-lieu-that",
       "nhom": "bang-hang",
