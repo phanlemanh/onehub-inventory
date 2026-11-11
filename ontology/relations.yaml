@@ -3,6 +3,11 @@
 # cardinality: one-to-one | one-to-many | many-to-one | many-to-many
 relations:
   - from: Company
+    name: employs
+    to: Member
+    cardinality: one-to-many
+    description: A company holds its own members; the same person at two companies is two members.
+  - from: Company
     name: offers
     to: Listing
     cardinality: one-to-many
