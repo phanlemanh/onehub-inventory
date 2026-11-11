@@ -20,6 +20,8 @@ executors:
     reui_catalog_test: "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose"   # danh-muc-reui (1g)
     dang_nhap_db: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx vitest run -c vitest.db.config.ts --reporter=verbose"   # dang-nhap-ma-email (row 8): lane Postgres, scratch databases dang_nhap_*
     dang_nhap_e2e: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx playwright test -c playwright.db.config.ts"   # dang-nhap-ma-email (row 8): browser flow on lane Postgres
+    moi_nguoi_db: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx vitest run -c vitest.db.config.ts tests/db/moi-nguoi.db.test.ts --reporter=verbose"   # moi-nguoi-gan-vai (row 9): lane Postgres, scratch databases moi_nguoi_*
+    moi_nguoi_e2e: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx playwright test -c playwright.db.config.ts tests/e2e-db/members.spec.ts"   # moi-nguoi-gan-vai (row 9): members screen on lane Postgres
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists
