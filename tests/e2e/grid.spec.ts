@@ -15,10 +15,13 @@ const bodyRows = (page: Page) => page.locator('[data-slot="data-region-body"] tb
 async function openGrid(page: Page, query = ""): Promise<void> {
   await page.goto(`${GRID}${query}`);
   await expect(page.locator("h2")).toHaveText("Vùng mẫu");
+  // A slow server streams the page: until React swaps it in, a hidden copy (`<div hidden id="S:0">`) sits next to
+  // the shown one. Wait for the swap so every check below sees one grid.
+  await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
   // Once hydrated, the grid's sideways scroll area takes keyboard focus (WCAG 2.1.1).
-  const viewport = page.locator(
-    '[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]',
-  );
+  const viewport = page
+    .locator('[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]')
+    .filter({ visible: true });
   if ((await viewport.count()) > 0) await expect(viewport).toHaveAttribute("tabindex", "0");
 }
 
