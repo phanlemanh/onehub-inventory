@@ -16,6 +16,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, posix, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import ts from "typescript";
 import { describe, expect, it } from "vitest";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -123,33 +124,124 @@ function forbiddenFor(target: string): Forbidden | undefined {
   );
 }
 
-/** `import … from`, `export … from`, `import "…"` and `import("…")`, with the clause when there is one. */
-const IMPORT =
-  /(?:(?:import|export)\s+(?:type\s+)?([\s\S]*?)\s+from\s*|import\s*\(\s*|import\s+)["']([^"']+)["']/g;
+/** One import of a file: its path, the names it brings in (`*` for the whole module) and whether only types come. */
+interface ImportOf {
+  spec: string;
+  names: string[];
+  typeOnly: boolean;
+}
+
+/**
+ * Every import of a file, read from TypeScript's own syntax tree rather than from the text: `import … from`,
+ * `import "…"`, `export … from` and `import("…")`, wherever they sit in the file.
+ */
+function importsOf(text: string, fileName: string): ImportOf[] {
+  const source = ts.createSourceFile(
+    fileName,
+    text,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX,
+  );
+  const found: ImportOf[] = [];
+  const visit = (node: ts.Node): void => {
+    if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
+      const clause = node.importClause;
+      const names: string[] = [];
+      let typeOnly = clause?.isTypeOnly ?? false;
+      if (clause?.name) names.push("default");
+      const bindings = clause?.namedBindings;
+      if (bindings && ts.isNamespaceImport(bindings)) names.push("*");
+      if (bindings && ts.isNamedImports(bindings)) {
+        for (const element of bindings.elements)
+          names.push((element.propertyName ?? element.name).text);
+        if (
+          !clause?.name &&
+          bindings.elements.length > 0 &&
+          bindings.elements.every((e) => e.isTypeOnly)
+        ) {
+          typeOnly = true;
+        }
+      }
+      found.push({ spec: node.moduleSpecifier.text, names, typeOnly });
+    } else if (
+      ts.isExportDeclaration(node) &&
+      node.moduleSpecifier &&
+      ts.isStringLiteral(node.moduleSpecifier)
+    ) {
+      const clause = node.exportClause;
+      const names =
+        clause && ts.isNamedExports(clause)
+          ? clause.elements.map((e) => (e.propertyName ?? e.name).text)
+          : ["*"];
+      found.push({ spec: node.moduleSpecifier.text, names, typeOnly: node.isTypeOnly });
+    } else if (
+      ts.isCallExpression(node) &&
+      node.expression.kind === ts.SyntaxKind.ImportKeyword &&
+      node.arguments[0] &&
+      ts.isStringLiteralLike(node.arguments[0])
+    ) {
+      found.push({ spec: node.arguments[0].text, names: ["*"], typeOnly: false });
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  return found;
+}
+
+/** The forbidden targets one import reaches; a type-only import brings no behaviour and reaches none. */
+function targetsOf(file: string, entry: ImportOf): string[] {
+  if (entry.typeOnly) return [];
+  if (entry.spec !== BARREL) return [resolveTarget(file, entry.spec)];
+  if (entry.names.includes("*")) return Object.values(BARREL_PARTS);
+  return Object.entries(BARREL_PARTS)
+    .filter(([name]) => entry.names.includes(name))
+    .map(([, part]) => part);
+}
 
 /** One line per forbidden import of a screen file: `<file>: imports <path> (<target>) — <use>`. */
 function rebuiltBehaviour(root: string): string[] {
   const problems: string[] = [];
   for (const path of screenFiles(root)) {
     const file = relative(root, path).split(sep).join("/");
-    const text = readFileSync(path, "utf8");
-    for (const match of text.matchAll(IMPORT)) {
-      const clause = match[1] ?? "";
-      const spec = match[2] ?? "";
-      const targets =
-        spec === BARREL
-          ? Object.entries(BARREL_PARTS)
-              .filter(([name]) => new RegExp(`\\b${name}\\b`).test(clause))
-              .map(([, part]) => part)
-          : [resolveTarget(file, spec)];
-      for (const target of targets) {
+    for (const entry of importsOf(readFileSync(path, "utf8"), file)) {
+      for (const target of targetsOf(file, entry)) {
         const rule = forbiddenFor(target);
         if (!rule || ALLOWED[file]?.includes(target)) continue;
-        problems.push(`${file}: imports ${spec} (${target}) — ${rule.use}`);
+        problems.push(`${file}: imports ${entry.spec} (${target}) — ${rule.use}`);
       }
     }
   }
   return problems;
+}
+
+/** Every form of statement that brings a module in, each placed between other imports. Written first: 11 forms. */
+const STATEMENT_FORMS: readonly ((spec: string) => string)[] = [
+  (x) => `import { RecordPanel } from "${x}";`,
+  (x) => `import RecordPanel from "${x}";`,
+  (x) => `import * as P from "${x}";`,
+  (x) => `import P, { RecordPanel } from "${x}";`,
+  (x) => `import "${x}";`,
+  (x) => `export { RecordPanel } from "${x}";`,
+  (x) => `export * from "${x}";`,
+  (x) => `export * as P from "${x}";`,
+  (x) => `const m = await import("${x}");`,
+  (x) => `function load() {\n  return import("${x}");\n}`,
+  (x) => `import {\n  RecordPanel,\n  useRecordAddress,\n} from "${x}";`,
+];
+
+/** Wraps one statement in a screen with ordinary imports before and after it. */
+function screenWith(statement: string): string {
+  return [
+    'import { useState } from "react";',
+    statement,
+    'import { DataRegion } from "@/components/candidate/data-region";',
+    'export { label } from "@/modules/company-config";',
+    "export default function Page() {",
+    "  return null;",
+    "}",
+    "",
+  ].join("\n");
 }
 
 /** Every way of writing an import path the guard knows of, from a screen at `src/app/man/page.tsx`. Written first. */
@@ -209,32 +301,46 @@ describe("screens declare, they do not rebuild behaviour", () => {
       expect(cases).toBe(9 * 6 + 4 * 2);
       expect(red).toBe(cases);
 
-      // Re-exporting, a side-effect import and a dynamic import are imports too.
-      for (const code of [
-        'export { RegionError } from "../../components/candidate/region-state";\n',
-        'import "@/components/candidate/region-state";\n',
-        'const m = await import("@/components/candidate/region-state");\n',
-      ]) {
+      // Every statement form, placed between other imports in one file, turns the guard red exactly once.
+      const forbidden = "@/components/candidate/record-panel";
+      expect(STATEMENT_FORMS).toHaveLength(11);
+      let forms = 0;
+      for (const form of STATEMENT_FORMS) {
+        const code = screenWith(form(forbidden));
         write(code);
-        expect(rebuiltBehaviour(root), code).toHaveLength(1);
-        red += 1;
+        expect(rebuiltBehaviour(root), code).toEqual([
+          `${page}: imports ${forbidden} (src/components/candidate/record-panel) — use RecordPanel through DataRegion record`,
+        ]);
+        forms += 1;
       }
-      // Base UI's barrel.
-      write('import { Dialog, Menu } from "@base-ui/react";\n');
-      expect(rebuiltBehaviour(root)).toEqual([
-        `${page}: imports @base-ui/react (@base-ui/react/dialog) — use RecordPanel or useChange`,
-      ]);
+      expect(forms).toBe(11);
 
-      // Controls: the shared pieces themselves, a look-alike name and Base UI's other parts stay green.
+      // Base UI's barrel: named, renamed, the whole module, and passed on.
+      const BARREL_FORMS = [
+        'import { Dialog, Menu } from "@base-ui/react";',
+        'import { AlertDialog as Ask } from "@base-ui/react";',
+        'import * as Base from "@base-ui/react";',
+        'export { Dialog } from "@base-ui/react";',
+      ];
+      for (const statement of BARREL_FORMS) {
+        write(screenWith(statement));
+        expect(rebuiltBehaviour(root).length, statement).toBeGreaterThan(0);
+      }
+
+      // Controls: the shared pieces themselves, types only, a look-alike name and Base UI's other parts stay green.
       write(
-        [
-          'import { DataRegion } from "../../components/candidate/data-region";',
-          'import { useChange } from "@/components/candidate/use-change";',
-          'import { X } from "@/components/ui/sheetish";',
-          'import { Menu } from "@base-ui/react";',
-          'import { Y } from "sonnerish";',
-          "",
-        ].join("\n"),
+        screenWith(
+          [
+            'import { useChange } from "@/components/candidate/use-change";',
+            'import type { RecordView } from "@/components/candidate/record-panel";',
+            'import { type RecordView as View } from "../../components/candidate/record-panel";',
+            'export type { RecordView } from "@/components/candidate/record-panel";',
+            'import { X } from "@/components/ui/sheetish";',
+            'import { Menu } from "@base-ui/react";',
+            'import { Y } from "sonnerish";',
+            "const text = 'import \"@/components/ui/sheet\"';",
+          ].join("\n"),
+        ),
       );
       expect(rebuiltBehaviour(root)).toEqual([]);
       rmSync(dir, { recursive: true });
