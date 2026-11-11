@@ -1421,6 +1421,24 @@
       ]
     },
     {
+      "name": "RailShell",
+      "file": "src/components/templates/app-shell/rail-shell.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "RAIL_MAIN_ID"
+        },
+        {
+          "name": "RailShell",
+          "props": [
+            "options",
+            "labels",
+            "account"
+          ]
+        }
+      ]
+    },
+    {
       "name": "NavMenu",
       "file": "src/components/templates/nav-menu.tsx",
       "level": "template",
