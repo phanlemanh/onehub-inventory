@@ -1,0 +1,44 @@
+# Screen register: every page under src/app is declared here (roadmap row 1d, decision 0017).
+# tools/coverage_matrix/check.py fails `make check` when a page is missing or an entry is wrong.
+#
+#   id        stable key; contracts list it under `screens:` and in their Vai × Màn block
+#   route     the page's path under src/app, without route groups "(x)" and slots "@x"
+#   title     label key in ontology/labels.yaml (null only for audience dev)
+#   family    a key of `families`, or null when not assigned yet (row 1c assigns)
+#   audience  staff (signed-in staff) | public (customer page) | dev (development build only)
+#   status    built (the page exists) | planned (declared ahead, no page yet)
+families:
+  grid: Lưới
+audiences: [staff, public, dev]
+statuses: [built, planned]
+screens:
+  - id: today
+    route: /
+    title: Today
+    family: null
+    audience: staff
+    status: built
+  - id: inventory
+    route: /inventory
+    title: Inventory
+    family: grid
+    audience: staff
+    status: built
+  - id: sent
+    route: /sent
+    title: Sent
+    family: grid
+    audience: staff
+    status: built
+  - id: contacts
+    route: /contacts
+    title: Contact
+    family: grid
+    audience: staff
+    status: planned
+  - id: proto
+    route: /proto/[slug]
+    title: null
+    family: null
+    audience: dev
+    status: built

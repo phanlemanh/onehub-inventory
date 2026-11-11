@@ -1,0 +1,6 @@
+{
+  "feature_plain": "Từ hàng này, mỗi vòng làm màn phải khai rõ từng vai thấy gì ở màn đó; màn mới chưa ghi sổ hay hợp đồng thiếu vai thì kiểm tra trước khi gộp báo đỏ, và một lệnh đếm cho biết các vòng khai đủ đến đâu.",
+  "decisions": [
+    {"id": "E11", "q": "Bốn vai và sổ màn đã khai đúng ý bảng phân quyền chưa?", "why": "Ba người chấm cùng đồng ý: bốn vai khớp quyết định 0016 và bản phạm vi, có ghi một người giữ nhiều vai, màn Liên hệ khai trước trong họ Lưới."}
+  ]
+}
