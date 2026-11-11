@@ -14,6 +14,7 @@ export const FIELD_DISPLAY = {
   "Listing.subdivisionName": "text",
   "Listing.unitNumber": "text",
   "Listing.withdrawnReason": "select",
+  "Member.name": "person",
   "Unit.bedroomsTotal": "count",
   "Unit.buildingName": "text",
   "Unit.directionFaces": "text",

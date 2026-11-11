@@ -19,6 +19,7 @@ export default async function FrameLayout({ children }: { children: React.ReactN
   return (
     <AppShell
       nav={NAV}
+      roles={session?.roles ?? []}
       account={
         <AccountMenu
           account={account}
