@@ -16,7 +16,7 @@ Bản kho: `<bản kho>`, một worktree tạm tại commit `c706223`, đã xoá
 
 # Phương án màn «Liên hệ» (Contact), danh sách quyết định thiết kế
 
-Gốc đường dẫn: `/tmp/moc-tree`. Mọi đường tệp dưới đây tính từ gốc này.
+Gốc đường dẫn: `<bản kho>`. Mọi đường tệp dưới đây tính từ gốc này.
 
 Cột «Loại» có bốn giá trị:
 

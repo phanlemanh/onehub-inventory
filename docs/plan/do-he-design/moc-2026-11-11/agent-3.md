@@ -117,7 +117,7 @@ Có mở màn Liên hệ trong đợt 1 không (quyết định #1). Khuyến ng
 
 **Tệp không tồn tại:** `design/patterns/`, `src/components/candidate/`, `design/screens.yaml`, `design/content.md`. Đây đều là chỗ skill hoặc đề xuất thiết kế trỏ tới.
 
-**Danh sách tệp đã đọc**, đường dẫn tính từ `/tmp/moc-tree/`:
+**Danh sách tệp đã đọc**, đường dẫn tính từ `<bản kho>/`:
 
 1. AGENTS.md
 2. CLAUDE.md

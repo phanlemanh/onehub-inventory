@@ -64,5 +64,5 @@
       "lech": 28
     }
   },
-  "ghi_chu": "token, luot_cong_cu_do, giay: số harness đo cho từng agent. tong, du, mot_phan, tu_doan_*, luot_cong_cu, tep_doc: số agent tự tổng kết, chép qua bảng so; agent 3 gộp dòng một phần vào tự đoán nên tu_doan không so thẳng giữa ba agent. ket_qua theo ba luật xếp dòng của de-bai-ba-agent.md, lập lại sau vòng chấm 1. Đường bản kho là một worktree tạm tại commit, đã xoá; khi dọn đường dẫn máy khỏi kho công khai (11/11) nó được lược thành <bản kho> trong câu giao đã gửi và /tmp/moc-tree trong phần trả về, nên hai mục đó ghi «nguyên văn, đường dẫn máy đã lược»."
+  "ghi_chu": "token, luot_cong_cu_do, giay: số harness đo cho từng agent. tong, du, mot_phan, tu_doan_*, luot_cong_cu, tep_doc: số agent tự tổng kết, chép qua bảng so; agent 3 gộp dòng một phần vào tự đoán nên tu_doan không so thẳng giữa ba agent. ket_qua theo ba luật xếp dòng của de-bai-ba-agent.md, lập lại sau vòng chấm 1. Đường bản kho là một worktree tạm tại commit, đã xoá; khi dọn đường dẫn máy khỏi kho công khai (11/11) nó được lược thành <bản kho> trong cả câu giao đã gửi lẫn phần trả về, nên hai mục đó ghi «nguyên văn, đường dẫn máy đã lược»."
 }
