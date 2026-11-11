@@ -1,0 +1,15 @@
+# Roles a company admin can assign to a staff member (decision 0016, roadmap code N3).
+# Display names live in ontology/labels.yaml under the same key (kind: role).
+# A person may hold several roles; their permissions add up. Who may do what is the
+# permission table (roadmap row 9a), not this file, so no role inherits another here.
+# tools/coverage_matrix/check.py reads this list for the Vai × Màn block of contracts.
+holds: many
+roles:
+  - name: ListAgent
+    description: Works the listing side, keeps listings and owner contacts up to date.
+  - name: BuyerAgent
+    description: Works the buyer side, sends listings to customers.
+  - name: TeamLead
+    description: Leads a team and sees the whole company's listings.
+  - name: CompanyAdmin
+    description: Manages people and configuration of the company, without seeing listings by default.

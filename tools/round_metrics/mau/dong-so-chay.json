@@ -1,0 +1,172 @@
+{
+  "reject": {
+    "nguon": "_acceptance/go-hoi-khi-gop/run-log.jsonl:18",
+    "dong": {
+      "ts": "2026-11-10T13:41:39Z",
+      "sha": "fac150ad59afdeaa0f38615c232b71e63c8039f0",
+      "round": 1,
+      "kind": "round-tally",
+      "verdict": "REJECT",
+      "expected": 5,
+      "returned": 5,
+      "blocked": 0
+    }
+  },
+  "pass": {
+    "nguon": "_acceptance/go-hoi-khi-gop/run-log.jsonl:34",
+    "dong": {
+      "ts": "2026-11-10T13:47:00Z",
+      "sha": "cf03bf15f46c5a74ce5ad89311d180b697fb276a",
+      "round": 2,
+      "kind": "round-tally",
+      "verdict": "PASS",
+      "expected": 5,
+      "returned": 5,
+      "blocked": 0
+    }
+  },
+  "thuoc_vat": {
+    "nguon": "_acceptance/go-hoi-khi-gop/run-log.jsonl:36",
+    "dong": {
+      "kind": "thuoc-vat",
+      "ts": "2026-11-10T13:51:05Z",
+      "round": 2,
+      "san": "fac150ad59afdeaa0f38615c232b71e63c8039f0",
+      "vat": [0, 0],
+      "thuoc": [1, 1],
+      "ho_so": [478, 0],
+      "nhat": 1,
+      "lan": 0,
+      "tep_thuoc": ["_acceptance/config.yaml"]
+    }
+  },
+  "blocked": {
+    "nguon": "onehub-quy-hang/_acceptance/bai-thu-luoi-5000-dong/run-log.jsonl:33",
+    "dong": {
+      "ts": "2026-10-30T10:09:33Z",
+      "sha": "8054bd89a119e08df1e5dc3468cc64a08e290d43",
+      "round": 1,
+      "kind": "round-tally",
+      "verdict": "BLOCKED",
+      "expected": 12,
+      "returned": 12,
+      "blocked": 1
+    }
+  },
+  "pending": {
+    "nguon": "onehub-quy-hang/_acceptance/bai-thu-zalo/run-log.jsonl:29",
+    "dong": {
+      "ts": "2026-10-30T06:09:05Z",
+      "sha": "e2041d863170dd88a5f4b344647d8c85538104f5",
+      "round": 1,
+      "kind": "round-tally",
+      "verdict": "PENDING-JUDGMENT",
+      "expected": 6,
+      "returned": 6,
+      "blocked": 0
+    }
+  },
+  "repin_do": {
+    "nguon": "onehub-quy-hang/_acceptance/anh-can-ba-ngan/run-log.jsonl:72",
+    "dong": {
+      "ts": "2026-11-01T09:13:44Z",
+      "kind": "repin-do",
+      "lan_id": "repin-20261101T091211Z-50517",
+      "sha": "7ea1982e35f1cd61381a2068fd0a645171941710",
+      "suites_exit": [0, 0, 0, 0, 0, 0, 0],
+      "evals_exit": {
+        "E1": 0,
+        "E1b": 1,
+        "E2": 0,
+        "E2b": 1,
+        "E3": 0,
+        "E3b": 1,
+        "E4": 1,
+        "E5": 1,
+        "E5b": 1,
+        "E6": 1,
+        "E6b": 0,
+        "E6c": 1,
+        "E7": 0,
+        "E8": 0,
+        "E9": 1,
+        "E10b": 0
+      },
+      "lenh_do": [
+        {
+          "cmd": "npm run db:migrate && npm run db:test",
+          "exit": 1,
+          "log": "<lược>"
+        }
+      ],
+      "cham": [
+        {
+          "tep": "_acceptance/anh-can-ba-ngan/decisions.jsonl",
+          "doi": "đổi nội dung",
+          "log": "<lược>",
+          "ly_do": "cham-ho-so"
+        }
+      ],
+      "wall_s": 93.5,
+      "so_lenh": 9,
+      "tong_ket": {
+        "ket_cuc": "do",
+        "phut": 1.6,
+        "so_lenh": 9,
+        "model_goi": 0,
+        "model_carry": 0,
+        "chap_chon": 0
+      },
+      "tai": {
+        "load1": 11.46,
+        "load5": 9.48,
+        "ncpu": 14,
+        "mem_free_mb": 2094,
+        "swap_used_mb": 11950,
+        "nen": null
+      }
+    }
+  },
+  "gio_may": {
+    "nguon": "onehub-quy-hang/_acceptance/va-khuon-doan-sdt-ranh-gioi/run-log.jsonl:55",
+    "dong": {
+      "ts": "2026-11-09T04:33:46.837Z",
+      "kind": "gio-may",
+      "cua_so": {
+        "tu": "2026-11-08T22:28:56.000Z",
+        "den": "2026-11-09T04:33:46.837Z"
+      },
+      "nguon": "<lược>",
+      "gio_may": 4.13,
+      "gio_cho": 1.95,
+      "token": {
+        "claude-haiku-5-5": {
+          "vao": 254,
+          "ra": 80600,
+          "doc_dem": 1036704,
+          "ghi_dem": 897424
+        },
+        "claude-opus-5-5": {
+          "vao": 1370,
+          "ra": 914676,
+          "doc_dem": 228301720,
+          "ghi_dem": 4882913
+        },
+        "claude-sonnet-5-5": {
+          "vao": 240,
+          "ra": 107153,
+          "doc_dem": 2863322,
+          "ghi_dem": 1180042
+        }
+      },
+      "quy_doi": 93.1316,
+      "phan_tram_tuan": 3.81,
+      "ty_le": 0.04086573629991889,
+      "khoang_doc": {
+        "tu": "2026-11-09T04:14:36.097Z",
+        "den": "2026-11-09T04:33:46.813Z",
+        "phan_tram": [32, 33]
+      }
+    }
+  }
+}

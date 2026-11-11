@@ -1,0 +1,19 @@
+{
+  "nguon": "onehub-quy-hang docs/plan/ma-tran-kiem-ke-design-claude-code.md, mục 3 «Làm lại vì gì», main @ e77c8fdc, 09/11/2026",
+  "cach_dem": "Một agent đọc bản ghi của 75 hồ sơ có đụng màn từ 02/11 và phân loại từng lần làm lại; khác cách đếm theo lượt chấm của kho này, nên chỉ so tỉ lệ theo tầng.",
+  "so_ho_so": 75,
+  "luot_cham_trung_binh": 2.2,
+  "theo_tang": {
+    "bai-kiem-ha-tang": 110,
+    "trang-thai-hanh-vi": 30,
+    "du-lieu-api": 17,
+    "nghiep-vu": 11,
+    "thanh-phan": 10,
+    "bo-cuc": 10,
+    "hop-dong-yeu-cau": 5,
+    "link": 4,
+    "chu-dinh-dang": 2,
+    "mau-token": 0,
+    "truy-cap": 0
+  }
+}

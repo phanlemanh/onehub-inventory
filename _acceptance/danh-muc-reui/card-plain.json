@@ -1,0 +1,10 @@
+{
+  "feature_plain": "Agent dựng màn tra được danh mục ReUI ngay trong kho, không cần mạng, và «đã tra, không có» thành bằng chứng người khác kiểm lại được.",
+  "decisions": [
+    {
+      "id": "E9",
+      "q": "Tệp hướng dẫn đủ để agent tự tra, chép bằng chứng và ghim lại chưa?",
+      "why": "Ba máy chấm cùng thấy tệp nói đủ ba việc và không tự mâu thuẫn; mọi lệnh trong tệp đã chạy được thật (E10)."
+    }
+  ]
+}
