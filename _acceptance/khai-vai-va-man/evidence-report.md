@@ -3,10 +3,11 @@ schema_version: 2
 feature_slug: khai-vai-va-man
 verdict: PENDING-JUDGMENT
 failed_evals: []
+reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: fc4385a04b389b5b2df41560ade84e4486127a3d
+verified_commit: b279c517dd5df41b8c716ce2090b96ff933aca53
 human_signoff:
 ---
 
@@ -24,106 +25,106 @@ human_signoff:
 | E8 | AC-8 | script | PASS |
 | E9 | AC-9 | script | PASS |
 | E10 | AC-9 | script | PASS |
-| E11 | AC-1 | judgment | PASS (đề xuất, chờ người chốt) |
+| E11 | AC-1 | judgment | PASS (đề xuất của hội đồng, chờ người chốt ở Cổng 2) |
 
 ## Evidence
 
 - eval: E1
-  run_id: minted-khai-vai-va-man-E1-r1
+  run_id: minted-khai-vai-va-man-E1-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.vai_man
-  verified_at: 2026-11-11T02:19:39Z
+  verified_at: 2026-11-11T02:54:43Z
   output: |
     npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false
-    Bộ kiểm chạy một lần cho E1 đến E9, kết thúc thành công.
+    Lệnh kết thúc thành công, toàn bộ ca của tệp kiểm đạt.
 
 - eval: E2
-  run_id: minted-khai-vai-va-man-E2-r1
+  run_id: minted-khai-vai-va-man-E2-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.vai_man
-  verified_at: 2026-11-11T02:19:39Z
+  verified_at: 2026-11-11T02:54:43Z
   output: |
     npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false
-    Bộ kiểm chạy một lần cho E1 đến E9, kết thúc thành công.
+    Lệnh kết thúc thành công, toàn bộ ca của tệp kiểm đạt.
 
 - eval: E3
-  run_id: minted-khai-vai-va-man-E3-r1
+  run_id: minted-khai-vai-va-man-E3-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.vai_man
-  verified_at: 2026-11-11T02:19:39Z
+  verified_at: 2026-11-11T02:54:43Z
   output: |
     npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false
-    Bộ kiểm chạy một lần cho E1 đến E9, kết thúc thành công.
+    Lệnh kết thúc thành công, toàn bộ ca của tệp kiểm đạt.
 
 - eval: E4
-  run_id: minted-khai-vai-va-man-E4-r1
+  run_id: minted-khai-vai-va-man-E4-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.vai_man
-  verified_at: 2026-11-11T02:19:39Z
+  verified_at: 2026-11-11T02:54:43Z
   output: |
     npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false
-    Bộ kiểm chạy một lần cho E1 đến E9, kết thúc thành công.
+    Lệnh kết thúc thành công, toàn bộ ca của tệp kiểm đạt.
 
 - eval: E5
-  run_id: minted-khai-vai-va-man-E5-r1
+  run_id: minted-khai-vai-va-man-E5-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.vai_man
-  verified_at: 2026-11-11T02:19:39Z
+  verified_at: 2026-11-11T02:54:43Z
   output: |
     npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false
-    Bộ kiểm chạy một lần cho E1 đến E9, kết thúc thành công.
+    Lệnh kết thúc thành công, toàn bộ ca của tệp kiểm đạt.
 
 - eval: E6
-  run_id: minted-khai-vai-va-man-E6-r1
+  run_id: minted-khai-vai-va-man-E6-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.vai_man
-  verified_at: 2026-11-11T02:19:39Z
+  verified_at: 2026-11-11T02:54:43Z
   output: |
     npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false
-    Bộ kiểm chạy một lần cho E1 đến E9, kết thúc thành công.
+    Lệnh kết thúc thành công, toàn bộ ca của tệp kiểm đạt.
 
 - eval: E7
-  run_id: minted-khai-vai-va-man-E7-r1
+  run_id: minted-khai-vai-va-man-E7-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.vai_man
-  verified_at: 2026-11-11T02:19:39Z
+  verified_at: 2026-11-11T02:54:43Z
   output: |
     npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false
-    Bộ kiểm chạy một lần cho E1 đến E9, kết thúc thành công.
+    Lệnh kết thúc thành công, toàn bộ ca của tệp kiểm đạt.
 
 - eval: E8
-  run_id: minted-khai-vai-va-man-E8-r1
+  run_id: minted-khai-vai-va-man-E8-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.vai_man
-  verified_at: 2026-11-11T02:19:39Z
+  verified_at: 2026-11-11T02:54:43Z
   output: |
     npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false
-    Bộ kiểm chạy một lần cho E1 đến E9, kết thúc thành công.
+    Lệnh kết thúc thành công, toàn bộ ca của tệp kiểm đạt.
 
 - eval: E9
-  run_id: minted-khai-vai-va-man-E9-r1
+  run_id: minted-khai-vai-va-man-E9-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.vai_man
-  verified_at: 2026-11-11T02:19:39Z
+  verified_at: 2026-11-11T02:54:43Z
   output: |
     npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false
-    Bộ kiểm chạy một lần cho E1 đến E9, kết thúc thành công.
+    Lệnh kết thúc thành công, toàn bộ ca của tệp kiểm đạt.
 
 - eval: E10
-  run_id: minted-khai-vai-va-man-E10-r1
+  run_id: minted-khai-vai-va-man-E10-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.script.check
-  verified_at: 2026-11-11T02:19:39Z
+  verified_at: 2026-11-11T02:54:43Z
   output: |
     make check
     CODEOWNERS matches governance/autonomy.yaml
@@ -131,27 +132,25 @@ human_signoff:
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-khai-vai-va-man-SUITE-build-r1
+  run_id: minted-khai-vai-va-man-SUITE-build-r2
   exit_code: 0
-  verified_at: 2026-11-11T02:19:39Z
+  verified_at: 2026-11-11T02:54:43Z
 
 - cmd: make e2e
-  run_id: minted-khai-vai-va-man-SUITE-make_e2e-r1
+  run_id: minted-khai-vai-va-man-SUITE-make_e2e-r2
   exit_code: 0
-  verified_at: 2026-11-11T02:19:39Z
+  verified_at: 2026-11-11T02:54:43Z
 
 ### Judgment
 
-Đề xuất panel (ba lens, cả ba cùng nghiêng PASS). Để trống human_override cho người quyết ở Cổng 2.
-
-- domain-correctness: PASS — roles.yaml chỉ liệt kê bốn vai ListAgent, BuyerAgent, TeamLead, CompanyAdmin, khớp N3 và 0016. Không có Seller/Buyer/Tenant (là bên giao dịch) hay OwnerMember. File ghi `holds: many`, quyền cộng dồn, không vai nào kế thừa vai khác, quyền nằm ở bảng quyền. screens.yaml có màn `contacts` thuộc family `grid`, audience staff, status planned. Màn `proto` có audience dev, title null, family null.
-- operational-feasibility: PASS — roles.yaml có đúng bốn vai cố định khớp N3 và quyết định 0016, không có bên giao dịch và không có OwnerMember. Mỗi vai chỉ có mô tả, không có trường quyền. Màn `contacts` (/contacts) khai trước với status planned, family grid, audience staff, title Contact có trong labels. Bản mẫu `proto` có audience dev, family null, title null.
-- spec-alignment: PASS — roles.yaml đúng bốn vai cố định, khớp N3 trong pham-vi-mvp-dot-1.md và 0016, không lẫn ListSide, BuyerSide hay OwnerMember. Phần đầu tệp ghi `holds: many`, quyền cộng dồn, không vai nào kế thừa. `contacts` có `family: grid` và `status: planned`, `proto` có `audience: dev` và `title: null`.
-
 - eval: E11
-  judged_by: judge panel (domain-correctness, operational-feasibility, spec-alignment)
+  judged_by: hội đồng judge (fresh context), đề xuất panel PASS
   verdict: PASS
-  rationale: Cả ba lens cùng thấy danh sách vai và sổ màn khớp N3, 0016 và hợp đồng. Eval không khai input nên máy không có căn cứ chấm lại; người quyết ở Cổng 2.
+  rationale: Ba góc nhìn cùng đồng ý bốn vai trong roles.yaml khớp quyết định 0016 và mục N3, có holds many, màn contacts khai trước ở họ grid.
+  votes:
+    - domain-correctness: PASS — roles.yaml liệt kê đúng bốn vai cố định ListAgent, BuyerAgent, TeamLead, CompanyAdmin, khớp quyết định 0016 và mục N3. Các vai không lẫn bên giao dịch (ListSide, BuyerSide), bên pháp lý (Seller, Buyer...) hay OwnerMember, là những khái niệm chỉ nằm trong labels.yaml. File có `holds: many`, ghi quyền cộng dồn, không vai nào kế thừa vai khác, quyền nằm ở bảng quyền riêng. screens.yaml có màn `contacts` (family grid, status planned, title Contact đã có nhãn) và màn `proto` mang audience dev, title null, đúng như chú thích của sổ.
+    - operational-feasibility: PASS — roles.yaml có đúng 4 vai cố định cho nhân viên sàn, không có bên giao dịch hay người giữ hàng. Đầu tệp ghi `holds: many`, "permissions add up" và "no role inherits another", và trỏ quyền sang bảng quyền, khớp 0016. Trong screens.yaml, màn `contacts` thuộc họ `grid` với `status: planned`, và `proto` có `audience: dev`.
+    - spec-alignment: PASS — roles.yaml có đúng bốn vai nhân viên sàn, khớp bốn vai Đầu chủ, Đầu khách, Trưởng nhóm, Quản trị sàn trong N3 và có nhãn tương ứng ở labels.yaml. Danh sách không có bên giao dịch và không có OwnerMember (Người giữ), vai này vẫn nằm trong labels.yaml. File ghi `holds: many`, "permissions add up" và "no role inherits another", không khai quyền, đúng với 0016. Màn contacts (/contacts) thuộc family grid với status planned, nên đã khai trước. Màn proto có audience dev và title null.
   human_override:  # chi nguoi ghi
 
 ## Known limits
@@ -160,10 +159,9 @@ human_signoff:
 
 ## Analyst
 
-Eval không phân biệt (pass trên cả HEAD lẫn baseline): E10 (`make check`). Đây là lệnh hồi quy, xanh cả hai phía; xác nhận là regression-guard có chủ ý.
+carried tu round 1 — baseline khong do lai round nay
 
-Baseline không đo:
-- npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false: bo qua baseline: tep tests/coverage-matrix.test.ts co o cay dang kiem nhung chua co o merge-base bbae7ab69314101b4d5bda45cc36fc5737920294 — eval moi, chay tren code cu khong phan biet gi
+Eval không phân biệt (xanh trên cả HEAD lẫn baseline): E10 (`make check`). Viết lại để assert hành vi mới, hoặc xác nhận đây là regression-guard có chủ ý.
 
 ## Variance
 
@@ -171,4 +169,5 @@ none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: E1 đến E10 xanh; E11 chờ người chốt ở Cổng 2, nên verdict là PENDING-JUDGMENT.
+Round 1: đã chạy vòng đầu và ghi các giới hạn đã biết (xem review-findings của round đó).
+Round 2: E1 đến E10 đạt, lệnh suite build và e2e đạt; E11 (judgment) hội đồng đề xuất PASS, chờ người chốt ở Cổng 2 — verdict tổng PENDING-JUDGMENT.
