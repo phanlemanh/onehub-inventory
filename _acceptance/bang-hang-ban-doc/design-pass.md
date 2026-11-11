@@ -6,14 +6,14 @@ material: real-components
 context: host-embedded
 context_scenes: []
 reaction: nac-1 (anh-gui-kem-the)
-options:
-divergence: skipped — màn đi theo khuôn Lưới đã duyệt ở hàng 1b; các lựa chọn còn mở (cỡ trang, nhãn, cột) đã là câu hỏi Hỏi-1, Hỏi-2, Hỏi-3 trên thẻ
+options: _acceptance/bang-hang-ban-doc/evidence/reui/ (ảnh ba khối Data Grid của ReUI, tra bằng tools/reui_catalog)
+divergence: opened
 ds_skill: inventory-ui
 states: [co-du-lieu, cho-tai, trong, tim-khong-ra, loi]
 breakpoints: [mobile-360, mobile-414, desktop-1024, desktop-1440]
 themes: [light, dark]
-patched: 0
-deferred: 3
+patched: 1
+deferred: 2
 ---
 # design-pass — bang-hang-ban-doc
 
@@ -65,6 +65,14 @@ trang cho tới khi chủ kho duyệt nhãn (Hỏi-2). Trang ảnh tự chứa (
 | loi | 1024 | dark | evidence/design-pass/loi--1024--toi.png |
 | loi | 1440 | dark | evidence/design-pass/loi--1440--toi.png |
 
+## Bước phân kỳ
+
+- Hướng «Khuôn Lưới đang có» — trục: dùng lại khuôn đã ký · động cơ: đủ trạng thái vùng và bộ bài kiểm chung · đánh đổi: không lọc, không thẻ trạng thái.
+- Hướng «Hàng chờ hỗ trợ» (data-grid-base-5) — trục: thanh công cụ dày · động cơ: lọc và ẩn hiện cột ngay trên bảng · đánh đổi: bỏ ô chọn, thao tác hàng loạt, dựng lại trạng thái vùng.
+- Hướng «Thẻ trạng thái» (data-grid-filtering-2) — trục: lọc theo trạng thái là cửa vào · động cơ: thấy ngay bao nhiêu căn mỗi trạng thái · đánh đổi: cần lọc, ngoài phạm vi hàng 2.
+- Hướng «Danh sách tối giản» (data-grid-base-6) — trục: gần khuôn nhất · động cơ: đổi ít · đánh đổi: thêm nút lọc chưa có việc.
+- Máy không khuyên (giám sát dặn chủ kho chọn); câu hỏi nằm trên thẻ.
+
 ## Cảnh ngữ-cảnh
 
 - Không cần cảnh riêng: bản bấm được nhúng trong khung thật (thanh bên «Bảng hàng», đầu màn, nút sáng tối, đăng nhập) — mọi ảnh đã cho thấy người vào màn từ đâu.
@@ -73,10 +81,9 @@ trang cho tới khi chủ kho duyệt nhãn (Hỏi-2). Trang ảnh tự chứa (
 
 ### Nhóm 1 — vá-được-trong-từ-vựng-token (đã vá tại chỗ)
 
-- Không có: khuôn Lưới hiện đúng năm trạng thái ở bốn khổ, sáng và tối; phiên không sửa gì.
+- Cột chữ rộng theo nội dung thật của vùng (tối đa độ dài đọc, cộng 1ch dư): ở 1440 đủ tám cột, không cuộn; mã căn không còn chiếm chỗ của tên khu (việc G-1111-10).
 
 ### Nhóm 2 — đòi-đổi-DS/component (chờ Gate 1)
 
-- Ở 1440, cột thứ tám «Xác nhận lúc» bị khuất sau cuộn ngang trong vùng (thanh bên chiếm chỗ; bề rộng cột theo luật kiểu của khuôn) — đề xuất: chấp nhận như luật khuôn, hoặc thu cột ở hàng sau khi có đo sử dụng.
 - Trạng thái trống chỉ nói vì sao, chưa có việc làm tiếp vì chưa có lối nhập hàng — đề xuất: ghi giới hạn đã biết, nút nhập đến cùng hàng nhập.
 - Ở trạng thái trống đầu vùng vẫn hiện «0 dòng» và ô tìm (hành vi của khuôn Lưới) — đề xuất: giữ, đổi thì đổi ở khuôn cho mọi màn.

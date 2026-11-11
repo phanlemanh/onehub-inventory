@@ -18,6 +18,7 @@ import {
   SEARCHABLE_KINDS,
   densityFor,
   editModeFor,
+  fittedWidthCh,
   type FieldKey,
   type TypedColumn,
 } from "./column-kind";
@@ -187,7 +188,18 @@ export function DataRegion({
     () => rows.filter((row) => matches(row, columns, query)),
     [rows, columns, query],
   );
-  const totalMinCh = columns.reduce((sum, column) => sum + column.widthCh, 0);
+  // Widths follow the rows the region holds, not the rows a search leaves, so columns do not jump while typing.
+  const widths = useMemo(
+    () =>
+      columns.map((column) =>
+        fittedWidthCh(
+          column,
+          rows.map((row) => row[column.field]),
+        ),
+      ),
+    [columns, rows],
+  );
+  const totalMinCh = widths.reduce((sum, w) => sum + w, 0);
   const density = widthCh === null ? "normal" : densityFor(totalMinCh, widthCh);
 
   const recordAddress = record?.address;
@@ -213,7 +225,7 @@ export function DataRegion({
         helper.accessor((row: GridRow) => row[column.field], {
           id: column.field,
           header: column.header,
-          size: Math.round(column.widthCh * chPx),
+          size: Math.round((widths[index] ?? column.widthCh) * chPx),
           cell: (info) => {
             const cell = (
               <TypedCell

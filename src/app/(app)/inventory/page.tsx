@@ -44,7 +44,7 @@ export default async function Page({ searchParams }: Props) {
           typeof state === "string" ? state : undefined,
           process.env.NODE_ENV,
         )}
-        emptyWhy="Sàn chưa có căn nào đang chào trên Bảng hàng."
+        emptyWhy={`${label("Company")} chưa có căn nào đang chào trên ${label("Inventory")}.`}
       />
     </>
   );

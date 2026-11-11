@@ -41,6 +41,30 @@ export function columnWidthCh(header: string, kind: DisplayKind): number {
   return Math.max(header.length, KIND_SAMPLE_LENGTH[kind]) + CELL_PADDING_CH;
 }
 
+/** Kinds whose width follows the longest text the region really holds, up to the kind's reading length. */
+export const CONTENT_WIDTH_KINDS: readonly DisplayKind[] = ["text", "person"];
+
+/**
+ * One more character on a fitted column: the cell's real padding (12px a side at normal density) is wider than the
+ * 1ch a side the rule counts, and digits and letters are not all one `ch` wide, so an exact fit would cut the value.
+ */
+export const FIT_SLACK_CH = 1;
+
+/**
+ * Width of a column on the rows a region really holds: text kinds take `max(label length, min(reading length,
+ * longest value)) + padding + one character of slack`, so a 4-character unit code does not take the room of a project name; other kinds keep
+ * the kind's sample length (columnWidthCh). A text column with no value at all keeps the reading length.
+ */
+export function fittedWidthCh(column: TypedColumn, values: readonly unknown[]): number {
+  if (!CONTENT_WIDTH_KINDS.includes(column.kind)) return column.widthCh;
+  const lengths = values
+    .filter((v) => v !== null && v !== undefined && v !== "")
+    .map((v) => String(v).length);
+  if (lengths.length === 0) return column.widthCh;
+  const longest = Math.min(KIND_SAMPLE_LENGTH[column.kind], Math.max(...lengths));
+  return Math.max(column.header.length, longest) + CELL_PADDING_CH + FIT_SLACK_CH;
+}
+
 /** Dense only when the columns' minimum width is wider than the content area. */
 export function densityFor(totalMinCh: number, containerCh: number): Density {
   return totalMinCh > containerCh ? "dense" : "normal";

@@ -3,7 +3,7 @@
 // decision:column-width
 // decision:table-density
 // decision:read-only-cell
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 
@@ -13,6 +13,7 @@ import {
   columnWidthCh,
   densityFor,
   DENSITY_ROW_CLASS,
+  fittedWidthCh,
   typedColumn,
   type TypedColumnSpec,
 } from "../src/components/candidate/column-kind";
@@ -496,5 +497,97 @@ describe("alignment on the rendered grid", () => {
     const header = container.querySelectorAll("thead th")[1]!;
     header.classList.replace("text-right", "text-left");
     expect(() => checkPairs(container)).toThrow("alignment drift: Listing.closePrice");
+  });
+});
+
+describe("content-fitted width of text columns", () => {
+  type Fit = typeof fittedWidthCh;
+  const code = typedColumn({ field: "Listing.unitNumber", header: "Căn" });
+  const tower = typedColumn({ field: "Listing.buildingName", header: "Toà nhà" });
+  const place = typedColumn({ field: "Listing.subdivisionName", header: "Khu" });
+  const price = typedColumn({ field: "Listing.listPrice", header: "Giá chào" });
+  // Written ahead: column, values, expected width in ch (max(label, min(reading length, longest)) + 2 + 1 slack).
+  const MATRIX: [string, ReturnType<typeof typedColumn>, unknown[], number][] = [
+    ["short code", code, ["0905", "1101"], 7],
+    ["label longer than values", tower, ["S1.01", "E1"], 10],
+    [
+      "long text capped at reading length",
+      place,
+      ["Vinhomes Ocean Park 2 – The Empire", "Ocean"],
+      19,
+    ],
+    ["no value keeps reading length", place, [null, undefined, ""], 18],
+    ["non-text kind keeps its sample length", price, [1_000_000], price.widthCh],
+  ];
+
+  function checkFit(fit: Fit): void {
+    for (const [name, column, values, want] of MATRIX) {
+      const got = fit(column, values);
+      if (got !== want) throw new Error(`fitted width: ${name} (${got} != ${want})`);
+    }
+  }
+
+  it("fits each text column to its longest value, between the label and the reading length", () => {
+    expect(MATRIX.length).toBe(5);
+    expect(() => checkFit(fittedWidthCh)).not.toThrow();
+  });
+
+  it("fails when the reading length no longer caps a long value", () => {
+    const uncapped: Fit = (column, values) =>
+      column.kind === "text"
+        ? Math.max(column.header.length, ...values.map((v) => String(v ?? "").length)) + 3
+        : column.widthCh;
+    expect(() => checkFit(uncapped)).toThrow("fitted width: long text capped at reading length");
+  });
+
+  it("fails when the old rule (reading length for every text column) comes back", () => {
+    const old: Fit = (column) => column.widthCh;
+    expect(() => checkFit(old)).toThrow("fitted width: short code");
+  });
+
+  const rows: GridRow[] = Array.from({ length: 60 }, (_, i) => ({
+    id: `r${i}`,
+    "Listing.unitNumber": String(1000 + i),
+    "Listing.buildingName": i < 30 ? "S1.01" : "E1",
+    "Listing.subdivisionName": i % 7 === 0 ? "Vinhomes Ocean Park 2 – The Empire" : "Ocean Park",
+  }));
+  const columns = [code, tower, place];
+  const widthsOf = (container: HTMLElement): string[] =>
+    [...container.querySelectorAll<HTMLElement>("thead th")].map((th) => th.style.width);
+
+  function checkSteady(before: string[], after: string[], when: string): void {
+    if (before.join() !== after.join()) {
+      throw new Error(
+        `width follows the shown rows: ${when} (${before.join()} -> ${after.join()})`,
+      );
+    }
+  }
+
+  it("keeps column widths while searching and paging: widths come from every row the region holds", () => {
+    const { container } = render(
+      <DataRegion title="Vùng" columns={columns} rows={rows} pageSize={25} />,
+    );
+    const before = widthsOf(container);
+    expect(before.every((w) => w !== "")).toBe(true);
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "E1" } });
+    checkSteady(before, widthsOf(container), "search");
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "" } });
+    fireEvent.click(screen.getByRole("button", { name: "Trang sau" }));
+    checkSteady(before, widthsOf(container), "next page");
+  });
+
+  it("fails when widths are measured on the rows a search leaves", () => {
+    const all = render(<DataRegion title="Vùng" columns={columns} rows={rows} pageSize={25} />);
+    const before = widthsOf(all.container);
+    cleanup();
+    const leftAfterSearch = rows.filter(
+      (r) => r["Listing.buildingName"] === "E1" && r["Listing.subdivisionName"] === "Ocean Park",
+    );
+    const some = render(
+      <DataRegion title="Vùng" columns={columns} rows={leftAfterSearch} pageSize={25} />,
+    );
+    expect(() => checkSteady(before, widthsOf(some.container), "search")).toThrow(
+      "width follows the shown rows: search",
+    );
   });
 });

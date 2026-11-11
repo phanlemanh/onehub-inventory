@@ -60,6 +60,10 @@ số đo), `design/behaviors.md` dòng «Chia trang — chốt ở lát cắt B�
   tệp nào dưới `src/` gõ cứng các nhãn ấy.
 - AC-10: Given Bảng hàng đang chạy, When nhìn ở bốn khổ với trạng thái có dữ liệu, sáng và tối, Then thấy đầu màn, tám cột
   đọc được (lưới dày và cuộn ngang trong vùng ở khổ hẹp), tên khu dài bị cắt gọn, trang không cuộn ngang. (judgment)
+- AC-11: Given Bảng hàng với 60 căn mẫu ở khổ 1440, When trang sẵn sàng, Then cả tám cột hiện đủ trong vùng và vùng không
+  cuộn ngang; và Given một cột chữ của Lưới dùng chung, When vùng giữ các dòng của nó, Then cột rộng bằng chuỗi dài nhất
+  vùng đang giữ (không hẹp hơn nhãn, không quá độ dài đọc của kiểu) cộng đệm — mã căn bốn ký tự không chiếm chỗ của tên khu —
+  và bề rộng không đổi khi gõ tìm hay chuyển trang.
 
 ## Vai × Màn
 
@@ -82,7 +86,7 @@ Quét trục tại chỗ theo khuôn «entity-feature» của bộ quét hình t
 - Trục 5 — chiều đo: ca chính xanh · ca phá đỏ với thông điệp ghim.
 - Trục 6 — vai: bốn vai của bản khai.
 
-Thước: AC-1 phủ trục 1; AC-3 phủ trục 2 (bảy trạng thái) và trục 5; AC-7 phủ trục 2 (bốn không áp); AC-2, AC-3, AC-10 phủ
+Thước: AC-1 phủ trục 1; AC-3 phủ trục 2 (bảy trạng thái) và trục 5; AC-7 phủ trục 2 (bốn không áp); AC-2, AC-3, AC-10, AC-11 phủ
 trục 3; AC-6 phủ trục 4; AC-4, AC-5, AC-8 phủ trục 5; Vai × Màn phủ trục 6 bằng ý định. [CE chưa kiểm chứng]: trục 6 chưa
 có phép đo — vai thật chưa nối vào khung.
 

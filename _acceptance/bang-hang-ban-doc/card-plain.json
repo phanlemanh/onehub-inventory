@@ -44,6 +44,10 @@
       "p": "Chặn: Bảng hàng không còn được bộ bài kiểm bỏ qua vì «chưa có vùng dữ liệu»; ai thêm lại nó vào danh sách bỏ qua thì bài đỏ."
     },
     {
+      "id": "AC-11",
+      "p": "Chặn: ở 1440 không cột nào khuất sau cuộn ngang — cột chữ rộng theo nội dung thật (mã căn không chiếm chỗ của tên khu), và bề rộng không nhảy khi tìm hay chuyển trang."
+    },
+    {
       "id": "OOS-1",
       "p": "KHÔNG sửa trên ô, KHÔNG mở hồ sơ căn cạnh bảng, KHÔNG lọc hay sắp xếp theo cột, KHÔNG chọn dòng."
     },

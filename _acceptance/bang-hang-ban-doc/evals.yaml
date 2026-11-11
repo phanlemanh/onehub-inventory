@@ -97,3 +97,19 @@ evals:
     paths: ["src/app/(app)/inventory/**", src/modules/listings/**, src/modules/catalog/**, tests/inventory-page.test.tsx]
     expected: "exit 0; tests/inventory-page.test.tsx gọi CHÍNH hàm trang của src/app/(app)/inventory/page.tsx (không gọi bộ đọc thuần) với searchParams thật: ma trận viết trước 5 tham số × 2 môi trường (vi.stubEnv NODE_ENV production, development) = 10 ô, đọc trạng thái mà trang đưa vào InventoryGrid: production 'ready' ở cả 5, development đúng trạng thái; trang ở 'ready' đưa 60 dòng, và dòng của lần chào id 4d415500-0001-4000-8000-000000000001 mang Unit.livingArea và Unit.bedroomsTotal bằng của căn có upi bằng upi liên kết căn của lần chào ấy (tra từ dữ liệu nguồn, không chép số); ca đối chứng: bản trang đọc thẳng tham số bỏ qua môi trường cho thông điệp 'page honours state in production: error'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-11
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/column-kind.ts, src/components/candidate/data-region.tsx, tests/grid.test.tsx]
+    expected: "exit 0; trong tests/grid.test.tsx khối 'content-fitted width of text columns': ma trận viết trước 5 ô (mã ngắn '0905' → 7ch, nhãn dài hơn giá trị → 10ch, chuỗi dài bị chặn ở độ dài đọc → 19ch, kể cả 1ch dư cho đệm thật; cột không giá trị giữ 18ch, kiểu không phải chữ giữ độ dài mẫu) khẳng định hằng 5; hai ca đối chứng: bộ tính bỏ chặn độ dài đọc cho 'fitted width: long text capped at reading length', luật cũ cho 'fitted width: short code'; vùng 60 dòng cỡ trang 25 giữ nguyên bề rộng mọi đầu cột sau khi gõ tìm và sau khi sang trang; ca đối chứng đo trên các dòng còn lại sau tìm cho 'width follows the shown rows: search'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/screens/inventory-width.spec.ts]
+    expected: "exit 0; tests/e2e/screens/inventory-width.spec.ts ở khổ 1440 mở /inventory: tám đầu cột nằm trọn trong khung vùng và khung vùng không cuộn ngang (scrollWidth = clientWidth); ở 360 và 414 trang không cuộn ngang và bài in số cột thấy trọn; ca đối chứng nới cột Khu thêm 40ch bằng thẻ style trên trang thật và khẳng định thông điệp 'inventory 1440: columns hidden behind horizontal scroll'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
