@@ -1,0 +1,120 @@
+schema_version: 1
+feature_slug: danh-muc-reui-doc-chac
+# Ca kiểm của vòng này ở tools/reui_catalog/doc-chac.test.mjs; tên ca mở đầu bằng "DC<n> ·" (n = số AC), để không trùng
+# chuỗi "E<n> ·" mà hồ sơ danh-muc-reui đếm trong catalog.test.mjs. reui_catalog_test chạy vitest với reporter verbose
+# trên cả thư mục: người chấm đếm ca theo tên, chỉ ca mở đầu "DC<n> ·".
+# Ca chạy lệnh dựng bản sao trong thư mục tạm (chép tools/reui_catalog và design/reui-catalog.json thật, nối
+# node_modules bằng symlink), gọi lệnh của BẢN SAO dưới bộ chặn mạng từ một thư mục khác; sau mỗi ca, trạng thái git
+# và băm của ảnh chụp, tệp ghim, danh mục của kho thật không đổi.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.reui_catalog_test
+    paths: [tools/reui_catalog/**]
+    expected: "exit 0; đúng 22 ca 'DC1 ·' đạt. Ca 'DC1 · matrix is 3 required sections x 7 heading forms' khẳng định danh sách nhóm của ma trận bằng REQUIRED_SECTIONS của catalog.mjs (tệp, tiêu đề, loại), ba loại phủ đủ KINDS, và ma trận có 21 phần tử. 21 ca 'DC1 · <tiêu đề> · <dạng>' với tiêu đề ∈ {Pro blocks, Free examples, ReUI Primitives} và dạng ∈ {case, no count, count with words, heading level, trailing space, CRLF, renamed}: mỗi ca dựng thư mục nguồn bằng cách chép ảnh chụp thật rồi đổi đúng dòng tiêu đề ấy, khẳng định dòng đã đổi khác bản gốc, chạy 'build.mjs --refresh --from <thư mục>' của bản sao: thoát 1; stderr chứa đúng dòng mong đợi viết sẵn trong ma trận — 'section missing in llms-full.txt: Pro blocks (block)', 'section missing in llms-full.txt: Free examples (example)' hay 'section missing in llms.txt: ReUI Primitives (component)' — và không chứa 'count mismatch'; ảnh chụp, pin.json và danh mục của bản sao giữ nguyên byte."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.reui_catalog_test
+    paths: [tools/reui_catalog/**]
+    expected: "exit 0; đúng 1 ca 'DC2 · intact source re-pins green' đạt: cùng cách dựng thư mục nguồn như DC1 nhưng không đổi dòng nào; '--refresh --from' thoát 0, stdout chứa '678 blocks, 27 components, 1264 examples', không dòng nào mở đầu 'added:' hay 'removed:'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.reui_catalog_test
+    paths: [tools/reui_catalog/**]
+    expected: "exit 0; đúng 6 ca 'DC3 ·' đạt: với mỗi nhóm (Pro blocks, Free examples ở llms-full.txt; ReUI Primitives ở llms.txt) và mỗi lệnh (regenerate, check), bản sao có dòng tiêu đề nhóm bị đổi sang dạng bỏ số khai, pin.json tính lại băm; lệnh thoát 1, stderr chứa 'section missing in <tệp>: <tiêu đề>', danh mục của bản sao giữ nguyên byte."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.reui_catalog_test
+    paths: [tools/reui_catalog/**]
+    expected: "exit 0; đúng 3 ca 'DC4 ·' đạt: 'DC4 · both llms-full sections missing are named together' (đổi tên cả hai tiêu đề của llms-full.txt; '--refresh --from' thoát 1, stderr chứa cả 'section missing in llms-full.txt: Pro blocks (block)' và 'section missing in llms-full.txt: Free examples (example)' trên hai dòng khác nhau); 'DC4 · nearest heading is named for a case change' (đổi 'Pro blocks' thành 'Pro Blocks'; stderr chứa 'nearest heading line 7: ## Pro Blocks (678)'); 'DC4 · nearest heading is named for a dropped count, not for a rename' (bỏ số khai: stderr chứa 'nearest heading line 7: ## Pro blocks'; đổi tên thành 'Blocks': stderr chứa 'section missing in llms-full.txt: Pro blocks (block)' và không chứa 'nearest heading')."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.reui_catalog_test
+    paths: [tools/reui_catalog/**, design/reui-catalog.json]
+    expected: "exit 0; đúng 271 ca 'DC5 ·' đạt. Ca 'DC5 · matrix is anchored to the code lists' khẳng định: tập nhãn của 10 dạng bằng tập nhãn FORBIDDEN của catalog.mjs; khoá cấp gốc {pin, counts} bằng ALLOWED_FIELDS.top trừ groups; 4 trường nhóm bằng ALLOWED_FIELDS.group trừ items; 3 trường mục bằng ALLOWED_FIELDS.item; 3 loại bằng KINDS; 2 tệp bằng SOURCES; 27 chỗ (2 gốc + 7 trường × 3 loại + 2 tệp × {dòng 3, dòng cuối có chữ}); ma trận có 270 phần tử. 270 ca 'DC5 · <chỗ> · <dạng>': trên bản sao trong bộ nhớ của danh mục hay ảnh chụp đã commit, nối một dấu cách và chuỗi vào sau giá trị gốc của đúng một chỗ (nhóm là nhóm đầu tiên của loại ấy, mục là mục đầu tiên của nhóm ấy, counts là counts.block), khẳng định giá trị đã đổi, gọi scanCatalog hoặc scanSnapshot: trả mảng đúng một lỗi, bằng chuỗi viết sẵn — 'forbidden in pin: <nhãn>'; 'forbidden in counts: <nhãn>'; 'forbidden in group <category gốc>: <nhãn>' (chỗ kind, group, base); 'forbidden in group <category gốc> <chuỗi>: <nhãn>' (chỗ category); 'forbidden in <tên mục gốc>: <nhãn>' (chỗ title, description); 'forbidden in <tên mục gốc> <chuỗi>: <nhãn>' (chỗ name); 'forbidden in snapshot <tệp> line <số dòng>: <nhãn>' (số dòng 1-gốc, tính từ tệp thật)."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.reui_catalog_test
+    paths: [tools/reui_catalog/**, design/reui-catalog.json]
+    expected: "exit 0; đúng 4 ca 'DC6 ·' đạt: 'DC6 · levels are anchored to ALLOWED_FIELDS' (ba cấp của ma trận bằng ba khoá top, group, item); 'DC6 · top', 'DC6 · group', 'DC6 · item' — thêm trường 'source' ở cấp ấy, scanCatalog trả đúng một lỗi, lần lượt 'forbidden field in catalog: source', 'forbidden field in group <category>: source', 'forbidden field in <tên mục>: source'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.reui_catalog_test
+    paths: [tools/reui_catalog/**, design/reui-catalog.json]
+    expected: "exit 0; đúng 3 ca 'DC7 ·' đạt: 'DC7 · committed catalog and snapshots scan clean' (scanCatalog và scanSnapshot trên vật đã commit trả mảng rỗng); 'DC7 · near-miss text is not flagged' (mô tả của mục đầu thêm 'Import data from a CSV file' và 'Export table rows', scanCatalog trả mảng rỗng); 'DC7 · check is green with forbidden: 0' (lệnh kiểm của bản sao chưa sửa thoát 0, stdout chứa 'forbidden: 0')."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.reui_catalog_test
+    paths: [tools/reui_catalog/**, design/reui-catalog.json]
+    expected: "exit 0; đúng 10 ca 'DC8 ·' đạt, mười cặp chỗ–dạng kê trước, mỗi dạng đúng một lần: pin · dấu ba backtick; counts · import x from \"y\"; kind (block) · import { a } from 'y'; category (example) · import * as a from \"y\"; base (component) · export default; name (example) · export const; title (block) · export function; description (component) · export class; llms-full.txt dòng 3 · Bearer; llms.txt dòng cuối có chữ · REUI_LICENSE. Mỗi ca: bản sao kho bị chèn đúng chỗ ấy (ảnh chụp thì pin.json tính lại băm), 'build.mjs --check' của bản sao thoát 1, stderr chứa đúng thông điệp ghim của DC5 cho chỗ và dạng ấy."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.reui_catalog_offline
+    paths: [tools/reui_catalog/**, design/reui-catalog.json]
+    expected: "exit 0; lệnh sinh lại chạy hai lần dưới bộ chặn mạng, git diff trên design/reui-catalog.json rỗng, in 'reui catalog regenerated twice offline, identical to commit'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.test.unit
+    paths: [tools/reui_catalog/**, design/reui-catalog.json]
+    expected: "exit 0; bộ kiểm của kho chạy tools/reui_catalog/catalog.test.mjs đủ 33 ca và tools/reui_catalog/doc-chac.test.mjs đủ 356 ca, 0 bỏ qua; không tên ca nào của doc-chac.test.mjs khớp /E[0-9]+ ·/ (chuỗi mà hồ sơ danh-muc-reui đếm); số ca của doc-chac.test.mjs khác 356 (tệp không được nhặt, hay ca bị bỏ) thì eval KHÔNG đạt."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-10
+    executor: judgment
+    inputs: [tools/reui_catalog/README.md]
+    question: "Một agent chưa biết danh mục chỉ đọc tệp này, mục ghim lại. Tệp có nói rõ: (1) khi nguồn ReUI đổi cách ghi tiêu đề một nhóm, lệnh ghim lại dừng, không ghi tệp nào và gọi tên nhóm bị mất; (2) khi gặp lỗi ấy agent phải làm gì (không tự sửa ảnh chụp, sửa bộ đọc trong một PR có người duyệt)? Có điều nào tự mâu thuẫn với phần còn lại của tệp không?"
+    expected: "PASS khi cả hai điều được nói rõ và tệp không tự mâu thuẫn; hành vi thật của lệnh do E1, E3, E4 đo"
+    evidence_required: [run_id, verdict, judges, verified_at]
+
+  - id: E12
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.reui_catalog_test
+    paths: [tools/reui_catalog/**, design/reui-catalog.json]
+    expected: "exit 0; đúng 31 ca 'DC11 ·' đạt. Ca 'DC11 · matrix is 10 forms x 3 key places' khẳng định mười dạng là đúng mười dạng của DC5 và ma trận có 30 phần tử. 30 ca 'DC11 · <chỗ> · <dạng>' với chỗ ∈ {pin, pin.files[0], counts}: trên bản sao trong bộ nhớ của danh mục đã commit, thêm một khoá mang tên là chuỗi ấy (giá trị 'x') vào đúng chỗ, khẳng định khoá đã có, gọi scanCatalog: trả mảng đúng một lỗi 'forbidden in pin: <nhãn>' (hai chỗ trong pin) hay 'forbidden in counts: <nhãn>'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-12
+    executor: script
+    cmd: config:executors.script.reui_catalog_test
+    paths: [tools/reui_catalog/**]
+    expected: "exit 0; đúng 5 ca 'DC12 ·' đạt, mỗi ca trên bản sao, lệnh của bản sao dưới bộ chặn mạng: 'DC12 · label renamed in code and source re-pins all 27 components' (catalog.mjs của bản sao đổi 'ReUI Primitives' thành 'ReUI primitives' trong REQUIRED_SECTIONS, nguồn đổi đúng tiêu đề ấy; '--refresh --from' thoát 0, stdout chứa '27 components' và không dòng 'removed:'); 'DC12 · label renamed in code only stops and names the section' (cùng sửa mã, nguồn giữ tiêu đề cũ; thoát 1, stderr chứa 'section missing in llms.txt: ReUI primitives (component)'); ba ca 'DC12 · <tiêu đề> · empty section' cho Pro blocks, Free examples, ReUI Primitives (nguồn đổi số khai thành 0 và bỏ mọi dòng mục của nhóm; thoát 1, stderr chứa 'section empty in <tệp>: <tiêu đề> (<loại>)', ảnh chụp, pin.json, danh mục của bản sao giữ nguyên byte)."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-12
+    executor: judgment
+    inputs: [tools/reui_catalog/README.md]
+    question: "Một người bảo trì chỉ đọc tệp này khi ReUI đổi tiêu đề một nhóm. Tệp có nói rõ tiêu đề các nhóm bắt buộc chỉ khai ở MỘT chỗ trong mã (đổi ở đó là đủ), và lệnh dừng khi một nhóm bắt buộc không đọc được mục nào? Có câu nào khiến họ phải sửa thêm chỗ khác hay tự mâu thuẫn không?"
+    expected: "PASS khi cả hai điều được nói rõ và không câu nào bảo sửa thêm chỗ khác; hành vi thật do E13 đo"
+    evidence_required: [run_id, verdict, judges, verified_at]

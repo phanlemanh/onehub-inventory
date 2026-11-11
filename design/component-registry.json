@@ -17,14 +17,36 @@
             "rows",
             "status",
             "onRetry",
+            "onCancel",
             "emptyWhy",
             "emptyAction",
             "action",
+            "record",
+            "editable",
             "pageSize"
           ]
         },
         {
           "name": "GRID_COPY"
+        }
+      ]
+    },
+    {
+      "name": "RecordPanel",
+      "file": "src/components/candidate/record-panel.tsx",
+      "level": "molecule",
+      "parts": [
+        {
+          "name": "RECORD_PARAM"
+        },
+        {
+          "name": "RecordPanel",
+          "props": [
+            "ids",
+            "openId",
+            "onNavigate",
+            "render"
+          ]
         }
       ]
     },
@@ -48,10 +70,13 @@
       ]
     },
     {
-      "name": "RegionEmpty",
+      "name": "LOADING_STEPS_MS",
       "file": "src/components/candidate/region-state.tsx",
       "level": "molecule",
       "parts": [
+        {
+          "name": "LOADING_STEPS_MS"
+        },
         {
           "name": "RegionEmpty",
           "props": [
@@ -69,6 +94,14 @@
           "name": "RegionForbidden"
         },
         {
+          "name": "RegionLoading",
+          "props": [
+            "columns",
+            "rows",
+            "onCancel"
+          ]
+        },
+        {
           "name": "RegionNoMatch",
           "props": [
             "onClear"
@@ -81,10 +114,9 @@
           ]
         },
         {
-          "name": "RegionSkeleton",
+          "name": "RegionPartialEmpty",
           "props": [
-            "columns",
-            "rows"
+            "onRetry"
           ]
         }
       ]
@@ -113,7 +145,8 @@
             "kind",
             "value",
             "transaction",
-            "lockedReason"
+            "lockedReason",
+            "editMode"
           ]
         }
       ]

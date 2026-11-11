@@ -15,6 +15,8 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [Listing](entities/listing.md) — một lần chào trên một căn
 - [Contact](entities/contact.md) — một người làm việc với sàn
 - [Agreement](entities/agreement.md) — cho phép một kết nối chảy
+- [ListingOwner](entities/listing-owner.md) — chủ của một lần chào, theo vai
+- [ListingUnit](entities/listing-unit.md) — lần chào trỏ tới căn của danh mục
 
 ## Flows
 

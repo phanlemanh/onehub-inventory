@@ -1,0 +1,133 @@
+schema_version: 1
+feature_slug: hanh-vi-trong-luoi-khung
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, tests/behavior.test.tsx]
+    expected: "exit 0; trong tests/behavior.test.tsx, Lưới có onOpen dựng nút mở ở ô đầu mỗi dòng mang tên bằng giá trị ô đầu; bấm nút của dòng thứ ba thì RecordPanel mở với tiêu đề của dòng ấy, tiêu điểm nằm trong hồ sơ và hàm đổi địa chỉ nhận ho-so=<id dòng ba>; dựng với id ban đầu thì hồ sơ mở sẵn; Esc gọi đổi địa chỉ bỏ ho-so và tiêu điểm về đúng nút mở của dòng ba (không phải dòng đầu); ca đối chứng dựng hồ sơ không trả tiêu điểm và khẳng định thông điệp 'focus not returned: <id>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, tests/behavior.test.tsx]
+    expected: "exit 0; với danh sách id viết trước ['a','b','c'] RecordPanel mở ở 'b': 'Sau' gọi đổi địa chỉ với 'c', 'Trước' với 'a'; ở 'c' nút 'Sau' bị tắt, ở 'a' nút 'Trước' bị tắt; trên DataRegion thật có năm dòng, gõ tìm để còn ba dòng rồi mở dòng đầu kết quả: 'Sau' tới dòng thứ hai của kết quả lọc, không tới dòng bị ẩn, và ở dòng thứ ba 'Sau' bị tắt; cùng một DataRegion dựng lần lượt dòng căn và dòng người, phần tử khung (data-slot record-panel) và các lớp của nó giống hệt nhau giữa hai lần; ca đối chứng đưa thứ tự chưa lọc vào khung và khẳng định thông điệp 'step order: <id>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/column-kind.ts, src/components/candidate/data-region.tsx, tests/behavior.test.tsx]
+    expected: "exit 0; ma trận viết trước đúng 11 kiểu: money, count, text, select, boolean, date → 'cell'; area, datetime, phone, status, person → 'panel'; bộ kiểm khẳng định 11 ô; Lưới khai editable dựng ô mang data-edit đúng theo kiểu của cột, Lưới không khai editable không ô nào mang data-edit; typedColumn có ca @ts-expect-error với editMode; ca đối chứng dùng luật đảo một kiểu (date → panel) và khẳng định thông điệp 'edit mode: date'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/region-state.tsx, src/components/candidate/data-region.tsx, src/components/candidate/region-header.tsx, tests/behavior.test.tsx]
+    expected: "exit 0; với đồng hồ giả của vitest, vùng loading ở 999 ms không có khung chờ hiện (data-shown khác 'true') và không câu tiến độ, ở 1000 ms có khung chờ đúng số cột, ở 9999 ms chưa có câu tiến độ, ở 10000 ms có câu 'Vẫn đang tải' và nút 'Huỷ' khi có onCancel — bấm gọi onCancel đúng một lần — và không có nút khi không có onCancel; suốt lúc tải đầu vùng có h2 nhưng không region-count và không ô tìm; ca đối chứng đặt ngưỡng 10 giây thành 1 giây và khẳng định thông điệp 'progress before 10s'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/region-state.tsx, src/components/candidate/data-region.tsx, src/components/candidate/region-header.tsx, src/components/candidate/grid-copy.ts, tests/behavior.test.tsx, tests/grid.test.tsx]
+    expected: "exit 0; ma trận viết trước trạng thái × phần đầu vùng: ready → có số dòng và ô tìm; loading, error, forbidden → chỉ h2; partial → có số dòng và ô tìm; vùng error có onRetry thì có nút 'Thử lại', bấm gọi onRetry một lần; không onRetry thì không có nút nào tên 'Thử lại' và câu lỗi có chữ 'tải lại trang'; vùng partial với 0 dòng hiện khối data-kind 'partial-empty' và không có chữ của câu trống 'chưa ai thêm'; ca đối chứng dựng đầu vùng hiện số dòng khi lỗi và khẳng định thông điệp 'header leaks count: error'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/data-region.tsx, src/components/candidate/region-header.tsx, tests/behavior.test.tsx]
+    expected: "exit 0; ma trận viết trước bốn ô (allowed true/false × status ready/forbidden): chỉ (true, ready) có nút 'Thêm dòng'; vùng forbidden không có dòng thân bảng và không region-count; kiểu tham số của action đòi trường allowed (ca @ts-expect-error truyền ReactNode trần); ca đối chứng bỏ qua allowed và khẳng định thông điệp 'action shown without permission'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/truncated-text.tsx, tests/behavior.test.tsx]
+    expected: "exit 0; với ResizeObserver giả và scrollWidth/clientWidth giả, TruncatedText dựng vừa (không data-cut, không tabIndex), rồi bề rộng hẹp lại và bộ quan sát báo đổi: có data-cut='true' và tabIndex 0; rộng ra lại: mất data-cut và tabIndex; bộ quan sát được gỡ khi tháo ô; ca đối chứng dùng bản chỉ đo lúc dựng và khẳng định thông điệp 'not remeasured on resize'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/use-change.tsx, src/components/templates/notify.ts, src/components/templates/screen-banner.tsx, src/components/templates/frame-copy.ts, tests/behavior.test.tsx]
+    expected: "exit 0; ma trận viết trước ba ô: (đảo được, trong sàn) → làm ngay, toast có 'Hoàn tác', bấm gọi undo một lần, không hộp xác nhận; (đảo được, ra ngoài sàn) và (không đảo được, trong sàn) → hộp xác nhận mở trước, việc chưa chạy, nút xác nhận có đúng chữ động từ màn đưa, 'Thôi' đóng hộp và việc không chạy, xác nhận thì việc chạy một lần và toast không có 'Hoàn tác'; việc ném lỗi khi navigator.onLine false → băng screen-banner kind save-failed và giá trị ô nhập của màn còn nguyên; việc ném FieldError thì cửa gửi nó qua bộ báo notify theo kênh field, trả lỗi về màn mang channel 'inline', không toast, không băng — cả khi thay đổi đi qua hộp xác nhận: sau khi bấm động từ, FieldError và lỗi khác đều về màn qua lời hứa của run (không thành false như bấm Thôi); notify('result') ra toast và notify('screen') ra băng trên màn; ca đối chứng dùng bản làm ngay mọi thay đổi và khẳng định thông điệp 'irreversible change ran without confirmation'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/app/**, src/modules/**, tests/behavior-guard.test.ts, tests/behavior.test.tsx, tests/grid.test.tsx, design/decisions.yaml]
+    expected: "exit 0; tests/behavior-guard.test.ts có danh sách viết trước đúng 13 nguồn bị cấm trong tệp màn, khai bằng tệp đích trong kho (9 tệp: components/ui/sheet, dialog, alert-dialog, drawer, skeleton, empty, spinner, components/candidate/record-panel, region-state) hay gói (4: sonner, vaul, @base-ui/react/dialog, @base-ui/react/alert-dialog); mỗi đường nhập được giải về tệp đích trước khi so, nên mọi cách viết quy về một; ma trận viết trước 9 tệp × 6 cách viết (bí danh, bí danh có đuôi, tương đối, tương đối có đuôi, tương đối qua gốc kho, tương đối mở bằng ./) cộng 4 gói × 2 cách viết (gói, đường con) = 62 ca phá trên cây tạm, mỗi ca đỏ với thông điệp nêu đúng tệp màn, đường nhập, tệp đích và thành phần dùng chung phải dùng thay, bộ kiểm khẳng định 62; câu nhập được đọc bằng cây cú pháp của TypeScript, không bằng biểu thức chữ; ma trận viết trước đúng 11 dạng câu lệnh (nhập tên, nhập mặc định, nhập cả mô-đun, mặc định kèm tên, nhập chỉ để chạy, tái xuất tên, tái xuất tất cả, tái xuất cả mô-đun, nhập động, nhập động trong hàm, nhập tên trải nhiều dòng), mỗi dạng đặt giữa các câu nhập và tái xuất khác trong một tệp màn nhiều dòng và đỏ đúng một lần, bộ kiểm khẳng định 11; cửa chung của Base UI đỏ với nhập Dialog, nhập AlertDialog đổi tên, nhập cả mô-đun dạng * as và tái xuất Dialog; ca đối chứng xanh cho chính các thành phần dùng chung, nhập chỉ để có kiểu (import type, { type … }, export type), một tên na ná (sheetish, sonnerish), phần khác của Base UI và một chuỗi chữ có hình câu nhập; quét thật mọi tệp .ts/.tsx dưới src/app và src/modules/*/ui không thấy nguồn nào, trừ src/app/layout.tsx chỉ được nhập components/ui/sonner; ma trận viết trước đúng sáu dòng nối id quyết định với một ca phá thử có thông điệp ghim — edit-in-cell 'edit mode: date', undo-or-confirm 'irreversible change ran without confirmation', feedback-by-delay 'progress before 10s', state-matrix 'header leaks count: error', notification-channel 'field error sent to toast' (gửi lỗi trường qua bộ báo thật notify với luật kênh đã phá và thấy toast bắn), read-only-cell 'locked cell without reason' — mỗi ca chạy và đỏ đúng thông điệp ấy, bộ kiểm khẳng định 6 ca; với sáu id ấy và record-panel, mỗi mục trong design/decisions.yaml có check trỏ tệp có thật chứa 'decision:<id>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.check
+    paths: [design/decisions.yaml, tests/**, src/**]
+    expected: "exit 0; make check gồm tools/design_check.py xanh với mọi dòng check mới của sáu quyết định tầng hành vi và mục record-panel (tệp có thật, có thẻ decision:<id>); chiều đỏ là chính design_check báo '<check>: the file does not name decision:<id>' khi thẻ bị gỡ, đã có ca trong tests/design-check.test.ts"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/**, "src/app/(app)/proto/**", tests/e2e/behavior.spec.ts]
+    expected: "exit 0; ở bốn khổ, ca 'behavior › record panel opens beside the grid and closes with Escape' bấm nút mở của một dòng: địa chỉ có ho-so=, ở 1024 và 1440 hồ sơ hẹp hơn cửa sổ và nằm bên phải, ở 360 và 414 hồ sơ rộng bằng cửa sổ; Esc đóng, địa chỉ không còn ho-so, tiêu điểm ở nút mở của dòng đó; ca 'behavior › opening the address opens the record' mở thẳng địa chỉ có ho-so; ca 'behavior › next and previous keep the frame' bấm Sau trên hồ sơ căn rồi trên hồ sơ người, hộp bao của khung (x, bề rộng) không đổi; ca đối chứng xoá tiêu điểm trả về trên trang thật và khẳng định thông điệp 'focus not returned'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/**, "src/app/(app)/proto/**", tests/e2e/behavior.spec.ts]
+    expected: "exit 0; ca 'behavior › loading has three steps by delay' dùng đồng hồ giả của Playwright trên ?state=loading: trước 1 giây không khung chờ hiện, sau 1 giây có, sau 10 giây có 'Vẫn đang tải' và 'Huỷ', bấm 'Huỷ' thì vùng thôi tải; đầu vùng không có ô tìm; ca 'behavior › error without retry wiring shows no dead button' trên ?state=error-no-retry không có nút 'Thử lại'; ca 'behavior › confirm names the verb and cancel changes nothing' mở hộp xác nhận, nút mang động từ, 'Thôi' không đổi dòng; ca 'behavior › reversible change offers undo' thấy toast 'Hoàn tác' và bấm thì dòng trở lại; mỗi ca có đối chứng khẳng định thông điệp 'behavior not shown: <ca>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/**, "src/app/(app)/proto/**", src/styles/**, tests/e2e/behavior.spec.ts]
+    expected: "exit 0; ca 'behavior › no serious accessibility violations' quét danh sách viết trước đúng 5 cảnh (hồ sơ đóng, hồ sơ mở, hộp xác nhận mở, vùng lỗi, vùng chờ tải sau 1 giây) ở sáng và tối, quét sau khi mọi chuyển động trên trang đã xong, bộ kiểm khẳng định 10 lượt; ca 'behavior › the page never scrolls sideways' đạt ở bốn khổ với hồ sơ đóng và mở; ca đối chứng ghi đè màu chữ trong hồ sơ trên trang thật (tắt chuyển màu, cặp màu cố định) và khẳng định axe báo color-contrast"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-10
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/components/candidate/**, "src/app/(app)/proto/**"]
+    steps:
+      - "Use the dev server at the URL given (lane port); do not start one on port 3470"
+      - "Navigate {url}/proto/hanh-vi-trong-luoi-khung at 1440x900, light, press the open button of the second listing row → screenshot evidence/E14-step1.png"
+      - "Same page, press «Sau» in the record panel, then switch to the people grid and open its first row → screenshot evidence/E14-step2.png"
+      - "Navigate {url}/proto/hanh-vi-trong-luoi-khung at 360x800, dark, open the first listing row → screenshot evidence/E14-step3.png"
+      - "Navigate {url}/proto/hanh-vi-trong-luoi-khung?state=error at 1440x900 → screenshot evidence/E14-step4.png"
+      - "Navigate {url}/proto/hanh-vi-trong-luoi-khung at 1440x900, press the irreversible demo action (its button carries the verb) → screenshot evidence/E14-step5.png"
+    expected: "hồ sơ nằm cạnh bảng bên phải, đầu hồ sơ có tên dòng, 'Trước', 'Sau', 'Đóng'; hồ sơ người dùng đúng khung ấy; ở 360 tối hồ sơ phủ toàn màn và đọc được; vùng lỗi đầu chỉ có tên vùng, câu ba phần và 'Thử lại'; hộp xác nhận nói việc sẽ xảy ra, nút mang động từ và có 'Thôi'"
+
+  - id: E15
+    criterion: AC-5
+    executor: judgment
+    question: "Trả lời bốn câu có/không chỉ dựa trên các hằng chữ trong grid-copy.ts và frame-copy.ts: (a) câu lỗi vùng khi màn chưa nối việc tải lại có đủ ba phần chuyện gì xảy ra, vì sao, làm gì tiếp và không nhắc tới nút «Thử lại»; (b) câu vùng tải hỏng một phần mà chưa có dòng nào nói rõ dữ liệu có nhưng chưa tải được, không nói chưa ai nhập; (c) câu tiến độ sau 10 giây nói đang tải lâu và cho biết có thể huỷ; (d) câu hộp xác nhận chung bảo người đọc việc sẽ xảy ra trước khi bấm. Với cả bốn: người dùng được gọi là «bạn» theo design/language.md và không có dấu chấm than."
+    inputs: [src/components/candidate/grid-copy.ts, src/components/templates/frame-copy.ts, design/language.md]
+
+  - id: E16
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/components/candidate/**, "src/app/(app)/proto/**"]
+    expected: "exit 0; sàn thiết kế bậc M1 không thấy mã màu hex thô nào trên các tệp giao diện của vòng; chiều đỏ là bộ kiểm của kit (design-floor-s4.mjs) báo hex thô khi một tệp giao diện chứa '#0246ff' viết thẳng"

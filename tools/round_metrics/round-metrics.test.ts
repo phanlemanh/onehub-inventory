@@ -4,12 +4,15 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
+  chmodSync,
   cpSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -206,6 +209,199 @@ describe("ghi", () => {
     };
     expect(strip(hong)).toEqual(strip(sach));
   });
+});
+
+// Row 1l (_acceptance/so-do-ghi-khong-mat-tang): ghi never overwrites a broken old measurement file.
+describe("ghi với bản cũ hỏng", () => {
+  const lines = [tally(1, "REJECT"), tally(2, "BLOCKED"), tally(3, "PASS")];
+  const CALLS: string[][] = [[], ["--phan", "r1=bo-cuc"]];
+  const GO = ["khong ghi de", "git", "--phan"];
+  // Spawns python several times per test; a busy machine runs past vitest's 5 s default.
+  const T = 60_000;
+
+  // A healthy old file, written by the real command, not by hand.
+  function lanh() {
+    const root = tempRoot();
+    const dir = hoSo(root, "a", { lines });
+    const r = run(root, "ghi", "--slug", "a", "--phan", "r1=trang-thai-hanh-vi");
+    expect(r.status, r.stderr).toBe(0);
+    const tep = join(dir, "so-do-vong.json");
+    return {
+      root,
+      dir,
+      tep,
+      goc: JSON.parse(readFileSync(tep, "utf8")) as Record<string, unknown>,
+    };
+  }
+
+  function dung(root: string, call: string[], nhom: string) {
+    const r = run(root, "ghi", "--slug", "a", ...call);
+    expect(r.status, `${nhom} ${call.join(" ")}: ${r.stderr}`).toBe(1);
+    expect(r.stderr).toContain("so-do-vong.json");
+    expect(r.stderr).toContain(nhom);
+    expect(r.stderr).not.toContain("Traceback");
+    for (const s of GO) expect(r.stderr).toContain(s);
+    return r;
+  }
+
+  it(
+    "ghi dừng khi bản cũ không đọc được",
+    () => {
+      const { root, tep } = lanh();
+      expect(run(root, "ghi", "--slug", "a").status).toBe(0);
+      rmSync(tep);
+      mkdirSync(tep);
+      for (const call of CALLS) {
+        dung(root, call, "khong doc duoc");
+        expect(readdirSync(tep)).toEqual([]);
+      }
+    },
+    T,
+  );
+
+  it.skipIf(process.getuid?.() === 0)(
+    "ghi dừng khi bản cũ bị cấm quyền đọc (bỏ qua dưới root)",
+    () => {
+      const { root, tep } = lanh();
+      chmodSync(tep, 0o000);
+      try {
+        for (const call of CALLS) {
+          const before = statSync(tep).mtimeMs;
+          dung(root, call, "khong doc duoc");
+          expect(statSync(tep).mtimeMs).toBe(before);
+        }
+      } finally {
+        chmodSync(tep, 0o644);
+      }
+    },
+    T,
+  );
+
+  it(
+    "ghi dừng khi bản cũ không phải JSON",
+    () => {
+      const NOI_DUNG: [string, Buffer][] = [
+        ["chuoi rac", Buffer.from("{khong phai json")],
+        ["tep rong", Buffer.alloc(0)],
+        ["byte la", Buffer.from([0xff, 0xfe])],
+      ];
+      let o = 0;
+      for (const [, noi] of NOI_DUNG)
+        for (const call of CALLS) {
+          const { root, tep } = lanh();
+          writeFileSync(tep, noi);
+          const before = hash(tep);
+          dung(root, call, "khong phai JSON");
+          expect(hash(tep)).toBe(before);
+          o++;
+        }
+      expect(o).toBe(6);
+    },
+    T,
+  );
+
+  // Nine shapes, each the healthy file with exactly one thing broken, and the label ghi must name.
+  const DANG: [string, (g: Record<string, unknown>) => unknown][] = [
+    ["goc", (g) => [g]],
+    ["thieu luot", (g) => ({ ...g, luot: undefined })],
+    ["luot", (g) => ({ ...g, luot: "r1" })],
+    ["muc", (g) => ({ ...g, luot: [7, ...(g.luot as unknown[]).slice(1)] })],
+    ["thieu vong", (g) => sua(g, (m) => delete m.vong)],
+    ["vong", (g) => sua(g, (m) => (m.vong = "1"))],
+    ["thieu tang", (g) => sua(g, (m) => delete m.tang)],
+    ["tang", (g) => sua(g, (m) => (m.tang = "bo-cuc"))],
+    ["tang la: mau-sac", (g) => sua(g, (m) => (m.tang = ["mau-sac"]))],
+  ];
+  function sua(g: Record<string, unknown>, f: (m: Record<string, unknown>) => unknown) {
+    const c = structuredClone(g);
+    f((c.luot as Record<string, unknown>[])[0]!);
+    return c;
+  }
+
+  it(
+    "ghi dừng khi bản cũ sai hình dạng",
+    () => {
+      expect(DANG.length).toBe(9);
+      let o = 0;
+      for (const [nhan, pha] of DANG)
+        for (const call of CALLS) {
+          const { root, tep, goc } = lanh();
+          writeFileSync(tep, JSON.stringify(pha(goc)));
+          const before = hash(tep);
+          const r = dung(root, call, "sai hinh dang");
+          const dong = r.stderr.split("\n");
+          expect(dong, nhan).toContain(`sai hinh dang: ${nhan}`);
+          for (const [khac] of DANG)
+            if (khac !== nhan)
+              expect(dong, `${nhan} / ${khac}`).not.toContain(`sai hinh dang: ${khac}`);
+          expect(hash(tep)).toBe(before);
+          o++;
+        }
+      expect(o).toBe(18);
+    },
+    T,
+  );
+
+  it(
+    "ghi: xoá bản hỏng thì dựng lại",
+    () => {
+      const NHOM: [string, (tep: string, g: Record<string, unknown>) => void][] = [
+        ["khong doc duoc", (tep) => (rmSync(tep), mkdirSync(tep))],
+        ["khong phai JSON", (tep) => writeFileSync(tep, "{khong phai json")],
+        ["sai hinh dang", (tep, g) => writeFileSync(tep, JSON.stringify([g]))],
+      ];
+      for (const [nhom, pha] of NHOM) {
+        const { root, dir, tep, goc } = lanh();
+        pha(tep, goc);
+        dung(root, [], nhom);
+        rmSync(tep, { recursive: true });
+        const r = run(root, "ghi", "--slug", "a", "--phan", "r1=bo-cuc");
+        expect(r.status, `${nhom}: ${r.stderr}`).toBe(0);
+        expect(
+          ban(dir)
+            .lam_lai.filter((x) => x.nguon === "r1")
+            .map((x) => x.tang),
+        ).toEqual(["bo-cuc"]);
+        expect(ban(dir).chua_phan).toEqual([]);
+      }
+    },
+    T,
+  );
+
+  it(
+    "ghi: bản cũ lành vẫn đi như cũ",
+    () => {
+      const TRANG_THAI: [string, (tep: string, g: Record<string, unknown>) => void][] = [
+        ["vang", (tep) => rmSync(tep)],
+        ["co tang", () => {}],
+        ["luot rong", (tep, g) => writeFileSync(tep, JSON.stringify({ ...g, luot: [] }))],
+      ];
+      let o = 0;
+      for (const [ten, dat] of TRANG_THAI)
+        for (const call of CALLS) {
+          const { root, dir, tep, goc } = lanh();
+          dat(tep, goc);
+          const r = run(root, "ghi", "--slug", "a", ...call);
+          expect(r.status, `${ten} ${call.join(" ")}: ${r.stderr}`).toBe(0);
+          const r1 = ban(dir)
+            .lam_lai.filter((x) => x.nguon === "r1")
+            .map((x) => x.tang);
+          if (call.length) {
+            expect(r1, ten).toEqual(["bo-cuc"]);
+            expect(ban(dir).chua_phan, ten).toEqual([]);
+          } else if (ten === "co tang") {
+            expect(r1).toEqual(["trang-thai-hanh-vi"]);
+            expect(ban(dir).chua_phan).toEqual([]);
+          } else {
+            expect(r1, ten).toEqual([]);
+            expect(ban(dir).chua_phan, ten).toEqual(["r1"]);
+          }
+          o++;
+        }
+      expect(o).toBe(6);
+    },
+    T,
+  );
 });
 
 describe("kiem", () => {

@@ -70,3 +70,22 @@ from files you downloaded yourself:
 ```bash
 node tools/reui_catalog/build.mjs --refresh --from <folder with llms-full.txt and llms.txt>
 ```
+
+### When re-pin stops on a missing section
+
+The catalog needs three sections, each with its exact heading: `## Pro blocks (<count>)` and
+`## Free examples (<count>)` in `llms-full.txt`, `## ReUI Primitives (<count>)` in `llms.txt`. If ReUI changes how
+it writes one of these headings (case, count, heading level, line endings, a new name), re-pin, regenerate and
+`--check` all stop before writing anything, with one line per missing section:
+
+```text
+section missing in llms-full.txt: Pro blocks (block) — nearest heading line 7: ## Pro Blocks (678)
+```
+
+The `nearest heading` part appears when a heading differs only by case, count or spacing; a renamed section has none.
+A required section whose heading is there but holds no item stops the same way, with `section empty in <file>:
+<heading> (<kind>)`.
+
+Do not edit the snapshot to make the heading match. Read what changed in the source, then change the heading in
+`REQUIRED_SECTIONS` in `tools/reui_catalog/catalog.mjs`, in a PR a human reviews, and re-pin. That list is the only
+place the headings are written: both readers take them from it, so nothing else needs to change.

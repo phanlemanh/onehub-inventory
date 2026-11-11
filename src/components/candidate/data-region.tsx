@@ -1,7 +1,7 @@
 "use client";
 
 import { createColumnHelper, useTable } from "@tanstack/react-table";
-import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 
 import {
   DataGrid,
@@ -11,23 +11,27 @@ import {
 import { DataGridPagination } from "@/components/reui/data-grid/data-grid-pagination";
 import { DataGridScrollArea } from "@/components/reui/data-grid/data-grid-scroll-area";
 import { DataGridTable } from "@/components/reui/data-grid/data-grid-table";
+import { Button } from "@/components/ui/button";
 
 import {
   DENSITY_ROW_CLASS,
   SEARCHABLE_KINDS,
   densityFor,
+  editModeFor,
   type FieldKey,
   type TypedColumn,
 } from "./column-kind";
 import { GRID_COPY, GRID_I18N } from "./grid-copy";
+import { RecordPanel, useRecordAddress, type RecordView } from "./record-panel";
 import { RegionHeader } from "./region-header";
 import {
   RegionEmpty,
   RegionError,
   RegionForbidden,
+  RegionLoading,
   RegionNoMatch,
   RegionPartial,
-  RegionSkeleton,
+  RegionPartialEmpty,
 } from "./region-state";
 import { TypedCell } from "./typed-cell";
 
@@ -41,6 +45,66 @@ export type GridRow = {
 export type RegionStatus = "ready" | "loading" | "error" | "partial" | "forbidden";
 
 export const DEFAULT_PAGE_SIZE = 50;
+
+/** The region's working button and whether the viewer may use it; a button without permission never shows. */
+export interface RegionAction {
+  node: ReactNode;
+  allowed: boolean;
+}
+
+/** How the region opens a row in the record panel: the screen says what one record shows, nothing else. */
+export interface RegionRecord {
+  render: (row: GridRow) => RecordView;
+  /** Controlled address, for tests and for screens that keep it elsewhere; the page address otherwise. */
+  address?: { openId: string | null; navigate: (id: string | null) => void };
+}
+
+/** The header shows the count and the search box only when the rows it would count are on screen. */
+export function headerShowsRows(status: RegionStatus): boolean {
+  return status === "ready" || status === "partial";
+}
+
+/** The panel when the page address holds the open record; it hands its `navigate` to the grid's open buttons. */
+function AddressedPanel({
+  rows,
+  ids,
+  record,
+  onReady,
+}: {
+  rows: readonly GridRow[];
+  ids: readonly string[];
+  record: RegionRecord;
+  onReady: (navigate: (id: string | null) => void) => void;
+}) {
+  const { openId, navigate } = useRecordAddress();
+  useEffect(() => onReady(navigate), [onReady, navigate]);
+  return <PanelFor rows={rows} ids={ids} record={record} openId={openId} navigate={navigate} />;
+}
+
+function PanelFor({
+  rows,
+  ids,
+  record,
+  openId,
+  navigate,
+}: {
+  rows: readonly GridRow[];
+  ids: readonly string[];
+  record: RegionRecord;
+  openId: string | null;
+  navigate: (id: string | null) => void;
+}) {
+  const byId = useMemo(() => new Map(rows.map((row) => [row.id, row])), [rows]);
+  const known = openId !== null && byId.has(openId) ? openId : null;
+  return (
+    <RecordPanel
+      ids={ids}
+      openId={known}
+      onNavigate={navigate}
+      render={(id) => record.render(byId.get(id) as GridRow)}
+    />
+  );
+}
 
 const helper = createColumnHelper<typeof dataGridFeatures, GridRow>();
 
@@ -89,26 +153,35 @@ export function DataRegion({
   rows,
   status = "ready",
   onRetry,
+  onCancel,
   emptyWhy,
   emptyAction,
   action,
+  record,
+  editable = false,
   pageSize = DEFAULT_PAGE_SIZE,
 }: {
   title: string;
   columns: readonly TypedColumn[];
   rows: readonly GridRow[];
   status?: RegionStatus;
+  /** Loads the region again; without it there is no «Thử lại» button. */
   onRetry?: () => void;
+  /** Stops a long load; offered after ten seconds of loading. */
+  onCancel?: () => void;
   /** Why this region is empty, in the screen's words; the general reason when absent. */
   emptyWhy?: string;
   emptyAction?: ReactNode;
-  action?: ReactNode;
+  action?: RegionAction;
+  /** Rows open in the record panel. */
+  record?: RegionRecord;
+  /** Cells say where they are edited: in the cell or in the record panel, by kind. */
+  editable?: boolean;
   pageSize?: number;
 }) {
   const searchId = useId();
   const [query, setQuery] = useState("");
   const { boxRef, chRef, widthCh, chPx } = useWidthInCh();
-  const retry = onRetry ?? (() => undefined);
 
   const shown = useMemo(
     () => rows.filter((row) => matches(row, columns, query)),
@@ -117,21 +190,53 @@ export function DataRegion({
   const totalMinCh = columns.reduce((sum, column) => sum + column.widthCh, 0);
   const density = widthCh === null ? "normal" : densityFor(totalMinCh, widthCh);
 
+  const recordAddress = record?.address;
+  const addressNavigate = useRef<((id: string | null) => void) | null>(null);
+  const onAddressReady = useCallback((navigate: (id: string | null) => void) => {
+    addressNavigate.current = navigate;
+  }, []);
+  const openRecord = record
+    ? (id: string) => {
+        if (recordAddress) recordAddress.navigate(id);
+        else addressNavigate.current?.(id);
+      }
+    : undefined;
+  const opensRecord = record !== undefined;
+  const openRef = useRef(openRecord);
+  useEffect(() => {
+    openRef.current = openRecord;
+  });
+
   const columnDefs = useMemo(
     () =>
-      columns.map((column) =>
+      columns.map((column, index) =>
         helper.accessor((row: GridRow) => row[column.field], {
           id: column.field,
           header: column.header,
           size: Math.round(column.widthCh * chPx),
-          cell: (info) => (
-            <TypedCell
-              kind={column.kind}
-              value={info.getValue()}
-              transaction={info.row.original.transaction}
-              lockedReason={info.row.original.locked?.[column.field]}
-            />
-          ),
+          cell: (info) => {
+            const cell = (
+              <TypedCell
+                kind={column.kind}
+                value={info.getValue()}
+                transaction={info.row.original.transaction}
+                lockedReason={info.row.original.locked?.[column.field]}
+                editMode={editable ? editModeFor(column.kind) : undefined}
+              />
+            );
+            if (index !== 0 || !opensRecord) return cell;
+            const id = info.row.original.id;
+            return (
+              <Button
+                variant="link"
+                size="sm"
+                data-record-open={id}
+                onClick={() => openRef.current?.(id)}
+              >
+                {cell}
+              </Button>
+            );
+          },
           meta: {
             headerTitle: column.header,
             headerClassName: column.align === "right" ? "text-right" : "text-left",
@@ -139,7 +244,7 @@ export function DataRegion({
           },
         }),
       ),
-    [columns, chPx],
+    [columns, chPx, editable, opensRecord],
   );
 
   const table = useTable({
@@ -162,11 +267,14 @@ export function DataRegion({
     viewport.setAttribute("aria-label", title);
   });
 
-  const visible = status !== "forbidden";
+  const showsRows = headerShowsRows(status);
   let body: ReactNode;
   if (status === "forbidden") body = <RegionForbidden />;
-  else if (status === "loading") body = <RegionSkeleton columns={columns.length} />;
-  else if (status === "error") body = <RegionError onRetry={retry} />;
+  else if (status === "loading")
+    body = <RegionLoading columns={columns.length} onCancel={onCancel} />;
+  else if (status === "error") body = <RegionError onRetry={onRetry} />;
+  else if (status === "partial" && rows.length === 0)
+    body = <RegionPartialEmpty onRetry={onRetry} />;
   else if (rows.length === 0) body = <RegionEmpty why={emptyWhy} action={emptyAction} />;
   else if (shown.length === 0) body = <RegionNoMatch onClear={() => setQuery("")} />;
   else
@@ -201,14 +309,14 @@ export function DataRegion({
       </span>
       <RegionHeader
         title={title}
-        total={visible && status !== "loading" ? rows.length : undefined}
-        shown={query ? shown.length : undefined}
+        total={showsRows ? rows.length : undefined}
+        shown={showsRows && query ? shown.length : undefined}
         query={query}
         onQuery={setQuery}
-        action={action}
+        action={action?.allowed && status !== "forbidden" ? action.node : undefined}
         searchId={searchId}
       />
-      {status === "partial" ? <RegionPartial onRetry={retry} /> : null}
+      {status === "partial" && rows.length > 0 ? <RegionPartial onRetry={onRetry} /> : null}
       {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
       <div
         ref={boxRef}
@@ -218,6 +326,24 @@ export function DataRegion({
       >
         {body}
       </div>
+      {record && showsRows ? (
+        record.address ? (
+          <PanelFor
+            rows={rows}
+            ids={shown.map((row) => row.id)}
+            record={record}
+            openId={record.address.openId}
+            navigate={record.address.navigate}
+          />
+        ) : (
+          <AddressedPanel
+            rows={rows}
+            ids={shown.map((row) => row.id)}
+            record={record}
+            onReady={onAddressReady}
+          />
+        )
+      ) : null}
     </section>
   );
 }

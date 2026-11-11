@@ -107,45 +107,25 @@ test.describe("grid", () => {
   });
 
   test("loading shows nothing before 1s then skeleton rows", async ({ page }) => {
-    await page.goto(`${GRID}?state=loading`, { waitUntil: "commit" });
+    // The region times its loading steps on its own clock (src/components/candidate/region-state.tsx); the test
+    // drives that clock so the check does not depend on how fast the machine is.
+    await page.clock.install();
+    await page.goto(`${GRID}?state=loading`);
     const skeleton = page.locator('[data-slot="region-skeleton"]');
     await skeleton.waitFor({ state: "attached" });
-    // Measure on the delay's own clock: the frame may remount the skeleton once when it switches to the
-    // phone layout, and the delay then starts again for the element the person actually sees.
-    // Sample inside the page on every frame: the first frame whose delay clock is between 500 ms and 1 s.
-    const early = await page.evaluate(
-      () =>
-        new Promise<{ t: number; v: string }>((resolve) => {
-          const tick = () => {
-            const el = document.querySelector('[data-slot="region-skeleton"]');
-            const t = Number(el?.getAnimations()[0]?.currentTime ?? -1);
-            if (el && t >= 500 && t < 1000) resolve({ t, v: getComputedStyle(el).visibility });
-            else requestAnimationFrame(tick);
-          };
-          tick();
-        }),
-    );
-    expect(early.v).toBe("hidden");
-    // The delay is 1 s with no duration, so its clock stops at exactly 1000 ms when it ends.
-    await expect
-      .poll(() => skeleton.evaluate((el) => el.getAnimations()[0]?.playState ?? "none"), {
-        timeout: 5000,
-      })
-      .toBe("finished");
-    const late = await skeleton.evaluate((el) => ({
-      t: Number(el.getAnimations()[0]?.currentTime ?? -1),
-      v: getComputedStyle(el).visibility,
-    }));
-    expect(late.t).toBeGreaterThanOrEqual(1000);
-    expect(late.v).toBe("visible");
+    await page.clock.runFor(500);
+    await assertSkeletonHiddenEarly(page);
+    await page.clock.runFor(600);
+    await expect(skeleton).toHaveCSS("visibility", "visible");
     await expect(skeleton).toHaveAttribute("data-columns", "9");
   });
 
   test("skeleton check fails when the delay is removed", async ({ page }) => {
-    await page.goto(`${GRID}?state=loading`, { waitUntil: "commit" });
+    await page.clock.install();
+    await page.goto(`${GRID}?state=loading`);
     const skeleton = page.locator('[data-slot="region-skeleton"]');
     await skeleton.waitFor({ state: "attached" });
-    await skeleton.evaluate((el) => el.classList.remove("onehub-reveal-after-1s"));
+    await skeleton.evaluate((el) => el.classList.remove("invisible"));
     await expect(assertSkeletonHiddenEarly(page)).rejects.toThrow("skeleton shown before 1s");
   });
 

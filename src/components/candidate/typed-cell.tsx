@@ -5,7 +5,7 @@ import type { DisplayKind } from "@/generated/display";
 import type { ListingStandardStatus } from "@/generated/ontology";
 import { EMPTY, STATUS_TONE, formatByKind, statusLabel, statusTone } from "@/lib/format";
 
-import { alignFor } from "./column-kind";
+import { alignFor, type EditMode } from "./column-kind";
 import { GRID_COPY } from "./grid-copy";
 import { TruncatedText } from "./truncated-text";
 
@@ -48,11 +48,14 @@ export function TypedCell({
   value,
   transaction,
   lockedReason,
+  editMode,
 }: {
   kind: DisplayKind;
   value: unknown;
   transaction?: "sale" | "lease";
   lockedReason?: string;
+  /** Where this cell is edited, when the region is editable (design/behaviors.md, edit data). */
+  editMode?: EditMode;
 }) {
   const align = alignFor(kind);
   return (
@@ -60,6 +63,7 @@ export function TypedCell({
       data-slot="typed-cell"
       data-kind={kind}
       data-align={align}
+      data-edit={editMode}
       className={
         align === "right"
           ? "flex min-w-0 items-center justify-end gap-1 text-right tabular-nums"
