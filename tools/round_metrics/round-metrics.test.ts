@@ -40,6 +40,8 @@ const MOC = "docs/plan/do-he-design";
 const POST_GATE = ["machine-cleared", "signed-off", "da-cham-boi-thuc-te"];
 // The status line comment of the kit contract template (acceptance-gate 2.38.1 contract-template.md).
 const TEMPLATE_COMMENT = "            # draft | approved | implemented | verified | signed-off";
+// Three ways a status line is written: bare, with the template comment, and quoted (double, single + comment).
+const STATUS_FORMS = (s: string) => [s, `${s}${TEMPLATE_COMMENT}`, `"${s}"`, `'${s}'   # x`];
 
 type Ban = {
   vong_cham: number;
@@ -240,6 +242,26 @@ describe("kiem", () => {
       expect(line).toContain(`round_metrics.py ghi --slug ${c.slug}`);
     }
     expect(red.some((l) => l.startsWith("ui-signed-off:"))).toBe(true);
+  });
+
+  it("kiem: ba dạng viết dòng trạng thái", () => {
+    const root = tempRoot();
+    const o = STATUSES.flatMap((s, i) =>
+      STATUS_FORMS(s).map((status, j) => ({ status, i, slug: `f-${i}-${j}` })),
+    );
+    expect(o.length).toBe(28);
+    for (const c of o) hoSo(root, c.slug, { status: c.status, surfaces: "ui" });
+    const r = run(root, "kiem");
+    const red = r.stdout
+      .trim()
+      .split("\n")
+      .map((l) => l.split(":")[0]);
+    expect(red.sort()).toEqual(
+      o
+        .filter((c) => c.i >= 3)
+        .map((c) => c.slug)
+        .sort(),
+    );
   });
 
   it("kiem: chưa phân tầng, bản cũ, và bản hợp lệ", () => {
@@ -470,15 +492,15 @@ describe("kiem-moc", () => {
           );
         },
       ],
-      // Every post-gate status, bare and with the trailing comment the kit's contract template carries.
-      ...POST_GATE.flatMap((status) =>
-        ["", TEMPLATE_COMMENT].map((comment): [string, (c: ReturnType<typeof mocRepo>) => void] => [
+      // Every post-gate status in every STATUS_FORMS form.
+      ...POST_GATE.flatMap((s) =>
+        STATUS_FORMS(s).map((status): [string, (c: ReturnType<typeof mocRepo>) => void] => [
           "do sau khi 1a gop",
           (c) => {
             mkdirSync(join(c.root, "_acceptance/khung-va-giao-dien"), { recursive: true });
             writeFileSync(
               join(c.root, "_acceptance/khung-va-giao-dien/contract.md"),
-              `---\nslug: khung-va-giao-dien\nstatus: ${status}${comment}\napproved_by:\n---\n`,
+              `---\nslug: khung-va-giao-dien\nstatus: ${status}\napproved_by:\n---\n`,
             );
             git(c.root, "add", ".");
             git(c.root, "commit", "-qm", `1a ${status}`);
@@ -509,10 +531,8 @@ describe("kiem-moc", () => {
   });
 
   it("kiem-moc: 1a còn trước Cổng Bằng chứng thì xanh", () => {
-    const cases = ["draft", "approved", "implemented", "verified"].flatMap((s) =>
-      ["", TEMPLATE_COMMENT].map((comment) => `${s}${comment}`),
-    );
-    expect(cases.length).toBe(8);
+    const cases = ["draft", "approved", "implemented", "verified"].flatMap((s) => STATUS_FORMS(s));
+    expect(cases.length).toBe(16);
     for (const status of cases) {
       const root = mkdtempSync(join(tmpdir(), "round-metrics-1a-"));
       git(root, "init", "-q");

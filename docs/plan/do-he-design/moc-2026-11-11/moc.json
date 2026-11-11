@@ -2,7 +2,7 @@
   "schema": 1,
   "ngay": "2026-11-11",
   "commit": "c706223901220e35f8095854249c171294b79739",
-  "ban_kho": "/private/tmp/claude-501/-Users-manhphan-dev-onehub-inventory--claude-worktrees-recursing-herschel-c4214a/b5157e36-b8ad-4efc-9799-b32ee3ccb9a4/scratchpad/moc-tree",
+  "ban_kho": "/tmp/moc-tree",
   "man": "Liên hệ (danh sách)",
   "de_bai": "docs/plan/do-he-design/de-bai-ba-agent.md",
   "bang_so": "docs/plan/do-he-design/moc-2026-11-11/so-sanh.md",
@@ -64,5 +64,5 @@
       "lech": 28
     }
   },
-  "ghi_chu": "token, luot_cong_cu_do, giay: số harness đo cho từng agent. tong, du, mot_phan, tu_doan_*, luot_cong_cu, tep_doc: số agent tự tổng kết, chép qua bảng so; agent 3 gộp dòng một phần vào tự đoán nên tu_doan không so thẳng giữa ba agent. ket_qua theo ba luật xếp dòng của de-bai-ba-agent.md, lập lại sau vòng chấm 1."
+  "ghi_chu": "token, luot_cong_cu_do, giay: số harness đo cho từng agent. tong, du, mot_phan, tu_doan_*, luot_cong_cu, tep_doc: số agent tự tổng kết, chép qua bảng so; agent 3 gộp dòng một phần vào tự đoán nên tu_doan không so thẳng giữa ba agent. ket_qua theo ba luật xếp dòng của de-bai-ba-agent.md, lập lại sau vòng chấm 1. ban_kho và đường trong câu giao đã gửi được thay bằng /tmp/moc-tree khi dọn đường dẫn máy khỏi kho công khai (11/11); đường thật là một worktree tạm tại commit, đã xoá."
 }

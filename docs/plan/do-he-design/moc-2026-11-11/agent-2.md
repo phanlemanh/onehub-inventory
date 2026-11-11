@@ -1,10 +1,10 @@
 # Phương án agent 2
 
-Bản kho: `/private/tmp/claude-501/-Users-manhphan-dev-onehub-inventory--claude-worktrees-recursing-herschel-c4214a/b5157e36-b8ad-4efc-9799-b32ee3ccb9a4/scratchpad/moc-tree` (commit `c706223`).
+Bản kho: `/tmp/moc-tree` (commit `c706223`).
 
 ## Câu giao đã gửi (nguyên văn)
 
-> Bạn là agent lập trình mới vào kho onehub-inventory ở thư mục `/private/tmp/claude-501/-Users-manhphan-dev-onehub-inventory--claude-worktrees-recursing-herschel-c4214a/b5157e36-b8ad-4efc-9799-b32ee3ccb9a4/scratchpad/moc-tree`. Chỉ đọc tệp trong thư mục đó (node_modules trong đó cũng được), không đọc thư mục nào khác. Hãy lập phương án dựng màn danh sách «Liên hệ» (Contact) cho nhân viên sàn: xem danh sách liên hệ, tìm, lọc, mở hồ sơ một liên hệ. Đọc đúng những gì kho yêu cầu đọc trước khi làm (AGENTS.md, CLAUDE.md và các tệp chúng trỏ tới), như khi bạn sắp dựng thật. Không viết mã, không sửa tệp nào.
+> Bạn là agent lập trình mới vào kho onehub-inventory ở thư mục `/tmp/moc-tree`. Chỉ đọc tệp trong thư mục đó (node_modules trong đó cũng được), không đọc thư mục nào khác. Hãy lập phương án dựng màn danh sách «Liên hệ» (Contact) cho nhân viên sàn: xem danh sách liên hệ, tìm, lọc, mở hồ sơ một liên hệ. Đọc đúng những gì kho yêu cầu đọc trước khi làm (AGENTS.md, CLAUDE.md và các tệp chúng trỏ tới), như khi bạn sắp dựng thật. Không viết mã, không sửa tệp nào.
 >
 > Trả về phương án dưới dạng danh sách quyết định thiết kế. Mỗi quyết định một dòng gồm: tên quyết định, lựa chọn của bạn, căn cứ (đường tệp trả lời quyết định này, hoặc «tự đoán»), và với quyết định tự đoán thì ghi thêm đây là việc hệ thiết kế lẽ ra phải trả lời sẵn hay việc sản phẩm cần người quyết. Tối thiểu phải có các quyết định: bố cục, có tạo khuôn mới không, thành phần bảng, cấu hình bảng, chiều cao dòng, cách nạp dữ liệu, căn cột số, căn cột ngày, bề rộng cột, đường dẫn và mô tả trang, tiêu đề trang, số đếm, trạng thái chờ tải và chưa có dữ liệu, tìm không ra, lỗi tải, định dạng số, định dạng ngày, địa chỉ riêng của hồ sơ, phím Esc và bàn phím, điện thoại, nhãn màn. Thêm mọi quyết định khác bạn phải đưa ra.
 >

@@ -97,7 +97,7 @@ def frontmatter(path: Path) -> dict[str, str]:
 
 
 def frontmatter_text(text: str) -> dict[str, str]:
-    """Top-level keys of a contract frontmatter, with trailing `# comments` removed."""
+    """Top-level keys of a contract frontmatter, without trailing `# comments` or surrounding quotes."""
     m = re.match(r"^---\r?\n(.*?)\r?\n---", text, re.S)
     if not m:
         return {}
@@ -105,7 +105,7 @@ def frontmatter_text(text: str) -> dict[str, str]:
     for line in m.group(1).splitlines():
         key, sep, value = line.partition(":")
         if sep and not line.startswith((" ", "\t")):
-            out[key.strip()] = value.split("#", 1)[0].strip()
+            out[key.strip()] = value.split("#", 1)[0].strip().strip("'\"")
     return out
 
 
