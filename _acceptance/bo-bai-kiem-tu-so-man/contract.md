@@ -5,6 +5,7 @@ slug: bo-bai-kiem-tu-so-man
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
+screens: []
 status: approved
 approved_by: Manh Phan
 approved_at: 2026-11-11
