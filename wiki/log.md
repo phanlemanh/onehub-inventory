@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-11 — Danh mục ReUI (678 khối Pro, 27 thành phần gốc, 1.264 ví dụ) ghim theo bản chụp có băm, tra được tại máy không cần mạng; kiểm trong `make check` đỏ khi có mục tra không ra hoặc lọt mã, khoá — [tools/reui_catalog](../tools/reui_catalog/README.md), hàng 1g
 - 2026-11-10 — Gộp PR thường không còn hỏi người, bốn kiểu gộp trái nếp vẫn hỏi; luật hỏi khi duyệt PR bắt được cờ ở mọi chỗ trong lệnh — user, 2026-11-10
 - 2026-11-10 — Kho chuyển sang công khai theo quyết định của chủ kho; bật luật bảo vệ main, quét bí mật và cảnh báo lỗ hổng — user, 2026-11-10
 - 2026-11-10 — Dữ liệu mẫu theo Vinhomes Ocean Park, căn và liên hệ nối từ đầu — [0020](decisions/0020-linked-sample-data-ocean-park.md)
