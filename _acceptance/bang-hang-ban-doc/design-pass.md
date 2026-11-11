@@ -12,7 +12,7 @@ ds_skill: inventory-ui
 states: [co-du-lieu, cho-tai, trong, tim-khong-ra, loi]
 breakpoints: [mobile-360, mobile-414, desktop-1024, desktop-1440]
 themes: [light, dark]
-patched: 1
+patched: 3
 deferred: 2
 ---
 # design-pass — bang-hang-ban-doc
@@ -71,7 +71,7 @@ trang cho tới khi chủ kho duyệt nhãn (Hỏi-2). Trang ảnh tự chứa (
 - Hướng «Hàng chờ hỗ trợ» (data-grid-base-5) — trục: thanh công cụ dày · động cơ: lọc và ẩn hiện cột ngay trên bảng · đánh đổi: bỏ ô chọn, thao tác hàng loạt, dựng lại trạng thái vùng.
 - Hướng «Thẻ trạng thái» (data-grid-filtering-2) — trục: lọc theo trạng thái là cửa vào · động cơ: thấy ngay bao nhiêu căn mỗi trạng thái · đánh đổi: cần lọc, ngoài phạm vi hàng 2.
 - Hướng «Danh sách tối giản» (data-grid-base-6) — trục: gần khuôn nhất · động cơ: đổi ít · đánh đổi: thêm nút lọc chưa có việc.
-- Máy không khuyên (giám sát dặn chủ kho chọn); câu hỏi nằm trên thẻ.
+- Chủ kho đã chọn («Đúng ý.»): giữ khuôn Lưới, xếp khung theo data-grid-editing-6, chưa thêm chức năng; thẻ điện thoại là hàng riêng sau hàng 3.
 
 ## Cảnh ngữ-cảnh
 
@@ -81,6 +81,8 @@ trang cho tới khi chủ kho duyệt nhãn (Hỏi-2). Trang ảnh tự chứa (
 
 ### Nhóm 1 — vá-được-trong-từ-vựng-token (đã vá tại chỗ)
 
+- Khung vùng xếp theo data-grid-editing-6 bằng Frame của ReUI: dải tên, thanh công cụ ô tìm + số dòng, chân bảng chia trang (việc G-1111-14, Hỏi-4 chủ kho «Đúng ý.»).
+- Chỗ thừa của bảng chia cho cột đang cắt chữ trước; bề rộng cột làm tròn xuống để 1440 không cuộn 1px.
 - Cột chữ rộng theo nội dung thật của vùng (tối đa độ dài đọc, cộng 1ch dư): ở 1440 đủ tám cột, không cuộn; mã căn không còn chiếm chỗ của tên khu (việc G-1111-10).
 
 ### Nhóm 2 — đòi-đổi-DS/component (chờ Gate 1)

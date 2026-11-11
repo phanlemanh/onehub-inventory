@@ -49,7 +49,7 @@
     },
     {
       "id": "OOS-1",
-      "p": "KHÔNG sửa trên ô, KHÔNG mở hồ sơ căn cạnh bảng, KHÔNG lọc hay sắp xếp theo cột, KHÔNG chọn dòng."
+      "p": "KHÔNG sửa trên ô, KHÔNG mở hồ sơ căn cạnh bảng, KHÔNG lọc hay sắp xếp theo cột, KHÔNG chọn dòng; khung xếp theo khối Quỹ hàng chọn nhưng chưa thêm nút lọc, chọn cột, xuất hay dòng tổng."
     },
     {
       "id": "OOS-2",
@@ -65,14 +65,14 @@
     },
     {
       "id": "OOS-5",
-      "p": "KHÔNG làm bảng thẻ trên điện thoại ở hàng này nếu chủ kho chọn theo Hỏi-5; trên điện thoại hôm nay là lưới cuộn ngang trong vùng."
+      "p": "KHÔNG làm bảng thẻ trên điện thoại: chủ kho chốt đó là hàng riêng sau hàng 3 («Đúng ý.»); trên điện thoại hàng này là lưới cuộn ngang trong vùng."
     },
     {
       "id": "OOS-6",
       "p": "KHÔNG sửa hai lỗi nhỏ đã biết của bản chạy chậm của bộ bài kiểm; gặp đỏ giả ở đó thì báo giám sát."
     }
   ],
-  "scope_plain": "Từ Quỹ hàng: Bảng hàng đích là bảng kiểu Sheet (khối data-grid-editing-6, nhóm theo toà, lọc từng cột, góc nhìn lưu) trên máy tính và bảng thẻ trên điện thoại. Bản đọc này giữ lưới, giá, nhãn trạng thái, tìm mã căn và đủ trạng thái màn; phần còn lại hoãn như dưới.",
+  "scope_plain": "Từ Quỹ hàng: Bảng hàng đích là bảng kiểu Sheet (khối data-grid-editing-6, nhóm theo toà, lọc từng cột, góc nhìn lưu) trên máy tính và bảng thẻ trên điện thoại. Chủ kho đã chốt («Đúng ý.»): giữ khuôn Lưới của kho, xếp khung theo khối ấy, chưa thêm chức năng; thẻ điện thoại là hàng riêng sau hàng 3.",
   "coverage_plain": [
     {
       "i": 0,

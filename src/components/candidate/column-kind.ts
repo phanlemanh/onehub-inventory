@@ -65,6 +65,37 @@ export function fittedWidthCh(column: TypedColumn, values: readonly unknown[]): 
   return Math.max(column.header.length, longest) + CELL_PADDING_CH + FIT_SLACK_CH;
 }
 
+/** What a text column would take to show its longest value whole: label or longest value, padding, slack. */
+export function fullWidthCh(column: TypedColumn, values: readonly unknown[]): number {
+  const fitted = fittedWidthCh(column, values);
+  if (!CONTENT_WIDTH_KINDS.includes(column.kind)) return fitted;
+  const lengths = values
+    .filter((v) => v !== null && v !== undefined && v !== "")
+    .map((v) => String(v).length);
+  if (lengths.length === 0) return fitted;
+  return Math.max(fitted, Math.max(...lengths) + CELL_PADDING_CH + FIT_SLACK_CH);
+}
+
+/**
+ * Hands the room a grid has to spare to the columns that cut their text, in order, each up to what shows its longest
+ * value whole. A grid with no room to spare keeps the fitted widths, so nothing is cut that was not cut before.
+ */
+export function spreadSpareCh(
+  fitted: readonly number[],
+  full: readonly number[],
+  containerCh: number | null,
+): number[] {
+  const widths = [...fitted];
+  if (containerCh === null) return widths;
+  let spare = Math.floor(containerCh - widths.reduce((sum, w) => sum + w, 0));
+  for (let i = 0; i < widths.length && spare > 0; i += 1) {
+    const grow = Math.min(spare, Math.max(0, (full[i] ?? 0) - (widths[i] ?? 0)));
+    widths[i] = (widths[i] ?? 0) + grow;
+    spare -= grow;
+  }
+  return widths;
+}
+
 /** Dense only when the columns' minimum width is wider than the content area. */
 export function densityFor(totalMinCh: number, containerCh: number): Density {
   return totalMinCh > containerCh ? "dense" : "normal";

@@ -11,6 +11,7 @@ import {
 import { DataGridPagination } from "@/components/reui/data-grid/data-grid-pagination";
 import { DataGridScrollArea } from "@/components/reui/data-grid/data-grid-scroll-area";
 import { DataGridTable } from "@/components/reui/data-grid/data-grid-table";
+import { Frame, FrameHeader, FramePanel } from "@/components/reui/frame";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -19,12 +20,14 @@ import {
   densityFor,
   editModeFor,
   fittedWidthCh,
+  fullWidthCh,
+  spreadSpareCh,
   type FieldKey,
   type TypedColumn,
 } from "./column-kind";
 import { GRID_COPY, GRID_I18N } from "./grid-copy";
 import { RecordPanel, useRecordAddress, type RecordView } from "./record-panel";
-import { RegionHeader } from "./region-header";
+import { RegionTitle, RegionToolbar } from "./region-header";
 import {
   RegionEmpty,
   RegionError,
@@ -189,7 +192,7 @@ export function DataRegion({
     [rows, columns, query],
   );
   // Widths follow the rows the region holds, not the rows a search leaves, so columns do not jump while typing.
-  const widths = useMemo(
+  const fitted = useMemo(
     () =>
       columns.map((column) =>
         fittedWidthCh(
@@ -199,8 +202,23 @@ export function DataRegion({
       ),
     [columns, rows],
   );
-  const totalMinCh = widths.reduce((sum, w) => sum + w, 0);
+  const full = useMemo(
+    () =>
+      columns.map((column) =>
+        fullWidthCh(
+          column,
+          rows.map((row) => row[column.field]),
+        ),
+      ),
+    [columns, rows],
+  );
+  const totalMinCh = fitted.reduce((sum, w) => sum + w, 0);
   const density = widthCh === null ? "normal" : densityFor(totalMinCh, widthCh);
+  // Spare room on a wide screen goes to columns that cut their text (a long project name), never below the fit.
+  const widths = useMemo(
+    () => spreadSpareCh(fitted, full, widthCh === null ? null : widthCh - 1),
+    [fitted, full, widthCh],
+  );
 
   const recordAddress = record?.address;
   const addressNavigate = useRef<((id: string | null) => void) | null>(null);
@@ -225,7 +243,7 @@ export function DataRegion({
         helper.accessor((row: GridRow) => row[column.field], {
           id: column.field,
           header: column.header,
-          size: Math.round((widths[index] ?? column.widthCh) * chPx),
+          size: Math.floor((widths[index] ?? column.widthCh) * chPx),
           cell: (info) => {
             const cell = (
               <TypedCell
@@ -256,7 +274,7 @@ export function DataRegion({
           },
         }),
       ),
-    [columns, chPx, editable, opensRecord],
+    [columns, chPx, editable, opensRecord, widths],
   );
 
   const table = useTable({
@@ -304,40 +322,55 @@ export function DataRegion({
           </DataGridScrollArea>
         </DataGridContainer>
         {shown.length > pageSize ? (
-          <DataGridPagination
-            sizes={[pageSize]}
-            rowsPerPageLabel={GRID_I18N.labels?.rowsPerPage}
-            previousPageLabel={GRID_I18N.labels?.previousPage}
-            nextPageLabel={GRID_I18N.labels?.nextPage}
-          />
+          <div data-slot="region-footer" className="border-t px-3 py-2">
+            <DataGridPagination
+              sizes={[pageSize]}
+              rowsPerPageLabel={GRID_I18N.labels?.rowsPerPage}
+              previousPageLabel={GRID_I18N.labels?.previousPage}
+              nextPageLabel={GRID_I18N.labels?.nextPage}
+            />
+          </div>
         ) : null}
       </DataGrid>
     );
 
   return (
-    <section data-slot="data-region" className="flex min-w-0 flex-col gap-4">
+    <section data-slot="data-region" className="flex min-w-0 flex-col">
       <span ref={chRef} aria-hidden="true" className="invisible absolute">
         0
       </span>
-      <RegionHeader
-        title={title}
-        total={showsRows ? rows.length : undefined}
-        shown={showsRows && query ? shown.length : undefined}
-        query={query}
-        onQuery={setQuery}
-        action={action?.allowed && status !== "forbidden" ? action.node : undefined}
-        searchId={searchId}
-      />
-      {status === "partial" && rows.length > 0 ? <RegionPartial onRetry={onRetry} /> : null}
-      {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
-      <div
-        ref={boxRef}
-        data-slot="data-region-body"
-        data-density={density}
-        className="w-0 min-w-full"
-      >
-        {body}
-      </div>
+      {/* Arrangement after data-grid-editing-6: name on the frame's header strip; toolbar, table and pages in one panel. */}
+      <Frame className="min-w-0">
+        <FrameHeader>
+          <RegionTitle title={title} />
+        </FrameHeader>
+        <FramePanel className="flex min-w-0 flex-col gap-3 p-0">
+          <div className="px-3 pt-3 empty:hidden">
+            <RegionToolbar
+              total={showsRows ? rows.length : undefined}
+              shown={showsRows && query ? shown.length : undefined}
+              query={query}
+              onQuery={setQuery}
+              action={action?.allowed && status !== "forbidden" ? action.node : undefined}
+              searchId={searchId}
+            />
+          </div>
+          {status === "partial" && rows.length > 0 ? (
+            <div className="px-3">
+              <RegionPartial onRetry={onRetry} />
+            </div>
+          ) : null}
+          {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
+          <div
+            ref={boxRef}
+            data-slot="data-region-body"
+            data-density={density}
+            className="w-0 min-w-full"
+          >
+            {body}
+          </div>
+        </FramePanel>
+      </Frame>
       {record && showsRows ? (
         record.address ? (
           <PanelFor

@@ -96,12 +96,13 @@ có phép đo — vai thật chưa nối vào khung.
 
 ## Out of scope
 
-- Không sửa trên ô (B4), không hồ sơ căn cạnh bảng (hàng 3), không lọc hay sắp xếp theo cột, không chọn dòng.
+- Không sửa trên ô (B4), không hồ sơ căn cạnh bảng (hàng 3), không lọc hay sắp xếp theo cột, không chọn dòng; khung xếp
+  theo `data-grid-editing-6` mà chưa thêm chức năng nào của nó (Hỏi-4): không nút lọc, chọn cột, xuất, không dòng tổng.
 - Không nút «Thêm dòng» hay nhập tệp ở trạng thái trống: chưa có lối nhập; câu trống chỉ nói vì sao.
 - Không đọc cơ sở dữ liệu, không bắt đăng nhập, không gắn vai thật vào vùng (hàng 8, 9a).
 - Không màn Đã gửi: vẫn trong danh sách «chưa có vùng».
-- Không bảng thẻ trên điện thoại (khối Quỹ hàng `product-grid-4`): Hỏi-5 quyết hàng nào làm; hàng này trên điện thoại là lưới
-  cuộn ngang trong vùng.
+- Không bảng thẻ trên điện thoại (khối Quỹ hàng `product-grid-4`): chủ kho chốt là hàng riêng sau hàng 3 (Hỏi-5); hàng này
+  trên điện thoại là lưới cuộn ngang trong vùng.
 - Không sửa hai lỗi nhỏ đã biết của bản chạy chậm của bộ bài (1f): gặp đỏ giả ở đó thì báo giám sát.
 
 ## Notes

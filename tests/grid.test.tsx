@@ -14,6 +14,8 @@ import {
   densityFor,
   DENSITY_ROW_CLASS,
   fittedWidthCh,
+  fullWidthCh,
+  spreadSpareCh,
   typedColumn,
   type TypedColumnSpec,
 } from "../src/components/candidate/column-kind";
@@ -589,5 +591,43 @@ describe("content-fitted width of text columns", () => {
     expect(() => checkSteady(before, widthsOf(some.container), "search")).toThrow(
       "width follows the shown rows: search",
     );
+  });
+});
+
+describe("spare room goes to columns that cut their text", () => {
+  type Spread = typeof spreadSpareCh;
+  // Written ahead: fitted widths, widths that show every value whole, room in ch, expected widths.
+  const MATRIX: [string, number[], number[], number | null, number[]][] = [
+    ["room for every cut column", [7, 10, 19, 11], [7, 10, 36, 11], 80, [7, 10, 36, 11]],
+    ["room for part of the cut", [7, 10, 19, 11], [7, 10, 36, 11], 55, [7, 10, 27, 11]],
+    ["no room keeps the fit", [7, 10, 19, 11], [7, 10, 36, 11], 40, [7, 10, 19, 11]],
+    ["width not measured yet keeps the fit", [7, 19], [7, 36], null, [7, 19]],
+    ["first cut column first", [19, 19], [30, 30], 50, [30, 20]],
+  ];
+
+  function checkSpread(spread: Spread): void {
+    for (const [name, fitted, full, room, want] of MATRIX) {
+      const got = spread(fitted, full, room);
+      if (got.join() !== want.join())
+        throw new Error(`spare room: ${name} (${got.join()} != ${want.join()})`);
+    }
+  }
+
+  it("grows cut columns up to their whole text, never past the room, never below the fit", () => {
+    expect(MATRIX.length).toBe(5);
+    expect(() => checkSpread(spreadSpareCh)).not.toThrow();
+    const place = typedColumn({ field: "Listing.subdivisionName", header: "Khu" });
+    expect(fullWidthCh(place, ["Vinhomes Ocean Park 2 – The Empire", "Ocean"])).toBe(37);
+    expect(fullWidthCh(place, ["Ocean"])).toBe(fittedWidthCh(place, ["Ocean"]));
+  });
+
+  it("fails when spare room is ignored (the long project name stays cut on a wide screen)", () => {
+    const ignore: Spread = (fitted) => [...fitted];
+    expect(() => checkSpread(ignore)).toThrow("spare room: room for every cut column");
+  });
+
+  it("fails when spare room overflows the grid", () => {
+    const greedy: Spread = (_fitted, full) => [...full];
+    expect(() => checkSpread(greedy)).toThrow("spare room: room for part of the cut");
   });
 });

@@ -66,6 +66,33 @@ ký `bang-hang-kieu-sheet` (hàng 14) và `bang-hang-dang-the` (hàng 32).
   dòng tổng, số thứ tự dòng, ô chọn, nút cột · cài đặt · xuất, cuộn liền thay chia trang, và không có trạng thái vùng.
   Dựng theo nó thì phải đổi khuôn đã ký cho mọi màn Lưới (Hỏi-4).
 
+## Xếp khung theo data-grid-editing-6 (Hỏi-4 đã trả lời)
+
+Chủ kho, «Đúng ý.»: giữ khuôn Lưới của kho (mọi trạng thái vùng và bài kiểm), xếp khung viền, thanh công cụ và chân bảng
+theo `data-grid-editing-6`, chưa thêm chức năng. Thành phần giữ nguyên như ReUI giao (`Frame`, `DataGrid`); mỗi vùng của
+khối lấy hay bỏ:
+
+| Vùng của khối | Lấy / bỏ | Vì sao |
+|---|---|---|
+| Khung viền bao trọn vùng, dải đầu mang tên vùng | lấy | gom tên, công cụ, bảng, chân vào một khối nhìn được như bảng tính |
+| Dòng tóm tắt dưới tên (số cần xem, tổng tiền) | bỏ | bản đọc chưa có số tóm tắt nào ngoài số dòng |
+| Thanh công cụ: ô tìm bên trái, số dòng ngay cạnh | lấy | đúng việc tìm mã căn; số dòng đứng cạnh ô tìm như khối |
+| Hoàn tác, làm lại | bỏ | bản đọc không sửa |
+| Nút Lọc, Cột, Cài đặt, Xuất | bỏ | chưa có chức năng (lọc, chọn cột là hàng sau) |
+| Cột số thứ tự dòng, ô chọn dòng, chữ cái tên cột | bỏ | không chọn dòng, không công thức |
+| Chân bảng: dòng tổng | bỏ | chưa có dòng tổng |
+| Chân bảng trong khung, có viền trên | lấy | chỗ của thanh chia trang 25 dòng (Hỏi-1) |
+| Thanh gợi ý «chọn ô để xem» | bỏ | không chọn ô |
+| Cuộn liền thay chia trang | bỏ | cỡ trang chốt ở Hỏi-1 |
+
+Bề rộng: cột Toà rộng 15 ký tự ở mọi khổ vì tên toà mẫu của Ocean Park 2, 3 là «[MAU] Toà E1» (nhãn mẫu bắt buộc), nằm ở
+trang 3; bề rộng tính trên mọi dòng nên không nhảy khi sang trang. Tên khu dài bị cắt ở 1440 chỉ khi không còn chỗ thừa:
+khi bảng hẹp hơn vùng, chỗ thừa chia cho cột đang cắt chữ trước (đến đủ chữ); ở 1440 tám cột đã dùng hết bề ngang nên tên
+dài «Vinhomes Ocean Park 2 – The Empire» vẫn cắt, đọc đủ khi rê hay tới bằng phím (trạng thái chữ dài).
+
+Bản điện thoại (Hỏi-5 đã trả lời, «Đúng ý.»): thẻ điện thoại là một hàng riêng sau hàng 3; hàng này trên điện thoại là
+lưới cuộn ngang trong vùng.
+
 ## Vai × Màn
 
 Bản khai vai (`ontology/roles.yaml`) nói Quản trị sàn «không thấy hàng theo mặc định». Hôm nay chưa có vai thật của người
