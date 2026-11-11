@@ -5,7 +5,7 @@ slug: cach-ly-moi-san
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: docs/superpowers/specs/2026-11-11-cach-ly-moi-san-design.md
@@ -93,3 +93,26 @@ Quét không gian bằng morphological-scan (preset test-matrix), bốn trục:
   `packages/api/src/one-door.test.ts` (bộ quét), `packages/db/tests/isolation.test.mjs` (các ca đọc, ghi chéo sàn),
   `packages/db/scripts/migrate.mjs` (luật áp migration).
 - Bộ kiểm chạy trên container `onehub-inventory-db-n` (`make db-up DB_LANE=n DB_PORT=5563`).
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-2: Các ghi chú trong tệp nền chỉ người viết mã về sau sang chỉ dẫn nhầm nơi, người dùng cuối không bị ảnh hưởng gì.
+  - Ngoài-3: Bộ kiểm cách ly giữa các sàn chưa tự chạy mỗi lần gộp mã, nên một thay đổi làm hở dữ liệu giữa các sàn có thể lọt nếu không ai chạy tay.
+  - Ngoài-7: Bộ kiểm tự đỏ chưa thử hết các kiểu phá luật, nên một lỗi trong chính bộ kiểm có thể không bị phát hiện.
+  - Ngoài-10: Mã nghiệp vụ viết sai hoặc cố ý có thể tự thoát khỏi vai hạn chế và nhìn thấy dữ liệu của sàn khác. Hiện chưa có mã nào làm vậy, nhưng nền chưa chặn được.
+  - Ngoài-11: Khi một lần huỷ giao dịch cũng lỗi, kết nối nửa chừng có thể quay lại bể và một yêu cầu sau dùng nhầm trạng thái của sàn trước. Trường hợp này hiếm.
+  - Ngoài-12: Sàn đối tác đọc được cả dòng thoả thuận của sàn kia, gồm tên người duyệt và điều khoản riêng, dù mô hình nghiệp vụ chưa mô tả quyền này.
+  - Ngoài-13: Về sau một thay đổi chỉ chạm cửa truy vấn hoặc bộ kiểm cách ly có thể được gộp mà không cần chủ kho duyệt, làm yếu luật cách ly giữa các sàn.
+  - Ngoài-15: Hồ sơ nghiệm thu mô tả sai cách giữ luật cách ly và xếp nhầm một việc đã làm vào mục không làm, người duyệt có thể hiểu sai.
+  - Ngoài-16: Một vài dạng luật mở quá rộng chưa có ca thử chứng minh bộ kiểm sẽ báo đỏ, nên chưa chắc chặn được.
+  - Ngoài-17: Một bản phá thử thêm sau có thể quên đăng ký mà không ai biết, nên bộ kiểm có thể báo đạt dù thực ra chưa được thử.
+  - Ngoài-18: Mã nghiệp vụ viết sau này về lý thuyết có thể tự đổi sàn hoặc thoát khỏi lớp cách ly giữa chừng, và hiện chưa có lưới nào bắt việc đó. Hiện chưa có đường truy vấn thật nên chưa ai bị ảnh hưởng.
+  - Ngoài-21: Mô hình dữ liệu thoả thuận trong cơ sở dữ liệu còn lệch với mô tả nghiệp vụ và một quyết định cũ, nên người đọc sau có thể hiểu sai quy tắc.
+  - Ngoài-22: Một người viết mã sau này có thể mở kết nối ngoài cửa bằng cách đặt tên khác mà bộ quét không phát hiện, làm mất lớp bảo vệ cách ly ở mã nguồn.
+  - Ngoài-23: Module khác về lý thuyết có thể tự dựng một cửa thứ hai thay vì dùng cửa chung, làm luật cách ly nằm ở hai nơi.
+  - Ngoài-24: Người viết bảng mới sau này có thể đi tìm bộ kiểm ở chỗ không tồn tại trong kho này.
+  - Ngoài-25: Một số tên tệp và hàm kiểm dùng tiếng Việt trái quy ước đặt tên tiếng Anh của kho, nhưng người dùng cuối không thấy gì.
+  - Ngoài-26: Thẻ duyệt hiện việc chặn mã mở kết nối ngoài cửa dưới mục không làm, người duyệt có thể tưởng nó bị cắt.
+  - Ngoài-28: Trong tình huống hiếm khi việc huỷ giao dịch cũng lỗi, một kết nối nửa chừng có thể bị dùng lại cho yêu cầu của sàn khác.
+  - Ngoài-29: Bản phá thử có thể báo đỏ vì một lý do không liên quan mà vẫn được tính là đã bắt đúng lỗi, nên độ tin cậy của lưới kiểm kém hơn vẻ ngoài.
+  - Ngoài-31: Nếu bộ quét bỏ sót một bảng công ty, bộ kiểm vẫn xanh mà không ai nhận ra số bảng bị thiếu.
+  - Ngoài-32: Một số kiểu mở kết nối trái phép chưa có ví dụ chứng minh bộ quét bắt được, nên lưới có thể có lỗ chưa ai thử.
+  - Ngoài-33: Cửa truy vấn chưa từng được chạy thật trên cơ sở dữ liệu thật, nên hành vi thật của nó chưa được xác nhận.
