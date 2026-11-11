@@ -1,41 +1,6 @@
 {
   "feature_plain": "Cổng chứng minh màn bắt mọi vòng dựng màn đi đúng thang «kho trước, ReUI sau, tạo tay cuối», bày ứng viên ReUI cho chủ kho chọn, và ghi mỗi thứ mới nhập kho vào một sổ khối.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ áp luật mới cho mọi vòng chưa qua Cổng Phạm vi, còn ba vòng đã qua (App Shell, Mời người, Vá đăng nhập) giữ luật cũ; bài kiểm cũ của cổng giữ nguyên từng chữ."},
-    {"id": "AC-2", "p": "Sẽ báo đỏ khi một vòng ghi «có sẵn trong kho» cho khối chính nó vừa tạo, hay cho khối chưa từng được chủ kho duyệt nhập kho."},
-    {"id": "AC-3", "p": "Sẽ báo đỏ khi màn mới hay khối mới thiếu hai đến ba ứng viên ReUI kèm ảnh, hoặc khối ReUI đem về không phải ứng viên chủ kho chọn."},
-    {"id": "AC-4", "p": "Sẽ báo đỏ khi khối ReUI đem về thiếu lý do cho từng vùng lấy, bỏ, thêm, hoặc bỏ quá nửa mà vẫn gọi là «chọn khối»."},
-    {"id": "AC-5", "p": "Sẽ có sổ khối của kho: mỗi thứ nhập kho một dòng (là gì, từ khối ReUI nào hay tạo tay, cho nhu cầu gì, chủ kho duyệt ngày nào); hai dòng cùng một nhu cầu thì đỏ."},
-    {"id": "AC-6", "p": "Sẽ báo đỏ khi hồ sơ màn không có mục «Từ Quỹ hàng» trỏ trang sổ bối cảnh của màn (hoặc ghi rõ vì sao chưa có trang)."},
-    {"id": "AC-7", "p": "Sẽ báo đỏ khi hồ sơ màn không ghi họ của màn và lối suy ra, hay ghi lệch với sổ màn."},
-    {"id": "AC-8", "p": "Sẽ cho App Shell một lối chứng minh riêng: vòng dựng App Shell không còn bị đòi chứng minh các màn nó bọc; chỉ tên khuôn bọc có trong danh sách người giữ mới được đi lối này."},
-    {"id": "AC-9", "p": "Sẽ chạy cổng mới trên chính kho trong bộ kiểm thường ngày, và khuôn tệp chứng minh điền đúng cách thì qua."},
-    {"id": "AC-10", "p": "Sẽ sửa luật giao diện của kho: bỏ câu «chuyển thể khối chỉ đổi dữ liệu, chữ, tham số», thay bằng luật ba tầng, thang ba bậc và thứ tự đọc tài liệu Quỹ hàng."}
-  ],
-  "scope_plain": "Năm việc để ngoài vòng này:",
-  "wont_do": [
-    {"id": "OOS-1", "p": "Không in ảnh ứng viên lên thẻ cổng — chờ bộ thẻ của kit; người mở ảnh trong hồ sơ."},
-    {"id": "OOS-2", "p": "Không để máy phán ảnh có đúng khối, vùng kê đủ chưa, hai nhu cầu có trùng nghĩa không — chủ kho soi ở Cổng Phạm vi."},
-    {"id": "OOS-3", "p": "Không dò xem vòng có đổi dòng sổ màn không; cổng đòi ghi họ cho mọi màn của vòng."},
-    {"id": "OOS-4", "p": "Không ghi sẵn khuôn Lưới, App Shell, đăng nhập, Thành viên vào sổ khối — các hàng của chúng nhập khi tới lượt."},
-    {"id": "OOS-5", "p": "Không sửa sổ màn, hồ sơ của hàng khác, hay lời tiêu chí đã ký của cổng cũ."}
-  ],
-  "coverage_plain": [
-    {"i": 0, "p": "Bảy điều của lời giao, mỗi điều một tiêu chí riêng (AC-2 đến AC-8)."},
-    {"i": 1, "p": "Ba lớp hồ sơ — giữ luật cũ, theo luật mới, đã đóng — được thử bằng một ma trận viết trước (AC-1)."},
-    {"i": 2, "p": "Mỗi nấc của hồ sơ, từ nháp tới đã ký, biết rõ mục nào bị đòi lúc nào (AC-1, AC-3, AC-6, AC-7)."},
-    {"i": 3, "p": "Mọi bậc của một khối — thành phần nhà cung cấp, đã nhập kho, vừa tạo, chưa nhập, không có, ReUI, tạo tay — đều có ca thử (AC-2 đến AC-5)."},
-    {"i": 4, "p": "Bốn lối của màn, kể cả lối khuôn bọc mới, đều có ca thử (AC-3, AC-7, AC-8, AC-9)."},
-    {"i": 5, "p": "Ba lối của cổng cũ giữ nguyên: bài cũ không sửa chữ nào (AC-1)."},
-    {"i": 6, "p": "Thử ở kho mẫu, trên chính kho, và trên khuôn tệp chứng minh (AC-9)."},
-    {"i": 7, "p": "Người đọc luật giao diện là tác tử dựng màn; hội đồng chấm đọc lại luật (AC-10)."},
-    {"i": 8, "p": "Năm chỗ máy không đo được ghi rõ là việc chủ kho soi, không giả làm phép đo."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Lý do giữ luật cũ cho ba vòng đã qua cổng trích sai câu; đã sửa: trích lời giao và tin đồng ý của giám sát. Lỗ còn lại (App Shell nhập kho mà không bị ép ghi sổ) giám sát nhắc dãy làm App Shell ghi tay; vòng sau dùng App Shell sẽ thấy đỏ chứ không lọt im."},
-    {"i": 1, "p": "Lối khuôn bọc để mở thì vòng màn nào cũng né được cổng; đã sửa: chỉ tên có trong danh sách người giữ (mở bằng App Shell) mới được đi lối này."},
-    {"i": 2, "p": "Lời hứa «bài cũ không sửa chữ nào» chưa đo được; đã sửa: bài mới để tệp riêng và bài kiểm ghim dấu vân tay của tệp bài cũ."},
-    {"i": 3, "p": "Chưa ghim mục nào bị đòi ở nấc nào; đã sửa: thêm bảng thử 2 nấc × 8 mục, mỗi ô ghim đỏ hay im."},
-    {"i": 4, "p": "Dòng thước «cùng một nhu cầu» hứa quá phần máy đo; đã sửa: máy chỉ đo cùng khoá, trùng nghĩa dưới khoá khác ghi là chủ kho soi."}
+  "decisions": [
+    {"id": "E10", "q": "Luật giao diện mới đã nói đủ thang ba bậc, ba tầng và cách đọc Quỹ hàng chưa?", "why": "Ba người chấm đọc luật như một tác tử dựng màn; cả ba thấy đủ sáu điều, kèm dòng trích."}
   ]
 }
