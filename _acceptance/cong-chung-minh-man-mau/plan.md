@@ -1,5 +1,7 @@
 # Kế hoạch — cong-chung-minh-man-mau
 
+Duyệt kế hoạch (Gate 1.5): Manh Phan, 2026-11-11.
+
 Thiết kế: [design.md](design.md) · hợp đồng: [contract.md](contract.md) · bộ đo: [evals.yaml](evals.yaml).
 
 Mọi việc tuần tự trong một phiên (các việc dùng chung bộ đọc của lưới nên không tách song song). Kiểm từng việc:

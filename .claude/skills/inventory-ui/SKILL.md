@@ -25,6 +25,28 @@ Read only what the task needs, in this order:
 
 Brand (logo, colours, type, tone): OneHub DS. Behaviour and accessibility: shadcn on Base UI. Dense blocks: ReUI. Everything else: Tailwind and shadcn defaults. A deviation needs a line in `design/decisions.yaml`.
 
+## Prove the screen before you present it
+
+A round that lists a product screen in its contract's `screens:` proves it in `_acceptance/<slug>/chung-minh-man.md`
+(decision 0019). Copy the template `tools/proof_gate/khuon-chung-minh.md`; keep its section names, column names and
+result words exactly. You do not choose the path — `design/screens.yaml` and the family file `design/patterns/<family>.md`
+do:
+
+- **New family** (no family, or no family file): `### Hướng`, two or three really different directions, one image each,
+  one marked chosen. Needed once the contract is approved.
+- **New reference** (the family file says `Màn: chưa có`, or names this screen): `### Ma trận trạng thái`, every state of
+  `design/states.md` passed with a real test file, or not applicable with a reason. Then change the line to
+  `Màn: <screen id>` in the same round.
+- **Follows the reference**: `### Ảnh cạnh màn mẫu` (one PNG pair per width in the family's `## Khổ so`, same data) and
+  `### Mặt so` (every aspect of the family). `giống` points at an image (`ảnh 1440`), never at a component name;
+  `khác — có lý do` points at a real file or decision; fix every `khác — vô cớ` before you present.
+
+Every path lists its blocks in `### Khối` with the rung `trong-kho`, `reui` or `ve-tay`. Leaving `trong-kho` needs what
+you searched, the nearest candidate (a real name in the registry or in `design/reui-catalog.json`, searched offline with
+`tools/reui_catalog`) and why it does not fit. The whole proof is needed once the contract is `implemented`.
+
+Check yourself with `python3 tools/proof_gate/check.py --root .` (it also runs in `make test`).
+
 ## Before you finish
 
 - `make check`, then `make e2e` for visible changes.
