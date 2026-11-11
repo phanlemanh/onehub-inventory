@@ -1,0 +1,170 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hồ sơ · va-dang-nhap</title>
+<style>
+:root{--bg:#faf9f6;--card:#fff;--bd:#e6e4de;--ink:#1f1f1d;--mut:#6c6a64;--hint:#9a988f}
+*{box-sizing:border-box}body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);margin:0;line-height:1.5;font-size:15px}
+.wrap{max-width:920px;margin:0 auto;padding:24px 20px 64px}
+h1{font-size:20px;margin:0 0 2px}h2{font-size:15px;margin:30px 0 10px;letter-spacing:.02em}
+.sub{font-size:13px;color:var(--mut)}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:3px 11px;border-radius:999px;vertical-align:middle}
+.pass{background:#E1F5EE;color:#085041}.pend{background:#FAEEDA;color:#633806}.rej{background:#FAECE7;color:#712B13}.neutral{background:#f1efe8;color:#444441}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--mut);margin-top:6px}
+.meta b{color:var(--ink);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--bd)}th{color:var(--mut);font-weight:600;font-size:12px}
+td a{color:#185FA5;text-decoration:none}.mono{font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.eval{scroll-margin-top:14px}.eval h3{font-size:14px;margin:0 0 4px}.eval .crit{font-size:13px;color:var(--mut);margin:0 0 8px}
+pre.out{background:#1f1f1d;color:#e8e6df;border-radius:8px;padding:11px 13px;overflow:auto;max-height:280px;font-size:12px;margin:8px 0}
+.kv{font-size:12px;color:var(--mut);display:flex;flex-wrap:wrap;gap:4px 16px;margin:6px 0}.kv b{color:var(--ink)}
+.shot img{display:block;max-width:100%;border:1px solid var(--bd);border-radius:8px}
+.slide{position:relative}.slide .frame{position:absolute;inset:0;opacity:0;transition:opacity .35s}.slide .frame:first-child{position:relative}.slide .frame.on{opacity:1}
+.slidebar{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--mut);margin-top:6px}
+.btn{font-size:12px;padding:4px 11px;border:1px solid var(--bd);border-radius:7px;background:#fff;cursor:pointer}
+.ov{background:#FAEEDA;color:#633806;border-radius:7px;padding:6px 10px;font-size:12px;display:inline-block}
+.ovok{background:#E1F5EE;color:#085041}
+.note{font-size:13px;color:var(--mut)}.flag{font-size:13px;border-radius:8px;padding:8px 11px;margin:6px 0}
+.fred{background:#FAECE7;color:#712B13}.fok{background:#E1F5EE;color:#085041}
+.foot{margin-top:30px;padding-top:14px;border-top:1px solid var(--bd);font-size:12px;color:var(--hint)}
+ul.ck{list-style:none;padding:0;margin:0}ul.ck li{padding:5px 0;font-size:14px}ul.ck input{margin-right:8px}
+.tl{border-left:2px solid var(--bd);padding-left:14px;margin:0}.tl li{font-size:13px;margin:0 0 6px;list-style:none}
+.dai{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 8px}
+.o{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:8px 11px;min-width:0}
+.o .hoi{font-size:11px;color:var(--mut);text-transform:none;letter-spacing:.02em}
+.o .tra{font-size:13px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.vang{color:var(--hint);font-style:italic}
+.chu-kho{font-size:12px;color:var(--mut);display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 10px}.chu-kho b{color:var(--ink)}
+details.muc{background:var(--card);border:1px solid var(--bd);border-radius:12px;margin:0 0 10px;padding:0 14px}
+details.muc>summary{cursor:pointer;font-weight:600;font-size:14px;padding:11px 0}
+details.muc[open]>summary{border-bottom:1px solid var(--bd);margin-bottom:10px}
+details.muc .noi{padding:0 0 12px;font-size:13px}
+.loc{display:flex;gap:6px;margin:0 0 8px}.loc .btn[aria-pressed="true"]{background:#1f1f1d;color:#fff}
+.tl li[hidden]{display:none}
+@media (max-width:720px){.dai{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<h1>Sau khi đăng nhập người dùng không bao giờ bị đưa sang trang ngoài, bấm Đăng xuất mà lỗi thì được báo rõ, và người không còn thuộc sàn nào có lối thoát khỏi màn chọn sàn</h1><div class="sub">Trang hồ sơ · <span class="mono">va-dang-nhap</span> · tier T3</div>
+<section class="dai" aria-label="Hồ sơ trong một phút"><div class="o" data-o="da_giao" data-nguon="contract.md"><div class="hoi">Đã giao gì</div><div class="tra">Sau khi đăng nhập người dùng không bao giờ bị đưa sang trang ngoài, bấm Đăng xuất mà lỗi thì được báo rõ, và người không còn thuộc sàn nào có lối thoát khỏi màn chọn sàn</div></div><div class="o" data-o="vi_sao" data-nguon="opportunity.md"><div class="hoi">Vì sao</div><div class="tra">Bốn mục ngoài hợp đồng của hàng 8, ba lỗ an toàn của phần đăng nhập. Chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng ngày 11/11/2026. Phải xong trước hàng đầu tiên đọc dữ liệu thật</div></div><div class="o" data-o="trang_thai" data-nguon="contract.md"><div class="hoi">Trạng thái</div><div class="tra">Đang làm</div></div><div class="o" data-o="ngay" data-nguon="contract.md"><div class="hoi">Ngày</div><div class="tra">2026-11-11</div></div><div class="o" data-o="production" data-nguon="decisions.jsonl"><div class="hoi">Đã lên production chưa</div><div class="tra">chưa ghi quan sát production</div></div><div class="o" data-o="do_gi" data-nguon="opportunity.md"><div class="hoi">Sẽ đo gì, khi nào</div><div class="tra">… — hạn …</div></div><div class="o" data-o="ket_qua" data-nguon="uat-session.md"><div class="hoi">Kết quả</div><div class="tra">chưa đo</div></div><div class="o" data-o="chua_lam" data-nguon="contract.md"><div class="hoi">Chưa làm gì</div><div class="tra">5 mục để ngoài phạm vi · 0 giới hạn đã biết</div></div><div class="o" data-o="ai_quyet" data-nguon="contract.md"><div class="hoi">Ai quyết</div><div class="tra">Cổng Đáng: Manh Phan · Cổng Phạm vi: Manh Phan · Cổng Bằng chứng: chưa ký</div></div></section>
+<div class="chu-kho" data-chu-kho><span data-k="tieu_chi">Tiêu chí <b>8</b></span><span data-k="phep_do">Phép đo <b>16</b></span><span data-k="luot_cham">Lượt chấm <b>2</b></span><span data-k="token">Token <b>98.553</b></span><span data-k="quyet_dinh_may">Quyết định máy <b>13</b></span><span data-k="quyet_dinh_nguoi">người <b>2</b></span><span data-k="ma">Mã <b>1194e61</b></span></div>
+<details class="muc" id="vi-sao"><summary>Vì sao làm</summary><div class="noi"><p>Bốn mục ngoài hợp đồng của hàng 8, ba lỗ an toàn của phần đăng nhập. Chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng ngày 11/11/2026. Phải xong trước hàng đầu tiên đọc dữ liệu thật</p></div></details>
+<details class="muc" id="da-hua"><summary>Đã hứa</summary><div class="noi"><ol class="hua"><li data-ac="AC-1"><b>AC-1</b> — Given ma trận viết trước gồm 14 dạng lách (địa chỉ tuyệt đối, giao thức khác, hai gạch, gạch ngược ở đầu hay</li><li data-ac="AC-2"><b>AC-2</b> — Given người đã đăng nhập và có sàn, hoặc người đang đăng nhập, When mở `/login` với đường trở về mang tab hay</li><li data-ac="AC-3"><b>AC-3</b> — Given người đã đăng nhập đang ở một trang của ứng dụng, When bấm «Đăng xuất» mà mạng đứt hoặc máy chủ trả lỗi,</li><li data-ac="AC-4"><b>AC-4</b> — Given người đã đăng nhập, When bấm «Đăng xuất» và máy chủ xoá phiên được, Then người về `/login` bước nhập</li><li data-ac="AC-5"><b>AC-5</b> — Given người đã đăng nhập rồi bị gỡ khỏi mọi sàn mà phiên còn, When mở `/login`, Then màn không hiện danh sách sàn</li><li data-ac="AC-6"><b>AC-6</b> — Given màn ở trạng thái hết sàn khi còn phiên, When bấm «Đăng xuất» mà mạng đứt hoặc máy chủ trả lỗi, Then người</li><li data-ac="AC-7"><b>AC-7</b> — Given ba lỗ đã vá, When chạy lại bài kiểm của hàng 8 (cơ sở dữ liệu và trình duyệt), bộ kiểm cách ly, bài quét</li><li data-ac="AC-8"><b>AC-8</b> — Given trạng thái hết sàn khi còn phiên và câu báo đăng xuất lỗi, ở bốn khổ 360, 414, 1024, 1440, sáng và tối,</li></ol></div></details>
+<details class="muc" id="thiet-ke"><summary>Thiết kế</summary><div class="noi"><p class="mono" data-design-doc>docs/superpowers/specs/2026-11-11-va-dang-nhap-design.md</p></div></details>
+<details class="muc" id="quyet-dinh"><summary>Quyết định</summary><div class="noi"><div class="loc" role="group" aria-label="Lọc quyết định"><button class="btn" data-loc="tat-ca" aria-pressed="true">Tất cả 15</button><button class="btn" data-loc="may" aria-pressed="false">Máy 13</button><button class="btn" data-loc="nguoi" aria-pressed="false">Người 2</button></div><ol class="tl" data-dong-thoi-gian><li data-loai="may" data-id="d-20261111T084451Z-1"><b>2026-11-11</b> · Máy · approach · S1 — Nạp 3 luật sản phẩm từ PRODUCT-INVARIANTS.md<div class="note">Kho đã khai tệp luật sản phẩm — bước thiết kế đọc nó trước khi chọn.</div></li><li data-loai="may" data-id="d-20261111T084451Z-2"><b>2026-11-11</b> · Máy · approach · S1 — Đã tra tri thức: Sau khi đăng nhập người dùng không bao giờ bị đưa sang trang ngoài, bấm Đăng xuất mà lỗi thì được báo rõ, và người không còn thuộc sàn nào có lối thoát khỏi màn chọn sàn<div class="note">Kho đã khai tri_thuc — bước thiết kế tra trang trước khi chọn.</div></li><li data-loai="may" data-id="d-20261111T084451Z-3"><b>2026-11-11</b> · Máy · approach · S1 — Kiểm đường trở về bằng danh sách cho phép rồi đọc bằng bộ đọc địa chỉ của chuẩn trình duyệt, không vá thêm ký tự cấm.<div class="note">Bản cũ là danh sách cấm vài ký tự đầu và lọt chính vì danh sách thiếu dạng tab (Ngoài-1, Ngoài-2 hàng 8); ma trận 14 dạng lách ở design doc.</div></li><li data-loai="may" data-id="d-20261111T084451Z-4"><b>2026-11-11</b> · Máy · approach · S1 — Đăng xuất lỗi báo bằng toast qua kênh thông báo kết quả của khung, không tự dựng câu báo trong menu.<div class="note">Luật kênh thông báo của kho giao kết quả thao tác cho toast, và bài rào hành vi cấm màn tự nhập toast.</div></li><li data-loai="may" data-id="d-20261111T084451Z-5"><b>2026-11-11</b> · Máy · approach · S1 — Đăng xuất lỗi thì máy chủ giữ nguyên phiên và cookie, màn nói «chưa thoát»; không xoá cookie khi chưa xoá được phiên.<div class="note">Câu giao của hàng đòi báo rõ khi đăng xuất lỗi; máy chủ của hàng 8 đã trả 500 và giữ cookie khi xoá phiên lỗi.</div></li><li data-loai="may" data-id="d-20261111T084451Z-6"><b>2026-11-11</b> · Máy · approach · S1 — Lối thoát của người hết sàn là nút Đăng xuất (xoá phiên), không phải «Dùng email khác» chỉ đổi bước trên màn.<div class="note">Còn phiên mà chỉ đổi bước thì lần mở /login kế lại thấy phiên không sàn; ô cơ hội đòi lối thoát khỏi màn chọn sàn.</div></li><li data-loai="may" data-id="d-20261111T084451Z-7"><b>2026-11-11</b> · Máy · approach · S1 — Bài kiểm có cơ sở dữ liệu của hàng chạy trên Postgres của dãy R (cổng 5565) bằng ba lệnh riêng thêm vào cấu hình nghiệm thu.<div class="note">Lệnh của hàng 8 mặc định dùng Postgres của dãy N, nơi hàng 9 đang chạy; luật đợt giao dãy R cổng 5565.</div></li><li data-loai="may" data-id="d-20261111T084451Z-8"><b>2026-11-11</b> · Máy · descope · S1 — Không vá đổi sàn lỗi mạng làm menu kẹt (Ngoài-6 của hàng 8) trong hàng này.<div class="note">Chủ kho đã ghi Ngoài-6 là giới hạn đã biết ở Cổng Bằng chứng hàng 8; ô cơ hội của 1m chỉ nêu ba lỗ.</div></li><li data-loai="may" data-id="d-20261111T084451Z-9"><b>2026-11-11</b> · Máy · descope · S1 — bỏ design-pass — chỉ thêm một trạng thái và một câu báo vào hai màn có sẵn của hàng 8; khung hình mọi trạng thái mới chụp ở Cổng Bằng chứng (E15)<div class="note">Màn đăng nhập và menu tài khoản đã qua Cổng Bằng chứng hàng 8; hàng này không đổi bố cục.</div></li><li data-loai="may" data-id="d-20261111T084451Z-10"><b>2026-11-11</b> · Máy · descope · S1 — bỏ coverage-scan — không gọi skill quét hình thái; trục độ phủ dựng tay từ ba lỗ, ma trận 14 dạng lách và bảng trạng thái; đổi lại không có bằng chứng độ phủ<div class="note">Không gian AC là ba lỗ đã được hàng 8 gọi tên, mỗi lỗ một ma trận nhỏ viết sẵn trong design doc.</div></li><li data-loai="may" data-id="d-20261111T084451Z-11"><b>2026-11-11</b> · Máy · approach · S1 — Màn mới «dang-nhap» không vào nhóm khuôn nào: tạo nhóm dang-nhap, hay để ngoài bản đồ?<div class="note">Bước thiết kế không thấy nhóm nào của bản đồ khuôn nhận màn này; xếp một màn thật sự mới vào nhóm là việc của người, một lần mỗi nhóm.</div></li><li data-loai="may" data-id="d-20261111T084747Z-12"><b>2026-11-11</b> · Máy · approach · S1 — Khi máy chủ không xoá được phiên: giữ cookie và báo «chưa thoát», hay xoá cookie ở máy này và báo phiên chưa thu ở máy chủ?<div class="note">Câu giao chỉ đòi báo rõ, không quyết giữ hay xoá cookie; hai lối cân an toàn trên máy dùng chung với việc nói đúng sự thật ở máy chủ (gap-probe P0).</div></li><li data-loai="nguoi" data-id="d-20261111T091403Z-13"><b>2026-11-11</b> · Người · seal · gate1 — </li><li data-loai="nguoi" data-id="d-20261111T091403Z-14"><b>2026-11-11</b> · Người (Manh Phan) · approach · gate1 — Duyệt kế hoạch 5 việc (Gate 1.5, hạng T3)<div class="note">người chọn ở Cổng Phạm vi: duyệt kế hoạch</div></li><li data-loai="may" data-id="d-20261111T095846Z-15"><b>2026-11-11</b> · Máy · fix · S4-r1 — Sửa lượt 1: dời tệp kịch bản chấm ra khỏi vùng lint, chờ câu báo hiện hẳn rồi mới chụp khung; bốn mục ngoài hợp đồng để chủ kho quyết ở Cổng Bằng chứng, không sửa trong vòng.<div class="note">Bộ kiểm chung đỏ vì tệp kịch bản chấm chép vào worktree; khung E15-step3 chụp lúc toast đang trượt vào; bài trình duyệt hỏng vì bản dựng dọn thư mục .next cùng lúc (đã hỏi giám sát R-1111-19).</div></li></ol></div></details>
+<details class="muc" id="bang-chung"><summary>Bằng chứng</summary><div class="noi">
+<div class="card" style="margin-top:12px"><span class="badge pass">PASS</span>
+<div class="meta"><span>Verified by: <b>fresh-context verification subagent</b></span><span>Human signoff: <b>CHƯA ký</b></span><span>enforcement: <b>strict</b></span></div></div>
+<h2>Các eval</h2><div class="card" style="padding:4px 8px"><table><thead><tr><th>Eval</th><th>Tiêu chí</th><th>Loại</th><th>Verdict</th><th>run_id</th><th>verified_at</th></tr></thead><tbody>
+<tr><td><a href="#E1">E1</a></td><td>AC-1</td><td>test</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E1-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E2">E2</a></td><td>AC-2</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E2-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E3">E3</a></td><td>AC-2</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E3-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E4">E4</a></td><td>AC-3</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E4-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E5">E5</a></td><td>AC-3</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E5-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E6">E6</a></td><td>AC-4</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E6-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E7">E7</a></td><td>AC-5</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E7-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E8">E8</a></td><td>AC-5</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E8-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E9">E9</a></td><td>AC-6</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E9-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E10">E10</a></td><td>AC-7</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E10-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E11">E11</a></td><td>AC-7</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E11-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E12">E12</a></td><td>AC-7</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E12-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E13">E13</a></td><td>AC-7</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E13-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E14">E14</a></td><td>AC-8</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E14-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E15">E15</a></td><td>AC-8</td><td>ui-check</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E15-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+<tr><td><a href="#E16">E16</a></td><td>AC-6</td><td>script</td><td><span class="badge pass">PASS</span></td><td class="mono">minted-va-dang-nhap-E16-r2</td><td class="mono">2026-11-11T10:31:49Z</td></tr>
+</tbody></table></div>
+<h2>Chi tiết từng eval</h2>
+<div class="card eval" id="E1"><h3><span class="badge pass">PASS</span> &nbsp;E1 · test</h3><p class="crit">AC-1: Given ma trận viết trước gồm 14 dạng lách (địa chỉ tuyệt đối, giao thức khác, hai gạch, gạch ngược ở đầu hay</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E1-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.test.unit</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: make test
+toàn bộ ca đơn vị xanh, gồm tests/next-path-matrix.test.ts</pre>
+</div>
+<div class="card eval" id="E2"><h3><span class="badge pass">PASS</span> &nbsp;E2 · script</h3><p class="crit">AC-2: Given người đã đăng nhập và có sàn, hoặc người đang đăng nhập, When mở `/login` với đường trở về mang tab hay</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E2-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_e2e</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+72 passed (1.7m)</pre>
+</div>
+<div class="card eval" id="E3"><h3><span class="badge pass">PASS</span> &nbsp;E3 · script</h3><p class="crit">AC-2: Given người đã đăng nhập và có sàn, hoặc người đang đăng nhập, When mở `/login` với đường trở về mang tab hay</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E3-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_e2e</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+72 passed (1.7m)</pre>
+</div>
+<div class="card eval" id="E4"><h3><span class="badge pass">PASS</span> &nbsp;E4 · script</h3><p class="crit">AC-3: Given người đã đăng nhập đang ở một trang của ứng dụng, When bấm «Đăng xuất» mà mạng đứt hoặc máy chủ trả lỗi,</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E4-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_e2e</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+72 passed (1.7m)</pre>
+</div>
+<div class="card eval" id="E5"><h3><span class="badge pass">PASS</span> &nbsp;E5 · script</h3><p class="crit">AC-3: Given người đã đăng nhập đang ở một trang của ứng dụng, When bấm «Đăng xuất» mà mạng đứt hoặc máy chủ trả lỗi,</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E5-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_e2e</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+72 passed (1.7m)</pre>
+</div>
+<div class="card eval" id="E6"><h3><span class="badge pass">PASS</span> &nbsp;E6 · script</h3><p class="crit">AC-4: Given người đã đăng nhập, When bấm «Đăng xuất» và máy chủ xoá phiên được, Then người về `/login` bước nhập</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E6-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_e2e</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+72 passed (1.7m)</pre>
+</div>
+<div class="card eval" id="E7"><h3><span class="badge pass">PASS</span> &nbsp;E7 · script</h3><p class="crit">AC-5: Given người đã đăng nhập rồi bị gỡ khỏi mọi sàn mà phiên còn, When mở `/login`, Then màn không hiện danh sách sàn</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E7-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_e2e</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+72 passed (1.7m)</pre>
+</div>
+<div class="card eval" id="E8"><h3><span class="badge pass">PASS</span> &nbsp;E8 · script</h3><p class="crit">AC-5: Given người đã đăng nhập rồi bị gỡ khỏi mọi sàn mà phiên còn, When mở `/login`, Then màn không hiện danh sách sàn</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E8-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_e2e</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+72 passed (1.7m)</pre>
+</div>
+<div class="card eval" id="E9"><h3><span class="badge pass">PASS</span> &nbsp;E9 · script</h3><p class="crit">AC-6: Given màn ở trạng thái hết sàn khi còn phiên, When bấm «Đăng xuất» mà mạng đứt hoặc máy chủ trả lỗi, Then người</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E9-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_e2e</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+72 passed (1.7m)</pre>
+</div>
+<div class="card eval" id="E10"><h3><span class="badge pass">PASS</span> &nbsp;E10 · script</h3><p class="crit">AC-7: Given ba lỗ đã vá, When chạy lại bài kiểm của hàng 8 (cơ sở dữ liệu và trình duyệt), bộ kiểm cách ly, bài quét</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E10-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_db</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 npx vitest run -c vitest.db.config.ts --reporter=verbose
+các ca của tests/db/dang-nhap.db.test.ts xanh trên Postgres dãy R</pre>
+</div>
+<div class="card eval" id="E11"><h3><span class="badge pass">PASS</span> &nbsp;E11 · script</h3><p class="crit">AC-7: Given ba lỗ đã vá, When chạy lại bài kiểm của hàng 8 (cơ sở dữ liệu và trình duyệt), bộ kiểm cách ly, bài quét</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E11-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_cach_ly</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 bash db/scripts/cach-ly.sh
+cach-ly: 19 ca đạt, vai quy_hang_app</pre>
+</div>
+<div class="card eval" id="E12"><h3><span class="badge pass">PASS</span> &nbsp;E12 · script</h3><p class="crit">AC-7: Given ba lỗ đã vá, When chạy lại bài kiểm của hàng 8 (cơ sở dữ liệu và trình duyệt), bộ kiểm cách ly, bài quét</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E12-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.check</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: make check
+CODEOWNERS matches governance/autonomy.yaml</pre>
+</div>
+<div class="card eval" id="E13"><h3><span class="badge pass">PASS</span> &nbsp;E13 · script</h3><p class="crit">AC-7: Given ba lỗ đã vá, When chạy lại bài kiểm của hàng 8 (cơ sở dữ liệu và trình duyệt), bộ kiểm cách ly, bài quét</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E13-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_e2e</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+72 passed (1.7m)</pre>
+</div>
+<div class="card eval" id="E14"><h3><span class="badge pass">PASS</span> &nbsp;E14 · script</h3><p class="crit">AC-8: Given trạng thái hết sàn khi còn phiên và câu báo đăng xuất lỗi, ở bốn khổ 360, 414, 1024, 1440, sáng và tối,</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E14-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_e2e</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+72 passed (1.7m)</pre>
+</div>
+<div class="card eval" id="E15"><h3><span class="badge pass">PASS</span> &nbsp;E15 · ui-check</h3><p class="crit">AC-8: Given trạng thái hết sàn khi còn phiên và câu báo đăng xuất lỗi, ở bốn khổ 360, 414, 1024, 1440, sáng và tối,</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E15-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.ui-check</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<div class="shot slide" data-n="5"><div class="frame"><img src="evidence/E15-step1.png" alt="frame 1" loading="lazy"></div><div class="frame"><img src="evidence/E15-step2.png" alt="frame 2" loading="lazy"></div><div class="frame"><img src="evidence/E15-step3.png" alt="frame 3" loading="lazy"></div><div class="frame"><img src="evidence/E15-step4.png" alt="frame 4" loading="lazy"></div><div class="frame"><img src="evidence/E15-step5.png" alt="frame 5" loading="lazy"></div></div><div class="slidebar"><button class="btn" data-toggle>⏸ Tạm dừng</button><span>5 frame · chạy như GIF</span></div>
+</div>
+<div class="card eval" id="E16"><h3><span class="badge pass">PASS</span> &nbsp;E16 · script</h3><p class="crit">AC-6: Given màn ở trạng thái hết sàn khi còn phiên, When bấm «Đăng xuất» mà mạng đứt hoặc máy chủ trả lỗi, Then người</p>
+<div class="kv"><span>run_id <b>minted-va-dang-nhap-E16-r2</b></span><span>exit_code <b>0</b></span><span>verifier <b class="mono">config:executors.script.va_dang_nhap_e2e</b></span><span>verified_at <b>2026-11-11T10:31:49Z</b></span><span>baseline <b>n-a</b></span></div>
+<pre class="out">lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+72 passed (1.7m)</pre>
+</div>
+<h2>Eval không phân biệt (Analyst)</h2><div class="flag fred">carried tu round 1 — baseline khong do lai round nay
+Baseline khong do: evals.yaml khong doi tu lan baseline cuoi (round 1), nen round nay khong do lai; moi block eval ghi baseline n-a.
+Eval khong-phan-biet (xanh tren ca HEAD lan baseline cu, chung minh harness chu khong phai feature; can viet lai de assert hanh vi moi hoac xac nhan la regression-guard co chu y):
+- E1 (make test)
+- E10 (vitest db, dang-nhap.db.test.ts)
+- E11 (cach-ly.sh)</div>
+<h2>Vòng verify</h2><ul class="tl"><li>Round 1: co sua sau vong dau — commit 1194e61 (e2e-db build folder out of .next, settle toast before frames). Returned to implementation.</li><li>Round 2: moi eval va lenh suite xanh, verdict PASS.</li></ul>
+</div></details>
+<details class="muc" id="tai-nguyen"><summary>Tài nguyên</summary><div class="noi"><table data-tai-nguyen><thead><tr><th>Khối</th><th>Tác tử</th><th>Token đầu ra</th></tr></thead><tbody><tr><td>S4 round 1</td><td>15</td><td>54.216</td></tr><tr><td>S4 round 2</td><td>15</td><td>44.337</td></tr></tbody></table><p class="note">2 lượt chấm · tổng 98.553 token</p></div></details>
+<details class="muc" id="gioi-han"><summary>Giới hạn và ngoài hợp đồng</summary><div class="noi"><ul data-gioi-han><li data-loai="ngoai">Thu mọi phiên của người khi khoá người hay gỡ khỏi sàn (hàng N8).</li><li data-loai="ngoai">Đổi sàn lỗi mạng làm menu kẹt (Ngoài-6 của hàng 8, đã ghi giới hạn đã biết).</li><li data-loai="ngoai">Báo «email không hợp lệ» thay vì lỗi máy chủ (Ngoài-11 của hàng 8, giới hạn đã biết).</li><li data-loai="ngoai">Bắt đăng nhập ở các màn dữ liệu mẫu (hàng N5); mời người, vai, bảng quyền (hàng 9, 9a).</li><li data-loai="ngoai">Chạy bài kiểm có cơ sở dữ liệu trên CI: cần job có Postgres ở `.github/workflows/`, việc của người.</li></ul></div></details>
+<details class="muc" id="giao"><summary>Giao</summary><div class="noi"><div class="kv" data-giao><span>Mã đã chấm <b class="mono">1194e61df4964c7ec89819fd7f59e945742101ff</b></span><span>Ngày ký <b>—</b></span><span>Cổng Đáng: Manh Phan · Cổng Phạm vi: Manh Phan · Cổng Bằng chứng: chưa ký</span><span data-pr>chưa gộp</span></div><p class="note">chưa ghi quan sát production</p></div></details>
+<details class="muc" id="gia-tri"><summary>Giá trị</summary><div class="noi"><ul data-gia-tri-nguong><li data-nguong>Câu hỏi phép đo trả lời: … — <b>chưa đo</b></li><li data-nguong>Kết quả nào là SỐNG: … — <b>chưa đo</b></li><li data-nguong>Kết quả nào là CHẾT: … — <b>chưa đo</b></li><li data-nguong>Timebox: … — <b>chưa đo</b></li></ul></div></details>
+<div class="foot">Trang trình bày · KHÔNG quyết — <span class="mono">evidence-report.md</span> + hook là nguồn-sự-thật. Sinh từ run đã verify; ảnh/output gắn run_id.</div>
+<script>
+document.querySelectorAll('[data-loc]').forEach(function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-loc');document.querySelectorAll('[data-loc]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b));});document.querySelectorAll('[data-dong-thoi-gian] li').forEach(function(li){li.hidden=!(v==='tat-ca'||li.getAttribute('data-loai')===v);});});});
+document.querySelectorAll('.slide').forEach(function(s){var fr=s.querySelectorAll('.frame');if(fr.length<2)return;var i=0;fr[0].classList.add('on');var adv=function(){fr[i].classList.remove('on');i=(i+1)%fr.length;fr[i].classList.add('on');};s._t=setInterval(adv,1600);var bar=s.nextElementSibling,b=bar?bar.querySelector('[data-toggle]'):null;if(b)b.addEventListener('click',function(){if(s._t){clearInterval(s._t);s._t=null;b.textContent='▶ Chạy';}else{s._t=setInterval(adv,1600);b.textContent='⏸ Tạm dừng';}});});
+</script>
+</div></body></html>

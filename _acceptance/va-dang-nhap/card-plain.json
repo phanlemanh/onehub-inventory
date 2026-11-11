@@ -1,37 +1,112 @@
 {
   "feature_plain": "Vá ba lỗ an toàn của phần đăng nhập: link lừa không đưa được người vừa đăng nhập sang trang lạ, bấm Đăng xuất mà lỗi thì được báo rõ là chưa thoát, và người không còn thuộc sàn nào có nút để thoát.",
   "will_do": [
-    {"id": "AC-1", "p": "Sẽ kiểm đường trở về sau đăng nhập trên 14 dạng lách viết sẵn (tab, xuống dòng, gạch ngược, khoảng trắng, …): mọi dạng lách về trang Hôm nay, 4 dạng hợp lệ giữ nguyên, mỗi dạng một ca."},
-    {"id": "AC-2", "p": "Sẽ giữ người ở trang của ứng dụng khi mở link đăng nhập có đường trở về lách — dù đã đăng nhập sẵn, vừa gõ mã, hay vừa chọn sàn."},
-    {"id": "AC-3", "p": "Sẽ báo «Chưa đăng xuất được. Bạn vẫn đang đăng nhập trên máy này…» và để người ở nguyên trang khi bấm Đăng xuất lúc mạng đứt hay máy chủ lỗi; bấm lại khi mạng về thì thoát được."},
-    {"id": "AC-4", "p": "Sẽ giữ đăng xuất thành công như hàng 8: về màn nhập email, phiên bị xoá ở máy chủ, cookie cũ không còn dùng được."},
-    {"id": "AC-6", "p": "Sẽ báo cùng câu «chưa đăng xuất» và giữ người ở màn hết sàn khi nút Đăng xuất ở đó gặp lỗi."},
-    {"id": "AC-7", "p": "Sẽ giữ xanh mọi bài kiểm của hàng 8, bộ kiểm cách ly sàn, bài quét một cửa và bài rào hành vi."},
-    {"id": "AC-8", "p": "Sẽ hiện trạng thái mới đọc được ở bốn khổ màn, sáng và tối, không lỗi tiếp cận; nút đang chờ chỉ bị khoá, không đổi chữ."}
+    {
+      "id": "AC-1",
+      "p": "Sẽ kiểm đường trở về sau đăng nhập trên 14 dạng lách viết sẵn (tab, xuống dòng, gạch ngược, khoảng trắng, …): mọi dạng lách về trang Hôm nay, 4 dạng hợp lệ giữ nguyên, mỗi dạng một ca."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ giữ người ở trang của ứng dụng khi mở link đăng nhập có đường trở về lách — dù đã đăng nhập sẵn, vừa gõ mã, hay vừa chọn sàn."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ báo «Chưa đăng xuất được. Bạn vẫn đang đăng nhập trên máy này…» và để người ở nguyên trang khi bấm Đăng xuất lúc mạng đứt hay máy chủ lỗi; bấm lại khi mạng về thì thoát được."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ giữ đăng xuất thành công như hàng 8: về màn nhập email, phiên bị xoá ở máy chủ, cookie cũ không còn dùng được."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ báo cùng câu «chưa đăng xuất» và giữ người ở màn hết sàn khi nút Đăng xuất ở đó gặp lỗi."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ giữ xanh mọi bài kiểm của hàng 8, bộ kiểm cách ly sàn, bài quét một cửa và bài rào hành vi."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ hiện trạng thái mới đọc được ở bốn khổ màn, sáng và tối, không lỗi tiếp cận; nút đang chờ chỉ bị khoá, không đổi chữ."
+    }
   ],
   "wont_do": [
-    {"id": "AC-5", "p": "Sẽ KHÔNG còn hiện danh sách sàn trống cho người đã bị gỡ khỏi mọi sàn: thay bằng câu giải thích và nút Đăng xuất."},
-    {"id": "OOS-1", "p": "KHÔNG thu mọi phiên của người khi bị khoá hay gỡ khỏi sàn — việc của hàng N8."},
-    {"id": "OOS-2", "p": "KHÔNG vá menu kẹt khi đổi sàn lúc mạng lỗi — đã là giới hạn đã biết của hàng 8."},
-    {"id": "OOS-3", "p": "KHÔNG đổi câu báo khi gõ email sai định dạng — giới hạn đã biết của hàng 8."},
-    {"id": "OOS-4", "p": "KHÔNG bắt đăng nhập ở các màn dữ liệu mẫu, không làm mời người, vai, bảng quyền."},
-    {"id": "OOS-5", "p": "KHÔNG chạy bài kiểm có cơ sở dữ liệu trên CI — cần sửa tệp CI, việc của chủ kho."}
+    {
+      "id": "AC-5",
+      "p": "Sẽ KHÔNG còn hiện danh sách sàn trống cho người đã bị gỡ khỏi mọi sàn: thay bằng câu giải thích và nút Đăng xuất."
+    },
+    {
+      "id": "OOS-1",
+      "p": "KHÔNG thu mọi phiên của người khi bị khoá hay gỡ khỏi sàn — việc của hàng N8."
+    },
+    {
+      "id": "OOS-2",
+      "p": "KHÔNG vá menu kẹt khi đổi sàn lúc mạng lỗi — đã là giới hạn đã biết của hàng 8."
+    },
+    {
+      "id": "OOS-3",
+      "p": "KHÔNG đổi câu báo khi gõ email sai định dạng — giới hạn đã biết của hàng 8."
+    },
+    {
+      "id": "OOS-4",
+      "p": "KHÔNG bắt đăng nhập ở các màn dữ liệu mẫu, không làm mời người, vai, bảng quyền."
+    },
+    {
+      "id": "OOS-5",
+      "p": "KHÔNG chạy bài kiểm có cơ sở dữ liệu trên CI — cần sửa tệp CI, việc của chủ kho."
+    }
   ],
   "scope_plain": "Năm việc gần kề cố ý để ngoài hàng này:",
   "coverage_plain": [
-    {"i": 0, "p": "Không chạy bước quét hình thái tự động; các trục dưới dựng tay từ ba lỗ mà hàng 8 đã gọi tên."},
-    {"i": 1, "p": "Đường trở về: 14 dạng lách và 4 dạng hợp lệ, mỗi dạng một ca (AC-1 ma trận đường trở về)."},
-    {"i": 2, "p": "Ba chỗ đọc đường trở về — máy chủ chuyển hướng, sau gõ mã, sau chọn sàn — đều đo trên trình duyệt (AC-2 chặn trang lạ)."},
-    {"i": 3, "p": "Kết quả đăng xuất: được, mạng đứt, máy chủ lỗi thật, bấm lại sau lỗi (AC-3, AC-4, AC-6 đăng xuất báo đúng)."},
-    {"i": 4, "p": "Hai chỗ có nút Đăng xuất: menu tài khoản và màn hết sàn (AC-3 đến AC-6)."},
-    {"i": 5, "p": "Bốn trạng thái người ở màn đăng nhập: chưa phiên, một sàn, nhiều sàn (bài hàng 8 giữ), hết sàn (AC-5 lối thoát)."},
-    {"i": 6, "p": "Bốn lớp: hàm kiểm, đường xác thực ở máy chủ, màn, khung — mỗi lớp có bài đo riêng."}
+    {
+      "i": 0,
+      "p": "Không chạy bước quét hình thái tự động; các trục dưới dựng tay từ ba lỗ mà hàng 8 đã gọi tên."
+    },
+    {
+      "i": 1,
+      "p": "Đường trở về: 14 dạng lách và 4 dạng hợp lệ, mỗi dạng một ca (AC-1 ma trận đường trở về)."
+    },
+    {
+      "i": 2,
+      "p": "Ba chỗ đọc đường trở về — máy chủ chuyển hướng, sau gõ mã, sau chọn sàn — đều đo trên trình duyệt (AC-2 chặn trang lạ)."
+    },
+    {
+      "i": 3,
+      "p": "Kết quả đăng xuất: được, mạng đứt, máy chủ lỗi thật, bấm lại sau lỗi (AC-3, AC-4, AC-6 đăng xuất báo đúng)."
+    },
+    {
+      "i": 4,
+      "p": "Hai chỗ có nút Đăng xuất: menu tài khoản và màn hết sàn (AC-3 đến AC-6)."
+    },
+    {
+      "i": 5,
+      "p": "Bốn trạng thái người ở màn đăng nhập: chưa phiên, một sàn, nhiều sàn (bài hàng 8 giữ), hết sàn (AC-5 lối thoát)."
+    },
+    {
+      "i": 6,
+      "p": "Bốn lớp: hàm kiểm, đường xác thực ở máy chủ, màn, khung — mỗi lớp có bài đo riêng."
+    }
   ],
   "gap_probe_plain": [
-    {"i": 0, "p": "Máy đã tự quyết giữ cookie khi máy chủ không xoá được phiên, trong khi đây là cân an toàn máy dùng chung với nói đúng sự thật — đã chuyển thành câu hỏi cho anh (Hỏi-2)."},
-    {"i": 1, "p": "Ca «máy chủ lỗi» lẽ ra giả lỗi ngay ở trình duyệt nên không đo được máy chủ — đã đổi sang lỗi máy chủ thật, kiểm cả cookie lẫn phiên, kèm bản phá."},
-    {"i": 2, "p": "Bước chọn sàn chưa có bài đo trên trình duyệt cho link lách — đã thêm ca người hai sàn."},
-    {"i": 3, "p": "Màn hết sàn chưa đo nhánh máy chủ lỗi và chưa kiểm phiên ở máy chủ — đã thêm ca và bài đo phía máy chủ."},
-    {"i": 4, "p": "Ví dụ link lách phía máy chủ vốn bị bản cũ chặn nên không chứng gì — đã đổi sang dạng bản cũ lọt."}
+    {
+      "i": 0,
+      "p": "Máy đã tự quyết giữ cookie khi máy chủ không xoá được phiên, trong khi đây là cân an toàn máy dùng chung với nói đúng sự thật — đã chuyển thành câu hỏi cho anh (Hỏi-2)."
+    },
+    {
+      "i": 1,
+      "p": "Ca «máy chủ lỗi» lẽ ra giả lỗi ngay ở trình duyệt nên không đo được máy chủ — đã đổi sang lỗi máy chủ thật, kiểm cả cookie lẫn phiên, kèm bản phá."
+    },
+    {
+      "i": 2,
+      "p": "Bước chọn sàn chưa có bài đo trên trình duyệt cho link lách — đã thêm ca người hai sàn."
+    },
+    {
+      "i": 3,
+      "p": "Màn hết sàn chưa đo nhánh máy chủ lỗi và chưa kiểm phiên ở máy chủ — đã thêm ca và bài đo phía máy chủ."
+    },
+    {
+      "i": 4,
+      "p": "Ví dụ link lách phía máy chủ vốn bị bản cũ chặn nên không chứng gì — đã đổi sang dạng bản cũ lọt."
+    }
   ]
 }
