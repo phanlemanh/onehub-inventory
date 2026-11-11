@@ -1,0 +1,1 @@
+driver: playwright spec (own webServer on 127.0.0.1:4077); no browser-tool network reader; spec 24 passed, WebServer logs only img aspect-ratio warnings and idle db connection close notices

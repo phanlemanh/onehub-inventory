@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "moi-nguoi-gan-vai",
-  "ghi_luc": "2026-11-11T10:23:35Z",
-  "vong_cham": 1,
+  "ghi_luc": "2026-11-11T10:31:11Z",
+  "vong_cham": 2,
   "luot": [
     {
       "vong": 1,
@@ -10,6 +10,11 @@
       "tang": [
         "bai-kiem-ha-tang"
       ]
+    },
+    {
+      "vong": 2,
+      "verdict": "PASS",
+      "tang": []
     }
   ],
   "lam_lai": [
