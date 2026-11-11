@@ -1433,7 +1433,8 @@
             "nav",
             "roles",
             "company",
-            "account"
+            "account",
+            "columnOpen"
           ]
         },
         {
@@ -1451,36 +1452,16 @@
       ]
     },
     {
-      "name": "RailShell",
-      "file": "src/components/templates/app-shell/rail-shell.tsx",
-      "level": "template",
-      "parts": [
-        {
-          "name": "RAIL_MAIN_ID"
-        },
-        {
-          "name": "RailShell",
-          "props": [
-            "options",
-            "labels",
-            "account"
-          ]
-        }
-      ]
-    },
-    {
       "name": "SecondColumn",
       "file": "src/components/templates/app-shell/second-column.tsx",
       "level": "template",
       "parts": [
         {
-          "name": "COLUMN_COOKIE"
-        },
-        {
           "name": "SecondColumn",
           "props": [
             "items",
-            "roles"
+            "roles",
+            "initialOpen"
           ]
         },
         {
