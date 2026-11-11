@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-11 — Ghim lại danh mục ReUI dừng và gọi tên nhóm khi nguồn đổi cách ghi tiêu đề nhóm, thay vì lặng lẽ bỏ cả nhóm; lưới chặn mã, khoá thử đủ 10 dạng × 27 chỗ và nay quét cả số đếm, bắt được câu import có nháy kép trong phần ghim — [tools/reui_catalog](../tools/reui_catalog/README.md), hàng 1k
 - 2026-11-11 — Danh mục ReUI (678 khối Pro, 27 thành phần gốc, 1.264 ví dụ) ghim theo bản chụp có băm, tra được tại máy không cần mạng; kiểm trong `make check` đỏ khi có mục tra không ra hoặc lọt mã, khoá — [tools/reui_catalog](../tools/reui_catalog/README.md), hàng 1g
 - 2026-11-11 — Sàn mẫu MAU trên Vinhomes Ocean Park 1, 2, 3: danh mục căn, 60 lần chào, 50 liên hệ nối sẵn; Liên hệ có thêm số điện thoại — [du-lieu-mau](../_acceptance/du-lieu-mau/design.md)
 - 2026-11-11 — Khung ứng dụng đầy đủ: mục đang chọn, lối nhảy, tiêu đề tab, trạng thái lỗi, không tìm thấy, chờ tải, hết phiên, bộ định dạng Intl vi-VN, màu sáu trạng thái, băng trên màn khi mất mạng, giao diện sáng và tối — hàng 1a, `_acceptance/khung-va-giao-dien/`

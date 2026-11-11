@@ -20,6 +20,14 @@ export const SOURCES = [
 ];
 
 export const KINDS = ["component", "block", "example"];
+
+// Sections every source must carry, with the exact heading the reader expects. A missing one stops the build.
+export const REQUIRED_SECTIONS = [
+  { file: "llms-full.txt", label: "Pro blocks", kind: "block" },
+  { file: "llms-full.txt", label: "Free examples", kind: "example" },
+  { file: "llms.txt", label: "ReUI Primitives", kind: "component" },
+];
+const SECTION_HEADING = /^## (.+?) \(([\d,]+)\)$/;
 const KIND_ORDER = { component: 0, block: 1, example: 2 };
 
 export const ALLOWED_FIELDS = {
@@ -45,11 +53,40 @@ const toInt = (s) => Number(s.replace(/,/g, ""));
 
 /** Parse the two source texts. Throws CatalogError when a declared count differs from what was read. */
 export function parseSources({ full, index }) {
+  const missing = [
+    ...missingSections("llms-full.txt", full),
+    ...missingSections("llms.txt", index),
+  ];
+  if (missing.length) throw new CatalogError(missing.join("\n"));
   const groups = [];
   const counts = { block: 0, component: 0, example: 0 };
   parseFull(full, groups, counts);
   parseIndex(index, groups, counts);
   return { groups, counts };
+}
+
+// Heading text with the hashes, the trailing count and the case taken away, to point at a heading that changed form.
+const looseHeading = (line) =>
+  line
+    .replace(/^#+\s*/, "")
+    .replace(/\s*\([^)]*\)\s*$/, "")
+    .trim()
+    .toLowerCase();
+
+/** One line per required section of `file` whose exact heading is absent, naming the nearest look-alike heading. */
+function missingSections(file, text) {
+  const lines = text.split("\n");
+  const out = [];
+  for (const s of REQUIRED_SECTIONS.filter((r) => r.file === file)) {
+    if (lines.some((l) => l.match(SECTION_HEADING)?.[1] === s.label)) continue;
+    let msg = `section missing in ${file}: ${s.label} (${s.kind})`;
+    const near = lines.findIndex(
+      (l) => l.startsWith("#") && looseHeading(l) === s.label.toLowerCase(),
+    );
+    if (near >= 0) msg += ` — nearest heading line ${near + 1}: ${lines[near].trimEnd()}`;
+    out.push(msg);
+  }
+  return out;
 }
 
 function closeCategory(cat) {
@@ -61,7 +98,9 @@ function closeCategory(cat) {
 }
 
 function parseFull(text, groups, counts) {
-  const sections = { "Pro blocks": "block", "Free examples": "example" };
+  const sections = Object.fromEntries(
+    REQUIRED_SECTIONS.filter((r) => r.file === "llms-full.txt").map((r) => [r.label, r.kind]),
+  );
   let section = null;
   let cat = null;
   const lines = text.split("\n");
@@ -75,7 +114,7 @@ function parseFull(text, groups, counts) {
     }
   };
   lines.forEach((line, i) => {
-    const sec = line.match(/^## (.+?) \(([\d,]+)\)$/);
+    const sec = line.match(SECTION_HEADING);
     if (sec || /^## /.test(line)) {
       closeSection();
       const kind = sec ? sections[sec[1]] : undefined;
@@ -120,12 +159,10 @@ function parseIndex(text, groups, counts) {
       );
     }
   };
-  let seen = false;
   lines.forEach((line, i) => {
     const sec = line.match(/^## ReUI Primitives \(([\d,]+)\)$/);
     if (sec) {
       prim = { declared: toInt(sec[1]), read: 0 };
-      seen = true;
       return;
     }
     if (!prim) return;
@@ -151,7 +188,6 @@ function parseIndex(text, groups, counts) {
     counts.component += 1;
   });
   close();
-  if (!seen) throw new CatalogError("count mismatch: ReUI Primitives section not found");
 }
 
 function addItem(groups, { kind, group, category, url, title, description }) {
@@ -236,12 +272,18 @@ export function scanCatalog(catalog) {
       if (!allowed.includes(k)) errors.push(`forbidden field in ${where}: ${k}`);
     }
   };
+  // Scan each string leaf as written: JSON text would escape quotes and hide `import x from "y"`.
+  const leaves = (value) =>
+    value && typeof value === "object" ? Object.values(value).flatMap(leaves) : [String(value)];
   const text = (value, where) => {
-    const s = typeof value === "string" ? value : JSON.stringify(value);
-    for (const f of FORBIDDEN) if (f.re.test(s)) errors.push(`forbidden in ${where}: ${f.label}`);
+    const strings = leaves(value);
+    for (const f of FORBIDDEN) {
+      if (strings.some((s) => f.re.test(s))) errors.push(`forbidden in ${where}: ${f.label}`);
+    }
   };
   fields(catalog, ALLOWED_FIELDS.top, "catalog");
   text(catalog.pin, "pin");
+  text(catalog.counts, "counts");
   for (const g of catalog.groups ?? []) {
     fields(g, ALLOWED_FIELDS.group, `group ${g.category}`);
     for (const [k, v] of Object.entries(g)) if (k !== "items") text(v, `group ${g.category}`);
