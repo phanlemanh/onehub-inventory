@@ -126,7 +126,7 @@ evals:
   - id: E11
     criterion: AC-7
     executor: script
-    cmd: config:executors.script.cach_ly
+    cmd: config:executors.script.cach_ly_n
     paths: [db/**]
     expected: "exit 0; bộ kiểm cách ly của hàng 7 chạy trên lược đồ đã áp mọi migration gồm 003: in 'ok moi-bang-cong-ty-ep-luat-theo-dong', 'ok luat-doc-ghi-theo-san', 'ok vai-api-khong-so-huu-khong-vuot' và không dòng 'HỎNG'; company_members nằm trong tập bảng công ty được quét"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

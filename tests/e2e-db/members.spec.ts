@@ -1,6 +1,10 @@
 // The members screen in the browser on this lane's Postgres (row 9, _acceptance/moi-nguoi-gan-vai/evals.yaml E7, E9,
 // E13, E14). Each test makes its own company and people; codes and invitations are read from the dev server's
 // outbox. SHOTS_DIR=<dir> saves one frame per state, and the eight frames E14 judges.
+// Accessibility matrix written first — the nine states of the design's state table, each scanned by axe in light and
+// dark: ST-members-loading, -long, -error (loi-va-thu-lai) · ST-members-ready, -forbidden (axe-sang-toi) ·
+// ST-invite-invalid, -already, -failed (loi-va-thu-lai; invalid also in axe-sang-toi) · ST-roles-last-admin
+// (doi-vai-thanh-ben). Round 1 found only five of them scanned.
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -225,6 +229,7 @@ test("doi-vai-thanh-ben", async ({ page }, info) => {
     dialog.getByText("Mỗi sàn cần ít nhất một Quản trị sàn. Gán vai này cho người khác trước."),
   ).toBeVisible();
   await shot(page, info, "ST-roles-last-admin");
+  await axeClean(page, "ST-roles-last-admin");
 });
 
 test("khong-du-quyen", async ({ page }, info) => {
@@ -262,15 +267,20 @@ test("loi-va-thu-lai", async ({ page }, info) => {
   });
   await signIn(page, people["P"]!.email);
 
-  // Loading: nothing under one second, then the skeleton.
+  // Loading: nothing under one second, then the skeleton. The list request is held until the frame and the scan
+  // are taken, so the frame shows the skeleton and not the loaded list (round 1).
+  let release = () => {};
+  const held = new Promise<void>((r) => (release = r));
   await page.route("**/api/v1/members", async (route) => {
     if (route.request().method() !== "GET") return route.fallback();
-    await new Promise((r) => setTimeout(r, 1500));
+    await held;
     await route.fallback();
   });
   await page.goto("/members");
   await expect(page.locator('[data-state="loading"] [data-slot="page-skeleton"]')).toBeVisible();
   await shot(page, info, "ST-members-loading");
+  await axeClean(page, "ST-members-loading");
+  release();
   await expect(page.locator('[data-state="ready"]')).toBeVisible();
   await page.unroute("**/api/v1/members");
 
@@ -284,6 +294,7 @@ test("loi-va-thu-lai", async ({ page }, info) => {
     long,
   );
   await shot(page, info, "ST-members-long");
+  await axeClean(page, "ST-members-long");
 
   // Error, then retry.
   await page.route("**/api/v1/members", (route) =>
@@ -294,6 +305,7 @@ test("loi-va-thu-lai", async ({ page }, info) => {
   await page.reload();
   await expect(page.locator('[data-slot="page-state"][data-kind="error"]')).toBeVisible();
   await shot(page, info, "ST-members-error");
+  await axeClean(page, "ST-members-error");
   await page.unroute("**/api/v1/members");
   await page.getByRole("button", { name: "Thử lại" }).click();
   await expect(page.locator('[data-state="ready"]')).toBeVisible();
@@ -306,12 +318,14 @@ test("loi-va-thu-lai", async ({ page }, info) => {
   await expect(dialog.getByText("Gõ tên người này như sàn vẫn gọi.")).toBeVisible();
   await expect(dialog.getByText("Chọn ít nhất một vai.")).toBeVisible();
   await shot(page, info, "ST-invite-invalid");
+  await axeClean(page, "ST-invite-invalid");
   await dialog.getByLabel("Email").fill(people["L"]!.email);
   await dialog.getByLabel("Tên trong sàn").fill("[Tên] Trùng");
   await dialog.getByRole("checkbox", { name: "Đầu chủ", exact: true }).check();
   await dialog.getByRole("button", { name: "Mời", exact: true }).click();
   await expect(dialog.getByText("Email này đã ở trong sàn.")).toBeVisible();
   await shot(page, info, "ST-invite-already");
+  await axeClean(page, "ST-invite-already");
   await page.route("**/api/v1/members", (route) =>
     route.request().method() === "POST"
       ? route.fulfill({ status: 500, body: "{}" })
@@ -324,6 +338,7 @@ test("loi-va-thu-lai", async ({ page }, info) => {
   await expect(dialog.getByLabel("Tên trong sàn")).toHaveValue("[Tên] Trùng");
   await expect(dialog.getByRole("button", { name: "Thử lại" })).toBeVisible();
   await shot(page, info, "ST-invite-failed");
+  await axeClean(page, "ST-invite-failed");
 });
 
 test("ban-phim-hop-thoai", async ({ page }, info) => {
