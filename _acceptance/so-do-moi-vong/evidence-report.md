@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: so-do-moi-vong
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 1c4de354a679213f93f80402d378f415de1d504a
-human_signoff:
+human_signoff: Manh Phan 2026-11-11
 ---
 
 # Evidence Report: so-do-moi-vong
@@ -148,7 +148,7 @@ Lệnh `make test` chạy một lần (1/1 lượt đạt, không phương sai) 
     - Phán quyết của chủ kho cho dòng 44 (Chữ dài) trong so-sanh.md: chú thích nổi của agent 2 là chi tiết thêm (Giống, như dòng 2 và dòng 23) hay là lựa chọn người dùng thấy (Lệch, như dòng 33). Nếu chủ kho chốt Giống thì số Giống thành 24 và số Lệch thành 28, không còn khớp moc.json, nên mục Đếm kết quả, mục Điều thấy được và ket_qua.toan_bang của moc.json phải sửa theo.
     - Phán quyết cùng kiểu của chủ kho cho các dòng 13, 29, 36 và 37, ghi vào mục «Năm dòng người chấm hỏi» của de-bai-ba-agent.md hoặc vào ghi chú so-sanh.md. Có phán quyết rõ cho các dòng này thì việc xếp 44 và các dòng kia có chuẩn để đối chiếu.
     - Chủ kho xác nhận các dòng sát ranh giới luật bớt chi tiết cũng đúng: dòng 29 (Agent 2 không có bộ lọc phạm vi trong #38 nhưng nhắc phạm vi ở #24) và dòng 40 (chỉ khác thứ tự), bằng câu xác nhận trong so-sanh.md hoặc de-bai-ba-agent.md.
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-11 — Đạt (dòng 44 giữ Lệch)
 
 ## Known limits
 

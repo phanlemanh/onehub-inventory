@@ -59,4 +59,8 @@ Năm dòng người chấm hỏi ở lần đo đầu, chủ kho xếp như sau:
 - Dòng 49 (Dữ liệu thử): Lệch — agent 2 không nêu cách xử lý dữ liệu cá nhân mà hai agent kia nêu; «không nêu» là Lệch như các dòng
   24, 34, 35, 52.
 
+Ở Cổng Bằng chứng (xác nhận ở phiên giám sát ngày 11/11/2026), chủ kho chốt thêm: bảng so đạt; dòng 44 (Chữ dài) giữ Lệch vì chú thích
+nổi là thứ người dùng thấy, cùng lý do dòng 33; các dòng sát ranh 13, 29, 36, 37, 40 giữ như đang xếp; mốc giữ 11 Giống / 10 Lệch
+trên 21 quyết định bắt buộc và 23 / 29 trên toàn bảng; bảng so của lần đo đầu đóng ở bản này.
+
 Cuối bảng đếm cho từng agent: số quyết định tự đoán, trong đó bao nhiêu hệ lẽ ra phải trả lời sẵn, bao nhiêu cần người quyết.

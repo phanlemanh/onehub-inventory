@@ -5,7 +5,7 @@ slug: so-do-moi-vong
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: docs/plan/do-he-design/thiet-ke.md
@@ -91,3 +91,34 @@ Quét trục tại chỗ theo khuôn quét hình thái, không gọi skill vì k
 - Mốc đo trên bản kho ở commit `c706223` (đỉnh `main` lúc nhận hàng), khi hồ sơ `khung-va-giao-dien` chưa có ở `main`.
 - CI chạy `make check` trên bản lấy nông; `kiem-moc` không đòi lịch sử git ở đó, lịch sử chỉ kiểm ở máy và ở lượt chấm S4.
 - Lúc thiết kế, kho không có hồ sơ giao diện nào đã qua chấm, nên lưới không cần danh sách miễn.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-1: Số đo đầu tiên của hồ sơ khung và giao diện có các tầng làm lại do đoán sau khi vòng đã xong, và chưa có dòng quyết định của chủ kho cho phép. Báo cáo có thể dựa trên một điểm dữ liệu chưa chắc.
+  - Ngoài-2: Thẻ chủ kho ký ghi tính năng ghi số đo chính vào mục sẽ không làm, nên người ký có thể đọc nhầm phạm vi.
+  - Ngoài-4: Khi một tệp số đo hoặc tệp mốc Quỹ hàng bị hỏng, báo cáo tổng hợp lặng lẽ đếm thiếu hoặc hiện dấu gạch, không cảnh báo.
+  - Ngoài-6: Nếu kết quả của một lượt đổi mà số lượt không đổi, lưới vẫn xanh và số tầng làm lại có thể lệch.
+  - Ngoài-7: Mỗi lần chạy kiểm thử để lại vài thư mục tạm trên máy, trong đó có một bản sao kho, làm đầy ổ dần.
+  - Ngoài-9: Người dùng gõ nhầm hoặc cố ý đưa một tên hồ sơ lạ có thể làm lệnh ghi tệp số đo ra ngoài thư mục nghiệm thu. Đây là công cụ chạy trên máy lập trình viên nên hậu quả nhỏ.
+  - Ngoài-10: Một thay đổi về nơi lưu báo cáo độ phủ đi kèm vào vòng này; mỗi lần chạy kiểm thử sẽ để lại thêm một thư mục báo cáo cũ không tự dọn. Người dùng sản phẩm không bị ảnh hưởng.
+  - Ngoài-11: Người đo lại mốc theo lời hướng dẫn đầu bảng so sẽ bỏ nhầm một luật đã chốt, nên số Giống/Lệch mới không so được với mốc cũ.
+  - Ngoài-12: Chủ kho nhìn thẻ duyệt sẽ thấy tiêu chí chính nằm ở phần 'không làm' và không có ở phần 'sẽ làm', dễ hiểu sai phạm vi khi ký.
+  - Ngoài-13: Chủ kho bị hỏi lại một câu đã trả lời và thấy số đếm quyết định cũ trên trang bằng chứng.
+  - Ngoài-15: Báo cáo gộp có thể đếm thiếu vòng hoặc để trống cột so với Quỹ hàng mà không cảnh báo, nên người đọc tin nhầm số.
+  - Ngoài-16: Một lệnh gõ sai tên hồ sơ có thể ghi tệp số đo ra ngoài thư mục hồ sơ, hoặc đọc tệp ngoài kho, nhưng chỉ khi người chạy tự gõ đường lạ trên máy mình.
+  - Ngoài-17: Nếu ai đó viết danh sách giao diện của hồ sơ theo kiểu nhiều dòng, hồ sơ giao diện đó sẽ lọt khỏi lưới kiểm mà không báo gì.
+  - Ngoài-19: Bài kiểm dùng dòng dựng sẵn thay vì dòng chép từ sổ chạy thật, nên có thể bỏ sót lệch giữa mẫu và thực tế.
+  - Ngoài-20: Nếu một vòng đang đạt sau đó bị chấm lại thành bị từ chối, bản số đo cũ vẫn được coi là còn mới và lưới không báo thiếu tầng làm lại cho vòng đó.
+  - Ngoài-21: Một số tệp công khai của kho còn chứa đường dẫn thư mục trên máy của chủ kho, làm lộ tên tài khoản máy. Không lộ khoá hay mật khẩu.
+  - Ngoài-23: Dữ liệu mẫu của bài kiểm do người gõ tay chứ không lấy từ khuôn của bộ công cụ, nên nếu khuôn đổi cách viết, bài vẫn xanh trong khi đọc hồ sơ thật có thể sai.
+  - Ngoài-24: A round for a mobile screen that has no design-pass file could pass grading without leaving a rework measurement, so that round would be missing from the rework report.
+  - Ngoài-25: The first baseline's same-versus-different count (10 vs 11) comes from rules written after the results were seen, so a reader may trust the baseline less than a version fixed in advance. The owner has not yet chosen between this version and the grader's smaller correction (12 vs 9).
+  - Ngoài-26: Two baseline plan files cite folders on the owner's own computer that no outside reader of the public repository can open. They also reveal a local home folder name.
+  - Ngoài-27: If someone types an odd folder name into the record command, the measurement file could be written outside the acceptance folder. Only the repo owner runs this command on their own machine.
+  - Ngoài-28: The automated tests do not cover one of the three statuses that mean the screen frame was already merged. If the check were later broken for that status, a baseline measured too late could pass unnoticed.
+  - Ngoài-29: Nếu ai đó gõ nhầm hoặc cố ý gõ tên hồ sơ có dấu đi lên thư mục cha, tệp số đo có thể bị ghi ra ngoài thư mục hồ sơ nghiệm thu.
+  - Ngoài-30: Thẻ chủ kho đọc để duyệt kế hoạch ghi việc ghi số đo chính ở mục Sẽ KHÔNG làm, nên bản duyệt có thể bị hiểu sai về phạm vi.
+  - Ngoài-31: Nếu bản số đo cũ bị hỏng, chạy lại lệnh ghi sẽ lặng lẽ mất các tầng đã khai trước đó và trông như chưa từng khai.
+  - Ngoài-32: Báo cáo gộp có thể bỏ qua một bản số đo hỏng mà không báo, làm số vòng và tỉ lệ làm lại thấp hơn thực tế.
+  - Ngoài-33: Bài kiểm chưa chứng minh được số vật, thước, nhát, giờ máy lấy từ dòng cuối, nên nếu sau này lấy nhầm dòng đầu thì có thể không ai biết.
+  - Ngoài-34: Báo cáo dạng chữ có thể in lệch cột hoặc sai số so với bản máy đọc mà bài kiểm vẫn xanh.
+  - Ngoài-35: Chưa có bài kiểm cho trường hợp khung có mặt nhưng chưa qua cổng, nên lưới có thể chặn nhầm mốc hợp lệ mà không ai thấy.
+  - Ngoài-36: Hồ sơ khai kiểu giao diện web hoặc web-ui có thể bị bỏ sót khỏi lưới mà bài kiểm không phát hiện.
