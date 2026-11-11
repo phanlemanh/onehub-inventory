@@ -5,7 +5,9 @@ slug: khai-lien-ket-chao-can
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config]
-status: draft
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-11
 design_doc: _acceptance/khai-lien-ket-chao-can/design.md
 ---
 
