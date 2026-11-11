@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { AUTH_BASE_PATH } from "@/modules/identity";
 
 import { LOGIN_COPY as COPY } from "./copy";
+import { signOut } from "./sign-out";
 
 /** Nothing to subscribe to: the value only differs between the server render and the browser. */
 const noSubscribe = () => () => {};
@@ -17,7 +18,7 @@ interface CompanyRef {
   name: string;
 }
 
-type Step = "email" | "code" | "choose" | "no-company";
+type Step = "email" | "code" | "choose" | "no-company" | "no-company-session";
 type Problem = null | "code-invalid" | "rate-limited" | "server-error";
 
 /** Keeps only digits: pasting "123 456" or "123-456" gives "123456". */
@@ -54,11 +55,13 @@ export function LoginForm({
 }: {
   next: string;
   codeLength: number;
-  labels: { signIn: string; code: string };
-  /** Already signed in without a company (several companies): start at the choice. */
+  labels: { signIn: string; signOut: string; code: string };
+  /** Already signed in without a company: the choice when there are companies, else the way out (row 1m). */
   initialCompanies: CompanyRef[] | null;
 }) {
-  const [step, setStep] = useState<Step>(initialCompanies ? "choose" : "email");
+  const [step, setStep] = useState<Step>(
+    initialCompanies ? (initialCompanies.length > 0 ? "choose" : "no-company-session") : "email",
+  );
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [companies, setCompanies] = useState<CompanyRef[]>(initialCompanies ?? []);
@@ -146,6 +149,15 @@ export function LoginForm({
     }
   }
 
+  async function leave() {
+    setBusy(true);
+    if (await signOut(labels.signOut)) {
+      go("/login");
+      return;
+    }
+    setBusy(false);
+  }
+
   function backToEmail() {
     setStep("email");
     setCode("");
@@ -167,6 +179,19 @@ export function LoginForm({
         ) : null}
       </div>
     ) : null;
+
+  if (step === "no-company-session") {
+    return (
+      <div className="flex flex-col gap-4" data-state="no-company-session">
+        <p role="alert" className="text-sm">
+          {COPY.noCompanySession}
+        </p>
+        <Button type="button" variant="outline" disabled={busy} onClick={() => void leave()}>
+          {labels.signOut}
+        </Button>
+      </div>
+    );
+  }
 
   if (step === "no-company") {
     return (

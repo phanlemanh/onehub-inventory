@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-11 — Vá phần đăng nhập: đường trở về sau đăng nhập kiểm bằng danh sách cho phép và bộ đọc địa chỉ của trình duyệt (14 dạng lách, mỗi dạng một ca); đăng xuất lỗi mạng hay máy chủ báo rõ «chưa thoát» và giữ người ở trang; người hết sàn mà còn phiên có nút Đăng xuất thay cho danh sách sàn trống — hàng 1m, `_acceptance/va-dang-nhap/`
 - 2026-11-11 — Sổ bối cảnh chưng cất từ Quỹ hàng trong kho tri thức: trang nền Sản phẩm, mục lục theo hàng lộ trình và 12 trang màn, mỗi ý trỏ nguồn Quỹ hàng ở commit `1729b11f` — [docs/tri-thuc/wiki/nen/muc-luc.md](../docs/tri-thuc/wiki/nen/muc-luc.md).
 - 2026-11-11 — Mời người, gán vai: màn Thành viên cho Quản trị sàn (mời bằng email kèm một thư mời, đổi vai, sàn luôn còn một quản trị), thực thể `Member` với tập vai và tên theo sàn, bốn hàm hẹp của vai danh tính; khuôn dùng chung hộp thoại có biểu mẫu và trạng thái trang «Không đủ quyền» — hàng 9, [0022](decisions/0022-moi-nguoi-gan-vai.md), `_acceptance/moi-nguoi-gan-vai/`
 - 2026-11-11 — Bộ bài kiểm sinh từ sổ màn: `tests/e2e/screens` đọc sổ màn và bản khai vai lúc chạy (qua bộ đọc của hàng 1d), mỗi màn đã dựng có bốn bài khung ở bốn khổ, màn Lưới có vùng và bản mẫu Lưới có bảy trạng thái vùng; mỗi bài có ca phá gọi đúng hàm kiểm ấy; đóng bốn lỗ bài kiểm của 1b (chờ tải treo, đối chứng chờ tải, tìm bỏ sót dòng, đỏ giả khi máy chậm) — hàng 1f, [0019](decisions/0019-measurable-design-system-pilot.md), `_acceptance/bo-bai-kiem-tu-so-man/`
