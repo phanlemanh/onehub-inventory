@@ -1,33 +1,42 @@
+# Review findings: cong-chung-minh-man-mau (round 3)
+
 ## Trong hợp đồng
 
-- **grounds_exist now fails a whole cell on any prose word or URL that contains '/'**
-  file: `tools/proof_gate/check.py:127`
-  severity: low
-  AC: AC-4
-  source: conventions
-  detail: The new rule says every token with '/' is a file reference that must resolve with is_file(). The tokenizer (`[^\s`,;()«»·]+`) still splits on whitespace only. So ordinary Vietnamese prose such as 'và/hoặc' or 'đọc/ghi', and any URL, are counted as missing files and turn the cell red. Checked against the real repo: grounds_exist('design/states.md') -> True, but grounds_exist('design/states.md (đọc/ghi)') -> False and grounds_exist('design/states.md và/hoặc AGENTS.md') -> False. A 'khác — có lý do' reason that cites the RESO dictionary URL (AGENTS.md makes RESO the naming source) also fails, even next to a valid ADR. Before this change, the same cells passed whenever one real reference was present. Rows hit: 'khác — có lý do' (ly-do-khong-can-cu, AC-4) and 'đạt' (bai-kiem-khong-co, AC-6). The gate fails closed, so nothing slips through; the cost is false red that the person writing the proof can only clear by rewording. Neither new test (proof-gate.test.ts:428 and :510) covers prose or a URL that contains '/', so this narrowing is untested and was not mentioned in decision d-20261111T050922Z-17. Possible fixes: only count a token as a path when it looks like one (file extension or a known top-level folder such as tests/, src/, design/, wiki/; URL schemes excluded), or document the restriction in khuon-chung-minh.md and add a test for it.
-  rationale: AC-4 requires a 'khác — có lý do' row with a real file or decision ground to stay silent, but a real ground next to prose like 'và/hoặc' turns the cell red.
-
-- **grounds_exist treats every word containing '/' as a file reference, so slashes in prose, URLs or markdown links now fail valid grounds**
-  file: `tools/proof_gate/check.py:127`
-  severity: medium
-  AC: AC-4
-  source: bugs
-  detail: The new rule is that every reference must resolve, but any token containing '/' still counts as a file reference. If the token is not an existing file, the whole cell fails. Prose, URLs and markdown links in the grounds column therefore turn real grounds red. Reproduced with Repo(root=repo) and a real file F = tools/proof_gate/check.py: `F` alone -> True; `F — chờ/tải tách riêng` -> False; `F (Chờ tải/Trống)` -> False; `F ListSide/BuyerSide` -> False; `F N/A` -> False; `F xem https://dd.reso.org/DD2.1/` -> False; `[F](F)` (markdown link to a real file) -> False because the `[F]` token fails is_file; `ADR-0002/ADR-0003` -> False even though both decisions exist. Result: the gate emits `ly-do-khong-can-cu` (aspects table) and `bai-kiem-khong-co` (state matrix) for rows whose grounds point to a real file. The new tests only cover a folder and a real file next to a missing one; nothing checks that a slash in plain prose stays silent. tools/proof_gate/khuon-chung-minh.md does not tell writers to avoid slashes or links either. Fix: count a token as a path reference only when it looks like a repo path (known extension, or a prefix such as src/ tests/ design/ wiki/ tools/ _acceptance/), skip URL schemes, and pull the target out of markdown links before the check.
-  rationale: AC-4 says a reason row with a real ground must be silent, yet slashes in prose, URLs or markdown links make a real ground fail.
+(không có)
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Hình dạng 4 — kiểm âm tính đứng một mình: luật 'mọi căn cứ phải có thật' không có ca đối chứng 'tệp thật + tệp thật'**
+- **A missing file inside quotes is silently skipped, so the grounds cell still passes**
+  Người dùng thấy gì: Khi người dựng màn viết lý do lệch có một tệp thật và một tệp không tồn tại đặt trong ngoặc kép kiểu văn bản, cổng vẫn cho qua. Tệp bịa đó không bị bắt.
+  Căn cứ: Hậu quả nhẹ: chỉ lọt khi ô lý do đã có ít nhất một căn cứ thật, người soi ở cổng vẫn đọc được, và ca này hiếm.
+  file: `tools/proof_gate/check.py`
+  severity: medium
+  Đề xuất: known-limits
+
+- **wiki/decisions/NNNN-<any-name>.md is accepted whenever the number exists, even if the file does not**
+  Người dùng thấy gì: Nếu lý do lệch trỏ tới một trang quyết định đúng số nhưng sai tên tệp, cổng vẫn cho qua. Liên kết sai không bị cảnh báo.
+  Căn cứ: Hậu quả nhẹ: số quyết định vẫn đúng nên người đọc tìm ra trang, không mất dữ liệu, và có thể sửa lại bất cứ lúc nào.
+  file: `tools/proof_gate/check.py`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Ordinary text with a slash and a dot is flagged as a missing file and fails a valid cell**
+  Người dùng thấy gì: Một ô lý do hợp lệ có nhắc cụm như TypeScript/Node.js có thể bị cổng báo đỏ nhầm. Người dựng màn phải viết lại câu cho cổng xanh.
+  Căn cứ: Hậu quả nhẹ: chỉ gây phiền, người dùng tự gỡ được bằng cách đổi cách viết và chạy lại, không mất dữ liệu.
+  file: `tools/proof_gate/check.py`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 4 — kiểm âm tính đứng một mình: luật 'mọi căn cứ phải có thật' không có ca đối chứng 'tệp thật + tệp thật' (r2 · tệp đã đổi)**
   Người dùng thấy gì: The checks have no case proving that a cell with two real references stays quiet. If the rule ever wrongly flagged every multi-reference cell, the test suite would not notice.
   Căn cứ: Low impact: nothing is wrong for users today, only a safety net is thin, and the gap is cheap to close later in a follow-up.
   file: `tools/proof_gate/proof-gate.test.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 5 — nói là quét cả LỚP nhưng chỉ kiểm vài điểm: ba loại căn cứ, mà luật 'một cái thiếu là hỏng cả ô' chỉ được kiểm với đường dẫn tệp**
+- **Hình dạng 5 — nói là quét cả LỚP nhưng chỉ kiểm vài điểm: ba loại căn cứ, mà luật 'một cái thiếu là hỏng cả ô' chỉ được kiểm với đường dẫn tệp (r2 · tệp đã đổi)**
   Người dùng thấy gì: Missing decision references and missing wiki references are not covered by tests when mixed with a real one. A future change could break them without anyone being warned.
   Căn cứ: Low impact: no data is lost and nobody sees a wrong result today; it only weakens future protection, and adding the cases later is cheap.
   file: `tools/proof_gate/proof-gate.test.ts`
