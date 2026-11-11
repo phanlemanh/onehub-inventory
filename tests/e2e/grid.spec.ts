@@ -71,14 +71,17 @@ test.describe("grid", () => {
 
   test("search filters rows and the count follows", async ({ page }) => {
     await openGrid(page);
-    await expect(region(page).getByText(`${TOTAL} dòng`)).toBeVisible();
+    await expect(region(page).locator('[data-slot="region-count"]')).toHaveText(`${TOTAL} dòng`);
     await page.getByRole("searchbox", { name: "Tìm trong vùng" }).fill("S1.01");
-    await expect(bodyRows(page).first()).toContainText("S1.01");
-    const count = await region(page).locator('[data-slot="region-count"]').textContent();
-    expect(count).toMatch(new RegExp(`^\\d+ / ${TOTAL} dòng$`));
-    const shown = Number(count?.split(" ")[0]);
+    const count = region(page).locator('[data-slot="region-count"]');
+    await expect(count).toHaveText(new RegExp(`^\\d+ / ${TOTAL} dòng$`));
+    const shown = Number((await count.textContent())?.split(" ")[0]);
     expect(shown).toBeGreaterThan(0);
-    expect(shown).toBeLessThan(TOTAL);
+    expect(shown).toBeLessThanOrEqual(50);
+    // Every row left matches, and the count is exactly the rows left.
+    const codes = await bodyRows(page).locator("td:first-child").allTextContents();
+    expect(codes).toHaveLength(shown);
+    for (const code of codes) expect(code).toContain("S1.01");
   });
 
   test("no match offers clear filter and it restores every row", async ({ page }) => {
@@ -87,7 +90,9 @@ test.describe("grid", () => {
     await expect(page.getByText("Không có dòng nào khớp")).toBeVisible();
     await assertNoMatchExit(page);
     await page.getByRole("button", { name: "Xoá lọc" }).click();
-    await expect(region(page).getByText(`${TOTAL} dòng`)).toBeVisible();
+    await expect(region(page).locator('[data-slot="region-count"]')).toHaveText(`${TOTAL} dòng`);
+    await expect(page.getByRole("searchbox", { name: "Tìm trong vùng" })).toHaveValue("");
+    await expect(bodyRows(page)).toHaveCount(50);
   });
 
   test("no-match check fails without the clear button", async ({ page }) => {
@@ -102,8 +107,34 @@ test.describe("grid", () => {
     await page.goto(`${GRID}?state=loading`, { waitUntil: "commit" });
     const skeleton = page.locator('[data-slot="region-skeleton"]');
     await skeleton.waitFor({ state: "attached" });
-    await assertSkeletonHiddenEarly(page);
-    await expect(skeleton).toBeVisible({ timeout: 3000 });
+    // Measure on the delay's own clock: the frame may remount the skeleton once when it switches to the
+    // phone layout, and the delay then starts again for the element the person actually sees.
+    // Sample inside the page on every frame: the first frame whose delay clock is between 500 ms and 1 s.
+    const early = await page.evaluate(
+      () =>
+        new Promise<{ t: number; v: string }>((resolve) => {
+          const tick = () => {
+            const el = document.querySelector('[data-slot="region-skeleton"]');
+            const t = Number(el?.getAnimations()[0]?.currentTime ?? -1);
+            if (el && t >= 500 && t < 1000) resolve({ t, v: getComputedStyle(el).visibility });
+            else requestAnimationFrame(tick);
+          };
+          tick();
+        }),
+    );
+    expect(early.v).toBe("hidden");
+    // The delay is 1 s with no duration, so its clock stops at exactly 1000 ms when it ends.
+    await expect
+      .poll(() => skeleton.evaluate((el) => el.getAnimations()[0]?.playState ?? "none"), {
+        timeout: 5000,
+      })
+      .toBe("finished");
+    const late = await skeleton.evaluate((el) => ({
+      t: Number(el.getAnimations()[0]?.currentTime ?? -1),
+      v: getComputedStyle(el).visibility,
+    }));
+    expect(late.t).toBeGreaterThanOrEqual(1000);
+    expect(late.v).toBe("visible");
     await expect(skeleton).toHaveAttribute("data-columns", "9");
   });
 

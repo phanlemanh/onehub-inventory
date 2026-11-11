@@ -75,6 +75,11 @@ export function TypedCell({
       aria-description={lockedReason ? `${GRID_COPY.lockedPrefix}: ${lockedReason}` : undefined}
     >
       {lockedReason ? (
+        <span data-slot="cell-lock-reason" className="sr-only">
+          {`${GRID_COPY.lockedPrefix}: ${lockedReason}`}
+        </span>
+      ) : null}
+      {lockedReason ? (
         <LockIcon
           data-slot="cell-lock"
           aria-hidden="true"

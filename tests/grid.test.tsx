@@ -326,9 +326,10 @@ describe("pagination and read-only cells", () => {
   });
 
   function checkLocked(root: HTMLElement): void {
-    const reason = root.getAttribute("aria-description");
-    if (root.querySelector('[data-slot="cell-lock"]') && !reason)
+    const reason = root.querySelector('[data-slot="cell-lock-reason"]')?.textContent;
+    if (root.querySelector('[data-slot="cell-lock"]') && !reason) {
       throw new Error("locked cell without reason");
+    }
   }
 
   it("shows a cell the viewer may not edit as plain text", () => {
@@ -345,11 +346,15 @@ describe("pagination and read-only cells", () => {
     expect(root.getAttribute("aria-description")).toContain("giá đang được kiểm lại");
     expect(root.getAttribute("title")).toContain("giá đang được kiểm lại");
     expect(() => checkLocked(root)).not.toThrow();
+    // A screen reader reads text, not an aria-description on a plain span: the reason is in the text.
+    expect(root.querySelector('[data-slot="cell-lock-reason"]')?.textContent).toBe(
+      "Ô đang khoá: giá đang được kiểm lại",
+    );
   });
 
   it("fails on a locked cell without a reason", () => {
     const { root } = cellText(<TypedCell kind="money" value={1} lockedReason="x" />);
-    root.removeAttribute("aria-description");
+    root.querySelector('[data-slot="cell-lock-reason"]')?.remove();
     expect(() => checkLocked(root)).toThrow("locked cell without reason");
   });
 });
@@ -438,6 +443,58 @@ describe("region states inside the grid", () => {
     expect(kindShown(container)).toEqual(["no-match"]);
     getByRole("button", { name: "Xoá lọc" }).click();
     await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(container.textContent).toContain("2 dòng");
+    expect((getByRole("searchbox") as HTMLInputElement).value).toBe("");
+    expect(container.querySelectorAll("tbody tr").length).toBe(2);
+    expect(container.querySelector('[data-slot="region-count"]')?.textContent).toBe("2 dòng");
+  });
+});
+
+describe("alignment on the rendered grid", () => {
+  const columns = [
+    typedColumn({ field: "Listing.listPrice", header: "Giá chào" }),
+    typedColumn({ field: "Listing.closePrice", header: "Giá chốt" }),
+    typedColumn({ field: "Listing.unitNumber", header: "Mã" }),
+    typedColumn({ field: "Listing.buildingName", header: "Toà nhà" }),
+  ];
+  const rows: GridRow[] = [
+    {
+      id: "a",
+      "Listing.listPrice": 4_850_000_000,
+      "Listing.closePrice": 4_700_000_000,
+      "Listing.unitNumber": "S1.01-0201",
+      "Listing.buildingName": "S1.01",
+    },
+  ];
+  const side = (el: Element | null | undefined): string =>
+    el?.classList.contains("text-right")
+      ? "right"
+      : el?.classList.contains("text-left")
+        ? "left"
+        : "none";
+
+  /** Header cell and body cell of each column must sit on the same side, the side of the kind. */
+  function checkPairs(container: HTMLElement): void {
+    const headers = [...container.querySelectorAll("thead th")];
+    const cells = [...container.querySelectorAll("tbody tr:first-child td")];
+    columns.forEach((column, i) => {
+      const want = column.align;
+      if (side(headers[i]) !== want || side(cells[i]) !== want) {
+        throw new Error(`alignment drift: ${column.field}`);
+      }
+    });
+  }
+
+  it("aligns header and body of every column to its kind, pair by pair", () => {
+    const { container } = render(<DataRegion title="Vùng" columns={columns} rows={rows} />);
+    expect(container.querySelectorAll("thead th").length).toBe(4);
+    expect(() => checkPairs(container)).not.toThrow();
+    expect(columns.map((column) => column.align)).toEqual(["right", "right", "left", "left"]);
+  });
+
+  it("fails when one header drifts from its cells", () => {
+    const { container } = render(<DataRegion title="Vùng" columns={columns} rows={rows} />);
+    const header = container.querySelectorAll("thead th")[1]!;
+    header.classList.replace("text-right", "text-left");
+    expect(() => checkPairs(container)).toThrow("alignment drift: Listing.closePrice");
   });
 });

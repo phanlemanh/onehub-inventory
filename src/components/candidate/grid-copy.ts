@@ -14,6 +14,7 @@ export const GRID_COPY = {
   lockedPrefix: "Ô đang khoá",
   empty: {
     title: "Chưa có dữ liệu ở đây",
+    why: "Vùng này chưa có dòng nào vì chưa ai thêm hay nhập dữ liệu vào.",
   },
   noMatch: {
     title: "Không có dòng nào khớp",

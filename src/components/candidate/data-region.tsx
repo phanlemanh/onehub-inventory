@@ -99,7 +99,8 @@ export function DataRegion({
   rows: readonly GridRow[];
   status?: RegionStatus;
   onRetry?: () => void;
-  emptyWhy: string;
+  /** Why this region is empty, in the screen's words; the general reason when absent. */
+  emptyWhy?: string;
   emptyAction?: ReactNode;
   action?: ReactNode;
   pageSize?: number;

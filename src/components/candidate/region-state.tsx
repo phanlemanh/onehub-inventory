@@ -50,8 +50,14 @@ function StateBlock({
   );
 }
 
-/** The region has no rows yet: the screen says why and offers the next step. */
-export function RegionEmpty({ why, action }: { why: string; action?: ReactNode }) {
+/** The region has no rows yet: says why (the screen's reason, or the general one) and offers the next step. */
+export function RegionEmpty({
+  why = GRID_COPY.empty.why,
+  action,
+}: {
+  why?: string;
+  action?: ReactNode;
+}) {
   return (
     <StateBlock kind="empty" title={GRID_COPY.empty.title} description={why}>
       {action}
