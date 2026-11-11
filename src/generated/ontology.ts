@@ -85,9 +85,13 @@ export interface Unit {
 
 // ---- Roles, actions and personal data (ontology/roles.yaml, actions.yaml)
 
-export type Role = string;
+export type Role = "ListAgent" | "BuyerAgent" | "TeamLead" | "CompanyAdmin";
 
 export const ROLE_INHERITS: Readonly<Record<string, readonly Role[]>> = {
+  "ListAgent": [],
+  "BuyerAgent": [],
+  "TeamLead": [],
+  "CompanyAdmin": [],
 };
 
 /** Who runs an action, and as which role. */
