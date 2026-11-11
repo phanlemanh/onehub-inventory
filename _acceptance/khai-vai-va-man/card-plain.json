@@ -1,0 +1,39 @@
+{
+  "feature_plain": "Từ hàng này, mỗi vòng làm màn phải khai rõ từng vai thấy gì ở màn đó; màn mới chưa ghi sổ hay hợp đồng thiếu vai thì kiểm tra tự động báo đỏ, và một lệnh đếm cho biết các vòng khai đủ đến đâu.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ khai đúng bốn vai được gán cho nhân viên sàn — Đầu chủ, Đầu khách, Trưởng nhóm, Quản trị sàn — và ghi rằng một người giữ được nhiều vai; vai nào thiếu tên hiển thị thì báo đỏ."},
+    {"id": "AC-2", "p": "Sẽ báo đỏ khi ai đó thêm một màn mới vào ứng dụng mà chưa ghi vào sổ màn, và gọi tên địa chỉ của màn đó."},
+    {"id": "AC-3", "p": "Sẽ báo đỏ khi sổ màn ghi sai so với ứng dụng thật: màn ghi đã có mà không có, màn ghi sắp làm mà đã có, trùng tên, hay ghi họ màn lạ."},
+    {"id": "AC-4", "p": "Sẽ ghi trước màn Liên hệ vào họ Lưới cùng Bảng hàng và Đã gửi, dù màn này làm sau."},
+    {"id": "AC-5", "p": "Sẽ báo đỏ khi hợp đồng của một vòng đang làm có giao diện mà không khai màn chạm tới hoặc thiếu bảng Vai × Màn."},
+    {"id": "AC-6", "p": "Sẽ báo đỏ khi bảng Vai × Màn thiếu một vai, thiếu một màn, để trống ô, hay ghi «không liên quan» mà không nói vì sao."},
+    {"id": "AC-8", "p": "Sẽ có một lệnh in số vòng khai đủ, số vòng thiếu, và tỉ lệ ô ghi «không liên quan», đặt cạnh mốc 33/98 của Quỹ hàng."},
+    {"id": "AC-9", "p": "Sẽ chạy kiểm tra này trong bộ kiểm chung trước mỗi lần gộp, nên lỗi khai thiếu chặn được việc gộp."}
+  ],
+  "wont_do": [
+    {"id": "AC-7", "p": "Sẽ KHÔNG báo đỏ các hồ sơ đã ký trước khi có bảng (như khung giao diện); chúng được đếm riêng là «trước khối»."},
+    {"id": "OOS-1", "p": "KHÔNG chạy thử bằng trình duyệt theo từng vai — để hàng 9b."},
+    {"id": "OOS-2", "p": "KHÔNG khai vai nào được vào màn nào hay vai nào kế thừa vai nào — bảng quyền của hàng 9a là nguồn duy nhất."},
+    {"id": "OOS-3", "p": "KHÔNG đổi thanh bên theo nhiều vai — hàng riêng xếp sau hàng này."},
+    {"id": "OOS-4", "p": "KHÔNG thêm vai cho khách xem trang chia sẻ hay cho trợ lý AI."},
+    {"id": "OOS-5", "p": "KHÔNG ép bảng Vai × Màn với vòng chỉ sửa quyền mà không khai giao diện (xem Hỏi-1)."},
+    {"id": "OOS-6", "p": "KHÔNG sửa phần nào khác của mô hình nghiệp vụ ngoài tệp danh sách vai."},
+    {"id": "OOS-7", "p": "KHÔNG sửa hồ sơ của vòng khác để thêm bảng."}
+  ],
+  "coverage_plain": [
+    {"i": 0, "p": "Phủ cả hai thứ được khai: vai (AC-1) và màn (AC-2, AC-3, AC-4)."},
+    {"i": 1, "p": "Phủ bốn kiểu sổ lệch với ứng dụng: màn chưa ghi, ghi mà không có, ghi trước khi làm, ghi sắp làm mà đã có (AC-2 đến AC-4)."},
+    {"i": 2, "p": "Phủ đủ bảy trạng thái hồ sơ của bộ công cụ, chia đang làm, đã đóng, và trạng thái lạ thì đỏ (AC-5 đến AC-7)."},
+    {"i": 3, "p": "Phủ mười kiểu bảng Vai × Màn khai sai, mỗi kiểu có ca phá thử (AC-5, AC-6)."},
+    {"i": 4, "p": "Phủ hai chỗ người dùng gặp: kiểm tra trước khi gộp (AC-9) và lệnh đếm số đo (AC-8)."},
+    {"i": 5, "p": "Để sau: chạy thử theo vai trên trình duyệt (9b), bảng quyền (9a), thanh bên nhiều vai, khách xem trang chia sẻ (17)."},
+    {"i": 6, "p": "Không bao giờ: máy chấm ô đúng hay sai — việc ấy của người ở Cổng Phạm vi."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Hai lựa chọn máy ghi là tự quyết nhưng căn cứ yếu: danh sách bốn vai chỉ dựa câu nói con số bốn, và lý do chọn Python gọi lối kia là chết trong khi nó chỉ đắt hơn. Đã sửa: dẫn câu của bản phạm vi gọi tên đủ bốn vai; đổi căn cứ chọn Python thành «dùng lại bộ đọc có sẵn»."},
+    {"i": 1, "p": "Hợp đồng không chạm giao diện nhưng có khai màn (như bảng quyền 9a) chưa được đo. Đã sửa: thêm vế vào tiêu chí và thêm ca phá thử."},
+    {"i": 2, "p": "Lời hứa «phá thì bộ kiểm chung đỏ» mới chỉ đo bằng chuỗi có mặt. Đã sửa: bài chấm đọc cấu hình bộ kiểm để chắc kiểm tra là bước bắt buộc và không nuốt lỗi, phá cả hai kiểu."},
+    {"i": 3, "p": "Chưa liệt kê đủ trạng thái hồ sơ, nên một vòng đã duyệt có thể lọt. Đã sửa: liệt đủ bảy trạng thái, mỗi trạng thái một ca; để sau: thử bộ ghi của bộ công cụ có giữ khoá khai màn khi ký — hàng 2 là hồ sơ đầu tiên thử được."},
+    {"i": 4, "p": "Câu hỏi cho hội đồng chấm đòi xét điều nó không có dữ liệu để xem. Đã sửa: bỏ vế ấy, máy đã đo bằng bài khác."}
+  ]
+}
