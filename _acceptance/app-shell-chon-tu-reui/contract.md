@@ -5,7 +5,7 @@ slug: app-shell-chon-tu-reui
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
-screens: [today, inventory, sent]
+screens: [proto]
 status: approved
 approved_by: Manh Phan
 approved_at: 2026-11-11T14:19:02Z
@@ -75,14 +75,13 @@ Thước đối chiếu: các vùng của `app-shell-8` (design.md, 15 vùng), b
 
 ## Vai × Màn
 
-App Shell bọc mọi màn nội bộ; hàng này không đổi ai vào màn nào. Mục giới hạn vai đầu tiên (Thành viên, chỉ quản trị
-sàn) tới từ hàng 9.
+Màn hàng này dựng là bản mẫu App Shell (chỉ ở máy làm). App Shell bọc mọi màn nội bộ nhưng không đổi ai vào màn nào:
+Hôm nay, Bảng hàng, Đã gửi hiện với mọi vai; Thành viên (hàng 9) chỉ quản trị sàn. Bảng quyền của hàng 9a quyết phần
+còn lại. Dòng màn sửa sau Cổng Phạm vi, xem sổ quyết định.
 
 | Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
 |---|---|---|---|---|
-| today | được — mục chung, hiện với mọi vai | được — mục chung, hiện với mọi vai | được — mục chung, hiện với mọi vai | được — mục chung, hiện với mọi vai |
-| inventory | được — mục chung, hiện với mọi vai | được — mục chung, hiện với mọi vai | được — mục chung, hiện với mọi vai | được — mục chung hôm nay; bảng quyền của hàng 9a quyết |
-| sent | được — mục chung, hiện với mọi vai | được — mục chung, hiện với mọi vai | được — mục chung, hiện với mọi vai | được — mục chung hôm nay; bảng quyền của hàng 9a quyết |
+| proto | được — bản mẫu chỉ ở máy làm | được — bản mẫu chỉ ở máy làm | được — bản mẫu chỉ ở máy làm | được — bản mẫu chỉ ở máy làm |
 
 ## Out of scope
 

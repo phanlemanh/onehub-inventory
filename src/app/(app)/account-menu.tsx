@@ -25,6 +25,8 @@ import { AUTH_BASE_PATH } from "@/modules/identity";
 
 import { LOGIN_COPY as COPY } from "../login/copy";
 
+import { useSwitchCompany } from "./company-switch";
+
 /** Nothing to subscribe to: the value only differs between the server render and the browser. */
 const noSubscribe = () => () => {};
 
@@ -61,6 +63,7 @@ export function AccountMenu({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(false);
+  const { switching, switchTo: switchCompany } = useSwitchCompany(account?.company?.id);
   // Set once the menu runs in the browser: before that, a click on the button opens nothing.
   const ready = useSyncExternalStore(
     noSubscribe,
@@ -85,15 +88,7 @@ export function AccountMenu({
 
   async function switchTo(companyId: string) {
     setOpen(false);
-    if (companyId === account?.company?.id) return;
-    setBusy(true);
-    const res = await fetch(`${AUTH_BASE_PATH}/session/company`, {
-      method: "PUT",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ companyId }),
-    });
-    setBusy(false);
-    if (res.ok) router.refresh();
+    await switchCompany(companyId);
   }
 
   async function signOut() {
@@ -136,7 +131,9 @@ export function AccountMenu({
           <>
             <DropdownMenuSeparator />
             <DropdownMenuSub>
-              <DropdownMenuSubTrigger disabled={busy}>{COPY.switchCompany}</DropdownMenuSubTrigger>
+              <DropdownMenuSubTrigger disabled={busy || switching}>
+                {COPY.switchCompany}
+              </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
                 <DropdownMenuRadioGroup
                   value={account.company?.id ?? ""}

@@ -5,8 +5,7 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AppShell, MAIN_ID, type NavItem } from "../src/components/templates/app-shell";
-import { COLUMN_COOKIE } from "../src/components/templates/app-shell/second-column";
-import { RAIL_COPY } from "../src/components/templates/app-shell/rail-copy";
+import { COLUMN_COOKIE } from "../src/components/templates/app-shell/column-cookie";
 import { FRAME_COPY } from "../src/components/templates/frame-copy";
 import { PageState } from "../src/components/templates/page-state";
 import { clearScreenBanner } from "../src/components/templates/screen-banner";
@@ -164,8 +163,10 @@ describe("second column of the App Shell", () => {
       "Lối tắt một",
       "Lối tắt hai",
     ]);
-    expect(links.filter((a) => a.getAttribute("aria-current") === "page")).toHaveLength(1);
-    expect(links[0]?.getAttribute("aria-current")).toBe("page");
+    // The rail alone marks the open screen ("page"); the second column marks the place inside it ("true").
+    expect(links.filter((a) => a.getAttribute("aria-current") === "true")).toHaveLength(1);
+    expect(links[0]?.getAttribute("aria-current")).toBe("true");
+    expect(document.querySelectorAll('[aria-current="page"]')).toHaveLength(1);
     expect(column().textContent).toContain("Lối tắt");
   });
 
@@ -173,29 +174,31 @@ describe("second column of the App Shell", () => {
     nav.pathname = "/";
     render(<AppShell nav={ITEMS} />);
     expect(column().querySelectorAll("a")).toHaveLength(0);
-    expect(column().textContent).toContain(RAIL_COPY.noSubItems);
+    expect(column().textContent).toContain(FRAME_COPY.secondColumn.noSubItems);
   });
 
   it("folds with the handle and stays folded after a reload", () => {
     nav.pathname = "/inventory";
     const first = render(<AppShell nav={ITEMS} />);
     expect(column().dataset.state).toBe("open");
-    fireEvent.click(screen.getByRole("button", { name: RAIL_COPY.collapseColumn }));
+    fireEvent.click(screen.getByRole("button", { name: FRAME_COPY.secondColumn.collapse }));
     expect(column().dataset.state).toBe("closed");
     expect(
-      screen.getByRole("button", { name: RAIL_COPY.expandColumn }).getAttribute("aria-expanded"),
+      screen
+        .getByRole("button", { name: FRAME_COPY.secondColumn.expand })
+        .getAttribute("aria-expanded"),
     ).toBe("false");
     first.unmount();
     render(<AppShell nav={ITEMS} />);
     expect(column().dataset.state, "second column state lost after reload").toBe("closed");
-    fireEvent.click(screen.getByRole("button", { name: RAIL_COPY.expandColumn }));
+    fireEvent.click(screen.getByRole("button", { name: FRAME_COPY.secondColumn.expand }));
     expect(column().dataset.state).toBe("open");
   });
 
   it("the reload check fails when the remembered choice is wiped", () => {
     nav.pathname = "/inventory";
     const first = render(<AppShell nav={ITEMS} />);
-    fireEvent.click(screen.getByRole("button", { name: RAIL_COPY.collapseColumn }));
+    fireEvent.click(screen.getByRole("button", { name: FRAME_COPY.secondColumn.collapse }));
     first.unmount();
     document.cookie = `${COLUMN_COOKIE}=; path=/; max-age=0`;
     render(<AppShell nav={ITEMS} />);

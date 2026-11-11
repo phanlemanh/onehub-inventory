@@ -17,17 +17,17 @@ import {
 import type { Role } from "@/generated/ontology";
 import { cn } from "@/lib/utils";
 
+import { FRAME_COPY } from "../frame-copy";
+import { COLUMN_COOKIE, COLUMN_COOKIE_MAX_AGE, columnOpenFromCookie } from "./column-cookie";
 import { currentEntry, isCurrent, type NavItem } from "../nav-menu";
-import { RAIL_COPY } from "./rail-copy";
 
-/** Cookie that remembers whether the person folded the second column (UI preference, no company data). */
-export const COLUMN_COOKIE = "app_shell_cot2";
-const COLUMN_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+const COPY = FRAME_COPY.secondColumn;
 
 const listeners = new Set<() => void>();
 
 function readOpen(): boolean {
-  return !document.cookie.split("; ").includes(`${COLUMN_COOKIE}=0`);
+  const pair = document.cookie.split("; ").find((c) => c.startsWith(`${COLUMN_COOKIE}=`));
+  return columnOpenFromCookie(pair?.slice(COLUMN_COOKIE.length + 1));
 }
 
 function subscribe(listener: () => void): () => void {
@@ -36,8 +36,8 @@ function subscribe(listener: () => void): () => void {
 }
 
 /** Open unless the person folded it; the choice survives a reload. */
-export function useColumnOpen(): [boolean, (open: boolean) => void] {
-  const open = useSyncExternalStore(subscribe, readOpen, () => true);
+export function useColumnOpen(initial = true): [boolean, (open: boolean) => void] {
+  const open = useSyncExternalStore(subscribe, readOpen, () => initial);
   const setOpen = useCallback((next: boolean) => {
     document.cookie = `${COLUMN_COOKIE}=${next ? 1 : 0}; path=/; max-age=${COLUMN_COOKIE_MAX_AGE}; samesite=lax`;
     for (const listener of listeners) listener();
@@ -63,7 +63,7 @@ export function SecondColumnNav({
       <nav aria-label={entry.title} className="flex flex-col gap-2 p-2">
         <SidebarGroup>
           <SidebarGroupLabel>{entry.title}</SidebarGroupLabel>
-          <p className="px-2 text-xs text-muted-foreground">{RAIL_COPY.noSubItems}</p>
+          <p className="px-2 text-xs text-muted-foreground">{COPY.noSubItems}</p>
         </SidebarGroup>
       </nav>
     );
@@ -91,7 +91,7 @@ export function SecondColumnNav({
                       render={
                         <Link
                           href={link.href}
-                          aria-current={active ? "page" : undefined}
+                          aria-current={active ? "true" : undefined}
                           onClick={() => {
                             if (isMobile) setOpenMobile(false);
                           }}
@@ -115,11 +115,14 @@ export function SecondColumnNav({
 export function SecondColumn({
   items,
   roles,
+  initialOpen = true,
 }: {
   items: readonly NavItem[];
   roles?: readonly Role[];
+  /** The remembered choice read on the server, so the first paint already matches it. */
+  initialOpen?: boolean;
 }) {
-  const [open, setOpen] = useColumnOpen();
+  const [open, setOpen] = useColumnOpen(initialOpen);
   return (
     <div className="sticky top-12 hidden max-h-svh shrink-0 self-start md:flex">
       <aside
@@ -135,7 +138,7 @@ export function SecondColumn({
         <Button
           variant="ghost"
           size="icon-xs"
-          aria-label={open ? RAIL_COPY.collapseColumn : RAIL_COPY.expandColumn}
+          aria-label={open ? COPY.collapse : COPY.expand}
           aria-expanded={open}
           onClick={() => setOpen(!open)}
         >

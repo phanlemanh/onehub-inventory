@@ -35,6 +35,7 @@ export function AppShell({
   roles,
   company,
   account,
+  columnOpen,
   children,
 }: {
   nav: readonly NavItem[];
@@ -44,6 +45,8 @@ export function AppShell({
   company?: ReactNode;
   /** The account corner of the top bar: sign-in link or account menu (row 8). */
   account?: ReactNode;
+  /** Whether the person left the second column open, read from its cookie on the server; absent means open. */
+  columnOpen?: boolean;
   children?: ReactNode;
 }) {
   return (
@@ -81,11 +84,12 @@ export function AppShell({
         </div>
       </Sidebar>
       <SidebarInset id={MAIN_ID} tabIndex={-1}>
-        <header className="sticky top-0 z-20 flex h-12 shrink-0 items-center gap-2 border-b bg-background px-2">
+        <header
+          data-slot="app-shell-top-bar"
+          className="sticky top-0 z-20 flex h-12 shrink-0 items-center gap-2 border-b bg-background px-2"
+        >
           <div className="flex min-w-0 flex-1 items-center gap-1">
-            <div className="md:hidden">
-              <SidebarTrigger aria-label={FRAME_COPY.openSidebar} />
-            </div>
+            <SidebarTrigger aria-label={FRAME_COPY.openSidebar} />
             {company}
           </div>
           <div className="ml-auto flex shrink-0 items-center gap-2">
@@ -94,7 +98,7 @@ export function AppShell({
           </div>
         </header>
         <div className="flex flex-1 flex-col md:flex-row">
-          <SecondColumn items={nav} roles={roles} />
+          <SecondColumn items={nav} roles={roles} initialOpen={columnOpen ?? true} />
           <div className="flex min-w-0 flex-1 flex-col">
             <ConnectionWatcher />
             <ScreenBanner />
