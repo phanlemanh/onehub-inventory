@@ -37,6 +37,8 @@ const TANG = [
   "truy-cap",
 ];
 const MOC = "docs/plan/do-he-design";
+// Tests that create git repositories or clones run past vitest's 5 s default when the machine is busy.
+const GIT_TIMEOUT = 60_000;
 const POST_GATE = ["machine-cleared", "signed-off", "da-cham-boi-thuc-te"];
 // The status line comment of the kit contract template (acceptance-gate 2.38.1 contract-template.md).
 const TEMPLATE_COMMENT = "            # draft | approved | implemented | verified | signed-off";
@@ -295,41 +297,53 @@ describe("kiem", () => {
     expect(r.stdout).toContain("kiem: 1 vong giao dien");
   });
 
-  it("kho thật: kiem và kiem-moc xanh", () => {
-    const k = run(ROOT, "kiem");
-    expect(k.status, k.stdout).toBe(0);
-    const m = run(ROOT, "kiem-moc");
-    expect(m.status, m.stdout).toBe(0);
-  });
+  it(
+    "kho thật: kiem và kiem-moc xanh",
+    () => {
+      const k = run(ROOT, "kiem");
+      expect(k.status, k.stdout).toBe(0);
+      const m = run(ROOT, "kiem-moc");
+      expect(m.status, m.stdout).toBe(0);
+    },
+    GIT_TIMEOUT,
+  );
 
-  it("kho thật: thêm vòng giao diện verified thì đỏ", () => {
-    const root = tempRoot();
-    cpSync(join(ROOT, "_acceptance"), join(root, "_acceptance"), { recursive: true });
-    cpSync(join(ROOT, MOC), join(root, MOC), { recursive: true });
-    expect(run(root, "kiem").status).toBe(0);
-    hoSo(root, "vong-moi", { status: "verified", surfaces: "ui" });
-    const r = run(root, "kiem");
-    expect(r.status).toBe(1);
-    expect(r.stdout).toContain("vong-moi:");
-  });
+  it(
+    "kho thật: thêm vòng giao diện verified thì đỏ",
+    () => {
+      const root = tempRoot();
+      cpSync(join(ROOT, "_acceptance"), join(root, "_acceptance"), { recursive: true });
+      cpSync(join(ROOT, MOC), join(root, MOC), { recursive: true });
+      expect(run(root, "kiem").status).toBe(0);
+      hoSo(root, "vong-moi", { status: "verified", surfaces: "ui" });
+      const r = run(root, "kiem");
+      expect(r.status).toBe(1);
+      expect(r.stdout).toContain("vong-moi:");
+    },
+    GIT_TIMEOUT,
+  );
 
-  it("kho thật lấy nông: kiem-moc vẫn chạy", () => {
-    const root = mkdtempSync(join(tmpdir(), "round-metrics-nong-"));
-    rmSync(root, { recursive: true });
-    git(tmpdir(), "clone", "-q", "--depth", "1", `file://${ROOT}`, root);
-    if (git(root, "rev-parse", "--is-shallow-repository") !== "true")
-      throw new Error("clone is not shallow");
-    let r = run(root, "kiem-moc");
-    expect(r.status, r.stdout).toBe(0);
-    expect(r.stdout).toContain("kho nong: bo qua kiem lich su git");
+  it(
+    "kho thật lấy nông: kiem-moc vẫn chạy",
+    () => {
+      const root = mkdtempSync(join(tmpdir(), "round-metrics-nong-"));
+      rmSync(root, { recursive: true });
+      git(tmpdir(), "clone", "-q", "--depth", "1", `file://${ROOT}`, root);
+      if (git(root, "rev-parse", "--is-shallow-repository") !== "true")
+        throw new Error("clone is not shallow");
+      let r = run(root, "kiem-moc");
+      expect(r.status, r.stdout).toBe(0);
+      expect(r.stdout).toContain("kho nong: bo qua kiem lich su git");
 
-    const moc = JSON.parse(readFileSync(join(root, MOC, latestMoc(root), "moc.json"), "utf8"));
-    const a2 = join(root, moc.agent[1].tep);
-    writeFileSync(a2, readFileSync(a2, "utf8").replace("lập phương án", "lập kế hoạch"));
-    r = run(root, "kiem-moc");
-    expect(r.status).toBe(1);
-    expect(r.stdout).toContain("cau giao khac de bai: agent 2");
-  });
+      const moc = JSON.parse(readFileSync(join(root, MOC, latestMoc(root), "moc.json"), "utf8"));
+      const a2 = join(root, moc.agent[1].tep);
+      writeFileSync(a2, readFileSync(a2, "utf8").replace("lập phương án", "lập kế hoạch"));
+      r = run(root, "kiem-moc");
+      expect(r.status).toBe(1);
+      expect(r.stdout).toContain("cau giao khac de bai: agent 2");
+    },
+    GIT_TIMEOUT,
+  );
 });
 
 function latestMoc(root: string) {
@@ -436,149 +450,143 @@ describe("kiem-moc", () => {
     return { root, base, name, mocPath, moc };
   }
 
-  it("kiem-moc: mốc thật xanh và sáu lần phá", () => {
-    expect(run(ROOT, "kiem-moc").status).toBe(0);
-    const ok = mocRepo();
-    const g = run(ok.root, "kiem-moc");
-    expect(g.status, g.stdout).toBe(0);
+  it(
+    "kiem-moc: mốc thật xanh và sáu lần phá",
+    () => {
+      expect(run(ROOT, "kiem-moc").status).toBe(0);
+      const ok = mocRepo();
+      const g = run(ok.root, "kiem-moc");
+      expect(g.status, g.stdout).toBe(0);
 
-    const cases: [string, (c: ReturnType<typeof mocRepo>) => void][] = [
-      [
-        "can dung 3 agent",
-        (c) =>
-          writeFileSync(c.mocPath, JSON.stringify({ ...c.moc, agent: c.moc.agent.slice(0, 2) })),
-      ],
-      [
-        "tep phuong an trung",
-        (c) =>
-          writeFileSync(
-            c.mocPath,
-            JSON.stringify({
-              ...c.moc,
-              agent: [
-                c.moc.agent[0],
-                { ...c.moc.agent[1], tep: c.moc.agent[0].tep },
-                c.moc.agent[2],
-              ],
-            }),
-          ),
-      ],
-      ["tep phuong an rong", (c) => writeFileSync(join(c.root, c.moc.agent[2].tep), "")],
-      ["thieu bang so", (c) => rmSync(join(c.root, c.moc.bang_so))],
-      [
-        "cau giao khac de bai: agent 2",
-        (c) => {
-          const p = join(c.root, c.moc.agent[1].tep);
-          writeFileSync(p, readFileSync(p, "utf8").replace("lập phương án", "lập kế hoạch"));
-        },
-      ],
-      [
-        "commit khong co",
-        (c) => writeFileSync(c.mocPath, JSON.stringify({ ...c.moc, commit: "0".repeat(40) })),
-      ],
-      [
-        "do sau khi 1a gop",
-        (c) => {
-          mkdirSync(join(c.root, "_acceptance/khung-va-giao-dien"), { recursive: true });
-          writeFileSync(
-            join(c.root, "_acceptance/khung-va-giao-dien/contract.md"),
-            "---\nstatus: signed-off\n---\n",
-          );
-          git(c.root, "add", ".");
-          git(c.root, "commit", "-qm", "1a");
-          writeFileSync(
-            c.mocPath,
-            JSON.stringify({ ...c.moc, commit: git(c.root, "rev-parse", "HEAD") }),
-          );
-        },
-      ],
-      // Every post-gate status in every STATUS_FORMS form.
-      ...POST_GATE.flatMap((s) =>
-        STATUS_FORMS(s).map((status): [string, (c: ReturnType<typeof mocRepo>) => void] => [
+      const cases: [string, (c: ReturnType<typeof mocRepo>) => void][] = [
+        [
+          "can dung 3 agent",
+          (c) =>
+            writeFileSync(c.mocPath, JSON.stringify({ ...c.moc, agent: c.moc.agent.slice(0, 2) })),
+        ],
+        [
+          "tep phuong an trung",
+          (c) =>
+            writeFileSync(
+              c.mocPath,
+              JSON.stringify({
+                ...c.moc,
+                agent: [
+                  c.moc.agent[0],
+                  { ...c.moc.agent[1], tep: c.moc.agent[0].tep },
+                  c.moc.agent[2],
+                ],
+              }),
+            ),
+        ],
+        ["tep phuong an rong", (c) => writeFileSync(join(c.root, c.moc.agent[2].tep), "")],
+        ["thieu bang so", (c) => rmSync(join(c.root, c.moc.bang_so))],
+        [
+          "cau giao khac de bai: agent 2",
+          (c) => {
+            const p = join(c.root, c.moc.agent[1].tep);
+            writeFileSync(p, readFileSync(p, "utf8").replace("lập phương án", "lập kế hoạch"));
+          },
+        ],
+        [
+          "commit khong co",
+          (c) => writeFileSync(c.mocPath, JSON.stringify({ ...c.moc, commit: "0".repeat(40) })),
+        ],
+        [
           "do sau khi 1a gop",
           (c) => {
             mkdirSync(join(c.root, "_acceptance/khung-va-giao-dien"), { recursive: true });
             writeFileSync(
               join(c.root, "_acceptance/khung-va-giao-dien/contract.md"),
-              `---\nslug: khung-va-giao-dien\nstatus: ${status}\napproved_by:\n---\n`,
+              "---\nstatus: signed-off\n---\n",
             );
             git(c.root, "add", ".");
-            git(c.root, "commit", "-qm", `1a ${status}`);
+            git(c.root, "commit", "-qm", "1a");
             writeFileSync(
               c.mocPath,
               JSON.stringify({ ...c.moc, commit: git(c.root, "rev-parse", "HEAD") }),
             );
           },
-        ]),
-      ),
-      [
-        "ban kho co san phuong an",
-        (c) =>
-          writeFileSync(
-            c.mocPath,
-            JSON.stringify({ ...c.moc, commit: git(c.root, "rev-parse", "HEAD") }),
-          ),
-      ],
-      ["moc.json hong", (c) => writeFileSync(c.mocPath, "{khong phai json")],
-      [
-        "cau giao khac de bai: agent 1",
-        (c) => {
-          // A machine path written back into the sent brief no longer equals the fixed brief.
-          const p = join(c.root, c.moc.agent[0].tep);
-          writeFileSync(
-            p,
-            readFileSync(p, "utf8").replace("ở thư mục `<bản kho>`", "ở thư mục `/tmp/moc-tree`"),
-          );
-        },
-      ],
-      [
-        "cau giao khac de bai: agent 3",
-        (c) => {
-          // The old heading claimed a verbatim brief; only the elided heading is read.
-          const p = join(c.root, c.moc.agent[2].tep);
-          writeFileSync(
-            p,
-            readFileSync(p, "utf8").replace(
-              "## Câu giao đã gửi (nguyên văn, đường dẫn máy đã lược)",
-              "## Câu giao đã gửi (nguyên văn)",
+        ],
+        [
+          "ban kho co san phuong an",
+          (c) =>
+            writeFileSync(
+              c.mocPath,
+              JSON.stringify({ ...c.moc, commit: git(c.root, "rev-parse", "HEAD") }),
             ),
-          );
-        },
-      ],
-    ];
-    for (const [message, breakIt] of cases) {
-      const c = mocRepo();
-      breakIt(c);
-      const r = run(c.root, "kiem-moc");
-      expect(r.status, message).toBe(1);
-      expect(r.stdout, message).toContain(message);
-    }
-  });
+        ],
+        ["moc.json hong", (c) => writeFileSync(c.mocPath, "{khong phai json")],
+        [
+          "cau giao khac de bai: agent 1",
+          (c) => {
+            // A machine path written back into the sent brief no longer equals the fixed brief.
+            const p = join(c.root, c.moc.agent[0].tep);
+            writeFileSync(
+              p,
+              readFileSync(p, "utf8").replace("ở thư mục `<bản kho>`", "ở thư mục `/tmp/moc-tree`"),
+            );
+          },
+        ],
+        [
+          "cau giao khac de bai: agent 3",
+          (c) => {
+            // The old heading claimed a verbatim brief; only the elided heading is read.
+            const p = join(c.root, c.moc.agent[2].tep);
+            writeFileSync(
+              p,
+              readFileSync(p, "utf8").replace(
+                "## Câu giao đã gửi (nguyên văn, đường dẫn máy đã lược)",
+                "## Câu giao đã gửi (nguyên văn)",
+              ),
+            );
+          },
+        ],
+      ];
+      for (const [message, breakIt] of cases) {
+        const c = mocRepo();
+        breakIt(c);
+        const r = run(c.root, "kiem-moc");
+        expect(r.status, message).toBe(1);
+        expect(r.stdout, message).toContain(message);
+      }
+    },
+    GIT_TIMEOUT,
+  );
 
-  it("kiem-moc: 1a còn trước Cổng Bằng chứng thì xanh", () => {
-    const cases = ["draft", "approved", "implemented", "verified"].flatMap((s) => STATUS_FORMS(s));
-    expect(cases.length).toBe(16);
-    for (const status of cases) {
+  it(
+    "kiem-moc: ma trận trạng thái hồ sơ 1a ở bốn dạng viết",
+    () => {
+      // One repository, one commit per case: the baseline points at the commit, the plans stay uncommitted.
       const root = mkdtempSync(join(tmpdir(), "round-metrics-1a-"));
       git(root, "init", "-q");
-      mkdirSync(join(root, "_acceptance/khung-va-giao-dien"), { recursive: true });
-      writeFileSync(
-        join(root, "_acceptance/khung-va-giao-dien/contract.md"),
-        `---\nstatus: ${status}\n---\n`,
-      );
-      git(root, "add", ".");
-      git(root, "commit", "-qm", "1a in progress");
-      const base = git(root, "rev-parse", "HEAD");
       cpSync(join(ROOT, MOC), join(root, MOC), { recursive: true });
       const mocPath = join(root, MOC, latestMoc(root), "moc.json");
-      writeFileSync(
-        mocPath,
-        JSON.stringify({ ...JSON.parse(readFileSync(mocPath, "utf8")), commit: base }),
+      const moc = JSON.parse(readFileSync(mocPath, "utf8"));
+      mkdirSync(join(root, "_acceptance/khung-va-giao-dien"), { recursive: true });
+      const before = ["draft", "approved", "implemented", "verified"].flatMap((s) =>
+        STATUS_FORMS(s),
       );
-      const r = run(root, "kiem-moc");
-      expect(r.status, `${status}: ${r.stdout}`).toBe(0);
-    }
-  });
+      const after = POST_GATE.flatMap((s) => STATUS_FORMS(s));
+      expect([before.length, after.length]).toEqual([16, 12]);
+      for (const [status, red] of [
+        ...before.map((s): [string, boolean] => [s, false]),
+        ...after.map((s): [string, boolean] => [s, true]),
+      ]) {
+        writeFileSync(
+          join(root, "_acceptance/khung-va-giao-dien/contract.md"),
+          `---\nslug: khung-va-giao-dien\nstatus: ${status}\napproved_by:\n---\n`,
+        );
+        git(root, "add", "_acceptance");
+        git(root, "commit", "-qm", `1a ${status}`);
+        writeFileSync(mocPath, JSON.stringify({ ...moc, commit: git(root, "rev-parse", "HEAD") }));
+        const r = run(root, "kiem-moc");
+        expect(r.status, `${status}: ${r.stdout}`).toBe(red ? 1 : 0);
+        if (red) expect(r.stdout, status).toContain("do sau khi 1a gop");
+      }
+    },
+    GIT_TIMEOUT,
+  );
 
   it("gop: khối mốc khớp moc.json", () => {
     const moc = JSON.parse(readFileSync(join(ROOT, MOC, latestMoc(ROOT), "moc.json"), "utf8"));

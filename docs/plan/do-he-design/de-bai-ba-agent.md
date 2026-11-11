@@ -44,15 +44,19 @@ chọn của từng agent và một trong ba kết quả:
 
 Luật áp dụng khi xếp dòng (chủ kho chốt ngày 11/11/2026; lần đo lại dùng y nguyên):
 
-- Một agent không nêu quyết định mà agent khác có nêu thì dòng đó là **Lệch**: «không nêu» được tính là một lựa chọn khác. Ngưỡng
-  này áp cả khi agent nêu quyết định nhưng bỏ một phần mà agent khác có nêu (ví dụ dòng «Dữ liệu thử» của lần đo đầu).
+- **«Không nêu» là Lệch**: một agent không nêu một quyết định mà agent khác có nêu thì dòng đó là Lệch.
 - **Giống, mang lỗi** chỉ dùng khi ít nhất một phương án tự trích luật bị trái. Người lập bảng không tự suy luật.
-- Một khác biệt chỉ tính ở dòng mang đúng tên nó; không có dòng như vậy thì tính ở dòng đầu tiên nó xuất hiện, và không tính lại ở
-  dòng khác.
-- Hai cách gọi khác nhau cho cùng một thứ người dùng nhìn thấy (ví dụ chữ trên nút) là hai lựa chọn khác nhau.
+- **Bớt chi tiết mà lựa chọn chính vẫn như nhau là Giống**: agent nêu cùng lựa chọn nhưng ghi ít chi tiết hơn agent khác thì không
+  tính là khác.
 
-Hai luật đầu đã có trong câu giao cho agent lập bảng của lần đo đầu, trước khi có kết quả. Một luật «tính lại khác biệt ở mọi dòng
-chứa nó» từng được thêm sau lượt chấm đầu; chủ kho bỏ luật đó vì nó được viết sau khi thấy số, và chốt luật thứ ba, thứ tư ở trên
-khi xếp năm dòng người chấm hỏi.
+Một luật thứ ba («tính lại một khác biệt ở mọi dòng chứa nó») từng được thêm sau lượt chấm đầu, khi đã thấy số; chủ kho bỏ luật đó.
+Vì vậy mỗi khác biệt chỉ tính một lần, ở dòng mang đúng tên nó (không có thì ở dòng đầu tiên chứa nó).
+
+Năm dòng người chấm hỏi ở lần đo đầu, chủ kho xếp như sau:
+
+- Dòng 1 (Bố cục), 6 (Cách nạp dữ liệu), 23 (Khung bọc): Giống — chỗ khác chỉ là chi tiết thêm, lựa chọn chính như nhau.
+- Dòng 33 (Che số và mở số): Lệch — hai chữ nút «Hiện số» và «Mở số» là thứ người dùng thấy, nên là hai lựa chọn chính khác nhau.
+- Dòng 49 (Dữ liệu thử): Lệch — agent 2 không nêu cách xử lý dữ liệu cá nhân mà hai agent kia nêu; «không nêu» là Lệch như các dòng
+  24, 34, 35, 52.
 
 Cuối bảng đếm cho từng agent: số quyết định tự đoán, trong đó bao nhiêu hệ lẽ ra phải trả lời sẵn, bao nhiêu cần người quyết.
