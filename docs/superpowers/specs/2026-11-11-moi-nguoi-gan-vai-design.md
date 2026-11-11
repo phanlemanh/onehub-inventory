@@ -83,17 +83,17 @@ không chạm trang khách.
 
 <!-- <<<UX-STATE-TABLE -->
 
-| Trạng thái           | Màn         | Hiển thị gì                                                                    | Người làm gì tiếp  |
-| -------------------- | ----------- | ------------------------------------------------------------------------------ | ------------------ |
-| ST-members-loading   | Thành viên  | khung chờ đúng bố cục bảng (từ 1 giây)                                         | chờ                |
-| ST-members-ready     | Thành viên  | bảng người: tên, email, nhãn vai, người mời và ngày mời                        | mời người, đổi vai |
-| ST-members-error     | Thành viên  | «Chưa tải được danh sách thành viên. Máy chủ không trả lời. Bấm Thử lại.»      | Thử lại            |
-| ST-members-forbidden | Thành viên  | «Chỉ Quản trị sàn xem được danh sách thành viên.» — không bảng, không số người | về Hôm nay         |
-| ST-members-long      | Thành viên  | tên, email rất dài cắt gọn, xem đủ khi rê chuột hay chạm                       | đọc                |
-| ST-invite-invalid    | hộp Mời     | câu dưới ô sai (email sai khuôn, tên trống, chưa chọn vai)                     | sửa ô              |
-| ST-invite-already    | hộp Mời     | «Email này đã ở trong sàn.» dưới ô email                                       | sửa email hay đóng |
-| ST-invite-failed     | hộp Mời     | câu ba phần, phần đã gõ giữ nguyên                                             | Thử lại            |
-| ST-roles-last-admin  | hộp Đổi vai | «Sàn cần ít nhất một Quản trị sàn. Gán vai này cho người khác trước.»          | chọn lại vai       |
+| Trạng thái           | Màn         | Hiển thị gì                                                                                  | Người làm gì tiếp  |
+| -------------------- | ----------- | -------------------------------------------------------------------------------------------- | ------------------ |
+| ST-members-loading   | Thành viên  | khung chờ đúng bố cục bảng (từ 1 giây)                                                       | chờ                |
+| ST-members-ready     | Thành viên  | bảng người: tên, email, nhãn vai, người mời và ngày mời                                      | mời người, đổi vai |
+| ST-members-error     | Thành viên  | trạng thái lỗi của trang (câu ba phần chung của khung, nút «Thử lại»)                        | Thử lại            |
+| ST-members-forbidden | Thành viên  | trạng thái trang «Không đủ quyền» (câu ba phần chung của khung) — không bảng, không số người | về Hôm nay         |
+| ST-members-long      | Thành viên  | tên, email rất dài cắt gọn, xem đủ khi rê chuột hay chạm                                     | đọc                |
+| ST-invite-invalid    | hộp Mời     | câu dưới ô sai (email sai khuôn, tên trống, chưa chọn vai)                                   | sửa ô              |
+| ST-invite-already    | hộp Mời     | «Email này đã ở trong sàn.» dưới ô email                                                     | sửa email hay đóng |
+| ST-invite-failed     | hộp Mời     | câu ba phần, phần đã gõ giữ nguyên                                                           | Thử lại            |
+| ST-roles-last-admin  | hộp Đổi vai | «Mỗi sàn cần ít nhất một Quản trị sàn. Gán vai này cho người khác trước.»                    | chọn lại vai       |
 
 <!-- UX-STATE-TABLE>>> -->
 

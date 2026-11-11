@@ -5,7 +5,7 @@ slug: moi-nguoi-gan-vai
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api, config]
-screens: [members, today, inventory, sent]
+screens: [members]
 status: approved
 approved_by: Manh Phan
 approved_at: 2026-11-11
@@ -80,15 +80,13 @@ một owner], [NGÀNH: OWASP Authentication Cheat Sheet — trả lời đồng 
 
 ## Vai × Màn
 
-Màn Thành viên chỉ của Quản trị sàn ở hàng này. Thanh bên trên mọi màn nội bộ đổi theo vai của phiên (thêm mục
-«Thành viên» cho Quản trị sàn). Vai nào thấy dữ liệu gì trên Hôm nay, Bảng hàng, Đã gửi là việc của bảng quyền 9a.
+Màn Thành viên chỉ của Quản trị sàn ở hàng này. Thanh bên của khung (không phải một màn trong sổ) đổi theo vai của phiên:
+thêm mục «Thành viên» cho Quản trị sàn, ba vai còn lại không thấy mục ấy (AC-6). Vai nào thấy dữ liệu gì trên Hôm nay,
+Bảng hàng, Đã gửi là việc của bảng quyền 9a.
 
 | Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
 |---|---|---|---|---|
-| members | không — thấy Không đủ quyền, không lộ người | không — thấy Không đủ quyền, không lộ người | không — thấy Không đủ quyền, không lộ người | được — xem, mời, đổi vai |
-| today | được — thanh bên không có mục Thành viên | được — thanh bên không có mục Thành viên | được — thanh bên không có mục Thành viên | được — thanh bên có mục Thành viên |
-| inventory | được — thanh bên không có mục Thành viên | được — thanh bên không có mục Thành viên | được — thanh bên không có mục Thành viên | được — thanh bên có mục Thành viên; quyền thấy hàng là của 9a |
-| sent | được — thanh bên không có mục Thành viên | được — thanh bên không có mục Thành viên | được — thanh bên không có mục Thành viên | được — thanh bên có mục Thành viên; quyền thấy hàng là của 9a |
+| members | chặn — thấy Không đủ quyền, không lộ người | chặn — thấy Không đủ quyền, không lộ người | chặn — thấy Không đủ quyền, không lộ người | được — xem, mời, đổi vai |
 
 ## Out of scope
 

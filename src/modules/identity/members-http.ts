@@ -38,7 +38,7 @@ const RoleSet = z
   .min(1)
   .refine((r) => new Set(r).size === r.length);
 const InviteBody = z.object({
-  email: z.email(),
+  email: z.string().trim().toLowerCase().pipe(z.email()),
   name: z.string().trim().min(1).max(MEMBER_NAME_MAX),
   roles: RoleSet,
 });
