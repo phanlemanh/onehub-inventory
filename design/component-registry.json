@@ -1409,6 +1409,7 @@
           "props": [
             "nav",
             "roles",
+            "company",
             "account"
           ]
         },
@@ -1417,6 +1418,12 @@
         },
         {
           "name": "NavItem"
+        },
+        {
+          "name": "NavLink"
+        },
+        {
+          "name": "NavSection"
         }
       ]
     },
@@ -1434,6 +1441,30 @@
             "options",
             "labels",
             "account"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SecondColumn",
+      "file": "src/components/templates/app-shell/second-column.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "COLUMN_COOKIE"
+        },
+        {
+          "name": "SecondColumn",
+          "props": [
+            "items",
+            "roles"
+          ]
+        },
+        {
+          "name": "SecondColumnNav",
+          "props": [
+            "items",
+            "roles"
           ]
         }
       ]
