@@ -1,0 +1,59 @@
+{
+ "ban": "8ee15fdf20865e117d188e4fcb9769b2318e98e0",
+ "base": "c706223901220e35f8095854249c171294b79739",
+ "den": "2ac804f6a5b90a4fc519ec63d1d681bab9ad5722",
+ "sua_tep_luat": {
+  "may": [],
+  "nguoi": []
+ },
+ "cham": [
+  {
+   "ma": "SP-1",
+   "tep": "db/tests/cach-ly.sql",
+   "dong": 312,
+   "chu": "  select rolsuper, rolbypassrls into r from pg_roles where rolname = 'quy_hang_app';"
+  },
+  {
+   "ma": "SP-1",
+   "tep": "db/tests/cach-ly.sql",
+   "dong": 316,
+   "chu": "  if r.rolsuper or r.rolbypassrls then"
+  },
+  {
+   "ma": "SP-1",
+   "tep": "db/tests/pha-thu/bo-ep-luat.sql",
+   "dong": 3,
+   "chu": "alter table agreements no force row level security;"
+  },
+  {
+   "ma": "SP-1",
+   "tep": "src/modules/identity/one-door.test.ts",
+   "dong": 91,
+   "chu": "        \"// pool.query('a comment does not count');\","
+  },
+  {
+   "ma": "SP-1",
+   "tep": "src/modules/identity/one-door.test.ts",
+   "dong": 96,
+   "chu": "    writeFileSync(join(dir, \"routes/hong.ts\"), \"const r = await appPool.query('select 1');\\n\");"
+  },
+  {
+   "ma": "SP-1",
+   "tep": "src/modules/identity/one-door.test.ts",
+   "dong": 97,
+   "chu": "    writeFileSync(join(dir, \"routes/moi.ts\"), \"const cfg = {};\\nconst p = new Pool(cfg);\\n\");"
+  },
+  {
+   "ma": "SP-1",
+   "tep": "src/modules/identity/one-door.test.ts",
+   "dong": 145,
+   "chu": "      'const r = await appPool.query(\"select id, company_id, kind, direction from agreements where status = $1\", [\"active\"]).then((x) => x.rows).catch(() => [])"
+  },
+  {
+   "ma": "SP-1",
+   "tep": "src/modules/identity/with-company.ts",
+   "dong": 38,
+   "chu": "  const client = await pool.connect();"
+  }
+ ]
+}
