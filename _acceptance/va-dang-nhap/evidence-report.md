@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 1194e61df4964c7ec89819fd7f59e945742101ff
+verified_commit: 95eb691edc91da99c45360e599ef10097a5bc326
 human_signoff: Manh Phan 2026-11-12
 ---
 
@@ -236,3 +236,7 @@ none — every multi-run eval is uniform
 
 Round 1: co sua sau vong dau — commit 1194e61 (e2e-db build folder out of .next, settle toast before frames). Returned to implementation.
 Round 2: moi eval va lenh suite xanh, verdict PASS.
+
+### Re-pin lần 1 — 2026-11-11, do gộp nhánh chính trước khi gộp PR (hàng 9, sổ bối cảnh)
+run_id: repin-20261111T234038Z-82908
+sha: 95eb691edc91da99c45360e599ef10097a5bc326 · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng · ngoài làn máy: E15
