@@ -1,3 +1,9 @@
+---
+slug: khai-vai-va-man
+plan_approved_by: Manh Phan
+plan_approved_at: 2026-11-11
+---
+
 # Kế hoạch: khai-vai-va-man
 
 Thiết kế: `_acceptance/khai-vai-va-man/design.md` · Hợp đồng: `_acceptance/khai-vai-va-man/contract.md`
