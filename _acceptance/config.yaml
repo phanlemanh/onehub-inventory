@@ -13,6 +13,7 @@ executors:
     quyen_kho_ban_goc: "node -e \"const a=JSON.parse(require('child_process').execSync('git show 84a2d597:.claude/settings.json')).permissions,b=JSON.parse(require('fs').readFileSync('.claude/settings.json')).permissions;for(const k of ['deny','allow'])if(JSON.stringify(a[k])!==JSON.stringify(b[k])){console.error(k+' list changed');process.exit(1)}console.log('deny and allow identical to 84a2d597')\""
     e2e: "make e2e"                  # suy từ: mk/design.mk — cần trình duyệt Playwright
     product_map: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/product-map.mjs\" --root . --check"   # suy từ: mẫu của kit, cách viết của Quỹ hàng
+    cach_ly: "bash db/scripts/cach-ly.sh"   # hồ sơ cach-ly-moi-san — Postgres của dãy (DB_LANE), duyệt N-2
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists

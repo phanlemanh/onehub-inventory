@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -92,5 +95,27 @@ describe("withCompany", () => {
 
     await expect(run, "the work's error wins over the rollback error").rejects.toBe(original);
     expect(db.released(), "the connection goes back to the pool once").toBe(1);
+  });
+});
+
+// The isolation suite must run the door's own statements, so a change to the door cannot leave the suite
+// testing something else (AC-7).
+function sqlUsesDoorStatements(sql: string): boolean {
+  return (
+    sql.includes(SET_ROLE_SQL + ";") &&
+    sql.includes("prepare dat_san(text, text) as " + SET_CONTEXT_SQL + ";")
+  );
+}
+
+describe("isolation suite and door", () => {
+  it("the isolation suite runs the door's own statements", () => {
+    const suite = readFileSync(
+      fileURLToPath(new URL("../../../db/tests/cach-ly.sql", import.meta.url)),
+      "utf8",
+    );
+    expect(sqlUsesDoorStatements(suite), "cach-ly.sql dùng nguyên văn hai câu của cửa").toBe(true);
+
+    const drifted = suite.replaceAll("app.company_id", "app.companyid");
+    expect(sqlUsesDoorStatements(drifted), "control: a one-character drift is caught").toBe(false);
   });
 });
