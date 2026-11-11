@@ -1,13 +1,13 @@
 ---
 schema_version: 2
 feature_slug: danh-muc-reui
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 71dcd6a22b8f2761d31fb828bc701cb4de7fc4e2
-human_signoff:
+human_signoff: Manh Phan 2026-11-11
 ---
 
 # Evidence Report: danh-muc-reui
@@ -140,7 +140,7 @@ Round 2. Toàn bộ eval máy được mang từ round 1 (delta không chạm pa
     - domain-correctness: PASS — README nêu lệnh `node tools/reui_catalog/tra.mjs <từ khoá>` chạy offline, lọc bằng `--loai`; cho đúng câu «không có mục nào khớp …» để chép nguyên văn cùng từ khoá; nói khi nào ghim lại và `build.mjs --refresh` là lệnh duy nhất cần mạng, có thêm đường `--from` mà không mâu thuẫn.
     - operational-feasibility: PASS — mục "When nothing matches" dặn chép nguyên văn kèm từ đã tìm và ứng viên gần nhất; mục "Re-pin" nêu rõ khi nào ghim lại, lệnh, việc cần mạng và lối `--from`; agent không phải đoán.
     - spec-alignment: PASS — đủ ba điều, ngày ghim do mỗi lần tra in ra, có đường `--from` cho trường hợp không có mạng, không tự mâu thuẫn.
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-11 — đạt
 
 ### Lệnh suite (hồi quy)
 

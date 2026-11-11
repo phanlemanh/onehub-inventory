@@ -5,7 +5,7 @@ slug: danh-muc-reui
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: _acceptance/danh-muc-reui/design.md
@@ -68,3 +68,23 @@ Ngưỡng ở ô cơ hội là chính câu «bật khi»: một lệnh sinh lạ
 - Hỏi-1 ở Cổng Phạm vi: kho công khai, nên chép tên và mô tả của ReUI vào kho là việc khó đảo (sổ `d-20261111T012410Z-7`).
 - Tra xếp hạng theo chữ khớp, không theo nghĩa: từ đồng nghĩa không có trong mô tả sẽ không ra.
 - Danh mục hôm nay ~410 KB. Khi ReUI lớn tới mức tệp vượt 500 KB, lệnh sinh lại dừng và nói rõ; lúc đó phải chọn chia tệp.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-1: Gõ lệnh ghim lại từ thư mục mà quên tên thư mục thì lệnh tải từ mạng và ghim lại, thay vì báo lỗi.
+  - Ngoài-4: Gõ bộ lọc loại mà thiếu giá trị thì lệnh tra không lọc, vẫn trả kết quả mọi loại và báo thành công.
+  - Ngoài-5: Bộ chặn mạng dùng trong phép đo không chặn mọi đường mạng cấp thấp (kết nối tự dựng, phân giải tên, gói UDP).
+  - Ngoài-6: Bộ kiểm chạy lệnh sinh lại trên kho thật, nên danh mục đang lệch sẽ bị sinh lại khi chạy kiểm.
+  - Ngoài-7: Phép đo sinh lại ngoại tuyến so với phần đang chuẩn bị lưu, không so với bản đã lưu.
+  - Ngoài-9: Ghim lại thiếu tên thư mục thì tải từ mạng mà không báo (cùng lỗi với Ngoài-1).
+  - Ngoài-10: Lệnh tra thiếu giá trị lọc thì bỏ lọc, và coi tuỳ chọn gõ sai là từ khoá.
+  - Ngoài-11: Phép đo sinh lại ngoại tuyến so với phần đang chuẩn bị lưu (cùng lỗi với Ngoài-7).
+  - Ngoài-12: Bộ chặn mạng không chặn kết nối tự dựng (cùng lỗi với Ngoài-5).
+  - Ngoài-14: Phép đo hướng dẫn chỉ kiểm hướng dẫn có nói «cần mạng», không chạy thật lệnh ghim lại có mạng.
+  - Ngoài-15: Bộ chặn mạng chỉ được thử ở bốn đường gọi mạng.
+  - Ngoài-16: Tên lệnh tra và tên tuỳ chọn viết bằng tiếng Việt, lệch quy ước tiếng Anh của kho.
+  - Ngoài-17: Chạy bộ kiểm có thể ghi đè danh mục đang sửa dở mà chưa lưu.
+  - Ngoài-18: Lọc loại thiếu giá trị và ghim lại thiếu thư mục đều không báo lỗi (cùng lỗi với Ngoài-1, Ngoài-4).
+  - Ngoài-19: Phép đo sinh lại ngoại tuyến so với phần đang chuẩn bị lưu (cùng lỗi với Ngoài-7).
+  - Ngoài-21: Lệnh tra bỏ lọc khi thiếu giá trị loại (cùng lỗi với Ngoài-4).
+  - Ngoài-22: Bộ kiểm sinh lại danh mục trên kho thật khi danh mục lệch (cùng lỗi với Ngoài-6).
+  - Ngoài-23: Ma trận chuỗi cấm chưa thử mọi loại chuỗi cấm trên cả danh mục lẫn ảnh chụp nguồn.
+  - Ngoài-24: Thứ tự kết quả tra và việc hai kiểu in cho cùng kết quả chưa được kiểm chặt.
