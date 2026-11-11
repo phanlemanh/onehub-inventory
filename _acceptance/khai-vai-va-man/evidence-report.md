@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: b279c517dd5df41b8c716ce2090b96ff933aca53
+verified_commit: e0e732d3a5911e33f8764a90b66fbbe3a77c9328
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -171,3 +171,7 @@ none — every multi-run eval is uniform
 
 Round 1: đã chạy vòng đầu và ghi các giới hạn đã biết (xem review-findings của round đó).
 Round 2: E1 đến E10 đạt, lệnh suite build và e2e đạt; E11 (judgment) hội đồng đề xuất PASS, chờ người chốt ở Cổng 2 — verdict tổng PENDING-JUDGMENT.
+
+### Re-pin lần 1 — 2026-11-11, do gộp nhánh chính có hàng 1g sau chữ ký
+run_id: repin-20261111T033321Z-91349
+sha: e0e732d3a5911e33f8764a90b66fbbe3a77c9328 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E11 (E11 không khai paths)
