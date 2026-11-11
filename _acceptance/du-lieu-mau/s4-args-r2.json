@@ -1,0 +1,493 @@
+{
+ "generated_at": "2026-11-10T23:34:50Z",
+ "generated_sha": "4239410fe72ac7e3af72b9b8c11ef3dbbffe9496",
+ "mainBranchInfo": {
+  "branch": "main",
+  "source": "remote"
+ },
+ "slug": "du-lieu-mau",
+ "round": 2,
+ "riskTier": "T2",
+ "evals": [
+  {
+   "id": "E1",
+   "criterion": "AC-1",
+   "cmd": "make test",
+   "expected": "\"exit 0; tests/sample-data.test.ts đạt; ca 'AC-1' dựng sàn mẫu hai lần qua cửa index.ts của ba mô-đun, lần một đặt process.env.TZ='UTC', lần hai 'Asia/Ho_Chi_Minh', so JSON.stringify từng byte bằng nhau và cả hai băm SHA-256 bằng hằng ghim trong bài kiểm; chiều đỏ cùng vật: một bản sao đổi giá một lần chào cho băm khác hằng ghim, bài kiểm khẳng định băm khác\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "src/modules/catalog/**",
+    "src/modules/listings/**",
+    "src/modules/contacts/**",
+    "tests/sample-data.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E2",
+   "criterion": "AC-2",
+   "cmd": "make test",
+   "expected": "\"exit 0; ca 'AC-2' khẳng định ma trận viết trước: đúng ba tên dự án (Vinhomes Ocean Park 1, Vinhomes Ocean Park 2 – The Empire, Vinhomes Ocean Park 3 – The Crown), toà Ocean Park 1 đúng tập {S1.01, S1.02, S1.03, S1.05}; checkSampleCatalog trên vật lành trả 0 lỗi; mọi căn readUnitCode(unitCode(căn)) ra đúng toà, tầng, trục; chiều đỏ trên bản sao: hai căn chung mã → 'mã căn trùng: <mã>', căn có tầng lệch mã → 'mã căn lệch thuộc tính: <mã>'\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "src/modules/catalog/**",
+    "tests/sample-data.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E3",
+   "criterion": "AC-3",
+   "cmd": "make test",
+   "expected": "\"exit 0; ca 'AC-3': đúng 60 lần chào, đếm theo trạng thái đúng Active 24, Incomplete 8, Pending 7, Hold 7, Closed 7, Withdrawn 7; checkSampleListings trên vật lành trả 0 lỗi; chiều đỏ trên bản sao, mỗi bản phá một chỗ, ghim thông điệp: bỏ một trạng thái → 'thiếu trạng thái: Hold', Closed mất giá chốt → 'Closed thiếu giá hoặc ngày chốt: <mã>', Withdrawn mất lý do → 'Withdrawn thiếu lý do: <mã>', hai lần chào chung căn → 'hai lần chào chung căn: <upi>', tên toà lệch căn → 'lần chào lệch căn: <mã>'\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "src/modules/listings/**",
+    "src/modules/catalog/**",
+    "tests/sample-data.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E4",
+   "criterion": "AC-4",
+   "cmd": "make test",
+   "expected": "\"exit 0; ca 'AC-4': số bản ghi từng loại bằng hằng viết trước (sàn 1, căn 432, lần chào 60, liên kết căn 60, liên hệ 50, liên kết chủ 60); ba hàm kiểm nhãn (catalog, listings, contacts) trên vật lành trả 0 lỗi; chiều đỏ trên sáu bản sao, mỗi loại một bản: tên sàn bỏ '[MAU]' → 'thiếu nhãn MAU: sàn <mã>', upi một căn bỏ 'mau' → 'thiếu nhãn MAU: căn <upi>', mã một lần chào đổi tiền tố → 'thiếu nhãn MAU: lần chào <mã>', mã một liên kết căn đổi tiền tố → 'thiếu nhãn MAU: liên kết căn <mã>', tên một liên hệ bỏ '· MAU' → 'thiếu nhãn MAU: liên hệ <mã>', mã một liên kết chủ đổi tiền tố → 'thiếu nhãn MAU: liên kết chủ <mã>'\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "src/modules/catalog/**",
+    "src/modules/listings/**",
+    "src/modules/contacts/**",
+    "tests/sample-data.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E5",
+   "criterion": "AC-5",
+   "cmd": "make test",
+   "expected": "\"exit 0; ca 'AC-5': checkNoRealData trên toàn sàn mẫu (mọi chuỗi của căn, lần chào, liên hệ, hai loại liên kết) trả 0 lỗi và đếm đúng 53 số mẫu tách từ phones, mỗi số khớp ^0900 000 0\\\\d\\\\d$; chiều đỏ trên bản sao, mỗi bản một chỗ, thông điệp mang loại và mã bản ghi: phones của một liên hệ thành '0912 345 678' → 'số không đúng dạng mẫu: liên hệ <mã>', số viết liền '0912345678' trong tên liên hệ → 'số không đúng dạng mẫu: liên hệ <mã>', chữ số toàn khổ '０９１２３４５６７８' trong tên toà của một căn → 'số không đúng dạng mẫu: căn <upi>', tên liên hệ không mở đầu '[Tên]' → 'tên không mang nhãn mẫu: liên hệ <mã>'; đối chứng dương: uuid, upi, mốc giờ ISO, mã căn 'S1.05-1208' không bị báo\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "src/modules/catalog/**",
+    "src/modules/listings/**",
+    "src/modules/contacts/**",
+    "tests/sample-data.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E6",
+   "criterion": "AC-6",
+   "cmd": "make test",
+   "expected": "\"exit 0; ca 'AC-6': checkLinkCases trên sàn mẫu trả 0 lỗi; chiều đỏ trên bốn bản sao, mỗi bản bỏ đúng một ca, ghim tên ca: 'thiếu ca: một chủ nhiều căn', 'thiếu ca: một căn nhiều chủ', 'thiếu ca: vừa chủ vừa khách', 'thiếu ca: căn chưa có chủ'\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "src/modules/contacts/**",
+    "tests/sample-data.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E7",
+   "criterion": "AC-7",
+   "cmd": "make test",
+   "expected": "\"exit 0; ca 'AC-7': chọn chủ nhà có từ hai lần chào, gọi updatePhones với '0900 000 099'; với MỌI mã lần chào của người đó ownersOf trả liên hệ mang số mới; quét mọi lần chào trong kho, không lần nào còn đọc ra số cũ; mọi liên hệ khác giữ nguyên phones; không bản ghi căn, lần chào hay liên kết nào có khoá 'phones' hay chuỗi khớp '0900 000'; chiều đỏ: một kho phá thử chép số vào liên kết (khử chuẩn hoá) thì bài kiểm cùng khuôn báo lần chào còn đọc số cũ\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "src/modules/contacts/**",
+    "tests/sample-data.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E8",
+   "criterion": "AC-8",
+   "cmd": "make test",
+   "expected": "\"exit 0; ca 'AC-8' nối ba mô-đun chỉ qua '@/modules/<tên>' (cửa index.ts): checkSampleLinks trả 0 lỗi; chiều đỏ trên bản sao: liên kết căn trỏ upi không có → 'liên kết căn trỏ căn không có: <upi>', liên kết chủ trỏ lần chào không có → 'liên kết chủ trỏ lần chào không có: <mã>', liên kết chủ trỏ liên hệ không có → 'liên kết chủ trỏ liên hệ không có: <mã>', một liên hệ mang mã sàn khác → 'bản ghi khác sàn: liên hệ <mã>', một liên kết chủ mang mã sàn khác → 'bản ghi khác sàn: liên kết chủ <mã>', một liên kết căn mang mã sàn khác → 'bản ghi khác sàn: liên kết căn <mã>'\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "src/modules/catalog/**",
+    "src/modules/listings/**",
+    "src/modules/contacts/**",
+    "tests/sample-data.test.ts"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.unit"
+  },
+  {
+   "id": "E9",
+   "criterion": "AC-9",
+   "cmd": "make check",
+   "expected": "\"exit 0; make check xanh, gồm kiểm ontology ('src/generated/ontology.ts is up to date'), kiểm ranh giới mô-đun (0 lỗi) và bài kiểm; src/generated/ontology.ts có nguyên dòng '  phones?: string;' trong interface Contact và dòng '  Contact: [\\\"fullName\\\", \\\"phones\\\"],'; bài kiểm khai dữ liệu liên hệ mẫu bằng 'satisfies readonly Contact[]' với Contact nhập từ src/generated/ontology.ts nên typecheck trong make check bắt mọi lệch kiểu\"",
+   "executor": "script",
+   "expectedExit": 0,
+   "paths": [
+    "ontology/entities/Contact.yaml",
+    "src/generated/**",
+    "src/modules/catalog/**",
+    "src/modules/listings/**",
+    "src/modules/contacts/**"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.script.check"
+  }
+ ],
+ "suiteCommands": [
+  "make check",
+  "npm run build",
+  "make e2e"
+ ],
+ "diffBase": "c706223901220e35f8095854249c171294b79739",
+ "repoRoot": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/hopeful-hertz-1d3fe0",
+ "personasPath": "/Users/manhphan/.claude/plugins/cache/acceptance-gate-kit/acceptance-gate/2.38.1/skills/acceptance/references/judge-personas.md",
+ "templatePath": "/Users/manhphan/.claude/plugins/cache/acceptance-gate-kit/acceptance-gate/2.38.1/skills/acceptance/references/evidence-report-template.md",
+ "toolKillRule": "# TOOL-KILL-RULE — lệnh bị công cụ ngắt KHÔNG phải lệnh fail\n\n**Nguồn duy nhất** của luật «hết giờ không phải trượt» cho MỌI đường chạy lệnh\nkiểm của kit. Hai đường tiêu thụ, cùng đọc khối marker dưới đây, không chép tay:\n\n- **Vòng lặp tính năng** (plugin feature-loop): skill `feature-loop` đọc file này\n  (resolve qua `resolve-plugin.mjs --require skills/acceptance/references/tool-kill-rule.md`)\n  và truyền NGUYÊN VĂN vào `args.toolKillRule` của workflow\n  `acceptance-verify.js`; workflow rút khối marker và nội suy vào prompt của mọi\n  agent chạy lệnh (machine · ui-check · baseline). Thiếu args hoặc không rút\n  được marker → workflow trả BLOCKED có tên, không chạy không luật.\n- **Đường VERIFY độc lập** (skill `acceptance` Phase 3): phiên điều phối chép khối\n  marker VERBATIM vào prompt của phiên tươi VERIFY, cùng nếp «Network truth».\n\nVì sao có luật: verifier chạy lệnh qua Bash tool có trần thời gian mặc định\n(~120 s) NGẮN hơn nhiều suite; lệnh bị công cụ giết trả exit code CỦA CÔNG CỤ,\nkhông phải của lệnh (vấp thật release-2-2-0 S4 r5: suite 108 s đơn lẻ, dưới tải\nbị giết ở 118 s → REJECT giả 4 eval). Nhận diện là việc AGENT (nó thấy tool\nresult thật); phần máy chỉ phòng thủ trên field cấu trúc `killedByTool` —\nKHÔNG grep nội dung output trong engine (chuỗi tổng kết là của suite từng repo).\n\nLệnh dài hơn trần 600 s của công cụ thì KHÔNG bị giết: công cụ **đẩy nó sang\nnền** và nó chạy tiếp. Tệp đầu ra nền trống tới phút chót, vì khung bọc lệnh của\nkit chỉ in khi lệnh xong — đọc trống thành «bị giết» là đúng sự cố crm 07/10/2026\n(hồ sơ `lenh-dai-chay-rieng`: hai lượt BLOCKED giả). Dòng «chuyển sang nền» trong\nkhối dưới là lối LỜI cho mọi lệnh. Lối MÁY: eval khai `long_running: <phút>`\ntrong `evals.yaml` thì lượt chấm feature-loop tự chạy lệnh nền, ghi nhật ký ở\n`.acceptance-runs/<slug>/s4-lenh-dai/` và chờ bằng lệnh nó sinh ra\n(`eval-executors.md`, mục `long_running`).\n\n<!-- <<<TOOL-KILL-RULE -->\nTRAN THOI GIAN CONG CU: khi goi Bash chay lenh, LUON dat tham so timeout >= 600000 (ms) — tran mac dinh cua cong cu (~120s) NGAN hon nhieu suite; lenh vuot tran se bi CONG CU giet va exit code luc do la cua cong cu, KHONG phai cua lenh. Neu lenh van bi cong cu dung (tool result bao timeout/killed, hoac output bi CAT giua chung truoc dong tong ket cuoi cua lenh) → DO KHONG PHAI ket qua that: khai cannotRun=true + killedByTool=true + reason \"bi cong cu giet o <so giay> giay\" kem dau hieu (timeout tool / output cat). TUYET DOI khong bao exitCode nhu the lenh tu fail va khong doan PASS/FAIL tu output cut.\nDAU RA DAI: harness co the CAT DAU RA RA TEP (\"Output too large … saved to <tep>\") va chi hien doan DAU — do KHONG phai bi cong cu giet: doc DUOI tep do (tail) de lay dong tong ket va ma thoat; chi khai killedByTool khi tool result bao timeout/killed that.\nCHUYEN SANG NEN KHONG PHAI BI GIET: tool result bao lenh chua xong trong timeout va da duoc CHUYEN SANG NEN (\"moved to the background\", kem ID + tep dau ra) → lenh VAN DANG CHAY: KHONG khai killedByTool, KHONG ket luan tu tep dau ra luc do. Tep dau ra nen TRONG la binh thuong — khung boc lenh chi in duoi dau ra + dong __EXIT=<n> khi lenh XONG. Cho bang lenh Bash co gioi han (moi lan goi ≤ 100 giay, duoi tran mac dinh 120 giay cua cong cu; vd vong lap kiem tep do co dong __EXIT= chua, sleep vai giay, het 100 giay thi thoat) va goi lai toi khi tep co dong __EXIT=<n> → doc ma tu dong do nhu binh thuong. Tong thoi gian cho toi da = so phut eval khai o long_running (vang thi 30 phut), tinh tu luc chay lenh; qua ma chua co dong __EXIT → cannotRun=true + reason \"lenh chay qua <so> phut chua xong — khai long_running: <phut> cho eval trong evals.yaml\" (KHONG killedByTool), va dung tac vu nen neu cong cu cho phep.\n<!-- TOOL-KILL-RULE>>> -->\n\n## Hồ sơ cho lượt bị ngắt (đường độc lập)\n\nPhiên tươi VERIFY gặp lệnh bị công cụ ngắt thì:\n\n- dòng run-log của eval đó: `\"exit_code\": null, \"killed_by_tool\": true` (không\n  ghi mã thoát của công cụ như mã thoát của lệnh);\n- verdict báo cáo `BLOCKED`, `reason: bi cong cu giet o <so giay> giay — <eval ids>`\n  (kèm dấu hiệu: timeout tool / output cắt trước dòng tổng kết); `failed_evals`\n  rỗng — người đọc hồ sơ thấy đây là sự cố hạ tầng, chữa bằng chạy lại với trần\n  công cụ đủ dài, không phải sửa sản phẩm.\n\nLệnh bị đẩy sang nền rồi QUÁ trần chờ (`long_running`, vắng thì 30 phút) cũng\nlà sự cố hạ tầng chứ không phải lệnh hỏng: dòng run-log `\"exit_code\": null`,\n`\"cannot_run\": true` (KHÔNG `killed_by_tool` — công cụ không giết nó), verdict\n`BLOCKED`, reason gọi tên việc cần làm (khai `long_running: <phút>` cho eval).\n",
+ "contractPath": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/hopeful-hertz-1d3fe0/_acceptance/du-lieu-mau/contract.md",
+ "invokedAt": "2026-11-10T23:34:50Z",
+ "invokedSha": "4239410fe72ac7e3af72b9b8c11ef3dbbffe9496",
+ "vungVat": [
+  "_acceptance/du-lieu-mau/card-plain.json",
+  "_acceptance/du-lieu-mau/card.html",
+  "_acceptance/du-lieu-mau/design-floor.json",
+  "_acceptance/du-lieu-mau/du-bao.json",
+  "_acceptance/du-lieu-mau/evals.yaml",
+  "_acceptance/du-lieu-mau/figures/chu-nha-gan-dau.html",
+  "_acceptance/du-lieu-mau/figures/chu-nha-gan-dau.png",
+  "_acceptance/du-lieu-mau/luat-cham.json",
+  "_acceptance/du-lieu-mau/s4-args.json",
+  "ontology/entities/Contact.yaml",
+  "src/generated/display.ts",
+  "src/generated/ontology.ts",
+  "src/modules/catalog/index.ts",
+  "src/modules/catalog/sample.ts",
+  "src/modules/contacts/index.ts",
+  "src/modules/contacts/sample.ts",
+  "src/modules/listings/index.ts",
+  "src/modules/listings/sample.ts",
+  "tests/sample-data.test.ts"
+ ],
+ "ngoaiVatGlobs": [
+  "docs/**",
+  "wiki/**",
+  "README.md",
+  "CHANGELOG.md",
+  "AGENTS.md",
+  "CLAUDE.md",
+  "setup-blueprint.yaml",
+  ".github/workflows/ci.yml",
+  "PRODUCT-MAP.md",
+  "LO-TRINH.html",
+  "docs/tri-thuc/**",
+  "_acceptance/*/**/*.md",
+  "_acceptance/*/**/*.jsonl"
+ ],
+ "ngoaiVatFiles": [
+  "LO-TRINH.html",
+  "PRODUCT-MAP.md",
+  "_acceptance/du-lieu-mau/contract.md",
+  "_acceptance/du-lieu-mau/decisions.jsonl",
+  "_acceptance/du-lieu-mau/design.md",
+  "_acceptance/du-lieu-mau/duong-nen.md",
+  "_acceptance/du-lieu-mau/evidence-report.md",
+  "_acceptance/du-lieu-mau/figures/index.md",
+  "_acceptance/du-lieu-mau/gap-probe.md",
+  "_acceptance/du-lieu-mau/opportunity.md",
+  "_acceptance/du-lieu-mau/plan.md",
+  "_acceptance/du-lieu-mau/review-findings.md",
+  "_acceptance/du-lieu-mau/run-log.jsonl",
+  "_acceptance/du-lieu-mau/usage-report.md",
+  "wiki/entities/contact.md",
+  "wiki/log.md"
+ ],
+ "diffFiles": [
+  "LO-TRINH.html",
+  "PRODUCT-MAP.md",
+  "_acceptance/du-lieu-mau/card-plain.json",
+  "_acceptance/du-lieu-mau/card.html",
+  "_acceptance/du-lieu-mau/contract.md",
+  "_acceptance/du-lieu-mau/decisions.jsonl",
+  "_acceptance/du-lieu-mau/design-floor.json",
+  "_acceptance/du-lieu-mau/design.md",
+  "_acceptance/du-lieu-mau/du-bao.json",
+  "_acceptance/du-lieu-mau/duong-nen.md",
+  "_acceptance/du-lieu-mau/evals.yaml",
+  "_acceptance/du-lieu-mau/evidence-report.md",
+  "_acceptance/du-lieu-mau/figures/chu-nha-gan-dau.html",
+  "_acceptance/du-lieu-mau/figures/chu-nha-gan-dau.png",
+  "_acceptance/du-lieu-mau/figures/index.md",
+  "_acceptance/du-lieu-mau/gap-probe.md",
+  "_acceptance/du-lieu-mau/luat-cham.json",
+  "_acceptance/du-lieu-mau/opportunity.md",
+  "_acceptance/du-lieu-mau/plan.md",
+  "_acceptance/du-lieu-mau/review-findings.md",
+  "_acceptance/du-lieu-mau/run-log.jsonl",
+  "_acceptance/du-lieu-mau/s4-args.json",
+  "_acceptance/du-lieu-mau/usage-report.md",
+  "ontology/entities/Contact.yaml",
+  "src/generated/display.ts",
+  "src/generated/ontology.ts",
+  "src/modules/catalog/index.ts",
+  "src/modules/catalog/sample.ts",
+  "src/modules/contacts/index.ts",
+  "src/modules/contacts/sample.ts",
+  "src/modules/listings/index.ts",
+  "src/modules/listings/sample.ts",
+  "tests/sample-data.test.ts",
+  "wiki/entities/contact.md",
+  "wiki/log.md"
+ ],
+ "fileDoTrongDiff": [
+  "_acceptance/du-lieu-mau/card-plain.json",
+  "_acceptance/du-lieu-mau/card.html",
+  "_acceptance/du-lieu-mau/design-floor.json",
+  "_acceptance/du-lieu-mau/du-bao.json",
+  "_acceptance/du-lieu-mau/evals.yaml",
+  "_acceptance/du-lieu-mau/figures/chu-nha-gan-dau.html",
+  "_acceptance/du-lieu-mau/figures/chu-nha-gan-dau.png",
+  "_acceptance/du-lieu-mau/luat-cham.json",
+  "_acceptance/du-lieu-mau/s4-args.json",
+  "ontology/entities/Contact.yaml",
+  "src/generated/display.ts",
+  "src/generated/ontology.ts",
+  "src/modules/catalog/index.ts",
+  "src/modules/catalog/sample.ts",
+  "src/modules/contacts/index.ts",
+  "src/modules/contacts/sample.ts",
+  "src/modules/listings/index.ts",
+  "src/modules/listings/sample.ts",
+  "tests/sample-data.test.ts"
+ ],
+ "coverageFiles": [
+  "ontology/entities/Contact.yaml",
+  "src/generated/display.ts",
+  "src/generated/ontology.ts",
+  "src/modules/catalog/index.ts",
+  "src/modules/catalog/sample.ts",
+  "src/modules/contacts/index.ts",
+  "src/modules/contacts/sample.ts",
+  "src/modules/listings/index.ts",
+  "src/modules/listings/sample.ts",
+  "tests/sample-data.test.ts"
+ ],
+ "coEvalPaths": true,
+ "evalsHash": "449d98b22a937e054170cdfb4e37200fc0fa6c61c48ad3c52913fba238e5151a",
+ "runBaseline": false,
+ "carriedAnalyst": {
+  "fromRound": 1,
+  "nonDiscriminating": [
+   {
+    "cmd": "make test",
+    "evals": [
+     "E1",
+     "E2",
+     "E3",
+     "E4",
+     "E5",
+     "E6",
+     "E7",
+     "E8"
+    ]
+   }
+  ]
+ },
+ "carriedFindings": [
+  {
+   "file": "tests/sample-data.test.ts",
+   "title": "Dữ liệu cá nhân: số điện thoại dạng thật trong bài kiểm và tài liệu (.claude/rules/personal-data.md, AGENTS «No real personal data»)",
+   "severity": "medium",
+   "plain": "Trong bài kiểm và tài liệu có một số điện thoại trông như số thật, và kho đang công khai. Nếu số đó thuộc về một người thật thì người đó bị lộ số trong lịch sử kho.",
+   "can_cu": "Hậu quả có thể là lộ số của một người thật và đã nằm trong lịch sử công khai nên khó rút lại, nhưng khả năng trùng người thật thấp và sửa sau rẻ.",
+   "proposal": "known-limits",
+   "fromRound": 1,
+   "tepDoi": true
+  },
+  {
+   "file": "src/modules/contacts/sample.ts",
+   "title": "Domain: bản ghi liên kết (OwnerLink, ListingUnit) có trong mã nhưng chưa có trong ontology",
+   "severity": "medium",
+   "plain": "Hai loại liên kết giữa chủ nhà với lần chào và giữa lần chào với căn chưa được khai trong mô hình nghiệp vụ. Khi làm cơ sở dữ liệu thật, hình dạng và việc cách ly theo sàn của chúng phải được định nghĩa lại từ đầu.",
+   "can_cu": "Không ảnh hưởng người dùng hôm nay vì chưa có cơ sở dữ liệu, nhưng cần khai trước khi lưu dữ liệu thật và đụng tới mô hình nghiệp vụ nên cần chủ kho soi, hợp làm một việc riêng.",
+   "proposal": "new-contract",
+   "fromRound": 1,
+   "tepDoi": false
+  },
+  {
+   "file": "src/modules/contacts/sample.ts",
+   "title": "Domain: luật nhãn MAU nằm ở hai chỗ (each business rule lives in one place)",
+   "severity": "low",
+   "plain": "Quy tắc gắn nhãn MAU được viết lặp ở hai nơi. Nếu sau này sửa một nơi mà quên nơi kia thì nhãn có thể lệch nhau, nhưng bài kiểm hiện đã bắt trường hợp này.",
+   "can_cu": "Chỉ là chuyện bảo trì, người dùng không thấy gì, đã có bài kiểm canh lệch và sửa sau rẻ.",
+   "proposal": "known-limits",
+   "fromRound": 1,
+   "tepDoi": false
+  },
+  {
+   "file": "ontology/entities/Contact.yaml",
+   "title": "Domain/RESO: `phones` gán cho ba tên RESO đơn trị",
+   "severity": "low",
+   "plain": "Trường số điện thoại của liên hệ gộp nhiều số nhưng lại mượn tên chuẩn ngành vốn chỉ dành cho từng số có vai riêng. Việc này dễ gây hiểu sai khi đối chiếu với chuẩn hoặc trao đổi dữ liệu sau này.",
+   "can_cu": "Chỉ gây nhầm khi đối chiếu chuẩn, không làm mất dữ liệu, và sửa chỉ là chỉnh một dòng mô tả khi chủ kho soi.",
+   "proposal": "known-limits",
+   "fromRound": 1,
+   "tepDoi": false
+  },
+  {
+   "file": "src/modules/contacts/sample.ts",
+   "title": "The linking-case check counts links, not distinct partners, so one duplicated link passes two cases",
+   "severity": "low",
+   "plain": "Nếu sau này một liên kết chủ nhà bị nhân đôi nhầm, bộ kiểm có thể báo đủ ca nối dù thực tế chưa đủ. Dữ liệu mẫu hiện nay không bị ảnh hưởng.",
+   "can_cu": "Chưa gây sai gì với dữ liệu hiện có, chỉ làm lưới kiểm lỏng hơn khi dữ liệu mẫu bị sửa, và dễ sửa sau.",
+   "proposal": "known-limits",
+   "fromRound": 1,
+   "tepDoi": false
+  },
+  {
+   "file": "_acceptance/du-lieu-mau/evals.yaml",
+   "title": "E8 expects a function checkSampleLinks that does not exist in the code",
+   "severity": "low",
+   "plain": "Tài liệu đánh giá nhắc tên một bước kiểm không tồn tại, nên người đối chiếu có thể không tìm thấy bằng chứng đúng chữ. Sản phẩm không bị ảnh hưởng.",
+   "can_cu": "Chỉ là sai chữ trong tài liệu, không ảnh hưởng người dùng hay dữ liệu, sửa một dòng bất cứ lúc nào.",
+   "proposal": "known-limits",
+   "fromRound": 1,
+   "tepDoi": false
+  },
+  {
+   "file": "tests/sample-data.test.ts",
+   "title": "Shape 5 (claims to sweep a class, tests only some cases): AC-3 'red: each broken rule is named' is missing rules and half of each pair",
+   "severity": "medium",
+   "plain": "Một số lỗi của lần chào, như thiếu ngày chốt hay lần chào không có căn, chưa có bài kiểm chứng minh bộ kiểm sẽ bắt. Nếu bước kiểm đó bị lỡ xoá thì không ai biết.",
+   "can_cu": "Dữ liệu mẫu hiện đúng và người dùng chưa thấy ảnh hưởng, rủi ro chỉ xuất hiện khi sửa bộ kiểm sau này, bổ sung bài kiểm khá rẻ.",
+   "proposal": "known-limits",
+   "fromRound": 1,
+   "tepDoi": true
+  },
+  {
+   "file": "tests/sample-data.test.ts",
+   "title": "Shape 4 (negative assertion alone): 'keeps numbers off other records' in AC-7 has no positive control",
+   "severity": "medium",
+   "plain": "Bài kiểm nói không bản ghi nào mang số điện thoại chưa có ca đối chứng cho thấy nó sẽ bắt khi có số lọt vào. Hiện dữ liệu vẫn đúng.",
+   "can_cu": "Dữ liệu hiện đúng nên người dùng không bị ảnh hưởng, chỉ là lưới kiểm chưa được chứng minh, và thêm ca đối chứng sau rất rẻ.",
+   "proposal": "known-limits",
+   "fromRound": 1,
+   "tepDoi": true
+  }
+ ],
+ "deltaFiles": [
+  "_acceptance/du-lieu-mau/luat-cham.json",
+  "_acceptance/du-lieu-mau/s4-args.json",
+  "tests/sample-data.test.ts"
+ ],
+ "thuocChup": {
+  "sha": "4239410fe72ac7e3af72b9b8c11ef3dbbffe9496",
+  "n": 30,
+  "digest": "469c89ef67bf949ec63b37c2d2edbf2f08c45bf808b98693492087166be04880",
+  "tep": {
+   "_acceptance/config.yaml": "decc848ff57bd2bce080682eb5eef4b2651088fe6a1b116b4b58e0b801bf0bb6",
+   "_acceptance/du-lieu-mau/evals.yaml": "449d98b22a937e054170cdfb4e37200fc0fa6c61c48ad3c52913fba238e5151a",
+   "tests/boundaries.test.ts": "7dac702c9e9811451f8d3741412eef9352348fffd7705b24990367aae24c9ed4",
+   "tests/commit-msg.test.ts": "8276578b01a42d0894f90f68f26d7f42a2ac95c2a845d6278a38dbe202ed611c",
+   "tests/design-check.test.ts": "e75b30023ffe2c9603d3d518265c118525d7bc3431c808a1116b879b372e3a85",
+   "tests/design-registry.test.ts": "77690e33a822e0bca7c54594b290337182adf50b0cc99fb2efde22b5eb9f7869",
+   "tests/e2e/shell.spec.ts": "1b2d500c6cb8ee17da92a6fba5e485f3ef36853474174c964e19b7f102b94b2b",
+   "tests/eslint-ui/no-arbitrary-text-size.test.mjs": "e26da07130ebda5c6028605b747f5bb01cce731022b333508001cdc57271995d",
+   "tests/eslint-ui/no-aschild.test.mjs": "d0d93674c33ccfff57ecc88d5aa73142ba1fe42cb0c7bb30db6b3190491c7766",
+   "tests/eslint-ui/no-banned-motion.test.mjs": "7dff75fe5912362d8e43bd6b093cb84d3fb49a48285501cc123cc679dd9ea401",
+   "tests/eslint-ui/no-emoji-icons.test.mjs": "e1e396b759bb027b38f9ac0a2f0de03ea1a53a532f8942d26b7e33375f09ad6d",
+   "tests/eslint-ui/no-hardcoded-color.test.mjs": "4b4e2cff0314ac20046dafc924704a652484fadea787d7603b17f0e49c67734e",
+   "tests/eslint-ui/no-native-dialogs.test.mjs": "1bc99d37addbc63ece7a51adf4c5f52f00be55fbd25c6673fc6410038c8d6a8b",
+   "tests/eslint-ui/no-off-scale-spacing.test.mjs": "eca3291bfea1b0bb1f0460a6e66fe125d22aece1517652220e7075c771305a83",
+   "tests/eslint-ui/no-partial-class.test.mjs": "61d329f197be1de6873ca1eeac36b73dda24ecdccff31626fdfec68e18d2bab6",
+   "tests/eslint-ui/no-raw-controls.test.mjs": "1a177095c89821090569d694f9b02e62220d14ea2683513b6fece27c79037977",
+   "tests/eslint-ui/no-raw-palette.test.mjs": "f52f15164f9c9853eb1d667d8556e41a3838df5ae579cc693fdb672ab0fffd8f",
+   "tests/eslint-ui/no-raw-table.test.mjs": "effca8d2f4ecf271ec2c0ecb2c38bdab0a937c37a27ee93d5ba7d73a72bdd52d",
+   "tests/eslint-ui/require-disable-reason.test.mjs": "baf8ec8240bc7b33a40c013db91378e7fba7869b16e574efa173949e7edcda9f",
+   "tests/hooks.test.ts": "fd9daa0597cc88ebf42924e2e166b7100863066e5ffa2b61ff54fe9b1b99ed7d",
+   "tests/kit-root.test.ts": "35e67ab3b8dcc753081f600ef59ecbc606b2a11d3804088d475cded52f7a9348",
+   "tests/label.test.ts": "d1c11c558348a0bafbb5ffa1abf9ed92bdb126a0fad52eac26316015059b1a70",
+   "tests/language.test.ts": "fb481c43c49cf1e9545c782ddaa84f50a60a498f0640e04671c18ed3faf0879d",
+   "tests/lint-floor.test.ts": "70f10d4d2c2685354b774202422f6dc05037c7a952e03558744718802aa2d273",
+   "tests/llm.test.ts": "2deac85903d84e8468814448c2ff76ca7134a6f376a1cc65acecf5332dc1cac7",
+   "tests/permissions.test.ts": "cc9ef9b071aad1767cc094b66bd77964bb6fb7059c906aa43037951e72e7a915",
+   "tests/product-invariants.test.ts": "f8eb84cda9b9a276e855e5d792ef8ee8f74ef321b378363f36cda06a0850b3af",
+   "tests/sample-data.test.ts": "32f24c025c4fbb3bbc5489636baa261c492e7de3f8953aa953306e4bd04b00bb",
+   "tests/test-utils.mjs": "2ffed2abf743cbc02f23a09b078166b7cecaa67864627aff1b07962710609eca",
+   "tests/typecheck-own.test.mjs": "a2bdc9bbcd83751a1b3c39cde07f516df377dbdd58dc0de23cf490bce1aad9cf"
+  }
+ },
+ "cayChup": {
+  "sha": "4239410fe72ac7e3af72b9b8c11ef3dbbffe9496",
+  "ban": {},
+  "chuaTheoDoi": []
+ },
+ "reviewSkillPath": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/hopeful-hertz-1d3fe0/.claude/skills/review-change/SKILL.md"
+}
