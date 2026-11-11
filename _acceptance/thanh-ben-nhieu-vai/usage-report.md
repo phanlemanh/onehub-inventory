@@ -60,3 +60,31 @@ wall: 102s
 - **claude-opus-5-5**: 3 agent · 17 calls · out 6,864 · in 36 · cache_read 328,203 · cache_create 80,082
 - **claude-sonnet-5-5**: 3 agent · 7 calls · out 5,435 · in 14 · cache_read 68,290 · cache_create 58,183
 - **claude-haiku-5-5**: 5 agent · 10 calls · out 4,255 · in 20 · cache_read 74,390 · cache_create 62,400
+### S4 round 3 — wf_7936fa71-e4d (10 agent, 15,094 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| machine:make e2e | claude-haiku-5-5 | 2 | 3,180 | 4 | 14,908 | 62 |
+| synthesize:report | claude-sonnet-5-5 | 3 | 3,060 | 6 | 46,162 | 22 |
+| review:measurement | claude-opus-5-5 | 4 | 1,801 | 8 | 62,638 | 19 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,524 | 4 | 11,604 | 34 |
+| machine:make test | claude-haiku-5-5 | 2 | 1,311 | 4 | 14,904 | 25 |
+| review:bugs | claude-opus-5-5 | 6 | 1,309 | 14 | 113,838 | 17 |
+| review:conventions | claude-opus-5-5 | 4 | 1,093 | 8 | 55,744 | 14 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 858 | 4 | 14,908 | 7 |
+| machine:R="${CLAUDE_PLUGIN_ROOT:-$(node tools/ki | claude-haiku-5-5 | 2 | 614 | 4 | 14,996 | 6 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 344 | 4 | 10,416 | 7 |
+
+
+wall: 133s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| machine | 5 | 7,487 | 71,320 | 104 | 04:32:45 | 04:34:28 |
+| review | 3 | 4,203 | 232,220 | 20 | 04:32:45 | 04:33:05 |
+| capture | 1 | 344 | 10,416 | 7 | 04:34:28 | 04:34:35 |
+| synthesize | 1 | 3,060 | 46,162 | 23 | 04:34:35 | 04:34:58 |
+
+- **claude-haiku-5-5**: 5 agent · 10 calls · out 7,487 · in 20 · cache_read 71,320 · cache_create 66,304
+- **claude-sonnet-5-5**: 2 agent · 5 calls · out 3,404 · in 10 · cache_read 56,578 · cache_create 58,409
+- **claude-opus-5-5**: 3 agent · 14 calls · out 4,203 · in 30 · cache_read 232,220 · cache_create 76,207
