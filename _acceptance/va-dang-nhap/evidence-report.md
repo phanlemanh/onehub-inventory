@@ -178,7 +178,7 @@ human_signoff: Manh Phan 2026-11-12
   run_id: minted-va-dang-nhap-E15-r2
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
+  verifier: config:executors.script.va_dang_nhap_e2e
   verified_at: 2026-11-11T10:31:49Z
   screenshot: evidence/E15-step1.png
   observed: |
