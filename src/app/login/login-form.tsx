@@ -5,7 +5,6 @@ import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } fro
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
 import { AUTH_BASE_PATH } from "@/modules/identity";
 
 import { LOGIN_COPY as COPY } from "./copy";
@@ -254,7 +253,6 @@ export function LoginForm({
         ) : null}
         {serverError}
         <Button type="submit" disabled={busy || code.length !== codeLength}>
-          {busy ? <Spinner /> : null}
           {busy ? COPY.signingIn : labels.signIn}
         </Button>
         <div className="flex flex-wrap gap-2">
@@ -311,7 +309,6 @@ export function LoginForm({
       ) : null}
       {serverError}
       <Button type="submit" disabled={busy}>
-        {busy ? <Spinner /> : null}
         {busy ? COPY.sending : COPY.sendCode}
       </Button>
     </form>
