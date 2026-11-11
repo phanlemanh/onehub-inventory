@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-11 — Hành vi nằm trong Lưới và khung: hồ sơ cạnh bảng một khung cho căn và người (địa chỉ riêng, Esc trả tiêu điểm, toàn màn trên điện thoại, đi qua lại theo dòng đang hiện), chờ tải ba nấc, lỗi không còn nút «Thử lại» chết, đầu vùng chỉ tên khi lỗi, nút làm việc theo quyền, cửa lưu chung có hoàn tác hay xác nhận; sáu quyết định tầng hành vi có bài kiểm đỏ được, bài rào đỏ khi màn tự dựng lại — hàng 1e, `_acceptance/hanh-vi-trong-luoi-khung/`
 - 2026-11-11 — Ghim lại danh mục ReUI dừng và gọi tên nhóm khi nguồn đổi cách ghi tiêu đề nhóm, thay vì lặng lẽ bỏ cả nhóm; lưới chặn mã, khoá thử đủ 10 dạng × 27 chỗ và nay quét cả số đếm, bắt được câu import có nháy kép trong phần ghim — [tools/reui_catalog](../tools/reui_catalog/README.md), hàng 1k
 - 2026-11-11 — Lệnh ghi số đo của vòng dừng và chỉ đường gỡ khi bản số đo cũ không đọc được, không phải JSON hay sai hình dạng, thay vì lặng lẽ bỏ tầng đã khai rồi ghi đè — hàng 1l, `_acceptance/so-do-ghi-khong-mat-tang/`
 - 2026-11-11 — Khai hai khái niệm liên kết vào mô hình nghiệp vụ: Chủ của hàng (ListingOwner, có sàn và vai bên bán) và Căn của hàng (ListingUnit); mã dữ liệu mẫu dùng kiểu sinh — [khai-lien-ket-chao-can](../_acceptance/khai-lien-ket-chao-can/design.md)

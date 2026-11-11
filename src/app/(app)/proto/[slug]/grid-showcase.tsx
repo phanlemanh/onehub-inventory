@@ -79,7 +79,7 @@ export function GridShowcase({ state, few }: { state?: string; few: boolean }) {
       onRetry={() => setStatus("ready")}
       emptyWhy="Chưa có dòng nào được nhập vào vùng này."
       emptyAction={<Button variant="outline">Nhập tệp Excel</Button>}
-      action={<Button>Thêm dòng</Button>}
+      action={{ node: <Button>Thêm dòng</Button>, allowed: true }}
     />
   );
 }

@@ -24,10 +24,30 @@ export const GRID_COPY = {
     title: "Vùng này chưa tải được",
     why: "Đã có lỗi khi lấy dữ liệu, phần còn lại của màn vẫn dùng được.",
     next: "Bạn bấm «Thử lại»; nếu vẫn lỗi, tải lại trang sau ít phút.",
+    /** When the screen has not wired a reload, there is no button to press. */
+    nextNoRetry: "Bạn tải lại trang; nếu vẫn lỗi, mở lại màn này sau ít phút.",
+  },
+  partialEmpty: {
+    title: "Dữ liệu của vùng chưa tải được",
+    why: "Vùng này có dữ liệu nhưng lần tải vừa rồi hỏng trước khi lấy được dòng nào.",
+    next: "Bạn bấm «Thử lại»; nếu vẫn lỗi, tải lại trang sau ít phút.",
+    nextNoRetry: "Bạn tải lại trang; nếu vẫn lỗi, mở lại màn này sau ít phút.",
+  },
+  slow: {
+    withCancel: "Vẫn đang tải, lâu hơn thường lệ. Bạn chờ thêm hoặc bấm «Huỷ» để dừng.",
+    withoutCancel: "Vẫn đang tải, lâu hơn thường lệ. Bạn chờ thêm ít giây.",
+  },
+  cancel: "Huỷ",
+  record: {
+    previous: "Trước",
+    next: "Sau",
+    close: "Đóng",
   },
   partial: {
     title: "Một số dòng chưa tải được",
     detail: "Các dòng đang hiện vẫn đúng và dùng được; bạn bấm «Thử lại» để tải phần còn thiếu.",
+    detailNoRetry:
+      "Các dòng đang hiện vẫn đúng và dùng được; bạn tải lại trang để lấy phần còn thiếu.",
   },
   forbidden: {
     title: "Bạn chưa có quyền xem vùng này",

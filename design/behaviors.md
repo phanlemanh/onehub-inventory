@@ -20,3 +20,16 @@ Câu trả lời đóng cho các việc lặp lại, để không phải đoán 
 | Điều hướng điện thoại | Thanh bên thu gọn; chưa có thanh dưới                                                                                                    |
 | Ô không sửa được      | Không có quyền thì hiện như chữ thường; tạm khoá thì nói lý do                                                                           |
 | Hành động nguy hiểm   | Câu xác nhận nói rõ việc sẽ xảy ra, nút mang đúng động từ đó                                                                             |
+
+## Dựng ở đâu
+
+Mỗi hành vi trên chỉ có một chỗ dựng; màn chỉ khai mình cần gì. Tệp màn (`src/app/**`, `src/modules/*/ui/**`) không nhập thẳng khung hồ sơ, hộp thoại, khung chờ, khối trạng thái, vòng xoay hay toast — `tests/behavior-guard.test.ts` đỏ nếu có.
+
+| Việc                         | Thành phần dùng chung                             | Màn khai                                              |
+| ---------------------------- | ------------------------------------------------- | ----------------------------------------------------- |
+| Mở hồ sơ cạnh bảng           | `DataRegion` với `record` (khung `RecordPanel`)   | cách dựng tên và nội dung của một dòng                |
+| Phản hồi theo độ trễ khi tải | `DataRegion` với `status="loading"`               | `onCancel` khi huỷ được                               |
+| Lỗi, một phần hỏng           | `DataRegion` với `status="error"` hay `"partial"` | `onRetry` khi tải lại được; không có thì không có nút |
+| Nút làm việc của vùng        | `DataRegion` với `action={{ node, allowed }}`     | người xem có quyền làm việc ấy không                  |
+| Sửa dữ liệu                  | `DataRegion` với `editable`, luật `editModeFor`   | vùng có sửa được không                                |
+| Lưu và hoàn tác              | `useChange`                                       | động từ, việc sẽ xảy ra, đảo được, ra ngoài sàn       |

@@ -1,0 +1,126 @@
+{
+ "feature_plain": "Mở hồ sơ một dòng, chờ tải, báo lỗi, lưu và hoàn tác cư xử giống nhau trên mọi màn Lưới, vì chỉ có một chỗ dựng; màn chỉ khai mình cần gì.",
+ "will_do": [
+  {
+   "id": "AC-1",
+   "p": "Sẽ mở hồ sơ của một dòng ngay cạnh bảng khi bấm mã dòng; hồ sơ có địa chỉ riêng để gửi cho đồng nghiệp, Esc đóng và đưa con trỏ về đúng dòng cũ; trên điện thoại hồ sơ phủ toàn màn."
+  },
+  {
+   "id": "AC-2",
+   "p": "Sẽ cho đi «Trước»/«Sau» qua các dòng đang hiện (kể cả khi đang tìm) mà khung hồ sơ không xê dịch; cùng một khung dùng cho hồ sơ căn lẫn hồ sơ người."
+  },
+  {
+   "id": "AC-3",
+   "p": "Sẽ tự quyết ô nào sửa ngay trên ô (giá, số, chữ, lựa chọn, có/không, ngày) và ô nào sửa trong hồ sơ, theo kiểu dữ liệu; màn không tự chọn."
+  },
+  {
+   "id": "AC-5",
+   "p": "Sẽ báo lỗi tải bằng câu ba phần; nút «Thử lại» chỉ hiện khi bấm thật sự tải lại; tải hỏng giữa chừng mà chưa có dòng nào thì nói dữ liệu có nhưng chưa tải được, không nói «chưa ai nhập»."
+  },
+  {
+   "id": "AC-7",
+   "p": "Sẽ đo lại chữ bị cắt mỗi khi cửa sổ đổi bề rộng, để chữ dài luôn đọc đủ được bằng bàn phím."
+  },
+  {
+   "id": "AC-8",
+   "p": "Sẽ lưu thay đổi đảo được ngay và cho «Hoàn tác»; thay đổi không đảo được hoặc ra ngoài sàn thì hỏi xác nhận, nút mang đúng động từ; mất mạng thì băng trên màn báo chưa lưu, chữ đang nhập còn nguyên."
+  },
+  {
+   "id": "AC-9",
+   "p": "Sẽ làm bộ kiểm của kho báo đỏ khi một màn tự dựng lại hồ sơ, hộp thoại, khung chờ hay thông báo, và sáu quy tắc hành vi đều có bài kiểm đỏ được khi phá."
+  }
+ ],
+ "wont_do": [
+  {
+   "id": "AC-4",
+   "p": "Sẽ KHÔNG hiện gì trong giây đầu khi tải; từ 1 giây có khung chờ, từ 10 giây có câu tiến độ và «Huỷ»; lúc tải đầu vùng không hiện số dòng hay ô tìm."
+  },
+  {
+   "id": "AC-6",
+   "p": "Sẽ KHÔNG cho người không đủ quyền thấy nút làm việc như «Thêm dòng»."
+  },
+  {
+   "id": "AC-10",
+   "p": "Sẽ KHÔNG để trang tràn ngang hay có lỗi trợ năng nghiêm trọng ở bốn khổ màn, sáng và tối, kể cả khi hồ sơ hay hộp xác nhận đang mở."
+  },
+  {
+   "id": "OOS-1",
+   "p": "Chưa có nội dung thật của hồ sơ căn hay hồ sơ người — bản mẫu dùng nội dung giả để chứng minh một khung nhận cả hai."
+  },
+  {
+   "id": "OOS-2",
+   "p": "Chưa có ô sửa thật trên Lưới — để cho việc sửa giá và trạng thái trên ô."
+  },
+  {
+   "id": "OOS-3",
+   "p": "Chưa có câu xác nhận riêng cho từng hành động nguy hiểm — chỉ có hộp xác nhận chung."
+  },
+  {
+   "id": "OOS-4",
+   "p": "Chưa báo «người khác vừa sửa» khi lưu — cần đường lưu thật lên máy chủ."
+  },
+  {
+   "id": "OOS-5",
+   "p": "Chưa chốt chia trang hay cuộn liền, chưa lọc theo cột — để cho Bảng hàng."
+  },
+  {
+   "id": "OOS-6",
+   "p": "Không thêm luật kiểm trong trình soạn mã — rào chặn nằm ở bộ kiểm của kho."
+  }
+ ],
+ "scope_plain": "Những việc dưới đây cố ý để cho hàng sau, vì cần dữ liệu thật hoặc màn thật:",
+ "coverage_plain": [
+  {
+   "i": 0,
+   "p": "Đủ sáu việc của hàng: mở hồ sơ (AC-1, AC-2), tìm không ra (giữ của Lưới), chờ tải (AC-4), lỗi (AC-5), lưu và hoàn tác (AC-8), màn chỉ khai mình cần gì (AC-3, AC-6, AC-9)."
+  },
+  {
+   "i": 1,
+   "p": "Sáu quy tắc hành vi trong sổ thiết kế, mỗi quy tắc nối với ít nhất một tiêu chí; đủ là mỗi quy tắc có bài kiểm đỏ được (AC-9)."
+  },
+  {
+   "i": 2,
+   "p": "Năm điều anh đặt khi ký Lưới đều thành tiêu chí: đầu vùng khi lỗi (AC-4, AC-5), tải hỏng không dòng (AC-5), nút Thử lại chết (AC-5), nút khi thiếu quyền (AC-6), đo lại chữ cắt (AC-7)."
+  },
+  {
+   "i": 3,
+   "p": "Hai loại hồ sơ: căn và người, cùng một khung (AC-2)."
+  },
+  {
+   "i": 4,
+   "p": "Ba kiểu lưu: đảo được trong sàn, đảo được ra ngoài sàn, không đảo được (AC-8)."
+  },
+  {
+   "i": 5,
+   "p": "Bốn khổ màn × sáng và tối (AC-10)."
+  },
+  {
+   "i": 6,
+   "p": "Chưa phủ «người khác vừa sửa khi lưu» — có lý do ở phần để lại."
+  }
+ ],
+ "gap_probe_plain": [
+  {
+   "i": 0,
+   "p": "Lý do bỏ bước xem bản mẫu trước cổng chỉ đúng cho Lưới, không cho khung hồ sơ và hộp xác nhận mới — đã sửa: dựng bản mẫu và chụp ảnh gửi kèm thẻ này."
+  },
+  {
+   "i": 1,
+   "p": "Việc ghi chỗ kiểm vào sổ thiết kế đang chờ giám sát mà hồ sơ không ghi lối nào — đã sửa: giám sát đã duyệt, sổ ghi rõ, bỏ lối dự phòng."
+  },
+  {
+   "i": 2,
+   "p": "Bài đo chỉ xem có nhãn quy tắc trong tệp, chưa chứng minh phá thì đỏ — đã sửa: thêm sáu ca phá thử, mỗi quy tắc một ca."
+  },
+  {
+   "i": 3,
+   "p": "Rào chặn màn tự dựng chỉ thử một loại hộp thoại — đã sửa: liệt đủ 11 nguồn bị cấm, mỗi nguồn một ca."
+  },
+  {
+   "i": 4,
+   "p": "Chưa rõ «Sau» lấy thứ tự sau khi tìm từ đâu — đã sửa: Lưới tự giữ hồ sơ nên luôn đi theo dòng đang hiện, thêm ca đo."
+  }
+ ],
+ "decisions": [],
+ "analyst_plain": ""
+}
