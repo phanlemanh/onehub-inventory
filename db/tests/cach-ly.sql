@@ -50,6 +50,26 @@ begin
   raise exception 'HỎNG %: câu chạy được — %', ca, cau;
 end $f$;
 
+-- A policy expression filters by company when every OR-term is exactly `<column> = app.current_company_id()`.
+-- Reads may also match a partner column (one ending in company_id); writes may only match the table's own company
+-- column. Anything else — `true`, `<>`, `is not null`, an extra `or …`, an `and …` — fails closed.
+create function pg_temp.loc_theo_san(bieu_thuc text, cot text, chi_cot_san boolean) returns boolean
+language plpgsql immutable as $f$
+declare phan text; m text[]; co_cot_san boolean := false;
+begin
+  foreach phan in array string_to_array(bieu_thuc, ' OR ') loop
+    -- Strips the deparser's parentheses, including the call's own `()`.
+    m := regexp_match(btrim(phan, ' ()'), '^(\w+) = app\.current_company_id$');
+    if m is null then return false; end if;
+    if m[1] = cot then
+      co_cot_san := true;
+    elsif chi_cot_san or m[1] !~ 'company_id$' then
+      return false;
+    end if;
+  end loop;
+  return co_cot_san;
+end $f$;
+
 -- Tables in scope: every ordinary or partitioned table in schema public with a company_id column, plus companies.
 create function pg_temp.bang_cong_ty() returns table (oid oid, ten name, cot text) language sql as $f$
   select c.oid, c.relname, case when c.relname = 'companies' then 'id' else 'company_id' end
@@ -261,7 +281,8 @@ begin
   raise notice 'ok moi-bang-cong-ty-ep-luat-theo-dong — % bảng', n;
 end $$;
 
--- 13. Every policy of every company table filters by company; reads exist; inserts and updates have a check.
+-- 13. Every policy of every company table filters by company (pg_temp.loc_theo_san); reads exist; inserts and updates
+--     have a check.
 do $$
 declare b record; p record; n int := 0;
 begin
@@ -272,12 +293,10 @@ begin
       raise exception 'HỎNG luat-doc-ghi-theo-san: % không có luật đọc', b.ten;
     end if;
     for p in select * from pg_policies where schemaname = 'public' and tablename = b.ten loop
-      if p.qual is not null
-         and not (position('current_company_id()' in p.qual) > 0 and p.qual ~ ('\m' || b.cot || '\M')) then
+      if p.qual is not null and not pg_temp.loc_theo_san(p.qual, b.cot, false) then
         raise exception 'HỎNG luat-doc-ghi-theo-san: % — luật % không lọc theo sàn: %', b.ten, p.policyname, p.qual;
       end if;
-      if p.with_check is not null
-         and not (position('current_company_id()' in p.with_check) > 0 and p.with_check ~ ('\m' || b.cot || '\M')) then
+      if p.with_check is not null and not pg_temp.loc_theo_san(p.with_check, b.cot, true) then
         raise exception 'HỎNG luat-doc-ghi-theo-san: % — luật % kiểm không theo sàn: %',
           b.ten, p.policyname, p.with_check;
       end if;

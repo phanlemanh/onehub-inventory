@@ -16,7 +16,9 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-const POOL_CALL = /\b\w*[Pp]ool\.(query|connect)\(|new\s+(?:pg\.)?(?:Pool|Client)\(/;
+// Type arguments (`query<Row>(`), optional chaining (`pool?.query(`) and spaces before `(` count too.
+const POOL_CALL =
+  /\b\w*[Pp]ool\??\.(?:query|connect)\s*(?:<[^>]*>)?\s*\(|new\s+(?:pg\.)?(?:Pool|Client)\s*(?:<[^>]*>)?\s*\(/;
 
 /** The only files allowed to touch a pool: the door itself, and this test (it writes those strings into fixtures). */
 const EXEMPT: ReadonlySet<string> = new Set([
@@ -70,6 +72,24 @@ describe("one query door", () => {
       { file: "routes/hong.ts", line: 1 },
       { file: "routes/moi.ts", line: 2 },
     ]);
+  });
+
+  it("control: typed and optional calls are named too", () => {
+    const dir = mkdtempSync(join(tmpdir(), "mot-cua-"));
+    writeFileSync(
+      join(dir, "typed.ts"),
+      [
+        "const a = await pool.query<Row>('select 1');",
+        "const b = await pool?.query('select 1');",
+        "const c = await appPool.connect ();",
+        "const d = new pg.Pool<Cfg>({});",
+        "const e = new Client ({});",
+      ].join("\n") + "\n",
+    );
+    expect(
+      scanQueries(dir, EXEMPT).map((v) => v.line),
+      "type arguments, optional chaining and spaces do not hide a pool call",
+    ).toEqual([1, 2, 3, 4, 5]);
   });
 
   it("control: a copy of this test outside the exemption is reported", () => {

@@ -2,7 +2,8 @@
 # Company isolation suite (SP-1, hồ sơ cach-ly-moi-san). Runs on this lane's Postgres container, never on real data:
 #   1. a fresh scratch database, migrations applied twice (the second run applies nothing);
 #   2. db/tests/cach-ly.sql — 14 cases under the API role, using the door's own statements;
-#   3. four break tests, each on its own scratch database: the suite must go red with the pinned message.
+#   3. four break cases (seven break files), each file on its own scratch database: the suite must go red with the
+#      pinned messages.
 # Every case prints `ok <case>` exactly once; the last line is `cach-ly: 19 ca đạt, vai quy_hang_app`.
 # Missing, repeated or failing cases are named and the exit code is not 0.
 #
@@ -40,12 +41,24 @@ CA_LENH=(
   pha-thu-luat-doc-mo
   pha-thu-bang-moi-luat-mo
 )
-# Break test → the lines its red run must contain.
+# Break case → its break files (db/tests/pha-thu/<file>.sql), each on its own scratch database.
+pha_thu_tep() {
+  case "$1" in
+    bo-ep-luat) printf '%s\n' bo-ep-luat ;;
+    luat-them-khong-kiem) printf '%s\n' luat-them-khong-kiem luat-them-khong-kiem-doi-tac ;;
+    luat-doc-mo) printf '%s\n' luat-doc-mo luat-doc-mo-hoac-true luat-doc-mo-khac-san ;;
+    bang-moi-luat-mo) printf '%s\n' bang-moi-luat-mo ;;
+  esac
+}
+# Break file → the lines its red run must contain.
 pha_thu_ghim() {
   case "$1" in
     bo-ep-luat) printf '%s\n' "HỎNG moi-bang-cong-ty-ep-luat-theo-dong: agreements" ;;
     luat-them-khong-kiem) printf '%s\n' "HỎNG a-khong-them-dong-ten-b" "HỎNG luat-doc-ghi-theo-san: agreements" ;;
-    luat-doc-mo) printf '%s\n' "HỎNG chua-dat-san-khong-thay-gi: agreements" "HỎNG luat-doc-ghi-theo-san: agreements" ;;
+    luat-them-khong-kiem-doi-tac) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: agreements" ;;
+    luat-doc-mo | luat-doc-mo-hoac-true)
+      printf '%s\n' "HỎNG chua-dat-san-khong-thay-gi: agreements" "HỎNG luat-doc-ghi-theo-san: agreements" ;;
+    luat-doc-mo-khac-san) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     bang-moi-luat-mo) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: bang_mau_cach_ly" ;;
   esac
 }
@@ -127,25 +140,31 @@ while IFS= read -r dong; do
   [ -n "$dong" ] && bao "$dong"
 done <<<"$lanh"
 
-# 3. Break tests: each must turn the suite red with its pinned lines.
+# 3. Break tests: every break file of a case must turn the suite red with its pinned lines.
 for pha in bo-ep-luat luat-them-khong-kiem luat-doc-mo bang-moi-luat-mo; do
-  db="cach_ly_pha_${pha//-/_}"
-  fresh_db "$db"
-  if ! bash "$here/migrate.sh" "$db" >/dev/null 2>&1 || ! pg_sql "$db" <"$tests/pha-thu/$pha.sql" >/dev/null 2>&1; then
-    bao "HỎNG pha-thu-$pha: không dựng được bản phá"
-    continue
-  fi
-  do_ra=$(chay_bo_kiem "$db")
-  rc=$?
-  printf '%s\n' "$do_ra" | sed "s/^/  [pha-thu-$pha] /"
-  thieu=""
-  while IFS= read -r ghim; do
-    grep -qF "$ghim" <<<"$do_ra" || thieu+="'$ghim' "
-  done < <(pha_thu_ghim "$pha")
-  if [ "$rc" -eq 0 ]; then
-    bao "HỎNG pha-thu-$pha: bộ kiểm vẫn xanh trên bản phá"
-  elif [ -n "$thieu" ]; then
-    bao "HỎNG pha-thu-$pha: đỏ nhưng thiếu dòng ghim $thieu"
+  loi_ca=""
+  while IFS= read -r tep; do
+    db="cach_ly_pha_${tep//-/_}"
+    fresh_db "$db"
+    if ! bash "$here/migrate.sh" "$db" >/dev/null 2>&1 || ! pg_sql "$db" <"$tests/pha-thu/$tep.sql" >/dev/null 2>&1; then
+      loi_ca+="$tep: không dựng được bản phá; "
+      continue
+    fi
+    do_ra=$(chay_bo_kiem "$db")
+    rc=$?
+    printf '%s\n' "$do_ra" | sed "s/^/  [pha-thu $tep] /"
+    thieu=""
+    while IFS= read -r ghim; do
+      grep -qF "$ghim" <<<"$do_ra" || thieu+="'$ghim' "
+    done < <(pha_thu_ghim "$tep")
+    if [ "$rc" -eq 0 ]; then
+      loi_ca+="$tep: bộ kiểm vẫn xanh trên bản phá; "
+    elif [ -n "$thieu" ]; then
+      loi_ca+="$tep: đỏ nhưng thiếu dòng ghim $thieu; "
+    fi
+  done < <(pha_thu_tep "$pha")
+  if [ -n "$loi_ca" ]; then
+    bao "HỎNG pha-thu-$pha: ${loi_ca%; }"
   else
     bao "ok pha-thu-$pha"
   fi
