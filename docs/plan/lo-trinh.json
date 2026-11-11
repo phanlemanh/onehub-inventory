@@ -238,7 +238,7 @@
         "1g"
       ],
       "slug": "thang-chon-khoi-vao-cong",
-      "bat_khi": "Khối tạo trong chính vòng mà ghi «trong kho» thì đỏ; màn hay khối mới nhập kho thiếu ứng viên ReUI kèm ảnh thì đỏ; khối ReUI lấy về thiếu dòng lý do cho vùng lấy, bỏ, thêm thì đỏ; hai dòng sổ khối cho cùng một nhu cầu thì đỏ; hồ sơ màn thiếu mục «Từ Quỹ hàng» hay thiếu họ của màn thì đỏ",
+      "bat_khi": "Khối tạo trong chính vòng mà ghi «trong kho» thì đỏ; màn hay khối mới nhập kho thiếu ứng viên ReUI kèm ảnh thì đỏ; khối ReUI lấy về thiếu dòng lý do cho vùng lấy, bỏ, thêm thì đỏ; hai dòng sổ khối cho cùng một nhu cầu thì đỏ; hồ sơ màn thiếu mục «Từ Quỹ hàng» hay thiếu họ của màn thì đỏ; khuôn bọc màn như App Shell có lối chứng minh riêng, không bị coi là dựng các màn nó bọc; mục «Từ Quỹ hàng» trỏ được trang sổ bối cảnh của màn",
       "nhom": "nen",
       "dot": "mvp-dot-1",
       "vung": [
@@ -575,7 +575,8 @@
       "dung_tren": [
         "9",
         "2",
-        "1n"
+        "1n",
+        "1o"
       ],
       "slug": "thanh-vien-chon-tu-reui",
       "bat_khi": "Thẻ Phạm vi nêu họ của màn và bày ứng viên: khuôn Lưới của kho, solution-users-8, hộp mời dialog-2; mọi bài kiểm quyền và mời của hàng 9 vẫn xanh, không đổi lời",
