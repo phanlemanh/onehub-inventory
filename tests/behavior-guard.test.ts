@@ -20,7 +20,7 @@ import { describe, expect, it } from "vitest";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-/** Every source a screen may not import, and the shared piece it must use instead. Written first: 11 entries. */
+/** Every source a screen may not import, and the shared piece it must use instead. Written first: 13 entries. */
 const FORBIDDEN: readonly { spec: string; use: string }[] = [
   { spec: "@/components/ui/sheet", use: "use RecordPanel through DataRegion record" },
   { spec: "@/components/ui/dialog", use: "use useChange for confirmation" },
@@ -33,6 +33,8 @@ const FORBIDDEN: readonly { spec: string; use: string }[] = [
   { spec: "vaul", use: "use RecordPanel through DataRegion record" },
   { spec: "@base-ui/react/dialog", use: "use RecordPanel or useChange" },
   { spec: "@base-ui/react/alert-dialog", use: "use useChange for confirmation" },
+  { spec: "@/components/candidate/record-panel", use: "use RecordPanel through DataRegion record" },
+  { spec: "@/components/candidate/region-state", use: "use DataRegion status" },
 ];
 
 /** The one file that mounts the toast host. */
@@ -67,6 +69,7 @@ function screenFiles(root: string): string[] {
   return [...sourceFiles(join(root, "src/app")), ...moduleUi];
 }
 
+/** `import … from`, `export … from`, `import "…"` and `import("…")`. */
 const IMPORT = /(?:from\s+|import\s*\(\s*|import\s+)["']([^"']+)["']/g;
 
 /** One line per screen file that imports a forbidden source: `<file>: imports <source> — <use>`. */
@@ -87,8 +90,8 @@ function rebuiltBehaviour(root: string): string[] {
 
 describe("screens declare, they do not rebuild behaviour", () => {
   it("lists the 11 forbidden sources", () => {
-    expect(FORBIDDEN).toHaveLength(11);
-    expect(new Set(FORBIDDEN.map((f) => f.spec)).size).toBe(11);
+    expect(FORBIDDEN).toHaveLength(13);
+    expect(new Set(FORBIDDEN.map((f) => f.spec)).size).toBe(13);
   });
 
   it("finds no screen file that rebuilds a behaviour", () => {
@@ -113,7 +116,18 @@ describe("screens declare, they do not rebuild behaviour", () => {
         red += 1;
         rmSync(dir, { recursive: true });
       }
-      expect(red).toBe(11);
+      expect(red).toBe(13);
+      // Re-exporting is importing too.
+      const again = join(root, "src/app/lai");
+      mkdirSync(again, { recursive: true });
+      writeFileSync(
+        join(again, "page.tsx"),
+        'export { RegionError } from "@/components/candidate/region-state";\n',
+      );
+      expect(rebuiltBehaviour(root)).toEqual([
+        "src/app/lai/page.tsx: imports @/components/candidate/region-state — use DataRegion status",
+      ]);
+      rmSync(again, { recursive: true });
       // A module's ui folder counts as a screen too.
       const ui = join(root, "src/modules/listings/ui");
       mkdirSync(ui, { recursive: true });

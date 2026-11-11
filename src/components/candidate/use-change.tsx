@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState, type ReactNode } from "react";
 
 import { FRAME_COPY } from "@/components/templates/frame-copy";
-import { notifyResult } from "@/components/templates/notify";
+import { notify, type NotifyChannel } from "@/components/templates/notify";
 import { saveWithBanner } from "@/components/templates/screen-banner";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,21 @@ import {
 } from "@/components/ui/dialog";
 
 type Work = () => Promise<void> | void;
+
+/**
+ * A change refused because of one field (e.g. «Giá phải lớn hơn 0»). The door sends it down the `field` channel,
+ * which is the field itself, and hands it back to the screen with the channel it took: the screen shows it there.
+ */
+export class FieldError extends Error {
+  channel: NotifyChannel | null = null;
+  constructor(
+    readonly field: string,
+    message: string,
+  ) {
+    super(message);
+    this.name = "FieldError";
+  }
+}
 
 interface ChangeBase {
   /** The verb on the confirm button, e.g. «Xoá căn»: the button names exactly what happens. */
@@ -45,20 +60,26 @@ export function needsConfirmation(change: Pick<Change, "reversible" | "leavesCom
 
 /**
  * The one door for saving and undoing. `run(change)` applies the rule above; a save that fails because the device
- * is offline goes to the screen banner and leaves the form alone (1a). Field errors are not this door's business:
- * they stay at the field (notification channel `field` → inline). Render `dialog` once in the screen.
+ * is offline goes to the screen banner and leaves the form alone (1a). A `FieldError` goes down the `field` channel —
+ * the field itself — and back to the screen, never to a toast. Render `dialog` once in the screen.
  */
 export function useChange(): { run: (change: Change) => Promise<boolean>; dialog: ReactNode } {
   const [pending, setPending] = useState<Change | null>(null);
   const settle = useRef<((ran: boolean) => void) | null>(null);
 
   const apply = useCallback(async (change: Change): Promise<boolean> => {
-    const saved = await saveWithBanner(async () => {
-      await change.apply();
-    });
+    let saved: boolean;
+    try {
+      saved = await saveWithBanner(async () => {
+        await change.apply();
+      });
+    } catch (error) {
+      if (error instanceof FieldError) error.channel = notify("field", { message: error.message });
+      throw error;
+    }
     if (!saved) return false;
     const undo = !needsConfirmation(change) && change.reversible ? change.undo : undefined;
-    notifyResult({ message: change.done, undo: undo ? () => void undo() : undefined });
+    notify("result", { message: change.done, undo: undo ? () => void undo() : undefined });
     return true;
   }, []);
 

@@ -21,9 +21,15 @@ import {
 import { RecordPanel, recordOpenSelector } from "../src/components/candidate/record-panel";
 import { LOADING_STEPS_MS, loadingStep } from "../src/components/candidate/region-state";
 import { TruncatedText } from "../src/components/candidate/truncated-text";
-import { needsConfirmation, useChange, type Change } from "../src/components/candidate/use-change";
+import {
+  FieldError,
+  needsConfirmation,
+  useChange,
+  type Change,
+} from "../src/components/candidate/use-change";
 import {
   channelFor,
+  notify,
   type NotifyChannel,
   type NotifyEvent,
 } from "../src/components/templates/notify";
@@ -177,8 +183,11 @@ function assertActionHidden(container: HTMLElement): void {
   }
 }
 
+/** Sends a field error through the real notifier with `rule` and checks no toast came out of it. */
 function assertFieldInline(rule: (event: NotifyEvent) => NotifyChannel): void {
-  if (rule("field") !== "inline") throw new Error("field error sent to toast");
+  toastMock.mockClear();
+  notify("field", { message: "Giá phải lớn hơn 0" }, rule);
+  if (toastMock.mock.calls.length > 0) throw new Error("field error sent to toast");
 }
 
 function assertLockedHasReason(container: HTMLElement): void {
@@ -745,12 +754,24 @@ describe("save and undo", () => {
       done: "Đã lưu.",
       reversible: true,
       apply: () => {
-        throw new Error("Giá phải lớn hơn 0");
+        throw new FieldError("Listing.listPrice", "Giá phải lớn hơn 0");
       },
       undo: () => {},
     });
-    await expect(failing).rejects.toThrow("Giá phải lớn hơn 0");
+    const error = await failing.catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(FieldError);
+    expect((error as FieldError).channel).toBe("inline");
     expect(toastMock).not.toHaveBeenCalled();
+    expect(getScreenBanner()).toBeNull();
+  });
+
+  it("sends a result to a toast and a screen problem to the banner", () => {
+    expect(notify("result", { message: "Đã lưu." })).toBe("toast");
+    expect(toastMock).toHaveBeenCalledWith("Đã lưu.");
+    expect(notify("screen", { message: "Màn chưa lưu được", detail: "Bạn thử lại." })).toBe(
+      "banner",
+    );
+    expect(getScreenBanner()?.title).toBe("Màn chưa lưu được");
   });
 
   it("break: running an irreversible change at once fails the check", async () => {
