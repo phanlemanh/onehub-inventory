@@ -119,7 +119,7 @@ human_signoff:
   run_id: minted-luoi-va-o-theo-kieu-E11-r3
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
+  verifier: config:capture.ui
   verified_at: 2026-11-11T03:18:14Z
   screenshot: evidence/E11-step1.png
   observed: |
