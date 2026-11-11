@@ -246,6 +246,41 @@
       ]
     },
     {
+      "ma": "1k",
+      "cau_giao": "Ghim lại danh mục ReUI từ nguồn đã đổi cách ghi tiêu đề mục thì máy dừng và gọi tên nhóm bị mất thay vì lặng lẽ bỏ cả nhóm, và phép chặn mã hay khoá phủ đủ các dạng đã kê",
+      "vai": "nen",
+      "tieu_chi": 4,
+      "vi_sao": "Bốn mục ngoài hợp đồng của hàng 1g, cùng một gốc: đọc nguồn theo tiêu đề mục quá hẹp và ma trận chuỗi cấm chưa đủ. Chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng ngày 11/11/2026",
+      "slug": "danh-muc-reui-doc-chac",
+      "hang": "T3",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "vung": [
+        "tools/reui_catalog/**",
+        "design/reui-catalog.json"
+      ],
+      "dung_tren": [
+        "1g"
+      ]
+    },
+    {
+      "ma": "1l",
+      "cau_giao": "Lệnh ghi số đo của một vòng không bao giờ lặng lẽ bỏ tầng đã khai: bản số đo cũ đọc không được thì lệnh dừng và nói rõ, không ghi đè",
+      "vai": "nen",
+      "tieu_chi": 3,
+      "vi_sao": "Hai mục ngoài hợp đồng của hàng 1h, cùng một lỗi: lệnh ghi bỏ mất tầng đã khai khi bản cũ hỏng rồi ghi đè. Chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng ngày 11/11/2026",
+      "slug": "so-do-ghi-khong-mat-tang",
+      "hang": "T3",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "vung": [
+        "tools/round_metrics/**"
+      ],
+      "dung_tren": [
+        "1h"
+      ]
+    },
+    {
       "ma": "2",
       "cau_giao": "Đầu chủ mở Bảng hàng và thấy các căn của sàn trên Lưới, đủ trạng thái màn, ở bốn khổ màn hình",
       "vai": "Đầu chủ",
