@@ -165,7 +165,8 @@ const FRAME_TESTS = ["tieu-de", "khong-cuon-ngang", "khong-loi-trinh-duyet", "ax
 
 /** `[size] screen recipe` for every frame main case in a listing. */
 function frameCases(lines: string[], kind: "khung" | "pha khung"): string[] {
-  const re = new RegExp(`^\\s*\\[(\\d+)\\] › .* › man (\\S+) › ${kind} ([a-z-]+)`);
+  // Only the normal copy: the slowed copy sits under "cham".
+  const re = new RegExp(`^\\s*\\[(\\d+)\\] › [^›]+› man (\\S+) › ${kind} ([a-z-]+)`);
   return lines.flatMap((l) => {
     const m = re.exec(l);
     return m ? [`${m[1]} ${m[2]} ${m[3]}`] : [];

@@ -17,13 +17,18 @@ async function busyMs(page: Page): Promise<number> {
   });
 }
 
-/** With E2E_CPU_THROTTLE set, slow this page's CPU and prove it is really slower. */
-async function throttle(page: Page): Promise<void> {
-  if (!(THROTTLE > 1)) return;
+/** Pages already slowed: the rate stays on a page across navigations, so measure and set it once per page. */
+const slowed = new WeakSet<Page>();
+
+/** Slow this page's CPU by `rate` (E2E_CPU_THROTTLE wins when set) and prove it is really slower. */
+async function throttle(page: Page, wanted = 0): Promise<void> {
+  const rate = THROTTLE > 1 ? THROTTLE : wanted;
+  if (!(rate > 1) || slowed.has(page)) return;
+  slowed.add(page);
   await page.goto("about:blank");
   const before = Math.min(await busyMs(page), await busyMs(page));
   const cdp = await page.context().newCDPSession(page);
-  await cdp.send("Emulation.setCPUThrottlingRate", { rate: THROTTLE });
+  await cdp.send("Emulation.setCPUThrottlingRate", { rate });
   const after = Math.min(await busyMs(page), await busyMs(page));
   if (after / before < MIN_SLOWDOWN) {
     throw new Error(`ham cpu khong co tac dung — ${before.toFixed(1)}ms → ${after.toFixed(1)}ms`);
@@ -54,7 +59,7 @@ export async function open(
   base: Omit<Ctx, "page" | "errors">,
   brk?: Break,
 ): Promise<Ctx> {
-  await throttle(page);
+  await throttle(page, base.cpu);
   const ctx: Ctx = { ...base, page, errors: [] };
   page.on("pageerror", (err) => ctx.errors.push(err.message));
   page.on("console", (msg) => {

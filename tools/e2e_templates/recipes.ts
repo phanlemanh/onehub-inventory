@@ -11,6 +11,8 @@ export interface Ctx {
   screen: string;
   /** Display name of the screen's title label (frame recipes). */
   title: string | null;
+  /** CPU slowdown for this case (0 = none); E2E_CPU_THROTTLE overrides it for a whole run. */
+  cpu?: number;
   /** Browser errors seen since the page was opened. */
   errors: string[];
 }
@@ -596,6 +598,12 @@ export function classifyGrid(
 
 /** What the page shows, for classifyGrid. */
 export async function readGrid(page: Page): Promise<{ hasRegion: boolean; hasTable: boolean }> {
+  // A grid may render a moment after hydration: give it time before calling the page grid-less.
+  await page
+    .locator('[data-slot="data-region"], table, [role="grid"], [role="table"]')
+    .first()
+    .waitFor({ state: "attached", timeout: 10_000 })
+    .catch(() => undefined);
   return {
     hasRegion: (await region(page).count()) > 0,
     hasTable:
