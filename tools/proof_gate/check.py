@@ -112,23 +112,35 @@ def grounds_exist(repo: Repo, text: str) -> bool:
     a missing test file is not grounds for the missing one.
     """
     refs = 0
-    for tok in re.findall(r"[^\s`,;()«»·]+", text):
+    wiki = re.compile(r"(?:wiki/decisions/|ADR-)(\d{4})(?:-[\w.-]*?)?(?:\.md)?(?=$|[^\w.-])")
+    for m in wiki.finditer(text):
+        refs += 1
+        if not list((repo.root / "wiki/decisions").glob(f"{m.group(1)}-*.md")):
+            return False
+    for tok in re.findall(r"[^\s`,;()«»·\[\]]+", wiki.sub(" ", text)):
         tok = tok.rstrip(".:")
-        wiki = re.fullmatch(r"(?:wiki/decisions/|ADR-)(\d{4})(?:-[\w.-]*)?", tok)
-        if wiki:
-            refs += 1
-            if not list((repo.root / "wiki/decisions").glob(f"{wiki.group(1)}-*.md")):
-                return False
-        elif tok.startswith("decision:"):
+        if tok.startswith("decision:"):
             refs += 1
             if tok.split(":", 1)[1] not in repo.decision_ids:
                 return False
-        elif "/" in tok:
+        elif is_path_ref(repo, tok):
             refs += 1
             path = re.split(r"#|:(?=\d)", tok)[0]
-            if not path or path.startswith("/") or ".." in path or not (repo.root / path).is_file():
+            if path.startswith("/") or ".." in path or not (repo.root / path).is_file():
                 return False
     return refs > 0
+
+
+def is_path_ref(repo: Repo, tok: str) -> bool:
+    """A token is a file reference when it starts in a top-level folder of the repo or ends in a file extension.
+
+    Prose such as «đọc/ghi», «N/A» or «ListSide/BuyerSide», and web links, are not file references.
+    """
+    if "/" not in tok or "://" in tok:
+        return False
+    first = tok.lstrip("./").split("/", 1)[0]
+    has_ext = re.search(r"\.[A-Za-z0-9]{1,5}(?:#.*|:\d+)?$", tok) is not None
+    return has_ext or (bool(first) and (repo.root / first).is_dir())
 
 
 def component_names_in(repo: Repo, text: str) -> list[str]:

@@ -432,6 +432,45 @@ describe("theo mẫu: chỗ lệch", () => {
       ]);
     }
   });
+  it("ma trận căn cứ: ba loại × có thật hay thiếu × đứng riêng hay đi cùng một tệp thật", () => {
+    const real = {
+      tep: "tests/region.test.ts",
+      quyet: "decision:grid-density",
+      wiki: "wiki/decisions/0019",
+    };
+    const missing = { tep: "tests/khong-co.test.ts", quyet: "decision:D-999", wiki: "ADR-9999" };
+    const cases: [string, boolean][] = [];
+    for (const k of ["tep", "quyet", "wiki"] as const) {
+      cases.push([real[k], true], [missing[k], false]);
+      cases.push(
+        [`tests/region.test.ts ${real[k]}`, true],
+        [`tests/region.test.ts ${missing[k]}`, false],
+      );
+    }
+    expect(cases).toHaveLength(12);
+    for (const [grounds, silent] of cases) {
+      const out = runWith([`| Bảng | khác — có lý do | ${grounds} |`]).stdout;
+      expect(codes(out), grounds).toEqual(silent ? [] : ["ly-do-khong-can-cu"]);
+    }
+  });
+  it("dấu / trong lời thường, đường web và liên kết markdown không bị coi là tệp", () => {
+    for (const grounds of [
+      "tests/region.test.ts (đọc/ghi)",
+      "tests/region.test.ts và/hoặc N/A",
+      "tests/region.test.ts ListSide/BuyerSide",
+      "tests/region.test.ts xem https://dd.reso.org/DD2.1/",
+      "[tests/region.test.ts](tests/region.test.ts)",
+      "ADR-0019/ADR-0019",
+    ]) {
+      expect(codes(runWith([`| Bảng | khác — có lý do | ${grounds} |`]).stdout), grounds).toEqual(
+        [],
+      );
+    }
+    // Prose alone is not grounds.
+    expect(codes(runWith(["| Bảng | khác — có lý do | đọc/ghi |"]).stdout)).toEqual([
+      "ly-do-khong-can-cu",
+    ]);
+  });
   it("đối chứng: tệp có thật, mã quyết định có thật, quyết định wiki có thật thì im", () => {
     const r = runWith([
       "| Bảng | khác — có lý do | `tests/region.test.ts` |",

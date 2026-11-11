@@ -107,3 +107,10 @@ Hai đến ba hướng thật sự khác nhau, mỗi hướng một ảnh riêng
 Bậc là một trong `trong-kho` · `reui` · `ve-tay`. `trong-kho`: tên có trong `design/component-registry.json`. `reui`: tên
 có trong `design/reui-catalog.json` (tra tại máy bằng `tools/reui_catalog`). Rơi khỏi `trong-kho` thì ghi đủ ba cột: đã tra
 gì, ứng viên gần nhất (tên có thật trong kho hay danh mục), vì sao không dùng được.
+
+## Căn cứ
+
+Một ô căn cứ (`khác — có lý do`, `đạt`) cần ít nhất một tham chiếu, và mọi tham chiếu trong ô phải có thật: đường tệp
+trong kho (bắt đầu bằng một thư mục gốc của kho, hay có đuôi tệp; thư mục không tính), `decision:<id>` của
+`design/decisions.yaml`, hay `wiki/decisions/<số>` · `ADR-<số>`. Lời thường có dấu «/» (đọc/ghi) và đường web không tính là
+tham chiếu.
