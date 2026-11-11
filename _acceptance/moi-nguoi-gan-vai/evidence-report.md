@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 7008b7bdab3511c46277cc8fc3ae6bb0d1246656
-human_signoff:
+human_signoff: Manh Phan 2026-11-11
 ---
 
 # Evidence Report: moi-nguoi-gan-vai
@@ -172,7 +172,7 @@ human_signoff:
   run_id: minted-moi-nguoi-gan-vai-E14-r2
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
+  verifier: config:executors.script.moi_nguoi_e2e
   verified_at: 2026-11-11T10:24:30Z
   screenshot: evidence/members-ready-1440-sang.png
   observed: |

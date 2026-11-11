@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api, config]
 screens: [members]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: docs/superpowers/specs/2026-11-11-moi-nguoi-gan-vai-design.md
@@ -111,3 +111,8 @@ Bảng hàng, Đã gửi là việc của bảng quyền 9a.
   sau migration này; câu lệnh mẫu của yêu cầu thử tay hàng 8 cập nhật theo.
 - Migration mới `003_moi_nguoi_gan_vai.sql` viết trong kho này theo bổ sung 2026-11-11 của quyết định 0008; số đổi nếu
   `origin/main` đã có 003 lúc gộp.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-1: Sổ mô-đun chưa ghi khái niệm Thành viên thuộc mô-đun danh tính; người dùng không thấy khác biệt.
+  - Ngoài-3: Việc lấy tên sàn và tên người mời cho thư mời đi qua một lối khác với lối đã ghi trong tài liệu; dữ liệu vẫn khoá theo sàn.
+  - Ngoài-4: Quản trị tự bỏ vai Quản trị sàn của mình khi còn quản trị khác sẽ thấy màn lỗi máy chủ kèm nút Thử lại không dùng được, phải tải lại trang mới thấy Không đủ quyền; phiên hết hạn trên màn này cũng báo nhầm là lỗi máy chủ.
+  - Ngoài-5: Bài kiểm «mời email đã có trả lời như email mới» có thể vẫn xanh nếu cả hai lời mời cùng hỏng giống nhau.

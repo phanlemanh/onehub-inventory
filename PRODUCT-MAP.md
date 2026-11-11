@@ -11,9 +11,9 @@ flowchart TD
   GD --> XL["Xếp lại sau<br/>chưa có"]
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
-  GP --> DL["Đang làm<br/>1 việc"] --> GB{"Cổng Bằng chứng"}
+  GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
   GB --> DG["Đã giao<br/>1 việc"]
-  GB --> CN["Chờ phiên nghiệm thu<br/>14 việc"] --> GG{"Cổng Giá trị"}
+  GB --> CN["Chờ phiên nghiệm thu<br/>15 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
 
@@ -29,10 +29,6 @@ flowchart TD
 - Đầu khách mở Đã gửi và thấy các link đã gửi trên cùng Lưới với Bảng hàng (`da-gui-tren-luoi`)
 - Đầu chủ bấm một căn và thấy hồ sơ căn cạnh bảng, trên điện thoại thấy thẻ căn (`ho-so-can`)
 
-## Đang làm
-
-- Quản trị sàn mời người vào sàn và gán một trong bốn vai (`moi-nguoi-gan-vai`)
-
 ## Đã giao — chờ phiên nghiệm thu
 
 - Mỗi sàn chỉ đọc và ghi được dữ liệu của mình, mọi truy vấn đi qua một cửa (`cach-ly-moi-san`)
@@ -46,6 +42,7 @@ flowchart TD
 - Mọi màn và mọi vai được khai cho máy đọc, màn chưa khai hay hợp đồng thiếu vai thì kiểm tra báo đỏ (`khai-vai-va-man`)
 - Nhân viên sàn mở ứng dụng ở giao diện sáng hoặc tối, luôn biết mình đang ở màn nào và được báo đúng chỗ khi có sự cố (`khung-va-giao-dien`)
 - Mọi vùng dữ liệu dùng chung Lưới, ô theo kiểu, đầu vùng và đủ trạng thái (`luoi-va-o-theo-kieu`)
+- Quản trị sàn mời người vào sàn và gán một trong bốn vai (`moi-nguoi-gan-vai`)
 - Lệnh ghi số đo của một vòng không bao giờ lặng lẽ bỏ tầng đã khai: bản số đo cũ đọc không được thì lệnh dừng và nói rõ, không ghi đè (`so-do-ghi-khong-mat-tang`)
 - Mỗi vòng giao diện máy ghi một bản số đo, một lệnh gộp theo tầng, và có mốc đối chứng trước khi dựng nền (`so-do-moi-vong`)
 - Một nhân viên giữ nhiều vai cùng lúc thấy đủ mục điều hướng của mọi vai mình giữ (`thanh-ben-nhieu-vai`)
