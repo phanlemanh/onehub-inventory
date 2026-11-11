@@ -1,0 +1,168 @@
+schema_version: 1
+feature_slug: moi-nguoi-gan-vai
+# Ma trận ca viết trước. Bài kiểm cơ sở dữ liệu (tests/db/moi-nguoi.db.test.ts, chạy bằng
+# config:executors.script.moi_nguoi_db trên Postgres của dãy, cơ sở nháp moi_nguoi_*) — 12 ca, mỗi ca một `it` mang
+# đúng tên dưới đây, reporter verbose in tên từng ca:
+#   moi-email-moi-vao-dung-san · thu-moi-mot-lan · thu-hong-khong-them · moi-email-da-co-khong-lo ·
+#   moi-bi-tu-choi-khong-doi · doi-vai-va-quan-tri-cuoi · ba-vai-khong-quan-tri · chua-dang-nhap-chua-chon-san ·
+#   doi-vai-nguoi-san-khac · vai-api-khong-ghi-thang · ham-hep-chi-san-cua-phien · rang-buoc-vai-bang-mo-hinh
+# Ca phá thử (cùng tệp, mỗi bản phá một cơ sở nháp riêng, ca tương ứng phải đỏ với thông điệp ghim):
+#   pha-thu-moi-khong-kiem-quan-tri (member_invite bỏ kiểm người gọi là Quản trị sàn)
+#     → «ba-vai-khong-quan-tri: Đầu chủ mời được người»
+#   pha-thu-doi-vai-moi-san (member_set_roles không lọc theo sàn của phiên)
+#     → «doi-vai-nguoi-san-khac: đổi được vai người của sàn khác»
+#   pha-thu-bo-quan-tri-cuoi (member_set_roles bỏ kiểm quản trị cuối cùng)
+#     → «doi-vai-va-quan-tri-cuoi: sàn mất quản trị cuối cùng»
+#   pha-thu-cap-ghi-bang (cấp insert trên company_members cho vai API)
+#     → «vai-api-khong-ghi-thang: company_members»
+#   pha-thu-ten-chung (member_list trả tên tài khoản thay tên trong sàn)
+#     → «moi-email-da-co-khong-lo: lộ tên sàn khác đặt»
+#   pha-thu-danh-sach-khong-kiem-quan-tri (member_list bỏ kiểm người gọi là Quản trị sàn)
+#     → «ham-hep-chi-san-cua-phien: member_list trả danh sách cho người không quản trị»
+#   pha-thu-vai-moi-san (member_roles đọc vai ở mọi sàn của người)
+#     → «ham-hep-chi-san-cua-phien: member_roles đọc vai sàn khác»
+#   pha-thu-lo-tai-khoan (member_invite trả thêm một trường khi email đã có tài khoản)
+#     → «moi-email-da-co-khong-lo: phản hồi khác khi tài khoản đã có»
+# Ma trận hàm hẹp viết trước (ca 'ham-hep-chi-san-cua-phien' gọi thẳng từng hàm qua cửa withCompany dưới vai API, không
+# qua đường HTTP; 4 hàm × 5 người gọi × 2 đích = 40 ô, mỗi ô một kết quả ghim; số assert = 40):
+#   người gọi: quản trị A · Đầu chủ A · Đầu khách A · Trưởng nhóm A · người chỉ thuộc B (phiên ở B) — cộng ô «không
+#   phiên» cho từng hàm ở ca 'chua-dang-nhap-chua-chon-san'
+#   đích: người ở A · người chỉ ở B
+#   member_roles: trả vai của CHÍNH người gọi ở sàn của phiên, bỏ qua đích; người ở B gọi dưới phiên A không có (rỗng)
+#   member_list: quản trị A → dòng của A, không dòng nào của B; ba vai khác ở A → lỗi forbidden; người B → chỉ dòng B
+#   member_invite: quản trị A → ok, dòng mới ở A; ba vai khác → forbidden, không dòng mới; mời người ở B vào A → ok ở A,
+#     dòng của người ấy ở B không đổi
+#   member_set_roles: quản trị A với đích ở A → ok; với đích chỉ ở B → not-member, B không đổi; ba vai khác → forbidden
+# Bài trình duyệt có cơ sở dữ liệu (tests/e2e-db/members.spec.ts, config:executors.script.moi_nguoi_e2e) — 6 ca × 4 khổ:
+#   moi-nguoi-va-dang-nhap · doi-vai-thanh-ben · khong-du-quyen · loi-va-thu-lai · ban-phim-hop-thoai ·
+#   axe-sang-toi (mọi trạng thái của bảng trạng thái, sáng và tối)
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.moi_nguoi_db
+    layer: backend-effect
+    paths: [src/modules/identity/**, src/app/api/v1/members/**, db/migrations/003_moi_nguoi_gan_vai.sql, tests/db/**]
+    expected: "exit 0; ca 'moi-email-moi-vao-dung-san': quản trị sàn A (phiên thật qua bộ xử lý đăng nhập của hàng 8) gọi POST /api/v1/members với email mới, tên '[Tên] Mới', vai [ListAgent, TeamLead] → 200; GET /api/v1/members có đúng một dòng email ấy với tên, tập vai {ListAgent, TeamLead}, invited_by = id quản trị, invited_at trong một phút; rồi email ấy xin mã, mã RÚT TỪ THÂN THƯ của bộ gửi giữ thư, đổi mã trả 200 với company.id = A và app.member_roles() dưới phiên ấy trả đúng {ListAgent, TeamLead}. Đối chứng: trước khi mời, cùng email xin mã thì không thư nào gửi. Chiều đỏ: mời mà đổi mã trả no-company thì ca in 'moi-email-moi-vao-dung-san: người được mời không vào được sàn'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.moi_nguoi_db
+    paths: [src/modules/identity/**, src/app/api/v1/members/**, db/migrations/003_moi_nguoi_gan_vai.sql, tests/db/**]
+    expected: "exit 0; ca 'thu-moi-mot-lan': sau một lần mời thành công bộ gửi thư mời giữ đúng một thư, tới đúng email, thân chứa tên sàn A, tên quản trị, nhãn từng vai lấy từ bảng nhãn và đường '<gốc yêu cầu>/login', không chứa chuỗi 6 chữ số nào; sau bốn lần mời bị từ chối (đã ở sàn, vai rỗng, Đầu chủ mời, chưa đăng nhập) số thư vẫn là một. Ca 'thu-hong-khong-them': bộ gửi ném lỗi thì POST trả 500 server-error, company_members và identity.users đếm bằng vai chủ không đổi; đối chứng dương cùng ca: bộ gửi lành thì cùng lời mời thêm đúng một dòng. Chiều đỏ: gửi thư sau khi giao dịch đã chốt thì ca in 'thu-hong-khong-them: thư hỏng mà người vẫn được thêm'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/identity/**]
+    expected: "exit 0; src/modules/identity/invite-mail.test.ts ca 'thu-moi-noi-dung': thư dựng từ tên sàn, tên người mời, tập vai và gốc 'https://vi-du.test' có tiêu đề và thân lấy chữ từ bảng nhãn, chứa 'https://vi-du.test/login', liệt kê nhãn vai theo thứ tự của ontology/roles.yaml; ca 'thu-moi-resend': bộ gửi Resend gọi fetch đúng một lần tới https://api.resend.com/emails với 'to' là email người được mời và ném lỗi (không chứa email) khi Resend trả 500. Chiều đỏ: thân thiếu đường đăng nhập thì ca in 'thu-moi-noi-dung: thiếu đường đăng nhập'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.moi_nguoi_db
+    paths: [src/modules/identity/**, src/app/api/v1/members/**, db/migrations/003_moi_nguoi_gan_vai.sql, tests/db/**]
+    expected: "exit 0; ca 'moi-email-da-co-khong-lo' dùng CÙNG một email Y trên hai cơ sở nháp dựng từ cùng hàm nạp: ở cơ sở một Y đã có tài khoản thuộc sàn B với tên '[Tên] B', ở cơ sở hai Y chưa có; quản trị A mời Y với tên '[Tên] A' ở cả hai: mã trạng thái, thân phản hồi và thân thư mời (rút từ bộ gửi giữ thư) bằng nhau từng byte sau khi thay id người bằng '<id>'. Đối chứng dương cùng ca: phép so ấy đỏ khi một trong hai phản hồi được thêm một trường (bản phá pha-thu-lo-tai-khoan làm ca in 'moi-email-da-co-khong-lo: phản hồi khác khi tài khoản đã có'). Ở cơ sở một: danh sách của A ghi '[Tên] A' cho Y, danh sách của B (quản trị B) vẫn ghi '[Tên] B', identity.users của Y giữ tên cũ, Y đổi mã thì danh sách sàn là đúng tập {A, B}. Chiều đỏ: bản phá pha-thu-ten-chung làm ca in 'moi-email-da-co-khong-lo: lộ tên sàn khác đặt'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.moi_nguoi_db
+    paths: [src/modules/identity/**, src/app/api/v1/members/**, db/migrations/003_moi_nguoi_gan_vai.sql, tests/db/**]
+    expected: "exit 0; ca 'moi-bi-tu-choi-khong-doi' đi bảy đầu vào: email đã ở A → 409 already-member; email sai khuôn, tên trống, vai [], vai ['Owner'], vai ['ListAgent','ListAgent'], thân không phải JSON → 400 bad-request; sau mỗi đầu vào số dòng company_members, identity.users (đếm bằng vai chủ) và số thư không đổi. Cùng ca: vai chủ update company_members set roles = '{}' và set roles = '{Owner}' đều lỗi vi phạm ràng buộc. Đối chứng dương: một lời mời hợp lệ ngay sau đó trả 200. Chiều đỏ: bất kỳ đầu vào nào trả 200 thì ca in 'moi-bi-tu-choi-khong-doi: <đầu vào> được nhận'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.moi_nguoi_db
+    layer: backend-effect
+    paths: [src/modules/identity/**, src/app/api/v1/members/**, db/migrations/003_moi_nguoi_gan_vai.sql, tests/db/**]
+    expected: "exit 0; ca 'doi-vai-va-quan-tri-cuoi': sàn A có P, Q (CompanyAdmin) và R (BuyerAgent); P gọi PUT /api/v1/members/<R>/roles với [ListAgent, TeamLead] → 200, GET danh sách và app.member_roles() dưới phiên của R đều ra {ListAgent, TeamLead}; P bỏ CompanyAdmin của Q → 200; P bỏ CompanyAdmin của chính P → 409 last-admin và vai của P vẫn {CompanyAdmin}. Cùng ca, trên cơ sở nháp mới: P và Q (hai quản trị duy nhất) bỏ CompanyAdmin của nhau trên hai kết nối đồng thời (hai giao dịch mở cùng lúc, chốt sau khi cả hai đã gọi hàm) → lời gọi chốt trước trả ok, lời gọi chờ khoá trả forbidden (lúc ấy người gọi đã không còn là quản trị), và sàn còn đúng một quản trị. Chiều đỏ: bản phá pha-thu-bo-quan-tri-cuoi làm ca in 'doi-vai-va-quan-tri-cuoi: sàn mất quản trị cuối cùng'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.moi_nguoi_e2e
+    layer: ui
+    paths: ["src/app/(app)/members/**", "src/app/(app)/nav.ts", "src/app/(app)/layout.tsx", tests/e2e-db/**]
+    expected: "exit 0; ca 'doi-vai-thanh-ben' ở bốn khổ: quản trị mở /members, bấm «Đổi vai» ở dòng R, chọn Quản trị sàn, Lưu → dòng R có nhãn Quản trị sàn; đăng nhập bằng R (mã rút từ hộp thư thử) thì thanh bên có mục «Thành viên» (getByRole link, toHaveCount(1)); quản trị bỏ lại vai ấy thì lần tải kế của R không còn mục (toHaveCount(0)). Cùng ca: bỏ Quản trị sàn của chính mình khi là quản trị cuối thì hộp hiện câu của ST-roles-last-admin"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.moi_nguoi_db
+    layer: backend-effect
+    paths: [src/modules/identity/**, src/app/api/v1/members/**, db/migrations/003_moi_nguoi_gan_vai.sql, tests/db/**]
+    expected: "exit 0; ca 'ba-vai-khong-quan-tri': với phiên của từng người chỉ giữ ListAgent, BuyerAgent, TeamLead, ba đường GET danh sách, POST mời, PUT đổi vai đều trả 403 forbidden, thân không chứa email hay tên người nào của sàn, không dòng nào đổi, không thư nào đi (9 lời gọi, đếm từng lời gọi); đối chứng dương: cùng ba lời gọi bằng phiên quản trị trả 200. Ca 'chua-dang-nhap-chua-chon-san': không cookie và phiên của người thuộc hai sàn chưa chọn sàn → 401 unauthenticated cho cả ba đường. Chiều đỏ: bản phá pha-thu-moi-khong-kiem-quan-tri làm ca in 'ba-vai-khong-quan-tri: Đầu chủ mời được người'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.moi_nguoi_e2e
+    layer: ui
+    paths: ["src/app/(app)/members/**", "src/app/(app)/nav.ts", "src/app/(app)/layout.tsx", tests/e2e-db/**]
+    expected: "exit 0; ca 'khong-du-quyen' ở bốn khổ: đăng nhập bằng một Đầu chủ, thanh bên không có mục «Thành viên» (toHaveCount(0)); mở thẳng /members thì thấy câu của ST-members-forbidden, trang không chứa email hay tên của người nào khác trong sàn (so với danh sách tên email đã nạp); chưa đăng nhập mở /members thì về /login?next=%2Fmembers. Đối chứng dương: quản trị thấy mục và bảng có đủ số người đã nạp"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.moi_nguoi_db
+    layer: backend-effect
+    paths: [src/modules/identity/**, src/app/api/v1/members/**, db/migrations/003_moi_nguoi_gan_vai.sql, tests/db/**]
+    expected: "exit 0; ca 'doi-vai-nguoi-san-khac': quản trị A gọi PUT đổi vai với id một người chỉ thuộc B → 404 not-member, vai người ấy ở B không đổi; GET danh sách của A không có ai của B (so tập id). Ca 'vai-api-khong-ghi-thang': has_table_privilege của quy_hang_app trên company_members là false cho INSERT, UPDATE, DELETE và trên identity.users là false cho SELECT, INSERT; quy_hang_identity không đăng nhập được và không có quyền trên bảng nào của public ngoài companies (SELECT) và company_members (SELECT, INSERT, UPDATE). Ca 'ham-hep-chi-san-cua-phien': đi đủ 40 ô của ma trận hàm hẹp viết trước ở đầu tệp, mỗi ô một assert với kết quả ghim; bản phá pha-thu-danh-sach-khong-kiem-quan-tri và pha-thu-vai-moi-san làm ca in đúng hai câu ghim của chúng. Chiều đỏ: bản phá pha-thu-doi-vai-moi-san làm ca in 'doi-vai-nguoi-san-khac: đổi được vai người của sàn khác'; bản phá pha-thu-cap-ghi-bang làm ca in 'vai-api-khong-ghi-thang: company_members'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.cach_ly_n
+    paths: [db/**]
+    expected: "exit 0; bộ kiểm cách ly của hàng 7 chạy trên lược đồ đã áp mọi migration gồm 003: in 'ok moi-bang-cong-ty-ep-luat-theo-dong', 'ok luat-doc-ghi-theo-san', 'ok vai-api-khong-so-huu-khong-vuot' và không dòng 'HỎNG'; company_members nằm trong tập bảng công ty được quét"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.moi_nguoi_db
+    paths: [src/modules/identity/**, db/migrations/003_moi_nguoi_gan_vai.sql, ontology/roles.yaml, tests/db/**]
+    expected: "exit 0; ca 'rang-buoc-vai-bang-mo-hinh': tập vai trong ràng buộc của cột roles (đọc từ pg_constraint) bằng đúng mảng ROLES sinh từ ontology/roles.yaml, cùng thứ tự; schema của thân POST mời nhận đúng bốn giá trị ấy và từ chối giá trị thứ năm; một dòng thành viên nạp TRƯỚC khi áp 003 (cơ sở nháp áp 001, 002, nạp dòng, rồi áp 003) có roles = {CompanyAdmin} và name = tên tài khoản. Chiều đỏ: thêm một vai vào ROLES giả trong ca thì ca in 'rang-buoc-vai-bang-mo-hinh: ràng buộc lệch mô hình'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.moi_nguoi_e2e
+    layer: ui
+    paths: ["src/app/(app)/members/**", tests/e2e-db/**]
+    expected: "exit 0; ca 'moi-nguoi-va-dang-nhap', 'loi-va-thu-lai', 'ban-phim-hop-thoai', 'axe-sang-toi' ở bốn khổ: luồng mời đi bằng bàn phím (Tab tới «Mời người», Enter mở hộp, gõ, Enter gửi; Esc đóng hộp và tiêu điểm về nút mở); bốn ô chọn vai theo thứ tự Đầu chủ, Đầu khách, Trưởng nhóm, Quản trị sàn; mỗi trạng thái ST-members-loading (đường danh sách trễ 1,5 giây), ST-members-error (đường trả 500, «Thử lại» tải lại được), ST-members-long, ST-invite-invalid, ST-invite-already, ST-invite-failed (phần đã gõ giữ nguyên), ST-roles-last-admin hiện đúng câu của bảng trạng thái; axe không có vi phạm ở mọi trạng thái, sáng và tối; mỗi trạng thái chụp một ảnh vào _acceptance/moi-nguoi-gan-vai/evidence/, và thêm tám ảnh ghim tên cho E14: members-ready-{1440,360}-{sang,toi}.png và members-invite-open-{1440,360}-{sang,toi}.png. Chiều đỏ: ca đếm vi phạm axe bằng toEqual([])"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-9
+    executor: ui-check
+    layer: ui-observed
+    paths: ["src/app/(app)/members/**", src/components/candidate/form-dialog.tsx]
+    steps:
+      - "Run config:executors.script.moi_nguoi_e2e with SHOTS_DIR=_acceptance/moi-nguoi-gan-vai/evidence (DB_LANE=n DB_PORT=5563); the spec saves the eight pinned frames members-ready-{1440,360}-{sang,toi}.png and members-invite-open-{1440,360}-{sang,toi}.png, plus one ST-*.png per state at 1440"
+      - "Read the eight pinned frames and the ST-*.png frames"
+    expected: "Ảnh màn Thành viên ở 1440 và 360, sáng và tối, trạng thái có dữ liệu và hộp Mời đang mở: danh sách đọc được, nhãn vai là nhãn chữ không phải mã, nút «Mời người» ở đầu màn, hộp thoại không tràn khổ 360, không chữ đè chữ; ảnh từng trạng thái hiện đúng câu của bảng trạng thái"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
+
+  - id: E15
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.vai_man
+    paths: [design/screens.yaml, _acceptance/moi-nguoi-gan-vai/contract.md, ontology/roles.yaml]
+    expected: "exit 0; bộ kiểm Vai × Màn của hàng 1d nhận màn members trong sổ màn (audience staff, tiêu đề là khoá trong bảng nhãn) và khối Vai × Màn của hợp đồng này đủ bốn vai cho mọi màn khai trong screens"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

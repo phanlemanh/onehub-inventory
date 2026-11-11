@@ -25,9 +25,9 @@ const digest = createHash("sha1").update(`${process.cwd()}:db:${RUN}`).digest();
 const PORT = Number(process.env["E2E_DB_PORT"] ?? 4000 + (digest.readUInt16BE(0) % 900));
 const URL = `http://127.0.0.1:${PORT}`;
 const DB_PORT = process.env["DB_PORT"] ?? "5563";
-// Outside .next: `next build` (run beside these tests in a gate round) empties .next and would pull the folder out
-// from under this dev server (row 1m). dist/ is already ignored by git, ESLint and Prettier.
-const DIST_DIR = `dist/e2e-db-${RUN}`;
+// Outside .next: `next build` empties .next when it starts, so a build running beside these tests (a gate round runs
+// the build and this command side by side) would delete the dev server's folder under it (row 9, round 1).
+const DIST_DIR = join("node_modules", ".cache", "onehub-e2e-db", RUN, "next");
 // The dev server's own tsconfig (next.config.ts), a copy of the repository's with paths from its own folder: the
 // repository's tsconfig.json stays untouched. Turbopack does not read files inside the build folder, so it lives in
 // the package cache.

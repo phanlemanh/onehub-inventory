@@ -1,0 +1,62 @@
+# Chỉ mục nguồn Quỹ hàng của sổ bối cảnh
+
+Phiên viết sổ bối cảnh ngày 2026-11-11 đọc kho riêng `onehub-quy-hang` ở commit `1729b11f`. Tệp này chỉ liệt
+đường và băm `git hash-object` của từng tệp nguồn ở commit ấy (dạng đường trỏ ghim `<kho>:<đường>#<băm>`), không chép
+nội dung. Các trang dưới `wiki/` trỏ tới đúng dòng trong các tệp này bằng tiền tố `qh:`.
+
+- onehub-quy-hang:_acceptance/bang-hang-kieu-sheet/contract.md#34a29753dfa9a081bf1205c47b0a8fecdb47a84e
+- onehub-quy-hang:_acceptance/bang-hang-kieu-sheet/design.md#7af15da7b5aab2bec9a09fb4d857d82a0fca75ec
+- onehub-quy-hang:_acceptance/dang-nhap-theo-san/review-findings.md#7df51afe687d59b60a911f1bcbd2d5cba9a7d653
+- onehub-quy-hang:_acceptance/lam-lai-hom-nay-dau-chu/contract.md#66523d814da5301f923c2052c857eb90eedcf08a
+- onehub-quy-hang:_acceptance/man-nhap-excel/evidence-report.md#ebf6718965d357fbe79d9a3fdfccdfcf8189152d
+- onehub-quy-hang:_acceptance/moi-nguoi-vai-khu/review-findings.md#03d91fdd9f8098eb77f4645452a41787d6ecceca
+- onehub-quy-hang:_acceptance/nhap-loi-tat-dinh/contract.md#55ef070eec6077148378e1c207f2907e0cda1ccf
+- onehub-quy-hang:_acceptance/nhap-loi-tat-dinh/so-nen.json#f3689f3f2f43e2ffb6aeb596b4cb5480a16c94dc
+- onehub-quy-hang:_acceptance/thue-phi/review-findings.md#3e32f5c9bebdc77c9d459461d8437daa73bc963a
+- onehub-quy-hang:_acceptance/va-anh-ban-that/contract.md#9608d9de5a4493c16d7b4199ffb63fbf81f1372c
+- onehub-quy-hang:_acceptance/va-bang-hang-cuon-so-lon/contract.md#4760d51f9b35ebd25fa0ff369f52318dc30f6475
+- onehub-quy-hang:_acceptance/va-lien-he/contract.md#c497f1216b1bc527f1451ce29c6e65f14d7cfba0
+- onehub-quy-hang:_acceptance/va-link-gui-can/contract.md#a7717043b31d61ee0ab1892f193490f850020b7d
+- onehub-quy-hang:_acceptance/va-nut-ghi-cuoc-goi-truong-nhom/contract.md#f13928d47ef5ec85dc41adaca8b315cc06d70970
+- onehub-quy-hang:_acceptance/va-pool-ket-noi/contract.md#1f2e3bc124cc000ae664a9ecea50ffc61b9b18f5
+- onehub-quy-hang:_acceptance/va-san-sang-ban/contract.md#14f55ce30ee4c58aa23a94b35fdc7aa6ad3b99a3
+- onehub-quy-hang:_acceptance/va-sua-tren-o/contract.md#7a73fc5fe3877d8e902d6fcb6b096bf5efc1e5e3
+- onehub-quy-hang:_acceptance/vo-ung-dung/review-findings.md#424025dc22ecdf76f32dce9adf309d5ded36a0e1
+- onehub-quy-hang:apps/web/src/app/(app)/inventory/bang-hang.tsx#9ab1b70a4144fd541ad79839476ed0cf3b9caec1
+- onehub-quy-hang:design/patterns/bang-hang.md#d7bd4262ebe606a9c9e4535dc3768858d6c5e0c1
+- onehub-quy-hang:design/patterns/cai-dat-san.md#cfa238c20935717f5c5853a30463fba1b5985767
+- onehub-quy-hang:design/patterns/da-gui.md#c2819efe92181b7f8a49d654def0a608a3685793
+- onehub-quy-hang:design/patterns/gui.md#069afc550a93a99aae08ca30bb7ab920705407e5
+- onehub-quy-hang:design/patterns/ho-so-can.md#70511014bdf22ce024e912374d5820a8bce6dbc7
+- onehub-quy-hang:design/patterns/hom-nay-dau-chu.md#93e9af2eac7c3c1b545ddd9356991ef7bd733692
+- onehub-quy-hang:design/patterns/hom-nay-truong-nhom.md#23826bb095a54035b0ffe693638b2487b8ab95d5
+- onehub-quy-hang:design/patterns/lien-he.md#580f38ca440b89fd7a0ceb7589dda667e0d22306
+- onehub-quy-hang:design/patterns/nhap-excel.md#3ac84b9c7a70151d7937340552286bae53959999
+- onehub-quy-hang:design/patterns/trang-khach.md#685f059b351e1fad28a7ae1c47a42c2a6f89cc30
+- onehub-quy-hang:design/patterns/trang-thai.md#0631cc5715db28d17a4f93f58625a132439754a4
+- onehub-quy-hang:design/patterns/xac-thuc.md#d453147b477de96ebb7049bbfec3b17654bbdc3d
+- onehub-quy-hang:docs/adr/0002-vo-va-ia-chon-tu-reui.md#64d6237b23e90637e9cfba78c77e74b0a5cf8f46
+- onehub-quy-hang:docs/adr/0003-bai-thu-zalo.md#f550d4ac030743618e9784c57eb68eadf0e1e049
+- onehub-quy-hang:docs/adr/0004-luoi-bang-hang.md#aa91cb78bd18d3498d5cc81395936fa5eb0e604a
+- onehub-quy-hang:docs/adr/0005-dang-nhap-theo-san.md#4585b9528a2fc72789bd5efe815a38824701764e
+- onehub-quy-hang:docs/adr/0006-vai-khu-va-loi-moi.md#356ae67b5383c5c582fa7719a6a6ef0783890a8c
+- onehub-quy-hang:docs/adr/0011-nhap-du-lieu-tac-tu.md#d0d4b733ebd061c53077d930f92e3a2f8b3f59a0
+- onehub-quy-hang:docs/adr/0013-ma-hoa-so-chu.md#a53144408b11e193baaccc53355e1938ccf1a99e
+- onehub-quy-hang:docs/adr/0014-kho-anh.md#bc12339e892451d56c15a0ec8b7a860caa28e438
+- onehub-quy-hang:docs/adr/0018-cau-hinh-theo-san.md#ebe5ec4d559b5cdea846dead2fe2b71c591555bb
+- onehub-quy-hang:docs/adr/0021-lien-he.md#46d8e0d0879ce2e90205f6a3aa69dc32c9535376
+- onehub-quy-hang:docs/adr/0024-he-bo-cuc.md#6d704331208a3c87f507a776ed3b137317795deb
+- onehub-quy-hang:docs/architecture/kien-truc-repo-va-stack.md#dc5bda5fe3461f902830a81f0666c448caf27fc4
+- onehub-quy-hang:docs/design/danh-gia-ngan-chi-tiet-can.md#b506e6789ecb605e946649447d07408ce561812c
+- onehub-quy-hang:docs/design/vo-va-ia.md#576f33e6fc47e008affb7b88b298fc977668f4fe
+- onehub-quy-hang:docs/plan/audit-san-moi-day-0.md#ae43c2117c8379e1498af8a1a8904b19eeb99750
+- onehub-quy-hang:docs/plan/dong-nhat-bang-hang-lien-he.md#cb28e0222c31036d29c269da4fb958f7cac0d316
+- onehub-quy-hang:docs/plan/mvp-mo-dan.md#da8940521fa0c56c6c3ffa56608aecfa7b9e1a53
+- onehub-quy-hang:docs/product/ghi-chep/2026-10-28-dau-chu-va-telesales.md#a9eaa2a1fc1bff84b0a51dcf4457b5b6c7cde7e6
+- onehub-quy-hang:docs/product/ghi-chep/2026-10-28-desktop-app.md#bf822d0431dad222675c09a9c857ea048995f10e
+- onehub-quy-hang:docs/product/ghi-chep/2026-10-28-ghi-nho.md#6ad4269b25b8052b1b36221e5cad0b34a45a4775
+- onehub-quy-hang:docs/product/ghi-chep/2026-10-29-kien-truc-thong-tin.md#e23c04cbd3fdd70f27006954583ef7d4ba9cefbd
+- onehub-quy-hang:docs/product/tham-chieu.md#a885b136c7467bc9c77c1de2985ffc5b56ba705e
+- onehub-quy-hang:docs/superpowers/specs/2026-11-04-da-gui-design.md#47b64a92004e209e1f466f1ba5fc305e07e07fca
+- onehub-quy-hang:docs/superpowers/specs/2026-11-04-trang-khach-rieng-design.md#c321e7aef4892760a552b9539778067ced7f0638
+- onehub-quy-hang:packages/db/seed/README.md#379b275a7b06c23050e14a08956b497a49958a15

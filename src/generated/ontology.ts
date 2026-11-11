@@ -89,6 +89,17 @@ export interface ListingUnit {
   upi: string;
 }
 
+/** A person who works in one company, with the roles that company gave them and the name it knows them by. */
+export interface Member {
+  companyId: string;
+  userId: string;
+  name: string;
+  roles: string;
+  invitedBy?: string;
+  /** ISO datetime */
+  invitedAt?: string;
+}
+
 export type UnitPropertyType = "Residential" | "Land";
 
 export type UnitPropertySubType = "Condominium" | "Townhouse" | "Single Family Residence" | "Unimproved Land";
@@ -162,6 +173,7 @@ export function can(role: Role, action: ActionSpec): boolean {
 /** Personal-data properties per entity (`pii: true` in the ontology). */
 export const PII_FIELDS: Readonly<Record<string, readonly string[]>> = {
   Contact: ["fullName", "phones"],
+  Member: ["name"],
 };
 
 /** Copy of `record` with personal data replaced: use before logging or agent output. */

@@ -35,6 +35,11 @@ export const FRAME_COPY = {
     why: "Địa chỉ này không có trong ứng dụng, có thể đã gõ nhầm hoặc trang đã đổi chỗ.",
     next: "Bạn về trang đầu rồi đi tiếp từ đó.",
   },
+  forbidden: {
+    title: "Không đủ quyền",
+    why: "Vai của bạn ở sàn này không mở được màn này, nên màn không hiện dữ liệu nào.",
+    next: "Bạn cần dùng màn này thì nhờ quản trị của sàn thêm vai.",
+  },
   sessionExpired: {
     title: "Phiên đăng nhập đã hết hạn",
     why: "Bạn đã rời ứng dụng quá lâu nên phiên đăng nhập kết thúc để giữ an toàn dữ liệu.",
