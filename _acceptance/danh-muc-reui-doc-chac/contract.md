@@ -5,7 +5,7 @@ slug: danh-muc-reui-doc-chac
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: _acceptance/danh-muc-reui-doc-chac/design.md
@@ -97,6 +97,7 @@ nghiệm thu giá trị trong đợt. Không có thước nào để nối.
   của nó so tổng số ca của cả thư mục; ca mới mở đầu `DC<số> ·` nên không lọt vào phép đếm nào của hồ sơ ấy (AC-9).
 - Mở lại ở Cổng Bằng chứng 2026-11-11 (chủ kho trả lời ở phiên giám sát, nguyên văn «sửa ngay»): Ngoài-3 thành AC-11, Ngoài-5 thành AC-12; hợp đồng có 12 tiêu chí.
 - Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
-  - Ngoài-1: Hướng dẫn sửa khi ReUI đổi tên mục thành phần gốc từng chưa nêu đủ chỗ phải đổi (AC-12 thu tiêu đề về một chỗ).
-  - Ngoài-2: Thẻ Cổng Phạm vi xếp tiêu chí đối chứng AC-7 vào nhóm việc không làm.
-  - Ngoài-4: Hướng dẫn sửa lỗi từng chưa nêu đủ mọi chỗ phải đổi khi ReUI đổi tên mục thành phần gốc.
+  - Ngoài-1: Biên bản kiểm luật sản phẩm của hồ sơ từng ghi tới một mốc mã cũ hơn bản cuối; kết luận không chạm luật nào vẫn đúng.
+  - Ngoài-2: Hướng dẫn sửa khi ReUI đổi tên mục thành phần gốc từng chưa nêu đủ chỗ phải đổi (AC-12 thu tiêu đề về một chỗ).
+  - Ngoài-3: Thẻ Cổng Phạm vi đầu tiên xếp tiêu chí đối chứng AC-7 vào nhóm việc không làm.
+  - Ngoài-5: Hướng dẫn sửa lỗi từng chưa nêu đủ mọi chỗ phải đổi khi ReUI đổi tên mục thành phần gốc.

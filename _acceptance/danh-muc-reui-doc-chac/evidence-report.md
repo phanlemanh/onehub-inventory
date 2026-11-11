@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: danh-muc-reui-doc-chac
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 0b2184f579adbea7712063c784ee97475c2db693
-human_signoff:
+human_signoff: Manh Phan 2026-11-11
 ---
 
 # Evidence Report: danh-muc-reui-doc-chac
@@ -176,7 +176,7 @@ human_signoff:
     - domain-correctness: PASS — Mục "When re-pin stops on a missing section" nói rõ re-pin, regenerate và --check đều dừng trước khi ghi gì, và in một dòng cho mỗi nhóm thiếu kèm tên nhóm, có dòng mẫu. Mục này dặn agent không sửa ảnh chụp, mà đọc nguồn đổi gì, sửa tiêu đề trong `REQUIRED_SECTIONS` ở `catalog.mjs` trong một PR có người duyệt rồi mới ghim lại. Không thấy chỗ nào trong tệp tự mâu thuẫn với hai ý này.
     - operational-feasibility: PASS — Mục "When re-pin stops on a missing section" nói rõ khi tiêu đề đổi thì re-pin, regenerate và --check đều dừng "before writing anything". In một dòng cho mỗi nhóm bị mất, có tên nhóm, kèm ví dụ. Dặn agent không sửa ảnh chụp, mà đọc nguồn đổi gì, sửa `REQUIRED_SECTIONS` qua PR có người duyệt, rồi ghim lại. Không thấy chỗ tự mâu thuẫn.
     - spec-alignment: PASS — Mục "When re-pin stops on a missing section" nói rõ re-pin, regenerate và --check đều dừng trước khi ghi gì, và in một dòng cho mỗi nhóm bị mất (ví dụ "section missing in llms-full.txt: Pro blocks (block)"). Dặn không sửa ảnh chụp, mà đọc nguồn đã đổi gì, sửa REQUIRED_SECTIONS trong catalog.mjs bằng một PR có người duyệt rồi ghim lại. Không thấy chỗ nào tự mâu thuẫn.
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-11 — Đạt
 
 - eval: E14
   judged_by: judge panel (fresh context), đề xuất PASS
@@ -184,7 +184,7 @@ human_signoff:
     - domain-correctness: PASS — Mục "When re-pin stops on a missing section" nói `REQUIRED_SECTIONS` trong `catalog.mjs` là nơi duy nhất ghi các tiêu đề, cả hai bộ đọc đều lấy từ đó, và "nothing else needs to change". Re-pin, regenerate và `--check` đều dừng trước khi ghi gì. Một nhóm bắt buộc có tiêu đề nhưng không có mục nào cũng dừng, kèm dòng `section empty in <file>: <heading> (<kind>)`. Không thấy câu nào bắt sửa thêm chỗ khác hay tự mâu thuẫn. Chỗ duy nhất hơi mơ hồ là tiêu đề có thể đổi cả số đếm, nhưng không làm sai kết luận.
     - operational-feasibility: PASS — Danh sách `REQUIRED_SECTIONS` trong `tools/reui_catalog/catalog.mjs` là nơi duy nhất ghi tiêu đề; cả hai bộ đọc lấy tiêu đề từ đó nên không cần sửa chỗ khác. Re-pin, regenerate và `--check` đều dừng trước khi ghi gì, và một nhóm có tiêu đề nhưng không có mục nào dừng với `section empty in <file>: <heading> (<kind>)`. Không thấy câu nào bắt sửa thêm chỗ khác hay tự mâu thuẫn.
     - spec-alignment: PASS — Danh sách `REQUIRED_SECTIONS` trong `catalog.mjs` là "the only place the headings are written". Cả hai bộ đọc lấy tiêu đề từ đó, nên "nothing else needs to change". Re-pin, regenerate và `--check` đều dừng trước khi ghi gì, và mục "section empty" cũng "stops the same way". Không thấy câu nào bắt sửa thêm chỗ khác hay tự mâu thuẫn. Bước "re-pin" sau khi đổi tiêu đề là quy trình chạy lại lệnh, không phải nơi khai báo tiêu đề thứ hai.
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-11 — Đạt
 
 ## Known limits
 
