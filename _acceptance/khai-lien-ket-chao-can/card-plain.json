@@ -1,33 +1,4 @@
 {
   "feature_plain": "Hai loại liên kết của dữ liệu — chủ nhà với lần chào, lần chào với căn — có chỗ đứng chính thức trong mô hình nghiệp vụ, kèm sàn sở hữu và vai, để khi làm cơ sở dữ liệu thật không phải định nghĩa lại từ đầu.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ khai hai khái niệm «Chủ của hàng» và «Căn của hàng», mỗi khái niệm mang sàn sở hữu, trỏ đúng liên hệ, lần chào, căn; vai chỉ là chủ bán hoặc chủ cho thuê."},
-    {"id": "AC-2", "p": "Sẽ nối hai khái niệm với sàn, liên hệ, lần chào, căn bằng sáu quan hệ mới, giữ nguyên hai quan hệ cũ."},
-    {"id": "AC-3", "p": "Sẽ cho mã dữ liệu mẫu dùng đúng kiểu sinh từ mô hình, không còn chỗ nào tự khai lại hình dạng liên kết."},
-    {"id": "AC-4", "p": "Sẽ báo đích danh liên kết chủ nào mang vai không phải bên bán."},
-    {"id": "AC-5", "p": "Sẽ giữ dữ liệu mẫu giống từng byte như hàng dữ liệu mẫu đã ký."},
-    {"id": "AC-6", "p": "Sẽ ghi hai khái niệm vào bảng thuật ngữ, nhãn hiển thị, wiki và bản đồ mô-đun, không thêm phụ thuộc giữa mô-đun."},
-    {"id": "AC-7", "p": "Sẽ bắt liên kết khác sàn với liên hệ hay lần chào nó trỏ, và lần chào có hai căn."}
-  ],
-  "wont_do": [
-    {"id": "OOS-1", "p": "Không làm bảng thật và cách ly theo dòng cho hai liên kết — việc của hàng cơ sở dữ liệu."},
-    {"id": "OOS-2", "p": "Không gắn người mua, người thuê với lần chào."},
-    {"id": "OOS-3", "p": "Không gom quy tắc nhãn MAU về một chỗ."},
-    {"id": "OOS-4", "p": "Không đổi màn hình nào."}
-  ],
-  "coverage_plain": [
-    {"i": 0, "p": "Hai liên kết có trong mô hình — AC-1 (khai đủ trường), AC-2 (quan hệ đủ)."},
-    {"i": 1, "p": "Sàn sở hữu — AC-1 (trường sàn), AC-7 (cùng sàn với hai đầu)."},
-    {"i": 2, "p": "Vai trên liên kết — AC-1 (giá trị cho phép), AC-4 (kiểm trên dữ liệu)."},
-    {"i": 3, "p": "Mã dùng kiểu sinh — AC-3; dữ liệu mẫu không đổi — AC-5."},
-    {"i": 4, "p": "Luật dữ liệu của liên kết — AC-7 (cùng sàn, một lần chào một căn)."},
-    {"i": 5, "p": "Khái niệm mới không mồ côi — AC-6 (thuật ngữ, nhãn, wiki, mô-đun sở hữu)."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Tên chuẩn ngành mà giám sát gợi ý lại mang nghĩa khác (lần chào gửi cho người mua xem) — bản nháp dùng tên riêng «Chủ của hàng», đưa lên câu hỏi cho anh (Hỏi-2)."},
-    {"i": 1, "p": "Bài đo chỉ xem kiểu sinh ra, không xem trường trỏ tới đâu — đã đo thêm từng trường trỏ đúng khái niệm."},
-    {"i": 2, "p": "Hai luật dữ liệu chưa có tiêu chí — đã thêm AC-7 và ghi rõ kiểu quan hệ một-một, một-nhiều."},
-    {"i": 3, "p": "Bài đo kiểu bằng chữ dễ lọt — đã đổi sang so kiểu trực tiếp, kèm đối chứng."},
-    {"i": 4, "p": "Lời hứa dữ liệu không đổi chưa được đo — bài kiểm mới tự tính dấu vân tay và so."}
-  ]
+  "scope_plain": "Hàng này chỉ khai mô hình và đổi kiểu của mã dữ liệu mẫu; bảng thật, người mua và màn hình để các hàng sau."
 }
