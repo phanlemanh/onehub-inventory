@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 4239410fe72ac7e3af72b9b8c11ef3dbbffe9496
+verified_commit: f8aa9dd3d83325dc840fc9f1285c4506df08f72e
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -139,3 +139,7 @@ none — every multi-run eval is uniform
 
 Round 1: bị REJECT ở bước S4, đã sửa và ghi lại ở commit 4239410. Returned to implementation.
 Round 2: toàn bộ E1-E9 và hai lệnh suite (npm run build, make e2e) đạt; verdict PASS.
+
+### Re-pin lần 1 — 2026-11-11, do gộp origin/main (khung-va-giao-dien) sau chữ ký
+run_id: repin-20261111T024045Z-78085
+sha: f8aa9dd3d83325dc840fc9f1285c4506df08f72e · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng
