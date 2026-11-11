@@ -1,0 +1,82 @@
+schema_version: 1
+feature_slug: bo-bai-kiem-tu-so-man
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.man_mau
+    paths: [tools/e2e_templates/**, tests/e2e/screens/**]
+    expected: "exit 0; bài 'sổ giả thêm màn thì có bộ' trong tools/e2e_templates/e2e-templates.test.ts đạt: danh sách viết trước trong bài là 4 màn ['today','inventory','sent','sign-in'] × 4 bài khung (tieu-de, khong-cuon-ngang, khong-loi-trinh-duyet, axe-sang-toi) × 4 khổ (360, 414, 1024, 1440) = 64 tên bài khung; tập tên bài khung mà `playwright test --list` in cho tests/e2e/screens trên sổ thật bằng đúng tập 64 tên ấy; và mọi màn built của sổ (đọc bằng bộ đọc 1d trong bài) hoặc có bài khung hoặc có dòng 'bo qua: <id>'; rồi trên bản sao sổ thêm màn 'ghost-built' (route /, audience public) thì có thêm đúng 16 bài khung mang 'ghost-built', bỏ màn ấy thì về đúng 64 (đối chứng dương và chiều đỏ trên cùng bản sao)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.man_mau
+    paths: [tools/e2e_templates/**, tests/e2e/screens/**]
+    expected: "exit 0; bài 'màn bị bỏ có tên' đạt: trên sổ thật, đầu ra liệt kê có dòng 'bo qua: contacts — planned' và 'bo qua: proto — dev', không bài nào mang id contacts hay proto; bài 'sổ sai thì đỏ' đạt: bản sao sổ có một màn thiếu khoá route, và một bản có family 'la' — liệt kê thoát khác 0, đầu ra chứa đúng thông điệp lỗi mà tools/coverage_matrix/registry.py in cho ca ấy (bài lấy thông điệp bằng cách gọi bộ đọc trên cùng bản sao, không chép tay), và không bài nào được liệt kê"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [tools/e2e_templates/**, tests/e2e/screens/**]
+    expected: "exit 0; mọi bài 'khung' của tests/e2e/screens đạt ở 4 khổ (360, 414, 1024, 1440) cho mọi màn built staff/public của sổ: tieu-de (một h1, chữ bằng nhãn của màn), khong-cuon-ngang, khong-loi-trinh-duyet, axe-sang-toi (0 vi phạm serious/critical ở light và dark, đếm đúng 2 lượt quét mỗi màn)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [tools/e2e_templates/**, tests/e2e/screens/**]
+    expected: "exit 0; mọi bài 'pha' của bộ khung đạt ở cả 4 khổ: với mỗi màn, 4 ca phá (đổi chữ h1, chèn phần tử rộng 2000px, ném lỗi trên trang, chữ trắng trên nền trắng) mỗi ca gọi đúng hàm kiểm của ca chính và đòi nó ném lỗi khớp thông điệp ghim gồm id màn và tên bài ('<id>: tieu-de', '<id>: cuon-ngang', '<id>: loi-trinh-duyet', '<id>: axe color-contrast'); bài liệt kê của E1 khẳng định thêm số ca phá khung bằng 4 màn × 4 ca × 4 khổ = 64"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/e2e_templates/**, design/states.md]
+    expected: "exit 0; bài 'công thức phủ bảng trạng thái' trong tools/e2e_templates/e2e-templates.test.ts đạt: đọc bảng trạng thái của design/states.md thật, tập trạng thái vùng (đoạn 'Các trạng thái vùng') bằng đúng tập khoá công thức (7); mỗi công thức có check, ít nhất một break và message; chiều đỏ trên bản sao: thêm dòng trạng thái vùng 'Thử ma' vào bản sao states.md thì bài kiểm cấu trúc trả lỗi gọi tên 'Thử ma', công thức bỏ break thì trả lỗi gọi tên công thức ấy"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [tools/e2e_templates/**, tests/e2e/screens/**]
+    expected: "exit 0; bộ 'vung' trên đích hiệu chuẩn /proto/luoi-va-o-theo-kieu đạt đủ 7 ca chính (cho-tai, trong, tim-khong-ra, loi, mot-phan-hong, chu-dai, khong-du-quyen) ở 4 khổ, và mọi ca phá của 7 công thức đạt (hàm kiểm đỏ với thông điệp ghim); inventory và sent (trong danh sách được phép chưa có vùng) là bài bỏ qua có lý do 'chua co vung du lieu'; bài đơn vị 'danh sách chưa có vùng' trong tools/e2e_templates/e2e-templates.test.ts đạt ba ca của hàm phân loại màn Lưới (đầu vào: id màn, có vùng hay không, có bảng ngoài vùng hay không): màn ngoài danh sách chưa có vùng → lỗi 'chua co vung du lieu: <id>' không phải bỏ qua; inventory chưa có vùng → bỏ qua; inventory có vùng → lỗi 'go khoi danh sach: inventory'; và bài trình duyệt 'ngoài khuôn' đạt: trên đích hiệu chuẩn, gỡ data-slot của vùng mà giữ bảng thì hàm nhận vùng ném 'luoi dung ngoai khuon'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [tools/e2e_templates/**, tests/e2e/screens/**]
+    expected: "exit 0; hai ca phá của công thức cho-tai đạt: (a) khung chờ bị gỡ ngay khi gắn vào trang → hàm kiểm ném 'cho-tai: khung cho khong hien' và ca đo thời gian từ lúc mở trang tới lúc ném dưới 15000 ms; (b) hẹn giờ của trang chạy ngay (độ trễ 1 giây bị bỏ bằng script khởi đầu, không đụng lớp CSS) → cùng hàm kiểm ném 'cho-tai: hien chi bao truoc 1 giay'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [tools/e2e_templates/**, tests/e2e/screens/**]
+    expected: "exit 0; ca chính của công thức tim đạt trên đích hiệu chuẩn: chuỗi tìm chọn từ dữ liệu sao cho tập khớp tính từ toàn bộ mã đọc qua mọi trang trước khi tìm có ít nhất 2 dòng và trải ít nhất 2 trang (bài khẳng định điều kiện này trước khi so); tập mã hiện qua mọi trang sau khi tìm bằng đúng tập khớp, và số ở đầu vùng bằng cỡ tập; ca phá gỡ một dòng khớp khỏi kết quả → hàm kiểm ném lỗi chứa 'tim: bo sot dong khop' và mã của dòng bị gỡ; ca phá khoá nút sang trang của kết quả (chỉ còn trang đầu) → ném 'tim: bo sot dong khop'; ca phá thêm một dòng không khớp → ném 'tim: hien dong khong khop'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [tools/e2e_templates/**, tests/e2e/screens/**]
+    expected: "exit 0; trong lượt make e2e, bản chậm của tests/e2e/screens (khối 'cham', chỉ ở khổ 1440, Emulation.setCPUThrottlingRate rate 4 qua CDP trên MỖI trang bộ chạy mở, đầu ra có dòng 'ham cpu: 4') đạt mọi bài như bản thường, không bài nào chạy lại; trên mỗi trang, bộ chạy đo một vòng tính cố định trước và sau khi hãm trong cùng trang và khẳng định tỉ lệ ít nhất 2,5 (thông điệp ghim 'ham cpu khong co tac dung' khi dưới ngưỡng); bài 'mo lai cung trang khong do lai ham cpu' đạt; bài đơn vị 'công thức không tự mở trang' đạt: công thức giả có goto thì bài cấu trúc trả lỗi gọi tên"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.man_mau
+    paths: [tools/e2e_templates/**, tests/e2e/screens/**]
+    expected: "exit 0; bài 'bảng vai theo bản khai' đạt: đầu ra liệt kê trên sổ thật có dòng bảng Vai × Màn với cột đúng 4 tên hiển thị theo thứ tự ontology/roles.yaml (đọc từ tệp trong bài, không chép tay); trên bản sao thêm vai 'Ghost' (nhãn 'Vai ma' ở bản sao labels.yaml) thì bảng có 5 cột, cột cuối 'Vai ma'; bỏ vai ấy thì về 4 cột"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
