@@ -120,8 +120,8 @@
   "decisions": [
     {
       "id": "E9",
-      "q": "Bảng so có xếp dòng 23 và dòng 20 đúng luật đã chốt không?",
-      "why": "Người chấm thấy đề bài đã ghi luật 1 rộng hơn chữ chủ kho (bỏ một phần cũng tính Lệch), nên dòng 23 chủ kho chốt Giống lại trái luật; đầu bảng so còn gọi sai số thứ tự luật."
+      "q": "Bảng so mốc có đạt, khi dòng 44 «Chữ dài» đang xếp Lệch?",
+      "why": "Ba người chấm khớp câu giao, mọi lựa chọn và số đếm; một người cho đạt, hai người hỏi dòng 44: agent 2 chỉ thêm chú thích nổi, theo luật «bớt chi tiết» có thể là Giống (toàn bảng thành 24/28). Các dòng 13, 29, 36, 37, 40 cũng sát ranh luật đó."
     }
   ]
 }
