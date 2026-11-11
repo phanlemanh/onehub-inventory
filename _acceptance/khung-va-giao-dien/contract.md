@@ -5,7 +5,7 @@ slug: khung-va-giao-dien
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
-status: verified
+status: signed-off
 approved_by:
 approved_at:
 veto_state: mo
@@ -74,3 +74,11 @@ Thước đối chiếu: năm mã F1–F5 của `docs/plan/pham-vi-mvp-dot-1.md`
 - Ngoài-7 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Trên trang mẫu chỉ có ở bản phát triển, nếu lưu hỏng khi vẫn có mạng thì người dùng không thấy báo gì và không biết là chưa lưu. — `src/app/(app)/proto/[slug]/frame-showcase.tsx`
 - Ngoài-8 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Bài kiểm tra có thể vẫn xanh dù trang không tìm thấy lộ nhãn nội bộ, nên một lỗi lộ nhãn sau này có thể lọt qua mà không ai biết. — `tests/e2e/frame.spec.ts`
 - Ngoài-9 (máy định tuyến 2026-11-10, đề xuất S4 known-limits): Bài kiểm tra không chứng minh chắc rằng khung chờ chỉ hiện sau 1 giây, nên nếu sau này nó hiện sớm hoặc muộn thì có thể không bị phát hiện. — `tests/e2e/frame.spec.ts`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-2: Tệp tham số của lượt chấm ghi đường dẫn trên máy người làm, nên lộ tên tài khoản máy và không chạy lại được trên máy khác.
+  - Ngoài-4: Băng «chưa lưu được» còn nằm lại khi nhân viên sang màn khác, và nút «Thử lại» gửi lại việc của màn cũ.
+  - Ngoài-5: Lưu lại thành công từ băng thì không có thông báo thành công và nút «Hoàn tác»; lỗi khác khi thử lại để băng mất mạng nằm lại.
+  - Ngoài-6: Ô trạng thái hay ô đúng/sai đi qua bộ định dạng chung sẽ hiện mã tiếng Anh; hàng Lưới xử lý các kiểu này.
+  - Ngoài-7: Trang mẫu không báo gì khi lưu hỏng lúc vẫn có mạng.
+  - Ngoài-8: Bài kiểm trang không tìm thấy chưa chứng minh riêng được nhánh bắt nhãn nội bộ.
+  - Ngoài-9: Bài kiểm khung chờ chưa ghim chính xác mốc 1 giây.
