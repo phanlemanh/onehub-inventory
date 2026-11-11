@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
 screens: []
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: _acceptance/bo-bai-kiem-tu-so-man/design.md
@@ -95,6 +95,12 @@ kiểm in thuộc AC-10.
 
 ## Notes
 
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-1: Tên bài kiểm và thông báo lỗi nội bộ của bộ bài viết bằng tiếng Việt, trái quy ước tiếng Anh của kho; người dùng cuối không thấy gì khác.
+  - Ngoài-2: Danh sách loại cột tìm được bị chép tay trong bộ bài; thêm loại cột tìm được mới thì bài tìm có thể không đọc cột ấy.
+  - Ngoài-3: Với bảng hơn 5000 dòng, bài tìm có thể bỏ sót dòng khớp mà không báo.
+  - Ngoài-5: Luật cấm công thức tự mở trang chỉ đọc mã của hàm kiểm, không bắt công thức mở trang gián tiếp.
+  - Ngoài-6: Bài đơn vị về thông điệp ghim so với chuỗi lỗi chép tay; bài trình duyệt vẫn bắt được khi cách báo lỗi đổi.
 - SP-4: bộ khung chạy cả màn `public` khi có, nhưng chỉ đo khung; không chứng gì về dữ liệu nội bộ.
 - Ca phá chạy ở cả bốn khổ như ca chính (sổ quyết định dòng 13).
 - Bài trình duyệt mang thời hạn riêng 90 giây (bài axe 240 giây); bài kiểm đơn vị gọi Python mang hạn 60 giây.
