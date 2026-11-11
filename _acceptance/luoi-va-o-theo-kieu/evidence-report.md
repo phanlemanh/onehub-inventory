@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 79c01352b9be585496eb8c83b9eb054cfb959730
+verified_commit: 7c5dae9643cfeaf84dc79d4140a8e49f442b69dc
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -199,3 +199,7 @@ none — every multi-run eval is uniform
 Round 1: baseline do lan dau; cac finding trong hop dong (AC-2, AC-6, AC-8, AC-9) tra ve cho ben cai dat. Verdict round 1: REJECT.
 Round 2: sua cac finding, E1-E14 chay lai; E2, E4, E5, E7 la ket qua goc cua round nay.
 Round 3: sua cho chu dai doc duoc khi tieu diem vao o; E1, E3, E6, E8, E9, E10, E11, E13, E14 chay lai, E2, E4, E5, E7 carry-forward tu round 2. Tat ca PASS.
+
+### Re-pin lần 1 — 2026-11-11, do gộp nhánh chính (hàng 1d) và sửa ca e2e chờ trang tải xong
+run_id: repin-20261111T033949Z-60343
+sha: 7c5dae9643cfeaf84dc79d4140a8e49f442b69dc · suites: 3 lệnh exit 0 · evals: 12/12 eval máy đạt kỳ vọng · ngoài làn máy: E11, E12 (E12 không khai paths)
