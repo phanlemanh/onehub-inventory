@@ -62,6 +62,10 @@ export function parseSources({ full, index }) {
   const counts = { block: 0, component: 0, example: 0 };
   parseFull(full, groups, counts);
   parseIndex(index, groups, counts);
+  const empty = REQUIRED_SECTIONS.filter((r) => counts[r.kind] === 0).map(
+    (r) => `section empty in ${r.file}: ${r.label} (${r.kind})`,
+  );
+  if (empty.length) throw new CatalogError(empty.join("\n"));
   return { groups, counts };
 }
 
@@ -150,19 +154,20 @@ function parseFull(text, groups, counts) {
 }
 
 function parseIndex(text, groups, counts) {
+  const req = REQUIRED_SECTIONS.find((r) => r.file === "llms.txt");
   let prim = null;
   const lines = text.split("\n");
   const close = () => {
     if (prim && prim.read !== prim.declared) {
       throw new CatalogError(
-        `count mismatch: ReUI Primitives declares ${prim.declared}, read ${prim.read}`,
+        `count mismatch: ${req.label} declares ${prim.declared}, read ${prim.read}`,
       );
     }
   };
   lines.forEach((line, i) => {
-    const sec = line.match(/^## ReUI Primitives \(([\d,]+)\)$/);
-    if (sec) {
-      prim = { declared: toInt(sec[1]), read: 0 };
+    const sec = line.match(SECTION_HEADING);
+    if (sec && sec[1] === req.label) {
+      prim = { declared: toInt(sec[2]), read: 0 };
       return;
     }
     if (!prim) return;
@@ -177,9 +182,9 @@ function parseIndex(text, groups, counts) {
     );
     if (!m) throw new CatalogError(`unreadable item line ${i + 1} of llms.txt`);
     addItem(groups, {
-      kind: "component",
+      kind: req.kind,
       group: null,
-      category: "ReUI Primitives",
+      category: req.label,
       url: m[2],
       title: m[1],
       description: m[3],
@@ -273,8 +278,13 @@ export function scanCatalog(catalog) {
     }
   };
   // Scan each string leaf as written: JSON text would escape quotes and hide `import x from "y"`.
+  // Key names count too: a licence key written as a field name must not pass.
   const leaves = (value) =>
-    value && typeof value === "object" ? Object.values(value).flatMap(leaves) : [String(value)];
+    value && typeof value === "object"
+      ? Object.entries(value).flatMap(([k, v]) =>
+          Array.isArray(value) ? leaves(v) : [k, ...leaves(v)],
+        )
+      : [String(value)];
   const text = (value, where) => {
     const strings = leaves(value);
     for (const f of FORBIDDEN) {

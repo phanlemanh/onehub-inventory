@@ -516,3 +516,100 @@ describe("DC8 · check command catches every layer", () => {
     );
   }
 });
+
+// ---- reopened at the evidence gate (AC-11, AC-12) ----
+
+const KEY_PLACES = [
+  ["pin", (cat) => cat.pin, "pin"],
+  ["pin.files[0]", (cat) => cat.pin.files[0], "pin"],
+  ["counts", (cat) => cat.counts, "counts"],
+];
+const KEY_MATRIX = KEY_PLACES.flatMap((place) => FORMS.map((form) => ({ place, form })));
+
+describe("DC11 · forbidden key names", () => {
+  const cat0 = realCatalog();
+  it("DC11 · matrix is 10 forms x 3 key places", () => {
+    expect(FORMS).toHaveLength(10);
+    expect(KEY_MATRIX).toHaveLength(30);
+  });
+  for (const { place, form } of KEY_MATRIX) {
+    const [id, target, where] = place;
+    it(`DC11 · ${id} · ${form.text}`, () => {
+      const cat = structuredClone(cat0);
+      target(cat)[form.text] = "x";
+      expect(Object.keys(target(cat))).toContain(form.text);
+      expect(lib.scanCatalog(cat)).toEqual([`forbidden in ${where}: ${form.label}`]);
+    });
+  }
+});
+
+/** Drop every line of section `s` after its heading up to the next `## ` heading, and declare 0. */
+function emptySection(s) {
+  return (text) => {
+    const lines = text.split("\n");
+    const at = lines.indexOf(`## ${s.label} (${s.count})`);
+    expect(at, `heading of ${s.label}`).toBeGreaterThanOrEqual(0);
+    let end = at + 1;
+    while (end < lines.length && !lines[end].startsWith("## ")) end += 1;
+    const out = [...lines.slice(0, at), `## ${s.label} (0)`, "", ...lines.slice(end)].join("\n");
+    expect(out).not.toBe(text);
+    return out;
+  };
+}
+
+describe("DC12 · one place for section headings", () => {
+  const prim = SECTIONS[2];
+  const renameInCode = (c) => {
+    const rel = "tools/reui_catalog/catalog.mjs";
+    const code = c.read(rel);
+    const changed = code.replace('label: "ReUI Primitives"', 'label: "ReUI primitives"');
+    expect(changed).not.toBe(code);
+    c.write(rel, changed);
+  };
+
+  it(
+    "DC12 · label renamed in code and source re-pins all 27 components",
+    () => {
+      const c = makeCopy();
+      renameInCode(c);
+      const dir = sourceDir({ "llms.txt": headingEdit(prim, "## ReUI primitives (27)") });
+      const r = c.run("build.mjs", "--refresh", "--from", dir);
+      expect(r.code, r.err).toBe(0);
+      expect(r.out).toContain("27 components");
+      expect(r.out.split("\n").filter((l) => l.startsWith("removed:"))).toEqual([]);
+    },
+    T,
+  );
+
+  it(
+    "DC12 · label renamed in code only stops and names the section",
+    () => {
+      const c = makeCopy();
+      renameInCode(c);
+      const r = c.run("build.mjs", "--refresh", "--from", sourceDir());
+      expect(r.code).toBe(1);
+      expect(r.err).toContain("section missing in llms.txt: ReUI primitives (component)");
+    },
+    T,
+  );
+
+  for (const s of SECTIONS) {
+    it(
+      `DC12 · ${s.label} · empty section`,
+      () => {
+        const c = makeCopy();
+        const before = c.state();
+        const r = c.run(
+          "build.mjs",
+          "--refresh",
+          "--from",
+          sourceDir({ [s.file]: emptySection(s) }),
+        );
+        expect(r.code, r.out).toBe(1);
+        expect(r.err).toContain(`section empty in ${s.file}: ${s.label} (${s.kind})`);
+        expect(c.state()).toBe(before);
+      },
+      T,
+    );
+  }
+});
