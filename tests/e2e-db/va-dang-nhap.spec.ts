@@ -97,6 +97,8 @@ async function shot(page: Page, info: TestInfo, step: number, size: string, dark
   const dir = process.env["SHOTS_DIR"];
   if (!dir || info.project.name !== size) return;
   mkdirSync(dir, { recursive: true });
+  // A toast slides in: wait until it has settled so the frame shows what the person reads.
+  await page.waitForTimeout(800);
   if (dark) await page.emulateMedia({ colorScheme: "dark" });
   await page.screenshot({ path: join(dir, `E15-step${step}.png`), fullPage: true });
   if (dark) await page.emulateMedia({ colorScheme: "light" });
