@@ -1,0 +1,50 @@
+schema_version: 1
+feature_slug: thanh-ben-nhieu-vai
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/templates/nav-menu.tsx, tests/nav-roles.test.tsx]
+    expected: "exit 0; trong tests/nav-roles.test.tsx, thanh bên dựng thật (NavMenu trong SidebarProvider) với 5 mục mẫu xen kẽ theo thứ tự khai: 'Mục chung một' (không giới hạn), 'Mục quản trị' (CompanyAdmin), 'Mục chung hai' (không giới hạn), 'Mục nhóm' (TeamLead, CompanyAdmin), 'Mục giao dịch' (ListAgent, BuyerAgent); ma trận viết trước bằng tay cho 16 tổ hợp vai × 5 mục, bộ kiểm khẳng định tập khoá tổ hợp của ma trận bằng đúng tập 16 tổ hợp con sinh từ bốn vai của Role (không lặp, không thiếu) và mỗi khoá có đủ 5 ô; ca 'shows every entry of every held role' đọc tên mục từ DOM cho 11 tổ hợp hai vai trở lên, mỗi tổ hợp đúng tập và đúng thứ tự khai (mục giới hạn vai đứng giữa hai mục chung khi được hiện), không mục nào lặp (tổ hợp TeamLead+CompanyAdmin thấy 'Mục nhóm' đúng một lần); ca đối chứng dựng thanh bên cho [ListAgent, TeamLead] rồi khẳng định với kỳ vọng của [ListAgent] và thấy 'role filter leaked: Mục nhóm', dựng cho [ListAgent] rồi khẳng định với kỳ vọng của [ListAgent, TeamLead] và thấy 'role filter missed: Mục nhóm', và một danh sách dồn mục chung lên đầu so với kỳ vọng của [CompanyAdmin] thì thấy 'navigation order changed'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/templates/nav-menu.tsx, tests/frame.test.tsx, tests/nav-roles.test.tsx]
+    expected: "exit 0; trong tests/frame.test.tsx, ma trận một vai của hàng 1a (4 vai × 4 mục = 16 ô) đạt khi thanh bên nhận danh sách một vai, và ca đối chứng 'the role check fails on a sidebar built for another role' vẫn thấy 'role filter leaked: Mục quản trị'; vì bảng ấy nằm trong tệp được sửa, luật một vai được đo lại độc lập trong tests/nav-roles.test.tsx: 4 tổ hợp một vai của ma trận 80 ô, viết trước từ AC-4 của hàng 1a (mục chung cộng mục khai vai đó, theo thứ tự khai), đạt trên DOM"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/templates/nav-menu.tsx, tests/nav-roles.test.tsx, tests/frame.test.tsx]
+    expected: "exit 0; trong tests/nav-roles.test.tsx, ca 'without roles only unrestricted entries show' dựng thanh bên không truyền roles và với roles=[]: cả hai lần DOM chỉ có 'Mục chung một', 'Mục chung hai' theo thứ tự (dù 'Mục quản trị' khai giữa hai mục ấy); ca đối chứng dựng với [CompanyAdmin] rồi khẳng định với kỳ vọng 'không rõ vai' và thấy 'role filter leaked: Mục quản trị'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.check
+    paths: [src/components/templates/nav-menu.tsx, tests/nav-roles.test.tsx, src/generated/ontology.ts]
+    expected: "exit 0; make check chạy kiểm kiểu trên tests/nav-roles.test.tsx, nơi (a) một mục điều hướng khai vai 'Admin' (ngoài bốn vai) đứng ngay dưới dòng '@ts-expect-error' và một mục khai 'TeamLead' không có chỉ thị nào, (b) expectTypeOf của kiểu phần tử trong roles của NavItem toEqualTypeOf<Role> với Role nhập từ @/generated/ontology (sinh từ ontology/roles.yaml); chiều đỏ: nới kiểu vai của mục về string thì chỉ thị (a) thành thừa ('Unused '@ts-expect-error' directive') và (b) lệch kiểu, make check thoát khác 0; kiểu khai tay thiếu hay thừa một vai so với tệp sinh cũng làm (b) đỏ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/templates/app-shell.tsx, src/components/templates/nav-menu.tsx, tests/nav-roles.test.tsx]
+    expected: "exit 0; trong tests/nav-roles.test.tsx, ca 'the frame passes every held role to the sidebar' dựng AppShell thật với 5 mục mẫu và roles=[BuyerAgent, TeamLead]: liên kết trong vùng điều hướng của khung là 'Mục chung một', 'Mục chung hai', 'Mục nhóm', 'Mục giao dịch' theo thứ tự khai, không có 'Mục quản trị'; ca đối chứng dựng AppShell với roles=[BuyerAgent] rồi khẳng định với kỳ vọng của [BuyerAgent, TeamLead] và thấy 'role filter missed: Mục nhóm'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/components/templates/**]
+    expected: "exit 0; sàn thiết kế bậc M1 không thấy mã màu hex thô nào trên các tệp giao diện vòng này chạm (nav-menu.tsx, app-shell.tsx); chiều đỏ là bộ kiểm của kit (design-floor-s4.mjs) báo hex thô khi một tệp giao diện chứa '#0246ff' viết thẳng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
