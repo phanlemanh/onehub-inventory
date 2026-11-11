@@ -3,16 +3,17 @@ schema_version: 2
 feature_slug: cach-ly-moi-san
 verdict: REJECT
 failed_evals: []
+reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: f24ddc6a05b48ef277154dde9364c4cbf3becd8a
+verified_commit: 1197da9b907ca3ebc161dfd3865ef101e016b937
 human_signoff:
 ---
 
 # Evidence Report: cach-ly-moi-san
 
-Lý do REJECT: lệnh suite `make check` không đạt (bước lint) và lệnh này không gắn eval nào, nên `failed_evals` để trống. Cả chín eval của hợp đồng đều đạt. Nguyên nhân lint nằm ở tệp sinh ra của lượt nghiệm thu, không phải mã của tính năng (xem review-findings.md).
+Vòng 2. Cả chín eval máy đều đạt, nhưng verdict là REJECT vì bước phân loại phạm vi còn năm phát hiện nằm trong hợp đồng (AC-6 và AC-8) chưa được sửa. Chi tiết trong review-findings.md, mục "Trong hợp đồng".
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
@@ -29,104 +30,102 @@ Lý do REJECT: lệnh suite `make check` không đạt (bước lint) và lệnh
 ## Evidence
 
 - eval: E1
-  run_id: minted-cach-ly-moi-san-E1-r1
+  run_id: minted-cach-ly-moi-san-E1-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.cach_ly
-  verified_at: 2026-11-11T02:27:36Z
+  verified_at: 2026-11-11T03:08:09Z
   output: |
     cach-ly: 19 ca đạt, vai quy_hang_app
 
 - eval: E2
-  run_id: minted-cach-ly-moi-san-E2-r1
+  run_id: minted-cach-ly-moi-san-E2-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.cach_ly
-  verified_at: 2026-11-11T02:27:36Z
+  verified_at: 2026-11-11T03:08:09Z
   output: |
     cach-ly: 19 ca đạt, vai quy_hang_app
 
 - eval: E3
-  run_id: minted-cach-ly-moi-san-E3-r1
+  run_id: minted-cach-ly-moi-san-E3-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.cach_ly
-  verified_at: 2026-11-11T02:27:36Z
+  verified_at: 2026-11-11T03:08:09Z
   output: |
     cach-ly: 19 ca đạt, vai quy_hang_app
 
 - eval: E4
-  run_id: minted-cach-ly-moi-san-E4-r1
+  run_id: minted-cach-ly-moi-san-E4-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.cach_ly
-  verified_at: 2026-11-11T02:27:36Z
+  verified_at: 2026-11-11T03:08:09Z
   output: |
     cach-ly: 19 ca đạt, vai quy_hang_app
 
 - eval: E5
-  run_id: minted-cach-ly-moi-san-E5-r1
+  run_id: minted-cach-ly-moi-san-E5-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.cach_ly
-  verified_at: 2026-11-11T02:27:36Z
+  verified_at: 2026-11-11T03:08:09Z
   output: |
     cach-ly: 19 ca đạt, vai quy_hang_app
 
 - eval: E6
-  run_id: minted-cach-ly-moi-san-E6-r1
+  run_id: minted-cach-ly-moi-san-E6-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.cach_ly
-  verified_at: 2026-11-11T02:27:36Z
+  verified_at: 2026-11-11T03:08:09Z
   output: |
     cach-ly: 19 ca đạt, vai quy_hang_app
 
 - eval: E7
-  run_id: minted-cach-ly-moi-san-E7-r1
+  run_id: minted-cach-ly-moi-san-E7-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-11T02:27:36Z
+  verified_at: 2026-11-11T03:08:09Z
   output: |
-    make test chạy xong, kết thúc thành công (phần cuối đầu ra chỉ là dòng kẻ ngăn cách).
+    make test: đạt (đuôi đầu ra chỉ có dòng kẻ ngăn)
 
 - eval: E8
-  run_id: minted-cach-ly-moi-san-E8-r1
+  run_id: minted-cach-ly-moi-san-E8-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-11T02:27:36Z
+  verified_at: 2026-11-11T03:08:09Z
   output: |
-    make test chạy xong, kết thúc thành công (phần cuối đầu ra chỉ là dòng kẻ ngăn cách).
+    make test: đạt (đuôi đầu ra chỉ có dòng kẻ ngăn)
 
 - eval: E9
-  run_id: minted-cach-ly-moi-san-E9-r1
+  run_id: minted-cach-ly-moi-san-E9-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.cach_ly
-  verified_at: 2026-11-11T02:27:36Z
+  verified_at: 2026-11-11T03:08:09Z
   output: |
     cach-ly: 19 ca đạt, vai quy_hang_app
 
 ### Lệnh suite (hồi quy)
 
 - cmd: make check
-  run_id: minted-cach-ly-moi-san-SUITE-make_check-r1
-  exit_code: 2
-  verified_at: 2026-11-11T02:27:36Z
-  note: bước lint đỏ, 189 lỗi no-undef và 11 cảnh báo, toàn bộ ở tệp sinh ra .acceptance-runs/cach-ly-moi-san/acceptance-verify.js (git bỏ qua, ESLint không bỏ qua). Lệnh này không gắn eval nào.
+  run_id: minted-cach-ly-moi-san-SUITE-make_check-r2
+  exit_code: 0
+  verified_at: 2026-11-11T03:08:09Z
 
 - cmd: npm run build
-  run_id: minted-cach-ly-moi-san-SUITE-build-r1
+  run_id: minted-cach-ly-moi-san-SUITE-build-r2
   exit_code: 0
-  verified_at: 2026-11-11T02:27:36Z
+  verified_at: 2026-11-11T03:08:09Z
 
 - cmd: make e2e
-  run_id: minted-cach-ly-moi-san-SUITE-make_e2e-r1
+  run_id: minted-cach-ly-moi-san-SUITE-make_e2e-r2
   exit_code: 0
-  verified_at: 2026-11-11T02:27:36Z
-  note: 16 ca đạt.
+  verified_at: 2026-11-11T03:08:09Z
 
 ## Known limits
 
@@ -134,16 +133,17 @@ Lý do REJECT: lệnh suite `make check` không đạt (bước lint) và lệnh
 
 ## Analyst
 
-Eval không phân biệt (đạt trên cả HEAD lẫn baseline):
-- make test: E7, E8
+carried tu round 1 — baseline khong do lai round nay
 
-Baseline khong do
-- bash db/scripts/cach-ly.sh: bo qua baseline: tep db/scripts/cach-ly.sh co o cay dang kiem nhung chua co o merge-base c706223901220e35f8095854249c171294b79739 — eval moi, chay tren code cu khong phan biet gi
+Baseline khong do: evals.yaml khong đổi từ lần đo baseline cuối (round 1), nên field baseline của từng eval ghi n-a.
+
+Eval không phân biệt (xanh trên cả code mới lẫn baseline đã đo): E7, E8 (lệnh make test). Cần viết lại để assert hành vi mới, hoặc xác nhận là regression-guard có chủ ý.
 
 ## Variance
 
-none — mọi eval chạy một lần, xác định, không có phương sai.
+none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: chín eval đạt nhưng make check (lệnh suite không gắn eval) không đạt ở bước lint vì tệp sinh ra của lượt nghiệm thu; verdict REJECT.
+Round 1: chín eval đạt; make check đỏ vì tệp kịch bản chấm chép vào thư mục chạy của kho; ba phát hiện trong hợp đồng (luật mở lọt phép dò chuỗi ở AC-6, lời gọi có khai kiểu lọt bộ quét ở AC-8). Đã sửa ở commit 3136708.
+Round 2: cả chín eval và ba lệnh suite đều đạt, nhưng REJECT vì còn năm phát hiện trong hợp đồng chưa sửa (AC-6: t1, t9, t11; AC-8: t2, t10). Cùng lớp lỗi với round 1 — dừng-vá, không tự chạy round 3.
