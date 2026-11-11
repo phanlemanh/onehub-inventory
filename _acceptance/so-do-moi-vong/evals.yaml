@@ -1,0 +1,80 @@
+schema_version: 1
+feature_slug: so-do-moi-vong
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/round_metrics/**]
+    expected: "exit 0; bài 'ghi: một lượt REJECT hai tầng, BLOCKED và repin-do' trong tools/round_metrics/round-metrics.test.ts đạt: so-do-vong.json có vong_cham 3, đúng 4 đơn vị (r1 trang-thai-hanh-vi, r1 bo-cuc, r2 bai-kiem-ha-tang, repin-do bai-kiem-ha-tang), theo_tang đủ 11 khoá với tổng 4, chua_phan rỗng, thuoc_vat và gio_may lấy từ dòng cuối; mỗi loại dòng trong sổ mẫu chép nguyên từ một sổ chạy thật do kit ghi (round-tally, thuoc-vat từ _acceptance/go-hoi-khi-gop/run-log.jsonl; gio-may, repin-do từ sổ chạy Quỹ hàng) và ghi nguồn tệp:dòng trong bài kiểm, chỉ đổi verdict và round; bài 'ghi: lượt chấm lại và PENDING-JUDGMENT' đạt: lượt có dòng REJECT rồi PASS và lượt PENDING-JUDGMENT cho 0 đơn vị; chiều đỏ: bỏ --phan thì cùng bài thấy chua_phan ['r1']"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/round_metrics/**]
+    expected: "exit 0; bài 'ghi lại giữ tầng đã khai' đạt: sau khi thêm dòng round-tally lượt 4 REJECT và chạy ghi không --phan, r1 vẫn mang hai tầng cũ và chua_phan đúng bằng ['r4']; đối chứng: xoá tệp cũ rồi ghi lại thì chua_phan là ['r1', 'r4']"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/round_metrics/**]
+    expected: "exit 0; bài 'ghi từ chối đầu vào sai' đạt: '--phan r1=mau-sac' thoát 1 và stderr chứa đủ 11 tên tầng; '--phan r3=bo-cuc' (lượt PASS) thoát 1 và stderr chứa 'r3'; '--phan r9=bo-cuc' (lượt không có) thoát 1; trong cả ba ca băm của so-do-vong.json trước và sau bằng nhau, hoặc tệp vẫn vắng; đối chứng dương: '--phan r1=bo-cuc' thoát 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/round_metrics/**]
+    expected: "exit 0; bài 'kiem: ma trận trạng thái và loại hồ sơ' đạt trên kho mẫu dựng trong thư mục tạm: ma trận viết trước gồm 7 trạng thái × 3 loại hồ sơ (surfaces ui, chỉ có design-pass.md, surfaces cli) không có bản số đo, khẳng định số phần tử bằng 21 và đỏ đúng 8 ô (4 trạng thái verified, machine-cleared, signed-off, da-cham-boi-thuc-te × 2 loại giao diện), mỗi ô đỏ in tên hồ sơ và 'round_metrics.py ghi --slug <slug>'; lệnh không có cờ hay danh sách miễn nào (bài khẳng định một hồ sơ signed-off giao diện thiếu bản số đo luôn đỏ); thêm ba ca đỏ với thông điệp ghim 'chua phan tang: r1', 'ban so do cu: 2 luot, so chay co 3' và ca xanh khi bản số đo hợp lệ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/round_metrics/**, _acceptance/**, docs/plan/do-he-design/**]
+    expected: "exit 0; bài 'kho thật: kiem và kiem-moc xanh' chạy round_metrics.py với --root là gốc kho suy từ vị trí tệp bài kiểm, không ghi cứng đường; bài 'kho thật: thêm vòng giao diện verified thì đỏ' chép _acceptance/ và docs/plan/do-he-design/ của kho thật sang thư mục tạm, thêm hồ sơ surfaces [ui] status verified không bản số đo, và thấy kiem thoát 1 gọi tên hồ sơ đó; bài 'kho thật lấy nông: kiem-moc vẫn chạy' chạy kiem-moc trên một bản git clone --depth 1 của kho thật và thấy thoát 0 kèm 'kho nong: bo qua kiem lich su git' (như CI); npm test chạy cả hai bài (vitest nhặt tools/round_metrics/round-metrics.test.ts)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/round_metrics/**, docs/plan/do-he-design/moc-quy-hang.json]
+    expected: "exit 0; bài 'gop: làm lại theo tầng' đạt trên hai bản số đo mẫu do chính lệnh ghi sinh (không viết tay JSON): bản --json có đúng 11 dòng tầng, số đơn vị khớp tổng hai bản, phần trăm trên mọi đơn vị cộng lại 100 (sai số làm tròn ≤ 1), phần trăm trên phần đổi sản phẩm bỏ bai-kiem-ha-tang và hop-dong-yeu-cau, phần trăm Quỹ hàng của bai-kiem-ha-tang là 55; bài 'mốc Quỹ hàng khớp 0019' đạt: tập khoá theo_tang của moc-quy-hang.json bằng đúng 11 tầng viết sẵn trong bài, tổng 199, phần trăm làm tròn của bai-kiem-ha-tang 55, trang-thai-hanh-vi 15, thanh-phan 5, mau-token 0; bản chữ in đủ 11 tên tầng và dòng số vòng, lượt chấm trung bình; đối chứng: không có bản số đo nào thì in 'chua co vong nao' và thoát 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/round_metrics/**, tools/design_check.py, design/decisions.yaml]
+    expected: "exit 0; bài 'gop: quyết định có kiểm theo tầng' đạt: trên kho thật, tổng số có kiểm và tổng số quyết định của các tầng bằng đúng hai số trong dòng 'determinism: a/b' do python3 tools/design_check.py in; trên kho mẫu có hai quyết định cùng tầng, một trỏ test có tồn tại và mang decision:<id>, một trỏ test không tồn tại, tầng đó ghi 1/2"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tools/round_metrics/**, docs/plan/do-he-design/**]
+    expected: "exit 0; bài 'kiem-moc: mốc thật xanh và sáu lần phá' đạt: moc.json thật cho thoát 0; sáu bản sao mỗi bản phá một điều kiện cho thoát 1 với thông điệp ghim: bỏ một agent ('can dung 3 agent'), hai agent trỏ cùng tệp ('tep phuong an trung'), một tệp phương án rỗng ('tep phuong an rong'), xoá so-sanh.md ('thieu bang so'), sửa một chữ trong câu đã gửi của agent-2.md ('cau giao khac de bai: agent 2'), commit không có ('commit khong co'), commit ở đó hồ sơ khung-va-giao-dien đã signed-off ('do sau khi 1a gop'), commit ở đó đã có thư mục mốc ('ban kho co san phuong an'); trên bản git clone --depth 1 của một kho mẫu thiếu commit đã khai thì thoát 0 và in 'kho nong: bo qua kiem lich su git', còn bản sao sửa câu giao trên cùng bản nông vẫn đỏ; gop --json mang khối moc với giong, giong_mang_loi, lech và tu_doan của ba agent khớp moc.json"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: judgment
+    inputs:
+      - docs/plan/do-he-design/de-bai-ba-agent.md
+      - docs/plan/do-he-design/moc-2026-11-11/agent-1.md
+      - docs/plan/do-he-design/moc-2026-11-11/agent-2.md
+      - docs/plan/do-he-design/moc-2026-11-11/agent-3.md
+      - docs/plan/do-he-design/moc-2026-11-11/so-sanh.md
+      - docs/plan/do-he-design/moc-2026-11-11/moc.json
+    question: "Trong các tệp được đưa: (1) mỗi tệp agent-N.md có chép câu giao trùng nguyên văn câu giao trong de-bai-ba-agent.md không; (2) với mỗi dòng của bảng so trong so-sanh.md, lựa chọn ghi cho agent 1, 2, 3 có khớp điều tệp agent-N.md tương ứng viết cho quyết định đó không, và kết quả Giống / Giống, mang lỗi / Lệch có đúng định nghĩa trong de-bai-ba-agent.md không; (3) số giống, giống mang lỗi, lệch và số tự đoán cuối bảng và trong moc.json có khớp các dòng của bảng không? Nêu từng dòng lệch nếu có."
+    expected: "PASS khi cả ba ý đúng; mỗi dòng bảng so lệch phương án là FAIL kèm tên quyết định"
+    evidence_required: [run_id, verdict, verifier, verified_at, rationale]

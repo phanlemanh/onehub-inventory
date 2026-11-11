@@ -12,6 +12,7 @@ Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 - 2026-11-11 — Danh mục ReUI (678 khối Pro, 27 thành phần gốc, 1.264 ví dụ) ghim theo bản chụp có băm, tra được tại máy không cần mạng; kiểm trong `make check` đỏ khi có mục tra không ra hoặc lọt mã, khoá — [tools/reui_catalog](../tools/reui_catalog/README.md), hàng 1g
 - 2026-11-11 — Sàn mẫu MAU trên Vinhomes Ocean Park 1, 2, 3: danh mục căn, 60 lần chào, 50 liên hệ nối sẵn; Liên hệ có thêm số điện thoại — [du-lieu-mau](../_acceptance/du-lieu-mau/design.md)
 - 2026-11-11 — Khung ứng dụng đầy đủ: mục đang chọn, lối nhảy, tiêu đề tab, trạng thái lỗi, không tìm thấy, chờ tải, hết phiên, bộ định dạng Intl vi-VN, màu sáu trạng thái, băng trên màn khi mất mạng, giao diện sáng và tối — hàng 1a, `_acceptance/khung-va-giao-dien/`
+- 2026-11-11 — Mỗi lượt kiểm ghi độ phủ vào một thư mục riêng, hai lượt chạy cùng lúc trong một checkout không còn làm hỏng nhau (lượt chấm 3 và 4 của hàng 1h) — [vitest.config.ts](../vitest.config.ts).
 - 2026-11-10 — Gộp PR thường không còn hỏi người, bốn kiểu gộp trái nếp vẫn hỏi; luật hỏi khi duyệt PR bắt được cờ ở mọi chỗ trong lệnh — user, 2026-11-10
 - 2026-11-10 — Kho chuyển sang công khai theo quyết định của chủ kho; bật luật bảo vệ main, quét bí mật và cảnh báo lỗ hổng — user, 2026-11-10
 - 2026-11-10 — Dữ liệu mẫu theo Vinhomes Ocean Park, căn và liên hệ nối từ đầu — [0020](decisions/0020-linked-sample-data-ocean-park.md)
