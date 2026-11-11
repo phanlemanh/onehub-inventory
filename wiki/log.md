@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-11 — Hành vi nằm trong Lưới và khung: hồ sơ cạnh bảng một khung cho căn và người (địa chỉ riêng, Esc trả tiêu điểm, toàn màn trên điện thoại, đi qua lại theo dòng đang hiện), chờ tải ba nấc, lỗi không còn nút «Thử lại» chết, đầu vùng chỉ tên khi lỗi, nút làm việc theo quyền, cửa lưu chung có hoàn tác hay xác nhận; sáu quyết định tầng hành vi có bài kiểm đỏ được, bài rào đỏ khi màn tự dựng lại — hàng 1e, `_acceptance/hanh-vi-trong-luoi-khung/`
 - 2026-11-11 — Lưới dùng chung: ô theo kiểu (canh lề, bề rộng, định dạng suy từ kiểu của trường), mật độ, đầu vùng, tìm, chia trang, bảy trạng thái vùng, ô chỉ đọc — hàng 1b, `_acceptance/luoi-va-o-theo-kieu/`
 - 2026-11-11 — Khai bốn vai và sổ màn cho máy đọc; `make check` đỏ khi có trang chưa khai hay hợp đồng của vòng giao diện thiếu khối Vai × Màn, `make coverage-report` in số đo của đợt thử — hàng 1d, [0017](decisions/0017-actor-surface-coverage-pilot.md), `_acceptance/khai-vai-va-man/`
 - 2026-11-11 — Danh mục ReUI (678 khối Pro, 27 thành phần gốc, 1.264 ví dụ) ghim theo bản chụp có băm, tra được tại máy không cần mạng; kiểm trong `make check` đỏ khi có mục tra không ra hoặc lọt mã, khoá — [tools/reui_catalog](../tools/reui_catalog/README.md), hàng 1g

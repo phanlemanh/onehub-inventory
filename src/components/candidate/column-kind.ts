@@ -76,5 +76,21 @@ export function typedColumn(spec: TypedColumnSpec): TypedColumn {
   };
 }
 
+/** Where a value of each kind is edited (design/behaviors.md, edit data): in the cell, or in the record panel. */
+export type EditMode = "cell" | "panel";
+
+export const IN_CELL_KINDS: readonly DisplayKind[] = [
+  "money",
+  "count",
+  "text",
+  "select",
+  "boolean",
+  "date",
+];
+
+export function editModeFor(kind: DisplayKind): EditMode {
+  return IN_CELL_KINDS.includes(kind) ? "cell" : "panel";
+}
+
 /** Kinds the search box reads: words, not numbers or dates. */
 export const SEARCHABLE_KINDS: readonly DisplayKind[] = ["text", "person", "select"];

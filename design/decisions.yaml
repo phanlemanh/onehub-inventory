@@ -144,14 +144,17 @@ decisions:
     layer: patterns
     kind: formula
     source: "display kind"
+    check: "test:tests/behavior.test.tsx"
   - id: undo-or-confirm
     layer: patterns
     kind: formula
     source: "reversibility"
+    check: "test:tests/behavior.test.tsx"
   - id: feedback-by-delay
     layer: patterns
     kind: standard
     source: "0.1, 1 and 10 second limits"
+    check: "test:tests/behavior.test.tsx"
   - id: target-size
     layer: conformance
     kind: standard
@@ -176,6 +179,7 @@ decisions:
     layer: patterns
     kind: closed
     source: "design/states.md"
+    check: "test:tests/behavior.test.tsx"
   - id: test-screen-sizes
     layer: conformance
     kind: formula
@@ -215,6 +219,7 @@ decisions:
     layer: patterns
     kind: closed
     source: "design/behaviors.md"
+    check: "test:tests/behavior.test.tsx"
   - id: status-tone
     layer: foundations
     kind: closed
@@ -223,7 +228,13 @@ decisions:
     layer: patterns
     kind: closed
     source: "design/behaviors.md"
+    check: "test:tests/behavior.test.tsx"
   - id: mobile-navigation
     layer: templates
     kind: closed
     source: "design/behaviors.md"
+  - id: record-panel
+    layer: patterns
+    kind: closed
+    source: "design/behaviors.md"
+    check: "test:tests/behavior.test.tsx"

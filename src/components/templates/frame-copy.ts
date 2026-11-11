@@ -10,6 +10,12 @@ export const FRAME_COPY = {
   brand: "OneHub",
   retry: "Thử lại",
   undo: "Hoàn tác",
+  confirm: {
+    cancel: "Thôi",
+    /** The question above the screen's own sentence of what will happen. */
+    title: (verb: string) => `Bạn chắc muốn ${verb.toLocaleLowerCase("vi")}?`,
+    note: "Bạn đọc kỹ việc sẽ xảy ra dưới đây trước khi bấm.",
+  },
   signInAgain: "Đăng nhập lại",
   goHome: "Về trang đầu",
   theme: {
