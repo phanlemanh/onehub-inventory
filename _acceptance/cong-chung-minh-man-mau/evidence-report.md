@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 0425091502eb185b26e6cf60e340c99585d0ea29
+verified_commit: 0c6bf41fb7b43c8e8c58ca8b69e98663e764d839
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -198,3 +198,7 @@ none — mọi eval chạy một lần, không có eval nhiều lần chạy; kh
 Round 1: mọi eval máy đạt; một phát hiện trong hợp đồng (AC-6, bậc 'đạt' nhận đường dẫn thư mục) được sửa; E11 chờ người chốt. Verdict PENDING-JUDGMENT.
 Round 2: eval máy đạt sau sửa; hai phát hiện trong hợp đồng (AC-4, từ có dấu gạch chéo bị coi là tệp) được sửa; E10 mang sang từ round 1. Verdict PENDING-JUDGMENT.
 Round 3: bản sửa proof-gate (commit 0425091) đạt toàn bộ eval máy và lệnh suite; E10 mang sang từ round 1; E11 vẫn chờ người chốt ở Cổng 2. Verdict PENDING-JUDGMENT.
+
+### Re-pin lần 1 — 2026-11-11, do gộp nhánh chính sau hàng 8, trước khi gộp PR #23
+run_id: repin-20261111T075251Z-43783
+sha: 0c6bf41fb7b43c8e8c58ca8b69e98663e764d839 · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E11 (E11 không khai paths)
