@@ -1,0 +1,37 @@
+{
+  "feature_plain": "Quản trị sàn có màn Thành viên để mời người vào sàn bằng email, chọn vai cho họ và đổi vai khi họ đổi việc.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ cho Quản trị sàn mời một email mới kèm tên và vai; người ấy hiện ngay trong danh sách, đăng nhập bằng mã email là vào thẳng sàn với đúng vai."},
+    {"id": "AC-2", "p": "Sẽ gửi đúng một thư mời khi quản trị bấm «Mời»; lời mời bị từ chối thì không thư nào đi, thư hỏng thì không ai được thêm."},
+    {"id": "AC-3", "p": "Sẽ không để sàn A biết một email đã có ở sàn khác: phản hồi và thư giống hệt mời email mới, và sàn A chỉ thấy tên chính mình đặt."},
+    {"id": "AC-4", "p": "Sẽ từ chối mời người đã ở sàn, email sai, tên trống, chưa chọn vai hay vai lạ — không thêm ai, không gửi thư."},
+    {"id": "AC-5", "p": "Sẽ đổi được vai của người trong sàn; sàn luôn còn ít nhất một Quản trị sàn, kể cả khi hai quản trị bỏ vai nhau cùng lúc."},
+    {"id": "AC-6", "p": "Sẽ chặn người không phải Quản trị sàn: màn báo Không đủ quyền mà không lộ ai trong sàn, mục Thành viên chỉ hiện trên thanh bên của quản trị."},
+    {"id": "AC-7", "p": "Sẽ giữ cách ly sàn: quản trị sàn A không xem hay đổi vai được người chỉ thuộc sàn B, và bộ kiểm cách ly của sàn vẫn xanh."},
+    {"id": "AC-8", "p": "Sẽ chỉ nhận đúng bốn vai đã khai, cùng thứ tự ở cơ sở dữ liệu, đường mời và màn; người đang có trong sàn thử nhận vai Quản trị sàn."},
+    {"id": "AC-9", "p": "Sẽ cho màn Thành viên chạy đúng ở điện thoại và máy tính, sáng và tối, dùng được bằng bàn phím, không lỗi trợ năng."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "Chưa gỡ người, khoá người, huỷ hay gửi lại lời mời, chưa báo ai đã vào hay chưa — để hàng khoá người và việc tách «người hết sàn kẹt»."},
+    {"id": "OOS-2", "p": "Chưa quyết vai nào làm được gì ngoài quản trị người — đó là bảng quyền của hàng 9a."},
+    {"id": "OOS-3", "p": "Chưa cho từng sàn đặt tên vai riêng — chờ có sàn thứ hai."},
+    {"id": "OOS-4", "p": "Chưa có màn mở sàn mới và quản trị đầu tiên — vẫn làm bằng lệnh vận hành như hàng 8."},
+    {"id": "OOS-5", "p": "Chưa có tìm, lọc, chia trang danh sách thành viên."},
+    {"id": "OOS-6", "p": "Bài kiểm không gửi thư thật; chủ kho nhận một thư mời thật trong một lần thử tay ở Cổng Bằng chứng."}
+  ],
+  "coverage_plain": [
+    {"i": 0, "p": "Ba thao tác xem, mời, đổi vai đều có tiêu chí (AC-1 đến AC-5); gỡ người để sau."},
+    {"i": 1, "p": "Bốn loại người được mời — email mới, đã có ở sàn khác, đã ở sàn này, dữ liệu sai — mỗi loại có tiêu chí (AC-1, AC-3, AC-4)."},
+    {"i": 2, "p": "Năm loại người bấm — quản trị, ba vai khác, chưa đăng nhập, chưa chọn sàn, quản trị sàn khác — đều có tiêu chí (AC-1, AC-6, AC-7)."},
+    {"i": 3, "p": "Tập vai một vai, nhiều vai, bỏ quản trị cuối cùng, vai sai đều có tiêu chí (AC-1, AC-4, AC-5, AC-8)."},
+    {"i": 4, "p": "Luật được giữ ở cả cơ sở dữ liệu, đường ghi, màn và thư (AC-2, AC-4, AC-6 đến AC-9)."},
+    {"i": 5, "p": "Giả định chờ anh gạch: một sàn MVP có vài chục người nên danh sách chưa cần tìm, lọc."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Việc thêm bốn hàm đặc quyền cho phần danh tính là nới ngoại lệ của luật cách ly sàn (SP-1) mà sổ ghi như máy tự quyết — đã chuyển thành câu hỏi cho anh (Hỏi-4)."},
+    {"i": 1, "p": "Việc mỗi sàn đặt tên riêng cho cùng một người là nghĩa sản phẩm người dùng thấy, không phải điều luật bắt buộc — đã chuyển thành câu hỏi cho anh (Hỏi-5)."},
+    {"i": 2, "p": "Lý do bỏ bước dựng mẫu giao diện trước cổng ghi sai và trỏ nhầm phép đo ảnh — đã sửa lý do, ghim tám ảnh bảng và hộp Mời để chấm ở Cổng Bằng chứng."},
+    {"i": 3, "p": "Phép đo «không lộ email đã có» so hai email khác nhau nên không đo được điều nó hứa — đã đổi sang cùng một email trên hai cơ sở dữ liệu, so cả phản hồi lẫn thư."},
+    {"i": 4, "p": "Các hàm đặc quyền chưa có bảng ca đầy đủ — đã thêm bảng 40 ô (bốn hàm × năm người gọi × hai đích) và hai bản phá."}
+  ]
+}
