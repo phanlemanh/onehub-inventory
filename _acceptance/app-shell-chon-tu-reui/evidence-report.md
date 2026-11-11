@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: app-shell-chon-tu-reui
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: d40200f61b854ab4657a5558cbc9f2441781c4b1
-human_signoff:
+human_signoff: Manh Phan 2026-11-12
 ---
 
 # Evidence Report: app-shell-chon-tu-reui
@@ -97,7 +97,7 @@ Lý do verdict tổng là PENDING-JUDGMENT: mọi eval máy đều xanh, còn m�
   run_id: minted-app-shell-chon-tu-reui-E10-r3
   exit_code: 0
   baseline: n-a
-  verifier: ui-check:E10
+  verifier: config:capture.ui
   verified_at: 2026-11-11T22:34:37Z
   screenshot: evidence/E10-inventory-1440-light.png
   observed: |
@@ -160,7 +160,7 @@ Panel đề xuất ba góc nhìn (fresh context). Các phiếu, giữ đủ ý k
     - Sửa lý do của dòng «Chuông và ngăn thông báo» và dòng «Thẻ chân cột thứ hai» cùng tệp trên để trỏ vào việc của nhân viên sàn, thay cho «dữ liệu mẫu» và «không phục vụ việc». Đọc lại hai dòng này thì phiếu đổi.
     - Chủ kho hoặc người giữ hợp đồng xác nhận trong hợp đồng AC-8 rằng lý do kiểu «kho đã có lời giải» (theo thang quyết định 0023, wiki/decisions/0023-chon-truoc-tao-sau.md) được tính là trỏ vào việc của người dùng; hoặc sửa hai dòng «Đổi sáng tối» và «Menu người dùng» trong design.md để nêu việc người dùng, ví dụ «nhân viên đổi sáng tối/đăng xuất/đổi sàn ở một chỗ quen».
     - Dòng «Thẻ chân cột thứ hai» trong design.md nêu rõ cả thẻ `inner-sidebar-security` (hoặc ghi chú rằng nó thuộc nhóm «…»), để vùng nguồn liệt kê đủ cả 20 tệp.
-  human_override:        # người điền "<tên> <ngày>" để chốt
+  human_override: Manh Phan 2026-11-12 — Đạt
 
 ## Known limits
 

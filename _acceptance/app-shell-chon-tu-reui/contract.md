@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: [proto]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11T14:19:02Z
 design_doc: _acceptance/app-shell-chon-tu-reui/design.md
@@ -111,3 +111,11 @@ còn lại. Dòng màn sửa sau Cổng Phạm vi, xem sổ quyết định.
 - Tệp `src/app/(app)/layout.tsx`, `src/app/(app)/nav.ts`, `tests/e2e/shell.spec.ts` đang nằm trong PR của hàng 9; hàng này
   chạm chúng sau khi hàng 9 gộp. Sổ khối `design/so-khoi.yaml` do hàng 1n dựng; dòng nhập kho của App Shell ghi vào đó
   khi 1n đã gộp, trước đó ghi ở design.md.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-12:
+  - Ngoài-1: Bản ghi phạm vi chấm luật sản phẩm có thể dừng sớm một commit; người dùng không thấy khác gì.
+  - Ngoài-2: Phép chờ trước khi chụp ngăn trượt từng chỉ đo âm tính; lượt 3 đã thay bằng phép kiểm ngăn nằm trong khung nhìn có đối chứng.
+  - Ngoài-3: Thứ tự trạng thái ở cột thứ hai có thể khác thứ tự trên màn Bảng hàng; đủ trạng thái và bấm vẫn đúng, sửa cùng bộ lọc trạng thái của hàng 2.
+  - Ngoài-4: Đổi sàn đúng lúc mất mạng hay hết phiên thì nút đổi sàn có thể khoá và không báo gì; tải lại trang thì gỡ được.
+  - Ngoài-5: Bài kiểm chưa bắt được hai biểu tượng màn bị tráo tên cho nhau.
+  - Ngoài-6: Bài kiểm có thể không phát hiện nếu ô gõ mã căn vô tình xuất hiện trên thanh trên.
+  - Ngoài-7: Bài kiểm đơn vị không bắt được nếu tiêu đề nhóm ở cột thứ hai biến mất.
