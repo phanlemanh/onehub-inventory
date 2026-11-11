@@ -21,7 +21,7 @@ Nguồn: `wiki/dot/mvp-dot-1.md#adb1cba497edd0ad0fd877ee7bf608aeabd4d83e` — ch
 
 Nhân viên sàn làm việc trong một App Shell chọn từ ReUI Pro, giữ đủ thanh bên theo vai, băng báo và các trạng thái toàn trang đang có
 
-Vì sao: Quyết định 0023: App Shell hiện là thanh bên shadcn mở rộng, dựng khi kho còn rỗng mà chưa bày ứng viên ReUI; Quỹ hàng đã chọn app-shell-8
+Vì sao: Quyết định 0023: App Shell hiện là thanh bên shadcn mở rộng, dựng khi kho còn rỗng. Chủ kho chốt ngày 11/11/2026: dùng app-shell-8, giữ cả hai cột; các phần còn lại quyết trên bản bấm được, không quyết bằng chữ
 
 ## Ngưỡng chết / ngưỡng UAT
 

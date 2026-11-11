@@ -90,6 +90,8 @@ Không chọn:
   data, text and props only») chưa khớp quyết định này; sửa ở hàng 1n của lộ trình.
 - App Shell, màn đăng nhập, màn Thành viên và hộp thoại biểu mẫu chưa «thuộc kho» đúng nghĩa; chọn lại ở các hàng 1o,
   1p, 9c.
+- App Shell: chủ kho chốt ngày 2026-11-11 dùng `app-shell-8` và giữ cả hai cột điều hướng. Các phần còn lại của App Shell
+  quyết trên bản bấm được ở Cổng Phạm vi của hàng 1o.
 - Khuôn Lưới dựng trên thành phần lưới dữ liệu của ReUI; phần khung, thanh công cụ và chân bảng xếp theo khối Quỹ hàng đã
   chọn (`data-grid-editing-6`) ở hàng 2, không thêm chức năng. Bảng thẻ trên điện thoại là hàng riêng sau hàng 3.
 - Trong đợt «nen», các dãy theo quyết định này qua luật đợt cho tới khi hàng 1n gộp.

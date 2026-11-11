@@ -252,7 +252,7 @@
       "cau_giao": "Nhân viên sàn làm việc trong một App Shell chọn từ ReUI Pro, giữ đủ thanh bên theo vai, băng báo và các trạng thái toàn trang đang có",
       "vai": "Nhân viên sàn",
       "tieu_chi": 8,
-      "vi_sao": "Quyết định 0023: App Shell hiện là thanh bên shadcn mở rộng, dựng khi kho còn rỗng mà chưa bày ứng viên ReUI; Quỹ hàng đã chọn app-shell-8",
+      "vi_sao": "Quyết định 0023: App Shell hiện là thanh bên shadcn mở rộng, dựng khi kho còn rỗng. Chủ kho chốt ngày 11/11/2026: dùng app-shell-8, giữ cả hai cột; các phần còn lại quyết trên bản bấm được, không quyết bằng chữ",
       "hang": "T3",
       "dung_tren": [
         "1a",
@@ -260,7 +260,7 @@
         "1f"
       ],
       "slug": "app-shell-chon-tu-reui",
-      "bat_khi": "Thẻ Phạm vi bày hai đến ba App Shell của ReUI kèm ảnh ở bốn khổ, trong đó có app-shell-8; App Shell được chọn có dòng trong sổ khối; mọi màn đang có vẫn qua bộ bài kiểm chung ở bốn khổ, sáng và tối; thanh bên vẫn hiện đủ mục của mọi vai người giữ",
+      "bat_khi": "App Shell dựng từ app-shell-8, giữ cả hai cột điều hướng; thẻ Phạm vi là bản bấm được, mỗi vùng của khối lấy hay bỏ có một dòng lý do; App Shell có dòng trong sổ khối; mọi màn đang có vẫn qua bộ bài kiểm chung ở bốn khổ, sáng và tối; thanh bên vẫn hiện đủ mục của mọi vai người giữ",
       "nhom": "nen",
       "dot": "mvp-dot-1",
       "vung": [
