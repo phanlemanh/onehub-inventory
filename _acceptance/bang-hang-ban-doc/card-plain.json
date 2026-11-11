@@ -1,0 +1,38 @@
+{
+  "feature_plain": "Đầu chủ mở Bảng hàng và đọc, tìm được 60 căn mẫu của sàn trên Lưới, đủ các trạng thái (chờ tải, trống, lỗi…) ở điện thoại lẫn máy tính; màn này thành mẫu cho mọi màn danh sách sau.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ hiện mỗi căn đang chào một dòng (60 dòng), diện tích và số phòng ngủ lấy đúng của căn mà lần chào ấy trỏ tới — căn không còn trong danh mục thì để trống, không mượn số căn khác."},
+    {"id": "AC-2", "p": "Sẽ cho Đầu chủ thấy đầu màn «Bảng hàng», tám cột Căn · Toà · Khu · Trạng thái · Giá chào · Diện tích · Phòng ngủ · Xác nhận lúc, «60 dòng», 25 dòng một trang, giá viết kiểu tiền, diện tích theo m²."},
+    {"id": "AC-3", "p": "Sẽ cho bộ bài kiểm chung của các màn danh sách chạy trọn trên Bảng hàng ở bốn khổ: đủ bảy trạng thái vùng, kiểm khung màn, sáng tối — mỗi bài đều được phá thử và đỏ đúng chỗ."},
+    {"id": "AC-5", "p": "Sẽ sửa bài «tìm» của bộ bài kiểm cho đọc đúng số dòng một trang của màn đang đo, để nó chạy được trên 60 căn mẫu."},
+    {"id": "AC-6", "p": "Sẽ chỉ cho bật trạng thái giả (lỗi, trống…) bằng đường dẫn ở bản đang phát triển; ở bản thật người dùng luôn thấy dữ liệu."},
+    {"id": "AC-7", "p": "Sẽ nộp tệp chứng minh màn mẫu đủ mười một trạng thái và ghi Bảng hàng là màn mẫu của họ màn danh sách."},
+    {"id": "AC-8", "p": "Sẽ tự chứng rằng phép kiểm «đủ ma trận trạng thái» thật sự chạy trên Bảng hàng — bỏ một trạng thái thì nó đỏ, không im lặng cho qua."},
+    {"id": "AC-9", "p": "Sẽ thêm năm chữ đầu cột vào từ điển sản phẩm thay vì gõ cứng trong màn."},
+    {"id": "AC-10", "p": "Sẽ có ảnh Bảng hàng ở bốn khổ, sáng và tối, để người nhìn tận mắt trước khi ký."}
+  ],
+  "wont_do": [
+    {"id": "AC-4", "p": "Chặn: Bảng hàng không còn được bộ bài kiểm bỏ qua vì «chưa có vùng dữ liệu»; ai thêm lại nó vào danh sách bỏ qua thì bài đỏ."},
+    {"id": "OOS-1", "p": "KHÔNG sửa trên ô, KHÔNG mở hồ sơ căn cạnh bảng, KHÔNG lọc hay sắp xếp theo cột, KHÔNG chọn dòng."},
+    {"id": "OOS-2", "p": "KHÔNG có nút thêm dòng hay nhập tệp khi bảng trống — chỉ nói vì sao trống."},
+    {"id": "OOS-3", "p": "KHÔNG đọc dữ liệu thật của sàn, KHÔNG bắt đăng nhập, KHÔNG gắn vai thật."},
+    {"id": "OOS-4", "p": "KHÔNG làm màn Đã gửi."},
+    {"id": "OOS-5", "p": "KHÔNG sửa hai lỗi nhỏ đã biết của bản chạy chậm của bộ bài kiểm; gặp đỏ giả ở đó thì báo giám sát."}
+  ],
+  "scope_plain": "Bản này chỉ để đọc và tìm; sửa, hồ sơ căn và dữ liệu thật là các hàng sau.",
+  "coverage_plain": [
+    {"i": 0, "p": "Nguồn dòng: căn có trong danh mục và căn đã mất khỏi danh mục — AC-1 (ghép đúng căn)."},
+    {"i": 1, "p": "Trạng thái màn: có dữ liệu cộng bảy trạng thái vùng (AC-3, bộ bài kiểm chung); bốn trạng thái không áp cho bản đọc có lý do trong tệp chứng minh (AC-7)."},
+    {"i": 2, "p": "Bốn khổ màn hình, sáng và tối — AC-2, AC-3, AC-10 (ảnh)."},
+    {"i": 3, "p": "Bản phát triển và bản thật — AC-6 (trạng thái giả chỉ ở bản phát triển)."},
+    {"i": 4, "p": "Mỗi phép đo có ca phá thử đỏ đúng thông điệp — AC-3, AC-4, AC-5, AC-8."},
+    {"i": 5, "p": "Bốn vai chỉ phủ bằng ý định trong bảng Vai × Màn; chưa đo được vì vai thật chưa nối vào màn."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Việc bỏ bước dựng bản thử trước cổng bị ghi như máy tự quyết, trong khi đó là chọn lựa của người — đã đổi thành câu hỏi Hỏi-4 cho chủ kho."},
+    {"i": 1, "p": "Thiết kế ghi «Dự án», «Tòa» trong khi từ điển là «Khu», «Toà» — đã thống nhất theo từ điển, và bài kiểm ghim đúng tám chữ đầu cột đã duyệt."},
+    {"i": 2, "p": "Lời hứa «bản thật không bật trạng thái giả» chỉ được đo ở bộ đọc riêng — đã thêm bài kiểm gọi chính trang Bảng hàng ở hai môi trường."},
+    {"i": 3, "p": "Chưa bài nào đo trang ghép căn với lần chào cho đúng — bài mới kiểm một căn biết trước mang đúng diện tích, phòng ngủ."},
+    {"i": 4, "p": "Câu hỏi chấm ảnh hỏi cả điều ảnh tĩnh không thấy và thiếu ảnh tối — đã ghim tên tám ảnh, thêm ảnh tối, chỉ hỏi điều ảnh thấy."}
+  ]
+}
