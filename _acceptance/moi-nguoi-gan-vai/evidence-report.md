@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 8e2131c2e95a6f736ac71b83b9e4b569b2dcb6a6
+verified_commit: 00e54b530ecf5de610d780095b05eb7a81a4271b
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -237,3 +237,7 @@ Round 2: toàn bộ 15 eval và 3 lệnh suite đạt; không có mục chờ ng
 ### Re-pin lần 1 — 2026-11-11, do gộp nhánh chính trước khi gộp hàng 9
 run_id: repin-20261111T154120Z-77161
 sha: 8e2131c2e95a6f736ac71b83b9e4b569b2dcb6a6 · suites: 3 lệnh exit 0 · evals: 14/14 eval máy đạt kỳ vọng · ngoài làn máy: E14
+
+### Re-pin lần 2 — 2026-11-11, do sửa hai bài kiểm theo CodeQL sau khi ghim
+run_id: repin-20261111T155436Z-88852
+sha: 00e54b530ecf5de610d780095b05eb7a81a4271b · suites: 3 lệnh exit 0 · evals: 14/14 eval máy đạt kỳ vọng · ngoài làn máy: E14
