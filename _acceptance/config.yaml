@@ -14,6 +14,9 @@ executors:
     e2e: "make e2e"                  # suy từ: mk/design.mk — cần trình duyệt Playwright
     product_map: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/product-map.mjs\" --root . --check"   # suy từ: mẫu của kit, cách viết của Quỹ hàng
     vai_man: "npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false"   # row 1d: role × screen register and contract block
+    reui_catalog_offline: "node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs && node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs && git diff --exit-code -- design/reui-catalog.json && echo 'reui catalog regenerated twice offline, identical to commit'"   # danh-muc-reui (1g)
+    reui_catalog_check: "node --require ./tools/reui_catalog/no-network.cjs tools/reui_catalog/build.mjs --check"   # danh-muc-reui (1g)
+    reui_catalog_test: "npx vitest run tools/reui_catalog --coverage.enabled=false --reporter=verbose"   # danh-muc-reui (1g)
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists
