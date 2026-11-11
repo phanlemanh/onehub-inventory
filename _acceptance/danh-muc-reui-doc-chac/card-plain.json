@@ -1,37 +1,6 @@
 {
-  "feature_plain": "Khi nguồn ReUI đổi cách ghi tiêu đề một nhóm, lệnh ghim lại danh mục dừng và nói rõ nhóm nào mất, thay vì lặng lẽ ghim một danh mục thiếu hàng trăm mục; và lưới chặn mã nguồn hay khoá bản quyền lọt vào danh mục được thử ở mọi chỗ, mọi dạng đã kê.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ dừng lệnh ghim lại và gọi đúng tên nhóm khi tiêu đề nhóm đổi theo bất kỳ dạng nào trong bảy dạng đã kê, không ghi tệp nào (21 trường hợp)."},
-    {"id": "AC-2", "p": "Sẽ ghim lại bình thường từ nguồn nguyên vẹn, đủ 678 khối, 27 thành phần gốc, 1264 ví dụ (đối chứng)."},
-    {"id": "AC-3", "p": "Sẽ làm lệnh sinh lại và lệnh kiểm cũng dừng, gọi tên nhóm, khi ai đó sửa tay ảnh chụp nguồn cho mất một nhóm."},
-    {"id": "AC-4", "p": "Sẽ gọi tên mọi nhóm mất trong một lần chạy, và chỉ ra dòng tiêu đề gần giống khi nguồn chỉ đổi chữ hoa hay bỏ số khai."},
-    {"id": "AC-5", "p": "Sẽ thử lưới chặn với 10 dạng mã hay khoá × 27 chỗ trong danh mục và ảnh chụp (270 trường hợp), neo vào chính danh sách trong mã để thêm dạng hay chỗ mới mà quên thử thì đỏ."},
-    {"id": "AC-6", "p": "Sẽ thử trường lạ ở cả ba cấp của danh mục."},
-    {"id": "AC-8", "p": "Sẽ chứng lệnh kiểm thật bắt được chuỗi cấm ở cả bốn lớp chỗ (10 trường hợp chạy lệnh)."},
-    {"id": "AC-9", "p": "Sẽ giữ danh mục hôm nay y từng byte và bộ kiểm 33 ca của hàng danh mục ReUI vẫn xanh."}
-  ],
-  "wont_do": [
-    {"id": "AC-7", "p": "Sẽ KHÔNG báo nhầm câu thường như «Import data from a CSV file» là mã (đối chứng của lưới chặn)."},
-    {"id": "OOS-1", "p": "KHÔNG tự nới cách đọc để nhận tiêu đề kiểu mới — nguồn đổi thì người sửa bộ đọc trong một PR."},
-    {"id": "OOS-2", "p": "KHÔNG sửa bộ kiểm hay hồ sơ đã ký của hàng danh mục ReUI."},
-    {"id": "OOS-3", "p": "KHÔNG mở rộng danh sách dạng cấm (ví dụ «bearer» chữ thường vẫn lọt như hôm nay)."},
-    {"id": "OOS-4", "p": "KHÔNG làm các lỗi nhỏ khác của hàng danh mục ReUI đã ghi là hạn chế đã biết."},
-    {"id": "OOS-5", "p": "KHÔNG bắt trường hợp một nhóm xuất hiện hai lần trong cùng tệp nguồn."}
-  ],
-  "coverage_plain": [
-    {"i": 0, "p": "Ba nhóm phải có của nguồn: khối Pro, ví dụ miễn phí, thành phần gốc — mỗi nhóm đều được thử."},
-    {"i": 1, "p": "Bảy cách tiêu đề có thể đổi, kê sẵn trước khi viết mã."},
-    {"i": 2, "p": "Ba lệnh người dùng chạy: ghim lại, sinh lại, kiểm."},
-    {"i": 3, "p": "Mười dạng chuỗi cấm, 27 chỗ chèn, ba cấp trường."},
-    {"i": 4, "p": "Mỗi ô của các trục trên trỏ tới đúng tiêu chí đo nó (AC-1 tới AC-9)."},
-    {"i": 5, "p": "Sinh lại và kiểm chỉ thử một dạng đổi tiêu đề mỗi nhóm, vì cùng một bộ đọc đã được thử đủ bảy dạng ở lệnh ghim lại."},
-    {"i": 6, "p": "Lệnh kiểm thật chỉ chạy 10 trường hợp; 270 trường hợp còn lại thử thẳng trên hàm quét cho nhanh."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Tiêu chí đầu chỉ đòi lỗi «có tên nhóm», nên một phần đã xanh sẵn khi chưa sửa gì — đã sửa: ghim nguyên dòng lỗi mới và cấm lỗi kiểu cũ."},
-    {"i": 1, "p": "Lưới chặn chỉ thử ở nhóm và mục đầu — đã sửa: thử ở cả ba loại và thêm khoá số đếm; việc này lộ ra khoá số đếm hôm nay không được quét, đưa vào phạm vi."},
-    {"i": 2, "p": "Chưa chứng bộ kiểm mới không làm đỏ hồ sơ đã ký của hàng danh mục ReUI — đã sửa: kê cách hồ sơ ấy đếm ca và cấm tên ca mới trùng kiểu đó."},
-    {"i": 3, "p": "Gợi ý dòng gần giống chỉ thử một kiểu — đã thêm ca bỏ số khai và ca đổi tên hẳn (không được gợi ý)."},
-    {"i": 4, "p": "Thông điệp mong đợi ở hai chỗ khó (tên nhóm, tên mục) chưa viết sẵn — đã viết sẵn, và kê trước 10 cặp cho lệnh kiểm."}
+  "feature_plain": "Khi nguồn ReUI đổi cách ghi tiêu đề một nhóm, lệnh ghim lại danh mục dừng và nói rõ nhóm nào mất thay vì lặng lẽ ghim thiếu; lưới chặn mã nguồn và khoá bản quyền được thử ở mọi chỗ, mọi dạng đã kê.",
+  "decisions": [
+    {"id": "E11", "q": "Hướng dẫn đã nói đủ khi nào ghim lại dừng và phải làm gì chưa?", "why": "Ba người chấm đều thấy mục mới của hướng dẫn nói rõ cả hai điều và không mâu thuẫn; hành vi thật của lệnh đã được máy đo riêng."}
   ]
 }
