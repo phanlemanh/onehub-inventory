@@ -6,6 +6,7 @@ recheck: strict         # suy từ: kho mới, chưa có báo cáo cũ
 executors:
   test:
     unit: "make test"                # suy từ: Makefile
+    proof_gate: "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose"   # thang-chon-khoi-vao-cong (1n): screen proof gate only
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
