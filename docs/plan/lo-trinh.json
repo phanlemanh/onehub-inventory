@@ -208,6 +208,44 @@
       "dot": "mvp-dot-1"
     },
     {
+      "ma": "1i",
+      "cau_giao": "Một nhân viên giữ nhiều vai cùng lúc thấy đủ mục điều hướng của mọi vai mình giữ",
+      "vai": "Nhân viên sàn",
+      "tieu_chi": 4,
+      "vi_sao": "Mục ngoài hợp đồng của hàng 1a: thanh bên chỉ lọc theo một vai. Chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng ngày 11/11/2026",
+      "slug": "thanh-ben-nhieu-vai",
+      "hang": "T2",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "vung": [
+        "src/components/templates/**",
+        "src/app/nav.ts"
+      ],
+      "dung_tren": [
+        "1a",
+        "1d"
+      ]
+    },
+    {
+      "ma": "1j",
+      "cau_giao": "Hai loại liên kết chủ nhà với lần chào và lần chào với căn được khai trong mô hình nghiệp vụ, kèm sàn sở hữu và vai trên quan hệ, và mã dùng kiểu sinh ra từ đó",
+      "vai": "nen",
+      "tieu_chi": 6,
+      "vi_sao": "Hai mục ngoài hợp đồng của hàng 1: liên kết đang nằm trong mã mà chưa khai trong mô hình nghiệp vụ. Chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng ngày 11/11/2026. Phải xong trước khi có cơ sở dữ liệu thật",
+      "slug": "khai-lien-ket-chao-can",
+      "hang": "T3",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "vung": [
+        "ontology/**",
+        "src/modules/listings/**",
+        "src/modules/contacts/**"
+      ],
+      "dung_tren": [
+        "1"
+      ]
+    },
+    {
       "ma": "2",
       "cau_giao": "Đầu chủ mở Bảng hàng và thấy các căn của sàn trên Lưới, đủ trạng thái màn, ở bốn khổ màn hình",
       "vai": "Đầu chủ",
@@ -441,7 +479,8 @@
         "7",
         "9",
         "9a",
-        "9b"
+        "9b",
+        "1j"
       ],
       "slug": "bang-hang-du-lieu-that",
       "nhom": "bang-hang",
