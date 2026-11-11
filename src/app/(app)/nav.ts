@@ -1,6 +1,5 @@
-import { label } from "@/modules/company-config";
-
 import type { NavItem } from "@/components/templates/app-shell";
+import { label } from "@/modules/company-config";
 
 export const NAV: NavItem[] = [
   { href: "/", title: label("Today") },

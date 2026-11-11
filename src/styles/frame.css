@@ -1,0 +1,16 @@
+/* Behaviour of the frame that has to work before the page hydrates (design/behaviors.md, feedback by delay). */
+
+/* A waiting screen stays hidden for its first second, then shows. CSS, not a timer: React does not hydrate a
+   fallback that the server streamed, so a timer in it would never start on the first load. */
+@keyframes onehub-reveal {
+  from {
+    visibility: hidden;
+  }
+  to {
+    visibility: visible;
+  }
+}
+
+.onehub-reveal-after-1s {
+  animation: onehub-reveal 0s linear 1s both;
+}
