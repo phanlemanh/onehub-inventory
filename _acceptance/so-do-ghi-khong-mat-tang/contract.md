@@ -5,7 +5,7 @@ slug: so-do-ghi-khong-mat-tang
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11
 design_doc: _acceptance/so-do-ghi-khong-mat-tang/design.md
@@ -59,6 +59,10 @@ AC-1, AC-2, AC-3 phủ ba nhóm hỏng; AC-4 phủ đường gỡ; AC-5 phủ ô
 - Lệnh `kiem` đã báo «ban so do hong»: không đổi.
 
 ## Notes
+
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-1: Tệp tham số của lượt chấm vòng 1 từng mang đường dẫn máy (tên tài khoản), và không chạy lại được ở máy khác; tệp đã rút khỏi kho trước khi ký.
+  - Ngoài-2: Hồ sơ nói ca bị cấm quyền đọc kiểm tệp không đổi bằng dấu băm, nhưng bài kiểm chỉ so giờ sửa tệp; lệnh vẫn dừng đúng và không ghi đè.
 
 - Ca quyền đọc bị cấm (chmod 000) chỉ được chứng khi bài chạy dưới tài khoản thường; dưới root bài ấy bỏ qua có tên.
 
