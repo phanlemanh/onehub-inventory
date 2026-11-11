@@ -44,8 +44,8 @@ tiêu chí tương ứng đổi lời trước khi duyệt.
 - AC-4: Given khổ máy tính, When nhìn thanh trên, Then có tên sàn đang làm theo Hỏi-4 (khuyên: ở đầu thanh trên; người
   thuộc nhiều sàn bấm vào thì đổi sàn bằng đúng lối đổi sàn của menu tài khoản), nút đổi giao diện và menu tài khoản
   của kho; không có nút tạo chung, không có bộ chọn ứng dụng hay môi trường; ô gõ mã căn và chuông theo Hỏi-2, Hỏi-3
-  (khuyên: chưa có); chọn sàn thứ hai thì phiên chuyển sang sàn ấy — tải lại trang vẫn ở sàn mới và Bảng hàng
-  chỉ hiện hàng của sàn mới. (cross-layer)
+  (khuyên: chưa có); chọn sàn thứ hai thì phiên chuyển sang sàn ấy — tải lại trang vẫn ở sàn mới và người dùng
+  chỉ thấy dữ liệu của sàn mới, đo trên màn Thành viên (màn duy nhất đang đọc dữ liệu thật theo sàn). (cross-layer)
 - AC-5: Given khổ 360 và 414, sáng và tối, When mở mỗi màn, Then không có cột nào chiếm màn, trang không cuộn ngang;
   theo Hỏi-5 (khuyên: thanh bên thu gọn) nút mở thanh bên ở thanh trên mở ngăn trượt có cột biểu tượng và cột thứ hai
   của màn đang mở; chọn một mục thì ngăn đóng và màn mới hiện.
@@ -87,6 +87,8 @@ còn lại. Dòng màn sửa sau Cổng Phạm vi, xem sổ quyết định.
 
 - Không làm góc nhìn đã lưu; không đếm và không lọc khi bấm lối tắt trạng thái: số đếm và lọc tới cùng bộ lọc trạng thái
   của Bảng hàng (hàng 2).
+- Không đo vế «Bảng hàng chỉ còn hàng của sàn mới» sau khi đổi sàn: Bảng hàng chưa đọc dữ liệu thật; vế ấy đo ở hàng nối
+  dữ liệu thật (hàng 10).
 - Không làm ô gõ mã căn và chuông (nếu chủ kho chọn «chưa»): MVP chưa có hồ sơ căn và nguồn thông báo.
 - Không đổi ai vào màn nào và không thêm màn: bảng quyền của hàng 9a và các hàng màn.
 - Không làm bốn tab dưới cho điện thoại (nếu chủ kho chọn thanh bên thu gọn).
