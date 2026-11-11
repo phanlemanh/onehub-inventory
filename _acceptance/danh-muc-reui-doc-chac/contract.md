@@ -56,7 +56,7 @@ thường thật); danh sách `FORBIDDEN`, `ALLOWED_FIELDS`, `SOURCES` của `to
 - Trục nhóm bắt buộc: Pro blocks | Free examples | ReUI Primitives.
 - Trục dạng đổi tiêu đề: bảy dạng đã kê ở Context.
 - Trục lệnh: ghim lại | sinh lại | kiểm.
-- Trục dạng chuỗi cấm: mười dạng đã kê. Trục chỗ chèn: mười chỗ đã kê. Trục cấp trường: gốc | nhóm | mục.
+- Trục dạng chuỗi cấm: mười dạng đã kê. Trục chỗ chèn: 27 chỗ đã kê. Trục cấp trường: gốc | nhóm | mục.
 - Ô nhóm × dạng × ghim lại đi AC-1 (21 ô), đối chứng AC-2. Ô nhóm × một dạng × {sinh lại, kiểm} đi AC-3. Nhiều nhóm
   cùng mất và dòng gần giống đi AC-4. Dạng × chỗ đi AC-5 (270 ô). Cấp trường đi AC-6. Đối chứng dương AC-7. Chỗ × lệnh
   kiểm đi AC-8. Không thoái lui đi AC-9.
