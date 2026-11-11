@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: []
-status: verified
+status: signed-off
 approved_by:
 approved_at:
 veto_state: mo
@@ -69,3 +69,20 @@ Vòng này dựng thành phần dùng chung (Lưới, ô theo kiểu, đầu vù
 
 - Mọi câu chữ của Lưới và trạng thái vùng nằm trong `src/components/candidate/grid-copy.ts`; tên vùng và tên cột do màn đưa vào qua `label()`.
 - Mục Ngoài-6 của hàng 1a (ô trạng thái hay đúng/sai hiện mã tiếng Anh) được giải ở lớp ô của hàng này.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-11:
+  - Ngoài-1: Một số tên cột và tên trang trên bản mẫu Lưới đang gõ tay thay vì lấy từ bộ nhãn chung.
+  - Ngoài-3: Bản ghi kiểm tra quy tắc sản phẩm chưa phủ lần sửa cuối cùng, dù kiểm lại tay thì không có vi phạm.
+  - Ngoài-4: Khi vùng bị lỗi tải, đầu vùng vẫn hiện số dòng và ô tìm phía trên thông báo lỗi, có thể khiến người xem tưởng vùng đang trống hoặc có dữ liệu.
+  - Ngoài-5: Một số tên cột và nút trên trang mẫu dành cho người phát triển được viết cứng, nhân viên sàn không nhìn thấy trang này.
+  - Ngoài-6: Với một số trình đọc màn hình, lý do khoá ô có thể bị đọc lặp hai lần cho người khiếm thị.
+  - Ngoài-7: Bài kiểm tự động cho trạng thái đang tải có thể treo tới hết giờ thay vì báo lỗi rõ ràng, và ca đối chứng không còn chứng minh được nó đỏ được.
+  - Ngoài-8: Trong trường hợp hiếm khi vùng tải hỏng một phần mà không có dòng nào, màn có thể nói sai rằng chưa ai nhập dữ liệu trong khi dữ liệu có nhưng chưa tải được.
+  - Ngoài-9: Bài kiểm tự động cho trạng thái đang tải chưa chứng minh được là nó sẽ báo đỏ đúng lúc khi lỗi xảy ra.
+  - Ngoài-10: Bài kiểm tự động cho ô tìm chưa bắt được trường hợp tìm bỏ sót bớt dòng đúng; nếu lỗi như vậy xảy ra, nhân viên có thể thấy thiếu dòng mà test không báo.
+  - Ngoài-11: Một số tên cột và nút trên trang mẫu dành cho người phát triển được viết cứng, nên sau này đổi tên khái niệm có thể bị lệch.
+  - Ngoài-12: Người không có quyền xem một vùng vẫn thấy nút làm việc như «Thêm dòng» trên vùng đó.
+  - Ngoài-13: Khi vùng báo lỗi tải, đầu vùng vẫn ghi số dòng và có ô tìm, nói ngược với thân vùng.
+  - Ngoài-14: Hai danh sách giống nhau được viết ở hai nơi, nên sau này sửa một nơi có thể quên nơi kia và hai ô hiển thị lệch nhau.
+  - Ngoài-16: Nếu một màn quên nối việc tải lại, nút «Thử lại» sẽ bấm không có tác dụng gì mà không báo lỗi.
+  - Ngoài-17: Khi tải lỗi, đầu vùng có thể ghi «0 dòng» như thể vùng thật sự trống, và ô tìm vẫn gõ được mà không có tác dụng.
+  - Ngoài-18: Một bài kiểm tự động có thể thỉnh thoảng đỏ giả khi máy chậm.
