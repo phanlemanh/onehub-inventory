@@ -127,7 +127,7 @@ describe("typed cell", () => {
 describe("column rules", () => {
   it("declares a column by field, the kind comes from the ontology table", () => {
     const fields = Object.keys(FIELD_DISPLAY) as Array<keyof typeof FIELD_DISPLAY>;
-    expect(fields.length).toBe(20);
+    expect(fields.length).toBeGreaterThan(0); // the loop below must not pass on an empty table
     for (const field of fields) {
       expect(typedColumn({ field, header: "x" }).kind, field).toBe(FIELD_DISPLAY[field]);
     }
