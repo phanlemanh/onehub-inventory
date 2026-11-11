@@ -1,3 +1,1 @@
-200 document http://127.0.0.1:3481/proto/luoi-va-o-theo-kieu
-200 document http://127.0.0.1:3481/proto/luoi-va-o-theo-kieu
-200 document http://127.0.0.1:3481/proto/luoi-va-o-theo-kieu?state=error
+(no failed requests, no console errors, no xhr)
