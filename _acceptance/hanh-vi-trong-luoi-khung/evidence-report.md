@@ -147,7 +147,7 @@ Round 4 chạy lại E9 và E10 (delta chạm tệp của hai eval này). Các e
 - eval: E14
   run_id: minted-hanh-vi-trong-luoi-khung-E14-r3
   exit_code: 0
-  verifier: config:executors.ui-check
+  verifier: config:capture.ui
   verified_at: 2026-11-11T06:20:47Z
   carried_from_round: 3
   note: carry-forward tu round 3 — delta khong cham paths cua eval (khung cua luot goc)
