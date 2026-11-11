@@ -6,6 +6,7 @@ import type {
   Company,
   Listing,
   ListingStandardStatus,
+  ListingUnit,
   ListingWithdrawnReason,
   Unit,
 } from "../../generated/ontology";
@@ -59,13 +60,8 @@ const WITHDRAWN_REASONS: readonly ListingWithdrawnReason[] = [
   "unreachable",
 ];
 
-/** The link between a listing and the catalog unit it offers (relation `Unit offered_as Listing`). */
-export interface ListingUnit {
-  id: string;
-  companyId: string;
-  listingId: string;
-  upi: string;
-}
+/** The link between a listing and the catalog unit it offers: the generated ontology concept `ListingUnit`. */
+export type { ListingUnit };
 
 /** What a listing copies from its unit. The caller passes catalog units and their project name. */
 export type ListingUnitSource = Pick<
@@ -201,6 +197,11 @@ export function checkListingLinks(
     if (!upis.has(x.upi)) errors.push(`liên kết căn trỏ căn không có: ${x.upi}`);
     if (x.companyId !== companyId) errors.push(`bản ghi khác sàn: liên kết căn ${x.id}`);
   }
+  const perListing = new Map<string, number>();
+  for (const x of data.listingUnits)
+    perListing.set(x.listingId, (perListing.get(x.listingId) ?? 0) + 1);
+  for (const [listingId, n] of perListing)
+    if (n > 1) errors.push(`lần chào có ${n} căn: ${listingId}`);
   for (const l of data.listings)
     if (l.companyId !== companyId) errors.push(`bản ghi khác sàn: lần chào ${l.id}`);
   return errors;

@@ -24,11 +24,11 @@ modules:
     depends_on: []
   - name: listings
     description: Listings, status, pricing and fees, freshness, events, photos
-    owns: [Listing]
+    owns: [Listing, ListingUnit]
     depends_on: []
   - name: contacts
     description: Contacts, phones and duplicate detection
-    owns: [Contact]
+    owns: [Contact, ListingOwner]
     depends_on: []
   - name: sharing
     description: Share links, the public customer page and redaction

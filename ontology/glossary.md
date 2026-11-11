@@ -13,5 +13,7 @@ defines the concept; anything else is marked as our own. Every display label and
 | `Listing`        | Một lần chào bán hay cho thuê của sàn trên một căn. RESO `Property`.                                  | «Tin» của Invest; «Quỹ hàng» là tên ứng dụng                        | Hàng         |
 | `Contact`        | Một người làm việc với sàn, mang một hay nhiều loại liên hệ. RESO `Contacts`.                         | Bản ghi riêng cho chủ nhà hay khách; «Lead» là dấu trên một liên hệ | Liên hệ      |
 | `Agreement`      | Cho phép một loại kết nối chảy theo một chiều, cho các lớp dữ liệu, trong một thời hạn. Riêng của ta. | RESO `ListingAgreement` (loại hợp đồng niêm yết); «Tích hợp»        | Thoả thuận   |
+| `ListingOwner`   | Một liên hệ là chủ của một lần chào, theo vai bên bán hay bên cho thuê, trong một sàn. Riêng của ta.  | RESO `ContactListings` (lần chào gửi cho người mua xem); `Contact`  | Chủ của hàng |
+| `ListingUnit`    | Liên kết một lần chào với căn trong danh mục dùng chung mà nó chào, trong một sàn. Riêng của ta.      | `Unit` (vật thể trong danh mục); `Listing` (lần chào)               | Căn của hàng |
 
 <!-- Add your terms above. Keep definitions to one sentence. -->
