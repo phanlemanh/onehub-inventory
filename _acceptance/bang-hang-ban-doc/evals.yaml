@@ -122,3 +122,11 @@ evals:
     paths: [src/components/candidate/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/screens/inventory-width.spec.ts]
     expected: "exit 0; tests/e2e/screens/inventory-width.spec.ts ở khổ 1440 mở /inventory: tám đầu cột nằm trọn trong khung vùng và khung vùng không cuộn ngang (scrollWidth = clientWidth); ở 360 và 414 trang không cuộn ngang và bài in số cột thấy trọn; ca đối chứng nới cột Khu thêm 40ch bằng thẻ style trên trang thật và khẳng định thông điệp 'inventory 1440: columns hidden behind horizontal scroll'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
