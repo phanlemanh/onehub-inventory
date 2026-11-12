@@ -1,5 +1,7 @@
 # Kế hoạch: cach-ly-truoc-du-lieu-that (hàng 7a)
 
+Duyệt kế hoạch: Manh Phan, 2026-11-12 (Gate 1.5).
+
 Hồ sơ: `_acceptance/cach-ly-truoc-du-lieu-that/` · Thiết kế: `design.md` · Viết theo lối khuyên của Hỏi-1 (tám loại · ghi
 hai luật). Mỗi việc chỉ xong khi phép đo mới của nó có cặp xanh trên bản lành, đỏ trên bản phá với dòng ghim.
 
