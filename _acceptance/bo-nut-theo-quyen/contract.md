@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api]
 screens: []
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-12T13:32:50Z
 design_doc: _acceptance/bo-nut-theo-quyen/design.md
@@ -106,3 +106,15 @@ chính các tiêu chí trên.
 - Trình tự: S3 chỉ bắt đầu khi hàng 2a và hàng 3 đã ở nhánh chính; khi đó gộp `origin/main` một lần rồi mới dựng.
 - Đổi `ontology/**` (dòng nháp, nhãn nút, câu «không đủ quyền») phải xin giám sát bằng yêu cầu chạm tệp; PR có mục «Đổi
   ontology — chủ kho soi».
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-13:
+  - Ngoài-1: Hai dòng sổ quyết định của vòng từng sai cú pháp; đã sửa, chữ giữ nguyên.
+  - Ngoài-2: Dòng sổ quyết định 33 từng sai cú pháp; đã sửa, chữ giữ nguyên.
+  - Ngoài-3: Bài kiểm mục Thành viên trên thanh bên dựng lại mục bằng cách đọc mã thay vì lấy mục thật, nên kém nhạy khi đổi cách khai mục.
+  - Ngoài-4: Màn nào quên khai bản ghi là của ai thì nút việc «của tôi» hiện cả trên bản ghi người khác; máy chủ vẫn từ chối.
+  - Ngoài-5: Trang mẫu bộ nút dùng tên trường chuẩn RESO cho nghĩa khác (người giữ, người tạo).
+  - Ngoài-6: Trang mẫu bộ nút giữ bản riêng danh sách bốn vai, có thể cũ khi vai đổi.
+  - Ngoài-7: Bài kiểm chỉ đo nút chính của hồ sơ biến mất khi không quyền, chưa đo nó hiện khi có quyền.
+  - Ngoài-8: Bài kiểm chưa đo việc ai cũng làm được vẫn còn trong «…» trên bản ghi người khác.
+  - Ngoài-9: Bài kiểm vai không được xem chỉ đo không có «…», chưa đo câu «không đủ quyền» hiện ra.
+  - Ngoài-10: Bài kiểm mục Thành viên dựng lại mục thanh bên từ mã nguồn thay vì mục thật.
+  - Ngoài-11: Bài kiểm câu từ chối so với câu lỗi chung viết tay, nên đổi chữ câu lỗi chung thì bài cần sửa một dòng.

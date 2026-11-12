@@ -1,20 +1,20 @@
 ---
 schema_version: 2
 feature_slug: bo-nut-theo-quyen
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: df2561e7183a5d5f787ab7c01ead0f43aba75ae9
-human_signoff:
+human_signoff: Manh Phan 2026-11-13
 ---
 
 # Evidence Report: bo-nut-theo-quyen
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
-| E1 | AC-1 | judgment | PENDING-JUDGMENT (judge đề xuất PASS, chờ người chốt) |
+| E1 | AC-1 | judgment | PASS (người chốt) |
 | E2 | AC-2 | script | PASS |
 | E3 | AC-3 | script | PASS |
 | E4 | AC-3 | script | PASS |
@@ -26,7 +26,7 @@ human_signoff:
 | E10 | AC-9 | script | PASS (carry-forward từ round 1) |
 | E11 | AC-10 | script | PASS |
 | E12 | AC-10 | ui-check | PASS |
-| E13 | AC-6 | judgment | PENDING-JUDGMENT (judge đề xuất PASS, chờ người chốt) |
+| E13 | AC-6 | judgment | PASS (người chốt) |
 | E14 | AC-10 | script | PASS (carry-forward từ round 1) |
 | E15 | AC-1 | script | PASS |
 
@@ -183,7 +183,7 @@ human_signoff:
     - domain-correctness: PASS — khớp H1, C, R1, O1, X1 và các sửa S2/S3; chỉ thiếu một ý nhỏ không lệch lựa chọn nào.
     - operational-feasibility: PASS — đủ bốn chỗ đặt, thứ tự trong «…» và cách xử nút không quyền (ẩn, không nút mờ, 403 có câu riêng).
     - spec-alignment: PASS — khớp d-17, d-18, d-5, d-6, d-7 và d-26; chỉ thiếu một điều nhỏ ngoài phạm vi câu hỏi.
-  human_override:  # chi nguoi ghi
+  human_override: "Đạt — Manh Phan 2026-11-13"
 
 - eval: E13
   judged_by: judge panel (3 lens), đề xuất PASS
@@ -192,9 +192,22 @@ human_signoff:
     - domain-correctness: PASS — câu riêng về quyền, không phải câu lỗi chung, đọc rõ ở cả hai chế độ màu.
     - operational-feasibility: PASS — câu nằm riêng trong hộp, tương phản đủ, không bị cắt hay che; ảnh không có câu lỗi chung để đối chiếu.
     - spec-alignment: PASS — chữ đỏ đặt riêng phía trên nút «Thôi», là câu riêng cho trường hợp thiếu quyền.
-  human_override:  # chi nguoi ghi
+  human_override: "Đạt — Manh Phan 2026-11-13"
 
 ## Known limits
+
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-13:
+  - Ngoài-1: Hai dòng sổ quyết định của vòng từng sai cú pháp; đã sửa, chữ giữ nguyên.
+  - Ngoài-2: Dòng sổ quyết định 33 từng sai cú pháp; đã sửa, chữ giữ nguyên.
+  - Ngoài-3: Bài kiểm mục Thành viên trên thanh bên dựng lại mục bằng cách đọc mã thay vì lấy mục thật, nên kém nhạy khi đổi cách khai mục.
+  - Ngoài-4: Màn nào quên khai bản ghi là của ai thì nút việc «của tôi» hiện cả trên bản ghi người khác; máy chủ vẫn từ chối.
+  - Ngoài-5: Trang mẫu bộ nút dùng tên trường chuẩn RESO cho nghĩa khác (người giữ, người tạo).
+  - Ngoài-6: Trang mẫu bộ nút giữ bản riêng danh sách bốn vai, có thể cũ khi vai đổi.
+  - Ngoài-7: Bài kiểm chỉ đo nút chính của hồ sơ biến mất khi không quyền, chưa đo nó hiện khi có quyền.
+  - Ngoài-8: Bài kiểm chưa đo việc ai cũng làm được vẫn còn trong «…» trên bản ghi người khác.
+  - Ngoài-9: Bài kiểm vai không được xem chỉ đo không có «…», chưa đo câu «không đủ quyền» hiện ra.
+  - Ngoài-10: Bài kiểm mục Thành viên dựng lại mục thanh bên từ mã nguồn thay vì mục thật.
+  - Ngoài-11: Bài kiểm câu từ chối so với câu lỗi chung viết tay, nên đổi chữ câu lỗi chung thì bài cần sửa một dòng.
 
 ## Ngoài hợp đồng
 
