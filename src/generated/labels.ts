@@ -44,6 +44,8 @@ export const LABELS = {
   Member: {"pref": "Thành viên"},
   Invite: {"pref": "Mời người"},
   ChangeRoles: {"pref": "Đổi vai"},
+  Action: {"pref": "Thao tác"},
+  Scope: {"pref": "Phạm vi"},
 } as const;
 
 export type ConceptCode = keyof typeof LABELS;
