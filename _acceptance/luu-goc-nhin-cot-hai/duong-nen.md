@@ -1,18 +1,17 @@
 ---
 slug: luu-goc-nhin-cot-hai
-at: 2026-11-12T14:21:13.659Z
-sha: 169581c3ab63b054db48deffebcd98901ca88598
-nen: do
+at: 2026-11-12T14:34:24.234Z
+sha: 74d90e4fab76ba63b852d26d373971a52e01bbd3
+nen: xanh
 cong_cu: xanh
-suite: do
+suite: xanh
 luoi: xanh
 engine: xanh
 ---
 
 ## Dòng đỏ
 
-- nen suite: DO SAN executors.script.check ma 2
-- nen suite: DO SAN executors.script.e2e ma 2
+- không có
 
 ## Dòng vàng
 
