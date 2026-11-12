@@ -11,7 +11,8 @@ xem của cùng một căn: cả hai đọc chung một mô hình dựng từ d�
 **Chủ kho chốt ở Cổng Phạm vi (2026-11-12): «Lấy B có ghim».** Ngăn nổi (lối B) là cách chung của cả ứng dụng để xem chi
 tiết một dòng (Bảng hàng, Liên hệ, Đã gửi, Hôm nay, Thành viên) và là chỗ của lớp trò chuyện với AI sau này. Ba điều kiện:
 ngăn không che thanh trên và thanh công cụ của bảng; ngăn không khoá bảng; có nút ghim biến ngăn thành cột khi làm lâu. Bên
-phải chỉ có một chỗ: hồ sơ và AI là hai thẻ của cùng một ngăn, không chồng lên nhau. Hàng 3 dựng ngăn nổi với hai điều kiện
+phải chỉ có một chỗ: hồ sơ và AI là hai thẻ của cùng một ngăn, không chồng lên nhau. Độ cao: chủ kho chốt «Trừ thanh trên» — ngăn chạy từ ngay dưới thanh trên của App Shell tới đáy màn hình (che phần phải
+của tên màn và thanh công cụ; nút của thanh công cụ nên đứng sát ô tìm); toàn màn thì ngăn cao hết màn. Hàng 3 dựng ngăn nổi với hai điều kiện
 đầu; nút ghim (kèm kéo đổi rộng) và lớp AI là hàng sau.
 
 ## Từ Quỹ hàng
@@ -22,7 +23,7 @@ Nguồn: `docs/tri-thuc/wiki/chu-de/ho-so-can.md`, `docs/tri-thuc/wiki/chu-de/ba
 
 | Quỹ hàng đã chọn | Hàng này giữ | Hàng này bỏ | Vì sao |
 | --- | --- | --- | --- |
-| Cạnh bảng là cột kéo chia `app-shell-11`, 38%, kéo 28–50% (lối C, chủ kho Quỹ hàng chọn 05/11, bỏ ngăn nổi `sheet-9` vì che nút) | Bảng vẫn bấm được, thanh công cụ và thanh trên không bị che, đi Trước/Sau không đóng | Cột đẩy bảng và kéo chia — thay bằng ngăn nổi `sheet-9` dưới thanh công cụ, cột thành nút ghim ở hàng sau | Chủ kho chốt «Lấy B có ghim»: một cách chung cho mọi màn và lớp AI; điều kiện «không che thanh» vá đúng lỗi Quỹ hàng gặp |
+| Cạnh bảng là cột kéo chia `app-shell-11`, 38%, kéo 28–50% (lối C, chủ kho Quỹ hàng chọn 05/11, bỏ ngăn nổi `sheet-9` vì che nút) | Bảng vẫn bấm được, thanh công cụ và thanh trên không bị che, đi Trước/Sau không đóng | Cột đẩy bảng và kéo chia — thay bằng ngăn nổi `sheet-9` từ dưới thanh trên tới đáy màn hình, cột thành nút ghim ở hàng sau | Chủ kho chốt «Lấy B có ghim»: một cách chung cho mọi màn và lớp AI; điều kiện «không che thanh» vá đúng lỗi Quỹ hàng gặp |
 | Ruột hồ sơ `solution-crm-4` | Đầu hồ sơ (mã căn, trạng thái), giá nổi bật, danh sách trường có nhãn | Chọn giai đoạn, xác suất thắng, đội, việc kế, tài chính, nút thắng thua | Hàng 3 chỉ đọc; các vùng kia là của bài toán bán hàng khác |
 | Thân điện thoại `product-detail-5`, thẻ trong danh sách `product-grid-4` | Thẻ căn theo ô của `product-grid-4`: mã căn và giá một dòng, nơi và trạng thái, ba thông số cạnh nhau | Ảnh bìa, hướng, giá kèm điều kiện phí, «Hỏi đầu chủ», nút chính dính đáy | Ảnh là G4, chủ nhà G1, Sẵn sàng bán G5 (hàng sau); nhãn «Hướng» chưa có trong bảng nhãn |
 | Hai thân từ một mô hình thuần (`mo-hinh.ts`) | Một mô hình `listingView` cho thẻ và hồ sơ | Lớp phủ quyền bốn cờ | Chưa có phần nội bộ nào trong hồ sơ hàng này |
@@ -74,7 +75,7 @@ và 1440 trên bản chạy (bảng dưới) và đặt giá lên đầu hồ s�
 | Trạng thái | Màn | Hiển thị gì | Người làm gì tiếp |
 |---|---|---|---|
 | ST-ho-so-dong | Bảng hàng | bảng đủ rộng, không ngăn hồ sơ | bấm mã căn |
-| ST-ho-so-mo | Bảng hàng | ngăn nổi hai phần năm bên phải, dưới thanh công cụ: thẻ căn + tám trường | Trước / Sau / Đóng, hoặc tiếp tục dùng bảng |
+| ST-ho-so-mo | Bảng hàng | ngăn nổi hai phần năm bên phải, từ dưới thanh trên tới đáy màn hình: thẻ căn + tám trường | Trước / Sau / Đóng, hoặc tiếp tục dùng bảng |
 | ST-ho-so-dau-cuoi | Bảng hàng | «Trước» (căn đầu) hay «Sau» (căn cuối) tắt | đi chiều kia hoặc Đóng |
 | ST-ho-so-thieu-du-lieu | Bảng hàng | ô thiếu hiện «—», không khoảng trống | không gì — đọc tiếp |
 | ST-ho-so-id-la | Bảng hàng | không mở hồ sơ | bấm mã căn khác |
@@ -84,7 +85,7 @@ và 1440 trên bản chạy (bảng dưới) và đặt giá lên đầu hồ s�
 
 ### 4. Hành vi
 
-- Từ 768 px: ngăn nổi trên phần phải các dòng, dưới thanh công cụ, không giữ tiêu điểm (bảng vẫn trong thứ tự Tab); mở từ trạng thái đóng thì tiêu điểm vào tên hồ
+- Từ 768 px: ngăn nổi bên phải từ dưới thanh trên tới đáy màn hình, không giữ tiêu điểm (bảng vẫn trong thứ tự Tab); mở từ trạng thái đóng thì tiêu điểm vào tên hồ
   sơ; đi «Trước»/«Sau» giữ tiêu điểm tại nút. Dưới 768 px: toàn màn, giữ tiêu điểm trong hồ sơ tới khi đóng.
 - Esc trong hồ sơ đóng hồ sơ; Esc trong lưới là của hàng 2a.
 - Giá trị mỗi trường hiện bằng đúng cách hiện của ô bảng (tiền «x,xx tỷ», m², huy hiệu trạng thái).
@@ -93,8 +94,8 @@ và 1440 trên bản chạy (bảng dưới) và đặt giá lên đầu hồ s�
 
 | Component | Nấc (dùng / ghép / mở rộng / tạo) | Vì sao (1 dòng) |
 |---|---|---|
-| RecordPanel (khung hồ sơ dùng chung, hàng 1e) | mở rộng | từ 768 px nổi trên phần phải các dòng, dưới thanh công cụ, không khoá bảng; giữ toàn màn trên điện thoại; đổi ở mọi nơi dùng |
-| DataRegion | mở rộng (chỉ chỗ đặt ngăn) | đặt ngăn hồ sơ trong vùng các dòng, dưới thanh công cụ |
+| RecordPanel (khung hồ sơ dùng chung, hàng 1e) | mở rộng | từ 768 px nổi bên phải từ dưới thanh trên tới đáy màn hình, không khoá bảng; giữ toàn màn trên điện thoại; đổi ở mọi nơi dùng |
+| DataRegion | mở rộng (chỉ chỗ đặt ngăn) | gắn ngăn hồ sơ; ngăn tự đo chỗ đứng theo thanh trên và vùng làm việc |
 | Frame, FramePanel, Button, Badge | dùng | thành phần nhà cung cấp |
 | ListingCard (thẻ căn) | ghép | xếp theo ô `product-grid-4`, từ TypedCell và chữ |
 | ListingRecordBody (ruột hồ sơ) | ghép | thẻ căn + danh sách trường theo `solution-crm-4` |
@@ -140,5 +141,5 @@ Never: trang toàn màn riêng `/units/<mã>` ở MVP — một căn một hồ 
 quen «thấy hết» và giành việc của nút Cột (2a).
 
 Ngăn nổi trước khi vá (cách khung dùng chung đang dựng, `evidence/ban-bam/loi-b-1024-sang.png`) phủ từ mép trên màn hình,
-che số dòng cạnh ô tìm và nút Đăng nhập ở thanh trên. Bản hàng 3 đặt ngăn trong vùng các dòng, dưới thanh công cụ: thanh trên,
-tên vùng, ô tìm, số dòng và phần trái tiêu đề cột luôn thấy.
+che số dòng cạnh ô tìm và nút Đăng nhập ở thanh trên. Bản hàng 3 đặt ngăn từ ngay dưới thanh trên tới đáy màn hình: thanh trên
+và ô tìm luôn thấy; ở 1024 ngăn che số dòng cạnh ô tìm.

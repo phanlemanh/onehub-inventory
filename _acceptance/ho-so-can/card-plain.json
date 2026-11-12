@@ -1,5 +1,5 @@
 {
-  "feature_plain": "Đầu chủ bấm mã một căn ở Bảng hàng thì hồ sơ căn mở thành ngăn nổi bên phải, không che thanh công cụ, đi lần lượt các căn được; trên điện thoại hồ sơ mở toàn màn, đầu màn là thẻ căn.",
+  "feature_plain": "Đầu chủ bấm mã một căn ở Bảng hàng thì hồ sơ căn mở thành ngăn nổi bên phải, cao từ dưới thanh trên tới đáy màn hình, đi lần lượt các căn được; trên điện thoại hồ sơ mở toàn màn, đầu màn là thẻ căn.",
   "will_do": [
     {
       "id": "AC-1",
@@ -37,7 +37,7 @@
   "wont_do": [
     {
       "id": "AC-2",
-      "p": "Sẽ KHÔNG che thanh trên, tên vùng, ô tìm và số dòng: trên máy tính hồ sơ là ngăn nổi trên phần phải các dòng, bảng bên trái vẫn dùng được, bấm căn khác thì hồ sơ đổi mà không đóng."
+      "p": "Sẽ KHÔNG che thanh trên và ô tìm: trên máy tính hồ sơ là ngăn nổi bên phải từ dưới thanh trên tới đáy màn hình, bảng bên trái ngăn vẫn dùng được, bấm căn khác thì hồ sơ đổi mà không đóng."
     },
     {
       "id": "AC-9",

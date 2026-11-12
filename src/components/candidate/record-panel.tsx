@@ -1,7 +1,14 @@
 "use client";
 
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
 import { Frame, FramePanel } from "@/components/reui/frame";
 import { Button } from "@/components/ui/button";
@@ -191,8 +198,49 @@ export function RecordPanel({
   );
 }
 
+/** The App Shell's top bar and work area, by their slots; a page without the App Shell uses the whole window. */
+const TOP_BAR = '[data-slot="app-shell-top-bar"]';
+const WORK_AREA = '[data-slot="sidebar-inset"]';
+
 /**
- * The panel floating over the right of the rows. It does not hold focus: the grid beside it stays in the tab order. Opening it
+ * Where the floating panel stands: from just under the App Shell's top bar to the bottom of the work area, flush with
+ * its right edge (owner's choice at row 3's scope gate, «Trừ thanh trên»). Measured, not fixed in a class, because the
+ * top bar hides in full screen (row 2a) and the panel then runs the whole height.
+ */
+function useWorkAreaBounds(open: boolean) {
+  const [bounds, setBounds] = useState<{ top: number; right: number; bottom: number }>({
+    top: 0,
+    right: 0,
+    bottom: 0,
+  });
+  useEffect(() => {
+    if (!open) return;
+    const measure = () => {
+      const bar = document.querySelector<HTMLElement>(TOP_BAR);
+      const area = document.querySelector<HTMLElement>(WORK_AREA)?.getBoundingClientRect();
+      const barRect = bar && bar.offsetParent !== null ? bar.getBoundingClientRect() : null;
+      setBounds({
+        top: Math.max(0, barRect ? barRect.bottom : (area?.top ?? 0)),
+        right: area ? Math.max(0, window.innerWidth - area.right) : 0,
+        bottom: area ? Math.max(0, window.innerHeight - area.bottom) : 0,
+      });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(document.documentElement);
+    window.addEventListener("resize", measure);
+    document.addEventListener("fullscreenchange", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+      document.removeEventListener("fullscreenchange", measure);
+    };
+  }, [open]);
+  return bounds;
+}
+
+/**
+ * The panel floating over the right of the work area. It does not hold focus: the grid beside it stays in the tab order. Opening it
  * from a closed state moves focus to its title so a keyboard user lands in it; walking to another row leaves focus
  * where it is.
  */
@@ -212,6 +260,7 @@ function RecordColumn({
   focusRow: () => void;
 }) {
   const titleRef = useRef<HTMLHeadingElement>(null);
+  const bounds = useWorkAreaBounds(openId !== null);
   const wasOpen = useRef(false);
   useEffect(() => {
     const open = openId !== null;
@@ -227,7 +276,14 @@ function RecordColumn({
       role="dialog"
       aria-modal="false"
       aria-labelledby={titleId}
-      className="absolute inset-y-0 right-0 z-50 flex w-2/5 min-w-80 max-w-lg flex-col border-l bg-background p-2"
+      style={
+        {
+          "--record-top": `${bounds.top}px`,
+          "--record-right": `${bounds.right}px`,
+          "--record-bottom": `${bounds.bottom}px`,
+        } as CSSProperties
+      }
+      className="fixed top-(--record-top) right-(--record-right) bottom-(--record-bottom) z-50 flex w-2/5 min-w-80 max-w-lg flex-col border-l bg-background p-2"
       onKeyDown={(event) => {
         if (event.key !== "Escape") return;
         event.stopPropagation();

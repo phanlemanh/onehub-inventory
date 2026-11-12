@@ -45,7 +45,6 @@ Dựng ở cổng của dãy D (3483).
   cùng cách định dạng của ô nhưng canh trái.
 - Đã vá: lối B (ngăn nổi) trên dữ liệu thật che ô tìm, số dòng và nút ở thanh trên ở 1024 → khuyến nghị lối A, chụp lối B
   để chủ kho so.
-- Chủ kho chốt «Lấy B có ghim»: ngăn nổi đặt trong vùng các dòng, dưới thanh công cụ; đã vá lớp của ngăn để tiêu đề cột đang
-  đứng yên không đè lên đầu ngăn; ngày ở «Xác nhận lúc» không còn tràn ở 1024 (ba thông số xuống dòng khi ngăn hẹp).
+- Chủ kho chốt «Lấy B có ghim»: rồi «Trừ thanh trên»: ngăn chạy từ ngay dưới thanh trên tới đáy màn hình; ngày ở «Xác nhận lúc» không còn tràn ở 1024 (ba thông số xuống dòng khi ngăn hẹp).
 - Để lại: khi hồ sơ mở, bên trái ngăn còn 5 cột ở 1440 và 3 cột ở 1024, cột Giá chào khuất sau ngăn; giá luôn ở đầu hồ sơ.
   Nút ghim (ngăn thành cột) là hàng sau.

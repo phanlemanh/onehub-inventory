@@ -70,7 +70,7 @@ hàng; bảy trạng thái vùng vẫn do bộ bài sinh từ sổ màn đo trê
 | sheet-9 | ngăn nổi bên phải, cao hết vùng | lấy | xem chi tiết một dòng mà không rời bảng; cách chung cả ứng dụng |
 | sheet-9 | thanh tên và nút Đóng | lấy | tên căn và Đóng; thêm Trước, Sau |
 | sheet-9 | lớp mờ phủ và khoá trang | bỏ | ngăn không khoá bảng: bảng bên trái vẫn bấm được |
-| sheet-9 | phủ từ mép trên màn hình | bỏ | ngăn nằm dưới thanh công cụ, không che thanh trên và ô tìm |
+| sheet-9 | phủ từ mép trên màn hình | bỏ | ngăn bắt đầu ngay dưới thanh trên của App Shell (chủ kho chốt «Trừ thanh trên»), thanh trên luôn thấy |
 | sheet-9 | sửa từng dòng tại chỗ | bỏ | hồ sơ hàng 3 chỉ đọc |
 | sheet-9 | nút Lưu thay đổi ở chân | bỏ | không có gì để lưu |
 | sheet-9 | mục mẹo nhanh | bỏ | không có việc tương ứng |
