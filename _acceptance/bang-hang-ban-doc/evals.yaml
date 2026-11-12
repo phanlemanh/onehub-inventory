@@ -77,10 +77,19 @@ evals:
     criterion: AC-10
     executor: ui-check
     layer: ui-observed
-    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**"]
-    target: "/inventory"
-    expected: "ảnh Bảng hàng trạng thái có dữ liệu, lưu đúng tên _acceptance/bang-hang-ban-doc/evidence/inventory-<khổ>-<sang|toi>.png cho khổ 360, 414, 1024, 1440 (tám ảnh): đầu màn 'Bảng hàng', đầu cột đọc được, ở 360/414 lưới dày với thanh cuộn ngang trong vùng còn trang không cuộn ngang, tên khu dài bị cắt có dấu chấm lửng, không chữ chồng chữ, nền và chữ đổi theo tối"
-    evidence_required: [screenshot, observed, verified_at]
+    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", src/components/candidate/**]
+    steps:
+      - "Use the dev server at the URL given (lane K, port 3481); do not start one on port 3470"
+      - "Navigate {url}/inventory at 1440x900, light → screenshot evidence/inventory-1440-sang.png"
+      - "Same page at 1440x900, dark (emulate prefers-color-scheme dark) → screenshot evidence/inventory-1440-toi.png"
+      - "Navigate {url}/inventory at 1024x768, light → screenshot evidence/inventory-1024-sang.png"
+      - "Same at 1024x768, dark → screenshot evidence/inventory-1024-toi.png"
+      - "Navigate {url}/inventory at 414x896, light → screenshot evidence/inventory-414-sang.png"
+      - "Same at 414x896, dark → screenshot evidence/inventory-414-toi.png"
+      - "Navigate {url}/inventory at 360x800, light → screenshot evidence/inventory-360-sang.png"
+      - "Same at 360x800, dark → screenshot evidence/inventory-360-toi.png"
+    expected: "tám ảnh Bảng hàng trạng thái có dữ liệu trong App Shell: đầu màn 'Bảng hàng', khung vùng có tên 'Hàng', ô tìm có kính lúp và số dòng, cột số dòng rồi tám cột đọc được (Căn, Toà, Dự án, Trạng thái, Giá chào, Diện tích, Phòng ngủ, Xác nhận lúc), kẻ dọc giữa cột, chân bảng '60 dòng'; ở 1440 đủ tám cột không thanh cuộn ngang; ở 360/414 lưới cuộn ngang trong vùng còn trang không cuộn ngang; không chữ chồng chữ; nền và chữ đổi theo tối và vẫn đọc được"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
 
   - id: E11
     criterion: AC-10
