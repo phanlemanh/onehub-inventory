@@ -63,6 +63,16 @@ const CELLS: Record<string, Partial<Record<Role, Scope>>> = {
   },
   manageCompanyCodes: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
 };
+// Row 9e (bo-nut-theo-quyen): the seven draft rows the owner chose at the scope gate, written before the table.
+const DRAFT_CELLS_9E: Record<string, Partial<Record<Role, Scope>>> = {
+  removeListing: { ListAgent: "own", TeamLead: "company" },
+  viewContacts: { ListAgent: "company", BuyerAgent: "company", TeamLead: "company" },
+  createContact: { ListAgent: "company", BuyerAgent: "company", TeamLead: "company" },
+  updateContact: { ListAgent: "own", BuyerAgent: "own", TeamLead: "company" },
+  removeContact: { ListAgent: "own", BuyerAgent: "own", TeamLead: "company" },
+  mergeContacts: { TeamLead: "company" },
+  eraseContactPersonalData: { TeamLead: "company" },
+};
 // Written before the code: API doors of live rows, and the exempt API doors.
 const API_DOORS = ["GET /api/v1/members", "POST /api/v1/members", "PUT /api/v1/members/[id]/roles"];
 const EXEMPT_API = [
@@ -123,6 +133,22 @@ describe("cong-quyen-15-to-hop", () => {
     expect(addUp(narrowest).failures).toContain(
       "cong-quyen-15-to-hop: ListAgent+CompanyAdmin × listMembers",
     );
+  });
+});
+
+describe("dong-nhap-9e", () => {
+  it("the seven draft rows of row 9e are the hand-written cells, planned, without doors", () => {
+    for (const [name, cells] of Object.entries(DRAFT_CELLS_9E)) {
+      const spec = ACTIONS.find((a) => a.name === name);
+      expect(spec?.status, name).toBe("planned");
+      expect(spec?.scope, name).toEqual(cells);
+      expect([...(spec?.doors.api ?? []), ...(spec?.doors.db ?? [])], name).toEqual([]);
+    }
+  });
+
+  it("the company admin has no cell in any of them", () => {
+    for (const name of Object.keys(DRAFT_CELLS_9E))
+      expect(allowedScope(["CompanyAdmin"], name as ActionName), name).toBeNull();
   });
 });
 

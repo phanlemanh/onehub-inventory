@@ -80,17 +80,21 @@ type RowAction = { key: DraftAction; text: string; danger: boolean; what: string
 
 function rowActions(choice: Choice, row: SampleRow): RowAction[] {
   const listings = choice.screen === "listings";
-  const noun = listings ? label("Unit") : label("Contact");
   const all: RowAction[] = listings
     ? [
-        { key: "updateListing", text: C.edit, danger: false, what: "" },
-        { key: "removeListing", text: C.remove(noun), danger: true, what: C.removeWhat },
+        { key: "updateListing", text: label("Edit"), danger: false, what: "" },
+        { key: "removeListing", text: label("RemoveListing"), danger: true, what: C.removeWhat },
       ]
     : [
-        { key: "updateContact", text: C.edit, danger: false, what: "" },
-        { key: "mergeContacts", text: C.merge(noun), danger: false, what: "" },
-        { key: "removeContact", text: C.remove(noun), danger: true, what: C.removeWhat },
-        { key: "eraseContactPersonalData", text: C.erase, danger: true, what: C.eraseWhat },
+        { key: "updateContact", text: label("Edit"), danger: false, what: "" },
+        { key: "mergeContacts", text: label("MergeContacts"), danger: false, what: "" },
+        { key: "removeContact", text: label("RemoveContact"), danger: true, what: C.removeWhat },
+        {
+          key: "eraseContactPersonalData",
+          text: label("EraseContactPersonalData"),
+          danger: true,
+          what: C.eraseWhat,
+        },
       ];
   return all.filter((a) => shows(choice.role, a.key, row.mine));
 }
@@ -236,10 +240,11 @@ export function ButtonShowcase({ initial, bare = false }: { initial: Choice; bar
     if (row && action) setTimeout(() => pick(row, action), 0);
   });
 
+  const addText = listings ? label("CreateListing") : label("CreateContact");
   const addButton = canAdd ? (
-    <Button onClick={() => (refused() ? null : notifyResult({ message: C.done(C.add(noun)) }))}>
+    <Button onClick={() => (refused() ? null : notifyResult({ message: C.done(addText) }))}>
       <PlusIcon aria-hidden data-icon="inline-start" />
-      {C.add(noun)}
+      {addText}
     </Button>
   ) : undefined;
 
