@@ -1,38 +1,7 @@
 {
   "feature_plain": "Trước khi nối dữ liệu thật, bộ kiểm cách ly bắt thêm các đường vòng làm một sàn đọc, sửa hay xoá được dữ liệu của sàn khác — mỗi đường vòng có một ca kiểm tự đỏ khi bị phá.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ chứng sàn vẫn thêm và sửa được thoả thuận của chính mình (để một lỗi chặn mọi lần ghi không lọt qua)."},
-    {"id": "AC-2", "p": "Sẽ chặn vai của ứng dụng có quyền xoá sạch bảng, gắn trigger hay khoá ngoại — kể cả quyền nhận gián tiếp."},
-    {"id": "AC-3", "p": "Sẽ đòi mọi bảng ứng dụng chạm được, ở bất kỳ nhóm bảng nào, đều bật luật lọc theo sàn."},
-    {"id": "AC-4", "p": "Sẽ đòi mọi dạng xem ứng dụng đọc được đều lọc theo sàn của người đọc; cấm dạng xem chụp sẵn."},
-    {"id": "AC-5", "p": "Sẽ giữ đúng mười hàm đặc quyền đăng nhập và thành viên chủ kho đã duyệt; hàm thứ mười một làm bộ kiểm đỏ."},
-    {"id": "AC-7", "p": "Sẽ bắt mọi chỗ lệch giữa loại thoả thuận bảng nhận và loại mô hình nghiệp vụ khai."},
-    {"id": "AC-8", "p": "Sẽ bắt mọi luật bảng thoả thuận đang áp mà mô hình nghiệp vụ chưa ghi tên."}
+  "decisions": [
+    {"id": "E11", "q": "Hồ sơ đã nói thẳng những gì máy chưa bắt được chưa?", "why": "Hội đồng ba người chấm đề xuất ĐẠT: bốn chỗ máy không đo chắc (câu đổi vai ghép lúc chạy, ứng dụng nối bằng vai chủ, luật viết lại câu, bộ kiểm chưa chạy trên máy kiểm chung) đều được ghi, và không câu nào nói chuyện đổi vai đã đóng hẳn."}
   ],
-  "wont_do": [
-    {"id": "AC-6", "p": "Chặn mã nghiệp vụ tự đổi vai hay đổi sàn ngay trong cửa truy vấn — chỉ bắt câu viết thẳng trong mã."},
-    {"id": "AC-9", "p": "Chặn bộ kiểm báo xanh khi một ca phá thử bị xoá, hết đỏ hay hỏng cú pháp."},
-    {"id": "OOS-1", "p": "KHÔNG đổi vai đăng nhập của ứng dụng (cách đóng tận gốc chuyện đổi vai) — đã đề xuất thành hàng riêng trước hàng nối dữ liệu thật."},
-    {"id": "OOS-2", "p": "KHÔNG đưa bộ kiểm cách ly lên máy chạy kiểm chung — chủ kho đã ghi giới hạn này ở hàng 7."},
-    {"id": "OOS-3", "p": "KHÔNG quét luật viết lại câu và trigger sự kiện của cơ sở dữ liệu."},
-    {"id": "OOS-4", "p": "KHÔNG làm luật riêng của loại thoả thuận «xử lý bằng AI» — việc của hàng nhập bằng AI."}
-  ],
-  "coverage_plain": [
-    {"i": 0, "p": "Phạm vi là đúng tám mục chủ kho chọn ở hàng 7, nên máy không quét thêm không gian lựa chọn."},
-    {"i": 1, "p": "Bảng dưới nối từng mục với tiêu chí đo nó."},
-    {"i": 3, "p": "Ngoài-1 (bảng thoả thuận lệch mô hình) → AC-7, AC-8."},
-    {"i": 4, "p": "Ngoài-4 (dạng xem, hàm đặc quyền, quyền xoá sạch) → AC-2, AC-4, AC-5."},
-    {"i": 5, "p": "Ngoài-5 (mã trong cửa đổi vai, đổi sàn) → AC-6 — đóng một phần: chỉ câu viết thẳng; gốc là vai đăng nhập, đề xuất hàng riêng."},
-    {"i": 6, "p": "Ngoài-6 (quyền xoá sạch và quyền bảng khác) → AC-2."},
-    {"i": 7, "p": "Ngoài-14 (dạng xem, hàm đặc quyền, nhóm bảng khác) → AC-3, AC-4, AC-5."},
-    {"i": 8, "p": "Ngoài-19 (dạng xem, dạng xem chụp sẵn, hàm đặc quyền, nhóm bảng khác) → AC-3, AC-4, AC-5."},
-    {"i": 9, "p": "Ngoài-20 (quyền xoá sạch, gắn trigger, khoá ngoại của vai ứng dụng) → AC-2."},
-    {"i": 10, "p": "Ngoài-30 (sàn ghi được dòng của mình) → AC-1."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Máy từng tự quyết hoãn cách đóng tận gốc chuyện đổi vai, dựa trên câu chỉ liên quan. Đã sửa: bảng phủ ghi «đóng một phần», và việc đổi vai đăng nhập gửi giám sát thành hàng riêng để chủ kho quyết."},
-    {"i": 1, "p": "Danh sách mười hàm đặc quyền chưa trỏ chữ chủ kho đã duyệt. Đã sửa: trỏ hai lần duyệt ở hàng 8 và 9, mỗi hàm ghi kèm lần duyệt của nó, không nới thêm."},
-    {"i": 2, "p": "Chưa có phép đo chứng bộ kiểm nêu tên tệp phá thử bị xoá, hết đỏ hay hỏng. Đã thêm một lượt chạy cố ý làm hỏng ba tệp và đòi đúng ba dòng báo."},
-    {"i": 3, "p": "Ca dạng xem không có đối chứng nên có thể xanh suông. Đã thêm một dạng xem hợp lệ tạm thời phải không bị nêu, và ca in số dạng xem đã quét."}
-  ]
+  "scope_plain": "Bốn việc đã cắt khỏi hàng này từ Cổng Phạm vi, không đổi."
 }
