@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # Company isolation suite (SP-1, hồ sơ cach-ly-moi-san). Runs on this lane's Postgres container, never on real data:
 #   1. a fresh scratch database, migrations applied twice (the second run applies nothing);
-#   2. db/tests/cach-ly.sql — 14 cases under the API role, using the door's own statements;
-#   3. four break cases (nine break files), each file on its own scratch database: the suite must go red with the
+#   2. db/tests/cach-ly.sql — 19 cases under the API role, using the door's own statements;
+#   3. nine break cases (eighteen break files), each file on its own scratch database: the suite must go red with the
 #      pinned messages.
-# Every case prints `ok <case>` exactly once; the last line is `cach-ly: 19 ca đạt, vai quy_hang_app`.
+# Every case prints `ok <case>` exactly once; the last line is `cach-ly: 29 ca đạt, vai quy_hang_app`.
 # Missing, repeated or failing cases are named and the exit code is not 0.
 #
 #   DB_LANE=n bash db/scripts/cach-ly.sh       (see db/scripts/psql.sh for DB_LANE and PSQL)
+#   TESTS_DIR — another copy of db/tests (tests of this runner only, tests/db/cach-ly.db.test.ts).
 #
 # It only creates and drops databases named cach_ly_*.
 set -uo pipefail
@@ -15,7 +16,7 @@ set -uo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=db/scripts/psql.sh
 source "$here/psql.sh"
-tests="$here/../tests"
+tests="${TESTS_DIR:-$here/../tests}"
 migrations="${MIGRATIONS_DIR:-$here/../migrations}"
 
 CA_SQL=(
@@ -33,6 +34,11 @@ CA_SQL=(
   moi-bang-cong-ty-ep-luat-theo-dong
   luat-doc-ghi-theo-san
   vai-api-khong-so-huu-khong-vuot
+  a-ghi-duoc-dong-cua-minh
+  vai-api-khong-quyen-nguy-hiem
+  vai-api-chi-cham-bang-co-luat
+  dang-xem-khong-vuot-luat
+  ham-dac-quyen-trong-danh-sach
 )
 CA_LENH=(
   ap-hai-lan
@@ -40,6 +46,11 @@ CA_LENH=(
   pha-thu-luat-them-khong-kiem
   pha-thu-luat-doc-mo
   pha-thu-bang-moi-luat-mo
+  pha-thu-ghi-bi-chan
+  pha-thu-quyen-nguy-hiem
+  pha-thu-bang-khong-luat
+  pha-thu-dang-xem-vuot
+  pha-thu-ham-dac-quyen
 )
 # Break case → its break files (db/tests/pha-thu/<file>.sql), each on its own scratch database.
 pha_thu_tep() {
@@ -49,6 +60,11 @@ pha_thu_tep() {
       printf '%s\n' luat-them-khong-kiem luat-them-khong-kiem-doi-tac luat-ghi-for-all-doi-tac luat-xoa-doi-tac ;;
     luat-doc-mo) printf '%s\n' luat-doc-mo luat-doc-mo-hoac-true luat-doc-mo-khac-san ;;
     bang-moi-luat-mo) printf '%s\n' bang-moi-luat-mo ;;
+    ghi-bi-chan) printf '%s\n' ghi-bi-chan ;;
+    quyen-nguy-hiem) printf '%s\n' cap-xoa-sach cap-trigger-public ;;
+    bang-khong-luat) printf '%s\n' bang-schema-khac bang-public-khong-cot-san ;;
+    dang-xem-vuot) printf '%s\n' dang-xem-thuong dang-xem-vat-chat ;;
+    ham-dac-quyen) printf '%s\n' ham-dac-quyen-public ham-trigger-dac-quyen ;;
   esac
 }
 # Break file → the lines its red run must contain.
@@ -63,6 +79,15 @@ pha_thu_ghim() {
       printf '%s\n' "HỎNG chua-dat-san-khong-thay-gi: agreements" "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     luat-doc-mo-khac-san) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     bang-moi-luat-mo) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: bang_mau_cach_ly" ;;
+    ghi-bi-chan) printf '%s\n' "HỎNG a-ghi-duoc-dong-cua-minh" ;;
+    cap-xoa-sach) printf '%s\n' "HỎNG vai-api-khong-quyen-nguy-hiem: public.agreements TRUNCATE" ;;
+    cap-trigger-public) printf '%s\n' "HỎNG vai-api-khong-quyen-nguy-hiem: public.companies TRIGGER" ;;
+    bang-schema-khac) printf '%s\n' "HỎNG vai-api-chi-cham-bang-co-luat: kho_ngoai.listings_mau" ;;
+    bang-public-khong-cot-san) printf '%s\n' "HỎNG vai-api-chi-cham-bang-co-luat: public.bang_tra_cuu_mau" ;;
+    dang-xem-thuong) printf '%s\n' "HỎNG dang-xem-khong-vuot-luat: public.agreements_tat_ca" ;;
+    dang-xem-vat-chat) printf '%s\n' "HỎNG dang-xem-khong-vuot-luat: public.agreements_dem" ;;
+    ham-dac-quyen-public) printf '%s\n' "HỎNG ham-dac-quyen-trong-danh-sach: public.dem_moi_thoa_thuan" ;;
+    ham-trigger-dac-quyen) printf '%s\n' "HỎNG ham-dac-quyen-trong-danh-sach: public.ghi_vet_thoa_thuan" ;;
   esac
 }
 
@@ -144,7 +169,8 @@ while IFS= read -r dong; do
 done <<<"$lanh"
 
 # 3. Break tests: every break file of a case must turn the suite red with its pinned lines.
-for pha in bo-ep-luat luat-them-khong-kiem luat-doc-mo bang-moi-luat-mo; do
+for pha in bo-ep-luat luat-them-khong-kiem luat-doc-mo bang-moi-luat-mo \
+  ghi-bi-chan quyen-nguy-hiem bang-khong-luat dang-xem-vuot ham-dac-quyen; do
   loi_ca=""
   while IFS= read -r tep; do
     db="cach_ly_pha_${tep//-/_}"

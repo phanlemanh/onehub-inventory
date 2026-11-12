@@ -48,7 +48,13 @@ const session = (company: string | null) => () => [
 ];
 
 function world(script: Record<string, Answer>, company: string | null = A) {
-  const pool = fakePool({ "select * from app.session_read": session(company), ...script });
+  // The session's person is a company admin unless a test scripts other roles (row 9a: the handlers ask the
+  // permission table first; the database refusal below stays the second lock).
+  const pool = fakePool({
+    "select * from app.session_read": session(company),
+    "select app.member_roles": () => [{ roles: ["CompanyAdmin"] }],
+    ...script,
+  });
   const invite = captureInviteSender();
   const deps: MembersDeps = { pool, invite: invite.sender };
   return { pool, invite, h: createMembersHandlers(() => deps) };
@@ -118,6 +124,22 @@ describe("members over HTTP", () => {
     const res = await h.list(req("GET"));
     expect(res.status).toBe(403);
     expect(await res.text()).toBe('{"error":"forbidden"}');
+  });
+
+  it("refuses a role without a cell before touching any data, with the same body for every action", async () => {
+    for (const roles of [["ListAgent"], ["BuyerAgent"], ["TeamLead"], []]) {
+      const { h, pool } = world({ "select app.member_roles": () => [{ roles }] });
+      const answers = [
+        await h.list(req("GET")),
+        await h.invite(req("POST", { email: "x@example.test", name: "x", roles: ["ListAgent"] })),
+        await h.setRoles(req("PUT", { roles: ["ListAgent"] }, `/${R}/roles`), R),
+      ];
+      for (const res of answers) {
+        expect(res.status, `${roles.join("+") || "không vai"}`).toBe(403);
+        expect(await res.text()).toBe('{"error":"forbidden"}');
+      }
+      expect(pool.seen.filter((t) => /member_(list|invite|set_roles)/.test(t))).toEqual([]);
+    }
   });
 
   it("is unauthenticated without a session, or before a company is chosen", async () => {

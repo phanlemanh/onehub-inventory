@@ -137,8 +137,68 @@ export interface ActionContext {
   actor: string;
 }
 
+export interface ReadOwnRolesInput {
+}
+
+export interface ReadCompanyInput {
+}
+
+export interface ListMembersInput {
+}
+
+export interface InviteMemberInput {
+}
+
+export interface ChangeMemberRolesInput {
+}
+
+export interface ReadAgreementsInput {
+}
+
+export interface ManageAgreementsInput {
+}
+
+export interface ViewListingsInput {
+}
+
+export interface CreateListingInput {
+}
+
+export interface UpdateListingInput {
+}
+
+export interface ActivateListingInput {
+}
+
+export interface ViewOwnerPhoneInput {
+}
+
 /** Implement these in src/actions/ — one function per ontology action. */
 export interface ActionHandlers {
+  /** Read the roles one holds in the company of the session. */
+  readOwnRoles(input: ReadOwnRolesInput, ctx: ActionContext): Promise<void>;
+  /** Read the name of the company of the session. */
+  readCompany(input: ReadCompanyInput, ctx: ActionContext): Promise<void>;
+  /** See the people of the company, with their roles. */
+  listMembers(input: ListMembersInput, ctx: ActionContext): Promise<void>;
+  /** Invite a person into the company with a set of roles. */
+  inviteMember(input: InviteMemberInput, ctx: ActionContext): Promise<void>;
+  /** Change the roles of a person of the company. */
+  changeMemberRoles(input: ChangeMemberRolesInput, ctx: ActionContext): Promise<void>;
+  /** See the connection agreements of the company. */
+  readAgreements(input: ReadAgreementsInput, ctx: ActionContext): Promise<void>;
+  /** Add a connection agreement or change one. */
+  manageAgreements(input: ManageAgreementsInput, ctx: ActionContext): Promise<void>;
+  /** See the listings of the company. */
+  viewListings(input: ViewListingsInput, ctx: ActionContext): Promise<void>;
+  /** Add a listing. */
+  createListing(input: CreateListingInput, ctx: ActionContext): Promise<void>;
+  /** Change a listing's price, fees or details. */
+  updateListing(input: UpdateListingInput, ctx: ActionContext): Promise<void>;
+  /** Put a listing on sale (own scope is the unit one keeps, or a unit nobody keeps yet). */
+  activateListing(input: ActivateListingInput, ctx: ActionContext): Promise<void>;
+  /** See the phone number of a listing's owner (own scope is the unit one keeps). */
+  viewOwnerPhone(input: ViewOwnerPhoneInput, ctx: ActionContext): Promise<void>;
 }
 
 export interface ActionSpec {
@@ -151,9 +211,395 @@ export interface ActionSpec {
   idempotent: boolean;
   output: string | null;
   inputSchema: Record<string, unknown>;
+  /** Permission table (decision 0016): each role's scope; a role without a cell may not run it. */
+  scope: Readonly<Partial<Record<Role, "company" | "own">>>;
+  status: "live" | "planned" | null;
+  states: readonly string[];
+  doors: { api: readonly string[]; db: readonly string[] };
 }
 
-export const ACTIONS: readonly ActionSpec[] = [];
+/** A door no role decides (ontology/actions.yaml `exempt`). */
+export interface ExemptDoor {
+  door: string;
+  reason: string;
+  reads: readonly string[];
+}
+
+export const ACTIONS: readonly ActionSpec[] = [
+  {
+    name: "readOwnRoles",
+    description: "Read the roles one holds in the company of the session.",
+    entity: "Member",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "own",
+      CompanyAdmin: "own",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: [],
+      db: ["function app.member_roles()", "table company_members select"],
+    },
+  },
+  {
+    name: "readCompany",
+    description: "Read the name of the company of the session.",
+    entity: "Company",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: [],
+      db: ["table companies select"],
+    },
+  },
+  {
+    name: "listMembers",
+    description: "See the people of the company, with their roles.",
+    entity: "Member",
+    kind: "query",
+    roles: ["CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["GET /api/v1/members"],
+      db: ["function app.member_list()", "table company_members select"],
+    },
+  },
+  {
+    name: "inviteMember",
+    description: "Invite a person into the company with a set of roles.",
+    entity: "Member",
+    kind: "create",
+    roles: ["CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["POST /api/v1/members"],
+      db: ["function app.member_invite(text, text, text[])"],
+    },
+  },
+  {
+    name: "changeMemberRoles",
+    description: "Change the roles of a person of the company.",
+    entity: "Member",
+    kind: "update",
+    roles: ["CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["PUT /api/v1/members/[id]/roles"],
+      db: ["function app.member_set_roles(uuid, text[])"],
+    },
+  },
+  {
+    name: "readAgreements",
+    description: "See the connection agreements of the company.",
+    entity: "Agreement",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: [],
+      db: ["table agreements select"],
+    },
+  },
+  {
+    name: "manageAgreements",
+    description: "Add a connection agreement or change one.",
+    entity: "Agreement",
+    kind: "command",
+    roles: ["CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: [],
+      db: ["table agreements insert", "table agreements update"],
+    },
+  },
+  {
+    name: "viewListings",
+    description: "See the listings of the company.",
+    entity: "Listing",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "createListing",
+    description: "Add a listing.",
+    entity: "Listing",
+    kind: "create",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "updateListing",
+    description: "Change a listing's price, fees or details.",
+    entity: "Listing",
+    kind: "update",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "activateListing",
+    description: "Put a listing on sale (own scope is the unit one keeps, or a unit nobody keeps yet).",
+    entity: "Listing",
+    kind: "command",
+    roles: ["ListAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: ["Incomplete", "Hold"],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "viewOwnerPhone",
+    description: "See the phone number of a listing's owner (own scope is the unit one keeps).",
+    entity: "ListingOwner",
+    kind: "query",
+    roles: ["ListAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+];
+
+export const PERMISSION_EXEMPT: readonly ExemptDoor[] = [
+  {
+    door: "POST /api/v1/auth/code",
+    reason: "Asks for a sign-in code before the person has a session or a company.",
+    reads: [],
+  },
+  {
+    door: "POST /api/v1/auth/session",
+    reason: "Signs in with the code; there is no company yet.",
+    reads: [],
+  },
+  {
+    door: "GET /api/v1/auth/session",
+    reason: "Reads one's own session and the companies one belongs to, before choosing one.",
+    reads: [],
+  },
+  {
+    door: "DELETE /api/v1/auth/session",
+    reason: "Signs out; works with or without a chosen company.",
+    reads: [],
+  },
+  {
+    door: "PUT /api/v1/auth/session/company",
+    reason: "Chooses the company of the session among the person's own companies.",
+    reads: [],
+  },
+  {
+    door: "function app.current_company_id()",
+    reason: "Reads the company of the session, set by the one query door.",
+    reads: [],
+  },
+  {
+    door: "function app.allowed(text)",
+    reason: "Reads the caller's scope for an action from the permission table; every role decision goes through it.",
+    reads: ["table app.permissions select"],
+  },
+  {
+    door: "function app.login_request_code(text, text, integer, integer, integer)",
+    reason: "Sign-in before a company is chosen (row 8).",
+    reads: [],
+  },
+  {
+    door: "function app.login_verify_code(text, text, text, integer, integer)",
+    reason: "Sign-in before a company is chosen (row 8).",
+    reads: [],
+  },
+  {
+    door: "function app.session_read(text, integer, integer)",
+    reason: "Reads one's own session (row 8).",
+    reads: [],
+  },
+  {
+    door: "function app.session_companies(text)",
+    reason: "Lists one's own companies before choosing one (row 8).",
+    reads: [],
+  },
+  {
+    door: "function app.session_set_company(text, uuid)",
+    reason: "Chooses the company of the session among one's own (row 8).",
+    reads: [],
+  },
+  {
+    door: "function app.session_end(text)",
+    reason: "Signs out (row 8).",
+    reads: [],
+  },
+];
 
 /** True if `role` (or a role it inherits) may run the action. */
 export function can(role: Role, action: ActionSpec): boolean {
