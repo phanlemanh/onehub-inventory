@@ -1,0 +1,125 @@
+{
+  "feature_plain": "Danh mục căn của Inventory nay lưu chuẩn như onehub-invest (theo RESO) để hai sản phẩm đọc chung, và mỗi sàn có mã, tên riêng cho toà, căn; không màn nào đổi.",
+  "will_do": [
+    {
+      "id": "AC-1",
+      "p": "Sẽ có cấp phân khu nằm dưới dự án; toà đứng dưới phân khu, hoặc thẳng dưới dự án khi không có phân khu; dữ liệu sai cấp bị từ chối."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ lưu tầng dạng chữ như chuẩn RESO, nhận được tầng kiểu 15A; tầng gõ có số 0 đầu như 07 được đọc thành 7."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ cấp cho mỗi toà, trục, căn một khoá riêng không đổi theo tên, mở đầu bằng bld_, stk_, unt_ như invest."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ giữ mã căn, mã toà gốc làm bí danh để tra ra đúng căn, đúng toà; một mã đang dùng không được trùng."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ tách mã căn người gõ thành toà, tầng, trục theo đúng 8 kiểu mã mà invest đọc; mã không khớp kiểu nào thì từ chối, không đoán."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ chuyển trọn danh mục mẫu (432 căn, gồm 60 căn đang chào) sang cách lưu mới, không mất, không nhân đôi căn nào; 60 lần chào mẫu vẫn y như trước."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ cho mọi sàn đọc danh mục chung nhưng không sàn nào sửa được nó; bộ kiểm cách ly vẫn xanh và bắt được bảng chung chưa khai."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ khai đủ khái niệm mới trong từ điển nghiệp vụ, với nhãn Phân khu, Trục, Tầng, Mã gốc, và bảng dữ liệu khớp đúng từ điển."
+    },
+    {
+      "id": "AC-9",
+      "p": "Sẽ cho mỗi sàn lưu mã và tên riêng mình gọi toà, căn; gõ mã riêng vẫn ra đúng căn chuẩn; sàn khác không thấy mã riêng ấy; danh mục chung không đổi."
+    }
+  ],
+  "scope_plain": "Năm việc để hàng sau, không làm ở hàng này:",
+  "wont_do": [
+    {
+      "id": "OOS-1",
+      "p": "KHÔNG mở chỗ thêm căn hay nhập Excel vào danh mục — để hàng «Thêm căn»."
+    },
+    {
+      "id": "OOS-2",
+      "p": "KHÔNG làm gộp, tách, ngừng toà và căn."
+    },
+    {
+      "id": "OOS-3",
+      "p": "KHÔNG đổi cách lần chào trỏ tới căn, KHÔNG làm màn Bảng hàng theo địa lý (hàng 2d)."
+    },
+    {
+      "id": "OOS-5",
+      "p": "KHÔNG nối thật với dữ liệu của onehub-invest."
+    },
+    {
+      "id": "OOS-4",
+      "p": "KHÔNG làm cách đọc mã riêng theo từng dự án."
+    },
+    {
+      "id": "OOS-6",
+      "p": "KHÔNG làm nhãn riêng, trường riêng, từ điển, căn chờ khớp, mẫu nhập trong hàng này — máy đề xuất hàng 7e ngay sau và mở rộng hàng nhập Sheet thành năm chỗ ghép (Hỏi-5)."
+    }
+  ],
+  "coverage_plain": [
+    {
+      "i": 0,
+      "p": "Đủ bảy cấp — dự án, phân khu, toà, trục, tầng, căn, mã gốc — so theo cách invest và chuẩn RESO chia cấp (AC-1 tới AC-4)."
+    },
+    {
+      "i": 1,
+      "p": "Mỗi cấp được kiểm ở sáu mặt: khoá, cấp cha, dạng giá trị, không trùng, ai đọc ai ghi, khớp từ điển (AC-1 tới AC-4, AC-7, AC-8)."
+    },
+    {
+      "i": 2,
+      "p": "Tách hai lớp: danh mục chung mọi sàn đọc mà không ai sửa (AC-7), và lớp riêng của từng sàn — ở hàng này là mã, tên riêng (AC-9)."
+    },
+    {
+      "i": 3,
+      "p": "Hai nguồn dữ liệu được phủ: danh mục mẫu chuyển sang (AC-6) và mã người gõ theo 8 kiểu của invest (AC-5); dữ liệu thật để hàng nối dữ liệu thật."
+    }
+  ],
+  "gap_probe_plain": [
+    {
+      "i": 0,
+      "p": "Máy đã tự quyết thêm một kiểu mã chỉ Inventory có, trong khi lý do của hàng là hai sản phẩm đọc chung. Đã sửa: thành câu hỏi Hỏi-4 cho anh, máy khuyên giữ đúng 8 kiểu của invest; dòng «không mở đường ghi» đổi căn cứ sang luật cách ly của hàng 9a."
+    },
+    {
+      "i": 1,
+      "p": "Đổi tầng sang chữ và đổi nghĩa khoá toà có thể làm Bảng hàng hiện sai. Đã soát: hôm nay không màn nào đọc hai trường ấy; thêm phép đo 60 lần chào mẫu trước và sau phải y hệt."
+    },
+    {
+      "i": 2,
+      "p": "Chưa có phép đo cho «dấu sàn cấp nguồn» trên danh mục. Đã sửa, rồi thay theo lời anh 12/11: danh mục chung không mang dấu sàn; «khoá sàn» thành mã và tên riêng của sàn, có phép đo riêng."
+    },
+    {
+      "i": 3,
+      "p": "Chưa nói rõ chỗ chạm luật cách ly giữa các sàn. Nay danh mục chung chỉ dùng đúng ngoại lệ «danh mục dùng chung» đã có; mọi thứ riêng của sàn nằm ở bảng có khoá sàn như mọi bảng khác."
+    },
+    {
+      "i": 4,
+      "p": "Hai phép đo của bộ đọc mã viết lỏng, người dựng dễ nới cho qua. Đã sửa: tách vế mã đúng và mã suýt đúng, ghim một mã cụ thể cho tầng 07."
+    },
+    {
+      "i": 5,
+      "p": "Phép đo khớp từ điển còn sót bảng mã riêng và nhãn «Mã riêng». Đã sửa: đo cả sáu bảng, có ca đỏ khi một cột lạ lọt vào danh mục."
+    },
+    {
+      "i": 6,
+      "p": "Bảng mã riêng chưa có ca đỏ trong bộ kiểm cách ly. Đã sửa: thêm tệp phá «sàn khác đọc được mã riêng» với dòng báo viết sẵn, và ca phiên chưa chọn sàn."
+    },
+    {
+      "i": 7,
+      "p": "Việc mở hàng 7e lật phạm vi MVP đã ký mà chưa thành câu hỏi. Đã sửa: thành Hỏi-5 cho anh."
+    },
+    {
+      "i": 8,
+      "p": "Tra mã riêng có thể ra một căn không tồn tại. Đã sửa: mã riêng phải trỏ căn, toà có thật; lý do «không tìm thấy» được ghim."
+    }
+  ],
+  "analyst_plain": "Không có phép chấm bằng hội đồng ở vòng này: mọi tiêu chí đều đo bằng máy."
+}

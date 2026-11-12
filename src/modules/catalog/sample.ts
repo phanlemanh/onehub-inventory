@@ -1,16 +1,32 @@
 // Sample catalog for the MAU sample company (roadmap row 1, decision 0020): Vinhomes Ocean Park 1, 2, 3.
-// Pure and deterministic: no clock, no Math.random. Units are fake; project and tower names are public.
+// Row 7d: stored like onehub-invest — project → complex → tower → stack → unit, prefixed keys, floor as text, and the
+// sample unit codes kept as original codes (aliases), looked up rather than split (Hỏi-4).
+// Pure and deterministic: no clock, no Math.random — keys come from a fixed sample clock and a counter, never from
+// content. Units are fake; project, complex and tower names are public.
 // Stack table taken from onehub-quy-hang commit 1f8a6edd, packages/db/seed/du-lieu-mau.mjs.
 import { LABELS } from "../../generated/labels";
-import type { Unit } from "../../generated/ontology";
+import type {
+  Building,
+  CatalogAlias,
+  Complex,
+  Stack,
+  Subdivision,
+  Unit,
+} from "../../generated/ontology";
+import { mintKey, type KeyPrefix } from "./keys";
+import { lookupCode } from "./lookup";
 
 const BUILDING_WORD = LABELS.Building.pref.toLowerCase();
 
 /** Every sample unit's UPI starts with this: the unit template has no label field. */
 export const SAMPLE_UPI_PREFIX = "urn:onehub:upi:mau:";
+/** Source of every sample original code. */
+export const SAMPLE_ALIAS_SOURCE = "MAU";
+/** The sample clock: keys of the sample are minted at this instant. */
+export const SAMPLE_EPOCH_MS = Date.UTC(2026, 10, 9);
 
 export interface SampleBuilding {
-  /** Tower code as written in a unit code, e.g. `S1.05`. Also the unit's `buildingKey`. */
+  /** Tower code as written in a unit code, e.g. `S1.05`; kept as the tower's original code. */
   code: string;
   name: string;
 }
@@ -18,6 +34,8 @@ export interface SampleBuilding {
 export interface SampleSubdivision {
   key: string;
   name: string;
+  /** The complex (phân khu) the towers stand in, when one is public. */
+  complex?: { slug: string; name: string };
   buildings: readonly SampleBuilding[];
   /** How a unit code of this project reads: one example and its reading. */
   codeExample: string;
@@ -25,23 +43,25 @@ export interface SampleSubdivision {
 }
 
 /**
- * Ocean Park 1 towers are four of the eleven public Sapphire 1 towers (S1.01–S1.12, no S1.04). Public sources list no
- * apartment tower names for Ocean Park 2 and 3, so those towers carry a fake name with the [MAU] label (Hỏi-2).
+ * Ocean Park 1 towers are four of the eleven public Sapphire 1 towers (S1.01–S1.12, no S1.04), in the public complex
+ * The Sapphire 1. Public sources list no apartment tower names for Ocean Park 2 and 3, so those towers carry a fake
+ * name with the [MAU] label (Hỏi-2) and stand directly under their project.
  */
 export const SAMPLE_SUBDIVISIONS: readonly SampleSubdivision[] = [
   {
     key: "op1",
     name: "Vinhomes Ocean Park 1",
+    complex: { slug: "op1-the-sapphire-1", name: "The Sapphire 1" },
     buildings: ["S1.01", "S1.02", "S1.03", "S1.05"].map((code) => ({ code, name: code })),
-    codeExample: "S1.05-1208",
-    codeReading: `${BUILDING_WORD} S1.05 · tầng 12 · trục 08`,
+    codeExample: "S1.05-1206",
+    codeReading: `${BUILDING_WORD} S1.05 · tầng 12 · trục 06`,
   },
   {
     key: "op2",
     name: "Vinhomes Ocean Park 2 – The Empire",
     buildings: [{ code: "E1", name: `[MAU] ${LABELS.Building.pref} E1` }],
     codeExample: "E1-0903",
-    codeReading: `${BUILDING_WORD} E1 · tầng 09 · trục 03`,
+    codeReading: `${BUILDING_WORD} E1 · tầng 9 · trục 03`,
   },
   {
     key: "op3",
@@ -65,30 +85,107 @@ const STACKS = [
 
 const two = (n: number) => String(n).padStart(2, "0");
 
-/** Every unit of the sample catalog: 6 towers × 12 floors × 6 stacks. A fresh array on every call. */
-export function sampleUnits(): Unit[] {
-  const units: Unit[] = [];
-  for (const sub of SAMPLE_SUBDIVISIONS)
-    for (const b of sub.buildings)
+/** Sixteen deterministic numbers for the n-th sample key (mulberry32 on the counter), letters of Crockford only. */
+function counterRandom(n: number): number[] {
+  let a = (0x7d000000 + n) >>> 0;
+  return Array.from({ length: 16 }, () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    // Letters only (Crockford 10–31): a sample key then carries the 5 digits of its time part and no more, so the
+    // no-real-data scan of the sample (9 digits in one string look like a phone number) stays quiet on keys.
+    return 10 + (((t ^ (t >>> 14)) >>> 0) % 22);
+  });
+}
+
+export interface SampleCatalog {
+  subdivisions: Subdivision[];
+  complexes: Complex[];
+  buildings: Building[];
+  stacks: Stack[];
+  units: Unit[];
+  aliases: CatalogAlias[];
+}
+
+/** The whole sample catalog, built fresh on every call. */
+export function sampleCatalog(): SampleCatalog {
+  let counter = 0;
+  const key = (prefix: KeyPrefix) => mintKey(prefix, SAMPLE_EPOCH_MS, counterRandom(++counter));
+  const out: SampleCatalog = {
+    subdivisions: [],
+    complexes: [],
+    buildings: [],
+    stacks: [],
+    units: [],
+    aliases: [],
+  };
+  const alias = (objectKey: string, kind: CatalogAlias["kind"], value: string) =>
+    out.aliases.push({
+      id: out.aliases.length + 1,
+      objectKey,
+      kind,
+      value,
+      source: SAMPLE_ALIAS_SOURCE,
+      firstSeen: "2026-11-09T00:00:00Z",
+    });
+
+  for (const sub of SAMPLE_SUBDIVISIONS) {
+    out.subdivisions.push({ slug: sub.key, name: sub.name });
+    if (sub.complex)
+      out.complexes.push({
+        slug: sub.complex.slug,
+        name: sub.complex.name,
+        subdivisionSlug: sub.key,
+      });
+    for (const b of sub.buildings) {
+      const buildingKey = key("bld");
+      out.buildings.push({
+        buildingKey,
+        subdivisionKey: sub.key,
+        ...(sub.complex ? { complexKey: sub.complex.slug } : {}),
+        buildingName: b.name,
+        upi: `${SAMPLE_UPI_PREFIX}${sub.key}:${b.code.toLowerCase()}`,
+      });
+      alias(buildingKey, "ma_goc", `${sub.key}/${b.code}`);
+      alias(buildingKey, "ten", b.name);
+      const stackKeys = STACKS.map((_, i) => {
+        const stackKey = key("stk");
+        out.stacks.push({ stackKey, buildingKey, stackCode: two(i + 1) });
+        alias(stackKey, "ma_goc", `${sub.key}/${b.code}/${two(i + 1)}`);
+        return stackKey;
+      });
       for (let floor = FLOORS.from; floor <= FLOORS.to; floor++)
         for (const [i, s] of STACKS.entries()) {
           const unitNumber = `${two(floor)}${two(i + 1)}`;
-          units.push({
+          const unitKey = key("unt");
+          out.units.push({
+            unitKey,
             upi: `${SAMPLE_UPI_PREFIX}${sub.key}:${b.code.toLowerCase()}:${unitNumber}`,
             subdivisionKey: sub.key,
-            buildingKey: b.code,
+            ...(sub.complex ? { complexKey: sub.complex.slug } : {}),
+            buildingKey,
             buildingName: b.name,
-            unitNumber,
+            stackKey: stackKeys[i]!,
             stack: two(i + 1),
-            floor,
+            unitNumber,
+            floor: String(floor),
             livingArea: s.area,
             bedroomsTotal: s.bedrooms,
             directionFaces: s.faces,
             propertyType: "Residential",
             propertySubType: "Condominium",
           });
+          alias(unitKey, "ma_goc", `${sub.key}/${b.code}-${unitNumber}`);
         }
-  return units;
+    }
+  }
+  return out;
+}
+
+/** Every unit of the sample catalog: 6 towers × 12 floors × 6 stacks. A fresh array on every call. */
+export function sampleUnits(): Unit[] {
+  return sampleCatalog().units;
 }
 
 /** Name of the project a unit belongs to, for the listing that copies it. */
@@ -96,20 +193,40 @@ export function subdivisionNameOf(unit: Pick<Unit, "subdivisionKey">): string | 
   return SAMPLE_SUBDIVISIONS.find((s) => s.key === unit.subdivisionKey)?.name;
 }
 
-/** The unit code people type: `S1.05-1208`. */
-export const unitCode = (unit: Pick<Unit, "buildingKey" | "unitNumber">) =>
-  `${unit.buildingKey}-${unit.unitNumber}`;
+const SAMPLE = sampleCatalog();
+const BUILDING_CODE = new Map(
+  SAMPLE.aliases
+    .filter((a) => a.kind === "ma_goc" && a.objectKey.startsWith("bld_"))
+    .map((a) => [a.objectKey, a.value.split("/")[1]!]),
+);
 
-/** Reads a unit code back into tower, floor and stack; null when it does not have the sample shape. */
-export function readUnitCode(
+/** The unit code people type: `S1.05-1208` — the tower's original code, a dash, the unit number. */
+export const unitCode = (unit: Pick<Unit, "buildingKey" | "unitNumber">) =>
+  `${BUILDING_CODE.get(unit.buildingKey) ?? unit.buildingKey}-${unit.unitNumber}`;
+
+/**
+ * Looks a sample unit code up through the original codes (not split: Hỏi-4) and returns that unit's tower key, floor
+ * and stack; null when no sample unit has that code.
+ */
+export function readSampleCode(
   code: string,
-): { buildingKey: string; floor: number; stack: string } | null {
-  const m = /^([A-Z][A-Z0-9.]*)-(\d{2})(\d{2})$/.exec(code);
-  if (!m) return null;
-  return { buildingKey: m[1]!, floor: Number(m[2]), stack: m[3]! };
+): { buildingKey: string; floor: string; stack: string } | null {
+  for (const sub of SAMPLE_SUBDIVISIONS) {
+    const hit = lookupCode(code, {
+      companyAliases: [],
+      catalogAliases: SAMPLE.aliases.filter((a) => a.kind === "ma_goc"),
+      subdivisionSlug: sub.key,
+    });
+    if (hit.source === "goc") {
+      const u = SAMPLE.units.find((x) => x.unitKey === hit.objectKey);
+      if (u && u.floor && u.stack)
+        return { buildingKey: u.buildingKey, floor: u.floor, stack: u.stack };
+    }
+  }
+  return null;
 }
 
-/** Catalog rules: unique unit codes, and a code that reads back to the unit's own tower, floor and stack. */
+/** Catalog rules: unique unit codes, and a code that looks up to the unit's own tower, floor and stack. */
 export function checkSampleCatalog(units: readonly Unit[]): string[] {
   const errors: string[] = [];
   const seen = new Set<string>();
@@ -117,7 +234,7 @@ export function checkSampleCatalog(units: readonly Unit[]): string[] {
     const code = unitCode(u);
     if (seen.has(code)) errors.push(`mã căn trùng: ${code}`);
     seen.add(code);
-    const read = readUnitCode(code);
+    const read = readSampleCode(code);
     if (
       !read ||
       read.buildingKey !== u.buildingKey ||
@@ -125,6 +242,30 @@ export function checkSampleCatalog(units: readonly Unit[]): string[] {
       read.stack !== u.stack
     )
       errors.push(`mã căn lệch thuộc tính: ${code}`);
+  }
+  return errors;
+}
+
+/**
+ * Hierarchy rules of a catalog: a complex sits under a project, a tower's complex belongs to the tower's own project,
+ * and a unit's tower, project and complex agree with that tower.
+ */
+export function checkCatalogHierarchy(c: SampleCatalog): string[] {
+  const errors: string[] = [];
+  const projects = new Set(c.subdivisions.map((s) => s.slug));
+  const complexOf = new Map(c.complexes.map((x) => [x.slug, x.subdivisionSlug]));
+  for (const x of c.complexes)
+    if (!projects.has(x.subdivisionSlug)) errors.push(`phân khu không thuộc dự án: ${x.slug}`);
+  const buildings = new Map(c.buildings.map((b) => [b.buildingKey, b]));
+  for (const b of c.buildings) {
+    if (!projects.has(b.subdivisionKey)) errors.push(`toà không thuộc dự án: ${b.buildingKey}`);
+    if (b.complexKey && complexOf.get(b.complexKey) !== b.subdivisionKey)
+      errors.push(`toà và phân khu khác dự án: ${b.buildingKey}`);
+  }
+  for (const u of c.units) {
+    const b = buildings.get(u.buildingKey);
+    if (!b || b.subdivisionKey !== u.subdivisionKey || b.complexKey !== u.complexKey)
+      errors.push(`căn lệch toà: ${u.upi}`);
   }
   return errors;
 }

@@ -1,0 +1,14 @@
+name: Subdivision
+description: >-
+  A project (dự án), the root of the shared catalog; shared by every company, so it has no companyId. Stored in
+  catalog_nodes with node_type project, as onehub-invest stores projects in asset_nodes.
+reso: SubdivisionName
+
+properties:
+  slug: { type: string, required: true, unique: true, display: none }
+  name: { type: string, required: true, display: text, reso: SubdivisionName }
+
+code:
+  model: src/modules/catalog/
+  tests: tests/
+wiki: wiki/entities/subdivision.md

@@ -298,7 +298,7 @@ describe("AC-4 an owner link carries an owner role", () => {
 
 // ——— AC-5: the sample data is unchanged ——————————————————————————————————————————————————————————
 
-const ROW_1_DIGEST = "16f9b15b3465b3f16b9a2e9ccfef6d00f0656a88f3b9d23f5492df128ece6ca0";
+const ROW_1_DIGEST = "428b20ae0e96076795e22ef1fd1734acf5743d8afb94366173973434eb3855c9";
 const digest = (s: Sample) => createHash("sha256").update(JSON.stringify(s)).digest("hex");
 
 describe("AC-5 the sample data is byte-identical to the signed sample-data row", () => {

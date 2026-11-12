@@ -1,0 +1,24 @@
+name: CatalogAlias
+description: >-
+  An original code or a name of a tower, stack or unit in the shared catalog, kept as an alias so the catalog
+  key never depends on how a source wrote it. Our own; shared catalog, no companyId.
+reso: none (our own, like onehub-invest registry_aliases)
+
+properties:
+  id: { type: integer, required: true, unique: true, display: none }
+  objectKey: { type: string, required: true, display: none }
+  kind: { type: enum, values: [ma_goc, ten], required: true, display: none }
+  value: { type: string, required: true, display: text }
+  source: { type: string, required: true, display: none }
+  firstSeen: { type: datetime, required: true, display: none }
+  retiredAt: { type: datetime, display: none }
+
+rules:
+  - id: one-active-original-code
+    description: An original code still in force is unique per source, kind and value; a retired one can be added again.
+    implemented_in: db/migrations/007_danh_muc_nhu_invest.sql
+
+code:
+  model: src/modules/catalog/
+  tests: tests/
+wiki: wiki/entities/catalog-alias.md
