@@ -795,7 +795,14 @@ describe("kho thật", () => {
 
   it("thêm vòng implemented khai Bảng hàng mà thiếu chứng minh thì đỏ", () => {
     const copy = mkdtempSync(join(tmpdir(), "proof-gate-real-"));
-    for (const d of ["design", "_acceptance", "wiki/decisions", "tests"]) {
+    for (const d of [
+      "design",
+      "_acceptance",
+      "wiki/decisions",
+      "tests",
+      "docs/tri-thuc",
+      "src/components",
+    ]) {
       cpSync(join(ROOT, d), join(copy, d), { recursive: true });
     }
     expect(run(copy).status).toBe(0);
@@ -810,7 +817,7 @@ describe("kho thật", () => {
     const section = (h: string) => text.split(`## ${h}\n`)[1]?.split("\n## ")[0] ?? "";
     expect(section("Triết lý")).toMatch(/Sheet/);
     expect(section("Triết lý")).toMatch(/Excel/);
-    expect(section("Màn mẫu")).toContain("Màn: chưa có");
+    expect(section("Màn mẫu")).toContain("Màn: inventory");
     expect(section("Khổ so").match(/\d+/g)?.map(Number)).toEqual([360, 414, 1024, 1440]);
     expect(
       section("Mặt so")

@@ -174,54 +174,117 @@ const bodyRows = (page: Page) => page.locator('[data-slot="data-region-body"] tb
 const stateOf = (page: Page, kind: string) =>
   page.locator(`[data-slot="region-state"][data-kind="${kind}"]`);
 const search = (page: Page) => region(page).getByRole("searchbox");
-const nextPage = (page: Page) => region(page).getByRole("button", { name: "Trang sau" });
+/** The grid's own scroll viewport: rows scroll inside it in one continuous run (row 2, «đọc như Sheet»). */
+const viewport = (page: Page) =>
+  page.locator('[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]').first();
 
 /** Kinds whose shown text is the searched value (column-kind.ts SEARCHABLE_KINDS, without `select`, which shows a label). */
 const TEXT_KINDS = ["text", "person"];
 
-/** Every row's searchable texts, across every page of the region, back on page 1 afterwards. */
-async function allRows(page: Page): Promise<string[][]> {
-  const rows: string[][] = [];
-  await bodyRows(page).first().waitFor({ timeout: SHORT });
-  for (let guard = 0; guard < 100; guard += 1) {
-    const pageRows = await bodyRows(page).evaluateAll(
-      (trs, kinds) =>
-        trs
-          .filter((tr) => getComputedStyle(tr).display !== "none")
-          .map((tr) =>
-            [...tr.querySelectorAll<HTMLElement>('[data-slot="typed-cell"]')]
-              .filter((cell) => kinds.includes(cell.dataset["kind"] ?? ""))
-              .map((cell) => {
-                const copy = cell.cloneNode(true) as HTMLElement;
-                copy.querySelectorAll('[data-slot="cell-lock-reason"]').forEach((n) => n.remove());
-                return (copy.textContent ?? "").trim();
-              }),
-          ),
-      TEXT_KINDS,
-    );
-    rows.push(...pageRows);
-    const next = nextPage(page);
-    if ((await next.count()) === 0 || (await next.isDisabled())) break;
-    const first = await bodyRows(page).first().textContent();
-    await next.click();
-    await page.waitForFunction(
-      (before) =>
-        document.querySelector('[data-slot="data-region-body"] tbody tr')?.textContent !== before,
-      first,
-      { timeout: SHORT },
-    );
+/** How many data rows a person sees in the grid's viewport at the top of the run (not the extra rows mounted ahead). */
+async function visibleRows(page: Page): Promise<number> {
+  return viewport(page).evaluate((el) => {
+    const box = el.getBoundingClientRect();
+    return [...el.querySelectorAll("tbody tr")].filter((tr) => {
+      if (!tr.querySelector('[data-slot="row-number"]')) return false;
+      const r = tr.getBoundingClientRect();
+      return r.bottom > box.top && r.top < box.bottom;
+    }).length;
+  });
+}
+
+/** Puts the mouse over the visible part of the grid's viewport, so the wheel scrolls the grid, not the page. */
+async function pointAtGrid(page: Page): Promise<void> {
+  const box = viewport(page);
+  await box.scrollIntoViewIfNeeded();
+  const b = await box.boundingBox();
+  const size = page.viewportSize();
+  if (!b || !size) return;
+  const top = Math.max(b.y, 0);
+  const bottom = Math.min(b.y + b.height, size.height);
+  await page.mouse.move(b.x + b.width / 2, top + (bottom - top) / 2);
+}
+
+/** Scrolls the grid's run with the mouse wheel until `done` holds or the run ends. */
+async function scrollUntil(page: Page, done: () => Promise<boolean>): Promise<void> {
+  if (await done()) return;
+  const box = viewport(page);
+  if ((await box.count()) === 0) return;
+  await pointAtGrid(page);
+  let still = 0;
+  for (let guard = 0; guard < 400 && still < 3; guard += 1) {
+    const before = await box.evaluate((el) => el.scrollTop);
+    await page.mouse.wheel(0, 400);
+    await page.waitForTimeout(60);
+    if (await done()) return;
+    still = (await box.evaluate((el) => el.scrollTop)) === before ? still + 1 : 0;
   }
-  const goFirst = region(page).getByRole("button", { name: "Tới trang 1" });
-  if ((await goFirst.count()) > 0 && (await goFirst.isEnabled())) await goFirst.click();
-  return rows;
+}
+
+/** The texts of the rows mounted now, with their row number; hidden rows are left out. */
+async function mountedRows(page: Page): Promise<[number, string[]][]> {
+  return bodyRows(page).evaluateAll(
+    (trs, kinds) =>
+      trs
+        .filter((tr) => getComputedStyle(tr).display !== "none")
+        .map((tr): [number, string[]] => [
+          Number(tr.querySelector('[data-slot="row-number"]')?.textContent ?? "0"),
+          [...tr.querySelectorAll<HTMLElement>('[data-slot="typed-cell"]')]
+            .filter((cell) => kinds.includes(cell.dataset["kind"] ?? ""))
+            .map((cell) => {
+              const copy = cell.cloneNode(true) as HTMLElement;
+              copy.querySelectorAll('[data-slot="cell-lock-reason"]').forEach((n) => n.remove());
+              return (copy.textContent ?? "").trim();
+            }),
+        ])
+        .filter(([n]) => n > 0),
+    TEXT_KINDS,
+  );
+}
+
+/**
+ * Every row's searchable texts in the one continuous run, read the way a person reads it: the mouse wheel scrolls the
+ * grid's viewport from top to bottom while the virtual body mounts the rows in view. Back at the top afterwards.
+ * Also returns how many rows a person sees in the viewport before any scrolling (the first window).
+ */
+async function allRowsWithWindow(page: Page): Promise<{ rows: string[][]; window: number }> {
+  await bodyRows(page).first().waitFor({ state: "attached", timeout: SHORT });
+  // Keyed by number AND texts: windows overlap (same row seen twice), but a row that is not in the data (an extra row
+  // sharing a number) stays a row of its own.
+  const seen = new Map<string, [number, string[]]>();
+  const add = (n: number, texts: string[]) => seen.set(`${n}|${key(texts)}`, [n, texts]);
+  const box = viewport(page);
+  await box.evaluate((el) => (el.scrollTop = 0));
+  const first = await mountedRows(page);
+  for (const [n, texts] of first) add(n, texts);
+  const window = await visibleRows(page);
+  await pointAtGrid(page);
+  let still = 0;
+  for (let guard = 0; guard < 400 && still < 3; guard += 1) {
+    const before = await box.evaluate((el) => el.scrollTop);
+    await page.mouse.wheel(0, 400);
+    await page.waitForTimeout(60);
+    for (const [n, texts] of await mountedRows(page)) add(n, texts);
+    const after = await box.evaluate((el) => el.scrollTop);
+    still = after === before ? still + 1 : 0;
+  }
+  await box.evaluate((el) => (el.scrollTop = 0));
+  const rows = [...seen.values()].sort(([a], [b]) => a - b).map(([, texts]) => texts);
+  return { rows, window };
+}
+
+async function allRows(page: Page): Promise<string[][]> {
+  return (await allRowsWithWindow(page)).rows;
 }
 
 const key = (row: string[]) => row.join(" ¦ ");
+/** Rows a first window holds when the caller gives none (the calibration grid's old page size, kept for its needle). */
 const PAGE_SIZE = 50;
 
 /**
- * A search string from the data whose matches lie on at least two pages before the search AND fill more than one page
- * after it, so both "filters only the page shown" and "keeps only the first page of results" show as dropped rows.
+ * A search string from the data whose matches lie beyond the first window before the search AND fill more than one window
+ * after it, so both "filters only the rows in view" and "keeps only the first window of results" show as dropped rows.
+ * `pageSize` is the first window: the rows a person sees before any scrolling (row 2: continuous run, no pages).
  */
 export function pickNeedle(rows: string[][], pageSize = PAGE_SIZE): string | null {
   const seen = new Set<string>();
@@ -259,11 +322,11 @@ export function compareRows(expected: string[][], shown: string[][]): string | n
 }
 
 async function searchCheck({ page }: Ctx): Promise<void> {
-  const before = await allRows(page);
-  const needle = pickNeedle(before);
+  const { rows: before, window } = await allRowsWithWindow(page);
+  const needle = pickNeedle(before, Math.max(1, window));
   if (needle === null)
     fail(
-      "tim: khong du du lieu de thu (can mot chuoi khop hon mot trang ket qua, nam tren >=2 trang)",
+      "tim: khong du du lieu de thu (can mot chuoi khop nhieu hon mot khung cuon, nam ngoai khung dau)",
     );
   const lower = needle.toLocaleLowerCase("vi");
   const expected = before.filter((r) => r.some((t) => t.toLocaleLowerCase("vi").includes(lower)));
@@ -490,7 +553,9 @@ export const REGION: Recipe[] = [
     state: "Chữ dài",
     async check({ page }) {
       const cut = page.locator('[data-slot="truncated-text"][data-cut="true"]').first();
-      // The grid marks a cell cut only after it has measured its width.
+      // The grid marks a cell cut only after it has measured its width. Row 2: the run is virtual, so a long value
+      // may sit below the first window — scroll the run until one is mounted.
+      await scrollUntil(page, async () => (await cut.count()) > 0);
       await cut
         .waitFor({ state: "attached", timeout: SHORT })
         .catch(() => fail("chu-dai: khong co o chu dai bi cat"));
@@ -567,19 +632,31 @@ export const REGION: Recipe[] = [
         name: "go mot dong khop",
         message: /tim: bo sot dong khop — /,
         // A style rule, not a DOM edit: the grid re-renders after measuring its width and would put a removed row back.
+        // Row 2: the run is virtual, so the rule names one result row (number 1) instead of the DOM's last row.
         apply: async ({ page }) => {
           await page.addStyleTag({
-            content: `${SEARCHING} tbody tr:last-child { display: none !important; }`,
+            content: `${SEARCHING} tbody tr:has([data-row-number="1"]) { display: none !important; }`,
           });
         },
       },
       {
-        name: "chi con trang dau",
+        // Row 2: equivalent of "only the first page of results" for a continuous run — the results cannot scroll past
+        // the first window, so rows below it never mount.
+        name: "chi con khung dau",
         message: /tim: bo sot dong khop — /,
+        // Hides every result row numbered past the first window (the rows a person sees before any scrolling),
+        // re-applied on every re-render: the results never reach past that window.
         apply: async ({ page }) => {
-          await page.addStyleTag({
-            content: `${SEARCHING} [data-slot="data-grid-pagination"] { display: none !important; }`,
-          });
+          const window = await visibleRows(page);
+          await onResult(
+            page,
+            `const box = document.querySelector('[data-slot="data-region"] input[type="search"]');
+             if (!box || !box.value) return;
+             document.querySelectorAll('[data-slot="data-region-body"] tbody tr').forEach((tr) => {
+               const n = Number(tr.querySelector('[data-slot="row-number"]')?.textContent ?? '0');
+               if (n > ${window}) tr.style.display = 'none';
+             });`,
+          );
         },
       },
       {
@@ -591,7 +668,7 @@ export const REGION: Recipe[] = [
             page,
             `const box = document.querySelector('[data-slot="data-region"] input[type="search"]');
              if (!box || !box.value || document.querySelector('tr[data-pha]')) return;
-             const row = document.querySelector('[data-slot="data-region-body"] tbody tr');
+             const row = document.querySelector('[data-slot="data-region-body"] tbody tr:has([data-slot="row-number"])');
              if (!row) return;
              const extra = row.cloneNode(true);
              extra.setAttribute('data-pha', '1');
@@ -608,7 +685,6 @@ export const REGION: Recipe[] = [
 
 /** Grid screens allowed to have no data region yet, each with why. Remove a line when the screen builds its region. */
 export const NO_REGION_YET: Record<string, string> = {
-  inventory: "trang chỉ có đầu màn, vùng Lưới dựng ở hàng 2 (Bảng hàng bản đọc)",
   sent: "trang chỉ có đầu màn, vùng Lưới dựng khi màn Đã gửi tới lượt",
 };
 
