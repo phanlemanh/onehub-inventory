@@ -254,6 +254,7 @@ describe("dang-nhap (Postgres của dãy)", () => {
       DATABASE_URL: w.db.url,
       AUTH_SECRET: "x".repeat(40),
       MAIL_FROM: "a@b.test",
+      APP_URL: "https://app.example.test",
     };
     const broken = createAuthHandlers(() => {
       const config = readAuthConfig(env);

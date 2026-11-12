@@ -3,8 +3,10 @@
 // decision:column-width
 // decision:table-density
 // decision:read-only-cell
-import { cleanup, render, screen } from "@testing-library/react";
+// decision:grid-continuous-run
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 
 import {
@@ -13,6 +15,9 @@ import {
   columnWidthCh,
   densityFor,
   DENSITY_ROW_CLASS,
+  fittedWidthCh,
+  fullWidthCh,
+  spreadSpareCh,
   typedColumn,
   type TypedColumnSpec,
 } from "../src/components/candidate/column-kind";
@@ -21,8 +26,10 @@ import { RegionHeader } from "../src/components/candidate/region-header";
 import { TypedCell } from "../src/components/candidate/typed-cell";
 import { FIELD_DISPLAY, type DisplayKind } from "../src/generated/display";
 import { formatArea, formatCount, formatMoney, statusLabel } from "../src/lib/format";
+import { tallGridViewport } from "./virtual-viewport";
 
 beforeAll(() => {
+  tallGridViewport();
   globalThis.ResizeObserver ??= class {
     observe() {}
     unobserve() {}
@@ -230,7 +237,8 @@ describe("density", () => {
 
   it("goes dense only when the columns are wider than the area", () => {
     expect(() => checkEdge(densityFor)).not.toThrow();
-    expect(DENSITY_ROW_CLASS).toEqual({ dense: "h-10 text-sm", normal: "h-12 text-base" });
+    // Row 2 (owner, «Duyệt»): dense rows drop to 32px like data-grid-editing-6 and a sheet; normal rows unchanged.
+    expect(DENSITY_ROW_CLASS).toEqual({ dense: "h-8 text-sm", normal: "h-12 text-base" });
   });
 
   it("fails on a density rule that is dense at the edge", () => {
@@ -280,7 +288,7 @@ describe("region header", () => {
   });
 });
 
-describe("pagination and read-only cells", () => {
+describe("continuous run and read-only cells", () => {
   const columns = [
     typedColumn({ field: "Listing.unitNumber", header: "Mã" }),
     typedColumn({ field: "Listing.listPrice", header: "Giá" }),
@@ -292,37 +300,46 @@ describe("pagination and read-only cells", () => {
       "Listing.listPrice": 2_000_000_000 + i,
     }));
 
-  function checkPager(container: HTMLElement): void {
-    if (!/Số dòng mỗi trang/.test(container.textContent ?? ""))
-      throw new Error("pagination missing");
+  // Row 2 (Bảng hàng, «đọc như Sheet»): the grid is one continuous run instead of pages. Equivalent measure of the 1b
+  // pager cases: every row is reachable in the one run, numbered 1..n without a gap, the footer counts them, no pager.
+  function checkRun(container: HTMLElement, n: number): void {
+    if (/Số dòng mỗi trang/.test(container.textContent ?? "")) throw new Error("pager present");
+    const numbers = [...container.querySelectorAll('tbody [data-slot="row-number"]')].map((el) =>
+      Number(el.textContent),
+    );
+    numbers.forEach((num, i) => {
+      if (num !== i + 1) throw new Error(`run broken at row ${i + 1}`);
+    });
+    if (numbers.length !== n) throw new Error(`run broken at row ${numbers.length + 1}`);
+    const footer = container.querySelector('[data-slot="region-footer-count"]');
+    if (footer?.textContent !== `${n} dòng`) throw new Error("footer count missing");
   }
 
-  it("shows at most one page of rows and a Vietnamese pager beyond the page size", () => {
+  it("shows every row in one numbered run, counted in the footer, with no pager", () => {
     const { container } = render(
       <DataRegion title="Vùng" columns={columns} rows={rowsOf(120)} emptyWhy="x" />,
     );
-    expect(container.querySelectorAll("tbody tr").length).toBe(50);
-    expect(() => checkPager(container)).not.toThrow();
+    expect(() => checkRun(container, 120)).not.toThrow();
+    expect(container.querySelectorAll('[data-slot="data-grid-pagination"]').length).toBe(0);
     expect(container.textContent).not.toMatch(/Rows per page|Go to next page/);
   });
 
-  it("has no pager at exactly one page", () => {
-    const { container } = render(
-      <DataRegion title="Vùng" columns={columns} rows={rowsOf(50)} emptyWhy="x" />,
-    );
-    expect(container.querySelectorAll("tbody tr").length).toBe(50);
-    expect(container.textContent).not.toMatch(/Số dòng mỗi trang/);
-  });
-
-  it("fails when the pager is missing beyond one page", () => {
+  it("fails when a row drops out of the run", () => {
     const { container } = render(
       <DataRegion title="Vùng" columns={columns} rows={rowsOf(51)} emptyWhy="x" />,
     );
-    container.querySelector('[data-slot="data-grid-pagination"]')?.remove();
-    for (const node of container.querySelectorAll("*")) {
-      if (node.textContent === "Số dòng mỗi trang") node.remove();
-    }
-    expect(() => checkPager(container)).toThrow("pagination missing");
+    container.querySelectorAll("tbody tr")[20]?.remove();
+    expect(() => checkRun(container, 51)).toThrow("run broken at row 21");
+  });
+
+  it("fails when a pager comes back", () => {
+    const { container } = render(
+      <DataRegion title="Vùng" columns={columns} rows={rowsOf(51)} emptyWhy="x" />,
+    );
+    const pager = document.createElement("div");
+    pager.textContent = "Số dòng mỗi trang";
+    container.append(pager);
+    expect(() => checkRun(container, 51)).toThrow("pager present");
   });
 
   function checkLocked(root: HTMLElement): void {
@@ -356,6 +373,49 @@ describe("pagination and read-only cells", () => {
     const { root } = cellText(<TypedCell kind="money" value={1} lockedReason="x" />);
     root.querySelector('[data-slot="cell-lock-reason"]')?.remove();
     expect(() => checkLocked(root)).toThrow("locked cell without reason");
+  });
+});
+
+describe("keyboard stop before and after the page runs", () => {
+  const columns = [typedColumn({ field: "Listing.unitNumber", header: "Mã" })];
+  const rows: GridRow[] = Array.from({ length: 60 }, (_, i) => ({
+    id: `r${i}`,
+    "Listing.unitNumber": `A-${i}`,
+  }));
+  const region = () => <DataRegion title="Vùng" columns={columns} rows={rows} emptyWhy="x" />;
+
+  /** The grid's scroll viewport must hold exactly one keyboard stop, on itself or inside it, at every moment. */
+  function checkStop(root: ParentNode, phase: "server" | "client"): void {
+    const viewport = root.querySelector('[data-slot="scroll-area-viewport"]');
+    if (!viewport) throw new Error(`no viewport (${phase})`);
+    const stops = [viewport, ...viewport.querySelectorAll("*")].filter(
+      (el) => el.getAttribute("tabindex") === "0",
+    );
+    if (stops.length === 0) throw new Error(`grid unreachable by keyboard (${phase})`);
+    if (stops.length > 1) throw new Error(`two keyboard stops (${phase})`);
+    if (phase === "client" && stops[0] !== viewport) throw new Error("stop not on the viewport");
+  }
+  const serverHtml = (): HTMLElement => {
+    const box = document.createElement("div");
+    box.innerHTML = renderToString(region());
+    return box;
+  };
+
+  it("the server HTML is reachable, and the stop moves to the viewport once the page runs", () => {
+    expect(() => checkStop(serverHtml(), "server")).not.toThrow();
+    const { container } = render(region());
+    expect(() => checkStop(container, "client")).not.toThrow();
+  });
+
+  it("fails when the server HTML has no stop, or when the stop is left behind on the content", () => {
+    const box = serverHtml();
+    box.querySelectorAll("[tabindex]").forEach((el) => el.removeAttribute("tabindex"));
+    expect(() => checkStop(box, "server")).toThrow("grid unreachable by keyboard (server)");
+    const { container } = render(region());
+    container
+      .querySelector('[data-slot="data-region-scroll-content"]')
+      ?.setAttribute("tabindex", "0");
+    expect(() => checkStop(container, "client")).toThrow("two keyboard stops (client)");
   });
 });
 
@@ -474,8 +534,9 @@ describe("alignment on the rendered grid", () => {
 
   /** Header cell and body cell of each column must sit on the same side, the side of the kind. */
   function checkPairs(container: HTMLElement): void {
-    const headers = [...container.querySelectorAll("thead th")];
-    const cells = [...container.querySelectorAll("tbody tr:first-child td")];
+    // The first column is the frozen row-number column (row 2); the typed columns follow it.
+    const headers = [...container.querySelectorAll("thead th")].slice(1);
+    const cells = [...container.querySelectorAll("tbody tr:first-child td")].slice(1);
     columns.forEach((column, i) => {
       const want = column.align;
       if (side(headers[i]) !== want || side(cells[i]) !== want) {
@@ -486,15 +547,140 @@ describe("alignment on the rendered grid", () => {
 
   it("aligns header and body of every column to its kind, pair by pair", () => {
     const { container } = render(<DataRegion title="Vùng" columns={columns} rows={rows} />);
-    expect(container.querySelectorAll("thead th").length).toBe(4);
+    expect(container.querySelectorAll("thead th").length).toBe(5);
     expect(() => checkPairs(container)).not.toThrow();
     expect(columns.map((column) => column.align)).toEqual(["right", "right", "left", "left"]);
   });
 
   it("fails when one header drifts from its cells", () => {
     const { container } = render(<DataRegion title="Vùng" columns={columns} rows={rows} />);
-    const header = container.querySelectorAll("thead th")[1]!;
+    const header = container.querySelectorAll("thead th")[2]!;
     header.classList.replace("text-right", "text-left");
     expect(() => checkPairs(container)).toThrow("alignment drift: Listing.closePrice");
+  });
+});
+
+describe("content-fitted width of text columns", () => {
+  type Fit = typeof fittedWidthCh;
+  const code = typedColumn({ field: "Listing.unitNumber", header: "Căn" });
+  const tower = typedColumn({ field: "Listing.buildingName", header: "Toà nhà" });
+  const place = typedColumn({ field: "Listing.subdivisionName", header: "Khu" });
+  const price = typedColumn({ field: "Listing.listPrice", header: "Giá chào" });
+  // Written ahead: column, values, expected width in ch (max(label, min(reading length, longest)) + 2 + 1 slack).
+  const MATRIX: [string, ReturnType<typeof typedColumn>, unknown[], number][] = [
+    ["short code", code, ["0905", "1101"], 7],
+    ["label longer than values", tower, ["S1.01", "E1"], 10],
+    [
+      "long text capped at reading length",
+      place,
+      ["Vinhomes Ocean Park 2 – The Empire", "Ocean"],
+      19,
+    ],
+    ["no value keeps reading length", place, [null, undefined, ""], 18],
+    ["non-text kind keeps its sample length", price, [1_000_000], price.widthCh],
+  ];
+
+  function checkFit(fit: Fit): void {
+    for (const [name, column, values, want] of MATRIX) {
+      const got = fit(column, values);
+      if (got !== want) throw new Error(`fitted width: ${name} (${got} != ${want})`);
+    }
+  }
+
+  it("fits each text column to its longest value, between the label and the reading length", () => {
+    expect(MATRIX.length).toBe(5);
+    expect(() => checkFit(fittedWidthCh)).not.toThrow();
+  });
+
+  it("fails when the reading length no longer caps a long value", () => {
+    const uncapped: Fit = (column, values) =>
+      column.kind === "text"
+        ? Math.max(column.header.length, ...values.map((v) => String(v ?? "").length)) + 3
+        : column.widthCh;
+    expect(() => checkFit(uncapped)).toThrow("fitted width: long text capped at reading length");
+  });
+
+  it("fails when the old rule (reading length for every text column) comes back", () => {
+    const old: Fit = (column) => column.widthCh;
+    expect(() => checkFit(old)).toThrow("fitted width: short code");
+  });
+
+  const rows: GridRow[] = Array.from({ length: 60 }, (_, i) => ({
+    id: `r${i}`,
+    "Listing.unitNumber": String(1000 + i),
+    "Listing.buildingName": i < 30 ? "S1.01" : "E1",
+    "Listing.subdivisionName": i % 7 === 0 ? "Vinhomes Ocean Park 2 – The Empire" : "Ocean Park",
+  }));
+  const columns = [code, tower, place];
+  const widthsOf = (container: HTMLElement): string[] =>
+    [...container.querySelectorAll<HTMLElement>("thead th")].map((th) => th.style.width);
+
+  function checkSteady(before: string[], after: string[], when: string): void {
+    if (before.join() !== after.join()) {
+      throw new Error(
+        `width follows the shown rows: ${when} (${before.join()} -> ${after.join()})`,
+      );
+    }
+  }
+
+  it("keeps column widths while searching: widths come from every row the region holds", () => {
+    const { container } = render(<DataRegion title="Vùng" columns={columns} rows={rows} />);
+    const before = widthsOf(container);
+    expect(before.every((w) => w !== "")).toBe(true);
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "E1" } });
+    checkSteady(before, widthsOf(container), "search");
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "" } });
+    checkSteady(before, widthsOf(container), "search cleared");
+  });
+
+  it("fails when widths are measured on the rows a search leaves", () => {
+    const all = render(<DataRegion title="Vùng" columns={columns} rows={rows} />);
+    const before = widthsOf(all.container);
+    cleanup();
+    const leftAfterSearch = rows.filter(
+      (r) => r["Listing.buildingName"] === "E1" && r["Listing.subdivisionName"] === "Ocean Park",
+    );
+    const some = render(<DataRegion title="Vùng" columns={columns} rows={leftAfterSearch} />);
+    expect(() => checkSteady(before, widthsOf(some.container), "search")).toThrow(
+      "width follows the shown rows: search",
+    );
+  });
+});
+
+describe("spare room goes to columns that cut their text", () => {
+  type Spread = typeof spreadSpareCh;
+  // Written ahead: fitted widths, widths that show every value whole, room in ch, expected widths.
+  const MATRIX: [string, number[], number[], number | null, number[]][] = [
+    ["room for every cut column", [7, 10, 19, 11], [7, 10, 36, 11], 80, [7, 10, 36, 11]],
+    ["room for part of the cut", [7, 10, 19, 11], [7, 10, 36, 11], 55, [7, 10, 27, 11]],
+    ["no room keeps the fit", [7, 10, 19, 11], [7, 10, 36, 11], 40, [7, 10, 19, 11]],
+    ["width not measured yet keeps the fit", [7, 19], [7, 36], null, [7, 19]],
+    ["first cut column first", [19, 19], [30, 30], 50, [30, 20]],
+  ];
+
+  function checkSpread(spread: Spread): void {
+    for (const [name, fitted, full, room, want] of MATRIX) {
+      const got = spread(fitted, full, room);
+      if (got.join() !== want.join())
+        throw new Error(`spare room: ${name} (${got.join()} != ${want.join()})`);
+    }
+  }
+
+  it("grows cut columns up to their whole text, never past the room, never below the fit", () => {
+    expect(MATRIX.length).toBe(5);
+    expect(() => checkSpread(spreadSpareCh)).not.toThrow();
+    const place = typedColumn({ field: "Listing.subdivisionName", header: "Khu" });
+    expect(fullWidthCh(place, ["Vinhomes Ocean Park 2 – The Empire", "Ocean"])).toBe(37);
+    expect(fullWidthCh(place, ["Ocean"])).toBe(fittedWidthCh(place, ["Ocean"]));
+  });
+
+  it("fails when spare room is ignored (the long project name stays cut on a wide screen)", () => {
+    const ignore: Spread = (fitted) => [...fitted];
+    expect(() => checkSpread(ignore)).toThrow("spare room: room for every cut column");
+  });
+
+  it("fails when spare room overflows the grid", () => {
+    const greedy: Spread = (_fitted, full) => [...full];
+    expect(() => checkSpread(greedy)).toThrow("spare room: room for part of the cut");
   });
 });

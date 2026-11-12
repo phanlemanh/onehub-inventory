@@ -70,6 +70,24 @@ describe("invite mail", () => {
     expect(err?.message).not.toContain("moi@example.test");
   });
 
+  it("thu-moi-dia-chi-cau-hinh-thang-goc-yeu-cau", async () => {
+    const ok = vi.fn(async () => new Response("{}", { status: 200 }));
+    await resendInviteSender({
+      apiKey: "k",
+      from: "OneHub <a@vi-du.test>",
+      appUrl: "https://app.example.test",
+      fetch: ok as unknown as typeof fetch,
+    })({ ...MAIL, origin: "https://ke-gian.test" });
+    const payload = String((ok.mock.calls[0] as unknown as [string, RequestInit])[1].body);
+    expect(payload).toContain("https://app.example.test/login");
+    if (payload.includes("ke-gian.test"))
+      throw new Error(
+        "thu-moi-dia-chi-cau-hinh-thang-goc-yeu-cau: thư theo tên máy chủ của yêu cầu",
+      );
+    // The check can see the forged host: the same mail without a configured app URL does carry it.
+    expect(inviteEmail({ ...MAIL, origin: "https://ke-gian.test" }).text).toContain("ke-gian.test");
+  });
+
   it("captures and fails on demand", async () => {
     const c = captureInviteSender();
     await c.sender(MAIL);

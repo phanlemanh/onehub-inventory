@@ -6,8 +6,7 @@ cap_nhat: 2026-11-11
 ---
 # Người dùng và vai
 
-Quy ước nguồn như [trang Sản phẩm](../nen/san-pham.md): `qh:` là Quỹ hàng ở commit `1729b11f`. Đường mở đầu
-`nhánh chore/nen-chon-truoc-tao-sau:` chưa gộp vào `main`, số dòng có thể đổi.
+Quy ước nguồn như [trang Sản phẩm](../nen/san-pham.md): `qh:` là Quỹ hàng ở commit `1729b11f`.
 
 ## Vì sao có
 
@@ -59,4 +58,4 @@ Quy ước nguồn như [trang Sản phẩm](../nen/san-pham.md): `qh:` là Qu�
 - **Ngược với Quỹ hàng:** kho này cho Quản trị sàn không tự thấy hàng hay số chủ, muốn thấy thì nhận thêm vai Trưởng nhóm.
   Quỹ hàng từng vấp ngõ cụt ngày đầu vì chính chỗ này. `wiki/decisions/0016-permission-model.md:36`
 - Màn Thành viên chọn lại ở hàng 9c: ứng viên là khuôn Lưới của kho, `solution-users-8`, hộp mời `dialog-2`.
-  `nhánh chore/nen-chon-truoc-tao-sau:docs/plan/lo-trinh.json:569-581`
+  `docs/plan/lo-trinh.json:589-602`

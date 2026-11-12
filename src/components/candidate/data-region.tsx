@@ -8,9 +8,9 @@ import {
   DataGridContainer,
   dataGridFeatures,
 } from "@/components/reui/data-grid/data-grid";
-import { DataGridPagination } from "@/components/reui/data-grid/data-grid-pagination";
 import { DataGridScrollArea } from "@/components/reui/data-grid/data-grid-scroll-area";
-import { DataGridTable } from "@/components/reui/data-grid/data-grid-table";
+import { DataGridTableVirtual } from "@/components/reui/data-grid/data-grid-table-virtual";
+import { Frame, FrameHeader, FramePanel } from "@/components/reui/frame";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -18,12 +18,15 @@ import {
   SEARCHABLE_KINDS,
   densityFor,
   editModeFor,
+  fittedWidthCh,
+  fullWidthCh,
+  spreadSpareCh,
   type FieldKey,
   type TypedColumn,
 } from "./column-kind";
 import { GRID_COPY, GRID_I18N } from "./grid-copy";
 import { RecordPanel, useRecordAddress, type RecordView } from "./record-panel";
-import { RegionHeader } from "./region-header";
+import { RegionTitle, RegionToolbar } from "./region-header";
 import {
   RegionEmpty,
   RegionError,
@@ -44,7 +47,17 @@ export type GridRow = {
 
 export type RegionStatus = "ready" | "loading" | "error" | "partial" | "forbidden";
 
-export const DEFAULT_PAGE_SIZE = 50;
+/** Row heights of the two densities (h-8, h-12, plus the 1px row border), for the virtual body to place rows before measuring them. */
+const ROW_HEIGHT_PX = { dense: 33, normal: 49 } as const;
+
+/** Viewport height of the grid: rows scroll inside it in one run, like a sheet; the page itself does not scroll. */
+const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-screen";
+
+/** Id of the row-number column, the first frozen column. */
+export const ROW_NUMBER_ID = "row-number";
+
+/** How many leading data columns stay put while the grid scrolls sideways, after the row numbers. */
+export const FROZEN_COLUMNS = 2;
 
 /** The region's working button and whether the viewer may use it; a button without permission never shows. */
 export interface RegionAction {
@@ -124,8 +137,10 @@ function matches(row: GridRow, columns: readonly TypedColumn[], query: string): 
 function useWidthInCh() {
   const boxRef = useRef<HTMLDivElement>(null);
   const chRef = useRef<HTMLSpanElement>(null);
+  const denseChRef = useRef<HTMLSpanElement>(null);
   const [widthCh, setWidthCh] = useState<number | null>(null);
   const [chPx, setChPx] = useState(8);
+  const [denseChPx, setDenseChPx] = useState(7);
   useEffect(() => {
     const box = boxRef.current;
     const ch = chRef.current;
@@ -133,6 +148,7 @@ function useWidthInCh() {
     const measure = () => {
       const one = ch.getBoundingClientRect().width || 8;
       setChPx(one);
+      setDenseChPx(denseChRef.current?.getBoundingClientRect().width || one);
       setWidthCh(box.getBoundingClientRect().width / one);
     };
     measure();
@@ -140,11 +156,11 @@ function useWidthInCh() {
     observer.observe(box);
     return () => observer.disconnect();
   }, []);
-  return { boxRef, chRef, widthCh, chPx };
+  return { boxRef, chRef, denseChRef, widthCh, chPx, denseChPx };
 }
 
 /**
- * The shared grid of every data region: header, typed columns, search, pagination and the region states
+ * The shared grid of every data region: header, typed columns, search, one continuous run of rows and the region states
  * (design/states.md). Screens give columns by field and rows; alignment, width, format and density follow the kind.
  */
 export function DataRegion({
@@ -159,7 +175,6 @@ export function DataRegion({
   action,
   record,
   editable = false,
-  pageSize = DEFAULT_PAGE_SIZE,
 }: {
   title: string;
   columns: readonly TypedColumn[];
@@ -177,18 +192,53 @@ export function DataRegion({
   record?: RegionRecord;
   /** Cells say where they are edited: in the cell or in the record panel, by kind. */
   editable?: boolean;
-  pageSize?: number;
 }) {
   const searchId = useId();
   const [query, setQuery] = useState("");
-  const { boxRef, chRef, widthCh, chPx } = useWidthInCh();
+  const { boxRef, chRef, denseChRef, widthCh, chPx: baseChPx, denseChPx } = useWidthInCh();
 
   const shown = useMemo(
     () => rows.filter((row) => matches(row, columns, query)),
     [rows, columns, query],
   );
-  const totalMinCh = columns.reduce((sum, column) => sum + column.widthCh, 0);
+  // Widths follow the rows the region holds, not the rows a search leaves, so columns do not jump while typing.
+  const fitted = useMemo(
+    () =>
+      columns.map((column) =>
+        fittedWidthCh(
+          column,
+          rows.map((row) => row[column.field]),
+        ),
+      ),
+    [columns, rows],
+  );
+  const full = useMemo(
+    () =>
+      columns.map((column) =>
+        fullWidthCh(
+          column,
+          rows.map((row) => row[column.field]),
+        ),
+      ),
+    [columns, rows],
+  );
+  // The row-number column counts too: digits of the last row number plus padding.
+  const rowNumberCh = String(rows.length).length + 3;
+  const totalMinCh = rowNumberCh + fitted.reduce((sum, w) => sum + w, 0);
   const density = widthCh === null ? "normal" : densityFor(totalMinCh, widthCh);
+  // Dense rows use the smaller text, so their columns are sized in the smaller text's ch: a grid that overflows in
+  // normal text shrinks with its text instead of keeping normal-text widths. Density itself is decided in normal ch.
+  const chPx = density === "dense" ? denseChPx : baseChPx;
+  // Spare room on a wide screen goes to columns that cut their text (a long project name), never below the fit.
+  const widths = useMemo(
+    () =>
+      spreadSpareCh(
+        fitted,
+        full,
+        widthCh === null ? null : (widthCh * baseChPx) / chPx - rowNumberCh - 1,
+      ),
+    [fitted, full, widthCh, baseChPx, chPx, rowNumberCh],
+  );
 
   const recordAddress = record?.address;
   const addressNavigate = useRef<((id: string | null) => void) | null>(null);
@@ -208,12 +258,31 @@ export function DataRegion({
   });
 
   const columnDefs = useMemo(
-    () =>
-      columns.map((column, index) =>
+    () => [
+      helper.display({
+        id: ROW_NUMBER_ID,
+        header: GRID_COPY.rowNumberHeader,
+        size: Math.floor(rowNumberCh * chPx),
+        cell: (info) => (
+          <span
+            data-slot="row-number"
+            data-row-number={info.row.index + 1}
+            className="text-muted-foreground tabular-nums"
+          >
+            {info.row.index + 1}
+          </span>
+        ),
+        meta: {
+          headerTitle: GRID_COPY.rowNumberLabel,
+          headerClassName: "text-right",
+          cellClassName: "text-right",
+        },
+      }),
+      ...columns.map((column, index) =>
         helper.accessor((row: GridRow) => row[column.field], {
           id: column.field,
           header: column.header,
-          size: Math.round(column.widthCh * chPx),
+          size: Math.floor((widths[index] ?? column.widthCh) * chPx),
           cell: (info) => {
             const cell = (
               <TypedCell
@@ -244,7 +313,8 @@ export function DataRegion({
           },
         }),
       ),
-    [columns, chPx, editable, opensRecord],
+    ],
+    [columns, chPx, editable, opensRecord, widths, rowNumberCh],
   );
 
   const table = useTable({
@@ -252,11 +322,20 @@ export function DataRegion({
     data: shown as GridRow[],
     columns: columnDefs,
     getRowId: (row: GridRow) => row.id,
-    initialState: { pagination: { pageIndex: 0, pageSize } },
+    // One continuous run: every row is on the single page, the virtual body mounts only the rows in view.
+    initialState: {
+      pagination: { pageIndex: 0, pageSize: Number.MAX_SAFE_INTEGER },
+      columnPinning: {
+        start: [ROW_NUMBER_ID, ...columns.slice(0, FROZEN_COLUMNS).map((column) => column.field)],
+        end: [],
+      },
+    },
   });
 
-  // The grid scrolls sideways inside its own viewport; keyboard users must be able to reach and scroll it
-  // (WCAG 2.1.1). ReUI's scroll area takes no props for its viewport, so the region labels it after render.
+  // The grid scrolls inside its own viewport; keyboard users must be able to reach and scroll it (WCAG 2.1.1).
+  // ReUI's scroll area takes no props for its viewport, so the region labels it once the page runs. Until then the
+  // server-rendered content holds the one keyboard stop, so the grid is reachable before the page takes input; the
+  // stop moves to the viewport here (React leaves the attribute alone while its prop does not change).
   useEffect(() => {
     const viewport = boxRef.current?.querySelector<HTMLElement>(
       '[data-slot="scroll-area-viewport"]',
@@ -265,6 +344,9 @@ export function DataRegion({
     viewport.tabIndex = 0;
     viewport.setAttribute("role", "region");
     viewport.setAttribute("aria-label", title);
+    boxRef.current
+      ?.querySelector('[data-slot="data-region-scroll-content"]')
+      ?.removeAttribute("tabindex");
   });
 
   const showsRows = headerShowsRows(status);
@@ -283,49 +365,75 @@ export function DataRegion({
         table={table}
         recordCount={shown.length}
         i18n={GRID_I18N}
-        tableLayout={{ headerSticky: true, width: "fixed", dense: density === "dense" }}
+        tableLayout={{
+          headerSticky: true,
+          headerBackground: true,
+          cellBorder: true,
+          columnsPinnable: true,
+          width: "fixed",
+          dense: density === "dense",
+        }}
         tableClassNames={{ bodyRow: DENSITY_ROW_CLASS[density] }}
       >
         <DataGridContainer>
-          <DataGridScrollArea>
-            <DataGridTable />
+          <DataGridScrollArea className={VIEWPORT_HEIGHT_CLASS}>
+            {/* Keyed by density: the virtual body keeps the estimate it started with for rows it has not measured, so a
+                switch from normal to dense rows must start it again or the run's height (and its last rows) go wrong. */}
+            <div data-slot="data-region-scroll-content" tabIndex={0}>
+              <DataGridTableVirtual key={density} estimateSize={ROW_HEIGHT_PX[density]} />
+            </div>
           </DataGridScrollArea>
         </DataGridContainer>
-        {shown.length > pageSize ? (
-          <DataGridPagination
-            sizes={[pageSize]}
-            rowsPerPageLabel={GRID_I18N.labels?.rowsPerPage}
-            previousPageLabel={GRID_I18N.labels?.previousPage}
-            nextPageLabel={GRID_I18N.labels?.nextPage}
-          />
-        ) : null}
+        <div data-slot="region-footer" className="border-t px-3 py-2">
+          <span data-slot="region-footer-count" className="text-sm text-muted-foreground">
+            {query
+              ? GRID_COPY.filteredCount(shown.length, rows.length)
+              : GRID_COPY.rowCount(rows.length)}
+          </span>
+        </div>
       </DataGrid>
     );
 
   return (
-    <section data-slot="data-region" className="flex min-w-0 flex-col gap-4">
-      <span ref={chRef} aria-hidden="true" className="invisible absolute">
+    <section data-slot="data-region" className="flex min-w-0 flex-col">
+      <span ref={chRef} aria-hidden="true" className="invisible absolute text-base">
         0
       </span>
-      <RegionHeader
-        title={title}
-        total={showsRows ? rows.length : undefined}
-        shown={showsRows && query ? shown.length : undefined}
-        query={query}
-        onQuery={setQuery}
-        action={action?.allowed && status !== "forbidden" ? action.node : undefined}
-        searchId={searchId}
-      />
-      {status === "partial" && rows.length > 0 ? <RegionPartial onRetry={onRetry} /> : null}
-      {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
-      <div
-        ref={boxRef}
-        data-slot="data-region-body"
-        data-density={density}
-        className="w-0 min-w-full"
-      >
-        {body}
-      </div>
+      <span ref={denseChRef} aria-hidden="true" className="invisible absolute text-sm">
+        0
+      </span>
+      {/* Arrangement after data-grid-editing-6: name on the frame's header strip; toolbar, table and pages in one panel. */}
+      <Frame className="min-w-0">
+        <FrameHeader>
+          <RegionTitle title={title} />
+        </FrameHeader>
+        <FramePanel className="flex min-w-0 flex-col gap-3 p-0">
+          <div className="px-3 pt-3 empty:hidden">
+            <RegionToolbar
+              total={showsRows ? rows.length : undefined}
+              shown={showsRows && query ? shown.length : undefined}
+              query={query}
+              onQuery={setQuery}
+              action={action?.allowed && status !== "forbidden" ? action.node : undefined}
+              searchId={searchId}
+            />
+          </div>
+          {status === "partial" && rows.length > 0 ? (
+            <div className="px-3">
+              <RegionPartial onRetry={onRetry} />
+            </div>
+          ) : null}
+          {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
+          <div
+            ref={boxRef}
+            data-slot="data-region-body"
+            data-density={density}
+            className="w-0 min-w-full"
+          >
+            {body}
+          </div>
+        </FramePanel>
+      </Frame>
       {record && showsRows ? (
         record.address ? (
           <PanelFor

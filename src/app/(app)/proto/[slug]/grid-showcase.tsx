@@ -46,10 +46,10 @@ function sampleRows(): GridRow[] {
 function columnsFor(few: boolean): TypedColumn[] {
   const all = [
     typedColumn({ field: "Listing.unitNumber", header: label("Unit") }),
-    typedColumn({ field: "Listing.standardStatus", header: "Trạng thái" }),
+    typedColumn({ field: "Listing.standardStatus", header: label("StandardStatus") }),
     typedColumn({ field: "Listing.listPrice", header: "Giá" }),
-    typedColumn({ field: "Unit.livingArea", header: "Diện tích" }),
-    typedColumn({ field: "Unit.bedroomsTotal", header: "Phòng ngủ" }),
+    typedColumn({ field: "Unit.livingArea", header: label("LivingArea") }),
+    typedColumn({ field: "Unit.bedroomsTotal", header: label("BedroomsTotal") }),
     typedColumn({ field: "Listing.buildingName", header: label("Building") }),
     typedColumn({ field: "Listing.subdivisionName", header: label("Subdivision") }),
     typedColumn({ field: "Listing.lastConfirmedAt", header: "Xác nhận lần cuối" }),

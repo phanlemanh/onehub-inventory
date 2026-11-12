@@ -11,6 +11,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { ListingStandardStatus } from "@/generated/ontology";
 import { formatByKind, statusLabel, statusTone } from "@/lib/format";
+import { label } from "@/modules/company-config";
 
 /** The flag the browser test sets to mend the broken screen before pressing «Thử lại». */
 export const MENDED_FLAG = "frame-proto-mended";
@@ -28,7 +29,7 @@ const SAMPLES = [
   { name: "Giá từ 1 tỷ", kind: "money", value: 4_850_000_000 },
   { name: "Giá dưới 1 tỷ", kind: "money", value: 320_000_000 },
   { name: "Giá dưới 1 triệu", kind: "money", value: 999_999 },
-  { name: "Diện tích", kind: "area", value: 75.5 },
+  { name: label("LivingArea"), kind: "area", value: 75.5 },
   { name: "Số đếm", kind: "count", value: 2418 },
   { name: "Ngày", kind: "date", value: "2026-11-05" },
   { name: "Ngày giờ", kind: "datetime", value: "2026-11-05T07:30:00Z" },
@@ -120,7 +121,7 @@ export function FrameShowcase({ slug }: { slug: string }) {
         <SaveDemo />
       </section>
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">Trạng thái toàn trang</h2>
+        <h2 className="text-lg font-semibold">{`${label("StandardStatus")} toàn trang`}</h2>
         <ul className="flex flex-col gap-2 text-sm">
           <li>
             <Link className="underline" href={`/proto/${slug}?state=error`}>

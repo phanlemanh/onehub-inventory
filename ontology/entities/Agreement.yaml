@@ -31,6 +31,15 @@ properties:
 rules:
   - id: every-connection-is-an-agreement
     description: A connection is enabled by an agreement, never by code written for one party.
+  - id: source-class-never-leaves
+    description: >-
+      The source data class (owner, owner phone, floor price, title photo) is never in an agreement, so it never
+      leaves the company. A table guard copied from onehub-quy-hang; not a product rule in the MVP (decision 0014).
+    implemented_in: db/migrations/001_nen_cong_ty.sql
+  - id: internal-data-inbound-only
+    description: >-
+      An agreement that carries company-internal data only flows inbound. A table guard copied from onehub-quy-hang.
+    implemented_in: db/migrations/001_nen_cong_ty.sql
 
 code:
   model: src/modules/agreements/

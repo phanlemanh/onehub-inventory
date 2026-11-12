@@ -1,0 +1,93 @@
+schema_version: 1
+feature_slug: app-shell-chon-tu-reui
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/templates/app-shell.tsx, src/components/templates/app-shell/**, tests/e2e/app-shell.spec.ts]
+    expected: "exit 0; trong tests/e2e/app-shell.spec.ts, ở 1024 và 1440, sáng và tối, với mỗi màn today, inventory, sent: có đúng một vùng điều hướng cột biểu tượng mà mỗi mục là một liên kết có tên đọc được bằng nhãn màn, đúng một mục mang aria-current=page và là màn đang mở, có vùng cột thứ hai mang tên màn, có thanh trên; bấm mục khác thì URL đổi sang màn ấy và h1 đổi theo; ca đối chứng mở một trang dựng App Shell với aria-current đặt sai mục thì bài đỏ với thông điệp 'current entry is not the open screen'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/templates/nav-menu.tsx, src/components/templates/app-shell/**, tests/app-shell.test.tsx, tests/nav-roles.test.tsx]
+    expected: "exit 0; tests/app-shell.test.tsx dựng App Shell mới (cột biểu tượng thật trong SidebarProvider) với 5 mục mẫu của tests/nav-roles.test.tsx và chạy lại đủ ma trận 16 tổ hợp vai viết trước: tên mục đọc từ DOM của cột biểu tượng, đúng tập và thứ tự khai, không lặp; ca đối chứng dựng cho [ListAgent, TeamLead] mà so với kỳ vọng [ListAgent] thì thấy 'role filter leaked: Mục nhóm'; tests/nav-roles.test.tsx của hàng 1i vẫn xanh"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/templates/app-shell/**, tests/e2e/app-shell.spec.ts]
+    expected: "exit 0; ở 1440: màn inventory có cột thứ hai với mục 'Tất cả hàng' và đủ sáu nhãn trạng thái đọc từ src/generated/labels.ts (danh sách viết trước trong bài, so bằng tập), không mục nào mang số, bấm một lối tắt thì URL là /inventory, màn sent có 'Tất cả link', màn today có câu chưa có mục con; bấm tay nắm thì bề rộng cột về 0 và nút đổi aria-expanded=false, tải lại trang vẫn gập, bấm lại thì mở; chiều đỏ: bài đổi kỳ vọng sau tải lại thành 'mở' trên cùng thao tác thì thấy 'second column state lost after reload'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/templates/app-shell/**, src/app/(app)/account-menu.tsx, tests/e2e/app-shell.spec.ts]
+    expected: "exit 0; ở 1440, thanh trên có tên sàn đang làm, nút 'Đổi giao diện' và nút menu tài khoản; không có nút nào tên 'Create', 'Tạo', không có nút 'Thông báo', không có ô 'Gõ mã căn' (theo phương án khuyên; chủ kho chọn khác thì kỳ vọng đổi trước khi duyệt); người thuộc hai sàn bấm tên sàn thấy danh sách hai sàn"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/templates/app-shell/**, tests/e2e/app-shell.spec.ts]
+    expected: "exit 0; ở 360 và 414, sáng và tối: không thấy cột biểu tượng hay cột thứ hai khi chưa mở, scrollWidth - clientWidth <= 0; bấm 'Mở hoặc đóng thanh bên' thì ngăn trượt hiện cả mục của cột biểu tượng và mục cột thứ hai của màn đang mở; bấm mục 'Đã gửi' thì ngăn đóng và h1 là 'Đã gửi'; chiều đỏ: bài kiểm ngăn còn mở sau khi chọn thì thấy 'sheet stayed open after choosing'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/templates/app-shell.tsx, src/components/templates/app-shell/**, tests/frame.test.tsx]
+    expected: "exit 0; các ca 'page states' và 'notification channels' của tests/frame.test.tsx chạy trên App Shell mới và giữ nguyên câu chữ của FRAME_COPY: lối nhảy tới nội dung trỏ đúng id vùng màn, băng mất mạng hiện khi offline và tự tắt khi online, băng lưu hỏng có 'Thử lại', trạng thái lỗi, không tìm thấy, hết phiên hiện trong vùng màn trong khi cột biểu tượng vẫn có trong DOM"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/templates/**, src/app/(app)/**, tests/e2e/**]
+    expected: "exit 0; bộ bài sinh từ sổ màn tests/e2e/screens/screens.spec.ts và tests/e2e/shell.spec.ts chạy ở bốn dự án 360, 414, 1024, 1440, mỗi màn nội bộ trong design/screens.yaml qua pha khung (một main, một h1, không cuộn ngang) và axe sáng tối không lỗi serious hay critical"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: judgment
+    inputs: [_acceptance/app-shell-chon-tu-reui/design.md]
+    question: "Bảng «Vùng của khối → lấy, bỏ, thêm» có đủ mọi vùng của app-shell-8 đã liệt kê không, phần đếm lấy và bỏ có khớp bảng theo phương án chủ kho đã chọn và có quá nửa vùng bị bỏ không (quá nửa thì phải gọi là ghép từ thành phần), mỗi dòng có một lý do trỏ vào việc của người dùng (không phải 'trông đẹp hơn' hay 'nhanh hơn'), phần 'Thêm' chỉ dùng thành phần của kho, và có dòng nhập kho nêu từ khối nào, cho nhu cầu gì, ngày chủ kho duyệt?"
+    evidence_required: [verdict, rationale, judges]
+
+  - id: E9
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.check
+    paths: [src/components/templates/**, src/components/ui/**, src/components/reui/**]
+    expected: "exit 0; make check chạy lint giao diện của kho (onehub-ui, shadcn/no-restyle) trên App Shell mới: không lớp sửa kiểu nào trên thành phần nhà cung cấp, không tệp nào trong src/components/ui hay src/components/reui bị sửa tay so với bản cài"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-1
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/components/templates/app-shell.tsx, src/components/templates/app-shell/**, tests/e2e/app-shell.spec.ts]
+    steps:
+      - "Run SHOTS_DIR=_acceptance/app-shell-chon-tu-reui/evidence npx playwright test tests/e2e/app-shell.spec.ts; the spec saves E10-inventory-1440-light.png, E10-inventory-1440-dark.png, E10-inventory-360-light.png, E10-inventory-360-dark.png and E10-sheet-360-light.png"
+      - "Read every evidence/E10-*.png frame and compare with the approved prototype frames in _acceptance/app-shell-chon-tu-reui/evidence/design-pass/anh/ (inventory-1440-light.jpg, inventory-360-dark.jpg, q5-a.jpg)"
+    expected: "ở 1440: cột biểu tượng hẹp bên trái có dấu OneHub và các biểu tượng màn, cột thứ hai có «Tất cả hàng» và sáu trạng thái không mang số, thanh trên có nút đổi giao diện và góc tài khoản, cách xếp như ảnh đã duyệt ở Cổng Phạm vi; ở 360 không cột nào chiếm màn và ngăn trượt mở ra có cả biểu tượng màn lẫn mục của cột thứ hai; tối đổi nền và chữ, đọc được"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
+
+  - id: E11
+    criterion: AC-4
+    executor: script
+    layer: backend-effect
+    cmd: config:executors.script.dang_nhap_e2e
+    paths: [src/app/(app)/company-switch.tsx, src/app/(app)/account-menu.tsx, src/app/(app)/layout.tsx, tests/e2e-db/app-shell-doi-san.spec.ts]
+    expected: "exit 0; trong tests/e2e-db/app-shell-doi-san.spec.ts trên Postgres của dãy, ở bốn khổ: một quản trị thuộc hai sàn mẫu (mỗi sàn có thêm một thành viên chỉ sàn ấy có, nhãn MAU) đăng nhập vào sàn A; bấm tên sàn ở thanh trên, chọn sàn B; tải lại trang thì thanh trên ghi sàn B và màn Thành viên có người riêng của sàn B, không có người riêng của sàn A; ca đối chứng kiểm sàn B ngay khi còn ở sàn A thì đỏ với thông điệp 'company switch did not reach the session'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
