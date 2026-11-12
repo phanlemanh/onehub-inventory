@@ -27,7 +27,7 @@ type Sample = ReturnType<typeof buildSample>;
 
 const clone = (s: Sample): Sample => structuredClone(s);
 const digest = (text: string) => createHash("sha256").update(text).digest("hex");
-const PINNED_DIGEST = "16f9b15b3465b3f16b9a2e9ccfef6d00f0656a88f3b9d23f5492df128ece6ca0";
+const PINNED_DIGEST = "428b20ae0e96076795e22ef1fd1734acf5743d8afb94366173973434eb3855c9";
 
 function scanGroups(s: Sample): contacts.ScanGroup[] {
   return [
@@ -108,19 +108,19 @@ describe("AC-2 the catalog covers Ocean Park 1, 2, 3", () => {
   it("every unit code is unique and reads back to its tower, floor and stack", () => {
     expect(catalog.checkSampleCatalog(units)).toEqual([]);
     for (const u of units)
-      expect(catalog.readUnitCode(catalog.unitCode(u))).toEqual({
+      expect(catalog.readSampleCode(catalog.unitCode(u))).toEqual({
         buildingKey: u.buildingKey,
         floor: u.floor,
         stack: u.stack,
       });
-    expect(catalog.readUnitCode("S1.05-1208")).toEqual({
-      buildingKey: "S1.05",
-      floor: 12,
-      stack: "08",
+    expect(catalog.readSampleCode("S1.05-1206")).toEqual({
+      buildingKey: units.find((u) => u.buildingName === "S1.05")!.buildingKey,
+      floor: "12",
+      stack: "06",
     });
     for (const s of catalog.SAMPLE_SUBDIVISIONS)
-      expect(catalog.readUnitCode(s.codeExample)).not.toBeNull();
-    expect(catalog.readUnitCode("toà S1.05 căn 1208")).toBeNull();
+      expect(catalog.readSampleCode(s.codeExample)).not.toBeNull();
+    expect(catalog.readSampleCode("toà S1.05 căn 1206")).toBeNull();
   });
 
   it("red: a duplicated code and a floor that disagrees with the code are named", () => {
@@ -131,7 +131,7 @@ describe("AC-2 the catalog covers Ocean Park 1, 2, 3", () => {
     );
 
     const off: Unit[] = structuredClone(units);
-    nth(off, 2).floor = 99;
+    nth(off, 2).floor = "99";
     expect(catalog.checkSampleCatalog(off)).toEqual([
       `mã căn lệch thuộc tính: ${catalog.unitCode(nth(units, 2))}`,
     ]);

@@ -53,8 +53,8 @@ export const SAMPLE_SUBDIVISIONS: readonly SampleSubdivision[] = [
     name: "Vinhomes Ocean Park 1",
     complex: { slug: "op1-the-sapphire-1", name: "The Sapphire 1" },
     buildings: ["S1.01", "S1.02", "S1.03", "S1.05"].map((code) => ({ code, name: code })),
-    codeExample: "S1.05-1208",
-    codeReading: `${BUILDING_WORD} S1.05 · tầng 12 · trục 08`,
+    codeExample: "S1.05-1206",
+    codeReading: `${BUILDING_WORD} S1.05 · tầng 12 · trục 06`,
   },
   {
     key: "op2",
@@ -85,7 +85,7 @@ const STACKS = [
 
 const two = (n: number) => String(n).padStart(2, "0");
 
-/** Sixteen deterministic numbers for the n-th sample key (mulberry32 on the counter). */
+/** Sixteen deterministic numbers for the n-th sample key (mulberry32 on the counter), letters of Crockford only. */
 function counterRandom(n: number): number[] {
   let a = (0x7d000000 + n) >>> 0;
   return Array.from({ length: 16 }, () => {
@@ -93,7 +93,9 @@ function counterRandom(n: number): number[] {
     let t = a;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) % 32;
+    // Letters only (Crockford 10–31): a sample key then carries the 5 digits of its time part and no more, so the
+    // no-real-data scan of the sample (9 digits in one string look like a phone number) stays quiet on keys.
+    return 10 + (((t ^ (t >>> 14)) >>> 0) % 22);
   });
 }
 

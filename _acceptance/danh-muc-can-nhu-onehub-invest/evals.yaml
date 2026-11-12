@@ -20,10 +20,11 @@ feature_slug: danh-muc-can-nhu-onehub-invest
 #   tsx — không viết tay; 432 căn, 60 upi của buildSampleListings.
 #   Bảng danh mục: catalog_nodes, catalog_buildings, catalog_stacks, catalog_units, catalog_aliases (5); bảng của sàn:
 #   company_catalog_aliases (trỏ toà hay căn bằng khoá ngoại, đúng một trong hai).
-#   Mã riêng (E16, E17) — bộ dữ liệu viết trước: sàn A: toà S1.05 gọi «Sapphire 5» (ten), căn S1.05-1208 ghi «SA5-12.08» (ma);
-#     sàn A còn ghi «S1.05-1209» (ma) trỏ căn S1.05-1210 — chuỗi trùng mã gốc của căn khác, tra trong A phải ra S1.05-1210
-#     nguồn 'san'; sàn B: «SA5-12.08» trỏ căn E1-0903. Tra: 'SA5-12.08' trong A → S1.05-1208 'san'; trong B → E1-0903 'san';
-#     'vinhomes-ocean-park-1/S1.05-1208' → 'goc'; 'Q12A-17-05A' → 'doc' (Q12A/17/05A); 'XYZ' → 'khong-tim-thay'.
+#   Mã riêng — bộ dữ liệu viết trước. E17 (thuần, khoá giả trong bài): sàn A «Sapphire 5» (ten) → toà S1.05;
+#     «SA5-12.08» (ma) → căn S1.05-1208; «S1.05-1209» (ma) → căn S1.05-1210 — chuỗi trùng mã gốc của căn khác, trong A
+#     phải ra S1.05-1210 nguồn 'san'; sàn B «SA5-12.08» → căn E1-0903. Tra: 'op1/S1.05-1208' → 'goc'; 'Q12A-17-05A' → 'doc'
+#     (Q12A/17/05A); 'XYZ' → 'khong-tim-thay'. E16 (cơ sở dữ liệu, danh mục mẫu thật): sàn A «SA5-12.08» → căn
+#     S1.05-1206, sàn B cùng chuỗi → căn E1-0903 (mẫu chỉ có trục 01–06, nên ví dụ cũ S1.05-1208 không có căn thật).
 evals:
   - id: E1
     criterion: AC-1
