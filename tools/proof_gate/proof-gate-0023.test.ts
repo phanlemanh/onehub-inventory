@@ -446,21 +446,40 @@ describe("tệp bài của hàng 1c không đổi", () => {
   // The one line row 2 may change (G-1111-29): the real Lưới family names its reference screen once row 2 signs.
   const REFERENCE_NOW = 'expect(section("Màn mẫu")).toContain("Màn: chưa có");';
   const REFERENCE_ROW2 = 'expect(section("Màn mẫu")).toContain("Màn: inventory");';
+  // The copy list row 2 may widen (K-1211-1): once the block ledger has real lines, a repo copy must carry the code
+  // files those lines name and the context pages, or the gate is red on the copy for a reason the case does not test.
+  const COPY_NOW = '    for (const d of ["design", "_acceptance", "wiki/decisions", "tests"]) {';
+  const COPY_ROW2 = [
+    "    for (const d of [",
+    '      "design",',
+    '      "_acceptance",',
+    '      "wiki/decisions",',
+    '      "tests",',
+    '      "docs/tri-thuc",',
+    '      "src/components",',
+    "    ]) {",
+  ].join("\n");
+  const normalise = (text: string) =>
+    text.replace(REFERENCE_ROW2, REFERENCE_NOW).replace(COPY_ROW2, COPY_NOW);
   function blob(text: string): string {
     const body = Buffer.from(text, "utf8");
     return createHash("sha1")
       .update(Buffer.concat([Buffer.from(`blob ${body.length}\0`), body]))
       .digest("hex");
   }
-  it("băm git của proof-gate.test.ts bằng bản đã ký (dòng màn mẫu của hàng 2 quy về bản cũ trước khi băm)", () => {
-    const text = readFileSync(OLD_TESTS, "utf8").replace(REFERENCE_ROW2, REFERENCE_NOW);
+  it("băm git của proof-gate.test.ts bằng bản đã ký (dòng màn mẫu và danh sách chép của hàng 2 quy về bản cũ trước khi băm)", () => {
+    const text = normalise(readFileSync(OLD_TESTS, "utf8"));
     expect(blob(text)).toBe(OLD_TESTS_BLOB);
-    // Controls: the row-2 line is allowed, any other edit is not.
-    const signed = readFileSync(OLD_TESTS, "utf8").replace(REFERENCE_ROW2, REFERENCE_NOW);
+    // Controls: the two row-2 edits are allowed, any other edit is not.
+    const signed = normalise(readFileSync(OLD_TESTS, "utf8"));
     expect(
       blob(signed.replace(REFERENCE_NOW, REFERENCE_ROW2).replace(REFERENCE_ROW2, REFERENCE_NOW)),
     ).toBe(OLD_TESTS_BLOB);
     expect(blob(signed.replace("toHaveLength(12)", "toHaveLength(11)"))).not.toBe(OLD_TESTS_BLOB);
+    expect(blob(normalise(signed.replace(COPY_NOW, COPY_ROW2)))).toBe(OLD_TESTS_BLOB);
+    // A copy list naming a wrong folder is not the allowed edit, so the pin stays red.
+    const wrong = COPY_ROW2.replace('"src/components"', '"src/component"');
+    expect(blob(normalise(signed.replace(COPY_NOW, wrong)))).not.toBe(OLD_TESTS_BLOB);
   });
 });
 
@@ -1150,6 +1169,7 @@ describe("kho thật và khuôn tệp chứng minh", () => {
       "tests",
       "tools/proof_gate",
       "docs/tri-thuc",
+      "src/components",
     ]) {
       if (existsSync(join(ROOT, d))) cpSync(join(ROOT, d), join(copy, d), { recursive: true });
     }

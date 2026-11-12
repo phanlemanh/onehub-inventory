@@ -795,7 +795,14 @@ describe("kho thật", () => {
 
   it("thêm vòng implemented khai Bảng hàng mà thiếu chứng minh thì đỏ", () => {
     const copy = mkdtempSync(join(tmpdir(), "proof-gate-real-"));
-    for (const d of ["design", "_acceptance", "wiki/decisions", "tests"]) {
+    for (const d of [
+      "design",
+      "_acceptance",
+      "wiki/decisions",
+      "tests",
+      "docs/tri-thuc",
+      "src/components",
+    ]) {
       cpSync(join(ROOT, d), join(copy, d), { recursive: true });
     }
     expect(run(copy).status).toBe(0);
