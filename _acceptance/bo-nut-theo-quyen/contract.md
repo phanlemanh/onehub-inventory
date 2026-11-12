@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api]
 screens: []
-status: approved
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-12T13:32:50Z
 design_doc: _acceptance/bo-nut-theo-quyen/design.md
