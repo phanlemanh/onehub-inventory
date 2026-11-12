@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 31b2e21f164d2b79b62db3920df3d94fa5e15061
+verified_commit: 31687231630b54910ca9dd4ea39d550766a5289f
 human_signoff: Manh Phan 2026-11-12
 ---
 
@@ -141,3 +141,7 @@ none — không eval nào chạy nhiều lần; mọi eval là deterministic và
 
 Round 1: lịch sử round cũ nằm ở các bản ghi round trước, không có trong dữ liệu round này; phần baseline được mang sang.
 Round 2: E1-E7 và ba lệnh suite đều xanh; E8 là mục judgment của hợp đồng T3 chờ người chốt ở Cổng 2, nên verdict là PENDING-JUDGMENT.
+
+### Re-pin lần 1 — 2026-11-12, do gop nhanh chinh truoc khi gop PR
+run_id: repin-20261112T024748Z-83296
+sha: 31687231630b54910ca9dd4ea39d550766a5289f · suites: 3 lệnh exit 0 · evals: 7/7 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)
