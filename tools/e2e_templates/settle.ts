@@ -78,6 +78,7 @@ export const CHO_TESTS: Readonly<Record<string, readonly string[]>> = {
     "phone sidebar opens as a sheet and closes after choosing",
     "losing the network shows a banner that leaves when it is back",
     "no serious accessibility violations on every frame screen",
+    "a save that fails offline keeps the input and offers retry",
   ],
   "tests/e2e/app-shell.spec.ts": [
     "no column takes the screen and nothing scrolls sideways (light)",

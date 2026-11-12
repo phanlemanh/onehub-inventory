@@ -62,3 +62,50 @@ export function untagged(
   }
   return missing;
 }
+
+const WAIT_CALL = /\b(openSheet|shown)\(/;
+const TEST_START = /\btest\(\s*(["`])((?:(?!\1).)+)\1/g;
+const COLOR_SCHEMES = ["light", "dark"];
+
+/**
+ * The tests of one file that wait for the sheet or a banner, read from the code: a test whose body calls openSheet()
+ * or shown(), or calls a helper of the same file whose body does (as members.spec's navMembers). A title written with
+ * `${colorScheme}` stands for its light and dark copies. A body runs from its title to the next test's title.
+ */
+export function waitingTests({ text }: SpecFile): string[] {
+  const helpers = new Set<string>();
+  const fn = /(?:async\s+)?function\s+(\w+)\s*\(/g;
+  const starts = [...text.matchAll(fn)].map((m) => ({ name: m[1]!, at: m.index! }));
+  starts.forEach((s, i) => {
+    const body = text
+      .slice(s.at, starts[i + 1]?.at ?? text.length)
+      .split(/\ntest(?:\.describe)?\(/)[0]!;
+    if (s.name !== "openSheet" && WAIT_CALL.test(body)) helpers.add(s.name);
+  });
+  const helperCall = helpers.size > 0 ? new RegExp(`\\b(${[...helpers].join("|")})\\(`) : null;
+  const tests = [...text.matchAll(TEST_START)];
+  const found: string[] = [];
+  tests.forEach((m, i) => {
+    const body = text.slice(m.index!, tests[i + 1]?.index ?? text.length);
+    if (!WAIT_CALL.test(body) && !(helperCall && helperCall.test(body))) return;
+    const title = m[2]!;
+    if (title.includes("${colorScheme}"))
+      found.push(...COLOR_SCHEMES.map((c) => title.replace("${colorScheme}", c)));
+    else found.push(title);
+  });
+  return found;
+}
+
+/** Tests that wait for the sheet or a banner (read from the code) but are not in `wanted`, as `<file> › <title>`. */
+export function unlisted(
+  files: readonly SpecFile[],
+  wanted: Readonly<Record<string, readonly string[]>> = CHO_TESTS,
+): string[] {
+  const missing: string[] = [];
+  for (const file of files) {
+    const listed = new Set(wanted[file.path] ?? []);
+    for (const title of waitingTests(file))
+      if (!listed.has(title)) missing.push(`${file.path} › ${title}`);
+  }
+  return missing;
+}

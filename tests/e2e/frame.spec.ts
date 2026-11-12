@@ -328,21 +328,27 @@ test.describe("frame", () => {
     await expect(assertBanner(page, "Mất kết nối mạng")).rejects.toThrow("banner missing");
   });
 
-  test("a save that fails offline keeps the input and offers retry", async ({ page, context }) => {
-    await page.goto(PROTO);
-    const note = page.getByLabel("Ghi chú thử");
-    await note.fill("ghi chú [Tên]");
-    await context.setOffline(true);
-    await page.getByRole("button", { name: "Lưu thử" }).click();
-    const banner = page.getByRole("alert").filter({ hasText: "Chưa lưu được vì mất kết nối mạng" });
-    await shown(banner, "bang chua luu");
-    await expect(note).toHaveValue("ghi chú [Tên]");
-    await context.setOffline(false);
-    await expect(banner).toBeVisible();
-    await banner.getByRole("button", { name: "Thử lại" }).click();
-    await expect(banner).toHaveCount(0);
-    await expect(note).toHaveValue("ghi chú [Tên]");
-  });
+  test(
+    "a save that fails offline keeps the input and offers retry",
+    { tag: "@cho" },
+    async ({ page, context }) => {
+      await page.goto(PROTO);
+      const note = page.getByLabel("Ghi chú thử");
+      await note.fill("ghi chú [Tên]");
+      await context.setOffline(true);
+      await page.getByRole("button", { name: "Lưu thử" }).click();
+      const banner = page
+        .getByRole("alert")
+        .filter({ hasText: "Chưa lưu được vì mất kết nối mạng" });
+      await shown(banner, "bang chua luu");
+      await expect(note).toHaveValue("ghi chú [Tên]");
+      await context.setOffline(false);
+      await expect(banner).toBeVisible();
+      await banner.getByRole("button", { name: "Thử lại" }).click();
+      await expect(banner).toHaveCount(0);
+      await expect(note).toHaveValue("ghi chú [Tên]");
+    },
+  );
 
   test("follows the device theme first", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "dark" });

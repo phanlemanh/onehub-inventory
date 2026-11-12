@@ -32,7 +32,7 @@ import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
 import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings";
 import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { checkRecipes, regionStates } from "./structure";
-import { untagged, waitCopies, type SpecFile } from "./cho-scan";
+import { unlisted, untagged, waitCopies, waitingTests, type SpecFile } from "./cho-scan";
 import { CHO_TESTS } from "./settle";
 
 const STATES_MD = readFileSync(join(REPO_ROOT, "design/states.md"), "utf8");
@@ -567,6 +567,35 @@ async function openSheet(page: Page): Promise<void> {
 });
 
 describe("the @cho du danh sach", () => {
+  it("every test that calls the shared waits, read from the code, is in CHO_TESTS", () => {
+    const files = specFiles();
+    const members = files.find((f) => f.path === "tests/e2e-db/members.spec.ts")!;
+    // Positive control: the reader sees a wait made through a helper (navMembers opens the sheet).
+    expect(waitingTests(members)).toEqual([
+      "moi-nguoi-va-dang-nhap",
+      "doi-vai-thanh-ben",
+      "khong-du-quyen",
+    ]);
+    const frame = files.find((f) => f.path === "tests/e2e/frame.spec.ts")!;
+    expect(waitingTests(frame)).toContain(
+      "a save that fails offline keeps the input and offers retry",
+    );
+    expect(unlisted(files)).toEqual([]);
+  });
+
+  it("a new test that waits for a banner in a copy of frame.spec.ts is named until it is listed", () => {
+    const frame = specFiles().find((f) => f.path === "tests/e2e/frame.spec.ts")!;
+    expect(unlisted([frame])).toEqual([]);
+    const copy = `${frame.text}
+test("a new banner wait", async ({ page }) => {
+  await shown(page.getByRole("alert"), "bang moi");
+});
+`;
+    expect(unlisted([{ path: frame.path, text: copy }])).toEqual([
+      "tests/e2e/frame.spec.ts › a new banner wait",
+    ]);
+  });
+
   it(
     "every test of CHO_TESTS carries the @cho tag, and removing it from one names that test",
     () => {
