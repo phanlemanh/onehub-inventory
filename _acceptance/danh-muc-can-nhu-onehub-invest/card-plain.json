@@ -62,7 +62,7 @@
     },
     {
       "id": "OOS-6",
-      "p": "KHÔNG làm nhãn riêng, trường riêng, từ điển giá trị của sàn trong hàng này — máy đề xuất hàng 7e làm ngay sau (Hỏi-5)."
+      "p": "KHÔNG làm nhãn riêng, trường riêng, từ điển, căn chờ khớp, mẫu nhập trong hàng này — máy đề xuất hàng 7e ngay sau và mở rộng hàng nhập Sheet thành năm chỗ ghép (Hỏi-5)."
     }
   ],
   "coverage_plain": [

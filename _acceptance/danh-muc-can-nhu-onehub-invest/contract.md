@@ -95,8 +95,8 @@ trường riêng, từ điển giá trị của sàn (đề xuất hàng 7e). Ne
 - Vòng đời toà, căn (gộp, tách, ngừng) và chặn xoá bằng trigger như invest.
 - `ListingUnit` trỏ `unitKey` thay cho `upi`; màn Bảng hàng theo địa lý (hàng 2d).
 - Luật đọc mã theo dự án.
-- Nhãn riêng của sàn (đổi chữ hiện của Dự án, Phân khu, Trục, Tầng…), trường riêng của sàn trên lần chào và từ điển giá
-  trị — đề xuất thành hàng 7e làm ngay sau hàng này, theo khuôn ADR-0018 của Quỹ hàng; chủ kho quyết ở Cổng Đáng.
+- Nhãn riêng, trường riêng, từ điển giá trị, căn chờ khớp và mẫu nhập của sàn — đề xuất hàng 7e làm ngay sau hàng này,
+  cùng hàng 11 mở rộng thành năm chỗ ghép khi nhập Sheet (`de-xuat-nhap-la-luc-anh-xa.md`); chủ kho quyết.
 - Đồng bộ thật với cơ sở dữ liệu của onehub-invest.
 
 ## Notes
