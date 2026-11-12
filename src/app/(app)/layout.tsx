@@ -7,6 +7,7 @@ import {
 } from "@/components/templates/app-shell/column-cookie";
 import { label } from "@/modules/company-config";
 import { currentSession } from "@/modules/identity/server";
+import { SessionRoles } from "@/modules/identity/ui";
 
 import { AccountMenu } from "./account-menu";
 import { CompanySwitch } from "./company-switch";
@@ -39,7 +40,8 @@ export default async function FrameLayout({ children }: { children: React.ReactN
         />
       }
     >
-      {children}
+      {/* Every action button reads the session's roles from here (PermittedAction, row 9e). */}
+      <SessionRoles roles={session?.roles ?? []}>{children}</SessionRoles>
     </AppShell>
   );
 }

@@ -29,4 +29,4 @@ hàng 3 nhận `RecordActions` cạnh nút ghim — đọc `design.md` của hai
   biến mất. Đề xuất: nút thêm đặt ở đầu màn như chủ kho chọn; riêng lúc toàn màn hình, cùng nút ấy hiện ở khe `action` của
   thanh công cụ trong lưới (một nút, hai chỗ theo chế độ, không hai nút cùng lúc). Ghi thành mục «sửa sau Cổng Phạm vi» để
   chủ kho phê ở Cổng Bằng chứng.
-- Trước khi dựng: gộp origin/main (đã có 7d: 10 dòng sống, hằng ô của E2 thành 4 × 2 × 17 = 136 với 7 dòng nháp của 9e) và gộp lại origin/chore/nen-lo-trinh-hang-nhap-3 (đỉnh 592a14b, G-1211-61), sinh lại bản đồ và lộ trình bằng máy.
+- Trước khi dựng: gộp origin/main (đã có 7d: 10 dòng sống, hằng ô của E2 thành 4 × 2 × 22 = 176: 10 dòng sống, 5 dòng nháp của Bảng hàng, 7 dòng nháp của 9e — đúng số evals ghi sẵn; con số 136 ghi trước đây quên 5 dòng nháp của Bảng hàng) và gộp lại origin/chore/nen-lo-trinh-hang-nhap-3 (đỉnh 592a14b, G-1211-61), sinh lại bản đồ và lộ trình bằng máy.

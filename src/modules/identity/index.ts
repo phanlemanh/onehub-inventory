@@ -4,9 +4,12 @@ export { safeNext } from "./next-path";
 export { canonicalRoles, isRole, MEMBER_NAME_MAX, MEMBERS_BASE_PATH, ROLES } from "./roles";
 export {
   actionSpec,
+  actionVisibility,
   allowedScope,
   EXEMPT_DOORS,
   LIVE_ACTIONS,
+  OTHERS_RECORD,
   type ActionName,
   type Scope,
+  type Visibility,
 } from "./permissions";

@@ -152,6 +152,30 @@ describe("dong-nhap-9e", () => {
   });
 });
 
+/** Decision 0016: the company admin looks after people and settings, not listings, owners or contacts. */
+function adminOnBusiness(table: readonly ActionSpec[]): string[] {
+  return table
+    .filter((a) => ["Listing", "ListingOwner", "Contact"].includes(a.entity ?? ""))
+    .filter((a) => a.scope.CompanyAdmin !== undefined)
+    .map((a) => `quan-tri-khong-o-nghiep-vu: ${a.name}`);
+}
+
+describe("quan-tri-khong-o-nghiep-vu", () => {
+  it("the company admin has no cell on any listing, owner or contact row", () => {
+    expect(ACTIONS.filter((a) => a.entity === "Contact").length).toBeGreaterThan(0);
+    expect(adminOnBusiness(ACTIONS)).toEqual([]);
+  });
+
+  it("break: a copy of the table giving the admin removeListing names that row", () => {
+    const table = ACTIONS.map((a) =>
+      a.name === "removeListing"
+        ? { ...a, scope: { ...a.scope, CompanyAdmin: "company" as const } }
+        : a,
+    );
+    expect(adminOnBusiness(table)).toEqual(["quan-tri-khong-o-nghiep-vu: removeListing"]);
+  });
+});
+
 describe("khong-vai-khong-quyen", () => {
   it("no role in the company of the session: no action at all", () => {
     for (const a of ACTIONS) expect(allowedScope([], a.name), a.name).toBeNull();
