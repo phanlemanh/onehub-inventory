@@ -41,6 +41,24 @@ thư giả danh người gửi chính thức.
   của hàng và đang có dãy N sửa. Bài cơ sở dữ liệu của hàng 9 (`tests/db/moi-nguoi.db.test.ts`) vẫn chạy trong làn máy và
   vẫn xanh vì máy phát triển chưa khai `APP_URL` dùng gốc của yêu cầu.
 
+## Từ Quỹ hàng
+
+Đã đọc ở onehub-quy-hang, commit `1729b11f` (chỉ đọc):
+
+- `apps/web/src/lib/api.ts` (hàm `getApi`): địa chỉ gốc của sản phẩm là biến `BETTER_AUTH_URL`, đọc bằng `need(...)` —
+  thiếu thì ném lỗi ở mọi môi trường — rồi đưa vào `baseURL` của thư viện better-auth (`packages/api/src/auth/auth.ts`).
+  `packages/api/src/push/gui.ts` dùng lại chính biến ấy làm địa chỉ của app khi gửi thông báo đẩy.
+- `.env.example`: `BETTER_AUTH_URL=http://localhost:3460`.
+- `docs/adr/0009-moi-truong-that.md`: một tên miền cố định cho bản thật; bản thật thiếu bộ gửi mã thì không khởi động
+  (nối ADR-0005 §7); bản xem trước dùng `BETTER_AUTH_URL` của tên miền chính.
+- `_acceptance/moi-nguoi-vai-khu/contract.md`: mời người không gửi thư — người được mời tự xin mã ở trang đăng nhập.
+  Quỹ hàng không có thư mời, nên không có chỗ nào dựng đường trong thư từ yêu cầu gửi tới.
+
+Hàng này giữ: địa chỉ gốc là một biến cấu hình, bản thật thiếu thì không khởi động.
+Bỏ: tên `BETTER_AUTH_URL` (kho này không dùng better-auth — quyết định 0021), và việc đòi biến ở mọi môi trường — máy
+phát triển của mỗi dãy chạy một cổng riêng nên vẫn theo gốc của yêu cầu khi chưa khai. Thêm mới so với Quỹ hàng: kiểm khuôn
+địa chỉ (https, không mật khẩu, không `?`/`#`), vì ở đây địa chỉ đi thẳng vào thư gửi cho người ngoài.
+
 ## Không có màn
 
 Hàng chỉ đổi cấu hình và thân thư: không có bản bấm được, không có đặc tả UX, không bài trình duyệt mới.
