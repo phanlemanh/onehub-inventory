@@ -7,6 +7,8 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-12 — App Shell chọn từ ReUI app-shell-8: cột biểu tượng lọc theo mọi vai, cột thứ hai theo màn (Bảng hàng có lối tắt trạng thái), gập và nhớ qua tải lại, tên sàn ở đầu thanh trên đổi sàn cùng lối với menu tài khoản; điện thoại dùng thanh bên thu gọn — hàng 1o, [0023](decisions/0023-chon-truoc-tao-sau.md), `_acceptance/app-shell-chon-tu-reui/`
+- 2026-11-11 — Recorded the reuse ladder set by the owner (choose before making; repo, then repo with ReUI Pro, then hand-made; three layers of "keep as is") and added roadmap rows 1n, 1o, 1p, 9c — [0023](decisions/0023-chon-truoc-tao-sau.md).
 - 2026-11-12 — Cổng chứng minh màn theo quyết định 0023: sổ khối `design/so-khoi.yaml` (mở rỗng), bậc «trong kho» tra sổ, ứng viên ReUI kèm ảnh, vùng lấy bỏ thêm, mục «Từ Quỹ hàng» và «Họ», lối khuôn bọc cho App Shell; ba hồ sơ đã qua Cổng Phạm vi giữ luật cũ; luật giao diện thay câu «chuyển thể chỉ đổi dữ liệu» bằng luật ba tầng — [0023](decisions/0023-chon-truoc-tao-sau.md), hàng 1n.
 - 2026-11-11 — Recorded the reuse ladder set by the owner (choose before making; repo, then repo with ReUI Pro, then hand-made; three layers of "keep as is") and added roadmap rows 1n, 1o, 1p, 9c — [0023](decisions/0023-chon-truoc-tao-sau.md).
 - 2026-11-11 — Vá phần đăng nhập: đường trở về sau đăng nhập kiểm bằng danh sách cho phép và bộ đọc địa chỉ của trình duyệt (14 dạng lách, mỗi dạng một ca); đăng xuất lỗi mạng hay máy chủ báo rõ «chưa thoát» và giữ người ở trang; người hết sàn mà còn phiên có nút Đăng xuất thay cho danh sách sàn trống — hàng 1m, `_acceptance/va-dang-nhap/`

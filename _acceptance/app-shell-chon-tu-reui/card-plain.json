@@ -1,0 +1,7 @@
+{
+  "feature_plain": "Mọi màn nội bộ nay đứng trong App Shell dựng từ khối app-shell-8: cột biểu tượng lọc theo mọi vai, cột thứ hai theo màn (Bảng hàng có lối tắt trạng thái), tên sàn ở đầu thanh trên đổi được sàn, điện thoại dùng thanh bên thu gọn.",
+  "decisions": [
+    {"id": "E8", "q": "Bảng lấy, bỏ, thêm của khối đủ rõ để nhập App Shell vào kho chưa?", "why": "Cả ba người chấm thấy đủ 15 vùng và phép đếm khớp; còn lấn cấn vài lý do nói «kho đã có» thay vì việc của nhân viên, và tên một thẻ chân cột chưa kể riêng."}
+  ],
+  "analyst_plain": "Hai bài kiểm đơn vị xanh cả trước lẫn sau thay đổi, tức chúng giữ hành vi cũ chứ không chứng thêm điều mới; phần mới được bài trình duyệt và bài đổi sàn đo."
+}
