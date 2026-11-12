@@ -21,6 +21,7 @@ export {
 } from "./invite-mail";
 export { createMembersHandlers, type MembersHandlers } from "./members-http";
 export { type MemberRow, type MembersDeps } from "./members";
+export { requireAction } from "./require-action";
 export { createAuthHandlers, type AuthHandlers } from "./http";
 export { sessionContext, type CompanyRef, type Session } from "./login";
 export { captureSender, codeEmail, type CodeSender, type SentMail } from "./sender";
