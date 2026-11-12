@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "app-shell-chon-tu-reui",
-  "ghi_luc": "2026-11-11T22:52:10Z",
-  "vong_cham": 3,
+  "ghi_luc": "2026-11-12T01:35:58Z",
+  "vong_cham": 5,
   "luot": [
     {
       "vong": 1,
@@ -23,6 +23,18 @@
     },
     {
       "vong": 3,
+      "verdict": "PENDING-JUDGMENT",
+      "tang": []
+    },
+    {
+      "vong": 4,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 5,
       "verdict": "PENDING-JUDGMENT",
       "tang": []
     }
@@ -47,10 +59,14 @@
     {
       "nguon": "r2",
       "tang": "hop-dong-yeu-cau"
+    },
+    {
+      "nguon": "r4",
+      "tang": "bai-kiem-ha-tang"
     }
   ],
   "theo_tang": {
-    "bai-kiem-ha-tang": 2,
+    "bai-kiem-ha-tang": 3,
     "trang-thai-hanh-vi": 0,
     "du-lieu-api": 0,
     "nghiep-vu": 0,
@@ -65,8 +81,8 @@
   "chua_phan": [],
   "thuoc_vat": {
     "vat": [
-      58,
-      1
+      76,
+      3
     ],
     "thuoc": [
       6,
