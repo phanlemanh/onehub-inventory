@@ -54,6 +54,15 @@ export const FRAME_COPY = {
     title: "Chưa lưu được vì mất kết nối mạng",
     detail: "Phần bạn đang nhập vẫn còn; khi có mạng lại, bạn bấm «Thử lại».",
   },
+  /** Second column of the App Shell (row 1o). */
+  secondColumn: {
+    all: "Tất cả",
+    allLinks: "Tất cả link",
+    byStatus: "Theo trạng thái",
+    noSubItems: "Màn này chưa có mục con.",
+    collapse: "Gập cột thứ hai",
+    expand: "Mở cột thứ hai",
+  },
   appError: {
     title: "Ứng dụng chưa mở được",
     detail: "Đã có lỗi khi mở ứng dụng. Bạn bấm «Thử lại»; nếu vẫn lỗi, tải lại trang sau ít phút.",

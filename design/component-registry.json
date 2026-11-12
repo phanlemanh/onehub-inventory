@@ -1432,7 +1432,9 @@
           "props": [
             "nav",
             "roles",
-            "account"
+            "company",
+            "account",
+            "columnOpen"
           ]
         },
         {
@@ -1440,6 +1442,34 @@
         },
         {
           "name": "NavItem"
+        },
+        {
+          "name": "NavLink"
+        },
+        {
+          "name": "NavSection"
+        }
+      ]
+    },
+    {
+      "name": "SecondColumn",
+      "file": "src/components/templates/app-shell/second-column.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "SecondColumn",
+          "props": [
+            "items",
+            "roles",
+            "initialOpen"
+          ]
+        },
+        {
+          "name": "SecondColumnNav",
+          "props": [
+            "items",
+            "roles"
+          ]
         }
       ]
     },

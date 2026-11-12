@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "bac": "M1",
+  "ly_do": "có giao diện (41 tệp khớp design.surface_globs), chưa khai nguồn — design_floor.tokens chưa khai; design_floor.registry chưa khai",
+  "tri_thuc": {
+    "trang_thai": "doc-duoc",
+    "ly_do": "",
+    "goc": "/var/folders/6x/1dlzszm51wzbt20dn5y1lgzh0000gn/T/design-floor-upstream/a7ad5f1e650321ac325734e9199f266c9b990212",
+    "chi_muc": {
+      "path": "knowledge/index.json",
+      "byte": 21239,
+      "token": 5310
+    },
+    "tep": [
+      {
+        "id": "ds-kit-onboarding",
+        "path": "knowledge/ds-kit-onboarding.md",
+        "diem": 1,
+        "byte": 15275,
+        "token": 3819
+      }
+    ]
+  },
+  "reuse_plan": null,
+  "flow": null,
+  "dong": [
+    "Bậc kho: M1 — có giao diện (41 tệp khớp design.surface_globs), chưa khai nguồn — design_floor.tokens chưa khai; design_floor.registry chưa khai",
+    "Tri thức thiết kế: chỉ mục (5310 token) + knowledge/ds-kit-onboarding.md (3819 token)"
+  ]
+}

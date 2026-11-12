@@ -1,7 +1,9 @@
 "use client";
 
+import { CircleDotIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
 
 import {
   SidebarMenu,
@@ -11,11 +13,27 @@ import {
 } from "@/components/ui/sidebar";
 import type { Role } from "@/generated/ontology";
 
+/** One entry of the second column of the App Shell (row 1o): a place inside the screen of its rail entry. */
+export interface NavLink {
+  href: string;
+  title: string;
+}
+
+/** A titled group of the second column; without a title it sits under the screen name. */
+export interface NavSection {
+  title?: string;
+  items: readonly NavLink[];
+}
+
 export interface NavItem {
   href: string;
   title: string;
   /** Roles that see this entry (declared in ontology/roles.yaml); absent means every role. */
   roles?: readonly Role[];
+  /** The rail icon (lucide); absent shows a neutral dot until the entry declares one. */
+  icon?: ReactNode;
+  /** What the second column holds while this screen is open; absent means the screen has no sub-places. */
+  sections?: readonly NavSection[];
 }
 
 /**
@@ -27,11 +45,23 @@ export function visibleNav(items: readonly NavItem[], roles: readonly Role[] = [
   return items.filter((item) => !item.roles || item.roles.some((r) => roles.includes(r)));
 }
 
-function isCurrent(pathname: string, href: string): boolean {
+export function isCurrent(pathname: string, href: string): boolean {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/** The navigation of the frame: marks the current screen and closes the phone sheet after a choice. */
+/** The visible entry whose screen is open, if any. */
+export function currentEntry(
+  items: readonly NavItem[],
+  roles: readonly Role[] | undefined,
+  pathname: string,
+): NavItem | undefined {
+  return visibleNav(items, roles).find((item) => isCurrent(pathname, item.href));
+}
+
+/**
+ * The rail of the App Shell: one icon per screen, its name as tooltip and accessible name, the open screen marked;
+ * in the phone sheet the name shows beside the icon and a choice closes the sheet.
+ */
 export function NavMenu({ items, roles }: { items: readonly NavItem[]; roles?: readonly Role[] }) {
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
@@ -43,6 +73,7 @@ export function NavMenu({ items, roles }: { items: readonly NavItem[]; roles?: r
           <SidebarMenuItem key={item.href}>
             <SidebarMenuButton
               isActive={current}
+              tooltip={item.title}
               render={
                 <Link
                   href={item.href}
@@ -53,7 +84,9 @@ export function NavMenu({ items, roles }: { items: readonly NavItem[]; roles?: r
                 />
               }
             >
-              {item.title}
+              {item.icon ?? <CircleDotIcon aria-hidden />}
+              {/* In the phone sheet the rail stays icon-only (as app-shell-8 does) so the second column keeps its width. */}
+              <span className={isMobile ? "sr-only" : undefined}>{item.title}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         );
