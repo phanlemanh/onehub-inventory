@@ -6,6 +6,7 @@
 // decision:grid-continuous-run
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactElement } from "react";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 
 import {
@@ -372,6 +373,49 @@ describe("continuous run and read-only cells", () => {
     const { root } = cellText(<TypedCell kind="money" value={1} lockedReason="x" />);
     root.querySelector('[data-slot="cell-lock-reason"]')?.remove();
     expect(() => checkLocked(root)).toThrow("locked cell without reason");
+  });
+});
+
+describe("keyboard stop before and after the page runs", () => {
+  const columns = [typedColumn({ field: "Listing.unitNumber", header: "Mã" })];
+  const rows: GridRow[] = Array.from({ length: 60 }, (_, i) => ({
+    id: `r${i}`,
+    "Listing.unitNumber": `A-${i}`,
+  }));
+  const region = () => <DataRegion title="Vùng" columns={columns} rows={rows} emptyWhy="x" />;
+
+  /** The grid's scroll viewport must hold exactly one keyboard stop, on itself or inside it, at every moment. */
+  function checkStop(root: ParentNode, phase: "server" | "client"): void {
+    const viewport = root.querySelector('[data-slot="scroll-area-viewport"]');
+    if (!viewport) throw new Error(`no viewport (${phase})`);
+    const stops = [viewport, ...viewport.querySelectorAll("*")].filter(
+      (el) => el.getAttribute("tabindex") === "0",
+    );
+    if (stops.length === 0) throw new Error(`grid unreachable by keyboard (${phase})`);
+    if (stops.length > 1) throw new Error(`two keyboard stops (${phase})`);
+    if (phase === "client" && stops[0] !== viewport) throw new Error("stop not on the viewport");
+  }
+  const serverHtml = (): HTMLElement => {
+    const box = document.createElement("div");
+    box.innerHTML = renderToString(region());
+    return box;
+  };
+
+  it("the server HTML is reachable, and the stop moves to the viewport once the page runs", () => {
+    expect(() => checkStop(serverHtml(), "server")).not.toThrow();
+    const { container } = render(region());
+    expect(() => checkStop(container, "client")).not.toThrow();
+  });
+
+  it("fails when the server HTML has no stop, or when the stop is left behind on the content", () => {
+    const box = serverHtml();
+    box.querySelectorAll("[tabindex]").forEach((el) => el.removeAttribute("tabindex"));
+    expect(() => checkStop(box, "server")).toThrow("grid unreachable by keyboard (server)");
+    const { container } = render(region());
+    container
+      .querySelector('[data-slot="data-region-scroll-content"]')
+      ?.setAttribute("tabindex", "0");
+    expect(() => checkStop(container, "client")).toThrow("two keyboard stops (client)");
   });
 });
 

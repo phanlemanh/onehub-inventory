@@ -332,8 +332,10 @@ export function DataRegion({
     },
   });
 
-  // The grid scrolls sideways inside its own viewport; keyboard users must be able to reach and scroll it
-  // (WCAG 2.1.1). ReUI's scroll area takes no props for its viewport, so the region labels it after render.
+  // The grid scrolls inside its own viewport; keyboard users must be able to reach and scroll it (WCAG 2.1.1).
+  // ReUI's scroll area takes no props for its viewport, so the region labels it once the page runs. Until then the
+  // server-rendered content holds the one keyboard stop, so the grid is reachable before the page takes input; the
+  // stop moves to the viewport here (React leaves the attribute alone while its prop does not change).
   useEffect(() => {
     const viewport = boxRef.current?.querySelector<HTMLElement>(
       '[data-slot="scroll-area-viewport"]',
@@ -342,6 +344,9 @@ export function DataRegion({
     viewport.tabIndex = 0;
     viewport.setAttribute("role", "region");
     viewport.setAttribute("aria-label", title);
+    boxRef.current
+      ?.querySelector('[data-slot="data-region-scroll-content"]')
+      ?.removeAttribute("tabindex");
   });
 
   const showsRows = headerShowsRows(status);
@@ -374,7 +379,9 @@ export function DataRegion({
           <DataGridScrollArea className={VIEWPORT_HEIGHT_CLASS}>
             {/* Keyed by density: the virtual body keeps the estimate it started with for rows it has not measured, so a
                 switch from normal to dense rows must start it again or the run's height (and its last rows) go wrong. */}
-            <DataGridTableVirtual key={density} estimateSize={ROW_HEIGHT_PX[density]} />
+            <div data-slot="data-region-scroll-content" tabIndex={0}>
+              <DataGridTableVirtual key={density} estimateSize={ROW_HEIGHT_PX[density]} />
+            </div>
           </DataGridScrollArea>
         </DataGridContainer>
         <div data-slot="region-footer" className="border-t px-3 py-2">
