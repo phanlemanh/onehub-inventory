@@ -1,5 +1,5 @@
 {
-  "feature_plain": "Danh mục căn của Inventory được lưu chuẩn như onehub-invest (theo RESO) để hai sản phẩm đọc chung, nhưng mỗi sàn vẫn gọi toà, căn theo cách của mình; không màn nào đổi.",
+  "feature_plain": "Danh mục căn của Inventory nay lưu chuẩn như onehub-invest (theo RESO) để hai sản phẩm đọc chung, và mỗi sàn có mã, tên riêng cho toà, căn; không màn nào đổi.",
   "will_do": [
     {
       "id": "AC-1",
@@ -120,5 +120,6 @@
       "i": 8,
       "p": "Tra mã riêng có thể ra một căn không tồn tại. Đã sửa: mã riêng phải trỏ căn, toà có thật; lý do «không tìm thấy» được ghim."
     }
-  ]
+  ],
+  "analyst_plain": "Không có phép chấm bằng hội đồng ở vòng này: mọi tiêu chí đều đo bằng máy."
 }
