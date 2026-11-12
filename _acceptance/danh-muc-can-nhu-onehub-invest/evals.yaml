@@ -164,3 +164,12 @@ evals:
     paths: [src/modules/catalog/**]
     expected: "exit 0; hàm tra mã thuần với ba nguồn dựng trong bài: mã có ở mã riêng của sàn → trả đối tượng ấy và nguồn 'san' dù chuỗi cũng khớp mã gốc của đối tượng khác; mã chỉ có ở mã gốc → nguồn 'goc'; mã chỉ đọc được bằng bộ đọc → nguồn 'doc' kèm toà, tầng, trục; mã không có đâu → không ra đối tượng, lý do 'khong-tim-thay'; tra với mã riêng của sàn B không bao giờ ra mã riêng của A (hàm nhận mã riêng của đúng một sàn)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E18
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.bang_quyen_db_r
+    paths: [ontology/actions.yaml, db/migrations/**, tests/db/bang-quyen*.ts, src/modules/catalog/**]
+    layer: backend-effect
+    expected: "exit 0; dòng 'csdl-theo-bang: 72/72 ô khớp' — 40 ô của hàng 9a và 32 ô mới (năm bảng danh mục đọc, mã riêng đọc, thêm, sửa × 4 vai): đọc cho cả bốn vai, thêm và sửa mã riêng cho Đầu chủ, Trưởng nhóm, Quản trị sàn, Đầu khách bị từ chối; người X của sàn B có phiên ở A thấy như Đầu chủ; bài quyen-csdl-ngoai-bang không còn quyền nào ngoài bảng. Chiều đỏ ở bài danh mục: tệp phá ma-rieng-khong-kiem-vai làm 'ma-rieng-theo-vai: Đầu khách thêm được mã riêng'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
