@@ -59,7 +59,7 @@ không được. Lời từ chối giống hệt nhau với mọi thao tác và 
 
 ### Cơ sở dữ liệu đọc bảng
 
-Migration `004_bang_quyen_theo_vai.sql` (tạo bằng `/new-migration`):
+Migration `006_bang_quyen_theo_vai.sql` (tạo bằng `/new-migration`):
 
 - Bảng `app.permissions (action, role, scope)` — danh mục dùng chung, không có `company_id` (ngoại lệ danh mục chung của
   AGENTS.md), chủ là vai danh tính, vai API chỉ đọc. Hạt là các dòng `live` của bảng.
@@ -130,6 +130,46 @@ mọi vai đọc được, chỉ Quản trị sàn thêm và sửa; lối khác 
   delete trên các lược đồ của sản phẩm); mỗi cửa phải có ít nhất một dòng sống hay một dòng `exempt`, và mỗi cửa khai trong
   bảng phải có thật. Cặp phá thử trên bản sao: thêm một route ghi mới, một hàm ghi cấp cho vai API, một quyền insert
   trên bảng → đỏ, thông điệp nêu tên cửa.
+
+## Từ Quỹ hàng
+
+Quy ước nguồn: `qh:` là kho Quỹ hàng ở commit `1729b11f` (chỉ đọc). Trang tổng hợp của kho này:
+`docs/tri-thuc/wiki/chu-de/quyen-va-cach-ly.md` và `thoa-thuan-ket-noi.md`.
+
+**Quỹ hàng giải nhu cầu này thế nào**
+
+- Rà soát phân quyền 05/11 (`qh:docs/plan/ra-soat-crud-phan-quyen.md`, bảng hai «thao tác × vai») thấy chỗ hở nặng nhất
+  là G1: ai đọc được hàng «Toàn sàn» thì đổi được giá, phí, trạng thái qua API, kể cả Telesales và Quản trị sàn; và G7:
+  rào ở cơ sở dữ liệu mỏng hơn API — luật theo dòng của hàng không xét vai, bảng thoả thuận thì thành viên nào cũng thêm,
+  sửa được.
+- Hồ sơ đã ký `qh:_acceptance/bang-quyen-theo-vai/` vá G1 và phần hàng của G7 bằng một bảng ca người × thao tác ở lõi,
+  `qh:packages/core/src/access/bang-quyen-hang.json` (14 ca × 4 thao tác: xem, tạo, sửa, đưa lên «Đang bán»). API, luật
+  theo dòng của hàng và ô Trạng thái của Bảng hàng cùng đọc bảng ấy; cờ «Sẵn sàng bán» suy từ «căn mình giữ, hoặc chưa
+  ai giữ».
+- Vai cố định, một người nhiều vai, vai đọc lại mỗi lời gọi chứ không lưu trong phiên; chỉ Quản trị sàn quản người; sàn
+  luôn còn một quản trị (`qh:docs/adr/0006-vai-khu-va-loi-moi.md`). Hồ sơ `qh:_acceptance/chu-san-du-vai/` thêm luật «vai
+  kéo theo vai»: trao Quản trị sàn là trao luôn bốn vai làm việc.
+
+**Hàng này giữ gì**
+
+- Một bảng quyền đọc chung cho API và cơ sở dữ liệu, có bài kiểm từng ô và bài phá thử đổi một ô — đúng bài học G1.
+- Rào ở cơ sở dữ liệu ngang API (bài học G7): luật theo dòng của `agreements` và `company_members` đọc cùng bảng.
+- Vai đọc lại mỗi lời gọi (`app.member_roles()`), không lưu trong phiên; luật «sàn luôn còn một quản trị».
+- Bảng nháp cho Bảng hàng lấy từ bảng hai của rà soát và `bang-quyen-hang.json` (mục «Bảng nháp từ Quỹ hàng» ở trên).
+
+**Hàng này bỏ gì, vì sao**
+
+- Bảng theo ca người (14 ca có tên) đổi thành bảng thao tác × vai × phạm vi, cộng quyền khi kiêm vai: quyết định 0016
+  của kho này. Ca người của Quỹ hàng trộn vai với quan hệ «giữ căn»; ở đây quan hệ ấy là ô phạm vi «Của tôi».
+- Vai Telesales: kho này có bốn vai (hàng 1d).
+- Luật «vai kéo theo vai»: 0016 chốt Quản trị sàn không tự thấy hàng hay số chủ; người cần cả hai thì giữ cả hai vai và
+  được cộng quyền.
+- Bảng quyền trong mã lõi (`packages/core`): ở đây bảng nằm trong mô hình nghiệp vụ (`ontology/actions.yaml`) và sinh ra
+  mã, để màn sau (hàng 19a) đọc cùng một nguồn.
+- Phần thi hành trên Bảng hàng (ô Trạng thái, cờ «Sẵn sàng bán»): Bảng hàng ở kho này chưa có lệnh ghi qua bảng quyền;
+  hàng mở các thao tác ấy chốt ô của mình.
+
+Không có điều nào ở trên trái phạm vi đã duyệt ở Cổng Phạm vi.
 
 ## Không làm ở vòng này
 

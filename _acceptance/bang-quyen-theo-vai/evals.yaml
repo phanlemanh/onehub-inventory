@@ -68,7 +68,7 @@ evals:
     executor: script
     cmd: config:executors.script.bang_quyen_db
     layer: backend-effect
-    paths: [src/modules/identity/**, src/app/api/v1/**, db/migrations/004_bang_quyen_theo_vai.sql, tests/db/**]
+    paths: [src/modules/identity/**, src/app/api/v1/**, db/migrations/006_bang_quyen_theo_vai.sql, tests/db/**]
     expected: "exit 0; ca 'api-theo-bang': sàn A có bốn người một vai (phiên thật qua bộ xử lý đăng nhập của hàng 8) và một người chỉ thuộc sàn B; với mỗi cửa API sống và mỗi vai, gọi route handler thật → ô 'không được' trả 403 với thân {\"error\":\"forbidden\"} giống hệt nhau và số dòng company_members, identity.users không đổi; ô được trả mã không phải 403 (200 hay lỗi nghiệp vụ đã khai); người X gọi bằng phiên A nhận đúng kết quả của ô ListAgent (403 ở ba cửa thành viên); in 'api-theo-bang: 12/12 ô khớp' — số 12 đếm từ bảng sinh và so với hằng 12 của ma trận viết trước; người sàn B gọi bằng phiên B không thấy dòng nào của A. Chiều đỏ: pha-thu-doi-o → «api-theo-bang: inviteMember × TeamLead»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
@@ -77,7 +77,7 @@ evals:
     executor: script
     cmd: config:executors.script.bang_quyen_db
     layer: backend-effect
-    paths: [db/migrations/004_bang_quyen_theo_vai.sql, src/modules/identity/**, tests/db/**, ontology/actions.yaml]
+    paths: [db/migrations/006_bang_quyen_theo_vai.sql, src/modules/identity/**, tests/db/**, ontology/actions.yaml]
     expected: "exit 0; ca 'csdl-theo-bang': với mỗi cửa cơ sở dữ liệu sống của bảng sinh và mỗi vai, gọi qua withCompany dưới quy_hang_app (hàm: kết quả hay lỗi 42501/'forbidden'; đọc bảng: số dòng thấy được; ghi bảng: được hay bị luật theo dòng từ chối) → khớp ô; người X với phiên ở A khớp đúng ô ListAgent ở mọi cửa (app.allowed('listMembers') là null, thêm thoả thuận bị 42501); in 'csdl-theo-bang: 40/40 ô khớp' so với hằng 40; ca 'ban-chep-khop-bang': tập (action, role, scope) của app.permissions bằng đúng tập sinh từ các dòng live, thiếu hay thừa thì in từng cặp. Chiều đỏ: pha-thu-doi-o → «csdl-theo-bang: inviteMember × TeamLead»; pha-thu-allowed-moi-san → «csdl-theo-bang: X × listMembers»; pha-thu-ban-chep-lech → «ban-chep-khop-bang: thiếu listMembers × CompanyAdmin»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
@@ -103,8 +103,8 @@ evals:
     executor: script
     cmd: config:executors.script.bang_quyen_db
     layer: backend-effect
-    paths: [db/migrations/004_bang_quyen_theo_vai.sql, src/modules/identity/**, ontology/entities/Member.yaml]
-    expected: "exit 0; ca 'quan-tri-nguoi-qua-bang': quét định nghĩa (pg_get_functiondef) của MỌI hàm trong lược đồ app và identity mà quy_hang_app được gọi, in số hàm đã quét; không hàm nào tham chiếu identity.is_admin; ba hàm app.member_list, app.member_invite, app.member_set_roles gọi app.allowed; gọi thật mỗi hàm với Quản trị sàn và Đầu chủ cho kết quả đúng ô (không chỉ đọc chuỗi); ontology/entities/Member.yaml luật company-admin-manages-people có implemented_in trỏ db/migrations/004_bang_quyen_theo_vai.sql và mô tả nhắc ontology/actions.yaml. Chiều đỏ: một hàm còn is_admin → «quan-tri-nguoi-qua-bang: member_invite còn kiểm vai tự viết»"
+    paths: [db/migrations/006_bang_quyen_theo_vai.sql, src/modules/identity/**, ontology/entities/Member.yaml]
+    expected: "exit 0; ca 'quan-tri-nguoi-qua-bang': quét định nghĩa (pg_get_functiondef) của MỌI hàm trong lược đồ app và identity mà quy_hang_app được gọi, in số hàm đã quét; không hàm nào tham chiếu identity.is_admin; ba hàm app.member_list, app.member_invite, app.member_set_roles gọi app.allowed; gọi thật mỗi hàm với Quản trị sàn và Đầu chủ cho kết quả đúng ô (không chỉ đọc chuỗi); ontology/entities/Member.yaml luật company-admin-manages-people có implemented_in trỏ db/migrations/006_bang_quyen_theo_vai.sql và mô tả nhắc ontology/actions.yaml. Chiều đỏ: một hàm còn is_admin → «quan-tri-nguoi-qua-bang: member_invite còn kiểm vai tự viết»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E8
@@ -113,7 +113,7 @@ evals:
     cmd: config:executors.script.moi_nguoi_db
     layer: backend-effect
     paths: [db/migrations/**, src/modules/identity/**, tests/db/moi-nguoi.db.test.ts]
-    expected: "exit 0; mười hai ca của hàng 9 (moi-email-moi-vao-dung-san … rang-buoc-vai-bang-mo-hinh) và tám cặp phá thử của nó xanh trên cây có migration 004, tệp kiểm của hàng 9 không đổi một dòng nào so với origin/main"
+    expected: "exit 0; mười hai ca của hàng 9 (moi-email-moi-vao-dung-san … rang-buoc-vai-bang-mo-hinh) và tám cặp phá thử của nó xanh trên cây có migration 006, tệp kiểm của hàng 9 không đổi một dòng nào so với origin/main"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E9
@@ -122,7 +122,7 @@ evals:
     cmd: config:executors.script.moi_nguoi_e2e
     layer: backend-effect
     paths: [db/migrations/**, src/modules/identity/**, src/app/**]
-    expected: "exit 0; sáu ca × bốn khổ của bài trình duyệt Thành viên xanh trên Postgres của dãy với migration 004 (Quản trị sàn xem, mời, đổi vai; ba vai khác thấy Không đủ quyền)"
+    expected: "exit 0; sáu ca × bốn khổ của bài trình duyệt Thành viên xanh trên Postgres của dãy với migration 006 (Quản trị sàn xem, mời, đổi vai; ba vai khác thấy Không đủ quyền)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E10
@@ -130,7 +130,7 @@ evals:
     executor: script
     cmd: config:executors.script.bang_quyen_db
     layer: backend-effect
-    paths: [db/migrations/004_bang_quyen_theo_vai.sql, tests/db/**]
+    paths: [db/migrations/006_bang_quyen_theo_vai.sql, tests/db/**]
     expected: "exit 0; ca 'bang-thanh-vien-chi-dong-minh': sàn A bốn người một vai, sàn B một người; dưới quy_hang_app với phiên từng người, select * from company_members → ĐC, ĐK, TN mỗi người đúng 1 dòng (user_id của chính mình), người X với phiên A đúng 1 dòng, QT A đúng 5 dòng của A (bốn người và X), người B đúng các dòng của B, không ai thấy dòng sàn kia. Chiều đỏ: pha-thu-doc-moi-dong → «bang-thanh-vien-chi-dong-minh: ListAgent thấy 4 dòng»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
@@ -139,7 +139,7 @@ evals:
     executor: script
     cmd: config:executors.script.bang_quyen_db
     layer: backend-effect
-    paths: [db/migrations/004_bang_quyen_theo_vai.sql, tests/db/**]
+    paths: [db/migrations/006_bang_quyen_theo_vai.sql, tests/db/**]
     expected: "exit 0; ca 'thoa-thuan-chi-quan-tri': từng người của A thêm một thoả thuận của A và sửa trạng thái một thoả thuận có sẵn của A dưới quy_hang_app → QT được; ĐC, ĐK, TN và người X (Quản trị sàn ở B) với phiên A bị từ chối (lỗi 42501 row-level security khi thêm; sửa trả 0 dòng), số dòng và trạng thái không đổi; đọc thoả thuận theo ô readAgreements; QT của B sửa thoả thuận của A → 0 dòng. Chiều đỏ: pha-thu-thoa-thuan-mo → «thoa-thuan-chi-quan-tri: ListAgent thêm được thoả thuận»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
@@ -149,7 +149,7 @@ evals:
     cmd: config:executors.script.cach_ly_n
     layer: backend-effect
     paths: [db/**]
-    expected: "exit 0; bộ kiểm cách ly của hàng 7 xanh trên Postgres của dãy N với migration 004 (mọi bảng của sàn có company_id và force row level security; app.permissions là ngoại lệ danh mục dùng chung được khai trong bộ kiểm)"
+    expected: "exit 0; bộ kiểm cách ly của hàng 7 xanh trên Postgres của dãy N với migration 006 (mọi bảng của sàn có company_id và force row level security; app.permissions là ngoại lệ danh mục dùng chung được khai trong bộ kiểm)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E13
@@ -157,8 +157,8 @@ evals:
     executor: script
     cmd: config:executors.script.bang_quyen_db
     layer: backend-effect
-    paths: [db/migrations/004_bang_quyen_theo_vai.sql, tests/db/**]
-    expected: "exit 0; ca 'bang-quyen-dung-chung': app.permissions không có cột company_id; quy_hang_app có select và không có insert, update, delete trên nó; app.allowed KHÔNG là security definer (prosecdef false) và proconfig chứa search_path; không hàm security definer mới nào ngoài các hàm đã có ở migration 002, 003 (so tập trước và sau migration 004); chủ của app.permissions không phải quy_hang_app. Chiều đỏ: cấp insert cho quy_hang_app trên bản nháp → «bang-quyen-dung-chung: quy_hang_app ghi được bảng quyền»"
+    paths: [db/migrations/006_bang_quyen_theo_vai.sql, tests/db/**]
+    expected: "exit 0; ca 'bang-quyen-dung-chung': app.permissions không có cột company_id; quy_hang_app có select và không có insert, update, delete trên nó; app.allowed KHÔNG là security definer (prosecdef false) và proconfig chứa search_path; không hàm security definer mới nào ngoài các hàm đã có ở migration 002, 003 (so tập trước và sau migration 006); chủ của app.permissions không phải quy_hang_app. Chiều đỏ: cấp insert cho quy_hang_app trên bản nháp → «bang-quyen-dung-chung: quy_hang_app ghi được bảng quyền»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E14
