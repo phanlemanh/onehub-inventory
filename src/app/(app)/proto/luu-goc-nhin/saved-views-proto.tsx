@@ -1,24 +1,17 @@
 "use client";
 
 import { BookmarkIcon, ChevronDownIcon, MoreHorizontalIcon, PlusIcon } from "lucide-react";
-import { useEffect, useId, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { DataRegion, type GridRow } from "@/components/candidate/data-region";
+import { FormDialog } from "@/components/candidate/form-dialog";
+import { useChange } from "@/components/candidate/use-change";
 import { filterRows, type ColumnFilters } from "@/components/candidate/grid-view";
 import { PageHeader } from "@/components/templates/page-header";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -178,9 +171,34 @@ export function SavedViewsProto({
   const [renaming, setRenaming] = useState<SavedView | null>(() =>
     variant.dialog === "doi-ten" ? (seedViews(statusLabels)[0] ?? null) : null,
   );
-  const [removing, setRemoving] = useState<SavedView | null>(() =>
-    variant.dialog === "xoa" ? (seedViews(statusLabels)[0] ?? null) : null,
-  );
+  const change = useChange();
+  const runChange = change.run;
+  function askRemove(v: SavedView) {
+    void runChange({
+      verb: COPY.remove,
+      what: `${COPY.removeTitle(v.name)} ${COPY.removeWhat}`,
+      done: `Đã xoá góc nhìn «${v.name}».`,
+      reversible: false,
+      apply: () => {
+        setViews((vs) => vs.filter((x) => x.id !== v.id));
+        if (openId === v.id) openView(null);
+      },
+    });
+  }
+  const askedOnFirstPaint = useRef(false);
+  useEffect(() => {
+    if (variant.dialog !== "xoa" || askedOnFirstPaint.current) return;
+    askedOnFirstPaint.current = true;
+    const first = seedViews(statusLabels)[0];
+    if (first)
+      void runChange({
+        verb: COPY.remove,
+        what: `${COPY.removeTitle(first.name)} ${COPY.removeWhat}`,
+        done: "",
+        reversible: false,
+        apply: () => undefined,
+      });
+  }, [variant.dialog, statusLabels, runChange]);
   const targets = useColumnTargets();
 
   const open = views.find((v) => v.id === openId) ?? null;
@@ -270,7 +288,7 @@ export function SavedViewsProto({
               <DropdownMenuContent side="right" align="start">
                 <DropdownMenuItem onClick={() => setRenaming(v)}>{COPY.rename}</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" onClick={() => setRemoving(v)}>
+                <DropdownMenuItem variant="destructive" onClick={() => askRemove(v)}>
                   {COPY.remove}
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -383,30 +401,7 @@ export function SavedViewsProto({
           setRenaming(null);
         }}
       />
-      <Dialog open={removing !== null} onOpenChange={(o) => (o ? undefined : setRemoving(null))}>
-        <DialogContent showCloseButton={false} data-slot="confirm-remove-view">
-          <DialogHeader>
-            <DialogTitle>{removing ? COPY.removeTitle(removing.name) : ""}</DialogTitle>
-            <DialogDescription>{COPY.removeWhat}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose render={<Button type="button" variant="outline" autoFocus />}>
-              {COPY.cancel}
-            </DialogClose>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => {
-                setViews((vs) => vs.filter((v) => v.id !== removing?.id));
-                if (openId === removing?.id) openView(null);
-                setRemoving(null);
-              }}
-            >
-              {COPY.remove}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {change.dialog}
     </>
   );
 }
@@ -441,50 +436,48 @@ function NameDialog({
       setShown(undefined);
     }
   }
-  function submit(e: FormEvent) {
-    e.preventDefault();
-    const p = problem(name);
-    if (p) {
-      setShown(p);
-      return;
-    }
-    onSubmit(name);
-  }
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent data-slot="name-view-dialog">
-        <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </DialogHeader>
-          <Field data-invalid={shown ? true : undefined}>
-            <FieldLabel htmlFor={id}>{COPY.name}</FieldLabel>
-            <Input
-              id={id}
-              value={name}
-              maxLength={NAME_MAX}
-              autoFocus
-              aria-invalid={shown ? true : undefined}
-              onChange={(e) => {
-                setName(e.target.value);
-                setShown(undefined);
-              }}
-            />
-            {shown ? (
-              <FieldError>{shown}</FieldError>
-            ) : (
-              <FieldDescription>{COPY.nameHint}</FieldDescription>
-            )}
-          </Field>
-          <DialogFooter>
-            <DialogClose render={<Button type="button" variant="outline" />}>
-              {COPY.cancel}
-            </DialogClose>
-            <Button type="submit">{submitLabel}</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <FormDialog
+      trigger={{
+        render: <Button type="button" variant="ghost" hidden tabIndex={-1} />,
+        label: null,
+      }}
+      title={title}
+      description={description}
+      submitLabel={submitLabel}
+      busyLabel={submitLabel}
+      busy={false}
+      open={open}
+      onOpenChange={onOpenChange}
+      slot="name-view-dialog"
+      onSubmit={() => {
+        const p = problem(name);
+        if (p) {
+          setShown(p);
+          return;
+        }
+        onSubmit(name);
+      }}
+    >
+      <Field data-invalid={shown ? true : undefined}>
+        <FieldLabel htmlFor={id}>{COPY.name}</FieldLabel>
+        <Input
+          id={id}
+          value={name}
+          maxLength={NAME_MAX}
+          autoFocus
+          aria-invalid={shown ? true : undefined}
+          onChange={(e) => {
+            setName(e.target.value);
+            setShown(undefined);
+          }}
+        />
+        {shown ? (
+          <FieldError>{shown}</FieldError>
+        ) : (
+          <FieldDescription>{COPY.nameHint}</FieldDescription>
+        )}
+      </Field>
+    </FormDialog>
   );
 }
