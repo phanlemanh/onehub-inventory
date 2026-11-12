@@ -2,14 +2,26 @@
 
 import { createContext, useCallback, useContext, type ReactNode } from "react";
 
+import { ActionPermissionProvider } from "@/components/candidate/action-permission";
+
 import type { Role } from "../../../generated/ontology";
 import { actionVisibility, type ActionName } from "../permissions";
 
 /** The roles of the session in its company, set once by the internal frame's layout. */
 const SessionRolesContext = createContext<readonly Role[]>([]);
 
+/** Sets the session's roles for PermittedAction, and the same rule for the shared «…» menus of the grid and record. */
 export function SessionRoles({ roles, children }: { roles: readonly Role[]; children: ReactNode }) {
-  return <SessionRolesContext.Provider value={roles}>{children}</SessionRolesContext.Provider>;
+  const permitted = useCallback(
+    (action: string, mine: boolean) =>
+      actionVisibility(roles, action as ActionName, mine) === "show",
+    [roles],
+  );
+  return (
+    <SessionRolesContext.Provider value={roles}>
+      <ActionPermissionProvider permitted={permitted}>{children}</ActionPermissionProvider>
+    </SessionRolesContext.Provider>
+  );
 }
 
 /** The roles of the session; empty outside the frame, so nothing is permitted there. */

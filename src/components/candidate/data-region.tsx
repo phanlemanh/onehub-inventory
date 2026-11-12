@@ -70,6 +70,7 @@ import {
 } from "./grid-view";
 import { RecordPanel, useRecordAddress, type RecordView } from "./record-panel";
 import { RegionTitle, RegionToolbar } from "./region-header";
+import { RowActions, type RecordAction } from "./row-actions";
 import {
   RegionEmpty,
   RegionError,
@@ -80,6 +81,7 @@ import {
   RegionPartialEmpty,
 } from "./region-state";
 import { TypedCell } from "./typed-cell";
+import { useChange } from "./use-change";
 
 /** One row: its id, its values by field, and the cells locked for now with the reason. */
 export type GridRow = {
@@ -122,6 +124,18 @@ const GROUP_TOGGLE_CH = 4;
 
 /** Id of the row-number column, the first frozen column. */
 export const ROW_NUMBER_ID = "row-number";
+
+/** Id of the row-actions column, pinned last: one «…» per row (row 9e). */
+export const ROW_ACTIONS_ID = "row-actions";
+
+/** Width of the row-actions column, in ch: the «…» button and its padding. */
+const ROW_ACTIONS_CH = 6;
+
+/** What one row offers in its «…»: the actions by permission-table name, whether the row is the viewer's own. */
+export interface RegionRowActions {
+  actions: readonly RecordAction[];
+  mine: boolean;
+}
 
 /** How many leading data columns stay put while the grid scrolls sideways, after the row numbers. */
 export const FROZEN_COLUMNS = 2;
@@ -293,6 +307,8 @@ export function DataRegion({
   emptyWhy,
   emptyAction,
   action,
+  headAction,
+  rowActions,
   record,
   editable = false,
   initialFilters,
@@ -310,6 +326,13 @@ export function DataRegion({
   emptyWhy?: string;
   emptyAction?: ReactNode;
   action?: RegionAction;
+  /**
+   * The page head's main button (the add button of the screen), already gated by PermittedAction. Full screen hides the page head,
+   * so the region shows the same button in its toolbar there — one button, two places by mode (ruling V-1211-6).
+   */
+  headAction?: ReactNode;
+  /** Each row's actions, shown as one «…» in a column pinned last; a row with nothing permitted shows none. */
+  rowActions?: (row: GridRow) => RegionRowActions;
   /** Rows open in the record panel. */
   record?: RegionRecord;
   /** Cells say where they are edited: in the cell or in the record panel, by kind. */
@@ -320,6 +343,8 @@ export function DataRegion({
   groupBy?: FieldKey;
 }) {
   const searchId = useId();
+  // One confirmation for every row's removing action: a row scrolled out of the virtual body keeps it open.
+  const removing = useChange();
   const [query, setQuery] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() =>
@@ -651,8 +676,51 @@ export function DataRegion({
           },
         }),
       ),
+      ...(rowActions
+        ? [
+            helper.display({
+              id: ROW_ACTIONS_ID,
+              header: () => <span className="sr-only">{GRID_COPY.rowActions.column}</span>,
+              size: Math.floor(ROW_ACTIONS_CH * chPx),
+              enableHiding: false,
+              enableSorting: false,
+              cell: (info) => {
+                const row = info.row.original;
+                if (isGroup(row)) return null;
+                const offer = rowActions(row as GridRow);
+                const title = String(
+                  cellText(
+                    columns[0]?.kind ?? "text",
+                    row[firstField as FieldKey],
+                    row.transaction,
+                  ),
+                );
+                return (
+                  <span data-row-actions-for={row.id} className="-my-1 flex justify-end">
+                    <RowActions
+                      actions={offer.actions}
+                      mine={offer.mine}
+                      title={title}
+                      run={removing.run}
+                      inGrid
+                    />
+                  </span>
+                );
+              },
+              meta: {
+                headerTitle: GRID_COPY.rowActions.column,
+                headerClassName: "text-right",
+                cellClassName: "text-right",
+                cellEdit: { editable: false, format: () => "" },
+              },
+            }),
+          ]
+        : []),
     ],
     [
+      rowActions,
+      removing.run,
+      firstField,
       columns,
       chPx,
       editable,
@@ -686,7 +754,7 @@ export function DataRegion({
       pagination: { pageIndex: 0, pageSize: Number.MAX_SAFE_INTEGER },
       columnPinning: {
         start: [ROW_NUMBER_ID, ...columns.slice(0, FROZEN_COLUMNS).map((column) => column.field)],
-        end: [],
+        end: rowActions ? [ROW_ACTIONS_ID] : [],
       },
     },
   });
@@ -721,14 +789,25 @@ export function DataRegion({
     }
   });
 
-  // Enter on a selected cell opens its row, the region's one «open row» door (the record panel of row 3).
+  // Enter on a selected cell opens its row, the region's one «open row» door (the record panel of row 3); on a row's
+  // «…» cell it opens that row's menu instead (row 9e).
   const onGridKeyDownCapture = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "Enter" || event.shiftKey || event.altKey || event.metaKey || event.ctrlKey)
       return;
-    if (!opensRecord) return;
     const focused = table.getFocusedCell?.();
     const id = focused?.row.id;
     if (!id || id.startsWith(GROUP_ID_PREFIX)) return;
+    if (focused?.column.id === ROW_ACTIONS_ID) {
+      const trigger = document.querySelector<HTMLElement>(
+        `[data-row-actions-for="${CSS.escape(id)}"] [data-slot="row-actions"]`,
+      );
+      if (!trigger) return;
+      event.preventDefault();
+      event.stopPropagation();
+      trigger.click();
+      return;
+    }
+    if (!opensRecord) return;
     event.preventDefault();
     event.stopPropagation();
     openRef.current?.(id);
@@ -751,6 +830,16 @@ export function DataRegion({
     status !== "error" &&
     rows.length > 0 &&
     shown.length > 0;
+  // The region's own button, and in full screen the page head's main button too (the page head is hidden there).
+  const shownHeadAction = fullScreen ? headAction : undefined;
+  const shownAction = action?.allowed ? action.node : undefined;
+  const toolbarAction =
+    status === "forbidden" || (!shownHeadAction && !shownAction) ? undefined : (
+      <>
+        {shownHeadAction}
+        {shownAction}
+      </>
+    );
   // The toolbar sits inside the grid when the grid shows, so its sheet tools reach the grid's table.
   const toolbar = (tools: ReactNode) => (
     <RegionToolbar
@@ -759,7 +848,7 @@ export function DataRegion({
       query={query}
       onQuery={setQuery}
       tools={tools}
-      action={action?.allowed && status !== "forbidden" ? action.node : undefined}
+      action={toolbarAction}
       searchId={searchId}
     />
   );
@@ -894,6 +983,7 @@ export function DataRegion({
           region's frame, whose panel clips its overflow (an accessibility scan would read the panel's top as cut off),
           and right before the region in page order, so Tab from the record goes into the region (AC-6 of row 3). Full
           screen covers the whole page, so the panel stays in view there too. */}
+      {removing.dialog}
       {record && showsRows ? (
         record.address ? (
           <PanelFor
