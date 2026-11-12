@@ -1,0 +1,93 @@
+schema_version: 1
+feature_slug: thang-chon-khoi-vao-cong
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**, design/so-khoi.yaml]
+    expected: "exit 0; bài 'hai lớp luật: chuyển tiếp × trạng thái' trong tools/proof_gate/proof-gate.test.ts dựng kho mẫu với ma trận viết trước 2 loại hồ sơ × 5 trạng thái, khẳng định số phần tử bằng 10, mỗi hồ sơ khai màn inventory (họ Lưới, Màn: chưa có) với tệp chứng minh lành theo luật 1c; lưới thoát 1 và đỏ đúng ba hồ sơ moi-approved, moi-implemented, moi-verified, mỗi dòng mang mã 'thieu-tu-quy-hang'; bảy hồ sơ còn lại không xuất hiện trong đầu ra; đối chứng dương: thêm tên ba hồ sơ ấy vào chuyen-tiep.yaml của kho mẫu thì lưới thoát 0. Bài 'chuyển tiếp của kho thật' đọc tools/proof_gate/chuyen-tiep.yaml, khẳng định tập tên là tập con của {app-shell-chon-tu-reui, moi-nguoi-gan-vai, va-dang-nhap} và mỗi tên có lý do không rỗng; cùng ma trận trên kho mẫu không có design/so-khoi.yaml thì lưới thoát 0 (luật 1c); bài 'tệp bài 1c không đổi' tính băm git của tools/proof_gate/proof-gate.test.ts và so bằng '0f59c79f8582471005018f1f7323ee2baf0037b4'; mọi bài của tệp ấy đạt trong cùng lượt; bài 'nấc trạng thái × mục' với ma trận viết trước 2 trạng thái × 8 mục khẳng định số phần tử bằng 16 và mỗi ô ghim: ở approved, bỏ Từ Quỹ hàng → 'thieu-tu-quy-hang', bỏ Họ → 'thieu-ho', bỏ nhóm màn → 'thieu-ung-vien', bỏ Từ Quỹ hàng của mục khuôn bọc → 'thieu-tu-quy-hang', bỏ nhóm khối, Vùng, Cách, dòng sổ → im; ở implemented cả tám → đỏ với mã riêng (nhóm khối 'thieu-ung-vien', Vùng 'thieu-vung', Cách 'thieu-cach', dòng sổ 'nhap-kho-thieu-so'); --report --json có khoá 'nhap_kho' và 'chuyen_tiep'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'bậc trong kho tra sổ khối' trên hồ sơ luật 0023 implemented: dòng 'LuoiRegion trong-kho' mà sổ khối ghi ho_so là chính hồ sơ → thoát 1 với 'trong-kho-tu-vong' và 'LuoiRegion'; dòng 'DataRegion trong-kho' mà DataRegion chỉ có trong sổ thành phần với tệp dưới src/components/candidate/ → 'trong-kho-chua-nhap'; tên 'KhongCo' → 'khoi-khong-co'; đối chứng dương: 'Button trong-kho' với tệp dưới src/components/ui/, và 'LuoiRegion trong-kho' khi ho_so là hồ sơ khác đã ký có dòng chứng từ, thì im; cùng dòng 'DataRegion trong-kho' ở hồ sơ có tên trong chuyen-tiep.yaml thì im"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'ứng viên ReUI kèm ảnh' từ một tệp lành (lưới thoát 0), mỗi lần phá đúng một chỗ trên bản sao thì thoát 1 với mã ghim: bỏ nhóm 'màn' của màn mẫu mới ở approved → 'thieu-ung-vien'; nhóm còn một dòng → 'ung-vien-it'; bốn dòng → 'ung-vien-nhieu'; ứng viên 'khong-co-block' → 'ung-vien-khong-co'; ảnh trỏ tệp không có → 'anh-khong-co'; ảnh là tệp chữ → 'anh-khong-phai-png'; hai ứng viên một ảnh → 'ung-vien-trung-anh'; hai dấu chọn → 'chon-qua-mot'; khối reui không phải ứng viên được chọn → 'reui-khong-duoc-chon'; khối ve-tay mà có ứng viên chọn → 've-tay-ma-chon'; các ca nhóm 'màn' chạy ở approved, các ca nhóm khối ở implemented; đối chứng: màn theo mẫu không có nhóm 'màn' thì im, và hồ sơ approved có khối reui mà chưa có nhóm khối thì im"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'vùng lấy bỏ thêm' trên khối data-grid-editing-6 bậc reui: không dòng vùng → 'thieu-vung'; xử lý 'giữ' → 'vung-xu-ly-la'; lý do rỗng → 'vung-thieu-ly-do'; cột Cách rỗng → 'thieu-cach'; Cách 'chép' → 'cach-la'; ma trận viết trước số bỏ × cách: (lấy 1, bỏ 2, chọn khối) → 'cat-qua-nua'; (lấy 1, bỏ 2, ghép từ thành phần) → im; (lấy 2, bỏ 2, chọn khối) → im; (lấy 2, bỏ 1, thêm 3, chọn khối) → im (vùng thêm không tính vào số vùng gốc)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**, design/so-khoi.yaml]
+    expected: "exit 0; bài 'sổ khối' từ sổ lành một dòng (lưới thoát 0), phá từng chỗ: dòng hai cùng nhu_cau → 'so-trung-nhu-cau' gọi tên cả hai dòng; cùng ten → 'so-trung-ten'; thiếu mo_ta → 'so-thieu-truong'; nguon 'khong-co-block' → 'so-nguon-la'; tep không có → 'so-tep-khong-co'; duyet '11/11' → 'so-ngay-la'; duyet khác ngày approved_at của hồ sơ nhập → 'so-ngay-lech'; ho_so không có → 'so-ho-so-khong-co'; bảng Khối của hồ sơ nhập không có dòng nguồn bậc reui → 'so-khong-chung-tu'; xoá dòng sổ của khối reui của hồ sơ implemented → 'nhap-kho-thieu-so'; bài kho thật đọc design/so-khoi.yaml không lỗi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'từ Quỹ hàng' ở hồ sơ luật 0023 approved: bỏ mục → 'thieu-tu-quy-hang'; từng cột Khối Quỹ hàng đã chọn, Giữ, Bỏ, Vì sao rỗng → 'tu-quy-hang-thieu-truong' (bốn ca); Trang 'docs/tri-thuc/wiki/chu-de/khong-co.md' → 'trang-boi-canh-khong-co'; Trang 'chưa có trang' không lý do → 'trang-boi-canh-khong-co'; đối chứng: trang có thật dưới docs/tri-thuc/wiki/chu-de/ và 'chưa có trang — sổ bối cảnh còn ở PR khác' thì im"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'họ của màn' ở hồ sơ luật 0023 approved: bỏ mục → 'thieu-ho'; inventory (family grid) ghi họ 'board' → 'ho-lech-so-man'; ghi lối 'theo mẫu' khi máy suy màn mẫu mới → 'loi-lech'; màn today (family null) ghi 'rỗng' không vì sao → 'ho-rong-thieu-ly-do'; ma trận viết trước ba lối (today họ mới, inventory màn mẫu mới, contacts theo mẫu) với họ và lối khớp → thoát 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'khuôn bọc' với hợp đồng implemented khai khuon_boc: app-shell và screens [today, inventory, sent]: tệp chứng minh không có '## Khuôn app-shell' → thoát 1 với 'thieu-chung-minh-khuon' và không dòng 'thieu-chung-minh' nào cho ba màn; hồ sơ chuyển tiếp có mục khuôn chỉ với bảng Khối → thoát 0; hồ sơ luật 0023 có mục khuôn chỉ với bảng Khối → đỏ 'thieu-tu-quy-hang' và 'thieu-ung-vien'; thêm Từ Quỹ hàng và nhóm ứng viên Cho = app-shell → thoát 0; sổ khối có app-shell do hồ sơ khác nhập thì không đòi nhóm ứng viên; bỏ khuon_boc khỏi hợp đồng → 'thieu-chung-minh' cho từng màn; khuon_boc: 'man-gia' không có trong khuon-boc.yaml → 'khuon-boc-la' và 'thieu-chung-minh' cho từng màn; hồ sơ luật 0023 approved khai khuon_boc: app-shell mà mục khuôn thiếu Từ Quỹ hàng và nhóm ứng viên → 'thieu-tu-quy-hang', 'thieu-ung-vien'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**, design/**, _acceptance/**/chung-minh-man.md]
+    expected: "exit 0; bài 'kho thật: lưới xanh' chạy lưới trên gốc kho, stderr rỗng, thoát 0; bài 'kho thật: thêm vòng luật 0023 thì đỏ' chép design, _acceptance, wiki/decisions, tests, tools/proof_gate/chuyen-tiep.yaml và src/components sang thư mục tạm, thêm hồ sơ implemented khai inventory với tệp chứng minh lành theo luật 1c, lưới thoát 1 với 'vong-moi · inventory · thieu-tu-quy-hang'; bài 'khuôn tệp chứng minh qua được lưới' rút bốn khối khuôn (KHUON-THEO-MAU, KHUON-MAN-MAU-MOI, KHUON-HO-MOI, KHUON-BOC) từ tools/proof_gate/khuon-chung-minh.md, điền như tác tử điền, ở hồ sơ luật 0023 implemented kèm dòng sổ khối cho khối reui của khuôn thì thoát 0; bài khẳng định kho thật có design/so-khoi.yaml; đổi '### Từ Quỹ hàng' thành '### Từ Quỹ' thì thấy 'thieu-tu-quy-hang'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: judgment
+    inputs:
+      - .claude/skills/inventory-ui/SKILL.md
+      - tools/proof_gate/khuon-chung-minh.md
+      - wiki/decisions/0023-chon-truoc-tao-sau.md
+    question: "Đọc như một tác tử sắp dựng một màn mới trong kho này, chỉ với ba tệp đã cho: (1) SKILL.md có nói thang ba bậc (lắp ghép từ kho; kho kết hợp ReUI Pro; tạo tay), đi từ trên xuống và chỉ xuống bậc khi bậc trên không đáp ứng việc của người dùng hay luật sản phẩm, đúng như quyết định 0023? (2) Có luật ba tầng giữ nguyên hình — thành phần giữ nguyên, khối ReUI là điểm xuất phát lấy bỏ thêm theo vùng có lý do và cắt quá nửa thì là ghép từ thành phần, khuôn của kho mới là thứ nhập kho và từ đó giữ nguyên — và dòng 'Adapting a ReUI block changes its data, text and props only' đã không còn? (3) Có nói nhập kho là một dòng design/so-khoi.yaml, và khối vòng vừa tạo không được ghi trong-kho? (4) Có thứ tự đọc tài liệu Quỹ hàng cho một màn, bắt đầu từ trang sổ bối cảnh docs/tri-thuc/wiki/chu-de/ rồi tới tài liệu của onehub-quy-hang? (5) Khuôn chứng minh có nói mục mới nào cần từ approved, mục nào từ implemented, và lối khuôn bọc với khuon_boc? (6) SKILL.md còn trỏ tools/proof_gate/check.py, tools/proof_gate/khuon-chung-minh.md, chung-minh-man.md và tools/reui_catalog? Trả lời từng câu có hay không kèm dòng trích."
+    expected: "Cả sáu câu là có, mỗi câu kèm dòng trích từ tệp."
+    evidence_required: [run_id, verdict, judges, verified_at]
+
+  - id: E11
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [.claude/skills/inventory-ui/SKILL.md, tools/proof_gate/khuon-chung-minh.md]
+    expected: "exit 0; bài 'luật giao diện theo 0023' đọc .claude/skills/inventory-ui/SKILL.md: không còn chuỗi 'Adapting a ReUI block changes its data, text and props only'; có 'design/so-khoi.yaml', 'docs/tri-thuc/wiki/chu-de/', 'onehub-quy-hang' và ba tầng 'component', 'ReUI block', 'template'; vẫn có 'tools/proof_gate/check.py', 'tools/proof_gate/khuon-chung-minh.md', 'chung-minh-man.md', 'tools/reui_catalog'; khuôn khuon-chung-minh.md có khối KHUON-BOC và các tiêu đề '### Từ Quỹ hàng', '### Họ', '### Ứng viên ReUI', '### Vùng'; đối chứng: chép SKILL.md sang bản sao, chèn lại câu cũ thì hàm kiểm của bài trả về lỗi gọi tên câu ấy"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

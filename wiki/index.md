@@ -50,6 +50,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0020 Dữ liệu mẫu theo Vinhomes Ocean Park, căn và liên hệ nối từ đầu](decisions/0020-linked-sample-data-ocean-park.md)
 - [0021 Đăng nhập bằng mã email, tự viết trong kho này](decisions/0021-dang-nhap-ma-email.md)
 - [0022 Mời người vào sàn và gán vai](decisions/0022-moi-nguoi-gan-vai.md)
+- [0023 Chọn trước, tạo sau — kho lớn dần](decisions/0023-chon-truoc-tao-sau.md)
 
 ## Incidents
 

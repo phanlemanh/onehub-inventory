@@ -1,0 +1,6 @@
+{
+  "feature_plain": "Cổng chứng minh màn bắt mọi vòng dựng màn đi đúng thang «kho trước, ReUI sau, tạo tay cuối», bày ứng viên ReUI cho chủ kho chọn, và ghi mỗi thứ mới nhập kho vào một sổ khối.",
+  "decisions": [
+    {"id": "E10", "q": "Luật giao diện mới đã nói đủ thang ba bậc, ba tầng và cách đọc Quỹ hàng chưa?", "why": "Ba người chấm đọc luật như một tác tử dựng màn; cả ba thấy đủ sáu điều, kèm dòng trích."}
+  ]
+}
