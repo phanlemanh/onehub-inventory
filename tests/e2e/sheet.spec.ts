@@ -568,3 +568,50 @@ test.describe("sheet full screen", () => {
     await expect(checkFullScreen(page)).rejects.toThrow("page header shown in full screen");
   });
 });
+
+test.describe("sheet footer in view", () => {
+  test.skip(
+    () => !WIDE.has(width()),
+    "the page fits the screen from 1024; narrower screens scroll the page",
+  );
+
+  /** Why the page fails to fit, or null: the page scrolls, or the footer's hint falls below the screen. */
+  async function fitProblem(page: Page): Promise<string | null> {
+    const r = await page.evaluate(() => {
+      const foot = document.querySelector('[data-slot="region-footer"]') as HTMLElement | null;
+      return {
+        overflow: document.scrollingElement!.scrollHeight - innerHeight,
+        footBottom: foot ? foot.getBoundingClientRect().bottom : Infinity,
+      };
+    });
+    if (r.overflow > 1) return `page scrolls by ${r.overflow}px`;
+    if (r.footBottom > (await page.evaluate(() => innerHeight)) + 1) return "footer below the fold";
+    return null;
+  }
+
+  test("the page does not scroll and the selection hint in the footer is on screen", async ({
+    page,
+  }) => {
+    await openInventory(page);
+    for (const filters of [false, true]) {
+      if (filters) await page.getByRole("button", { name: "Lọc", exact: true }).click();
+      await (await cellOf(page, 3, "Listing.unitNumber")).click();
+      await page.keyboard.press("Shift+ArrowDown");
+      await expect(page.locator('[data-slot="region-footer"]')).toContainText("2 ô đã chọn");
+      expect(await fitProblem(page), filters ? "filters open" : "default").toBeNull();
+    }
+  });
+
+  test("footer check fails when the grid is as tall as the screen", async ({ page }) => {
+    await openInventory(page);
+    // Break the fit: the grid's scroll box grows to the screen's height, as before row 2a.
+    await page.evaluate(() => {
+      let box = document.querySelector<HTMLElement>(
+        '[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]',
+      );
+      while (box && !box.className.includes("--region-height")) box = box.parentElement;
+      box!.style.setProperty("height", "100vh", "important");
+    });
+    expect(await fitProblem(page)).toMatch(/^page scrolls by \d+px$/);
+  });
+});

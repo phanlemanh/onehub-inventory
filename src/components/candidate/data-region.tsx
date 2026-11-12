@@ -90,15 +90,22 @@ export type RegionStatus = "ready" | "loading" | "error" | "partial" | "forbidde
 /** Row heights of the two densities (h-8, h-12, plus the 1px row border), for the virtual body to place rows before measuring them. */
 const ROW_HEIGHT_PX = { dense: 33, normal: 49 } as const;
 
-/** Viewport height of the grid: rows scroll inside it in one run, like a sheet; the page itself does not scroll. */
-const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-screen";
+/**
+ * Viewport height of the grid: rows scroll inside it in one run, like a sheet; the page itself does not scroll. From
+ * 1024 the grid takes the screen less the App Shell's top bar, the page header, the toolbar and the footer, so the
+ * footer (row count, selection hint) stays on screen; a height the region sets once as a custom property.
+ */
+const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-(--region-height)";
 
 /**
  * In full screen the grid ends at the screen's bottom edge: the screen less the name strip, toolbar and footer, a
  * height the region sets once as a custom property.
  */
 const FULL_SCREEN_HEIGHT_CLASS = "group-data-full-screen/region:h-(--region-full-height)";
-const FULL_SCREEN_HEIGHT = { "--region-full-height": "calc(100dvh - 10rem)" } as CSSProperties;
+const REGION_HEIGHTS = {
+  "--region-height": "calc(100dvh - 23rem)",
+  "--region-full-height": "calc(100dvh - 10rem)",
+} as CSSProperties;
 
 const noSubscribe = () => () => undefined;
 
@@ -802,7 +809,7 @@ export function DataRegion({
     <section
       data-slot="data-region"
       data-full-screen={fullScreen || undefined}
-      style={FULL_SCREEN_HEIGHT}
+      style={REGION_HEIGHTS}
       className="group/region flex min-w-0 flex-col bg-background"
     >
       <span ref={chRef} aria-hidden="true" className="invisible absolute text-base">
