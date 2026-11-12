@@ -21,3 +21,12 @@ Thứ tự: 1 → 2 → 3 → (4 ∥ 5 ∥ 6 ∥ 7) → 8 → 9 → 10. Việc 4
 
 Rủi ro đã thấy: khe cột cuối của `DataRegion` phải sống chung phím mũi tên của 2a (cột không sửa được); đầu ngăn nổi của
 hàng 3 nhận `RecordActions` cạnh nút ghim — đọc `design.md` của hai hàng ấy sau khi gộp.
+
+Đọc trước trên nhánh chính sau khi 2a gộp (5d962fb, 2026-11-12):
+- `DataRegion` của 2a giữ khe `action` ở thanh công cụ trong lưới và đã ghim cột đầu (`columnPinning.end` còn trống): khe
+  thao tác dòng của việc 4 là một cột ghim cuối (`end: ["row-actions"]`), không đụng phần sửa trên ô.
+- Va chạm cần G phân xử: ở «Toàn màn hình» (2a, từ 768px) đầu màn và App Shell ẩn, nên nút thêm đặt ở đầu màn (Hỏi-2 = C)
+  biến mất. Đề xuất: nút thêm đặt ở đầu màn như chủ kho chọn; riêng lúc toàn màn hình, cùng nút ấy hiện ở khe `action` của
+  thanh công cụ trong lưới (một nút, hai chỗ theo chế độ, không hai nút cùng lúc). Ghi thành mục «sửa sau Cổng Phạm vi» để
+  chủ kho phê ở Cổng Bằng chứng.
+- Trước khi dựng: gộp origin/main (đã có 7d: 10 dòng sống, hằng ô của E2 thành 4 × 2 × 17 = 136 với 7 dòng nháp của 9e) và gộp lại origin/chore/nen-lo-trinh-hang-nhap-3 (đỉnh 592a14b, G-1211-61), sinh lại bản đồ và lộ trình bằng máy.
