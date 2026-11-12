@@ -88,13 +88,14 @@ evals:
       - "Same at 414x896, dark → screenshot evidence/inventory-414-toi.png"
       - "Navigate {url}/inventory at 360x800, light → screenshot evidence/inventory-360-sang.png"
       - "Same at 360x800, dark → screenshot evidence/inventory-360-toi.png"
+      - "Navigate {url}/inventory at 1440x900, light, type Empire in the search box and wait for the rows to settle → screenshot evidence/inventory-1440-chu-dai.png (the long project name in the «Dự án» column ends in an ellipsis)"
     expected: "tám ảnh Bảng hàng trạng thái có dữ liệu trong App Shell: đầu màn 'Bảng hàng', khung vùng có tên 'Hàng', ô tìm có kính lúp và số dòng, cột số dòng rồi tám cột đọc được (Căn, Toà, Dự án, Trạng thái, Giá chào, Diện tích, Phòng ngủ, Xác nhận lúc), kẻ dọc giữa cột, chân bảng '60 dòng'; ở 1440 đủ tám cột không thanh cuộn ngang; ở 360/414 lưới cuộn ngang trong vùng còn trang không cuộn ngang; không chữ chồng chữ; nền và chữ đổi theo tối và vẫn đọc được"
     evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
 
   - id: E11
     criterion: AC-10
     executor: judgment
-    inputs: [_acceptance/bang-hang-ban-doc/evidence/inventory-360-sang.png, _acceptance/bang-hang-ban-doc/evidence/inventory-360-toi.png, _acceptance/bang-hang-ban-doc/evidence/inventory-1440-sang.png, _acceptance/bang-hang-ban-doc/evidence/inventory-1440-toi.png, _acceptance/bang-hang-ban-doc/design.md]
+    inputs: [_acceptance/bang-hang-ban-doc/evidence/inventory-360-sang.png, _acceptance/bang-hang-ban-doc/evidence/inventory-360-toi.png, _acceptance/bang-hang-ban-doc/evidence/inventory-1440-sang.png, _acceptance/bang-hang-ban-doc/evidence/inventory-1440-toi.png, _acceptance/bang-hang-ban-doc/evidence/inventory-1440-chu-dai.png, _acceptance/bang-hang-ban-doc/design.md]
     question: "Bốn ảnh Bảng hàng (360 và 1440, sáng và tối) có cho thấy đúng những gì ảnh tĩnh thấy được theo mục Đặc tả UX của design.md không: đầu màn 'Bảng hàng', các đầu cột hiện ra đọc được, chữ không chồng nhau, tên khu dài bị cắt có dấu chấm lửng, và ảnh tối vẫn đủ tương phản để đọc? (Thứ tự tám cột và việc cuộn trong vùng do E2, E3 đo, không hỏi ở đây.)"
     evidence_required: [verdict, rationale]
 

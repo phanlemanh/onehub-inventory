@@ -20,6 +20,9 @@ async function openProto(page: Page, query = ""): Promise<void> {
   await expect(region(page).locator("h2")).toHaveText(/mẫu$/);
   // Wait for a streamed copy to be swapped in, so every check sees one region.
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  await expect(
+    region(page).locator('[data-slot="scroll-area-viewport"]:not([tabindex="0"])'),
+  ).toHaveCount(0);
 }
 
 /** Opens the n-th row; retried because the first click may land before the page takes input. */

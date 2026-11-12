@@ -43,7 +43,7 @@ export default async function Page({ searchParams }: Props) {
           typeof state === "string" ? state : undefined,
           process.env.NODE_ENV,
         )}
-        emptyWhy={`${label("Company")} chưa có căn nào đang chào trên ${label("Inventory")}.`}
+        emptyWhy={`${label("Company")} chưa có ${label("Unit").toLocaleLowerCase("vi")} nào đang chào trên ${label("Inventory")}.`}
         reloadLabel="Tải lại"
       />
     </>
