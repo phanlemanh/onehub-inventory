@@ -20,7 +20,7 @@ export const PROTO_COPY = {
     toolbar: {
       A: "A · đầu vùng (data-grid-base-1)",
       B: "B · một dòng cùng ô tìm (data-grid-base-7)",
-      C: "C · đầu màn (khe nút của PageHeader)",
+      C: "C · đầu màn (chủ kho chọn)",
     },
     row: {
       R1: "R1 · chỉ «…» cuối dòng",
@@ -28,7 +28,7 @@ export const PROTO_COPY = {
       R3: "R3 · không nút trên dòng, việc nằm trong hồ sơ",
     },
     words: {
-      H1: "H1 · một nút «Xoá»",
+      H1: "H1 · động từ thường «Xoá» (chủ kho chọn)",
       H2: "H2 · tách theo nghĩa (quyết định 0016)",
     },
     others: {
@@ -71,6 +71,7 @@ export const PROTO_COPY = {
   confirm: {
     shortTitle: (what: string) => `${what}?`,
     shortWhy: "Bạn không hoàn tác được bằng một lần bấm.",
+    deleteWhy: "Dòng rời danh sách của mọi người trong sàn; ai xoá và lúc nào vẫn được giữ.",
     reasonTitle: (what: string) => `Gỡ ${what} khỏi danh sách`,
     reasonWhy: "Chọn đúng lý do: mỗi lý do để lại dấu vết khác nhau.",
     reasonWithdrawShort: "Căn thôi bán",

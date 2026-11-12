@@ -1,13 +1,13 @@
 {
   "feature_plain": "Mọi màn có cùng một bộ nút thêm, sửa, gỡ đặt ở cùng chỗ, và mỗi người chỉ thấy nút vai của mình được dùng theo bảng quyền.",
   "will_do": [
-    {"id": "AC-1", "p": "Sẽ ghi vào sổ thiết kế luật chỗ đặt: nút thêm, nút của vùng, việc trên một dòng, việc trong hồ sơ — cho máy tính và điện thoại — đúng như anh chọn hôm nay."},
+    {"id": "AC-1", "p": "Sẽ ghi vào sổ thiết kế luật chỗ đặt anh chọn: nút thêm ở đầu màn, một nút «…» cuối dòng, việc trong hồ sơ ở đầu hồ sơ — cho máy tính và điện thoại."},
     {"id": "AC-2", "p": "Sẽ cho mọi nút hỏi cùng một chỗ: vai có quyền thì thấy nút, không có thì không thấy; dòng của người khác theo đúng cách anh chọn ở Hỏi-4."},
     {"id": "AC-4", "p": "Sẽ xếp menu «…» một kiểu ở mọi màn: việc thường trước, việc gỡ cuối cùng, chữ đỏ, tách một vạch; menu không còn việc thì không hiện."},
-    {"id": "AC-5", "p": "Sẽ luôn hỏi lại trước khi gỡ, nút xác nhận nói đúng việc (ví dụ «Ngừng bán»), bấm Huỷ thì không có gì xảy ra."},
+    {"id": "AC-5", "p": "Sẽ luôn hỏi lại trước khi gỡ, nút xác nhận nói đúng việc (ví dụ «Xoá căn»), bấm Huỷ thì không có gì xảy ra."},
     {"id": "AC-6", "p": "Sẽ nói rõ «Không đủ quyền làm việc này» khi máy chủ từ chối (vai vừa bị đổi), khác lỗi chung, và làm mới bộ nút — thử thật trên hộp mời và đổi vai của màn Thành viên."},
     {"id": "AC-7", "p": "Sẽ cho thanh bên và màn Thành viên đọc bảng quyền thay vì gõ cứng «Quản trị sàn»: đổi một ô trong bảng là thanh bên đổi theo, không sửa mã."},
-    {"id": "AC-8", "p": "Sẽ thêm vào bảng quyền các dòng nháp cho ngừng bán, gỡ căn tạo nhầm và các việc với liên hệ, theo chữ anh chọn ở Hỏi-1 và ô anh chọn ở Hỏi-6."},
+    {"id": "AC-8", "p": "Sẽ thêm vào bảng quyền bảy dòng nháp: xoá căn, và xem, thêm, sửa, xoá, gộp liên hệ, xoá tên và số theo yêu cầu — chữ là động từ thường anh chọn, ô liên hệ theo thông lệ CRM."},
     {"id": "AC-9", "p": "Sẽ sinh bảng vai × màn tới từng nút từ bảng quyền, để các hàng sau trỏ vào bảng ấy thay vì viết tay."},
     {"id": "AC-10", "p": "Sẽ giữ trang mẫu của bộ nút chạy được dưới bốn vai, ở điện thoại và máy tính, sáng và tối, không lỗi trợ năng."}
   ],

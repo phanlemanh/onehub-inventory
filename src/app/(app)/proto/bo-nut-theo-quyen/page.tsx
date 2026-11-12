@@ -26,9 +26,9 @@ export default async function ButtonsProtoPage({ searchParams }: Props) {
   const initial: Choice = {
     screen: pick(q.man, ["listings", "contacts"] as const, "listings"),
     role: pick<Role>(q.vai, ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"], "ListAgent"),
-    toolbar: pick(q.tb, ["A", "B", "C"] as const, "A"),
+    toolbar: pick(q.tb, ["A", "B", "C"] as const, "C"),
     row: pick(q.dong, ["R1", "R2", "R3"] as const, "R1"),
-    words: pick(q.chu, ["H1", "H2"] as const, "H2"),
+    words: pick(q.chu, ["H1", "H2"] as const, "H1"),
     others: pick(q.khac, ["O1", "O2"] as const, "O1"),
     confirm: pick(q.hop, ["X1", "X2", "X3"] as const, "X1"),
     open:

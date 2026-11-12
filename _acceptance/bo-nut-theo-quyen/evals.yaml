@@ -2,13 +2,13 @@ schema_version: 1
 feature_slug: bo-nut-theo-quyen
 # Ma trận viết trước (AC-2, AC-4, AC-9, AC-10): bốn vai × mọi dòng của ontology/actions.yaml × hai loại bản ghi (của tôi,
 # của người khác). Số ô = 4 × số dòng của bảng sinh × 2; bài kiểm đếm từ bảng sinh và ghim thêm số dòng viết trước
-# theo Hỏi-1: H2 → 12 dòng hôm nay + 8 dòng nháp = 20 dòng → 160 ô; H1 → 18 dòng → 144 ô. Hằng điền ngay sau Cổng Phạm vi,
-# trước khi viết mã, để bảng co lại thì cũng đỏ.
+# chủ kho chọn H1: 12 dòng hôm nay + 7 dòng nháp = 19 dòng → 152 ô; hàng 7d (dãy R) thêm 3 dòng sống — gộp sau nó thì 22 dòng
+# → 176 ô, hằng sửa đúng lúc gộp nhánh chính về. Bảng co lại thì cũng đỏ.
 # Kết quả mỗi ô: hien (phạm vi company, hoặc own trên bản ghi của tôi) · an (không ô) · theo-luat-khac (own trên bản ghi
 # người khác: an nếu chủ kho chọn O1, mo nếu O2 — hằng LUAT_KHAC trong mã, đổi bằng một dòng).
 #
 # Bài và ca (tên ca là thông điệp ghim):
-#   src/modules/identity/permitted-action.test.tsx: nut-theo-bang-160-o · nhieu-vai-cong-quyen · dong-nguoi-khac
+#   src/modules/identity/permitted-action.test.tsx: nut-theo-bang-du-o · nhieu-vai-cong-quyen · dong-nguoi-khac
 #   src/components/candidate/row-actions.test.tsx: thu-tu-trong-menu · menu-rong-khong-hien · hop-go-focus-huy ·
 #     hop-go-dong-tu-danh-tu · huy-khong-gui
 #   tests/bo-nut-kiem.test.ts (bộ kiểm AC-3, chạy trong make check): ghi-khong-qua-cua · thao-tac-ngoai-bang ·
@@ -18,7 +18,7 @@ feature_slug: bo-nut-theo-quyen
 #     tu-choi-403-cau-rieng
 #   tests/e2e/bo-nut.spec.ts: bon-vai-hai-kho · axe-sang-toi
 # Cặp phá thử (bản sao hay tệp tạm; ca tương ứng phải đỏ với thông điệp ghim):
-#   pha-thu-own-thanh-company (actionVisibility coi own như company)       → «dong-nguoi-khac: ListAgent × withdrawListing»
+#   pha-thu-own-thanh-company (actionVisibility coi own như company)       → «dong-nguoi-khac: ListAgent × removeListing»
 #   pha-thu-go-dau-menu (RowActions đặt việc gỡ lên đầu)                     → «thu-tu-trong-menu»
 #   pha-thu-nut-tran (tệp mẫu gọi fetch POST /api/v1/members, nút Button trần) → «ghi-khong-qua-cua: <tệp>:<dòng>»
 #   pha-thu-nut-tran-canh-nut-boc (một nút bọc đúng và một nút trần cùng gửi ghi trong một tệp) → «ghi-khong-qua-cua: <tệp>:<dòng>»
@@ -45,7 +45,7 @@ evals:
     executor: script
     cmd: config:executors.script.bo_nut_unit
     paths: [src/modules/identity/**, src/generated/ontology.ts, ontology/actions.yaml]
-    expected: "exit 0; ca 'nut-theo-bang-160-o' duyệt đủ 4 vai × mọi dòng của ACTIONS × 2 loại bản ghi (số ô in ra bằng 4 × số dòng × 2 và bằng hằng viết trước theo Hỏi-1: 160 với H2, 144 với H1), mỗi ô khớp luật hien/an/theo-luat-khac; ca 'nhieu-vai-cong-quyen' (15 tổ hợp vai) lấy phạm vi rộng nhất; ca 'dong-nguoi-khac' theo hằng LUAT_KHAC. Chiều đỏ: pha-thu-own-thanh-company làm 'dong-nguoi-khac' đỏ với «dong-nguoi-khac: ListAgent × withdrawListing»"
+    expected: "exit 0; ca 'nut-theo-bang-du-o' duyệt đủ 4 vai × mọi dòng của ACTIONS × 2 loại bản ghi (số ô in ra bằng 4 × số dòng × 2 và bằng hằng viết trước: 152, hay 176 khi hàng 7d đã gộp), mỗi ô khớp luật hien/an/theo-luat-khac; ca 'nhieu-vai-cong-quyen' (15 tổ hợp vai) lấy phạm vi rộng nhất; ca 'dong-nguoi-khac' theo hằng LUAT_KHAC. Chiều đỏ: pha-thu-own-thanh-company làm 'dong-nguoi-khac' đỏ với «dong-nguoi-khac: ListAgent × removeListing»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3
@@ -103,7 +103,7 @@ evals:
     executor: script
     cmd: config:executors.script.bang_quyen_unit
     paths: [ontology/actions.yaml, src/generated/ontology.ts, src/modules/identity/**]
-    expected: "exit 0; ca 'bang-sinh-du-dong' khớp bảng có thêm các dòng nháp của hàng này (trạng thái planned, không cửa) và ca mới 'quan-tri-khong-o-nghiep-vu': CompanyAdmin không có ô ở mọi dòng entity Listing, ListingOwner, Contact. Chiều đỏ: bản sao bảng thêm CompanyAdmin vào withdrawListing → «quan-tri-khong-o-nghiep-vu: withdrawListing»"
+    expected: "exit 0; ca 'bang-sinh-du-dong' khớp bảng có thêm các dòng nháp của hàng này (trạng thái planned, không cửa) và ca mới 'quan-tri-khong-o-nghiep-vu': CompanyAdmin không có ô ở mọi dòng entity Listing, ListingOwner, Contact. Chiều đỏ: bản sao bảng thêm CompanyAdmin vào removeListing → «quan-tri-khong-o-nghiep-vu: removeListing»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E10
@@ -128,7 +128,7 @@ evals:
     layer: ui-observed
     target: http://127.0.0.1:3489/proto/bo-nut-theo-quyen?bang=an
     paths: [src/app/(app)/proto/bo-nut-theo-quyen/**, src/components/candidate/**, src/modules/identity/ui/**]
-    question: "Mở trang với tham số vai=ListAgent, BuyerAgent, TeamLead, CompanyAdmin lần lượt (thêm man=contacts cho màn Liên hệ), ở 360 và 1440, sáng và tối. Kỳ vọng từng ô (với khuyến nghị ở cổng; nếu chủ kho chọn khác, câu này được sửa trước S4 theo dòng sổ gate1): Bảng hàng — ListAgent: nút «Thêm căn» cùng dòng với ô tìm; «…» trên dòng của mình có Sửa, rồi vạch, rồi Ngừng bán, Gỡ tạo nhầm chữ đỏ; trên dòng người khác chỉ Sửa. BuyerAgent: «Thêm căn»; «…» chỉ có Sửa. TeamLead: như ListAgent trên mọi dòng. CompanyAdmin: vùng «Bạn chưa có quyền xem vùng này», không nút nào. Liên hệ — ListAgent và BuyerAgent: «Thêm liên hệ»; «…» chỉ trên dòng mình tạo (Sửa, Gỡ tạo nhầm); dòng người khác không có «…». TeamLead: «…» mọi dòng có Sửa, Gộp với liên hệ khác…, vạch, Gỡ tạo nhầm, Xoá tên và số theo yêu cầu. CompanyAdmin: vùng không đủ quyền. Ô nào lệch thì nêu vai × màn × khổ × chế độ màu."
+    question: "Mở trang với tham số vai=ListAgent, BuyerAgent, TeamLead, CompanyAdmin lần lượt (thêm man=contacts cho màn Liên hệ), ở 360 và 1440, sáng và tối. Kỳ vọng từng ô (lựa chọn chủ kho ở Cổng Phạm vi): nút thêm ở đầu màn cạnh tiêu đề; mỗi dòng một nút «…» cuối dòng (cuối thẻ ở điện thoại). Bảng hàng — ListAgent: «Thêm căn»; «…» trên dòng của mình có Sửa, vạch, Xoá căn chữ đỏ; trên dòng người khác chỉ Sửa. BuyerAgent: «Thêm căn»; «…» chỉ có Sửa. TeamLead: như ListAgent trên mọi dòng. CompanyAdmin: vùng «Bạn chưa có quyền xem vùng này», không nút nào. Liên hệ — ListAgent và BuyerAgent: «Thêm liên hệ»; «…» chỉ trên dòng mình tạo (Sửa, vạch, Xoá liên hệ); dòng người khác không có «…». TeamLead: «…» mọi dòng có Sửa, Gộp với liên hệ khác…, vạch, Xoá liên hệ, Xoá tên và số theo yêu cầu. CompanyAdmin: vùng không đủ quyền. Ô nào lệch thì nêu vai × màn × khổ × chế độ màu."
     expected: "Ảnh từng vai × khổ × chế độ màu khớp luật; không nút nào hiện cho vai không có ô"
     evidence_required: [run_id, screenshot, observed, verdict]
 

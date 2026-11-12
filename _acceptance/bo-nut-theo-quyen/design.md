@@ -27,13 +27,13 @@ và màn Liên hệ; các hàng ấy chỉ khai tên thao tác và đặt nút t
 
 | Nút | Chỗ | Máy tính | Điện thoại |
 |---|---|---|---|
-| Thêm thứ chính của màn (thêm căn, thêm liên hệ) | theo Hỏi-2 | một nút chính, chữ «Thêm <danh từ>» | cùng chỗ, cùng chữ |
+| Thêm thứ chính của màn (thêm căn, thêm liên hệ) | đầu màn, cạnh tiêu đề (chủ kho chọn C) | một nút chính, chữ «Thêm <danh từ>» | cùng chỗ, cùng chữ |
 | Nút của vùng (việc trên cả vùng) | đầu vùng, bên phải | nút phụ cạnh nút chính | gập vào «…» của vùng khi quá một nút |
-| Thao tác trên một dòng | theo Hỏi-3 | cuối dòng | cuối thẻ |
+| Thao tác trên một dòng | một nút «…» (R1) | cuối dòng | cuối thẻ |
 | Thao tác trong hồ sơ | đầu hồ sơ, bên phải | một nút chính (Sửa) + «…» | như máy tính |
 
-Trong mọi «…»: việc thường trước, việc gỡ sau cùng, tách bằng một vạch, chữ đỏ. Việc gỡ luôn qua hộp xác nhận (Hỏi-5),
-nút của hộp mang đúng động từ + danh từ (`design/language.md`). Nút không có quyền: theo Hỏi-4 cho phạm vi «của tôi»; vai
+Trong mọi «…»: việc thường trước, việc gỡ sau cùng, tách bằng một vạch, chữ đỏ. Việc xoá luôn qua hộp xác nhận ngắn (X1),
+nút của hộp mang đúng động từ + danh từ (`design/language.md`). Nút không có quyền trên bản ghi của người khác (phạm vi «của tôi»): ẩn (O1); vai
 không có ô trong bảng quyền thì không thấy nút, «…» không còn việc nào thì không có «…».
 
 ### 2. Một thành phần chung
@@ -61,24 +61,27 @@ Một bài kiểm mới ở `tests/` (không sửa `eslint.config.js`) quét `sr
 
 Mỗi luật có cặp hai chiều trên cùng một tệp mẫu (lành → xanh, phá → đỏ với tên luật).
 
-### 4. Dòng nháp của bảng quyền (đổi `ontology/**` — xin G, chủ kho soi)
+### 4. Dòng nháp của bảng quyền (đổi `ontology/**` — G đã duyệt V-2, chủ kho soi)
 
-Theo quyết định 0016 «xoá tách theo nghĩa nghiệp vụ»; trạng thái `planned`, hàng mở cửa thật quyết lại từng ô:
+Chủ kho chọn động từ thường (Hỏi-1, H1): «Sửa», «Xoá căn», «Xoá liên hệ». «Xoá» là gỡ khỏi danh sách và giữ dấu vết ai xoá,
+lúc nào — không xoá dòng (Quỹ hàng ADR-0008, ADR-0012). Ngừng bán là đổi trạng thái qua Sửa, không nằm trong nhóm xoá. Gộp liên
+hệ và Xoá tên, số theo yêu cầu vẫn là hai việc riêng mang động từ của nó (quyết định 0016, Nghị định 356). Ô của liên hệ theo
+thông lệ CRM chủ kho chọn (Hỏi-6): mọi người đọc, người tạo và cấp trên sửa, xoá. Trạng thái `planned`, không cửa; hàng mở
+chức năng quyết lại từng ô.
 
-| Thao tác | Nghĩa | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
+| Thao tác | Nút | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
 |---|---|---|---|---|---|
-| withdrawListing | Ngừng bán (sang Ngừng hẳn) | của tôi | — | toàn sàn | — |
-| removeListingCreatedByMistake | Gỡ căn tạo nhầm | của tôi | — | toàn sàn | — |
-| viewContacts | Xem liên hệ | toàn sàn | toàn sàn | toàn sàn | — |
+| removeListing | Xoá căn | của tôi | — | toàn sàn | — |
+| viewContacts | (xem màn Liên hệ) | toàn sàn | toàn sàn | toàn sàn | — |
 | createContact | Thêm liên hệ | toàn sàn | toàn sàn | toàn sàn | — |
-| updateContact | Sửa liên hệ | của tôi | của tôi | toàn sàn | — |
-| mergeContacts | Gộp liên hệ | — | — | toàn sàn | — |
-| removeContactCreatedByMistake | Gỡ liên hệ tạo nhầm | của tôi | của tôi | toàn sàn | — |
+| updateContact | Sửa | của tôi | của tôi | toàn sàn | — |
+| removeContact | Xoá liên hệ | của tôi | của tôi | toàn sàn | — |
+| mergeContacts | Gộp với liên hệ khác… | — | — | toàn sàn | — |
 | eraseContactPersonalData | Xoá tên và số theo yêu cầu | — | — | toàn sàn | — |
 
 `createListing`, `updateListing`, `viewListings` đã có từ hàng 9a. Quản trị sàn không có ô ở các dòng của căn: 0016 «Quản trị
-sàn lo người và cấu hình, không tự có quyền xem hàng hay số chủ». Các ô của liên hệ là đề xuất, chủ kho chốt ở Hỏi-6. Nếu chủ kho chọn H1 ở Hỏi-1, hai dòng gỡ căn gộp thành một dòng
-`removeListing` và hai dòng gỡ liên hệ thành `removeContact`, và hộp xác nhận hỏi lý do (X2).
+sàn lo người và cấu hình, không tự có quyền xem hàng hay số chủ»; với liên hệ, chủ kho chọn thông lệ CRM nên vai này cũng không
+có ô.
 
 ### 5. Vai × Màn tới cấp nút
 

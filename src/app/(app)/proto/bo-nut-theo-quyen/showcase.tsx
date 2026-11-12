@@ -111,14 +111,14 @@ function rowActions(choice: Choice, row: SampleRow): RowAction[] {
   });
   const edit = make(listings ? "updateListing" : "updateContact", C.actions.edit);
   if (choice.words === "H1") {
-    return [
-      edit,
-      make(
-        listings ? "removeListingCreatedByMistake" : "removeContactCreatedByMistake",
-        listings ? C.actions.deleteUnit : C.actions.deleteContact,
-        true,
-      ),
-    ];
+    return listings
+      ? [edit, make("removeListing", C.actions.deleteUnit, true)]
+      : [
+          edit,
+          make("mergeContacts", C.actions.merge),
+          make("removeContact", C.actions.deleteContact, true),
+          make("eraseContactPersonalData", C.actions.erase, true),
+        ];
   }
   return listings
     ? [
@@ -380,7 +380,11 @@ function ConfirmRemove({
       <DialogContent showCloseButton={false} role="alertdialog">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{C.confirm.shortWhy}</DialogDescription>
+          <DialogDescription>
+            {choice.words === "H1" && choice.confirm === "X1"
+              ? C.confirm.deleteWhy
+              : C.confirm.shortWhy}
+          </DialogDescription>
         </DialogHeader>
         {body}
         <DialogFooter>

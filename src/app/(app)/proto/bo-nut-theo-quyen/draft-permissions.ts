@@ -35,6 +35,12 @@ export const DRAFT_ACTIONS: readonly ActionSpec[] = [
     ListAgent: "own",
     TeamLead: "company",
   }),
+  row("removeListing", "delete", "Listing", { ListAgent: "own", TeamLead: "company" }),
+  row("removeContact", "delete", "Contact", {
+    ListAgent: "own",
+    BuyerAgent: "own",
+    TeamLead: "company",
+  }),
   row("viewContacts", "query", "Contact", AGENTS_AND_LEAD),
   row("createContact", "create", "Contact", AGENTS_AND_LEAD),
   row("updateContact", "update", "Contact", {
@@ -57,6 +63,8 @@ export type DraftAction =
   | "updateListing"
   | "withdrawListing"
   | "removeListingCreatedByMistake"
+  | "removeListing"
+  | "removeContact"
   | "viewContacts"
   | "createContact"
   | "updateContact"
