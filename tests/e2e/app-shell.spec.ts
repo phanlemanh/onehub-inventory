@@ -5,7 +5,10 @@
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { expect, test, type Page } from "@playwright/test";
+import { type Page } from "@playwright/test";
+
+import { expect, test } from "../../tools/e2e_templates/fixture";
+import { openSheet } from "../../tools/e2e_templates/settle";
 
 import { LABELS } from "../../src/generated/labels";
 
@@ -31,7 +34,6 @@ const SECOND_COLUMN: Record<string, readonly string[]> = {
   "/sent": ["Tất cả link"],
 };
 const NO_SUB_ITEMS = "Màn này chưa có mục con.";
-const OPEN_SHEET = "Mở hoặc đóng thanh bên";
 
 /** Desktop rail entries, read from the page. */
 function rail(page: Page) {
@@ -86,22 +88,6 @@ async function shot(page: Page, name: string) {
   if (!dir) return;
   mkdirSync(dir, { recursive: true });
   await page.screenshot({ path: join(dir, `E10-${name}.png`) });
-}
-
-/**
- * Opens the phone sheet the way the shared frame suite does: a click that lands before the page hydrates does
- * nothing, so press again until the sheet shows, then wait for the slide-in to finish.
- */
-async function openSheet(page: Page): Promise<void> {
-  const sheet = page.locator('[data-mobile="true"]');
-  await expect(async () => {
-    if (!(await sheet.isVisible()))
-      await page.getByRole("button", { name: OPEN_SHEET }).first().click();
-    await expect(sheet).toBeVisible({ timeout: 2000 });
-  }).toPass({ timeout: 20_000 });
-  await page.waitForFunction(() =>
-    document.getAnimations().every((a) => a.playState !== "running"),
-  );
 }
 
 async function noSideways(page: Page) {
@@ -203,66 +189,72 @@ test.describe("App Shell on a phone", () => {
   test.skip(({ viewport }) => (viewport?.width ?? 0) >= 768, "phone sizes only");
 
   for (const colorScheme of ["light", "dark"] as const) {
-    test(`no column takes the screen and nothing scrolls sideways (${colorScheme})`, async ({
-      page,
-    }) => {
-      await page.emulateMedia({ colorScheme });
-      for (const s of SCREENS) {
-        await page.goto(s.href);
-        await expect(page.locator("h1")).toHaveText(s.title);
-        await expect(column(page)).toBeHidden();
-        await expect(rail(page)).toHaveCount(0);
-        expect(await noSideways(page)).toBeLessThanOrEqual(0);
-        if (s.href === "/inventory" && page.viewportSize()?.width === 360)
-          await shot(page, `inventory-360-${colorScheme}`);
-      }
-    });
+    test(
+      `no column takes the screen and nothing scrolls sideways (${colorScheme})`,
+      { tag: "@cho" },
+      async ({ page }) => {
+        await page.emulateMedia({ colorScheme });
+        for (const s of SCREENS) {
+          await page.goto(s.href);
+          await expect(page.locator("h1")).toHaveText(s.title);
+          await expect(column(page)).toBeHidden();
+          await expect(rail(page)).toHaveCount(0);
+          expect(await noSideways(page)).toBeLessThanOrEqual(0);
+          if (s.href === "/inventory" && page.viewportSize()?.width === 360)
+            await shot(page, `inventory-360-${colorScheme}`);
+        }
+      },
+    );
   }
 
-  test("the sheet holds the rail and the second column, and closes after a choice", async ({
-    page,
-  }) => {
-    await page.goto("/inventory");
-    await openSheet(page);
-    const sheet = page.locator('[data-mobile="true"]');
-    await expect(sheet.getByRole("link", { name: LABELS.Sent.pref, exact: true })).toBeVisible();
-    for (const name of SECOND_COLUMN["/inventory"]!) {
-      await expect(sheet.getByRole("link", { name, exact: true }).first()).toBeVisible();
-    }
-    // The sheet slides in; shoot only once it lies wholly on screen, so the frame shows it open.
-    const width = page.viewportSize()!.width;
-    await expect
-      .poll(async () => {
-        try {
-          assertSheetInView(await sheetBox(page), width);
-          return "in view";
-        } catch (e) {
-          return (e as Error).message;
-        }
-      })
-      .toBe("in view");
-    if (width === 360) await shot(page, "sheet-360-light");
-    await sheet.getByRole("link", { name: LABELS.Sent.pref, exact: true }).click();
-    await expect(page.locator("h1")).toHaveText(LABELS.Sent.pref);
-    await expect(sheet).toHaveCount(0);
-    assertSheetClosed(await page.locator('[data-mobile="true"] a').count());
-  });
+  test(
+    "the sheet holds the rail and the second column, and closes after a choice",
+    { tag: "@cho" },
+    async ({ page }) => {
+      await page.goto("/inventory");
+      await openSheet(page);
+      const sheet = page.locator('[data-mobile="true"]');
+      await expect(sheet.getByRole("link", { name: LABELS.Sent.pref, exact: true })).toBeVisible();
+      for (const name of SECOND_COLUMN["/inventory"]!) {
+        await expect(sheet.getByRole("link", { name, exact: true }).first()).toBeVisible();
+      }
+      // The sheet slides in; shoot only once it lies wholly on screen, so the frame shows it open.
+      const width = page.viewportSize()!.width;
+      await expect
+        .poll(async () => {
+          try {
+            assertSheetInView(await sheetBox(page), width);
+            return "in view";
+          } catch (e) {
+            return (e as Error).message;
+          }
+        })
+        .toBe("in view");
+      if (width === 360) await shot(page, "sheet-360-light");
+      await sheet.getByRole("link", { name: LABELS.Sent.pref, exact: true }).click();
+      await expect(page.locator("h1")).toHaveText(LABELS.Sent.pref);
+      await expect(sheet).toHaveCount(0);
+      assertSheetClosed(await page.locator('[data-mobile="true"] a').count());
+    },
+  );
 
-  test("the in-view check fails on a closed sheet and on a sheet still off screen", async ({
-    page,
-  }) => {
-    await page.goto("/inventory");
-    const width = page.viewportSize()!.width;
-    expect(() => assertSheetInView(null, width)).toThrow(
-      "sheet frame does not show the open sheet",
-    );
-    expect(await sheetBox(page)).toBeNull();
-    expect(() => assertSheetInView({ x: -288, width: 288 }, width)).toThrow(
-      "sheet frame does not show the open sheet",
-    );
-  });
+  test(
+    "the in-view check fails on a closed sheet and on a sheet still off screen",
+    { tag: "@cho" },
+    async ({ page }) => {
+      await page.goto("/inventory");
+      const width = page.viewportSize()!.width;
+      expect(() => assertSheetInView(null, width)).toThrow(
+        "sheet frame does not show the open sheet",
+      );
+      expect(await sheetBox(page)).toBeNull();
+      expect(() => assertSheetInView({ x: -288, width: 288 }, width)).toThrow(
+        "sheet frame does not show the open sheet",
+      );
+    },
+  );
 
-  test("the sheet check fails while the sheet is still open", async ({ page }) => {
+  test("the sheet check fails while the sheet is still open", { tag: "@cho" }, async ({ page }) => {
     await page.goto("/inventory");
     await openSheet(page);
     const open = await page.locator('[data-mobile="true"] a').count();
