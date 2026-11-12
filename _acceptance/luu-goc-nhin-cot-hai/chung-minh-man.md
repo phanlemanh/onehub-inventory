@@ -8,7 +8,7 @@ dòng sổ khối điền ở S3, trước lượt chấm.
 ### Từ Quỹ hàng
 
 | Trang | Khối Quỹ hàng đã chọn | Giữ | Bỏ | Vì sao |
-| ----- | --------------------- | --- | -- | ------ |
+| ----- | --------------------- | --- | --- | ------ |
 | docs/tri-thuc/wiki/chu-de/app-shell.md | `app-shell-8`: cột thứ hai theo nhà là chỗ của góc nhìn đã lưu («góc nhìn của đội, của tôi, + Lưu góc nhìn») | chỗ đặt ở cột thứ hai của nhà Bảng hàng | thẻ chân cột độ tươi | hàng 1o đã chọn `app-shell-8` với cột thứ hai; độ tươi chưa có số đo |
 | docs/tri-thuc/wiki/chu-de/bang-hang.md | `solution-dev-ops-2`: nút «Góc nhìn ▾» đầu thanh công cụ lưu lọc, cột, sắp xếp, cách nhóm | năm thứ một góc nhìn mang; nút ấy thành ứng viên S3 | lưu trên máy theo người và sàn | kho này chưa cho giữ dữ liệu của sàn trên máy (AGENTS.md); máy khuyên lưu trên máy chủ (Hỏi-1) |
 
