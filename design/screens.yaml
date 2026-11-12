@@ -42,12 +42,6 @@ screens:
     family: null
     audience: dev
     status: built
-  - id: proto-luu-goc-nhin
-    route: /proto/luu-goc-nhin
-    title: null
-    family: null
-    audience: dev
-    status: built
   - id: sign-in
     route: /login
     title: SignIn
