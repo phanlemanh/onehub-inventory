@@ -3,7 +3,7 @@
 Điều kiện bắt đầu: hàng 3 (hồ sơ căn) và hàng 9e (bộ nút theo quyền) đã ở nhánh chính; gộp `origin/main` về MỘT lần,
 `make setup`, `make gen`, rồi mới dựng. Lựa chọn của chủ kho ở Cổng Phạm vi (Hỏi-1 … Hỏi-5) điền vào hợp đồng và thiết kế
 trước việc 1. Chạm `ontology/**`, `db/migrations/**`, `src/components/candidate/**`, `src/generated/**` (chỉ bằng `make gen`)
-và tệp kiểm e2e có sẵn chỉ sau khi giám sát duyệt yêu cầu chạm tệp; số migration do giám sát cấp. Postgres dãy K:
+và tệp kiểm e2e có sẵn chỉ sau khi giám sát duyệt yêu cầu chạm tệp; số migration 009 (giám sát cấp, K-19; điều kiện ở K-19 và K-20). Postgres dãy K:
 `make db-up DB_LANE=k DB_PORT=5564`.
 
 Kế hoạch theo khuyến nghị (máy chủ, riêng người lưu, L1, S1, không tự lưu). Chủ kho chọn cả sàn ở Hỏi-2 thì việc 1 thêm
@@ -12,8 +12,8 @@ kho của trình duyệt và xoá khi đăng xuất.
 
 | # | Việc | Tệp | Kiểm từng việc | Phục vụ | Độc lập |
 |---|---|---|---|---|---|
-| 1 | Khái niệm Góc nhìn: thực thể `SavedView` (khái niệm riêng, ghi rõ khác RESO SavedSearch), nhãn «Góc nhìn», chữ nút; ba thao tác (`saveView`, `editView`, `removeView`) phạm vi «của tôi» cho mọi vai đọc Bảng hàng; `make gen` | `ontology/entities/saved-view.yaml`, `ontology/glossary.md`, `ontology/labels.yaml`, `ontology/actions.yaml`, `src/generated/**` | `make ontology` · `make gen` sạch | AC-1, AC-7 | không (mọi việc sau đọc tên) |
-| 2 | Bảng `saved_view` (company_id, người lưu, màn, tên, cách xem jsonb có ràng buộc khuôn, thời điểm), duy nhất (sàn, người, màn, tên thường hoá), cách ly theo dòng bắt buộc, cấp quyền tối thiểu; ca trong bộ kiểm cách ly | `db/migrations/<số G cấp>_goc_nhin.sql`, `db/scripts/**` (nếu bộ kiểm cần liệt bảng) | E9 trên dãy K, phá thử tắt force | AC-7 | không (sau 1) |
+| 1 | Khái niệm Góc nhìn: thực thể `SavedView` (khái niệm riêng, ghi rõ khác RESO SavedSearch), nhãn «Góc nhìn», chữ nút; bốn thao tác (`listSavedViews` đọc, `saveView`, `editView`, `removeView`) là dòng sống có cửa thật, phạm vi «của tôi» cho các vai đọc Bảng hàng; thêm vào hai bài ghim bảng quyền ở `src/modules/identity` (chỉ thêm); `make gen` commit riêng | `ontology/entities/saved-view.yaml`, `ontology/glossary.md`, `ontology/labels.yaml`, `ontology/actions.yaml`, `src/generated/**`, hai bài ghim bảng quyền ở `src/modules/identity/` | `make ontology` · `make gen` sạch | AC-1, AC-7 | không (mọi việc sau đọc tên) |
+| 2 | Bảng `saved_view` (company_id, người lưu, màn, tên, cách xem jsonb có ràng buộc khuôn, thời điểm), duy nhất (sàn, người, màn, tên thường hoá), cách ly theo dòng bắt buộc, cấp quyền tối thiểu; ca trong bộ kiểm cách ly | `db/migrations/009_goc_nhin.sql`, `db/scripts/**` (nếu bộ kiểm cần liệt bảng) | E9 trên dãy K, phá thử tắt force | AC-7 | không (sau 1) |
 | 3 | Mô-đun listings: kiểu `GridView` có kiểm khuôn, hàm kiểm tên dùng chung; `server.ts` đọc, thêm, đổi tên, lưu thay đổi, xoá qua `withCompany` với điều kiện người lưu; cửa `/api/v1/saved-views` và `/api/v1/saved-views/[id]` mỏng | `src/modules/listings/**`, `src/app/api/v1/saved-views/**`, `tests/db/goc-nhin.db.test.ts`, `tests/saved-view-name.test.ts` | E1 · E8 · E10 · E11 | AC-1, AC-7, AC-8 | không (sau 2) |
 | 4 | Lưới dùng chung: `initialView`, `onViewChange`, `sameView`; Ngoài-4 (thanh công cụ, ô tìm, ô lọc ở nguyên chỗ khi rỗng) | `src/components/candidate/data-region.tsx`, `grid-view.ts`, `region-state.tsx`, `tests/grid-saved-view.test.tsx`, `tests/grid-sheet.test.tsx` | E3 · E12 | AC-2, AC-9 | có (với 5) |
 | 5 | App Shell: layout đọc góc nhìn của người xem, nhóm mục động của Bảng hàng trong cấu hình điều hướng, dấu «đã đổi»; Ngoài-5 (chế độ tập trung tắt khi đổi đường dẫn và khi vùng gỡ) | `src/app/(app)/layout.tsx`, `src/app/(app)/nav.ts` (xin G), `src/components/templates/app-shell/**`, `src/components/templates/shell-focus.tsx`, `tests/second-column-views.test.tsx` | E4 (phần sáng một mục) · E14 | AC-3, AC-10 | có (với 4) |

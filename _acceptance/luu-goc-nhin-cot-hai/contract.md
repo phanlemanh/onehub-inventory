@@ -83,7 +83,8 @@ khác), bảng trạng thái `design/states.md`.
 
 ## Vai × Màn
 
-Bảng quyền thêm ba thao tác góc nhìn (lưu, sửa — gồm đổi tên và lưu thay đổi —, xoá) với phạm vi «của tôi» cho đúng các vai
+Bảng quyền thêm bốn thao tác góc nhìn (đọc danh sách — quyết mục nào hiện ở cột thứ hai —, lưu, sửa — gồm đổi tên và lưu
+thay đổi —, xoá) với phạm vi «của tôi» cho đúng các vai
 đọc được Bảng hàng theo hàng 2a (Đầu chủ, Đầu khách, Trưởng nhóm); Quản trị sàn không có ô nên không thấy nút và `/api/v1`
 trả 403.
 
@@ -112,7 +113,7 @@ chính các tiêu chí trên.
 
 - Trình tự: S3 chỉ bắt đầu khi hàng 3 (hồ sơ căn) và hàng 9e (bộ nút theo quyền) đã ở nhánh chính; khi đó gộp `origin/main`
   một lần rồi mới dựng.
-- Đổi `ontology/**` (thực thể Góc nhìn, nhãn, ba dòng bảng quyền), `db/migrations/**` (bảng mới, số do giám sát cấp),
+- Đổi `ontology/**` (thực thể Góc nhìn, nhãn, ba dòng bảng quyền), `db/migrations/**` (bảng mới, số 009 giám sát đã cấp),
   `src/components/candidate/**` (lưới dùng chung, Ngoài-4) phải xin giám sát bằng yêu cầu chạm tệp; PR có mục «Đổi ontology
   — chủ kho soi».
 - Dữ liệu căn của Bảng hàng vẫn là dữ liệu mẫu; góc nhìn lưu trên máy chủ thật, nên bộ kiểm chạy trên Postgres của dãy K

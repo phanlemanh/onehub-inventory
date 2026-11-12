@@ -47,13 +47,13 @@ sát duyệt chạm tệp và chủ kho soi trong PR.
    màn (dọn khi gỡ), nên quay lại bằng phím hay cử chỉ không để App Shell ẩn.
 3. **Mô-đun listings**: `server.ts` đọc, ghi góc nhìn qua `withCompany`; ba cửa `/api/v1/saved-views` (thêm), `…/[id]`
    (đổi tên, lưu thay đổi, xoá). Bảng `saved_view` có `company_id`, người lưu, tên, góc nhìn (jsonb đã kiểm khuôn), bật cách
-   ly theo dòng ngay trong migration; số migration hỏi giám sát (006, 007 đã có chủ, 008 dành cho 7c).
+   ly theo dòng ngay trong migration; số migration 009 (giám sát cấp).
 4. **Bảng hàng** (`src/app/(app)/inventory/`): `?goc-nhin=<id>` mở góc nhìn; trang đọc danh sách của người xem, đưa vào
    khe cột thứ hai và giao góc nhìn cho lưới. Góc nhìn không có (đã xoá, của người khác) thì mở Bảng hàng trống lọc kèm
    một câu báo.
 5. **Bộ nút** theo khuôn hàng 9e đã duyệt: nút lưu là nút của vùng; việc trên một mục nằm trong «…» cuối mục (Đổi tên; vạch;
    Xoá góc nhìn chữ đỏ, cuối); xoá qua hộp xác nhận ngắn, focus đầu ở «Thôi», nút mang đúng «Xoá góc nhìn»; người không
-   được làm thì không thấy nút. Ba thao tác (lưu, đổi tên và lưu thay đổi, xoá) vào bảng quyền với phạm vi «của tôi» cho
+   được làm thì không thấy nút. Bốn thao tác (đọc danh sách, lưu, đổi tên và lưu thay đổi, xoá) vào bảng quyền với phạm vi «của tôi» cho
    các vai đọc được Bảng hàng (Đầu chủ, Đầu khách, Trưởng nhóm — Quản trị sàn bị chặn ở Bảng hàng từ hàng 2a), qua
    `PermittedAction` của 9e.
 
