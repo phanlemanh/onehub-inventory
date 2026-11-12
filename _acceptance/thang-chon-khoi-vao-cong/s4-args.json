@@ -1,0 +1,442 @@
+{
+ "generated_at": "2026-11-11T23:05:31Z",
+ "generated_sha": "cdc11154ce1c0923f34bdb3b1710573ea0f67ae4",
+ "mainBranchInfo": {
+  "branch": "main",
+  "source": "remote"
+ },
+ "slug": "thang-chon-khoi-vao-cong",
+ "round": 1,
+ "riskTier": "T3",
+ "evals": [
+  {
+   "id": "E1",
+   "criterion": "AC-1",
+   "cmd": "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose",
+   "expected": "\"exit 0; bài 'hai lớp luật: chuyển tiếp × trạng thái' trong tools/proof_gate/proof-gate.test.ts dựng kho mẫu với ma trận viết trước 2 loại hồ sơ × 5 trạng thái, khẳng định số phần tử bằng 10, mỗi hồ sơ khai màn inventory (họ Lưới, Màn: chưa có) với tệp chứng minh lành theo luật 1c; lưới thoát 1 và đỏ đúng ba hồ sơ moi-approved, moi-implemented, moi-verified, mỗi dòng mang mã 'thieu-tu-quy-hang'; bảy hồ sơ còn lại không xuất hiện trong đầu ra; đối chứng dương: thêm tên ba hồ sơ ấy vào chuyen-tiep.yaml của kho mẫu thì lưới thoát 0. Bài 'chuyển tiếp của kho thật' đọc tools/proof_gate/chuyen-tiep.yaml, khẳng định tập tên là tập con của {app-shell-chon-tu-reui, moi-nguoi-gan-vai, va-dang-nhap} và mỗi tên có lý do không rỗng; cùng ma trận trên kho mẫu không có design/so-khoi.yaml thì lưới thoát 0 (luật 1c); bài 'tệp bài 1c không đổi' tính băm git của tools/proof_gate/proof-gate.test.ts và so bằng '0f59c79f8582471005018f1f7323ee2baf0037b4'; mọi bài của tệp ấy đạt trong cùng lượt; bài 'nấc trạng thái × mục' với ma trận viết trước 2 trạng thái × 8 mục khẳng định số phần tử bằng 16 và mỗi ô ghim: ở approved, bỏ Từ Quỹ hàng → 'thieu-tu-quy-hang', bỏ Họ → 'thieu-ho', bỏ nhóm màn → 'thieu-ung-vien', bỏ Từ Quỹ hàng của mục khuôn bọc → 'thieu-tu-quy-hang', bỏ nhóm khối, Vùng, Cách, dòng sổ → im; ở implemented cả tám → đỏ với mã riêng (nhóm khối 'thieu-ung-vien', Vùng 'thieu-vung', Cách 'thieu-cach', dòng sổ 'nhap-kho-thieu-so'); --report --json có khoá 'nhap_kho' và 'chuyen_tiep'\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "tools/proof_gate/**",
+    "design/so-khoi.yaml"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.proof_gate"
+  },
+  {
+   "id": "E2",
+   "criterion": "AC-2",
+   "cmd": "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose",
+   "expected": "\"exit 0; bài 'bậc trong kho tra sổ khối' trên hồ sơ luật 0023 implemented: dòng 'LuoiRegion trong-kho' mà sổ khối ghi ho_so là chính hồ sơ → thoát 1 với 'trong-kho-tu-vong' và 'LuoiRegion'; dòng 'DataRegion trong-kho' mà DataRegion chỉ có trong sổ thành phần với tệp dưới src/components/candidate/ → 'trong-kho-chua-nhap'; tên 'KhongCo' → 'khoi-khong-co'; đối chứng dương: 'Button trong-kho' với tệp dưới src/components/ui/, và 'LuoiRegion trong-kho' khi ho_so là hồ sơ khác đã ký có dòng chứng từ, thì im; cùng dòng 'DataRegion trong-kho' ở hồ sơ có tên trong chuyen-tiep.yaml thì im\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "tools/proof_gate/**"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.proof_gate"
+  },
+  {
+   "id": "E3",
+   "criterion": "AC-3",
+   "cmd": "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose",
+   "expected": "\"exit 0; bài 'ứng viên ReUI kèm ảnh' từ một tệp lành (lưới thoát 0), mỗi lần phá đúng một chỗ trên bản sao thì thoát 1 với mã ghim: bỏ nhóm 'màn' của màn mẫu mới ở approved → 'thieu-ung-vien'; nhóm còn một dòng → 'ung-vien-it'; bốn dòng → 'ung-vien-nhieu'; ứng viên 'khong-co-block' → 'ung-vien-khong-co'; ảnh trỏ tệp không có → 'anh-khong-co'; ảnh là tệp chữ → 'anh-khong-phai-png'; hai ứng viên một ảnh → 'ung-vien-trung-anh'; hai dấu chọn → 'chon-qua-mot'; khối reui không phải ứng viên được chọn → 'reui-khong-duoc-chon'; khối ve-tay mà có ứng viên chọn → 've-tay-ma-chon'; các ca nhóm 'màn' chạy ở approved, các ca nhóm khối ở implemented; đối chứng: màn theo mẫu không có nhóm 'màn' thì im, và hồ sơ approved có khối reui mà chưa có nhóm khối thì im\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "tools/proof_gate/**"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.proof_gate"
+  },
+  {
+   "id": "E4",
+   "criterion": "AC-4",
+   "cmd": "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose",
+   "expected": "\"exit 0; bài 'vùng lấy bỏ thêm' trên khối data-grid-editing-6 bậc reui: không dòng vùng → 'thieu-vung'; xử lý 'giữ' → 'vung-xu-ly-la'; lý do rỗng → 'vung-thieu-ly-do'; cột Cách rỗng → 'thieu-cach'; Cách 'chép' → 'cach-la'; ma trận viết trước số bỏ × cách: (lấy 1, bỏ 2, chọn khối) → 'cat-qua-nua'; (lấy 1, bỏ 2, ghép từ thành phần) → im; (lấy 2, bỏ 2, chọn khối) → im; (lấy 2, bỏ 1, thêm 3, chọn khối) → im (vùng thêm không tính vào số vùng gốc)\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "tools/proof_gate/**"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.proof_gate"
+  },
+  {
+   "id": "E5",
+   "criterion": "AC-5",
+   "cmd": "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose",
+   "expected": "\"exit 0; bài 'sổ khối' từ sổ lành một dòng (lưới thoát 0), phá từng chỗ: dòng hai cùng nhu_cau → 'so-trung-nhu-cau' gọi tên cả hai dòng; cùng ten → 'so-trung-ten'; thiếu mo_ta → 'so-thieu-truong'; nguon 'khong-co-block' → 'so-nguon-la'; tep không có → 'so-tep-khong-co'; duyet '11/11' → 'so-ngay-la'; duyet khác ngày approved_at của hồ sơ nhập → 'so-ngay-lech'; ho_so không có → 'so-ho-so-khong-co'; bảng Khối của hồ sơ nhập không có dòng nguồn bậc reui → 'so-khong-chung-tu'; xoá dòng sổ của khối reui của hồ sơ implemented → 'nhap-kho-thieu-so'; bài kho thật đọc design/so-khoi.yaml không lỗi\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "tools/proof_gate/**",
+    "design/so-khoi.yaml"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.proof_gate"
+  },
+  {
+   "id": "E6",
+   "criterion": "AC-6",
+   "cmd": "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose",
+   "expected": "\"exit 0; bài 'từ Quỹ hàng' ở hồ sơ luật 0023 approved: bỏ mục → 'thieu-tu-quy-hang'; từng cột Khối Quỹ hàng đã chọn, Giữ, Bỏ, Vì sao rỗng → 'tu-quy-hang-thieu-truong' (bốn ca); Trang 'docs/tri-thuc/wiki/chu-de/khong-co.md' → 'trang-boi-canh-khong-co'; Trang 'chưa có trang' không lý do → 'trang-boi-canh-khong-co'; đối chứng: trang có thật dưới docs/tri-thuc/wiki/chu-de/ và 'chưa có trang — sổ bối cảnh còn ở PR khác' thì im\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "tools/proof_gate/**"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.proof_gate"
+  },
+  {
+   "id": "E7",
+   "criterion": "AC-7",
+   "cmd": "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose",
+   "expected": "\"exit 0; bài 'họ của màn' ở hồ sơ luật 0023 approved: bỏ mục → 'thieu-ho'; inventory (family grid) ghi họ 'board' → 'ho-lech-so-man'; ghi lối 'theo mẫu' khi máy suy màn mẫu mới → 'loi-lech'; màn today (family null) ghi 'rỗng' không vì sao → 'ho-rong-thieu-ly-do'; ma trận viết trước ba lối (today họ mới, inventory màn mẫu mới, contacts theo mẫu) với họ và lối khớp → thoát 0\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "tools/proof_gate/**"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.proof_gate"
+  },
+  {
+   "id": "E8",
+   "criterion": "AC-8",
+   "cmd": "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose",
+   "expected": "\"exit 0; bài 'khuôn bọc' với hợp đồng implemented khai khuon_boc: app-shell và screens [today, inventory, sent]: tệp chứng minh không có '## Khuôn app-shell' → thoát 1 với 'thieu-chung-minh-khuon' và không dòng 'thieu-chung-minh' nào cho ba màn; hồ sơ chuyển tiếp có mục khuôn chỉ với bảng Khối → thoát 0; hồ sơ luật 0023 có mục khuôn chỉ với bảng Khối → đỏ 'thieu-tu-quy-hang' và 'thieu-ung-vien'; thêm Từ Quỹ hàng và nhóm ứng viên Cho = app-shell → thoát 0; sổ khối có app-shell do hồ sơ khác nhập thì không đòi nhóm ứng viên; bỏ khuon_boc khỏi hợp đồng → 'thieu-chung-minh' cho từng màn; khuon_boc: 'man-gia' không có trong khuon-boc.yaml → 'khuon-boc-la' và 'thieu-chung-minh' cho từng màn; hồ sơ luật 0023 approved khai khuon_boc: app-shell mà mục khuôn thiếu Từ Quỹ hàng và nhóm ứng viên → 'thieu-tu-quy-hang', 'thieu-ung-vien'\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "tools/proof_gate/**"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.proof_gate"
+  },
+  {
+   "id": "E9",
+   "criterion": "AC-9",
+   "cmd": "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose",
+   "expected": "\"exit 0; bài 'kho thật: lưới xanh' chạy lưới trên gốc kho, stderr rỗng, thoát 0; bài 'kho thật: thêm vòng luật 0023 thì đỏ' chép design, _acceptance, wiki/decisions, tests, tools/proof_gate/chuyen-tiep.yaml và src/components sang thư mục tạm, thêm hồ sơ implemented khai inventory với tệp chứng minh lành theo luật 1c, lưới thoát 1 với 'vong-moi · inventory · thieu-tu-quy-hang'; bài 'khuôn tệp chứng minh qua được lưới' rút bốn khối khuôn (KHUON-THEO-MAU, KHUON-MAN-MAU-MOI, KHUON-HO-MOI, KHUON-BOC) từ tools/proof_gate/khuon-chung-minh.md, điền như tác tử điền, ở hồ sơ luật 0023 implemented kèm dòng sổ khối cho khối reui của khuôn thì thoát 0; bài khẳng định kho thật có design/so-khoi.yaml; đổi '### Từ Quỹ hàng' thành '### Từ Quỹ' thì thấy 'thieu-tu-quy-hang'\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    "tools/proof_gate/**",
+    "design/**",
+    "_acceptance/**/chung-minh-man.md"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.proof_gate"
+  },
+  {
+   "id": "E10",
+   "criterion": "AC-10",
+   "expected": "\"Cả sáu câu là có, mỗi câu kèm dòng trích từ tệp.\"",
+   "question": "\"Đọc như một tác tử sắp dựng một màn mới trong kho này, chỉ với ba tệp đã cho: (1) SKILL.md có nói thang ba bậc (lắp ghép từ kho; kho kết hợp ReUI Pro; tạo tay), đi từ trên xuống và chỉ xuống bậc khi bậc trên không đáp ứng việc của người dùng hay luật sản phẩm, đúng như quyết định 0023? (2) Có luật ba tầng giữ nguyên hình — thành phần giữ nguyên, khối ReUI là điểm xuất phát lấy bỏ thêm theo vùng có lý do và cắt quá nửa thì là ghép từ thành phần, khuôn của kho mới là thứ nhập kho và từ đó giữ nguyên — và dòng 'Adapting a ReUI block changes its data, text and props only' đã không còn? (3) Có nói nhập kho là một dòng design/so-khoi.yaml, và khối vòng vừa tạo không được ghi trong-kho? (4) Có thứ tự đọc tài liệu Quỹ hàng cho một màn, bắt đầu từ trang sổ bối cảnh docs/tri-thuc/wiki/chu-de/ rồi tới tài liệu của onehub-quy-hang? (5) Khuôn chứng minh có nói mục mới nào cần từ approved, mục nào từ implemented, và lối khuôn bọc với khuon_boc? (6) SKILL.md còn trỏ tools/proof_gate/check.py, tools/proof_gate/khuon-chung-minh.md, chung-minh-man.md và tools/reui_catalog? Trả lời từng câu có hay không kèm dòng trích.\"",
+   "executor": "judgment",
+   "expectedExit": 0,
+   "inputs": [
+    "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/priceless-turing-34d58f/.claude/skills/inventory-ui/SKILL.md",
+    "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/priceless-turing-34d58f/tools/proof_gate/khuon-chung-minh.md",
+    "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/priceless-turing-34d58f/wiki/decisions/0023-chon-truoc-tao-sau.md"
+   ],
+   "evidence_required": [
+    "run_id",
+    "verdict",
+    "judges",
+    "verified_at"
+   ]
+  },
+  {
+   "id": "E11",
+   "criterion": "AC-10",
+   "cmd": "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose",
+   "expected": "\"exit 0; bài 'luật giao diện theo 0023' đọc .claude/skills/inventory-ui/SKILL.md: không còn chuỗi 'Adapting a ReUI block changes its data, text and props only'; có 'design/so-khoi.yaml', 'docs/tri-thuc/wiki/chu-de/', 'onehub-quy-hang' và ba tầng 'component', 'ReUI block', 'template'; vẫn có 'tools/proof_gate/check.py', 'tools/proof_gate/khuon-chung-minh.md', 'chung-minh-man.md', 'tools/reui_catalog'; khuôn khuon-chung-minh.md có khối KHUON-BOC và các tiêu đề '### Từ Quỹ hàng', '### Họ', '### Ứng viên ReUI', '### Vùng'; đối chứng: chép SKILL.md sang bản sao, chèn lại câu cũ thì hàm kiểm của bài trả về lỗi gọi tên câu ấy\"",
+   "executor": "test",
+   "expectedExit": 0,
+   "paths": [
+    ".claude/skills/inventory-ui/SKILL.md",
+    "tools/proof_gate/khuon-chung-minh.md"
+   ],
+   "evidence_required": [
+    "run_id",
+    "exit_code",
+    "verifier",
+    "verified_at",
+    "output"
+   ],
+   "ref": "config:executors.test.proof_gate"
+  }
+ ],
+ "suiteCommands": [
+  "make check",
+  "npm run build",
+  "make e2e"
+ ],
+ "diffBase": "1491ce895198377e44540384b48cd7dd038ceba3",
+ "repoRoot": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/priceless-turing-34d58f",
+ "personasPath": "/Users/manhphan/.claude/plugins/cache/acceptance-gate-kit/acceptance-gate/2.38.1/skills/acceptance/references/judge-personas.md",
+ "templatePath": "/Users/manhphan/.claude/plugins/cache/acceptance-gate-kit/acceptance-gate/2.38.1/skills/acceptance/references/evidence-report-template.md",
+ "toolKillRule": "# TOOL-KILL-RULE — lệnh bị công cụ ngắt KHÔNG phải lệnh fail\n\n**Nguồn duy nhất** của luật «hết giờ không phải trượt» cho MỌI đường chạy lệnh\nkiểm của kit. Hai đường tiêu thụ, cùng đọc khối marker dưới đây, không chép tay:\n\n- **Vòng lặp tính năng** (plugin feature-loop): skill `feature-loop` đọc file này\n  (resolve qua `resolve-plugin.mjs --require skills/acceptance/references/tool-kill-rule.md`)\n  và truyền NGUYÊN VĂN vào `args.toolKillRule` của workflow\n  `acceptance-verify.js`; workflow rút khối marker và nội suy vào prompt của mọi\n  agent chạy lệnh (machine · ui-check · baseline). Thiếu args hoặc không rút\n  được marker → workflow trả BLOCKED có tên, không chạy không luật.\n- **Đường VERIFY độc lập** (skill `acceptance` Phase 3): phiên điều phối chép khối\n  marker VERBATIM vào prompt của phiên tươi VERIFY, cùng nếp «Network truth».\n\nVì sao có luật: verifier chạy lệnh qua Bash tool có trần thời gian mặc định\n(~120 s) NGẮN hơn nhiều suite; lệnh bị công cụ giết trả exit code CỦA CÔNG CỤ,\nkhông phải của lệnh (vấp thật release-2-2-0 S4 r5: suite 108 s đơn lẻ, dưới tải\nbị giết ở 118 s → REJECT giả 4 eval). Nhận diện là việc AGENT (nó thấy tool\nresult thật); phần máy chỉ phòng thủ trên field cấu trúc `killedByTool` —\nKHÔNG grep nội dung output trong engine (chuỗi tổng kết là của suite từng repo).\n\nLệnh dài hơn trần 600 s của công cụ thì KHÔNG bị giết: công cụ **đẩy nó sang\nnền** và nó chạy tiếp. Tệp đầu ra nền trống tới phút chót, vì khung bọc lệnh của\nkit chỉ in khi lệnh xong — đọc trống thành «bị giết» là đúng sự cố crm 07/10/2026\n(hồ sơ `lenh-dai-chay-rieng`: hai lượt BLOCKED giả). Dòng «chuyển sang nền» trong\nkhối dưới là lối LỜI cho mọi lệnh. Lối MÁY: eval khai `long_running: <phút>`\ntrong `evals.yaml` thì lượt chấm feature-loop tự chạy lệnh nền, ghi nhật ký ở\n`.acceptance-runs/<slug>/s4-lenh-dai/` và chờ bằng lệnh nó sinh ra\n(`eval-executors.md`, mục `long_running`).\n\n<!-- <<<TOOL-KILL-RULE -->\nTRAN THOI GIAN CONG CU: khi goi Bash chay lenh, LUON dat tham so timeout >= 600000 (ms) — tran mac dinh cua cong cu (~120s) NGAN hon nhieu suite; lenh vuot tran se bi CONG CU giet va exit code luc do la cua cong cu, KHONG phai cua lenh. Neu lenh van bi cong cu dung (tool result bao timeout/killed, hoac output bi CAT giua chung truoc dong tong ket cuoi cua lenh) → DO KHONG PHAI ket qua that: khai cannotRun=true + killedByTool=true + reason \"bi cong cu giet o <so giay> giay\" kem dau hieu (timeout tool / output cat). TUYET DOI khong bao exitCode nhu the lenh tu fail va khong doan PASS/FAIL tu output cut.\nDAU RA DAI: harness co the CAT DAU RA RA TEP (\"Output too large … saved to <tep>\") va chi hien doan DAU — do KHONG phai bi cong cu giet: doc DUOI tep do (tail) de lay dong tong ket va ma thoat; chi khai killedByTool khi tool result bao timeout/killed that.\nCHUYEN SANG NEN KHONG PHAI BI GIET: tool result bao lenh chua xong trong timeout va da duoc CHUYEN SANG NEN (\"moved to the background\", kem ID + tep dau ra) → lenh VAN DANG CHAY: KHONG khai killedByTool, KHONG ket luan tu tep dau ra luc do. Tep dau ra nen TRONG la binh thuong — khung boc lenh chi in duoi dau ra + dong __EXIT=<n> khi lenh XONG. Cho bang lenh Bash co gioi han (moi lan goi ≤ 100 giay, duoi tran mac dinh 120 giay cua cong cu; vd vong lap kiem tep do co dong __EXIT= chua, sleep vai giay, het 100 giay thi thoat) va goi lai toi khi tep co dong __EXIT=<n> → doc ma tu dong do nhu binh thuong. Tong thoi gian cho toi da = so phut eval khai o long_running (vang thi 30 phut), tinh tu luc chay lenh; qua ma chua co dong __EXIT → cannotRun=true + reason \"lenh chay qua <so> phut chua xong — khai long_running: <phut> cho eval trong evals.yaml\" (KHONG killedByTool), va dung tac vu nen neu cong cu cho phep.\n<!-- TOOL-KILL-RULE>>> -->\n\n## Hồ sơ cho lượt bị ngắt (đường độc lập)\n\nPhiên tươi VERIFY gặp lệnh bị công cụ ngắt thì:\n\n- dòng run-log của eval đó: `\"exit_code\": null, \"killed_by_tool\": true` (không\n  ghi mã thoát của công cụ như mã thoát của lệnh);\n- verdict báo cáo `BLOCKED`, `reason: bi cong cu giet o <so giay> giay — <eval ids>`\n  (kèm dấu hiệu: timeout tool / output cắt trước dòng tổng kết); `failed_evals`\n  rỗng — người đọc hồ sơ thấy đây là sự cố hạ tầng, chữa bằng chạy lại với trần\n  công cụ đủ dài, không phải sửa sản phẩm.\n\nLệnh bị đẩy sang nền rồi QUÁ trần chờ (`long_running`, vắng thì 30 phút) cũng\nlà sự cố hạ tầng chứ không phải lệnh hỏng: dòng run-log `\"exit_code\": null`,\n`\"cannot_run\": true` (KHÔNG `killed_by_tool` — công cụ không giết nó), verdict\n`BLOCKED`, reason gọi tên việc cần làm (khai `long_running: <phút>` cho eval).\n",
+ "contractPath": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/priceless-turing-34d58f/_acceptance/thang-chon-khoi-vao-cong/contract.md",
+ "invokedAt": "2026-11-11T23:05:31Z",
+ "invokedSha": "cdc11154ce1c0923f34bdb3b1710573ea0f67ae4",
+ "vungVat": [
+  ".claude/skills/inventory-ui/SKILL.md",
+  "_acceptance/app-shell-chon-tu-reui/du-bao.json",
+  "_acceptance/config.yaml",
+  "_acceptance/dang-nhap-chon-tu-reui/du-bao.json",
+  "_acceptance/thang-chon-khoi-vao-cong/card-plain.json",
+  "_acceptance/thang-chon-khoi-vao-cong/card.html",
+  "_acceptance/thang-chon-khoi-vao-cong/design-floor.json",
+  "_acceptance/thang-chon-khoi-vao-cong/du-bao.json",
+  "_acceptance/thang-chon-khoi-vao-cong/evals.yaml",
+  "_acceptance/thang-chon-khoi-vao-cong/khuon-nap.json",
+  "_acceptance/thanh-vien-chon-tu-reui/du-bao.json",
+  "design/so-khoi.yaml",
+  "tools/proof_gate/check.py",
+  "tools/proof_gate/chuyen-tiep.yaml",
+  "tools/proof_gate/khuon-boc.yaml",
+  "tools/proof_gate/khuon-chung-minh.md",
+  "tools/proof_gate/model.py",
+  "tools/proof_gate/proof-gate-0023.test.ts"
+ ],
+ "ngoaiVatGlobs": [
+  "docs/**",
+  "wiki/**",
+  "README.md",
+  "CHANGELOG.md",
+  "AGENTS.md",
+  "CLAUDE.md",
+  "setup-blueprint.yaml",
+  ".github/workflows/ci.yml",
+  "PRODUCT-MAP.md",
+  "LO-TRINH.html",
+  "docs/tri-thuc/**",
+  "_acceptance/*/**/*.md",
+  "_acceptance/*/**/*.jsonl"
+ ],
+ "ngoaiVatFiles": [
+  "LO-TRINH.html",
+  "PRODUCT-MAP.md",
+  "_acceptance/app-shell-chon-tu-reui/opportunity.md",
+  "_acceptance/dang-nhap-chon-tu-reui/opportunity.md",
+  "_acceptance/thang-chon-khoi-vao-cong/contract.md",
+  "_acceptance/thang-chon-khoi-vao-cong/decisions.jsonl",
+  "_acceptance/thang-chon-khoi-vao-cong/design.md",
+  "_acceptance/thang-chon-khoi-vao-cong/duong-nen.md",
+  "_acceptance/thang-chon-khoi-vao-cong/figures/index.md",
+  "_acceptance/thang-chon-khoi-vao-cong/gap-probe.md",
+  "_acceptance/thang-chon-khoi-vao-cong/opportunity.md",
+  "_acceptance/thang-chon-khoi-vao-cong/plan.md",
+  "_acceptance/thang-chon-khoi-vao-cong/usage-report.md",
+  "_acceptance/thanh-vien-chon-tu-reui/opportunity.md",
+  "docs/plan/lo-trinh.json",
+  "wiki/decisions/0023-chon-truoc-tao-sau.md",
+  "wiki/index.md",
+  "wiki/log.md"
+ ],
+ "diffFiles": [
+  ".claude/skills/inventory-ui/SKILL.md",
+  "LO-TRINH.html",
+  "PRODUCT-MAP.md",
+  "_acceptance/app-shell-chon-tu-reui/du-bao.json",
+  "_acceptance/app-shell-chon-tu-reui/opportunity.md",
+  "_acceptance/config.yaml",
+  "_acceptance/dang-nhap-chon-tu-reui/du-bao.json",
+  "_acceptance/dang-nhap-chon-tu-reui/opportunity.md",
+  "_acceptance/thang-chon-khoi-vao-cong/card-plain.json",
+  "_acceptance/thang-chon-khoi-vao-cong/card.html",
+  "_acceptance/thang-chon-khoi-vao-cong/contract.md",
+  "_acceptance/thang-chon-khoi-vao-cong/decisions.jsonl",
+  "_acceptance/thang-chon-khoi-vao-cong/design-floor.json",
+  "_acceptance/thang-chon-khoi-vao-cong/design.md",
+  "_acceptance/thang-chon-khoi-vao-cong/du-bao.json",
+  "_acceptance/thang-chon-khoi-vao-cong/duong-nen.md",
+  "_acceptance/thang-chon-khoi-vao-cong/evals.yaml",
+  "_acceptance/thang-chon-khoi-vao-cong/figures/index.md",
+  "_acceptance/thang-chon-khoi-vao-cong/gap-probe.md",
+  "_acceptance/thang-chon-khoi-vao-cong/khuon-nap.json",
+  "_acceptance/thang-chon-khoi-vao-cong/opportunity.md",
+  "_acceptance/thang-chon-khoi-vao-cong/plan.md",
+  "_acceptance/thang-chon-khoi-vao-cong/usage-report.md",
+  "_acceptance/thanh-vien-chon-tu-reui/du-bao.json",
+  "_acceptance/thanh-vien-chon-tu-reui/opportunity.md",
+  "design/so-khoi.yaml",
+  "docs/plan/lo-trinh.json",
+  "tools/proof_gate/check.py",
+  "tools/proof_gate/chuyen-tiep.yaml",
+  "tools/proof_gate/khuon-boc.yaml",
+  "tools/proof_gate/khuon-chung-minh.md",
+  "tools/proof_gate/model.py",
+  "tools/proof_gate/proof-gate-0023.test.ts",
+  "wiki/decisions/0023-chon-truoc-tao-sau.md",
+  "wiki/index.md",
+  "wiki/log.md"
+ ],
+ "fileDoTrongDiff": [
+  ".claude/skills/inventory-ui/SKILL.md",
+  "_acceptance/app-shell-chon-tu-reui/du-bao.json",
+  "_acceptance/config.yaml",
+  "_acceptance/dang-nhap-chon-tu-reui/du-bao.json",
+  "_acceptance/thang-chon-khoi-vao-cong/card-plain.json",
+  "_acceptance/thang-chon-khoi-vao-cong/card.html",
+  "_acceptance/thang-chon-khoi-vao-cong/design-floor.json",
+  "_acceptance/thang-chon-khoi-vao-cong/du-bao.json",
+  "_acceptance/thang-chon-khoi-vao-cong/evals.yaml",
+  "_acceptance/thang-chon-khoi-vao-cong/khuon-nap.json",
+  "_acceptance/thanh-vien-chon-tu-reui/du-bao.json",
+  "design/so-khoi.yaml",
+  "tools/proof_gate/check.py",
+  "tools/proof_gate/chuyen-tiep.yaml",
+  "tools/proof_gate/khuon-boc.yaml",
+  "tools/proof_gate/khuon-chung-minh.md",
+  "tools/proof_gate/model.py",
+  "tools/proof_gate/proof-gate-0023.test.ts"
+ ],
+ "coverageFiles": [
+  ".claude/skills/inventory-ui/SKILL.md",
+  "design/so-khoi.yaml",
+  "tools/proof_gate/check.py",
+  "tools/proof_gate/chuyen-tiep.yaml",
+  "tools/proof_gate/khuon-boc.yaml",
+  "tools/proof_gate/khuon-chung-minh.md",
+  "tools/proof_gate/model.py",
+  "tools/proof_gate/proof-gate-0023.test.ts"
+ ],
+ "coEvalPaths": true,
+ "evalsHash": "454ccfb0374a577069ad1f024e6ad10c34ef13fcd57e744f0e04854648b53da2",
+ "runBaseline": true,
+ "thuocChup": {
+  "sha": "cdc11154ce1c0923f34bdb3b1710573ea0f67ae4",
+  "n": 63,
+  "digest": "bcee7af2049579f7abf601723cda8508d398437eaf178358ff36a43020dc1a3f",
+  "tep": {
+   "_acceptance/config.yaml": "1f50cdb830724ea7ab86eb42dc825f67de1516ff4b2b4ded81594ec312e4aacb",
+   "_acceptance/thang-chon-khoi-vao-cong/evals.yaml": "454ccfb0374a577069ad1f024e6ad10c34ef13fcd57e744f0e04854648b53da2",
+   "src/modules/identity/code.test.ts": "7d2bebbc7292b47a99fa9f87e9486e299bfb46d809c36c2d3e1addc4dedb54b2",
+   "src/modules/identity/config.test.ts": "a482ab483acc1c15bf9f8c5dc0794fc5b80aca56d401c686176693837692d176",
+   "src/modules/identity/http.test.ts": "0b2b74c5185c3272b1bf1d1f78d042ffa75742459b346e8861c00afe2dc844f3",
+   "src/modules/identity/one-door.test.ts": "1de5ac02ab2ab8bb1d4ee061142440f5ecd7b32c5ed5ffbb2db3d4f83bbbd629",
+   "src/modules/identity/with-company.test.ts": "66a5867b975b24568b5c93cbf478df779a9e115c8a10c4ea04b0cb5dfb2ffaca",
+   "tests/behavior-guard.test.ts": "89f0809f14960b5343278ad021f07bf1a2a85eb6646bdfbfe5798878cafe1289",
+   "tests/behavior.test.tsx": "658fa748bfcf508be2044dac6a1ba24f979083fcfffc8709b093f5397a031f1b",
+   "tests/boundaries.test.ts": "7dac702c9e9811451f8d3741412eef9352348fffd7705b24990367aae24c9ed4",
+   "tests/commit-msg.test.ts": "8276578b01a42d0894f90f68f26d7f42a2ac95c2a845d6278a38dbe202ed611c",
+   "tests/coverage-matrix.test.ts": "090990566785a0be3bed2e6413391262dbd2ba3912836f87e51df527dadd3999",
+   "tests/db/dang-nhap.db.test.ts": "6f20cbc46e2e200476d8252d7666fdc8b894ecb0e18f0d950b3767faa1aad485",
+   "tests/db/helpers.ts": "a2f81566a0d19cc00a820979b635b1e316c407b952ccdba06839622305a23b39",
+   "tests/db/pha-thu/cap-quyen-bang.sql": "4670c05b9cba708dae0d00fe80c0a496208d3d4538abadb68f6a59afa0609440",
+   "tests/db/pha-thu/ds-san-khong-loc.sql": "93e0fe8face722d2fb41eade2e8b7a4d581fe9bdfbcff3a3503d013ca531a737",
+   "tests/db/pha-thu/khong-dem-sai.sql": "efdb3c72eab93343712da45b192515843bdff34487662682346098f6acd2e745",
+   "tests/db/pha-thu/vai-ham-doc-them.sql": "f1bc67de1c4000683a86e7a373dd2533613777063bc965876ad5e0ae9b89b8d2",
+   "tests/design-check.test.ts": "e75b30023ffe2c9603d3d518265c118525d7bc3431c808a1116b879b372e3a85",
+   "tests/design-registry.test.ts": "77690e33a822e0bca7c54594b290337182adf50b0cc99fb2efde22b5eb9f7869",
+   "tests/e2e-db/login.spec.ts": "057a5b4695612325e239e89bd395eeccea2d09bd28a79503f527690a91abd372",
+   "tests/e2e-db/setup.ts": "452a45fd3c67f516ced036ed0956e357aed75b9418e1752015b362ff00a91904",
+   "tests/e2e-db/teardown.ts": "5d31751619d0758f554e8fe6261a9c07a4c6a19ce090242811cf0f96ee8b0a6e",
+   "tests/e2e/account.spec.ts": "6791bf2e9f5ddd3616f05ee325dd4092eeef256fbc670fbaef994e890592ac5e",
+   "tests/e2e/behavior.spec.ts": "128f87137f916f0a127b1210014c6fa2682e0c8a27191236206502ee6df781d2",
+   "tests/e2e/frame.spec.ts": "033a00fda57da76dd9a2a61888445d774906e6eec845b1fce8ed43db342878a6",
+   "tests/e2e/grid.spec.ts": "348f13930f92e20da93da861a81652d59f63b1829258893aa763ff93b3655dff",
+   "tests/e2e/screens/screens.spec.ts": "7914cefd38e85666fc7a1a33f07ca08dac84181e288db328f126f780c0f4c41a",
+   "tests/e2e/shell.spec.ts": "1b2d500c6cb8ee17da92a6fba5e485f3ef36853474174c964e19b7f102b94b2b",
+   "tests/eslint-ui/no-arbitrary-text-size.test.mjs": "e26da07130ebda5c6028605b747f5bb01cce731022b333508001cdc57271995d",
+   "tests/eslint-ui/no-aschild.test.mjs": "d0d93674c33ccfff57ecc88d5aa73142ba1fe42cb0c7bb30db6b3190491c7766",
+   "tests/eslint-ui/no-banned-motion.test.mjs": "7dff75fe5912362d8e43bd6b093cb84d3fb49a48285501cc123cc679dd9ea401",
+   "tests/eslint-ui/no-emoji-icons.test.mjs": "e1e396b759bb027b38f9ac0a2f0de03ea1a53a532f8942d26b7e33375f09ad6d",
+   "tests/eslint-ui/no-hardcoded-color.test.mjs": "4b4e2cff0314ac20046dafc924704a652484fadea787d7603b17f0e49c67734e",
+   "tests/eslint-ui/no-native-dialogs.test.mjs": "1bc99d37addbc63ece7a51adf4c5f52f00be55fbd25c6673fc6410038c8d6a8b",
+   "tests/eslint-ui/no-off-scale-spacing.test.mjs": "eca3291bfea1b0bb1f0460a6e66fe125d22aece1517652220e7075c771305a83",
+   "tests/eslint-ui/no-partial-class.test.mjs": "61d329f197be1de6873ca1eeac36b73dda24ecdccff31626fdfec68e18d2bab6",
+   "tests/eslint-ui/no-raw-controls.test.mjs": "1a177095c89821090569d694f9b02e62220d14ea2683513b6fece27c79037977",
+   "tests/eslint-ui/no-raw-palette.test.mjs": "f52f15164f9c9853eb1d667d8556e41a3838df5ae579cc693fdb672ab0fffd8f",
+   "tests/eslint-ui/no-raw-table.test.mjs": "effca8d2f4ecf271ec2c0ecb2c38bdab0a937c37a27ee93d5ba7d73a72bdd52d",
+   "tests/eslint-ui/require-disable-reason.test.mjs": "baf8ec8240bc7b33a40c013db91378e7fba7869b16e574efa173949e7edcda9f",
+   "tests/format.test.ts": "1472c1061117457d4307fdb15ef7cf9e8b9f3e3d6d063f5361af9d781aa89eba",
+   "tests/frame.test.tsx": "218bb71de79dabf43e59a846ea885bcd0c02e5a75ffc82b06137accec9c49aa1",
+   "tests/grid.test.tsx": "a635fe8385986560f75d9cc25b14d46678386e5e4ce86c4e0c8b772934f6444b",
+   "tests/hooks.test.ts": "fd9daa0597cc88ebf42924e2e166b7100863066e5ffa2b61ff54fe9b1b99ed7d",
+   "tests/kit-root.test.ts": "35e67ab3b8dcc753081f600ef59ecbc606b2a11d3804088d475cded52f7a9348",
+   "tests/label.test.ts": "d1c11c558348a0bafbb5ffa1abf9ed92bdb126a0fad52eac26316015059b1a70",
+   "tests/language.test.ts": "fb481c43c49cf1e9545c782ddaa84f50a60a498f0640e04671c18ed3faf0879d",
+   "tests/link-types.test.ts": "f3bbe7e35d1c067d4f373ccaf24ef1e69491f2c3543b64ccbc0b7117195320be",
+   "tests/lint-floor.test.ts": "70f10d4d2c2685354b774202422f6dc05037c7a952e03558744718802aa2d273",
+   "tests/llm.test.ts": "2deac85903d84e8468814448c2ff76ca7134a6f376a1cc65acecf5332dc1cac7",
+   "tests/nav-roles.test.tsx": "ce3b4c2c5768f8f091543a46467e32883c30726cfb368daaf0118129d5d2d0a8",
+   "tests/permissions.test.ts": "cc9ef9b071aad1767cc094b66bd77964bb6fb7059c906aa43037951e72e7a915",
+   "tests/product-invariants.test.ts": "f8eb84cda9b9a276e855e5d792ef8ee8f74ef321b378363f36cda06a0850b3af",
+   "tests/sample-data.test.ts": "32f24c025c4fbb3bbc5489636baa261c492e7de3f8953aa953306e4bd04b00bb",
+   "tests/test-utils.mjs": "2ffed2abf743cbc02f23a09b078166b7cecaa67864627aff1b07962710609eca",
+   "tests/typecheck-own.test.mjs": "a2bdc9bbcd83751a1b3c39cde07f516df377dbdd58dc0de23cf490bce1aad9cf",
+   "tools/e2e_templates/e2e-templates.test.ts": "7973080390194553bbf25e3e1db6bd969587358cd3d5b172e93671180ae33ad6",
+   "tools/proof_gate/proof-gate-0023.test.ts": "e9790d42ed998dc797c2412c478f98df187fb966e994ee188363d64a5c97a9e5",
+   "tools/proof_gate/proof-gate.test.ts": "ff9e7f0fd92554b5666c4b5c0a0bfdbc31c398fa3934ccb857d4bc7c25355903",
+   "tools/reui_catalog/catalog.test.mjs": "7de81daad09eb237d910230f660a32305cf76d8832bd3ba6d37e8e9908b2cbc8",
+   "tools/reui_catalog/doc-chac.test.mjs": "04bf070ef149a38e89cb35eaf6c0c16cb404d78120847f258eb0b82af3b7258e",
+   "tools/round_metrics/round-metrics.test.ts": "e92772a3694c8651af8a7fcf6be6d2eeba17c378ca47d72e2e3e17cdf9bc329a"
+  }
+ },
+ "cayChup": {
+  "sha": "cdc11154ce1c0923f34bdb3b1710573ea0f67ae4",
+  "ban": {},
+  "chuaTheoDoi": []
+ },
+ "reviewSkillPath": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/priceless-turing-34d58f/.claude/skills/review-change/SKILL.md"
+}

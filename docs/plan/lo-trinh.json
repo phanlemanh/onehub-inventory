@@ -227,6 +227,69 @@
       ]
     },
     {
+      "ma": "1n",
+      "cau_giao": "Vòng dựng màn đi đúng thang kho, kho kết hợp ReUI Pro, tạo tay; thứ mới nhập kho được bày cho chủ kho chọn ở Cổng Phạm vi và có một dòng trong sổ khối",
+      "vai": "nen",
+      "tieu_chi": 8,
+      "vi_sao": "Quyết định 0023: cổng chứng minh màn cho khối tự làm trong vòng tính là có sẵn, chỉ tra từng khối nhỏ, và luật giao diện còn dòng «chuyển thể khối chỉ đổi dữ liệu, chữ, tham số»",
+      "hang": "T3",
+      "dung_tren": [
+        "1c",
+        "1g"
+      ],
+      "slug": "thang-chon-khoi-vao-cong",
+      "bat_khi": "Khối tạo trong chính vòng mà ghi «trong kho» thì đỏ; màn hay khối mới nhập kho thiếu ứng viên ReUI kèm ảnh thì đỏ; khối ReUI lấy về thiếu dòng lý do cho vùng lấy, bỏ, thêm thì đỏ; hai dòng sổ khối cho cùng một nhu cầu thì đỏ; hồ sơ màn thiếu mục «Từ Quỹ hàng» hay thiếu họ của màn thì đỏ; khuôn bọc màn như App Shell có lối chứng minh riêng, không bị coi là dựng các màn nó bọc; mục «Từ Quỹ hàng» trỏ được trang sổ bối cảnh của màn",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "vung": [
+        "tools/proof_gate/**",
+        ".claude/skills/inventory-ui/**",
+        "design/so-khoi.yaml"
+      ]
+    },
+    {
+      "ma": "1o",
+      "cau_giao": "Nhân viên sàn làm việc trong một App Shell chọn từ ReUI Pro, giữ đủ thanh bên theo vai, băng báo và các trạng thái toàn trang đang có",
+      "vai": "Nhân viên sàn",
+      "tieu_chi": 8,
+      "vi_sao": "Quyết định 0023: App Shell hiện là thanh bên shadcn mở rộng, dựng khi kho còn rỗng. Chủ kho chốt ngày 11/11/2026: dùng app-shell-8, giữ cả hai cột; các phần còn lại quyết trên bản bấm được, không quyết bằng chữ",
+      "hang": "T3",
+      "dung_tren": [
+        "1a",
+        "1i",
+        "1f"
+      ],
+      "slug": "app-shell-chon-tu-reui",
+      "bat_khi": "App Shell dựng từ app-shell-8, giữ cả hai cột điều hướng; thẻ Phạm vi là bản bấm được, mỗi vùng của khối lấy hay bỏ có một dòng lý do; App Shell có dòng trong sổ khối; mọi màn đang có vẫn qua bộ bài kiểm chung ở bốn khổ, sáng và tối; thanh bên vẫn hiện đủ mục của mọi vai người giữ",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "vung": [
+        "src/components/templates/**",
+        "src/app/(app)/layout.tsx",
+        "src/app/nav.ts",
+        "tests/e2e/shell.spec.ts"
+      ]
+    },
+    {
+      "ma": "1p",
+      "cau_giao": "Nhân viên sàn đăng nhập bằng mã email trên màn đăng nhập chọn từ ReUI Pro, luồng và luật an toàn giữ nguyên",
+      "vai": "Nhân viên sàn",
+      "tieu_chi": 5,
+      "vi_sao": "Quyết định 0023: màn đăng nhập ghép tay khi kho còn rỗng; Quỹ hàng đã chọn auth-15",
+      "hang": "T2",
+      "dung_tren": [
+        "8",
+        "1m"
+      ],
+      "slug": "dang-nhap-chon-tu-reui",
+      "bat_khi": "Thẻ Phạm vi bày hai đến ba khối đăng nhập của ReUI kèm ảnh, trong đó có auth-15; mọi bài kiểm đăng nhập của hàng 8 và 1m vẫn xanh, không đổi lời",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "vung": [
+        "src/app/login/**"
+      ]
+    },
+    {
       "ma": "1j",
       "cau_giao": "Hai loại liên kết chủ nhà với lần chào và lần chào với căn được khai trong mô hình nghiệp vụ, kèm sàn sở hữu và vai trên quan hệ, và mã dùng kiểu sinh ra từ đó",
       "vai": "nen",
@@ -278,6 +341,26 @@
       ],
       "dung_tren": [
         "1h"
+      ]
+    },
+    {
+      "ma": "1m",
+      "cau_giao": "Sau khi đăng nhập người dùng không bao giờ bị đưa sang trang ngoài, bấm Đăng xuất mà lỗi thì được báo rõ, và người không còn thuộc sàn nào có lối thoát khỏi màn chọn sàn",
+      "vai": "Nhân viên sàn",
+      "tieu_chi": 4,
+      "vi_sao": "Bốn mục ngoài hợp đồng của hàng 8, ba lỗ an toàn của phần đăng nhập. Chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng ngày 11/11/2026. Phải xong trước hàng đầu tiên đọc dữ liệu thật",
+      "slug": "va-dang-nhap",
+      "hang": "T3",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "vung": [
+        "src/app/login/**",
+        "src/app/api/v1/auth/**",
+        "src/modules/identity/next-path.ts",
+        "src/modules/identity/http.ts"
+      ],
+      "dung_tren": [
+        "8"
       ]
     },
     {
@@ -503,6 +586,29 @@
       ]
     },
     {
+      "ma": "9c",
+      "cau_giao": "Quản trị sàn xem danh sách người và mời người trên màn Thành viên chọn từ kho và ReUI Pro, quyền và luật mời giữ nguyên",
+      "vai": "Quản trị sàn",
+      "tieu_chi": 6,
+      "vi_sao": "Quyết định 0023: màn Thành viên và hộp mời ghép tay, họ của màn để rỗng nên không so với màn danh sách nào; Quỹ hàng đã chọn solution-users-8",
+      "hang": "T2",
+      "dung_tren": [
+        "9",
+        "2",
+        "1n",
+        "1o"
+      ],
+      "slug": "thanh-vien-chon-tu-reui",
+      "bat_khi": "Thẻ Phạm vi nêu họ của màn và bày ứng viên: khuôn Lưới của kho, solution-users-8, hộp mời dialog-2; mọi bài kiểm quyền và mời của hàng 9 vẫn xanh, không đổi lời",
+      "nhom": "nen",
+      "dot": "mvp-dot-1",
+      "vung": [
+        "src/app/(app)/members/**",
+        "src/modules/identity/ui/**",
+        "src/components/candidate/form-dialog.tsx"
+      ]
+    },
+    {
       "ma": "10",
       "cau_giao": "Đầu chủ đăng nhập và thấy, sửa được hàng thật của sàn mình trên Bảng hàng",
       "vai": "Đầu chủ",
@@ -515,7 +621,8 @@
         "9",
         "9a",
         "9b",
-        "1j"
+        "1j",
+        "1m"
       ],
       "slug": "bang-hang-du-lieu-that",
       "nhom": "bang-hang",

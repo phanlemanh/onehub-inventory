@@ -32,7 +32,11 @@ export default async function LoginPage({
           <LoginForm
             next={next}
             codeLength={CODE_LENGTH}
-            labels={{ signIn: label("SignIn"), code: label("LoginCode") }}
+            labels={{
+              signIn: label("SignIn"),
+              signOut: label("SignOut"),
+              code: label("LoginCode"),
+            }}
             initialCompanies={session && !session.company ? session.companies : null}
           />
         </FramePanel>

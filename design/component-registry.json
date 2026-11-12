@@ -34,6 +34,29 @@
       ]
     },
     {
+      "name": "FormDialog",
+      "file": "src/components/candidate/form-dialog.tsx",
+      "level": "organism",
+      "parts": [
+        {
+          "name": "FormDialog",
+          "props": [
+            "trigger",
+            "title",
+            "description",
+            "submitLabel",
+            "busyLabel",
+            "busy",
+            "open",
+            "onOpenChange",
+            "onSubmit",
+            "formError",
+            "slot"
+          ]
+        }
+      ]
+    },
+    {
       "name": "RecordPanel",
       "file": "src/components/candidate/record-panel.tsx",
       "level": "molecule",
@@ -1420,7 +1443,9 @@
           "props": [
             "nav",
             "roles",
-            "account"
+            "company",
+            "account",
+            "columnOpen"
           ]
         },
         {
@@ -1428,6 +1453,34 @@
         },
         {
           "name": "NavItem"
+        },
+        {
+          "name": "NavLink"
+        },
+        {
+          "name": "NavSection"
+        }
+      ]
+    },
+    {
+      "name": "SecondColumn",
+      "file": "src/components/templates/app-shell/second-column.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "SecondColumn",
+          "props": [
+            "items",
+            "roles",
+            "initialOpen"
+          ]
+        },
+        {
+          "name": "SecondColumnNav",
+          "props": [
+            "items",
+            "roles"
+          ]
         }
       ]
     },

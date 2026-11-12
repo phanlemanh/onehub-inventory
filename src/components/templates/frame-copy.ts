@@ -35,6 +35,11 @@ export const FRAME_COPY = {
     why: "Địa chỉ này không có trong ứng dụng, có thể đã gõ nhầm hoặc trang đã đổi chỗ.",
     next: "Bạn về trang đầu rồi đi tiếp từ đó.",
   },
+  forbidden: {
+    title: "Không đủ quyền",
+    why: "Vai của bạn ở sàn này không mở được màn này, nên màn không hiện dữ liệu nào.",
+    next: "Bạn cần dùng màn này thì nhờ quản trị của sàn thêm vai.",
+  },
   sessionExpired: {
     title: "Phiên đăng nhập đã hết hạn",
     why: "Bạn đã rời ứng dụng quá lâu nên phiên đăng nhập kết thúc để giữ an toàn dữ liệu.",
@@ -48,6 +53,15 @@ export const FRAME_COPY = {
   saveFailedOffline: {
     title: "Chưa lưu được vì mất kết nối mạng",
     detail: "Phần bạn đang nhập vẫn còn; khi có mạng lại, bạn bấm «Thử lại».",
+  },
+  /** Second column of the App Shell (row 1o). */
+  secondColumn: {
+    all: "Tất cả",
+    allLinks: "Tất cả link",
+    byStatus: "Theo trạng thái",
+    noSubItems: "Màn này chưa có mục con.",
+    collapse: "Gập cột thứ hai",
+    expand: "Mở cột thứ hai",
   },
   appError: {
     title: "Ứng dụng chưa mở được",

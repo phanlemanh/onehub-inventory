@@ -11,15 +11,23 @@ import {
   type LoginDeps,
   type Session,
 } from "./login";
+import { memberRoles, type MembersDeps } from "./members";
+import { createMembersHandlers, type MembersHandlers } from "./members-http";
 import { createPool } from "./with-company";
+import type { Role } from "../../generated/ontology";
 
-let deps: LoginDeps | null | undefined;
+let deps: (LoginDeps & MembersDeps) | null | undefined;
 
-function liveDeps(): LoginDeps | null {
+function liveDeps(): (LoginDeps & MembersDeps) | null {
   if (deps !== undefined) return deps;
   const config = readAuthConfig(process.env);
   deps = config.databaseUrl
-    ? { pool: createPool(config.databaseUrl), secret: config.secret, sender: config.sender }
+    ? {
+        pool: createPool(config.databaseUrl),
+        secret: config.secret,
+        sender: config.sender,
+        invite: config.inviteSender,
+      }
     : null;
   return deps;
 }
@@ -32,8 +40,18 @@ export function authHandlers(): AuthHandlers {
   return handlers;
 }
 
+let membersHandlersCache: MembersHandlers | undefined;
+
+/** The handlers behind /api/v1/members (row 9). */
+export function membersHandlers(): MembersHandlers {
+  membersHandlersCache ??= createMembersHandlers(liveDeps);
+  return membersHandlersCache;
+}
+
 export interface CurrentSession extends Session {
   companies: CompanyRef[];
+  /** Roles held in the session's company (row 9); none before a company is chosen. */
+  roles: Role[];
 }
 
 /**
@@ -53,7 +71,11 @@ export async function currentSession(): Promise<CurrentSession | null> {
   try {
     const session = await readSession(d, token);
     if (!session) return null;
-    return { ...session, companies: await sessionCompanies(d, token) };
+    const companies = await sessionCompanies(d, token);
+    const roles = session.company
+      ? await memberRoles(d, { userId: session.userId, companyId: session.company.id })
+      : [];
+    return { ...session, companies, roles };
   } catch (err) {
     console.error(
       "[dang-nhap] không đọc được phiên:",

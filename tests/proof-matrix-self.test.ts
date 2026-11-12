@@ -72,8 +72,12 @@ function copyRepo(): string {
     "_acceptance",
     "tools/proof_gate",
     "tools/e2e_templates",
+    "tools/repo_ontology.py",
     "tests",
     "wiki",
+    // The 0023 gate checks the files of the block ledger and the context page of the record.
+    "docs/tri-thuc",
+    "src/components",
   ]) {
     cpSync(join(ROOT, part), join(dir, part), { recursive: true });
   }

@@ -17,7 +17,7 @@ import {
   pickNeedle,
   pinned,
 } from "./recipes";
-import { REPO_ROOT } from "./register";
+import { REPO_ROOT, SESSION_SCREENS } from "./register";
 import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
 import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings";
 import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
@@ -214,6 +214,10 @@ function copyRegister(): string {
     cpSync(join(REPO_ROOT, rel), join(root, rel));
   }
   for (const s of bridge(REPO_ROOT).screens) if (s.status === "built") stubPage(root, s.route);
+  for (const rel of Object.values(SESSION_SCREENS)) {
+    mkdirSync(dirname(join(root, rel)), { recursive: true });
+    cpSync(join(REPO_ROOT, rel), join(root, rel));
+  }
   return root;
 }
 
@@ -307,6 +311,48 @@ describe("màn bị bỏ có tên", () => {
     },
     SLOW,
   );
+});
+
+describe("màn cần đăng nhập bỏ qua có điều kiện", () => {
+  it(
+    "the members screen is skipped by name while its signed-in test measures frame and axe",
+    () => {
+      const r = list(copyRegister());
+      expect(r.status).toBe(0);
+      expect(r.lines).toContain(
+        "bo qua: members — can dang nhap — khung va axe do o tests/e2e-db/members.spec.ts",
+      );
+      expect(r.lines.some((l) => / › man members › /.test(l))).toBe(false);
+    },
+    SLOW,
+  );
+
+  for (const [name, change, message] of [
+    [
+      "the signed-in test is gone",
+      null,
+      "man members can dang nhap nhung bai tests/e2e-db/members.spec.ts khong co",
+    ],
+    [
+      "the signed-in test no longer runs axe",
+      (t: string) => t.replaceAll("AxeBuilder", "KhongCo"),
+      "man members can dang nhap nhung bai tests/e2e-db/members.spec.ts khong chay axe",
+    ],
+  ] as const) {
+    it(
+      `${name}: the listing fails and names the screen`,
+      () => {
+        const root = copyRegister();
+        const file = join(root, SESSION_SCREENS["members"]!);
+        if (change) writeFileSync(file, change(readFileSync(file, "utf8")));
+        else rmSync(file);
+        const r = list(root);
+        expect(r.status).not.toBe(0);
+        expect(r.out).toContain(message);
+      },
+      SLOW,
+    );
+  }
 });
 
 describe("sổ sai thì đỏ", () => {
