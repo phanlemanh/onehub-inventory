@@ -37,7 +37,8 @@ phán quyết 2026-11-12 06:20Z (chia việc với hàng 2a), tin K-1211-9 của
 - AC-4: Given hồ sơ mở, When nhìn địa chỉ trang, Then địa chỉ mang `ho-so=<id lần chào>`; mở thẳng địa chỉ ấy thì hồ sơ căn
   ấy hiện; nút lùi của trình duyệt đóng hồ sơ; địa chỉ mang id không có thì không mở gì và bảng vẫn bình thường.
 - AC-5: Given hồ sơ mở, When bấm «Sau» và «Trước», Then đi theo đúng thứ tự dòng bảng đang hiện (cả sau khi gõ tìm), «Trước»
-  tắt ở dòng đầu và «Sau» tắt ở dòng cuối; dòng đang mở bị tìm làm biến khỏi bảng thì hồ sơ vẫn hiện căn ấy và cả hai nút tắt.
+  tắt ở dòng đầu và «Sau» tắt ở dòng cuối; dòng đang mở bị tìm làm biến khỏi bảng thì hồ sơ vẫn hiện căn ấy và cả hai nút tắt; vùng đang chờ tải, lỗi, không
+  có dòng hay không đủ quyền thì địa chỉ mang id thật cũng không mở hồ sơ.
 - AC-6: Given hồ sơ mở ở máy tính, When mở từ lúc đóng, Then tiêu điểm vào tên hồ sơ; When bấm Esc trong hồ sơ hoặc «Đóng»,
   Then hồ sơ đóng và tiêu điểm về đúng mã căn của dòng vừa xem; bảng không bị giữ tiêu điểm khi hồ sơ mở (Tab vào được bảng).
 - AC-7: Given Bảng hàng ở 414 và 360, When chạm mã một căn, Then hồ sơ mở toàn màn (phủ cả khung nhìn), đầu màn là thẻ căn
@@ -86,6 +87,8 @@ thuê, nhãn trạng thái theo cho thuê chỉ đo ở mức mô hình.
 - Không phím mũi tên, chọn ô, bôi vùng, lọc từng cột, nhóm, ẩn hiện cột (hàng 2a); Enter mở dòng là lối 2a dựng, hồ sơ nối
   vào khi 2a gộp (hàng ký sau chấm lại phần bị đụng).
 - Không kéo đổi rộng cột hồ sơ (Hỏi-2), không trang toàn màn riêng cho một căn.
+- Không nút chính dính đáy trên điện thoại («Hỏi đầu chủ», «Ghi cuộc gọi») (Hỏi-4): luồng Gửi (K1) và ghi cuộc gọi (G3)
+  chưa có.
 - Không hướng căn trên thẻ: bảng nhãn chưa có nhãn «Hướng», mô hình nghiệp vụ không mở ở hàng này.
 
 ## Notes

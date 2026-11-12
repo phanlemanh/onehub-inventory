@@ -14,7 +14,7 @@ evals:
     executor: script
     cmd: config:executors.script.e2e
     paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, src/modules/listings/ui/**, tests/e2e/ho-so-can.spec.ts]
-    expected: "exit 0; tests/e2e/ho-so-can.spec.ts ở 1440 và 1024 mở /inventory, bấm mã căn thứ năm: hồ sơ data-record-layout='column' hiện, mép trái hồ sơ không nhỏ hơn mép phải khung bảng, mép trên hai bên lệch không quá 2 px, rộng hồ sơ trong khoảng 35–45% tổng hai bên; gõ một mã căn vào ô tìm khi hồ sơ mở thì số dòng đổi; bấm mã căn khác thì data-record-id đổi mà hồ sơ không đóng; ca đối chứng đặt hồ sơ thành lớp nổi (position fixed, right 0) bằng thẻ style trên trang thật cho thông điệp 'record covers the grid'"
+    expected: "exit 0; tests/e2e/ho-so-can.spec.ts ở 1440 và 1024 mở /inventory, bấm mã căn thứ năm: hồ sơ data-record-layout='column' hiện, mép trái hồ sơ không nhỏ hơn mép phải khung bảng, mép trên hai bên lệch không quá 2 px, rộng hồ sơ trong khoảng 35–45% tổng hai bên; gõ một mã căn vào ô tìm khi hồ sơ mở thì số dòng đổi; bấm mã căn khác thì data-record-id đổi mà hồ sơ không đóng; từ nút 'Đóng' bấm Tab tối đa 10 lần thì tiêu điểm rời hồ sơ và nằm trong khung vùng dữ liệu (không quay vòng trong hồ sơ), ca đối chứng của bước này dựng lại bẫy tiêu điểm (giữ Tab trong hồ sơ bằng trình nghe keydown trên trang thật) cho 'grid not reachable by Tab'; ca đối chứng đặt hồ sơ thành lớp nổi (position fixed, right 0) bằng thẻ style trên trang thật cho thông điệp 'record covers the grid'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3
@@ -22,7 +22,7 @@ evals:
     executor: script
     cmd: config:executors.script.e2e
     paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, src/modules/listings/ui/**, tests/e2e/ho-so-can.spec.ts]
-    expected: "exit 0; ở 1440 và 1024 với hồ sơ mở: cuộn ngang khung bảng tới cuối thì ba đầu cột #, Căn, Toà vẫn nằm trọn trong khung, đủ tám đầu cột dữ liệu vẫn có trong bảng (không cột nào bị ẩn), giá của căn đang mở thấy ở đầu hồ sơ; bài in dòng 'visible columns <khổ> closed=<n> open=<m>'; ca đối chứng bỏ ghim cột Toà bằng thẻ style cho thông điệp 'frozen column scrolled away: Toà'"
+    expected: "exit 0; ở 1440 và 1024 với hồ sơ mở: số đầu cột nằm trọn trong khung cuộn ít nhất 5 ở 1440 và ít nhất 3 ở 1024 (ngưỡng viết trong tệp, bài in 'visible columns <khổ> closed=<n> open=<m>'); cuộn ngang khung bảng tới cuối thì ba đầu cột #, Căn, Toà vẫn nằm trọn trong khung; với mỗi cột trong tám cột dữ liệu, cuộn tới nó thì đầu cột có bề ngang lớn hơn 0 và nằm trọn trong khung (không cột nào bị ẩn); giá của căn đang mở thấy ở đầu hồ sơ; ca đối chứng bỏ ghim cột Toà bằng thẻ style cho 'frozen column scrolled away: Toà', ca đối chứng ẩn cột Diện tích bằng thẻ style cho 'column hidden: Diện tích'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E4
@@ -38,7 +38,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, tests/ho-so-can.test.tsx]
-    expected: "exit 0; trong tests/ho-so-can.test.tsx trên DataRegion có record với khung nhìn rộng: mở dòng đầu thì 'Trước' tắt, 'Sau' sang dòng hai; mở dòng cuối thì 'Sau' tắt; sau khi gõ tìm, 'Sau' đi theo dòng đang hiện (bỏ qua dòng bị lọc); dòng đang mở bị tìm làm biến thì hồ sơ vẫn mang id ấy và cả hai nút tắt; ca đối chứng đi theo thứ tự mọi dòng thay vì dòng đang hiện cho 'walk ignores search'"
+    expected: "exit 0; trong tests/ho-so-can.test.tsx trên DataRegion có record với khung nhìn rộng: mở dòng đầu thì 'Trước' tắt, 'Sau' sang dòng hai; mở dòng cuối thì 'Sau' tắt; sau khi gõ tìm, 'Sau' đi theo dòng đang hiện (bỏ qua dòng bị lọc); dòng đang mở bị tìm làm biến thì hồ sơ vẫn mang id ấy và cả hai nút tắt; vùng ở bốn trạng thái chờ tải, lỗi, một phần hỏng không dòng, không đủ quyền kèm địa chỉ mang id thật thì không có hồ sơ nào hiện, cùng địa chỉ ấy ở trạng thái có dòng thì hồ sơ hiện (đối chứng dương); ca đối chứng đi theo thứ tự mọi dòng thay vì dòng đang hiện cho 'walk ignores search', ca đối chứng dựng hồ sơ bất kể trạng thái vùng cho 'record opened in a region without rows'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E6
