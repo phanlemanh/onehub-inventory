@@ -41,9 +41,9 @@ không số đếm, Hỏi-4 nút «Lưu góc nhìn» của vùng, Hỏi-5 không
   trong ô tìm như lúc lưu. (cross-layer)
 - AC-3: Given cột thứ hai có «Tất cả căn», các mục trạng thái và các góc nhìn, When người đi giữa chúng, Then đúng một mục
   sáng — mục đang mở; đầu màn mang tên góc nhìn đang mở; khi người đổi cách xem của góc nhìn đang mở, mục ấy mang dấu «đã
-  đổi» và nút lưu có «Lưu thay đổi» và «Lưu thành góc nhìn mới»; bấm lại mục ấy thì về đúng cách xem đã lưu.
+  đổi» và nút lưu có «Lưu thay đổi» và «Lưu thành mới»; bấm lại mục ấy thì về đúng cách xem đã lưu.
 - AC-4: Given một góc nhìn đang mở đã đổi cách xem, When người bấm «Lưu thay đổi», Then máy chủ ghi đè cách xem của góc nhìn
-  ấy, dấu «đã đổi» mất, tải lại vẫn ra cách xem mới; «Lưu thành góc nhìn mới» tạo mục thứ hai và để mục cũ nguyên. (cross-layer)
+  ấy, dấu «đã đổi» mất, tải lại vẫn ra cách xem mới; «Lưu thành mới» tạo mục thứ hai và để mục cũ nguyên. (cross-layer)
 - AC-5: Given «…» cuối một mục góc nhìn, When người chọn «Đổi tên», gõ tên mới rồi lưu, Then mục mang tên mới ở cột thứ hai,
   vẫn sáng nếu đang mở, cách xem không đổi, và tải lại vẫn mang tên mới. (cross-layer)
 - AC-6: Given «…» cuối một mục, When người chọn «Xoá góc nhìn», Then việc ấy đứng cuối, tách bằng vạch, chữ đỏ; hộp xác nhận

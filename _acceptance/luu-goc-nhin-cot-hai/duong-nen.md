@@ -16,3 +16,9 @@ engine: xanh
 ## Dòng vàng
 
 - không có
+
+## Ghi chú (G-1211-70)
+
+- Chỗ đỏ duy nhất — ca phá «bỏ tabindex» của vùng chữ dài ở Bảng hàng, khổ 1440, lượt máy chạy chậm — là nhiễu hạ tầng có
+  sẵn trên nhánh chính: đỏ ở hai lượt đường nền (16:06 trên e255843, 16:21 trên efd154a, máy tải nặng), chạy riêng ba lần
+  liền khi máy rảnh đều xanh (2026-11-12, `--repeat-each=3`, 3 passed). Không sửa, không nới bài.

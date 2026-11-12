@@ -32,7 +32,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/components/templates/**, src/modules/listings/ui/**, tests/second-column-views.test.tsx]
-    expected: "exit 0; tests/second-column-views.test.tsx: cột thứ hai với 'Tất cả căn', sáu mục trạng thái và ba góc nhìn; ma trận viết trước 5 địa chỉ (/inventory, ?status=Active, ?goc-nhin=g1, ?goc-nhin=g2, ?goc-nhin=khong-co) hằng 5 — đếm mục mang aria-current bằng 1 ở bốn địa chỉ đầu, đúng mục; địa chỉ góc nhìn không có thì sáng 'Tất cả căn'; dấu 'đã đổi' hiện trên mục đang mở khi view hiện tại khác view đã lưu và mất khi bằng; nút lưu có 'Lưu thay đổi' và 'Lưu thành góc nhìn mới' chỉ khi 'đã đổi'; ca phá đánh dấu sáng theo tiền tố đường dẫn và khẳng định 'more than one item active: 2'"
+    expected: "exit 0; tests/second-column-views.test.tsx: cột thứ hai với 'Tất cả căn', sáu mục trạng thái và ba góc nhìn; ma trận viết trước 5 địa chỉ (/inventory, ?status=Active, ?goc-nhin=g1, ?goc-nhin=g2, ?goc-nhin=khong-co) hằng 5 — đếm mục mang aria-current bằng 1 ở bốn địa chỉ đầu, đúng mục; địa chỉ góc nhìn không có thì sáng 'Tất cả căn'; dấu 'đã đổi' hiện trên mục đang mở khi view hiện tại khác view đã lưu và mất khi bằng; nút lưu có 'Lưu thay đổi' và 'Lưu thành mới' chỉ khi 'đã đổi'; ca phá đánh dấu sáng theo tiền tố đường dẫn và khẳng định 'more than one item active: 2'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E5
@@ -41,7 +41,7 @@ evals:
     cmd: config:executors.script.goc_nhin_e2e
     layer: backend-effect
     paths: [src/components/candidate/**, src/modules/listings/**, "src/app/(app)/inventory/**", "src/app/api/v1/saved-views/**", tests/e2e-db/goc-nhin.spec.ts]
-    expected: "exit 0; ca 'save changes' ở 1440: mở góc nhìn của E2, thêm lọc Phòng ngủ '2', mục mang dấu 'đã đổi'; bấm 'Lưu thay đổi' → dấu mất, tải lại thì lọc Phòng ngủ còn và danh sách mã căn BẰNG tập tính lại; ca 'save as new': đổi tiếp sắp xếp, 'Lưu thành góc nhìn mới' tên '[MAU] Hai phòng ngủ' → cột có hai mục, mở mục cũ thì sắp xếp là của lần lưu trước; đọc bảng saved_view: đúng hai dòng của A; ca phá 'Lưu thay đổi' gửi cách xem cũ và khẳng định 'save changes did not overwrite'; ca 'reselect discards changes': mở góc nhìn, đổi lọc (dấu 'đã đổi' hiện), bấm lại chính mục ấy → mã căn theo thứ tự BẰNG bản đã lưu, dấu 'đã đổi' mất, đầu màn có chữ BẰNG tên góc nhìn; ca phá giữ trạng thái lưới khi bấm cùng địa chỉ và khẳng định 'reselect kept unsaved changes'"
+    expected: "exit 0; ca 'save changes' ở 1440: mở góc nhìn của E2, thêm lọc Phòng ngủ '2', mục mang dấu 'đã đổi'; bấm 'Lưu thay đổi' → dấu mất, tải lại thì lọc Phòng ngủ còn và danh sách mã căn BẰNG tập tính lại; ca 'save as new': đổi tiếp sắp xếp, 'Lưu thành mới' tên '[MAU] Hai phòng ngủ' → cột có hai mục, mở mục cũ thì sắp xếp là của lần lưu trước; đọc bảng saved_view: đúng hai dòng của A; ca phá 'Lưu thay đổi' gửi cách xem cũ và khẳng định 'save changes did not overwrite'; ca 'reselect discards changes': mở góc nhìn, đổi lọc (dấu 'đã đổi' hiện), bấm lại chính mục ấy → mã căn theo thứ tự BẰNG bản đã lưu, dấu 'đã đổi' mất, đầu màn có chữ BẰNG tên góc nhìn; ca phá giữ trạng thái lưới khi bấm cùng địa chỉ và khẳng định 'reselect kept unsaved changes'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E6

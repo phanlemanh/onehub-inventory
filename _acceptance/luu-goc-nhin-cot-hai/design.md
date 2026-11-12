@@ -68,7 +68,7 @@ nhánh chính về một lần, rồi mới viết mã.
 - Suôn sẻ: Bảng hàng → lọc, sắp, nhóm, ẩn cột → «Lưu góc nhìn» → đặt tên → mục mới hiện ở cột thứ hai, sáng lên, địa chỉ
   mang góc nhìn (điểm ra: Bảng hàng đang ở góc nhìn vừa lưu). Lần sau: bấm mục ở cột thứ hai → đúng tập dòng, thứ tự,
   nhóm, cột; tải lại hay mở ở máy khác vẫn vậy.
-- Đổi rồi lưu: đang ở một góc nhìn, đổi lọc → mục mang dấu «đã đổi»; «Lưu thay đổi» ghi đè, «Lưu thành góc nhìn mới» tạo
+- Đổi rồi lưu: đang ở một góc nhìn, đổi lọc → mục mang dấu «đã đổi»; «Lưu thay đổi» ghi đè, «Lưu thành mới» tạo
   mục khác; bấm lại mục ấy (hay mục khác) thì bỏ thay đổi chưa lưu (Hỏi-5).
 - Biên: chưa có góc nhìn nào → câu gợi ý trong nhóm; tên trống hay trùng → báo ngay dưới ô; lọc ra rỗng → vẫn sửa riêng
   từng luật lọc (Ngoài-4); rời trang khi đang toàn màn hình → màn kế đầy đủ App Shell (Ngoài-5).
@@ -88,7 +88,7 @@ nhánh chính về một lần, rồi mới viết mã.
 |---|---|---|---|
 | ST-inventory-views-empty | inventory | nhóm «Góc nhìn của tôi» với câu «Chưa có góc nhìn nào. Lọc, sắp xếp hay ẩn cột rồi bấm «Lưu góc nhìn».» | lọc rồi lưu |
 | ST-inventory-view-open | inventory | mục góc nhìn sáng ở cột thứ hai, đầu màn mang tên góc nhìn, lưới đúng cách xem | làm việc trên lưới |
-| ST-inventory-view-changed | inventory | mục đang mở mang dấu «đã đổi»; nút lưu có «Lưu thay đổi» và «Lưu thành góc nhìn mới» | lưu hay bỏ |
+| ST-inventory-view-changed | inventory | mục đang mở mang dấu «đã đổi»; nút lưu có «Lưu thay đổi» và «Lưu thành mới» | lưu hay bỏ |
 | ST-inventory-view-missing | inventory | Bảng hàng trống lọc + câu «Góc nhìn này không còn» | chọn mục khác |
 | ST-inventory-view-save-failed | inventory | hộp giữ tên, câu lỗi, nút «Thử lại» | thử lại hay thôi |
 | ST-inventory-view-refused | inventory | câu «không đủ quyền» + «Tải lại trang để thấy đúng các nút» (9e) | tải lại |
