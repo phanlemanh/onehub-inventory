@@ -185,6 +185,101 @@ describe("agreements table against the ontology (Ngoài-1)", () => {
   });
 });
 
+/** Commit where row 7a reached main: the runner whose cases and pinned lines no later row may loosen. */
+const RUNNER_BASE = "d85d815";
+
+interface RunnerShape {
+  cases: string[];
+  /** break file → its pinned lines, for every break file of every break case. */
+  pins: Map<string, string[]>;
+  /** break file → its break case. */
+  caseOf: Map<string, string>;
+}
+
+/** Reads the case lists and the two break functions of a runner text by running them in bash, not by parsing. */
+export function runnerShape(text: string): RunnerShape {
+  const pick = (re: RegExp, what: string) => {
+    const m = re.exec(text);
+    if (!m) throw new Error(`bộ chạy không có ${what}`);
+    return m[0];
+  };
+  const defs = [
+    pick(/^CA_SQL=\([\s\S]*?^\)$/m, "CA_SQL"),
+    pick(/^CA_LENH=\([\s\S]*?^\)$/m, "CA_LENH"),
+    pick(/^pha_thu_tep\(\) \{[\s\S]*?^\}$/m, "pha_thu_tep"),
+    pick(/^pha_thu_ghim\(\) \{[\s\S]*?^\}$/m, "pha_thu_ghim"),
+  ].join("\n");
+  const out = execFileSync(
+    "bash",
+    [
+      "-c",
+      'eval "$DEFS"; for c in "${CA_SQL[@]}" "${CA_LENH[@]}"; do echo "ca|$c"; done; ' +
+        'for c in "${CA_LENH[@]}"; do p=${c#pha-thu-}; [ "$p" = "$c" ] && continue; ' +
+        'while read -r t; do [ -z "$t" ] && continue; echo "tep|$p|$t"; ' +
+        'while IFS= read -r g; do echo "ghim|$t|$g"; done < <(pha_thu_ghim "$t"); done < <(pha_thu_tep "$p"); done',
+    ],
+    { env: { ...process.env, DEFS: defs }, encoding: "utf8" },
+  );
+  const shape: RunnerShape = { cases: [], pins: new Map(), caseOf: new Map() };
+  for (const line of out.split("\n")) {
+    const [kind, a, b] = line.split("|");
+    if (kind === "ca") shape.cases.push(a!);
+    if (kind === "tep") {
+      shape.caseOf.set(b!, a!);
+      shape.pins.set(b!, []);
+    }
+    if (kind === "ghim") shape.pins.get(a!)!.push(b!);
+  }
+  return shape;
+}
+
+/** What the old runner measured and the new one no longer does, word for word. */
+export function loosened(base: RunnerShape, now: RunnerShape): string[] {
+  const out: string[] = [];
+  for (const c of base.cases) if (!now.cases.includes(c)) out.push(`mất ca: ${c}`);
+  for (const [file, pins] of base.pins) {
+    if (now.caseOf.get(file) !== base.caseOf.get(file)) {
+      out.push(`tệp phá ${file} không còn ở ca pha-thu-${base.caseOf.get(file)}`);
+      continue;
+    }
+    for (const pin of pins)
+      if (!now.pins.get(file)!.includes(pin)) out.push(`tệp phá ${file} mất dòng ghim: ${pin}`);
+  }
+  return out;
+}
+
+describe("isolation runner keeps every case and pinned line of rows 7 and 7a (E5)", () => {
+  const base = runnerShape(
+    execFileSync("git", ["show", `${RUNNER_BASE}:db/scripts/cach-ly.sh`], {
+      cwd: ROOT,
+      encoding: "utf8",
+    }),
+  );
+  const current = readFileSync(join(ROOT, "db/scripts/cach-ly.sh"), "utf8");
+
+  it(`reads the runner at ${RUNNER_BASE}: 29 cases, 18 break files, 21 pinned lines`, () => {
+    expect(base.cases).toHaveLength(29);
+    expect(base.pins.size).toBe(18);
+    expect([...base.pins.values()].flat()).toHaveLength(21);
+  });
+
+  it("the current runner still has every old case, break file and pinned line, word for word", () => {
+    expect(loosened(base, runnerShape(current))).toEqual([]);
+  });
+
+  it("break: one letter changed in the pinned line of dang-xem-thuong is named", () => {
+    const old = '"HỎNG dang-xem-khong-vuot-luat: public.agreements_tat_ca"';
+    expect(current).toContain(old);
+    const edited = current.replace(
+      old,
+      '"HỎNG dang-xem-khong-vuot-luat: public.agreements_tat_cb"',
+    );
+    expect(loosened(base, runnerShape(edited))).toEqual([
+      "tệp phá dang-xem-thuong mất dòng ghim: HỎNG dang-xem-khong-vuot-luat: public.agreements_tat_ca",
+    ]);
+  });
+});
+
 describe("isolation runner names every broken break file (E9b)", () => {
   function runRunner(tests: string): { code: number; out: string } {
     try {
@@ -205,18 +300,18 @@ describe("isolation runner names every broken break file (E9b)", () => {
     return dir;
   }
 
-  it("control: an unchanged copy passes with 29 cases", () => {
+  it("control: an unchanged copy passes with 31 cases", () => {
     const dir = copyTests();
     try {
       const r = runRunner(dir);
       expect(r.code, r.out).toBe(0);
-      expect(r.out).toContain("cach-ly: 29 ca đạt, vai quy_hang_app");
+      expect(r.out).toContain("cach-ly: 31 ca đạt, vai quy_hang_app");
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
   });
 
-  it("a deleted, a harmless and an unparsable break file are each named", () => {
+  it("a deleted, two harmless and an unparsable break file are each named", () => {
     const dir = copyTests();
     try {
       unlinkSync(join(dir, "pha-thu/cap-trigger-public.sql"));
@@ -225,16 +320,73 @@ describe("isolation runner names every broken break file (E9b)", () => {
         join(dir, "pha-thu/ham-trigger-dac-quyen.sql"),
         "create functio public.hong(;\n",
       );
+      writeFileSync(join(dir, "pha-thu/dang-xem-chi-xoa.sql"), "select 1;\n");
       const r = runRunner(dir);
       expect(r.code).not.toBe(0);
-      expect(r.out).not.toContain("cach-ly: 29 ca đạt");
+      expect(r.out).not.toContain("cach-ly: 31 ca đạt");
       expect(r.out.split("\n").filter((l) => l.startsWith("HỎNG pha-thu-"))).toEqual([
         "HỎNG pha-thu-quyen-nguy-hiem: cap-trigger-public: không dựng được bản phá",
         "HỎNG pha-thu-dang-xem-vuot: dang-xem-vat-chat: bộ kiểm vẫn xanh trên bản phá",
         "HỎNG pha-thu-ham-dac-quyen: ham-trigger-dac-quyen: không dựng được bản phá",
+        "HỎNG pha-thu-dang-xem-chi-ghi: dang-xem-chi-xoa: bộ kiểm vẫn xanh trên bản phá",
       ]);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
+  });
+});
+
+// Row 7b (_acceptance/cach-ly-dang-xem-chi-ghi/evals.yaml E3): the hole case 20 closes is real, not a false alarm.
+// Same copy built from the break file dang-xem-chi-xoa, two companies with one agreement each; the API role with
+// company A set by the door's own statement deletes through the view.
+describe("break: a delete-only plain view lets company A delete company B's agreements (E3)", () => {
+  const A = "00000000-0000-4000-8000-00000000000a";
+  const B = "00000000-0000-4000-8000-00000000000b";
+  /** The door's statement, read from db/tests/cach-ly.sql (`prepare dat_san`), which a unit test pins to the door. */
+  const DAT_SAN = /^prepare dat_san\(text, text\) as (.*);$/m.exec(
+    readFileSync(join(ROOT, "db/tests/cach-ly.sql"), "utf8"),
+  )![1]!;
+
+  async function deleteAsA(db: ScratchDb): Promise<string | null> {
+    await db.owner.query("begin");
+    try {
+      await db.owner.query("set local role quy_hang_app");
+      await db.owner.query(DAT_SAN, ["[Tên]", A]);
+      await db.owner.query("delete from public.agreements_xoa where true");
+      await db.owner.query("commit");
+      return null;
+    } catch (err) {
+      await db.owner.query("rollback");
+      return (err as Error).message;
+    }
+  }
+  const countOfB = async (db: ScratchDb) =>
+    (
+      await db.owner.query<{ n: number }>(
+        "select count(*)::int as n from agreements where company_id = $1",
+        [B],
+      )
+    ).rows[0]!.n;
+
+  it("plain view: B goes from 1 to 0; security_invoker view: permission denied and B keeps 1", async () => {
+    const db = await open("xem_chi_xoa");
+    await db.owner.query(readFileSync(join(ROOT, "db/tests/pha-thu/dang-xem-chi-xoa.sql"), "utf8"));
+    await db.owner.query(
+      `insert into companies (id, name) values ('${A}', '[Sàn A]'), ('${B}', '[Sàn B]');
+       insert into agreements (company_id, kind, direction, counterparty, data_classes, valid_from, approved_by)
+       values ('${A}', 'catalog_source', 'inbound', 'nguồn mẫu', '{catalog}', now(), '[Tên]'),
+              ('${B}', 'listing_channel', 'outbound', 'kênh mẫu', '{shareable_listing}', now(), '[Tên]')`,
+    );
+    expect(await countOfB(db)).toBe(1);
+    expect(await deleteAsA(db)).toBeNull();
+    expect(await countOfB(db), "dạng xem thường xoá được thoả thuận của sàn B").toBe(0);
+
+    await db.owner.query(
+      `insert into agreements (company_id, kind, direction, counterparty, data_classes, valid_from, approved_by)
+       values ('${B}', 'listing_channel', 'outbound', 'kênh mẫu', '{shareable_listing}', now(), '[Tên]')`,
+    );
+    await db.owner.query("alter view public.agreements_xoa set (security_invoker = true)");
+    expect(await deleteAsA(db)).toBe("permission denied for table agreements");
+    expect(await countOfB(db)).toBe(1);
   });
 });
