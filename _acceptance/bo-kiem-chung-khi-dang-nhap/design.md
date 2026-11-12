@@ -89,6 +89,22 @@ Bài đăng nhập riêng của màn Thành viên (`tests/e2e-db/members.spec.ts
 - Khâu chuẩn bị chung đổi (thêm sàn thử, người thử) nên mọi bài cũ của hàng 8, 9, 1m, 1o trong `tests/e2e-db/` chạy lại
   trọn ở lệnh `kiem_chung_db_tron`, số bài so với nhánh chính.
 
+## Từ Quỹ hàng
+
+Đã tra `onehub-quy-hang` ở commit `1729b11f` (chỉ đọc): quyết định, tệp CI, bài kiểm có cơ sở dữ liệu, kịch bản chụp màn
+trong hồ sơ.
+
+| Quỹ hàng giải thế nào | Tệp | Hàng 1r giữ gì, bỏ gì, vì sao |
+|---|---|---|
+| Không có bộ kiểm trình duyệt chung chạy trong kho. Màn được mở bằng kịch bản chụp riêng của từng hồ sơ, chạy tay ở lượt chấm. | `_acceptance/bang-hang-dang-the/thu/chup.mjs`, `_acceptance/tab-toi/thu/chup-ba-loi.mjs` (không có tệp cấu hình Playwright nào trong kho) | Không có gì để giữ cho phần «bộ kiểm chung sinh từ sổ màn»: phần ấy là của kho này (hàng 1f). |
+| Phiên đăng nhập người mẫu: gọi API gửi mã, đọc mã ở nhật ký máy dev (`[ma-dang-nhap] <email> <mã>`), đổi lấy cookie phiên, giữ cookie ở `.acceptance-runs/` và dùng lại khi còn sống vì mỗi email chỉ xin được 5 mã trong 15 phút. | `_acceptance/bang-hang-dang-the/thu/phien.mjs`, `packages/api/src/auth/sender.ts` (dòng 8) | Giữ ý: đăng nhập MỘT lần mỗi lượt rồi dùng lại phiên (hàng này lưu trạng thái trình duyệt ở tệp của lượt), và tệp phiên nằm ngoài cây kho. Bỏ: đọc mã từ nhật ký máy dev — kho này đã có hộp thư thử của bài hàng 8, 9, nên đi qua màn đăng nhập thật thay vì gọi API rồi cài cookie; như vậy đường đăng nhập cũng được đo. |
+| CI có Postgres cho bài cách ly và bài cơ sở dữ liệu (việc `isolation`: dịch vụ `postgres:16`, `db:migrate`, `db:test`), không có bài trình duyệt nào trên CI. | `.github/workflows/ci.yml` (việc `isolation`), `package.json` (`db:test`) | Khớp Hỏi-1: lượt có phiên chạy ở máy dãy và lượt chấm. Việc `isolation` của Quỹ hàng là mẫu cho hàng 1s «CI có Postgres» (chủ kho sửa tệp CI), không làm trong hàng này. |
+| Phiên đăng nhập 30 ngày đo bằng bài cơ sở dữ liệu, không qua trình duyệt: dựng auth và API trên một gốc, đăng nhập bằng mã bắt được ở bộ gửi giả. | `packages/api/test-db/session.test.ts`, `packages/api/test-db/helpers.ts` | Không lấy: hàng này đo màn trong trình duyệt khi đã đăng nhập, không đo luật của phiên. |
+| Chờ trong kịch bản chụp bằng hằng thời gian cố định (`setTimeout(r, 500)` sau khi đặt cookie, rải ở các kịch bản `thu/`); không có hàm chờ dùng chung. | `_acceptance/bang-hang-dang-the/thu/chup.mjs` (dòng 23), các tệp `_acceptance/*/thu/*.mjs` | Bỏ: chờ theo hằng số chính là lớp lỗi làm hàng 1o trượt trên máy chậm. Hàng này chờ đến khi ngăn hay băng hiện hẳn và hết chuyển động (`settle.ts`), mỗi hàm có cặp ca hai chiều. Quỹ hàng không có phần này. |
+
+Việc đọc không lộ ra điều nào trái với phạm vi đã duyệt. Sổ bối cảnh của kho (`docs/tri-thuc/wiki/chu-de/`, PR #34) đọc lại
+sau khi gộp nhánh chính, trước T2.
+
 ## Lựa chọn và căn cứ
 
 | Lựa chọn | Nguồn căn cứ |
