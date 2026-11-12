@@ -5,7 +5,7 @@ slug: cach-ly-dang-xem-chi-ghi
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: _acceptance/cach-ly-dang-xem-chi-ghi/design.md
@@ -91,3 +91,8 @@ Không gian quét tay (dòng `descope` «bỏ coverage-scan» trong sổ). Trụ
 - Việc kèm cần chạm `tests/db/moi-nguoi.db.test.ts` và thêm một dòng `_acceptance/config.yaml` — xin giám sát ở yêu cầu
   C-5. Giám sát từ chối thì AC-6, AC-7 ra khỏi hợp đồng này (thành việc riêng) và Cổng Phạm vi ký lại; chưa có trả lời
   thì không dựng việc 7 của kế hoạch.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-13:
+  - Ngoài-1: Bộ kiểm cách ly vẫn xanh với dạng xem chạy theo quyền người đọc mà gắn luật viết lại câu, dù qua luật ấy một sàn xoá được dữ liệu sàn khác (chạm SP-1, chưa có dạng xem nào như vậy).
+  - Ngoài-2: Mô tả phép đo E5 ghi 18 dòng ghim của bộ chạy cũ, số thật là 21; phép kiểm đo đủ 21.
+  - Ngoài-3: Đối chứng dương của ca 20 chỉ chứng dạng xem đúng không bị nêu, chưa chứng bộ kiểm nhận đủ cả ba quyền thêm, sửa, xoá.
+  - Ngoài-4: Đường cấp quyền ghi qua vai cha chưa có bản phá thử riêng; nó được phủ nhờ hàm đọc quyền tính quyền thừa kế.
