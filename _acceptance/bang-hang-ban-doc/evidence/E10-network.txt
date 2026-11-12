@@ -1,0 +1,1 @@
+playwright script, 4 viewports, http://127.0.0.1:3677/inventory: status 200 each; responses>=400 or requestfailed: none; console not captured
