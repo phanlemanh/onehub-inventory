@@ -50,3 +50,13 @@ Không chọn:
 - Các hàng `18a` (khoá người, bàn giao), `18b` (sửa liên hệ, gỡ tạo nhầm, xoá dữ liệu cá nhân) và `19a` (trang chỉ đọc «Vai nào làm được gì», nhật ký quản trị) phải xong trước khi chuyển dữ liệu thật của sàn.
 - Nghị định 356/2025 Điều 5 cho thời hạn hoàn tất: sửa 10 ngày, xoá 20 ngày. Sửa và xoá theo yêu cầu vì vậy không thể để quá muộn.
 - Needs confirmation: yêu cầu về mã hoá, phân quyền và nhật ký đối với dữ liệu trên đám mây chưa được kiểm chứng trên văn bản luật. Một bản tin nói phải mã hoá khi lưu, điều này có thể đụng việc lưu số điện thoại dạng rõ ở quyết định 0014. Cần rà soát pháp lý trước khi có dữ liệu thật.
+
+## Amendment 2026-11-12 — row 9a
+
+- Bảng quyền đã dựng: `ontology/actions.yaml`, mỗi dòng một thao tác, mỗi vai một ô phạm vi; bộ sinh của kho mang bảng
+  sang `src/generated/ontology.ts` và từ chối dòng sai khuôn.
+- Cơ sở dữ liệu giữ bản chép các ô sống ở `app.permissions` (migration 006), bài kiểm so từng dòng với bảng sinh. Luật
+  vai ở cơ sở dữ liệu là luật thu hẹp (restrictive) đặt cạnh luật theo sàn, nên chỉ bớt quyền.
+- Đọc thoả thuận kết nối chưa có luật vai ở cơ sở dữ liệu: ô `readAgreements` hôm nay cho cả bốn vai, bài kiểm từng ô đỏ
+  khi bảng đổi mà luật chưa theo.
+- Hồ sơ: `_acceptance/bang-quyen-theo-vai/`.
