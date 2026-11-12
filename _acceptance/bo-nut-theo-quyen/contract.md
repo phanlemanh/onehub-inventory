@@ -5,7 +5,7 @@ slug: bo-nut-theo-quyen
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api]
-screens: [members]
+screens: []
 status: approved
 approved_by: Manh Phan
 approved_at: 2026-11-12T13:32:50Z
@@ -78,11 +78,11 @@ vì không gian đã khép bởi bảng quyền và bốn chỗ đặt.
 
 ## Vai × Màn
 
-Hàng này chạm một màn sản phẩm. Từ AC-9 bảng này sinh từ bảng quyền; dưới đây là trạng thái đích của màn Thành viên.
-
-| Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
-|---|---|---|---|---|
-| members | không — không có ô `listMembers`; mục không có trên thanh bên | không — như Đầu chủ | không — như Đầu chủ | được — xem (`listMembers`), nút Mời (`inviteMember`), nút Đổi vai (`changeMemberRoles`), toàn sàn |
+Hợp đồng không khai màn sản phẩm (sửa sau Cổng Phạm vi, giám sát duyệt ở V-1211-8): hàng này dựng khuôn bộ nút và đổi hành vi
+nút, câu từ chối trên màn Thành viên; chứng minh họ màn Thành viên là của hàng 9c. Trạng thái đích của màn Thành viên, nay
+viết thành câu thay cho bảng: Đầu chủ, Đầu khách và Trưởng nhóm bị chặn — không có ô `listMembers`, mục không có trên thanh
+bên; Quản trị sàn được — xem (`listMembers`), nút Mời (`inviteMember`), nút Đổi vai (`changeMemberRoles`), toàn sàn. Từ AC-9
+bảng này sinh từ bảng quyền.
 
 ## Đường đo
 
