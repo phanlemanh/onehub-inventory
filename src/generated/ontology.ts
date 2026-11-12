@@ -24,10 +24,63 @@ export interface Agreement {
   specialTerms: boolean;
 }
 
+/** A tower (toà) of the shared catalog, under a complex when one is known, otherwise directly under its project; no companyId. Keyed like onehub-invest buildings. */
+export interface Building {
+  buildingKey: string;
+  /** id of Subdivision */
+  subdivisionKey: string;
+  /** id of Complex */
+  complexKey?: string;
+  buildingName: string;
+  upi: string;
+}
+
+export type CatalogAliasKind = "ma_goc" | "ten";
+
+/** An original code or a name of a tower, stack or unit in the shared catalog, kept as an alias so the catalog key never depends on how a source wrote it. Our own; shared catalog, no companyId. */
+export interface CatalogAlias {
+  id: number;
+  objectKey: string;
+  kind: CatalogAliasKind;
+  value: string;
+  source: string;
+  /** ISO datetime */
+  firstSeen: string;
+  /** ISO datetime */
+  retiredAt?: string;
+}
+
 /** A brokerage using the product; the tenant that owns one isolated area of data. */
 export interface Company {
   id: string;
   name: string;
+}
+
+export type CompanyCatalogAliasKind = "ma" | "ten";
+
+/** A code or name one company uses for a tower or a unit of the shared catalog. Belongs to that company only; the shared catalog never changes. */
+export interface CompanyCatalogAlias {
+  id: number;
+  /** id of Company */
+  companyId: string;
+  /** id of Building */
+  buildingKey?: string;
+  /** id of Unit */
+  unitKey?: string;
+  kind: CompanyCatalogAliasKind;
+  value: string;
+  /** ISO datetime */
+  createdAt: string;
+  /** ISO datetime */
+  retiredAt?: string;
+}
+
+/** A subdivision of a project (phân khu), child of exactly one Subdivision; shared catalog, no companyId. Stored in catalog_nodes with node_type complex. */
+export interface Complex {
+  slug: string;
+  name: string;
+  /** id of Subdivision */
+  subdivisionSlug: string;
 }
 
 /** One person a company works with; owner, buyer, tenant and landlord are types of contact, not separate records. */
@@ -100,19 +153,40 @@ export interface Member {
   invitedAt?: string;
 }
 
+/** A stack (trục) of one tower; a local extension, as in onehub-invest; shared catalog, no companyId. */
+export interface Stack {
+  stackKey: string;
+  /** id of Building */
+  buildingKey: string;
+  stackCode: string;
+}
+
+/** A project (dự án), the root of the shared catalog; shared by every company, so it has no companyId. Stored in catalog_nodes with node_type project, as onehub-invest stores projects in asset_nodes. */
+export interface Subdivision {
+  slug: string;
+  name: string;
+}
+
 export type UnitPropertyType = "Residential" | "Land";
 
 export type UnitPropertySubType = "Condominium" | "Townhouse" | "Single Family Residence" | "Unimproved Land";
 
 /** A physical apartment, house or plot in the shared catalog; shared by every company, so it has no company_id. */
 export interface Unit {
+  unitKey: string;
   upi: string;
+  /** id of Subdivision */
   subdivisionKey: string;
+  /** id of Complex */
+  complexKey?: string;
+  /** id of Building */
   buildingKey: string;
   buildingName: string;
-  unitNumber: string;
+  /** id of Stack */
+  stackKey?: string;
   stack?: string;
-  floor?: number;
+  unitNumber: string;
+  floor?: string;
   livingArea?: number;
   bedroomsTotal?: number;
   directionFaces?: string;
