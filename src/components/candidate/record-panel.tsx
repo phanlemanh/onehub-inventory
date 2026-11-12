@@ -221,7 +221,8 @@ function useWorkAreaBounds(open: boolean) {
       const area = document.querySelector<HTMLElement>(WORK_AREA)?.getBoundingClientRect();
       const barRect = bar && bar.offsetParent !== null ? bar.getBoundingClientRect() : null;
       setBounds({
-        top: Math.max(0, barRect ? barRect.bottom : (area?.top ?? 0)),
+        // No top bar (full screen): the panel runs the whole height, from the top of the window.
+        top: Math.max(0, barRect ? barRect.bottom : 0),
         right: area ? Math.max(0, window.innerWidth - area.right) : 0,
         bottom: area ? Math.max(0, window.innerHeight - area.bottom) : 0,
       });

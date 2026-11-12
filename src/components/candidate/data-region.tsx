@@ -425,16 +425,9 @@ export function DataRegion({
           ) : null}
           {/* The record panel floats over the right of the rows, below the toolbar: the toolbar, the column headers'
               left part and the App Shell's top bar stay in view, and the rows on its left stay usable. */}
+          {/* The panel comes before the rows in the page order (it floats, so the eye does not see it): Tab from the
+              record goes straight into the grid, never out of the region (AC-6 of row 3). */}
           <div data-slot="data-region-stage" className="relative min-w-0">
-            {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
-            <div
-              ref={boxRef}
-              data-slot="data-region-body"
-              data-density={density}
-              className="w-0 min-w-full"
-            >
-              {body}
-            </div>
             {record && showsRows ? (
               record.address ? (
                 <PanelFor
@@ -453,6 +446,15 @@ export function DataRegion({
                 />
               )
             ) : null}
+            {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
+            <div
+              ref={boxRef}
+              data-slot="data-region-body"
+              data-density={density}
+              className="w-0 min-w-full"
+            >
+              {body}
+            </div>
           </div>
         </FramePanel>
       </Frame>

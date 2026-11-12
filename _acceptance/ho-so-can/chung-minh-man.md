@@ -24,15 +24,15 @@ hàng; bảy trạng thái vùng vẫn do bộ bài sinh từ sổ màn đo trê
 | màn | app-shell-11 | evidence/reui/app-shell-11.png | |
 | màn | sheet-9 | evidence/reui/sheet-9.png | x |
 | màn | solution-crm-9 | evidence/reui/solution-crm-9.png | |
-| RecordPanel | app-shell-11 | evidence/reui/app-shell-11.png | |
-| RecordPanel | sheet-9 | evidence/reui/sheet-9.png | x |
-| RecordPanel | solution-crm-3 | evidence/reui/solution-crm-3.png | |
-| ListingRecordBody | solution-crm-4 | evidence/reui/solution-crm-4.png | x |
-| ListingRecordBody | sheet-9 | evidence/reui/sheet-9.png | |
-| ListingRecordBody | sheet-22 | evidence/reui/sheet-22.png | |
-| ListingCard | product-grid-4 | evidence/reui/product-grid-4.png | x |
-| ListingCard | product-detail-5 | evidence/reui/product-detail-5.png | |
-| ListingCard | solution-crm-4 | evidence/reui/solution-crm-4.png | |
+| sheet-9 | app-shell-11 | evidence/reui/app-shell-11.png | |
+| sheet-9 | sheet-9 | evidence/reui/sheet-9.png | x |
+| sheet-9 | solution-crm-3 | evidence/reui/solution-crm-3.png | |
+| solution-crm-4 | solution-crm-4 | evidence/reui/solution-crm-4.png | x |
+| solution-crm-4 | sheet-9 | evidence/reui/sheet-9.png | |
+| solution-crm-4 | sheet-22 | evidence/reui/sheet-22.png | |
+| product-grid-4 | product-grid-4 | evidence/reui/product-grid-4.png | x |
+| product-grid-4 | product-detail-5 | evidence/reui/product-detail-5.png | |
+| product-grid-4 | solution-crm-4 | evidence/reui/solution-crm-4.png | |
 
 ### Ma trận trạng thái
 
@@ -54,9 +54,9 @@ hàng; bảy trạng thái vùng vẫn do bộ bài sinh từ sổ màn đo trê
 
 | Khối | Bậc | Đã tra | Ứng viên gần nhất | Vì sao không dùng | Cách |
 | --- | --- | --- | --- | --- | --- |
-| RecordPanel | reui | ngăn chi tiết cạnh bảng (app-shell-*, sheet-*, solution-crm-*) | app-shell-11 | cột đẩy bảng làm co bảng; chủ kho chốt ngăn nổi làm cách chung, cột thành nút ghim ở hàng sau | ghép từ thành phần |
-| ListingRecordBody | reui | ruột hồ sơ một bản ghi (solution-crm-*, sheet-*) | sheet-9 | sửa từng dòng tại chỗ; hồ sơ hàng này chỉ đọc | ghép từ thành phần |
-| ListingCard | reui | thẻ sản phẩm có giá và thông số (product-grid-*, product-detail-*, product-card-*) | product-detail-5 | trang sản phẩm cả màn với ảnh lớn và nút mua; thẻ căn cần gọn | ghép từ thành phần |
+| sheet-9 | reui | ngăn chi tiết cạnh bảng (app-shell-*, sheet-*, solution-crm-*) | app-shell-11 | cột đẩy bảng làm co bảng; chủ kho chốt ngăn nổi làm cách chung, cột thành nút ghim ở hàng sau | ghép từ thành phần |
+| solution-crm-4 | reui | ruột hồ sơ một bản ghi (solution-crm-*, sheet-*) | sheet-9 | sửa từng dòng tại chỗ; hồ sơ hàng này chỉ đọc | ghép từ thành phần |
+| product-grid-4 | reui | thẻ sản phẩm có giá và thông số (product-grid-*, product-detail-*, product-card-*) | product-detail-5 | trang sản phẩm cả màn với ảnh lớn và nút mua; thẻ căn cần gọn | ghép từ thành phần |
 | Frame | trong-kho | | | | |
 | Button | trong-kho | | | | |
 | Badge | trong-kho | | | | |
