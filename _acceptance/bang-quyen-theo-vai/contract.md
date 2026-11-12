@@ -5,8 +5,10 @@ slug: bang-quyen-theo-vai
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config]
-status: draft
+status: approved
 design_doc: _acceptance/bang-quyen-theo-vai/design.md
+approved_by: Manh Phan
+approved_at: 2026-11-12
 ---
 
 # Acceptance Contract: bang-quyen-theo-vai
