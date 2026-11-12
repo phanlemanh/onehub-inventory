@@ -44,6 +44,7 @@ export function sentToSignIn(page: Page, route: string): boolean {
 
 const THROTTLE = Number(process.env["E2E_CPU_THROTTLE"] ?? "0");
 const MIN_SLOWDOWN = 2.5;
+const MEASURE_TRIES = 3;
 
 /** Time a fixed piece of work inside the page, in ms. */
 async function busyMs(page: Page): Promise<number> {
@@ -64,13 +65,20 @@ export async function throttle(page: Page, wanted = 0): Promise<void> {
   if (!(rate > 1) || slowed.has(page)) return;
   slowed.add(page);
   await page.goto("about:blank");
-  const before = Math.min(await busyMs(page), await busyMs(page));
   const cdp = await page.context().newCDPSession(page);
-  await cdp.send("Emulation.setCPUThrottlingRate", { rate });
-  const after = Math.min(await busyMs(page), await busyMs(page));
-  if (after / before < MIN_SLOWDOWN) {
-    throw new Error(`ham cpu khong co tac dung — ${before.toFixed(1)}ms → ${after.toFixed(1)}ms`);
+  const fastest = async () => Math.min(await busyMs(page), await busyMs(page), await busyMs(page));
+  // A busy machine (other runs of a gate round) inflates one baseline sample; measure the pair again, up to three
+  // times, before calling the slowing ineffective. A slowing that does nothing stays near 1× on every try.
+  let before = 0;
+  let after = 0;
+  for (let attempt = 0; attempt < MEASURE_TRIES; attempt += 1) {
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
+    before = await fastest();
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate });
+    after = await fastest();
+    if (after / before >= MIN_SLOWDOWN) return;
   }
+  throw new Error(`ham cpu khong co tac dung — ${before.toFixed(1)}ms → ${after.toFixed(1)}ms`);
 }
 
 /** Wait until the streamed page is swapped in and React has hydrated it, so a click does something. */
