@@ -581,7 +581,8 @@
       "hang": "T2",
       "dung_tren": [
         "2",
-        "2a"
+        "2a",
+        "9e"
       ],
       "slug": "sua-tren-o",
       "nhom": "bang-hang",
@@ -826,6 +827,35 @@
       ]
     },
     {
+      "ma": "9e",
+      "cau_giao": "Người dùng ở vai nào cũng thấy bộ nút thêm, sửa, gỡ đặt cùng một chỗ trên mọi màn — thêm một căn, gỡ một căn, thêm một liên hệ, gỡ một liên hệ — và chỉ thấy nút mình được dùng theo bảng quyền",
+      "vai": "nen",
+      "tieu_chi": 8,
+      "vi_sao": "Chủ kho 2026-11-12 ở phiên giám sát: «Kiểm tra và phân tích tôi thấy đó là phân quyền CRUD ở mọi màn. Trong quá trình chạy thử của onehub-quy-hang tôi mới nhận ra điều này dẫn đến cấu trúc ux/ui của bộ nút không được suy nghĩ từ đầu.» và «build bộ nút theo quyền, ví dụ như thêm một căn vào, xoá một căn đi,...tương tự thêm một liên hệ, xoá một liên hệ,...». Quỹ hàng có bốn cách gắn quyền cho nút, nút hiện rồi máy chủ từ chối, cùng một việc đặt khác chỗ theo màn và theo khổ. Ở kho này bảng quyền của hàng 9a đã có hàm cho màn hỏi quyền nhưng chưa màn nào gọi; hàng 4 là hàng đầu tiên có nút ghi trên Bảng hàng nên hàng này đi trước",
+      "hang": "T3",
+      "dung_tren": [
+        "9a",
+        "2a",
+        "3"
+      ],
+      "slug": "bo-nut-theo-quyen",
+      "bat_khi": "Sổ thiết kế có luật chỗ đặt cho nút thêm ở đầu màn, nút của vùng, thao tác trên dòng và thao tác trong hồ sơ, ở máy tính lẫn điện thoại; mọi nút thao tác khai tên thao tác trong bảng quyền và đi qua một thành phần chung, nút không khai thì bộ kiểm của kho đỏ; vai không có quyền không thấy nút, người chỉ được làm trên bản ghi của mình thấy dòng của người khác theo đúng một cách đã chốt, bị máy chủ từ chối thì có câu «không đủ quyền» riêng; thanh bên và màn Thành viên đọc bảng quyền thay cho vai viết cứng; bảng quyền có dòng nháp cho thêm và gỡ căn, thêm và gỡ liên hệ theo nghĩa nghiệp vụ của quyết định 0016; bảng vai × màn xuống tới cấp nút và sinh từ bảng quyền; thẻ Phạm vi bày ứng viên ReUI kèm ảnh theo quyết định 0023 trên một bản bấm được",
+      "nhom": "nen",
+      "vung": [
+        "design/behaviors.md",
+        "design/states.md",
+        "design/so-khoi.yaml",
+        "design/patterns/**",
+        "src/components/candidate/**",
+        "src/components/templates/**",
+        "src/app/(app)/nav.ts",
+        "src/app/(app)/members/**",
+        "src/modules/identity/ui/**",
+        "tools/coverage_matrix/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "9b",
       "cau_giao": "Mỗi màn được kiểm bằng từng vai ở bốn khổ màn hình, vai không được vào thấy đúng Không đủ quyền và không lộ dữ liệu",
       "vai": "nen",
@@ -858,7 +888,8 @@
         "9",
         "2",
         "1n",
-        "1o"
+        "1o",
+        "9e"
       ],
       "slug": "thanh-vien-chon-tu-reui",
       "bat_khi": "Thẻ Phạm vi nêu họ của màn và bày ứng viên: khuôn Lưới của kho, solution-users-8, hộp mời dialog-2; mọi bài kiểm quyền và mời của hàng 9 vẫn xanh, không đổi lời",
@@ -891,7 +922,8 @@
         "1s",
         "7b",
         "7c",
-        "7d"
+        "7d",
+        "9e"
       ],
       "slug": "bang-hang-du-lieu-that",
       "nhom": "bang-hang",
@@ -1089,7 +1121,8 @@
       "dung_tren": [
         "9a",
         "13",
-        "18"
+        "18",
+        "9e"
       ],
       "slug": "khoa-nguoi-ban-giao",
       "phu": [
@@ -1114,7 +1147,8 @@
       "dung_tren": [
         "9a",
         "13",
-        "18"
+        "18",
+        "9e"
       ],
       "slug": "sua-go-xoa-du-lieu",
       "phu": [
