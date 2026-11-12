@@ -37,3 +37,33 @@ wall: 767s
 - **claude-opus-5-5**: 3 agent · 35 calls · out 17,135 · in 76 · cache_read 1,272,018 · cache_create 165,560
 - **claude-sonnet-5-5**: 7 agent · 17 calls · out 18,812 · in 34 · cache_read 185,234 · cache_create 158,699
 - **claude-haiku-5-5**: 8 agent · 16 calls · out 14,568 · in 32 · cache_read 109,910 · cache_create 119,669
+### S4 round 2 — wf_96028427-05b (11 agent, 21,251 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| synthesize:report | claude-sonnet-5-5 | 2 | 5,404 | 4 | 26,288 | 33 |
+| review:invariants | claude-opus-5-5 | 10 | 4,702 | 22 | 366,321 | 55 |
+| machine:make e2e | claude-haiku-5-5 | 2 | 2,646 | 4 | 3,300 | 351 |
+| review:bugs | claude-opus-5-5 | 8 | 2,436 | 16 | 121,020 | 32 |
+| judge:E14:operational-feasibility | claude-sonnet-5-5 | 2 | 1,171 | 4 | 15,254 | 10 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 1,023 | 4 | 15,222 | 8 |
+| judge:E14:spec-alignment | claude-sonnet-5-5 | 2 | 1,018 | 4 | 15,252 | 9 |
+| judge:E14:domain-correctness | claude-sonnet-5-5 | 2 | 883 | 4 | 11,636 | 7 |
+| capture:provenance | claude-sonnet-5-5 | 3 | 665 | 6 | 24,995 | 11 |
+| machine:make check | claude-haiku-5-5 | 2 | 661 | 4 | 15,218 | 36 |
+| review:measurement | claude-opus-5-5 | 3 | 642 | 6 | 30,336 | 8 |
+
+
+wall: 439s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| review | 3 | 7,780 | 517,677 | 55 | 09:39:25 | 09:40:19 |
+| machine | 3 | 4,330 | 33,740 | 395 | 09:39:25 | 09:45:59 |
+| judge | 3 | 3,072 | 42,142 | 12 | 09:39:25 | 09:39:36 |
+| capture | 1 | 665 | 24,995 | 11 | 09:45:59 | 09:46:10 |
+| synthesize | 1 | 5,404 | 26,288 | 34 | 09:46:10 | 09:46:43 |
+
+- **claude-sonnet-5-5**: 5 agent · 11 calls · out 9,141 · in 22 · cache_read 93,425 · cache_create 107,367
+- **claude-opus-5-5**: 3 agent · 21 calls · out 7,780 · in 44 · cache_read 517,677 · cache_create 92,021
+- **claude-haiku-5-5**: 3 agent · 6 calls · out 4,330 · in 12 · cache_read 33,740 · cache_create 51,538
