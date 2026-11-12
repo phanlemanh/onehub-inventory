@@ -5,7 +5,7 @@ slug: danh-muc-can-nhu-onehub-invest
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: docs/superpowers/specs/2026-11-12-danh-muc-can-nhu-onehub-invest-design.md
@@ -101,6 +101,15 @@ trường riêng, từ điển giá trị của sàn (đề xuất hàng 7e). Ne
 
 ## Notes
 
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-12:
+  - Ngoài-1: Một căn có thể lưu thiếu phân khu dù toà của nó thuộc phân khu (cơ sở dữ liệu chưa chặn); chưa xảy ra vì chưa có đường ghi danh mục.
+  - Ngoài-2: Một mã gốc có thể trỏ tới toà, trục hay căn không có thật; danh mục chỉ do hệ thống nạp.
+  - Ngoài-3: Gõ mã có dấu cách ở đầu thì mã gốc báo không tìm thấy (mã riêng của sàn vẫn tra được).
+  - Ngoài-4: Khoá ngoại ghép không chặn căn thiếu phân khu trong toà có phân khu (cùng gốc với mục 1).
+  - Ngoài-5: Bài kiểm tra mã gốc chỉ xác nhận ra một căn, chưa xác nhận đúng căn S1.05-1206.
+  - Ngoài-6: Bài kiểm ghim tên ràng buộc bằng «chứa», nên catalog_nodes_parent cũng khớp catalog_nodes_parent_is_project.
+  - Ngoài-7: Bước xác nhận ảnh chụp danh mục cũ đúng nguồn lặng lẽ bỏ qua khi máy kiểm không có lịch sử git.
+  - Ngoài-8: Ca đỏ của phép đo 60 lần chào ghim tên toà cài vào, chưa ghim upi của căn bị đổi.
 - Chạm SP-1, giữ đúng ngoại lệ đã có, không nới thêm: AGENTS.md «The shared catalog is the only exception»; danh sách danh
   mục chung đã khai của hàng 9a (`db/tests/cach-ly.sql`, ca 17). Mọi thứ riêng của một sàn nằm ở bảng có `company_id`, không
   bao giờ ở danh mục chung.
