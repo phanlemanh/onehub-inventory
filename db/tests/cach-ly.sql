@@ -25,6 +25,15 @@ create function pg_temp.dung_hai_san() returns void language sql as $f$
      '00000000-0000-4000-8000-00000000000a', '{shareable_listing}', now(), '[Tên]');
 $f$;
 
+-- A's company admin (row 9a): since the permission table, only a person whose roles allow manageAgreements writes
+-- agreements. Write cases run as this person, so what refuses a write to B is the company rule, not the role rule.
+create function pg_temp.them_quan_tri_a() returns void language sql as $f$
+  insert into identity.users (id, email, name)
+    values ('00000000-0000-4000-8000-0000000000a1', 'quan-tri-a@example.test', '[Tên]');
+  insert into company_members (company_id, user_id, name, roles)
+    values ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a1', '[Tên]', '{CompanyAdmin}');
+$f$;
+
 -- Under the API role, neither table shows any row.
 create function pg_temp.khong_thay_gi(ca text) returns void language plpgsql as $f$
 declare n bigint;
@@ -60,11 +69,27 @@ insert into luat_cho_phep values
   ('agreements', 'agreements_read',
    '((company_id = app.current_company_id()) OR (counterparty_company_id = app.current_company_id()))');
 
-create function pg_temp.dung_dang(bang name, luat name, lenh text, bieu_thuc text, cot text) returns boolean
+-- Restrictive policies (row 9a, permission table): Postgres ANDs them with the company policies above, so they can only
+-- take rows away, never add any. Still a written list: each one asks the permission table (app.allowed) and nothing
+-- else, and the company policy of the same command must still be there (case 13 checks that).
+create temp table luat_thu_hep (bang name not null, luat name not null, bieu_thuc text not null);
+insert into luat_thu_hep values
+  -- 006_bang_quyen_theo_vai.sql: one's own row, or every row of the company when listMembers allows it.
+  ('company_members', 'company_members_by_permission',
+   '(((user_id)::text = current_setting(''app.user_id''::text, true)) OR (app.allowed(''listMembers''::text) = ''company''::text))'),
+  -- 006_bang_quyen_theo_vai.sql: only manageAgreements adds or changes an agreement.
+  ('agreements', 'agreements_insert_by_permission', '(app.allowed(''manageAgreements''::text) = ''company''::text)'),
+  ('agreements', 'agreements_update_by_permission', '(app.allowed(''manageAgreements''::text) = ''company''::text)');
+
+create function pg_temp.dung_dang(bang name, luat name, lenh text, bieu_thuc text, cot text,
+                                  kieu text default 'PERMISSIVE') returns boolean
 language sql stable as $f$
-  select bieu_thuc = format('(%s = app.current_company_id())', cot)
-      or (lenh = 'SELECT' and exists (select from pg_temp.luat_cho_phep l
-                                      where l.bang = $1 and l.luat = $2 and l.bieu_thuc = $4));
+  select (kieu = 'PERMISSIVE'
+          and (bieu_thuc = format('(%s = app.current_company_id())', cot)
+               or (lenh = 'SELECT' and exists (select from pg_temp.luat_cho_phep l
+                                               where l.bang = $1 and l.luat = $2 and l.bieu_thuc = $4))))
+      or (kieu = 'RESTRICTIVE' and exists (select from pg_temp.luat_thu_hep l
+                                           where l.bang = $1 and l.luat = $2 and l.bieu_thuc = $4));
 $f$;
 
 -- Tables in scope: every ordinary or partitioned table in schema public with a company_id column, plus companies.
@@ -179,8 +204,9 @@ rollback;
 -- 7. Company A cannot add an agreement in B's name.
 begin;
 select pg_temp.dung_hai_san();
+select pg_temp.them_quan_tri_a();
 set local role quy_hang_app;
-execute dat_san('[Tên]', '00000000-0000-4000-8000-00000000000a');
+execute dat_san('00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-00000000000a');
 do $$
 begin
   perform pg_temp.phai_loi('a-khong-them-dong-ten-b',
@@ -194,8 +220,9 @@ rollback;
 -- 8. Company A's update of B's agreement touches no row, and B's row keeps its value.
 begin;
 select pg_temp.dung_hai_san();
+select pg_temp.them_quan_tri_a();
 set local role quy_hang_app;
-execute dat_san('[Tên]', '00000000-0000-4000-8000-00000000000a');
+execute dat_san('00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-00000000000a');
 do $$
 declare n bigint;
 begin
@@ -219,8 +246,9 @@ rollback;
 -- 9. Company A cannot move its agreement to B.
 begin;
 select pg_temp.dung_hai_san();
+select pg_temp.them_quan_tri_a();
 set local role quy_hang_app;
-execute dat_san('[Tên]', '00000000-0000-4000-8000-00000000000a');
+execute dat_san('00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-00000000000a');
 do $$
 begin
   perform pg_temp.phai_loi('a-khong-chuyen-dong-sang-b',
@@ -286,14 +314,23 @@ begin
   for b in select * from pg_temp.bang_cong_ty() loop
     n := n + 1;
     if not exists (select from pg_policies
-                   where schemaname = 'public' and tablename = b.ten and cmd in ('SELECT', 'ALL')) then
+                   where schemaname = 'public' and tablename = b.ten and cmd in ('SELECT', 'ALL')
+                     and permissive = 'PERMISSIVE') then
       raise exception 'HỎNG luat-doc-ghi-theo-san: % không có luật đọc', b.ten;
     end if;
     for p in select * from pg_policies where schemaname = 'public' and tablename = b.ten loop
-      if p.qual is not null and not pg_temp.dung_dang(b.ten, p.policyname, p.cmd, p.qual, b.cot) then
+      -- A restrictive policy alone grants nothing: its command needs a company policy of its own.
+      if p.permissive = 'RESTRICTIVE'
+         and not exists (select from pg_policies q
+                         where q.schemaname = 'public' and q.tablename = b.ten and q.permissive = 'PERMISSIVE'
+                           and (q.cmd = p.cmd or q.cmd = 'ALL')) then
+        raise exception 'HỎNG luat-doc-ghi-theo-san: % — luật thu hẹp % không có luật theo sàn cùng lệnh', b.ten, p.policyname;
+      end if;
+      if p.qual is not null and not pg_temp.dung_dang(b.ten, p.policyname, p.cmd, p.qual, b.cot, p.permissive) then
         raise exception 'HỎNG luat-doc-ghi-theo-san: % — luật % không đúng dạng cho phép: %', b.ten, p.policyname, p.qual;
       end if;
-      if p.with_check is not null and not pg_temp.dung_dang(b.ten, p.policyname, p.cmd, p.with_check, b.cot) then
+      if p.with_check is not null
+         and not pg_temp.dung_dang(b.ten, p.policyname, p.cmd, p.with_check, b.cot, p.permissive) then
         raise exception 'HỎNG luat-doc-ghi-theo-san: % — luật % kiểm không đúng dạng cho phép: %',
           b.ten, p.policyname, p.with_check;
       end if;
@@ -339,11 +376,13 @@ create function pg_temp.quan_he_ngoai_he_thong() returns table (oid oid, ten tex
   order by 2;
 $f$;
 
--- 15. Positive control for writes (Ngoài-30): company A adds and changes its own agreement, and reads both back.
+-- 15. Positive control for writes (Ngoài-30): company A adds and changes its own agreement, and reads both back. Since
+--     row 9a only a person whose roles allow manageAgreements writes agreements, so the session is A's company admin.
 begin;
 select pg_temp.dung_hai_san();
+select pg_temp.them_quan_tri_a();
 set local role quy_hang_app;
-execute dat_san('[Tên]', '00000000-0000-4000-8000-00000000000a');
+execute dat_san('00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-00000000000a');
 do $$
 declare n bigint; v text;
 begin
@@ -418,6 +457,22 @@ begin
   if not thay @> array['public.agreements', 'public.companies', 'public.company_members'] then
     raise exception 'HỎNG vai-api-chi-cham-bang-co-luat: bản quét không thấy đủ ba bảng công ty, chỉ thấy %', thay;
   end if;
+  -- Shared catalogs (row 9a): a table without company_id that the role reaches must be on this written list, and the
+  -- role only reads it. Today the list is the permission table, app.permissions (006_bang_quyen_theo_vai.sql).
+  for r in select q.oid, q.ten from pg_temp.quan_he_ngoai_he_thong() q
+           where q.loai in ('r', 'p', 'f') and q.ten = any (thay)
+             and q.ten <> 'public.companies'
+             and not exists (select from pg_attribute a
+                             where a.attrelid = q.oid and a.attname = 'company_id' and not a.attisdropped) loop
+    if r.ten <> all (array['app.permissions']) then
+      raise exception 'HỎNG vai-api-chi-cham-bang-co-luat: % — bảng không có company_id mà vai chạm được, không phải danh mục chung đã khai', r.ten;
+    end if;
+    if has_any_column_privilege('quy_hang_app', r.oid, 'INSERT')
+       or has_any_column_privilege('quy_hang_app', r.oid, 'UPDATE')
+       or has_table_privilege('quy_hang_app', r.oid, 'DELETE') then
+      raise exception 'HỎNG vai-api-chi-cham-bang-co-luat: % — vai ghi được danh mục chung', r.ten;
+    end if;
+  end loop;
   for r in select n.nspname from pg_namespace n
            where n.nspname not like 'pg\_%' and has_schema_privilege('quy_hang_app', n.oid, 'CREATE') loop
     raise exception 'HỎNG vai-api-chi-cham-bang-co-luat: vai có quyền tạo trong schema %', r.nspname;
