@@ -76,8 +76,8 @@ Theo quyết định 0016 «xoá tách theo nghĩa nghiệp vụ»; trạng thá
 | removeContactCreatedByMistake | Gỡ liên hệ tạo nhầm | của tôi | của tôi | toàn sàn | — |
 | eraseContactPersonalData | Xoá tên và số theo yêu cầu | — | — | toàn sàn | — |
 
-`createListing`, `updateListing`, `viewListings` đã có từ hàng 9a. Quản trị sàn không có ô nào ở đây: 0016 «Quản trị sàn lo
-người và cấu hình, không tự có quyền xem hàng hay số chủ». Nếu chủ kho chọn H1 ở Hỏi-1, hai dòng gỡ căn gộp thành một dòng
+`createListing`, `updateListing`, `viewListings` đã có từ hàng 9a. Quản trị sàn không có ô ở các dòng của căn: 0016 «Quản trị
+sàn lo người và cấu hình, không tự có quyền xem hàng hay số chủ». Các ô của liên hệ là đề xuất, chủ kho chốt ở Hỏi-6. Nếu chủ kho chọn H1 ở Hỏi-1, hai dòng gỡ căn gộp thành một dòng
 `removeListing` và hai dòng gỡ liên hệ thành `removeContact`, và hộp xác nhận hỏi lý do (X2).
 
 ### 5. Vai × Màn tới cấp nút

@@ -2,7 +2,8 @@ schema_version: 1
 feature_slug: bo-nut-theo-quyen
 # Ma trận viết trước (AC-2, AC-4, AC-9, AC-10): bốn vai × mọi dòng của ontology/actions.yaml × hai loại bản ghi (của tôi,
 # của người khác). Số ô = 4 × số dòng của bảng sinh × 2; bài kiểm đếm từ bảng sinh và ghim thêm số dòng viết trước
-# (12 dòng hôm nay + 8 dòng nháp của hàng này = 20 → 160 ô) để bảng co lại thì cũng đỏ.
+# theo Hỏi-1: H2 → 12 dòng hôm nay + 8 dòng nháp = 20 dòng → 160 ô; H1 → 18 dòng → 144 ô. Hằng điền ngay sau Cổng Phạm vi,
+# trước khi viết mã, để bảng co lại thì cũng đỏ.
 # Kết quả mỗi ô: hien (phạm vi company, hoặc own trên bản ghi của tôi) · an (không ô) · theo-luat-khac (own trên bản ghi
 # người khác: an nếu chủ kho chọn O1, mo nếu O2 — hằng LUAT_KHAC trong mã, đổi bằng một dòng).
 #
@@ -19,7 +20,10 @@ feature_slug: bo-nut-theo-quyen
 # Cặp phá thử (bản sao hay tệp tạm; ca tương ứng phải đỏ với thông điệp ghim):
 #   pha-thu-own-thanh-company (actionVisibility coi own như company)       → «dong-nguoi-khac: ListAgent × withdrawListing»
 #   pha-thu-go-dau-menu (RowActions đặt việc gỡ lên đầu)                     → «thu-tu-trong-menu»
-#   pha-thu-nut-tran (tệp mẫu gọi fetch POST /api/v1/members, nút Button trần) → «ghi-khong-qua-cua: <tệp>»
+#   pha-thu-nut-tran (tệp mẫu gọi fetch POST /api/v1/members, nút Button trần) → «ghi-khong-qua-cua: <tệp>:<dòng>»
+#   pha-thu-nut-tran-canh-nut-boc (một nút bọc đúng và một nút trần cùng gửi ghi trong một tệp) → «ghi-khong-qua-cua: <tệp>:<dòng>»
+#   pha-thu-vai-so-sanh (roles.some((r) => r === "CompanyAdmin")) → «vai-viet-cung: <tệp>:<dòng>»
+#   pha-thu-nav-cung-o-moi (bản sao bảng thêm TeamLead vào listMembers, nav so vai cứng) → «thanh-ben-theo-o: TeamLead»
 #   pha-thu-ten-la (PermittedAction action="deleteEverything")              → «thao-tac-ngoai-bang: deleteEverything»
 #   pha-thu-vai-cung (tệp mẫu có session.roles.includes("CompanyAdmin"))     → «vai-viet-cung: <tệp>»
 #   pha-thu-o-listMembers (bản sao bảng thêm TeamLead vào listMembers)       → «doi-o-doi-bang: members × TeamLead»
@@ -41,7 +45,7 @@ evals:
     executor: script
     cmd: config:executors.script.bo_nut_unit
     paths: [src/modules/identity/**, src/generated/ontology.ts, ontology/actions.yaml]
-    expected: "exit 0; ca 'nut-theo-bang-160-o' duyệt đủ 4 vai × mọi dòng của ACTIONS × 2 loại bản ghi (số ô in ra bằng 4 × số dòng × 2 và bằng hằng 160 viết trước), mỗi ô khớp luật hien/an/theo-luat-khac; ca 'nhieu-vai-cong-quyen' (15 tổ hợp vai) lấy phạm vi rộng nhất; ca 'dong-nguoi-khac' theo hằng LUAT_KHAC. Chiều đỏ: pha-thu-own-thanh-company làm 'dong-nguoi-khac' đỏ với «dong-nguoi-khac: ListAgent × withdrawListing»"
+    expected: "exit 0; ca 'nut-theo-bang-160-o' duyệt đủ 4 vai × mọi dòng của ACTIONS × 2 loại bản ghi (số ô in ra bằng 4 × số dòng × 2 và bằng hằng viết trước theo Hỏi-1: 160 với H2, 144 với H1), mỗi ô khớp luật hien/an/theo-luat-khac; ca 'nhieu-vai-cong-quyen' (15 tổ hợp vai) lấy phạm vi rộng nhất; ca 'dong-nguoi-khac' theo hằng LUAT_KHAC. Chiều đỏ: pha-thu-own-thanh-company làm 'dong-nguoi-khac' đỏ với «dong-nguoi-khac: ListAgent × withdrawListing»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3
@@ -49,7 +53,7 @@ evals:
     executor: script
     cmd: config:executors.script.bo_nut_kiem
     paths: [tests/bo-nut-kiem.test.ts, src/app/**, src/modules/*/ui/**, ontology/actions.yaml]
-    expected: "exit 0; ba luật mỗi luật một cặp trên tệp mẫu tạm: lành → xanh, phá → đỏ với thông điệp ghim «ghi-khong-qua-cua: <tệp>», «thao-tac-ngoai-bang: deleteEverything», «vai-viet-cung: <tệp>»; cây thật của kho xanh với cả ba luật"
+    expected: "exit 0; ba luật, đo theo từng nút chứ không theo cả tệp: mỗi lệnh gửi yêu cầu ghi phải nằm trong hàm xử lý của một nút dựng qua PermittedAction. Cặp lành/phá trên tệp mẫu tạm: nút trần → «ghi-khong-qua-cua: <tệp>:<dòng>»; một nút bọc đúng cạnh một nút trần trong cùng tệp → vẫn đỏ ở dòng của nút trần; action lạ → «thao-tac-ngoai-bang: deleteEverything»; tên vai trong chuỗi so sánh bất kỳ (includes, ===, some, roles: [...]) trong src/app → «vai-viet-cung: <tệp>:<dòng>»; cây thật của kho xanh với cả ba luật"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E4
@@ -82,7 +86,7 @@ evals:
     cmd: config:executors.script.bo_nut_e2e_db
     layer: backend-effect
     paths: [src/app/(app)/members/**, src/modules/identity/**, tests/e2e-db/bo-nut-members.spec.ts]
-    expected: "exit 0; ca 'tu-choi-403-cau-rieng': phiên Quản trị sàn mở hộp mời, vai bị gỡ ở cơ sở dữ liệu của dãy, bấm Mời → API trả 403 (đọc ở mạng của trang) và hộp hiện câu «Không đủ quyền làm việc này» khác câu lỗi chung, trang làm mới và mục Thành viên biến khỏi thanh bên; cùng cho hộp đổi vai. Chiều đỏ: pha-thu-403-chung làm ca đỏ"
+    expected: "exit 0; ca 'tu-choi-403-cau-rieng': phiên Quản trị sàn mở hộp mời, vai bị gỡ ở cơ sở dữ liệu của dãy, bấm Mời → API trả 403 (đọc ở mạng của trang) và hộp hiện câu «Không đủ quyền làm việc này» khác câu lỗi chung, trang làm mới và mục Thành viên biến khỏi thanh bên; cùng cho hộp đổi vai. Ca chụp bốn ảnh vào evidence/tu-choi-403/ (hai hộp × 360/1440 × sáng/tối như tên tệp của E13). Chiều đỏ: pha-thu-403-chung làm ca đỏ"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E8
@@ -90,8 +94,8 @@ evals:
     executor: script
     cmd: config:executors.script.bo_nut_e2e_db
     layer: backend-effect
-    paths: [src/app/(app)/nav.ts, src/app/(app)/members/**, src/components/templates/**, tests/e2e-db/bo-nut-members.spec.ts]
-    expected: "exit 0; ca 'thanh-ben-theo-bang' và 'man-thanh-vien-theo-bang': với bốn người một vai và một người hai vai, mục và màn Thành viên hiện ⟺ allowedScope(vai, listMembers) ≠ null; ca 'doi-o-doi-bang' của E10 chứng đổi ô thì theo. Chiều đỏ: nav.ts khai lại roles cứng thì E3 đỏ «vai-viet-cung»"
+    paths: [src/app/(app)/nav.ts, src/app/(app)/members/**, src/components/templates/**, tests/e2e-db/bo-nut-members.spec.ts, src/components/templates/nav-menu.test.ts]
+    expected: "exit 0; ca 'thanh-ben-theo-bang' và 'man-thanh-vien-theo-bang': với bốn người một vai và một người hai vai, mục và màn Thành viên hiện ⟺ allowedScope(vai, listMembers) ≠ null; ca 'thanh-ben-theo-o' chạy visibleNav và cổng màn Thành viên trên bản sao bảng quyền có thêm TeamLead vào listMembers: người chỉ giữ TeamLead thấy mục và qua cổng màn. Chiều đỏ: pha-thu-nav-cung-o-moi làm ca đỏ «thanh-ben-theo-o: TeamLead»; nav.ts so vai cứng thì E3 đỏ «vai-viet-cung»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E9
@@ -124,19 +128,21 @@ evals:
     layer: ui-observed
     target: http://127.0.0.1:3489/proto/bo-nut-theo-quyen?bang=an
     paths: [src/app/(app)/proto/bo-nut-theo-quyen/**, src/components/candidate/**, src/modules/identity/ui/**]
-    question: "Dưới bốn vai (tham số vai=ListAgent|BuyerAgent|TeamLead|CompanyAdmin), ở 360 và 1440, sáng và tối: nút thêm, «…» trên dòng và đầu hồ sơ có đúng chỗ theo mục «Bộ nút theo quyền» của design/behaviors.md không; Quản trị sàn có thấy vùng «Bạn chưa có quyền xem vùng này» và không nút nào không; mở «…» thì việc gỡ có ở cuối, đỏ, tách vạch không?"
+    question: "Mở trang với tham số vai=ListAgent, BuyerAgent, TeamLead, CompanyAdmin lần lượt (thêm man=contacts cho màn Liên hệ), ở 360 và 1440, sáng và tối. Kỳ vọng từng ô (với khuyến nghị ở cổng; nếu chủ kho chọn khác, câu này được sửa trước S4 theo dòng sổ gate1): Bảng hàng — ListAgent: nút «Thêm căn» cùng dòng với ô tìm; «…» trên dòng của mình có Sửa, rồi vạch, rồi Ngừng bán, Gỡ tạo nhầm chữ đỏ; trên dòng người khác chỉ Sửa. BuyerAgent: «Thêm căn»; «…» chỉ có Sửa. TeamLead: như ListAgent trên mọi dòng. CompanyAdmin: vùng «Bạn chưa có quyền xem vùng này», không nút nào. Liên hệ — ListAgent và BuyerAgent: «Thêm liên hệ»; «…» chỉ trên dòng mình tạo (Sửa, Gỡ tạo nhầm); dòng người khác không có «…». TeamLead: «…» mọi dòng có Sửa, Gộp với liên hệ khác…, vạch, Gỡ tạo nhầm, Xoá tên và số theo yêu cầu. CompanyAdmin: vùng không đủ quyền. Ô nào lệch thì nêu vai × màn × khổ × chế độ màu."
     expected: "Ảnh từng vai × khổ × chế độ màu khớp luật; không nút nào hiện cho vai không có ô"
     evidence_required: [run_id, screenshot, observed, verdict]
 
   - id: E13
     criterion: AC-6
-    executor: ui-check
-    layer: ui-observed
-    target: http://127.0.0.1:3489/members
-    paths: [src/app/(app)/members/**]
-    question: "Khi máy chủ từ chối (403) lúc mời hay đổi vai, hộp thoại có hiện câu «Không đủ quyền làm việc này» kèm lời bảo tải lại, khác câu lỗi chung, đọc được ở sáng và tối, 360 và 1440 không?"
-    expected: "Ảnh hộp thoại với câu riêng ở bốn tổ hợp khổ × màu"
-    evidence_required: [run_id, screenshot, observed, verdict]
+    executor: judgment
+    inputs:
+      - _acceptance/bo-nut-theo-quyen/evidence/tu-choi-403/moi-360-sang.png
+      - _acceptance/bo-nut-theo-quyen/evidence/tu-choi-403/moi-1440-toi.png
+      - _acceptance/bo-nut-theo-quyen/evidence/tu-choi-403/doi-vai-360-toi.png
+      - _acceptance/bo-nut-theo-quyen/evidence/tu-choi-403/doi-vai-1440-sang.png
+    question: "Bốn ảnh do bài E7 chụp ngay khi máy chủ trả 403 trong hộp mời và hộp đổi vai (trạng thái ST-members-refused). Mỗi ảnh có hiện câu «Không đủ quyền làm việc này» kèm lời bảo tải lại trang, tách khỏi câu lỗi chung, đọc rõ ở chế độ màu của ảnh không?"
+    expected: "PASS khi cả bốn ảnh có câu riêng đọc rõ; FAIL nêu ảnh lệch"
+    evidence_required: [run_id, verdict, verifier, verified_at]
 
   - id: E14
     criterion: AC-10

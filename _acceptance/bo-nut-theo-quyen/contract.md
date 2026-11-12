@@ -54,7 +54,8 @@ Luật sản phẩm chạm: SP-1 (bảng quyền đọc qua cửa của mô-đun
   `listMembers` trong bảng quyền thì thanh bên và màn theo ngay, không sửa mã. (cross-layer)
 - AC-8: Given bảng quyền `ontology/actions.yaml`, When `make gen` và `make ontology` chạy, Then bảng có các dòng nháp
   (trạng thái planned) cho ngừng bán và gỡ căn, xem, thêm, sửa, gộp, gỡ liên hệ và xoá dữ liệu cá nhân của liên hệ theo
-  nghĩa nghiệp vụ của quyết định 0016 và chữ chủ kho chốt; Quản trị sàn không có ô nào ở các dòng ấy; mã sinh khớp bảng.
+  nghĩa nghiệp vụ của quyết định 0016, chữ trên nút theo lựa chọn Hỏi-1 và ô phạm vi của liên hệ theo lựa chọn Hỏi-6 ở Cổng
+  Phạm vi (dòng sổ gate1 hay dòng S1 không bị lật); Quản trị sàn không có ô ở các dòng của căn; mã sinh khớp bảng.
 - AC-9: Given bảng quyền và các nút đã khai trên từng màn, When lệnh sinh bảng vai × màn chạy, Then mỗi màn × vai liệt đúng
   các nút hiện kèm phạm vi; đổi một ô của bảng quyền thì bảng sinh đổi theo; tệp sinh lệch bảng quyền thì `make check` đỏ.
 - AC-10: Given mẫu chạy của khuôn `/proto/bo-nut-theo-quyen`, When xem dưới bốn vai ở 360 và 1440, sáng và tối, Then bộ nút
