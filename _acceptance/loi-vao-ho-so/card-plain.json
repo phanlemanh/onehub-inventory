@@ -1,0 +1,35 @@
+{
+  "feature_plain": "Đầu chủ mở một căn ở trang riêng để chép đường dẫn gửi đồng nghiệp, và gõ mã căn ở thanh trên để tới thẳng hồ sơ căn.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ có nút «Mở toàn màn» ở đầu hồ sơ căn cạnh Bảng hàng (mọi khổ), bấm là sang trang riêng của căn; nút lùi về đúng hồ sơ đang mở."},
+    {"id": "AC-2", "p": "Sẽ hiện trên trang riêng đúng thân hồ sơ của hàng 3 (thẻ căn và tám trường), tên căn và toà ở đầu, nút «Chép đường dẫn» và lối về Bảng hàng."},
+    {"id": "AC-3", "p": "Sẽ chép đúng đường dẫn đầy đủ của trang và báo «Đã chép đường dẫn»; trình duyệt không cho chép thì bảo người chép ở ô địa chỉ."},
+    {"id": "AC-4", "p": "Sẽ mở đúng căn và đúng lần chào khi đồng nghiệp mở đường dẫn, kể cả khi căn đã đổi mã hay toà; lần chào đã rút thì hiện lần chào hiện tại kèm một dòng báo."},
+    {"id": "AC-6", "p": "Sẽ hỏi «Nhiều căn — chọn toà» với một nút cho mỗi toà khi mã có ở nhiều toà; mã có ở một toà thì mở thẳng."},
+    {"id": "AC-7", "p": "Sẽ có «Gõ mã căn» trên thanh trên (cả phím ⌘K, Ctrl+K và «/»): gõ mã rồi Enter là tới trang riêng; ô rỗng thì báo ngay dưới ô."},
+    {"id": "AC-8", "p": "Sẽ đọc được ở cả bốn khổ màn, sáng và tối, không cuộn ngang, không lỗi trợ năng nặng."}
+  ],
+  "wont_do": [
+    {"id": "AC-5", "p": "Sẽ KHÔNG mở hồ sơ nào khi mã không có trong Bảng hàng: trang nói rõ «Không có căn này trong Bảng hàng» và có nút «Về Bảng hàng»."},
+    {"id": "OOS-1", "p": "Sẽ KHÔNG thêm căn khi gõ mã không khớp — thêm căn bằng mã là hàng 12."},
+    {"id": "OOS-2", "p": "Sẽ KHÔNG có danh sách các lần chào của căn trên trang riêng — việc của hàng 3b."},
+    {"id": "OOS-3", "p": "Sẽ KHÔNG có «Trước», «Sau» trên trang riêng, không ghim hồ sơ thành cột (hàng 3a)."},
+    {"id": "OOS-4", "p": "Sẽ KHÔNG mở ứng dụng gửi hay Zalo — chỉ chép đường dẫn, người tự dán và tự bấm gửi."},
+    {"id": "OOS-5", "p": "Sẽ KHÔNG gợi ý mã khi đang gõ, không nhảy tới màn khác theo tên trong hộp gõ mã."},
+    {"id": "OOS-6", "p": "Sẽ KHÔNG làm cửa đăng nhập riêng: trang đi qua đúng cửa của Bảng hàng (hôm nay còn dữ liệu mẫu, chưa bắt đăng nhập)."}
+  ],
+  "coverage_plain": [
+    {"i": 0, "p": "Ba lối vào đều được đo: nút «Mở toàn màn» (AC-1), đường dẫn được gửi (AC-4), ô «Gõ mã căn» bằng nút và bằng phím (AC-7)."},
+    {"i": 1, "p": "Mọi kết quả tìm đều có bài: một căn, nhiều toà, mã lạ, toà sai, lần chào cũ hay vắng, ô rỗng (AC-4 đến AC-7)."},
+    {"i": 2, "p": "Bốn khổ màn, sáng và tối được chụp và quét trợ năng (AC-8)."},
+    {"i": 3, "p": "Chép được và bị trình duyệt chặn đều có bài riêng (AC-3)."},
+    {"i": 4, "p": "Người có và không có Bảng hàng: chỉ người có mới thấy ô gõ mã (AC-7)."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Sổ quyết định đánh dấu nhầm một dòng là «đã thay», làm mất giới hạn «Nhiều căn chỉ đo trên dữ liệu dựng tay» — đã sửa, giới hạn hiện lại."},
+    {"i": 1, "p": "Máy đã tự quyết lặng lẽ hiện lần chào khác khi lần chào trong đường dẫn đã rút — nay thành câu hỏi cho anh (Hỏi-4), bản nháp theo khuyến nghị có dòng báo."},
+    {"i": 2, "p": "Đường dẫn chỉ dựa vào mã căn và toà sẽ hỏng khi căn đổi mã hay toà đổi tên — đã sửa: lần chào trong đường dẫn thắng, đường dẫn cũ vẫn mở đúng."},
+    {"i": 3, "p": "Hợp đồng hứa người không đăng nhập không xem được, trong khi Bảng hàng hôm nay chưa bắt đăng nhập — đã bỏ lời hứa sai, nói thật trang đi qua cửa của Bảng hàng và đo việc ấy."},
+    {"i": 4, "p": "Ảnh cho người chấm thiếu báo đã chép và dòng báo lần chào cũ — đã thêm; «Nhiều căn» trên Bảng hàng thật còn hoãn vì dữ liệu mẫu không có mã trùng."}
+  ]
+}
