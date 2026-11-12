@@ -1,9 +1,9 @@
-// Drop this run's scratch database and its outbox.
+// Drop this run's scratch database, its outbox and its test session.
 import { rmSync } from "node:fs";
 
 import pg from "pg";
 
-import { DB_NAME, DB_URL, OUTBOX } from "../../playwright.db.config";
+import { DB_NAME, DB_URL, OUTBOX, SESSION_FILE } from "../../playwright.db.config";
 
 export default async function teardown(): Promise<void> {
   const admin = new pg.Client({ connectionString: DB_URL.replace(`/${DB_NAME}`, "/postgres") });
@@ -14,4 +14,5 @@ export default async function teardown(): Promise<void> {
     await admin.end();
   }
   rmSync(OUTBOX, { force: true });
+  rmSync(SESSION_FILE, { force: true });
 }

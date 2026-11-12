@@ -87,7 +87,8 @@
             "ids",
             "openId",
             "onNavigate",
-            "render"
+            "render",
+            "returnFocus"
           ]
         }
       ]

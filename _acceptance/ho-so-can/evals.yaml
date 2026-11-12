@@ -1,0 +1,107 @@
+schema_version: 1
+feature_slug: ho-so-can
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/ui/**, tests/ho-so-can.test.tsx]
+    expected: "exit 0; trong tests/ho-so-can.test.tsx, với MỌI dòng Bảng hàng dựng từ dữ liệu mẫu bằng inventoryRows, listingView cho mã căn, nơi (toà · khu), trạng thái, giá và tám trường bằng đúng giá trị của dòng (so lại từ dòng, không chép số); ListingCard và ListingRecordBody dựng trên một dòng biết trước hiện giá bằng formatMoney của dòng, diện tích có 'm²', huy hiệu data-status đúng trạng thái, ba thông số theo thứ tự Diện tích, Phòng ngủ, Xác nhận lúc; dòng thiếu giá và diện tích hiện '—' ở cả thẻ và hồ sơ; ca đối chứng: mô hình lấy giá của dòng khác cho thông điệp 'card and record disagree: price', thẻ bỏ thông số thứ ba cho 'card facts: expected 3'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, src/modules/listings/ui/**, tests/e2e/ho-so-can.spec.ts]
+    expected: "exit 0; tests/e2e/ho-so-can.spec.ts ở 1440 và 1024 mở /inventory, bấm mã căn thứ năm: hồ sơ data-record-layout='float' hiện, mép trên ngăn lệch mép dưới thanh trên của App Shell không quá 2 px, mép dưới ngăn lệch đáy vùng làm việc không quá 2 px, rộng ngăn trong khoảng 35–45% bề rộng khung nhìn (hoặc bằng chặn dưới 20rem, chặn trên 32rem), phần tử ở giữa ô tìm và ở giữa nút tài khoản trên thanh trên (elementFromPoint) vẫn là chính chúng, không phải ngăn; khi thanh trên ẩn (bỏ thanh trên bằng thẻ style display none rồi đổi cỡ khung nhìn) mép trên ngăn về 0 ± 2 px; gõ một mã căn vào ô tìm khi hồ sơ mở thì số dòng đổi; bấm mã căn khác thì data-record-id đổi mà hồ sơ không đóng; từ nút 'Đóng' bấm Tab tối đa 10 lần thì tiêu điểm rời hồ sơ và nằm trong khung vùng dữ liệu (không quay vòng trong hồ sơ), ca đối chứng của bước này dựng lại bẫy tiêu điểm (giữ Tab trong hồ sơ bằng trình nghe keydown trên trang thật) cho 'grid not reachable by Tab'; ở cả bốn khổ, sáng và tối, ba nút Trước, Sau, Đóng nằm cùng một hàng ở góc trên phải ngăn (mép trên ba nút lệch mép trên tên hồ sơ không quá 4 px, mép phải nút Đóng cách mép phải thân ngăn không quá 24 px), ca đối chứng ép thanh tên xuống dòng (flex-wrap: wrap, tên rộng 100%) cho 'record actions left the top right'; ca đối chứng đặt ngăn phủ từ mép trên màn hình (top 0) bằng thẻ style trên trang thật cho thông điệp 'record covers the top bar'; ngăn và thân ngăn không cuộn ngang (scrollWidth bằng clientWidth) ở 1440 và 1024, ca đối chứng ép ruột hồ sơ rộng 900 px bằng thẻ style cho 'record scrolls sideways'; cuộn trang xuống 400 px rồi về 0 thì mép trên ngăn vẫn sát mép dưới thanh trên và mép dưới vẫn sát đáy (lệch không quá 2 px), ca đối chứng cho ngăn position absolute bằng thẻ style cho 'not under the top bar' hoặc 'record covers the top bar'; sau khi gộp hàng 2a (phân xử D-1211-19, D-1211-20), ở 1440 và 1024: một cú bấm vào chữ mã căn mở hồ sơ, bấm lề trống của ô Căn chỉ chọn ô (không có hồ sơ, ô đang chọn là ô Căn của dòng ấy), Enter trên ô đang chọn mở đúng căn ấy, ca đối chứng gỡ data-cell-interactive khỏi chữ mã căn cho 'unit code needs two clicks to open'; bôi một vùng có cột Căn bằng chuột (từ ô Toà sang lề trống ô Căn) và bằng Shift+mũi tên rồi chép ra đúng mã căn và toà; đóng hồ sơ thì tiêu điểm về chữ mã căn và ô Căn là ô đang chọn, rồi từ chữ mã căn: ArrowDown sang dòng kế, Shift+ArrowDown chọn hai ô, Ctrl+C chép đúng mã căn — mỗi việc một ca đối chứng nuốt phím trên chữ mã căn cho 'keys stuck on the unit code'; tests/e2e/sheet.spec.ts của hàng 2a xanh"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, src/modules/listings/ui/**, tests/e2e/ho-so-can.spec.ts]
+    expected: "exit 0; ở 1440 và 1024 với hồ sơ mở: số đầu cột nằm trọn trong khung cuộn và bên trái mép ngăn ít nhất 4 ở 1440 và ít nhất 2 ở 1024 (ngưỡng viết trong tệp, bài in 'visible columns <khổ> closed=<n> open=<m>'; đổi từ 5 và 3 theo phân xử D-1211-12 của giám sát); cột Căn và Toà nằm trọn trong khung và bên trái mép ngăn ở cả hai khổ, ca đối chứng nới ngăn rộng 85vw cho 'record hides a frozen column'; cuộn ngang khung bảng tới cuối thì ba đầu cột #, Căn, Toà vẫn nằm trọn trong khung và bên trái mép ngăn; với mỗi cột trong tám cột dữ liệu, cuộn tới nó thì đầu cột có bề ngang lớn hơn 0 và nằm trọn trong khung (không cột nào bị ẩn); giá của căn đang mở thấy ở đầu hồ sơ; ca đối chứng bỏ ghim cột Toà bằng thẻ style cho 'frozen column scrolled away: Toà', ca đối chứng ẩn cột Diện tích bằng thẻ style cho 'column hidden: Diện tích'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, src/modules/listings/ui/**, tests/e2e/ho-so-can.spec.ts]
+    expected: "exit 0; bấm mã căn thì địa chỉ có ho-so=<id lần chào của dòng>; mở thẳng /inventory?ho-so=<id ấy> thì hồ sơ của đúng căn ấy hiện; page.goBack() đóng hồ sơ (không còn data-slot record-panel) và vẫn ở /inventory; mở /inventory?ho-so=khong-co thì không có hồ sơ, bảng đủ 60 dòng và không lỗi trình duyệt; ca đối chứng đọc hồ sơ theo chỉ số dòng thay vì id cho thông điệp 'address opened the wrong record'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, tests/ho-so-can.test.tsx]
+    expected: "exit 0; trong tests/ho-so-can.test.tsx trên DataRegion có record với khung nhìn rộng: mở dòng đầu thì 'Trước' tắt, 'Sau' sang dòng hai; mở dòng cuối thì 'Sau' tắt; sau khi gõ tìm, 'Sau' đi theo dòng đang hiện (bỏ qua dòng bị lọc); dòng đang mở bị tìm làm biến thì hồ sơ vẫn mang id ấy và cả hai nút tắt; vùng ở bốn trạng thái chờ tải, lỗi, một phần hỏng không dòng, không đủ quyền kèm địa chỉ mang id thật thì không có hồ sơ nào hiện, cùng địa chỉ ấy ở trạng thái có dòng thì hồ sơ hiện (đối chứng dương); ca đối chứng đi theo thứ tự mọi dòng thay vì dòng đang hiện cho 'walk ignores search', ca đối chứng dựng hồ sơ bất kể trạng thái vùng cho 'record opened in a region without rows'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, tests/ho-so-can.test.tsx]
+    expected: "exit 0; khung nhìn rộng (innerWidth 1440): mở từ lúc đóng thì document.activeElement là tiêu đề hồ sơ; bấm 'Sau' thì tiêu điểm ở lại nút 'Sau'; Esc trong hồ sơ đóng hồ sơ và tiêu điểm về nút mở của đúng dòng vừa xem; 'Đóng' cũng vậy; hồ sơ mang aria-modal='false' và nút mở của dòng khác vẫn bấm được khi hồ sơ mở; ca đối chứng trả tiêu điểm về dòng đầu cho 'focus went to the wrong row'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/record-panel.tsx, src/modules/listings/ui/**, tests/e2e/ho-so-can.spec.ts]
+    expected: "exit 0; ở 414 và 360 chạm mã căn: hồ sơ data-record-layout='screen' phủ cả khung nhìn (rộng bằng khung nhìn, cao bằng khung nhìn); phần tử đầu tiên của thân hồ sơ là data-slot listing-card có mã căn, giá, nơi, huy hiệu trạng thái và ba thông số; dưới là tám trường; bấm 'Đóng' thì hồ sơ biến và tiêu điểm ở mã căn vừa xem; trang không cuộn ngang; ca đối chứng thu hồ sơ về rộng 75% bằng thẻ style cho 'phone record is not full screen'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, tests/behavior.test.tsx, tests/behavior-guard.test.ts, tests/grid.test.tsx, tools/proof_gate/**, _acceptance/ho-so-can/chung-minh-man.md]
+    expected: "exit 0; make test chạy tests/behavior.test.tsx (hồ sơ mở từ lưới, đi qua lại, địa chỉ), tests/behavior-guard.test.ts (không tệp màn nào nhập thẳng khung hồ sơ hay hộp thoại) và tests/grid.test.tsx đều xanh không sửa bài nào của chúng; python3 tools/proof_gate/check.py --root . xanh với hồ sơ này ở trạng thái hiện tại"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/record-panel.tsx, src/modules/listings/ui/**, tests/e2e/ho-so-can.spec.ts]
+    expected: "exit 0; axe trên /inventory với hồ sơ một căn đang mở ở 1440 và 360, sáng và tối (4 lượt quét, đếm trong tệp), không vi phạm mức serious hay critical; ca đối chứng bỏ tên của hộp hồ sơ (gỡ aria-labelledby) cho thông điệp axe có mã 'aria-dialog-name'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, src/modules/listings/ui/**]
+    steps:
+      - "Use the dev server at the URL given (lane D, port 3483); if it does not answer, start it from the repo root with npx next dev -p 3483 -H 127.0.0.1 (never port 3470, never while a suite command is running), note its PID and stop only that PID when done"
+      - "At 1440x900, light: open {url}/inventory, click the fifth unit code in the «Căn» column → screenshot evidence/ho-so-1440-sang.png"
+      - "Same at 1440x900, dark (emulate prefers-color-scheme dark) → screenshot evidence/ho-so-1440-toi.png"
+      - "Same at 1024x768, light → screenshot evidence/ho-so-1024-sang.png"
+      - "Same at 1024x768, dark → screenshot evidence/ho-so-1024-toi.png"
+      - "Same at 414x896, light → screenshot evidence/ho-so-414-sang.png"
+      - "Same at 414x896, dark → screenshot evidence/ho-so-414-toi.png"
+      - "Same at 360x800, light → screenshot evidence/ho-so-360-sang.png"
+      - "Same at 360x800, dark → screenshot evidence/ho-so-360-toi.png"
+    expected: "tám ảnh: ở 1440 và 1024 hồ sơ nổi bên phải từ ngay dưới thanh trên tới đáy màn hình; thanh trên của App Shell và ô tìm không bị che, hồ sơ có tên «<mã căn> · <toà>», nút Trước, Sau, Đóng, thẻ căn (mã căn và giá một dòng, nơi và huy hiệu trạng thái, ba thông số) rồi tám trường; ở 414 và 360 hồ sơ phủ toàn màn, đầu là thẻ căn; không chữ chồng chữ; ảnh tối đọc được"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
+
+  - id: E11
+    criterion: AC-10
+    executor: judgment
+    inputs: [_acceptance/ho-so-can/evidence/ho-so-1440-sang.png, _acceptance/ho-so-can/evidence/ho-so-1440-toi.png, _acceptance/ho-so-can/evidence/ho-so-1024-sang.png, _acceptance/ho-so-can/evidence/ho-so-360-sang.png, _acceptance/ho-so-can/evidence/ho-so-360-toi.png, _acceptance/ho-so-can/design.md]
+    question: "Năm ảnh Bảng hàng có hồ sơ một căn đang mở có khớp mục «Đặc tả UX» và «Sống chung với hàng 2a» của design.md không: ở 1440 và 1024 hồ sơ nổi bên phải từ dưới thanh trên tới đáy màn hình, ô tìm và thanh trên không bị che, cột Căn và Toà còn thấy; ở 360 hồ sơ toàn màn, đầu là thẻ căn có mã căn, giá, nơi, trạng thái và ba thông số; chữ không chồng chữ và ảnh tối đọc được?"
+    evidence_required: [verdict, rationale]
+
+  - id: E12
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, src/modules/listings/ui/**]
+    expected: "exit 0; không mã màu thô trên các tệp giao diện vòng này chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

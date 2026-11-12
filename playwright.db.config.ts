@@ -52,6 +52,12 @@ export const DB_NAME = `dang_nhap_e2e_${RUN}`;
 export const DB_URL = `postgres://postgres:local-only@127.0.0.1:${DB_PORT}/${DB_NAME}`;
 // Outside test-results: every Playwright run empties that folder when it starts, including another run's outbox.
 export const OUTBOX = join(tmpdir(), `onehub-e2e-db-outbox-${RUN}.jsonl`);
+// The register-driven suite's one test session (row 1r): a person holding all four roles in a test company, signed in
+// once through the real sign-in screen by the `phien` project; the browser state lives outside the repository.
+export const TEST_PERSON = `phien-thu-${RUN}@example.test`;
+export const SESSION_FILE = join(tmpdir(), `onehub-e2e-db-phien-${RUN}.json`);
+const SUITE = /screens\.spec\.ts$/;
+const SIGN_IN_ONCE = /phien\.setup\.ts$/;
 
 export default defineConfig({
   testDir: "tests/e2e-db",
@@ -64,10 +70,26 @@ export default defineConfig({
   globalSetup: "./tests/e2e-db/setup.ts",
   globalTeardown: "./tests/e2e-db/teardown.ts",
   use: { baseURL: URL },
-  projects: SIZES.map(({ name, width, height }) => ({
-    name,
-    use: { ...devices["Desktop Chrome"], viewport: { width, height } },
-  })),
+  projects: [
+    // The tests of rows 8, 9, 1m, 1o sign their own people in, as before.
+    ...SIZES.map(({ name, width, height }) => ({
+      name,
+      testIgnore: [SUITE, SIGN_IN_ONCE],
+      use: { ...devices["Desktop Chrome"], viewport: { width, height } },
+    })),
+    { name: "phien", testMatch: SIGN_IN_ONCE, use: { ...devices["Desktop Chrome"] } },
+    // The register-driven suite opens every screen with the one test session (row 1r, AC-1, AC-2).
+    ...SIZES.map(({ name, width, height }) => ({
+      name: `co-phien-${name}`,
+      testMatch: SUITE,
+      dependencies: ["phien"],
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width, height },
+        storageState: SESSION_FILE,
+      },
+    })),
+  ],
   webServer: {
     command: `npx next dev -p ${PORT}`,
     url: URL,

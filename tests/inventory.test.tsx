@@ -30,6 +30,17 @@ beforeAll(() => {
     disconnect() {}
   } as unknown as typeof ResizeObserver;
   Element.prototype.getAnimations ??= () => [];
+  // The grid opens a listing's record (row 3), and the record asks for the screen width through matchMedia.
+  window.matchMedia ??= ((query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    onchange: null,
+    dispatchEvent: () => false,
+  })) as unknown as typeof window.matchMedia;
 });
 afterEach(cleanup);
 
