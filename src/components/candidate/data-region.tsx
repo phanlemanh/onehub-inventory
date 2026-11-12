@@ -101,7 +101,9 @@ const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-(--region-height)";
  * In full screen the grid ends at the screen's bottom edge: the screen less the name strip, toolbar and footer, a
  * height the region sets once as a custom property.
  */
-const FULL_SCREEN_HEIGHT_CLASS = "group-data-full-screen/region:h-(--region-full-height)";
+// Repeated under lg: so it beats the lg: height of the normal page, which would otherwise win from 1024 (AC-11).
+const FULL_SCREEN_HEIGHT_CLASS =
+  "group-data-full-screen/region:h-(--region-full-height) lg:group-data-full-screen/region:h-(--region-full-height)";
 const REGION_HEIGHTS = {
   "--region-height": "calc(100dvh - 23rem)",
   "--region-full-height": "calc(100dvh - 10rem)",

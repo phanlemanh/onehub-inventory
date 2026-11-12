@@ -504,12 +504,20 @@ test.describe("sheet full screen", () => {
         full: !!document.fullscreenElement,
         topBar: !!document.querySelector('[data-slot="app-shell-top-bar"]'),
         header: !!document.querySelector('[data-slot="page-header"]'),
+        // Room left under the grid's footer: in full screen the grid reaches the bottom of the screen (the region keeps its own
+        // bottom padding, about 15px; the normal-page height would leave some 200px).
+        gapBelow:
+          innerHeight -
+          (document.querySelector('[data-slot="region-footer"]')?.getBoundingClientRect().bottom ??
+            0),
         menuOnTop,
       };
     });
     if (!state.full) throw new Error("not full screen");
     if (state.header) throw new Error("page header shown in full screen");
     if (state.topBar) throw new Error("top bar shown in full screen");
+    if (state.gapBelow > 32)
+      throw new Error(`grid short in full screen: ${Math.round(state.gapBelow)}px left`);
     if (!state.menuOnTop) throw new Error("menu hidden in full screen: Cột");
   }
 
@@ -566,6 +574,23 @@ test.describe("sheet full screen", () => {
     await page.evaluate(() => document.documentElement.requestFullscreen());
     await page.getByRole("button", { name: "Cột", exact: true }).click();
     await expect(checkFullScreen(page)).rejects.toThrow("page header shown in full screen");
+  });
+
+  test("full-screen check fails when the grid keeps the normal page height", async ({ page }) => {
+    test.skip(!WIDE.has(width()), "no full screen below 768px");
+    await openInventory(page);
+    await page.getByRole("button", { name: "Toàn màn hình" }).click();
+    await expect.poll(() => page.evaluate(() => !!document.fullscreenElement)).toBe(true);
+    // Break: the scroll box keeps the normal page's height in full screen (the bug of round 2).
+    await page.evaluate(() => {
+      let box = document.querySelector<HTMLElement>(
+        '[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]',
+      );
+      while (box && !box.className.includes("--region-height")) box = box.parentElement;
+      box!.style.setProperty("height", "var(--region-height)", "important");
+    });
+    await page.getByRole("button", { name: "Cột", exact: true }).click();
+    await expect(checkFullScreen(page)).rejects.toThrow(/^grid short in full screen: \d+px left$/);
   });
 });
 
