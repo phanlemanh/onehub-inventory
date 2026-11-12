@@ -167,6 +167,39 @@ export const FRAME: Recipe[] = [
   },
 ];
 
+// ---- session recipe: the signed-in run only (roadmap row 1r) ----------------------------------------------------
+
+/** The id of the session recipe; the runner lets this one check read a screen it was sent away from. */
+export const SESSION_ID = "phien-thu";
+
+/** The pinned message when a screen sends the signed-in test person to the sign-in page. */
+export function pushedOut(screen: string): string {
+  return `${screen}: phien-thu — bi day ve dang nhap`;
+}
+
+/**
+ * Runs only in the signed-in run: the screen opened with the test session stays on its own route. The break clears
+ * the session cookie before the page opens, and the same check must name the screen. Kept apart from FRAME, so the
+ * frame recipes and their breaks of row 1f stay as they were.
+ */
+export const SESSION: Recipe[] = [
+  {
+    id: SESSION_ID,
+    async check({ page, screen }) {
+      if (new URL(page.url()).pathname === "/login") fail(pushedOut(screen));
+    },
+    breaks: [
+      {
+        name: "xoa cookie phien",
+        message: (id) => new RegExp(`^${escapeRe(pushedOut(id))}`),
+        before: async ({ page }) => {
+          await page.context().clearCookies();
+        },
+      },
+    ],
+  },
+];
+
 // ---- region recipes: grid screens with a data region, and the grid sample -------------------------------------
 
 const region = (page: Page) => page.locator('[data-slot="data-region"]');

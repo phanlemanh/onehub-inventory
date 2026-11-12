@@ -62,3 +62,28 @@ relations:
     to: ListingUnit
     cardinality: one-to-many
     description: One unit can be offered by several listings; this is how Unit offered_as Listing is stored.
+  - from: Subdivision
+    name: divided_into
+    to: Complex
+    cardinality: one-to-many
+    description: A project holds its complexes; a complex belongs to exactly one project.
+  - from: Subdivision
+    name: holds_building
+    to: Building
+    cardinality: one-to-many
+    description: Every tower belongs to one project, through a complex when one is known.
+  - from: Building
+    name: has_stack
+    to: Stack
+    cardinality: one-to-many
+    description: A stack belongs to one tower.
+  - from: Building
+    name: contains
+    to: Unit
+    cardinality: one-to-many
+    description: A unit belongs to one tower, and to one of its stacks when the stack is known.
+  - from: Company
+    name: names_in_catalog
+    to: CompanyCatalogAlias
+    cardinality: one-to-many
+    description: A company holds its own codes and names for catalog towers and units.

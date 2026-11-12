@@ -1,0 +1,30 @@
+name: CompanyCatalogAlias
+description: >-
+  A code or name one company uses for a tower or a unit of the shared catalog. Belongs to that company only; the
+  shared catalog never changes.
+reso: none (our own)
+
+properties:
+  id: { type: integer, required: true, unique: true, display: none }
+  companyId: { type: ref, target: Company, required: true, display: none }
+  buildingKey: { type: ref, target: Building, display: none }
+  unitKey: { type: ref, target: Unit, display: none }
+  kind: { type: enum, values: [ma, ten], required: true, display: none }
+  value: { type: string, required: true, display: text }
+  createdAt: { type: datetime, required: true, display: none }
+  retiredAt: { type: datetime, display: none }
+
+rules:
+  - id: company-code-points-to-one-object
+    description: >-
+      A company code or name points to exactly one tower or one unit that exists in the catalog, and is unique per
+      company, kind and value while in force; another company may use the same text for another object.
+    implemented_in: db/migrations/007_danh_muc_nhu_invest.sql
+  - id: code-lookup-order
+    description: A typed code resolves by the company's own codes first, then the catalog's original codes, then the reader.
+    implemented_in: src/modules/catalog/lookup.ts
+
+code:
+  model: src/modules/catalog/
+  tests: tests/
+wiki: wiki/entities/company-catalog-alias.md

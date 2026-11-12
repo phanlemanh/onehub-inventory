@@ -78,6 +78,8 @@ function copyRepo(): string {
     // The 0023 gate checks the files of the block ledger and the context page of the record.
     "docs/tri-thuc",
     "src/components",
+    // A module's own blocks (row 3: the listing card and record body) live in src/modules/<name>/ui.
+    "src/modules",
   ]) {
     cpSync(join(ROOT, part), join(dir, part), { recursive: true });
   }

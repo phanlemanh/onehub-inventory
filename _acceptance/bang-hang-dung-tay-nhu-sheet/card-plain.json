@@ -1,0 +1,124 @@
+{
+  "feature_plain": "Đầu chủ dùng Bảng hàng như Google Sheet: đi ô bằng phím, bôi vùng rồi chép sang Zalo hay Excel, sắp xếp, lọc từng cột, nhóm theo toà, ẩn hiện cột; sáu lối tắt trạng thái ở thanh bên mở sẵn bảng đã lọc.",
+  "will_do": [
+    {
+      "id": "AC-1",
+      "p": "Sẽ cho đi giữa các ô bằng mũi tên, Tab, Home, End, Ctrl+Home, Ctrl+End, PageDown, và bảng luôn cuộn theo để ô đang chọn không bị khuất, ở cả bốn khổ màn."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ cho bôi một vùng ô rồi Ctrl+C (Cmd+C trên Mac) chép đúng chữ đang thấy, tách cột như Excel, không kèm tiêu đề; giá chép ra «4,65 tỷ», trạng thái chép ra «Đang bán»."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ cho bấm tiêu đề cột để chọn Tăng dần hoặc Giảm dần; ô trống luôn nằm cuối, trạng thái xếp theo đúng thứ tự trạng thái, số dòng vẫn đếm liền."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ có nút «Lọc» mở một hàng ô lọc dưới tiêu đề, mỗi cột lọc theo kiểu của nó: chữ không cần gõ dấu, trạng thái chọn nhiều, giá gõ theo tỷ như «<=5», số gõ «2-5», ngày gõ số ngày đã qua; các ô cộng dồn, có «Xoá lọc»."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ có nút «Nhóm theo Toà»: mỗi toà một dòng nhóm có tên và số căn, gập mở được, số dòng đếm liền qua các toà, sắp xếp áp trong từng toà."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ có nút «Cột» để ẩn hiện từng cột (trừ cột Căn); ba cột đầu vẫn đứng yên khi cuộn ngang trên điện thoại, và bỏ ghim được ở menu tiêu đề."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ cho sáu lối tắt trạng thái ở thanh bên mở Bảng hàng đã lọc đúng trạng thái, lối đang mở sáng lên, và thứ tự trạng thái ở thanh bên trùng thứ tự trong ô lọc."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ đặt mọi thói quen này trong khuôn Lưới dùng chung, nên màn Đã gửi và các màn danh sách sau có ngay; Enter trên một dòng mở hồ sơ căn khi màn có hồ sơ (hàng 3 nối vào)."
+    },
+    {
+      "id": "AC-9",
+      "p": "Sẽ qua bài kiểm trợ năng ở bốn khổ, sáng và tối, và người dùng bàn phím đi được qua nút công cụ, tiêu đề, ô lọc rồi vào bảng bằng một điểm dừng."
+    },
+    {
+      "id": "AC-10",
+      "p": "Sẽ để người chấm nhìn ảnh xác nhận nút, ô lọc, dòng nhóm và vùng chọn đọc được, phân biệt được với dòng thường, ở cả sáng và tối."
+    },
+    {
+      "id": "AC-11",
+      "p": "Sẽ có nút «Toàn màn hình» (máy tính, từ 768px): chỉ còn bảng trên cả màn hình, thanh điều hướng và đầu màn ẩn đi, thấy nhiều dòng hơn (1440: 18 lên 21, 1024: 13 lên 17); Esc để thoát."
+    }
+  ],
+  "scope_plain": "Những việc dưới đây cố ý để hàng khác làm:",
+  "wont_do": [
+    {
+      "id": "OOS-1",
+      "p": "Chưa sửa trên ô, chưa dán từ Excel hay xoá ô: bảng vẫn chỉ đọc (hàng 4 và hàng 5)."
+    },
+    {
+      "id": "OOS-2",
+      "p": "Chưa có bảng thẻ cho điện thoại: trên điện thoại vẫn là lưới cuộn ngang (hàng 2b)."
+    },
+    {
+      "id": "OOS-3",
+      "p": "Chưa lưu cách xem: lọc, sắp, nhóm, cột chỉ giữ trong lần mở màn, trừ trạng thái của lối tắt nằm trên địa chỉ."
+    },
+    {
+      "id": "OOS-4",
+      "p": "Chưa lọc theo dự án, phân khu ở thanh bên, chưa nhóm theo loại căn, chưa kéo đổi thứ tự hay độ rộng cột, chưa dòng tổng, chưa xuất tệp."
+    },
+    {
+      "id": "OOS-5",
+      "p": "Chưa đo bảng với 5.000 căn: đo khi nối dữ liệu thật."
+    },
+    {
+      "id": "OOS-6",
+      "p": "Chưa lưu cách xem thành mục ở cột thứ hai (việc lưu góc nhìn đang gác), chưa có toàn màn hình trên điện thoại."
+    }
+  ],
+  "coverage_plain": [
+    {
+      "i": 0,
+      "p": "Mọi thao tác của câu giao (phím, chép, sắp, lọc, nhóm, cột, lối tắt, mở dòng) và chế độ toàn màn hình anh vừa chốt đều có tiêu chí riêng, AC-1 đến AC-8 và AC-11."
+    },
+    {
+      "i": 1,
+      "p": "Sáu kiểu cột (chữ, tiền, diện tích, số, trạng thái, ngày) đều được sắp và lọc thử trên 60 căn mẫu (AC-3, AC-4)."
+    },
+    {
+      "i": 2,
+      "p": "Bốn khổ màn 360, 414, 1024, 1440, cả sáng và tối, có bài kiểm phím, trợ năng và ảnh (AC-1, AC-9, AC-10)."
+    },
+    {
+      "i": 3,
+      "p": "Các cặp dùng chung (lọc + nhóm, sắp + nhóm, ẩn cột + nhóm, ẩn cột + chép, lối tắt + lọc thêm) đều có ca đo (AC-2, AC-5, AC-6, AC-7)."
+    },
+    {
+      "i": 4,
+      "p": "Mỗi bài đo có ca phá chứng nó đỏ khi tính năng hỏng, kèm câu báo ghim sẵn."
+    },
+    {
+      "i": 5,
+      "p": "Đo cả trên Bảng hàng lẫn một màn danh sách khác dùng cùng khuôn, để biết thói quen không bị viết riêng cho Bảng hàng (AC-8)."
+    }
+  ],
+  "gap_probe_plain": [
+    {
+      "i": 0,
+      "p": "Hai lựa chọn máy tự quyết chưa có căn cứ đủ chặt (bỏ nút Xuất, cho chọn nhiều ở ô lọc trạng thái). Đã sửa: bỏ Xuất thành câu hỏi Hỏi-4 cho anh; chọn nhiều giữ vì thành phần lọc có sẵn của kho là chọn nhiều."
+    },
+    {
+      "i": 1,
+      "p": "Một dòng sổ thay nhầm dòng khác nên quyết định thứ tự trạng thái suýt mất khỏi thẻ. Đã ghi lại dòng thứ tự trạng thái."
+    },
+    {
+      "i": 2,
+      "p": "Bài kiểm bàn phím mâu thuẫn với tiêu chí (ô lọc phải vào được bằng Tab). Đã viết lại theo danh sách điểm dừng đếm trước, có ca phá khi một ô lọc bị rút khỏi Tab."
+    },
+    {
+      "i": 3,
+      "p": "Bài chép chưa chép cột giá và trạng thái, chưa thử Cmd+C. Đã thêm: chép giá, trạng thái, so cả chuỗi, thử cả Ctrl+C và Cmd+C."
+    },
+    {
+      "i": 4,
+      "p": "Chưa đo sắp xếp khi đang nhóm và lối tắt rồi lọc thêm. Đã thêm cả hai ca, mỗi ca có ca phá."
+    }
+  ]
+}
