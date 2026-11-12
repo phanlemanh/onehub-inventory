@@ -18,7 +18,12 @@ feature_slug: danh-muc-can-nhu-onehub-invest
 #   Khoá: bld_/stk_/unt_ + 26 ký tự 0-9A-HJKMNP-TV-Z; từ chối bld_ 25 ký tự, unt_…I…, blk_….
 #   Chuyển mẫu: ảnh chụp danh mục cũ lấy bằng `git show <commit trước hàng>:src/modules/catalog/sample.ts` chạy qua
 #   tsx — không viết tay; 432 căn, 60 upi của buildSampleListings.
-#   Bảng danh mục: catalog_nodes, catalog_buildings, catalog_stacks, catalog_units, catalog_aliases (5).
+#   Bảng danh mục: catalog_nodes, catalog_buildings, catalog_stacks, catalog_units, catalog_aliases (5); bảng của sàn:
+#   company_catalog_aliases (trỏ toà hay căn bằng khoá ngoại, đúng một trong hai).
+#   Mã riêng (E16, E17) — bộ dữ liệu viết trước: sàn A: toà S1.05 gọi «Sapphire 5» (ten), căn S1.05-1208 ghi «SA5-12.08» (ma);
+#     sàn A còn ghi «S1.05-1209» (ma) trỏ căn S1.05-1210 — chuỗi trùng mã gốc của căn khác, tra trong A phải ra S1.05-1210
+#     nguồn 'san'; sàn B: «SA5-12.08» trỏ căn E1-0903. Tra: 'SA5-12.08' trong A → S1.05-1208 'san'; trong B → E1-0903 'san';
+#     'vinhomes-ocean-park-1/S1.05-1208' → 'goc'; 'Q12A-17-05A' → 'doc' (Q12A/17/05A); 'XYZ' → 'khong-tim-thay'.
 evals:
   - id: E1
     criterion: AC-1
@@ -107,7 +112,7 @@ evals:
     cmd: config:executors.script.danh_muc_db_r
     paths: [db/migrations/**, tests/db/danh-muc*.ts]
     layer: backend-effect
-    expected: "exit 0; ca 'danh-muc-chi-doc': dưới vai quy_hang_app, sàn A, sàn B và phiên chưa chọn sàn đều đọc được cùng số dòng của năm bảng; insert, update, delete, truncate trên từng bảng đều lỗi permission denied; select agreement_id lỗi permission denied; danh sách cột vai đọc được của mỗi bảng bằng đúng danh sách viết trước trong bài"
+    expected: "exit 0; ca 'danh-muc-chi-doc': dưới vai quy_hang_app, sàn A, sàn B và phiên chưa chọn sàn đều đọc được cùng số dòng của năm bảng; insert, update, delete, truncate trên từng bảng đều lỗi permission denied; danh sách cột vai đọc được của mỗi bảng bằng đúng danh sách viết trước trong bài"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E12
@@ -123,7 +128,7 @@ evals:
     executor: script
     cmd: config:executors.script.danh_muc_db_r
     paths: [db/migrations/**, ontology/**, tests/db/danh-muc*.ts]
-    expected: "exit 0; ca 'cot-khop-ontology': với mỗi bảng danh mục, tập cột (bỏ agreement_id và cột hệ thống đã liệt trong bài) bằng tập thuộc tính của thực thể ontology tương ứng đổi sang snake_case; bản sao ontology thêm một thuộc tính không có cột làm ca đỏ với thông điệp nêu thực thể và thuộc tính"
+    expected: "exit 0; ca 'cot-khop-ontology': với sáu bảng (năm bảng danh mục chung và company_catalog_aliases), tập cột (bỏ đúng các cột hệ thống liệt trong bài: created_at, retired_at, first_seen) bằng tập thuộc tính của thực thể ontology tương ứng đổi sang snake_case; hai bản sao làm ca đỏ với thông điệp nêu bảng hay thực thể và cột hay thuộc tính: ontology thêm một thuộc tính không có cột, và một bảng danh mục thêm cột agreement_id không có trong ontology"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E14
@@ -131,7 +136,7 @@ evals:
     executor: script
     cmd: config:executors.script.check
     paths: [ontology/**, src/generated/**, src/modules/catalog/**]
-    expected: "exit 0; make check xanh: make ontology không báo lệch giữa ontology, wiki và mã sinh; không nhãn nào gõ cứng trong src (Phân khu, Trục, Tầng, Mã gốc lấy từ LABELS)"
+    expected: "exit 0; make check xanh: make ontology không báo lệch giữa ontology, wiki và mã sinh; không nhãn nào gõ cứng trong src (Phân khu, Trục, Tầng, Mã gốc, Mã riêng lấy từ LABELS)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E15
@@ -143,10 +148,18 @@ evals:
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E16
-    criterion: AC-7
+    criterion: AC-9
     executor: script
     cmd: config:executors.script.danh_muc_db_r
-    paths: [db/migrations/**, tests/db/danh-muc*.ts, src/modules/catalog/**]
+    paths: [db/migrations/**, db/tests/**, tests/db/danh-muc*.ts]
     layer: backend-effect
-    expected: "exit 0; ca 'khoa-san-dung-loai' dưới vai chủ bảng: sau khi nạp mẫu, mọi dòng của năm bảng có agreement_id không trống và nối được tới một thoả thuận kind = 'catalog_source' của sàn mẫu (đối chứng dương: thêm một toà với thoả thuận catalog_source thành công); thêm dòng agreement_id trống lỗi not-null, thêm dòng trỏ thoả thuận kind 'spreadsheet' lỗi khoá ngoại với tên ràng buộc ghim trong thông điệp"
+    expected: "exit 0; ca 'ma-rieng-cua-san' dưới vai quy_hang_app: sàn A thêm mã riêng 'SA5-12.08' trỏ một unt_ có trong danh mục và đọc lại được (đối chứng dương); sàn B đọc bảng mã riêng thấy 0 dòng của A; phiên chưa chọn sàn đọc thấy 0 dòng, không lỗi; B thêm cùng chuỗi trỏ một unt_ khác thành công; A thêm lần hai cùng chuỗi trỏ đối tượng khác lỗi vi phạm chỉ mục duy nhất (company_id, kind, value); A thêm dòng đứng tên B lỗi luật theo dòng; A thêm mã riêng trỏ unt_ không có trong danh mục lỗi khoá ngoại với tên ràng buộc ghim; số dòng của năm bảng danh mục chung trước và sau bằng nhau. Chiều đỏ cùng bộ chạy cách ly: tệp phá ma-rieng-doc-mo (thêm luật đọc using (true) trên company_catalog_aliases) làm bộ kiểm in 'HỎNG luat-doc-ghi-theo-san: company_catalog_aliases — luật ma_rieng_doc_mo không đúng dạng cho phép: true' và bộ chạy in 'ok' cho tệp phá ấy"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E17
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.danh_muc
+    paths: [src/modules/catalog/**]
+    expected: "exit 0; hàm tra mã thuần với ba nguồn dựng trong bài: mã có ở mã riêng của sàn → trả đối tượng ấy và nguồn 'san' dù chuỗi cũng khớp mã gốc của đối tượng khác; mã chỉ có ở mã gốc → nguồn 'goc'; mã chỉ đọc được bằng bộ đọc → nguồn 'doc' kèm toà, tầng, trục; mã không có đâu → không ra đối tượng, lý do 'khong-tim-thay'; tra với mã riêng của sàn B không bao giờ ra mã riêng của A (hàm nhận mã riêng của đúng một sàn)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

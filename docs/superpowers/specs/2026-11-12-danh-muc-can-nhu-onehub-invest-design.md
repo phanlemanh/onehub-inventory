@@ -42,13 +42,36 @@ khoá sàn nào (không `company_id`, không luật theo dòng theo sàn).
   như invest.
 - Cùng tệp, dòng 18–33 và 74–93: bảng dùng chung không có `company_id`, ép luật theo dòng, mọi sàn đọc (`using (true)`);
   ghi phải qua thoả thuận `catalog_source` còn hiệu lực của một sàn tin cậy, mỗi dòng mang `agreement_id`, sàn khác
-  không đọc được cột này (`014_danh_muc_doc_cua_minh.sql`). **Giữ**: đây là «khoá sàn mà onehub-invest không có» — xem
-  Hỏi-1.
+  không đọc được cột này (`014_danh_muc_doc_cua_minh.sql`). **Giữ** phần bảng dùng chung chỉ đọc; **để hàng 12** phần
+  ghi có thoả thuận nguồn (dấu sàn cấp dòng chỉ có nghĩa khi có đường ghi).
+- `docs/adr/0018-cau-hinh-theo-san.md` và `docs/product/tham-chieu.md:111-124`: ba lớp «lõi chuẩn · cách gọi riêng ·
+  trường riêng», có rào — không đối tượng tự tạo, không công thức, không bố cục tự dựng; trường riêng là `jsonb` trên lần
+  chào kèm bảng định nghĩa theo sàn (`043_truong_rieng.sql`, trần 20 trường, 30 lựa chọn); nhãn riêng ở
+  `company_settings` (`039_cach_goi_rieng.sql`); từ điển giá trị cho ba trường (`051_tu_dien_cua_san.sql`). Lời chủ kho
+  ghi trong ADR: «trước đây sự thiếu linh hoạt thường mang lại thất bại». **Giữ** khung ba lớp: hàng này dựng lõi và một
+  phần lớp của sàn chạm thẳng danh mục (mã và tên riêng); nhãn riêng, trường riêng, từ điển đề xuất thành hàng 7e.
+- Quỹ hàng **không có** bảng nối mã riêng của một sàn với danh mục chung (ADR-0026 chỉ gợi ý, «mã ngoài danh mục vẫn lưu
+  được»). Đây là chỗ hở hàng này lấp: sàn gõ mã theo thói quen của mình mà vẫn trỏ đúng căn chuẩn.
 - `packages/core/src/catalog/code-rule.ts`: luật đọc mã là dữ liệu theo dự án, một luật. **Bỏ** cho bộ đọc này: lấy bộ 8
   dạng của invest vì hai sản phẩm phải đọc chung mã; luật theo sàn để sau.
 - `packages/db/tests/danh-muc-dung-chung.test.mjs`: bộ kiểm riêng cho bảng dùng chung (đọc được ở mọi sàn, không ai
   ghi, cột đọc được viết sẵn). **Giữ** cách ấy trong một tệp kiểm mới của hàng này.
 - Không có bảng bí danh mã căn (chỉ `company_value_aliases` cho ba trường). **Không có** — lấy từ invest.
+
+## Khung: chuẩn ở lõi, linh hoạt ở lớp của sàn
+
+Chủ kho 12/11: chuẩn hoá danh mục như onehub-invest vì cùng gốc RESO, nhưng không cứng — sàn môi giới thường thiếu
+chuẩn hoá, triển khai không đổi được thì thất bại. Hai lực ấy không trái nhau nếu tách hai lớp:
+
+| Lớp                                      | Ai đọc, ai ghi                                   | Gồm                                                                                               | Hàng       |
+| ---------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ---------- |
+| Lõi chuẩn — danh mục chung               | Mọi sàn đọc, invest đọc chung; không sàn nào sửa | Dự án, phân khu, toà, trục, căn, mã gốc; tên và khoá theo RESO                                    | 7d         |
+| Lớp của sàn — chạm danh mục              | Chỉ sàn ấy                                       | Mã và tên riêng sàn gọi toà, căn                                                                  | 7d         |
+| Lớp của sàn — cách gọi và thông tin thêm | Chỉ sàn ấy                                       | Nhãn riêng (đổi chữ hiện của Dự án, Phân khu, Trục…), trường riêng trên lần chào, từ điển giá trị | đề xuất 7e |
+
+Luật của khung: một sàn không bao giờ sửa được lõi; mọi thứ riêng của sàn nằm ở bảng có `company_id` và luật theo dòng
+như mọi bảng của sàn; nghĩa vẫn do lõi giữ, chữ riêng chỉ là chữ hiện (Quỹ hàng `packages/core/src/labels/index.ts:3-5`).
+Rào giữ theo ADR-0018: không đối tượng tự tạo, không công thức, không luồng tự vẽ.
 
 ## Thiết kế
 
@@ -61,11 +84,12 @@ khoá sàn nào (không `company_id`, không luật theo dòng theo sàn).
 | Thực thể mới | `Building` — toà; cha là phân khu nếu biết, không thì dự án                                                            | Toà (đã có)    | `Building`: `BuildingKey`, `BuildingName`     |
 | Thực thể mới | `Stack` — trục của một toà                                                                                             | Trục (mới)     | mở rộng riêng, như invest                     |
 | Sửa          | `Unit` thêm `unitKey`, `stackKey`, `complexKey`; `buildingKey` đổi nghĩa thành khoá `bld_`; `floor` đổi từ số sang chữ | Tầng (mới)     | `UnitFloorLocation`, `UniversalPropertySubId` |
+| Thực thể mới | `CompanyCatalogAlias` — mã, tên riêng sàn gọi toà, căn; có `companyId`                                                 | Mã riêng (mới) | không có; riêng của ta                        |
 | Thực thể mới | `CatalogAlias` — mã gốc và tên của toà, trục, căn                                                                      | Mã gốc (mới)   | không có; riêng của ta                        |
 | Luật mới     | `complex-under-project`, `prefixed-keys`, `floor-text`, `one-active-original-code`                                     | —              | —                                             |
 
 `Unit.upi` giữ nguyên để `ListingUnit` không đổi (đổi liên kết sang `unitKey` là việc sau). `subdivisionKey` của căn
-giữ tên, nghĩa là khoá dự án. Bảng thuật ngữ thêm bốn dòng: Phân khu, Trục, Tầng, Mã gốc, kèm từ tránh dùng («Khu»
+giữ tên, nghĩa là khoá dự án. Bảng thuật ngữ thêm năm dòng: Phân khu, Trục, Tầng, Mã gốc, Mã riêng, kèm từ tránh dùng («Khu»
 vẫn tránh như lời chốt ở hàng 2).
 
 ### Lưu trữ (migration 007, số do giám sát cấp)
@@ -82,12 +106,11 @@ Bảng ở schema `public`, tên mở đầu `catalog_` như Quỹ hàng:
 - `catalog_aliases`: `object_key` khớp `^(bld|stk|unt)_`, `kind` ∈ {`ma_goc`, `ten`}, `value`, `source`, `first_seen`,
   `retired_at`; mã gốc còn hiệu lực là duy nhất theo `(source, kind, value)`; giá trị mã gốc là
   `<slug dự án>/<MÃ VIẾT HOA>` như invest.
-- Khoá sàn (theo khuyến nghị Hỏi-1): mỗi bảng có `agreement_id` không trống, khoá ngoại ghép `(agreement_id,
-agreement_kind)` → `agreements (id, kind)` với `agreement_kind` cố định `catalog_source` (thêm ràng buộc duy nhất
-  `(id, kind)` trên `agreements`), nên dòng trỏ thoả thuận loại khác bị từ chối; vai của API không đọc được cột này. Nạp
-  mẫu dùng thoả thuận `catalog_source` của sàn mẫu MAU. Đây là chạm SP-1: dữ liệu theo sàn trong bảng không có
-  `company_id`, che bằng quyền theo cột — giữ đúng ngoại lệ «The shared catalog is the only exception» của AGENTS.md và
-  danh sách danh mục chung của hàng 9a, không nới thêm.
+- Mã và tên riêng của sàn (Hỏi-1): `company_catalog_aliases` — `company_id`, `building_key` hay `unit_key` (khoá ngoại tới danh mục, đúng một trong hai),
+  `kind` ∈ {`ma`, `ten`}, `value`, `created_at`, `retired_at`; duy nhất theo `(company_id, kind, value)` khi còn hiệu
+  lực; luật theo dòng dạng chuẩn `company_id = app.current_company_id()` cho đọc và ghi. Là bảng của sàn bình thường, nằm
+  trong phạm vi các ca có sẵn của bộ kiểm cách ly, không phải ngoại lệ.
+- Tra mã (`index.ts`, thuần): mã riêng của sàn → mã gốc của danh mục → bộ đọc 8 dạng; hàm nhận mã riêng của đúng một sàn.
 - Mỗi bảng bật và ép luật theo dòng, một luật đọc `using (true)`, vai của API chỉ được đọc; không ai ghi qua API ở hàng
   này. Năm bảng vào danh sách danh mục chung đã khai của bộ kiểm cách ly (cạnh `app.permissions` của hàng 9a), nên bảng
   thứ sáu không khai vẫn làm bộ kiểm đỏ.
@@ -111,7 +134,7 @@ agreement_kind)` → `agreements (id, kind)` với `agreement_kind` cố định
   chào, từng căn giữ `upi`, toà, tầng, trục; mã cũ tra qua bí danh ra đúng căn; 60 lần chào mẫu dựng từ danh mục mới
   giống hệt bản dựng từ danh mục cũ (không màn nào đọc `floor` hay `buildingKey` hôm nay, bài này giữ điều đó).
 - Cơ sở dữ liệu (`tests/db/` tệp mới, Postgres dãy R): ràng buộc khoá, tầng, cha của phân khu, mã gốc trùng; mọi sàn và
-  phiên chưa chọn sàn đọc được; vai API không thêm, sửa, xoá, xoá sạch; không đọc được `agreement_id`; các cột vai đọc
+  phiên chưa chọn sàn đọc được; vai API không thêm, sửa, xoá, xoá sạch; mã riêng của sàn A không lộ sang B; các cột vai đọc
   được khớp danh sách viết trước; cột của bảng khớp thuộc tính của ontology.
 - Bộ kiểm cách ly (`db/scripts/cach-ly.sh`) xanh, kèm một tệp phá mới: cấp quyền thêm trên `catalog_units` cho vai API thì
   đỏ với dòng ghim.
@@ -122,12 +145,14 @@ Không có — hàng này không đổi màn nào (sổ: «bỏ đặc-tả-UX»
 
 ## Lựa chọn và căn cứ
 
-Xem `_acceptance/danh-muc-can-nhu-onehub-invest/decisions.jsonl`. Bốn câu cho chủ kho: Hỏi-1 nghĩa của «khoá sàn»,
-Hỏi-2 tên toà là cột hay bí danh, Hỏi-3 duyệt các thay đổi mô hình nghiệp vụ, Hỏi-4 bộ đọc đúng 8 dạng của invest.
+Xem `_acceptance/danh-muc-can-nhu-onehub-invest/decisions.jsonl`. Năm câu cho chủ kho: Hỏi-1 «khoá sàn» là lớp của sàn trên danh mục,
+Hỏi-2 tên toà là cột hay bí danh, Hỏi-3 duyệt các thay đổi mô hình nghiệp vụ, Hỏi-4 bộ đọc đúng 8 dạng của invest, Hỏi-5 mở hàng 7e (nhãn riêng, trường riêng, từ điển giá
+trị của sàn) ngay sau hàng này, lật quyết định hoãn L4/H4 của phạm vi MVP — máy khuyên mở; lối khác: giữ hoãn tới đợt 3.
 
 ## Ngoài phạm vi
 
 - Ghi danh mục qua `/api/v1` (thêm căn, nhập Excel) và vòng đời gộp, tách, ngừng của toà, căn: hàng 12 và sau.
 - `ListingUnit` trỏ `unitKey` thay cho `upi`; màn Bảng hàng theo địa lý (2d).
-- Mã căn riêng của từng sàn (bí danh theo sàn), luật đọc mã theo dự án.
+- Luật đọc mã theo dự án.
+- Nhãn riêng, trường riêng, từ điển giá trị của sàn: đề xuất hàng 7e (xem Khung).
 - Đồng bộ thật với cơ sở dữ liệu của onehub-invest.
