@@ -2,12 +2,11 @@
 loai: chu-de
 ma: [N2, N6]
 nguon: [raw/2026-11-11-so-boi-canh-quy-hang/chi-muc.md]
-cap_nhat: 2026-11-11
+cap_nhat: 2026-11-12
 ---
 # Đăng nhập
 
-Quy ước nguồn như [trang Sản phẩm](../nen/san-pham.md): `qh:` là Quỹ hàng ở commit `1729b11f`. Đường mở đầu
-`nhánh chore/nen-chon-truoc-tao-sau:` chưa gộp vào `main`, số dòng có thể đổi.
+Quy ước nguồn như [trang Sản phẩm](../nen/san-pham.md): `qh:` là Quỹ hàng ở commit `1729b11f`.
 
 ## Vì sao có
 
@@ -50,7 +49,8 @@ Quy ước nguồn như [trang Sản phẩm](../nen/san-pham.md): `qh:` là Qu�
 
 - Giữ N2 mã qua email, N6 menu tài khoản và đăng xuất, giữ nguyên các con số của Quỹ hàng; tự viết gọn trong mô-đun
   `identity`. `docs/plan/pham-vi-mvp-dot-1.md:25,35` · `wiki/decisions/0021-dang-nhap-ma-email.md:30-37`
-- Bỏ mật khẩu (L11) và đổi sàn trong ứng dụng (L12); chọn sàn chỉ có lúc đăng nhập. `docs/plan/pham-vi-mvp-dot-1.md:72-73` ·
-  `wiki/decisions/0021-dang-nhap-ma-email.md:41`
+- Bỏ mật khẩu (L11). `docs/plan/pham-vi-mvp-dot-1.md:72`
+- Chọn sàn có ở màn đăng nhập, và đổi sàn trong ứng dụng đã có ở menu tài khoản (hàng 8), dù bản phạm vi ghi L12 là cắt.
+  `wiki/decisions/0021-dang-nhap-ma-email.md:41` · `docs/superpowers/specs/2026-11-11-dang-nhap-ma-email-design.md:21`
 - Màn đăng nhập chọn lại ở hàng 1p, có `auth-15` trong các ứng viên, luật an toàn giữ nguyên.
-  `nhánh chore/nen-chon-truoc-tao-sau:docs/plan/lo-trinh.json:274-285`
+  `docs/plan/lo-trinh.json:274-285`
