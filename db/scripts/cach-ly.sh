@@ -2,7 +2,7 @@
 # Company isolation suite (SP-1, hồ sơ cach-ly-moi-san). Runs on this lane's Postgres container, never on real data:
 #   1. a fresh scratch database, migrations applied twice (the second run applies nothing);
 #   2. db/tests/cach-ly.sql — 20 cases under the API role, using the door's own statements;
-#   3. ten break cases (twenty-one break files), each file on its own scratch database: the suite must go red with the
+#   3. ten break cases (twenty-four break files), each file on its own scratch database: the suite must go red with the
 #      pinned messages.
 # Every case prints `ok <case>` exactly once; the last line is `cach-ly: 31 ca đạt, vai quy_hang_app`.
 # Missing, repeated or failing cases are named and the exit code is not 0.
@@ -60,11 +60,11 @@ pha_thu_tep() {
     bo-ep-luat) printf '%s\n' bo-ep-luat ;;
     luat-them-khong-kiem)
       printf '%s\n' luat-them-khong-kiem luat-them-khong-kiem-doi-tac luat-ghi-for-all-doi-tac luat-xoa-doi-tac ;;
-    luat-doc-mo) printf '%s\n' luat-doc-mo luat-doc-mo-hoac-true luat-doc-mo-khac-san ;;
+    luat-doc-mo) printf '%s\n' luat-doc-mo luat-doc-mo-hoac-true luat-doc-mo-khac-san ma-rieng-doc-mo ;;
     bang-moi-luat-mo) printf '%s\n' bang-moi-luat-mo ;;
     ghi-bi-chan) printf '%s\n' ghi-bi-chan ;;
     quyen-nguy-hiem) printf '%s\n' cap-xoa-sach cap-trigger-public ;;
-    bang-khong-luat) printf '%s\n' bang-schema-khac bang-public-khong-cot-san ;;
+    bang-khong-luat) printf '%s\n' bang-schema-khac bang-public-khong-cot-san danh-muc-ghi-duoc danh-muc-khong-khai ;;
     dang-xem-vuot) printf '%s\n' dang-xem-thuong dang-xem-vat-chat ;;
     ham-dac-quyen) printf '%s\n' ham-dac-quyen-public ham-trigger-dac-quyen ;;
     dang-xem-chi-ghi) printf '%s\n' dang-xem-chi-xoa dang-xem-chi-sua-cot dang-xem-chi-them-schema-khac ;;
@@ -81,12 +81,18 @@ pha_thu_ghim() {
     luat-doc-mo | luat-doc-mo-hoac-true)
       printf '%s\n' "HỎNG chua-dat-san-khong-thay-gi: agreements" "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     luat-doc-mo-khac-san) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: agreements" ;;
+    ma-rieng-doc-mo)
+      printf '%s\n' "HỎNG luat-doc-ghi-theo-san: company_catalog_aliases — luật ma_rieng_doc_mo không đúng dạng cho phép: true" ;;
     bang-moi-luat-mo) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: bang_mau_cach_ly" ;;
     ghi-bi-chan) printf '%s\n' "HỎNG a-ghi-duoc-dong-cua-minh" ;;
     cap-xoa-sach) printf '%s\n' "HỎNG vai-api-khong-quyen-nguy-hiem: public.agreements TRUNCATE" ;;
     cap-trigger-public) printf '%s\n' "HỎNG vai-api-khong-quyen-nguy-hiem: public.companies TRIGGER" ;;
     bang-schema-khac) printf '%s\n' "HỎNG vai-api-chi-cham-bang-co-luat: kho_ngoai.listings_mau" ;;
     bang-public-khong-cot-san) printf '%s\n' "HỎNG vai-api-chi-cham-bang-co-luat: public.bang_tra_cuu_mau" ;;
+    danh-muc-ghi-duoc)
+      printf '%s\n' "HỎNG vai-api-chi-cham-bang-co-luat: public.catalog_units — vai ghi được danh mục chung" ;;
+    danh-muc-khong-khai)
+      printf '%s\n' "HỎNG vai-api-chi-cham-bang-co-luat: public.catalog_khong_khai — bảng không có company_id mà vai chạm được, không phải danh mục chung đã khai" ;;
     dang-xem-thuong) printf '%s\n' "HỎNG dang-xem-khong-vuot-luat: public.agreements_tat_ca" ;;
     dang-xem-vat-chat) printf '%s\n' "HỎNG dang-xem-khong-vuot-luat: public.agreements_dem" ;;
     ham-dac-quyen-public) printf '%s\n' "HỎNG ham-dac-quyen-trong-danh-sach: public.dem_moi_thoa_thuan" ;;
