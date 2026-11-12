@@ -62,6 +62,14 @@ ký `bang-hang-kieu-sheet` (hàng 14) và `bang-hang-dang-the` (hàng 32).
   hàng cho chúng và hàng 2 là bản đọc; sửa trên ô — hàng B4; hồ sơ căn cạnh bảng — hàng 3; đọc từ kho trên máy (lọc
   không gọi mạng) — luật kho: chưa giữ dữ liệu sàn trên máy trước khi xong MVP; mười sáu cột — dữ liệu mẫu hàng 1 chưa có
   loại căn, phí, nội thất, pháp lý, tài chính, mức đủ; bảng thẻ điện thoại — Hỏi-5.
+- **Địa lý rộng → hẹp (chủ kho nêu 2026-11-12, sau Cổng Phạm vi).** Đầu chủ làm việc theo Dự án → Phân khu → Toà → Tầng,
+  Sheet chia tab theo dự án, lọc bằng cột. Quỹ hàng: danh mục «khu (`SubdivisionName`) → toà / phân khu → trục / dãy → căn»
+  (`docs/product/tham-chieu.md:67`); mỗi khu một tab Sheet (`docs/product/ghi-chep/2026-10-28-desktop-app.md:13`); góc
+  nhìn đã lưu thay các tab (`docs/product/tham-chieu.md:75`); đổi `project` thành `SubdivisionName` trong lõi
+  (`_acceptance/khu-va-loai-hinh/contract.md`, AC-1); «khu phụ trách» là khái niệm khác, do sàn tự đặt (`docs/adr/0006-vai-khu-va-loi-moi.md:21`);
+  hàng chưa có mã căn chỉ biết toà (`docs/adr/0026-gan-ma-can.md`). Hàng 2 giữ: dòng xếp theo khu → toà → tầng → trục.
+  Hàng 2 không làm: cây dự án → toà ở cột thứ hai, lọc theo cột địa lý, cấp phân khu — là hàng sau, chờ chủ kho quyết.
+
 - **Khuôn Lưới (hàng 1b) khác `data-grid-editing-6` ở đâu:** cùng lưới ReUI bên dưới. Khuôn Lưới có đầu vùng tên + số
   dòng, một ô tìm chung, chia trang và bảy trạng thái vùng đã có bài kiểm; `data-grid-editing-6` có hàng lọc theo cột,
   dòng tổng, số thứ tự dòng, ô chọn, nút cột · cài đặt · xuất, cuộn liền thay chia trang, và không có trạng thái vùng.
