@@ -246,6 +246,30 @@ export function checkSampleCatalog(units: readonly Unit[]): string[] {
   return errors;
 }
 
+/**
+ * Hierarchy rules of a catalog: a complex sits under a project, a tower's complex belongs to the tower's own project,
+ * and a unit's tower, project and complex agree with that tower.
+ */
+export function checkCatalogHierarchy(c: SampleCatalog): string[] {
+  const errors: string[] = [];
+  const projects = new Set(c.subdivisions.map((s) => s.slug));
+  const complexOf = new Map(c.complexes.map((x) => [x.slug, x.subdivisionSlug]));
+  for (const x of c.complexes)
+    if (!projects.has(x.subdivisionSlug)) errors.push(`phân khu không thuộc dự án: ${x.slug}`);
+  const buildings = new Map(c.buildings.map((b) => [b.buildingKey, b]));
+  for (const b of c.buildings) {
+    if (!projects.has(b.subdivisionKey)) errors.push(`toà không thuộc dự án: ${b.buildingKey}`);
+    if (b.complexKey && complexOf.get(b.complexKey) !== b.subdivisionKey)
+      errors.push(`toà và phân khu khác dự án: ${b.buildingKey}`);
+  }
+  for (const u of c.units) {
+    const b = buildings.get(u.buildingKey);
+    if (!b || b.subdivisionKey !== u.subdivisionKey || b.complexKey !== u.complexKey)
+      errors.push(`căn lệch toà: ${u.upi}`);
+  }
+  return errors;
+}
+
 /** Every unit carries the MAU label in its UPI. */
 export function checkCatalogLabels(units: readonly Unit[]): string[] {
   return units

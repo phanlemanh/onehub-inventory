@@ -9,6 +9,7 @@ import {
   UNIT_CODE_FORMS,
   type UnitCodeForm,
 } from "./unit-code";
+import { sampleCatalog } from "./sample";
 
 const RIGHT: ReadonlyArray<[string, string, string, string, string]> = [
   ["gach", "Q12A-17-05A", "Q12A", "17", "05A"],
@@ -91,5 +92,14 @@ describe("tầng dạng chữ theo RESO UnitFloorLocation", () => {
     expect(normaliseFloor("07")).toBe("7");
     expect(normaliseFloor("015A")).toBe("15A");
     expect(normaliseFloor("00")).toBe("0");
+  });
+});
+
+describe("tầng của danh mục mẫu", () => {
+  it("mọi căn mẫu có tầng là chữ khớp ^[0-9]+[A-Z]?$, không số 0 đầu", () => {
+    const bad = sampleCatalog().units.filter(
+      (u) => typeof u.floor !== "string" || !isFloor(u.floor),
+    );
+    expect(bad.map((u) => u.upi)).toEqual([]);
   });
 });

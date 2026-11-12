@@ -79,7 +79,7 @@ evals:
     executor: script
     cmd: config:executors.script.danh_muc_db_r
     paths: [db/migrations/**, tests/db/danh-muc*.ts, src/modules/catalog/**]
-    expected: "exit 0; ca 'ma-goc-bi-danh': sau khi nạp danh mục mẫu, mỗi toà, trục, căn có đúng một mã gốc còn hiệu lực dạng '<slug dự án>/<MÃ VIẾT HOA>'; tra 'vinhomes-ocean-park-1/S1.05-1208' ra đúng một unt_; thêm lại cùng (source, kind, value) còn hiệu lực lỗi vi phạm chỉ mục duy nhất; đặt retired_at cho dòng cũ rồi thêm lại thì thành công"
+    expected: "exit 0; ca 'ma-goc-bi-danh': sau khi nạp danh mục mẫu, mỗi toà, trục, căn có đúng một mã gốc còn hiệu lực dạng '<slug dự án>/<MÃ VIẾT HOA>'; tra 'op1/S1.05-1206' ra đúng một unt_; thêm lại cùng (source, kind, value) còn hiệu lực lỗi vi phạm chỉ mục duy nhất; đặt retired_at cho dòng cũ rồi thêm lại thì thành công"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E8
@@ -129,7 +129,7 @@ evals:
     executor: script
     cmd: config:executors.script.danh_muc_db_r
     paths: [db/migrations/**, ontology/**, tests/db/danh-muc*.ts]
-    expected: "exit 0; ca 'cot-khop-ontology': với sáu bảng (năm bảng danh mục chung và company_catalog_aliases), tập cột (bỏ đúng các cột hệ thống liệt trong bài: created_at, retired_at, first_seen) bằng tập thuộc tính của thực thể ontology tương ứng đổi sang snake_case; hai bản sao làm ca đỏ với thông điệp nêu bảng hay thực thể và cột hay thuộc tính: ontology thêm một thuộc tính không có cột, và một bảng danh mục thêm cột agreement_id không có trong ontology"
+    expected: "exit 0; ca 'cot-khop-ontology': với sáu bảng (năm bảng danh mục chung và company_catalog_aliases), tập cột (cộng đúng các cột hệ thống liệt trong bài: node_type, parent_type của catalog_nodes, subdivision_type của catalog_buildings — cột sinh để khoá ngoại ghép giữ cấp; catalog_nodes so với hợp của Subdivision và Complex) bằng tập thuộc tính của thực thể ontology tương ứng đổi sang snake_case; hai bản sao làm ca đỏ với thông điệp nêu bảng hay thực thể và cột hay thuộc tính: ontology thêm một thuộc tính không có cột, và một bảng danh mục thêm cột agreement_id không có trong ontology"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E14
