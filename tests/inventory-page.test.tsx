@@ -100,3 +100,56 @@ describe("inventory page (E12)", () => {
     await expect(checkPage(blind)).rejects.toThrow("page honours state in production: loading");
   });
 });
+
+describe("status shortcuts open the page filtered (row 2a, E10)", () => {
+  type FilterProps = { filters?: Record<string, unknown> };
+  async function filtersFor(
+    page: PageFn,
+    status: string | string[],
+  ): Promise<FilterProps["filters"]> {
+    const tree = await page({
+      searchParams: Promise.resolve({ status } as unknown as Record<string, string>),
+    });
+    const children = (tree.props as { children: ReactElement[] }).children;
+    const grid = children.find((child) => child.type === InventoryGrid);
+    if (!grid) throw new Error("page has no inventory grid");
+    return (grid.props as FilterProps).filters;
+  }
+
+  // Written ahead: six statuses and one unknown value = 7 cells.
+  const CELLS: [string, Record<string, unknown>][] = [
+    ["Active", { "Listing.standardStatus": ["Active"] }],
+    ["Incomplete", { "Listing.standardStatus": ["Incomplete"] }],
+    ["Pending", { "Listing.standardStatus": ["Pending"] }],
+    ["Closed", { "Listing.standardStatus": ["Closed"] }],
+    ["Hold", { "Listing.standardStatus": ["Hold"] }],
+    ["Withdrawn", { "Listing.standardStatus": ["Withdrawn"] }],
+    ["Paused", {}],
+  ];
+
+  async function checkStatusPage(page: PageFn): Promise<void> {
+    for (const [status, want] of CELLS) {
+      const got = await filtersFor(page, status);
+      if (JSON.stringify(got ?? {}) !== JSON.stringify(want))
+        throw new Error(`page drops status: ${status}`);
+    }
+  }
+
+  it("hands the grid the status filter each shortcut asks for (7 cells)", async () => {
+    expect(CELLS).toHaveLength(7);
+    await expect(checkStatusPage(Page as unknown as PageFn)).resolves.toBeUndefined();
+    expect(await filtersFor(Page as unknown as PageFn, ["Active", "Pending"])).toEqual({
+      "Listing.standardStatus": ["Active"],
+    });
+  });
+
+  it("the check fails on a page that drops the status", async () => {
+    const dropping: PageFn = async ({ searchParams }) => {
+      const params = await searchParams;
+      return (Page as unknown as PageFn)({
+        searchParams: Promise.resolve({ ...params, status: "" }),
+      });
+    };
+    await expect(checkStatusPage(dropping)).rejects.toThrow("page drops status: Active");
+  });
+});
