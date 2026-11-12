@@ -505,6 +505,8 @@ export function DataRegion({
           size: Math.floor((widths[index] ?? column.widthCh) * chPx),
           // The first column names the row (the unit code) and always stays; any other may be hidden.
           enableHiding: index !== 0,
+          // Filters are the region's own rules (grid-view.ts); the table runs none of its own.
+          filterFn: () => true,
           cell: (info) => {
             const row = info.row.original;
             if (row.group) {
@@ -617,6 +619,17 @@ export function DataRegion({
     viewport.setAttribute("role", "region");
     viewport.setAttribute("aria-label", title);
     viewport.querySelector('table[data-slot="data-grid-table"]')?.setAttribute("aria-label", title);
+    // Frozen columns and the sticky header never cover the selected cell (design/behaviors.md, focus): the browser
+    // scrolls a cell into view past them, as far as the frozen columns are wide and the header is tall.
+    const scrollingBox =
+      viewport.querySelector<HTMLElement>('[data-slot="data-grid-table-viewport"]') ?? viewport;
+    const frozen = [...viewport.querySelectorAll<HTMLElement>("thead th[data-pinned]")];
+    const frozenWidth = frozen.reduce((sum, th) => sum + th.getBoundingClientRect().width, 0);
+    const headHeight = viewport.querySelector("thead")?.getBoundingClientRect().height ?? 0;
+    for (const box of new Set([scrollingBox, viewport])) {
+      box.style.scrollPaddingLeft = `${Math.round(frozenWidth)}px`;
+      box.style.scrollPaddingTop = `${Math.round(headHeight)}px`;
+    }
   });
 
   // Enter on a selected cell opens its row, the region's one «open row» door (the record panel of row 3).
