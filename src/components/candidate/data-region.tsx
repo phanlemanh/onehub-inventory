@@ -395,7 +395,7 @@ export function DataRegion({
     );
 
   return (
-    <section data-slot="data-region" className="flex min-w-0 flex-col">
+    <section data-slot="data-region" className="flex min-w-0 flex-col gap-3 md:flex-row">
       <span ref={chRef} aria-hidden="true" className="invisible absolute text-base">
         0
       </span>
@@ -403,7 +403,7 @@ export function DataRegion({
         0
       </span>
       {/* Arrangement after data-grid-editing-6: name on the frame's header strip; toolbar, table and pages in one panel. */}
-      <Frame className="min-w-0">
+      <Frame className="min-w-0 md:flex-1">
         <FrameHeader>
           <RegionTitle title={title} />
         </FrameHeader>
