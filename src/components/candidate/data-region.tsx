@@ -304,11 +304,14 @@ export function DataRegion({
     () => false,
   );
   const setShellFocused = shell.setFocused;
+  const fullScreenButtonRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     const onChange = () => {
       if (document.fullscreenElement) return;
       setFullScreen(false);
       setShellFocused(false);
+      // Back where the keyboard was: the button that entered full screen.
+      requestAnimationFrame(() => fullScreenButtonRef.current?.focus());
     };
     document.addEventListener("fullscreenchange", onChange);
     return () => document.removeEventListener("fullscreenchange", onChange);
@@ -709,6 +712,7 @@ export function DataRegion({
               variant={fullScreen ? "secondary" : "outline"}
               size="sm"
               aria-pressed={fullScreen}
+              ref={fullScreenButtonRef}
               data-slot="full-screen-toggle"
               onClick={toggleFullScreen}
             >
