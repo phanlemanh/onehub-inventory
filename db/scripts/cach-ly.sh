@@ -9,6 +9,8 @@
 #
 #   DB_LANE=n bash db/scripts/cach-ly.sh       (see db/scripts/psql.sh for DB_LANE and PSQL)
 #   TESTS_DIR — another copy of db/tests (tests of this runner only, tests/db/cach-ly.db.test.ts).
+#   CACH_LY_NHAN — a tag ([a-z0-9]+) put in every scratch database name, so two runs on one lane at the same time
+#   (a grading round runs its commands in parallel) never drop each other's databases.
 #
 # It only creates and drops databases named cach_ly_*.
 set -uo pipefail
@@ -18,6 +20,9 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$here/psql.sh"
 tests="${TESTS_DIR:-$here/../tests}"
 migrations="${MIGRATIONS_DIR:-$here/../migrations}"
+nhan="${CACH_LY_NHAN:-}"
+case "$nhan" in *[!a-z0-9]*) echo "từ chối: CACH_LY_NHAN chỉ gồm chữ thường và số, không phải $nhan" >&2; exit 2 ;; esac
+lanh="cach_ly_${nhan:+${nhan}_}lanh"
 
 CA_SQL=(
   doi-chung-vai-chu-thay-du
@@ -154,15 +159,15 @@ bao() {
 }
 
 # 1. Migrations applied twice on a fresh database.
-fresh_db cach_ly_lanh
+fresh_db "$lanh"
 so_tep=$(find "$migrations" -maxdepth 1 -name '[0-9][0-9][0-9]_*.sql' | wc -l | tr -d ' ')
-lan_mot=$(bash "$here/migrate.sh" cach_ly_lanh 2>&1)
+lan_mot=$(bash "$here/migrate.sh" "$lanh" 2>&1)
 rc_mot=$?
 printf '%s\n' "$lan_mot"
-lan_hai=$(bash "$here/migrate.sh" cach_ly_lanh 2>&1)
+lan_hai=$(bash "$here/migrate.sh" "$lanh" 2>&1)
 rc_hai=$?
 printf '%s\n' "$lan_hai"
-so_dong=$(pg_cmd cach_ly_lanh "select count(*) from public.schema_migrations" 2>/dev/null || echo "?")
+so_dong=$(pg_cmd "$lanh" "select count(*) from public.schema_migrations" 2>/dev/null || echo "?")
 so_da_ap=$(grep -c '^đã áp ' <<<"$lan_mot" || true)
 if [ "$so_dong" != "$so_tep" ]; then
   bao "HỎNG ap-hai-lan: sổ có $so_dong dòng, thư mục có $so_tep tệp"
@@ -175,17 +180,17 @@ else
 fi
 
 # 2. The suite on the clean database.
-lanh=$(chay_bo_kiem cach_ly_lanh)
+ket_lanh=$(chay_bo_kiem "$lanh")
 while IFS= read -r dong; do
   [ -n "$dong" ] && bao "$dong"
-done <<<"$lanh"
+done <<<"$ket_lanh"
 
 # 3. Break tests: every break file of a case must turn the suite red with its pinned lines.
 for pha in bo-ep-luat luat-them-khong-kiem luat-doc-mo bang-moi-luat-mo \
   ghi-bi-chan quyen-nguy-hiem bang-khong-luat dang-xem-vuot ham-dac-quyen dang-xem-chi-ghi; do
   loi_ca=""
   while IFS= read -r tep; do
-    db="cach_ly_pha_${tep//-/_}"
+    db="cach_ly_${nhan:+${nhan}_}pha_${tep//-/_}"
     fresh_db "$db"
     if ! bash "$here/migrate.sh" "$db" >/dev/null 2>&1 || ! pg_sql "$db" <"$tests/pha-thu/$tep.sql" >/dev/null 2>&1; then
       loi_ca+="$tep: không dựng được bản phá; "

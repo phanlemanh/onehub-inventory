@@ -112,8 +112,13 @@ const dbs: ScratchDb[] = [];
 afterEach(async () => {
   for (const db of dbs.splice(0)) await db.drop();
 });
+/**
+ * Scratch names carry this process's id: a grading round runs this file in two commands at once on one lane (the
+ * isolation command and the whole database suite), and equal names would drop each other's databases (row 7b, r1).
+ */
+const TAG = `p${process.pid}`;
 async function open(suffix: string, breakFile?: string): Promise<ScratchDb> {
-  const db = await scratchDb(suffix, breakFile, { prefix: "cach_ly_db" });
+  const db = await scratchDb(suffix, breakFile, { prefix: `cach_ly_db_${TAG}` });
   dbs.push(db);
   return db;
 }
@@ -284,7 +289,12 @@ describe("isolation runner names every broken break file (E9b)", () => {
   function runRunner(tests: string): { code: number; out: string } {
     try {
       const out = execFileSync("bash", [join(ROOT, "db/scripts/cach-ly.sh")], {
-        env: { ...process.env, DB_LANE: process.env["DB_LANE"] ?? "c", TESTS_DIR: tests },
+        env: {
+          ...process.env,
+          DB_LANE: process.env["DB_LANE"] ?? "c",
+          TESTS_DIR: tests,
+          CACH_LY_NHAN: TAG,
+        },
         encoding: "utf8",
         stdio: ["ignore", "pipe", "pipe"],
       });
@@ -308,6 +318,23 @@ describe("isolation runner names every broken break file (E9b)", () => {
       expect(r.out).toContain("cach-ly: 31 ca đạt, vai quy_hang_app");
     } finally {
       rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("a tag other than lowercase letters and digits is refused before any database is made", () => {
+    try {
+      execFileSync("bash", [join(ROOT, "db/scripts/cach-ly.sh")], {
+        env: { ...process.env, DB_LANE: process.env["DB_LANE"] ?? "c", CACH_LY_NHAN: "x; drop" },
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+      expect.unreachable("bộ chạy nhận nhãn có ký tự lạ");
+    } catch (err) {
+      const e = err as { status: number; stderr: string };
+      expect(e.status).toBe(2);
+      expect(e.stderr).toContain(
+        "từ chối: CACH_LY_NHAN chỉ gồm chữ thường và số, không phải x; drop",
+      );
     }
   });
 
