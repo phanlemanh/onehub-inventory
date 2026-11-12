@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 50f7390ab97502c65234276e56e48ff82f9aeb8b
+verified_commit: 832254c4f3ebf28a1a5143a13cd3adf141187044
 human_signoff: Manh Phan 2026-11-12
 ---
 
@@ -249,3 +249,7 @@ none — every multi-run eval is uniform
 ## Iterations
 
 Round 1: 18 eval máy đều qua, hai lệnh suite (build, e2e) xanh. Verdict PASS.
+
+### Re-pin lần 1 — 2026-11-12, do gộp nhánh chính trước khi gộp PR
+run_id: repin-20261112T133244Z-52040
+sha: 832254c4f3ebf28a1a5143a13cd3adf141187044 · suites: 3 lệnh exit 0 · evals: 18/18 eval máy đạt kỳ vọng
