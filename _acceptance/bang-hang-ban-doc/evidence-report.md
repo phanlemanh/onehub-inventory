@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: bang-hang-ban-doc
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 99e90e33bcac25f33b499b6ce22f19786b1039d0
-human_signoff:
+human_signoff: Manh Phan 2026-11-12
 ---
 
 # Evidence Report: bang-hang-ban-doc
@@ -46,7 +46,7 @@ human_signoff:
   required_evidence:
     - Ảnh nền tối ở 1440 với bộ lọc Empire (cùng khung với inventory-1440-chu-dai.png), cho thấy cột Dự án cắt bằng dấu chấm lửng mà vẫn đọc được. Lấy từ bộ ảnh chụp màn Bảng hàng trong _acceptance/bang-hang-ban-doc/evidence/, ví dụ inventory-1440-chu-dai-toi.png.
     - Hoặc sửa câu hỏi E11 để nói rõ dấu chấm lửng chỉ chấm trên inventory-1440-chu-dai.png (ảnh thứ năm, nền sáng), để phạm vi bốn ảnh không đòi ảnh tĩnh ở 360 hay nền tối phải cho thấy dấu chấm lửng.
-  human_override:  # chi nguoi ghi
+  human_override: PASS — Manh Phan 2026-11-12: Đạt
 
 ## Evidence
 

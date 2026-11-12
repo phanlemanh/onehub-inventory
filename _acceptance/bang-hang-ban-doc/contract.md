@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: [inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: _acceptance/bang-hang-ban-doc/design.md
@@ -116,3 +116,14 @@ có phép đo — vai thật chưa nối vào khung.
 
 - Hỏi-1 (cỡ trang 25) hết hiệu lực: chủ kho đổi hàng này thành «đọc như Sheet» (cuộn liền). Hỏi-2 (năm nhãn cột) đã hỏi giám sát đợt; lời đáp ghi vào sổ quyết
   định.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-12:
+  - Ngoài-1: Thẻ trình chủ kho còn xin phê một giới hạn cũ là bàn phím chưa vào được bảng trước khi trang nhận thao tác, dù lỗi này đã sửa xong.
+  - Ngoài-2: Câu hỏi cho người chấm ảnh vẫn nói bốn ảnh dù đã có ảnh thứ năm.
+  - Ngoài-3: Bài kiểm trợ năng có thể quét quá sớm, trước khi khung cuộn của bảng sẵn sàng.
+  - Ngoài-4: Trên trang mẫu nội bộ, tiêu đề phần trạng thái toàn trang dùng chữ của trạng thái căn.
+  - Ngoài-5: Khi sàn chưa có căn nào, câu báo trống viết sẵn chữ «căn».
+  - Ngoài-6: Số dòng hiện hai lần, cạnh ô tìm và ở chân bảng.
+  - Ngoài-7: Trên trang mẫu Lưới, hai cột còn mang tên cũ khác với Bảng hàng thật.
+  - Ngoài-8: Số «60 dòng» hiện cạnh ô tìm và lặp lại ở chân bảng.
+  - Ngoài-9: Bài kiểm chỉ xác nhận có huy hiệu trạng thái, chưa kiểm huy hiệu khớp đúng trạng thái của từng dòng.
+  - Ngoài-10: Bài kiểm bề rộng cột khi gõ tìm không chứng minh ô tìm thật sự đã lọc dòng.
