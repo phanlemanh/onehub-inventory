@@ -107,3 +107,9 @@ thuê, nhãn trạng thái theo cho thuê chỉ đo ở mức mô hình.
   - Ngoài-5: Bài kiểm trên điện thoại chưa so thẻ căn với đúng căn vừa chạm.
 - Ngoài-1 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Nếu sau này thẻ căn trên điện thoại hiện nhầm căn khác, bài kiểm tự động có thể không phát hiện. Hôm nay người dùng không thấy lỗi nào. — `tests/e2e/ho-so-can.spec.ts`
 - Ngoài-2 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Nếu bộ kiểm chạy thiếu một khổ màn hình, việc quét trợ năng có thể bỏ sót mà vẫn báo xanh. Người dùng không thấy gì khác đi ở sản phẩm hôm nay. — `tests/e2e/ho-so-can.spec.ts`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-12 (thẻ sau vòng 4):
+  - Ngoài-1: Bài kiểm trên điện thoại chưa so thẻ căn với đúng căn vừa chạm.
+  - Ngoài-2: Phép đếm số lượt quét trợ năng không bao giờ báo đỏ; chạy thiếu một khổ thì vẫn xanh.
+  - Ngoài-3: Cuộn trang khi hồ sơ căn đang mở có thể hơi nặng trên máy yếu.
+  - Ngoài-6: Trình đọc màn hình đọc giá trên thẻ căn mà không kèm nhãn «Giá chào».
+  - Ngoài-7: Bài kiểm trên điện thoại chỉ thấy thẻ có chữ, chưa so với căn vừa chạm.
