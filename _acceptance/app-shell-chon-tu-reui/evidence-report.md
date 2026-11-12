@@ -6,7 +6,7 @@ failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 31e8e4e7f7dc201079cb33fbd4fa079aa76f8a58
+verified_commit: 636c5028d0dc6951680d13178897a80a5f1f45d5
 human_signoff: Manh Phan 2026-11-12
 ---
 
@@ -180,3 +180,7 @@ Round 2: E10 khung ngăn trượt trùng byte với khung ngăn đóng nên chư
 Round 3: panel E8 được chấm (domain-correctness FAIL, operational-feasibility UNCERTAIN, spec-alignment PASS); chi tiết xem run-log và review-findings.
 Round 4: REJECT — bài kiểm khung chung (accessibility) hết giờ một lần. Returned to implementation.
 Round 5: mọi eval máy xanh (E1, E3, E4, E5, E7, E11 chạy lại; E2, E6, E9, E10 carry-forward); E8 chờ người quyết. PENDING-JUDGMENT.
+
+### Re-pin lần 1 — 2026-11-12, do gộp nhánh chính sau chữ ký (hàng 1m sửa đăng xuất trong menu tài khoản)
+run_id: repin-20261112T014121Z-81972
+sha: 636c5028d0dc6951680d13178897a80a5f1f45d5 · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths), E10
