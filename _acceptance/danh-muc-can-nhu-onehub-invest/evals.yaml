@@ -6,7 +6,7 @@ feature_slug: danh-muc-can-nhu-onehub-invest
 #     gach           Q12A-17-05A  → Q12A / 17 / 05A    · suýt: Q12A-1-05A
 #     cham           Q1.18.12     → Q1 / 18 / 12       · suýt: Q1.18
 #     tien-to-x      QQQQQ_Q1-X24.04 → Q1 / 24 / 04    · suýt: QQQQ_Q1-X24.04
-#     dinh-cham      QX102.01     → QX1 / 2 / 01       · suýt: QX1020.01
+#     dinh-cham      QX102.01     → QX1 / 2 / 01       · suýt: QX102.1 (QX1020.01 khớp thật: toà QX10, tầng 20)
 #     toa-cham-bon   Q6.0107.05   → Q6.01 / 7 / 05     · suýt: Q6.010.05
 #     toa-cham-dinh  Q2.1715A10   → Q2.17 / 15A / 10   · suýt: Q2.17-15A10
 #     dinh-lien      QX11807      → QX1 / 18 / 07      · suýt: QX1180
