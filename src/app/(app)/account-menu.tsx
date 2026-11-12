@@ -24,6 +24,7 @@ import {
 import { AUTH_BASE_PATH } from "@/modules/identity";
 
 import { LOGIN_COPY as COPY } from "../login/copy";
+import { signOut } from "../login/sign-out";
 
 import { useSwitchCompany } from "./company-switch";
 
@@ -91,9 +92,13 @@ export function AccountMenu({
     await switchCompany(companyId);
   }
 
-  async function signOut() {
+  async function signOutHere() {
     setBusy(true);
-    await fetch(`${AUTH_BASE_PATH}/session`, { method: "DELETE" }).catch(() => null);
+    const done = await signOut(labels.signOut);
+    if (!done) {
+      setBusy(false);
+      return;
+    }
     router.replace("/login");
     router.refresh();
   }
@@ -150,7 +155,7 @@ export function AccountMenu({
           </>
         ) : null}
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled={busy} onClick={() => void signOut()}>
+        <DropdownMenuItem disabled={busy} onClick={() => void signOutHere()}>
           <LogOutIcon />
           {labels.signOut}
         </DropdownMenuItem>

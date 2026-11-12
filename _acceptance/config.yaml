@@ -6,6 +6,7 @@ recheck: strict         # suy từ: kho mới, chưa có báo cáo cũ
 executors:
   test:
     unit: "make test"                # suy từ: Makefile
+    proof_gate: "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose"   # thang-chon-khoi-vao-cong (1n): screen proof gate only
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
@@ -21,6 +22,9 @@ executors:
     man_mau: "npx vitest run tools/e2e_templates --coverage.enabled=false --reporter=verbose"   # bo-bai-kiem-tu-so-man (1f): register-driven suite, unit level
     dang_nhap_db: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx vitest run -c vitest.db.config.ts --reporter=verbose"   # dang-nhap-ma-email (row 8): lane Postgres, scratch databases dang_nhap_*
     dang_nhap_e2e: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx playwright test -c playwright.db.config.ts"   # dang-nhap-ma-email (row 8): browser flow on lane Postgres
+    va_dang_nhap_db: "DB_LANE=r DB_PORT=5565 npx vitest run -c vitest.db.config.ts --reporter=verbose"   # va-dang-nhap (row 1m): row 8 database tests on lane R Postgres
+    va_dang_nhap_e2e: "DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts"   # va-dang-nhap (row 1m): every sign-in browser test on lane R Postgres
+    va_dang_nhap_cach_ly: "DB_LANE=r DB_PORT=5565 bash db/scripts/cach-ly.sh"   # va-dang-nhap (row 1m): isolation suite on lane R Postgres
     moi_nguoi_db: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx vitest run -c vitest.db.config.ts tests/db/moi-nguoi.db.test.ts --reporter=verbose"   # moi-nguoi-gan-vai (row 9): lane Postgres, scratch databases moi_nguoi_*
     cach_ly_n: "DB_LANE=${DB_LANE:-n} bash db/scripts/cach-ly.sh"   # moi-nguoi-gan-vai (row 9): the isolation suite on lane N's Postgres when other lanes' containers run too
     moi_nguoi_e2e: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx playwright test -c playwright.db.config.ts tests/e2e-db/members.spec.ts"   # moi-nguoi-gan-vai (row 9): members screen on lane Postgres

@@ -1,7 +1,8 @@
-"""Readers for the screen proof gate (roadmap row 1c, decision 0019). Standard library only.
+"""Readers for the screen proof gate (roadmap rows 1c and 1n, decisions 0019 and 0023). Standard library only.
 
 Reads the screen register, the family files of the template map (`design/patterns/<family>.md`), the state matrix,
-the component registry, the ReUI catalog, contracts and their proof files (`_acceptance/<slug>/chung-minh-man.md`).
+the component registry, the ReUI catalog, the block ledger (`design/so-khoi.yaml`), the transition list and the list
+of wrapping templates (`tools/proof_gate/`), contracts and their proof files (`_acceptance/<slug>/chung-minh-man.md`).
 The rules live in check.py.
 """
 
@@ -27,6 +28,11 @@ DECISIONS_FILE = "design/decisions.yaml"
 PATTERNS_DIR = "design/patterns"
 PROOF_FILE = "chung-minh-man.md"
 RESERVED_PATTERN_FILES = {"README.md", "lech-lot.md"}
+LEDGER_FILE = "design/so-khoi.yaml"  # decision 0023: one line per thing taken into the store
+TRANSITION_FILE = "tools/proof_gate/chuyen-tiep.yaml"  # rounds past the scope gate when row 1n merged: 1c rules
+WRAPPERS_FILE = "tools/proof_gate/khuon-boc.yaml"  # templates that wrap screens (App Shell), kept by people
+CONTEXT_PAGES_DIR = "docs/tri-thuc/wiki/chu-de"  # context book of Quy hang, one page per screen
+VENDOR_DIRS = ("src/components/ui/", "src/components/reui/")  # supplier components: kept as delivered
 
 OPEN = ("draft", "approved", "implemented", "verified")
 CLOSED = ("signed-off", "machine-cleared", "da-cham-boi-thuc-te")
@@ -127,7 +133,15 @@ class Repo:
     registry_names: set[str] = field(default_factory=set)
     catalog_names: set[str] = field(default_factory=set)
     decision_ids: set[str] = field(default_factory=set)
+    registry_files: dict[str, str] = field(default_factory=dict)
+    ledger_present: bool = False
+    ledger: list[dict[str, Any]] = field(default_factory=list)
+    transition: dict[str, str] = field(default_factory=dict)  # slug -> reason
+    wrappers: set[str] = field(default_factory=set)
     errors: list[str] = field(default_factory=list)
+
+    def is_vendor(self, name: str) -> bool:
+        return self.registry_files.get(name, "").startswith(VENDOR_DIRS)
 
     def family_of(self, screen_id: str) -> Family | None:
         screen = self.screens.get(screen_id) or {}
@@ -216,12 +230,51 @@ def load_repo(root: Path) -> Repo:
             for comp in data.get("components", []):
                 if isinstance(comp, dict) and comp.get("name"):
                     repo.registry_names.add(str(comp["name"]))
+                    repo.registry_files[str(comp["name"])] = str(comp.get("file") or "")
         else:
             repo.catalog_names = _names_from_catalog(data)
     dec_path = root / DECISIONS_FILE
     if dec_path.is_file():
         repo.decision_ids = set(re.findall(r"^\s*-\s*id:\s*([A-Za-z0-9_.-]+)", dec_path.read_text(encoding="utf-8"), re.M))
+    _load_lists(repo, root)
     return repo
+
+
+def _load_lists(repo: Repo, root: Path) -> None:
+    """The block ledger, the transition list and the wrapper list. A missing ledger means decision 0023 is not on."""
+    path = root / LEDGER_FILE
+    if path.is_file():
+        repo.ledger_present = True
+        try:
+            doc = load_yaml_file(path)
+        except YamlError as exc:
+            repo.errors.append(f"{LEDGER_FILE}: không đọc được ({exc})")
+            doc = None
+        items = doc.get("khoi") if isinstance(doc, dict) else None
+        if not isinstance(items, list):
+            repo.errors.append(f"{LEDGER_FILE}: thiếu danh sách 'khoi:'")
+            items = []
+        repo.ledger = [i if isinstance(i, dict) else {} for i in items]
+    for rel, key, field_name in ((TRANSITION_FILE, "ho_so", "slug"), (WRAPPERS_FILE, "khuon", "id")):
+        path = root / rel
+        if not path.is_file():
+            continue
+        try:
+            doc = load_yaml_file(path)
+        except YamlError as exc:
+            repo.errors.append(f"{rel}: không đọc được ({exc})")
+            continue
+        for item in (doc.get(key) if isinstance(doc, dict) else None) or []:
+            if not isinstance(item, dict) or not item.get(field_name):
+                repo.errors.append(f"{rel}: một dòng thiếu '{field_name}'")
+                continue
+            reason = str(item.get("ly_do") or "").strip()
+            if not reason:
+                repo.errors.append(f"{rel}: '{item[field_name]}' thiếu lý do")
+            if key == "ho_so":
+                repo.transition[str(item[field_name])] = reason
+            else:
+                repo.wrappers.add(str(item[field_name]))
 
 
 # ---------------------------------------------------------------- contracts and proofs
@@ -241,6 +294,9 @@ class Contract:
     screens: list[str]
     proof_exists: bool = False
     proofs: dict[str, ScreenProof] = field(default_factory=dict)
+    approved_at: str = ""
+    wrapper: str | None = None  # `khuon_boc` of the contract: the template this round proves
+    templates: dict[str, ScreenProof] = field(default_factory=dict)  # `## Khuôn <id>` sections
 
 
 def load_contracts(root: Path) -> list[Contract]:
@@ -258,18 +314,23 @@ def load_contracts(root: Path) -> list[Contract]:
         screens = fm.get("screens")
         screens = [str(s) for s in screens] if isinstance(screens, list) else []
         c = Contract(slug=path.parent.name, dir=path.parent, status=str(fm.get("status") or ""), screens=screens)
+        c.approved_at = str(fm.get("approved_at") or "")[:10]
+        c.wrapper = str(fm["khuon_boc"]) if fm.get("khuon_boc") else None
         proof = path.parent / PROOF_FILE
         if proof.is_file():
             c.proof_exists = True
-            c.proofs = parse_proof(proof.read_text(encoding="utf-8"))
+            text = proof.read_text(encoding="utf-8")
+            c.proofs = parse_proof(text)
+            c.templates = parse_proof(text, "Khuôn")
         out.append(c)
     return out
 
 
-def parse_proof(text: str) -> dict[str, ScreenProof]:
+def parse_proof(text: str, kind: str = "Màn") -> dict[str, ScreenProof]:
+    """Level-2 sections `## Màn <id>` (or `## Khuôn <id>` for a wrapping template) → their level-3 parts."""
     out: dict[str, ScreenProof] = {}
     for heading, lines in sections(text, 2).items():
-        m = re.match(r"^Màn\s+`?([A-Za-z0-9_.-]+)`?\s*$", heading)
+        m = re.match(rf"^{kind}\s+`?([A-Za-z0-9_.-]+)`?\s*$", heading)
         if m:
             out[m.group(1)] = ScreenProof(screen=m.group(1), parts=sections("\n".join(lines), 3))
     return out
