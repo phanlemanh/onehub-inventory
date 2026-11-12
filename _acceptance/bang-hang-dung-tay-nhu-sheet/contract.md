@@ -66,6 +66,11 @@ Source input: hàng `2a` của `docs/plan/lo-trinh.json`, ô `opportunity.md` (b
 - AC-10: Given Bảng hàng đang chạy, When nhìn ở bốn khổ, sáng và tối, với hàng lọc mở, nhóm theo toà và một vùng ô đã bôi,
   Then nút công cụ, ô lọc, dòng nhóm và vùng chọn đọc được, không chữ chồng chữ, vùng chọn và dòng nhóm phân biệt được với dòng
   thường. (judgment)
+- AC-11: Given Bảng hàng ở khổ 1440 và 1024, When bấm «Toàn màn hình», Then trình duyệt vào toàn màn hình, cột biểu tượng,
+  cột thứ hai, thanh trên và đầu màn «Bảng hàng» ẩn đi, lưới dày và kéo tới đáy màn hình mà trang không cuộn, số dòng thấy
+  được nhiều hơn lúc thường (1440 × 900: từ 18 lên 21; 1024 × 768: từ 13 lên 17); menu «Cột», menu tiêu đề và ô chọn trạng
+  thái mở ra vẫn hiện trên bảng; phím, chép, lọc, nhóm chạy như thường; When Esc hay bấm «Thoát toàn màn hình», Then App Shell
+  và đầu màn trở lại như trước; dưới khổ 768 không có nút này.
 
 ## Vai × Màn
 
@@ -79,7 +84,7 @@ Như hàng 2: khung chưa có vai thật. Các thói quen chỉ đổi cách xem
 
 Quét trục tại chỗ theo khuôn «entity-feature» của bộ quét hình thái (sổ quyết định):
 
-- Trục 1 — thao tác: phím đi ô · bôi vùng và chép · sắp xếp · lọc · nhóm · ẩn hiện cột · lối tắt · mở dòng.
+- Trục 1 — thao tác: phím đi ô · bôi vùng và chép · sắp xếp · lọc · nhóm · ẩn hiện cột · lối tắt · mở dòng · toàn màn hình.
 - Trục 2 — kiểu cột: chữ · tiền · diện tích · số · trạng thái · ngày giờ.
 - Trục 3 — khổ và giao diện: 360 · 414 · 1024 · 1440; sáng · tối.
 - Trục 4 — kết hợp: lọc + nhóm · sắp + nhóm · ẩn cột + nhóm · ẩn cột + chép · lối tắt + lọc thêm.
@@ -88,7 +93,7 @@ Quét trục tại chỗ theo khuôn «entity-feature» của bộ quét hình t
 
 Thước: AC-1 trục 1 (phím) × trục 3; AC-2 trục 1 (chép) × trục 2 (chữ, tiền, trạng thái) × trục 4 (ẩn cột); AC-3 trục 1
 (sắp) × trục 2; AC-4 trục 1 (lọc) × trục 2; AC-5 trục 4 (lọc, sắp + nhóm); AC-6 trục 4 (ẩn cột + nhóm), trục 3 (360), ghim;
-AC-7 lối tắt, trục 4 (lối tắt + lọc thêm); AC-8 trục 6, mở dòng; AC-9,
+AC-7 lối tắt, trục 4 (lối tắt + lọc thêm); AC-8 trục 6, mở dòng; AC-11 toàn màn hình × trục 3 (1440, 1024); AC-9,
 AC-10 trục 3; mọi eval máy khai cặp hai chiều (trục 5). [CE chưa kiểm chứng]: kéo chuột bôi vùng chỉ đo trên trình duyệt ở
 1440 (bài phím phủ phần còn lại).
 
@@ -104,6 +109,7 @@ AC-10 trục 3; mọi eval máy khai cặp hai chiều (trục 5). [CE chưa ki�
 - Không lọc theo dự án, phân khu ở cột thứ hai, không nhóm theo loại căn (dữ liệu mẫu chưa có), không kéo đổi thứ tự hay đổi
   rộng cột, không dòng tổng, không xuất tệp.
 - Không đo 5.000 dòng (hàng nối dữ liệu thật).
+- Không lưu cách xem thành mục ở cột thứ hai (góc nhìn lưu, hàng H7 đang gác); không toàn màn hình trên điện thoại.
 
 ## Notes
 

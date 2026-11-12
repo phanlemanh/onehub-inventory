@@ -8,7 +8,7 @@ import {
   type SortingState,
   type ColumnVisibilityState,
 } from "@tanstack/react-table";
-import { Columns3Icon, FilterIcon, ListTreeIcon } from "lucide-react";
+import { Columns3Icon, FilterIcon, ListTreeIcon, Maximize2Icon, Minimize2Icon } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -16,6 +16,8 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
+  type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
 } from "react";
@@ -34,6 +36,7 @@ import { DataGridScrollArea } from "@/components/reui/data-grid/data-grid-scroll
 import { DataGridTableRowExpand } from "@/components/reui/data-grid/data-grid-table";
 import { DataGridTableVirtual } from "@/components/reui/data-grid/data-grid-table-virtual";
 import { Frame, FrameHeader, FramePanel } from "@/components/reui/frame";
+import { useShellFocus } from "@/components/templates/shell-focus";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -89,6 +92,15 @@ const ROW_HEIGHT_PX = { dense: 33, normal: 49 } as const;
 
 /** Viewport height of the grid: rows scroll inside it in one run, like a sheet; the page itself does not scroll. */
 const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-screen";
+
+/**
+ * In full screen the grid ends at the screen's bottom edge: the screen less the name strip, toolbar and footer, a
+ * height the region sets once as a custom property.
+ */
+const FULL_SCREEN_HEIGHT_CLASS = "group-data-full-screen/region:h-(--region-full-height)";
+const FULL_SCREEN_HEIGHT = { "--region-full-height": "calc(100dvh - 10rem)" } as CSSProperties;
+
+const noSubscribe = () => () => undefined;
 
 /** Narrowest a column gets while the filter row is open, in ch: room for a rule like «<=5» or «toa e». */
 const FILTER_MIN_CH = 11;
@@ -282,6 +294,40 @@ export function DataRegion({
   const [grouped, setGrouped] = useState(false);
   const [expanded, setExpanded] = useState<ExpandedState>(true);
   const [selectedCells, setSelectedCells] = useState(0);
+  // Full screen, like a sheet's: the whole page goes full screen (browser bars hidden, menus still open on top) and the
+  // App Shell steps aside, so the region alone fills the screen. Esc, handled by the browser, leaves it.
+  const shell = useShellFocus();
+  const [fullScreen, setFullScreen] = useState(false);
+  const canFullScreen = useSyncExternalStore(
+    noSubscribe,
+    () => document.fullscreenEnabled === true,
+    () => false,
+  );
+  const setShellFocused = shell.setFocused;
+  useEffect(() => {
+    const onChange = () => {
+      if (document.fullscreenElement) return;
+      setFullScreen(false);
+      setShellFocused(false);
+    };
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, [setShellFocused]);
+  const toggleFullScreen = () => {
+    if (fullScreen) {
+      if (document.fullscreenElement) void document.exitFullscreen();
+      setFullScreen(false);
+      setShellFocused(false);
+      return;
+    }
+    void document.documentElement.requestFullscreen().then(
+      () => {
+        setFullScreen(true);
+        setShellFocused(true);
+      },
+      () => undefined,
+    );
+  };
   const { boxRef, chRef, denseChRef, widthCh, chPx: baseChPx, denseChPx } = useWidthInCh();
 
   const filters = useMemo(() => filtersFrom(columnFilters), [columnFilters]);
@@ -344,7 +390,12 @@ export function DataRegion({
   // The row-number column counts too: digits of the last row number plus padding.
   const rowNumberCh = String(rows.length).length + 3;
   const totalMinCh = rowNumberCh + fitted.reduce((sum, w) => sum + w, 0);
-  const density = widthCh === null ? "normal" : densityFor(totalMinCh, widthCh);
+  // Full screen is for seeing the most rows, as on a sheet: rows stay dense there whatever the width.
+  const density = fullScreen
+    ? "dense"
+    : widthCh === null
+      ? "normal"
+      : densityFor(totalMinCh, widthCh);
   // Dense rows use the smaller text, so their columns are sized in the smaller text's ch: a grid that overflows in
   // normal text shrinks with its text instead of keeping normal-text widths. Density itself is decided in normal ch.
   const chPx = density === "dense" ? denseChPx : baseChPx;
@@ -551,10 +602,10 @@ export function DataRegion({
     },
   });
 
-  // The grid scrolls inside its own viewport; keyboard users must be able to reach and scroll it (WCAG 2.1.1).
-  // ReUI's scroll area takes no props for its viewport, so the region labels it once the page runs. Until then the
-  // server-rendered content holds the one keyboard stop, so the grid is reachable before the page takes input; the
-  // stop moves to the grid table once the page runs (cell selection puts focus on the table, role="grid").
+  // The grid scrolls inside its own viewport; keyboard users must be able to reach and scroll it (WCAG 2.1.1). With cell
+  // selection the grid table itself is the one keyboard stop, from the server HTML on (ReUI renders it focusable): focus
+  // on the table is what moves the selected cell. ReUI's scroll area takes no props for its viewport, so the region
+  // names the viewport and the table once the page runs.
   useEffect(() => {
     const viewport = boxRef.current?.querySelector<HTMLElement>(
       '[data-slot="scroll-area-viewport"]',
@@ -562,17 +613,7 @@ export function DataRegion({
     if (!viewport) return;
     viewport.setAttribute("role", "region");
     viewport.setAttribute("aria-label", title);
-    const grid = viewport.querySelector<HTMLElement>('table[data-slot="data-grid-table"]');
-    if (grid) {
-      grid.tabIndex = 0;
-      grid.setAttribute("aria-label", title);
-      viewport.removeAttribute("tabindex");
-    } else {
-      viewport.tabIndex = 0;
-    }
-    boxRef.current
-      ?.querySelector('[data-slot="data-region-scroll-content"]')
-      ?.removeAttribute("tabindex");
+    viewport.querySelector('table[data-slot="data-grid-table"]')?.setAttribute("aria-label", title);
   });
 
   // Enter on a selected cell opens its row, the region's one «open row» door (the record panel of row 3).
@@ -661,6 +702,25 @@ export function DataRegion({
             </Button>
           }
         />
+        {/* From 768px only: on a phone the toolbar wraps and the phone has no full screen of its own (row 2b). */}
+        {canFullScreen ? (
+          <span className="hidden md:contents">
+            <Button
+              variant={fullScreen ? "secondary" : "outline"}
+              size="sm"
+              aria-pressed={fullScreen}
+              data-slot="full-screen-toggle"
+              onClick={toggleFullScreen}
+            >
+              {fullScreen ? (
+                <Minimize2Icon aria-hidden="true" />
+              ) : (
+                <Maximize2Icon aria-hidden="true" />
+              )}
+              {fullScreen ? GRID_COPY.sheet.leaveFullScreen : GRID_COPY.sheet.fullScreen}
+            </Button>
+          </span>
+        ) : null}
       </div>
     ) : null;
   let body: ReactNode;
@@ -695,14 +755,10 @@ export function DataRegion({
         <DataGridCellSelection key={density} />
         <div className="p-3 empty:hidden">{toolbar(sheetTools)}</div>
         <DataGridContainer>
-          <DataGridScrollArea className={VIEWPORT_HEIGHT_CLASS}>
+          <DataGridScrollArea className={`${VIEWPORT_HEIGHT_CLASS} ${FULL_SCREEN_HEIGHT_CLASS}`}>
             {/* Keyed by density: the virtual body keeps the estimate it started with for rows it has not measured, so a
                 switch from normal to dense rows must start it again or the run's height (and its last rows) go wrong. */}
-            <div
-              data-slot="data-region-scroll-content"
-              tabIndex={0}
-              onKeyDownCapture={onGridKeyDownCapture}
-            >
+            <div data-slot="data-region-scroll-content" onKeyDownCapture={onGridKeyDownCapture}>
               <DataGridTableVirtual key={density} estimateSize={ROW_HEIGHT_PX[density]} />
             </div>
           </DataGridScrollArea>
@@ -726,7 +782,12 @@ export function DataRegion({
     );
 
   return (
-    <section data-slot="data-region" className="flex min-w-0 flex-col">
+    <section
+      data-slot="data-region"
+      data-full-screen={fullScreen || undefined}
+      style={FULL_SCREEN_HEIGHT}
+      className="group/region flex min-w-0 flex-col bg-background"
+    >
       <span ref={chRef} aria-hidden="true" className="invisible absolute text-base">
         0
       </span>

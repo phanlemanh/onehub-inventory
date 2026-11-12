@@ -146,3 +146,11 @@ evals:
     inputs: [_acceptance/bang-hang-dung-tay-nhu-sheet/evidence/loc-1440-sang.png, _acceptance/bang-hang-dung-tay-nhu-sheet/evidence/loc-1440-toi.png, _acceptance/bang-hang-dung-tay-nhu-sheet/evidence/nhom-1440-toi.png, _acceptance/bang-hang-dung-tay-nhu-sheet/evidence/chon-1024-sang.png, _acceptance/bang-hang-dung-tay-nhu-sheet/evidence/loc-nhom-360-toi.png, _acceptance/bang-hang-dung-tay-nhu-sheet/design.md]
     question: "Năm ảnh Bảng hàng (lọc mở ở 1440 sáng và tối, nhóm theo toà ở 1440 tối, vùng ô đã bôi ở 1024, lọc và nhóm ở 360 tối) có cho thấy đúng các trạng thái ST-inventory-loc-mo, ST-inventory-nhom, ST-inventory-chon-vung trong mục Đặc tả UX của design.md không: nút công cụ và ô lọc đọc được, dòng nhóm và vùng ô đã bôi phân biệt được với dòng thường, chữ không chồng nhau, ảnh tối đủ tương phản để đọc? (Tập dòng đúng hay sai do E5, E7 đo, không hỏi ở đây.)"
     evidence_required: [verdict, rationale]
+
+  - id: E18
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/**, src/components/templates/**, "src/app/(app)/**", tests/e2e/sheet.spec.ts]
+    expected: "exit 0; ca 'sheet full screen' ở 1440×900 và 1024×768 (hằng 2): đếm dòng thấy trọn trong khung lúc thường, bấm 'Toàn màn hình'; document.fullscreenElement là trang, không còn [data-slot=app-shell-top-bar], [data-slot=page-header], cột thứ hai; trang không cuộn (scrollHeight = innerHeight); số dòng thấy trọn lớn hơn lúc thường và bảng ở mật độ dày; mở menu 'Cột' thì phần tử ở giữa menu là chính menu (elementFromPoint); Control+End tới dòng 60; thoát toàn màn hình thì thanh trên, đầu màn trở lại và nút mang aria-pressed false; ở 414 và 360 không có nút; hai ca phá: chỉ đưa vùng lưới lên toàn màn cho 'menu hidden in full screen: Cột', không ẩn đầu màn cho 'page header shown in full screen'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

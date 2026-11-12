@@ -17,6 +17,7 @@ import { SecondColumn, SecondColumnNav } from "./app-shell/second-column";
 import { FRAME_COPY } from "./frame-copy";
 import { NavMenu, type NavItem } from "./nav-menu";
 import { ConnectionWatcher, ScreenBanner } from "./screen-banner";
+import { HiddenInFocus, ShellContent, ShellFocusProvider } from "./shell-focus";
 import { ThemeSwitch } from "./theme";
 
 export type { NavItem, NavLink, NavSection } from "./nav-menu";
@@ -50,62 +51,70 @@ export function AppShell({
   children?: ReactNode;
 }) {
   return (
-    <SidebarProvider defaultOpen={false}>
-      <a
-        href={`#${MAIN_ID}`}
-        className="sr-only z-50 rounded-md bg-background px-4 py-2 text-sm font-medium focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:ring-2 focus:ring-ring"
-      >
-        {FRAME_COPY.skipToContent}
-      </a>
-      <Sidebar collapsible="icon" variant="inset">
-        <div className="flex h-full">
-          <div className="flex h-full flex-col">
-            <SidebarHeader>
-              <div className="flex justify-center py-1">
-                <Image
-                  src="/brand/logo-mark.svg"
-                  alt={FRAME_COPY.brand}
-                  width={28}
-                  height={28}
-                  priority
-                />
-              </div>
-            </SidebarHeader>
-            <SidebarContent>
-              <SidebarGroup>
-                <NavMenu items={nav} roles={roles} />
-              </SidebarGroup>
-            </SidebarContent>
-          </div>
-          {/* Phone sheet only: the second column beside the rail, as app-shell-8 does. */}
-          <div className="flex min-w-0 flex-1 flex-col overflow-y-auto border-l md:hidden">
-            <SecondColumnNav items={nav} roles={roles} />
-          </div>
-        </div>
-      </Sidebar>
-      <SidebarInset id={MAIN_ID} tabIndex={-1}>
-        <header
-          data-slot="app-shell-top-bar"
-          className="sticky top-0 z-20 flex h-12 shrink-0 items-center gap-2 border-b bg-background px-2"
+    <ShellFocusProvider>
+      <SidebarProvider defaultOpen={false}>
+        <a
+          href={`#${MAIN_ID}`}
+          className="sr-only z-50 rounded-md bg-background px-4 py-2 text-sm font-medium focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:ring-2 focus:ring-ring"
         >
-          <div className="flex min-w-0 flex-1 items-center gap-1">
-            <SidebarTrigger aria-label={FRAME_COPY.openSidebar} />
-            {company}
+          {FRAME_COPY.skipToContent}
+        </a>
+        <HiddenInFocus>
+          <Sidebar collapsible="icon" variant="inset">
+            <div className="flex h-full">
+              <div className="flex h-full flex-col">
+                <SidebarHeader>
+                  <div className="flex justify-center py-1">
+                    <Image
+                      src="/brand/logo-mark.svg"
+                      alt={FRAME_COPY.brand}
+                      width={28}
+                      height={28}
+                      priority
+                    />
+                  </div>
+                </SidebarHeader>
+                <SidebarContent>
+                  <SidebarGroup>
+                    <NavMenu items={nav} roles={roles} />
+                  </SidebarGroup>
+                </SidebarContent>
+              </div>
+              {/* Phone sheet only: the second column beside the rail, as app-shell-8 does. */}
+              <div className="flex min-w-0 flex-1 flex-col overflow-y-auto border-l md:hidden">
+                <SecondColumnNav items={nav} roles={roles} />
+              </div>
+            </div>
+          </Sidebar>
+        </HiddenInFocus>
+        <SidebarInset id={MAIN_ID} tabIndex={-1}>
+          <HiddenInFocus>
+            <header
+              data-slot="app-shell-top-bar"
+              className="sticky top-0 z-20 flex h-12 shrink-0 items-center gap-2 border-b bg-background px-2"
+            >
+              <div className="flex min-w-0 flex-1 items-center gap-1">
+                <SidebarTrigger aria-label={FRAME_COPY.openSidebar} />
+                {company}
+              </div>
+              <div className="ml-auto flex shrink-0 items-center gap-2">
+                <ThemeSwitch />
+                {account}
+              </div>
+            </header>
+          </HiddenInFocus>
+          <div className="flex flex-1 flex-col md:flex-row">
+            <HiddenInFocus>
+              <SecondColumn items={nav} roles={roles} initialOpen={columnOpen ?? true} />
+            </HiddenInFocus>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <ConnectionWatcher />
+              <ScreenBanner />
+              <ShellContent>{children}</ShellContent>
+            </div>
           </div>
-          <div className="ml-auto flex shrink-0 items-center gap-2">
-            <ThemeSwitch />
-            {account}
-          </div>
-        </header>
-        <div className="flex flex-1 flex-col md:flex-row">
-          <SecondColumn items={nav} roles={roles} initialOpen={columnOpen ?? true} />
-          <div className="flex min-w-0 flex-1 flex-col">
-            <ConnectionWatcher />
-            <ScreenBanner />
-            <div className="flex flex-col gap-6 p-4 lg:p-8">{children}</div>
-          </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+        </SidebarInset>
+      </SidebarProvider>
+    </ShellFocusProvider>
   );
 }

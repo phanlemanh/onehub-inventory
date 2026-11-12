@@ -20,6 +20,7 @@ Thang «Chọn trước, tạo sau» (quyết định 0023), từng phần:
 | Ẩn hiện cột | 1 — kho, xếp theo `data-grid-editing-6` | nút «Cột» là `DataGridColumnVisibility` |
 | Nhóm dòng theo toà | 2 — kho + ReUI Pro | kho chưa có dáng dòng nhóm: chủ kho chọn ở Hỏi-1 (`data-grid-grouping-2` hay `data-grid-grouping-1`); gập mở bằng `DataGridTableRowExpand` của lưới |
 | Lối tắt trạng thái | 1 — kho | cột thứ hai của App Shell (hàng 1o) đã có sáu mục; nay mỗi mục trỏ `/inventory?status=<trạng thái>` |
+| Toàn màn hình | 3 — tạo tay (chủ kho chốt 2026-11-12 trong phiên dãy K) | ReUI không có; nút trên thanh công cụ của lưới đưa cả trang vào toàn màn của trình duyệt và bật chế độ tập trung của App Shell (ẩn cột biểu tượng, cột thứ hai, thanh trên, đầu màn); chỉ từ 768px |
 
 Lọc, sắp xếp và nhóm là hàm thuần trên các dòng vùng đang giữ (`src/components/candidate/grid-view.ts`), như Quỹ hàng làm,
 không gọi mạng. Bảng chỉ hiện kết quả (`manualSorting`, `manualFiltering`). Thứ tự áp: tìm và lọc → sắp xếp → nhóm; số dòng
@@ -117,10 +118,14 @@ hoặc chờ chủ kho), kéo đổi thứ tự hay đổi rộng cột, dòng t
 | ST-inventory-nhom | Bảng hàng | dòng nhóm: nút gập, tên toà, «n dòng»; số dòng liền qua nhóm | gập, mở, sắp trong nhóm |
 | ST-inventory-chon-vung | Bảng hàng | vùng ô tô màu, chân «n ô đã chọn · Ctrl+C để chép» | chép, Esc bỏ chọn |
 | ST-inventory-menu-cot | Bảng hàng | menu «Hiện cột» có tích, Căn không tắt được | tắt, bật cột |
+| ST-inventory-toan-man | Bảng hàng | chỉ còn vùng lưới trên cả màn hình, nút «Thoát toàn màn hình» | dùng bảng, Esc để thoát |
 <!-- UX-STATE-TABLE>>> -->
 
 ### 4. Hành vi
 
+- Toàn màn hình (từ 768px): nút «Toàn màn hình» → cả trang vào toàn màn của trình duyệt, App Shell và đầu màn ẩn, lưới dày
+  kéo tới đáy màn; Esc hay «Thoát toàn màn hình» trở lại. Chỉ đưa riêng vùng lưới lên toàn màn thì menu mở ra không hiện,
+  nên dùng toàn trang.
 - Phím: mũi tên một ô; Tab, Shift+Tab sang ô kế, ở mép thì ra khỏi lưới; Home, End đầu, cuối dòng; Ctrl+Home, Ctrl+End góc
   bảng; PageUp, PageDown một khung; Shift cộng phím mở rộng vùng; Ctrl+A cả bảng; Esc bỏ vùng; ô chọn luôn nằm trọn trong
   khung (bảng cuộn theo, cả ngang ở 360 và 414).
