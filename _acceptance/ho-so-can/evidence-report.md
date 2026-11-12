@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 93811d83daa960c887ebd4e0946880039b525892
+verified_commit: edcf17a89857a424371ae515f2d68f8af06fcf96
 human_signoff: Manh Phan 2026-11-12
 ---
 
@@ -179,3 +179,7 @@ none — mọi eval chạy một lần, xác định; không có eval nhiều l�
 ## Iterations
 
 Round 4: mọi eval máy xanh, E10 có tám ảnh đã đối chiếu, E11 ba lens đề xuất PASS chờ người ở Cổng 2; lịch sử các round trước xem run-log.jsonl.
+
+### Re-pin lần 1 — 2026-11-12, do gộp nhánh chính có hàng 1r sau chữ ký
+run_id: repin-20261112T153042Z-38517
+sha: edcf17a89857a424371ae515f2d68f8af06fcf96 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E10, E11 (E11 không khai paths) · AC không có chốt máy: AC-10
