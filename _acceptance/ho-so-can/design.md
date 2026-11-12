@@ -33,6 +33,8 @@ và 1440 trên bản chạy (bảng dưới) và đặt giá lên đầu hồ s�
 - Khi hồ sơ mở, mũi tên vẫn đi ô trong lưới (của 2a); Esc trong hồ sơ đóng hồ sơ và trả tiêu điểm về mã căn của dòng.
 - Khi hồ sơ mở, cột số dòng, Căn, Toà vẫn đứng yên; bảng cuộn ngang trong phần còn lại, không tự ẩn cột (người tự ẩn bằng nút
   Cột của 2a).
+- Toàn màn hình của Bảng hàng (hàng 2a, chủ kho chốt): khi hồ sơ đang mở thì toàn màn giữ cột hồ sơ, không tự đóng; Esc
+  lúc toàn màn do trình duyệt nhận để thoát toàn màn trước, lần Esc sau mới đóng hồ sơ (thống nhất với dãy K, tin K-1211-13).
 - Số cột còn thấy trọn khi hồ sơ mở, đo trên bản chạy với 60 căn mẫu (App Shell hai cột, bảng tám cột cộng cột số dòng;
   kịch bản đo đếm đầu cột nằm trọn trong khung cuộn của bảng):
 
