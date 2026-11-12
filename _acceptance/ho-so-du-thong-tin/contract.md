@@ -94,6 +94,7 @@ mức mô hình như hàng 3.
 - Không migration, không bảng lần chào trong cơ sở dữ liệu (hàng 10), nếu chủ kho chọn lối khuyên ở Hỏi-2.
 - Không lịch sử của căn (hàng 3c), không ảnh, không Sẵn sàng bán (hàng 15), không bao phí và dòng thuế phí (hàng 19).
 - Không địa chỉ riêng mở thẳng một lần chào cũ, không trang riêng của căn (hàng 3f).
+- Không số chủ nhà hay liên hệ của chủ trên hồ sơ (hàng 13, sau hàng 10); không màn danh bạ liên hệ (L2, sau MVP).
 - Không đổi cách gọi theo sàn cho «Loại hình» và các giá trị (hàng 7e).
 - Không đổi cách lưu hướng trong danh mục (đang là chữ «Đông Nam»; RESO `DirectionFaces` là giá trị tiếng Anh) — hồ sơ
   hiện đúng chữ đang lưu.
