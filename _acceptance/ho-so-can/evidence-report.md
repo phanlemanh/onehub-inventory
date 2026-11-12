@@ -116,7 +116,7 @@ human_signoff:
   run_id: minted-ho-so-can-E10-r3
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
+  verifier: config:capture.ui
   verified_at: 2026-11-12T10:32:11Z
   screenshot: evidence/ho-so-1440-sang.png
   observed: |
