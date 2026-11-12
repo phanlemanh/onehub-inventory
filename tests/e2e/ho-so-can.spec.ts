@@ -112,7 +112,8 @@ async function floatGeometry(page: Page): Promise<{
   });
 }
 
-function assertFloat(g: Awaited<ReturnType<typeof floatGeometry>>): void {
+/** The record runs from just under the top bar to the bottom of the work area or the window. */
+function assertEdges(g: Awaited<ReturnType<typeof floatGeometry>>): void {
   if (g.barBottom !== null && g.aside.top < g.barBottom - 2)
     throw new Error("record covers the top bar");
   if (g.barBottom !== null && Math.abs(g.aside.top - g.barBottom) > 2) {
@@ -123,6 +124,10 @@ function assertFloat(g: Awaited<ReturnType<typeof floatGeometry>>): void {
   if (Math.abs(g.aside.bottom - bottom) > 2) {
     throw new Error(`record bottom ${g.aside.bottom} not at the work area's bottom ${bottom}`);
   }
+}
+
+function assertFloat(g: Awaited<ReturnType<typeof floatGeometry>>): void {
+  assertEdges(g);
   const share = g.aside.width / g.viewport;
   const clamped = Math.min(512, Math.max(320, g.viewport * 0.4));
   if (!(share >= 0.35 && share <= 0.45) && Math.abs(g.aside.width - clamped) > 2) {
@@ -306,6 +311,30 @@ test.describe("E2 · the record floats beside the grid", () => {
     await expect
       .poll(async () => (await floatGeometry(page)).aside.top, { message: info.project.name })
       .toBeLessThanOrEqual(2);
+  });
+
+  test("keeps its place under the top bar when the page scrolls", async ({ page }) => {
+    await openInventory(page);
+    await openFifth(page);
+    await expect.poll(async () => (await floatGeometry(page)).aside.top).toBeGreaterThan(0);
+    for (const y of [400, 0]) {
+      await page.evaluate((to) => window.scrollTo(0, to), y);
+      await expect(async () => assertEdges(await floatGeometry(page))).toPass({ timeout: 2000 });
+    }
+  });
+
+  test("break: a record that does not follow the scroll leaves the top bar", async ({ page }) => {
+    await injectStyle(
+      page,
+      '[role="dialog"][aria-modal="false"] { position: absolute !important; }',
+    );
+    await openInventory(page);
+    await openFifth(page);
+    await page.waitForTimeout(300);
+    await page.evaluate(() => window.scrollTo(0, 400));
+    await page.waitForTimeout(300);
+    const g = await floatGeometry(page);
+    expect(() => assertEdges(g)).toThrow(/record covers the top bar|not under the top bar/);
   });
 
   test("break: a record from the top of the screen covers the top bar", async ({ page }) => {

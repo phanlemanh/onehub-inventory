@@ -231,10 +231,13 @@ function useWorkAreaBounds(open: boolean) {
     const observer = new ResizeObserver(measure);
     observer.observe(document.documentElement);
     window.addEventListener("resize", measure);
+    // The page scrolls under the sticky top bar: the bar's bottom and the work area's bottom move with it.
+    window.addEventListener("scroll", measure, { passive: true });
     document.addEventListener("fullscreenchange", measure);
     return () => {
       observer.disconnect();
       window.removeEventListener("resize", measure);
+      window.removeEventListener("scroll", measure);
       document.removeEventListener("fullscreenchange", measure);
     };
   }, [open]);
