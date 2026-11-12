@@ -39,6 +39,14 @@ const isSentenceCase = (label: string): boolean =>
     return i === 0 ? first === first.toUpperCase() : first === first.toLowerCase();
   });
 
+// A label counts only as a whole word: «Toàn màn hình» does not contain the label «Toà».
+// Letters and combining marks both count as word characters, so Vietnamese diacritics keep a word whole.
+const WORD = "[\\p{L}\\p{M}\\p{N}]";
+const containsTerm = (text: string, term: string): boolean =>
+  new RegExp(`(?<!${WORD})${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?!${WORD})`, "u").test(
+    text,
+  );
+
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
@@ -54,6 +62,13 @@ describe("language checks can fail", () => {
     expect(hasOldTone("chuẩn hoá")).toBe(false);
     expect(hasOldTone("hoàn tất")).toBe(false);
     expect(hasOldTone("quý")).toBe(false);
+  });
+
+  it("finds a hard-coded label as a whole word only", () => {
+    expect(containsTerm('const name = "Toà A";', "Toà")).toBe(true);
+    expect(containsTerm("<span>Toà</span>", "Toà")).toBe(true);
+    expect(containsTerm('fullScreen: "Toàn màn hình"', "Toà")).toBe(false);
+    expect(containsTerm("Toàn", "Toà")).toBe(false);
   });
 
   it("flags title case", () => {
@@ -118,7 +133,7 @@ describe("source code", () => {
       const text = readFileSync(file, "utf8");
       expect(hasOldTone(text), file).toBe(false);
       for (const term of terms) {
-        expect(text.includes(term), `${file}: ${term}`).toBe(false);
+        expect(containsTerm(text, term), `${file}: ${term}`).toBe(false);
       }
     }
   });

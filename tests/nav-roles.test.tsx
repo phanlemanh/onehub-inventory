@@ -8,7 +8,11 @@ import { NavMenu, visibleNav, type NavItem } from "../src/components/templates/n
 import { SidebarProvider } from "../src/components/ui/sidebar";
 import type { Role } from "../src/generated/ontology";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/",
+  // The second column lights a status shortcut by its query too (row 2a).
+  useSearchParams: () => new URLSearchParams(),
+}));
 
 beforeAll(() => {
   window.matchMedia ??= ((query: string) => ({

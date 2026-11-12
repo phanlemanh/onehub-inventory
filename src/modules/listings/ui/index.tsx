@@ -2,6 +2,9 @@
 export { InventoryGrid } from "./inventory-grid";
 export {
   INVENTORY_FIELDS,
+  INVENTORY_GROUP_BY,
+  inventoryFiltersFrom,
+  inventoryStatusHref,
   inventoryColumns,
   inventoryRows,
   inventoryStateFrom,
