@@ -1,0 +1,38 @@
+{
+  "feature_plain": "Đầu chủ mở hồ sơ một căn và đọc đủ: căn là căn gì, lần chào đang mở có pháp lý, nội thất, tài chính, tình trạng sử dụng ra sao, căn đã chào mấy lần, hồ sơ còn thiếu gì và lần cuối xác nhận với chủ nhà cách đây bao lâu. Chỉ đọc.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ thêm vào mô hình nghiệp vụ năm thông tin của lần chào (nội thất, tình trạng sử dụng, pháp lý, tài chính, ngày tạo), luật một căn chỉ có một lần chào đang mở, và nhãn tiếng Việt cho mọi chữ mới, mỗi nhãn không quá 17 ký tự."},
+    {"id": "AC-2", "p": "Sẽ giữ nguyên 60 lần chào mẫu và 60 dòng Bảng hàng, thêm các lần chào cũ đã bán hoặc ngừng bán cho một phần các căn, có ô đủ và ô trống."},
+    {"id": "AC-3", "p": "Sẽ hiện khối «Căn»: mã căn, loại căn (Studio, 2PN…), diện tích, tầng, hướng, toà, dự án, loại hình; ô trống ghi «—»."},
+    {"id": "AC-4", "p": "Sẽ ghi nơi chốn «Dự án · Toà · Loại hình», ba thông số Diện tích · Phòng ngủ · Hướng, và câu «Xác nhận N ngày trước» hoặc «Chưa xác nhận với chủ nhà», đếm ngày theo giờ Việt Nam."},
+    {"id": "AC-5", "p": "Sẽ hiện khối lần chào với pháp lý, nội thất, tài chính, tình trạng sử dụng; ô thiếu ghi «Chưa có»."},
+    {"id": "AC-6", "p": "Sẽ hiện thanh «Mức đủ thông tin» số phần có trên năm và tên phần còn thiếu."},
+    {"id": "AC-7", "p": "Sẽ liệt các lần chào của căn, mới trước; chạm một lần cũ thì cả hồ sơ đổi sang lần ấy, có nút về lần mới nhất."},
+    {"id": "AC-9", "p": "Sẽ qua quét trợ năng ở máy tính và điện thoại, sáng và tối, cả khi đang xem lần cũ."},
+    {"id": "AC-10", "p": "Sẽ đọc được từ trên xuống ở bốn khổ màn hình, sáng và tối — người chấm nhìn ảnh."}
+  ],
+  "wont_do": [
+    {"id": "AC-8", "p": "Sẽ KHÔNG có ô nhập hay nút nào đổi dữ liệu trong hồ sơ, và Bảng hàng giữ đúng tám cột, 60 dòng."},
+    {"id": "OOS-1", "p": "Không sửa gì trong hồ sơ — sửa là hàng 4 và 3d."},
+    {"id": "OOS-2", "p": "Không thêm bảng vào cơ sở dữ liệu ở hàng này nếu chủ kho chọn lối khuyên của Hỏi-2; bảng lần chào đến ở hàng 10."},
+    {"id": "OOS-3", "p": "Không lịch sử của căn, không ảnh, không Sẵn sàng bán, không bao phí — các hàng 3c, 15, 19."},
+    {"id": "OOS-4", "p": "Không đường dẫn riêng mở thẳng một lần chào cũ, không trang riêng của căn — hàng 3f."},
+    {"id": "OOS-5", "p": "Không đổi cách gọi «Loại hình» theo từng sàn — hàng 7e."},
+    {"id": "OOS-6", "p": "Không đổi cách danh mục lưu hướng; hồ sơ hiện đúng chữ đang lưu («Đông Nam»)."}
+  ],
+  "scope_plain": "Hồ sơ chỉ thêm phần đọc; sửa, lưu vào cơ sở dữ liệu và ảnh thuộc các hàng sau.",
+  "coverage_plain": [
+    {"i": 0, "p": "Bốn khổ màn hình, sáng và tối: quét trợ năng (AC-9) và người nhìn ảnh (AC-10)."},
+    {"i": 1, "p": "Mỗi phần của hồ sơ có một tiêu chí: đầu hồ sơ (AC-4), mức đủ (AC-6), căn (AC-3), lần chào (AC-5), các lần chào (AC-7)."},
+    {"i": 2, "p": "Lần chào đủ, thiếu từng phần, thiếu cả bốn, chưa xác nhận, xác nhận hôm nay: AC-5, AC-6 (đủ 32 tổ hợp có hay thiếu) và AC-4."},
+    {"i": 3, "p": "Căn một lần chào và nhiều lần chào, xem lần cũ, sang căn khác: AC-7, dữ liệu mẫu ở AC-2."},
+    {"i": 4, "p": "Mô hình nghiệp vụ và dữ liệu mẫu: thông tin mới, nhãn, luật một lần chào mở (AC-1, AC-2)."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Chưa hỏi chủ kho những trạng thái nào tính là «đang mở» trong luật một căn một lần chào mở — nay thành Hỏi-5, và phép đo thử đủ sáu trạng thái."},
+    {"i": 1, "p": "Máy tự chọn ngày tạo làm ngày của lần chào mà bỏ sót lối ngày ký với chủ nhà — nay thành Hỏi-6."},
+    {"i": 2, "p": "Máy tự chọn tách lần chào cũ thành tập riêng với căn cứ chưa đủ — nay thành Hỏi-7."},
+    {"i": 3, "p": "Phép đo mô hình chưa kiểm kiểu giá trị của bốn thông tin và nhãn của các giá trị cố định — đã thêm."},
+    {"i": 4, "p": "Dữ liệu mẫu chưa chắc có căn ba lần chào khác nhau về giá, mức đủ, xác nhận, nên phép đo xem lần cũ có thể đúng rỗng — đã thêm khẳng định và ca phá."}
+  ]
+}
