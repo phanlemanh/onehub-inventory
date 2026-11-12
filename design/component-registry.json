@@ -86,6 +86,7 @@
             "onOpenChange",
             "onSubmit",
             "formError",
+            "refused",
             "slot"
           ]
         }
@@ -1553,11 +1554,20 @@
       "level": "template",
       "parts": [
         {
+          "name": "NavItem"
+        },
+        {
+          "name": "NavLink"
+        },
+        {
           "name": "NavMenu",
           "props": [
             "items",
             "roles"
           ]
+        },
+        {
+          "name": "NavSection"
         }
       ]
     },
