@@ -3,7 +3,7 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
 /**
- * Focus mode of the App Shell (row 2a, «Toàn màn hình»): while one region holds the whole screen, the shell's rails,
+ * Focus mode of the App Shell (row 2a, «Cả màn hình»): while one region holds the whole screen, the shell's rails,
  * top bar and the page header step aside so the region fills the screen, as a sheet does in full screen. A region asks
  * for it; without a provider (a region outside the shell, a test) asking does nothing.
  */

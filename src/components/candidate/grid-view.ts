@@ -51,7 +51,7 @@ export const MONEY_FILTER_UNIT = 1_000_000_000;
 export type ColumnFilter = string | readonly string[];
 export type ColumnFilters = Partial<Record<FieldKey, ColumnFilter>>;
 
-/** Lower case without Vietnamese marks, «đ» read as «d», so «toa e» finds «Toà E1». */
+/** Lower case without Vietnamese marks, «đ» read as «d», so «dong» finds «Đông». */
 export function foldText(text: string): string {
   return text
     .normalize("NFD")
@@ -225,7 +225,7 @@ function sortKey(kind: DisplayKind, value: unknown): number | string | null {
 
 /**
  * Rows sorted by one column; empty cells stay last both ways, statuses follow STATUS_ORDER, text compares like a
- * Vietnamese reader with numbers as numbers («Toà 2» before «Toà 10»). Equal rows keep their order.
+ * Vietnamese reader with numbers as numbers («S2» before «S10»). Equal rows keep their order.
  */
 export function sortRows<R extends ViewRow>(
   rows: readonly R[],
