@@ -742,6 +742,30 @@
       "dot": "mvp-dot-1"
     },
     {
+      "ma": "7e",
+      "cau_giao": "Mỗi sàn có lớp riêng của mình trên lõi chuẩn — nhãn riêng, trường riêng, từ điển giá trị, căn chờ khớp và mẫu nhập — và Bảng hàng hiện trường riêng, đọc nhãn riêng của sàn",
+      "vai": "nen",
+      "tieu_chi": 10,
+      "vi_sao": "Chủ kho 2026-11-12 ở phiên dãy R: «chuẩn hoá danh mục căn như onehub-invest vì đều gốc là tiêu chuẩn dữ liệu reso, nhưng không cứng mà cho người dùng thêm trường riêng, nhãn riêng, vì người dùng là các công ty môi giới họ hoạt động thường thiếu chuẩn hoá và triển khai nếu không khả năng thay đổi thì thường thất bại» và «MVP sẽ cho người dùng bắt đầu bằng import file google sheet hay excel mà họ đang làm việc quản lý bảng hàng vào […] Khi Import vào thì đây chính là thời điểm mapping giữa sự chuẩn hoá của onehub-inventory và sự không chuẩn của người dùng.» Chủ kho nhận Hỏi-5 ở Cổng Phạm vi hàng 7d cùng ngày: mở hàng này ngay sau 7d, trước khi nối dữ liệu thật; lật phần hoãn L4 và phần nhớ mẫu nhập của L5 (AI vẫn hoãn). Bản đề xuất: _acceptance/danh-muc-can-nhu-onehub-invest/de-xuat-nhap-la-luc-anh-xa.md",
+      "hang": "T3",
+      "dung_tren": [
+        "7d",
+        "7a"
+      ],
+      "slug": "lop-rieng-cua-san",
+      "bat_khi": "Sàn lưu và đọc được nhãn riêng của trường chuẩn, trường riêng (chữ, số, ngày, chọn một, có/không; trần 20 trường, 30 lựa chọn), từ điển giá trị, căn chờ khớp và mẫu nhập; mọi bảng của lớp này có khoá sàn và qua bộ kiểm cách ly, sàn khác không thấy; Bảng hàng hiện trường riêng sau cột chuẩn và hiện nhãn riêng thay nhãn chuẩn; căn chờ khớp dùng được ngay và khớp vào danh mục chung khi danh mục có căn ấy mà sàn không phải nhập lại; có một bảng xem lại tối giản cho lớp riêng; trong rào ADR-0018: không đối tượng tự tạo, không công thức, không bộ máy luật; màn Cài đặt sàn đầy đủ để H4",
+      "nhom": "nen",
+      "vung": [
+        "src/modules/company-config/**",
+        "src/modules/listings/**",
+        "src/modules/catalog/**",
+        "db/**",
+        "tests/db/**",
+        "ontology/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "8",
       "cau_giao": "Nhân viên sàn nhập mã gửi qua email và vào đúng sàn của mình",
       "vai": "Nhân viên sàn",
@@ -923,7 +947,8 @@
         "7b",
         "7c",
         "7d",
-        "9e"
+        "9e",
+        "7e"
       ],
       "slug": "bang-hang-du-lieu-that",
       "nhom": "bang-hang",
@@ -938,13 +963,14 @@
     },
     {
       "ma": "11",
-      "cau_giao": "Đầu chủ nạp tệp Excel, xem trước kết quả, áp vào bảng và hoàn tác được",
+      "cau_giao": "Đầu chủ nạp tệp Excel hay Sheet đang dùng, ghép cột, tên cột, giá trị và mã căn của mình vào chuẩn ngay ở màn xem trước, áp vào bảng và hoàn tác được; lần sau cùng dạng tệp không phải ghép lại",
       "vai": "Đầu chủ",
-      "tieu_chi": 10,
-      "vi_sao": "Đường chính để bỏ Sheet",
+      "tieu_chi": 12,
+      "vi_sao": "Đường chính để bỏ Sheet. Chủ kho 2026-11-12 ở phiên dãy R: «chuẩn hoá danh mục căn như onehub-invest vì đều gốc là tiêu chuẩn dữ liệu reso, nhưng không cứng mà cho người dùng thêm trường riêng, nhãn riêng, vì người dùng là các công ty môi giới họ hoạt động thường thiếu chuẩn hoá và triển khai nếu không khả năng thay đổi thì thường thất bại» và «MVP sẽ cho người dùng bắt đầu bằng import file google sheet hay excel mà họ đang làm việc quản lý bảng hàng vào […] Khi Import vào thì đây chính là thời điểm mapping giữa sự chuẩn hoá của onehub-inventory và sự không chuẩn của người dùng.» Lần nhập là lúc sàn bắt đầu dùng sản phẩm và là lúc ghép chuẩn với không chuẩn",
       "hang": "T3",
       "dung_tren": [
-        "10"
+        "10",
+        "7e"
       ],
       "slug": "nhap-excel",
       "nhom": "dua-hang",
@@ -954,7 +980,8 @@
       ],
       "vung": [
         "src/modules/imports/**"
-      ]
+      ],
+      "bat_khi": "Năm chỗ ghép trong một lần nhập: cột, tên cột, giá trị, căn, dạng tệp; mỗi ô mang một trong bốn dấu giữ nguyên · máy sửa kèm lý do · cần người · chặn, không có đường nhập thẳng; trên bộ tệp thử bẩn có đáp án 100% ô có đích (trường chuẩn, trường riêng, hay giữ nguyên kèm dấu cần người), không ô nào bị bỏ lặng lẽ; lựa chọn của người ghi vào lớp riêng của sàn (hàng 7e) khi lần nhập thành công; lần nhập thứ hai cùng dạng tệp không hỏi lại câu nào đã trả lời; hoàn tác gỡ cả ô lẫn phần vừa học; không dùng AI (H5). Cổng Phạm vi cân việc tách làm hai hàng nếu vượt 12 tiêu chí"
     },
     {
       "ma": "12",
@@ -1291,8 +1318,8 @@
     {
       "ma": "H4",
       "dot": "mvp-dot-1",
-      "cau_giao": "Quản trị sàn tự đặt cách gọi, trạng thái và trường riêng",
-      "ly_do": "Đợt 3; MVP dùng hằng số trong mã",
+      "cau_giao": "Quản trị sàn có màn Cài đặt đầy đủ để tự đặt cách gọi, trạng thái và trường riêng",
+      "ly_do": "Đợt 3. Từ 2026-11-12 phần lưu và đọc lớp riêng của sàn đã vào MVP ở hàng 7e (chủ kho nhận Hỏi-5 của hàng 7d); ở đây chỉ còn màn cấu hình đầy đủ và trạng thái riêng",
       "phu": [
         "L4"
       ],
@@ -1302,7 +1329,7 @@
       "ma": "H5",
       "dot": "mvp-dot-1",
       "cau_giao": "Đầu chủ nhập tệp có AI đề xuất cột",
-      "ly_do": "Đợt 3; nhập không AI đủ cho một sàn",
+      "ly_do": "Đợt 3; nhập không AI đủ cho một sàn. Từ 2026-11-12 phần nhớ mẫu nhập (tất định, không AI) đã vào MVP ở hàng 7e và hàng 11",
       "phu": [
         "L5"
       ],
