@@ -25,23 +25,25 @@ export default async function FrameLayout({ children }: { children: React.ReactN
         companies: session.companies,
       }
     : null;
+  // Every action button and the App Shell's entries read the session's roles from here (PermittedAction, row 9e).
   return (
-    <AppShell
-      nav={NAV}
-      roles={session?.roles ?? []}
-      columnOpen={columnOpen}
-      company={
-        account ? <CompanySwitch company={account.company} companies={account.companies} /> : null
-      }
-      account={
-        <AccountMenu
-          account={account}
-          labels={{ signIn: label("SignIn"), signOut: label("SignOut") }}
-        />
-      }
-    >
-      {/* Every action button reads the session's roles from here (PermittedAction, row 9e). */}
-      <SessionRoles roles={session?.roles ?? []}>{children}</SessionRoles>
-    </AppShell>
+    <SessionRoles roles={session?.roles ?? []}>
+      <AppShell
+        nav={NAV}
+        roles={session?.roles ?? []}
+        columnOpen={columnOpen}
+        company={
+          account ? <CompanySwitch company={account.company} companies={account.companies} /> : null
+        }
+        account={
+          <AccountMenu
+            account={account}
+            labels={{ signIn: label("SignIn"), signOut: label("SignOut") }}
+          />
+        }
+      >
+        {children}
+      </AppShell>
+    </SessionRoles>
   );
 }

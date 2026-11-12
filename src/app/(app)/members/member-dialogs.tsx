@@ -1,8 +1,10 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useId, useRef, useState } from "react";
 
 import { FormDialog } from "@/components/candidate/form-dialog";
+import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
@@ -14,6 +16,25 @@ import { MEMBERS_COPY as COPY } from "./copy";
 import type { Member, MembersLabels } from "./members-screen";
 
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * A 403 from the server (row 9e): the dialog shows the «not allowed» sentence, apart from the general error, and when
+ * it closes the page refreshes, so the frame and its buttons follow the permission table again.
+ */
+function useRefusal(): { refused: () => void; onClose: () => void } {
+  const router = useRouter();
+  const was = useRef(false);
+  return {
+    refused: () => {
+      was.current = true;
+    },
+    onClose: () => {
+      if (!was.current) return;
+      was.current = false;
+      router.refresh();
+    },
+  };
+}
 
 /** Four checkboxes in register order; the set is what is checked. */
 function RolePicker({
@@ -73,6 +94,7 @@ export function InviteDialog({
     form?: string;
   }>({});
   const [busy, setBusy] = useState(false);
+  const refusal = useRefusal();
 
   function reset() {
     setEmail("");
@@ -104,7 +126,10 @@ export function InviteDialog({
         onInvited(cleanName);
       } else if (res.status === 409) setErrors({ email: COPY.alreadyMember });
       else if (res.status === 400) setErrors({ email: COPY.emailInvalid });
-      else setErrors({ form: COPY.failed });
+      else if (res.status === 403) {
+        refusal.refused();
+        setErrors({ form: FRAME_COPY.refusedAction });
+      } else setErrors({ form: COPY.failed });
     } catch {
       setErrors({ form: COPY.failed });
     } finally {
@@ -124,7 +149,10 @@ export function InviteDialog({
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
-        if (!next) reset();
+        if (!next) {
+          reset();
+          refusal.onClose();
+        }
       }}
       onSubmit={() => void submit()}
       formError={errors.form}
@@ -172,6 +200,7 @@ export function RolesDialog({
   const [roles, setRoles] = useState<Role[]>(member.roles);
   const [errors, setErrors] = useState<{ roles?: string; form?: string }>({});
   const [busy, setBusy] = useState(false);
+  const refusal = useRefusal();
 
   async function submit() {
     if (!roles.length) {
@@ -190,7 +219,10 @@ export function RolesDialog({
         setErrors({});
         onSaved();
       } else if (res.status === 409) setErrors({ roles: COPY.lastAdmin(labels.companyAdmin) });
-      else setErrors({ form: COPY.failed });
+      else if (res.status === 403) {
+        refusal.refused();
+        setErrors({ form: FRAME_COPY.refusedAction });
+      } else setErrors({ form: COPY.failed });
     } catch {
       setErrors({ form: COPY.failed });
     } finally {
@@ -220,6 +252,7 @@ export function RolesDialog({
       onOpenChange={(next) => {
         setOpen(next);
         if (next) setRoles(member.roles);
+        else refusal.onClose();
         setErrors({});
       }}
       onSubmit={() => void submit()}

@@ -9,9 +9,8 @@
 //   vai-viet-cung        no role name is written as a string in a screen (src/app/**) to show or hide something;
 //                        label("<Role>") for display is allowed.
 //
-// The real tree has files the build step of row 9e converts (plan step 8); they are listed in PENDING with their exact
-// findings, so a new violation turns red and a converted file must leave the list. PENDING is empty before the
-// evidence gate of 9e.
+// The real tree must be clean: PENDING held the findings the build step of row 9e converted (the members screen and
+// the sidebar, plan step 8) and is empty since; a new violation turns red with its file and line.
 import {
   mkdtempSync,
   mkdirSync,
@@ -283,12 +282,7 @@ export function check(root: string, files: string[] = screenFiles(root)): Findin
 const fmt = (f: Finding) => `${f.rule}: ${f.at} — ${f.why}`;
 
 /** Files of the real tree the build of row 9e converts (plan step 8); empty before the evidence gate. */
-const PENDING = [
-  'ghi-khong-qua-cua: src/app/(app)/members/member-dialogs.tsx:96 — InviteDialog chưa đứng trong PermittedAction action="inviteMember"',
-  'ghi-khong-qua-cua: src/app/(app)/members/member-dialogs.tsx:183 — RolesDialog chưa đứng trong PermittedAction action="changeMemberRoles"',
-  "vai-viet-cung: src/app/(app)/members/page.tsx:18 — CompanyAdmin",
-  "vai-viet-cung: src/app/(app)/nav.ts:49 — CompanyAdmin",
-];
+const PENDING: string[] = [];
 
 describe("bộ kiểm nút đi đường khác (hàng 9e, AC-3)", () => {
   it("cây thật: không lỗi nào ngoài danh sách đang chuyển, và danh sách không cũ", () => {
