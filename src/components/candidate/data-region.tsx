@@ -553,6 +553,7 @@ export function DataRegion({
                 variant="link"
                 size="sm"
                 data-record-open={id}
+                tabIndex={-1}
                 onClick={() => openRef.current?.(id)}
               >
                 {cell}
