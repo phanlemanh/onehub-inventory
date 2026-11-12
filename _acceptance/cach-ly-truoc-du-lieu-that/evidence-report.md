@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: cach-ly-truoc-du-lieu-that
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 0beec6a5c1209d686a3333113a97eef4f44224e6
-human_signoff:
+human_signoff: Manh Phan 2026-11-12
 ---
 
 # Evidence Report: cach-ly-truoc-du-lieu-that
@@ -150,7 +150,7 @@ human_signoff:
   - domain-correctness: PASS — Phần «Thứ không đo chắc bằng máy» trong design.md nêu cả bốn điểm: câu đổi vai ghép lúc chạy không bị bắt, ứng dụng nối bằng vai chủ nên `reset role` về thẳng vai chủ, luật viết lại câu và trigger sự kiện không được quét, bộ kiểm chưa chạy trên CI. contract.md lặp lại ở Out of scope và Known limits. Bảng Coverage ghi Ngoài-5 là «đóng một phần», nên luật quét một cửa không bị coi là đóng hẳn kẽ hở đổi vai, đổi sàn.
   - operational-feasibility: PASS — Thiết kế nói thẳng bốn phần: câu đổi vai ghép lúc chạy không bị bắt, vai đăng nhập là vai chủ nên `reset role` trong cửa về vai chủ, luật viết lại câu và trigger sự kiện không được quét, bộ kiểm chưa chạy trên CI. Hợp đồng nhắc lại ở Out of scope, Known limits và dòng «đóng một phần» của Ngoài-5.
   - spec-alignment: PASS — Thiết kế nêu cả bốn phần; hợp đồng lặp lại ở Out of scope, ở Known limits (AC-6) và trong bảng phủ, nơi Ngoài-5 ghi «đóng một phần». Không coi luật quét một cửa là đã đóng hẳn kẽ hở đổi vai, đổi sàn.
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-12 — Đạt
 
 ## Known limits
 

@@ -5,7 +5,7 @@ slug: cach-ly-truoc-du-lieu-that
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: _acceptance/cach-ly-truoc-du-lieu-that/design.md
@@ -99,3 +99,6 @@ bản phá) phủ ở mọi AC.
   đổi theo.
 - Migration 005 chỉ đúng khi hàng 9a gộp trước với 004 (giám sát, C-1211-2).
 - Known limits: luật quét một cửa chỉ bắt câu viết thẳng trong mã nguồn — câu ghép lúc chạy không bị bắt (AC-6).
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-12:
+  - Ngoài-2: chạy tay bài kiểm cơ sở dữ liệu mà quên đặt biến môi trường thì các phép kiểm rải sang hai cơ sở dữ liệu thử của hai dãy; người dùng cuối không bị ảnh hưởng.
+  - Ngoài-3: ca phá thử rút quyền ghi đỏ cả khi ca kiểm hỏng vì lý do khác, nên chưa chứng minh đỏ đúng vì mất quyền ghi; cách ly giữa các sàn không đổi.
