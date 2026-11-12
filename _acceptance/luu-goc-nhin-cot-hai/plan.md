@@ -1,5 +1,7 @@
 # Kế hoạch dựng — luu-goc-nhin-cot-hai (hàng 2c, T3)
 
+Đã duyệt: Manh Phan, 2026-11-12 («duyệt kế hoạch»).
+
 Điều kiện bắt đầu: hàng 3 (hồ sơ căn) và hàng 9e (bộ nút theo quyền) đã ở nhánh chính; gộp `origin/main` về MỘT lần,
 `make setup`, `make gen`, rồi mới dựng. Lựa chọn của chủ kho ở Cổng Phạm vi (Hỏi-1 … Hỏi-5) điền vào hợp đồng và thiết kế
 trước việc 1. Chạm `ontology/**`, `db/migrations/**`, `src/components/candidate/**`, `src/generated/**` (chỉ bằng `make gen`)
