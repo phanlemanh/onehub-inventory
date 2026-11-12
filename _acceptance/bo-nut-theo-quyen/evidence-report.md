@@ -6,7 +6,7 @@ failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: df2561e7183a5d5f787ab7c01ead0f43aba75ae9
+verified_commit: 04f3c1ecef5b5069176ec030bbb05f6480c00348
 human_signoff: Manh Phan 2026-11-13
 ---
 
@@ -227,3 +227,7 @@ none — every multi-run eval is uniform
 
 Round 1: bản ghi S4 round 1 ở trạng thái PENDING-JUDGMENT với một finding trong hợp đồng (AC-3: menu, thao tác dòng và thanh bên phải gọi tên việc theo kiểu của bảng quyền). Đã sửa ở commit df2561e, trả về để chạy lại.
 Round 2: mọi eval máy xanh, E10 và E14 mang từ round 1 (delta không chạm paths); E1 và E13 chờ người chốt ở Cổng 2; còn ba finding ngoài hợp đồng trong review-findings.md.
+
+### Re-pin lần 1 — 2026-11-12, do hoá cũ do gộp nhánh chính sau hàng 7b (PR #41), bài chụp ảnh ghi ra thư mục chạy
+run_id: repin-20261112T233328Z-72931
+sha: 04f3c1ecef5b5069176ec030bbb05f6480c00348 · suites: 3 lệnh exit 0 · evals: 12/12 eval máy đạt kỳ vọng · ngoài làn máy: E1 (E1 không khai paths), E12, E13 (E13 không khai paths)
