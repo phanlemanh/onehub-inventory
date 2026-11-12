@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-12 — Roadmap: added rows 2a (use the grid by hand like a sheet), 2b (phone cards), 1q, 1r, 9d, 7a from the owner's sheet-habit decision and the items signed as "new contract"; row 10 now waits for 1r, 9d, 7a; opened the worth-gate cell of row 9a — [lo-trinh](../docs/plan/lo-trinh.json).
 - 2026-11-12 — Cổng chứng minh màn theo quyết định 0023: sổ khối `design/so-khoi.yaml` (mở rỗng), bậc «trong kho» tra sổ, ứng viên ReUI kèm ảnh, vùng lấy bỏ thêm, mục «Từ Quỹ hàng» và «Họ», lối khuôn bọc cho App Shell; ba hồ sơ đã qua Cổng Phạm vi giữ luật cũ; luật giao diện thay câu «chuyển thể chỉ đổi dữ liệu» bằng luật ba tầng — [0023](decisions/0023-chon-truoc-tao-sau.md), hàng 1n.
 - 2026-11-11 — Recorded the reuse ladder set by the owner (choose before making; repo, then repo with ReUI Pro, then hand-made; three layers of "keep as is") and added roadmap rows 1n, 1o, 1p, 9c — [0023](decisions/0023-chon-truoc-tao-sau.md).
 - 2026-11-11 — Vá phần đăng nhập: đường trở về sau đăng nhập kiểm bằng danh sách cho phép và bộ đọc địa chỉ của trình duyệt (14 dạng lách, mỗi dạng một ca); đăng xuất lỗi mạng hay máy chủ báo rõ «chưa thoát» và giữ người ở trang; người hết sàn mà còn phiên có nút Đăng xuất thay cho danh sách sàn trống — hàng 1m, `_acceptance/va-dang-nhap/`
