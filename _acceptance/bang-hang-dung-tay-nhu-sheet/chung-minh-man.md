@@ -69,7 +69,7 @@ thái «Tìm không ra» nay gặp cả khi lọc từng cột ra rỗng.
 | DataGridColumnHeader | trong-kho | | | | |
 | DataGridColumnFilter | trong-kho | | | | |
 | DataGridColumnVisibility | trong-kho | | | | |
-| DataGridTableRowExpand | trong-kho | | | | |
+| DataGridTable | trong-kho | | | | |
 | Input | trong-kho | | | | |
 | Button | trong-kho | | | | |
 | Badge | trong-kho | | | | |

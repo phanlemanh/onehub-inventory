@@ -442,7 +442,7 @@ test.describe("sheet tab stops", () => {
     "Lọc",
     "Cột",
     "Nhóm theo Toà",
-    ...(WIDE.has(width()) ? ["Cả màn hình"] : []),
+    ...(WIDE.has(width()) ? ["Toàn màn hình"] : []),
   ];
 
   for (const [name, filterOpen] of [
@@ -523,7 +523,7 @@ test.describe("sheet full screen", () => {
     }
     await openInventory(page);
     const before = await visibleRows(page);
-    await page.getByRole("button", { name: "Cả màn hình" }).click();
+    await page.getByRole("button", { name: "Toàn màn hình" }).click();
     await expect.poll(() => page.evaluate(() => !!document.fullscreenElement)).toBe(true);
     await page.waitForTimeout(300);
     expect(
@@ -542,7 +542,7 @@ test.describe("sheet full screen", () => {
     await page.keyboard.press("Control+End");
     await page.waitForTimeout(200);
     expect((await focused(page))?.row).toBe(60);
-    await page.getByRole("button", { name: "Thoát cả màn hình" }).click();
+    await page.getByRole("button", { name: "Thoát toàn màn hình" }).click();
     await expect.poll(() => page.evaluate(() => !!document.fullscreenElement)).toBe(false);
     await expect(page.locator('[data-slot="page-header"]')).toBeVisible();
     await expect(page.locator('[data-slot="full-screen-toggle"]')).toHaveAttribute(
