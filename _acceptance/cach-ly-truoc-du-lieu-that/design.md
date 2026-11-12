@@ -93,6 +93,15 @@ thể và `make gen` theo đó.
 | Ứng dụng thật nối bằng vai chủ riêng `quy_hang_owner` có `bypassrls`; truy vấn của sàn vẫn `set local role quy_hang_app`. Kiểm nhanh môi trường thật soi bảng `public` ép luật, vai API không sở hữu bảng, không `bypassrls`. | `docs/adr/0009-moi-truong-that.md` (mục 2, mục kiểm nhanh 3) | Cho thấy gốc của Ngoài-5 cũng có ở Quỹ hàng: `reset role` trong cửa về vai chủ vượt luật. Không làm trong hàng này; là căn cứ cho đề xuất hàng riêng «vai đăng nhập không phải chủ» (yêu cầu C-3). |
 | Bảng thoả thuận nới thêm hai loại: «xử lý bằng AI» (migration 035) rồi «xác nhận danh mục» (migration 040), mỗi lần thay ràng buộc loại; giữ chốt lớp `source` (`agreements_never_source`). Kèm luật riêng của từng loại (mỗi sàn một thoả thuận AI; chỉ chiều ra, chỉ lớp danh mục). | `packages/db/migrations/035_xu_ly_bang_ai.sql`, `packages/db/migrations/040_xac_nhan_danh_muc.sql`, `packages/core/src/agreements.ts` | Giữ: thay ràng buộc loại cho đủ tám loại, cùng danh sách và cùng tên ràng buộc (migration 005). Bỏ: luật riêng của hai loại và sổ chi phí AI — thuộc hàng nhập bằng AI và hàng xác nhận danh mục, nằm ngoài tám mục của hàng 7. |
 
+Sổ bối cảnh của kho (đọc sau khi gộp nhánh chính, 2026-11-12) thêm hai ý:
+
+- `docs/tri-thuc/wiki/chu-de/quyen-va-cach-ly.md` mục «Lỗi đã gặp»: ở Quỹ hàng, một hàm chạy bằng quyền chủ hàm không tự
+  kiểm vai và bị bắt ba vòng liền. Đây đúng là lớp mà ca «hàm đặc quyền trong danh sách» khoá lại: hàm thứ mười một phải
+  có chữ chủ kho trước khi vào danh sách.
+- `docs/tri-thuc/wiki/chu-de/thoa-thuan-ket-noi.md` mục «MVP này giữ gì, bỏ gì»: MVP cắt các loại kết nối khác và tính
+  năng xác nhận danh mục. Hàng này không dựng tính năng nào cho hai loại mới; bảng chỉ *lưu được* chúng cho khớp mô hình,
+  theo lựa chọn của chủ kho ở Hỏi-1.
+
 Việc đọc không lộ ra điều nào trái với phạm vi đã duyệt.
 
 ## Đặc tả UX
