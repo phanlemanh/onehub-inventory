@@ -2,7 +2,7 @@
 # Company isolation suite (SP-1, hồ sơ cach-ly-moi-san). Runs on this lane's Postgres container, never on real data:
 #   1. a fresh scratch database, migrations applied twice (the second run applies nothing);
 #   2. db/tests/cach-ly.sql — 19 cases under the API role, using the door's own statements;
-#   3. nine break cases (twenty-one break files), each file on its own scratch database: the suite must go red with the
+#   3. nine break cases (twenty-two break files), each file on its own scratch database: the suite must go red with the
 #      pinned messages.
 # Every case prints `ok <case>` exactly once; the last line is `cach-ly: 29 ca đạt, vai quy_hang_app`.
 # Missing, repeated or failing cases are named and the exit code is not 0.
@@ -55,7 +55,7 @@ CA_LENH=(
 # Break case → its break files (db/tests/pha-thu/<file>.sql), each on its own scratch database.
 pha_thu_tep() {
   case "$1" in
-    bo-ep-luat) printf '%s\n' bo-ep-luat ;;
+    bo-ep-luat) printf '%s\n' bo-ep-luat goc-nhin-bo-ep-luat ;;
     luat-them-khong-kiem)
       printf '%s\n' luat-them-khong-kiem luat-them-khong-kiem-doi-tac luat-ghi-for-all-doi-tac luat-xoa-doi-tac ;;
     luat-doc-mo) printf '%s\n' luat-doc-mo luat-doc-mo-hoac-true luat-doc-mo-khac-san ma-rieng-doc-mo ;;
@@ -71,6 +71,7 @@ pha_thu_tep() {
 pha_thu_ghim() {
   case "$1" in
     bo-ep-luat) printf '%s\n' "HỎNG moi-bang-cong-ty-ep-luat-theo-dong: agreements" ;;
+    goc-nhin-bo-ep-luat) printf '%s\n' "HỎNG moi-bang-cong-ty-ep-luat-theo-dong: saved_view" ;;
     luat-them-khong-kiem) printf '%s\n' "HỎNG a-khong-them-dong-ten-b" "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     luat-them-khong-kiem-doi-tac) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     luat-ghi-for-all-doi-tac) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: bang_doi_tac_mau" ;;
