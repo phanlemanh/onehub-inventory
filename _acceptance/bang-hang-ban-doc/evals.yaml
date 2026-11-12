@@ -79,7 +79,7 @@ evals:
     layer: ui-observed
     paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", src/components/candidate/**]
     steps:
-      - "Use the dev server at the URL given (lane K, port 3481); do not start one on port 3470"
+      - "Use the dev server at the URL given (lane K, port 3481); if it does not answer, start it from the repo root with PORT=3481 npm run dev (never port 3470, never while a suite command is running), note its PID and stop only that PID when done"
       - "Navigate {url}/inventory at 1440x900, light → screenshot evidence/inventory-1440-sang.png"
       - "Same page at 1440x900, dark (emulate prefers-color-scheme dark) → screenshot evidence/inventory-1440-toi.png"
       - "Navigate {url}/inventory at 1024x768, light → screenshot evidence/inventory-1024-sang.png"
