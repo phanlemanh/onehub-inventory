@@ -43,6 +43,27 @@ khoi:
     mo_ta: Chữ dài cắt gọn trong một ô, đọc đủ khi rê chuột
     ho_so: bang-hang-ban-doc
     duyet: 2026-11-12
+  - ten: RecordPanel
+    tep: src/components/candidate/record-panel.tsx
+    nguon: sheet-9
+    nhu_cau: xem-chi-tiet-mot-dong
+    mo_ta: Ngăn nổi bên phải để xem chi tiết một dòng mà bảng bên trái vẫn dùng được
+    ho_so: ho-so-can
+    duyet: 2026-11-12
+  - ten: ListingRecordBody
+    tep: src/modules/listings/ui/listing-record.tsx
+    nguon: solution-crm-4
+    nhu_cau: ruot-ho-so-can
+    mo_ta: Ruột hồ sơ một căn — thẻ căn ở đầu rồi đủ các trường dạng nhãn và giá trị
+    ho_so: ho-so-can
+    duyet: 2026-11-12
+  - ten: ListingCard
+    tep: src/modules/listings/ui/listing-record.tsx
+    nguon: product-grid-4
+    nhu_cau: the-can
+    mo_ta: Thẻ một căn với mã căn, giá, nơi, trạng thái và ba thông số
+    ho_so: ho-so-can
+    duyet: 2026-11-12
   - ten: data-grid-grouping-2
     tep: src/components/candidate/data-region.tsx
     nguon: data-grid-grouping-2

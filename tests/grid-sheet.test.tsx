@@ -30,6 +30,17 @@ beforeAll(() => {
     return { ...plain, toJSON: () => plain } as DOMRect;
   };
   tallGridViewport();
+  // Enter opens a listing's record (row 3), and the record asks for the screen width through matchMedia.
+  window.matchMedia ??= ((query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    onchange: null,
+    dispatchEvent: () => false,
+  })) as unknown as typeof window.matchMedia;
   globalThis.ResizeObserver ??= class {
     observe() {}
     unobserve() {}

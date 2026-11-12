@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,12 @@ import {
   type InventoryField,
   type InventoryState,
 } from "./inventory-rows";
+import { listingRecord } from "./listing-record";
 
 /** Rows kept when part of the load fails: the first page and a half, so the partial state still spans two pages. */
 const PARTIAL_ROWS = 40;
 
-/** The inventory grid: the screen only declares columns, rows and its empty reason; the region owns behaviour. */
+/** The inventory grid: the screen declares columns, rows, its empty reason and what one listing's record shows. */
 export function InventoryGrid({
   title,
   headers,
@@ -40,6 +41,7 @@ export function InventoryGrid({
 }) {
   const router = useRouter();
   const [current, setCurrent] = useState<InventoryState>(state);
+  const record = useMemo(() => listingRecord(headers), [headers]);
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
     current === "empty" ? [] : current === "partial" ? rows.slice(0, PARTIAL_ROWS) : rows;
@@ -50,6 +52,7 @@ export function InventoryGrid({
       rows={shown}
       status={status}
       onRetry={() => setCurrent("ready")}
+      record={record}
       emptyWhy={emptyWhy}
       initialFilters={filters}
       groupBy={INVENTORY_GROUP_BY}
