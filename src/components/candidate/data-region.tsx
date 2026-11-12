@@ -1,21 +1,43 @@
 "use client";
 
-import { createColumnHelper, useTable } from "@tanstack/react-table";
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  createColumnHelper,
+  useTable,
+  type ColumnFiltersState,
+  type ExpandedState,
+  type SortingState,
+  type ColumnVisibilityState,
+} from "@tanstack/react-table";
+import { Columns3Icon, FilterIcon, ListTreeIcon } from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 
+import { Badge } from "@/components/reui/badge";
 import {
   DataGrid,
   DataGridContainer,
   dataGridFeatures,
+  type DataGridCellSelectionSnapshot,
 } from "@/components/reui/data-grid/data-grid";
+import { DataGridCellSelection } from "@/components/reui/data-grid/data-grid-cell-selection";
+import { DataGridColumnHeader } from "@/components/reui/data-grid/data-grid-column-header";
+import { DataGridColumnVisibility } from "@/components/reui/data-grid/data-grid-column-visibility";
 import { DataGridScrollArea } from "@/components/reui/data-grid/data-grid-scroll-area";
+import { DataGridTableRowExpand } from "@/components/reui/data-grid/data-grid-table";
 import { DataGridTableVirtual } from "@/components/reui/data-grid/data-grid-table-virtual";
 import { Frame, FrameHeader, FramePanel } from "@/components/reui/frame";
 import { Button } from "@/components/ui/button";
 
 import {
   DENSITY_ROW_CLASS,
-  SEARCHABLE_KINDS,
   densityFor,
   editModeFor,
   fittedWidthCh,
@@ -24,7 +46,22 @@ import {
   type FieldKey,
   type TypedColumn,
 } from "./column-kind";
+import { ColumnFilterCell, type FilterOption } from "./column-filter-cell";
 import { GRID_COPY, GRID_I18N } from "./grid-copy";
+import {
+  GROUP_ID_PREFIX,
+  STATUS_ORDER,
+  cellText,
+  filterIsEmpty,
+  filterModeFor,
+  filterRows,
+  groupRows,
+  rowNumbers,
+  sortRows,
+  type ColumnFilter,
+  type ColumnFilters,
+  type SortBy,
+} from "./grid-view";
 import { RecordPanel, useRecordAddress, type RecordView } from "./record-panel";
 import { RegionTitle, RegionToolbar } from "./region-header";
 import {
@@ -119,19 +156,17 @@ function PanelFor({
   );
 }
 
-const helper = createColumnHelper<typeof dataGridFeatures, GridRow>();
+/** A row of the table: a data row, or a group row holding the data rows under one value. */
+type TableRow = GridRow & {
+  /** Where the row stands in reading order, on through the groups; group rows have none. */
+  rowNumber?: number;
+  group?: { label: string; count: number; field: FieldKey };
+  subRows?: TableRow[];
+};
 
-function matches(row: GridRow, columns: readonly TypedColumn[], query: string): boolean {
-  const needle = query.trim().toLocaleLowerCase("vi");
-  if (needle === "") return true;
-  return columns.some(
-    (column) =>
-      SEARCHABLE_KINDS.includes(column.kind) &&
-      String(row[column.field] ?? "")
-        .toLocaleLowerCase("vi")
-        .includes(needle),
-  );
-}
+const helper = createColumnHelper<typeof dataGridFeatures, TableRow>();
+
+const isGroup = (row: TableRow) => row.group !== undefined;
 
 /** Width of the content area in ch, measured on the element itself so the density follows the real layout. */
 function useWidthInCh() {
@@ -159,9 +194,38 @@ function useWidthInCh() {
   return { boxRef, chRef, denseChRef, widthCh, chPx, denseChPx };
 }
 
+/** The values a value column holds, in the order a reader expects: statuses in STATUS_ORDER, others as they come. */
+function filterOptions(column: TypedColumn, rows: readonly GridRow[]): FilterOption[] {
+  if (filterModeFor(column.kind) !== "values") return [];
+  const seen = new Map<string, string>();
+  for (const row of rows) {
+    const value = row[column.field];
+    if (value === null || value === undefined || value === "") continue;
+    const key = String(value);
+    if (!seen.has(key)) seen.set(key, cellText(column.kind, value));
+  }
+  const options = [...seen.entries()].map(([value, label]) => ({ value, label }));
+  if (column.kind === "status") {
+    const at = (value: string) => {
+      const index = (STATUS_ORDER as readonly string[]).indexOf(value);
+      return index === -1 ? STATUS_ORDER.length : index;
+    };
+    return options.sort((a, b) => at(a.value) - at(b.value));
+  }
+  return options;
+}
+
+function filtersFrom(state: ColumnFiltersState): ColumnFilters {
+  const filters: ColumnFilters = {};
+  for (const entry of state) filters[entry.id as FieldKey] = entry.value as ColumnFilter;
+  return filters;
+}
+
 /**
- * The shared grid of every data region: header, typed columns, search, one continuous run of rows and the region states
- * (design/states.md). Screens give columns by field and rows; alignment, width, format and density follow the kind.
+ * The shared grid of every data region: header, typed columns, search, one continuous run of rows, the region states
+ * (design/states.md), and the sheet habits of row 2a — a selected cell moved by the keyboard, a range copied as
+ * tab-separated text, sort by a header, one filter per column, rows grouped under one field, columns shown or hidden.
+ * Screens give columns by field and rows; alignment, width, format, density and these habits follow the kind.
  */
 export function DataRegion({
   title,
@@ -175,6 +239,8 @@ export function DataRegion({
   action,
   record,
   editable = false,
+  initialFilters,
+  groupBy,
 }: {
   title: string;
   columns: readonly TypedColumn[];
@@ -192,16 +258,54 @@ export function DataRegion({
   record?: RegionRecord;
   /** Cells say where they are edited: in the cell or in the record panel, by kind. */
   editable?: boolean;
+  /** Column filters the region opens with, e.g. a status shortcut of the App Shell. */
+  initialFilters?: ColumnFilters;
+  /** The field rows may be grouped under; the toolbar offers «Nhóm theo …» only when the screen names one. */
+  groupBy?: FieldKey;
 }) {
   const searchId = useId();
   const [query, setQuery] = useState("");
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() =>
+    Object.entries(initialFilters ?? {})
+      .filter(([, value]) => !filterIsEmpty(value))
+      .map(([id, value]) => ({ id, value })),
+  );
+  const [filterRowOpen, setFilterRowOpen] = useState(() => columnFilters.length > 0);
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({});
+  const [grouped, setGrouped] = useState(false);
+  const [expanded, setExpanded] = useState<ExpandedState>(true);
+  const [selectedCells, setSelectedCells] = useState(0);
   const { boxRef, chRef, denseChRef, widthCh, chPx: baseChPx, denseChPx } = useWidthInCh();
 
+  const filters = useMemo(() => filtersFrom(columnFilters), [columnFilters]);
+  const activeFilterCount = columns.filter((c) => !filterIsEmpty(filters[c.field])).length;
+  const sortBy: SortBy | null = sorting[0]
+    ? { field: sorting[0].id as FieldKey, direction: sorting[0].desc ? "desc" : "asc" }
+    : null;
+  const groupColumn = groupBy ? columns.find((c) => c.field === groupBy) : undefined;
+  const isGrouped = grouped && groupColumn !== undefined;
+
+  // Filter, then sort, then group: a sort orders rows inside each group, numbers run on through the groups.
   const shown = useMemo(
-    () => rows.filter((row) => matches(row, columns, query)),
-    [rows, columns, query],
+    () => sortRows(filterRows(rows, columns, filters, query), columns, sortBy),
+    [rows, columns, filters, query, sortBy?.field, sortBy?.direction], // eslint-disable-line react-hooks/exhaustive-deps
   );
-  // Widths follow the rows the region holds, not the rows a search leaves, so columns do not jump while typing.
+  const data = useMemo((): TableRow[] => {
+    if (!isGrouped || !groupColumn) {
+      const numbers = rowNumbers(shown);
+      return shown.map((row) => ({ ...row, rowNumber: numbers.get(row.id) }));
+    }
+    const groups = groupRows(shown, groupColumn);
+    const numbers = rowNumbers(groups);
+    return groups.map((g): TableRow => ({
+      id: g.id,
+      group: { label: g.label, count: g.rows.length, field: groupColumn.field },
+      subRows: g.rows.map((row) => ({ ...row, rowNumber: numbers.get(row.id) })),
+    }));
+  }, [shown, isGrouped, groupColumn]);
+
+  // Widths follow the rows the region holds, not the rows a filter leaves, so columns do not jump while typing.
   const fitted = useMemo(
     () =>
       columns.map((column) =>
@@ -220,6 +324,10 @@ export function DataRegion({
           rows.map((row) => row[column.field]),
         ),
       ),
+    [columns, rows],
+  );
+  const options = useMemo(
+    () => new Map(columns.map((column) => [column.field, filterOptions(column, rows)])),
     [columns, rows],
   );
   // The row-number column counts too: digits of the last row number plus padding.
@@ -257,21 +365,39 @@ export function DataRegion({
     openRef.current = openRecord;
   });
 
+  // The group label sits in the grouping column, or in the first data column shown when that one is hidden.
+  const visibleFields = columns
+    .map((column) => column.field)
+    .filter((field) => columnVisibility[field] !== false);
+  const groupLabelField =
+    groupColumn && visibleFields.includes(groupColumn.field) ? groupColumn.field : visibleFields[0];
+  // The group's row count sits in the next column shown, so the label keeps its column's whole width.
+  const groupCountField =
+    visibleFields[visibleFields.indexOf(groupLabelField as FieldKey) + 1] ?? groupLabelField;
+
   const columnDefs = useMemo(
     () => [
       helper.display({
         id: ROW_NUMBER_ID,
         header: GRID_COPY.rowNumberHeader,
         size: Math.floor(rowNumberCh * chPx),
-        cell: (info) => (
-          <span
-            data-slot="row-number"
-            data-row-number={info.row.index + 1}
-            className="text-muted-foreground tabular-nums"
-          >
-            {info.row.index + 1}
-          </span>
-        ),
+        enableHiding: false,
+        enableSorting: false,
+        enablePinning: false,
+        enableCellSelection: false,
+        cell: (info) => {
+          if (isGroup(info.row.original)) return null;
+          const n = info.row.original.rowNumber;
+          return (
+            <span
+              data-slot="row-number"
+              data-row-number={n}
+              className="text-muted-foreground tabular-nums"
+            >
+              {n}
+            </span>
+          );
+        },
         meta: {
           headerTitle: GRID_COPY.rowNumberLabel,
           headerClassName: "text-right",
@@ -279,22 +405,60 @@ export function DataRegion({
         },
       }),
       ...columns.map((column, index) =>
-        helper.accessor((row: GridRow) => row[column.field], {
+        helper.accessor((row: TableRow) => row[column.field], {
           id: column.field,
-          header: column.header,
+          header: ({ column: tableColumn }) => (
+            <div data-slot="sheet-header" className="flex w-full min-w-0 flex-col py-1">
+              <DataGridColumnHeader
+                column={tableColumn}
+                title={column.header}
+                className={column.align === "right" ? "ms-auto" : undefined}
+              />
+              {filterRowOpen ? (
+                <ColumnFilterCell
+                  spec={column}
+                  column={tableColumn}
+                  options={options.get(column.field) ?? []}
+                />
+              ) : null}
+            </div>
+          ),
           size: Math.floor((widths[index] ?? column.widthCh) * chPx),
+          // The first column names the row (the unit code) and always stays; any other may be hidden.
+          enableHiding: index !== 0,
+          enablePinning: false,
           cell: (info) => {
+            const row = info.row.original;
+            if (row.group) {
+              const count = (
+                <Badge variant="secondary" size="sm" data-slot="group-count">
+                  {GRID_COPY.sheet.groupCount(row.group.count)}
+                </Badge>
+              );
+              if (column.field === groupLabelField) {
+                return (
+                  <span data-slot="group-label" className="flex min-w-0 items-center gap-1">
+                    <DataGridTableRowExpand row={info.row} indent={0} />
+                    <span className="truncate font-medium">
+                      {row.group.label || GRID_COPY.sheet.groupEmpty}
+                    </span>
+                    {groupCountField === groupLabelField ? count : null}
+                  </span>
+                );
+              }
+              return column.field === groupCountField ? count : null;
+            }
             const cell = (
               <TypedCell
                 kind={column.kind}
                 value={info.getValue()}
-                transaction={info.row.original.transaction}
-                lockedReason={info.row.original.locked?.[column.field]}
+                transaction={row.transaction}
+                lockedReason={row.locked?.[column.field]}
                 editMode={editable ? editModeFor(column.kind) : undefined}
               />
             );
             if (index !== 0 || !opensRecord) return cell;
-            const id = info.row.original.id;
+            const id = row.id;
             return (
               <Button
                 variant="link"
@@ -310,18 +474,49 @@ export function DataRegion({
             headerTitle: column.header,
             headerClassName: column.align === "right" ? "text-right" : "text-left",
             cellClassName: column.align === "right" ? "text-right" : "text-left",
+            // A copy carries the words the cell shows; nothing in the grid is written from here (rows 4, 5 edit).
+            cellEdit: {
+              editable: false,
+              format: (value: unknown, row: TableRow) =>
+                row.group
+                  ? column.field === groupLabelField
+                    ? row.group.label
+                    : ""
+                  : cellText(column.kind, value, row.transaction),
+            },
           },
         }),
       ),
     ],
-    [columns, chPx, editable, opensRecord, widths, rowNumberCh],
+    [
+      columns,
+      chPx,
+      editable,
+      opensRecord,
+      widths,
+      rowNumberCh,
+      filterRowOpen,
+      options,
+      groupLabelField,
+      groupCountField,
+    ],
   );
 
   const table = useTable({
     features: dataGridFeatures,
-    data: shown as GridRow[],
+    data,
     columns: columnDefs,
-    getRowId: (row: GridRow) => row.id,
+    getRowId: (row: TableRow) => row.id,
+    getSubRows: (row: TableRow) => row.subRows,
+    // Filters, sort and groups are the region's own pure rules (grid-view.ts); the table only shows their result.
+    manualSorting: true,
+    manualFiltering: true,
+    autoResetExpanded: false,
+    state: { sorting, columnFilters, columnVisibility, expanded },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onExpandedChange: setExpanded,
     // One continuous run: every row is on the single page, the virtual body mounts only the rows in view.
     initialState: {
       pagination: { pageIndex: 0, pageSize: Number.MAX_SAFE_INTEGER },
@@ -335,21 +530,115 @@ export function DataRegion({
   // The grid scrolls inside its own viewport; keyboard users must be able to reach and scroll it (WCAG 2.1.1).
   // ReUI's scroll area takes no props for its viewport, so the region labels it once the page runs. Until then the
   // server-rendered content holds the one keyboard stop, so the grid is reachable before the page takes input; the
-  // stop moves to the viewport here (React leaves the attribute alone while its prop does not change).
+  // stop moves to the grid table once the page runs (cell selection puts focus on the table, role="grid").
   useEffect(() => {
     const viewport = boxRef.current?.querySelector<HTMLElement>(
       '[data-slot="scroll-area-viewport"]',
     );
     if (!viewport) return;
-    viewport.tabIndex = 0;
     viewport.setAttribute("role", "region");
     viewport.setAttribute("aria-label", title);
+    const grid = viewport.querySelector<HTMLElement>('table[data-slot="data-grid-table"]');
+    if (grid) {
+      grid.tabIndex = 0;
+      grid.setAttribute("aria-label", title);
+      viewport.removeAttribute("tabindex");
+    } else {
+      viewport.tabIndex = 0;
+    }
     boxRef.current
       ?.querySelector('[data-slot="data-region-scroll-content"]')
       ?.removeAttribute("tabindex");
   });
 
+  // Enter on a selected cell opens its row, the region's one «open row» door (the record panel of row 3).
+  const onGridKeyDownCapture = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Enter" || event.shiftKey || event.altKey || event.metaKey || event.ctrlKey)
+      return;
+    if (!opensRecord) return;
+    const focused = table.getFocusedCell?.();
+    const id = focused?.row.id;
+    if (!id || id.startsWith(GROUP_ID_PREFIX)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    openRef.current?.(id);
+  };
+
+  const onSelection = useCallback((snapshot: DataGridCellSelectionSnapshot) => {
+    setSelectedCells(snapshot.visibleCellCount);
+  }, []);
+
+  const clearFilters = () => {
+    setQuery("");
+    setColumnFilters([]);
+  };
+  const narrowed = query.trim() !== "" || activeFilterCount > 0;
+
   const showsRows = headerShowsRows(status);
+  const gridShown =
+    status !== "forbidden" &&
+    status !== "loading" &&
+    status !== "error" &&
+    rows.length > 0 &&
+    shown.length > 0;
+  // The toolbar sits inside the grid when the grid shows, so its sheet tools reach the grid's table.
+  const toolbar = (tools: ReactNode) => (
+    <RegionToolbar
+      total={showsRows ? rows.length : undefined}
+      shown={showsRows && narrowed ? shown.length : undefined}
+      query={query}
+      onQuery={setQuery}
+      tools={tools}
+      action={action?.allowed && status !== "forbidden" ? action.node : undefined}
+      searchId={searchId}
+    />
+  );
+  const sheetTools =
+    showsRows && rows.length > 0 ? (
+      <div data-slot="sheet-tools" className="flex flex-wrap items-center gap-2">
+        <Button
+          variant={filterRowOpen ? "secondary" : "outline"}
+          size="sm"
+          aria-pressed={filterRowOpen}
+          data-slot="filter-toggle"
+          onClick={() => setFilterRowOpen((open) => !open)}
+        >
+          <FilterIcon aria-hidden="true" />
+          {activeFilterCount > 0
+            ? GRID_COPY.sheet.filterOn(activeFilterCount)
+            : GRID_COPY.sheet.filter}
+        </Button>
+        {narrowed ? (
+          <Button variant="ghost" size="sm" data-slot="clear-filters" onClick={clearFilters}>
+            {GRID_COPY.sheet.clearFilters}
+          </Button>
+        ) : null}
+        {groupColumn ? (
+          <Button
+            variant={isGrouped ? "secondary" : "outline"}
+            size="sm"
+            aria-pressed={isGrouped}
+            data-slot="group-toggle"
+            onClick={() => {
+              setGrouped((on) => !on);
+              setExpanded(true);
+            }}
+          >
+            <ListTreeIcon aria-hidden="true" />
+            {GRID_COPY.sheet.groupBy(groupColumn.header)}
+          </Button>
+        ) : null}
+        <DataGridColumnVisibility
+          table={table}
+          trigger={
+            <Button variant="outline" size="sm" data-slot="columns-toggle">
+              <Columns3Icon aria-hidden="true" />
+              {GRID_COPY.sheet.columns}
+            </Button>
+          }
+        />
+      </div>
+    ) : null;
   let body: ReactNode;
   if (status === "forbidden") body = <RegionForbidden />;
   else if (status === "loading")
@@ -358,13 +647,14 @@ export function DataRegion({
   else if (status === "partial" && rows.length === 0)
     body = <RegionPartialEmpty onRetry={onRetry} />;
   else if (rows.length === 0) body = <RegionEmpty why={emptyWhy} action={emptyAction} />;
-  else if (shown.length === 0) body = <RegionNoMatch onClear={() => setQuery("")} />;
+  else if (shown.length === 0) body = <RegionNoMatch onClear={clearFilters} />;
   else
     body = (
       <DataGrid
         table={table}
         recordCount={shown.length}
         i18n={GRID_I18N}
+        onCellSelectionChange={onSelection}
         tableLayout={{
           headerSticky: true,
           headerBackground: true,
@@ -372,24 +662,42 @@ export function DataRegion({
           columnsPinnable: true,
           width: "fixed",
           dense: density === "dense",
+          cellSelection: true,
         }}
         tableClassNames={{ bodyRow: DENSITY_ROW_CLASS[density] }}
       >
+        <DataGridCellSelection />
+        <div className="p-3 empty:hidden">{toolbar(sheetTools)}</div>
         <DataGridContainer>
           <DataGridScrollArea className={VIEWPORT_HEIGHT_CLASS}>
             {/* Keyed by density: the virtual body keeps the estimate it started with for rows it has not measured, so a
                 switch from normal to dense rows must start it again or the run's height (and its last rows) go wrong. */}
-            <div data-slot="data-region-scroll-content" tabIndex={0}>
-              <DataGridTableVirtual key={density} estimateSize={ROW_HEIGHT_PX[density]} />
+            <div
+              data-slot="data-region-scroll-content"
+              tabIndex={0}
+              onKeyDownCapture={onGridKeyDownCapture}
+            >
+              <DataGridTableVirtual
+                key={`${density}-${filterRowOpen}`}
+                estimateSize={ROW_HEIGHT_PX[density]}
+              />
             </div>
           </DataGridScrollArea>
         </DataGridContainer>
-        <div data-slot="region-footer" className="border-t px-3 py-2">
+        <div
+          data-slot="region-footer"
+          className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t px-3 py-2"
+        >
           <span data-slot="region-footer-count" className="text-sm text-muted-foreground">
-            {query
+            {narrowed
               ? GRID_COPY.filteredCount(shown.length, rows.length)
               : GRID_COPY.rowCount(rows.length)}
           </span>
+          {selectedCells > 0 ? (
+            <span data-slot="region-selection" className="text-sm text-muted-foreground">
+              {GRID_COPY.sheet.selected(selectedCells)} · {GRID_COPY.sheet.copyHint}
+            </span>
+          ) : null}
         </div>
       </DataGrid>
     );
@@ -408,16 +716,7 @@ export function DataRegion({
           <RegionTitle title={title} />
         </FrameHeader>
         <FramePanel className="flex min-w-0 flex-col gap-3 p-0">
-          <div className="px-3 pt-3 empty:hidden">
-            <RegionToolbar
-              total={showsRows ? rows.length : undefined}
-              shown={showsRows && query ? shown.length : undefined}
-              query={query}
-              onQuery={setQuery}
-              action={action?.allowed && status !== "forbidden" ? action.node : undefined}
-              searchId={searchId}
-            />
-          </div>
+          {gridShown ? null : <div className="px-3 pt-3 empty:hidden">{toolbar(null)}</div>}
           {status === "partial" && rows.length > 0 ? (
             <div className="px-3">
               <RegionPartial onRetry={onRetry} />

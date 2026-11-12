@@ -22,6 +22,27 @@ export const GRID_COPY = {
   noMatch: {
     title: "Không có dòng nào khớp",
     why: "Chữ bạn gõ không có trong dòng nào của vùng này.",
+    whyFiltered: "Không dòng nào của vùng này khớp cùng lúc ô tìm và các ô lọc đang bật.",
+  },
+  /** Using the grid by hand like a sheet (row 2a): filter row, columns, grouping, selection. */
+  sheet: {
+    filter: "Lọc",
+    filterOn: (count: number) => `Lọc (${count})`,
+    columns: "Cột",
+    columnsMenu: "Hiện cột",
+    groupBy: (header: string) => `Nhóm theo ${header}`,
+    clearFilters: "Xoá lọc",
+    filterLabel: (header: string) => `Lọc cột ${header}`,
+    textPlaceholder: "Chứa…",
+    numberPlaceholder: "vd <=5, 2-5",
+    moneyPlaceholder: "Tỷ, vd <=5",
+    valuesPlaceholder: "Chọn",
+    invalidRule: "Chưa đọc được luật lọc: gõ như <=5, >2 hay 2-5",
+    groupCount: (count: number) => `${count} dòng`,
+    groupEmpty: "Chưa ghi",
+    selected: (count: number) => `${count} ô đã chọn`,
+    copyHint: "Ctrl+C để chép",
+    copied: (count: number) => `Đã chép ${count} ô`,
   },
   error: {
     title: "Vùng này chưa tải được",
@@ -74,5 +95,9 @@ export const GRID_I18N: DataGridI18nOverrides = {
     goToPage: (page) => `Tới trang ${page}`,
     filterNoResults: GRID_COPY.noMatch.title,
     filterClear: GRID_COPY.clearFilter,
+    toggleColumns: GRID_COPY.sheet.columnsMenu,
+    expandRow: "Mở nhóm",
+    collapseRow: "Gập nhóm",
+    filterSelectedCount: (count) => `${count} đã chọn`,
   },
 };

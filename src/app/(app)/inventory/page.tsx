@@ -6,6 +6,7 @@ import { label } from "@/modules/company-config";
 import { SAMPLE_COMPANY, buildSampleListings } from "@/modules/listings";
 import {
   InventoryGrid,
+  inventoryFiltersFrom,
   inventoryRows,
   inventoryStateFrom,
   type InventoryField,
@@ -29,13 +30,14 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 
 /** Inventory, read-only: the sample company's listings (roadmap row 1) on the shared grid. */
 export default async function Page({ searchParams }: Props) {
-  const { state } = await searchParams;
+  const { state, status } = await searchParams;
   const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
   const { listings, listingUnits } = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
   return (
     <>
       <PageHeader title={label("Inventory")} />
       <InventoryGrid
+        key={typeof status === "string" ? status : ""}
         title={label("Listing")}
         headers={HEADERS}
         rows={inventoryRows({ listings, listingUnits, units })}
@@ -45,6 +47,7 @@ export default async function Page({ searchParams }: Props) {
         )}
         emptyWhy={`${label("Company")} chưa có ${label("Unit").toLocaleLowerCase("vi")} nào đang chào trên ${label("Inventory")}.`}
         reloadLabel="Tải lại"
+        filters={inventoryFiltersFrom(typeof status === "string" ? status : undefined)}
       />
     </>
   );
