@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory]
-status: implemented
+status: verified
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: _acceptance/bang-hang-dung-tay-nhu-sheet/design.md
@@ -115,3 +115,12 @@ AC-10 trục 3; mọi eval máy khai cặp hai chiều (trục 5). [CE chưa ki�
 
 - Hỏi-1 (dáng dòng nhóm), Hỏi-2 (lọc ngày theo số ngày đã qua), Hỏi-3 (tiêu đề cột là menu của ReUI), Hỏi-4 (bỏ nút Xuất)
   chờ chủ kho ở Cổng Phạm vi.
+- Ngoài-1 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Trên Bảng hàng, lưới vẫn vừa màn hình và chân bảng vẫn thấy được. Nếu sau này đổi chiều cao đầu trang hay thanh công cụ, hoặc một màn Lưới khác dùng khuôn này, chân bảng có thể tụt khỏi màn hình mà không có kiểm tra nào báo. — `src/components/candidate/data-region.tsx`
+- Ngoài-2 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Trên một màn Lưới khác có đầu trang hay thanh công cụ cao khác Bảng hàng, bảng có thể bị cuộn thừa hoặc chừa khoảng trống. Bảng hàng hiện tại vẫn hiển thị đúng. — `src/components/candidate/data-region.tsx`
+- Ngoài-3 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Người dùng thấy các trạng thái đúng thứ tự trên mọi màn hiện nay. Nguy cơ là về sau sửa thứ tự ở một nơi mà quên nơi kia thì hai danh sách lệch nhau. — `src/components/candidate/grid-view.ts`
+- Ngoài-6 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Người dùng không thấy gì khác đi; chỉ là một phép kiểm chép vùng ô không thật sự chạy nên một lỗi chép sai có thể lọt qua mà không bị bắt. — `tests/e2e/sheet.spec.ts`
+- Ngoài-7 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Nếu giá hay trạng thái hiển thị sai thì phép kiểm chép vẫn báo đạt, vì nó so với chính thứ đang hiển thị. — `tests/e2e/sheet.spec.ts`
+- Ngoài-8 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Chưa chứng minh được rằng phép kiểm menu nằm trên cùng khi toàn màn hình thật sự bắt được lỗi, nên menu bị khuất có thể lọt qua. — `tests/e2e/sheet.spec.ts`
+- Ngoài-10 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Người dùng bàn phím có thể gặp thêm điểm dừng Tab thừa hoặc thứ tự Tab bị đảo mà phép kiểm vẫn báo đạt. — `tests/e2e/sheet.spec.ts`
+- Ngoài-11 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Lọc giá sai đơn vị mà vẫn bớt vài dòng thì phép kiểm vẫn báo đạt, nên người dùng có thể thấy thiếu hay thừa dòng khi lọc kết hợp. — `tests/e2e/sheet.spec.ts`
+- Ngoài-12 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Nếu PageDown chỉ xuống một dòng như mũi tên xuống thì phép kiểm vẫn báo đạt, người dùng sẽ thấy phím nhảy trang không nhảy xa. — `tests/e2e/sheet.spec.ts`

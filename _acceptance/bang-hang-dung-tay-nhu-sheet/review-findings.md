@@ -1,18 +1,19 @@
 ## Trong hợp đồng
 
-- **From 1024 up, full screen keeps the normal-page grid height; the full-screen height never takes effect**
-  AC: AC-11
-  file: `src/components/candidate/data-region.tsx:98`
-  severity: medium
-  source: bugs
-  detail: The grid's scroll box gets both `lg:h-(--region-height)` and `group-data-full-screen/region:h-(--region-full-height)` (line 782). In the compiled CSS both rules have the same specificity (0,1,0), because `:is(:where(.group/region)[data-full-screen] .cls)` counts only `.cls`. The `lg:` rule sits inside `@media (min-width: 64rem)`, which comes later in the stylesheet (offset 149335 vs 80760 in .next/dev/.../[root-of-the-server]__0-3okyl8hewtx._.css), so it wins whenever the screen is 1024 or wider. Full screen is only offered at those widths, so in full screen the grid is still `calc(100dvh - 23rem)` instead of `calc(100dvh - 10rem)`. That leaves about 13rem of empty space under the footer, and the `--region-full-height` rule never applies. Before this change the same conflict existed with `lg:h-screen`; this change replaced 100vh with a value 23rem shorter, which makes the full-screen grid visibly short. The e2e test 'full screen shows only the grid, more rows…' does not catch it: switching to dense rows alone gives more visible rows than before. Fix: give the full-screen height a variant that beats the `lg:` one, for example `lg:group-data-full-screen/region:h-(--region-full-height)` or `!`, and add an e2e assertion that in full screen the footer's bottom edge is near innerHeight.
-  rationale: AC-11 đòi ở 1440 và 1024, khi toàn màn hình lưới kéo tới đáy màn hình; finding cho thấy lưới vẫn giữ chiều cao thường và chừa khoảng trống dưới chân bảng.
+Không có phát hiện nào.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Shared grid component hard-codes the Inventory page's surrounding layout height (23rem)**
+- **Shared DataRegion hard-codes the inventory page's layout height (23rem)**
+  Người dùng thấy gì: Trên Bảng hàng, lưới vẫn vừa màn hình và chân bảng vẫn thấy được. Nếu sau này đổi chiều cao đầu trang hay thanh công cụ, hoặc một màn Lưới khác dùng khuôn này, chân bảng có thể tụt khỏi màn hình mà không có kiểm tra nào báo.
+  Căn cứ: Hiện chỉ Bảng hàng dùng đúng bố cục này nên người dùng chưa gặp lỗi; nếu có lệch thì chỉ là chân bảng bị che, tải lại hay đổi cỡ cửa sổ không mất dữ liệu, và có thể sửa khi thêm màn Lưới thứ hai.
+  file: `src/components/candidate/data-region.tsx`
+  severity: low
+  Đề xuất: known-limits
+
+- **Shared grid component hard-codes the Inventory page's surrounding layout height (23rem) (r2 · tệp đã đổi)**
   Người dùng thấy gì: Trên một màn Lưới khác có đầu trang hay thanh công cụ cao khác Bảng hàng, bảng có thể bị cuộn thừa hoặc chừa khoảng trống. Bảng hàng hiện tại vẫn hiển thị đúng.
   Căn cứ: Hiện chỉ Bảng hàng dùng thật, màn khác mới là trang mẫu; hậu quả chỉ là lệch bố cục, không mất dữ liệu, và chỉnh khi màn Lưới thứ hai ra đời thì rẻ.
   file: `src/components/candidate/data-region.tsx`
