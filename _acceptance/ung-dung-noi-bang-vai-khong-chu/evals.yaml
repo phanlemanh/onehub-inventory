@@ -1,0 +1,148 @@
+schema_version: 1
+feature_slug: ung-dung-noi-bang-vai-khong-chu
+# Ma trận viết trước.
+#   Bộ chạy cách ly (db/scripts/cach-ly.sh) sau hàng 7c: 31 ca cũ + 4 ca mới (cộng ca của hàng 2c nếu gộp trước).
+#     Ca mới, mỗi ca in «ok <ca>» đúng một lần ở bản lành:
+#       vai-dang-nhap-khong-ve-chu (db/tests/vai-dang-nhap.sql, dưới vai chủ, giao dịch rút lại) — 11 điều:
+#         (12 điều; điều 12: quyền hiệu lực has_table_privilege = rỗng trên quan hệ ngoài hệ thống, has_function_privilege
+#         ⊆ tập hàm quy_hang_app chạy được — tính cả PUBLIC và quyền mặc định)
+#         rolcanlogin · ¬rolsuper · ¬rolcreaterole · ¬rolcreatedb · ¬rolreplication · ¬rolbypassrls · không sở hữu
+#         (pg_class, pg_proc, pg_namespace ngoài hệ thống) · không quyền thẳng trên quan hệ hay hàm (aclexplode, grantee
+#         = vai) · tập MEMBER = {quy_hang_login, quy_hang_app} · lời cấp quy_hang_app: set_option ∧ ¬inherit_option ∧
+#         ¬admin_option · không vai nào với tới được mà vượt luật theo dòng hay siêu người dùng.
+#       dang-nhap-khong-ve-vai-chu (db/tests/vai-dang-nhap-phien.sql, kết nối psql -U quy_hang_login) — 5 lệnh bị từ chối:
+#         set role <chủ companies> · set role quy_hang_identity · set session authorization <chủ> · sau reset role:
+#         select companies · select agreements; và current_user sau reset = quy_hang_login.
+#       dang-nhap-qua-cua-doc-duoc (cùng tệp, cùng kết nối) — đối chứng: hai câu của cửa với sàn A → đếm agreements = 1,
+#         counterparty của A.
+#       pha-thu-vai-dang-nhap — bảy tệp phá, mỗi tệp: begin; <tệp>; <ca danh mục>; rollback → dòng ghim:
+#         cap-vai-chu → «HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login về được vai chủ postgres»
+#         cap-vai-danh-tinh → «HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login vượt được luật theo dòng qua quy_hang_identity»
+#         cap-ke-thua → «HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login kế thừa quyền của quy_hang_app»
+#         so-huu-bang → «HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login sở hữu public.agreements»
+#         vuot-luat → «HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login vượt được luật theo dòng»
+#         quyen-thang → «HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login có quyền thẳng trên public.agreements SELECT»
+#         quyen-ham-thang → «HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login chạy được hàm public.ham_chu_mau mà quy_hang_app không chạy được»
+#         sau bảy tệp: ca danh mục chạy lại phải ok, không thì «HỎNG pha-thu-vai-dang-nhap: bản phá để lại dấu trên cụm».
+#   Cửa (src/modules/identity/with-company.ts) — kiểm vai nối, ma trận 4 vai × 2 kết cục:
+#     postgres → «cửa từ chối vai nối postgres: về được vai chủ postgres» · tạm(app+chủ) → «… về được vai chủ postgres» ·
+#     tạm(app+identity) → «… vượt được luật theo dòng qua quy_hang_identity» · quy_hang_login → chạy, đọc đúng sàn.
+#     Chiều đỏ của bộ kiểm cửa: bản cửa bỏ bước kiểm (fake/biến thể trong bài đơn vị) → ca từ chối đỏ với tên ca.
+#   Cửa đổi vai (AC-7): 3 lệnh × (bị từ chối, đếm A=1, B=1).
+#   Bài quét chuỗi nối (AC-8): tệp quét tests/db/**, tests/e2e-db/**, playwright.db.config.ts; mẫu đỏ:
+#     createPool(<…>.url) · createPool(DB_URL) · DATABASE_URL: DB_URL · new pg.Pool({ connectionString: <…>.url — trên
+#     bản sao trong thư mục tạm có đúng một dòng như vậy → bài nêu đúng tệp và dòng.
+#   .env.example (AC-9): mốc 83d1764 (nhánh chính khi mở hàng) — mọi dòng cũ có trong tệp mới; thêm hai dòng mang
+#     «quy_hang_login» và «PSQL_LOGIN».
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.vai_dang_nhap_c
+    layer: backend-effect
+    paths: [db/migrations/**, db/tests/**, db/scripts/**]
+    expected: "exit 0; bộ chạy in 'ok ap-hai-lan' (migration 008 áp một lần, lần hai 0 migration mới) và đúng một lần 'ok vai-dang-nhap-khong-ve-chu'; chiều đỏ cùng ca: E4"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.vai_dang_nhap_c
+    layer: backend-effect
+    paths: [db/migrations/**, db/tests/**, db/scripts/**]
+    expected: "exit 0; bộ chạy in đúng một lần 'ok dang-nhap-khong-ve-vai-chu' — ca chạy trên kết nối psql đăng nhập bằng quy_hang_login (bộ chạy in 'phiên đăng nhập: quy_hang_login' trước ca), ba lệnh đổi vai và hai lệnh đọc sau reset role đều gặp lỗi thiếu quyền; chiều đỏ: bài 'phiên chạy dưới vai chủ thì ca đỏ' của tests/db/cach-ly.db.test.ts chạy tệp phiên bằng kết nối vai chủ và thấy 'HỎNG dang-nhap-khong-ve-vai-chu: set role postgres không bị từ chối'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.vai_dang_nhap_c
+    layer: backend-effect
+    paths: [db/tests/**, db/scripts/**, src/modules/identity/with-company.ts]
+    expected: "exit 0; bộ chạy in đúng một lần 'ok dang-nhap-qua-cua-doc-duoc — 1 thoả thuận của sàn A'; câu đổi vai và câu đặt sàn trong tệp phiên trùng nguyên văn SET_ROLE_SQL, SET_CONTEXT_SQL của cửa (bài 'tệp phiên dùng đúng câu của cửa' trong tests/db/cach-ly.db.test.ts xanh)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.vai_dang_nhap_c
+    layer: backend-effect
+    paths: [db/tests/**, db/scripts/**]
+    expected: "exit 0; bộ chạy in 'ok pha-thu-vai-dang-nhap'; trong các dòng '[pha-thu <tệp>]': cap-vai-chu có 'HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login về được vai chủ postgres', cap-vai-danh-tinh có '…: quy_hang_login vượt được luật theo dòng qua quy_hang_identity', cap-ke-thua có '…: quy_hang_login kế thừa quyền của quy_hang_app', so-huu-bang có '…: quy_hang_login sở hữu public.agreements', vuot-luat có '…: quy_hang_login vượt được luật theo dòng', quyen-thang có '…: quy_hang_login có quyền thẳng trên public.agreements SELECT', quyen-ham-thang có '…: quy_hang_login chạy được hàm public.ham_chu_mau mà quy_hang_app không chạy được'; sau lượt chạy, danh mục của cụm không còn lời cấp hay thuộc tính phá nào (ca danh mục chạy lại ok)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.vai_dang_nhap_c
+    paths: [db/tests/**, db/scripts/**, tests/db/cach-ly.db.test.ts]
+    expected: "exit 0; dòng cuối bộ chạy 'cach-ly: <n> ca đạt, vai quy_hang_app, nối bằng quy_hang_login' với <n> bằng số phần tử CA_SQL + CA_LENH + CA_DANG_NHAP của bộ chạy hiện tại (bài kiểm bộ chạy đếm và so); bài 'bộ chạy giữ nguyên ca và dòng ghim cũ' xanh với mốc là bộ chạy ở nhánh chính trước hàng này; bản sao thay cap-vai-chu.sql bằng 'select 1;' thoát khác 0 và in đúng 'HỎNG pha-thu-vai-dang-nhap: cap-vai-chu: bộ kiểm vẫn xanh trên bản phá'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.vai_dang_nhap_c
+    layer: backend-effect
+    paths: [src/modules/identity/with-company.ts, tests/db/vai-dang-nhap.db.test.ts, tests/db/helpers.ts]
+    expected: "exit 0; tests/db/vai-dang-nhap.db.test.ts xanh: ba pool vai về được vai chủ (postgres; vai tạm thành viên quy_hang_app + chủ; vai tạm thành viên quy_hang_app + quy_hang_identity) đều ném lỗi mở đầu 'cửa từ chối vai nối' nêu tên vai và lý do, hàm truyền vào không chạy (biến đếm 0), vai chủ đếm thoả thuận A=1, B=1 không đổi; pool quy_hang_login đọc đúng 1 thoả thuận của A; vai tạm bị xoá sau bài"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6b
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.vai_dang_nhap_unit
+    paths: [src/modules/identity/with-company.ts, src/modules/identity/with-company.test.ts]
+    expected: "exit 0; bài đơn vị của cửa với pool giả: kết quả kiểm vai đạt → hàm chạy, câu kiểm chạy đúng một lần cho hai lời gọi; kết quả từ chối → ném 'cửa từ chối vai nối <vai>: <lý do>', không câu 'begin' nào được gửi, lời gọi sau kiểm lại; chiều đỏ: một cửa giả bỏ bước kiểm dựng ngay trong tệp bài (không qua tham số của cửa thật) chạy cùng phép khẳng định của ca từ chối thì phép khẳng định ném; chữ ký công khai của withCompany và createPool không có tham số nào tắt bước kiểm (bài so số tham số)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.vai_dang_nhap_c
+    layer: backend-effect
+    paths: [src/modules/identity/with-company.ts, tests/db/vai-dang-nhap.db.test.ts]
+    expected: "exit 0; ca 'mã trong cửa đổi vai' xanh: trên pool quy_hang_login, phiên sàn A, ba lệnh (reset role rồi select agreements · set role postgres · set session authorization postgres) mỗi lệnh ném lỗi chứa 'permission denied', withCompany ném lại; vai chủ đếm thoả thuận A=1, B=1; đối chứng cùng ca: cùng ba lệnh trên một client nối bằng vai chủ không bị từ chối (cho thấy phép đo thật sự phân biệt)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.cach_ly_7b_db_c
+    layer: backend-effect
+    paths: [db/**, tests/db/**, src/modules/identity/**]
+    expected: "exit 0; vitest in 'Test Files  <n> passed (<n>)' cho mọi tệp tests/db/*.db.test.ts, không ca 'skipped', không bộ lọc -t"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8b
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.vai_dang_nhap_e2e_c
+    layer: backend-effect
+    paths: [tests/e2e-db/**, playwright.db.config.ts, tests/db/helpers.ts, src/modules/identity/**]
+    expected: "exit 0; mọi bài của playwright.db.config.ts đạt, máy chủ dev nối bằng quy_hang_login (cửa từ chối vai chủ nên một DATABASE_URL vai chủ làm mọi bài đăng nhập đỏ)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8c
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.vai_dang_nhap_unit
+    paths: [tests/vai-dang-nhap-nguon.test.ts, tests/db/**, tests/e2e-db/**, playwright.db.config.ts]
+    expected: "exit 0; bài quét nguồn xanh trên cây thật (0 dòng đưa chuỗi nối vai chủ cho pool sản phẩm hay DATABASE_URL); chiều đỏ cùng tệp: mỗi mẫu trong bốn mẫu đặt vào một bản sao ở thư mục tạm → bài nêu đúng tệp và số dòng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.vai_dang_nhap_unit
+    paths: [.env.example, tests/vai-dang-nhap-nguon.test.ts]
+    expected: "exit 0; bài '.env.example chỉ thêm dòng' xanh: mọi dòng của 'git show 83d1764:.env.example' có trong tệp hiện tại; có dòng chứa 'quy_hang_login' và dòng chứa 'PSQL_LOGIN'; chiều đỏ: bản sao xoá một dòng cũ → bài nêu đúng dòng ấy"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9b
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["**"]
+    expected: "exit 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
