@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-12 — Invitation sign-in link built from `APP_URL` (the product's own address), never from the request's host; production refuses to start without it or with a malformed one (https only); the login-code mail carries no link — [0021](decisions/0021-dang-nhap-ma-email.md), row 9d.
 - 2026-11-12 — Roadmap: added rows 2a (use the grid by hand like a sheet), 2b (phone cards), 1q, 1r, 9d, 7a from the owner's sheet-habit decision and the items signed as "new contract"; row 10 now waits for 1r, 9d, 7a; opened the worth-gate cell of row 9a — [lo-trinh](../docs/plan/lo-trinh.json).
 - 2026-11-12 — Cổng chứng minh màn theo quyết định 0023: sổ khối `design/so-khoi.yaml` (mở rỗng), bậc «trong kho» tra sổ, ứng viên ReUI kèm ảnh, vùng lấy bỏ thêm, mục «Từ Quỹ hàng» và «Họ», lối khuôn bọc cho App Shell; ba hồ sơ đã qua Cổng Phạm vi giữ luật cũ; luật giao diện thay câu «chuyển thể chỉ đổi dữ liệu» bằng luật ba tầng — [0023](decisions/0023-chon-truoc-tao-sau.md), hàng 1n.
 - 2026-11-11 — Recorded the reuse ladder set by the owner (choose before making; repo, then repo with ReUI Pro, then hand-made; three layers of "keep as is") and added roadmap rows 1n, 1o, 1p, 9c — [0023](decisions/0023-chon-truoc-tao-sau.md).
