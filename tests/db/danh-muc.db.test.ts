@@ -45,8 +45,33 @@ async function failsWith(sql: string, values: unknown[], pinned: string): Promis
   expect(message, sql).toContain(pinned);
 }
 
-const asApp = <T>(companyId: string | null, fn: Parameters<typeof withCompany<T>>[2]) =>
-  withCompany(pool, { userId: "[Tên]", companyId }, fn);
+/** People of the two companies: a list agent of A, a list agent of B, a buyer agent of A (no manageCompanyCodes). */
+const PEOPLE = { la: "", lb: "", ba: "" };
+const userOf: Record<string, keyof typeof PEOPLE> = { [A]: "la", [B]: "lb" };
+
+const asApp = <T>(
+  companyId: string | null,
+  fn: Parameters<typeof withCompany<T>>[2],
+  who: keyof typeof PEOPLE = companyId ? (userOf[companyId] ?? "la") : "la",
+) => withCompany(pool, { userId: PEOPLE[who], companyId }, fn);
+
+async function addPeople(target: ScratchDb): Promise<void> {
+  for (const [who, company, role] of [
+    ["la", A, "ListAgent"],
+    ["lb", B, "ListAgent"],
+    ["ba", A, "BuyerAgent"],
+  ] as const) {
+    const u = await target.owner.query(
+      "insert into identity.users (email, name) values ($1, '[Tên]') returning id",
+      [`${who}@example.test`],
+    );
+    PEOPLE[who] = (u.rows[0] as { id: string }).id;
+    await target.owner.query(
+      "insert into company_members (company_id, user_id, name, roles) values ($1, $2, '[Tên]', $3)",
+      [company, PEOPLE[who], [role]],
+    );
+  }
+}
 
 beforeAll(async () => {
   db = await scratchDb("7d", undefined, { prefix: "danh_muc" });
@@ -55,6 +80,7 @@ beforeAll(async () => {
     [A, B],
   );
   await load();
+  await addPeople(db);
   pool = createPool(db.url);
 });
 
@@ -396,6 +422,16 @@ describe("E16 ma-rieng-cua-san", () => {
     const units = sampleCatalog().units;
     const u1206 = units.find((u) => u.upi.endsWith("op1:s1.05:1206"))!.unitKey;
     const u0903 = units.find((u) => u.upi.endsWith("op2:e1:0903"))!.unitKey;
+    const buyerAdds = () =>
+      asApp(
+        A,
+        (c) =>
+          c.query(
+            "insert into company_catalog_aliases (company_id, unit_key, kind, value) values ($1, $2, 'ma', 'DK-1')",
+            [A, u1206],
+          ),
+        "ba",
+      );
     const sharedCount = () =>
       db.owner.query(`select ${SHARED.map((t) => `(select count(*) from ${t})`).join(" + ")} as n`);
     const before = (await sharedCount()).rows[0];
@@ -429,6 +465,7 @@ describe("E16 ma-rieng-cua-san", () => {
       'new row violates row-level security policy for table "company_catalog_aliases"',
     );
     expect(await errOf(add(A, A, K("unt", 404), "ma"))).toBe("company_catalog_aliases_unit");
+    expect(await errOf(buyerAdds())).toBe(BUYER_DENIED);
     expect((await sharedCount()).rows[0]).toEqual(before);
 
     const ownA = (
@@ -441,5 +478,49 @@ describe("E16 ma-rieng-cua-san", () => {
       source: "san",
       objectKey: u1206,
     });
+  });
+});
+
+const BUYER_DENIED =
+  'new row violates row-level security policy "company_catalog_aliases_insert_by_permission" for table "company_catalog_aliases"';
+
+/** Throws the pinned message when a buyer agent can add a company code (no manageCompanyCodes cell). */
+async function checkBuyerCannotAddCode(target: ScratchDb, targetPool: DbPool): Promise<void> {
+  const unit = sampleCatalog().units[0]!.unitKey;
+  const err = await withCompany(targetPool, { userId: PEOPLE.ba, companyId: A }, (c) =>
+    c.query(
+      "insert into company_catalog_aliases (company_id, unit_key, kind, value) values ($1, $2, 'ma', 'DK-2')",
+      [A, unit],
+    ),
+  ).then(
+    () => "",
+    (e: Error) => e.message,
+  );
+  void target;
+  if (err !== BUYER_DENIED) throw new Error("ma-rieng-theo-vai: Đầu khách thêm được mã riêng");
+}
+
+describe("E16 tệp phá ma-rieng-khong-kiem-vai", () => {
+  it("bản lành qua; bản bỏ luật thu hẹp đỏ với dòng ghim", async () => {
+    await checkBuyerCannotAddCode(db, pool);
+    const saved = { ...PEOPLE };
+    const broken = await scratchDb("7d_pha", "ma-rieng-khong-kiem-vai", { prefix: "danh_muc" });
+    const brokenPool = createPool(broken.url);
+    try {
+      await broken.owner.query(
+        "insert into companies (id, name) values ($1, '[MAU] Sàn A'), ($2, '[MAU] Sàn B')",
+        [A, B],
+      );
+      for (const s of catalogLoadStatements(sampleCatalog()))
+        await broken.owner.query(s.text, s.values);
+      await addPeople(broken);
+      await expect(checkBuyerCannotAddCode(broken, brokenPool)).rejects.toThrow(
+        "ma-rieng-theo-vai: Đầu khách thêm được mã riêng",
+      );
+    } finally {
+      await (brokenPool as unknown as { end(): Promise<void> }).end();
+      await broken.drop();
+      Object.assign(PEOPLE, saved);
+    }
   });
 });

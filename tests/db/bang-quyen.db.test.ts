@@ -7,6 +7,8 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { ACTIONS, PERMISSION_EXEMPT, type ActionSpec, type Role } from "@/generated/ontology";
+import { sampleCatalog } from "@/modules/catalog";
+import { catalogLoadStatements } from "@/modules/catalog/load-sql";
 
 import {
   asPerson,
@@ -31,8 +33,9 @@ afterEach(async () => {
 
 const FOUR = ["LA", "BA", "TL", "CA"] as const;
 type Seen = "company" | "own" | null;
-// Written before the code (evals.yaml): 10 database doors × 4 roles.
-const DB_CELLS = 40;
+// Written before the code (evals.yaml): 10 database doors × 4 roles, plus row 7d's 8 doors × 4 roles (five catalog
+// tables read; company codes read, add, change) — 40 + 32.
+const DB_CELLS = 72;
 // Written before the code (evals.yaml): the exempt database doors.
 const EXEMPT_DB = [
   "function app.current_company_id()",
@@ -46,6 +49,43 @@ const EXEMPT_DB = [
 ];
 
 const code = (err: unknown) => (err as { code?: string }).code;
+
+// Row 7d: the shared catalog and one company code in A and one in B, loaded once per world by the owner.
+const catalogs = new WeakMap<World, Promise<{ unit: string; codeA: string }>>();
+function catalogFixture(w: World): Promise<{ unit: string; codeA: string }> {
+  let p = catalogs.get(w);
+  if (!p) {
+    p = (async () => {
+      const c = sampleCatalog();
+      for (const s of catalogLoadStatements(c)) await w.db.owner.query(s.text, s.values);
+      const unit = c.units[0]!.unitKey;
+      const add = (company: string) =>
+        w.db.owner.query(
+          "insert into company_catalog_aliases (company_id, unit_key, kind, value) values ($1, $2, 'ma', 'SA5-12.08') returning id",
+          [company, unit],
+        );
+      const codeA = ((await add(w.A)).rows[0] as { id: string }).id;
+      await add(w.B);
+      return { unit, codeA };
+    })();
+    catalogs.set(w, p);
+  }
+  return p;
+}
+
+/** Reads one shared catalog table: every role reads it, a role without the cell gets permission denied. */
+const readShared = (w: World, who: Person, table: string) =>
+  catalogFixture(w).then(() =>
+    asPerson(w, who, w.A, async (c) => {
+      try {
+        const { rows } = await c.query(`select count(*)::int as n from ${table}`);
+        return ((rows[0] as { n: number }).n > 0 ? "company" : "?0") as Seen;
+      } catch (err) {
+        if (code(err) === "42501") return null;
+        throw err;
+      }
+    }),
+  );
 
 /** What one person gets at one database door, read the way the door works. */
 async function observe(w: World, who: Person, door: string): Promise<Seen> {
@@ -128,6 +168,49 @@ async function observe(w: World, who: Person, door: string): Promise<Seen> {
         ]);
         return (r.rowCount === 1 ? "company" : r.rowCount === 0 ? null : "?") as Seen;
       });
+    case "table catalog_nodes select":
+      return readShared(w, who, "catalog_nodes");
+    case "table catalog_buildings select":
+      return readShared(w, who, "catalog_buildings");
+    case "table catalog_stacks select":
+      return readShared(w, who, "catalog_stacks");
+    case "table catalog_units select":
+      return readShared(w, who, "catalog_units");
+    case "table catalog_aliases select":
+      return readShared(w, who, "catalog_aliases");
+    case "table company_catalog_aliases select":
+      await catalogFixture(w);
+      return asPerson(w, who, A, async (c) => {
+        const { rows } = await c.query("select company_id from company_catalog_aliases");
+        const r = rows as { company_id: string }[];
+        if (r.some((x) => x.company_id !== A)) return "?" as Seen;
+        return (r.length === 1 ? "company" : r.length === 0 ? null : `?${r.length}`) as Seen;
+      });
+    case "table company_catalog_aliases insert": {
+      const { unit } = await catalogFixture(w);
+      return asPerson(w, who, A, async (c) => {
+        try {
+          await c.query(
+            "insert into company_catalog_aliases (company_id, unit_key, kind, value) values ($1, $2, 'ma', 'SA5-12.09')",
+            [A, unit],
+          );
+          return "company" as Seen;
+        } catch (err) {
+          if (code(err) === "42501") return null;
+          throw err;
+        }
+      });
+    }
+    case "table company_catalog_aliases update": {
+      const { codeA } = await catalogFixture(w);
+      return asPerson(w, who, A, async (c) => {
+        const r = await c.query(
+          "update company_catalog_aliases set value = 'SA5-12.10' where id = $1",
+          [codeA],
+        );
+        return (r.rowCount === 1 ? "company" : r.rowCount === 0 ? null : "?") as Seen;
+      });
+    }
     default:
       throw new Error(`csdl-theo-bang: không biết đo cửa ${door}`);
   }

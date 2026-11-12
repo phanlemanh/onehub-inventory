@@ -132,3 +132,25 @@ create policy company_catalog_aliases_update on company_catalog_aliases for upda
   with check (company_id = app.current_company_id());
 revoke all on company_catalog_aliases from public;
 grant select, insert, update on company_catalog_aliases to quy_hang_app;
+
+-- 7. Bảng quyền (hàng 9a): ba thao tác của hàng này, chép từ ontology/actions.yaml. Đọc danh mục chung và mã riêng cho
+--    cả bốn vai; thêm, sửa mã riêng cho Đầu chủ, Trưởng nhóm, Quản trị sàn (đề xuất, chủ kho phê ở Cổng Bằng chứng).
+insert into app.permissions (action, role, scope) values
+  ('readCatalog', 'ListAgent', 'company'),
+  ('readCatalog', 'BuyerAgent', 'company'),
+  ('readCatalog', 'TeamLead', 'company'),
+  ('readCatalog', 'CompanyAdmin', 'company'),
+  ('readCompanyCodes', 'ListAgent', 'company'),
+  ('readCompanyCodes', 'BuyerAgent', 'company'),
+  ('readCompanyCodes', 'TeamLead', 'company'),
+  ('readCompanyCodes', 'CompanyAdmin', 'company'),
+  ('manageCompanyCodes', 'ListAgent', 'company'),
+  ('manageCompanyCodes', 'TeamLead', 'company'),
+  ('manageCompanyCodes', 'CompanyAdmin', 'company');
+
+-- Chỉ người manageCompanyCodes cho phép mới thêm, sửa mã riêng; luật thu hẹp đứng cùng luật theo sàn cùng lệnh.
+create policy company_catalog_aliases_insert_by_permission on company_catalog_aliases as restrictive for insert
+  with check (app.allowed('manageCompanyCodes') = 'company');
+create policy company_catalog_aliases_update_by_permission on company_catalog_aliases as restrictive for update
+  using (app.allowed('manageCompanyCodes') = 'company')
+  with check (app.allowed('manageCompanyCodes') = 'company');

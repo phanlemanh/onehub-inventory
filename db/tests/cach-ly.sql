@@ -79,7 +79,12 @@ insert into luat_thu_hep values
    '(((user_id)::text = current_setting(''app.user_id''::text, true)) OR (app.allowed(''listMembers''::text) = ''company''::text))'),
   -- 006_bang_quyen_theo_vai.sql: only manageAgreements adds or changes an agreement.
   ('agreements', 'agreements_insert_by_permission', '(app.allowed(''manageAgreements''::text) = ''company''::text)'),
-  ('agreements', 'agreements_update_by_permission', '(app.allowed(''manageAgreements''::text) = ''company''::text)');
+  ('agreements', 'agreements_update_by_permission', '(app.allowed(''manageAgreements''::text) = ''company''::text)'),
+  -- 007_danh_muc_nhu_invest.sql (hàng 7d): only manageCompanyCodes adds or changes a company's own codes.
+  ('company_catalog_aliases', 'company_catalog_aliases_insert_by_permission',
+   '(app.allowed(''manageCompanyCodes''::text) = ''company''::text)'),
+  ('company_catalog_aliases', 'company_catalog_aliases_update_by_permission',
+   '(app.allowed(''manageCompanyCodes''::text) = ''company''::text)');
 
 create function pg_temp.dung_dang(bang name, luat name, lenh text, bieu_thuc text, cot text,
                                   kieu text default 'PERMISSIVE') returns boolean
