@@ -128,7 +128,7 @@ human_signoff: Manh Phan 2026-11-13
   run_id: E12-verify-1
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
+  verifier: config:capture.ui
   verified_at: 2026-11-12T16:49:25Z
   screenshot: evidence/E12-listings-ListAgent-1440-sang.png
   observed: |
