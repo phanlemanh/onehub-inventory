@@ -128,5 +128,12 @@
       "i": 4,
       "p": "Câu hỏi chấm ảnh hỏi cả điều ảnh tĩnh không thấy và thiếu ảnh tối — đã ghim tên tám ảnh, thêm ảnh tối, chỉ hỏi điều ảnh thấy."
     }
+  ],
+  "decisions": [
+    {
+      "id": "E11",
+      "q": "Tên dự án dài có bị cắt gọn bằng dấu «…» không?",
+      "why": "Hội đồng chấm trước khi ảnh tên dài chụp xong nên chưa chắc. Ảnh inventory-1440-chu-dai.png nay đã có: 12 dòng «Vinhomes Ocean Park…» cắt gọn, không đè cột bên."
+    }
   ]
 }
