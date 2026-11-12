@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory]
-status: implemented
+status: machine-cleared
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: _acceptance/ho-so-can/design.md
@@ -98,3 +98,6 @@ thuê, nhãn trạng thái theo cho thuê chỉ đo ở mức mô hình.
 ## Notes
 
 - Sống chung với hàng 2a: `design.md` mục «Sống chung với hàng 2a».
+- Ngoài-1 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Khi cuộn trang lúc hồ sơ căn đang mở, hồ sơ được vẽ lại nhiều lần hơn mức cần, nên trên máy yếu có thể thấy cuộn hơi nặng. Hồ sơ vẫn hiện đúng vị trí và đúng nội dung. — `src/components/candidate/record-panel.tsx`
+- Ngoài-4 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Người dùng đọc màn hình sẽ nghe giá chỉ là một con số, không có chữ «Giá chào» đi kèm. Người nhìn màn hình không bị ảnh hưởng. — `src/modules/listings/ui/listing-record.tsx`
+- Ngoài-5 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Nếu sau này thẻ căn trên điện thoại hiện nhầm căn khác, bài kiểm tự động hiện tại có thể không bắt được. Hôm nay người dùng không thấy lỗi nào. — `tests/e2e/ho-so-can.spec.ts`

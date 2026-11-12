@@ -1,3 +1,5 @@
-E10 network (playwright MCP, origin http://localhost:3570)
-console errors: 0 (2 total messages, 0 errors, 0 warnings)
-non-static requests: none listed; 297 static requests not shown (no failures reported)
+server http://localhost:3570 (same worktree; 3483 blocked by single-instance lock)
+nav 1440/1024/414/360 x light/dark: HTTP 200 (8 of 8)
+console errors: none
+requestfailed: none
+app fetch/xhr and 4xx/5xx: none observed
