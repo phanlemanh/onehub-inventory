@@ -12,8 +12,8 @@ ds_skill: inventory-ui
 states: [goc-nhin-dang-mo, menu-muc, hop-luu, hop-doi-ten, hop-xoa, menu-goc-nhin-S3]
 breakpoints: [mobile-360, mobile-414, desktop-1024, desktop-1440]
 themes: [light, dark]
-patched: 4
-deferred: 2
+patched: 5
+deferred: 1
 ---
 # design-pass — luu-goc-nhin-cot-hai
 
@@ -48,7 +48,7 @@ chung-ca-san chỉ ở 1440 và 1024 (ở điện thoại danh sách nằm trong
 | 2 | Ở điện thoại danh sách bị vẽ hai lần trong ngăn trượt | patched: bỏ chỗ chèn trùng |
 | 3 | Tên góc nhìn bị cắt sớm khi có số đếm | patched: số nhường chỗ cho «…» khi rê, dùng thành phần chuẩn của cột |
 | 4 | Bộ kiểm giao diện của kho chặn tự sửa kiểu thành phần và nút tự dựng | patched: mục góc nhìn dùng cách ghép chuẩn (mục có «…» và số sẵn), địa chỉ quyết mục đang mở |
-| 5 | Nhóm góc nhìn không thụt lề như các mục trạng thái (thành phần khác) | deferred: bước dựng thống nhất một kiểu mục cho cả cột |
+| 5 | Nhóm góc nhìn không thụt lề như các mục trạng thái (thành phần khác) | patched: chủ kho chọn cả cột một kiểu; góc nhìn dùng mục con của App Shell, «…» và số qua lớp bọc ngoài; ở mục đang mở số nhường chỗ cho «…» |
 | 6 | Hộp xác nhận xoá ở điện thoại xếp nút xoá trên «Thôi» | deferred: dùng đúng hộp xác nhận của khuôn 9e khi dựng |
 
 ## Nấc

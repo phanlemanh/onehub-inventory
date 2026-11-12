@@ -30,11 +30,6 @@ import {
   SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuBadge,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
@@ -269,32 +264,51 @@ export function SavedViewsProto({
       const active = v.id === openId;
       const count = variant.list === "l2" ? filterRows(rows, columns, v.filters).length : null;
       return (
-        <SidebarMenuItem key={v.id}>
-          <SidebarMenuButton
-            isActive={active}
-            aria-current={active ? "true" : undefined}
-            render={<Link href={href({ mo: v.id })} />}
-          >
-            <span className="truncate">{v.name}</span>
-          </SidebarMenuButton>
-          {count !== null ? <SidebarMenuBadge>{count}</SidebarMenuBadge> : null}
-          {own ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={<SidebarMenuAction showOnHover aria-label={COPY.more(v.name)} />}
+        <SidebarMenuSubItem key={v.id}>
+          {/* The App Shell's sub-item, unchanged; a plain wrapper places the item's «…» over its right edge. */}
+          <div className="group/view relative">
+            <SidebarMenuSubButton
+              isActive={active}
+              aria-current={active ? "true" : undefined}
+              render={<Link href={href({ mo: v.id })} />}
+            >
+              <span className="truncate">{v.name}</span>
+              {count !== null && !(own && active) ? (
+                <span className="ml-auto text-xs text-muted-foreground tabular-nums group-focus-within/view:invisible group-hover/view:invisible">
+                  {count}
+                </span>
+              ) : null}
+            </SidebarMenuSubButton>
+            {own ? (
+              <span
+                className={
+                  active
+                    ? "absolute inset-y-0 right-0.5 flex items-center"
+                    : "absolute inset-y-0 right-0.5 flex items-center opacity-0 group-focus-within/view:opacity-100 group-hover/view:opacity-100"
+                }
               >
-                <MoreHorizontalIcon aria-hidden />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="right" align="start">
-                <DropdownMenuItem onClick={() => setRenaming(v)}>{COPY.rename}</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" onClick={() => askRemove(v)}>
-                  {COPY.remove}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : null}
-        </SidebarMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    render={
+                      <Button variant="ghost" size="icon-xs" aria-label={COPY.more(v.name)} />
+                    }
+                  >
+                    <MoreHorizontalIcon aria-hidden />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="right" align="start">
+                    <DropdownMenuItem onClick={() => setRenaming(v)}>
+                      {COPY.rename}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem variant="destructive" onClick={() => askRemove(v)}>
+                      {COPY.remove}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </span>
+            ) : null}
+          </div>
+        </SidebarMenuSubItem>
       );
     });
 
@@ -323,7 +337,7 @@ export function SavedViewsProto({
           {mine.length === 0 ? (
             <p className="px-2 text-xs text-muted-foreground">{COPY.noViews}</p>
           ) : (
-            <SidebarMenu>{viewItems(mine, true)}</SidebarMenu>
+            <SidebarMenuSub>{viewItems(mine, true)}</SidebarMenuSub>
           )}
         </SidebarGroupContent>
       </SidebarGroup>
@@ -331,7 +345,7 @@ export function SavedViewsProto({
         <SidebarGroup data-slot="company-views">
           <SidebarGroupLabel>{COPY.company}</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>{viewItems(company, false)}</SidebarMenu>
+            <SidebarMenuSub>{viewItems(company, false)}</SidebarMenuSub>
           </SidebarGroupContent>
         </SidebarGroup>
       ) : null}

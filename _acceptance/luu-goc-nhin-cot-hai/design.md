@@ -116,7 +116,7 @@ nhánh chính về một lần, rồi mới viết mã.
 | `FormDialog` (candidate) | dùng | hộp đặt tên và đổi tên — khuôn hộp biểu mẫu sẵn có |
 | Hộp xác nhận xoá, `PermittedAction`, «…» của dòng (9e) | dùng | khuôn bộ nút chủ kho đã duyệt ở 9e |
 | `DropdownMenu` (shadcn) | dùng | «…» của mục; menu «Góc nhìn ▾» nếu chọn S3 |
-| Nhóm mục động ở cột thứ hai (`NavSection` sẵn có, dữ liệu theo người xem) | mở rộng | dùng đúng cột thứ hai của 1o; chỉ thêm dấu «đã đổi» |
+| Nhóm mục động ở cột thứ hai (`NavSection` sẵn có, dữ liệu theo người xem) | mở rộng | dùng đúng mục con của cột thứ hai (1o), cả cột một kiểu; «…», số đếm và dấu «đã đổi» qua lớp bọc ngoài |
 
 ### 6. Khuôn IA đã chọn + căn cứ
 
