@@ -111,7 +111,7 @@ describe("inventory rows (E1)", () => {
 const APPROVED_HEADERS = [
   "Căn",
   "Toà",
-  "Khu",
+  "Dự án",
   "Trạng thái",
   "Giá chào",
   "Diện tích",

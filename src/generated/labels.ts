@@ -7,7 +7,7 @@ export const LABELS = {
   Agreement: {"pref": "Thoả thuận"},
   ListingOwner: {"pref": "Chủ của hàng"},
   ListingUnit: {"pref": "Căn của hàng"},
-  Subdivision: {"pref": "Khu"},
+  Subdivision: {"pref": "Dự án"},
   Building: {"pref": "Toà"},
   ListSide: {"pref": "Phía chủ"},
   BuyerSide: {"pref": "Phía khách"},

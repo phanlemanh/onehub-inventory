@@ -18,7 +18,7 @@ Bản đọc: không sửa ô (B4), không hồ sơ căn cạnh bảng (hàng 3)
 - **Vùng.** Thành phần `InventoryGrid` ở `src/modules/listings/ui/` nhận danh sách cặp (lần chào, căn) và dựng
   `DataRegion` của khuôn Lưới; nó chỉ khai cột, dòng, tên vùng, câu trống và trạng thái — không tự dựng hành vi (bài rào
   của 1e). Hàm thuần `inventoryRows` đổi cặp thành dòng Lưới, kiểm được không cần trình duyệt.
-- **Cột** (tám, theo thứ tự): Căn (`Listing.unitNumber`) · Toà (`Listing.buildingName`) · Khu
+- **Cột** (tám, theo thứ tự): Căn (`Listing.unitNumber`) · Toà (`Listing.buildingName`) · Dự án
   (`Listing.subdivisionName`) · Trạng thái (`Listing.standardStatus`) · Giá chào (`Listing.listPrice`) · Diện tích
   (`Unit.livingArea`) · Phòng ngủ (`Unit.bedroomsTotal`) · Xác nhận lúc (`Listing.lastConfirmedAt`). Kiểu, canh lề, bề
   rộng, mật độ đến từ bảng kiểu đã sinh, màn không chọn. Tên khu dài («Vinhomes Ocean Park 2 – The Empire») bị cắt

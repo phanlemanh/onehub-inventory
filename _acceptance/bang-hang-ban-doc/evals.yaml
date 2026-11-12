@@ -14,7 +14,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/inventory.test.tsx]
-    expected: "exit 0; InventoryGrid dựng với 60 dòng mẫu: cột số dòng rồi đúng tám đầu cột theo thứ tự, chữ mỗi đầu cột bằng label() của khái niệm Unit, Building, Subdivision, StandardStatus, ListPrice, LivingArea, BedroomsTotal, LastConfirmedAt VÀ bằng chuỗi đã duyệt viết sẵn: 'Căn', 'Toà', 'Khu', 'Trạng thái', 'Giá chào', 'Diện tích', 'Phòng ngủ', 'Xác nhận lúc'; cả 60 dòng trong một lần cuộn, số dòng 1..60 không hở, không thanh chia trang, chân bảng '60 dòng'; cột số dòng, Căn, Toà được ghim đầu (trạng thái ghim của bảng); một ô giá dạng 'x,xx tỷ', một ô diện tích có 'm²', ô trạng thái là huy hiệu data-status đúng trạng thái; ca đối chứng xoá một dòng khỏi lần cuộn cho 'run broken at row <n>' và chèn lại thanh chia trang cho 'pager present'"
+    expected: "exit 0; InventoryGrid dựng với 60 dòng mẫu: cột số dòng rồi đúng tám đầu cột theo thứ tự, chữ mỗi đầu cột bằng label() của khái niệm Unit, Building, Subdivision, StandardStatus, ListPrice, LivingArea, BedroomsTotal, LastConfirmedAt VÀ bằng chuỗi đã duyệt viết sẵn: 'Căn', 'Toà', 'Dự án', 'Trạng thái', 'Giá chào', 'Diện tích', 'Phòng ngủ', 'Xác nhận lúc'; cả 60 dòng trong một lần cuộn, số dòng 1..60 không hở, không thanh chia trang, chân bảng '60 dòng'; cột số dòng, Căn, Toà được ghim đầu (trạng thái ghim của bảng); một ô giá dạng 'x,xx tỷ', một ô diện tích có 'm²', ô trạng thái là huy hiệu data-status đúng trạng thái; ca đối chứng xoá một dòng khỏi lần cuộn cho 'run broken at row <n>' và chèn lại thanh chia trang cho 'pager present'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3

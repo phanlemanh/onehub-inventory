@@ -51,9 +51,9 @@ concepts:
   Subdivision:
     kind: entity
     reso: SubdivisionName
-    pref: Khu
+    pref: Dự án
     en: Subdivision
-    avoid: [Dự án]
+    avoid: [Khu, Khu đô thị]
   Building:
     kind: entity
     reso: BuildingName

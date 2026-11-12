@@ -33,7 +33,7 @@ số đo), `design/behaviors.md` dòng «Chia trang — chốt ở lát cắt B�
   cùng diện tích và số phòng ngủ của ĐÚNG căn mà liên kết căn của lần chào ấy trỏ tới; và When một liên kết trỏ căn
   không có trong danh mục, Then dòng ấy hiện diện tích và phòng ngủ trống, không lấy số của căn khác.
 - AC-2: Given mở Bảng hàng ở bốn khổ, When trang sẵn sàng, Then đầu màn là «Bảng hàng», vùng dữ liệu có cột số dòng rồi đúng
-  tám cột theo thứ tự Căn · Toà · Khu · Trạng thái · Giá chào · Diện tích · Phòng ngủ · Xác nhận lúc với nhãn lấy từ
+  tám cột theo thứ tự Căn · Toà · Dự án · Trạng thái · Giá chào · Diện tích · Phòng ngủ · Xác nhận lúc với nhãn lấy từ
   `ontology/labels.yaml`; cả 60 dòng nằm trong một lần cuộn liền (không chia trang), đánh số 1 đến 60 không hở; tiêu đề cột
   đứng yên khi cuộn dọc, cột số dòng cùng Căn và Toà đứng yên khi cuộn ngang; chân bảng ghi «60 dòng»; giá hiện theo kiểu
   tiền, diện tích theo m², trạng thái là huy hiệu chữ của trạng thái ấy.

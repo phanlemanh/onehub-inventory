@@ -7,7 +7,7 @@
     },
     {
       "id": "AC-2",
-      "p": "Sẽ cho Đầu chủ đọc Bảng hàng như Sheet: cả 60 căn trong một lần cuộn liền, cột số dòng bên trái, tiêu đề cột đứng yên khi cuộn dọc, số dòng cùng Căn và Toà đứng yên khi cuộn ngang, chân bảng ghi «60 dòng»; tám cột Căn · Toà · Khu · Trạng thái · Giá chào · Diện tích · Phòng ngủ · Xác nhận lúc, giá kiểu tiền, diện tích theo m²."
+      "p": "Sẽ cho Đầu chủ đọc Bảng hàng như Sheet: cả 60 căn trong một lần cuộn liền, cột số dòng bên trái, tiêu đề cột đứng yên khi cuộn dọc, số dòng cùng Căn và Toà đứng yên khi cuộn ngang, chân bảng ghi «60 dòng»; tám cột Căn · Toà · Dự án · Trạng thái · Giá chào · Diện tích · Phòng ngủ · Xác nhận lúc, giá kiểu tiền, diện tích theo m²."
     },
     {
       "id": "AC-3",
