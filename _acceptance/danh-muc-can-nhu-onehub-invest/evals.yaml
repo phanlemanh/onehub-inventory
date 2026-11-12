@@ -1,0 +1,152 @@
+schema_version: 1
+feature_slug: danh-muc-can-nhu-onehub-invest
+# Ma trận viết trước.
+#   Bộ đọc mã (src/modules/catalog/unit-code.test.ts) — đúng 8 dạng của invest (Hỏi-4), mỗi dạng một mã đúng → (toà, tầng, trục) và một mã
+#   suýt đúng → từ chối; mã mẫu theo test của invest (pipeline/lib/ma-can-s08.test.mjs, tiền tố Q bịa):
+#     gach           Q12A-17-05A  → Q12A / 17 / 05A    · suýt: Q12A-1-05A
+#     cham           Q1.18.12     → Q1 / 18 / 12       · suýt: Q1.18
+#     tien-to-x      QQQQQ_Q1-X24.04 → Q1 / 24 / 04    · suýt: QQQQ_Q1-X24.04
+#     dinh-cham      QX102.01     → QX1 / 2 / 01       · suýt: QX1020.01
+#     toa-cham-bon   Q6.0107.05   → Q6.01 / 7 / 05     · suýt: Q6.010.05
+#     toa-cham-dinh  Q2.1715A10   → Q2.17 / 15A / 10   · suýt: Q2.17-15A10
+#     dinh-lien      QX11807      → QX1 / 18 / 07      · suýt: QX1180
+#     chan-de        QX101S10     → QX1 / 1 / S10      · suýt: QX101S1
+#     thêm: gach Q12A-07-05A → tầng '7' (bỏ số 0 đầu). Mã mẫu cũ S1.05-1208 không thuộc dạng nào → khong-khop-khuon;
+#     nó được tra nguyên văn qua bí danh (E7, E9), không tách.
+#   Lý do từ chối đúng ba: ma-rong (""), khong-khop-khuon, nhieu-khuon (dựng bằng một bảng dạng giả có hai dạng trùng).
+#   Tầng: nhận 7, 15A; từ chối "", 07, -1, 15-A, A15 (bảng ở DB và hàm thuần cùng một danh sách).
+#   Khoá: bld_/stk_/unt_ + 26 ký tự 0-9A-HJKMNP-TV-Z; từ chối bld_ 25 ký tự, unt_…I…, blk_….
+#   Chuyển mẫu: ảnh chụp danh mục cũ lấy bằng `git show <commit trước hàng>:src/modules/catalog/sample.ts` chạy qua
+#   tsx — không viết tay; 432 căn, 60 upi của buildSampleListings.
+#   Bảng danh mục: catalog_nodes, catalog_buildings, catalog_stacks, catalog_units, catalog_aliases (5).
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.danh_muc_db_r
+    paths: [db/migrations/**, tests/db/danh-muc*.ts]
+    expected: "exit 0; ca 'phan-khu-con-du-an': thêm dự án, phân khu cha là dự án, toà dưới phân khu và toà thẳng dưới dự án đều thành công (đối chứng dương); ba lệnh phân khu không cha, phân khu cha là phân khu, dự án có cha đều lỗi vi phạm ràng buộc và bài ghim tên ràng buộc trong thông điệp lỗi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.danh_muc
+    paths: [src/modules/catalog/**]
+    expected: "exit 0; danh mục mẫu có đúng một phân khu (The Sapphire 1) cha là Ocean Park 1 mang reso ComplexName; toà S1.01–S1.05 dưới phân khu, toà E1 và C1 thẳng dưới dự án; bản sao đặt cha phân khu là phân khu khác bị hàm kiểm danh mục báo 'phân khu không thuộc dự án: <slug>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.danh_muc_db_r
+    paths: [db/migrations/**, tests/db/danh-muc*.ts]
+    expected: "exit 0; ca 'tang-dang-chu': cột floor kiểu text; 7 và 15A thêm được; '', '07', '-1', '15-A', 'A15' mỗi giá trị lỗi với tên ràng buộc tầng trong thông điệp"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.danh_muc
+    paths: [src/modules/catalog/**]
+    expected: "exit 0; hàm kiểm tầng thuần nhận và từ chối đúng danh sách của ma trận; readUnitCode('Q12A-07-05A') trả floor '7'; mọi căn mẫu có floor là chuỗi khớp ^[0-9]+[A-Z]?$"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.danh_muc
+    paths: [src/modules/catalog/**]
+    expected: "exit 0; mintKey cho ba tiền tố trả chuỗi khớp ^(bld|stk|unt)_[0-9A-HJKMNP-TV-Z]{26}$; hai lần gọi với cùng đầu vào nội dung nhưng khác số ngẫu nhiên ra hai khoá khác nhau; mọi khoá của danh mục mẫu khớp mẫu và không trùng; dựng danh mục mẫu hai lần ra cùng khoá (tất định)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.danh_muc_db_r
+    paths: [db/migrations/**, tests/db/danh-muc*.ts]
+    expected: "exit 0; ca 'khoa-tien-to': khoá đúng của ba bảng thêm được; bld_ 25 ký tự, unt_ có chữ I, blk_ đúng độ dài đều lỗi với tên ràng buộc khoá trong thông điệp"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.danh_muc_db_r
+    paths: [db/migrations/**, tests/db/danh-muc*.ts, src/modules/catalog/**]
+    expected: "exit 0; ca 'ma-goc-bi-danh': sau khi nạp danh mục mẫu, mỗi toà, trục, căn có đúng một mã gốc còn hiệu lực dạng '<slug dự án>/<MÃ VIẾT HOA>'; tra 'vinhomes-ocean-park-1/S1.05-1208' ra đúng một unt_; thêm lại cùng (source, kind, value) còn hiệu lực lỗi vi phạm chỉ mục duy nhất; đặt retired_at cho dòng cũ rồi thêm lại thì thành công"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.danh_muc
+    paths: [src/modules/catalog/**]
+    expected: "exit 0; 16 ca của ma trận qua với giá trị ghim: 8 mã đúng mỗi mã khớp đúng một dạng và ra đúng toà, tầng, trục; 8 mã suýt đúng mỗi mã khớp không dạng nào, lý do 'khong-khop-khuon'; '' cho 'ma-rong'; bảng dạng giả có hai dạng trùng cho 'nhieu-khuon' với thông điệp nêu mã và hai tên dạng; mã mẫu cũ S1.05-1208 cho 'khong-khop-khuon'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.danh_muc
+    paths: [src/modules/catalog/**, tests/danh-muc-chuyen-mau.test.ts]
+    expected: "exit 0; ảnh chụp danh mục cũ rút từ commit trước hàng (không viết tay) có 432 căn; danh mục mới có 432 căn, tập upi bằng nhau; mỗi căn giữ tên toà, số căn, tầng (đổi sang chữ), trục, diện tích, hướng; 60 upi của lần chào mẫu đều có căn; mã cũ của từng căn đọc qua bí danh ra đúng upi; bản sao bỏ một căn bị báo 'mất căn: <upi>', bản sao nhân đôi bị báo 'căn trùng: <upi>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.danh_muc_db_r
+    paths: [db/migrations/**, tests/db/danh-muc*.ts, src/modules/catalog/**]
+    layer: backend-effect
+    expected: "exit 0; ca 'nap-mau-du': nạp danh mục mẫu vào cơ sở dữ liệu rồi đọc dưới vai quy_hang_app ra 3 dự án, 1 phân khu, 6 toà, 36 trục, 432 căn; 60 upi của lần chào mẫu đều có trong catalog_units; nạp lại lần hai không thêm dòng nào"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.danh_muc_db_r
+    paths: [db/migrations/**, tests/db/danh-muc*.ts]
+    layer: backend-effect
+    expected: "exit 0; ca 'danh-muc-chi-doc': dưới vai quy_hang_app, sàn A, sàn B và phiên chưa chọn sàn đều đọc được cùng số dòng của năm bảng; insert, update, delete, truncate trên từng bảng đều lỗi permission denied; select agreement_id lỗi permission denied; danh sách cột vai đọc được của mỗi bảng bằng đúng danh sách viết trước trong bài"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.danh_muc_db_r
+    paths: [db/migrations/**, db/tests/**, db/scripts/**]
+    expected: "exit 0; bộ kiểm cách ly in 'ok vai-api-chi-cham-bang-co-luat' với năm bảng danh mục nằm trong danh sách danh mục chung đã khai; chiều đỏ cùng bộ chạy: tệp phá cấp insert trên catalog_units cho quy_hang_app in 'HỎNG vai-api-chi-cham-bang-co-luat: public.catalog_units — vai ghi được danh mục chung', tệp phá tạo bảng public.catalog_khong_khai không company_id có luật ép và cấp select cho vai in 'HỎNG vai-api-chi-cham-bang-co-luat: public.catalog_khong_khai — bảng không có company_id mà vai chạm được, không phải danh mục chung đã khai'; bộ chạy in 'ok' cho cả hai tệp phá"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.danh_muc_db_r
+    paths: [db/migrations/**, ontology/**, tests/db/danh-muc*.ts]
+    expected: "exit 0; ca 'cot-khop-ontology': với mỗi bảng danh mục, tập cột (bỏ agreement_id và cột hệ thống đã liệt trong bài) bằng tập thuộc tính của thực thể ontology tương ứng đổi sang snake_case; bản sao ontology thêm một thuộc tính không có cột làm ca đỏ với thông điệp nêu thực thể và thuộc tính"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.check
+    paths: [ontology/**, src/generated/**, src/modules/catalog/**]
+    expected: "exit 0; make check xanh: make ontology không báo lệch giữa ontology, wiki và mã sinh; không nhãn nào gõ cứng trong src (Phân khu, Trục, Tầng, Mã gốc lấy từ LABELS)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.danh_muc
+    paths: [src/modules/catalog/**, tests/danh-muc-chuyen-mau.test.ts]
+    expected: "exit 0; 60 lần chào dựng bằng buildSampleListings từ danh mục mới bằng sâu (toEqual) 60 lần chào dựng từ danh mục cũ rút ở commit trước hàng; bản sao đổi tên toà của một căn được chào làm ca đỏ với thông điệp nêu upi của căn ấy"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E16
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.danh_muc_db_r
+    paths: [db/migrations/**, tests/db/danh-muc*.ts, src/modules/catalog/**]
+    layer: backend-effect
+    expected: "exit 0; ca 'khoa-san-dung-loai' dưới vai chủ bảng: sau khi nạp mẫu, mọi dòng của năm bảng có agreement_id không trống và nối được tới một thoả thuận kind = 'catalog_source' của sàn mẫu (đối chứng dương: thêm một toà với thoả thuận catalog_source thành công); thêm dòng agreement_id trống lỗi not-null, thêm dòng trỏ thoả thuận kind 'spreadsheet' lỗi khoá ngoại với tên ràng buộc ghim trong thông điệp"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
