@@ -55,6 +55,19 @@ async function assertSkeletonHiddenEarly(page: Page): Promise<void> {
   if (visibility !== "hidden") throw new Error("skeleton shown before 1s");
 }
 
+/** Scrolls the grid's run to its end and reads the last row number (row 2: one continuous virtual run). */
+async function lastRowNumber(page: Page): Promise<number> {
+  const viewport = page
+    .locator('[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]')
+    .first();
+  await viewport.evaluate((el) => (el.scrollTop = el.scrollHeight));
+  await page.waitForTimeout(300);
+  await viewport.evaluate((el) => (el.scrollTop = el.scrollHeight));
+  await page.waitForTimeout(300);
+  const numbers = await bodyRows(page).locator('[data-slot="row-number"]').allTextContents();
+  return Math.max(...numbers.map(Number));
+}
+
 async function assertDensity(page: Page, height: number, fontPx: string): Promise<void> {
   const row = bodyRows(page).first();
   const box = await row.boundingBox();
@@ -80,11 +93,13 @@ test.describe("grid", () => {
     await expect(count).toHaveText(new RegExp(`^\\d+ / ${TOTAL} dòng$`));
     const shown = Number((await count.textContent())?.split(" ")[0]);
     expect(shown).toBeGreaterThan(0);
-    expect(shown).toBeLessThanOrEqual(50);
-    // Every row left matches, and the count is exactly the rows left.
-    const codes = await bodyRows(page).locator("td:first-child").allTextContents();
-    expect(codes).toHaveLength(shown);
+    expect(shown).toBeLessThan(TOTAL);
+    // Every row left matches (row 2: the unit code is the column after the row number), and the count is exactly the
+    // rows left: the one continuous run is numbered 1..shown, its last row reachable at the bottom of the viewport.
+    const codes = await bodyRows(page).locator("td:nth-child(2)").allTextContents();
+    expect(codes.length).toBeGreaterThan(0);
     for (const code of codes) expect(code).toContain("S1.01");
+    expect(await lastRowNumber(page)).toBe(shown);
   });
 
   test("no match offers clear filter and it restores every row", async ({ page }) => {
@@ -95,7 +110,11 @@ test.describe("grid", () => {
     await page.getByRole("button", { name: "Xoá lọc" }).click();
     await expect(region(page).locator('[data-slot="region-count"]')).toHaveText(`${TOTAL} dòng`);
     await expect(page.getByRole("searchbox", { name: "Tìm trong vùng" })).toHaveValue("");
-    await expect(bodyRows(page)).toHaveCount(50);
+    // Row 2: every row is back in the one run (no pages): the footer counts them all, the last is numbered TOTAL.
+    await expect(region(page).locator('[data-slot="region-footer-count"]')).toHaveText(
+      `${TOTAL} dòng`,
+    );
+    expect(await lastRowNumber(page)).toBe(TOTAL);
   });
 
   test("no-match check fails without the clear button", async ({ page }) => {
@@ -150,7 +169,7 @@ test.describe("grid", () => {
     await openGrid(page, "?state=partial");
     await assertState(page, "partial");
     await expect(bodyRows(page).first()).toBeVisible();
-    await expect(region(page).getByText("40 dòng")).toBeVisible();
+    await expect(region(page).locator('[data-slot="region-count"]')).toHaveText("40 dòng");
     await expect(
       region(page).getByRole("status").getByRole("button", { name: "Thử lại" }),
     ).toBeVisible();
@@ -218,7 +237,8 @@ test.describe("grid", () => {
       "data-density",
       "dense",
     );
-    await assertDensity(page, 40, "14px");
+    // Row 2: dense rows are 32px like data-grid-editing-6 (h-8), plus the 1px row border.
+    await assertDensity(page, 33, "14px");
   });
 
   test("few columns on a wide screen render normal", async ({ page }, info) => {
@@ -240,13 +260,13 @@ test.describe("grid", () => {
     await expect(bodyRows(page).first()).toBeVisible();
     await bodyRows(page).evaluateAll((rows) => {
       for (const row of rows) {
-        row.classList.remove("h-10", "text-sm");
+        row.classList.remove("h-8", "text-sm");
         row.classList.add("h-12", "text-base");
         for (const cell of row.querySelectorAll("td"))
           (cell as HTMLElement).style.fontSize = "16px";
       }
     });
-    await expect(assertDensity(page, 40, "14px")).rejects.toThrow("density not applied");
+    await expect(assertDensity(page, 33, "14px")).rejects.toThrow("density not applied");
   });
 
   test("the page never scrolls sideways", async ({ page }) => {
