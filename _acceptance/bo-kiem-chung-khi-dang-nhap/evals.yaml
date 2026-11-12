@@ -1,0 +1,122 @@
+schema_version: 1
+feature_slug: bo-kiem-chung-khi-dang-nhap
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.kiem_chung_phien
+    paths: [tools/e2e_templates/**, tests/e2e-db/**, playwright.db.config.ts]
+    expected: "exit 0; dự án 'phien' chạy đúng 1 bài 'dang nhap phien thu' và xanh (đăng nhập qua /login bằng mã trong hộp thư thử của lượt, người thử mang đủ 4 vai ListAgent, BuyerAgent, TeamLead, CompanyAdmin); mọi bài của tests/e2e-db/screens.spec.ts chạy sau nó (phụ thuộc dự án); ca phá 'pha phien-thu: xoa cookie phien' của mỗi màn cần đăng nhập xanh — nghĩa là chính hàm kiểm của ca chính ném lỗi khớp '^<màn>: phien-thu — bi day ve dang nhap' (đối chứng dương: ca chính 'phien-thu' của cùng màn xanh trên cùng trang khi còn cookie)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.kiem_chung_phien
+    paths: [tools/e2e_templates/**, tests/e2e-db/**, playwright.db.config.ts]
+    expected: "exit 0; bài viết trước trong tests/e2e-db/screens.spec.ts khẳng định tập màn đo ở lượt có phiên = mọi màn built staff/public của sổ trừ danh sách người chưa đăng nhập (hôm nay: today, inventory, sent, members — 4 màn) và in dòng 'man do co phien: today, inventory, sent, members'; với mỗi màn, 4 bài 'khung' (tieu-de, khong-cuon-ngang, khong-loi-trinh-duyet, axe-sang-toi) và 4 bài 'pha khung' của hàng 1f xanh ở 4 khổ (360, 414, 1024, 1440) = 4 × 8 × 4 = 128 bài, cộng bộ vùng cho màn lưới (inventory, sent) như lượt không phiên; màn members mở ở trạng thái thường (h1 'Thành viên'), không phải 'Không đủ quyền'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.kiem_chung_phien
+    paths: [tools/e2e_templates/**, tests/e2e-db/**]
+    expected: "exit 0; đầu ra có đúng dòng 'bo qua can dang nhap: 0' và dòng 'bo qua: sign-in — cho nguoi chua dang nhap' (danh sách SIGNED_OUT_SCREENS có lý do); bài 'man cho nguoi chua dang nhap that su day nguoi da dang nhap di' xanh: với phiên thử, mở /login rời khỏi /login; ca phá cùng bài: khai thêm 'today' vào danh sách trên bản sao → đỏ 'today: khai cho nguoi chua dang nhap nhung khong day di'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.man_mau
+    paths: [tools/e2e_templates/**]
+    expected: "exit 0; trong tools/e2e_templates/e2e-templates.test.ts: register.ts không còn xuất SESSION_SCREENS hay sessionSuiteProblem (bài đọc danh sách xuất của mô-đun); bài 'danh sach nguoi chua dang nhap co ly do' đạt: mỗi mục có lý do khác rỗng, mục trỏ id không có trong sổ thì đỏ 'man la trong danh sach nguoi chua dang nhap: <id>' (bản sao sổ)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [tools/e2e_templates/**, tests/e2e/**, playwright.config.ts]
+    expected: "exit 0; ở lượt không cơ sở dữ liệu, mọi bài của 'man members' trong tests/e2e/screens bị bỏ với chú thích 'can dang nhap — do o luot co phien' (đọc bằng reporter json trong bài 'giao man can dang nhap' của tests/e2e/screens: tất cả bài của members có status skipped và annotation đúng chữ ấy, 0 bài members passed); today, inventory, sent, sign-in chạy và xanh như hàng 1f; ca phá: bài 'mo trang dang nhap thay man' giả một màn mở thẳng /login khi chưa đăng nhập — runner trả về 'giao' chứ không chạy hàm kiểm (không bài nào xanh trên trang đăng nhập)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [tools/e2e_templates/settle.ts, tests/e2e/settle.spec.ts]
+    expected: "exit 0; báo cáo của make e2e có đúng 3 bài của tests/e2e/settle.spec.ts về ngăn (ngan mo, ngan chua dung, ngan khong mo) ở khổ 360, đều passed, 0 skipped; nội dung: ca chính — openSheet trên trang bản mẫu trả về khi '[data-mobile=\"true\"]' hiện và document.getAnimations() không còn phần tử đang chạy (bài đọc lại cả hai sau khi hàm trả về); ca phá 1 — gắn chuyển động lặp vô hạn vào ngăn → chính openSheet ném lỗi khớp 'ngan chua dung'; ca phá 2 — gỡ nút 'Mở hoặc đóng thanh bên' → ném lỗi khớp 'ngan khong mo'; hai ca phá cùng trang, cùng hàm với ca chính"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [tools/e2e_templates/settle.ts, tests/e2e/settle.spec.ts]
+    expected: "exit 0; báo cáo của make e2e có đúng 2 bài băng của tests/e2e/settle.spec.ts (bang hien, bang khong hien) ở mỗi khổ, đều passed, 0 skipped; nội dung: ca chính — mất mạng trên /inventory, shown(băng 'Mất kết nối mạng', 'bang mat mang') trả về khi băng hiện và chuyển động của nó dừng; hạn chờ của shown là 20000ms (bài đọc hằng xuất SETTLE_MS); ca phá — giữ mạng, gọi chính shown trên băng ấy → ném lỗi khớp '^bang mat mang: khong hien' trong dưới 25000ms"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.man_mau
+    paths: [tools/e2e_templates/**, tests/e2e/**, tests/e2e-db/**]
+    expected: "exit 0; bài 'khong ban chep ham cho' trong tools/e2e_templates/e2e-templates.test.ts quét mọi tệp *.spec.ts dưới tests/e2e và tests/e2e-db: không tệp nào ngoài tools/e2e_templates/settle.ts bấm nút 'Mở hoặc đóng thanh bên' rồi chờ ngăn, hay gọi setOffline(true) rồi tự chờ băng — mỗi chỗ mở ngăn và chờ băng gọi openSheet/shown; chiều đỏ trên bản sao: thêm lại hàm openSheet chép tay vào một bản sao frame.spec.ts → bài trả lỗi gọi tên tệp và dòng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.kiem_chung_lap
+    paths: [tools/e2e_templates/**, tests/e2e/**]
+    expected: "exit 0; đầu ra in 'ham cpu: 4' (bộ hãm tự chứng chậm hơn ít nhất 2.5 lần, như hàng 1f; chiều đỏ có sẵn của hàng 1f: hãm không tác dụng thì lượt đỏ 'ham cpu khong co tac dung'); mọi bài mang thẻ @cho (mở ngăn, băng mất mạng, axe có băng và ngăn của frame.spec, App Shell trên điện thoại của app-shell.spec, settle.spec) chạy 20 lần ở mỗi khổ 360 và 1024; dòng tổng kết của Playwright báo 0 failed, 0 flaky và số bài passed = số bài @cho × 2 khổ × 20"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.kiem_chung_lap_phien
+    paths: [tools/e2e_templates/**, tests/e2e-db/members.spec.ts]
+    expected: "exit 0; đầu ra in 'ham cpu: 4'; bài mang thẻ @cho của tests/e2e-db/members.spec.ts (mở ngăn để tới Thành viên trên điện thoại) chạy 20 lần ở khổ 360; 0 failed, 0 flaky"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.man_mau
+    paths: [tools/e2e_templates/**]
+    expected: "exit 0; bài 'ca pha hang 1f giu nguyen' trong tools/e2e_templates/e2e-templates.test.ts mang bảng viết trước gồm mọi cặp (công thức, tên ca phá, nguồn thông điệp ghim) của FRAME và REGION trên nhánh chính tại d85d815 (nhánh chính hàng này gộp về trước việc gom hàm chờ; hàng 2 đã ký đổi tên ca 'chi con trang dau' thành 'chi con khung dau' sau a97c71d) — bảng được rút bằng máy từ 'git show d85d815:tools/e2e_templates/recipes.ts' khi viết, không chép tay — và khẳng định FRAME/REGION hiện tại chứa đủ từng cặp, cùng thông điệp ghim cho màn 'man-thu'; chiều đỏ: bỏ một ca phá trên bản sao danh sách → bài gọi tên ca ấy"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["**"]
+    expected: "exit 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: ["**"]
+    expected: "exit 0; toàn bộ make e2e xanh ở 4 khổ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.kiem_chung_db_tron
+    paths: [tools/e2e_templates/**, tests/e2e-db/**, playwright.db.config.ts]
+    expected: "exit 0; toàn bộ playwright.db.config.ts trên Postgres dãy H: 0 failed, 0 flaky; mỗi tệp login.spec.ts, va-dang-nhap.spec.ts, members.spec.ts, app-shell-doi-san.spec.ts có số bài bằng số mà 'npx playwright test -c playwright.db.config.ts --list' in cho tệp ấy trên bản checkout a97c71d (rút bằng máy lúc chấm, không chép tay), cộng bài mới của phien.setup.ts và screens.spec.ts"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.man_mau
+    paths: [tools/e2e_templates/**, tests/e2e/**, tests/e2e-db/**]
+    expected: "exit 0; bài 'the @cho du danh sach' trong tools/e2e_templates/e2e-templates.test.ts: danh sách viết trước CHO_TESTS (tools/e2e_templates/settle.ts) gồm ít nhất — frame.spec: 'losing the network shows a banner that leaves when it is back', 'no serious accessibility violations on every frame screen', mọi bài mở ngăn; app-shell.spec: mọi bài 'App Shell on a phone'; members.spec: mọi bài gọi navMembers ở điện thoại; settle.spec: cả 5 bài — và mỗi tên trong danh sách là một bài có thật mang thẻ @cho (đọc bằng 'playwright test --list --grep @cho'); chiều đỏ trên bản sao: gỡ thẻ @cho khỏi bài mất mạng → bài trả lỗi gọi đúng tên bài ấy"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

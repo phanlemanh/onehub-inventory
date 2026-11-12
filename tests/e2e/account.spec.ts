@@ -1,7 +1,8 @@
 // Sign-in corner of the frame and the sign-in screen without a database (row 8). CI runs this in `make e2e`;
 // the full flow on Postgres is tests/e2e-db/login.spec.ts.
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../../tools/e2e_templates/fixture";
+import { shown } from "../../tools/e2e_templates/settle";
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
@@ -27,12 +28,13 @@ test.describe("tai khoan khong co co so du lieu", () => {
     }
   });
 
-  test("login-loi-may-chu", async ({ page }) => {
+  test("login-loi-may-chu", { tag: "@cho" }, async ({ page }) => {
     await page.goto("/login");
     await expect(page.locator('[data-state="email"][data-ready]')).toBeVisible();
     await page.getByLabel("Email").fill("nhan-vien@example.test");
     await page.getByRole("button", { name: "Gửi mã" }).click();
     const alert = page.locator('[data-state="server-error"]');
+    await shown(alert, "bao loi gui ma");
     await expect(alert).toContainText("Chưa gửi được yêu cầu.");
     await expect(alert.getByRole("button", { name: "Thử lại" })).toBeVisible();
     await expect(page.getByLabel("Email")).toHaveValue("nhan-vien@example.test");
