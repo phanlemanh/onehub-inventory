@@ -2,6 +2,10 @@
 export type DisplayKind = "money" | "area" | "count" | "date" | "datetime" | "person" | "phone" | "status" | "text" | "boolean" | "select";
 
 export const FIELD_DISPLAY = {
+  "Building.buildingName": "text",
+  "CatalogAlias.value": "text",
+  "CompanyCatalogAlias.value": "text",
+  "Complex.name": "text",
   "Contact.contactTypes": "select",
   "Contact.fullName": "person",
   "Contact.phones": "phone",
@@ -15,10 +19,12 @@ export const FIELD_DISPLAY = {
   "Listing.unitNumber": "text",
   "Listing.withdrawnReason": "select",
   "Member.name": "person",
+  "Stack.stackCode": "text",
+  "Subdivision.name": "text",
   "Unit.bedroomsTotal": "count",
   "Unit.buildingName": "text",
   "Unit.directionFaces": "text",
-  "Unit.floor": "count",
+  "Unit.floor": "text",
   "Unit.livingArea": "area",
   "Unit.propertySubType": "select",
   "Unit.propertyType": "select",
