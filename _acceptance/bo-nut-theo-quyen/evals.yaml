@@ -128,6 +128,10 @@ evals:
     layer: ui-observed
     target: http://127.0.0.1:3489/proto/bo-nut-theo-quyen?bang=an
     paths: [src/app/(app)/proto/bo-nut-theo-quyen/**, src/components/candidate/**, src/modules/identity/ui/**]
+    steps:
+      - "With the lane V dev server on port 3489, open http://127.0.0.1:3489/proto/bo-nut-theo-quyen?bang=an&man=<listings|contacts>&vai=<ListAgent|BuyerAgent|TeamLead|CompanyAdmin> for every role and both screens, at 360 and 1440 wide, light and dark (prefers-color-scheme)"
+      - "On each page with rows, open the «…» of a row whose keeper or creator column says «Tôi», then of a row of [Tên] (a row without «…» is a finding only if the expectation lists actions for it); save one frame per state as _acceptance/bo-nut-theo-quyen/evidence/E12-<man>-<vai>-<khổ>-<sang|toi>.png"
+      - "Compare every frame with the per-role expectations of the question, and name any cell that differs"
     question: "Mở trang với tham số vai=ListAgent, BuyerAgent, TeamLead, CompanyAdmin lần lượt (thêm man=contacts cho màn Liên hệ), ở 360 và 1440, sáng và tối. Kỳ vọng từng ô (lựa chọn chủ kho ở Cổng Phạm vi): nút thêm ở đầu màn cạnh tiêu đề; mỗi dòng một nút «…» cuối dòng (cuối thẻ ở điện thoại). Bảng hàng — ListAgent: «Thêm căn»; «…» trên dòng của mình có Sửa, vạch, Xoá căn chữ đỏ; trên dòng người khác chỉ Sửa. BuyerAgent: «Thêm căn»; «…» chỉ có Sửa. TeamLead: như ListAgent trên mọi dòng. CompanyAdmin: vùng «Bạn chưa có quyền xem vùng này», không nút nào. Liên hệ — ListAgent và BuyerAgent: «Thêm liên hệ»; «…» chỉ trên dòng mình tạo (Sửa, vạch, Xoá liên hệ); dòng người khác không có «…». TeamLead: «…» mọi dòng có Sửa, Gộp với liên hệ khác…, vạch, Xoá liên hệ, Xoá tên và số theo yêu cầu. CompanyAdmin: vùng không đủ quyền. Ô nào lệch thì nêu vai × màn × khổ × chế độ màu."
     expected: "Ảnh từng vai × khổ × chế độ màu khớp luật; không nút nào hiện cho vai không có ô"
     evidence_required: [run_id, screenshot, observed, verdict]
