@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, useRef, useState } from "react";
+import { useId, useState } from "react";
 
 import { FormDialog } from "@/components/candidate/form-dialog";
 import { FRAME_COPY } from "@/components/templates/frame-copy";
@@ -21,16 +21,15 @@ const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * A 403 from the server (row 9e): the dialog shows the «not allowed» sentence, apart from the general error, and when
  * it closes the page refreshes, so the frame and its buttons follow the permission table again.
  */
-function useRefusal(): { refused: () => void; onClose: () => void } {
+function useRefusal(): { refused: () => void; onClose: () => void; is: boolean } {
   const router = useRouter();
-  const was = useRef(false);
+  const [is, setIs] = useState(false);
   return {
-    refused: () => {
-      was.current = true;
-    },
+    is,
+    refused: () => setIs(true),
     onClose: () => {
-      if (!was.current) return;
-      was.current = false;
+      if (!is) return;
+      setIs(false);
       router.refresh();
     },
   };
@@ -156,6 +155,7 @@ export function InviteDialog({
       }}
       onSubmit={() => void submit()}
       formError={errors.form}
+      refused={refusal.is}
     >
       <Field data-invalid={errors.email ? true : undefined}>
         <FieldLabel htmlFor={`${id}-email`}>{COPY.emailLabel}</FieldLabel>
@@ -257,6 +257,7 @@ export function RolesDialog({
       }}
       onSubmit={() => void submit()}
       formError={errors.form}
+      refused={refusal.is}
     >
       <RolePicker value={roles} onChange={setRoles} labels={labels} error={errors.roles} />
     </FormDialog>

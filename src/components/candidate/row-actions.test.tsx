@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+// decision:action-buttons
 // Row 9e (bo-nut-theo-quyen), AC-4 and AC-5: the «…» of a record and its removing confirmation.
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
