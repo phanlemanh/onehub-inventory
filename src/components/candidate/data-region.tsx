@@ -395,70 +395,72 @@ export function DataRegion({
     );
 
   return (
-    <section data-slot="data-region" className="flex min-w-0 flex-col">
-      <span ref={chRef} aria-hidden="true" className="invisible absolute text-base">
-        0
-      </span>
-      <span ref={denseChRef} aria-hidden="true" className="invisible absolute text-sm">
-        0
-      </span>
-      {/* Arrangement after data-grid-editing-6: name on the frame's header strip; toolbar, table and pages in one panel. */}
-      <Frame className="min-w-0">
-        <FrameHeader>
-          <RegionTitle title={title} />
-        </FrameHeader>
-        <FramePanel className="flex min-w-0 flex-col gap-3 p-0">
-          <div className="px-3 pt-3 empty:hidden">
-            <RegionToolbar
-              total={showsRows ? rows.length : undefined}
-              shown={showsRows && query ? shown.length : undefined}
-              query={query}
-              onQuery={setQuery}
-              action={action?.allowed && status !== "forbidden" ? action.node : undefined}
-              searchId={searchId}
-            />
-          </div>
-          {status === "partial" && rows.length > 0 ? (
-            <div className="px-3">
-              <RegionPartial onRetry={onRetry} />
+    <>
+      {/* The record panel floats over the right of the work area, from just under the App Shell's top bar to the
+          bottom of the screen (decision 0024, «Trừ thanh trên»); the rows on its left stay usable. It sits outside the
+          region's frame, whose panel clips its overflow (an accessibility scan would read the panel's top as cut off),
+          and right before the region in page order, so Tab from the record goes into the region (AC-6 of row 3). */}
+      {record && showsRows ? (
+        record.address ? (
+          <PanelFor
+            rows={rows}
+            ids={shown.map((row) => row.id)}
+            record={record}
+            openId={record.address.openId}
+            navigate={record.address.navigate}
+          />
+        ) : (
+          <AddressedPanel
+            rows={rows}
+            ids={shown.map((row) => row.id)}
+            record={record}
+            onReady={onAddressReady}
+          />
+        )
+      ) : null}
+      <section data-slot="data-region" className="flex min-w-0 flex-col">
+        <span ref={chRef} aria-hidden="true" className="invisible absolute text-base">
+          0
+        </span>
+        <span ref={denseChRef} aria-hidden="true" className="invisible absolute text-sm">
+          0
+        </span>
+        {/* Arrangement after data-grid-editing-6: name on the frame's header strip; toolbar, table and pages in one panel. */}
+        <Frame className="min-w-0">
+          <FrameHeader>
+            <RegionTitle title={title} />
+          </FrameHeader>
+          <FramePanel className="flex min-w-0 flex-col gap-3 p-0">
+            <div className="px-3 pt-3 empty:hidden">
+              <RegionToolbar
+                total={showsRows ? rows.length : undefined}
+                shown={showsRows && query ? shown.length : undefined}
+                query={query}
+                onQuery={setQuery}
+                action={action?.allowed && status !== "forbidden" ? action.node : undefined}
+                searchId={searchId}
+              />
             </div>
-          ) : null}
-          {/* The record panel floats over the right of the rows, below the toolbar: the toolbar, the column headers'
-              left part and the App Shell's top bar stay in view, and the rows on its left stay usable. */}
-          {/* The panel comes before the rows in the page order (it floats, so the eye does not see it): Tab from the
-              record goes straight into the grid, never out of the region (AC-6 of row 3). */}
-          <div data-slot="data-region-stage" className="relative min-w-0">
-            {record && showsRows ? (
-              record.address ? (
-                <PanelFor
-                  rows={rows}
-                  ids={shown.map((row) => row.id)}
-                  record={record}
-                  openId={record.address.openId}
-                  navigate={record.address.navigate}
-                />
-              ) : (
-                <AddressedPanel
-                  rows={rows}
-                  ids={shown.map((row) => row.id)}
-                  record={record}
-                  onReady={onAddressReady}
-                />
-              )
+            {status === "partial" && rows.length > 0 ? (
+              <div className="px-3">
+                <RegionPartial onRetry={onRetry} />
+              </div>
             ) : null}
-            {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
-            <div
-              ref={boxRef}
-              data-slot="data-region-body"
-              data-density={density}
-              className="w-0 min-w-full"
-            >
-              {body}
+            <div data-slot="data-region-stage" className="relative min-w-0">
+              {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
+              <div
+                ref={boxRef}
+                data-slot="data-region-body"
+                data-density={density}
+                className="w-0 min-w-full"
+              >
+                {body}
+              </div>
             </div>
-          </div>
-        </FramePanel>
-      </Frame>
-    </section>
+          </FramePanel>
+        </Frame>
+      </section>
+    </>
   );
 }
 
