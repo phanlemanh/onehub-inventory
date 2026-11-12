@@ -33,3 +33,4 @@ playwright-report/
 
 # Run logs of the acceptance kit and batches
 .acceptance-runs/
+.playwright-mcp/

@@ -384,7 +384,11 @@ describe("keyboard stop before and after the page runs", () => {
   }));
   const region = () => <DataRegion title="Vùng" columns={columns} rows={rows} emptyWhy="x" />;
 
-  /** The grid's scroll viewport must hold exactly one keyboard stop, on itself or inside it, at every moment. */
+  /**
+   * The grid's scroll viewport must be reachable by keyboard at every moment, and its body must hold at most one stop:
+   * the header's buttons (sort menu, unpin, row 2a) are stops of their own; below them, once the page runs, the grid
+   * table is the single stop that moves the selected cell.
+   */
   function checkStop(root: ParentNode, phase: "server" | "client"): void {
     const viewport = root.querySelector('[data-slot="scroll-area-viewport"]');
     if (!viewport) throw new Error(`no viewport (${phase})`);
@@ -392,8 +396,10 @@ describe("keyboard stop before and after the page runs", () => {
       (el) => el.getAttribute("tabindex") === "0",
     );
     if (stops.length === 0) throw new Error(`grid unreachable by keyboard (${phase})`);
-    if (stops.length > 1) throw new Error(`two keyboard stops (${phase})`);
-    if (phase === "client" && stops[0] !== viewport) throw new Error("stop not on the viewport");
+    const bodyStops = stops.filter((el) => !el.closest("thead"));
+    if (bodyStops.length > 1) throw new Error(`two keyboard stops (${phase})`);
+    if (phase === "client" && bodyStops[0]?.getAttribute("data-slot") !== "data-grid-table")
+      throw new Error("stop not on the grid table");
   }
   const serverHtml = (): HTMLElement => {
     const box = document.createElement("div");
@@ -401,7 +407,7 @@ describe("keyboard stop before and after the page runs", () => {
     return box;
   };
 
-  it("the server HTML is reachable, and the stop moves to the viewport once the page runs", () => {
+  it("the server HTML is reachable, and the body's one stop is the grid table once the page runs", () => {
     expect(() => checkStop(serverHtml(), "server")).not.toThrow();
     const { container } = render(region());
     expect(() => checkStop(container, "client")).not.toThrow();

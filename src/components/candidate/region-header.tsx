@@ -29,6 +29,7 @@ export function RegionToolbar({
   query,
   onQuery,
   action,
+  tools,
   searchId,
   showCount = true,
 }: {
@@ -39,6 +40,8 @@ export function RegionToolbar({
   query: string;
   onQuery: (query: string) => void;
   action?: ReactNode;
+  /** The grid's sheet tools (filter row, grouping, columns), after the count. */
+  tools?: ReactNode;
   searchId: string;
   /** False when the count sits elsewhere (the grid's footer, row 2), so the region shows it once. */
   showCount?: boolean;
@@ -69,6 +72,7 @@ export function RegionToolbar({
           {count}
         </span>
       ) : null}
+      {tools}
       {action ? (
         <div data-slot="region-action" className="ml-auto">
           {action}
