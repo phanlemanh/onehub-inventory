@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 99237bdf39fb003775382255be1f3900d68d80cd
+verified_commit: 584757b8343a440da161539df085cebd75e0d706
 human_signoff: Manh Phan 2026-11-12
 ---
 
@@ -222,3 +222,7 @@ Round 3: all evals passed on 069b48b; verdict PASS.
 ### Re-pin lần 1 — 2026-11-12, do gộp nhánh chính sau hàng 2a và 9a, trước chữ ký
 run_id: repin-20261112T133954Z-74482
 sha: 99237bdf39fb003775382255be1f3900d68d80cd · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng
+
+### Re-pin lần 2 — 2026-11-12, do gộp nhánh chính sau hàng danh mục căn, trước khi gộp PR
+run_id: repin-20261112T143004Z-98388
+sha: 584757b8343a440da161539df085cebd75e0d706 · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng
