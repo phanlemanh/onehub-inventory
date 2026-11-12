@@ -5,7 +5,7 @@ slug: bang-quyen-theo-vai
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config]
-status: verified
+status: signed-off
 design_doc: _acceptance/bang-quyen-theo-vai/design.md
 approved_by: Manh Phan
 approved_at: 2026-11-12
@@ -113,3 +113,8 @@ thao tác ghi không có dòng thì bài đỏ»:
   trỏ bảng; bảng thuật ngữ thêm «Thao tác» và «Phạm vi». Tệp ngoài ranh giới dãy N đã xin giám sát (N-8).
 - Migration mới `004_bang_quyen_theo_vai.sql`; số đổi nếu `origin/main` đã có 004 lúc gộp.
 - Không có ngưỡng nghiệm thu giá trị riêng: chủ kho dời nghiệm thu tới cuối lộ trình.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-12:
+  - Ngoài-1: Cặp phá thử «mời người khi cơ sở dữ liệu không kiểm Quản trị sàn» của hàng 9 báo đỏ khi chạy cả bộ kiểm cơ sở dữ liệu; nó được loại khỏi lượt chấm vì API nay chặn trước.
+  - Ngoài-2: Với ô «Của tôi», API cho qua còn cơ sở dữ liệu đòi «Toàn sàn»; hôm nay ba thao tác quản trị người chỉ có ô «Toàn sàn» nên chưa lệch.
+  - Ngoài-3: Bài kiểm API chỉ xác nhận Quản trị sàn không bị chặn, chưa xác nhận thao tác thành công thật.
+  - Ngoài-4: Bài kiểm cơ sở dữ liệu chỉ xem người dùng có nhận vai nào không, chưa so đúng vai của chính họ ở sàn đang dùng.

@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: bang-quyen-theo-vai
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: b8968ecdb386b1d43531056512d35d50e532813d
-human_signoff:
+human_signoff: Manh Phan 2026-11-12
 ---
 
 # Evidence Report: bang-quyen-theo-vai
@@ -162,7 +162,7 @@ Round 2. Mười ba eval máy E1 đến E13 được mang sang từ round 1 vì 
     - domain-correctness: PASS — Glossary có hai dòng `Action` (Thao tác) và `Scope` (Phạm vi). Dòng Action nói «việc đọc hay ghi có tên trong bảng quyền (ontology/actions.yaml)». Dòng Scope nói «Toàn sàn (company), Của tôi (own), hay không được». Cả hai khớp cách actions.yaml dùng: mỗi dòng là một thao tác, và `scope` có company, own hoặc không có ô. Cột «Không nhầm với» tách rõ hai thuật ngữ này khỏi Company, vai và các thuật ngữ khác, nên không trùng nghĩa. wiki/log.md có dòng ngày 2026-11-12 «Hàng 9a dựng bảng quyền theo vai».
     - operational-feasibility: PASS — ontology/glossary.md có hai dòng `Action` (Thao tác) và `Scope` (Phạm vi), đều ghi "Riêng của ta". `Action` là việc có tên trong bảng quyền `ontology/actions.yaml`. `Scope` là Toàn sàn (`company`), Của tôi (`own`) hoặc không được. Cách hiểu này khớp với actions.yaml, nơi mỗi thao tác là một dòng và mỗi vai có một ô `company` hoặc `own`, vai không có ô thì không được chạy. Hai dòng còn nêu rõ các thuật ngữ cần tránh nhầm (Company, vai, trạng thái bản ghi), và tra "Action|Scope" trong glossary chỉ ra hai dòng này nên không có mục trùng. wiki/log.md có dòng 2026-11-12 nói hàng 9a dựng bảng quyền theo vai.
     - spec-alignment: PASS — Bảng thuật ngữ có hai mục `Action` (Thao tác) và `Scope` (Phạm vi), đều đánh dấu «Riêng của ta». Nghĩa khớp actions.yaml: thao tác là một dòng của bảng quyền, mỗi vai một ô; phạm vi là `company` (Toàn sàn), `own` (Của tôi) hoặc không có ô, tức không được. Cột «không nhầm với» tách hai mục khỏi `Company`, vai và trạng thái bản ghi. wiki/log.md có dòng 2026-11-12 «Hàng 9a dựng bảng quyền theo vai».
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-12 — Đạt
 
 ### Lệnh suite (hồi quy)
 
