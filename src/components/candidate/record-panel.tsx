@@ -103,9 +103,10 @@ function PanelHeader({
 const TITLE_CLASS = "min-w-0 flex-1 basis-40 text-lg font-semibold break-words";
 
 /**
- * The one record panel of the app (design/behaviors.md, open the record panel). From 768 px it is a column standing
- * beside the grid, the grid's own height, two fifths of the region: the grid shrinks to its left and stays usable, nothing
- * covers its toolbar. On a phone it is the whole screen. Esc or «Đóng» closes it and focus goes back to the row that
+ * The one record panel of the app (design/behaviors.md, open the record panel; owner's choice at row 3's scope gate:
+ * a floating panel is the app's one way to show a row's detail). From 768 px it floats over the right of the rows,
+ * below the region's toolbar, two fifths wide: the grid does not move, its toolbar and the App Shell's top bar stay in
+ * view, and the rows on its left stay usable. On a phone it is the whole screen. Esc or «Đóng» closes it and focus goes back to the row that
  * opened it; «Trước» and «Sau» walk the rows in the order the grid shows them, inside the same frame. The panel knows
  * nothing about listings or people: the screen gives `render`.
  */
@@ -191,7 +192,7 @@ export function RecordPanel({
 }
 
 /**
- * The panel as a column beside the grid. It does not hold focus: the grid beside it stays in the tab order. Opening it
+ * The panel floating over the right of the rows. It does not hold focus: the grid beside it stays in the tab order. Opening it
  * from a closed state moves focus to its title so a keyboard user lands in it; walking to another row leaves focus
  * where it is.
  */
@@ -226,7 +227,7 @@ function RecordColumn({
       role="dialog"
       aria-modal="false"
       aria-labelledby={titleId}
-      className="flex min-h-0 min-w-0 flex-col md:w-2/5 md:shrink-0"
+      className="absolute inset-y-0 right-0 z-50 flex w-2/5 min-w-80 max-w-lg flex-col border-l bg-background p-2"
       onKeyDown={(event) => {
         if (event.key !== "Escape") return;
         event.stopPropagation();
@@ -235,9 +236,9 @@ function RecordColumn({
     >
       <Frame
         data-slot="record-panel"
-        data-record-layout="column"
+        data-record-layout="float"
         data-record-id={openId}
-        className="min-h-0 flex-1 text-sm"
+        className="min-h-0 flex-1 text-sm shadow-lg"
       >
         <FramePanel className="flex min-h-0 flex-1 flex-col p-0">
           <PanelHeader

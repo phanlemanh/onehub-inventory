@@ -395,7 +395,7 @@ export function DataRegion({
     );
 
   return (
-    <section data-slot="data-region" className="flex min-w-0 flex-col gap-3 md:flex-row">
+    <section data-slot="data-region" className="flex min-w-0 flex-col">
       <span ref={chRef} aria-hidden="true" className="invisible absolute text-base">
         0
       </span>
@@ -403,7 +403,7 @@ export function DataRegion({
         0
       </span>
       {/* Arrangement after data-grid-editing-6: name on the frame's header strip; toolbar, table and pages in one panel. */}
-      <Frame className="min-w-0 md:flex-1">
+      <Frame className="min-w-0">
         <FrameHeader>
           <RegionTitle title={title} />
         </FrameHeader>
@@ -423,35 +423,39 @@ export function DataRegion({
               <RegionPartial onRetry={onRetry} />
             </div>
           ) : null}
-          {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
-          <div
-            ref={boxRef}
-            data-slot="data-region-body"
-            data-density={density}
-            className="w-0 min-w-full"
-          >
-            {body}
+          {/* The record panel floats over the right of the rows, below the toolbar: the toolbar, the column headers'
+              left part and the App Shell's top bar stay in view, and the rows on its left stay usable. */}
+          <div data-slot="data-region-stage" className="relative min-w-0">
+            {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
+            <div
+              ref={boxRef}
+              data-slot="data-region-body"
+              data-density={density}
+              className="w-0 min-w-full"
+            >
+              {body}
+            </div>
+            {record && showsRows ? (
+              record.address ? (
+                <PanelFor
+                  rows={rows}
+                  ids={shown.map((row) => row.id)}
+                  record={record}
+                  openId={record.address.openId}
+                  navigate={record.address.navigate}
+                />
+              ) : (
+                <AddressedPanel
+                  rows={rows}
+                  ids={shown.map((row) => row.id)}
+                  record={record}
+                  onReady={onAddressReady}
+                />
+              )
+            ) : null}
           </div>
         </FramePanel>
       </Frame>
-      {record && showsRows ? (
-        record.address ? (
-          <PanelFor
-            rows={rows}
-            ids={shown.map((row) => row.id)}
-            record={record}
-            openId={record.address.openId}
-            navigate={record.address.navigate}
-          />
-        ) : (
-          <AddressedPanel
-            rows={rows}
-            ids={shown.map((row) => row.id)}
-            record={record}
-            onReady={onAddressReady}
-          />
-        )
-      ) : null}
     </section>
   );
 }

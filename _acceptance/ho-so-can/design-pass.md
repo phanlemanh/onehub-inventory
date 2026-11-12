@@ -12,7 +12,7 @@ ds_skill: inventory-ui
 states: [ho-so-dong, ho-so-mo]
 breakpoints: [mobile-360, mobile-414, desktop-1024, desktop-1440]
 themes: [light, dark]
-patched: 2
+patched: 4
 deferred: 1
 ---
 # design-pass — ho-so-can
@@ -45,5 +45,7 @@ Dựng ở cổng của dãy D (3483).
   cùng cách định dạng của ô nhưng canh trái.
 - Đã vá: lối B (ngăn nổi) trên dữ liệu thật che ô tìm, số dòng và nút ở thanh trên ở 1024 → khuyến nghị lối A, chụp lối B
   để chủ kho so.
-- Để lại: khi hồ sơ mở, cột Giá chào trong bảng khuất ở cả 1440 (còn 5 cột) và 1024 (còn 3 cột); giá luôn ở đầu hồ sơ. Kéo
-  đổi rộng là Hỏi-2.
+- Chủ kho chốt «Lấy B có ghim»: ngăn nổi đặt trong vùng các dòng, dưới thanh công cụ; đã vá lớp của ngăn để tiêu đề cột đang
+  đứng yên không đè lên đầu ngăn; ngày ở «Xác nhận lúc» không còn tràn ở 1024 (ba thông số xuống dòng khi ngăn hẹp).
+- Để lại: khi hồ sơ mở, bên trái ngăn còn 5 cột ở 1440 và 3 cột ở 1024, cột Giá chào khuất sau ngăn; giá luôn ở đầu hồ sơ.
+  Nút ghim (ngăn thành cột) là hàng sau.

@@ -1,38 +1,116 @@
 {
-  "feature_plain": "Đầu chủ bấm mã một căn ở Bảng hàng thì hồ sơ căn mở thành cột cạnh bảng và đi lần lượt các căn được; trên điện thoại hồ sơ mở toàn màn, đầu màn là thẻ căn.",
+  "feature_plain": "Đầu chủ bấm mã một căn ở Bảng hàng thì hồ sơ căn mở thành ngăn nổi bên phải, không che thanh công cụ, đi lần lượt các căn được; trên điện thoại hồ sơ mở toàn màn, đầu màn là thẻ căn.",
   "will_do": [
-    {"id": "AC-1", "p": "Sẽ hiện thẻ căn và hồ sơ từ cùng một nguồn: mã căn, nơi, trạng thái, giá và tám thông tin đúng như dòng trên bảng; ô thiếu hiện «—»."},
-    {"id": "AC-3", "p": "Sẽ giữ cột số dòng, Căn, Toà đứng yên khi hồ sơ mở, không tự giấu cột nào, và giá căn đang mở luôn thấy ở đầu hồ sơ (bảng còn ít nhất 5 cột ở 1440, 3 cột ở 1024)."},
-    {"id": "AC-4", "p": "Sẽ cho mỗi hồ sơ một địa chỉ riêng: mở thẳng địa chỉ là thấy đúng căn, nút lùi của trình duyệt đóng hồ sơ, địa chỉ sai thì không mở gì."},
-    {"id": "AC-5", "p": "Sẽ cho «Trước» và «Sau» đi đúng thứ tự dòng đang hiện, kể cả sau khi tìm; hồ sơ không mở khi vùng đang tải, lỗi hay không đủ quyền."},
-    {"id": "AC-6", "p": "Sẽ đưa con trỏ bàn phím vào hồ sơ khi mở, trả về đúng mã căn khi đóng bằng Esc hay «Đóng», và bảng vẫn dùng được bằng phím Tab."},
-    {"id": "AC-7", "p": "Sẽ mở hồ sơ toàn màn trên điện thoại (414, 360), đầu màn là thẻ căn, «Đóng» về bảng."},
-    {"id": "AC-8", "p": "Sẽ giữ nguyên hành vi hồ sơ ở các chỗ khác đang dùng chung khung này; mọi bài kiểm cũ vẫn xanh."},
-    {"id": "AC-10", "p": "Sẽ trình tám ảnh bốn khổ sáng tối với hồ sơ đang mở để người nhìn mà chấm."}
+    {
+      "id": "AC-1",
+      "p": "Sẽ hiện thẻ căn và hồ sơ từ cùng một nguồn: mã căn, nơi, trạng thái, giá và tám thông tin đúng như dòng trên bảng; ô thiếu hiện «—»."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ giữ cột số dòng, Căn, Toà luôn thấy bên trái ngăn khi hồ sơ mở, không tự giấu cột nào, và giá căn đang mở luôn ở đầu hồ sơ (bên trái ngăn còn ít nhất 5 cột ở 1440, 3 cột ở 1024)."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ cho mỗi hồ sơ một địa chỉ riêng: mở thẳng địa chỉ là thấy đúng căn, nút lùi của trình duyệt đóng hồ sơ, địa chỉ sai thì không mở gì."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ cho «Trước» và «Sau» đi đúng thứ tự dòng đang hiện, kể cả sau khi tìm; hồ sơ không mở khi vùng đang tải, lỗi hay không đủ quyền."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ đưa con trỏ bàn phím vào hồ sơ khi mở, trả về đúng mã căn khi đóng bằng Esc hay «Đóng», và bảng vẫn dùng được bằng phím Tab."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ mở hồ sơ toàn màn trên điện thoại (414, 360), đầu màn là thẻ căn, «Đóng» về bảng."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ giữ nguyên hành vi hồ sơ ở các chỗ khác đang dùng chung khung này; mọi bài kiểm cũ vẫn xanh."
+    },
+    {
+      "id": "AC-10",
+      "p": "Sẽ trình tám ảnh bốn khổ sáng tối với hồ sơ đang mở để người nhìn mà chấm."
+    }
   ],
   "wont_do": [
-    {"id": "AC-2", "p": "Sẽ KHÔNG che bảng: trên máy tính hồ sơ đứng cạnh bảng, ô tìm và thanh trên vẫn thấy và dùng được, bấm căn khác thì hồ sơ đổi mà không đóng."},
-    {"id": "AC-9", "p": "Sẽ KHÔNG có lỗi trợ năng mức nặng khi hồ sơ mở, ở 1440 và 360, sáng và tối."},
-    {"id": "OOS-1", "p": "KHÔNG có ảnh, số chủ nhà, Sẵn sàng bán, chế độ cuộc gọi — mỗi thứ là hàng sau."},
-    {"id": "OOS-2", "p": "KHÔNG sửa gì trong hồ sơ; sửa là hàng 4, 5."},
-    {"id": "OOS-3", "p": "KHÔNG đổi bảng trên điện thoại thành danh sách thẻ — đó là hàng 2b, dùng lại thẻ căn của hàng này."},
-    {"id": "OOS-4", "p": "KHÔNG làm phím mũi tên, chọn ô, bôi vùng, lọc, nhóm, ẩn cột — của hàng 2a; Enter mở hồ sơ nối vào khi 2a gộp."},
-    {"id": "OOS-5", "p": "KHÔNG kéo đổi rộng cột hồ sơ, KHÔNG trang riêng cho một căn."},
-    {"id": "OOS-6", "p": "KHÔNG có nút chính dính đáy trên điện thoại («Hỏi đầu chủ», «Ghi cuộc gọi»)."},
-    {"id": "OOS-7", "p": "KHÔNG hiện hướng căn trên thẻ — chưa có nhãn «Hướng»."}
+    {
+      "id": "AC-2",
+      "p": "Sẽ KHÔNG che thanh trên, tên vùng, ô tìm và số dòng: trên máy tính hồ sơ là ngăn nổi trên phần phải các dòng, bảng bên trái vẫn dùng được, bấm căn khác thì hồ sơ đổi mà không đóng."
+    },
+    {
+      "id": "AC-9",
+      "p": "Sẽ KHÔNG có lỗi trợ năng mức nặng khi hồ sơ mở, ở 1440 và 360, sáng và tối."
+    },
+    {
+      "id": "OOS-1",
+      "p": "KHÔNG có ảnh, số chủ nhà, Sẵn sàng bán, chế độ cuộc gọi — mỗi thứ là hàng sau."
+    },
+    {
+      "id": "OOS-2",
+      "p": "KHÔNG sửa gì trong hồ sơ; sửa là hàng 4, 5."
+    },
+    {
+      "id": "OOS-3",
+      "p": "KHÔNG đổi bảng trên điện thoại thành danh sách thẻ — đó là hàng 2b, dùng lại thẻ căn của hàng này."
+    },
+    {
+      "id": "OOS-4",
+      "p": "KHÔNG làm phím mũi tên, chọn ô, bôi vùng, lọc, nhóm, ẩn cột — của hàng 2a; Enter mở hồ sơ nối vào khi 2a gộp."
+    },
+    {
+      "id": "OOS-5",
+      "p": "KHÔNG có nút ghim ngăn thành cột, kéo đổi rộng hay trò chuyện với AI ở hàng này (anh đã chốt «B có ghim», ghim là hàng sau); KHÔNG trang riêng cho một căn."
+    },
+    {
+      "id": "OOS-6",
+      "p": "KHÔNG có nút chính dính đáy trên điện thoại («Hỏi đầu chủ», «Ghi cuộc gọi»)."
+    },
+    {
+      "id": "OOS-7",
+      "p": "KHÔNG hiện hướng căn trên thẻ — chưa có nhãn «Hướng»."
+    }
   ],
   "scope_plain": "Hàng này chỉ đọc và chỉ lo mở một căn; phần còn lại thuộc các hàng sau đã có trên lộ trình.",
   "coverage_plain": [
-    {"i": 0, "p": "Bốn khổ màn, sáng và tối: AC-2, AC-3, AC-6 (máy tính), AC-7 (điện thoại), AC-9, AC-10 (sáng tối) đo trên trình duyệt thật."},
-    {"i": 1, "p": "Cách mở và đóng: bấm mã căn, địa chỉ, nút lùi (AC-4), Esc và «Đóng» (AC-6); Enter để sau khi hàng 2a gộp."},
-    {"i": 2, "p": "Trạng thái hồ sơ: mở, đi qua lại, đầu cuối, căn bị tìm làm biến, địa chỉ sai, vùng không có dòng — AC-4, AC-5."},
-    {"i": 3, "p": "Dữ liệu căn đủ hay thiếu: AC-1; căn cho thuê chưa có trong dữ liệu mẫu nên chỉ đo ở mức mô hình."}
+    {
+      "i": 0,
+      "p": "Bốn khổ màn, sáng và tối: AC-2, AC-3, AC-6 (máy tính), AC-7 (điện thoại), AC-9, AC-10 (sáng tối) đo trên trình duyệt thật."
+    },
+    {
+      "i": 1,
+      "p": "Cách mở và đóng: bấm mã căn, địa chỉ, nút lùi (AC-4), Esc và «Đóng» (AC-6); Enter để sau khi hàng 2a gộp."
+    },
+    {
+      "i": 2,
+      "p": "Trạng thái hồ sơ: mở, đi qua lại, đầu cuối, căn bị tìm làm biến, địa chỉ sai, vùng không có dòng — AC-4, AC-5."
+    },
+    {
+      "i": 3,
+      "p": "Dữ liệu căn đủ hay thiếu: AC-1; căn cho thuê chưa có trong dữ liệu mẫu nên chỉ đo ở mức mô hình."
+    }
   ],
   "gap_probe_plain": [
-    {"i": 0, "p": "Máy đã tự bỏ nhiều phần của khối gốc mà sổ chưa ghi lý do (nút «Hỏi đầu chủ», nút chính dính đáy, giá kèm phí). Đã sửa: phần có mã riêng trên bản phạm vi ghi căn cứ; nút chính dính đáy thành câu Hỏi-4 cho anh."},
-    {"i": 1, "p": "Một dòng sổ gộp nhiều lựa chọn về sống chung với hàng 2a. Đã tách: «bấm ô chỉ chọn ô, mở bằng mã căn» thành câu Hỏi-5 cho anh; phần còn lại máy quyết vì chỉ một lối."},
-    {"i": 2, "p": "Bài đo «Tab vào được bảng» chỉ xem thuộc tính, không bấm thật. Đã thêm bước bấm Tab trên trình duyệt thật kèm ca phá."},
-    {"i": 3, "p": "Bài đo số cột còn thấy chỉ in số, không có ngưỡng. Đã ghim ngưỡng 5 cột (1440) và 3 cột (1024) và kiểm từng cột không bị giấu."},
-    {"i": 4, "p": "Chưa đo trường hợp vùng không đủ quyền mà địa chỉ vẫn mở hồ sơ. Đã thêm ca này cho bốn trạng thái vùng."}
+    {
+      "i": 0,
+      "p": "Máy đã tự bỏ nhiều phần của khối gốc mà sổ chưa ghi lý do (nút «Hỏi đầu chủ», nút chính dính đáy, giá kèm phí). Đã sửa: phần có mã riêng trên bản phạm vi ghi căn cứ; nút chính dính đáy thành câu Hỏi-4 cho anh."
+    },
+    {
+      "i": 1,
+      "p": "Một dòng sổ gộp nhiều lựa chọn về sống chung với hàng 2a. Đã tách: «bấm ô chỉ chọn ô, mở bằng mã căn» thành câu Hỏi-5 cho anh; phần còn lại máy quyết vì chỉ một lối."
+    },
+    {
+      "i": 2,
+      "p": "Bài đo «Tab vào được bảng» chỉ xem thuộc tính, không bấm thật. Đã thêm bước bấm Tab trên trình duyệt thật kèm ca phá."
+    },
+    {
+      "i": 3,
+      "p": "Bài đo số cột còn thấy chỉ in số, không có ngưỡng. Đã ghim ngưỡng 5 cột (1440) và 3 cột (1024) và kiểm từng cột không bị giấu."
+    },
+    {
+      "i": 4,
+      "p": "Chưa đo trường hợp vùng không đủ quyền mà địa chỉ vẫn mở hồ sơ. Đã thêm ca này cho bốn trạng thái vùng."
+    }
   ]
 }

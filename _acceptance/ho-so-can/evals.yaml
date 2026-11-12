@@ -14,7 +14,7 @@ evals:
     executor: script
     cmd: config:executors.script.e2e
     paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, src/modules/listings/ui/**, tests/e2e/ho-so-can.spec.ts]
-    expected: "exit 0; tests/e2e/ho-so-can.spec.ts ở 1440 và 1024 mở /inventory, bấm mã căn thứ năm: hồ sơ data-record-layout='column' hiện, mép trái hồ sơ không nhỏ hơn mép phải khung bảng, mép trên hai bên lệch không quá 2 px, rộng hồ sơ trong khoảng 35–45% tổng hai bên; gõ một mã căn vào ô tìm khi hồ sơ mở thì số dòng đổi; bấm mã căn khác thì data-record-id đổi mà hồ sơ không đóng; từ nút 'Đóng' bấm Tab tối đa 10 lần thì tiêu điểm rời hồ sơ và nằm trong khung vùng dữ liệu (không quay vòng trong hồ sơ), ca đối chứng của bước này dựng lại bẫy tiêu điểm (giữ Tab trong hồ sơ bằng trình nghe keydown trên trang thật) cho 'grid not reachable by Tab'; ca đối chứng đặt hồ sơ thành lớp nổi (position fixed, right 0) bằng thẻ style trên trang thật cho thông điệp 'record covers the grid'"
+    expected: "exit 0; tests/e2e/ho-so-can.spec.ts ở 1440 và 1024 mở /inventory, bấm mã căn thứ năm: hồ sơ data-record-layout='float' hiện, mép trên ngăn không cao hơn mép dưới thanh công cụ của vùng, rộng ngăn trong khoảng 35–45% bề rộng vùng các dòng (hoặc bằng chặn dưới 20rem), phần tử ở giữa ô tìm, ở giữa số dòng và ở giữa thanh trên (elementFromPoint) vẫn là chính chúng, không phải ngăn; gõ một mã căn vào ô tìm khi hồ sơ mở thì số dòng đổi; bấm mã căn khác thì data-record-id đổi mà hồ sơ không đóng; từ nút 'Đóng' bấm Tab tối đa 10 lần thì tiêu điểm rời hồ sơ và nằm trong khung vùng dữ liệu (không quay vòng trong hồ sơ), ca đối chứng của bước này dựng lại bẫy tiêu điểm (giữ Tab trong hồ sơ bằng trình nghe keydown trên trang thật) cho 'grid not reachable by Tab'; ca đối chứng đặt ngăn phủ từ mép trên màn hình (position fixed, top 0, right 0) bằng thẻ style trên trang thật cho thông điệp 'record covers the toolbar'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3
@@ -22,7 +22,7 @@ evals:
     executor: script
     cmd: config:executors.script.e2e
     paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, src/modules/listings/ui/**, tests/e2e/ho-so-can.spec.ts]
-    expected: "exit 0; ở 1440 và 1024 với hồ sơ mở: số đầu cột nằm trọn trong khung cuộn ít nhất 5 ở 1440 và ít nhất 3 ở 1024 (ngưỡng viết trong tệp, bài in 'visible columns <khổ> closed=<n> open=<m>'); cuộn ngang khung bảng tới cuối thì ba đầu cột #, Căn, Toà vẫn nằm trọn trong khung; với mỗi cột trong tám cột dữ liệu, cuộn tới nó thì đầu cột có bề ngang lớn hơn 0 và nằm trọn trong khung (không cột nào bị ẩn); giá của căn đang mở thấy ở đầu hồ sơ; ca đối chứng bỏ ghim cột Toà bằng thẻ style cho 'frozen column scrolled away: Toà', ca đối chứng ẩn cột Diện tích bằng thẻ style cho 'column hidden: Diện tích'"
+    expected: "exit 0; ở 1440 và 1024 với hồ sơ mở: số đầu cột nằm trọn trong khung cuộn và bên trái mép ngăn ít nhất 5 ở 1440 và ít nhất 3 ở 1024 (ngưỡng viết trong tệp, bài in 'visible columns <khổ> closed=<n> open=<m>'); cuộn ngang khung bảng tới cuối thì ba đầu cột #, Căn, Toà vẫn nằm trọn trong khung và bên trái mép ngăn; với mỗi cột trong tám cột dữ liệu, cuộn tới nó thì đầu cột có bề ngang lớn hơn 0 và nằm trọn trong khung (không cột nào bị ẩn); giá của căn đang mở thấy ở đầu hồ sơ; ca đối chứng bỏ ghim cột Toà bằng thẻ style cho 'frozen column scrolled away: Toà', ca đối chứng ẩn cột Diện tích bằng thẻ style cho 'column hidden: Diện tích'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E4
@@ -88,14 +88,14 @@ evals:
       - "Same at 414x896, dark → screenshot evidence/ho-so-414-toi.png"
       - "Same at 360x800, light → screenshot evidence/ho-so-360-sang.png"
       - "Same at 360x800, dark → screenshot evidence/ho-so-360-toi.png"
-    expected: "tám ảnh: ở 1440 và 1024 bảng bên trái và hồ sơ bên phải đứng cạnh nhau, không chồng lên nhau, thanh công cụ của bảng (ô tìm, số dòng) và thanh trên của App Shell không bị che, hồ sơ có tên «<mã căn> · <toà>», nút Trước, Sau, Đóng, thẻ căn (mã căn và giá một dòng, nơi và huy hiệu trạng thái, ba thông số) rồi tám trường; ở 414 và 360 hồ sơ phủ toàn màn, đầu là thẻ căn; không chữ chồng chữ; ảnh tối đọc được"
+    expected: "tám ảnh: ở 1440 và 1024 hồ sơ nổi trên phần phải các dòng, dưới thanh công cụ; thanh công cụ của bảng (ô tìm, số dòng) và thanh trên của App Shell không bị che, hồ sơ có tên «<mã căn> · <toà>», nút Trước, Sau, Đóng, thẻ căn (mã căn và giá một dòng, nơi và huy hiệu trạng thái, ba thông số) rồi tám trường; ở 414 và 360 hồ sơ phủ toàn màn, đầu là thẻ căn; không chữ chồng chữ; ảnh tối đọc được"
     evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
 
   - id: E11
     criterion: AC-10
     executor: judgment
     inputs: [_acceptance/ho-so-can/evidence/ho-so-1440-sang.png, _acceptance/ho-so-can/evidence/ho-so-1440-toi.png, _acceptance/ho-so-can/evidence/ho-so-1024-sang.png, _acceptance/ho-so-can/evidence/ho-so-360-sang.png, _acceptance/ho-so-can/evidence/ho-so-360-toi.png, _acceptance/ho-so-can/design.md]
-    question: "Năm ảnh Bảng hàng có hồ sơ một căn đang mở có khớp mục «Đặc tả UX» và «Sống chung với hàng 2a» của design.md không: ở 1440 và 1024 bảng và hồ sơ đứng cạnh nhau, ô tìm và thanh trên không bị che, cột Căn và Toà còn thấy; ở 360 hồ sơ toàn màn, đầu là thẻ căn có mã căn, giá, nơi, trạng thái và ba thông số; chữ không chồng chữ và ảnh tối đọc được?"
+    question: "Năm ảnh Bảng hàng có hồ sơ một căn đang mở có khớp mục «Đặc tả UX» và «Sống chung với hàng 2a» của design.md không: ở 1440 và 1024 hồ sơ nổi trên phần phải các dòng, ô tìm, số dòng và thanh trên không bị che, cột Căn và Toà còn thấy; ở 360 hồ sơ toàn màn, đầu là thẻ căn có mã căn, giá, nơi, trạng thái và ba thông số; chữ không chồng chữ và ảnh tối đọc được?"
     evidence_required: [verdict, rationale]
 
   - id: E12

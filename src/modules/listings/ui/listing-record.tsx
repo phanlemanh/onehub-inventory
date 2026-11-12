@@ -102,7 +102,7 @@ export function ListingCard({ view, priceLabel }: { view: ListingView; priceLabe
           <TypedCell kind="status" value={view.status} transaction={view.transaction} />
         </span>
       </div>
-      <dl data-slot="listing-card-facts" className="grid grid-cols-3 gap-3 border-t pt-3">
+      <dl data-slot="listing-card-facts" className="flex flex-wrap gap-x-6 gap-y-2 border-t pt-3">
         {view.facts.map(({ column, value }) => (
           <div
             key={column.field}
@@ -132,7 +132,7 @@ export function ListingRecordBody({ view, priceLabel }: { view: ListingView; pri
         {view.fields.map(({ column, value }) => (
           <div key={column.field} data-field={column.field} className="contents">
             <dt className="col-span-2 text-muted-foreground">{column.header}</dt>
-            <dd className="col-span-3 min-w-0">
+            <dd className="col-span-3 min-w-0 break-words">
               <Value column={column} value={value} transaction={view.transaction} />
             </dd>
           </div>

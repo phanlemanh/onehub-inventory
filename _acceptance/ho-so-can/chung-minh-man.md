@@ -9,7 +9,7 @@ hàng; bảy trạng thái vùng vẫn do bộ bài sinh từ sổ màn đo trê
 
 | Trang | Khối Quỹ hàng đã chọn | Giữ | Bỏ | Vì sao |
 | --- | --- | --- | --- | --- |
-| docs/tri-thuc/wiki/chu-de/ho-so-can.md | app-shell-11 cột kéo chia cạnh bảng, ruột solution-crm-4, thân điện thoại product-detail-5, thẻ product-grid-4 | cột đứng cạnh bảng ngoài khung bảng, bảng co và vẫn bấm được; đầu hồ sơ, giá nổi bật, danh sách trường; thẻ một dòng mã và giá, ba thông số; một mô hình cho hai dạng xem; điện thoại toàn màn | kéo đổi rộng, ảnh, hướng, giá kèm phí, chủ nhà, Sẵn sàng bán, cuộc gọi, lớp phủ quyền, trang riêng /units | hàng 3 chỉ đọc B2, B3; ảnh, chủ nhà, Sẵn sàng bán là hàng sau; kéo chia cần gói mới (Hỏi-2) |
+| docs/tri-thuc/wiki/chu-de/ho-so-can.md | app-shell-11 cột kéo chia cạnh bảng, ruột solution-crm-4, thân điện thoại product-detail-5, thẻ product-grid-4 | bảng vẫn bấm được, không che thanh; đầu hồ sơ, giá nổi bật, danh sách trường; thẻ một dòng mã và giá, ba thông số; một mô hình cho hai dạng xem; điện thoại toàn màn | kéo đổi rộng, ảnh, hướng, giá kèm phí, chủ nhà, Sẵn sàng bán, cuộc gọi, lớp phủ quyền, trang riêng /units | chủ kho chốt ngăn nổi làm cách chung cả ứng dụng và cho lớp AI; hàng 3 chỉ đọc B2, B3; ảnh, chủ nhà, Sẵn sàng bán là hàng sau |
 
 ### Họ
 
@@ -21,11 +21,11 @@ hàng; bảy trạng thái vùng vẫn do bộ bài sinh từ sổ màn đo trê
 
 | Cho | Ứng viên | Ảnh | Chọn |
 | --- | --- | --- | --- |
-| màn | app-shell-11 | evidence/reui/app-shell-11.png | x |
-| màn | sheet-9 | evidence/reui/sheet-9.png | |
+| màn | app-shell-11 | evidence/reui/app-shell-11.png | |
+| màn | sheet-9 | evidence/reui/sheet-9.png | x |
 | màn | solution-crm-9 | evidence/reui/solution-crm-9.png | |
-| RecordPanel | app-shell-11 | evidence/reui/app-shell-11.png | x |
-| RecordPanel | sheet-9 | evidence/reui/sheet-9.png | |
+| RecordPanel | app-shell-11 | evidence/reui/app-shell-11.png | |
+| RecordPanel | sheet-9 | evidence/reui/sheet-9.png | x |
 | RecordPanel | solution-crm-3 | evidence/reui/solution-crm-3.png | |
 | ListingRecordBody | solution-crm-4 | evidence/reui/solution-crm-4.png | x |
 | ListingRecordBody | sheet-9 | evidence/reui/sheet-9.png | |
@@ -54,7 +54,7 @@ hàng; bảy trạng thái vùng vẫn do bộ bài sinh từ sổ màn đo trê
 
 | Khối | Bậc | Đã tra | Ứng viên gần nhất | Vì sao không dùng | Cách |
 | --- | --- | --- | --- | --- | --- |
-| RecordPanel | reui | ngăn chi tiết cạnh bảng (app-shell-*, sheet-*, solution-crm-*) | sheet-9 | ngăn nổi đè bảng che ô tìm, số dòng và thanh trên; còn ba cột ở 1024 | ghép từ thành phần |
+| RecordPanel | reui | ngăn chi tiết cạnh bảng (app-shell-*, sheet-*, solution-crm-*) | app-shell-11 | cột đẩy bảng làm co bảng; chủ kho chốt ngăn nổi làm cách chung, cột thành nút ghim ở hàng sau | ghép từ thành phần |
 | ListingRecordBody | reui | ruột hồ sơ một bản ghi (solution-crm-*, sheet-*) | sheet-9 | sửa từng dòng tại chỗ; hồ sơ hàng này chỉ đọc | ghép từ thành phần |
 | ListingCard | reui | thẻ sản phẩm có giá và thông số (product-grid-*, product-detail-*, product-card-*) | product-detail-5 | trang sản phẩm cả màn với ảnh lớn và nút mua; thẻ căn cần gọn | ghép từ thành phần |
 | Frame | trong-kho | | | | |
@@ -67,13 +67,14 @@ hàng; bảy trạng thái vùng vẫn do bộ bài sinh từ sổ màn đo trê
 
 | Khối | Vùng | Xử lý | Lý do |
 | --- | --- | --- | --- |
-| app-shell-11 | cột chi tiết đứng cạnh thân, cao hết vùng | lấy | đầu chủ làm lâu cạnh bảng, bảng vẫn dùng được |
-| app-shell-11 | thanh tên và nút của cột chi tiết | lấy | tên căn, Trước, Sau, Đóng |
-| app-shell-11 | kéo chia đổi rộng | bỏ | cần gói kéo chia mới (Hỏi-2) |
-| app-shell-11 | thanh điều hướng bên trái | bỏ | App Shell của kho đã có (app-shell-8) |
-| app-shell-11 | thanh tab Tổng quan, Hoạt động | bỏ | hồ sơ hàng này một phần |
-| app-shell-11 | bàn làm việc dưới đáy | bỏ | không có việc dưới bảng |
-| app-shell-11 | cột lịch và việc kế bên phải | bỏ | không thuộc Bảng hàng |
+| sheet-9 | ngăn nổi bên phải, cao hết vùng | lấy | xem chi tiết một dòng mà không rời bảng; cách chung cả ứng dụng |
+| sheet-9 | thanh tên và nút Đóng | lấy | tên căn và Đóng; thêm Trước, Sau |
+| sheet-9 | lớp mờ phủ và khoá trang | bỏ | ngăn không khoá bảng: bảng bên trái vẫn bấm được |
+| sheet-9 | phủ từ mép trên màn hình | bỏ | ngăn nằm dưới thanh công cụ, không che thanh trên và ô tìm |
+| sheet-9 | sửa từng dòng tại chỗ | bỏ | hồ sơ hàng 3 chỉ đọc |
+| sheet-9 | nút Lưu thay đổi ở chân | bỏ | không có gì để lưu |
+| sheet-9 | mục mẹo nhanh | bỏ | không có việc tương ứng |
+| sheet-9 | nút Trước, Sau | thêm | đi lần lượt các căn mà không đóng ngăn |
 | solution-crm-4 | đầu: mã và huy hiệu giai đoạn | lấy | mã căn và trạng thái |
 | solution-crm-4 | số tiền lớn | lấy | giá chào luôn thấy dù bảng khuất cột giá |
 | solution-crm-4 | danh sách trường có nhãn | lấy | tám trường của căn |
