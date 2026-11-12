@@ -4,6 +4,7 @@ import {
   createColumnHelper,
   useTable,
   type ColumnFiltersState,
+  type ColumnPinningState,
   type ExpandedState,
   type SortingState,
   type ColumnVisibilityState,
@@ -130,6 +131,9 @@ export const ROW_ACTIONS_ID = "row-actions";
 
 /** Width of the row-actions column, in ch: the «…» button and its padding. */
 const ROW_ACTIONS_CH = 6;
+
+/** The most of the region's width the pinned columns may take before the second frozen column lets go. */
+const PINNED_SHARE = 0.7;
 
 /** What one row offers in its «…»: the actions by permission-table name, whether the row is the viewer's own. */
 export interface RegionRowActions {
@@ -734,6 +738,26 @@ export function DataRegion({
     ],
   );
 
+  // Frozen columns: the row numbers and the first columns at the start, the row actions at the end. Pinning is the
+  // person's to change (the header menu); the row actions always stay last. On a narrow region with row actions the
+  // two pinned sides would cover each other (a phone), so only the row numbers and the first column stay frozen there.
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>(() => ({
+    start: [ROW_NUMBER_ID, ...columns.slice(0, FROZEN_COLUMNS).map((column) => column.field)],
+    end: [],
+  }));
+  const pinnedCh =
+    rowNumberCh + widths.slice(0, FROZEN_COLUMNS).reduce((sum, w) => sum + w, 0) + ROW_ACTIONS_CH;
+  const pinnedTooWide =
+    rowActions !== undefined && widthCh !== null && pinnedCh > widthCh * PINNED_SHARE;
+  const shownPinning: ColumnPinningState = {
+    start: pinnedTooWide
+      ? (columnPinning.start ?? []).filter((id) => id === ROW_NUMBER_ID || id === firstField)
+      : (columnPinning.start ?? []),
+    end: rowActions
+      ? [...(columnPinning.end ?? []).filter((id) => id !== ROW_ACTIONS_ID), ROW_ACTIONS_ID]
+      : (columnPinning.end ?? []),
+  };
+
   const table = useTable({
     features: dataGridFeatures,
     data,
@@ -744,18 +768,15 @@ export function DataRegion({
     manualSorting: true,
     manualFiltering: true,
     autoResetExpanded: false,
-    state: { sorting, columnFilters, columnVisibility, expanded },
+    state: { sorting, columnFilters, columnVisibility, expanded, columnPinning: shownPinning },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    onColumnPinningChange: setColumnPinning,
     onExpandedChange: setExpanded,
     // One continuous run: every row is on the single page, the virtual body mounts only the rows in view.
     initialState: {
       pagination: { pageIndex: 0, pageSize: Number.MAX_SAFE_INTEGER },
-      columnPinning: {
-        start: [ROW_NUMBER_ID, ...columns.slice(0, FROZEN_COLUMNS).map((column) => column.field)],
-        end: rowActions ? [ROW_ACTIONS_ID] : [],
-      },
     },
   });
   useEffect(() => {

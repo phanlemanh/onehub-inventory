@@ -1,35 +1,28 @@
 "use client";
 
-import { EllipsisIcon, PlusIcon, SearchIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { typedColumn } from "@/components/candidate/column-kind";
-import { DataRegion } from "@/components/candidate/data-region";
-import { useChange } from "@/components/candidate/use-change";
+import { DataRegion, type GridRow, type RegionRecord } from "@/components/candidate/data-region";
+import { RecordActions, type RecordAction } from "@/components/candidate/row-actions";
 import { Frame, FrameHeader, FramePanel } from "@/components/reui/frame";
+import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { notifyResult } from "@/components/templates/notify";
 import { PageHeader } from "@/components/templates/page-header";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { label } from "@/modules/company-config";
-import { allowedScope, type ActionName } from "@/modules/identity";
+import { allowedScope } from "@/modules/identity";
+import { PermittedAction, SessionRoles } from "@/modules/identity/ui";
 import type { Role } from "@/generated/ontology";
 
 import { PROTO_COPY as C } from "./copy";
-import { DRAFT_ACTIONS, type DraftAction } from "./draft-permissions";
-import { SampleGrid } from "./sample-grid";
 
 /**
- * The button set the owner chose at the scope gate of row 9e: the add button in the page head, one «…» at the end of a
- * row, plain verbs, actions on someone else's record hidden, a short confirmation through the store's useChange.
+ * The template sample of row 9e (bo-nut-theo-quyen): the button set the owner chose at the scope gate, built from the
+ * real parts — the add button in the page head through PermittedAction, one «…» per row in the shared grid's last
+ * column, the record's actions at the head of the record panel, removing actions confirmed through useChange — and
+ * decided by the real permission table (ontology/actions.yaml) for the role chosen on the control board.
  */
 export type Choice = {
   screen: "listings" | "contacts";
@@ -39,115 +32,74 @@ export type Choice = {
 
 const ROLES: readonly Role[] = ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"];
 
-/** A row of the sample: a code, a second line, and whether the viewer keeps or created it (own scope). */
-type SampleRow = { id: string; title: string; detail: string; extra: string; mine: boolean };
-
-/** Made-up units and contacts: codes, placeholder names and reserved test numbers only. */
-function sample(screen: Choice["screen"]): SampleRow[] {
+/** Made-up units and contacts: codes, placeholder names and reserved test numbers only. Row ids say whose they are. */
+function sample(screen: Choice["screen"]): GridRow[] {
   return Array.from({ length: 8 }, (_, i) => {
     const mine = i % 3 !== 1;
-    const other = `[Tên] ${String(i + 2).padStart(2, "0")}`;
+    const keeper = mine ? C.me : `[Tên] ${String(i + 2).padStart(2, "0")}`;
     if (screen === "listings") {
       const building = `S${(i % 3) + 1}.0${(i % 4) + 1}`;
       return {
-        id: `can-${i + 1}`,
-        title: `${building}-${String(12 + i).padStart(2, "0")}0${(i % 8) + 1}`,
-        detail: `${(2.1 + i * 0.35).toFixed(2).replace(".", ",")} tỷ`,
-        extra: mine ? C.me : other,
-        mine,
+        id: `${mine ? "cua-toi" : "nguoi-khac"}-can-${i + 1}`,
+        "Listing.unitNumber": `${building}-${String(12 + i).padStart(2, "0")}0${(i % 8) + 1}`,
+        "Listing.listPrice": 2_100_000_000 + i * 350_000_000,
+        // The sample's keeper, in a text column (the grid has no keeper field yet).
+        "Listing.subdivisionName": keeper,
       };
     }
     return {
-      id: `lh-${i + 1}`,
-      title: `[Tên] ${String(i + 1).padStart(2, "0")}`,
-      detail: `0900 000 0${String(i + 1).padStart(2, "0")}`,
-      extra: mine ? C.me : other,
-      mine,
+      id: `${mine ? "cua-toi" : "nguoi-khac"}-lh-${i + 1}`,
+      "Contact.fullName": `[Tên] ${String(i + 1).padStart(2, "0")}`,
+      "Contact.phones": `0900 000 0${String(i + 1).padStart(2, "0")}`,
+      // The sample's creator, in a text column (contacts have no creator field yet).
+      "Listing.subdivisionName": keeper,
     };
   });
 }
 
-const can = (role: Role, action: DraftAction) =>
-  allowedScope([role], action as ActionName, DRAFT_ACTIONS);
+const isMine = (row: GridRow) => row.id.startsWith("cua-toi");
+const titleOf = (row: GridRow) => String(row["Listing.unitNumber"] ?? row["Contact.fullName"]);
 
-/** Shown when the role has the action for the whole company, or for its own records and this one is its own. */
-function shows(role: Role, action: DraftAction, mine: boolean): boolean {
-  const scope = can(role, action);
-  return scope === "company" || (scope === "own" && mine);
+/** The actions of one record of the sample, by permission-table name; the menu keeps the ones the role may run. */
+function recordActions(screen: Choice["screen"], row: GridRow): RecordAction[] {
+  const title = titleOf(row);
+  const done = (verb: string) => () => notifyResult({ message: C.done(verb) });
+  const remove = (verb: string, what: string) => ({
+    verb: `${verb} ${title}`,
+    what,
+    done: C.done(verb),
+    apply: async () => {},
+  });
+  if (screen === "listings")
+    return [
+      { action: "updateListing", label: label("Edit"), onSelect: done(label("Edit")) },
+      {
+        action: "removeListing",
+        label: label("RemoveListing"),
+        remove: remove(label("RemoveListing"), C.removeWhat),
+      },
+    ];
+  return [
+    { action: "updateContact", label: label("Edit"), onSelect: done(label("Edit")) },
+    {
+      action: "mergeContacts",
+      label: C.mergeWith(label("Contact")),
+      onSelect: done(label("MergeContacts")),
+    },
+    {
+      action: "removeContact",
+      label: label("RemoveContact"),
+      remove: remove(label("RemoveContact"), C.removeWhat),
+    },
+    {
+      action: "eraseContactPersonalData",
+      label: C.eraseOnRequest(label("EraseContactPersonalData")),
+      remove: remove(label("EraseContactPersonalData"), C.eraseWhat),
+    },
+  ];
 }
 
-type RowAction = { key: DraftAction; text: string; danger: boolean; what: string };
-
-function rowActions(choice: Choice, row: SampleRow): RowAction[] {
-  const listings = choice.screen === "listings";
-  const all: RowAction[] = listings
-    ? [
-        { key: "updateListing", text: label("Edit"), danger: false, what: "" },
-        { key: "removeListing", text: label("RemoveListing"), danger: true, what: C.removeWhat },
-      ]
-    : [
-        { key: "updateContact", text: label("Edit"), danger: false, what: "" },
-        { key: "mergeContacts", text: label("MergeContacts"), danger: false, what: "" },
-        { key: "removeContact", text: label("RemoveContact"), danger: true, what: C.removeWhat },
-        {
-          key: "eraseContactPersonalData",
-          text: label("EraseContactPersonalData"),
-          danger: true,
-          what: C.eraseWhat,
-        },
-      ];
-  return all.filter((a) => shows(choice.role, a.key, row.mine));
-}
-
-/** The «…» of one record: ordinary actions first, removing ones last and apart; nothing to do, no «…». */
-function MoreMenu({
-  actions,
-  title,
-  onPick,
-  defaultOpen,
-}: {
-  actions: RowAction[];
-  title: string;
-  onPick: (action: RowAction) => void;
-  defaultOpen?: boolean;
-}) {
-  if (actions.length === 0) return null;
-  const plain = actions.filter((a) => !a.danger);
-  const danger = actions.filter((a) => a.danger);
-  const item = (a: RowAction) => (
-    <DropdownMenuItem
-      key={a.key}
-      variant={a.danger ? "destructive" : "default"}
-      onClick={() => onPick(a)}
-    >
-      {a.text}
-    </DropdownMenuItem>
-  );
-  return (
-    <DropdownMenu defaultOpen={defaultOpen}>
-      <DropdownMenuTrigger
-        render={<Button variant="ghost" size="icon-sm" aria-label={`${C.more} — ${title}`} />}
-      >
-        <EllipsisIcon aria-hidden />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {plain.length > 0 ? <DropdownMenuGroup>{plain.map(item)}</DropdownMenuGroup> : null}
-        {plain.length > 0 && danger.length > 0 ? <DropdownMenuSeparator /> : null}
-        {danger.length > 0 ? <DropdownMenuGroup>{danger.map(item)}</DropdownMenuGroup> : null}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
-function Controls({
-  choice,
-  set,
-  onRefuse,
-}: {
-  choice: Choice;
-  set: (patch: Partial<Choice>) => void;
-  onRefuse: () => void;
-}) {
+function Controls({ choice, set }: { choice: Choice; set: (patch: Partial<Choice>) => void }) {
   const option = (pressed: boolean, text: string, onClick: () => void) => (
     <Button
       key={text}
@@ -165,7 +117,7 @@ function Controls({
         <h2 className="text-sm font-semibold">{C.controls.heading}</h2>
         <p className="text-muted-foreground text-xs">{C.controls.note}</p>
       </FrameHeader>
-      <FramePanel className="grid gap-4 md:grid-cols-3">
+      <FramePanel className="grid gap-4 md:grid-cols-2">
         <div role="group" aria-label={C.controls.screen} className="flex flex-wrap gap-1">
           {option(choice.screen === "listings", label("Inventory"), () =>
             set({ screen: "listings" }),
@@ -177,11 +129,6 @@ function Controls({
         <div role="group" aria-label={C.controls.role} className="flex flex-wrap gap-1">
           {ROLES.map((r) => option(choice.role === r, label(r), () => set({ role: r })))}
         </div>
-        <div>
-          <Button size="sm" variant="outline" onClick={onRefuse}>
-            {C.controls.refuse}
-          </Button>
-        </div>
       </FramePanel>
     </Frame>
   );
@@ -189,159 +136,112 @@ function Controls({
 
 export function ButtonShowcase({ initial, bare = false }: { initial: Choice; bare?: boolean }) {
   const [choice, setChoice] = useState<Choice>(initial);
-  const [query, setQuery] = useState("");
-  const [refuseNext, setRefuseNext] = useState(false);
-  const opened = useRef(false);
-  const { run, dialog } = useChange();
-  const wide = useWide();
   const set = (patch: Partial<Choice>) => setChoice((c) => ({ ...c, ...patch, open: undefined }));
-
-  const listings = choice.screen === "listings";
-  const noun = listings ? label("Unit") : label("Contact");
-  const screenTitle = listings ? label("Inventory") : label("Contact");
-  const rows = useMemo(() => sample(choice.screen), [choice.screen]);
-  const shown = rows.filter((r) =>
-    `${r.title} ${r.detail}`.toLocaleLowerCase("vi").includes(query.toLocaleLowerCase("vi")),
-  );
-  const canView = can(choice.role, listings ? "viewListings" : "viewContacts") !== null;
-  const canAdd = can(choice.role, listings ? "createListing" : "createContact") !== null;
-
-  const refused = (): boolean => {
-    if (!refuseNext) return false;
-    setRefuseNext(false);
-    notifyResult({ message: C.refused });
-    return true;
-  };
-  const pick = (row: SampleRow, action: RowAction) => {
-    if (refused()) return;
-    if (!action.danger) {
-      notifyResult({ message: C.done(action.text) });
-      return;
-    }
-    void run({
-      verb: `${action.text} ${row.title}`,
-      what: action.what,
-      done: C.done(action.text),
-      reversible: false,
-      apply: async () => {},
-    });
-  };
-
-  // Screenshot helpers: open the first own record's removing confirmation, or show the refusal notice, once.
-  useEffect(() => {
-    if (opened.current || !choice.open || choice.open === "menu") return;
-    opened.current = true;
-    if (choice.open === "refused") {
-      setTimeout(() => notifyResult({ message: C.refused }), 300);
-      return;
-    }
-    const row = rows.find((r) => r.mine);
-    const action = row ? rowActions(choice, row).find((a) => a.danger) : undefined;
-    if (row && action) setTimeout(() => pick(row, action), 0);
-  });
-
-  const addText = listings ? label("CreateListing") : label("CreateContact");
-  const addButton = canAdd ? (
-    <Button onClick={() => (refused() ? null : notifyResult({ message: C.done(addText) }))}>
-      <PlusIcon aria-hidden data-icon="inline-start" />
-      {addText}
-    </Button>
-  ) : undefined;
-
-  const buttons = (row: SampleRow, i: number) => (
-    <div className="flex justify-end">
-      <MoreMenu
-        actions={rowActions(choice, row)}
-        title={row.title}
-        onPick={(a) => pick(row, a)}
-        defaultOpen={choice.open === "menu" && i === 1}
-      />
-    </div>
-  );
-
-  const region = !canView ? (
-    <DataRegion
-      title={screenTitle}
-      columns={[typedColumn({ field: "Listing.unitNumber", header: noun })]}
-      rows={[]}
-      status="forbidden"
-    />
-  ) : (
-    <Frame>
-      <FrameHeader>
-        <h2 className="text-sm font-semibold">{screenTitle}</h2>
-      </FrameHeader>
-      <FramePanel className="grid gap-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="w-full sm:w-64">
-            <InputGroup>
-              <InputGroupAddon>
-                <SearchIcon aria-hidden="true" />
-              </InputGroupAddon>
-              <InputGroupInput
-                type="search"
-                aria-label={C.search}
-                placeholder={C.search}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </InputGroup>
-          </div>
-          <span className="text-muted-foreground text-xs">{C.rows(shown.length)}</span>
-        </div>
-        {wide ? (
-          <SampleGrid
-            rows={shown}
-            headers={[
-              noun,
-              listings ? label("ListPrice") : C.phone,
-              listings ? label("OwnerMember") : C.creator,
-            ]}
-            onOpen={() => undefined}
-            buttonsLabel={C.more}
-            buttons={(row, i) => buttons(row as SampleRow, i)}
-          />
-        ) : (
-          <ul className="divide-y">
-            {shown.map((row, i) => (
-              <li key={row.id} className="flex items-center gap-2 py-2">
-                <div className="min-w-0 flex-1 px-2.5">
-                  <span className="block truncate text-sm font-medium">{row.title}</span>
-                  <span className="text-muted-foreground block text-xs">
-                    {row.detail} · {row.extra}
-                  </span>
-                </div>
-                {buttons(row, i)}
-              </li>
-            ))}
-          </ul>
-        )}
-      </FramePanel>
-    </Frame>
-  );
-
   return (
     <div className="grid gap-6">
-      {bare ? null : <Controls choice={choice} set={set} onRefuse={() => setRefuseNext(true)} />}
-      <PageHeader
-        title={`${screenTitle} · ${label(choice.role)}`}
-        action={canView ? addButton : undefined}
-      />
-      {region}
-      {dialog}
+      {bare ? null : <Controls choice={choice} set={set} />}
+      {/* The sample stands in for a session holding the chosen role: the real rule, a chosen set of roles. */}
+      <SessionRoles roles={[choice.role]}>
+        <Sample key={`${choice.screen}-${choice.role}`} choice={choice} />
+      </SessionRoles>
     </div>
   );
 }
 
-/** True from the sm breakpoint up (640px): the grid there, the card list below it. */
-function useWide(): boolean {
-  const [wide, setWide] = useState(true);
+function Sample({ choice }: { choice: Choice }) {
+  const listings = choice.screen === "listings";
+  const noun = listings ? label("Unit") : label("Contact");
+  const screenTitle = listings ? label("Inventory") : label("Contact");
+  const rows = useMemo(() => sample(choice.screen), [choice.screen]);
+  const roles = [choice.role];
+  const canView =
+    (listings ? allowedScope(roles, "viewListings") : allowedScope(roles, "viewContacts")) !== null;
+  const addText = listings ? label("CreateListing") : label("CreateContact");
+  const opened = useRef(false);
+
+  const columns = listings
+    ? [
+        typedColumn({ field: "Listing.unitNumber", header: noun }),
+        typedColumn({ field: "Listing.listPrice", header: label("ListPrice") }),
+        typedColumn({ field: "Listing.subdivisionName", header: label("OwnerMember") }),
+      ]
+    : [
+        typedColumn({ field: "Contact.fullName", header: noun }),
+        typedColumn({ field: "Contact.phones", header: C.phone }),
+        typedColumn({ field: "Listing.subdivisionName", header: C.creator }),
+      ];
+
+  const record: RegionRecord = {
+    render: (row) => ({
+      title: titleOf(row),
+      body: <p className="text-muted-foreground">{C.recordNote}</p>,
+      actions: (
+        <RecordActions
+          main={{
+            action: listings ? "updateListing" : "updateContact",
+            label: label("Edit"),
+            onSelect: () => notifyResult({ message: C.done(label("Edit")) }),
+          }}
+          actions={recordActions(choice.screen, row).slice(1)}
+          mine={isMine(row)}
+          title={titleOf(row)}
+        />
+      ),
+    }),
+  };
+
+  // Screenshot helpers: open the second row's «…», the first own row's removing confirmation, or the refusal notice.
   useEffect(() => {
-    const query = window.matchMedia("(min-width: 640px)");
-    const update = () => setWide(query.matches);
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
-  return wide;
+    if (opened.current || !choice.open) return;
+    opened.current = true;
+    if (choice.open === "refused") {
+      setTimeout(() => notifyResult({ message: FRAME_COPY.refusedAction }), 300);
+      return;
+    }
+    // The grid draws its rows after it measures the page: wait until the row's «…» is there.
+    const id = choice.open === "menu" ? rows[1]?.id : rows.find(isMine)?.id;
+    const press = (selector: string, then?: () => void, tries = 40) => {
+      const el = document.querySelector<HTMLElement>(selector);
+      // Once there, a beat more: the grid takes focus when it settles, which would close a menu opened before.
+      if (el)
+        setTimeout(() => {
+          el.click();
+          then?.();
+        }, 600);
+      else if (tries > 0) setTimeout(() => press(selector, then, tries - 1), 150);
+    };
+    press(`[data-row-actions-for="${id}"] [data-slot="row-actions"]`, () => {
+      if (choice.open === "remove") press('[role="menuitem"][data-variant="destructive"]');
+    });
+  });
+
+  const add = (
+    <Button onClick={() => notifyResult({ message: C.done(addText) })}>
+      <PlusIcon aria-hidden data-icon="inline-start" />
+      {addText}
+    </Button>
+  );
+  const addButton = listings ? (
+    <PermittedAction action="createListing">{add}</PermittedAction>
+  ) : (
+    <PermittedAction action="createContact">{add}</PermittedAction>
+  );
+
+  return (
+    <>
+      <PageHeader
+        title={`${screenTitle} · ${label(choice.role)}`}
+        action={canView ? addButton : undefined}
+      />
+      <DataRegion
+        title={screenTitle}
+        columns={columns}
+        rows={canView ? rows : []}
+        status={canView ? "ready" : "forbidden"}
+        headAction={canView ? addButton : undefined}
+        rowActions={(row) => ({ actions: recordActions(choice.screen, row), mine: isMine(row) })}
+        record={record}
+      />
+    </>
+  );
 }
