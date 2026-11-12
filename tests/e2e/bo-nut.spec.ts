@@ -149,10 +149,10 @@ test("axe-sang-toi", async ({ page }) => {
 });
 
 // Ruling V-1211-6 (approved by the owner at the evidence gate): one add button, two places by mode. Full screen hides the
-// page head, so the same button shows in the grid's toolbar; never both at once. Frames go to the round's evidence.
+// page head, so the same button shows in the grid's toolbar; never both at once. Frames go to the run folder; the signed record keeps its own copies.
 test("nut-them-toan-man-hinh", async ({ page }, info) => {
   test.skip(info.project.name !== "1440", "full screen is offered from 768px; one width is enough");
-  const shots = "_acceptance/bo-nut-theo-quyen/evidence/toan-man-hinh";
+  const shots = ".acceptance-runs/bo-nut-theo-quyen/toan-man-hinh";
   await open(page, "listings", "ListAgent");
   const add = page.getByRole("button", { name: LABELS.CreateListing.pref });
   await expect(add).toHaveCount(1);

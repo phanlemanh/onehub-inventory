@@ -6,7 +6,7 @@
 //     (an entry naming a role instead of the action) turns red with «thanh-ben-theo-o: TeamLead».
 //   tu-choi-403-cau-rieng — a company admin opens Invite, then Change roles; the role is taken away in the database;
 //     pressing the dialog's button gets 403 and the dialog shows the refusal sentence, not the general error; closing it
-//     refreshes the page and the sidebar entry goes. Four frames go to the round's evidence (E13).
+//     refreshes the page and the sidebar entry goes. Four frames go to the run folder (the signed E13 copies stay in the record).
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -31,7 +31,7 @@ const CHANGE = "Đổi vai";
 const FORBIDDEN = "Không đủ quyền";
 const REFUSED = FRAME_COPY.refusedAction;
 const GENERAL_ERROR = "Máy chủ đang gặp lỗi";
-const SHOTS = join("_acceptance", "bo-nut-theo-quyen", "evidence", "tu-choi-403");
+const SHOTS = join(".acceptance-runs", "bo-nut-theo-quyen", "tu-choi-403");
 
 let owner: pg.Client;
 test.beforeAll(async () => {
