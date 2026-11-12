@@ -1,5 +1,5 @@
-// Draft rows of the permission table for the prototype of row 9e. They are NOT in ontology/actions.yaml yet: the round
-// adds them there (status planned) after the scope gate, with the owner's choice of words and meanings. Cells follow
+// Draft rows of the permission table for the prototype of row 9e, as approved at its scope gate (plain verbs, contact
+// cells after common CRM practice). They are NOT in ontology/actions.yaml yet: the build step adds them (status planned). Cells follow
 // decision 0016: Company admin looks after people and settings, not listings or contacts; Team lead sees the whole
 // company; agents work on their own records for the removing actions.
 import type { ActionSpec, Role } from "@/generated/ontology";
@@ -30,11 +30,6 @@ export const DRAFT_ACTIONS: readonly ActionSpec[] = [
   row("viewListings", "query", "Listing", AGENTS_AND_LEAD),
   row("createListing", "create", "Listing", AGENTS_AND_LEAD),
   row("updateListing", "update", "Listing", AGENTS_AND_LEAD),
-  row("withdrawListing", "command", "Listing", { ListAgent: "own", TeamLead: "company" }),
-  row("removeListingCreatedByMistake", "delete", "Listing", {
-    ListAgent: "own",
-    TeamLead: "company",
-  }),
   row("removeListing", "delete", "Listing", { ListAgent: "own", TeamLead: "company" }),
   row("removeContact", "delete", "Contact", {
     ListAgent: "own",
@@ -49,11 +44,6 @@ export const DRAFT_ACTIONS: readonly ActionSpec[] = [
     TeamLead: "company",
   }),
   row("mergeContacts", "command", "Contact", { TeamLead: "company" }),
-  row("removeContactCreatedByMistake", "delete", "Contact", {
-    ListAgent: "own",
-    BuyerAgent: "own",
-    TeamLead: "company",
-  }),
   row("eraseContactPersonalData", "delete", "Contact", { TeamLead: "company" }),
 ];
 
@@ -61,13 +51,10 @@ export type DraftAction =
   | "viewListings"
   | "createListing"
   | "updateListing"
-  | "withdrawListing"
-  | "removeListingCreatedByMistake"
   | "removeListing"
   | "removeContact"
   | "viewContacts"
   | "createContact"
   | "updateContact"
   | "mergeContacts"
-  | "removeContactCreatedByMistake"
   | "eraseContactPersonalData";
