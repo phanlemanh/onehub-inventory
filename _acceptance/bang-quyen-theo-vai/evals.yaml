@@ -110,10 +110,13 @@ evals:
   - id: E8
     criterion: AC-6
     executor: script
-    cmd: config:executors.script.moi_nguoi_db
+    cmd: config:executors.script.moi_nguoi_db_9a
     layer: backend-effect
-    paths: [db/migrations/**, src/modules/identity/**, tests/db/moi-nguoi.db.test.ts]
-    expected: "exit 0; mười hai ca của hàng 9 (moi-email-moi-vao-dung-san … rang-buoc-vai-bang-mo-hinh) và tám cặp phá thử của nó xanh trên cây có migration 006, tệp kiểm của hàng 9 không đổi một dòng nào so với origin/main"
+    paths: [db/migrations/**, src/modules/identity/**, tests/db/moi-nguoi.db.test.ts, tests/db/pha-thu/**]
+    # Sửa lời theo chữ chủ kho 2026-11-12 («Đồng ý sửa E8»): API nay chặn trước theo bảng (AC-3), nên cặp
+    # pha-thu-moi-khong-kiem-quan-tri không làm đỏ được qua API; lớp chặn ở cơ sở dữ liệu của việc mời đo ở E4
+    # (csdl-theo-bang: inviteMember × ListAgent gọi thẳng, cặp phá thử pha-thu-doi-o).
+    expected: "exit 0; mười hai ca của hàng 9 (moi-email-moi-vao-dung-san … rang-buoc-vai-bang-mo-hinh) và bảy cặp phá thử của nó xanh trên cây có migration 006, cặp pha-thu-moi-khong-kiem-quan-tri bỏ qua (1 skipped); tệp kiểm của hàng 9 không đổi một dòng nào so với origin/main"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E9
