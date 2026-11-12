@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 0beec6a5c1209d686a3333113a97eef4f44224e6
+verified_commit: 8f92bb8e8fe7bdb9473f6b92f303f6238cf80fe2
 human_signoff: Manh Phan 2026-11-12
 ---
 
@@ -174,3 +174,7 @@ none — every multi-run eval is uniform
 ## Iterations
 
 Round 1: mọi eval máy xanh; E11 (judgment) chờ người chốt ở Cổng 2 nên verdict là PENDING-JUDGMENT.
+
+### Re-pin lần 1 — 2026-11-12, do gộp nhánh chính về trước khi gộp PR #33
+run_id: repin-20261112T062048Z-75335
+sha: 8f92bb8e8fe7bdb9473f6b92f303f6238cf80fe2 · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E11 (E11 không khai paths)
