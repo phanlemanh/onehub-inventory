@@ -48,6 +48,20 @@ const CELLS: Record<string, Partial<Record<Role, Scope>>> = {
     CompanyAdmin: "company",
   },
   manageAgreements: { CompanyAdmin: "company" },
+  // Row 7d (R-1211-20): the shared catalog and the company's own codes.
+  readCatalog: {
+    ListAgent: "company",
+    BuyerAgent: "company",
+    TeamLead: "company",
+    CompanyAdmin: "company",
+  },
+  readCompanyCodes: {
+    ListAgent: "company",
+    BuyerAgent: "company",
+    TeamLead: "company",
+    CompanyAdmin: "company",
+  },
+  manageCompanyCodes: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
 };
 // Written before the code: API doors of live rows, and the exempt API doors.
 const API_DOORS = ["GET /api/v1/members", "POST /api/v1/members", "PUT /api/v1/members/[id]/roles"];
@@ -99,10 +113,10 @@ describe("cong-quyen-15-to-hop", () => {
     expect(Object.fromEntries(LIVE_ACTIONS.map((a) => [a.name, a.scope]))).toEqual(CELLS);
   });
 
-  it("every live action × every set of roles gets the widest scope: 7 × 15 = 105 asserts", () => {
+  it("every live action × every set of roles gets the widest scope: 10 × 15 = 150 asserts", () => {
     const r = addUp(allowedScope);
     expect(r.failures).toEqual([]);
-    expect(r.count).toBe(105);
+    expect(r.count).toBe(150);
   });
 
   it("break: taking the narrowest scope names the first set that differs", () => {

@@ -77,6 +77,40 @@ actions:
     doors:
       db: ["table agreements insert", "table agreements update"]
 
+  - name: readCatalog
+    description: Read the shared unit catalog — projects, complexes, towers, stacks, units and original codes.
+    entity: Unit
+    kind: query
+    status: live
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db:
+        [
+          "table catalog_nodes select",
+          "table catalog_buildings select",
+          "table catalog_stacks select",
+          "table catalog_units select",
+          "table catalog_aliases select",
+        ]
+
+  - name: readCompanyCodes
+    description: Read the codes and names the company uses for catalog towers and units.
+    entity: CompanyCatalogAlias
+    kind: query
+    status: live
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db: ["table company_catalog_aliases select"]
+
+  - name: manageCompanyCodes
+    description: Add or change a code or name the company uses for a catalog tower or unit.
+    entity: CompanyCatalogAlias
+    kind: command
+    status: live
+    scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db: ["table company_catalog_aliases insert", "table company_catalog_aliases update"]
+
   # Draft rows for the listing board, from Quỹ hàng's permission review of 05/11 (table two) and its signed
   # bang-quyen-hang.json, without the Telesales role. Row 10 onwards decides each cell when it opens the door.
   - name: viewListings

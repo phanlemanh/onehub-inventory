@@ -24,10 +24,63 @@ export interface Agreement {
   specialTerms: boolean;
 }
 
+/** A tower (toà) of the shared catalog, under a complex when one is known, otherwise directly under its project; no companyId. Keyed like onehub-invest buildings. */
+export interface Building {
+  buildingKey: string;
+  /** id of Subdivision */
+  subdivisionKey: string;
+  /** id of Complex */
+  complexKey?: string;
+  buildingName: string;
+  upi: string;
+}
+
+export type CatalogAliasKind = "ma_goc" | "ten";
+
+/** An original code or a name of a tower, stack or unit in the shared catalog, kept as an alias so the catalog key never depends on how a source wrote it. Our own; shared catalog, no companyId. */
+export interface CatalogAlias {
+  id: number;
+  objectKey: string;
+  kind: CatalogAliasKind;
+  value: string;
+  source: string;
+  /** ISO datetime */
+  firstSeen: string;
+  /** ISO datetime */
+  retiredAt?: string;
+}
+
 /** A brokerage using the product; the tenant that owns one isolated area of data. */
 export interface Company {
   id: string;
   name: string;
+}
+
+export type CompanyCatalogAliasKind = "ma" | "ten";
+
+/** A code or name one company uses for a tower or a unit of the shared catalog. Belongs to that company only; the shared catalog never changes. */
+export interface CompanyCatalogAlias {
+  id: number;
+  /** id of Company */
+  companyId: string;
+  /** id of Building */
+  buildingKey?: string;
+  /** id of Unit */
+  unitKey?: string;
+  kind: CompanyCatalogAliasKind;
+  value: string;
+  /** ISO datetime */
+  createdAt: string;
+  /** ISO datetime */
+  retiredAt?: string;
+}
+
+/** A subdivision of a project (phân khu), child of exactly one Subdivision; shared catalog, no companyId. Stored in catalog_nodes with node_type complex. */
+export interface Complex {
+  slug: string;
+  name: string;
+  /** id of Subdivision */
+  subdivisionSlug: string;
 }
 
 /** One person a company works with; owner, buyer, tenant and landlord are types of contact, not separate records. */
@@ -100,19 +153,40 @@ export interface Member {
   invitedAt?: string;
 }
 
+/** A stack (trục) of one tower; a local extension, as in onehub-invest; shared catalog, no companyId. */
+export interface Stack {
+  stackKey: string;
+  /** id of Building */
+  buildingKey: string;
+  stackCode: string;
+}
+
+/** A project (dự án), the root of the shared catalog; shared by every company, so it has no companyId. Stored in catalog_nodes with node_type project, as onehub-invest stores projects in asset_nodes. */
+export interface Subdivision {
+  slug: string;
+  name: string;
+}
+
 export type UnitPropertyType = "Residential" | "Land";
 
 export type UnitPropertySubType = "Condominium" | "Townhouse" | "Single Family Residence" | "Unimproved Land";
 
 /** A physical apartment, house or plot in the shared catalog; shared by every company, so it has no company_id. */
 export interface Unit {
+  unitKey: string;
   upi: string;
+  /** id of Subdivision */
   subdivisionKey: string;
+  /** id of Complex */
+  complexKey?: string;
+  /** id of Building */
   buildingKey: string;
   buildingName: string;
-  unitNumber: string;
+  /** id of Stack */
+  stackKey?: string;
   stack?: string;
-  floor?: number;
+  unitNumber: string;
+  floor?: string;
   livingArea?: number;
   bedroomsTotal?: number;
   directionFaces?: string;
@@ -158,6 +232,15 @@ export interface ReadAgreementsInput {
 export interface ManageAgreementsInput {
 }
 
+export interface ReadCatalogInput {
+}
+
+export interface ReadCompanyCodesInput {
+}
+
+export interface ManageCompanyCodesInput {
+}
+
 export interface ViewListingsInput {
 }
 
@@ -189,6 +272,12 @@ export interface ActionHandlers {
   readAgreements(input: ReadAgreementsInput, ctx: ActionContext): Promise<void>;
   /** Add a connection agreement or change one. */
   manageAgreements(input: ManageAgreementsInput, ctx: ActionContext): Promise<void>;
+  /** Read the shared unit catalog — projects, complexes, towers, stacks, units and original codes. */
+  readCatalog(input: ReadCatalogInput, ctx: ActionContext): Promise<void>;
+  /** Read the codes and names the company uses for catalog towers and units. */
+  readCompanyCodes(input: ReadCompanyCodesInput, ctx: ActionContext): Promise<void>;
+  /** Add or change a code or name the company uses for a catalog tower or unit. */
+  manageCompanyCodes(input: ManageCompanyCodesInput, ctx: ActionContext): Promise<void>;
   /** See the listings of the company. */
   viewListings(input: ViewListingsInput, ctx: ActionContext): Promise<void>;
   /** Add a listing. */
@@ -401,6 +490,86 @@ export const ACTIONS: readonly ActionSpec[] = [
     doors: {
       api: [],
       db: ["table agreements insert", "table agreements update"],
+    },
+  },
+  {
+    name: "readCatalog",
+    description: "Read the shared unit catalog — projects, complexes, towers, stacks, units and original codes.",
+    entity: "Unit",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: [],
+      db: ["table catalog_nodes select", "table catalog_buildings select", "table catalog_stacks select", "table catalog_units select", "table catalog_aliases select"],
+    },
+  },
+  {
+    name: "readCompanyCodes",
+    description: "Read the codes and names the company uses for catalog towers and units.",
+    entity: "CompanyCatalogAlias",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: [],
+      db: ["table company_catalog_aliases select"],
+    },
+  },
+  {
+    name: "manageCompanyCodes",
+    description: "Add or change a code or name the company uses for a catalog tower or unit.",
+    entity: "CompanyCatalogAlias",
+    kind: "command",
+    roles: ["ListAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: [],
+      db: ["table company_catalog_aliases insert", "table company_catalog_aliases update"],
     },
   },
   {

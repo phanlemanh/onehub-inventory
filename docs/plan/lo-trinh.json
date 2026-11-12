@@ -191,6 +191,26 @@
       "dot": "mvp-dot-1"
     },
     {
+      "ma": "1s",
+      "cau_giao": "CI chạy các bài trình duyệt có đăng nhập trên một Postgres riêng của lượt, để bộ kiểm chung đo được màn cần đăng nhập ngay trên CI",
+      "vai": "nen",
+      "tieu_chi": 3,
+      "vi_sao": "Chủ kho duyệt Cổng Phạm vi hàng 1r ngày 2026-11-12: lượt có phiên chạy ở máy dãy và lượt chấm, việc đưa Postgres lên CI thành hàng riêng trước hàng 10. Hàng 2 vừa hỏng một ca chỉ hiện trên CI. Tệp CI do chủ kho sửa",
+      "hang": "T3",
+      "dung_tren": [
+        "1r"
+      ],
+      "slug": "ci-co-postgres",
+      "bat_khi": "Trên CI lượt có phiên đo mọi màn cần đăng nhập, in «bỏ qua cần đăng nhập: 0»; một ca phá (bỏ phiên thử) làm ô kiểm đỏ; thời gian CI tăng không quá mức chủ kho chốt ở Cổng Phạm vi",
+      "nhom": "nen",
+      "vung": [
+        "playwright.db.config.ts",
+        "tests/e2e-db/**",
+        "db/scripts/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "1g",
       "cau_giao": "Agent tra được danh mục ReUI Pro ngay trong kho theo phiên bản đã ghim, không phụ thuộc kết nối ngoài",
       "tieu_chi": 6,
@@ -453,6 +473,47 @@
       "dot": "mvp-dot-1"
     },
     {
+      "ma": "2c",
+      "cau_giao": "Đầu chủ lưu cách xem Bảng hàng (lọc, sắp xếp, nhóm, cột đang hiện) thành một mục ở cột thứ hai của App Shell và mở lại đúng cách xem ấy",
+      "vai": "Đầu chủ",
+      "tieu_chi": 6,
+      "vi_sao": "Chủ kho 2026-11-12 trong phiên dãy K: «Có, tách hàng riêng» — tách phần lưu góc nhìn khỏi mục gác H7, đi ngay sau hàng 2a vì nối thẳng vào lọc, sắp xếp, nhóm, cột của 2a. Ở Sheet mỗi khu một tab; góc nhìn đã lưu thay cho tab",
+      "hang": "T3",
+      "dung_tren": [
+        "2a"
+      ],
+      "slug": "luu-goc-nhin-cot-hai",
+      "bat_khi": "Lưu một cách xem rồi mở lại ra đúng tập dòng, thứ tự, nhóm và cột; mục đã lưu hiện ở cột thứ hai của App Shell và sáng lên khi đang mở; đổi tên và xoá được; Cổng Phạm vi chốt lưu trên máy chủ (dùng được trên mọi máy, cần bảng dữ liệu mới) hay cách khác, vì luật kho chưa cho giữ dữ liệu của sàn trên máy",
+      "nhom": "bang-hang",
+      "vung": [
+        "src/modules/listings/**",
+        "src/components/templates/app-shell/**",
+        "src/app/(app)/inventory/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "2d",
+      "cau_giao": "Đầu chủ đi Bảng hàng theo địa lý: chọn dự án, phân khu, toà ở cột thứ hai của App Shell và lọc các cột địa lý trên bảng",
+      "vai": "Đầu chủ",
+      "tieu_chi": 7,
+      "vi_sao": "Chủ kho 2026-11-12 nêu lối làm việc theo địa lý trong phiên dãy K: đầu chủ nghĩ theo dự án → phân khu → toà, như mỗi khu một tab ở Sheet. Cần cấp phân khu của hàng 7d",
+      "hang": "T2",
+      "dung_tren": [
+        "2a",
+        "7d"
+      ],
+      "slug": "bang-hang-theo-dia-ly",
+      "bat_khi": "Cột thứ hai hiện cây dự án → phân khu → toà kèm số căn; chọn một nút thì bảng lọc đúng tập căn và nút sáng lên; lọc cột địa lý trên bảng và cây ở cột thứ hai luôn khớp nhau; thẻ Phạm vi bày ứng viên ReUI cho cây kèm ảnh theo quyết định 0023",
+      "nhom": "bang-hang",
+      "vung": [
+        "src/modules/listings/ui/**",
+        "src/components/templates/app-shell/**",
+        "src/app/(app)/inventory/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "3",
       "cau_giao": "Đầu chủ bấm một căn và thấy hồ sơ căn cạnh bảng, trên điện thoại thấy thẻ căn",
       "vai": "Đầu chủ",
@@ -472,6 +533,25 @@
       "vung": [
         "src/modules/listings/ui/**"
       ]
+    },
+    {
+      "ma": "3a",
+      "cau_giao": "Đầu chủ ghim ngăn chi tiết thành một cột cạnh bảng khi làm lâu trên một căn, bỏ ghim thì ngăn nổi lại",
+      "vai": "Đầu chủ",
+      "tieu_chi": 5,
+      "vi_sao": "Chủ kho 2026-11-12 trong phiên dãy D: «Lấy B có ghim» — ngăn nổi là cách chung cả ứng dụng để xem chi tiết một dòng; nút ghim biến ngăn thành cột khi làm lâu. Hàng 3 dựng ngăn nổi, phần ghim là hàng này",
+      "hang": "T2",
+      "dung_tren": [
+        "3"
+      ],
+      "slug": "ngan-chi-tiet-ghim-thanh-cot",
+      "bat_khi": "Bấm ghim thì ngăn thành cột cạnh bảng, bảng co lại và không cột nào bị tự giấu; bỏ ghim thì ngăn nổi lại; trạng thái ghim giữ khi đi sang căn khác; ngăn nổi hay ghim đều không che thanh trên và thanh công cụ, không khoá bảng; mọi màn dùng khung chi tiết chung đều có nút ghim",
+      "nhom": "bang-hang",
+      "vung": [
+        "src/components/candidate/**",
+        "src/modules/listings/ui/**"
+      ],
+      "dot": "mvp-dot-1"
     },
     {
       "ma": "2b",
@@ -596,6 +676,67 @@
         "db/**",
         "tests/db/**",
         "src/modules/identity/with-company.ts"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "7b",
+      "cau_giao": "Bộ kiểm cách ly bắt cả dạng xem chỉ cấp quyền ghi, sửa hay xoá cho vai của ứng dụng mà không chạy theo quyền người đọc",
+      "vai": "nen",
+      "tieu_chi": 3,
+      "vi_sao": "Mục Ngoài-1 của hàng 7a; chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng ngày 2026-11-12. Qua lối tắt ấy một sàn xoá được thoả thuận của mọi sàn",
+      "hang": "T3",
+      "dung_tren": [
+        "7a"
+      ],
+      "slug": "cach-ly-dang-xem-chi-ghi",
+      "bat_khi": "Một dạng xem chỉ có quyền ghi, sửa hay xoá mà vượt luật theo dòng thì bộ kiểm cách ly đỏ; ca phá dựng đúng dạng xem ấy trên bản sao và đỏ với thông điệp ghim",
+      "nhom": "nen",
+      "vung": [
+        "db/**",
+        "tests/db/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "7c",
+      "cau_giao": "Ứng dụng nối cơ sở dữ liệu bằng một vai đăng nhập không phải chủ bảng, chỉ là thành viên của vai API, để mã trong cửa có đổi vai cũng không về được vai chủ",
+      "vai": "nen",
+      "tieu_chi": 4,
+      "vi_sao": "Từ hàng 7a: luật quét một cửa chỉ bắt câu viết thẳng; gốc của mục Ngoài-5 hàng 7 nằm ở vai đăng nhập. Phải xong trước khi nối dữ liệu thật",
+      "hang": "T3",
+      "dung_tren": [
+        "7a"
+      ],
+      "slug": "ung-dung-noi-bang-vai-khong-chu",
+      "bat_khi": "Chuỗi nối của ứng dụng dùng vai đăng nhập riêng không sở hữu bảng nào; từ vai ấy lệnh đổi về vai chủ bị từ chối; bộ kiểm cách ly và mọi bài cơ sở dữ liệu chạy dưới vai ấy vẫn xanh; ca phá cấp lại quyền chủ thì đỏ",
+      "nhom": "nen",
+      "vung": [
+        "db/**",
+        "tests/db/**",
+        "src/modules/identity/with-company.ts",
+        ".env.example"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "7d",
+      "cau_giao": "Danh mục căn dùng chung lưu cùng cách với onehub-invest: có cấp phân khu dưới dự án, tầng lưu theo RESO, toà · trục · căn có khoá riêng, mã căn gốc giữ làm bí danh",
+      "vai": "nen",
+      "tieu_chi": 8,
+      "vi_sao": "Chủ kho đồng ý đề xuất trong phiên dãy K ngày 2026-11-12 sau khi so hai kho: hai sản phẩm phải đọc chung một danh mục căn. Đi trước «Bảng hàng theo địa lý» (2d) và trước khi nối dữ liệu thật; giữ khoá sàn mà onehub-invest không có. Đổi ontology nên cần chủ kho soi",
+      "hang": "T3",
+      "dung_tren": [
+        "7a"
+      ],
+      "slug": "danh-muc-can-nhu-onehub-invest",
+      "bat_khi": "Danh mục có cấp phân khu (RESO Building.ComplexName) là con của dự án; tầng lưu dạng chữ theo RESO UnitFloorLocation; toà, trục, căn có khoá riêng có tiền tố; mã căn gốc giữ làm bí danh và bộ đọc tách được nhiều dạng mã; 60 căn mẫu chuyển sang không mất căn nào; bộ kiểm cách ly vẫn xanh với danh mục dùng chung là ngoại lệ đã khai",
+      "nhom": "nen",
+      "vung": [
+        "ontology/**",
+        "db/**",
+        "src/modules/catalog/**",
+        "tests/db/**"
       ],
       "dot": "mvp-dot-1"
     },
@@ -746,7 +887,11 @@
         "1m",
         "1r",
         "9d",
-        "7a"
+        "7a",
+        "1s",
+        "7b",
+        "7c",
+        "7d"
       ],
       "slug": "bang-hang-du-lieu-that",
       "nhom": "bang-hang",
@@ -1142,8 +1287,8 @@
     {
       "ma": "H7",
       "dot": "mvp-dot-1",
-      "cau_giao": "Đầu chủ lưu góc nhìn và sửa hàng loạt",
-      "ly_do": "Cắt khỏi MVP để giữ Bảng hàng đơn giản",
+      "cau_giao": "Đầu chủ sửa hàng loạt",
+      "ly_do": "Cắt khỏi MVP để giữ Bảng hàng đơn giản. Phần lưu góc nhìn đã tách thành hàng 2c (chủ kho 2026-11-12)",
       "phu": [
         "L7"
       ],
