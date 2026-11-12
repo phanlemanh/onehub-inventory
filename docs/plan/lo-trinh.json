@@ -169,6 +169,28 @@
       "dot": "mvp-dot-1"
     },
     {
+      "ma": "1r",
+      "cau_giao": "Bộ kiểm chung sinh từ sổ màn chạy được trên màn cần đăng nhập và không lỡ nhịp khi máy chậm",
+      "vai": "nen",
+      "tieu_chi": 6,
+      "vi_sao": "Chủ kho 2026-11-11 cho bộ kiểm chung bỏ qua có điều kiện màn cần đăng nhập (hàng 9); khi nối dữ liệu thật mọi màn đều cần đăng nhập nên bộ kiểm sẽ bỏ qua gần hết. Hàng 1o trượt hai lần vì bài kiểm lỡ nhịp trên máy chậm",
+      "hang": "T3",
+      "dung_tren": [
+        "1f",
+        "9",
+        "1o"
+      ],
+      "slug": "bo-kiem-chung-khi-dang-nhap",
+      "bat_khi": "Bộ kiểm chung mở được màn cần đăng nhập bằng một phiên thử và đo khung, trợ năng như màn thường; danh sách bỏ qua vì cần đăng nhập về rỗng; các bài chờ ngăn, băng báo hiện hẳn rồi mới đo, chạy lặp hai mươi lần dưới máy giảm tốc vẫn xanh",
+      "nhom": "nen",
+      "vung": [
+        "tools/e2e_templates/**",
+        "tests/e2e/**",
+        "playwright.config.ts"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "1g",
       "cau_giao": "Agent tra được danh mục ReUI Pro ngay trong kho theo phiên bản đã ghim, không phụ thuộc kết nối ngoài",
       "tieu_chi": 6,
@@ -246,6 +268,24 @@
         ".claude/skills/inventory-ui/**",
         "design/so-khoi.yaml"
       ]
+    },
+    {
+      "ma": "1q",
+      "cau_giao": "Cổng chứng minh màn bắt được khối mới mà vòng dựng không kê ra trong hồ sơ",
+      "vai": "nen",
+      "tieu_chi": 4,
+      "vi_sao": "Giám sát rà cổng ngày 2026-11-12 theo yêu cầu chủ kho: cổng của hàng 1n chỉ xét khối hồ sơ tự khai, nên khối tạo tay mà không kê thì cổng im lặng",
+      "hang": "T3",
+      "dung_tren": [
+        "1n"
+      ],
+      "slug": "cong-bat-khoi-khong-ke",
+      "bat_khi": "Thành phần mới xuất hiện trong sổ thành phần sinh so với nhánh chính, nằm ngoài thư mục nhà cung cấp, mà không có trong bảng Khối của hồ sơ nào đang mở thì đỏ; ca phá tương ứng đỏ đúng câu",
+      "nhom": "nen",
+      "vung": [
+        "tools/proof_gate/**"
+      ],
+      "dot": "mvp-dot-1"
     },
     {
       "ma": "1o",
@@ -391,6 +431,28 @@
       "du_lieu": "gia"
     },
     {
+      "ma": "2a",
+      "cau_giao": "Đầu chủ dùng Bảng hàng bằng tay như Sheet: đi giữa các ô bằng phím mũi tên, bôi một vùng ô rồi chép sang Zalo hay Excel, bấm tiêu đề để sắp xếp, lọc từng cột, nhóm dòng theo toà, ẩn hiện cột",
+      "vai": "Đầu chủ",
+      "tieu_chi": 9,
+      "vi_sao": "Chủ kho 2026-11-11: Bảng hàng phải giữ thói quen Sheet của đầu chủ, mục đích gốc của Quỹ hàng. Lớp hai sau «đọc như Sheet» của hàng 2; sáu lối tắt theo trạng thái ở cột thứ hai của App Shell chờ bộ lọc này",
+      "hang": "T2",
+      "dung_tren": [
+        "2",
+        "1o"
+      ],
+      "slug": "bang-hang-dung-tay-nhu-sheet",
+      "bat_khi": "Phím mũi tên, Tab, Home, End đưa ô chọn đi đúng và bảng cuộn theo; bôi vùng rồi chép ra đúng chữ tách cột; sắp xếp và lọc từng cột cho đúng tập dòng trên 60 căn mẫu; nhóm theo toà giữ số dòng đếm liền; lối tắt trạng thái ở cột thứ hai mở Bảng hàng đã lọc đúng trạng thái; thứ tự trạng thái ở hai nơi là một",
+      "nhom": "bang-hang",
+      "vung": [
+        "src/components/candidate/**",
+        "src/modules/listings/ui/**",
+        "src/app/(app)/inventory/**",
+        "src/app/(app)/nav.ts"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "3",
       "cau_giao": "Đầu chủ bấm một căn và thấy hồ sơ căn cạnh bảng, trên điện thoại thấy thẻ căn",
       "vai": "Đầu chủ",
@@ -412,6 +474,25 @@
       ]
     },
     {
+      "ma": "2b",
+      "cau_giao": "Đầu chủ và Đầu khách mở Bảng hàng trên điện thoại thấy danh sách thẻ căn và chạm thẻ để mở hồ sơ căn",
+      "vai": "Đầu chủ",
+      "tieu_chi": 6,
+      "vi_sao": "Chủ kho 2026-11-11 chọn làm bảng thẻ điện thoại thành hàng riêng sau hàng 3. Sheet trên điện thoại gần như không dùng được; Quỹ hàng dùng danh sách thẻ. Hôm nay Bảng hàng trên điện thoại là bảng cuộn ngang, thấy trọn hai cột",
+      "hang": "T2",
+      "dung_tren": [
+        "3"
+      ],
+      "slug": "bang-hang-the-dien-thoai",
+      "bat_khi": "Ở 360 và 414 Bảng hàng hiện thẻ căn thay cho bảng, mỗi thẻ đủ mã căn, giá, trạng thái; chạm thẻ mở hồ sơ căn toàn màn, lùi về giữ chỗ đang cuộn; thẻ Phạm vi bày ứng viên ReUI kèm ảnh theo quyết định 0023",
+      "nhom": "bang-hang",
+      "vung": [
+        "src/modules/listings/ui/**",
+        "src/app/(app)/inventory/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "4",
       "cau_giao": "Đầu chủ sửa giá và trạng thái ngay trên ô, thấy lỗi ngay tại ô đó",
       "vai": "Đầu chủ",
@@ -419,7 +500,8 @@
       "vi_sao": "Thay thao tác sửa trên Sheet",
       "hang": "T2",
       "dung_tren": [
-        "2"
+        "2",
+        "2a"
       ],
       "slug": "sua-tren-o",
       "nhom": "bang-hang",
@@ -431,7 +513,8 @@
       "vung": [
         "src/modules/listings/ui/**",
         "src/components/candidate/**"
-      ]
+      ],
+      "bat_khi": "Hoàn tác hỏng thì báo rõ, kể cả khi mất mạng; bài rào «màn tự dựng lại hành vi» đọc đúng tệp .ts (việc phụ K-5 của hàng 1e)"
     },
     {
       "ma": "5",
@@ -497,6 +580,26 @@
       ]
     },
     {
+      "ma": "7a",
+      "cau_giao": "Bộ kiểm cách ly giữa các sàn bắt thêm tám kẽ hở đã nêu ở hàng 7 trước khi nối dữ liệu thật",
+      "vai": "nen",
+      "tieu_chi": 8,
+      "vi_sao": "Tám mục ngoài hợp đồng của hàng 7 (1, 4, 5, 6, 14, 19, 20, 30); chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng. Hậu quả nếu xảy ra là lộ hoặc mất dữ liệu của nhiều sàn",
+      "hang": "T3",
+      "dung_tren": [
+        "7"
+      ],
+      "slug": "cach-ly-truoc-du-lieu-that",
+      "bat_khi": "Mỗi kẽ hở trong tám mục có một ca kiểm đỏ được khi phá: dạng xem và hàm vượt luật theo dòng, quyền xoá hay cắt bảng cấp nhầm cho vai API, bảng mới thiếu luật theo dòng, bảng thoả thuận chưa có chỗ lưu",
+      "nhom": "nen",
+      "vung": [
+        "db/**",
+        "tests/db/**",
+        "src/modules/identity/with-company.ts"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "8",
       "cau_giao": "Nhân viên sàn nhập mã gửi qua email và vào đúng sàn của mình",
       "vai": "Nhân viên sàn",
@@ -537,6 +640,24 @@
         "src/modules/identity/**",
         "src/modules/company-config/**"
       ]
+    },
+    {
+      "ma": "9d",
+      "cau_giao": "Thư mời dẫn người được mời tới đúng trang đăng nhập của sản phẩm, lấy từ cấu hình chứ không từ yêu cầu gửi tới",
+      "vai": "Quản trị sàn",
+      "tieu_chi": 3,
+      "vi_sao": "Mục ngoài hợp đồng 2 của hàng 9; chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng ngày 2026-11-11. Ở một số cách triển khai đường trong thư có thể bị trỏ sang trang khác",
+      "hang": "T3",
+      "dung_tren": [
+        "9"
+      ],
+      "slug": "thu-moi-dia-chi-tu-cau-hinh",
+      "bat_khi": "Đường trong thư mời lấy từ địa chỉ gốc khai trong cấu hình; yêu cầu mang tên máy chủ lạ không đổi được đường trong thư; bản thật thiếu cấu hình ấy thì không khởi động",
+      "nhom": "nen",
+      "vung": [
+        "src/modules/identity/**"
+      ],
+      "dot": "mvp-dot-1"
     },
     {
       "ma": "9a",
@@ -622,7 +743,10 @@
         "9a",
         "9b",
         "1j",
-        "1m"
+        "1m",
+        "1r",
+        "9d",
+        "7a"
       ],
       "slug": "bang-hang-du-lieu-that",
       "nhom": "bang-hang",

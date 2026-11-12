@@ -13,7 +13,10 @@ export interface InviteMail {
   companyName: string;
   inviterName: string;
   roles: readonly Role[];
-  /** Origin of the request that invited, e.g. https://app.example — the mail links to its sign-in page. */
+  /**
+   * Origin of the request that invited. Only a development machine without APP_URL links to it; a sender built with
+   * the configured app URL (always, in production) ignores it, so a forged Host cannot steer the link (row 9d).
+   */
   origin: string;
 }
 
@@ -25,12 +28,15 @@ export interface SentInvite {
   text: string;
 }
 
-/** Subject and body: who invited, into which company, as what, and where to sign in. No code, no secret. */
-export function inviteEmail(mail: InviteMail): { subject: string; text: string } {
+/**
+ * Subject and body: who invited, into which company, as what, and where to sign in. No code, no secret. The sign-in
+ * link is built from `appUrl` when given, else from the mail's request origin (development only).
+ */
+export function inviteEmail(mail: InviteMail, appUrl?: string): { subject: string; text: string } {
   const roles = canonicalRoles(mail.roles)
     .map((r) => LABELS[r].pref)
     .join(", ");
-  const login = `${mail.origin.replace(/\/+$/, "")}/login`;
+  const login = `${(appUrl ?? mail.origin).replace(/\/+$/, "")}/login`;
   return {
     subject: `${mail.inviterName} mời bạn vào ${mail.companyName} trên OneHub`,
     text: [
@@ -47,6 +53,8 @@ export function inviteEmail(mail: InviteMail): { subject: string; text: string }
 export function resendInviteSender(o: {
   apiKey: string;
   from: string;
+  /** The configured app URL (APP_URL); the link never follows the request's Host when it is set. */
+  appUrl?: string;
   fetch?: typeof fetch;
 }): InviteSender {
   const send = o.fetch ?? fetch;
@@ -54,16 +62,16 @@ export function resendInviteSender(o: {
     const res = await send("https://api.resend.com/emails", {
       method: "POST",
       headers: { authorization: `Bearer ${o.apiKey}`, "content-type": "application/json" },
-      body: JSON.stringify({ from: o.from, to: [mail.email], ...inviteEmail(mail) }),
+      body: JSON.stringify({ from: o.from, to: [mail.email], ...inviteEmail(mail, o.appUrl) }),
     });
     if (!res.ok) throw new Error(`gửi thư mời thất bại: Resend ${res.status}`);
   };
 }
 
 /** Development only: prints the mail; with an outbox path, also appends it as one JSON line. */
-export function devInviteSender(outbox?: string): InviteSender {
+export function devInviteSender(outbox?: string, appUrl?: string): InviteSender {
   return async (mail) => {
-    const built: SentInvite = { email: mail.email, ...inviteEmail(mail) };
+    const built: SentInvite = { email: mail.email, ...inviteEmail(mail, appUrl) };
     console.log(`[thu-moi] ${built.email} · ${built.subject}`);
     if (outbox)
       appendFileSync(
