@@ -28,6 +28,10 @@ executors:
     moi_nguoi_db: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx vitest run -c vitest.db.config.ts tests/db/moi-nguoi.db.test.ts --reporter=verbose"   # moi-nguoi-gan-vai (row 9): lane Postgres, scratch databases moi_nguoi_*
     cach_ly_n: "DB_LANE=${DB_LANE:-n} bash db/scripts/cach-ly.sh"   # moi-nguoi-gan-vai (row 9): the isolation suite on lane N's Postgres when other lanes' containers run too
     moi_nguoi_e2e: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx playwright test -c playwright.db.config.ts tests/e2e-db/members.spec.ts"   # moi-nguoi-gan-vai (row 9): members screen on lane Postgres
+    kiem_chung_phien: "DB_LANE=h DB_PORT=5567 npx playwright test -c playwright.db.config.ts tests/e2e-db/screens.spec.ts"   # bo-kiem-chung-khi-dang-nhap (1r): register-driven suite with one test session, lane H Postgres
+    kiem_chung_lap: "E2E_CPU_THROTTLE=4 npx playwright test --grep @cho --project=360 --project=1024 --repeat-each=20"   # bo-kiem-chung-khi-dang-nhap (1r): sheet and banner waits, 20 runs on a 4x slowed CPU
+    kiem_chung_lap_phien: "DB_LANE=h DB_PORT=5567 E2E_CPU_THROTTLE=4 npx playwright test -c playwright.db.config.ts tests/e2e-db/members.spec.ts --grep @cho --project=360 --repeat-each=20"   # bo-kiem-chung-khi-dang-nhap (1r): members sheet wait, 20 runs slowed, lane H Postgres
+    kiem_chung_db_tron: "DB_LANE=h DB_PORT=5567 npx playwright test -c playwright.db.config.ts"   # bo-kiem-chung-khi-dang-nhap (1r): every signed-in browser test after the shared setup changed, lane H Postgres
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists
