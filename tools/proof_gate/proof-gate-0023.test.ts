@@ -459,8 +459,17 @@ describe("tệp bài của hàng 1c không đổi", () => {
     '      "src/components",',
     "    ]) {",
   ].join("\n");
+  // One more step, row 3 (D-5): the block ledger names module UI files, so the copy also carries src/modules.
+  // No fourth step: a row that needs more widens the copy list by rule, not by another step here.
+  const COPY_ROW3 = COPY_ROW2.replace(
+    '      "src/components",\n',
+    '      "src/components",\n      "src/modules",\n',
+  );
   const normalise = (text: string) =>
-    text.replace(REFERENCE_ROW2, REFERENCE_NOW).replace(COPY_ROW2, COPY_NOW);
+    text
+      .replace(REFERENCE_ROW2, REFERENCE_NOW)
+      .replace(COPY_ROW3, COPY_NOW)
+      .replace(COPY_ROW2, COPY_NOW);
   function blob(text: string): string {
     const body = Buffer.from(text, "utf8");
     return createHash("sha1")
@@ -480,6 +489,11 @@ describe("tệp bài của hàng 1c không đổi", () => {
     // A copy list naming a wrong folder is not the allowed edit, so the pin stays red.
     const wrong = COPY_ROW2.replace('"src/components"', '"src/component"');
     expect(blob(normalise(signed.replace(COPY_NOW, wrong)))).not.toBe(OLD_TESTS_BLOB);
+    // Row 3's step: the widened list gives the signed hash; a misspelt module folder does not.
+    expect(COPY_ROW3).not.toBe(COPY_ROW2);
+    expect(blob(normalise(signed.replace(COPY_NOW, COPY_ROW3)))).toBe(OLD_TESTS_BLOB);
+    const wrongModules = COPY_ROW3.replace('"src/modules"', '"src/module"');
+    expect(blob(normalise(signed.replace(COPY_NOW, wrongModules)))).not.toBe(OLD_TESTS_BLOB);
   });
 });
 
