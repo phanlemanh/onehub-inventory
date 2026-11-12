@@ -1,5 +1,2 @@
-FAIL-eligible failed requests (status>=400/failed):
-(none)
-
-console error/warning:
+Playwright response>=400/requestfailed/console errors for app origin 127.0.0.1:3489:
 (none)
