@@ -162,7 +162,9 @@ test("thanh-ben-theo-bang · man-thanh-vien-theo-bang", { tag: "@cho" }, async (
 function membersEntry(): NavItem {
   const text = readFileSync(join("src", "app", "(app)", "nav.ts"), "utf8");
   const line = text.split("\n").find((l) => l.includes('href: "/members"'));
-  const action = line?.match(/action: "(\w+)"/)?.[1];
+  const named = line?.match(/action: "(\w+)"/)?.[1];
+  // Only a row of the permission table counts; an unknown name leaves the entry without an action.
+  const action = ACTIONS.find((a) => a.name === named)?.name;
   const roles = line?.match(/roles: \[([^\]]*)\]/)?.[1];
   return {
     href: "/members",

@@ -2,7 +2,7 @@
 // tests read them without React). The rail and second column draw them (nav-menu.tsx, app-shell/second-column.tsx).
 import type { ReactNode } from "react";
 
-import type { ActionPermission } from "@/components/candidate/action-permission";
+import type { ActionPermission, PermissionAction } from "@/components/candidate/action-permission";
 import type { Role } from "@/generated/ontology";
 
 /** One entry of the second column of the App Shell (row 1o): a place inside the screen of its rail entry. */
@@ -26,7 +26,7 @@ export interface NavItem {
    * The permission-table action that opens this screen (row 9e): the entry shows only when the session may run it, so
    * a changed cell of ontology/actions.yaml moves the entry without code. Prefer it over `roles`.
    */
-  action?: string;
+  action?: PermissionAction;
   /** The rail icon (lucide); absent shows a neutral dot until the entry declares one. */
   icon?: ReactNode;
   /** What the second column holds while this screen is open; absent means the screen has no sub-places. */

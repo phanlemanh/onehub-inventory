@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { useActionPermission } from "./action-permission";
+import { useActionPermission, type PermissionAction } from "./action-permission";
 import { GRID_COPY } from "./grid-copy";
 import { useChange, type Change } from "./use-change";
 
@@ -22,7 +22,7 @@ export type RemoveChange = Omit<Extract<Change, { reversible: false }>, "reversi
 
 /** One thing a person can do to a record, named by its row in the permission table (ontology/actions.yaml). */
 export type RecordAction = {
-  action: string;
+  action: PermissionAction;
   /** Verb plus noun from the labels, e.g. label("RemoveListing"). */
   label: string;
 } & ({ onSelect: () => void; remove?: never } | { remove: RemoveChange; onSelect?: never });
@@ -123,7 +123,7 @@ export function RecordActions({
   mine,
   title,
 }: {
-  main?: { action: string; label: string; icon?: ReactNode; onSelect: () => void };
+  main?: { action: PermissionAction; label: string; icon?: ReactNode; onSelect: () => void };
   actions: readonly RecordAction[];
   mine: boolean;
   title: string;

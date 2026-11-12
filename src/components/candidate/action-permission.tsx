@@ -2,8 +2,13 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 
+import type { ActionSpec } from "@/generated/ontology";
+
+/** A row of the permission table (ontology/actions.yaml): a name outside it does not type-check. */
+export type PermissionAction = ActionSpec["name"];
+
 /** Whether the session may run an action, on its own record (`mine`) or on someone else's. */
-export type ActionPermission = (action: string, mine: boolean) => boolean;
+export type ActionPermission = (action: PermissionAction, mine: boolean) => boolean;
 
 /** Nothing is permitted until the identity module says so: a menu outside the frame shows no action. */
 const DENY_ALL: ActionPermission = () => false;

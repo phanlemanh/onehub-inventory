@@ -13,8 +13,7 @@ const SessionRolesContext = createContext<readonly Role[]>([]);
 /** Sets the session's roles for PermittedAction, and the same rule for the shared «…» menus of the grid and record. */
 export function SessionRoles({ roles, children }: { roles: readonly Role[]; children: ReactNode }) {
   const permitted = useCallback(
-    (action: string, mine: boolean) =>
-      actionVisibility(roles, action as ActionName, mine) === "show",
+    (action: ActionName, mine: boolean) => actionVisibility(roles, action, mine) === "show",
     [roles],
   );
   return (

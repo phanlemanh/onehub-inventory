@@ -2,13 +2,19 @@
 // decision:action-buttons
 // Row 9e (bo-nut-theo-quyen), AC-4 and AC-5: the «…» of a record and its removing confirmation.
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import { FRAME_COPY } from "@/components/templates/frame-copy";
+import type { NavItem } from "@/components/templates/nav-items";
+import type { ActionSpec } from "@/generated/ontology";
 
 import { tallGridViewport } from "../../../tests/virtual-viewport";
 
-import { ActionPermissionProvider, type ActionPermission } from "./action-permission";
+import {
+  ActionPermissionProvider,
+  type ActionPermission,
+  type PermissionAction,
+} from "./action-permission";
 import { typedColumn } from "./column-kind";
 import { DataRegion, type GridRow } from "./data-region";
 import { RecordActions, RowActions, type RecordAction } from "./row-actions";
@@ -162,6 +168,26 @@ describe("hop-go", () => {
     });
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     expect(apply).not.toHaveBeenCalled();
+  });
+});
+
+// AC-3 (S4 round 1, finding t1): an action named in a row or record menu, or in an App Shell entry, must be a row of
+// the permission table, or `make typecheck` fails. If the type loosens back to a plain string, the @ts-expect-error
+// lines below are no longer errors and the type check fails on them instead: the pair turns red either way.
+describe("thao-tac-ngoai-bang: menus and sidebar entries name rows of the permission table", () => {
+  it("the action type is exactly the table's names", () => {
+    expectTypeOf<PermissionAction>().toEqualTypeOf<ActionSpec["name"]>();
+    expectTypeOf<RecordAction["action"]>().toEqualTypeOf<ActionSpec["name"]>();
+    expectTypeOf<NonNullable<NavItem["action"]>>().toEqualTypeOf<ActionSpec["name"]>();
+  });
+
+  it("break: a name outside the table does not type-check", () => {
+    const known: RecordAction = { action: "removeListing", label: "x", onSelect: () => {} };
+    // @ts-expect-error -- "deleteEverything" is not a row of ontology/actions.yaml
+    const unknown: RecordAction = { action: "deleteEverything", label: "x", onSelect: () => {} };
+    // @ts-expect-error -- an App Shell entry cannot name an action outside the table either
+    const entry: NavItem = { href: "/x", title: "x", action: "deleteEverything" };
+    expect([known, unknown, entry]).toHaveLength(3);
   });
 });
 
