@@ -184,7 +184,15 @@ describe("screens", () => {
     );
     expect(new Set(routes)).toEqual(new Set(built));
     expect(new Set(built)).toEqual(
-      new Set(["/", "/inventory", "/sent", "/proto/[slug]", "/login", "/members"]),
+      new Set([
+        "/",
+        "/inventory",
+        "/sent",
+        "/proto/[slug]",
+        "/login",
+        "/members",
+        "/proto/luu-goc-nhin",
+      ]),
     );
   });
 
