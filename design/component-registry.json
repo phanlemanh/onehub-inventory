@@ -2,6 +2,21 @@
   "version": 2,
   "components": [
     {
+      "name": "ColumnFilterCell",
+      "file": "src/components/candidate/column-filter-cell.tsx",
+      "level": "organism",
+      "parts": [
+        {
+          "name": "ColumnFilterCell",
+          "props": [
+            "spec",
+            "column",
+            "options"
+          ]
+        }
+      ]
+    },
+    {
       "name": "DataRegion",
       "file": "src/components/candidate/data-region.tsx",
       "level": "organism",
@@ -19,7 +34,9 @@
             "emptyAction",
             "action",
             "record",
-            "editable"
+            "editable",
+            "initialFilters",
+            "groupBy"
           ]
         },
         {
@@ -97,6 +114,7 @@
             "query",
             "onQuery",
             "action",
+            "tools",
             "searchId",
             "showCount"
           ]
@@ -1548,6 +1566,22 @@
         },
         {
           "name": "ScreenBanner"
+        }
+      ]
+    },
+    {
+      "name": "HiddenInFocus",
+      "file": "src/components/templates/shell-focus.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "HiddenInFocus"
+        },
+        {
+          "name": "ShellContent"
+        },
+        {
+          "name": "ShellFocusProvider"
         }
       ]
     },

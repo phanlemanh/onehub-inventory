@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useSyncExternalStore } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -54,6 +54,7 @@ export function SecondColumnNav({
   roles?: readonly Role[];
 }) {
   const pathname = usePathname();
+  const search = useSearchParams().toString();
   const { isMobile, setOpenMobile } = useSidebar();
   const entry = currentEntry(items, roles, pathname);
   if (!entry) return null;
@@ -68,9 +69,11 @@ export function SecondColumnNav({
       </nav>
     );
   }
-  // The first link that matches the address exactly is the open place; otherwise the first link of the screen.
+  // The first link that matches the address exactly (with its query, so a status shortcut lights up) is the open
+  // place; otherwise the first link of the screen.
   const links = sections.flatMap((s) => s.items);
-  const exact = links.findIndex((l) => l.href === pathname);
+  const here = search ? `${pathname}?${search}` : pathname;
+  const exact = links.findIndex((l) => l.href === here);
   const openIndex = exact >= 0 ? exact : links.findIndex((l) => isCurrent(pathname, l.href));
   const offsets = sections.map((_, i) =>
     sections.slice(0, i).reduce((sum, s) => sum + s.items.length, 0),
