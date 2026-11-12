@@ -146,6 +146,9 @@ có căn cứ hai kho.
 
 ## Câu hỏi cho chủ kho (Cổng Phạm vi)
 
+Đã chốt 2026-11-12 (Manh Phan): duyệt theo khuyến nghị cả năm câu — Hỏi-1 máy chủ, Hỏi-2 riêng người lưu, Hỏi-3 L1
+không số, Hỏi-4 S1, Hỏi-5 không tự lưu; cả cột thứ hai một kiểu mục.
+
 - Hỏi-1 · Lưu ở đâu. Khuyên: trên máy chủ — mở ở máy nào cũng thấy, hợp luật kho không giữ dữ liệu sàn trên máy; giá: một
   bảng dữ liệu mới, hàng thành T3. Lối khác: lưu trên trình duyệt như Quỹ hàng — không cần bảng mới, nhưng phạm luật «không
   giữ dữ liệu của sàn trên máy», đổi máy là mất, và phải xoá khi đăng xuất.

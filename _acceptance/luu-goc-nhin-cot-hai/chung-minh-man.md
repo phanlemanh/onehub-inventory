@@ -22,9 +22,9 @@ dòng sổ khối điền ở S3, trước lượt chấm.
 
 | Cho | Ứng viên | Ảnh | Chọn |
 | --- | -------- | --- | ---- |
-| màn | c-sidebar-1 | evidence/reui-c-sidebar-1.png | |
+| màn | c-sidebar-1 | evidence/reui-c-sidebar-1.png | ✓ |
 | màn | solution-dev-ops-2 | evidence/reui-solution-dev-ops-2.png | |
 | màn | data-grid-drag-drop-3 | evidence/reui-data-grid-drag-drop-3.png | |
 
 Bản bấm được của các lối ghép từ ứng viên trên: `/proto/luu-goc-nhin` (L1, L2 cho danh sách; S1, S2, S3 cho cách lưu),
-ảnh bốn khổ sáng tối ở `figures/proto/`. Chủ kho chọn ở Cổng Phạm vi; máy đánh dấu cột Chọn theo chữ chủ kho.
+ảnh bốn khổ sáng tối ở `figures/proto/`. Chủ kho duyệt Cổng Phạm vi 2026-11-12 theo khuyến nghị (L1 không số, S1, riêng người lưu, lưu trên máy chủ, không tự lưu); cả cột thứ hai một kiểu mục con.

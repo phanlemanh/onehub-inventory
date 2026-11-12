@@ -6,7 +6,9 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api]
 screens: [inventory]
-status: draft
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-12
 design_doc: _acceptance/luu-goc-nhin-cot-hai/design.md
 ---
 
@@ -26,8 +28,8 @@ mục Notes), khuôn bộ nút của hàng 9e (`_acceptance/bo-nut-theo-quyen/`,
 
 Luật sản phẩm chạm: SP-1 (bảng mới của sàn). Không chạm SP-3, SP-4.
 
-Các tiêu chí dưới viết theo khuyến nghị của máy cho Hỏi-1 (lưu trên máy chủ), Hỏi-2 (riêng người lưu), Hỏi-4 (nút «Lưu góc
-nhìn» của vùng) và Hỏi-5 (không tự lưu). Chủ kho chọn khác thì máy sửa lời tiêu chí trước khi duyệt.
+Chủ kho duyệt theo khuyến nghị cả năm câu (2026-11-12): Hỏi-1 lưu trên máy chủ, Hỏi-2 riêng người lưu, Hỏi-3 danh sách L1
+không số đếm, Hỏi-4 nút «Lưu góc nhìn» của vùng, Hỏi-5 không tự lưu; cả cột thứ hai một kiểu mục con.
 
 ## Criteria
 
