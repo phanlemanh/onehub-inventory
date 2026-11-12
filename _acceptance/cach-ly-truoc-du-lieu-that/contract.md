@@ -5,7 +5,7 @@ slug: cach-ly-truoc-du-lieu-that
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config]
-status: approved
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: _acceptance/cach-ly-truoc-du-lieu-that/design.md
