@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "bang-hang-ban-doc",
-  "ghi_luc": "2026-11-12T03:35:15Z",
-  "vong_cham": 2,
+  "ghi_luc": "2026-11-12T04:15:54Z",
+  "vong_cham": 3,
   "luot": [
     {
       "vong": 1,
@@ -13,6 +13,11 @@
     },
     {
       "vong": 2,
+      "verdict": "PENDING-JUDGMENT",
+      "tang": []
+    },
+    {
+      "vong": 3,
       "verdict": "PENDING-JUDGMENT",
       "tang": []
     }
@@ -39,8 +44,8 @@
   "chua_phan": [],
   "thuoc_vat": {
     "vat": [
-      69,
-      19
+      123,
+      22
     ],
     "thuoc": [
       24,

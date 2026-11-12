@@ -1,297 +1,306 @@
-[inventory-1440-sang] 200 document http://127.0.0.1:3677/inventory
-[inventory-1440-sang] 200 font http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
-[inventory-1440-sang] 200 image http://127.0.0.1:3677/brand/logo-mark.svg
-[inventory-1440-sang] 200 stylesheet http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
-[inventory-1440-sang] 200 font http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
-[inventory-1440-sang] 200 font http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
-[inventory-1440-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
-[inventory-1440-toi] 200 document http://127.0.0.1:3677/inventory
-[inventory-1440-toi] 200 font http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
-[inventory-1440-toi] 200 image http://127.0.0.1:3677/brand/logo-mark.svg
-[inventory-1440-toi] 200 font http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
-[inventory-1440-toi] 200 stylesheet http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
-[inventory-1440-toi] 200 font http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
-[inventory-1440-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
-[inventory-1024-sang] 200 document http://127.0.0.1:3677/inventory
-[inventory-1024-sang] 200 font http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
-[inventory-1024-sang] 200 image http://127.0.0.1:3677/brand/logo-mark.svg
-[inventory-1024-sang] 200 font http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
-[inventory-1024-sang] 200 stylesheet http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
-[inventory-1024-sang] 200 font http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
-[inventory-1024-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
-[inventory-1024-toi] 200 document http://127.0.0.1:3677/inventory
-[inventory-1024-toi] 200 font http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
-[inventory-1024-toi] 200 font http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
-[inventory-1024-toi] 200 image http://127.0.0.1:3677/brand/logo-mark.svg
-[inventory-1024-toi] 200 stylesheet http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
-[inventory-1024-toi] 200 font http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
-[inventory-1024-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
-[inventory-414-sang] 200 document http://127.0.0.1:3677/inventory
-[inventory-414-sang] 200 font http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
-[inventory-414-sang] 200 image http://127.0.0.1:3677/brand/logo-mark.svg
-[inventory-414-sang] 200 stylesheet http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
-[inventory-414-sang] 200 font http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
-[inventory-414-sang] 200 font http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
-[inventory-414-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
-[inventory-414-toi] 200 document http://127.0.0.1:3677/inventory
-[inventory-414-toi] 200 font http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
-[inventory-414-toi] 200 image http://127.0.0.1:3677/brand/logo-mark.svg
-[inventory-414-toi] 200 font http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
-[inventory-414-toi] 200 stylesheet http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
-[inventory-414-toi] 200 font http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
-[inventory-414-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
-[inventory-360-sang] 200 document http://127.0.0.1:3677/inventory
-[inventory-360-sang] 200 image http://127.0.0.1:3677/brand/logo-mark.svg
-[inventory-360-sang] 200 font http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
-[inventory-360-sang] 200 stylesheet http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
-[inventory-360-sang] 200 font http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
-[inventory-360-sang] 200 font http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
-[inventory-360-sang] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
-[inventory-360-toi] 200 document http://127.0.0.1:3677/inventory
-[inventory-360-toi] 200 font http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
-[inventory-360-toi] 200 image http://127.0.0.1:3677/brand/logo-mark.svg
-[inventory-360-toi] 200 font http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
-[inventory-360-toi] 200 stylesheet http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
-[inventory-360-toi] 200 font http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
-[inventory-360-toi] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
-[inventory-1440-chu-dai] 200 document http://127.0.0.1:3677/inventory
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
-[inventory-1440-chu-dai] 200 font http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
-[inventory-1440-chu-dai] 200 font http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
-[inventory-1440-chu-dai] 200 stylesheet http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
-[inventory-1440-chu-dai] 200 image http://127.0.0.1:3677/brand/logo-mark.svg
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
-[inventory-1440-chu-dai] 200 font http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
-[inventory-1440-chu-dai] 200 script http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
+200 GET http://127.0.0.1:3677/inventory
+200 GET http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
+200 GET http://127.0.0.1:3677/brand/logo-mark.svg
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
+200 GET http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
+200 GET http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
+STEP1 1440 light {"docScroll":"1440>1440","innerScroll":null,"dark":"rgb(255, 255, 255)","text":"Bỏ qua tới nội dung chính\nHôm nay\nBảng hàng\nĐã gửi\nToggle Sidebar\nĐăng nhập\nBảng hàng\nTất cả hàng\nTheo trạng thái\nChưa đủ để rao\nĐang bán\nĐang giao dịch\nĐã bán\nTạm ngừng\nNgừng hẳn\nBảng hàng\nHàng\n60 dòng\n#\tCăn\tToà\tDự án\tTrạng thái\tGiá chào\tDiện tích\tPhòng ngủ\tXác nhận lúc\n1\t\n0905\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang giao dịch\n\t\n5,71 tỷ\n\t\n96,8 m²\n\t\n3\n\t\n09:00 01/11/2026\n\n2\t\n1101\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n2,71 tỷ\n\t\n54,2 m²\n\t\n1\n\t\n09:00 02/11/2026\n\n3\t\n1202\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nChưa đủ để rao\n\t\n4,32 tỷ\n\t\n68,5 m²\n\t\n2\n\t\n09:00 03/11/2026\n\n4\t\n1303\n\t\nS1.01\n\t\nVinhomes Ocea"}
+200 GET http://127.0.0.1:3677/inventory
+200 GET http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
+200 GET http://127.0.0.1:3677/brand/logo-mark.svg
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
+200 GET http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
+200 GET http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
+STEP2 1440 dark {"docScroll":"1440>1440","innerScroll":null,"dark":"lab(2.75381 0 0)","text":"Bỏ qua tới nội dung chính\nHôm nay\nBảng hàng\nĐã gửi\nToggle Sidebar\nĐăng nhập\nBảng hàng\nTất cả hàng\nTheo trạng thái\nChưa đủ để rao\nĐang bán\nĐang giao dịch\nĐã bán\nTạm ngừng\nNgừng hẳn\nBảng hàng\nHàng\n60 dòng\n#\tCăn\tToà\tDự án\tTrạng thái\tGiá chào\tDiện tích\tPhòng ngủ\tXác nhận lúc\n1\t\n0905\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang giao dịch\n\t\n5,71 tỷ\n\t\n96,8 m²\n\t\n3\n\t\n09:00 01/11/2026\n\n2\t\n1101\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n2,71 tỷ\n\t\n54,2 m²\n\t\n1\n\t\n09:00 02/11/2026\n\n3\t\n1202\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nChưa đủ để rao\n\t\n4,32 tỷ\n\t\n68,5 m²\n\t\n2\n\t\n09:00 03/11/2026\n\n4\t\n1303\n\t\nS1.01\n\t\nVinhomes Ocea"}
+200 GET http://127.0.0.1:3677/inventory
+200 GET http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
+200 GET http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
+200 GET http://127.0.0.1:3677/brand/logo-mark.svg
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
+200 GET http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
+200 GET http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
+STEP3 1024 light {"docScroll":"1024>1024","innerScroll":"DIV 1013>622","dark":"rgb(255, 255, 255)","text":"Bỏ qua tới nội dung chính\nHôm nay\nBảng hàng\nĐã gửi\nToggle Sidebar\nĐăng nhập\nBảng hàng\nTất cả hàng\nTheo trạng thái\nChưa đủ để rao\nĐang bán\nĐang giao dịch\nĐã bán\nTạm ngừng\nNgừng hẳn\nBảng hàng\nHàng\n60 dòng\n#\tCăn\tToà\tDự án\tTrạng thái\tGiá chào\tDiện tích\tPhòng ngủ\tXác nhận lúc\n1\t\n0905\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang giao dịch\n\t\n5,71 tỷ\n\t\n96,8 m²\n\t\n3\n\t\n09:00 01/11/2026\n\n2\t\n1101\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n2,71 tỷ\n\t\n54,2 m²\n\t\n1\n\t\n09:00 02/11/2026\n\n3\t\n1202\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nChưa đủ để rao\n\t\n4,32 tỷ\n\t\n68,5 m²\n\t\n2\n\t\n09:00 03/11/2026\n\n4\t\n1303\n\t\nS1.01\n\t\nVinhomes Ocea"}
+200 GET http://127.0.0.1:3677/inventory
+200 GET http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
+200 GET http://127.0.0.1:3677/brand/logo-mark.svg
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
+200 GET http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
+200 GET http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
+STEP4 1024 dark {"docScroll":"1024>1024","innerScroll":"DIV 1013>622","dark":"lab(2.75381 0 0)","text":"Bỏ qua tới nội dung chính\nHôm nay\nBảng hàng\nĐã gửi\nToggle Sidebar\nĐăng nhập\nBảng hàng\nTất cả hàng\nTheo trạng thái\nChưa đủ để rao\nĐang bán\nĐang giao dịch\nĐã bán\nTạm ngừng\nNgừng hẳn\nBảng hàng\nHàng\n60 dòng\n#\tCăn\tToà\tDự án\tTrạng thái\tGiá chào\tDiện tích\tPhòng ngủ\tXác nhận lúc\n1\t\n0905\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang giao dịch\n\t\n5,71 tỷ\n\t\n96,8 m²\n\t\n3\n\t\n09:00 01/11/2026\n\n2\t\n1101\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n2,71 tỷ\n\t\n54,2 m²\n\t\n1\n\t\n09:00 02/11/2026\n\n3\t\n1202\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nChưa đủ để rao\n\t\n4,32 tỷ\n\t\n68,5 m²\n\t\n2\n\t\n09:00 03/11/2026\n\n4\t\n1303\n\t\nS1.01\n\t\nVinhomes Ocea"}
+200 GET http://127.0.0.1:3677/inventory
+200 GET http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
+200 GET http://127.0.0.1:3677/brand/logo-mark.svg
+200 GET http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
+200 GET http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
+STEP5 414 light {"docScroll":"414>414","innerScroll":"DIV 1013>372","dark":"rgb(255, 255, 255)","text":"Bỏ qua tới nội dung chính\nToggle Sidebar\nĐăng nhập\nBảng hàng\nHàng\n60 dòng\n#\tCăn\tToà\tDự án\tTrạng thái\tGiá chào\tDiện tích\tPhòng ngủ\tXác nhận lúc\n1\t\n0905\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang giao dịch\n\t\n5,71 tỷ\n\t\n96,8 m²\n\t\n3\n\t\n09:00 01/11/2026\n\n2\t\n1101\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n2,71 tỷ\n\t\n54,2 m²\n\t\n1\n\t\n09:00 02/11/2026\n\n3\t\n1202\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nChưa đủ để rao\n\t\n4,32 tỷ\n\t\n68,5 m²\n\t\n2\n\t\n09:00 03/11/2026\n\n4\t\n1303\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n5,03 tỷ\n\t\n75 m²\n\t\n2\n\t\n09:00 04/11/2026\n\n5\t\n1603\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n4,28 tỷ\n\t\n75 m"}
+200 GET http://127.0.0.1:3677/inventory
+200 GET http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
+200 GET http://127.0.0.1:3677/brand/logo-mark.svg
+200 GET http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
+200 GET http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
+STEP6 414 dark {"docScroll":"414>414","innerScroll":"DIV 1013>372","dark":"lab(2.75381 0 0)","text":"Bỏ qua tới nội dung chính\nToggle Sidebar\nĐăng nhập\nBảng hàng\nHàng\n60 dòng\n#\tCăn\tToà\tDự án\tTrạng thái\tGiá chào\tDiện tích\tPhòng ngủ\tXác nhận lúc\n1\t\n0905\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang giao dịch\n\t\n5,71 tỷ\n\t\n96,8 m²\n\t\n3\n\t\n09:00 01/11/2026\n\n2\t\n1101\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n2,71 tỷ\n\t\n54,2 m²\n\t\n1\n\t\n09:00 02/11/2026\n\n3\t\n1202\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nChưa đủ để rao\n\t\n4,32 tỷ\n\t\n68,5 m²\n\t\n2\n\t\n09:00 03/11/2026\n\n4\t\n1303\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n5,03 tỷ\n\t\n75 m²\n\t\n2\n\t\n09:00 04/11/2026\n\n5\t\n1603\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n4,28 tỷ\n\t\n75 m"}
+200 GET http://127.0.0.1:3677/inventory
+200 GET http://127.0.0.1:3677/brand/logo-mark.svg
+200 GET http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
+200 GET http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
+200 GET http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
+STEP7 360 light {"docScroll":"360>360","innerScroll":"DIV 1013>318","dark":"rgb(255, 255, 255)","text":"Bỏ qua tới nội dung chính\nToggle Sidebar\nĐăng nhập\nBảng hàng\nHàng\n60 dòng\n#\tCăn\tToà\tDự án\tTrạng thái\tGiá chào\tDiện tích\tPhòng ngủ\tXác nhận lúc\n1\t\n0905\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang giao dịch\n\t\n5,71 tỷ\n\t\n96,8 m²\n\t\n3\n\t\n09:00 01/11/2026\n\n2\t\n1101\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n2,71 tỷ\n\t\n54,2 m²\n\t\n1\n\t\n09:00 02/11/2026\n\n3\t\n1202\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nChưa đủ để rao\n\t\n4,32 tỷ\n\t\n68,5 m²\n\t\n2\n\t\n09:00 03/11/2026\n\n4\t\n1303\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n5,03 tỷ\n\t\n75 m²\n\t\n2\n\t\n09:00 04/11/2026\n\n5\t\n1603\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n4,28 tỷ\n\t\n75 m"}
+200 GET http://127.0.0.1:3677/inventory
+200 GET http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
+200 GET http://127.0.0.1:3677/brand/logo-mark.svg
+200 GET http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
+200 GET http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
+STEP8 360 dark {"docScroll":"360>360","innerScroll":"DIV 1013>318","dark":"lab(2.75381 0 0)","text":"Bỏ qua tới nội dung chính\nToggle Sidebar\nĐăng nhập\nBảng hàng\nHàng\n60 dòng\n#\tCăn\tToà\tDự án\tTrạng thái\tGiá chào\tDiện tích\tPhòng ngủ\tXác nhận lúc\n1\t\n0905\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang giao dịch\n\t\n5,71 tỷ\n\t\n96,8 m²\n\t\n3\n\t\n09:00 01/11/2026\n\n2\t\n1101\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n2,71 tỷ\n\t\n54,2 m²\n\t\n1\n\t\n09:00 02/11/2026\n\n3\t\n1202\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nChưa đủ để rao\n\t\n4,32 tỷ\n\t\n68,5 m²\n\t\n2\n\t\n09:00 03/11/2026\n\n4\t\n1303\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n5,03 tỷ\n\t\n75 m²\n\t\n2\n\t\n09:00 04/11/2026\n\n5\t\n1603\n\t\nS1.01\n\t\nVinhomes Ocean Park 1\n\t\nĐang bán\n\t\n4,28 tỷ\n\t\n75 m"}
+200 GET http://127.0.0.1:3677/inventory
+200 GET http://127.0.0.1:3677/_next/static/media/2bbe8d2671613f1f-s.p.0k62hbripvv8p.woff2
+200 GET http://127.0.0.1:3677/brand/logo-mark.svg
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_0qva5cupmdgep._.js
+200 GET http://127.0.0.1:3677/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Broot-of-the-server%5D__0-3okyl8hewtx._.css
+200 GET http://127.0.0.1:3677/_next/static/chunks/1q96_modules_next_dist_compiled_react-dom_cjs_react-dom_development_1sqry0_53krp4.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-dom_0grqycjrj6mju._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_1amofcmz--cdp._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_react-server-dom-turbopack_164kp-67asdr9._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40swc_helpers_cjs_1r9vbqwj2323d._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1anvha4rlo79g._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/_1bj9ps6apokuo._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/turbopack-_06rkbud3pyrlm._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_internals_1qep7qxhwkszh._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_utils_06t2o7xu3f1tr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_1hbnfl_9ns__v._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_menu_0xddncbrb9ljj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/1daa_next_dist_compiled_react-dom_cjs_react-dom-client_development_0mp0cp_t-ezj9.js
+200 GET http://127.0.0.1:3677/_next/static/media/1bffadaabf893a1e-s.3-6t-g6q0vh0a.woff2
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_compiled_next-devtools_index_090k2jmam7qwg.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_%40base-ui_react_floating-ui-react_1-wjo_jl-n34e._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_1cs807xgrp1sc._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_next_dist_client_1wygxxh5rwq0t._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_(app)_error_tsx_1zpzf4epi0h8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_app_global-error_tsx_1511-6v-z1mcr._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0p76iw5_0rdrq._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_08bwsuq_xve8i._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_0z5n-toqg81b1._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/src_0fkk6_hxl6myj._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/node_modules_1k5isos6n8dfw._.js
+200 GET http://127.0.0.1:3677/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsayzyj2p6._.js
+STEP10 "Bỏ qua tới nội dung chính\nHôm nay\nBảng hàng\nĐã gửi\nToggle Sidebar\nĐăng nhập\nBảng hàng\nTất cả hàng\nTheo trạng thái\nChưa đủ để rao\nĐang bán\nĐang giao dịch\nĐã bán\nTạm ngừng\nNgừng hẳn\nBảng hàng\nHàng\n12 / 60 dòng\n#\tCăn\tToà\tDự án\tTrạng thái\tGiá chào\tDiện tích\tPhòng ngủ\tXác nhận lúc\n1\t\n0504\n\t\n[MAU] Toà E1\n\t\nVinhomes Ocean Park 2 – The Empire\n\t\nChưa đủ để rao\n\t\n4,12 tỷ\n\t\n82,3 m²\n\t\n2\n\t\n09:00 01/11/2026\n\n2\t\n0601\n\t\n[MAU] Toà E1\n\t\nVinhomes Ocean Park 2 – The Empire\n\t\nĐã bán\n\t\n3,2 tỷ\n\t\n54,2 m²\n\t\n1\n\t\n09:00 02"

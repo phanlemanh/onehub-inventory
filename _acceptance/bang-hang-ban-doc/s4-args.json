@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-11-12T03:24:46Z",
-  "generated_sha": "917bc8c98251a38d63aa559ebc72cce7e70606c1",
+  "generated_at": "2026-11-12T04:08:03Z",
+  "generated_sha": "99e90e33bcac25f33b499b6ce22f19786b1039d0",
   "mainBranchInfo": {
     "branch": "main",
     "source": "remote"
   },
   "slug": "bang-hang-ban-doc",
-  "round": 2,
+  "round": 3,
   "riskTier": "T3",
   "evals": [
     {
@@ -249,7 +249,7 @@
         "verdict",
         "rationale"
       ],
-      "inputsHash": "ec1c9a18ce1e1ce90d307b75372d305e27bb80edf870a9bfab98e190b8633c8f"
+      "inputsHash": "51f73e793284f6fb760e66e6b836a36948ce07e0fc4e8b270cf700224c76c6c2"
     },
     {
       "id": "E12",
@@ -345,14 +345,14 @@
     "npm run build",
     "make e2e"
   ],
-  "diffBase": "a97c71d49bf0dc2c7555c8160c74d44b9c120c8f",
+  "diffBase": "1213e66d7256bd816feb6a69f2e13c20c822f53e",
   "repoRoot": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/gracious-raman-dd20c0",
   "personasPath": "/Users/manhphan/.claude/plugins/cache/acceptance-gate-kit/acceptance-gate/2.38.1/skills/acceptance/references/judge-personas.md",
   "templatePath": "/Users/manhphan/.claude/plugins/cache/acceptance-gate-kit/acceptance-gate/2.38.1/skills/acceptance/references/evidence-report-template.md",
   "toolKillRule": "# TOOL-KILL-RULE — lệnh bị công cụ ngắt KHÔNG phải lệnh fail\n\n**Nguồn duy nhất** của luật «hết giờ không phải trượt» cho MỌI đường chạy lệnh\nkiểm của kit. Hai đường tiêu thụ, cùng đọc khối marker dưới đây, không chép tay:\n\n- **Vòng lặp tính năng** (plugin feature-loop): skill `feature-loop` đọc file này\n  (resolve qua `resolve-plugin.mjs --require skills/acceptance/references/tool-kill-rule.md`)\n  và truyền NGUYÊN VĂN vào `args.toolKillRule` của workflow\n  `acceptance-verify.js`; workflow rút khối marker và nội suy vào prompt của mọi\n  agent chạy lệnh (machine · ui-check · baseline). Thiếu args hoặc không rút\n  được marker → workflow trả BLOCKED có tên, không chạy không luật.\n- **Đường VERIFY độc lập** (skill `acceptance` Phase 3): phiên điều phối chép khối\n  marker VERBATIM vào prompt của phiên tươi VERIFY, cùng nếp «Network truth».\n\nVì sao có luật: verifier chạy lệnh qua Bash tool có trần thời gian mặc định\n(~120 s) NGẮN hơn nhiều suite; lệnh bị công cụ giết trả exit code CỦA CÔNG CỤ,\nkhông phải của lệnh (vấp thật release-2-2-0 S4 r5: suite 108 s đơn lẻ, dưới tải\nbị giết ở 118 s → REJECT giả 4 eval). Nhận diện là việc AGENT (nó thấy tool\nresult thật); phần máy chỉ phòng thủ trên field cấu trúc `killedByTool` —\nKHÔNG grep nội dung output trong engine (chuỗi tổng kết là của suite từng repo).\n\nLệnh dài hơn trần 600 s của công cụ thì KHÔNG bị giết: công cụ **đẩy nó sang\nnền** và nó chạy tiếp. Tệp đầu ra nền trống tới phút chót, vì khung bọc lệnh của\nkit chỉ in khi lệnh xong — đọc trống thành «bị giết» là đúng sự cố crm 07/10/2026\n(hồ sơ `lenh-dai-chay-rieng`: hai lượt BLOCKED giả). Dòng «chuyển sang nền» trong\nkhối dưới là lối LỜI cho mọi lệnh. Lối MÁY: eval khai `long_running: <phút>`\ntrong `evals.yaml` thì lượt chấm feature-loop tự chạy lệnh nền, ghi nhật ký ở\n`.acceptance-runs/<slug>/s4-lenh-dai/` và chờ bằng lệnh nó sinh ra\n(`eval-executors.md`, mục `long_running`).\n\n<!-- <<<TOOL-KILL-RULE -->\nTRAN THOI GIAN CONG CU: khi goi Bash chay lenh, LUON dat tham so timeout >= 600000 (ms) — tran mac dinh cua cong cu (~120s) NGAN hon nhieu suite; lenh vuot tran se bi CONG CU giet va exit code luc do la cua cong cu, KHONG phai cua lenh. Neu lenh van bi cong cu dung (tool result bao timeout/killed, hoac output bi CAT giua chung truoc dong tong ket cuoi cua lenh) → DO KHONG PHAI ket qua that: khai cannotRun=true + killedByTool=true + reason \"bi cong cu giet o <so giay> giay\" kem dau hieu (timeout tool / output cat). TUYET DOI khong bao exitCode nhu the lenh tu fail va khong doan PASS/FAIL tu output cut.\nDAU RA DAI: harness co the CAT DAU RA RA TEP (\"Output too large … saved to <tep>\") va chi hien doan DAU — do KHONG phai bi cong cu giet: doc DUOI tep do (tail) de lay dong tong ket va ma thoat; chi khai killedByTool khi tool result bao timeout/killed that.\nCHUYEN SANG NEN KHONG PHAI BI GIET: tool result bao lenh chua xong trong timeout va da duoc CHUYEN SANG NEN (\"moved to the background\", kem ID + tep dau ra) → lenh VAN DANG CHAY: KHONG khai killedByTool, KHONG ket luan tu tep dau ra luc do. Tep dau ra nen TRONG la binh thuong — khung boc lenh chi in duoi dau ra + dong __EXIT=<n> khi lenh XONG. Cho bang lenh Bash co gioi han (moi lan goi ≤ 100 giay, duoi tran mac dinh 120 giay cua cong cu; vd vong lap kiem tep do co dong __EXIT= chua, sleep vai giay, het 100 giay thi thoat) va goi lai toi khi tep co dong __EXIT=<n> → doc ma tu dong do nhu binh thuong. Tong thoi gian cho toi da = so phut eval khai o long_running (vang thi 30 phut), tinh tu luc chay lenh; qua ma chua co dong __EXIT → cannotRun=true + reason \"lenh chay qua <so> phut chua xong — khai long_running: <phut> cho eval trong evals.yaml\" (KHONG killedByTool), va dung tac vu nen neu cong cu cho phep.\n<!-- TOOL-KILL-RULE>>> -->\n\n## Hồ sơ cho lượt bị ngắt (đường độc lập)\n\nPhiên tươi VERIFY gặp lệnh bị công cụ ngắt thì:\n\n- dòng run-log của eval đó: `\"exit_code\": null, \"killed_by_tool\": true` (không\n  ghi mã thoát của công cụ như mã thoát của lệnh);\n- verdict báo cáo `BLOCKED`, `reason: bi cong cu giet o <so giay> giay — <eval ids>`\n  (kèm dấu hiệu: timeout tool / output cắt trước dòng tổng kết); `failed_evals`\n  rỗng — người đọc hồ sơ thấy đây là sự cố hạ tầng, chữa bằng chạy lại với trần\n  công cụ đủ dài, không phải sửa sản phẩm.\n\nLệnh bị đẩy sang nền rồi QUÁ trần chờ (`long_running`, vắng thì 30 phút) cũng\nlà sự cố hạ tầng chứ không phải lệnh hỏng: dòng run-log `\"exit_code\": null`,\n`\"cannot_run\": true` (KHÔNG `killed_by_tool` — công cụ không giết nó), verdict\n`BLOCKED`, reason gọi tên việc cần làm (khai `long_running: <phút>` cho eval).\n",
   "contractPath": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/gracious-raman-dd20c0/_acceptance/bang-hang-ban-doc/contract.md",
-  "invokedAt": "2026-11-12T03:24:46Z",
-  "invokedSha": "917bc8c98251a38d63aa559ebc72cce7e70606c1",
+  "invokedAt": "2026-11-12T04:08:03Z",
+  "invokedSha": "99e90e33bcac25f33b499b6ce22f19786b1039d0",
   "vungVat": [
     "_acceptance/bang-hang-ban-doc/card-plain.json",
     "_acceptance/bang-hang-ban-doc/card.html",
@@ -364,8 +364,11 @@
     "_acceptance/bang-hang-ban-doc/design.md",
     "_acceptance/bang-hang-ban-doc/duong-nen.md",
     "_acceptance/bang-hang-ban-doc/evals.yaml",
+    "_acceptance/bang-hang-ban-doc/evidence-page.html",
     "_acceptance/bang-hang-ban-doc/evidence-report.md",
     "_acceptance/bang-hang-ban-doc/evidence/E10-network.txt",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step1.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step10.png",
     "_acceptance/bang-hang-ban-doc/evidence/E10-step2.png",
     "_acceptance/bang-hang-ban-doc/evidence/E10-step3.png",
     "_acceptance/bang-hang-ban-doc/evidence/E10-step4.png",
@@ -417,6 +420,7 @@
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/trong--414--toi.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1024-sang.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1024-toi.png",
+    "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-chu-dai.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-sang.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-toi.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-360-sang.png",
@@ -438,11 +442,14 @@
     "_acceptance/bang-hang-ban-doc/evidence/reui/product-grid-4.png",
     "_acceptance/bang-hang-ban-doc/figures/index.md",
     "_acceptance/bang-hang-ban-doc/gap-probe.md",
+    "_acceptance/bang-hang-ban-doc/khuon-cham.json",
     "_acceptance/bang-hang-ban-doc/khuon-nap.json",
+    "_acceptance/bang-hang-ban-doc/luat-cham.json",
     "_acceptance/bang-hang-ban-doc/plan.md",
     "_acceptance/bang-hang-ban-doc/review-findings.md",
     "_acceptance/bang-hang-ban-doc/run-log.jsonl",
     "_acceptance/bang-hang-ban-doc/s4-args.json",
+    "_acceptance/bang-hang-ban-doc/so-do-vong.json",
     "_acceptance/bang-hang-ban-doc/usage-report.md",
     "design/behaviors.md",
     "design/component-registry.json",
@@ -512,8 +519,11 @@
     "_acceptance/bang-hang-ban-doc/design.md",
     "_acceptance/bang-hang-ban-doc/duong-nen.md",
     "_acceptance/bang-hang-ban-doc/evals.yaml",
+    "_acceptance/bang-hang-ban-doc/evidence-page.html",
     "_acceptance/bang-hang-ban-doc/evidence-report.md",
     "_acceptance/bang-hang-ban-doc/evidence/E10-network.txt",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step1.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step10.png",
     "_acceptance/bang-hang-ban-doc/evidence/E10-step2.png",
     "_acceptance/bang-hang-ban-doc/evidence/E10-step3.png",
     "_acceptance/bang-hang-ban-doc/evidence/E10-step4.png",
@@ -565,6 +575,7 @@
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/trong--414--toi.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1024-sang.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1024-toi.png",
+    "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-chu-dai.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-sang.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-toi.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-360-sang.png",
@@ -586,11 +597,14 @@
     "_acceptance/bang-hang-ban-doc/evidence/reui/product-grid-4.png",
     "_acceptance/bang-hang-ban-doc/figures/index.md",
     "_acceptance/bang-hang-ban-doc/gap-probe.md",
+    "_acceptance/bang-hang-ban-doc/khuon-cham.json",
     "_acceptance/bang-hang-ban-doc/khuon-nap.json",
+    "_acceptance/bang-hang-ban-doc/luat-cham.json",
     "_acceptance/bang-hang-ban-doc/plan.md",
     "_acceptance/bang-hang-ban-doc/review-findings.md",
     "_acceptance/bang-hang-ban-doc/run-log.jsonl",
     "_acceptance/bang-hang-ban-doc/s4-args.json",
+    "_acceptance/bang-hang-ban-doc/so-do-vong.json",
     "_acceptance/bang-hang-ban-doc/usage-report.md",
     "design/behaviors.md",
     "design/component-registry.json",
@@ -639,8 +653,11 @@
     "_acceptance/bang-hang-ban-doc/design.md",
     "_acceptance/bang-hang-ban-doc/duong-nen.md",
     "_acceptance/bang-hang-ban-doc/evals.yaml",
+    "_acceptance/bang-hang-ban-doc/evidence-page.html",
     "_acceptance/bang-hang-ban-doc/evidence-report.md",
     "_acceptance/bang-hang-ban-doc/evidence/E10-network.txt",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step1.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step10.png",
     "_acceptance/bang-hang-ban-doc/evidence/E10-step2.png",
     "_acceptance/bang-hang-ban-doc/evidence/E10-step3.png",
     "_acceptance/bang-hang-ban-doc/evidence/E10-step4.png",
@@ -692,6 +709,7 @@
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/trong--414--toi.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1024-sang.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1024-toi.png",
+    "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-chu-dai.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-sang.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-toi.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-360-sang.png",
@@ -713,11 +731,14 @@
     "_acceptance/bang-hang-ban-doc/evidence/reui/product-grid-4.png",
     "_acceptance/bang-hang-ban-doc/figures/index.md",
     "_acceptance/bang-hang-ban-doc/gap-probe.md",
+    "_acceptance/bang-hang-ban-doc/khuon-cham.json",
     "_acceptance/bang-hang-ban-doc/khuon-nap.json",
+    "_acceptance/bang-hang-ban-doc/luat-cham.json",
     "_acceptance/bang-hang-ban-doc/plan.md",
     "_acceptance/bang-hang-ban-doc/review-findings.md",
     "_acceptance/bang-hang-ban-doc/run-log.jsonl",
     "_acceptance/bang-hang-ban-doc/s4-args.json",
+    "_acceptance/bang-hang-ban-doc/so-do-vong.json",
     "_acceptance/bang-hang-ban-doc/usage-report.md",
     "design/patterns/luoi.md",
     "ontology/glossary.md",
@@ -756,8 +777,11 @@
     "_acceptance/bang-hang-ban-doc/design.md",
     "_acceptance/bang-hang-ban-doc/duong-nen.md",
     "_acceptance/bang-hang-ban-doc/evals.yaml",
+    "_acceptance/bang-hang-ban-doc/evidence-page.html",
     "_acceptance/bang-hang-ban-doc/evidence-report.md",
     "_acceptance/bang-hang-ban-doc/evidence/E10-network.txt",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step1.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step10.png",
     "_acceptance/bang-hang-ban-doc/evidence/E10-step2.png",
     "_acceptance/bang-hang-ban-doc/evidence/E10-step3.png",
     "_acceptance/bang-hang-ban-doc/evidence/E10-step4.png",
@@ -809,6 +833,7 @@
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/trong--414--toi.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1024-sang.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1024-toi.png",
+    "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-chu-dai.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-sang.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-toi.png",
     "_acceptance/bang-hang-ban-doc/evidence/inventory-360-sang.png",
@@ -830,11 +855,14 @@
     "_acceptance/bang-hang-ban-doc/evidence/reui/product-grid-4.png",
     "_acceptance/bang-hang-ban-doc/figures/index.md",
     "_acceptance/bang-hang-ban-doc/gap-probe.md",
+    "_acceptance/bang-hang-ban-doc/khuon-cham.json",
     "_acceptance/bang-hang-ban-doc/khuon-nap.json",
+    "_acceptance/bang-hang-ban-doc/luat-cham.json",
     "_acceptance/bang-hang-ban-doc/plan.md",
     "_acceptance/bang-hang-ban-doc/review-findings.md",
     "_acceptance/bang-hang-ban-doc/run-log.jsonl",
     "_acceptance/bang-hang-ban-doc/s4-args.json",
+    "_acceptance/bang-hang-ban-doc/so-do-vong.json",
     "_acceptance/bang-hang-ban-doc/usage-report.md",
     "design/patterns/luoi.md",
     "ontology/glossary.md",
@@ -860,13 +888,40 @@
   ],
   "coEvalPaths": true,
   "evalsHash": "88826220a20943cb2d389438841bf7ffaaa7fc44a8a9839bd5349f44819ac0e6",
-  "runBaseline": true,
+  "runBaseline": false,
+  "carriedAnalyst": {
+    "fromRound": 2,
+    "nonDiscriminating": [
+      {
+        "cmd": "make test",
+        "evals": [
+          "E2",
+          "E6",
+          "E8",
+          "E12"
+        ]
+      },
+      {
+        "cmd": "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root .",
+        "evals": [
+          "E15"
+        ]
+      }
+    ]
+  },
   "carriedEvals": [
     {
       "id": "E1",
       "runId": "minted-bang-hang-ban-doc-E1-r1",
       "fromRound": 1,
       "verifiedAt": "2026-11-12T03:10:45Z",
+      "cmd": "make test"
+    },
+    {
+      "id": "E2",
+      "runId": "minted-bang-hang-ban-doc-E2-r2",
+      "fromRound": 2,
+      "verifiedAt": "2026-11-12T03:24:46Z",
       "cmd": "make test"
     },
     {
@@ -884,6 +939,13 @@
       "cmd": "npx vitest run tools/e2e_templates --coverage.enabled=false --reporter=verbose"
     },
     {
+      "id": "E6",
+      "runId": "minted-bang-hang-ban-doc-E6-r2",
+      "fromRound": 2,
+      "verifiedAt": "2026-11-12T03:24:46Z",
+      "cmd": "make test"
+    },
+    {
       "id": "E7",
       "runId": "minted-bang-hang-ban-doc-E7-r1",
       "fromRound": 1,
@@ -898,14 +960,41 @@
       "cmd": "make test"
     },
     {
-      "id": "E13",
-      "runId": "minted-bang-hang-ban-doc-E13-r1",
-      "fromRound": 1,
-      "verifiedAt": "2026-11-12T03:10:45Z",
+      "id": "E12",
+      "runId": "minted-bang-hang-ban-doc-E12-r2",
+      "fromRound": 2,
+      "verifiedAt": "2026-11-12T03:24:46Z",
       "cmd": "make test"
+    },
+    {
+      "id": "E15",
+      "runId": "minted-bang-hang-ban-doc-E15-r2",
+      "fromRound": 2,
+      "verifiedAt": "2026-11-12T03:24:46Z",
+      "cmd": "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."
     }
   ],
   "carriedFindings": [
+    {
+      "file": "_acceptance/bang-hang-ban-doc/evals.yaml",
+      "title": "E11 judge question still says 'four images' after a fifth (long-name) screenshot was added to its inputs",
+      "severity": "medium",
+      "plain": "Câu hỏi cho người chấm ảnh vẫn nói bốn ảnh dù đã có ảnh thứ năm. Màn hình cho người dùng không đổi, chỉ có nguy cơ phép chấm bỏ qua ảnh mới và lại cho kết quả chưa chắc về tên dự án dài bị cắt.",
+      "can_cu": "Không ảnh hưởng người dùng, chỉ làm phép chấm có thể lưỡng lự và chạy lại được; sửa lại rẻ nhưng không đổi hành vi của màn.",
+      "proposal": "known-limits",
+      "fromRound": 2,
+      "tepDoi": false
+    },
+    {
+      "file": "tests/e2e/behavior.spec.ts",
+      "title": "Hình dạng 4 (âm tính một mình): chỗ chờ trước lượt quét trợ năng chỉ đòi «không còn khung cuộn nào thiếu tabindex», không đòi khung cuộn có mặt",
+      "severity": "low",
+      "plain": "Bài kiểm trợ năng có thể quét quá sớm, trước khi khung cuộn của bảng sẵn sàng. Người dùng bàn phím không bị ảnh hưởng ngay, nhưng lỗi chập chờn đã thấy ở khổ 1024 có thể xuất hiện lại mà bài kiểm không báo.",
+      "can_cu": "Chỉ làm bài kiểm kém chắc chắn, không làm mất hay lộ dữ liệu của người dùng; chạy lại được và sửa sau cũng rẻ.",
+      "proposal": "known-limits",
+      "fromRound": 2,
+      "tepDoi": false
+    },
     {
       "file": "src/app/(app)/proto/[slug]/frame-showcase.tsx",
       "title": "label(\"StandardStatus\") reused for a different meaning (region/page states)",
@@ -924,7 +1013,7 @@
       "can_cu": "Nhẹ: chỉ lệch chữ ở một câu hiếm gặp, không mất dữ liệu, và việc sàn đổi tên gọi này chưa xảy ra.",
       "proposal": "known-limits",
       "fromRound": 1,
-      "tepDoi": true
+      "tepDoi": false
     },
     {
       "file": "src/components/candidate/data-region.tsx",
@@ -934,7 +1023,7 @@
       "can_cu": "Chỉ là trùng lặp và lệch cách ghi, người dùng vẫn đọc đúng số dòng, không mất dữ liệu, sửa nhỏ sau cũng được.",
       "proposal": "known-limits",
       "fromRound": 1,
-      "tepDoi": false
+      "tepDoi": true
     },
     {
       "file": "src/app/(app)/proto/[slug]/grid-showcase.tsx",
@@ -954,7 +1043,7 @@
       "can_cu": "Chỉ thừa một con số, không sai thông tin, không mất dữ liệu, và gỡ đi còn kéo theo chỉnh bài kiểm tìm nên để sau.",
       "proposal": "known-limits",
       "fromRound": 1,
-      "tepDoi": false
+      "tepDoi": true
     },
     {
       "file": "tests/inventory.test.tsx",
@@ -974,43 +1063,57 @@
       "can_cu": "Người dùng không gặp lỗi nào hôm nay, các bài tìm khác đã phủ việc lọc, và thêm một dòng kiểm chứng sau là rẻ.",
       "proposal": "known-limits",
       "fromRound": 1,
-      "tepDoi": false
+      "tepDoi": true
     }
   ],
   "deltaFiles": [
+    ".env.example",
+    "_acceptance/bang-hang-ban-doc/card-plain.json",
+    "_acceptance/bang-hang-ban-doc/card.html",
     "_acceptance/bang-hang-ban-doc/decisions.jsonl",
-    "_acceptance/bang-hang-ban-doc/evals.yaml",
+    "_acceptance/bang-hang-ban-doc/evidence-page.html",
     "_acceptance/bang-hang-ban-doc/evidence-report.md",
     "_acceptance/bang-hang-ban-doc/evidence/E10-network.txt",
-    "_acceptance/bang-hang-ban-doc/evidence/E10-step2.png",
-    "_acceptance/bang-hang-ban-doc/evidence/E10-step3.png",
-    "_acceptance/bang-hang-ban-doc/evidence/E10-step4.png",
-    "_acceptance/bang-hang-ban-doc/evidence/E10-step5.png",
-    "_acceptance/bang-hang-ban-doc/evidence/E10-step6.png",
-    "_acceptance/bang-hang-ban-doc/evidence/E10-step7.png",
-    "_acceptance/bang-hang-ban-doc/evidence/E10-step8.png",
-    "_acceptance/bang-hang-ban-doc/evidence/E10-step9.png",
-    "_acceptance/bang-hang-ban-doc/evidence/inventory-1024-sang.png",
-    "_acceptance/bang-hang-ban-doc/evidence/inventory-1024-toi.png",
-    "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-sang.png",
-    "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-toi.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step1.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step10.png",
+    "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-chu-dai.png",
+    "_acceptance/bang-hang-ban-doc/khuon-cham.json",
+    "_acceptance/bang-hang-ban-doc/luat-cham.json",
     "_acceptance/bang-hang-ban-doc/review-findings.md",
     "_acceptance/bang-hang-ban-doc/run-log.jsonl",
     "_acceptance/bang-hang-ban-doc/s4-args.json",
-    "src/app/(app)/inventory/page.tsx",
-    "tests/e2e/behavior.spec.ts"
+    "_acceptance/bang-hang-ban-doc/so-do-vong.json",
+    "_acceptance/bang-hang-dung-tay-nhu-sheet/du-bao.json",
+    "_acceptance/bang-hang-the-dien-thoai/du-bao.json",
+    "_acceptance/bang-quyen-theo-vai/du-bao.json",
+    "_acceptance/bo-kiem-chung-khi-dang-nhap/du-bao.json",
+    "_acceptance/cach-ly-truoc-du-lieu-that/du-bao.json",
+    "_acceptance/cong-bat-khoi-khong-ke/du-bao.json",
+    "_acceptance/thu-moi-dia-chi-tu-cau-hinh/card-plain.json",
+    "_acceptance/thu-moi-dia-chi-tu-cau-hinh/card.html",
+    "_acceptance/thu-moi-dia-chi-tu-cau-hinh/du-bao.json",
+    "_acceptance/thu-moi-dia-chi-tu-cau-hinh/evals.yaml",
+    "_acceptance/thu-moi-dia-chi-tu-cau-hinh/evidence-page.html",
+    "_acceptance/thu-moi-dia-chi-tu-cau-hinh/luat-cham.json",
+    "src/components/candidate/data-region.tsx",
+    "src/modules/identity/config.test.ts",
+    "src/modules/identity/config.ts",
+    "src/modules/identity/invite-mail.test.ts",
+    "src/modules/identity/invite-mail.ts",
+    "tests/db/dang-nhap.db.test.ts",
+    "tests/grid.test.tsx"
   ],
   "thuocChup": {
-    "sha": "917bc8c98251a38d63aa559ebc72cce7e70606c1",
+    "sha": "99e90e33bcac25f33b499b6ce22f19786b1039d0",
     "n": 86,
-    "digest": "56e1f0b958db4e7adf28ae99ac3baff9ad5b5f4f1007ee851f7a14cba60ddc94",
+    "digest": "2f612240ac3813d359fae238af1d2203f71bf71e6fefe5bf4b953e48d9657fab",
     "tep": {
       "_acceptance/bang-hang-ban-doc/evals.yaml": "88826220a20943cb2d389438841bf7ffaaa7fc44a8a9839bd5349f44819ac0e6",
       "_acceptance/config.yaml": "da5b95ed8b08f729c7fb594ee2daa178550e12acf1c7fb107b786fd2c421a637",
       "src/modules/identity/code.test.ts": "7d2bebbc7292b47a99fa9f87e9486e299bfb46d809c36c2d3e1addc4dedb54b2",
-      "src/modules/identity/config.test.ts": "a482ab483acc1c15bf9f8c5dc0794fc5b80aca56d401c686176693837692d176",
+      "src/modules/identity/config.test.ts": "562f08f3863e008ca5ce4b3fe31758149ad55f6918c23218b23449ab252a26d5",
       "src/modules/identity/http.test.ts": "0b2b74c5185c3272b1bf1d1f78d042ffa75742459b346e8861c00afe2dc844f3",
-      "src/modules/identity/invite-mail.test.ts": "5a0809802fa9f3389b58547c0a7c1ea324fa05ec5f5c0a6ac1aef4f38002017a",
+      "src/modules/identity/invite-mail.test.ts": "28ea8eceb35a1187974412f3b1cf7721c7533debd3e03ff2a909c8cfa811a698",
       "src/modules/identity/members-http.test.ts": "5abd318e7cb96379fac2e0b48b5fd1b0df7c205d604c2e32a300efcc27eb1164",
       "src/modules/identity/one-door.test.ts": "1de5ac02ab2ab8bb1d4ee061142440f5ecd7b32c5ed5ffbb2db3d4f83bbbd629",
       "src/modules/identity/with-company.test.ts": "66a5867b975b24568b5c93cbf478df779a9e115c8a10c4ea04b0cb5dfb2ffaca",
@@ -1020,7 +1123,7 @@
       "tests/boundaries.test.ts": "7dac702c9e9811451f8d3741412eef9352348fffd7705b24990367aae24c9ed4",
       "tests/commit-msg.test.ts": "8276578b01a42d0894f90f68f26d7f42a2ac95c2a845d6278a38dbe202ed611c",
       "tests/coverage-matrix.test.ts": "66ecae687688bc1125a64d3c31fd18f1e9f543a2ecc9d4a770158e34efdc5d6d",
-      "tests/db/dang-nhap.db.test.ts": "5c3c4d8079b05d0b5f3271f63ad1d9be9fa635bc8f7bcaec0757b5a6a5560f42",
+      "tests/db/dang-nhap.db.test.ts": "2b8810282f14919d229bded6678fedcf5e0cd311770f38ae5a2443ab73233dd2",
       "tests/db/helpers.ts": "304366b74003192d8d2fd47884cd2a37aa353288ade8925a1b239d171f7e82a4",
       "tests/db/moi-nguoi.db.test.ts": "0d202a269f5cc4c3f80b6e92b4bdbbbd785524944b3d78e02f526e567d3f2e2e",
       "tests/db/pha-thu/bo-quan-tri-cuoi.sql": "fe0d8f8e877d4cdbba9edf0c015a6b9eab9ac793f787d7adbe9d0e287e7e8a95",
@@ -1066,7 +1169,7 @@
       "tests/form-dialog.test.tsx": "b4e53a8954ba886d070cc9244631b030e6ed90ee6828f636cd483cb4e34eb1b2",
       "tests/format.test.ts": "1472c1061117457d4307fdb15ef7cf9e8b9f3e3d6d063f5361af9d781aa89eba",
       "tests/frame.test.tsx": "bd23ab6cf93894dd0b2dd9cfc43eb09f19f152dd2a328a20ba0232605373b001",
-      "tests/grid.test.tsx": "73dcea719c0579dd7d32404f6bf2ea3419bcf0b9067b3790034531a2c8ce6594",
+      "tests/grid.test.tsx": "f82c0771f0daf9bb0058bf22567e4bd18a9041800f1e2ccdf7563aa1e483de89",
       "tests/hooks.test.ts": "fd9daa0597cc88ebf42924e2e166b7100863066e5ffa2b61ff54fe9b1b99ed7d",
       "tests/inventory-page.test.tsx": "868419b1f37ce81fb154ba23d7962c6fb7a7e949b7d205bda91c5535a5d89488",
       "tests/inventory.test.tsx": "bfcab6cbce45708ff12b42b4b47f2d88bfa90a1b207283e74b6dc856ef95c7a8",
@@ -1094,7 +1197,7 @@
     }
   },
   "cayChup": {
-    "sha": "917bc8c98251a38d63aa559ebc72cce7e70606c1",
+    "sha": "99e90e33bcac25f33b499b6ce22f19786b1039d0",
     "ban": {
       "_acceptance/config.yaml": "da5b95ed8b08f729c7fb594ee2daa178550e12acf1c7fb107b786fd2c421a637"
     },

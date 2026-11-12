@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 917bc8c98251a38d63aa559ebc72cce7e70606c1
+verified_commit: 99e90e33bcac25f33b499b6ce22f19786b1039d0
 human_signoff:
 ---
 
@@ -15,142 +15,116 @@ human_signoff:
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
-| E1 | AC-1 | test | PASS (carry-forward tu round 1) |
-| E2 | AC-2 | test | PASS |
+| E1 | AC-1 | test | PASS (carry-forward round 1) |
+| E2 | AC-2 | test | PASS (carry-forward round 2) |
 | E3 | AC-3 | script | PASS |
-| E4 | AC-4 | script | PASS (carry-forward tu round 1) |
-| E5 | AC-5 | script | PASS (carry-forward tu round 1) |
-| E6 | AC-6 | test | PASS |
-| E7 | AC-7 | test | PASS (carry-forward tu round 1) |
+| E4 | AC-4 | script | PASS (carry-forward round 1) |
+| E5 | AC-5 | script | PASS (carry-forward round 1) |
+| E6 | AC-6 | test | PASS (carry-forward round 2) |
+| E7 | AC-7 | test | PASS (carry-forward round 1) |
 | E8 | AC-8 | test | PASS |
-| E9 | AC-9 | test | PASS (carry-forward tu round 1) |
+| E9 | AC-9 | test | PASS (carry-forward round 1) |
 | E10 | AC-10 | ui-check | PASS |
 | E11 | AC-10 | judgment | UNCERTAIN |
-| E12 | AC-6 | test | PASS |
-| E13 | AC-11 | test | PASS (carry-forward tu round 1) |
+| E12 | AC-6 | test | PASS (carry-forward round 2) |
+| E13 | AC-11 | test | PASS |
 | E14 | AC-11 | script | PASS |
-| E15 | AC-7 | script | PASS |
+| E15 | AC-7 | script | PASS (carry-forward round 2) |
 
-## Analyst
+## Judge
 
-Eval khong-phan-biet (pass tren CA code moi lan baseline, chung minh harness chu khong phai feature; viet lai de assert hanh vi moi hoac xac nhan la regression-guard co chu y):
+Đề xuất panel cho E11: PASS (2 phiếu PASS, 1 phiếu UNCERTAIN). Ý kiến khác hiển thị đầy đủ bên dưới; `human_override` để trống cho người quyết ở Cổng 2.
 
-- E2, E6, E8, E12 (lenh `make test`): baseline green.
-- E15 (lenh design-floor-khuon): baseline green.
+- domain-correctness: PASS — Bốn ảnh (360 và 1440, sáng và tối) cho thấy đầu màn "Bảng hàng", các đầu cột đọc được và không có chữ chồng nhau. Ảnh tối vẫn đủ tương phản, kể cả huy hiệu trạng thái. Dấu chấm lửng ("Vinhomes Ocean Park...") chỉ thấy trong ảnh chu-dai 1440 sáng, không có trong bốn ảnh chính; ảnh đó nằm trong danh sách input nên dùng được. Ảnh 360 chỉ hiện bốn cột đầu vì phần còn lại nằm trong vùng cuộn ngang, do E2/E3 đo nên không tính ở đây.
+- operational-feasibility: PASS — Cả bốn ảnh có đầu màn "Bảng hàng" và vùng "Hàng · 60 dòng". Các đầu cột trong khung nhìn đọc rõ: 360 thấy #, Căn, Toà, Dự án; 1440 thấy đủ tám cột. Không có chữ chồng nhau. Ảnh tối (360 và 1440) có chữ sáng trên nền tối, nhãn trạng thái vẫn đọc được. Việc cắt tên khu dài bằng dấu chấm lửng thấy ở ảnh chu-dai 1440 ("Vinhomes Ocean Park..."), một đầu vào hợp lệ của eval này. Ở 360 cột Dự án bị cắt ở mép khung cuộn ngang, đúng thiết kế, không phải lỗi.
+- spec-alignment: UNCERTAIN — Trong bốn ảnh, đầu màn "Bảng hàng" và các đầu cột đang hiện ra đều đọc được, không có chữ chồng nhau, và ảnh tối đủ tương phản. Dấu chấm lửng của tên khu dài không có trong bốn ảnh này: ở 1440 sáng và tối, "Vinhomes Ocean Park 1" vừa đủ ô; ở 360 chữ "Vinhomes C" bị khung cuộn cắt cụt chứ không có dấu chấm lửng. Dấu chấm lửng chỉ thấy ở ảnh thứ năm (inventory-1440-chu-dai.png, chỉ nền sáng), nên chưa chứng minh được cho ảnh tối hay cho 360.
 
-Eval phan biet (red tren baseline): E3, E14 (lenh `make e2e`).
-
-Baseline khong do: E10 (ui-check, baseline n-a: khong chay duoc tren code cu). Cac eval carry-forward (E1, E4, E5, E7, E9, E13) khong chay lai o round nay nen khong do baseline.
+- eval: E11
+  judged_by: judge panel (domain-correctness, operational-feasibility, spec-alignment), fresh context
+  verdict: UNCERTAIN
+  rationale: Hai phiếu PASS, một phiếu UNCERTAIN từ spec-alignment. Dấu chấm lửng của tên khu dài chỉ được chứng minh ở một ảnh nền sáng 1440, chưa có ở nền tối hay ở 360.
+  required_evidence:
+    - Ảnh nền tối ở 1440 với bộ lọc Empire (cùng khung với inventory-1440-chu-dai.png), cho thấy cột Dự án cắt bằng dấu chấm lửng mà vẫn đọc được. Lấy từ bộ ảnh chụp màn Bảng hàng trong _acceptance/bang-hang-ban-doc/evidence/, ví dụ inventory-1440-chu-dai-toi.png.
+    - Hoặc sửa câu hỏi E11 để nói rõ dấu chấm lửng chỉ chấm trên inventory-1440-chu-dai.png (ảnh thứ năm, nền sáng), để phạm vi bốn ảnh không đòi ảnh tĩnh ở 360 hay nền tối phải cho thấy dấu chấm lửng.
+  human_override:  # chi nguoi ghi
 
 ## Evidence
 
-- eval: E2
-  run_id: minted-bang-hang-ban-doc-E2-r2
-  exit_code: 0
-  baseline: green
-  verifier: config:executors.test.unit
-  verified_at: 2026-11-12T03:24:46Z
-  output: |
-    Lenh: make test (cover E2, E6, E8, E12), chay 1 lan, 1 lan dat.
-    ================================================================================
-    __EXIT=0
-
-- eval: E6
-  run_id: minted-bang-hang-ban-doc-E6-r2
-  exit_code: 0
-  baseline: green
-  verifier: config:executors.test.unit
-  verified_at: 2026-11-12T03:24:46Z
-  output: |
-    Lenh: make test (cung lan chay voi E2).
-    ================================================================================
-    __EXIT=0
-
-- eval: E8
-  run_id: minted-bang-hang-ban-doc-E8-r2
-  exit_code: 0
-  baseline: green
-  verifier: config:executors.test.unit
-  verified_at: 2026-11-12T03:24:46Z
-  output: |
-    Lenh: make test (cung lan chay voi E2).
-    ================================================================================
-    __EXIT=0
-
-- eval: E12
-  run_id: minted-bang-hang-ban-doc-E12-r2
-  exit_code: 0
-  baseline: green
-  verifier: config:executors.test.unit
-  verified_at: 2026-11-12T03:24:46Z
-  output: |
-    Lenh: make test (cung lan chay voi E2).
-    ================================================================================
-    __EXIT=0
+Các eval chạy lại ở round 3 (code đã đổi ở commit sửa lưới vào được bằng bàn phím):
 
 - eval: E3
-  run_id: minted-bang-hang-ban-doc-E3-r2
-  exit_code: 0
-  baseline: red
-  verifier: config:executors.script.e2e
-  verified_at: 2026-11-12T03:24:46Z
-  output: |
-    Lenh: make e2e (cover E3, E14), chay 1 lan, 1 lan dat.
-    639 passed (5.1m)
-    __EXIT=0
-
-- eval: E14
-  run_id: minted-bang-hang-ban-doc-E14-r2
-  exit_code: 0
-  baseline: red
-  verifier: config:executors.script.e2e
-  verified_at: 2026-11-12T03:24:46Z
-  output: |
-    Lenh: make e2e (cung lan chay voi E3).
-    639 passed (5.1m)
-    __EXIT=0
-
-- eval: E15
-  run_id: minted-bang-hang-ban-doc-E15-r2
-  exit_code: 0
-  baseline: green
-  verifier: config:executors.design.khuon
-  verified_at: 2026-11-12T03:24:46Z
-  output: |
-    Lenh: design-floor-khuon.mjs --kiem --root .
-    10 tệp giao diện ngoài bản đồ
-    __EXIT=0
-
-- eval: E10
-  run_id: minted-bang-hang-ban-doc-E10-r2
+  run_id: minted-bang-hang-ban-doc-E3-r3
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
-  verified_at: 2026-11-12T03:24:46Z
-  screenshot: evidence/inventory-1440-sang.png   # chin khung: inventory-1440/1024/414/360 x sang/toi + inventory-1440-chu-dai.png; ban sao E10-step1..E10-step10.png
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-12T04:08:03Z
+  output: |
+    639 passed (5.1m)
+
+- eval: E14
+  run_id: minted-bang-hang-ban-doc-E14-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-12T04:08:03Z
+  output: |
+    639 passed (5.1m)
+
+- eval: E8
+  run_id: minted-bang-hang-ban-doc-E8-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.unit
+  verified_at: 2026-11-12T04:08:03Z
+  output: |
+    make test hoàn tất, không có ca đỏ.
+
+- eval: E13
+  run_id: minted-bang-hang-ban-doc-E13-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.unit
+  verified_at: 2026-11-12T04:08:03Z
+  output: |
+    make test hoàn tất, không có ca đỏ.
+
+- eval: E10
+  run_id: minted-bang-hang-ban-doc-E10-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.design.ui_check
+  verified_at: 2026-11-12T04:08:03Z
+  screenshot: evidence/E10-step1.png
   observed: |
-    I opened 6 of the 9 frames with Read: 1440 sang, 1440 toi, 1024 sang, 414 toi, 360 sang, 1440 chu-dai. The other 3 (1024 toi, 414 sang, 360 toi) were not opened; I checked them only through the DOM metrics.
-    1440 sang: App Shell with sidebar (Bảng hàng / Tất cả hàng, Theo trạng thái). Title 'Bảng hàng'. Frame titled 'Hàng'. Search box with a magnifier icon and placeholder 'Gõ để tìm', then '60 dòng'. Columns #, Căn, Toà, Dự án, Trạng thái, Giá chào, Diện tích, Phòng ngủ, Xác nhận lúc, all eight readable with no horizontal scrollbar. Vertical rules between columns. Status badges coloured, numbers right-aligned, no overlapping text. The footer is below the fold.
-    1440 toi: same layout on a dark background with light text; badges and column rules still readable, no overlap.
-    1024 sang: sidebar still shown; the grid scrolls inside its frame, with the Giá chào column cut at the edge, and 'Vinhomes Ocean Pa...' truncated. The page itself does not scroll horizontally.
-    414 toi: sidebar collapsed, dark. Search box and '60 dòng' stacked; grid shows #, Căn, Toà, Dự án (cut off), scrolls horizontally inside the frame, footer '60 dòng' visible at the bottom, no overlapping text.
-    360 sang: same as 414 in light mode; grid cut off at Dự án and scrolls in its frame, footer '60 dòng' visible, page does not scroll horizontally.
-    1440 chu-dai: search 'Empire' with a clear (x) button, counter '12 / 60 dòng', 12 rows, Dự án column 'Vinhomes Ocean Park...' ending in an ellipsis; layout intact.
-    This matches Expected, with one exception: the footer '60 dòng' is not visible in the 1440/1024 viewport frames because it is below the fold.
-  network_observed: unscoped-partial
+    step1 (1440 light): The App Shell is in place, with a left sidebar (Bảng hàng, Tất cả hàng, status list) and the page title "Bảng hàng". The frame "Hàng" holds a search box with a magnifier icon reading "Gõ để tìm" and "60 dòng". The grid has # plus 8 columns, all readable: Căn, Toà, Dự án (full "Vinhomes Ocean Park 1"), Trạng thái (coloured badges), Giá chào, Diện tích, Phòng ngủ, Xác nhận lúc. Vertical rules separate the columns. All 8 columns fit with no horizontal scrollbar. The footer is below the fold in this frame; the DOM has it. step2 (1440 dark): same layout on a near-black background. Text is white and the badges have dark variants, all readable. step3 (1024 light): the grid is cut after "Giá chào" and scrolls sideways inside the frame. The page itself does not scroll, and the Dự án column is truncated with an ellipsis ("Vinhomes Ocean Pa..."). step4 (1024 dark): same as step3 in dark, readable. step5 (414 light): the sidebar is hidden and the title, frame "Hàng", search box and "60 dòng" are visible. The grid shows #, Căn, Toà and the start of Dự án, then cuts off to the right. A footer "60 dòng" shows at the bottom. The page does not scroll sideways. step6 (414 dark): same as step5 in dark, readable. step7 (360 light) and step8 (360 dark): same as 414 but narrower; the search box is narrower and the grid shows #, Căn, Toà, and part of Dự án. Both are readable and there is no overlapping text. step10 (1440 light, "Empire"): the search box has focus and shows "Empire" with a clear (x) button; the count is "12 / 60 dòng". 12 rows are listed. The Toà column reads "[MAU] Toà E1" and the Dự án column reads "Vinhomes Ocean Park..." with a trailing ellipsis, as expected. The grid keeps its fixed height, so there is blank space under the rows. This is not a defect. No frame has overlapping text.
+  network_observed: clean
+
+Các eval mang sang từ round trước (carry-forward, delta không chạm paths của eval; round này không chạy lại):
 
 - eval: E1
   run_id: minted-bang-hang-ban-doc-E1-r1
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.test.unit
   verified_at: 2026-11-12T03:10:45Z
   carried_from_round: 1
   output: |
     carry-forward tu round 1 — delta khong cham paths cua eval
 
+- eval: E2
+  run_id: minted-bang-hang-ban-doc-E2-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.unit
+  verified_at: 2026-11-12T03:24:46Z
+  carried_from_round: 2
+  output: |
+    carry-forward tu round 2 — delta khong cham paths cua eval
+
 - eval: E4
   run_id: minted-bang-hang-ban-doc-E4-r1
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.man_mau
   verified_at: 2026-11-12T03:10:45Z
   carried_from_round: 1
@@ -160,15 +134,27 @@ Baseline khong do: E10 (ui-check, baseline n-a: khong chay duoc tren code cu). C
 - eval: E5
   run_id: minted-bang-hang-ban-doc-E5-r1
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.man_mau
   verified_at: 2026-11-12T03:10:45Z
   carried_from_round: 1
   output: |
     carry-forward tu round 1 — delta khong cham paths cua eval
 
+- eval: E6
+  run_id: minted-bang-hang-ban-doc-E6-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.unit
+  verified_at: 2026-11-12T03:24:46Z
+  carried_from_round: 2
+  output: |
+    carry-forward tu round 2 — delta khong cham paths cua eval
+
 - eval: E7
   run_id: minted-bang-hang-ban-doc-E7-r1
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.test.unit
   verified_at: 2026-11-12T03:10:45Z
   carried_from_round: 1
@@ -178,59 +164,65 @@ Baseline khong do: E10 (ui-check, baseline n-a: khong chay duoc tren code cu). C
 - eval: E9
   run_id: minted-bang-hang-ban-doc-E9-r1
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.test.unit
   verified_at: 2026-11-12T03:10:45Z
   carried_from_round: 1
   output: |
     carry-forward tu round 1 — delta khong cham paths cua eval
 
-- eval: E13
-  run_id: minted-bang-hang-ban-doc-E13-r1
+- eval: E12
+  run_id: minted-bang-hang-ban-doc-E12-r2
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-12T03:10:45Z
-  carried_from_round: 1
+  verified_at: 2026-11-12T03:24:46Z
+  carried_from_round: 2
   output: |
-    carry-forward tu round 1 — delta khong cham paths cua eval
+    carry-forward tu round 2 — delta khong cham paths cua eval
 
-### Judgment (E11)
-
-Panel de xuat cho E11 (AC-10): ba loi nhin, de xuat UNCERTAIN. Moi y kien duoc ghi day du. Cac phieu nay duoc cham khi tep inventory-1440-chu-dai.png chua co tren dia; tep nay nay da co trong thu muc evidence (xem E10), nguoi quyet nen mo xem truc tiep.
-
-- eval: E11
-  judged_by: judge-subagent panel (fresh context)
-  verdict: UNCERTAIN
-  rationale: Bon anh 360/1440 sang va toi cho thay dau man «Bảng hàng» ro, dau cot doc duoc, chu khong chong nhau, anh toi du tuong phan. Nhung khong anh nao trong bon anh cho thay ten khu dai bi cat bang dau cham lung: o 1440 chi co «Vinhomes Ocean Park 1» day du, o 360 chu bi cat boi mep vung cuon ngang chu khong phai boi dau cham lung.
-  votes:
-    - domain-correctness: UNCERTAIN — khong anh nao co ten khu dai bi cat co dau cham lung; anh inventory-1440-chu-dai.png nam trong danh sach input nhung luc cham chua ton tai tren dia.
-    - operational-feasibility: UNCERTAIN — cac dong hien ra chi co «Vinhomes Ocean Park 1»; o 360 chu «Vinhomes C» bi cat boi khung cuon ngang, khong co dau «…»; anh chu-dai luc cham chua co.
-    - spec-alignment: UNCERTAIN — o 1440 «Vinhomes Ocean Park 1» hien du chu; o 360 chu bi cat boi mep khung cuon; anh chu-dai luc cham chua co.
-  required_evidence:
-    - Anh `_acceptance/bang-hang-ban-doc/evidence/inventory-1440-chu-dai.png`, chup o 1440, co dong «Vinhomes Ocean Park 2 – The Empire» trong cot Du an, hien dau cham lung va khong chong chu len cot ke ben. Co anh nay va dat thi mục cham lung duoc cham, verdict co the thanh PASS.
-    - Hoac mot anh Bang hang 1440 sang/toi cuon toi cac dong Ocean Park 2 de thay ten khu dai bi cat co dau cham lung, chup bang buoc ui-check cua hang nay va luu trong thu muc evidence/.
-  human_override:  # chi nguoi ghi
+- eval: E15
+  run_id: minted-bang-hang-ban-doc-E15-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.design.khuon
+  verified_at: 2026-11-12T03:24:46Z
+  carried_from_round: 2
+  output: |
+    carry-forward tu round 2 — delta khong cham paths cua eval
 
 ### Lệnh suite (hồi quy)
 
 - cmd: make check
-  run_id: minted-bang-hang-ban-doc-SUITE-make_check-r2
+  run_id: minted-bang-hang-ban-doc-SUITE-make_check-r3
   exit_code: 0
-  verified_at: 2026-11-12T03:24:46Z
+  verified_at: 2026-11-12T04:08:03Z
 
 - cmd: npm run build
-  run_id: minted-bang-hang-ban-doc-SUITE-build-r2
+  run_id: minted-bang-hang-ban-doc-SUITE-build-r3
   exit_code: 0
-  verified_at: 2026-11-12T03:24:46Z
+  verified_at: 2026-11-12T04:08:03Z
 
 ## Known limits
 
 ## Ngoài hợp đồng
 
+## Analyst
+
+carried tu round 2 — baseline khong do lai round nay.
+
+Baseline khong do: toan bo eval (n-a) — evals.yaml khong doi tu lan baseline cuoi (round 2), nen round nay khong do lai.
+
+Eval khong-phan-biet (xanh tren ca HEAD lan baseline, chung to harness chu khong phai feature; nen viet lai de assert hanh vi moi hoac xac nhan la regression-guard co chu y):
+- make test: E2, E6, E8, E12
+- design-floor-khuon (buoc cham khuon): E15
+
 ## Variance
 
-none — every multi-run eval is uniform (moi eval chay 1 lan, deterministic, khong co pass_rate hon hop).
+none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: E3, E14 failed (bước `make e2e` đỏ: một lượt quét trợ năng ở khổ 1024, ghi ở commit 12ab062) — returned to implementation.
-Round 2: moi eval may xanh (E2, E3, E6, E8, E10, E12, E14, E15 chay lai; E1, E4, E5, E7, E9, E13 carry-forward tu round 1); E11 van UNCERTAIN, cho nguoi quyet o Cong 2.
+Round 1: E3, E14 failed — bai e2e chua xanh (vung chua co du lieu o buoc chay dau). Returned to implementation.
+Round 2: machine evals green, panel E11 waits for the owner.
+Round 3: sua lưới vào được bằng bàn phím trước khi trang nhận thao tác; E3, E14, E8, E13, E10 chạy lại và xanh, các eval còn lại carry-forward; E11 vẫn chờ người quyết ở Cổng 2.
