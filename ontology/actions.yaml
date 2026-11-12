@@ -111,6 +111,49 @@ actions:
     doors:
       db: ["table company_catalog_aliases insert", "table company_catalog_aliases update"]
 
+  # Row 2c (luu-goc-nhin-cot-hai): saved views of the listing board, each person's own. The three roles that read the
+  # listing board (row 2a) hold every cell, own scope; CompanyAdmin has none. Approved by the owner at the scope gate,
+  # 2026-11-12 (Hỏi-2: the saver's own).
+  - name: listSavedViews
+    description: List one's own saved views of a grid screen, for the App Shell's second column.
+    entity: SavedView
+    kind: query
+    status: live
+    scope: { ListAgent: own, BuyerAgent: own, TeamLead: own }
+    doors:
+      api: ["GET /api/v1/saved-views"]
+      db: ["table saved_view select"]
+
+  - name: saveView
+    description: Save the current way of looking at a grid screen as a new view, under a name.
+    entity: SavedView
+    kind: create
+    status: live
+    scope: { ListAgent: own, BuyerAgent: own, TeamLead: own }
+    doors:
+      api: ["POST /api/v1/saved-views"]
+      db: ["table saved_view insert"]
+
+  - name: editView
+    description: Rename one's own saved view, or overwrite it with the current way of looking.
+    entity: SavedView
+    kind: update
+    status: live
+    scope: { ListAgent: own, BuyerAgent: own, TeamLead: own }
+    doors:
+      api: ["PATCH /api/v1/saved-views/[id]"]
+      db: ["table saved_view update"]
+
+  - name: removeView
+    description: Remove one's own saved view.
+    entity: SavedView
+    kind: delete
+    status: live
+    scope: { ListAgent: own, BuyerAgent: own, TeamLead: own }
+    doors:
+      api: ["DELETE /api/v1/saved-views/[id]"]
+      db: ["table saved_view delete"]
+
   # Draft rows for the listing board, from Quỹ hàng's permission review of 05/11 (table two) and its signed
   # bang-quyen-hang.json, without the Telesales role. Row 10 onwards decides each cell when it opens the door.
   - name: viewListings

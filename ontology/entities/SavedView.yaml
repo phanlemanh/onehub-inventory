@@ -1,0 +1,41 @@
+name: SavedView
+description: >-
+  A way of looking at one grid screen that one person saved under a name — the search text, the filter of each column,
+  the sort, whether rows are grouped, and the hidden columns — shown as an item of the App Shell's second column and
+  opened again exactly as saved. Belongs to the person who saved it, inside one company.
+reso: >-
+  none (our own). RESO SavedSearch is a buyer's search criteria used to send new listings, a different meaning; the
+  name is not reused.
+
+properties:
+  id: { type: uuid, required: true, unique: true, display: none }
+  companyId: { type: ref, target: Company, required: true, display: none }
+  userId: { type: uuid, required: true, display: none }
+  screen: { type: enum, values: [inventory], required: true, display: none }
+  name: { type: string, required: true, max: 40, display: text }
+  view: { type: text, required: true, display: none }
+  createdAt: { type: datetime, required: true, display: none }
+  updatedAt: { type: datetime, required: true, display: none }
+
+rules:
+  - id: saved-view-belongs-to-its-owner
+    description: >-
+      Only the person who saved a view lists, opens, renames, overwrites or removes it, and only when the permission
+      table allows the action (rows listSavedViews, saveView, editView, removeView; own scope). Another member of the
+      same company, or anyone of another company, never sees it.
+    implemented_in: db/migrations/009_goc_nhin.sql
+  - id: saved-view-name
+    description: >-
+      A name is trimmed, 1 to 40 characters, and unique without regard to case among the same person's views of the same
+      screen; two people may use the same name.
+    implemented_in: src/modules/listings/saved-view.ts
+  - id: saved-view-holds-five-things
+    description: >-
+      A view holds exactly the search text, the column filters, the sort, grouping on or off and the hidden columns —
+      not full screen, the selected cell, open groups or the scroll position.
+    implemented_in: src/modules/listings/saved-view.ts
+
+code:
+  model: src/modules/listings/
+  tests: tests/db/goc-nhin.db.test.ts
+wiki: wiki/entities/saved-view.md

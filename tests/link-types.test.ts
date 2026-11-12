@@ -315,6 +315,10 @@ describe("AC-5 the sample data is byte-identical to the signed sample-data row",
 
 // ——— AC-6: glossary and module owners ————————————————————————————————————————————————————————————
 
+// Dependencies between modules approved since this row, written before the code; any other one is new. Row 2c
+// (K-21, K-24): listings goes through the identity module's shared action door (decision 0025).
+const APPROVED_DEPENDENCIES = new Set(["listings → identity"]);
+
 interface ModuleMap {
   modules: { name: string; owns?: string[]; depends_on?: string[] }[];
 }
@@ -332,7 +336,8 @@ function checkHomes(glossary: string, map: ModuleMap): string[] {
     else if (got !== mod) errors.push(`sai mô-đun sở hữu: ${entity} → ${got}`);
   }
   for (const m of map.modules)
-    if ((m.depends_on ?? []).length > 0) errors.push(`có phụ thuộc mới: ${m.name}`);
+    if ((m.depends_on ?? []).some((d) => !APPROVED_DEPENDENCIES.has(`${m.name} → ${d}`)))
+      errors.push(`có phụ thuộc mới: ${m.name}`);
   return errors;
 }
 
@@ -349,6 +354,13 @@ describe("AC-6 the two concepts have a glossary line and an owning module", () =
     const c = broken.modules.find((m) => m.name === "contacts")!;
     c.owns = (c.owns ?? []).filter((e) => e !== "ListingOwner");
     expect(checkHomes(glossary, broken)).toEqual(["không mô-đun nào sở hữu: ListingOwner"]);
+  });
+
+  it("red: a dependency that was not approved is named", () => {
+    const broken: ModuleMap = structuredClone(map);
+    const l = broken.modules.find((m) => m.name === "listings")!;
+    l.depends_on = [...(l.depends_on ?? []), "contacts"];
+    expect(checkHomes(glossary, broken)).toEqual(["có phụ thuộc mới: listings"]);
   });
 });
 
