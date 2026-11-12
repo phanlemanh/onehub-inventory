@@ -232,6 +232,15 @@ export interface ReadAgreementsInput {
 export interface ManageAgreementsInput {
 }
 
+export interface ReadCatalogInput {
+}
+
+export interface ReadCompanyCodesInput {
+}
+
+export interface ManageCompanyCodesInput {
+}
+
 export interface ViewListingsInput {
 }
 
@@ -263,6 +272,12 @@ export interface ActionHandlers {
   readAgreements(input: ReadAgreementsInput, ctx: ActionContext): Promise<void>;
   /** Add a connection agreement or change one. */
   manageAgreements(input: ManageAgreementsInput, ctx: ActionContext): Promise<void>;
+  /** Read the shared unit catalog — projects, complexes, towers, stacks, units and original codes. */
+  readCatalog(input: ReadCatalogInput, ctx: ActionContext): Promise<void>;
+  /** Read the codes and names the company uses for catalog towers and units. */
+  readCompanyCodes(input: ReadCompanyCodesInput, ctx: ActionContext): Promise<void>;
+  /** Add or change a code or name the company uses for a catalog tower or unit. */
+  manageCompanyCodes(input: ManageCompanyCodesInput, ctx: ActionContext): Promise<void>;
   /** See the listings of the company. */
   viewListings(input: ViewListingsInput, ctx: ActionContext): Promise<void>;
   /** Add a listing. */
@@ -475,6 +490,86 @@ export const ACTIONS: readonly ActionSpec[] = [
     doors: {
       api: [],
       db: ["table agreements insert", "table agreements update"],
+    },
+  },
+  {
+    name: "readCatalog",
+    description: "Read the shared unit catalog — projects, complexes, towers, stacks, units and original codes.",
+    entity: "Unit",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: [],
+      db: ["table catalog_nodes select", "table catalog_buildings select", "table catalog_stacks select", "table catalog_units select", "table catalog_aliases select"],
+    },
+  },
+  {
+    name: "readCompanyCodes",
+    description: "Read the codes and names the company uses for catalog towers and units.",
+    entity: "CompanyCatalogAlias",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: [],
+      db: ["table company_catalog_aliases select"],
+    },
+  },
+  {
+    name: "manageCompanyCodes",
+    description: "Add or change a code or name the company uses for a catalog tower or unit.",
+    entity: "CompanyCatalogAlias",
+    kind: "command",
+    roles: ["ListAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: [],
+      db: ["table company_catalog_aliases insert", "table company_catalog_aliases update"],
     },
   },
   {
