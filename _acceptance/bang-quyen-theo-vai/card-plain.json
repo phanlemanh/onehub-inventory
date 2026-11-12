@@ -1,0 +1,39 @@
+{
+  "feature_plain": "Ai được xem gì, sửa gì trong sàn nay ghi ở một bảng duy nhất; máy chủ và cơ sở dữ liệu cùng tra bảng ấy, và thêm một thao tác mà quên ghi vào bảng thì bài kiểm báo đỏ ngay.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ có một bảng quyền trong mô hình nghiệp vụ: mỗi thao tác ghi rõ vai nào làm được, trong phạm vi nào (Toàn sàn, Của tôi); bảng ghi sai khuôn thì máy chặn và nêu tên thao tác."},
+    {"id": "AC-2", "p": "Sẽ cộng quyền cho người kiêm nhiều vai: họ được phạm vi rộng nhất trong các vai đang giữ ở sàn này."},
+    {"id": "AC-3", "p": "Sẽ để máy chủ tra bảng trước mọi thao tác: ai không được thì nhận đúng một câu «không đủ quyền», không có gì bị ghi."},
+    {"id": "AC-4", "p": "Sẽ để cơ sở dữ liệu tự chặn lần nữa theo cùng bảng, kể cả khi ai đó đi vòng qua máy chủ; vai tính theo sàn đang làm, không theo sàn khác."},
+    {"id": "AC-5", "p": "Sẽ báo đỏ khi có một lối đọc hay ghi mới mà bảng chưa có dòng; chỉ lối đăng nhập (trước khi chọn sàn) được miễn, mỗi lối một lý do."},
+    {"id": "AC-6", "p": "Sẽ giữ nguyên việc quản trị người của hàng 9: Quản trị sàn xem, mời, đổi vai như cũ, ba vai kia vẫn bị chặn — chỉ khác là luật nay nằm trong bảng."},
+    {"id": "AC-8", "p": "Sẽ chỉ cho Quản trị sàn thêm và sửa thoả thuận kết nối (theo Hỏi về thoả thuận); hôm nay mọi thành viên ghi được ở cơ sở dữ liệu."},
+    {"id": "AC-9", "p": "Sẽ giữ nguyên cách ly giữa các sàn và ghi lại hai thuật ngữ mới «Thao tác», «Phạm vi» cùng sổ thay đổi."}
+  ],
+  "wont_do": [
+    {"id": "AC-7", "p": "Chặn Đầu chủ, Đầu khách, Trưởng nhóm đọc thẳng danh sách người của sàn ở cơ sở dữ liệu: mỗi người chỉ thấy dòng của chính mình."},
+    {"id": "OOS-1", "p": "KHÔNG dựng màn «Vai nào làm được gì» và nhật ký quản trị — để hàng 19a; hàng này không có màn nào."},
+    {"id": "OOS-2", "p": "KHÔNG thi hành điều kiện theo trạng thái hàng (ví dụ ai đưa hàng lên «Đang bán») — làm ở hàng đầu tiên cần nó, dự kiến hàng 10."},
+    {"id": "OOS-3", "p": "KHÔNG chốt năm dòng nháp của Bảng hàng ở đây — chốt ở hàng mở thao tác ấy."},
+    {"id": "OOS-4", "p": "KHÔNG có phạm vi Nhóm, KHÔNG cho sàn tự thu hẹp quyền — chờ sau MVP và sàn thứ hai."},
+    {"id": "OOS-5", "p": "KHÔNG đổi bộ kiểm trình duyệt theo vai (hàng 9b), khoá người, bàn giao, xoá dữ liệu cá nhân (hàng 18a, 18b)."}
+  ],
+  "scope_plain": "Những việc dưới đây cố ý để sang hàng khác:",
+  "coverage_plain": [
+    {"i": 0, "p": "Ba lớp giữ luật đều đọc cùng bảng: phép tính cộng quyền (AC-2), máy chủ (AC-3), cơ sở dữ liệu (AC-4, AC-7, AC-8); màn để hàng 19a."},
+    {"i": 1, "p": "Người gọi: bốn vai đơn lẻ, đủ 15 cách kiêm vai, người không có vai, người của sàn khác, và người làm Quản trị ở sàn khác nhưng chỉ là Đầu chủ ở sàn này."},
+    {"i": 2, "p": "Thao tác đọc và ghi đều có ô; dòng nháp bị kiểm khuôn (AC-1); lối được miễn bị ghim đúng danh sách (AC-5)."},
+    {"i": 3, "p": "Ba loại lối vào dữ liệu đều bị quét: đường máy chủ, hàm của cơ sở dữ liệu, quyền ghi trên bảng (AC-5)."},
+    {"i": 4, "p": "Phạm vi: Toàn sàn và Của tôi có ca kiểm; Nhóm không làm ở MVP."},
+    {"i": 5, "p": "Trạng thái bản ghi: chỉ khai trong bảng; chưa thao tác nào cần nên chưa đo được — máy chặn dòng nào khai trạng thái mà chưa có phần thi hành."},
+    {"i": 6, "p": "Ba chỗ hở đã có đều có tiêu chí: quản trị người (AC-6), đọc danh sách người (AC-7), ghi thoả thuận (AC-8)."},
+    {"i": 7, "p": "Giả định: mọi lối của máy chủ nằm dưới /api/v1, như luật kho đã chốt."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Bản đầu định thêm một hàm vượt luật theo dòng của cơ sở dữ liệu mà không nêu rủi ro cách ly sàn. Đã sửa: không thêm hàm vượt luật nào, dùng lại hàm đã duyệt ở hàng 9; bài kiểm canh việc này."},
+    {"i": 1, "p": "Thiếu ca người thuộc hai sàn với hai vai khác nhau, đúng chỗ dễ lộ dữ liệu. Đã thêm người X (Quản trị ở sàn khác, Đầu chủ ở sàn này) vào mọi bài kiểm, kèm bản phá thử."},
+    {"i": 2, "p": "Danh sách lối được miễn chưa viết trước ở cả hai lớp, nên có thể nới lặng lẽ. Đã ghim đúng danh sách ở cả hai lớp, thêm một mục là đỏ."},
+    {"i": 3, "p": "Ai được ghi thoả thuận kết nối là việc của chủ kho, không phải của máy. Đã chuyển thành câu hỏi trên thẻ."},
+    {"i": 4, "p": "Bài kiểm luật quản trị người chỉ đọc ba hàm và chỉ dò chữ. Đã mở ra mọi hàm vai API gọi được, và gọi thật từng hàm."}
+  ]
+}
