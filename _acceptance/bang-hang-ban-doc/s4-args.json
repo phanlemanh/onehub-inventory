@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-11-12T03:10:45Z",
-  "generated_sha": "62818c0d0bac72046d3916ad6ad77ea7f0e72779",
+  "generated_at": "2026-11-12T03:24:46Z",
+  "generated_sha": "917bc8c98251a38d63aa559ebc72cce7e70606c1",
   "mainBranchInfo": {
     "branch": "main",
     "source": "remote"
   },
   "slug": "bang-hang-ban-doc",
-  "round": 1,
+  "round": 2,
   "riskTier": "T3",
   "evals": [
     {
@@ -215,7 +215,8 @@
         "Navigate {url}/inventory at 414x896, light → screenshot evidence/inventory-414-sang.png",
         "Same at 414x896, dark → screenshot evidence/inventory-414-toi.png",
         "Navigate {url}/inventory at 360x800, light → screenshot evidence/inventory-360-sang.png",
-        "Same at 360x800, dark → screenshot evidence/inventory-360-toi.png"
+        "Same at 360x800, dark → screenshot evidence/inventory-360-toi.png",
+        "Navigate {url}/inventory at 1440x900, light, type Empire in the search box and wait for the rows to settle → screenshot evidence/inventory-1440-chu-dai.png (the long project name in the «Dự án» column ends in an ellipsis)"
       ],
       "paths": [
         "src/modules/listings/ui/**",
@@ -241,12 +242,14 @@
         "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/gracious-raman-dd20c0/_acceptance/bang-hang-ban-doc/evidence/inventory-360-toi.png",
         "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/gracious-raman-dd20c0/_acceptance/bang-hang-ban-doc/evidence/inventory-1440-sang.png",
         "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/gracious-raman-dd20c0/_acceptance/bang-hang-ban-doc/evidence/inventory-1440-toi.png",
+        "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/gracious-raman-dd20c0/_acceptance/bang-hang-ban-doc/evidence/inventory-1440-chu-dai.png",
         "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/gracious-raman-dd20c0/_acceptance/bang-hang-ban-doc/design.md"
       ],
       "evidence_required": [
         "verdict",
         "rationale"
-      ]
+      ],
+      "inputsHash": "ec1c9a18ce1e1ce90d307b75372d305e27bb80edf870a9bfab98e190b8633c8f"
     },
     {
       "id": "E12",
@@ -348,8 +351,8 @@
   "templatePath": "/Users/manhphan/.claude/plugins/cache/acceptance-gate-kit/acceptance-gate/2.38.1/skills/acceptance/references/evidence-report-template.md",
   "toolKillRule": "# TOOL-KILL-RULE — lệnh bị công cụ ngắt KHÔNG phải lệnh fail\n\n**Nguồn duy nhất** của luật «hết giờ không phải trượt» cho MỌI đường chạy lệnh\nkiểm của kit. Hai đường tiêu thụ, cùng đọc khối marker dưới đây, không chép tay:\n\n- **Vòng lặp tính năng** (plugin feature-loop): skill `feature-loop` đọc file này\n  (resolve qua `resolve-plugin.mjs --require skills/acceptance/references/tool-kill-rule.md`)\n  và truyền NGUYÊN VĂN vào `args.toolKillRule` của workflow\n  `acceptance-verify.js`; workflow rút khối marker và nội suy vào prompt của mọi\n  agent chạy lệnh (machine · ui-check · baseline). Thiếu args hoặc không rút\n  được marker → workflow trả BLOCKED có tên, không chạy không luật.\n- **Đường VERIFY độc lập** (skill `acceptance` Phase 3): phiên điều phối chép khối\n  marker VERBATIM vào prompt của phiên tươi VERIFY, cùng nếp «Network truth».\n\nVì sao có luật: verifier chạy lệnh qua Bash tool có trần thời gian mặc định\n(~120 s) NGẮN hơn nhiều suite; lệnh bị công cụ giết trả exit code CỦA CÔNG CỤ,\nkhông phải của lệnh (vấp thật release-2-2-0 S4 r5: suite 108 s đơn lẻ, dưới tải\nbị giết ở 118 s → REJECT giả 4 eval). Nhận diện là việc AGENT (nó thấy tool\nresult thật); phần máy chỉ phòng thủ trên field cấu trúc `killedByTool` —\nKHÔNG grep nội dung output trong engine (chuỗi tổng kết là của suite từng repo).\n\nLệnh dài hơn trần 600 s của công cụ thì KHÔNG bị giết: công cụ **đẩy nó sang\nnền** và nó chạy tiếp. Tệp đầu ra nền trống tới phút chót, vì khung bọc lệnh của\nkit chỉ in khi lệnh xong — đọc trống thành «bị giết» là đúng sự cố crm 07/10/2026\n(hồ sơ `lenh-dai-chay-rieng`: hai lượt BLOCKED giả). Dòng «chuyển sang nền» trong\nkhối dưới là lối LỜI cho mọi lệnh. Lối MÁY: eval khai `long_running: <phút>`\ntrong `evals.yaml` thì lượt chấm feature-loop tự chạy lệnh nền, ghi nhật ký ở\n`.acceptance-runs/<slug>/s4-lenh-dai/` và chờ bằng lệnh nó sinh ra\n(`eval-executors.md`, mục `long_running`).\n\n<!-- <<<TOOL-KILL-RULE -->\nTRAN THOI GIAN CONG CU: khi goi Bash chay lenh, LUON dat tham so timeout >= 600000 (ms) — tran mac dinh cua cong cu (~120s) NGAN hon nhieu suite; lenh vuot tran se bi CONG CU giet va exit code luc do la cua cong cu, KHONG phai cua lenh. Neu lenh van bi cong cu dung (tool result bao timeout/killed, hoac output bi CAT giua chung truoc dong tong ket cuoi cua lenh) → DO KHONG PHAI ket qua that: khai cannotRun=true + killedByTool=true + reason \"bi cong cu giet o <so giay> giay\" kem dau hieu (timeout tool / output cat). TUYET DOI khong bao exitCode nhu the lenh tu fail va khong doan PASS/FAIL tu output cut.\nDAU RA DAI: harness co the CAT DAU RA RA TEP (\"Output too large … saved to <tep>\") va chi hien doan DAU — do KHONG phai bi cong cu giet: doc DUOI tep do (tail) de lay dong tong ket va ma thoat; chi khai killedByTool khi tool result bao timeout/killed that.\nCHUYEN SANG NEN KHONG PHAI BI GIET: tool result bao lenh chua xong trong timeout va da duoc CHUYEN SANG NEN (\"moved to the background\", kem ID + tep dau ra) → lenh VAN DANG CHAY: KHONG khai killedByTool, KHONG ket luan tu tep dau ra luc do. Tep dau ra nen TRONG la binh thuong — khung boc lenh chi in duoi dau ra + dong __EXIT=<n> khi lenh XONG. Cho bang lenh Bash co gioi han (moi lan goi ≤ 100 giay, duoi tran mac dinh 120 giay cua cong cu; vd vong lap kiem tep do co dong __EXIT= chua, sleep vai giay, het 100 giay thi thoat) va goi lai toi khi tep co dong __EXIT=<n> → doc ma tu dong do nhu binh thuong. Tong thoi gian cho toi da = so phut eval khai o long_running (vang thi 30 phut), tinh tu luc chay lenh; qua ma chua co dong __EXIT → cannotRun=true + reason \"lenh chay qua <so> phut chua xong — khai long_running: <phut> cho eval trong evals.yaml\" (KHONG killedByTool), va dung tac vu nen neu cong cu cho phep.\n<!-- TOOL-KILL-RULE>>> -->\n\n## Hồ sơ cho lượt bị ngắt (đường độc lập)\n\nPhiên tươi VERIFY gặp lệnh bị công cụ ngắt thì:\n\n- dòng run-log của eval đó: `\"exit_code\": null, \"killed_by_tool\": true` (không\n  ghi mã thoát của công cụ như mã thoát của lệnh);\n- verdict báo cáo `BLOCKED`, `reason: bi cong cu giet o <so giay> giay — <eval ids>`\n  (kèm dấu hiệu: timeout tool / output cắt trước dòng tổng kết); `failed_evals`\n  rỗng — người đọc hồ sơ thấy đây là sự cố hạ tầng, chữa bằng chạy lại với trần\n  công cụ đủ dài, không phải sửa sản phẩm.\n\nLệnh bị đẩy sang nền rồi QUÁ trần chờ (`long_running`, vắng thì 30 phút) cũng\nlà sự cố hạ tầng chứ không phải lệnh hỏng: dòng run-log `\"exit_code\": null`,\n`\"cannot_run\": true` (KHÔNG `killed_by_tool` — công cụ không giết nó), verdict\n`BLOCKED`, reason gọi tên việc cần làm (khai `long_running: <phút>` cho eval).\n",
   "contractPath": "/Users/manhphan/dev/onehub-inventory/.claude/worktrees/gracious-raman-dd20c0/_acceptance/bang-hang-ban-doc/contract.md",
-  "invokedAt": "2026-11-12T03:10:45Z",
-  "invokedSha": "62818c0d0bac72046d3916ad6ad77ea7f0e72779",
+  "invokedAt": "2026-11-12T03:24:46Z",
+  "invokedSha": "917bc8c98251a38d63aa559ebc72cce7e70606c1",
   "vungVat": [
     "_acceptance/bang-hang-ban-doc/card-plain.json",
     "_acceptance/bang-hang-ban-doc/card.html",
@@ -361,6 +364,16 @@
     "_acceptance/bang-hang-ban-doc/design.md",
     "_acceptance/bang-hang-ban-doc/duong-nen.md",
     "_acceptance/bang-hang-ban-doc/evals.yaml",
+    "_acceptance/bang-hang-ban-doc/evidence-report.md",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-network.txt",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step2.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step3.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step4.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step5.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step6.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step7.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step8.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step9.png",
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/cho-tai--1024--sang.png",
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/cho-tai--1024--toi.png",
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/cho-tai--1440--sang.png",
@@ -427,6 +440,9 @@
     "_acceptance/bang-hang-ban-doc/gap-probe.md",
     "_acceptance/bang-hang-ban-doc/khuon-nap.json",
     "_acceptance/bang-hang-ban-doc/plan.md",
+    "_acceptance/bang-hang-ban-doc/review-findings.md",
+    "_acceptance/bang-hang-ban-doc/run-log.jsonl",
+    "_acceptance/bang-hang-ban-doc/s4-args.json",
     "_acceptance/bang-hang-ban-doc/usage-report.md",
     "design/behaviors.md",
     "design/component-registry.json",
@@ -450,6 +466,7 @@
     "src/modules/listings/ui/inventory-grid.tsx",
     "src/modules/listings/ui/inventory-rows.ts",
     "tests/behavior.test.tsx",
+    "tests/e2e/behavior.spec.ts",
     "tests/e2e/grid.spec.ts",
     "tests/e2e/screens/inventory-width.spec.ts",
     "tests/grid.test.tsx",
@@ -495,6 +512,16 @@
     "_acceptance/bang-hang-ban-doc/design.md",
     "_acceptance/bang-hang-ban-doc/duong-nen.md",
     "_acceptance/bang-hang-ban-doc/evals.yaml",
+    "_acceptance/bang-hang-ban-doc/evidence-report.md",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-network.txt",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step2.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step3.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step4.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step5.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step6.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step7.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step8.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step9.png",
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/cho-tai--1024--sang.png",
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/cho-tai--1024--toi.png",
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/cho-tai--1440--sang.png",
@@ -561,6 +588,9 @@
     "_acceptance/bang-hang-ban-doc/gap-probe.md",
     "_acceptance/bang-hang-ban-doc/khuon-nap.json",
     "_acceptance/bang-hang-ban-doc/plan.md",
+    "_acceptance/bang-hang-ban-doc/review-findings.md",
+    "_acceptance/bang-hang-ban-doc/run-log.jsonl",
+    "_acceptance/bang-hang-ban-doc/s4-args.json",
     "_acceptance/bang-hang-ban-doc/usage-report.md",
     "design/behaviors.md",
     "design/component-registry.json",
@@ -584,6 +614,7 @@
     "src/modules/listings/ui/inventory-grid.tsx",
     "src/modules/listings/ui/inventory-rows.ts",
     "tests/behavior.test.tsx",
+    "tests/e2e/behavior.spec.ts",
     "tests/e2e/grid.spec.ts",
     "tests/e2e/screens/inventory-width.spec.ts",
     "tests/grid.test.tsx",
@@ -608,6 +639,16 @@
     "_acceptance/bang-hang-ban-doc/design.md",
     "_acceptance/bang-hang-ban-doc/duong-nen.md",
     "_acceptance/bang-hang-ban-doc/evals.yaml",
+    "_acceptance/bang-hang-ban-doc/evidence-report.md",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-network.txt",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step2.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step3.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step4.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step5.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step6.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step7.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step8.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step9.png",
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/cho-tai--1024--sang.png",
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/cho-tai--1024--toi.png",
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/cho-tai--1440--sang.png",
@@ -674,6 +715,9 @@
     "_acceptance/bang-hang-ban-doc/gap-probe.md",
     "_acceptance/bang-hang-ban-doc/khuon-nap.json",
     "_acceptance/bang-hang-ban-doc/plan.md",
+    "_acceptance/bang-hang-ban-doc/review-findings.md",
+    "_acceptance/bang-hang-ban-doc/run-log.jsonl",
+    "_acceptance/bang-hang-ban-doc/s4-args.json",
     "_acceptance/bang-hang-ban-doc/usage-report.md",
     "design/patterns/luoi.md",
     "ontology/glossary.md",
@@ -688,6 +732,7 @@
     "src/modules/listings/ui/inventory-grid.tsx",
     "src/modules/listings/ui/inventory-rows.ts",
     "tests/behavior.test.tsx",
+    "tests/e2e/behavior.spec.ts",
     "tests/e2e/grid.spec.ts",
     "tests/e2e/screens/inventory-width.spec.ts",
     "tests/grid.test.tsx",
@@ -711,6 +756,16 @@
     "_acceptance/bang-hang-ban-doc/design.md",
     "_acceptance/bang-hang-ban-doc/duong-nen.md",
     "_acceptance/bang-hang-ban-doc/evals.yaml",
+    "_acceptance/bang-hang-ban-doc/evidence-report.md",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-network.txt",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step2.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step3.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step4.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step5.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step6.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step7.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step8.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step9.png",
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/cho-tai--1024--sang.png",
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/cho-tai--1024--toi.png",
     "_acceptance/bang-hang-ban-doc/evidence/design-pass/cho-tai--1440--sang.png",
@@ -777,6 +832,9 @@
     "_acceptance/bang-hang-ban-doc/gap-probe.md",
     "_acceptance/bang-hang-ban-doc/khuon-nap.json",
     "_acceptance/bang-hang-ban-doc/plan.md",
+    "_acceptance/bang-hang-ban-doc/review-findings.md",
+    "_acceptance/bang-hang-ban-doc/run-log.jsonl",
+    "_acceptance/bang-hang-ban-doc/s4-args.json",
     "_acceptance/bang-hang-ban-doc/usage-report.md",
     "design/patterns/luoi.md",
     "ontology/glossary.md",
@@ -801,14 +859,153 @@
     "tools/proof_gate/proof-gate.test.ts"
   ],
   "coEvalPaths": true,
-  "evalsHash": "c66368f7e2ab883902787f82e35d1e4cf5b7d0402b1a941b83d733676ba12b82",
+  "evalsHash": "88826220a20943cb2d389438841bf7ffaaa7fc44a8a9839bd5349f44819ac0e6",
   "runBaseline": true,
+  "carriedEvals": [
+    {
+      "id": "E1",
+      "runId": "minted-bang-hang-ban-doc-E1-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-12T03:10:45Z",
+      "cmd": "make test"
+    },
+    {
+      "id": "E4",
+      "runId": "minted-bang-hang-ban-doc-E4-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-12T03:10:45Z",
+      "cmd": "npx vitest run tools/e2e_templates --coverage.enabled=false --reporter=verbose"
+    },
+    {
+      "id": "E5",
+      "runId": "minted-bang-hang-ban-doc-E5-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-12T03:10:45Z",
+      "cmd": "npx vitest run tools/e2e_templates --coverage.enabled=false --reporter=verbose"
+    },
+    {
+      "id": "E7",
+      "runId": "minted-bang-hang-ban-doc-E7-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-12T03:10:45Z",
+      "cmd": "make test"
+    },
+    {
+      "id": "E9",
+      "runId": "minted-bang-hang-ban-doc-E9-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-12T03:10:45Z",
+      "cmd": "make test"
+    },
+    {
+      "id": "E13",
+      "runId": "minted-bang-hang-ban-doc-E13-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-12T03:10:45Z",
+      "cmd": "make test"
+    }
+  ],
+  "carriedFindings": [
+    {
+      "file": "src/app/(app)/proto/[slug]/frame-showcase.tsx",
+      "title": "label(\"StandardStatus\") reused for a different meaning (region/page states)",
+      "severity": "medium",
+      "plain": "Trên trang mẫu nội bộ, tiêu đề phần trạng thái toàn trang dùng chữ của trạng thái căn. Nếu sàn đổi tên trạng thái căn thì tiêu đề này đổi theo dù không liên quan.",
+      "can_cu": "Chỉ ảnh hưởng một trang mẫu nội bộ, khách hàng và đầu chủ không thấy, không mất dữ liệu, sửa lúc nào cũng rẻ.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "src/app/(app)/inventory/page.tsx",
+      "title": "The Bảng hàng empty-state sentence hard-codes the Unit label «căn»",
+      "severity": "medium",
+      "plain": "Khi sàn chưa có căn nào, câu báo trống viết sẵn chữ «căn». Nếu sàn đổi tên gọi này thì câu đó lệch với phần còn lại của màn.",
+      "can_cu": "Nhẹ: chỉ lệch chữ ở một câu hiếm gặp, không mất dữ liệu, và việc sàn đổi tên gọi này chưa xảy ra.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": true
+    },
+    {
+      "file": "src/components/candidate/data-region.tsx",
+      "title": "The row-count rule is split into two places with different conditions; showCount is documented but never used",
+      "severity": "low",
+      "plain": "Số dòng hiện hai lần, cạnh ô tìm và ở chân bảng. Khi tìm mà vẫn giữ đủ dòng thì hai nơi ghi hơi khác nhau.",
+      "can_cu": "Chỉ là trùng lặp và lệch cách ghi, người dùng vẫn đọc đúng số dòng, không mất dữ liệu, sửa nhỏ sau cũng được.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "src/app/(app)/proto/[slug]/grid-showcase.tsx",
+      "title": "Showcases still hard-code headers for concepts that now have labels (ListPrice, LastConfirmedAt)",
+      "severity": "low",
+      "plain": "Trên trang mẫu Lưới, hai cột còn mang tên cũ khác với Bảng hàng thật. Cùng một thông tin mà hai màn gọi hai tên.",
+      "can_cu": "Chỉ lệch tên ở trang mẫu nội bộ, không mất dữ liệu, không ảnh hưởng đầu chủ, đổi lại rẻ khi dọn trang mẫu.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "src/components/candidate/data-region.tsx",
+      "title": "Row count appears twice: the toolbar's showCount switch is never used",
+      "severity": "low",
+      "plain": "Số «60 dòng» hiện cạnh ô tìm và lặp lại ở chân bảng. Hơi thừa nhưng không sai.",
+      "can_cu": "Chỉ thừa một con số, không sai thông tin, không mất dữ liệu, và gỡ đi còn kéo theo chỉnh bài kiểm tìm nên để sau.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "tests/inventory.test.tsx",
+      "title": "Shape 3: the test checks that a status badge exists, but the promise is that each badge matches its row's status",
+      "severity": "medium",
+      "plain": "Bài kiểm chỉ xác nhận có huy hiệu trạng thái, chưa kiểm huy hiệu khớp đúng trạng thái của từng dòng. Nếu sau này huy hiệu hiện sai dòng thì bài kiểm vẫn xanh.",
+      "can_cu": "Màn hôm nay hiển thị đúng, rủi ro chỉ là bỏ sót lỗi tương lai, người dùng chưa gặp gì, và bổ sung kiểm chứng sau rất rẻ.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "tests/grid.test.tsx",
+      "title": "Shape 4: the 'widths stay the same' check stands alone, with no proof the search actually filtered",
+      "severity": "low",
+      "plain": "Bài kiểm bề rộng cột khi gõ tìm không chứng minh ô tìm thật sự đã lọc dòng. Nếu ô tìm hỏng thì bài này vẫn xanh.",
+      "can_cu": "Người dùng không gặp lỗi nào hôm nay, các bài tìm khác đã phủ việc lọc, và thêm một dòng kiểm chứng sau là rẻ.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    }
+  ],
+  "deltaFiles": [
+    "_acceptance/bang-hang-ban-doc/decisions.jsonl",
+    "_acceptance/bang-hang-ban-doc/evals.yaml",
+    "_acceptance/bang-hang-ban-doc/evidence-report.md",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-network.txt",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step2.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step3.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step4.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step5.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step6.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step7.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step8.png",
+    "_acceptance/bang-hang-ban-doc/evidence/E10-step9.png",
+    "_acceptance/bang-hang-ban-doc/evidence/inventory-1024-sang.png",
+    "_acceptance/bang-hang-ban-doc/evidence/inventory-1024-toi.png",
+    "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-sang.png",
+    "_acceptance/bang-hang-ban-doc/evidence/inventory-1440-toi.png",
+    "_acceptance/bang-hang-ban-doc/review-findings.md",
+    "_acceptance/bang-hang-ban-doc/run-log.jsonl",
+    "_acceptance/bang-hang-ban-doc/s4-args.json",
+    "src/app/(app)/inventory/page.tsx",
+    "tests/e2e/behavior.spec.ts"
+  ],
   "thuocChup": {
-    "sha": "62818c0d0bac72046d3916ad6ad77ea7f0e72779",
+    "sha": "917bc8c98251a38d63aa559ebc72cce7e70606c1",
     "n": 86,
-    "digest": "dc52601add8cc2f39f44150e4242736a9cc02573394a52d3022dcb0b0196d4cd",
+    "digest": "56e1f0b958db4e7adf28ae99ac3baff9ad5b5f4f1007ee851f7a14cba60ddc94",
     "tep": {
-      "_acceptance/bang-hang-ban-doc/evals.yaml": "c66368f7e2ab883902787f82e35d1e4cf5b7d0402b1a941b83d733676ba12b82",
+      "_acceptance/bang-hang-ban-doc/evals.yaml": "88826220a20943cb2d389438841bf7ffaaa7fc44a8a9839bd5349f44819ac0e6",
       "_acceptance/config.yaml": "da5b95ed8b08f729c7fb594ee2daa178550e12acf1c7fb107b786fd2c421a637",
       "src/modules/identity/code.test.ts": "7d2bebbc7292b47a99fa9f87e9486e299bfb46d809c36c2d3e1addc4dedb54b2",
       "src/modules/identity/config.test.ts": "a482ab483acc1c15bf9f8c5dc0794fc5b80aca56d401c686176693837692d176",
@@ -848,7 +1045,7 @@
       "tests/e2e-db/va-dang-nhap.spec.ts": "46e75fbd081837f04f8af582e8a37d240f73051952cb9740d5169b62b21b77a9",
       "tests/e2e/account.spec.ts": "6791bf2e9f5ddd3616f05ee325dd4092eeef256fbc670fbaef994e890592ac5e",
       "tests/e2e/app-shell.spec.ts": "162ba3e7d8c3939ed2b191899d5b9af0572ed270f2cf87eac9106add59dfa363",
-      "tests/e2e/behavior.spec.ts": "128f87137f916f0a127b1210014c6fa2682e0c8a27191236206502ee6df781d2",
+      "tests/e2e/behavior.spec.ts": "eae7d38204799d021f986d8d4a77ce7fe7b7e94b2dcc25a62f6389b3a9ae633c",
       "tests/e2e/frame.spec.ts": "033a00fda57da76dd9a2a61888445d774906e6eec845b1fce8ed43db342878a6",
       "tests/e2e/grid.spec.ts": "6b43167a5de82552a1ac8e77f4bf594b5db88ca3a155ad1d09cd29e0c41821c5",
       "tests/e2e/screens/inventory-width.spec.ts": "6dcf90366bce0f62038cf0d28ccfcc9fc1585a25f1ec3e0c56d17199ccbc5584",
@@ -897,7 +1094,7 @@
     }
   },
   "cayChup": {
-    "sha": "62818c0d0bac72046d3916ad6ad77ea7f0e72779",
+    "sha": "917bc8c98251a38d63aa559ebc72cce7e70606c1",
     "ban": {
       "_acceptance/config.yaml": "da5b95ed8b08f729c7fb594ee2daa178550e12acf1c7fb107b786fd2c421a637"
     },
