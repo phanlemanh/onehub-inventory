@@ -97,7 +97,14 @@ test.describe("behavior", () => {
       expect(Math.round(box!.width)).toBe(width);
     } else {
       expect(box!.width).toBeLessThan(width);
-      expect(Math.round(box!.x + box!.width)).toBe(width);
+      // The floating record stands inside the App Shell's work area (decision 0024): its right edge is the area's.
+      const edges = await page.evaluate(() => ({
+        record: document
+          .querySelector('[role="dialog"][aria-modal="false"]')!
+          .getBoundingClientRect().right,
+        area: document.querySelector('[data-slot="sidebar-inset"]')!.getBoundingClientRect().right,
+      }));
+      expect(Math.abs(edges.record - edges.area)).toBeLessThanOrEqual(1);
     }
     await page.getByRole("button", { name: "Sau" }).click();
     await expect(page).toHaveURL(/ho-so=can-3/);
