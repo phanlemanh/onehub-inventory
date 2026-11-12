@@ -93,6 +93,9 @@ const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-screen";
 /** Narrowest a column gets while the filter row is open, in ch: room for a rule like «<=5» or «toa e». */
 const FILTER_MIN_CH = 11;
 
+/** Room the group's open-close button takes in front of a group label, in ch. */
+const GROUP_TOGGLE_CH = 4;
+
 /** Id of the row-number column, the first frozen column. */
 export const ROW_NUMBER_ID = "row-number";
 
@@ -353,8 +356,23 @@ export function DataRegion({
       full,
       widthCh === null ? null : (widthCh * baseChPx) / chPx - rowNumberCh - 1,
     );
-    return filterRowOpen ? spread.map((w) => Math.max(w, FILTER_MIN_CH)) : spread;
-  }, [fitted, full, widthCh, baseChPx, chPx, rowNumberCh, filterRowOpen]);
+    // While grouped, the grouping column also holds the group's open-close button in front of its label.
+    return spread.map((w, i) => {
+      const grown = isGrouped && columns[i]?.field === groupColumn?.field ? w + GROUP_TOGGLE_CH : w;
+      return filterRowOpen ? Math.max(grown, FILTER_MIN_CH) : grown;
+    });
+  }, [
+    fitted,
+    full,
+    widthCh,
+    baseChPx,
+    chPx,
+    rowNumberCh,
+    filterRowOpen,
+    isGrouped,
+    columns,
+    groupColumn,
+  ]);
 
   const recordAddress = record?.address;
   const addressNavigate = useRef<((id: string | null) => void) | null>(null);
