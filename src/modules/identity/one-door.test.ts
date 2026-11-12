@@ -5,6 +5,9 @@
 //   2. No file outside the door opens a connection or runs a statement straight on a pool, or builds a new Pool or
 //      Client. Statements run on the client that withCompany hands over (already switched to quy_hang_app) go
 //      through the door and are not counted.
+//   3. No file outside the door switches role or session settings (row 7a, Ngoài-5 of row 7): a statement run on the
+//      client inside withCompany could otherwise leave quy_hang_app or move to another company. Only statements
+//      written out in the source are seen; text built at run time is a known limit of this scan.
 // Idea copied from packages/api/src/one-door.test.ts of onehub-quy-hang (commit 1729b11f).
 import {
   mkdirSync,
@@ -29,6 +32,10 @@ const DRIVER_IMPORT =
 const POOL_CALL =
   /\b\w*[Pp]ool\s*\??\.\s*(?:query|connect)\s*(?:<[^()]*>)?\s*\(|\bnew\s+(?:pg\s*\.\s*)?(?:Pool|Client)\s*(?:<[^()]*>)?\s*\(/g;
 
+/** A statement that leaves the API role or changes the company or user of the transaction. */
+const CONTEXT_SWITCH =
+  /\b(?:re)?set\s+(?:(?:local|session)\s+)?role\b|\bset\s+(?:(?:local|session)\s+)?session\s+authorization\b|\breset\s+(?:all|session\s+authorization)\b|\bdiscard\s+all\b|\bset_config\s*\(|\bset\s+(?:(?:local|session)\s+)?app\.\w+/gi;
+
 const SOURCE_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".mts", ".cts"]);
 
 /** The only files allowed to load a driver or touch a pool: the door, and this test (it writes those strings into
@@ -47,7 +54,7 @@ function scanText(file: string, text: string): Violation[] {
     .map((line) => (line.trim().startsWith("//") ? "" : line))
     .join("\n");
   const lines = new Set<number>();
-  for (const pattern of [DRIVER_IMPORT, POOL_CALL]) {
+  for (const pattern of [DRIVER_IMPORT, POOL_CALL, CONTEXT_SWITCH]) {
     for (const match of code.matchAll(pattern)) {
       lines.add(code.slice(0, match.index).split("\n").length);
     }
@@ -150,6 +157,44 @@ describe("one query door", () => {
     expect(scanQueries(dir, EXEMPT), "the call is named at the line of the pool").toEqual([
       { file: "broken.ts", line: 1 },
     ]);
+  });
+
+  it("control: a role or company switch outside the door is named, in every written form", () => {
+    const dir = mkdtempSync(join(tmpdir(), "mot-cua-"));
+    writeFileSync(
+      join(dir, "lanh.ts"),
+      [
+        'import { withCompany } from "@/modules/identity/server";',
+        "await withCompany(pool, ctx, (tx) => tx.query('select role, settings from members where id = $1', [id]));",
+        "const reset = () => setRoleFilter(null);",
+        "// tx.query('reset role') in a comment does not count",
+      ].join("\n") + "\n",
+    );
+    expect(
+      scanQueries(dir, EXEMPT),
+      "words like role or reset in other uses are not counted",
+    ).toEqual([]);
+
+    // The matrix written before the rule (evals.yaml E6): nine forms, one per line of one file.
+    writeFileSync(
+      join(dir, "doi-vai.ts"),
+      [
+        "await tx.query('set local role postgres');",
+        'await tx.query("RESET ROLE");',
+        "await tx.query(`set",
+        "  role postgres`);",
+        "await tx.query('set session authorization postgres');",
+        "await tx.query('reset all');",
+        "await tx.query('DISCARD ALL');",
+        "await tx.query(\"select set_config('app.company_id', $1, true)\", [other]);",
+        "await tx.query(`set local app.company_id = '${other}'`);",
+        "await tx.query('SET app.user_id = 1');",
+      ].join("\n") + "\n",
+    );
+    expect(
+      scanQueries(dir, EXEMPT),
+      "mã ngoài cửa đổi vai hay đổi sàn: every form is named at its line",
+    ).toEqual([1, 2, 3, 5, 6, 7, 8, 9, 10].map((line) => ({ file: "doi-vai.ts", line })));
   });
 
   it("control: a copy of this test outside the exemption is reported", () => {

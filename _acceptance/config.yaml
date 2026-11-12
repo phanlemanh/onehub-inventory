@@ -7,6 +7,7 @@ executors:
   test:
     unit: "make test"                # suy từ: Makefile
     proof_gate: "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose"   # thang-chon-khoi-vao-cong (1n): screen proof gate only
+    mot_cua: "npx vitest run src/modules/identity/one-door.test.ts --coverage.enabled=false --reporter=verbose"   # row 7a: one query door scan, rule 3 (no role or company switch outside the door)
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
@@ -32,6 +33,8 @@ executors:
     kiem_chung_lap: "E2E_CPU_THROTTLE=4 npx playwright test --grep @cho --project=360 --project=1024 --repeat-each=20"   # bo-kiem-chung-khi-dang-nhap (1r): sheet and banner waits, 20 runs on a 4x slowed CPU
     kiem_chung_lap_phien: "DB_LANE=h DB_PORT=5567 E2E_CPU_THROTTLE=4 npx playwright test -c playwright.db.config.ts tests/e2e-db/members.spec.ts --grep @cho --project=360 --repeat-each=20"   # bo-kiem-chung-khi-dang-nhap (1r): members sheet wait, 20 runs slowed, lane H Postgres
     kiem_chung_db_tron: "DB_LANE=h DB_PORT=5567 npx playwright test -c playwright.db.config.ts"   # bo-kiem-chung-khi-dang-nhap (1r): every signed-in browser test after the shared setup changed, lane H Postgres
+    cach_ly_c: "DB_LANE=${DB_LANE:-c} DB_PORT=${DB_PORT:-5569} bash -c 'bash db/scripts/cach-ly.sh && npx vitest run -c vitest.db.config.ts tests/db/cach-ly.db.test.ts --reporter=verbose'"   # cach-ly-truoc-du-lieu-that (row 7a): isolation suite, then agreements-vs-ontology and runner tests, lane C Postgres — one command so a grading round never runs two of them on the same scratch databases
+    cach_ly_db_c: "DB_LANE=${DB_LANE:-c} DB_PORT=${DB_PORT:-5569} bash -c 'bash db/scripts/cach-ly.sh && npx vitest run -c vitest.db.config.ts tests/db/cach-ly.db.test.ts --reporter=verbose'"   # row 7a: same command as cach_ly_c on purpose (deduplicated in a grading round)
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists

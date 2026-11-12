@@ -4,6 +4,9 @@ import type { DataGridI18nOverrides } from "@/components/reui/data-grid/data-gri
 
 export const GRID_COPY = {
   rowCount: (total: number) => `${total} dòng`,
+  /** Header of the row-number column, and what a screen reader hears for it. */
+  rowNumberHeader: "#",
+  rowNumberLabel: "Số thứ tự dòng",
   filteredCount: (shown: number, total: number) => `${shown} / ${total} dòng`,
   searchLabel: "Tìm trong vùng",
   searchPlaceholder: "Gõ để tìm",

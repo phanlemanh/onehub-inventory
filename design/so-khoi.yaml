@@ -14,4 +14,32 @@
 # Empty on purpose: per decision 0023 nothing is in the store yet in the full sense. App Shell, sign-in, Members and
 # the form dialog are chosen again in rows 1o, 1p and 9c; the grid template is arranged in row 2.
 version: 1
-khoi: []
+khoi:
+  - ten: DataRegion
+    tep: src/components/candidate/data-region.tsx
+    nguon: data-grid-editing-6
+    nhu_cau: bang-nhieu-dong
+    mo_ta: Danh sách nhiều dòng mà Đầu chủ xem, lọc, tìm như bảng tính
+    ho_so: bang-hang-ban-doc
+    duyet: 2026-11-12
+  - ten: PageHeader
+    tep: src/components/templates/page-header.tsx
+    nguon: tao-tay
+    nhu_cau: dau-trang
+    mo_ta: Đầu trang của một màn — tên màn và việc chính
+    ho_so: bang-hang-ban-doc
+    duyet: 2026-11-12
+  - ten: TypedCell
+    tep: src/components/candidate/typed-cell.tsx
+    nguon: tao-tay
+    nhu_cau: o-theo-kieu-du-lieu
+    mo_ta: Một ô của lưới hiện giá trị theo kiểu dữ liệu (số, tiền, ngày, chữ)
+    ho_so: bang-hang-ban-doc
+    duyet: 2026-11-12
+  - ten: TruncatedText
+    tep: src/components/candidate/truncated-text.tsx
+    nguon: tao-tay
+    nhu_cau: chu-dai-cat-gon
+    mo_ta: Chữ dài cắt gọn trong một ô, đọc đủ khi rê chuột
+    ho_so: bang-hang-ban-doc
+    duyet: 2026-11-12

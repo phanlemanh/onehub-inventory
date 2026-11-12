@@ -1,4 +1,4 @@
--- Company isolation suite (SP-1): 14 SQL cases, run by db/scripts/cach-ly.sh on a scratch database that has the
+-- Company isolation suite (SP-1): 19 SQL cases (14 of row 7, 5 of row 7a), run by db/scripts/cach-ly.sh on a scratch database that has the
 -- migrations applied. Each case builds companies A and B as the table owner inside one transaction, switches to the
 -- API role with the door's own statements (src/modules/identity/with-company.ts), checks reads and writes, and
 -- rolls back. A passing case prints `ok <case>`; a failing one raises `HỎNG <case>: <table or reason>`.
@@ -323,4 +323,204 @@ begin
     end if;
   end loop;
   raise notice 'ok vai-api-khong-so-huu-khong-vuot';
+end $$;
+
+-- Row 7a (hồ sơ cach-ly-truoc-du-lieu-that). Each scan below is an allow-list over everything the API role can reach,
+-- in every schema that is not a system schema, so a new kind of detour fails until a line here says it is allowed.
+
+-- Relations of every non-system schema (this session's own temporary objects are not counted).
+create function pg_temp.quan_he_ngoai_he_thong() returns table (oid oid, ten text, loai "char") language sql as $f$
+  select c.oid, format('%s.%s', n.nspname, c.relname), c.relkind
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname not in ('pg_catalog', 'information_schema')
+    and n.nspname not like 'pg\_toast%' and n.nspname not like 'pg\_temp%'
+    and c.relkind in ('r', 'p', 'v', 'm', 'f')
+  order by 2;
+$f$;
+
+-- 15. Positive control for writes (Ngoài-30): company A adds and changes its own agreement, and reads both back.
+begin;
+select pg_temp.dung_hai_san();
+set local role quy_hang_app;
+execute dat_san('[Tên]', '00000000-0000-4000-8000-00000000000a');
+do $$
+declare n bigint; v text;
+begin
+  begin
+    insert into agreements (company_id, kind, direction, counterparty, data_classes, valid_from, approved_by)
+    values ('00000000-0000-4000-8000-00000000000a', 'spreadsheet', 'inbound', 'bảng mẫu', '{catalog}', now(), '[Tên]');
+    get diagnostics n = row_count;
+    if n <> 1 then raise exception 'thêm được % dòng, cần 1', n; end if;
+    update agreements set counterparty = 'nguồn đã sửa'
+    where company_id = '00000000-0000-4000-8000-00000000000a' and kind = 'catalog_source';
+    get diagnostics n = row_count;
+    if n <> 1 then raise exception 'sửa được % dòng, cần 1', n; end if;
+    select count(*) into n from agreements
+    where company_id = '00000000-0000-4000-8000-00000000000a' and kind = 'spreadsheet' and counterparty = 'bảng mẫu';
+    if n <> 1 then raise exception 'đọc lại thấy % dòng vừa thêm, cần 1', n; end if;
+    select counterparty into v from agreements
+    where company_id = '00000000-0000-4000-8000-00000000000a' and kind = 'catalog_source';
+    if v is distinct from 'nguồn đã sửa' then raise exception 'đọc lại giá trị %, cần «nguồn đã sửa»', v; end if;
+  exception when others then
+    raise exception 'HỎNG a-ghi-duoc-dong-cua-minh: %', sqlerrm;
+  end;
+  raise notice 'ok a-ghi-duoc-dong-cua-minh';
+end $$;
+rollback;
+
+-- 16. No dangerous privilege (Ngoài-4, 6, 20): row security does not apply to TRUNCATE, and TRIGGER or REFERENCES
+--     let a role act on rows it cannot see. has_table_privilege counts grants to PUBLIC and to parent roles too.
+begin;
+select pg_temp.dung_hai_san();
+set local role quy_hang_app;
+execute dat_san('[Tên]', '00000000-0000-4000-8000-00000000000a');
+do $$
+begin
+  perform pg_temp.phai_loi('vai-api-khong-quyen-nguy-hiem', 'truncate agreements',
+    'permission denied for table agreements');
+end $$;
+rollback;
+do $$
+declare r record; q text; k int := 0;
+begin
+  for r in select * from pg_temp.quan_he_ngoai_he_thong() loop
+    k := k + 1;
+    foreach q in array array['TRUNCATE', 'TRIGGER', 'REFERENCES'] loop
+      if has_table_privilege('quy_hang_app', r.oid, q) then
+        raise exception 'HỎNG vai-api-khong-quyen-nguy-hiem: % %', r.ten, q;
+      end if;
+    end loop;
+  end loop;
+  if k = 0 then raise exception 'HỎNG vai-api-khong-quyen-nguy-hiem: không thấy quan hệ nào'; end if;
+  raise notice 'ok vai-api-khong-quyen-nguy-hiem — % quan hệ', k;
+end $$;
+
+-- 17. The API role touches only tables with row security (Ngoài-19, a new table without rules): every table it holds
+--     any privilege on, in any schema, enables and forces row level security; it creates nothing and cannot enter
+--     the identity schema. Cases 12 and 13 look at schema public only; this case closes that from the role's side.
+do $$
+declare r record; k int := 0; thay text[] := '{}';
+begin
+  for r in select q.oid, q.ten from pg_temp.quan_he_ngoai_he_thong() q where q.loai in ('r', 'p', 'f') loop
+    if has_any_column_privilege('quy_hang_app', r.oid, 'SELECT')
+       or has_any_column_privilege('quy_hang_app', r.oid, 'INSERT')
+       or has_any_column_privilege('quy_hang_app', r.oid, 'UPDATE')
+       or has_table_privilege('quy_hang_app', r.oid, 'DELETE') then
+      k := k + 1;
+      thay := thay || r.ten;
+      if not exists (select from pg_class c where c.oid = r.oid and c.relrowsecurity and c.relforcerowsecurity) then
+        raise exception 'HỎNG vai-api-chi-cham-bang-co-luat: % — vai chạm được mà không bật và ép luật theo dòng', r.ten;
+      end if;
+    end if;
+  end loop;
+  -- Positive control: the scan sees the three company tables the API role is known to read.
+  if not thay @> array['public.agreements', 'public.companies', 'public.company_members'] then
+    raise exception 'HỎNG vai-api-chi-cham-bang-co-luat: bản quét không thấy đủ ba bảng công ty, chỉ thấy %', thay;
+  end if;
+  for r in select n.nspname from pg_namespace n
+           where n.nspname not like 'pg\_%' and has_schema_privilege('quy_hang_app', n.oid, 'CREATE') loop
+    raise exception 'HỎNG vai-api-chi-cham-bang-co-luat: vai có quyền tạo trong schema %', r.nspname;
+  end loop;
+  if exists (select from pg_namespace where nspname = 'identity')
+     and has_schema_privilege('quy_hang_app', 'identity', 'USAGE') then
+    raise exception 'HỎNG vai-api-chi-cham-bang-co-luat: vai vào được schema identity';
+  end if;
+  raise notice 'ok vai-api-chi-cham-bang-co-luat — % bảng', k;
+end $$;
+
+-- 18. Views do not bypass row security (Ngoài-4, 14, 19): a view runs as its owner unless it is security_invoker, and
+--     a materialized view has no row security at all. Every view the API role can read must be security_invoker; no
+--     materialized view may be readable by it.
+create function pg_temp.dang_xem_vuot() returns table (ten text, doc_duoc int) language sql as $f$
+  with doc as (
+    select q.oid, q.ten, q.loai from pg_temp.quan_he_ngoai_he_thong() q
+    where q.loai in ('v', 'm') and has_any_column_privilege('quy_hang_app', q.oid, 'SELECT')
+  )
+  select d.ten, (select count(*)::int from doc) from doc d
+  where d.loai = 'm'
+     or not exists (select from pg_class c, unnest(coalesce(c.reloptions, '{}')) o
+                    where c.oid = d.oid
+                      and lower(o) in ('security_invoker=true', 'security_invoker=on', 'security_invoker=1',
+                                       'security_invoker=yes'))
+  union all
+  select null, (select count(*)::int from doc);
+$f$;
+-- Positive control in its own transaction: a security_invoker view granted to the API role is counted, not named.
+begin;
+create view public.agreements_doi_chung with (security_invoker = true) as select id, company_id from agreements;
+grant select on public.agreements_doi_chung to quy_hang_app;
+do $$
+declare ten_vuot text[]; dem int;
+begin
+  select array_agg(ten) filter (where ten is not null), max(doc_duoc) into ten_vuot, dem from pg_temp.dang_xem_vuot();
+  if ten_vuot is not null or dem <> 1 then
+    raise exception 'HỎNG dang-xem-khong-vuot-luat: đối chứng — dạng xem chạy theo người đọc bị nêu (%) hoặc không được đếm (%)',
+      ten_vuot, dem;
+  end if;
+end $$;
+rollback;
+do $$
+declare ten_vuot text[]; dem int;
+begin
+  select array_agg(ten order by ten) filter (where ten is not null), max(doc_duoc) into ten_vuot, dem
+  from pg_temp.dang_xem_vuot();
+  if ten_vuot is not null then
+    raise exception 'HỎNG dang-xem-khong-vuot-luat: % — dạng xem vai đọc được mà không chạy theo quyền người đọc, hoặc là dạng xem vật chất hoá',
+      array_to_string(ten_vuot, ', ');
+  end if;
+  raise notice 'ok dang-xem-khong-vuot-luat — % dạng xem', dem;
+end $$;
+
+-- 19. Privileged functions are a written list (Ngoài-4, 14, 19): a SECURITY DEFINER function runs as its owner, so one
+--     the API role can call — directly or through PUBLIC, which every new function gets by default — or that a trigger
+--     on a table the role can write calls, must be listed here with its owner and a pinned search_path. The list is the
+--     identity exception the owner approved: row 8 (dang-nhap-ma-email#d-20261111T052230Z-14) and row 9
+--     (moi-nguoi-gan-vai#d-20261111T084753Z-14). An 11th function needs the owner's word first.
+create temp table ham_cho_phep (lich text not null, chu name not null, duyet text not null);
+insert into ham_cho_phep values
+  ('app.login_request_code', 'quy_hang_identity', 'dang-nhap-ma-email#d-20261111T052230Z-14'),
+  ('app.login_verify_code', 'quy_hang_identity', 'dang-nhap-ma-email#d-20261111T052230Z-14'),
+  ('app.session_read', 'quy_hang_identity', 'dang-nhap-ma-email#d-20261111T052230Z-14'),
+  ('app.session_companies', 'quy_hang_identity', 'dang-nhap-ma-email#d-20261111T052230Z-14'),
+  ('app.session_set_company', 'quy_hang_identity', 'dang-nhap-ma-email#d-20261111T052230Z-14'),
+  ('app.session_end', 'quy_hang_identity', 'dang-nhap-ma-email#d-20261111T052230Z-14'),
+  ('app.member_roles', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14'),
+  ('app.member_list', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14'),
+  ('app.member_invite', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14'),
+  ('app.member_set_roles', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14');
+do $$
+declare r record; k int := 0;
+begin
+  for r in
+    select distinct format('%s.%s', n.nspname, p.proname) as lich, pg_get_userbyid(p.proowner) as chu, p.proconfig
+    from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where p.prosecdef
+      and n.nspname not in ('pg_catalog', 'information_schema') and n.nspname not like 'pg\_temp%'
+      and (has_function_privilege('quy_hang_app', p.oid, 'EXECUTE')
+           or exists (select from pg_trigger t
+                      where t.tgfoid = p.oid and not t.tgisinternal
+                        and (has_table_privilege('quy_hang_app', t.tgrelid, 'INSERT')
+                             or has_table_privilege('quy_hang_app', t.tgrelid, 'UPDATE')
+                             or has_table_privilege('quy_hang_app', t.tgrelid, 'DELETE'))))
+    order by 1
+  loop
+    k := k + 1;
+    if not exists (select from ham_cho_phep h where h.lich = r.lich) then
+      raise exception 'HỎNG ham-dac-quyen-trong-danh-sach: % (chủ %) — hàm đặc quyền vai gọi được hay trigger gọi tới, không có trong danh sách',
+        r.lich, r.chu;
+    end if;
+    if not exists (select from ham_cho_phep h where h.lich = r.lich and h.chu = r.chu) then
+      raise exception 'HỎNG ham-dac-quyen-trong-danh-sach: % — chủ là %, danh sách ghi khác', r.lich, r.chu;
+    end if;
+    if not exists (select from unnest(coalesce(r.proconfig, '{}')) c where c like 'search\_path=%') then
+      raise exception 'HỎNG ham-dac-quyen-trong-danh-sach: % — không ghim đường tìm', r.lich;
+    end if;
+  end loop;
+  if k <> (select count(*) from ham_cho_phep) then
+    raise exception 'HỎNG ham-dac-quyen-trong-danh-sach: tìm thấy % hàm, danh sách có % — hàm trong danh sách đã mất hay đổi',
+      k, (select count(*) from ham_cho_phep);
+  end if;
+  raise notice 'ok ham-dac-quyen-trong-danh-sach — % hàm', k;
 end $$;

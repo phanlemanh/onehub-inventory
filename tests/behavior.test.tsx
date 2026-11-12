@@ -35,11 +35,13 @@ import {
 } from "../src/components/templates/notify";
 import { clearScreenBanner, getScreenBanner } from "../src/components/templates/screen-banner";
 import type { DisplayKind } from "../src/generated/display";
+import { tallGridViewport } from "./virtual-viewport";
 
 const toastMock = vi.hoisted(() => vi.fn());
 vi.mock("sonner", () => ({ toast: toastMock }));
 
 beforeAll(() => {
+  tallGridViewport();
   // jsdom has no Web Animations; Base UI's scroll area asks for them on a timer.
   Element.prototype.getAnimations ??= () => [];
   globalThis.ResizeObserver ??= class {

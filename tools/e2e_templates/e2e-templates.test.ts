@@ -18,6 +18,9 @@ import {
   pinned,
 } from "./recipes";
 import { REPO_ROOT, SESSION_SCREENS } from "./register";
+import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
+import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings";
+import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { checkRecipes, regionStates } from "./structure";
 
 const STATES_MD = readFileSync(join(REPO_ROOT, "design/states.md"), "utf8");
@@ -103,18 +106,64 @@ describe("danh sách chưa có vùng", () => {
     );
   });
   it("a listed screen without a region is skipped with its reason", () => {
-    const v = classifyGrid("inventory", { hasRegion: false, hasTable: false });
-    expect(v).toEqual({ run: false, skip: `chua co vung du lieu — ${NO_REGION_YET["inventory"]}` });
+    const v = classifyGrid("sent", { hasRegion: false, hasTable: false });
+    expect(v).toEqual({ run: false, skip: `chua co vung du lieu — ${NO_REGION_YET["sent"]}` });
   });
   it("a listed screen that has a region must leave the list", () => {
-    expect(() => classifyGrid("inventory", { hasRegion: true, hasTable: true })).toThrow(
-      "go khoi danh sach: inventory",
+    expect(() => classifyGrid("sent", { hasRegion: true, hasTable: true })).toThrow(
+      "go khoi danh sach: sent",
+    );
+  });
+  // Row 2 (Bảng hàng): the inventory screen built its region, so it left the list and its region suite runs.
+  it("inventory has left the list and its region suite runs", () => {
+    expect(Object.keys(NO_REGION_YET)).toEqual(["sent"]);
+    expect(classifyGrid("inventory", { hasRegion: true, hasTable: true })).toEqual({ run: true });
+  });
+  it("putting inventory back on the list is red", () => {
+    const back = { ...NO_REGION_YET, inventory: "tra lai" };
+    expect(() => classifyGrid("inventory", { hasRegion: true, hasTable: true }, back)).toThrow(
+      "da co vung, go khoi danh sach: inventory",
     );
   });
   it("a table outside the shared region is red", () => {
     expect(() => classifyGrid("sent", { hasRegion: false, hasTable: true })).toThrow(
       "sent: luoi dung ngoai khuon",
     );
+  });
+});
+
+// ---- search on the inventory run (row 2, E5) ----------------------------------------------------------------------
+
+describe("bai tim tren Bang hang cuon lien (hang 2)", () => {
+  // The texts the search recipe reads (text cells: unit, building, project), built by the screen's own row builder.
+  const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
+  const sample = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
+  const rows = inventoryRows({ ...sample, units }).map((r) =>
+    ["Listing.unitNumber", "Listing.buildingName", "Listing.subdivisionName"].map((f) =>
+      String(r[f as keyof typeof r] ?? ""),
+    ),
+  );
+
+  for (const window of [24, 25, 27]) {
+    it(`finds a needle past the first window of ${window} visible rows`, () => {
+      const needle = pickNeedle(rows, window);
+      expect(needle).not.toBeNull();
+      const hits = rows
+        .map((r, i) => (r.some((t) => t.toLocaleLowerCase("vi").includes(needle!)) ? i : -1))
+        .filter((i) => i >= 0);
+      expect(hits.length).toBeGreaterThan(window);
+      expect(hits.length).toBeLessThan(rows.length);
+      expect(hits.some((i) => i >= window)).toBe(true);
+    });
+  }
+
+  it("has no needle with the old hard-coded page of 50 (why the window is read from the screen)", () => {
+    expect(rows).toHaveLength(60);
+    expect(pickNeedle(rows, 50)).toBeNull();
+  });
+
+  it("fails as before on the calibration grid when its rows hold no needle", () => {
+    expect(pickNeedle(rows.slice(0, 20), 25)).toBeNull();
   });
 });
 

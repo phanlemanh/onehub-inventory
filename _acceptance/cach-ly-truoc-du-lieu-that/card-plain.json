@@ -1,0 +1,7 @@
+{
+  "feature_plain": "Trước khi nối dữ liệu thật, bộ kiểm cách ly bắt thêm các đường vòng làm một sàn đọc, sửa hay xoá được dữ liệu của sàn khác — mỗi đường vòng có một ca kiểm tự đỏ khi bị phá.",
+  "decisions": [
+    {"id": "E11", "q": "Hồ sơ đã nói thẳng những gì máy chưa bắt được chưa?", "why": "Hội đồng ba người chấm đề xuất ĐẠT: bốn chỗ máy không đo chắc (câu đổi vai ghép lúc chạy, ứng dụng nối bằng vai chủ, luật viết lại câu, bộ kiểm chưa chạy trên máy kiểm chung) đều được ghi, và không câu nào nói chuyện đổi vai đã đóng hẳn."}
+  ],
+  "scope_plain": "Bốn việc đã cắt khỏi hàng này từ Cổng Phạm vi, không đổi."
+}
