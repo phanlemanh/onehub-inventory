@@ -98,7 +98,7 @@ test.describe("sheet keys", () => {
   test("sheet keys move the selected cell and the grid follows it", async ({ page }) => {
     expect(KEYS).toHaveLength(9);
     await openInventory(page);
-    await (await cellOf(page, 1, "Listing.unitNumber")).click();
+    await (await cellOf(page, 1, "Listing.unitNumber")).click({ position: { x: 3, y: 3 } });
     for (const [key, row, col] of KEYS) {
       await page.keyboard.press(key);
       await page.waitForTimeout(150);
@@ -111,7 +111,7 @@ test.describe("sheet keys", () => {
 
   test("sheet keys: cell out of view fails the check", async ({ page }) => {
     await openInventory(page);
-    await (await cellOf(page, 2, "Listing.unitNumber")).click();
+    await (await cellOf(page, 2, "Listing.unitNumber")).click({ position: { x: 3, y: 3 } });
     await page.keyboard.press("End");
     await page.waitForTimeout(150);
     // Slide row 2 under the sticky header, still mounted: the check must see it covered.
@@ -163,7 +163,7 @@ test.describe("sheet copy", () => {
       await context.grantPermissions(["clipboard-read", "clipboard-write"]);
       await openInventory(page);
       // (a) unit codes and towers of rows 3..5
-      await (await cellOf(page, 3, "Listing.unitNumber")).click();
+      await (await cellOf(page, 3, "Listing.unitNumber")).click({ position: { x: 3, y: 3 } });
       await page.keyboard.press("Shift+ArrowDown");
       await page.keyboard.press("Shift+ArrowDown");
       await page.keyboard.press("Shift+ArrowRight");
@@ -210,7 +210,7 @@ test.describe("sheet copy", () => {
       await page.getByRole("menuitemcheckbox", { name: "Toà" }).click();
       await page.keyboard.press("Escape");
       await expect(page.getByRole("menu")).toBeHidden();
-      await (await cellOf(page, 1, "Listing.unitNumber")).click();
+      await (await cellOf(page, 1, "Listing.unitNumber")).click({ position: { x: 3, y: 3 } });
       await page.keyboard.press("Shift+ArrowRight");
       await page.keyboard.press("Shift+ArrowDown");
       await page.keyboard.press(copyKey);
@@ -546,7 +546,7 @@ test.describe("sheet full screen", () => {
     await expect(page.getByRole("menu")).toBeVisible();
     await checkFullScreen(page);
     await page.keyboard.press("Escape");
-    await (await cellOf(page, 1, "Listing.unitNumber")).click();
+    await (await cellOf(page, 1, "Listing.unitNumber")).click({ position: { x: 3, y: 3 } });
     await page.keyboard.press("Control+End");
     await page.waitForTimeout(200);
     expect((await focused(page))?.row).toBe(60);
@@ -620,7 +620,7 @@ test.describe("sheet footer in view", () => {
     await openInventory(page);
     for (const filters of [false, true]) {
       if (filters) await page.getByRole("button", { name: "Lọc", exact: true }).click();
-      await (await cellOf(page, 3, "Listing.unitNumber")).click();
+      await (await cellOf(page, 3, "Listing.unitNumber")).click({ position: { x: 3, y: 3 } });
       await page.keyboard.press("Shift+ArrowDown");
       await expect(page.locator('[data-slot="region-footer"]')).toContainText("2 ô đã chọn");
       expect(await fitProblem(page), filters ? "filters open" : "default").toBeNull();

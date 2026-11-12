@@ -454,9 +454,8 @@ test.describe("E2 · the unit code opens in one click, the cell selects like a s
     await expect(panel(page)).toHaveAttribute("data-record-id", id!);
   });
 
-  test("closing gives focus to the unit code and the arrows run on from its cell", async ({
-    page,
-  }) => {
+  /** Opens row 5 by its code and closes it: focus is back on the code, its cell is the selected cell. */
+  async function openAndClose(page: Page): Promise<void> {
     await openInventory(page);
     await assertOneClickOpens(page, 5);
     await panel(page).getByRole("button", { name: "Đóng" }).click();
@@ -464,11 +463,67 @@ test.describe("E2 · the unit code opens in one click, the cell selects like a s
     await expect
       .poll(() => gridFocus(page))
       .toMatchObject({ row: "5", col: "Listing.unitNumber", active: "unit-code" });
-    await page.keyboard.press("ArrowDown");
-    await expect.poll(() => gridFocus(page)).toMatchObject({ row: "6", col: "Listing.unitNumber" });
-    await page.keyboard.press("Shift+ArrowDown");
-    await expect(page.locator('[data-slot="region-footer"]')).toContainText("2 ô đã chọn");
-  });
+  }
+
+  /** The three keys on the unit code after closing: the next row, a two-cell range, the code copied. */
+  async function assertKeysRunOn(page: Page, key: "down" | "range" | "copy"): Promise<void> {
+    const footer = page.locator('[data-slot="region-footer"]');
+    if (key === "down") {
+      await page.keyboard.press("ArrowDown");
+      await page.waitForTimeout(300);
+      const f = await gridFocus(page);
+      if (f.row !== "6")
+        throw new Error(`keys stuck on the unit code: ArrowDown left row ${f.row}`);
+    } else if (key === "range") {
+      await page.keyboard.press("Shift+ArrowDown");
+      await page.waitForTimeout(300);
+      if (!((await footer.textContent()) ?? "").includes("2 ô đã chọn")) {
+        throw new Error("keys stuck on the unit code: Shift+ArrowDown selected no range");
+      }
+    } else {
+      await page.evaluate(() => navigator.clipboard.writeText("trống"));
+      await page.keyboard.press("ControlOrMeta+c");
+      await page.waitForTimeout(300);
+      const copied = await page.evaluate(() => navigator.clipboard.readText());
+      const unit = ((await cellAt(page, 5, "Listing.unitNumber").textContent()) ?? "").trim();
+      if (copied !== unit)
+        throw new Error(`keys stuck on the unit code: copied ${JSON.stringify(copied)}`);
+    }
+  }
+
+  /** A break: keys pressed on the unit code never reach the page (as if the code kept them for itself). */
+  async function keepKeysOnCode(page: Page): Promise<void> {
+    await page.evaluate(() => {
+      window.addEventListener(
+        "keydown",
+        (event) => {
+          if ((event.target as Element | null)?.closest?.("[data-record-open]")) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+          }
+        },
+        true,
+      );
+    });
+  }
+
+  for (const key of ["down", "range", "copy"] as const) {
+    test(`closing gives focus to the unit code and keys run on from its cell: ${key}`, async ({
+      page,
+      context,
+    }) => {
+      await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+      await openAndClose(page);
+      await assertKeysRunOn(page, key);
+    });
+
+    test(`break: a unit code that keeps the keys is caught: ${key}`, async ({ page, context }) => {
+      await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+      await openAndClose(page);
+      await keepKeysOnCode(page);
+      await expect(assertKeysRunOn(page, key)).rejects.toThrow("keys stuck on the unit code");
+    });
+  }
 
   test("a range over the unit column copies the unit codes", async ({ page, context }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);

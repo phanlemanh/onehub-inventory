@@ -490,7 +490,13 @@ export function DataRegion({
   const handOverKey = useCallback(
     (id: string, event: KeyboardEvent<HTMLButtonElement>) => {
       const api = selectionApi.current;
-      if (!api || !firstField || !GRID_KEYS.has(event.key)) return;
+      if (!api || !firstField) return;
+      // Copy: focus moves to the grid before the browser fires its copy, so the grid copies its selected cells.
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "c") {
+        api.focusCell(id, firstField);
+        return;
+      }
+      if (!GRID_KEYS.has(event.key)) return;
       event.preventDefault();
       api.focusCell(id, firstField);
       document.activeElement?.dispatchEvent(
@@ -610,19 +616,22 @@ export function DataRegion({
             if (index !== 0 || !opensRecord) return cell;
             const id = row.id;
             return (
-              <Button
-                variant="link"
-                size="sm"
-                data-record-open={id}
-                // The unit code is the row's open door: one click opens it (the grid's two-step press for controls
-                // in a cell does not apply); the rest of the cell selects like a sheet. Keys belong to the grid.
-                data-cell-interactive=""
-                tabIndex={-1}
-                onClick={() => openRef.current?.(id)}
-                onKeyDown={(event) => handOverKeyRef.current(id, event)}
-              >
-                {cell}
-              </Button>
+              // The negative margin keeps the row at the grid's density height: the button is taller than the text.
+              <span className="-my-1 inline-flex">
+                <Button
+                  variant="link"
+                  size="sm"
+                  data-record-open={id}
+                  // The unit code is the row's open door: one click opens it (the grid's two-step press for controls
+                  // in a cell does not apply); the rest of the cell selects like a sheet. Keys belong to the grid.
+                  data-cell-interactive=""
+                  tabIndex={-1}
+                  onClick={() => openRef.current?.(id)}
+                  onKeyDown={(event) => handOverKeyRef.current(id, event)}
+                >
+                  {cell}
+                </Button>
+              </span>
             );
           },
           meta: {
