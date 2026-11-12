@@ -1,20 +1,3 @@
-[     220ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[     257ms] [LOG] [HMR] connected @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[     308ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3570/favicon.ico:1
-[    8268ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[    8284ms] [LOG] [HMR] connected @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   10277ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   10285ms] [LOG] [HMR] connected @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   12235ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   12253ms] [LOG] [HMR] connected @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   14126ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   14134ms] [LOG] [HMR] connected @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   16084ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   16093ms] [LOG] [HMR] connected @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   18038ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   18055ms] [LOG] [HMR] connected @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   20101ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   20109ms] [LOG] [HMR] connected @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   21969ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-[   21984ms] [LOG] [HMR] connected @ http://localhost:3570/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:720
-NOTE: only error = favicon.ico 404 (static asset, note-only). No failed fetch/XHR.
+E10 network (playwright MCP, origin http://localhost:3570)
+console errors: 0 (2 total messages, 0 errors, 0 warnings)
+non-static requests: none listed; 297 static requests not shown (no failures reported)
