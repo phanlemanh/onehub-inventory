@@ -1,0 +1,81 @@
+schema_version: 1
+feature_slug: thu-moi-dia-chi-tu-cau-hinh
+# Ma trận ca viết trước. Mọi ca là bài kiểm đơn vị, chạy trong `make test` (config:executors.test.unit), mỗi ca một `it`
+# mang đúng tên dưới đây:
+#   src/modules/identity/config.test.ts:
+#     ban-that-thieu-cau-hinh (ca có sẵn, mở rộng: năm biến) · dia-chi-goc-sai-khuon · thu-moi-khong-theo-ten-may-chu ·
+#     thu-moi-duong-con · may-dev-theo-cau-hinh · thu-ma-khong-co-duong · env-mau-co-dia-chi-goc
+#   src/modules/identity/invite-mail.test.ts:
+#     thu-moi-dia-chi-cau-hinh-thang-goc-yeu-cau
+# Ma trận «sai khuôn» viết trước (ca dia-chi-goc-sai-khuon, bản thật, 5 giá trị → 5 lần ném lỗi gọi tên APP_URL, và
+# không giá trị nào xuất hiện trong thông điệp):
+#   'app.example.test' (không tuyệt đối) · 'http://app.example.test' (không https) · 'ftp://app.example.test' ·
+#   'https://u:p@app.example.test' (tên/mật khẩu) · 'https://app.example.test/?a=1' và 'https://app.example.test/#h'
+#   (gộp một ô «có ? hay #», hai giá trị) — tổng 6 giá trị, 6 assert ném lỗi + 6 assert thông điệp không chứa giá trị.
+#   Đối chứng dương cùng ca: 'https://app.example.test' và 'https://app.example.test/onehub/' không ném.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    layer: backend-effect
+    paths: [src/modules/identity/config.ts, src/modules/identity/config.test.ts, src/modules/identity/invite-mail.ts, src/modules/identity/runtime.ts]
+    expected: "exit 0; src/modules/identity/config.test.ts ca 'thu-moi-khong-theo-ten-may-chu': readAuthConfig với NODE_ENV=production, đủ năm biến, APP_URL='https://app.example.test' và fetch giả; gọi config.inviteSender với thư mang origin 'https://app.example.test' → fetch được gọi đúng một lần tới https://api.resend.com/emails, thân JSON có text chứa 'https://app.example.test/login' (rút bằng URL parse: có một liên kết với origin 'https://app.example.test' và pathname '/login')"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    layer: backend-effect
+    paths: [src/modules/identity/config.ts, src/modules/identity/config.test.ts, src/modules/identity/invite-mail.ts, src/modules/identity/invite-mail.test.ts]
+    expected: "exit 0; cùng ca 'thu-moi-khong-theo-ten-may-chu', lần gọi thứ hai với origin 'https://ke-gian.test' → TOÀN BỘ thân JSON gửi Resend (chuỗi hoá trọn payload: subject, text, và html hay trường nào khác nếu có) không chứa chuỗi 'ke-gian.test'; đối chứng dương: payload chứa 'https://app.example.test/login'; liên kết đăng nhập duy nhất vẫn là https://app.example.test/login. Đối chứng hai chiều trên CÙNG thư: inviteEmail dựng KHÔNG có địa chỉ cấu hình thì thân chứa 'ke-gian.test' (chứng phép so bắt được). invite-mail.test.ts ca 'thu-moi-dia-chi-cau-hinh-thang-goc-yeu-cau': resendInviteSender có appUrl 'https://app.example.test' gửi thư origin 'https://ke-gian.test' → payload gửi Resend (chuỗi hoá trọn) chứa https://app.example.test/login, không chứa 'ke-gian.test'. Chiều đỏ: bộ gửi dùng mail.origin thì ca in 'thu-moi-khong-theo-ten-may-chu: thư theo tên máy chủ của yêu cầu'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/identity/config.ts, src/modules/identity/config.test.ts, src/instrumentation.ts]
+    expected: "exit 0; config.test.ts ca 'ban-that-thieu-cau-hinh': PRODUCTION_VARS bằng đúng ['DATABASE_URL','AUTH_SECRET','RESEND_API_KEY','MAIL_FROM','APP_URL']; với từng biến để trống thì assertProductionConfig và readAuthConfig ném AuthConfigError có tên biến; ca 'the server start refuses production without its configuration': register() của src/instrumentation.ts với NODE_ENV=production, NEXT_RUNTIME=nodejs, đủ năm biến thì xong (đối chứng dương), thiếu APP_URL thì reject với thông điệp chứa 'APP_URL'. Chiều đỏ: bỏ APP_URL khỏi danh sách thì assert danh sách đỏ và register() resolve khi thiếu APP_URL"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/identity/config.ts, src/modules/identity/config.test.ts, src/instrumentation.ts]
+    expected: "exit 0; config.test.ts ca 'dia-chi-goc-sai-khuon' đi ma trận 6 giá trị viết trước ở đầu tệp này: mỗi giá trị làm assertProductionConfig ném AuthConfigError có 'APP_URL' trong message (đối chứng dương), và cả message lẫn String(cause) (nếu có cause) đều không chứa giá trị đã khai, không chứa phần sau '://' của giá trị, không chứa 'u:p' (6 × 3 assert). Giá trị 'http://app.example.test' ở phía ném hay phía nhận theo câu trả lời Hỏi của sổ (dòng https/http): ma trận viết trước theo khuyến nghị «chỉ https»; chủ kho chọn «nhận cả http» thì giá trị ấy chuyển sang đối chứng dương và register() reject bằng 'ftp://app.example.test' thay; register() reject với giá trị 'http://app.example.test' (theo câu trả lời như trên). Đối chứng dương cùng ca: 'https://app.example.test' và 'https://app.example.test/onehub/' không ném. Ca 'thu-moi-duong-con': APP_URL='https://app.example.test/onehub/' thì thư mời chứa liên kết pathname '/onehub/login'. Chiều đỏ: kiểm khuôn chỉ xét có mặt thì ca in 'dia-chi-goc-sai-khuon: <giá trị> được nhận'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/identity/config.ts, src/modules/identity/config.test.ts, src/modules/identity/invite-mail.ts]
+    expected: "exit 0; config.test.ts ca 'may-dev-theo-cau-hinh': NODE_ENV=development, LOGIN_CODE_OUTBOX trỏ tệp tạm; không khai APP_URL → thư mời origin 'http://127.0.0.1:3485' ghi vào tệp có liên kết http://127.0.0.1:3485/login; khai APP_URL='http://127.0.0.1:3470' → cùng thư có liên kết http://127.0.0.1:3470/login và không chứa '3485'. Hai lần đọc từ dòng JSON bộ gửi máy phát triển thật ghi, không dựng tay"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/identity/sender.ts, src/modules/identity/config.test.ts]
+    expected: "exit 0; config.test.ts ca 'thu-ma-khong-co-duong': config.sender của bản thật (fetch giả) gửi mã '123456' → TOÀN BỘ payload gửi Resend trừ trường 'from' (chuỗi hoá trọn: subject, text, html nếu có) không khớp /https?:\\/\\//; đối chứng dương cùng ca: payload chứa '123456' (thư thật đã được dựng, không phải chuỗi rỗng). Chiều đỏ: thêm một liên kết vào thư mã thì ca in 'thu-ma-khong-co-duong: thư mã có đường'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [.env.example, src/modules/identity/config.test.ts]
+    expected: "exit 0; config.test.ts ca 'env-mau-co-dia-chi-goc': đọc .env.example ở gốc kho (đường suy từ vị trí tệp kiểm), có dòng khớp /^#?\\s*APP_URL=https:\\/\\/example\\.test\\s*$/m và một dòng khớp /^#.*APP_URL.*bắt buộc ở bản thật/m; mọi địa chỉ khớp /https?:\\/\\/[^\\s>]+/ trong tệp có tên máy kết thúc '.test' hoặc là resend.com hay dd.reso.org. Chiều đỏ: xoá dòng APP_URL thì ca in 'env-mau-co-dia-chi-goc: thiếu APP_URL'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-2
+    executor: judgment
+    inputs: [src/modules/identity/invite-mail.ts, src/modules/identity/config.ts, src/modules/identity/runtime.ts, src/modules/identity/members.ts]
+    question: "Trong bốn tệp này, ở bản thật (NODE_ENV=production): (a) bộ xử lý mời người mà runtime.ts dựng có nhận đúng bộ gửi thư mời do readAuthConfig dựng (không tự dựng bộ gửi khác) không; (b) members.ts có gửi thư mời qua đúng bộ gửi trong deps không; (c) có đường nào để đường đăng nhập trong thư mời lấy từ trường origin của thư thay vì từ APP_URL không? Trả lời từng câu, trỏ hàm."
+    expected: "(a) có, (b) có, (c) không: bộ gửi Resend do readAuthConfig dựng ở bản thật luôn mang địa chỉ cấu hình, runtime.ts nối nó vào deps.invite, members.ts gọi deps.invite, và hàm dựng thân thư dùng địa chỉ cấu hình khi có."
+    evidence_required: [run_id, verdict, rationale]

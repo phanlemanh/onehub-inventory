@@ -2,12 +2,11 @@
 loai: chu-de
 ma: [F1, F2, F3, F4, F5]
 nguon: [raw/2026-11-11-so-boi-canh-quy-hang/chi-muc.md]
-cap_nhat: 2026-11-11
+cap_nhat: 2026-11-12
 ---
 # App Shell
 
-Quy ước nguồn như [trang Sản phẩm](../nen/san-pham.md): `qh:` là Quỹ hàng ở commit `1729b11f`. Đường mở đầu
-`nhánh chore/nen-chon-truoc-tao-sau:` chưa gộp vào `main`, số dòng có thể đổi.
+Quy ước nguồn như [trang Sản phẩm](../nen/san-pham.md): `qh:` là Quỹ hàng ở commit `1729b11f`.
 
 ## Vì sao có
 
@@ -15,7 +14,7 @@ Quy ước nguồn như [trang Sản phẩm](../nen/san-pham.md): `qh:` là Qu�
 - Mỗi nhà trả lời một câu: Hôm nay — giờ làm gì? Bảng hàng — có hàng gì? Cài đặt — luật nào?
   `qh:docs/product/tham-chieu.md:221`
 - Kho này từng ghép App Shell tay khi kho còn rỗng, chưa bày ứng viên ReUI.
-  `nhánh chore/nen-chon-truoc-tao-sau:wiki/decisions/0023-chon-truoc-tao-sau.md:42-45`
+  `wiki/decisions/0023-chon-truoc-tao-sau.md:42-45`
 
 ## Ai dùng và làm việc gì
 
@@ -46,14 +45,17 @@ Quy ước nguồn như [trang Sản phẩm](../nen/san-pham.md): `qh:` là Qu�
 - Ngăn thông báo trên điện thoại trượt từ phải, trái luật kéo từ đáy. `qh:_acceptance/vo-ung-dung/review-findings.md:21-26`
 - App Shell coi lỗi 500 khi đọc phiên là chưa đăng nhập, gây sự cố bản thật 06/11. `qh:_acceptance/va-pool-ket-noi/contract.md:20-22`
 - Chọn khối theo từng màn nên cùng nhu cầu ra nhiều lời giải (Bảng hàng và Liên hệ lệch 43 chỗ).
-  `nhánh chore/nen-chon-truoc-tao-sau:wiki/decisions/0023-chon-truoc-tao-sau.md:36-40`
+  `wiki/decisions/0023-chon-truoc-tao-sau.md:36-40`
 
 ## MVP này giữ gì, bỏ gì
 
 - Giữ F1–F5: App Shell đầy đủ (mục đang chọn, tiêu đề tab, nút chính, điều hướng theo vai, thanh bên thu gọn trên điện
   thoại), trạng thái toàn trang, bộ định dạng, luật kênh thông báo, sáng và tối. `docs/plan/pham-vi-mvp-dot-1.md:12-16`
-- Bỏ thanh tab dưới trên điện thoại và đổi sàn trong ứng dụng (L12). `docs/design-standard-proposal.md:91` ·
+- Bỏ thanh tab dưới trên điện thoại; điện thoại dùng thanh bên thu gọn. `docs/design-standard-proposal.md:91`
+- **Đổi sàn trong ứng dụng đã có**, dù bản phạm vi ghi L12 là cắt: menu tài khoản có «Đổi sàn» (hàng 8), và tên sàn ở đầu
+  thanh trên đổi sàn bằng đúng lối ấy (hàng 1o). Bài học Quỹ hàng ở mục «Lỗi đã gặp» vì thế vẫn áp dụng.
+  `docs/superpowers/specs/2026-11-11-dang-nhap-ma-email-design.md:21` · `_acceptance/app-shell-chon-tu-reui/contract.md:44-49` ·
   `docs/plan/pham-vi-mvp-dot-1.md:73`
 - Chủ kho chốt 11/11: dùng `app-shell-8`, giữ cả hai cột; phần còn lại quyết trên bản bấm được ở hàng 1o.
-  `nhánh chore/nen-chon-truoc-tao-sau:wiki/decisions/0023-chon-truoc-tao-sau.md:93-94`
+  `wiki/decisions/0023-chon-truoc-tao-sau.md:93-94`
 - Kích thước 264/56 px của bộ thiết kế đã khớp `app-shell-8` chưa: chưa xác nhận. `docs/design-standard-proposal.md:134`

@@ -1,8 +1,8 @@
 ---
 loai: nen
 ma: []
-nguon: [raw/2026-11-11-so-boi-canh-quy-hang/chi-muc.md]
-cap_nhat: 2026-11-11
+nguon: [raw/2026-11-11-so-boi-canh-quy-hang/chi-muc.md, raw/2026-11-12-so-boi-canh-quy-hang-2/chi-muc.md]
+cap_nhat: 2026-11-12
 ---
 # Mục lục sổ bối cảnh: hàng nào đọc trang nào
 
@@ -23,14 +23,22 @@ Mọi hàng đọc [Sản phẩm](san-pham.md) trước.
 | 1n | Thang chọn khối vào cổng | [App Shell](../chu-de/app-shell.md) |
 | 1o | App Shell chọn từ ReUI | [App Shell](../chu-de/app-shell.md) |
 | 1p | Đăng nhập chọn từ ReUI | [Đăng nhập](../chu-de/dang-nhap.md) |
+| 1q | Cổng bắt khối không kê | [Sản phẩm](san-pham.md) (chưa có trang riêng) |
+| 1r | Bộ kiểm chung khi đăng nhập | [Bài kiểm trình duyệt](../chu-de/bai-kiem-trinh-duyet.md), [Đăng nhập](../chu-de/dang-nhap.md) |
 | 2 | Bảng hàng bản đọc | [Bảng hàng](../chu-de/bang-hang.md) |
+| 2a | Bảng hàng dùng tay như Sheet | [Bảng hàng](../chu-de/bang-hang.md), [Sửa trên ô và dán từ Excel](../chu-de/sua-tren-o-va-dan-excel.md) |
+| 2b | Thẻ căn trên điện thoại | [Bảng hàng](../chu-de/bang-hang.md), [Hồ sơ căn](../chu-de/ho-so-can.md) |
 | 3 | Hồ sơ căn | [Hồ sơ căn](../chu-de/ho-so-can.md), [Bảng hàng](../chu-de/bang-hang.md) |
 | 4, 5 | Sửa trên ô, dán từ Excel | [Sửa trên ô và dán từ Excel](../chu-de/sua-tren-o-va-dan-excel.md) |
 | 6 | Đã gửi trên Lưới | [Đã gửi và trang khách](../chu-de/da-gui-va-trang-khach.md), [Bảng hàng](../chu-de/bang-hang.md) |
-| 7 | Cách ly mỗi sàn | [Người dùng và vai](../chu-de/nguoi-dung-va-vai.md) |
-| 8 | Đăng nhập mã email | [Đăng nhập](../chu-de/dang-nhap.md) |
-| 9, 9a, 9b | Mời người, bảng quyền, kiểm vai | [Người dùng và vai](../chu-de/nguoi-dung-va-vai.md) |
+| 7 | Cách ly mỗi sàn | [Quyền và cách ly](../chu-de/quyen-va-cach-ly.md), [Thoả thuận kết nối](../chu-de/thoa-thuan-ket-noi.md) |
+| 7a | Cách ly trước dữ liệu thật | [Quyền và cách ly](../chu-de/quyen-va-cach-ly.md), [Bài kiểm trình duyệt](../chu-de/bai-kiem-trinh-duyet.md) |
+| 8 | Đăng nhập mã email | [Đăng nhập](../chu-de/dang-nhap.md), [Thư và bản thật](../chu-de/thu-va-moi-truong-that.md) |
+| 9 | Mời người, gán vai | [Người dùng và vai](../chu-de/nguoi-dung-va-vai.md), [Thư và bản thật](../chu-de/thu-va-moi-truong-that.md) |
+| 9a | Bảng quyền theo vai | [Quyền và cách ly](../chu-de/quyen-va-cach-ly.md), [Người dùng và vai](../chu-de/nguoi-dung-va-vai.md) |
+| 9b | Kiểm vai theo màn | [Bài kiểm trình duyệt](../chu-de/bai-kiem-trinh-duyet.md), [Người dùng và vai](../chu-de/nguoi-dung-va-vai.md) |
 | 9c | Thành viên chọn từ ReUI | [Người dùng và vai](../chu-de/nguoi-dung-va-vai.md), [Bảng hàng](../chu-de/bang-hang.md) |
+| 9d | Thư mời lấy địa chỉ từ cấu hình | [Thư và bản thật](../chu-de/thu-va-moi-truong-that.md) |
 | 10 | Bảng hàng dữ liệu thật | [Bảng hàng](../chu-de/bang-hang.md), [Sửa trên ô và dán từ Excel](../chu-de/sua-tren-o-va-dan-excel.md) |
 | 11 | Nhập Excel | [Nhập Excel](../chu-de/nhap-excel.md) |
 | 12 | Thêm căn | [Nhập Excel](../chu-de/nhap-excel.md), [Hồ sơ căn](../chu-de/ho-so-can.md) |
@@ -47,8 +55,8 @@ Mọi hàng đọc [Sản phẩm](san-pham.md) trước.
 | 20 | Số đo đợt bỏ Sheet | [Sản phẩm](san-pham.md) |
 | 21 | Chuyển dữ liệu | [Liên hệ](../chu-de/lien-he.md), [Sản phẩm](san-pham.md) |
 
-Hàng công cụ (1c, 1d, 1f, 1g, 1h, 1k, 1l) chỉ cần trang Sản phẩm. Hàng 1i, 1n, 1o, 1p, 9c lấy từ
-`docs/plan/lo-trinh.json` của nhánh `chore/nen-chon-truoc-tao-sau`, chưa gộp vào `main`.
+Hàng công cụ 1c, 1d, 1g, 1h, 1k, 1l chỉ cần trang Sản phẩm; hàng 1f đọc thêm [Bài kiểm trình duyệt](../chu-de/bai-kiem-trinh-duyet.md). Hàng 1q, 1r, 2a, 2b, 7a, 9d lấy
+từ `docs/plan/lo-trinh.json` của nhánh `chore/nen-lo-trinh-lop-sheet-va-no`, chưa gộp vào `main`.
 
 Mỗi trang ghi «chưa xác nhận» ở chỗ không tìm được nguồn; các chỗ ấy là câu hỏi cho chủ kho ở Cổng Phạm vi, không phải
 điều đã đúng.
