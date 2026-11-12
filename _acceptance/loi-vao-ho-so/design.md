@@ -42,10 +42,14 @@ thanh trên, ô của hàng 12 trong hộp thêm căn) và không dùng chung ph
 - Địa chỉ trang riêng `/inventory/units/<mã căn>?toa=<toà>&ho-so=<id lần chào>`; mọi lối vào đều về đây.
 - Tìm căn theo mã: bỏ khoảng trắng hai đầu, không phân biệt hoa thường, chỉ trong các dòng Bảng hàng người ấy thấy (cùng
   nguồn với Bảng hàng — không mở đường đọc dữ liệu mới, không chạm SP-1).
+- `ho-so` còn trong Bảng hàng → id thắng mã và toà: mở đúng lần chào ấy, viết lại địa chỉ theo mã, toà hiện tại (đường dẫn
+  đã gửi không hỏng khi căn đổi mã hay toà đổi tên).
 - `toa` vắng và mã có ở một toà → mở luôn; ở nhiều toà → «Nhiều căn — chọn toà»; `toa` không khớp toà nào có mã ấy → xử như
   `toa` vắng.
-- `ho-so` vắng hoặc không thuộc căn → lần chào đầu tiên của căn theo thứ tự Bảng hàng.
-- Trang riêng là trang nội bộ trong App Shell, cần đăng nhập như Bảng hàng; không phải trang khách (không chạm SP-4).
+- `ho-so` vắng → lần chào hiện tại của căn theo thứ tự Bảng hàng; `ho-so` không còn trong Bảng hàng → như vậy kèm một dòng
+  báo (Hỏi-4).
+- Trang riêng là trang nội bộ trong App Shell, đi qua đúng cửa của Bảng hàng (hôm nay dữ liệu mẫu, chưa bắt đăng nhập; khi
+  Bảng hàng đọc dữ liệu thật theo sàn thì trang theo cùng cửa); không phải trang khách (không chạm SP-4).
 - Chép đường dẫn bằng bộ nhớ chép của trình duyệt, không mở ứng dụng gửi nào (SP-3: người tự dán và tự bấm gửi).
 - Dữ liệu mẫu (60 lần chào) không có mã nào ở hai toà và không căn nào có hai lần chào; ca «Nhiều căn» đo bằng bài kiểm trên
   dòng dựng tay và bằng bản mẫu, chưa thấy được trên Bảng hàng thật tới khi có dữ liệu thật (hàng 10). Đổi bộ mẫu không
@@ -80,6 +84,7 @@ thanh trên, ô của hàng 12 trong hộp thêm căn) và không dùng chung ph
 | ST-unit-nhieu | Trang riêng | «Nhiều căn — chọn toà»; «Mã «0905» có ở 2 toà. Bạn chọn toà để mở đúng hồ sơ.»; một nút cho mỗi toà | Bấm một toà |
 | ST-unit-khong | Trang riêng | «Không có căn này trong Bảng hàng»; câu vì sao kèm mã đã gõ; nút «Về Bảng hàng» | Về Bảng hàng |
 | ST-unit-khong-quyen | Trang riêng | Trạng thái trang «không đủ quyền» của kho (vai không có Bảng hàng) | Về trang đầu |
+| ST-unit-lan-chao-cu | Trang riêng | Thân hồ sơ lần chào hiện tại, trên đầu một dòng báo «Lần chào trong đường dẫn không còn trong Bảng hàng — đang hiện lần chào hiện tại của căn.» | Đọc, chép đường dẫn mới |
 | ST-unit-da-chep | Trang riêng | Báo «Đã chép đường dẫn» | Dán vào nơi gửi |
 | ST-unit-chep-loi | Trang riêng | Báo «Chưa chép được. Bạn chép đường dẫn trong ô địa chỉ của trình duyệt.» | Chép tay |
 | ST-jump-mo | Hộp gõ mã | Tên hộp, câu hướng dẫn, ô gõ có tiêu điểm, nút «Mở» | Gõ, Enter |

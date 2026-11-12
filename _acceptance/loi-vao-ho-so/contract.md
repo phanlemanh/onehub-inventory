@@ -33,13 +33,16 @@ Quỹ hàng ↔ Inventory» mục 4, 5, 6, 40.
   `/inventory/units/<mã căn>?toa=<toà>&ho-so=<id lần chào>`; nút lùi của trình duyệt đưa về Bảng hàng với hồ sơ ấy đang mở.
 - AC-2: Given trang riêng của một căn có trong Bảng hàng, When trang mở, Then thân trang là chính thân hồ sơ của hàng 3
   (thẻ căn rồi tám trường, cùng giá trị như hồ sơ cạnh bảng của căn ấy), đầu trang là «<mã căn> · <toà>» kèm nút «Chép đường
-  dẫn», và có lối «Bảng hàng» quay về Bảng hàng.
+  dẫn», và có lối «Bảng hàng» quay về Bảng hàng; trang đọc các dòng qua cùng một nguồn với Bảng hàng, nên một căn có trong
+  danh mục mà không có lần chào nào trong Bảng hàng thì là «không có căn» (AC-5).
 - AC-3: Given trang riêng, When bấm «Chép đường dẫn», Then bộ nhớ chép giữ đúng địa chỉ đầy đủ của trang (có `toa` và
   `ho-so`) và có báo «Đã chép đường dẫn»; When trình duyệt không cho chép, Then báo «Chưa chép được. Bạn chép đường dẫn trong
   ô địa chỉ của trình duyệt.» và không báo đã chép.
 - AC-4: Given đường dẫn chép từ trang riêng, When một người cùng sàn mở nó trong một phiên trình duyệt khác, Then thấy đúng
-  căn và đúng lần chào ấy; When `ho-so` vắng hoặc không thuộc căn ấy, Then trang mở lần chào đầu tiên của căn theo thứ tự
-  Bảng hàng.
+  căn và đúng lần chào ấy; When id lần chào (`ho-so`) còn trong Bảng hàng mà mã hay toà trên địa chỉ đã khác, Then vẫn mở
+  đúng lần chào ấy và địa chỉ được viết lại theo mã, toà hiện tại; When `ho-so` vắng, Then mở lần chào hiện tại của căn
+  theo thứ tự Bảng hàng; When `ho-so` không còn trong Bảng hàng, Then mở lần chào hiện tại của căn kèm dòng báo «Lần chào
+  trong đường dẫn không còn trong Bảng hàng — đang hiện lần chào hiện tại của căn.» (Hỏi-4).
 - AC-5: Given một mã căn không có ở toà nào trong Bảng hàng người ấy thấy, When mở trang riêng của
   mã ấy, Then thấy «Không có căn này trong Bảng hàng», câu vì sao nêu lại mã đã gõ, và nút «Về Bảng hàng»; không thân hồ
   sơ nào hiện.
@@ -88,7 +91,9 @@ trên dòng dựng tay trong bài kiểm.
 - Không «Trước», «Sau» trên trang riêng; không ghim hồ sơ thành cột (hàng 3a).
 - Không mở bảng chia sẻ của thiết bị hay gửi qua Zalo: chỉ chép đường dẫn (SP-3).
 - Không gợi ý mã khi đang gõ, không nhảy theo tên màn trong hộp gõ mã (Quỹ hàng có; thanh bên đã có lối tới các màn).
-- Không đường dẫn cho người ngoài sàn: người không đăng nhập hay khác sàn không xem được trang này; trang khách là luồng Gửi.
+- Không tự làm cửa đăng nhập hay chặn sàn riêng cho trang này: trang đi qua đúng cửa của Bảng hàng. Hôm nay Bảng hàng còn
+  chạy trên dữ liệu mẫu của một sàn và chưa bắt đăng nhập, nên trang riêng cũng vậy; khi Bảng hàng đọc dữ liệu thật qua cửa
+  theo sàn (hàng 10) thì trang này theo cùng cửa. Đường dẫn không dành cho khách; trang khách là luồng Gửi.
 
 ## Notes
 

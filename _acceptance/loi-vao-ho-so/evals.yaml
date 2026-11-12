@@ -14,7 +14,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/loi-vao-ho-so.test.tsx]
-    expected: "exit 0; trong tests/loi-vao-ho-so.test.tsx, với MỌI dòng Bảng hàng dựng từ dữ liệu mẫu bằng inventoryRows, thân trang riêng của mã và toà của dòng ấy là ListingRecordBody với cùng listingView như hồ sơ cạnh bảng (so mã căn, giá, trạng thái và tám trường từ chính dòng); đầu trang là '<mã> · <toà>', có nút 'Chép đường dẫn' và liên kết 'Bảng hàng' tới /inventory; ca đối chứng dựng thân từ dòng kế bên cho 'unit page shows another listing', ca đối chứng bỏ liên kết quay về cho 'no way back to inventory'"
+    expected: "exit 0; trong tests/loi-vao-ho-so.test.tsx, trang riêng và Bảng hàng lấy dòng từ CÙNG một hàm nạp dòng (bài so tham chiếu hàm được gọi, ca đối chứng cho trang dựng dòng riêng cho 'unit page reads its own rows'); một căn có trong danh mục mẫu mà không có lần chào thì phép tìm trả 'khong'; với MỌI dòng Bảng hàng dựng từ dữ liệu mẫu bằng inventoryRows, thân trang riêng của mã và toà của dòng ấy là ListingRecordBody với cùng listingView như hồ sơ cạnh bảng (so mã căn, giá, trạng thái và tám trường từ chính dòng); đầu trang là '<mã> · <toà>', có nút 'Chép đường dẫn' và liên kết 'Bảng hàng' tới /inventory; ca đối chứng dựng thân từ dòng kế bên cho 'unit page shows another listing', ca đối chứng bỏ liên kết quay về cho 'no way back to inventory'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3
@@ -29,8 +29,8 @@ evals:
     criterion: AC-4
     executor: script
     cmd: config:executors.script.e2e
-    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts]
-    expected: "exit 0; chép đường dẫn ở một ngữ cảnh trình duyệt rồi mở nó ở một browser.newContext() mới: data-listing-id của thân bằng id đã chép và mã căn bằng mã đã chép; cùng mã và toà mà ho-so=khong-co hoặc không có ho-so thì data-listing-id là id lần chào đầu của căn theo thứ tự inventoryRows (bài in id mong đợi); ca đối chứng đọc lần chào theo chỉ số thay vì id cho 'link opened the wrong listing'"
+    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts, tests/loi-vao-ho-so.test.tsx]
+    expected: "exit 0; chép đường dẫn ở một ngữ cảnh trình duyệt rồi mở nó ở một browser.newContext() mới: data-listing-id của thân bằng id đã chép và mã căn bằng mã đã chép; mở /inventory/units/MA-CU?toa=TOA-CU&ho-so=<id của dòng thứ năm> thì thân mang id ấy và page.url() được viết lại thành mã, toà của dòng thứ năm; cùng mã và toà mà không có ho-so thì data-listing-id là id lần chào đầu của căn theo thứ tự inventoryRows (bài in id mong đợi) và không có dòng báo; ho-so=khong-co thì cùng lần chào ấy kèm dòng báo 'Lần chào trong đường dẫn không còn trong Bảng hàng — đang hiện lần chào hiện tại của căn.'; ca đối chứng dương: ho-so hợp lệ thì không có dòng báo; ca đối chứng đọc lần chào theo chỉ số thay vì id cho 'link opened the wrong listing', ca đối chứng bỏ dòng báo cho 'stale listing shown without notice'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E5
@@ -76,5 +76,6 @@ evals:
       - "Same page at 1440x900 dark, 1024x768 light and dark, 414x896 light and dark, 360x780 light and dark → evidence/trang-<width>-<sang|toi>.png"
       - "At 1440x900 and 360x780, light and dark: open {url}/inventory/units/Z-99.99 → evidence/khong-<width>-<sang|toi>.png"
       - "At 1440x900 and 360x780, light and dark: on {url}/inventory press Control+K → evidence/go-ma-<width>-<sang|toi>.png"
-    expected: "Trang riêng: thân hồ sơ giống hồ sơ cạnh bảng của cùng căn, tên «<mã> · <toà>» và nút «Chép đường dẫn» ở đầu, lối «Bảng hàng» thấy được; trang mã lạ nói rõ không có căn và có nút «Về Bảng hàng»; hộp gõ mã có ô gõ thấy rõ, không bị bàn phím hay mép màn che ở 360; không chữ đè nhau, không cuộn ngang, chữ đọc được ở cả sáng và tối"
+      - "At 1440x900 light and 360x780 dark, on a unit page: click «Chép đường dẫn» (grant clipboard permission) → evidence/da-chep-<width>.png; open {url}/inventory/units/<code>?ho-so=khong-co → evidence/lan-chao-cu-<width>.png"
+    expected: "Trang riêng: thân hồ sơ giống hồ sơ cạnh bảng của cùng căn, tên «<mã> · <toà>» và nút «Chép đường dẫn» ở đầu, lối «Bảng hàng» thấy được; báo «Đã chép đường dẫn» thấy rõ; dòng báo lần chào cũ đọc được và không che thân hồ sơ; trang mã lạ nói rõ không có căn và có nút «Về Bảng hàng»; hộp gõ mã có ô gõ thấy rõ, không bị bàn phím hay mép màn che ở 360; không chữ đè nhau, không cuộn ngang, chữ đọc được ở cả sáng và tối"
     evidence_required: [run_id, screenshot, observed]
