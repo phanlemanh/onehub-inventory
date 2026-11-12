@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: [proto]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-11T14:19:02Z
 design_doc: _acceptance/app-shell-chon-tu-reui/design.md
@@ -119,3 +119,19 @@ còn lại. Dòng màn sửa sau Cổng Phạm vi, xem sổ quyết định.
   - Ngoài-5: Bài kiểm chưa bắt được hai biểu tượng màn bị tráo tên cho nhau.
   - Ngoài-6: Bài kiểm có thể không phát hiện nếu ô gõ mã căn vô tình xuất hiện trên thanh trên.
   - Ngoài-7: Bài kiểm đơn vị không bắt được nếu tiêu đề nhóm ở cột thứ hai biến mất.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-12 (ký lại sau lượt chấm lại; thay danh sách trên):
+  - Ngoài-1: Ở cột thứ hai, hai trạng thái «Đã đóng» và «Tạm giữ» có thể nằm khác thứ tự so với màn Bảng hàng. Đủ trạng thái và bấm vào vẫn đúng.
+  - Ngoài-2: Người dùng không thấy khác gì: cột thứ hai vẫn nhớ đang mở hay gập. Chỉ là tên lưu trong trình duyệt đặt chưa đúng quy ước tiếng Anh của đội.
+  - Ngoài-3: Người dùng không bị ảnh hưởng. Chỉ có một tệp kiểm thử đặt tên chưa theo quy ước tiếng Anh của đội.
+  - Ngoài-4: Nếu mất mạng hoặc phiên hết hạn đúng lúc đổi sàn, nút đổi sàn có thể bị khoá và không báo gì. Người dùng phải tải lại trang mới dùng lại được.
+  - Ngoài-5: Nếu bấm đăng xuất đúng lúc đang đổi sàn, việc đổi sàn có thể chạy dở rồi trang làm mới sau khi đã thoát. Người dùng chỉ thấy màn đăng nhập hoặc phải thử lại.
+  - Ngoài-6: Nếu một ô gõ mã căn vô tình hiện lên thanh trên, bài kiểm tự động có thể không báo. Người dùng sẽ thấy một ô chưa có chức năng.
+  - Ngoài-7: Bài kiểm chỉ xác nhận cột thứ hai có hiện, chưa xác nhận tên cột đúng với màn đang mở. Nếu tên cột sai, người dùng thấy tiêu đề lạc màn.
+  - Ngoài-8: Người dùng không thấy khác gì. Chỉ là cách mở ngăn trượt trên điện thoại trong bài kiểm có hai bản giống nhau, nên sau này sửa một bên mà quên bên kia thì bài kiểm có thể báo sai.
+  - Ngoài-9: The grading record may stop one commit early, so the last small fixes to the phone menu might not be reviewed in the next round. Staff using the app see no difference.
+  - Ngoài-10: The automatic check before taking the phone-menu picture could pass even when the menu is not open, so a wrong picture could slip through again. Staff using the app are not affected directly.
+  - Ngoài-11: Danh sách trạng thái hàng ở cột thứ hai có thể xếp khác thứ tự so với màn Bảng hàng. Nhân viên thấy hai thứ tự khác nhau, nhưng mọi trạng thái vẫn đủ và bấm vẫn đúng.
+  - Ngoài-12: Nếu mất mạng hoặc phiên hết hạn đúng lúc đổi sàn, nút đổi sàn có thể bị khoá và không báo lỗi gì. Người dùng phải tải lại trang mới đổi được.
+  - Ngoài-13: Bài kiểm chưa bắt được trường hợp hai biểu tượng bị tráo tên cho nhau. Người dùng chỉ gặp điều này nếu sau này ai đó vô tình đảo nhãn.
+  - Ngoài-14: Bài kiểm có thể không phát hiện nếu ô gõ mã căn vô tình xuất hiện trên thanh trên khi chưa có hồ sơ căn. Hiện tại ô này không được làm nên người dùng không bị ảnh hưởng.
+  - Ngoài-15: Nếu tiêu đề nhóm ở cột thứ hai biến mất, bài kiểm vẫn xanh. Người dùng chỉ mất một dòng chữ phân nhóm, các lối tắt vẫn dùng được.

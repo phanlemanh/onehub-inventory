@@ -1,13 +1,13 @@
 ---
 schema_version: 2
 feature_slug: app-shell-chon-tu-reui
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 31e8e4e7f7dc201079cb33fbd4fa079aa76f8a58
-human_signoff:
+human_signoff: Manh Phan 2026-11-12
 ---
 
 # Evidence Report: app-shell-chon-tu-reui
@@ -115,7 +115,7 @@ Round 5. Mọi eval máy đều xanh; còn một mục judgment (E8) chờ ngư�
   run_id: minted-app-shell-chon-tu-reui-E10-r4
   exit_code: 0
   baseline: n-a
-  verifier: ui-check
+  verifier: config:capture.ui
   verified_at: 2026-11-11T23:48:10Z
   carried_from_round: 4
   # carry-forward tu round 4 — delta khong cham paths cua eval
@@ -139,7 +139,7 @@ Round 5. Mọi eval máy đều xanh; còn một mục judgment (E8) chờ ngư�
     - Sửa lý do của dòng «Chuông và ngăn thông báo» và dòng «Thẻ chân cột thứ hai» cùng tệp trên để trỏ vào việc của nhân viên sàn, thay cho «dữ liệu mẫu» và «không phục vụ việc». Đọc lại hai dòng này thì kết quả đổi.
     - Chủ kho hoặc người giữ hợp đồng xác nhận trong hợp đồng AC-8 rằng lý do kiểu «kho đã có lời giải» (theo thang quyết định 0023, wiki/decisions/0023-chon-truoc-tao-sau.md) được tính là trỏ vào việc của người dùng. Hoặc sửa hai dòng «Đổi sáng tối» và «Menu người dùng» trong design.md để nêu việc người dùng, ví dụ «nhân viên đổi sáng tối/đăng xuất/đổi sàn ở một chỗ quen».
     - Dòng «Thẻ chân cột thứ hai» trong design.md nêu rõ cả thẻ inner-sidebar-security (hoặc ghi chú rằng nó thuộc nhóm «…»). Khi đó vùng nguồn liệt kê đủ cả 20 tệp.
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-12 — Đạt
 
 ### Lệnh suite (hồi quy)
 
