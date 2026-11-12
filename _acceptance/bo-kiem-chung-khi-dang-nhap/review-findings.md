@@ -1,57 +1,46 @@
-# Review findings: bo-kiem-chung-khi-dang-nhap (round 2)
+# Review findings: bo-kiem-chung-khi-dang-nhap (round 3)
 
 ## Trong hợp đồng
 
-(không có)
+Không có finding nào.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Every `make e2e` run now leaves a full Next build folder under node_modules/.cache/onehub-e2e/<pid>, and nothing ever removes it**
-  Người dùng thấy gì: Mỗi lần chạy kiểm trình duyệt để lại một thư mục tạm lớn trên máy người làm, nên ổ đĩa đầy dần. Người dùng sản phẩm không bị ảnh hưởng.
-  Căn cứ: Chỉ tốn chỗ ổ đĩa trên máy dev, không mất hay lộ dữ liệu, người làm tự xoá thư mục tạm được bất cứ lúc nào; sửa thì rẻ nhưng không cấp bách.
+- **Every `make e2e` run now leaves a full Next build folder behind in node_modules/.cache/onehub-e2e/<pid>, and nothing removes it**
+  Người dùng thấy gì: Mỗi lần chạy bộ kiểm trên máy, một thư mục dựng tạm nặng được để lại và không bị xoá, nên đĩa đầy dần sau nhiều lượt. Kết quả kiểm vẫn đúng, người dùng cuối không bị ảnh hưởng.
+  Căn cứ: Chỉ ảnh hưởng máy của người làm, không mất dữ liệu và không làm kết quả sai; người làm tự xoá thư mục tạm được, và chỉ gặp khi chạy rất nhiều lượt liên tiếp.
   file: `playwright.config.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **The wait-copy scanner only catches a hand-written banner wait written on one line, and misses the exact pattern this change replaced**
-  Người dùng thấy gì: Nếu sau này ai đó lại viết tay đoạn chờ băng báo theo kiểu nhiều dòng, công cụ canh sẽ không báo, và bài kiểm có thể chập chờn trên máy chậm mà không ai hay.
-  Căn cứ: Hiện mã đã sạch nên chưa gây hại gì ngay, nhưng lưới an toàn có lỗ hổng; việc làm chặt bộ quét là một việc riêng vừa phải, không nên nhét vào vòng này.
-  file: `tools/e2e_templates/cho-scan.ts`
-  severity: medium
-  Đề xuất: new-contract
-
-- **The shared waits throw away the real error and rethrow a fixed message**
-  Người dùng thấy gì: Khi bài kiểm hỏng vì lý do khác như trang sập, báo cáo vẫn ghi là ngăn không mở hoặc băng không hiện, nên người làm khó tìm đúng nguyên nhân.
-  Căn cứ: Chỉ làm chậm việc tìm lỗi của người làm, không ảnh hưởng người dùng sản phẩm hay dữ liệu; chạy lại bài kiểm vẫn thấy lỗi nên chấp nhận được tạm thời.
+- **The shared sheet and banner waits throw away the real error and replace it with a fixed message**
+  Người dùng thấy gì: Khi chờ ngăn trượt hay băng báo thất bại vì một lý do khác, thông báo lỗi vẫn là câu cố định nên người đọc có thể hiểu sai nguyên nhân. Bài vẫn đỏ đúng, không có chuyện báo xanh giả.
+  Căn cứ: Hậu quả nhẹ: chỉ làm khó chẩn đoán lỗi chứ không làm lọt lỗi, không mất dữ liệu và người làm vẫn chạy lại để tìm nguyên nhân thật.
   file: `tools/e2e_templates/settle.ts`
   severity: low
   Đề xuất: known-limits
 
-- **Each browser run leaves its own build folder in node_modules/.cache, and nothing removes it**
-  Người dùng thấy gì: Mỗi lượt kiểm trình duyệt hay liệt kê bài đều để lại thư mục tạm trên máy người làm, nên ổ đĩa đầy dần. Người dùng sản phẩm không bị ảnh hưởng.
-  Căn cứ: Chỉ tốn ổ đĩa trên máy dev, không mất dữ liệu và xoá tay được; cùng gốc với lỗi tương tự nên ghi một lần là đủ.
+- **Every browser run of the main config leaves a full Next dev build folder that is never deleted**
+  Người dùng thấy gì: Mỗi lần chạy kiểm trình duyệt thường lệ để lại một thư mục dựng tạm không được dọn, làm đĩa đầy dần. Người dùng cuối không bị ảnh hưởng.
+  Căn cứ: Chỉ tốn đĩa trên máy người làm, tự xoá tay được, không sai kết quả kiểm; gộp chung với việc dọn thư mục tạm nói ở mục trên.
   file: `playwright.config.ts`
   severity: low
   Đề xuất: known-limits
 
-- **Hinh dang 5 (tuyen quet LOP nhung chi co diem-case): bo quet 'khong ban chep ham cho' chi bat dang cho bang viet tren mot dong**
-  Người dùng thấy gì: Công cụ canh việc chờ viết tay chỉ nhận ra một kiểu viết, nên bản chép tay viết theo kiểu phổ biến hơn vẫn lọt qua và có thể làm bài kiểm chập chờn trở lại.
-  Căn cứ: Chưa gây hại ngay vì mã hiện tại đã sạch, nhưng lưới canh có lỗ hổng lớn; sửa cần một việc riêng có ca thử đủ dạng nên đáng làm thành hợp đồng mới.
-  file: `tools/e2e_templates/cho-scan.ts`
-  severity: high
+- **Hình dạng 5 (tuyên quét LỚP nhưng chỉ có điểm-case): E5 hứa mọi bài của màn members ở lượt không phiên đều bị bỏ, nhưng không bài nào đếm việc đó**
+  Người dùng thấy gì: Ở lượt chạy không có cơ sở dữ liệu, chưa có phép đếm nào chắc chắn rằng toàn bộ bài của màn Thành viên đều bị bỏ. Nếu sau này có chỗ đo nhầm trên trang đăng nhập rồi báo xanh, có thể không ai biết.
+  Căn cứ: Hậu quả hiện chưa xảy ra, chỉ là thiếu lưới bảo vệ cho thay đổi tương lai; thêm phép đếm sau này không đắt và không làm mất gì của người dùng.
+  file: `tools/e2e_templates/suite.ts`
+  severity: medium
   Đề xuất: new-contract
 
-- **Hinh dang 2 (fixture viet tay dung khuon ben doc): chieu do cua bai the @cho cat dong khoi danh sach thay vi go the that**
-  Người dùng thấy gì: Bài thử chứng minh việc gỡ thẻ chờ chỉ kiểm trên dữ liệu viết tay, nên nếu cách công cụ thật nhận thẻ khác đi thì bài thử vẫn xanh dù đã sai.
-  Căn cứ: Chỉ làm giảm độ tin của một bài thử nội bộ, không ảnh hưởng người dùng sản phẩm hay dữ liệu; rủi ro thấp nên ghi lại là đủ.
+- **Hình dạng 2 (fixture viết tay theo đúng khuôn bên đọc): chiều đỏ «gỡ thẻ @cho» được tạo bằng chính điều kiện so khớp của untagged()**
+  Người dùng thấy gì: Bài kiểm chứng rằng việc gỡ thẻ cho bài mất mạng bị bắt được chỉ chạy trên dữ liệu dựng sẵn, chưa đi qua một vòng chạy thật. Nếu dạng dòng thật khác đi, lỗi gỡ thẻ có thể lọt mà không ai thấy.
+  Căn cứ: Chỉ làm phép chứng của một bài phụ kém chặt, không ảnh hưởng người dùng cuối hay dữ liệu; rủi ro thấp và có thể ghi nhận rồi làm sau.
   file: `tools/e2e_templates/e2e-templates.test.ts`
   severity: medium
   Đề xuất: known-limits
-
-## Chưa adversarial-verify (refuter chết)
-
-(không có)
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
