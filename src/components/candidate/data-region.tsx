@@ -90,6 +90,9 @@ const ROW_HEIGHT_PX = { dense: 33, normal: 49 } as const;
 /** Viewport height of the grid: rows scroll inside it in one run, like a sheet; the page itself does not scroll. */
 const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-screen";
 
+/** Narrowest a column gets while the filter row is open, in ch: room for a rule like «<=5» or «toa e». */
+const FILTER_MIN_CH = 11;
+
 /** Id of the row-number column, the first frozen column. */
 export const ROW_NUMBER_ID = "row-number";
 
@@ -304,6 +307,11 @@ export function DataRegion({
       subRows: g.rows.map((row) => ({ ...row, rowNumber: numbers.get(row.id) })),
     }));
   }, [shown, isGrouped, groupColumn]);
+  // Ids of the data rows in the order they are read (through the groups): the record panel steps through them.
+  const readingIds = useMemo(
+    () => data.flatMap((row) => (row.subRows ? row.subRows.map((sub) => sub.id) : [row.id])),
+    [data],
+  );
 
   // Widths follow the rows the region holds, not the rows a filter leaves, so columns do not jump while typing.
   const fitted = useMemo(
@@ -338,15 +346,15 @@ export function DataRegion({
   // normal text shrinks with its text instead of keeping normal-text widths. Density itself is decided in normal ch.
   const chPx = density === "dense" ? denseChPx : baseChPx;
   // Spare room on a wide screen goes to columns that cut their text (a long project name), never below the fit.
-  const widths = useMemo(
-    () =>
-      spreadSpareCh(
-        fitted,
-        full,
-        widthCh === null ? null : (widthCh * baseChPx) / chPx - rowNumberCh - 1,
-      ),
-    [fitted, full, widthCh, baseChPx, chPx, rowNumberCh],
-  );
+  // With the filter row open every column is at least wide enough to type a short rule in its box.
+  const widths = useMemo(() => {
+    const spread = spreadSpareCh(
+      fitted,
+      full,
+      widthCh === null ? null : (widthCh * baseChPx) / chPx - rowNumberCh - 1,
+    );
+    return filterRowOpen ? spread.map((w) => Math.max(w, FILTER_MIN_CH)) : spread;
+  }, [fitted, full, widthCh, baseChPx, chPx, rowNumberCh, filterRowOpen]);
 
   const recordAddress = record?.address;
   const addressNavigate = useRef<((id: string | null) => void) | null>(null);
@@ -383,7 +391,6 @@ export function DataRegion({
         size: Math.floor(rowNumberCh * chPx),
         enableHiding: false,
         enableSorting: false,
-        enablePinning: false,
         enableCellSelection: false,
         cell: (info) => {
           if (isGroup(info.row.original)) return null;
@@ -426,7 +433,6 @@ export function DataRegion({
           size: Math.floor((widths[index] ?? column.widthCh) * chPx),
           // The first column names the row (the unit code) and always stays; any other may be hidden.
           enableHiding: index !== 0,
-          enablePinning: false,
           cell: (info) => {
             const row = info.row.original;
             if (row.group) {
@@ -666,7 +672,9 @@ export function DataRegion({
         }}
         tableClassNames={{ bodyRow: DENSITY_ROW_CLASS[density] }}
       >
-        <DataGridCellSelection />
+        {/* Keyed with the virtual body below: the selection binds its keys to the body's viewport once, so a body
+            started again (a density switch) must bind them again. */}
+        <DataGridCellSelection key={density} />
         <div className="p-3 empty:hidden">{toolbar(sheetTools)}</div>
         <DataGridContainer>
           <DataGridScrollArea className={VIEWPORT_HEIGHT_CLASS}>
@@ -677,10 +685,7 @@ export function DataRegion({
               tabIndex={0}
               onKeyDownCapture={onGridKeyDownCapture}
             >
-              <DataGridTableVirtual
-                key={`${density}-${filterRowOpen}`}
-                estimateSize={ROW_HEIGHT_PX[density]}
-              />
+              <DataGridTableVirtual key={density} estimateSize={ROW_HEIGHT_PX[density]} />
             </div>
           </DataGridScrollArea>
         </DataGridContainer>
@@ -737,18 +742,13 @@ export function DataRegion({
         record.address ? (
           <PanelFor
             rows={rows}
-            ids={shown.map((row) => row.id)}
+            ids={readingIds}
             record={record}
             openId={record.address.openId}
             navigate={record.address.navigate}
           />
         ) : (
-          <AddressedPanel
-            rows={rows}
-            ids={shown.map((row) => row.id)}
-            record={record}
-            onReady={onAddressReady}
-          />
+          <AddressedPanel rows={rows} ids={readingIds} record={record} onReady={onAddressReady} />
         )
       ) : null}
     </section>

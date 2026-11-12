@@ -30,7 +30,18 @@ export type FilterMode = "text" | "values" | "number";
 export function filterModeFor(kind: DisplayKind): FilterMode {
   if (kind === "status" || kind === "select" || kind === "boolean") return "values";
   if (kind === "money" || kind === "area" || kind === "count") return "number";
+  if (kind === "date" || kind === "datetime") return "number";
   return "text";
+}
+
+/** A date is filtered by the whole days gone since it («>14» means more than two weeks ago), in Vietnam time. */
+export function daysSince(value: unknown, now: number): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const time = new Date(value as string).getTime();
+  if (Number.isNaN(time)) return null;
+  const DAY = 86_400_000;
+  const VN = 7 * 3_600_000;
+  return Math.floor((now + VN) / DAY) - Math.floor((time + VN) / DAY);
 }
 
 /** Prices are typed in billions («<=5» means at most 5 tỷ), as on the owner's sheet. */
@@ -134,7 +145,12 @@ export function filterIsInvalid(column: TypedColumn, filter: ColumnFilter | unde
   return filter.trim() !== "" && parseNumberRule(filter) === null;
 }
 
-function columnMatches(row: ViewRow, column: TypedColumn, filter: ColumnFilter): boolean {
+function columnMatches(
+  row: ViewRow,
+  column: TypedColumn,
+  filter: ColumnFilter,
+  now: number,
+): boolean {
   const value = row[column.field];
   const mode = filterModeFor(column.kind);
   if (mode === "values") {
@@ -145,6 +161,10 @@ function columnMatches(row: ViewRow, column: TypedColumn, filter: ColumnFilter):
   if (mode === "number") {
     const test = parseNumberRule(filter);
     if (test === null) return true;
+    if (column.kind === "date" || column.kind === "datetime") {
+      const days = daysSince(value, now);
+      return days !== null && test(days);
+    }
     if (typeof value !== "number" || Number.isNaN(value)) return false;
     return test(column.kind === "money" ? value / MONEY_FILTER_UNIT : value);
   }
@@ -160,6 +180,7 @@ export function filterRows<R extends ViewRow>(
   columns: readonly TypedColumn[],
   filters: ColumnFilters,
   query = "",
+  now: number = Date.now(),
 ): R[] {
   const needle = foldText(query.trim());
   const active = columns.filter((column) => !filterIsEmpty(filters[column.field]));
@@ -174,7 +195,7 @@ export function filterRows<R extends ViewRow>(
     )
       return false;
     return active.every((column) =>
-      columnMatches(row, column, filters[column.field] as ColumnFilter),
+      columnMatches(row, column, filters[column.field] as ColumnFilter, now),
     );
   });
 }

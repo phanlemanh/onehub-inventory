@@ -1,0 +1,148 @@
+schema_version: 1
+feature_slug: bang-hang-dung-tay-nhu-sheet
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/sheet.spec.ts]
+    expected: "exit 0; trong báo cáo Playwright của tests/e2e/sheet.spec.ts, ca 'sheet keys' chạy và xanh ở cả bốn khổ 360/414/1024/1440: bảng viết trước 9 phím (ArrowRight, ArrowDown, Tab, Shift+Tab, End, Home, Control+End, Control+Home, PageDown) với dòng và cột đích của từng phím, bộ kiểm khẳng định hằng 9; sau mỗi phím ô mang data-cell-focused ở đúng data-row-id và data-col-id, và khung chữ nhật của ô nằm trọn trong khung cuộn trừ phần tiêu đề và ba cột đứng yên; Escape xoá mọi data-cell-selected; ca phá 'sheet keys: cell out of view' cuộn khung về đầu bằng mã sau phím End và khẳng định thông điệp 'focused cell out of view: End'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, tests/e2e/sheet.spec.ts]
+    expected: "exit 0; ca 'sheet copy' ở 1440 (quyền clipboard-read bật), chạy hai lần với Control+C và Meta+C (bảng hai phím viết trước, hằng 2): (a) từ ô Căn dòng 3 bôi Shift+ArrowDown ×2, Shift+ArrowRight; chữ trong khay chép BẰNG cả chuỗi dựng lại trong bài từ dữ liệu mẫu (mã căn và toà dòng 3..5, tách tab, dòng tách CRLF); chân bảng chứa '6 ô đã chọn'; (b) từ ô Trạng thái dòng 1 bôi Shift+ArrowRight, Shift+ArrowDown; chữ chép BẰNG chuỗi dựng từ nhãn trạng thái và giá định dạng 'x,xx tỷ' của dòng 1..2 (dựng trong bài từ label() và formatMoney, không đọc DOM); (c) tắt cột Toà, bôi Căn → Dự án dòng 1..2; chữ chép BẰNG chuỗi Căn⇥Dự án dựng từ dữ liệu; ca phá: chuỗi dựng từ giá trị thô (mã trạng thái, số đồng) và chuỗi có thêm dòng tiêu đề, mỗi chuỗi khẳng định thông điệp 'copied text differs from the selected cells'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/grid-view.ts, tests/grid-view.test.ts]
+    expected: "exit 0; trong tests/grid-view.test.ts khối 'cellText': ma trận viết trước 7 kiểu (money → '4,65 tỷ', area → có 'm²', count, status → nhãn 'Đang bán' và nhãn cho thuê khi transaction lease, datetime, text, giá trị rỗng → '') khẳng định hằng 7; ca đối chứng dùng String(value) cho tiền và khẳng định thông điệp 'cellText money: raw number'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/grid-view.ts, src/components/candidate/data-region.tsx, tests/grid-view.test.ts, tests/grid-sheet.test.tsx]
+    expected: "exit 0; tests/grid-view.test.ts khối 'sortRows' trên 60 dòng dựng bằng inventoryRows từ dữ liệu mẫu: với mỗi kiểu (text, money, area, count, status, datetime) × 2 chiều = 12 ô viết trước (hằng 12), thứ tự trả về được kiểm từng cặp kề nhau bằng luật so độc lập trong bài (ô trống cuối cả hai chiều, trạng thái theo STATUS_ORDER, 'Toà 2' trước 'Toà 10'); bỏ sắp xếp trả về thứ tự ban đầu; tests/grid-sheet.test.tsx: chọn Tăng dần ở menu tiêu đề Giá chào của DataRegion làm cột Giá chào tăng dần và số dòng 1..60 liền; hai ca đối chứng: luật so chữ cho trạng thái cho 'status sorted by label', luật để ô trống đầu khi giảm cho 'empty cell not last: desc'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/grid-view.ts, src/modules/listings/**, tests/grid-view.test.ts]
+    expected: "exit 0; khối 'filterRows on the 60 sample rows': ma trận viết trước 9 ô lọc (Toà 'toa e', Trạng thái [Active, Pending], Giá chào '<=5', Diện tích '60-80', Phòng ngủ '>=3', Xác nhận lúc '>5' với now cố định, Phòng ngủ '1 hoặc 3', Diện tích '>60 và <90', Giá chào '5 tỷ' là luật sai) khẳng định hằng 9; mỗi ô so tập id trả về với tập tính lại trong bài từ trường thô của dữ liệu nguồn (không gọi hàm lọc), tập ấy không rỗng và nhỏ hơn 60 ở tám ô hợp lệ; luật sai trả đủ 60 và filterIsInvalid đúng; hai ô cộng dồn cho giao của hai tập; ba ca đối chứng: lọc chữ có phân biệt dấu cho 'text filter not accent-folded', giá so theo đồng thay tỷ cho 'money rule not in billions', ô lọc OR thay AND cho 'filters do not stack'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/**, tests/grid-sheet.test.tsx]
+    expected: "exit 0; tests/grid-sheet.test.tsx dựng DataRegion với 60 dòng mẫu: bấm 'Lọc' hiện một ô lọc dưới mỗi tiêu đề (8 ô, chữ/số là ô gõ, Trạng thái là bộ chọn); gõ '<=5' ở Giá chào làm số dòng hiện bằng đếm lại từ dữ liệu và chân ghi 'n / 60 dòng'; gõ '5 tỷ' làm ô mang aria-invalid và số dòng về 60; lọc ra rỗng hiện 'Không có dòng nào khớp' và bấm 'Xoá lọc' trả về '60 dòng'; ca đối chứng bỏ aria-invalid khỏi ô luật sai cho 'invalid rule not marked'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, tests/grid-view.test.ts, tests/grid-sheet.test.tsx]
+    expected: "exit 0; groupRows + rowNumbers trên 60 dòng mẫu (có và không lọc Trạng thái Active): thứ tự nhóm theo luật so số-như-số, số nhóm bằng số toà khác nhau tính lại từ nguồn, mỗi dòng nằm dưới toà của nó, tổng dòng các nhóm bằng số dòng sau lọc, số dòng 1..n liền theo thứ tự đọc; DataRegion với groupBy bật 'Nhóm theo Toà' hiện đúng số dòng nhóm, mỗi dòng nhóm có tên toà và 'k dòng', số dòng ở thân bảng liền 1..n và dòng nhóm không có số; gập nhóm đầu thì các dòng của nó biến mất và số của dòng đầu nhóm hai không đổi; nhóm theo Toà cộng sắp Giá chào tăng rồi giảm (2 ô viết trước): thứ tự toà như khi không sắp, và trong mỗi nhóm từng cặp dòng kề nhau đúng chiều theo luật so độc lập trong bài; hai ca đối chứng: đánh số lại từ 1 mỗi nhóm cho 'row numbers restart in group', gom nhóm theo thứ tự gốc cho 'sort lost inside group'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/**, tests/grid-sheet.test.tsx]
+    expected: "exit 0; menu 'Cột' của DataRegion liệt kê đúng bảy tên cột (không Căn, không #); tắt 'Dự án' làm tiêu đề và mọi ô cột ấy biến mất, bật lại thì hiện giữa Toà và Trạng thái; đang nhóm mà tắt 'Toà' thì nhãn nhóm nằm ở cột Căn; chọn 'Bỏ ghim' ở menu tiêu đề Toà làm Toà thôi ghim còn # và Căn vẫn ghim (trạng thái ghim của bảng); ca đối chứng cho phép tắt Căn và khẳng định thông điệp 'first column can be hidden'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/**, tests/e2e/sheet.spec.ts]
+    expected: "exit 0; ca 'sheet frozen columns' ở 360: cuộn khung lưới hết sang phải, ba ô đầu cột #, Căn, Toà giữ nguyên toạ độ trái (lệch dưới 1px) và cột Xác nhận lúc vào khung; ca phá thêm style bỏ position sticky và khẳng định 'frozen column moved: Căn'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.unit
+    layer: backend-effect
+    paths: ["src/app/(app)/nav.ts", "src/app/(app)/inventory/**", src/modules/listings/ui/**, src/components/candidate/grid-view.ts, src/components/templates/app-shell/**, tests/inventory-page.test.tsx, tests/app-shell-status-shortcuts.test.tsx]
+    expected: "exit 0; tests/app-shell-status-shortcuts.test.tsx: sáu mục 'Theo trạng thái' của NAV có href /inventory?status=<X> theo đúng thứ tự STATUS_ORDER, và thứ tự ấy bằng thứ tự khoá Status* đọc thẳng từ ontology/labels.yaml trong bài, và bằng thứ tự lựa chọn của ô lọc Trạng thái của DataRegion; cột thứ hai dựng ở địa chỉ /inventory?status=Pending cho aria-current ở đúng mục 'Đang giao dịch' và không ở 'Tất cả hàng'; tests/inventory-page.test.tsx gọi CHÍNH hàm trang với searchParams status = mỗi trạng thái trong sáu (ma trận 6 + 1 tham số lạ, hằng 7): bộ lọc trang đưa vào InventoryGrid bằng { 'Listing.standardStatus': [X] }, tham số lạ cho {}; hai ca đối chứng: thứ tự sidebar riêng (Hold trước Closed) cho 'status order differs: sidebar', trang bỏ qua tham số cho 'page drops status: Active'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: ["src/app/(app)/**", src/components/**, src/modules/listings/**, tests/e2e/sheet.spec.ts]
+    expected: "exit 0; ca 'status shortcuts' ở 1440 và 360 (mở thanh bên trên điện thoại): bấm từng lối trong sáu lối ở cột thứ hai; mỗi lần địa chỉ là /inventory?status=<X>, mọi dòng của lưới (đọc bằng cuộn khung) mang data-status = X, số dòng bằng SAMPLE_STATUS_COUNTS[X], chân ghi 'n / 60 dòng', lối ấy có aria-current; sau lối 'Đang bán', gõ '<=5' ở ô lọc Giá chào: mọi dòng còn mang data-status Active và giá ≤ 5 tỷ, số dòng bằng giao tính lại từ dữ liệu mẫu; ca phá đổi href một lối sang trạng thái khác bằng mã và khẳng định 'shortcut opens wrong status: <X>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/**, "src/app/(app)/proto/**", tests/grid-sheet.test.tsx]
+    expected: "exit 0; DataRegion dựng với cột của trang mẫu khuôn Lưới (không truyền prop nào cho thói quen Sheet) có nút 'Lọc', 'Cột', menu tiêu đề và bảng mang role grid; với record: Enter trên một ô dòng k gọi navigate đúng id dòng k (tính lại từ dữ liệu), không có record thì Enter chuyển ô chọn xuống dòng k+1; ca đối chứng gọi navigate với id dòng đầu cho 'enter opened another row'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/**, "src/app/(app)/**", tests/e2e/sheet.spec.ts, tests/e2e/frame.spec.ts]
+    expected: "exit 0; ca 'sheet axe' ở bốn khổ × sáng/tối × ba trạng thái (mặc định, lọc mở với '<=5' ở Giá chào, nhóm theo Toà) = 24 ô viết trước (hằng 24): axe không có vi phạm serious hay critical; ca 'sheet tab stops' ở bốn khổ × hai trạng thái (mặc định, lọc mở) = 8 ô (hằng 8), trước và sau khi trang chạy: Tab từ ô tìm đi qua đúng danh sách điểm dừng viết trước trong vùng lưới — nút công cụ (Lọc, Nhóm theo Toà, Cột, thêm Xoá lọc khi có lọc), 8 nút tiêu đề, 8 ô lọc khi hàng lọc mở, rồi bảng role grid — số điểm dừng bằng độ dài danh sách, và thân bảng chỉ là MỘT điểm dừng (không ô hay dòng nào nhận Tab riêng); trang không cuộn ngang (scrollWidth ≤ clientWidth); hai ca phá: bỏ aria-label của ô lọc Giá chào cho axe báo 'label', đặt tabindex -1 cho một ô lọc cho 'tab stop missing: Lọc cột Giá chào'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, "src/app/(app)/**"]
+    expected: "exit 0; sàn thiết kế không báo mã màu thô trong tệp giao diện vòng này chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E16
+    criterion: AC-10
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", "src/app/(app)/nav.ts"]
+    steps:
+      - "Use the dev server at the URL given (lane K, port 3481); if it does not answer, start it from the repo root with PORT=3481 npm run dev (never port 3470, never while a suite command is running), note its PID and stop only that PID when done"
+      - "Navigate {url}/inventory?status=Active at 1440x900, light, type <=5 in the filter box labelled «Lọc cột Giá chào» → screenshot evidence/loc-1440-sang.png"
+      - "Same at 1440x900, dark → screenshot evidence/loc-1440-toi.png"
+      - "Navigate {url}/inventory at 1440x900, light, press the «Nhóm theo Toà» button → screenshot evidence/nhom-1440-sang.png"
+      - "Same at 1440x900, dark → screenshot evidence/nhom-1440-toi.png"
+      - "Navigate {url}/inventory at 1024x768, light, click the Căn cell of row 3, press Shift+ArrowDown twice and Shift+ArrowRight twice → screenshot evidence/chon-1024-sang.png"
+      - "Navigate {url}/inventory at 414x896, light, press «Lọc» then «Nhóm theo Toà» → screenshot evidence/loc-nhom-414-sang.png"
+      - "Navigate {url}/inventory at 360x800, dark, press «Lọc» then «Nhóm theo Toà» → screenshot evidence/loc-nhom-360-toi.png"
+      - "Navigate {url}/inventory at 360x800, light, press the «Cột» button → screenshot evidence/cot-360-sang.png"
+    expected: "tám ảnh Bảng hàng trong App Shell: thanh công cụ có ô tìm, số dòng, 'Lọc', 'Nhóm theo Toà', 'Cột'; khi lọc mở có một ô lọc dưới mỗi tiêu đề, nút 'Lọc (n)' và 'Xoá lọc'; dòng nhóm mang tên toà và 'k dòng'; vùng ô đã bôi tô màu và chân ghi 'n ô đã chọn · Ctrl+C để chép'; menu Cột có bảy mục tích; ở 360/414 thanh công cụ xuống dòng, lưới cuộn ngang trong vùng, trang không cuộn ngang; nền và chữ đổi theo tối"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
+
+  - id: E17
+    criterion: AC-10
+    executor: judgment
+    inputs: [_acceptance/bang-hang-dung-tay-nhu-sheet/evidence/loc-1440-sang.png, _acceptance/bang-hang-dung-tay-nhu-sheet/evidence/loc-1440-toi.png, _acceptance/bang-hang-dung-tay-nhu-sheet/evidence/nhom-1440-toi.png, _acceptance/bang-hang-dung-tay-nhu-sheet/evidence/chon-1024-sang.png, _acceptance/bang-hang-dung-tay-nhu-sheet/evidence/loc-nhom-360-toi.png, _acceptance/bang-hang-dung-tay-nhu-sheet/design.md]
+    question: "Năm ảnh Bảng hàng (lọc mở ở 1440 sáng và tối, nhóm theo toà ở 1440 tối, vùng ô đã bôi ở 1024, lọc và nhóm ở 360 tối) có cho thấy đúng các trạng thái ST-inventory-loc-mo, ST-inventory-nhom, ST-inventory-chon-vung trong mục Đặc tả UX của design.md không: nút công cụ và ô lọc đọc được, dòng nhóm và vùng ô đã bôi phân biệt được với dòng thường, chữ không chồng nhau, ảnh tối đủ tương phản để đọc? (Tập dòng đúng hay sai do E5, E7 đo, không hỏi ở đây.)"
+    evidence_required: [verdict, rationale]

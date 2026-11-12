@@ -53,7 +53,9 @@ export function ColumnFilterCell<TData extends object>({
       ? GRID_COPY.sheet.textPlaceholder
       : spec.kind === "money"
         ? GRID_COPY.sheet.moneyPlaceholder
-        : GRID_COPY.sheet.numberPlaceholder;
+        : spec.kind === "date" || spec.kind === "datetime"
+          ? GRID_COPY.sheet.datePlaceholder
+          : GRID_COPY.sheet.numberPlaceholder;
   return (
     <div data-slot="column-filter" data-filter-mode={mode} className="pt-1">
       <Input
