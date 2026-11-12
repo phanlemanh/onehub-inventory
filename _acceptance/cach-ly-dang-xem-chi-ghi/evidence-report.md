@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 543e4c5f3c1e4f0313337427e08ffe2bd177f6eb
+verified_commit: aca484ed12f03537d87a1748b0e69c1efae90306
 human_signoff: Manh Phan 2026-11-13
 ---
 
@@ -129,3 +129,7 @@ none — mọi eval chạy một lần, xác định, không có phương sai.
 
 Round 1: kết quả round cũ nằm ở lịch sử, đã chuyển về triển khai.
 Round 2: E1 đến E8 và hai lệnh suite đều xanh; không eval nào hỏng.
+
+### Re-pin lần 1 — 2026-11-12, do gộp nhánh chính trước khi gộp PR #41
+run_id: repin-20261112T223914Z-23385
+sha: aca484ed12f03537d87a1748b0e69c1efae90306 · suites: 3 lệnh exit 0 · evals: 8/8 eval máy đạt kỳ vọng
