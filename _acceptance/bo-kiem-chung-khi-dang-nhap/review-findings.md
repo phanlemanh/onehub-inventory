@@ -1,45 +1,57 @@
-# Review findings: bo-kiem-chung-khi-dang-nhap (round 1)
+# Review findings: bo-kiem-chung-khi-dang-nhap (round 2)
 
 ## Trong hợp đồng
 
-- **Hình dạng 5 (claims a whole class but checks a point list): CHO_TESTS leaves out a test that waits for a banner through shown()**
-  file: `tools/e2e_templates/settle.ts:79`
-  severity: high
-  AC: AC-8
-  source: measurement
-  detail: CHO_TESTS says it lists 'every test that waits for the phone sheet or a banner'. Evals E8 and E15 say the same: every @cho test, including the offline banner, runs 20 times on a slowed CPU. The test 'a save that fails offline keeps the input and offers retry' in tests/e2e/frame.spec.ts:331 calls setOffline(true) and then `await shown(banner, "bang chua luu")`, so it waits for a banner. It has no { tag: "@cho" } and is not in CHO_TESTS. The check untagged() in tools/e2e_templates/cho-scan.ts only confirms that names already in the hand list appear in `--list --grep @cho`. Nothing derives the full set from the real calls to openSheet()/shown() in tests/e2e and tests/e2e-db and compares it with CHO_TESTS. So a test that uses the shared wait can drop out of the slowed repeat run, and the suite still passes.
-  rationale: AC-8 requires the tests that wait for the sheet and the banner to be repeated twenty times on a slowed machine, and a banner-waiting test is missing from that repeated set.
+(không có)
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Session break silently skips instead of failing when clearing the cookie no longer signs the person out**
-  Người dùng thấy gì: Nếu một ngày xoá phiên không còn đẩy người dùng ra trang đăng nhập, bài kiểm tương ứng sẽ bị bỏ qua thay vì báo đỏ. Khi đó lỗ hổng truy cập có thể lọt qua mà bộ kiểm vẫn xanh.
-  Căn cứ: Đây là lớp phòng thủ phụ cho chính bộ kiểm, không phải lỗi người dùng gặp ngay, và hợp đồng đã ghim cách bài kiểm báo đỏ; sửa sau cũng không đắt.
-  file: `tools/e2e_templates/runner.ts`
+- **Every `make e2e` run now leaves a full Next build folder under node_modules/.cache/onehub-e2e/<pid>, and nothing ever removes it**
+  Người dùng thấy gì: Mỗi lần chạy kiểm trình duyệt để lại một thư mục tạm lớn trên máy người làm, nên ổ đĩa đầy dần. Người dùng sản phẩm không bị ảnh hưởng.
+  Căn cứ: Chỉ tốn chỗ ổ đĩa trên máy dev, không mất hay lộ dữ liệu, người làm tự xoá thư mục tạm được bất cứ lúc nào; sửa thì rẻ nhưng không cấp bách.
+  file: `playwright.config.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Signed-out run (the only one CI runs) silently skips any screen that starts redirecting to /login**
-  Người dùng thấy gì: Trên máy CI, nếu một màn công khai bất ngờ bắt người dùng đăng nhập, các bài kiểm của màn đó bị bỏ qua và CI vẫn xanh. Lỗi chỉ lộ ra ở lượt có phiên chạy tay.
-  Căn cứ: Hợp đồng đã nêu rõ và chấp nhận hạn chế này cho tới khi CI có cơ sở dữ liệu; hậu quả chỉ là phát hiện chậm hơn, không mất dữ liệu.
-  file: `tools/e2e_templates/suite.ts`
+- **The wait-copy scanner only catches a hand-written banner wait written on one line, and misses the exact pattern this change replaced**
+  Người dùng thấy gì: Nếu sau này ai đó lại viết tay đoạn chờ băng báo theo kiểu nhiều dòng, công cụ canh sẽ không báo, và bài kiểm có thể chập chờn trên máy chậm mà không ai hay.
+  Căn cứ: Hiện mã đã sạch nên chưa gây hại gì ngay, nhưng lưới an toàn có lỗ hổng; việc làm chặt bộ quét là một việc riêng vừa phải, không nên nhét vào vòng này.
+  file: `tools/e2e_templates/cho-scan.ts`
   severity: medium
+  Đề xuất: new-contract
+
+- **The shared waits throw away the real error and rethrow a fixed message**
+  Người dùng thấy gì: Khi bài kiểm hỏng vì lý do khác như trang sập, báo cáo vẫn ghi là ngăn không mở hoặc băng không hiện, nên người làm khó tìm đúng nguyên nhân.
+  Căn cứ: Chỉ làm chậm việc tìm lỗi của người làm, không ảnh hưởng người dùng sản phẩm hay dữ liệu; chạy lại bài kiểm vẫn thấy lỗi nên chấp nhận được tạm thời.
+  file: `tools/e2e_templates/settle.ts`
+  severity: low
   Đề xuất: known-limits
 
-- **Hình dạng 2 (hand-built fixture instead of a round trip): the 'remove the @cho tag' break edits the list output, not the test**
-  Người dùng thấy gì: Bài kiểm chứng việc thiếu nhãn chờ mới thử trên dữ liệu dựng sẵn, chưa thử trên một bản sao thật của bài kiểm. Nếu Playwright xử lý nhãn khác dự đoán, lỗi có thể không bị bắt.
-  Căn cứ: Rủi ro thấp vì chỉ ảnh hưởng độ tin cậy của công cụ kiểm, người dùng cuối không bị tác động, và có thể bổ sung sau với chi phí vừa phải.
+- **Each browser run leaves its own build folder in node_modules/.cache, and nothing removes it**
+  Người dùng thấy gì: Mỗi lượt kiểm trình duyệt hay liệt kê bài đều để lại thư mục tạm trên máy người làm, nên ổ đĩa đầy dần. Người dùng sản phẩm không bị ảnh hưởng.
+  Căn cứ: Chỉ tốn ổ đĩa trên máy dev, không mất dữ liệu và xoá tay được; cùng gốc với lỗi tương tự nên ghi một lần là đủ.
+  file: `playwright.config.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hinh dang 5 (tuyen quet LOP nhung chi co diem-case): bo quet 'khong ban chep ham cho' chi bat dang cho bang viet tren mot dong**
+  Người dùng thấy gì: Công cụ canh việc chờ viết tay chỉ nhận ra một kiểu viết, nên bản chép tay viết theo kiểu phổ biến hơn vẫn lọt qua và có thể làm bài kiểm chập chờn trở lại.
+  Căn cứ: Chưa gây hại ngay vì mã hiện tại đã sạch, nhưng lưới canh có lỗ hổng lớn; sửa cần một việc riêng có ca thử đủ dạng nên đáng làm thành hợp đồng mới.
+  file: `tools/e2e_templates/cho-scan.ts`
+  severity: high
+  Đề xuất: new-contract
+
+- **Hinh dang 2 (fixture viet tay dung khuon ben doc): chieu do cua bai the @cho cat dong khoi danh sach thay vi go the that**
+  Người dùng thấy gì: Bài thử chứng minh việc gỡ thẻ chờ chỉ kiểm trên dữ liệu viết tay, nên nếu cách công cụ thật nhận thẻ khác đi thì bài thử vẫn xanh dù đã sai.
+  Căn cứ: Chỉ làm giảm độ tin của một bài thử nội bộ, không ảnh hưởng người dùng sản phẩm hay dữ liệu; rủi ro thấp nên ghi lại là đủ.
   file: `tools/e2e_templates/e2e-templates.test.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 4 (negative-only, no positive control): the session break can silently become a skip on every screen**
-  Người dùng thấy gì: Nếu màn Thành viên ngừng đẩy người chưa đăng nhập ra ngoài, bài kiểm phá phiên của màn đó thành bỏ qua và bộ kiểm vẫn xanh. Người chưa đăng nhập có thể vào được màn không nên thấy mà không ai hay.
-  Căn cứ: Hậu quả tiềm tàng nghiêm trọng hơn nhưng cần một lỗi khác xảy ra trước; hợp đồng không bao gồm và có thể thêm một chốt đếm số màn sau này với chi phí thấp.
-  file: `tools/e2e_templates/runner.ts`
-  severity: medium
-  Đề xuất: known-limits
+## Chưa adversarial-verify (refuter chết)
+
+(không có)
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
