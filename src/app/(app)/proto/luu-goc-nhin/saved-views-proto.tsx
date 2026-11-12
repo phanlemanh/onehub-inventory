@@ -85,7 +85,7 @@ const COPY = {
   saveTitle: "Lưu góc nhìn",
   saveWhat: "Lưu lọc, ô tìm, sắp xếp, nhóm và các cột đang hiện thành một mục ở cột bên trái.",
   name: "Tên góc nhìn",
-  nameHint: "Ví dụ: Toà S1.01 đang bán. Tối đa 40 ký tự.",
+  nameHint: "Ví dụ: S1.01 đang bán. Tối đa 40 ký tự.",
   nameEmpty: "Đặt tên cho góc nhìn.",
   nameTaken: "Đã có góc nhìn mang tên này.",
   rename: "Đổi tên",
@@ -93,7 +93,7 @@ const COPY = {
   renameWhat: "Chỉ đổi tên; lọc, sắp xếp, nhóm và cột giữ nguyên.",
   remove: "Xoá góc nhìn",
   removeTitle: (name: string) => `Xoá góc nhìn «${name}»?`,
-  removeWhat: "Mục biến khỏi cột bên trái. Căn trong Bảng hàng không đổi gì.",
+  removeWhat: "Mục biến khỏi cột bên trái. Dữ liệu không đổi gì.",
   cancel: "Thôi",
   more: (name: string) => `Việc khác với «${name}»`,
   protoNote:
@@ -104,19 +104,19 @@ function seedViews(statusLabels: Record<string, string>): SavedView[] {
   return [
     {
       id: "s101-dang-ban",
-      name: `Toà S1.01 ${statusLabels.Active?.toLocaleLowerCase("vi") ?? ""}`.trim(),
+      name: `S1.01 ${statusLabels.Active?.toLocaleLowerCase("vi") ?? ""}`.trim(),
       owner: "toi",
       filters: { "Listing.buildingName": "S1.01", "Listing.standardStatus": ["Active"] },
     },
     {
       id: "hai-phong-ngu",
-      name: "Hai phòng ngủ",
+      name: "Hai PN",
       owner: "toi",
       filters: { "Unit.bedroomsTotal": "2" },
     },
     {
       id: "giu-cho",
-      name: `Căn ${statusLabels.Hold?.toLocaleLowerCase("vi") ?? ""}`.trim(),
+      name: `${statusLabels.Hold ?? ""}`.trim(),
       owner: "san",
       filters: { "Listing.standardStatus": ["Hold"] },
     },

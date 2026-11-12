@@ -101,7 +101,7 @@ chính các tiêu chí trên.
 
 - Góc nhìn dùng chung cả sàn, nếu chủ kho chọn «riêng người lưu» ở Hỏi-2: một hàng sau, kèm dòng bảng quyền cho người thêm,
   sửa, xoá góc nhìn của sàn.
-- Góc nhìn cho màn Lưới khác (Đã gửi, Liên hệ): khe cột thứ hai và kiểu cách xem dùng lại được, mỗi màn một hàng.
+- Góc nhìn cho màn Lưới khác (Đã gửi, Liên hệ): nhóm mục động ở cột thứ hai và kiểu cách xem dùng lại được, mỗi màn một hàng.
 - Sắp thứ tự góc nhìn bằng kéo thả, góc nhìn mặc định khi mở Bảng hàng, ghim góc nhìn lên điện thoại.
 - Chia sẻ góc nhìn ra ngoài sàn: không bao giờ (SP-4).
 - Sửa hàng loạt, phần còn lại của mục gác L7.
