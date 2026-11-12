@@ -1,46 +1,4 @@
 {
-  "feature_plain": "Bộ kiểm chung của mọi màn đo được cả màn cần đăng nhập (như Thành viên, và mọi màn sau khi nối dữ liệu thật), và thôi báo đỏ oan khi máy chạy chậm.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ cho bộ kiểm một người thử đủ bốn vai, đăng nhập một lần qua màn đăng nhập thật; mất phiên giữa chừng thì báo đỏ rõ tên màn."},
-    {"id": "AC-2", "p": "Sẽ đo mọi màn của sổ — kể cả Thành viên — bằng đủ bốn bài khung và bốn ca phá cũ, ở bốn khổ màn."},
-    {"id": "AC-4", "p": "Sẽ để lượt kiểm không có cơ sở dữ liệu (CI) giao màn cần đăng nhập sang lượt có phiên, có ghi lý do, không xanh giả."},
-    {"id": "AC-5", "p": "Sẽ chỉ đo ngăn trượt trên điện thoại khi ngăn đã mở hẳn và đứng yên; ngăn không mở hay không dừng thì báo đỏ rõ."},
-    {"id": "AC-6", "p": "Sẽ chờ băng báo (như mất mạng) hiện hẳn, đủ lâu cho máy chậm gấp bốn; băng không hiện thì báo đỏ rõ."},
-    {"id": "AC-7", "p": "Sẽ gom mọi chỗ chờ ngăn và chờ băng về hai hàm dùng chung, bỏ các bản chép riêng."},
-    {"id": "AC-8", "p": "Sẽ chạy các bài chờ ấy hai mươi lần trên máy giảm tốc bốn lần, không lần nào đỏ; máy không chậm được thật thì báo đỏ chứ không tính là đã lặp."}
-  ],
-  "wont_do": [
-    {"id": "AC-3", "p": "Sẽ KHÔNG còn bỏ qua màn nào vì cần đăng nhập — thay cơ chế «bỏ qua có điều kiện» chủ kho chọn ở hàng 9; chỉ màn Đăng nhập được đo ở lượt chưa đăng nhập, có lý do."},
-    {"id": "AC-9", "p": "Sẽ KHÔNG bỏ hay đổi lời ca phá nào của hàng 1f; toàn bộ bài kiểm cũ, kể cả các bài đăng nhập của hàng 8, 9, 1m, vẫn xanh."},
-    {"id": "OOS-1", "p": "KHÔNG đi từng cặp vai × màn — để cho hàng 9b, cần bảng quyền của hàng 9a."},
-    {"id": "OOS-2", "p": "Đưa cơ sở dữ liệu lên CI tuỳ câu trả lời Hỏi-1: theo khuyến nghị thì thành một hàng riêng trước hàng 10."},
-    {"id": "OOS-3", "p": "KHÔNG đổi cách chờ trong các bài đăng nhập đã ký của hàng 8, 1m — để mục riêng."},
-    {"id": "OOS-4", "p": "KHÔNG sửa màn, App Shell hay phần đăng nhập — chỉ sửa bài kiểm và công cụ kiểm."}
-  ],
-  "coverage_plain": [
-    {"i": 0, "p": "Đã quét đủ các tổ hợp theo năm trục dưới đây trước khi chốt tiêu chí."},
-    {"i": 1, "p": "Căn cứ phía sản phẩm: sổ màn và cách từng màn đẩy người chưa đăng nhập đi,"},
-    {"i": 2, "p": "màn Đăng nhập đẩy người đã đăng nhập đi, hai cách chạy bài kiểm trình duyệt,"},
-    {"i": 3, "p": "và CI hôm nay chưa có cơ sở dữ liệu."},
-    {"i": 4, "p": "Căn cứ phía ngành: cách Playwright khuyên làm đăng nhập cho bài kiểm — đăng nhập một lần, lưu phiên;"},
-    {"i": 5, "p": "chờ bằng khẳng định tự đợi thay vì đếm ngay;"},
-    {"i": 6, "p": "và chạy lặp nhiều lần để bắt bài chập chờn."},
-    {"i": 7, "p": "Năm trục quét:"},
-    {"i": 8, "p": "Cách vào màn: mở khi chưa đăng nhập · cần đăng nhập · dành cho người chưa đăng nhập · màn thử · màn chưa dựng."},
-    {"i": 9, "p": "Lượt chạy: không cơ sở dữ liệu (CI) · có cơ sở dữ liệu với phiên thử."},
-    {"i": 10, "p": "Phiên khi mở màn: còn · mất (AC-1, mất phiên thì đỏ)."},
-    {"i": 11, "p": "Chỗ chờ: ngăn trượt · băng báo; hộp thoại để sau."},
-    {"i": 12, "p": "Nhịp máy: thường · chậm gấp bốn, lặp hai mươi lần."},
-    {"i": 13, "p": "Làm ngay: màn cần đăng nhập ở lượt có phiên còn phiên (AC-2) và mất phiên (AC-1), ở lượt CI (AC-4),"},
-    {"i": 14, "p": "màn Đăng nhập ở lượt có phiên (AC-3), ngăn và băng trên máy chậm (AC-5, AC-6, AC-8)."},
-    {"i": 15, "p": "Để sau: hộp thoại và câu báo của màn đăng nhập đổi sang hàm chờ;"},
-    {"i": 16, "p": "ma trận vai × màn (hàng 9b). Không làm: phiên giả không cần cơ sở dữ liệu trong mã sản phẩm."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Bài của hai hàm chờ ghi hai chỗ khác nhau, có thể không ai chạy nó — đã chốt một chỗ và đòi đếm đủ số bài trong báo cáo."},
-    {"i": 1, "p": "Không bài chấm nào chạy trọn các bài đăng nhập cũ sau khi đổi khâu chuẩn bị — đã thêm một lượt chạy trọn, số bài so với nhánh chính."},
-    {"i": 2, "p": "Bài nào được lặp hai mươi lần là do người làm tự gắn thẻ — đã thêm danh sách viết trước, gỡ thẻ thì đỏ."},
-    {"i": 3, "p": "Khuyến nghị Hỏi-1 chỉ an toàn nếu có hàng «CI có cơ sở dữ liệu» trước hàng 10 — chủ kho trả lời; phần ngoài phạm vi đã viết theo hai nhánh."},
-    {"i": 4, "p": "Việc thay ca kiểm của hàng 9 còn treo — giám sát đã cho thay, thẻ nói rõ ba ca cũ được thay bằng ca nào."}
-  ]
+  "feature_plain": "Bộ kiểm tự động giờ đo được cả các màn phải đăng nhập mới xem được (như màn Thành viên), và không còn báo đỏ oan khi máy chạy chậm.",
+  "scope_plain": "Bốn việc cố ý để ngoài lượt này, đã ghi từ Cổng Phạm vi:"
 }
