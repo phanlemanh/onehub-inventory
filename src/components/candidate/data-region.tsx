@@ -29,7 +29,10 @@ import {
   dataGridFeatures,
   type DataGridCellSelectionSnapshot,
 } from "@/components/reui/data-grid/data-grid";
-import { DataGridCellSelection } from "@/components/reui/data-grid/data-grid-cell-selection";
+import {
+  DataGridCellSelection,
+  type DataGridCellSelectionApi,
+} from "@/components/reui/data-grid/data-grid-cell-selection";
 import { DataGridColumnHeader } from "@/components/reui/data-grid/data-grid-column-header";
 import { DataGridColumnVisibility } from "@/components/reui/data-grid/data-grid-column-visibility";
 import { DataGridScrollArea } from "@/components/reui/data-grid/data-grid-scroll-area";
@@ -123,6 +126,18 @@ export const ROW_NUMBER_ID = "row-number";
 /** How many leading data columns stay put while the grid scrolls sideways, after the row numbers. */
 export const FROZEN_COLUMNS = 2;
 
+/** The keys the sheet grid moves by: pressed on a row's unit code, they go to the grid (ruling D-1211-19). */
+const GRID_KEYS = new Set([
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "Home",
+  "End",
+  "PageUp",
+  "PageDown",
+]);
+
 /** The region's working button and whether the viewer may use it; a button without permission never shows. */
 export interface RegionAction {
   node: ReactNode;
@@ -147,15 +162,26 @@ function AddressedPanel({
   ids,
   record,
   onReady,
+  returnFocus,
 }: {
   rows: readonly GridRow[];
   ids: readonly string[];
   record: RegionRecord;
   onReady: (navigate: (id: string | null) => void) => void;
+  returnFocus?: (id: string) => boolean;
 }) {
   const { openId, navigate } = useRecordAddress();
   useEffect(() => onReady(navigate), [onReady, navigate]);
-  return <PanelFor rows={rows} ids={ids} record={record} openId={openId} navigate={navigate} />;
+  return (
+    <PanelFor
+      rows={rows}
+      ids={ids}
+      record={record}
+      openId={openId}
+      navigate={navigate}
+      returnFocus={returnFocus}
+    />
+  );
 }
 
 function PanelFor({
@@ -164,12 +190,14 @@ function PanelFor({
   record,
   openId,
   navigate,
+  returnFocus,
 }: {
   rows: readonly GridRow[];
   ids: readonly string[];
   record: RegionRecord;
   openId: string | null;
   navigate: (id: string | null) => void;
+  returnFocus?: (id: string) => boolean;
 }) {
   const byId = useMemo(() => new Map(rows.map((row) => [row.id, row])), [rows]);
   const known = openId !== null && byId.has(openId) ? openId : null;
@@ -179,6 +207,7 @@ function PanelFor({
       openId={known}
       onNavigate={navigate}
       render={(id) => record.render(byId.get(id) as GridRow)}
+      returnFocus={returnFocus}
     />
   );
 }
@@ -449,9 +478,41 @@ export function DataRegion({
       }
     : undefined;
   const opensRecord = record !== undefined;
+  // Closing the record gives focus back to the row's unit code and makes its cell the grid's selected cell, so the
+  // sheet keys run on from there at once (ruling D-1211-19). The code button hands any navigation key to the grid.
+  const selectionApi = useRef<DataGridCellSelectionApi | null>(null);
+  const selectCellRef = useRef<((id: string) => void) | null>(null);
+  const firstField = columns[0]?.field;
+  const returnFocusToCell = useCallback((id: string) => {
+    selectCellRef.current?.(id);
+    return false;
+  }, []);
+  const handOverKey = useCallback(
+    (id: string, event: KeyboardEvent<HTMLButtonElement>) => {
+      const api = selectionApi.current;
+      if (!api || !firstField || !GRID_KEYS.has(event.key)) return;
+      event.preventDefault();
+      api.focusCell(id, firstField);
+      document.activeElement?.dispatchEvent(
+        new globalThis.KeyboardEvent("keydown", {
+          key: event.key,
+          code: event.code,
+          shiftKey: event.shiftKey,
+          ctrlKey: event.ctrlKey,
+          metaKey: event.metaKey,
+          altKey: event.altKey,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    },
+    [firstField],
+  );
   const openRef = useRef(openRecord);
+  const handOverKeyRef = useRef(handOverKey);
   useEffect(() => {
     openRef.current = openRecord;
+    handOverKeyRef.current = handOverKey;
   });
 
   // The group label sits in the grouping column, or in the first data column shown when that one is hidden.
@@ -553,8 +614,12 @@ export function DataRegion({
                 variant="link"
                 size="sm"
                 data-record-open={id}
+                // The unit code is the row's open door: one click opens it (the grid's two-step press for controls
+                // in a cell does not apply); the rest of the cell selects like a sheet. Keys belong to the grid.
+                data-cell-interactive=""
                 tabIndex={-1}
                 onClick={() => openRef.current?.(id)}
+                onKeyDown={(event) => handOverKeyRef.current(id, event)}
               >
                 {cell}
               </Button>
@@ -615,6 +680,11 @@ export function DataRegion({
         end: [],
       },
     },
+  });
+  useEffect(() => {
+    selectCellRef.current = (id) => {
+      if (firstField && table.setFocusedCell) table.setFocusedCell(id, firstField);
+    };
   });
 
   // The grid scrolls inside its own viewport; keyboard users must be able to reach and scroll it (WCAG 2.1.1). With cell
@@ -779,7 +849,7 @@ export function DataRegion({
       >
         {/* Keyed with the virtual body below: the selection binds its keys to the body's viewport once, so a body
             started again (a density switch) must bind them again. */}
-        <DataGridCellSelection key={density} />
+        <DataGridCellSelection key={density} apiRef={selectionApi} />
         <div className="p-3 empty:hidden">{toolbar(sheetTools)}</div>
         <DataGridContainer>
           <DataGridScrollArea className={`${VIEWPORT_HEIGHT_CLASS} ${FULL_SCREEN_HEIGHT_CLASS}`}>
@@ -823,9 +893,16 @@ export function DataRegion({
             record={record}
             openId={record.address.openId}
             navigate={record.address.navigate}
+            returnFocus={returnFocusToCell}
           />
         ) : (
-          <AddressedPanel rows={rows} ids={readingIds} record={record} onReady={onAddressReady} />
+          <AddressedPanel
+            rows={rows}
+            ids={readingIds}
+            record={record}
+            onReady={onAddressReady}
+            returnFocus={returnFocusToCell}
+          />
         )
       ) : null}
       <section

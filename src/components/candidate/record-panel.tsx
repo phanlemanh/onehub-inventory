@@ -123,26 +123,38 @@ export function RecordPanel({
   openId,
   onNavigate,
   render,
+  returnFocus,
 }: {
   /** The rows in the order the grid shows them now (after search). */
   ids: readonly string[];
   openId: string | null;
   onNavigate: (id: string | null) => void;
   render: (id: string) => RecordView;
+  /**
+   * Where focus goes when the panel closes, when the screen knows better than the row's open button: a sheet grid
+   * puts it on the row's cell so its keys work at once. Returns false to fall back to the button.
+   */
+  returnFocus?: (id: string) => boolean;
 }) {
-  // The record last shown: closing clears `openId`, and focus then goes to this row's button.
+  // The record last shown: closing clears `openId`, and focus then goes to this row.
   const lastShown = useRef<string | null>(openId);
   useEffect(() => {
     if (openId !== null) lastShown.current = openId;
   }, [openId]);
+  const returnFocusRef = useRef(returnFocus);
+  useEffect(() => {
+    returnFocusRef.current = returnFocus;
+  });
   const isPhone = useIsMobile();
   const index = openId === null ? -1 : ids.indexOf(openId);
   const view = openId === null ? null : render(openId);
   const previous = index > 0 ? ids[index - 1] : undefined;
   const next = index >= 0 && index < ids.length - 1 ? ids[index + 1] : undefined;
   const focusRow = useCallback(() => {
-    if (lastShown.current === null) return;
-    document.querySelector<HTMLElement>(recordOpenSelector(lastShown.current))?.focus();
+    const id = lastShown.current;
+    if (id === null) return;
+    if (returnFocusRef.current?.(id)) return;
+    document.querySelector<HTMLElement>(recordOpenSelector(id))?.focus();
   }, []);
 
   if (!isPhone)

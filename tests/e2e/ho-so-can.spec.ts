@@ -394,6 +394,127 @@ test.describe("E2 · «Trước», «Sau», «Đóng» sit top right on every si
   });
 });
 
+// ---- E2/E6 · the unit code beside the sheet grid (ruling D-1211-19, after row 2a) -----------------------------------
+// The unit code opens in one click; the rest of the unit cell selects like a sheet; Enter on the selected cell opens;
+// closing gives focus back to the unit code and the arrows run on from its cell; a range over the unit column copies.
+
+/** The cell of grid row `n` (its row number) in `field`. */
+const cellAt = (page: Page, n: number, field: string) =>
+  page
+    .locator('[data-slot="data-region-body"] tbody tr')
+    .filter({ has: page.locator(`[data-row-number="${n}"]`) })
+    .locator(`td[data-col-id="${field}"]`);
+
+/** Grid row number and column of the grid's selected cell, and where the document focus is. */
+async function gridFocus(
+  page: Page,
+): Promise<{ row: string | null; col: string | null; active: string }> {
+  return page.evaluate(() => {
+    const td = document.querySelector("td[data-cell-focused]");
+    const active = document.activeElement;
+    return {
+      row:
+        td?.closest("tr")?.querySelector("[data-row-number]")?.getAttribute("data-row-number") ??
+        null,
+      col: td?.getAttribute("data-col-id") ?? null,
+      active: active?.getAttribute("data-record-open") ? "unit-code" : (active?.tagName ?? ""),
+    };
+  });
+}
+
+/** One click on row `n`'s unit code opens its record. */
+async function assertOneClickOpens(page: Page, n: number): Promise<void> {
+  await cellAt(page, n, "Listing.unitNumber").locator("[data-record-open]").click();
+  await page.waitForTimeout(300);
+  if ((await panel(page).count()) !== 1) throw new Error("unit code needs two clicks to open");
+}
+
+test.describe("E2 · the unit code opens in one click, the cell selects like a sheet", () => {
+  test.beforeEach(({ browserName }, info) =>
+    test.skip(browserName !== "chromium" || !WIDE.has(info.project.name), "do o 1440 va 1024"),
+  );
+
+  test("one click on the code opens; the blank of the cell selects; Enter on it opens", async ({
+    page,
+  }) => {
+    await openInventory(page);
+    await assertOneClickOpens(page, 5);
+    await page.keyboard.press("Escape");
+    await expect(panel(page)).toHaveCount(0);
+    // The blank edge of row 7's unit cell: the cell is selected, nothing opens.
+    await cellAt(page, 7, "Listing.unitNumber").click({ position: { x: 3, y: 3 } });
+    await page.waitForTimeout(300);
+    await expect(panel(page)).toHaveCount(0);
+    expect(await gridFocus(page)).toMatchObject({ row: "7", col: "Listing.unitNumber" });
+    await page.keyboard.press("Enter");
+    await expect(panel(page)).toHaveCount(1);
+    const id = await cellAt(page, 7, "Listing.unitNumber")
+      .locator("[data-record-open]")
+      .getAttribute("data-record-open");
+    await expect(panel(page)).toHaveAttribute("data-record-id", id!);
+  });
+
+  test("closing gives focus to the unit code and the arrows run on from its cell", async ({
+    page,
+  }) => {
+    await openInventory(page);
+    await assertOneClickOpens(page, 5);
+    await panel(page).getByRole("button", { name: "Đóng" }).click();
+    await expect(panel(page)).toHaveCount(0);
+    await expect
+      .poll(() => gridFocus(page))
+      .toMatchObject({ row: "5", col: "Listing.unitNumber", active: "unit-code" });
+    await page.keyboard.press("ArrowDown");
+    await expect.poll(() => gridFocus(page)).toMatchObject({ row: "6", col: "Listing.unitNumber" });
+    await page.keyboard.press("Shift+ArrowDown");
+    await expect(page.locator('[data-slot="region-footer"]')).toContainText("2 ô đã chọn");
+  });
+
+  test("a range over the unit column copies the unit codes", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await openInventory(page);
+    const expected = async () => {
+      const lines: string[] = [];
+      for (const n of [3, 4]) {
+        const unit = ((await cellAt(page, n, "Listing.unitNumber").textContent()) ?? "").trim();
+        const tower = ((await cellAt(page, n, "Listing.buildingName").textContent()) ?? "").trim();
+        lines.push(`${unit}\t${tower}`);
+      }
+      return lines.join("\r\n");
+    };
+    const copied = async () => {
+      await page.keyboard.press("ControlOrMeta+c");
+      await page.waitForTimeout(300);
+      return page.evaluate(() => navigator.clipboard.readText());
+    };
+    // By the mouse: from the tower of row 3 to the blank edge of row 4's unit cell.
+    const from = (await cellAt(page, 3, "Listing.buildingName").boundingBox())!;
+    const to = (await cellAt(page, 4, "Listing.unitNumber").boundingBox())!;
+    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(to.x + 3, to.y + to.height - 3, { steps: 5 });
+    await page.mouse.up();
+    await expect(panel(page)).toHaveCount(0);
+    expect(await copied()).toBe(await expected());
+    // By the keys: from the tower of row 3, Shift+Left and Shift+Down.
+    await cellAt(page, 3, "Listing.buildingName").click();
+    await page.keyboard.press("Shift+ArrowLeft");
+    await page.keyboard.press("Shift+ArrowDown");
+    expect(await copied()).toBe(await expected());
+  });
+
+  test("break: a unit code that keeps the grid's two-step press is caught", async ({ page }) => {
+    await openInventory(page);
+    await page.evaluate(() => {
+      for (const el of document.querySelectorAll("[data-record-open]"))
+        el.removeAttribute("data-cell-interactive");
+    });
+    await expect(assertOneClickOpens(page, 5)).rejects.toThrow(
+      "unit code needs two clicks to open",
+    );
+  });
+});
+
 // ---- E3 · AC-3: the columns left of the record ----------------------------------------------------------------------
 
 test.describe("E3 · the grid beside the record keeps its columns", () => {
