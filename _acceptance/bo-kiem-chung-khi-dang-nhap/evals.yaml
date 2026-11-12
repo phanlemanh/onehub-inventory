@@ -86,7 +86,7 @@ evals:
     executor: script
     cmd: config:executors.script.man_mau
     paths: [tools/e2e_templates/**]
-    expected: "exit 0; bài 'ca pha hang 1f giu nguyen' trong tools/e2e_templates/e2e-templates.test.ts mang bảng viết trước gồm mọi cặp (công thức, tên ca phá, nguồn thông điệp ghim) của FRAME và REGION trên nhánh chính tại a97c71d — bảng được rút bằng máy từ 'git show a97c71d:tools/e2e_templates/recipes.ts' khi viết, không chép tay — và khẳng định FRAME/REGION hiện tại chứa đủ từng cặp, cùng thông điệp ghim cho màn 'man-thu'; chiều đỏ: bỏ một ca phá trên bản sao danh sách → bài gọi tên ca ấy"
+    expected: "exit 0; bài 'ca pha hang 1f giu nguyen' trong tools/e2e_templates/e2e-templates.test.ts mang bảng viết trước gồm mọi cặp (công thức, tên ca phá, nguồn thông điệp ghim) của FRAME và REGION trên nhánh chính tại d85d815 (nhánh chính hàng này gộp về trước việc gom hàm chờ; hàng 2 đã ký đổi tên ca 'chi con trang dau' thành 'chi con khung dau' sau a97c71d) — bảng được rút bằng máy từ 'git show d85d815:tools/e2e_templates/recipes.ts' khi viết, không chép tay — và khẳng định FRAME/REGION hiện tại chứa đủ từng cặp, cùng thông điệp ghim cho màn 'man-thu'; chiều đỏ: bỏ một ca phá trên bản sao danh sách → bài gọi tên ca ấy"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E12

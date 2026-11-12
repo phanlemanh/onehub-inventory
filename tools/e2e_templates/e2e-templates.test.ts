@@ -24,8 +24,10 @@ import {
   compareRows,
   pickNeedle,
   pinned,
+  type Recipe,
 } from "./recipes";
-import { REPO_ROOT, SESSION_SCREENS } from "./register";
+import * as registerModule from "./register";
+import { REPO_ROOT, SIGNED_OUT_SCREENS, signedOutProblems } from "./register";
 import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
 import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings";
 import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
@@ -224,10 +226,6 @@ function copyRegister(): string {
     cpSync(join(REPO_ROOT, rel), join(root, rel));
   }
   for (const s of bridge(REPO_ROOT).screens) if (s.status === "built") stubPage(root, s.route);
-  for (const rel of Object.values(SESSION_SCREENS)) {
-    mkdirSync(dirname(join(root, rel)), { recursive: true });
-    cpSync(join(REPO_ROOT, rel), join(root, rel));
-  }
   return root;
 }
 
@@ -269,18 +267,21 @@ describe("sổ giả thêm màn thì có bộ", () => {
   it(
     "the real register lists exactly the written frame suites, and a new screen adds its own",
     () => {
-      /** Written before the code: the built staff and public screens on main after row 8. */
-      const SCREENS = ["today", "inventory", "sent", "sign-in"];
+      /**
+       * Written before the code: the built staff and public screens on main after row 9. Row 1r: members is listed
+       * too — it needs a session, so the signed-out run hands it over by name at run time (64 became 80).
+       */
+      const SCREENS = ["today", "inventory", "sent", "sign-in", "members"];
       const expected = SCREENS.flatMap((s) =>
         SIZES.flatMap((z) => FRAME_TESTS.map((t) => `${z} ${s} ${t}`)),
       );
-      expect(expected).toHaveLength(64);
+      expect(expected).toHaveLength(80);
 
       const root = copyRegister();
       const before = list(root);
       expect(before.status).toBe(0);
       expect(frameCases(before.lines, "khung").sort()).toEqual([...expected].sort());
-      expect(frameCases(before.lines, "pha khung")).toHaveLength(64);
+      expect(frameCases(before.lines, "pha khung")).toHaveLength(80);
       // Every built screen has a suite or a named skip line.
       for (const s of bridge(root).screens.filter((x) => x.status === "built")) {
         const has = before.lines.some((l) => l.includes(` › man ${s.id} › `));
@@ -299,11 +300,11 @@ describe("sổ giả thêm màn thì có bộ", () => {
       expect(added.status).toBe(0);
       const ghost = frameCases(added.lines, "khung").filter((c) => c.includes(" ghost-built "));
       expect(ghost).toHaveLength(16);
-      expect(frameCases(added.lines, "khung")).toHaveLength(80);
+      expect(frameCases(added.lines, "khung")).toHaveLength(96);
 
       edit(root, "design/screens.yaml", (t) => t.split("  - id: ghost-built\n")[0]!);
       rmSync(join(root, "src/app/ghost"), { recursive: true });
-      expect(frameCases(list(root).lines, "khung")).toHaveLength(64);
+      expect(frameCases(list(root).lines, "khung")).toHaveLength(80);
     },
     SLOW * 3,
   );
@@ -323,46 +324,112 @@ describe("màn bị bỏ có tên", () => {
   );
 });
 
-describe("màn cần đăng nhập bỏ qua có điều kiện", () => {
+// Row 1r replaces row 9's «màn cần đăng nhập: bỏ qua có điều kiện» and its three cases: the screen is measured with a
+// test session in the signed-in run (E1, E2 there), and handed over by name in the signed-out run (E5 there).
+describe("màn cần đăng nhập không còn danh sách bỏ qua", () => {
+  it("register.ts no longer exports SESSION_SCREENS or sessionSuiteProblem", () => {
+    const names = Object.keys(registerModule);
+    expect(names).toContain("SIGNED_OUT_SCREENS");
+    expect(names).not.toContain("SESSION_SCREENS");
+    expect(names).not.toContain("sessionSuiteProblem");
+  });
+
   it(
-    "the members screen is skipped by name while its signed-in test measures frame and axe",
+    "the signed-out run lists members and skips no screen for needing a session",
     () => {
       const r = list(copyRegister());
       expect(r.status).toBe(0);
-      expect(r.lines).toContain(
-        "bo qua: members — can dang nhap — khung va axe do o tests/e2e-db/members.spec.ts",
-      );
-      expect(r.lines.some((l) => / › man members › /.test(l))).toBe(false);
+      expect(r.lines.some((l) => / › man members › khung tieu-de$/.test(l.trimEnd()))).toBe(true);
+      expect(r.lines.filter((l) => l.startsWith("bo qua: "))).toEqual([
+        "bo qua: contacts — planned",
+        "bo qua: proto — dev",
+      ]);
+    },
+    SLOW,
+  );
+});
+
+describe("danh sach nguoi chua dang nhap co ly do", () => {
+  it("every entry has a reason and names a screen of the register", () => {
+    for (const why of Object.values(SIGNED_OUT_SCREENS)) expect(why.trim()).not.toBe("");
+    expect(signedOutProblems(bridge(REPO_ROOT))).toEqual([]);
+  });
+
+  it(
+    "a copy of the register without the listed screen fails the listing and names it",
+    () => {
+      const root = copyRegister();
+      expect(signedOutProblems(bridge(root))).toEqual([]);
+      edit(root, "design/screens.yaml", (t) => {
+        const cut = t.replace(/ {2}- id: sign-in\n(?: {4}.*\n)+/, "");
+        expect(cut).not.toBe(t);
+        return cut;
+      });
+      // The page goes too, or the register reader stops first on a page that has no screen.
+      rmSync(join(root, "src/app/login"), { recursive: true });
+      expect(signedOutProblems(bridge(root))).toEqual([
+        "man la trong danh sach nguoi chua dang nhap: sign-in",
+      ]);
+      const r = list(root);
+      expect(r.status).not.toBe(0);
+      expect(r.out).toContain("man la trong danh sach nguoi chua dang nhap: sign-in");
     },
     SLOW,
   );
 
-  for (const [name, change, message] of [
-    [
-      "the signed-in test is gone",
-      null,
-      "man members can dang nhap nhung bai tests/e2e-db/members.spec.ts khong co",
-    ],
-    [
-      "the signed-in test no longer runs axe",
-      (t: string) => t.replaceAll("AxeBuilder", "KhongCo"),
-      "man members can dang nhap nhung bai tests/e2e-db/members.spec.ts khong chay axe",
-    ],
-  ] as const) {
-    it(
-      `${name}: the listing fails and names the screen`,
-      () => {
-        const root = copyRegister();
-        const file = join(root, SESSION_SCREENS["members"]!);
-        if (change) writeFileSync(file, change(readFileSync(file, "utf8")));
-        else rmSync(file);
-        const r = list(root);
-        expect(r.status).not.toBe(0);
-        expect(r.out).toContain(message);
-      },
-      SLOW,
+  it("an empty reason is named", () => {
+    expect(signedOutProblems(bridge(REPO_ROOT), { "sign-in": " " })).toEqual([
+      "ly do rong trong danh sach nguoi chua dang nhap: sign-in",
+    ]);
+  });
+});
+
+describe("ca pha hang 1f giu nguyen", () => {
+  /**
+   * Every (recipe, break, pinned message for screen «man-thu») of FRAME and REGION on main at d85d815 — the main this
+   * row merged before its shared-wait step; row 2 (signed, merged) renamed «chi con trang dau» to «chi con khung dau»
+   * after a97c71d. Drawn by machine when written: the file of `git show d85d815:tools/e2e_templates/recipes.ts` was
+   * imported and each break's `pinned(brk, "man-thu").source` printed — not copied by hand.
+   */
+  const ROW_1F: readonly (readonly [string, string, string])[] = [
+    ["tieu-de", "doi chu h1", "^man-thu: tieu-de — "],
+    ["khong-cuon-ngang", "chen phan tu rong 2000px", "^man-thu: cuon-ngang — "],
+    ["khong-loi-trinh-duyet", "nem loi tren trang", "^man-thu: loi-trinh-duyet — .*pha thu"],
+    ["axe-sang-toi", "chu trang tren nen trang", "^man-thu: axe .*color-contrast"],
+    ["cho-tai", "khung cho khong bao gio hien", "cho-tai: khung cho khong hien"],
+    ["cho-tai", "bo do tre cua dong ho vung", "cho-tai: hien chi bao truoc 1 giay"],
+    ["trong", "go buoc tiep", "trong: khong co buoc tiep"],
+    ["tim-khong-ra", "go nut Xoa loc", "tim-khong-ra: thieu loi thoat Xoa loc"],
+    ["loi", "go ly do", "loi: thieu ly do"],
+    ["mot-phan-hong", "go bang bao", "mot-phan-hong: khong bao phan hong"],
+    ["chu-dai", "go tabindex", "chu-dai: khong toi duoc bang ban phim"],
+    ["khong-du-quyen", "chen so dong", "khong-du-quyen: lo so dong"],
+    ["tim", "go mot dong khop", "tim: bo sot dong khop — "],
+    ["tim", "chi con khung dau", "tim: bo sot dong khop — "],
+    ["tim", "them mot dong khong khop", "tim: hien dong khong khop — "],
+  ];
+
+  /** The rows of ROW_1F missing from `recipes`, by recipe and break name. */
+  function lost(recipes: readonly Recipe[]): string[] {
+    const now = new Set(
+      recipes.flatMap((r) =>
+        r.breaks.map((b) => JSON.stringify([r.id, b.name, pinned(b, "man-thu").source])),
+      ),
     );
+    return ROW_1F.filter((row) => !now.has(JSON.stringify(row))).map(([r, b]) => `${r}: ${b}`);
   }
+
+  it("FRAME and REGION hold every break of row 1f with the same pinned message", () => {
+    expect(ROW_1F).toHaveLength(15);
+    expect(lost([...FRAME, ...REGION])).toEqual([]);
+  });
+
+  it("a break dropped from a copy of the list is named", () => {
+    const copy = [...FRAME, ...REGION].map((r) =>
+      r.id === "loi" ? { ...r, breaks: r.breaks.filter((b) => b.name !== "go ly do") } : r,
+    );
+    expect(lost(copy)).toEqual(["loi: go ly do"]);
+  });
 });
 
 describe("sổ sai thì đỏ", () => {
