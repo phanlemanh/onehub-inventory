@@ -53,7 +53,7 @@ evals:
     executor: script
     cmd: config:executors.script.bo_nut_kiem
     paths: [tests/bo-nut-kiem.test.ts, src/app/**, src/modules/*/ui/**, ontology/actions.yaml]
-    expected: "exit 0; ba luật, đo theo từng nút chứ không theo cả tệp: mỗi lệnh gửi yêu cầu ghi phải nằm trong hàm xử lý của một nút dựng qua PermittedAction. Cặp lành/phá trên tệp mẫu tạm: nút trần → «ghi-khong-qua-cua: <tệp>:<dòng>»; một nút bọc đúng cạnh một nút trần trong cùng tệp → vẫn đỏ ở dòng của nút trần; action lạ → «thao-tac-ngoai-bang: deleteEverything»; tên vai trong chuỗi so sánh bất kỳ (includes, ===, some, roles: [...]) trong src/app → «vai-viet-cung: <tệp>:<dòng>»; cây thật của kho xanh với cả ba luật"
+    expected: "exit 0; ba luật, đo theo từng nút chứ không theo cả tệp: mỗi lệnh gửi yêu cầu ghi phải nằm trong hàm xử lý của một nút dựng qua PermittedAction. Cặp lành/phá trên tệp mẫu tạm: nút trần → «ghi-khong-qua-cua: <tệp>:<dòng>»; một nút bọc đúng cạnh một nút trần trong cùng tệp → vẫn đỏ ở dòng của nút trần; action lạ → «thao-tac-ngoai-bang: deleteEverything»; tên vai trong chuỗi so sánh bất kỳ (includes, ===, some, roles: [...]) trong src/app → «vai-viet-cung: <tệp>:<dòng>»; cây thật của kho xanh với cả ba luật và danh sách PENDING trong tests/bo-nut-kiem.test.ts RỖNG (việc 8 đã chuyển màn Thành viên và thanh bên)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E4
