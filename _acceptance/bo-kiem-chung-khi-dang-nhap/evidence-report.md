@@ -7,8 +7,8 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 069b48b16b54b891d9d59bed85aadcfad7fa3727
-human_signoff:
+verified_commit: 99237bdf39fb003775382255be1f3900d68d80cd
+human_signoff: Manh Phan 2026-11-12
 ---
 
 # Evidence Report: bo-kiem-chung-khi-dang-nhap
@@ -218,3 +218,7 @@ none — every multi-run eval is uniform
 Round 1: BLOCKED — port clash between two browser runs; one finding in contract. Returned to implementation.
 Round 2: REJECT — throttle proof noisy under load, one 5-second wait. Returned to implementation.
 Round 3: all evals passed on 069b48b; verdict PASS.
+
+### Re-pin lần 1 — 2026-11-12, do gộp nhánh chính sau hàng 2a và 9a, trước chữ ký
+run_id: repin-20261112T133954Z-74482
+sha: 99237bdf39fb003775382255be1f3900d68d80cd · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng

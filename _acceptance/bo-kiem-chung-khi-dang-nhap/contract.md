@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
 screens: []
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: _acceptance/bo-kiem-chung-khi-dang-nhap/design.md
@@ -110,3 +110,8 @@ Không áp: hàng này dùng một phiên mang đủ bốn vai để mở mọi 
 
 - Known limits: lượt không phiên trên CI không đo màn cần đăng nhập; nó giao màn ấy cho lượt có phiên bằng tên. Gỡ khi CI có
   Postgres.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-12:
+  - Ngoài-1: mỗi lượt kiểm trình duyệt để lại một thư mục dựng tạm trên máy làm việc, không ai dọn, nên đĩa đầy dần.
+  - Ngoài-2: khi chờ ngăn hay băng báo hỏng vì lý do khác (trang sập), câu báo vẫn là câu cố định, che nguyên nhân thật.
+  - Ngoài-3: cùng gốc với Ngoài-1 — lượt kiểm thường lệ cũng để lại thư mục dựng tạm không dọn.
+  - Ngoài-5: phép thử chiều đỏ của nhãn lặp dựng trên danh sách đã lọc sẵn, chưa thử gỡ nhãn thật trên bản sao bài kiểm.
