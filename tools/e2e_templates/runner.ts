@@ -20,9 +20,17 @@ export type Base = Omit<Ctx, "page" | "errors"> & { mode?: Mode };
  * Waits until the address is the redirect's target; does nothing when the page carries no such redirect.
  */
 export async function followRedirect(page: Page): Promise<void> {
-  const content = await page.evaluate(
-    () => document.getElementById("__next-page-redirect")?.getAttribute("content") ?? null,
-  );
+  let content: string | null;
+  try {
+    content = await page.evaluate(
+      () => document.getElementById("__next-page-redirect")?.getAttribute("content") ?? null,
+    );
+  } catch (err) {
+    // The redirect fired while the page was being read: the browser is already on its way to the target.
+    if (!String(err).includes("Execution context was destroyed")) throw err;
+    await page.waitForLoadState("domcontentloaded");
+    return;
+  }
   const target = content?.match(/url=(.+)$/i)?.[1];
   if (!target) return;
   const path = new URL(target, page.url()).pathname;
