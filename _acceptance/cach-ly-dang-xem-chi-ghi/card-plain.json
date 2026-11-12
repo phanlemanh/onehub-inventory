@@ -1,37 +1,3 @@
 {
-  "feature_plain": "Bộ kiểm cách ly giữa các sàn sẽ đỏ khi ai đó thêm một «dạng xem» (một bảng ảo) mà ứng dụng được thêm, sửa hay xoá qua nó mà không bị luật sàn chặn — lối tắt mà một sàn có thể dùng để xoá thoả thuận của mọi sàn.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ kiểm mọi dạng xem mà ứng dụng được thêm, sửa hay xoá: dạng xem nào không chạy theo quyền người dùng thì bộ kiểm đỏ; một dạng xem làm đúng cách thì được đếm mà không bị nêu."},
-    {"id": "AC-2", "p": "Sẽ dựng thử ba lối tắt khác nhau (chỉ cấp xoá; chỉ cấp sửa một cột cho mọi người; chỉ cấp thêm ở một khu khác) và bộ kiểm đỏ với đúng tên dạng xem và quyền — trong khi phép kiểm cũ của hàng 7a vẫn xanh, chứng nó đã bỏ sót."},
-    {"id": "AC-3", "p": "Sẽ chứng kẽ hở là thật: qua lối tắt ấy sàn A xoá được thoả thuận của sàn B; khi dạng xem chạy đúng cách thì cùng lệnh bị từ chối và thoả thuận của B còn nguyên."},
-    {"id": "AC-4", "p": "Sẽ nâng tổng số ca của bộ kiểm từ 29 lên 31, và bộ kiểm tự báo tên khi một bản thử phá mới không còn làm đỏ."},
-    {"id": "AC-5", "p": "Sẽ giữ nguyên mọi ca và thông điệp đỏ cũ của hàng 7, 7a — đối chiếu thẳng với bản đã vào nhánh chính, không phép đo nào bị nới."},
-    {"id": "AC-6", "p": "Sẽ sửa cặp thử cũ của hàng 9 để đo đúng lớp cơ sở dữ liệu: người chỉ là Đầu chủ gọi thẳng việc mời người thì bị từ chối; bản phá bỏ phép kiểm quyền thì cặp đỏ đúng thông điệp."},
-    {"id": "AC-7", "p": "Sẽ cho cả bộ kiểm cơ sở dữ liệu chạy xanh trong một lệnh, không bỏ ca nào, và bộ kiểm chung của kho xanh."}
-  ],
-  "wont_do": [
-    {"id": "OOS-1", "p": "KHÔNG quét «luật viết lại câu» gắn trên dạng xem — vẫn ngoài phạm vi như hàng 7a."},
-    {"id": "OOS-2", "p": "KHÔNG đưa bộ kiểm cách ly lên máy kiểm tự động khi mở PR — việc của hàng 1s."},
-    {"id": "OOS-3", "p": "KHÔNG đổi vai đăng nhập cơ sở dữ liệu của ứng dụng — việc của hàng 7c."},
-    {"id": "OOS-4", "p": "KHÔNG đổi các ca và cặp thử khác của hàng 9."}
-  ],
-  "scope_plain": "Bốn thứ cố ý để ngoài, mỗi thứ đã có chỗ của nó:",
-  "coverage_plain": [
-    {"i": 0, "p": "Độ phủ được liệt tay theo các trục dưới (không gian nhỏ, không chạy công cụ quét)."},
-    {"i": 2, "p": "Cả ba quyền ghi — thêm, sửa (kể cả chỉ một cột), xoá — đều có ca kiểm và bản thử phá (AC-1, AC-2)."},
-    {"i": 3, "p": "Quyền nhận thẳng và nhận qua «mọi người» có bản thử phá; quyền thừa kế từ vai mẹ được cùng phép đọc quyền tính sẵn (AC-1, AC-2)."},
-    {"i": 4, "p": "Dạng xem ở khu chung và ở một khu mới đều bị bắt (AC-2)."},
-    {"i": 5, "p": "Dạng xem thường bị nêu; dạng xem chạy theo người dùng là đối chứng xanh; dạng xem tính sẵn thì không ghi được nên ngoài trục (AC-1 đến AC-3)."},
-    {"i": 6, "p": "Kẽ hở thật được chứng bằng một lần xoá thật, đối chứng bằng một lần bị từ chối (AC-3)."},
-    {"i": 7, "p": "Phép đo cũ không bị nới: 29 ca, 18 thông điệp đỏ của hàng 7, 7a (AC-5)."},
-    {"i": 8, "p": "Việc kèm của hàng 9: lớp cơ sở dữ liệu của việc mời người, và cả bộ kiểm cơ sở dữ liệu xanh (AC-6, AC-7)."},
-    {"i": 9, "p": "Giả định chưa thử riêng: lối «quyền thừa kế từ vai mẹ» không có bản thử phá riêng —"},
-    {"i": 10, "p": "dựa vào việc phép đọc quyền của cơ sở dữ liệu đã tính thừa kế, và hàng 7a đã chứng lối «mọi người» cùng cách đọc ấy."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Đối chứng của ca «kẽ hở thật» chưa nói vì sao thoả thuận của B còn: có thể chỉ vì lệnh lỗi. Đã sửa: ghim đúng lỗi «không có quyền xoá» rồi mới đếm B còn 1."},
-    {"i": 1, "p": "Hai tiêu chí của việc kèm hàng 9 cần giám sát cho chạm thêm một tệp kiểm và thêm một dòng lệnh, chưa có trả lời. Đã sửa: hợp đồng ghi rõ — giám sát từ chối thì hai tiêu chí tách thành việc riêng và duyệt lại phạm vi; chưa trả lời thì chưa làm phần ấy."},
-    {"i": 2, "p": "Mốc «không nới phép đo cũ» do chính người làm chép tay, có thể chép từ bản đã sửa. Đã sửa: đọc thẳng bộ kiểm ở bản đã vào nhánh chính (hàng 7a), đếm đủ 29 ca và 18 thông điệp."},
-    {"i": 3, "p": "Đối chứng trong ca mới không hiện ra ở kết quả chạy. Đã sửa: dòng kết quả ghi rõ «đối chứng 1», sai số thì ca tự đỏ."}
-  ]
+  "feature_plain": "Bộ kiểm cách ly giờ đỏ khi có một dạng xem cho ứng dụng thêm, sửa hay xoá thoả thuận mà không theo quyền người dùng — lối tắt từng cho một sàn xoá thoả thuận của sàn khác mà bộ kiểm vẫn xanh."
 }
