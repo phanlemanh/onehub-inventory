@@ -29,8 +29,8 @@ executors:
     moi_nguoi_db: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx vitest run -c vitest.db.config.ts tests/db/moi-nguoi.db.test.ts --reporter=verbose"   # moi-nguoi-gan-vai (row 9): lane Postgres, scratch databases moi_nguoi_*
     cach_ly_n: "DB_LANE=${DB_LANE:-n} bash db/scripts/cach-ly.sh"   # moi-nguoi-gan-vai (row 9): the isolation suite on lane N's Postgres when other lanes' containers run too
     moi_nguoi_e2e: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx playwright test -c playwright.db.config.ts tests/e2e-db/members.spec.ts"   # moi-nguoi-gan-vai (row 9): members screen on lane Postgres
-    cach_ly_c: "DB_LANE=${DB_LANE:-c} bash db/scripts/cach-ly.sh"   # cach-ly-truoc-du-lieu-that (row 7a): isolation suite on lane C Postgres
-    cach_ly_db_c: "DB_LANE=${DB_LANE:-c} DB_PORT=${DB_PORT:-5569} npx vitest run -c vitest.db.config.ts tests/db/cach-ly.db.test.ts --reporter=verbose"   # row 7a: agreements table against the ontology, lane C Postgres
+    cach_ly_c: "DB_LANE=${DB_LANE:-c} DB_PORT=${DB_PORT:-5569} bash -c 'bash db/scripts/cach-ly.sh && npx vitest run -c vitest.db.config.ts tests/db/cach-ly.db.test.ts --reporter=verbose'"   # cach-ly-truoc-du-lieu-that (row 7a): isolation suite, then agreements-vs-ontology and runner tests, lane C Postgres — one command so a grading round never runs two of them on the same scratch databases
+    cach_ly_db_c: "DB_LANE=${DB_LANE:-c} DB_PORT=${DB_PORT:-5569} bash -c 'bash db/scripts/cach-ly.sh && npx vitest run -c vitest.db.config.ts tests/db/cach-ly.db.test.ts --reporter=verbose'"   # row 7a: same command as cach_ly_c on purpose (deduplicated in a grading round)
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists

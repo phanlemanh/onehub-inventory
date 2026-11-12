@@ -82,6 +82,19 @@ thể và `make gen` theo đó.
 - Luật viết lại câu (CREATE RULE) và trigger sự kiện chạy bằng quyền chủ bảng; bộ kiểm không quét hai thứ này.
 - Bộ kiểm vẫn chạy trên Postgres của dãy, chưa chạy trên CI (Ngoài-3 của hàng 7, chủ kho ghi giới hạn đã biết).
 
+## Từ Quỹ hàng
+
+Đã tra `onehub-quy-hang` ở commit `1729b11f` (chỉ đọc).
+
+| Quỹ hàng giải thế nào | Tệp | Hàng 7a giữ gì, bỏ gì, vì sao |
+|---|---|---|
+| Bộ kiểm cách ly quét «mọi bảng dữ liệu bật và ép luật theo dòng» chỉ ở schema `public`, chỉ bảng thường; có ca «vai API không vào được schema danh tính». Không có ca nào cho quyền xoá sạch bảng, dạng xem, dạng xem chụp sẵn hay hàm đặc quyền. | `packages/db/tests/isolation.test.mjs` (dòng 100–115, 188) | Giữ ca schema danh tính (thành một vế của ca «chỉ chạm bảng có luật»). Bỏ giới hạn «chỉ `public`»: Quỹ hàng mang đúng chỗ hở Ngoài-14, 19 nêu, nên hàng 7a quét từ phía quyền của vai, ở mọi schema. Bốn ca còn lại là mới, Quỹ hàng không có. |
+| Bài quét một cửa chỉ bắt nạp thư viện Postgres và gọi thẳng trên bể; không bắt câu đổi vai hay đổi sàn. | `packages/api/src/one-door.test.ts` | Giữ hai luật cũ (kho này đã chép ở hàng 7). Thêm luật 3 — Quỹ hàng không có. |
+| Ứng dụng thật nối bằng vai chủ riêng `quy_hang_owner` có `bypassrls`; truy vấn của sàn vẫn `set local role quy_hang_app`. Kiểm nhanh môi trường thật soi bảng `public` ép luật, vai API không sở hữu bảng, không `bypassrls`. | `docs/adr/0009-moi-truong-that.md` (mục 2, mục kiểm nhanh 3) | Cho thấy gốc của Ngoài-5 cũng có ở Quỹ hàng: `reset role` trong cửa về vai chủ vượt luật. Không làm trong hàng này; là căn cứ cho đề xuất hàng riêng «vai đăng nhập không phải chủ» (yêu cầu C-3). |
+| Bảng thoả thuận nới thêm hai loại: «xử lý bằng AI» (migration 035) rồi «xác nhận danh mục» (migration 040), mỗi lần thay ràng buộc loại; giữ chốt lớp `source` (`agreements_never_source`). Kèm luật riêng của từng loại (mỗi sàn một thoả thuận AI; chỉ chiều ra, chỉ lớp danh mục). | `packages/db/migrations/035_xu_ly_bang_ai.sql`, `packages/db/migrations/040_xac_nhan_danh_muc.sql`, `packages/core/src/agreements.ts` | Giữ: thay ràng buộc loại cho đủ tám loại, cùng danh sách và cùng tên ràng buộc (migration 005). Bỏ: luật riêng của hai loại và sổ chi phí AI — thuộc hàng nhập bằng AI và hàng xác nhận danh mục, nằm ngoài tám mục của hàng 7. |
+
+Việc đọc không lộ ra điều nào trái với phạm vi đã duyệt.
+
 ## Đặc tả UX
 
 Bỏ — hàng không có màn (xem sổ quyết định).
