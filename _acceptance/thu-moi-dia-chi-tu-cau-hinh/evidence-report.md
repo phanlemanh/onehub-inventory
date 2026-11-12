@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: thu-moi-dia-chi-tu-cau-hinh
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 31b2e21f164d2b79b62db3920df3d94fa5e15061
-human_signoff:
+human_signoff: Manh Phan 2026-11-12
 ---
 
 # Evidence Report: thu-moi-dia-chi-tu-cau-hinh
@@ -114,7 +114,7 @@ Panel đề xuất: PASS (ba góc nhìn). Hợp đồng là T3 nên người ph�
   judged_by: judge-subagent (fresh context), panel đề xuất gồm domain-correctness, operational-feasibility, spec-alignment
   verdict: PASS
   rationale: Cả ba góc nhìn thấy bộ gửi Resend ở bản thật luôn mang địa chỉ cấu hình, runtime.ts nối nó vào deps.invite, members.ts chỉ gửi qua deps.invite, và ở bản thật thư không rơi về origin của yêu cầu.
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-12 — Đạt
 
   Phiếu từng góc nhìn:
   - domain-correctness: PASS — (a) runtime.ts liveDeps gán invite từ config.inviteSender của readAuthConfig(process.env), không dựng bộ gửi nào khác; ở bản thật readAuthConfig trả resendInviteSender kèm appUrl. (b) members.ts inviteMember chỉ gửi qua deps.invite, kiểu InviteSender. (c) assertProductionConfig và parseAppUrl bảo đảm appUrl khác rỗng ở bản thật nên inviteEmail không rơi về mail.origin; chỉ devInviteSender khi không có APP_URL và captureInviteSender của bài kiểm dùng origin, cả hai không chạy ở bản thật.

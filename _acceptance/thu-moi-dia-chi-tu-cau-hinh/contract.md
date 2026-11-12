@@ -5,7 +5,7 @@ slug: thu-moi-dia-chi-tu-cau-hinh
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, api]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: docs/superpowers/specs/2026-11-12-thu-moi-dia-chi-tu-cau-hinh-design.md
@@ -69,3 +69,8 @@ Thước CE: mỗi ô của năm trục đầu có ít nhất một AC; ô «sai
 
 - Known limits: phép đo dừng ở bộ gửi thư mà cấu hình dựng — chính bộ gửi `runtime.ts` nối vào bộ xử lý mời người ở bản
   thật; không có bài HTTP đầu-cuối với tên máy chủ lạ.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-12:
+  - Ngoài-1: bộ xếp bậc tự động chấm thay đổi cấu hình đăng nhập này ở mức vừa; người duyệt coi nó như mức cao.
+  - Ngoài-2: một dòng chú thích về địa chỉ sản phẩm trong tệp cấu hình mẫu viết bằng tiếng Việt, vì tiêu chí AC-7 đòi đúng câu ấy.
+  - Ngoài-5: (trùng Ngoài-1, ghi từ lượt chấm 1) bậc duyệt tự động thấp hơn đáng có.
+  - Ngoài-6: AC-4 và phép đo E4 còn ghi cả hai nhánh https/http dù chủ kho đã chốt chỉ nhận https.
