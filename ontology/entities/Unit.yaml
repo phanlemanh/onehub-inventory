@@ -1,15 +1,18 @@
 name: Unit
 description: A physical apartment, house or plot in the shared catalog; shared by every company, so it has no company_id.
-reso: none as a resource; fields follow RESO Property (UnitNumber, BuildingName, SubdivisionName, LivingArea, BedroomsTotal, DirectionFaces, PropertyType, PropertySubType)
+reso: none as a resource; fields follow RESO Property (UnitNumber, BuildingName, SubdivisionName, UnitFloorLocation, LivingArea, BedroomsTotal, DirectionFaces, PropertyType, PropertySubType)
 
 properties:
+  unitKey: { type: string, required: true, unique: true, display: none }
   upi: { type: string, required: true, unique: true, display: none }
-  subdivisionKey: { type: string, required: true, display: none }
-  buildingKey: { type: string, required: true, display: none }
+  subdivisionKey: { type: ref, target: Subdivision, required: true, display: none }
+  complexKey: { type: ref, target: Complex, display: none }
+  buildingKey: { type: ref, target: Building, required: true, display: none }
   buildingName: { type: string, required: true, display: text }
-  unitNumber: { type: string, required: true, display: text }
+  stackKey: { type: ref, target: Stack, display: none }
   stack: { type: string, display: text }
-  floor: { type: integer, display: count }
+  unitNumber: { type: string, required: true, display: text }
+  floor: { type: string, display: text, reso: UnitFloorLocation }
   livingArea: { type: number, min: 0, display: area, reso: LivingArea }
   bedroomsTotal: { type: integer, min: 0, display: count, reso: BedroomsTotal }
   directionFaces: { type: string, display: text }
@@ -21,6 +24,11 @@ properties:
       required: true,
       display: select,
     }
+
+rules:
+  - id: floor-text
+    description: The floor is text in the RESO UnitFloorLocation sense, digits with an optional letter (7, 15A), no leading zero.
+    implemented_in: src/modules/catalog/unit-code.ts
 
 code:
   model: src/modules/catalog/

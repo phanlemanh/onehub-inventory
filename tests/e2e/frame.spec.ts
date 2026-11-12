@@ -9,7 +9,10 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { type Page } from "@playwright/test";
+
+import { expect, test } from "../../tools/e2e_templates/fixture";
+import { openSheet, SETTLE_MS, shown } from "../../tools/e2e_templates/settle";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const PROTO = "/proto/khung-va-giao-dien";
@@ -125,27 +128,12 @@ async function assertBanner(page: Page, text: string): Promise<void> {
   if ((await banner.count()) !== 1) throw new Error(`banner missing: ${text}`);
 }
 
-async function openSheet(page: Page): Promise<void> {
-  // A click that lands before the page hydrates does nothing: press again until the sheet shows.
-  const sheet = page.locator('[data-mobile="true"]');
-  await expect(async () => {
-    if (!(await sheet.isVisible())) {
-      await page.getByRole("button", { name: "Mở hoặc đóng thanh bên" }).click();
-    }
-    await expect(sheet).toBeVisible({ timeout: 2000 });
-  }).toPass({ timeout: 20_000 });
-  // Wait for the slide-in to finish: a half-faded sheet is not what the person reads.
-  await page.waitForFunction(() =>
-    document.getAnimations().every((a) => a.playState !== "running"),
-  );
-}
-
 // ---- cases ------------------------------------------------------------------------------------------------------
 
 test.describe("frame", () => {
   test.setTimeout(90_000);
 
-  test("marks the current screen and names the tab", async ({ page }, info) => {
+  test("marks the current screen and names the tab", { tag: "@cho" }, async ({ page }, info) => {
     for (const screen of SCREENS) {
       await page.goto(screen.href);
       await expect(page.locator("h1")).toHaveText(screen.title);
@@ -155,18 +143,22 @@ test.describe("frame", () => {
     }
   });
 
-  test("current-screen check fails when the mark is moved", async ({ page }, info) => {
-    await page.goto("/inventory");
-    await pageReady(page);
-    if (PHONE.has(info.project.name)) await openSheet(page);
-    await page.evaluate(() => {
-      document.querySelector('[aria-current="page"]')?.removeAttribute("aria-current");
-      document.querySelector('a[href="/sent"]')?.setAttribute("aria-current", "page");
-    });
-    await expect(assertCurrentScreen(page, "/inventory", "Bảng hàng")).rejects.toThrow(
-      "current screen mark",
-    );
-  });
+  test(
+    "current-screen check fails when the mark is moved",
+    { tag: "@cho" },
+    async ({ page }, info) => {
+      await page.goto("/inventory");
+      await pageReady(page);
+      if (PHONE.has(info.project.name)) await openSheet(page);
+      await page.evaluate(() => {
+        document.querySelector('[aria-current="page"]')?.removeAttribute("aria-current");
+        document.querySelector('a[href="/sent"]')?.setAttribute("aria-current", "page");
+      });
+      await expect(assertCurrentScreen(page, "/inventory", "Bảng hàng")).rejects.toThrow(
+        "current screen mark",
+      );
+    },
+  );
 
   test("first Tab reaches the skip link and it moves focus to main", async ({ page }) => {
     await page.goto("/inventory");
@@ -185,17 +177,21 @@ test.describe("frame", () => {
     await expect(assertSkipLink(page)).rejects.toThrow("skip link target");
   });
 
-  test("phone sidebar opens as a sheet and closes after choosing", async ({ page }, info) => {
-    test.skip(!PHONE.has(info.project.name), "desktop");
-    await page.goto("/");
-    await pageReady(page);
-    await expect(page.getByRole("link", { name: "Bảng hàng" })).toBeHidden();
-    await openSheet(page);
-    const sheet = page.locator('[data-mobile="true"]');
-    await sheet.getByRole("link", { name: "Bảng hàng" }).click();
-    await expect(page).toHaveURL(/\/inventory$/);
-    await expect(sheet).toBeHidden();
-  });
+  test(
+    "phone sidebar opens as a sheet and closes after choosing",
+    { tag: "@cho" },
+    async ({ page }, info) => {
+      test.skip(!PHONE.has(info.project.name), "desktop");
+      await page.goto("/");
+      await pageReady(page);
+      await expect(page.getByRole("link", { name: "Bảng hàng" })).toBeHidden();
+      await openSheet(page);
+      const sheet = page.locator('[data-mobile="true"]');
+      await sheet.getByRole("link", { name: "Bảng hàng" }).click();
+      await expect(page).toHaveURL(/\/inventory$/);
+      await expect(sheet).toBeHidden();
+    },
+  );
 
   test("does not scroll sideways", async ({ page }) => {
     for (const href of ["/", "/inventory", "/sent", PROTO, `${PROTO}?state=error`]) {
@@ -310,18 +306,21 @@ test.describe("frame", () => {
     expect(violations.map((v) => v.id)).toContain("color-contrast");
   });
 
-  test("losing the network shows a banner that leaves when it is back", async ({
-    page,
-    context,
-  }) => {
-    await page.goto("/inventory");
-    await pageReady(page);
-    await context.setOffline(true);
-    await expect(page.getByRole("alert").filter({ hasText: "Mất kết nối mạng" })).toBeVisible();
-    await assertBanner(page, "chưa lưu được");
-    await context.setOffline(false);
-    await expect(page.getByRole("alert").filter({ hasText: "Mất kết nối mạng" })).toHaveCount(0);
-  });
+  test(
+    "losing the network shows a banner that leaves when it is back",
+    { tag: "@cho" },
+    async ({ page, context }) => {
+      await page.goto("/inventory");
+      await pageReady(page);
+      await context.setOffline(true);
+      await shown(page.getByRole("alert").filter({ hasText: "Mất kết nối mạng" }), "bang mat mang");
+      await assertBanner(page, "chưa lưu được");
+      await context.setOffline(false);
+      await expect(page.getByRole("alert").filter({ hasText: "Mất kết nối mạng" })).toHaveCount(0, {
+        timeout: SETTLE_MS,
+      });
+    },
+  );
 
   test("banner check fails while the network is up", async ({ page }) => {
     await page.goto("/inventory");
@@ -329,21 +328,27 @@ test.describe("frame", () => {
     await expect(assertBanner(page, "Mất kết nối mạng")).rejects.toThrow("banner missing");
   });
 
-  test("a save that fails offline keeps the input and offers retry", async ({ page, context }) => {
-    await page.goto(PROTO);
-    const note = page.getByLabel("Ghi chú thử");
-    await note.fill("ghi chú [Tên]");
-    await context.setOffline(true);
-    await page.getByRole("button", { name: "Lưu thử" }).click();
-    const banner = page.getByRole("alert").filter({ hasText: "Chưa lưu được vì mất kết nối mạng" });
-    await expect(banner).toBeVisible();
-    await expect(note).toHaveValue("ghi chú [Tên]");
-    await context.setOffline(false);
-    await expect(banner).toBeVisible();
-    await banner.getByRole("button", { name: "Thử lại" }).click();
-    await expect(banner).toHaveCount(0);
-    await expect(note).toHaveValue("ghi chú [Tên]");
-  });
+  test(
+    "a save that fails offline keeps the input and offers retry",
+    { tag: "@cho" },
+    async ({ page, context }) => {
+      await page.goto(PROTO);
+      const note = page.getByLabel("Ghi chú thử");
+      await note.fill("ghi chú [Tên]");
+      await context.setOffline(true);
+      await page.getByRole("button", { name: "Lưu thử" }).click();
+      const banner = page
+        .getByRole("alert")
+        .filter({ hasText: "Chưa lưu được vì mất kết nối mạng" });
+      await shown(banner, "bang chua luu");
+      await expect(note).toHaveValue("ghi chú [Tên]");
+      await context.setOffline(false);
+      await expect(banner).toBeVisible();
+      await banner.getByRole("button", { name: "Thử lại" }).click();
+      await expect(banner).toHaveCount(0);
+      await expect(note).toHaveValue("ghi chú [Tên]");
+    },
+  );
 
   test("follows the device theme first", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "dark" });
@@ -365,49 +370,50 @@ test.describe("frame", () => {
     await expect(page.locator("html")).toHaveClass(/\bdark\b/);
   });
 
-  test("no serious accessibility violations on every frame screen", async ({
-    page,
-    context,
-  }, info) => {
-    // 18 scans with axe: slower CI runners need more than the suite default.
-    test.setTimeout(240_000);
-    const phone = PHONE.has(info.project.name);
-    /** Written before the code: 9 screens, each scanned in light and in dark. */
-    const SCAN_LIST = [
-      { name: "today", href: "/" },
-      { name: "inventory", href: "/inventory" },
-      { name: "sent", href: "/sent" },
-      { name: "prototype", href: PROTO },
-      { name: "error", href: `${PROTO}?state=error` },
-      { name: "session expired", href: `${PROTO}?state=session-expired` },
-      { name: "not found", href: "/no-such-page" },
-      { name: "offline banner", href: "/inventory", offline: true },
-      { name: phone ? "sidebar sheet" : "sidebar expanded", href: "/inventory", sheet: phone },
-    ];
-    expect(SCAN_LIST).toHaveLength(9);
-    let scans = 0;
-    const found: Record<string, string[]> = {};
-    for (const colorScheme of ["light", "dark"] as const) {
-      await page.emulateMedia({ colorScheme });
-      for (const screen of SCAN_LIST) {
-        await page.goto(screen.href);
-        await pageReady(page);
-        if (screen.offline) {
-          await context.setOffline(true);
-          await expect(page.locator('[data-slot="screen-banner"]')).toBeVisible();
+  test(
+    "no serious accessibility violations on every frame screen",
+    { tag: "@cho" },
+    async ({ page, context }, info) => {
+      // 18 scans with axe: slower CI runners need more than the suite default.
+      test.setTimeout(240_000);
+      const phone = PHONE.has(info.project.name);
+      /** Written before the code: 9 screens, each scanned in light and in dark. */
+      const SCAN_LIST = [
+        { name: "today", href: "/" },
+        { name: "inventory", href: "/inventory" },
+        { name: "sent", href: "/sent" },
+        { name: "prototype", href: PROTO },
+        { name: "error", href: `${PROTO}?state=error` },
+        { name: "session expired", href: `${PROTO}?state=session-expired` },
+        { name: "not found", href: "/no-such-page" },
+        { name: "offline banner", href: "/inventory", offline: true },
+        { name: phone ? "sidebar sheet" : "sidebar expanded", href: "/inventory", sheet: phone },
+      ];
+      expect(SCAN_LIST).toHaveLength(9);
+      let scans = 0;
+      const found: Record<string, string[]> = {};
+      for (const colorScheme of ["light", "dark"] as const) {
+        await page.emulateMedia({ colorScheme });
+        for (const screen of SCAN_LIST) {
+          await page.goto(screen.href);
+          await pageReady(page);
+          if (screen.offline) {
+            await context.setOffline(true);
+            await shown(page.locator('[data-slot="screen-banner"]'), "bang mat mang");
+          }
+          if (screen.sheet) {
+            await openSheet(page);
+          }
+          const ids = await seriousViolations(page);
+          if (ids.length > 0) found[`${colorScheme} ${screen.name}`] = ids;
+          scans += 1;
+          if (screen.offline) await context.setOffline(false);
         }
-        if (screen.sheet) {
-          await openSheet(page);
-        }
-        const ids = await seriousViolations(page);
-        if (ids.length > 0) found[`${colorScheme} ${screen.name}`] = ids;
-        scans += 1;
-        if (screen.offline) await context.setOffline(false);
       }
-    }
-    expect(found).toEqual({});
-    expect(scans).toBe(18);
-  });
+      expect(found).toEqual({});
+      expect(scans).toBe(18);
+    },
+  );
 
   test("accessibility check fails on a retry button with unreadable text", async ({ page }) => {
     await page.goto(`${PROTO}?state=error`);

@@ -1,0 +1,181 @@
+# Permission table (decision 0016, roadmap row 9a). One row per action; the API, the database and later the screens
+# read this table, and every cell has a test. Display names: ontology/glossary.md (Thao tác, Phạm vi).
+#
+#   scope    one cell per role of ontology/roles.yaml: company (Toàn sàn) or own (Của tôi); a role without a cell may
+#            not run the action. A person with several roles gets the widest scope of their roles.
+#   status   live (has doors in the code) or planned (draft from Quỹ hàng, no door yet; the row that opens it decides
+#            each cell at its own scope gate and turns it live).
+#   states   record states the action allows (planned rows only for now: no live action depends on a record state).
+#   doors    api: "<METHOD> /api/v1/..." · db: "function <schema>.<name>(<types>)" or "table <name> <privilege>".
+#
+# The database keeps a copy of the live cells in app.permissions (migration 006); tests/db/bang-quyen.db.test.ts
+# compares it row by row with the generated table. A new action adds a row here and a migration that inserts it.
+actions:
+  - name: readOwnRoles
+    description: Read the roles one holds in the company of the session.
+    entity: Member
+    kind: query
+    status: live
+    scope: { ListAgent: own, BuyerAgent: own, TeamLead: own, CompanyAdmin: own }
+    doors:
+      db: ["function app.member_roles()", "table company_members select"]
+
+  - name: readCompany
+    description: Read the name of the company of the session.
+    entity: Company
+    kind: query
+    status: live
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db: ["table companies select"]
+
+  - name: listMembers
+    description: See the people of the company, with their roles.
+    entity: Member
+    kind: query
+    status: live
+    scope: { CompanyAdmin: company }
+    doors:
+      api: ["GET /api/v1/members"]
+      db: ["function app.member_list()", "table company_members select"]
+
+  - name: inviteMember
+    description: Invite a person into the company with a set of roles.
+    entity: Member
+    kind: create
+    status: live
+    scope: { CompanyAdmin: company }
+    doors:
+      api: ["POST /api/v1/members"]
+      db: ["function app.member_invite(text, text, text[])"]
+
+  - name: changeMemberRoles
+    description: Change the roles of a person of the company.
+    entity: Member
+    kind: update
+    status: live
+    scope: { CompanyAdmin: company }
+    doors:
+      api: ["PUT /api/v1/members/[id]/roles"]
+      db: ["function app.member_set_roles(uuid, text[])"]
+
+  - name: readAgreements
+    description: See the connection agreements of the company.
+    entity: Agreement
+    kind: query
+    status: live
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db: ["table agreements select"]
+
+  - name: manageAgreements
+    description: Add a connection agreement or change one.
+    entity: Agreement
+    kind: command
+    status: live
+    scope: { CompanyAdmin: company }
+    doors:
+      db: ["table agreements insert", "table agreements update"]
+
+  - name: readCatalog
+    description: Read the shared unit catalog — projects, complexes, towers, stacks, units and original codes.
+    entity: Unit
+    kind: query
+    status: live
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db:
+        [
+          "table catalog_nodes select",
+          "table catalog_buildings select",
+          "table catalog_stacks select",
+          "table catalog_units select",
+          "table catalog_aliases select",
+        ]
+
+  - name: readCompanyCodes
+    description: Read the codes and names the company uses for catalog towers and units.
+    entity: CompanyCatalogAlias
+    kind: query
+    status: live
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db: ["table company_catalog_aliases select"]
+
+  - name: manageCompanyCodes
+    description: Add or change a code or name the company uses for a catalog tower or unit.
+    entity: CompanyCatalogAlias
+    kind: command
+    status: live
+    scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db: ["table company_catalog_aliases insert", "table company_catalog_aliases update"]
+
+  # Draft rows for the listing board, from Quỹ hàng's permission review of 05/11 (table two) and its signed
+  # bang-quyen-hang.json, without the Telesales role. Row 10 onwards decides each cell when it opens the door.
+  - name: viewListings
+    description: See the listings of the company.
+    entity: Listing
+    kind: query
+    status: planned
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company }
+
+  - name: createListing
+    description: Add a listing.
+    entity: Listing
+    kind: create
+    status: planned
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company }
+
+  - name: updateListing
+    description: Change a listing's price, fees or details.
+    entity: Listing
+    kind: update
+    status: planned
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company }
+
+  - name: activateListing
+    description: Put a listing on sale (own scope is the unit one keeps, or a unit nobody keeps yet).
+    entity: Listing
+    kind: command
+    status: planned
+    scope: { ListAgent: own, TeamLead: company }
+    states: [Incomplete, Hold]
+
+  - name: viewOwnerPhone
+    description: See the phone number of a listing's owner (own scope is the unit one keeps).
+    entity: ListingOwner
+    kind: query
+    status: planned
+    scope: { ListAgent: own, TeamLead: company }
+
+# Doors that no role decides. Only two kinds may be here: identity doors that run before a company is chosen (the
+# identity exception of SP-1: one person belongs to several companies) and functions that read the session context.
+exempt:
+  - door: POST /api/v1/auth/code
+    reason: Asks for a sign-in code before the person has a session or a company.
+  - door: POST /api/v1/auth/session
+    reason: Signs in with the code; there is no company yet.
+  - door: GET /api/v1/auth/session
+    reason: Reads one's own session and the companies one belongs to, before choosing one.
+  - door: DELETE /api/v1/auth/session
+    reason: Signs out; works with or without a chosen company.
+  - door: PUT /api/v1/auth/session/company
+    reason: Chooses the company of the session among the person's own companies.
+  - door: function app.current_company_id()
+    reason: Reads the company of the session, set by the one query door.
+  - door: function app.allowed(text)
+    reason: Reads the caller's scope for an action from the permission table; every role decision goes through it.
+    reads: ["table app.permissions select"]
+  - door: function app.login_request_code(text, text, integer, integer, integer)
+    reason: Sign-in before a company is chosen (row 8).
+  - door: function app.login_verify_code(text, text, text, integer, integer)
+    reason: Sign-in before a company is chosen (row 8).
+  - door: function app.session_read(text, integer, integer)
+    reason: Reads one's own session (row 8).
+  - door: function app.session_companies(text)
+    reason: Lists one's own companies before choosing one (row 8).
+  - door: function app.session_set_company(text, uuid)
+    reason: Chooses the company of the session among one's own (row 8).
+  - door: function app.session_end(text)
+    reason: Signs out (row 8).

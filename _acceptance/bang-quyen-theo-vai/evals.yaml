@@ -1,0 +1,172 @@
+schema_version: 1
+feature_slug: bang-quyen-theo-vai
+# Ma trận ô viết trước, từ bảng sống của design.md (7 thao tác sống × 4 vai = 28 ô):
+#   readOwnRoles      ĐC own     · ĐK own     · TN own     · QT own      | API —                         | DB app.member_roles(), company_members (dòng mình)
+#   readCompany       ĐC company · ĐK company · TN company · QT company  | API —                         | DB table companies select
+#   listMembers       —          · —          · —          · QT company  | API GET /api/v1/members       | DB app.member_list(), company_members select
+#   inviteMember      —          · —          · —          · QT company  | API POST /api/v1/members      | DB app.member_invite(text,text,text[])
+#   changeMemberRoles —          · —          · —          · QT company  | API PUT /api/v1/members/[id]/roles | DB app.member_set_roles(uuid,text[])
+#   readAgreements    ĐC company · ĐK company · TN company · QT company  | API —                         | DB table agreements select   (Hỏi-1)
+#   manageAgreements  —          · —          · —          · QT company  | API —                         | DB table agreements insert, update
+# Người gọi trong mọi bài cơ sở dữ liệu và API: bốn người một vai ở sàn A; người X — CompanyAdmin ở sàn B nhưng chỉ
+# ListAgent ở sàn A, gọi bằng phiên ở A (ô của X phải bằng ô ListAgent); người Y chỉ thuộc sàn B.
+# Tập miễn viết trước — API: POST /api/v1/auth/code, POST|GET|DELETE /api/v1/auth/session, PUT /api/v1/auth/session/company;
+# cơ sở dữ liệu: function app.current_company_id(), app.allowed(text), app.login_request_code, app.login_verify_code,
+# app.session_read, app.session_companies, app.session_set_company, app.session_end. Bài kiểm assert bằng đúng hai tập.
+#   pha-thu-mien-them (thêm function app.member_invite vào danh sách miễn của bản sao bảng)
+#     → «quyen-csdl-ngoai-bang: tập miễn khác tập viết trước: app.member_invite»
+#   pha-thu-allowed-moi-san (app.allowed lấy vai của người ở mọi sàn, không lọc sàn của phiên)
+#     → «csdl-theo-bang: X × listMembers» và «bang-thanh-vien-chi-dong-minh: X thấy 4 dòng»
+# Ô API = 3 cửa API × 4 vai = 12. Ô cơ sở dữ liệu = 10 cửa cơ sở dữ liệu × 4 vai = 40 (company_members select là cửa của cả readOwnRoles và listMembers) (mỗi cửa của dòng là một lần gọi).
+# Số ô in ra bởi bài kiểm là số đếm được từ bảng sinh, không phải hằng viết tay; bài ghim thêm hằng 12 và 40 ở ma trận
+# viết trước để bảng sinh co lại thì cũng đỏ.
+#
+# Bài thuần (config:executors.script.bang_quyen_unit — vitest, không cần Postgres, cũng chạy trong make test):
+#   src/modules/identity/permissions.test.ts: cong-quyen-15-to-hop · khong-vai-khong-quyen · route-ngoai-bang ·
+#     cua-api-khai-ma-khong-co
+#   src/modules/identity/permission-table.test.ts: bang-sinh-du-dong · kiem-khuon-bang (bộ sinh trên bản sao kho)
+# Bài cơ sở dữ liệu (config:executors.script.bang_quyen_db — Postgres của dãy N, cơ sở nháp bang_quyen_*):
+#   tests/db/bang-quyen.db.test.ts: csdl-theo-bang · ban-chep-khop-bang · quyen-csdl-ngoai-bang ·
+#     quan-tri-nguoi-qua-bang · bang-thanh-vien-chi-dong-minh · thoa-thuan-chi-quan-tri · bang-quyen-dung-chung
+#   tests/db/bang-quyen-api.db.test.ts: api-theo-bang
+# Cặp phá thử (mỗi bản phá trên bản sao hay cơ sở nháp riêng, ca tương ứng phải đỏ với thông điệp ghim):
+#   pha-thu-doi-o (đổi ô inviteMember × TeamLead sang company trong bản sao bảng sinh)
+#     → «api-theo-bang: inviteMember × TeamLead» và «csdl-theo-bang: inviteMember × TeamLead»
+#   pha-thu-route-moi (thêm src/app/api/v1/thu/route.ts xuất POST, không có dòng)
+#     → «route-ngoai-bang: POST /api/v1/thu»
+#   pha-thu-ham-moi (tạo hàm app.thu_ghi() cấp execute cho quy_hang_app)
+#     → «quyen-csdl-ngoai-bang: function app.thu_ghi()»
+#   pha-thu-cap-insert (cấp insert trên companies cho quy_hang_app)
+#     → «quyen-csdl-ngoai-bang: table companies insert»
+#   pha-thu-ban-chep-lech (xoá một dòng của app.permissions)
+#     → «ban-chep-khop-bang: thiếu listMembers × CompanyAdmin»
+#   pha-thu-cong-quyen-min (allowedScope lấy phạm vi hẹp nhất thay rộng nhất, trên bản sao hàm)
+#     → «cong-quyen-15-to-hop: ListAgent+CompanyAdmin × listMembers»
+#   pha-thu-doc-moi-dong (luật đọc company_members bỏ điều kiện vai)
+#     → «bang-thanh-vien-chi-dong-minh: ListAgent thấy 4 dòng»
+#   pha-thu-thoa-thuan-mo (luật ghi agreements bỏ điều kiện vai)
+#     → «thoa-thuan-chi-quan-tri: ListAgent thêm được thoả thuận»
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.bang_quyen_unit
+    paths: [ontology/actions.yaml, tools/ontology_actions.py, src/generated/ontology.ts, src/modules/identity/**]
+    expected: "exit 0; ca 'bang-sinh-du-dong': ACTIONS của mã sinh có đúng mọi dòng của ontology/actions.yaml (7 sống, 5 nháp), mỗi dòng mang kind, scope theo vai, states, doors.api, doors.db, status khớp từng trường với YAML đọc lại bằng trình đọc YAML của kho; ca 'kiem-khuon-bang': trên bản sao kho, bộ sinh (make ontology) đỏ với thông điệp nêu tên thao tác cho từng bản hỏng — vai 'Telesales' → «unknown role Telesales», phạm vi 'team' → «unknown scope team», dòng live không cửa → «live action <tên> has no door», dòng planned có cửa → «planned action <tên> has a door», dòng live khai states → «live action <tên> declares states»; đối chứng: bản sao lành thì xanh. Chiều đỏ: mã sinh thiếu một dòng thì 'bang-sinh-du-dong' in tên thao tác thiếu"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.bang_quyen_unit
+    paths: [src/modules/identity/**, src/generated/ontology.ts, ontology/actions.yaml]
+    expected: "exit 0; ca 'cong-quyen-15-to-hop': với mỗi thao tác sống và mỗi tập con khác rỗng của bốn vai (15), allowedScope trả phạm vi rộng nhất trong các ô của các vai ấy; ma trận kỳ vọng viết trước trong tệp kiểm (không tính bằng chính hàm), số assert = 7 × 15 = 105 và bài kiểm assert số ấy; ca 'khong-vai-khong-quyen': tập vai rỗng → null cho mọi thao tác. Chiều đỏ: pha-thu-cong-quyen-min → «cong-quyen-15-to-hop: ListAgent+CompanyAdmin × listMembers»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.bang_quyen_db
+    layer: backend-effect
+    paths: [src/modules/identity/**, src/app/api/v1/**, db/migrations/006_bang_quyen_theo_vai.sql, tests/db/**]
+    expected: "exit 0; ca 'api-theo-bang': sàn A có bốn người một vai (phiên thật qua bộ xử lý đăng nhập của hàng 8) và một người chỉ thuộc sàn B; với mỗi cửa API sống và mỗi vai, gọi route handler thật → ô 'không được' trả 403 với thân {\"error\":\"forbidden\"} giống hệt nhau và số dòng company_members, identity.users không đổi; ô được trả mã không phải 403 (200 hay lỗi nghiệp vụ đã khai); người X gọi bằng phiên A nhận đúng kết quả của ô ListAgent (403 ở ba cửa thành viên); in 'api-theo-bang: 12/12 ô khớp' — số 12 đếm từ bảng sinh và so với hằng 12 của ma trận viết trước; người sàn B gọi bằng phiên B không thấy dòng nào của A. Chiều đỏ: pha-thu-doi-o → «api-theo-bang: inviteMember × TeamLead»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.bang_quyen_db
+    layer: backend-effect
+    paths: [db/migrations/006_bang_quyen_theo_vai.sql, src/modules/identity/**, tests/db/**, ontology/actions.yaml]
+    expected: "exit 0; ca 'csdl-theo-bang': với mỗi cửa cơ sở dữ liệu sống của bảng sinh và mỗi vai, gọi qua withCompany dưới quy_hang_app (hàm: kết quả hay lỗi 42501/'forbidden'; đọc bảng: số dòng thấy được; ghi bảng: được hay bị luật theo dòng từ chối) → khớp ô; người X với phiên ở A khớp đúng ô ListAgent ở mọi cửa (app.allowed('listMembers') là null, thêm thoả thuận bị 42501); in 'csdl-theo-bang: 40/40 ô khớp' so với hằng 40; ca 'ban-chep-khop-bang': tập (action, role, scope) của app.permissions bằng đúng tập sinh từ các dòng live, thiếu hay thừa thì in từng cặp. Chiều đỏ: pha-thu-doi-o → «csdl-theo-bang: inviteMember × TeamLead»; pha-thu-allowed-moi-san → «csdl-theo-bang: X × listMembers»; pha-thu-ban-chep-lech → «ban-chep-khop-bang: thiếu listMembers × CompanyAdmin»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.bang_quyen_unit
+    paths: [src/app/api/v1/**, src/modules/identity/**, ontology/actions.yaml]
+    expected: "exit 0; ca 'route-ngoai-bang': liệt mọi tệp src/app/api/v1/**/route.ts và mọi phương thức HTTP nó xuất (GET, POST, PUT, PATCH, DELETE), mỗi cặp phải là doors.api của ít nhất một dòng live hay nằm trong exempt; ca 'cua-api-khai-ma-khong-co': mỗi doors.api khai trong bảng phải có route và phương thức thật. Danh sách miễn API bằng đúng tập API viết trước ở đầu tệp này, mỗi mục có lý do khác rỗng. Chiều đỏ: pha-thu-route-moi trên bản sao cây → «route-ngoai-bang: POST /api/v1/thu»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.bang_quyen_db
+    layer: backend-effect
+    paths: [db/migrations/**, ontology/actions.yaml, tests/db/**]
+    expected: "exit 0; ca 'quyen-csdl-ngoai-bang': trên cơ sở nháp đủ migration, liệt mọi hàm mà quy_hang_app có quyền execute (has_function_privilege) và mọi cặp bảng × quyền select/insert/update/delete mà quy_hang_app có (has_table_privilege) trong các lược đồ public, app, identity; mỗi mục phải là doors.db của ít nhất một dòng live hay nằm trong exempt; mỗi doors.db khai phải có thật; danh sách miễn cơ sở dữ liệu bằng đúng tập viết trước ở đầu tệp này. Chiều đỏ: pha-thu-mien-them → «quyen-csdl-ngoai-bang: tập miễn khác tập viết trước: app.member_invite»; pha-thu-ham-moi → «quyen-csdl-ngoai-bang: function app.thu_ghi()»; pha-thu-cap-insert → «quyen-csdl-ngoai-bang: table companies insert»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.bang_quyen_db
+    layer: backend-effect
+    paths: [db/migrations/006_bang_quyen_theo_vai.sql, src/modules/identity/**, ontology/entities/Member.yaml]
+    expected: "exit 0; ca 'quan-tri-nguoi-qua-bang': quét định nghĩa (pg_get_functiondef) của MỌI hàm trong lược đồ app và identity mà quy_hang_app được gọi, in số hàm đã quét; không hàm nào tham chiếu identity.is_admin; ba hàm app.member_list, app.member_invite, app.member_set_roles gọi app.allowed; gọi thật mỗi hàm với Quản trị sàn và Đầu chủ cho kết quả đúng ô (không chỉ đọc chuỗi); ontology/entities/Member.yaml luật company-admin-manages-people có implemented_in trỏ db/migrations/006_bang_quyen_theo_vai.sql và mô tả nhắc ontology/actions.yaml. Chiều đỏ: một hàm còn is_admin → «quan-tri-nguoi-qua-bang: member_invite còn kiểm vai tự viết»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.moi_nguoi_db_9a
+    layer: backend-effect
+    paths: [db/migrations/**, src/modules/identity/**, tests/db/moi-nguoi.db.test.ts, tests/db/pha-thu/**]
+    # Sửa lời theo chữ chủ kho 2026-11-12 («Đồng ý sửa E8»): API nay chặn trước theo bảng (AC-3), nên cặp
+    # pha-thu-moi-khong-kiem-quan-tri không làm đỏ được qua API; lớp chặn ở cơ sở dữ liệu của việc mời đo ở E4
+    # (csdl-theo-bang: inviteMember × ListAgent gọi thẳng, cặp phá thử pha-thu-doi-o).
+    expected: "exit 0; mười hai ca của hàng 9 (moi-email-moi-vao-dung-san … rang-buoc-vai-bang-mo-hinh) và bảy cặp phá thử của nó xanh trên cây có migration 006, cặp pha-thu-moi-khong-kiem-quan-tri bỏ qua (1 skipped); tệp kiểm của hàng 9 không đổi một dòng nào so với origin/main"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.moi_nguoi_e2e
+    layer: backend-effect
+    paths: [db/migrations/**, src/modules/identity/**, src/app/**]
+    expected: "exit 0; sáu ca × bốn khổ của bài trình duyệt Thành viên xanh trên Postgres của dãy với migration 006 (Quản trị sàn xem, mời, đổi vai; ba vai khác thấy Không đủ quyền)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.bang_quyen_db
+    layer: backend-effect
+    paths: [db/migrations/006_bang_quyen_theo_vai.sql, tests/db/**]
+    expected: "exit 0; ca 'bang-thanh-vien-chi-dong-minh': sàn A bốn người một vai, sàn B một người; dưới quy_hang_app với phiên từng người, select * from company_members → ĐC, ĐK, TN mỗi người đúng 1 dòng (user_id của chính mình), người X với phiên A đúng 1 dòng, QT A đúng 5 dòng của A (bốn người và X), người B đúng các dòng của B, không ai thấy dòng sàn kia. Chiều đỏ: pha-thu-doc-moi-dong → «bang-thanh-vien-chi-dong-minh: ListAgent thấy 4 dòng»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.bang_quyen_db
+    layer: backend-effect
+    paths: [db/migrations/006_bang_quyen_theo_vai.sql, tests/db/**]
+    expected: "exit 0; ca 'thoa-thuan-chi-quan-tri': từng người của A thêm một thoả thuận của A và sửa trạng thái một thoả thuận có sẵn của A dưới quy_hang_app → QT được; ĐC, ĐK, TN và người X (Quản trị sàn ở B) với phiên A bị từ chối (lỗi 42501 row-level security khi thêm; sửa trả 0 dòng), số dòng và trạng thái không đổi; đọc thoả thuận theo ô readAgreements; QT của B sửa thoả thuận của A → 0 dòng. Chiều đỏ: pha-thu-thoa-thuan-mo → «thoa-thuan-chi-quan-tri: ListAgent thêm được thoả thuận»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.cach_ly_n
+    layer: backend-effect
+    paths: [db/**]
+    expected: "exit 0; bộ kiểm cách ly của hàng 7 xanh trên Postgres của dãy N với migration 006 (mọi bảng của sàn có company_id và force row level security; app.permissions là ngoại lệ danh mục dùng chung được khai trong bộ kiểm)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.bang_quyen_db
+    layer: backend-effect
+    paths: [db/migrations/006_bang_quyen_theo_vai.sql, tests/db/**]
+    expected: "exit 0; ca 'bang-quyen-dung-chung': app.permissions không có cột company_id; quy_hang_app có select và không có insert, update, delete trên nó; app.allowed KHÔNG là security definer (prosecdef false) và proconfig chứa search_path; không hàm security definer mới nào ngoài các hàm đã có ở migration 002, 003 (so tập trước và sau migration 006); chủ của app.permissions không phải quy_hang_app. Chiều đỏ: cấp insert cho quy_hang_app trên bản nháp → «bang-quyen-dung-chung: quy_hang_app ghi được bảng quyền»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-9
+    executor: judgment
+    inputs: [ontology/glossary.md, wiki/log.md, ontology/actions.yaml]
+    question: "Bảng thuật ngữ có mục «Thao tác» và «Phạm vi» với tên mã tiếng Anh, nghĩa khớp cách ontology/actions.yaml dùng hai khái niệm ấy (thao tác là một dòng của bảng quyền; phạm vi là Toàn sàn, Của tôi hay không được), không trùng nghĩa một thuật ngữ có sẵn; và wiki/log.md có một dòng ngày 2026-11-12 nói hàng 9a dựng bảng quyền theo vai?"
+    evidence_required: [run_id, verdicts, verified_at]

@@ -2,20 +2,12 @@ import { CalendarCheckIcon, LayoutGridIcon, SendIcon, UsersIcon } from "lucide-r
 import { createElement } from "react";
 
 import type { NavItem } from "@/components/templates/app-shell";
+import { STATUS_ORDER } from "@/components/candidate/grid-view";
 import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { label } from "@/modules/company-config";
+import { inventoryStatusHref } from "@/modules/listings/ui";
 
 const icon = (Icon: typeof SendIcon) => createElement(Icon, { "aria-hidden": true });
-
-/** Listing statuses in the order of ontology/labels.yaml; the shortcuts open the inventory screen (filters come with row 2). */
-const STATUSES = [
-  "StatusIncomplete",
-  "StatusActive",
-  "StatusPending",
-  "StatusClosed",
-  "StatusHold",
-  "StatusWithdrawn",
-] as const;
 
 const COPY = FRAME_COPY.secondColumn;
 
@@ -36,7 +28,11 @@ export const NAV: NavItem[] = [
       },
       {
         title: COPY.byStatus,
-        items: STATUSES.map((status) => ({ href: "/inventory", title: label(status) })),
+        // One order for statuses everywhere (STATUS_ORDER); each shortcut opens the grid filtered to its status.
+        items: STATUS_ORDER.map((status) => ({
+          href: inventoryStatusHref(status),
+          title: label(`Status${status}`),
+        })),
       },
     ],
   },

@@ -7,7 +7,7 @@ as $$
 declare
   v_company uuid := app.current_company_id();
 begin
-  if not identity.is_admin(v_company, identity.session_user_id()) then
+  if app.allowed('listMembers') is distinct from 'company' then
     raise exception 'forbidden' using errcode = '42501';
   end if;
   return query

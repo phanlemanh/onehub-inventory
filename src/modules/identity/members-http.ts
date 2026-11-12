@@ -8,6 +8,8 @@ import type { Role } from "../../generated/ontology";
 import { tokenFrom } from "./http";
 import { readSession, sessionContext } from "./login";
 import { inviteMember, listMembers, setMemberRoles, type MembersDeps } from "./members";
+import type { ActionName } from "./permissions";
+import { requireAction } from "./require-action";
 import { MEMBER_NAME_MAX, ROLES } from "./roles";
 
 export type MembersErrorCode =
@@ -61,8 +63,11 @@ export interface MembersHandlers {
 
 /** `getDeps` is resolved per request: null means members are not configured here (no database on a dev machine). */
 export function createMembersHandlers(getDeps: () => MembersDeps | null): MembersHandlers {
+  // Every handler names its action of the permission table (ontology/actions.yaml); a cell that does not allow it is
+  // the same 403 body for every action, before any data is touched.
   async function guarded(
     req: Request,
+    action: ActionName,
     fn: (deps: MembersDeps, ctx: { userId: string; companyId: string }) => Promise<Response>,
   ): Promise<Response> {
     try {
@@ -70,8 +75,9 @@ export function createMembersHandlers(getDeps: () => MembersDeps | null): Member
       if (!deps) return error("server-error");
       const session = await readSession(deps, tokenFrom(req));
       if (!session?.company) return error("unauthenticated");
-      const ctx = sessionContext(session);
-      return await fn(deps, { userId: ctx.userId, companyId: session.company.id });
+      const ctx = { userId: sessionContext(session).userId, companyId: session.company.id };
+      if ((await requireAction(deps, ctx, action)) === null) return error("forbidden");
+      return await fn(deps, ctx);
     } catch (err) {
       console.error("[thanh-vien] lỗi máy chủ:", err instanceof Error ? err.message : "không rõ");
       return error("server-error");
@@ -80,14 +86,14 @@ export function createMembersHandlers(getDeps: () => MembersDeps | null): Member
 
   return {
     list: (req) =>
-      guarded(req, async (deps, ctx) => {
+      guarded(req, "listMembers", async (deps, ctx) => {
         const members = await listMembers(deps, ctx);
         if (members === "forbidden") return error("forbidden");
         return Response.json({ members });
       }),
 
     invite: (req) =>
-      guarded(req, async (deps, ctx) => {
+      guarded(req, "inviteMember", async (deps, ctx) => {
         const input = await body(req, InviteBody);
         if (!input) return error("bad-request");
         const result = await inviteMember(deps, ctx, input, new URL(req.url).origin);
@@ -96,7 +102,7 @@ export function createMembersHandlers(getDeps: () => MembersDeps | null): Member
       }),
 
     setRoles: (req, userId) =>
-      guarded(req, async (deps, ctx) => {
+      guarded(req, "changeMemberRoles", async (deps, ctx) => {
         if (!z.uuid().safeParse(userId).success) return error("not-member");
         const input = await body(req, RolesBody);
         if (!input) return error("bad-request");

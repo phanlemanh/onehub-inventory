@@ -802,6 +802,7 @@ describe("kho thật", () => {
       "tests",
       "docs/tri-thuc",
       "src/components",
+      "src/modules",
     ]) {
       cpSync(join(ROOT, d), join(copy, d), { recursive: true });
     }

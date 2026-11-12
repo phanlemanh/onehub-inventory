@@ -2,3 +2,11 @@
 export { AUTH_BASE_PATH, CODE_LENGTH, SESSION_COOKIE } from "./constants";
 export { safeNext } from "./next-path";
 export { canonicalRoles, isRole, MEMBER_NAME_MAX, MEMBERS_BASE_PATH, ROLES } from "./roles";
+export {
+  actionSpec,
+  allowedScope,
+  EXEMPT_DOORS,
+  LIVE_ACTIONS,
+  type ActionName,
+  type Scope,
+} from "./permissions";

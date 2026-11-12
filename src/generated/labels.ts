@@ -9,6 +9,11 @@ export const LABELS = {
   ListingUnit: {"pref": "Căn của hàng"},
   Subdivision: {"pref": "Dự án"},
   Building: {"pref": "Toà"},
+  Complex: {"pref": "Phân khu"},
+  Stack: {"pref": "Trục"},
+  UnitFloorLocation: {"pref": "Tầng"},
+  CatalogAlias: {"pref": "Mã gốc"},
+  CompanyCatalogAlias: {"pref": "Mã riêng"},
   ListSide: {"pref": "Phía chủ"},
   BuyerSide: {"pref": "Phía khách"},
   ListAgent: {"pref": "Đầu chủ"},
@@ -44,6 +49,8 @@ export const LABELS = {
   Member: {"pref": "Thành viên"},
   Invite: {"pref": "Mời người"},
   ChangeRoles: {"pref": "Đổi vai"},
+  Action: {"pref": "Thao tác"},
+  Scope: {"pref": "Phạm vi"},
 } as const;
 
 export type ConceptCode = keyof typeof LABELS;

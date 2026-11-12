@@ -12,7 +12,11 @@ import { clearScreenBanner } from "../src/components/templates/screen-banner";
 import type { Role } from "../src/generated/ontology";
 
 const nav = vi.hoisted(() => ({ pathname: "/" }));
-vi.mock("next/navigation", () => ({ usePathname: () => nav.pathname }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => nav.pathname,
+  // The second column lights a status shortcut by its query too (row 2a); these cases open plain addresses.
+  useSearchParams: () => new URLSearchParams(),
+}));
 
 beforeAll(() => {
   window.matchMedia ??= ((query: string) => ({

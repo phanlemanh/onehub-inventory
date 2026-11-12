@@ -55,9 +55,29 @@ PY_TYPES = {
 
 
 def load_actions(root: Path) -> list[dict[str, Any]]:
+    """Actions of ontology/actions.yaml. A row of the permission table (decision 0016) carries `scope`, one cell per
+    role; its `roles` are the roles that have a cell, so code reading `roles` keeps working."""
     data = load_yaml_file(root / "ontology" / "actions.yaml") or {}
     items = data.get("actions") if isinstance(data, dict) else None
-    return [a for a in (items or []) if isinstance(a, dict)]
+    out = []
+    for a in items or []:
+        if not isinstance(a, dict):
+            continue
+        if isinstance(a.get("scope"), dict) and "roles" not in a:
+            a = {**a, "roles": list(a["scope"])}
+        out.append(a)
+    return out
+
+
+def load_exempt(root: Path) -> list[dict[str, Any]]:
+    """Doors that no role decides (ontology/actions.yaml `exempt`), each with a reason."""
+    data = load_yaml_file(root / "ontology" / "actions.yaml") or {}
+    items = data.get("exempt") if isinstance(data, dict) else None
+    return [e for e in (items or []) if isinstance(e, dict)]
+
+
+SCOPES = {"company", "own"}
+STATUSES = {"live", "planned"}
 
 
 def load_roles(root: Path) -> list[dict[str, Any]]:
@@ -78,6 +98,44 @@ def pii_fields(entities: dict[str, dict[str, Any]]) -> dict[str, list[str]]:
 
 def has_any(root: Path, entities: dict[str, dict[str, Any]]) -> bool:
     return bool(load_actions(root) or load_roles(root) or pii_fields(entities))
+
+
+def _doors(a: dict[str, Any]) -> dict[str, list[str]]:
+    doors = a.get("doors") if isinstance(a.get("doors"), dict) else {}
+    return {k: [str(d) for d in (doors.get(k) or [])] for k in ("api", "db")}
+
+
+def _lint_permission_row(
+    a: dict[str, Any], label: str, role_names: list[str], apath: str, error: Any
+) -> None:
+    """Shape of one row of the permission table (decision 0016). Messages name the action."""
+    name = str(a.get("name") or "")
+    scope = a.get("scope")
+    if not isinstance(scope, dict):
+        error(apath, f"{label}: scope must map each role to company or own")
+        return
+    for role, value in scope.items():
+        if role_names and role not in role_names:
+            error(apath, f"{label}: unknown role {role}")
+        if value not in SCOPES:
+            error(apath, f"{label}: unknown scope {value}")
+    status = a.get("status")
+    if status not in STATUSES:
+        error(apath, f"{label}: status must be live or planned")
+    doors = _doors(a)
+    has_door = bool(doors["api"] or doors["db"])
+    if status == "live" and not has_door:
+        error(apath, f"live action {name} has no door")
+    if status == "planned" and has_door:
+        error(apath, f"planned action {name} has a door")
+    if status == "live" and a.get("states"):
+        error(apath, f"live action {name} declares states")
+    for door in doors["api"]:
+        if not re.fullmatch(r"(GET|POST|PUT|PATCH|DELETE) /api/v1/\S+", door):
+            error(apath, f"{label}: api door '{door}' must be '<METHOD> /api/v1/...'")
+    for door in doors["db"]:
+        if not re.fullmatch(r"(function [a-z_]+\.[a-z_]+\([a-z_\[\], ]*\)|table [a-z_.]+ (select|insert|update|delete))", door):
+            error(apath, f"{label}: db door '{door}' must be 'function <schema>.<name>(<types>)' or 'table <name> <privilege>'")
 
 
 # ----------------------------------------------------------------------------- lint
@@ -122,8 +180,10 @@ def lint(root: Path, entities: dict[str, dict[str, Any]], error: Any, warn: Any)
         out = str(a.get("output") or "").removesuffix("[]")
         if out and out not in entities:
             error(apath, f"{label}: output '{a.get('output')}' is not an entity")
+        if "scope" in a or "status" in a or "doors" in a:
+            _lint_permission_row(a, label, role_names, apath, error)
         for role in a.get("roles") or []:
-            if role_names and role not in role_names:
+            if role_names and role not in role_names and "scope" not in a:
                 error(apath, f"{label}: role '{role}' is not in ontology/roles.yaml")
         if not a.get("roles"):
             warn(apath, f"{label}: no roles: nobody may run it")
@@ -139,6 +199,16 @@ def lint(root: Path, entities: dict[str, dict[str, Any]], error: Any, warn: Any)
                 )
             elif spec["type"] == "enum" and not spec.get("values"):
                 error(apath, f"{label}: input '{field}' enum needs values")
+    exempt_seen: set[str] = set()
+    for e in load_exempt(root):
+        door = str(e.get("door") or "")
+        if not door:
+            error(apath, "exempt: every entry needs a door")
+        if not str(e.get("reason") or "").strip():
+            error(apath, f"exempt door '{door}' needs a reason")
+        if door in exempt_seen:
+            error(apath, f"exempt door '{door}' listed twice")
+        exempt_seen.add(door)
 
 
 def _role_allows(role: str, allowed: list[str], roles: list[dict[str, Any]]) -> bool:
@@ -296,6 +366,18 @@ def gen_ts(root: Path, entities: dict[str, dict[str, Any]]) -> str:
         "  idempotent: boolean;",
         "  output: string | null;",
         "  inputSchema: Record<string, unknown>;",
+        "  /** Permission table (decision 0016): each role's scope; a role without a cell may not run it. */",
+        '  scope: Readonly<Partial<Record<Role, "company" | "own">>>;',
+        '  status: "live" | "planned" | null;',
+        "  states: readonly string[];",
+        "  doors: { api: readonly string[]; db: readonly string[] };",
+        "}",
+        "",
+        "/** A door no role decides (ontology/actions.yaml `exempt`). */",
+        "export interface ExemptDoor {",
+        "  door: string;",
+        "  reason: string;",
+        "  reads: readonly string[];",
         "}",
         "",
     ]
@@ -310,10 +392,24 @@ def gen_ts(root: Path, entities: dict[str, dict[str, Any]]) -> str:
             "idempotent": bool(a.get("idempotent", False)),
             "output": a.get("output"),
             "inputSchema": json_schema(a.get("input") or {}),
+            "scope": dict(a.get("scope") or {}),
+            "status": a.get("status"),
+            "states": [str(x) for x in (a.get("states") or [])],
+            "doors": _doors(a),
         }
         for a in actions
     ]
     out.append(f"export const ACTIONS: readonly ActionSpec[] = {_js(specs)};")
+    exempt = [
+        {
+            "door": str(e.get("door") or ""),
+            "reason": str(e.get("reason") or ""),
+            "reads": [str(x) for x in (e.get("reads") or [])],
+        }
+        for e in load_exempt(root)
+    ]
+    out.append("")
+    out.append(f"export const PERMISSION_EXEMPT: readonly ExemptDoor[] = {_js(exempt)};")
     out += [
         "",
         "/** True if `role` (or a role it inherits) may run the action. */",

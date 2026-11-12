@@ -1,0 +1,21 @@
+name: Complex
+description: >-
+  A subdivision of a project (phân khu), child of exactly one Subdivision; shared catalog, no companyId. Stored in
+  catalog_nodes with node_type complex.
+reso: Building.ComplexName
+
+properties:
+  slug: { type: string, required: true, unique: true, display: none }
+  name: { type: string, required: true, display: text, reso: ComplexName }
+  subdivisionSlug: { type: ref, target: Subdivision, required: true, display: none }
+
+rules:
+  - id: complex-under-project
+    description: >-
+      A complex's parent is a project; a project has no parent and a complex cannot be the parent of a complex.
+    implemented_in: db/migrations/007_danh_muc_nhu_invest.sql
+
+code:
+  model: src/modules/catalog/
+  tests: tests/
+wiki: wiki/entities/complex.md
