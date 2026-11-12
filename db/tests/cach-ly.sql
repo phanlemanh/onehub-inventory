@@ -79,7 +79,12 @@ insert into luat_thu_hep values
    '(((user_id)::text = current_setting(''app.user_id''::text, true)) OR (app.allowed(''listMembers''::text) = ''company''::text))'),
   -- 006_bang_quyen_theo_vai.sql: only manageAgreements adds or changes an agreement.
   ('agreements', 'agreements_insert_by_permission', '(app.allowed(''manageAgreements''::text) = ''company''::text)'),
-  ('agreements', 'agreements_update_by_permission', '(app.allowed(''manageAgreements''::text) = ''company''::text)');
+  ('agreements', 'agreements_update_by_permission', '(app.allowed(''manageAgreements''::text) = ''company''::text)'),
+  -- 007_danh_muc_nhu_invest.sql (hàng 7d): only manageCompanyCodes adds or changes a company's own codes.
+  ('company_catalog_aliases', 'company_catalog_aliases_insert_by_permission',
+   '(app.allowed(''manageCompanyCodes''::text) = ''company''::text)'),
+  ('company_catalog_aliases', 'company_catalog_aliases_update_by_permission',
+   '(app.allowed(''manageCompanyCodes''::text) = ''company''::text)');
 
 create function pg_temp.dung_dang(bang name, luat name, lenh text, bieu_thuc text, cot text,
                                   kieu text default 'PERMISSIVE') returns boolean
@@ -458,13 +463,17 @@ begin
     raise exception 'HỎNG vai-api-chi-cham-bang-co-luat: bản quét không thấy đủ ba bảng công ty, chỉ thấy %', thay;
   end if;
   -- Shared catalogs (row 9a): a table without company_id that the role reaches must be on this written list, and the
-  -- role only reads it. Today the list is the permission table, app.permissions (006_bang_quyen_theo_vai.sql).
+  -- role only reads it: the permission table, app.permissions (006_bang_quyen_theo_vai.sql), and the five tables of the
+  -- shared unit catalog (007_danh_muc_nhu_invest.sql).
   for r in select q.oid, q.ten from pg_temp.quan_he_ngoai_he_thong() q
            where q.loai in ('r', 'p', 'f') and q.ten = any (thay)
              and q.ten <> 'public.companies'
              and not exists (select from pg_attribute a
                              where a.attrelid = q.oid and a.attname = 'company_id' and not a.attisdropped) loop
-    if r.ten <> all (array['app.permissions']) then
+    if r.ten <> all (array['app.permissions',
+                           -- 007_danh_muc_nhu_invest.sql (hàng 7d): danh mục căn dùng chung.
+                           'public.catalog_nodes', 'public.catalog_buildings', 'public.catalog_stacks',
+                           'public.catalog_units', 'public.catalog_aliases']) then
       raise exception 'HỎNG vai-api-chi-cham-bang-co-luat: % — bảng không có company_id mà vai chạm được, không phải danh mục chung đã khai', r.ten;
     end if;
     if has_any_column_privilege('quy_hang_app', r.oid, 'INSERT')

@@ -12,6 +12,12 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 
 - [Company](entities/company.md) — sàn, đơn vị cách ly dữ liệu
 - [Unit](entities/unit.md) — căn trong danh mục dùng chung
+- [Subdivision](entities/subdivision.md) — dự án, gốc của danh mục dùng chung
+- [Complex](entities/complex.md) — phân khu của một dự án
+- [Building](entities/building.md) — toà, khoá `bld_`
+- [Stack](entities/stack.md) — trục của một toà
+- [CatalogAlias](entities/catalog-alias.md) — mã gốc giữ làm bí danh
+- [CompanyCatalogAlias](entities/company-catalog-alias.md) — mã, tên riêng một sàn gọi toà, căn
 - [Listing](entities/listing.md) — một lần chào trên một căn
 - [Contact](entities/contact.md) — một người làm việc với sàn
 - [Agreement](entities/agreement.md) — cho phép một kết nối chảy

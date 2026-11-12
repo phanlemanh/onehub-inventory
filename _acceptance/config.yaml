@@ -8,6 +8,7 @@ executors:
     unit: "make test"                # suy từ: Makefile
     proof_gate: "npx vitest run tools/proof_gate --coverage.enabled=false --reporter=verbose"   # thang-chon-khoi-vao-cong (1n): screen proof gate only
     mot_cua: "npx vitest run src/modules/identity/one-door.test.ts --coverage.enabled=false --reporter=verbose"   # row 7a: one query door scan, rule 3 (no role or company switch outside the door)
+    danh_muc: "npx vitest run src/modules/catalog tests/danh-muc-chuyen-mau.test.ts --coverage.enabled=false --reporter=verbose"   # danh-muc-can-nhu-onehub-invest (row 7d): code reader, keys, sample move
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
@@ -34,6 +35,8 @@ executors:
     moi_nguoi_db_9a: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx vitest run -c vitest.db.config.ts tests/db/moi-nguoi.db.test.ts -t '^(?!.*pha-thu-moi-khong-kiem-quan-tri)' --reporter=verbose"   # bang-quyen-theo-vai (row 9a): row 9's cases and seven break pairs; the invite-without-admin-check pair is caught first at the API now and its database lock is measured by E4 (owner, 2026-11-12)
     cach_ly_c: "DB_LANE=${DB_LANE:-c} DB_PORT=${DB_PORT:-5569} bash -c 'bash db/scripts/cach-ly.sh && npx vitest run -c vitest.db.config.ts tests/db/cach-ly.db.test.ts --reporter=verbose'"   # cach-ly-truoc-du-lieu-that (row 7a): isolation suite, then agreements-vs-ontology and runner tests, lane C Postgres — one command so a grading round never runs two of them on the same scratch databases
     cach_ly_db_c: "DB_LANE=${DB_LANE:-c} DB_PORT=${DB_PORT:-5569} bash -c 'bash db/scripts/cach-ly.sh && npx vitest run -c vitest.db.config.ts tests/db/cach-ly.db.test.ts --reporter=verbose'"   # row 7a: same command as cach_ly_c on purpose (deduplicated in a grading round)
+    danh_muc_db_r: "DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} bash -c 'bash db/scripts/cach-ly.sh && npx vitest run -c vitest.db.config.ts tests/db/danh-muc.db.test.ts --reporter=verbose'"   # row 7d: isolation suite, then shared catalog database tests, lane R Postgres — one command so a round never runs both on the same scratch databases
+    bang_quyen_db_r: "DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} npx vitest run -c vitest.db.config.ts tests/db/bang-quyen.db.test.ts --reporter=verbose"   # row 7d: permission table with the three catalog actions (72 cells), lane R Postgres
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists

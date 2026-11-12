@@ -20,7 +20,7 @@ modules:
     depends_on: []
   - name: catalog
     description: Shared catalog of subdivisions, buildings and units
-    owns: [Unit]
+    owns: [Subdivision, Complex, Building, Stack, Unit, CatalogAlias, CompanyCatalogAlias]
     depends_on: []
   - name: listings
     description: Listings, status, pricing and fees, freshness, events, photos

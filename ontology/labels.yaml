@@ -59,6 +59,32 @@ concepts:
     reso: BuildingName
     pref: Toà
     en: Building
+  Complex:
+    kind: entity
+    reso: ComplexName
+    pref: Phân khu
+    en: Complex
+    avoid: [Khu]
+  Stack:
+    kind: entity
+    own: true
+    pref: Trục
+    en: Stack
+  UnitFloorLocation:
+    kind: field
+    reso: UnitFloorLocation
+    pref: Tầng
+    en: Floor
+  CatalogAlias:
+    kind: entity
+    own: true
+    pref: Mã gốc
+    en: Original code
+  CompanyCatalogAlias:
+    kind: entity
+    own: true
+    pref: Mã riêng
+    en: Company code
   ListSide:
     kind: side
     own: true
