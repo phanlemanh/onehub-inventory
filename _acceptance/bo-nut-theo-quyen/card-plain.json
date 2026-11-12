@@ -1,41 +1,16 @@
 {
-  "feature_plain": "Mọi màn có cùng một bộ nút thêm, sửa, gỡ đặt ở cùng chỗ, và mỗi người chỉ thấy nút vai của mình được dùng theo bảng quyền.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ ghi vào sổ thiết kế luật chỗ đặt anh chọn: nút thêm ở đầu màn, một nút «…» cuối dòng, việc trong hồ sơ ở đầu hồ sơ — cho máy tính và điện thoại."},
-    {"id": "AC-2", "p": "Sẽ cho mọi nút hỏi cùng một chỗ: vai có quyền thì thấy nút, không có thì không thấy; dòng của người khác theo đúng cách anh chọn ở Hỏi-4."},
-    {"id": "AC-4", "p": "Sẽ xếp menu «…» một kiểu ở mọi màn: việc thường trước, việc gỡ cuối cùng, chữ đỏ, tách một vạch; menu không còn việc thì không hiện."},
-    {"id": "AC-5", "p": "Sẽ luôn hỏi lại trước khi gỡ, nút xác nhận nói đúng việc (ví dụ «Xoá căn»), bấm Huỷ thì không có gì xảy ra."},
-    {"id": "AC-6", "p": "Sẽ nói rõ «Không đủ quyền làm việc này» khi máy chủ từ chối (vai vừa bị đổi), khác lỗi chung, và làm mới bộ nút — thử thật trên hộp mời và đổi vai của màn Thành viên."},
-    {"id": "AC-7", "p": "Sẽ cho thanh bên và màn Thành viên đọc bảng quyền thay vì gõ cứng «Quản trị sàn»: đổi một ô trong bảng là thanh bên đổi theo, không sửa mã."},
-    {"id": "AC-8", "p": "Sẽ thêm vào bảng quyền bảy dòng nháp: xoá căn, và xem, thêm, sửa, xoá, gộp liên hệ, xoá tên và số theo yêu cầu — chữ là động từ thường anh chọn, ô liên hệ theo thông lệ CRM."},
-    {"id": "AC-9", "p": "Sẽ sinh bảng vai × màn tới từng nút từ bảng quyền, để các hàng sau trỏ vào bảng ấy thay vì viết tay."},
-    {"id": "AC-10", "p": "Sẽ giữ trang mẫu của bộ nút chạy được dưới bốn vai, ở điện thoại và máy tính, sáng và tối, không lỗi trợ năng."}
+  "feature_plain": "Ở vai nào, người dùng cũng thấy nút thêm, sửa, xoá đặt cùng một chỗ trên mọi màn, và chỉ thấy những nút bảng quyền cho mình dùng.",
+  "decisions": [
+    {
+      "id": "E1",
+      "q": "Mục «Bộ nút theo quyền» trong sổ thiết kế có đúng các lựa chọn của anh không?",
+      "why": "Hội đồng ba người chấm thấy đủ bốn chỗ đặt nút cho máy tính và điện thoại, thứ tự trong «…», và luật nút không quyền. Chỉ thiếu một ý nhỏ: «Ngừng bán là đổi trạng thái qua Sửa»."
+    },
+    {
+      "id": "E13",
+      "q": "Bốn ảnh câu «Không đủ quyền» có đọc rõ, tách khỏi câu lỗi chung không?",
+      "why": "Hội đồng thấy cả bốn ảnh (hộp mời và hộp đổi vai, máy tính và điện thoại, sáng và tối) đều có câu riêng chữ đỏ, đọc rõ."
+    }
   ],
-  "wont_do": [
-    {"id": "AC-3", "p": "Chặn mọi nút gửi dữ liệu mà không đi qua chỗ hỏi quyền chung, và chặn mã gõ cứng tên vai — kiểm tra của kho báo đỏ, chỉ đúng tệp và dòng."},
-    {"id": "OOS-1", "p": "KHÔNG làm chức năng thêm căn, gỡ căn, thêm hay gỡ liên hệ thật — hàng 12, 18b và màn Liên hệ làm, theo luật này."},
-    {"id": "OOS-2", "p": "KHÔNG mở đường ghi thật cho các dòng nháp — hàng mở chức năng quyết lại từng ô."},
-    {"id": "OOS-3", "p": "KHÔNG sửa hàng loạt, không chọn nhiều dòng — đã cắt khỏi MVP."},
-    {"id": "OOS-4", "p": "KHÔNG làm trang «Vai nào làm được gì» — hàng 19a."},
-    {"id": "OOS-5", "p": "KHÔNG kiểm từng vai trên từng màn sản phẩm bằng trình duyệt — hàng 9b; ở đây đo trên trang mẫu và màn Thành viên."},
-    {"id": "OOS-6", "p": "KHÔNG chọn lại màn Thành viên từ ReUI — hàng 9c."}
-  ],
-  "scope_plain": "Hàng này dựng khuôn và luật cho bộ nút; chức năng thật đến ở các hàng sau.",
-  "coverage_plain": [
-    {"i": 0, "p": "Đủ bốn loại việc: thêm, sửa, gỡ theo nghĩa nghiệp vụ, và việc khác như gộp liên hệ (AC-1, AC-4, AC-5, AC-8)."},
-    {"i": 1, "p": "Đủ bốn chỗ đặt nút: đầu màn, đầu vùng, trên dòng, trong hồ sơ (AC-1 luật chỗ đặt, AC-4 menu, AC-10 trang mẫu)."},
-    {"i": 2, "p": "Đủ hai khổ: máy tính và điện thoại (AC-1, AC-4, AC-10)."},
-    {"i": 3, "p": "Đủ bốn tình huống quyền: cả sàn, việc của mình, việc của người khác, không có quyền (AC-2 hiện ẩn nút, AC-7 thanh bên, AC-10 trang mẫu)."},
-    {"i": 4, "p": "Đủ ba đường: giao diện tự ẩn nút, máy chủ từ chối, mã đi sai đường bị chặn (AC-2, AC-6, AC-3)."},
-    {"i": 5, "p": "Bảng quyền là nguồn duy nhất: từ bảng ra nút, ra bảng vai × màn, ra thanh bên và màn (AC-2, AC-9, AC-7)."},
-    {"i": 6, "p": "Để sau: sửa hàng loạt, trang «Vai nào làm được gì», kiểm từng màn bằng trình duyệt, phạm vi Nhóm."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Ai được xem, sửa, gộp, xoá liên hệ là việc của anh, máy đã tự điền — nay thành câu Hỏi-6 kèm ảnh bộ nút từng vai trên màn Liên hệ."},
-    {"i": 1, "p": "Lý do «Quản trị sàn không đụng liên hệ» chỉ đúng cho căn, không đúng cho việc xoá dữ liệu cá nhân theo yêu cầu — đã tách: phần căn giữ, phần liên hệ vào Hỏi-6."},
-    {"i": 2, "p": "Chưa có phép đo «đổi ô trong bảng quyền thì thanh bên đổi theo» — đã thêm, kèm một lần phá thử để chứng phép đo biết đỏ."},
-    {"i": 3, "p": "Kiểm tra cũ chỉ xét cả tệp, một nút trần nằm cạnh nút đúng vẫn lọt — đã đổi sang xét từng nút."},
-    {"i": 4, "p": "Hai bài nhìn bằng mắt không có cách tạo tình huống bị từ chối và không có luật để so — đã cho bài kiểm tự động chụp ảnh lúc bị từ chối, và ghi kỳ vọng từng vai vào câu hỏi."},
-    {"i": 5, "p": "Số ô phải kiểm phụ thuộc lựa chọn chữ ở Hỏi-1 — đã ghi theo lựa chọn, điền ngay sau cổng."}
-  ]
+  "analyst_plain": ""
 }
