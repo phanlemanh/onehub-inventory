@@ -10,8 +10,11 @@ import { expect, test, type Page } from "@playwright/test";
 const URL = "/inventory";
 const WIDE = new Set(["1440", "1024"]);
 const PHONE = new Set(["414", "360"]);
-/** Data columns fully in view left of the open record, at least (AC-3). */
-const MIN_VISIBLE: Readonly<Record<string, number>> = { "1440": 5, "1024": 3 };
+/**
+ * Data columns fully in view left of the open record, at least (AC-3). 4 and 2 since the coordinator's ruling
+ * D-1211-12: the first 5/3 was pinned before the owner chose a floating panel two fifths wide.
+ */
+const MIN_VISIBLE: Readonly<Record<string, number>> = { "1440": 4, "1024": 2 };
 const FROZEN = ["#", "Căn", "Toà"];
 const DATA_HEADERS = [
   "Căn",
@@ -207,6 +210,16 @@ async function assertFrozenAtEnd(page: Page): Promise<void> {
   }
 }
 
+/** With the record open, Căn and Toà are fully in view left of it: the promise of AC-3 (ruling D-1211-12). */
+async function assertUnitAndBuildingInView(page: Page): Promise<void> {
+  const { texts } = await columnsInView(page);
+  for (const name of ["Căn", "Toà"]) {
+    if (!texts.some((t) => t === name || t.startsWith(name))) {
+      throw new Error(`record hides a frozen column: ${name}`);
+    }
+  }
+}
+
 /** Every data column, scrolled to, has a width and sits fully inside the grid's viewport. */
 async function assertNoColumnHidden(page: Page): Promise<void> {
   for (const name of DATA_HEADERS) {
@@ -368,6 +381,7 @@ test.describe("E3 · the grid beside the record keeps its columns", () => {
     const open = (await columnsInView(page)).full;
     console.log(`visible columns ${info.project.name} closed=${closed} open=${open}`);
     expect(open).toBeGreaterThanOrEqual(MIN_VISIBLE[info.project.name]!);
+    await assertUnitAndBuildingInView(page);
     await expect(panel(page).locator('[data-slot="listing-card-price"]')).toBeVisible();
     await assertFrozenAtEnd(page);
     await assertNoColumnHidden(page);
@@ -383,6 +397,16 @@ test.describe("E3 · the grid beside the record keeps its columns", () => {
     await openInventory(page);
     await openFifth(page);
     await expect(assertFrozenAtEnd(page)).rejects.toThrow("frozen column scrolled away: Toà");
+  });
+
+  test("break: a record wide enough to cover Toà is caught", async ({ page }) => {
+    await injectStyle(
+      page,
+      '[role="dialog"][aria-modal="false"] { width: 85vw !important; max-width: none !important; }',
+    );
+    await openInventory(page);
+    await openFifth(page);
+    await expect(assertUnitAndBuildingInView(page)).rejects.toThrow("record hides a frozen column");
   });
 
   test("break: a hidden Diện tích column is caught", async ({ page }) => {
