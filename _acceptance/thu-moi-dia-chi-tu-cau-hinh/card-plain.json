@@ -1,0 +1,34 @@
+{
+  "feature_plain": "Thư mời luôn dẫn người được mời tới đúng trang đăng nhập của OneHub, theo địa chỉ khai sẵn khi triển khai, không theo yêu cầu gửi tới.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ ghi trong thư mời đúng đường tới trang đăng nhập theo địa chỉ sản phẩm đã khai."},
+    {"id": "AC-2", "p": "Sẽ giữ nguyên đường ấy dù yêu cầu mời mang tên máy chủ lạ — thư không nhắc tên lạ ở chỗ nào."},
+    {"id": "AC-5", "p": "Sẽ để máy của người làm (chưa khai địa chỉ) chạy như hôm nay; khai rồi thì địa chỉ khai thắng."},
+    {"id": "AC-6", "p": "Sẽ giữ thư mã đăng nhập không có đường nào — hàng đăng nhập bằng mã không cùng lỗi, và có phép đo giữ điều đó."},
+    {"id": "AC-7", "p": "Sẽ ghi biến mới vào tệp cấu hình mẫu với địa chỉ ví dụ, kèm câu «bắt buộc ở bản thật»."}
+  ],
+  "wont_do": [
+    {"id": "AC-3", "p": "Chặn bản thật khởi động khi chưa khai địa chỉ sản phẩm, lỗi gọi đúng tên biến."},
+    {"id": "AC-4", "p": "Chặn bản thật khởi động khi địa chỉ khai sai khuôn (thiếu giao thức, có mật khẩu, có dấu ? hay #, không phải https nếu anh chọn như khuyến nghị), không in giá trị ra nhật ký."},
+    {"id": "OOS-1", "p": "KHÔNG dọn trường thừa trên đường mời người lúc này — dãy đang làm bảng quyền đang sửa cùng chỗ; dọn sau khi hàng ấy gộp."},
+    {"id": "OOS-2", "p": "KHÔNG thử lại toàn đường mời người có cơ sở dữ liệu với tên máy chủ lạ; đo ở bộ gửi thư mà bản thật dùng."},
+    {"id": "OOS-3", "p": "KHÔNG đổi chữ trong thư mời hay thư mã."},
+    {"id": "OOS-4", "p": "KHÔNG kiểm tên miền khai có thật trỏ về máy chủ này — việc của người triển khai."}
+  ],
+  "scope_plain": "Bốn việc để ngoài lần này:",
+  "coverage_plain": [
+    {"i": 0, "p": "Cả bản thật lẫn máy của người làm đều có tiêu chí (AC-1..4 cho bản thật, AC-5 cho máy người làm)."},
+    {"i": 1, "p": "Biến địa chỉ ở mọi trạng thái — khai đúng, thiếu, sai khuôn, có đường con — đều có tiêu chí (AC-1, AC-3, AC-4)."},
+    {"i": 2, "p": "Đường trong thư đã đo với ba nguồn tên máy: địa chỉ khai, gốc bình thường, gốc lạ (AC-1, AC-5, AC-2)."},
+    {"i": 3, "p": "Cả thư mời và thư mã đăng nhập đều được đo (AC-1..5, AC-6)."},
+    {"i": 4, "p": "Chặn ở cả lúc khởi động và lúc đọc cấu hình khi chạy (AC-3, AC-4)."},
+    {"i": 5, "p": "Tệp cấu hình mẫu có tiêu chí riêng (AC-7); mọi ô đều có ít nhất một tiêu chí, ô «sai khuôn» đo đủ sáu giá trị trong một ca."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Chưa có phép đo cho việc bản thật thật sự dùng đúng bộ gửi thư đã sửa — đã thêm: người chấm đọc cả chỗ nối và chỗ gọi gửi thư."},
+    {"i": 1, "p": "Câu hỏi https hay http còn mở mà hợp đồng đã viết sẵn đáp án — đã sửa: vế ấy ghi rõ «chờ anh trả lời»."},
+    {"i": 2, "p": "Phép đo chỉ soi tiêu đề và thân chữ của thư — đã sửa: soi toàn bộ thư gửi đi."},
+    {"i": 3, "p": "Phép đo «không in giá trị» bỏ sót mật khẩu nằm giữa địa chỉ và lỗi gốc — đã sửa: soi cả hai."},
+    {"i": 4, "p": "Câu chú thích của tệp cấu hình mẫu chưa ghim chữ, và chỉ quét địa chỉ https — đã sửa: ghim cụm «bắt buộc ở bản thật», quét cả http."}
+  ]
+}
