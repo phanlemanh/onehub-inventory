@@ -7,8 +7,8 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 788b31d61b6593b485c264afe05585b38ffaf266
-human_signoff:
+verified_commit: 17d85ab2608ec9441aefe39260b4e9da2836d95f
+human_signoff: Manh Phan 2026-11-12
 ---
 
 # Evidence Report: bang-hang-dung-tay-nhu-sheet
@@ -148,7 +148,7 @@ human_signoff:
   run_id: minted-bang-hang-dung-tay-nhu-sheet-E16-r3
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
+  verifier: config:executors.design.ui_check
   verified_at: 2026-11-12T09:57:48Z
   screenshot: evidence/E16-step2.png
   observed: |
@@ -255,3 +255,7 @@ none — every multi-run eval is uniform
 Round 1: E16 không đạt (ảnh chưa đủ), hồ sơ REJECT. Returned to implementation.
 Round 2: make check đỏ, hội đồng E17 chưa đồng ý PASS (thiếu ảnh chân bảng ở 1024) và có một phát hiện trong hợp đồng cho AC-11 (toàn màn hình giữ chiều cao thường từ 1024). Returned to implementation.
 Round 3: mọi eval xanh, make check và build xanh, E16 có khung nhìn thấy khớp Expected, E17 đề xuất PASS. Verdict PASS.
+
+### Re-pin lần 1 — 2026-11-12, do gộp nhánh chính (hàng 7a, 9a) trước khi gộp PR #37
+run_id: repin-20261112T105015Z-95252
+sha: 17d85ab2608ec9441aefe39260b4e9da2836d95f · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E16, E17 (E17 không khai paths) · AC không có chốt máy: AC-10

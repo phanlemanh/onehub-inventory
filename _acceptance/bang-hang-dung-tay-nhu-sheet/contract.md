@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: _acceptance/bang-hang-dung-tay-nhu-sheet/design.md
@@ -124,3 +124,13 @@ AC-10 trục 3; mọi eval máy khai cặp hai chiều (trục 5). [CE chưa ki�
 - Ngoài-10 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Người dùng bàn phím có thể gặp thêm điểm dừng Tab thừa hoặc thứ tự Tab bị đảo mà phép kiểm vẫn báo đạt. — `tests/e2e/sheet.spec.ts`
 - Ngoài-11 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Lọc giá sai đơn vị mà vẫn bớt vài dòng thì phép kiểm vẫn báo đạt, nên người dùng có thể thấy thiếu hay thừa dòng khi lọc kết hợp. — `tests/e2e/sheet.spec.ts`
 - Ngoài-12 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Nếu PageDown chỉ xuống một dòng như mũi tên xuống thì phép kiểm vẫn báo đạt, người dùng sẽ thấy phím nhảy trang không nhảy xa. — `tests/e2e/sheet.spec.ts`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-12:
+  - Ngoài-1: Trên Bảng hàng, lưới vẫn vừa màn hình và chân bảng vẫn thấy được. Nếu sau này đổi chiều cao đầu trang hay thanh công cụ, hoặc một màn Lưới khác dùng khuôn này, chân bảng có thể tụt khỏi màn hình mà không có kiểm tra nào báo.
+  - Ngoài-2: Trên một màn Lưới khác có đầu trang hay thanh công cụ cao khác Bảng hàng, bảng có thể bị cuộn thừa hoặc chừa khoảng trống. Bảng hàng hiện tại vẫn hiển thị đúng.
+  - Ngoài-3: Người dùng thấy các trạng thái đúng thứ tự trên mọi màn hiện nay. Nguy cơ là về sau sửa thứ tự ở một nơi mà quên nơi kia thì hai danh sách lệch nhau.
+  - Ngoài-6: Người dùng không thấy gì khác đi; chỉ là một phép kiểm chép vùng ô không thật sự chạy nên một lỗi chép sai có thể lọt qua mà không bị bắt.
+  - Ngoài-7: Nếu giá hay trạng thái hiển thị sai thì phép kiểm chép vẫn báo đạt, vì nó so với chính thứ đang hiển thị.
+  - Ngoài-8: Chưa chứng minh được rằng phép kiểm menu nằm trên cùng khi toàn màn hình thật sự bắt được lỗi, nên menu bị khuất có thể lọt qua.
+  - Ngoài-10: Người dùng bàn phím có thể gặp thêm điểm dừng Tab thừa hoặc thứ tự Tab bị đảo mà phép kiểm vẫn báo đạt.
+  - Ngoài-11: Lọc giá sai đơn vị mà vẫn bớt vài dòng thì phép kiểm vẫn báo đạt, nên người dùng có thể thấy thiếu hay thừa dòng khi lọc kết hợp.
+  - Ngoài-12: Nếu PageDown chỉ xuống một dòng như mũi tên xuống thì phép kiểm vẫn báo đạt, người dùng sẽ thấy phím nhảy trang không nhảy xa.
