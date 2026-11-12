@@ -7,6 +7,8 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-12 — Hồ sơ căn: bấm mã căn trên Bảng hàng mở hồ sơ trong ngăn nổi bên phải (từ dưới thanh trên tới đáy màn hình, không khoá bảng, có địa chỉ `?ho-so=`), điện thoại mở toàn màn với thẻ căn ở đầu; thẻ và hồ sơ đọc một mô hình; Tab từ hồ sơ đi vào bảng — hàng 3, `_acceptance/ho-so-can/`, [0024](decisions/0024-ngan-noi-xem-chi-tiet.md).
+
 - 2026-11-12 — Owner chose a floating panel as the app's one way to show a row's detail (with a pin, AI in the same slot) — [0024](decisions/0024-ngan-noi-xem-chi-tiet.md).
 - 2026-11-12 — Bảng hàng bản đọc, «đọc như Sheet»: `/inventory` đọc 60 lần chào mẫu trên khuôn Lưới; khuôn Lưới cuộn liền một mạch (bảng cuộn ảo ReUI) thay chia trang, tiêu đề và cột số dòng · Căn · Toà đứng yên, khung xếp theo `data-grid-editing-6` (kẻ dọc giữa cột, dòng dày 32px, ô tìm kèm số dòng), cột chữ rộng theo nội dung; năm nhãn cột mới; Bảng hàng thành màn mẫu của họ Lưới — hàng 2, `_acceptance/bang-hang-ban-doc/`
 - 2026-11-12 — Invitation sign-in link built from `APP_URL` (the product's own address), never from the request's host; production refuses to start without it or with a malformed one (https only); the login-code mail carries no link — [0021](decisions/0021-dang-nhap-ma-email.md), row 9d.
