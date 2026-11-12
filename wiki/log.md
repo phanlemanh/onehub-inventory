@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-12 — Góc nhìn đã lưu, phần máy chủ (hàng 2c): khái niệm `SavedView`, bốn thao tác của bảng quyền (của tôi, ba vai đọc Bảng hàng), bảng `saved_view` (migration 009, chỉ người lưu chạm được), cửa `/api/v1/saved-views`; mô-đun danh tính mở cửa thao tác dùng chung — `_acceptance/luu-goc-nhin-cot-hai/`, [0025](decisions/0025-cua-thao-tac-dung-chung.md).
 - 2026-11-12 — Hồ sơ căn: bấm mã căn trên Bảng hàng mở hồ sơ trong ngăn nổi bên phải (từ dưới thanh trên tới đáy màn hình, không khoá bảng, có địa chỉ `?ho-so=`), điện thoại mở toàn màn với thẻ căn ở đầu; thẻ và hồ sơ đọc một mô hình; Tab từ hồ sơ đi vào bảng — hàng 3, `_acceptance/ho-so-can/`, [0024](decisions/0024-ngan-noi-xem-chi-tiet.md).
 - 2026-11-12 — Owner chose a floating panel as the app's one way to show a row's detail (with a pin, AI in the same slot) — [0024](decisions/0024-ngan-noi-xem-chi-tiet.md).
 - 2026-11-12 — Bộ kiểm chung khi đăng nhập (hàng 1r): lượt có cơ sở dữ liệu đăng nhập một người thử đủ bốn vai MỘT lần qua màn đăng nhập thật rồi đo mọi màn, kể cả Thành viên; lượt không phiên giao màn cần đăng nhập sang lượt có phiên bằng tên — thay «màn cần đăng nhập: bỏ qua có điều kiện» của hàng 9. Mọi bài mở ngăn và chờ băng báo đi qua hai hàm chờ dùng chung (`tools/e2e_templates/settle.ts`), lặp 20 lần ở máy giảm tốc 4 lần — `_acceptance/bo-kiem-chung-khi-dang-nhap/`

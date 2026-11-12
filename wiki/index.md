@@ -18,6 +18,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [Stack](entities/stack.md) — trục của một toà
 - [CatalogAlias](entities/catalog-alias.md) — mã gốc giữ làm bí danh
 - [CompanyCatalogAlias](entities/company-catalog-alias.md) — mã, tên riêng một sàn gọi toà, căn
+- [SavedView](entities/saved-view.md) — góc nhìn một người lưu cho một màn Lưới
 - [Listing](entities/listing.md) — một lần chào trên một căn
 - [Contact](entities/contact.md) — một người làm việc với sàn
 - [Agreement](entities/agreement.md) — cho phép một kết nối chảy
@@ -58,6 +59,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0022 Mời người vào sàn và gán vai](decisions/0022-moi-nguoi-gan-vai.md)
 - [0023 Chọn trước, tạo sau — kho lớn dần](decisions/0023-chon-truoc-tao-sau.md)
 - [0024 Ngăn nổi để xem chi tiết một dòng](decisions/0024-ngan-noi-xem-chi-tiet.md)
+- [0025 Cửa thao tác dùng chung và phụ thuộc mô-đun đầu tiên](decisions/0025-cua-thao-tac-dung-chung.md)
 
 ## Incidents
 
