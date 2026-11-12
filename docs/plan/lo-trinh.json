@@ -535,6 +535,25 @@
       ]
     },
     {
+      "ma": "3a",
+      "cau_giao": "Đầu chủ ghim ngăn chi tiết thành một cột cạnh bảng khi làm lâu trên một căn, bỏ ghim thì ngăn nổi lại",
+      "vai": "Đầu chủ",
+      "tieu_chi": 5,
+      "vi_sao": "Chủ kho 2026-11-12 trong phiên dãy D: «Lấy B có ghim» — ngăn nổi là cách chung cả ứng dụng để xem chi tiết một dòng; nút ghim biến ngăn thành cột khi làm lâu. Hàng 3 dựng ngăn nổi, phần ghim là hàng này",
+      "hang": "T2",
+      "dung_tren": [
+        "3"
+      ],
+      "slug": "ngan-chi-tiet-ghim-thanh-cot",
+      "bat_khi": "Bấm ghim thì ngăn thành cột cạnh bảng, bảng co lại và không cột nào bị tự giấu; bỏ ghim thì ngăn nổi lại; trạng thái ghim giữ khi đi sang căn khác; ngăn nổi hay ghim đều không che thanh trên và thanh công cụ, không khoá bảng; mọi màn dùng khung chi tiết chung đều có nút ghim",
+      "nhom": "bang-hang",
+      "vung": [
+        "src/components/candidate/**",
+        "src/modules/listings/ui/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "2b",
       "cau_giao": "Đầu chủ và Đầu khách mở Bảng hàng trên điện thoại thấy danh sách thẻ căn và chạm thẻ để mở hồ sơ căn",
       "vai": "Đầu chủ",
