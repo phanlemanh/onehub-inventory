@@ -21,7 +21,7 @@ async function busyMs(page: Page): Promise<number> {
 const slowed = new WeakSet<Page>();
 
 /** Slow this page's CPU by `rate` (E2E_CPU_THROTTLE wins when set) and prove it is really slower. */
-async function throttle(page: Page, wanted = 0): Promise<void> {
+export async function throttle(page: Page, wanted = 0): Promise<void> {
   const rate = THROTTLE > 1 ? THROTTLE : wanted;
   if (!(rate > 1) || slowed.has(page)) return;
   slowed.add(page);
