@@ -80,9 +80,10 @@ function PanelHeader({
   close: ReactNode;
 }) {
   return (
-    <div data-slot="record-panel-header" className="flex flex-wrap items-center gap-2 border-b p-4">
+    <div data-slot="record-panel-header" className="flex items-start gap-2 border-b p-4">
       {title}
-      <div className="flex items-center gap-2">
+      {/* «Trước», «Sau», «Đóng» always sit top right, on every width and theme; a long name wraps instead. */}
+      <div className="ml-auto flex shrink-0 items-center gap-1">
         <Button
           variant="outline"
           size="sm"
@@ -107,7 +108,7 @@ function PanelHeader({
   );
 }
 
-const TITLE_CLASS = "min-w-0 flex-1 basis-40 text-lg font-semibold break-words";
+const TITLE_CLASS = "min-w-0 flex-1 text-lg font-semibold break-words";
 
 /**
  * The one record panel of the app (design/behaviors.md, open the record panel; owner's choice at row 3's scope gate:

@@ -87,6 +87,8 @@ và 1440 trên bản chạy (bảng dưới) và đặt giá lên đầu hồ s�
 
 - Từ 768 px: ngăn nổi bên phải từ dưới thanh trên tới đáy màn hình, không giữ tiêu điểm (bảng vẫn trong thứ tự Tab); mở từ trạng thái đóng thì tiêu điểm vào tên hồ
   sơ; đi «Trước»/«Sau» giữ tiêu điểm tại nút. Dưới 768 px: toàn màn, giữ tiêu điểm trong hồ sơ tới khi đóng.
+- Ba nút Trước, Sau, Đóng luôn ở góc trên phải ngăn, mọi khổ và cả sáng lẫn tối (chủ kho nêu 2026-11-12); tên hồ sơ dài thì
+  xuống dòng, nút không rời chỗ.
 - Esc trong hồ sơ đóng hồ sơ; Esc trong lưới là của hàng 2a.
 - Giá trị mỗi trường hiện bằng đúng cách hiện của ô bảng (tiền «x,xx tỷ», m², huy hiệu trạng thái).
 
