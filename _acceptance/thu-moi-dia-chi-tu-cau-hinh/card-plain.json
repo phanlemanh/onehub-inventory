@@ -1,0 +1,6 @@
+{
+  "feature_plain": "Thư mời luôn dẫn người được mời tới đúng trang đăng nhập của OneHub, theo địa chỉ khai sẵn khi triển khai, không theo yêu cầu gửi tới.",
+  "decisions": [
+    {"id": "E8", "q": "Ở bản thật, thư mời có luôn dùng địa chỉ khai sẵn không?", "why": "Ba người chấm đọc chỗ dựng bộ gửi, chỗ nối vào việc mời người và chỗ gửi thư: cả ba thấy bản thật không có đường nào quay về tên máy chủ của yêu cầu."}
+  ]
+}

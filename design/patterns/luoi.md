@@ -13,8 +13,6 @@ mau_dang_chay:
 khe_bat_buoc: [title, columns, rows, status]
 cam_ngoai_khuon: [DataGrid, DataGridTable, Table]
 ngoai_le:
-  - tep: "src/app/(app)/inventory/page.tsx"
-    ly_do: trang chỉ có đầu màn, vùng Lưới dựng ở hàng 2 (Bảng hàng bản đọc)
   - tep: "src/app/(app)/sent/page.tsx"
     ly_do: trang chỉ có đầu màn, vùng Lưới dựng khi màn Đã gửi tới lượt
 nhan_viec: Đầu chủ xem, lọc và sửa danh sách hàng thay cho bảng tính
@@ -29,10 +27,11 @@ Lưới thay Sheet và Excel cho Đầu chủ: mở ra là thấy mọi dòng, s
 
 ## Màn mẫu
 
-Màn: chưa có
+Màn: inventory
 
-Màn Lưới thật đầu tiên dựng thành màn mẫu khi tệp chứng minh của nó đạt đủ ma trận trạng thái (`design/states.md`); vòng ấy
-đổi dòng trên thành `Màn: <id màn>`. Bản mẫu Lưới ở trang thử là mẫu của khuôn, không phải màn mẫu.
+Bảng hàng (hàng 2, «đọc như Sheet») là màn mẫu: tệp chứng minh `_acceptance/bang-hang-ban-doc/chung-minh-man.md` đạt đủ ma
+trận trạng thái (`design/states.md`). Các màn Lưới sau so cạnh nó. Bản mẫu Lưới ở trang thử là mẫu của khuôn, không phải
+màn mẫu.
 
 ## Khổ so
 
