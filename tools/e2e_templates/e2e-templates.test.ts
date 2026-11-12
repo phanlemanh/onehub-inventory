@@ -2,7 +2,15 @@
 // The list cases run `playwright test --list` on an edited copy of the register (SCREENS_ROOT); every edit has its
 // positive control on the same copy first.
 import { execFileSync, spawnSync } from "node:child_process";
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -22,6 +30,8 @@ import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
 import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings";
 import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { checkRecipes, regionStates } from "./structure";
+import { untagged, waitCopies, type SpecFile } from "./cho-scan";
+import { CHO_TESTS } from "./settle";
 
 const STATES_MD = readFileSync(join(REPO_ROOT, "design/states.md"), "utf8");
 const SLOW = 60_000;
@@ -413,5 +423,105 @@ describe("bảng vai theo bản khai", () => {
       expect(header(list(root).lines)).toEqual(["Màn", ...declared]);
     },
     SLOW * 3,
+  );
+});
+
+// ---- shared waits (row 1r: E8, E15) -----------------------------------------------------------------------------
+
+/** Every browser test file of both runs, read from disk. */
+function specFiles(): SpecFile[] {
+  const out: SpecFile[] = [];
+  for (const dir of ["tests/e2e", "tests/e2e-db"]) {
+    for (const rel of readdirSync(join(REPO_ROOT, dir), { recursive: true }) as string[]) {
+      if (!rel.endsWith(".spec.ts")) continue;
+      const path = `${dir}/${rel}`;
+      out.push({ path, text: readFileSync(join(REPO_ROOT, path), "utf8") });
+    }
+  }
+  return out;
+}
+
+/** `playwright test --list --grep @cho` of both browser runs, one text. */
+function choList(): string {
+  const run = (args: string[]) => {
+    const r = spawnSync("npx", ["playwright", "test", ...args, "--list", "--grep", "@cho"], {
+      cwd: REPO_ROOT,
+      encoding: "utf8",
+    });
+    if (r.status !== 0) throw new Error(`playwright --list ${args.join(" ")}: ${r.stderr}`);
+    return r.stdout;
+  };
+  return `${run([])}\n${run(["-c", "playwright.db.config.ts"])}`;
+}
+
+describe("khong ban chep ham cho", () => {
+  it("no browser test opens the sheet or waits for a banner by hand", () => {
+    const files = specFiles();
+    expect(files.map((f) => f.path)).toEqual(
+      expect.arrayContaining([
+        "tests/e2e/frame.spec.ts",
+        "tests/e2e/app-shell.spec.ts",
+        "tests/e2e-db/members.spec.ts",
+        "tests/e2e/settle.spec.ts",
+      ]),
+    );
+    expect(waitCopies(files)).toEqual([]);
+  });
+
+  it("a hand-written sheet opener put back into a copy of frame.spec.ts is named with file and line", () => {
+    const frame = specFiles().find((f) => f.path === "tests/e2e/frame.spec.ts")!;
+    expect(waitCopies([frame])).toEqual([]);
+    const copy = `${frame.text}
+async function openSheet(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "Mở hoặc đóng thanh bên" }).click();
+}
+`;
+    // The file ends with a newline and the copy adds one more, so the function starts one line after the last.
+    const at = frame.text.split("\n").length + 1;
+    expect(waitCopies([{ path: frame.path, text: copy }])).toEqual([
+      `tests/e2e/frame.spec.ts:${at}: ham mo ngan chep tay`,
+      `tests/e2e/frame.spec.ts:${at + 1}: bam nut mo ngan khong qua openSheet`,
+    ]);
+  });
+
+  it("a banner awaited by hand after going offline is named", () => {
+    const frame = specFiles().find((f) => f.path === "tests/e2e/frame.spec.ts")!;
+    const copy = frame.text.replace(
+      'await shown(page.getByRole("alert").filter({ hasText: "Mất kết nối mạng" }), "bang mat mang");',
+      'await expect(page.getByRole("alert").filter({ hasText: "Mất kết nối mạng" })).toBeVisible();',
+    );
+    expect(copy).not.toBe(frame.text);
+    const found = waitCopies([{ path: frame.path, text: copy }]);
+    expect(found).toHaveLength(1);
+    expect(found[0]).toMatch(
+      /^tests\/e2e\/frame\.spec\.ts:\d+: cho bang tu viet sau khi mat mang$/,
+    );
+  });
+});
+
+describe("the @cho du danh sach", () => {
+  it(
+    "every test of CHO_TESTS carries the @cho tag, and removing it from one names that test",
+    () => {
+      expect(CHO_TESTS["tests/e2e/settle.spec.ts"]).toHaveLength(5);
+      expect(CHO_TESTS["tests/e2e/frame.spec.ts"]).toEqual(
+        expect.arrayContaining([
+          "losing the network shows a banner that leaves when it is back",
+          "no serious accessibility violations on every frame screen",
+        ]),
+      );
+      const listed = choList();
+      expect(untagged(listed)).toEqual([]);
+
+      // Without its tag the test drops out of `--grep @cho`: the same list less that test's lines.
+      const NETWORK = "losing the network shows a banner that leaves when it is back";
+      const stripped = listed
+        .split("\n")
+        .filter((l) => !l.trimEnd().endsWith(`› ${NETWORK}`))
+        .join("\n");
+      expect(stripped).not.toBe(listed);
+      expect(untagged(stripped)).toEqual([`tests/e2e/frame.spec.ts › ${NETWORK}`]);
+    },
+    SLOW * 2,
   );
 });

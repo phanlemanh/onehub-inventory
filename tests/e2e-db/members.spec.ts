@@ -9,10 +9,12 @@ import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page, type TestInfo } from "@playwright/test";
+import { type Page, type TestInfo } from "@playwright/test";
 import pg from "pg";
 
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
+import { expect, test } from "../../tools/e2e_templates/fixture";
+import { openSheet } from "../../tools/e2e_templates/settle";
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const MEMBER = "Thành viên";
@@ -109,8 +111,7 @@ const mobile = (info: TestInfo) => Number(info.project.name) < 768;
 /** The «Thành viên» entries of the sidebar; on a phone the sidebar sheet is opened first. */
 async function navMembers(page: Page, info: TestInfo) {
   await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
-  if (mobile(info))
-    await page.getByRole("button", { name: "Mở hoặc đóng thanh bên" }).first().click();
+  if (mobile(info)) await openSheet(page);
   return page.getByRole("link", { name: MEMBER, exact: true });
 }
 
@@ -168,7 +169,7 @@ async function invite(page: Page, email: string, name: string, roles: string[]) 
   return dialog;
 }
 
-test("moi-nguoi-va-dang-nhap", async ({ page }, info) => {
+test("moi-nguoi-va-dang-nhap", { tag: "@cho" }, async ({ page }, info) => {
   const { people } = await team(info, "moi", { P: { roles: ["CompanyAdmin"] } });
   await signIn(page, people["P"]!.email);
   await expect(await navMembers(page, info)).toHaveCount(1);
@@ -184,7 +185,7 @@ test("moi-nguoi-va-dang-nhap", async ({ page }, info) => {
   await expect(await navMembers(page, info)).toHaveCount(0);
 });
 
-test("doi-vai-thanh-ben", async ({ page }, info) => {
+test("doi-vai-thanh-ben", { tag: "@cho" }, async ({ page }, info) => {
   const { people } = await team(info, "doi", {
     P: { roles: ["CompanyAdmin"] },
     R: { roles: ["BuyerAgent"] },
@@ -232,7 +233,7 @@ test("doi-vai-thanh-ben", async ({ page }, info) => {
   await axeClean(page, "ST-roles-last-admin");
 });
 
-test("khong-du-quyen", async ({ page }, info) => {
+test("khong-du-quyen", { tag: "@cho" }, async ({ page }, info) => {
   const { people } = await team(info, "quyen", {
     P: { roles: ["CompanyAdmin"] },
     LA: { roles: ["ListAgent"] },
