@@ -25,7 +25,7 @@ async function sentInvitePayload(env: Record<string, string>, origin: string): P
   const config = readAuthConfig(env, fetchMock as unknown as typeof fetch);
   await config.inviteSender({
     email: "moi@example.test",
-    companyName: "[Sàn A]",
+    companyName: "[Công ty A]",
     inviterName: "[Tên] P",
     roles: ["ListAgent"],
     origin,
@@ -138,7 +138,7 @@ describe("production configuration", () => {
     const dir = mkdtempSync(join(tmpdir(), "thu-moi-"));
     const mail = {
       email: "moi@example.test",
-      companyName: "[Sàn A]",
+      companyName: "[Công ty A]",
       inviterName: "[Tên] P",
       roles: ["ListAgent" as const],
       origin: "http://127.0.0.1:3485",
