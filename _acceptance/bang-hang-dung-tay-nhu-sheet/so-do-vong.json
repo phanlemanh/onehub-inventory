@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "slug": "bang-hang-dung-tay-nhu-sheet",
+  "ghi_luc": "2026-11-12T10:49:55Z",
+  "vong_cham": 3,
+  "luot": [
+    {
+      "vong": 1,
+      "verdict": "REJECT",
+      "tang": [
+        "bo-cuc"
+      ]
+    },
+    {
+      "vong": 2,
+      "verdict": "REJECT",
+      "tang": [
+        "bo-cuc"
+      ]
+    },
+    {
+      "vong": 3,
+      "verdict": "PASS",
+      "tang": []
+    }
+  ],
+  "lam_lai": [
+    {
+      "nguon": "r1",
+      "tang": "bo-cuc"
+    },
+    {
+      "nguon": "r2",
+      "tang": "bo-cuc"
+    },
+    {
+      "nguon": "repin-do:repin-20261112T104208Z-19705",
+      "tang": "bai-kiem-ha-tang"
+    }
+  ],
+  "theo_tang": {
+    "bai-kiem-ha-tang": 1,
+    "trang-thai-hanh-vi": 0,
+    "du-lieu-api": 0,
+    "nghiep-vu": 0,
+    "thanh-phan": 0,
+    "bo-cuc": 2,
+    "hop-dong-yeu-cau": 0,
+    "link": 0,
+    "chu-dinh-dang": 0,
+    "mau-token": 0,
+    "truy-cap": 0
+  },
+  "chua_phan": [],
+  "thuoc_vat": {
+    "vat": [
+      110,
+      12
+    ],
+    "thuoc": [
+      0,
+      0
+    ],
+    "nhat": 0
+  },
+  "gio_may": null
+}

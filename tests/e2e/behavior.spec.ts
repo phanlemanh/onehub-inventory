@@ -21,7 +21,7 @@ async function openProto(page: Page, query = ""): Promise<void> {
   // Wait for a streamed copy to be swapped in, so every check sees one region.
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
   await expect(
-    region(page).locator('[data-slot="scroll-area-viewport"]:not([tabindex="0"])'),
+    region(page).locator('table[data-slot="data-grid-table"]:not([tabindex="0"])'),
   ).toHaveCount(0);
 }
 

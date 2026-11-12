@@ -15,8 +15,8 @@ rules:
     description: Roles are a non-empty set taken from ontology/roles.yaml, without repeats.
     implemented_in: db/migrations/003_moi_nguoi_gan_vai.sql
   - id: company-admin-manages-people
-    description: Only a CompanyAdmin of the current company lists, invites and changes the roles of its members (until the permission table of row 9a).
-    implemented_in: db/migrations/003_moi_nguoi_gan_vai.sql
+    description: Who lists, invites and changes the roles of the members of the current company is the permission table (ontology/actions.yaml rows listMembers, inviteMember, changeMemberRoles; today CompanyAdmin only); a person reads their own row.
+    implemented_in: db/migrations/006_bang_quyen_theo_vai.sql
   - id: one-admin-left
     description: A company always keeps at least one CompanyAdmin.
     implemented_in: db/migrations/003_moi_nguoi_gan_vai.sql

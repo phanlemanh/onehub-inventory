@@ -253,3 +253,14 @@ concepts:
     own: true
     pref: Đổi vai
     en: Change roles
+  Action:
+    kind: entity
+    own: true
+    pref: Thao tác
+    en: Action
+    avoid: [Chức năng]
+  Scope:
+    kind: field
+    own: true
+    pref: Phạm vi
+    en: Scope

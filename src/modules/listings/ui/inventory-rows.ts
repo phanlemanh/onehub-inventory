@@ -1,5 +1,6 @@
 // Pure parts of the inventory grid (roadmap row 2): rows, columns and the state a URL asks for. Safe on the server.
 import { typedColumn, type TypedColumn } from "@/components/candidate/column-kind";
+import { STATUS_ORDER, type ColumnFilters } from "@/components/candidate/grid-view";
 import type { GridRow, RegionStatus } from "@/components/candidate/data-region";
 import type { Listing, ListingUnit, Unit } from "@/generated/ontology";
 
@@ -65,4 +66,24 @@ export type InventoryField = (typeof INVENTORY_FIELDS)[number];
 /** The eight columns of the inventory grid, in order, with the headers the page gives. */
 export function inventoryColumns(headers: Readonly<Record<InventoryField, string>>): TypedColumn[] {
   return INVENTORY_FIELDS.map((field) => typedColumn({ field, header: headers[field] }));
+}
+
+/** The field the inventory grid groups rows under: the building, as the owner's sheet does. */
+export const INVENTORY_GROUP_BY = "Listing.buildingName" as const;
+
+/**
+ * The status filter a status shortcut asks for with `?status=<StandardStatus>` (several joined by commas); an unknown
+ * status is dropped, and no known status leaves the grid unfiltered.
+ */
+export function inventoryFiltersFrom(param: string | undefined): ColumnFilters {
+  const wanted = (param ?? "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter((part) => (STATUS_ORDER as readonly string[]).includes(part));
+  return wanted.length > 0 ? { "Listing.standardStatus": wanted } : {};
+}
+
+/** Address of the inventory grid filtered to one status: what each status shortcut of the App Shell opens. */
+export function inventoryStatusHref(status: string): string {
+  return `/inventory?status=${encodeURIComponent(status)}`;
 }
