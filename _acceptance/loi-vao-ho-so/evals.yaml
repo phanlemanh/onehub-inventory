@@ -1,0 +1,80 @@
+schema_version: 1
+feature_slug: loi-vao-ho-so
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/ui/**, src/components/candidate/record-panel.tsx, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts]
+    expected: "exit 0; tests/e2e/loi-vao-ho-so.spec.ts ở 1440, 1024, 414, 360 mở /inventory, bấm mã căn thứ năm: trong đầu hồ sơ có nút tên đọc được «Mở toàn màn» và nó đứng trước nút «Trước» theo thứ tự tài liệu; bấm nó thì địa chỉ là /inventory/units/<mã căn của dòng>?toa=<toà của dòng>&ho-so=<id của dòng> (giá trị so lại từ dòng, không chép số) và trang riêng hiện; page.goBack() về /inventory?ho-so=<id ấy> với hồ sơ đang mở; ca đối chứng gỡ nút khỏi đầu hồ sơ bằng thẻ style display none cho 'open full missing', ca đối chứng để nút dẫn tới mã của dòng đầu cho 'open full went to the wrong unit'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/loi-vao-ho-so.test.tsx]
+    expected: "exit 0; trong tests/loi-vao-ho-so.test.tsx, với MỌI dòng Bảng hàng dựng từ dữ liệu mẫu bằng inventoryRows, thân trang riêng của mã và toà của dòng ấy là ListingRecordBody với cùng listingView như hồ sơ cạnh bảng (so mã căn, giá, trạng thái và tám trường từ chính dòng); đầu trang là '<mã> · <toà>', có nút 'Chép đường dẫn' và liên kết 'Bảng hàng' tới /inventory; ca đối chứng dựng thân từ dòng kế bên cho 'unit page shows another listing', ca đối chứng bỏ liên kết quay về cho 'no way back to inventory'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts]
+    expected: "exit 0; ở 1440 với quyền clipboard-read và clipboard-write: mở trang riêng của căn thứ năm, bấm 'Chép đường dẫn' thì navigator.clipboard.readText() bằng đúng page.url() (có toa và ho-so) và có báo 'Đã chép đường dẫn'; ca chặn: thay navigator.clipboard.writeText bằng hàm ném lỗi (addInitScript) rồi bấm thì có báo 'Chưa chép được. Bạn chép đường dẫn trong ô địa chỉ của trình duyệt.' và không có 'Đã chép đường dẫn'; ca đối chứng chép địa chỉ không kèm query cho 'copied link lost the listing'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts]
+    expected: "exit 0; chép đường dẫn ở một ngữ cảnh trình duyệt rồi mở nó ở một browser.newContext() mới: data-listing-id của thân bằng id đã chép và mã căn bằng mã đã chép; cùng mã và toà mà ho-so=khong-co hoặc không có ho-so thì data-listing-id là id lần chào đầu của căn theo thứ tự inventoryRows (bài in id mong đợi); ca đối chứng đọc lần chào theo chỉ số thay vì id cho 'link opened the wrong listing'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/ui/**, src/components/templates/page-state.tsx, "src/app/(app)/inventory/**", tests/loi-vao-ho-so.test.tsx]
+    expected: "exit 0; phép tìm căn trả 'khong' cho mã không có ở dòng nào (kể cả có toà kèm theo), và KHÔNG trả 'khong' cho mã có thật kèm một toà sai (ca ấy thuộc E6); trang riêng của mã 'Z-99.99' hiện tiêu đề 'Không có căn này trong Bảng hàng', câu vì sao chứa 'Z-99.99', nút 'Về Bảng hàng' tới /inventory, và không có data-slot listing-record; ca đối chứng cho phép tìm khớp theo tiền tố mã cho 'partial code matched a unit', ca đối chứng hiện thân rỗng thay vì trạng thái trang cho 'unknown code rendered a record'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/loi-vao-ho-so.test.tsx]
+    expected: "exit 0; trên ma trận dòng dựng tay viết trước trong tệp (mã A ở toà T1, T2, T3; mã B chỉ ở T1; mã C ở T1 và T2 khác hoa thường 'c-1'/'C-1'): phép tìm mã A không toà cho 'nhieu' với đúng ba toà theo thứ tự xuất hiện, mã A kèm T2 cho 'mot' ở T2, mã A kèm T9 (toà không có mã) cho 'nhieu' ba toà như vắng toà, mã B kèm T2 (toà sai) cho 'mot' ở T1, mã B cho 'mot', 'c-1' cho 'nhieu' hai toà; trạng thái trang 'Nhiều căn — chọn toà' có đúng một liên kết mỗi toà, href mỗi liên kết là /inventory/units/<mã>?toa=<toà>; số liên kết bằng số toà trong ma trận; ca đối chứng bỏ toà trùng cuối cho 'building missing from choice', ca đối chứng mở luôn toà đầu cho 'many buildings opened the first'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/ui/**, src/components/templates/app-shell.tsx, "src/app/(app)/layout.tsx", tests/e2e/loi-vao-ho-so.spec.ts]
+    expected: "exit 0; ở 1440 và 360, trên /inventory và trên / : bấm nút tên 'Gõ mã căn' trên thanh trên thì hộp mở, tiêu điểm ở ô gõ; gõ '  0905 ' (khoảng trắng hai đầu, hoặc mã của dòng thứ năm viết khác hoa thường nếu có chữ) rồi Enter thì địa chỉ là /inventory/units/<mã>... và thân trang hiện; Ctrl+K và Meta+K mở hộp; '/' mở hộp khi tiêu điểm ở thân trang và KHÔNG mở khi tiêu điểm ở ô tìm của Bảng hàng (chữ '/' vào ô ấy); Enter khi ô rỗng thì có 'Bạn gõ mã căn trước đã.' và hộp còn mở; Esc đóng hộp và tiêu điểm về nút; ca đối chứng nuốt Enter cho 'jump did not navigate', ca đối chứng mở hộp khi gõ '/' trong ô nhập cho 'slash stolen from a text field'; người không có vai thấy Bảng hàng: đo ở mức bài kiểm đơn vị trên khe thanh trên (không có nút khi danh sách vai không mở inventory), ca đối chứng luôn hiện nút cho 'jump shown without inventory'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/ui/**, src/components/templates/**, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts, tests/e2e/a11y.spec.ts]
+    expected: "exit 0; ở 1440, 1024, 414, 360, sáng và tối: trang riêng có căn, 'nhiều căn' (qua trang thử dựng dòng tay của bản mẫu, chỉ ở bản dựng phát triển) và 'không có căn' (mã Z-99.99) và hộp gõ mã đang mở có document.documentElement.scrollWidth bằng clientWidth; quét axe không có lỗi impact serious hay critical; ca đối chứng ép thân rộng 900 px cho 'unit page scrolls sideways', ca đối chứng chèn chữ xám nhạt trên nền trắng cho lỗi axe color-contrast"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-8
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/modules/listings/ui/**, src/components/templates/**, "src/app/(app)/inventory/**"]
+    steps:
+      - "Use the dev server at the URL given (lane R, port 3491); if it does not answer, start it from the repo root with npx next dev -p 3491 -H 127.0.0.1 (never port 3470, never while a suite command is running), note its PID and stop only that PID when done"
+      - "At 1440x900, light: open {url}/inventory, click the fifth unit code, then the «Mở toàn màn» button → screenshot evidence/trang-1440-sang.png"
+      - "Same page at 1440x900 dark, 1024x768 light and dark, 414x896 light and dark, 360x780 light and dark → evidence/trang-<width>-<sang|toi>.png"
+      - "At 1440x900 and 360x780, light and dark: open {url}/inventory/units/Z-99.99 → evidence/khong-<width>-<sang|toi>.png"
+      - "At 1440x900 and 360x780, light and dark: on {url}/inventory press Control+K → evidence/go-ma-<width>-<sang|toi>.png"
+    expected: "Trang riêng: thân hồ sơ giống hồ sơ cạnh bảng của cùng căn, tên «<mã> · <toà>» và nút «Chép đường dẫn» ở đầu, lối «Bảng hàng» thấy được; trang mã lạ nói rõ không có căn và có nút «Về Bảng hàng»; hộp gõ mã có ô gõ thấy rõ, không bị bàn phím hay mép màn che ở 360; không chữ đè nhau, không cuộn ngang, chữ đọc được ở cả sáng và tối"
+    evidence_required: [run_id, screenshot, observed]

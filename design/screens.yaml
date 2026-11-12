@@ -42,6 +42,12 @@ screens:
     family: null
     audience: dev
     status: built
+  - id: proto-loi-vao
+    route: /proto/loi-vao-ho-so
+    title: null
+    family: null
+    audience: dev
+    status: built
   - id: sign-in
     route: /login
     title: SignIn

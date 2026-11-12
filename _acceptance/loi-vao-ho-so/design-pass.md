@@ -1,0 +1,78 @@
+---
+slug: loi-vao-ho-so
+at: 2026-11-12T23:22:29Z
+route: http://127.0.0.1:3491/proto/loi-vao-ho-so
+material: real-components
+context: host-embedded
+context_scenes: []
+reaction: nac-1 (anh-gui-kem-the)
+options: _acceptance/loi-vao-ho-so/design-pass/ung-vien/ (ảnh bốn khối ReUI) và design-pass/*.png (bản đề xuất trên dữ liệu mẫu)
+divergence: opened
+ds_skill: inventory-ui
+states: [ngan, trang, nhieu, khong, go-ma]
+breakpoints: [mobile-360, mobile-414, desktop-1024, desktop-1440]
+themes: [light, dark]
+patched: 1
+deferred: 0
+---
+# design-pass — loi-vao-ho-so
+
+Bản bấm được ở `/proto/loi-vao-ho-so` trong App Shell thật, dữ liệu mẫu (lần chào đầu: 0905 · S1.01), dựng bằng thành
+phần thật của kho: thân `ListingRecordBody` của hàng 3, `PageHeader`, `Frame`, `Dialog`, `InputGroup`, `Empty`. Cảnh
+«ngan» chép đầu hồ sơ của hàng 3 vì khe nút của hàng 9e chưa ở nhánh chính. Cảnh «nhieu» mượn toà thứ hai từ dữ liệu mẫu.
+
+## Ma trận capture
+
+| state | breakpoint | theme | file |
+|---|---|---|---|
+| ngan | 1440 | light | design-pass/ngan-1440-sang.png |
+| ngan | 1440 | dark | design-pass/ngan-1440-toi.png |
+| ngan | 1024 | light | design-pass/ngan-1024-sang.png |
+| ngan | 1024 | dark | design-pass/ngan-1024-toi.png |
+| ngan | 414 | light | design-pass/ngan-414-sang.png |
+| ngan | 414 | dark | design-pass/ngan-414-toi.png |
+| ngan | 360 | light | design-pass/ngan-360-sang.png |
+| ngan | 360 | dark | design-pass/ngan-360-toi.png |
+| trang | 1440 | light | design-pass/trang-1440-sang.png |
+| trang | 1440 | dark | design-pass/trang-1440-toi.png |
+| trang | 1024 | light | design-pass/trang-1024-sang.png |
+| trang | 1024 | dark | design-pass/trang-1024-toi.png |
+| trang | 414 | light | design-pass/trang-414-sang.png |
+| trang | 414 | dark | design-pass/trang-414-toi.png |
+| trang | 360 | light | design-pass/trang-360-sang.png |
+| trang | 360 | dark | design-pass/trang-360-toi.png |
+| nhieu | 1440 | light | design-pass/nhieu-1440-sang.png |
+| nhieu | 1440 | dark | design-pass/nhieu-1440-toi.png |
+| nhieu | 1024 | light | design-pass/nhieu-1024-sang.png |
+| nhieu | 1024 | dark | design-pass/nhieu-1024-toi.png |
+| nhieu | 414 | light | design-pass/nhieu-414-sang.png |
+| nhieu | 414 | dark | design-pass/nhieu-414-toi.png |
+| nhieu | 360 | light | design-pass/nhieu-360-sang.png |
+| nhieu | 360 | dark | design-pass/nhieu-360-toi.png |
+| khong | 1440 | light | design-pass/khong-1440-sang.png |
+| khong | 1440 | dark | design-pass/khong-1440-toi.png |
+| khong | 1024 | light | design-pass/khong-1024-sang.png |
+| khong | 1024 | dark | design-pass/khong-1024-toi.png |
+| khong | 414 | light | design-pass/khong-414-sang.png |
+| khong | 414 | dark | design-pass/khong-414-toi.png |
+| khong | 360 | light | design-pass/khong-360-sang.png |
+| khong | 360 | dark | design-pass/khong-360-toi.png |
+| go-ma | 1440 | light | design-pass/go-ma-1440-sang.png |
+| go-ma | 1440 | dark | design-pass/go-ma-1440-toi.png |
+| go-ma | 1024 | light | design-pass/go-ma-1024-sang.png |
+| go-ma | 1024 | dark | design-pass/go-ma-1024-toi.png |
+| go-ma | 414 | light | design-pass/go-ma-414-sang.png |
+| go-ma | 414 | dark | design-pass/go-ma-414-toi.png |
+| go-ma | 360 | light | design-pass/go-ma-360-sang.png |
+| go-ma | 360 | dark | design-pass/go-ma-360-toi.png |
+
+## Findings
+
+- Đã sửa: hộp «Gõ mã căn» mở sẵn lúc dựng trên máy chủ thì không hiện; nay mở sau khi trang chạy để ảnh cảnh go-ma thấy hộp.
+- Ở 360, đầu trang riêng xuống hai dòng (tên căn rồi nút «Chép đường dẫn») — chấp nhận, đúng cách `PageHeader` xuống dòng.
+- Trong bản mẫu, dòng địa chỉ chỉ để chủ kho thấy đường dẫn trông thế nào; trang thật không in địa chỉ.
+
+## Nấc
+
+- context: host-embedded — chụp trong App Shell thật.
+- reaction: nac-1 — ảnh gửi kèm thẻ Cổng Phạm vi, chủ kho phản ứng ở cổng.
