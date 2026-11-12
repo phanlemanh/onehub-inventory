@@ -30,7 +30,9 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 
 /** Inventory, read-only: the sample company's listings (roadmap row 1) on the shared grid. */
 export default async function Page({ searchParams }: Props) {
-  const { state, status } = await searchParams;
+  const { state, status: statusParam } = await searchParams;
+  // A status shortcut opens the grid filtered (row 2a); a repeated parameter keeps its first value.
+  const status = Array.isArray(statusParam) ? statusParam[0] : statusParam;
   const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
   const { listings, listingUnits } = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
   return (
