@@ -198,6 +198,24 @@ async function checkNonAdminCannotInvite(w: World): Promise<void> {
     throw new Error("ba-vai-khong-quan-tri: Đầu chủ mời được người");
 }
 
+/**
+ * Row 7b (Ngoài-1 of row 9a): the database itself refuses a ListAgent's invite. Since row 9a the API answers 403 before
+ * the database is asked, so the API check above cannot tell a database that checks the permission from one that does
+ * not; this one calls the function straight through the door under the API role, as LA in A.
+ */
+async function checkDbRefusesNonAdminInvite(w: World): Promise<void> {
+  const before = await memberCount(w);
+  const rows = await direct<{ status: string }>(
+    w,
+    w.p.id.LA,
+    w.p.A,
+    "select status from app.member_invite($1, $2, $3)",
+    ["moi@example.test", "[Tên] Mới", ["ListAgent"]],
+  );
+  if (rows[0]?.status !== "forbidden" || (await memberCount(w)) !== before)
+    throw new Error("ba-vai-khong-quan-tri: cơ sở dữ liệu cho Đầu chủ mời người");
+}
+
 async function checkOtherCompanyUntouched(w: World): Promise<void> {
   const cookie = await signIn(w, w.p.email.P);
   const res = await setRoles(w, w.p.id.X, ["CompanyAdmin"], cookie);
@@ -820,8 +838,8 @@ describe("break files", () => {
   const breaks: [string, string, (w: World) => Promise<void>][] = [
     [
       "moi-khong-kiem-quan-tri",
-      "ba-vai-khong-quan-tri: Đầu chủ mời được người",
-      checkNonAdminCannotInvite,
+      "ba-vai-khong-quan-tri: cơ sở dữ liệu cho Đầu chủ mời người",
+      checkDbRefusesNonAdminInvite,
     ],
     [
       "doi-vai-moi-san",
