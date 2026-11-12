@@ -23,16 +23,16 @@ nhà cách đây bao lâu. Hồ sơ vẫn chỉ đọc. Hàng 15 (Sẵn sàng b�
 1. **Mô hình nghiệp vụ (đổi ontology — chủ kho soi).** `Listing` thêm năm trường:
    `furnished` (RESO `Furnished`), `occupantType` (RESO `OccupantType`), `legalStatus` (riêng của ta), `financing`
    (riêng của ta), `originalEntryTimestamp` (RESO `OriginalEntryTimestamp` — lúc lần chào được tạo, để xếp và ghi ngày
-   cho «các lần chào của căn»). Kiểu giá trị của bốn trường đầu là Hỏi-1. Thêm luật `one-open-listing-per-unit`: trong
+   cho «các lần chào của căn»; Hỏi-6). Kiểu giá trị của bốn trường đầu là Hỏi-1. Thêm luật `one-open-listing-per-unit`: trong
    một sàn, một căn có nhiều nhất một lần chào đang mở (Incomplete, Active, Pending, Hold); lần chào cũ đã đóng (Closed,
-   Withdrawn) thì giữ lại. Bảng nhãn thêm nhãn cho năm trường, cho `DirectionFaces` («Hướng»), `PropertySubType`
+   Withdrawn) thì giữ lại (tập trạng thái mở là Hỏi-5). Bảng nhãn thêm nhãn cho năm trường, cho `DirectionFaces` («Hướng»), `PropertySubType`
    («Loại hình») và bốn giá trị của nó, «Loại căn», «Mức đủ thông tin», «Các lần chào» — mỗi nhãn tối đa 17 ký tự.
 2. **Không migration ở hàng này (Hỏi-2).** Chưa có bảng lần chào để thêm cột; năm cột vào cùng bảng lần chào khi hàng 10
    tạo bảng ấy, qua `/new-migration` và bộ kiểm cách ly. Ô cơ hội ghi «có lần chuyển lược đồ» — đây là chỗ lệch, chủ kho
    chốt.
 3. **Dữ liệu mẫu.** 60 lần chào hiện tại giữ nguyên mã, trạng thái, giá (Bảng hàng và hồ sơ đã ký của hàng 1, 2, 3 không
    đổi). Thêm bốn trường cho mỗi lần chào (có ô bỏ trống có chủ đích) và `originalEntryTimestamp`. Thêm một tập «lần
-   chào cũ» (Closed hoặc Withdrawn, nhãn MAU) trên một phần ba số căn đã có lần chào — đọc qua một hàm riêng, nên
+   chào cũ» (Closed hoặc Withdrawn, nhãn MAU) trên một phần ba số căn đã có lần chào — đọc qua một hàm riêng (Hỏi-7), nên
    `buildSampleListings` vẫn trả đúng 60 và Bảng hàng vẫn 60 dòng.
 4. **Luật thuần trong mô-đun lần chào** (`src/modules/listings/index.ts`, an toàn ở trình duyệt):
    - `completeness(listing)`: năm phần theo thứ tự Giá · Nội thất · Pháp lý · Tài chính · Tình trạng sử dụng; trả số có,
