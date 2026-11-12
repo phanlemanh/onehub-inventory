@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "ho-so-can",
-  "ghi_luc": "2026-11-12T12:17:51Z",
-  "vong_cham": 3,
+  "ghi_luc": "2026-11-12T14:29:58Z",
+  "vong_cham": 4,
   "luot": [
     {
       "vong": 1,
@@ -21,6 +21,11 @@
       "vong": 3,
       "verdict": "PASS",
       "tang": []
+    },
+    {
+      "vong": 4,
+      "verdict": "PASS",
+      "tang": []
     }
   ],
   "lam_lai": [
@@ -31,10 +36,14 @@
     {
       "nguon": "r1",
       "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "repin-do:repin-20261112T122636Z-65907",
+      "tang": "bai-kiem-ha-tang"
     }
   ],
   "theo_tang": {
-    "bai-kiem-ha-tang": 1,
+    "bai-kiem-ha-tang": 2,
     "trang-thai-hanh-vi": 0,
     "du-lieu-api": 0,
     "nghiep-vu": 0,
@@ -49,14 +58,14 @@
   "chua_phan": [],
   "thuoc_vat": {
     "vat": [
-      106,
-      63
+      437,
+      117
     ],
     "thuoc": [
       1,
       1
     ],
-    "nhat": 0
+    "nhat": 1
   },
   "gio_may": null
 }

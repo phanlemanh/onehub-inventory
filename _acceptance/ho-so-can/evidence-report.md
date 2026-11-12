@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 55db8b4457228f5131eb49bf4063601971b9a87a
+verified_commit: 93811d83daa960c887ebd4e0946880039b525892
 human_signoff:
 ---
 
@@ -31,141 +31,131 @@ human_signoff:
 ## Evidence
 
 - eval: E1
-  run_id: minted-ho-so-can-E1-r2
+  run_id: minted-ho-so-can-E1-r4
   exit_code: 0
-  carried_from_round: 2
   baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-12T10:20:40Z
+  verified_at: 2026-11-12T14:19:08Z
   output: |
-    carry-forward tu round 2 — delta khong cham paths cua eval
-
-- eval: E2
-  run_id: minted-ho-so-can-E2-r3
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.e2e
-  verified_at: 2026-11-12T10:32:11Z
-  output: |
-    make e2e: 683 passed (5.3m)
-
-- eval: E3
-  run_id: minted-ho-so-can-E3-r3
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.e2e
-  verified_at: 2026-11-12T10:32:11Z
-  output: |
-    make e2e: 683 passed (5.3m)
-
-- eval: E4
-  run_id: minted-ho-so-can-E4-r3
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.e2e
-  verified_at: 2026-11-12T10:32:11Z
-  output: |
-    make e2e: 683 passed (5.3m)
+    make test chạy xanh (gồm tests/ho-so-can.test.tsx); lệnh kết thúc sạch.
 
 - eval: E5
-  run_id: minted-ho-so-can-E5-r3
+  run_id: minted-ho-so-can-E5-r4
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-12T10:32:11Z
+  verified_at: 2026-11-12T14:19:08Z
   output: |
-    make test: finished green
+    make test chạy xanh (gồm tests/ho-so-can.test.tsx); lệnh kết thúc sạch.
 
 - eval: E6
-  run_id: minted-ho-so-can-E6-r3
+  run_id: minted-ho-so-can-E6-r4
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-12T10:32:11Z
+  verified_at: 2026-11-12T14:19:08Z
   output: |
-    make test: finished green
-
-- eval: E7
-  run_id: minted-ho-so-can-E7-r3
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.e2e
-  verified_at: 2026-11-12T10:32:11Z
-  output: |
-    make e2e: 683 passed (5.3m)
+    make test chạy xanh (gồm tests/ho-so-can.test.tsx); lệnh kết thúc sạch.
 
 - eval: E8
-  run_id: minted-ho-so-can-E8-r3
+  run_id: minted-ho-so-can-E8-r4
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-12T10:32:11Z
+  verified_at: 2026-11-12T14:19:08Z
   output: |
-    make test: finished green
+    make test chạy xanh (gồm behavior, behavior-guard, grid); lệnh kết thúc sạch.
 
-- eval: E9
-  run_id: minted-ho-so-can-E9-r3
+- eval: E2
+  run_id: minted-ho-so-can-E2-r4
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.e2e
-  verified_at: 2026-11-12T10:32:11Z
+  verified_at: 2026-11-12T14:19:08Z
   output: |
-    make e2e: 683 passed (5.3m)
+    779 passed (6.4m)
 
-- eval: E10
-  run_id: minted-ho-so-can-E10-r3
+- eval: E3
+  run_id: minted-ho-so-can-E3-r4
   exit_code: 0
   baseline: n-a
-  verifier: config:capture.ui
-  verified_at: 2026-11-12T10:32:11Z
-  screenshot: evidence/ho-so-1440-sang.png
-  observed: |
-    I opened all 8 saved PNGs with Read.
-    - ho-so-1440-sang: panel at the right, about x=930–1420, from y≈66 to y≈890. The App Shell top bar (toggle, theme icon, «Đăng nhập») and the search box are not covered. Title «1603 · S1.01» with Trước, Sau, Đóng. Unit card: «1603» and «4,28 tỷ» on one line; «S1.01 · Vinhomes Ocean Park 1» with the green badge «Đang bán»; three specs: Diện tích 75 m², Phòng ngủ 2, Xác nhận lúc 09:00 05/11/2026. Then 8 fields: Căn, Toà, Dự án, Trạng thái, Giá chào, Diện tích, Phòng ngủ, Xác nhận lúc. No overlapping text.
-    - ho-so-1440-toi: same layout on a dark background; text and badges are readable.
-    - ho-so-1024-sang: the panel is wider, about x=617–1005, with the same header, unit card and 8 fields. Top bar and search are not covered.
-    - ho-so-1024-toi: same, dark, readable.
-    - ho-so-414-sang: the record covers the full screen, with no table behind it. The head row (title, Trước, Sau, Đóng) comes first, then the unit card, then 8 fields. No overlap.
-    - ho-so-414-toi: same, dark, readable.
-    - ho-so-360-sang: full screen. The title wraps to two lines, «1603 ·» then «S1.01», and the buttons still fit. Unit card and 8 fields are intact, with no overlap.
-    - ho-so-360-toi: same, dark, readable.
-    All 8 frames match the Expected.
-  network_observed: no-app-traffic
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-12T14:19:08Z
+  output: |
+    779 passed (6.4m)
 
-- eval: E11
-  judged_by: judge panel (domain-correctness, operational-feasibility, spec-alignment)
-  verdict: PASS
-  rationale: Ba góc nhìn đều thấy hồ sơ nổi đúng vị trí ở 1440 và 1024, toàn màn ở 360, thẻ căn đủ nội dung, không chữ chồng chữ, ảnh tối đọc được.
-  human_override:  # chi nguoi ghi
+- eval: E4
+  run_id: minted-ho-so-can-E4-r4
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-12T14:19:08Z
+  output: |
+    779 passed (6.4m)
+
+- eval: E7
+  run_id: minted-ho-so-can-E7-r4
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-12T14:19:08Z
+  output: |
+    779 passed (6.4m)
+
+- eval: E9
+  run_id: minted-ho-so-can-E9-r4
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-12T14:19:08Z
+  output: |
+    779 passed (6.4m)
 
 - eval: E12
-  run_id: minted-ho-so-can-E12-r3
+  run_id: minted-ho-so-can-E12-r4
   exit_code: 0
   baseline: n-a
   verifier: config:executors.design.floor
-  verified_at: 2026-11-12T10:32:11Z
+  verified_at: 2026-11-12T14:19:08Z
   output: |
-    design-floor-s4: no raw colour codes in the files this round touched
+    design-floor-s4 chạy sạch, không mã màu thô trên các tệp giao diện vòng này chạm.
 
-### Judge panels
-
-Panel de xuat cho E11 (human_override de TRONG cho nguoi quyet o Cong 2):
-
-- domain-correctness: PASS — Ở 1440 và 1024, hồ sơ nổi bên phải bắt đầu ngay dưới thanh trên (khoảng y=65) và chạy gần tới đáy ảnh. Thanh trên, ô «Gõ để tìm», cột #, Căn, Toà đều còn thấy. Số cột ở 1440 là 5 (#, Căn, Toà, Dự án, Trạng thái) và ở 1024 là 3 (#, Căn, Toà), khớp bảng đo trong design.md. Ở 360, hồ sơ toàn màn có đầu là thẻ căn gồm mã 1603, giá 4,28 tỷ, nơi S1.01 · Vinhomes Ocean Park 1, huy hiệu «Đang bán» và ba thông số (Diện tích, Phòng ngủ, Xác nhận lúc). Ba nút Trước, Sau, Đóng nằm ở góc trên phải. Không có chữ chồng chữ ở cả năm ảnh, và hai ảnh tối đọc rõ.
-- operational-feasibility: PASS — Ở 1440 và 1024 (sáng, và tối ở 1440) ngăn nổi bên phải chạy từ ngay dưới thanh trên tới đáy màn hình. Thanh trên và ô «Gõ để tìm» vẫn thấy, cột #, Căn, Toà còn thấy (1440 còn 5 cột, 1024 còn 3 cột, đúng bảng đo trong design.md). Việc ngăn che số dòng ở 1024 là điều design.md đã nêu. Ở 360 (sáng và tối) hồ sơ toàn màn, đầu là thẻ căn có mã 1603, giá 4,28 tỷ, nơi, huy hiệu «Đang bán» và ba thông số (Diện tích, Phòng ngủ, Xác nhận lúc). Ba nút Trước, Sau, Đóng nằm góc trên phải. Chữ không chồng chữ và ảnh tối đọc được.
-- spec-alignment: PASS — Ở 1440 và 1024 hồ sơ nổi bên phải từ ngay dưới thanh trên tới đáy màn hình. Thanh trên và ô tìm không bị che, cột #, Căn, Toà còn thấy (1024 đúng 3 cột như bảng đo trong design.md; số dòng bị che ở 1024 cũng đã được design.md chấp nhận). Ở 360 hồ sơ toàn màn, đầu là thẻ căn có mã 1603, giá 4,28 tỷ, nơi, trạng thái Đang bán và ba thông số. Ba nút Trước, Sau, Đóng ở góc trên phải, tên dài xuống dòng, chữ không chồng chữ, cả hai ảnh tối đều đọc rõ.
+- eval: E10
+  run_id: minted-ho-so-can-E10-r4
+  exit_code: 0
+  baseline: n-a
+  verifier: config:capture.ui
+  verified_at: 2026-11-12T14:19:08Z
+  screenshot: evidence/ho-so-1440-sang.png
+  observed: |
+    1440 sáng/tối: hồ sơ nổi bên phải, bắt đầu ngay dưới thanh trên (thanh trên với nút giao diện và Đăng nhập, ô «Gõ để tìm» vẫn thấy rõ, không bị che), cao tới gần đáy màn hình (chừa khoảng nhỏ). Tên «1603 · S1.01», nút Trước, Sau, Đóng; thẻ căn: 1603 và 4,28 tỷ cùng một dòng, «S1.01 · Vinhomes Ocean Park 1» cùng huy hiệu Đang bán, ba thông số (75 m², 2, 09:00 05/11/2026); rồi tám trường. Dòng 1603 được chọn trong bảng. Không chữ chồng chữ. Ảnh tối đọc rõ, huy hiệu và chữ tương phản tốt. 1024 sáng/tối: cùng bố cục, hồ sơ hẹp hơn (393px), thanh trên và ô tìm không bị che, đủ thẻ căn và tám trường. 414 sáng/tối: hồ sơ phủ toàn màn, đầu là tên + Trước/Sau/Đóng, rồi thẻ căn, rồi tám trường, không chồng chữ. 360 sáng/tối: phủ toàn màn, tên «1603 · S1.01» xuống hai dòng ('1603 ·' / 'S1.01') nhưng không chồng lên nút; thẻ căn và tám trường đầy đủ, đọc được; ảnh tối đọc được. Khớp Expected.
+  network_observed: no-app-traffic
 
 ### Lệnh suite (hồi quy)
 
 - cmd: make check
-  run_id: minted-ho-so-can-SUITE-make_check-r3
+  run_id: minted-ho-so-can-SUITE-make_check-r4
   exit_code: 0
-  verified_at: 2026-11-12T10:32:11Z
+  verified_at: 2026-11-12T14:19:08Z
 
 - cmd: npm run build
-  run_id: minted-ho-so-can-SUITE-build-r3
+  run_id: minted-ho-so-can-SUITE-build-r4
   exit_code: 0
-  verified_at: 2026-11-12T10:32:11Z
+  verified_at: 2026-11-12T14:19:08Z
+
+### Judgment
+
+Đề xuất panel cho E11 (ba lens, đều PASS); human_override để trống cho người quyết ở Cổng 2.
+
+- domain-correctness: PASS — Ở 1440 và 1024, hồ sơ nổi bên phải từ ngay dưới thanh trên tới đáy màn hình; thanh trên và ô tìm không bị che, các cột #, Căn, Toà còn thấy, số cột khớp bảng đo (1440 thấy 5, 1024 thấy 3). Ở 360 hồ sơ toàn màn, đầu là thẻ căn 1603, giá 4,28 tỷ, nơi, huy hiệu Đang bán, ba thông số, dưới là tám trường; ba nút ở góc trên phải; tên xuống dòng không chồng chữ; ảnh tối đọc được.
+- operational-feasibility: PASS — Ngăn nổi bắt đầu ngay dưới thanh trên và chạy tới đáy; ô tìm vẫn thấy; cột #, Căn, Toà vẫn thấy (1440 còn 5 cột, 1024 còn 3 cột, đúng bảng đo của design.md). Ở 1024 ngăn che chữ «60 dòng» cạnh ô tìm, đúng như design.md ghi. Ở 360 hồ sơ toàn màn, tên xuống dòng, ba nút vẫn ở góc trên phải, không chữ chồng chữ, ảnh tối đọc rõ.
+- spec-alignment: PASS — Ngăn nổi từ ngay dưới thanh trên tới đáy, thanh trên và ô tìm vẫn thấy, cột #, Căn, Toà còn trọn. Ở 360 hồ sơ toàn màn, đầu là thẻ căn có mã 1603, giá 4,28 tỷ, nơi, huy hiệu «Đang bán» và ba thông số; tên xuống dòng và ba nút vẫn ở góc trên phải, đúng như design.md cho phép; hai ảnh tối đọc rõ.
+
+- eval: E11
+  judged_by: judge-subagent (fresh context)
+  verdict: PASS
+  rationale: Cả ba lens (domain-correctness, operational-feasibility, spec-alignment) đều chấm PASS trên tám ảnh E10.
+  human_override:  # chi nguoi ghi
 
 ## Known limits
 
@@ -175,19 +165,17 @@ Panel de xuat cho E11 (human_override de TRONG cho nguoi quyet o Cong 2):
 
 baseline: BLOCKED ha tang — lenh baseline khong chay dong nao (cong cu tu choi loi goi, hoac khong ghi duoc tep kich ban) — cong cu tra: «This session is isolated in the worktree /Users/manhphan/dev/onehub-inventory/.claude/worktrees/goofy-chebyshev-a2f603, but this command is too complex to verify that it stays inside the worktree. Refusing to run it — a worktree-isolated se»
 
-Baseline khong do:
-- make e2e: BLOCKED ha tang baseline: lenh baseline khong chay dong nao (cong cu tu choi loi goi, hoac khong ghi duoc tep kich ban) — cong cu tra: «This session is isolated in the worktree /Users/manhphan/dev/onehub-inventory/.claude/worktrees/goofy-chebyshev-a2f603, but this command is too complex to verify that it stays inside the worktree. Refusing to run it — a worktree-isolated se»
-- make test: BLOCKED ha tang baseline: lenh baseline khong chay dong nao (cong cu tu choi loi goi, hoac khong ghi duoc tep kich ban) — cong cu tra: «This session is isolated in the worktree /Users/manhphan/dev/onehub-inventory/.claude/worktrees/goofy-chebyshev-a2f603, but this command is too complex to verify that it stays inside the worktree. Refusing to run it — a worktree-isolated se»
-- R="${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}" && node "$R/scripts/design-floor-s4.mjs" --root .: BLOCKED ha tang baseline: lenh baseline khong chay dong nao (cong cu tu choi loi goi, hoac khong ghi duoc tep kich ban) — cong cu tra: «This session is isolated in the worktree /Users/manhphan/dev/onehub-inventory/.claude/worktrees/goofy-chebyshev-a2f603, but this command is too complex to verify that it stays inside the worktree. Refusing to run it — a worktree-isolated se»
+Eval không-phân-biệt: không đo được ở round này (baseline BLOCKED hạ tầng), nên không có căn cứ liệt kê eval nào.
 
-none — moi eval feature deu red tren baseline (co phan biet)
+Baseline khong do:
+- make test: BLOCKED ha tang baseline: lenh baseline khong chay dong nao (cong cu tu choi loi goi, hoac khong ghi duoc tep kich ban) — cong cu tra: «This session is isolated in the worktree /Users/manhphan/dev/onehub-inventory/.claude/worktrees/goofy-chebyshev-a2f603, but this command is too complex to verify that it stays inside the worktree. Refusing to run it — a worktree-isolated se»
+- make e2e: BLOCKED ha tang baseline: lenh baseline khong chay dong nao (cong cu tu choi loi goi, hoac khong ghi duoc tep kich ban) — cong cu tra: «This session is isolated in the worktree /Users/manhphan/dev/onehub-inventory/.claude/worktrees/goofy-chebyshev-a2f603, but this command is too complex to verify that it stays inside the worktree. Refusing to run it — a worktree-isolated se»
+- R="${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}" && node "$R/scripts/design-floor-s4.mjs" --root .: BLOCKED ha tang baseline: lenh baseline khong chay dong nao (cong cu tu choi loi goi, hoac khong ghi duoc tep kich ban) — cong cu tra: «This session is isolated in the worktree /Users/manhphan/dev/onehub-inventory/.claude/worktrees/goofy-chebyshev-a2f603, but this command is too complex to verify that it stays inside the worktree. Refusing to run it — a worktree-isolated se»
 
 ## Variance
 
-none — every multi-run eval is uniform
+none — mọi eval chạy một lần, xác định; không có eval nhiều lượt.
 
 ## Iterations
 
-Round 1: da qua cac vong truoc; lich su chi tiet nam trong run-log.jsonl.
-Round 2: PASS — mot phat hien trong hop dong: hồ sơ nổi không theo cuộn trang.
-Round 3: PASS — sửa hồ sơ nổi đo lại khi trang cuộn (commit 55db8b4); E1 mang tu round 2, cac eval con lai chay lai, baseline khong do duoc vi ha tang.
+Round 4: mọi eval máy xanh, E10 có tám ảnh đã đối chiếu, E11 ba lens đề xuất PASS chờ người ở Cổng 2; lịch sử các round trước xem run-log.jsonl.

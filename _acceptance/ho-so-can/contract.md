@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory]
-status: machine-cleared
+status: verified
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: _acceptance/ho-so-can/design.md
@@ -105,3 +105,5 @@ thuê, nhãn trạng thái theo cho thuê chỉ đo ở mức mô hình.
   - Ngoài-1: Cuộn trang khi hồ sơ căn đang mở có thể hơi nặng trên máy yếu.
   - Ngoài-4: Trình đọc màn hình đọc giá trên thẻ căn mà không kèm nhãn «Giá chào».
   - Ngoài-5: Bài kiểm trên điện thoại chưa so thẻ căn với đúng căn vừa chạm.
+- Ngoài-1 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Nếu sau này thẻ căn trên điện thoại hiện nhầm căn khác, bài kiểm tự động có thể không phát hiện. Hôm nay người dùng không thấy lỗi nào. — `tests/e2e/ho-so-can.spec.ts`
+- Ngoài-2 (máy định tuyến 2026-11-12, đề xuất S4 known-limits): Nếu bộ kiểm chạy thiếu một khổ màn hình, việc quét trợ năng có thể bỏ sót mà vẫn báo xanh. Người dùng không thấy gì khác đi ở sản phẩm hôm nay. — `tests/e2e/ho-so-can.spec.ts`

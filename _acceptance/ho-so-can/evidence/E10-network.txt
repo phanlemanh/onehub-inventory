@@ -1,5 +1,1 @@
-server http://localhost:3570 (same worktree; 3483 blocked by single-instance lock)
-nav 1440/1024/414/360 x light/dark: HTTP 200 (8 of 8)
-console errors: none
-requestfailed: none
-app fetch/xhr and 4xx/5xx: none observed
+(no failed requests, no console errors/warnings)
