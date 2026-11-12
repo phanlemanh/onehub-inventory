@@ -1,0 +1,24 @@
+name: Building
+description: >-
+  A tower (toà) of the shared catalog, under a complex when one is known, otherwise directly under its project; no
+  companyId. Keyed like onehub-invest buildings.
+reso: Building (BuildingKey, BuildingName)
+
+properties:
+  buildingKey: { type: string, required: true, unique: true, reso: BuildingKey, display: none }
+  subdivisionKey: { type: ref, target: Subdivision, required: true, display: none }
+  complexKey: { type: ref, target: Complex, display: none }
+  buildingName: { type: string, required: true, display: text, reso: BuildingName }
+  upi: { type: string, required: true, unique: true, display: none }
+
+rules:
+  - id: prefixed-keys
+    description: >-
+      Building, stack and unit keys are bld_, stk_, unt_ plus 26 Crockford base32 characters, minted once and never
+      derived from content.
+    implemented_in: src/modules/catalog/keys.ts
+
+code:
+  model: src/modules/catalog/
+  tests: tests/
+wiki: wiki/entities/building.md

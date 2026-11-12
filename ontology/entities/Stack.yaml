@@ -1,0 +1,13 @@
+name: Stack
+description: A stack (trục) of one tower; a local extension, as in onehub-invest; shared catalog, no companyId.
+reso: none (local extension, like onehub-invest)
+
+properties:
+  stackKey: { type: string, required: true, unique: true, display: none }
+  buildingKey: { type: ref, target: Building, required: true, display: none }
+  stackCode: { type: string, required: true, display: text }
+
+code:
+  model: src/modules/catalog/
+  tests: tests/
+wiki: wiki/entities/stack.md
