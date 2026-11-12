@@ -5,7 +5,7 @@ slug: cach-ly-dang-xem-chi-ghi
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config]
-status: implemented
+status: verified
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: _acceptance/cach-ly-dang-xem-chi-ghi/design.md
