@@ -1170,6 +1170,8 @@ describe("kho thật và khuôn tệp chứng minh", () => {
       "tools/proof_gate",
       "docs/tri-thuc",
       "src/components",
+      // A module's own blocks (row 3: the listing card and record body) live in src/modules/<name>/ui.
+      "src/modules",
     ]) {
       if (existsSync(join(ROOT, d))) cpSync(join(ROOT, d), join(copy, d), { recursive: true });
     }
