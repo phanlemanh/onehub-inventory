@@ -172,3 +172,33 @@ wall: 609s
 - **claude-sonnet-5-5**: 4 agent · 19 calls · out 16,768 · in 38 · cache_read 1,003,946 · cache_create 197,979
 - **claude-opus-5-5**: 3 agent · 18 calls · out 5,924 · in 36 · cache_read 298,886 · cache_create 64,082
 - **claude-haiku-5-5**: 5 agent · 10 calls · out 9,354 · in 20 · cache_read 62,418 · cache_create 80,839
+### S4 round 6 — wf_ebd6c18c-35e (11 agent, 24,081 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| synthesize:report | claude-sonnet-5-5 | 4 | 6,898 | 8 | 107,717 | 48 |
+| review:bugs | claude-opus-5-5 | 10 | 4,815 | 20 | 246,047 | 54 |
+| machine:DB_LANE=${DB_LANE:-v} DB_PORT=${DB_PORT: | claude-haiku-5-5 | 2 | 2,985 | 4 | 15,706 | 72 |
+| machine:make e2e | claude-haiku-5-5 | 2 | 2,176 | 4 | 3,300 | 553 |
+| machine:make test | claude-haiku-5-5 | 2 | 1,863 | 4 | 15,592 | 33 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,543 | 4 | 12,292 | 60 |
+| review:conventions | claude-opus-5-5 | 5 | 1,259 | 10 | 67,772 | 16 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 923 | 4 | 15,596 | 9 |
+| triage | claude-sonnet-5-5 | 2 | 664 | 4 | 13,393 | 8 |
+| review:measurement | claude-opus-5-5 | 2 | 618 | 4 | 15,405 | 7 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 337 | 4 | 11,103 | 7 |
+
+
+wall: 685s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| review | 3 | 6,692 | 329,224 | 55 | 22:15:30 | 22:16:26 |
+| machine | 5 | 9,490 | 62,486 | 622 | 22:15:30 | 22:25:52 |
+| triage | 1 | 664 | 13,393 | 8 | 22:25:52 | 22:26:00 |
+| capture | 1 | 337 | 11,103 | 8 | 22:26:00 | 22:26:08 |
+| synthesize | 1 | 6,898 | 107,717 | 48 | 22:26:08 | 22:26:56 |
+
+- **claude-sonnet-5-5**: 3 agent · 8 calls · out 7,899 · in 16 · cache_read 132,213 · cache_create 75,394
+- **claude-opus-5-5**: 3 agent · 17 calls · out 6,692 · in 34 · cache_read 329,224 · cache_create 75,016
+- **claude-haiku-5-5**: 5 agent · 10 calls · out 9,490 · in 20 · cache_read 62,486 · cache_create 81,805

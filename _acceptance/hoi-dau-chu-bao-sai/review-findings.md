@@ -1,21 +1,26 @@
-# Review findings: hoi-dau-chu-bao-sai (round 5)
+# Review findings: hoi-dau-chu-bao-sai (round 6)
 
 ## Trong hợp đồng
-
-(không có)
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **E9 now calls shown() but is missing from CHO_TESTS and has no @cho tag, so the unit test fails and make check goes red**
+- **Thẻ Cổng Bằng chứng liệt 9 phép đo «chưa đạt» và bảo «quay lại sửa code», trong khi chỉ E8b trượt**
+  Người dùng thấy gì: Thẻ trình chủ kho ghi sai là nhiều phép đo chưa đạt và bảo quay lại sửa, trong khi thực tế chỉ một phép đo trượt. Chủ kho có thể đọc nhầm mức độ hỏng, nhưng tính năng cho người dùng cuối không bị ảnh hưởng.
+  Căn cứ: Chỉ làm sai lời nhắc trên thẻ chứ không làm mất hay lộ dữ liệu người dùng, chủ kho đối chiếu được với báo cáo bằng chứng, và chỗ sửa nằm ở bộ công cụ chung nên sửa ở kho này không có ích.
+  file: `_acceptance/hoi-dau-chu-bao-sai/card.html`
+  severity: low
+  Đề xuất: known-limits
+
+- **E9 now calls shown() but is missing from CHO_TESTS and has no @cho tag, so the unit test fails and make check goes red (r5 · tệp đã đổi)**
   Người dùng thấy gì: Người dùng không thấy gì khác trên màn hình. Chỉ là bộ kiểm tra tự động của đội đang báo đỏ nên khó tin vào tín hiệu xanh trước khi phát hành.
   Căn cứ: Không ảnh hưởng người dùng cuối và không mất dữ liệu; chỉ làm kiểm tra nội bộ đỏ, và sửa sau rất rẻ khi có người xử lý.
   file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
   severity: high
   Đề xuất: known-limits
 
-- **seriousViolations writes its own wait for animations to stop instead of using the shared settle helper**
+- **seriousViolations writes its own wait for animations to stop instead of using the shared settle helper (r5 · tệp đã đổi)**
   Người dùng thấy gì: Người dùng không bị ảnh hưởng. Chỉ có thể làm bài kiểm tra trợ năng chờ lâu hoặc báo lỗi khó hiểu nếu có hiệu ứng chạy mãi.
   Căn cứ: Không đụng tới người dùng cuối, không mất dữ liệu; chỉ là chỗ chờ viết lặp trong kiểm thử và hiện chưa gây hỏng gì nên ghi lại là đủ.
   file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
