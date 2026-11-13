@@ -44,10 +44,11 @@ Source input: hàng `3e` của lộ trình, ô `_acceptance/hoi-dau-chu-bao-sai/
 - AC-5: Given người xem chính là người giữ căn, hoặc vai của người xem không có ô xem hàng trong bảng quyền (Quản trị sàn),
   When mở hồ sơ căn, Then không có thanh đáy và không có nút hỏi; đổi sang căn người khác giữ (bấm «Sau») thì thanh hiện lại.
 - AC-6: Given hồ sơ đang mở, người xem có quyền đọc danh mục căn, When bấm «Báo sai thông tin» ở mục thuộc tính, Then hộp
-  «Báo sai thông tin căn <mã>» mở với danh sách năm thuộc tính danh mục (Căn, Toà, Khu, Diện tích, Phòng ngủ) và dòng «Đang
-  hiện: <giá trị trên hồ sơ>» theo thuộc tính đang chọn; nút «Chép và mở bảng chia sẻ» chỉ bật khi giá trị đúng có 1–200 ký
-  tự (sau khi cắt khoảng trắng) và căn cứ không quá 500.
-- AC-7: Given hộp báo sai đã điền, When bấm «Chép và mở bảng chia sẻ», Then tin gồm đúng các dòng mã căn, toà, khu, thuộc tính,
+  «Báo sai thông tin căn <mã>» mở với danh sách năm thuộc tính danh mục (Căn, Toà, Dự án, Diện tích, Phòng ngủ) và dòng «Đang
+  hiện: <giá trị trên hồ sơ>» theo thuộc tính đang chọn; ô giá trị đúng nhận tối đa 200 ký tự, ô căn cứ tối đa 500; bấm «Chép
+  và mở bảng chia sẻ» khi giá trị đúng trống (sau khi cắt khoảng trắng) thì không soạn gì và ô ấy báo lỗi tại chỗ «Gõ giá trị
+  đúng trước khi gửi.» (cách báo lỗi trường của hộp dùng chung).
+- AC-7: Given hộp báo sai đã điền, When bấm «Chép và mở bảng chia sẻ», Then tin gồm đúng các dòng mã căn, toà, dự án, thuộc tính,
   đang hiện, đúng là, và ghi chú khi có, đi cùng đường của AC-2 và AC-3 (bảng chia sẻ; không có thì chép); hộp hiện «Đã mở bảng
   chia sẻ» / «Đã chép» / lỗi kèm ô chỉ đọc chứa tin; đóng hộp thì xoá các ô.
 - AC-8: Given cả hai nút, When bấm qua mọi nhánh của AC-2, AC-3, AC-4, AC-7, Then trình duyệt không gửi yêu cầu mạng nào, dữ
@@ -74,7 +75,7 @@ Quét theo khuôn «entity-feature» của bộ quét hình thái; bản đầy 
 - Trục B — căn: có người giữ · chưa ai giữ.
 - Trục C — máy: có bảng chia sẻ · chỉ chép · không cả hai; kết cục: gửi · huỷ · từ chối · lỗi chép.
 - Trục D — khổ: 1440 · 1024 · 414 · 360; sáng · tối.
-- Trục E — nút: hỏi · báo sai (năm thuộc tính, ô trống, ô quá dài).
+- Trục E — nút: hỏi · báo sai (năm thuộc tính, ô trống, ô chạm trần).
 
 Thước: AC-1, AC-4, AC-5 phủ A × B; AC-2, AC-3, AC-7 phủ C; AC-6 phủ E; AC-1, AC-9 phủ D; AC-8 phủ A (ngoài khung, không
 quyền) và C (không mạng). [CE chưa kiểm chứng]: bảng chia sẻ thật của điện thoại (Zalo, Messenger trong danh sách) không đo

@@ -18,7 +18,7 @@ chiếu: mục 25 và 35 của bảng so Chi tiết căn Quỹ hàng ↔ Invento
   có tên thì nhãn trần; bảng chia sẻ gọi ngay trong lượt bấm (máy từ chối nếu mất cử chỉ của người); người huỷ bảng chia
   sẻ thì không báo gì; máy từ chối chia sẻ thì chép thay; chép không được thì hiện tin để chép tay.
 - Giữ: hộp báo sai — chọn thuộc tính, ô giá trị đúng bắt buộc (≤ 200 ký tự), ô căn cứ (≤ 500), tin gồm mã căn, toà, khu,
-  thuộc tính, đang hiện, đúng là, ghi chú.
+  thuộc tính, đang hiện, đúng là, ghi chú. Ô trống thì báo lỗi tại ô (cách của hộp dùng chung `FormDialog`), không tắt nút.
 - Đổi: Quỹ hàng đọc tên đầu chủ bằng một lời gọi mạng lúc mở hồ sơ; ở đây tên đi cùng dòng của Bảng hàng (dữ liệu mẫu
   tới hàng 10), không lời gọi nào.
 - Đổi: đường dẫn trong tin trỏ thẳng hồ sơ của căn trên Bảng hàng (`/inventory?ho-so=<mã hàng>`), không phải trang tìm.
@@ -50,7 +50,7 @@ chiếu: mục 25 và 35 của bảng so Chi tiết căn Quỹ hàng ↔ Invento
   giá trị đúng, ghi căn cứ → «Chép và mở bảng chia sẻ» → bảng chia sẻ → người tự gửi; hộp ở lại với dòng «Đã mở bảng chia
   sẻ» cho tới khi người đóng.
 - Biên: căn chưa ai giữ → nút tắt «Căn chưa có đầu chủ giữ»; người xem chính là người giữ → không có thanh đáy; vai không có
-  quyền xem hàng (Quản trị sàn) → không thanh đáy; ô giá trị đúng trống hay quá 200 ký tự → nút soạn tắt.
+  quyền xem hàng (Quản trị sàn) → không thanh đáy; ô giá trị đúng trống mà bấm soạn → ô báo lỗi tại chỗ, không soạn gì.
 - Lỗi & quay lại: máy không có bảng chia sẻ hay từ chối → chép, báo «Đã chép tin hỏi» / «Đã chép»; chép cũng không được →
   báo «Máy này không chép hay chia sẻ được» và hiện tin trong ô chỉ đọc để chép tay; người huỷ bảng chia sẻ → không báo gì,
   bấm lại được.
@@ -73,8 +73,8 @@ chiếu: mục 25 và 35 của bảng so Chi tiết căn Quỹ hàng ↔ Invento
 | ST-hoi-khong-quyen | Thanh đáy | Không có thanh đáy (vai không có ô xem hàng) | — |
 | ST-hoi-da-chep | Thanh đáy | Toast «Đã chép tin hỏi» | Dán vào ứng dụng nhắn tin |
 | ST-hoi-loi | Thanh đáy | Toast lỗi «Máy này không chép hay chia sẻ được» kèm tin để chép tay | Chép tay |
-| ST-bao-mo | Hộp báo sai | Thuộc tính đầu tiên đã chọn, ô giá trị đúng trống, nút soạn tắt | Gõ giá trị đúng |
-| ST-bao-san-sang | Hộp báo sai | Nút «Chép và mở bảng chia sẻ» bật | Bấm |
+| ST-bao-mo | Hộp báo sai | Thuộc tính đầu tiên đã chọn, «Đang hiện», ô giá trị đúng trống | Gõ giá trị đúng |
+| ST-bao-thieu | Hộp báo sai | Bấm soạn khi ô trống: ô đỏ, câu «Gõ giá trị đúng trước khi gửi.» | Gõ rồi bấm lại |
 | ST-bao-da-mo | Hộp báo sai | Dòng báo «Đã mở bảng chia sẻ» | Đóng hộp |
 | ST-bao-da-chep | Hộp báo sai | Dòng báo «Đã chép» | Dán, đóng hộp |
 | ST-bao-loi | Hộp báo sai | Dòng báo lỗi và ô chỉ đọc chứa tin để chép tay | Chép tay, đóng |
@@ -127,7 +127,7 @@ https://<máy chủ>/inventory?ho-so=<mã hàng>
 ```
 Báo sai thông tin căn A-12.05
 Toà: S1.01
-Khu: Ocean Park 1
+Dự án: Vinhomes Ocean Park 1
 Thuộc tính: Diện tích
 Đang hiện: 68,5 m²
 Đúng là: 72 m²

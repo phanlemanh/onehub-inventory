@@ -62,7 +62,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/modules/listings/**, tests/hoi-dau-chu-bao-sai.test.tsx]
-    expected: "exit 0; bấm 'Báo sai thông tin' mở hộp tiêu đề 'Báo sai thông tin căn <mã>'; danh sách chọn có đúng năm mục theo thứ tự Căn, Toà, Khu, Diện tích, Phòng ngủ (chữ lấy từ label()); chọn từng mục thì 'Đang hiện:' bằng giá trị hồ sơ hiện cho trường ấy (rút từ listingView, không viết tay); ma trận ô giá trị đúng: '' tắt, '   ' tắt, 'a' bật, 200 ký tự bật, 201 ký tự không gõ được quá 200 (maxLength), căn cứ 501 ký tự không gõ được quá 500; vai không có ô readCatalog (dựng bảng quyền thử bỏ ô) thì không có nút; ca đối chứng cho chọn cả Giá chào cho 'listing field offered as catalog field'"
+    expected: "exit 0; bấm 'Báo sai thông tin' mở hộp tiêu đề 'Báo sai thông tin căn <mã>'; danh sách chọn có đúng năm mục theo thứ tự Căn, Toà, Dự án, Diện tích, Phòng ngủ (chữ lấy từ label()); chọn từng mục thì 'Đang hiện:' bằng giá trị hồ sơ hiện cho trường ấy (rút từ listingView, không viết tay); ma trận ô giá trị đúng khi bấm 'Chép và mở bảng chia sẻ': '' và '   ' không gọi share giả và hiện 'Gõ giá trị đúng trước khi gửi.' tại ô (aria-invalid), 'a' và 200 ký tự gọi share một lần, 201 ký tự không gõ được quá 200 (maxLength), căn cứ 501 ký tự không gõ được quá 500; vai không có ô readCatalog (dựng bảng quyền thử bỏ ô) thì không có nút; ca đối chứng cho chọn cả Giá chào cho 'listing field offered as catalog field'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E7
@@ -70,7 +70,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/lib/share/**, src/modules/listings/**, tests/hoi-dau-chu-bao-sai.test.tsx]
-    expected: "exit 0; tin báo sai dựng từ một hàng mẫu và chữ gõ: các dòng theo đúng thứ tự 'Báo sai thông tin căn <mã>', 'Toà: ', 'Khu: ', 'Thuộc tính: ', 'Đang hiện: ', 'Đúng là: ' (đã cắt khoảng trắng), thêm 'Ghi chú: ' chỉ khi căn cứ khác rỗng; bấm nút soạn với share giả gọi share một lần trong lượt bấm với text ấy; ba kết cục chia-se, da-chep, loi hiện đúng 'Đã mở bảng chia sẻ', 'Đã chép', lỗi kèm textarea readonly có nguyên tin; huy không hiện gì; đóng hộp rồi mở lại thì hai ô rỗng và không dòng báo; ca đối chứng thiếu dòng 'Đang hiện' cho 'report missing current value'"
+    expected: "exit 0; tin báo sai dựng từ một hàng mẫu và chữ gõ: các dòng theo đúng thứ tự 'Báo sai thông tin căn <mã>', 'Toà: ', 'Dự án: ', 'Thuộc tính: ', 'Đang hiện: ', 'Đúng là: ' (đã cắt khoảng trắng), thêm 'Ghi chú: ' chỉ khi căn cứ khác rỗng; bấm nút soạn với share giả gọi share một lần trong lượt bấm với text ấy; ba kết cục chia-se, da-chep, loi hiện đúng 'Đã mở bảng chia sẻ', 'Đã chép', lỗi kèm textarea readonly có nguyên tin; huy không hiện gì; đóng hộp rồi mở lại thì hai ô rỗng và không dòng báo; ca đối chứng thiếu dòng 'Đang hiện' cho 'report missing current value'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E8
