@@ -8,14 +8,16 @@ import { SavedViewMenu } from "./saved-view-menu";
 
 /**
  * The «my views» group of the inventory's second column (row 2c), drawn like every other entry of the column: one
- * line per view, its «…» at the end, a sentence while there is none. Null when the person cannot list views.
+ * line per view, its «…» at the end, a sentence while there is none or when they could not be read. Null when the
+ * person cannot list views.
  */
 export function savedViewsSection(
-  views: readonly SavedView[] | null,
+  views: readonly SavedView[] | null | "unreadable",
   labels: SavedViewLabels,
 ): NavSection | null {
   if (views === null) return null;
   const copy = savedViewCopy(labels);
+  if (views === "unreadable") return { title: copy.mine, empty: copy.unreadable, items: [] };
   const names = views.map((v) => v.name);
   return {
     title: copy.mine,

@@ -42,11 +42,13 @@ export default async function Page({ searchParams }: Props) {
   // A saved view opens by its own address (row 2c): gone, or someone else's, opens every unit with a sentence.
   const viewParam = params[SAVED_VIEW_PARAM];
   const viewId = Array.isArray(viewParam) ? viewParam[0] : viewParam;
-  const [savedViews, openView] = await Promise.all([
+  const [listed, openView] = await Promise.all([
     mySavedViews("inventory"),
     viewId ? mySavedView(viewId) : Promise.resolve(null),
   ]);
   const missing = viewId !== undefined && openView === null;
+  // Views that could not be read still leave saving open; the server checks names again.
+  const savedViews = listed === "unreadable" ? [] : listed;
   const viewLabels = savedViewLabels();
   const viewCopy = savedViewCopy(viewLabels);
   const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));

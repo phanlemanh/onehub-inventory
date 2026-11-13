@@ -28,6 +28,7 @@ export function savedViewCopy(l: SavedViewLabels) {
     labels: l,
     mine: `${l.view} của tôi`,
     empty: `Chưa có ${view} nào. Lọc, sắp xếp hay ẩn cột rồi bấm «${l.save}».`,
+    unreadable: `Chưa đọc được ${view} của bạn. Tải lại trang sau ít phút.`,
     /** The mark of an open view whose arrangement moved since it was opened. */
     changed: "đã đổi",
     missing: `${l.view} này không còn`,

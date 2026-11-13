@@ -542,6 +542,36 @@ export function DataRegion({
     groupColumn,
   ]);
 
+  // Header cells, kept apart from the widths: a header renderer is a component to the table, so a new one each time the
+  // widths move (a scroll bar coming or going as rows filter out) would draw the filter boxes again and drop the focus
+  // of the box being typed in (row 2c, Ngoài-4 of 2a).
+  const headers = useMemo(
+    () =>
+      columns.map(
+        (column) =>
+          helper.accessor((row: TableRow) => row[column.field], {
+            id: column.field,
+            header: ({ column: tableColumn }) => (
+              <div data-slot="sheet-header" className="flex w-full min-w-0 flex-col py-1">
+                <DataGridColumnHeader
+                  column={tableColumn}
+                  title={column.header}
+                  className={column.align === "right" ? "ms-auto" : undefined}
+                />
+                {filterRowOpen ? (
+                  <ColumnFilterCell
+                    spec={column}
+                    column={tableColumn}
+                    options={options.get(column.field) ?? []}
+                  />
+                ) : null}
+              </div>
+            ),
+          }).header,
+      ),
+    [columns, filterRowOpen, options],
+  );
+
   const recordAddress = record?.address;
   const addressNavigate = useRef<((id: string | null) => void) | null>(null);
   const onAddressReady = useCallback((navigate: (id: string | null) => void) => {
@@ -638,22 +668,7 @@ export function DataRegion({
       ...columns.map((column, index) =>
         helper.accessor((row: TableRow) => row[column.field], {
           id: column.field,
-          header: ({ column: tableColumn }) => (
-            <div data-slot="sheet-header" className="flex w-full min-w-0 flex-col py-1">
-              <DataGridColumnHeader
-                column={tableColumn}
-                title={column.header}
-                className={column.align === "right" ? "ms-auto" : undefined}
-              />
-              {filterRowOpen ? (
-                <ColumnFilterCell
-                  spec={column}
-                  column={tableColumn}
-                  options={options.get(column.field) ?? []}
-                />
-              ) : null}
-            </div>
-          ),
+          header: headers[index],
           size: Math.floor((widths[index] ?? column.widthCh) * chPx),
           // The first column names the row (the unit code) and always stays; any other may be hidden.
           enableHiding: index !== 0,
@@ -778,8 +793,7 @@ export function DataRegion({
       opensRecord,
       widths,
       rowNumberCh,
-      filterRowOpen,
-      options,
+      headers,
       groupLabelField,
       groupCountField,
     ],

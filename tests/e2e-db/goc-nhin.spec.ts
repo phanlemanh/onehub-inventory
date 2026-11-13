@@ -8,8 +8,11 @@
 //   rename — E6, with its break.
 //   remove — E7: the last item, a line before it, red; the confirmation starts on «Thôi»; Esc sends nothing.
 //   phone sheet — 360: the view is in the sheet's second column on first paint and opens the same rows.
+//   axe — E16: the inventory with a view in the second column and its «…» open, and with the remove confirmation open,
+//     light and dark: no serious violation. Break: the «…» without its name → axe reports «button-name».
 import { existsSync, readFileSync } from "node:fs";
 
+import AxeBuilder from "@axe-core/playwright";
 import { type Browser, type Page, type TestInfo } from "@playwright/test";
 import pg from "pg";
 
@@ -383,6 +386,14 @@ test("remove", async ({ page }, info) => {
   const focusOnCancel = (text: string | null) => {
     if (text?.trim() !== FRAME_COPY.confirm.cancel) throw new Error("confirm focus not on cancel");
   };
+  // The dialog moves focus once it has opened; wait for it to land, then check where.
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.activeElement?.closest('[role="dialog"], [role="alertdialog"]') !== null,
+      ),
+    )
+    .toBe(true);
   focusOnCancel(await page.evaluate(() => document.activeElement?.textContent ?? null));
   expect(() => focusOnCancel(REMOVE)).toThrow("confirm focus not on cancel");
   await page.keyboard.press("Escape");
@@ -423,7 +434,7 @@ test("remove", async ({ page }, info) => {
 
 // ---- E2, phone ---------------------------------------------------------------------------------------------------------
 
-test("phone sheet", async ({ page }, info) => {
+test("phone sheet", { tag: "@cho" }, async ({ page }, info) => {
   test.skip(info.project.name !== "360", "measured at 360");
   const me = await person(info, "dt");
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -441,4 +452,73 @@ test("phone sheet", async ({ page }, info) => {
   await expect(page.getByRole("dialog")).toBeHidden();
   await page.waitForURL((u) => u.searchParams.has("goc-nhin"));
   expect((await snapshot(page)).units).toEqual(wide.units);
+});
+
+// ---- E16 --------------------------------------------------------------------------------------------------------------
+
+async function seriousViolations(page: Page): Promise<string[]> {
+  const { violations } = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+    .exclude("nextjs-portal")
+    .analyze();
+  return violations
+    .filter((v) => v.impact === "serious" || v.impact === "critical")
+    .map((v) => v.id);
+}
+
+test.describe("axe", () => {
+  // Written ahead: 2 states × 2 schemes = 4 cells, at 1440.
+  const STATES: [string, (page: Page) => Promise<void>][] = [
+    [
+      "«…» of a view open",
+      async (page) => {
+        await secondColumn(page)
+          .getByRole("button", { name: new RegExp(escaped(NAME)) })
+          .click();
+        await expect(page.getByRole("menu")).toBeVisible();
+      },
+    ],
+    [
+      "remove confirmation open",
+      async (page) => {
+        await secondColumn(page)
+          .getByRole("button", { name: new RegExp(escaped(NAME)) })
+          .click();
+        await page.getByRole("menuitem", { name: REMOVE }).click();
+        await expect(page.getByRole("alertdialog").or(page.getByRole("dialog"))).toBeVisible();
+      },
+    ],
+  ];
+
+  for (const scheme of ["light", "dark"] as const)
+    for (const [name, open] of STATES)
+      test(`no serious violations: ${scheme}, ${name}`, async ({ page }, info) => {
+        test.skip(info.project.name !== "1440", "measured at 1440");
+        expect(STATES.length * 2).toBe(4);
+        const me = await person(info, `axe-${scheme}`);
+        await signIn(page, me.email);
+        await arrange(page);
+        await saveAs(page, NAME);
+        await page.emulateMedia({ colorScheme: scheme });
+        // What is measured must be on screen first: a scan of a screen without it would pass on nothing.
+        await expect(
+          secondColumn(page).locator('[data-slot="second-column-trailing"]'),
+        ).toHaveCount(1);
+        await open(page);
+        await page.waitForTimeout(200);
+        expect(await seriousViolations(page)).toEqual([]);
+      });
+
+  test("axe catches a «…» without a name", async ({ page }, info) => {
+    test.skip(info.project.name !== "1440", "measured at 1440");
+    const me = await person(info, "axe-ten");
+    await signIn(page, me.email);
+    await arrange(page);
+    await saveAs(page, NAME);
+    await secondColumn(page)
+      .locator('[data-slot="row-actions"]')
+      .first()
+      .evaluate((el) => el.removeAttribute("aria-label"));
+    expect(await seriousViolations(page)).toContain("button-name");
+  });
 });

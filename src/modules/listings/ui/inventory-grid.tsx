@@ -69,6 +69,9 @@ export function InventoryGrid({
   }, [changed, openHref, setChanged, copy]);
   useEffect(() => () => setChanged(null), [setChanged]);
   const record = useMemo(() => listingRecord(headers), [headers]);
+  // The same columns on every render: this grid renders again on each change of arrangement (the «changed» mark), and
+  // new columns would draw the header cells, with the filter box being typed in, again.
+  const columns = useMemo(() => inventoryColumns(headers), [headers]);
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
     current === "empty" ? [] : current === "partial" ? rows.slice(0, PARTIAL_ROWS) : rows;
@@ -77,7 +80,7 @@ export function InventoryGrid({
       // Pressing the open entry of the second column again opens it afresh, its unsaved changes dropped.
       key={`${openView?.id ?? ""}:${place.reopened}`}
       title={title}
-      columns={inventoryColumns(headers)}
+      columns={columns}
       rows={shown}
       status={status}
       onRetry={() => setCurrent("ready")}
