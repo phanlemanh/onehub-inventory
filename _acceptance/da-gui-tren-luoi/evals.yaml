@@ -1,0 +1,131 @@
+schema_version: 1
+feature_slug: da-gui-tren-luoi
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/sharing/sample.ts, src/modules/listings/**, src/modules/catalog/**, tests/sent.test.tsx]
+    expected: "exit 0; trong tests/sent.test.tsx, buildSampleShareLinks trên id của 60 lần chào mẫu hàng 1 cho đúng 14 link; với MỌI link bộ kiểm tra lại từ dữ liệu nguồn: companyId = sàn mẫu, id bắt đầu 4d415500-0010-, recipientName bắt đầu '[Tên]', listingCount = số id trong includes của link và mọi id ấy là lần chào của sàn mẫu, có link listingCount 1, link listingCount 30, link openCount > 0 với interestCount 0, và link có recipientName dài hơn 60 ký tự nằm trong năm dòng đầu của sentRows (mới gửi trước), interestCount <= listingCount, openCount 0 ⇔ không có lastOpenedAt, lastOpenedAt >= sentAt; checkShareLinks trả mảng rỗng; ma trận phá viết trước 7 ô trên bản sao (đổi companyId, bỏ nhãn MAU ở id, tên thật không '[Tên]', listingCount lệch includes, quan tâm vượt số căn, chưa mở mà có lúc mở, mở trước lúc gửi) mỗi ô khẳng định đúng một thông điệp ghim của luật ('link khác sàn: <id>', 'thiếu nhãn MAU: link <id>', 'tên người nhận không phải tên giả: <id>', 'số căn lệch số lần chào trong link: <id>', 'quan tâm nhiều hơn số căn: <id>', 'chưa mở mà có lúc mở: <id>', 'mở trước khi gửi: <id>'); bộ kiểm khẳng định hằng 7 viết trong tệp"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/sharing/ui/**, "src/app/(app)/sent/**", tests/sent.test.tsx]
+    expected: "exit 0; SentGrid dựng với 14 dòng mẫu: tên vùng 'Link đã gửi'; cột số dòng rồi đúng sáu đầu cột theo thứ tự, chữ mỗi đầu cột bằng label() của RecipientName, OpenCount, InterestCount, LastOpenedAt, SentAt, ListingCount VÀ bằng chuỗi viết sẵn 'Người nhận', 'Lượt mở', 'Quan tâm', 'Mở gần nhất', 'Gửi lúc', 'Số căn'; dòng 1 là link có sentAt mới nhất và sentAt không tăng theo dòng; chân bảng '14 dòng'; ô của ba cột số mang canh phải của lưới; ô Mở gần nhất của link 4d415500-0010-4000-8000-000000000001 (chưa mở) là '—'; trạng thái trống có câu nói vì sao chứa 'chưa gửi link' và một liên kết chữ 'Mở Bảng hàng' với href '/inventory'; ca đối chứng: bộ dựng dòng không sắp xếp (giữ thứ tự đầu vào đảo) cho 'sent rows not newest first', và đổi thứ tự hai trường trong danh sách cột cho 'sent column order: <vị trí>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/sharing/ui/**, "src/app/(app)/sent/**", src/components/candidate/**, tools/e2e_templates/**, tests/e2e/screens/screens.spec.ts]
+    expected: "exit 0; trong báo cáo Playwright của tests/e2e/screens/screens.spec.ts, ở cả bốn khổ 360/414/1024/1440, mọi ca dưới 'man sent › vung' mà bộ bài có ở commit được chấm (không đòi ca nào dựa vào ô tìm của vùng — ô ấy bỏ theo lời chốt 13/11, hàng 2e) và mọi ca 'pha vung …' của chúng ĐƯỢC CHẠY và xanh, số ca vùng của sent bằng số ca vùng của inventory trong cùng báo cáo — không ca nào bỏ qua với lý do 'chua co vung du lieu'; bốn ca khung của sent (gồm axe sáng và tối) và các ca 'pha khung …' xanh; ca phá xanh nghĩa là chính hàm kiểm của ca chính đã ném đúng thông điệp ghim trên Đã gửi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.man_mau
+    paths: [tools/e2e_templates/**]
+    expected: "exit 0; NO_REGION_YET là đối tượng rỗng (không khoá sent, không khoá inventory); classifyGrid('sent', {hasRegion:true, hasTable:true}) với danh sách thật cho {run:true}; ca đối chứng với bản sao danh sách thêm lại sent ném 'go khoi danh sach: sent'; các ca trước đây dùng sent làm ví dụ màn chưa có vùng nay dùng một tên giả và vẫn đỏ đúng thông điệp cũ (bỏ qua 'chua co vung du lieu', 'go khoi danh sach', bảng ngoài vùng) — không ca nào bị xoá"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/sharing/ui/sent-rows.ts, src/modules/listings/ui/inventory-rows.ts, tests/sent.test.tsx]
+    expected: "exit 0; ma trận viết trước 6 tham số (loading, empty, error, partial, forbidden, lạ) × 2 môi trường (production, development) = 12 ô cho sentStateFrom: production 'ready' ở cả 6, development đúng trạng thái ở 5 ô và 'ready' cho tham số lạ; bộ kiểm khẳng định hằng 12 viết trong tệp; ca đối chứng dùng bộ đọc bỏ qua môi trường cho 'production honours state: loading'; cùng 12 ô chạy trên inventoryStateFrom của Bảng hàng và khẳng định hai bộ đọc cho cùng kết quả ở từng ô, ca đối chứng bộ đọc của Đã gửi bỏ 'partial' cho 'state readers disagree: partial/development'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    layer: backend-effect
+    paths: ["src/app/(app)/sent/**", src/modules/sharing/**, src/modules/listings/**, src/modules/catalog/**, tests/sent-page.test.tsx]
+    expected: "exit 0; tests/sent-page.test.tsx gọi CHÍNH hàm trang của src/app/(app)/sent/page.tsx (không gọi bộ đọc thuần) với searchParams thật: ma trận viết trước 5 tham số × 2 môi trường (vi.stubEnv NODE_ENV production, development) = 10 ô, đọc trạng thái mà trang đưa vào SentGrid: production 'ready' ở cả 5, development đúng trạng thái; trang ở 'ready' đưa 14 dòng, và unitsByLink của link 4d415500-0010-4000-8000-000000000005 có số mục bằng ShareLink.listingCount của dòng ấy, mỗi mục là mã căn · toà của đúng lần chào trong includes (tra từ dữ liệu nguồn, không chép chuỗi); ca đối chứng: bản trang đọc thẳng tham số bỏ qua môi trường cho 'page honours state in production: error'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/sharing/ui/**, "src/app/(app)/sent/**", src/components/candidate/record-panel.tsx, tests/e2e/screens/sent.spec.ts]
+    expected: "exit 0; tests/e2e/screens/sent.spec.ts ở khổ 1440 và 360: bấm chữ người nhận của dòng link 4d415500-0010-4000-8000-000000000005 mở ngăn chi tiết, địa chỉ có ho-so=4d415500-0010-4000-8000-000000000005, tiêu đề ngăn bằng chữ người nhận của dòng ấy, sáu cặp nhãn–giá trị trong ngăn bằng chữ của sáu ô cùng dòng trên lưới, mục 'Căn trong link' có số mục bằng ô Số căn (30); bấm 'Đóng' thì tiêu điểm về đúng nút mở của dòng ấy; ca đối chứng mở ngăn của dòng khác (ho-so của link số 2) rồi so với ô của dòng link số 5 cho 'record shows another row: 4d415500-0010-4000-8000-000000000005'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/sharing/ui/**, "src/app/(app)/sent/**", src/modules/listings/ui/inventory-grid.tsx, tests/sent-reuse.test.ts]
+    expected: "exit 0; tests/sent-reuse.test.ts đọc mã nguồn bằng bộ phân tích TypeScript (không biểu thức chữ): mọi phần tử JSX DataRegion trong src/modules/sharing/ui/** có tập thuộc tính là tập con của tập thuộc tính DataRegion trong src/modules/listings/ui/inventory-grid.tsx, không thuộc tính nào tên className, style, size, variant, color, density hay bắt đầu 'class'; không tệp nào dưới src/modules/sharing/ui/** hay src/app/(app)/sent/** nhập DataGrid, DataGridTable, Table hay thành phần dưới @/components/reui/data-grid; ca đối chứng trên chuỗi mã dựng sẵn: thêm className='p-2' vào DataRegion cho 'styling prop on DataRegion: className', nhập DataGridTable cho 'grid built outside the template: DataGridTable'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [_acceptance/da-gui-tren-luoi/chung-minh-man.md, _acceptance/da-gui-tren-luoi/evidence/**, design/patterns/luoi.md, tools/proof_gate/**]
+    expected: "exit 0; lưới chứng minh màn (tools/proof_gate) xanh trên kho có hồ sơ này ở trạng thái implemented trở lên; mục '## Màn sent' theo lối 'theo mẫu' có Từ Quỹ hàng, Họ (luoi, theo mẫu), Ứng viên ReUI với ảnh có thật, Ảnh cạnh màn mẫu đủ bốn khổ 360/414/1024/1440 trỏ PNG có thật, Mặt so đủ mười hai mặt của design/patterns/luoi.md không dòng 'khác — vô cớ', và bảng Khối; design/patterns/luoi.md không còn mục ngoai_le trỏ src/app/(app)/sent/page.tsx"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.check
+    paths: [ontology/**, architecture/modules.yaml, src/generated/**, src/modules/sharing/**, tests/language.test.ts, tests/sent.test.tsx]
+    expected: "exit 0; make check xanh, gồm: kiểm mô hình (wiki-lint thấy thực thể ShareLink có trang wiki, quan hệ hợp lệ), sinh lại không đổi tệp sinh, rào ranh giới (sharing sở hữu ShareLink, không phụ thuộc mô-đun mới), tests/language.test.ts (bảy khái niệm mới own: true, nhãn duy nhất, ≤17 ký tự, khớp bảng thuật ngữ, không gõ cứng dưới src/); và trong tests/sent.test.tsx khối 'SP-4 signal': mọi tệp dưới src/modules/sharing/ui/ không khớp biểu thức Dấu hiệu của SP-4 đọc từ PRODUCT-INVARIANTS.md lúc chạy (không chép tay), ca đối chứng chuỗi 'import x from \"@/modules/contacts\"' khớp biểu thức và cho 'SP-4 signal in sharing ui: <tệp>'; khối 'ShareLink model' đọc ontology/entities/ShareLink.yaml bằng bộ phân tích YAML: recipientName có pii true, companyId có required true và target Company; ca đối chứng trên bản sao bỏ từng cờ cho 'recipientName not marked personal' và 'companyId not required'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/data-region.tsx, tests/grid-open-truncate.test.tsx]
+    expected: "exit 0; tests/grid-open-truncate.test.tsx dựng DataRegion có ngăn chi tiết với một dòng có chữ cột đầu dài 120 ký tự: phần tử bọc nút mở và nút mở mang lớp giới hạn bề rộng (max-w-full, min-w-0) và chữ nằm trong phần tử cắt có title bằng chữ đầy đủ; nút mở vẫn có data-record-open và tabIndex -1; ca đối chứng dựng lại với bản bọc cũ (inline-flex không giới hạn) cho 'open cell not truncated'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/**, src/modules/sharing/ui/**, src/modules/listings/ui/**, tests/e2e/screens/open-cell-truncate.spec.ts, tests/e2e/sheet.spec.ts, tests/e2e/ho-so-can.spec.ts]
+    expected: "exit 0; tests/e2e/screens/open-cell-truncate.spec.ts ở 1440 và 360: trên /sent nút mở của dòng tên dài có cạnh phải không vượt cạnh phải của ô chứa nó, scrollWidth > clientWidth của phần tử chữ (đã cắt), title chứa chữ đầy đủ, chiều cao dòng bằng chiều cao dòng ngắn, một lần bấm vào chữ mở ngăn chi tiết; trên /inventory cùng phép đo với một mã căn dài chèn bằng tham số thử của bài (route giả, không sửa dữ liệu mẫu); ca đối chứng gỡ lớp giới hạn bằng thẻ style trên trang thật cho 'open cell overflows its cell: sent'; tests/e2e/sheet.spec.ts và tests/e2e/ho-so-can.spec.ts xanh không sửa phép so"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-10
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/modules/sharing/ui/**, "src/app/(app)/sent/**", src/components/candidate/**]
+    steps:
+      - "Use the dev server at the URL given (lane D, port 3483); if it does not answer, start it from the repo root with PORT=3483 npm run dev (never port 3470, never while a suite command is running), note its PID and stop only that PID when done"
+      - "Navigate {url}/sent at 1440x900, light → screenshot evidence/sent-1440-sang.png"
+      - "Same page at 1440x900, dark (emulate prefers-color-scheme dark) → screenshot evidence/sent-1440-toi.png"
+      - "Navigate {url}/sent at 1024x768, light → screenshot evidence/sent-1024-sang.png; dark → evidence/sent-1024-toi.png"
+      - "Navigate {url}/sent at 414x896, light → screenshot evidence/sent-414-sang.png; dark → evidence/sent-414-toi.png"
+      - "Navigate {url}/sent at 360x800, light → screenshot evidence/sent-360-sang.png; dark → evidence/sent-360-toi.png"
+      - "Navigate {url}/sent?ho-so=4d415500-0010-4000-8000-000000000005 at 1440x900, light → screenshot evidence/sent-1440-ho-so.png; dark → evidence/sent-1440-ho-so-toi.png; at 1024x768 light → evidence/sent-1024-ho-so.png; at 414x896 light → evidence/sent-414-ho-so.png; at 360x800 light → evidence/sent-360-ho-so.png; dark → evidence/sent-360-ho-so-toi.png"
+      - "Navigate {url}/sent at 360x800, light, hover the third row's recipient (the long name) → screenshot evidence/sent-360-ten-dai.png"
+    expected: "mười bốn ảnh Đã gửi trong App Shell: đầu màn 'Đã gửi', khung vùng tên 'Link đã gửi', số dòng, cột số dòng rồi sáu cột đọc được (Người nhận, Lượt mở, Quan tâm, Mở gần nhất, Gửi lúc, Số căn), chân bảng '14 dòng'; tên người nhận dài kết thúc bằng dấu chấm lửng, không đè sang cột bên; ở 1440 đủ sáu cột; ở 360/414 lưới cuộn ngang trong vùng còn trang không cuộn ngang; ngăn chi tiết có tên người nhận, sáu trường và danh sách căn, không che thanh trên của App Shell; nền và chữ đổi theo tối và vẫn đọc được"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
+
+  - id: E15
+    criterion: AC-10
+    executor: judgment
+    inputs: [_acceptance/da-gui-tren-luoi/evidence/sent-360-sang.png, _acceptance/da-gui-tren-luoi/evidence/sent-360-toi.png, _acceptance/da-gui-tren-luoi/evidence/sent-360-ten-dai.png, _acceptance/da-gui-tren-luoi/evidence/sent-1440-sang.png, _acceptance/da-gui-tren-luoi/evidence/sent-1440-toi.png, _acceptance/da-gui-tren-luoi/evidence/sent-1440-ho-so.png, _acceptance/da-gui-tren-luoi/evidence/sent-1440-ho-so-toi.png, _acceptance/da-gui-tren-luoi/evidence/sent-360-ho-so.png, _acceptance/da-gui-tren-luoi/design.md]
+    question: "Tám ảnh Đã gửi (360 và 1440 sáng, tối; tên dài ở 360; ngăn chi tiết ở 1440 sáng, tối và 360) có cho thấy đúng những gì ảnh tĩnh thấy được theo mục Đặc tả UX của design.md không: đầu màn 'Đã gửi', các đầu cột đọc được, chữ không chồng nhau, tên người nhận dài bị cắt có dấu chấm lửng, ngăn chi tiết có tên người nhận, các trường và danh sách căn, và ảnh tối vẫn đủ tương phản để đọc? (Thứ tự cột, số dòng và việc cuộn trong vùng do E2, E3 đo, không hỏi ở đây.)"
+    evidence_required: [verdict, rationale]
