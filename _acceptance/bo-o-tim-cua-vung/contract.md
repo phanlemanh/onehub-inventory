@@ -65,6 +65,10 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại, không luật
   sai một điều thì đỏ với mã riêng gọi tên khối và điều sai; bản sao thiếu lịch sử thì làm theo Hỏi-2 (khuyến nghị: tự lấy
   phần lịch sử còn thiếu — commit khai, cha của nó, lịch sử của sổ khối — từ kho gốc rồi kiểm, lấy không được thì đỏ nói
   rõ vì sao; không bao giờ lấy ngày hay danh sách tệp của commit gốc ghép của bản sao nông). Cặp FormDialog hôm nay qua được.
+- AC-11 (sửa sau Cổng Phạm vi — G-1311-37, Ngoài-6 của 3f chủ kho chọn «mở hợp đồng mới» 2026-11-13; chủ kho phê ở Cổng
+  Bằng chứng): Given ô lọc đầu cột của lưới chung và ô ⌘K của thanh trên, When người gõ chữ không dấu hay có dấu, Then cả
+  hai so trên chữ đã bỏ dấu tiếng Việt («đ» coi như «d») qua MỘT hàm chuẩn hoá đặt ở một chỗ, hai nơi cùng gọi: «dong» khớp
+  «Đông», «Đông» vẫn khớp «Đông», gõ đúng dấu chữ khác («Động») không bị coi là sai; phần ô ⌘K làm sau khi 3f ở nhánh chính.
 
 ## Coverage
 

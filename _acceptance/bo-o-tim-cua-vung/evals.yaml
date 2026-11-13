@@ -146,3 +146,11 @@ evals:
     paths: [tests/**, tools/e2e_templates/**, _acceptance/bo-o-tim-cua-vung/doi-bai-kiem.md, _acceptance/bo-o-tim-cua-vung/rang/**]
     expected: "exit 0; _acceptance/bo-o-tim-cua-vung/rang/doi-bai-kiem.mjs so cây với merge-base của nhánh chính: mọi dòng BỊ BỎ trong tests/** và tools/e2e_templates/** có chứa 'searchbox', 'Gõ để tìm', 'Tìm trong vùng', 'Tìm không ra', 'tim-khong-ra', 'NO_SEARCH_CASE' hay khoá 'query' của cách xem (danh sách viết sẵn trong thước, hằng 7) đều có một hàng 'cũ' trong doi-bai-kiem.md (đếm khớp, in số); mỗi hàng 'mới' trỏ tới tệp và tên ca có thật trong cây (đọc tệp, tìm tên ca); ca phá chép bảng vào thư mục tạm, xoá một hàng, chạy thước trên bản sao và khẳng định 'doi-bai-kiem: thieu hang cho dong bo: <tệp>:<dòng>'; ca phá thứ hai trỏ một hàng tới tên ca không có và khẳng định 'doi-bai-kiem: ca khong co: <tên>'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E19
+    criterion: AC-11
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/**, src/components/shell/**, tests/khong-dau.test.ts]
+    expected: "exit 0; tệp mới tests/khong-dau.test.ts: hàm chuẩn hoá một chỗ — 'dong' khớp 'Đông', 'Đông' khớp 'Đông', 'Động' gõ đúng dấu khớp 'Động', 'đ'→'d', chữ hoa thường như nhau; lọc ô đầu cột của lưới chung trên dữ liệu mẫu có 'Đông' trả đúng dòng khi gõ 'dong'; gợi ý ô ⌘K gõ 'dong' có mục 'Đông' và Enter không ra bảng rỗng; khẳng định cấu trúc: ô lọc cột và ô ⌘K cùng nhập đúng một hàm chuẩn hoá (không bản sao thứ hai); ca phá: thay hàm bằng so nguyên văn thì 'dong' không khớp 'Đông' và bài đỏ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
