@@ -6,12 +6,13 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 import { cleanup, render } from "@testing-library/react";
-import { afterEach, beforeAll, describe, expect, it } from "vitest";
+import { cloneElement, type ReactElement } from "react";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
+import SentPage from "../src/app/(app)/sent/page";
 import type { GridRow } from "../src/components/candidate/data-region";
 import type { ShareLink } from "../src/generated/ontology";
 import { sampleUnits, subdivisionNameOf } from "../src/modules/catalog";
-import { label } from "../src/modules/company-config";
 import { SAMPLE_COMPANY, buildSampleListings } from "../src/modules/listings";
 import { inventoryStateFrom } from "../src/modules/listings/ui";
 import {
@@ -22,7 +23,6 @@ import {
   sentRows,
   sentStateFrom,
   type SampleShareLinks,
-  type SentField,
 } from "../src/modules/sharing/ui";
 import { tallGridViewport } from "./virtual-viewport";
 
@@ -150,81 +150,79 @@ describe("sample sent links (E1)", () => {
 
 // Written ahead: the six header words in column order (scope gate, Hỏi-2).
 const APPROVED_HEADERS = ["Người nhận", "Lượt mở", "Quan tâm", "Mở gần nhất", "Gửi lúc", "Số căn"];
-const HEADERS: Record<SentField, string> = {
-  "ShareLink.recipientName": label("RecipientName"),
-  "ShareLink.listingCount": label("ListingCount"),
-  "ShareLink.sentAt": label("SentAt"),
-  "ShareLink.openCount": label("OpenCount"),
-  "ShareLink.interestCount": label("InterestCount"),
-  "ShareLink.lastOpenedAt": label("LastOpenedAt"),
-};
+type PageFn = (props: { searchParams: Promise<Record<string, string>> }) => Promise<ReactElement>;
 
-function renderGrid(rows: GridRow[], state: "ready" | "empty" = "ready") {
-  return render(
-    <SentGrid
-      title={label("ShareLink")}
-      headers={HEADERS}
-      rows={rows}
-      state={state}
-      emptyWhy={`Bạn chưa gửi link nào cho khách. Chọn căn để gửi ở ${label("Inventory")}.`}
-      emptyActionLabel={`Mở ${label("Inventory")}`}
-      emptyActionHref="/inventory"
-      unitsByLink={{}}
-      unitsHeading="x"
-    />,
-  );
+/** The Sent grid exactly as the page builds it (headers, empty words, action), opened in development. */
+async function pageGrid(state = ""): Promise<ReactElement<{ rows: GridRow[] }>> {
+  vi.stubEnv("NODE_ENV", "development");
+  try {
+    const tree = await (SentPage as unknown as PageFn)({
+      searchParams: Promise.resolve<Record<string, string>>(state ? { state } : {}),
+    });
+    const children = (tree.props as { children: ReactElement[] }).children;
+    const grid = children.find((child) => child.type === SentGrid);
+    if (!grid) throw new Error("page has no sent grid");
+    return grid as ReactElement<{ rows: GridRow[] }>;
+  } finally {
+    vi.unstubAllEnvs();
+  }
 }
+
+/** When each link was sent, from the source records, not from the grid. */
+const SENT_AT = new Map(sample.links.map((l) => [l.id, Date.parse(l.sentAt)]));
 
 const NEVER_OPENED = "4d415500-0010-4000-8000-000000000001";
 
 /** What the Sent grid shows: region name, headers in order, newest first, footer count, right-aligned counts. */
-function checkGrid(container: HTMLElement, rows: GridRow[]): void {
+/** What the Sent grid shows, read from the rendered grid: name, headers, newest first, footer, counts, the «—». */
+function checkGrid(container: HTMLElement): void {
   if (!container.textContent?.includes("Link đã gửi")) throw new Error("region name");
   const headers = [...container.querySelectorAll("thead th")].map((th) => th.textContent?.trim());
   if (headers[0] !== "#") throw new Error("row-number column missing");
   headers.slice(1).forEach((h, i) => {
     if (h !== APPROVED_HEADERS[i]) throw new Error(`sent column order: ${i + 1}`);
   });
-  const sent = rows.map((r) => Date.parse(String(r["ShareLink.sentAt"])));
-  if (sent.some((t, i) => i > 0 && t > (sent[i - 1] as number)))
+  // The order the grid shows: each body row named by its open door, its send time looked up in the source.
+  const shown = [...container.querySelectorAll("tbody [data-record-open]")].map(
+    (el) => el.getAttribute("data-record-open") ?? "",
+  );
+  if (shown.length !== 14) throw new Error(`rows shown: ${shown.length}`);
+  const sent = shown.map((id) => SENT_AT.get(id) ?? Number.NaN);
+  if (sent.some((t, i) => Number.isNaN(t) || (i > 0 && t > (sent[i - 1] as number))))
     throw new Error("sent rows not newest first");
   if (container.querySelector('[data-slot="region-footer-count"]')?.textContent !== "14 dòng")
     throw new Error("footer count missing");
   const counts = [...container.querySelectorAll('[data-slot="typed-cell"][data-kind="count"]')];
   if (counts.length === 0 || counts.some((el) => el.getAttribute("data-align") !== "right"))
     throw new Error("count cells not right-aligned");
-  const neverRow = rows.findIndex((r) => r.id === NEVER_OPENED);
-  const tr = container.querySelectorAll("tbody tr:has([data-slot='row-number'])")[neverRow];
+  const tr = container.querySelector(`[data-record-open="${NEVER_OPENED}"]`)?.closest("tr");
   const lastOpened = tr?.querySelectorAll("td")[1 + SENT_FIELDS.indexOf("ShareLink.lastOpenedAt")];
   if (lastOpened?.textContent?.trim() !== "—") throw new Error("never-opened link shows a time");
 }
 
 describe("sent grid (E2)", () => {
-  const rows = sentRows(sample.links);
-
-  it("shows the region, the six approved columns newest first, and counts in the footer", () => {
-    expect(SENT_FIELDS.map((f) => HEADERS[f])).toEqual(APPROVED_HEADERS);
-    const { container } = renderGrid(rows);
-    expect(() => checkGrid(container, rows)).not.toThrow();
+  it("shows the region, the six approved columns newest first, and counts in the footer", async () => {
+    const { container } = render(await pageGrid());
+    expect(() => checkGrid(container)).not.toThrow();
   });
 
-  it("fails when rows keep their input order", () => {
-    const reversed = [...rows].reverse();
-    const { container } = renderGrid(reversed);
-    expect(() => checkGrid(container, reversed)).toThrow("sent rows not newest first");
+  it("fails when rows keep their input order", async () => {
+    const grid = await pageGrid();
+    const { container } = render(cloneElement(grid, { rows: [...grid.props.rows].reverse() }));
+    expect(() => checkGrid(container)).toThrow("sent rows not newest first");
   });
 
-  it("fails when two columns swap", () => {
-    const { container } = renderGrid(rows);
+  it("fails when two columns swap", async () => {
+    const { container } = render(await pageGrid());
     const ths = container.querySelectorAll("thead th");
     const second = ths[2]?.textContent ?? "";
     (ths[2] as HTMLElement).textContent = ths[3]?.textContent ?? "";
     (ths[3] as HTMLElement).textContent = second;
-    expect(() => checkGrid(container, rows)).toThrow("sent column order: 2");
+    expect(() => checkGrid(container)).toThrow("sent column order: 2");
   });
 
-  it("says why it is empty and offers the inventory, a page that exists", () => {
-    const { container } = renderGrid(rows, "empty");
+  it("says why it is empty and offers the inventory, with the page's own words", async () => {
+    const { container } = render(await pageGrid("empty"));
     expect(container.textContent).toContain("chưa gửi link");
     const link = [...container.querySelectorAll("a")].find((a) => a.textContent === "Mở Bảng hàng");
     expect(link?.getAttribute("href")).toBe("/inventory");
