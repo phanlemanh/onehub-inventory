@@ -1,39 +1,128 @@
 {
-  "feature_plain": "Đầu khách mở Đã gửi và thấy các link mình đã gửi — ai nhận, khách mở mấy lần, quan tâm mấy căn, mở gần nhất lúc nào — trên cùng một bảng như Bảng hàng; dữ liệu mẫu, chưa gửi thật.",
   "will_do": [
-    {"id": "AC-1", "p": "Sẽ có 14 link mẫu đủ dạng (chưa mở, mở mà chưa quan tâm, có quan tâm, 1 căn, 30 căn, tên dài) và máy tự bắt link sai luật."},
-    {"id": "AC-2", "p": "Sẽ hiện sáu cột Người nhận · Lượt mở · Quan tâm · Mở gần nhất · Gửi lúc · Số căn, mới gửi trước; chưa gửi gì thì mời mở Bảng hàng."},
-    {"id": "AC-4", "p": "Sẽ chỉ mở các trạng thái thử (tải, trống, lỗi…) ở bản phát triển; bản thật luôn hiện dữ liệu."},
-    {"id": "AC-5", "p": "Sẽ mở ngăn chi tiết cạnh bảng khi bấm tên người nhận: đủ sáu thông tin và danh sách căn trong link."},
-    {"id": "AC-6", "p": "Sẽ dùng nguyên bảng chung của Bảng hàng, màn không thêm kiểu dáng riêng nào."},
-    {"id": "AC-7", "p": "Sẽ có ảnh Đã gửi cạnh Bảng hàng ở bốn khổ màn hình và bảng so mười hai mặt của họ bảng."},
-    {"id": "AC-8", "p": "Sẽ thêm khái niệm «Link đã gửi» vào mô hình nghiệp vụ, tên người nhận đánh dấu là dữ liệu cá nhân."},
-    {"id": "AC-9", "p": "Sẽ sửa bảng chung: chữ dài ở cột đầu bị cắt gọn thay vì đè sang ô bên, ở cả Bảng hàng và Đã gửi."},
-    {"id": "AC-10", "p": "Sẽ đọc được ở điện thoại và máy tính, sáng và tối, ngăn chi tiết không che thanh trên."}
+    {
+      "id": "AC-1",
+      "p": "Sẽ có 14 link mẫu đủ dạng (chưa mở, mở mà chưa quan tâm, có quan tâm, 1 căn, 30 căn, tên dài) và máy tự bắt link sai luật."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ hiện sáu cột Người nhận · Lượt mở · Quan tâm · Mở gần nhất · Gửi lúc · Số căn, mới gửi trước; chưa gửi gì thì mời mở Bảng hàng."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ chỉ mở các trạng thái thử (tải, trống, lỗi…) ở bản phát triển; bản thật luôn hiện dữ liệu."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ mở ngăn chi tiết cạnh bảng khi bấm tên người nhận: đủ sáu thông tin và danh sách căn trong link."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ dùng nguyên bảng chung của Bảng hàng, màn không thêm kiểu dáng riêng nào."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ có ảnh Đã gửi cạnh Bảng hàng ở bốn khổ màn hình và bảng so mười hai mặt của họ bảng."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ thêm khái niệm «Link đã gửi» vào mô hình nghiệp vụ, tên người nhận đánh dấu là dữ liệu cá nhân."
+    },
+    {
+      "id": "AC-9",
+      "p": "Sẽ sửa bảng chung: chữ dài ở cột đầu bị cắt gọn thay vì đè sang ô bên, ở cả Bảng hàng và Đã gửi."
+    },
+    {
+      "id": "AC-10",
+      "p": "Sẽ đọc được ở điện thoại và máy tính, sáng và tối, ngăn chi tiết không che thanh trên."
+    }
   ],
   "wont_do": [
-    {"id": "AC-3", "p": "Sẽ KHÔNG còn để bộ bài kiểm chung bỏ qua Đã gửi: mọi trạng thái của màn được chạy và mỗi ca phá phải đỏ."},
-    {"id": "OOS-1", "p": "KHÔNG gửi link, không nút «Gửi căn» (hàng 16)."},
-    {"id": "OOS-2", "p": "KHÔNG lượt mở thật, không lưu khách, không tắt hay hạn link, không trang khách (hàng 17, 18)."},
-    {"id": "OOS-3", "p": "KHÔNG nút thao tác nào trên dòng, không thêm quyền mới."},
-    {"id": "OOS-4", "p": "KHÔNG làm thẻ riêng cho điện thoại; điện thoại cuộn ngang trong bảng như Bảng hàng."},
-    {"id": "OOS-5", "p": "KHÔNG nhóm dòng, không cột người gửi, không trạng thái link."},
-    {"id": "OOS-6", "p": "KHÔNG đọc dữ liệu thật, không bảng dữ liệu mới, không bắt đăng nhập."},
-    {"id": "OOS-7", "p": "KHÔNG gộp luật đọc trạng thái thử vào bảng chung ở hàng này; để sau khi hàng 2c gộp."}
+    {
+      "id": "AC-3",
+      "p": "Sẽ KHÔNG còn để bộ bài kiểm chung bỏ qua Đã gửi: mọi trạng thái của màn được chạy và mỗi ca phá phải đỏ."
+    },
+    {
+      "id": "OOS-1",
+      "p": "KHÔNG gửi link, không nút «Gửi căn» (hàng 16)."
+    },
+    {
+      "id": "OOS-2",
+      "p": "KHÔNG lượt mở thật, không lưu khách, không tắt hay hạn link, không trang khách (hàng 17, 18)."
+    },
+    {
+      "id": "OOS-3",
+      "p": "KHÔNG nút thao tác nào trên dòng, không thêm quyền mới."
+    },
+    {
+      "id": "OOS-4",
+      "p": "KHÔNG làm thẻ riêng cho điện thoại; điện thoại cuộn ngang trong bảng như Bảng hàng."
+    },
+    {
+      "id": "OOS-5",
+      "p": "KHÔNG nhóm dòng, không cột người gửi, không trạng thái link."
+    },
+    {
+      "id": "OOS-6",
+      "p": "KHÔNG đọc dữ liệu thật, không bảng dữ liệu mới, không bắt đăng nhập."
+    },
+    {
+      "id": "OOS-7",
+      "p": "KHÔNG gộp luật đọc trạng thái thử vào bảng chung ở hàng này; để sau khi hàng 2c gộp."
+    }
   ],
   "scope_plain": "Màn chỉ đọc dữ liệu mẫu; gửi, lượt mở thật và lưu khách là các hàng sau.",
   "coverage_plain": [
-    {"i": 0, "p": "Dạng link: chưa mở, mở mà chưa quan tâm, có quan tâm đều có trong mẫu (AC-1 dữ liệu mẫu, AC-2 bảng); link đã tắt để hàng 17."},
-    {"i": 1, "p": "Cỡ dữ liệu: link 1 căn, 30 căn và tên người nhận dài đều có (AC-1, AC-5 ngăn chi tiết, AC-9 cắt chữ dài); số rất lớn để dữ liệu thật."},
-    {"i": 2, "p": "Bốn vai chỉ khai ý định ai thấy gì; phạm vi thật do bảng quyền của hàng 18 quyết — chưa có phép đo."},
-    {"i": 3, "p": "Vào từ dữ liệu mẫu, ra ngăn chi tiết (AC-5); dữ liệu thật và gửi lại link để sau, xuất bảng không làm."},
-    {"i": 4, "p": "Trạng thái màn, bốn khổ, sáng tối và bản thật đã cố định theo bảng chung, đo bằng AC-3, AC-4, AC-7, AC-10."}
+    {
+      "i": 0,
+      "p": "Dạng link: chưa mở, mở mà chưa quan tâm, có quan tâm đều có trong mẫu (AC-1 dữ liệu mẫu, AC-2 bảng); link đã tắt để hàng 17."
+    },
+    {
+      "i": 1,
+      "p": "Cỡ dữ liệu: link 1 căn, 30 căn và tên người nhận dài đều có (AC-1, AC-5 ngăn chi tiết, AC-9 cắt chữ dài); số rất lớn để dữ liệu thật."
+    },
+    {
+      "i": 2,
+      "p": "Bốn vai chỉ khai ý định ai thấy gì; phạm vi thật do bảng quyền của hàng 18 quyết — chưa có phép đo."
+    },
+    {
+      "i": 3,
+      "p": "Vào từ dữ liệu mẫu, ra ngăn chi tiết (AC-5); dữ liệu thật và gửi lại link để sau, xuất bảng không làm."
+    },
+    {
+      "i": 4,
+      "p": "Trạng thái màn, bốn khổ, sáng tối và bản thật đã cố định theo bảng chung, đo bằng AC-3, AC-4, AC-7, AC-10."
+    }
   ],
   "gap_probe_plain": [
-    {"i": 0, "p": "Lý do bỏ bước quét độ phủ không đứng vững — đã chạy quét thật, thêm dạng «mở mà chưa quan tâm»."},
-    {"i": 1, "p": "Luật đọc trạng thái thử có hai bản (Bảng hàng và Đã gửi) — giữ hai bản vì chưa được chạm bảng chung, thêm bài kiểm đỏ khi hai bản lệch nhau."},
-    {"i": 2, "p": "Bảng ai thấy gì tự điền phạm vi thấy tên khách — để hàng 18 quyết bằng bảng quyền, ghi rõ trong hợp đồng."},
-    {"i": 3, "p": "Chưa có phép đo cờ dữ liệu cá nhân và sàn bắt buộc của link — đã thêm, kèm ca phá."},
-    {"i": 4, "p": "Ảnh để chấm bằng mắt có thể không chứa dòng tên dài hay ngăn chi tiết ở nền tối — đã ghim vị trí dòng và thêm ảnh."}
-  ]
+    {
+      "i": 0,
+      "p": "Lý do bỏ bước quét độ phủ không đứng vững — đã chạy quét thật, thêm dạng «mở mà chưa quan tâm»."
+    },
+    {
+      "i": 1,
+      "p": "Luật đọc trạng thái thử có hai bản (Bảng hàng và Đã gửi) — giữ hai bản vì chưa được chạm bảng chung, thêm bài kiểm đỏ khi hai bản lệch nhau."
+    },
+    {
+      "i": 2,
+      "p": "Bảng ai thấy gì tự điền phạm vi thấy tên khách — để hàng 18 quyết bằng bảng quyền, ghi rõ trong hợp đồng."
+    },
+    {
+      "i": 3,
+      "p": "Chưa có phép đo cờ dữ liệu cá nhân và sàn bắt buộc của link — đã thêm, kèm ca phá."
+    },
+    {
+      "i": 4,
+      "p": "Ảnh để chấm bằng mắt có thể không chứa dòng tên dài hay ngăn chi tiết ở nền tối — đã ghim vị trí dòng và thêm ảnh."
+    }
+  ],
+  "feature_plain": "Đầu khách mở Đã gửi và thấy 14 link mẫu đã gửi trên cùng bảng với Bảng hàng; bấm tên người nhận mở ngăn chi tiết với các căn trong link.",
+  "decisions": [
+    {
+      "id": "E15",
+      "q": "Tám ảnh Đã gửi có đúng như bản đặc tả giao diện không?",
+      "why": "Ba người chấm độc lập đều đề xuất Đạt: tên dài cắt gọn, ngăn chi tiết đủ trường, ảnh tối đọc được. Máy không tự chốt mục chấm bằng mắt."
+    }
+  ],
+  "analyst_plain": ""
 }
