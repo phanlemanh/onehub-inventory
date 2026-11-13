@@ -5,7 +5,7 @@ slug: ung-dung-noi-bang-vai-khong-chu
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-13
 design_doc: _acceptance/ung-dung-noi-bang-vai-khong-chu/design.md
@@ -116,3 +116,9 @@ luật theo dòng đã cách ly, nhân vai theo sàn ngoài ý định. `[CE ch�
 - Migration 008 (số giám sát cấp). Không sửa migration đã gộp.
 - Hàng 2c (dãy K) gộp trước và sửa `db/tests/cach-ly.sql`, `db/scripts/cach-ly.sh`: trước lượt chấm gộp nhánh chính có
   2c, giữ cả hai bên, tính lại số ca ở AC-5 trên cây đã gộp.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-13:
+  - SP-1: Sáu chỗ chạm dấu hiệu của luật là mã phát hiện vai vượt luật theo dòng và một bản phá chạy trong giao dịch rút lại — ngoại lệ có tên, không nới luật.
+  - Ngoài-1: Trang quyết định của hàng này trùng số 0025 với hàng 9e cho tới khi đổi sang 0027 lúc gộp nhánh chính.
+  - Ngoài-2: Bài quét chuỗi nối của bài kiểm chỉ bắt cách viết trên một dòng; cửa từ chối vai chủ lúc chạy vẫn chặn.
+  - Ngoài-3: Chạy tay riêng bài phiên mà không chọn dãy cơ sở dữ liệu thì bài mặc định dãy C.
+  - Ngoài-4: Bài «không tham số nào tắt bước kiểm» đo cách khai báo hàm, chưa đo hành vi khi có tuỳ chọn thêm.
