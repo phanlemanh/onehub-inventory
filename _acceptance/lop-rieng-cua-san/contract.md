@@ -89,6 +89,17 @@ màn Cài đặt sàn đầy đủ (H4); trạng thái riêng của sàn (L4 ph�
 Never: trường tính bằng công thức; đối tượng tự tạo; từ điển có điều kiện; sửa danh mục chung từ lớp của sàn.
 Ô gạch: «trang khách × nhãn riêng» — trang khách chưa dựng; luật ghi ở Notes, đo ở hàng của trang khách.
 
+## Vai × Màn
+
+Bảng quyền thêm năm thao tác của lớp riêng (`_acceptance/lop-rieng-cua-san/thao-tac-nhap.yaml`): đọc cho cả bốn vai;
+thêm, sửa, ngừng dùng, khớp căn chờ cho Đầu chủ, Trưởng nhóm, Quản trị sàn (Hỏi-1, chủ kho duyệt 2026-11-13). Đầu khách
+thấy màn nhưng không có nút ghi nào; `/api/v1` trả 403.
+
+| Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
+|---|---|---|---|---|
+| inventory | được — đọc nhãn riêng ở tiêu đề cột, cột riêng sau tám cột chuẩn | được — như Đầu chủ | được — như Đầu chủ | được — như Đầu chủ |
+| tuy-chinh-san | được — xem năm phần; Thêm, Sửa, Ngừng dùng; Khớp với danh mục; Đổi tên mẫu nhập | được — chỉ xem năm phần, không nút ghi | được — như Đầu chủ | được — như Đầu chủ |
+
 ## Đường đo
 
 Ô cơ hội khai ngưỡng sống là câu «Bật khi» của hàng. Mỗi vế một thước:

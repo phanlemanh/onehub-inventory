@@ -154,6 +154,49 @@ actions:
       api: ["DELETE /api/v1/saved-views/[id]"]
       db: ["table saved_view delete"]
 
+  # The company layer (row 7e, lop-rieng-cua-san): who reads and who changes the company's own labels, custom fields,
+  # value spellings, pending units and import templates. Approved by the owner at the scope gate, 2026-11-13 (Hỏi-1:
+  # ListAgent, TeamLead, CompanyAdmin change; BuyerAgent reads). Planned until migration 010 and /api/v1/company-layer
+  # open their doors (tasks 2 and 5 of the plan).
+  - name: readCompanyLayer
+    description: See the company's own labels, custom fields, value spellings, pending units and import templates.
+    entity: CompanyLabel
+    kind: query
+    status: planned
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
+
+  - name: addCompanyLayer
+    description: Add a company label, custom field or value spelling.
+    entity: CompanyLabel
+    kind: create
+    status: planned
+    scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+
+  - name: editCompanyLayer
+    description: >-
+      Change a company label's words, a custom field's name and options (never its kind), a value spelling, or an
+      import template's name.
+    entity: CompanyLabel
+    kind: update
+    status: planned
+    scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+
+  - name: retireCompanyLayer
+    description: >-
+      Stop using a label, field, value spelling, pending unit or import template; nothing is deleted and values already
+      on units stay.
+    entity: CompanyLabel
+    kind: delete
+    status: planned
+    scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+
+  - name: matchPendingUnits
+    description: Match the company's pending units with units the shared catalog now has; the catalog never changes.
+    entity: PendingUnit
+    kind: command
+    status: planned
+    scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+
   # Draft rows for the listing board, from Quỹ hàng's permission review of 05/11 (table two) and its signed
   # bang-quyen-hang.json, without the Telesales role. Row 10 onwards decides each cell when it opens the door.
   - name: viewListings

@@ -18,6 +18,15 @@ của sàn» (bảng xem lại tối giản của lớp riêng). Bản mẫu: `/
 | --- | --- | --- |
 | grid | màn mẫu mới | Bảng hàng là màn mẫu của họ Lưới; hàng này thêm cột, không đổi khuôn |
 
+### Ứng viên ReUI
+
+Không chọn khối nào: cột riêng dựng bằng cột có kiểu khai sẵn của lưới trong kho (khối `DataRegion`), không thêm khối.
+
+| Cho | Ứng viên | Ảnh | Chọn |
+| --- | --- | --- | --- |
+| màn | data-grid-columns-5 | evidence/reui/data-grid-columns-5.png | |
+| màn | data-grid-columns-4 | evidence/reui/data-grid-columns-4.png | |
+
 ## Màn tuy-chinh-san
 
 ### Từ Quỹ hàng

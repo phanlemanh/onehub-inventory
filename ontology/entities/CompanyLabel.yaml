@@ -1,0 +1,25 @@
+name: CompanyLabel
+description: >-
+  The words one company uses for a standard concept instead of the preferred label («Block» for «Toà»). Belongs to
+  that company only; the customer page never reads it.
+reso: none (our own)
+
+properties:
+  id: { type: integer, required: true, unique: true, display: none }
+  companyId: { type: ref, target: Company, required: true, display: none }
+  concept: { type: string, required: true, display: text }
+  label: { type: string, required: true, max: 40, display: text }
+  createdAt: { type: datetime, required: true, display: none }
+  retiredAt: { type: datetime, display: none }
+
+rules:
+  - id: company-label-one-per-concept
+    description: >-
+      A company has at most one label in use per concept; the concept is a field or entity of ontology/labels.yaml;
+      the words are trimmed, 1 to 40 characters. Retiring it brings back the preferred label.
+    implemented_in: db/migrations/010_lop_rieng_cua_san.sql
+
+code:
+  model: src/modules/company-config/
+  tests: tests/db/lop-rieng.db.test.ts
+wiki: wiki/entities/company-label.md

@@ -91,6 +91,32 @@ concepts:
     pref: Góc nhìn
     en: Saved view
     avoid: [Bộ lọc đã lưu, Tìm kiếm đã lưu]
+  CompanyLabel:
+    kind: entity
+    own: true
+    pref: Nhãn riêng
+    en: Company label
+  CustomField:
+    kind: entity
+    own: true
+    pref: Trường riêng
+    en: Custom field
+  CompanyValueAlias:
+    kind: entity
+    own: true
+    pref: Cách viết riêng
+    en: Company spelling
+    avoid: [Từ điển]
+  PendingUnit:
+    kind: entity
+    own: true
+    pref: Căn chờ khớp
+    en: Pending unit
+  ImportTemplate:
+    kind: entity
+    own: true
+    pref: Mẫu nhập
+    en: Import template
   SaveView:
     kind: action
     own: true
@@ -391,3 +417,45 @@ concepts:
     own: true
     pref: Mở gần nhất
     en: Last opened
+  CompanyLayer:
+    kind: surface
+    own: true
+    pref: Tuỳ chỉnh của sàn
+    en: Company settings
+    avoid: [Lớp riêng, Cài đặt sàn]
+  ValueDictionary:
+    kind: surface
+    own: true
+    pref: Từ điển giá trị
+    en: Value dictionary
+  AddCompanyLabel:
+    kind: action
+    own: true
+    pref: Thêm nhãn riêng
+    en: Add label
+  AddCustomField:
+    kind: action
+    own: true
+    pref: Thêm trường riêng
+    en: Add field
+  AddValueAlias:
+    kind: action
+    own: true
+    pref: Thêm cách viết
+    en: Add spelling
+  MatchPendingUnits:
+    kind: action
+    own: true
+    pref: Khớp với danh mục
+    en: Match with catalog
+  RetireItem:
+    kind: action
+    own: true
+    pref: Ngừng dùng
+    en: Stop using
+    avoid: [Xoá]
+  RenameTemplate:
+    kind: action
+    own: true
+    pref: Đổi tên mẫu
+    en: Rename

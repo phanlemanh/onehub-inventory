@@ -36,6 +36,12 @@ screens:
     family: grid
     audience: staff
     status: planned
+  - id: tuy-chinh-san
+    route: /tuy-chinh-san
+    title: CompanyLayer
+    family: grid
+    audience: staff
+    status: planned
   - id: proto
     route: /proto/[slug]
     title: null

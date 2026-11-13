@@ -55,11 +55,11 @@ parts:
     head: [{ action: addCompanyLayer, label: "Thêm trường riêng" }]
     row: [{ action: editCompanyLayer, label: "Sửa" }, { action: retireCompanyLayer, label: "Ngừng dùng" }]
   tu-dien:
-    head: [{ action: addCompanyLayer, label: "Thêm từ điển" }]
+    head: [{ action: addCompanyLayer, label: "Thêm cách viết" }]
     row: [{ action: editCompanyLayer, label: "Sửa" }, { action: retireCompanyLayer, label: "Ngừng dùng" }]
   can-cho:
     head: [{ action: matchPendingUnits, label: "Khớp với danh mục" }]
     row: [{ action: retireCompanyLayer, label: "Ngừng dùng" }]
   mau:
     head: []
-    row: [{ action: editCompanyLayer, label: "Đổi tên" }, { action: retireCompanyLayer, label: "Ngừng dùng" }]
+    row: [{ action: editCompanyLayer, label: "Đổi tên mẫu" }, { action: retireCompanyLayer, label: "Ngừng dùng" }]
