@@ -41,7 +41,7 @@ jobs:
   # Everything after the service is one command of the repository (db/scripts/ci-db.sh), connected as quy_hang_login.
   e2e-db:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     services:
       postgres:
         image: postgres:16

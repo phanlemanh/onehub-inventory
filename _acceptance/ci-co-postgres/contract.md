@@ -5,7 +5,7 @@ slug: ci-co-postgres
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-13
 design_doc: _acceptance/ci-co-postgres/design.md
@@ -113,3 +113,7 @@ CI thật đo ở AC-10 khi bản vá vào PR (Hỏi-1). Lượt dựng lại (A
 ## Notes
 
 - Dọn ở máy dãy: các thư mục dựng tạm đã có từ trước hàng này được dọn ở lượt kế của mỗi cấu hình (tiến trình đã chết).
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-14:
+  - Ngoài-1: Bài kiểm «không đọc lịch sử git» chưa bắt lệnh git viết xuống nhiều dòng; một bài như vậy chỉ đỏ khi chạy trên CI.
+  - Ngoài-2: Bài kiểm ấy chưa bắt git chạy từ một chuỗi lệnh duy nhất; một bài như vậy chỉ đỏ khi chạy trên CI.
+  - Ngoài-3: Bài kiểm ấy cho qua lệnh đọc commit cha của bản hiện tại; một bài như vậy chỉ đỏ khi chạy trên CI.

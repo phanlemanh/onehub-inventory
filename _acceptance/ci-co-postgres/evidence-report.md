@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 46bc6edc6683dee81c4403c9ee2628d86160c183
-human_signoff:
+human_signoff: Manh Phan 2026-11-14
 ---
 
 # Evidence Report: ci-co-postgres
