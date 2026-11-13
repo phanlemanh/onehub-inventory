@@ -1,38 +1,4 @@
 {
   "feature_plain": "Ứng dụng nối cơ sở dữ liệu bằng một vai riêng không làm chủ bảng nào, nên kể cả khi mã chạy trong cửa truy vấn cố «đổi vai», nó cũng không lấy lại được quyền đọc ghi dữ liệu của mọi sàn.",
-  "will_do": [
-    {"id": "AC-2", "p": "Sẽ từ chối mọi lối đổi về vai chủ khi đã đăng nhập bằng vai riêng, và sau khi «trả vai» thì không đọc được bảng sàn nào (đo trên một kết nối đăng nhập thật)."},
-    {"id": "AC-3", "p": "Sẽ vẫn đọc đúng dữ liệu của sàn mình khi đi đúng hai câu của cửa — đối chứng rằng vai riêng vẫn làm việc được."},
-    {"id": "AC-4", "p": "Sẽ báo đỏ có tên lý do cho từng kiểu cấp lại quyền chủ (bảy bản phá thử), và không bản phá nào để lại dấu trên cơ sở dữ liệu."},
-    {"id": "AC-5", "p": "Sẽ giữ nguyên mọi ca cũ của bộ kiểm cách ly và đếm đúng số ca mới ở dòng tổng."},
-    {"id": "AC-6", "p": "Sẽ cho cửa truy vấn tự kiểm vai nối và từ chối chạy khi vai ấy về được vai chủ hay vượt được luật theo dòng — không câu nào chạy, không dòng nào bị đọc."},
-    {"id": "AC-7", "p": "Sẽ chặn mã chạy trong cửa khi nó «trả vai» hay đổi sang vai chủ; dữ liệu của hai sàn không đổi."},
-    {"id": "AC-8", "p": "Sẽ chạy mọi bài kiểm cơ sở dữ liệu và bài trình duyệt có cơ sở dữ liệu bằng chính vai riêng ấy, và có bài quét báo đỏ nếu bài nào lén dùng lại vai chủ."},
-    {"id": "AC-9", "p": "Sẽ chỉ thêm dòng vào tệp biến môi trường mẫu (chuỗi nối bằng vai riêng, biến cho CI sau này), không xoá dòng nào; kiểm tra chung của kho xanh."}
-  ],
-  "wont_do": [
-    {"id": "AC-1", "p": "Chặn vai riêng có bất kỳ quyền đặc biệt, quyền sở hữu hay quyền thẳng nào; nó chỉ được là thành viên không kế thừa của vai API."},
-    {"id": "OOS-1", "p": "KHÔNG đặt mật khẩu hay đổi chuỗi nối trên cơ sở dữ liệu thật — việc của chủ kho khi nối dữ liệu thật (hàng 10)."},
-    {"id": "OOS-2", "p": "KHÔNG chạy bộ kiểm cách ly trên CI — để hàng CI có Postgres (1s); hàng này chỉ để sẵn biến cho nó."},
-    {"id": "OOS-3", "p": "KHÔNG viết lại 20 ca cũ của bộ kiểm cách ly; thay bằng ca đăng nhập thật mới."},
-    {"id": "OOS-4", "p": "KHÔNG tạo vai riêng cho từng sàn."}
-  ],
-  "scope_plain": "Những việc dưới đây cố ý để ngoài hàng này:",
-  "coverage_plain": [
-    {"i": 0, "p": "Độ phủ được quét theo khuôn rủi ro, đối chiếu tài liệu chính thức của Postgres 16 về thành viên vai và đổi vai, cùng mã cửa truy vấn hiện có."},
-    {"i": 4, "p": "Cả bốn lối đổi vai trong một phiên đều có ca bị từ chối (AC-2 đăng nhập thật, AC-7 qua cửa)."},
-    {"i": 5, "p": "Mọi thuộc tính nguy hiểm của vai riêng đều được kiểm và có bản phá thử riêng (AC-1 vai sạch, AC-4 bảy bản phá)."},
-    {"i": 6, "p": "Đo ở ba lớp: danh mục của cơ sở dữ liệu, một phiên đăng nhập thật, và chính cửa của ứng dụng."},
-    {"i": 7, "p": "Chạy ở bộ kiểm cách ly, bài cơ sở dữ liệu, bài trình duyệt; máy chủ thật được giữ bằng việc cửa từ chối vai chủ (AC-6)."},
-    {"i": 8, "p": "Có đối chứng dương: đi đúng cửa thì đọc đúng sàn mình (AC-3, AC-6)."},
-    {"i": 9, "p": "Để sau: xoay mật khẩu và giới hạn số kết nối của vai (vận hành). Không làm: vai riêng cho từng sàn."},
-    {"i": 10, "p": "Một chỗ chưa có ca riêng: đổi vai bên trong hàm chạy bằng quyền chủ — Postgres vốn cấm việc này."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Phép kiểm quyền ban đầu bỏ sót quyền cấp cho mọi người và quyền mặc định của hàm — đã sửa: tính quyền hiệu lực, thêm bản phá thứ bảy."},
-    {"i": 1, "p": "Vai dùng chung cả cụm cơ sở dữ liệu nên các lượt chạy song song có thể giẫm nhau — đã sửa: tạo vai chỉ khi chưa có, không đụng mật khẩu, đặt mật khẩu chỉ khi cần và thử lại."},
-    {"i": 2, "p": "Lo tệp biến môi trường mẫu còn chuỗi nối vai chủ — đã bác: dòng ấy là ghi chú, ứng dụng không nạp tệp mẫu."},
-    {"i": 3, "p": "Chưa nói thứ tự với bản thật — đã sửa: ghi rõ chưa có bản thật nào; khi nối dữ liệu thật phải đổi chuỗi nối trước lần triển khai đầu."},
-    {"i": 4, "p": "Bài kiểm từng định dùng một công tắc tắt bước kiểm của cửa — đã sửa: không có công tắc nào, chiều đỏ đo bằng cửa giả trong bài."}
-  ]
+  "scope_plain": "Những việc cố ý để ngoài hàng này, đã duyệt ở Cổng Phạm vi:"
 }
