@@ -99,6 +99,13 @@ khoi:
     mo_ta: Một hộp hỏi vài trường (tiêu đề, một câu nói việc sẽ xảy ra, các trường, «Thôi» và nút gửi), giữ chữ đã gõ khi gửi hỏng
     ho_so: moi-nguoi-gan-vai
     duyet: 2026-11-11
+  - ten: UnitJump
+    tep: src/modules/listings/ui/unit-jump.tsx
+    nguon: tao-tay
+    nhu_cau: o-tim-thanh-tren
+    mo_ta: Ô tìm duy nhất của sản phẩm ở thanh trên App Shell — gõ mã căn, toà hay dự án, có gợi ý ghi loại, mở bằng ⌘K
+    ho_so: loi-vao-ho-so
+    duyet: 2026-11-13
 # Blocks made before this ledger existed, each named with the round that made it, the commit that created it and the
 # day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
 # still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).
