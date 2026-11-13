@@ -5,6 +5,7 @@ slug: sua-tren-o
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
+screens: [inventory]
 status: approved
 approved_by: Manh Phan
 approved_at: 2026-11-13T03:15:58Z
@@ -60,6 +61,14 @@ Source input: ô cơ hội `_acceptance/sua-tren-o/opportunity.md` (build, Manh 
   phần bị cấm, Then bài rào đỏ gọi tên tệp và câu nhập (tệp `.ts` đọc như TypeScript, `.tsx` như TSX); và trên cây sau hàng
   này `make check` xanh, nhãn mới (trường Lý do ngừng và các lý do theo Hỏi-2) đến từ
   `ontology/labels.yaml`, mỗi nhãn tối đa 17 ký tự.
+
+## Vai × Màn
+
+Sửa trên ô theo dòng `updateListing` của bảng quyền (hàng 9a, nhắc lại AC-8); đọc giữ như hàng 2.
+
+| Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
+|---|---|---|---|---|
+| inventory | được — sửa Giá chào và Trạng thái trên ô, từ 768 px | được — sửa Giá chào và Trạng thái trên ô, từ 768 px | được — sửa Giá chào và Trạng thái trên ô, từ 768 px | chặn — ô như chữ thường, không mở khung sửa |
 
 ## Đường đo
 
