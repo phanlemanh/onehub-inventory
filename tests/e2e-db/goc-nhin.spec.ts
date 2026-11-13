@@ -201,7 +201,7 @@ async function saveAs(page: Page, name: string, button = SAVE) {
     await expect(entry(page, name)).toHaveAttribute("aria-current", "true");
 }
 
-const escaped = (text: string) => text.replace(/[[\]().*+?^$|\\]/g, "\\$&");
+const escaped = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 /** A view's entry; its accessible name may end with the «đã đổi» mark. */
 const entry = (page: Page, name: string) =>
   secondColumn(page).getByRole("link", { name: new RegExp(`^${escaped(name)}( đã đổi)?$`) });
@@ -336,7 +336,7 @@ test("rename", async ({ page }, info) => {
   const before = await snapshot(page);
   const [stored] = await storedViews(me.id);
   await secondColumn(page)
-    .getByRole("button", { name: new RegExp(NAME.replace(/[[\]]/g, "\\$&")) })
+    .getByRole("button", { name: new RegExp(escaped(NAME)) })
     .click();
   await page.getByRole("menuitem", { name: RENAME }).click();
   const dialog = page.locator('[data-slot="view-name-dialog"]');
@@ -387,7 +387,7 @@ test("remove", async ({ page }, info) => {
   await saveAs(page, NAME);
   const href = new URL(page.url()).pathname + new URL(page.url()).search;
   const more = secondColumn(page).getByRole("button", {
-    name: new RegExp(NAME.replace(/[[\]]/g, "\\$&")),
+    name: new RegExp(escaped(NAME)),
   });
 
   await more.click();
