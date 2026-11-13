@@ -680,7 +680,7 @@
       "hang": "T2",
       "dung_tren": [
         "3",
-        "2e"
+        "2c"
       ],
       "slug": "loi-vao-ho-so",
       "bat_khi": "Nút «Mở toàn màn» trên ngăn chi tiết sang trang riêng của căn, trang có nút chép đường dẫn; người cùng sàn mở đường dẫn thấy đúng căn và đúng lần chào; đường dẫn mang mã lạ thì báo «Không có căn này trong Bảng hàng» kèm lối về Bảng hàng; gõ mã căn ở thanh trên mở thẳng hồ sơ căn; mã có ở hai toà trở lên thì hiện «Nhiều căn — chọn toà» với một nút cho từng toà; mã không khớp căn nào thì nói rõ và không mở gì; đủ bốn khổ màn hình",
