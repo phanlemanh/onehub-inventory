@@ -43,6 +43,14 @@ button table `_acceptance/lop-rieng-cua-san/thao-tac-nhap.yaml`, scope answers i
 - No real personal data: `[Tên]`, `0900 000 0xx`, `[Sàn …]`.
 - Load rule (G, 13/11): outside a grading turn run only this row's test files; never two heavy test commands at once.
 
+## Chỗ cần chủ kho cho phép riêng
+
+Task 1 sửa công cụ sinh mã từ mô hình nghiệp vụ (`tools/ontology_codegen.py`, tầng cao — chỉ chủ kho cho phép; giám sát
+trả lời R-11): thêm kiểu «đối tượng» để lựa chọn của trường riêng và giá trị cột riêng trên một căn có kiểu thật. Chữ
+«duyệt kế hoạch» của chủ kho là phép cho đúng chỗ sửa ấy và không gì khác trong `tools/`. Lối vòng nếu chủ kho không cho
+(«duyệt kế hoạch, lối vòng»): không đụng công cụ; hai thuộc tính ấy khai kiểu chữ trong mô hình, mô-đun cấu hình sàn tự
+đọc và kiểm chữ ấy ở mép (zod), hàng 10 nhận lại đúng cách làm đó. Không sửa tệp công cụ trước chữ của chủ kho.
+
 ## Review Focus
 
 1. Two requests add the 20th and 21st field at the same moment — the database cap must hold (row lock in the trigger),
