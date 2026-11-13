@@ -304,6 +304,27 @@ concepts:
     pref: Ngày bán
     lease: Ngày cho thuê
     en: Close date
+  WithdrawnReason:
+    kind: field
+    own: true
+    pref: Lý do ngừng
+    en: Withdrawn reason
+  WithdrawnSoldElsewhere:
+    kind: field
+    own: true
+    pref: Chủ bán nơi khác
+    lease: Cho thuê nơi khác
+    en: Sold elsewhere
+  WithdrawnOwnerChangedMind:
+    kind: field
+    own: true
+    pref: Chủ đổi ý
+    en: Owner changed mind
+  WithdrawnUnreachable:
+    kind: field
+    own: true
+    pref: Mất liên lạc
+    en: Unreachable
   LoginCode:
     kind: field
     own: true

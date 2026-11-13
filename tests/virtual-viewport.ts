@@ -6,10 +6,9 @@ export const VIEWPORT_TEST_HEIGHT = 100_000;
 export function tallGridViewport(): void {
   const original = Element.prototype.getBoundingClientRect;
   Element.prototype.getBoundingClientRect = function (this: Element) {
-    const box = original.call(this);
     if (this instanceof HTMLElement && this.dataset["slot"] === "scroll-area-viewport") {
+      // Every field is set here: a box from a floating element's measuring may carry no toJSON to spread.
       return {
-        ...box.toJSON(),
         x: 0,
         y: 0,
         top: 0,
@@ -21,7 +20,7 @@ export function tallGridViewport(): void {
         toJSON: () => ({}),
       } as DOMRect;
     }
-    return box;
+    return original.call(this);
   };
   for (const prop of ["clientHeight", "offsetHeight"] as const) {
     Object.defineProperty(HTMLElement.prototype, prop, {
