@@ -6,9 +6,9 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
 screens: [today, inventory, sent, members, sign-in]
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-13
 design_doc: _acceptance/kiem-vai-theo-man/design.md
 ---
 
