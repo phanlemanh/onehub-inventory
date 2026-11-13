@@ -19,6 +19,8 @@ import { describe, expect, it } from "vitest";
 import {
   FRAME,
   NO_REGION_YET,
+  NO_SEARCH_CASE,
+  regionCaseSkip,
   REGION,
   classifyGrid,
   compareRows,
@@ -112,24 +114,28 @@ describe("thông điệp ghim gọi tên màn", () => {
 // ---- grid screens without a region (E6) -------------------------------------------------------------------------
 
 describe("danh sách chưa có vùng", () => {
+  // Row 6 (Đã gửi) built its region, so the real list is empty; the rules are measured on a list holding a made-up
+  // screen, with the same pinned messages as before.
+  const LISTED = { "man-gia": "ly do gia" };
   it("a grid screen outside the list without a region is red, not skipped", () => {
     expect(() => classifyGrid("ghost-grid", { hasRegion: false, hasTable: false })).toThrow(
       "chua co vung du lieu: ghost-grid",
     );
   });
   it("a listed screen without a region is skipped with its reason", () => {
-    const v = classifyGrid("sent", { hasRegion: false, hasTable: false });
-    expect(v).toEqual({ run: false, skip: `chua co vung du lieu — ${NO_REGION_YET["sent"]}` });
+    const v = classifyGrid("man-gia", { hasRegion: false, hasTable: false }, LISTED);
+    expect(v).toEqual({ run: false, skip: `chua co vung du lieu — ${LISTED["man-gia"]}` });
   });
   it("a listed screen that has a region must leave the list", () => {
-    expect(() => classifyGrid("sent", { hasRegion: true, hasTable: true })).toThrow(
-      "go khoi danh sach: sent",
+    expect(() => classifyGrid("man-gia", { hasRegion: true, hasTable: true }, LISTED)).toThrow(
+      "go khoi danh sach: man-gia",
     );
   });
-  // Row 2 (Bảng hàng): the inventory screen built its region, so it left the list and its region suite runs.
-  it("inventory has left the list and its region suite runs", () => {
-    expect(Object.keys(NO_REGION_YET)).toEqual(["sent"]);
+  // Row 2 (Bảng hàng) and row 6 (Đã gửi) built their regions, so both left the list and their region suites run.
+  it("inventory and sent have left the list and their region suites run", () => {
+    expect(NO_REGION_YET).toEqual({});
     expect(classifyGrid("inventory", { hasRegion: true, hasTable: true })).toEqual({ run: true });
+    expect(classifyGrid("sent", { hasRegion: true, hasTable: true })).toEqual({ run: true });
   });
   it("putting inventory back on the list is red", () => {
     const back = { ...NO_REGION_YET, inventory: "tra lai" };
@@ -137,10 +143,35 @@ describe("danh sách chưa có vùng", () => {
       "da co vung, go khoi danh sach: inventory",
     );
   });
-  it("a table outside the shared region is red", () => {
-    expect(() => classifyGrid("sent", { hasRegion: false, hasTable: true })).toThrow(
-      "sent: luoi dung ngoai khuon",
+  it("putting sent back on the list is red", () => {
+    const back = { ...NO_REGION_YET, sent: "tra lai" };
+    expect(() => classifyGrid("sent", { hasRegion: true, hasTable: true }, back)).toThrow(
+      "go khoi danh sach: sent",
     );
+  });
+  it("a table outside the shared region is red", () => {
+    expect(() => classifyGrid("man-gia", { hasRegion: false, hasTable: true }, LISTED)).toThrow(
+      "man-gia: luoi dung ngoai khuon",
+    );
+  });
+});
+
+// ---- grid screens that do not run the search case (row 6, ruling D-1311-7) ------------------------------------------
+
+describe("man khong chay ca tim", () => {
+  it("sent skips the search case with its reason, and only the search case", () => {
+    expect(Object.keys(NO_SEARCH_CASE)).toEqual(["sent"]);
+    expect(regionCaseSkip("sent", "tim")).toBe(`khong chay ca tim — ${NO_SEARCH_CASE["sent"]}`);
+    expect(regionCaseSkip("sent", "trong")).toBeNull();
+    expect(regionCaseSkip("sent", "chu-dai")).toBeNull();
+  });
+  it("another grid screen still runs the search case", () => {
+    expect(regionCaseSkip("inventory", "tim")).toBeNull();
+    expect(regionCaseSkip("contacts", "tim")).toBeNull();
+  });
+  it("only the search case of a listed screen is skipped", () => {
+    expect(regionCaseSkip("inventory", "tim", { inventory: "x" })).toBe("khong chay ca tim — x");
+    expect(regionCaseSkip("man-gia", "loi", { "man-gia": "x" })).toBeNull();
   });
 });
 

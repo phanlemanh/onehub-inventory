@@ -708,10 +708,12 @@ export function DataRegion({
             const id = row.id;
             return (
               // The negative margin keeps the row at the grid's density height: the button is taller than the text.
-              <span className="-my-1 inline-flex">
+              // It may not grow past its cell: a long value is cut like every other text cell (row 6, sent).
+              <span className="-my-1 inline-flex max-w-full min-w-0">
                 <Button
                   variant="link"
                   size="sm"
+                  className="w-full"
                   data-record-open={id}
                   // The unit code is the row's open door: one click opens it (the grid's two-step press for controls
                   // in a cell does not apply); the rest of the cell selects like a sheet. Keys belong to the grid.
