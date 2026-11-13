@@ -10,11 +10,12 @@ import { label } from "@/modules/company-config";
 import { currentSession } from "@/modules/identity/server";
 import { SessionRoles } from "@/modules/identity/ui";
 import { mySavedViews } from "@/modules/listings/server";
-import { savedViewsSection } from "@/modules/listings/ui";
+import { UnitJump, savedViewsSection } from "@/modules/listings/ui";
 
 import { AccountMenu } from "./account-menu";
 import { CompanySwitch } from "./company-switch";
-import { navFor } from "./nav";
+import { sampleSearchRows } from "./inventory-sample-rows";
+import { navFor, searchShownFor } from "./nav";
 import { savedViewLabels } from "./saved-view-labels";
 
 /** Every internal screen stands in the frame; its error, loading and not-found states too. */
@@ -36,14 +37,29 @@ export default async function FrameLayout({ children }: { children: React.ReactN
         companies: session.companies,
       }
     : null;
+  const roles = session?.roles ?? [];
+  const canSearch = searchShownFor(nav, roles);
   // Every action button and the App Shell's entries read the session's roles from here (PermittedAction, row 9e).
   return (
-    <SessionRoles roles={session?.roles ?? []}>
+    <SessionRoles roles={roles}>
       <PlaceChangeProvider>
         <AppShell
           nav={nav}
-          roles={session?.roles ?? []}
+          roles={roles}
           columnOpen={columnOpen}
+          search={
+            canSearch ? (
+              <UnitJump
+                rows={sampleSearchRows()}
+                words={{
+                  unit: label("Unit"),
+                  building: label("Building"),
+                  subdivision: label("Subdivision"),
+                  inventory: label("Inventory"),
+                }}
+              />
+            ) : null
+          }
           company={
             account ? (
               <CompanySwitch company={account.company} companies={account.companies} />
