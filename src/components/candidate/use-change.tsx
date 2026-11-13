@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback, useRef, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 
 import { FRAME_COPY } from "@/components/templates/frame-copy";
-import { notify, type NotifyChannel } from "@/components/templates/notify";
+import { notify, notifyResult, type NotifyChannel } from "@/components/templates/notify";
 import { saveWithBanner } from "@/components/templates/screen-banner";
 import { Button } from "@/components/ui/button";
+import { writeFailure } from "@/lib/write-failure";
 import {
   Dialog,
   DialogClose,
@@ -136,4 +138,82 @@ export function useChange(): { run: (change: Change) => Promise<boolean>; dialog
   );
 
   return { run, dialog };
+}
+
+/** What a write door answers (row 4): the four outcomes of the real write path, never a thrown error. */
+export type WriteOutcome = "saved" | "refused" | "offline" | "conflict";
+type Failure = Exclude<WriteOutcome, "saved">;
+
+/**
+ * One write of an in-place edit (row 4): the screen has already shown the new value; the door says how it went.
+ * `undo` is a write like any other and is absent when the change cannot be undone.
+ */
+export interface DoorChange {
+  /** The toast after the save, e.g. «Đã đổi giá căn 1101: 2,8 tỷ.» */
+  done: string;
+  write: () => Promise<WriteOutcome>;
+  undo?: () => Promise<WriteOutcome>;
+  /** The toast after an undo that went through. */
+  undone: string;
+  /** Why the save failed (not refused), e.g. offline; the screen has put the old value back. */
+  failed: (why: Failure) => string;
+  /** Why the undo failed (not refused), naming what the row still holds. */
+  undoFailed: (why: Failure) => string;
+}
+
+/**
+ * Runs one write; a thrown failure of the real write path becomes its outcome (fetch's TypeError or a device that
+ * reports itself offline → offline, 403 → refused, 409 → conflict). Anything else is a fault and is thrown on.
+ */
+async function attempt(write: () => Promise<WriteOutcome>): Promise<WriteOutcome> {
+  try {
+    return await write();
+  } catch (failure) {
+    const why =
+      writeFailure(failure) ??
+      (typeof navigator !== "undefined" && navigator.onLine === false ? "offline" : null);
+    if (why === null) throw failure;
+    return why;
+  }
+}
+
+const STAYS = { duration: Number.POSITIVE_INFINITY } as const;
+
+/**
+ * Says a failed write. A failed save names why; a refused save (403) gets the frame's own sentence (row 9e). A failed
+ * undo always names what the row still holds, adds the refusal sentence when refused, and stays until «Thử lại».
+ */
+function sayFailure(why: Failure, sentence: (why: Failure) => string, retry?: () => void): void {
+  if (!retry) {
+    toast.error(why === "refused" ? FRAME_COPY.refusedAction : sentence(why));
+    return;
+  }
+  const message =
+    why === "refused" ? `${sentence(why)} ${FRAME_COPY.refusedAction}` : sentence(why);
+  toast.error(message, { ...STAYS, action: { label: FRAME_COPY.retry, onClick: retry } });
+}
+
+/**
+ * The save rule of design/behaviors.md for a write door: the toast after a save offers «Hoàn tác» when the change can
+ * be undone, and an undo that fails is never silent — a notice stays until the person presses «Thử lại» (row 4).
+ * Returns the save's outcome so the screen can put the old value back when it is not «saved».
+ */
+export async function runDoorChange(change: DoorChange): Promise<WriteOutcome> {
+  const outcome = await attempt(change.write);
+  if (outcome !== "saved") {
+    sayFailure(outcome, change.failed);
+    return outcome;
+  }
+  const { undo } = change;
+  if (!undo) {
+    notifyResult({ message: change.done });
+    return outcome;
+  }
+  const tryUndo = async (): Promise<void> => {
+    const back = await attempt(undo);
+    if (back === "saved") notifyResult({ message: change.undone });
+    else sayFailure(back, change.undoFailed, () => void tryUndo());
+  };
+  notifyResult({ message: change.done, undo: () => void tryUndo() });
+  return outcome;
 }

@@ -4,6 +4,9 @@ import { PageHeader } from "@/components/templates/page-header";
 import { sampleUnits, subdivisionNameOf } from "@/modules/catalog";
 import { label } from "@/modules/company-config";
 import { SAMPLE_COMPANY, buildSampleListings } from "@/modules/listings";
+import { isRole } from "@/modules/identity";
+import { currentSession } from "@/modules/identity/server";
+import { SessionRoles } from "@/modules/identity/ui";
 import { mySavedView, mySavedViews } from "@/modules/listings/server";
 
 import { savedViewLabels } from "../saved-view-labels";
@@ -36,7 +39,7 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 /** Inventory, read-only: the sample company's listings (roadmap row 1) on the shared grid. */
 export default async function Page({ searchParams }: Props) {
   const params = await searchParams;
-  const { state, status: statusParam } = params;
+  const { state, status: statusParam, vai } = params;
   // A status shortcut opens the grid filtered (row 2a); a repeated parameter keeps its first value.
   const status = Array.isArray(statusParam) ? statusParam[0] : statusParam;
   // A saved view opens by its own address (row 2c): gone, or someone else's, opens every unit with a sentence.
@@ -53,7 +56,16 @@ export default async function Page({ searchParams }: Props) {
   const viewCopy = savedViewCopy(viewLabels);
   const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
   const { listings, listingUnits } = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
-  return (
+  // Without a signed-in session, outside production, ?vai=<role> stands in for the session's role, so the browser
+  // tests and the screenshots of row 4 can open the cells the permission table gives that role. A real session wins.
+  const standIn =
+    process.env.NODE_ENV !== "production" &&
+    typeof vai === "string" &&
+    isRole(vai) &&
+    (await currentSession()) === null
+      ? [vai]
+      : null;
+  const page = (
     <>
       <PageHeader title={openView ? openView.name : label("Inventory")} />
       {/* Always present, so the sentence about a view that is gone is read out when it appears. */}
@@ -77,6 +89,7 @@ export default async function Page({ searchParams }: Props) {
         title={label("Listing")}
         headers={HEADERS}
         rows={inventoryRows({ listings, listingUnits, units })}
+        listings={listings}
         state={inventoryStateFrom(
           typeof state === "string" ? state : undefined,
           process.env.NODE_ENV,
@@ -91,4 +104,5 @@ export default async function Page({ searchParams }: Props) {
       />
     </>
   );
+  return standIn ? <SessionRoles roles={standIn}>{page}</SessionRoles> : page;
 }

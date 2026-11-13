@@ -86,20 +86,8 @@ export function applyChange(
   };
 }
 
-/**
- * The outcome a failed call to the real write path means: fetch throws a TypeError when the network is down, and the
- * server answers 403 (refused) or 409 (conflict). Anything else is not one of the door's outcomes: null.
- */
-export function failureOutcome(failure: unknown): "offline" | "refused" | "conflict" | null {
-  if (failure instanceof TypeError) return "offline";
-  const status =
-    typeof failure === "object" && failure !== null && "status" in failure
-      ? (failure as { status: unknown }).status
-      : undefined;
-  if (status === 403) return "refused";
-  if (status === 409) return "conflict";
-  return null;
-}
+/** The outcome a failed call to the real write path means; one rule, shared with the screens' write door. */
+export { writeFailure as failureOutcome } from "../../lib/write-failure";
 
 /**
  * The save door on the sample listings, in memory. `online` says whether the device has a network: no writes while

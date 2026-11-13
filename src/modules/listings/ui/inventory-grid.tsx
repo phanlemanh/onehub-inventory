@@ -7,7 +7,9 @@ import { DataRegion, type GridRow, type RegionStatus } from "@/components/candid
 import type { ColumnFilters, GridView } from "@/components/candidate/grid-view";
 import { usePlaceChange } from "@/components/templates/app-shell/place-change";
 import { Button } from "@/components/ui/button";
+import type { Listing } from "@/generated/ontology";
 
+import type { ListingSaveDoor } from "../save-door";
 import type { SavedView } from "../saved-view";
 
 import {
@@ -20,6 +22,7 @@ import { listingRecord } from "./listing-record";
 import { SaveViewButtons } from "./save-view-buttons";
 import { gridView, sameAsStored, savedViewHref } from "./saved-view-api";
 import { savedViewCopy, type SavedViewLabels } from "./saved-view-copy";
+import { useListingCellEdit } from "./use-listing-cell-edit";
 
 /** Rows kept when part of the load fails: the first page and a half, so the partial state still spans two pages. */
 const PARTIAL_ROWS = 40;
@@ -36,6 +39,8 @@ export function InventoryGrid({
   savedViews,
   openView,
   viewLabels,
+  listings,
+  door,
 }: {
   title: string;
   headers: Readonly<Record<InventoryField, string>>;
@@ -52,6 +57,10 @@ export function InventoryGrid({
   openView?: SavedView | null;
   /** Words of the saved views, from the label table (needed with `savedViews`). */
   viewLabels?: SavedViewLabels;
+  /** The listings the rows show: with them, price and status are edited in the cell under the permission table (row 4). */
+  listings?: readonly Listing[];
+  /** The save door of those edits; the sample door in memory when absent (row 10 hands in the real one). */
+  door?: ListingSaveDoor;
 }) {
   const router = useRouter();
   const [current, setCurrent] = useState<InventoryState>(state);
@@ -72,45 +81,50 @@ export function InventoryGrid({
   // The same columns on every render: this grid renders again on each change of arrangement (the «changed» mark), and
   // new columns would draw the header cells, with the filter box being typed in, again.
   const columns = useMemo(() => inventoryColumns(headers), [headers]);
+  const edit = useListingCellEdit({ rows, listings, headers, door });
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
-    current === "empty" ? [] : current === "partial" ? rows.slice(0, PARTIAL_ROWS) : rows;
+    current === "empty" ? [] : current === "partial" ? edit.rows.slice(0, PARTIAL_ROWS) : edit.rows;
   return (
-    <DataRegion
-      // Pressing the open entry of the second column again opens it afresh, its unsaved changes dropped.
-      key={`${openView?.id ?? ""}:${place.reopened}`}
-      title={title}
-      columns={columns}
-      rows={shown}
-      status={status}
-      onRetry={() => setCurrent("ready")}
-      record={record}
-      emptyWhy={emptyWhy}
-      initialFilters={filters}
-      initialView={saved}
-      onViewChange={setView}
-      action={
-        savedViews && copy
-          ? {
-              allowed: true,
-              node: (
-                <SaveViewButtons
-                  current={view}
-                  open={openView ?? null}
-                  changed={changed}
-                  taken={savedViews.map((v) => v.name)}
-                  copy={copy}
-                />
-              ),
-            }
-          : undefined
-      }
-      groupBy={INVENTORY_GROUP_BY}
-      emptyAction={
-        <Button variant="outline" onClick={() => router.refresh()}>
-          {reloadLabel}
-        </Button>
-      }
-    />
+    <>
+      {edit.dialogs}
+      <DataRegion
+        // Pressing the open entry of the second column again opens it afresh, its unsaved changes dropped.
+        key={`${openView?.id ?? ""}:${place.reopened}`}
+        title={title}
+        columns={columns}
+        rows={shown}
+        status={status}
+        onRetry={() => setCurrent("ready")}
+        record={record}
+        emptyWhy={emptyWhy}
+        initialFilters={filters}
+        initialView={saved}
+        onViewChange={setView}
+        action={
+          savedViews && copy
+            ? {
+                allowed: true,
+                node: (
+                  <SaveViewButtons
+                    current={view}
+                    open={openView ?? null}
+                    changed={changed}
+                    taken={savedViews.map((v) => v.name)}
+                    copy={copy}
+                  />
+                ),
+              }
+            : undefined
+        }
+        groupBy={INVENTORY_GROUP_BY}
+        emptyAction={
+          <Button variant="outline" onClick={() => router.refresh()}>
+            {reloadLabel}
+          </Button>
+        }
+        cellEdit={edit.cellEdit}
+      />
+    </>
   );
 }
