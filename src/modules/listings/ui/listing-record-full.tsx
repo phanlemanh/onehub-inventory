@@ -3,12 +3,12 @@
 // listing was confirmed, how complete it is, the unit, the listing, and every listing of the unit. Read-only. Blocks
 // follow solution-crm-4 (Hỏi-4 at the scope gate), assembled from what the repo has. Touching an earlier listing turns
 // the whole record to it, the address stays (Hỏi-3).
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
 import { TypedCell } from "@/components/candidate/typed-cell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { EMPTY, formatArea } from "@/lib/format";
+import { EMPTY, formatArea, formatMoney } from "@/lib/format";
 import type {
   ListingFurnished,
   ListingOccupantType,
@@ -118,6 +118,13 @@ export function ListingRecordFull({
 }) {
   const newestId = data.listings[0]?.id ?? view.id;
   const [pickedId, setPickedId] = useState(newestId);
+  const top = useRef<HTMLDivElement>(null);
+  // Turning to another listing changes the card at the head: bring the head back into view so it reads top down.
+  const pick = (id: string) => {
+    setPickedId(id);
+    const body = top.current?.closest<HTMLElement>('[data-slot="record-panel-body"]');
+    if (body) body.scrollTop = 0;
+  };
   const picked = data.listings.find((l) => l.id === pickedId) ?? data.listings[0];
   if (!picked) return null;
   const isNewest = picked.id === newestId;
@@ -153,6 +160,7 @@ export function ListingRecordFull({
   };
   return (
     <div
+      ref={top}
       data-slot="listing-record"
       data-listing-id={view.id}
       data-listing-in-view={picked.id}
@@ -169,7 +177,7 @@ export function ListingRecordFull({
           className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-muted px-3 py-2 text-sm"
         >
           <span>{RECORD_COPY.viewingEarlier(picked.number)}</span>
-          <Button variant="link" size="sm" onClick={() => setPickedId(newestId)}>
+          <Button variant="link" size="sm" onClick={() => pick(newestId)}>
             {RECORD_COPY.backToNewest}
           </Button>
         </div>
@@ -276,14 +284,13 @@ export function ListingRecordFull({
                 variant={l.id === picked.id ? "secondary" : "ghost"}
                 size="sm"
                 aria-current={l.id === picked.id ? "true" : undefined}
-                onClick={() => setPickedId(l.id)}
+                onClick={() => pick(l.id)}
               >
                 {RECORD_COPY.listingNumber(l.number)}
               </Button>
               <TypedCell kind="status" value={l.standardStatus} transaction={l.transaction} />
               <span className="ml-auto text-sm whitespace-nowrap text-muted-foreground tabular-nums">
-                <TypedCell kind="money" value={l.listPrice ?? null} transaction={l.transaction} /> ·{" "}
-                {l.createdOn}
+                {formatMoney(l.listPrice)} · {l.createdOn}
               </span>
             </li>
           ))}

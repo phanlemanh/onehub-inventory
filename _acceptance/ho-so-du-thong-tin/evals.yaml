@@ -81,8 +81,9 @@ evals:
     steps:
       - "Mở /inventory ở 1440, sáng; bấm mã căn có ba lần chào (bài E7 in mã); chụp."
       - "Lặp ở 1024, 414, 360; mỗi khổ chụp sáng và tối."
-      - "Ở 1440 sáng chạm 'Lần 1'; chụp."
-    expected: "Ở mỗi ảnh đọc được từ trên xuống: câu xác nhận · Mức đủ thông tin · Căn · Lần chào · Các lần chào; chữ không chồng chữ, không tràn ngang; ô 'Chưa có' nhạt hơn giá trị thật; ảnh tối đọc được; ở 414 và 360 thẻ căn ở đầu, ba thông số Diện tích · Phòng ngủ · Hướng."
+      - "Ở mỗi khổ, sáng, cuộn thân hồ sơ tới cuối (khối Các lần chào); chụp thêm một ảnh — hồ sơ dài hơn khung nhìn nên đọc từ trên xuống qua hai ảnh."
+      - "Ở 1440 sáng chạm 'Lần 1'; chụp (thẻ căn ở đầu phải thấy lại, với giá của Lần 1)."
+    expected: "Ở mỗi khổ, ảnh đầu và ảnh cuối ghép lại đọc được từ trên xuống: câu xác nhận · Mức đủ thông tin · Căn · Lần chào · Các lần chào; chữ không chồng chữ, không tràn ngang; ô 'Chưa có' nhạt hơn giá trị thật; ảnh tối đọc được; ở 414 và 360 thẻ căn ở đầu, ba thông số Diện tích · Phòng ngủ · Hướng."
     evidence_required: [run_id, screenshot, observed, verifier, verified_at]
 
   - id: E11

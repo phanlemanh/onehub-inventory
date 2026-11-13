@@ -22,6 +22,7 @@ import {
 
 beforeAll(() => {
   Element.prototype.getAnimations ??= () => [];
+  Element.prototype.scrollIntoView ??= () => {};
 });
 afterEach(cleanup);
 

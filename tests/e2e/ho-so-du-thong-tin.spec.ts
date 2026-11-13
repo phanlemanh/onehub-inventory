@@ -6,6 +6,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { formatMoney } from "../../src/lib/format";
 import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog/sample";
 import { listingsOfUnit } from "../../src/modules/listings/record";
 import {
@@ -22,6 +23,21 @@ const all = [...current.listings, ...earlier.listings];
 const links = [...current.listingUnits, ...earlier.listingUnits];
 const listingsOf = (id: string) =>
   listingsOfUnit(current.listingUnits.find((x) => x.listingId === id)!.upi, all, links);
+/**
+ * The listings of a unit by creation time, newest first, worked out here from the sample data on its own (not through
+ * the record's sort): the order the record must show, and «Lần k» counted from the oldest.
+ */
+function expectedOrder(id: string): { id: string; label: string; price: number | undefined }[] {
+  const upi = current.listingUnits.find((x) => x.listingId === id)!.upi;
+  const onUnit = new Set(links.filter((x) => x.upi === upi).map((x) => x.listingId));
+  const mine = all.filter((l) => onUnit.has(l.id));
+  const created = (l: (typeof all)[number]) => Date.parse(l.originalEntryTimestamp!);
+  return mine
+    .map((l) => ({ l, older: mine.filter((o) => created(o) < created(l)).length }))
+    .sort((a, b) => b.older - a.older)
+    .map(({ l, older }) => ({ id: l.id, label: `Lần ${older + 1}`, price: l.listPrice }));
+}
+
 /** A unit with three listings, and one with a single listing: read from the sample data, never typed by hand. */
 const THREE = current.listings.find((l) => listingsOf(l.id).length === 3)!.id;
 const ONE = current.listings.find((l) => listingsOf(l.id).length === 1)!.id;
@@ -59,9 +75,25 @@ async function keptErrors(page: Page): Promise<string[]> {
   return got.current === got.numbers[0] && note === 0 ? [] : ["old listing kept across units"];
 }
 
-function listedErrors(got: { numbers: string[] }, n: number): string[] {
-  const want = Array.from({ length: n }, (_, i) => `Lần ${n - i}`);
-  return got.numbers.join() === want.join() ? [] : ["listings of unit not newest first"];
+/** The lines of the list against the creation order: each line names its listing and its number. */
+async function orderErrors(page: Page, id: string): Promise<string[]> {
+  const shown = await record(page).evaluate((el) =>
+    [...el.querySelectorAll('[data-slot="listings-of-unit"] li')].map((li) => ({
+      id: li.getAttribute("data-listing-id") ?? "",
+      label: li.querySelector("button")?.textContent ?? "",
+    })),
+  );
+  const want = expectedOrder(id).map(({ id: i, label }) => ({ id: i, label }));
+  return JSON.stringify(shown) === JSON.stringify(want)
+    ? []
+    : ["listings of unit not newest first"];
+}
+
+/** The card's price against the price of the listing in view, from the sample data. */
+async function priceErrors(page: Page, price: number | undefined): Promise<string[]> {
+  return (await text(page, "listing-card-price")).trim() === formatMoney(price)
+    ? []
+    : ["old listing price not shown"];
 }
 
 test.describe("E7 · every listing of the unit, newest first", () => {
@@ -75,22 +107,24 @@ test.describe("E7 · every listing of the unit, newest first", () => {
   test("three listings, turn to Lần 1 and back, the address stays", async ({ page }) => {
     const data = records[THREE]!;
     await openRecord(page, THREE);
-    const got = await listed(page);
-    expect(listedErrors(got, 3)).toEqual([]);
-    expect(got.current).toBe("Lần 3");
+    const order = expectedOrder(THREE);
+    expect(await orderErrors(page, THREE)).toEqual([]);
+    expect((await listed(page)).current).toBe(order[0]!.label);
     await expect(record(page).locator('[data-slot="listings-of-unit"] h3')).toHaveText(
       "Các lần chào của căn · 3",
     );
     const address = page.url();
-    const newestPrice = await text(page, "listing-card-price");
+    expect(await priceErrors(page, order[0]!.price)).toEqual([]);
 
     await record(page).getByRole("button", { name: "Lần 1" }).click();
     const first = data.listings[2]!;
+    expect(order[2]!.id).toBe(first.id);
     await expect(record(page).locator('[data-slot="listing-earlier-note"]')).toContainText(
       "Đang xem lần chào cũ · Lần 1",
     );
-    const priceNow = await text(page, "listing-card-price");
-    if (priceNow === newestPrice) throw new Error("old listing price not shown");
+    expect(await priceErrors(page, order[2]!.price)).toEqual([]);
+    // The head of the record comes back into view with the earlier listing's price.
+    await expect(record(page).locator('[data-slot="listing-card"]')).toBeInViewport();
     await expect(
       record(page).locator('[data-slot="listing-card-status"] [data-status]'),
     ).toHaveAttribute("data-status", first.standardStatus);
@@ -101,7 +135,7 @@ test.describe("E7 · every listing of the unit, newest first", () => {
     expect(page.url()).toBe(address);
 
     await record(page).getByRole("button", { name: "Về lần mới nhất" }).click();
-    expect(await text(page, "listing-card-price")).toBe(newestPrice);
+    expect(await priceErrors(page, order[0]!.price)).toEqual([]);
     await expect(record(page).locator('[data-slot="listing-earlier-note"]')).toHaveCount(0);
   });
 
@@ -136,22 +170,24 @@ test.describe("E7 · every listing of the unit, newest first", () => {
     await expect(record(page).locator('[data-slot="listings-of-unit"] h3')).toHaveText(
       "Các lần chào của căn · 1",
     );
-    expect(listedErrors(await listed(page), 1)).toEqual([]);
+    expect(await orderErrors(page, ONE)).toEqual([]);
   });
 
-  test("break: listings in oldest-first order are named", async ({ page }) => {
+  test("break: listings sorted oldest first, still numbered by position, are named", async ({
+    page,
+  }) => {
     await openRecord(page, THREE);
-    const reversed = await record(page).evaluate((el) => {
-      const ul = el.querySelector('[data-slot="listings-of-unit"] ul')!;
-      for (const li of [...ul.children].reverse()) ul.appendChild(li);
-      return [...ul.querySelectorAll("li button")].map((b) => b.textContent ?? "");
+    // A sort turned the wrong way: the listings come oldest first while «Lần 3, 2, 1» still counts down by position.
+    await record(page).evaluate((el) => {
+      const lines = [...el.querySelectorAll('[data-slot="listings-of-unit"] li')];
+      const ids = lines.map((li) => li.getAttribute("data-listing-id")).reverse();
+      lines.forEach((li, i) => li.setAttribute("data-listing-id", ids[i] ?? ""));
     });
-    expect(listedErrors({ numbers: reversed }, 3)).toEqual(["listings of unit not newest first"]);
+    expect(await orderErrors(page, THREE)).toEqual(["listings of unit not newest first"]);
   });
 
   test("break: an old listing whose price never shows is named", async ({ page }) => {
     await openRecord(page, THREE);
-    const newestPrice = await text(page, "listing-card-price");
     // Freeze the card's price, the way a record that keeps the newest listing's price would show it.
     await record(page).evaluate((el) => {
       const price = el.querySelector('[data-slot="listing-card-price"]')!;
@@ -159,9 +195,9 @@ test.describe("E7 · every listing of the unit, newest first", () => {
       price.replaceWith(frozen);
     });
     await record(page).getByRole("button", { name: "Lần 1" }).click();
-    const priceNow = await text(page, "listing-card-price");
-    const message = priceNow === newestPrice ? "old listing price not shown" : "";
-    expect(message).toBe("old listing price not shown");
+    expect(await priceErrors(page, expectedOrder(THREE)[2]!.price)).toEqual([
+      "old listing price not shown",
+    ]);
   });
 });
 
@@ -203,18 +239,16 @@ test.describe("E8 · the record only reads", () => {
     expect(await readOnlyErrors(page)).toEqual([]);
     expect(writes.length ? "write request while reading record" : "").toBe("");
     const headers = await page.locator('[data-slot="data-region"] thead th').allInnerTexts();
-    expect(headers.map((h) => h.trim()).filter(Boolean)).toEqual(
-      expect.arrayContaining([
-        "Căn",
-        "Toà",
-        "Dự án",
-        "Trạng thái",
-        "Giá chào",
-        "Diện tích",
-        "Phòng ngủ",
-        "Xác nhận lúc",
-      ]),
-    );
+    expect(headers.map((h) => h.trim()).filter((h) => h !== "" && h !== "#")).toEqual([
+      "Căn",
+      "Toà",
+      "Dự án",
+      "Trạng thái",
+      "Giá chào",
+      "Diện tích",
+      "Phòng ngủ",
+      "Xác nhận lúc",
+    ]);
     await expect(page.locator('[data-slot="data-region"]')).toContainText("60 dòng");
   });
 
