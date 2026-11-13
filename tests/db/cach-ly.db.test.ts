@@ -322,6 +322,12 @@ describe("isolation runner after row 7c keeps everything the main branch measure
   });
 });
 
+/**
+ * A whole runner run (35 cases, 31 scratch databases) takes about a minute alone and longer when a grading round runs
+ * other database commands on the lane at the same time (row 7c, round 1: 81 s) — past vitest's 60 s default.
+ */
+const RUNNER_TIMEOUT = 300_000;
+
 describe("isolation runner names every broken break file (E9b)", () => {
   function runRunner(tests: string): { code: number; out: string } {
     try {
@@ -347,16 +353,20 @@ describe("isolation runner names every broken break file (E9b)", () => {
     return dir;
   }
 
-  it(`control: an unchanged copy passes with ${CURRENT_CASES.length} cases`, () => {
-    const dir = copyTests();
-    try {
-      const r = runRunner(dir);
-      expect(r.code, r.out).toBe(0);
-      expect(r.out.trimEnd().split("\n").at(-1)).toBe(LAST_LINE);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
+  it(
+    `control: an unchanged copy passes with ${CURRENT_CASES.length} cases`,
+    () => {
+      const dir = copyTests();
+      try {
+        const r = runRunner(dir);
+        expect(r.code, r.out).toBe(0);
+        expect(r.out.trimEnd().split("\n").at(-1)).toBe(LAST_LINE);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    },
+    RUNNER_TIMEOUT,
+  );
 
   it("a tag other than lowercase letters and digits is refused before any database is made", () => {
     try {
@@ -375,31 +385,35 @@ describe("isolation runner names every broken break file (E9b)", () => {
     }
   });
 
-  it("a deleted, two harmless and an unparsable break file are each named", () => {
-    const dir = copyTests();
-    try {
-      unlinkSync(join(dir, "pha-thu/cap-trigger-public.sql"));
-      writeFileSync(join(dir, "pha-thu/dang-xem-vat-chat.sql"), "select 1;\n");
-      writeFileSync(
-        join(dir, "pha-thu/ham-trigger-dac-quyen.sql"),
-        "create functio public.hong(;\n",
-      );
-      writeFileSync(join(dir, "pha-thu/dang-xem-chi-xoa.sql"), "select 1;\n");
-      writeFileSync(join(dir, "pha-thu/cap-vai-chu.sql"), "select 1;\n");
-      const r = runRunner(dir);
-      expect(r.code).not.toBe(0);
-      expect(r.out).not.toContain(LAST_LINE);
-      expect(r.out.split("\n").filter((l) => l.startsWith("HỎNG pha-thu-"))).toEqual([
-        "HỎNG pha-thu-quyen-nguy-hiem: cap-trigger-public: không dựng được bản phá",
-        "HỎNG pha-thu-dang-xem-vuot: dang-xem-vat-chat: bộ kiểm vẫn xanh trên bản phá",
-        "HỎNG pha-thu-ham-dac-quyen: ham-trigger-dac-quyen: không dựng được bản phá",
-        "HỎNG pha-thu-dang-xem-chi-ghi: dang-xem-chi-xoa: bộ kiểm vẫn xanh trên bản phá",
-        "HỎNG pha-thu-vai-dang-nhap: cap-vai-chu: bộ kiểm vẫn xanh trên bản phá",
-      ]);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
+  it(
+    "a deleted, two harmless and an unparsable break file are each named",
+    () => {
+      const dir = copyTests();
+      try {
+        unlinkSync(join(dir, "pha-thu/cap-trigger-public.sql"));
+        writeFileSync(join(dir, "pha-thu/dang-xem-vat-chat.sql"), "select 1;\n");
+        writeFileSync(
+          join(dir, "pha-thu/ham-trigger-dac-quyen.sql"),
+          "create functio public.hong(;\n",
+        );
+        writeFileSync(join(dir, "pha-thu/dang-xem-chi-xoa.sql"), "select 1;\n");
+        writeFileSync(join(dir, "pha-thu/cap-vai-chu.sql"), "select 1;\n");
+        const r = runRunner(dir);
+        expect(r.code).not.toBe(0);
+        expect(r.out).not.toContain(LAST_LINE);
+        expect(r.out.split("\n").filter((l) => l.startsWith("HỎNG pha-thu-"))).toEqual([
+          "HỎNG pha-thu-quyen-nguy-hiem: cap-trigger-public: không dựng được bản phá",
+          "HỎNG pha-thu-dang-xem-vuot: dang-xem-vat-chat: bộ kiểm vẫn xanh trên bản phá",
+          "HỎNG pha-thu-ham-dac-quyen: ham-trigger-dac-quyen: không dựng được bản phá",
+          "HỎNG pha-thu-dang-xem-chi-ghi: dang-xem-chi-xoa: bộ kiểm vẫn xanh trên bản phá",
+          "HỎNG pha-thu-vai-dang-nhap: cap-vai-chu: bộ kiểm vẫn xanh trên bản phá",
+        ]);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    },
+    RUNNER_TIMEOUT,
+  );
 });
 
 // Row 7b (_acceptance/cach-ly-dang-xem-chi-ghi/evals.yaml E3): the hole case 20 closes is real, not a false alarm.
