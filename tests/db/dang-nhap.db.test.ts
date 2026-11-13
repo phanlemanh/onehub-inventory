@@ -34,7 +34,7 @@ interface World {
 async function world(suffix: string, breakFile?: string): Promise<World> {
   const db = await scratchDb(suffix, breakFile);
   const fx = await seed(db.owner);
-  const pool = createPool(db.url) as World["pool"];
+  const pool = createPool(db.appUrl) as World["pool"];
   const { sender, sent } = captureSender();
   const deps: LoginDeps = { pool, secret: "test-secret-dang-nhap", sender };
   return { db, pool, fx, mail: sent, deps, h: createAuthHandlers(() => deps) };
@@ -251,7 +251,7 @@ describe("dang-nhap (Postgres của dãy)", () => {
     const { sender, sent } = captureSender();
     const env = {
       NODE_ENV: "production",
-      DATABASE_URL: w.db.url,
+      DATABASE_URL: w.db.appUrl,
       AUTH_SECRET: "x".repeat(40),
       MAIL_FROM: "a@b.test",
       APP_URL: "https://app.example.test",
