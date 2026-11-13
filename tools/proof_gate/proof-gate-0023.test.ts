@@ -17,7 +17,12 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { crc32, deflateSync } from "node:zlib";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// Each case runs the proof gate as a child process, up to 16 in a row: under a loaded machine the 2 × 8 matrix hit the
+// 5 s default during row 4's evidence round (1.2 s alone at load 11). A ceiling for this file only, as row 6 did for the
+// grid tests; no assertion changes.
+vi.setConfig({ testTimeout: 20_000 });
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const SCRIPT = join(ROOT, "tools/proof_gate/check.py");
