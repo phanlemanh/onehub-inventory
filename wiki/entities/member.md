@@ -49,3 +49,5 @@ nhiều sàn; mỗi sàn là một dòng riêng.
 Bảng thành viên (chỉ ai thuộc sàn nào) có từ hàng 8, 11/11/2026. Vai, tên theo sàn, lời mời từ hàng 9, 11/11/2026 (hồ sơ
 `_acceptance/moi-nguoi-gan-vai/`, quyết định [0022](../decisions/0022-moi-nguoi-gan-vai.md)). Quyền quản trị người
 chuyển vào bảng quyền chung ở hàng 9a, 12/11/2026 (hồ sơ `_acceptance/bang-quyen-theo-vai/`).
+
+Hàng 9e, 12/11/2026: mục Thành viên của thanh bên và màn Thành viên hiện theo ô `listMembers` của bảng quyền, không so tên vai; nút Mời và Đổi vai đi qua `PermittedAction`; máy chủ trả 403 thì hộp thoại hiện câu «Không đủ quyền làm việc này» và trang làm mới (hồ sơ `_acceptance/bo-nut-theo-quyen/`, quyết định [0025](../decisions/0025-bo-nut-theo-quyen.md)).

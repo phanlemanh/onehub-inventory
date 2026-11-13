@@ -343,6 +343,7 @@ describe("màn cần đăng nhập không còn danh sách bỏ qua", () => {
       expect(r.lines.filter((l) => l.startsWith("bo qua: "))).toEqual([
         "bo qua: contacts — planned",
         "bo qua: proto — dev",
+        "bo qua: proto-bo-nut — dev",
       ]);
     },
     SLOW,

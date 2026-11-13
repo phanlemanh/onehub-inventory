@@ -243,3 +243,8 @@ decisions:
     kind: closed
     source: "design/behaviors.md"
     check: "test:tests/grid.test.tsx"
+  - id: action-buttons
+    layer: patterns
+    kind: closed
+    source: "design/behaviors.md, mục «Bộ nút theo quyền» (hàng 9e, chủ kho chọn ở Cổng Phạm vi 2026-11-12)"
+    check: "test:src/components/candidate/row-actions.test.tsx"

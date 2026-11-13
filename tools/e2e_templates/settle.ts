@@ -89,6 +89,10 @@ export const CHO_TESTS: Readonly<Record<string, readonly string[]>> = {
     "the sheet check fails while the sheet is still open",
   ],
   "tests/e2e-db/members.spec.ts": ["moi-nguoi-va-dang-nhap", "doi-vai-thanh-ben", "khong-du-quyen"],
+  "tests/e2e-db/bo-nut-members.spec.ts": [
+    "thanh-ben-theo-bang · man-thanh-vien-theo-bang",
+    "tu-choi-403-cau-rieng",
+  ],
   "tests/e2e/settle.spec.ts": [
     "ngan mo",
     "ngan chua dung",

@@ -51,6 +51,13 @@ export const LABELS = {
   ChangeRoles: {"pref": "Đổi vai"},
   Action: {"pref": "Thao tác"},
   Scope: {"pref": "Phạm vi"},
+  Edit: {"pref": "Sửa"},
+  CreateListing: {"pref": "Thêm căn"},
+  RemoveListing: {"pref": "Xoá căn"},
+  CreateContact: {"pref": "Thêm liên hệ"},
+  RemoveContact: {"pref": "Xoá liên hệ"},
+  MergeContacts: {"pref": "Gộp liên hệ"},
+  EraseContactPersonalData: {"pref": "Xoá tên và số"},
 } as const;
 
 export type ConceptCode = keyof typeof LABELS;
