@@ -33,6 +33,7 @@ evals:
     criterion: AC-1
     executor: script
     cmd: config:executors.script.ci_db_thu
+    long_running: 90
     layer: backend-effect
     paths: [db/scripts/**, mk/db.mk, playwright.db.config.ts, playwright.config.ts, tests/e2e-db/**, tests/db/**, tests/fixtures/**]
     expected: "exit 0; trong phần lượt xanh: sáu dòng 'ci-db: <bước> đạt (mã 0, …)' đúng thứ tự chuan-bi, cach-ly, bai-db, co-phien, khong-phien, dem; bước dem in 'tep: <tệp> dat <n>' với n ≥ 1 cho đủ 8 tệp tests/db và 8 tệp spec đã ghim (gồm goc-nhin.spec.ts, bo-nut-members.spec.ts, vai-noi.spec.ts), đọc từ báo cáo JSON; có dòng 'bo qua can dang nhap: 0'; dòng 'ci-db: 6/6 bước đạt'. Chiều đỏ của đếm theo tệp: E4 (mọi bài của một tệp đổi thành skipped → 'tep khong co bai dat: <tệp>')"
@@ -42,6 +43,7 @@ evals:
     criterion: AC-2
     executor: script
     cmd: config:executors.script.ci_db_thu
+    long_running: 90
     layer: backend-effect
     paths: [db/scripts/**, db/tests/**, playwright.db.config.ts]
     expected: "exit 0; phần lượt xanh có 'cach-ly: <n> ca đạt, vai quy_hang_app, nối bằng quy_hang_login', 'phiên đăng nhập: quy_hang_login', và bài tests/e2e-db/vai-noi.spec.ts đạt (tập vai kết nối của máy chủ dev đọc từ pg_stat_activity = {quy_hang_login}); phần 'pha may-chu-chu' (bản sao playwright.db.config.ts đặt DATABASE_URL của máy chủ dev bằng postgres, chạy riêng vai-noi.spec.ts) đỏ với 'may chu dev noi bang vai khac quy_hang_login: postgres'; phần 'pha vai-chu' (bản sao ci-db.sh nối phần phiên bằng -U postgres, chỉ chạy chuan-bi cach-ly) có 'ci-db: cach-ly HỎNG', dòng chứa 'HỎNG dang-nhap-khong-ve-vai-chu', dòng cuối chứa 'HỎNG: cach-ly'; dòng cuối ci-thu có 'pha vai-chu do' và 'pha may-chu-chu do'"
@@ -68,6 +70,7 @@ evals:
     criterion: AC-5
     executor: script
     cmd: config:executors.script.ci_db_thu
+    long_running: 90
     layer: backend-effect
     paths: [db/scripts/**, mk/db.mk, _acceptance/ci-co-postgres/ci-yml.patch, tests/**, playwright.db.config.ts, playwright.config.ts]
     expected: "exit 0; ci-thu in 'ban sao nong: depth 1' (git rev-parse --is-shallow-repository = true trong bản sao), 'postgres: <ảnh> (tu ban va)', rồi lượt xanh 'ci-db: 6/6 bước đạt'; 'make check' trong cùng bản sao nông thoát 0 ('check xanh'); dòng 'ci-thu: xanh <phút> phút' với <phút> dưới 2/3 trần ('tran <m> phut' đọc từ timeout-minutes của bản vá — ci-thu thoát khác 0 khi vượt); biên trần: ca dưới ngưỡng (1,9 phút với trần 3) KHÔNG đỏ, ca từ 2/3 trần (2,5 phút) đỏ 'vuot 2/3 tran: 2.5 / 3' — đo bằng 'ci-thu.sh --kiem-tran' trong tests/ci-yml-patch.test.ts (E9)"
@@ -77,6 +80,7 @@ evals:
     criterion: AC-6
     executor: script
     cmd: config:executors.script.ci_db_thu
+    long_running: 90
     layer: backend-effect
     paths: [db/scripts/**, tests/e2e-db/**, playwright.db.config.ts]
     expected: "exit 0; phần 'pha bo-phien' (phien.setup.ts của bản sao ghi trạng thái trình duyệt rỗng, BUOC='co-phien khong-phien dem') có 'ci-db: co-phien HỎNG', ít nhất một dòng bắt đầu 'roi: ', dòng cuối của make chứa 'HỎNG: co-phien' và mã khác 0; dòng cuối ci-thu 'ci-thu: xanh <phút> phút · pha bo-phien do · pha vai-chu do'"
@@ -103,6 +107,7 @@ evals:
     criterion: AC-8
     executor: script
     cmd: config:executors.script.ci_db_thu
+    long_running: 90
     layer: backend-effect
     paths: [tests/e2e-db/don-dung-tam.ts, playwright.config.ts, playwright.db.config.ts]
     expected: "exit 0; sau lượt xanh trong bản sao, ci-thu in 'thu muc dung tam con lai: 0' cho cả node_modules/.cache/onehub-e2e và onehub-e2e-db của bản sao"
