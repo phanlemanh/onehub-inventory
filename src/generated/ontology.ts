@@ -170,6 +170,21 @@ export interface SavedView {
   updatedAt: string;
 }
 
+/** One link a company member sent to one recipient, carrying one or more listings; the customer opens it without signing in. */
+export interface ShareLink {
+  id: string;
+  /** id of Company */
+  companyId: string;
+  recipientName?: string;
+  listingCount: number;
+  /** ISO datetime */
+  sentAt: string;
+  openCount: number;
+  interestCount: number;
+  /** ISO datetime */
+  lastOpenedAt?: string;
+}
+
 /** A stack (trục) of one tower; a local extension, as in onehub-invest; shared catalog, no companyId. */
 export interface Stack {
   stackKey: string;
@@ -1142,6 +1157,7 @@ export function can(role: Role, action: ActionSpec): boolean {
 export const PII_FIELDS: Readonly<Record<string, readonly string[]>> = {
   Contact: ["fullName", "phones"],
   Member: ["name"],
+  ShareLink: ["recipientName"],
 };
 
 /** Copy of `record` with personal data replaced: use before logging or agent output. */
