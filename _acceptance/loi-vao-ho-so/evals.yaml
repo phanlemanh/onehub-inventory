@@ -79,3 +79,11 @@ evals:
       - "At 1440x900 light: open {url}/inventory?ho-so=khong-co → evidence/duong-dan-cu-1440.png"
     expected: "Nút «Chép đường dẫn» thấy rõ ở đầu hồ sơ, không đẩy «Trước», «Sau», «Đóng» xuống dòng ở 1024 và 360; báo «Đã chép đường dẫn» thấy rõ; ô ⌘K có chỗ gõ và gợi ý thấy rõ, mỗi gợi ý ghi rõ loại, không bị mép màn che ở 360; mã lạ cho trạng thái không dòng nào khớp quen thuộc của Bảng hàng, mã thấy ở đầu cột Căn; đường dẫn cũ cho Bảng hàng bình thường kèm báo; không chữ đè nhau, không cuộn ngang, chữ đọc được ở cả sáng và tối"
     evidence_required: [run_id, screenshot, observed]
+
+  - id: E10
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi (Bảng hàng vẫn dựng trong DataRegion, ô ⌘K nằm ở thanh trên của App Shell, không dựng lưới ngoài khuôn)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
