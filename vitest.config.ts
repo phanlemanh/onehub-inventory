@@ -5,6 +5,8 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   test: {
+    // Tests failed falsely on the 5 s default while several lanes ran side by side; this ceiling only catches a hung test.
+    testTimeout: 20_000,
     exclude: ["tests/e2e/**", "tests/e2e-db/**", "tests/db/**", "node_modules/**", ".next/**"],
     coverage: {
       enabled: true,
