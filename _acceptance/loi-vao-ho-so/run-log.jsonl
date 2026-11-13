@@ -41,3 +41,4 @@
 {"ts":"2026-11-13T06:43:32Z","sha":"ad1efd2167f010ca420818997128b3094b5eff40","round":2,"kind":"baseline","evals_hash":"cb94310e0bde12a22b324823db9c7aa99dce7b7e32b8ee09ccd88323ac396ade","non_discriminating":[]}
 {"ts":"2026-11-13T06:43:32Z","sha":"ad1efd2167f010ca420818997128b3094b5eff40","round":2,"kind":"round-tally","verdict":"PASS","expected":4,"returned":4,"blocked":0}
 {"ts":"2026-11-13T06:43:32Z","sha":"ad1efd2167f010ca420818997128b3094b5eff40","round":2,"kind":"chot-truong-nguoi","human_signoff":0,"human_override":0,"bypass_ack":0,"verified_at":4}
+{"kind":"thuoc-vat","ts":"2026-11-13T06:52:29Z","round":2,"san":"7ebbb7bfd08ee8dfc733ef9953b41b4cce10f44a","vat":[0,0],"thuoc":[9,0],"ho_so":[306,1],"nhat":2,"lan":0,"tep_thuoc":["_acceptance/loi-vao-ho-so/evals.yaml"]}
