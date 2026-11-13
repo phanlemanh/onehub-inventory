@@ -717,9 +717,26 @@ export const REGION: Recipe[] = [
 // ---- which grid screens may lack a region -----------------------------------------------------------------------
 
 /** Grid screens allowed to have no data region yet, each with why. Remove a line when the screen builds its region. */
-export const NO_REGION_YET: Record<string, string> = {
-  sent: "trang chỉ có đầu màn, vùng Lưới dựng khi màn Đã gửi tới lượt",
+export const NO_REGION_YET: Record<string, string> = {};
+
+/**
+ * Grid screens that do not run the search case, each with why (supervisor ruling D-1311-7). The region search box is
+ * dropped across the grid family by the owner's decision of 2026-11-13; row 2e removes the search case and this list.
+ */
+export const NO_SEARCH_CASE: Record<string, string> = {
+  sent: "ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này",
 };
+
+/** Why a region case does not run on a screen, or null when it runs: only the search case can be listed out. */
+export function regionCaseSkip(
+  id: string,
+  recipeId: string,
+  listed: Record<string, string> = NO_SEARCH_CASE,
+): string | null {
+  if (recipeId !== "tim") return null;
+  const why = listed[id];
+  return why === undefined ? null : `khong chay ca tim — ${why}`;
+}
 
 export type GridVerdict = { run: true } | { run: false; skip: string };
 

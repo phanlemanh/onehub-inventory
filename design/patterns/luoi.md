@@ -12,9 +12,7 @@ mau_dang_chay:
   tep: "src/app/(app)/proto/[slug]/grid-showcase.tsx"
 khe_bat_buoc: [title, columns, rows, status]
 cam_ngoai_khuon: [DataGrid, DataGridTable, Table]
-ngoai_le:
-  - tep: "src/app/(app)/sent/page.tsx"
-    ly_do: trang chỉ có đầu màn, vùng Lưới dựng khi màn Đã gửi tới lượt
+ngoai_le: []
 nhan_viec: Đầu chủ xem, lọc và sửa danh sách hàng thay cho bảng tính
 ---
 

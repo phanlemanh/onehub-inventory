@@ -366,3 +366,38 @@ concepts:
     own: true
     pref: Báo sai thông tin
     en: Report wrong details
+  ShareLink:
+    kind: entity
+    own: true
+    pref: Link đã gửi
+    en: Sent link
+  RecipientName:
+    kind: field
+    own: true
+    pref: Người nhận
+    en: Recipient
+  ListingCount:
+    kind: field
+    own: true
+    pref: Số căn
+    en: Units
+  SentAt:
+    kind: field
+    own: true
+    pref: Gửi lúc
+    en: Sent at
+  OpenCount:
+    kind: field
+    own: true
+    pref: Lượt mở
+    en: Opens
+  InterestCount:
+    kind: field
+    own: true
+    pref: Quan tâm
+    en: Interested
+  LastOpenedAt:
+    kind: field
+    own: true
+    pref: Mở gần nhất
+    en: Last opened

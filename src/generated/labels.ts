@@ -66,6 +66,13 @@ export const LABELS = {
   EraseContactPersonalData: {"pref": "Xoá tên và số"},
   AskListAgent: {"pref": "Hỏi đầu chủ"},
   ReportUnitError: {"pref": "Báo sai thông tin"},
+  ShareLink: {"pref": "Link đã gửi"},
+  RecipientName: {"pref": "Người nhận"},
+  ListingCount: {"pref": "Số căn"},
+  SentAt: {"pref": "Gửi lúc"},
+  OpenCount: {"pref": "Lượt mở"},
+  InterestCount: {"pref": "Quan tâm"},
+  LastOpenedAt: {"pref": "Mở gần nhất"},
 } as const;
 
 export type ConceptCode = keyof typeof LABELS;
