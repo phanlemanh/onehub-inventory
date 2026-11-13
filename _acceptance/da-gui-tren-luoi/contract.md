@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: [sent]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-13
 design_doc: _acceptance/da-gui-tren-luoi/design.md
@@ -116,3 +116,12 @@ Màn phủ trục C bằng ý định. [CE chưa kiểm chứng]: trục C chưa
 - Bảng Vai × Màn là ý định như của Bảng hàng; ai được thấy tên người nhận (dữ liệu cá nhân) với dữ liệu thật do bảng
   quyền của hàng 18 quyết, không lấy bảng này làm lời duyệt (phản biện, P1).
 - Thứ tự gộp: hàng 2c gộp trước; sửa lưới dùng chung (AC-9) làm sau cùng trên cây đã gộp main có 2c.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-13:
+  - Ngoài-1: Ảnh «rê chuột lên tên dài» ở khổ 360 giống hệt ảnh thường, nên hồ sơ không cho thấy gợi ý đọc đủ tên.
+  - Ngoài-2: Câu «không lỗi mạng, không lỗi trình duyệt» của bước chụp ảnh không kèm bản ghi để kiểm lại.
+  - Ngoài-4: Ảnh rê chuột lên tên dài là bản sao của ảnh thường (lượt soát thứ hai nêu lại Ngoài-1).
+  - Ngoài-5: Kết luận không lỗi mạng là câu viết tay, không có nhật ký thật (lượt soát thứ hai nêu lại Ngoài-2).
+  - Ngoài-6: Ảnh rê chuột không chứng minh phần đọc đủ tên (lượt soát thứ ba nêu lại Ngoài-1).
+  - Ngoài-7: Một câu «không có lỗi» đứng một mình, không chứng tỏ bộ ghi đã chạy (lượt soát thứ ba nêu lại Ngoài-2).
+  - Ngoài-8: Quy tắc khi nào màn hiện trạng thái thử nghiệm có hai bản giống nhau, ở Bảng hàng và ở Đã gửi.
+  - Ngoài-9: Phần dựng link mẫu và kiểm luật link lấy ra qua cửa giao diện của mô-đun Chia sẻ, chưa qua cửa luật thuần.

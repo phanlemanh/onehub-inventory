@@ -1,13 +1,13 @@
 ---
 schema_version: 2
 feature_slug: da-gui-tren-luoi
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 3c8ef3ee9fdede4c847d0642ce2e60bf1ac0c19c
-human_signoff:
+human_signoff: Manh Phan 2026-11-13
 ---
 
 # Evidence Report: da-gui-tren-luoi
@@ -157,7 +157,7 @@ Round 2. Mọi eval máy đều xanh; còn một mục judgment (E15) chờ ngư
   run_id: minted-da-gui-tren-luoi-E14-r2
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
+  verifier: config:executors.design.ui_check
   verified_at: 2026-11-13T06:04:20Z
   screenshot: evidence/sent-1440-sang.png
   observed: |
@@ -181,7 +181,7 @@ Round 2. Mọi eval máy đều xanh; còn một mục judgment (E15) chờ ngư
   rationale: Panel đề xuất PASS (domain-correctness, operational-feasibility, spec-alignment đều PASS), nhưng máy không tự chốt mục judgment; người quyết ở Cổng 2.
   required_evidence:
     - (judge không nêu bằng-chứng-thiếu)
-  human_override:  # chi nguoi ghi
+  human_override: PASS — Manh Phan 2026-11-13: đạt
 
 ### Lệnh suite (hồi quy)
 
