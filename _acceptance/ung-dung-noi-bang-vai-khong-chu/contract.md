@@ -5,9 +5,9 @@ slug: ung-dung-noi-bang-vai-khong-chu
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config]
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-13
 design_doc: _acceptance/ung-dung-noi-bang-vai-khong-chu/design.md
 ---
 
