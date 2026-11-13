@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: ad1efd2167f010ca420818997128b3094b5eff40
+verified_commit: c7be718fd5f594c60970622c9c4bd61f931c0b7a
 human_signoff: Manh Phan 2026-11-13
 ---
 
@@ -173,3 +173,7 @@ none — every multi-run eval is uniform
 
 Round 1: grading round recorded; the dev-only badge was hidden in the screenshot steps and E9 was to be re-captured.
 Round 2: E9 re-captured (frames 1-19) and the three suite commands re-run; E1-E8 and E10 carried from round 1 because the delta does not touch their paths.
+
+### Re-pin lần 1 — 2026-11-13, do gộp nhánh chính (vai đăng nhập, hàng 1s) vào nhánh trước khi gộp PR #46
+run_id: repin-20261113T090923Z-56995
+sha: c7be718fd5f594c60970622c9c4bd61f931c0b7a · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng · ngoài làn máy: E9
