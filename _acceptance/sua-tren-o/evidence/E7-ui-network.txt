@@ -1,5 +1,9 @@
-# E7-ui network/console (Playwright, http://127.0.0.1:3487)
-1440-sang unit=1101 before=2,71 tỷ afterEnter=2,8 tỷ toast@1.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 1101 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"] toast@11.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 1101 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"] retryBtns=1 cellAfter=2,8 tỷ
-1440-toi unit=1101 before=2,71 tỷ afterEnter=2,8 tỷ toast@1.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 1101 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"] toast@11.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 1101 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"] retryBtns=1 cellAfter=2,8 tỷ
-1024-sang unit=1101 before=2,71 tỷ afterEnter=2,8 tỷ toast@1.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 1101 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"] toast@11.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 1101 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"] retryBtns=1 cellAfter=2,8 tỷ
-1024-toi unit=1101 before=2,71 tỷ afterEnter=2,8 tỷ toast@1.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 1101 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"] toast@11.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 1101 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"] retryBtns=1 cellAfter=2,8 tỷ
+# E7-ui network/console (independent verifier run, http://127.0.0.1:3487)
+1440-sang 200 GET http://127.0.0.1:3487/inventory?vai=ListAgent
+1440-sang 200 GET http://127.0.0.1:3487/brand/logo-mark.svg
+1440-toi 200 GET http://127.0.0.1:3487/inventory?vai=ListAgent
+1440-toi 200 GET http://127.0.0.1:3487/brand/logo-mark.svg
+1024-sang 200 GET http://127.0.0.1:3487/inventory?vai=ListAgent
+1024-sang 200 GET http://127.0.0.1:3487/brand/logo-mark.svg
+1024-toi 200 GET http://127.0.0.1:3487/inventory?vai=ListAgent
+1024-toi 200 GET http://127.0.0.1:3487/brand/logo-mark.svg
