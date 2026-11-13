@@ -1,0 +1,126 @@
+schema_version: 1
+feature_slug: ci-co-postgres
+# Ma trận viết trước.
+#   make ci-db — sáu bước, thứ tự cố định: chuan-bi, cach-ly, bai-db, co-phien, khong-phien, dem.
+#     Dòng mỗi bước: «ci-db: <bước> đạt (mã 0, <s> giây)» | «ci-db: <bước> HỎNG (mã <n>, <s> giây)».
+#     Dòng cuối: «ci-db: 6/6 bước đạt» | «ci-db: <k>/<m> bước đạt — HỎNG: <bước> <bước>…» (m = số bước đã chọn).
+#     Tệp bước bai-db phải chạy (ghim hôm nay, viết trước): tests/db/{bang-quyen-api,bang-quyen,cach-ly,dang-nhap,
+#       danh-muc,goc-nhin,moi-nguoi,vai-dang-nhap}.db.test.ts — 8 tệp.
+#     Tệp bước co-phien phải chạy: tests/e2e-db/{app-shell-doi-san,bo-nut-members,goc-nhin,login,members,screens,
+#       va-dang-nhap,vai-noi}.spec.ts + phien.setup.ts — 8 tệp spec (vai-noi mới của hàng này).
+#     Bước dem còn in «tep: <tệp> dat <n>» cho 8 + 8 tệp ghim, đọc báo cáo JSON; tệp n = 0 → «tep khong co bai dat: <tệp>».
+#   Vai nối của máy chủ dev (AC-2): tập usename trong pg_stat_activity của cơ sở nháp, trừ pid của bài đọc = {quy_hang_login};
+#     rỗng → «may chu dev khong mo ket noi nao»; khác → «may chu dev noi bang vai khac quy_hang_login: <vai>».
+#     Ma trận bước đỏ (AC-3, bài trên bản sao script với lệnh giả): 6 bước × {đỏ một mình} → chuan-bi đỏ: dừng, 0/6;
+#       bước khác đỏ: 5/6, đúng bước ấy trong «HỎNG:»; hai bước đỏ (cach-ly, dem): 4/6, «HỎNG: cach-ly dem» đúng thứ tự;
+#       BUOC="co-phien khong-phien dem": đúng ba dòng bước, dòng cuối «3/3»; dem không chạy khi thiếu báo cáo:
+#       «ci-db: dem HỎNG» kèm «thieu bao cao: <tệp>».
+#   Phép đếm giao–nhận — ba bản phá rút từ báo cáo THẬT của một lượt (tệp chép ở tests/fixtures/ci-db/), mỗi bản một
+#     dòng ghim:
+#       bỏ một bài nhận khỏi lượt có phiên       → «roi: <khổ> <đường tên>»
+#       đổi bài nhận ấy thành skipped              → «roi: <khổ> <đường tên>»
+#       đổi một bài của màn đã giao thành passed  → «do nham trang dang nhap: <khổ> <đường tên>»
+#       báo cáo không phiên không giao bài nào    → «giao: 0 — luot khong phien khong giao bai nao»
+#     Đối chứng dương: hai báo cáo lành → «giao: N · nhan: N · roi: 0 · do nham: 0», N ≥ 1, N = số bài skip lý do giao.
+#   Dọn thư mục dựng tạm — 6 loại thư mục × 2 cấu hình, liveness đọc từ tệp .chu (pid tiến trình chủ), không từ tên:
+#     chủ chết (xoá lúc bắt đầu) · chủ sống (giữ) · tên là số của tiến trình chết nhưng .chu là pid sống (giữ — ca số
+#     tiến trình dùng lại) · tên đặt bằng E2E_RUN không phải số, chủ sống (giữ) · không có .chu (giữ) · chính lượt (xoá
+#     khi tiến trình chính thoát). Chiều đỏ: bản hàm dọn bỏ kiểm .chu (đọc tên) → bài «chu song con nguyen» đỏ nêu thư mục.
+#   ci-thu.sh — dòng cuối «ci-thu: xanh <phút> phút · check xanh · pha bo-phien do · pha vai-chu do · pha may-chu-chu do»;
+#     trần phút đọc từ timeout-minutes của bản vá, lượt xanh phải dưới 2/3 trần.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.ci_db_thu
+    layer: backend-effect
+    paths: [db/scripts/**, mk/db.mk, playwright.db.config.ts, playwright.config.ts, tests/e2e-db/**, tests/db/**, tests/fixtures/**]
+    expected: "exit 0; trong phần lượt xanh: sáu dòng 'ci-db: <bước> đạt (mã 0, …)' đúng thứ tự chuan-bi, cach-ly, bai-db, co-phien, khong-phien, dem; bước dem in 'tep: <tệp> dat <n>' với n ≥ 1 cho đủ 8 tệp tests/db và 8 tệp spec đã ghim (gồm goc-nhin.spec.ts, bo-nut-members.spec.ts, vai-noi.spec.ts), đọc từ báo cáo JSON; có dòng 'bo qua can dang nhap: 0'; dòng 'ci-db: 6/6 bước đạt'. Chiều đỏ của đếm theo tệp: E4 (mọi bài của một tệp đổi thành skipped → 'tep khong co bai dat: <tệp>')"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.ci_db_thu
+    layer: backend-effect
+    paths: [db/scripts/**, db/tests/**, playwright.db.config.ts]
+    expected: "exit 0; phần lượt xanh có 'cach-ly: <n> ca đạt, vai quy_hang_app, nối bằng quy_hang_login', 'phiên đăng nhập: quy_hang_login', và bài tests/e2e-db/vai-noi.spec.ts đạt (tập vai kết nối của máy chủ dev đọc từ pg_stat_activity = {quy_hang_login}); phần 'pha may-chu-chu' (bản sao playwright.db.config.ts đặt DATABASE_URL của máy chủ dev bằng postgres, chạy riêng vai-noi.spec.ts) đỏ với 'may chu dev noi bang vai khac quy_hang_login: postgres'; phần 'pha vai-chu' (bản sao ci-db.sh nối phần phiên bằng -U postgres, chỉ chạy chuan-bi cach-ly) có 'ci-db: cach-ly HỎNG', dòng chứa 'HỎNG dang-nhap-khong-ve-vai-chu', dòng cuối chứa 'HỎNG: cach-ly'; dòng cuối ci-thu có 'pha vai-chu do' và 'pha may-chu-chu do'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.script.ci_db_kiem
+    paths: [db/scripts/ci-db.sh, tests/ci-db.test.ts]
+    expected: "exit 0; tests/ci-db.test.ts chạy CHÍNH db/scripts/ci-db.sh trong thư mục tạm với lệnh giả (psql, npx, bộ chạy cách ly giả) và xanh đủ ma trận bước đỏ viết trước: chuan-bi đỏ → dừng, '0/6 bước đạt — HỎNG: chuan-bi'; mỗi bước khác đỏ một mình → '5/6' và đúng tên bước; cach-ly + dem đỏ → 'HỎNG: cach-ly dem'; BUOC ba bước → '3/3'; thiếu báo cáo → 'thieu bao cao:'; bài đối chứng: mọi lệnh giả xanh → '6/6 bước đạt' mã 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.script.ci_db_kiem
+    layer: backend-effect
+    paths: [tests/e2e-db/dem-giao-nhan.ts, tests/dem-giao-nhan.test.ts, tests/fixtures/ci-db/**]
+    expected: "exit 0; (bản phá thứ tư: mọi bài của một tệp spec đổi thành skipped → 'tep khong co bai dat: <tệp>'); tests/dem-giao-nhan.test.ts đọc hai báo cáo JSON thật (tests/fixtures/ci-db/, chép từ một lượt make ci-db, không viết tay) → 'giao: N · nhan: N · roi: 0 · do nham: 0' với N bằng số bài skip lý do 'can dang nhap — do o luot co phien' đếm độc lập trong bài; ba bản phá dựng bằng cách sửa bản sao của chính hai báo cáo ấy, mỗi bản thoát 1 và in đúng dòng ghim ở ma trận cho đúng bài bị phá; báo cáo không giao bài nào → 'giao: 0 — luot khong phien khong giao bai nao'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.ci_db_thu
+    layer: backend-effect
+    paths: [db/scripts/**, mk/db.mk, _acceptance/ci-co-postgres/ci-yml.patch, tests/**, playwright.db.config.ts, playwright.config.ts]
+    expected: "exit 0; ci-thu in 'ban sao nong: depth 1' (git rev-parse --is-shallow-repository = true trong bản sao), 'postgres: <ảnh> (tu ban va)', rồi lượt xanh 'ci-db: 6/6 bước đạt'; 'make check' trong cùng bản sao nông thoát 0 ('check xanh'); dòng 'ci-thu: xanh <phút> phút' với <phút> dưới 2/3 trần ('tran <m> phut' đọc từ timeout-minutes của bản vá — ci-thu thoát khác 0 khi vượt); biên trần: ca dưới ngưỡng (1,9 phút với trần 3) KHÔNG đỏ, ca từ 2/3 trần (2,5 phút) đỏ 'vuot 2/3 tran: 2.5 / 3' — đo bằng 'ci-thu.sh --kiem-tran' trong tests/ci-yml-patch.test.ts (E9)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.ci_db_thu
+    layer: backend-effect
+    paths: [db/scripts/**, tests/e2e-db/**, playwright.db.config.ts]
+    expected: "exit 0; phần 'pha bo-phien' (phien.setup.ts của bản sao ghi trạng thái trình duyệt rỗng, BUOC='co-phien khong-phien dem') có 'ci-db: co-phien HỎNG', ít nhất một dòng bắt đầu 'roi: ', dòng cuối của make chứa 'HỎNG: co-phien' và mã khác 0; dòng cuối ci-thu 'ci-thu: xanh <phút> phút · pha bo-phien do · pha vai-chu do'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.script.ci_db_kiem
+    paths: [tests/db/cach-ly.db.test.ts, tests/fixtures/cach-ly-*.sh, tests/ci-ban-sao-nong.test.ts]
+    expected: "exit 0; tests/ci-ban-sao-nong.test.ts: mã blob (git hash-object) của tests/fixtures/cach-ly-d85d815.sh = 9838bcec9edc334d14fde3f00e11e5d6a17cdfe9 và của cach-ly-83d1764.sh = 10817856c9a165790b17fd59d473c9316fba4e92 (ghim lúc chép, không đọc lịch sử); quét mọi tests/**, tools/**, db/scripts/**, playwright.config.ts, playwright.db.config.ts không còn lời gọi git show/log/rev-parse tới commit khác HEAD; chiều đỏ: một tệp tests/x.test.ts trong bản sao thư mục gọi git show tới một commit cũ → bài quét nêu đúng tệp và dòng; đổi một byte bản chép → mã blob lệch, bài nêu tên tệp. Lượt trong bản sao nông (E1) chạy bước bai-db xanh là chứng thứ hai."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.script.ci_db_kiem
+    layer: backend-effect
+    paths: [tests/e2e-db/don-dung-tam.ts, tests/don-dung-tam.test.ts, playwright.config.ts, playwright.db.config.ts]
+    expected: "exit 0; tests/don-dung-tam.test.ts gọi đúng hàm globalSetup mà hai cấu hình Playwright khai (đọc đường từ chính cấu hình) trên thư mục tạm có đủ sáu loại thư mục ở ma trận: chỉ thư mục chủ chết bị xoá; ca số tiến trình dùng lại (tên là pid chết, .chu là pid sống) còn; tên không phải số mà chủ sống còn; không .chu còn; thư mục của lượt bị xoá khi một tiến trình con chạy hàm rồi thoát; chiều đỏ: bản hàm đọc liveness từ tên thay vì .chu làm bài 'chu song con nguyen' đỏ nêu thư mục"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8b
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.ci_db_thu
+    layer: backend-effect
+    paths: [tests/e2e-db/don-dung-tam.ts, playwright.config.ts, playwright.db.config.ts]
+    expected: "exit 0; sau lượt xanh trong bản sao, ci-thu in 'thu muc dung tam con lai: 0' cho cả node_modules/.cache/onehub-e2e và onehub-e2e-db của bản sao"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.script.ci_db_kiem
+    paths: [_acceptance/ci-co-postgres/ci-yml.patch, db/scripts/ci-thu.sh, tests/ci-yml-patch.test.ts]
+    expected: "exit 0; tests/ci-yml-patch.test.ts: git apply --check của bản vá lên .github/workflows/ci.yml ở HEAD thành công; mọi dòng thay đổi của bản vá bắt đầu bằng '+'; YAML sau khi áp có đúng một job mới với timeout-minutes, services.postgres.image 'postgres:16', env POSTGRES_PASSWORD 'local-only', ports ['5432:5432'], các bước checkout / setup-node node-version-file .nvmrc / npm ci / npx playwright install --with-deps chromium / make ci-db; các job cũ giống hệt trước khi áp; 'ci-thu.sh --chi-doc <bản vá>' in ảnh, mật khẩu, cổng, lệnh, trần đọc từ tệp, và trên bản sao bản vá đổi ảnh thành postgres:17 thì in postgres:17; 'ci-thu.sh --kiem-tran <phút> <bản vá>' với bản sao timeout-minutes: 3 và 2,5 phút thoát khác 0 in 'vuot 2/3 tran: 2.5 / 3', với 1,9 phút thoát 0 (đối chứng dương)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.ci_db_that
+    layer: backend-effect
+    paths: [db/scripts/ci-that.mjs, .github/workflows/ci.yml]
+    expected: "exit 0; ci-that đọc lượt CI mới nhất trên đầu nhánh của hàng (gh run list/view): job e2e-db conclusion success, nhật ký job có 'bo qua can dang nhap: 0' và 'ci-db: 6/6 bước đạt', thời lượng job ≤ timeout-minutes; in 'run <id> · e2e-db <phút> phút · tong CI <phút> (main <phút>)'. Chỉ đo khi chủ kho cho thợ dán (Hỏi-1); chủ kho tự dán thì ô này khai status: not-run kèm giới hạn đã biết."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

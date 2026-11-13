@@ -1,0 +1,36 @@
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -37,6 +37,33 @@
+       - run: npx playwright install --with-deps chromium
+       - run: make e2e
+
++  # Row 1s: browser tests with a session, the isolation suite and the database tests, on a Postgres of this run only.
++  # Everything after the service is one command of the repository (db/scripts/ci-db.sh), connected as quy_hang_login.
++  e2e-db:
++    runs-on: ubuntu-latest
++    timeout-minutes: 30
++    services:
++      postgres:
++        image: postgres:16
++        env:
++          POSTGRES_PASSWORD: local-only
++        ports:
++          - 5432:5432
++        options: >-
++          --health-cmd "pg_isready -U postgres"
++          --health-interval 5s
++          --health-timeout 5s
++          --health-retries 20
++    steps:
++      - uses: actions/checkout@v7
++      - uses: actions/setup-node@v7
++        with:
++          node-version-file: .nvmrc
++          cache: npm
++      - run: npm ci
++      - run: npx playwright install --with-deps chromium
++      - run: make ci-db
++
+   # Acceptance gate of the kit, run from a pinned tag so no kit file is copied here.
+   # Raising the kit version is a deliberate change of KIT_TAG; this file is in t1_skip_globs.
+   gate:
