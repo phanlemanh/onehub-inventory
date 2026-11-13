@@ -65,8 +65,10 @@ import {
   groupRows,
   rowNumbers,
   sortRows,
+  viewWithin,
   type ColumnFilter,
   type ColumnFilters,
+  type GridView,
   type SortBy,
 } from "./grid-view";
 import { RecordPanel, useRecordAddress, type RecordView } from "./record-panel";
@@ -317,6 +319,8 @@ export function DataRegion({
   editable = false,
   initialFilters,
   groupBy,
+  initialView,
+  onViewChange,
 }: {
   title: string;
   columns: readonly TypedColumn[];
@@ -345,20 +349,33 @@ export function DataRegion({
   initialFilters?: ColumnFilters;
   /** The field rows may be grouped under; the toolbar offers «Nhóm theo …» only when the screen names one. */
   groupBy?: FieldKey;
+  /**
+   * The arrangement the region opens with (row 2c, a saved view): search text, filters, sort, grouping, hidden columns.
+   * Parts naming a column the region does not have are dropped. Wins over `initialFilters`. Give the region a new
+   * `key` to open another one.
+   */
+  initialView?: GridView;
+  /** Hears the arrangement after each change the person makes (and once on opening). */
+  onViewChange?: (view: GridView) => void;
 }) {
   const searchId = useId();
   // One confirmation for every row's removing action: a row scrolled out of the virtual body keeps it open.
   const removing = useChange();
-  const [query, setQuery] = useState("");
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [opening] = useState(() => (initialView ? viewWithin(initialView, columns) : undefined));
+  const [query, setQuery] = useState(opening?.query ?? "");
+  const [sorting, setSorting] = useState<SortingState>(() =>
+    (opening?.sort ?? []).map((s) => ({ id: s.field, desc: s.direction === "desc" })),
+  );
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() =>
-    Object.entries(initialFilters ?? {})
+    Object.entries(opening?.filters ?? initialFilters ?? {})
       .filter(([, value]) => !filterIsEmpty(value))
       .map(([id, value]) => ({ id, value })),
   );
   const [filterRowOpen, setFilterRowOpen] = useState(() => columnFilters.length > 0);
-  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>({});
-  const [grouped, setGrouped] = useState(false);
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>(() =>
+    Object.fromEntries((opening?.hidden ?? []).map((field) => [field, false])),
+  );
+  const [grouped, setGrouped] = useState(opening?.grouped ?? false);
   const [expanded, setExpanded] = useState<ExpandedState>(true);
   const [selectedCells, setSelectedCells] = useState(0);
   // Full screen, like a sheet's: the whole page goes full screen (browser bars hidden, menus still open on top) and the
@@ -383,6 +400,15 @@ export function DataRegion({
     document.addEventListener("fullscreenchange", onChange);
     return () => document.removeEventListener("fullscreenchange", onChange);
   }, [setShellFocused]);
+  // Leaving the screen in full screen (Back, a gesture, a link — row 2c, Ngoài-5 of 2a): the region goes, so it gives
+  // the screen back to the App Shell and to the browser's own bars.
+  useEffect(
+    () => () => {
+      setShellFocused(false);
+      if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
+    },
+    [setShellFocused],
+  );
   const toggleFullScreen = () => {
     if (fullScreen) {
       if (document.fullscreenElement) void document.exitFullscreen();
@@ -407,6 +433,27 @@ export function DataRegion({
     : null;
   const groupColumn = groupBy ? columns.find((c) => c.field === groupBy) : undefined;
   const isGrouped = grouped && groupColumn !== undefined;
+  const hiddenKey = columns
+    .filter((c) => columnVisibility[c.field] === false)
+    .map((c) => c.field)
+    .join("|");
+  const view = useMemo(
+    (): GridView => ({
+      query,
+      filters,
+      sort: sortBy ? [sortBy] : [],
+      grouped: isGrouped,
+      hidden: hiddenKey === "" ? [] : (hiddenKey.split("|") as FieldKey[]),
+    }),
+    [query, filters, sortBy?.field, sortBy?.direction, isGrouped, hiddenKey], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+  const viewListener = useRef(onViewChange);
+  useEffect(() => {
+    viewListener.current = onViewChange;
+  });
+  useEffect(() => {
+    viewListener.current?.(view);
+  }, [view]);
 
   // Filter, then sort, then group: a sort orders rows inside each group, numbers run on through the groups.
   const shown = useMemo(
@@ -494,6 +541,36 @@ export function DataRegion({
     columns,
     groupColumn,
   ]);
+
+  // Header cells, kept apart from the widths: a header renderer is a component to the table, so a new one each time the
+  // widths move (a scroll bar coming or going as rows filter out) would draw the filter boxes again and drop the focus
+  // of the box being typed in (row 2c, Ngoài-4 of 2a).
+  const headers = useMemo(
+    () =>
+      columns.map(
+        (column) =>
+          helper.accessor((row: TableRow) => row[column.field], {
+            id: column.field,
+            header: ({ column: tableColumn }) => (
+              <div data-slot="sheet-header" className="flex w-full min-w-0 flex-col py-1">
+                <DataGridColumnHeader
+                  column={tableColumn}
+                  title={column.header}
+                  className={column.align === "right" ? "ms-auto" : undefined}
+                />
+                {filterRowOpen ? (
+                  <ColumnFilterCell
+                    spec={column}
+                    column={tableColumn}
+                    options={options.get(column.field) ?? []}
+                  />
+                ) : null}
+              </div>
+            ),
+          }).header,
+      ),
+    [columns, filterRowOpen, options],
+  );
 
   const recordAddress = record?.address;
   const addressNavigate = useRef<((id: string | null) => void) | null>(null);
@@ -591,22 +668,7 @@ export function DataRegion({
       ...columns.map((column, index) =>
         helper.accessor((row: TableRow) => row[column.field], {
           id: column.field,
-          header: ({ column: tableColumn }) => (
-            <div data-slot="sheet-header" className="flex w-full min-w-0 flex-col py-1">
-              <DataGridColumnHeader
-                column={tableColumn}
-                title={column.header}
-                className={column.align === "right" ? "ms-auto" : undefined}
-              />
-              {filterRowOpen ? (
-                <ColumnFilterCell
-                  spec={column}
-                  column={tableColumn}
-                  options={options.get(column.field) ?? []}
-                />
-              ) : null}
-            </div>
-          ),
+          header: headers[index],
           size: Math.floor((widths[index] ?? column.widthCh) * chPx),
           // The first column names the row (the unit code) and always stays; any other may be hidden.
           enableHiding: index !== 0,
@@ -731,8 +793,7 @@ export function DataRegion({
       opensRecord,
       widths,
       rowNumberCh,
-      filterRowOpen,
-      options,
+      headers,
       groupLabelField,
       groupCountField,
     ],
@@ -846,11 +907,7 @@ export function DataRegion({
 
   const showsRows = headerShowsRows(status);
   const gridShown =
-    status !== "forbidden" &&
-    status !== "loading" &&
-    status !== "error" &&
-    rows.length > 0 &&
-    shown.length > 0;
+    status !== "forbidden" && status !== "loading" && status !== "error" && rows.length > 0;
   // The region's own button, and in full screen the page head's main button too (the page head is hidden there).
   const shownHeadAction = fullScreen ? headAction : undefined;
   const shownAction = action?.allowed ? action.node : undefined;
@@ -888,7 +945,8 @@ export function DataRegion({
             ? GRID_COPY.sheet.filterOn(activeFilterCount)
             : GRID_COPY.sheet.filter}
         </Button>
-        {narrowed ? (
+        {/* With no row left the body offers «Xoá lọc» itself; one button, not two. */}
+        {narrowed && shown.length > 0 ? (
           <Button variant="ghost" size="sm" data-slot="clear-filters" onClick={clearFilters}>
             {GRID_COPY.sheet.clearFilters}
           </Button>
@@ -947,13 +1005,15 @@ export function DataRegion({
   else if (status === "partial" && rows.length === 0)
     body = <RegionPartialEmpty onRetry={onRetry} />;
   else if (rows.length === 0) body = <RegionEmpty why={emptyWhy} action={emptyAction} />;
-  else if (shown.length === 0) body = <RegionNoMatch onClear={clearFilters} />;
   else
     body = (
       <DataGrid
         table={table}
         recordCount={shown.length}
         i18n={GRID_I18N}
+        // A filter that leaves no row keeps the toolbar, the search box and the filter row where they are (row 2c,
+        // Ngoài-4 of 2a): only the table's body says so, and each rule can still be mended on its own.
+        emptyMessage={<RegionNoMatch onClear={clearFilters} />}
         onCellSelectionChange={onSelection}
         tableLayout={{
           headerSticky: true,

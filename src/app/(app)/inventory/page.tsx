@@ -5,9 +5,14 @@ import { PageHeader } from "@/components/templates/page-header";
 import { sampleUnits, subdivisionNameOf } from "@/modules/catalog";
 import { label } from "@/modules/company-config";
 import { SAMPLE_COMPANY, buildSampleListings } from "@/modules/listings";
+import { mySavedView, mySavedViews } from "@/modules/listings/server";
+
+import { savedViewLabels } from "../saved-view-labels";
 import {
   ENTRY_COPY,
   InventoryGrid,
+  SAVED_VIEW_PARAM,
+  savedViewCopy,
   inventoryFiltersFrom,
   inventoryOpeningFor,
   inventoryRows,
@@ -41,6 +46,17 @@ export default async function Page({ searchParams }: Props) {
   const state = first(query.state);
   // A status shortcut opens the grid filtered (row 2a).
   const status = first(query.status);
+  // A saved view opens by its own address (row 2c): gone, or someone else's, opens every unit with a sentence.
+  const viewId = first(query[SAVED_VIEW_PARAM]);
+  const [listed, openView] = await Promise.all([
+    mySavedViews("inventory"),
+    viewId ? mySavedView(viewId) : Promise.resolve(null),
+  ]);
+  const missing = viewId !== undefined && openView === null;
+  // Views that could not be read still leave saving open; the server checks names again.
+  const savedViews = listed === "unreadable" ? [] : listed;
+  const viewLabels = savedViewLabels();
+  const viewCopy = savedViewCopy(viewLabels);
   const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
   const { listings, listingUnits } = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
   const rows = inventoryRows({ listings, listingUnits, units });
@@ -60,15 +76,34 @@ export default async function Page({ searchParams }: Props) {
     next.set("ho-so", opening.recordId);
     redirect(`/inventory?${next}`);
   }
-  const filters = { ...inventoryFiltersFrom(status), ...opening.filters };
+  // One way to open the grid arranged (row 2c's initial view): a saved view's own arrangement wins; otherwise the
+  // status shortcut and the search's column filter fill the column filters the grid opens with.
+  const filters =
+    openView || missing ? undefined : { ...inventoryFiltersFrom(status), ...opening.filters };
   // A shared link (row 3f) to a listing no longer on the inventory: the grid opens as usual and says why.
   const asked = first(query["ho-so"]);
   const stale = asked !== undefined && !rows.some((row) => row.id === asked);
   return (
     <>
-      <PageHeader title={label("Inventory")} />
+      <PageHeader title={openView ? openView.name : label("Inventory")} />
+      {/* Always present, so the sentence about a view that is gone is read out when it appears. */}
+      <p
+        role="status"
+        data-slot="saved-view-missing"
+        className="rounded-md border px-3 py-2 text-sm empty:hidden"
+      >
+        {missing ? (
+          <>
+            <span className="font-medium">{viewCopy.missing}.</span>{" "}
+            <span className="text-muted-foreground">{viewCopy.missingWhy}</span>
+          </>
+        ) : null}
+      </p>
       <InventoryGrid
-        key={JSON.stringify(filters)}
+        key={JSON.stringify(filters ?? null)}
+        savedViews={savedViews}
+        openView={openView}
+        viewLabels={viewLabels}
         title={label("Listing")}
         headers={HEADERS}
         rows={rows}

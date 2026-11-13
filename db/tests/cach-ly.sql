@@ -84,7 +84,17 @@ insert into luat_thu_hep values
   ('company_catalog_aliases', 'company_catalog_aliases_insert_by_permission',
    '(app.allowed(''manageCompanyCodes''::text) = ''company''::text)'),
   ('company_catalog_aliases', 'company_catalog_aliases_update_by_permission',
-   '(app.allowed(''manageCompanyCodes''::text) = ''company''::text)');
+   '(app.allowed(''manageCompanyCodes''::text) = ''company''::text)'),
+  -- 009_goc_nhin.sql (hàng 2c): a saved view is touched only by the person who saved it, and only when the permission
+  -- table allows the action of that command.
+  ('saved_view', 'saved_view_own_read',
+   '(((user_id)::text = current_setting(''app.user_id''::text, true)) AND (app.allowed(''listSavedViews''::text) IS NOT NULL))'),
+  ('saved_view', 'saved_view_own_insert',
+   '(((user_id)::text = current_setting(''app.user_id''::text, true)) AND (app.allowed(''saveView''::text) IS NOT NULL))'),
+  ('saved_view', 'saved_view_own_update',
+   '(((user_id)::text = current_setting(''app.user_id''::text, true)) AND (app.allowed(''editView''::text) IS NOT NULL))'),
+  ('saved_view', 'saved_view_own_delete',
+   '(((user_id)::text = current_setting(''app.user_id''::text, true)) AND (app.allowed(''removeView''::text) IS NOT NULL))');
 
 create function pg_temp.dung_dang(bang name, luat name, lenh text, bieu_thuc text, cot text,
                                   kieu text default 'PERMISSIVE') returns boolean

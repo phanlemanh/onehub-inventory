@@ -1,0 +1,17 @@
+{
+ "ban": "8ee15fdf20865e117d188e4fcb9769b2318e98e0",
+ "base": "f458f6d3dbbb80bfa0c1512fe202559cf45dddef",
+ "den": "8f04f8ea4146ca227a589892fbac1f7aba9b8d4f",
+ "sua_tep_luat": {
+  "may": [],
+  "nguoi": []
+ },
+ "cham": [
+  {
+   "ma": "SP-1",
+   "tep": "db/tests/pha-thu/goc-nhin-bo-ep-luat.sql",
+   "dong": 4,
+   "chu": "alter table saved_view no force row level security;"
+  }
+ ]
+}
