@@ -1,6 +1,6 @@
 name: SavedView
 description: >-
-  A way of looking at one grid screen that one person saved under a name — the search text, the filter of each column,
+  A way of looking at one grid screen that one person saved under a name — the filter of each column,
   the sort, whether rows are grouped, and the hidden columns — shown as an item of the App Shell's second column and
   opened again exactly as saved. Belongs to the person who saved it, inside one company.
 reso: >-
@@ -31,9 +31,9 @@ rules:
     implemented_in: src/modules/listings/saved-view.ts
   - id: saved-view-holds-four-things
     description: >-
-      A view holds exactly the column filters, the sort, grouping on or off and the hidden columns — not the search
-      text (searching moves to the top bar, owner 2026-11-13), full screen, the selected cell, open groups or the scroll
-      position.
+      A view holds exactly the column filters, the sort, grouping on or off and the hidden columns — nothing typed to
+      search (searching is the top bar's job, owner 2026-11-13; migration 011 dropped the stored text), full screen,
+      the selected cell, open groups or the scroll position.
     implemented_in: src/modules/listings/saved-view.ts
 
 code:
