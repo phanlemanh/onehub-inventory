@@ -2,12 +2,16 @@
 import { describe, expect, it } from "vitest";
 
 import type { GridRow } from "@/components/candidate/data-region";
+import type { NavItem } from "@/components/templates/app-shell";
+import type { Role } from "@/generated/ontology";
 import {
   findByCode,
   inventoryOpeningFor,
   searchHref,
   searchSuggestions,
 } from "@/modules/listings/ui";
+
+import { NAV, searchShownFor } from "../src/app/(app)/nav";
 
 /** The matrix, written before the code: code A in three buildings, B in one, C in two with different letter case. */
 const row = (id: string, code: string, building: string, subdivision = "Khu 1"): GridRow => ({
@@ -138,5 +142,28 @@ describe("searchHref", () => {
     expect(searchHref("unit", " 0601 ")).toBe("/inventory?ma=0601");
     expect(searchHref("building", "S1.02")).toBe("/inventory?toa=S1.02");
     expect(searchHref("subdivision", "Khu 1")).toBe("/inventory?du-an=Khu+1");
+  });
+});
+
+describe("the top-bar search slot follows the inventory entry (E5)", () => {
+  type Rule = (nav: readonly NavItem[], roles: readonly Role[]) => boolean;
+  const NAV_WITH_ROLES: NavItem[] = [
+    { href: "/", title: "Hôm nay" },
+    { href: "/inventory", title: "Bảng hàng", roles: ["ListAgent", "BuyerAgent", "TeamLead"] },
+  ];
+  /** The measure: no inventory entry, no search; an inventory entry, a search. */
+  function checkGate(rule: Rule): void {
+    expect(rule(NAV_WITH_ROLES, ["CompanyAdmin"]), "jump shown without inventory").toBe(false);
+    expect(rule(NAV_WITH_ROLES, []), "jump shown without inventory").toBe(false);
+    expect(rule(NAV_WITH_ROLES, ["CompanyAdmin", "ListAgent"])).toBe(true);
+    expect(rule(NAV, ["BuyerAgent"])).toBe(true);
+  }
+
+  it("shows the search exactly when the person's roles open the inventory", () => {
+    checkGate(searchShownFor);
+  });
+
+  it("the check fails when the search always shows", () => {
+    expect(() => checkGate(() => true)).toThrow("jump shown without inventory");
   });
 });

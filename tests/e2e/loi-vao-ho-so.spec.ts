@@ -2,8 +2,8 @@
 // decision:no-sideways-scroll
 // Ways into one listing's record (roadmap row 3f, _acceptance/loi-vao-ho-so): «Chép đường dẫn» at the head of the record
 // (E1, E2), the copied link opened in another browser (E3), a stale link (E4), the inventory opened from a unit code
-// (E5 part, E6 on the real page), and an accessibility scan of the record with the new button (E8). The top-bar ⌘K box
-// is measured once it is built. Every check has a break case with a pinned message.
+// (E6 on the real page), the top-bar ⌘K box (E5), an unknown code typed in it (E7), and accessibility scans of the record,
+// the grid after an unknown code and the open box (E8). Every check has a break case with a pinned message.
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
@@ -25,6 +25,10 @@ const PHONE = new Set(["414", "360"]);
 const STALE = "Căn trong đường dẫn không còn trong Bảng hàng.";
 const COPIED = "Đã chép đường dẫn";
 const COPY_FAILED = "Chưa chép được. Bạn chép đường dẫn trong ô địa chỉ của trình duyệt.";
+
+const SEARCH = "Gõ mã căn";
+const UNKNOWN = "Z-99.99";
+const NO_MATCH = "Không có dòng nào khớp";
 
 const panel = (page: Page) => page.locator('[data-slot="record-panel"]');
 const openers = (page: Page) => page.locator("[data-record-open]");
@@ -230,4 +234,284 @@ test.describe("E8 · accessibility with the copy button", () => {
       expect(bad.map((v) => v.id)).toEqual([]);
     });
   }
+});
+
+const searchButton = (page: Page) =>
+  page.locator('[data-slot="app-shell-top-bar"]').getByRole("button", { name: SEARCH });
+const palette = (page: Page) => page.locator('[data-slot="unit-jump-palette"]');
+const paletteInput = (page: Page) => palette(page).getByRole("combobox");
+const unitFilter = (page: Page) => page.locator('input[aria-label="Lọc cột Căn"]');
+
+/** The first listing whose code is in one building only: its id, code and building, read from the grid. */
+async function uniqueRow(page: Page): Promise<{ id: string; unit: string; building: string }> {
+  await openInventory(page);
+  await openers(page).nth(4).waitFor();
+  const codes = await openers(page).allTextContents();
+  const index = codes.findIndex((c) => !SHARED_CODES.has(c.trim()));
+  const opener = openers(page).nth(index);
+  const id = (await opener.getAttribute("data-record-open")) ?? "";
+  const unit = ((await opener.textContent()) ?? "").trim();
+  const building = (
+    (await page
+      .locator('[data-slot="data-region"] tbody tr')
+      .nth(index)
+      .locator("td")
+      .nth(2)
+      .textContent()) ?? ""
+  ).trim();
+  return { id, unit, building };
+}
+
+/** Shows the row of column filters (it opens by itself only when a filter is set). */
+async function showFilters(page: Page): Promise<void> {
+  if (await unitFilter(page).isVisible()) return;
+  await page
+    .locator('[data-slot="data-region"]')
+    .getByRole("button", { name: "Lọc", exact: true })
+    .click();
+  await expect(unitFilter(page)).toBeVisible();
+}
+
+async function openSearch(page: Page): Promise<void> {
+  await searchButton(page).click();
+  await expect(paletteInput(page)).toBeFocused();
+}
+
+/** E5: after a jump the grid is at /inventory, the code sits in the unit column filter, and the record is open. */
+async function checkJumped(page: Page, id: string, unit: string): Promise<void> {
+  await expect(page, "jump did not navigate").toHaveURL(/\/inventory\?/, { timeout: 5000 });
+  await expect(unitFilter(page), "code not in the unit column filter").toHaveValue(unit, {
+    timeout: 5000,
+  });
+  await expect(panel(page)).toHaveAttribute("data-record-id", id);
+}
+
+/** A capture listener ahead of the page's own: how a break case swallows or steals a key. */
+async function captureKey(page: Page, script: string): Promise<void> {
+  await page.addInitScript(script);
+}
+
+test.describe("E5 · the top-bar ⌘K box", () => {
+  for (const start of ["/inventory", "/"]) {
+    test(`from ${start}: suggests the code, Enter opens its record in the inventory`, async ({
+      page,
+    }, info) => {
+      test.skip(!["1440", "360"].includes(info.project.name), "1440 and 360");
+      const { id, unit } = await uniqueRow(page);
+      await page.goto(start);
+      await openSearch(page);
+      await paletteInput(page).fill(unit.slice(0, 2));
+      const suggestion = palette(page).getByRole("option").filter({ hasText: unit }).first();
+      await expect(suggestion).toContainText("Căn");
+      await paletteInput(page).fill(`  ${unit.toLowerCase()}  `);
+      await paletteInput(page).press("Enter");
+      await checkJumped(page, id, unit);
+      await expect(unitFilter(page)).toBeVisible();
+    });
+  }
+
+  test("a suggestion chosen with the mouse does the same", async ({ page }, info) => {
+    test.skip(info.project.name !== "1440", "one width is enough");
+    const { id, unit } = await uniqueRow(page);
+    await openSearch(page);
+    await paletteInput(page).fill(unit);
+    await palette(page).getByRole("option").filter({ hasText: unit }).first().click();
+    await checkJumped(page, id, unit);
+  });
+
+  test("a building suggestion fills the building column and opens no record", async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== "1440", "one width is enough");
+    const { building } = await uniqueRow(page);
+    await openSearch(page);
+    await paletteInput(page).fill(building);
+    const suggestion = palette(page).getByRole("option").filter({ hasText: "Toà" }).first();
+    await expect(suggestion).toContainText(building);
+    await suggestion.click();
+    await expect(page.locator('input[aria-label="Lọc cột Toà"]')).toHaveValue(building);
+    await expect(panel(page)).toHaveCount(0);
+  });
+
+  test("Ctrl+K, Meta+K and / open the box; / in a field stays in the field", async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== "1440", "keys on the desktop");
+    await openInventory(page);
+    for (const key of ["Control+k", "Meta+k"]) {
+      await page.locator("body").press(key);
+      await expect(paletteInput(page)).toBeFocused();
+      await page.keyboard.press("Escape");
+      await expect(palette(page)).toHaveCount(0);
+    }
+    await page.locator("body").press("/");
+    await expect(paletteInput(page)).toBeFocused();
+    await page.keyboard.press("Escape");
+    await showFilters(page);
+    await unitFilter(page).click();
+    await page.keyboard.press("/");
+    await expect(palette(page), "slash stolen from a text field").toHaveCount(0);
+    await expect(unitFilter(page), "slash stolen from a text field").toHaveValue("/");
+  });
+
+  test("Enter in an empty box goes nowhere; Esc closes and gives focus back", async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== "1440", "one width is enough");
+    await openInventory(page);
+    const before = page.url();
+    await openSearch(page);
+    await paletteInput(page).press("Enter");
+    await expect(paletteInput(page)).toBeVisible();
+    expect(page.url()).toBe(before);
+    await page.keyboard.press("Escape");
+    await expect(palette(page)).toHaveCount(0);
+    await expect(searchButton(page)).toBeFocused();
+  });
+
+  test("the check fails when Enter is swallowed", async ({ page }, info) => {
+    test.skip(info.project.name !== "1440", "one width is enough");
+    await captureKey(
+      page,
+      `window.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && e.target instanceof Element && e.target.closest('[data-slot="unit-jump-palette"]')) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        }
+      }, true);`,
+    );
+    const { id, unit } = await uniqueRow(page);
+    await page.goto("/");
+    await openSearch(page);
+    await paletteInput(page).fill(unit);
+    await paletteInput(page).press("Enter");
+    await expect(checkJumped(page, id, unit)).rejects.toThrow("jump did not navigate");
+  });
+
+  test("the check fails when / is stolen from a field", async ({ page }, info) => {
+    test.skip(info.project.name !== "1440", "one width is enough");
+    await captureKey(
+      page,
+      `window.addEventListener("keydown", (e) => {
+        if (e.key === "/" && e.target instanceof HTMLInputElement) {
+          e.preventDefault();
+          document.querySelector('[data-slot="unit-jump"] button')?.click();
+        }
+      }, true);`,
+    );
+    await openInventory(page);
+    await showFilters(page);
+    await unitFilter(page).click();
+    await page.keyboard.press("/");
+    await expect(
+      expect(palette(page), "slash stolen from a text field").toHaveCount(0, { timeout: 2000 }),
+    ).rejects.toThrow("slash stolen from a text field");
+  });
+
+  test("the check fails when the code lands in another column", async ({ page }, info) => {
+    test.skip(info.project.name !== "1440", "one width is enough");
+    const { id, unit } = await uniqueRow(page);
+    // The code in the building column instead of the unit column, with the record open.
+    await openInventory(page, `?toa=${encodeURIComponent(unit)}&ho-so=${encodeURIComponent(id)}`);
+    await expect(checkJumped(page, id, unit)).rejects.toThrow("code not in the unit column filter");
+  });
+});
+
+/** E7: an unknown code shows «no row matches» with «Xoá lọc», the code visible in the unit filter, and no record. */
+async function checkUnknown(page: Page): Promise<void> {
+  await expect(page.getByText(NO_MATCH)).toBeVisible();
+  await expect(unitFilter(page)).toHaveValue(UNKNOWN);
+  await expect(unitFilter(page)).toBeVisible();
+  await expect(panel(page), "unknown code opened a record").toHaveCount(0);
+}
+
+test.describe("E7 · an unknown code typed in the box", () => {
+  test("says no row matches, keeps the code in the unit filter, and «Xoá lọc» brings every row back", async ({
+    page,
+  }, info) => {
+    test.skip(!["1440", "360"].includes(info.project.name), "1440 and 360");
+    await page.goto("/");
+    await openSearch(page);
+    await paletteInput(page).fill(UNKNOWN);
+    await paletteInput(page).press("Enter");
+    await expect(page).toHaveURL(/\/inventory\?ma=/);
+    await checkUnknown(page);
+    await page
+      .locator('[data-slot="data-region"]')
+      .getByRole("button", { name: "Xoá lọc" })
+      .click();
+    await expect(unitFilter(page)).toHaveValue("");
+    await expect(openers(page).first()).toBeVisible();
+    await expect(page.getByText(NO_MATCH)).toHaveCount(0);
+  });
+
+  test("the check fails when a record opens anyway", async ({ page }, info) => {
+    test.skip(info.project.name !== "1440", "one width is enough");
+    await openInventory(page, `?ma=${UNKNOWN}`);
+    // A record panel standing beside the empty grid, as if the first row had been opened anyway.
+    await page.evaluate(() => {
+      const fake = document.createElement("section");
+      fake.dataset["slot"] = "record-panel";
+      document.body.append(fake);
+    });
+    await expect(checkUnknown(page)).rejects.toThrow("unknown code opened a record");
+  });
+});
+
+/** E8: no sideways scroll and no serious or critical axe issue inside `scope`. */
+async function checkReadable(page: Page, scope: string): Promise<void> {
+  const width = await page.evaluate(() => [
+    document.documentElement.scrollWidth,
+    document.documentElement.clientWidth,
+    // The record head stands inside a panel that clips: its right edge is measured against the screen too.
+    document.querySelector('[data-slot="record-panel-header"]')?.getBoundingClientRect().right ?? 0,
+  ]);
+  expect(width[0], "record head scrolls sideways").toBeLessThanOrEqual(width[1]!);
+  expect(width[2], "record head scrolls sideways").toBeLessThanOrEqual(width[1]! + 0.5);
+  // Measured once the box has finished appearing: a fading box reads as pale text.
+  await page.waitForFunction(() =>
+    document.getAnimations().every((a) => a.playState !== "running"),
+  );
+  const result = await new AxeBuilder({ page }).include(scope).analyze();
+  const bad = result.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
+  expect(bad.map((v) => v.id)).toEqual([]);
+}
+
+test.describe("E8 · the grid after an unknown code, and the open box", () => {
+  for (const scheme of ["light", "dark"] as const) {
+    test(`no serious or critical issue, ${scheme}`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: scheme });
+      await openInventory(page, `?ma=${UNKNOWN}`);
+      await checkReadable(page, '[data-slot="data-region"]');
+      await openSearch(page);
+      await paletteInput(page).fill("0");
+      await expect(palette(page).getByRole("option").first()).toBeVisible();
+      await checkReadable(page, '[data-slot="unit-jump-palette"]');
+    });
+  }
+
+  test("the check fails when the record head is wider than the screen", async ({ page }, info) => {
+    test.skip(info.project.name !== "360", "phone only");
+    await injectStyle(page, '[data-slot="record-panel-header"] { min-width: 900px !important; }');
+    await openInventory(page);
+    await openFifth(page);
+    await expect(checkReadable(page, '[data-slot="record-panel"]')).rejects.toThrow(
+      "record head scrolls sideways",
+    );
+  });
+
+  test("the check fails on pale text", async ({ page }, info) => {
+    test.skip(info.project.name !== "1440", "one width is enough");
+    await openInventory(page);
+    await openFifth(page);
+    await page.evaluate(() => {
+      const p = document.createElement("p");
+      p.textContent = "Chữ xám nhạt";
+      p.style.cssText = "color:#eeeeee;background:#ffffff";
+      document.querySelector('[data-slot="record-panel"]')?.append(p);
+    });
+    await expect(checkReadable(page, '[data-slot="record-panel"]')).rejects.toThrow(
+      "color-contrast",
+    );
+  });
 });
