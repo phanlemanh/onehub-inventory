@@ -45,7 +45,7 @@ flowchart TD
 
 ## Chờ duyệt phạm vi
 
-- Đầu chủ mở một căn ở trang riêng bằng nút «Mở toàn màn», chép đường dẫn gửi đồng nghiệp mở đúng căn và đúng lần chào, và gõ mã căn ở thanh trên để tới thẳng hồ sơ căn (`loi-vao-ho-so`)
+- Đầu chủ chép đường dẫn một căn gửi đồng nghiệp mở đúng căn và đúng lần chào, và gõ mã căn ở thanh trên để mở thẳng hồ sơ căn trên Bảng hàng (`loi-vao-ho-so`)
 
 ## Đã giao — chờ phiên nghiệm thu
 
