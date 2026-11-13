@@ -2,7 +2,8 @@
 // git history. Two parts:
 //   1. the copies of the isolation runner at d85d815 and 83d1764 (tests/fixtures) are byte-exact: their git blob id,
 //      computed here without git, equals the blob id recorded when they were copied;
-//   2. no test or tool CI runs calls `git show`, `git log` or `git rev-parse <commit>` — with a red case in a copy.
+//   2. no test or tool CI runs reads git history (show, log, cat-file, rev-list, blame, rev-parse <commit>), except the
+//      callers listed with their fall-back — with a matrix of call forms and a red case in a copy.
 import { createHash } from "node:crypto";
 import {
   mkdirSync,
@@ -53,15 +54,24 @@ const SKIP_DIR = new Set(["node_modules", "fixtures", "__pycache__", ".pytest_ca
 const FALLS_BACK: Record<string, string> = {
   "tests/danh-muc-chuyen-mau.test.ts":
     "snapshotFromGit tra null khi ban sao khong co lich su; bai doc anh chup cua cung commit",
+  "tools/round_metrics/round_metrics.py":
+    "kiem_moc: commit khong co ma kho la kho nong thi ghi 'kho nong: bo qua kiem lich su git' va dung",
 };
 
-/** A call that reads git history: `git show` / `git log` as a command or an argument list, `rev-parse <hex>`. */
-const HISTORY = [
-  /["'`]git["'`]\s*,\s*\[\s*["'`](show|log)["'`]/,
-  /\bgit\(\s*["'`](show|log)["'`]/,
-  /\bgit\s+(show|log)\s/,
-  /rev-parse["'`]?\s*,?\s*["'`]?[0-9a-f]{7,40}\b/,
-];
+/**
+ * A call that reads git history, as a class: a line that invokes git — the word as a string (`"git"`), a call
+ * (`git(`, any arguments before the verb), or a shell command (`git -C dir …`) — and names a history verb anywhere on it:
+ * `show`, `log`, `cat-file`, `rev-list`, `blame`, or `rev-parse` with an argument that is not a flag and not HEAD.
+ */
+const GIT = /["'`]git["'`]|\bgit\s*\(|(^|[\s;|&$(])git\s+[-a-z]/;
+const VERB = /(^|[\s"'`,([])(show|log|cat-file|rev-list|blame)(?=[\s"'`,)\]]|$)/;
+const REV_PARSE = /rev-parse["'`]?\s*,?\s*(?!["'`]?(-|HEAD\b))["'`$]?[\w${]/;
+
+export function readsHistory(line: string): boolean {
+  const code = line.trim();
+  if (code.startsWith("//") || code.startsWith("*") || code.startsWith("#")) return false;
+  return GIT.test(line) && (VERB.test(line) || REV_PARSE.test(line));
+}
 
 function files(root: string, entry: string): string[] {
   const path = join(root, entry);
@@ -90,9 +100,7 @@ export function historyCalls(
     readFileSync(join(root, file), "utf8")
       .split("\n")
       .forEach((line, i) => {
-        const code = line.trim();
-        if (code.startsWith("//") || code.startsWith("*") || code.startsWith("#")) return;
-        if (HISTORY.some((re) => re.test(line))) out.push(`goi lich su git: ${rel}:${i + 1}`);
+        if (readsHistory(line)) out.push(`goi lich su git: ${rel}:${i + 1}`);
       });
   }
   return out;
@@ -131,33 +139,66 @@ describe("ban sao nong: khong bai nao CI chay doc lich su git (AC-7)", () => {
       expect(statSync(join(ROOT, file)).isFile()).toBe(true);
   });
 
+  it("moi tep trong danh sach du phong that su doc lich su (danh sach khong cu)", () => {
+    for (const file of Object.keys(FALLS_BACK)) {
+      const lines = readFileSync(join(ROOT, file), "utf8").split("\n");
+      expect(lines.some(readsHistory), file).toBe(true);
+    }
+  });
+
+  // The matrix of call forms, written before the scan: every form that reads history is caught, every control is not.
+  // Built from pieces so this file does not hold the patterns it scans for.
+  const g = ["g", "it"].join("");
+  const sha = ["83d", "1764"].join("");
+  const READS: [string, string][] = [
+    [
+      "execFileSync, argument list",
+      `execFileSync("${g}", ["show", "${sha}:db/scripts/cach-ly.sh"]);`,
+    ],
+    ["shell command", `base=$(${g} show d85d815:db/scripts/cach-ly.sh)`],
+    ["shell command with -C", `${g} -C "$dir" log --oneline -1 ${sha}`],
+    ["argument list with -C", `spawnSync("${g}", ["-C", dir, "show", ref]);`],
+    ["helper, verb first", `${g}("show", \`\${commit}:a.sh\`)`],
+    ["helper, root first", `${g}(root, "show", f"{commit}:{KHUNG}")`],
+    ["cat-file", `${g}(root, "cat-file", "-e", f"{commit}^{{commit}}")`],
+    ["rev-list", `subprocess.run(["${g}", "rev-list", "--count", base])`],
+    ["blame", `${g} blame -L 1,2 a.ts`],
+    ["rev-parse of a literal commit", `${g}("rev-parse", "${sha}")`],
+    ["rev-parse of a variable", `${g}("rev-parse", \`\${BIEN}^{commit}\`)`],
+    ["python list, rev-parse", `subprocess.run(["${g}", "rev-parse", commit])`],
+  ];
+  const CONTROLS: [string, string][] = [
+    ["comment", `// ${g} show abc1234:a.sh in a comment is fine`],
+    ["rev-parse --show-toplevel", `const top = ${g}("rev-parse", "--show-toplevel");`],
+    ["rev-parse HEAD", `${g} rev-parse HEAD`],
+    ["github, not git", `const url = "https://github.com/a/b/show";`],
+    ["a .git folder", `const d = join(root, ".${g}", "log");`],
+    ["status", `${g}("status", "--porcelain")`],
+  ];
+
+  it("ma tran dang goi: moi dang doc lich su bi bat, moi doi chung khong", () => {
+    expect(READS.filter(([, line]) => !readsHistory(line)).map(([name]) => name)).toEqual([]);
+    expect(CONTROLS.filter(([, line]) => readsHistory(line)).map(([name]) => name)).toEqual([]);
+  });
+
   it("pha: mot tep tests/*.test.ts doc lich su toi commit cu thi bai neu dung tep va dong", () => {
     const dir = mkdtempSync(join(tmpdir(), "ban-sao-nong-"));
     try {
       mkdirSync(join(dir, "tests"), { recursive: true });
-      // Built from pieces so this file does not hold the patterns it scans for.
-      const g = ["g", "it"].join("");
+      mkdirSync(join(dir, "tools/m"), { recursive: true });
       writeFileSync(
         join(dir, "tests/x.test.ts"),
-        [
-          `// ${g} show abc1234:a.sh in a comment is fine`,
-          `const a = execFileSync("${g}", ["show", "abc1234:db/scripts/cach-ly.sh"]);`,
-          "const b = 1;",
-        ].join("\n"),
+        [CONTROLS[0]![1], READS[0]![1], "const b = 1;"].join("\n"),
       );
-      writeFileSync(join(dir, "tests/y.sh"), `base=$(${g} show d85d815:db/scripts/cach-ly.sh)\n`);
-      writeFileSync(
-        join(dir, "tests/z.test.ts"),
-        `${g}("rev-parse", "${["83d", "1764"].join("")}")\n`,
-      );
-      writeFileSync(
-        join(dir, "tests/ok.test.ts"),
-        `const top = ${g}("rev-parse", "--show-toplevel");\n`,
-      );
-      expect(historyCalls(dir, ["tests"], {})).toEqual([
+      writeFileSync(join(dir, "tests/y.sh"), `${READS[1]![1]}\n`);
+      writeFileSync(join(dir, "tests/z.test.ts"), `${READS[9]![1]}\n`);
+      writeFileSync(join(dir, "tests/ok.test.ts"), `${CONTROLS[1]![1]}\n`);
+      writeFileSync(join(dir, "tools/m/m.py"), `x = 1\n${READS[5]![1]}\n`);
+      expect(historyCalls(dir, ["tests", "tools"], {})).toEqual([
         "goi lich su git: tests/x.test.ts:2",
         "goi lich su git: tests/y.sh:1",
         "goi lich su git: tests/z.test.ts:1",
+        "goi lich su git: tools/m/m.py:2",
       ]);
     } finally {
       rmSync(dir, { recursive: true, force: true });

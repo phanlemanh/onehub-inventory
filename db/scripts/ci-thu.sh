@@ -106,11 +106,26 @@ docker run -d --rm --name "$ten" -e POSTGRES_PASSWORD="$MAT_KHAU" -p "127.0.0.1:
   echo "ci-thu: không dựng được container $ANH"
   exit 1
 }
-until docker exec "$ten" pg_isready -U postgres -q; do sleep 1; done
+for i in $(seq 1 120); do
+  docker exec "$ten" pg_isready -U postgres -q 2>/dev/null && break
+  [ "$i" -eq 120 ] && {
+    echo "ci-thu: Postgres $ANH không sẵn sàng sau 120 giây"
+    exit 1
+  }
+  sleep 1
+done
 
 # psql inside the container when this machine has none (CI has psql on the runner).
-moi_truong=(DB_PORT="$cong")
-command -v psql >/dev/null 2>&1 || moi_truong+=(CI_DB_CONTAINER="$ten")
+moi_truong=(DB_PORT="$cong" PGPASSWORD=local-only DB_LANE=ci)
+if command -v psql >/dev/null 2>&1; then
+  psql_cmd="psql -h 127.0.0.1 -p $cong"
+else
+  moi_truong+=(CI_DB_CONTAINER="$ten")
+  psql_cmd="docker exec -i -e PGPASSWORD=local-only $ten psql -h 127.0.0.1 -p 5432"
+fi
+# A break that calls Playwright directly (may-chu-chu) gets the psql commands make ci-db would export; without them the
+# scratch database is looked up among the lane containers by name. ci-db.sh sets its own and ignores these.
+moi_truong+=("PSQL=$psql_cmd -U postgres" "PSQL_LOGIN=$psql_cmd -U quy_hang_login")
 loi=""
 
 echo "ci-thu: ── luot xanh: $LENH"

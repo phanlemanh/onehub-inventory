@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // The real CI run of row 1s (_acceptance/ci-co-postgres AC-10, E10): the latest run of the CI workflow on this
-// branch's head commit, read through gh. Green only when the job e2e-db succeeded, its log has
+// checkout's HEAD commit, read through gh — found by the commit, not the branch name: the local branch of a worktree
+// and the pushed branch of the pull request differ. Green only when the job e2e-db succeeded, its log has
 // `bo qua can dang nhap: 0` and `ci-db: 6/6 bước đạt`, and it took no longer than the job's timeout-minutes. Prints
 //   run <id> · e2e-db <m> phut · tong CI <m> (main <m>)
 //
@@ -31,16 +32,16 @@ const timeout = Number(block.match(/^ {4}timeout-minutes: (\d+)$/m)?.[1]);
 if (!timeout) fail("job e2e-db khong khai timeout-minutes");
 
 const sha = sh("git", ["rev-parse", "HEAD"]).trim();
-const branch = sh("git", ["rev-parse", "--abbrev-ref", "HEAD"]).trim();
 const fields = "databaseId,headSha,status,conclusion,startedAt,updatedAt,event";
 const choIdx = process.argv.indexOf("--cho");
 const choMin = choIdx > 0 ? Number(process.argv[choIdx + 1]) : 0;
+if (!Number.isFinite(choMin) || choMin < 0) fail("--cho can mot so phut");
 const deadline = Date.now() + choMin * 60000;
 let runs;
 let run;
 for (;;) {
   runs = JSON.parse(
-    gh("run", "list", "--workflow", "ci.yml", "--branch", branch, "-L", "30", "--json", fields),
+    gh("run", "list", "--workflow", "ci.yml", "--commit", sha, "-L", "30", "--json", fields),
   );
   run =
     runs.find((r) => r.headSha === sha && r.event === "pull_request") ??
