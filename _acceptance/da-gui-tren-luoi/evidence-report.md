@@ -6,7 +6,7 @@ failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 3c8ef3ee9fdede4c847d0642ce2e60bf1ac0c19c
+verified_commit: 309d08c6bc5f48d81e9b4f107b9cd326efc809a4
 human_signoff: Manh Phan 2026-11-13
 ---
 
@@ -213,3 +213,7 @@ Panel đề xuất cho E15 (human_override để trống):
 
 Round 1: làm lại sau vòng đầu — E2 và E13 đo lưới đã dựng, E14 theo quyết định 0024 trên điện thoại (commit 3c8ef3e).
 Round 2: mọi eval máy xanh; E3, E4, E6, E7, E8, E9, E12 carry-forward từ round 1; E15 chờ người chốt ở Cổng 2.
+
+### Re-pin lần 1 — 2026-11-13, do gộp main có hàng 7c sau chữ ký
+run_id: repin-20261113T091847Z-78527
+sha: 309d08c6bc5f48d81e9b4f107b9cd326efc809a4 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E14, E15 (E15 không khai paths) · AC không có chốt máy: AC-10
