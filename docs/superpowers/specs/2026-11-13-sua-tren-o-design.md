@@ -104,13 +104,14 @@ dùng migration 012 (011 đã cấp cho 2c).
 
 ### 5. Xuất xứ component
 
-| Component                                                 | Nấc (dùng / ghép / mở rộng / tạo) | Vì sao (1 dòng)                                                   |
-| --------------------------------------------------------- | --------------------------------- | ----------------------------------------------------------------- |
-| ReUI data-grid (`onCellEditRequest`, `cellEdit.editable`) | dùng                              | Lưới đã có F2, gõ để sửa, bấm đúp, khoá theo dòng                 |
-| `DataRegion` (`cellEdit`)                                 | mở rộng                           | Một chỗ quyết ô nào mở sửa theo bảng quyền và khoá của dòng       |
-| `CellEditor` (Popover của Base UI neo vào ô)              | tạo                               | Khung sửa dùng chung cho mọi Lưới; hàng 5 (dán từ Excel) dùng lại |
-| `useChange`                                               | mở rộng                           | Hoàn tác đi qua cổng lưu, hỏng thì báo                            |
-| Badge trạng thái, Input, Button                           | dùng                              | Đã có trong kho                                                   |
+| Component                                                 | Nấc (dùng / ghép / mở rộng / tạo) | Vì sao (1 dòng)                                                 |
+| --------------------------------------------------------- | --------------------------------- | --------------------------------------------------------------- |
+| ReUI data-grid (`onCellEditRequest`, `cellEdit.editable`) | dùng                              | Lưới đã có F2, gõ để sửa, bấm đúp, khoá theo dòng               |
+| `DataRegion` (`cellEdit`)                                 | mở rộng                           | Một chỗ quyết ô nào mở sửa theo bảng quyền và khoá của dòng     |
+| `CellEditor` theo dáng ReUI data-grid-editing-2           | ghép                              | Ô nhập nằm trong ô, một dòng dưới ô (Hỏi-4); hàng 5 dùng lại    |
+| `FormDialog`                                              | dùng                              | Đã bán, Ngừng hẳn và hỏi lại giá hỏi trong hộp giữa màn (Hỏi-4) |
+| `useChange`                                               | mở rộng                           | Hoàn tác đi qua cổng lưu, hỏng thì báo                          |
+| Badge trạng thái, Input, Button                           | dùng                              | Đã có trong kho                                                 |
 
 ### 6. Khuôn IA đã chọn + căn cứ
 
