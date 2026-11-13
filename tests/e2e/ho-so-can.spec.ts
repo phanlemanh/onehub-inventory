@@ -411,6 +411,7 @@ test.describe("E2, AC-10 of row 3e · the record head on two lines on every size
       await openInventory(page);
       await openFifth(page);
       await assertHeaderTwoLines(page);
+      await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
       mkdirSync(HEAD_SHOTS, { recursive: true });
       await page.screenshot({
         path: join(HEAD_SHOTS, `dau-ho-so-${info.project.name}-${colorScheme}.png`),

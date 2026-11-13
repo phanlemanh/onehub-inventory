@@ -127,6 +127,8 @@ async function openRecord(page: Page, id: string) {
 
 async function frame(page: Page, info: TestInfo, name: string, scheme: "light" | "dark") {
   await page.emulateMedia({ colorScheme: scheme });
+  // The dev server's own badge is not part of the product.
+  await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
   await page.waitForTimeout(250);
   mkdirSync(SHOTS, { recursive: true });
   await page.screenshot({ path: join(SHOTS, `${name}-${info.project.name}-${scheme}.png`) });
@@ -377,7 +379,9 @@ test("failure frames: no share sheet and no clipboard", async ({ page }, info) =
   await signIn(page, await person(info, "loi", ["BuyerAgent"]));
   await openRecord(page, rowKept("other").id);
   await page.locator('[data-slot="ask-list-agent"]').click();
-  await expect(page.getByRole("alert")).toHaveText(ASK_COPY.failed);
+  await expect(page.locator('[data-slot="record-footer"]').getByRole("alert")).toHaveText(
+    ASK_COPY.failed,
+  );
   for (const scheme of ["light", "dark"] as const) await frame(page, info, "hoi-loi", scheme);
   await page.getByRole("button", { name: REPORT }).click();
   await page.getByLabel(ASK_COPY.report.right).fill("72 m²");
