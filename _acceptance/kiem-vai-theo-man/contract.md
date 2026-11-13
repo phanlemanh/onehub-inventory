@@ -5,7 +5,7 @@ slug: kiem-vai-theo-man
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
-screens: [today, inventory, sent, members, sign-in]
+screens: []
 status: approved
 approved_by: Manh Phan
 approved_at: 2026-11-13
@@ -118,7 +118,11 @@ chưa đăng nhập với dữ liệu mẫu — hàng 10 đóng); người giữ
 
 ## Vai × Màn
 
-Kỳ vọng hôm nay, sinh từ `vao` của sổ màn và bảng quyền 9a; bộ kiểm đi đúng các ô này.
+Hàng này không dựng hay đổi màn nào, nên không khai `screens` (cổng chứng minh màn chỉ áp cho hàng dựng màn). Nó đo mọi cặp
+vai × màn của sổ trong trình duyệt; kỳ vọng hôm nay ở mục «Kỳ vọng vai × màn» dưới đây, sinh từ `vao` của sổ màn và bảng
+quyền 9a.
+
+## Kỳ vọng vai × màn
 
 | Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
 |---|---|---|---|---|

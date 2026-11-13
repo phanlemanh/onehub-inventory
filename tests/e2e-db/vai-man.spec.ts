@@ -211,8 +211,27 @@ async function navStep(page: Page, role: Role, size: Size): Promise<void> {
       `${role} @${size}: thanh ben ${p.screen}`,
     ).toHaveCount(p.expect === "chan" ? 0 : 1);
   }
-  if (Number(size) < 768) await page.keyboard.press("Escape");
 }
+
+// The sidebar for every role, at 1440 and on the phone sheet at 360 (AC-7). One test with a literal title, tagged for
+// the slowed-CPU repeats of the shared waits (tools/e2e_templates/settle.ts, CHO_TESTS); each role in its own context
+// from the shared door.
+test("thanh ben theo vai", { tag: "@cho" }, async ({ browser }, info) => {
+  const size = info.project.name.replace(/^vai-/, "") as Size;
+  test.skip(!NAV_SIZES.includes(size), `thanh ben chi do o ${NAV_SIZES.join(", ")}`);
+  for (const role of ROLES) {
+    const context = await browser.newContext({
+      storageState: roleSession(role),
+      viewport: info.project.use.viewport!,
+    });
+    const page = await context.newPage();
+    try {
+      await test.step(`${role} @${size}: thanh ben`, () => navStep(page, role, size));
+    } finally {
+      await context.close();
+    }
+  }
+});
 
 for (const role of ROLES) {
   test.describe(role, () => {
@@ -221,8 +240,7 @@ for (const role of ROLES) {
     test(`vai ${role}`, async ({ page }, info) => {
       const size = info.project.name.replace(/^vai-/, "") as Size;
       const mine = pairsAt(ALL, size).filter((p) => p.role === role);
-      const nav = NAV_SIZES.includes(size);
-      test.skip(mine.length === 0 && !nav, `${role} @${size}: khong co cap nao o kho nay`);
+      test.skip(mine.length === 0, `${role} @${size}: khong co cap nao o kho nay`);
       for (const p of mine) {
         if (p.expect === "duoc-vao") {
           await test.step(stepName(p, size, "duoc vao"), () => allowedStep(page, p, size));
@@ -241,7 +259,6 @@ for (const role of ROLES) {
           });
         }
       }
-      if (nav) await test.step(`${role} @${size}: thanh ben`, () => navStep(page, role, size));
     });
   });
 }
