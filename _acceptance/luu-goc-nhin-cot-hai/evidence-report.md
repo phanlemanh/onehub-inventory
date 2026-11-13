@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 8f04f8ea4146ca227a589892fbac1f7aba9b8d4f
+verified_commit: 360a005d0fa127ac09108547e7df3f7d5492f98c
 human_signoff:
 ---
 
@@ -167,7 +167,7 @@ human_signoff:
   run_id: minted-luu-goc-nhin-cot-hai-E15-r2
   exit_code: 0
   baseline: n-a
-  verifier: ui-check:E15
+  verifier: config:capture.ui
   verified_at: 2026-11-13T03:09:22Z
   screenshot: evidence/E15-1440-sang-thanh-cong-cu.png
   observed: |
@@ -242,3 +242,7 @@ none — every multi-run eval is uniform
 
 Round 1: 19 eval chay lan dau; E15 can khung thanh cong cu truoc khi ngan dien thoai che (S4 round 1). Returned to implementation.
 Round 2: E2, E3, E5, E6, E7, E8, E9, E15, E16, E19 chay lai tren commit 8f04f8e, tat ca dat; E1, E4, E10-E14, E17, E18 giu nguyen tu round 1 (delta khong cham paths cua eval).
+
+### Re-pin lần 1 — 2026-11-13, do sửa cảnh báo CodeQL ở bài trình duyệt và ghi số đo vòng sau khi verified
+run_id: repin-20261113T034533Z-23967
+sha: 360a005d0fa127ac09108547e7df3f7d5492f98c · suites: 3 lệnh exit 0 · evals: 18/18 eval máy đạt kỳ vọng · ngoài làn máy: E15
