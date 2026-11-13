@@ -72,6 +72,7 @@ evals:
     paths: [src/modules/listings/ui/**, src/components/templates/**, "src/app/(app)/inventory/**"]
     steps:
       - "Use the dev server at the URL given (lane R, port 3491); if it does not answer, start it from the repo root with npx next dev -p 3491 -H 127.0.0.1 (never port 3470, never while a suite command is running), note its PID and stop only that PID when done"
+      - "Before every screenshot, hide the Next.js dev indicator, which only the dev server draws: run document.querySelectorAll('nextjs-portal').forEach(e => e.style.display = 'none') in the page; hide nothing else"
       - "At 1440x900, light: open {url}/inventory, click the fifth unit code → screenshot evidence/ho-so-1440-sang.png"
       - "Same at 1440x900 dark, 1024x768 light and dark, 414x896 light and dark, 360x780 light and dark → evidence/ho-so-<width>-<sang|toi>.png"
       - "At 1440x900 light and 360x780 dark: click «Chép đường dẫn» (grant clipboard permission) → evidence/da-chep-<width>.png"
