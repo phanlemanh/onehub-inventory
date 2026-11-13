@@ -5,8 +5,23 @@ import { TypedCell } from "@/components/candidate/typed-cell";
 import { EMPTY, formatByKind } from "@/lib/format";
 import type { TypedColumn } from "@/components/candidate/column-kind";
 
+import type { ReactNode } from "react";
+
+import { sampleKeeperOf } from "../sample";
+import { AskListAgent } from "./ask-list-agent";
+import type { AskWords } from "./ask-copy";
 import { CopyLink } from "./copy-link";
 import { inventoryColumns, type InventoryField } from "./inventory-rows";
+import { ReportUnitError } from "./report-unit-error";
+
+/** The catalog properties a person may report wrong (row 3e): the shared unit catalog's, not the company's own. */
+const CATALOG_FIELDS: readonly InventoryField[] = [
+  "Listing.unitNumber",
+  "Listing.buildingName",
+  "Listing.subdivisionName",
+  "Unit.livingArea",
+  "Unit.bedroomsTotal",
+];
 
 /** The facts the card shows in its three-up row, in order (after product-grid-4's specs row). */
 const CARD_FACTS: readonly InventoryField[] = [
@@ -121,14 +136,33 @@ export function ListingCard({ view, priceLabel }: { view: ListingView; priceLabe
   );
 }
 
-/** The record of one listing: the card on top, then every inventory field as label and value. */
-export function ListingRecordBody({ view, priceLabel }: { view: ListingView; priceLabel: string }) {
+/**
+ * The record of one listing: the card on top, then every inventory field as label and value. `report` is the
+ * properties' own action (row 3e, ReportUnitError), at the right above the fields.
+ */
+export function ListingRecordBody({
+  view,
+  priceLabel,
+  report,
+}: {
+  view: ListingView;
+  priceLabel: string;
+  report?: ReactNode;
+}) {
   return (
     <div data-slot="listing-record" data-listing-id={view.id} className="flex flex-col gap-4">
       <ListingCard view={view} priceLabel={priceLabel} />
+      {report ? (
+        <div
+          data-slot="listing-record-fields-head"
+          className="-mb-2 flex justify-end border-t pt-2"
+        >
+          {report}
+        </div>
+      ) : null}
       <dl
         data-slot="listing-record-fields"
-        className="grid grid-cols-5 gap-x-4 gap-y-2 border-t pt-4"
+        className={`grid grid-cols-5 gap-x-4 gap-y-2 ${report ? "" : "border-t pt-4"}`}
       >
         {view.fields.map(({ column, value }) => (
           <div key={column.field} data-field={column.field} className="contents">
@@ -143,16 +177,60 @@ export function ListingRecordBody({ view, priceLabel }: { view: ListingView; pri
   );
 }
 
-/** How the inventory grid opens a row: the record names the unit and shows the listing's record body. */
-export function listingRecord(headers: Readonly<Record<InventoryField, string>>): RegionRecord {
+/** What the record shows for a catalog property, as the record shows it (money, m², «—»). */
+const shownText = (column: TypedColumn, value: unknown): string =>
+  value === null || value === undefined || value === "" ? EMPTY : formatByKind(column.kind, value);
+
+/** The catalog properties of one listing a person may report wrong, in order, with what the record shows. */
+export function reportFieldsOf(view: ListingView): { name: string; shown: string }[] {
+  return view.fields
+    .filter(({ column }) => CATALOG_FIELDS.includes(column.field as InventoryField))
+    .map(({ column, value }) => ({ name: column.header, shown: shownText(column, value) }));
+}
+
+/**
+ * How the inventory grid opens a row: the record names the unit and shows the listing's record body. With `words`
+ * (row 3e) the record also carries ReportUnitError on its properties and AskListAgent at its foot.
+ */
+export function listingRecord(
+  headers: Readonly<Record<InventoryField, string>>,
+  words?: AskWords,
+): RegionRecord {
   return {
     render: (row) => {
       const view = listingView(row, headers);
+      const building = text(row["Listing.buildingName"]);
+      const report = words ? (
+        <ReportUnitError
+          key={view.id}
+          unit={{
+            unitNumber: view.unitNumber,
+            building,
+            subdivision: text(row["Listing.subdivisionName"]),
+            buildingLabel: headers["Listing.buildingName"],
+            subdivisionLabel: headers["Listing.subdivisionName"],
+          }}
+          fields={reportFieldsOf(view)}
+          words={words}
+        />
+      ) : undefined;
       return {
-        title: [view.unitNumber, text(row["Listing.buildingName"])]
-          .filter((part) => part !== "")
-          .join(" · "),
-        body: <ListingRecordBody view={view} priceLabel={headers["Listing.listPrice"]} />,
+        title: [view.unitNumber, building].filter((part) => part !== "").join(" · "),
+        body: (
+          <ListingRecordBody
+            view={view}
+            priceLabel={headers["Listing.listPrice"]}
+            report={report}
+          />
+        ),
+        footer: words ? (
+          <AskListAgent
+            key={view.id}
+            listing={{ id: view.id, unitNumber: view.unitNumber, buildingName: building }}
+            keeper={sampleKeeperOf(view.id)}
+            words={words}
+          />
+        ) : undefined,
         // Row 3f: the record's link, so a colleague opens the same listing on the inventory.
         actions: <CopyLink id={view.id} />,
       };

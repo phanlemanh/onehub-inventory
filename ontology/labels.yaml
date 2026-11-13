@@ -377,6 +377,16 @@ concepts:
     own: true
     pref: Xoá tên và số
     en: Erase name and number
+  AskListAgent:
+    kind: action
+    own: true
+    pref: Hỏi đầu chủ
+    en: Ask the listing agent
+  ReportUnitError:
+    kind: action
+    own: true
+    pref: Báo sai thông tin
+    en: Report wrong details
   ShareLink:
     kind: entity
     own: true
