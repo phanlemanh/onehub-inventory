@@ -63,19 +63,25 @@ dữ liệu của sổ màn; phép đo rò rỉ ở AC-6 đo giữa các vai tro
   ghim `members × <vai> @1440: <mong gì>` và cây gốc chạy cùng cặp thì xanh.
 
 - AC-9: Given sổ màn và mã, When công cụ sinh bảng Vai × Màn tới cấp nút chạy, Then nó đọc tên thao tác trong thư mục của
-  trang VÀ trong phần giao diện (`src/modules/<m>/ui/`) của mọi mô-đun mà trang hay khung nhập, giữ MỌI màn của sổ (cả màn
-  chưa có trang, cả màn chưa tìm thấy tên nào), gộp nút khai với nút tìm thấy: nút khai mà chưa thấy trong mã mang dấu «dự
-  kiến»; và trên bản sao, một màn đã dựng mà mã có một thao tác chưa khai trong `nut` thì `make check` đỏ với thông điệp ghim
-  `<màn>: ma co <thao tác> chua khai`, một nút khai mà thao tác không có trong bảng quyền thì đỏ `<màn>: nut <tên> khong co
-  trong bang quyen`.
+  trang VÀ trong đúng các tệp giao diện mô-đun (`src/modules/<m>/ui/`) mà trang (hay khung) thật sự nhập — đi theo tên được
+  nhập qua cửa `ui`, qua thành phần trung gian trong `src/components/`, và qua nhập tương đối trong mô-đun; không gán cả mô-đun
+  cho màn —, giữ MỌI màn của sổ (cả màn chưa có trang, cả màn chưa tìm thấy tên nào), gộp nút khai với nút tìm thấy: nút khai
+  mà chưa thấy trong mã mang dấu «dự kiến»; và trên bản sao, một màn đã dựng mà mã có một thao tác chưa khai trong `nut` — đặt
+  thẳng trong trang, trong tệp giao diện mô-đun trang nhập, hay qua một thành phần trung gian — thì `make check` đỏ với thông
+  điệp ghim `<màn>: ma co <thao tác> chua khai`; một nút khai mà thao tác không có trong bảng quyền thì đỏ `<màn>: nut <tên>
+  khong co trong bang quyen`.
 - AC-10: Given bảng sinh ra (`design/vai-man-nut.md`), When đọc bảng, Then có đúng một mục cho mỗi màn của sổ cộng một mục
   khung App Shell (ô tìm ⌘K, đổi sàn, đăng xuất, cách xem đã lưu); mỗi mục có bốn hàng vai, cột «Nút theo quyền» (thao tác,
   phạm vi, dấu «dự kiến») và cột «Nút không theo quyền»; tệp lệch bảng thì `make check` đỏ như hôm nay.
-- AC-11: Given phiên của một vai và một màn được vào, When mở màn, Then mỗi nút theo quyền đang hiện mang dấu thao tác và mỗi
-  dấu nằm trong ô của vai ấy ở bảng sinh ra (không vai nào thấy nút ngoài ô của mình); nút khai `mo_san` (hiện ngay khi mở
-  màn) hiện với đúng các vai có ô; và trên bản sao cây đổi nút «Mời người» của màn Thành viên sang một thao tác khác mà không
-  sinh lại bảng, cặp members × CompanyAdmin ở 1440 đỏ với hai thông điệp ghim `members × CompanyAdmin @1440: thieu nut
-  inviteMember` và `members × CompanyAdmin @1440: thay nut <thao tác> khong co trong o`.
+- AC-11: Given phiên của một vai và một màn được vào, When mở màn, Then mỗi nút theo quyền đang hiện mang dấu thao tác; dấu
+  nằm trong vùng khung App Shell (thanh trên, cột thứ hai) được so với mục `khung` của bảng, dấu còn lại so với mục của màn;
+  mỗi dấu nằm trong ô của vai ấy (không vai nào thấy nút ngoài ô của mình); tập nút `mo_san` thấy được bằng đúng bảng viết
+  sẵn cho từng cặp (từ sổ màn ∩ ô của vai, kể cả cặp được vào mà không có ô, như Bảng hàng × Quản trị sàn); dấu là một thuộc
+  tính gắn lên chính phần tử nút, không thêm phần tử nào vào trang; và trên bản sao cây, (a) đổi nút «Mời người» sang một thao
+  tác khác mà không sinh lại bảng → members × CompanyAdmin @1440 đỏ `thieu nut inviteMember` và `thay nut <thao tác> khong co
+  trong o`; (b) đặt một nút lưu cách xem vào thân màn Thành viên → đỏ `members × CompanyAdmin @1440: thay nut saveView khong co
+  trong o`; (c) cho Quản trị sàn quyền lưu cách xem trong bảng quyền mà không sinh lại bảng → đỏ `<khung hay inventory> ×
+  CompanyAdmin @1440: thay nut saveView khong co trong o`.
 
 ## Coverage
 

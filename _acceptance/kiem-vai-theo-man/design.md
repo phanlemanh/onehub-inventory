@@ -115,22 +115,24 @@ diện các mô-đun nó nhập. Bốn việc, không hơn:
    `ontology/actions.yaml` — và `nut_chung: [<nút không theo quyền>…]`; một nút có thể mang `mo_san: true` khi nó hiện ngay lúc
    mở màn. Khối `khung` ở đầu sổ khai nút của thanh trên App Shell (ô tìm ⌘K, đổi sàn, đăng xuất) và của cột thứ hai (cách
    xem đã lưu).
-2. **Công cụ sinh bảng** đọc thêm phần giao diện (`src/modules/<m>/ui/**`) của mọi mô-đun mà trang (hay khung) nhập; giữ mọi
-   màn của sổ; gộp nút khai với nút tìm thấy; nút khai chưa thấy trong mã mang dấu «dự kiến»; màn đã dựng mà mã có thao tác
-   chưa khai → `make check` đỏ. Đọc theo mô-đun nên một mô-đun dùng ở hai màn đóng góp tên cho cả hai: màn khai thêm tên ấy
-   (thừa an toàn hơn thiếu; ghi ở Known limits nếu gặp). Dạng JSON giữ các khoá cũ (`actions`, `cells`) để bài kiểm của hàng 9e
+2. **Công cụ sinh bảng** đọc thêm đúng các tệp giao diện mô-đun mà trang (hay khung) nhập: tên nhập qua cửa `ui` được lần
+   tới tệp định nghĩa nó, rồi theo nhập tương đối trong mô-đun và qua thành phần trung gian trong `src/components/`. Không gán
+   cả mô-đun cho màn: gán cả mô-đun sẽ bắt Hôm nay khai nút căn chỉ vì cùng mô-đun, và bảng chủ kho duyệt sẽ sai. Giữ mọi màn
+   của sổ; gộp nút khai với nút tìm thấy; nút khai chưa thấy trong mã mang dấu «dự kiến»; màn đã dựng mà mã có thao tác chưa
+   khai → `make check` đỏ. Dạng JSON giữ các khoá cũ (`actions`, `cells`) để bài kiểm của hàng 9e
    không đổi lời; thêm `planned` và `common`.
 3. **Bảng sinh ra** có một mục cho mỗi màn của sổ cộng mục `khung`; ba cột: Vai · Nút theo quyền (thao tác, phạm vi, «dự kiến»)
    · Nút không theo quyền.
-4. **Ma trận trình duyệt so nút.** Nút theo quyền mang một dấu đọc được: `PermittedAction` bọc nút được phép trong một phần tử
-   `display: contents` có `data-thao-tac` (không đổi hình, không đổi luật — sửa duy nhất vào mã sản phẩm, đường hạng cao
-   `src/modules/identity/ui/`). Ở mỗi cặp được vào, mọi dấu đang hiện phải nằm trong ô của vai; nút `mo_san` phải hiện với đúng
-   các vai có ô. Không thêm lần mở trang nào: so ngay trên trang đã mở cho bước được vào.
+4. **Ma trận trình duyệt so nút.** Nút theo quyền mang một dấu đọc được: `PermittedAction` gắn thuộc tính `data-thao-tac`
+   lên chính phần tử nút con (không bọc, không thêm phần tử — nên không đổi bố cục hay bộ chọn của nhóm nút; sửa duy nhất vào
+   mã sản phẩm, đường hạng cao `src/modules/identity/ui/`). Một bài quét buộc mọi chỗ dùng có đúng một phần tử con. Dấu nằm
+   trong vùng khung App Shell so với mục `khung`, còn lại so với mục của màn. Ở mỗi cặp được vào: mọi dấu nằm trong ô của vai;
+   tập nút `mo_san` thấy được bằng bảng viết sẵn cho từng cặp. Không thêm lần mở trang nào.
 
 Không làm: gắn kiểm quyền cho nút đang nối tay trong thành phần của hàng 4, 3b, 3e; thêm thao tác cho Đã gửi (ghi nợ).
 
 Công thêm so với bản tám tiêu chí: công cụ sinh bảng và bài của nó khoảng nửa ngày; khai sổ cho 8 màn và khung khoảng một
-giờ; dấu thao tác và bài của nó khoảng một giờ; so nút trong ma trận khoảng 2–3 giờ; tổng khoảng một ngày máy. Thời gian chạy
+giờ; dấu thao tác và bài của nó khoảng một giờ; so nút trong ma trận khoảng 2–3 giờ; đọc theo tệp được nhập (thay vì cả mô-đun) và ba bản phá thêm khoảng 2–3 giờ; tổng khoảng một ngày rưỡi máy. Thời gian chạy
 bộ trình duyệt gần như không đổi (cùng lần mở trang); `make check` thêm vài giây.
 
 ## Ranh giới với hàng khác

@@ -142,6 +142,26 @@
     {
       "i": 4,
       "p": "Thanh bên trên điện thoại chưa được đo — đã sửa: đo ở khổ 1440 và 360 cho cả bốn vai."
+    },
+    {
+      "i": 5,
+      "p": "Nút của khung App Shell và nút của màn chưa tách khi so — đã sửa: nút ở khung so với phần khung của bảng, còn lại so với phần của màn; thêm bản cố ý làm hỏng đặt nút lạc màn."
+    },
+    {
+      "i": 6,
+      "p": "Máy tự chọn gán cả nhóm giao diện cho màn, khiến bảng có thể ghi nút không có trên màn — đã sửa: chỉ gán đúng phần màn thật sự dùng; Hôm nay không bị ghi nút căn."
+    },
+    {
+      "i": 7,
+      "p": "Lời hứa «không đổi hình nút» chưa đo được — đã sửa: không bọc nút nữa, chỉ gắn một thuộc tính lên chính nút; bài kiểm so trang có và không có dấu chỉ khác đúng thuộc tính ấy."
+    },
+    {
+      "i": 8,
+      "p": "Chưa có bảng viết sẵn nút nào phải hiện ở từng cặp — đã sửa: bảng 17 dòng, có cả Bảng hàng × Quản trị sàn không nút nào, kèm bản cố ý làm hỏng."
+    },
+    {
+      "i": 9,
+      "p": "Bản cố ý làm hỏng chỉ thử nút đặt thẳng trong màn — đã sửa: thử thêm nút đặt trong phần giao diện dùng chung và qua thành phần trung gian."
     }
   ]
 }

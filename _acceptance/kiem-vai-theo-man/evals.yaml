@@ -94,7 +94,7 @@ evals:
     executor: test
     cmd: config:executors.test.vai_man_nut
     paths: [tools/coverage_matrix/buttons.py, design/screens.yaml, ontology/actions.yaml, src/modules/*/ui/**, src/app/**, tests/vai-man-nut-sinh.test.ts, tests/bo-nut-vai-man.test.ts]
-    expected: "exit 0; ca 'doc-giao-dien-mo-dun': trên sổ thật, mục inventory của bảng JSON có saveView, editView, removeView mang dấu tìm-thấy (đọc từ src/modules/listings/ui) và updateListing, createListing, activateListing, removeListing, viewOwnerPhone mang dấu du-kien; ca 'giu-moi-man': tập id màn của bảng = tập id của sổ màn (gồm contacts planned, proto, sign-in) — không bỏ màn nào; ca phá trên bản sao: thêm PermittedAction action=\"readCatalog\" vào trang inventory mà không khai → '--check' thoát 1 với dòng 'inventory: ma co readCatalog chua khai'; khai nut 'khongCo' cho today → 'today: nut khongCo khong co trong bang quyen'; đối chứng: cùng hai lệnh trên cây thật thoát 0; các ca cũ của tests/bo-nut-vai-man.test.ts (hàng 9e) vẫn xanh, không đổi lời"
+    expected: "exit 0; ca 'doc-giao-dien-mo-dun': trên sổ thật, mục inventory của bảng JSON có saveView, editView, removeView mang dấu tìm-thấy (đọc từ src/modules/listings/ui) và updateListing, createListing, activateListing, removeListing, viewOwnerPhone mang dấu du-kien; ca 'giu-moi-man': tập id màn của bảng = tập id của sổ màn (gồm contacts planned, proto, sign-in) — không bỏ màn nào; ca 'khong-gan-ca-mo-dun': trên sổ thật, mục today KHÔNG có thao tác nào của listings (today không nhập tệp nào của listings/ui), mục khung có saveView, editView, removeView; ba ca phá trên bản sao cho cùng thông điệp 'inventory: ma co readCatalog chua khai': thêm PermittedAction action=\"readCatalog\" (a) thẳng vào trang inventory, (b) vào một tệp của src/modules/listings/ui/ mà trang nhập, (c) vào một thành phần trung gian mới trong src/components/ mà trang nhập; và đặt nó vào một tệp listings/ui mà KHÔNG trang nào nhập → không đỏ (đối chứng: đọc theo tệp được nhập, không theo cả mô-đun); khai nut 'khongCo' cho today → 'today: nut khongCo khong co trong bang quyen'; đối chứng: cùng hai lệnh trên cây thật thoát 0; các ca cũ của tests/bo-nut-vai-man.test.ts (hàng 9e) vẫn xanh, không đổi lời"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E13
@@ -110,21 +110,21 @@ evals:
     executor: script
     cmd: config:executors.script.vai_man_e2e
     paths: [tests/e2e-db/**, design/vai-man-nut.md, design/screens.yaml, src/modules/identity/ui/**, src/app/**]
-    expected: "exit 0; mỗi cặp được vào ở 1440 có bước '<màn> × <vai> @1440: nut' xanh (17 bước); mỗi dấu data-thao-tac đang hiện nằm trong ô của vai ấy ở bảng JSON của công cụ; bước 'members × CompanyAdmin @1440: nut' thấy đủ hai nút mo_san inviteMember và changeMemberRoles (đối chứng dương: dấu đọc được, không phải tập rỗng luôn xanh); ở cặp được vào không có nút nào, bước in 'khong nut theo quyen' thay vì im"
+    expected: "exit 0; tệp bài có bảng viết sẵn 17 dòng (cặp được vào ở 1440 → tập dấu mo_san mong thấy), bằng với sổ màn ∩ ô của vai — tối thiểu members × CompanyAdmin = {inviteMember, changeMemberRoles} và inventory × CompanyAdmin = {} ; mỗi cặp có bước '<màn> × <vai> @1440: nut' xanh: tập mo_san thấy = tập viết sẵn (thiếu thì đỏ 'thieu nut <x>'), mọi dấu data-thao-tac trong vùng khung nằm trong ô của mục khung, mọi dấu khác nằm trong ô của mục màn (ngoài ô thì đỏ 'thay nut <x> khong co trong o'); bước in số dấu đã đọc mỗi cặp (members × CompanyAdmin > 0 — đối chứng dương)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E15
     criterion: AC-11
     executor: script
     cmd: config:executors.script.vai_man_pha_thu
-    paths: [tests/e2e-db/**, src/app/(app)/members/**, src/modules/identity/ui/**, design/vai-man-nut.md]
-    expected: "exit 0; lệnh phá thử in thêm dòng 'pha doi-nut-moi: do — members × CompanyAdmin @1440: thieu nut inviteMember' và cùng lượt dòng có 'thay nut readCompany khong co trong o' (bản sao đổi action=\"inviteMember\" thành action=\"readCompany\" ở trang Thành viên, không sinh lại bảng); cây gốc cùng cặp xanh"
+    paths: [tests/e2e-db/**, src/app/(app)/members/**, src/modules/identity/ui/**, design/vai-man-nut.md, ontology/actions.yaml]
+    expected: "exit 0; lệnh phá thử in thêm ba dòng, mỗi dòng một bản sao: 'pha doi-nut-moi: do — members × CompanyAdmin @1440: thieu nut inviteMember' (cùng lượt có 'thay nut readCompany khong co trong o'); 'pha nut-lac-man: do — members × CompanyAdmin @1440: thay nut saveView khong co trong o' (nút lưu cách xem đặt vào thân màn Thành viên); 'pha quyen-chua-sinh-bang: do — <khung|inventory> × CompanyAdmin @1440: thay nut saveView khong co trong o' (bảng quyền cho Quản trị sàn saveView, không sinh lại bảng); cây gốc cùng các cặp xanh"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E16
     criterion: AC-11
     executor: test
     cmd: config:executors.test.vai_man_nut
-    paths: [src/modules/identity/ui/**, tests/vai-man-dau-nut.test.tsx]
-    expected: "exit 0; ca 'dau-thao-tac' trong tests/vai-man-dau-nut.test.tsx: nút được phép nằm trong đúng một phần tử data-thao-tac=<thao tác> có display: contents (không chiếm chỗ, không đổi hình); nút bị cấm không để lại phần tử nào; các ca cũ của bộ nút theo quyền (hàng 9e, lệnh bo_nut_unit) không đổi lời"
+    paths: [src/modules/identity/ui/**, src/**/*.tsx, tests/vai-man-dau-nut.test.tsx]
+    expected: "exit 0; ca 'dau-la-thuoc-tinh': render một nút được phép qua PermittedAction và render chính nút ấy không qua PermittedAction → cây DOM bằng nhau trừ đúng một thuộc tính data-thao-tac trên phần tử nút (cùng số phần tử, cùng thứ tự, cùng class); nút bị cấm không để lại phần tử nào; ca 'mot-phan-tu-con': quét mọi chỗ dùng PermittedAction trong src/ — con là đúng một phần tử JSX (không mảng, không chữ trần), chỗ vi phạm thì đỏ ghim '<tệp>:<dòng>: PermittedAction can dung mot phan tu con'; ca phá: bản sao một tệp dùng hai phần tử con → đỏ đúng thông điệp; các ca cũ của bộ nút theo quyền (hàng 9e, lệnh bo_nut_unit) không đổi lời"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

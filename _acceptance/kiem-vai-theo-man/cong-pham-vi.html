@@ -37,7 +37,7 @@ ul{margin:6px 0;padding-left:20px}table{border-collapse:collapse;width:100%;font
 <h2>Hỏi-3 · Gộp việc lấp bảng «vai nào thấy nút nào» vào hàng này?</h2>
 <p><span class="k">Khuyên: gộp</span> (giám sát đã quyết, chờ chữ anh) — mỗi màn khai ở một chỗ: cần quyền gì để vào và có những nút nào; máy sinh bảng cho mọi màn và khung App Shell; bộ kiểm trình duyệt so nút mỗi vai thấy với bảng.</p>
 <p><b>Lối khác:</b> giữ hàng này ở mức «vào được hay bị chặn», lấp bảng nút ở một hàng riêng — xong sớm hơn khoảng một ngày, bảng nút còn thiếu màn tới lúc ấy.</p>
-<p class="mut">Công thêm khoảng một ngày máy; thời gian chạy bộ trình duyệt gần như không đổi. Chạm hai chỗ hạng cao, nêu đích danh để chữ duyệt của anh phủ luôn: công cụ sinh bảng (<code>tools/coverage_matrix/buttons.py</code>) và nút theo quyền (<code>src/modules/identity/ui/permitted-action.tsx</code>, chỉ thêm một dấu đọc được, không đổi hình hay luật).</p>
+<p class="mut">Công thêm khoảng một ngày rưỡi máy; thời gian chạy bộ trình duyệt gần như không đổi. Chạm hai chỗ hạng cao, nêu đích danh để chữ duyệt của anh phủ luôn: công cụ sinh bảng (<code>tools/coverage_matrix/buttons.py</code>) và nút theo quyền (<code>src/modules/identity/ui/permitted-action.tsx</code>, chỉ gắn thêm một thuộc tính đọc được lên chính nút, không thêm phần tử, không đổi hình hay luật).</p>
 <p class="mut">Không làm ở đây: gắn kiểm quyền cho nút đang nối tay trong các hàng sửa trên ô, hồ sơ căn đang dựng; thêm thao tác mới cho Đã gửi (ghi nợ).</p>
 </section>
 
@@ -66,7 +66,7 @@ ul{margin:6px 0;padding-left:20px}table{border-collapse:collapse;width:100%;font
 
 <section class="card">
 <h2>Trả lời</h2>
-<p>Gõ ở phiên dãy D. Duyệt theo hai khuyến nghị:</p>
+<p>Gõ ở phiên dãy D. Duyệt theo ba khuyến nghị:</p>
 <pre>/acceptance-gate:approve kiem-vai-theo-man duyệt</pre>
 <p class="mut">Muốn chọn khác: «sửa: Hỏi-1 A», «sửa: Hỏi-2 ontology» / «sửa: Hỏi-2 thanh bên», hoặc «sửa: Hỏi-3 tách». Sau Cổng Phạm vi còn chữ «duyệt kế hoạch» (chín bước, ở thẻ kỹ thuật và tệp kế hoạch).</p>
 <p class="mut">Trở ngại: không có. Ngoài hợp đồng: cho bản mẫu và ảnh chụp các hàng khác chạy dưới một vai — cách làm đã ghi, đề nghị giám sát giao như việc phụ.</p>
