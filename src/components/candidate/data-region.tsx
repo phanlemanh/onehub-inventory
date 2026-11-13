@@ -53,6 +53,8 @@ import {
   type FieldKey,
   type TypedColumn,
 } from "./column-kind";
+import { useActionPermission, type PermissionAction } from "./action-permission";
+import { CellEditor } from "./cell-editor";
 import { ColumnFilterCell, type FilterOption } from "./column-filter-cell";
 import { GRID_COPY, GRID_I18N } from "./grid-copy";
 import {
@@ -92,6 +94,27 @@ export type GridRow = {
   transaction?: "sale" | "lease";
   locked?: Partial<Record<FieldKey, string>>;
 } & Partial<Record<FieldKey, unknown>>;
+
+/** One cell being edited: the screen draws the editor and calls `close` when it saved or gave up. */
+export type CellEditSession = {
+  row: GridRow;
+  field: FieldKey;
+  /** The character typed to start editing; absent for F2 and double-click. */
+  initialText?: string;
+  /** Closes the editor and gives the keyboard back to the cell; `next` moves to the next cell (Tab). */
+  close: (move?: "next") => void;
+};
+
+export type RegionCellEdit = {
+  /** The permission-table action every edit runs; without it the cells stay plain text. */
+  action: PermissionAction;
+  fields: readonly FieldKey[];
+  /** Whether the row is the viewer's own, for an own-scope permission. */
+  mine?: (row: GridRow) => boolean;
+  /** The label of the editor: the field and the row, for screen readers. */
+  label: (row: GridRow, field: FieldKey) => string;
+  render: (session: CellEditSession) => ReactNode;
+};
 
 export type RegionStatus = "ready" | "loading" | "error" | "partial" | "forbidden";
 
@@ -317,6 +340,7 @@ export function DataRegion({
   rowActions,
   record,
   editable = false,
+  cellEdit,
   initialFilters,
   groupBy,
   initialView,
@@ -345,6 +369,8 @@ export function DataRegion({
   record?: RegionRecord;
   /** Cells say where they are edited: in the cell or in the record panel, by kind. */
   editable?: boolean;
+  /** Cells edited in place (row 4): which fields, under which permission, and the editor the screen draws. */
+  cellEdit?: RegionCellEdit;
   /** Column filters the region opens with, e.g. a status shortcut of the App Shell. */
   initialFilters?: ColumnFilters;
   /** The field rows may be grouped under; the toolbar offers «Nhóm theo …» only when the screen names one. */
@@ -378,6 +404,22 @@ export function DataRegion({
   const [grouped, setGrouped] = useState(opening?.grouped ?? false);
   const [expanded, setExpanded] = useState<ExpandedState>(true);
   const [selectedCells, setSelectedCells] = useState(0);
+  // Editing in place (row 4): a cell opens only when the permission table gives the session the edit action, the
+  // field is one the screen opened, and the row does not lock it.
+  const permitted = useActionPermission();
+  const [editing, setEditing] = useState<{
+    rowId: string;
+    field: FieldKey;
+    initialText?: string;
+    anchor: Element;
+  } | null>(null);
+  const canEdit = useCallback(
+    (row: GridRow, field: FieldKey): boolean => {
+      if (!cellEdit || !cellEdit.fields.includes(field) || row.locked?.[field]) return false;
+      return permitted(cellEdit.action, cellEdit.mine ? cellEdit.mine(row) : true);
+    },
+    [permitted, cellEdit],
+  );
   // Full screen, like a sheet's: the whole page goes full screen (browser bars hidden, menus still open on top) and the
   // App Shell steps aside, so the region alone fills the screen. Esc, handled by the browser, leaves it.
   const shell = useShellFocus();
@@ -708,10 +750,12 @@ export function DataRegion({
             const id = row.id;
             return (
               // The negative margin keeps the row at the grid's density height: the button is taller than the text.
-              <span className="-my-1 inline-flex">
+              // It may not grow past its cell: a long value is cut like every other text cell (row 6, sent).
+              <span className="-my-1 inline-flex max-w-full min-w-0">
                 <Button
                   variant="link"
                   size="sm"
+                  className="w-full"
                   data-record-open={id}
                   // The unit code is the row's open door: one click opens it (the grid's two-step press for controls
                   // in a cell does not apply); the rest of the cell selects like a sheet. Keys belong to the grid.
@@ -731,7 +775,7 @@ export function DataRegion({
             cellClassName: column.align === "right" ? "text-right" : "text-left",
             // A copy carries the words the cell shows; nothing in the grid is written from here (rows 4, 5 edit).
             cellEdit: {
-              editable: false,
+              editable: (row: TableRow) => !row.group && canEdit(row as GridRow, column.field),
               format: (value: unknown, row: TableRow) =>
                 row.group
                   ? column.field === groupLabelField
@@ -796,6 +840,7 @@ export function DataRegion({
       headers,
       groupLabelField,
       groupCountField,
+      canEdit,
     ],
   );
 
@@ -1015,6 +1060,22 @@ export function DataRegion({
         // Ngoài-4 of 2a): only the table's body says so, and each rule can still be mended on its own.
         emptyMessage={<RegionNoMatch onClear={clearFilters} />}
         onCellSelectionChange={onSelection}
+        onCellEditRequest={
+          cellEdit
+            ? (request) => {
+                const anchor = document.querySelector(
+                  `[data-slot="data-region-scroll-content"] td[data-cell-focused]`,
+                );
+                if (!anchor) return;
+                setEditing({
+                  rowId: request.rowId,
+                  field: request.columnId as FieldKey,
+                  initialText: request.initialText,
+                  anchor,
+                });
+              }
+            : undefined
+        }
         tableLayout={{
           headerSticky: true,
           headerBackground: true,
@@ -1029,6 +1090,45 @@ export function DataRegion({
         {/* Keyed with the virtual body below: the selection binds its keys to the body's viewport once, so a body
             started again (a density switch) must bind them again. */}
         <DataGridCellSelection key={density} apiRef={selectionApi} />
+        {editing && cellEdit
+          ? (() => {
+              const row = rows.find((r) => r.id === editing.rowId);
+              if (!row) return null;
+              const close = (move?: "next") => {
+                setEditing(null);
+                // Back to the grid: the edited cell is still the selected cell, so arrows carry on from it.
+                requestAnimationFrame(() => {
+                  const viewport = document.querySelector<HTMLElement>(
+                    `[data-slot="data-region-scroll-content"] [tabindex="0"]`,
+                  );
+                  viewport?.focus();
+                  if (move === "next")
+                    viewport?.dispatchEvent(
+                      new globalThis.KeyboardEvent("keydown", { key: "Tab", bubbles: true }),
+                    );
+                });
+              };
+              return (
+                <CellEditor
+                  anchor={editing.anchor}
+                  find={() =>
+                    document.querySelector(
+                      `[data-slot="data-region-scroll-content"] td[data-cell-focused]`,
+                    )
+                  }
+                  label={cellEdit.label(row, editing.field)}
+                  onClose={() => close()}
+                >
+                  {cellEdit.render({
+                    row,
+                    field: editing.field,
+                    initialText: editing.initialText,
+                    close,
+                  })}
+                </CellEditor>
+              );
+            })()
+          : null}
         <div className="p-3 empty:hidden">{toolbar(sheetTools)}</div>
         <DataGridContainer>
           <DataGridScrollArea className={`${VIEWPORT_HEIGHT_CLASS} ${FULL_SCREEN_HEIGHT_CLASS}`}>

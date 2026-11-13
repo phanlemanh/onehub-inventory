@@ -49,6 +49,10 @@ export const LABELS = {
   LastConfirmedAt: {"pref": "Xác nhận lúc"},
   ClosePrice: {"pref": "Giá chốt"},
   CloseDate: {"pref": "Ngày bán", "lease": "Ngày cho thuê"},
+  WithdrawnReason: {"pref": "Lý do ngừng"},
+  WithdrawnSoldElsewhere: {"pref": "Chủ bán nơi khác", "lease": "Cho thuê nơi khác"},
+  WithdrawnOwnerChangedMind: {"pref": "Chủ đổi ý"},
+  WithdrawnUnreachable: {"pref": "Mất liên lạc"},
   LoginCode: {"pref": "Mã đăng nhập"},
   SignIn: {"pref": "Đăng nhập"},
   SignOut: {"pref": "Đăng xuất"},
@@ -64,6 +68,13 @@ export const LABELS = {
   RemoveContact: {"pref": "Xoá liên hệ"},
   MergeContacts: {"pref": "Gộp liên hệ"},
   EraseContactPersonalData: {"pref": "Xoá tên và số"},
+  ShareLink: {"pref": "Link đã gửi"},
+  RecipientName: {"pref": "Người nhận"},
+  ListingCount: {"pref": "Số căn"},
+  SentAt: {"pref": "Gửi lúc"},
+  OpenCount: {"pref": "Lượt mở"},
+  InterestCount: {"pref": "Quan tâm"},
+  LastOpenedAt: {"pref": "Mở gần nhất"},
 } as const;
 
 export type ConceptCode = keyof typeof LABELS;

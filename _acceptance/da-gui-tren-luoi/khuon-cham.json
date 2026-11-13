@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "den": "e0a551f0d16d37afffd5b3e6981991234be0653d",
+  "base": "1c83e80b1063af61e4626244180d92f70b88d365",
+  "ghim": {
+    "luoi": "4fc9a14418a61892ab1e76132041f3e091b4ae12"
+  },
+  "theo_khuon": [],
+  "lech_moi": [],
+  "no_cu": [
+    {
+      "tep": "src/app/(app)/sent/page.tsx",
+      "khoi": "DataRegion",
+      "loai": "khuon",
+      "so": 1,
+      "nhom": "luoi"
+    }
+  ],
+  "khong_do": [],
+  "ngoai_ban_do": 5,
+  "nhom": [
+    "luoi"
+  ]
+}
