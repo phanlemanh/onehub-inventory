@@ -132,16 +132,28 @@ interface ImportOf {
 }
 
 /**
+ * How a file is parsed, by its ending (row 4, K-5): `.tsx` as TSX, `.ts` as TypeScript. Read as TSX, a type assertion
+ * `<T>x` in a `.ts` file opens a JSX element that swallows the imports after it.
+ */
+function scriptKindOf(fileName: string): ts.ScriptKind {
+  return fileName.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+}
+
+/**
  * Every import of a file, read from TypeScript's own syntax tree rather than from the text: `import … from`,
  * `import "…"`, `export … from` and `import("…")`, wherever they sit in the file.
  */
-function importsOf(text: string, fileName: string): ImportOf[] {
+function importsOf(
+  text: string,
+  fileName: string,
+  kindOf: (fileName: string) => ts.ScriptKind = scriptKindOf,
+): ImportOf[] {
   const source = ts.createSourceFile(
     fileName,
     text,
     ts.ScriptTarget.Latest,
     true,
-    ts.ScriptKind.TSX,
+    kindOf(fileName),
   );
   const found: ImportOf[] = [];
   const visit = (node: ts.Node): void => {
@@ -200,11 +212,14 @@ function targetsOf(file: string, entry: ImportOf): string[] {
 }
 
 /** One line per forbidden import of a screen file: `<file>: imports <path> (<target>) — <use>`. */
-function rebuiltBehaviour(root: string): string[] {
+function rebuiltBehaviour(
+  root: string,
+  kindOf: (fileName: string) => ts.ScriptKind = scriptKindOf,
+): string[] {
   const problems: string[] = [];
   for (const path of screenFiles(root)) {
     const file = relative(root, path).split(sep).join("/");
-    for (const entry of importsOf(readFileSync(path, "utf8"), file)) {
+    for (const entry of importsOf(readFileSync(path, "utf8"), file, kindOf)) {
       for (const target of targetsOf(file, entry)) {
         const rule = forbiddenFor(target);
         if (!rule || ALLOWED[file]?.includes(target)) continue;
@@ -358,6 +373,45 @@ describe("screens declare, they do not rebuild behaviour", () => {
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
+  });
+});
+
+describe("ts-doc-nhu-typescript", () => {
+  const dialog = "@/components/ui/dialog";
+  const statement = `import { Dialog } from "${dialog}";`;
+  /** Writes one screen file with `before` ahead of the forbidden import, and runs the guard with `kindOf`. */
+  function guard(name: string, before: string, kindOf?: (f: string) => ts.ScriptKind): string[] {
+    const root = mkdtempSync(join(tmpdir(), "behaviour-guard-ts-"));
+    try {
+      const dir = join(root, "src/app/man");
+      mkdirSync(dir, { recursive: true });
+      writeFileSync(join(dir, name), `${before}\n${statement}\nexport default x;\n`);
+      return rebuiltBehaviour(root, kindOf);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  }
+  const expected = (file: string) =>
+    `${file}: imports ${dialog} (src/components/ui/dialog) — use useChange for confirmation`;
+  // Read as TSX for every file, the guard misses the import of a .ts file (the hole of row 1e).
+  const allTsx = () => ts.ScriptKind.TSX;
+
+  it("ts-doc-nhu-typescript: src/app/man/page.ts", () => {
+    const found = guard("page.ts", "const x = <T>y;");
+    expect(found, "ts-doc-nhu-typescript: src/app/man/page.ts").toEqual([
+      expected("src/app/man/page.ts"),
+    ]);
+  });
+
+  it("ts-doc-nhu-typescript: src/app/man/page.tsx stays TSX", () => {
+    const found = guard("page.tsx", "const x = <div />;");
+    expect(found, "ts-doc-nhu-typescript: src/app/man/page.tsx").toEqual([
+      expected("src/app/man/page.tsx"),
+    ]);
+  });
+
+  it("break: reading every file as TSX misses the import of the .ts file", () => {
+    expect(guard("page.ts", "const x = <T>y;", allTsx)).toEqual([]);
   });
 });
 
