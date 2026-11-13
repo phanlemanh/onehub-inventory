@@ -19,7 +19,7 @@ const HEADERS: Record<InventoryField, string> = {
 
 /**
  * Development-only clickable prototype of row 3f (loi-vao-ho-so) for its scope gate, served by the proto page at /proto/loi-vao-ho-so. `canh` picks the scene
- * (ngan · trang · nhieu · khong · go-ma) and `bang=an` hides the control board for screenshots.
+ * (ngan · go-ma · nhieu · khong · cu) and `bang=an` hides the control board for screenshots.
  */
 export function EntryProto({ q }: { q: Record<string, string | string[] | undefined> }) {
   const scene: Scene =
@@ -29,19 +29,27 @@ export function EntryProto({ q }: { q: Record<string, string | string[] | undefi
   const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
   const { listings, listingUnits } = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
   const rows = inventoryRows({ listings, listingUnits, units });
-  const row = rows[0]!;
-  const otherBuilding =
+  const first = rows[0]!;
+  const other =
     rows
       .map((r) => String(r["Listing.buildingName"]))
-      .find((b) => b !== row["Listing.buildingName"]) ?? "S2.05";
+      .find((b) => b !== first["Listing.buildingName"]) ?? "S2.05";
+  // The sample has no code in two buildings: the prototype adds one listing of the first code in another building.
+  const twin = [...rows, { ...first, id: `${first.id}-twin`, "Listing.buildingName": other }];
   return (
     <EntryShowcase
       scene={scene}
       bare={q.bang === "an"}
-      row={row}
-      otherBuilding={otherBuilding}
+      rows={rows}
+      twin={twin}
       headers={HEADERS}
-      words={{ unit: label("Unit"), building: label("Building"), inventory: label("Inventory") }}
+      words={{
+        unit: label("Unit"),
+        building: label("Building"),
+        inventory: label("Inventory"),
+        listing: label("Listing"),
+        emptyWhy: `${label("Company")} chưa có ${label("Unit").toLocaleLowerCase("vi")} nào đang chào trên ${label("Inventory")}.`,
+      }}
     />
   );
 }

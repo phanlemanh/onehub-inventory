@@ -2,8 +2,8 @@
 
 | Điểm | Đếm | Hình |
 |---|---|---|
-| Ba lối vào một hồ sơ (Hỏi-1, Hỏi-3; địa chỉ chung) | 4 bước nối tiếp, 3 nhánh rẽ (một căn · nhiều toà · không có) | cần hình — `luong-loi-vao` |
-| Hỏi-2 họ của màn mới | dưới ngưỡng: 1 bước, 2 lối | — |
+| Hai lối vào cùng Bảng hàng (Hỏi-1, Hỏi-3) | 4 bước nối tiếp, 3 nhánh rẽ (một căn · nhiều toà · không có) | cần hình — `luong-loi-vao` (vẽ lại sau lời chủ kho ở Cổng Phạm vi) |
+| Hỏi-4 đường dẫn cũ | dưới ngưỡng: 1 bước, 2 lối | — |
 
 ## Đề bài `luong-loi-vao`
 

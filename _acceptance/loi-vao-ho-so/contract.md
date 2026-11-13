@@ -1,6 +1,6 @@
 ---
 schema_version: 1
-feature: "Đầu chủ mở một căn ở trang riêng bằng nút «Mở toàn màn», chép đường dẫn gửi đồng nghiệp mở đúng căn và đúng lần chào, và gõ mã căn ở thanh trên để tới thẳng hồ sơ căn"
+feature: "Đầu chủ chép đường dẫn một căn gửi đồng nghiệp mở đúng căn và đúng lần chào, và gõ mã căn ở thanh trên để mở thẳng hồ sơ căn trên Bảng hàng"
 slug: loi-vao-ho-so
 owner: phanlemanh@gmail.com
 risk_tier: T2
@@ -15,46 +15,41 @@ design_doc: _acceptance/loi-vao-ho-so/design.md
 ## Context
 
 Hàng 3f của lộ trình (`docs/plan/lo-trinh.json`), một trong năm hàng chủ kho quyết «Build cả năm hàng» (2026-11-12) sau khi
-so hồ sơ căn của Quỹ hàng với hàng 3. Hàng 3 mở hồ sơ một căn cạnh Bảng hàng và địa chỉ `?ho-so=<id>` mở lại được, nhưng
-không có trang riêng cho một căn và không có chỗ gõ mã căn. Hàng này thêm trang riêng (dùng lại thân hồ sơ của hàng 3, khung
-hồ sơ dùng chung của Lưới theo quyết định 0023), nút «Mở toàn màn», nút «Chép đường dẫn» và ô «Gõ mã căn» ở thanh trên của
-App Shell. Nút ở đầu hồ sơ đặt trong khe nút của hàng 9e, nên hàng này dựng sau 9e.
+so hồ sơ căn của Quỹ hàng với hàng 3. Hàng 3 mở hồ sơ một căn nổi cạnh Bảng hàng, và địa chỉ `/inventory?ho-so=<id lần
+chào>` mở lại đúng hồ sơ ấy. Ở Cổng Phạm vi chủ kho chọn giữ nguyên cách xem này, không làm trang riêng cho một căn («Tôi
+muốn lối Lối khác, đơn giản hơn, vì giữ đúng ux hiện nay.»). Hàng này thêm nút «Chép đường dẫn» ở đầu hồ sơ (khe nút của
+hàng 9e) và ô «Gõ mã căn» ở thanh trên của App Shell; cả hai đều dẫn về Bảng hàng với hồ sơ của căn bật sẵn.
 
-Luật sản phẩm: SP-1 — trang đọc cùng nguồn với Bảng hàng, không mở đường đọc dữ liệu mới; SP-3 — chỉ chép vào bộ nhớ chép,
-người tự dán và tự gửi; SP-4 — trang riêng là trang nội bộ cần đăng nhập, không phải trang khách. Không luật nào bị nới.
+Luật sản phẩm: SP-1 — tìm căn theo mã chỉ trong các dòng Bảng hàng đã đọc, không mở đường đọc dữ liệu mới; SP-3 — chỉ chép
+vào bộ nhớ chép, người tự dán và tự gửi; SP-4 — đường dẫn là địa chỉ nội bộ của Bảng hàng, không phải trang khách. Không
+luật nào bị nới.
 
 Source input: ô `_acceptance/loi-vao-ho-so/opportunity.md` (build), lời giao của giám sát đợt «nen», bảng so «Chi tiết căn
-Quỹ hàng ↔ Inventory» mục 4, 5, 6, 40.
+Quỹ hàng ↔ Inventory» mục 4, 5, 6, 40, lời chủ kho ở Cổng Phạm vi (sổ quyết định, `stage: gate1`).
 
 ## Criteria
 
 - AC-1: Given hồ sơ một căn đang mở cạnh Bảng hàng ở 1440, 1024 và toàn màn ở 414, 360, When nhìn đầu hồ sơ, Then có nút
-  biểu tượng tên «Mở toàn màn» đứng trước «Trước», «Sau», «Đóng»; bấm nó thì sang trang riêng của căn ấy, địa chỉ
-  `/inventory/units/<mã căn>?toa=<toà>&ho-so=<id lần chào>`; nút lùi của trình duyệt đưa về Bảng hàng với hồ sơ ấy đang mở.
-- AC-2: Given trang riêng của một căn có trong Bảng hàng, When trang mở, Then thân trang là chính thân hồ sơ của hàng 3
-  (thẻ căn rồi tám trường, cùng giá trị như hồ sơ cạnh bảng của căn ấy), đầu trang là «<mã căn> · <toà>» kèm nút «Chép đường
-  dẫn», và có lối «Bảng hàng» quay về Bảng hàng; trang đọc các dòng qua cùng một nguồn với Bảng hàng, nên một căn có trong
-  danh mục mà không có lần chào nào trong Bảng hàng thì là «không có căn» (AC-5).
-- AC-3: Given trang riêng, When bấm «Chép đường dẫn», Then bộ nhớ chép giữ đúng địa chỉ đầy đủ của trang (có `toa` và
-  `ho-so`) và có báo «Đã chép đường dẫn»; When trình duyệt không cho chép, Then báo «Chưa chép được. Bạn chép đường dẫn trong
-  ô địa chỉ của trình duyệt.» và không báo đã chép.
-- AC-4: Given đường dẫn chép từ trang riêng, When một người cùng sàn mở nó trong một phiên trình duyệt khác, Then thấy đúng
-  căn và đúng lần chào ấy; When id lần chào (`ho-so`) còn trong Bảng hàng mà mã hay toà trên địa chỉ đã khác, Then vẫn mở
-  đúng lần chào ấy và địa chỉ được viết lại theo mã, toà hiện tại; When `ho-so` vắng, Then mở lần chào hiện tại của căn
-  theo thứ tự Bảng hàng; When `ho-so` không còn trong Bảng hàng, Then mở lần chào hiện tại của căn kèm dòng báo «Lần chào
-  trong đường dẫn không còn trong Bảng hàng — đang hiện lần chào hiện tại của căn.» (Hỏi-4).
-- AC-5: Given một mã căn không có ở toà nào trong Bảng hàng người ấy thấy, When mở trang riêng của
-  mã ấy, Then thấy «Không có căn này trong Bảng hàng», câu vì sao nêu lại mã đã gõ, và nút «Về Bảng hàng»; không thân hồ
-  sơ nào hiện.
-- AC-6: Given một mã căn có ở hai toà trở lên trong Bảng hàng, When mở trang riêng của mã ấy không kèm toà, Then thấy «Nhiều
-  căn — chọn toà» với đúng một nút cho mỗi toà có mã ấy, mỗi nút mở trang riêng của căn ở toà đó; mã có ở một toà thì mở
-  thẳng căn ấy; địa chỉ kèm một toà không có mã ấy thì xử như không kèm toà.
-- AC-7: Given một người có vai thấy Bảng hàng, ở bất kỳ màn nào có App Shell, When bấm «Gõ mã căn» trên thanh trên (hoặc
-  ⌘K / Ctrl+K, hoặc «/» khi không đứng trong ô nhập), gõ một mã rồi Enter, Then tới trang riêng của mã ấy (khoảng trắng hai
-  đầu bỏ qua, chữ hoa thường như nhau); Enter khi ô rỗng thì báo «Bạn gõ mã căn trước đã.» dưới ô và hộp không đóng; Esc
-  đóng hộp; người có vai không thấy Bảng hàng thì không có nút và phím tắt.
-- AC-8: Given trang riêng ở ba trạng thái (có căn, nhiều căn, không có căn) và hộp gõ mã đang mở, When nhìn ở 1440, 1024,
-  414, 360, sáng và tối, Then không cuộn ngang, chữ không đè nhau, và quét trợ năng không lỗi mức nghiêm trọng hay nguy cấp.
+  «Chép đường dẫn» đứng trước «Trước», «Sau», «Đóng» (ở 414 và 360 nút chỉ hiện biểu tượng, tên vẫn đọc được, và cả bốn
+  nút nằm trọn trong khung nhìn); thân hồ sơ không đổi so với hàng 3.
+- AC-2: Given hồ sơ một căn đang mở, When bấm «Chép đường dẫn», Then bộ nhớ chép giữ đúng địa chỉ đầy đủ
+  `<gốc>/inventory?ho-so=<id lần chào>` của căn ấy và có báo «Đã chép đường dẫn»; When trình duyệt không cho chép, Then báo
+  «Chưa chép được. Bạn chép đường dẫn trong ô địa chỉ của trình duyệt.» và không báo đã chép.
+- AC-3: Given đường dẫn chép từ hồ sơ, When một người cùng sàn mở nó trong một phiên trình duyệt khác, Then thấy Bảng hàng
+  với hồ sơ của đúng căn và đúng lần chào ấy bật sẵn.
+- AC-4: Given đường dẫn mang id lần chào không còn trong Bảng hàng, When mở nó, Then Bảng hàng hiện bình thường, không hồ sơ
+  nào bật, và có báo «Căn trong đường dẫn không còn trong Bảng hàng.» (Hỏi-2 trên thẻ).
+- AC-5: Given một người có vai thấy Bảng hàng, ở bất kỳ màn nào có App Shell, When bấm «Gõ mã căn» trên thanh trên (hoặc
+  ⌘K / Ctrl+K, hoặc «/» khi không đứng trong ô nhập), gõ một mã có ở đúng một toà rồi Enter, Then tới Bảng hàng với hồ sơ của
+  căn ấy bật sẵn (khoảng trắng hai đầu bỏ qua, chữ hoa thường như nhau); Enter khi ô rỗng thì báo «Bạn gõ mã căn trước đã.»
+  và hộp không đóng; Esc đóng hộp; người có vai không thấy Bảng hàng thì không có nút và phím tắt.
+- AC-6: Given một mã căn có ở hai toà trở lên trong Bảng hàng, When gõ mã ấy rồi Enter, Then Bảng hàng chỉ còn các dòng của
+  mã ấy (mã nằm trong ô tìm), mỗi toà một dòng, kèm câu «Mã «<mã>» có ở <N> toà — bấm mã căn ở dòng của toà cần mở.», và không hồ sơ nào tự bật.
+- AC-7: Given một mã không có ở dòng nào của Bảng hàng, When gõ mã ấy rồi Enter, Then Bảng hàng hiện trạng thái «không dòng
+  nào khớp» sẵn có, chữ đã gõ nằm trong ô tìm của Bảng hàng ở mọi khổ, không hồ sơ nào bật.
+- AC-8: Given hồ sơ có nút «Chép đường dẫn», Bảng hàng lọc theo mã ở nhiều toà, và hộp gõ mã đang mở, When nhìn ở 1440,
+  1024, 414, 360, sáng và tối, Then không cuộn ngang, chữ không đè nhau, và quét trợ năng không lỗi mức nghiêm trọng hay nguy
+  cấp.
 
 ## Vai × Màn
 
@@ -62,26 +57,21 @@ Hôm nay khung chưa bắt đăng nhập ở dữ liệu mẫu nên ô dưới l
 
 | Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
 |---|---|---|---|---|
-| inventory | được — thêm nút «Mở toàn màn» | được — thêm nút «Mở toàn màn» | được — thêm nút «Mở toàn màn» | chặn — như hàng 3 |
-
-Trang riêng của căn là màn mới, chưa có trong sổ màn; hàng khai nó vào sổ (cùng họ chủ kho chọn ở Hỏi-2) khi dựng trang, và
-dòng của nó trong bảng trên là: Đầu chủ, Đầu khách, Trưởng nhóm được — trang riêng mọi căn của sàn; Quản trị sàn chặn —
-trạng thái trang không đủ quyền, như Bảng hàng.
+| inventory | được — chép đường dẫn, gõ mã căn | được — chép đường dẫn, gõ mã căn | được — chép đường dẫn, gõ mã căn | chặn — như hàng 3, không có ô gõ mã |
 
 ## Coverage
 
-Quét theo khuôn «entity-feature» của bộ quét hình thái, trên ba lối vào của một hồ sơ.
+Quét theo khuôn «entity-feature» của bộ quét hình thái, trên hai lối vào một hồ sơ.
 
-- Trục A — lối vào: «Mở toàn màn» · địa chỉ được gửi · «Gõ mã căn» (nút, ⌘K, «/»).
-- Trục B — kết quả tìm: một căn · nhiều toà · mã lạ · toà sai · `ho-so` lạ hay vắng · ô rỗng.
+- Trục A — lối vào: đường dẫn được gửi · «Gõ mã căn» (nút, ⌘K, «/»).
+- Trục B — kết quả: một căn · nhiều toà · mã lạ · id lần chào đã rút · ô rỗng.
 - Trục C — khổ và màu: 1440 · 1024 · 414 · 360; sáng · tối.
 - Trục D — chép: được · bị chặn.
 - Trục E — vai: có Bảng hàng · không có.
 
-Thước: AC-1 phủ A («Mở toàn màn») × C (bốn khổ); AC-4 phủ A (địa chỉ) × B (`ho-so` lạ, vắng); AC-5, AC-6 phủ B (mã lạ, toà
-sai, nhiều toà, một toà); AC-7 phủ A («Gõ mã căn» ba lối) × B (ô rỗng) × E; AC-3 phủ D; AC-2 phủ thân hồ sơ; AC-8 phủ C ×
-ba trạng thái. [CE chưa kiểm chứng]: B «nhiều toà» trên Bảng hàng thật — dữ liệu mẫu không có mã ở hai toà, ca này chỉ đo
-trên dòng dựng tay trong bài kiểm.
+Thước: AC-1 phủ C (bốn khổ); AC-2 phủ D; AC-3, AC-4 phủ A (đường dẫn) × B (một căn, id đã rút); AC-5 phủ A («Gõ mã căn» ba
+lối) × B (một căn, ô rỗng) × E; AC-6, AC-7 phủ B (nhiều toà, mã lạ); AC-8 phủ C × ba trạng thái. [CE chưa kiểm chứng]: B
+«nhiều toà» trên Bảng hàng thật — dữ liệu mẫu không có mã ở hai toà, ca này chỉ đo trên dòng dựng tay trong bài kiểm.
 
 ## Đường đo
 
@@ -89,16 +79,17 @@ trên dòng dựng tay trong bài kiểm.
 
 ## Out of scope
 
+- Không trang riêng cho một căn, không nút «Mở toàn màn»: chủ kho chọn giữ hồ sơ nổi cạnh Bảng hàng (Cổng Phạm vi).
 - Không thêm căn khi gõ mã không khớp: thêm căn bằng mã là hàng 12; ô của hàng này chỉ tìm căn đã có trong Bảng hàng.
-- Không danh sách các lần chào của căn hay đổi lần chào trên trang riêng (hàng 3b «Hồ sơ đủ thông tin»).
-- Không «Trước», «Sau» trên trang riêng; không ghim hồ sơ thành cột (hàng 3a).
-- Không mở bảng chia sẻ của thiết bị hay gửi qua Zalo: chỉ chép đường dẫn (SP-3).
+- Không danh sách các lần chào của căn hay đổi lần chào trong hồ sơ (hàng 3b «Hồ sơ đủ thông tin»).
+- Không mở ứng dụng gửi hay Zalo: chỉ chép đường dẫn, người tự dán và tự bấm gửi (SP-3).
 - Không gợi ý mã khi đang gõ, không nhảy theo tên màn trong hộp gõ mã (Quỹ hàng có; thanh bên đã có lối tới các màn).
-- Không tự làm cửa đăng nhập hay chặn sàn riêng cho trang này: trang đi qua đúng cửa của Bảng hàng. Hôm nay Bảng hàng còn
-  chạy trên dữ liệu mẫu của một sàn và chưa bắt đăng nhập, nên trang riêng cũng vậy; khi Bảng hàng đọc dữ liệu thật qua cửa
-  theo sàn (hàng 10) thì trang này theo cùng cửa. Đường dẫn không dành cho khách; trang khách là luồng Gửi.
+- Không cửa đăng nhập riêng: đường dẫn đi qua đúng cửa của Bảng hàng — hôm nay dữ liệu mẫu của một sàn, chưa bắt đăng nhập;
+  khi Bảng hàng đọc dữ liệu thật theo sàn (hàng 10) thì đường dẫn theo cùng cửa. Đường dẫn không dành cho khách.
 
 ## Notes
 
-- Dựng sau hàng 9e (khe nút đầu hồ sơ) và sau khi bộ phát lịch giao hàng (trùng tệp với 2c, 9e ở `src/app/(app)/inventory/**`
-  và App Shell).
+- Dựng sau hàng 9e (đã gộp — khe nút đầu hồ sơ) và sau khi bộ phát lịch giao hàng (trùng tệp với 2c ở
+  `src/app/(app)/inventory/**`).
+- Sửa ở Cổng Phạm vi: lời giao trên lộ trình nói «trang riêng», «Mở toàn màn» và «Nhiều căn — chọn toà» với một nút mỗi toà;
+  theo lối chủ kho chọn, hàng không có trang riêng và chọn toà bằng chính các dòng Bảng hàng (sổ quyết định, `stage: gate1`).

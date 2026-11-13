@@ -51,7 +51,7 @@
 <body>
   <div class="frame">
     <p class="eyebrow">Sơ đồ luồng · Cổng Phạm vi · lối vào hồ sơ</p>
-    <h1>Ba lối vào, một trang riêng cho mỗi căn</h1>
+    <h1>Hai lối vào, cùng Bảng hàng như hôm nay</h1>
 
     <svg viewBox="0 0 1200 480" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -90,25 +90,25 @@
       <rect x="604" y="338" width="64" height="14" rx="2" fill="#f5f5f5"/>
       <text x="636" y="349" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">không có</text>
       <rect x="816" y="162" width="72" height="14" rx="2" fill="#f5f5f5"/>
-      <text x="820" y="173" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif">bấm một toà</text>
+      <text x="820" y="173" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif">bấm mã căn</text>
 
       <!-- ===== Nodes ===== -->
       <!-- E1: Mở toàn màn (entry, oval) -->
-      <text x="216" y="64" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.06em">AC-1</text>
+      <text x="216" y="64" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.06em">AC-1, 2</text>
       <rect x="40" y="72" width="176" height="64" rx="32" fill="#f5f5f5"/>
       <rect x="40" y="72" width="176" height="64" rx="32" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
-      <text x="128" y="102" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">«Mở toàn màn»</text>
-      <text x="128" y="118" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">hồ sơ cạnh Bảng hàng</text>
+      <text x="128" y="102" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Bấm mã căn</text>
+      <text x="128" y="118" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">trong Bảng hàng</text>
 
       <!-- E2: Gõ mã căn (entry, oval) -->
-      <text x="216" y="192" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.06em">AC-7</text>
+      <text x="216" y="192" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.06em">AC-5</text>
       <rect x="40" y="200" width="176" height="64" rx="32" fill="#f5f5f5"/>
       <rect x="40" y="200" width="176" height="64" rx="32" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
       <text x="128" y="230" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">«Gõ mã căn»</text>
       <text x="128" y="246" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">thanh trên · <tspan font-family="'Geist Mono', monospace" font-size="9">⌘K · /</tspan></text>
 
       <!-- E3: đường dẫn đồng nghiệp gửi (entry, oval) -->
-      <text x="216" y="320" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.06em">AC-4</text>
+      <text x="216" y="320" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.06em">AC-3</text>
       <rect x="40" y="328" width="176" height="64" rx="32" fill="#f5f5f5"/>
       <rect x="40" y="328" width="176" height="64" rx="32" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
       <text x="128" y="358" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Đường dẫn</text>
@@ -117,41 +117,41 @@
       <!-- T: Trang riêng (focal, the one node all entries reach) -->
       <rect x="264" y="184" width="224" height="96" rx="6" fill="#f5f5f5"/>
       <rect x="264" y="184" width="224" height="96" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
-      <text x="376" y="220" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Trang riêng của căn</text>
-      <text x="376" y="244" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">/inventory/units/&lt;mã&gt;</text>
-      <text x="376" y="260" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">?toa=&amp;ho-so=</text>
+      <text x="376" y="220" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Bảng hàng</text>
+      <text x="376" y="244" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">/inventory?ho-so=&lt;id&gt;</text>
+      <text x="376" y="260" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">hoặc ?ma=&lt;mã&gt;</text>
 
       <!-- D: tìm căn (decision) -->
       <polygon points="576,184 624,232 576,280 528,232" fill="#f5f5f5"/>
       <polygon points="576,184 624,232 576,280 528,232" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
       <text x="576" y="230" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Tìm căn</text>
-      <text x="576" y="245" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">id · mã · toà</text>
+      <text x="576" y="245" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif" text-anchor="middle">id · mã</text>
 
       <!-- S1: hồ sơ của căn -->
       <rect x="688" y="64" width="240" height="80" rx="6" fill="#f5f5f5"/>
       <rect x="688" y="64" width="240" height="80" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
-      <text x="808" y="96" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Hồ sơ của căn</text>
-      <text x="808" y="113" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">thân hồ sơ hàng 3</text>
+      <text x="808" y="96" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Hồ sơ nổi cạnh bảng</text>
+      <text x="808" y="113" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">như hàng 3</text>
       <text x="808" y="129" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">nút «Chép đường dẫn»</text>
 
       <!-- S2: nhiều căn — chọn toà -->
       <rect x="688" y="196" width="240" height="72" rx="6" fill="#f5f5f5"/>
       <rect x="688" y="196" width="240" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
       <rect x="696" y="204" width="36" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
-      <text x="714" y="216" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-6</text>
-      <text x="808" y="240" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">«Nhiều căn — chọn toà»</text>
-      <text x="808" y="256" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">một nút cho mỗi toà</text>
+      <text x="714" y="216" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-6 </text>
+      <text x="808" y="240" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Bảng lọc theo mã</text>
+      <text x="808" y="256" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">mỗi toà một dòng</text>
 
       <!-- S3: không có căn -->
       <rect x="688" y="324" width="240" height="72" rx="6" fill="#f5f5f5"/>
       <rect x="688" y="324" width="240" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
       <rect x="696" y="332" width="36" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
-      <text x="714" y="344" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-5</text>
-      <text x="808" y="368" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">«Không có căn này trong Bảng hàng»</text>
-      <text x="808" y="384" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">mã không có ở toà nào</text>
+      <text x="714" y="344" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-7</text>
+      <text x="808" y="368" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">«Không dòng nào khớp»</text>
+      <text x="808" y="384" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">trạng thái sẵn có</text>
 
       <!-- X1: đã chép (exit, focal) -->
-      <text x="1160" y="64" fill="#ba4513" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.06em">AC-3</text>
+      <text x="1160" y="64" fill="#ba4513" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.06em">AC-2</text>
       <rect x="1000" y="72" width="160" height="64" rx="32" fill="#f5f5f5"/>
       <rect x="1000" y="72" width="160" height="64" rx="32" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
       <text x="1080" y="102" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">«Đã chép đường dẫn»</text>
@@ -160,7 +160,7 @@
       <!-- X2: về Bảng hàng (exit) -->
       <rect x="1000" y="328" width="160" height="64" rx="32" fill="#f5f5f5"/>
       <rect x="1000" y="328" width="160" height="64" rx="32" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
-      <text x="1080" y="364" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">«Về Bảng hàng»</text>
+      <text x="1080" y="364" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Xoá lọc</text>
 
       <!-- ===== Legend ===== -->
       <line x1="40" y1="428" x2="1160" y2="428" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
@@ -170,7 +170,7 @@
       <text x="164" y="456" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Lối vào · điểm ra</text>
 
       <rect x="284" y="446" width="24" height="12" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
-      <text x="316" y="456" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Trạng thái của trang riêng</text>
+      <text x="316" y="456" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Trạng thái của Bảng hàng</text>
 
       <polygon points="484,444 492,452 484,460 476,452" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
       <text x="500" y="456" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Rẽ nhánh</text>

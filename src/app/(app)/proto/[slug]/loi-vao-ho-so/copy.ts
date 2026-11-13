@@ -5,26 +5,22 @@ const lower = (noun: string) => noun.toLocaleLowerCase("vi");
 
 /** Frame words the row proposes (they would move to the grid and frame copy files when the row is built). */
 export const ENTRY_COPY = {
-  openFull: "Mở toàn màn",
   copyLink: "Chép đường dẫn",
   copied: "Đã chép đường dẫn",
   copyFailed: "Chưa chép được. Bạn chép đường dẫn trong ô địa chỉ của trình duyệt.",
+  staleLink: (unit: string, inventory: string) =>
+    `${unit} trong đường dẫn không còn trong ${inventory}.`,
   jump: (unit: string) => `Gõ mã ${lower(unit)}`,
   jumpHint: (unit: string) => `Gõ mã ${lower(unit)}…`,
   jumpWhy: (unit: string, inventory: string) =>
     `Gõ đúng mã ${lower(unit)} rồi Enter để mở hồ sơ ${lower(unit)} trong ${inventory}.`,
   jumpGo: "Mở",
   jumpEmpty: (unit: string) => `Bạn gõ mã ${lower(unit)} trước đã.`,
-  notFound: (unit: string, inventory: string) => `Không có ${lower(unit)} này trong ${inventory}`,
-  notFoundWhy: (code: string, inventory: string) =>
-    `Mã «${code}» không khớp dòng nào bạn thấy trong ${inventory}. Bạn xem lại mã, hoặc mở ${inventory} để tìm.`,
-  backTo: (inventory: string) => `Về ${inventory}`,
-  many: (unit: string, building: string) => `Nhiều ${lower(unit)} — chọn ${lower(building)}`,
-  manyWhy: (code: string, count: number, building: string) =>
-    `Mã «${code}» có ở ${count} ${lower(building)}. Bạn chọn ${lower(building)} để mở đúng hồ sơ.`,
+  many: (code: string, count: number, building: string, unit: string) =>
+    `Mã «${code}» có ở ${count} ${lower(building)} — bấm mã ${lower(unit)} ở dòng của ${lower(building)} cần mở.`,
 } as const;
 
-export const SCENES = ["ngan", "trang", "nhieu", "khong", "go-ma"] as const;
+export const SCENES = ["ngan", "go-ma", "nhieu", "khong", "cu"] as const;
 export type Scene = (typeof SCENES)[number];
 
 export const PROTO_COPY = {
@@ -35,12 +31,13 @@ export const PROTO_COPY = {
     scene: "Cảnh",
   },
   scenes: {
-    ngan: "Hồ sơ cạnh bảng",
-    trang: "Trang riêng của căn",
+    ngan: "Hồ sơ có «Chép đường dẫn»",
+    "go-ma": "Gõ mã căn",
     nhieu: "Mã có ở hai toà",
     khong: "Mã lạ",
-    "go-ma": "Gõ mã căn",
+    cu: "Đường dẫn cũ",
   },
   topBarNote: "Thanh trên của App Shell (bản mẫu chép lại phần bên phải).",
-  sharedNote: "Đồng nghiệp cùng sàn mở đường dẫn này thấy đúng căn và đúng lần chào.",
+  recordNote:
+    "Đầu hồ sơ như hàng 3, thêm «Chép đường dẫn». Bấm thử: địa chỉ /inventory?ho-so=<id> vào bộ nhớ chép.",
 } as const;
