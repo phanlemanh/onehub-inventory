@@ -5,6 +5,9 @@
 #   DB_LANE   — lane name; the container is onehub-inventory-db-$DB_LANE (see mk/db.mk).
 #               Unset: the single running onehub-inventory-db-* container. None or several: stop and ask for DB_LANE.
 #
+#   PSQL_LOGIN — with PSQL set (CI, row 1s): the whole psql command for the app's login role quy_hang_login (row 7c).
+#
+# pg_psql_login [psql args…] — psql connected AS quy_hang_login: the container's local socket (trust), or PSQL_LOGIN.
 # pg_sql <db> [psql args…]  — stdin goes straight to psql, which stops at the first error.
 # pg_cmd <db> <statement>   — one statement; stdin is closed so `docker exec -i` cannot eat the caller's input.
 
@@ -38,6 +41,19 @@ pg_psql() {
     $PSQL "$@"
   else
     docker exec -i "$PG_CONTAINER" psql -U postgres "$@"
+  fi
+}
+
+pg_psql_login() {
+  if [ -n "${PSQL:-}" ]; then
+    if [ -z "${PSQL_LOGIN:-}" ]; then
+      echo "PSQL đặt mà thiếu PSQL_LOGIN — cần lệnh psql nối bằng quy_hang_login (.env.example)" >&2
+      return 2
+    fi
+    # shellcheck disable=SC2086 # PSQL_LOGIN is a command line on purpose
+    $PSQL_LOGIN "$@"
+  else
+    docker exec -i "$PG_CONTAINER" psql -U quy_hang_login "$@"
   fi
 }
 

@@ -93,7 +93,7 @@ evals:
     executor: test
     cmd: config:executors.test.vai_dang_nhap_unit
     paths: [src/modules/identity/with-company.ts, src/modules/identity/with-company.test.ts]
-    expected: "exit 0; bài đơn vị của cửa với pool giả: kết quả kiểm vai đạt → hàm chạy, câu kiểm chạy đúng một lần cho hai lời gọi; kết quả từ chối → ném 'cửa từ chối vai nối <vai>: <lý do>', không câu 'begin' nào được gửi, lời gọi sau kiểm lại; chiều đỏ: một cửa giả bỏ bước kiểm dựng ngay trong tệp bài (không qua tham số của cửa thật) chạy cùng phép khẳng định của ca từ chối thì phép khẳng định ném; chữ ký công khai của withCompany và createPool không có tham số nào tắt bước kiểm (bài so số tham số)"
+    expected: "exit 0; bài đơn vị của cửa với pool giả: kết quả kiểm vai đạt → hàm chạy, câu kiểm chạy đúng một lần cho hai lời gọi; kết quả từ chối → ném 'cửa từ chối vai nối <vai>: <lý do>', không câu 'begin' nào được gửi, lời gọi sau kiểm lại; chiều đỏ: cùng phép khẳng định của ca từ chối, áp lên một lượt mà vai lọt qua bước kiểm (hàm truyền vào chạy), thì không đạt — không dựng bản sao cửa trong tệp bài, vì bộ quét một cửa cấm câu đổi vai ngoài cửa; chữ ký công khai của withCompany và createPool không có tham số nào tắt bước kiểm (bài so số tham số)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E7

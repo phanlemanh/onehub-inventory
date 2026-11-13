@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-13 — The app connects as login role quy_hang_login (migration 008); the query door refuses an owner-reachable role; isolation suite gains login-session cases (row 7c) — [0025](decisions/0025-ung-dung-noi-bang-vai-dang-nhap.md).
 - 2026-11-12 — Isolation suite catches write-only views (row 7b): a plain view the API role can only insert into, update or delete through runs as its owner and skipped case 18 — company A could delete company B's agreements. Case 20 names such views in any schema, three break files prove it, the runner goes to 31 cases and keeps every old case and pinned line word for word; the row 9 invite break pair measures the database again, and every database test runs on lane C in one command with none skipped — [hồ sơ](../_acceptance/cach-ly-dang-xem-chi-ghi/contract.md).
 - 2026-11-12 — Hồ sơ căn: bấm mã căn trên Bảng hàng mở hồ sơ trong ngăn nổi bên phải (từ dưới thanh trên tới đáy màn hình, không khoá bảng, có địa chỉ `?ho-so=`), điện thoại mở toàn màn với thẻ căn ở đầu; thẻ và hồ sơ đọc một mô hình; Tab từ hồ sơ đi vào bảng — hàng 3, `_acceptance/ho-so-can/`, [0024](decisions/0024-ngan-noi-xem-chi-tiet.md).
 - 2026-11-12 — Owner chose a floating panel as the app's one way to show a row's detail (with a pin, AI in the same slot) — [0024](decisions/0024-ngan-noi-xem-chi-tiet.md).

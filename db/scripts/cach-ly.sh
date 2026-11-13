@@ -3,8 +3,13 @@
 #   1. a fresh scratch database, migrations applied twice (the second run applies nothing);
 #   2. db/tests/cach-ly.sql — 20 cases under the API role, using the door's own statements;
 #   3. ten break cases (twenty-four break files), each file on its own scratch database: the suite must go red with the
-#      pinned messages.
-# Every case prints `ok <case>` exactly once; the last line is `cach-ly: 31 ca đạt, vai quy_hang_app`.
+#      pinned messages;
+#   4. the app's login role (row 7c): db/tests/vai-dang-nhap.sql on the clean database in a rolled-back transaction;
+#      db/tests/vai-dang-nhap-phien.sql on a connection logged in AS quy_hang_login; seven break files, each in one
+#      rolled-back transaction with the catalog case (roles belong to the whole cluster, so a break is never committed),
+#      then the catalog case once more — a trace left on the cluster fails it.
+# Every case prints `ok <case>` exactly once; the last line is
+# `cach-ly: 35 ca đạt, vai quy_hang_app, nối bằng quy_hang_login`.
 # Missing, repeated or failing cases are named and the exit code is not 0.
 #
 #   DB_LANE=n bash db/scripts/cach-ly.sh       (see db/scripts/psql.sh for DB_LANE and PSQL)
@@ -59,6 +64,28 @@ CA_LENH=(
   pha-thu-ham-dac-quyen
   pha-thu-dang-xem-chi-ghi
 )
+CA_DANG_NHAP=(
+  vai-dang-nhap-khong-ve-chu
+  dang-nhap-khong-ve-vai-chu
+  dang-nhap-qua-cua-doc-duoc
+  pha-thu-vai-dang-nhap
+)
+# Break files of the login role (db/tests/pha-thu/<file>.sql) → the line its red run must contain.
+VAI_DANG_NHAP_PHA=(cap-vai-chu cap-vai-danh-tinh cap-ke-thua so-huu-bang vuot-luat quyen-thang quyen-ham-thang)
+vai_dang_nhap_ghim() {
+  case "$1" in
+    cap-vai-chu) printf '%s\n' "HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login về được vai chủ postgres" ;;
+    cap-vai-danh-tinh)
+      printf '%s\n' "HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login vượt được luật theo dòng qua quy_hang_identity" ;;
+    cap-ke-thua) printf '%s\n' "HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login kế thừa quyền của quy_hang_app" ;;
+    so-huu-bang) printf '%s\n' "HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login sở hữu public.agreements" ;;
+    vuot-luat) printf '%s\n' "HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login vượt được luật theo dòng" ;;
+    quyen-thang)
+      printf '%s\n' "HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login có quyền thẳng trên public.agreements SELECT" ;;
+    quyen-ham-thang)
+      printf '%s\n' "HỎNG vai-dang-nhap-khong-ve-chu: quy_hang_login chạy được hàm public.ham_chu_mau mà quy_hang_app không chạy được" ;;
+  esac
+}
 # Break case → its break files (db/tests/pha-thu/<file>.sql), each on its own scratch database.
 pha_thu_tep() {
   case "$1" in
@@ -216,8 +243,66 @@ for pha in bo-ep-luat luat-them-khong-kiem luat-doc-mo bang-moi-luat-mo \
   fi
 done
 
-# 4. Count: every case exactly once, nothing failed.
-tat_ca=("${CA_SQL[@]}" "${CA_LENH[@]}")
+# 4. The app's login role (row 7c).
+# The catalog case in one rolled-back transaction, after an optional break file. Prints its ok/HỎNG lines.
+vai_dang_nhap_danh_muc() {
+  local db="$1" pha="${2:-}"
+  {
+    echo "begin;"
+    [ -n "$pha" ] && cat "$tests/pha-thu/$pha.sql"
+    cat "$tests/vai-dang-nhap.sql"
+    echo "rollback;"
+  } | pg_psql -d "$db" -X -q -o /dev/null 2>&1 | sed -nE 's/^.*(NOTICE|ERROR):  ((ok|HỎNG) .*)$/\2/p'
+}
+dong=$(vai_dang_nhap_danh_muc "$lanh")
+bao "${dong:-HỎNG vai-dang-nhap-khong-ve-chu: ca không in gì}"
+
+# The session cases, on a connection logged in as quy_hang_login, on their own scratch database with two companies.
+dang_nhap="cach_ly_${nhan:+${nhan}_}dang_nhap"
+fresh_db "$dang_nhap"
+if ! bash "$here/migrate.sh" "$dang_nhap" >/dev/null 2>&1 || ! pg_sql "$dang_nhap" <"$tests/vai-dang-nhap-mau.sql" >/dev/null 2>&1; then
+  bao "HỎNG dang-nhap-khong-ve-vai-chu: không dựng được cơ sở nháp của bước phiên"
+else
+  echo "phiên đăng nhập: quy_hang_login"
+  phien=$(pg_psql_login -d "$dang_nhap" -X -q -o /dev/null <"$tests/vai-dang-nhap-phien.sql" 2>&1)
+  rc_phien=$?
+  phien_dong=$(sed -nE 's/^.*(NOTICE|ERROR):  ((ok|HỎNG) .*)$/\2/p' <<<"$phien")
+  if [ -z "$phien_dong" ]; then
+    bao "HỎNG dang-nhap-khong-ve-vai-chu: không mở được phiên bằng quy_hang_login (mã $rc_phien): $(head -1 <<<"$phien")"
+  else
+    while IFS= read -r dong; do
+      [ -n "$dong" ] && bao "$dong"
+    done <<<"$phien_dong"
+  fi
+fi
+
+# Seven break files, each must turn the catalog case red with its pinned line; afterwards nothing is left behind.
+loi_ca=""
+for tep in "${VAI_DANG_NHAP_PHA[@]}"; do
+  if [ ! -f "$tests/pha-thu/$tep.sql" ]; then
+    loi_ca+="$tep: không có tệp phá; "
+    continue
+  fi
+  do_ra=$(vai_dang_nhap_danh_muc "$lanh" "$tep")
+  printf '%s\n' "$do_ra" | sed "s/^/  [pha-thu $tep] /"
+  ghim=$(vai_dang_nhap_ghim "$tep")
+  if ! grep -q '^HỎNG ' <<<"$do_ra"; then
+    loi_ca+="$tep: bộ kiểm vẫn xanh trên bản phá; "
+  elif ! grep -qxF "$ghim" <<<"$do_ra"; then
+    loi_ca+="$tep: đỏ nhưng thiếu dòng ghim '$ghim'; "
+  fi
+done
+if [ "$(vai_dang_nhap_danh_muc "$lanh")" != "ok vai-dang-nhap-khong-ve-chu" ]; then
+  loi_ca+="bản phá để lại dấu trên cụm; "
+fi
+if [ -n "$loi_ca" ]; then
+  bao "HỎNG pha-thu-vai-dang-nhap: ${loi_ca%; }"
+else
+  bao "ok pha-thu-vai-dang-nhap"
+fi
+
+# 5. Count: every case exactly once, nothing failed.
+tat_ca=("${CA_SQL[@]}" "${CA_LENH[@]}" "${CA_DANG_NHAP[@]}")
 dat=0
 thieu_ca=()
 for ca in "${tat_ca[@]}"; do
@@ -225,7 +310,7 @@ for ca in "${tat_ca[@]}"; do
   if [ "$n" -eq 1 ]; then dat=$((dat + 1)); else thieu_ca+=("$ca"); fi
 done
 if [ "$dat" -eq "${#tat_ca[@]}" ] && ! grep -q '^HỎNG ' <<<"$ket_qua"; then
-  echo "cach-ly: $dat ca đạt, vai quy_hang_app"
+  echo "cach-ly: $dat ca đạt, vai quy_hang_app, nối bằng quy_hang_login"
   exit 0
 fi
 echo "cach-ly: $dat/${#tat_ca[@]} ca đạt — chưa đạt: ${thieu_ca[*]:-(không)}; có dòng HỎNG ở trên" >&2
