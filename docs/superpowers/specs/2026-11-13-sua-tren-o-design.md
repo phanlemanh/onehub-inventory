@@ -35,13 +35,14 @@ Vì sao: thay thao tác sửa trên Sheet. Ô Cổng Đáng: `_acceptance/sua-tr
 `src/modules/listings/edit-rules.ts` (hàm thuần, qua `index.ts`): `readPrice`, `priceAsksAgain` (ngưỡng 20% khai một
 chỗ), `STATUS_NEXT`, `nextStatuses`, `statusNeeds`, `statusUndoable`, `isLocked`. Ô và hàng 3d chỉ gọi các hàm này.
 
-## Ghi vào đâu (Hỏi-1)
+## Ghi vào đâu (Hỏi-1 — chủ kho duyệt theo khuyến nghị, 2026-11-13)
 
-Hôm nay Bảng hàng còn dữ liệu mẫu, chưa có bảng căn. Khuyến nghị: lần sửa đi qua **một cổng lưu** (`useChange` mở rộng)
-ghi vào bộ dữ liệu mẫu trên trình duyệt; tải lại trang thì về dữ liệu mẫu. Hàng 10 cắm cửa `/api/v1` thật vào cổng ấy
-mà không đổi ô. Lối khác: cửa `PATCH /api/v1/listings/{id}` trên kho mẫu trong bộ nhớ máy chủ ngay hàng này (thêm cửa,
-chuyển `updateListing` sang live, migration 011) — «Không đủ quyền» đo trên máy chủ thật sớm hơn, đổi lại thêm khoảng
-nửa ngày và một lượt soi cơ sở dữ liệu.
+Lần sửa đi qua **một cổng lưu** ghi vào bộ dữ liệu mẫu trong bộ nhớ của trang — không ghi xuống bộ nhớ lâu dài của
+trình duyệt, tải lại trang là về dữ liệu mẫu. Chữ ký của cổng mang đủ bốn kết cục mà đường ghi thật `/api/v1` sẽ trả —
+**được**, **bị từ chối** (403), **lỗi mạng**, **xung đột** (căn đã đổi từ chỗ khác) — để hàng 10 cắm đường ghi thật vào mà
+không đổi mã ô. Ở hàng này cổng mẫu chỉ sinh ra «được» và «lỗi mạng» (thiết bị mất mạng); «bị từ chối» và «xung đột» đo
+bằng cổng giả trong bài kiểm; ô báo «xung đột» bằng câu riêng và về giá trị cũ. Lối cửa API không chọn; nếu sau này mở thì
+dùng migration 012 (011 đã cấp cho 2c).
 
 ## Việc đi kèm
 
