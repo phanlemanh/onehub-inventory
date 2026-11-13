@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useSyncExternalStore } from "react";
 
 import { useActionPermission } from "@/components/candidate/action-permission";
+import { Badge } from "@/components/reui/badge";
 import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
@@ -133,13 +134,13 @@ export function SecondColumnNav({
                   >
                     <span className="truncate">{link.title}</span>
                     {changed ? (
-                      <span
+                      <Badge
                         data-slot="place-changed"
-                        className="ml-auto flex shrink-0 items-center"
+                        variant="warning-light"
+                        className="ml-auto shrink-0"
                       >
-                        <span aria-hidden className="size-1.5 rounded-full bg-primary" />
-                        <span className="sr-only">{changed}</span>
-                      </span>
+                        {changed}
+                      </Badge>
                     ) : null}
                   </SidebarMenuSubButton>
                 );

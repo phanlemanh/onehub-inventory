@@ -347,6 +347,26 @@ test("rename", async ({ page }, info) => {
   };
   viewKept(after!.view);
   expect(() => viewKept({})).toThrow("rename changed the view");
+
+  // A long name (40 characters, the most a name may have) is cut with «…» on one line and shown whole on hover.
+  const LONG = "[MAU] Toà S1.01 và S1.02 đang bán gấp ạ!";
+  expect([...LONG]).toHaveLength(40);
+  await secondColumn(page)
+    .getByRole("button", { name: /Khu S1/ })
+    .click();
+  await page.getByRole("menuitem", { name: RENAME }).click();
+  await dialog.getByLabel("Tên").fill(LONG);
+  await dialog.getByLabel("Tên").press("Enter");
+  await expect(dialog).toBeHidden();
+  const long = entry(page, LONG);
+  await expect(long).toHaveAttribute("title", LONG);
+  const cut = await long.locator("span.truncate").evaluate((el) => ({
+    cut: el.scrollWidth > el.clientWidth,
+    lines: Math.round(
+      el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight),
+    ),
+  }));
+  expect(cut).toEqual({ cut: true, lines: 1 });
 });
 
 // ---- E7 ---------------------------------------------------------------------------------------------------------------

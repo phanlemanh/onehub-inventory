@@ -74,3 +74,12 @@ nguon: wiki/dot/mvp-dot-1.md#adb1cba497edd0ad0fd877ee7bf608aeabd4d83e
 ```
 
 <!-- PHAM-VI-MA>>> -->
+
+## Sửa đổi
+
+Mỗi dòng một lần đổi phạm vi sau khi bản này chốt; không sửa dòng cũ, chỉ thêm.
+
+- 2026-11-12 — `L4`, `L5` không còn hoãn nguyên khối: hàng 7e (lớp riêng của sàn) và hàng 11 mở rộng (ghép khi nhập) đã vào
+  lộ trình, chủ kho quyết 2026-11-12; H4 chỉ còn màn Cài đặt đầy đủ, H5 chỉ còn AI.
+- 2026-11-13 — `L7` tách một phần: góc nhìn lưu của riêng người lưu ở Bảng hàng là hàng 2c
+  (`_acceptance/luu-goc-nhin-cot-hai/`, chủ kho mở hàng riêng 2026-11-12); sửa hàng loạt và đổi đầu chủ hàng loạt vẫn hoãn.
