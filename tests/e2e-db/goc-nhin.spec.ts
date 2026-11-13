@@ -13,7 +13,7 @@
 import { existsSync, readFileSync } from "node:fs";
 
 import AxeBuilder from "@axe-core/playwright";
-import { type Browser, type Page, type TestInfo } from "@playwright/test";
+import { type Browser, type Locator, type Page, type TestInfo } from "@playwright/test";
 import pg from "pg";
 
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
@@ -150,18 +150,23 @@ export function checkReopened(got: Snapshot, want: Snapshot): void {
   }
 }
 
+/**
+ * Types a rule into a filter box until it stays: the grid draws its table body again once it has measured its width (row
+ * density, row 2a), so a rule typed in the first moments after the page opens may land in a box that is then replaced.
+ */
+async function fillStays(page: Page, box: Locator, value: string) {
+  await expect(async () => {
+    await box.fill(value);
+    await page.waitForTimeout(300);
+    await expect(box).toHaveValue(value, { timeout: 100 });
+  }).toPass();
+}
+
 /** The arrangement of E1 built by hand: status Active (shortcut), Toà «S1.0», price high to low, groups, two columns hidden. The search box is not part of a view (owner 2026-11-13). */
 async function arrange(page: Page) {
   await page.goto("/inventory?status=Active");
   await settled(page);
-  // The grid draws its table body again once it has measured its width (row density); type after that, so retry
-  // until the rule stays in its box.
-  const tower = region(page).getByLabel("Lọc cột Toà");
-  await expect(async () => {
-    await tower.fill("S1.0");
-    await page.waitForTimeout(300);
-    await expect(tower).toHaveValue("S1.0", { timeout: 100 });
-  }).toPass();
+  await fillStays(page, region(page).getByLabel("Lọc cột Toà"), "S1.0");
   await region(page).locator('thead th[data-col-id="Listing.listPrice"] button').first().click();
   await page.getByRole("menuitem", { name: "Giảm dần" }).click();
   await region(page).locator('[data-slot="group-toggle"]').click();
@@ -269,7 +274,7 @@ test("save changes · save as new · reselect discards changes", async ({ page }
   const changedMark = entry(page, NAME).locator('[data-slot="place-changed"]');
 
   // Reselect discards changes.
-  await region(page).getByLabel("Lọc cột Phòng ngủ").fill("2");
+  await fillStays(page, region(page).getByLabel("Lọc cột Phòng ngủ"), "2");
   await expect(changedMark).toHaveCount(1);
   await entry(page, NAME).click();
   await expect(changedMark).toHaveCount(0);
@@ -285,7 +290,7 @@ test("save changes · save as new · reselect discards changes", async ({ page }
   expect(() => reselectKept(filtered)).toThrow("reselect kept unsaved changes");
 
   // Save changes.
-  await region(page).getByLabel("Lọc cột Phòng ngủ").fill("2");
+  await fillStays(page, region(page).getByLabel("Lọc cột Phòng ngủ"), "2");
   await expect(changedMark).toHaveCount(1);
   const two = await snapshot(page);
   await region(page).getByRole("button", { name: SAVE_CHANGES }).click();
@@ -549,8 +554,8 @@ test.describe("axe", () => {
 // ---- E15 frames ---------------------------------------------------------------------------------------------------------
 
 // Frames for the ui-check E15, taken only when asked (GOC_NHIN_ANH=1): at each width and both themes, the second column
-// with the views group and an open view marked «đã đổi» with both save buttons, the «…» menu, the naming dialog and the
-// remove confirmation. On 360 and 414 the second column rides in the phone sheet, opened first.
+// with the views group and an open view marked «đã đổi», the region's toolbar with both save buttons (taken before the
+// phone sheet covers it), the «…» menu, the naming dialog and the remove confirmation. On 360 and 414 the second column rides in the phone sheet, opened first.
 test("E15 frames", { tag: "@cho" }, async ({ page }, info) => {
   test.skip(!process.env["GOC_NHIN_ANH"], "frames only when asked");
   const dir = "_acceptance/luu-goc-nhin-cot-hai/evidence";
@@ -567,7 +572,7 @@ test("E15 frames", { tag: "@cho" }, async ({ page }, info) => {
     await page.goto(`/inventory?goc-nhin=${first.id}`);
   } else await entry(page, NAME).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(NAME);
-  await region(page).getByLabel("Lọc cột Phòng ngủ").fill("2");
+  await fillStays(page, region(page).getByLabel("Lọc cột Phòng ngủ"), "2");
   await expect(region(page).getByRole("button", { name: SAVE_CHANGES })).toBeVisible();
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
@@ -577,6 +582,9 @@ test("E15 frames", { tag: "@cho" }, async ({ page }, info) => {
         path: `${dir}/E15-${width}-${scheme === "light" ? "sang" : "toi"}-${state}.png`,
       });
     };
+    // The region's toolbar with both save buttons, before anything covers it (on a phone the sheet would).
+    await expect(region(page).getByRole("button", { name: SAVE_CHANGES })).toBeInViewport();
+    await shot("thanh-cong-cu");
     if (phone) await openSheet(page);
     await shot("cot-thu-hai");
     const column = phone ? page.getByRole("dialog") : secondColumn(page);
