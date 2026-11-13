@@ -1,7 +1,7 @@
 // Browser tests of sign-in on this lane's Postgres (row 8):
 //   DB_LANE=n DB_PORT=5563 npx playwright test -c playwright.db.config.ts
 // Global setup makes the scratch database dang_nhap_e2e and seeds it; the dev server reads codes from an outbox file
-// (development only — production never writes codes anywhere). Not run on CI: CI has no Postgres yet.
+// (development only — production never writes codes anywhere). On CI through `make ci-db` (row 1s, db/scripts/ci-db.sh).
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -59,7 +59,8 @@ export const OUTBOX = join(tmpdir(), `onehub-e2e-db-outbox-${RUN}.jsonl`);
 // once through the real sign-in screen by the `phien` project; the browser state lives outside the repository.
 export const TEST_PERSON = `phien-thu-${RUN}@example.test`;
 export const SESSION_FILE = join(tmpdir(), `onehub-e2e-db-phien-${RUN}.json`);
-const SUITE = /screens\.spec\.ts$/;
+// The register-driven suite and the login-role check (row 1s) run with the test session.
+const SUITE = /(screens|vai-noi)\.spec\.ts$/;
 const SIGN_IN_ONCE = /phien\.setup\.ts$/;
 
 export default defineConfig({
