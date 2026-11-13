@@ -1,0 +1,41 @@
+{
+  "feature_plain": "Đầu chủ sửa giá chào và trạng thái từng căn ngay trên ô của Bảng hàng như trên Sheet, lỗi hiện ngay dưới ô, và hoàn tác hỏng thì được báo rõ.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ đọc giá gõ theo cách nói của nghề («4,65 tỷ», «4ty65», «950tr») đúng từng đồng, chữ mơ hồ thì nói chưa hiểu chứ không đoán; luật nằm một chỗ để màn sửa nhanh trên điện thoại dùng lại."},
+    {"id": "AC-2", "p": "Sẽ mở khung sửa ngay dưới ô Giá chào khi gõ, bấm F2 hay bấm đúp, đọc lại «Hiểu là…», Enter ghi một lần; ô và «Xác nhận lúc» đổi ngay, thông báo có Hoàn tác."},
+    {"id": "AC-3", "p": "Sẽ báo ngay trong khung khi chữ gõ chưa hiểu và không ghi gì; Esc giữ giá cũ."},
+    {"id": "AC-4", "p": "Sẽ hỏi lại tại ô, kèm giá cũ → mới, khi giá đổi quá 20%; đúng 20% thì ghi thẳng."},
+    {"id": "AC-5", "p": "Sẽ chỉ đưa các trạng thái được phép chuyển tới; Đã bán đòi giá chốt và ngày bán, Ngừng hẳn đòi lý do (theo Hỏi-2), nấc không hoàn tác được thì nói trước khi ghi (theo Hỏi-3)."},
+    {"id": "AC-7", "p": "Sẽ báo rõ, bằng thông báo đứng yên có nút Thử lại, khi hoàn tác hỏng vì mất mạng hay bị từ chối — nói căn nào vẫn đang mang giá trị mới; lưu hỏng thì ô về giá cũ, bị từ chối thì câu «Không đủ quyền» riêng."},
+    {"id": "AC-8", "p": "Sẽ chỉ mở ô cho vai có quyền sửa theo bảng quyền; sáu cột còn lại không mở; điện thoại không mở ô nào."},
+    {"id": "AC-9", "p": "Sẽ giữ nguyên phím quen của Bảng hàng: Enter mở hồ sơ căn, bấm mã căn mở hồ sơ, chép ô, mũi tên; Tab trong khung ghi rồi sang ô kế."},
+    {"id": "AC-10", "p": "Sẽ làm bài rào «màn tự dựng lại hành vi» đọc đúng tệp TypeScript thường; nhãn mới lấy từ bảng nhãn, mỗi nhãn tối đa 17 ký tự; kiểm tra toàn kho xanh."}
+  ],
+  "wont_do": [
+    {"id": "AC-6", "p": "Sẽ KHÔNG mở sửa giá hay trạng thái của căn Đã bán (theo Hỏi-3); ô có ổ khoá và nói lý do; căn Ngừng hẳn khoá trạng thái."},
+    {"id": "OOS-1", "p": "KHÔNG làm cột Phí và điều kiện phí — Bảng hàng chưa có trường này."},
+    {"id": "OOS-2", "p": "KHÔNG làm dán từ Excel, kéo điền, sửa hàng loạt — đó là hàng 5."},
+    {"id": "OOS-3", "p": "KHÔNG làm hoàn tác bằng Ctrl/Cmd+Z và báo khi hai người cùng sửa — cần đường ghi thật của hàng 10."},
+    {"id": "OOS-4", "p": "KHÔNG làm sửa trên ô ở điện thoại — đó là hàng 3d, dùng lại luật của hàng này."},
+    {"id": "OOS-5", "p": "KHÔNG ghi vào cơ sở dữ liệu — hôm nay chưa có bảng căn (xem Hỏi-1)."}
+  ],
+  "scope_plain": "Những việc dưới đây cố ý để hàng khác làm:",
+  "coverage_plain": [
+    {"i": 0, "p": "Cột: chỉ Giá chào và Trạng thái mở sửa, sáu cột còn lại chỉ đọc — đủ khi ma trận tám cột đúng hai cột mở (AC-8 quyền và cột)."},
+    {"i": 1, "p": "Loại thay đổi: giá trong ngưỡng, vượt ngưỡng, chưa có giá, từng nấc trạng thái, nấc cần thêm thông tin, nấc cuối — đủ khi ma trận ngưỡng sáu ca và bảng chuyển 36 ô xanh (AC-4 hỏi lại, AC-5 trạng thái)."},
+    {"i": 2, "p": "Chữ người gõ: đúng, mơ hồ, sai, biên — đủ khi bảng 24 dòng viết trước xanh (AC-1 đọc giá, AC-3 báo chưa hiểu)."},
+    {"i": 3, "p": "Sau khi ghi: hoàn tác được, không được, lưu hỏng, bị từ chối, hoàn tác hỏng — đủ khi ba khuôn lỗi thật đều có lời báo (AC-7 báo hỏng)."},
+    {"i": 4, "p": "Ai và ở đâu: vai có quyền, không quyền, căn khoá, máy tính, điện thoại — đủ khi bốn vai và hai khổ điện thoại đúng (AC-6 khoá, AC-8 quyền)."},
+    {"i": 5, "p": "Phím: vào sửa, trong khung, ra khung, và phím cũ của Bảng hàng — đủ khi bài phím mới và các bài cũ cùng xanh (AC-9 phím giữ nguyên)."},
+    {"i": 6, "p": "Mỗi trục có ít nhất một tiêu chí; bài rào và kiểm tra toàn kho ở AC-10."},
+    {"i": 7, "p": "Để sau: cột Phí, Ctrl/Cmd+Z, báo hai người cùng sửa, sàn tự chỉnh ngưỡng 20%."},
+    {"i": 8, "p": "Không bao giờ: sửa diện tích, phòng ngủ, toà trên ô; sửa trên ô ở điện thoại."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Máy đã tự quyết «Đã bán là nấc cuối và khoá cả giá» mà căn cứ không nói điều đó — nay tách thành Hỏi-3 cho bạn quyết."},
+    {"i": 1, "p": "Máy đã chốt sẵn ba lý do ngừng trong khi Hỏi-2 còn chờ bạn — nay tiêu chí và phép đo theo câu trả lời Hỏi-2."},
+    {"i": 2, "p": "Hợp đồng chỉ khớp lối khuyến nghị của Hỏi-1 — nay ghi sẵn tiêu chí và phép đo thêm nếu bạn chọn đường ghi qua máy chủ."},
+    {"i": 3, "p": "«Mất mạng» chỉ được đo bằng lỗi tự dựng — nay đo bằng đúng ba kiểu lỗi của đường ghi thật và tắt mạng trình duyệt thật."},
+    {"i": 4, "p": "Không tiêu chí nào giữ sáu cột còn lại chỉ đọc — nay có ma trận tám cột, đúng hai cột mở."}
+  ]
+}
