@@ -1,75 +1,91 @@
-# Review findings: hoi-dau-chu-bao-sai (round 4)
+# Review findings: hoi-dau-chu-bao-sai (round 5)
 
 ## Trong hợp đồng
+
+(không có)
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Real listings always show 'Căn chưa có đầu chủ giữ' because the keeper comes from the sample-id helper**
+- **E9 now calls shown() but is missing from CHO_TESTS and has no @cho tag, so the unit test fails and make check goes red**
+  Người dùng thấy gì: Người dùng không thấy gì khác trên màn hình. Chỉ là bộ kiểm tra tự động của đội đang báo đỏ nên khó tin vào tín hiệu xanh trước khi phát hành.
+  Căn cứ: Không ảnh hưởng người dùng cuối và không mất dữ liệu; chỉ làm kiểm tra nội bộ đỏ, và sửa sau rất rẻ khi có người xử lý.
+  file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
+  severity: high
+  Đề xuất: known-limits
+
+- **seriousViolations writes its own wait for animations to stop instead of using the shared settle helper**
+  Người dùng thấy gì: Người dùng không bị ảnh hưởng. Chỉ có thể làm bài kiểm tra trợ năng chờ lâu hoặc báo lỗi khó hiểu nếu có hiệu ứng chạy mãi.
+  Căn cứ: Không đụng tới người dùng cuối, không mất dữ liệu; chỉ là chỗ chờ viết lặp trong kiểm thử và hiện chưa gây hỏng gì nên ghi lại là đủ.
+  file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
+  severity: low
+  Đề xuất: wont-fix
+
+- **Real listings always show 'Căn chưa có đầu chủ giữ' because the keeper comes from the sample-id helper (r4)**
   Người dùng thấy gì: Với căn nhập thật từ Sheet, nút hỏi sẽ luôn báo «Căn chưa có đầu chủ giữ» dù thực tế có người giữ, nên người dùng không hỏi được đầu chủ qua nút này.
   Căn cứ: Tới khi có dữ liệu người giữ căn thật ở hàng 10 thì chưa thể đúng; nút chỉ tắt chứ không gửi nhầm hay mất dữ liệu, và người dùng vẫn hỏi bằng cách khác.
   file: `src/modules/listings/ui/listing-record.tsx`
   severity: medium
   Đề xuất: known-limits
 
-- **Wording of the error report is defined twice (messages.ts and ask-copy.ts)**
+- **Wording of the error report is defined twice (messages.ts and ask-copy.ts) (r4)**
   Người dùng thấy gì: Nếu sau này ai đổi chữ trong hộp báo sai mà quên đổi chữ trong tin gửi đi, hai nơi sẽ lệch nhau; hiện tại người dùng chưa thấy gì sai.
   Căn cứ: Hiện không ảnh hưởng người dùng và chỉ là nguy cơ lệch chữ về sau; sửa tốn công mà lợi ích nhỏ.
   file: `src/modules/listings/messages.ts`
   severity: low
   Đề xuất: wont-fix
 
-- **recordLink is exported from two public doors, and CopyLink still bypasses the shared share/copy helper**
+- **recordLink is exported from two public doors, and CopyLink still bypasses the shared share/copy helper (r4)**
   Người dùng thấy gì: Nút Chép đường dẫn vẫn chạy bằng cách chép riêng, có thể báo lỗi khác với hai nút mới khi trình duyệt từ chối chép.
   Căn cứ: Người dùng chỉ có thể gặp khác biệt nhỏ ở thông báo lỗi hiếm gặp và thử lại được; sửa chỉ là dọn mã.
   file: `src/modules/listings/ui/copy-link.tsx`
   severity: low
   Đề xuất: wont-fix
 
-- **Shape 3 (presence instead of relation): E6 checks only that the «Đang hiện» value is non-empty, not that it equals what the record shows**
+- **Shape 3 (presence instead of relation): E6 checks only that the «Đang hiện» value is non-empty, not that it equals what the record shows (r4)**
   Người dùng thấy gì: Bài kiểm thử có thể không bắt được lỗi nếu «Đang hiện» trong hộp báo sai lệch với giá trị hồ sơ, nên một lỗi như vậy có thể lọt tới người dùng.
   Căn cứ: Hiện chưa thấy hiển thị sai thật, nguy cơ chỉ xảy ra khi có thay đổi sau này; siết bài kiểm thử rẻ nhưng có thể làm ở đợt khác.
   file: `tests/hoi-dau-chu-bao-sai.test.tsx`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 3 (presence instead of relation): E3 builds the expected copied text from the copied text itself**
+- **Shape 3 (presence instead of relation): E3 builds the expected copied text from the copied text itself (r4)**
   Người dùng thấy gì: Bài kiểm thử không chứng minh dòng câu hỏi trong tin chép đúng căn, nên tin hỏi nhầm căn có thể không bị phát hiện.
   Căn cứ: Hiện chưa có bằng chứng tin sai; nếu sai thì người gửi thấy ngay trước khi bấm gửi nên tự sửa được.
   file: `tests/hoi-dau-chu-bao-sai.test.tsx`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 3 (presence instead of relation): when copying fails, the hand-copy box is checked only for the link, not for the whole message**
+- **Shape 3 (presence instead of relation): when copying fails, the hand-copy box is checked only for the link, not for the whole message (r4)**
   Người dùng thấy gì: Khi chép thất bại, ô chép tay có thể thiếu phần câu hỏi mà bài kiểm thử vẫn không báo, nên người dùng có thể chỉ nhận được đường dẫn.
   Căn cứ: Chỉ xảy ra khi chép thất bại, hiếm; người dùng vẫn thấy ô và tự gõ thêm được.
   file: `tests/hoi-dau-chu-bao-sai.test.tsx`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 4 (negative assertion alone): the admin test checks only that the foot bar is absent, while no record opens at all**
+- **Shape 4 (negative assertion alone): the admin test checks only that the foot bar is absent, while no record opens at all (r4 · tệp đã đổi)**
   Người dùng thấy gì: Bài kiểm thử vai Quản trị sàn không chứng minh gì về luật ẩn nút, nên nếu nút lỡ hiện sai cho vai này thì sẽ không bị bắt.
   Căn cứ: Quản trị sàn vốn không mở được hồ sơ căn nên nút không thể hiện ra; rủi ro thấp và sửa sau được.
   file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 4 (negative assertion alone): the E5b break compares the keeper's name with the string 'viewer' and is always true**
+- **Shape 4 (negative assertion alone): the E5b break compares the keeper's name with the string 'viewer' and is always true (r4 · tệp đã đổi)**
   Người dùng thấy gì: Kiểm thử không phát hiện được trường hợp đổi sang căn khác mà thanh đáy vẫn giữ tên người giữ căn cũ, nên người dùng có thể hỏi nhầm người.
   Căn cứ: Hiện chưa thấy thanh đáy giữ tên cũ; nếu có thì tên hiện ngay trên nút nên người dùng nhận ra và thử lại được.
   file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 4 (assertion âm tính một mình): «break» của E5b so hai chuỗi tự dựng, không đo trang (r3)**
+- **Hình dạng 4 (assertion âm tính một mình): «break» của E5b so hai chuỗi tự dựng, không đo trang (r3 · tệp đã đổi)**
   Người dùng thấy gì: Một phép kiểm kiểu «đổi căn thì thanh đáy phải đổi người giữ» luôn xanh nên không bắt được lỗi nếu thanh đáy giữ nhầm tên người giữ cũ. Người dùng chưa thấy lỗi thật nào, chỉ là lưới an toàn ở chỗ này lỏng.
   Căn cứ: Nhẹ với người dùng vì chưa có hành vi sai nào được chỉ ra; chỉ là lưới bắt lỗi lỏng, ghi lại rồi siết khi sửa nơi này sau.
   file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
   severity: high
   Đề xuất: known-limits
 
-- **Hình dạng 4 (assertion âm tính một mình): ca Quản trị sàn chỉ đo việc thanh đáy vắng mặt (r3)**
+- **Hình dạng 4 (assertion âm tính một mình): ca Quản trị sàn chỉ đo việc thanh đáy vắng mặt (r3 · tệp đã đổi)**
   Người dùng thấy gì: Phép kiểm cho vai Quản trị sàn có thể xanh dù trang tải lỗi, nên chưa chắc chứng minh được là nút hỏi bị ẩn đúng vì luật quyền. Hành vi thật với người dùng chưa thấy sai.
   Căn cứ: Nhẹ vì không có người dùng nào bị ảnh hưởng đã biết; chỉ là bằng chứng kiểm chưa chặt, thêm một phép kiểm dương là rẻ nếu sau này cần.
   file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
@@ -153,7 +169,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 4 (ca đối chứng không chạm phép đo thật): break E5b so tên người giữ với chuỗi kiểu giữ, không phải với thanh đáy (r1)**
+- **Hình dạng 4 (ca đối chứng không chạm phép đo thật): break E5b so tên người giữ với chuỗi kiểu giữ, không phải với thanh đáy (r1 · tệp đã đổi)**
   Người dùng thấy gì: Một ca thử không đo được việc thanh đáy có còn giữ tên người giữ căn trước khi đổi sang căn khác hay không. Nếu lỗi này xảy ra, người dùng sẽ thấy tên người giữ sai.
   Căn cứ: Là chỗ kiểm yếu; nếu lỗi có thật người dùng tự thấy ngay và tải lại là hết.
   file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
@@ -173,7 +189,5 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   file: `tests/hoi-dau-chu-bao-sai.test.tsx`
   severity: low
   Đề xuất: wont-fix
-
-## Chưa adversarial-verify (refuter chết)
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
