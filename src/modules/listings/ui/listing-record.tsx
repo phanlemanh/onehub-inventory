@@ -7,6 +7,11 @@ import type { TypedColumn } from "@/components/candidate/column-kind";
 
 import { CopyLink } from "./copy-link";
 import { inventoryColumns, type InventoryField } from "./inventory-rows";
+import {
+  ListingRecordFull,
+  type ListingRecordData,
+  type RecordLabels,
+} from "./listing-record-full";
 
 /** The facts the card shows in its three-up row, in order (after product-grid-4's specs row). */
 const CARD_FACTS: readonly InventoryField[] = [
@@ -143,16 +148,34 @@ export function ListingRecordBody({ view, priceLabel }: { view: ListingView; pri
   );
 }
 
-/** How the inventory grid opens a row: the record names the unit and shows the listing's record body. */
-export function listingRecord(headers: Readonly<Record<InventoryField, string>>): RegionRecord {
+/** What the full record of row 3b reads: each row's unit and listings, and the labels the record shows. */
+export interface FullRecordInput {
+  records: Readonly<Record<string, ListingRecordData>>;
+  labels: RecordLabels;
+}
+
+/**
+ * How the inventory grid opens a row: the record names the unit and shows the listing's record body — the full record
+ * of row 3b when the page passes the row's unit and listings, otherwise the eight inventory fields of row 3.
+ */
+export function listingRecord(
+  headers: Readonly<Record<InventoryField, string>>,
+  full?: FullRecordInput,
+): RegionRecord {
   return {
     render: (row) => {
       const view = listingView(row, headers);
+      const data = full?.records[row.id];
       return {
         title: [view.unitNumber, text(row["Listing.buildingName"])]
           .filter((part) => part !== "")
           .join(" · "),
-        body: <ListingRecordBody view={view} priceLabel={headers["Listing.listPrice"]} />,
+        body:
+          data && full ? (
+            <ListingRecordFull key={view.id} view={view} data={data} labels={full.labels} />
+          ) : (
+            <ListingRecordBody view={view} priceLabel={headers["Listing.listPrice"]} />
+          ),
         // Row 3f: the record's link, so a colleague opens the same listing on the inventory.
         actions: <CopyLink id={view.id} />,
       };

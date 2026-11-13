@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/templates/page-header";
 import { label } from "@/modules/company-config";
 import { mySavedView, mySavedViews } from "@/modules/listings/server";
 
-import { sampleInventoryRows } from "../inventory-sample-rows";
+import { sampleInventoryRows, sampleRecords } from "../inventory-sample-rows";
 import { savedViewLabels } from "../saved-view-labels";
 import {
   ENTRY_COPY,
@@ -16,6 +16,7 @@ import {
   inventoryOpeningFor,
   inventoryStateFrom,
   type InventoryField,
+  type RecordLabels,
 } from "@/modules/listings/ui";
 
 export const metadata: Metadata = { title: label("Inventory") };
@@ -30,6 +31,47 @@ const HEADERS: Record<InventoryField, string> = {
   "Unit.livingArea": label("LivingArea"),
   "Unit.bedroomsTotal": label("BedroomsTotal"),
   "Listing.lastConfirmedAt": label("LastConfirmedAt"),
+};
+
+/** Labels of the full unit record (row 3b), from the label table. */
+const RECORD_LABELS: RecordLabels = {
+  unit: label("Unit"),
+  unitKind: label("UnitKind"),
+  livingArea: label("LivingArea"),
+  bedrooms: label("BedroomsTotal"),
+  floor: label("UnitFloorLocation"),
+  direction: label("DirectionFaces"),
+  building: label("Building"),
+  subdivision: label("Subdivision"),
+  propertyType: label("PropertySubType"),
+  listPrice: label("ListPrice"),
+  completeness: label("Completeness"),
+  currentListing: label("CurrentListing"),
+  viewedListing: label("ViewedListing"),
+  listingsOfUnit: label("ListingsOfUnit"),
+  parts: {
+    listPrice: label("ListPrice"),
+    furnished: label("Furnished"),
+    legalStatus: label("LegalStatus"),
+    financing: label("Financing"),
+    occupantType: label("OccupantType"),
+  },
+  furnishedValues: {
+    Furnished: label("FurnishedFull"),
+    Partially: label("FurnishedPartial"),
+    Unfurnished: label("FurnishedNone"),
+  },
+  occupantValues: {
+    Owner: label("OccupantOwner"),
+    Tenant: label("OccupantTenant"),
+    Vacant: label("OccupantVacant"),
+  },
+  propertyTypeValues: {
+    Condominium: label("SubTypeCondominium"),
+    Townhouse: label("SubTypeTownhouse"),
+    "Single Family Residence": label("SubTypeSingleFamily"),
+    "Unimproved Land": label("SubTypeLand"),
+  },
 };
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -108,6 +150,7 @@ export default async function Page({ searchParams }: Props) {
         reloadLabel="Tải lại"
         filters={filters}
         staleLinkNote={stale ? ENTRY_COPY.staleLink(label("Unit"), label("Inventory")) : undefined}
+        fullRecord={{ records: sampleRecords(new Date()), labels: RECORD_LABELS }}
       />
     </>
   );
