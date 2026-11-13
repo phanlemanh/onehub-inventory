@@ -65,7 +65,7 @@ function UnderCell({ children, alert }: { children: React.ReactNode; alert?: boo
     <div
       data-slot="cell-edit-line"
       role={alert ? "alert" : undefined}
-      className="flex w-max max-w-80 min-w-(--anchor-width) flex-col gap-1.5 rounded-b-md border bg-popover px-2 py-1.5 text-xs text-popover-foreground shadow-md"
+      className="absolute top-full flex w-max max-w-80 min-w-(--anchor-width) flex-col gap-1.5 rounded-b-md border bg-popover px-2 py-1.5 text-xs text-popover-foreground shadow-md group-data-[edge=end]/cell-editor:right-0 group-data-[edge=start]/cell-editor:left-0"
     >
       {children}
     </div>
@@ -192,7 +192,7 @@ function StatusEditor({
         word(labels, "StandardStatus"),
         String(session.row["Listing.unitNumber"] ?? ""),
       )}
-      className="flex min-w-(--anchor-width) flex-col items-start gap-0.5 rounded-md border bg-popover p-1 shadow-md ring-2 ring-primary"
+      className="absolute top-0 flex w-max min-w-(--anchor-width) flex-col items-start gap-0.5 rounded-md border bg-popover p-1 shadow-md ring-2 ring-primary group-data-[edge=end]/cell-editor:right-0 group-data-[edge=start]/cell-editor:left-0"
     >
       {nextStatuses(from).map((status, index) => (
         <Button

@@ -1109,6 +1109,11 @@ export function DataRegion({
               return (
                 <CellEditor
                   anchor={editing.anchor}
+                  find={() =>
+                    document.querySelector(
+                      `[data-slot="data-region-scroll-content"] td[data-cell-focused]`,
+                    )
+                  }
                   label={cellEdit.label(row, editing.field)}
                   onClose={() => close()}
                 >

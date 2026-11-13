@@ -23,6 +23,7 @@
           "name": "CellEditor",
           "props": [
             "anchor",
+            "find",
             "label",
             "onClose"
           ]

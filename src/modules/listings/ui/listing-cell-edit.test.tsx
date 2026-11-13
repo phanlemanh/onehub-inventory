@@ -300,6 +300,30 @@ describe("cell edit of the grid", () => {
     expect(toast.error).toHaveBeenCalledOnce();
   });
 
+  it("luu-hong-ve-cu: a write that breaks in an unknown way still puts the old price back and says so", async () => {
+    const save = vi.fn(async (): Promise<SaveOutcome> => {
+      throw new Error("500");
+    });
+    const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+    const hook = renderHook(() =>
+      useListingCellEdit({
+        rows: [row()],
+        listings: [LISTING],
+        headers: HEADERS,
+        labels,
+        door: { save },
+      }),
+    );
+    await editPrice(hook, "2,8 tỷ");
+    expect(hook.result.current.rows[0]!["Listing.listPrice"], "luu-hong-ve-cu: lỗi lạ").toBe(
+      2_710_000_000,
+    );
+    expect(toast.error).toHaveBeenCalledOnce();
+    expect(String(toast.error.mock.calls[0]![0])).toContain("máy chủ báo lỗi");
+    expect(toast).not.toHaveBeenCalled();
+    errors.mockRestore();
+  });
+
   it("a change the door finds invalid counts as refused", async () => {
     const { hook } = hookWith(["invalid"]);
     await editPrice(hook, "2,8 tỷ");

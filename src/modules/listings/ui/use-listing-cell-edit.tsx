@@ -163,7 +163,7 @@ export function useListingCellEdit({
       });
       if (outcome !== "saved") patch(row.id, before);
     },
-    [headers, patch, write],
+    [headers, labels, patch, write],
   );
 
   const cellEdit = useMemo<RegionCellEdit | undefined>(() => {

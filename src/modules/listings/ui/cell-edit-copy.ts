@@ -42,6 +42,9 @@ export function word(
   return labels[concept][tx === "lease" ? "lease" : "sale"];
 }
 
+/** Why a write did not go through (the write door's outcomes other than saved). */
+type Failure = "offline" | "conflict" | "refused" | "fault";
+
 const exact = new Intl.NumberFormat("vi-VN");
 
 /** A price written to the last đồng, so opening a price and pressing Enter never changes it. */
@@ -83,16 +86,13 @@ export const CELL_EDIT_COPY = {
   done: (what: string, undoable: boolean) =>
     undoable ? `Đã đổi ${what}.` : `Đã đổi ${what}. Không hoàn tác được.`,
   undone: (what: string) => `Đã hoàn tác: ${what}.`,
-  saveFailed: (what: string, why: "offline" | "conflict" | "refused") =>
-    why === "conflict"
-      ? `Chưa lưu ${what}: căn vừa đổi từ chỗ khác. Ô đã về giá trị cũ; tải lại trang để thấy bản mới.`
-      : `Chưa lưu được ${what} — mất kết nối mạng. Ô đã về giá trị cũ; có mạng lại thì sửa lại.`,
-  undoFailed: (
-    labels: CellEditLabels,
-    unit: string,
-    now: string,
-    why: "offline" | "conflict" | "refused",
-  ) =>
+  saveFailed: (what: string, why: Failure) =>
+    why === "fault"
+      ? `Chưa lưu được ${what} — máy chủ báo lỗi. Ô đã về giá trị cũ; thử lại sau ít phút.`
+      : why === "conflict"
+        ? `Chưa lưu ${what}: căn vừa đổi từ chỗ khác. Ô đã về giá trị cũ; tải lại trang để thấy bản mới.`
+        : `Chưa lưu được ${what} — mất kết nối mạng. Ô đã về giá trị cũ; có mạng lại thì sửa lại.`,
+  undoFailed: (labels: CellEditLabels, unit: string, now: string, why: Failure) =>
     why === "offline"
       ? `Chưa hoàn tác được vì mất kết nối mạng. ${word(labels, "Unit")} ${unit} vẫn là ${now}; có mạng lại thì bấm «Thử lại».`
       : why === "conflict"

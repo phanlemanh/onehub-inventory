@@ -1,1 +1,1 @@
-(no failed requests, no console errors, no app fetch/xhr/non-GET seen)
+(no events)

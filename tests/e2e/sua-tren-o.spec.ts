@@ -67,7 +67,7 @@ async function anyWayOpens(page: Page, unit: string, field: string): Promise<boo
     else await cellOf(page, unit, field).dblclick({ position: { x: 3, y: 3 } });
     // An editor opens within a frame; give it time to show before deciding it did not.
     const opened = await editor(page)
-      .waitFor({ state: "visible", timeout: 600 })
+      .waitFor({ state: "attached", timeout: 1_000 })
       .then(() => true)
       .catch(() => false);
     if (opened) {
@@ -98,6 +98,19 @@ test.describe("sua-tren-o", () => {
     const before = await cellOf(page, "1101", "Listing.lastConfirmedAt").innerText();
     await typeInPrice(page, "1101", "2,8 tỷ");
     await expect(line(page)).toContainText("Hiểu là: 2.800.000.000 ₫ (2,8 tỷ)");
+    // The input sits on the cell it edits, also after the grid scrolled the cell into view (1024, round 2 of S4).
+    await expect
+      .poll(
+        async () => {
+          const cell = await cellOf(page, "1101", PRICE).boundingBox();
+          const input = await editor(page).getByRole("textbox").boundingBox();
+          return cell && input
+            ? Math.max(Math.abs(cell.x - input.x), Math.abs(cell.y - input.y))
+            : Number.POSITIVE_INFINITY;
+        },
+        { message: "sua-gia-mot-lan-ghi: khung lệch ô" },
+      )
+      .toBeLessThanOrEqual(4);
     await page.keyboard.press("Enter");
     await expect(editor(page)).toHaveCount(0);
     await expect(cellOf(page, "1101", PRICE)).toHaveText("2,8 tỷ");

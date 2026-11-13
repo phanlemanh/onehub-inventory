@@ -145,6 +145,19 @@ describe("luu-hong-ve-cu", () => {
   });
 });
 
+describe("loi-la", () => {
+  it("loi-la: a 500 or a bug answers fault, says why and offers no undo", async () => {
+    const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+    const outcome = await runDoorChange(
+      change({ write: viaFetch(async () => new Response(null, { status: 500 })) }),
+    );
+    expect(outcome).toBe("fault");
+    expect(toast.error).toHaveBeenCalledOnce();
+    expect(toast).not.toHaveBeenCalled();
+    errors.mockRestore();
+  });
+});
+
 describe("tu-choi-403-cau-rieng", () => {
   it("tu-choi-403-cau-rieng: a refused save gets the refusal sentence", async () => {
     const outcome = await runDoorChange(
