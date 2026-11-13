@@ -58,7 +58,7 @@ lượt đang sống; (b) đăng ký xoá thư mục của chính lượt khi ti
 gỡ máy chủ dev sau `globalTeardown`, nên xoá ở teardown là xoá dưới chân máy chủ đang chạy). Thư mục không có `.chu` (đời
 trước hàng này) không bị chạm tự động; lần đầu chạy, `ci-thu` và lượt dọn tay xoá chúng ở máy dãy.
 
-Vai nối của máy chủ dev được đo bằng quan hệ: bài mới `tests/e2e-db/vai-noi.spec.ts` mở một màn có phiên, rồi đọc
+Vai nối của máy chủ dev được đo bằng quan hệ: bài mới `tests/e2e-db/vai-noi.spec.ts` xin mã đăng nhập trên màn đăng nhập thật (không cần phiên — máy chủ nối sai vai thì không đăng nhập được ai, bài vẫn phải chạy), rồi đọc
 `pg_stat_activity` của cơ sở nháp bằng vai chủ; tập vai của các kết nối (trừ kết nối của chính bài) phải đúng bằng
 {`quy_hang_login`}. Bước `dem` còn đọc báo cáo JSON để in số bài đạt của từng tệp ghim — một tệp toàn bài bị bỏ qua là đỏ.
 

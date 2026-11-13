@@ -184,7 +184,7 @@ pha vai-chu db/scripts/ci-db.sh \
 pha may-chu-chu playwright.db.config.ts \
   'postgres://quy_hang_login:local-only@' \
   'postgres://postgres:local-only@' \
-  'npx playwright test -c playwright.db.config.ts tests/e2e-db/vai-noi.spec.ts --project=co-phien-1440' \
+  'npx playwright test -c playwright.db.config.ts tests/e2e-db/vai-noi.spec.ts --project=1440' \
   'may chu dev noi bang vai khac quy_hang_login: postgres'
 
 if [ -n "$loi" ]; then

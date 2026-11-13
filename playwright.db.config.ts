@@ -59,8 +59,7 @@ export const OUTBOX = join(tmpdir(), `onehub-e2e-db-outbox-${RUN}.jsonl`);
 // once through the real sign-in screen by the `phien` project; the browser state lives outside the repository.
 export const TEST_PERSON = `phien-thu-${RUN}@example.test`;
 export const SESSION_FILE = join(tmpdir(), `onehub-e2e-db-phien-${RUN}.json`);
-// The register-driven suite and the login-role check (row 1s) run with the test session.
-const SUITE = /(screens|vai-noi)\.spec\.ts$/;
+const SUITE = /screens\.spec\.ts$/;
 const SIGN_IN_ONCE = /phien\.setup\.ts$/;
 
 export default defineConfig({
