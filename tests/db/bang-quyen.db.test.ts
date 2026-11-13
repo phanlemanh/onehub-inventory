@@ -105,7 +105,7 @@ function viewFixture(w: World): Promise<Record<string, string>> {
       ] as const) {
         const { rows } = await w.db.owner.query<{ id: string }>(
           `insert into saved_view (company_id, user_id, screen, name, view)
-           values ($1, $2, 'inventory', 'Của ' || $3, '{"query":"","filters":{},"sort":[],"grouped":false,"hidden":[]}')
+           values ($1, $2, 'inventory', 'Của ' || $3, '{"filters":{},"sort":[],"grouped":false,"hidden":[]}')
            returning id`,
           [company, w.id[who], who],
         );
@@ -286,7 +286,7 @@ async function observe(w: World, who: Person, door: string): Promise<Seen> {
           (
             await c.query(
               `insert into saved_view (company_id, user_id, screen, name, view)
-             values ($1, $2, 'inventory', 'Mới', '{"query":"","filters":{},"sort":[],"grouped":false,"hidden":[]}')`,
+             values ($1, $2, 'inventory', 'Mới', '{"filters":{},"sort":[],"grouped":false,"hidden":[]}')`,
               [A, ownerId],
             )
           ).rowCount ?? 0,

@@ -40,20 +40,18 @@ describe("saved view name", () => {
 
 describe("saved view shape", () => {
   const view = {
-    query: "S1",
     filters: { "Listing.buildingName": ["S1.01"], "Listing.standardStatus": ["Active"] },
     sort: [{ field: "Listing.listPrice", direction: "desc" }],
     grouped: true,
     hidden: ["Listing.subdivisionName", "Listing.lastConfirmedAt"],
   };
 
-  it("holds the five things and nothing else", () => {
+  it("holds the four things and nothing else — not the search text", () => {
     expect(SavedViewState.parse(view)).toEqual(view);
     expect(Object.keys(SavedViewState.shape).sort()).toEqual([
       "filters",
       "grouped",
       "hidden",
-      "query",
       "sort",
     ]);
   });
@@ -62,5 +60,6 @@ describe("saved view shape", () => {
     const noSort = Object.fromEntries(Object.entries(view).filter(([k]) => k !== "sort"));
     expect(SavedViewState.safeParse(noSort).success).toBe(false);
     expect(SavedViewState.safeParse({ ...view, fullScreen: true }).success).toBe(false);
+    expect(SavedViewState.safeParse({ ...view, query: "S1" }).success).toBe(false);
   });
 });

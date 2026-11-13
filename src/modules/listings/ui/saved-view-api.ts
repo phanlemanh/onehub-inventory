@@ -1,6 +1,6 @@
 // The browser's side of /api/v1/saved-views (row 2c): addresses, the stored shape of a view and how an answer reads.
 // The requests themselves sit in the components that send them, each behind its row of the permission table (row 9e).
-import type { GridView } from "@/components/candidate/grid-view";
+import { sameView, type GridView } from "@/components/candidate/grid-view";
 
 import type { SavedView, SavedViewNameError, SavedViewState } from "../saved-view";
 
@@ -17,10 +17,9 @@ export type SaveOutcome =
 
 const NAME_ERRORS: readonly string[] = ["name-empty", "name-too-long", "name-taken"];
 
-/** The grid's arrangement as a view stores it (plain arrays and records, nothing else). */
+/** The grid's arrangement as a view stores it (plain arrays and records, nothing else; never the search text). */
 export function storedView(view: GridView): SavedViewState {
   return {
-    query: view.query,
     filters: Object.fromEntries(
       Object.entries(view.filters).map(([field, value]) => [
         field,
@@ -33,9 +32,14 @@ export function storedView(view: GridView): SavedViewState {
   };
 }
 
-/** A stored view as the grid opens it; fields the grid no longer has are dropped by the grid itself. */
+/** A stored view as the grid opens it, with an empty search box; fields the grid no longer has are dropped by the grid. */
 export function gridView(view: SavedViewState): GridView {
-  return view as unknown as GridView;
+  return { ...(view as unknown as Omit<GridView, "query">), query: "" };
+}
+
+/** True when the grid shows what the view stored: the search box is not part of a view, so it never marks a change. */
+export function sameAsStored(current: GridView, stored: GridView): boolean {
+  return sameView({ ...current, query: "" }, stored);
 }
 
 /** Reads the server's answer to a save or an edit; a request that never got one is `failed`. */

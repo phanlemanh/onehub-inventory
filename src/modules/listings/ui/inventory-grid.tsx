@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
-import { sameView, type ColumnFilters, type GridView } from "@/components/candidate/grid-view";
+import type { ColumnFilters, GridView } from "@/components/candidate/grid-view";
 import { usePlaceChange } from "@/components/templates/app-shell/place-change";
 import { Button } from "@/components/ui/button";
 
@@ -18,7 +18,7 @@ import {
 } from "./inventory-rows";
 import { listingRecord } from "./listing-record";
 import { SaveViewButtons } from "./save-view-buttons";
-import { gridView, savedViewHref } from "./saved-view-api";
+import { gridView, sameAsStored, savedViewHref } from "./saved-view-api";
 import { savedViewCopy, type SavedViewLabels } from "./saved-view-copy";
 
 /** Rows kept when part of the load fails: the first page and a half, so the partial state still spans two pages. */
@@ -60,7 +60,7 @@ export function InventoryGrid({
   const saved = useMemo(() => (openView ? gridView(openView.view) : undefined), [openView]);
   const copy = useMemo(() => (viewLabels ? savedViewCopy(viewLabels) : null), [viewLabels]);
   const changed =
-    openView != null && saved !== undefined && view !== null && !sameView(view, saved);
+    openView != null && saved !== undefined && view !== null && !sameAsStored(view, saved);
   // The second column marks the open view «đã đổi» while the grid differs from what was saved (Hỏi-5: never saved by itself).
   const { setChanged } = place;
   const openHref = openView ? savedViewHref(openView.id) : null;

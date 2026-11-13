@@ -34,7 +34,7 @@ export function savedViewCopy(l: SavedViewLabels) {
     missing: `${l.view} này không còn`,
     missingWhy: `${l.view} đã bị xoá hoặc không phải của bạn. Bạn đang xem mọi ${l.unit.toLocaleLowerCase("vi")}.`,
     nameLabel: "Tên",
-    saveDescription: `Đặt tên cho cách xem này: tìm, lọc, sắp xếp, nhóm và cột đang hiện. Chỉ bạn thấy ${view} này.`,
+    saveDescription: `Đặt tên cho cách xem này: lọc, sắp xếp, nhóm và cột đang hiện. Chỉ bạn thấy ${view} này.`,
     saveAsNewDescription: `Cách xem đang có thành một ${view} mới; ${view} đang mở giữ nguyên.`,
     renameDescription: "Chỉ đổi tên, cách xem giữ nguyên.",
     submit: "Lưu",

@@ -31,9 +31,7 @@ function toView(row: Row): SavedView {
     id: row.id,
     screen: row.screen,
     name: row.name,
-    view: parsed.success
-      ? parsed.data
-      : { query: "", filters: {}, sort: [], grouped: false, hidden: [] },
+    view: parsed.success ? parsed.data : { filters: {}, sort: [], grouped: false, hidden: [] },
   };
 }
 

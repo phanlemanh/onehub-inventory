@@ -95,13 +95,13 @@ const LABELS = savedViewLabels();
 const COPY = savedViewCopy(LABELS);
 const ALL_TITLE = navFor().find((i) => i.href === "/inventory")!.sections![0]!.items[0]!.title;
 
-const EMPTY = { query: "", filters: {}, sort: [], grouped: false, hidden: [] };
+const EMPTY = { filters: {}, sort: [], grouped: false, hidden: [] };
 const VIEWS: SavedView[] = [
   {
     id: "00000000-0000-4000-8000-0000000000a1",
     screen: "inventory",
     name: "[MAU] Toà S1.01",
-    view: { ...EMPTY, query: "S1.01" },
+    view: { ...EMPTY, filters: { "Listing.buildingName": "S1.01" } },
   },
   {
     id: "00000000-0000-4000-8000-0000000000b2",
@@ -213,13 +213,18 @@ describe("changed mark and save buttons", () => {
     expect(screen.queryByRole("button", { name: LABELS.saveChanges })).toBeNull();
     expect(screen.getByRole("button", { name: LABELS.save })).toBeTruthy();
 
+    // The search box is not part of a view (owner 2026-11-13): typing in it marks nothing.
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "S1.02" } });
+    expect(mark()).toHaveLength(0);
+    expect(screen.queryByRole("button", { name: LABELS.saveChanges })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: /^Nhóm theo/ }));
     expect(mark()).toHaveLength(1);
     expect(lit()[0]!.querySelector('[data-slot="place-changed"]')).not.toBeNull();
     expect(screen.getByRole("button", { name: LABELS.saveChanges })).toBeTruthy();
     expect(screen.getByRole("button", { name: LABELS.saveAsNew })).toBeTruthy();
 
-    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "S1.01" } });
+    fireEvent.click(screen.getByRole("button", { name: /^Nhóm theo/ }));
     expect(mark()).toHaveLength(0);
     expect(screen.queryByRole("button", { name: LABELS.saveChanges })).toBeNull();
   });
@@ -311,13 +316,7 @@ describe("naming dialog", () => {
         .body as string,
     );
     expect(body.name).toBe("[MAU] Mới");
-    expect(Object.keys(body.view).sort()).toEqual([
-      "filters",
-      "grouped",
-      "hidden",
-      "query",
-      "sort",
-    ]);
+    expect(Object.keys(body.view).sort()).toEqual(["filters", "grouped", "hidden", "sort"]);
   });
 
   it("no view yet shows the hint in the group", () => {

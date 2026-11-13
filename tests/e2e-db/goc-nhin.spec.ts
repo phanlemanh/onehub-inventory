@@ -150,12 +150,18 @@ export function checkReopened(got: Snapshot, want: Snapshot): void {
   }
 }
 
-/** The arrangement of E1 built by hand: search «S1», status Active (shortcut), Toà «S1.0», price high to low, groups, two columns hidden. */
+/** The arrangement of E1 built by hand: status Active (shortcut), Toà «S1.0», price high to low, groups, two columns hidden. The search box is not part of a view (owner 2026-11-13). */
 async function arrange(page: Page) {
   await page.goto("/inventory?status=Active");
   await settled(page);
-  await region(page).getByRole("searchbox").fill("S1");
-  await region(page).getByLabel("Lọc cột Toà").fill("S1.0");
+  // The grid draws its table body again once it has measured its width (row density); type after that, so retry
+  // until the rule stays in its box.
+  const tower = region(page).getByLabel("Lọc cột Toà");
+  await expect(async () => {
+    await tower.fill("S1.0");
+    await page.waitForTimeout(300);
+    await expect(tower).toHaveValue("S1.0", { timeout: 100 });
+  }).toPass();
   await region(page).locator('thead th[data-col-id="Listing.listPrice"] button').first().click();
   await page.getByRole("menuitem", { name: "Giảm dần" }).click();
   await region(page).locator('[data-slot="group-toggle"]').click();
@@ -173,12 +179,7 @@ function expectedUnits(): string[] {
   const rows = inventoryRows({ listings, listingUnits, units }).filter(
     (r) =>
       r["Listing.standardStatus"] === "Active" &&
-      String(r["Listing.buildingName"]).toLowerCase().includes("s1.0") &&
-      [r["Listing.unitNumber"], r["Listing.buildingName"], r["Listing.subdivisionName"]].some((v) =>
-        String(v ?? "")
-          .toLowerCase()
-          .includes("s1"),
-      ),
+      String(r["Listing.buildingName"]).toLowerCase().includes("s1.0"),
   );
   return rows.map((r) => String(r["Listing.unitNumber"])).sort();
 }
@@ -190,7 +191,9 @@ async function saveAs(page: Page, name: string, button = SAVE) {
   await dialog.getByLabel("Tên").press("Enter");
   await expect(dialog).toBeHidden();
   await page.waitForURL((u) => u.searchParams.has("goc-nhin"));
-  await expect(entry(page, name)).toHaveAttribute("aria-current", "true");
+  // On a phone the second column rides in the closed sheet; the entry is checked where it shows.
+  if (await secondColumn(page).isVisible())
+    await expect(entry(page, name)).toHaveAttribute("aria-current", "true");
 }
 
 const escaped = (text: string) => text.replace(/[[\]().*+?^$|\\]/g, "\\$&");
@@ -541,4 +544,54 @@ test.describe("axe", () => {
       .evaluate((el) => el.removeAttribute("aria-label"));
     expect(await seriousViolations(page)).toContain("button-name");
   });
+});
+
+// ---- E15 frames ---------------------------------------------------------------------------------------------------------
+
+// Frames for the ui-check E15, taken only when asked (GOC_NHIN_ANH=1): at each width and both themes, the second column
+// with the views group and an open view marked «đã đổi» with both save buttons, the «…» menu, the naming dialog and the
+// remove confirmation. On 360 and 414 the second column rides in the phone sheet, opened first.
+test("E15 frames", { tag: "@cho" }, async ({ page }, info) => {
+  test.skip(!process.env["GOC_NHIN_ANH"], "frames only when asked");
+  const dir = "_acceptance/luu-goc-nhin-cot-hai/evidence";
+  const width = info.project.name;
+  const phone = Number(width) < 768;
+  const me = await person(info, `anh-${width}`);
+  await signIn(page, me.email);
+  await arrange(page);
+  await saveAs(page, NAME);
+  await saveAs(page, "[MAU] Hai phòng ngủ");
+  // On a phone the view opens by its address, so the sheet is closed and settled before the frames open it.
+  if (phone) {
+    const first = (await storedViews(me.id)).find((v) => v.name === NAME)!;
+    await page.goto(`/inventory?goc-nhin=${first.id}`);
+  } else await entry(page, NAME).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(NAME);
+  await region(page).getByLabel("Lọc cột Phòng ngủ").fill("2");
+  await expect(region(page).getByRole("button", { name: SAVE_CHANGES })).toBeVisible();
+  for (const scheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme: scheme });
+    const shot = async (state: string) => {
+      await page.waitForTimeout(250);
+      await page.screenshot({
+        path: `${dir}/E15-${width}-${scheme === "light" ? "sang" : "toi"}-${state}.png`,
+      });
+    };
+    if (phone) await openSheet(page);
+    await shot("cot-thu-hai");
+    const column = phone ? page.getByRole("dialog") : secondColumn(page);
+    await column.getByRole("button", { name: new RegExp(escaped(NAME)) }).click();
+    await expect(page.getByRole("menu")).toBeVisible();
+    await shot("menu");
+    await page.getByRole("menuitem", { name: REMOVE }).click();
+    await shot("xac-nhan-xoa");
+    await page.keyboard.press("Escape");
+    if (phone) await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await region(page).getByRole("button", { name: SAVE_AS_NEW }).click();
+    await expect(page.locator('[data-slot="view-name-dialog"]')).toBeVisible();
+    await shot("hop-dat-ten");
+    await page.keyboard.press("Escape");
+    await expect(page.locator('[data-slot="view-name-dialog"]')).toHaveCount(0);
+  }
 });

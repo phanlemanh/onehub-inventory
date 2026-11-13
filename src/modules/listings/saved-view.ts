@@ -12,13 +12,12 @@ export const SAVED_VIEW_NAME_MAX = 40;
 export const SAVED_VIEWS_BASE_PATH = "/api/v1/saved-views";
 
 /**
- * The five things a view holds, and nothing else: the search text, each column's filter (text, or a set of values),
- * the sort, grouping on or off, and the hidden columns. Full screen, the selected cell, open groups and the scroll
- * position are not part of a view.
+ * The four things a view holds, and nothing else: each column's filter (text, or a set of values), the sort, grouping
+ * on or off, and the hidden columns. The search text is not part of a view (the owner, 2026-11-13: searching moves to
+ * the top bar), nor are full screen, the selected cell, open groups and the scroll position.
  */
 export const SavedViewState = z
   .object({
-    query: z.string().max(200),
     filters: z.record(z.string().min(1), z.union([z.string(), z.array(z.string()).max(50)])),
     sort: z
       .array(z.object({ field: z.string().min(1), direction: z.enum(["asc", "desc"]) }).strict())

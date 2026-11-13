@@ -61,7 +61,7 @@ async function apiWorld(suffix: string) {
     withCompany,
   });
   const NO_VIEW = "00000000-0000-4000-8000-0000000000ff";
-  const EMPTY_VIEW = { query: "", filters: {}, sort: [], grouped: false, hidden: [] };
+  const EMPTY_VIEW = { filters: {}, sort: [], grouped: false, hidden: [] };
   const signIn = async (who: Person, company: string): Promise<string> => {
     const email = w.email[who];
     await auth.requestCode(req(`${ORIGIN}/api/v1/auth/code`, "POST", { email }));

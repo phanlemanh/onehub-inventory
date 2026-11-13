@@ -29,10 +29,11 @@ rules:
       A name is trimmed, 1 to 40 characters, and unique without regard to case among the same person's views of the same
       screen; two people may use the same name.
     implemented_in: src/modules/listings/saved-view.ts
-  - id: saved-view-holds-five-things
+  - id: saved-view-holds-four-things
     description: >-
-      A view holds exactly the search text, the column filters, the sort, grouping on or off and the hidden columns —
-      not full screen, the selected cell, open groups or the scroll position.
+      A view holds exactly the column filters, the sort, grouping on or off and the hidden columns — not the search
+      text (searching moves to the top bar, owner 2026-11-13), full screen, the selected cell, open groups or the scroll
+      position.
     implemented_in: src/modules/listings/saved-view.ts
 
 code:

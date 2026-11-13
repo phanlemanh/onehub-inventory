@@ -93,7 +93,7 @@ export const CHO_TESTS: Readonly<Record<string, readonly string[]>> = {
     "thanh-ben-theo-bang · man-thanh-vien-theo-bang",
     "tu-choi-403-cau-rieng",
   ],
-  "tests/e2e-db/goc-nhin.spec.ts": ["phone sheet"],
+  "tests/e2e-db/goc-nhin.spec.ts": ["phone sheet", "E15 frames"],
   "tests/e2e/settle.spec.ts": [
     "ngan mo",
     "ngan chua dung",

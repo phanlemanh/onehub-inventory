@@ -33,12 +33,17 @@ không số đếm, Hỏi-4 nút «Lưu góc nhìn» của vùng, Hỏi-5 không
 
 ## Criteria
 
-- AC-1: Given Bảng hàng đang lọc theo toà và trạng thái, có chữ trong ô tìm, sắp theo giá giảm dần, nhóm theo toà và ẩn hai
-  cột, When người bấm «Lưu góc nhìn», đặt tên rồi lưu, Then một mục mang tên ấy hiện ở cột thứ hai của App Shell, sáng lên,
-  địa chỉ trang mang góc nhìn, và máy chủ giữ đủ năm thứ của cách xem ấy cho đúng người và sàn. (cross-layer)
+- AC-1: Given Bảng hàng đang lọc theo toà và trạng thái, sắp theo giá giảm dần, nhóm theo toà và ẩn hai cột, When người bấm
+  «Lưu góc nhìn», đặt tên rồi lưu, Then một mục mang tên ấy hiện ở cột thứ hai của App Shell, sáng lên, địa chỉ trang mang
+  góc nhìn, và máy chủ giữ đủ bốn thứ của cách xem ấy (lọc cột, sắp xếp, nhóm, cột ẩn — không giữ chữ trong ô tìm) cho
+  đúng người và sàn. (cross-layer)
 - AC-2: Given một góc nhìn đã lưu, When người mở nó từ cột thứ hai, hoặc tải lại trang, hoặc mở địa chỉ ấy trong một phiên
-  đăng nhập khác của cùng người, Then Bảng hàng ra đúng tập dòng, đúng thứ tự, đúng nhóm, đúng các cột đang hiện và đúng chữ
-  trong ô tìm như lúc lưu. (cross-layer)
+  đăng nhập khác của cùng người, Then Bảng hàng ra đúng tập dòng, đúng thứ tự, đúng nhóm và đúng các cột đang hiện như lúc
+  lưu, ô tìm trống. (cross-layer)
+
+> Sửa sau Cổng Phạm vi, 2026-11-13 (giám sát G-1311-10, chờ chủ kho phê ở Cổng Bằng chứng): góc nhìn không lưu chữ tìm.
+> Nguyên văn chủ kho: «Đồng ý lối A, một điểm tôi muốn bổ sung là đưa search đúng vào (⌘K) ở thanh trên đây cũng là nơi
+> shell đã có ux?» — lối A bỏ ô tìm của vùng ở mọi bảng họ Lưới (hàng 2e); ở 2c ô tìm vẫn nguyên, chỉ không vào góc nhìn.
 - AC-3: Given cột thứ hai có «Tất cả căn», các mục trạng thái và các góc nhìn, When người đi giữa chúng, Then đúng một mục
   sáng — mục đang mở; đầu màn mang tên góc nhìn đang mở; khi người đổi cách xem của góc nhìn đang mở, mục ấy mang dấu «đã
   đổi» và nút lưu có «Lưu thay đổi» và «Lưu thành mới»; bấm lại mục ấy thì về đúng cách xem đã lưu.
@@ -68,11 +73,12 @@ không số đếm, Hỏi-4 nút «Lưu góc nhìn» của vùng, Hỏi-5 không
 ## Coverage
 
 Quét không gian theo trục (skill `morphological-scan`, preset entity-feature cho thực thể Góc nhìn), thước đối chiếu: bốn
-thao tác của một bản ghi (tạo, đọc, sửa, xoá), năm thứ của cách xem, ba lớp người (chính mình, người cùng sàn, người sàn
+thao tác của một bản ghi (tạo, đọc, sửa, xoá), bốn thứ của cách xem, ba lớp người (chính mình, người cùng sàn, người sàn
 khác), bảng trạng thái `design/states.md`.
 
 - Trục thao tác: lưu mới (AC-1) | mở lại (AC-2) | lưu thay đổi (AC-4) | đổi tên (AC-5) | xoá (AC-6).
-- Trục thứ trong cách xem: ô tìm | lọc cột | sắp xếp | nhóm | cột ẩn (AC-1, AC-2, AC-4).
+- Trục thứ trong cách xem: lọc cột | sắp xếp | nhóm | cột ẩn (AC-1, AC-2, AC-4); ô tìm không thuộc góc nhìn (sửa sau Cổng
+  Phạm vi, G-1311-10).
 - Trục đường mở: cột thứ hai | tải lại | phiên khác | địa chỉ của góc nhìn đã xoá (AC-2, AC-6).
 - Trục người: chính mình | người cùng sàn | người sàn khác | vai không đọc Bảng hàng (AC-7).
 - Trục đường đi: giao diện (AC-3, AC-8) | `/api/v1` (AC-7, AC-8) | cơ sở dữ liệu (AC-1, AC-7).

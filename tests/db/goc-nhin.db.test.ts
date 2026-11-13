@@ -24,17 +24,16 @@ afterEach(async () => {
   for (const w of worlds.splice(0)) await dropWorld(w);
 });
 
-// Written before the code (E1): a view with all five things set.
+// Written before the code (E1): a view with all four things set (the search text is not part of a view since the
+// owner's ruling of 2026-11-13, G-1311-10).
 const VIEW: SavedViewState = {
-  query: "S1",
   filters: { "Listing.buildingName": ["S1.01"], "Listing.standardStatus": ["Active"] },
   sort: [{ field: "Listing.listPrice", direction: "desc" }],
   grouped: true,
   hidden: ["Listing.subdivisionName", "Listing.lastConfirmedAt"],
 };
-const FIVE = ["query", "filters", "sort", "grouped", "hidden"] as const;
+const FOUR = ["filters", "sort", "grouped", "hidden"] as const;
 const OTHER_VIEW: SavedViewState = {
-  query: "",
   filters: { "Unit.bedroomsTotal": "2" },
   sort: [],
   grouped: false,
@@ -146,7 +145,7 @@ async function saved(
   return ((await res.json()) as { view: SavedView }).view;
 }
 
-// ---- save (E1): the server keeps all five things of the view, for the right person and company
+// ---- save (E1): the server keeps all four things of the view, for the right person and company
 
 async function checkStored(
   v: ViewWorld,
@@ -162,7 +161,7 @@ async function checkStored(
   if (row.user_id !== v.idOf(who)) failures.push("saved view stored under wrong person");
   if (row.name !== name) failures.push("saved view stored under wrong name");
   let compared = 0;
-  for (const k of FIVE) {
+  for (const k of FOUR) {
     compared += 1;
     if (JSON.stringify(row.view[k]) !== JSON.stringify(sent[k]))
       failures.push(`saved view lost part: ${k}`);
@@ -171,12 +170,12 @@ async function checkStored(
 }
 
 describe("save", () => {
-  it("POST keeps the five things of the view for the saver in the saver's company", async () => {
+  it("POST keeps the four things of the view for the saver in the saver's company", async () => {
     const v = await viewWorld("luu");
     const g = await saved(v, "A", "Toà S1 đang bán");
     const r = await checkStored(v, g.id, "A", "Toà S1 đang bán", VIEW);
     expect(r.failures).toEqual([]);
-    expect(r.compared).toBe(5);
+    expect(r.compared).toBe(4);
     expect(g).toEqual({ id: g.id, screen: "inventory", name: "Toà S1 đang bán", view: VIEW });
   });
 
@@ -184,6 +183,14 @@ describe("save", () => {
     const v = await viewWorld("luu_thieu");
     const noSort = Object.fromEntries(Object.entries(VIEW).filter(([k]) => k !== "sort"));
     const res = await v.api.save("A", "Thiếu sắp xếp", noSort);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "bad-request" });
+    expect(await v.rows()).toBe(0);
+  });
+
+  it("a view carrying the search text is refused at the door and nothing is stored", async () => {
+    const v = await viewWorld("luu_tim");
+    const res = await v.api.save("A", "Có chữ tìm", { ...VIEW, query: "S1" });
     expect(res.status).toBe(400);
     expect(await res.json()).toEqual({ error: "bad-request" });
     expect(await v.rows()).toBe(0);
