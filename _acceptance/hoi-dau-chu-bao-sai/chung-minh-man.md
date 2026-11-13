@@ -22,8 +22,11 @@ hàng không đổi; bộ bài sinh từ sổ màn vẫn đo chúng như hàng 2
 
 | Cho | Ứng viên | Ảnh | Chọn |
 | --- | --- | --- | --- |
-| thanh-day | sheet-8 | evidence/reui/sheet-8.png | x |
-| thanh-day | product-detail-5 | evidence/reui/product-detail-5.png | |
+| màn | sheet-9 | evidence/reui/sheet-9.png | x |
+| màn | app-shell-11 | evidence/reui/app-shell-11.png | |
+| màn | solution-crm-4 | evidence/reui/solution-crm-4.png | |
+| sheet-8 | sheet-8 | evidence/reui/sheet-8.png | x |
+| sheet-8 | product-detail-5 | evidence/reui/product-detail-5.png | |
 
 ### Ma trận trạng thái
 
@@ -45,7 +48,7 @@ hàng không đổi; bộ bài sinh từ sổ màn vẫn đo chúng như hàng 2
 
 | Khối | Bậc | Đã tra | Ứng viên gần nhất | Vì sao không dùng | Cách |
 | --- | --- | --- | --- | --- | --- |
-| AskListAgent | reui | chân dính của ngăn (`tra.mjs sticky footer action bar`) | product-detail-5 | trang sản phẩm cả màn, hộp mua không dính | ghép từ thành phần |
+| sheet-8 | reui | chân dính của ngăn (`tra.mjs sticky footer action bar`) | product-detail-5 | trang sản phẩm cả màn, hộp mua không dính | ghép từ thành phần |
 | RecordPanel | trong-kho | | | | |
 | FormDialog | trong-kho | | | | |
 | Button | trong-kho | | | | |
@@ -55,6 +58,6 @@ hàng không đổi; bộ bài sinh từ sổ màn vẫn đo chúng như hàng 2
 
 | Khối | Vùng | Xử lý | Lý do |
 | --- | --- | --- | --- |
-| AskListAgent | chân dính có vạch trên | lấy | nút bước kế luôn trong tầm tay khi thân hồ sơ cuộn |
-| AskListAgent | biểu mẫu hai phần của ngăn | bỏ | hồ sơ căn đã có thân riêng (hàng 3) |
-| AskListAgent | hai nút Reset và Save | bỏ | luật chỗ đặt D: thanh chỉ chứa một nút |
+| sheet-8 | chân dính có vạch trên | lấy | nút bước kế luôn trong tầm tay khi thân hồ sơ cuộn |
+| sheet-8 | biểu mẫu hai phần của ngăn | bỏ | hồ sơ căn đã có thân riêng (hàng 3) |
+| sheet-8 | hai nút Reset và Save | bỏ | luật chỗ đặt D: thanh chỉ chứa một nút |
