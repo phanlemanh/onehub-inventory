@@ -174,7 +174,7 @@ export function ListingRecordFull({
           </Button>
         </div>
       )}
-      {/* Row 15 places «Sẵn sàng bán» on this line, beside the count (LUAT, «Bộ nút của hồ sơ căn»). */}
+      {/* Row 15 places its ready-to-list button on this line, beside the count (LUAT, «Bộ nút của hồ sơ căn»). */}
       <div data-slot="listing-completeness" className="flex flex-col gap-1.5">
         <Progress value={done.have} max={done.need} aria-label={labels.completeness}>
           <div className="flex w-full items-center justify-between gap-2 text-sm">

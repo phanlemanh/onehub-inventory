@@ -15,7 +15,7 @@ export const RECORD_COPY = {
   backToNewest: "Về lần mới nhất",
   /** «Mã căn»: the code of the unit, from the unit's label. */
   unitCode: (unit: string) => `Mã ${unit.toLocaleLowerCase("vi")}`,
-  /** «Các lần chào của căn · 3». */
+  /** The heading of the unit's listings with their count, after the label passed in. */
   listingsOfUnit: (listings: string, unit: string, n: number) =>
     `${listings} của ${unit.toLocaleLowerCase("vi")} · ${n}`,
 } as const;
