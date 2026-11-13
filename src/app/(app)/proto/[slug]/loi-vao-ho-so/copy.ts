@@ -16,11 +16,11 @@ export const ENTRY_COPY = {
     `Gõ đúng mã ${lower(unit)} rồi Enter để mở hồ sơ ${lower(unit)} trong ${inventory}.`,
   jumpGo: "Mở",
   jumpEmpty: (unit: string) => `Bạn gõ mã ${lower(unit)} trước đã.`,
-  many: (code: string, count: number, building: string, unit: string) =>
-    `Mã «${code}» có ở ${count} ${lower(building)} — bấm mã ${lower(unit)} ở dòng của ${lower(building)} cần mở.`,
+  noSuggestion: (unit: string, inventory: string) =>
+    `Không có ${lower(unit)} nào khớp — Enter để lọc ${inventory} theo chữ này.`,
 } as const;
 
-export const SCENES = ["ngan", "go-ma", "nhieu", "khong", "cu"] as const;
+export const SCENES = ["ngan", "go-ma", "mot", "nhieu", "khong", "cu"] as const;
 export type Scene = (typeof SCENES)[number];
 
 export const PROTO_COPY = {
@@ -32,12 +32,14 @@ export const PROTO_COPY = {
   },
   scenes: {
     ngan: "Hồ sơ có «Chép đường dẫn»",
-    "go-ma": "Gõ mã căn",
+    "go-ma": "Ô ⌘K có gợi ý",
+    mot: "Chọn một căn",
     nhieu: "Mã có ở hai toà",
     khong: "Mã lạ",
     cu: "Đường dẫn cũ",
   },
-  topBarNote: "Thanh trên của App Shell (bản mẫu chép lại phần bên phải).",
+  topBarNote:
+    "Thanh trên của App Shell (bản mẫu chép lại phần bên phải). Bản mẫu dựng bảng lệnh bằng hộp sẵn của kho — dáng gần đúng.",
   recordNote:
     "Đầu hồ sơ như hàng 3, thêm «Chép đường dẫn». Bấm thử: địa chỉ /inventory?ho-so=<id> vào bộ nhớ chép.",
 } as const;

@@ -38,7 +38,7 @@ evals:
     executor: script
     cmd: config:executors.script.e2e
     paths: [src/modules/listings/ui/**, src/components/templates/app-shell.tsx, "src/app/(app)/layout.tsx", "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts, tests/loi-vao-ho-so.test.tsx]
-    expected: "exit 0; ở 1440 và 360, trên /inventory và trên / : bấm nút tên 'Gõ mã căn' trên thanh trên thì hộp mở, tiêu điểm ở ô gõ; gõ mã của dòng thứ năm kèm khoảng trắng hai đầu (và viết khác hoa thường nếu mã có chữ) rồi Enter thì đang ở /inventory và hồ sơ hiện với data-record-id bằng id của dòng thứ năm; Ctrl+K và Meta+K mở hộp; '/' mở hộp khi tiêu điểm ở thân trang và KHÔNG mở khi tiêu điểm ở ô tìm của Bảng hàng (chữ '/' vào ô ấy); Enter khi ô rỗng thì có 'Bạn gõ mã căn trước đã.' và hộp còn mở; Esc đóng hộp và tiêu điểm về nút; ca đối chứng nuốt Enter cho 'jump did not navigate', ca đối chứng mở hộp khi gõ '/' trong ô nhập cho 'slash stolen from a text field'; trong tests/loi-vao-ho-so.test.tsx, khe ô gõ mã trên thanh trên rỗng khi danh sách vai không mở Bảng hàng và có nút khi mở, ca đối chứng luôn hiện nút cho 'jump shown without inventory'"
+    expected: "exit 0; ở 1440 và 360, trên /inventory và trên / : bấm ô tên 'Gõ mã căn' trên thanh trên thì ô mở, tiêu điểm ở chỗ gõ; gõ hai ký tự đầu của mã dòng thứ năm thì có gợi ý mang mã ấy và nhãn loại 'Căn'; gõ trọn mã kèm khoảng trắng hai đầu (khác hoa thường nếu mã có chữ) rồi Enter thì đang ở /inventory, ô lọc đầu cột Căn mang đúng mã ấy và nhìn thấy được, và hồ sơ hiện với data-record-id bằng id của dòng thứ năm; chọn gợi ý bằng chuột cho cùng kết quả; Ctrl+K và Meta+K mở ô; '/' mở ô khi tiêu điểm ở thân trang và KHÔNG mở khi tiêu điểm ở một ô lọc đầu cột (chữ '/' vào ô ấy); Enter khi ô rỗng thì vẫn ở trang cũ và ô còn mở; Esc đóng ô và tiêu điểm về chỗ mở; nếu Hỏi-2 chọn nhận cả toà và dự án: gõ tên toà của dòng thứ năm cho gợi ý nhãn 'Toà', chọn thì ô lọc đầu cột Toà mang tên ấy và không hồ sơ nào bật; ca đối chứng nuốt Enter cho 'jump did not navigate', ca đối chứng mở ô khi gõ '/' trong ô nhập cho 'slash stolen from a text field', ca đối chứng điền mã vào ô khác ô cột Căn cho 'code not in the unit column filter'; trong tests/loi-vao-ho-so.test.tsx, khe ô ⌘K trên thanh trên rỗng khi danh sách vai không mở Bảng hàng và có ô khi mở, ca đối chứng luôn hiện ô cho 'jump shown without inventory'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E6
@@ -46,7 +46,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/loi-vao-ho-so.test.tsx]
-    expected: "exit 0; trong tests/loi-vao-ho-so.test.tsx, trên ma trận dòng dựng tay viết trước trong tệp (mã A ở toà T1, T2, T3; mã B chỉ ở T1; mã C ở T1 và T2 viết 'c-1' và 'C-1'): phép tìm mã A cho 'nhieu' với đúng ba dòng theo thứ tự xuất hiện, mã B cho 'mot' với id của dòng ấy, ' c-1 ' cho 'nhieu' hai dòng, 'Z' cho 'khong'; Bảng hàng dựng trên ma trận với mã A chỉ hiện ba dòng của mã A, câu 'Mã «A» có ở 3 toà — bấm mã căn ở dòng của toà cần mở.' và không hồ sơ nào; số dòng hiện bằng số toà trong ma trận; ca đối chứng bỏ dòng trùng cuối cho 'building missing from choice', ca đối chứng tự mở dòng đầu cho 'many buildings opened the first', ca đối chứng khớp theo tiền tố mã cho 'partial code matched a unit'"
+    expected: "exit 0; trong tests/loi-vao-ho-so.test.tsx, trên ma trận dòng dựng tay viết trước trong tệp (mã A ở toà T1, T2, T3; mã B chỉ ở T1; mã C ở T1 và T2 viết 'c-1' và 'C-1'): phép tìm mã A cho 'nhieu' với đúng ba dòng theo thứ tự xuất hiện, mã B cho 'mot' với id của dòng ấy, ' c-1 ' cho 'nhieu' hai dòng, 'Z' cho 'khong', 'A-' (tiền tố) cho 'khong'; cách mở Bảng hàng dựng từ kết quả: 'mot' cho lọc cột Căn bằng mã và hồ sơ là id dòng ấy, 'nhieu' cho lọc cột Căn bằng mã và KHÔNG hồ sơ, 'khong' cho lọc cột Căn bằng chữ đã gõ và KHÔNG hồ sơ; Bảng hàng dựng trên ma trận với lọc của mã A chỉ hiện ba dòng của mã A và không có data-slot record-panel; ca đối chứng bỏ dòng trùng cuối cho 'building missing from choice', ca đối chứng mở hồ sơ dòng đầu khi nhiều toà cho 'many buildings opened the first', ca đối chứng khớp theo tiền tố mã cho 'partial code matched a unit'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E7
@@ -54,7 +54,7 @@ evals:
     executor: script
     cmd: config:executors.script.e2e
     paths: [src/modules/listings/ui/**, src/components/candidate/data-region.tsx, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts]
-    expected: "exit 0; gõ 'Z-99.99' trong hộp gõ mã rồi Enter thì đang ở /inventory, vùng Bảng hàng ở trạng thái không dòng nào khớp sẵn có (cùng data-slot và chữ tiêu đề như khi gõ chữ lạ vào ô tìm), ở 1440 và 360 ô tìm của Bảng hàng mang giá trị 'Z-99.99' và nhìn thấy được, và không có data-slot record-panel; ca đối chứng mở hồ sơ dòng đầu khi không khớp cho 'unknown code opened a record'"
+    expected: "exit 0; gõ 'Z-99.99' trong ô ⌘K rồi Enter thì đang ở /inventory, vùng Bảng hàng ở trạng thái không dòng nào khớp sẵn có (cùng data-slot và chữ tiêu đề như khi lọc cột bằng chữ lạ) có nút 'Xoá lọc', ở 1440 và 360 ô lọc đầu cột Căn mang 'Z-99.99' và nhìn thấy được, và không có data-slot record-panel; bấm 'Xoá lọc' thì đủ 60 dòng; ca đối chứng mở hồ sơ dòng đầu khi không khớp cho 'unknown code opened a record'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E8
@@ -62,7 +62,7 @@ evals:
     executor: script
     cmd: config:executors.script.e2e
     paths: [src/modules/listings/ui/**, src/components/templates/**, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts]
-    expected: "exit 0; ở 1440, 1024, 414, 360, sáng và tối: Bảng hàng với hồ sơ đang mở (có 'Chép đường dẫn'), Bảng hàng sau khi gõ mã lạ, và hộp gõ mã đang mở có document.documentElement.scrollWidth bằng clientWidth; quét axe không có lỗi impact serious hay critical; ca đối chứng ép đầu hồ sơ rộng 900 px cho 'record head scrolls sideways', ca đối chứng chèn chữ xám nhạt trên nền trắng cho lỗi axe color-contrast"
+    expected: "exit 0; ở 1440, 1024, 414, 360, sáng và tối: Bảng hàng với hồ sơ đang mở (có 'Chép đường dẫn'), Bảng hàng sau khi gõ mã lạ, và ô ⌘K đang mở có gợi ý có document.documentElement.scrollWidth bằng clientWidth; quét axe không có lỗi impact serious hay critical; ca đối chứng ép đầu hồ sơ rộng 900 px cho 'record head scrolls sideways', ca đối chứng chèn chữ xám nhạt trên nền trắng cho lỗi axe color-contrast"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E9
@@ -75,7 +75,7 @@ evals:
       - "At 1440x900, light: open {url}/inventory, click the fifth unit code → screenshot evidence/ho-so-1440-sang.png"
       - "Same at 1440x900 dark, 1024x768 light and dark, 414x896 light and dark, 360x780 light and dark → evidence/ho-so-<width>-<sang|toi>.png"
       - "At 1440x900 light and 360x780 dark: click «Chép đường dẫn» (grant clipboard permission) → evidence/da-chep-<width>.png"
-      - "At 1440x900 and 360x780, light and dark: on {url}/inventory press Control+K → evidence/go-ma-<width>-<sang|toi>.png; type Z-99.99 and Enter → evidence/ma-la-<width>-<sang|toi>.png"
+      - "At 1440x900 and 360x780, light and dark: on {url}/inventory press Control+K and type the first two characters of the fifth unit code → evidence/go-ma-<width>-<sang|toi>.png; clear, type Z-99.99 and Enter → evidence/ma-la-<width>-<sang|toi>.png"
       - "At 1440x900 light: open {url}/inventory?ho-so=khong-co → evidence/duong-dan-cu-1440.png"
-    expected: "Nút «Chép đường dẫn» thấy rõ ở đầu hồ sơ, không đẩy «Trước», «Sau», «Đóng» xuống dòng ở 1024 và 360; báo «Đã chép đường dẫn» thấy rõ; hộp gõ mã có ô gõ thấy rõ, không bị mép màn che ở 360; mã lạ cho trạng thái không dòng nào khớp quen thuộc của Bảng hàng; đường dẫn cũ cho Bảng hàng bình thường kèm báo; không chữ đè nhau, không cuộn ngang, chữ đọc được ở cả sáng và tối"
+    expected: "Nút «Chép đường dẫn» thấy rõ ở đầu hồ sơ, không đẩy «Trước», «Sau», «Đóng» xuống dòng ở 1024 và 360; báo «Đã chép đường dẫn» thấy rõ; ô ⌘K có chỗ gõ và gợi ý thấy rõ, mỗi gợi ý ghi rõ loại, không bị mép màn che ở 360; mã lạ cho trạng thái không dòng nào khớp quen thuộc của Bảng hàng, mã thấy ở đầu cột Căn; đường dẫn cũ cho Bảng hàng bình thường kèm báo; không chữ đè nhau, không cuộn ngang, chữ đọc được ở cả sáng và tối"
     evidence_required: [run_id, screenshot, observed]

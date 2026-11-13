@@ -21,6 +21,14 @@ const HEADERS: Record<InventoryField, string> = {
  * Development-only clickable prototype of row 3f (loi-vao-ho-so) for its scope gate, served by the proto page at /proto/loi-vao-ho-so. `canh` picks the scene
  * (ngan · go-ma · nhieu · khong · cu) and `bang=an` hides the control board for screenshots.
  */
+/** «Listing.buildingName=S1.01» → a column filter of the grid, for the scene a ⌘K choice opens. */
+function columnFrom(raw: unknown): { field: InventoryField; value: string } | null {
+  if (typeof raw !== "string") return null;
+  const at = raw.indexOf("=");
+  const field = raw.slice(0, at) as InventoryField;
+  return at > 0 && field in HEADERS ? { field, value: raw.slice(at + 1) } : null;
+}
+
 export function EntryProto({ q }: { q: Record<string, string | string[] | undefined> }) {
   const scene: Scene =
     typeof q.canh === "string" && (SCENES as readonly string[]).includes(q.canh)
@@ -42,12 +50,14 @@ export function EntryProto({ q }: { q: Record<string, string | string[] | undefi
       bare={q.bang === "an"}
       rows={rows}
       twin={twin}
+      column={columnFrom(q.cot)}
       headers={HEADERS}
       words={{
         unit: label("Unit"),
         building: label("Building"),
         inventory: label("Inventory"),
         listing: label("Listing"),
+        subdivision: label("Subdivision"),
         emptyWhy: `${label("Company")} chưa có ${label("Unit").toLocaleLowerCase("vi")} nào đang chào trên ${label("Inventory")}.`,
       }}
     />

@@ -9,7 +9,7 @@ reaction: nac-1 (anh-gui-kem-the)
 options: _acceptance/loi-vao-ho-so/design-pass/ung-vien/ (ảnh ba khối ReUI) và design-pass/*.png (bản đề xuất trên dữ liệu mẫu)
 divergence: opened
 ds_skill: inventory-ui
-states: [ngan, go-ma, nhieu, khong, cu]
+states: [ngan, go-ma, mot, nhieu, khong, cu]
 breakpoints: [mobile-360, mobile-414, desktop-1024, desktop-1440]
 themes: [light, dark]
 patched: 4
@@ -41,6 +41,14 @@ phần thật của kho: thân `ListingRecordBody` của hàng 3, `PageHeader`, 
 | go-ma | 414 | dark | design-pass/go-ma-414-toi.png |
 | go-ma | 360 | light | design-pass/go-ma-360-sang.png |
 | go-ma | 360 | dark | design-pass/go-ma-360-toi.png |
+| mot | 1440 | light | design-pass/mot-1440-sang.png |
+| mot | 1440 | dark | design-pass/mot-1440-toi.png |
+| mot | 1024 | light | design-pass/mot-1024-sang.png |
+| mot | 1024 | dark | design-pass/mot-1024-toi.png |
+| mot | 414 | light | design-pass/mot-414-sang.png |
+| mot | 414 | dark | design-pass/mot-414-toi.png |
+| mot | 360 | light | design-pass/mot-360-sang.png |
+| mot | 360 | dark | design-pass/mot-360-toi.png |
 | nhieu | 1440 | light | design-pass/nhieu-1440-sang.png |
 | nhieu | 1440 | dark | design-pass/nhieu-1440-toi.png |
 | nhieu | 1024 | light | design-pass/nhieu-1024-sang.png |
@@ -82,6 +90,13 @@ phần thật của kho: thân `ListingRecordBody` của hàng 3, `PageHeader`, 
   «Chép đường dẫn» chỉ hiện biểu tượng và tên căn xuống một dòng riêng (Hỏi-3).
 - Đã sửa trong hợp đồng: với mã lạ trên điện thoại, chữ đã gõ không thấy vì hàng lọc cột bị ẩn — trang thật đưa mã vào ô
   tìm. Bản mẫu vẫn lọc bằng cột Căn.
+
+- Lời chốt sau của chủ kho về ô tìm (ô ⌘K ở thanh trên là chỗ tìm duy nhất): ô ⌘K có gợi ý ghi rõ loại; chọn gợi ý hay
+  Enter mở Bảng hàng thật với mã ở đầu cột Căn và hàng lọc mở (cảnh «mot» bật thêm hồ sơ). Bản mẫu dựng bảng lệnh bằng hộp
+  biểu mẫu của kho vì gói cmdk chưa cài — có thêm «Thôi», «Mở» mà bảng lệnh thật không có. Ô «Gõ để tìm» của vùng vẫn còn
+  trong ảnh: việc bỏ nó là hàng 2e.
+- Phát hiện: lọc ra rỗng thì Bảng hàng giấu hàng lọc đầu cột (ảnh «khong» ở 1440 và 360) — mã vừa gõ không thấy được. Đúng
+  mục Ngoài-4 của hàng 2a mà hàng 2c đang sửa; AC-7 của 3f đứng trên bản sửa ấy.
 
 ## Nấc
 

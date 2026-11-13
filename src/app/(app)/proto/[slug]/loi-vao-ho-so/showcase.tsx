@@ -26,6 +26,7 @@ export interface Words {
   building: string;
   inventory: string;
   listing: string;
+  subdivision: string;
   emptyWhy: string;
 }
 
@@ -95,65 +96,122 @@ function PanelScene({ row, headers }: { row: GridRow; headers: Record<InventoryF
   );
 }
 
-/** Scenes «nhieu», «khong», «cu»: the real inventory grid, filtered by the typed code, with the row's one sentence. */
+/** Scenes «mot», «nhieu», «khong», «cu»: the real inventory grid opened with a column filter, as the ⌘K box leaves it. */
 function GridScene({
   rows,
   headers,
   words,
-  code,
+  filter,
   note,
 }: {
   rows: readonly GridRow[];
   headers: Record<InventoryField, string>;
   words: Words;
-  code: string | null;
+  filter: { field: InventoryField; value: string } | null;
   note: string | null;
 }) {
   useEffect(() => {
     if (note) notifyResult({ message: note });
   }, [note]);
-  const many = code ? rows.filter((r) => String(r["Listing.unitNumber"]) === code) : [];
   return (
-    <div className="flex flex-col gap-3">
-      {many.length > 1 ? (
-        <p data-slot="jump-many" className="text-sm">
-          {ENTRY_COPY.many(code!, many.length, words.building, words.unit)}
-        </p>
-      ) : null}
-      <InventoryGrid
-        title={words.listing}
-        headers={headers}
-        rows={rows}
-        state="ready"
-        emptyWhy={words.emptyWhy}
-        reloadLabel="Tải lại"
-        filters={code ? { "Listing.unitNumber": code } : undefined}
-      />
-    </div>
+    <InventoryGrid
+      title={words.listing}
+      headers={headers}
+      rows={rows}
+      state="ready"
+      emptyWhy={words.emptyWhy}
+      reloadLabel="Tải lại"
+      filters={filter ? { [filter.field]: filter.value } : undefined}
+    />
   );
 }
 
-/** Scene «go-ma»: the top bar's «Gõ mã căn» (⌘K or «/») opens the store's form dialog; Enter opens the inventory with the unit's record. */
-function JumpScene({ words, bare }: { words: Words; bare: boolean }) {
+/** One suggestion of the ⌘K box: what kind it is, what it shows, and the column it filters. */
+interface Suggestion {
+  kind: string;
+  text: string;
+  field: InventoryField;
+  value: string;
+  id?: string;
+}
+
+const fold = (t: string) => t.trim().toLocaleLowerCase("vi");
+
+/** Suggestions for the typed text from the inventory rows: units, then buildings, then subdivisions. */
+function suggest(rows: readonly GridRow[], typed: string, words: Words): Suggestion[] {
+  const q = fold(typed);
+  if (!q) return [];
+  const out: Suggestion[] = [];
+  const seen = new Set<string>();
+  const push = (s: Suggestion) => {
+    const key = `${s.field}|${s.text}`;
+    if (seen.has(key) || out.length >= 8) return;
+    seen.add(key);
+    out.push(s);
+  };
+  for (const r of rows) {
+    const code = String(r["Listing.unitNumber"]);
+    if (fold(code).startsWith(q))
+      push({
+        kind: words.unit,
+        text: `${code} · ${r["Listing.buildingName"]}`,
+        field: "Listing.unitNumber",
+        value: code,
+        id: r.id,
+      });
+  }
+  for (const r of rows) {
+    const b = String(r["Listing.buildingName"]);
+    if (fold(b).includes(q))
+      push({ kind: words.building, text: b, field: "Listing.buildingName", value: b });
+  }
+  for (const r of rows) {
+    const d = String(r["Listing.subdivisionName"]);
+    if (fold(d).includes(q))
+      push({ kind: words.subdivision, text: d, field: "Listing.subdivisionName", value: d });
+  }
+  return out;
+}
+
+/** Scene «go-ma»: the top bar's ⌘K box with suggestions; choosing one opens the inventory filtered at its column. */
+function JumpScene({
+  rows,
+  words,
+  bare,
+}: {
+  rows: readonly GridRow[];
+  words: Words;
+  bare: boolean;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  // Opened after mount so the screenshot of this scene shows the dialog (a dialog open on the server render stays shut).
+  // Opened after mount so the screenshot of this scene shows the box (a dialog open on the server render stays shut).
   useEffect(() => {
     const id = requestAnimationFrame(() => setOpen(true));
     return () => cancelAnimationFrame(id);
   }, []);
-  const [text, setText] = useState("");
-  const [error, setError] = useState<string | undefined>(undefined);
-  const go = () => {
-    const code = text.trim();
-    if (!code) return setError(ENTRY_COPY.jumpEmpty(words.unit));
+  const [text, setText] = useState(String(rows[0]?.["Listing.unitNumber"] ?? "").slice(0, 2));
+  const list = suggest(rows, text, words);
+  const go = (s: Suggestion | null) => {
+    const typed = text.trim();
+    if (!s && !typed) return;
     setOpen(false);
-    router.push(
-      sceneHref(
-        code.toLowerCase() === "z-99.99" ? "khong" : code === "0905" ? "nhieu" : "ngan",
-        bare,
-      ),
-    );
+    const code = s?.field === "Listing.unitNumber" || !s ? (s?.value ?? typed) : null;
+    const units = code
+      ? rows.filter((r) => fold(String(r["Listing.unitNumber"])) === fold(code))
+      : [];
+    const scene: Scene = !code
+      ? "mot"
+      : units.length === 1
+        ? "mot"
+        : units.length > 1
+          ? "nhieu"
+          : "khong";
+    const q = new URLSearchParams({ canh: scene });
+    if (s && !code) q.set("cot", `${s.field}=${s.value}`);
+    if (units.length === 1) q.set("ho-so", units[0]!.id);
+    if (bare) q.set("bang", "an");
+    router.push(`${BASE}?${q}`);
   };
   return (
     <div className="flex flex-col gap-4">
@@ -183,8 +241,7 @@ function JumpScene({ words, bare }: { words: Words; bare: boolean }) {
             busy={false}
             open={open}
             onOpenChange={setOpen}
-            onSubmit={go}
-            formError={error}
+            onSubmit={() => go(list[0] ?? null)}
             slot="unit-jump"
           >
             <InputGroup>
@@ -194,15 +251,26 @@ function JumpScene({ words, bare }: { words: Words; bare: boolean }) {
               <InputGroupInput
                 autoFocus
                 aria-label={ENTRY_COPY.jump(words.unit)}
-                aria-invalid={error ? true : undefined}
                 placeholder="VD 0905"
                 value={text}
-                onChange={(e) => {
-                  setText(e.target.value);
-                  setError(undefined);
-                }}
+                onChange={(e) => setText(e.target.value)}
               />
             </InputGroup>
+            <ul data-slot="jump-suggestions" className="flex max-h-64 flex-col overflow-y-auto">
+              {text.trim() && list.length === 0 ? (
+                <li className="px-2 py-1.5 text-sm text-muted-foreground">
+                  {ENTRY_COPY.noSuggestion(words.unit, words.inventory)}
+                </li>
+              ) : null}
+              {list.map((s) => (
+                <li key={`${s.field}|${s.text}`}>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => go(s)}>
+                    <span className="w-14 text-left text-xs text-muted-foreground">{s.kind}</span>
+                    <span className="flex-1 text-left">{s.text}</span>
+                  </Button>
+                </li>
+              ))}
+            </ul>
           </FormDialog>
         </div>
       </div>
@@ -217,6 +285,7 @@ export function EntryShowcase({
   twin,
   headers,
   words,
+  column,
 }: {
   scene: Scene;
   bare: boolean;
@@ -225,6 +294,8 @@ export function EntryShowcase({
   twin: readonly GridRow[];
   headers: Record<InventoryField, string>;
   words: Words;
+  /** A column filter chosen in the ⌘K box (building or subdivision), as «field=value». */
+  column?: { field: InventoryField; value: string } | null;
 }) {
   const row = rows[0]!;
   const code = String(row["Listing.unitNumber"]);
@@ -258,19 +329,40 @@ export function EntryShowcase({
         </section>
       )}
       {scene === "ngan" ? <PanelScene row={row} headers={headers} /> : null}
-      {scene === "go-ma" ? <JumpScene words={words} bare={bare} /> : null}
+      {scene === "go-ma" ? <JumpScene rows={twin} words={words} bare={bare} /> : null}
+      {scene === "mot" ? (
+        <GridScene
+          rows={rows}
+          headers={headers}
+          words={words}
+          filter={column ?? { field: "Listing.unitNumber", value: code }}
+          note={null}
+        />
+      ) : null}
       {scene === "nhieu" ? (
-        <GridScene rows={twin} headers={headers} words={words} code={code} note={null} />
+        <GridScene
+          rows={twin}
+          headers={headers}
+          words={words}
+          filter={{ field: "Listing.unitNumber", value: code }}
+          note={null}
+        />
       ) : null}
       {scene === "khong" ? (
-        <GridScene rows={rows} headers={headers} words={words} code="Z-99.99" note={null} />
+        <GridScene
+          rows={rows}
+          headers={headers}
+          words={words}
+          filter={{ field: "Listing.unitNumber", value: "Z-99.99" }}
+          note={null}
+        />
       ) : null}
       {scene === "cu" ? (
         <GridScene
           rows={rows}
           headers={headers}
           words={words}
-          code={null}
+          filter={null}
           note={ENTRY_COPY.staleLink(words.unit, words.inventory)}
         />
       ) : null}
