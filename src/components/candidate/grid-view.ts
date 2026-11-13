@@ -299,3 +299,72 @@ export function rowNumbers<R extends ViewRow>(
   }
   return numbers;
 }
+
+/**
+ * How a person has arranged the grid (row 2c, a saved view): the search text, each column's filter, the sort, grouping
+ * on or off and the hidden columns. Full screen, the selected cell, open groups and the scroll position are not part of
+ * it. A screen may give one to the region to open with and hear each change of it.
+ */
+export interface GridView {
+  query: string;
+  filters: ColumnFilters;
+  sort: readonly SortBy[];
+  grouped: boolean;
+  hidden: readonly FieldKey[];
+}
+
+export const EMPTY_VIEW: GridView = {
+  query: "",
+  filters: {},
+  sort: [],
+  grouped: false,
+  hidden: [],
+};
+
+/** The filters that filter something, values in a set sorted, so two views that filter alike compare equal. */
+function liveFilters(filters: ColumnFilters): [string, string | string[]][] {
+  return Object.entries(filters)
+    .filter(([, value]) => !filterIsEmpty(value))
+    .map(([field, value]): [string, string | string[]] => [
+      field,
+      typeof value === "string" ? value.trim() : [...(value as readonly string[])].sort(),
+    ])
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+}
+
+/**
+ * True when two views show the same grid: the same search text (ends trimmed), the same live filters whatever their
+ * order, the same sort, grouping and hidden columns (in any order).
+ */
+export function sameView(a: GridView, b: GridView): boolean {
+  if (a.query.trim() !== b.query.trim()) return false;
+  if (a.grouped !== b.grouped) return false;
+  if (JSON.stringify(liveFilters(a.filters)) !== JSON.stringify(liveFilters(b.filters)))
+    return false;
+  if (
+    a.sort.length !== b.sort.length ||
+    a.sort.some((s, i) => s.field !== b.sort[i]?.field || s.direction !== b.sort[i]?.direction)
+  )
+    return false;
+  const hiddenA = [...a.hidden].sort();
+  const hiddenB = [...b.hidden].sort();
+  return hiddenA.length === hiddenB.length && hiddenA.every((f, i) => f === hiddenB[i]);
+}
+
+/**
+ * A view kept to the columns the grid has now: a filter, sort or hidden column of a field the grid no longer shows is
+ * dropped and the rest opens (design.md, «Hành vi»). The first column names the row and never hides.
+ */
+export function viewWithin(view: GridView, columns: readonly TypedColumn[]): GridView {
+  const fields = new Set<string>(columns.map((c) => c.field));
+  const first = columns[0]?.field;
+  return {
+    query: view.query,
+    filters: Object.fromEntries(
+      Object.entries(view.filters).filter(([field]) => fields.has(field)),
+    ) as ColumnFilters,
+    sort: view.sort.filter((s) => fields.has(s.field)).slice(0, 1),
+    grouped: view.grouped,
+    hidden: view.hidden.filter((f) => fields.has(f) && f !== first),
+  };
+}

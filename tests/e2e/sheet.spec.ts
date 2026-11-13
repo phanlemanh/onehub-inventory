@@ -640,3 +640,120 @@ test.describe("sheet footer in view", () => {
     expect(await fitProblem(page)).toMatch(/^page scrolls by \d+px$/);
   });
 });
+
+// Row 2c (luu-goc-nhin-cot-hai), E13 — Ngoài-4 of 2a: a search that leaves no row keeps the search box, its focus and
+// the filter boxes; one rule mended brings the rows back.
+test.describe("no match keeps filters", () => {
+  /** The filter boxes are still there to mend (seen at 1024 and 1440; the Lọc button on a phone). */
+  async function checkFilters(page: Page): Promise<void> {
+    const boxes = page.locator('[data-slot="data-region"] [data-slot="column-filter"]');
+    const toggle = page.locator('[data-slot="filter-toggle"]');
+    const ok = WIDE.has(width())
+      ? (await boxes.count()) === 8 && (await boxes.first().isVisible())
+      : (await toggle.count()) === 1 && (await toggle.isEnabled());
+    if (!ok) throw new Error("filters gone on no match");
+  }
+
+  test("search «zzz» letter by letter, then mend the tower filter", async ({ page }) => {
+    await openInventory(page);
+    await page.getByRole("button", { name: /^Lọc/ }).click();
+    if (WIDE.has(width())) await page.getByLabel("Lọc cột Toà").fill("S1.0");
+    const box = page.getByRole("searchbox");
+    await box.click();
+    await page.keyboard.type("zzz", { delay: 30 });
+    await expect(page.getByText("Không có dòng nào khớp")).toBeVisible();
+    await expect(box).toBeFocused();
+    await expect(box).toHaveValue("zzz");
+    await checkFilters(page);
+    await box.fill("");
+    if (WIDE.has(width())) {
+      // Typed letter by letter: the box keeps its focus when its rule leaves no row, and mending it brings rows back.
+      const tower = page.getByLabel("Lọc cột Toà");
+      await tower.fill("");
+      await tower.click();
+      await page.keyboard.type("khong-co", { delay: 30 });
+      await expect(page.getByText("Không có dòng nào khớp")).toBeVisible();
+      await expect(tower).toBeFocused();
+      await checkFilters(page);
+      for (let i = 0; i < "khong-co".length; i += 1) await page.keyboard.press("Backspace");
+      await expect(tower).toHaveValue("");
+      await expect(bodyRows(page).first()).toBeVisible();
+    }
+    // Break: the filter boxes removed while nothing matches.
+    await box.fill("zzz");
+    await page.evaluate(() =>
+      document
+        .querySelectorAll('[data-slot="column-filter"], [data-slot="filter-toggle"]')
+        .forEach((el) => el.remove()),
+    );
+    await expect(checkFilters(page)).rejects.toThrow("filters gone on no match");
+  });
+});
+
+// Row 2c, E14 — Ngoài-5 of 2a: leaving the inventory while it holds the whole screen gives the next screen the whole
+// App Shell, without a reload; back on the inventory it is in the normal mode.
+test.describe("leaving full screen restores the shell", () => {
+  test.skip(() => width() !== "1440", "measured at 1440");
+
+  async function checkShell(page: Page): Promise<void> {
+    const parts = await page.evaluate(() =>
+      [
+        '[data-sidebar="sidebar"]',
+        '[data-slot="app-shell-top-bar"]',
+        '[data-slot="app-shell-second-column"]',
+        '[data-slot="page-header"]',
+      ].map((sel) => {
+        const el = document.querySelector<HTMLElement>(sel);
+        return !!el && el.getClientRects().length > 0;
+      }),
+    );
+    if (parts.some((p) => !p)) throw new Error("shell still hidden after leaving full screen");
+  }
+
+  const WAYS: [string, (page: Page) => Promise<void>][] = [
+    [
+      "Back",
+      async (page) => {
+        await page.goBack();
+      },
+    ],
+    [
+      "a link through the router",
+      async (page) =>
+        page.evaluate(() =>
+          (
+            window as unknown as { next: { router: { push: (h: string) => void } } }
+          ).next.router.push("/sent"),
+        ),
+    ],
+  ];
+
+  for (const [name, leave] of WAYS)
+    test(`by ${name}`, async ({ page }) => {
+      expect(WAYS).toHaveLength(2);
+      let loads = 0;
+      page.on("load", () => (loads += 1));
+      await page.goto("/");
+      await page.getByRole("link", { name: "Bảng hàng" }).first().click();
+      await page.waitForURL("**/inventory");
+      await expect(table(page)).toHaveAttribute("tabindex", "0");
+      const loadsBefore = loads;
+      await page.getByRole("button", { name: "Toàn màn hình" }).click();
+      await expect.poll(() => page.evaluate(() => !!document.fullscreenElement)).toBe(true);
+      await expect(page.locator('[data-slot="app-shell-top-bar"]')).toHaveCount(0);
+      await expect(checkShell(page)).rejects.toThrow(
+        "shell still hidden after leaving full screen",
+      );
+      await leave(page);
+      await page.waitForURL((u) => u.pathname !== "/inventory");
+      await expect(page.locator('[data-slot="page-header"]')).toBeVisible();
+      await checkShell(page);
+      expect(loads).toBe(loadsBefore);
+      await page.goto("/inventory");
+      await expect(table(page)).toHaveAttribute("tabindex", "0");
+      await expect(page.locator('[data-slot="data-region"]')).not.toHaveAttribute(
+        "data-full-screen",
+      );
+      await expect(page.locator('[data-slot="app-shell-top-bar"]')).toBeVisible();
+    });
+});

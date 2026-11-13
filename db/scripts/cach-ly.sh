@@ -2,7 +2,7 @@
 # Company isolation suite (SP-1, hồ sơ cach-ly-moi-san). Runs on this lane's Postgres container, never on real data:
 #   1. a fresh scratch database, migrations applied twice (the second run applies nothing);
 #   2. db/tests/cach-ly.sql — 20 cases under the API role, using the door's own statements;
-#   3. ten break cases (twenty-four break files), each file on its own scratch database: the suite must go red with the
+#   3. ten break cases (twenty-five break files), each file on its own scratch database: the suite must go red with the
 #      pinned messages;
 #   4. the app's login role (row 7c): db/tests/vai-dang-nhap.sql on the clean database in a rolled-back transaction;
 #      db/tests/vai-dang-nhap-phien.sql on a connection logged in AS quy_hang_login; seven break files, each in one
@@ -89,7 +89,7 @@ vai_dang_nhap_ghim() {
 # Break case → its break files (db/tests/pha-thu/<file>.sql), each on its own scratch database.
 pha_thu_tep() {
   case "$1" in
-    bo-ep-luat) printf '%s\n' bo-ep-luat ;;
+    bo-ep-luat) printf '%s\n' bo-ep-luat goc-nhin-bo-ep-luat ;;
     luat-them-khong-kiem)
       printf '%s\n' luat-them-khong-kiem luat-them-khong-kiem-doi-tac luat-ghi-for-all-doi-tac luat-xoa-doi-tac ;;
     luat-doc-mo) printf '%s\n' luat-doc-mo luat-doc-mo-hoac-true luat-doc-mo-khac-san ma-rieng-doc-mo ;;
@@ -106,6 +106,7 @@ pha_thu_tep() {
 pha_thu_ghim() {
   case "$1" in
     bo-ep-luat) printf '%s\n' "HỎNG moi-bang-cong-ty-ep-luat-theo-dong: agreements" ;;
+    goc-nhin-bo-ep-luat) printf '%s\n' "HỎNG moi-bang-cong-ty-ep-luat-theo-dong: saved_view" ;;
     luat-them-khong-kiem) printf '%s\n' "HỎNG a-khong-them-dong-ten-b" "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     luat-them-khong-kiem-doi-tac) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     luat-ghi-for-all-doi-tac) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: bang_doi_tac_mau" ;;
