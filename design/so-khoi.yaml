@@ -102,6 +102,7 @@ khoi:
 # Blocks made before this ledger existed, each named with the round that made it, the commit that created it and the
 # day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
 # still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).
+# Adding a pair here needs a ruling of the batch supervisor, and the owner signs it at the evidence gate of that row.
 khoi_co_truoc:
   - ten: FormDialog
     ho_so: moi-nguoi-gan-vai
