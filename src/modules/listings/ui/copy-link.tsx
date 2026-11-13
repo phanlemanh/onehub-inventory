@@ -14,8 +14,8 @@ export function recordLink(id: string, origin: string): string {
 
 /**
  * «Chép đường dẫn» at the head of a listing's record (row 3f): copies the record's link and says so; when the browser
- * refuses the clipboard it says where to copy from instead. On the phone the button shows its icon only, so the head
- * keeps «Trước», «Sau» and «Đóng» in view; its name stays readable.
+ * refuses the clipboard it says where to copy from instead. Below wide screens the button shows its icon only, so the head
+ * keeps «Trước», «Sau» and «Đóng» on one line beside the name; its name stays readable.
  */
 export function CopyLink({ id }: { id: string }) {
   async function copy() {
@@ -35,7 +35,7 @@ export function CopyLink({ id }: { id: string }) {
       onClick={() => void copy()}
     >
       <LinkIcon aria-hidden="true" />
-      <span className="max-sm:sr-only">{ENTRY_COPY.copyLink}</span>
+      <span className="max-xl:sr-only">{ENTRY_COPY.copyLink}</span>
     </Button>
   );
 }

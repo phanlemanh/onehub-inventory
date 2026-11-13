@@ -76,8 +76,8 @@ Quét theo khuôn «entity-feature» của bộ quét hình thái, trên hai l�
 - Trục E — vai: có Bảng hàng · không có.
 
 Thước: AC-1 phủ C (bốn khổ); AC-2 phủ D; AC-3, AC-4 phủ A (đường dẫn) × B (một căn, id đã rút); AC-5 phủ A («Gõ mã căn» ba
-lối) × B (một căn, ô rỗng) × E; AC-6, AC-7 phủ B (nhiều toà, mã lạ); AC-8 phủ C × ba trạng thái. [CE chưa kiểm chứng]: B
-«nhiều toà» trên Bảng hàng thật — dữ liệu mẫu không có mã ở hai toà, ca này chỉ đo trên dòng dựng tay trong bài kiểm.
+lối) × B (một căn, ô rỗng) × E; AC-6, AC-7 phủ B (nhiều toà, mã lạ); AC-8 phủ C × ba trạng thái. Ca «nhiều toà» đo trên Bảng hàng thật: dữ liệu mẫu có 10 mã ở hai
+toà trở lên (0601 ở ba toà).
 
 ## Đường đo
 

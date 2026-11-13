@@ -52,8 +52,8 @@ hàng 12 trong hộp thêm căn) và không dùng chung phép xử lý mã.
   không tự bật; không dòng nào → trạng thái «Không có dòng nào khớp». Không đường đọc dữ liệu mới (SP-1).
 - Đường dẫn mang id đã không còn → Bảng hàng bình thường kèm một báo (câu hỏi về đường dẫn cũ).
 - Chép đường dẫn bằng bộ nhớ chép của trình duyệt, báo qua kênh báo kết quả của kho; không mở ứng dụng gửi nào (SP-3).
-- Dữ liệu mẫu (60 lần chào) không có mã nào ở hai toà; ca nhiều toà đo bằng bài kiểm trên dòng dựng tay và bằng bản mẫu,
-  chưa thấy được trên Bảng hàng thật tới khi có dữ liệu thật (hàng 10). Bộ mẫu đã ghim băm nên không đổi được.
+- Dữ liệu mẫu (60 lần chào) có 10 mã ở hai toà trở lên (0601, 1606 ở ba toà), nên ca nhiều toà xem và đo được ngay trên
+  Bảng hàng thật.
 
 <!-- <<<UX-SPEC-TEMPLATE -->
 ## Đặc tả UX
