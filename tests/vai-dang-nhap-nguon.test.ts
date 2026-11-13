@@ -4,7 +4,6 @@
 //      (`<db>.url`, `DB_URL`). Fixtures still use the owner, through other names.
 //   2. .env.example only gains lines: every line it had on the main branch when the row opened is still there, and it
 //      has the login-role connection string and PSQL_LOGIN for the CI row (1s).
-import { execFileSync } from "node:child_process";
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,6 +12,11 @@ import { describe, expect, it } from "vitest";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const ENV_BASE = "83d1764";
+/**
+ * .env.example as it was on the main branch when the row opened (commit 83d1764), kept as a file: CI checks out a
+ * shallow history, where `git show 83d1764:.env.example` has no object to read.
+ */
+const ENV_BASE_FILE = join(ROOT, "tests/fixtures/env-example-83d1764.txt");
 
 /** The owner's connection string, as the tests name it. */
 const OWNER = String.raw`(?:[\w.]*\.url|DB_URL)\b`;
@@ -101,10 +105,7 @@ export function droppedLines(base: string, now: string): string[] {
 }
 
 describe(".env.example only gains lines (E9)", () => {
-  const base = execFileSync("git", ["show", `${ENV_BASE}:.env.example`], {
-    cwd: ROOT,
-    encoding: "utf8",
-  });
+  const base = readFileSync(ENV_BASE_FILE, "utf8");
   const now = readFileSync(join(ROOT, ".env.example"), "utf8");
 
   it(`every line of .env.example at ${ENV_BASE} is still there`, () => {
