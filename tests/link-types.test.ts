@@ -316,7 +316,7 @@ describe("AC-5 the sample data is byte-identical to the signed sample-data row",
 // ——— AC-6: glossary and module owners ————————————————————————————————————————————————————————————
 
 // Dependencies between modules approved since this row, written before the code; any other one is new. Row 2c
-// (K-21, K-24): listings goes through the identity module's shared action door (decision 0025).
+// (K-21, K-24): listings goes through the identity module's shared action door (decision 0026).
 const APPROVED_DEPENDENCIES = new Set(["listings → identity"]);
 
 interface ModuleMap {

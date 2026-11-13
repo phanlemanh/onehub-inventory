@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useSyncExternalStore } from "react";
 
+import { useActionPermission } from "@/components/candidate/action-permission";
 import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
@@ -56,7 +57,8 @@ export function SecondColumnNav({
   const pathname = usePathname();
   const search = useSearchParams().toString();
   const { isMobile, setOpenMobile } = useSidebar();
-  const entry = currentEntry(items, roles, pathname);
+  const permitted = useActionPermission();
+  const entry = currentEntry(items, roles, pathname, permitted);
   if (!entry) return null;
   const sections = entry.sections ?? [];
   if (sections.length === 0) {

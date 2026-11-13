@@ -285,6 +285,27 @@ export interface ActivateListingInput {
 export interface ViewOwnerPhoneInput {
 }
 
+export interface RemoveListingInput {
+}
+
+export interface ViewContactsInput {
+}
+
+export interface CreateContactInput {
+}
+
+export interface UpdateContactInput {
+}
+
+export interface RemoveContactInput {
+}
+
+export interface MergeContactsInput {
+}
+
+export interface EraseContactPersonalDataInput {
+}
+
 /** Implement these in src/actions/ — one function per ontology action. */
 export interface ActionHandlers {
   /** Read the roles one holds in the company of the session. */
@@ -325,6 +346,20 @@ export interface ActionHandlers {
   activateListing(input: ActivateListingInput, ctx: ActionContext): Promise<void>;
   /** See the phone number of a listing's owner (own scope is the unit one keeps). */
   viewOwnerPhone(input: ViewOwnerPhoneInput, ctx: ActionContext): Promise<void>;
+  /** Remove a listing from the list; who removed it and when is kept (own scope is the unit one keeps). */
+  removeListing(input: RemoveListingInput, ctx: ActionContext): Promise<void>;
+  /** See the contacts of the company. */
+  viewContacts(input: ViewContactsInput, ctx: ActionContext): Promise<void>;
+  /** Add a contact. */
+  createContact(input: CreateContactInput, ctx: ActionContext): Promise<void>;
+  /** Change a contact's details (own scope is a contact one created). */
+  updateContact(input: UpdateContactInput, ctx: ActionContext): Promise<void>;
+  /** Remove a contact from the list; who removed it and when is kept (own scope is a contact one created). */
+  removeContact(input: RemoveContactInput, ctx: ActionContext): Promise<void>;
+  /** Merge two records of the same contact into one. */
+  mergeContacts(input: MergeContactsInput, ctx: ActionContext): Promise<void>;
+  /** Erase a contact's name and phone number at that person's request; the rest of the history is kept. */
+  eraseContactPersonalData(input: EraseContactPersonalDataInput, ctx: ActionContext): Promise<void>;
 }
 
 export interface ActionSpec {
@@ -832,6 +867,183 @@ export const ACTIONS: readonly ActionSpec[] = [
     },
     scope: {
       ListAgent: "own",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "removeListing",
+    description: "Remove a listing from the list; who removed it and when is kept (own scope is the unit one keeps).",
+    entity: "Listing",
+    kind: "delete",
+    roles: ["ListAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "viewContacts",
+    description: "See the contacts of the company.",
+    entity: "Contact",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "createContact",
+    description: "Add a contact.",
+    entity: "Contact",
+    kind: "create",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "updateContact",
+    description: "Change a contact's details (own scope is a contact one created).",
+    entity: "Contact",
+    kind: "update",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "removeContact",
+    description: "Remove a contact from the list; who removed it and when is kept (own scope is a contact one created).",
+    entity: "Contact",
+    kind: "delete",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "mergeContacts",
+    description: "Merge two records of the same contact into one.",
+    entity: "Contact",
+    kind: "command",
+    roles: ["TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "eraseContactPersonalData",
+    description: "Erase a contact's name and phone number at that person's request; the rest of the history is kept.",
+    entity: "Contact",
+    kind: "command",
+    roles: ["TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
       TeamLead: "company",
     },
     status: "planned",

@@ -192,6 +192,59 @@ actions:
     status: planned
     scope: { ListAgent: own, TeamLead: company }
 
+  # Draft rows of row 9e (bo-nut-theo-quyen), cells chosen by the owner at its scope gate on 2026-11-12: «Xoá» means the
+  # row leaves the list and who removed it and when is kept (decision 0016, amended in the same change); contacts follow
+  # common CRM practice — everyone reads, the creator and the team lead change and remove, only the team lead merges and
+  # erases personal data. The row that opens each door decides its cells again and turns it live.
+  - name: removeListing
+    description: Remove a listing from the list; who removed it and when is kept (own scope is the unit one keeps).
+    entity: Listing
+    kind: delete
+    status: planned
+    scope: { ListAgent: own, TeamLead: company }
+
+  - name: viewContacts
+    description: See the contacts of the company.
+    entity: Contact
+    kind: query
+    status: planned
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company }
+
+  - name: createContact
+    description: Add a contact.
+    entity: Contact
+    kind: create
+    status: planned
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company }
+
+  - name: updateContact
+    description: Change a contact's details (own scope is a contact one created).
+    entity: Contact
+    kind: update
+    status: planned
+    scope: { ListAgent: own, BuyerAgent: own, TeamLead: company }
+
+  - name: removeContact
+    description: Remove a contact from the list; who removed it and when is kept (own scope is a contact one created).
+    entity: Contact
+    kind: delete
+    status: planned
+    scope: { ListAgent: own, BuyerAgent: own, TeamLead: company }
+
+  - name: mergeContacts
+    description: Merge two records of the same contact into one.
+    entity: Contact
+    kind: command
+    status: planned
+    scope: { TeamLead: company }
+
+  - name: eraseContactPersonalData
+    description: Erase a contact's name and phone number at that person's request; the rest of the history is kept.
+    entity: Contact
+    kind: command
+    status: planned
+    scope: { TeamLead: company }
+
 # Doors that no role decides. Only two kinds may be here: identity doors that run before a company is chosen (the
 # identity exception of SP-1: one person belongs to several companies) and functions that read the session context.
 exempt:

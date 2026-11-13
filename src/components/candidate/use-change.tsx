@@ -34,7 +34,7 @@ export class FieldError extends Error {
 }
 
 interface ChangeBase {
-  /** The verb on the confirm button, e.g. «Xoá căn»: the button names exactly what happens. */
+  /** The verb on the confirm button, verb plus noun from the labels: the button names exactly what happens. */
   verb: string;
   /** What will happen, in one sentence, shown before an irreversible change. */
   what: string;

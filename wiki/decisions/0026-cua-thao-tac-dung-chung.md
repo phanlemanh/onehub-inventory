@@ -13,7 +13,7 @@ sources:
   ["giám sát đợt nền, yêu cầu K-21 và K-23, 2026-11-12", _acceptance/luu-goc-nhin-cot-hai/plan.md]
 ---
 
-# 0025 Cửa thao tác dùng chung và phụ thuộc mô-đun đầu tiên
+# 0026 Cửa thao tác dùng chung và phụ thuộc mô-đun đầu tiên
 
 ## Status
 

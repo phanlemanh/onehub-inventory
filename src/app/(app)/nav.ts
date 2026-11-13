@@ -42,5 +42,6 @@ export const NAV: NavItem[] = [
     icon: icon(SendIcon),
     sections: [{ items: [{ href: "/sent", title: COPY.allLinks }] }],
   },
-  { href: "/members", title: label("Member"), icon: icon(UsersIcon), roles: ["CompanyAdmin"] },
+  // Shows when the permission table gives the session listMembers (row 9e), not by a role's name.
+  { href: "/members", title: label("Member"), icon: icon(UsersIcon), action: "listMembers" },
 ];

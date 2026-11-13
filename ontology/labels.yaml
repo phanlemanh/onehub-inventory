@@ -321,3 +321,38 @@ concepts:
     own: true
     pref: Phạm vi
     en: Scope
+  Edit:
+    kind: action
+    own: true
+    pref: Sửa
+    en: Edit
+  CreateListing:
+    kind: action
+    own: true
+    pref: Thêm căn
+    en: Add unit
+  RemoveListing:
+    kind: action
+    own: true
+    pref: Xoá căn
+    en: Remove unit
+  CreateContact:
+    kind: action
+    own: true
+    pref: Thêm liên hệ
+    en: Add contact
+  RemoveContact:
+    kind: action
+    own: true
+    pref: Xoá liên hệ
+    en: Remove contact
+  MergeContacts:
+    kind: action
+    own: true
+    pref: Gộp liên hệ
+    en: Merge contacts
+  EraseContactPersonalData:
+    kind: action
+    own: true
+    pref: Xoá tên và số
+    en: Erase name and number
