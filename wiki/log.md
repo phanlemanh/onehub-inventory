@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-13 — Đã gửi trên Lưới (hàng 6): màn Đã gửi đọc 14 link mẫu trên cùng bảng dùng chung với Bảng hàng, không prop kiểu dáng; bấm tên người nhận mở ngăn chi tiết với các căn trong link; khái niệm mới «Link đã gửi» (`ShareLink`, mô-đun sharing); Đã gửi ra khỏi danh sách «chưa có vùng», miễn ca tìm tới khi hàng 2e bỏ ô tìm — `_acceptance/da-gui-tren-luoi/`, [ShareLink](entities/share-link.md).
 - 2026-11-13 — Hồ sơ đủ thông tin (hàng 3b): hồ sơ căn hiện khối Căn (loại căn, tầng, hướng, loại hình), khối lần chào (pháp lý, nội thất, tài chính, hiện trạng), mức đủ thông tin, câu xác nhận đếm ngày theo giờ Việt Nam và các lần chào của căn; lần chào thêm năm trường và luật một lần chào mở trên một căn; chưa có migration (bảng lần chào ở hàng 10) — `_acceptance/ho-so-du-thong-tin/`.
 - 2026-11-13 — Lối vào hồ sơ (hàng 3f): nút «Chép đường dẫn» ở đầu hồ sơ căn, báo khi đường dẫn tới lần chào đã rút, và ô ⌘K ở thanh trên App Shell — chỗ tìm duy nhất, gợi ý mã căn kèm toà, tên toà và dự án, dẫn về Bảng hàng qua cách xem ban đầu của hàng 2c; một dòng khớp thì hồ sơ bật, nhiều toà thì không; thêm gói cmdk — `_acceptance/loi-vao-ho-so/`, [0028](decisions/0028-them-goi-cmdk-cho-o-k.md).
 - 2026-11-13 — The app connects as login role quy_hang_login (migration 008); the query door refuses an owner-reachable role; isolation suite gains login-session cases (row 7c) — [0027](decisions/0027-ung-dung-noi-bang-vai-dang-nhap.md).

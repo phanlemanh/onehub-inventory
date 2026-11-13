@@ -248,3 +248,8 @@ decisions:
     kind: closed
     source: "design/behaviors.md, mục «Bộ nút theo quyền» (hàng 9e, chủ kho chọn ở Cổng Phạm vi 2026-11-12)"
     check: "test:src/components/candidate/row-actions.test.tsx"
+  - id: grid-reuse-no-styling
+    layer: patterns
+    kind: closed
+    source: "design/patterns/luoi.md; hàng 6 Đã gửi trên Lưới (chủ kho duyệt Cổng Phạm vi 2026-11-13): màn Lưới thứ hai chỉ truyền cho DataRegion các prop Bảng hàng cũng truyền, không prop kiểu dáng"
+    check: "test:tests/sent-reuse.test.ts"
