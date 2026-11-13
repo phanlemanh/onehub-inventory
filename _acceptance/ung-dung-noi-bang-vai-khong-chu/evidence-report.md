@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 3b1759d5a0c0bf0831254ee5fd35fba7b5711971
+verified_commit: f3232793556ed69aca5a1e40750dcd4097a865c0
 human_signoff: Manh Phan 2026-11-13
 ---
 
@@ -182,3 +182,7 @@ Round 2: moi eval chay lai xanh; E6b, E8b, E9 giu tu round 1 vi delta khong cham
 ### Re-pin lần 1 — 2026-11-13, do gộp nhánh chính có hàng 2c; chạy lại sau lượt đỏ chập chờn (bảng tính, ô chữ dài 1440 — cả hai đạt khi chạy riêng)
 run_id: repin-20261113T053031Z-25408
 sha: 3b1759d5a0c0bf0831254ee5fd35fba7b5711971 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng
+
+### Re-pin lần 2 — 2026-11-13, do bài .env.example đọc mốc từ tệp chép (CI lấy lịch sử nông)
+run_id: repin-20261113T061454Z-13194
+sha: f3232793556ed69aca5a1e40750dcd4097a865c0 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng
