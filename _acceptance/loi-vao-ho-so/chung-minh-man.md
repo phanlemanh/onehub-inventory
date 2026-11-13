@@ -25,6 +25,9 @@ của Bảng hàng không đổi; bộ bài sinh từ sổ màn vẫn đo chúng
 | màn | navbar-4 | evidence/reui/navbar-4.png | x |
 | màn | app-shell-2 | evidence/reui/app-shell-2.png | |
 | màn | solution-crm-4 | evidence/reui/solution-crm-4.png | |
+| UnitJump | navbar-6 | evidence/reui/navbar-6.png | |
+| UnitJump | app-shell-12 | evidence/reui/app-shell-12.png | |
+| UnitJump | c-command-3 | evidence/reui/c-command-3.png | |
 
 ### Ma trận trạng thái
 
@@ -49,3 +52,5 @@ của Bảng hàng không đổi; bộ bài sinh từ sổ màn vẫn đo chúng
 | DataRegion | trong-kho | | | | |
 | RecordPanel | trong-kho | | | | |
 | Button | trong-kho | | | | |
+| Command | trong-kho | | | | |
+| UnitJump | ve-tay | navbar, app shell, command (tools/reui_catalog «command», «search») | navbar-4 | navbar-4 và navbar-6 là cả một thanh trên, app-shell-12 cả một khung; kho đã có thanh trên của App Shell (hàng 1o) nên chỉ lấy ô tìm ⌘K của navbar-4 đặt vào khe, ráp từ Command của shadcn với gợi ý ghi loại như nhóm của c-command-3 | |

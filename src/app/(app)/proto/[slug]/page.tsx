@@ -7,12 +7,10 @@ import { PageState } from "@/components/templates/page-state";
 import { BehaviorShowcase } from "./behavior-showcase";
 import { BrokenOnClient, FrameShowcase } from "./frame-showcase";
 import { GridShowcase } from "./grid-showcase";
-import { EntryProto } from "./loi-vao-ho-so/entry-proto";
 
 const FRAME_SLUG = "khung-va-giao-dien";
 const GRID_SLUG = "luoi-va-o-theo-kieu";
 const BEHAVIOR_SLUG = "hanh-vi-trong-luoi-khung";
-const ENTRY_SLUG = "loi-vao-ho-so";
 const SLOW_MS = 4000;
 
 type Props = {
@@ -28,9 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProtoPage({ params, searchParams }: Props) {
   if (process.env.NODE_ENV === "production") notFound();
   const { slug } = await params;
-  const query = await searchParams;
-  const { state, columns, quyen } = query;
-  if (slug === ENTRY_SLUG) return <EntryProto q={query} />;
+  const { state, columns, quyen } = await searchParams;
   if (slug === BEHAVIOR_SLUG) {
     return (
       <>
