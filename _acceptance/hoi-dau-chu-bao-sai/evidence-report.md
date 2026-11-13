@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: hoi-dau-chu-bao-sai
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 295963e9742669f5f07e47b7806efd74c2191067
-human_signoff:
+human_signoff: Manh Phan 2026-11-14
 ---
 
 # Evidence Report: hoi-dau-chu-bao-sai
@@ -150,7 +150,7 @@ Round 6. Mọi phép đo máy đều xanh; còn một mục judgment (E9c) chờ
   run_id: minted-hoi-dau-chu-bao-sai-E9b-r5
   exit_code: 0
   baseline: n-a
-  verifier: ui-check
+  verifier: config:executors.script.hoi_dau_chu_e2e_db
   verified_at: 2026-11-13T21:51:46Z
   carried_from_round: 5
   # carry-forward tu round 5 — delta khong cham paths cua eval
@@ -217,7 +217,7 @@ Round 6. Mọi phép đo máy đều xanh; còn một mục judgment (E9c) chờ
     - domain-correctness: PASS (r3)
     - operational-feasibility: PASS (r3)
     - spec-alignment: PASS (r3)
-  human_override:  # chi nguoi ghi
+  human_override: PASS — Manh Phan 2026-11-14: Đạt
 
 ## Known limits
 

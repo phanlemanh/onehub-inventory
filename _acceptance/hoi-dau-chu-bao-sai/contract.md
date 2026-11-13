@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: [inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-13
 design_doc: _acceptance/hoi-dau-chu-bao-sai/design.md
@@ -106,3 +106,29 @@ trình.
 - Không nút «Ghi cuộc gọi» ở đáy hồ sơ (hàng 14); thanh đáy của hàng này để chỗ cho nó nhưng không dựng.
 - Không báo sai giá, trạng thái, ngày xác nhận (dữ liệu riêng của sàn, người giữ căn sửa) — câu hỏi các thuộc tính báo sai.
 - Không thêm dòng bảng quyền; không chạm mô-đun sharing (hàng 6 giữ).
+
+## Notes
+
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-14:
+  - Ngoài-1: Thẻ trình chủ kho ghi sai là nhiều phép đo chưa đạt và bảo quay lại sửa, trong khi thực tế chỉ một phép đo trượt. Chủ kho có thể đọc nhầm mức độ hỏng, nhưng tính năng cho người dùng cuối không bị ảnh hưởng.
+  - Ngoài-2: Người dùng không thấy gì khác trên màn hình. Chỉ là bộ kiểm tra tự động của đội đang báo đỏ nên khó tin vào tín hiệu xanh trước khi phát hành.
+  - Ngoài-4: Với căn nhập thật từ Sheet, nút hỏi sẽ luôn báo «Căn chưa có đầu chủ giữ» dù thực tế có người giữ, nên người dùng không hỏi được đầu chủ qua nút này.
+  - Ngoài-7: Bài kiểm thử có thể không bắt được lỗi nếu «Đang hiện» trong hộp báo sai lệch với giá trị hồ sơ, nên một lỗi như vậy có thể lọt tới người dùng.
+  - Ngoài-8: Bài kiểm thử không chứng minh dòng câu hỏi trong tin chép đúng căn, nên tin hỏi nhầm căn có thể không bị phát hiện.
+  - Ngoài-9: Khi chép thất bại, ô chép tay có thể thiếu phần câu hỏi mà bài kiểm thử vẫn không báo, nên người dùng có thể chỉ nhận được đường dẫn.
+  - Ngoài-10: Bài kiểm thử vai Quản trị sàn không chứng minh gì về luật ẩn nút, nên nếu nút lỡ hiện sai cho vai này thì sẽ không bị bắt.
+  - Ngoài-11: Kiểm thử không phát hiện được trường hợp đổi sang căn khác mà thanh đáy vẫn giữ tên người giữ căn cũ, nên người dùng có thể hỏi nhầm người.
+  - Ngoài-12: Một phép kiểm kiểu «đổi căn thì thanh đáy phải đổi người giữ» luôn xanh nên không bắt được lỗi nếu thanh đáy giữ nhầm tên người giữ cũ. Người dùng chưa thấy lỗi thật nào, chỉ là lưới an toàn ở chỗ này lỏng.
+  - Ngoài-13: Phép kiểm cho vai Quản trị sàn có thể xanh dù trang tải lỗi, nên chưa chắc chứng minh được là nút hỏi bị ẩn đúng vì luật quyền. Hành vi thật với người dùng chưa thấy sai.
+  - Ngoài-14: Nếu dòng «Đang hiện» trong hộp báo sai lấy nhầm giá trị của thuộc tính khác thì các phép kiểm hiện tại vẫn không báo. Chưa có bằng chứng người dùng đang thấy giá trị sai.
+  - Ngoài-15: Phần câu hỏi trong tin chép (mã căn, toà) không được đối chiếu với hàng thật, chỉ đường dẫn được kiểm. Nếu tin hỏi nhầm căn, bài kiểm vẫn xanh, nhưng chưa thấy tin sai thật.
+  - Ngoài-16: Một số ca kiểm «nếu bỏ luật thì phải đỏ» không thực sự bỏ luật nên không chứng minh được lưới bắt lỗi hoạt động. Người dùng không thấy khác biệt nào hiện nay.
+  - Ngoài-17: Phép kiểm cho vai không có quyền đọc danh mục không phân biệt được «thiếu quyền đúng ô» với «thiếu cả khung quyền», nên nếu nút báo sai gắn nhầm quyền thì chưa chắc bị bắt. Chưa thấy ai bị hiện nút sai.
+  - Ngoài-18: Một vài tổ hợp hiếm khi máy chia sẻ bị từ chối mà bộ nhớ tạm cũng hỏng hoặc không có chưa được kiểm tự động. Nếu có lỗi ở đó, người dùng có thể không nhận được thông báo đúng, nhưng chưa thấy lỗi thật.
+  - Ngoài-19: Hai chỗ trong ứng dụng cùng viết một câu «Đang hiện» và một thông báo lỗi. Hôm nay người dùng thấy chữ giống nhau; nếu sau này sửa một chỗ quên chỗ kia thì hộp và tin chép đi sẽ lệch chữ.
+  - Ngoài-21: Bài thử việc ai thấy nút hỏi tự tính đáp án từ chính bảng quyền, nên nếu bảng quyền đổi nhầm thì bài thử vẫn xanh. Người dùng có thể thấy hoặc mất nút sai mà không ai báo.
+  - Ngoài-22: Bài thử chỉ kiểm dòng «Đang hiện» có chữ, chưa kiểm đúng giá trị của thuộc tính đang chọn. Nếu hiện nhầm giá trị của thuộc tính khác thì bài thử vẫn qua.
+  - Ngoài-23: Bài thử chưa kiểm dòng đầu của tin hỏi có đúng căn và toà hay không, chỉ kiểm đường dẫn. Chép nhầm căn sẽ không bị bắt.
+  - Ngoài-24: Mấy ca thử đối chứng không chứng minh được bài thử thật sẽ bắt được lỗi. Nếu sau này nút hiện sai chỗ, các ca này có thể không báo.
+  - Ngoài-25: Một ca thử không đo được việc thanh đáy có còn giữ tên người giữ căn trước khi đổi sang căn khác hay không. Nếu lỗi này xảy ra, người dùng sẽ thấy tên người giữ sai.
+  - Ngoài-26: Chưa chứng minh được nút báo sai ẩn đi đúng vì thiếu quyền đọc danh mục, chứ không phải vì lý do khác. Có thể có vai bị ẩn hoặc hiện nút sai mà không ai báo.
