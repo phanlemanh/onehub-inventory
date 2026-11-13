@@ -125,6 +125,7 @@ evals:
     criterion: AC-10
     executor: script
     cmd: config:executors.script.ci_db_that
+    long_running: 70
     layer: backend-effect
     paths: [db/scripts/ci-that.mjs, .github/workflows/ci.yml]
     expected: "exit 0; ci-that đọc lượt CI mới nhất trên đầu nhánh của hàng (gh run list/view): job e2e-db conclusion success, nhật ký job có 'bo qua can dang nhap: 0' và 'ci-db: 6/6 bước đạt', thời lượng job ≤ timeout-minutes; in 'run <id> · e2e-db <phút> phút · tong CI <phút> (main <phút>)'. Chỉ đo khi chủ kho cho thợ dán (Hỏi-1); chủ kho tự dán thì ô này khai status: not-run kèm giới hạn đã biết."

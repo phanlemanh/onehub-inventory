@@ -55,7 +55,7 @@ executors:
     cach_ly_k: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} bash db/scripts/cach-ly.sh"   # luu-goc-nhin-cot-hai (row 2c): isolation suite with the saved_view table, lane K Postgres
     ci_db_thu: "bash db/scripts/ci-thu.sh"   # ci-co-postgres (row 1s): shallow clone of HEAD + fresh Postgres from the workflow patch, `make ci-db` green, then break copies (no test session, session cases as owner) red
     ci_db_kiem: "npx vitest run tests/ci-db.test.ts tests/dem-giao-nhan.test.ts tests/don-dung-tam.test.ts tests/ci-ban-sao-nong.test.ts tests/ci-yml-patch.test.ts --coverage.enabled=false --reporter=verbose"   # ci-co-postgres (row 1s): step runner on stubs, hand-over count, build folder sweep, shallow-clone fixtures, workflow patch
-    ci_db_that: "node db/scripts/ci-that.mjs"   # ci-co-postgres (row 1s): latest CI run on the branch head — job e2e-db green, its log lines, duration against timeout-minutes
+    ci_db_that: "node db/scripts/ci-that.mjs --cho 60"   # ci-co-postgres (row 1s): latest CI run on the branch head — job e2e-db green, its log lines, duration against timeout-minutes
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists

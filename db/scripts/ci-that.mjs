@@ -4,7 +4,9 @@
 // `bo qua can dang nhap: 0` and `ci-db: 6/6 bước đạt`, and it took no longer than the job's timeout-minutes. Prints
 //   run <id> · e2e-db <m> phut · tong CI <m> (main <m>)
 //
-//   node db/scripts/ci-that.mjs
+//   node db/scripts/ci-that.mjs [--cho <phút>]
+//   --cho  wait up to this many minutes for the run on HEAD to appear and finish (a grading round starts right after
+//          the push); default 0, read once.
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -31,12 +33,21 @@ if (!timeout) fail("job e2e-db khong khai timeout-minutes");
 const sha = sh("git", ["rev-parse", "HEAD"]).trim();
 const branch = sh("git", ["rev-parse", "--abbrev-ref", "HEAD"]).trim();
 const fields = "databaseId,headSha,status,conclusion,startedAt,updatedAt,event";
-const runs = JSON.parse(
-  gh("run", "list", "--workflow", "ci.yml", "--branch", branch, "-L", "30", "--json", fields),
-);
-const run =
-  runs.find((r) => r.headSha === sha && r.event === "pull_request") ??
-  runs.find((r) => r.headSha === sha);
+const choIdx = process.argv.indexOf("--cho");
+const choMin = choIdx > 0 ? Number(process.argv[choIdx + 1]) : 0;
+const deadline = Date.now() + choMin * 60000;
+let runs;
+let run;
+for (;;) {
+  runs = JSON.parse(
+    gh("run", "list", "--workflow", "ci.yml", "--branch", branch, "-L", "30", "--json", fields),
+  );
+  run =
+    runs.find((r) => r.headSha === sha && r.event === "pull_request") ??
+    runs.find((r) => r.headSha === sha);
+  if ((run && run.status === "completed") || Date.now() >= deadline) break;
+  execFileSync("sleep", ["60"]);
+}
 if (!run) fail(`chua co luot CI tren dau nhanh ${sha.slice(0, 7)}`);
 if (run.status !== "completed") fail(`luot ${run.databaseId} chua xong (${run.status})`);
 
