@@ -45,10 +45,12 @@ export function AskListAgentBar({
   id,
   unit,
   building,
+  inHead = false,
 }: {
   id: string;
   unit: string;
   building: string;
+  inHead?: boolean;
 }) {
   const permitted = useActionPermission();
   const holder = sampleHolderOf(id);
@@ -61,6 +63,13 @@ export function AskListAgentBar({
       },
     );
   };
+  if (inHead)
+    return (
+      <Button size="sm" disabled={holder.kind === "none"} data-action="viewListings" onClick={ask}>
+        {holder.kind === "none" ? null : <MessageCircleQuestionIcon aria-hidden="true" />}
+        {holder.kind === "none" ? UNHELD : `${ASK} · ${holder.name}`}
+      </Button>
+    );
   return (
     <div data-slot="record-footer" className="border-t bg-background p-4">
       <Button

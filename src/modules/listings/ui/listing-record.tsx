@@ -182,7 +182,18 @@ export function listingRecord(headers: Readonly<Record<InventoryField, string>>)
           .filter((part) => part !== "")
           .join(" · "),
         body: <ListingRecordBody view={view} priceLabel={headers["Listing.listPrice"]} />,
-        footer: <AskListAgentBar id={view.id} unit={view.unitNumber} building={view.building} />,
+        ...(typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).get("cho") === "dau"
+          ? {
+              actions: (
+                <AskListAgentBar inHead id={view.id} unit={view.unitNumber} building={view.building} />
+              ),
+            }
+          : {
+              footer: (
+                <AskListAgentBar id={view.id} unit={view.unitNumber} building={view.building} />
+              ),
+            }),
       };
     },
   };
