@@ -336,6 +336,8 @@ test.describe("E5 · the top-bar ⌘K box", () => {
   }, info) => {
     test.skip(info.project.name !== "1440", "keys on the desktop");
     await openInventory(page);
+    // The shortcut works once the box has attached its key listener; pressing earlier tests the page's load, not the keys.
+    await expect(page.locator('[data-slot="unit-jump"][data-ready]')).toHaveCount(1);
     for (const key of ["Control+k", "Meta+k"]) {
       await page.locator("body").press(key);
       await expect(paletteInput(page)).toBeFocused();
