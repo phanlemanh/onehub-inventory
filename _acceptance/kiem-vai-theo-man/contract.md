@@ -106,7 +106,10 @@ Kỳ vọng hôm nay, sinh từ `vao` của sổ màn và bảng quyền 9a; b�
   Notes (Ngoài-1). Hàng này chỉ dựng cửa đăng nhập sao cho việc ấy dùng lại được.
 - Sửa trang Thành viên và thanh bên để đọc thẳng `vao` từ sổ màn — hàng 10.
 - Đưa `phien.setup.ts` của 1r và `members.spec.ts` của 9 về cửa đăng nhập chung — việc riêng, không sửa tệp bài của hàng khác.
-- Kiểm nút theo vai trên màn được vào — hàng 9e.
+- Kiểm tới cấp NÚT: hàng này kiểm tới cấp MÀN (vào được hay bị chặn). Bảng nút theo vai (`design/vai-man-nut.md`, hàng 9e) hôm
+  nay chỉ có 2 màn vì nút của Bảng hàng, hồ sơ căn, Đã gửi nằm trong thành phần dùng chung mà công cụ quét không đi theo, và
+  hầu hết thao tác ghi còn `planned`. Khi bảng có màn, ma trận của hàng này mở rộng sang nút rẻ (cùng lần mở trang) — việc
+  riêng, giám sát quyết ai làm.
 - Chạy trên CI — hàng 1s đưa Postgres vào CI; trước đó bộ chạy ở máy dãy.
 
 ## Notes

@@ -1,0 +1,38 @@
+{
+  "feature_plain": "Mỗi lần kiểm có cơ sở dữ liệu, máy đăng nhập lần lượt bằng từng vai của một sàn thử và mở từng màn, để bắt ngay khi một vai vào được màn lẽ ra bị chặn hoặc thấy dữ liệu không được thấy.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ ghi rõ trong danh sách màn: muốn vào mỗi màn cần quyền gì; khai thiếu hay khai tên quyền không có thì kiểm tra chung báo đỏ."},
+    {"id": "AC-2", "p": "Sẽ tự đi đủ mọi cặp vai × màn đang có (hôm nay 5 màn × 4 vai = 20 cặp); màn mới thêm vào danh sách tự có cặp, không ai phải viết thêm bài."},
+    {"id": "AC-3", "p": "Sẽ có một chỗ duy nhất đăng nhập bằng từng vai qua màn đăng nhập thật; các bài kiểm và (sau này) ảnh bản mẫu xin phiên ở đó, không tự đăng nhập."},
+    {"id": "AC-4", "p": "Sẽ xác nhận vai được phép thì thấy màn bình thường, đúng tên màn; người đã đăng nhập mở màn Đăng nhập thì về Hôm nay."},
+    {"id": "AC-6", "p": "Sẽ xác nhận vai bị chặn không nhận được tên hay email của người khác trong sàn, cả trên trang lẫn trong dữ liệu trình duyệt tải về; cùng lượt, Quản trị sàn thấy đúng người ấy."},
+    {"id": "AC-7", "p": "Sẽ xác nhận thanh bên (cả ngăn điều hướng trên điện thoại) chỉ hiện mục dẫn tới màn mà vai được vào."},
+    {"id": "AC-8", "p": "Sẽ chứng bộ kiểm biết đỏ: ba bản cố ý làm hỏng (mở màn Thành viên cho mọi vai, khai sai quyền vào, để lộ tên người) đều làm nó báo đỏ đúng cặp."}
+  ],
+  "wont_do": [
+    {"id": "AC-5", "p": "Chặn: vai không được vào thấy đúng một thông báo «Không đủ quyền» kèm đường về Hôm nay, ở mọi khổ màn hình chủ kho chốt."},
+    {"id": "OOS-1", "p": "KHÔNG cho bản mẫu và ảnh chụp của các hàng khác chạy dưới một vai trong hàng này — chỉ dựng sẵn chỗ đăng nhập để việc ấy dùng lại (cách làm ghi ở phần ghi chú)."},
+    {"id": "OOS-2", "p": "KHÔNG sửa màn Thành viên và thanh bên để đọc thẳng luật vào từ danh sách màn — để hàng dữ liệu thật (hàng 10)."},
+    {"id": "OOS-3", "p": "KHÔNG chuyển các bài đăng nhập cũ của hàng khác sang chỗ đăng nhập chung."},
+    {"id": "OOS-4", "p": "KHÔNG kiểm tới từng nút — hàng này kiểm tới cấp màn; bảng nút theo vai hôm nay mới có 2 màn, nối sang nút là việc riêng, rẻ khi bảng đủ màn."},
+    {"id": "OOS-5", "p": "KHÔNG chạy trên máy kiểm chung của GitHub cho tới khi hàng 1s đưa cơ sở dữ liệu lên đó; trước đó chạy ở máy của dãy."}
+  ],
+  "coverage_plain": [
+    {"i": 0, "p": "Máy tự quét các chiều của bài toán (vai, màn, kỳ vọng, chỗ thấy, khổ) để không sót tiêu chí."},
+    {"i": 8, "p": "Vai: đủ bốn vai, mỗi người thử giữ đúng một vai."},
+    {"i": 9, "p": "Màn: 5 màn đang chạy đều đo; Liên hệ (chưa dựng) và bản mẫu (chỉ ở máy dựng) đứng ngoài, có lý do."},
+    {"i": 10, "p": "Kỳ vọng mỗi cặp: được vào, bị chặn, hoặc bị đẩy về Hôm nay (màn Đăng nhập)."},
+    {"i": 11, "p": "Chỗ thấy: thông báo trên trang, thanh bên, và dữ liệu trình duyệt tải về (AC-4 đến AC-7)."},
+    {"i": 12, "p": "Khổ màn hình: 360, 414, 1024, 1440 — phần nào đi ở khổ nào do Hỏi-1 chốt."},
+    {"i": 13, "p": "Mỗi phép đo được chứng cả hai chiều: xanh khi lành, đỏ khi cố ý làm hỏng (AC-1, AC-3, AC-7, AC-8)."},
+    {"i": 14, "p": "Làm ngay: mọi cặp được vào, mọi cặp bị chặn, thanh bên, khai danh sách màn, chỗ đăng nhập chung, bản phá thử."},
+    {"i": 15, "p": "Để sau: người chưa đăng nhập mở Hôm nay, Bảng hàng, Đã gửi (hàng 10 đóng); người giữ nhiều vai và đổi vai giữa chừng đã có bài ở hàng 9, 9a."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Chỗ đặt luật «màn nào cần quyền gì» lẽ ra là việc chủ kho chọn, máy đã tự chọn — nay thành Hỏi-2 trên thẻ, kèm ba lối."},
+    {"i": 1, "p": "Phép đo chưa theo câu trả lời Hỏi-1 — đã sửa: kê sẵn số bước cho từng lối, cặp bị chặn luôn đo ở cả bốn khổ."},
+    {"i": 2, "p": "Phép đo «không lộ dữ liệu» qua đường tải về chưa có đối chứng — đã sửa: cùng đường ấy phải bắt được người chứng ở Quản trị sàn, và không bắt được gì thì báo đỏ."},
+    {"i": 3, "p": "Chưa buộc bài trình duyệt đi đúng danh sách cặp máy sinh — đã sửa: sau lượt, máy so các bước đã chạy với danh sách cặp."},
+    {"i": 4, "p": "Thanh bên trên điện thoại chưa được đo — đã sửa: đo ở khổ 1440 và 360 cho cả bốn vai."}
+  ]
+}
