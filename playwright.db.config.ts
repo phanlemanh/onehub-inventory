@@ -50,6 +50,9 @@ writeFileSync(
 );
 export const DB_NAME = `dang_nhap_e2e_${RUN}`;
 export const DB_URL = `postgres://postgres:local-only@127.0.0.1:${DB_PORT}/${DB_NAME}`;
+// The dev server connects as the app's login role, never as the owner (row 7c): the door refuses an owner connection.
+// Global setup (scratchDb) makes the role able to log in on this lane.
+export const APP_DB_URL = `postgres://quy_hang_login:local-only@127.0.0.1:${DB_PORT}/${DB_NAME}`;
 // Outside test-results: every Playwright run empties that folder when it starts, including another run's outbox.
 export const OUTBOX = join(tmpdir(), `onehub-e2e-db-outbox-${RUN}.jsonl`);
 // The register-driven suite's one test session (row 1r): a person holding all four roles in a test company, signed in
@@ -96,7 +99,7 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 120_000,
     env: {
-      DATABASE_URL: DB_URL,
+      DATABASE_URL: APP_DB_URL,
       NEXT_DIST_DIR: DIST_DIR,
       NEXT_TSCONFIG: join(TSCONFIG_DIR, "tsconfig.json"),
       AUTH_SECRET: "e2e-only-secret",

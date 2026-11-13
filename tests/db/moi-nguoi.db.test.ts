@@ -87,7 +87,7 @@ async function seedPeople(owner: pg.Client): Promise<People> {
 async function world(suffix: string, breakFile?: string): Promise<World> {
   const db = await scratchDb(suffix, breakFile, { prefix: "moi_nguoi" });
   const p = await seedPeople(db.owner);
-  const pool = createPool(db.url) as World["pool"];
+  const pool = createPool(db.appUrl) as World["pool"];
   const code = captureSender();
   const invite = captureInviteSender();
   const deps: LoginDeps & MembersDeps = {
@@ -512,7 +512,7 @@ describe("moi-nguoi (row 9) on a clean database", () => {
 
     // Two admins drop each other's admin role at the same time: exactly one wins, one admin is left.
     const v = await world("doi_vai_dong_thoi");
-    const raw = new pg.Pool({ connectionString: v.db.url, max: 2 });
+    const raw = new pg.Pool({ connectionString: v.db.appUrl, max: 2 });
     const open = async (user: string) => {
       const c = await raw.connect();
       await c.query("begin");

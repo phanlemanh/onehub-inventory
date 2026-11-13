@@ -74,7 +74,7 @@ export async function world(suffix: string, breakFile?: string, upTo?: number): 
     ).rows[0]!.id;
   const agreementA = await agreement(A, "catalog_source");
   await agreement(B, "spreadsheet");
-  return { db, pool: createPool(db.url) as World["pool"], A, B, id, email, agreementA };
+  return { db, pool: createPool(db.appUrl) as World["pool"], A, B, id, email, agreementA };
 }
 
 export async function dropWorld(w: World): Promise<void> {
