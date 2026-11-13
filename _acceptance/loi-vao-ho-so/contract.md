@@ -44,7 +44,7 @@ Quỹ hàng ↔ Inventory» mục 4, 5, 6, 40, lời chủ kho ở Cổng Phạm
   căn ấy bật sẵn (khoảng trắng hai đầu bỏ qua, chữ hoa thường như nhau); Enter khi ô rỗng thì báo «Bạn gõ mã căn trước đã.»
   và hộp không đóng; Esc đóng hộp; người có vai không thấy Bảng hàng thì không có nút và phím tắt.
 - AC-6: Given một mã căn có ở hai toà trở lên trong Bảng hàng, When gõ mã ấy rồi Enter, Then Bảng hàng chỉ còn các dòng của
-  mã ấy (mã nằm trong ô tìm), mỗi toà một dòng, kèm câu «Mã «<mã>» có ở <N> toà — bấm mã căn ở dòng của toà cần mở.», và không hồ sơ nào tự bật.
+  mã ấy (mã nằm trong ô tìm), mỗi toà một dòng, kèm câu «Mã «<mã>» có ở <N> toà — bấm mã căn ở dòng của toà cần mở.», và hồ sơ KHÔNG tự bật khi còn hơn một dòng — người chọn bằng cách bấm mã căn ở một dòng.
 - AC-7: Given một mã không có ở dòng nào của Bảng hàng, When gõ mã ấy rồi Enter, Then Bảng hàng hiện trạng thái «không dòng
   nào khớp» sẵn có, chữ đã gõ nằm trong ô tìm của Bảng hàng ở mọi khổ, không hồ sơ nào bật.
 - AC-8: Given hồ sơ có nút «Chép đường dẫn», Bảng hàng lọc theo mã ở nhiều toà, và hộp gõ mã đang mở, When nhìn ở 1440,
