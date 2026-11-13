@@ -128,13 +128,11 @@
   "decisions": [
     {
       "id": "E1b",
-      "q": "Bộ đọc giá hiểu đúng mọi cách gõ giá thường gặp của nghề chưa?",
-      "why": "Hội đồng ba người chấm đề xuất ĐẠT; mục chấm bằng phán xét nên cần anh chốt."
+      "q": "Hội đồng đề xuất: đạt. Luật đọc giá, ngưỡng hỏi lại, bảng chuyển trạng thái nằm trọn một chỗ, giao diện không tự viết lại luật?"
     },
     {
       "id": "E10c",
-      "q": "Bốn nhãn lý do ngừng mới có ngắn gọn, đúng chữ của nghề không?",
-      "why": "Hội đồng ba người chấm đề xuất ĐẠT; nhãn mới vào bảng nhãn gốc nên cần anh chốt."
+      "q": "Hội đồng đề xuất: đạt. Đủ nhãn lý do ngừng theo Hỏi-2, mỗi nhãn tối đa 17 ký tự, thuật ngữ ghi là khái niệm riêng?"
     }
   ]
 }
