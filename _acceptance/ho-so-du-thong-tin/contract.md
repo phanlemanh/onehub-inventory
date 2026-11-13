@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: [inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-13
 design_doc: _acceptance/ho-so-du-thong-tin/design.md
@@ -102,3 +102,13 @@ mức mô hình như hàng 3.
 ## Notes
 
 - Bảng so nguồn: mục 10, 11, 15, 16, 21, 27, 28 của bảng so Chi tiết căn (ghi chú chung của nhóm phiên).
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-14:
+  - Ngoài-2: Báo cáo ghi bước E10 không có lưu lượng mạng nhưng tệp ghi vết mạng của bước ấy trống, nên câu đó chưa kiểm lại được.
+  - Ngoài-3: Kết luận «không có lưu lượng mạng» của E10 đứng một mình, không có phép đối chứng đi kèm.
+  - Ngoài-5: Hồ sơ cuộn về đầu bằng cách chạm vào phần trong của khung hồ sơ; khung đổi cách dựng thì có thể thôi cuộn về đầu.
+  - Ngoài-6: Câu «Chưa xác nhận với chủ nhà» luôn dùng chữ «chủ nhà», kể cả với căn cho thuê hay sàn gọi khác.
+  - Ngoài-7: Chữ «Studio» và «{n}PN» cố định trong chương trình, sàn chưa đổi được cách gọi.
+  - Ngoài-8: Lần chào cho thuê sẽ hiện chữ của việc bán trên hồ sơ; dữ liệu mẫu hiện chưa có lần chào cho thuê.
+  - Ngoài-9: Hồ sơ mở lần chào mới nhất của căn theo ngày tạo, không phải đúng dòng vừa chạm; lần chào thiếu ngày tạo có thể làm hồ sơ mở lần cũ.
+  - Ngoài-10: Bài tự kiểm «chuỗi rỗng tính là có» báo lỗi bằng thông điệp khác điều đã ghi, dù vẫn bắt được lỗi.
+  - Ngoài-11: Tên khối «Lần chào đang mở / đang xem» mới đo ở hai trong sáu trạng thái.
