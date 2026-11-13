@@ -1,12 +1,61 @@
-# Review findings: hoi-dau-chu-bao-sai (round 2)
+# Review findings: hoi-dau-chu-bao-sai (round 3)
 
 ## Trong hợp đồng
 
-Không có finding nào.
+Không có finding nào map được vào AC ở lượt này. Lỗi của E9b (chữ nút vượt 17 ký tự, không nằm trong bảng nhãn) được ghi trong evidence-report.md, không thuộc danh sách finding này.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
+
+- **Hình dạng 4 (assertion âm tính một mình): «break» của E5b so hai chuỗi tự dựng, không đo trang**
+  Người dùng thấy gì: Một phép kiểm kiểu «đổi căn thì thanh đáy phải đổi người giữ» luôn xanh nên không bắt được lỗi nếu thanh đáy giữ nhầm tên người giữ cũ. Người dùng chưa thấy lỗi thật nào, chỉ là lưới an toàn ở chỗ này lỏng.
+  Căn cứ: Nhẹ với người dùng vì chưa có hành vi sai nào được chỉ ra; chỉ là lưới bắt lỗi lỏng, ghi lại rồi siết khi sửa nơi này sau.
+  file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
+  severity: high
+  Đề xuất: known-limits
+
+- **Hình dạng 4 (assertion âm tính một mình): ca Quản trị sàn chỉ đo việc thanh đáy vắng mặt**
+  Người dùng thấy gì: Phép kiểm cho vai Quản trị sàn có thể xanh dù trang tải lỗi, nên chưa chắc chứng minh được là nút hỏi bị ẩn đúng vì luật quyền. Hành vi thật với người dùng chưa thấy sai.
+  Căn cứ: Nhẹ vì không có người dùng nào bị ảnh hưởng đã biết; chỉ là bằng chứng kiểm chưa chặt, thêm một phép kiểm dương là rẻ nếu sau này cần.
+  file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
+  severity: high
+  Đề xuất: known-limits
+
+- **Hình dạng 3 (assert «có mặt» khi lời hứa là quan hệ): «Đang hiện» chỉ được kiểm là khác rỗng**
+  Người dùng thấy gì: Nếu dòng «Đang hiện» trong hộp báo sai lấy nhầm giá trị của thuộc tính khác thì các phép kiểm hiện tại vẫn không báo. Chưa có bằng chứng người dùng đang thấy giá trị sai.
+  Căn cứ: Mức nhẹ đến vừa vì nếu sai thì người dùng sẽ báo nhầm giá trị, nhưng chưa thấy lỗi thật và người dùng tự nhìn ra được ngay trên hồ sơ.
+  file: `tests/hoi-dau-chu-bao-sai.test.tsx`
+  severity: high
+  Đề xuất: known-limits
+
+- **Hình dạng 3 (assert «có mặt» khi lời hứa là quan hệ): giá trị mong đợi của tin đã chép được dựng từ chính đầu ra**
+  Người dùng thấy gì: Phần câu hỏi trong tin chép (mã căn, toà) không được đối chiếu với hàng thật, chỉ đường dẫn được kiểm. Nếu tin hỏi nhầm căn, bài kiểm vẫn xanh, nhưng chưa thấy tin sai thật.
+  Căn cứ: Vừa vì tin nhầm căn sẽ làm người giữ căn hiểu sai, nhưng người gửi tự đọc tin trước khi bấm gửi nên tự bắt được; chưa thấy lỗi thật.
+  file: `tests/hoi-dau-chu-bao-sai.test.tsx`
+  severity: high
+  Đề xuất: known-limits
+
+- **Hình dạng 2 (dùng bản viết tay thay đầu ra thật): các ca «break» tự dựng giá trị sai rồi đảo assertion, không làm hỏng mã sản phẩm**
+  Người dùng thấy gì: Một số ca kiểm «nếu bỏ luật thì phải đỏ» không thực sự bỏ luật nên không chứng minh được lưới bắt lỗi hoạt động. Người dùng không thấy khác biệt nào hiện nay.
+  Căn cứ: Nhẹ với người dùng vì không có hành vi sai nào; chỉ làm giảm độ tin cậy của lưới kiểm, nên ghi rõ giới hạn này.
+  file: `tests/hoi-dau-chu-bao-sai.test.tsx`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Hình dạng 4 (assertion âm tính một mình): ca «role without catalog reading» đo việc thiếu provider, không đo ô readCatalog**
+  Người dùng thấy gì: Phép kiểm cho vai không có quyền đọc danh mục không phân biệt được «thiếu quyền đúng ô» với «thiếu cả khung quyền», nên nếu nút báo sai gắn nhầm quyền thì chưa chắc bị bắt. Chưa thấy ai bị hiện nút sai.
+  Căn cứ: Nhẹ vì không có người dùng bị lộ nút sai đã biết và nút chỉ soạn tin nội bộ, người tự bấm gửi; siết phép kiểm sau là rẻ.
+  file: `tests/hoi-dau-chu-bao-sai.test.tsx`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Hình dạng 5 (tuyên quét cả lớp nhưng chỉ có từng ca lẻ): ma trận openShare tuyên «every device × outcome cell» mà chỉ có 6 trong 12 ô**
+  Người dùng thấy gì: Một vài tổ hợp hiếm khi máy chia sẻ bị từ chối mà bộ nhớ tạm cũng hỏng hoặc không có chưa được kiểm tự động. Nếu có lỗi ở đó, người dùng có thể không nhận được thông báo đúng, nhưng chưa thấy lỗi thật.
+  Căn cứ: Nhẹ vì tổ hợp này hiếm, người dùng thử lại hoặc tự chép tay được; thêm ca kiểm sau là rẻ nhưng không gấp.
+  file: `src/lib/share/share.test.ts`
+  severity: low
+  Đề xuất: known-limits
 
 - **The 'Đang hiện' report line and the lowercase helper are each written in two places (r1)**
   Người dùng thấy gì: Hai chỗ trong ứng dụng cùng viết một câu «Đang hiện» và một thông báo lỗi. Hôm nay người dùng thấy chữ giống nhau; nếu sau này sửa một chỗ quên chỗ kia thì hộp và tin chép đi sẽ lệch chữ.

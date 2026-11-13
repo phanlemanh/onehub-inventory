@@ -2,52 +2,67 @@
 schema_version: 2
 feature_slug: hoi-dau-chu-bao-sai
 verdict: REJECT
-failed_evals: []
+failed_evals: ["E9b"]
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 0e18f9dd8ced5efe35e021cd104fb307241609ea
+verified_commit: e02e9e518801b8718dfa809b5ed4d49d17a3565b
 human_signoff:
 ---
 
 # Evidence Report: hoi-dau-chu-bao-sai
 
-Vòng 2. Verdict REJECT vì một lệnh suite (`make e2e`) đỏ; lệnh này không gắn eval nào nên `failed_evals` để trống. Ca đỏ nằm ở tệp `tests/e2e/loi-vao-ho-so.spec.ts` (hộp ⌘K trên thanh đầu trang, ở khổ 1440), không phải tệp của hàng này. Mọi eval của hàng này chạy vòng 2 hoặc mang từ vòng 1 đều xanh.
+Round 3. Lệnh ui-check:E9b thoát khác 0 (gắn eval E9b); không có lệnh fail nào khác không gắn eval.
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
-| E1 | AC-1 | script | PASS (carry-forward từ round 1) |
+| E1 | AC-1 | script | PASS |
 | E2 | AC-2 | test | PASS |
-| E2b | AC-2 | script | PASS (carry-forward từ round 1) |
-| E3 | AC-3 | test | PASS |
+| E2b | AC-2 | script | PASS |
+| E3 | AC-3 | test | PASS (carry-forward từ round 2) |
 | E4 | AC-4 | test | PASS |
 | E5 | AC-5 | test | PASS |
-| E5b | AC-5 | script | PASS (carry-forward từ round 1) |
+| E5b | AC-5 | script | PASS |
 | E6 | AC-6 | test | PASS |
 | E7 | AC-7 | test | PASS |
 | E8 | AC-8 | script | PASS |
 | E8b | AC-8 | test | PASS |
-| E9 | AC-9 | script | PASS (carry-forward từ round 1) |
-| E9b | AC-9 | ui-check | PASS (carry-forward từ round 1) |
-| E9c | AC-9 | judgment | judge đề xuất PASS, chờ người chốt |
-| E10 | AC-9 | script | PASS (carry-forward từ round 1) |
-| E11 | AC-9 | script | PASS (carry-forward từ round 1) |
-| E12 | AC-10 | script | PASS (carry-forward từ round 1) |
+| E9 | AC-9 | script | PASS |
+| E9b | AC-9 | ui-check | FAIL |
+| E9c | AC-9 | judgment | chờ người (hội đồng đề xuất PASS) |
+| E10 | AC-9 | script | PASS |
+| E11 | AC-9 | script | PASS |
+| E12 | AC-10 | script | PASS |
 
 ## Evidence
 
-### Eval chạy vòng 2
+- eval: E1
+  run_id: minted-hoi-dau-chu-bao-sai-E1-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.hoi_dau_chu_e2e_db
+  verified_at: 2026-11-13T14:06:43Z
+  output: |
+    21 passed (1.6m)
 
 - eval: E2
-  run_id: minted-hoi-dau-chu-bao-sai-E2-r2
+  run_id: minted-hoi-dau-chu-bao-sai-E2-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-13T11:43:59Z
-  runs: 1
+  verified_at: 2026-11-13T14:06:43Z
   output: |
-    make test chạy một lần, phủ E2, E3, E4, E5, E6, E7, E8b; kết thúc xanh.
+    make test xanh (toàn bộ bộ test đơn vị)
+
+- eval: E2b
+  run_id: minted-hoi-dau-chu-bao-sai-E2b-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.hoi_dau_chu_e2e_db
+  verified_at: 2026-11-13T14:06:43Z
+  output: |
+    21 passed (1.6m)
 
 - eval: E3
   run_id: minted-hoi-dau-chu-bao-sai-E3-r2
@@ -55,183 +70,145 @@ Vòng 2. Verdict REJECT vì một lệnh suite (`make e2e`) đỏ; lệnh này k
   baseline: n-a
   verifier: config:executors.test.unit
   verified_at: 2026-11-13T11:43:59Z
-  runs: 1
+  carried_from_round: 2
   output: |
-    make test chạy một lần, phủ E2, E3, E4, E5, E6, E7, E8b; kết thúc xanh.
+    carry-forward tu round 2 — delta khong cham paths cua eval
 
 - eval: E4
-  run_id: minted-hoi-dau-chu-bao-sai-E4-r2
+  run_id: minted-hoi-dau-chu-bao-sai-E4-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-13T11:43:59Z
-  runs: 1
+  verified_at: 2026-11-13T14:06:43Z
   output: |
-    make test chạy một lần, phủ E2, E3, E4, E5, E6, E7, E8b; kết thúc xanh.
+    make test xanh
 
 - eval: E5
-  run_id: minted-hoi-dau-chu-bao-sai-E5-r2
+  run_id: minted-hoi-dau-chu-bao-sai-E5-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-13T11:43:59Z
-  runs: 1
+  verified_at: 2026-11-13T14:06:43Z
   output: |
-    make test chạy một lần, phủ E2, E3, E4, E5, E6, E7, E8b; kết thúc xanh.
-
-- eval: E6
-  run_id: minted-hoi-dau-chu-bao-sai-E6-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.unit
-  verified_at: 2026-11-13T11:43:59Z
-  runs: 1
-  output: |
-    make test chạy một lần, phủ E2, E3, E4, E5, E6, E7, E8b; kết thúc xanh.
-
-- eval: E7
-  run_id: minted-hoi-dau-chu-bao-sai-E7-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.unit
-  verified_at: 2026-11-13T11:43:59Z
-  runs: 1
-  output: |
-    make test chạy một lần, phủ E2, E3, E4, E5, E6, E7, E8b; kết thúc xanh.
-
-- eval: E8b
-  run_id: minted-hoi-dau-chu-bao-sai-E8b-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.unit
-  verified_at: 2026-11-13T11:43:59Z
-  runs: 1
-  output: |
-    make test chạy một lần, phủ E2, E3, E4, E5, E6, E7, E8b; kết thúc xanh.
-
-- eval: E8
-  run_id: minted-hoi-dau-chu-bao-sai-E8-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.hoi_dau_chu_e2e_db
-  verified_at: 2026-11-13T11:43:59Z
-  runs: 1
-  output: |
-    21 passed (58.4s)
-
-### Eval mang từ vòng 1 (carry-forward)
-
-- eval: E1
-  run_id: minted-hoi-dau-chu-bao-sai-E1-r1
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.hoi_dau_chu_e2e_db
-  verified_at: 2026-11-13T11:29:56Z
-  carried_from_round: 1
-  note: carry-forward từ round 1 — delta không chạm paths của eval
-
-- eval: E2b
-  run_id: minted-hoi-dau-chu-bao-sai-E2b-r1
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.hoi_dau_chu_e2e_db
-  verified_at: 2026-11-13T11:29:56Z
-  carried_from_round: 1
-  note: carry-forward từ round 1 — delta không chạm paths của eval
+    make test xanh
 
 - eval: E5b
-  run_id: minted-hoi-dau-chu-bao-sai-E5b-r1
+  run_id: minted-hoi-dau-chu-bao-sai-E5b-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.hoi_dau_chu_e2e_db
-  verified_at: 2026-11-13T11:29:56Z
-  carried_from_round: 1
-  note: carry-forward từ round 1 — delta không chạm paths của eval
+  verified_at: 2026-11-13T14:06:43Z
+  output: |
+    21 passed (1.6m)
+
+- eval: E6
+  run_id: minted-hoi-dau-chu-bao-sai-E6-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.unit
+  verified_at: 2026-11-13T14:06:43Z
+  output: |
+    make test xanh
+
+- eval: E7
+  run_id: minted-hoi-dau-chu-bao-sai-E7-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.unit
+  verified_at: 2026-11-13T14:06:43Z
+  output: |
+    make test xanh
+
+- eval: E8
+  run_id: minted-hoi-dau-chu-bao-sai-E8-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.hoi_dau_chu_e2e_db
+  verified_at: 2026-11-13T14:06:43Z
+  output: |
+    21 passed (1.6m)
+
+- eval: E8b
+  run_id: minted-hoi-dau-chu-bao-sai-E8b-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.unit
+  verified_at: 2026-11-13T14:06:43Z
+  output: |
+    make test xanh
 
 - eval: E9
-  run_id: minted-hoi-dau-chu-bao-sai-E9-r1
+  run_id: minted-hoi-dau-chu-bao-sai-E9-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.hoi_dau_chu_e2e_db
-  verified_at: 2026-11-13T11:29:56Z
-  carried_from_round: 1
-  note: carry-forward từ round 1 — delta không chạm paths của eval
+  verified_at: 2026-11-13T14:06:43Z
+  output: |
+    21 passed (1.6m)
 
 - eval: E9b
-  run_id: minted-hoi-dau-chu-bao-sai-E9b-r1
-  exit_code: 0
+  run_id: minted-hoi-dau-chu-bao-sai-E9b-r3
+  exit_code: 1
   baseline: n-a
   verifier: ui-check
-  verified_at: 2026-11-13T11:29:56Z
-  carried_from_round: 1
-  note: carry-forward từ round 1 — delta không chạm paths của eval
+  verified_at: 2026-11-13T14:06:43Z
   screenshot: evidence/E9b-hoi-1440-light.png
-  observed: |
-    hoi-1440-light, hoi-1024-dark, hoi-360-dark: the record panel has a foot bar pinned to its bottom with a button 'Hỏi đầu chủ · [Tên] 03'; the body above has the 'Báo sai thông tin' button and no text overlaps. dau-ho-so-360-light: the head is on two lines, name '1603 · S1.01' on one and the buttons (link, Trước, Sau, Đóng) on the next. chua-ai-giu-1440-light and chua-ai-giu-360-light: the foot bar button is greyed out and reads 'Căn chưa có đầu chủ giữ'. bao-sai-1440-light and bao-sai-360-dark: report dialog with 'Thuộc tính sai' = Căn, 'Đang hiện: 1101', 'Giá trị đúng' = '72 m²', and buttons 'Chép và mở bảng chia sẻ' and 'Thôi'. hoi-loi-360-light: red message 'Máy này không chép hay chia sẻ được. Chép tay tin dưới đây rồi gửi.' with a text box showing the whole message including the link, no cut-off. hoi-loi-1440-dark: same message and full text box in the foot area. bao-sai-loi-360-light and bao-sai-loi-1440-dark: the report dialog shows the failure message and a read-only box holding the full text (title, Toà, Dự án, Thuộc tính, Đang hiện, Đúng là), nothing cut. No frame differs from the expected. Note: 'Hỏi đầu chủ · [Tên] 03' (22 chars) and 'Chép và mở bảng chia sẻ' (23) are over 17, but the first has the person name as data and the second is the dialog's submit button; the contract limits the two main buttons, and chung-minh-man.md already records the 21-character case as a known item. I did not treat this as a failure. Chỉ 12 trong 35 khung được mở bằng Read; 23 khung còn lại dựa vào các assert đã qua. Tính chọn-bôi được của ô chỉ đọc không thấy được trên điểm ảnh nên không kiểm bằng ảnh.
   network_observed: n-a (driver)
+  observed: |
+    Frames opened and read. hoi-1440-light, hoi-360-dark, hoi-414-dark, hoi-1024-light: record body, then a bar stuck to the bottom with one blue (or light-blue in dark) button 'Hỏi đầu chủ · [Tên] 03', no overlap with the text above, bar separated by a rule; matches. chua-ai-giu-1440-light and chua-ai-giu-360-light: the bar button is greyed/pale and reads 'Căn chưa có đầu chủ giữ' (matches the expected off-button text). bao-sai-1440-light and bao-sai-1440-dark: dialog 'Báo sai thông tin căn 1101', 'Thuộc tính sai' = Căn, 'Đang hiện: 1101', 'Giá trị đúng' = 72 m², notes box, buttons 'Thôi' and 'Chép và mở bảng chia sẻ'; bao-sai-360-light: same as a sheet over the record, buttons stacked; matches. hoi-loi-1440-light and hoi-loi-360-dark: the ask button stays, red error 'Máy này không chép hay chia sẻ được. Chép tay tin dưới đây rồi gửi.' and a textarea with the whole message 'Hỏi về căn 1101 · S1.01' plus the full URL, wrapped, not cut; matches. bao-sai-loi-1440-dark and bao-sai-loi-360-light/dark: the dialog shows the same notice and a read-only box with all six lines (Báo sai thông tin căn 1101 / Toà / Dự án / Thuộc tính / Đang hiện / Đúng là: 72 m²), none cut; matches. dau-ho-so-360-dark and minh-giu-1440-light (own unit): head on two lines (title, then buttons), no ask bar on one's own unit; matches. DIFFERS from Expected: button texts are not all from the label table and not all <= 17 chars: 'Chép và mở bảng chia sẻ' (23, in bao-sai-* frames at 1440/1024/414/360), 'Hỏi đầu chủ · [Tên] 03' (22, all hoi-* frames) and 'Căn chưa có đầu chủ giữ' (23, chua-ai-giu-* frames). Visual layout, no-overlap, uncut and selectable message are fine.
+  output: |
+    Step1 (lane V db up): 21 passed, 19 skipped. Step2 ('two lines'): 16 passed. Step3: 35 frames copied to _acceptance/hoi-dau-chu-bao-sai/evidence/ as E9b-*.png (hoi, bao-sai, hoi-loi, bao-sai-loi, chua-ai-giu, minh-giu, dau-ho-so). Opened 16 of them with Read; the rest not individually opened.
+    PASS foot bar sticks to the record bottom, no text overlap (1440/1024/414/360, light and dark); PASS unit nobody keeps shows off button 'Căn chưa có đầu chủ giữ' (1440, 360); PASS report dialog at 1440 and 360 with 'Căn' chosen and 'Đang hiện: 1101'; PASS copy-failure frames show the whole message uncut in a selectable read-only textarea.
+    FAIL 'every button text from the label table, <= 17 chars': dialog primary 'Chép và mở bảng chia sẻ' = 23 chars, hard-coded in src/modules/listings/ui/ask-copy.ts:32, not in ontology/labels.yaml; 'Hỏi đầu chủ · [Tên] 03' = 22 chars; 'Căn chưa có đầu chủ giữ' = 23 chars. Only the label-table prefs 'Hỏi đầu chủ' (11) and 'Báo sai thông tin' (17) meet the cap. The author's own file chung-minh-man.md already lists 'chữ nút 21 ký tự' as a known gap.
 
 - eval: E10
-  run_id: minted-hoi-dau-chu-bao-sai-E10-r1
+  run_id: minted-hoi-dau-chu-bao-sai-E10-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.design.floor
-  verified_at: 2026-11-13T11:29:56Z
-  carried_from_round: 1
-  note: carry-forward từ round 1 — delta không chạm paths của eval
+  verified_at: 2026-11-13T14:06:43Z
+  output: |
+    design-floor-s4 xanh
 
 - eval: E11
-  run_id: minted-hoi-dau-chu-bao-sai-E11-r1
+  run_id: minted-hoi-dau-chu-bao-sai-E11-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.design.khuon
-  verified_at: 2026-11-13T11:29:56Z
-  carried_from_round: 1
-  note: carry-forward từ round 1 — delta không chạm paths của eval
+  verified_at: 2026-11-13T14:06:43Z
+  output: |
+    9 tệp giao diện ngoài bản đồ
 
 - eval: E12
-  run_id: minted-hoi-dau-chu-bao-sai-E12-r1
+  run_id: minted-hoi-dau-chu-bao-sai-E12-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.e2e
-  verified_at: 2026-11-13T11:29:56Z
-  carried_from_round: 1
-  note: carry-forward từ round 1 — delta không chạm paths của eval
-
-### Judgment (đề xuất, chưa có người chốt)
-
-- eval: E9c
-  judged_by: hội đồng 3 judge (fresh context)
-  proposal: PASS
-  panel: domain-correctness, operational-feasibility, spec-alignment
-  votes:
-    - domain-correctness: PASS — AskListAgent có pref «Hỏi đầu chủ» (11 ký tự), ReportUnitError có pref «Báo sai thông tin» (17 ký tự), cả hai kind action, own true; chữ khớp design.md và AC-1, AC-6. Hai tên không phải tên trường RESO nào judge biết; judge không đối chiếu được RESO DD 2.1 vì nằm ngoài danh sách input.
-    - operational-feasibility: PASS — chữ hai nút khớp design.md và contract.md (đã duyệt, T3, trần 17 ở AC-9); hai tên không phải tên RESO nên không dùng lại nghĩa nào.
-    - spec-alignment: PASS — chữ khớp design.md và trần 17 ký tự của AC-9; own true nghĩa là khái niệm riêng của kho.
-  human_override:  # chi nguoi ghi
+  verified_at: 2026-11-13T14:06:43Z
+  output: |
+    975 passed (10.3m)
 
 ### Lệnh suite (hồi quy)
 
 - cmd: make check
-  run_id: minted-hoi-dau-chu-bao-sai-SUITE-make_check-r2
+  run_id: minted-hoi-dau-chu-bao-sai-SUITE-make_check-r3
   exit_code: 0
-  verified_at: 2026-11-13T11:43:59Z
+  verified_at: 2026-11-13T14:06:43Z
 
 - cmd: npm run build
-  run_id: minted-hoi-dau-chu-bao-sai-SUITE-build-r2
+  run_id: minted-hoi-dau-chu-bao-sai-SUITE-build-r3
   exit_code: 0
-  verified_at: 2026-11-13T11:43:59Z
+  verified_at: 2026-11-13T14:06:43Z
 
-- cmd: make e2e
-  run_id: minted-hoi-dau-chu-bao-sai-SUITE-make_e2e-r2
-  exit_code: 2
-  verified_at: 2026-11-13T11:43:59Z
-  note: lệnh không gắn eval nào. 889 ca qua, 634 bỏ qua, 1 ca đỏ.
-  failing_case: tests/e2e/loi-vao-ho-so.spec.ts:334 (khổ 1440), E5 · the top-bar ⌘K box, "Ctrl+K, Meta+K and / open the box; / in a field stays in the field". Phép thử mong đợi ô nhập của bảng nhảy-tới-căn (`unit-jump-palette`) nhận focus sau khi bấm Control+K; sau 5000 ms không tìm thấy phần tử. Tệp thuộc hàng loi-vao-ho-so, không phải hàng này.
-  output: |
-    1 failed
-    [1440] › tests/e2e/loi-vao-ho-so.spec.ts:334:3 › E5 · the top-bar ⌘K box
-    634 skipped
-    889 passed (6.9m)
+## Judge (đề xuất, để human_override trống)
+
+- eval: E9c
+  proposal: PASS
+  panel:
+  - domain-correctness: PASS — Trong labels.yaml, AskListAgent có pref "Hỏi đầu chủ" và ReportUnitError có pref "Báo sai thông tin", cả hai kind: action và own: true. Chữ khớp design.md và contract.md AC-1, AC-6; "Báo sai thông tin" đúng 17 ký tự, "Hỏi đầu chủ" ngắn hơn. Hai tên mã là ghép riêng, không trùng tên RESO nào với nghĩa khác.
+  - operational-feasibility: PASS — AskListAgent "Hỏi đầu chủ" (11 ký tự) và ReportUnitError "Báo sai thông tin" (17 ký tự) khớp design.md và contract.md (AC-9, giới hạn 17 ký tự). Cả hai có kind: action và own: true; tên không trùng RESO, mang nghĩa hành động riêng của sản phẩm.
+  - spec-alignment: PASS — labels.yaml có AskListAgent (11 ký tự) và ReportUnitError (đúng 17 ký tự), kind: action, own: true. Chữ khớp design.md (Hỏi-1) và contract.md AC-6/AC-9; không dùng lại tên RESO cho nghĩa khác.
+  human_override:  # chi nguoi ghi
 
 ## Known limits
 
@@ -241,17 +218,16 @@ Vòng 2. Verdict REJECT vì một lệnh suite (`make e2e`) đỏ; lệnh này k
 
 carried tu round 1 — baseline khong do lai round nay
 
-Eval không phân biệt (xanh trên cả HEAD lẫn baseline, chứng minh harness chứ không phải tính năng; cần viết lại để assert hành vi mới hoặc xác nhận là regression-guard có chủ ý):
-- E10 (lệnh `design-floor-s4.mjs`): quét mã màu thô, kết quả không phụ thuộc hành vi mới của hàng này.
-- E11 (lệnh `design-floor-khuon.mjs --kiem`): chấm khuôn nhóm luoi, kết quả không phụ thuộc hành vi mới của hàng này.
+Eval không-phân-biệt (pass trên cả HEAD lẫn baseline, ở round 1): E10 (design-floor-s4), E11 (design-floor-khuon). Cần viết lại để assert hành vi mới hoặc xác nhận là regression-guard có chủ ý.
 
-Baseline không đo vòng này: mọi eval ghi n-a vì evals.yaml không đổi từ lần baseline cuối ở round 1.
+Baseline không đo lại round này (evals.yaml không đổi từ lần đo cuối, round 1); field baseline của từng eval ghi n-a.
 
 ## Variance
 
-none — mọi eval chạy một lần, không có eval nào ngẫu nhiên và không có eval nào lúc xanh lúc đỏ.
+none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: S4 vòng 1 bị REJECT vì một ca lưới (grid) quá giờ, không liên quan hàng này (theo commit 0e18f9d).
-Round 2: eval của hàng này xanh (E2 tới E8b chạy lại, E1, E2b, E5b, E9, E9b, E10, E11, E12 mang từ round 1); make check và npm run build xanh; make e2e đỏ một ca ở tests/e2e/loi-vao-ho-so.spec.ts:334 (hộp ⌘K, khổ 1440), không gắn eval nào. Trả về để người xem ca đó có phải do thay đổi của hàng này hay do hàng loi-vao-ho-so.
+Round 1: REJECT — hết giờ ở một ca lưới không liên quan; trả về triển khai.
+Round 2: REJECT — lỗi chập chờn ở phím tắt ⌘K; đã sửa bằng chờ bộ nghe phím gắn xong (commit e02e9e5).
+Round 3: E9b failed — chữ nút không nằm trong bảng nhãn và vượt 17 ký tự: 'Chép và mở bảng chia sẻ' (23, cứng trong src/modules/listings/ui/ask-copy.ts:32), 'Hỏi đầu chủ · [Tên] 03' (22), 'Căn chưa có đầu chủ giữ' (23). Bố cục, không chồng chữ, tin chép đủ và bôi chọn được đều đạt. Các eval máy khác xanh.

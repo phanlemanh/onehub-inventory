@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "den": "f71ca93996c24e3fbe334e97ca2a8c311002ebcb",
-  "base": "dcf39ffb28f1957965010d18cf636b9879096332",
+  "den": "e02e9e518801b8718dfa809b5ed4d49d17a3565b",
+  "base": "ab97dffab8a4d8dfe3a5b8951b13f2a9287cb902",
   "ghim": {
     "luoi": "5ba22e8c5cb8042290787653bd154f5b03cf1274"
   },
@@ -17,7 +17,7 @@
     }
   ],
   "khong_do": [],
-  "ngoai_ban_do": 8,
+  "ngoai_ban_do": 9,
   "nhom": [
     "luoi"
   ]

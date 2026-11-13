@@ -72,3 +72,41 @@ wall: 542s
 - **claude-sonnet-5-5**: 5 agent · 11 calls · out 11,834 · in 24 · cache_read 107,560 · cache_create 124,793
 - **claude-haiku-5-5**: 5 agent · 11 calls · out 9,992 · in 24 · cache_read 77,154 · cache_create 80,777
 - **claude-opus-5-5**: 3 agent · 12 calls · out 3,769 · in 24 · cache_read 141,239 · cache_create 48,049
+### S4 round 3 — wf_ff0fe587-7b4 (17 agent, 52,752 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| synthesize:report | claude-sonnet-5-5 | 2 | 8,615 | 4 | 31,399 | 49 |
+| ui:E9b | claude-sonnet-5-5 | 10 | 6,812 | 20 | 723,222 | 194 |
+| review:conventions | claude-opus-5-5 | 20 | 6,742 | 44 | 707,791 | 87 |
+| review:measurement | claude-opus-5-5 | 4 | 6,422 | 10 | 66,198 | 69 |
+| review:bugs | claude-opus-5-5 | 9 | 4,173 | 18 | 236,108 | 50 |
+| machine:make e2e | claude-haiku-5-5 | 4 | 3,682 | 8 | 35,288 | 636 |
+| triage | claude-sonnet-5-5 | 2 | 3,122 | 4 | 16,241 | 23 |
+| machine:DB_LANE=${DB_LANE:-v} DB_PORT=${DB_PORT: | claude-haiku-5-5 | 2 | 3,096 | 4 | 15,584 | 111 |
+| machine:make test | claude-haiku-5-5 | 2 | 1,924 | 4 | 15,470 | 78 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,522 | 4 | 16,518 | 45 |
+| judge:E9c:domain-correctness | claude-sonnet-5-5 | 2 | 1,344 | 4 | 11,851 | 11 |
+| judge:E9c:operational-feasibility | claude-sonnet-5-5 | 2 | 1,289 | 4 | 15,469 | 10 |
+| judge:E9c:spec-alignment | claude-sonnet-5-5 | 2 | 1,163 | 4 | 15,467 | 9 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 1,101 | 4 | 16,522 | 11 |
+| machine:R="${CLAUDE_PLUGIN_ROOT:-$(node tools/ki | claude-haiku-5-5 | 2 | 718 | 4 | 15,567 | 5 |
+| machine:R="${CLAUDE_PLUGIN_ROOT:-$(node tools/ki | claude-haiku-5-5 | 2 | 589 | 4 | 15,562 | 5 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 438 | 4 | 12,029 | 5 |
+
+
+wall: 768s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| ui | 1 | 6,812 | 723,222 | 194 | 14:08:28 | 14:11:42 |
+| review | 3 | 17,337 | 1,010,097 | 87 | 14:08:28 | 14:09:55 |
+| machine | 7 | 12,632 | 130,511 | 692 | 14:08:28 | 14:20:00 |
+| judge | 3 | 3,796 | 42,787 | 12 | 14:08:28 | 14:08:40 |
+| triage | 1 | 3,122 | 16,241 | 23 | 14:20:00 | 14:20:23 |
+| capture | 1 | 438 | 12,029 | 5 | 14:20:23 | 14:20:27 |
+| synthesize | 1 | 8,615 | 31,399 | 49 | 14:20:27 | 14:21:16 |
+
+- **claude-sonnet-5-5**: 7 agent · 22 calls · out 22,783 · in 44 · cache_read 825,678 · cache_create 252,560
+- **claude-opus-5-5**: 3 agent · 33 calls · out 17,337 · in 72 · cache_read 1,010,097 · cache_create 143,080
+- **claude-haiku-5-5**: 7 agent · 16 calls · out 12,632 · in 32 · cache_read 130,511 · cache_create 105,654
