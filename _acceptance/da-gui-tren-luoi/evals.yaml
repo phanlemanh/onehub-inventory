@@ -95,7 +95,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/components/candidate/data-region.tsx, tests/grid-open-truncate.test.tsx]
-    expected: "exit 0; tests/grid-open-truncate.test.tsx dựng DataRegion có ngăn chi tiết với một dòng có chữ cột đầu dài 120 ký tự: phần tử bọc nút mở và nút mở mang lớp giới hạn bề rộng (max-w-full, min-w-0) và chữ nằm trong phần tử cắt có title bằng chữ đầy đủ; nút mở vẫn có data-record-open và tabIndex -1; ca đối chứng dựng lại với bản bọc cũ (inline-flex không giới hạn) cho 'open cell not truncated'"
+    expected: "exit 0; tests/grid-open-truncate.test.tsx dựng DataRegion có ngăn chi tiết với một dòng có chữ cột đầu dài 120 ký tự: phần tử bọc nút mở mang lớp giới hạn bề rộng (max-w-full, min-w-0) và nút mở lấp đầy phần tử bọc (w-full — luật kho shadcn/no-restyle chỉ cho nút lớp w-full) và chữ nằm trong phần tử cắt có title bằng chữ đầy đủ; nút mở vẫn có data-record-open và tabIndex -1; ca đối chứng dựng lại với bản bọc cũ (inline-flex không giới hạn) cho 'open cell not truncated'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E13
