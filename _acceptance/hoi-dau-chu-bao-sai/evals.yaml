@@ -127,3 +127,11 @@ evals:
     paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
     expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/record-panel.tsx, tests/e2e/hoi-dau-chu-bao-sai.spec.ts, tests/e2e/ho-so-can.spec.ts]
+    expected: "exit 0; ở 1440, 1024, 414, 360, sáng và tối, hồ sơ mở: data-slot record-panel-header có hai dòng — mép dưới tiêu đề nằm trên mép trên của hàng nút (lệch ≥ 0 px), tiêu đề cao đúng một dòng (chiều cao ≤ 1,6 lần cỡ chữ), mọi nút của hàng nằm trọn trong hồ sơ (mép phải ≤ mép phải hồ sơ); nút Chép đường dẫn không có chữ hiện, có aria-label và gợi ý khi rê; ca đối chứng ép đầu hồ sơ về một dòng bằng thẻ style cho 'record header is one line', ca đối chứng ép tên căn rộng 40px cho 'unit name squeezed'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

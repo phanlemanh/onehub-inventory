@@ -62,6 +62,16 @@ Source input: hàng `3e` của lộ trình, ô `_acceptance/hoi-dau-chu-bao-sai/
   hộp báo sai, Then quét trợ năng không có lỗi mức nghiêm trọng hay nguy cấp, chữ hai nút lấy từ bảng nhãn và không quá 17
   ký tự, chữ không chồng chữ, ảnh tối đọc được. (judgment)
 
+## Sửa sau Cổng Phạm vi
+
+Chủ kho phê ở Cổng Bằng chứng (giám sát phân xử, LUAT của đợt).
+
+- AC-10 (G-1311-39, chủ kho nguyên văn «Có, mọi khổ»): Given hồ sơ căn đang mở ở bốn khổ, sáng và tối, When nhìn đầu hồ
+  sơ, Then đầu hồ sơ có hai dòng — tên căn một dòng riêng, các nút (Chép đường dẫn, «…», Trước, Sau, Đóng) một dòng dưới —
+  «Chép đường dẫn» chỉ là biểu tượng có tên đọc được cho trình đọc màn hình và gợi ý khi rê; tên căn không bị bóp hay xuống
+  dòng từng chữ và không nút nào tràn khỏi hồ sơ ở 360 và ở ngăn nổi 1024.
+- Chỗ đặt (G-1311-38): thanh dính đáy là chỗ đặt thứ năm của bộ nút, chứa đúng một nút; ghi vào luật bộ nút.
+
 ## Vai × Màn
 
 Vai của người xem đọc từ bảng quyền qua khuôn nút 9e. Người giữ căn là dữ liệu mẫu tới hàng 10.
