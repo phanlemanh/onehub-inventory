@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
 import { notifyResult } from "@/components/templates/notify";
@@ -47,8 +47,11 @@ export function InventoryGrid({
   const [current, setCurrent] = useState<InventoryState>(state);
   const record = useMemo(() => listingRecord(headers), [headers]);
   // A shared link to a listing that left the inventory opens the grid as usual, and says why no record opened.
+  const staleSaid = useRef(false);
   useEffect(() => {
-    if (staleLinkNote) notifyResult({ message: staleLinkNote });
+    if (!staleLinkNote || staleSaid.current) return;
+    staleSaid.current = true;
+    notifyResult({ message: staleLinkNote });
   }, [staleLinkNote]);
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
