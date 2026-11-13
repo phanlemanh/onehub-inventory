@@ -30,7 +30,8 @@ Source input: hàng `3e` của lộ trình, ô `_acceptance/hoi-dau-chu-bao-sai/
 
 ## Criteria
 
-- AC-1: Given hồ sơ một căn do người khác giữ đang mở, người xem có quyền xem hàng, When nhìn đáy hồ sơ ở bốn khổ, Then có
+- AC-1 (theo khuyến nghị Hỏi-5; chủ kho chọn đầu hồ sơ thì AC-1 đổi thành nút chính ở đầu hồ sơ trước khi dựng): Given hồ sơ
+  một căn do người khác giữ đang mở, người xem có quyền xem hàng, When nhìn đáy hồ sơ ở bốn khổ, Then có
   một thanh dính đáy (không cuộn theo thân) với một nút «Hỏi đầu chủ · <tên người giữ>»; ở 414 và 360 nút cao ít nhất 44 px
   và rộng hết hồ sơ toàn màn; thanh không che dòng cuối của thân khi cuộn hết.
 - AC-2: Given thanh hỏi của AC-1 trên máy có bảng chia sẻ, When bấm nút, Then máy gọi bảng chia sẻ đúng một lần ngay trong
@@ -38,7 +39,7 @@ Source input: hàng `3e` của lộ trình, ô `_acceptance/hoi-dau-chu-bao-sai/
   đường dẫn ấy thì hồ sơ của đúng căn ấy hiện; người huỷ bảng chia sẻ thì không có thông báo nào.
 - AC-3: Given máy không có bảng chia sẻ hoặc bảng chia sẻ từ chối (lỗi khác huỷ), When bấm «Hỏi đầu chủ», Then tin và
   đường dẫn được chép vào bộ nhớ tạm và hiện thông báo «Đã chép tin hỏi»; chép cũng không được thì báo lỗi kèm nguyên tin để
-  chép tay.
+  chép tay; thông báo lỗi ở lại tới khi người đóng.
 - AC-4: Given hồ sơ một căn chưa ai giữ, When nhìn đáy hồ sơ, Then nút ở thanh đáy tắt, mang chữ «Căn chưa có đầu chủ giữ», và
   bấm không gọi bảng chia sẻ hay bộ nhớ tạm.
 - AC-5: Given người xem chính là người giữ căn, hoặc vai của người xem không có ô xem hàng trong bảng quyền (Quản trị sàn),

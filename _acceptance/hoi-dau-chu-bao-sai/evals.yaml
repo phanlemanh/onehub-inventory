@@ -30,7 +30,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/lib/share/**, tests/hoi-dau-chu-bao-sai.test.tsx]
-    expected: "exit 0; ma trận viết trước ba máy × kết cục cho hàm mở của src/lib/share (số assert bằng số ô): có share và share xong → 'chia-se'; có share, share ném AbortError → 'huy' và không chép; có share, share ném lỗi khác, có clipboard → chép 'text\\nurl' và 'da-chep'; không share, có clipboard → 'da-chep'; không share, clipboard ném → 'loi'; không share, không clipboard → 'loi'; trên nút hỏi: 'da-chep' gọi notify với 'Đã chép tin hỏi', 'loi' hiện lỗi chứa nguyên tin; ca đối chứng nuốt lỗi chép trả 'da-chep' cho 'copy failure reported as copied'"
+    expected: "exit 0; ma trận viết trước ba máy × kết cục cho hàm mở của src/lib/share (số assert bằng số ô): có share và share xong → 'chia-se'; có share, share ném AbortError → 'huy' và không chép; có share, share ném lỗi khác, có clipboard → chép 'text\\nurl' và 'da-chep'; không share, có clipboard → 'da-chep'; không share, clipboard ném → 'loi'; không share, không clipboard → 'loi'; trên nút hỏi: 'da-chep' gọi notify với 'Đã chép tin hỏi', 'loi' hiện lỗi chứa nguyên tin và gọi toast với duration Infinity (ở lại tới khi người đóng), ca đối chứng dùng thời gian mặc định cho 'error toast closes by itself'; ca đối chứng nuốt lỗi chép trả 'da-chep' cho 'copy failure reported as copied'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E4
@@ -70,7 +70,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/lib/share/**, src/modules/listings/**, tests/hoi-dau-chu-bao-sai.test.tsx]
-    expected: "exit 0; tin báo sai dựng từ một hàng mẫu và chữ gõ: các dòng theo đúng thứ tự 'Báo sai thông tin căn <mã>', 'Toà: ', 'Dự án: ', 'Thuộc tính: ', 'Đang hiện: ', 'Đúng là: ' (đã cắt khoảng trắng), thêm 'Ghi chú: ' chỉ khi căn cứ khác rỗng; bấm nút soạn với share giả gọi share một lần trong lượt bấm với text ấy; ba kết cục chia-se, da-chep, loi hiện đúng 'Đã mở bảng chia sẻ', 'Đã chép', lỗi kèm textarea readonly có nguyên tin; huy không hiện gì; đóng hộp rồi mở lại thì hai ô rỗng và không dòng báo; ca đối chứng thiếu dòng 'Đang hiện' cho 'report missing current value'"
+    expected: "exit 0; tin báo sai dựng từ một hàng mẫu và chữ gõ: các dòng theo đúng thứ tự 'Báo sai thông tin căn <mã>', 'Toà: ', 'Dự án: ', 'Thuộc tính: ', 'Đang hiện: ', 'Đúng là: ' (đã cắt khoảng trắng), thêm 'Ghi chú: ' chỉ khi căn cứ khác rỗng; bấm nút soạn qua FormDialog thật với share giả ghi thứ tự: share được gọi đúng một lần, đồng bộ trong trình xử lý bấm (trước mọi await), với text ấy; ba kết cục chia-se, da-chep, loi hiện đúng 'Đã mở bảng chia sẻ', 'Đã chép', lỗi kèm textarea readonly có nguyên tin; huy không hiện gì; đóng hộp rồi mở lại thì hai ô rỗng và không dòng báo; ca đối chứng thiếu dòng 'Đang hiện' cho 'report missing current value', ca đối chứng chèn một await trước share cho 'report share called outside the click'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E8
@@ -94,7 +94,7 @@ evals:
     executor: script
     cmd: config:executors.script.e2e
     paths: [src/components/candidate/record-panel.tsx, src/modules/listings/ui/**, tests/e2e/hoi-dau-chu-bao-sai.spec.ts]
-    expected: "exit 0; quét axe ở 1440 và 360, sáng và tối, với hồ sơ có thanh đáy, rồi với hộp báo sai mở: không vi phạm mức serious hay critical; bài đếm đúng 8 lượt quét đã chạy (in 'axe scans 8'); ca đối chứng hạ tương phản chữ nút bằng thẻ style cho vi phạm color-contrast"
+    expected: "exit 0; ma trận viết trước 4 khổ (1440, 1024, 414, 360) × sáng, tối × 2 bề mặt (hồ sơ có thanh đáy, hộp báo sai mở): quét axe không vi phạm mức serious hay critical; bài đếm đúng 16 lượt quét đã chạy (in 'axe scans 16'); ca đối chứng hạ tương phản chữ nút bằng thẻ style cho vi phạm color-contrast"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E9b
@@ -102,7 +102,7 @@ evals:
     executor: ui-check
     layer: ui-observed
     paths: [src/components/candidate/record-panel.tsx, src/modules/listings/ui/**]
-    expected: "Ảnh hồ sơ ở 1440, 1024, 414, 360, sáng và tối: thanh đáy với nút hỏi dính đáy hồ sơ, không chồng chữ; ảnh căn chưa ai giữ có nút tắt chữ 'Căn chưa có đầu chủ giữ'; ảnh hộp báo sai ở 1440 và 360 với một thuộc tính đã chọn và 'Đang hiện'; mọi chữ nút từ bảng nhãn, ≤ 17 ký tự"
+    expected: "Ảnh hồ sơ ở 1440, 1024, 414, 360, sáng và tối: thanh đáy với nút hỏi dính đáy hồ sơ, không chồng chữ; ảnh căn chưa ai giữ có nút tắt chữ 'Căn chưa có đầu chủ giữ'; ảnh hộp báo sai ở 1440 và 360 với một thuộc tính đã chọn và 'Đang hiện'; ảnh lỗi chép của nút hỏi (thông báo lỗi kèm nguyên tin) và của hộp báo sai (ô chỉ đọc) ở 360 và 1440, sáng và tối: nguyên tin hiện đủ, không bị cắt, bôi chọn được; mọi chữ nút từ bảng nhãn, ≤ 17 ký tự"
     evidence_required: [screenshot, observed]
 
   - id: E9c

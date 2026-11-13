@@ -17,7 +17,7 @@ chiếu: mục 25 và 35 của bảng so Chi tiết căn Quỹ hàng ↔ Invento
 - Giữ: thanh dính đáy một nút; căn chưa ai giữ thì nút tắt và chữ trên nút nói vì sao; nhãn «Hỏi đầu chủ · <tên>», chưa
   có tên thì nhãn trần; bảng chia sẻ gọi ngay trong lượt bấm (máy từ chối nếu mất cử chỉ của người); người huỷ bảng chia
   sẻ thì không báo gì; máy từ chối chia sẻ thì chép thay; chép không được thì hiện tin để chép tay.
-- Giữ: hộp báo sai — chọn thuộc tính, ô giá trị đúng bắt buộc (≤ 200 ký tự), ô căn cứ (≤ 500), tin gồm mã căn, toà, khu,
+- Giữ: hộp báo sai — chọn thuộc tính, ô giá trị đúng bắt buộc (≤ 200 ký tự), ô căn cứ (≤ 500), tin gồm mã căn, toà, dự án,
   thuộc tính, đang hiện, đúng là, ghi chú. Ô trống thì báo lỗi tại ô (cách của hộp dùng chung `FormDialog`), không tắt nút.
 - Đổi: Quỹ hàng đọc tên đầu chủ bằng một lời gọi mạng lúc mở hồ sơ; ở đây tên đi cùng dòng của Bảng hàng (dữ liệu mẫu
   tới hàng 10), không lời gọi nào.
@@ -72,7 +72,7 @@ chiếu: mục 25 và 35 của bảng so Chi tiết căn Quỹ hàng ↔ Invento
 | ST-hoi-minh-giu | Thanh đáy | Không có thanh đáy | — |
 | ST-hoi-khong-quyen | Thanh đáy | Không có thanh đáy (vai không có ô xem hàng) | — |
 | ST-hoi-da-chep | Thanh đáy | Toast «Đã chép tin hỏi» | Dán vào ứng dụng nhắn tin |
-| ST-hoi-loi | Thanh đáy | Toast lỗi «Máy này không chép hay chia sẻ được» kèm tin để chép tay | Chép tay |
+| ST-hoi-loi | Thanh đáy | Toast lỗi «Máy này không chép hay chia sẻ được» kèm tin để chép tay, ở lại tới khi người đóng | Chép tay, đóng |
 | ST-bao-mo | Hộp báo sai | Thuộc tính đầu tiên đã chọn, «Đang hiện», ô giá trị đúng trống | Gõ giá trị đúng |
 | ST-bao-thieu | Hộp báo sai | Bấm soạn khi ô trống: ô đỏ, câu «Gõ giá trị đúng trước khi gửi.» | Gõ rồi bấm lại |
 | ST-bao-da-mo | Hộp báo sai | Dòng báo «Đã mở bảng chia sẻ» | Đóng hộp |
