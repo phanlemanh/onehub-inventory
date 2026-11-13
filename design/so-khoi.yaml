@@ -106,6 +106,13 @@ khoi:
     mo_ta: Ô tìm duy nhất của sản phẩm ở thanh trên App Shell — gõ mã căn, toà hay dự án, có gợi ý ghi loại, mở bằng ⌘K
     ho_so: loi-vao-ho-so
     duyet: 2026-11-13
+  - ten: AskListAgent
+    tep: src/modules/listings/ui/ask-list-agent.tsx
+    nguon: sheet-8
+    nhu_cau: nut-dinh-day-ho-so
+    mo_ta: Thanh dính đáy hồ sơ với đúng một nút bước kế với một người — chân dính lấy từ sheet-8
+    ho_so: hoi-dau-chu-bao-sai
+    duyet: 2026-11-13
 # Blocks made before this ledger existed, each named with the round that made it, the commit that created it and the
 # day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
 # still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).

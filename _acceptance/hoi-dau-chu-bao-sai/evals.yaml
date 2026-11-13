@@ -4,9 +4,9 @@ evals:
   - id: E1
     criterion: AC-1
     executor: script
-    cmd: config:executors.script.e2e
-    paths: [src/components/candidate/record-panel.tsx, src/modules/listings/ui/**, tests/e2e/hoi-dau-chu-bao-sai.spec.ts]
-    expected: "exit 0; tests/e2e/hoi-dau-chu-bao-sai.spec.ts ở 1440, 1024, 414, 360 mở /inventory?ho-so=<id hàng mẫu do người khác giữ, rút từ hàm mẫu của listings, không viết tay>: phần tử data-slot record-footer nằm ngoài data-slot record-panel-body, chứa đúng một nút có chữ 'Hỏi đầu chủ · ' nối tên người giữ của hàng ấy; cuộn thân hồ sơ tới cuối thì mép trên thanh không đổi quá 1 px và mép dưới phần tử cuối của thân nằm trên mép trên thanh; ở 414 và 360 nút cao ít nhất 44 px và rộng bằng thân hồ sơ trừ lề (±2 px); ca đối chứng đặt thanh vào trong thân bằng thẻ style position static cho 'footer scrolls with the body', ca đối chứng ép nút cao 32 px cho 'touch target below 44'"
+    cmd: config:executors.script.hoi_dau_chu_e2e_db
+    paths: [src/components/candidate/record-panel.tsx, src/modules/listings/ui/**, tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts]
+    expected: "exit 0; tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts ở 1440, 1024, 414, 360 mở /inventory?ho-so=<id hàng mẫu do người khác giữ, rút từ hàm mẫu của listings, không viết tay>: phần tử data-slot record-footer nằm ngoài data-slot record-panel-body, chứa đúng một nút có chữ 'Hỏi đầu chủ · ' nối tên người giữ của hàng ấy; cuộn thân hồ sơ tới cuối thì mép trên thanh không đổi quá 1 px và mép dưới phần tử cuối của thân nằm trên mép trên thanh; ở 414 và 360 nút cao ít nhất 36 px (cỡ lớn của bộ nút) và rộng bằng thân hồ sơ trừ lề (±2 px); ca đối chứng đặt thanh vào trong thân bằng thẻ style position static cho 'footer scrolls with the body', ca đối chứng ép nút cao 28 px cho 'touch target below 36'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E2
@@ -20,8 +20,8 @@ evals:
   - id: E2b
     criterion: AC-2
     executor: script
-    cmd: config:executors.script.e2e
-    paths: [src/modules/listings/ui/**, src/lib/share/**, tests/e2e/hoi-dau-chu-bao-sai.spec.ts]
+    cmd: config:executors.script.hoi_dau_chu_e2e_db
+    paths: [src/modules/listings/ui/**, src/lib/share/**, tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts]
     expected: "exit 0; ở 1440 và 360 trên trang thật, navigator.share giả ghi lại đối số: bấm 'Hỏi đầu chủ' thì có đúng một lời gọi, url của nó mở trong trang mới hiện hồ sơ có data-record-id bằng id hàng đang hỏi; ca đối chứng cho nút gửi url của hàng đầu bảng cho 'link opens another unit'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
@@ -30,7 +30,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/lib/share/**, tests/hoi-dau-chu-bao-sai.test.tsx]
-    expected: "exit 0; ma trận viết trước ba máy × kết cục cho hàm mở của src/lib/share (số assert bằng số ô): có share và share xong → 'chia-se'; có share, share ném AbortError → 'huy' và không chép; có share, share ném lỗi khác, có clipboard → chép 'text\\nurl' và 'da-chep'; không share, có clipboard → 'da-chep'; không share, clipboard ném → 'loi'; không share, không clipboard → 'loi'; trên nút hỏi: 'da-chep' gọi notify với 'Đã chép tin hỏi', 'loi' hiện lỗi chứa nguyên tin và gọi toast với duration Infinity (ở lại tới khi người đóng), ca đối chứng dùng thời gian mặc định cho 'error toast closes by itself'; ca đối chứng nuốt lỗi chép trả 'da-chep' cho 'copy failure reported as copied'"
+    expected: "exit 0; ma trận viết trước ba máy × kết cục cho hàm mở của src/lib/share (số assert bằng số ô): có share và share xong → 'chia-se'; có share, share ném AbortError → 'huy' và không chép; có share, share ném lỗi khác, có clipboard → chép 'text\\nurl' và 'da-chep'; không share, có clipboard → 'da-chep'; không share, clipboard ném → 'loi'; không share, không clipboard → 'loi'; trên nút hỏi: 'da-chep' gọi notify với 'Đã chép tin hỏi', 'loi' hiện ngay dưới nút một dòng role=alert và ô chỉ đọc chứa nguyên tin (ở lại tới khi đổi căn hay bấm lại), ca đối chứng ẩn ô ấy cho 'manual copy text missing'; ca đối chứng nuốt lỗi chép trả 'da-chep' cho 'copy failure reported as copied'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E4
@@ -52,8 +52,8 @@ evals:
   - id: E5b
     criterion: AC-5
     executor: script
-    cmd: config:executors.script.e2e
-    paths: [src/components/candidate/record-panel.tsx, src/modules/listings/ui/**, tests/e2e/hoi-dau-chu-bao-sai.spec.ts]
+    cmd: config:executors.script.hoi_dau_chu_e2e_db
+    paths: [src/components/candidate/record-panel.tsx, src/modules/listings/ui/**, tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts]
     expected: "exit 0; ở 1440 mở hồ sơ hàng mẫu do chính người xem giữ: không có data-slot record-footer; bấm 'Sau' tới hàng do người khác giữ (rút từ hàm mẫu) thì thanh hiện với tên người giữ của hàng ấy; ca đối chứng giữ tên người giữ của hàng trước cho 'footer kept the previous holder'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
@@ -76,8 +76,8 @@ evals:
   - id: E8
     criterion: AC-8
     executor: script
-    cmd: config:executors.script.e2e
-    paths: [src/modules/listings/ui/**, src/lib/share/**, tests/e2e/hoi-dau-chu-bao-sai.spec.ts]
+    cmd: config:executors.script.hoi_dau_chu_e2e_db
+    paths: [src/modules/listings/ui/**, src/lib/share/**, tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts]
     expected: "exit 0; layer: backend-effect — ở 1440 trên trang thật ghi mọi yêu cầu (page.on('request')) sau khi trang tải xong: bấm hỏi (share giả thành công, rồi huỷ, rồi không có share), mở hộp báo sai, điền, bấm soạn, đóng — không có yêu cầu nào ngoài tải tài nguyên tĩnh và RSC điều hướng cùng nguồn của Next (phương thức GET, không thân); không yêu cầu POST, PUT, PATCH, DELETE; văn bản ô của dòng ấy trên Bảng hàng và tám trường hồ sơ trước và sau giống hệt; ca đối chứng thêm một fetch POST vào lượt bấm (route giả) cho 'button sent a request'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
@@ -92,9 +92,9 @@ evals:
   - id: E9
     criterion: AC-9
     executor: script
-    cmd: config:executors.script.e2e
-    paths: [src/components/candidate/record-panel.tsx, src/modules/listings/ui/**, tests/e2e/hoi-dau-chu-bao-sai.spec.ts]
-    expected: "exit 0; ma trận viết trước 4 khổ (1440, 1024, 414, 360) × sáng, tối × 2 bề mặt (hồ sơ có thanh đáy, hộp báo sai mở): quét axe không vi phạm mức serious hay critical; bài đếm đúng 16 lượt quét đã chạy (in 'axe scans 16'); ca đối chứng hạ tương phản chữ nút bằng thẻ style cho vi phạm color-contrast"
+    cmd: config:executors.script.hoi_dau_chu_e2e_db
+    paths: [src/components/candidate/record-panel.tsx, src/modules/listings/ui/**, tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts]
+    expected: "exit 0; ma trận viết trước 4 khổ (1440, 1024, 414, 360) × sáng, tối × 2 bề mặt (hồ sơ có thanh đáy, hộp báo sai mở): quét axe không vi phạm mức serious hay critical; mỗi khổ in 'axe scans <khổ> 4', bốn khổ cộng 16 lượt; ca đối chứng hạ tương phản chữ nút bằng thẻ style cho vi phạm color-contrast"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E9b
@@ -132,6 +132,6 @@ evals:
     criterion: AC-10
     executor: script
     cmd: config:executors.script.e2e
-    paths: [src/components/candidate/record-panel.tsx, tests/e2e/hoi-dau-chu-bao-sai.spec.ts, tests/e2e/ho-so-can.spec.ts]
+    paths: [src/components/candidate/record-panel.tsx, src/modules/listings/ui/copy-link.tsx, tests/e2e/ho-so-can.spec.ts, tests/e2e/loi-vao-ho-so.spec.ts]
     expected: "exit 0; ở 1440, 1024, 414, 360, sáng và tối, hồ sơ mở: data-slot record-panel-header có hai dòng — mép dưới tiêu đề nằm trên mép trên của hàng nút (lệch ≥ 0 px), tiêu đề cao đúng một dòng (chiều cao ≤ 1,6 lần cỡ chữ), mọi nút của hàng nằm trọn trong hồ sơ (mép phải ≤ mép phải hồ sơ); nút Chép đường dẫn không có chữ hiện, có aria-label và gợi ý khi rê; ca đối chứng ép đầu hồ sơ về một dòng bằng thẻ style cho 'record header is one line', ca đối chứng ép tên căn rộng 40px cho 'unit name squeezed'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

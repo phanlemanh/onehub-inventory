@@ -34,7 +34,7 @@ Source input: hàng `3e` của lộ trình, ô `_acceptance/hoi-dau-chu-bao-sai/
 
 - AC-1 (theo khuyến nghị của câu hỏi chỗ đặt nút hỏi; chủ kho chọn đầu hồ sơ thì AC-1 đổi thành nút chính ở đầu hồ sơ trước khi dựng): Given hồ sơ
   một căn do người khác giữ đang mở, người xem có quyền xem hàng, When nhìn đáy hồ sơ ở bốn khổ, Then có
-  một thanh dính đáy (không cuộn theo thân) với một nút «Hỏi đầu chủ · <tên người giữ>»; ở 414 và 360 nút cao ít nhất 44 px
+  một thanh dính đáy (không cuộn theo thân) với một nút «Hỏi đầu chủ · <tên người giữ>»; ở 414 và 360 nút dùng cỡ lớn của bộ nút (cao 36 px; bộ nút của kho không có cỡ 44 px — sửa sau Cổng Phạm vi)
   và rộng hết hồ sơ toàn màn; thanh không che dòng cuối của thân khi cuộn hết.
 - AC-2: Given thanh hỏi của AC-1 trên máy có bảng chia sẻ, When bấm nút, Then máy gọi bảng chia sẻ đúng một lần ngay trong
   lượt bấm với tin «Hỏi về căn <mã căn> · <toà>» và đường dẫn tuyệt đối `/inventory?ho-so=<mã hàng>` của chính căn ấy; mở
