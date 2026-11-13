@@ -1,0 +1,4 @@
+{
+  "feature_plain": "Ứng dụng nối cơ sở dữ liệu bằng một vai riêng không làm chủ bảng nào, nên kể cả khi mã chạy trong cửa truy vấn cố «đổi vai», nó cũng không lấy lại được quyền đọc ghi dữ liệu của mọi sàn.",
+  "scope_plain": "Những việc cố ý để ngoài hàng này, đã duyệt ở Cổng Phạm vi:"
+}

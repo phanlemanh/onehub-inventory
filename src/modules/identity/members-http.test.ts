@@ -11,7 +11,7 @@ import { captureInviteSender, devInviteSender } from "./invite-mail";
 import { memberRoles, type MembersDeps } from "./members";
 import { createMembersHandlers } from "./members-http";
 import { canonicalRoles, isRole } from "./roles";
-import type { DbClient, DbPool } from "./with-company";
+import { CHECK_LOGIN_ROLE_SQL, type DbClient, type DbPool } from "./with-company";
 
 const A = "00000000-0000-4000-8000-00000000000a";
 const P = "00000000-0000-4000-8000-0000000000a1";
@@ -25,6 +25,9 @@ function fakePool(script: Record<string, Answer>): DbPool & { seen: string[] } {
   const seen: string[] = [];
   const client: DbClient = {
     async query(text, params) {
+      // The door's login-role check (row 7c): this fake connects as the login role.
+      if (text === CHECK_LOGIN_ROLE_SQL)
+        return { rows: [{ vai: "quy_hang_login", loi: null }], rowCount: 1 };
       seen.push(text);
       const key = Object.keys(script).find((k) => text.startsWith(k));
       const rows = key ? await script[key]!(params) : [];

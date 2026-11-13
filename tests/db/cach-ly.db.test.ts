@@ -192,6 +192,8 @@ describe("agreements table against the ontology (Ngoài-1)", () => {
 
 /** Commit where row 7a reached main: the runner whose cases and pinned lines no later row may loosen. */
 const RUNNER_BASE = "d85d815";
+/** The runner on the main branch when row 7c opened (_acceptance/ung-dung-noi-bang-vai-khong-chu, E5). */
+const RUNNER_BASE_7C = "83d1764";
 
 interface RunnerShape {
   cases: string[];
@@ -213,12 +215,14 @@ export function runnerShape(text: string): RunnerShape {
     pick(/^CA_LENH=\([\s\S]*?^\)$/m, "CA_LENH"),
     pick(/^pha_thu_tep\(\) \{[\s\S]*?^\}$/m, "pha_thu_tep"),
     pick(/^pha_thu_ghim\(\) \{[\s\S]*?^\}$/m, "pha_thu_ghim"),
+    // Row 7c: the login-role cases, absent from older runners.
+    /^CA_DANG_NHAP=\([\s\S]*?^\)$/m.exec(text)?.[0] ?? "CA_DANG_NHAP=()",
   ].join("\n");
   const out = execFileSync(
     "bash",
     [
       "-c",
-      'eval "$DEFS"; for c in "${CA_SQL[@]}" "${CA_LENH[@]}"; do echo "ca|$c"; done; ' +
+      'eval "$DEFS"; for c in "${CA_SQL[@]}" "${CA_LENH[@]}" "${CA_DANG_NHAP[@]}"; do echo "ca|$c"; done; ' +
         'for c in "${CA_LENH[@]}"; do p=${c#pha-thu-}; [ "$p" = "$c" ] && continue; ' +
         'while read -r t; do [ -z "$t" ] && continue; echo "tep|$p|$t"; ' +
         'while IFS= read -r g; do echo "ghim|$t|$g"; done < <(pha_thu_ghim "$t"); done < <(pha_thu_tep "$p"); done',
@@ -285,6 +289,45 @@ describe("isolation runner keeps every case and pinned line of rows 7 and 7a (E5
   });
 });
 
+// Row 7c (_acceptance/ung-dung-noi-bang-vai-khong-chu/evals.yaml E5): nothing the runner measured before the row is
+// loosened, and the count on the last line is the runner's own number of cases.
+const CURRENT_CASES = runnerShape(readFileSync(join(ROOT, "db/scripts/cach-ly.sh"), "utf8")).cases;
+const LAST_LINE = `cach-ly: ${CURRENT_CASES.length} ca đạt, vai quy_hang_app, nối bằng quy_hang_login`;
+
+describe("isolation runner after row 7c keeps everything the main branch measured (E5)", () => {
+  const base = runnerShape(
+    execFileSync("git", ["show", `${RUNNER_BASE_7C}:db/scripts/cach-ly.sh`], {
+      cwd: ROOT,
+      encoding: "utf8",
+    }),
+  );
+
+  it(`reads the runner at ${RUNNER_BASE_7C}: 31 cases, 24 break files`, () => {
+    expect(base.cases).toHaveLength(31);
+    expect(base.pins.size).toBe(24);
+  });
+
+  it("the current runner keeps every case and pinned line of it, and adds the four login-role cases", () => {
+    expect(
+      loosened(base, runnerShape(readFileSync(join(ROOT, "db/scripts/cach-ly.sh"), "utf8"))),
+    ).toEqual([]);
+    expect(CURRENT_CASES.filter((c) => !base.cases.includes(c))).toEqual(
+      expect.arrayContaining([
+        "vai-dang-nhap-khong-ve-chu",
+        "dang-nhap-khong-ve-vai-chu",
+        "dang-nhap-qua-cua-doc-duoc",
+        "pha-thu-vai-dang-nhap",
+      ]),
+    );
+  });
+});
+
+/**
+ * A whole runner run (35 cases, 31 scratch databases) takes about a minute alone and longer when a grading round runs
+ * other database commands on the lane at the same time (row 7c, round 1: 81 s) — past vitest's 60 s default.
+ */
+const RUNNER_TIMEOUT = 300_000;
+
 describe("isolation runner names every broken break file (E9b)", () => {
   function runRunner(tests: string): { code: number; out: string } {
     try {
@@ -310,16 +353,20 @@ describe("isolation runner names every broken break file (E9b)", () => {
     return dir;
   }
 
-  it("control: an unchanged copy passes with 31 cases", () => {
-    const dir = copyTests();
-    try {
-      const r = runRunner(dir);
-      expect(r.code, r.out).toBe(0);
-      expect(r.out).toContain("cach-ly: 31 ca đạt, vai quy_hang_app");
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
+  it(
+    `control: an unchanged copy passes with ${CURRENT_CASES.length} cases`,
+    () => {
+      const dir = copyTests();
+      try {
+        const r = runRunner(dir);
+        expect(r.code, r.out).toBe(0);
+        expect(r.out.trimEnd().split("\n").at(-1)).toBe(LAST_LINE);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    },
+    RUNNER_TIMEOUT,
+  );
 
   it("a tag other than lowercase letters and digits is refused before any database is made", () => {
     try {
@@ -338,29 +385,35 @@ describe("isolation runner names every broken break file (E9b)", () => {
     }
   });
 
-  it("a deleted, two harmless and an unparsable break file are each named", () => {
-    const dir = copyTests();
-    try {
-      unlinkSync(join(dir, "pha-thu/cap-trigger-public.sql"));
-      writeFileSync(join(dir, "pha-thu/dang-xem-vat-chat.sql"), "select 1;\n");
-      writeFileSync(
-        join(dir, "pha-thu/ham-trigger-dac-quyen.sql"),
-        "create functio public.hong(;\n",
-      );
-      writeFileSync(join(dir, "pha-thu/dang-xem-chi-xoa.sql"), "select 1;\n");
-      const r = runRunner(dir);
-      expect(r.code).not.toBe(0);
-      expect(r.out).not.toContain("cach-ly: 31 ca đạt");
-      expect(r.out.split("\n").filter((l) => l.startsWith("HỎNG pha-thu-"))).toEqual([
-        "HỎNG pha-thu-quyen-nguy-hiem: cap-trigger-public: không dựng được bản phá",
-        "HỎNG pha-thu-dang-xem-vuot: dang-xem-vat-chat: bộ kiểm vẫn xanh trên bản phá",
-        "HỎNG pha-thu-ham-dac-quyen: ham-trigger-dac-quyen: không dựng được bản phá",
-        "HỎNG pha-thu-dang-xem-chi-ghi: dang-xem-chi-xoa: bộ kiểm vẫn xanh trên bản phá",
-      ]);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
+  it(
+    "a deleted, two harmless and an unparsable break file are each named",
+    () => {
+      const dir = copyTests();
+      try {
+        unlinkSync(join(dir, "pha-thu/cap-trigger-public.sql"));
+        writeFileSync(join(dir, "pha-thu/dang-xem-vat-chat.sql"), "select 1;\n");
+        writeFileSync(
+          join(dir, "pha-thu/ham-trigger-dac-quyen.sql"),
+          "create functio public.hong(;\n",
+        );
+        writeFileSync(join(dir, "pha-thu/dang-xem-chi-xoa.sql"), "select 1;\n");
+        writeFileSync(join(dir, "pha-thu/cap-vai-chu.sql"), "select 1;\n");
+        const r = runRunner(dir);
+        expect(r.code).not.toBe(0);
+        expect(r.out).not.toContain(LAST_LINE);
+        expect(r.out.split("\n").filter((l) => l.startsWith("HỎNG pha-thu-"))).toEqual([
+          "HỎNG pha-thu-quyen-nguy-hiem: cap-trigger-public: không dựng được bản phá",
+          "HỎNG pha-thu-dang-xem-vuot: dang-xem-vat-chat: bộ kiểm vẫn xanh trên bản phá",
+          "HỎNG pha-thu-ham-dac-quyen: ham-trigger-dac-quyen: không dựng được bản phá",
+          "HỎNG pha-thu-dang-xem-chi-ghi: dang-xem-chi-xoa: bộ kiểm vẫn xanh trên bản phá",
+          "HỎNG pha-thu-vai-dang-nhap: cap-vai-chu: bộ kiểm vẫn xanh trên bản phá",
+        ]);
+      } finally {
+        rmSync(dir, { recursive: true, force: true });
+      }
+    },
+    RUNNER_TIMEOUT,
+  );
 });
 
 // Row 7b (_acceptance/cach-ly-dang-xem-chi-ghi/evals.yaml E3): the hole case 20 closes is real, not a false alarm.
@@ -415,5 +468,49 @@ describe("break: a delete-only plain view lets company A delete company B's agre
     await db.owner.query("alter view public.agreements_xoa set (security_invoker = true)");
     expect(await deleteAsA(db)).toBe("permission denied for table agreements");
     expect(await countOfB(db)).toBe(1);
+  });
+});
+
+// Row 7c (_acceptance/ung-dung-noi-bang-vai-khong-chu/evals.yaml E2, E3): the session file proves something only because
+// it runs on a connection logged in as quy_hang_login. Run under the owner, the same file must go red; and it switches
+// role and company with the door's own statements.
+describe("login-role session file (E2, E3)", () => {
+  const PHIEN = join(ROOT, "db/tests/vai-dang-nhap-phien.sql");
+  function runAs(fn: "pg_psql" | "pg_psql_login", db: string): string[] {
+    const out = execFileSync(
+      "bash",
+      [
+        "-c",
+        `source "$1/db/scripts/psql.sh"; ${fn} -d "$2" -X -q -o /dev/null <"$3" 2>&1; true`,
+        "_",
+        ROOT,
+        db,
+        PHIEN,
+      ],
+      { env: { ...process.env, DB_LANE: process.env["DB_LANE"] ?? "c" }, encoding: "utf8" },
+    );
+    return out
+      .split("\n")
+      .map((l) => /(?:NOTICE|ERROR):\s+((?:ok|HỎNG) .*)$/.exec(l)?.[1])
+      .filter((l): l is string => l !== undefined);
+  }
+
+  it("on a login-role connection both cases pass; under the owner the refusal case is red", async () => {
+    const db = await open("phien");
+    await db.owner.query(readFileSync(join(ROOT, "db/tests/vai-dang-nhap-mau.sql"), "utf8"));
+    expect(runAs("pg_psql_login", db.name)).toEqual([
+      "ok dang-nhap-khong-ve-vai-chu",
+      "ok dang-nhap-qua-cua-doc-duoc — 1 thoả thuận của sàn A",
+    ]);
+    expect(runAs("pg_psql", db.name)).toContain(
+      "HỎNG dang-nhap-khong-ve-vai-chu: set role postgres không bị từ chối",
+    );
+  });
+
+  it("the session file switches role and company with the door's exact statements", async () => {
+    const { SET_ROLE_SQL, SET_CONTEXT_SQL } = await import("@/modules/identity/with-company");
+    const text = readFileSync(PHIEN, "utf8");
+    expect(text).toContain(`\n${SET_ROLE_SQL};\n`);
+    expect(text).toContain(`prepare dat_san_cua(text, text) as ${SET_CONTEXT_SQL};`);
   });
 });
