@@ -11,6 +11,7 @@ executors:
     danh_muc: "npx vitest run src/modules/catalog tests/danh-muc-chuyen-mau.test.ts --coverage.enabled=false --reporter=verbose"   # danh-muc-can-nhu-onehub-invest (row 7d): code reader, keys, sample move
     vai_dang_nhap_unit: "npx vitest run src/modules/identity/with-company.test.ts tests/vai-dang-nhap-nguon.test.ts --coverage.enabled=false --reporter=verbose"   # ung-dung-noi-bang-vai-khong-chu (row 7c): door checks its login role, source scan of test connection strings, .env.example add-only
     vai_man_so: "npx vitest run tests/vai-man-so-man.test.ts --coverage.enabled=false --reporter=verbose"   # kiem-vai-theo-man (row 9b): screen register entry rule, pair set, shared sign-in door, sidebar vs register
+    vai_man_nut: "npx vitest run tests/vai-man-nut-sinh.test.ts tests/vai-man-dau-nut.test.tsx tests/bo-nut-vai-man.test.ts src/modules/identity/permitted-action.test.tsx --coverage.enabled=false --reporter=verbose"   # kiem-vai-theo-man (row 9b): role × screen × button table from the register and module UI, every screen and the App Shell frame
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml

@@ -1,38 +1,147 @@
 {
-  "feature_plain": "Mỗi lần kiểm có cơ sở dữ liệu, máy đăng nhập lần lượt bằng từng vai của một sàn thử và mở từng màn, để bắt ngay khi một vai vào được màn lẽ ra bị chặn hoặc thấy dữ liệu không được thấy.",
+  "feature_plain": "Mỗi lần kiểm có cơ sở dữ liệu, máy đăng nhập lần lượt bằng từng vai của một sàn thử, mở từng màn và so nút mỗi vai thấy với bảng «vai nào thấy nút nào» — bảng nay phủ mọi màn — để bắt ngay khi một vai vào nhầm màn, thấy nhầm nút hay thấy dữ liệu không được thấy.",
   "will_do": [
-    {"id": "AC-1", "p": "Sẽ ghi rõ trong danh sách màn: muốn vào mỗi màn cần quyền gì; khai thiếu hay khai tên quyền không có thì kiểm tra chung báo đỏ."},
-    {"id": "AC-2", "p": "Sẽ tự đi đủ mọi cặp vai × màn đang có (hôm nay 5 màn × 4 vai = 20 cặp); màn mới thêm vào danh sách tự có cặp, không ai phải viết thêm bài."},
-    {"id": "AC-3", "p": "Sẽ có một chỗ duy nhất đăng nhập bằng từng vai qua màn đăng nhập thật; các bài kiểm và (sau này) ảnh bản mẫu xin phiên ở đó, không tự đăng nhập."},
-    {"id": "AC-4", "p": "Sẽ xác nhận vai được phép thì thấy màn bình thường, đúng tên màn; người đã đăng nhập mở màn Đăng nhập thì về Hôm nay."},
-    {"id": "AC-6", "p": "Sẽ xác nhận vai bị chặn không nhận được tên hay email của người khác trong sàn, cả trên trang lẫn trong dữ liệu trình duyệt tải về; cùng lượt, Quản trị sàn thấy đúng người ấy."},
-    {"id": "AC-7", "p": "Sẽ xác nhận thanh bên (cả ngăn điều hướng trên điện thoại) chỉ hiện mục dẫn tới màn mà vai được vào."},
-    {"id": "AC-8", "p": "Sẽ chứng bộ kiểm biết đỏ: ba bản cố ý làm hỏng (mở màn Thành viên cho mọi vai, khai sai quyền vào, để lộ tên người) đều làm nó báo đỏ đúng cặp."}
+    {
+      "id": "AC-1",
+      "p": "Sẽ ghi ở một chỗ cho mỗi màn (kể cả màn chưa dựng): muốn vào cần quyền gì và màn có những nút nào; khai thiếu hay khai tên quyền không có thì kiểm tra chung báo đỏ."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ tự đi đủ mọi cặp vai × màn đang có (hôm nay 5 màn × 4 vai = 20 cặp); màn mới thêm vào danh sách tự có cặp, không ai phải viết thêm bài."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ có một chỗ duy nhất đăng nhập bằng từng vai qua màn đăng nhập thật; các bài kiểm và (sau này) ảnh bản mẫu xin phiên ở đó, không tự đăng nhập."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ xác nhận vai được phép thì thấy màn bình thường, đúng tên màn; người đã đăng nhập mở màn Đăng nhập thì về Hôm nay."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ xác nhận vai bị chặn không nhận được tên hay email của người khác trong sàn, cả trên trang lẫn trong dữ liệu trình duyệt tải về; cùng lượt, Quản trị sàn thấy đúng người ấy."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ xác nhận thanh bên (cả ngăn điều hướng trên điện thoại) chỉ hiện mục dẫn tới màn mà vai được vào."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ chứng bộ kiểm biết đỏ: ba bản cố ý làm hỏng (mở màn Thành viên cho mọi vai, khai sai quyền vào, để lộ tên người) đều làm nó báo đỏ đúng cặp."
+    },
+    {
+      "id": "AC-9",
+      "p": "Sẽ cho máy tìm nút ở cả phần giao diện dùng chung mà màn dùng, giữ mọi màn trong bảng, đánh dấu «dự kiến» cho nút đã khai mà chưa dựng, và báo đỏ khi màn có nút chưa khai."
+    },
+    {
+      "id": "AC-10",
+      "p": "Sẽ có bảng «vai nào thấy nút nào» cho mọi màn cộng thanh trên App Shell, mỗi màn tách nút theo quyền và nút ai cũng có."
+    },
+    {
+      "id": "AC-11",
+      "p": "Sẽ xác nhận trong trình duyệt: không vai nào thấy nút ngoài phần của mình, và nút phải hiện thì hiện đúng với vai được phép."
+    }
   ],
   "wont_do": [
-    {"id": "AC-5", "p": "Chặn: vai không được vào thấy đúng một thông báo «Không đủ quyền» kèm đường về Hôm nay, ở mọi khổ màn hình chủ kho chốt."},
-    {"id": "OOS-1", "p": "KHÔNG cho bản mẫu và ảnh chụp của các hàng khác chạy dưới một vai trong hàng này — chỉ dựng sẵn chỗ đăng nhập để việc ấy dùng lại (cách làm ghi ở phần ghi chú)."},
-    {"id": "OOS-2", "p": "KHÔNG sửa màn Thành viên và thanh bên để đọc thẳng luật vào từ danh sách màn — để hàng dữ liệu thật (hàng 10)."},
-    {"id": "OOS-3", "p": "KHÔNG chuyển các bài đăng nhập cũ của hàng khác sang chỗ đăng nhập chung."},
-    {"id": "OOS-4", "p": "KHÔNG kiểm tới từng nút — hàng này kiểm tới cấp màn; bảng nút theo vai hôm nay mới có 2 màn, nối sang nút là việc riêng, rẻ khi bảng đủ màn."},
-    {"id": "OOS-5", "p": "KHÔNG chạy trên máy kiểm chung của GitHub cho tới khi hàng 1s đưa cơ sở dữ liệu lên đó; trước đó chạy ở máy của dãy."}
+    {
+      "id": "AC-5",
+      "p": "Chặn: vai không được vào thấy đúng một thông báo «Không đủ quyền» kèm đường về Hôm nay, ở mọi khổ màn hình chủ kho chốt."
+    },
+    {
+      "id": "OOS-1",
+      "p": "KHÔNG cho bản mẫu và ảnh chụp của các hàng khác chạy dưới một vai trong hàng này — chỉ dựng sẵn chỗ đăng nhập để việc ấy dùng lại (cách làm ghi ở phần ghi chú)."
+    },
+    {
+      "id": "OOS-2",
+      "p": "KHÔNG sửa màn Thành viên và thanh bên để đọc thẳng luật vào từ danh sách màn — để hàng dữ liệu thật (hàng 10)."
+    },
+    {
+      "id": "OOS-3",
+      "p": "KHÔNG chuyển các bài đăng nhập cũ của hàng khác sang chỗ đăng nhập chung."
+    },
+    {
+      "id": "OOS-4",
+      "p": "KHÔNG gắn kiểm quyền cho các nút đang nối tay trong các hàng sửa trên ô, hồ sơ căn đang dựng — để hàng dữ liệu thật và từng hàng ấy."
+    },
+    {
+      "id": "OOS-5",
+      "p": "KHÔNG thêm quyền mới cho màn Đã gửi — ghi nợ; hôm nay Đã gửi khai không có nút theo quyền."
+    },
+    {
+      "id": "OOS-6",
+      "p": "KHÔNG đổi luật vào hay ô quyền nào — hàng này chỉ khai và đo."
+    },
+    {
+      "id": "OOS-7",
+      "p": "KHÔNG chạy trên máy kiểm chung của GitHub cho tới khi hàng 1s đưa cơ sở dữ liệu lên đó; trước đó chạy ở máy của dãy."
+    }
   ],
   "coverage_plain": [
-    {"i": 0, "p": "Máy tự quét các chiều của bài toán (vai, màn, kỳ vọng, chỗ thấy, khổ) để không sót tiêu chí."},
-    {"i": 8, "p": "Vai: đủ bốn vai, mỗi người thử giữ đúng một vai."},
-    {"i": 9, "p": "Màn: 5 màn đang chạy đều đo; Liên hệ (chưa dựng) và bản mẫu (chỉ ở máy dựng) đứng ngoài, có lý do."},
-    {"i": 10, "p": "Kỳ vọng mỗi cặp: được vào, bị chặn, hoặc bị đẩy về Hôm nay (màn Đăng nhập)."},
-    {"i": 11, "p": "Chỗ thấy: thông báo trên trang, thanh bên, và dữ liệu trình duyệt tải về (AC-4 đến AC-7)."},
-    {"i": 12, "p": "Khổ màn hình: 360, 414, 1024, 1440 — phần nào đi ở khổ nào do Hỏi-1 chốt."},
-    {"i": 13, "p": "Mỗi phép đo được chứng cả hai chiều: xanh khi lành, đỏ khi cố ý làm hỏng (AC-1, AC-3, AC-7, AC-8)."},
-    {"i": 14, "p": "Làm ngay: mọi cặp được vào, mọi cặp bị chặn, thanh bên, khai danh sách màn, chỗ đăng nhập chung, bản phá thử."},
-    {"i": 15, "p": "Để sau: người chưa đăng nhập mở Hôm nay, Bảng hàng, Đã gửi (hàng 10 đóng); người giữ nhiều vai và đổi vai giữa chừng đã có bài ở hàng 9, 9a."}
+    {
+      "i": 0,
+      "p": "Máy tự quét các chiều của bài toán (vai, màn, kỳ vọng, chỗ thấy, khổ) để không sót tiêu chí."
+    },
+    {
+      "i": 8,
+      "p": "Vai: đủ bốn vai, mỗi người thử giữ đúng một vai."
+    },
+    {
+      "i": 9,
+      "p": "Màn: 5 màn đang chạy đều đo; Liên hệ (chưa dựng) và bản mẫu (chỉ ở máy dựng) đứng ngoài, có lý do."
+    },
+    {
+      "i": 10,
+      "p": "Kỳ vọng mỗi cặp: được vào, bị chặn, hoặc bị đẩy về Hôm nay (màn Đăng nhập)."
+    },
+    {
+      "i": 11,
+      "p": "Chỗ thấy: thông báo trên trang, thanh bên, và dữ liệu trình duyệt tải về (AC-4 đến AC-7)."
+    },
+    {
+      "i": 12,
+      "p": "Khổ màn hình: 360, 414, 1024, 1440 — phần nào đi ở khổ nào do Hỏi-1 chốt."
+    },
+    {
+      "i": 13,
+      "p": "Cấp đo: vào màn, nút theo quyền, nút ai cũng có (AC-4 đến AC-7, AC-9 đến AC-11)."
+    },
+    {
+      "i": 14,
+      "p": "Chỗ nút sống: trong thư mục màn, trong phần giao diện dùng chung, trên khung App Shell (AC-9, AC-10)."
+    },
+    {
+      "i": 15,
+      "p": "Mỗi phép đo được chứng cả hai chiều: xanh khi lành, đỏ khi cố ý làm hỏng (AC-1, AC-3, AC-7, AC-8)."
+    },
+    {
+      "i": 16,
+      "p": "Làm ngay: mọi cặp được vào, mọi cặp bị chặn, thanh bên, khai danh sách màn và nút, bảng nút cho mọi màn, so nút trong trình duyệt, chỗ đăng nhập chung, bản phá thử."
+    },
+    {
+      "i": 17,
+      "p": "Để sau: người chưa đăng nhập mở Hôm nay, Bảng hàng, Đã gửi (hàng 10 đóng); người giữ nhiều vai và đổi vai giữa chừng đã có bài ở hàng 9, 9a."
+    }
   ],
   "gap_probe_plain": [
-    {"i": 0, "p": "Chỗ đặt luật «màn nào cần quyền gì» lẽ ra là việc chủ kho chọn, máy đã tự chọn — nay thành Hỏi-2 trên thẻ, kèm ba lối."},
-    {"i": 1, "p": "Phép đo chưa theo câu trả lời Hỏi-1 — đã sửa: kê sẵn số bước cho từng lối, cặp bị chặn luôn đo ở cả bốn khổ."},
-    {"i": 2, "p": "Phép đo «không lộ dữ liệu» qua đường tải về chưa có đối chứng — đã sửa: cùng đường ấy phải bắt được người chứng ở Quản trị sàn, và không bắt được gì thì báo đỏ."},
-    {"i": 3, "p": "Chưa buộc bài trình duyệt đi đúng danh sách cặp máy sinh — đã sửa: sau lượt, máy so các bước đã chạy với danh sách cặp."},
-    {"i": 4, "p": "Thanh bên trên điện thoại chưa được đo — đã sửa: đo ở khổ 1440 và 360 cho cả bốn vai."}
+    {
+      "i": 0,
+      "p": "Chỗ đặt luật «màn nào cần quyền gì» lẽ ra là việc chủ kho chọn, máy đã tự chọn — nay thành Hỏi-2 trên thẻ, kèm ba lối."
+    },
+    {
+      "i": 1,
+      "p": "Phép đo chưa theo câu trả lời Hỏi-1 — đã sửa: kê sẵn số bước cho từng lối, cặp bị chặn luôn đo ở cả bốn khổ."
+    },
+    {
+      "i": 2,
+      "p": "Phép đo «không lộ dữ liệu» qua đường tải về chưa có đối chứng — đã sửa: cùng đường ấy phải bắt được người chứng ở Quản trị sàn, và không bắt được gì thì báo đỏ."
+    },
+    {
+      "i": 3,
+      "p": "Chưa buộc bài trình duyệt đi đúng danh sách cặp máy sinh — đã sửa: sau lượt, máy so các bước đã chạy với danh sách cặp."
+    },
+    {
+      "i": 4,
+      "p": "Thanh bên trên điện thoại chưa được đo — đã sửa: đo ở khổ 1440 và 360 cho cả bốn vai."
+    }
   ]
 }

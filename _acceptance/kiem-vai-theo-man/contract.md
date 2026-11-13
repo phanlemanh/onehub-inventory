@@ -19,8 +19,11 @@ design_doc: _acceptance/kiem-vai-theo-man/design.md
 Quyết định 0017: bài chấm giao diện hôm nay không đăng nhập theo vai; bộ kiểm chung của hàng 1r mở mọi màn bằng một người
 giữ đủ bốn vai. Hàng này khai cửa vào của từng màn trong sổ màn, dựng một cửa đăng nhập theo vai dùng chung, và cho bộ kiểm
 trình duyệt đi từng cặp vai × màn: cặp được vào thấy màn thường, cặp bị chặn thấy đúng «Không đủ quyền» và không lộ dữ liệu.
-Hàng không dựng màn, không sửa mã sản phẩm. Hạng ghi trên lộ trình là T3 (giám sát giữ T3: hàng nằm trên đường tới hàng 10);
-máy suy theo tệp chạm sẽ ra T2 vì không chạm `tools/**`.
+Giám sát gộp thêm (2026-11-13, tin G-1311-78): sổ màn là MỘT chỗ khai cho mỗi màn — cần quyền gì để vào VÀ có những nút
+nào; công cụ sinh bảng Vai × Màn tới cấp nút phủ mọi màn của sổ và khung App Shell; ma trận trình duyệt so nút mỗi vai thấy
+với bảng. Hàng không dựng màn. Mã sản phẩm chỉ đổi một chỗ: nút theo quyền mang thêm một dấu đọc được (không đổi hình, không
+đổi luật). Hạng T3: chạm `tools/coverage_matrix/buttons.py` và `src/modules/identity/ui/` (hai đường hạng cao, nêu đích danh ở
+trang cổng).
 
 Source input: hàng `9b` của `docs/plan/lo-trinh.json`, ô `_acceptance/kiem-vai-theo-man/opportunity.md` (build, Manh Phan,
 2026-11-13), quyết định 0017 (`wiki/decisions/0017-actor-surface-coverage-pilot.md`), bảng quyền 9a (`ontology/actions.yaml`,
@@ -30,10 +33,12 @@ dữ liệu của sổ màn; phép đo rò rỉ ở AC-6 đo giữa các vai tro
 
 ## Criteria
 
-- AC-1: Given sổ màn `design/screens.yaml`, When chạy `make check`, Then mỗi màn có `audience` `staff` hay `public` mang khoá
-  `vao` (tên một thao tác trong `ontology/actions.yaml`, hoặc `null` = mọi thành viên của sàn), màn `built` không trỏ thao tác
-  `planned`; và trên bản sao sổ màn thiếu khoá, trỏ tên lạ, hay màn built trỏ thao tác planned thì kiểm tra đỏ với thông điệp
-  ghim `<màn>: <lỗi>`.
+- AC-1: Given sổ màn `design/screens.yaml`, When chạy `make check`, Then mỗi màn có `audience` `staff` hay `public` — kể cả
+  màn `planned` — mang khoá `vao` (tên một thao tác trong `ontology/actions.yaml`, hoặc `null` = mọi thành viên của sàn) và khoá
+  `nut` (danh sách thao tác có nút trên màn, mỗi tên có trong bảng quyền; danh sách rỗng được), cùng `nut_chung` (nút không
+  theo quyền, như «Chép đường dẫn»); màn `built` không lấy thao tác `planned` làm `vao`; sổ có khối `khung` khai nút của thanh
+  trên App Shell; và trên bản sao sổ màn thiếu khoá, trỏ tên lạ, hay màn built lấy thao tác planned làm `vao` thì kiểm tra đỏ
+  với thông điệp ghim `<màn>: <lỗi>`.
 - AC-2: Given sổ màn và bốn vai của `ontology/roles.yaml`, When bộ kiểm vai × màn chạy, Then tập cặp nó đi bằng đúng tích (màn
   `built` của nhân viên) × (bốn vai) — hôm nay 5 × 4 = 20 cặp — và mỗi màn ngoài ma trận có lý do viết sẵn (`planned`, `dev`);
   các bước trình duyệt thật sự chạy, đọc từ báo cáo của lượt, bằng đúng tập cặp ấy theo khổ đã chốt (lệch thì đỏ, ghim cặp thừa
@@ -57,6 +62,21 @@ dữ liệu của sổ màn; phép đo rò rỉ ở AC-6 đo giữa các vai tro
   viên; khối «Không đủ quyền» in tên người chứng — When chạy cặp liên quan ở khổ 1440, Then mỗi bản đỏ với đúng thông điệp
   ghim `members × <vai> @1440: <mong gì>` và cây gốc chạy cùng cặp thì xanh.
 
+- AC-9: Given sổ màn và mã, When công cụ sinh bảng Vai × Màn tới cấp nút chạy, Then nó đọc tên thao tác trong thư mục của
+  trang VÀ trong phần giao diện (`src/modules/<m>/ui/`) của mọi mô-đun mà trang hay khung nhập, giữ MỌI màn của sổ (cả màn
+  chưa có trang, cả màn chưa tìm thấy tên nào), gộp nút khai với nút tìm thấy: nút khai mà chưa thấy trong mã mang dấu «dự
+  kiến»; và trên bản sao, một màn đã dựng mà mã có một thao tác chưa khai trong `nut` thì `make check` đỏ với thông điệp ghim
+  `<màn>: ma co <thao tác> chua khai`, một nút khai mà thao tác không có trong bảng quyền thì đỏ `<màn>: nut <tên> khong co
+  trong bang quyen`.
+- AC-10: Given bảng sinh ra (`design/vai-man-nut.md`), When đọc bảng, Then có đúng một mục cho mỗi màn của sổ cộng một mục
+  khung App Shell (ô tìm ⌘K, đổi sàn, đăng xuất, cách xem đã lưu); mỗi mục có bốn hàng vai, cột «Nút theo quyền» (thao tác,
+  phạm vi, dấu «dự kiến») và cột «Nút không theo quyền»; tệp lệch bảng thì `make check` đỏ như hôm nay.
+- AC-11: Given phiên của một vai và một màn được vào, When mở màn, Then mỗi nút theo quyền đang hiện mang dấu thao tác và mỗi
+  dấu nằm trong ô của vai ấy ở bảng sinh ra (không vai nào thấy nút ngoài ô của mình); nút khai `mo_san` (hiện ngay khi mở
+  màn) hiện với đúng các vai có ô; và trên bản sao cây đổi nút «Mời người» của màn Thành viên sang một thao tác khác mà không
+  sinh lại bảng, cặp members × CompanyAdmin ở 1440 đỏ với hai thông điệp ghim `members × CompanyAdmin @1440: thieu nut
+  inviteMember` và `members × CompanyAdmin @1440: thay nut <thao tác> khong co trong o`.
+
 ## Coverage
 
 Quét bằng skill `morphological-scan` (preset test-matrix, chế độ máy tự trả lời).
@@ -75,10 +95,12 @@ Bypassing Authorization Schema]`.
 | Kỳ vọng | được vào · bị chặn · đẩy đi (Đăng nhập) | `vao` + `allowedScope` |
 | Lớp thấy | khối trên trang · thanh bên · HTML và mạng | AC-4…AC-7 |
 | Khổ | 360 · 414 · 1024 · 1440 | Hỏi-1 |
+| Cấp | vào màn · nút theo quyền · nút không theo quyền | AC-4…AC-7, AC-9…AC-11 |
+| Chỗ nút sống | thư mục trang · giao diện mô-đun · khung App Shell | AC-9, AC-10 |
 | Hướng phép đo | xanh trên cây lành · đỏ trên bản phá | AC-1, AC-3, AC-7 (`make check`), AC-8 (trình duyệt) |
 
 Core: built × mọi vai × được vào (AC-4) · built × vai bị chặn (AC-5, AC-6) · thanh bên (AC-7) · khai sổ (AC-1, AC-2) · cửa
-đăng nhập (AC-3) · phá thử (AC-8). Later: người chưa đăng nhập × màn nhân viên (hôm nay Hôm nay, Bảng hàng, Đã gửi mở cho người
+đăng nhập (AC-3) · phá thử (AC-8) · khai nút và sinh bảng mọi màn (AC-9, AC-10) · so nút trong trình duyệt (AC-11). Later: người chưa đăng nhập × màn nhân viên (hôm nay Hôm nay, Bảng hàng, Đã gửi mở cho người
 chưa đăng nhập với dữ liệu mẫu — hàng 10 đóng); người giữ nhiều vai (cộng quyền đã đo ở 9a và `tests/nav-roles.test.tsx`);
 đổi vai giữa phiên (`members.spec.ts` của hàng 9). Never: phiên giả không qua màn đăng nhập.
 
@@ -106,10 +128,10 @@ Kỳ vọng hôm nay, sinh từ `vao` của sổ màn và bảng quyền 9a; b�
   Notes (Ngoài-1). Hàng này chỉ dựng cửa đăng nhập sao cho việc ấy dùng lại được.
 - Sửa trang Thành viên và thanh bên để đọc thẳng `vao` từ sổ màn — hàng 10.
 - Đưa `phien.setup.ts` của 1r và `members.spec.ts` của 9 về cửa đăng nhập chung — việc riêng, không sửa tệp bài của hàng khác.
-- Kiểm tới cấp NÚT: hàng này kiểm tới cấp MÀN (vào được hay bị chặn). Bảng nút theo vai (`design/vai-man-nut.md`, hàng 9e) hôm
-  nay chỉ có 2 màn vì nút của Bảng hàng, hồ sơ căn, Đã gửi nằm trong thành phần dùng chung mà công cụ quét không đi theo, và
-  hầu hết thao tác ghi còn `planned`. Khi bảng có màn, ma trận của hàng này mở rộng sang nút rẻ (cùng lần mở trang) — việc
-  riêng, giám sát quyết ai làm.
+- Gắn kiểm quyền cho nút đang nối tay trong thành phần của hàng 4, 3b, 3e (nút chưa đi qua nút theo quyền) — để hàng 10 và
+  từng hàng ấy; bảng sẽ hiện chúng ở cột «Nút không theo quyền» hay không hiện cho tới khi chúng đi qua nút theo quyền.
+- Thêm thao tác mới vào ontology cho màn Đã gửi — ghi nợ; hôm nay Đã gửi khai `nut: []`.
+- Đổi luật vào hay ô quyền nào của bảng quyền — hàng này chỉ khai và đo; ô quyền đổi ở hàng của nghiệp vụ ấy.
 - Chạy trên CI — hàng 1s đưa Postgres vào CI; trước đó bộ chạy ở máy dãy.
 
 ## Notes
@@ -119,4 +141,8 @@ Kỳ vọng hôm nay, sinh từ `vao` của sổ màn và bảng quyền 9a; b�
   `[Sàn mẫu thử vai]` thay vì «Đăng nhập». Lệnh chụp của từng hàng gọi đúng dự án ấy. Đề nghị giám sát giao như một việc phụ.
 - Hỏi-2 (chỗ đặt luật vào màn): bản nháp theo khuyến nghị — khoá `vao` trong sổ màn. Nếu chủ kho chọn lối khác, AC-1 và AC-7
   đổi nguồn đọc, các AC còn lại giữ nguyên.
-- Hạng: lộ trình và giám sát ghi T3; tệp chạm (`tests/**`, `design/screens.yaml`, `playwright.db.config.ts`) cho máy suy T2.
+- Hạng T3: chạm `tools/coverage_matrix/buttons.py` (công cụ sinh bảng) và `src/modules/identity/ui/permitted-action.tsx` (thêm
+  dấu thao tác, không đổi hình hay luật).
+- Bảng hiện ra một điều chủ kho nên thấy: Quản trị sàn không có ô nào trên Bảng hàng (không lưu cách xem, không thao tác căn
+  nào), và `viewListings` không cho Quản trị sàn — khi hàng 10 đặt `vao: viewListings` cho Bảng hàng, Quản trị sàn sẽ bị chặn
+  khỏi Bảng hàng nếu bảng quyền giữ nguyên.

@@ -104,11 +104,40 @@ Ba bản phá thử, chạy trên bản sao cây (worktree tạm), mỗi bản c
 
 Bài `make check` có cặp phá riêng trên bản sao sổ màn (khoá `vao` thiếu, tên thao tác lạ, thanh bên lệch).
 
+## Bảng nút (gộp vào hàng theo giám sát, 2026-11-13 — Hỏi-3)
+
+Gốc: bảng Vai × Màn tới cấp nút (`design/vai-man-nut.md`) hôm nay chỉ có 2 màn vì công cụ sinh bảng
+(`tools/coverage_matrix/buttons.py`) chỉ đọc tên thao tác trong thư mục của trang, bỏ màn chưa có trang và màn không tìm thấy
+tên nào; nút thật của Bảng hàng sống ở `src/modules/listings/ui/`, khung App Shell ở `src/app/(app)/layout.tsx` và phần giao
+diện các mô-đun nó nhập. Bốn việc, không hơn:
+
+1. **Sổ màn khai nút.** Mỗi màn staff/public (kể cả màn chưa dựng) có `nut: [<thao tác>…]` — tên phải có trong
+   `ontology/actions.yaml` — và `nut_chung: [<nút không theo quyền>…]`; một nút có thể mang `mo_san: true` khi nó hiện ngay lúc
+   mở màn. Khối `khung` ở đầu sổ khai nút của thanh trên App Shell (ô tìm ⌘K, đổi sàn, đăng xuất) và của cột thứ hai (cách
+   xem đã lưu).
+2. **Công cụ sinh bảng** đọc thêm phần giao diện (`src/modules/<m>/ui/**`) của mọi mô-đun mà trang (hay khung) nhập; giữ mọi
+   màn của sổ; gộp nút khai với nút tìm thấy; nút khai chưa thấy trong mã mang dấu «dự kiến»; màn đã dựng mà mã có thao tác
+   chưa khai → `make check` đỏ. Đọc theo mô-đun nên một mô-đun dùng ở hai màn đóng góp tên cho cả hai: màn khai thêm tên ấy
+   (thừa an toàn hơn thiếu; ghi ở Known limits nếu gặp). Dạng JSON giữ các khoá cũ (`actions`, `cells`) để bài kiểm của hàng 9e
+   không đổi lời; thêm `planned` và `common`.
+3. **Bảng sinh ra** có một mục cho mỗi màn của sổ cộng mục `khung`; ba cột: Vai · Nút theo quyền (thao tác, phạm vi, «dự kiến»)
+   · Nút không theo quyền.
+4. **Ma trận trình duyệt so nút.** Nút theo quyền mang một dấu đọc được: `PermittedAction` bọc nút được phép trong một phần tử
+   `display: contents` có `data-thao-tac` (không đổi hình, không đổi luật — sửa duy nhất vào mã sản phẩm, đường hạng cao
+   `src/modules/identity/ui/`). Ở mỗi cặp được vào, mọi dấu đang hiện phải nằm trong ô của vai; nút `mo_san` phải hiện với đúng
+   các vai có ô. Không thêm lần mở trang nào: so ngay trên trang đã mở cho bước được vào.
+
+Không làm: gắn kiểm quyền cho nút đang nối tay trong thành phần của hàng 4, 3b, 3e; thêm thao tác cho Đã gửi (ghi nợ).
+
+Công thêm so với bản tám tiêu chí: công cụ sinh bảng và bài của nó khoảng nửa ngày; khai sổ cho 8 màn và khung khoảng một
+giờ; dấu thao tác và bài của nó khoảng một giờ; so nút trong ma trận khoảng 2–3 giờ; tổng khoảng một ngày máy. Thời gian chạy
+bộ trình duyệt gần như không đổi (cùng lần mở trang); `make check` thêm vài giây.
+
 ## Ranh giới với hàng khác
 
 - 1r: một phiên đủ vai, đo khung từng màn. 9b: từng vai, đo được vào hay bị chặn. Không sửa `tools/e2e_templates/`.
 - 1s (PR #48): đưa Postgres vào CI. Khi 1s gộp, bộ 9b chạy trên CI cùng các bài có cơ sở dữ liệu; trước đó chỉ chạy ở máy dãy.
-- 9e: bảng nút theo vai. 9b không kiểm nút.
+- 9e: dựng nút theo quyền và bảng nút cho 2 màn. 9b mở bảng ra mọi màn và đo nó trong trình duyệt; bài của 9e giữ nguyên.
 - 10: luật vào cho Bảng hàng, Đã gửi theo dữ liệu thật; khi 10 đổi `vao` trong sổ, ma trận tự đổi kỳ vọng.
 
 ## Luật sản phẩm

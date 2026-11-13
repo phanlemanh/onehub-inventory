@@ -6,7 +6,7 @@ evals:
     executor: test
     cmd: config:executors.test.vai_man_so
     paths: [design/screens.yaml, ontology/actions.yaml, tests/vai-man-so-man.test.ts, tests/e2e-db/vai-man.ts]
-    expected: "exit 0; ca 'so-man-du-cua-vao' xanh trên sổ thật (mọi màn staff/public có khoá vao; today, inventory, sent, sign-in = null; members = listMembers); ba ca phá trên bản sao sổ màn đỏ đúng thông điệp ghim: xoá khoá vao của members → 'members: thieu khoa vao'; vao: khongCo → 'members: vao khongCo khong co trong bang quyen'; vao của today trỏ một thao tác planned (viewListings) → 'today: man built tro thao tac planned viewListings'"
+    expected: "exit 0; ca 'so-man-du-cua-vao' xanh trên sổ thật (mọi màn staff/public kể cả contacts planned có khoá vao, nut, nut_chung; today, inventory, sent, sign-in, contacts vao = null; members vao = listMembers; members nut = [inviteMember, changeMemberRoles]; sent nut = []; sổ có khối khung); ca phá thêm: xoá khoá nut của inventory → 'inventory: thieu khoa nut'; ba ca phá trên bản sao sổ màn đỏ đúng thông điệp ghim: xoá khoá vao của members → 'members: thieu khoa vao'; vao: khongCo → 'members: vao khongCo khong co trong bang quyen'; vao của today trỏ một thao tác planned (viewListings) → 'today: man built tro thao tac planned viewListings'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E2
@@ -87,4 +87,44 @@ evals:
     cmd: config:executors.script.check
     paths: ["**"]
     expected: "exit 0; make check xanh — gồm tests/vai-man-so-man.test.ts trong make test và coverage-matrix đọc sổ màn có khoá vao mới không lỗi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.vai_man_nut
+    paths: [tools/coverage_matrix/buttons.py, design/screens.yaml, ontology/actions.yaml, src/modules/*/ui/**, src/app/**, tests/vai-man-nut-sinh.test.ts, tests/bo-nut-vai-man.test.ts]
+    expected: "exit 0; ca 'doc-giao-dien-mo-dun': trên sổ thật, mục inventory của bảng JSON có saveView, editView, removeView mang dấu tìm-thấy (đọc từ src/modules/listings/ui) và updateListing, createListing, activateListing, removeListing, viewOwnerPhone mang dấu du-kien; ca 'giu-moi-man': tập id màn của bảng = tập id của sổ màn (gồm contacts planned, proto, sign-in) — không bỏ màn nào; ca phá trên bản sao: thêm PermittedAction action=\"readCatalog\" vào trang inventory mà không khai → '--check' thoát 1 với dòng 'inventory: ma co readCatalog chua khai'; khai nut 'khongCo' cho today → 'today: nut khongCo khong co trong bang quyen'; đối chứng: cùng hai lệnh trên cây thật thoát 0; các ca cũ của tests/bo-nut-vai-man.test.ts (hàng 9e) vẫn xanh, không đổi lời"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.vai_man_nut
+    paths: [tools/coverage_matrix/buttons.py, design/vai-man-nut.md, design/screens.yaml, tests/vai-man-nut-sinh.test.ts]
+    expected: "exit 0; ca 'bang-du-muc': design/vai-man-nut.md có đúng một mục '## <id>' cho mỗi màn của sổ (8 hôm nay) cộng một mục '## khung' — đếm viết trước 9 mục; mỗi mục có bảng 3 cột 'Vai | Nút theo quyền | Nút không theo quyền' với 4 hàng vai; mục khung liệt ô tìm, đổi sàn, đăng xuất ở cột không theo quyền và saveView, editView, removeView ở cột theo quyền; ca 'du-kien': ô Đầu chủ của inventory chứa 'createListing (toàn sàn, dự kiến)'; ca phá: sửa tay một ô của tệp → '--check' thoát 1 'lệch bảng quyền: inventory'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.vai_man_e2e
+    paths: [tests/e2e-db/**, design/vai-man-nut.md, design/screens.yaml, src/modules/identity/ui/**, src/app/**]
+    expected: "exit 0; mỗi cặp được vào ở 1440 có bước '<màn> × <vai> @1440: nut' xanh (17 bước); mỗi dấu data-thao-tac đang hiện nằm trong ô của vai ấy ở bảng JSON của công cụ; bước 'members × CompanyAdmin @1440: nut' thấy đủ hai nút mo_san inviteMember và changeMemberRoles (đối chứng dương: dấu đọc được, không phải tập rỗng luôn xanh); ở cặp được vào không có nút nào, bước in 'khong nut theo quyen' thay vì im"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.vai_man_pha_thu
+    paths: [tests/e2e-db/**, src/app/(app)/members/**, src/modules/identity/ui/**, design/vai-man-nut.md]
+    expected: "exit 0; lệnh phá thử in thêm dòng 'pha doi-nut-moi: do — members × CompanyAdmin @1440: thieu nut inviteMember' và cùng lượt dòng có 'thay nut readCompany khong co trong o' (bản sao đổi action=\"inviteMember\" thành action=\"readCompany\" ở trang Thành viên, không sinh lại bảng); cây gốc cùng cặp xanh"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E16
+    criterion: AC-11
+    executor: test
+    cmd: config:executors.test.vai_man_nut
+    paths: [src/modules/identity/ui/**, tests/vai-man-dau-nut.test.tsx]
+    expected: "exit 0; ca 'dau-thao-tac' trong tests/vai-man-dau-nut.test.tsx: nút được phép nằm trong đúng một phần tử data-thao-tac=<thao tác> có display: contents (không chiếm chỗ, không đổi hình); nút bị cấm không để lại phần tử nào; các ca cũ của bộ nút theo quyền (hàng 9e, lệnh bo_nut_unit) không đổi lời"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
