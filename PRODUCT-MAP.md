@@ -6,8 +6,8 @@
 
 ```mermaid
 flowchart TD
-  A["Đang cân nhắc cơ hội<br/>4 việc"] --> GD{"Cổng Đáng"}
-  GD --> B["Sắp mở vòng<br/>12 việc"]
+  A["Đang cân nhắc cơ hội<br/>chưa có"] --> GD{"Cổng Đáng"}
+  GD --> B["Sắp mở vòng<br/>20 việc"]
   GD --> XL["Xếp lại sau<br/>chưa có"]
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
@@ -22,26 +22,27 @@ flowchart TD
 > đã đủ và đúng chưa · **Cổng Bằng chứng** đã làm đúng thứ đã hứa chưa ·
 > **Cổng Giá trị** thứ đã giao có ăn thua không.
 
-## Đang cân nhắc cơ hội
-
-- Đầu chủ và Đầu khách mở Bảng hàng trên điện thoại thấy danh sách thẻ căn và chạm thẻ để mở hồ sơ căn (`bang-hang-the-dien-thoai`)
-- Cổng chứng minh màn bắt được khối mới mà vòng dựng không kê ra trong hồ sơ (`cong-bat-khoi-khong-ke`)
-- Nhân viên sàn đăng nhập bằng mã email trên màn đăng nhập chọn từ ReUI Pro, luồng và luật an toàn giữ nguyên (`dang-nhap-chon-tu-reui`)
-- Quản trị sàn xem danh sách người và mời người trên màn Thành viên chọn từ kho và ReUI Pro, quyền và luật mời giữ nguyên (`thanh-vien-chon-tu-reui`)
-
 ## Sắp mở vòng
 
+- Đầu chủ và Đầu khách mở Bảng hàng trên điện thoại thấy danh sách thẻ căn và chạm thẻ để mở hồ sơ căn (`bang-hang-the-dien-thoai`)
 - Đầu chủ đi Bảng hàng theo địa lý: chọn dự án, phân khu, toà ở cột thứ hai của App Shell và lọc các cột địa lý trên bảng (`bang-hang-theo-dia-ly`)
+- Đầu chủ và Đầu khách lọc mọi bảng họ Lưới chỉ bằng cách gõ vào ô lọc dưới tiêu đề cột như ở Sheet; ô «Gõ để tìm» của vùng không còn trên màn nào của họ Lưới — Bảng hàng, Đã gửi, sau này Liên hệ; tìm thì dùng ô ⌘K ở thanh trên của App Shell (hàng 3f) (`bo-o-tim-cua-vung`)
 - CI chạy các bài trình duyệt có đăng nhập trên một Postgres riêng của lượt, để bộ kiểm chung đo được màn cần đăng nhập ngay trên CI (`ci-co-postgres`)
+- Cổng chứng minh màn bắt được khối mới mà vòng dựng không kê ra trong hồ sơ (`cong-bat-khoi-khong-ke`)
 - Đầu khách mở Đã gửi và thấy các link đã gửi trên cùng Lưới với Bảng hàng (`da-gui-tren-luoi`)
+- Nhân viên sàn đăng nhập bằng mã email trên màn đăng nhập chọn từ ReUI Pro, luồng và luật an toàn giữ nguyên (`dang-nhap-chon-tu-reui`)
 - Đầu chủ mở hồ sơ căn và đọc đủ thông tin của căn và của lần chào: tầng, hướng, loại hình, pháp lý, nội thất, tài chính, tình trạng sử dụng, các lần chào trước của căn, mức đủ thông tin và lần xác nhận với chủ nhà cách đây bao lâu (`ho-so-du-thong-tin`)
 - Đầu khách bấm «Hỏi đầu chủ» trên hồ sơ căn để mở bảng chia sẻ của máy với tin soạn sẵn cho người giữ căn, và bấm «Báo sai thông tin căn» để soạn tin nêu trường sai cùng giá trị đúng; người tự bấm gửi (`hoi-dau-chu-bao-sai`)
+- Mỗi màn được kiểm bằng từng vai ở bốn khổ màn hình, vai không được vào thấy đúng Không đủ quyền và không lộ dữ liệu (`kiem-vai-theo-man`)
 - Đầu chủ mở hồ sơ căn và thấy lịch sử của căn: tạo lần chào, đổi giá, đổi trạng thái, đổi thông tin, xác nhận với chủ nhà, mỗi việc kèm vai người làm và lúc làm (`lich-su-cua-can`)
 - Đầu chủ mở một căn ở trang riêng bằng nút «Mở toàn màn», chép đường dẫn gửi đồng nghiệp mở đúng căn và đúng lần chào, và gõ mã căn ở thanh trên để tới thẳng hồ sơ căn (`loi-vao-ho-so`)
 - Mỗi sàn có lớp riêng của mình trên lõi chuẩn — nhãn riêng, trường riêng, từ điển giá trị, căn chờ khớp và mẫu nhập — và Bảng hàng hiện trường riêng, đọc nhãn riêng của sàn (`lop-rieng-cua-san`)
 - Đầu chủ lưu cách xem Bảng hàng (lọc, sắp xếp, nhóm, cột đang hiện) thành một mục ở cột thứ hai của App Shell và mở lại đúng cách xem ấy (`luu-goc-nhin-cot-hai`)
 - Đầu chủ ghim ngăn chi tiết thành một cột cạnh bảng khi làm lâu trên một căn, bỏ ghim thì ngăn nổi lại (`ngan-chi-tiet-ghim-thanh-cot`)
 - Đầu chủ đổi giá và đổi trạng thái ngay trong hồ sơ căn trên điện thoại, theo cùng luật với sửa trên ô của Bảng hàng (`sua-nhanh-tren-dien-thoai`)
+- Đầu chủ sửa giá và trạng thái ngay trên ô, thấy lỗi ngay tại ô đó (`sua-tren-o`)
+- Quản trị sàn xem danh sách người và mời người trên màn Thành viên chọn từ kho và ReUI Pro, quyền và luật mời giữ nguyên (`thanh-vien-chon-tu-reui`)
+- Quản trị sàn đặt Thuế phí và thấy Bảng hàng tính theo mức đó (`thue-phi`)
 - Ứng dụng nối cơ sở dữ liệu bằng một vai đăng nhập không phải chủ bảng, chỉ là thành viên của vai API, để mã trong cửa có đổi vai cũng không về được vai chủ (`ung-dung-noi-bang-vai-khong-chu`)
 
 ## Đã giao — chờ phiên nghiệm thu
