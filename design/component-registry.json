@@ -1741,6 +1741,45 @@
       ]
     },
     {
+      "name": "Command",
+      "file": "src/components/ui/command.tsx",
+      "level": "organism",
+      "parts": [
+        {
+          "name": "Command"
+        },
+        {
+          "name": "CommandDialog",
+          "props": [
+            "title",
+            "description",
+            "showCloseButton"
+          ]
+        },
+        {
+          "name": "CommandEmpty"
+        },
+        {
+          "name": "CommandGroup"
+        },
+        {
+          "name": "CommandInput"
+        },
+        {
+          "name": "CommandItem"
+        },
+        {
+          "name": "CommandList"
+        },
+        {
+          "name": "CommandSeparator"
+        },
+        {
+          "name": "CommandShortcut"
+        }
+      ]
+    },
+    {
       "name": "Dialog",
       "file": "src/components/ui/dialog.tsx",
       "level": "molecule",
