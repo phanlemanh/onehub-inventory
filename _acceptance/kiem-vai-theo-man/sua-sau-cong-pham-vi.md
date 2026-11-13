@@ -25,3 +25,15 @@ Bốn điều kiện giám sát đặt, và chỗ giữ:
 
 Bài chấm bị ảnh hưởng: E14 (đọc sổ thay vì đọc thuộc tính), E16 (cây trang có và không có nút theo quyền giống hệt; sổ có cả
 hai chiều; bản dựng không cờ không ghi gì).
+
+## Chỗ tầng cao thứ ba — danh sách bài chờ của bộ kiểm chung
+
+Đúng một dòng thêm vào `tools/e2e_templates/settle.ts` (`CHO_TESTS`): đăng ký bài mới «thanh ben theo vai» của
+`tests/e2e-db/vai-man.spec.ts`. Không đổi luật nào của công cụ.
+
+Vì sao buộc phải có: bài thanh bên ở khổ 360 mở ngăn điều hướng bằng hàm chờ dùng chung; luật của bộ kiểm chung (hàng 1r)
+đòi mọi bài như vậy có tên trong danh sách để chạy lặp dưới máy chậm, thiếu thì `make check` đỏ. Chỗ này không nằm trong hai
+chỗ tầng cao chủ kho đã cho ở Cổng Phạm vi (công cụ sinh bảng, nút theo quyền); giám sát cho giữ trên nhánh để lượt chấm chạy,
+chủ kho phê ở Cổng Bằng chứng.
+
+Nếu chủ kho không cho: hoàn lại dòng ấy và bỏ phần thanh bên ở khổ 360 khỏi bài (AC-7 khi ấy chỉ đo ở 1440, ghi giới hạn).
