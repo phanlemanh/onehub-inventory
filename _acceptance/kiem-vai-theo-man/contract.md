@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
 screens: []
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-13
 design_doc: _acceptance/kiem-vai-theo-man/design.md
@@ -156,3 +156,14 @@ quyền 9a.
 - Bảng hiện ra một điều chủ kho nên thấy: Quản trị sàn không có ô nào trên Bảng hàng (không lưu cách xem, không thao tác căn
   nào), và `viewListings` không cho Quản trị sàn — khi hàng 10 đặt `vao: viewListings` cho Bảng hàng, Quản trị sàn sẽ bị chặn
   khỏi Bảng hàng nếu bảng quyền giữ nguyên.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-14:
+  - Ngoài-1: Dòng thêm vào bộ chờ chung của bài kiểm trình duyệt là chỗ chạm tầng cao, được chủ kho phê ở cổng này chứ không ở Cổng Phạm vi.
+  - Ngoài-2: Tài liệu thiết kế còn tả cách đánh dấu nút cũ; mã nay dùng sổ ghi nút trong bản dựng cho bộ kiểm.
+  - Ngoài-3: Chưa có chốt nào chặn bật nhầm cờ sổ ghi nút khi dựng bản chạy thật; bật nhầm thì trình duyệt lộ quyền nội bộ của người đăng nhập, không lộ dữ liệu khách.
+  - Ngoài-4: Phép đo rò rỉ người chứng vẫn có thể xanh khi nội dung trang không đọc được.
+  - Ngoài-5: Bản sao của lệnh phá thử giữ lại tệp đã xoá mà chưa commit.
+  - Ngoài-6: Luật phân hạng tự động xếp tệp nút theo quyền thấp hơn thực tế; chỉ chủ kho sửa được luật ấy.
+  - Ngoài-7: Bản sao của lệnh phá thử bỏ sót thay đổi đã đưa vào vùng chờ commit.
+  - Ngoài-9: Bài kiểm bảng nút chỉ kiểm tên nút có mặt, chưa kiểm nút nằm đúng ô vai × màn.
+  - Ngoài-10: Bài chặn viết tay danh sách màn chỉ dò năm màn cố định, màn thêm sau có thể lọt.
+  - Ngoài-11: Tập màn của phép kiểm thanh bên suy từ chữ trong tệp thanh bên; đổi cách viết đường dẫn thì một màn có thể rơi khỏi phép kiểm mà bài vẫn xanh.
