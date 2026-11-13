@@ -2,6 +2,7 @@
 // fields, column kinds and template signatures. Matrices are written before the code; each rule has a break case.
 import { describe, expect, it } from "vitest";
 
+import { label } from ".";
 import {
   FIELD_LIMIT,
   OPTION_LIMIT,
@@ -36,16 +37,18 @@ describe("a field draft (E2, AC-11)", () => {
   const existing = {
     liveFields: [{ name: "Ghi chú", code: "ghi_chu" }],
     labels: ["Block"],
-    standardHeaders: [
-      "Căn",
-      "Toà",
-      "Dự án",
-      "Trạng thái",
-      "Giá chào",
-      "Diện tích",
-      "Phòng ngủ",
-      "Xác nhận lúc",
-    ],
+    standardHeaders: (
+      [
+        "Unit",
+        "Building",
+        "Subdivision",
+        "StandardStatus",
+        "ListPrice",
+        "LivingArea",
+        "BedroomsTotal",
+        "LastConfirmedAt",
+      ] as const
+    ).map((c) => label(c)),
   };
   const ok = { name: "Hướng view", kind: "single_select" as const, options: ["Biển", "Hồ"] };
 
@@ -74,7 +77,7 @@ describe("a field draft (E2, AC-11)", () => {
   });
 
   it("refuses the four taken names written before the code", () => {
-    const TAKEN = ["ghi chu", "Block", "Giá chào", "TOÀ"];
+    const TAKEN = ["ghi chu", "Block", label("ListPrice"), label("Building").toUpperCase()];
     expect(TAKEN).toHaveLength(4);
     for (const name of TAKEN)
       expect(checkFieldDraft({ ...ok, name }, existing), name).toContain("name-taken");
