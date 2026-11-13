@@ -10,6 +10,7 @@ import { PageState } from "@/components/templates/page-state";
 import type { Role } from "@/generated/ontology";
 import { formatDate } from "@/lib/format";
 import { MEMBERS_BASE_PATH } from "@/modules/identity";
+import { PermittedAction } from "@/modules/identity/ui";
 
 import { MEMBERS_COPY as COPY } from "./copy";
 import { InviteDialog, RolesDialog } from "./member-dialogs";
@@ -72,13 +73,15 @@ export function MembersScreen({ labels }: { labels: MembersLabels }) {
     <PageHeader
       title={labels.title}
       action={
-        <InviteDialog
-          labels={labels}
-          onInvited={(name) => {
-            notifyResult({ message: COPY.invited(name) });
-            reload();
-          }}
-        />
+        <PermittedAction action="inviteMember">
+          <InviteDialog
+            labels={labels}
+            onInvited={(name) => {
+              notifyResult({ message: COPY.invited(name) });
+              reload();
+            }}
+          />
+        </PermittedAction>
       }
     />
   );
@@ -106,14 +109,16 @@ export function MembersScreen({ labels }: { labels: MembersLabels }) {
     );
 
   const changeRoles = (m: Member) => (
-    <RolesDialog
-      member={m}
-      labels={labels}
-      onSaved={() => {
-        notifyResult({ message: COPY.rolesChanged(m.name) });
-        reload();
-      }}
-    />
+    <PermittedAction action="changeMemberRoles">
+      <RolesDialog
+        member={m}
+        labels={labels}
+        onSaved={() => {
+          notifyResult({ message: COPY.rolesChanged(m.name) });
+          reload();
+        }}
+      />
+    </PermittedAction>
   );
 
   return (

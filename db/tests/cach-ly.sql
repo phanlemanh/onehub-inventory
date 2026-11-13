@@ -1,4 +1,4 @@
--- Company isolation suite (SP-1): 19 SQL cases (14 of row 7, 5 of row 7a), run by db/scripts/cach-ly.sh on a scratch database that has the
+-- Company isolation suite (SP-1): 20 SQL cases (14 of row 7, 5 of row 7a, 1 of row 7b), run by db/scripts/cach-ly.sh on a scratch database that has the
 -- migrations applied. Each case builds companies A and B as the table owner inside one transaction, switches to the
 -- API role with the door's own statements (src/modules/identity/with-company.ts), checks reads and writes, and
 -- rolls back. A passing case prints `ok <case>`; a failing one raises `HỎNG <case>: <table or reason>`.
@@ -84,7 +84,17 @@ insert into luat_thu_hep values
   ('company_catalog_aliases', 'company_catalog_aliases_insert_by_permission',
    '(app.allowed(''manageCompanyCodes''::text) = ''company''::text)'),
   ('company_catalog_aliases', 'company_catalog_aliases_update_by_permission',
-   '(app.allowed(''manageCompanyCodes''::text) = ''company''::text)');
+   '(app.allowed(''manageCompanyCodes''::text) = ''company''::text)'),
+  -- 009_goc_nhin.sql (hàng 2c): a saved view is touched only by the person who saved it, and only when the permission
+  -- table allows the action of that command.
+  ('saved_view', 'saved_view_own_read',
+   '(((user_id)::text = current_setting(''app.user_id''::text, true)) AND (app.allowed(''listSavedViews''::text) IS NOT NULL))'),
+  ('saved_view', 'saved_view_own_insert',
+   '(((user_id)::text = current_setting(''app.user_id''::text, true)) AND (app.allowed(''saveView''::text) IS NOT NULL))'),
+  ('saved_view', 'saved_view_own_update',
+   '(((user_id)::text = current_setting(''app.user_id''::text, true)) AND (app.allowed(''editView''::text) IS NOT NULL))'),
+  ('saved_view', 'saved_view_own_delete',
+   '(((user_id)::text = current_setting(''app.user_id''::text, true)) AND (app.allowed(''removeView''::text) IS NOT NULL))');
 
 create function pg_temp.dung_dang(bang name, luat name, lenh text, bieu_thuc text, cot text,
                                   kieu text default 'PERMISSIVE') returns boolean
@@ -587,4 +597,49 @@ begin
       k, (select count(*) from ham_cho_phep);
   end if;
   raise notice 'ok ham-dac-quyen-trong-danh-sach — % hàm', k;
+end $$;
+
+-- 20. Views do not write past row security (row 7b, hồ sơ cach-ly-dang-xem-chi-ghi): case 18 looks only at views the
+--     API role can read, but a plain view runs as its owner for INSERT, UPDATE and DELETE too, and those need no
+--     SELECT. Every view the role can insert into, update (any column) or delete from — granted directly, through
+--     PUBLIC or through a parent role — must be security_invoker. Materialized views cannot be written.
+create function pg_temp.dang_xem_ghi() returns table (ten text, quyen text, theo_nguoi_doc boolean) language sql as $f$
+  select q.ten, p.quyen,
+         exists (select from pg_class c, unnest(coalesce(c.reloptions, '{}')) o
+                 where c.oid = q.oid
+                   and lower(o) in ('security_invoker=true', 'security_invoker=on', 'security_invoker=1',
+                                    'security_invoker=yes'))
+  from pg_temp.quan_he_ngoai_he_thong() q
+  cross join unnest(array['INSERT', 'UPDATE', 'DELETE']) as p(quyen)
+  where q.loai = 'v'
+    and case p.quyen when 'DELETE' then has_table_privilege('quy_hang_app', q.oid, 'DELETE')
+                     else has_any_column_privilege('quy_hang_app', q.oid, p.quyen) end
+  order by 1, 2;
+$f$;
+do $$
+declare doi_chung int; doi_chung_bi_neu boolean; dem int; vuot text[];
+begin
+  -- Positive control in a subtransaction that is always undone: a security_invoker view with insert, update on one
+  -- column and delete granted to the API role is counted once and not named.
+  begin
+    create view public.agreements_doi_chung_ghi with (security_invoker = true) as select * from agreements;
+    grant insert, delete on public.agreements_doi_chung_ghi to quy_hang_app;
+    grant update (counterparty) on public.agreements_doi_chung_ghi to quy_hang_app;
+    select count(distinct ten), bool_or(not theo_nguoi_doc) into doi_chung, doi_chung_bi_neu
+    from pg_temp.dang_xem_ghi() where ten = 'public.agreements_doi_chung_ghi';
+    raise sqlstate 'U7B00';
+  exception when sqlstate 'U7B00' then null;
+  end;
+  if doi_chung <> 1 or doi_chung_bi_neu then
+    raise exception 'HỎNG dang-xem-ghi-khong-vuot-luat: đối chứng — dạng xem chạy theo người đọc được đếm % lần, bị nêu: %',
+      doi_chung, doi_chung_bi_neu;
+  end if;
+  select count(distinct ten), array_agg(ten || ' ' || quyen order by ten, quyen) filter (where not theo_nguoi_doc)
+    into dem, vuot
+  from pg_temp.dang_xem_ghi();
+  if vuot is not null then
+    raise exception 'HỎNG dang-xem-ghi-khong-vuot-luat: % — dạng xem vai ghi được mà không chạy theo quyền người đọc',
+      array_to_string(vuot, ', ');
+  end if;
+  raise notice 'ok dang-xem-ghi-khong-vuot-luat — % dạng xem, đối chứng %', dem, doi_chung;
 end $$;

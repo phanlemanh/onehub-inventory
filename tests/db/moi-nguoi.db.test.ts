@@ -87,7 +87,7 @@ async function seedPeople(owner: pg.Client): Promise<People> {
 async function world(suffix: string, breakFile?: string): Promise<World> {
   const db = await scratchDb(suffix, breakFile, { prefix: "moi_nguoi" });
   const p = await seedPeople(db.owner);
-  const pool = createPool(db.url) as World["pool"];
+  const pool = createPool(db.appUrl) as World["pool"];
   const code = captureSender();
   const invite = captureInviteSender();
   const deps: LoginDeps & MembersDeps = {
@@ -196,6 +196,24 @@ async function checkNonAdminCannotInvite(w: World): Promise<void> {
   );
   if (res.status !== 403 || (await memberCount(w)) !== before)
     throw new Error("ba-vai-khong-quan-tri: Đầu chủ mời được người");
+}
+
+/**
+ * Row 7b (Ngoài-1 of row 9a): the database itself refuses a ListAgent's invite. Since row 9a the API answers 403 before
+ * the database is asked, so the API check above cannot tell a database that checks the permission from one that does
+ * not; this one calls the function straight through the door under the API role, as LA in A.
+ */
+async function checkDbRefusesNonAdminInvite(w: World): Promise<void> {
+  const before = await memberCount(w);
+  const rows = await direct<{ status: string }>(
+    w,
+    w.p.id.LA,
+    w.p.A,
+    "select status from app.member_invite($1, $2, $3)",
+    ["moi@example.test", "[Tên] Mới", ["ListAgent"]],
+  );
+  if (rows[0]?.status !== "forbidden" || (await memberCount(w)) !== before)
+    throw new Error("ba-vai-khong-quan-tri: cơ sở dữ liệu cho Đầu chủ mời người");
 }
 
 async function checkOtherCompanyUntouched(w: World): Promise<void> {
@@ -494,7 +512,7 @@ describe("moi-nguoi (row 9) on a clean database", () => {
 
     // Two admins drop each other's admin role at the same time: exactly one wins, one admin is left.
     const v = await world("doi_vai_dong_thoi");
-    const raw = new pg.Pool({ connectionString: v.db.url, max: 2 });
+    const raw = new pg.Pool({ connectionString: v.db.appUrl, max: 2 });
     const open = async (user: string) => {
       const c = await raw.connect();
       await c.query("begin");
@@ -820,8 +838,8 @@ describe("break files", () => {
   const breaks: [string, string, (w: World) => Promise<void>][] = [
     [
       "moi-khong-kiem-quan-tri",
-      "ba-vai-khong-quan-tri: Đầu chủ mời được người",
-      checkNonAdminCannotInvite,
+      "ba-vai-khong-quan-tri: cơ sở dữ liệu cho Đầu chủ mời người",
+      checkDbRefusesNonAdminInvite,
     ],
     [
       "doi-vai-moi-san",

@@ -24,6 +24,11 @@ export const GRID_COPY = {
     why: "Chữ bạn gõ không có trong dòng nào của vùng này.",
     whyFiltered: "Không dòng nào của vùng này khớp cùng lúc ô tìm và các ô lọc đang bật.",
   },
+  /** The «…» of a row or a record (row 9e): its button's name, and the header of the grid's last column. */
+  rowActions: {
+    more: (title: string) => `Việc khác — ${title}`,
+    column: "Việc",
+  },
   /** Using the grid by hand like a sheet (row 2a): filter row, columns, grouping, selection. */
   sheet: {
     filter: "Lọc",

@@ -9,6 +9,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { ACTIONS, PERMISSION_EXEMPT, type ActionSpec, type Role } from "@/generated/ontology";
 import { sampleCatalog } from "@/modules/catalog";
 import { catalogLoadStatements } from "@/modules/catalog/load-sql";
+import type { DbClient } from "@/modules/identity/with-company";
 
 import {
   asPerson,
@@ -34,8 +35,8 @@ afterEach(async () => {
 const FOUR = ["LA", "BA", "TL", "CA"] as const;
 type Seen = "company" | "own" | null;
 // Written before the code (evals.yaml): 10 database doors × 4 roles, plus row 7d's 8 doors × 4 roles (five catalog
-// tables read; company codes read, add, change) — 40 + 32.
-const DB_CELLS = 72;
+// tables read; company codes read, add, change) — 40 + 32; plus row 2c's 4 saved-view doors × 4 roles — 16.
+const DB_CELLS = 88;
 // Written before the code (evals.yaml): the exempt database doors.
 const EXEMPT_DB = [
   "function app.current_company_id()",
@@ -86,6 +87,60 @@ const readShared = (w: World, who: Person, table: string) =>
       }
     }),
   );
+
+// Row 2c: one saved view per person of A (X too) and one of Y in B, loaded once per world by the owner.
+const views = new WeakMap<World, Promise<Record<string, string>>>();
+function viewFixture(w: World): Promise<Record<string, string>> {
+  let p = views.get(w);
+  if (!p) {
+    p = (async () => {
+      const ids: Record<string, string> = {};
+      for (const [who, company] of [
+        ["LA", w.A],
+        ["BA", w.A],
+        ["TL", w.A],
+        ["CA", w.A],
+        ["X", w.A],
+        ["Y", w.B],
+      ] as const) {
+        const { rows } = await w.db.owner.query<{ id: string }>(
+          `insert into saved_view (company_id, user_id, screen, name, view)
+           values ($1, $2, 'inventory', 'Của ' || $3, '{"filters":{},"sort":[],"grouped":false,"hidden":[]}')
+           returning id`,
+          [company, w.id[who], who],
+        );
+        ids[who] = rows[0]!.id;
+      }
+      return ids;
+    })();
+    views.set(w, p);
+  }
+  return p;
+}
+
+/** Someone else of A than `who`, whose saved view `who` must not touch. */
+const otherOf = (who: Person): Person => (who === "LA" ? "BA" : "LA");
+
+/** A saved-view write: own when one's own row goes through and another's does not, company when both do. */
+async function viewWrite(
+  w: World,
+  who: Person,
+  write: (c: DbClient, ownerId: string, viewId: string) => Promise<number>,
+): Promise<Seen> {
+  const ids = await viewFixture(w);
+  const tryOne = (target: Person) =>
+    asPerson(w, who, w.A, async (c) => {
+      try {
+        return await write(c, w.id[target], ids[target]!);
+      } catch (err) {
+        if (code(err) === "42501") return 0;
+        throw err;
+      }
+    });
+  const own = await tryOne(who);
+  const other = await tryOne(otherOf(who));
+  return (own === 1 ? (other === 1 ? "company" : "own") : other === 1 ? "?" : null) as Seen;
+}
 
 /** What one person gets at one database door, read the way the door works. */
 async function observe(w: World, who: Person, door: string): Promise<Seen> {
@@ -211,6 +266,46 @@ async function observe(w: World, who: Person, door: string): Promise<Seen> {
         return (r.rowCount === 1 ? "company" : r.rowCount === 0 ? null : "?") as Seen;
       });
     }
+    // Row 2c: the saved view table; each person keeps to their own views.
+    case "table saved_view select": {
+      await viewFixture(w);
+      return asPerson(w, who, A, async (c) => {
+        const { rows } = await c.query("select user_id, company_id from saved_view");
+        const r = rows as { user_id: string; company_id: string }[];
+        if (r.some((x) => x.company_id !== A)) return "?" as Seen;
+        if (r.length === 5) return "company" as Seen;
+        if (r.length === 1 && r[0]!.user_id === w.id[who]) return "own" as Seen;
+        return (r.length === 0 ? null : `?${r.length}`) as Seen;
+      });
+    }
+    case "table saved_view insert":
+      return viewWrite(
+        w,
+        who,
+        async (c, ownerId) =>
+          (
+            await c.query(
+              `insert into saved_view (company_id, user_id, screen, name, view)
+             values ($1, $2, 'inventory', 'Mới', '{"filters":{},"sort":[],"grouped":false,"hidden":[]}')`,
+              [A, ownerId],
+            )
+          ).rowCount ?? 0,
+      );
+    case "table saved_view update":
+      return viewWrite(
+        w,
+        who,
+        async (c, _ownerId, viewId) =>
+          (await c.query("update saved_view set name = 'Đổi' where id = $1", [viewId])).rowCount ??
+          0,
+      );
+    case "table saved_view delete":
+      return viewWrite(
+        w,
+        who,
+        async (c, _ownerId, viewId) =>
+          (await c.query("delete from saved_view where id = $1", [viewId])).rowCount ?? 0,
+      );
     default:
       throw new Error(`csdl-theo-bang: không biết đo cửa ${door}`);
   }

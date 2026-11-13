@@ -14,6 +14,12 @@ export const LABELS = {
   UnitFloorLocation: {"pref": "Tầng"},
   CatalogAlias: {"pref": "Mã gốc"},
   CompanyCatalogAlias: {"pref": "Mã riêng"},
+  SavedView: {"pref": "Góc nhìn"},
+  SaveView: {"pref": "Lưu góc nhìn"},
+  SaveViewChanges: {"pref": "Lưu thay đổi"},
+  SaveAsNewView: {"pref": "Lưu thành mới"},
+  RenameView: {"pref": "Đổi tên"},
+  RemoveView: {"pref": "Xoá góc nhìn"},
   ListSide: {"pref": "Phía chủ"},
   BuyerSide: {"pref": "Phía khách"},
   ListAgent: {"pref": "Đầu chủ"},
@@ -51,6 +57,13 @@ export const LABELS = {
   ChangeRoles: {"pref": "Đổi vai"},
   Action: {"pref": "Thao tác"},
   Scope: {"pref": "Phạm vi"},
+  Edit: {"pref": "Sửa"},
+  CreateListing: {"pref": "Thêm căn"},
+  RemoveListing: {"pref": "Xoá căn"},
+  CreateContact: {"pref": "Thêm liên hệ"},
+  RemoveContact: {"pref": "Xoá liên hệ"},
+  MergeContacts: {"pref": "Gộp liên hệ"},
+  EraseContactPersonalData: {"pref": "Xoá tên và số"},
 } as const;
 
 export type ConceptCode = keyof typeof LABELS;

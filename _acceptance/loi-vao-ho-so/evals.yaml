@@ -1,0 +1,90 @@
+schema_version: 1
+feature_slug: loi-vao-ho-so
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/ui/**, src/components/candidate/record-panel.tsx, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts]
+    expected: "exit 0; tests/e2e/loi-vao-ho-so.spec.ts ở 1440, 1024, 414, 360 mở /inventory, bấm mã căn thứ năm: trong đầu hồ sơ có nút tên đọc được 'Chép đường dẫn' và nó đứng trước nút 'Trước' theo thứ tự tài liệu; ở 414 và 360 nút chỉ hiện biểu tượng và cả bốn nút có hộp bao nằm trọn trong khung nhìn (ca đối chứng ép chữ của nút hiện ra ở 360 cho 'record head buttons fall off the phone'); data-slot listing-record vẫn có thẻ căn và tám trường như hàng 3; ca đối chứng gỡ nút khỏi đầu hồ sơ bằng thẻ style display none cho 'copy link missing from the record head'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts]
+    expected: "exit 0; ở 1440 với quyền clipboard-read và clipboard-write: mở hồ sơ căn thứ năm, bấm 'Chép đường dẫn' thì navigator.clipboard.readText() bằng new URL('/inventory?ho-so=' + <id của dòng thứ năm>, gốc trang).toString() (id so lại từ data-record-id, không chép số) và có báo 'Đã chép đường dẫn'; ca chặn: thay navigator.clipboard.writeText bằng hàm ném lỗi (addInitScript) rồi bấm thì có báo 'Chưa chép được. Bạn chép đường dẫn trong ô địa chỉ của trình duyệt.' và không có 'Đã chép đường dẫn'; ca đối chứng chép địa chỉ không kèm ho-so cho 'copied link lost the listing'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/ui/**, src/components/candidate/record-panel.tsx, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts]
+    expected: "exit 0; chép đường dẫn ở một ngữ cảnh trình duyệt rồi mở nó ở một browser.newContext() mới: hồ sơ hiện với data-record-id bằng id đã chép và tên hồ sơ chứa mã căn của dòng ấy; ca đối chứng mở hồ sơ theo chỉ số dòng thay vì id cho 'link opened the wrong listing'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/ui/**, src/components/candidate/record-panel.tsx, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts]
+    expected: "exit 0; mở /inventory?ho-so=khong-co thì không có data-slot record-panel, Bảng hàng đủ 60 dòng và có báo 'Căn trong đường dẫn không còn trong Bảng hàng.'; ca đối chứng dương: mở /inventory?ho-so=<id của dòng thứ năm> thì hồ sơ hiện và KHÔNG có báo ấy; mở /inventory không ho-so thì không có báo; ca đối chứng bỏ báo cho 'stale link opened silently'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/ui/**, src/components/templates/app-shell.tsx, "src/app/(app)/layout.tsx", "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts, tests/loi-vao-ho-so.test.tsx]
+    expected: "exit 0; ở 1440 và 360, trên /inventory và trên / : bấm ô tên 'Gõ mã căn' trên thanh trên thì ô mở, tiêu điểm ở chỗ gõ; gõ hai ký tự đầu của mã dòng thứ năm thì có gợi ý mang mã ấy và nhãn loại 'Căn'; gõ trọn mã kèm khoảng trắng hai đầu (khác hoa thường nếu mã có chữ) rồi Enter thì đang ở /inventory, ô lọc đầu cột Căn mang đúng mã ấy và nhìn thấy được, và hồ sơ hiện với data-record-id bằng id của dòng thứ năm; chọn gợi ý bằng chuột cho cùng kết quả; Ctrl+K và Meta+K mở ô; '/' mở ô khi tiêu điểm ở thân trang và KHÔNG mở khi tiêu điểm ở một ô lọc đầu cột (chữ '/' vào ô ấy); Enter khi ô rỗng thì vẫn ở trang cũ và ô còn mở; Esc đóng ô và tiêu điểm về chỗ mở; nếu Hỏi-2 chọn nhận cả toà và dự án: gõ tên toà của dòng thứ năm cho gợi ý nhãn 'Toà', chọn thì ô lọc đầu cột Toà mang tên ấy và không hồ sơ nào bật; ca đối chứng nuốt Enter cho 'jump did not navigate', ca đối chứng mở ô khi gõ '/' trong ô nhập cho 'slash stolen from a text field', ca đối chứng điền mã vào ô khác ô cột Căn cho 'code not in the unit column filter'; trong tests/loi-vao-ho-so.test.tsx, khe ô ⌘K trên thanh trên rỗng khi danh sách vai không mở Bảng hàng và có ô khi mở, ca đối chứng luôn hiện ô cho 'jump shown without inventory'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/loi-vao-ho-so.test.tsx, tests/e2e/loi-vao-ho-so.spec.ts]
+    expected: "exit 0; trong tests/loi-vao-ho-so.test.tsx, trên ma trận dòng dựng tay viết trước trong tệp (mã A ở toà T1, T2, T3; mã B chỉ ở T1; mã C ở T1 và T2 viết 'c-1' và 'C-1'): phép tìm mã A cho 'nhieu' với đúng ba dòng theo thứ tự xuất hiện, mã B cho 'mot' với id của dòng ấy, ' c-1 ' cho 'nhieu' hai dòng, 'Z' cho 'khong', 'A-' (tiền tố) cho 'khong'; cách mở Bảng hàng dựng từ kết quả: 'mot' cho lọc cột Căn bằng mã và hồ sơ là id dòng ấy, 'nhieu' cho lọc cột Căn bằng mã và KHÔNG hồ sơ, 'khong' cho lọc cột Căn bằng chữ đã gõ và KHÔNG hồ sơ; trong tests/e2e/loi-vao-ho-so.spec.ts mở /inventory?ma=0601 (mã mẫu ở ba toà) thì đúng ba dòng, ba toà khác nhau, không có data-slot record-panel; ca đối chứng bỏ dòng trùng cuối cho 'building missing from choice', ca đối chứng mở hồ sơ dòng đầu khi nhiều toà cho 'many buildings opened the first', ca đối chứng khớp theo tiền tố mã cho 'partial code matched a unit'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/ui/**, src/components/candidate/data-region.tsx, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts]
+    expected: "exit 0; gõ 'Z-99.99' trong ô ⌘K rồi Enter thì đang ở /inventory, vùng Bảng hàng ở trạng thái không dòng nào khớp sẵn có (cùng data-slot và chữ tiêu đề như khi lọc cột bằng chữ lạ) có nút 'Xoá lọc', ở 1440 và 360 ô lọc đầu cột Căn mang 'Z-99.99' và nhìn thấy được, và không có data-slot record-panel; bấm 'Xoá lọc' thì đủ 60 dòng; ca đối chứng mở hồ sơ dòng đầu khi không khớp cho 'unknown code opened a record'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/ui/**, src/components/templates/**, "src/app/(app)/inventory/**", tests/e2e/loi-vao-ho-so.spec.ts]
+    expected: "exit 0; ở 1440, 1024, 414, 360, sáng và tối: Bảng hàng với hồ sơ đang mở (có 'Chép đường dẫn'), Bảng hàng sau khi gõ mã lạ, và ô ⌘K đang mở có gợi ý có document.documentElement.scrollWidth bằng clientWidth; quét axe không có lỗi impact serious hay critical; ca đối chứng ép đầu hồ sơ rộng 900 px cho 'record head scrolls sideways', ca đối chứng chèn chữ xám nhạt trên nền trắng cho lỗi axe color-contrast"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-8
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/modules/listings/ui/**, src/components/templates/**, "src/app/(app)/inventory/**"]
+    steps:
+      - "Use the dev server at the URL given (lane R, port 3491); if it does not answer, start it from the repo root with npx next dev -p 3491 -H 127.0.0.1 (never port 3470, never while a suite command is running), note its PID and stop only that PID when done"
+      - "Before every screenshot, hide the Next.js dev indicator, which only the dev server draws: run document.querySelectorAll('nextjs-portal').forEach(e => e.style.display = 'none') in the page; hide nothing else"
+      - "At 1440x900, light: open {url}/inventory, click the fifth unit code → screenshot evidence/ho-so-1440-sang.png"
+      - "Same at 1440x900 dark, 1024x768 light and dark, 414x896 light and dark, 360x780 light and dark → evidence/ho-so-<width>-<sang|toi>.png"
+      - "At 1440x900 light and 360x780 dark: click «Chép đường dẫn» (grant clipboard permission) → evidence/da-chep-<width>.png"
+      - "At 1440x900 and 360x780, light and dark: on {url}/inventory press Control+K and type the first two characters of the fifth unit code → evidence/go-ma-<width>-<sang|toi>.png; clear, type Z-99.99 and Enter → evidence/ma-la-<width>-<sang|toi>.png"
+      - "At 1440x900 light: open {url}/inventory?ho-so=khong-co → evidence/duong-dan-cu-1440.png"
+    expected: "Nút «Chép đường dẫn» thấy rõ ở đầu hồ sơ, không đẩy «Trước», «Sau», «Đóng» xuống dòng ở 1024 và 360; báo «Đã chép đường dẫn» thấy rõ; ô ⌘K có chỗ gõ và gợi ý thấy rõ, mỗi gợi ý ghi rõ loại, không bị mép màn che ở 360; mã lạ cho trạng thái không dòng nào khớp quen thuộc của Bảng hàng, mã thấy ở đầu cột Căn; đường dẫn cũ cho Bảng hàng bình thường kèm báo; không chữ đè nhau, không cuộn ngang, chữ đọc được ở cả sáng và tối"
+    evidence_required: [run_id, screenshot, observed]
+
+  - id: E10
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi (Bảng hàng vẫn dựng trong DataRegion, ô ⌘K nằm ở thanh trên của App Shell, không dựng lưới ngoài khuôn)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

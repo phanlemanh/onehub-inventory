@@ -153,6 +153,23 @@ export interface Member {
   invitedAt?: string;
 }
 
+export type SavedViewScreen = "inventory";
+
+/** A way of looking at one grid screen that one person saved under a name — the search text, the filter of each column, the sort, whether rows are grouped, and the hidden columns — shown as an item of the App Shell's second column and opened again exactly as saved. Belongs to the person who saved it, inside one company. */
+export interface SavedView {
+  id: string;
+  /** id of Company */
+  companyId: string;
+  userId: string;
+  screen: SavedViewScreen;
+  name: string;
+  view: string;
+  /** ISO datetime */
+  createdAt: string;
+  /** ISO datetime */
+  updatedAt: string;
+}
+
 /** A stack (trục) of one tower; a local extension, as in onehub-invest; shared catalog, no companyId. */
 export interface Stack {
   stackKey: string;
@@ -241,6 +258,18 @@ export interface ReadCompanyCodesInput {
 export interface ManageCompanyCodesInput {
 }
 
+export interface ListSavedViewsInput {
+}
+
+export interface SaveViewInput {
+}
+
+export interface EditViewInput {
+}
+
+export interface RemoveViewInput {
+}
+
 export interface ViewListingsInput {
 }
 
@@ -254,6 +283,27 @@ export interface ActivateListingInput {
 }
 
 export interface ViewOwnerPhoneInput {
+}
+
+export interface RemoveListingInput {
+}
+
+export interface ViewContactsInput {
+}
+
+export interface CreateContactInput {
+}
+
+export interface UpdateContactInput {
+}
+
+export interface RemoveContactInput {
+}
+
+export interface MergeContactsInput {
+}
+
+export interface EraseContactPersonalDataInput {
 }
 
 /** Implement these in src/actions/ — one function per ontology action. */
@@ -278,6 +328,14 @@ export interface ActionHandlers {
   readCompanyCodes(input: ReadCompanyCodesInput, ctx: ActionContext): Promise<void>;
   /** Add or change a code or name the company uses for a catalog tower or unit. */
   manageCompanyCodes(input: ManageCompanyCodesInput, ctx: ActionContext): Promise<void>;
+  /** List one's own saved views of a grid screen, for the App Shell's second column. */
+  listSavedViews(input: ListSavedViewsInput, ctx: ActionContext): Promise<void>;
+  /** Save the current way of looking at a grid screen as a new view, under a name. */
+  saveView(input: SaveViewInput, ctx: ActionContext): Promise<void>;
+  /** Rename one's own saved view, or overwrite it with the current way of looking. */
+  editView(input: EditViewInput, ctx: ActionContext): Promise<void>;
+  /** Remove one's own saved view. */
+  removeView(input: RemoveViewInput, ctx: ActionContext): Promise<void>;
   /** See the listings of the company. */
   viewListings(input: ViewListingsInput, ctx: ActionContext): Promise<void>;
   /** Add a listing. */
@@ -288,6 +346,20 @@ export interface ActionHandlers {
   activateListing(input: ActivateListingInput, ctx: ActionContext): Promise<void>;
   /** See the phone number of a listing's owner (own scope is the unit one keeps). */
   viewOwnerPhone(input: ViewOwnerPhoneInput, ctx: ActionContext): Promise<void>;
+  /** Remove a listing from the list; who removed it and when is kept (own scope is the unit one keeps). */
+  removeListing(input: RemoveListingInput, ctx: ActionContext): Promise<void>;
+  /** See the contacts of the company. */
+  viewContacts(input: ViewContactsInput, ctx: ActionContext): Promise<void>;
+  /** Add a contact. */
+  createContact(input: CreateContactInput, ctx: ActionContext): Promise<void>;
+  /** Change a contact's details (own scope is a contact one created). */
+  updateContact(input: UpdateContactInput, ctx: ActionContext): Promise<void>;
+  /** Remove a contact from the list; who removed it and when is kept (own scope is a contact one created). */
+  removeContact(input: RemoveContactInput, ctx: ActionContext): Promise<void>;
+  /** Merge two records of the same contact into one. */
+  mergeContacts(input: MergeContactsInput, ctx: ActionContext): Promise<void>;
+  /** Erase a contact's name and phone number at that person's request; the rest of the history is kept. */
+  eraseContactPersonalData(input: EraseContactPersonalDataInput, ctx: ActionContext): Promise<void>;
 }
 
 export interface ActionSpec {
@@ -573,6 +645,110 @@ export const ACTIONS: readonly ActionSpec[] = [
     },
   },
   {
+    name: "listSavedViews",
+    description: "List one's own saved views of a grid screen, for the App Shell's second column.",
+    entity: "SavedView",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "own",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["GET /api/v1/saved-views"],
+      db: ["table saved_view select"],
+    },
+  },
+  {
+    name: "saveView",
+    description: "Save the current way of looking at a grid screen as a new view, under a name.",
+    entity: "SavedView",
+    kind: "create",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "own",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["POST /api/v1/saved-views"],
+      db: ["table saved_view insert"],
+    },
+  },
+  {
+    name: "editView",
+    description: "Rename one's own saved view, or overwrite it with the current way of looking.",
+    entity: "SavedView",
+    kind: "update",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "own",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["PATCH /api/v1/saved-views/[id]"],
+      db: ["table saved_view update"],
+    },
+  },
+  {
+    name: "removeView",
+    description: "Remove one's own saved view.",
+    entity: "SavedView",
+    kind: "delete",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "own",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["DELETE /api/v1/saved-views/[id]"],
+      db: ["table saved_view delete"],
+    },
+  },
+  {
     name: "viewListings",
     description: "See the listings of the company.",
     entity: "Listing",
@@ -691,6 +867,183 @@ export const ACTIONS: readonly ActionSpec[] = [
     },
     scope: {
       ListAgent: "own",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "removeListing",
+    description: "Remove a listing from the list; who removed it and when is kept (own scope is the unit one keeps).",
+    entity: "Listing",
+    kind: "delete",
+    roles: ["ListAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "viewContacts",
+    description: "See the contacts of the company.",
+    entity: "Contact",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "createContact",
+    description: "Add a contact.",
+    entity: "Contact",
+    kind: "create",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "updateContact",
+    description: "Change a contact's details (own scope is a contact one created).",
+    entity: "Contact",
+    kind: "update",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "removeContact",
+    description: "Remove a contact from the list; who removed it and when is kept (own scope is a contact one created).",
+    entity: "Contact",
+    kind: "delete",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "mergeContacts",
+    description: "Merge two records of the same contact into one.",
+    entity: "Contact",
+    kind: "command",
+    roles: ["TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      TeamLead: "company",
+    },
+    status: "planned",
+    states: [],
+    doors: {
+      api: [],
+      db: [],
+    },
+  },
+  {
+    name: "eraseContactPersonalData",
+    description: "Erase a contact's name and phone number at that person's request; the rest of the history is kept.",
+    entity: "Contact",
+    kind: "command",
+    roles: ["TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
       TeamLead: "company",
     },
     status: "planned",

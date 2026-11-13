@@ -2,6 +2,19 @@
   "version": 2,
   "components": [
     {
+      "name": "ActionPermissionProvider",
+      "file": "src/components/candidate/action-permission.tsx",
+      "level": "atom",
+      "parts": [
+        {
+          "name": "ActionPermissionProvider",
+          "props": [
+            "permitted"
+          ]
+        }
+      ]
+    },
+    {
       "name": "ColumnFilterCell",
       "file": "src/components/candidate/column-filter-cell.tsx",
       "level": "organism",
@@ -33,10 +46,14 @@
             "emptyWhy",
             "emptyAction",
             "action",
+            "headAction",
+            "rowActions",
             "record",
             "editable",
             "initialFilters",
-            "groupBy"
+            "groupBy",
+            "initialView",
+            "onViewChange"
           ]
         },
         {
@@ -44,6 +61,9 @@
         },
         {
           "name": "GRID_COPY"
+        },
+        {
+          "name": "ROW_ACTIONS_ID"
         },
         {
           "name": "ROW_NUMBER_ID"
@@ -68,6 +88,7 @@
             "onOpenChange",
             "onSubmit",
             "formError",
+            "refused",
             "slot"
           ]
         }
@@ -170,6 +191,32 @@
           "name": "RegionPartialEmpty",
           "props": [
             "onRetry"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RowActions",
+      "file": "src/components/candidate/row-actions.tsx",
+      "level": "organism",
+      "parts": [
+        {
+          "name": "RecordActions",
+          "props": [
+            "main",
+            "actions",
+            "mine",
+            "title"
+          ]
+        },
+        {
+          "name": "RowActions",
+          "props": [
+            "actions",
+            "mine",
+            "title",
+            "run",
+            "inGrid"
           ]
         }
       ]
@@ -1464,6 +1511,7 @@
             "roles",
             "company",
             "account",
+            "search",
             "columnOpen"
           ]
         },
@@ -1478,6 +1526,16 @@
         },
         {
           "name": "NavSection"
+        }
+      ]
+    },
+    {
+      "name": "PlaceChangeProvider",
+      "file": "src/components/templates/app-shell/place-change.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "PlaceChangeProvider"
         }
       ]
     },
@@ -1509,11 +1567,20 @@
       "level": "template",
       "parts": [
         {
+          "name": "NavItem"
+        },
+        {
+          "name": "NavLink"
+        },
+        {
           "name": "NavMenu",
           "props": [
             "items",
             "roles"
           ]
+        },
+        {
+          "name": "NavSection"
         }
       ]
     },
@@ -1671,6 +1738,45 @@
       "parts": [
         {
           "name": "Checkbox"
+        }
+      ]
+    },
+    {
+      "name": "Command",
+      "file": "src/components/ui/command.tsx",
+      "level": "organism",
+      "parts": [
+        {
+          "name": "Command"
+        },
+        {
+          "name": "CommandDialog",
+          "props": [
+            "title",
+            "description",
+            "showCloseButton"
+          ]
+        },
+        {
+          "name": "CommandEmpty"
+        },
+        {
+          "name": "CommandGroup"
+        },
+        {
+          "name": "CommandInput"
+        },
+        {
+          "name": "CommandItem"
+        },
+        {
+          "name": "CommandList"
+        },
+        {
+          "name": "CommandSeparator"
+        },
+        {
+          "name": "CommandShortcut"
         }
       ]
     },

@@ -33,3 +33,29 @@ export function allowedScope(
   }
   return best;
 }
+
+/** What a button of an action does for the viewer: shown, or not rendered at all. */
+export type Visibility = "show" | "hide";
+
+/**
+ * An action of own scope on someone else's record (rule `LUAT_KHAC` of row 9e's evals). The owner chose O1 at the
+ * scope gate: hidden. Changing it to a disabled button with a reason is this one line plus that third visibility.
+ */
+export const OTHERS_RECORD: Visibility = "hide";
+
+/**
+ * Whether the button of an action shows (row 9e): the screens and the server read the same rule. Company scope shows
+ * it; own scope shows it on the viewer's own record (`mine`, true for actions that are not about one record) and
+ * follows `OTHERS_RECORD` on someone else's; no cell hides it.
+ */
+export function actionVisibility(
+  roles: readonly Role[],
+  action: ActionName,
+  mine = true,
+  table: readonly ActionSpec[] = ACTIONS,
+): Visibility {
+  const scope = allowedScope(roles, action, table);
+  if (scope === "company") return "show";
+  if (scope === "own") return mine ? "show" : OTHERS_RECORD;
+  return "hide";
+}

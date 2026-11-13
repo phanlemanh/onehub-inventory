@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useSyncExternalStore } from "react";
 
+import { useActionPermission } from "@/components/candidate/action-permission";
+import { Badge } from "@/components/reui/badge";
 import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
@@ -19,7 +21,8 @@ import { cn } from "@/lib/utils";
 
 import { FRAME_COPY } from "../frame-copy";
 import { COLUMN_COOKIE, COLUMN_COOKIE_MAX_AGE, columnOpenFromCookie } from "./column-cookie";
-import { currentEntry, isCurrent, type NavItem } from "../nav-menu";
+import { currentEntry, isCurrent, type NavItem, type NavLink } from "../nav-menu";
+import { usePlaceChange } from "./place-change";
 
 const COPY = FRAME_COPY.secondColumn;
 
@@ -45,6 +48,28 @@ export function useColumnOpen(initial = true): [boolean, (open: boolean) => void
   return [open, setOpen];
 }
 
+/**
+ * The entry of the open place: among the links of the screen's path whose every query parameter the address carries,
+ * the one carrying the most (a status shortcut or a saved view over «Tất cả», whatever else the address holds, such as
+ * an open record); the first link of the screen when none fits. One entry, never two.
+ */
+export function openLinkIndex(links: readonly NavLink[], pathname: string, search: string): number {
+  const here = new URLSearchParams(search);
+  let best = -1;
+  let bestCount = -1;
+  links.forEach((link, i) => {
+    const url = new URL(link.href, "http://x");
+    if (url.pathname !== pathname) return;
+    const wanted = [...url.searchParams.entries()];
+    if (!wanted.every(([k, v]) => here.getAll(k).includes(v))) return;
+    if (wanted.length > bestCount) {
+      best = i;
+      bestCount = wanted.length;
+    }
+  });
+  return best >= 0 ? best : links.findIndex((l) => isCurrent(pathname, l.href));
+}
+
 /** The places inside the open screen, or a sentence when it has none. */
 export function SecondColumnNav({
   items,
@@ -56,7 +81,9 @@ export function SecondColumnNav({
   const pathname = usePathname();
   const search = useSearchParams().toString();
   const { isMobile, setOpenMobile } = useSidebar();
-  const entry = currentEntry(items, roles, pathname);
+  const permitted = useActionPermission();
+  const place = usePlaceChange();
+  const entry = currentEntry(items, roles, pathname, permitted);
   if (!entry) return null;
   const sections = entry.sections ?? [];
   if (sections.length === 0) {
@@ -69,12 +96,8 @@ export function SecondColumnNav({
       </nav>
     );
   }
-  // The first link that matches the address exactly (with its query, so a status shortcut lights up) is the open
-  // place; otherwise the first link of the screen.
   const links = sections.flatMap((s) => s.items);
-  const here = search ? `${pathname}?${search}` : pathname;
-  const exact = links.findIndex((l) => l.href === here);
-  const openIndex = exact >= 0 ? exact : links.findIndex((l) => isCurrent(pathname, l.href));
+  const openIndex = openLinkIndex(links, pathname, search);
   const offsets = sections.map((_, i) =>
     sections.slice(0, i).reduce((sum, s) => sum + s.items.length, 0),
   );
@@ -84,25 +107,62 @@ export function SecondColumnNav({
         <SidebarGroup key={section.title ?? i}>
           <SidebarGroupLabel>{section.title ?? entry.title}</SidebarGroupLabel>
           <SidebarGroupContent>
+            {section.items.length === 0 && section.empty ? (
+              <p data-slot="second-column-empty" className="px-2 text-xs text-muted-foreground">
+                {section.empty}
+              </p>
+            ) : null}
             <SidebarMenuSub>
               {section.items.map((link, j) => {
                 const active = offsets[i]! + j === openIndex;
+                const changed = place.changed?.href === link.href ? place.changed.mark : null;
+                const button = (
+                  <SidebarMenuSubButton
+                    isActive={active}
+                    render={
+                      <Link
+                        href={link.href}
+                        aria-current={active ? "true" : undefined}
+                        title={link.trailing ? link.title : undefined}
+                        onClick={() => {
+                          // Pressing the open entry again opens its place afresh, unsaved changes dropped (row 2c).
+                          if (active) place.reopen();
+                          if (isMobile) setOpenMobile(false);
+                        }}
+                      />
+                    }
+                  >
+                    <span className="truncate">{link.title}</span>
+                    {changed ? (
+                      <Badge
+                        data-slot="place-changed"
+                        variant="warning-light"
+                        className="ml-auto shrink-0"
+                      >
+                        {changed}
+                      </Badge>
+                    ) : null}
+                  </SidebarMenuSubButton>
+                );
                 return (
                   <SidebarMenuSubItem key={`${link.href}-${link.title}`}>
-                    <SidebarMenuSubButton
-                      isActive={active}
-                      render={
-                        <Link
-                          href={link.href}
-                          aria-current={active ? "true" : undefined}
-                          onClick={() => {
-                            if (isMobile) setOpenMobile(false);
-                          }}
-                        />
-                      }
-                    >
-                      <span>{link.title}</span>
-                    </SidebarMenuSubButton>
+                    {link.trailing ? (
+                      // The «…» stands beside the entry, shown on hover, keyboard focus, touch and the open entry.
+                      <div className="group/place flex min-w-0 items-center gap-0.5">
+                        <div className="min-w-0 flex-1">{button}</div>
+                        <div
+                          data-slot="second-column-trailing"
+                          className={cn(
+                            "shrink-0 opacity-0 group-focus-within/place:opacity-100 group-hover/place:opacity-100 pointer-coarse:opacity-100 has-[[aria-expanded=true]]:opacity-100",
+                            active && "opacity-100",
+                          )}
+                        >
+                          {link.trailing}
+                        </div>
+                      </div>
+                    ) : (
+                      button
+                    )}
                   </SidebarMenuSubItem>
                 );
               })}

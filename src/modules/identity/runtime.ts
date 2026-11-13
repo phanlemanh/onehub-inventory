@@ -1,9 +1,10 @@
 // The running server's sign-in: one pool per process, configuration read from the environment on first use.
 import { cookies } from "next/headers";
 
+import { openDoor, type DoorError, type OpenedDoor } from "./action-door";
 import { readAuthConfig } from "./config";
 import { SESSION_COOKIE } from "./constants";
-import { createAuthHandlers, type AuthHandlers } from "./http";
+import { createAuthHandlers, tokenFrom, type AuthHandlers } from "./http";
 import {
   readSession,
   sessionCompanies,
@@ -13,7 +14,8 @@ import {
 } from "./login";
 import { memberRoles, type MembersDeps } from "./members";
 import { createMembersHandlers, type MembersHandlers } from "./members-http";
-import { createPool } from "./with-company";
+import type { ActionName } from "./permissions";
+import { createPool, type DbPool } from "./with-company";
 import type { Role } from "../../generated/ontology";
 
 let deps: (LoginDeps & MembersDeps) | null | undefined;
@@ -83,4 +85,19 @@ export async function currentSession(): Promise<CurrentSession | null> {
     );
     return null;
   }
+}
+
+/** The pool of the running server, or null when the database is not configured here; a bad configuration throws. */
+function livePool(): DbPool | null {
+  return liveDeps()?.pool ?? null;
+}
+
+/** The shared action door (row 2c) for an API request of another module: who calls, and may they run `action`. */
+export function actionDoor(req: Request, action: ActionName): Promise<OpenedDoor | DoorError> {
+  return openDoor(livePool, tokenFrom(req), action);
+}
+
+/** The same door for a server component of this request, through the session cookie. */
+export async function sessionDoor(action: ActionName): Promise<OpenedDoor | DoorError> {
+  return openDoor(livePool, (await cookies()).get(SESSION_COOKIE)?.value, action);
 }

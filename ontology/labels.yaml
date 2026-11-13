@@ -85,6 +85,37 @@ concepts:
     own: true
     pref: Mã riêng
     en: Company code
+  SavedView:
+    kind: entity
+    own: true
+    pref: Góc nhìn
+    en: Saved view
+    avoid: [Bộ lọc đã lưu, Tìm kiếm đã lưu]
+  SaveView:
+    kind: action
+    own: true
+    pref: Lưu góc nhìn
+    en: Save view
+  SaveViewChanges:
+    kind: action
+    own: true
+    pref: Lưu thay đổi
+    en: Save changes
+  SaveAsNewView:
+    kind: action
+    own: true
+    pref: Lưu thành mới
+    en: Save as new view
+  RenameView:
+    kind: action
+    own: true
+    pref: Đổi tên
+    en: Rename
+  RemoveView:
+    kind: action
+    own: true
+    pref: Xoá góc nhìn
+    en: Remove view
   ListSide:
     kind: side
     own: true
@@ -290,3 +321,38 @@ concepts:
     own: true
     pref: Phạm vi
     en: Scope
+  Edit:
+    kind: action
+    own: true
+    pref: Sửa
+    en: Edit
+  CreateListing:
+    kind: action
+    own: true
+    pref: Thêm căn
+    en: Add unit
+  RemoveListing:
+    kind: action
+    own: true
+    pref: Xoá căn
+    en: Remove unit
+  CreateContact:
+    kind: action
+    own: true
+    pref: Thêm liên hệ
+    en: Add contact
+  RemoveContact:
+    kind: action
+    own: true
+    pref: Xoá liên hệ
+    en: Remove contact
+  MergeContacts:
+    kind: action
+    own: true
+    pref: Gộp liên hệ
+    en: Merge contacts
+  EraseContactPersonalData:
+    kind: action
+    own: true
+    pref: Xoá tên và số
+    en: Erase name and number

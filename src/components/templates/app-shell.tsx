@@ -28,7 +28,7 @@ export const MAIN_ID = "main-content";
 /**
  * The App Shell (row 1o), arranged from ReUI app-shell-8 (decision 0023): an icon rail with one entry per screen
  * the person's roles open, a second column with the places inside the open screen (foldable, remembered), and a top
- * bar with the company, the theme switch and the account menu. On the phone the rail and the second column ride in
+ * bar with the company, the search box (row 3f), the theme switch and the account menu. On the phone the rail and the second column ride in
  * one sheet opened from the top bar. The skip link, the screen banner and the full-page states are the repo's own.
  */
 export function AppShell({
@@ -36,6 +36,7 @@ export function AppShell({
   roles,
   company,
   account,
+  search,
   columnOpen,
   children,
 }: {
@@ -46,6 +47,8 @@ export function AppShell({
   company?: ReactNode;
   /** The account corner of the top bar: sign-in link or account menu (row 8). */
   account?: ReactNode;
+  /** The product's one search box, in the top bar (row 3f); absent when the person's roles open no screen to search. */
+  search?: ReactNode;
   /** Whether the person left the second column open, read from its cookie on the server; absent means open. */
   columnOpen?: boolean;
   children?: ReactNode;
@@ -98,6 +101,7 @@ export function AppShell({
                 {company}
               </div>
               <div className="ml-auto flex shrink-0 items-center gap-2">
+                {search}
                 <ThemeSwitch />
                 {account}
               </div>

@@ -3,19 +3,19 @@ import { redirect } from "next/navigation";
 
 import { loginHref, PageState } from "@/components/templates/page-state";
 import { label } from "@/modules/company-config";
-import { ROLES } from "@/modules/identity";
+import { allowedScope, ROLES } from "@/modules/identity";
 import { currentSession } from "@/modules/identity/server";
 
 import { MembersScreen } from "./members-screen";
 
 export const metadata: Metadata = { title: label("Member") };
 
-/** Company admins see the people of their company; anyone else sees «not allowed» and no one's name. */
+/** Whoever the permission table gives listMembers sees the people of the company; anyone else sees «not allowed». */
 export default async function Page() {
   const session = await currentSession();
   if (!session?.company) redirect(loginHref("/members"));
   const admin = label("CompanyAdmin");
-  if (!session.roles.includes("CompanyAdmin")) {
+  if (allowedScope(session.roles, "listMembers") === null) {
     return <PageState kind="forbidden" homeHref="/" />;
   }
   return (
