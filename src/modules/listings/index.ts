@@ -7,6 +7,7 @@ export {
   normalizeViewName,
   SAVED_VIEW_NAME_MAX,
   SAVED_VIEW_SCREENS,
+  SAVED_VIEWS_BASE_PATH,
   SavedViewState,
   type SavedView,
   type SavedViewNameError,

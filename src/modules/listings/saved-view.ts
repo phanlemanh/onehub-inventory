@@ -8,6 +8,9 @@ export type SavedViewScreen = (typeof SAVED_VIEW_SCREENS)[number];
 
 export const SAVED_VIEW_NAME_MAX = 40;
 
+/** The API door of saved views: list and save here, edit and remove at `<base>/<id>`. */
+export const SAVED_VIEWS_BASE_PATH = "/api/v1/saved-views";
+
 /**
  * The five things a view holds, and nothing else: the search text, each column's filter (text, or a set of values),
  * the sort, grouping on or off, and the hidden columns. Full screen, the selected cell, open groups and the scroll

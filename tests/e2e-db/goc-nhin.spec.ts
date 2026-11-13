@@ -1,0 +1,444 @@
+// Row 2c (luu-goc-nhin-cot-hai), evals E2, E5, E6, E7 on this lane's Postgres: a person arranges the inventory, saves
+// the arrangement as a view in the App Shell's second column and opens it again.
+//   saved view round trip — search, two filters, a sort, groups and two hidden columns; saved, then opened three ways
+//     (the entry, a reload, a new browser session of the same person): rows, order, groups, columns and search text equal
+//     what was recorded, and the rows equal the set worked out here from the sample data. Break: groups dropped from the
+//     stored view → «reopened view differs: groups».
+//   save changes · save as new · reselect discards changes — E5, with its two breaks.
+//   rename — E6, with its break.
+//   remove — E7: the last item, a line before it, red; the confirmation starts on «Thôi»; Esc sends nothing.
+//   phone sheet — 360: the view is in the sheet's second column on first paint and opens the same rows.
+import { existsSync, readFileSync } from "node:fs";
+
+import { type Browser, type Page, type TestInfo } from "@playwright/test";
+import pg from "pg";
+
+import { DB_URL, OUTBOX } from "../../playwright.db.config";
+import { FRAME_COPY } from "../../src/components/templates/frame-copy";
+import { label } from "../../src/modules/company-config";
+import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
+import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings";
+import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
+import { expect, test } from "../../tools/e2e_templates/fixture";
+import { openSheet } from "../../tools/e2e_templates/settle";
+
+const SAVE = label("SaveView");
+const SAVE_CHANGES = label("SaveViewChanges");
+const SAVE_AS_NEW = label("SaveAsNewView");
+const RENAME = label("RenameView");
+const REMOVE = label("RemoveView");
+const ALL = `${FRAME_COPY.secondColumn.all} ${label("Listing").toLocaleLowerCase("vi")}`;
+const NAME = "[MAU] Toà S1.01 đang bán";
+
+let owner: pg.Client;
+test.beforeAll(async () => {
+  owner = new pg.Client({ connectionString: DB_URL });
+  await owner.connect();
+});
+test.afterAll(async () => {
+  await owner.end();
+});
+
+// ---- people and sign-in ---------------------------------------------------------------------------------------------
+
+async function person(info: TestInfo, tag: string): Promise<{ email: string; id: string }> {
+  const stamp = `${tag}-${info.project.name}-${Date.now()}`;
+  const company = (
+    await owner.query<{ id: string }>("insert into companies (name) values ($1) returning id", [
+      `[Công ty ${tag}]`,
+    ])
+  ).rows[0]!.id;
+  const email = `la-${stamp}@example.test`;
+  const id = (
+    await owner.query<{ id: string }>(
+      "insert into identity.users (email, name) values ($1, $2) returning id",
+      [email, "[Tên] LA"],
+    )
+  ).rows[0]!.id;
+  await owner.query(
+    "insert into company_members (company_id, user_id, name, roles) values ($1, $2, $3, $4)",
+    [company, id, "[Tên] LA", ["ListAgent"]],
+  );
+  return { email, id };
+}
+
+function codes(email: string): string[] {
+  if (!existsSync(OUTBOX)) return [];
+  return readFileSync(OUTBOX, "utf8")
+    .split("\n")
+    .filter(Boolean)
+    .map((l) => JSON.parse(l) as { email: string; text: string; kind?: string })
+    .filter((m) => m.email === email && m.kind !== "invite")
+    .map((m) => m.text);
+}
+
+async function signIn(page: Page, email: string, next = "/") {
+  await page.context().clearCookies();
+  const before = codes(email).length;
+  await page.goto(`/login?next=${encodeURIComponent(next)}`);
+  await expect(page.locator('[data-state="email"][data-ready]')).toBeVisible();
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email").press("Enter");
+  await expect(page.locator('[data-state="code"]')).toBeVisible();
+  await expect.poll(() => codes(email).length, { timeout: 10_000 }).toBeGreaterThan(before);
+  const code = codes(email)
+    .at(-1)!
+    .match(/\b\d{6}\b/)?.[0];
+  if (!code) throw new Error(`thư tới ${email} không mang mã`);
+  await page.getByLabel("Mã đăng nhập").fill(code);
+  await page.getByLabel("Mã đăng nhập").press("Enter");
+  await page.waitForURL((u) => u.pathname === new URL(next, "http://x").pathname);
+}
+
+// ---- the grid as a person sees it ------------------------------------------------------------------------------------
+
+const region = (page: Page) => page.locator('[data-slot="data-region"]');
+const secondColumn = (page: Page) => page.locator('[data-slot="app-shell-second-column"]');
+
+async function settled(page: Page) {
+  await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  await expect(
+    region(page).locator('[data-slot="data-region-body"] table[data-slot="data-grid-table"]'),
+  ).toBeVisible();
+}
+
+/** What a reopened view must give back: unit codes in reading order, groups, shown headers and the search text. */
+interface Snapshot {
+  units: string[];
+  groups: string[];
+  columns: string[];
+  query: string;
+}
+
+async function snapshot(page: Page): Promise<Snapshot> {
+  await settled(page);
+  // The virtual body draws its rows once it has measured itself.
+  await expect(
+    region(page).locator('[data-slot="data-region-body"] tbody tr[data-row-id]').first(),
+  ).toBeVisible();
+  return page.evaluate(() => {
+    const body = document.querySelector('[data-slot="data-region-body"]')!;
+    const rows = [...body.querySelectorAll<HTMLElement>("tbody tr[data-row-id]")];
+    return {
+      units: rows
+        .filter((r) => !r.dataset["rowId"]!.startsWith("nhom:"))
+        .map(
+          (r) => r.querySelector('td[data-col-id="Listing.unitNumber"]')?.textContent?.trim() ?? "",
+        ),
+      groups: rows
+        .filter((r) => r.dataset["rowId"]!.startsWith("nhom:"))
+        .map((r) => r.dataset["rowId"]!.slice("nhom:".length)),
+      columns: [...body.querySelectorAll<HTMLElement>("thead tr:first-child th[data-col-id]")]
+        .map((th) => th.dataset["colId"]!)
+        .filter((id) => id.includes(".")),
+      query:
+        document.querySelector<HTMLInputElement>('[data-slot="data-region"] input[type="search"]')
+          ?.value ?? "",
+    };
+  });
+}
+
+/** Throws naming the first part of the view that came back different. */
+export function checkReopened(got: Snapshot, want: Snapshot): void {
+  if (process.env["GOC_NHIN_DEBUG"]) console.log(JSON.stringify({ got, want }));
+  for (const part of ["groups", "columns", "query", "units"] as const) {
+    if (JSON.stringify(got[part]) !== JSON.stringify(want[part]))
+      throw new Error(`reopened view differs: ${part}`);
+  }
+}
+
+/** The arrangement of E1 built by hand: search «S1», status Active (shortcut), Toà «S1.0», price high to low, groups, two columns hidden. */
+async function arrange(page: Page) {
+  await page.goto("/inventory?status=Active");
+  await settled(page);
+  await region(page).getByRole("searchbox").fill("S1");
+  await region(page).getByLabel("Lọc cột Toà").fill("S1.0");
+  await region(page).locator('thead th[data-col-id="Listing.listPrice"] button').first().click();
+  await page.getByRole("menuitem", { name: "Giảm dần" }).click();
+  await region(page).locator('[data-slot="group-toggle"]').click();
+  await region(page).getByRole("button", { name: "Cột", exact: true }).click();
+  await page.getByRole("menuitemcheckbox", { name: label("Subdivision") }).click();
+  await page.getByRole("menuitemcheckbox", { name: label("LastConfirmedAt") }).click();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("menu")).toBeHidden();
+}
+
+/** The same rows worked out from the sample data, without the grid's own rules. */
+function expectedUnits(): string[] {
+  const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
+  const { listings, listingUnits } = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
+  const rows = inventoryRows({ listings, listingUnits, units }).filter(
+    (r) =>
+      r["Listing.standardStatus"] === "Active" &&
+      String(r["Listing.buildingName"]).toLowerCase().includes("s1.0") &&
+      [r["Listing.unitNumber"], r["Listing.buildingName"], r["Listing.subdivisionName"]].some((v) =>
+        String(v ?? "")
+          .toLowerCase()
+          .includes("s1"),
+      ),
+  );
+  return rows.map((r) => String(r["Listing.unitNumber"])).sort();
+}
+
+async function saveAs(page: Page, name: string, button = SAVE) {
+  await region(page).getByRole("button", { name: button }).click();
+  const dialog = page.locator('[data-slot="view-name-dialog"]');
+  await dialog.getByLabel("Tên").fill(name);
+  await dialog.getByLabel("Tên").press("Enter");
+  await expect(dialog).toBeHidden();
+  await page.waitForURL((u) => u.searchParams.has("goc-nhin"));
+  await expect(entry(page, name)).toHaveAttribute("aria-current", "true");
+}
+
+const escaped = (text: string) => text.replace(/[[\]().*+?^$|\\]/g, "\\$&");
+/** A view's entry; its accessible name may end with the «đã đổi» mark. */
+const entry = (page: Page, name: string) =>
+  secondColumn(page).getByRole("link", { name: new RegExp(`^${escaped(name)}( đã đổi)?$`) });
+
+async function storedViews(userId: string) {
+  return (
+    await owner.query<{ id: string; name: string; view: Record<string, unknown> }>(
+      "select id, name, view from saved_view where user_id = $1 order by created_at",
+      [userId],
+    )
+  ).rows;
+}
+
+async function freshSession(browser: Browser, email: string, href: string): Promise<Snapshot> {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage();
+  await signIn(page, email, href);
+  const snap = await snapshot(page);
+  await context.close();
+  return snap;
+}
+
+// ---- E2 ---------------------------------------------------------------------------------------------------------------
+
+test("saved view round trip", async ({ page, browser }, info) => {
+  test.skip(info.project.name !== "1440", "measured at 1440");
+  const me = await person(info, "vong");
+  await signIn(page, me.email);
+  await arrange(page);
+  const before = await snapshot(page);
+  expect([...before.units].sort()).toEqual(expectedUnits());
+  expect(before.groups.length).toBeGreaterThan(1);
+  expect(before.columns).not.toContain("Listing.subdivisionName");
+  await saveAs(page, NAME);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(NAME);
+  const href = new URL(page.url()).pathname + new URL(page.url()).search;
+
+  // (a) another entry, then the view's entry
+  await secondColumn(page).getByRole("link", { name: ALL, exact: true }).click();
+  await page.waitForURL((u) => !u.searchParams.has("goc-nhin"));
+  await entry(page, NAME).click();
+  await page.waitForURL((u) => u.searchParams.has("goc-nhin"));
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(NAME);
+  checkReopened(await snapshot(page), before);
+  // (b) a reload
+  await page.reload();
+  checkReopened(await snapshot(page), before);
+  // (c) a new session of the same person
+  checkReopened(await freshSession(browser, me.email, href), before);
+
+  // Break: the stored view loses its groups.
+  await owner.query(
+    "update saved_view set view = jsonb_set(view, '{grouped}', 'false') where user_id = $1",
+    [me.id],
+  );
+  await page.reload();
+  const broken = await snapshot(page);
+  expect(() => checkReopened(broken, before)).toThrow("reopened view differs: groups");
+});
+
+// ---- E5 ---------------------------------------------------------------------------------------------------------------
+
+test("save changes · save as new · reselect discards changes", async ({ page }, info) => {
+  test.skip(info.project.name !== "1440", "measured at 1440");
+  const me = await person(info, "doi");
+  await signIn(page, me.email);
+  await arrange(page);
+  await saveAs(page, NAME);
+  const saved = await snapshot(page);
+  const changedMark = entry(page, NAME).locator('[data-slot="place-changed"]');
+
+  // Reselect discards changes.
+  await region(page).getByLabel("Lọc cột Phòng ngủ").fill("2");
+  await expect(changedMark).toHaveCount(1);
+  await entry(page, NAME).click();
+  await expect(changedMark).toHaveCount(0);
+  checkReopened(await snapshot(page), saved);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(NAME);
+  // Break: had the grid kept its state on the same address, the rows would still be the filtered ones.
+  const filtered = { ...saved, units: saved.units.slice(0, 1) };
+  expect(() => checkReopened(filtered, saved)).toThrow("reopened view differs: units");
+  const reselectKept = (s: Snapshot) => {
+    if (JSON.stringify(s.units) !== JSON.stringify(saved.units))
+      throw new Error("reselect kept unsaved changes");
+  };
+  expect(() => reselectKept(filtered)).toThrow("reselect kept unsaved changes");
+
+  // Save changes.
+  await region(page).getByLabel("Lọc cột Phòng ngủ").fill("2");
+  await expect(changedMark).toHaveCount(1);
+  const two = await snapshot(page);
+  await region(page).getByRole("button", { name: SAVE_CHANGES }).click();
+  await expect(changedMark).toHaveCount(0);
+  await page.reload();
+  checkReopened(await snapshot(page), two);
+  const [row] = await storedViews(me.id);
+  const overwritten = (v: Record<string, unknown>) => {
+    const filters = v["filters"] as Record<string, unknown>;
+    if (filters["Unit.bedroomsTotal"] !== "2") throw new Error("save changes did not overwrite");
+  };
+  overwritten(row!.view);
+  expect(() =>
+    overwritten({
+      ...row!.view,
+      filters: { ...(row!.view["filters"] as object), "Unit.bedroomsTotal": undefined },
+    }),
+  ).toThrow("save changes did not overwrite");
+
+  // Save as new: the old view keeps its sort.
+  await region(page).locator('thead th[data-col-id="Listing.listPrice"] button').first().click();
+  await page.getByRole("menuitem", { name: "Tăng dần" }).click();
+  await expect(changedMark).toHaveCount(1);
+  await saveAs(page, "[MAU] Hai phòng ngủ", SAVE_AS_NEW);
+  await expect(secondColumn(page).locator('[data-slot="second-column-trailing"]')).toHaveCount(2);
+  await entry(page, NAME).click();
+  await page.waitForURL((u) => u.searchParams.get("goc-nhin") === row!.id);
+  checkReopened(await snapshot(page), two);
+  const rows = await storedViews(me.id);
+  expect(rows).toHaveLength(2);
+  expect((rows[0]!.view["sort"] as { direction: string }[])[0]!.direction).toBe("desc");
+  expect((rows[1]!.view["sort"] as { direction: string }[])[0]!.direction).toBe("asc");
+});
+
+// ---- E6 ---------------------------------------------------------------------------------------------------------------
+
+test("rename", async ({ page }, info) => {
+  test.skip(info.project.name !== "1440", "measured at 1440");
+  const me = await person(info, "ten");
+  await signIn(page, me.email);
+  await arrange(page);
+  await saveAs(page, NAME);
+  const before = await snapshot(page);
+  const [stored] = await storedViews(me.id);
+  await secondColumn(page)
+    .getByRole("button", { name: new RegExp(NAME.replace(/[[\]]/g, "\\$&")) })
+    .click();
+  await page.getByRole("menuitem", { name: RENAME }).click();
+  const dialog = page.locator('[data-slot="view-name-dialog"]');
+  await dialog.getByLabel("Tên").fill("[MAU] Khu S1");
+  await dialog.getByLabel("Tên").press("Enter");
+  await expect(dialog).toBeHidden();
+  await expect(entry(page, "[MAU] Khu S1")).toHaveAttribute("aria-current", "true");
+  checkReopened(await snapshot(page), before);
+  await page.reload();
+  await expect(entry(page, "[MAU] Khu S1")).toBeVisible();
+  const [after] = await storedViews(me.id);
+  expect(after!.name).toBe("[MAU] Khu S1");
+  const viewKept = (v: unknown) => {
+    if (JSON.stringify(v) !== JSON.stringify(stored!.view))
+      throw new Error("rename changed the view");
+  };
+  viewKept(after!.view);
+  expect(() => viewKept({})).toThrow("rename changed the view");
+});
+
+// ---- E7 ---------------------------------------------------------------------------------------------------------------
+
+test("remove", async ({ page }, info) => {
+  test.skip(info.project.name !== "1440", "measured at 1440");
+  const me = await person(info, "xoa");
+  await signIn(page, me.email);
+  await arrange(page);
+  await saveAs(page, NAME);
+  const href = new URL(page.url()).pathname + new URL(page.url()).search;
+  const more = secondColumn(page).getByRole("button", {
+    name: new RegExp(NAME.replace(/[[\]]/g, "\\$&")),
+  });
+
+  await more.click();
+  const items = page.getByRole("menuitem");
+  await expect(items.last()).toHaveText(REMOVE);
+  await expect(page.getByRole("menu").locator('[role="separator"]')).toHaveCount(1);
+  const colors = await items.last().evaluate((el) => {
+    const probe = document.createElement("span");
+    probe.style.color = "var(--destructive)";
+    document.body.append(probe);
+    const want = getComputedStyle(probe).color;
+    probe.remove();
+    return { got: getComputedStyle(el).color, want };
+  });
+  expect(colors.got).toBe(colors.want);
+
+  let deletes = 0;
+  page.on("request", (r) => {
+    if (r.method() === "DELETE" && r.url().includes("/api/v1/saved-views/")) deletes += 1;
+  });
+  await items.last().click();
+  const confirm = page.getByRole("alertdialog").or(page.getByRole("dialog"));
+  await expect(confirm).toBeVisible();
+  const focusOnCancel = (text: string | null) => {
+    if (text?.trim() !== FRAME_COPY.confirm.cancel) throw new Error("confirm focus not on cancel");
+  };
+  focusOnCancel(await page.evaluate(() => document.activeElement?.textContent ?? null));
+  expect(() => focusOnCancel(REMOVE)).toThrow("confirm focus not on cancel");
+  await page.keyboard.press("Escape");
+  await expect(confirm).toBeHidden();
+  expect(deletes).toBe(0);
+
+  await more.click();
+  await page.getByRole("menuitem", { name: REMOVE }).click();
+  await confirm.getByRole("button", { name: REMOVE }).click();
+  await page.waitForURL((u) => u.pathname === "/inventory" && !u.searchParams.has("goc-nhin"));
+  await expect(entry(page, NAME)).toHaveCount(0);
+  await expect(secondColumn(page).getByRole("link", { name: ALL, exact: true })).toHaveAttribute(
+    "aria-current",
+    "true",
+  );
+  expect(await storedViews(me.id)).toHaveLength(0);
+
+  await page.goto(href);
+  await expect(page.locator('[data-slot="saved-view-missing"]')).toContainText(
+    `${label("SavedView")} này không còn`,
+  );
+  await expect(region(page).locator('[data-slot="region-footer-count"]')).toHaveText("60 dòng");
+
+  // Removing a view that is not open keeps the place.
+  await arrange(page);
+  await saveAs(page, "[MAU] Một");
+  await arrange(page);
+  await saveAs(page, "[MAU] Hai");
+  const here = page.url();
+  await secondColumn(page)
+    .getByRole("button", { name: /\[MAU\] Một/ })
+    .click();
+  await page.getByRole("menuitem", { name: REMOVE }).click();
+  await confirm.getByRole("button", { name: REMOVE }).click();
+  await expect(entry(page, "[MAU] Một")).toHaveCount(0);
+  expect(page.url()).toBe(here);
+});
+
+// ---- E2, phone ---------------------------------------------------------------------------------------------------------
+
+test("phone sheet", async ({ page }, info) => {
+  test.skip(info.project.name !== "360", "measured at 360");
+  const me = await person(info, "dt");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await signIn(page, me.email);
+  await arrange(page);
+  await saveAs(page, NAME);
+  const wide = await snapshot(page);
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto("/inventory");
+  await settled(page);
+  await openSheet(page);
+  const link = page.getByRole("dialog").getByRole("link", { name: NAME, exact: true });
+  await expect(link).toBeVisible();
+  await link.click();
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await page.waitForURL((u) => u.searchParams.has("goc-nhin"));
+  expect((await snapshot(page)).units).toEqual(wide.units);
+});
