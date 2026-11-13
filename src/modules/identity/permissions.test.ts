@@ -62,6 +62,11 @@ const CELLS: Record<string, Partial<Record<Role, Scope>>> = {
     CompanyAdmin: "company",
   },
   manageCompanyCodes: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
+  // Row 2c (K-19): saved views, each person's own, for the three roles that read the listing board.
+  listSavedViews: { ListAgent: "own", BuyerAgent: "own", TeamLead: "own" },
+  saveView: { ListAgent: "own", BuyerAgent: "own", TeamLead: "own" },
+  editView: { ListAgent: "own", BuyerAgent: "own", TeamLead: "own" },
+  removeView: { ListAgent: "own", BuyerAgent: "own", TeamLead: "own" },
 };
 // Row 9e (bo-nut-theo-quyen): the seven draft rows the owner chose at the scope gate, written before the table.
 const DRAFT_CELLS_9E: Record<string, Partial<Record<Role, Scope>>> = {
@@ -74,7 +79,16 @@ const DRAFT_CELLS_9E: Record<string, Partial<Record<Role, Scope>>> = {
   eraseContactPersonalData: { TeamLead: "company" },
 };
 // Written before the code: API doors of live rows, and the exempt API doors.
-const API_DOORS = ["GET /api/v1/members", "POST /api/v1/members", "PUT /api/v1/members/[id]/roles"];
+const API_DOORS = [
+  "GET /api/v1/members",
+  "POST /api/v1/members",
+  "PUT /api/v1/members/[id]/roles",
+  // Row 2c (K-19): saved views.
+  "GET /api/v1/saved-views",
+  "POST /api/v1/saved-views",
+  "PATCH /api/v1/saved-views/[id]",
+  "DELETE /api/v1/saved-views/[id]",
+];
 const EXEMPT_API = [
   "POST /api/v1/auth/code",
   "POST /api/v1/auth/session",
@@ -123,10 +137,10 @@ describe("cong-quyen-15-to-hop", () => {
     expect(Object.fromEntries(LIVE_ACTIONS.map((a) => [a.name, a.scope]))).toEqual(CELLS);
   });
 
-  it("every live action × every set of roles gets the widest scope: 10 × 15 = 150 asserts", () => {
+  it("every live action × every set of roles gets the widest scope: 14 × 15 = 210 asserts (row 2c: +4 rows)", () => {
     const r = addUp(allowedScope);
     expect(r.failures).toEqual([]);
-    expect(r.count).toBe(150);
+    expect(r.count).toBe(210);
   });
 
   it("break: taking the narrowest scope names the first set that differs", () => {

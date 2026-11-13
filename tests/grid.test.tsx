@@ -30,6 +30,8 @@ import { tallGridViewport } from "./virtual-viewport";
 
 beforeAll(() => {
   tallGridViewport();
+  // A filter that leaves no row now keeps the grid and its scroll area (row 2c), which asks jsdom for animations.
+  Element.prototype.getAnimations ??= () => [];
   globalThis.ResizeObserver ??= class {
     observe() {}
     unobserve() {}

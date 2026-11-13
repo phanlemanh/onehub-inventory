@@ -51,7 +51,9 @@
             "record",
             "editable",
             "initialFilters",
-            "groupBy"
+            "groupBy",
+            "initialView",
+            "onViewChange"
           ]
         },
         {
@@ -1509,6 +1511,7 @@
             "roles",
             "company",
             "account",
+            "search",
             "columnOpen"
           ]
         },
@@ -1523,6 +1526,16 @@
         },
         {
           "name": "NavSection"
+        }
+      ]
+    },
+    {
+      "name": "PlaceChangeProvider",
+      "file": "src/components/templates/app-shell/place-change.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "PlaceChangeProvider"
         }
       ]
     },
@@ -1725,6 +1738,45 @@
       "parts": [
         {
           "name": "Checkbox"
+        }
+      ]
+    },
+    {
+      "name": "Command",
+      "file": "src/components/ui/command.tsx",
+      "level": "organism",
+      "parts": [
+        {
+          "name": "Command"
+        },
+        {
+          "name": "CommandDialog",
+          "props": [
+            "title",
+            "description",
+            "showCloseButton"
+          ]
+        },
+        {
+          "name": "CommandEmpty"
+        },
+        {
+          "name": "CommandGroup"
+        },
+        {
+          "name": "CommandInput"
+        },
+        {
+          "name": "CommandItem"
+        },
+        {
+          "name": "CommandList"
+        },
+        {
+          "name": "CommandSeparator"
+        },
+        {
+          "name": "CommandShortcut"
         }
       ]
     },

@@ -1,15 +1,35 @@
 import { CalendarCheckIcon, LayoutGridIcon, SendIcon, UsersIcon } from "lucide-react";
 import { createElement } from "react";
 
-import type { NavItem } from "@/components/templates/app-shell";
+import type { NavItem, NavSection } from "@/components/templates/app-shell";
+import { visibleNav } from "@/components/templates/nav-items";
 import { STATUS_ORDER } from "@/components/candidate/grid-view";
 import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { label } from "@/modules/company-config";
 import { inventoryStatusHref } from "@/modules/listings/ui";
 
+import type { Role } from "@/generated/ontology";
+
 const icon = (Icon: typeof SendIcon) => createElement(Icon, { "aria-hidden": true });
 
 const COPY = FRAME_COPY.secondColumn;
+
+/**
+ * The App Shell's entries for one person: the inventory's second column gains their saved views (row 2c) after the
+ * status shortcuts when their roles can list them.
+ */
+export function navFor({ savedViews }: { savedViews?: NavSection | null } = {}): NavItem[] {
+  return NAV.map((item) =>
+    item.href === "/inventory" && savedViews
+      ? { ...item, sections: [...(item.sections ?? []), savedViews] }
+      : item,
+  );
+}
+
+/** The top-bar search (row 3f) leads to the inventory, so it shows by the same rule as the inventory's entry. */
+export function searchShownFor(nav: readonly NavItem[], roles: readonly Role[]): boolean {
+  return visibleNav(nav, roles).some((item) => item.href === "/inventory");
+}
 
 export const NAV: NavItem[] = [
   { href: "/", title: label("Today"), icon: icon(CalendarCheckIcon) },
