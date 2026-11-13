@@ -6,7 +6,9 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory]
-status: draft
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-13
 design_doc: _acceptance/loi-vao-ho-so/design.md
 ---
 
