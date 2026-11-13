@@ -1,17 +1,10 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-
 import { sampleUnits, subdivisionNameOf } from "@/modules/catalog";
 import { label } from "@/modules/company-config";
 import { SAMPLE_COMPANY, buildSampleListings } from "@/modules/listings";
 import { inventoryRows, type InventoryField } from "@/modules/listings/ui";
 
-import { PROTO_COPY, SCENES, type Scene } from "./copy";
+import { SCENES, type Scene } from "./copy";
 import { EntryShowcase } from "./showcase";
-
-type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
-
-export const metadata: Metadata = { title: PROTO_COPY.title };
 
 const HEADERS: Record<InventoryField, string> = {
   "Listing.unitNumber": label("Unit"),
@@ -25,12 +18,10 @@ const HEADERS: Record<InventoryField, string> = {
 };
 
 /**
- * Development-only clickable prototype of row 3f (loi-vao-ho-so) for its scope gate. `canh` picks the scene
+ * Development-only clickable prototype of row 3f (loi-vao-ho-so) for its scope gate, served by the proto page at /proto/loi-vao-ho-so. `canh` picks the scene
  * (ngan · trang · nhieu · khong · go-ma) and `bang=an` hides the control board for screenshots.
  */
-export default async function EntryProtoPage({ searchParams }: Props) {
-  if (process.env.NODE_ENV === "production") notFound();
-  const q = await searchParams;
+export function EntryProto({ q }: { q: Record<string, string | string[] | undefined> }) {
   const scene: Scene =
     typeof q.canh === "string" && (SCENES as readonly string[]).includes(q.canh)
       ? (q.canh as Scene)

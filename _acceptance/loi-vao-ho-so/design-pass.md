@@ -72,6 +72,10 @@ phần thật của kho: thân `ListingRecordBody` của hàng 3, `PageHeader`, 
 - Ở 360, đầu trang riêng xuống hai dòng (tên căn rồi nút «Chép đường dẫn») — chấp nhận, đúng cách `PageHeader` xuống dòng.
 - Trong bản mẫu, dòng địa chỉ chỉ để chủ kho thấy đường dẫn trông thế nào; trang thật không in địa chỉ.
 
+- Đã sửa theo bộ rào của kho (màn không tự dựng hộp thoại, báo nổi, trạng thái trống): hộp gõ mã dùng hộp biểu mẫu sẵn của
+  kho (có thêm nút «Thôi»), báo đã chép đi qua kênh báo kết quả của kho, trạng thái «nhiều căn» và «không có căn» ở bản mẫu
+  vẽ tay cùng bố cục (trang thật sẽ mở rộng trạng thái trang của kho). Bản mẫu chuyển về trang thử chung, cùng địa chỉ.
+
 ## Nấc
 
 - context: host-embedded — chụp trong App Shell thật.

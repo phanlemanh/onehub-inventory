@@ -34,7 +34,7 @@ thanh trên, ô của hàng 12 trong hộp thêm căn) và không dùng chung ph
 | Nút biểu tượng «Mở toàn màn» (Maximize) ở đầu cột | **Giữ**, đặt trong khe nút đầu hồ sơ của 9e, trước «Trước», «Sau», «Đóng» | Cùng chỗ người đã quen |
 | «Không có căn này trong Bảng hàng» | **Giữ** chữ; thêm lối «Về Bảng hàng» ở mọi khổ (Quỹ hàng chỉ có ở điện thoại) | Trang riêng không có bảng bên cạnh để quay lại |
 | «Nhiều căn» + một nút cho từng toà | **Giữ** | Đúng ý định của hàng |
-| Ô «Gõ mã căn» là bảng lệnh ⌘K (cmdk), gõ tên nhà cũng nhảy | **Đổi** (Hỏi-1): hộp ghép từ kho, chỉ mã căn | Kho chưa có bảng lệnh; nhảy theo tên màn đã có ở thanh bên |
+| Ô «Gõ mã căn» là bảng lệnh ⌘K (cmdk), gõ tên nhà cũng nhảy | **Đổi** (Hỏi-1): hộp biểu mẫu sẵn của kho, chỉ mã căn | Kho chưa có bảng lệnh; nhảy theo tên màn đã có ở thanh bên |
 | Lần chào chọn trong trang (`lan`) | **Bỏ cho MVP**: trang hiện một lần chào; danh sách các lần chào là của hàng 3b | Hàng 3b «Hồ sơ đủ thông tin» giữ phần này |
 
 ## Lựa chọn của máy (ghi ở sổ quyết định)
@@ -111,7 +111,7 @@ thái trang chung của App Shell.
 | Khe nút đầu hồ sơ `RecordView.actions` (hàng 9e) | dùng | Chỗ chung cho nút ở đầu hồ sơ |
 | `PageHeader` (kho) | dùng | Đầu trang: tên và việc chính «Chép đường dẫn» |
 | `PageState` (kho) | mở rộng | Thêm chữ riêng cho «không có căn» và «nhiều căn» thay vì dựng trạng thái trang thứ hai |
-| `Dialog`, `InputGroup`, `Button`, `Tooltip` (nhà cung cấp) | ghép | Hộp gõ mã (Hỏi-1) |
+| `FormDialog` (kho, hàng 9) + `InputGroup` | dùng | Hộp gõ mã (Hỏi-1): hộp biểu mẫu sẵn của kho — Enter gửi, Esc đóng, tiêu điểm về nút; bộ rào của kho cấm màn tự dựng hộp thoại |
 | Thông báo kết quả `notifyResult` (kho) | dùng | Báo đã chép theo luật kênh của `design/behaviors.md` |
 | Khe ô tìm trên thanh trên App Shell | mở rộng | App Shell hàng 1o chưa có khe này; app-shell-8 gốc có ô tìm ở thanh trên |
 

@@ -12,26 +12,14 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { toast } from "sonner";
 
 import { GRID_COPY } from "@/components/candidate/grid-copy";
 import { Frame, FramePanel } from "@/components/reui/frame";
 import { PageHeader } from "@/components/templates/page-header";
 import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader } from "@/components/ui/empty";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group";
+import { FormDialog } from "@/components/candidate/form-dialog";
+import { notifyResult } from "@/components/templates/notify";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { GridRow } from "@/components/candidate/data-region";
 import { ListingRecordBody, listingView, type InventoryField } from "@/modules/listings/ui";
@@ -134,9 +122,9 @@ function PageScene({
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(new URL(href, window.location.origin).toString());
-      toast(ENTRY_COPY.copied);
+      notifyResult({ message: ENTRY_COPY.copied });
     } catch {
-      toast(ENTRY_COPY.copyFailed);
+      notifyResult({ message: ENTRY_COPY.copyFailed });
     }
   };
   return (
@@ -169,6 +157,10 @@ function PageScene({
   );
 }
 
+/**
+ * A whole-page state with this row's own words. The product extends the store's PageState for this; the prototype
+ * draws the same centred layout by hand so it does not touch product code before the scope gate.
+ */
 function StatePage({
   title,
   why,
@@ -179,13 +171,11 @@ function StatePage({
   children: ReactNode;
 }) {
   return (
-    <Empty data-slot="page-state">
-      <EmptyHeader>
-        <h1 className="text-lg font-semibold">{title}</h1>
-        <EmptyDescription>{why}</EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>{children}</EmptyContent>
-    </Empty>
+    <div data-slot="page-state" className="flex flex-col items-center gap-4 py-16 text-center">
+      <h1 className="text-lg font-semibold">{title}</h1>
+      <p className="max-w-md text-sm text-muted-foreground">{why}</p>
+      {children}
+    </div>
   );
 }
 
@@ -227,7 +217,7 @@ function UnknownScene({ words }: { words: Words }) {
   );
 }
 
-/** Scene «go-ma»: the top bar's «Gõ mã căn» (⌘K or «/») opens a small dialog; Enter opens the unit's record. */
+/** Scene «go-ma»: the top bar's «Gõ mã căn» (⌘K or «/») opens the store's form dialog; Enter opens the unit's page. */
 function JumpScene({ words, bare }: { words: Words; bare: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -237,7 +227,7 @@ function JumpScene({ words, bare }: { words: Words; bare: boolean }) {
     return () => cancelAnimationFrame(id);
   }, []);
   const [text, setText] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | undefined>(undefined);
   const go = () => {
     const code = text.trim();
     if (!code) return setError(ENTRY_COPY.jumpEmpty(words.unit));
@@ -257,27 +247,29 @@ function JumpScene({ words, bare }: { words: Words; bare: boolean }) {
         className="flex h-12 items-center justify-end gap-2 rounded-md border bg-background px-2"
       >
         <div className="w-56">
-          <Button variant="outline" size="sm" className="w-full" onClick={() => setOpen(true)}>
-            <SearchIcon aria-hidden="true" />
-            <span className="flex-1 text-left font-normal text-muted-foreground">
-              {ENTRY_COPY.jumpHint(words.unit)}
-            </span>
-            <kbd className="rounded border px-1 text-xs text-muted-foreground">⌘K</kbd>
-          </Button>
-        </div>
-      </div>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{ENTRY_COPY.jump(words.unit)}</DialogTitle>
-            <DialogDescription>{ENTRY_COPY.jumpWhy(words.unit, words.inventory)}</DialogDescription>
-          </DialogHeader>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              go();
+          <FormDialog
+            trigger={{
+              render: <Button variant="outline" size="sm" className="w-full" />,
+              label: (
+                <>
+                  <SearchIcon aria-hidden="true" />
+                  <span className="flex-1 text-left font-normal text-muted-foreground">
+                    {ENTRY_COPY.jumpHint(words.unit)}
+                  </span>
+                  <kbd className="rounded border px-1 text-xs text-muted-foreground">⌘K</kbd>
+                </>
+              ),
             }}
-            className="flex flex-col gap-2"
+            title={ENTRY_COPY.jump(words.unit)}
+            description={ENTRY_COPY.jumpWhy(words.unit, words.inventory)}
+            submitLabel={ENTRY_COPY.jumpGo}
+            busyLabel={ENTRY_COPY.jumpGo}
+            busy={false}
+            open={open}
+            onOpenChange={setOpen}
+            onSubmit={go}
+            formError={error}
+            slot="unit-jump"
           >
             <InputGroup>
               <InputGroupAddon>
@@ -291,19 +283,13 @@ function JumpScene({ words, bare }: { words: Words; bare: boolean }) {
                 value={text}
                 onChange={(e) => {
                   setText(e.target.value);
-                  setError(null);
+                  setError(undefined);
                 }}
               />
-              <InputGroupAddon align="inline-end">
-                <InputGroupButton type="submit" variant="default">
-                  {ENTRY_COPY.jumpGo}
-                </InputGroupButton>
-              </InputGroupAddon>
             </InputGroup>
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
-          </form>
-        </DialogContent>
-      </Dialog>
+          </FormDialog>
+        </div>
+      </div>
     </div>
   );
 }

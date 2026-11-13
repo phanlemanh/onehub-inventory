@@ -5,7 +5,7 @@ slug: loi-vao-ho-so
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
-screens: [unit, inventory]
+screens: [inventory]
 status: draft
 design_doc: _acceptance/loi-vao-ho-so/design.md
 ---
@@ -62,8 +62,11 @@ Hôm nay khung chưa bắt đăng nhập ở dữ liệu mẫu nên ô dưới l
 
 | Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
 |---|---|---|---|---|
-| unit | được — trang riêng mọi căn của sàn | được — trang riêng mọi căn của sàn | được — trang riêng mọi căn của sàn | chặn — trạng thái trang không đủ quyền; bảng quyền của hàng 9a quyết |
 | inventory | được — thêm nút «Mở toàn màn» | được — thêm nút «Mở toàn màn» | được — thêm nút «Mở toàn màn» | chặn — như hàng 3 |
+
+Trang riêng của căn là màn mới, chưa có trong sổ màn; hàng khai nó vào sổ (cùng họ chủ kho chọn ở Hỏi-2) khi dựng trang, và
+dòng của nó trong bảng trên là: Đầu chủ, Đầu khách, Trưởng nhóm được — trang riêng mọi căn của sàn; Quản trị sàn chặn —
+trạng thái trang không đủ quyền, như Bảng hàng.
 
 ## Coverage
 
