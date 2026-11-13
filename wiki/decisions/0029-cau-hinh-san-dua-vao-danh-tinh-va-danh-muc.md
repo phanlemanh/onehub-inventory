@@ -5,6 +5,7 @@ links:
   [
     architecture/modules.yaml,
     src/modules/company-config/,
+    db/migrations/010_lop_rieng_cua_san.sql,
     tools/ontology_codegen.py,
     _acceptance/lop-rieng-cua-san/contract.md,
   ]

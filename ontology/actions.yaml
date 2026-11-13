@@ -156,21 +156,38 @@ actions:
 
   # The company layer (row 7e, lop-rieng-cua-san): who reads and who changes the company's own labels, custom fields,
   # value spellings, pending units and import templates. Approved by the owner at the scope gate, 2026-11-13 (Hỏi-1:
-  # ListAgent, TeamLead, CompanyAdmin change; BuyerAgent reads). Planned until migration 010 and /api/v1/company-layer
-  # open their doors (tasks 2 and 5 of the plan).
+  # ListAgent, TeamLead, CompanyAdmin change; BuyerAgent reads). Database doors: migration 010; API doors: task 5.
   - name: readCompanyLayer
     description: See the company's own labels, custom fields, value spellings, pending units and import templates.
     entity: CompanyLabel
     kind: query
-    status: planned
+    status: live
     scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db:
+        [
+          "table company_labels select",
+          "table company_fields select",
+          "table company_value_aliases select",
+          "table company_pending_units select",
+          "table company_import_templates select",
+        ]
 
   - name: addCompanyLayer
     description: Add a company label, custom field or value spelling.
     entity: CompanyLabel
     kind: create
-    status: planned
+    status: live
     scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db:
+        [
+          "table company_labels insert",
+          "table company_fields insert",
+          "table company_value_aliases insert",
+          "table company_pending_units insert",
+          "table company_import_templates insert",
+        ]
 
   - name: editCompanyLayer
     description: >-
@@ -178,8 +195,16 @@ actions:
       import template's name.
     entity: CompanyLabel
     kind: update
-    status: planned
+    status: live
     scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db:
+        [
+          "table company_labels update",
+          "table company_fields update",
+          "table company_value_aliases update",
+          "table company_import_templates update",
+        ]
 
   - name: retireCompanyLayer
     description: >-
@@ -187,15 +212,26 @@ actions:
       on units stay.
     entity: CompanyLabel
     kind: delete
-    status: planned
+    status: live
     scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db:
+        [
+          "table company_labels update",
+          "table company_fields update",
+          "table company_value_aliases update",
+          "table company_pending_units update",
+          "table company_import_templates update",
+        ]
 
   - name: matchPendingUnits
     description: Match the company's pending units with units the shared catalog now has; the catalog never changes.
     entity: PendingUnit
     kind: command
-    status: planned
+    status: live
     scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db: ["table company_pending_units update"]
 
   # Draft rows for the listing board, from Quỹ hàng's permission review of 05/11 (table two) and its signed
   # bang-quyen-hang.json, without the Telesales role. Row 10 onwards decides each cell when it opens the door.

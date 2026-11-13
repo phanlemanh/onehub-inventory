@@ -114,8 +114,8 @@ describe("bang-sinh-du-dong", () => {
 
   it("the generated table carries every row and field of ontology/actions.yaml", () => {
     expect(compareTable(yaml.actions, ACTIONS)).toEqual([]);
-    expect(ACTIONS.filter((a) => a.status === "live")).toHaveLength(14); // row 2c adds four saved-view rows
-    expect(ACTIONS.filter((a) => a.status === "planned")).toHaveLength(17); // row 7e adds five company-layer rows, planned until their doors open
+    expect(ACTIONS.filter((a) => a.status === "live")).toHaveLength(19); // row 2c adds four saved-view rows, row 7e five company-layer rows
+    expect(ACTIONS.filter((a) => a.status === "planned")).toHaveLength(12);
     expect(PERMISSION_EXEMPT.map((e) => [e.door, e.reason, [...e.reads]])).toEqual(
       yaml.exempt.map((e) => [String(e["door"]), String(e["reason"]), list(e["reads"])]),
     );

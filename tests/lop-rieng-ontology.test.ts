@@ -162,3 +162,102 @@ describe("the code generator's object type (owner's allowance, plan task 1)", ()
     }
   });
 });
+
+// ——— Migration half (plan task 2): the five tables match the five entities, and the fence of ADR-0018 holds ————————
+
+const MIGRATION = "db/migrations/010_lop_rieng_cua_san.sql";
+const TABLE_OF: Record<(typeof LAYER_ENTITIES)[number], string> = {
+  CompanyLabel: "company_labels",
+  CustomField: "company_fields",
+  CompanyValueAlias: "company_value_aliases",
+  PendingUnit: "company_pending_units",
+  ImportTemplate: "company_import_templates",
+};
+const snake = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
+
+/** Columns of one `create table` in the migration, in order. */
+function columnsOf(sql: string, table: string): string[] {
+  const m = new RegExp(`create table ${table} \\(([\\s\\S]*?)\\n\\);`).exec(sql);
+  if (!m) return [];
+  return (
+    m[1]!
+      .split("\n")
+      // A column starts at two spaces; deeper lines continue a constraint.
+      .filter(
+        (l) => /^ {2}[a-z_]+\s/.test(l) && !/^ {2}(constraint|primary|unique|check)\b/.test(l),
+      )
+      .map((l) => l.trim().split(/\s+/)[0]!)
+  );
+}
+
+/** Every failure of the migration against the model and the fence, as pinned lines. */
+export function migrationFailures(root: string): string[] {
+  const out: string[] = [];
+  const sql = readFileSync(join(root, MIGRATION), "utf8");
+  for (const name of LAYER_ENTITIES) {
+    const e = readEntity(root, name);
+    const props = Object.keys(e?.properties ?? {})
+      .map(snake)
+      .sort();
+    const cols = columnsOf(sql, TABLE_OF[name]).sort();
+    if (props.join() !== cols.join())
+      out.push(`columns differ from ${name}: ${cols.join()} vs ${props.join()}`);
+  }
+  const kinds = /kind\s+text not null check \(kind in \(([^)]*)\)\)/.exec(sql)?.[1] ?? "";
+  const dbKinds = [...kinds.matchAll(/'([a-z_]+)'/g)].map((m) => m[1]!);
+  const extra = dbKinds.filter((k) => !(FIELD_KINDS as readonly string[]).includes(k));
+  if (extra.length || dbKinds.length !== FIELD_KINDS.length)
+    out.push(`field kinds differ from ontology: ${extra.join(", ") || dbKinds.join(", ")}`);
+  if (/grant[^;]*\bdelete\b/i.test(sql)) out.push("the API role may delete from the company layer");
+  if (/create table \w*(rule|workflow|formula)/i.test(sql))
+    out.push("a rule, workflow or formula table exists");
+  if (/generated always as \(/i.test(sql)) out.push("a computed column exists");
+  return out;
+}
+
+describe("migration 010 matches the model and keeps the fence (E16)", () => {
+  it("holds on the real files", () => {
+    expect(Object.keys(TABLE_OF)).toHaveLength(5);
+    expect(migrationFailures(ROOT)).toEqual([]);
+  });
+
+  it("break: a 'formula' kind in a copy of the migration is named", () => {
+    const dir = mkdtempSync(join(tmpdir(), "lop-rieng-mig-"));
+    cpSync(join(ROOT, "ontology"), join(dir, "ontology"), { recursive: true });
+    cpSync(join(ROOT, "tools"), join(dir, "tools"), { recursive: true });
+    cpSync(join(ROOT, "db/migrations"), join(dir, "db/migrations"), { recursive: true });
+    const p = join(dir, MIGRATION);
+    writeFileSync(
+      p,
+      readFileSync(p, "utf8").replace(
+        "'single_select', 'boolean')",
+        "'single_select', 'boolean', 'formula')",
+      ),
+    );
+    try {
+      expect(migrationFailures(dir)).toContain("field kinds differ from ontology: formula");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("break: a delete grant in a copy of the migration is named", () => {
+    const dir = mkdtempSync(join(tmpdir(), "lop-rieng-mig-"));
+    cpSync(join(ROOT, "ontology"), join(dir, "ontology"), { recursive: true });
+    cpSync(join(ROOT, "tools"), join(dir, "tools"), { recursive: true });
+    cpSync(join(ROOT, "db/migrations"), join(dir, "db/migrations"), { recursive: true });
+    const p = join(dir, MIGRATION);
+    writeFileSync(
+      p,
+      readFileSync(p, "utf8").replace(
+        "grant select, insert, update on",
+        "grant select, insert, update, delete on",
+      ),
+    );
+    try {
+      expect(migrationFailures(dir)).toContain("the API role may delete from the company layer");
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
