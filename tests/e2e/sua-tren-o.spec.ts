@@ -280,17 +280,17 @@ test.describe("sua-tren-o", () => {
     await expect(cellOf(page, "1202", PRICE)).toHaveAttribute("data-cell-focused", /.*/);
   });
 
-  for (const scheme of ["light", "dark"] as const) {
-    test(`axe-sang-toi: ${scheme}`, async ({ page }) => {
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`axe-sang-toi: ${colorScheme}`, { tag: "@cho" }, async ({ page }) => {
       test.skip(width() !== "1440", "the editors are the same at every wide size");
-      await page.emulateMedia({ colorScheme: scheme });
+      await page.emulateMedia({ colorScheme });
       await openInventory(page);
       const check = async (what: string) => {
         const { violations } = await new AxeBuilder({ page })
           .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
           .include('[data-slot="cell-editor"], [data-slot="status-dialog"]')
           .analyze();
-        expect(violations, `axe-sang-toi: ${scheme} ${what}`).toEqual([]);
+        expect(violations, `axe-sang-toi: ${colorScheme} ${what}`).toEqual([]);
       };
       await typeInPrice(page, "1101", "2,8 tỷ");
       // Scan only once each editor has finished appearing: a half-faded box reads as low contrast (G-1311-108).
