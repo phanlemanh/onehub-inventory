@@ -5,6 +5,7 @@ import { TypedCell } from "@/components/candidate/typed-cell";
 import { EMPTY, formatByKind } from "@/lib/format";
 import type { TypedColumn } from "@/components/candidate/column-kind";
 
+import { CopyLink } from "./copy-link";
 import { inventoryColumns, type InventoryField } from "./inventory-rows";
 
 /** The facts the card shows in its three-up row, in order (after product-grid-4's specs row). */
@@ -152,6 +153,8 @@ export function listingRecord(headers: Readonly<Record<InventoryField, string>>)
           .filter((part) => part !== "")
           .join(" · "),
         body: <ListingRecordBody view={view} priceLabel={headers["Listing.listPrice"]} />,
+        // Row 3f: the record's link, so a colleague opens the same listing on the inventory.
+        actions: <CopyLink id={view.id} />,
       };
     },
   };

@@ -144,8 +144,13 @@ async function assertActionsTopRight(page: Page): Promise<void> {
     const record = document.querySelector('[data-slot="record-panel"]')!;
     const header = record.querySelector('[data-slot="record-panel-header"]')!;
     const title = header.querySelector("h2")!.getBoundingClientRect();
-    const buttons = [...header.querySelectorAll("button")].map((b) => b.getBoundingClientRect());
+    const all = [...header.querySelectorAll("button")];
+    const buttons = all.map((b) => b.getBoundingClientRect());
     return {
+      // The last three are «Trước», «Sau», «Đóng»; row 3f's «Chép đường dẫn» may stand before them, on the same line.
+      lastThree: all
+        .slice(-3)
+        .map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim() ?? ""),
       titleTop: title.top,
       tops: buttons.map((b) => b.top),
       closeRight: buttons.at(-1)!.right,
@@ -154,7 +159,8 @@ async function assertActionsTopRight(page: Page): Promise<void> {
   });
   const offTop = g.tops.some((top) => Math.abs(top - g.titleTop) > 4);
   const offRight = g.recordRight - g.closeRight > 24;
-  if (g.tops.length !== 3 || offTop || offRight)
+  const named = ["Trước", "Sau", "Đóng"].every((name, i) => g.lastThree[i]?.includes(name));
+  if (g.tops.length < 3 || !named || offTop || offRight)
     throw new Error("record actions left the top right");
 }
 

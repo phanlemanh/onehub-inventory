@@ -62,6 +62,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0024 Ngăn nổi để xem chi tiết một dòng](decisions/0024-ngan-noi-xem-chi-tiet.md)
 - [0025 Bộ nút theo quyền — một chỗ đặt, một cửa, một bảng](decisions/0025-bo-nut-theo-quyen.md)
 - [0026 Cửa thao tác dùng chung và phụ thuộc mô-đun đầu tiên](decisions/0026-cua-thao-tac-dung-chung.md)
+- [0028 Thêm gói cmdk cho ô ⌘K](decisions/0028-them-goi-cmdk-cho-o-k.md)
 
 ## Incidents
 
