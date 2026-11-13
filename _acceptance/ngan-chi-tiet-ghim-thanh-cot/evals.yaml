@@ -1,0 +1,110 @@
+schema_version: 1
+feature_slug: ngan-chi-tiet-ghim-thanh-cot
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.ghim_ngan_e2e
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/grid-copy.ts, tests/e2e/ghim-ngan.spec.ts]
+    expected: "exit 0; trong tests/e2e/ghim-ngan.spec.ts ở khổ 1440 và 1024, trên /inventory và /sent với hồ sơ dòng đầu đang mở: dòng hai của đầu hồ sơ ([data-slot=record-panel-actions]) có đúng một nút tên 'Ghim thành cột', thứ tự các nút trong dòng là [nút của bản ghi…, Ghim thành cột, Trước, Sau, Đóng] (so theo vị trí trái sang phải); ở khổ 360 và 414 hồ sơ có data-record-layout=screen và không có nút tên 'Ghim thành cột' hay 'Bỏ ghim'; ở khổ 768x1024 với cột thứ hai App Shell mở (vùng làm việc dưới 800 px) không có nút ghim và hồ sơ là float, gập cột thứ hai (vùng làm việc từ 800 px) thì có nút và sau khi ghim 320 ≤ bề rộng cột ≤ vùng làm việc − 480; ca đối chứng trên bản dựng mà nút đặt sau 'Đóng' cho 'pin button out of place: after Đóng'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.ghim_ngan_e2e
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, src/components/ui/resizable.tsx, tests/e2e/ghim-ngan.spec.ts]
+    expected: "exit 0; ở 1440 và 1024, trên /inventory và trên /sent (cùng các vế): đếm số đầu cột đang hiện của lưới trước khi mở hồ sơ (n); bấm Ghim thì hồ sơ có data-record-layout=pinned, không có box-shadow, mép phải cột = mép phải vùng làm việc App Shell (lệch ≤ 1 px), mép phải [data-slot=data-region] ≤ mép trái cột + 1 px, số đầu cột đang hiện vẫn là n, nút mang tên 'Bỏ ghim' và aria-pressed=true; bấm 'Bỏ ghim' thì cùng data-record-id, data-record-layout=float, bề rộng vùng dữ liệu bằng bề rộng đo lúc chưa mở hồ sơ (lệch ≤ 1 px); trước khi ghim cuộn thân hồ sơ ([data-slot=record-panel-body]) xuống 120 px, sau khi ghim và sau khi bỏ ghim scrollTop vẫn là 120 ± 1 và document.activeElement là nút ghim (tên mới); ca đối chứng bản dựng gắn lại cây khi đổi dáng cho 'record remounted on pin: scroll 0', ca đối chứng bản dựng giấu cột khi ghim cho 'columns hidden on pin: n → n-1', bản dựng không co vùng cho 'region under pinned column'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.ghim_ngan_e2e
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, tests/e2e/ghim-ngan.spec.ts]
+    expected: "exit 0; ở 1440, ma trận viết trước 5 đường đi khi đang ghim (Sau · bấm mã căn dòng 3 · Đóng rồi mở dòng 2 · tải lại trang · sang /sent rồi mở dòng đầu), mỗi ô khẳng định data-record-layout=pinned và bề rộng cột bằng bề rộng trước đường đi (lệch ≤ 1 px); bộ kiểm khẳng định hằng 5 viết trong tệp; sau 'Đóng' không còn [data-slot=record-panel] và vùng dữ liệu đủ rộng; ca đối chứng bản dựng giữ ghim trong bộ nhớ trang (không lưu) cho 'pin lost after: tai lai'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.ghim_ngan_e2e
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, tests/e2e/ghim-ngan.spec.ts]
+    expected: "exit 0; ở 1440 và 1024, với hồ sơ nổi rồi ghim: đỉnh hồ sơ ≥ đáy [data-slot=app-shell-top-bar] và hộp của thanh công cụ vùng không giao hộp của hồ sơ; bấm ô cột Toà của dòng 2 thì ô ấy có aria-selected=true, ArrowDown chuyển chọn sang dòng 3; bấm 'Toàn màn hình' khi đang ghim thì cột vẫn data-record-layout=pinned và mép phải vùng dữ liệu ≤ mép trái cột + 1 px; ca đối chứng bản dựng hồ sơ ghim phủ từ đỉnh cửa sổ cho 'top bar covered by record'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.ghim_ngan_e2e
+    paths: [src/components/candidate/record-panel.tsx, src/components/ui/resizable.tsx, tests/e2e/ghim-ngan.spec.ts]
+    expected: "exit 0; ở 1440 khi đang ghim: kéo vạch chia ([role=separator] trong khung) sang trái 200 px thì cột rộng thêm 200 ± 2 px; kéo sang phải 2000 px thì cột còn đúng 320 ± 1 px; kéo sang trái 2000 px thì cột bằng 60% bề rộng vùng làm việc ± 1 px; tiêu điểm vào vạch rồi ArrowLeft thì cột rộng thêm, ArrowRight hẹp lại; tải lại trang thì bề rộng bằng lần đo cuối ± 1 px; ca đối chứng bản dựng bỏ trần hẹp cho 'pinned column narrower than 320'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/record-pin.ts, tests/ghim-ngan.test.ts]
+    expected: "exit 0; tests/ghim-ngan.test.ts: ma trận viết trước 8 giá trị cookie ('1:520' · '0:520' · '1:200' (dưới 320) · '1:99999' · '1:abc' · '' · 'x' · '1:520:MAU') qua readPin cho đúng {pinned, width} đã viết sẵn — giá trị hỏng hay ngoài giới hạn là chưa ghim với width null; writePin({pinned:true,width:520}) cho chuỗi khớp /^ho_so_ghim=1:520; path=\\/; max-age=\\d+; samesite=lax$/; bộ kiểm khẳng định hằng 8 viết trong tệp; ca đối chứng writePin nhận thêm id căn thì chuỗi cookie chứa id ấy và bài báo 'pin cookie carries record data'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.ghim_ngan_e2e
+    layer: backend-effect
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/record-pin.ts, tests/e2e/ghim-ngan.spec.ts]
+    expected: "exit 0; sau khi ghim và kéo ở 1440, context.cookies() có đúng một cookie tên bắt đầu 'ho_so' là ho_so_ghim với giá trị khớp /^1:\\d+$/, không chứa data-record-id đang mở; localStorage và sessionStorage không có khoá mới so với trước khi ghim; đặt cookie 'ho_so_ghim=1:abc' rồi tải lại thì hồ sơ mở ra nổi (data-record-layout=float)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.ghim_ngan_e2e
+    paths: [src/components/candidate/record-panel.tsx, src/components/ui/resizable.tsx, tests/e2e/ghim-ngan.spec.ts]
+    expected: "exit 0; ở 1440 sáng và tối với hồ sơ ghim: quét axe (wcag2a, wcag2aa) trên trang không vi phạm; nút tên 'Bỏ ghim' có aria-pressed=true; [role=separator] có tên không rỗng và aria-valuenow là số; tiêu điểm trong hồ sơ ghim, Escape thì không còn hồ sơ và tiêu điểm nằm ở chữ mở của dòng đã mở; mở lại và ghim, chọn ô Toà dòng 2 rồi Escape thì hồ sơ vẫn pinned; ở ô Giá chào đang sửa (Enter vào chế độ sửa) Escape thì ô thôi sửa và hồ sơ vẫn pinned; ca đối chứng bản dựng nghe Escape trên cả trang cho 'pinned record closed from grid', ca đối chứng bản dựng bỏ tên vạch chia cho vi phạm axe tên luật"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.vai_man_nut
+    paths: [design/screens.yaml, design/vai-man-nut.md, src/components/candidate/record-panel.tsx]
+    expected: "exit 0; bộ sinh bảng vai × màn × nút đọc design/screens.yaml có 'Ghim' trong nut_chung của inventory và sent; bảng sinh lại bằng tệp đã commit"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["**"]
+    expected: "exit 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-9
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/components/candidate/**, src/modules/listings/ui/**]
+    steps:
+      - "Use the dev server at the URL given (lane D, port 3483); if it does not answer, start it from the repo root with PORT=3483 npm run dev (never port 3470, never while a suite command is running), note its PID and stop only that PID when done"
+      - "Navigate {url}/inventory at 1440x900, light; click the unit code of the first row; click the button named 'Ghim thành cột' → screenshot evidence/ghim-1440-sang.png"
+      - "Same at 1440x900 dark → evidence/ghim-1440-toi.png; at 1024x768 light and dark → evidence/ghim-1024-sang.png, evidence/ghim-1024-toi.png"
+      - "Navigate {url}/inventory at 360x800 light, open the first row → evidence/ho-so-360-sang.png"
+    expected: "Ảnh 1440 và 1024: hồ sơ là cột liền mép phải dưới thanh trên, có vạch chia mảnh với tay cầm ở mép trái cột, bảng bên trái không bị che, nút Ghim (đang bấm) ở dòng hai đầu hồ sơ trước Trước, Sau, Đóng; ảnh 360: hồ sơ toàn màn không có nút Ghim"
+    evidence_required: [screenshot, observed]
+
+  - id: E12
+    criterion: AC-9
+    executor: judgment
+    inputs:
+      - _acceptance/ngan-chi-tiet-ghim-thanh-cot/evidence/ghim-1440-sang.png
+      - _acceptance/ngan-chi-tiet-ghim-thanh-cot/evidence/ghim-1440-toi.png
+      - _acceptance/ngan-chi-tiet-ghim-thanh-cot/evidence/ghim-1024-sang.png
+      - _acceptance/ngan-chi-tiet-ghim-thanh-cot/evidence/ghim-1024-toi.png
+      - _acceptance/ngan-chi-tiet-ghim-thanh-cot/evidence/ho-so-360-sang.png
+      - _acceptance/ngan-chi-tiet-ghim-thanh-cot/evidence/reui/app-shell-11.png
+      - _acceptance/ngan-chi-tiet-ghim-thanh-cot/contract.md
+    question: "Trả lời riêng cho từng ảnh ghim-1440-sang, ghim-1440-toi, ghim-1024-sang, ghim-1024-toi: ảnh có cùng dáng với vùng nội dung | cột Details của ảnh app-shell-11.png không: cột chi tiết liền mép phải, vạch chia mảnh có tay cầm giữa nội dung và cột, không bóng nổi; vạch chia có nhìn thấy được (kể cả ở nền tối), và nút Ghim có nằm ở chỗ AC-1 của contract.md đặt (dòng hai đầu hồ sơ, trước Trước, Sau, Đóng)? Và ảnh ho-so-360-sang có phải hồ sơ toàn màn không có nút Ghim?"
+    evidence_required: [verdict, rationale]
