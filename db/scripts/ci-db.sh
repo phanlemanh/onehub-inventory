@@ -9,7 +9,7 @@
 #     cach-ly      the isolation suite (db/scripts/cach-ly.sh), its session cases connected as quy_hang_login
 #     bai-db       every database test file (vitest -c vitest.db.config.ts), JSON report
 #     co-phien     every signed-in browser test file (playwright -c playwright.db.config.ts), JSON report
-#     khong-phien  the signed-out run of the register-driven suite (main configuration), JSON report
+#     khong-phien  the signed-out run of the register-driven suite (main configuration), JSON report, no slowed copy
 #     dem          hand-over count between the two runs and passed tests per file (tests/e2e-db/dem-giao-nhan.ts)
 #   BUOC="…"       same as the arguments, for `make ci-db BUOC="co-phien khong-phien dem"`.
 #   DB_PORT        Postgres port (default 5432, the CI service).
@@ -97,8 +97,10 @@ chay() {
       PLAYWRIGHT_JSON_OUTPUT_NAME="$OUT/co-phien.json" npx playwright test -c playwright.db.config.ts --reporter=list,json
       ;;
     khong-phien)
+      # Without the slowed copy (describe «cham», CPU slowed four times): the e2e job already runs it, and the count
+      # receives a slowed test by the normal test of the same size anyway.
       PLAYWRIGHT_JSON_OUTPUT_NAME="$OUT/khong-phien.json" npx playwright test tests/e2e/screens/screens.spec.ts \
-        --reporter=list,json
+        --grep-invert "(^| )cham( |$)" --reporter=list,json
       ;;
     dem) node tests/e2e-db/dem-giao-nhan.ts "$OUT" ;;
   esac
