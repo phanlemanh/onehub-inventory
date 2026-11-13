@@ -125,6 +125,11 @@ thêm dáng ghim của chi tiết.
   màn 360 không đủ chỗ cho bảng và cột cùng lúc. Lối khác: ghim = hồ sơ thành trang riêng có địa chỉ riêng — trái lời chủ
   kho ở Cổng Phạm vi 3f «Không làm trang riêng cho một căn».
 
+- **Hỏi-2 · Ở màn hẹp (1024), ghim khi cột thứ hai của App Shell đang mở thì sao?** Khuyến nghị: A — giữ nguyên cột thứ
+  hai; bảng còn trọn hai cột dữ liệu (Căn, Toà), người dùng tự gập cột thứ hai bằng một cú bấm nếu cần. Lối khác: B — bấm
+  Ghim thì cột thứ hai tự gập, bỏ ghim thì trở lại; bảng thêm khoảng 300 px nhưng đổi hành vi App Shell (chủ kho chốt giữ
+  hai cột ngày 11/11) ở riêng tình huống này.
+
 ## Ngoài phạm vi
 
 - Lớp trò chuyện với AI trong ngăn (thẻ thứ hai của cùng ngăn) — hàng sau, chưa có ô.

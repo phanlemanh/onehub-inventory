@@ -28,6 +28,7 @@ Resizable của ReUI, chưa phải mã thành phần.
 | tình huống | 1440 | 1024 | 414 | 360 |
 |---|---|---|---|---|
 | noi · ghim | sáng, tối | sáng, tối | — | — |
+| hoi2-a-cot-hai-mo · hoi2-b-cot-hai-gap | — | sáng | — | — |
 | ghim-keo · sent-ghim | sáng | sáng | — | — |
 | dien-thoai (hồ sơ toàn màn) | — | — | sáng | sáng |
 
@@ -37,4 +38,5 @@ Resizable của ReUI, chưa phải mã thành phần.
 
 1. (đã sửa) Dấu dev của Next ở góc trái lọt vào ảnh — ẩn trong lượt chụp.
 2. (đã sửa) Nút Ghim khi đang bấm trông như chưa bấm — thêm nền nhấn theo `aria-pressed`.
-3. (rủi ro, đưa lên đầu trang cổng) 1024 với cột hai App Shell mở: bảng còn trọn hai cột dữ liệu khi ghim.
+3. (thành Hỏi-2 theo giám sát) 1024 với cột hai App Shell mở: bảng còn trọn hai cột dữ liệu khi ghim — hai ảnh A giữ
+   cột hai, B tự gập.

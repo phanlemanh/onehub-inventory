@@ -95,7 +95,8 @@ coverage-scan» trong sổ quyết định. Thay vào đó, các trục cố đ�
 
 ## Notes
 
-- Hỏi cho chủ kho ở Cổng Phạm vi: Hỏi-1 điện thoại (thiết kế, mục «Câu cho chủ kho»).
+- Hỏi cho chủ kho ở Cổng Phạm vi: Hỏi-1 điện thoại; Hỏi-2 ghim ở màn hẹp khi cột thứ hai App Shell mở (thiết kế, mục
+  «Câu cho chủ kho»). Chọn B ở Hỏi-2 thì thêm tiêu chí tự gập và trả cột thứ hai.
 - Gói mới `react-resizable-panels` (MIT) cài cùng thành phần `resizable` bằng lệnh shadcn; giám sát cho chạm ba tệp ngoài
   vùng (tin D-1311-31) với năm điều kiện, trang quyết định 0031.
 - Phần dựng chờ 3e, 4, 2e gộp vào nhánh chính.
