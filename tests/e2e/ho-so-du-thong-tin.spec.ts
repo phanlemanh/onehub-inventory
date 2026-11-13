@@ -52,6 +52,13 @@ async function listed(page: Page): Promise<{ numbers: string[]; current: string 
   });
 }
 
+/** After moving to another unit the record shows that unit's newest listing, with no earlier-listing note. */
+async function keptErrors(page: Page): Promise<string[]> {
+  const got = await listed(page);
+  const note = await record(page).locator('[data-slot="listing-earlier-note"]').count();
+  return got.current === got.numbers[0] && note === 0 ? [] : ["old listing kept across units"];
+}
+
 function listedErrors(got: { numbers: string[] }, n: number): string[] {
   const want = Array.from({ length: n }, (_, i) => `Lần ${n - i}`);
   return got.numbers.join() === want.join() ? [] : ["listings of unit not newest first"];
@@ -103,9 +110,25 @@ test.describe("E7 · every listing of the unit, newest first", () => {
     await record(page).getByRole("button", { name: "Lần 1" }).click();
     await panel(page).getByRole("button", { name: "Sau" }).click();
     await expect(panel(page)).not.toHaveAttribute("data-record-id", THREE);
-    await expect(record(page).locator('[data-slot="listing-earlier-note"]')).toHaveCount(0);
-    const got = await listed(page);
-    expect(got.current).toBe(got.numbers[0]);
+    expect(await keptErrors(page)).toEqual([]);
+  });
+
+  test("break: a record that keeps the earlier listing on the next unit is named", async ({
+    page,
+  }) => {
+    await openRecord(page, THREE);
+    await panel(page).getByRole("button", { name: "Sau" }).click();
+    await expect(panel(page)).not.toHaveAttribute("data-record-id", THREE);
+    // Mark the oldest line as the one in view and show the note, the way a record that kept the choice would.
+    await record(page).evaluate((el) => {
+      const buttons = [...el.querySelectorAll('[data-slot="listings-of-unit"] li button')];
+      for (const b of buttons) b.removeAttribute("aria-current");
+      buttons.at(-1)?.setAttribute("aria-current", "true");
+      const note = document.createElement("div");
+      note.setAttribute("data-slot", "listing-earlier-note");
+      el.prepend(note);
+    });
+    expect(await keptErrors(page)).toEqual(["old listing kept across units"]);
   });
 
   test("a unit with one listing lists one line", async ({ page }) => {
