@@ -1,0 +1,130 @@
+schema_version: 1
+feature_slug: kiem-vai-theo-man
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.vai_man_so
+    paths: [design/screens.yaml, ontology/actions.yaml, tests/vai-man-so-man.test.ts, tests/e2e-db/vai-man.ts]
+    expected: "exit 0; ca 'so-man-du-cua-vao' xanh trên sổ thật (mọi màn staff/public kể cả contacts planned có khoá vao, nut, nut_chung; today, inventory, sent, sign-in, contacts vao = null; members vao = listMembers; members nut = [inviteMember, changeMemberRoles]; sent nut = []; sổ có khối khung); ca phá thêm: xoá khoá nut của inventory → 'inventory: thieu khoa nut'; ba ca phá trên bản sao sổ màn đỏ đúng thông điệp ghim: xoá khoá vao của members → 'members: thieu khoa vao'; vao: khongCo → 'members: vao khongCo khong co trong bang quyen'; vao của today trỏ một thao tác planned (viewListings) → 'today: man built tro thao tac planned viewListings'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.vai_man_so
+    paths: [design/screens.yaml, ontology/roles.yaml, tests/vai-man-so-man.test.ts, tests/e2e-db/vai-man.ts]
+    expected: "exit 0; ca 'tap-cap-bang-tich' khẳng định tập cặp do hàm sinh cặp của bộ kiểm trả về = tích viết trước [today, inventory, sent, members, sign-in] × [ListAgent, BuyerAgent, TeamLead, CompanyAdmin] (20 cặp) và màn ngoài ma trận = {contacts: planned, proto: dev, proto-bo-nut: dev}; ca phá trên bản sao sổ màn thêm màn built staff 'thu-them' (route /thu-them, vao null) → hàm sinh cặp trả 24 cặp gồm 4 cặp 'thu-them × <vai>' (đối chứng: cùng hàm trên sổ thật trả 20)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.vai_man_so
+    paths: [tests/vai-man-so-man.test.ts, tests/e2e-db/vai-man.spec.ts, tests/e2e-db/vai.setup.ts, tests/e2e-db/dang-nhap-vai.ts]
+    expected: "exit 0; ca 'cua-dang-nhap-chung' xanh: trong tests/e2e-db/vai-man.spec.ts không có getByLabel('Email'), getByLabel('Mã đăng nhập') hay đọc hộp thư mã, tệp nhận phiên chỉ qua phienCuaVai(), tệp nhập hàm sinh cặp và không chứa id màn nào của sổ dưới dạng chuỗi viết tay (ca phá thứ hai: thêm chuỗi 'members' vào bản sao tệp bài → đỏ 'vai-man.spec.ts: id man viet tay members'); ca phá trên bản sao tệp bài thêm một dòng getByLabel('Mã đăng nhập') → đỏ 'vai-man.spec.ts: tu dang nhap, dung cua chung'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.vai_man_e2e
+    paths: [tests/e2e-db/**, playwright.db.config.ts, design/screens.yaml]
+    expected: "exit 0; dự án 'vai' chạy đúng 1 bài 'dang nhap bon vai' và xanh: tạo sàn '[Sàn mẫu thử vai]', 4 người mỗi người đúng 1 vai và 1 người chứng, đăng nhập 4 lần qua /login bằng mã trong hộp thư thử của lượt (mỗi người đúng 1 thư mã), lưu 4 tệp phiên; mọi bài 'vai-*' chạy sau nó (phụ thuộc dự án); đầu ra có dòng 'cua dang nhap: 4 vai, 4 lan dang nhap'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.vai_man_e2e
+    paths: [tests/e2e-db/**, playwright.db.config.ts, design/screens.yaml, src/app/**]
+    expected: "exit 0; các bài được đăng ký bằng cách lặp đầu ra của hàm sinh cặp (không có id màn viết tay trong tệp bài — E3 giữ); sau lượt, bước đối chiếu đọc báo cáo JSON của Playwright, chuẩn hoá tên bước về (màn, vai, khổ) và so BẰNG với đầu ra hàm sinh cặp theo khổ Hỏi-1 chốt, in 'vai x man: 20 cap, <k> buoc' — lệch thì đỏ ghim 'doi chieu: thua <cặp>' hoặc 'doi chieu: thieu <cặp>'; mỗi cặp được vào có bước '<màn> × <vai> @<khổ>: duoc vao' xanh — lối B: 17 bước ở 1440 (today, inventory, sent, sign-in × 4 vai và members × CompanyAdmin); lối A: 17 × 4 khổ = 68 bước; trang không có [data-slot=page-state][data-kind=forbidden], h1 = tên màn trong sổ (Hôm nay, Bảng hàng, Đã gửi, Thành viên); sign-in × mỗi vai kết thúc ở pathname '/'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.vai_man_e2e
+    paths: [tests/e2e-db/**, playwright.db.config.ts, design/screens.yaml, src/app/**, src/components/templates/**]
+    expected: "exit 0; mỗi cặp bị chặn (members × ListAgent, BuyerAgent, TeamLead) có bước '<màn> × <vai> @<khổ>: khong du quyen' xanh ở cả bốn khổ 360, 414, 1024, 1440 = 3 × 4 = 12 bước (như nhau ở lối A và B): đúng 1 khối [data-kind=forbidden], h1 'Không đủ quyền', có liên kết về '/'; ảnh members-<vai>-1440.png và members-<vai>-360.png nằm ở thư mục kết quả"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.vai_man_e2e
+    paths: [tests/e2e-db/**, playwright.db.config.ts, src/app/**, src/components/templates/**]
+    expected: "exit 0; mỗi cặp bị chặn có bước '<màn> × <vai> @<khổ>: khong lo nguoi chung' xanh — chuỗi tên '[Tên] Người chứng' và email người chứng của lượt không có trong page.content() và trong thân mọi phản hồi văn bản (html, json, luồng RSC) ghi được từ lúc mở trang tới khi khối hiện; số phản hồi văn bản ghi được của mỗi cặp bị chặn > 0, tập rỗng thì đỏ ghim '<màn> × <vai> @<khổ>: khong ghi duoc phan hoi'; cùng lượt, bước 'members × CompanyAdmin @1440: thay nguoi chung' xanh với HAI vế bằng CHÍNH hai đường đo trên: tên người chứng có trong page.content() VÀ có trong ít nhất một thân phản hồi ghi được (đối chứng dương cho cả đường trang lẫn đường mạng)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.vai_man_e2e
+    paths: [tests/e2e-db/**, src/app/(app)/nav.ts, src/components/**, design/screens.yaml]
+    expected: "exit 0; 8 bước viết trước '<vai> @<khổ>: thanh ben' cho 4 vai × {1440, 360} xanh — ở 360 mở ngăn điều hướng trước khi đếm; mục dẫn tới /members hiện đúng với CompanyAdmin, vắng với ba vai còn lại; mục Hôm nay, Bảng hàng, Đã gửi hiện với cả bốn vai"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.vai_man_so
+    paths: [tests/vai-man-so-man.test.ts, src/app/(app)/nav.ts, design/screens.yaml]
+    expected: "exit 0; ca 'thanh-ben-khop-so-man' xanh: mỗi mục thanh bên có href trùng route một màn của sổ khai cùng thao tác với vao của màn ấy (members: listMembers = listMembers; today, inventory, sent: không thao tác = null); ca phá trên bản sao sổ màn đổi vao của members thành inviteMember → đỏ 'members: thanh ben khai listMembers, so man khai inviteMember'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.vai_man_pha_thu
+    paths: [tests/e2e-db/**, playwright.db.config.ts, design/screens.yaml, src/app/(app)/members/**, src/components/templates/**]
+    expected: "exit 0 của lệnh phá thử; lệnh dựng bản sao cây ở thư mục tạm cho mỗi bản phá, chạy đúng cặp ở khổ 1440 rồi in một dòng mỗi bản: 'pha mo-members: do — members × TeamLead @1440: mong Khong du quyen' · 'pha so-man-mo: do — members × ListAgent @1440: mong man thuong' · 'pha lo-nguoi-chung: do — members × BuyerAgent @1440: lo nguoi chung'; và dòng 'cay goc: xanh' cho cùng ba cặp trên cây chưa phá; lệnh thoát khác 0 nếu một bản phá xanh, một thông điệp lệch, hay cây gốc đỏ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["**"]
+    expected: "exit 0; make check xanh — gồm tests/vai-man-so-man.test.ts trong make test và coverage-matrix đọc sổ màn có khoá vao mới không lỗi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.vai_man_nut
+    paths: [tools/coverage_matrix/buttons.py, design/screens.yaml, ontology/actions.yaml, src/modules/*/ui/**, src/app/**, tests/vai-man-nut-sinh.test.ts, tests/bo-nut-vai-man.test.ts]
+    expected: "exit 0; ca 'doc-giao-dien-mo-dun': trên sổ thật, mục inventory của bảng JSON có editView, saveView tìm thấy (đọc từ src/modules/listings/ui) và createListing, updateListing, activateListing, removeListing, viewOwnerPhone mang dấu dự kiến (planned); ca 'khong-gan-ca-mo-dun': mục today KHÔNG có thao tác nào, mục khung có editView, removeView; cây thật '--check' thoát 0; ba ca phá trên bản sao cho cùng dòng 'inventory: ma co readCatalog chua khai' khi một thao tác chưa khai (action: \"readCatalog\") đặt (a) thẳng vào trang inventory, (b) vào tệp src/modules/listings/ui/inventory-grid.tsx mà trang nhập, (c) vào một thành phần trung gian mới trong src/components/ mà trang nhập; đối chứng: đặt nó vào một tệp listings/ui mà không trang nào nhập → '--check' thoát 0 và không nhắc readCatalog; ca 'nut-khong-co-trong-bang': khai nut khongCo cho today → 'today: nut khongCo khong co trong bang quyen'; các ca của tests/bo-nut-vai-man.test.ts (hàng 9e) vẫn xanh, không đổi lời"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.vai_man_nut
+    paths: [tools/coverage_matrix/buttons.py, design/vai-man-nut.md, design/screens.yaml, tests/vai-man-nut-sinh.test.ts]
+    expected: "exit 0; ca 'bang-du-muc': design/vai-man-nut.md có đúng một mục '## <id>' cho mỗi màn của sổ (8 hôm nay) cộng một mục '## khung' — đếm viết trước 9 mục; mỗi mục có bảng 3 cột 'Vai | Nút theo quyền | Nút không theo quyền' với 4 hàng vai; mục khung liệt ô tìm, đổi sàn, đăng xuất ở cột không theo quyền và saveView, editView, removeView ở cột theo quyền; ca 'du-kien': ô Đầu chủ của inventory chứa 'createListing (toàn sàn, dự kiến)'; ca phá: sửa tay một ô của tệp → '--check' thoát 1 'lệch bảng quyền: inventory'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.vai_man_e2e
+    paths: [tests/e2e-db/**, design/vai-man-nut.md, design/screens.yaml, src/modules/identity/ui/**, src/app/**]
+    expected: "exit 0; với mỗi cặp được vào ở 1440, bước '<màn> × <vai> @1440: duoc vao' đọc sổ ghi nhận của nút theo quyền (mục sửa sau Cổng Phạm vi, sua-sau-cong-pham-vi.md) và so với bảng ĐÃ SINH design/vai-man-nut.md: mọi quyết định thuộc mục của màn hay mục khung, mọi nút được cho hiện nằm trong ô của vai (ngoài ô thì đỏ '<màn> × <vai> @1440: thay nut <x> khong co trong o'), mọi nút mo_san của vai được cho hiện (thiếu thì đỏ 'thieu nut <x>'); bước in '<màn> × <vai> @1440: nut — <n> quyet dinh, <m> hien' (members × CompanyAdmin > 0, inventory × ba vai có lưu cách xem > 0 — đối chứng dương); phép so nút thật theo tên hiển thị cho mỗi nút mo_san: inventory 'Lưu góc nhìn' hiện với ListAgent, BuyerAgent, TeamLead và không có với CompanyAdmin; members 'Mời người' và 'Đổi vai' hiện với CompanyAdmin"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.vai_man_pha_thu
+    paths: [tests/e2e-db/**, src/app/(app)/members/**, src/modules/identity/ui/**, design/vai-man-nut.md, ontology/actions.yaml]
+    expected: "exit 0; lệnh phá thử in thêm ba dòng, mỗi dòng một bản sao: 'pha doi-nut-moi: do — members × CompanyAdmin @1440: thieu nut inviteMember' (cùng lượt có 'thay nut readCompany khong co trong o'); 'pha nut-lac-man: do — members × CompanyAdmin @1440: thay nut saveView khong co trong o' (nút lưu cách xem đặt vào thân màn Thành viên); 'pha quyen-chua-sinh-bang: do — <khung|inventory> × CompanyAdmin @1440: thay nut saveView khong co trong o' (bảng quyền cho Quản trị sàn saveView, không sinh lại bảng); cây gốc cùng các cặp xanh"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E16
+    criterion: AC-11
+    executor: test
+    cmd: config:executors.test.vai_man_nut
+    paths: [src/modules/identity/ui/**, src/**/*.tsx, tests/vai-man-dau-nut.test.tsx]
+    expected: "exit 0; tests/vai-man-dau-nut.test.tsx: ca 'khong-them-gi-vao-trang' — nút được cho hiện qua nút theo quyền cho đúng HTML của nút trần (không thêm phần tử hay thuộc tính); ca 'ghi-hai-chieu' — khi cờ NEXT_PUBLIC_E2E_BUTTON_RECORD=1, sổ ghi cả thao tác được cho hiện (saveView, shown true, scope own) lẫn thao tác bị chặn (inviteMember, shown false, scope null); ca 'tat-co-khong-ghi' — không cờ thì không ghi gì; ca 'ban-that-khong-ghi' — mọi lời gọi ghi nằm sau điều kiện cờ, và bản phá bỏ điều kiện đỏ với 'permitted-action.tsx: recordButton chay khong qua co dung'; các ca cũ của bộ nút theo quyền (hàng 9e, src/modules/identity/permitted-action.test.tsx) không đổi lời"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

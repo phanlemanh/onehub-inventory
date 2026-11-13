@@ -7,10 +7,22 @@
 #   family    a key of `families`, or null when not assigned yet (row 1c assigns)
 #   audience  staff (signed-in staff) | public (customer page) | dev (development build only)
 #   status    built (the page exists) | planned (declared ahead, no page yet)
+#   vao       (staff/public) the action a role must hold to open the screen, a name in ontology/actions.yaml, or null when
+#             every member of the company may open it; a built screen never names a planned action (row 9b)
+#   nut       (staff/public) the actions the screen has buttons for, names in ontology/actions.yaml; a declared action not
+#             found in the code yet shows as «dự kiến» in design/vai-man-nut.md (row 9b)
+#   mo_san    (optional) the actions of `nut` whose buttons show as soon as the screen opens; the role × screen browser
+#             suite expects exactly these for every role that holds them (row 9b)
+#   nut_chung (staff/public) buttons that do not depend on a permission, as people read them
+#
+# `khung` declares the same for the App Shell around every staff screen: the top bar and the second column (row 9b).
 families:
   grid: Lưới
 audiences: [staff, public, dev]
 statuses: [built, planned]
+khung:
+  nut: [editView, removeView]
+  nut_chung: [Tìm (⌘K), Đổi sàn, Đăng xuất]
 screens:
   - id: today
     route: /
@@ -18,24 +30,44 @@ screens:
     family: null
     audience: staff
     status: built
+    vao: null
+    nut: []
+    nut_chung: []
   - id: inventory
     route: /inventory
     title: Inventory
     family: grid
     audience: staff
     status: built
+    vao: null
+    nut:
+      - saveView
+      - editView
+      - createListing
+      - updateListing
+      - activateListing
+      - removeListing
+      - viewOwnerPhone
+    mo_san: [saveView]
+    nut_chung: [Chép đường dẫn, Lọc, Cột, Toàn màn hình, Trước, Sau, Đóng]
   - id: sent
     route: /sent
     title: Sent
     family: grid
     audience: staff
     status: built
+    vao: null
+    nut: []
+    nut_chung: [Lọc, Cột, Toàn màn hình]
   - id: contacts
     route: /contacts
     title: Contact
     family: grid
     audience: staff
     status: planned
+    vao: viewContacts
+    nut: [createContact, updateContact, removeContact, mergeContacts, eraseContactPersonalData]
+    nut_chung: []
   - id: proto
     route: /proto/[slug]
     title: null
@@ -54,9 +86,16 @@ screens:
     family: null
     audience: staff
     status: built
+    vao: null
+    nut: []
+    nut_chung: []
   - id: members
     route: /members
     title: Member
     family: null
     audience: staff
     status: built
+    vao: listMembers
+    nut: [inviteMember, changeMemberRoles]
+    mo_san: [inviteMember, changeMemberRoles]
+    nut_chung: []
