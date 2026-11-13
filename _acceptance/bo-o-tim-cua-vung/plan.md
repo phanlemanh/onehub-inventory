@@ -1,5 +1,7 @@
 # Kế hoạch — bo-o-tim-cua-vung (hàng 2e, T3)
 
+Đã duyệt: Manh Phan, 2026-11-13 («duyệt kế hoạch 2e: duyệt»).
+
 Hai đợt dựng, theo điều kiện của giám sát: **đợt A** không chạm lưới dùng chung, dựng ngay sau hai chữ ký (Cổng Phạm vi,
 kế hoạch); **đợt B** chạm lưới dùng chung, chỉ bắt đầu khi hàng 4 «Sửa trên ô» đã gộp — khi ấy gộp `origin/main` MỘT lần
 rồi mới dựng. Mỗi việc kết bằng bài của nó xanh và cặp ca phá đỏ đúng thông điệp ghim (luật đo mới của kit).
