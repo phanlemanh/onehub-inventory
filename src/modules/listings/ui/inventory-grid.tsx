@@ -22,6 +22,7 @@ import { listingRecord } from "./listing-record";
 import { SaveViewButtons } from "./save-view-buttons";
 import { gridView, sameAsStored, savedViewHref } from "./saved-view-api";
 import { savedViewCopy, type SavedViewLabels } from "./saved-view-copy";
+import type { CellEditLabels } from "./cell-edit-copy";
 import { useListingCellEdit } from "./use-listing-cell-edit";
 
 /** Rows kept when part of the load fails: the first page and a half, so the partial state still spans two pages. */
@@ -40,6 +41,7 @@ export function InventoryGrid({
   openView,
   viewLabels,
   listings,
+  editLabels,
   door,
 }: {
   title: string;
@@ -59,6 +61,8 @@ export function InventoryGrid({
   viewLabels?: SavedViewLabels;
   /** The listings the rows show: with them, price and status are edited in the cell under the permission table (row 4). */
   listings?: readonly Listing[];
+  /** Words of the cell editors from the label table (needed with `listings`). */
+  editLabels?: CellEditLabels;
   /** The save door of those edits; the sample door in memory when absent (row 10 hands in the real one). */
   door?: ListingSaveDoor;
 }) {
@@ -81,7 +85,7 @@ export function InventoryGrid({
   // The same columns on every render: this grid renders again on each change of arrangement (the «changed» mark), and
   // new columns would draw the header cells, with the filter box being typed in, again.
   const columns = useMemo(() => inventoryColumns(headers), [headers]);
-  const edit = useListingCellEdit({ rows, listings, headers, door });
+  const edit = useListingCellEdit({ rows, listings, headers, labels: editLabels, door });
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
     current === "empty" ? [] : current === "partial" ? edit.rows.slice(0, PARTIAL_ROWS) : edit.rows;

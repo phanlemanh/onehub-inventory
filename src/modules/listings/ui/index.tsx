@@ -22,3 +22,9 @@ export {
 export { SAVED_VIEW_PARAM, savedViewHref } from "./saved-view-api";
 export { savedViewCopy, type SavedViewCopy, type SavedViewLabels } from "./saved-view-copy";
 export { savedViewsSection } from "./saved-views-section";
+export {
+  CELL_EDIT_CONCEPTS,
+  cellEditLabels,
+  type CellEditConcept,
+  type CellEditLabels,
+} from "./cell-edit-copy";

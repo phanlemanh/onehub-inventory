@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { ListingStandardStatus, ListingWithdrawnReason } from "@/generated/ontology";
 import { statusLabel, statusTone } from "@/lib/format";
-import { label, type TransactionKind } from "@/modules/company-config";
 
 import {
   nextStatuses,
@@ -27,7 +26,13 @@ import {
   type StatusNeed,
 } from "../edit-rules";
 
-import { CELL_EDIT_COPY as COPY, WITHDRAWN_REASON_ORDER, exactNumber } from "./cell-edit-copy";
+import {
+  CELL_EDIT_COPY as COPY,
+  WITHDRAWN_REASON_ORDER,
+  exactNumber,
+  word,
+  type CellEditLabels,
+} from "./cell-edit-copy";
 
 /** The writes an editor asks for; the grid applies them through the save door and offers «Hoàn tác». */
 export type ListingEdit =
@@ -59,9 +64,11 @@ function UnderCell({ children, alert }: { children: React.ReactNode; alert?: boo
 
 function PriceEditor({
   session,
+  labels,
   onSave,
 }: {
   session: CellEditSession;
+  labels: CellEditLabels;
   onSave: (edit: ListingEdit) => void;
 }) {
   const previous = (session.row["Listing.listPrice"] as number | null) ?? null;
@@ -99,7 +106,8 @@ function PriceEditor({
           readOnly={asking !== null}
           value={text}
           aria-label={COPY.editLabel(
-            label("ListPrice"),
+            labels,
+            word(labels, "ListPrice"),
             String(session.row["Listing.unitNumber"] ?? ""),
           )}
           aria-invalid={error || emptyTried || undefined}
@@ -150,10 +158,12 @@ function PriceEditor({
 
 function StatusEditor({
   session,
+  labels,
   onSave,
   onAsk,
 }: {
   session: CellEditSession;
+  labels: CellEditLabels;
   onSave: (edit: ListingEdit) => void;
   onAsk: (ask: StatusAsk) => void;
 }) {
@@ -168,7 +178,8 @@ function StatusEditor({
     <div
       role="listbox"
       aria-label={COPY.editLabel(
-        label("StandardStatus"),
+        labels,
+        word(labels, "StandardStatus"),
         String(session.row["Listing.unitNumber"] ?? ""),
       )}
       className="flex min-w-(--anchor-width) flex-col items-start gap-0.5 rounded-md border bg-popover p-1 shadow-md ring-2 ring-primary"
@@ -195,17 +206,19 @@ function StatusEditor({
 /** The editor of one inventory cell: price or status. */
 export function ListingCellEdit({
   session,
+  labels,
   onSave,
   onAsk,
 }: {
   session: CellEditSession;
+  labels: CellEditLabels;
   onSave: (edit: ListingEdit) => void;
   onAsk: (ask: StatusAsk) => void;
 }) {
   return session.field === "Listing.listPrice" ? (
-    <PriceEditor session={session} onSave={onSave} />
+    <PriceEditor session={session} labels={labels} onSave={onSave} />
   ) : (
-    <StatusEditor session={session} onSave={onSave} onAsk={onAsk} />
+    <StatusEditor session={session} labels={labels} onSave={onSave} onAsk={onAsk} />
   );
 }
 
@@ -218,31 +231,40 @@ const NEED_LABEL: Readonly<Record<StatusNeed, "ClosePrice" | "CloseDate" | "With
 /** Closed asks the close price (prefilled with the list price) and date (today); Withdrawn asks a reason. */
 export function StatusNeedsDialog({
   ask,
+  labels,
   onClose,
   onSave,
 }: {
   ask: StatusAsk | null;
+  labels: CellEditLabels;
   onClose: () => void;
   onSave: (row: GridRow, edit: ListingEdit) => void;
 }) {
   // Keyed, so every ask starts from the prefilled values.
   return ask ? (
-    <NeedsDialog key={`${ask.row.id}:${ask.to}`} ask={ask} onClose={onClose} onSave={onSave} />
+    <NeedsDialog
+      key={`${ask.row.id}:${ask.to}`}
+      ask={ask}
+      labels={labels}
+      onClose={onClose}
+      onSave={onSave}
+    />
   ) : null;
 }
 
 function NeedsDialog({
   ask,
+  labels,
   onClose,
   onSave,
 }: {
   ask: StatusAsk;
+  labels: CellEditLabels;
   onClose: () => void;
   onSave: (row: GridRow, edit: ListingEdit) => void;
 }) {
   const { row, to } = ask;
-  const tx: TransactionKind | undefined = row.transaction;
-  const as = tx ? { transaction: tx } : {};
+  const tx = row.transaction;
   const from = row["Listing.standardStatus"] as ListingStandardStatus;
   const [closePriceText, setClosePriceText] = useState(() => {
     const p = row["Listing.listPrice"] as number | null;
@@ -286,7 +308,7 @@ function NeedsDialog({
       onSubmit={submit}
       formError={
         tried && needs.length > 0
-          ? COPY.missing(needs.map((n) => label(NEED_LABEL[n], as).toLocaleLowerCase("vi")))
+          ? COPY.missing(needs.map((n) => word(labels, NEED_LABEL[n], tx).toLocaleLowerCase("vi")))
           : undefined
       }
       slot="status-dialog"
@@ -294,7 +316,7 @@ function NeedsDialog({
       {to === "Closed" ? (
         <div className="grid grid-cols-2 gap-3 text-sm">
           <label className="flex flex-col gap-1">
-            {label("ClosePrice", as)}
+            {word(labels, "ClosePrice", tx)}
             <Input
               value={closePriceText}
               aria-invalid={(tried && !closePrice.ok) || undefined}
@@ -309,17 +331,17 @@ function NeedsDialog({
             </span>
           </label>
           <label className="flex flex-col gap-1">
-            {label("CloseDate", as)}
+            {word(labels, "CloseDate", tx)}
             <Input type="date" value={closeDate} onChange={(e) => setCloseDate(e.target.value)} />
           </label>
         </div>
       ) : (
         <div
           role="radiogroup"
-          aria-label={label("WithdrawnReason")}
+          aria-label={word(labels, "WithdrawnReason")}
           className="flex flex-col gap-1.5 text-sm"
         >
-          <span>{label("WithdrawnReason")}</span>
+          <span>{word(labels, "WithdrawnReason")}</span>
           <div className="flex flex-wrap gap-2">
             {WITHDRAWN_REASON_ORDER.map((r) => (
               <Button
@@ -331,7 +353,7 @@ function NeedsDialog({
                 aria-checked={reason === r}
                 onClick={() => setReason(r)}
               >
-                {COPY.reason(r, tx)}
+                {COPY.reason(labels, r, tx)}
               </Button>
             ))}
           </div>

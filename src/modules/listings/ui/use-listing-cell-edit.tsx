@@ -11,7 +11,7 @@ import { formatMoney, statusLabel } from "@/lib/format";
 
 import { sampleSaveDoor, type ListingChange, type ListingSaveDoor } from "../save-door";
 
-import { CELL_EDIT_COPY as COPY } from "./cell-edit-copy";
+import { CELL_EDIT_COPY as COPY, type CellEditLabels } from "./cell-edit-copy";
 import type { InventoryField } from "./inventory-rows";
 import {
   ListingCellEdit,
@@ -57,12 +57,15 @@ export function useListingCellEdit({
   rows,
   listings,
   headers,
+  labels,
   door: given,
 }: {
   rows: readonly GridRow[];
   /** Absent: the grid is read-only. */
   listings: readonly Listing[] | undefined;
   headers: Readonly<Record<InventoryField, string>>;
+  /** Words of the editors from the label table; absent with `listings` absent. */
+  labels: CellEditLabels | undefined;
   door?: ListingSaveDoor;
 }): { rows: readonly GridRow[]; cellEdit: RegionCellEdit | undefined; dialogs: ReactNode } {
   const [door] = useState<ListingSaveDoor & { current?: (id: string) => Listing | undefined }>(
@@ -139,7 +142,7 @@ export function useListingCellEdit({
             }
           : undefined,
         failed: (why) => COPY.saveFailed(what(edit.field, edit.value).toLocaleLowerCase("vi"), why),
-        undoFailed: (why) => COPY.undoFailed(unit, shown(edit.field, edit.value), why),
+        undoFailed: (why) => COPY.undoFailed(labels!, unit, shown(edit.field, edit.value), why),
       });
       if (outcome !== "saved") patch(row.id, before);
     },
@@ -147,28 +150,34 @@ export function useListingCellEdit({
   );
 
   const cellEdit = useMemo<RegionCellEdit | undefined>(() => {
-    if (!wide || !listings) return undefined;
+    if (!wide || !listings || !labels) return undefined;
     return {
       action: "updateListing",
       fields: [PRICE, STATUS],
       label: (row, field) =>
-        COPY.editLabel(headers[field as InventoryField], String(row["Listing.unitNumber"] ?? "")),
+        COPY.editLabel(
+          labels,
+          headers[field as InventoryField],
+          String(row["Listing.unitNumber"] ?? ""),
+        ),
       render: (session) => (
         <ListingCellEdit
           session={session}
+          labels={labels}
           onSave={(edit) => void save(session.row, edit)}
           onAsk={setAsk}
         />
       ),
     };
-  }, [wide, listings, headers, save]);
+  }, [wide, listings, labels, headers, save]);
 
-  const dialogs = (
+  const dialogs = labels ? (
     <StatusNeedsDialog
+      labels={labels}
       ask={ask}
       onClose={() => setAsk(null)}
       onSave={(row, edit) => void save(row, edit)}
     />
-  );
+  ) : null;
   return { rows: data, cellEdit, dialogs };
 }

@@ -12,6 +12,7 @@ import { mySavedView, mySavedViews } from "@/modules/listings/server";
 import { savedViewLabels } from "../saved-view-labels";
 import {
   InventoryGrid,
+  cellEditLabels,
   SAVED_VIEW_PARAM,
   savedViewCopy,
   inventoryFiltersFrom,
@@ -90,6 +91,7 @@ export default async function Page({ searchParams }: Props) {
         headers={HEADERS}
         rows={inventoryRows({ listings, listingUnits, units })}
         listings={listings}
+        editLabels={cellEditLabels((concept, transaction) => label(concept, { transaction }))}
         state={inventoryStateFrom(
           typeof state === "string" ? state : undefined,
           process.env.NODE_ENV,

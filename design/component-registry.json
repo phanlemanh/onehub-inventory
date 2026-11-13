@@ -24,7 +24,6 @@
           "props": [
             "anchor",
             "label",
-            "placement",
             "onClose"
           ]
         }
