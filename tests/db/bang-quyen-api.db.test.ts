@@ -9,6 +9,10 @@ import type { LoginDeps } from "@/modules/identity/login";
 import type { MembersDeps } from "@/modules/identity/members";
 import { createMembersHandlers } from "@/modules/identity/members-http";
 import { captureSender } from "@/modules/identity/sender";
+import { openDoor } from "@/modules/identity/action-door";
+import { tokenFrom } from "@/modules/identity/http";
+import { withCompany } from "@/modules/identity/with-company";
+import { createSavedViewsHandlers } from "@/modules/listings/saved-views-http";
 
 import {
   doorScope,
@@ -22,8 +26,8 @@ import {
 import { count } from "./helpers";
 
 const ORIGIN = "http://127.0.0.1:3485";
-// Written before the code (evals.yaml): 3 API doors × 4 roles.
-const API_CELLS = 12;
+// Written before the code (evals.yaml): 3 API doors × 4 roles; plus row 2c's 4 saved-view doors × 4 roles.
+const API_CELLS = 28;
 
 const worlds: World[] = [];
 afterEach(async () => {
@@ -51,6 +55,13 @@ async function apiWorld(suffix: string) {
   };
   const auth = createAuthHandlers(() => deps);
   const members = createMembersHandlers(() => deps);
+  // Row 2c: saved views through the identity module's shared door.
+  const views = createSavedViewsHandlers({
+    door: (r, action) => openDoor(() => w.pool, tokenFrom(r), action),
+    withCompany,
+  });
+  const NO_VIEW = "00000000-0000-4000-8000-0000000000ff";
+  const EMPTY_VIEW = { filters: {}, sort: [], grouped: false, hidden: [] };
   const signIn = async (who: Person, company: string): Promise<string> => {
     const email = w.email[who];
     await auth.requestCode(req(`${ORIGIN}/api/v1/auth/code`, "POST", { email }));
@@ -88,6 +99,29 @@ async function apiWorld(suffix: string) {
         return members.setRoles(
           req(`${ORIGIN}/api/v1/members/${w.id.LA}/roles`, "PUT", { roles: ["ListAgent"] }, cookie),
           w.id.LA,
+        );
+      case "GET /api/v1/saved-views":
+        return views.list(
+          req(`${ORIGIN}/api/v1/saved-views?screen=inventory`, "GET", undefined, cookie),
+        );
+      case "POST /api/v1/saved-views":
+        return views.save(
+          req(
+            `${ORIGIN}/api/v1/saved-views`,
+            "POST",
+            { screen: "inventory", name: `Góc nhìn ${n}`, view: EMPTY_VIEW },
+            cookie,
+          ),
+        );
+      case "PATCH /api/v1/saved-views/[id]":
+        return views.edit(
+          req(`${ORIGIN}/api/v1/saved-views/${NO_VIEW}`, "PATCH", { name: `Đổi ${n}` }, cookie),
+          NO_VIEW,
+        );
+      case "DELETE /api/v1/saved-views/[id]":
+        return views.remove(
+          req(`${ORIGIN}/api/v1/saved-views/${NO_VIEW}`, "DELETE", undefined, cookie),
+          NO_VIEW,
         );
       default:
         throw new Error(`api-theo-bang: không biết gọi cửa ${door}`);

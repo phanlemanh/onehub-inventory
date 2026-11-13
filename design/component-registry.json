@@ -51,7 +51,9 @@
             "record",
             "editable",
             "initialFilters",
-            "groupBy"
+            "groupBy",
+            "initialView",
+            "onViewChange"
           ]
         },
         {
@@ -1523,6 +1525,16 @@
         },
         {
           "name": "NavSection"
+        }
+      ]
+    },
+    {
+      "name": "PlaceChangeProvider",
+      "file": "src/components/templates/app-shell/place-change.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "PlaceChangeProvider"
         }
       ]
     },

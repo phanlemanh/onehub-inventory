@@ -19,6 +19,7 @@ export const FIELD_DISPLAY = {
   "Listing.unitNumber": "text",
   "Listing.withdrawnReason": "select",
   "Member.name": "person",
+  "SavedView.name": "text",
   "ShareLink.interestCount": "count",
   "ShareLink.lastOpenedAt": "datetime",
   "ShareLink.listingCount": "count",

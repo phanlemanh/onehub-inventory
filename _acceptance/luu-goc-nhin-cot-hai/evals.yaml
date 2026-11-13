@@ -1,0 +1,167 @@
+schema_version: 1
+feature_slug: luu-goc-nhin-cot-hai
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.goc_nhin_db
+    layer: backend-effect
+    paths: [src/modules/listings/**, "src/app/api/v1/saved-views/**", db/migrations/**, tests/db/goc-nhin.db.test.ts]
+    expected: "exit 0; tests/db/goc-nhin.db.test.ts khối 'save': gửi POST /api/v1/saved-views qua route handler thật với phiên của người A (sàn 1) và một cách xem viết trước đủ bốn thứ (lọc Toà [S1.01] + Trạng thái [Active], sắp Giá chào giảm, nhóm bật, ẩn Dự án và Xác nhận lúc); đọc lại dòng saved_view bằng vai quản trị của bài: company_id = sàn 1, người lưu = A, tên đúng, cách xem BẰNG đối tượng gửi (so sâu từng trong bốn khoá, hằng 4; chữ tìm không thuộc góc nhìn từ lời chốt của chủ kho 2026-11-13 — cách xem mang chữ tìm bị cửa từ chối 400); ca phá gửi cách xem thiếu khoá sắp xếp và khẳng định thông điệp 'saved view lost part: sort'; ca phá thứ hai ghi bằng company_id của phiên khác và khẳng định 'saved view stored under wrong company'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.goc_nhin_e2e
+    layer: backend-effect
+    paths: [src/components/candidate/**, src/components/templates/**, src/modules/listings/**, "src/app/(app)/inventory/**", "src/app/api/v1/saved-views/**", tests/e2e-db/goc-nhin.spec.ts]
+    expected: "exit 0; ca 'saved view round trip' ở 1440 trên Postgres dãy K: đăng nhập người A, dựng trên Bảng hàng cách xem của E1 bằng giao diện (lọc hai cột, sắp Giá chào giảm, bật nhóm theo Toà, tắt hai cột), lưu tên '[MAU] Toà S1.01 đang bán'; ghi lại danh sách mã căn theo thứ tự, danh sách nhóm và tiêu đề cột đang hiện; rồi (a) bấm 'Tất cả căn' rồi bấm mục góc nhìn, (b) tải lại trang, (c) mở địa chỉ góc nhìn trong một browser context mới đăng nhập cùng người A — ở cả ba đường (hằng 3) mã căn theo thứ tự, nhóm, cột BẰNG bản ghi lại và ô tìm trống (chữ tìm không thuộc góc nhìn, sửa sau Cổng Phạm vi G-1311-10); tập mã căn cũng BẰNG tập tính độc lập trong bài từ dữ liệu mẫu theo luật lọc; ca phá mở góc nhìn với cách xem bị bỏ phần nhóm (sửa dòng trong cơ sở dữ liệu) và khẳng định 'reopened view differs: groups'; ca 'phone sheet' ở 360: mở ngăn trượt, mục góc nhìn có trong cột thứ hai của ngăn ngay lần vẽ đầu, bấm vào thì mã căn theo thứ tự BẰNG bản ghi lại ở 1440 và ngăn đóng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/**, tests/grid-saved-view.test.tsx]
+    expected: "exit 0; tests/grid-saved-view.test.tsx dựng DataRegion 60 dòng mẫu với initialView: ma trận viết trước 6 cách xem (chỉ tìm, chỉ lọc, chỉ sắp, chỉ nhóm, chỉ ẩn cột, đủ năm thứ) hằng 6 — mỗi ca so mã căn theo thứ tự, nhóm và tiêu đề cột hiện với kết quả tính độc lập bằng filterRows/sortRows/groupRows trên dữ liệu nguồn; onViewChange báo đúng cách xem sau mỗi thao tác của người (gõ tìm, lọc, sắp, nhóm, ẩn cột: 5 ô); sameView đúng trên ma trận 10 cặp viết trước (bằng nhau khi khác thứ tự khoá lọc, khác khi khác một trong năm thứ); hai ca phá: initialView bỏ qua cột ẩn cho 'initial view ignored: hidden columns', sameView bỏ qua ô tìm cho 'sameView blind to query'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/templates/**, src/modules/listings/ui/**, tests/second-column-views.test.tsx]
+    expected: "exit 0; tests/second-column-views.test.tsx: cột thứ hai với 'Tất cả căn', sáu mục trạng thái và ba góc nhìn; ma trận viết trước 5 địa chỉ (/inventory, ?status=Active, ?goc-nhin=g1, ?goc-nhin=g2, ?goc-nhin=khong-co) hằng 5 — đếm mục mang aria-current bằng 1 ở bốn địa chỉ đầu, đúng mục; địa chỉ góc nhìn không có thì sáng 'Tất cả căn'; dấu 'đã đổi' hiện trên mục đang mở khi view hiện tại khác view đã lưu và mất khi bằng; nút lưu có 'Lưu thay đổi' và 'Lưu thành mới' chỉ khi 'đã đổi'; ca phá đánh dấu sáng theo tiền tố đường dẫn và khẳng định 'more than one item active: 2'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.goc_nhin_e2e
+    layer: backend-effect
+    paths: [src/components/candidate/**, src/modules/listings/**, "src/app/(app)/inventory/**", "src/app/api/v1/saved-views/**", tests/e2e-db/goc-nhin.spec.ts]
+    expected: "exit 0; ca 'save changes' ở 1440: mở góc nhìn của E2, thêm lọc Phòng ngủ '2', mục mang dấu 'đã đổi'; bấm 'Lưu thay đổi' → dấu mất, tải lại thì lọc Phòng ngủ còn và danh sách mã căn BẰNG tập tính lại; ca 'save as new': đổi tiếp sắp xếp, 'Lưu thành mới' tên '[MAU] Hai phòng ngủ' → cột có hai mục, mở mục cũ thì sắp xếp là của lần lưu trước; đọc bảng saved_view: đúng hai dòng của A; ca phá 'Lưu thay đổi' gửi cách xem cũ và khẳng định 'save changes did not overwrite'; ca 'reselect discards changes': mở góc nhìn, đổi lọc (dấu 'đã đổi' hiện), bấm lại chính mục ấy → mã căn theo thứ tự BẰNG bản đã lưu, dấu 'đã đổi' mất, đầu màn có chữ BẰNG tên góc nhìn; ca phá giữ trạng thái lưới khi bấm cùng địa chỉ và khẳng định 'reselect kept unsaved changes'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.goc_nhin_e2e
+    layer: backend-effect
+    paths: [src/components/templates/**, src/modules/listings/**, "src/app/api/v1/saved-views/**", tests/e2e-db/goc-nhin.spec.ts]
+    expected: "exit 0; ca 'rename' ở 1440: «…» của mục → 'Đổi tên' → tên '[MAU] Khu S1' → mục mang tên mới và vẫn aria-current, mã căn theo thứ tự không đổi so với trước khi đổi tên, tải lại vẫn tên mới; dòng saved_view có tên mới và cách xem BẰNG cách xem trước khi đổi tên; ca phá đổi tên mà ghi đè cách xem rỗng và khẳng định 'rename changed the view'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.goc_nhin_e2e
+    layer: backend-effect
+    paths: [src/components/templates/**, src/components/candidate/**, src/modules/listings/**, "src/app/api/v1/saved-views/**", tests/e2e-db/goc-nhin.spec.ts]
+    expected: "exit 0; ca 'remove' ở 1440: «…» của mục đang mở → việc cuối là 'Xoá góc nhìn', có vạch ngăn trước nó, màu chữ là màu destructive của chủ đề (so computed color với token); bấm → hộp xác nhận, document.activeElement là 'Thôi'; Esc đóng và đếm yêu cầu DELETE bằng 0; mở lại, bấm 'Xoá góc nhìn' → mục mất, địa chỉ về /inventory, 'Tất cả căn' sáng, bảng saved_view không còn dòng; mở địa chỉ cũ → câu 'Góc nhìn này không còn' và số dòng bằng tổng dữ liệu mẫu; xoá một góc nhìn không đang mở thì chỗ đang xem giữ nguyên; ca phá để focus đầu ở nút xoá và khẳng định 'confirm focus not on cancel'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.goc_nhin_db
+    layer: backend-effect
+    paths: [src/modules/listings/**, "src/app/api/v1/saved-views/**", db/migrations/**, tests/db/goc-nhin.db.test.ts]
+    expected: "exit 0; khối 'who sees a saved view': A (sàn 1) lưu góc nhìn g; ma trận viết trước 3 người (A, B cùng sàn 1, C sàn 2) × 5 việc (liệt kê, đọc theo id, đổi tên, lưu thay đổi cách xem, xoá) = 15 ô hằng 15 — A được cả năm; B và C: liệt kê không có g, đọc theo id 404, đổi tên, lưu thay đổi và xoá trả 403 hoặc 404 và đọc lại bằng vai quản trị thấy dòng g y nguyên (tên, cách xem); khối 'roles': ma trận viết trước 4 vai × 4 thao tác (đọc danh sách, lưu, sửa, xoá) = 16 ô hằng 16 — Đầu chủ, Đầu khách, Trưởng nhóm được (đối chứng dương), Quản trị sàn nhận 403 với mã lỗi ghim và bảng không đổi; truy vấn thẳng bảng saved_view dưới vai ứng dụng với ngữ cảnh sàn 2 trả 0 dòng; ca phá đọc qua hàm thiếu điều kiện người lưu và khẳng định 'saved view visible to another member'; ca phá bỏ điều kiện người lưu ở nhánh lưu thay đổi và khẳng định 'saved view overwritten by another member'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.cach_ly_k
+    layer: backend-effect
+    paths: [db/migrations/**, db/scripts/**]
+    expected: "exit 0; bộ kiểm cách ly chạy trên Postgres dãy K liệt bảng saved_view trong danh sách bảng của sàn (có company_id, row level security bật và bắt buộc, vai ứng dụng không sở hữu bảng) và mọi ca của bảng ấy đạt; ca phá của bộ (migration tạm tắt force row level security) đỏ với tên bảng saved_view"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/**, src/components/templates/**, tests/saved-view-name.test.ts, tests/second-column-views.test.tsx]
+    expected: "exit 0; tests/saved-view-name.test.ts: hàm kiểm tên (một hàm, dùng ở cả giao diện và máy chủ) trên ma trận viết trước 7 ca — '' , '   ', 41 ký tự, trùng 'Toà S1' với 'toà s1', trùng tên của người khác (được), 40 ký tự (được), tên có dấu tiếng Việt (được) — hằng 7, mỗi ca so lỗi trả về với lỗi viết trước; tests/second-column-views.test.tsx: hộp đặt tên với tên trống không đóng và hiện câu dưới ô; lưu hỏng (fetch trả 500) giữ chữ đã gõ, hiện câu lỗi và nút 'Thử lại'; 403 hiện câu 'không đủ quyền' của khuôn 9e; trạng thái danh sách rỗng hiện câu gợi ý; nhóm có đủ mục ngay trong bản vẽ của máy chủ ở cột máy tính và ngăn điện thoại (không có trạng thái đang đọc — sửa sau Cổng Phạm vi, giám sát K-1311-1); góc nhìn không đọc được thì nhóm nói rõ và App Shell vẫn dùng được; ca phá cho hộp đóng khi lưu hỏng và khẳng định 'typed name lost on failed save'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.goc_nhin_db
+    layer: backend-effect
+    paths: [src/modules/listings/**, "src/app/api/v1/saved-views/**", tests/db/goc-nhin.db.test.ts]
+    expected: "exit 0; khối 'name rules at the API': cùng 7 ca của E10 gửi thẳng POST và PATCH /api/v1/saved-views (bỏ qua giao diện) — 4 ca sai trả 400 với mã lỗi viết trước và bảng saved_view không thêm dòng nào; 3 ca đúng trả 201/200; hai người khác nhau được trùng tên; ca phá bỏ kiểm tên ở máy chủ và khẳng định 'server accepted empty name'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/**, tests/grid-sheet.test.tsx]
+    expected: "exit 0; tests/grid-sheet.test.tsx khối 'no match keeps the toolbar': DataRegion 60 dòng, mở hàng ô lọc, ma trận viết trước 3 cách ra rỗng (gõ ô tìm 'zzz', lọc Toà 'khong-co', lọc Giá chào '<0') hằng 3 — sau mỗi cách: ô tìm, nút Lọc, Cột, Nhóm, Toàn màn hình và cả 8 ô lọc cột vẫn trong DOM; ô tìm vẫn là document.activeElement khi vừa gõ ở đó và cùng một nút DOM như trước khi rỗng (không dựng lại); thân lưới có 'Không căn nào khớp' và 'Xoá lọc'; sửa riêng luật sai (xoá chữ ở đúng ô ấy) thì số dòng trở lại bằng đếm lại từ dữ liệu mà các luật khác còn giữ; ca phá dựng lại thanh công cụ ngoài lưới khi rỗng và khẳng định 'search box remounted on no match'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/candidate/**, tests/e2e/sheet.spec.ts]
+    expected: "exit 0; ca 'no match keeps filters' ở bốn khổ: gõ 'zzz' vào ô tìm từng ký tự; sau ký tự cuối focus vẫn ở ô tìm và chữ là 'zzz'; các ô lọc cột thấy được (Playwright toBeVisible) ở 1024 và 1440, ở 360/414 nút Lọc vẫn bấm được; xoá một ký tự ở ô lọc Toà làm dòng hiện lại; ca phá như E12 khẳng định 'filters gone on no match'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/components/templates/**, src/components/candidate/**, tests/e2e/sheet.spec.ts]
+    expected: "exit 0; ca 'leaving full screen restores the shell' ở 1440: từ Hôm nay sang Bảng hàng, bật Toàn màn hình (khẳng định thanh trên ẩn), rồi ma trận viết trước 2 đường rời (page.goBack(), bấm liên kết đổi màn qua history.pushState của Next) hằng 2 — sau mỗi đường: cột biểu tượng, thanh trên, cột thứ hai và đầu màn đều visible mà không reload (đếm sự kiện load không tăng); quay lại Bảng hàng thì không có data-full-screen và thanh trên hiện; ca phá bỏ dọn chế độ tập trung khi rời và khẳng định 'shell still hidden after leaving full screen'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-3
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/components/templates/**, src/components/candidate/**, "src/app/(app)/inventory/**", src/modules/listings/ui/**]
+    inputs: [_acceptance/luu-goc-nhin-cot-hai/design.md]
+    steps:
+      - "Lane K Postgres up (DB_LANE=k DB_PORT=5564 make db-up), then take the frames: GOC_NHIN_ANH=1 DB_LANE=k DB_PORT=5564 npx playwright test -c playwright.db.config.ts tests/e2e-db/goc-nhin.spec.ts -g 'E15 frames' — it signs a ListAgent in, saves two views, opens the first, adds a bedrooms filter so it is marked «đã đổi», and writes _acceptance/luu-goc-nhin-cot-hai/evidence/E15-<360|414|1024|1440>-<sang|toi>-<thanh-cong-cu|cot-thu-hai|menu|xac-nhan-xoa|hop-dat-ten>.png (40 frames; thanh-cong-cu is the region's toolbar with both save buttons, taken before anything covers it; on 360 and 414 the second column is the phone sheet)"
+      - "Open every frame and check the five points of the question in each; name any frame (width × theme × state) where a point fails"
+    question: "Trên Bảng hàng đang chạy (dữ liệu mẫu, Postgres dãy K, đăng nhập Đầu chủ), ở 1440, 1024, 414 (cột thứ hai trong ngăn trượt), 360, sáng và tối: (1) nhóm «Góc nhìn của tôi» ở cột thứ hai theo lối chủ kho chốt ở Cổng Phạm vi 2026-11-12: L1 — cùng kiểu mục con với «Theo trạng thái» (thụt lề, vạch dọc), KHÔNG có số đếm ở mục nào, «…» hiện khi rê hay ở mục đang mở; chỉ một nhóm (góc nhìn riêng người lưu); mục đang mở sáng, đúng một mục sáng; (2) nút «Lưu góc nhìn» trên thanh công cụ của vùng Bảng hàng (lối S1 đã chốt); (3) «…» của mục: Đổi tên, vạch, Xoá góc nhìn chữ đỏ cuối; (4) hộp đặt tên và hộp xác nhận xoá đọc được, không tràn ở 360; (5) mục mang dấu 'đã đổi' khi đổi cách xem. Chụp từng khổ và từng chủ đề vào _acceptance/luu-goc-nhin-cot-hai/evidence/."
+    expected: "Năm điểm đúng ở cả tám khung (4 khổ × 2 chủ đề); ảnh lưu trong evidence/"
+    evidence_required: [run_id, screenshot, observed, verifier, verified_at]
+
+  - id: E16
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.goc_nhin_e2e
+    paths: [src/components/templates/**, src/components/candidate/**, "src/app/(app)/inventory/**", tests/e2e-db/goc-nhin.spec.ts]
+    expected: "exit 0; bài axe của tests/e2e-db/goc-nhin.spec.ts (sửa sau Cổng Phạm vi, giám sát K-1311-2: nhóm góc nhìn chỉ hiện khi có phiên và Postgres) có màn Bảng hàng ở hai trạng thái mới (cột thứ hai có góc nhìn, «…» mở; hộp xác nhận xoá mở) ở sáng và tối, mỗi ca khẳng định thứ cần đo đang hiện trước khi quét: 0 vi phạm; ca phá bỏ aria-label của «…» và khẳng định axe báo 'button-name'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E17
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/components/templates/**, src/components/candidate/**, "src/app/(app)/inventory/**", src/modules/listings/ui/**]
+    expected: "exit 0; không hex thô trên tệp giao diện mà vòng chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E18
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E19
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["**"]
+    expected: "exit 0; make check xanh, gồm rào ranh giới mô-đun (listings chỉ dùng withCompany qua cửa của identity), bộ kiểm bộ nút của 9e (mọi nút ghi góc nhìn đi qua PermittedAction với tên thao tác có trong bảng quyền), ontology khớp mã sinh và bảng vai × màn sinh"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

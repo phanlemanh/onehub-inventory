@@ -85,6 +85,37 @@ concepts:
     own: true
     pref: Mã riêng
     en: Company code
+  SavedView:
+    kind: entity
+    own: true
+    pref: Góc nhìn
+    en: Saved view
+    avoid: [Bộ lọc đã lưu, Tìm kiếm đã lưu]
+  SaveView:
+    kind: action
+    own: true
+    pref: Lưu góc nhìn
+    en: Save view
+  SaveViewChanges:
+    kind: action
+    own: true
+    pref: Lưu thay đổi
+    en: Save changes
+  SaveAsNewView:
+    kind: action
+    own: true
+    pref: Lưu thành mới
+    en: Save as new view
+  RenameView:
+    kind: action
+    own: true
+    pref: Đổi tên
+    en: Rename
+  RemoveView:
+    kind: action
+    own: true
+    pref: Xoá góc nhìn
+    en: Remove view
   ListSide:
     kind: side
     own: true

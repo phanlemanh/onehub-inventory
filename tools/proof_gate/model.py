@@ -137,6 +137,9 @@ class Repo:
     ledger_present: bool = False
     ledger: list[dict[str, Any]] = field(default_factory=list)
     transition: dict[str, str] = field(default_factory=dict)  # slug -> reason
+    # Blocks made before the block ledger existed, each named with the round that made it (row 2c, ruling K-1311-4):
+    # the ledger line of such a pair needs no «ve-tay» row in that round's proof, when that round is closed.
+    legacy_blocks: set[tuple[str, str]] = field(default_factory=set)
     wrappers: set[str] = field(default_factory=set)
     errors: list[str] = field(default_factory=list)
 
@@ -255,6 +258,7 @@ def _load_lists(repo: Repo, root: Path) -> None:
             repo.errors.append(f"{LEDGER_FILE}: thiếu danh sách 'khoi:'")
             items = []
         repo.ledger = [i if isinstance(i, dict) else {} for i in items]
+        _load_legacy_blocks(repo, doc)
     for rel, key, field_name in ((TRANSITION_FILE, "ho_so", "slug"), (WRAPPERS_FILE, "khuon", "id")):
         path = root / rel
         if not path.is_file():
@@ -275,6 +279,23 @@ def _load_lists(repo: Repo, root: Path) -> None:
                 repo.transition[str(item[field_name])] = reason
             else:
                 repo.wrappers.add(str(item[field_name]))
+
+
+LEGACY_KEY = "khoi_co_truoc"
+LEGACY_FIELDS = ("ten", "ho_so", "commit", "ngay", "vi_sao")
+
+
+def _load_legacy_blocks(repo: Repo, doc: Any) -> None:
+    """Pairs block ↔ round of the ledger's `khoi_co_truoc:` list; each names its creating commit and day."""
+    for item in (doc.get(LEGACY_KEY) if isinstance(doc, dict) else None) or []:
+        if not isinstance(item, dict):
+            repo.errors.append(f"{LEDGER_FILE}: một dòng của '{LEGACY_KEY}' không đọc được")
+            continue
+        missing = [f for f in LEGACY_FIELDS if not str(item.get(f) or "").strip()]
+        if missing:
+            repo.errors.append(f"{LEDGER_FILE}: '{LEGACY_KEY}' {item.get('ten', '?')} thiếu {', '.join(missing)}")
+            continue
+        repo.legacy_blocks.add((str(item["ten"]), str(item["ho_so"])))
 
 
 # ---------------------------------------------------------------- contracts and proofs

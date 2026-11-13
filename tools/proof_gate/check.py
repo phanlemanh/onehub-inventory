@@ -549,6 +549,8 @@ def check_ledger(repo: Repo, by_slug: dict[str, Contract]) -> list[Finding]:
             emit(name, "so-ngay-lech", f"ngày duyệt {day} khác ngày hồ sơ '{slug}' qua Cổng Phạm vi ({owner.approved_at or 'chưa duyệt'})")
         rows = [r for part in list(owner.proofs.values()) + list(owner.templates.values()) for r in block_rows(part)]
         want_name, want_rung = (source, "reui") if source != HAND_MADE else (name, "ve-tay")
+        if (name, slug) in repo.legacy_blocks and owner.status not in OPEN:
+            continue  # made before the ledger by a closed round, named pair by pair (so-khoi.yaml, khoi_co_truoc)
         if not any(bare(r.get("khối", "")) == want_name and fold(bare(r.get("bậc", ""))) == want_rung for r in rows):
             emit(name, "so-khong-chung-tu", f"bảng Khối của hồ sơ '{slug}' không có dòng '{want_name}' bậc {want_rung}")
     return out

@@ -24,8 +24,8 @@ modules:
     depends_on: []
   - name: listings
     description: Listings, status, pricing and fees, freshness, events, photos
-    owns: [Listing, ListingUnit]
-    depends_on: []
+    owns: [Listing, ListingUnit, SavedView]
+    depends_on: [identity] # saved views (row 2c): the shared action door and withCompany, decision 0026
   - name: contacts
     description: Contacts, phones and duplicate detection
     owns: [Contact, ListingOwner]
