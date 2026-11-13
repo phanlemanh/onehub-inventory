@@ -303,3 +303,77 @@ describe("one template, one «open row» door", () => {
     ).toThrow("enter opened another row");
   });
 });
+
+// Row 2c (luu-goc-nhin-cot-hai), E12 — Ngoài-4 of 2a: a filter that leaves no row keeps the toolbar, the search box and
+// the filter row where they are; the body says so and each rule can be mended on its own.
+describe("no match keeps the toolbar", () => {
+  const searchBox = () => screen.getByRole("searchbox") as HTMLInputElement;
+  const TOOLS = ["filter-toggle", "group-toggle", "columns-toggle"];
+
+  /** The toolbar and the filter boxes are still there, and the search box is the same element as before. */
+  function checkKept(before: HTMLInputElement): void {
+    if (searchBox() !== before) throw new Error("search box remounted on no match");
+    for (const slot of TOOLS)
+      if (!document.querySelector(`[data-slot=${slot}]`)) throw new Error(`toolbar lost ${slot}`);
+    if (document.querySelectorAll("[data-slot=column-filter]").length !== 8)
+      throw new Error("filters gone on no match");
+  }
+
+  const WAYS: [string, () => void, () => void, () => number][] = [
+    [
+      "search «zzz»",
+      () => {
+        act(() => searchBox().focus());
+        fireEvent.change(searchBox(), { target: { value: "zzz" } });
+      },
+      () => fireEvent.change(searchBox(), { target: { value: "" } }),
+      () => 60,
+    ],
+    [
+      "Toà «khong-co»",
+      () =>
+        fireEvent.change(screen.getByLabelText("Lọc cột Toà"), { target: { value: "khong-co" } }),
+      () => fireEvent.change(screen.getByLabelText("Lọc cột Toà"), { target: { value: "" } }),
+      () => 60,
+    ],
+    [
+      "Giá chào «<0» beside Phòng ngủ «2»",
+      () => {
+        fireEvent.change(screen.getByLabelText("Lọc cột Phòng ngủ"), { target: { value: "2" } });
+        fireEvent.change(screen.getByLabelText("Lọc cột Giá chào"), { target: { value: "<0" } });
+      },
+      () => fireEvent.change(screen.getByLabelText("Lọc cột Giá chào"), { target: { value: "" } }),
+      () => rows.filter((r) => r["Unit.bedroomsTotal"] === 2).length,
+    ],
+  ];
+
+  it.each(WAYS)("%s", (name, empty, mend, left) => {
+    region();
+    fireEvent.click(screen.getByRole("button", { name: /^Lọc/ }));
+    const before = searchBox();
+    empty();
+    expect(bodyRows()).toHaveLength(0);
+    checkKept(before);
+    if (name.startsWith("search")) {
+      expect(document.activeElement).toBe(before);
+      expect(before.value).toBe("zzz");
+    }
+    expect(screen.getByText("Không có dòng nào khớp")).toBeTruthy();
+    expect(screen.getAllByRole("button", { name: "Xoá lọc" })).toHaveLength(1);
+    mend();
+    expect(bodyRows()).toHaveLength(left());
+  });
+
+  it("3 ways written ahead", () => {
+    expect(WAYS).toHaveLength(3);
+  });
+
+  it("the check fails when the toolbar is drawn again outside the grid", () => {
+    region();
+    const before = searchBox();
+    fireEvent.change(before, { target: { value: "zzz" } });
+    const copy = before.cloneNode() as HTMLInputElement;
+    before.replaceWith(copy);
+    expect(() => checkKept(before)).toThrow("search box remounted on no match");
+  });
+});

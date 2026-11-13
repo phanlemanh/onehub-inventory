@@ -81,7 +81,7 @@ beforeAll(async () => {
   );
   await load();
   await addPeople(db);
-  pool = createPool(db.url);
+  pool = createPool(db.appUrl);
 });
 
 afterAll(async () => {
@@ -505,7 +505,7 @@ describe("E16 tệp phá ma-rieng-khong-kiem-vai", () => {
     await checkBuyerCannotAddCode(db, pool);
     const saved = { ...PEOPLE };
     const broken = await scratchDb("7d_pha", "ma-rieng-khong-kiem-vai", { prefix: "danh_muc" });
-    const brokenPool = createPool(broken.url);
+    const brokenPool = createPool(broken.appUrl);
     try {
       await broken.owner.query(
         "insert into companies (id, name) values ($1, '[MAU] Sàn A'), ($2, '[MAU] Sàn B')",

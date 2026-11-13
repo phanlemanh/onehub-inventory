@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đổi góc nhìn đang mở</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Lora:ital,wght@0,400;1,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', 'Lora', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1200px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 900px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Hỏi-5 · Cổng Phạm vi · Lưu góc nhìn</p>
+    <h1>Đổi một góc nhìn đang mở: không tự lưu, người chọn</h1>
+
+    <svg viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- Connectors (drawn before boxes) -->
+      <line x1="500" y1="88" x2="500" y2="120" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="500" y1="168" x2="500" y2="196" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+      <line x1="500" y1="252" x2="500" y2="284" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- Branch 1: left -->
+      <path d="M380 340 H188 Q180 340 180 348 V448" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- Branch 2: down -->
+      <line x1="500" y1="396" x2="500" y2="448" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- Branch 3: right -->
+      <path d="M620 340 H812 Q820 340 820 348 V448" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- Leader to the side note -->
+      <line x1="620" y1="224" x2="680" y2="224" stroke="rgba(45,49,66,0.30)" stroke-width="1" stroke-dasharray="4,3"/>
+
+      <!-- Branch labels -->
+      <rect x="236" y="316" width="96" height="16" rx="2" fill="#f5f5f5"/>
+      <text x="284" y="328" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">LƯU THAY ĐỔI</text>
+      <rect x="508" y="412" width="168" height="16" rx="2" fill="#f5f5f5"/>
+      <text x="512" y="424" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.06em">LƯU THÀNH GÓC NHÌN MỚI</text>
+      <rect x="640" y="316" width="160" height="16" rx="2" fill="#f5f5f5"/>
+      <text x="720" y="328" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">BẤM LẠI HAY SANG MỤC KHÁC</text>
+
+      <!-- Start: open a saved view -->
+      <rect x="400" y="40" width="200" height="48" rx="24" fill="#f5f5f5"/>
+      <rect x="400" y="40" width="200" height="48" rx="24" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="500" y="68" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Mở một góc nhìn</text>
+
+      <!-- Step: change the view -->
+      <rect x="380" y="120" width="240" height="48" rx="6" fill="#f5f5f5"/>
+      <rect x="380" y="120" width="240" height="48" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="500" y="148" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Đổi lọc, sắp, nhóm hay cột</text>
+
+      <!-- Step: changed mark (focal) -->
+      <rect x="380" y="196" width="240" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="380" y="196" width="240" height="56" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <text x="500" y="220" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Mục mang dấu «đã đổi»</text>
+      <text x="500" y="238" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">chưa ghi gì, cách xem cũ vẫn còn</text>
+
+      <!-- Decision -->
+      <polygon points="500,284 620,340 500,396 380,340" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="500" y="336" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Người chọn</text>
+      <text x="500" y="352" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">một trong ba</text>
+
+      <!-- End 1 -->
+      <rect x="60" y="448" width="240" height="64" rx="32" fill="#f5f5f5"/>
+      <rect x="60" y="448" width="240" height="64" rx="32" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="180" y="476" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Góc nhìn được ghi đè</text>
+      <text x="180" y="494" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">dấu «đã đổi» mất</text>
+
+      <!-- End 2 -->
+      <rect x="380" y="448" width="240" height="64" rx="32" fill="#f5f5f5"/>
+      <rect x="380" y="448" width="240" height="64" rx="32" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="500" y="476" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Thêm một góc nhìn mới</text>
+      <text x="500" y="494" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">góc nhìn cũ giữ nguyên</text>
+
+      <!-- End 3 -->
+      <rect x="700" y="448" width="240" height="64" rx="32" fill="#f5f5f5"/>
+      <rect x="700" y="448" width="240" height="64" rx="32" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="820" y="476" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Bỏ thay đổi chưa lưu</text>
+      <text x="820" y="494" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="middle">về đúng cách xem đã lưu</text>
+
+      <!-- Side note: the other option -->
+      <rect x="680" y="168" width="260" height="112" rx="6" fill="#f5f5f5"/>
+      <rect x="680" y="168" width="260" height="112" rx="6" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="696" y="192" fill="#4f5d75" font-size="9" font-weight="500" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LỐI KHÁC · KHÔNG KHUYÊN</text>
+      <text x="696" y="216" fill="#2d3142" font-size="14" font-style="italic" font-family="'Instrument Serif', 'Lora', serif">Tự lưu mọi thay đổi, như tab Sheet:</text>
+      <text x="696" y="240" fill="#4f5d75" font-size="14" font-style="italic" font-family="'Instrument Serif', 'Lora', serif">không có dấu «đã đổi»,</text>
+      <text x="696" y="260" fill="#4f5d75" font-size="14" font-style="italic" font-family="'Instrument Serif', 'Lora', serif">không có đường về cách xem cũ.</text>
+
+      <!-- Legend -->
+      <line x1="40" y1="548" x2="960" y2="548" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
+      <text x="40" y="568" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.14em">CHÚ THÍCH · HÌNH NÓI LOẠI BƯỚC</text>
+
+      <rect x="40" y="584" width="24" height="16" rx="8" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="72" y="596" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif">Đầu và kết</text>
+
+      <rect x="164" y="584" width="24" height="16" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="196" y="596" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif">Bước</text>
+
+      <polygon points="256,592 268,584 280,592 268,600" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="292" y="596" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif">Người chọn</text>
+
+      <rect x="384" y="584" width="24" height="16" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <text x="416" y="596" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif">Điểm khác giữa hai lối</text>
+
+      <rect x="560" y="584" width="24" height="16" rx="2" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.20)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="592" y="596" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif">Lối khác</text>
+
+      <text x="960" y="596" fill="#4f5d75" font-size="10" font-family="'Geist', sans-serif" text-anchor="end">Tiêu chí liên quan: AC-3 · AC-4</text>
+    </svg>
+  </div>
+</body>
+</html>

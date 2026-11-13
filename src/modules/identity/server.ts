@@ -13,6 +13,8 @@ export {
 } from "./with-company";
 export { assertProductionConfig, AuthConfigError, PRODUCTION_VARS } from "./config";
 export { authHandlers, currentSession, membersHandlers, type CurrentSession } from "./runtime";
+export { actionDoor, sessionDoor } from "./runtime";
+export { isDoorError, openDoor, type DoorError, type OpenedDoor } from "./action-door";
 export {
   captureInviteSender,
   inviteEmail,

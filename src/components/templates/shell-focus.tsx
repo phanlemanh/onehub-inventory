@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
 /**
@@ -18,6 +19,14 @@ const ShellFocusContext = createContext<ShellFocus>(NO_SHELL);
 
 export function ShellFocusProvider({ children }: { children: ReactNode }) {
   const [focused, setFocused] = useState(false);
+  // Focus mode belongs to one screen: a new address (Back, a gesture, a link) gives the next screen the whole shell
+  // (row 2c, Ngoài-5 of 2a). The region that asked also gives it back when it goes.
+  const pathname = usePathname();
+  const [focusedAt, setFocusedAt] = useState(pathname);
+  if (focusedAt !== pathname) {
+    setFocusedAt(pathname);
+    if (focused) setFocused(false);
+  }
   const value = useMemo(() => ({ focused, setFocused }), [focused]);
   return <ShellFocusContext.Provider value={value}>{children}</ShellFocusContext.Provider>;
 }

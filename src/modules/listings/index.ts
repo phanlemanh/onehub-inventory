@@ -5,3 +5,15 @@ export * from "./sample";
 export * from "./edit-rules";
 // The save door of an edit (row 4): the four outcomes of the real write path, on the sample listings until row 10.
 export * from "./save-door";
+// Saved views (row 2c): what a view holds and the one name rule, shared by the naming dialog and the API.
+export {
+  checkViewName,
+  normalizeViewName,
+  SAVED_VIEW_NAME_MAX,
+  SAVED_VIEW_SCREENS,
+  SAVED_VIEWS_BASE_PATH,
+  SavedViewState,
+  type SavedView,
+  type SavedViewNameError,
+  type SavedViewScreen,
+} from "./saved-view";

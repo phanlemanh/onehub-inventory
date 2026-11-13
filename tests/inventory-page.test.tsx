@@ -15,6 +15,11 @@ import {
 import { InventoryGrid } from "../src/modules/listings/ui";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: () => {} }) }));
+// Saved views (row 2c) are read from the database behind the session; this page test has neither.
+vi.mock("../src/modules/listings/server", () => ({
+  mySavedViews: async () => null,
+  mySavedView: async () => null,
+}));
 
 afterEach(() => {
   vi.unstubAllEnvs();

@@ -1,0 +1,22 @@
+# Copy to .env and fill in real values. Never commit .env.
+# Document EVERY variable the app reads, with a safe dummy value.
+
+APP_ENV=development
+LOG_LEVEL=info
+# DATABASE_URL=postgres://localhost:5432/app
+
+# Claude API. Leave the key empty here; set the real value in .env or your secret manager.
+ANTHROPIC_API_KEY=
+CLAUDE_MODEL=claude-opus-5-5
+
+# Sign-in with an emailed code (row 8, decision 0021). Production refuses to start without all four.
+# AUTH_SECRET: a long random string; it keys the hash of every login code.
+# AUTH_SECRET=
+# Resend: https://resend.com — the key and a sender on a verified domain.
+# RESEND_API_KEY=
+# MAIL_FROM=OneHub <no-reply@example.test>
+# Development only: also append each login code to this file (browser tests read it).
+# LOGIN_CODE_OUTBOX=
+# The product's own address (row 9d): the sign-in link in every invitation is built from it, never from the request.
+# APP_URL bắt buộc ở bản thật: https, absolute, no user or password, no ? or #. Optional on a development machine.
+# APP_URL=https://example.test

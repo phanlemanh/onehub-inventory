@@ -9,12 +9,19 @@ import type { Role } from "@/generated/ontology";
 export interface NavLink {
   href: string;
   title: string;
+  /**
+   * What sits at the end of the entry (row 2c): the «…» of a saved view, already gated by the permission table. It shows
+   * on hover, on keyboard focus and on the open entry. Absent, the entry is drawn as before.
+   */
+  trailing?: ReactNode;
 }
 
 /** A titled group of the second column; without a title it sits under the screen name. */
 export interface NavSection {
   title?: string;
   items: readonly NavLink[];
+  /** The sentence the group shows while it holds no entry (row 2c); absent, the group shows its title alone as before. */
+  empty?: string;
 }
 
 export interface NavItem {

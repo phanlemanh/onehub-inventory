@@ -37,8 +37,11 @@ export function FormDialog({
   slot,
   children,
 }: {
-  /** The button that opens the dialog (e.g. `<Button />`) and its label. */
-  trigger: { render: ReactElement; label: ReactNode };
+  /**
+   * The button that opens the dialog (e.g. `<Button />`) and its label. Absent when something else opens it through
+   * `open` (an item of a «…» menu, row 2c); focus then goes back to what had it before the dialog opened.
+   */
+  trigger?: { render: ReactElement; label: ReactNode };
   title: string;
   description: string;
   submitLabel: string;
@@ -60,7 +63,7 @@ export function FormDialog({
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger render={trigger.render}>{trigger.label}</DialogTrigger>
+      {trigger ? <DialogTrigger render={trigger.render}>{trigger.label}</DialogTrigger> : null}
       <DialogContent data-slot={slot ?? "form-dialog"}>
         <form onSubmit={submit} noValidate className="flex flex-col gap-4">
           <DialogHeader>

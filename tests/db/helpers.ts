@@ -1,5 +1,6 @@
 // Scratch databases on this lane's Postgres for the sign-in tests. Fixtures are written as the owner (the container's
-// superuser); everything the product does goes through the door, withCompany, exactly as the server does.
+// superuser); everything the product does goes through the door, withCompany, exactly as the server does — on a pool
+// logged in as the app's login role quy_hang_login (`appUrl`, row 7c), never as the owner.
 import { execFileSync } from "node:child_process";
 import { cpSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -19,6 +20,62 @@ function urlFor(db: string): string {
   return u.toString();
 }
 
+/** The app's login role (migration 008) and its password on a lane's disposable Postgres only. */
+export const LOGIN_ROLE = "quy_hang_login";
+const LOGIN_PASSWORD = "local-only";
+
+function appUrlFor(db: string): string {
+  const u = new URL(urlFor(db));
+  u.username = LOGIN_ROLE;
+  u.password = LOGIN_PASSWORD;
+  return u.toString();
+}
+
+let loginReady = false;
+/**
+ * Makes quy_hang_login able to log in over TCP on this lane: the role belongs to the whole cluster and migration 008
+ * sets no password. Tries to connect first and sets the password only when that fails, retrying when another run on
+ * the lane changes the role at the same moment. A cluster where no database has reached migration 008 yet has no
+ * role: nothing to do until one has.
+ */
+async function ensureLogin(db: string): Promise<void> {
+  if (loginReady) return;
+  const tryLogin = async () => {
+    const c = new pg.Client({ connectionString: appUrlFor(db) });
+    try {
+      await c.connect();
+      return true;
+    } catch {
+      return false;
+    } finally {
+      await c.end().catch(() => {});
+    }
+  };
+  if (await tryLogin()) {
+    loginReady = true;
+    return;
+  }
+  for (let i = 0; i < 5; i++) {
+    try {
+      const exists = await admin(async (c) => {
+        if (
+          (await c.query("select 1 from pg_roles where rolname = $1", [LOGIN_ROLE])).rowCount === 0
+        )
+          return false;
+        await c.query(`alter role ${LOGIN_ROLE} password '${LOGIN_PASSWORD}'`);
+        return true;
+      });
+      if (!exists) return;
+      break;
+    } catch (err) {
+      if (!/concurrently/.test(String(err)) || i === 4) throw err;
+      await new Promise((r) => setTimeout(r, 200 * (i + 1)));
+    }
+  }
+  if (!(await tryLogin())) throw new Error(`${LOGIN_ROLE} không đăng nhập được trên ${db}`);
+  loginReady = true;
+}
+
 async function admin<T>(fn: (c: pg.Client) => Promise<T>): Promise<T> {
   const c = new pg.Client({ connectionString: ADMIN_URL });
   await c.connect();
@@ -31,7 +88,10 @@ async function admin<T>(fn: (c: pg.Client) => Promise<T>): Promise<T> {
 
 export interface ScratchDb {
   name: string;
+  /** The owner's connection string: fixtures and catalog reads only. */
   url: string;
+  /** The app's connection string, logged in as quy_hang_login: every pool the product uses in a test (row 7c). */
+  appUrl: string;
   owner: pg.Client;
   drop(): Promise<void>;
 }
@@ -73,6 +133,7 @@ export async function scratchDb(
     await c.query(`create database ${name}`);
   });
   migrate(name, opts.upTo);
+  await ensureLogin(name);
   const owner = new pg.Client({ connectionString: urlFor(name) });
   await owner.connect();
   if (breakFile)
@@ -80,6 +141,7 @@ export async function scratchDb(
   return {
     name,
     url: urlFor(name),
+    appUrl: appUrlFor(name),
     owner,
     async drop() {
       await owner.end();
