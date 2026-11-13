@@ -5,7 +5,7 @@
 | Hỏi-1 Ai được sửa lớp riêng | dưới ngưỡng: 1 bước, 0 nhánh | — |
 | Hỏi-2 Bảng xem lại làm được gì | dưới ngưỡng: 1 bước, 0 nhánh | — |
 | Hỏi-3 Dáng màn | dưới ngưỡng: ảnh bản mẫu thay hình | — |
-| Hỏi-4 Căn chờ khớp lúc nào | cần hình: tra bốn nguồn rồi khớp, ba nhánh kết quả | khop-can-cho |
+| Hỏi-4 Căn chờ khớp lúc nào | cần hình: tra bốn nguồn rồi khớp, ba nhánh kết quả | figures/khop-can-cho.png |
 | Hỏi-5 Tên màn | dưới ngưỡng: 0 bước | — |
 | Hỏi-6 Trạng thái riêng | dưới ngưỡng: 1 bước | — |
 
