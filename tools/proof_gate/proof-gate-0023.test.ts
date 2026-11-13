@@ -1369,3 +1369,82 @@ describe("luật giao diện theo 0023", () => {
       expect(t).toContain(h);
   });
 });
+
+// ---------------------------------------------------------------- blocks made before the ledger (row 2c, K-1311-4)
+
+describe("khối có trước luật sổ khối: miễn theo từng cặp gọi tên", () => {
+  const OLD = "hang-cu";
+  const legacyLine = (over: Entry = {}): Entry => ({
+    ten: "HopCu",
+    tep: "src/components/candidate/hop-cu.tsx",
+    nguon: "tao-tay",
+    nhu_cau: "hop-cu",
+    mo_ta: "Hộp có trước luật sổ khối",
+    ho_so: OLD,
+    duyet: APPROVED_AT,
+    ...over,
+  });
+  /** A healthy repo, a signed round without any «ve-tay» row, the legacy block's file, and a ledger naming `pairs`. */
+  function withOldRound(lines: Entry[], pairs: { ten: string; ho_so: string }[]): string {
+    const root = healthy();
+    contract(root, OLD, "signed-off", []);
+    write(root, "src/components/candidate/hop-cu.tsx", "export {};\n");
+    write(
+      root,
+      "design/so-khoi.yaml",
+      [
+        ledgerYaml(lines).trimEnd(),
+        ...(pairs.length ? ["khoi_co_truoc:"] : []),
+        ...pairs.flatMap((p) => [
+          `  - ten: ${p.ten}`,
+          `    ho_so: ${p.ho_so}`,
+          "    commit: abc1234",
+          `    ngay: ${APPROVED_AT}`,
+          "    vi_sao: có trước luật sổ khối",
+        ]),
+        "",
+      ].join("\n"),
+    );
+    return root;
+  }
+
+  it("(a) cặp có tên thì xanh", () => {
+    const r = run(withOldRound([gridLine(), legacyLine()], [{ ten: "HopCu", ho_so: OLD }]));
+    expect(codes(r.stdout)).toEqual([]);
+    expect(r.status).toBe(0);
+  });
+
+  it("(b) không có tên trong mục thì vẫn đỏ so-khong-chung-tu", () => {
+    expect(codesOf(withOldRound([gridLine(), legacyLine()], []))).toEqual(["so-khong-chung-tu"]);
+  });
+
+  it("(c) khối khác trỏ về cùng hồ sơ mà không có tên thì vẫn đỏ", () => {
+    const other = legacyLine({ ten: "HopKhac", nhu_cau: "hop-khac" });
+    const r = run(withOldRound([gridLine(), legacyLine(), other], [{ ten: "HopCu", ho_so: OLD }]));
+    expect(codes(r.stdout)).toEqual(["so-khong-chung-tu"]);
+    expect(r.stdout).toContain("HopKhac");
+  });
+
+  it("(d) cặp có tên mà tệp khối không có thì đỏ", () => {
+    const gone = legacyLine({ tep: "src/components/candidate/khong-co.tsx" });
+    expect(codesOf(withOldRound([gridLine(), gone], [{ ten: "HopCu", ho_so: OLD }]))).toEqual([
+      "so-tep-khong-co",
+    ]);
+  });
+
+  it("cặp trỏ một hồ sơ còn mở thì không được miễn", () => {
+    const open = legacyLine({ ho_so: SLUG, ten: "HopMo", nhu_cau: "hop-mo" });
+    const r = run(withOldRound([gridLine(), open], [{ ten: "HopMo", ho_so: SLUG }]));
+    expect(codes(r.stdout)).toContain("so-khong-chung-tu");
+  });
+
+  it("một dòng của mục thiếu commit thì không đọc được", () => {
+    const root = withOldRound([gridLine(), legacyLine()], [{ ten: "HopCu", ho_so: OLD }]);
+    const text = readFileSync(join(root, "design/so-khoi.yaml"), "utf8").replace(
+      "    commit: abc1234\n",
+      "",
+    );
+    write(root, "design/so-khoi.yaml", text);
+    expect(codesOf(root)).toEqual(expect.arrayContaining(["doc-loi", "so-khong-chung-tu"]));
+  });
+});

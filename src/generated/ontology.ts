@@ -153,6 +153,23 @@ export interface Member {
   invitedAt?: string;
 }
 
+export type SavedViewScreen = "inventory";
+
+/** A way of looking at one grid screen that one person saved under a name — the search text, the filter of each column, the sort, whether rows are grouped, and the hidden columns — shown as an item of the App Shell's second column and opened again exactly as saved. Belongs to the person who saved it, inside one company. */
+export interface SavedView {
+  id: string;
+  /** id of Company */
+  companyId: string;
+  userId: string;
+  screen: SavedViewScreen;
+  name: string;
+  view: string;
+  /** ISO datetime */
+  createdAt: string;
+  /** ISO datetime */
+  updatedAt: string;
+}
+
 /** A stack (trục) of one tower; a local extension, as in onehub-invest; shared catalog, no companyId. */
 export interface Stack {
   stackKey: string;
@@ -241,6 +258,18 @@ export interface ReadCompanyCodesInput {
 export interface ManageCompanyCodesInput {
 }
 
+export interface ListSavedViewsInput {
+}
+
+export interface SaveViewInput {
+}
+
+export interface EditViewInput {
+}
+
+export interface RemoveViewInput {
+}
+
 export interface ViewListingsInput {
 }
 
@@ -299,6 +328,14 @@ export interface ActionHandlers {
   readCompanyCodes(input: ReadCompanyCodesInput, ctx: ActionContext): Promise<void>;
   /** Add or change a code or name the company uses for a catalog tower or unit. */
   manageCompanyCodes(input: ManageCompanyCodesInput, ctx: ActionContext): Promise<void>;
+  /** List one's own saved views of a grid screen, for the App Shell's second column. */
+  listSavedViews(input: ListSavedViewsInput, ctx: ActionContext): Promise<void>;
+  /** Save the current way of looking at a grid screen as a new view, under a name. */
+  saveView(input: SaveViewInput, ctx: ActionContext): Promise<void>;
+  /** Rename one's own saved view, or overwrite it with the current way of looking. */
+  editView(input: EditViewInput, ctx: ActionContext): Promise<void>;
+  /** Remove one's own saved view. */
+  removeView(input: RemoveViewInput, ctx: ActionContext): Promise<void>;
   /** See the listings of the company. */
   viewListings(input: ViewListingsInput, ctx: ActionContext): Promise<void>;
   /** Add a listing. */
@@ -605,6 +642,110 @@ export const ACTIONS: readonly ActionSpec[] = [
     doors: {
       api: [],
       db: ["table company_catalog_aliases insert", "table company_catalog_aliases update"],
+    },
+  },
+  {
+    name: "listSavedViews",
+    description: "List one's own saved views of a grid screen, for the App Shell's second column.",
+    entity: "SavedView",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "own",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["GET /api/v1/saved-views"],
+      db: ["table saved_view select"],
+    },
+  },
+  {
+    name: "saveView",
+    description: "Save the current way of looking at a grid screen as a new view, under a name.",
+    entity: "SavedView",
+    kind: "create",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "own",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["POST /api/v1/saved-views"],
+      db: ["table saved_view insert"],
+    },
+  },
+  {
+    name: "editView",
+    description: "Rename one's own saved view, or overwrite it with the current way of looking.",
+    entity: "SavedView",
+    kind: "update",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "own",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["PATCH /api/v1/saved-views/[id]"],
+      db: ["table saved_view update"],
+    },
+  },
+  {
+    name: "removeView",
+    description: "Remove one's own saved view.",
+    entity: "SavedView",
+    kind: "delete",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      BuyerAgent: "own",
+      TeamLead: "own",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["DELETE /api/v1/saved-views/[id]"],
+      db: ["table saved_view delete"],
     },
   },
   {

@@ -87,3 +87,8 @@ relations:
     to: CompanyCatalogAlias
     cardinality: one-to-many
     description: A company holds its own codes and names for catalog towers and units.
+  - from: Company
+    name: keeps_views_of
+    to: SavedView
+    cardinality: one-to-many
+    description: A company holds the saved views of its members; each view belongs to the one member who saved it.

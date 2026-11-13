@@ -514,6 +514,36 @@
       "dot": "mvp-dot-1"
     },
     {
+      "ma": "2e",
+      "cau_giao": "Đầu chủ và Đầu khách lọc mọi bảng họ Lưới chỉ bằng cách gõ vào ô lọc dưới tiêu đề cột như ở Sheet; ô «Gõ để tìm» của vùng không còn trên màn nào của họ Lưới — Bảng hàng, Đã gửi, sau này Liên hệ; tìm thì dùng ô ⌘K ở thanh trên của App Shell (hàng 3f)",
+      "vai": "Đầu chủ",
+      "tieu_chi": 8,
+      "vi_sao": "Chủ kho 2026-11-13: «Tôi thấy một điểm chưa rõ ràng ở ux, bảng hàng đang hoạt động theo ux của sheet, nên khi tìm căn thì nó dùng luôn header của cột để input, tương tự ở từng cột, box search hiện nay chỉ gây confuse cho người dùng là khi nào dùng box search và khi nào gõ trên cột?» Trang so sánh các lối kèm ảnh chụp màn được bày ở một phiên thảo luận riêng; chủ kho chốt cùng ngày: «Đồng ý lối A, một điểm tôi muốn bổ sung là đưa search đúng vào (⌘K) ở thanh trên đây cũng là nơi shell đã có ux?». Lối A là bỏ ô tìm của vùng, chỉ còn lọc ở ô dưới tiêu đề cột. Đứng sau hàng 2a vì bộ lọc từng cột là của 2a, sau hàng 2c để cách xem đã lưu không mang chữ tìm; hàng 3f đứng trên hàng này vì ô ⌘K ở thanh trên là nơi tìm còn lại. Bộ bài kiểm sinh từ sổ màn đang gõ vào ô tìm và nằm trong thư mục công cụ của kho, nên hàng này là T3",
+      "hang": "T3",
+      "dung_tren": [
+        "2a",
+        "2c"
+      ],
+      "slug": "bo-o-tim-cua-vung",
+      "bat_khi": "Lưới dùng chung không còn vẽ và không còn nhận ô tìm của vùng trên mọi màn họ Lưới, ở máy tính và điện thoại; trạng thái vùng «Tìm không ra» đổi tên thành «Không có dòng nào khớp» và vẫn có lối thoát «Xoá lọc»; ma trận trạng thái, bảng hành vi và khuôn Lưới ghi đúng như vậy; mọi bài kiểm đang gõ vào ô tìm được viết lại sang ô lọc dưới tiêu đề cột mà phép so không yếu đi; cách xem đã lưu của hàng 2c không mang chữ tìm; trên điện thoại vẫn còn hàng ô lọc dưới tiêu đề cột",
+      "nhom": "bang-hang",
+      "vung": [
+        "src/components/candidate/**",
+        "design/states.md",
+        "design/behaviors.md",
+        "design/patterns/luoi.md",
+        "tools/e2e_templates/**",
+        "tests/grid.test.tsx",
+        "tests/behavior.test.tsx",
+        "tests/ho-so-can.test.tsx",
+        "tests/e2e/grid.spec.ts",
+        "tests/e2e/behavior.spec.ts",
+        "tests/e2e/sheet.spec.ts",
+        "tests/e2e/ho-so-can.spec.ts"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "3",
       "cau_giao": "Đầu chủ bấm một căn và thấy hồ sơ căn cạnh bảng, trên điện thoại thấy thẻ căn",
       "vai": "Đầu chủ",
@@ -649,7 +679,8 @@
       "vi_sao": "Chủ kho 2026-11-12 ở Cổng Đáng của năm hàng tách ra khi so hồ sơ căn của Quỹ hàng với hàng 3 «Hồ sơ căn»: «Build cả năm hàng». Hồ sơ hàng 3 mở lại được bằng địa chỉ có mã hồ sơ nhưng không có trang riêng cho một căn (hợp đồng hàng 3 cắt ra), và chưa có chỗ gõ mã căn để tới thẳng hồ sơ; hàng 12 gõ mã để thêm căn, là việc khác. Quỹ hàng có cả hai, kèm bước chọn toà khi hai toà trùng mã",
       "hang": "T2",
       "dung_tren": [
-        "3"
+        "3",
+        "2c"
       ],
       "slug": "loi-vao-ho-so",
       "bat_khi": "Nút «Mở toàn màn» trên ngăn chi tiết sang trang riêng của căn, trang có nút chép đường dẫn; người cùng sàn mở đường dẫn thấy đúng căn và đúng lần chào; đường dẫn mang mã lạ thì báo «Không có căn này trong Bảng hàng» kèm lối về Bảng hàng; gõ mã căn ở thanh trên mở thẳng hồ sơ căn; mã có ở hai toà trở lên thì hiện «Nhiều căn — chọn toà» với một nút cho từng toà; mã không khớp căn nào thì nói rõ và không mở gì; đủ bốn khổ màn hình",
