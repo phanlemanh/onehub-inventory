@@ -6,6 +6,7 @@ import { EMPTY, formatByKind } from "@/lib/format";
 import type { TypedColumn } from "@/components/candidate/column-kind";
 
 import { inventoryColumns, type InventoryField } from "./inventory-rows";
+import { AskListAgentBar, ReportUnitError } from "./proto-hoi-dau-chu";
 
 /** The facts the card shows in its three-up row, in order (after product-grid-4's specs row). */
 const CARD_FACTS: readonly InventoryField[] = [
@@ -14,10 +15,21 @@ const CARD_FACTS: readonly InventoryField[] = [
   "Listing.lastConfirmedAt",
 ];
 
+/** Catalog properties a person may report wrong (row 3e prototype). */
+const CATALOG_FIELDS: readonly InventoryField[] = [
+  "Listing.unitNumber",
+  "Listing.buildingName",
+  "Listing.subdivisionName",
+  "Unit.livingArea",
+  "Unit.bedroomsTotal",
+];
+
 /** What both views of one listing read: its name, where it sits, and every inventory field by column. */
 export interface ListingView {
   id: string;
   unitNumber: string;
+  building: string;
+  subdivision: string;
   place: string;
   status: unknown;
   price: unknown;
@@ -62,6 +74,8 @@ export function listingView(
   return {
     id: row.id,
     unitNumber: text(row["Listing.unitNumber"]),
+    building: text(row["Listing.buildingName"]),
+    subdivision: text(row["Listing.subdivisionName"]),
     place: [row["Listing.buildingName"], row["Listing.subdivisionName"]]
       .map(text)
       .filter((part) => part !== "")
@@ -125,9 +139,25 @@ export function ListingRecordBody({ view, priceLabel }: { view: ListingView; pri
   return (
     <div data-slot="listing-record" data-listing-id={view.id} className="flex flex-col gap-4">
       <ListingCard view={view} priceLabel={priceLabel} />
+      <div className="-mb-2 flex justify-end border-t pt-2">
+        <ReportUnitError
+          unit={view.unitNumber}
+          building={view.building}
+          subdivision={view.subdivision}
+          fields={view.fields
+            .filter(({ column }) => CATALOG_FIELDS.includes(column.field as InventoryField))
+            .map(({ column, value }) => ({
+              name: column.header,
+              shown:
+                value === null || value === undefined || value === ""
+                  ? EMPTY
+                  : formatByKind(column.kind, value),
+            }))}
+        />
+      </div>
       <dl
         data-slot="listing-record-fields"
-        className="grid grid-cols-5 gap-x-4 gap-y-2 border-t pt-4"
+        className="grid grid-cols-5 gap-x-4 gap-y-2"
       >
         {view.fields.map(({ column, value }) => (
           <div key={column.field} data-field={column.field} className="contents">
@@ -152,6 +182,7 @@ export function listingRecord(headers: Readonly<Record<InventoryField, string>>)
           .filter((part) => part !== "")
           .join(" · "),
         body: <ListingRecordBody view={view} priceLabel={headers["Listing.listPrice"]} />,
+        footer: <AskListAgentBar id={view.id} unit={view.unitNumber} building={view.building} />,
       };
     },
   };

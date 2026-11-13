@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { PageHeader } from "@/components/templates/page-header";
+import { SessionRoles } from "@/modules/identity/ui";
 import { sampleUnits, subdivisionNameOf } from "@/modules/catalog";
 import { label } from "@/modules/company-config";
 import { SAMPLE_COMPANY, buildSampleListings } from "@/modules/listings";
@@ -30,12 +31,14 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 
 /** Inventory, read-only: the sample company's listings (roadmap row 1) on the shared grid. */
 export default async function Page({ searchParams }: Props) {
-  const { state, status: statusParam } = await searchParams;
+  const { state, status: statusParam, vai } = await searchParams;
   // A status shortcut opens the grid filtered (row 2a); a repeated parameter keeps its first value.
   const status = Array.isArray(statusParam) ? statusParam[0] : statusParam;
   const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
   const { listings, listingUnits } = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
-  return (
+  // PROTOTYPE (row 3e): ?vai=<Role> stands in for a signed-in role.
+  const protoRoles = typeof vai === "string" ? [vai as "BuyerAgent"] : null;
+  const page = (
     <>
       <PageHeader title={label("Inventory")} />
       <InventoryGrid
@@ -53,4 +56,5 @@ export default async function Page({ searchParams }: Props) {
       />
     </>
   );
+  return protoRoles ? <SessionRoles roles={protoRoles}>{page}</SessionRoles> : page;
 }

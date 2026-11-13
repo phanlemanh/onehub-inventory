@@ -26,6 +26,8 @@ export interface RecordView {
   body: ReactNode;
   /** The record's actions, usually a RecordActions (row 9e): at the head, before «Trước», «Sau» and «Đóng». */
   actions?: ReactNode;
+  /** One bar stuck to the foot of the record, outside the scrolling body (row 3e: «Hỏi đầu chủ»). */
+  footer?: ReactNode;
 }
 
 /** The selector of the button that opened a record, so focus can go back to the row it came from. */
@@ -211,6 +213,7 @@ export function RecordPanel({
           <div data-slot="record-panel-body" className="min-h-0 flex-1 overflow-y-auto p-4">
             {view?.body}
           </div>
+          {view?.footer}
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
@@ -345,6 +348,7 @@ function RecordColumn({
           <div data-slot="record-panel-body" className="min-h-0 flex-1 overflow-y-auto p-4">
             {view.body}
           </div>
+          {view.footer}
         </FramePanel>
       </Frame>
     </aside>
