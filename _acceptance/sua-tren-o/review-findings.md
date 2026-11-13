@@ -1,111 +1,108 @@
+# Review findings: sua-tren-o (round 4)
+
 ## Trong hợp đồng
+
+Không có finding nào map được vào AC.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Authorization and input (check 6): the role can be set from the address bar on the Inventory screen**
-  Người dùng thấy gì: Trên môi trường xem thử không phải bản chính thức và không có người đăng nhập, ai biết cách gõ thêm vào địa chỉ có thể tự chọn vai và mở ô sửa. Hiện chỉ ghi vào dữ liệu mẫu nên chưa lộ dữ liệu thật.
-  Căn cứ: Hậu quả nhẹ vì chưa có dữ liệu thật để lộ và bản chính thức không bị ảnh hưởng; nhưng khi có đường ghi thật thì phải xử lý, sửa lúc đó vẫn rẻ.
-  file: `src/app/(app)/inventory/page.tsx`
-  severity: low
+- **Authorization (check 6): moving a status in the cell skips the activateListing permission**
+  Người dùng thấy gì: Một Đầu khách hoặc đầu chủ không giữ căn có thể đưa căn lên trạng thái đang bán, dù bảng quyền chỉ cho đầu chủ của căn và Trưởng nhóm. Hiện việc ghi mới chạm dữ liệu mẫu nên chưa ảnh hưởng dữ liệu thật.
+  Căn cứ: Chưa gây hại vì chưa ghi dữ liệu thật, nhưng phải sửa trước khi nối đường ghi thật; sửa thuộc một tính năng riêng về quyền theo từng nấc.
+  file: `src/modules/listings/ui/use-listing-cell-edit.tsx`
+  severity: medium
+  Đề xuất: new-contract
+
+- **Domain (check 3): new business rules in code are missing from ontology/**
+  Người dùng thấy gì: Các luật chuyển trạng thái, khoá căn đã bán và hỏi lại khi giá lệch lớn chỉ được ghi ở tài liệu, chưa ở danh mục khái niệm gốc. Người dùng không thấy khác biệt nào.
+  Căn cứ: Người dùng không bị ảnh hưởng; đây là nợ tài liệu, bổ sung sau rẻ và không mất dữ liệu.
+  file: `src/modules/listings/edit-rules.ts`
+  severity: medium
   Đề xuất: known-limits
 
-- **Product language: label words written directly in src/ instead of coming from labels.yaml**
-  Người dùng thấy gì: Hai câu báo xung đột và một câu xác nhận dùng chữ «căn» và «chủ nhà» gõ cố định; với căn cho thuê, câu vẫn nói «chủ nhà» thay vì «chủ cho thuê».
-  Căn cứ: Chỉ lệch chữ nhẹ ở vài câu thông báo, không mất dữ liệu và không sai nghĩa; chữ này đã nằm trong bản thiết kế được duyệt nên có thể ghi lại là chữ đã chấp thuận.
+- **Authorization and input (check 6): the role can be set from the address with ?vai= on the Inventory screen**
+  Người dùng thấy gì: Ở bản thử hoặc bản dev, ai mở được địa chỉ đều có thể tự chọn vai bằng đường dẫn mà không cần đăng nhập. Bản chính thức vẫn được chặn.
+  Căn cứ: Hiện chỉ chạm dữ liệu mẫu nên nhẹ, nhưng thành rủi ro thật khi bản thử có dữ liệu thật; nên dọn trước khi nối đường ghi thật.
+  file: `src/app/(app)/inventory/page.tsx`
+  severity: low
+  Đề xuất: new-contract
+
+- **Product language: words that belong to labels are typed directly in src/**
+  Người dùng thấy gì: Một vài câu thông báo dùng chữ cố định như «chủ nhà» nên với căn cho thuê có thể hiện sai từ. Chỉ là lệch từ ngữ, không mất dữ liệu.
+  Căn cứ: Nhẹ, chỉ sai chữ trong vài câu; người dùng vẫn hiểu và sửa sau rẻ.
   file: `src/modules/listings/ui/cell-edit-copy.ts`
   severity: low
   Đề xuất: known-limits
 
-- **Shape 5, a whole class is claimed but only one case is tested: the test name says 'a 500 or a bug' and runs only the 500**
-  Người dùng thấy gì: Bài thử chỉ kiểm tra trường hợp máy chủ trả lỗi, chưa kiểm tra trường hợp chương trình tự gặp lỗi lạ khi lưu. Nếu nhánh đó hỏng, người dùng có thể không thấy báo lỗi đúng ở ô.
-  Căn cứ: Chỉ là chỗ bài thử còn thiếu, không phải lỗi người dùng đang gặp; thêm ca thử sau rất rẻ và không mất dữ liệu.
-  file: `src/components/candidate/use-change.test.tsx`
+- **Design (check 9): a rule refusal is reported to the user as a permission refusal**
+  Người dùng thấy gì: Trong vài ca hiếm, như gõ giá dưới một triệu, người dùng bị báo là không đủ quyền trong khi lý do thật là giá không hợp lệ. Giá cũ vẫn được giữ.
+  Căn cứ: Lời báo sai lý do gây khó hiểu nhưng không mất dữ liệu và người dùng nhập lại được; sửa vừa phải.
+  file: `src/modules/listings/ui/use-listing-cell-edit.tsx`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 4, a negative check with no pinned positive control: the claim 'says why' only checks that toast.error ran once**
-  Người dùng thấy gì: Bài thử ở tầng dưới chỉ biết có một thông báo lỗi hiện ra, chưa kiểm tra thông báo nói đúng lý do. Nếu lý do bị nói sai thì bài thử này vẫn xanh, nhưng bài thử ở màn hình đã kiểm tra câu đúng.
-  Căn cứ: Người dùng không bị ảnh hưởng vì một bài thử khác đã giữ đúng câu lý do; sửa sau rẻ và không có nguy cơ mất dữ liệu.
-  file: `src/components/candidate/use-change.test.tsx`
-  severity: medium
-  Đề xuất: known-limits
-
-- **Authorization (check 6): status moves bypass activateListing in the permission table (r2 · tệp đã đổi)**
-  Người dùng thấy gì: Một người môi giới phía khách, hoặc người không giữ căn đó, có thể đưa căn từ Chưa đủ hay Tạm giữ sang Đang bán ngay trên ô, dù bảng quyền không cho. Hiện chỉ ghi vào dữ liệu mẫu trong bộ nhớ.
-  Căn cứ: Hiện chưa chạm dữ liệu thật và tải lại là mất, nhưng khi nối đường ghi thật ở hàng 10 thì phải chốt quyền kích hoạt; sửa ngay giờ thì rẻ hơn làm lại sau.
+- **Undo puts back price, status and confirmed time together, not just the field that was edited, so the grid stops matching the store**
+  Người dùng thấy gì: Nếu sửa giá, rồi đổi trạng thái, rồi bấm Hoàn tác giá, bảng có thể hiện trạng thái cũ trong khi dữ liệu đã ở trạng thái mới. Lần đổi trạng thái kế tiếp sẽ bị từ chối với lời báo sai.
+  Căn cứ: Có lệch hiển thị so với dữ liệu nhưng chỉ khi thao tác xen kẽ trong thời gian ngắn, tải lại trang là hết; chưa ghi thật nên chưa mất dữ liệu.
   file: `src/modules/listings/ui/use-listing-cell-edit.tsx`
   severity: medium
   Đề xuất: new-contract
 
-- **Authorization / CI and agent privileges (checks 6, 8): role taken from the URL in non-production builds (r2)**
-  Người dùng thấy gì: Trên bản chạy thử (không phải bản chính thức), ai mở đường dẫn có gắn vai đều bật được ô sửa như vai đó mà không cần đăng nhập. Bản chính thức không bị.
-  Căn cứ: Chỉ ảnh hưởng bản thử, ghi vào dữ liệu mẫu, không lộ dữ liệu thật; nhẹ và người dùng bản chính thức không gặp.
-  file: `src/app/(app)/inventory/page.tsx`
-  severity: low
-  Đề xuất: known-limits
-
-- **Tier (check 10): high tier because the ontology is touched; needs a code owner and an ontology call-out (r2)**
-  Người dùng thấy gì: Người dùng không thấy gì khác. Chỉ là thay đổi nhãn mới cần chủ kho xác nhận trong mô tả PR trước khi gộp.
-  Căn cứ: Không ảnh hưởng người dùng hay dữ liệu; chỉ là việc ghi chú và duyệt khi gộp, làm ở bước gộp là đủ.
-  file: `ontology/labels.yaml`
-  severity: low
-  Đề xuất: known-limits
-
-- **Status cell moves a listing to Active under updateListing, bypassing activateListing scope (r2 · tệp đã đổi)**
-  Người dùng thấy gì: Người môi giới không giữ căn vẫn có thể đưa căn lên Đang bán từ ô Trạng thái, trái với bảng quyền. Hiện chỉ tác động lên dữ liệu mẫu.
-  Căn cứ: Chưa mất dữ liệu thật và tải lại là về như cũ, nhưng cần chốt luật quyền trước khi nối đường ghi thật, nên gộp vào việc riêng.
-  file: `src/modules/listings/ui/use-listing-cell-edit.tsx`
-  severity: medium
-  Đề xuất: new-contract
-
-- **Rule refusals ('invalid') are reported as permission refusals, and a failed undo then sits on screen forever (r2 · tệp đã đổi)**
-  Người dùng thấy gì: Nếu bấm Hoàn tác sau khi căn đã chuyển sang trạng thái cuối, người dùng thấy câu báo thiếu quyền sai nguyên nhân và thông báo kẹt lại với nút Thử lại không bao giờ thành công.
-  Căn cứ: Hiếm gặp, không mất dữ liệu và dữ liệu không bị sai; chỉ gây khó hiểu, tải lại trang là hết.
-  file: `src/modules/listings/ui/use-listing-cell-edit.tsx`
-  severity: medium
-  Đề xuất: known-limits
-
-- **Cell accepts sub-million prices that the save door then rejects as 'refused' (r2)**
-  Người dùng thấy gì: Gõ giá rất nhỏ như 0,5 tr thì ô tưởng hiểu nhưng khi lưu bị từ chối, ô trở về giá cũ kèm câu báo thiếu quyền gây hiểu nhầm.
-  Căn cứ: Giá chào dưới một triệu hầu như không có thật, không mất dữ liệu, người dùng gõ lại giá đúng là xong.
-  file: `src/modules/listings/save-door.ts`
-  severity: medium
-  Đề xuất: known-limits
-
-- **Every TypeError is treated as 'offline', hiding real bugs as network failures (r2)**
-  Người dùng thấy gì: Nếu có lỗi lập trình trong lúc lưu, người dùng chỉ thấy báo mất mạng và giá trị trở về, còn lỗi thật bị che.
-  Căn cứ: Giá trị không bị lưu sai và tự về cũ nên người dùng không mất gì; chỉ khó tìm lỗi cho đội làm, sửa sau rẻ.
+- **Any TypeError thrown inside a write is treated as «offline», with no log**
+  Người dùng thấy gì: Một lỗi lập trình bất ngờ có thể bị báo là mất mạng và không được ghi lại, khiến khó phát hiện lỗi thật. Người dùng chỉ thấy lời báo mất mạng.
+  Căn cứ: Chỉ ảnh hưởng khi có lỗi lập trình hiếm gặp, người dùng thử lại được; chủ yếu làm khó việc dò lỗi.
   file: `src/lib/write-failure.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **An `invalid` answer from the save door is quietly shown as a permission refusal**
+  Người dùng thấy gì: Khi một thay đổi vi phạm luật, ví dụ hoàn tác giá sau khi căn đã bán, người dùng bị báo thiếu quyền thay vì lý do thật, và lý do không được ghi lại.
+  Căn cứ: Gây hiểu nhầm nhưng không mất dữ liệu, ca hiếm; người dùng tải lại là thấy đúng trạng thái.
+  file: `src/modules/listings/ui/use-listing-cell-edit.tsx`
   severity: low
   Đề xuất: known-limits
 
-- **Shape 3 (string present instead of the relation): hoan-tac-hong-bao-ro in use-change.test checks a fixed fixture sentence, not the unit and the value the cell actually shows (r2 · tệp đã đổi)**
-  Người dùng thấy gì: Người dùng không thấy khác. Lượt đo cho thông báo hoàn tác hỏng chưa tự kiểm việc thông báo nêu đúng căn và đúng giá trị.
-  Căn cứ: Hành vi sản phẩm vẫn được một bài kiểm khác phủ nên không có rủi ro trực tiếp cho người dùng; chỉ làm số đo kém chặt, thêm bài vào danh sách chạy là rẻ.
+- **After a conflict the row's version is never refreshed, so every later save of that row conflicts again**
+  Người dùng thấy gì: Khi hai người cùng sửa một căn trên đường ghi thật, người bị xung đột sẽ bị kẹt cho tới khi tải lại trang. Hiện chưa xảy ra vì chỉ có dữ liệu mẫu.
+  Căn cứ: Chưa xảy ra hôm nay và tải lại trang là gỡ được; hợp đồng đã hoãn phần này sang hàng nối đường ghi thật.
+  file: `src/modules/listings/ui/use-listing-cell-edit.tsx`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 3 (và 2): bài 'hoan-tac-hong-bao-ro' ở use-change đòi một chuỗi mà chính fixture viết sẵn, không đo quan hệ giữa lời báo và giá ô đang hiện**
+  Người dùng thấy gì: Một bài kiểm về lời báo khi hoàn tác hỏng không thể đỏ dù lời báo nêu sai căn hay sai giá, nên có thể bỏ lọt lỗi cho hai ca lỗi mạng và bị từ chối.
+  Căn cứ: Không ảnh hưởng người dùng trực tiếp, chỉ làm lưới an toàn yếu hơn; củng cố bài kiểm sau rẻ.
   file: `src/components/candidate/use-change.test.tsx`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 2 (hand-written fixture): the 'navigator.onLine false' failure is made up as Error("network down") instead of coming from the real write path (r2 · tệp đã đổi)**
-  Người dùng thấy gì: Người dùng không thấy khác. Một ca báo mất mạng trong bài kiểm dùng lỗi tự dựng thay vì lỗi của đường ghi thật.
-  Căn cứ: Không ảnh hưởng người dùng, hai ca còn lại đã đi qua đường ghi thật; chỉ làm bài đo kém sát.
+- **Hình dạng 2: khuôn lỗi 'navigator.onLine false' được viết tay cho vừa nhánh đọc, không đi qua đường ghi thật**
+  Người dùng thấy gì: Một bài kiểm dùng lỗi mất mạng dựng tay không giống lỗi thật của đường ghi, nên đo kém chặt cho nhánh dự phòng.
+  Căn cứ: Không ảnh hưởng người dùng; nhánh này chỉ là dự phòng và đã có bài khác đo lỗi thật, chi phí sửa không đáng.
   file: `src/components/candidate/use-change.test.tsx`
   severity: low
-  Đề xuất: known-limits
+  Đề xuất: wont-fix
 
-- **Shape 4 (negative assertion with no positive control): khong-quyen-chu-thuong passes even if ?vai=CompanyAdmin is ignored (r2 · tệp đã đổi)**
-  Người dùng thấy gì: Người dùng không thấy khác. Bài kiểm vai không có quyền có thể xanh dù vai chưa thật sự được áp dụng.
-  Căn cứ: Hành vi vai có quyền đã có bài kiểm khác; rủi ro là một lỗi quyền sau này lọt qua mà không đỏ, sửa bài kiểm rẻ.
+- **Hình dạng 5: 'cot-chi-doc' tuyên duyệt ma trận 8 cột × 3 lối vào, nhưng chỉ đo 8 giá trị gộp bằng HOẶC**
+  Người dùng thấy gì: Bài kiểm các cột chỉ-đọc chỉ thử một lối vào cho hai cột sửa được, nên nếu gõ hoặc bấm đúp hỏng trên ô Giá thì bài vẫn xanh.
+  Căn cứ: Rủi ro là bỏ sót lỗi sau này, chưa phải lỗi hiện có; bổ sung ca kiểm là việc rẻ.
   file: `tests/e2e/sua-tren-o.spec.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 4 (pinned message): the messages the evals.yaml break directions expect do not match the messages the tests print (r2)**
-  Người dùng thấy gì: Người dùng không thấy khác. Hai bài đo ghi sai câu báo đỏ mong đợi nên người chấm khó đối chiếu chiều làm hỏng.
-  Căn cứ: Không ảnh hưởng sản phẩm hay dữ liệu; chỉ là câu chữ trong hồ sơ đo, sửa rất rẻ khi tiện.
+- **Hình dạng 4: lời hứa ghim thông điệp trong evals không khớp thông điệp bài thật in ra**
+  Người dùng thấy gì: Mô tả trong sổ đo không khớp chữ với thông điệp bài kiểm in ra, nên người chấm có thể không tìm thấy chuỗi đã hứa.
+  Căn cứ: Không chạm người dùng cuối, chỉ lệch chữ trong tài liệu nội bộ; sửa không đáng công.
   file: `_acceptance/sua-tren-o/evals.yaml`
+  severity: low
+  Đề xuất: wont-fix
+
+- **Hình dạng 4: câu kiểm âm 'cổng lưu 0 lần' đọc một lần ngay sau thao tác, trong khi phía dương của cùng tệp phải chờ lặp**
+  Người dùng thấy gì: Một bài kiểm khẳng định không có lần ghi nào chỉ nhìn một lần ngay sau thao tác, nên một lần ghi sai đến trễ vẫn lọt qua.
+  Căn cứ: Chỉ làm lưới kiểm yếu hơn ở một ca hiếm; người dùng không bị ảnh hưởng và thêm chờ lặp là việc rẻ.
+  file: `tests/e2e/sua-tren-o.spec.ts`
   severity: low
   Đề xuất: known-limits
 
