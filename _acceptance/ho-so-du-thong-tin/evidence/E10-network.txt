@@ -1,2 +1,0 @@
-Playwright script (not the browser pane); responses>=400, requestfailed, console errors:
-(none)
