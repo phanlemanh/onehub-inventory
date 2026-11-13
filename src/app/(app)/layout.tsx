@@ -7,6 +7,7 @@ import {
 } from "@/components/templates/app-shell/column-cookie";
 import { label } from "@/modules/company-config";
 import { currentSession } from "@/modules/identity/server";
+import { SessionRoles } from "@/modules/identity/ui";
 
 import { AccountMenu } from "./account-menu";
 import { CompanySwitch } from "./company-switch";
@@ -24,22 +25,25 @@ export default async function FrameLayout({ children }: { children: React.ReactN
         companies: session.companies,
       }
     : null;
+  // Every action button and the App Shell's entries read the session's roles from here (PermittedAction, row 9e).
   return (
-    <AppShell
-      nav={NAV}
-      roles={session?.roles ?? []}
-      columnOpen={columnOpen}
-      company={
-        account ? <CompanySwitch company={account.company} companies={account.companies} /> : null
-      }
-      account={
-        <AccountMenu
-          account={account}
-          labels={{ signIn: label("SignIn"), signOut: label("SignOut") }}
-        />
-      }
-    >
-      {children}
-    </AppShell>
+    <SessionRoles roles={session?.roles ?? []}>
+      <AppShell
+        nav={NAV}
+        roles={session?.roles ?? []}
+        columnOpen={columnOpen}
+        company={
+          account ? <CompanySwitch company={account.company} companies={account.companies} /> : null
+        }
+        account={
+          <AccountMenu
+            account={account}
+            labels={{ signIn: label("SignIn"), signOut: label("SignOut") }}
+          />
+        }
+      >
+        {children}
+      </AppShell>
+    </SessionRoles>
   );
 }

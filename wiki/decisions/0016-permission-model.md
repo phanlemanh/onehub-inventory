@@ -60,3 +60,13 @@ Không chọn:
 - Đọc thoả thuận kết nối chưa có luật vai ở cơ sở dữ liệu: ô `readAgreements` hôm nay cho cả bốn vai, bài kiểm từng ô đỏ
   khi bảng đổi mà luật chưa theo.
 - Hồ sơ: `_acceptance/bang-quyen-theo-vai/`.
+
+## Amendment 2026-11-12 — row 9e
+
+- Chủ kho chọn một nút động từ thường «Xoá» (Hỏi-1, H1) thay cho việc tách mọi kiểu xoá thành nhiều nút: «Xoá» là gỡ dòng
+  khỏi danh sách và giữ dấu vết ai xoá, lúc nào — không xoá dòng khỏi cơ sở dữ liệu. Ngừng bán là đổi trạng thái qua Sửa,
+  không nằm trong nhóm xoá. Gộp liên hệ và Xoá tên, số theo yêu cầu (Nghị định 356) vẫn là hai việc riêng mang động từ của nó.
+- Bảng quyền có thêm bảy dòng nháp: `removeListing`, và xem, thêm, sửa, xoá, gộp liên hệ, xoá tên và số của liên hệ; ô
+  liên hệ theo thông lệ CRM (mọi người đọc, người tạo và Trưởng nhóm sửa, xoá; chỉ Trưởng nhóm gộp và xoá dữ liệu cá nhân).
+  Quản trị sàn không có ô ở các dòng căn, chủ và liên hệ.
+- Nút đọc bảng quyền qua một cửa: [0025](0025-bo-nut-theo-quyen.md). Hồ sơ: `_acceptance/bo-nut-theo-quyen/`.

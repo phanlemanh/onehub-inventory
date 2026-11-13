@@ -29,6 +29,34 @@ Câu trả lời đóng cho các việc lặp lại, để không phải đoán 
 | Toàn màn hình         | Từ 768px: nút «Toàn màn hình» đưa cả trang vào toàn màn, App Shell và đầu màn ẩn, lưới dày; Esc thoát                                                                                                                                                                           |
 | Lối tắt trạng thái    | Cột thứ hai mở Bảng hàng đã lọc `?status=<trạng thái>`; một thứ tự trạng thái cho mọi nơi (thứ tự nhãn)                                                                                                                                                                         |
 | Chữ mở trong ô        | Trong Lưới, chữ là đường mở (mã căn) mở hồ sơ bằng một cú bấm; phần còn lại của ô chỉ chọn ô như Sheet; Enter trên ô đang chọn cũng mở; chữ mở không là chỗ dừng Tab; đóng hồ sơ thì tiêu điểm về chữ mở, ô của nó là ô đang chọn và phím mũi tên chạy tiếp (phân xử D-1211-19) |
+| Bộ nút theo quyền     | Mỗi nút thao tác đi qua `PermittedAction` và hiện theo bảng quyền; không quyền thì không có nút; chỗ đặt và thứ tự ở mục «Bộ nút theo quyền» dưới đây                                                                                                                           |
+
+## Bộ nút theo quyền
+
+Hàng 9e, lựa chọn của chủ kho ở Cổng Phạm vi (2026-11-12). Bảng quyền `ontology/actions.yaml` là nguồn duy nhất: nút hiện
+khi vai của phiên có ô cho thao tác của nút (`actionVisibility` cạnh `allowedScope`), màn không so tên vai.
+
+| Nút                                             | Chỗ                       | Máy tính                             | Điện thoại                                       |
+| ----------------------------------------------- | ------------------------- | ------------------------------------ | ------------------------------------------------ |
+| Thêm thứ chính của màn (thêm căn, thêm liên hệ) | Đầu màn, cạnh tiêu đề (C) | Một nút chính, chữ «Thêm <danh từ>»  | Cùng chỗ, cùng chữ                               |
+| Nút của vùng (việc trên cả vùng)                | Đầu vùng, bên phải        | Nút phụ trong thanh công cụ của vùng | Cùng chỗ; thanh công cụ xuống dòng khi chật      |
+| Thao tác trên một dòng                          | Một nút «…» (R1)          | Cột cuối của lưới, ghim bên phải     | Cột cuối của lưới, ghim nên luôn thấy ở mép phải |
+| Thao tác trong hồ sơ                            | Đầu hồ sơ, bên phải       | Một nút chính (thường là Sửa) và «…» | Như máy tính, trong hồ sơ toàn màn               |
+
+- Toàn màn hình (từ 768px): đầu màn ẩn, nên nút thêm của đầu màn hiện ở thanh công cụ của vùng — một nút, hai chỗ theo
+  chế độ, không bao giờ hai nút cùng lúc (giám sát phân xử V-1211-6, chủ kho phê ở Cổng Bằng chứng).
+- Trong mọi «…»: việc thường trước, việc xoá sau cùng, tách bằng một vạch, chữ đỏ. «…» không còn việc nào thì không có «…».
+- Chữ trên nút là động từ thường kèm danh từ (H1): «Sửa», «Xoá căn», «Xoá liên hệ», «Gộp với liên hệ khác…», «Xoá tên và số
+  theo yêu cầu». «Xoá» là gỡ khỏi danh sách và giữ dấu vết ai xoá, lúc nào (quyết định 0016, sửa ngày 2026-11-12).
+- Việc xoá luôn qua hộp xác nhận ngắn (X1) của `useChange`: tiêu đề hỏi đúng việc, một câu nói việc sẽ xảy ra, tiêu điểm đầu ở
+  nút huỷ, Esc là huỷ, nút xác nhận mang đúng động từ và danh từ; huỷ không gửi gì.
+- Phạm vi «của tôi» trên bản ghi của người khác: ẩn nút (O1). Vai không có ô: không thấy nút. Không có nút mờ.
+- Máy chủ trả 403 cho một việc người đã bấm (bảng quyền hay vai vừa đổi): câu riêng «Không đủ quyền làm việc này. Tải lại
+  trang để thấy đúng các nút.», khác câu lỗi chung; đóng hộp thì trang làm mới để bộ nút theo bảng quyền mới.
+- Mục thanh bên của một màn khai `action` của thao tác mở màn ấy; mục hiện khi và chỉ khi bảng quyền cho thao tác đó.
+- Bộ kiểm `tests/bo-nut-kiem.test.ts` (trong `make check`) đỏ khi một nút gửi yêu cầu ghi mà không đứng trong
+  `PermittedAction` đúng thao tác, khi khai tên thao tác không có trong bảng, hay khi `src/app` viết cứng tên vai.
+- Bảng vai × màn tới cấp nút sinh từ bảng quyền: `design/vai-man-nut.md` (`make check` đỏ khi lệch).
 
 ## Dựng ở đâu
 
@@ -42,3 +70,6 @@ Mỗi hành vi trên chỉ có một chỗ dựng; màn chỉ khai mình cần g
 | Nút làm việc của vùng        | `DataRegion` với `action={{ node, allowed }}`     | người xem có quyền làm việc ấy không                  |
 | Sửa dữ liệu                  | `DataRegion` với `editable`, luật `editModeFor`   | vùng có sửa được không                                |
 | Lưu và hoàn tác              | `useChange`                                       | động từ, việc sẽ xảy ra, đảo được, ra ngoài sàn       |
+| Nút thao tác theo quyền      | `PermittedAction` (cửa `ui` của mô-đun danh tính) | tên thao tác của bảng quyền, bản ghi có phải của mình |
+| Việc trên một dòng           | `DataRegion` với `rowActions` (`RowActions`)      | các việc của dòng, dòng có phải của mình              |
+| Việc trong hồ sơ             | `RecordActions` trong `actions` của hồ sơ         | nút chính và các việc còn lại                         |

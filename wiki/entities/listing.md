@@ -24,3 +24,5 @@ không thêm giá trị thứ bảy. Đã bán bắt buộc giá chốt và ngà
 ## History
 
 Lấy từ từ vựng của Quỹ hàng khi dựng kho, 09/11/2026.
+
+Hàng 9e, 12/11/2026: bảng quyền có dòng nháp `removeListing` — «Xoá căn» là gỡ khỏi danh sách, giữ dấu vết (sửa đổi của [0016](../decisions/0016-permission-model.md)).
