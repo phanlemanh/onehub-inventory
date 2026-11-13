@@ -92,3 +92,13 @@ relations:
     to: SavedView
     cardinality: one-to-many
     description: A company holds the saved views of its members; each view belongs to the one member who saved it.
+  - from: Company
+    name: holds_share_link
+    to: ShareLink
+    cardinality: one-to-many
+    description: A company holds the links its members sent; no other company sees them.
+  - from: ShareLink
+    name: includes
+    to: Listing
+    cardinality: many-to-many
+    description: A link carries one or more listings of its company; a listing can go out in several links.

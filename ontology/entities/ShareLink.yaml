@@ -1,0 +1,31 @@
+name: ShareLink
+description: One link a company member sent to one recipient, carrying one or more listings; the customer opens it without signing in.
+own: "Our own concept. RESO ContactListings is one listing sent to one contact; a link carries several listings in one send, so it does not reuse that name."
+
+properties:
+  id: { type: uuid, required: true, unique: true }
+  companyId: { type: ref, target: Company, required: true }
+  recipientName: { type: string, pii: true, display: person }
+  listingCount: { type: integer, min: 1, required: true, display: count }
+  sentAt: { type: datetime, required: true, display: datetime }
+  openCount: { type: integer, min: 0, required: true, display: count }
+  interestCount: { type: integer, min: 0, required: true, display: count }
+  lastOpenedAt: { type: datetime, display: datetime }
+
+rules:
+  - id: listing-count-is-derived
+    description: listingCount is the number of listings the link includes (relation ShareLink includes Listing); nobody types it.
+    implemented_in: src/modules/sharing/sample.ts
+  - id: recipient-is-a-name-only
+    description: The recipient is a display name only; whether it links to a Contact is decided by roadmap row 18 (saving customers).
+  - id: interest-once-per-listing
+    description: The customer marks interest at most once per listing of a link, so interestCount never exceeds listingCount.
+    implemented_in: src/modules/sharing/sample.ts
+  - id: never-opened-has-no-time
+    description: A link opened zero times has no lastOpenedAt; one opened at least once has one, not earlier than sentAt.
+    implemented_in: src/modules/sharing/sample.ts
+
+code:
+  model: src/modules/sharing/
+  tests: tests/
+wiki: wiki/entities/share-link.md

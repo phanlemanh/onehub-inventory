@@ -25,6 +25,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [ListingOwner](entities/listing-owner.md) — chủ của một lần chào, theo vai
 - [ListingUnit](entities/listing-unit.md) — lần chào trỏ tới căn của danh mục
 - [Member](entities/member.md) — người làm việc trong một sàn, với vai sàn giao
+- [ShareLink](entities/share-link.md) — link đã gửi cho một người nhận, gói nhiều lần chào
 
 ## Flows
 
