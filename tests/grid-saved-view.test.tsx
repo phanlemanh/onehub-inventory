@@ -25,6 +25,10 @@ import { SAMPLE_COMPANY, buildSampleListings } from "../src/modules/listings";
 import { INVENTORY_FIELDS, inventoryRows } from "../src/modules/listings/ui";
 import { tallGridViewport } from "./virtual-viewport";
 
+// The 60-row grid renders slowly when the machine is loaded (grid-sheet hit 5.3 s on the 5 s default in rows 2c and 7c): a
+// ceiling for this file only; no assertion changes.
+vi.setConfig({ testTimeout: 20_000 });
+
 beforeAll(() => {
   // jsdom's rects lack toJSON, which the tall-viewport helper spreads; menus measure the viewport through it.
   const base = Element.prototype.getBoundingClientRect;
