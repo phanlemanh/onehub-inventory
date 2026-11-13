@@ -48,6 +48,7 @@ screens:
       - activateListing
       - removeListing
       - viewOwnerPhone
+    mo_san: [saveView]
     nut_chung: [Chép đường dẫn, Lọc, Cột, Toàn màn hình, Trước, Sau, Đóng]
   - id: sent
     route: /sent
