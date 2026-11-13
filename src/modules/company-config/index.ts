@@ -16,3 +16,24 @@ export function label(concept: ConceptCode, options: LabelOptions = {}): string 
   const entry: { pref: string; lease?: string } = LABELS[concept];
   return options.transaction === "lease" && entry.lease ? entry.lease : entry.pref;
 }
+
+export {
+  FIELD_KINDS,
+  FIELD_LIMIT,
+  NAME_LIMIT,
+  OPTION_LIMIT,
+  STANDARD_VALUE_SETS,
+  TEXT_VALUE_LIMIT,
+  checkCustomValue,
+  checkFieldDraft,
+  columnKindOf,
+  fold,
+  templateSignature,
+  valueSetOf,
+  type CustomFieldShape,
+  type FieldContext,
+  type FieldDraft,
+  type FieldKind,
+  type FieldProblem,
+  type ValueProblem,
+} from "./rules";
