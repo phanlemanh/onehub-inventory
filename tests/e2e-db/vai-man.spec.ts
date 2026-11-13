@@ -179,7 +179,9 @@ async function blockedStep(page: Page, p: Pair, size: Size, info: TestInfo): Pro
   rec.stop();
   const bodies = [await page.content(), ...(await rec.bodies)];
   await test.step(stepName(p, size, "khong lo nguoi chung"), () => {
-    if (bodies.length < 2) throw new Error(stepName(p, size, "khong ghi duoc phan hoi"));
+    // The page itself plus at least one response read in full: a listener that read nothing measures nothing.
+    if (bodies.filter((b) => b.length > 0).length < 2)
+      throw new Error(stepName(p, size, "khong ghi duoc phan hoi"));
     for (const b of bodies)
       if (b.includes(WITNESS.name) || b.includes(WITNESS.email))
         throw new Error(stepName(p, size, "lo nguoi chung"));

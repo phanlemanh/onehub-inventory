@@ -4,15 +4,8 @@
 // with its pinned message. The real tree runs the same roles and must stay green. Lane Postgres: DB_LANE, DB_PORT.
 //   DB_LANE=d DB_PORT=5571 node tests/e2e-db/pha-thu-vai-man.mjs
 import { spawnSync } from "node:child_process";
-import {
-  cpSync,
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -95,32 +88,31 @@ function sh(cmd, args, opts = {}) {
   return spawnSync(cmd, args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, ...opts });
 }
 
-/** A copy of the working tree: HEAD checked out, then every changed or new file of the working tree on top. */
+/**
+ * A copy of the working tree in the system's temporary folder, outside the repository, so no other check of the
+ * repository ever sees it: HEAD checked out, then every changed or new file of the working tree on top, and the
+ * packages cloned in. Removed when the run ends, and when building it fails.
+ */
 function workingCopy() {
-  // Inside the repository, under dist/ (ignored by git; not under node_modules, where Node will not strip types): Node
-  // and the dev server find the packages by walking up to the repository's own node_modules, so the copy needs no
-  // install and no link (a linked node_modules sends the dev server's build folder outside the copy).
-  const base = join(ROOT, "dist", "pha-thu-vai-man");
-  mkdirSync(base, { recursive: true });
-  const dir = mkdtempSync(join(base, "ban-sao-"));
+  const dir = mkdtempSync(join(tmpdir(), "pha-thu-vai-man-"));
   rmSync(dir, { recursive: true, force: true });
   const add = sh("git", ["-C", ROOT, "worktree", "add", "--detach", dir, "HEAD"]);
   if (add.status !== 0) throw new Error(`khong tao duoc ban sao: ${add.stderr}`);
-  const changed = sh("git", ["-C", ROOT, "ls-files", "-m", "-o", "--exclude-standard"])
-    .stdout.split("\n")
-    .filter(Boolean);
-  for (const rel of changed)
-    if (existsSync(join(ROOT, rel))) cpSync(join(ROOT, rel), join(dir, rel), { recursive: true });
-  // The copy's dev server compiles with the repository as its root, the folder holding both the copy and the packages:
-  // Turbopack resolves nothing outside its root. Only the copy's config changes.
-  const config = join(dir, "next.config.ts");
-  const text = readFileSync(config, "utf8");
-  const rooted = text.replace(
-    'allowedDevOrigins: ["127.0.0.1"],',
-    `allowedDevOrigins: ["127.0.0.1"],\n  turbopack: { root: ${JSON.stringify(ROOT)} },`,
-  );
-  if (rooted === text) throw new Error("khong dat duoc goc dung cho ban sao");
-  writeFileSync(config, rooted);
+  try {
+    const changed = sh("git", ["-C", ROOT, "ls-files", "-m", "-o", "--exclude-standard"])
+      .stdout.split("\n")
+      .filter(Boolean);
+    for (const rel of changed)
+      if (existsSync(join(ROOT, rel))) cpSync(join(ROOT, rel), join(dir, rel), { recursive: true });
+    // The packages as a copy-on-write clone (APFS clonefile, `cp -c`): instant, takes no space, and makes the copy an
+    // ordinary checkout — no link, no config change. The clone excludes the repository's own build caches.
+    const clone = sh("cp", ["-cR", join(ROOT, "node_modules"), join(dir, "node_modules")]);
+    if (clone.status !== 0) throw new Error(`khong nhan ban duoc node_modules: ${clone.stderr}`);
+    rmSync(join(dir, "node_modules", ".cache"), { recursive: true, force: true });
+  } catch (e) {
+    sh("git", ["-C", ROOT, "worktree", "remove", "--force", dir]);
+    throw e;
+  }
   return dir;
 }
 
