@@ -1527,6 +1527,7 @@
             "roles",
             "company",
             "account",
+            "search",
             "columnOpen"
           ]
         },
@@ -1753,6 +1754,45 @@
       "parts": [
         {
           "name": "Checkbox"
+        }
+      ]
+    },
+    {
+      "name": "Command",
+      "file": "src/components/ui/command.tsx",
+      "level": "organism",
+      "parts": [
+        {
+          "name": "Command"
+        },
+        {
+          "name": "CommandDialog",
+          "props": [
+            "title",
+            "description",
+            "showCloseButton"
+          ]
+        },
+        {
+          "name": "CommandEmpty"
+        },
+        {
+          "name": "CommandGroup"
+        },
+        {
+          "name": "CommandInput"
+        },
+        {
+          "name": "CommandItem"
+        },
+        {
+          "name": "CommandList"
+        },
+        {
+          "name": "CommandSeparator"
+        },
+        {
+          "name": "CommandShortcut"
         }
       ]
     },

@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
 import type { ColumnFilters, GridView } from "@/components/candidate/grid-view";
 import { usePlaceChange } from "@/components/templates/app-shell/place-change";
+import { notifyResult } from "@/components/templates/notify";
 import { Button } from "@/components/ui/button";
 import type { Listing } from "@/generated/ontology";
 
@@ -37,6 +38,7 @@ export function InventoryGrid({
   emptyWhy,
   reloadLabel,
   filters,
+  staleLinkNote,
   savedViews,
   openView,
   viewLabels,
@@ -51,8 +53,10 @@ export function InventoryGrid({
   emptyWhy: string;
   /** The empty state's next step: load the list again (someone may have added units meanwhile). */
   reloadLabel: string;
-  /** Column filters the grid opens with (a status shortcut). */
+  /** Column filters the grid opens with (a status shortcut, or the top-bar search of row 3f). */
   filters?: ColumnFilters;
+  /** Said once when the page opens: the address named a listing that is not among the rows (a stale link, row 3f). */
+  staleLinkNote?: string;
   /** The person's saved views (row 2c); null when their roles cannot save one. */
   savedViews?: readonly SavedView[] | null;
   /** The saved view the address opens; the grid opens with its arrangement. */
@@ -82,6 +86,13 @@ export function InventoryGrid({
   }, [changed, openHref, setChanged, copy]);
   useEffect(() => () => setChanged(null), [setChanged]);
   const record = useMemo(() => listingRecord(headers), [headers]);
+  // A shared link to a listing that left the inventory opens the grid as usual, and says why no record opened.
+  const staleSaid = useRef(false);
+  useEffect(() => {
+    if (!staleLinkNote || staleSaid.current) return;
+    staleSaid.current = true;
+    notifyResult({ message: staleLinkNote });
+  }, [staleLinkNote]);
   // The same columns on every render: this grid renders again on each change of arrangement (the «changed» mark), and
   // new columns would draw the header cells, with the filter box being typed in, again.
   const columns = useMemo(() => inventoryColumns(headers), [headers]);
