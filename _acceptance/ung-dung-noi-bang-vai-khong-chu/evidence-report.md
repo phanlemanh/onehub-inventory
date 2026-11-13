@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: d45297372416f6094cbc5639a69781417ffb12b6
+verified_commit: 3b1759d5a0c0bf0831254ee5fd35fba7b5711971
 human_signoff: Manh Phan 2026-11-13
 ---
 
@@ -178,3 +178,7 @@ none — every multi-run eval is uniform
 
 Round 1: bo chay toan bo bai bi tu choi — bai chay ca bo cua cach-ly het gio khi may tai nang. Tra ve cho buoc trien khai; da cho hai bai chay ca bo 300 giay.
 Round 2: moi eval chay lai xanh; E6b, E8b, E9 giu tu round 1 vi delta khong cham paths cua chung.
+
+### Re-pin lần 1 — 2026-11-13, do gộp nhánh chính có hàng 2c; chạy lại sau lượt đỏ chập chờn (bảng tính, ô chữ dài 1440 — cả hai đạt khi chạy riêng)
+run_id: repin-20261113T053031Z-25408
+sha: 3b1759d5a0c0bf0831254ee5fd35fba7b5711971 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng
