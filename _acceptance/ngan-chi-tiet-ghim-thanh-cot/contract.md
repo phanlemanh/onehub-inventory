@@ -6,7 +6,9 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory, sent]
-status: draft
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-13
 design_doc: docs/superpowers/specs/2026-11-14-ngan-chi-tiet-ghim-thanh-cot-design.md
 ---
 
