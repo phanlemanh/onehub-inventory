@@ -5,6 +5,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 import { label } from "../../src/modules/company-config";
+import { shown } from "../../tools/e2e_templates/settle";
 
 const WIDE = new Set(["1024", "1440"]);
 const width = () => test.info().project.name;
@@ -292,18 +293,21 @@ test.describe("sua-tren-o", () => {
         expect(violations, `axe-sang-toi: ${scheme} ${what}`).toEqual([]);
       };
       await typeInPrice(page, "1101", "2,8 tỷ");
+      // Scan only once each editor has finished appearing: a half-faded box reads as low contrast (G-1311-108).
+      await shown(editor(page), "khung giá");
       await check("giá");
       await editor(page).getByRole("textbox").fill("4ty65");
       await page.keyboard.press("Enter");
-      await expect(page.locator('[data-slot="price-ask"]')).toBeVisible();
+      await shown(page.locator('[data-slot="price-ask"]'), "hỏi lại");
       await check("hỏi lại");
       await page.keyboard.press("Escape");
       await page.keyboard.press("Escape");
       await select(page, "1101", STATUS);
       await page.keyboard.press("F2");
+      await shown(editor(page).getByRole("listbox"), "khung trạng thái");
       await check("trạng thái");
       await editor(page).getByRole("option").filter({ hasText: "Đã bán" }).click();
-      await expect(page.locator('[data-slot="status-dialog"]')).toBeVisible();
+      await shown(page.locator('[data-slot="status-dialog"]'), "hộp đã bán");
       await check("đã bán");
     });
   }
