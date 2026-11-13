@@ -81,7 +81,6 @@ export function UnitJump({
         <Button
           variant="outline"
           size="sm"
-          aria-label={ENTRY_COPY.search(words.unit)}
           aria-keyshortcuts="Meta+K Control+K /"
           onClick={() => setOpen(true)}
         >
@@ -89,48 +88,57 @@ export function UnitJump({
           <span className="text-muted-foreground max-sm:sr-only">
             {ENTRY_COPY.searchHint(words.unit)}
           </span>
-          <kbd className="rounded border px-1 text-xs text-muted-foreground max-sm:hidden">⌘K</kbd>
+          <kbd
+            aria-hidden="true"
+            className="rounded border px-1 text-xs text-muted-foreground max-sm:hidden"
+          >
+            ⌘K
+          </kbd>
         </Button>
       </span>
-      <CommandDialog
-        open={open}
-        onOpenChange={setOpen}
-        title={ENTRY_COPY.search(words.unit)}
-        description={ENTRY_COPY.searchWhy(words.unit, words.inventory)}
-      >
-        {/* The suggestions are already the matches; the palette keeps them in this order. */}
-        <CommandInputBox
-          text={text}
-          onText={setText}
-          placeholder={ENTRY_COPY.searchHint(words.unit)}
-          label={ENTRY_COPY.search(words.unit)}
-          onEnterWithout={list.length === 0 ? () => go("unit", text) : undefined}
+      {/* Mounted only while open: the palette puts its hidden title outside the box, and a closed box must add no
+          heading to the page. */}
+      {open ? (
+        <CommandDialog
+          open
+          onOpenChange={setOpen}
+          title={ENTRY_COPY.search(words.unit)}
+          description={ENTRY_COPY.searchWhy(words.unit, words.inventory)}
         >
-          <CommandList>
-            {text.trim() ? (
-              <CommandEmpty>{ENTRY_COPY.searchEmpty(words.unit, words.inventory)}</CommandEmpty>
-            ) : null}
-            {list.length > 0 ? (
-              <CommandGroup>
-                {list.map((s) => (
-                  <CommandItem
-                    key={`${s.kind}|${s.value}`}
-                    value={`${s.kind}|${s.value}`}
-                    onSelect={() => go(s.kind, s.value)}
-                  >
-                    <span className="w-16 shrink-0 text-xs text-muted-foreground">
-                      {kindWord[s.kind]}
-                    </span>
-                    <span className="min-w-0 flex-1 truncate">
-                      {s.kind === "unit" ? ENTRY_COPY.inBuildings(s.value, s.buildings) : s.value}
-                    </span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            ) : null}
-          </CommandList>
-        </CommandInputBox>
-      </CommandDialog>
+          {/* The suggestions are already the matches; the palette keeps them in this order. */}
+          <CommandInputBox
+            text={text}
+            onText={setText}
+            placeholder={ENTRY_COPY.searchHint(words.unit)}
+            label={ENTRY_COPY.search(words.unit)}
+            onEnterWithout={list.length === 0 ? () => go("unit", text) : undefined}
+          >
+            <CommandList>
+              {text.trim() ? (
+                <CommandEmpty>{ENTRY_COPY.searchEmpty(words.unit, words.inventory)}</CommandEmpty>
+              ) : null}
+              {list.length > 0 ? (
+                <CommandGroup>
+                  {list.map((s) => (
+                    <CommandItem
+                      key={`${s.kind}|${s.value}`}
+                      value={`${s.kind}|${s.value}`}
+                      onSelect={() => go(s.kind, s.value)}
+                    >
+                      <span className="w-16 shrink-0 text-xs text-muted-foreground">
+                        {kindWord[s.kind]}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate">
+                        {s.kind === "unit" ? ENTRY_COPY.inBuildings(s.value, s.buildings) : s.value}
+                      </span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              ) : null}
+            </CommandList>
+          </CommandInputBox>
+        </CommandDialog>
+      ) : null}
     </>
   );
 }

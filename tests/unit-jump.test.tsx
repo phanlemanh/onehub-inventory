@@ -33,7 +33,7 @@ const input = () => screen.getByRole("combobox");
 
 function setup() {
   render(<UnitJump rows={ROWS} words={WORDS} />);
-  return screen.getByRole("button", { name: "Gõ mã căn" });
+  return screen.getByRole("button", { name: /^Gõ mã căn/ });
 }
 
 describe("UnitJump", () => {

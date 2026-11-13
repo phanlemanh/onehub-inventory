@@ -179,9 +179,12 @@ test.describe("App Shell on a computer", () => {
     const bar = page.locator('[data-slot="app-shell-top-bar"]').first();
     await expect(bar.getByRole("button", { name: "Đổi giao diện" })).toBeVisible();
     await expect(bar.getByRole("link", { name: LABELS.SignIn.pref })).toBeVisible();
-    for (const absent of [/^Create$/, /^Tạo$/, /Thông báo/, /Gõ mã căn/]) {
+    for (const absent of [/^Create$/, /^Tạo$/, /Thông báo/]) {
       await expect(page.getByRole("button", { name: absent })).toHaveCount(0);
     }
+    // The one search box is the product's own (row 3f, the owner's word at its scope gate), not the block's demo.
+    await expect(page.getByRole("button", { name: /Gõ mã căn/ })).toHaveCount(1);
+    await expect(bar.locator('[data-slot="unit-jump"]').getByRole("button")).toHaveCount(1);
   });
 });
 
