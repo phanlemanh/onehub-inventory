@@ -112,7 +112,7 @@ human_signoff: Manh Phan 2026-11-13
   run_id: minted-loi-vao-ho-so-E9-r2
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
+  verifier: config:capture.ui
   verified_at: 2026-11-13T06:43:32Z
   screenshot: evidence/E9-step1.png
   observed: |
