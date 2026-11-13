@@ -95,12 +95,18 @@ export { writeFailure as failureOutcome } from "../../lib/write-failure";
  */
 export function sampleSaveDoor(
   listings: readonly Listing[],
-  env: { online: () => boolean } = { online: () => true },
+  env: {
+    online: () => boolean;
+    /** Told of every request that reaches the door (the browser tests count writes through it). */
+    seen?: (request: SaveRequest) => void;
+  } = { online: () => true },
 ): ListingSaveDoor & { current(id: string): Listing | undefined } {
   const store = new Map(listings.map((l) => [l.id, l]));
   return {
     current: (id) => store.get(id),
-    async save({ id, version, change, at }) {
+    async save(request) {
+      env.seen?.(request);
+      const { id, version, change, at } = request;
       if (!env.online()) return { kind: "offline" };
       const listing = store.get(id);
       if (!listing) return { kind: "conflict" };

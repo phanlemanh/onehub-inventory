@@ -9,7 +9,12 @@ import { runDoorChange, type WriteOutcome } from "@/components/candidate/use-cha
 import type { Listing, ListingStandardStatus } from "@/generated/ontology";
 import { formatMoney, statusLabel } from "@/lib/format";
 
-import { sampleSaveDoor, type ListingChange, type ListingSaveDoor } from "../save-door";
+import {
+  sampleSaveDoor,
+  type ListingChange,
+  type ListingSaveDoor,
+  type SaveRequest,
+} from "../save-door";
 
 import { CELL_EDIT_COPY as COPY, type CellEditLabels } from "./cell-edit-copy";
 import type { InventoryField } from "./inventory-rows";
@@ -69,7 +74,19 @@ export function useListingCellEdit({
   door?: ListingSaveDoor;
 }): { rows: readonly GridRow[]; cellEdit: RegionCellEdit | undefined; dialogs: ReactNode } {
   const [door] = useState<ListingSaveDoor & { current?: (id: string) => Listing | undefined }>(
-    () => given ?? sampleSaveDoor(listings ?? [], { online: () => navigator.onLine }),
+    () =>
+      given ??
+      sampleSaveDoor(listings ?? [], {
+        online: () => navigator.onLine,
+        // Outside production the browser tests read every request the sample door got (row 4, E2, E3, E5).
+        seen:
+          process.env.NODE_ENV === "production"
+            ? undefined
+            : (request) => {
+                const log = window as unknown as { __sampleSaves?: SaveRequest[] };
+                (log.__sampleSaves ??= []).push(request);
+              },
+      }),
   );
   const [versions] = useState(() => new Map((listings ?? []).map((l) => [l.id, l.version])));
   const [data, setData] = useState<readonly GridRow[]>(() =>

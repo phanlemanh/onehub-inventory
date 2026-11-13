@@ -2,6 +2,7 @@
 // Concept words come from the page through CellEditLabels (labels.yaml); prices from formatMoney.
 import type { ListingStandardStatus, ListingWithdrawnReason } from "@/generated/ontology";
 import { formatMoney, statusLabel } from "@/lib/format";
+import { WITHDRAWN_REASONS } from "../edit-rules";
 import type { GridRow } from "@/components/candidate/data-region";
 
 type TransactionKind = NonNullable<GridRow["transaction"]>;
@@ -52,7 +53,8 @@ const REASON_LABEL = {
   unreachable: "WithdrawnUnreachable",
 } as const satisfies Record<ListingWithdrawnReason, string>;
 
-export const WITHDRAWN_REASON_ORDER = Object.keys(REASON_LABEL) as ListingWithdrawnReason[];
+/** The reasons in the order of the rules (edit-rules.ts). */
+export const WITHDRAWN_REASON_ORDER = WITHDRAWN_REASONS;
 
 const CONFIRMS = "Tính là vừa xác nhận với chủ nhà.";
 const HOW = "gõ như 4,65 tỷ hoặc 950 triệu";

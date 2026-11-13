@@ -27,6 +27,14 @@ const editor = (page: Page) => page.locator('[data-slot="cell-editor"]');
 const line = (page: Page) => page.locator('[data-slot="cell-edit-line"]');
 const toasts = (page: Page) => page.locator("[data-sonner-toast]");
 
+/** Every change the sample save door received so far (outside production the page logs them, row 4). */
+const saves = (page: Page) =>
+  page.evaluate(() =>
+    ((window as unknown as { __sampleSaves?: { change: unknown }[] }).__sampleSaves ?? []).map(
+      (r) => r.change,
+    ),
+  );
+
 async function openInventory(page: Page, role = "ListAgent"): Promise<void> {
   await page.goto(`/inventory?vai=${role}`);
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
@@ -94,8 +102,10 @@ test.describe("sua-tren-o", () => {
     await expect(editor(page)).toHaveCount(0);
     await expect(cellOf(page, "1101", PRICE)).toHaveText("2,8 tỷ");
     await expect(cellOf(page, "1101", "Listing.lastConfirmedAt")).not.toHaveText(before);
+    await expect
+      .poll(() => saves(page), { message: "sua-gia-mot-lan-ghi: lần ghi" })
+      .toEqual([{ field: "listPrice", listPrice: 2_800_000_000 }]);
     const done = toasts(page).filter({ hasText: "Đã đổi" });
-    await expect(done, "sua-gia-mot-lan-ghi: 1 lần ghi").toHaveCount(1);
     await expect(done.getByRole("button", { name: "Hoàn tác" })).toBeVisible();
     await expect(page.getByRole("button", { name: /^Lưu$/ })).toHaveCount(0);
   });
@@ -106,7 +116,8 @@ test.describe("sua-tren-o", () => {
     await typeInPrice(page, "1101", "abc");
     await page.keyboard.press("Enter");
     await expect(line(page)).toContainText("Chưa hiểu «abc» — gõ như 4,65 tỷ hoặc 950 triệu");
-    await expect(toasts(page), "gia-chua-hieu-khong-ghi: 1 lần ghi").toHaveCount(0);
+    expect(await saves(page), "gia-chua-hieu-khong-ghi: 1 lần ghi").toEqual([]);
+    await expect(toasts(page)).toHaveCount(0);
     await page.keyboard.press("Escape");
     await expect(editor(page)).toHaveCount(0);
     await expect(cellOf(page, "1101", PRICE)).toHaveText("2,71 tỷ");
@@ -121,13 +132,15 @@ test.describe("sua-tren-o", () => {
     await expect(ask).toContainText("Giá đổi +72% — đổi chứ?");
     await expect(ask).toContainText("2,71 tỷ → 4,65 tỷ");
     await editor(page).getByRole("button", { name: "Thôi" }).click();
-    await expect(toasts(page)).toHaveCount(0);
+    expect(await saves(page), "hoi-lai-tai-o: Thôi ghi").toEqual([]);
     await page.keyboard.press("Escape");
     await expect(cellOf(page, "1101", PRICE)).toHaveText("2,71 tỷ");
     await typeInPrice(page, "1101", "4ty65");
     await page.keyboard.press("Enter");
     await editor(page).getByRole("button", { name: "Đổi giá" }).click();
-    await expect(toasts(page).filter({ hasText: "Đã đổi" })).toHaveCount(1);
+    await expect
+      .poll(() => saves(page), { message: "hoi-lai-tai-o: Đổi giá ghi" })
+      .toEqual([{ field: "listPrice", listPrice: 4_650_000_000 }]);
     await expect(cellOf(page, "1101", PRICE)).toHaveText("4,65 tỷ");
   });
 
@@ -143,15 +156,25 @@ test.describe("sua-tren-o", () => {
     await expect(dialog).toContainText("Đã bán là nấc cuối: không hoàn tác được.");
     const price = dialog.getByLabel(label("ClosePrice"));
     await expect(price).toHaveValue("2.710.000.000");
+    // Today in Vietnam, where the companies work (not the UTC date).
     await expect(dialog.getByLabel(label("CloseDate"))).toHaveValue(
-      new Date().toISOString().slice(0, 10),
+      new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Ho_Chi_Minh" }).format(new Date()),
     );
     await price.fill("");
     await dialog.getByRole("button", { name: "Đổi trạng thái" }).click();
     await expect(dialog).toContainText("Còn thiếu giá chốt.");
-    await expect(toasts(page)).toHaveCount(0);
+    expect(await saves(page), "trang-thai-chi-nac-hop-le: thiếu giá chốt mà ghi").toEqual([]);
     await price.fill("2,7 tỷ");
     await dialog.getByRole("button", { name: "Đổi trạng thái" }).click();
+    await expect
+      .poll(() => saves(page), { message: "trang-thai-chi-nac-hop-le: lần ghi" })
+      .toEqual([
+        expect.objectContaining({
+          field: "standardStatus",
+          standardStatus: "Closed",
+          closePrice: 2_700_000_000,
+        }),
+      ]);
     const done = toasts(page).filter({ hasText: "Không hoàn tác được." });
     await expect(done).toHaveCount(1);
     await expect(done.getByRole("button", { name: "Hoàn tác" })).toHaveCount(0);

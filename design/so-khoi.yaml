@@ -99,10 +99,17 @@ khoi:
     mo_ta: Một hộp hỏi vài trường (tiêu đề, một câu nói việc sẽ xảy ra, các trường, «Thôi» và nút gửi), giữ chữ đã gõ khi gửi hỏng
     ho_so: moi-nguoi-gan-vai
     duyet: 2026-11-11
-# Blocks made before this ledger existed, each named with the round that made it, the commit that created it and the
-# day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
-# still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).
-# Adding a pair here needs a ruling of the batch supervisor, and the owner signs it at the evidence gate of that row.
+  # Blocks made before this ledger existed, each named with the round that made it, the commit that created it and the
+  # day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
+  # still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).
+  # Adding a pair here needs a ruling of the batch supervisor, and the owner signs it at the evidence gate of that row.
+  - ten: CellEditor
+    tep: src/components/candidate/cell-editor.tsx
+    nguon: data-grid-editing-2
+    nhu_cau: sua-tren-o
+    mo_ta: Sửa một ô ngay trong Lưới — ô nhập nằm trong ô, một dòng ngay dưới ô đọc lại, báo lỗi hay hỏi lại
+    ho_so: sua-tren-o
+    duyet: 2026-11-13
 khoi_co_truoc:
   - ten: FormDialog
     ho_so: moi-nguoi-gan-vai

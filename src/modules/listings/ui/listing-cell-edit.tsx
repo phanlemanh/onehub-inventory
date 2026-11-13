@@ -19,6 +19,7 @@ import {
   priceAsksAgain,
   priceLocked,
   priceSwing,
+  priceUnchanged,
   readPrice,
   statusLocked,
   statusNeeds,
@@ -45,6 +46,15 @@ export type ListingEdit =
       withdrawnReason?: ListingWithdrawnReason;
       undoable: boolean;
     };
+
+/** The companies' time zone: every company today works in Vietnam (a per-company zone is company-config's later). */
+const COMPANY_ZONE = "Asia/Ho_Chi_Minh";
+const dayIn = new Intl.DateTimeFormat("en-CA", { timeZone: COMPANY_ZONE });
+
+/** Today in Vietnam (yyyy-mm-dd), not in UTC: from 00:00 to 06:59 there UTC is still yesterday. */
+export function companyToday(now: Date = new Date()): string {
+  return dayIn.format(now);
+}
 
 /** A status move that needs more than the move itself (Closed, Withdrawn): the grid opens `StatusNeedsDialog`. */
 export type StatusAsk = { row: GridRow; to: ListingStandardStatus };
@@ -83,7 +93,7 @@ function PriceEditor({
   const submit = (move?: "next") => {
     setTried(true);
     if (!read.ok) return;
-    if (read.value === previous) return session.close(move);
+    if (priceUnchanged(previous, read.value)) return session.close(move);
     if (priceAsksAgain(previous, read.value)) return setAsking(read.value);
     save(read.value, move);
   };
@@ -270,7 +280,7 @@ function NeedsDialog({
     const p = row["Listing.listPrice"] as number | null;
     return p ? exactNumber(p) : "";
   });
-  const [closeDate, setCloseDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [closeDate, setCloseDate] = useState(() => companyToday());
   const [reason, setReason] = useState<ListingWithdrawnReason | null>(null);
   const [tried, setTried] = useState(false);
   const closePrice = readPrice(closePriceText);
@@ -279,15 +289,17 @@ function NeedsDialog({
     closeDate: closeDate || undefined,
     withdrawnReason: reason ?? undefined,
   });
+  // What the move asks for comes from the rules: the fields of `statusNeeds` with nothing given yet.
+  const asks = new Set(statusNeeds(to, {}));
   const submit = () => {
     setTried(true);
     if (needs.length > 0) return;
     onSave(row, {
       field: "Listing.standardStatus",
       value: to,
-      closePrice: to === "Closed" && closePrice.ok ? closePrice.value : undefined,
-      closeDate: to === "Closed" ? closeDate : undefined,
-      withdrawnReason: to === "Withdrawn" ? (reason ?? undefined) : undefined,
+      closePrice: asks.has("closePrice") && closePrice.ok ? closePrice.value : undefined,
+      closeDate: asks.has("closeDate") ? closeDate : undefined,
+      withdrawnReason: asks.has("withdrawnReason") ? (reason ?? undefined) : undefined,
       undoable: statusUndoable(from, to),
     });
     onClose();
@@ -313,7 +325,7 @@ function NeedsDialog({
       }
       slot="status-dialog"
     >
-      {to === "Closed" ? (
+      {asks.has("closePrice") ? (
         <div className="grid grid-cols-2 gap-3 text-sm">
           <label className="flex flex-col gap-1">
             {word(labels, "ClosePrice", tx)}
@@ -367,11 +379,8 @@ function NeedsDialog({
 export function lockedReasons(row: GridRow): GridRow["locked"] {
   const status = row["Listing.standardStatus"] as ListingStandardStatus;
   const name = statusLabel(status, row.transaction);
-  if (priceLocked(status))
-    return {
-      "Listing.listPrice": COPY.lockedClosed(name),
-      "Listing.standardStatus": COPY.lockedFinal(name),
-    };
-  if (statusLocked(status)) return { "Listing.standardStatus": COPY.lockedFinal(name) };
-  return undefined;
+  const locked: NonNullable<GridRow["locked"]> = {};
+  if (priceLocked(status)) locked["Listing.listPrice"] = COPY.lockedClosed(name);
+  if (statusLocked(status)) locked["Listing.standardStatus"] = COPY.lockedFinal(name);
+  return Object.keys(locked).length > 0 ? locked : undefined;
 }

@@ -53,7 +53,6 @@ Bảng hàng thật (tình huống gõ sai, khổ 1440); trang so sánh đủ: `
 
 | Khối | Bậc | Đã tra | Ứng viên gần nhất | Vì sao không dùng | Cách |
 | --- | --- | --- | --- | --- | --- |
-| data-grid-editing-6 | reui | lưới có sửa tại ô (data-grid-editing-*, data-grid-columns-*, data-grid-virtualization-*) | data-grid-columns-3 | không có sửa tại ô | ghép từ thành phần |
 | data-grid-editing-2 | reui | khung sửa một ô (data-grid-editing-2, data-grid-editing-5, data-grid-editing-6) | data-grid-editing-5 | ô nhập phủ kín ô, không đọc lại giá trước khi ghi; gõ sai chỉ báo ở góc màn sau Enter (Hỏi-4) | ghép từ thành phần |
 | DataRegion | trong-kho | | | | |
 | FormDialog | trong-kho | | | | |
@@ -72,5 +71,3 @@ Bảng hàng thật (tình huống gõ sai, khổ 1440); trang so sánh đủ: `
 | data-grid-editing-2 | thêm dòng mới ở cuối bảng | bỏ | thêm căn là hàng khác |
 | data-grid-editing-2 | dòng «Hiểu là…» và câu hỏi lại dưới ô | thêm | đọc lại giá và hỏi lại khi giá đổi quá 20%, tại ô (AC-2, AC-4; Hỏi-4) |
 | data-grid-editing-2 | hộp giữa màn cho Đã bán, Ngừng hẳn | thêm | hỏi giá chốt, ngày, lý do và nói nấc cuối (AC-5; Hỏi-4) |
-| data-grid-editing-6 | sửa tại ô theo cột | lấy | hai cột Giá chào, Trạng thái |
-| data-grid-editing-6 | ô khoá có ổ khoá và lý do | lấy | căn Đã bán, Ngừng hẳn (AC-6) |

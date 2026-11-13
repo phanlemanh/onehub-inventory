@@ -1,0 +1,20 @@
+# E7-ui network/console (Playwright, http://127.0.0.1:3487)
+
+
+# log
+1440-sang rows=[{"c":"0905","p":"5,71 tỷ","s":"Đang giao dịch"},{"c":"1101","p":"2,71 tỷ","s":"Đang bán"},{"c":"1202","p":"4,32 tỷ","s":"Chưa đủ để rao"},{"c":"1303","p":"5,03 tỷ","s":"Đang bán"},{"c":"1603","p":"4,28 tỷ","s":"Đang bán"},{"c":"1604","p":"6,17 tỷ","s":"Chưa đủ để rao"},{"c":"0601","p":"3,36 tỷ","s":"Tạm ngừng"},{"c":"0602","p":"3,08 tỷ","s":"Chưa đủ để rao"}]
+1440-sang unit=1101 before=2,71 tỷ afterEnter cell=2,8 tỷ
+1440-sang toasts@1.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 1101 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"]
+1440-sang toasts@11.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 1101 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"] retryButtons=1 cell=2,8 tỷ
+1440-toi rows=[{"c":"0905","p":"5,71 tỷ","s":"Đang giao dịch"},{"c":"1101","p":"2,71 tỷ","s":"Đang bán"},{"c":"1202","p":"4,32 tỷ","s":"Chưa đủ để rao"},{"c":"1303","p":"5,03 tỷ","s":"Đang bán"},{"c":"1603","p":"4,28 tỷ","s":"Đang bán"},{"c":"1604","p":"6,17 tỷ","s":"Chưa đủ để rao"},{"c":"0601","p":"3,36 tỷ","s":"Tạm ngừng"},{"c":"0602","p":"3,08 tỷ","s":"Chưa đủ để rao"}]
+1440-toi unit=0602 before=3,08 tỷ afterEnter cell=2,8 tỷ
+1440-toi toasts@1.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 0602 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"]
+1440-toi toasts@11.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 0602 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"] retryButtons=1 cell=2,8 tỷ
+1024-sang rows=[{"c":"0905","p":"5,71 tỷ","s":"Đang giao dịch"},{"c":"1101","p":"2,71 tỷ","s":"Đang bán"},{"c":"1202","p":"4,32 tỷ","s":"Chưa đủ để rao"},{"c":"1303","p":"5,03 tỷ","s":"Đang bán"},{"c":"1603","p":"4,28 tỷ","s":"Đang bán"},{"c":"1604","p":"6,17 tỷ","s":"Chưa đủ để rao"},{"c":"0601","p":"3,36 tỷ","s":"Tạm ngừng"},{"c":"0602","p":"3,08 tỷ","s":"Chưa đủ để rao"}]
+1024-sang unit=0701 before=3,14 tỷ afterEnter cell=2,8 tỷ
+1024-sang toasts@1.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 0701 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"]
+1024-sang toasts@11.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 0701 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"] retryButtons=1 cell=2,8 tỷ
+1024-toi rows=[{"c":"0905","p":"5,71 tỷ","s":"Đang giao dịch"},{"c":"1101","p":"2,71 tỷ","s":"Đang bán"},{"c":"1202","p":"4,32 tỷ","s":"Chưa đủ để rao"},{"c":"1303","p":"5,03 tỷ","s":"Đang bán"},{"c":"1603","p":"4,28 tỷ","s":"Đang bán"},{"c":"1604","p":"6,17 tỷ","s":"Chưa đủ để rao"},{"c":"0601","p":"3,36 tỷ","s":"Tạm ngừng"},{"c":"0602","p":"3,08 tỷ","s":"Chưa đủ để rao"}]
+1024-toi unit=0901 before=3,14 tỷ afterEnter cell=2,8 tỷ
+1024-toi toasts@1.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 0901 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"]
+1024-toi toasts@11.5s=["Chưa hoàn tác được vì mất kết nối mạng. Căn 0901 vẫn là 2,8 tỷ; có mạng lại thì bấm «Thử lại».\nThử lại"] retryButtons=1 cell=2,8 tỷ

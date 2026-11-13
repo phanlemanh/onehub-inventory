@@ -8,10 +8,30 @@ export type WriteFailure = "offline" | "refused" | "conflict";
 export function writeFailure(failure: unknown): WriteFailure | null {
   if (failure instanceof TypeError) return "offline";
   const status =
-    typeof failure === "object" && failure !== null && "status" in failure
-      ? (failure as { status: unknown }).status
-      : undefined;
+    failure instanceof WriteRefused
+      ? failure.status
+      : typeof failure === "object" && failure !== null && "status" in failure
+        ? (failure as { status: unknown }).status
+        : undefined;
   if (status === 403) return "refused";
   if (status === 409) return "conflict";
   return null;
+}
+
+/** What `writeFetch` throws when the server answers with an error: the HTTP status, read by `writeFailure`. */
+export class WriteRefused extends Error {
+  constructor(readonly status: number) {
+    super(String(status));
+    this.name = "WriteRefused";
+  }
+}
+
+/**
+ * The one way a screen writes to /api/v1 (row 10 plugs it into the save door): fetch throws a TypeError when the
+ * network is down, and an answer that is not ok is thrown as `WriteRefused` with its status. `writeFailure` reads both.
+ */
+export async function writeFetch(input: string, init: RequestInit): Promise<Response> {
+  const response = await fetch(input, init);
+  if (!response.ok) throw new WriteRefused(response.status);
+  return response;
 }

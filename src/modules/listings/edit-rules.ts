@@ -66,6 +66,11 @@ export function readPrice(raw: string): PriceRead {
 }
 
 /** Whether a new price differs from the old one by more than the asking threshold (exactly 20 % does not ask). */
+/** Whether a read price leaves the price as it was: the cell then just closes, nothing is written. */
+export function priceUnchanged(previous: number | null | undefined, next: number): boolean {
+  return previous === next;
+}
+
 export function priceAsksAgain(previous: number | null | undefined, next: number): boolean {
   if (previous === null || previous === undefined || previous <= 0) return false;
   return Math.abs(next - previous) / previous > PRICE_SWING_ASK;

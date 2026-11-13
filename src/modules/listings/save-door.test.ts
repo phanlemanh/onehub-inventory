@@ -1,8 +1,9 @@
 // Row 4 (sua-tren-o) eval E7, door layer: the save door's four outcomes on the sample listings, the failure shapes of
 // the real write path, and undo as a save like any other. Case names are the pinned messages.
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Listing } from "../../generated/ontology";
+import { writeFetch } from "../../lib/write-failure";
 import { applyChange, failureOutcome, sampleSaveDoor } from "./index";
 
 const AT = "2026-11-13T09:00:00.000Z";
@@ -180,15 +181,27 @@ describe("cong-luu-luat", () => {
 });
 
 describe("khuon-loi-that", () => {
-  it("khuon-loi-that: fetch's TypeError is offline", () => {
-    expect(failureOutcome(new TypeError("Failed to fetch"))).toBe("offline");
+  // The failures come out of the write path itself (writeFetch over a fetch that answers as the server would), not
+  // from objects the test shapes to fit the reader.
+  const answering = (answer: () => Promise<Response>) => {
+    vi.stubGlobal("fetch", vi.fn(answer));
+    return writeFetch("/api/v1/listings/x", { method: "PATCH", body: "{}" }).then(
+      () => "saved" as const,
+      (failure: unknown) => failureOutcome(failure),
+    );
+  };
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("khuon-loi-that: fetch's TypeError is offline", async () => {
+    expect(await answering(() => Promise.reject(new TypeError("Failed to fetch")))).toBe("offline");
   });
-  it("khuon-loi-that: a 403 response is refused, a 409 response is conflict", () => {
-    expect(failureOutcome(new Response(null, { status: 403 }))).toBe("refused");
-    expect(failureOutcome(new Response(null, { status: 409 }))).toBe("conflict");
+  it("khuon-loi-that: a 403 response is refused, a 409 response is conflict", async () => {
+    expect(await answering(async () => new Response(null, { status: 403 }))).toBe("refused");
+    expect(await answering(async () => new Response(null, { status: 409 }))).toBe("conflict");
   });
-  it("khuon-loi-that: anything else is not one of the door's outcomes", () => {
-    expect(failureOutcome(new Response(null, { status: 500 }))).toBeNull();
+  it("khuon-loi-that: anything else is not one of the door's outcomes", async () => {
+    expect(await answering(async () => new Response(null, { status: 500 }))).toBeNull();
+    expect(await answering(async () => new Response("{}", { status: 200 }))).toBe("saved");
     expect(failureOutcome(new Error("boom"))).toBeNull();
     expect(failureOutcome(undefined)).toBeNull();
   });

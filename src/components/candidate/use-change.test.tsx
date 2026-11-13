@@ -5,6 +5,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { FRAME_COPY } from "@/components/templates/frame-copy";
+import { writeFetch } from "@/lib/write-failure";
+
 import { runDoorChange, type DoorChange, type WriteOutcome } from "./use-change";
 
 const toast = vi.hoisted(() => Object.assign(vi.fn(), { error: vi.fn() }));
@@ -26,6 +28,17 @@ afterEach(() => {
 });
 
 /** A write that fails the way the real write path does: it throws. */
+/** A write through the real write path, over a fetch that answers as the server or the network would. */
+const viaFetch = (answer: () => Promise<Response>) => async (): Promise<WriteOutcome> => {
+  vi.stubGlobal("fetch", vi.fn(answer));
+  try {
+    await writeFetch("/api/v1/listings/x", { method: "PATCH", body: "{}" });
+    return "saved";
+  } finally {
+    vi.unstubAllGlobals();
+  }
+};
+
 const throws = (failure: unknown) => async (): Promise<WriteOutcome> => {
   throw failure;
 };
@@ -72,9 +85,9 @@ describe("hoan-tac-qua-cong-luu", () => {
 
 describe("hoan-tac-hong-bao-ro", () => {
   const shapes: [string, () => Promise<WriteOutcome>][] = [
-    ["TypeError Failed to fetch", throws(new TypeError("Failed to fetch"))],
+    ["TypeError Failed to fetch", viaFetch(() => Promise.reject(new TypeError("Failed to fetch")))],
     ["navigator.onLine false", throws(new Error("network down"))],
-    ["status 403", throws({ status: 403 })],
+    ["status 403", viaFetch(async () => new Response(null, { status: 403 }))],
   ];
   for (const [shape, undo] of shapes) {
     it(`hoan-tac-hong-bao-ro: ${shape}`, async () => {
@@ -124,7 +137,7 @@ describe("hoan-tac-hong-bao-ro", () => {
 describe("luu-hong-ve-cu", () => {
   it("luu-hong-ve-cu: a failed save answers its outcome, says why and offers no undo", async () => {
     const outcome = await runDoorChange(
-      change({ write: throws(new TypeError("Failed to fetch")) }),
+      change({ write: viaFetch(() => Promise.reject(new TypeError("Failed to fetch"))) }),
     );
     expect(outcome, "luu-hong-ve-cu: the screen puts the old value back on this").toBe("offline");
     expect(toast.error).toHaveBeenCalledWith("Chưa lưu được giá căn 1101 — mất kết nối mạng.");
@@ -134,7 +147,9 @@ describe("luu-hong-ve-cu", () => {
 
 describe("tu-choi-403-cau-rieng", () => {
   it("tu-choi-403-cau-rieng: a refused save gets the refusal sentence", async () => {
-    const outcome = await runDoorChange(change({ write: throws({ status: 403 }) }));
+    const outcome = await runDoorChange(
+      change({ write: viaFetch(async () => new Response(null, { status: 403 })) }),
+    );
     expect(outcome).toBe("refused");
     expect(toast.error, "tu-choi-403-cau-rieng").toHaveBeenCalledWith(
       "Không đủ quyền làm việc này. Tải lại trang để thấy đúng các nút.",

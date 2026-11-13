@@ -7,13 +7,18 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { CellEditSession, GridRow } from "@/components/candidate/data-region";
 import { LABELS } from "@/generated/labels";
 import type { Listing } from "@/generated/ontology";
-import { statusLabel } from "@/lib/format";
+import { formatMoney, statusLabel } from "@/lib/format";
 
 import type { ListingSaveDoor, SaveOutcome } from "../save-door";
 
 import { CELL_EDIT_COPY, cellEditLabels } from "./cell-edit-copy";
 import type { InventoryField } from "./inventory-rows";
-import { ListingCellEdit, StatusNeedsDialog, lockedReasons } from "./listing-cell-edit";
+import {
+  ListingCellEdit,
+  StatusNeedsDialog,
+  companyToday,
+  lockedReasons,
+} from "./listing-cell-edit";
 import { useListingCellEdit } from "./use-listing-cell-edit";
 
 /** The words from the label table, as the page passes them. */
@@ -184,6 +189,15 @@ describe("status needs dialog", () => {
   });
 });
 
+describe("ngay-ban-mac-dinh", () => {
+  it("the close date is today in Vietnam, not in UTC", () => {
+    // 23:30 UTC on the 12th is 06:30 on the 13th in Vietnam.
+    expect(companyToday(new Date("2026-11-12T23:30:00Z"))).toBe("2026-11-13");
+    expect(companyToday(new Date("2026-11-13T16:59:00Z"))).toBe("2026-11-13");
+    expect(companyToday(new Date("2026-11-13T17:00:00Z"))).toBe("2026-11-14");
+  });
+});
+
 describe("locked reasons", () => {
   it("Closed locks price and status, Withdrawn only status, Active nothing", () => {
     expect(Object.keys(lockedReasons(row({ "Listing.standardStatus": "Closed" })) ?? {})).toEqual([
@@ -258,6 +272,25 @@ describe("cell edit of the grid", () => {
     await act(async () => undo.onClick());
     expect(save).toHaveBeenCalledTimes(2);
     expect(hook.result.current.rows[0]!["Listing.listPrice"]).toBe(2_710_000_000);
+  });
+
+  it("hoan-tac-hong-bao-ro: a failed undo names the unit and the value the cell still shows", async () => {
+    const { hook, save } = hookWith(["saved", "offline"]);
+    await editPrice(hook, "2,8 tỷ");
+    const undo = (toast.mock.calls[0]![1] as { action: { onClick: () => void } }).action;
+    await act(async () => undo.onClick());
+    expect(save).toHaveBeenCalledTimes(2);
+    const shown = formatMoney(hook.result.current.rows[0]!["Listing.listPrice"] as number);
+    expect(shown, "the cell keeps the new price").toBe("2,8 tỷ");
+    const [message, options] = toast.error.mock.calls[0] as [
+      string,
+      { duration: number; action: { label: string } },
+    ];
+    expect(message, "hoan-tac-hong-bao-ro").toBe(
+      CELL_EDIT_COPY.undoFailed(labels, "1101", shown, "offline"),
+    );
+    expect(message).toContain(`1101 vẫn là ${shown}`);
+    expect(options.duration).toBe(Number.POSITIVE_INFINITY);
   });
 
   it("a save the door does not take puts the old price back and says why", async () => {
