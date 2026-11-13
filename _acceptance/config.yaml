@@ -50,6 +50,7 @@ executors:
     goc_nhin_db: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx vitest run -c vitest.db.config.ts tests/db/goc-nhin.db.test.ts --reporter=verbose"   # luu-goc-nhin-cot-hai (row 2c): saved views at API and database, lane K Postgres
     goc_nhin_e2e: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx playwright test -c playwright.db.config.ts tests/e2e-db/goc-nhin.spec.ts"   # luu-goc-nhin-cot-hai (row 2c): save, open, rename, remove a saved view in the browser, lane K Postgres
     cach_ly_k: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} bash db/scripts/cach-ly.sh"   # luu-goc-nhin-cot-hai (row 2c): isolation suite with the saved_view table, lane K Postgres
+    doi_bai_kiem: "node _acceptance/bo-o-tim-cua-vung/rang/doi-bai-kiem.mjs --root . --self-test"   # bo-o-tim-cua-vung (row 2e): every removed test line about the region search box has a row in the old → new table
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists

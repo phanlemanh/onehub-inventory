@@ -1,0 +1,37 @@
+{
+  "feature_plain": "Bảng hàng và Đã gửi không còn ô «Gõ để tìm»; người dùng lọc bằng ô dưới tiêu đề cột như ở Sheet, còn tìm thì dùng ô ⌘K ở thanh trên.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ bỏ ô tìm khỏi Bảng hàng và Đã gửi ở mọi trạng thái, mọi khổ máy tính và điện thoại, sáng và tối."},
+    {"id": "AC-2", "p": "Sẽ lọc đúng và đủ dòng khi gõ vào ô dưới tiêu đề «Căn», kể cả dòng phải cuộn mới thấy; các ô lọc cột vẫn chồng nhau."},
+    {"id": "AC-4", "p": "Sẽ cho hàng ô lọc dưới tiêu đề cột hiện sẵn và bỏ nút «Lọc» (theo khuyến nghị câu Hỏi-1; anh chọn khác thì tiêu chí đổi theo)."},
+    {"id": "AC-5", "p": "Sẽ giữ hàng ô lọc trên điện thoại, cuộn ngang cùng bảng và gõ được như ở máy tính."},
+    {"id": "AC-6", "p": "Sẽ để góc nhìn đã lưu chỉ giữ lọc cột, sắp xếp, nhóm và cột ẩn; địa chỉ hay dữ liệu cũ còn chữ tìm bị bỏ qua."},
+    {"id": "AC-7", "p": "Sẽ sửa tài liệu trạng thái, hành vi, khuôn Lưới và mô tả Góc nhìn cho hết nói «ô tìm»; nhật ký ghi việc góc nhìn bỏ chữ tìm."},
+    {"id": "AC-8", "p": "Sẽ đổi phép thử «tìm» của bộ bài kiểm chung thành phép thử «lọc đầu cột» với cùng ba ca phá, và cho Đã gửi chạy đủ bộ."},
+    {"id": "AC-9", "p": "Sẽ viết lại mọi bài kiểm từng gõ vào ô tìm sang ô đầu cột mà không bài nào bị nới, kèm bảng đối chiếu cũ → mới có máy đếm."},
+    {"id": "AC-10", "p": "Sẽ chỉ cho một khối cũ được miễn chứng từ khi máy kiểm được commit tạo nó có thật, đúng tệp, đúng ngày và trước luật sổ khối."}
+  ],
+  "wont_do": [
+    {"id": "AC-3", "p": "Chặn cảnh bảng trắng không lối ra: không dòng nào khớp thì bảng nói «Không có dòng nào khớp» và có «Xoá lọc», ô đang gõ giữ chữ."},
+    {"id": "OOS-1", "p": "KHÔNG làm ô ⌘K ở thanh trên — đó là hàng 3f."},
+    {"id": "OOS-2", "p": "KHÔNG đặt một ô lọc cả bảng ở chỗ khác — trái lời anh chốt."},
+    {"id": "OOS-3", "p": "KHÔNG làm màn Liên hệ — chưa dựng."},
+    {"id": "OOS-4", "p": "KHÔNG đổi cách lọc từng kiểu cột hay phím của Bảng hàng."},
+    {"id": "OOS-5", "p": "KHÔNG gắn ba hạn chế anh đã ghi ở hàng 2c (Ngoài-11, 12, 15) vào hàng này."}
+  ],
+  "scope_plain": "Những việc dưới đây cố ý để ngoài hàng này:",
+  "coverage_plain": [
+    {"i": 0, "p": "Mọi màn dùng bảng chung đang có (Bảng hàng, Đã gửi) đều được đo — AC-1 (không còn ô tìm), AC-8 (bộ bài chung); Liên hệ dùng bảng đã sửa khi dựng."},
+    {"i": 1, "p": "Bảy trạng thái của một bảng (có dòng, đang tải, trống, lỗi, không đủ quyền…) đều được soi không còn ô tìm — AC-1, AC-3, AC-8."},
+    {"i": 2, "p": "Bốn khổ màn hình, sáng và tối — AC-1, AC-4 (hàng ô lọc), AC-5 (điện thoại)."},
+    {"i": 3, "p": "Mọi chỗ trong kho còn nhắc ô tìm — tài liệu, mô tả nghiệp vụ, mã, bài kiểm — đều được dọn và có máy đếm — AC-6 đến AC-9."},
+    {"i": 4, "p": "Bốn điều kiểm của một khối được miễn, cộng ca máy CI thiếu lịch sử — AC-10 (cửa miễn có chứng từ)."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Bảng đối chiếu bài kiểm cũ → mới do chính người dựng viết, không ai đếm nó có đủ dòng. Đã thêm một thước máy đếm mọi dòng bài kiểm bị bỏ có nhắc ô tìm; thiếu hàng là đỏ."},
+    {"i": 1, "p": "Đã gửi có thể chưa được đo nếu hàng 6 chưa vào kho mà máy vẫn báo xanh. Đã sửa: thiếu Đã gửi thì bài đỏ, và lượt chấm chờ hàng 6 vào kho."},
+    {"i": 2, "p": "Trên máy CI thiếu lịch sử, commit đầu của bản sao trông như tạo mọi tệp, nên một khối miễn giả có thể lọt. Đã thêm hai ca phá cho đúng tình huống ấy."},
+    {"i": 3, "p": "Nhật ký thay đổi và bảng hành vi chưa có phép đo nào đọc. Đã ghim danh sách chữ cấm và thêm hai tệp vào phần soi của hội đồng."},
+    {"i": 4, "p": "Mở Bảng hàng từ địa chỉ cũ còn chữ tìm có thể lọc ngầm. Đã thêm ca đo địa chỉ cũ và ghim nguyên văn câu báo «không khớp»."}
+  ]
+}
