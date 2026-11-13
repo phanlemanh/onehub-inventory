@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 
 import { AppShell } from "@/components/templates/app-shell";
+import { visibleNav } from "@/components/templates/nav-items";
 import { PlaceChangeProvider } from "@/components/templates/app-shell/place-change";
 import {
   COLUMN_COOKIE,
@@ -10,10 +11,11 @@ import { label } from "@/modules/company-config";
 import { currentSession } from "@/modules/identity/server";
 import { SessionRoles } from "@/modules/identity/ui";
 import { mySavedViews } from "@/modules/listings/server";
-import { savedViewsSection } from "@/modules/listings/ui";
+import { UnitJump, savedViewsSection } from "@/modules/listings/ui";
 
 import { AccountMenu } from "./account-menu";
 import { CompanySwitch } from "./company-switch";
+import { sampleSearchRows } from "./inventory-sample-rows";
 import { navFor } from "./nav";
 import { savedViewLabels } from "./saved-view-labels";
 
@@ -36,6 +38,9 @@ export default async function FrameLayout({ children }: { children: React.ReactN
         companies: session.companies,
       }
     : null;
+  const roles = session?.roles ?? [];
+  // The top-bar search (row 3f) leads to the inventory, so it shows by the same rule as the inventory's entry.
+  const canSearch = visibleNav(nav, roles).some((item) => item.href === "/inventory");
   // Every action button and the App Shell's entries read the session's roles from here (PermittedAction, row 9e).
   return (
     <SessionRoles roles={session?.roles ?? []}>
@@ -44,6 +49,19 @@ export default async function FrameLayout({ children }: { children: React.ReactN
           nav={nav}
           roles={session?.roles ?? []}
           columnOpen={columnOpen}
+          search={
+            canSearch ? (
+              <UnitJump
+                rows={sampleSearchRows()}
+                words={{
+                  unit: label("Unit"),
+                  building: label("Building"),
+                  subdivision: label("Subdivision"),
+                  inventory: label("Inventory"),
+                }}
+              />
+            ) : null
+          }
           company={
             account ? (
               <CompanySwitch company={account.company} companies={account.companies} />

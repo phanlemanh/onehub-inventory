@@ -4,6 +4,11 @@ export {
   INVENTORY_FIELDS,
   INVENTORY_GROUP_BY,
   findByCode,
+  searchHref,
+  searchSuggestions,
+  SEARCH_PARAM,
+  type SearchKind,
+  type SearchSuggestion,
   inventoryFiltersFrom,
   inventoryOpeningFor,
   inventoryStatusHref,
@@ -28,3 +33,4 @@ export { ENTRY_COPY } from "./entry-copy";
 export { SAVED_VIEW_PARAM, savedViewHref } from "./saved-view-api";
 export { savedViewCopy, type SavedViewCopy, type SavedViewLabels } from "./saved-view-copy";
 export { savedViewsSection } from "./saved-views-section";
+export { UnitJump } from "./unit-jump";

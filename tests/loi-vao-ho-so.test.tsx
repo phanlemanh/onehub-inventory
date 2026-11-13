@@ -2,7 +2,12 @@
 import { describe, expect, it } from "vitest";
 
 import type { GridRow } from "@/components/candidate/data-region";
-import { findByCode, inventoryOpeningFor } from "@/modules/listings/ui";
+import {
+  findByCode,
+  inventoryOpeningFor,
+  searchHref,
+  searchSuggestions,
+} from "@/modules/listings/ui";
 
 /** The matrix, written before the code: code A in three buildings, B in one, C in two with different letter case. */
 const row = (id: string, code: string, building: string, subdivision = "Khu 1"): GridRow => ({
@@ -93,5 +98,45 @@ describe("inventoryOpeningFor", () => {
 
   it("nothing asked: no filter, no record", () => {
     expect(inventoryOpeningFor(MATRIX, {})).toEqual({ filters: {}, recordId: null });
+  });
+});
+
+describe("searchSuggestions", () => {
+  it("one suggestion per code, with every building it is in", () => {
+    const list = searchSuggestions(MATRIX, "a");
+    const units = list.filter((s) => s.kind === "unit");
+    expect(units.map((s) => s.value)).toEqual(["A", "A-10"]);
+    expect(units[0]!.buildings, "building missing from choice").toEqual(["T1", "T2", "T3"]);
+  });
+
+  it("a code typed whole comes before the codes it starts", () => {
+    const list = searchSuggestions([row("x", "A-10", "T1"), row("y", "a", "T2")], " A ");
+    expect(list[0]).toMatchObject({ kind: "unit", value: "a" });
+  });
+
+  it("codes match from their start; buildings and subdivisions anywhere", () => {
+    expect(searchSuggestions(MATRIX, "-1").filter((s) => s.kind === "unit")).toEqual([]);
+    const places = searchSuggestions(MATRIX, "khu");
+    expect(places).toEqual([{ kind: "subdivision", value: "Khu 1", buildings: [] }]);
+    const buildings = searchSuggestions(MATRIX, "t");
+    expect(buildings.map((s) => `${s.kind}:${s.value}`)).toEqual([
+      "building:T1",
+      "building:T2",
+      "building:T3",
+    ]);
+  });
+
+  it("nothing typed suggests nothing, and never more than eight", () => {
+    expect(searchSuggestions(MATRIX, "  ")).toEqual([]);
+    const many = Array.from({ length: 20 }, (_, i) => row(`r${i}`, `9${i}`, "T9"));
+    expect(searchSuggestions(many, "9")).toHaveLength(8);
+  });
+});
+
+describe("searchHref", () => {
+  it("puts the text in the parameter of its kind, trimmed", () => {
+    expect(searchHref("unit", " 0601 ")).toBe("/inventory?ma=0601");
+    expect(searchHref("building", "S1.02")).toBe("/inventory?toa=S1.02");
+    expect(searchHref("subdivision", "Khu 1")).toBe("/inventory?du-an=Khu+1");
   });
 });

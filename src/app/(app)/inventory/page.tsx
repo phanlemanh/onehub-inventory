@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/templates/page-header";
-import { sampleUnits, subdivisionNameOf } from "@/modules/catalog";
 import { label } from "@/modules/company-config";
-import { SAMPLE_COMPANY, buildSampleListings } from "@/modules/listings";
 import { mySavedView, mySavedViews } from "@/modules/listings/server";
 
+import { sampleInventoryRows } from "../inventory-sample-rows";
 import { savedViewLabels } from "../saved-view-labels";
 import {
   ENTRY_COPY,
@@ -15,7 +14,6 @@ import {
   savedViewCopy,
   inventoryFiltersFrom,
   inventoryOpeningFor,
-  inventoryRows,
   inventoryStateFrom,
   type InventoryField,
 } from "@/modules/listings/ui";
@@ -57,9 +55,7 @@ export default async function Page({ searchParams }: Props) {
   const savedViews = listed === "unreadable" ? [] : listed;
   const viewLabels = savedViewLabels();
   const viewCopy = savedViewCopy(viewLabels);
-  const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
-  const { listings, listingUnits } = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
-  const rows = inventoryRows({ listings, listingUnits, units });
+  const rows = sampleInventoryRows();
   // The top-bar search (row 3f) opens the grid with its text in a column filter; one unit found opens its record
   // through the record's own address (row 3), so the back button and «Chép đường dẫn» work as usual.
   const opening = inventoryOpeningFor(rows, {
