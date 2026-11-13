@@ -20,6 +20,14 @@ import {
 
 export const metadata: Metadata = { title: label("Inventory") };
 
+/** Words of the record's AskListAgent and ReportUnitError buttons (row 3e), from the label table. */
+const ASK_WORDS = {
+  ask: label("AskListAgent"),
+  report: label("ReportUnitError"),
+  unit: label("Unit"),
+  listAgent: label("ListAgent"),
+};
+
 /** Headers of the eight inventory columns, from the label table (approved at the scope gate, Hỏi-2). */
 const HEADERS: Record<InventoryField, string> = {
   "Listing.unitNumber": label("Unit"),
@@ -100,6 +108,7 @@ export default async function Page({ searchParams }: Props) {
         savedViews={savedViews}
         openView={openView}
         viewLabels={viewLabels}
+        askWords={ASK_WORDS}
         title={label("Listing")}
         headers={HEADERS}
         rows={rows}

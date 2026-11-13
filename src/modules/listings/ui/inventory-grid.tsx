@@ -17,6 +17,7 @@ import {
   type InventoryField,
   type InventoryState,
 } from "./inventory-rows";
+import type { AskWords } from "./ask-copy";
 import { listingRecord } from "./listing-record";
 import { SaveViewButtons } from "./save-view-buttons";
 import { gridView, sameAsStored, savedViewHref } from "./saved-view-api";
@@ -38,6 +39,7 @@ export function InventoryGrid({
   savedViews,
   openView,
   viewLabels,
+  askWords,
 }: {
   title: string;
   headers: Readonly<Record<InventoryField, string>>;
@@ -56,6 +58,8 @@ export function InventoryGrid({
   openView?: SavedView | null;
   /** Words of the saved views, from the label table (needed with `savedViews`). */
   viewLabels?: SavedViewLabels;
+  /** Words of the AskListAgent and ReportUnitError buttons in the record (row 3e), from the label table. */
+  askWords?: AskWords;
 }) {
   const router = useRouter();
   const [current, setCurrent] = useState<InventoryState>(state);
@@ -72,7 +76,7 @@ export function InventoryGrid({
     setChanged(changed && openHref ? { href: openHref, mark: copy?.changed ?? "" } : null);
   }, [changed, openHref, setChanged, copy]);
   useEffect(() => () => setChanged(null), [setChanged]);
-  const record = useMemo(() => listingRecord(headers), [headers]);
+  const record = useMemo(() => listingRecord(headers, askWords), [headers, askWords]);
   // A shared link to a listing that left the inventory opens the grid as usual, and says why no record opened.
   const staleSaid = useRef(false);
   useEffect(() => {
