@@ -1,4 +1,10 @@
-import { CalendarCheckIcon, LayoutGridIcon, SendIcon, UsersIcon } from "lucide-react";
+import {
+  CalendarCheckIcon,
+  LayoutGridIcon,
+  SendIcon,
+  SlidersHorizontalIcon,
+  UsersIcon,
+} from "lucide-react";
 import { createElement } from "react";
 
 import type { NavItem, NavSection } from "@/components/templates/app-shell";
@@ -10,6 +16,8 @@ import { inventoryStatusHref } from "@/modules/listings/ui";
 
 import type { Role } from "@/generated/ontology";
 
+import { PARTS, PROTO_7E } from "./proto/lop-rieng-cua-san/copy";
+
 const icon = (Icon: typeof SendIcon) => createElement(Icon, { "aria-hidden": true });
 
 const COPY = FRAME_COPY.secondColumn;
@@ -19,7 +27,7 @@ const COPY = FRAME_COPY.secondColumn;
  * status shortcuts when their roles can list them.
  */
 export function navFor({ savedViews }: { savedViews?: NavSection | null } = {}): NavItem[] {
-  return NAV.map((item) =>
+  return [...NAV, ...PROTO_NAV].map((item) =>
     item.href === "/inventory" && savedViews
       ? { ...item, sections: [...(item.sections ?? []), savedViews] }
       : item,
@@ -65,3 +73,25 @@ export const NAV: NavItem[] = [
   // Shows when the permission table gives the session listMembers (row 9e), not by a role's name.
   { href: "/members", title: label("Member"), icon: icon(UsersIcon), action: "listMembers" },
 ];
+
+// Row 7e scope-gate prototype only (development builds): the review screen's entry with its five parts in the second
+// column, where shape A puts them. Removed before the row is graded; the build adds the real entry.
+const PROTO_NAV: NavItem[] =
+  process.env.NODE_ENV === "production"
+    ? []
+    : [
+        {
+          href: PROTO_7E.href,
+          title: PROTO_7E.screen,
+          icon: icon(SlidersHorizontalIcon),
+          action: "readCompanyCodes",
+          sections: [
+            {
+              items: PARTS.map((p) => ({
+                href: `${PROTO_7E.href}?phan=${p}`,
+                title: PROTO_7E.parts[p],
+              })),
+            },
+          ],
+        },
+      ];

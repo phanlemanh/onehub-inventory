@@ -1,7 +1,7 @@
 # Chứng minh màn — lop-rieng-cua-san
 
 Hàng 7e đổi Bảng hàng (nhãn riêng thay nhãn chuẩn ở tiêu đề cột, trường riêng sau tám cột chuẩn) và thêm màn «Tuỳ chỉnh
-của sàn» (bảng xem lại tối giản của lớp riêng). Bản mẫu: `/proto/lop-rieng-cua-san`, ảnh ở `design-pass/`. Các mục đòi từ
+của sàn» (bảng xem lại tối giản của lớp riêng). Bản mẫu: `/proto/lop-rieng-cua-san`, ảnh ở `cong/`, trang cổng `cong-pham-vi.html`. Các mục đòi từ
 `implemented` (Ma trận trạng thái, Ảnh cạnh màn mẫu, Mặt so, Khối, Vùng) điền khi dựng.
 
 ## Màn inventory
@@ -30,12 +30,12 @@ của sàn» (bảng xem lại tối giản của lớp riêng). Bản mẫu: `/
 
 | Họ đề xuất | Lối | Vì sao |
 | --- | --- | --- |
-| grid | theo mẫu | Mỗi phần là một danh sách nhiều dòng với «…» cuối dòng; so cạnh Bảng hàng (Hỏi-3 lối A) |
+| grid | theo mẫu | Lối A của Hỏi-3: mỗi phần là một vùng Lưới, so cạnh Bảng hàng; chọn B thì họ đổi, chứng minh lại lúc dựng |
 
 ### Ứng viên ReUI
 
 | Cho | Ứng viên | Ảnh | Chọn |
 | --- | --- | --- | --- |
-| màn | settings-4 | evidence/reui/settings-4.png | |
-| màn | settings-11 | evidence/reui/settings-11.png | |
+| màn | settings-4 | evidence/reui/settings-4-goc-1440.png | |
+| màn | settings-11 | evidence/reui/settings-11-goc-1440.png | |
 | màn | settings-9 | evidence/reui/settings-9.png | |

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 
 import {
   alignFor,
@@ -9,70 +9,27 @@ import {
   type FieldKey,
   type TypedColumn,
 } from "@/components/candidate/column-kind";
-import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
-import type { RecordAction } from "@/components/candidate/row-actions";
-import {
-  Frame,
-  FrameDescription,
-  FrameHeader,
-  FramePanel,
-  FrameTitle,
-} from "@/components/reui/frame";
+import { DataRegion, type GridRow } from "@/components/candidate/data-region";
+import { RowActions, type RecordAction } from "@/components/candidate/row-actions";
+import { Badge } from "@/components/reui/badge";
+import { Frame, FrameDescription, FrameHeader, FramePanel } from "@/components/reui/frame";
 import { notifyResult } from "@/components/templates/notify";
 import { PageHeader } from "@/components/templates/page-header";
 import { Button } from "@/components/ui/button";
 import type { DisplayKind } from "@/generated/display";
-import type { Role } from "@/generated/ontology";
 import { label } from "@/modules/company-config";
-import { PermittedAction, SessionRoles } from "@/modules/identity/ui";
+import { PermittedAction } from "@/modules/identity/ui";
 
-// Prototype words: the build moves every one of them to ontology/labels.yaml (Hỏi-5 names the screen).
-const W = {
-  screen: "Tuỳ chỉnh của sàn",
-  parts: {
-    nhan: "Nhãn riêng",
-    truong: "Trường riêng",
-    "tu-dien": "Từ điển giá trị",
-    "can-cho": "Căn chờ khớp",
-    mau: "Mẫu nhập",
-  },
-  empty: {
-    nhan: "Sàn chưa đặt nhãn riêng. Nhãn riêng sinh ra khi nhập bảng hàng.",
-    truong: "Sàn chưa có trường riêng. Trường riêng sinh ra khi nhập bảng hàng.",
-    "tu-dien": "Sàn chưa có từ điển giá trị. Từ điển sinh ra khi nhập bảng hàng.",
-    "can-cho": "Không có căn nào chờ khớp với danh mục.",
-    mau: "Sàn chưa có mẫu nhập. Mẫu nhập sinh ra sau lần nhập đầu.",
-  },
-  rename: "Đổi chữ",
-  retire: "Ngừng dùng",
-  match: "Khớp với danh mục",
-  matched: "Đã khớp 1 căn, còn 2 căn chờ",
-  col: {
-    concept: "Khái niệm chuẩn",
-    own: "Chữ của sàn",
-    name: "Tên trường",
-    kind: "Kiểu",
-    options: "Lựa chọn",
-    field: "Trường",
-    raw: "Chữ thô",
-    value: "Giá trị chuẩn",
-    code: "Mã sàn gõ",
-    state: "Tình trạng",
-    template: "Tên mẫu",
-    columns: "Số cột",
-  },
-} as const;
+import { PARTS, PROTO_7E as C, type Part } from "./copy";
+import { PART_COLUMNS, sampleLayer, type LayerItem } from "./sample";
 
-type Part = keyof typeof W.parts;
-export type Scene = {
-  canh: "bang-hang" | "a" | "b" | "c";
-  phan: Part;
-  state: "ready" | "empty" | "error" | "forbidden" | "loading";
-  readOnly: boolean;
-};
+export type Shape = "a" | "b" | "bang-hang";
 
-/** A column whose kind the company's field declares, not the generated ontology table (row 7e, AC-8). */
-function customColumn(code: string, header: string, kind: DisplayKind): TypedColumn {
+// Stand-in until manageCompanyLayer is in the permission table: the same three roles as manageCompanyCodes (Hỏi-1).
+const MANAGE = "manageCompanyCodes" as const;
+
+/** A column whose kind the prototype declares, not the generated ontology table. */
+function column(code: string, header: string, kind: DisplayKind): TypedColumn {
   return {
     field: `custom.${code}` as FieldKey,
     header,
@@ -82,9 +39,139 @@ function customColumn(code: string, header: string, kind: DisplayKind): TypedCol
   };
 }
 
+function actionsFor(part: Part, item: LayerItem): RecordAction[] {
+  const list: RecordAction[] = [];
+  if (part === "nhan" || part === "truong")
+    list.push({
+      action: MANAGE,
+      label: C.rename,
+      onSelect: () => notifyResult({ message: `${C.rename}: ${item.name}` }),
+    });
+  list.push({
+    action: MANAGE,
+    label: C.retire,
+    remove: {
+      verb: `${C.retire} ${item.name}`,
+      what: C.retireWhat,
+      done: `Đã ${C.retire.toLowerCase()}`,
+      apply: async () => {},
+    },
+  });
+  return list;
+}
+
+function MatchButton() {
+  return (
+    <PermittedAction action={MANAGE}>
+      <Button size="sm" variant="outline" onClick={() => notifyResult({ message: C.matched })}>
+        {C.match}
+      </Button>
+    </PermittedAction>
+  );
+}
+
+/** Shape A: the part chosen in the App Shell's second column fills the content area as one grid. */
+function ShapeA({ part }: { part: Part }) {
+  const layer = useMemo(() => sampleLayer(), []);
+  const items = layer[part];
+  const columns = PART_COLUMNS[part].map(([code, header]) => column(code, header, "text"));
+  const rows = items.map(
+    (item) =>
+      ({
+        id: item.id,
+        ...Object.fromEntries(Object.entries(item.cells).map(([k, v]) => [`custom.${k}`, v])),
+      }) as GridRow,
+  );
+  return (
+    <>
+      <PageHeader title={C.parts[part]} action={part === "can-cho" ? <MatchButton /> : undefined} />
+      <DataRegion
+        title={C.parts[part]}
+        columns={columns}
+        rows={rows}
+        emptyWhy={C.empty[part]}
+        rowActions={(row) => ({
+          actions: actionsFor(
+            part,
+            items.find((i) => i.id === row.id)!,
+          ),
+          mine: true,
+        })}
+      />
+    </>
+  );
+}
+
+const SHOWN = 5;
+
+/** Only a state that differs between rows gets a badge: every listed label, field or entry is in use. */
+function StateBadge({ state }: { state: LayerItem["state"] }) {
+  if (state === "use") return null;
+  return (
+    <Badge variant={state === "many" ? "warning" : "secondary"} size="sm">
+      {state === "many" ? C.manyMatch : C.waiting}
+    </Badge>
+  );
+}
+
+/**
+ * Shape B, built after the picture of ReUI settings-4 (not its code): one Frame with the screen's title, then one group
+ * per part — title, one line, and compact rows of name · one line · state · «…». A long part shows its first five.
+ */
+function ShapeB({ part }: { part: Part }) {
+  const layer = useMemo(() => sampleLayer(), []);
+  useEffect(() => {
+    if (part !== "nhan") document.getElementById(`phan-${part}`)?.scrollIntoView();
+  }, [part]);
+  return (
+    <>
+      <PageHeader title={C.screen} />
+      <Frame className="w-full max-w-3xl">
+        {/* The block's header keeps its line; the title is the page header's, and «New» goes (Hỏi-2: adding is the
+            import's job). */}
+        <FrameHeader>
+          <FrameDescription>{C.screenWhy}</FrameDescription>
+        </FrameHeader>
+        {PARTS.map((p) => {
+          const items = layer[p];
+          return (
+            <FramePanel key={p} id={`phan-${p}`} className="scroll-mt-20">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="font-semibold">{C.parts[p]}</h2>
+                  <p className="text-sm text-muted-foreground">{C.partWhy[p]}</p>
+                </div>
+                {p === "can-cho" ? <MatchButton /> : null}
+              </div>
+              <ul className="mt-3 divide-y divide-dashed">
+                {items.slice(0, SHOWN).map((item) => (
+                  <li key={item.id} className="flex items-center gap-3 py-2.5">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">{item.name}</p>
+                      <p className="truncate text-sm text-muted-foreground">{item.line}</p>
+                    </div>
+                    <StateBadge state={item.state} />
+                    <RowActions actions={actionsFor(p, item)} mine title={item.name} />
+                  </li>
+                ))}
+              </ul>
+              {items.length > SHOWN ? (
+                <Button variant="link" size="sm">
+                  {C.seeAll(items.length)}
+                </Button>
+              ) : null}
+            </FramePanel>
+          );
+        })}
+      </Frame>
+    </>
+  );
+}
+
 const VIEWS = ["Biển", "Hồ", "Phố", "Nội khu"];
 
-function inventoryScene(rows: readonly GridRow[]) {
+/** The inventory of the sample company with two company labels and two custom fields after the standard columns. */
+function Inventory({ rows }: { rows: readonly GridRow[] }) {
   const columns: TypedColumn[] = [
     typedColumn({ field: "Listing.unitNumber", header: label("Unit") }),
     typedColumn({ field: "Listing.buildingName", header: "Block" }),
@@ -94,252 +181,41 @@ function inventoryScene(rows: readonly GridRow[]) {
     typedColumn({ field: "Unit.livingArea", header: label("LivingArea") }),
     typedColumn({ field: "Unit.bedroomsTotal", header: label("BedroomsTotal") }),
     typedColumn({ field: "Listing.lastConfirmedAt", header: label("LastConfirmedAt") }),
-    customColumn("huong_view", "Hướng view", "select"),
-    customColumn("ghi_chu", "Ghi chú", "text"),
+    column("huong_view", "Hướng view", "select"),
+    column("ghi_chu", "Ghi chú nội bộ", "text"),
   ];
-  const withCustom = rows.map((r, i) => ({
-    ...r,
-    "custom.huong_view": i % 5 === 4 ? null : VIEWS[i % VIEWS.length],
-    "custom.ghi_chu": i % 3 === 0 ? "Chủ cần bán trước Tết" : null,
-  }));
-  return { columns, rows: withCustom };
-}
-
-function partData(part: Part): { columns: TypedColumn[]; rows: Record<string, unknown>[] } {
-  const t = (field: FieldKey, header: string) => customColumn(String(field), header, "text");
-  switch (part) {
-    case "nhan":
-      return {
-        columns: [t("concept" as FieldKey, W.col.concept), t("own" as FieldKey, W.col.own)],
-        rows: [
-          { id: "n1", "custom.concept": label("Building"), "custom.own": "Block" },
-          { id: "n2", "custom.concept": label("ListPrice"), "custom.own": "Giá KBP" },
-          { id: "n3", "custom.concept": label("Subdivision"), "custom.own": "Phân khu" },
-        ],
-      };
-    case "truong":
-      return {
-        columns: [
-          t("name" as FieldKey, W.col.name),
-          t("kind" as FieldKey, W.col.kind),
-          t("options" as FieldKey, W.col.options),
-        ],
-        rows: [
-          {
-            id: "t1",
-            "custom.name": "Hướng view",
-            "custom.kind": "Chọn một",
-            "custom.options": VIEWS.join(", "),
-          },
-          { id: "t2", "custom.name": "Ghi chú", "custom.kind": "Chữ", "custom.options": null },
-          {
-            id: "t3",
-            "custom.name": "Đã có sổ",
-            "custom.kind": "Có/không",
-            "custom.options": null,
-          },
-        ],
-      };
-    case "tu-dien":
-      return {
-        columns: [
-          t("field" as FieldKey, W.col.field),
-          t("raw" as FieldKey, W.col.raw),
-          t("value" as FieldKey, W.col.value),
-        ],
-        rows: [
-          {
-            id: "d1",
-            "custom.field": label("StandardStatus"),
-            "custom.raw": "còn",
-            "custom.value": label("StatusActive"),
-          },
-          { id: "d2", "custom.field": "Hướng view", "custom.raw": "biển", "custom.value": "Biển" },
-          { id: "d3", "custom.field": "Hướng", "custom.raw": "ĐN", "custom.value": "Đông Nam" },
-        ],
-      };
-    case "can-cho":
-      return {
-        columns: [t("code" as FieldKey, W.col.code), t("state" as FieldKey, W.col.state)],
-        rows: [
-          { id: "c1", "custom.code": "SA5-12.08", "custom.state": "Chờ khớp" },
-          { id: "c2", "custom.code": "S1.05 - 1208", "custom.state": "Chờ khớp" },
-          {
-            id: "c3",
-            "custom.code": "Sapphire 5 tầng 12",
-            "custom.state": "Nhiều căn khớp, chờ người",
-          },
-        ],
-      };
-    case "mau":
-      return {
-        columns: [
-          t("template" as FieldKey, W.col.template),
-          t("columns" as FieldKey, W.col.columns),
-        ],
-        rows: [{ id: "m1", "custom.template": "Bảng hàng tháng 11", "custom.columns": "12 cột" }],
-      };
-  }
-}
-
-// Stand-in until manageCompanyLayer is in the permission table: the same three roles as manageCompanyCodes (Hỏi-1).
-const MANAGE = "manageCompanyCodes" as const;
-
-function PartRegion({ part, state }: { part: Part; state: Scene["state"] }) {
-  const [matched, setMatched] = useState(false);
-  const data = useMemo(() => partData(part), [part]);
-  const status: RegionStatus = state === "empty" ? "ready" : state;
-  const rows = state === "empty" ? [] : (data.rows as GridRow[]);
-  const actions = (row: GridRow): RecordAction[] => {
-    const name = String(Object.values(row)[1] ?? "");
-    const list: RecordAction[] = [];
-    if (part === "nhan" || part === "truong")
-      list.push({
-        action: MANAGE,
-        label: W.rename,
-        onSelect: () => notifyResult({ message: `${W.rename}: ${name}` }),
-      });
-    list.push({
-      action: MANAGE,
-      label: W.retire,
-      remove: {
-        verb: `${W.retire} ${name}`,
-        what: "Giá trị cũ vẫn giữ trên căn.",
-        done: `Đã ${W.retire.toLowerCase()}`,
-        apply: async () => {},
-      },
-    });
-    return list;
-  };
+  const withCustom = rows.map(
+    (r, i) =>
+      ({
+        ...r,
+        "custom.huong_view": i % 5 === 4 ? null : VIEWS[i % VIEWS.length],
+        "custom.ghi_chu": i % 3 === 0 ? "Chủ cần bán trước Tết" : null,
+      }) as GridRow,
+  );
   return (
-    <DataRegion
-      title={W.parts[part]}
-      columns={data.columns}
-      rows={matched && part === "can-cho" ? rows.slice(1) : rows}
-      status={status}
-      emptyWhy={W.empty[part]}
-      headAction={
-        part === "can-cho" ? (
-          <PermittedAction action={MANAGE}>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setMatched(true);
-                notifyResult({ message: W.matched });
-              }}
-            >
-              {W.match}
-            </Button>
-          </PermittedAction>
-        ) : undefined
-      }
-      rowActions={(row) => ({ actions: actions(row), mine: true })}
-    />
+    <>
+      <PageHeader title={label("Inventory")} />
+      <DataRegion title={label("Inventory")} columns={columns} rows={withCustom} emptyWhy="" />
+    </>
   );
 }
 
-const PARTS = Object.keys(W.parts) as Part[];
-
-/** A: the five parts as a list beside the region (the build puts them in the App Shell's second column). */
-function ShapeA({ scene }: { scene: Scene }) {
-  const [part, setPart] = useState<Part>(scene.phan);
+/** The design-pass prototype of row 7e: shape A or B of the review screen, or the inventory with the company's words. */
+export function LayerShowcase({
+  shape,
+  part,
+  rows,
+}: {
+  shape: Shape;
+  part: Part;
+  rows: readonly GridRow[];
+}) {
   return (
-    <div className="flex flex-col gap-4 md:flex-row">
-      <nav aria-label={W.screen} className="md:w-56 md:shrink-0">
-        <ul className="flex gap-1 overflow-x-auto md:flex-col">
-          {PARTS.map((p) => (
-            <li key={p}>
-              <Button
-                variant={p === part ? "secondary" : "ghost"}
-                aria-current={p === part ? "page" : undefined}
-                className="w-full"
-                onClick={() => setPart(p)}
-              >
-                {W.parts[p]}
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <div className="min-w-0 flex-1">
-        <PartRegion part={part} state={scene.state} />
-      </div>
+    // The region's own search box is gone from every grid (row 2e, owner 2026-11-13): hidden here until 2e lands.
+    <div className="flex flex-col gap-4 [&_[data-slot=region-toolbar]>div:has(input[type=search])]:hidden">
+      {shape === "a" ? <ShapeA part={part} /> : null}
+      {shape === "b" ? <ShapeB part={part} /> : null}
+      {shape === "bang-hang" ? <Inventory rows={rows} /> : null}
     </div>
-  );
-}
-
-/** B (after ReUI settings-4): every part stacked on one page, each in its own region. */
-function ShapeB({ scene }: { scene: Scene }) {
-  return (
-    <div className="flex flex-col gap-6">
-      {PARTS.map((p) => (
-        <PartRegion key={p} part={p} state={scene.state} />
-      ))}
-    </div>
-  );
-}
-
-/** C (after ReUI settings-11): one tab per part above one region. */
-function ShapeC({ scene }: { scene: Scene }) {
-  const [part, setPart] = useState<Part>(scene.phan);
-  return (
-    <div className="flex flex-col gap-3">
-      <div role="tablist" aria-label={W.screen} className="flex gap-1 overflow-x-auto border-b">
-        {PARTS.map((p) => (
-          <Button
-            key={p}
-            role="tab"
-            aria-selected={p === part}
-            variant={p === part ? "secondary" : "ghost"}
-            onClick={() => setPart(p)}
-          >
-            {W.parts[p]}
-          </Button>
-        ))}
-      </div>
-      <PartRegion part={part} state={scene.state} />
-    </div>
-  );
-}
-
-/** The design-pass prototype of row 7e on sample data, under the roles a scene asks for. */
-export function LayerShowcase({ scene, rows }: { scene: Scene; rows: readonly GridRow[] }) {
-  const roles: Role[] = scene.readOnly ? ["BuyerAgent"] : ["CompanyAdmin"];
-  const inv = useMemo(() => inventoryScene(rows), [rows]);
-  return (
-    <SessionRoles roles={roles}>
-      <div className="flex flex-col gap-4">
-        <Frame>
-          <FrameHeader>
-            <FrameTitle>Bản mẫu hàng 7e</FrameTitle>
-            <FrameDescription>
-              {scene.canh === "bang-hang"
-                ? "Bảng hàng của sàn mẫu: «Block» và «Giá KBP» là nhãn riêng, «Hướng view» và «Ghi chú» là trường riêng."
-                : `Dáng ${scene.canh.toUpperCase()} của màn ${W.screen}.`}
-            </FrameDescription>
-          </FrameHeader>
-          <FramePanel className="hidden" />
-        </Frame>
-        {scene.canh === "bang-hang" ? (
-          <>
-            <PageHeader title={label("Inventory")} />
-            <DataRegion
-              title={label("Inventory")}
-              columns={inv.columns}
-              rows={inv.rows}
-              emptyWhy="Sàn chưa có căn nào."
-            />
-          </>
-        ) : (
-          <>
-            <PageHeader title={W.screen} />
-            {scene.canh === "a" ? <ShapeA scene={scene} /> : null}
-            {scene.canh === "b" ? <ShapeB scene={scene} /> : null}
-            {scene.canh === "c" ? <ShapeC scene={scene} /> : null}
-          </>
-        )}
-      </div>
-    </SessionRoles>
   );
 }

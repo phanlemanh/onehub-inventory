@@ -142,7 +142,10 @@ tính từ trường khác), không bộ máy luật hay quy trình (từ điể
 
 Khuôn IA: danh-sách-chi-tiết (master-detail)
 Căn cứ: (ii) không tra mẫu thị trường (Mobbin không cần): năm phần là năm danh sách cùng dạng; App Shell đã có cột thứ hai
-cho mục con (hàng 2c), nên cột thứ hai là danh sách phần và vùng phải là chi tiết. Hai lối khác là ứng viên ReUI ở Hỏi-3.
+cho mục con (hàng 2c), nên cột thứ hai là danh sách phần và vùng phải là chi tiết. Hỏi-3 (đặt lại sau rà soát cổng
+2026-11-13) hỏi đúng câu ấy: năm bảng riêng (A, danh-sách-chi-tiết) hay một trang danh sách gọn thấy hết (B, một-cột-cuộn,
+dựng theo hình khối ReUI settings-4). Lối thẻ tab (settings-11) bị loại vì phần lớn khung hình giống A. Trang cổng:
+`_acceptance/lop-rieng-cua-san/cong-pham-vi.html`.
 
 ### 7. Thẻ việc
 
