@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-13
 design_doc: _acceptance/loi-vao-ho-so/design.md
@@ -109,3 +109,11 @@ toà trở lên (0601 ở ba toà).
 - Ngoài-5 (máy định tuyến 2026-11-13, đề xuất S4 known-limits): Dòng mô tả của ô tìm ⌘K luôn viết «toà» và «dự án», nên nếu một sàn đổi tên hai khái niệm này thì dòng mô tả vẫn hiện chữ cũ. — `src/modules/listings/ui/entry-copy.ts`
 - Ngoài-7 (máy định tuyến 2026-11-13, đề xuất S4 known-limits): Sau khi tìm một căn rồi đóng hồ sơ, nếu tải lại trang hoặc lưu cách xem thì hồ sơ căn đó tự mở lại dù người dùng đã đóng. — `src/app/(app)/inventory/page.tsx`
 - Ngoài-8 (máy định tuyến 2026-11-13, đề xuất S4 known-limits): Người dùng không thấy gì sai hôm nay: Enter trên ô rỗng vẫn không đi đâu. Chỉ là phép đo tự động có thể bỏ sót nếu sau này có lỗi làm trang chuyển chậm. — `tests/e2e/loi-vao-ho-so.spec.ts`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-13:
+  - Ngoài-1: Sàn đổi tên «Toà» hay «Dự án» thì dòng mô tả của ô tìm vẫn ghi chữ cũ.
+  - Ngoài-2: Ô tìm ở thanh trên gợi ý từ dữ liệu mẫu của một sàn; phải gắn theo sàn đang mở trước khi dữ liệu thật vào (hàng 10).
+  - Ngoài-3: Bước chụp ảnh kiểm giao diện ẩn cả khung báo lỗi của môi trường phát triển, nên ảnh có thể trông sạch khi trang đang lỗi.
+  - Ngoài-4: Phép kiểm khuôn báo đạt nhưng chưa chứng minh Bảng hàng dựng đúng khuôn, vì Bảng hàng vẫn là nợ cũ của khuôn.
+  - Ngoài-5: Dòng mô tả ô ⌘K viết cứng chữ «toà» và «dự án».
+  - Ngoài-7: Tìm ra một căn rồi đóng hồ sơ, tải lại trang hay lưu cách xem thì hồ sơ tự mở lại.
+  - Ngoài-8: Phép đo «Enter trên ô rỗng không đi đâu» chưa có ca đối chứng.

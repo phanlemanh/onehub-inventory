@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: ad1efd2167f010ca420818997128b3094b5eff40
-human_signoff:
+human_signoff: Manh Phan 2026-11-13
 ---
 
 # Evidence Report: loi-vao-ho-so
