@@ -10,6 +10,8 @@ executors:
     mot_cua: "npx vitest run src/modules/identity/one-door.test.ts --coverage.enabled=false --reporter=verbose"   # row 7a: one query door scan, rule 3 (no role or company switch outside the door)
     danh_muc: "npx vitest run src/modules/catalog tests/danh-muc-chuyen-mau.test.ts --coverage.enabled=false --reporter=verbose"   # danh-muc-can-nhu-onehub-invest (row 7d): code reader, keys, sample move
     vai_dang_nhap_unit: "npx vitest run src/modules/identity/with-company.test.ts tests/vai-dang-nhap-nguon.test.ts --coverage.enabled=false --reporter=verbose"   # ung-dung-noi-bang-vai-khong-chu (row 7c): door checks its login role, source scan of test connection strings, .env.example add-only
+    vai_man_so: "npx vitest run tests/vai-man-so-man.test.ts --coverage.enabled=false --reporter=verbose"   # kiem-vai-theo-man (row 9b): screen register entry rule, pair set, shared sign-in door, sidebar vs register
+    vai_man_nut: "npx vitest run tests/vai-man-nut-sinh.test.ts tests/vai-man-dau-nut.test.tsx tests/bo-nut-vai-man.test.ts src/modules/identity/permitted-action.test.tsx --coverage.enabled=false --reporter=verbose"   # kiem-vai-theo-man (row 9b): role × screen × button table from the register and module UI, every screen and the App Shell frame
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
@@ -53,6 +55,8 @@ executors:
     goc_nhin_db: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx vitest run -c vitest.db.config.ts tests/db/goc-nhin.db.test.ts --reporter=verbose"   # luu-goc-nhin-cot-hai (row 2c): saved views at API and database, lane K Postgres
     goc_nhin_e2e: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx playwright test -c playwright.db.config.ts tests/e2e-db/goc-nhin.spec.ts"   # luu-goc-nhin-cot-hai (row 2c): save, open, rename, remove a saved view in the browser, lane K Postgres
     cach_ly_k: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} bash db/scripts/cach-ly.sh"   # luu-goc-nhin-cot-hai (row 2c): isolation suite with the saved_view table, lane K Postgres
+    vai_man_e2e: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} bash -c 'J=$(mktemp -t vai-man).json; PLAYWRIGHT_JSON_OUTPUT_NAME=$J npx playwright test -c playwright.db.config.ts tests/e2e-db/vai.setup.ts tests/e2e-db/vai-man.spec.ts --reporter=list,json && node tests/e2e-db/vai-man-doi-chieu.mjs $J'"   # kiem-vai-theo-man (row 9b): every role × screen pair through the shared role sign-in door, lane D Postgres
+    vai_man_pha_thu: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} node tests/e2e-db/pha-thu-vai-man.mjs"   # kiem-vai-theo-man (row 9b): three breaks on a copy of the tree, each must turn its pair red with the pinned message
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists
