@@ -25,5 +25,6 @@ defines the concept; anything else is marked as our own. Every display label and
 | `Stack`               | Trục của một toà, khoá `stk_`. Mở rộng riêng như onehub-invest; RESO không có.                                  | Số căn (`UnitNumber`); tầng                                                       | Trục         |
 | `CatalogAlias`        | Mã gốc hay tên của toà, trục, căn mà một nguồn đã viết, giữ làm bí danh của khoá danh mục. Riêng của ta.        | Khoá danh mục (`bld_`, `stk_`, `unt_`); mã riêng của sàn (`CompanyCatalogAlias`)  | Mã gốc       |
 | `CompanyCatalogAlias` | Mã hay tên một sàn tự gọi toà, căn của danh mục dùng chung; chỉ sàn ấy thấy. Riêng của ta.                      | Mã gốc của danh mục (`CatalogAlias`); nhãn riêng của sàn                          | Mã riêng     |
+| `ShareLink`           | Link gửi một người nhận, gói nhiều lần chào; người nhận mới là tên, chưa nối `Contact` (hàng 18). Riêng của ta. | RESO `ContactListings` (từng căn cho từng liên hệ, không gói); `Contact`          | Link đã gửi  |
 
 <!-- Add your terms above. Keep definitions to one sentence. -->

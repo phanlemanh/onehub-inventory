@@ -87,3 +87,13 @@ relations:
     to: CompanyCatalogAlias
     cardinality: one-to-many
     description: A company holds its own codes and names for catalog towers and units.
+  - from: Company
+    name: holds_share_link
+    to: ShareLink
+    cardinality: one-to-many
+    description: A company holds the links its members sent; no other company sees them.
+  - from: ShareLink
+    name: includes
+    to: Listing
+    cardinality: many-to-many
+    description: A link carries one or more listings of its company; a listing can go out in several links.
