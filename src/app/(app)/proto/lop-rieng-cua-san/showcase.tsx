@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   alignFor,
@@ -10,12 +10,23 @@ import {
   type TypedColumn,
 } from "@/components/candidate/column-kind";
 import { DataRegion, type GridRow } from "@/components/candidate/data-region";
+import { FormDialog } from "@/components/candidate/form-dialog";
 import { RowActions, type RecordAction } from "@/components/candidate/row-actions";
 import { Badge } from "@/components/reui/badge";
 import { Frame, FrameDescription, FrameHeader, FramePanel } from "@/components/reui/frame";
 import { notifyResult } from "@/components/templates/notify";
 import { PageHeader } from "@/components/templates/page-header";
 import { Button } from "@/components/ui/button";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import type { DisplayKind } from "@/generated/display";
 import { label } from "@/modules/company-config";
 import { PermittedAction } from "@/modules/identity/ui";
@@ -25,8 +36,9 @@ import { PART_COLUMNS, sampleLayer, type LayerItem } from "./sample";
 
 export type Shape = "a" | "b" | "bang-hang";
 
-// Stand-in until manageCompanyLayer is in the permission table: the same three roles as manageCompanyCodes (Hỏi-1).
-const MANAGE = "manageCompanyCodes" as const;
+// Stand-ins until the five draft actions (thao-tac-nhap.yaml) are in the permission table: the same roles as the
+// catalog's company codes (Hỏi-1).
+const WRITE = "manageCompanyCodes" as const;
 
 /** A column whose kind the prototype declares, not the generated ontology table. */
 function column(code: string, header: string, kind: DisplayKind): TypedColumn {
@@ -39,16 +51,23 @@ function column(code: string, header: string, kind: DisplayKind): TypedColumn {
   };
 }
 
+/** The row's «…» of each part, from thao-tac-nhap.yaml: Sửa or Đổi tên first, Ngừng dùng last; no Xoá anywhere. */
 function actionsFor(part: Part, item: LayerItem): RecordAction[] {
   const list: RecordAction[] = [];
-  if (part === "nhan" || part === "truong")
+  if (part === "nhan" || part === "truong" || part === "tu-dien")
     list.push({
-      action: MANAGE,
+      action: WRITE,
+      label: C.edit,
+      onSelect: () => notifyResult({ message: `${C.edit}: ${item.name}` }),
+    });
+  if (part === "mau")
+    list.push({
+      action: WRITE,
       label: C.rename,
       onSelect: () => notifyResult({ message: `${C.rename}: ${item.name}` }),
     });
   list.push({
-    action: MANAGE,
+    action: WRITE,
     label: C.retire,
     remove: {
       verb: `${C.retire} ${item.name}`,
@@ -60,18 +79,88 @@ function actionsFor(part: Part, item: LayerItem): RecordAction[] {
   return list;
 }
 
-function MatchButton() {
+/** The add form of a custom field: name, kind (fixed once made), options for «Chọn một». */
+function AddFieldDialog({ startOpen }: { startOpen: boolean }) {
+  const [open, setOpen] = useState(startOpen);
+  const F = C.form;
   return (
-    <PermittedAction action={MANAGE}>
-      <Button size="sm" variant="outline" onClick={() => notifyResult({ message: C.matched })}>
-        {C.match}
-      </Button>
-    </PermittedAction>
+    <FormDialog
+      trigger={{ render: <Button size="sm" />, label: F.title }}
+      title={F.title}
+      description={F.why}
+      submitLabel={F.submit}
+      busyLabel={F.busy}
+      busy={false}
+      open={open}
+      onOpenChange={setOpen}
+      onSubmit={() => {
+        setOpen(false);
+        notifyResult({ message: F.title });
+      }}
+    >
+      <Field>
+        <FieldLabel htmlFor="ten-truong">{F.name}</FieldLabel>
+        <Input id="ten-truong" defaultValue="Hướng view" />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="kieu-truong">{F.kind}</FieldLabel>
+        <NativeKind id="kieu-truong" kinds={F.kinds} />
+      </Field>
+      <Field>
+        <FieldLabel htmlFor="lua-chon">{F.options}</FieldLabel>
+        <Textarea id="lua-chon" rows={4} defaultValue={"Biển\nHồ\nPhố\nNội khu"} />
+      </Field>
+    </FormDialog>
   );
 }
 
+function NativeKind({ id, kinds }: { id: string; kinds: readonly string[] }) {
+  return (
+    <Select defaultValue="Chọn một">
+      <SelectTrigger id={id}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {kinds.map((k) => (
+          <SelectItem key={k} value={k}>
+            {k}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+/** The buttons at the head of a part: «Thêm …» where adding is allowed, «Khớp với danh mục» on pending units. */
+function HeadButtons({ part, formOpen }: { part: Part; formOpen?: boolean }) {
+  if (part === "truong")
+    return (
+      <PermittedAction action={WRITE}>
+        <AddFieldDialog startOpen={formOpen === true} />
+      </PermittedAction>
+    );
+  const add = C.add[part];
+  if (add)
+    return (
+      <PermittedAction action={WRITE}>
+        <Button size="sm" onClick={() => notifyResult({ message: add })}>
+          {add}
+        </Button>
+      </PermittedAction>
+    );
+  if (part === "can-cho")
+    return (
+      <PermittedAction action={WRITE}>
+        <Button size="sm" variant="outline" onClick={() => notifyResult({ message: C.matched })}>
+          {C.match}
+        </Button>
+      </PermittedAction>
+    );
+  return null;
+}
+
 /** Shape A: the part chosen in the App Shell's second column fills the content area as one grid. */
-function ShapeA({ part }: { part: Part }) {
+function ShapeA({ part, formOpen }: { part: Part; formOpen: boolean }) {
   const layer = useMemo(() => sampleLayer(), []);
   const items = layer[part];
   const columns = PART_COLUMNS[part].map(([code, header]) => column(code, header, "text"));
@@ -84,7 +173,7 @@ function ShapeA({ part }: { part: Part }) {
   );
   return (
     <>
-      <PageHeader title={C.parts[part]} action={part === "can-cho" ? <MatchButton /> : undefined} />
+      <PageHeader title={C.parts[part]} action={<HeadButtons part={part} formOpen={formOpen} />} />
       <DataRegion
         title={C.parts[part]}
         columns={columns}
@@ -141,7 +230,7 @@ function ShapeB({ part }: { part: Part }) {
                   <h2 className="font-semibold">{C.parts[p]}</h2>
                   <p className="text-sm text-muted-foreground">{C.partWhy[p]}</p>
                 </div>
-                {p === "can-cho" ? <MatchButton /> : null}
+                <HeadButtons part={p} />
               </div>
               <ul className="mt-3 divide-y divide-dashed">
                 {items.slice(0, SHOWN).map((item) => (
@@ -205,15 +294,18 @@ export function LayerShowcase({
   shape,
   part,
   rows,
+  formOpen = false,
 }: {
   shape: Shape;
   part: Part;
   rows: readonly GridRow[];
+  /** Opens «Thêm trường riêng» on first paint, for the scope gate's picture of the form. */
+  formOpen?: boolean;
 }) {
   return (
     // The region's own search box is gone from every grid (row 2e, owner 2026-11-13): hidden here until 2e lands.
     <div className="flex flex-col gap-4 [&_[data-slot=region-toolbar]>div:has(input[type=search])]:hidden">
-      {shape === "a" ? <ShapeA part={part} /> : null}
+      {shape === "a" ? <ShapeA part={part} formOpen={formOpen} /> : null}
       {shape === "b" ? <ShapeB part={part} /> : null}
       {shape === "bang-hang" ? <Inventory rows={rows} /> : null}
     </div>

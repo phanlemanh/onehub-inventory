@@ -50,14 +50,20 @@ Phan ngày 12/11/2026. Lõi dữ liệu giữ chuẩn; phần khác nhau của t
   ra nhưng cột ấy mang dấu «đích đã ngừng» để màn nhập hỏi lại, không ghi vào trường đã ngừng.
 - AC-7 (cross-layer): Given hai sàn A, B, When đọc và ghi năm bảng của lớp riêng, Then mọi bảng có `company_id`, luật theo
   dòng ép buộc; sàn B và phiên chưa chọn sàn không thấy dòng nào của A; vai API không xoá được; chỉ vai có
-  `manageCompanyLayer` ghi được; bộ kiểm cách ly có ca cho năm bảng và đỏ có dòng ghim khi một bảng mất luật theo dòng.
+  quyền ghi của bảng quyền (thêm, sửa, ngừng dùng, khớp) ghi được; bộ kiểm cách ly có ca cho năm bảng và đỏ có dòng ghim khi một bảng mất luật theo dòng.
 - AC-8 (cross-layer): Given sàn A có nhãn riêng «Block» cho Toà và hai trường riêng còn dùng (một đã ngừng), When mở Bảng
   hàng, Then tiêu đề cột Toà là «Block», hai trường riêng hiện sau tám cột chuẩn theo vị trí, mỗi cột theo kiểu (căn lề,
   lọc, sắp như cột chuẩn), trường đã ngừng không hiện; sàn B mở Bảng hàng thấy nhãn chuẩn và không cột riêng nào.
 - AC-9 (cross-layer): Given sàn A có đủ năm phần, When mở màn «Tuỳ chỉnh của sàn», Then thấy năm phần với đúng dòng của
-  sàn; người có `manageCompanyLayer` đổi chữ nhãn riêng, tên trường riêng, ngừng dùng một dòng và bấm khớp căn chờ, nút đi
-  qua khuôn nút theo quyền của hàng 9e; vai chỉ đọc không thấy nút; máy chủ từ chối thì hiện câu không đủ quyền; màn đủ
-  trạng thái của `design/states.md` ở bốn khổ, sáng và tối, axe không lỗi.
+  sàn, và mỗi phần có đúng bộ nút của bảng `thao-tac-nhap.yaml` theo khuôn nút theo quyền của hàng 9e: «Thêm» ở đầu vùng
+  (Nhãn riêng, Trường riêng, Từ điển), «Khớp với danh mục» ở đầu vùng Căn chờ khớp, «…» cuối dòng có Sửa (hay Đổi tên ở
+  Mẫu nhập) và Ngừng dùng, không phần nào có Xoá; vai có quyền thấy nút theo bảng vai × nút viết sẵn, vai chỉ đọc không
+  thấy nút nào; máy chủ từ chối thì hiện câu không đủ quyền; màn đủ trạng thái của `design/states.md` ở bốn khổ, sáng và
+  tối, axe không lỗi.
+- AC-11 (cross-layer): Given người có quyền thêm, sửa, When thêm hay sửa một nhãn riêng, trường riêng hay dòng từ điển bằng
+  hộp biểu mẫu trên màn, Then lần ghi đi qua `/api/v1` và qua đúng các luật của AC-1, AC-2, AC-4 (trần 20 trường còn dùng,
+  30 lựa chọn, tên không trùng, giá trị thuộc tập của trường) ở cả cửa lẫn cơ sở dữ liệu; lỗi hiện ngay dưới ô và chữ đã
+  gõ còn nguyên; sửa trường riêng đổi được tên và lựa chọn nhưng không đổi được kiểu; ngừng dùng không xoá dòng nào.
 - AC-10: Given mô hình nghiệp vụ, When so ontology với bảng, kiểu sinh và mã, Then năm thực thể mới có tệp ontology (tên
   riêng của kho, không mượn tên RESO cho nghĩa khác), `make gen` khớp, cột bảng khớp thuộc tính, nhãn lấy từ
   `ontology/labels.yaml`, `modules.yaml` khai sở hữu và phụ thuộc; rào ADR-0018 giữ: kiểu trường là tập đóng, không cột
@@ -77,9 +83,9 @@ migration 039, 043, 045, 051, 052; ADR-0018]`.
 - Trục C — ai dùng ngay: Bảng hàng (7e) | màn nhập (hàng 11) | dữ liệu thật (hàng 10). [thước CE: `dung_tren` của hàng 10, 11]
 
 Core: A×«lưu, luật» cho nhãn (AC-1), trường (AC-2), giá trị (AC-3), từ điển (AC-4), căn chờ (AC-5), mẫu (AC-6); B cách ly
-và quyền (AC-7); Bảng hàng (AC-8); bảng xem lại (AC-9); ontology và rào (AC-10).
+và quyền (AC-7); Bảng hàng (AC-8); màn Tuỳ chỉnh và bộ nút (AC-9); thêm, sửa trên màn (AC-11); ontology và rào (AC-10).
 Later: lưu giá trị trường riêng trên lần chào thật (hàng 10); ghép khi nhập, bốn dấu mỗi ô, «không ô nào mất» (hàng 11);
-màn Cài đặt sàn đầy đủ (H4); trạng thái riêng của sàn (L4 phần còn lại); thêm mới ở bảng xem lại (theo Hỏi-2).
+màn Cài đặt sàn đầy đủ (H4); trạng thái riêng của sàn (L4 phần còn lại); thêm căn chờ khớp bằng tay (hàng 12, theo Hỏi-7).
 Never: trường tính bằng công thức; đối tượng tự tạo; từ điển có điều kiện; sửa danh mục chung từ lớp của sàn.
 Ô gạch: «trang khách × nhãn riêng» — trang khách chưa dựng; luật ghi ở Notes, đo ở hàng của trang khách.
 
@@ -92,7 +98,7 @@ Never: trường tính bằng công thức; đối tượng tự tạo; từ đi
 - Mọi bảng có khoá sàn, qua bộ kiểm cách ly, sàn khác không thấy → AC-7.
 - Bảng hàng hiện trường riêng sau cột chuẩn, nhãn riêng thay nhãn chuẩn → AC-8.
 - Căn chờ khớp dùng được ngay và khớp vào danh mục mà không nhập lại → AC-5.
-- Bảng xem lại tối giản → AC-9.
+- Bảng xem lại tối giản → AC-9; chủ kho nâng thành đủ bộ nút thêm, sửa, ngừng dùng (2026-11-13) → AC-9, AC-11.
 - Rào ADR-0018 → AC-10. Màn Cài đặt sàn đầy đủ để H4 → Out of scope.
 
 ## Out of scope

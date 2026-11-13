@@ -69,7 +69,7 @@ evals:
     cmd: config:executors.script.lop_rieng_db
     layer: backend-effect
     paths: [src/modules/company-config/**, "src/app/api/v1/company-layer/**", db/migrations/010_*.sql, ontology/actions.yaml, tests/db/lop-rieng.db.test.ts]
-    expected: "exit 0; khối 'permissions': bảng 8 ô viết sẵn trong bài theo câu trả lời Hỏi-1 (khuyến nghị: readCompanyLayer cho ListAgent, BuyerAgent, TeamLead, CompanyAdmin; manageCompanyLayer cho ListAgent, TeamLead, CompanyAdmin, không cho BuyerAgent), không đọc từ ontology/actions.yaml; mỗi ô thử ở cửa API (Đầu chủ POST nhãn nhận 200, Đầu khách 403) và ở cơ sở dữ liệu (luật thu hẹp theo quyền); bảng quyền sinh từ actions.yaml BẰNG bảng viết sẵn; vai không có manageCompanyLayer POST nhãn bị 403 và chèn thẳng trong withCompany bị luật thu hẹp chặn; ca phá: bỏ luật thu hẹp insert của company_labels → khẳng định 'insert allowed without manageCompanyLayer'"
+    expected: "exit 0; khối 'permissions': bảng 20 ô (4 vai × 5 thao tác readCompanyLayer, addCompanyLayer, editCompanyLayer, retireCompanyLayer, matchPendingUnits) viết sẵn trong bài theo câu trả lời Hỏi-1 (khuyến nghị: đọc cho cả bốn vai; bốn thao tác ghi cho ListAgent, TeamLead, CompanyAdmin, không cho BuyerAgent), không đọc từ ontology/actions.yaml; mỗi ô thử ở cửa API (Đầu chủ POST nhãn nhận 200, Đầu khách 403) và ở cơ sở dữ liệu (luật thu hẹp theo quyền), hằng 20; bảng quyền sinh từ actions.yaml BẰNG bảng viết sẵn; vai không có addCompanyLayer POST nhãn bị 403 và chèn thẳng trong withCompany bị luật thu hẹp chặn; ca phá: bỏ luật thu hẹp insert của company_labels → khẳng định 'insert allowed without addCompanyLayer'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E9
@@ -104,14 +104,14 @@ evals:
     cmd: config:executors.script.lop_rieng_e2e
     layer: backend-effect
     paths: [src/modules/company-config/**, "src/app/(app)/tuy-chinh-san/**", src/components/templates/**, src/modules/identity/ui/**, tests/e2e-db/lop-rieng.spec.ts]
-    expected: "exit 0; ca 'review screen' ở 1440: Quản trị sàn A mở màn Tuỳ chỉnh của sàn, cột thứ hai có đúng năm mục viết trước (hằng 5); từng mục mở vùng có số dòng BẰNG số dòng của sàn A đọc bằng vai quản trị của bài; «…» → 'Đổi chữ' nhãn 'Block' thành 'Lô' → tải lại vẫn 'Lô' và Bảng hàng có tiêu đề 'Lô'; «…» → 'Ngừng dùng' trường ghi_chu → xác nhận → mục biến mất và Bảng hàng không còn cột 'Ghi chú'; 'Khớp với danh mục' → thông báo 'Đã khớp 1 căn, còn 0 căn chờ'; Đầu khách A mở màn thấy năm phần và không nút ghi nào (đếm 0 nút có tên Đổi chữ, Ngừng dùng, Khớp), còn Đầu chủ, Trưởng nhóm, Quản trị sàn mỗi vai đếm được > 0 nút ấy; đổi tên trường thành tên đã có thì lỗi hiện dưới ô và chữ đã gõ còn nguyên; quyền bị gỡ giữa chừng → 'Không đủ quyền làm việc này'; axe không lỗi ở sáng và tối; ca phá: hiện nút Ngừng dùng ngoài PermittedAction → bộ kiểm nút của 9e đỏ 'write button outside PermittedAction'"
+    expected: "exit 0; ca 'review screen' ở 1440: Quản trị sàn A mở màn Tuỳ chỉnh của sàn, năm phần có đúng số dòng của sàn A đọc bằng vai quản trị của bài; bảng nút viết sẵn trong bài theo _acceptance/lop-rieng-cua-san/thao-tac-nhap.yaml (5 phần × nút đầu vùng và nút «…») hằng 5 — mỗi phần đếm đúng nút đầu vùng (Thêm nhãn riêng, Thêm trường riêng, Thêm từ điển, Khớp với danh mục, không nút ở Mẫu nhập) và đúng mục của «…» (Sửa · Ngừng dùng; Ngừng dùng; Đổi tên · Ngừng dùng), không phần nào có mục chứa chữ 'Xoá'; ma trận 4 vai × 5 phần hằng 20: Đầu khách đếm 0 nút ghi ở mọi phần, ba vai kia đếm đúng bảng; «…» → 'Sửa' nhãn 'Block' thành 'Lô' → tải lại vẫn 'Lô' và Bảng hàng có tiêu đề 'Lô'; «…» → 'Ngừng dùng' trường ghi_chu → xác nhận → mục biến mất và Bảng hàng không còn cột ấy; 'Khớp với danh mục' → thông báo 'Đã khớp 1 căn, còn 0 căn chờ'; quyền bị gỡ giữa chừng → 'Không đủ quyền làm việc này'; axe không lỗi ở sáng và tối; ca phá: hiện nút Ngừng dùng ngoài PermittedAction → bộ kiểm nút của 9e đỏ 'write button outside PermittedAction'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E13
     criterion: AC-9
     executor: ui-check
     layer: ui-observed
-    target: "Màn Tuỳ chỉnh của sàn: năm phần, trạng thái rỗng, lỗi, không đủ quyền, ở 360, 414, 1024, 1440, sáng và tối"
+    target: "Màn Tuỳ chỉnh của sàn: năm phần với nút Thêm và menu «…» mở, hộp Thêm trường riêng, trạng thái rỗng, lỗi, không đủ quyền, ở 360, 414, 1024, 1440, sáng và tối"
     paths: ["src/app/(app)/tuy-chinh-san/**", src/modules/company-config/**, src/components/templates/**]
     expected: "Ảnh từng khổ cho thấy cột thứ hai (ngăn trượt ở điện thoại) liệt kê năm phần, vùng Lưới với «…» cuối dòng, trạng thái rỗng nói lý do và chỉ đường nhập, không chữ đè, không cuộn ngang ngoài vùng Lưới"
     evidence_required: [screenshot, observed]
@@ -154,4 +154,13 @@ evals:
     cmd: config:executors.design.floor
     paths: ["src/app/(app)/tuy-chinh-san/**", src/modules/company-config/ui/**, src/modules/listings/ui/**]
     expected: "exit 0; sàn thiết kế không thấy mã màu thô trên tệp giao diện mà vòng chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E19
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.lop_rieng_e2e
+    layer: backend-effect
+    paths: [src/modules/company-config/**, "src/app/(app)/tuy-chinh-san/**", "src/app/api/v1/company-layer/**", tests/e2e-db/lop-rieng.spec.ts]
+    expected: "exit 0; ca 'add and edit on screen' ở 1440: Đầu chủ A bấm 'Thêm trường riêng', điền tên 'Hướng view', kiểu Chọn một, bốn lựa chọn → dòng mới hiện trong phần và đọc lại bằng vai quản trị của bài có đúng một dòng company_fields của A; 'Thêm nhãn riêng' Toà → 'Block' và 'Thêm từ điển' Hướng 'ĐN' → Đông Nam đọc lại đúng; ma trận viết trước 4 lỗi hằng 4 (tên trùng 'ghi chu' sau gấp chữ, 31 lựa chọn, trường thứ 21 còn dùng, giá trị từ điển ngoài tập) — mỗi lỗi hiện dưới ô của hộp, chữ đã gõ còn nguyên, không dòng nào được thêm; 'Sửa' trường Hướng view: ô Kiểu bị khoá, đổi tên và thêm lựa chọn lưu được; 'Ngừng dùng' rồi đếm dòng trong bảng bằng vai quản trị: dòng còn, retired_at có giá trị; ca phá: cho đổi kiểu khi sửa → khẳng định 'field kind changed on edit'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

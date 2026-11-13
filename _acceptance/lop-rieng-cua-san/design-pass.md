@@ -9,7 +9,7 @@ reaction: nac-1 (anh-gui-kem-the)
 options: _acceptance/lop-rieng-cua-san/cong-pham-vi.html (trang cổng, hai lối so ngang) · ảnh ở cong/ · khối gốc ở evidence/reui/
 divergence: opened
 ds_skill: inventory-ui
-states: [a-truong, b-dau-trang, b-ca-trang, a-can-cho, bang-hang, bang-hang-cuon-phai, a-mau-2c]
+states: [a-truong, b-dau-trang, b-ca-trang, a-can-cho, bieu-mau-them-truong, bang-hang, bang-hang-cuon-phai, a-mau-2c]
 breakpoints: [mobile-360, desktop-1440]
 themes: [light]
 patched: 6
@@ -43,6 +43,7 @@ giống A.
 | b-dau-trang | 360 | light | cong/b-dau-trang-360-sang.png |
 | bang-hang | 1440 | light | cong/bang-hang-1440-sang.png |
 | bang-hang-cuon-phai | 1440 | light | cong/bang-hang-cuon-phai-1440-sang.png |
+| bieu-mau-them-truong | 1440 | light | cong/bieu-mau-them-truong-1440-sang.png |
 
 ## Findings
 
@@ -50,4 +51,6 @@ giống A.
   trong khung cao hết màn; ảnh chưa đăng nhập, có dải «Bản mẫu» và ô tìm đã bỏ; danh sách năm phần căn giữa.
 - Sửa sau lần soát của giám sát: hai ảnh Bảng hàng từng trùng ảnh lối A (cookie chọn dáng không đổi), nay chụp đúng và cắt
   đúng vùng Bảng hàng; B chụp từ đầu trang, mỗi phần ba dòng như khối gốc, thêm ảnh cả trang.
+- Chủ kho yêu cầu đủ bộ nút (2026-11-13): hai lối có «Thêm …» ở đầu phần và «…» mở trên ảnh chính, thêm ảnh hộp «Thêm
+  trường riêng»; bảng nút từng phần ở `thao-tac-nhap.yaml`.
 - Ảnh tối và trạng thái (rỗng, lỗi, chỉ đọc) để sau khi anh chọn lối.

@@ -1,0 +1,65 @@
+# Draft of the permission-table rows and the planned buttons of row 7e (lop-rieng-cua-san), written at the design step
+# so the scope gate can show which role sees which button before anything is built (supervisor G-1311-75, owner
+# 2026-11-13: «không quét được màn với quyền và bộ button action»). The rows move into ontology/actions.yaml in this
+# row's PR (a change to the business model, named in the PR description); when row 9b lands, the screen's buttons move
+# into the screen register. Scopes follow Hỏi-1's recommendation; change Hỏi-1 and every «manage» row changes with it.
+
+actions:
+  - name: readCompanyLayer
+    description: See the company's own labels, custom fields, value dictionary, pending units and import templates.
+    entity: CompanyLabel
+    kind: read
+    status: planned
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
+
+  - name: addCompanyLayer
+    description: Add a company label, custom field or dictionary entry.
+    entity: CompanyLabel
+    kind: create
+    status: planned
+    scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+
+  - name: editCompanyLayer
+    description: >-
+      Change the words of a company label, the name and options of a custom field (never its kind), a dictionary entry,
+      or the name of an import template.
+    entity: CompanyLabel
+    kind: update
+    status: planned
+    scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+
+  - name: retireCompanyLayer
+    description: >-
+      Stop using a label, field, dictionary entry, pending unit or import template; nothing is deleted and values
+      already on units stay.
+    entity: CompanyLabel
+    kind: delete
+    status: planned
+    scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+
+  - name: matchPendingUnits
+    description: Match the company's pending units with units the shared catalog now has; the catalog never changes.
+    entity: PendingUnit
+    kind: command
+    status: planned
+    scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
+
+# Screen «Tuỳ chỉnh của sàn» (tuy-chinh-san): the buttons of each part, in the row 9e template — «Thêm» at the head of
+# the region, the rest in the row's «…», removing actions last. No «Xoá» anywhere: «Ngừng dùng» keeps the history.
+screen: tuy-chinh-san
+parts:
+  nhan:
+    head: [{ action: addCompanyLayer, label: "Thêm nhãn riêng" }]
+    row: [{ action: editCompanyLayer, label: "Sửa" }, { action: retireCompanyLayer, label: "Ngừng dùng" }]
+  truong:
+    head: [{ action: addCompanyLayer, label: "Thêm trường riêng" }]
+    row: [{ action: editCompanyLayer, label: "Sửa" }, { action: retireCompanyLayer, label: "Ngừng dùng" }]
+  tu-dien:
+    head: [{ action: addCompanyLayer, label: "Thêm từ điển" }]
+    row: [{ action: editCompanyLayer, label: "Sửa" }, { action: retireCompanyLayer, label: "Ngừng dùng" }]
+  can-cho:
+    head: [{ action: matchPendingUnits, label: "Khớp với danh mục" }]
+    row: [{ action: retireCompanyLayer, label: "Ngừng dùng" }]
+  mau:
+    head: []
+    row: [{ action: editCompanyLayer, label: "Đổi tên" }, { action: retireCompanyLayer, label: "Ngừng dùng" }]

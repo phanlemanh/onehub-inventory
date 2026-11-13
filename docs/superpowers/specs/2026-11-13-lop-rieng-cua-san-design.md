@@ -71,12 +71,19 @@ tính từ trường khác), không bộ máy luật hay quy trình (từ điể
 - Mẫu nhập: tên 1–60, chữ ký dạng tệp = danh sách tên cột đã gấp theo thứ tự; mỗi cột đi tới đúng một đích: trường chuẩn
   (khoá của `FIELD_DISPLAY`), trường riêng còn dùng, hoặc «bỏ cột» có chủ ý. Mỗi (sàn, chữ ký) một mẫu còn dùng.
 
+## Bộ nút của màn (chủ kho chọn 2026-11-13)
+
+Chủ kho: «Tôi thấy thiếu bộ nút crud như các kiến trúc chung?» — màn Tuỳ chỉnh của sàn có đủ bộ nút theo khuôn 9e. Bảng
+nút từng phần và năm thao tác nháp: `_acceptance/lop-rieng-cua-san/thao-tac-nhap.yaml` (vào `ontology/actions.yaml` trong
+PR của hàng này). Không có «Xoá»: «Ngừng dùng» giữ lịch sử. Trường riêng sửa được tên và lựa chọn, không đổi kiểu. Căn
+chờ khớp không thêm tay (Hỏi-7, máy khuyên để hàng 12). Mẫu nhập chỉ đổi tên và ngừng dùng; tạo mới qua màn nhập.
+
 ## Cửa và quyền
 
 - Ghi đi qua `/api/v1/company-layer/*` bằng cửa thao tác dùng chung của mô-đun danh tính (quyết định 0026) và `withCompany`.
   Không xoá: ngừng dùng. Vai API không có quyền `delete`.
-- Hai thao tác mới trong `ontology/actions.yaml`: `readCompanyLayer` (bốn vai, phạm vi sàn) và `manageCompanyLayer` (theo
-  Hỏi-1). Bảng quyền migration 010 chép từ đó; luật thu hẹp theo quyền như `company_catalog_aliases`.
+- Năm thao tác mới trong `ontology/actions.yaml` (nháp ở `thao-tac-nhap.yaml`): `readCompanyLayer` (bốn vai), `addCompanyLayer`,
+  `editCompanyLayer`, `retireCompanyLayer`, `matchPendingUnits` (theo Hỏi-1). Bảng quyền migration 010 chép từ đó; luật thu hẹp theo quyền như `company_catalog_aliases`.
 - `architecture/modules.yaml`: `company-config` sở hữu năm thực thể mới, dựa vào `identity` (cửa) và `catalog` (tra căn
   khi khớp). Trang quyết định 0029 (xin giám sát số).
 
