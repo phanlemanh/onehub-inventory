@@ -43,7 +43,7 @@ Lối theo mẫu không đòi nhóm `màn`; ba ứng viên dưới để chủ k
 | Thanh công cụ, lọc, tìm, sắp xếp | giống | ảnh 1440: ô tìm, số dòng, Lọc, Cột, Toàn màn hình; mũi tên sắp xếp ở mọi đầu cột |
 | Bảng | giống | ảnh 1440: cột số dòng ghim, kẻ dọc giữa cột, số canh phải, mật độ dòng như Bảng hàng |
 | Mở chi tiết cạnh bảng | giống | ảnh 1440: chữ cột đầu là nút mở; ngăn nổi theo `wiki/decisions/0024-ngan-noi-xem-chi-tiet.md` (evidence/sent-ho-so-1440.png) |
-| Trạng thái tải, trống, lỗi | khác — có lý do | `src/app/(app)/sent/page.tsx`: lời mời ở trạng thái trống là «Mở Bảng hàng» thay vì «Tải lại», vì chưa có lối gửi (`design/states.md`) |
+| Trạng thái tải, trống, lỗi | khác — có lý do | `src/modules/sharing/ui/sent-grid.tsx`: lời mời ở trạng thái trống là «Mở Bảng hàng» thay vì «Tải lại», vì chưa có lối gửi (`design/states.md`) |
 | Ghi và báo đã lưu | khác — có lý do | `_acceptance/da-gui-tren-luoi/contract.md`: màn chỉ đọc, không ô nào sửa được, như Bảng hàng bản đọc |
 | Phím tắt | giống | ảnh 1440: cùng lưới nên cùng phím của `design/behaviors.md`; bài phím của khuôn chạy trên mọi màn Lưới |
 | Điện thoại | giống | ảnh 360: lưới cuộn ngang trong vùng, cột số dòng và cột đầu đứng yên, trang không cuộn ngang |
