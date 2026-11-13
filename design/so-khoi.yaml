@@ -103,6 +103,9 @@ khoi:
 # day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
 # still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).
 # Adding a pair here needs a ruling of the batch supervisor, and the owner signs it at the evidence gate of that row.
+# The proof gate checks each pair in git (row 2e, tools/proof_gate/legacy.py): the commit exists, adds the block's
+# file, carries the written day, and that day is before the commit that added this ledger. A shallow copy fetches the
+# missing history first; if it cannot, the pair is red.
 khoi_co_truoc:
   - ten: FormDialog
     ho_so: moi-nguoi-gan-vai

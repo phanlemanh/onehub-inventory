@@ -139,7 +139,7 @@ class Repo:
     transition: dict[str, str] = field(default_factory=dict)  # slug -> reason
     # Blocks made before the block ledger existed, each named with the round that made it (row 2c, ruling K-1311-4):
     # the ledger line of such a pair needs no «ve-tay» row in that round's proof, when that round is closed.
-    legacy_blocks: set[tuple[str, str]] = field(default_factory=set)
+    legacy_blocks: dict[tuple[str, str], dict[str, str]] = field(default_factory=dict)
     wrappers: set[str] = field(default_factory=set)
     errors: list[str] = field(default_factory=list)
 
@@ -295,7 +295,7 @@ def _load_legacy_blocks(repo: Repo, doc: Any) -> None:
         if missing:
             repo.errors.append(f"{LEDGER_FILE}: '{LEGACY_KEY}' {item.get('ten', '?')} thiếu {', '.join(missing)}")
             continue
-        repo.legacy_blocks.add((str(item["ten"]), str(item["ho_so"])))
+        repo.legacy_blocks[(str(item["ten"]), str(item["ho_so"]))] = {f: str(item[f]).strip() for f in LEGACY_FIELDS}
 
 
 # ---------------------------------------------------------------- contracts and proofs
