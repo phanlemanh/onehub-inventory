@@ -64,6 +64,8 @@ export const LABELS = {
   RemoveContact: {"pref": "Xoá liên hệ"},
   MergeContacts: {"pref": "Gộp liên hệ"},
   EraseContactPersonalData: {"pref": "Xoá tên và số"},
+  AskListAgent: {"pref": "Hỏi đầu chủ"},
+  ReportUnitError: {"pref": "Báo sai thông tin"},
 } as const;
 
 export type ConceptCode = keyof typeof LABELS;
