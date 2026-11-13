@@ -21,6 +21,12 @@ import {
   saveTemplate,
   type RunAs,
 } from "@/modules/company-config/store";
+import { createCompanyLayerHandlers } from "@/modules/company-config/company-layer-http";
+import { openDoor } from "@/modules/identity/action-door";
+import { createAuthHandlers, tokenFrom } from "@/modules/identity/http";
+import type { LoginDeps } from "@/modules/identity/login";
+import type { ActionName } from "@/modules/identity/permissions";
+import { captureSender } from "@/modules/identity/sender";
 import { withCompany } from "@/modules/identity/with-company";
 
 import { dropWorld, world, type Person, type World } from "./bang-quyen-world";
@@ -422,5 +428,153 @@ describe("import templates (E6)", () => {
     ).toEqual({ ok: false, problem: "taken" });
     expect((await retireItem(a, "fields", view.id)).ok).toBe(true);
     expect((await findTemplate(a, SHEET))?.retiredColumns).toEqual([3]);
+  });
+});
+
+// ---- the doors of /api/v1/company-layer (E8, E1 at the route) ------------------------------------------------------
+
+const ORIGIN = "http://127.0.0.1:3485";
+function req(url: string, method: string, body?: unknown, cookie?: string): Request {
+  return new Request(url, {
+    method,
+    headers: { "content-type": "application/json", ...(cookie ? { cookie } : {}) },
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+  });
+}
+
+async function apiWorld(suffix: string) {
+  const w = await layerWorld(suffix);
+  const code = captureSender();
+  const deps: LoginDeps = { pool: w.pool, secret: "test-secret-lop-rieng", sender: code.sender };
+  const auth = createAuthHandlers(() => deps);
+  const door = (r: Request, action: ActionName) => openDoor(() => w.pool, tokenFrom(r), action);
+  const h = createCompanyLayerHandlers({ door, withCompany });
+  const cookies = new Map<Person, string>();
+  const cookie = async (who: Person): Promise<string> => {
+    const have = cookies.get(who);
+    if (have) return have;
+    const email = w.email[who];
+    await auth.requestCode(req(`${ORIGIN}/api/v1/auth/code`, "POST", { email }));
+    const mail = [...code.sent].reverse().find((m) => m.email === email);
+    const otp = mail?.text.match(/\b\d{6}\b/)?.[0];
+    const res = await auth.verifyCode(
+      req(`${ORIGIN}/api/v1/auth/session`, "POST", { email, code: otp }),
+    );
+    if (!res.ok) throw new Error(`đăng nhập ${who} trả ${res.status}`);
+    const c = (res.headers.get("set-cookie") ?? "").split(";")[0]!;
+    const json = (await res.json()) as { company: { id: string } | null };
+    if (json.company?.id !== w.A) {
+      const chosen = await auth.chooseCompany(
+        req(`${ORIGIN}/api/v1/auth/session/company`, "PUT", { companyId: w.A }, c),
+      );
+      if (!chosen.ok) throw new Error(`chọn sàn của ${who} trả ${chosen.status}`);
+    }
+    cookies.set(who, c);
+    return c;
+  };
+  const url = `${ORIGIN}/api/v1/company-layer`;
+  return { w, h, cookie, url };
+}
+
+// Written in the test from the owner's answer to Hỏi-1, not read from ontology/actions.yaml: 4 roles × 5 actions.
+const ROLES = ["LA", "BA", "TL", "CA"] as const;
+const WRITERS = new Set(["LA", "TL", "CA"]);
+const CELLS: Record<string, Record<(typeof ROLES)[number], boolean>> = {
+  readCompanyLayer: { LA: true, BA: true, TL: true, CA: true },
+  addCompanyLayer: { LA: true, BA: false, TL: true, CA: true },
+  editCompanyLayer: { LA: true, BA: false, TL: true, CA: true },
+  retireCompanyLayer: { LA: true, BA: false, TL: true, CA: true },
+  matchPendingUnits: { LA: true, BA: false, TL: true, CA: true },
+};
+
+describe("permissions (E8)", () => {
+  it("every role × every action matches the table written here, at the API and in the database", async () => {
+    const { w, h, cookie, url } = await apiWorld("quyen");
+    expect(Object.keys(CELLS).length * ROLES.length).toBe(20);
+    const seen: string[] = [];
+    for (const who of ROLES) {
+      const c = await cookie(who);
+      const add = await h.add(
+        req(`${url}/labels`, "POST", { concept: "Unit", label: `Căn ${who}` }, c),
+        "labels",
+      );
+      const id = add.ok ? ((await add.json()) as { id: string }).id : null;
+      const anyId =
+        id ??
+        (
+          await w.db.owner.query(
+            "insert into company_labels (company_id, concept, label) values ($1, 'Subdivision', $2) returning id::text",
+            [w.A, `Khu ${who}`],
+          )
+        ).rows[0].id;
+      const results: Record<string, boolean> = {
+        readCompanyLayer: (await h.read(req(url, "GET", undefined, c))).ok,
+        addCompanyLayer: add.ok,
+        editCompanyLayer: (
+          await h.edit(req(`${url}/labels/${anyId}`, "PATCH", { label: "Lô" }, c), "labels", anyId)
+        ).ok,
+        retireCompanyLayer: (
+          await h.retire(
+            req(`${url}/labels/${anyId}/retire`, "POST", undefined, c),
+            "labels",
+            anyId,
+          )
+        ).ok,
+        matchPendingUnits: (await h.match(req(`${url}/pending-units/match`, "POST", undefined, c)))
+          .ok,
+      };
+      for (const [action, ok] of Object.entries(results))
+        if (ok !== CELLS[action]![who])
+          seen.push(`${who} ${action}: ${ok ? "allowed" : "refused"}`);
+      if (!WRITERS.has(who)) expect(add.status).toBe(403);
+    }
+    expect(seen).toEqual([]);
+    // In the database: a person without addCompanyLayer cannot insert straight through the door either.
+    let message = "";
+    try {
+      await runAs(
+        w,
+        "BA",
+        w.A,
+      )((c) =>
+        c.query(
+          "insert into company_labels (company_id, concept, label) values (app.current_company_id(), 'Unit', 'X')",
+        ),
+      );
+    } catch (err) {
+      message = String((err as Error).message);
+    }
+    expect(message).toContain("row-level security");
+  });
+
+  it("break: without the restrictive insert rule a person without addCompanyLayer inserts", async () => {
+    const w = await layerWorld("quyen_pha");
+    await w.db.owner.query("drop policy company_labels_insert_by_permission on company_labels");
+    await runAs(
+      w,
+      "BA",
+      w.A,
+    )((c) =>
+      c.query(
+        "insert into company_labels (company_id, concept, label) values (app.current_company_id(), 'Unit', 'X')",
+      ),
+    );
+    const n = Number((await w.db.owner.query("select count(*) from company_labels")).rows[0].count);
+    expect(n, "insert allowed without addCompanyLayer").toBe(1);
+  });
+
+  it("answers a bad body, an unknown part and an unknown concept with fixed codes", async () => {
+    const { h, cookie, url } = await apiWorld("ma_loi");
+    const c = await cookie("CA");
+    expect((await h.add(req(`${url}/labels`, "POST", { nope: 1 }, c), "labels")).status).toBe(400);
+    expect((await h.add(req(`${url}/khac`, "POST", {}, c), "khac")).status).toBe(404);
+    const bad = await h.add(
+      req(`${url}/labels`, "POST", { concept: "Inventory", label: "X" }, c),
+      "labels",
+    );
+    expect(bad.status).toBe(400);
+    expect(await bad.json()).toEqual({ error: "concept-unknown" });
+    const unsigned = await h.read(req(url, "GET"));
+    expect(unsigned.status).toBe(401);
   });
 });

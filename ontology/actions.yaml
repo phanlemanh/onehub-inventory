@@ -156,7 +156,7 @@ actions:
 
   # The company layer (row 7e, lop-rieng-cua-san): who reads and who changes the company's own labels, custom fields,
   # value spellings, pending units and import templates. Approved by the owner at the scope gate, 2026-11-13 (Hỏi-1:
-  # ListAgent, TeamLead, CompanyAdmin change; BuyerAgent reads). Database doors: migration 010; API doors: task 5.
+  # ListAgent, TeamLead, CompanyAdmin change; BuyerAgent reads). Database doors: migration 010; API doors: /api/v1/company-layer.
   - name: readCompanyLayer
     description: See the company's own labels, custom fields, value spellings, pending units and import templates.
     entity: CompanyLabel
@@ -164,6 +164,7 @@ actions:
     status: live
     scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
     doors:
+      api: ["GET /api/v1/company-layer"]
       db:
         [
           "table company_labels select",
@@ -180,6 +181,7 @@ actions:
     status: live
     scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
     doors:
+      api: ["POST /api/v1/company-layer/[part]"]
       db:
         [
           "table company_labels insert",
@@ -198,6 +200,7 @@ actions:
     status: live
     scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
     doors:
+      api: ["PATCH /api/v1/company-layer/[part]/[id]"]
       db:
         [
           "table company_labels update",
@@ -215,6 +218,7 @@ actions:
     status: live
     scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
     doors:
+      api: ["POST /api/v1/company-layer/[part]/[id]/retire"]
       db:
         [
           "table company_labels update",
@@ -231,6 +235,7 @@ actions:
     status: live
     scope: { ListAgent: company, TeamLead: company, CompanyAdmin: company }
     doors:
+      api: ["POST /api/v1/company-layer/pending-units/match"]
       db: ["table company_pending_units update"]
 
   # Draft rows for the listing board, from Quỹ hàng's permission review of 05/11 (table two) and its signed

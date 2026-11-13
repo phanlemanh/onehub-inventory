@@ -98,6 +98,12 @@ const API_DOORS = [
   "GET /api/v1/saved-views",
   "POST /api/v1/saved-views",
   "PATCH /api/v1/saved-views/[id]",
+  // Row 7e: the company layer.
+  "GET /api/v1/company-layer",
+  "POST /api/v1/company-layer/[part]",
+  "PATCH /api/v1/company-layer/[part]/[id]",
+  "POST /api/v1/company-layer/[part]/[id]/retire",
+  "POST /api/v1/company-layer/pending-units/match",
   "DELETE /api/v1/saved-views/[id]",
 ];
 const EXEMPT_API = [

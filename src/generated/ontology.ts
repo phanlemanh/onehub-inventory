@@ -889,7 +889,7 @@ export const ACTIONS: readonly ActionSpec[] = [
     status: "live",
     states: [],
     doors: {
-      api: [],
+      api: ["GET /api/v1/company-layer"],
       db: ["table company_labels select", "table company_fields select", "table company_value_aliases select", "table company_pending_units select", "table company_import_templates select"],
     },
   },
@@ -915,7 +915,7 @@ export const ACTIONS: readonly ActionSpec[] = [
     status: "live",
     states: [],
     doors: {
-      api: [],
+      api: ["POST /api/v1/company-layer/[part]"],
       db: ["table company_labels insert", "table company_fields insert", "table company_value_aliases insert", "table company_pending_units insert", "table company_import_templates insert"],
     },
   },
@@ -941,7 +941,7 @@ export const ACTIONS: readonly ActionSpec[] = [
     status: "live",
     states: [],
     doors: {
-      api: [],
+      api: ["PATCH /api/v1/company-layer/[part]/[id]"],
       db: ["table company_labels update", "table company_fields update", "table company_value_aliases update", "table company_import_templates update"],
     },
   },
@@ -967,7 +967,7 @@ export const ACTIONS: readonly ActionSpec[] = [
     status: "live",
     states: [],
     doors: {
-      api: [],
+      api: ["POST /api/v1/company-layer/[part]/[id]/retire"],
       db: ["table company_labels update", "table company_fields update", "table company_value_aliases update", "table company_pending_units update", "table company_import_templates update"],
     },
   },
@@ -993,7 +993,7 @@ export const ACTIONS: readonly ActionSpec[] = [
     status: "live",
     states: [],
     doors: {
-      api: [],
+      api: ["POST /api/v1/company-layer/pending-units/match"],
       db: ["table company_pending_units update"],
     },
   },
