@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: sua-tren-o
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 2083750a2e86b2629a6ce1f7f809af0f25fce722
-human_signoff:
+human_signoff: Manh Phan 2026-11-14
 ---
 
 # Evidence Report: sua-tren-o
@@ -229,7 +229,7 @@ human_signoff:
     - domain-correctness: PASS — edit-rules.ts chứa đủ luật (readPrice, PRICE_SWING_ASK và priceAsksAgain, STATUS_NEXT cùng canMove/nextStatuses/statusUndoable, statusNeeds, priceLocked/statusLocked), index.ts xuất lại; listing-cell-edit.tsx chỉ gọi. Lưu ý nhỏ: danh sách lý do rút lấy từ WITHDRAWN_REASON_ORDER trong cell-edit-copy, nằm ngoài input nên chưa kiểm được; đó không phải nấc hay ngưỡng nên không đổi kết luận.
     - operational-feasibility: PASS — mọi luật ở edit-rules.ts, giao diện chỉ gọi; hai chỗ còn lại (Math.round hiển thị ở dòng 136, needs.length > 0) chỉ là trình bày. Hai tệp candidate chung chung chỉ đọc row.locked.
     - spec-alignment: PASS — giao diện không viết luật nào; dòng 136 chỉ làm tròn để hiển thị, nhánh dòng 328-351 chạy theo statusNeeds. WITHDRAWN_REASON_ORDER ở cell-edit-copy nằm ngoài input, chưa kiểm.
-  human_override:  # chi nguoi ghi
+  human_override: "Đạt — Manh Phan 2026-11-14"
 
 - eval: E10c
   judged_by: judge panel (fresh context), đề xuất PASS
@@ -237,7 +237,7 @@ human_signoff:
     - domain-correctness: PASS — không có dòng gate1 trả lời Hỏi-2 nên theo khuyến nghị: ba lý do, không «Khác». labels.yaml đủ nhãn, không nhãn nào quá 17 ký tự; glossary ghi WithdrawnReason là khái niệm riêng, RESO DD 2.1 không có trường này.
     - operational-feasibility: PASS — cùng căn cứ: đủ WithdrawnReason, WithdrawnSoldElsewhere (16, biến thể thuê 17), WithdrawnOwnerChangedMind (9), WithdrawnUnreachable (12); glossary có dòng WithdrawnReason là khái niệm riêng.
     - spec-alignment: PASS — đủ nhãn theo Hỏi-2 theo khuyến nghị dòng 13, không nhãn nào quá 17 ký tự, glossary ghi khái niệm riêng.
-  human_override:  # chi nguoi ghi
+  human_override: "Đạt — Manh Phan 2026-11-14"
 
 ## Known limits
 

@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: [inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-13T03:15:58Z
 design_doc: docs/superpowers/specs/2026-11-13-sua-tren-o-design.md
@@ -115,3 +115,13 @@ Quét không gian AC theo trục (morphological, preset entity-feature, rút g�
   ma trận, AC-6 khoá sau khi thông báo tắt.
 - Mất mạng ở hàng này đo trên trình duyệt đặt ngoại tuyến (cổng lưu từ chối); hàng 10 đo lại trên đường ghi thật.
 - Lệch hydrate ở trạng thái tải (dãy V): không tái hiện ở 1440 trên nhánh hiện tại, đã báo G, không sửa trong hàng này.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-14:
+  - Ngoài-2: Luật chuyển trạng thái, khoá căn đã bán và hỏi lại khi giá lệch lớn mới ghi ở tài liệu, chưa vào danh mục khái niệm gốc.
+  - Ngoài-4: Vài câu thông báo dùng chữ cố định như «chủ nhà», nên với căn cho thuê có thể hiện sai từ.
+  - Ngoài-5: Trong vài ca hiếm, như gõ giá dưới một triệu, người dùng bị báo không đủ quyền thay vì giá không hợp lệ.
+  - Ngoài-7: Một lỗi lập trình bất ngờ lúc ghi có thể bị báo là mất mạng và không được ghi lại.
+  - Ngoài-8: Khi một thay đổi vi phạm luật (ví dụ hoàn tác giá sau khi căn đã bán), người dùng bị báo thiếu quyền thay vì lý do thật.
+  - Ngoài-9: Khi hai người cùng sửa một căn trên đường ghi thật, người bị xung đột kẹt tới khi tải lại trang.
+  - Ngoài-10: Bài kiểm lời báo khi hoàn tác hỏng không đỏ được dù lời báo nêu sai căn hay sai giá.
+  - Ngoài-12: Bài kiểm các cột chỉ-đọc chỉ thử một lối vào cho hai cột sửa được.
+  - Ngoài-14: Bài kiểm «không có lần ghi nào» chỉ nhìn một lần ngay sau thao tác, nên một lần ghi sai đến trễ vẫn lọt.
