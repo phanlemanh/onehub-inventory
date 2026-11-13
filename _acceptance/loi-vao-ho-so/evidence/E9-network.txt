@@ -1,1 +1,4 @@
-(no failed requests, no >=400, no console errors)
+failed/>=400 app-origin requests:
+(none)
+console errors:
+(none)

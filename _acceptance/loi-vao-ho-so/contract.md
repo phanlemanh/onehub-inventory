@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory]
-status: implemented
+status: verified
 approved_by: Manh Phan
 approved_at: 2026-11-13
 design_doc: _acceptance/loi-vao-ho-so/design.md
@@ -102,3 +102,10 @@ toà trở lên (0601 ở ba toà).
   thấy được (bản mẫu chụp lại đúng lỗi ấy ở 1440 và 360).
 - Sửa ở Cổng Phạm vi: lời giao trên lộ trình nói «trang riêng», «Mở toàn màn» và «Nhiều căn — chọn toà» với một nút mỗi toà;
   theo lối chủ kho chọn, hàng không có trang riêng và chọn toà bằng chính các dòng Bảng hàng (sổ quyết định, `stage: gate1`).
+- Ngoài-1 (máy định tuyến 2026-11-13, đề xuất S4 known-limits): Nếu một sàn đổi tên «Toà» hoặc «Dự án» thành chữ khác, dòng mô tả trong ô tìm vẫn ghi chữ cũ, trong khi các gợi ý bên dưới dùng chữ mới. Ô tìm vẫn chạy đúng. — `src/modules/listings/ui/entry-copy.ts`
+- Ngoài-2 (máy định tuyến 2026-11-13, đề xuất S4 known-limits): Hôm nay ô tìm ở thanh trên luôn gợi ý từ dữ liệu mẫu của một sàn, không phân biệt người dùng thuộc sàn nào. Khi dữ liệu thật vào, phải gắn lại theo sàn đang mở, nếu không sàn này có thể thấy mã căn của sàn khác. — `src/app/(app)/layout.tsx`
+- Ngoài-3 (máy định tuyến 2026-11-13, đề xuất S4 known-limits): Ảnh chụp kiểm tra giao diện có thể trông sạch dù trang đang báo lỗi lúc chạy, vì khung báo lỗi của môi trường phát triển bị ẩn. Người dùng thật không bị ảnh hưởng. — `_acceptance/loi-vao-ho-so/evals.yaml`
+- Ngoài-4 (máy định tuyến 2026-11-13, đề xuất S4 known-limits): Phép kiểm khuôn giao diện báo đạt dù chính nó ghi nhận Bảng hàng chưa theo khuôn từ trước, nên kết quả đạt này không chứng minh được điều nó hứa. Người dùng không thấy khác biệt nào. — `_acceptance/loi-vao-ho-so/evals.yaml`
+- Ngoài-5 (máy định tuyến 2026-11-13, đề xuất S4 known-limits): Dòng mô tả của ô tìm ⌘K luôn viết «toà» và «dự án», nên nếu một sàn đổi tên hai khái niệm này thì dòng mô tả vẫn hiện chữ cũ. — `src/modules/listings/ui/entry-copy.ts`
+- Ngoài-7 (máy định tuyến 2026-11-13, đề xuất S4 known-limits): Sau khi tìm một căn rồi đóng hồ sơ, nếu tải lại trang hoặc lưu cách xem thì hồ sơ căn đó tự mở lại dù người dùng đã đóng. — `src/app/(app)/inventory/page.tsx`
+- Ngoài-8 (máy định tuyến 2026-11-13, đề xuất S4 known-limits): Người dùng không thấy gì sai hôm nay: Enter trên ô rỗng vẫn không đi đâu. Chỉ là phép đo tự động có thể bỏ sót nếu sau này có lỗi làm trang chuyển chậm. — `tests/e2e/loi-vao-ho-so.spec.ts`
