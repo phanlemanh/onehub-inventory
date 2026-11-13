@@ -61,6 +61,9 @@ export const TEST_PERSON = `phien-thu-${RUN}@example.test`;
 export const SESSION_FILE = join(tmpdir(), `onehub-e2e-db-phien-${RUN}.json`);
 const SUITE = /screens\.spec\.ts$/;
 const SIGN_IN_ONCE = /phien\.setup\.ts$/;
+// The role × screen suite (row 9b): the shared role door signs each role in once (`vai`), then one project per width.
+const ROLE_DOOR = /vai\.setup\.ts$/;
+const ROLE_SUITE = /vai-man\.spec\.ts$/;
 
 export default defineConfig({
   testDir: "tests/e2e-db",
@@ -77,7 +80,7 @@ export default defineConfig({
     // The tests of rows 8, 9, 1m, 1o sign their own people in, as before.
     ...SIZES.map(({ name, width, height }) => ({
       name,
-      testIgnore: [SUITE, SIGN_IN_ONCE],
+      testIgnore: [SUITE, SIGN_IN_ONCE, ROLE_DOOR, ROLE_SUITE],
       use: { ...devices["Desktop Chrome"], viewport: { width, height } },
     })),
     { name: "phien", testMatch: SIGN_IN_ONCE, use: { ...devices["Desktop Chrome"] } },
@@ -92,6 +95,13 @@ export default defineConfig({
         storageState: SESSION_FILE,
       },
     })),
+    { name: "vai", testMatch: ROLE_DOOR, use: { ...devices["Desktop Chrome"] } },
+    ...SIZES.map(({ name, width, height }) => ({
+      name: `vai-${name}`,
+      testMatch: ROLE_SUITE,
+      dependencies: ["vai"],
+      use: { ...devices["Desktop Chrome"], viewport: { width, height } },
+    })),
   ],
   webServer: {
     command: `npx next dev -p ${PORT}`,
@@ -104,6 +114,8 @@ export default defineConfig({
       NEXT_TSCONFIG: join(TSCONFIG_DIR, "tsconfig.json"),
       AUTH_SECRET: "e2e-only-secret",
       LOGIN_CODE_OUTBOX: OUTBOX,
+      // The permission button records its decisions for the role × screen suite (row 9b); dev builds only.
+      NEXT_PUBLIC_E2E_BUTTON_RECORD: "1",
     },
   },
 });

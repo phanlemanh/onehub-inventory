@@ -1,0 +1,204 @@
+schema_version: 1
+feature_slug: sua-tren-o
+# Ma trận viết trước:
+#   AC-1: bảng chữ giá 24 dòng (16 hiểu, 8 chưa hiểu) ở src/modules/listings/edit-rules.test.ts, viết trước mã; số dòng
+#         ghim bằng hằng 24 — bảng co lại cũng đỏ.
+#   AC-4: 6 ca ngưỡng (+20%, +20,01%, -20%, -20,01%, chưa có giá, cùng giá).
+#   AC-5: 6 trạng thái × 6 nấc đích = 36 ô, đúng 12 ô cho phép (bảng 12 lối); hằng 36 và 12 ghim.
+# Bài và ca (tên ca là thông điệp ghim):
+#   src/modules/listings/edit-rules.test.ts: doc-gia-bang-viet-truoc · nguong-hoi-lai · bang-chuyen-36-o · dieu-kien-nac ·
+#     hoan-tac-duoc
+#   src/components/candidate/use-change.test.tsx: hoan-tac-qua-cong-luu · hoan-tac-hong-bao-ro · luu-hong-ve-cu ·
+#     tu-choi-403-cau-rieng
+#   src/components/candidate/data-region-cell-edit.test.tsx: mo-theo-quyen · khoa-theo-dong · enter-van-mo-ho-so
+#   tests/behavior-guard.test.ts: ts-doc-nhu-typescript
+#   tests/e2e/sua-tren-o.spec.ts (bốn khổ): sua-gia-mot-lan-ghi · gia-chua-hieu-khong-ghi · hoi-lai-tai-o ·
+#     trang-thai-chi-nac-hop-le · da-ban-khoa · khong-quyen-chu-thuong · dien-thoai-khong-sua · phim-giu-nguyen ·
+#     axe-sang-toi
+# Cặp phá thử (bản sao; ca tương ứng phải đỏ với thông điệp ghim):
+#   pha-thu-lam-tron (readPrice làm tròn tới 10 triệu)                → «doc-gia-bang-viet-truoc: 4,655 tỷ»
+#   pha-thu-nguong-bang (> thành >=)                                   → «nguong-hoi-lai: +20%»
+#   pha-thu-mo-nac-cuoi (Closed: ["Active"])                           → «bang-chuyen-36-o: Closed→Active»
+#   pha-thu-hoan-tac-im (undo nuốt lỗi như bản trước hàng 4)           → «hoan-tac-hong-bao-ro»
+#   pha-thu-bo-quyen (canEdit bỏ kiểm bảng quyền)                      → «mo-theo-quyen: CompanyAdmin»
+#   pha-thu-enter-sua (Enter mở khung thay vì hồ sơ)                   → «enter-van-mo-ho-so»
+#   pha-thu-ts-thanh-tsx (bài rào đọc mọi tệp như TSX)                → «ts-doc-nhu-typescript: src/app/man/page.ts»
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.sua_tren_o
+    paths: [src/modules/listings/**]
+    expected: "exit 0; ca 'doc-gia-bang-viet-truoc' duyệt đủ 24 dòng của bảng viết trước (số dòng in ra = 24), mỗi dòng đúng số đồng hay «chưa hiểu». Chiều đỏ: pha-thu-lam-tron đỏ với «doc-gia-bang-viet-truoc: 4,655 tỷ»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E1b
+    criterion: AC-1
+    executor: judgment
+    inputs:
+      - src/modules/listings/edit-rules.ts
+      - src/modules/listings/index.ts
+      - src/modules/listings/ui/listing-cell-edit.tsx
+      - src/modules/listings/ui/inventory-grid.tsx
+      - src/components/candidate/cell-editor.tsx
+      - src/components/candidate/data-region.tsx
+    question: "Luật đọc giá, ngưỡng hỏi lại 20%, bảng chuyển trạng thái và điều kiện từng nấc có nằm trọn trong edit-rules.ts (hàm thuần, xuất qua index.ts) không, và hai tệp giao diện có chỉ gọi các hàm ấy mà không tự viết lại luật nào (so số, liệt kê nấc, ngưỡng) không? Nêu dòng nào tự viết luật."
+    expected: "PASS khi mọi luật ở edit-rules.ts và giao diện chỉ gọi; FAIL nêu tệp và dòng"
+    evidence_required: [run_id, verdict, verifier, verified_at]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.sua_tren_o_e2e
+    paths: [src/modules/listings/**, src/components/candidate/**, src/app/(app)/inventory/**, tests/e2e/sua-tren-o.spec.ts]
+    expected: "exit 0 ở bốn khổ; ca 'sua-gia-mot-lan-ghi': gõ «2,8 tỷ» trên ô Giá chào của căn đang bán thấy «Hiểu là: 2.800.000.000 ₫ (2,8 tỷ)», Enter làm cổng lưu nhận đúng một lần ghi {listPrice: 2800000000}, ô hiện 2,8 tỷ, Xác nhận lúc đổi, thông báo có Hoàn tác, trang không có nút Lưu. Chiều đỏ: cổng lưu gọi hai lần → «sua-gia-mot-lan-ghi: 2 lần ghi»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2-ui
+    criterion: AC-2
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3487/inventory?vai=ListAgent
+    paths: [src/modules/listings/ui/**, src/components/candidate/**]
+    steps:
+      - "With the lane H dev server on port 3487, open http://127.0.0.1:3487/inventory?vai=ListAgent at 1440 and 1024 wide, light and dark"
+      - "Click the Giá chào cell of an Active unit, type «2,8 tỷ», save one frame as _acceptance/sua-tren-o/evidence/E2-<khổ>-<sang|toi>.png, press Enter, save a second frame"
+    question: "Khung sửa có nằm ngay dưới ô Giá chào, ô vẫn thấy được, câu «Hiểu là» đọc đúng từng đồng, và sau Enter ô cùng Xác nhận lúc đổi và thông báo có Hoàn tác không? Nêu khổ và chế độ màu nào lệch."
+    expected: "Mọi khung khớp; khung không che ô đang sửa"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.sua_tren_o_e2e
+    paths: [src/modules/listings/**, src/components/candidate/**, tests/e2e/sua-tren-o.spec.ts]
+    expected: "exit 0; ca 'gia-chua-hieu-khong-ghi': gõ «abc» rồi Enter thấy «Chưa hiểu «abc» — gõ như 4,65 tỷ hoặc 950 triệu» trong khung, cổng lưu 0 lần; Esc đóng khung, ô giữ giá cũ. Chiều đỏ: Enter ghi chữ chưa hiểu → «gia-chua-hieu-khong-ghi: 1 lần ghi»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.sua_tren_o
+    paths: [src/modules/listings/**]
+    expected: "exit 0; ca 'nguong-hoi-lai' đủ 6 ca viết trước: +20% và -20% không hỏi, +20,01% và -20,01% hỏi, chưa có giá không hỏi, cùng giá không hỏi. Chiều đỏ: pha-thu-nguong-bang đỏ với «nguong-hoi-lai: +20%»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4-e2e
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.sua_tren_o_e2e
+    paths: [src/modules/listings/ui/**, tests/e2e/sua-tren-o.spec.ts]
+    expected: "exit 0; ca 'hoi-lai-tai-o': giá 2,71 tỷ gõ «4ty65» rồi Enter thấy «Giá đổi +72% — đổi chứ?» và «2,71 tỷ → 4,65 tỷ» trong khung; Thôi không ghi, Đổi giá ghi một lần"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.sua_tren_o
+    paths: [src/modules/listings/**]
+    expected: "exit 0; ca 'bang-chuyen-36-o' duyệt 6 × 6 = 36 ô (in ra 36), đúng 12 ô cho phép theo bảng viết trước; ca 'dieu-kien-nac' Đã bán thiếu giá chốt hay ngày, Ngừng hẳn thiếu lý do thì statusNeeds không rỗng; ca 'hoan-tac-duoc' Đã bán, Ngừng hẳn không hoàn tác được. Chiều đỏ: pha-thu-mo-nac-cuoi đỏ với «bang-chuyen-36-o: Closed→Active»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5-e2e
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.sua_tren_o_e2e
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e/sua-tren-o.spec.ts]
+    expected: "exit 0; ca 'trang-thai-chi-nac-hop-le': ô Trạng thái của căn Đang bán chỉ đưa Đang giao dịch, Đã bán, Tạm ngừng, Ngừng hẳn; chọn Đã bán có Giá chốt điền sẵn giá chào và Ngày bán là hôm nay, xoá giá chốt rồi bấm Đổi trạng thái thấy «Còn thiếu giá chốt.» và cổng lưu 0 lần; khung nói «Đã bán là nấc cuối: không hoàn tác được.», ghi xong thông báo không có Hoàn tác; Ngừng hẳn thiếu lý do thì «Còn thiếu lý do ngừng.»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.sua_tren_o_e2e
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e/sua-tren-o.spec.ts]
+    expected: "exit 0; ca 'da-ban-khoa': trên căn Đã bán, F2, gõ và bấm đúp ở ô Giá chào và Trạng thái không mở khung; ô có ổ khoá và tên khả dụng nói lý do; căn Ngừng hẳn: ô Trạng thái khoá, ô Giá mở. Chiều đỏ: bỏ khoá theo dòng → «da-ban-khoa: Giá chào mở»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.sua_tren_o
+    paths: [src/components/candidate/use-change.tsx, src/components/candidate/use-change.test.tsx, src/components/templates/**]
+    expected: "exit 0; ca 'hoan-tac-qua-cong-luu' Hoàn tác gọi cổng lưu một lần với giá trị trước; ca 'hoan-tac-hong-bao-ro' với đúng khuôn lỗi của đường ghi thật — TypeError «Failed to fetch», navigator.onLine false, phản hồi status 403 — mỗi khuôn có thông báo đứng yên nêu căn và giá trị đang mang kèm «Thử lại» (ghim thông điệp «hoan-tac-hong-bao-ro: <khuôn>»), đối chứng dương: hoàn tác thành công thì không có thông báo lỗi; ca 'luu-hong-ve-cu' ô về giá trị cũ và thông báo nói vì sao; ca 'tu-choi-403-cau-rieng' câu «Không đủ quyền làm việc này. Tải lại trang để thấy đúng các nút.». Chiều đỏ: pha-thu-hoan-tac-im đỏ với «hoan-tac-hong-bao-ro»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7-ui
+    criterion: AC-7
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3487/inventory
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, src/components/templates/**]
+    steps:
+      - "With the lane H dev server on port 3487, sign in as the sample ListAgent (or the test session the e2e setup gives), open the target at 1440 and 1024 wide, light and dark"
+      - "Edit a Giá chào cell to «2,8 tỷ», press Enter, then switch the browser offline (Playwright context.setOffline(true)) and press «Hoàn tác» on the toast; save one frame as _acceptance/sua-tren-o/evidence/E7-<khổ>-<sang|toi>.png; wait ten seconds and save a second frame"
+    question: "Sau khi hoàn tác hỏng, thông báo có nói rõ chưa hoàn tác được, căn nào đang mang giá nào, và có nút Thử lại không; thông báo có còn sau mười giây không; ô có vẫn hiện giá mới (khớp lời báo) không?"
+    expected: "Thông báo đứng yên, nói đúng căn và giá đang mang, có Thử lại; ô khớp lời báo"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.sua_tren_o
+    paths: [src/components/candidate/**, src/modules/identity/**]
+    expected: "exit 0; ca 'mo-theo-quyen' với bốn vai: ListAgent, BuyerAgent, TeamLead mở khung ở ô Giá chào, CompanyAdmin không mở và ô không mang dấu sửa; ca 'khoa-theo-dong' ô khoá không mở. Chiều đỏ: pha-thu-bo-quyen đỏ với «mo-theo-quyen: CompanyAdmin»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8-e2e
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.sua_tren_o_e2e
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e/sua-tren-o.spec.ts]
+    expected: "exit 0; ca 'khong-quyen-chu-thuong' (vai CompanyAdmin, 1440) F2, gõ, bấm đúp không mở khung; ca 'dien-thoai-khong-sua' ở 360 và 414 với vai ListAgent không ô nào mở khung; ca 'cot-chi-doc' ở 1440 với vai ListAgent duyệt ma trận viết trước 8 cột × (F2, gõ, bấm đúp): đúng 2 cột (Giá chào, Trạng thái) mở khung, 6 cột không — ghim «cot-chi-doc: <cột> mở» khi lệch"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.sua_tren_o_e2e
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, tests/e2e/sua-tren-o.spec.ts, tests/e2e/sheet.spec.ts, tests/e2e/ho-so-can.spec.ts]
+    expected: "exit 0; ca 'phim-giu-nguyen': Enter trên ô Giá chào đang chọn mở hồ sơ căn (không mở khung); bấm mã căn mở hồ sơ; bấm lề ô chỉ chọn ô; Ctrl+C chép «2,71 tỷ»; trong khung Tab ghi rồi ô đang chọn là ô kế bên phải; Esc đóng khung, tiêu điểm ở ô vừa sửa, ArrowDown chọn ô dưới. Các bài 2a, 3 cũ (sheet.spec.ts, ho-so-can.spec.ts) vẫn xanh. Chiều đỏ: pha-thu-enter-sua đỏ với «enter-van-mo-ho-so»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.sua_tren_o_rao
+    paths: [tests/behavior-guard.test.ts]
+    expected: "exit 0; ca 'ts-doc-nhu-typescript': tệp mẫu tạm src/app/man/page.ts có `const x = <T>y;` trước `import { Dialog } from \"@/components/ui/dialog\"` thì bài rào đỏ gọi tên tệp và câu nhập; cùng câu trong page.tsx vẫn được đọc như TSX. Chiều đỏ: pha-thu-ts-thanh-tsx đỏ với «ts-doc-nhu-typescript: src/app/man/page.ts»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10b
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["**"]
+    expected: "exit 0 (make check xanh, gồm kiểm nhãn không viết cứng, ranh giới mô-đun, bộ kiểm nút theo quyền, ontology và tệp sinh)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10c
+    criterion: AC-10
+    executor: judgment
+    inputs:
+      - ontology/labels.yaml
+      - ontology/glossary.md
+      - _acceptance/sua-tren-o/decisions.jsonl
+    question: "Bảng nhãn có đủ nhãn cho trường lý do ngừng (Listing.withdrawnReason) và cho từng lý do mà chủ kho chốt ở Hỏi-2 (dòng stage gate1 trong decisions.jsonl; không có dòng ấy thì theo khuyến nghị của dòng Hỏi-2), mỗi nhãn tối đa 17 ký tự, và bảng thuật ngữ có ghi lý do ngừng là khái niệm riêng (RESO DD 2.1 không có trường ấy) không? Nêu nhãn nào thiếu hay quá dài."
+    expected: "PASS khi đủ nhãn theo Hỏi-2, mỗi nhãn ≤ 17 ký tự, và thuật ngữ ghi khái niệm riêng; FAIL nêu nhãn"
+    evidence_required: [run_id, verdict, verifier, verified_at]
+
+  - id: E11
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.sua_tren_o_e2e
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e/sua-tren-o.spec.ts]
+    expected: "exit 0; ca 'axe-sang-toi': khung sửa giá, khung trạng thái và hộp hỏi lại không có lỗi axe ở sáng và tối"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
