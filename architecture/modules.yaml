@@ -32,7 +32,7 @@ modules:
     depends_on: []
   - name: sharing
     description: Share links, the public customer page and redaction
-    owns: []
+    owns: [ShareLink]
     depends_on: []
   - name: imports
     description: Data import, including the AI-assisted planning call
