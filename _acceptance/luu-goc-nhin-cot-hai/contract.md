@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api]
 screens: [inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-12
 design_doc: _acceptance/luu-goc-nhin-cot-hai/design.md
@@ -126,3 +126,20 @@ chính các tiêu chí trên.
   — chủ kho soi».
 - Dữ liệu căn của Bảng hàng vẫn là dữ liệu mẫu; góc nhìn lưu trên máy chủ thật, nên bộ kiểm chạy trên Postgres của dãy K
   (`DB_LANE=k`, `DB_PORT=5564`).
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-13:
+  - Ngoài-1: Lời mô tả của góc nhìn trong mô hình nghiệp vụ vẫn nói có lưu chữ tìm, trong khi thực tế đã bỏ.
+  - Ngoài-2: Báo cáo gửi chủ kho không nêu rõ rằng lần này có đụng tới luật cách ly giữa các sàn, nên chủ kho có thể ký duyệt mà không biết cần soi kỹ chỗ ấy.
+  - Ngoài-4: Nhật ký thay đổi chưa ghi việc góc nhìn không còn lưu chữ tìm và bước chuyển dữ liệu đã bỏ chữ ấy khỏi các góc nhìn cũ.
+  - Ngoài-5: Ảnh chụp thanh công cụ trên điện thoại có thể không chứng minh cả hai nút lưu đều nằm trong khung nhìn.
+  - Ngoài-6: Một câu mô tả nội bộ vẫn nói góc nhìn giữ cả chữ trong ô tìm, trong khi sản phẩm thật đã bỏ.
+  - Ngoài-7: Cổng kiểm bằng chứng cho phép bỏ qua một bước với các khối cũ chỉ cần khai một dòng, nên có thể lọt một khối chưa có chứng từ thật.
+  - Ngoài-8: Mã kiểm quyền được xếp mức rủi ro thấp hơn đáng lẽ, nhưng lần thay đổi này vẫn tính là mức cao và cần chủ mã duyệt.
+  - Ngoài-9: Nhật ký chung chưa ghi việc góc nhìn bỏ chữ tìm kiếm theo phán quyết của chủ kho.
+  - Ngoài-10: Một người đăng nhập có thể lưu một góc nhìn rất lớn của riêng mình.
+  - Ngoài-11: Khi máy chủ lỗi tạm lúc mở một góc nhìn, người dùng bị báo là góc nhìn đã xoá và thấy mọi căn không lọc.
+  - Ngoài-12: Nếu góc nhìn đã bị xoá ở tab khác, bấm lưu báo kiểm tra mạng và Thử lại mãi không được.
+  - Ngoài-13: Một bài kiểm tự động chưa chứng minh được nó bắt được lỗi lưới giữ nguyên trạng thái khi bấm lại mục.
+  - Ngoài-14: Bài kiểm có thể xanh dù bộ đếm không thấy được yêu cầu xoá thật.
+  - Ngoài-15: Bài kiểm quyền có thể bỏ sót trường hợp bị từ chối mà vẫn ghi một góc nhìn.
+  - Ngoài-16: Bài kiểm không canh nút Toàn màn hình khi không còn dòng khớp, nên nếu nút ấy biến mất thì có thể không ai biết.
+  - SP-1: tệp phá thử của bộ kiểm cách ly tắt cách ly bắt buộc của bảng góc nhìn, chỉ trên cơ sở dữ liệu tạm, để chứng bộ kiểm báo đỏ đúng tên bảng.
