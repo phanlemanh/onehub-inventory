@@ -1,0 +1,47 @@
+{
+ "ban": "8ee15fdf20865e117d188e4fcb9769b2318e98e0",
+ "base": "f458f6d3dbbb80bfa0c1512fe202559cf45dddef",
+ "den": "d45297372416f6094cbc5639a69781417ffb12b6",
+ "sua_tep_luat": {
+  "may": [],
+  "nguoi": []
+ },
+ "cham": [
+  {
+   "ma": "SP-1",
+   "tep": "db/tests/pha-thu/vuot-luat.sql",
+   "dong": 2,
+   "chu": "alter role quy_hang_login bypassrls;"
+  },
+  {
+   "ma": "SP-1",
+   "tep": "db/tests/vai-dang-nhap.sql",
+   "dong": 32,
+   "chu": "  if r.rolbypassrls then"
+  },
+  {
+   "ma": "SP-1",
+   "tep": "db/tests/vai-dang-nhap.sql",
+   "dong": 64,
+   "chu": "      x.rolbypassrls or x.rolsuper desc,"
+  },
+  {
+   "ma": "SP-1",
+   "tep": "db/tests/vai-dang-nhap.sql",
+   "dong": 73,
+   "chu": "    if exists (select from pg_roles where rolname = v and (rolbypassrls or rolsuper)) then"
+  },
+  {
+   "ma": "SP-1",
+   "tep": "src/modules/identity/with-company.ts",
+   "dong": 37,
+   "chu": "  (select 'vượt được luật theo dòng' from pg_roles where rolname = session_user and rolbypassrls),"
+  },
+  {
+   "ma": "SP-1",
+   "tep": "src/modules/identity/with-company.ts",
+   "dong": 39,
+   "chu": "   where (x.rolbypassrls or x.rolsuper) and pg_has_role(session_user, x.oid, 'MEMBER')"
+  }
+ ]
+}
