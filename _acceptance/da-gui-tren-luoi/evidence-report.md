@@ -6,7 +6,7 @@ failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 309d08c6bc5f48d81e9b4f107b9cd326efc809a4
+verified_commit: 19fedbbf774450fa0fc9333f92d09a18b8a0a7fe
 human_signoff: Manh Phan 2026-11-13
 ---
 
@@ -217,3 +217,7 @@ Round 2: mọi eval máy xanh; E3, E4, E6, E7, E8, E9, E12 carry-forward từ ro
 ### Re-pin lần 1 — 2026-11-13, do gộp main có hàng 7c sau chữ ký
 run_id: repin-20261113T091847Z-78527
 sha: 309d08c6bc5f48d81e9b4f107b9cd326efc809a4 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E14, E15 (E15 không khai paths) · AC không có chốt máy: AC-10
+
+### Re-pin lần 2 — 2026-11-13, do gộp main có hàng 3f trước khi gộp
+run_id: repin-20261113T102311Z-64137
+sha: 19fedbbf774450fa0fc9333f92d09a18b8a0a7fe · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E14, E15 (E15 không khai paths) · AC không có chốt máy: AC-10
