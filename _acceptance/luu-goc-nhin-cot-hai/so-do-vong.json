@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "slug": "luu-goc-nhin-cot-hai",
+  "ghi_luc": "2026-11-13T03:35:01Z",
+  "vong_cham": 2,
+  "luot": [
+    {
+      "vong": 1,
+      "verdict": "REJECT",
+      "tang": []
+    },
+    {
+      "vong": 2,
+      "verdict": "PASS",
+      "tang": []
+    }
+  ],
+  "lam_lai": [
+    {
+      "nguon": "repin-do:repin-20261113T032554Z-42366",
+      "tang": "bai-kiem-ha-tang"
+    }
+  ],
+  "theo_tang": {
+    "bai-kiem-ha-tang": 1,
+    "trang-thai-hanh-vi": 0,
+    "du-lieu-api": 0,
+    "nghiep-vu": 0,
+    "thanh-phan": 0,
+    "bo-cuc": 0,
+    "hop-dong-yeu-cau": 0,
+    "link": 0,
+    "chu-dinh-dang": 0,
+    "mau-token": 0,
+    "truy-cap": 0
+  },
+  "chua_phan": [
+    "r1"
+  ],
+  "thuoc_vat": {
+    "vat": [
+      162,
+      77
+    ],
+    "thuoc": [
+      5,
+      2
+    ],
+    "nhat": 0
+  },
+  "gio_may": null
+}
