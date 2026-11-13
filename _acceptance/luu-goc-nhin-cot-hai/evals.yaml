@@ -85,7 +85,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/modules/listings/**, src/components/templates/**, tests/saved-view-name.test.ts, tests/second-column-views.test.tsx]
-    expected: "exit 0; tests/saved-view-name.test.ts: hàm kiểm tên (một hàm, dùng ở cả giao diện và máy chủ) trên ma trận viết trước 7 ca — '' , '   ', 41 ký tự, trùng 'Toà S1' với 'toà s1', trùng tên của người khác (được), 40 ký tự (được), tên có dấu tiếng Việt (được) — hằng 7, mỗi ca so lỗi trả về với lỗi viết trước; tests/second-column-views.test.tsx: hộp đặt tên với tên trống không đóng và hiện câu dưới ô; lưu hỏng (fetch trả 500) giữ chữ đã gõ, hiện câu lỗi và nút 'Thử lại'; 403 hiện câu 'không đủ quyền' của khuôn 9e; trạng thái danh sách rỗng hiện câu gợi ý; đang đọc hiện khung dòng; ca phá cho hộp đóng khi lưu hỏng và khẳng định 'typed name lost on failed save'"
+    expected: "exit 0; tests/saved-view-name.test.ts: hàm kiểm tên (một hàm, dùng ở cả giao diện và máy chủ) trên ma trận viết trước 7 ca — '' , '   ', 41 ký tự, trùng 'Toà S1' với 'toà s1', trùng tên của người khác (được), 40 ký tự (được), tên có dấu tiếng Việt (được) — hằng 7, mỗi ca so lỗi trả về với lỗi viết trước; tests/second-column-views.test.tsx: hộp đặt tên với tên trống không đóng và hiện câu dưới ô; lưu hỏng (fetch trả 500) giữ chữ đã gõ, hiện câu lỗi và nút 'Thử lại'; 403 hiện câu 'không đủ quyền' của khuôn 9e; trạng thái danh sách rỗng hiện câu gợi ý; nhóm có đủ mục ngay trong bản vẽ của máy chủ ở cột máy tính và ngăn điện thoại (không có trạng thái đang đọc — sửa sau Cổng Phạm vi, giám sát K-1311-1); góc nhìn không đọc được thì nhóm nói rõ và App Shell vẫn dùng được; ca phá cho hộp đóng khi lưu hỏng và khẳng định 'typed name lost on failed save'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E11
@@ -134,9 +134,9 @@ evals:
   - id: E16
     criterion: AC-6
     executor: script
-    cmd: config:executors.script.e2e
-    paths: [src/components/templates/**, src/components/candidate/**, "src/app/(app)/inventory/**", tests/e2e/**]
-    expected: "exit 0; bài axe của tests/e2e có màn Bảng hàng ở hai trạng thái mới (cột thứ hai có góc nhìn, «…» mở; hộp xác nhận xoá mở) ở sáng và tối: 0 vi phạm; ca phá bỏ aria-label của «…» và khẳng định axe báo 'button-name'"
+    cmd: config:executors.script.goc_nhin_e2e
+    paths: [src/components/templates/**, src/components/candidate/**, "src/app/(app)/inventory/**", tests/e2e-db/goc-nhin.spec.ts]
+    expected: "exit 0; bài axe của tests/e2e-db/goc-nhin.spec.ts (sửa sau Cổng Phạm vi, giám sát K-1311-2: nhóm góc nhìn chỉ hiện khi có phiên và Postgres) có màn Bảng hàng ở hai trạng thái mới (cột thứ hai có góc nhìn, «…» mở; hộp xác nhận xoá mở) ở sáng và tối, mỗi ca khẳng định thứ cần đo đang hiện trước khi quét: 0 vi phạm; ca phá bỏ aria-label của «…» và khẳng định axe báo 'button-name'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E17

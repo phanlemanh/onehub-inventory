@@ -92,3 +92,19 @@ khoi:
     mo_ta: Đầu hồ sơ có một nút chính (thường là Sửa) và «…» của các việc còn lại, theo bảng quyền
     ho_so: bo-nut-theo-quyen
     duyet: 2026-11-12
+  - ten: FormDialog
+    tep: src/components/candidate/form-dialog.tsx
+    nguon: tao-tay
+    nhu_cau: hop-bieu-mau
+    mo_ta: Một hộp hỏi vài trường (tiêu đề, một câu nói việc sẽ xảy ra, các trường, «Thôi» và nút gửi), giữ chữ đã gõ khi gửi hỏng
+    ho_so: moi-nguoi-gan-vai
+    duyet: 2026-11-11
+# Blocks made before this ledger existed, each named with the round that made it, the commit that created it and the
+# day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
+# still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).
+khoi_co_truoc:
+  - ten: FormDialog
+    ho_so: moi-nguoi-gan-vai
+    commit: fd5ebee
+    ngay: 2026-11-11
+    vi_sao: Hộp biểu mẫu dùng chung do hàng 9 tạo trước luật sổ khối; hàng 2c bù dòng sổ, hồ sơ đã ký của hàng 9 giữ nguyên.
