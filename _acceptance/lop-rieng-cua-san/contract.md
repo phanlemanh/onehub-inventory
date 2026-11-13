@@ -6,9 +6,9 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config, ui]
 screens: [inventory, tuy-chinh-san]
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-13
 design_doc: docs/superpowers/specs/2026-11-13-lop-rieng-cua-san-design.md
 ---
 
