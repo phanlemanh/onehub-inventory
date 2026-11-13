@@ -30,7 +30,7 @@ Source input: hàng `3e` của lộ trình, ô `_acceptance/hoi-dau-chu-bao-sai/
 
 ## Criteria
 
-- AC-1 (theo khuyến nghị Hỏi-5; chủ kho chọn đầu hồ sơ thì AC-1 đổi thành nút chính ở đầu hồ sơ trước khi dựng): Given hồ sơ
+- AC-1 (theo khuyến nghị của câu hỏi chỗ đặt nút hỏi; chủ kho chọn đầu hồ sơ thì AC-1 đổi thành nút chính ở đầu hồ sơ trước khi dựng): Given hồ sơ
   một căn do người khác giữ đang mở, người xem có quyền xem hàng, When nhìn đáy hồ sơ ở bốn khổ, Then có
   một thanh dính đáy (không cuộn theo thân) với một nút «Hỏi đầu chủ · <tên người giữ>»; ở 414 và 360 nút cao ít nhất 44 px
   và rộng hết hồ sơ toàn màn; thanh không che dòng cuối của thân khi cuộn hết.
@@ -92,5 +92,5 @@ trình.
 - Không chỗ nhận báo sai trên máy chủ, không ghi nhật ký «đã hỏi», không thông báo trong ứng dụng (sổ quyết định, descope).
 - Không dữ liệu người giữ căn thật (hàng 10); không đổi thực thể Listing.
 - Không nút «Ghi cuộc gọi» ở đáy hồ sơ (hàng 14); thanh đáy của hàng này để chỗ cho nó nhưng không dựng.
-- Không báo sai giá, trạng thái, ngày xác nhận (dữ liệu riêng của sàn, người giữ căn sửa) — Hỏi-3.
+- Không báo sai giá, trạng thái, ngày xác nhận (dữ liệu riêng của sàn, người giữ căn sửa) — câu hỏi các thuộc tính báo sai.
 - Không thêm dòng bảng quyền; không chạm mô-đun sharing (hàng 6 giữ).

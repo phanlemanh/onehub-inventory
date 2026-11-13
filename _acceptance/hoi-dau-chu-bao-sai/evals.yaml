@@ -109,7 +109,7 @@ evals:
     criterion: AC-9
     executor: judgment
     inputs: [_acceptance/hoi-dau-chu-bao-sai/design.md, _acceptance/hoi-dau-chu-bao-sai/contract.md, ontology/labels.yaml]
-    question: "Theo design.md và contract.md, hai nhãn mới AskListAgent và ReportUnitError trong ontology/labels.yaml có đúng chữ đã duyệt (Hỏi-1), có kind action, own: true, không quá 17 ký tự, và không dùng lại tên RESO cho nghĩa khác không?"
+    question: "Theo design.md và contract.md, hai nhãn mới AskListAgent và ReportUnitError trong ontology/labels.yaml có đúng chữ đã duyệt ở câu hỏi chữ nút báo sai, có kind action, own: true, không quá 17 ký tự, và không dùng lại tên RESO cho nghĩa khác không?"
     evidence_required: [verdict, reasons]
 
   - id: E10

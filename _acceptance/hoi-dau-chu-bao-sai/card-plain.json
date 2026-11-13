@@ -1,0 +1,36 @@
+{
+  "feature_plain": "Người xem một căn mình không giữ hỏi được người giữ căn ngay trên hồ sơ, và báo được một thuộc tính căn sai — máy chỉ soạn sẵn tin và mở bảng chia sẻ của điện thoại hay máy tính, người tự bấm gửi.",
+  "will_do": [
+    {"id":"AC-1","p":"Sẽ có một nút «Hỏi đầu chủ · tên người giữ» dính ở đáy hồ sơ căn, không trôi khi cuộn; trên điện thoại nút to đủ ngón cái (theo lựa chọn chỗ đặt ở câu hỏi bên dưới)."},
+    {"id":"AC-2","p":"Sẽ mở bảng chia sẻ của máy với tin «Hỏi về căn … · Toà …» kèm đường dẫn mở đúng hồ sơ căn ấy; người huỷ thì không có thông báo nào."},
+    {"id":"AC-3","p":"Sẽ chép tin vào bộ nhớ tạm và báo «Đã chép tin hỏi» khi máy không có bảng chia sẻ; chép cũng hỏng thì hiện nguyên tin để chép tay, thông báo ở lại tới khi người đóng."},
+    {"id":"AC-4","p":"Sẽ tắt nút và ghi «Căn chưa có đầu chủ giữ» với căn chưa ai giữ."},
+    {"id":"AC-5","p":"Sẽ không hiện nút hỏi cho chính người giữ căn, hay cho Quản trị sàn (không có quyền xem hàng)."},
+    {"id":"AC-6","p":"Sẽ có nút «Báo sai thông tin» ở mục thuộc tính: chọn một trong năm thuộc tính danh mục, thấy giá trị đang hiện, gõ giá trị đúng và căn cứ; ô giá trị đúng trống thì báo ngay tại ô."},
+    {"id":"AC-7","p":"Sẽ soạn tin báo sai đủ các dòng (căn, toà, dự án, thuộc tính, đang hiện, đúng là, ghi chú) rồi đi cùng đường bảng chia sẻ hay chép như nút hỏi."},
+    {"id":"AC-9","p":"Sẽ đọc rõ ở bốn khổ màn, sáng và tối, quét trợ năng không lỗi nặng; chữ hai nút lấy từ bảng nhãn, không quá 17 ký tự."}
+  ],
+  "wont_do": [
+    {"id":"AC-8","p":"Sẽ KHÔNG gửi gì qua mạng, không ghi gì vào dữ liệu căn, không có đường gửi nào ngoài bảng chia sẻ của máy và bộ nhớ tạm; hai nút chỉ hiện theo bảng quyền."},
+    {"id":"OOS-1","p":"Chưa có chỗ nhận báo sai trên máy chủ, chưa đếm số lần hỏi, chưa thông báo trong ứng dụng."},
+    {"id":"OOS-2","p":"Người giữ căn là dữ liệu mẫu; dữ liệu thật đến ở hàng 10."},
+    {"id":"OOS-3","p":"Chưa có nút «Ghi cuộc gọi» ở đáy hồ sơ (hàng 14)."},
+    {"id":"OOS-4","p":"Không báo sai giá, trạng thái, ngày xác nhận — người giữ căn tự sửa (câu hỏi thuộc tính báo sai)."},
+    {"id":"OOS-5","p":"Không thêm dòng bảng quyền, không đụng phần gửi link cho khách (hàng 6)."}
+  ],
+  "coverage_plain": [
+    {"i":0,"p":"Người xem: không giữ căn thấy nút, người giữ căn và Quản trị sàn không thấy, ngoài khung nội bộ không nút nào (AC-1, AC-5, AC-8)."},
+    {"i":1,"p":"Căn có người giữ thì hỏi được, căn chưa ai giữ thì nút tắt kèm lý do (AC-1, AC-4)."},
+    {"i":2,"p":"Máy có bảng chia sẻ, chỉ chép được, hay không cả hai; người gửi, huỷ, máy từ chối, chép hỏng — mỗi ô một phép đo (AC-2, AC-3, AC-7)."},
+    {"i":3,"p":"Bốn khổ màn, sáng và tối, có ảnh và quét trợ năng (AC-1, AC-9)."},
+    {"i":4,"p":"Nút hỏi và hộp báo sai: năm thuộc tính, ô trống, ô chạm trần ký tự (AC-6)."}
+  ],
+  "gap_probe_plain": [
+    {"i":0,"p":"Chỗ đặt thanh dính đáy chưa được ai duyệt và việc sửa khung hồ sơ dùng chung còn chờ — đã xử: giám sát mở tệp có điều kiện, chỗ đặt thành một câu hỏi cho anh kèm ảnh hai lối."},
+    {"i":1,"p":"Câu hỏi về các thuộc tính báo sai dùng chữ «Khu» trong khi bản dựng dùng «Dự án» — đã sửa câu hỏi theo bảng nhãn."},
+    {"i":2,"p":"Phép đo báo sai chưa chắc bảng chia sẻ được gọi ngay trong cú bấm (điện thoại thật sẽ từ chối) — đã thêm phép đo thứ tự và ca phá thử."},
+    {"i":3,"p":"Lỗi chép chưa có ảnh và thông báo lỗi có thể tự tắt trước khi người kịp chép tay — đã thêm ảnh và đòi thông báo ở lại tới khi người đóng."},
+    {"i":4,"p":"Quét trợ năng mới hứa bốn khổ mà chỉ đo hai — đã nâng lên đủ bốn khổ, sáng tối, hai bề mặt."}
+  ],
+  "scope_plain": "Năm việc dưới đây cố ý để ngoài hàng này:"
+}
