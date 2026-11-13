@@ -24,6 +24,8 @@ export const RECORD_PARAM = "ho-so";
 export interface RecordView {
   title: string;
   body: ReactNode;
+  /** The record's actions, usually a RecordActions (row 9e): at the head, before «Trước», «Sau» and «Đóng». */
+  actions?: ReactNode;
 }
 
 /** The selector of the button that opened a record, so focus can go back to the row it came from. */
@@ -72,8 +74,10 @@ function PanelHeader({
   next,
   onNavigate,
   close,
+  actions,
 }: {
   title: ReactNode;
+  actions?: ReactNode;
   previous: string | undefined;
   next: string | undefined;
   onNavigate: (id: string | null) => void;
@@ -84,6 +88,7 @@ function PanelHeader({
       {title}
       {/* «Trước», «Sau», «Đóng» always sit top right, on every width and theme; a long name wraps instead. */}
       <div className="ml-auto flex shrink-0 items-center gap-1">
+        {actions}
         <Button
           variant="outline"
           size="sm"
@@ -195,6 +200,7 @@ export function RecordPanel({
             previous={previous}
             next={next}
             onNavigate={onNavigate}
+            actions={view?.actions}
             close={
               <Dialog.Close render={<Button variant="ghost" size="sm" />}>
                 <XIcon aria-hidden="true" />
@@ -328,6 +334,7 @@ function RecordColumn({
             previous={previous}
             next={next}
             onNavigate={onNavigate}
+            actions={view?.actions}
             close={
               <Button variant="ghost" size="sm" onClick={() => onNavigate(null)}>
                 <XIcon aria-hidden="true" />

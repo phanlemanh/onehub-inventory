@@ -1,0 +1,89 @@
+schema_version: 1
+feature_slug: cach-ly-dang-xem-chi-ghi
+# Ma trận viết trước.
+#   Bộ chạy cách ly (db/scripts/cach-ly.sh) sau hàng 7b: 31 ca, mỗi ca in «ok <ca>» đúng một lần ở bản lành.
+#     29 ca của hàng 7 và 7a giữ nguyên tên và dòng ghim.
+#     1 ca SQL mới (db/tests/cach-ly.sql, ca 20): dang-xem-ghi-khong-vuot-luat
+#       quyền xét: INSERT (bất kỳ cột) · UPDATE (bất kỳ cột) · DELETE, trên relkind 'v', mọi schema không phải hệ thống.
+#       đối chứng dương trong ca: dạng xem security_invoker cấp INSERT, UPDATE(một cột), DELETE cho vai → đếm 1, không nêu.
+#     1 ca phá mới, ca → tệp → dòng ghim (mỗi tệp không cấp SELECT, nên ca 18 vẫn in ok trên bản phá):
+#       pha-thu-dang-xem-chi-ghi:
+#         dang-xem-chi-xoa → «HỎNG dang-xem-ghi-khong-vuot-luat: public.agreements_xoa DELETE»
+#         dang-xem-chi-sua-cot → «HỎNG dang-xem-ghi-khong-vuot-luat: public.agreements_sua_ben UPDATE» (cấp cho PUBLIC)
+#         dang-xem-chi-them-schema-khac → «HỎNG dang-xem-ghi-khong-vuot-luat: kho_xem.agreements_them INSERT»
+#     Dòng tổng của bản lành: «cach-ly: 31 ca đạt, vai quy_hang_app».
+#   Mốc «không nới»: bộ chạy ở commit d85d815 (git show) — 29 tên ca, 18 dòng ghim; bài kiểm khẳng định đủ số rồi tìm
+#     từng chuỗi nguyên văn trong bộ chạy mới.
+#   Ca phá của bài kiểm cơ sở dữ liệu (AC-3): cùng một bản sao dựng từ tệp phá dang-xem-chi-xoa + hai sàn mỗi sàn một
+#     thoả thuận: dạng xem thường → vai chủ đếm thoả thuận của B 1 → 0; đổi dạng xem sang security_invoker → vẫn 1.
+#   Việc kèm hàng 9 (AC-6): app.member_invite gọi thẳng dưới quy_hang_app, phiên của Đầu chủ (ListAgent) ở sàn mình:
+#     bản lành → lỗi, số thành viên không đổi; bản phá moi-khong-kiem-quan-tri (thân hàm của 006 bỏ phép kiểm quyền) →
+#     thêm được người → thông điệp ghim «ba-vai-khong-quan-tri: cơ sở dữ liệu cho Đầu chủ mời người».
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.cach_ly_c
+    layer: backend-effect
+    paths: [db/migrations/**, db/tests/**, db/scripts/**]
+    expected: "exit 0; bộ chạy in đúng một lần dòng bắt đầu 'ok dang-xem-ghi-khong-vuot-luat — ' và kết thúc ', đối chứng 1' trên bản lành; con số đối chứng là số dạng xem ghi được mà ca đếm khi có dạng xem security_invoker cấp thêm, sửa một cột, xoá cho vai (trong giao dịch rút lại) — khác 1 thì ca tự ném HỎNG; dạng xem ấy không bị nêu. Chiều đỏ cùng ca: xem E2"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.cach_ly_c
+    layer: backend-effect
+    paths: [db/migrations/**, db/tests/**, db/scripts/**]
+    expected: "exit 0; bộ chạy in 'ok pha-thu-dang-xem-chi-ghi'; trong dòng '[pha-thu <tệp>]' của từng tệp phá: dang-xem-chi-xoa có 'HỎNG dang-xem-ghi-khong-vuot-luat: public.agreements_xoa DELETE', dang-xem-chi-sua-cot có 'HỎNG dang-xem-ghi-khong-vuot-luat: public.agreements_sua_ben UPDATE', dang-xem-chi-them-schema-khac có 'HỎNG dang-xem-ghi-khong-vuot-luat: kho_xem.agreements_them INSERT'; và cả ba tệp đều có 'ok dang-xem-khong-vuot-luat' (ca 18 của hàng 7a xanh trên bản phá)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.cach_ly_c
+    layer: backend-effect
+    paths: [db/tests/**, tests/db/cach-ly.db.test.ts, tests/db/helpers.ts]
+    expected: "exit 0; ca 'pha-thu dạng xem chỉ xoá: sàn A xoá được thoả thuận của sàn B' xanh: trên bản sao từ tệp phá dang-xem-chi-xoa, dưới vai quy_hang_app với sàn A bằng câu dat_san của cửa, delete qua public.agreements_xoa, vai chủ đếm thoả thuận của B từ 1 xuống 0; cùng bản sao sau 'alter view … set (security_invoker = true)' cùng lệnh ném đúng 'permission denied for table agreements' và vai chủ đếm B vẫn 1"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.cach_ly_c
+    paths: [db/tests/**, db/scripts/**, tests/db/cach-ly.db.test.ts]
+    expected: "exit 0; bộ chạy in dòng cuối 'cach-ly: 31 ca đạt, vai quy_hang_app'; bài kiểm bộ chạy: bản sao chưa đổi đạt 31 ca; bản sao thay dang-xem-chi-xoa.sql bằng 'select 1;' (cùng ba chỗ hỏng cũ của hàng 7a) thoát khác 0 và các dòng 'HỎNG pha-thu-' gồm đúng 'HỎNG pha-thu-dang-xem-chi-ghi: dang-xem-chi-xoa: bộ kiểm vẫn xanh trên bản phá'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.cach_ly_c
+    paths: [db/tests/**, db/scripts/**, tests/db/cach-ly.db.test.ts]
+    expected: "exit 0; bộ chạy in 'ok <ca>' đúng một lần cho cả 29 ca của hàng 7 và 7a (danh sách CA_SQL, CA_LENH cũ); bài kiểm 'bộ chạy giữ nguyên ca và dòng ghim cũ' xanh — đọc bộ chạy ở commit d85d815 bằng git show, rút 29 tên ca (CA_SQL, CA_LENH) và 18 dòng ghim (pha_thu_ghim), khẳng định đủ 29 và 18, rồi khẳng định mỗi chuỗi có nguyên văn trong db/scripts/cach-ly.sh hiện tại; chiều đỏ cùng bài: một bản sao bộ chạy sửa một chữ trong dòng ghim của dang-xem-thuong thì bài nêu đúng dòng ấy"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.cach_ly_7b_db_c
+    layer: backend-effect
+    paths: [db/migrations/**, tests/db/moi-nguoi.db.test.ts, tests/db/pha-thu/moi-khong-kiem-quan-tri.sql]
+    expected: "exit 0; ca 'pha-thu-moi-khong-kiem-quan-tri' của tests/db/moi-nguoi.db.test.ts chạy (không bị bỏ qua) và xanh: bản lành — app.member_invite gọi dưới quy_hang_app với phiên của Đầu chủ ném lỗi, số thành viên của sàn không đổi; bản phá — cùng lời gọi thêm được người và phép kiểm ném đúng 'ba-vai-khong-quan-tri: cơ sở dữ liệu cho Đầu chủ mời người'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.cach_ly_7b_db_c
+    paths: [db/**, tests/db/**, src/modules/identity/**]
+    expected: "exit 0; vitest in 'Test Files  <n> passed (<n>)' cho mọi tệp tests/db/*.db.test.ts và không có ca 'skipped'; lệnh không mang bộ lọc -t"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["**"]
+    expected: "exit 0 — lint, format, typecheck, unit test, ontology, ranh giới mô-đun xanh"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

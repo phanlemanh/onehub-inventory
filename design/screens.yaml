@@ -42,6 +42,12 @@ screens:
     family: null
     audience: dev
     status: built
+  - id: proto-bo-nut
+    route: /proto/bo-nut-theo-quyen
+    title: null
+    family: null
+    audience: dev
+    status: built
   - id: proto-loi-vao
     route: /proto/loi-vao-ho-so
     title: null

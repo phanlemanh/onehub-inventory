@@ -78,3 +78,17 @@ khoi:
     mo_ta: Một vùng chiếm cả màn hình, App Shell và đầu màn ẩn đi, như toàn màn hình của Sheet
     ho_so: bang-hang-dung-tay-nhu-sheet
     duyet: 2026-11-12
+  - ten: RowActions
+    tep: src/components/candidate/row-actions.tsx
+    nguon: tao-tay
+    nhu_cau: viec-tren-dong
+    mo_ta: Một nút «…» cuối dòng giữ các việc trên một bản ghi theo bảng quyền, việc xoá sau cùng và qua hộp xác nhận
+    ho_so: bo-nut-theo-quyen
+    duyet: 2026-11-12
+  - ten: RecordActions
+    tep: src/components/candidate/row-actions.tsx
+    nguon: tao-tay
+    nhu_cau: viec-trong-ho-so
+    mo_ta: Đầu hồ sơ có một nút chính (thường là Sửa) và «…» của các việc còn lại, theo bảng quyền
+    ho_so: bo-nut-theo-quyen
+    duyet: 2026-11-12

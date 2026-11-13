@@ -1,0 +1,16 @@
+{
+  "feature_plain": "Ở vai nào, người dùng cũng thấy nút thêm, sửa, xoá đặt cùng một chỗ trên mọi màn, và chỉ thấy những nút bảng quyền cho mình dùng.",
+  "decisions": [
+    {
+      "id": "E1",
+      "q": "Mục «Bộ nút theo quyền» trong sổ thiết kế có đúng các lựa chọn của anh không?",
+      "why": "Hội đồng ba người chấm thấy đủ bốn chỗ đặt nút cho máy tính và điện thoại, thứ tự trong «…», và luật nút không quyền. Chỉ thiếu một ý nhỏ: «Ngừng bán là đổi trạng thái qua Sửa»."
+    },
+    {
+      "id": "E13",
+      "q": "Bốn ảnh câu «Không đủ quyền» có đọc rõ, tách khỏi câu lỗi chung không?",
+      "why": "Hội đồng thấy cả bốn ảnh (hộp mời và hộp đổi vai, máy tính và điện thoại, sáng và tối) đều có câu riêng chữ đỏ, đọc rõ."
+    }
+  ],
+  "analyst_plain": ""
+}

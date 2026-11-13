@@ -29,3 +29,5 @@ nối bằng `", "` trong một chuỗi, vì ontology chưa có kiểu danh sác
 Thêm `phones` cùng dữ liệu mẫu Ocean Park, 11/11/2026 (hàng lộ trình 1, `_acceptance/du-lieu-mau/`).
 
 Lấy từ từ vựng của Quỹ hàng khi dựng kho, 09/11/2026. Bỏ luật giữ thông tin chủ nhà trong công ty cho MVP, xem [0014](../decisions/0014-mvp-product-rules.md).
+
+Hàng 9e, 12/11/2026: bảng quyền có sáu dòng nháp cho liên hệ (xem, thêm, sửa, xoá, gộp, xoá tên và số theo yêu cầu), ô theo thông lệ CRM; chưa có cửa nào (hồ sơ `_acceptance/bo-nut-theo-quyen/`, sửa đổi của [0016](../decisions/0016-permission-model.md)).

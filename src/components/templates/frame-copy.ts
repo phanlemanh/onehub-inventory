@@ -17,6 +17,11 @@ export const FRAME_COPY = {
     title: (verb: string) => `Bạn chắc muốn ${verb.toLocaleLowerCase("vi")}?`,
     note: "Bạn đọc kỹ việc sẽ xảy ra dưới đây trước khi bấm.",
   },
+  /**
+   * The server refused an action the person pressed (403: the permission table or their roles changed since the page
+   * loaded). Apart from the general error, and the page refreshes its buttons when the dialog closes (row 9e).
+   */
+  refusedAction: "Không đủ quyền làm việc này. Tải lại trang để thấy đúng các nút.",
   signInAgain: `${LABELS.SignIn.pref} lại`,
   goHome: "Về trang đầu",
   theme: {
