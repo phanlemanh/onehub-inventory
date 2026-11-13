@@ -102,7 +102,7 @@ function ShapeA({ part }: { part: Part }) {
   );
 }
 
-const SHOWN = 5;
+const SHOWN = 3;
 
 /** Only a state that differs between rows gets a badge: every listed label, field or entry is in use. */
 function StateBadge({ state }: { state: LayerItem["state"] }) {

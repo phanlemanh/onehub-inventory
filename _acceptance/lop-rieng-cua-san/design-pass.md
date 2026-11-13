@@ -9,7 +9,7 @@ reaction: nac-1 (anh-gui-kem-the)
 options: _acceptance/lop-rieng-cua-san/cong-pham-vi.html (trang cổng, hai lối so ngang) · ảnh ở cong/ · khối gốc ở evidence/reui/
 divergence: opened
 ds_skill: inventory-ui
-states: [a-truong, b-truong, b-dau-trang, a-can-cho, bang-hang, bang-hang-cuon-phai, a-mau-2c]
+states: [a-truong, b-dau-trang, b-ca-trang, a-can-cho, bang-hang, bang-hang-cuon-phai, a-mau-2c]
 breakpoints: [mobile-360, desktop-1440]
 themes: [light]
 patched: 6
@@ -37,10 +37,10 @@ giống A.
 | a-mau-2c | 1440 | light | cong/a-mau-2c-1440-sang.png |
 | a-truong | 1440 | light | cong/a-truong-1440-sang.png |
 | a-truong | 360 | light | cong/a-truong-360-sang.png |
+| b-ca-trang | 1440 | light | cong/b-ca-trang-1440-sang.png |
+| b-ca-trang | 360 | light | cong/b-ca-trang-360-sang.png |
 | b-dau-trang | 1440 | light | cong/b-dau-trang-1440-sang.png |
 | b-dau-trang | 360 | light | cong/b-dau-trang-360-sang.png |
-| b-truong | 1440 | light | cong/b-truong-1440-sang.png |
-| b-truong | 360 | light | cong/b-truong-360-sang.png |
 | bang-hang | 1440 | light | cong/bang-hang-1440-sang.png |
 | bang-hang-cuon-phai | 1440 | light | cong/bang-hang-cuon-phai-1440-sang.png |
 
@@ -48,4 +48,6 @@ giống A.
 
 - Đã sửa sáu lỗi của lần trình đầu: A không ở cột thứ hai; B, C không giống khối; ảnh không cùng điều kiện; bảng ba dòng
   trong khung cao hết màn; ảnh chưa đăng nhập, có dải «Bản mẫu» và ô tìm đã bỏ; danh sách năm phần căn giữa.
+- Sửa sau lần soát của giám sát: hai ảnh Bảng hàng từng trùng ảnh lối A (cookie chọn dáng không đổi), nay chụp đúng và cắt
+  đúng vùng Bảng hàng; B chụp từ đầu trang, mỗi phần ba dòng như khối gốc, thêm ảnh cả trang.
 - Ảnh tối và trạng thái (rỗng, lỗi, chỉ đọc) để sau khi anh chọn lối.
