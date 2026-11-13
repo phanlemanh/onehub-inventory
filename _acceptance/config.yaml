@@ -10,6 +10,7 @@ executors:
     mot_cua: "npx vitest run src/modules/identity/one-door.test.ts --coverage.enabled=false --reporter=verbose"   # row 7a: one query door scan, rule 3 (no role or company switch outside the door)
     danh_muc: "npx vitest run src/modules/catalog tests/danh-muc-chuyen-mau.test.ts --coverage.enabled=false --reporter=verbose"   # danh-muc-can-nhu-onehub-invest (row 7d): code reader, keys, sample move
     vai_dang_nhap_unit: "npx vitest run src/modules/identity/with-company.test.ts tests/vai-dang-nhap-nguon.test.ts --coverage.enabled=false --reporter=verbose"   # ung-dung-noi-bang-vai-khong-chu (row 7c): door checks its login role, source scan of test connection strings, .env.example add-only
+    lop_rieng_unit: "npx vitest run src/modules/company-config tests/lop-rieng-ontology.test.ts src/components/candidate/column-kind.test.ts --coverage.enabled=false --reporter=verbose"   # lop-rieng-cua-san (row 7e): custom values, custom columns, ontology fence
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
@@ -53,6 +54,9 @@ executors:
     goc_nhin_db: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx vitest run -c vitest.db.config.ts tests/db/goc-nhin.db.test.ts --reporter=verbose"   # luu-goc-nhin-cot-hai (row 2c): saved views at API and database, lane K Postgres
     goc_nhin_e2e: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx playwright test -c playwright.db.config.ts tests/e2e-db/goc-nhin.spec.ts"   # luu-goc-nhin-cot-hai (row 2c): save, open, rename, remove a saved view in the browser, lane K Postgres
     cach_ly_k: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} bash db/scripts/cach-ly.sh"   # luu-goc-nhin-cot-hai (row 2c): isolation suite with the saved_view table, lane K Postgres
+    lop_rieng_db: "DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} npx vitest run -c vitest.db.config.ts tests/db/lop-rieng.db.test.ts --reporter=verbose"   # lop-rieng-cua-san (row 7e): company layer at API and database, lane R Postgres
+    lop_rieng_e2e: "DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} npx playwright test -c playwright.db.config.ts tests/e2e-db/lop-rieng.spec.ts"   # lop-rieng-cua-san (row 7e): inventory words and the review screen in the browser, lane R Postgres
+    cach_ly_r: "DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} bash db/scripts/cach-ly.sh"   # lop-rieng-cua-san (row 7e): isolation suite with the five company-layer tables, lane R Postgres
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists
