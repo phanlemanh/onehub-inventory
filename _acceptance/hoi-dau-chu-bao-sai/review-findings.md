@@ -1,56 +1,110 @@
-# Review findings: hoi-dau-chu-bao-sai (round 3)
+# Review findings: hoi-dau-chu-bao-sai (round 4)
 
 ## Trong hợp đồng
-
-Không có finding nào map được vào AC ở lượt này. Lỗi của E9b (chữ nút vượt 17 ký tự, không nằm trong bảng nhãn) được ghi trong evidence-report.md, không thuộc danh sách finding này.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Hình dạng 4 (assertion âm tính một mình): «break» của E5b so hai chuỗi tự dựng, không đo trang**
+- **Real listings always show 'Căn chưa có đầu chủ giữ' because the keeper comes from the sample-id helper**
+  Người dùng thấy gì: Với căn nhập thật từ Sheet, nút hỏi sẽ luôn báo «Căn chưa có đầu chủ giữ» dù thực tế có người giữ, nên người dùng không hỏi được đầu chủ qua nút này.
+  Căn cứ: Tới khi có dữ liệu người giữ căn thật ở hàng 10 thì chưa thể đúng; nút chỉ tắt chứ không gửi nhầm hay mất dữ liệu, và người dùng vẫn hỏi bằng cách khác.
+  file: `src/modules/listings/ui/listing-record.tsx`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Wording of the error report is defined twice (messages.ts and ask-copy.ts)**
+  Người dùng thấy gì: Nếu sau này ai đổi chữ trong hộp báo sai mà quên đổi chữ trong tin gửi đi, hai nơi sẽ lệch nhau; hiện tại người dùng chưa thấy gì sai.
+  Căn cứ: Hiện không ảnh hưởng người dùng và chỉ là nguy cơ lệch chữ về sau; sửa tốn công mà lợi ích nhỏ.
+  file: `src/modules/listings/messages.ts`
+  severity: low
+  Đề xuất: wont-fix
+
+- **recordLink is exported from two public doors, and CopyLink still bypasses the shared share/copy helper**
+  Người dùng thấy gì: Nút Chép đường dẫn vẫn chạy bằng cách chép riêng, có thể báo lỗi khác với hai nút mới khi trình duyệt từ chối chép.
+  Căn cứ: Người dùng chỉ có thể gặp khác biệt nhỏ ở thông báo lỗi hiếm gặp và thử lại được; sửa chỉ là dọn mã.
+  file: `src/modules/listings/ui/copy-link.tsx`
+  severity: low
+  Đề xuất: wont-fix
+
+- **Shape 3 (presence instead of relation): E6 checks only that the «Đang hiện» value is non-empty, not that it equals what the record shows**
+  Người dùng thấy gì: Bài kiểm thử có thể không bắt được lỗi nếu «Đang hiện» trong hộp báo sai lệch với giá trị hồ sơ, nên một lỗi như vậy có thể lọt tới người dùng.
+  Căn cứ: Hiện chưa thấy hiển thị sai thật, nguy cơ chỉ xảy ra khi có thay đổi sau này; siết bài kiểm thử rẻ nhưng có thể làm ở đợt khác.
+  file: `tests/hoi-dau-chu-bao-sai.test.tsx`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Shape 3 (presence instead of relation): E3 builds the expected copied text from the copied text itself**
+  Người dùng thấy gì: Bài kiểm thử không chứng minh dòng câu hỏi trong tin chép đúng căn, nên tin hỏi nhầm căn có thể không bị phát hiện.
+  Căn cứ: Hiện chưa có bằng chứng tin sai; nếu sai thì người gửi thấy ngay trước khi bấm gửi nên tự sửa được.
+  file: `tests/hoi-dau-chu-bao-sai.test.tsx`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Shape 3 (presence instead of relation): when copying fails, the hand-copy box is checked only for the link, not for the whole message**
+  Người dùng thấy gì: Khi chép thất bại, ô chép tay có thể thiếu phần câu hỏi mà bài kiểm thử vẫn không báo, nên người dùng có thể chỉ nhận được đường dẫn.
+  Căn cứ: Chỉ xảy ra khi chép thất bại, hiếm; người dùng vẫn thấy ô và tự gõ thêm được.
+  file: `tests/hoi-dau-chu-bao-sai.test.tsx`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Shape 4 (negative assertion alone): the admin test checks only that the foot bar is absent, while no record opens at all**
+  Người dùng thấy gì: Bài kiểm thử vai Quản trị sàn không chứng minh gì về luật ẩn nút, nên nếu nút lỡ hiện sai cho vai này thì sẽ không bị bắt.
+  Căn cứ: Quản trị sàn vốn không mở được hồ sơ căn nên nút không thể hiện ra; rủi ro thấp và sửa sau được.
+  file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Shape 4 (negative assertion alone): the E5b break compares the keeper's name with the string 'viewer' and is always true**
+  Người dùng thấy gì: Kiểm thử không phát hiện được trường hợp đổi sang căn khác mà thanh đáy vẫn giữ tên người giữ căn cũ, nên người dùng có thể hỏi nhầm người.
+  Căn cứ: Hiện chưa thấy thanh đáy giữ tên cũ; nếu có thì tên hiện ngay trên nút nên người dùng nhận ra và thử lại được.
+  file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Hình dạng 4 (assertion âm tính một mình): «break» của E5b so hai chuỗi tự dựng, không đo trang (r3)**
   Người dùng thấy gì: Một phép kiểm kiểu «đổi căn thì thanh đáy phải đổi người giữ» luôn xanh nên không bắt được lỗi nếu thanh đáy giữ nhầm tên người giữ cũ. Người dùng chưa thấy lỗi thật nào, chỉ là lưới an toàn ở chỗ này lỏng.
   Căn cứ: Nhẹ với người dùng vì chưa có hành vi sai nào được chỉ ra; chỉ là lưới bắt lỗi lỏng, ghi lại rồi siết khi sửa nơi này sau.
   file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
   severity: high
   Đề xuất: known-limits
 
-- **Hình dạng 4 (assertion âm tính một mình): ca Quản trị sàn chỉ đo việc thanh đáy vắng mặt**
+- **Hình dạng 4 (assertion âm tính một mình): ca Quản trị sàn chỉ đo việc thanh đáy vắng mặt (r3)**
   Người dùng thấy gì: Phép kiểm cho vai Quản trị sàn có thể xanh dù trang tải lỗi, nên chưa chắc chứng minh được là nút hỏi bị ẩn đúng vì luật quyền. Hành vi thật với người dùng chưa thấy sai.
   Căn cứ: Nhẹ vì không có người dùng nào bị ảnh hưởng đã biết; chỉ là bằng chứng kiểm chưa chặt, thêm một phép kiểm dương là rẻ nếu sau này cần.
   file: `tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts`
   severity: high
   Đề xuất: known-limits
 
-- **Hình dạng 3 (assert «có mặt» khi lời hứa là quan hệ): «Đang hiện» chỉ được kiểm là khác rỗng**
+- **Hình dạng 3 (assert «có mặt» khi lời hứa là quan hệ): «Đang hiện» chỉ được kiểm là khác rỗng (r3)**
   Người dùng thấy gì: Nếu dòng «Đang hiện» trong hộp báo sai lấy nhầm giá trị của thuộc tính khác thì các phép kiểm hiện tại vẫn không báo. Chưa có bằng chứng người dùng đang thấy giá trị sai.
   Căn cứ: Mức nhẹ đến vừa vì nếu sai thì người dùng sẽ báo nhầm giá trị, nhưng chưa thấy lỗi thật và người dùng tự nhìn ra được ngay trên hồ sơ.
   file: `tests/hoi-dau-chu-bao-sai.test.tsx`
   severity: high
   Đề xuất: known-limits
 
-- **Hình dạng 3 (assert «có mặt» khi lời hứa là quan hệ): giá trị mong đợi của tin đã chép được dựng từ chính đầu ra**
+- **Hình dạng 3 (assert «có mặt» khi lời hứa là quan hệ): giá trị mong đợi của tin đã chép được dựng từ chính đầu ra (r3)**
   Người dùng thấy gì: Phần câu hỏi trong tin chép (mã căn, toà) không được đối chiếu với hàng thật, chỉ đường dẫn được kiểm. Nếu tin hỏi nhầm căn, bài kiểm vẫn xanh, nhưng chưa thấy tin sai thật.
   Căn cứ: Vừa vì tin nhầm căn sẽ làm người giữ căn hiểu sai, nhưng người gửi tự đọc tin trước khi bấm gửi nên tự bắt được; chưa thấy lỗi thật.
   file: `tests/hoi-dau-chu-bao-sai.test.tsx`
   severity: high
   Đề xuất: known-limits
 
-- **Hình dạng 2 (dùng bản viết tay thay đầu ra thật): các ca «break» tự dựng giá trị sai rồi đảo assertion, không làm hỏng mã sản phẩm**
+- **Hình dạng 2 (dùng bản viết tay thay đầu ra thật): các ca «break» tự dựng giá trị sai rồi đảo assertion, không làm hỏng mã sản phẩm (r3)**
   Người dùng thấy gì: Một số ca kiểm «nếu bỏ luật thì phải đỏ» không thực sự bỏ luật nên không chứng minh được lưới bắt lỗi hoạt động. Người dùng không thấy khác biệt nào hiện nay.
   Căn cứ: Nhẹ với người dùng vì không có hành vi sai nào; chỉ làm giảm độ tin cậy của lưới kiểm, nên ghi rõ giới hạn này.
   file: `tests/hoi-dau-chu-bao-sai.test.tsx`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 4 (assertion âm tính một mình): ca «role without catalog reading» đo việc thiếu provider, không đo ô readCatalog**
+- **Hình dạng 4 (assertion âm tính một mình): ca «role without catalog reading» đo việc thiếu provider, không đo ô readCatalog (r3)**
   Người dùng thấy gì: Phép kiểm cho vai không có quyền đọc danh mục không phân biệt được «thiếu quyền đúng ô» với «thiếu cả khung quyền», nên nếu nút báo sai gắn nhầm quyền thì chưa chắc bị bắt. Chưa thấy ai bị hiện nút sai.
   Căn cứ: Nhẹ vì không có người dùng bị lộ nút sai đã biết và nút chỉ soạn tin nội bộ, người tự bấm gửi; siết phép kiểm sau là rẻ.
   file: `tests/hoi-dau-chu-bao-sai.test.tsx`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 5 (tuyên quét cả lớp nhưng chỉ có từng ca lẻ): ma trận openShare tuyên «every device × outcome cell» mà chỉ có 6 trong 12 ô**
+- **Hình dạng 5 (tuyên quét cả lớp nhưng chỉ có từng ca lẻ): ma trận openShare tuyên «every device × outcome cell» mà chỉ có 6 trong 12 ô (r3)**
   Người dùng thấy gì: Một vài tổ hợp hiếm khi máy chia sẻ bị từ chối mà bộ nhớ tạm cũng hỏng hoặc không có chưa được kiểm tự động. Nếu có lỗi ở đó, người dùng có thể không nhận được thông báo đúng, nhưng chưa thấy lỗi thật.
   Căn cứ: Nhẹ vì tổ hợp này hiếm, người dùng thử lại hoặc tự chép tay được; thêm ca kiểm sau là rẻ nhưng không gấp.
   file: `src/lib/share/share.test.ts`
@@ -119,5 +173,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   file: `tests/hoi-dau-chu-bao-sai.test.tsx`
   severity: low
   Đề xuất: wont-fix
+
+## Chưa adversarial-verify (refuter chết)
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).

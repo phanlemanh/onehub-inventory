@@ -18,6 +18,7 @@ import { SAMPLE_COMPANY, buildSampleListings, sampleKeeperOf } from "../../src/m
 import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { ASK_COPY } from "../../src/modules/listings/ui/ask-copy";
 import { expect, test } from "../../tools/e2e_templates/fixture";
+import { shown } from "../../tools/e2e_templates/settle";
 
 const SHOTS = join(".acceptance-runs", "hoi-dau-chu-bao-sai", "e2e");
 const ASK = label("AskListAgent");
@@ -324,6 +325,12 @@ test("E8 · no write request and no change through every branch", async ({ page 
 // ---- E9 · axe, light and dark, both surfaces --------------------------------------------------------------------
 
 async function seriousViolations(page: Page): Promise<string[]> {
+  // Scan the settled page: a dialog still fading in reads as low contrast (round 4 of row 3e, 360 dark).
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.getAnimations().filter((a) => a.playState === "running").length),
+    )
+    .toBe(0);
   const { violations } = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     .options({ rules: { "aria-dialog-name": { enabled: true } } })
@@ -346,7 +353,7 @@ test("E9 · axe on the record with its foot bar and on the report dialog", async
     expect(await seriousViolations(page), `record ${scheme}`).toEqual([]);
     scans += 1;
     await page.getByRole("button", { name: REPORT }).click();
-    await expect(page.locator('[data-slot="report-unit-error"]')).toBeVisible();
+    await shown(page.locator('[data-slot="report-unit-error"]'), "hop bao sai");
     await page.getByLabel(ASK_COPY.report.right).fill("72 m²");
     expect(await seriousViolations(page), `report ${scheme}`).toEqual([]);
     scans += 1;
