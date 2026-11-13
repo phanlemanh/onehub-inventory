@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 2083750a2e86b2629a6ce1f7f809af0f25fce722
+verified_commit: 7fa8253b80ea5947e231e620a60bb2661c911d50
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -264,3 +264,7 @@ Round 1: carried, lịch sử chi tiết nằm trong các vòng trước.
 Round 2: carried.
 Round 3: cap of 3 rounds reached, báo cáo và thẻ cổng bằng chứng đã lập.
 Round 4: mọi eval máy xanh (164 e2e, 989 trong make e2e, make check, build); E1b và E10c chờ người, verdict PENDING-JUDGMENT.
+
+### Re-pin lần 1 — 2026-11-13, do gộp nhánh chính có hàng 9b trước khi gộp PR 52
+run_id: repin-20261113T231140Z-15817
+sha: 7fa8253b80ea5947e231e620a60bb2661c911d50 · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E1b (E1b không khai paths), E2-ui, E7-ui, E10c (E10c không khai paths)
