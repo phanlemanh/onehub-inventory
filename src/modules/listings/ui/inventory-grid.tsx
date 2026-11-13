@@ -1,9 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
+import { notifyResult } from "@/components/templates/notify";
 import { Button } from "@/components/ui/button";
 
 import type { ColumnFilters } from "@/components/candidate/grid-view";
@@ -28,6 +29,7 @@ export function InventoryGrid({
   emptyWhy,
   reloadLabel,
   filters,
+  staleLinkNote,
 }: {
   title: string;
   headers: Readonly<Record<InventoryField, string>>;
@@ -36,12 +38,18 @@ export function InventoryGrid({
   emptyWhy: string;
   /** The empty state's next step: load the list again (someone may have added units meanwhile). */
   reloadLabel: string;
-  /** Column filters the grid opens with (a status shortcut). */
+  /** Column filters the grid opens with (a status shortcut, or the top-bar search of row 3f). */
   filters?: ColumnFilters;
+  /** Said once when the page opens: the address named a listing that is not among the rows (a stale link, row 3f). */
+  staleLinkNote?: string;
 }) {
   const router = useRouter();
   const [current, setCurrent] = useState<InventoryState>(state);
   const record = useMemo(() => listingRecord(headers), [headers]);
+  // A shared link to a listing that left the inventory opens the grid as usual, and says why no record opened.
+  useEffect(() => {
+    if (staleLinkNote) notifyResult({ message: staleLinkNote });
+  }, [staleLinkNote]);
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
     current === "empty" ? [] : current === "partial" ? rows.slice(0, PARTIAL_ROWS) : rows;

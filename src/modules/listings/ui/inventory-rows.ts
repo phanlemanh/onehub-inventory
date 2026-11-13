@@ -87,3 +87,52 @@ export function inventoryFiltersFrom(param: string | undefined): ColumnFilters {
 export function inventoryStatusHref(status: string): string {
   return `/inventory?status=${encodeURIComponent(status)}`;
 }
+
+/** A code compared the way a person types it: no spaces at the ends, letter case ignored. */
+const codeKey = (text: string): string => text.trim().toLocaleLowerCase("vi");
+
+/** What a typed unit code finds among the inventory rows (row 3f): one unit, a code in several buildings, or nothing. */
+export type CodeMatch =
+  | { kind: "mot"; rows: GridRow[] }
+  | { kind: "nhieu"; rows: GridRow[] }
+  | { kind: "khong"; rows: [] };
+
+/** The rows whose unit code is the typed code, whole — never a prefix — in the order the rows come. */
+export function findByCode(rows: readonly GridRow[], typed: string): CodeMatch {
+  const key = codeKey(typed);
+  if (key === "") return { kind: "khong", rows: [] };
+  const found = rows.filter((r) => codeKey(String(r["Listing.unitNumber"] ?? "")) === key);
+  if (found.length === 0) return { kind: "khong", rows: [] };
+  return found.length === 1 ? { kind: "mot", rows: found } : { kind: "nhieu", rows: found };
+}
+
+/** What the top-bar search asks the inventory for: a unit code, a building or a subdivision. */
+export interface InventoryAsk {
+  code?: string;
+  building?: string;
+  subdivision?: string;
+}
+
+/**
+ * How the inventory opens for a search (row 3f): the text goes into its column's filter, so the filter row shows what
+ * was typed; a code that finds exactly one unit opens that unit's record too. Several buildings or nothing found
+ * open no record — the person picks a row, or sees that nothing matches.
+ */
+export function inventoryOpeningFor(
+  rows: readonly GridRow[],
+  ask: InventoryAsk,
+): { filters: ColumnFilters; recordId: string | null } {
+  const code = ask.code?.trim();
+  if (code) {
+    const match = findByCode(rows, code);
+    return {
+      filters: { "Listing.unitNumber": code },
+      recordId: match.kind === "mot" ? match.rows[0]!.id : null,
+    };
+  }
+  const building = ask.building?.trim();
+  if (building) return { filters: { "Listing.buildingName": building }, recordId: null };
+  const subdivision = ask.subdivision?.trim();
+  if (subdivision) return { filters: { "Listing.subdivisionName": subdivision }, recordId: null };
+  return { filters: {}, recordId: null };
+}

@@ -3,11 +3,15 @@ export { InventoryGrid } from "./inventory-grid";
 export {
   INVENTORY_FIELDS,
   INVENTORY_GROUP_BY,
+  findByCode,
   inventoryFiltersFrom,
+  inventoryOpeningFor,
   inventoryStatusHref,
   inventoryColumns,
   inventoryRows,
   inventoryStateFrom,
+  type CodeMatch,
+  type InventoryAsk,
   type InventoryField,
   type InventoryState,
   type InventoryUnit,
@@ -19,3 +23,5 @@ export {
   listingView,
   type ListingView,
 } from "./listing-record";
+export { CopyLink, recordLink } from "./copy-link";
+export { ENTRY_COPY } from "./entry-copy";
