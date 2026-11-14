@@ -52,7 +52,7 @@ evals:
     criterion: AC-3
     executor: test
     layer: backend-effect
-    cmd: config:executors.test.dang_nhap_1p_e2e
+    cmd: config:executors.script.dang_nhap_1p_e2e
     paths: [src/app/login/**, src/modules/identity/**, tests/e2e-db/**]
     expected: "exit 0; mọi bài của playwright.db.config.ts xanh trên Postgres làn H, gồm login.spec.ts và va-dang-nhap.spec.ts (đăng nhập, chọn sàn, mã sai, xin mã quá nhiều, chưa thuộc sàn, đăng xuất). Chiều đỏ: bài login.spec.ts đã đỏ khi đăng nhập hỏng ở hàng 8 — hàng này không thêm thước, chỉ chạy lại"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
