@@ -20,7 +20,7 @@ import {
   type InventoryState,
 } from "./inventory-rows";
 import type { AskWords } from "./ask-copy";
-import { listingRecord } from "./listing-record";
+import { listingRecord, type FullRecordInput } from "./listing-record";
 import { SaveViewButtons } from "./save-view-buttons";
 import { gridView, sameAsStored, savedViewHref } from "./saved-view-api";
 import { savedViewCopy, type SavedViewLabels } from "./saved-view-copy";
@@ -43,10 +43,11 @@ export function InventoryGrid({
   savedViews,
   openView,
   viewLabels,
+  askWords,
+  fullRecord,
   listings,
   editLabels,
   door,
-  askWords,
 }: {
   title: string;
   headers: Readonly<Record<InventoryField, string>>;
@@ -65,14 +66,16 @@ export function InventoryGrid({
   openView?: SavedView | null;
   /** Words of the saved views, from the label table (needed with `savedViews`). */
   viewLabels?: SavedViewLabels;
+  /** Words of the AskListAgent and ReportUnitError buttons in the record (row 3e), from the label table. */
+  askWords?: AskWords;
+  /** Each row's unit and listings with the record's labels (row 3b); without it the record shows the eight fields. */
+  fullRecord?: FullRecordInput;
   /** The listings the rows show: with them, price and status are edited in the cell under the permission table (row 4). */
   listings?: readonly Listing[];
   /** Words of the cell editors from the label table (needed with `listings`). */
   editLabels?: CellEditLabels;
   /** The save door of those edits; the sample door in memory when absent (row 10 hands in the real one). */
   door?: ListingSaveDoor;
-  /** Words of the AskListAgent and ReportUnitError buttons in the record (row 3e), from the label table. */
-  askWords?: AskWords;
 }) {
   const router = useRouter();
   const [current, setCurrent] = useState<InventoryState>(state);
@@ -89,7 +92,10 @@ export function InventoryGrid({
     setChanged(changed && openHref ? { href: openHref, mark: copy?.changed ?? "" } : null);
   }, [changed, openHref, setChanged, copy]);
   useEffect(() => () => setChanged(null), [setChanged]);
-  const record = useMemo(() => listingRecord(headers, askWords), [headers, askWords]);
+  const record = useMemo(
+    () => listingRecord(headers, fullRecord, askWords),
+    [headers, fullRecord, askWords],
+  );
   // A shared link to a listing that left the inventory opens the grid as usual, and says why no record opened.
   const staleSaid = useRef(false);
   useEffect(() => {

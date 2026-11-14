@@ -1,0 +1,103 @@
+schema_version: 1
+feature_slug: ho-so-du-thong-tin
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    paths: [ontology/**, src/generated/**, wiki/entities/listing.md, tests/ho-so-du-thong-tin.test.ts]
+    expected: "exit 0; make check xanh, gồm make ontology (mô hình, wiki và mã sinh khớp) và make gen không đổi tệp nào; trong tests/ho-so-du-thong-tin.test.ts: kiểu Listing sinh ra có đủ năm khoá furnished, occupantType, legalStatus, financing, originalEntryTimestamp (bài đọc ontology/entities/Listing.yaml và so tập khoá với danh sách viết trước trong tệp, đếm 5/5); luật one-open-listing-per-unit có trong Listing.yaml hoặc ListingUnit.yaml; với MỌI nhãn mới (danh sách viết trước trong tệp: năm trường, DirectionFaces, PropertySubType và bốn giá trị, UnitKind, Completeness, ListingsOfUnit) label() trả chữ khác rỗng, không quá 17 ký tự, và cả các giá trị cố định của Nội thất, Tình trạng sử dụng; kiểu của từng trường so với bảng viết trước trong tệp theo lời chốt Hỏi-1 (lối khuyên: furnished và occupantType là tập giá trị cố định đúng ba giá trị, legalStatus và financing là chữ), đếm 5/5; ca đối chứng đổi Nội thất thành chữ tự do trên bản sao cho 'listing field type: furnished', ca đối chứng bỏ một khoá khỏi bản sao Listing.yaml cho 'listing field missing: <khoá>', ca đối chứng nhãn 18 ký tự cho 'label too long: <khoá>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/**, tests/ho-so-du-thong-tin.test.ts, tests/sample-data*.test.ts]
+    expected: "exit 0; trong tests/ho-so-du-thong-tin.test.ts: buildSampleListings trả đúng 60 lần chào, mã, trạng thái và giá của từng lần bằng bản ghim 60 dòng viết trước trong tệp (băm của bộ ba mã·trạng thái·giá); inventoryRows trên dữ liệu mẫu vẫn 60 dòng; hàm lần chào cũ trả ≥ 10 lần chào, mỗi lần Closed hoặc Withdrawn, mã bắt đầu tiền tố MAU, trỏ một căn đã có lần chào hiện tại, ngày tạo sớm hơn lần hiện tại; mọi lần chào (hiện tại và cũ) có originalEntryTimestamp; mỗi trường trong bốn trường có ít nhất một lần chào đủ và một lần chào trống; có ít nhất một căn đủ ba lần chào, ở căn ấy Lần 1 khác lần mới nhất ở giá, ở số phần đủ và ở câu xác nhận, và có ít nhất một ô trống; bộ kiểm dữ liệu mẫu trả rỗng; ma trận viết trước sáu trạng thái của lần cũ khi lần mới Active (đếm 6/6): bốn trạng thái mở theo lời chốt Hỏi-5 cho 'two open listings on one unit', Closed và Withdrawn không cho; ca đối chứng đổi giá một lần chào hiện tại cho 'current sample changed'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/**, tests/ho-so-du-thong-tin.test.tsx]
+    expected: "exit 0; trong tests/ho-so-du-thong-tin.test.tsx, với MỌI 60 dòng mẫu, khối data-slot='listing-unit' của hồ sơ dựng ra có tám nhãn theo thứ tự Mã căn, Loại căn, Diện tích, Tầng, Hướng, Toà, Dự án, Loại hình và giá trị so lại từ căn trong danh mục (không chép số); unitKind(0)='Studio', unitKind(2)='2PN', unitKind(null)='—'; căn thiếu tầng và hướng (bản sao) hiện '—'; ca đối chứng lấy hướng của căn khác cho 'unit block disagrees: Hướng'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/**, tests/ho-so-du-thong-tin.test.tsx]
+    expected: "exit 0; confirmationAge với ma trận viết trước trong tệp (cùng ngày giờ Việt Nam → 0, 23:30 hôm qua giờ Việt Nam → 1, 06:00 sáng nay giờ Việt Nam = 23:00Z hôm qua → 0 (ca UTC đếm sai), 9 ngày → 9, null → null, ngày tương lai → 0), đếm 6/6 ca; câu hiện 'Xác nhận hôm nay', 'Xác nhận 9 ngày trước', 'Chưa xác nhận với chủ nhà'; thẻ căn có data-slot listing-card-place đúng 'Dự án · Toà · Loại hình' của căn và ba thông số theo thứ tự Diện tích, Phòng ngủ, Hướng; ca đối chứng đếm theo UTC cho 'confirmation age: 06:00 local counted as yesterday', ca đối chứng bỏ loại hình khỏi nơi chốn cho 'place line missing property type'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/**, tests/ho-so-du-thong-tin.test.tsx]
+    expected: "exit 0; khối data-slot='listing-offer' có bốn dòng theo thứ tự Pháp lý, Nội thất, Tài chính, Tình trạng sử dụng với giá trị so lại từ lần chào; với một lần chào thiếu cả bốn (bản sao) cả bốn ô là 'Chưa có' và mang data-empty; tên khối 'Lần chào đang mở' khi trạng thái mở, 'Lần chào đang xem' khi Closed hay Withdrawn; ca đối chứng hiện '—' thay 'Chưa có' cho 'missing offer field not marked'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/**, tests/ho-so-du-thong-tin.test.ts, tests/ho-so-du-thong-tin.test.tsx]
+    expected: "exit 0; completeness chạy đủ 32 tổ hợp có/thiếu của năm phần (bài sinh tổ hợp và ĐẾM 32 lần khẳng định), mỗi tổ hợp: có = số phần có, cần = 5, thiếu = tên phần thiếu theo đúng thứ tự Giá, Nội thất, Pháp lý, Tài chính, Tình trạng sử dụng; chuỗi rỗng tính là thiếu; khối data-slot='listing-completeness' hiện 'có/5', progressbar có aria-valuenow bằng số có và aria-valuemax 5, dòng 'Còn thiếu: …' hoặc 'Đủ thông tin'; ca đối chứng đảo thứ tự thiếu cho 'completeness order', ca đối chứng tính chuỗi rỗng là có cho 'empty string counted as present'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/**, src/components/candidate/record-panel.tsx, tests/e2e/ho-so-du-thong-tin.spec.ts]
+    expected: "exit 0; tests/e2e/ho-so-du-thong-tin.spec.ts ở 1440 và 360: mở hồ sơ một căn có ba lần chào (mã căn lấy từ dữ liệu mẫu trong bài, không chép tay): 'Các lần chào của căn · 3', ba dòng 'Lần 3', 'Lần 2', 'Lần 1' theo thứ tự ngày tạo giảm dần, dòng đầu aria-current; chạm 'Lần 1' thì giá ở thẻ căn, huy hiệu trạng thái, khối lần chào, mức đủ và câu xác nhận đổi sang giá trị của lần ấy (so với dữ liệu mẫu), có dải 'Đang xem lần chào cũ · Lần 1' và tên khối 'Lần chào đang xem', địa chỉ trang không đổi; bấm 'Về lần mới nhất' thì về Lần 3; chạm lần cũ rồi bấm 'Sau' thì căn kế hiện ở lần mới nhất của nó, không có dải; căn chỉ một lần chào: 'Các lần chào của căn · 1'; ca đối chứng xếp cũ trước cho 'listings of unit not newest first', ca đối chứng giữ giá lần mới khi chạm lần cũ cho 'old listing price not shown', ca đối chứng giữ lần đã chọn khi sang căn khác cho 'old listing kept across units'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/**, src/app/(app)/inventory/**, tests/e2e/ho-so-du-thong-tin.spec.ts]
+    expected: "exit 0; với hồ sơ mở ở 1440, trong hồ sơ không có input, textarea, select, [contenteditable] nào, mọi button trong hồ sơ thuộc tập viết trước trong bài (Trước, Sau, Đóng, Về lần mới nhất, các dòng lần chào), và không yêu cầu mạng nào có phương thức khác GET trong lúc mở, chạm lần cũ, về lần mới nhất (đếm bằng page.on('request')); bảng có tám đầu cột như hàng 2 và 60 dòng; ca đối chứng chèn một input vào hồ sơ bằng thẻ script cho 'record is not read-only', ca đối chứng gửi một fetch POST trên trang cho 'write request while reading record'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/modules/listings/**, src/components/candidate/record-panel.tsx, tests/e2e/ho-so-du-thong-tin.spec.ts]
+    expected: "exit 0; axe trên /inventory với hồ sơ một căn có ba lần chào đang mở ở 1440 và 360, sáng và tối, ở lần mới nhất và khi đang xem Lần 1 (8 lượt quét, bài ĐẾM 8 và đỏ khi khác 8 với thông điệp 'axe scans: expected 8'), không vi phạm mức serious hay critical; ca đối chứng bỏ nhãn của progressbar cho thông điệp axe có mã 'aria-progressbar-name'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/modules/listings/ui/**, src/components/candidate/record-panel.tsx]
+    steps:
+      - "Mở /inventory ở 1440, sáng; bấm mã căn có ba lần chào (bài E7 in mã); chụp."
+      - "Lặp ở 1024, 414, 360; mỗi khổ chụp sáng và tối."
+      - "Ở mỗi khổ, sáng, cuộn thân hồ sơ tới cuối (khối Các lần chào); chụp thêm một ảnh — hồ sơ dài hơn khung nhìn nên đọc từ trên xuống qua hai ảnh."
+      - "Ở 1440 sáng chạm 'Lần 1'; chụp (thẻ căn ở đầu phải thấy lại, với giá của Lần 1)."
+    expected: "Ở mỗi khổ, ảnh đầu và ảnh cuối ghép lại đọc được từ trên xuống: câu xác nhận · Mức đủ thông tin · Căn · Lần chào · Các lần chào; chữ không chồng chữ, không tràn ngang; ô 'Chưa có' nhạt hơn giá trị thật; ảnh tối đọc được; ở 414 và 360 thẻ căn ở đầu, ba thông số Diện tích · Phòng ngủ · Hướng."
+    evidence_required: [run_id, screenshot, observed, verifier, verified_at]
+
+  - id: E11
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/modules/listings/ui/**]
+    expected: "exit 0; sàn thiết kế không thấy mã màu thô nào trên tệp giao diện mà vòng chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

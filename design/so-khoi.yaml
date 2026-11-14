@@ -64,6 +64,13 @@ khoi:
     mo_ta: Thẻ một căn với mã căn, giá, nơi, trạng thái và ba thông số
     ho_so: ho-so-can
     duyet: 2026-11-12
+  - ten: ListingRecordFull
+    tep: src/modules/listings/ui/listing-record-full.tsx
+    nguon: solution-crm-4
+    nhu_cau: ho-so-du-thong-tin
+    mo_ta: Thân hồ sơ đủ của một căn — khối căn, khối lần chào, mức đủ thông tin, câu xác nhận, các lần chào của căn
+    ho_so: ho-so-du-thong-tin
+    duyet: 2026-11-13
   - ten: data-grid-grouping-2
     tep: src/components/candidate/data-region.tsx
     nguon: data-grid-grouping-2

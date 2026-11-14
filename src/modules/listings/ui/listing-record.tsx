@@ -22,6 +22,11 @@ const CATALOG_FIELDS: readonly InventoryField[] = [
   "Unit.livingArea",
   "Unit.bedroomsTotal",
 ];
+import {
+  ListingRecordFull,
+  type ListingRecordData,
+  type RecordLabels,
+} from "./listing-record-full";
 
 /** The facts the card shows in its three-up row, in order (after product-grid-4's specs row). */
 const CARD_FACTS: readonly InventoryField[] = [
@@ -188,12 +193,20 @@ export function reportFieldsOf(view: ListingView): { name: string; shown: string
     .map(({ column, value }) => ({ name: column.header, shown: shownText(column, value) }));
 }
 
+/** What the full record of row 3b reads: each row's unit and listings, and the labels the record shows. */
+export interface FullRecordInput {
+  records: Readonly<Record<string, ListingRecordData>>;
+  labels: RecordLabels;
+}
+
 /**
- * How the inventory grid opens a row: the record names the unit and shows the listing's record body. With `words`
- * (row 3e) the record also carries ReportUnitError on its properties and AskListAgent at its foot.
+ * How the inventory grid opens a row: the record names the unit and shows the listing's record body — the full record
+ * of row 3b when the page passes the row's unit and listings, otherwise the eight inventory fields of row 3. With
+ * `words` (row 3e) the record also carries ReportUnitError on its unit properties and AskListAgent at its foot.
  */
 export function listingRecord(
   headers: Readonly<Record<InventoryField, string>>,
+  full?: FullRecordInput,
   words?: AskWords,
 ): RegionRecord {
   return {
@@ -214,15 +227,25 @@ export function listingRecord(
           words={words}
         />
       ) : undefined;
+      const data = full?.records[row.id];
       return {
         title: [view.unitNumber, building].filter((part) => part !== "").join(" · "),
-        body: (
-          <ListingRecordBody
-            view={view}
-            priceLabel={headers["Listing.listPrice"]}
-            report={report}
-          />
-        ),
+        body:
+          data && full ? (
+            <ListingRecordFull
+              key={view.id}
+              view={view}
+              data={data}
+              labels={full.labels}
+              report={report}
+            />
+          ) : (
+            <ListingRecordBody
+              view={view}
+              priceLabel={headers["Listing.listPrice"]}
+              report={report}
+            />
+          ),
         footer: words ? (
           <AskListAgent
             key={view.id}

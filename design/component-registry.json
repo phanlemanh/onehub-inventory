@@ -2114,6 +2114,31 @@
       ]
     },
     {
+      "name": "Progress",
+      "file": "src/components/ui/progress.tsx",
+      "level": "atom",
+      "parts": [
+        {
+          "name": "Progress",
+          "props": [
+            "value"
+          ]
+        },
+        {
+          "name": "ProgressIndicator"
+        },
+        {
+          "name": "ProgressLabel"
+        },
+        {
+          "name": "ProgressTrack"
+        },
+        {
+          "name": "ProgressValue"
+        }
+      ]
+    },
+    {
       "name": "ResizableHandle",
       "file": "src/components/ui/resizable.tsx",
       "level": "atom",

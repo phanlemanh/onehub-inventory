@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 295963e9742669f5f07e47b7806efd74c2191067
+verified_commit: 3c27f1e61d9239376869461db9311f3cd23bc94d
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -237,3 +237,7 @@ none — mọi eval chạy một lượt (runs: 1), không có phương sai.
 
 Round 5: E8b trượt (kiểm SP-3 trên các tệp nút mới); các eval khác giữ PASS hoặc carried. Trả về sửa code.
 Round 6: E1, E2b, E5b, E8, E8b, E9 chạy lại và xanh; E2, E3, E4, E5, E6, E7, E9b, E10, E11, E12 carried; suite make check, build, make e2e xanh. Còn E9c (judgment, panel carried từ round 3) chờ người ở Cổng 2.
+
+### Re-pin lần 1 — 2026-11-14, do gộp nhánh chính sau 3b (PR #47) trước khi gộp PR #49
+run_id: repin-20261114T032125Z-52321
+sha: 3c27f1e61d9239376869461db9311f3cd23bc94d · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng · ngoài làn máy: E9b, E9c (E9c không khai paths) · diff chạm vật đo ngoài làn máy: E9b — chưa chứng lại, đi vòng S4 delta

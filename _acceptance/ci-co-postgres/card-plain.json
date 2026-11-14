@@ -1,0 +1,38 @@
+{
+  "feature_plain": "Mỗi PR có thêm một ô kiểm trên CI chạy trên cơ sở dữ liệu thử của riêng lượt ấy: các màn cần đăng nhập, bộ kiểm cách ly giữa các sàn và các bài cơ sở dữ liệu đều được đo ngay trên CI, không còn chỉ ở máy dãy.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ chạy mọi bộ kiểm cần cơ sở dữ liệu bằng một lệnh, theo sáu bước có tên, và báo số bài đạt của từng tệp — một tệp không bài nào đạt là đỏ."},
+    {"id": "AC-2", "p": "Sẽ chứng ứng dụng và bộ kiểm cách ly nối bằng vai đăng nhập không sở hữu bảng (của hàng 7c), đo bằng chính danh sách kết nối của cơ sở dữ liệu; nối bằng vai chủ thì đỏ."},
+    {"id": "AC-3", "p": "Sẽ chạy tiếp các bước sau khi một bước đỏ và gọi tên đúng bước đỏ ở dòng cuối, trừ bước chuẩn bị đỏ thì dừng ngay."},
+    {"id": "AC-5", "p": "Sẽ dựng lại máy chủ CI ở máy dãy (bản sao nông, cơ sở dữ liệu mới theo đúng bản vá) và chạy xanh dưới 2/3 trần thời gian, kể cả các bài kiểm cũ."},
+    {"id": "AC-6", "p": "Sẽ cho thấy ô kiểm đỏ khi bỏ phiên thử: bài màn cần đăng nhập rơi, phép đếm gọi tên từng bài."},
+    {"id": "AC-7", "p": "Sẽ bỏ mọi chỗ bài kiểm đọc lịch sử git, vì CI chỉ lấy bản sao nông; bản chép bộ chạy cũ được giữ đúng bằng mã băm."},
+    {"id": "AC-8", "p": "Sẽ tự dọn thư mục dựng tạm của mỗi lượt kiểm trình duyệt — loại thư mục từng làm đầy đĩa máy — mà không chạm thư mục của lượt đang chạy."},
+    {"id": "AC-9", "p": "Sẽ soạn sẵn bản vá tệp CI chỉ thêm một ô kiểm mới, không sửa dòng nào có sẵn, và lượt dựng lại đọc đúng bản vá ấy."},
+    {"id": "AC-10", "p": "Sẽ ghi lượt CI thật trên PR (ô kiểm xanh, thời lượng, mức tăng so với nhánh chính) nếu anh cho thợ dán bản vá."}
+  ],
+  "wont_do": [
+    {"id": "AC-4", "p": "Chặn mọi bài màn cần đăng nhập rơi giữa hai lượt: bài nào lượt không đăng nhập bỏ qua thì lượt có đăng nhập phải chạy và đạt, và không bài nào được báo đạt khi thật ra đang đứng ở trang đăng nhập."},
+    {"id": "OOS-1", "p": "Sẽ KHÔNG tự sửa tệp CI nếu anh không cho; đặt ô kiểm mới thành bắt buộc trước khi gộp là cài đặt GitHub của anh."},
+    {"id": "OOS-2", "p": "Sẽ KHÔNG gỡ các lệnh chấm riêng theo dãy của hàng khác."},
+    {"id": "OOS-3", "p": "Sẽ KHÔNG thêm bản chạy chậm cho lượt có đăng nhập, cũng không dựng ma trận vai × màn (để hàng 9b)."},
+    {"id": "OOS-4", "p": "Sẽ KHÔNG đổi bộ kiểm chung (vùng của hàng 2e đang chạy)."}
+  ],
+  "scope_plain": "Bốn việc để ngoài hàng này:",
+  "coverage_plain": [
+    {"i": 0, "p": "Quét đủ năm trục trước khi viết tiêu chí:"},
+    {"i": 2, "p": "Mọi bộ kiểm cần cơ sở dữ liệu đều chạy trên CI: cách ly, bài cơ sở dữ liệu, mọi bài trình duyệt có đăng nhập, lượt không đăng nhập và phép đếm (AC-1, AC-2, AC-4)."},
+    {"i": 3, "p": "Vai nối: lành là vai đăng nhập không sở hữu bảng, phá là vai chủ — phải đỏ (AC-2)."},
+    {"i": 4, "p": "Môi trường: máy dãy, bản dựng lại giống CI, và CI thật sau khi bản vá vào (AC-1, AC-5, AC-10)."},
+    {"i": 5, "p": "Các chiều đỏ: một bước đỏ giữa chừng, bỏ phiên thử, bài rơi giữa hai lượt, bài đo nhầm trang đăng nhập (AC-3, AC-4, AC-6)."},
+    {"i": 6, "p": "Thư mục dựng tạm: của lượt đã chết thì xoá, của lượt đang chạy và thư mục lạ thì giữ, của chính lượt thì xoá khi xong (AC-8)."},
+    {"i": 7, "p": "Giả định đã khai: máy chủ GitHub chậm hơn máy dãy, nên lượt dựng lại phải xong dưới 2/3 trần; CI thật chỉ đo được khi bản vá vào PR (Hỏi-1)."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Bài kiểm mới lại đọc lịch sử git, sẽ đỏ trên CI bản sao nông như hàng 7c — đã đổi sang so mã băm ghim sẵn, quét mọi bài CI chạy, và chạy cả bài kiểm cũ trong bản dựng lại."},
+    {"i": 1, "p": "Không tiêu chí nào đòi một lượt CI thật — đã thêm AC-10 (lượt CI thật trên PR khi anh cho dán) và hạ biên bản dựng lại xuống 2/3 trần."},
+    {"i": 2, "p": "Vai nối của máy chủ thử chỉ được đo bằng một dòng chữ in sẵn — đã đổi sang đọc danh sách kết nối thật của cơ sở dữ liệu, kèm bản phá nối bằng vai chủ."},
+    {"i": 3, "p": "Căn cứ của việc dọn thư mục trích sai câu và chưa tính số tiến trình bị dùng lại — đã đổi cách nhận lượt sống bằng tệp ghi chủ, có ca kiểm riêng."},
+    {"i": 4, "p": "Có tên tệp trong nhật ký chưa chứng tệp đã chạy thật — đã đếm số bài đạt từng tệp từ báo cáo máy."}
+  ]
+}

@@ -48,6 +48,8 @@ screens:
       - activateListing
       - removeListing
       - viewOwnerPhone
+      - readCatalog
+      - viewListings
     mo_san: [saveView]
     nut_chung: [Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng]
   - id: sent
