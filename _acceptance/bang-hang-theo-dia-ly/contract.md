@@ -40,9 +40,11 @@ duyệt.
 - AC-2: Given cây của AC-1, When Đầu chủ bấm một dự án, một phân khu, hay một toà, Then bảng còn đúng tập dòng của nơi ấy —
   so theo mã dòng, không thiếu không thừa —, chân bảng «x / 60 dòng» với x bằng số căn của nơi ấy (36, 36, 6, 9, 10, 11, 12, 12, 12, 12), nút ấy sáng và là mục sáng duy
   nhất của cột thứ hai.
-- AC-3: Given một nơi vừa chọn, When nhìn hàng ô lọc dưới tiêu đề, Then ô Dự án hiện tên dự án trọn vẹn và ô Toà hiện tên
-  toà (phân khu: các toà của nó, cách nhau dấu phẩy; dự án: ô Toà trống); lọc ấy khớp trọn tên — dự án tên «… Park 1» không
-  lấy dòng của dự án «… Park 10».
+- AC-3: Given một nơi vừa chọn, When nhìn hàng ô lọc dưới tiêu đề, Then ô Dự án GIỮ trọn tên dự án và ô Toà giữ tên toà
+  (phân khu: các toà của nó, cách nhau dấu phẩy; dự án: ô Toà trống) — không viết tắt, đọc được trọn khi rê hay focus;
+  chỗ hiện trọn tên bằng mắt là mục đang sáng ở cột thứ hai (bề rộng ô theo luật bề rộng cột của `design/behaviors.md`);
+  lọc ấy khớp trọn tên — dự án tên «… Park 1» không lấy dòng của dự án «… Park 10». (Sửa sau Cổng Phạm vi, G-1411 trả
+  lời K-1411-35, chờ chủ kho phê ở Cổng Bằng chứng.)
 - AC-4: Given bảng đang lọc theo một nơi, When Đầu chủ sửa ô lọc Dự án hay Toà, hay bấm «Xoá lọc», Then cây theo cùng trạng
   thái: một nút sáng khi và chỉ khi tập dòng lọc ra bằng đúng tập dòng của nơi ấy (chọn từ cây, hay chữ gõ tay mà lọc ra
   đúng những dòng ấy — gõ «… Park 1» khi có cả «… Park 10» thì không nút nào sáng); không trùng nơi nào thì không nút nào sáng;

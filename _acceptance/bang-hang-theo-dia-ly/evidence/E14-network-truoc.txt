@@ -1,0 +1,12 @@
+200 GET http://127.0.0.1:3499/sent
+200 GET http://127.0.0.1:3499/sent
+200 GET http://127.0.0.1:3499/tuy-chinh-san
+500 GET http://127.0.0.1:3499/api/v1/company-layer
+CONSOLE Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+500 GET http://127.0.0.1:3499/api/v1/company-layer
+CONSOLE Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+200 GET http://127.0.0.1:3499/tuy-chinh-san
+500 GET http://127.0.0.1:3499/api/v1/company-layer
+CONSOLE Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+500 GET http://127.0.0.1:3499/api/v1/company-layer
+CONSOLE Failed to load resource: the server responded with a status of 500 (Internal Server Error)

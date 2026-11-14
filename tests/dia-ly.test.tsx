@@ -317,6 +317,11 @@ const box = (header: string) =>
   document.querySelector<HTMLInputElement>(`input[aria-label*="${header}"]`)!;
 const footer = () => /(\d+) \/ 60 dòng/.exec(document.body.textContent ?? "")?.[1];
 
+/** The box holds the whole name and reads it whole on hover (AC-3, revised after the scope gate); throws otherwise. */
+function checkReadsWhole(input: HTMLInputElement, whole: string): void {
+  if (input.value !== whole || input.title !== whole) throw new Error(`ten o loc cat: ${whole}`);
+}
+
 /** After a pick the status filter is still on; throws when the pick dropped it. */
 function checkKept(statusKept: boolean): void {
   if (!statusKept) throw new Error("mat loc khac");
@@ -352,5 +357,14 @@ describe("one filter state", () => {
     fireEvent.click(within(groupOf(P1)).getByRole("link", { name: "The Sapphire 1" }));
     await waitFor(() => expect(box("Toà").value).toBe("S1.01, S1.02, S1.03, S1.05"));
     expect(footer()).toBe("36");
+    checkReadsWhole(box("Dự án"), P1);
+    checkReadsWhole(box("Toà"), "S1.01, S1.02, S1.03, S1.05");
+  });
+
+  it("break: a box that reads a cut name is caught", () => {
+    const input = document.createElement("input");
+    input.value = P1;
+    input.title = "Vinhomes Ocean P";
+    expect(() => checkReadsWhole(input, P1)).toThrow(`ten o loc cat: ${P1}`);
   });
 });

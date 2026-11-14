@@ -297,6 +297,12 @@ test("E9 reload, a copied link, a saved view, an unknown place", async ({
   expect(await region(page).getByLabel("Lọc cột Toà").inputValue()).toBe(
     "S1.01, S1.02, S1.03, S1.05",
   );
+  // The box keeps the whole names and reads them whole on hover (AC-3, revised after the scope gate).
+  await expect(region(page).getByLabel("Lọc cột Toà")).toHaveAttribute(
+    "title",
+    "S1.01, S1.02, S1.03, S1.05",
+  );
+  await expect(region(page).getByLabel("Lọc cột Dự án")).toHaveAttribute("title", P1);
   checkLit(await litNames(column(page)), "Sapphire");
 
   await page.goto("/inventory?vung=khong-co");

@@ -39,7 +39,7 @@ evals:
     executor: test
     cmd: config:executors.test.dia_ly
     paths: [src/components/candidate/grid-view.ts, src/components/candidate/column-filter-cell.tsx, tests/dia-ly.test.tsx]
-    expected: "exit 0; ô lọc chữ nhận danh sách tên hiện các tên nối ', ' (phân khu: 'S1.01, S1.02, S1.03, S1.05'); danh sách khớp trọn tên: hai dòng dự án '… Park 1' và '… Park 10', lọc ['… Park 1'] giữ đúng một dòng; đối chứng: chữ gõ '… Park 1' (chứa chữ) giữ cả hai; ca phá đổi so khớp trọn thành chứa chữ thì đỏ với 'khop tron hong'"
+    expected: "exit 0; ô lọc chữ nhận danh sách tên hiện các tên nối ', ' (phân khu: 'S1.01, S1.02, S1.03, S1.05') và tên đọc được của ô (value và title) bằng trọn tên nơi, ca phá ô đọc tên cắt đỏ với 'ten o loc cat: <nơi>'; danh sách khớp trọn tên: hai dòng dự án '… Park 1' và '… Park 10', lọc ['… Park 1'] giữ đúng một dòng; đối chứng: chữ gõ '… Park 1' (chứa chữ) giữ cả hai; ca phá đổi so khớp trọn thành chứa chữ thì đỏ với 'khop tron hong'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E6
@@ -117,7 +117,7 @@ evals:
       - "Navigate {url}/inventory at 1440x900, light; click the place 'The Sapphire 1' in the second column → screenshot evidence/E14-phan-khu-1440-sang.png; dark → evidence/E14-phan-khu-1440-toi.png"
       - "At 360x800 light open the App Shell sheet → screenshot evidence/E14-ngan-360-sang.png; click '[MAU] Toà E1' → screenshot evidence/E14-toa-360-sang.png"
       - "Navigate {url}/sent at 1440x900 and 360x800 light (360: open the App Shell sheet) → screenshots evidence/E14-sent-1440-sang.png, evidence/E14-sent-360-sang.png; same for {url}/tuy-chinh-san when that route exists (row 7e) → evidence/E14-tuy-chinh-1440-sang.png, evidence/E14-tuy-chinh-360-sang.png; compare each with its 'before' shot taken on the main branch at the round's diff base (evidence/E14-*-truoc.png), 4/4 pairs"
-    expected: "Second column shows one group per project under 'Theo trạng thái', titled like 'Theo trạng thái', entries without counts; the chosen place is the one highlighted entry; Dự án and Toà filter cells show the whole names; footer reads '36 / 60 dòng' after The Sapphire 1 and '12 / 60 dòng' after [MAU] Toà E1; on /sent and /tuy-chinh-san the second column has no tree and the same entries and highlight as the before shot at both widths"
+    expected: "Second column shows one group per project under 'Theo trạng thái', titled like 'Theo trạng thái', entries without counts; the chosen place is the one highlighted entry; Dự án and Toà filter cells hold the whole names (the box may be cut by the column-width rule; hovering it shows the whole name), and the lit entry of the second column shows the place name in full; footer reads '36 / 60 dòng' after The Sapphire 1 and '12 / 60 dòng' after [MAU] Toà E1; on /sent and /tuy-chinh-san the second column has no tree and the same entries and highlight as the before shot at both widths"
     evidence_required: [run_id, screenshot, observed, verifier, verified_at]
 
   - id: E15

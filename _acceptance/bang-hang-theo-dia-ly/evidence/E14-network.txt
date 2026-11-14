@@ -1,0 +1,21 @@
+200 GET http://127.0.0.1:3481/inventory
+CONSOLE %c%s%c [lop-rieng] không đọc được: background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   relation "company_labels" does not exist
+200 POST http://127.0.0.1:3481/__nextjs_original-stack-frames
+200 GET http://127.0.0.1:3481/inventory
+CONSOLE %c%s%c [lop-rieng] không đọc được: background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   relation "company_labels" does not exist
+200 POST http://127.0.0.1:3481/__nextjs_original-stack-frames
+200 GET http://127.0.0.1:3481/inventory
+CONSOLE %c%s%c [lop-rieng] không đọc được: background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server   relation "company_labels" does not exist
+200 POST http://127.0.0.1:3481/__nextjs_original-stack-frames
+200 GET http://127.0.0.1:3481/sent
+200 GET http://127.0.0.1:3481/sent
+200 GET http://127.0.0.1:3481/tuy-chinh-san
+500 GET http://127.0.0.1:3481/api/v1/company-layer
+CONSOLE Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+500 GET http://127.0.0.1:3481/api/v1/company-layer
+CONSOLE Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+200 GET http://127.0.0.1:3481/tuy-chinh-san
+500 GET http://127.0.0.1:3481/api/v1/company-layer
+CONSOLE Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+500 GET http://127.0.0.1:3481/api/v1/company-layer
+CONSOLE Failed to load resource: the server responded with a status of 500 (Internal Server Error)

@@ -56,16 +56,20 @@ export function ColumnFilterCell<TData extends object>({
         : spec.kind === "date" || spec.kind === "datetime"
           ? GRID_COPY.sheet.datePlaceholder
           : GRID_COPY.sheet.numberPlaceholder;
+  const shown = typeof value === "string" ? value : (value ?? []).join(", ");
   return (
     <div data-slot="column-filter" data-filter-mode={mode} className="pt-1">
+      {/* A rule longer than the box reads in full as TruncatedText's text does (design/states.md, long text): on hover
+          (title), on focus (the box scrolls through it) and to a screen reader (the value). The block wraps a span and
+          Input owns its typography, so the box takes the block's rule without its «…». */}
       <Input
         type="text"
         inputMode={mode === "number" ? "decimal" : undefined}
         aria-label={GRID_COPY.sheet.filterLabel(spec.header)}
         aria-invalid={invalid || undefined}
-        title={invalid ? GRID_COPY.sheet.invalidRule : undefined}
+        title={invalid ? GRID_COPY.sheet.invalidRule : shown || undefined}
         placeholder={placeholder}
-        value={typeof value === "string" ? value : (value ?? []).join(", ")}
+        value={shown}
         onChange={(event) => column.setFilterValue(event.target.value)}
         // Typing in the box must not move the grid's selected cell.
         onKeyDown={(event) => event.stopPropagation()}
