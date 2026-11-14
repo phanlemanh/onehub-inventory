@@ -22,9 +22,11 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
+import { FRAME_COPY } from "../frame-copy";
 import type { NavLink, NavSection } from "../nav-menu";
 
 const ROOT = "__root__";
+const ALL = FRAME_COPY.secondColumn.all;
 
 /** Prototype only: the place keeps the drawing being compared (`?loi=`). */
 function withLoi(href: string): string {
@@ -172,6 +174,60 @@ function GroupsB({ section, activeHref }: { section: NavSection; activeHref: str
   );
 }
 
+/**
+ * Lối D — the same look as the rest of the column: each project a group titled with its name, as «Theo trạng thái» is;
+ * its places are the column's own entries, the count standing at the end where a saved view's «…» stands. Only a
+ * complex nests its buildings, one level, so names keep their room.
+ */
+function SectionsD({ section, activeHref }: { section: NavSection; activeHref: string | null }) {
+  const { isMobile, setOpenMobile } = useSidebar();
+  const close = () => {
+    if (isMobile) setOpenMobile(false);
+  };
+  const entry = (l: NavLink, title = l.title): React.ReactNode => (
+    <SidebarMenuSubItem key={`${l.href}-${title}`}>
+      <div className="flex min-w-0 items-center gap-1">
+        <div className="min-w-0 flex-1">
+          <SidebarMenuSubButton
+            isActive={l.href === activeHref}
+            render={
+              <Link
+                href={withLoi(l.href)}
+                title={l.title}
+                aria-current={l.href === activeHref ? "true" : undefined}
+                onClick={close}
+              />
+            }
+          >
+            <span>{title}</span>
+          </SidebarMenuSubButton>
+        </div>
+        <div className="shrink-0 pe-1">
+          <Count n={l.count} />
+        </div>
+      </div>
+      {(l.children ?? []).length > 0 ? (
+        <SidebarMenuSub>{(l.children ?? []).map((c) => entry(c))}</SidebarMenuSub>
+      ) : null}
+    </SidebarMenuSubItem>
+  );
+  return (
+    <div data-slot="geo-tree" data-loi="d">
+      {section.items.map((project) => (
+        <SidebarGroup key={project.href}>
+          <SidebarGroupLabel title={project.title}>{project.title}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenuSub>
+              {entry({ ...project, children: [] }, ALL)}
+              {(project.children ?? []).map((c) => entry(c))}
+            </SidebarMenuSub>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      ))}
+    </div>
+  );
+}
+
 /** Lối C — ReUI Tree «Permissions» (c-tree-7): plus/minus, a box on each building, several buildings at once. */
 function ChecksC({ section, activeHrefs }: { section: NavSection; activeHrefs: string[] }) {
   const router = useRouter();
@@ -274,6 +330,7 @@ export function SecondColumnTree({
   const activeHrefs = params
     .getAll("vung")
     .map((k) => `/inventory?${new URLSearchParams({ vung: k })}`);
+  if (loi === "d") return <SectionsD section={section} activeHref={activeHref} />;
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{section.title}</SidebarGroupLabel>

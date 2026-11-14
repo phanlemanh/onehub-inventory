@@ -59,7 +59,8 @@ chọn trước khi duyệt.
   nơi thì ngăn đóng và bảng lọc như AC-2; ở 1024 và 1440 tên nơi dài xuống dòng, không cắt — ba dự án «Vinhomes Ocean Park
   …» phân biệt được.
 - AC-9: Given Bảng hàng có cây ở 1440 và 360, sáng và tối, When chạy bài trợ năng axe và đi bằng phím, Then không vi phạm
-  nào; Tab vào cây, mũi tên tới được từng nơi, Enter mở nơi ấy, nút đang chọn mang `aria-current`.
+  nào; bàn phím tới được từng nơi (Tab với D; mũi tên của khối Cây với A, C), Enter mở nơi ấy, nút đang chọn mang
+  `aria-current`.
 - AC-10: Given các màn khác dùng cột thứ hai của App Shell (Đã gửi; Tuỳ chỉnh của sàn khi hàng 7e đã gộp), When mở các màn ấy
   ở 1440 và 360, Then cột thứ hai của chúng như trước (cùng mục, cùng mục sáng, không cây), bài kiểm App Shell cũ vẫn xanh
   không đổi lời; ảnh trước/sau trên trang Cổng Bằng chứng.
@@ -104,5 +105,5 @@ chí trên.
 - Tệp ngoài vùng (G-1411-79 cho ở mức bản bấm được, nêu đích danh): `src/components/templates/nav-items.ts`, `nav-menu.tsx`
   (mục con và số của cột thứ hai); `src/components/candidate/grid-view.ts`, `column-filter-cell.tsx` (khớp trọn tên cho danh
   sách, hiện danh sách); `package.json`, `package-lock.json`, `src/components/reui/tree.tsx`, `design/component-registry.json`
-  (khối Cây của ReUI, cả hai lối còn lại đều dùng); `_acceptance/config.yaml` (hai dòng lệnh chấm, chỉ thêm).
+  (chỉ khi chủ kho chọn A hay C; chọn D thì gỡ gói Cây khỏi nhánh); `_acceptance/config.yaml` (hai dòng lệnh chấm, chỉ thêm).
 - Bản bấm được có tham số chỉ để so (`?loi=`, `?nhieu=`); gỡ khi dựng.

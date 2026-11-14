@@ -28,20 +28,21 @@ cho mục lục phụ của màn — kèm số căn, và nối cây với ô l�
 - **Tên dài.** Ba dự án mẫu cùng mở đầu «Vinhomes Ocean …»; cắt chữ thì không phân biệt được (thấy ở bản đầu). Tên nơi xuống
   dòng trong cột, không cắt.
 
-## Hai lối (Hỏi-1, câu chính của Cổng Phạm vi)
+## Ba lối (Hỏi-1, câu chính của Cổng Phạm vi)
 
 | Lối | Dáng | Số căn | Rất nhiều toà | Khối |
 |---|---|---|---|---|
-| A (khuyên) | Cây gập; chỉ mở nhánh đang chọn; tên dài xuống dòng | chữ số mờ cuối dòng | gọn — nhánh khác gập | ReUI Tree «Basic» (c-tree-1) |
+| D (khuyên) | Cùng UI với cả cột: mỗi dự án một nhóm có tiêu đề như «Theo trạng thái»; «Tất cả», phân khu, toà là mục con; phân khu lồng toà một cấp; không gập | chữ số mờ cuối mục | dài, cuộn trong cột | mục của cột thứ hai (bậc 1, trong kho), không thêm gói |
+| A | Cây gập; chỉ mở nhánh đang chọn; tên dài xuống dòng | chữ số mờ cuối dòng | gọn — nhánh khác gập | ReUI Tree «Basic» (c-tree-1) |
 | C | Cây có ô chọn, cộng/trừ; chọn nhiều toà một lúc | chữ số mờ cuối dòng | dài, cuộn trong cột | ReUI Tree «Permissions» (c-tree-7) |
 
-Khuyên A: đọc được tên dài, gọn khi nhiều toà, chọn một nơi là một lần bấm. Giá: cây là kiểu mục khác các mục còn lại của
-cột (chủ kho chốt ở 2c «cả cột thứ hai một kiểu mục») và thêm gói phụ thuộc `@headless-tree`.
+Khuyên D: chủ kho hỏi ở Cổng Phạm vi có nên đồng nhất UI với «Bảng hàng» và «Theo trạng thái» — D giữ đúng luật 2c «cả cột
+thứ hai một kiểu mục», không thêm gói, tên đọc trọn vì tên dự án lên tiêu đề nhóm. Giá: không gập, sàn rất nhiều toà thì
+cột dài. A và C cần gói `@headless-tree` và khối Cây ReUI.
 
-**Đã loại — B, mục con gốc của cột** (bậc 1 của quyết định 0023, đúng kiểu mục 2c): luật lint của kho cấm đặt lớp chiều
+**Đã loại — B, mục con gốc của cột lồng ba cấp** (dự án cũng là mục con): luật lint của kho cấm đặt lớp chiều
 cao, chữ lên mục gốc thanh bên; dựng đúng luật thì mục con lồng hai cấp ở cột 14 rem chỉ còn chừng mười chữ — «S..»,
-«Vinhomes Oc…» (`figures/proto/b-phan-khu-cot.png`). Mở lại B cần thêm một cỡ «hai dòng» vào mục gốc của thanh bên, là sửa
-`src/components/ui`, cấm theo luật riêng 11 của kho. Kẻ thụt lề của khối c-tree-2 cũng bỏ vì cần lớp tự chế lint cấm.
+«Vinhomes Oc…» (`figures/proto/b-phan-khu-cot.png`). D sửa đúng chỗ ấy: tên dự án lên tiêu đề nhóm, chỉ còn một cấp lồng. Kẻ thụt lề của khối c-tree-2 cũng bỏ vì cần lớp tự chế lint cấm.
 
 ## Từ Quỹ hàng
 
@@ -82,14 +83,15 @@ Dự án/Phân khu/Toà của RESO và danh mục 7d.
 ### 4. Hành vi
 
 - Bấm một nơi chỉ thay lọc Dự án, Toà; lọc khác đang bật giữ nguyên (Hỏi-2). Số căn đếm theo các lọc khác đang bật, không theo chính lọc Dự án/Toà; nơi còn 0 vẫn hiện, ghi 0 (Hỏi-3).
-- Phím: Tab vào cây, mũi tên lên/xuống/trái/phải của khối Cây đi giữa các nơi và gập/mở, Enter mở nơi.
+- Phím: D — Tab tới từng nơi, Enter mở; A, C — Tab vào cây, mũi tên đi giữa các nơi và gập/mở, Enter mở.
 - Khổ: 1440, 1024 cột thứ hai rộng 14 rem như cũ; 414, 360 cây trong ngăn.
 
 ### 5. Xuất xứ component
 
 | Component | Nấc (dùng / ghép / mở rộng / tạo) | Vì sao (1 dòng) |
 |---|---|---|
-| Tree (ReUI, c-tree-1 / c-tree-7) | dùng | cây của lối A hay C, cài bằng CLI |
+| Mục con cột thứ hai (SidebarMenuSub), tiêu đề nhóm | dùng | lối D, không đặt lớp nào lên mục gốc |
+| Tree (ReUI, c-tree-1 / c-tree-7) | dùng | chỉ khi chọn A hay C, cài bằng CLI |
 | Danh sách mục cột thứ hai (nav-items) | mở rộng | mục có mục con và số; màn khai, cột vẽ |
 | Ô lọc cột (candidate) | mở rộng | hiện danh sách tên; khớp trọn tên cho danh sách |
 

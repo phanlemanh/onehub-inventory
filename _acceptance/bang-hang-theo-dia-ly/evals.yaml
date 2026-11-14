@@ -95,7 +95,7 @@ evals:
     executor: script
     cmd: config:executors.test.dia_ly_e2e_db
     paths: [src/components/templates/app-shell/**, tests/e2e-db/dia-ly.spec.ts]
-    expected: "exit 0; axe trên Bảng hàng có cây ở 1440 và 360, sáng và tối: 0 vi phạm; Tab vào cây, mũi tên tới nút S1.01 rồi Enter → bảng lọc S1.01 và nút mang aria-current; ca phá (nút không vào được bằng Tab) đỏ với 'khong toi duoc bang phim'"
+    expected: "exit 0; axe trên Bảng hàng có cây ở 1440 và 360, sáng và tối: 0 vi phạm; tới nút S1.01 bằng bàn phím theo lối đã chọn (Tab với D, mũi tên với A, C) rồi Enter → bảng lọc S1.01 và nút mang aria-current; ca phá (nút không vào được bằng Tab) đỏ với 'khong toi duoc bang phim'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E13
