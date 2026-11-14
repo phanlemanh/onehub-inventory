@@ -128,5 +128,12 @@
       "i": 4,
       "p": "Chưa kê hết mọi chỗ đọc sổ linh kiện. Đã kê năm chỗ và chạy cổng chứng minh màn trên sổ thật; phần thử với sổ cũ bị bác vì cổng ấy chỉ đọc tên và tệp, sổ cũ cũng có."
     }
+  ],
+  "decisions": [
+    {
+      "id": "E9",
+      "q": "Hướng dẫn dựng màn có tả đúng sổ linh kiện mới không?",
+      "why": "Ba người chấm độc lập đều thấy mục 1 nêu đủ sáu thứ của mỗi linh kiện và không còn nói «mỗi phần»."
+    }
   ]
 }
