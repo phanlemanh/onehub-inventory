@@ -47,3 +47,33 @@ cột đầu là tên khái niệm chuẩn, không có chữ số, chữ riêng 
    R khuyên: `vao_vung` vào «Trường riêng» với ba trường thử (hai tên có chữ số, một trường «chọn một» khoảng 25 lựa
    chọn để ô «Lựa chọn» bị cắt thật ở 1440), và G soát trước bài «vừa 8 cột» của hàng nào dùng sàn thử chung; nếu có
    thì dùng lối «Mẫu nhập» và chấp nhận rủi ro «chữ dài» ở khổ rộng.
+
+## Kiểm trên giấy: phần nào làm lối vào của bộ khung (G-1411-50)
+
+Căn cứ đọc mã, không chạy bộ đầy đủ:
+
+- **Lọc đầu cột:** cột đầu phải có chuỗi chứa chữ số, khớp ít nhất 2 dòng mà không phải mọi dòng
+  (`pickNeedle` trong `tools/e2e_templates/recipes.ts` bản 2e).
+- **Chữ dài:** phải có một ô bị cắt. Lưới không có trần bề rộng cột: mỗi cột nới tới hết chữ khi còn chỗ (`spreadSpareCh`,
+  `fullWidthCh` trong `src/components/candidate/column-kind.ts`), nên ô chỉ bị cắt khi tổng chữ đầy đủ của các cột rộng
+  hơn vùng. Ở 1440 vùng lưới rộng khoảng 1040 px, tức khoảng 110 ký tự; ở 1024 khoảng 65 ký tự (ảnh `evidence/`).
+
+| Phần | Cột hiện trên màn | Lọc đầu cột | Chữ dài ở 1024 | Chữ dài ở 1440 | Thêm cột vào Bảng hàng của sàn thử chung |
+| --- | --- | --- | --- | --- | --- |
+| Căn chờ khớp | Mã sàn gõ (tối đa 80), Tình trạng | Đạt với ba mã như «A-101», «A-102», «B-201» | Đạt: mã 80 ký tự bị cắt | Không chắc: cột mã còn khoảng 84 ký tự, mã 80 ký tự vừa | Không |
+| Từ điển giá trị | Trường, Chữ sàn viết (40), Giá trị chuẩn | Chỉ đạt khi tên trường có chữ số, tức là trường riêng | Đạt khi giá trị dài, tức là lựa chọn của trường riêng | Đạt khi ba cột cùng dài (khoảng 120 ký tự) | Có, vì cần trường riêng |
+| Mẫu nhập | Tên mẫu (60), Số cột | Đạt với «Sheet 2024», «Sheet 2025», «Mẫu tháng» | Đạt: tên 60 ký tự bị cắt | Không: 60 ký tự vừa | Không |
+| Nhãn riêng (phần mở đầu) | Khái niệm chuẩn, Chữ của sàn (40) | Không: tên khái niệm không có chữ số | Đạt: nhãn 40 ký tự bị cắt (đã đo) | Không: 40 ký tự vừa (đã đo) | Không |
+
+Kết luận:
+
+- **Căn chờ khớp** là phần ít dữ liệu nhất đo được «lọc đầu cột»: ba căn chờ có mã chứa chữ số, không thêm cột nào vào
+  Bảng hàng.
+- **«Chữ dài» ở 1440** không phần nào đo chắc chắn mà không có trường riêng, vì mọi chữ sàn nhập đều có trần (40, 60,
+  80 ký tự) nhỏ hơn bề rộng vùng ở khổ ấy.
+  - Với «Căn chờ khớp» thì sát ngưỡng: mã 80 ký tự cần khoảng 83 ký tự bề rộng, cột có khoảng 84.
+  - Đo ở 1024 thì đạt, nhưng con số ở 1440 phải chạy thật mới biết.
+- **R khuyên:** `vao_vung: /tuy-chinh-san?phan=can-cho`, cùng ba căn chờ cho sàn thử chung: hai mã ngắn có chữ số và
+  một mã 80 ký tự.
+  - Khi dựng, chạy thật ca «chữ dài» ở 1440 trước.
+  - Còn vừa ô thì dừng, báo G: khi ấy chỉ còn lối đổi luật công cụ cho ca «chữ dài».
