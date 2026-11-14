@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 476666e8a81655f7e284fa787a8043074a8c3881
+verified_commit: 0d6acd84861efd4fff906d9766bb7bb7d7ffe305
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -236,3 +236,7 @@ Không có mục judgment trong hợp đồng này; không có panel nào cần 
 
 Round 1: E10 failed — bài khoá lời hàng 9c ném lỗi khi checkout nông nên make check đỏ. Returned to implementation.
 Round 2: E3, E4, E10, E13 chạy lại và xanh trên 476666e; các eval còn lại mang từ round 1.
+
+### Re-pin lần 1 — 2026-11-14, do gộp main sau hàng 7e
+run_id: repin-20261114T155830Z-87687
+sha: 0d6acd84861efd4fff906d9766bb7bb7d7ffe305 · suites: 3 lệnh exit 0 · evals: 14/14 eval máy đạt kỳ vọng · ngoài làn máy: E7, E12 · AC không có chốt máy: AC-9
