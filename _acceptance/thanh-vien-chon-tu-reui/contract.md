@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [members]
-status: approved
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-14T13:02:38Z
 design_doc: _acceptance/thanh-vien-chon-tu-reui/design.md
