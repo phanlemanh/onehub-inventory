@@ -257,7 +257,7 @@ test("tu-choi-403-cau-rieng", { tag: "@cho" }, async ({ page }, info) => {
   await page.goto("/members");
   await expect(page.locator('[data-state="ready"]')).toBeVisible();
   await page
-    .locator(`li[data-member="${people["R"]!.email}"]`)
+    .locator(`[data-member="${people["R"]!.email}"]`)
     .getByRole("button", { name: new RegExp(CHANGE) })
     .click();
   const roles = page.locator('[data-slot="roles-dialog"]');

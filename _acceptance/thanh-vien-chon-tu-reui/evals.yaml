@@ -1,0 +1,139 @@
+schema_version: 1
+feature_slug: thanh-vien-chon-tu-reui
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.thanh_vien_e2e_c
+    paths: [src/app/(app)/members/**, tests/e2e-db/thanh-vien.spec.ts]
+    expected: "exit 0; tests/e2e-db/thanh-vien.spec.ts dựng một sàn chín người (danh sách viết trước trong bài: tên, email, vai, người mời), đăng nhập Quản trị sàn, mở /members ở 1440: có đúng một khung tên 'Thành viên' với dòng '9 người trong sàn'; tập dòng người đọc từ DOM bằng [data-member] đúng bằng chín email đã dựng; mỗi dòng có chữ cái đầu, tên, email, 'Người mời: …' và đúng tập nhãn vai của người ấy, nút tên 'Đổi vai · <tên>'; không có ô searchbox, tablist, progressbar hay nút 'Xuất'; chiều đỏ: bài đối chứng dựng sàn có thêm người thứ mười mà giữ kỳ vọng chín thì thấy 'member rows differ from the company'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.thanh_vien_e2e_c
+    paths: [src/app/(app)/members/**, tests/e2e-db/thanh-vien.spec.ts]
+    expected: "exit 0; cùng sàn ở bốn dự án 360, 414, 1024, 1440, bài đo bề rộng khung [data-slot=members-frame] rồi chọn kỳ vọng theo bảng viết trước: khung >= 896 px thì với mỗi phần (người, người mời, vai, nút) toạ độ trái bằng nhau ở mọi dòng (sai số 1 px); 672 <= khung < 896 thì phần người mời không hiện và ba phần còn lại thẳng hàng; khung < 672 thì đáy khối tên-email nằm trên đỉnh khối vai; ở 1440 khung >= 896; thêm hai ca biên đặt khung ở 895 và 896 px bằng khổ cửa sổ tính từ lề App Shell; scrollWidth - clientWidth <= 0 ở mọi khổ; một người tên 80 ký tự có phần tên bị cắt (scrollWidth > clientWidth) và title mang đủ tên; chiều đỏ: bài đối chứng dịch một dòng 8 px bằng style thì thấy 'column spine broken: <phần>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.thanh_vien_e2e_c
+    paths: [src/app/(app)/members/**, src/modules/identity/ui/**, tests/e2e-db/members.spec.ts, tests/e2e-db/bo-nut-members.spec.ts]
+    expected: "exit 0; tests/e2e-db/members.spec.ts và tests/e2e-db/bo-nut-members.spec.ts của hàng 9 và 9e chạy đủ, mọi ca xanh (lời bài không đổi do E13 đo)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-3
+    executor: script
+    layer: backend-effect
+    cmd: config:executors.script.moi_nguoi_db_c
+    paths: [src/modules/identity/**, db/migrations/**, tests/db/moi-nguoi.db.test.ts]
+    expected: "exit 0 trên Postgres của dãy C: mọi ca của tests/db/moi-nguoi.db.test.ts xanh (tệp không đổi do E13 đo)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.thanh_vien_e2e_c
+    paths: [src/app/(app)/members/**, src/components/candidate/form-dialog.tsx, tests/e2e-db/thanh-vien.spec.ts, tests/e2e-db/members.spec.ts]
+    expected: "exit 0; trong tests/e2e-db/thanh-vien.spec.ts ở 1440: bấm 'Mời người' thì hộp [data-slot=invite-dialog] có tiêu đề 'Mời người' và ngay cạnh trong cùng hàng một nhãn mang đúng tên sàn đã dựng; có đúng ba nhóm trường Email, Tên trong sàn, Vai với bốn ô đánh dấu vai theo thứ tự bảng vai; chân hộp có 'Thôi' và 'Mời'; mời một email mới thì hộp đóng, có báo 'Đã mời [Tên] …' và dòng [data-member=<email>] xuất hiện; các ca lỗi mời của tests/e2e-db/members.spec.ts xanh như E3; chiều đỏ: bài đối chứng đặt kỳ vọng tên sàn khác thì thấy 'invite badge is not the company'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.thanh_vien_unit
+    paths: [src/components/candidate/form-dialog.tsx, tests/form-dialog.test.tsx]
+    expected: "exit 0; tests/form-dialog.test.tsx có ca 'khong nhan' dựng FormDialog không truyền badge và so cây con của DialogHeader đúng như trước hàng này (tiêu đề là con trực tiếp, không phần tử bọc), và ca 'co nhan' truyền badge thì nhãn và tiêu đề là anh em trong cùng một phần tử; mọi ca cũ của tệp xanh; chiều đỏ: ca đối chứng luôn bọc tiêu đề thì thấy 'header changed without badge'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-5
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/components/candidate/form-dialog.tsx, src/modules/listings/ui/view-name-dialog.tsx, src/modules/listings/ui/listing-cell-edit.tsx, src/modules/listings/ui/report-unit-error.tsx]
+    steps:
+      - "Open the three pairs of shots in _acceptance/thanh-vien-chon-tu-reui/evidence/: truoc-form-dialog-dat-ten-goc-nhin.png and sau-form-dialog-dat-ten-goc-nhin.png (name a saved view, Inventory, signed in as ListAgent), truoc-form-dialog-bao-sai.png and sau-form-dialog-bao-sai.png (report wrong unit info, record panel, BuyerAgent), truoc-form-dialog-trang-thai.png and sau-form-dialog-trang-thai.png (status dialog of in-cell edit). «truoc» was taken with the main branch's FormDialog, «sau» with this branch's, same data, 1440 light"
+      - "Compare each pair side by side: title line, description, fields, footer buttons, spacing; also compare the files' sha256 and say whether each pair is byte-identical"
+    expected: "Ảnh 1440 sáng của ba hộp dùng FormDialog ở màn khác (đặt tên góc nhìn, sửa trên ô, báo sai thông tin) trên nhánh của hàng và trên nhánh chính đặt cạnh nhau: không khác về dáng tiêu đề, khoảng cách, trường và chân hộp; không có nhãn cạnh tiêu đề"
+    evidence_required: [screenshot, observed]
+
+  - id: E8
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.thanh_vien_e2e_c
+    paths: [src/app/(app)/members/**, tests/e2e-db/thanh-vien.spec.ts]
+    expected: "exit 0; tests/e2e-db/thanh-vien.spec.ts có ma trận chín trạng thái viết trước (ST-members-loading, -error, -forbidden, -ready, -long, ST-invite-invalid, -already, -failed, ST-roles-last-admin); mỗi trạng thái kiểm đúng cột 'Hiển thị gì' của bảng trạng thái thiết kế — loading có khung chờ và nút 'Mời người'; error có nút 'Thử lại'; forbidden có 'Không đủ quyền' và lối về Hôm nay; ready có khung 'Thành viên' và dòng đếm; long có tên cắt và title đủ; ba lỗi mời có đúng câu của hàng 9 và nút 'Thử lại' ở lỗi máy chủ; last-admin có câu Quản trị sàn cuối — rồi quét axe sáng và tối không lỗi serious hay critical; số trạng thái đã chạy bằng chín; chiều đỏ: ca đối chứng ẩn nút 'Thử lại' bằng style thì thấy 'state ST-members-error missing: Thử lại'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.thanh_vien_unit
+    paths: [src/app/(app)/members/**, tests/thanh-vien-mot-cua.test.ts]
+    expected: "exit 0; tests/thanh-vien-mot-cua.test.ts đọc mọi tệp trong src/app/(app)/members: mọi lời gọi fetch dùng MEMBERS_BASE_PATH của @/modules/identity, không tệp nào nhập @/lib/db, pg, server-only hay đường dẫn /api ghim chữ; chiều đỏ trên bản sao trong thư mục tạm có thêm một fetch('/api/v1/khac') thì thấy 'members screen reads outside the identity door'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["src/**", "design/**", "ontology/**", "tests/**", "tools/**"]
+    expected: "exit 0; make check xanh (lint, chữ không ghim, ranh giới mô-đun, kiểu, bài đơn vị, ontology, chứng minh màn)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [design/screens.yaml, design/patterns/**, design/so-khoi.yaml, _acceptance/thanh-vien-chon-tu-reui/chung-minh-man.md, tools/proof_gate/**]
+    expected: "exit 0; lưới chứng minh màn đọc chung-minh-man.md của hàng này đạt; design/screens.yaml có family khác null cho màn members và tệp họ tương ứng ở design/patterns/ tồn tại; design/so-khoi.yaml có dòng solution-users-8 và dòng dialog-2 với ho_so: thanh-vien-chon-tu-reui"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-9
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/app/(app)/members/**, src/modules/identity/ui/**, src/components/candidate/framed-list.tsx, src/components/candidate/form-dialog.tsx]
+    steps:
+      - "Open _acceptance/thanh-vien-chon-tu-reui/evidence/sau-members-1440-sang.png (the members screen, signed in as CompanyAdmin of a six-person sample company, 1440 light) beside _acceptance/thanh-vien-chon-tu-reui/evidence/design-pass/anh/goc-users8.png (ReUI solution-users-8 original)"
+      - "Open _acceptance/thanh-vien-chon-tu-reui/evidence/sau-hop-moi-1440-sang.png (the invite dialog) beside _acceptance/thanh-vien-chon-tu-reui/evidence/design-pass/anh/goc-dialog2.png (ReUI dialog-2 original)"
+      - "Also open _acceptance/thanh-vien-chon-tu-reui/evidence/design-pass/anh/lo-b-users8.png and hop-moi.png (the shots the owner approved at the scope gate) and say whether the built screen keeps that look"
+    expected: "Danh sách là một khung có đầu (tên, dòng đếm), mỗi dòng có chữ cái đầu tròn, tên trên email, cột thẳng hàng, nút cuối dòng — như khung Members của solution-users-8; hộp có nhãn nhỏ cạnh tiêu đề, trường xếp dọc, dải chân hai nút — như dialog-2; không có ô tìm, thẻ, khung khách, khung lời mời; dáng giữ như ảnh chủ kho đã duyệt ở Cổng Phạm vi"
+    evidence_required: [screenshot, observed]
+
+  - id: E13
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.thanh_vien_unit
+    paths: [tests/e2e-db/members.spec.ts, tests/e2e-db/bo-nut-members.spec.ts, tests/e2e-db/app-shell-doi-san.spec.ts, tests/db/moi-nguoi.db.test.ts, tests/thanh-vien-khoa-bai.test.ts]
+    expected: "exit 0; tests/thanh-vien-khoa-bai.test.ts lấy git diff giữa merge-base với nhánh chính và HEAD của bốn tệp: với tests/e2e-db/members.spec.ts, tests/e2e-db/bo-nut-members.spec.ts và tests/e2e-db/app-shell-doi-san.spec.ts mọi dòng thêm/bớt khớp đúng một cặp chỉ khác nhau ở li[data-member= thành [data-member=; với tests/db/moi-nguoi.db.test.ts diff rỗng; chiều đỏ trên chuỗi diff mẫu sửa một chuỗi trong expect thì thấy 'row 9 test changed beyond the row locator: <dòng>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-4
+    executor: script
+    layer: backend-effect
+    cmd: config:executors.script.thanh_vien_e2e_c
+    paths: [src/app/(app)/members/**, src/modules/identity/**, tests/e2e-db/thanh-vien.spec.ts]
+    expected: "exit 0; trong tests/e2e-db/thanh-vien.spec.ts sau khi mời qua hộp ở 1440, bài đọc bảng company_members bằng kết nối chủ của sàn đã dựng: có đúng một dòng mới với tên trong sàn đã gõ, đúng tập vai đã đánh dấu và invited_by là Quản trị sàn đang đăng nhập; chiều đỏ: ca đối chứng kỳ vọng thêm một vai không đánh dấu thì thấy 'invited member roles differ'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.thanh_vien_unit
+    paths: [src/components/candidate/framed-list.tsx, tests/framed-list.test.tsx]
+    expected: "exit 0; tests/framed-list.test.tsx dựng FramedList với đủ khe — tên, dòng đếm, nút đầu khung, một dòng có phần chính, phần phụ, nhãn, chỗ chỉnh cuối dòng, một dòng chỉ có phần chính, chân khung có ghi chú và nút lưu — thấy mỗi khe ở đúng chỗ, thứ tự phần của dòng đủ là main, secondary, tags, control, dòng thiếu khe không để lại phần rỗng, không chân khung khi không truyền; chiều đỏ: thứ tự phần sai thì thấy 'framed list row out of spine'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E16
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/danh-sach-khung.md", "src/modules/identity/ui/members-list.tsx", "src/components/candidate/framed-list.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm danh-sach-khung"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
