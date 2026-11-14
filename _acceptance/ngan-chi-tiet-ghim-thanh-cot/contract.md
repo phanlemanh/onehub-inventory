@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory, sent]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-13
 design_doc: docs/superpowers/specs/2026-11-14-ngan-chi-tiet-ghim-thanh-cot-design.md
@@ -112,3 +112,14 @@ coverage-scan» trong sổ quyết định. Thay vào đó, các trục cố đ�
 - Ngoài-5 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Khi mở rộng thanh bên ở cửa sổ khoảng 1024 px, hồ sơ nổi hẹp lại còn 320 px thay vì khoảng hai phần năm cửa sổ như trước. Vẫn đọc và dùng được, chỉ chật hơn. — `src/components/candidate/record-panel.tsx`
 - Ngoài-6 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Nếu mở rộng thanh bên khi hồ sơ đang ghim, cột ghim có thể chiếm quá nhiều chỗ và bảng bị chật hơn mức tối thiểu cho đến khi đổi cỡ cửa sổ hoặc tải lại trang. — `src/components/candidate/record-panel.tsx`
 - Ngoài-7 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Một phép kiểm tra thanh công cụ có bị hồ sơ che hay không có thể lặng lẽ không đo gì nếu nhãn nút đổi. Người dùng hiện không thấy lỗi nào. — `tests/e2e/ghim-ngan.spec.ts`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-14:
+  - Ngoài-1: Báo cáo cho người duyệt đang nói có mâu thuẫn chưa giải quyết ở phần so ảnh 1024, trong khi ảnh mới đã có sẵn. Người duyệt có thể bị rối hoặc đòi chụp lại thứ đã có, nhưng tính năng với người dùng không đổi.
+  - Ngoài-2: Ghi chú rà soát vẫn nói hội đồng đề xuất đạt trong khi vòng này là không đạt. Người ký có thể bị dẫn tới quyết định dựa trên thông tin cũ; người dùng cuối không thấy gì.
+  - Ngoài-4: Người dùng không thấy gì khác. Chỉ người đọc mã sau này có thể hiểu sai chỗ đứng của hồ sơ nổi vì lời chú thích đã cũ.
+  - Ngoài-5: Một phép kiểm tra nhỏ về việc lưu trạng thái ghim không thể phát hiện lỗi thật. Người dùng không bị ảnh hưởng vì kiểm tra trên trình duyệt thật vẫn bảo vệ việc này.
+  - Ngoài-6: Báo cáo nghiệm thu có thể ghi đạt cho phần ảnh giống mẫu ở cỡ 1024 trong khi ảnh đã lưu cho thấy dáng khác. Người dùng cuối không thấy gì, nhưng người duyệt có thể tin nhầm là đã đạt.
+  - Ngoài-8: Một trang ghi chép nội bộ vẫn mô tả hồ sơ nổi đứng sát thanh trên cùng. Người dùng không thấy khác biệt, chỉ người đọc lại lịch sử quyết định có thể hiểu nhầm.
+  - Ngoài-9: Tài liệu mô tả hồ sơ tự mâu thuẫn và thiếu mức rộng tối thiểu của bảng. Người dùng không thấy gì khác, chỉ người làm tiếp có thể hiểu sai.
+  - Ngoài-10: Một phép kiểm tra nhỏ về việc lưu trạng thái ghim không thể phát hiện lỗi thật. Người dùng không bị ảnh hưởng vì kiểm tra trên trình duyệt thật vẫn bảo vệ việc này.
+  - Ngoài-12: Nhật ký thay đổi bị dời một dòng của hàng khác xuống thấp hơn. Người dùng không thấy gì, chỉ có thể gây xung đột khi gộp với các hàng khác.
+  - Ngoài-13: Phép kiểm tra thanh công cụ có bị hồ sơ che hay không có thể lặng lẽ không đo gì nếu nhãn nút đổi. Người dùng hiện không thấy lỗi nào.

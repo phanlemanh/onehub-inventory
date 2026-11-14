@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 45e5ff4ce338aaeb8d069fb8c8410c234f312fec
-human_signoff:
+human_signoff: Manh Phan 2026-11-14
 ---
 
 # Evidence Report: ngan-chi-tiet-ghim-thanh-cot
@@ -134,7 +134,7 @@ human_signoff:
   run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E11-r5
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
+  verifier: config:executors.design.ui_check
   verified_at: 2026-11-14T06:18:04Z
   carried_from_round: 5
   screenshot: evidence/ghim-1440-sang.png
