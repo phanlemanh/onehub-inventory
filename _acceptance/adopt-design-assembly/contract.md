@@ -5,7 +5,7 @@ slug: adopt-design-assembly
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, tooling]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-15
 design_doc: docs/superpowers/specs/2026-11-14-adopt-design-assembly-design.md
@@ -105,3 +105,19 @@ Người đọc sổ linh kiện, kê trước từ việc tìm tên tệp trên
 - Các phép đo mới của hồ sơ nằm ở `rang/`: chúng chạy ở lượt chấm và lượt ghim lại, không chạy trong `make check`. Sau khi
   gộp, `make check` vẫn giữ tám phép kiểm lint qua lệnh kiểm design-assembly, và lệnh ấy đỏ khi dữ liệu của nó trỏ luật
   khác luật dòng sổ nêu; thứ không ai giữ nữa là việc các dòng sổ cũ còn nguyên (AC-4).
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-15:
+  - Ngoài-1: Phép đo «công cụ cũ» vẫn nạp bộ chuyển lint mới, nên lời mô tả của nó nói quá; kết quả hôm nay vẫn đúng.
+  - Ngoài-2: Thẻ Cổng Phạm vi duyệt lại ghi «chín quyết định» ở bảng phủ trong khi tiêu chí ghi tám; hợp đồng mới là bản đúng.
+  - Ngoài-3: Phép đo tắt riêng luật nêu tên có thể báo đỏ nhầm khi việc khác chạy cùng lúc trên cùng thư mục; chạy một mình
+    thì đạt, và nó không bao giờ xanh giả.
+  - Ngoài-4: Chiều đỏ của phép đo ấy dựa vào một nhánh dự phòng của công cụ mới; bỏ nhánh đó thì phép đo đỏ với lý do khác.
+  - Ngoài-5: Phép đo sinh lại sổ linh kiện chỉ cảnh báo, không đỏ, khi việc sinh lại đổi thêm tệp khác.
+  - Ngoài-8: Phép đo sinh lại sổ linh kiện ghi đè sổ trên chính kho, nên lần chạy thứ hai luôn đạt; lần đầu vẫn báo lỗi.
+  - Ngoài-10: Bài kiểm sổ linh kiện chỉ soi vài linh kiện khi khẳng định mọi linh kiện có tệp, cấp và nguồn.
+  - Ngoài-11: Bài kiểm chỉ soi một linh kiện mỗi thư mục thư viện khi khẳng định mọi linh kiện mua về được ghi là thư viện.
+  - Ngoài-12: Một bài kiểm vẫn đạt nếu linh kiện SidebarSeparator biến mất khỏi sổ.
+  - Ngoài-13: Phép đo cách sinh sổ tìm đúng lệnh trong tệp dựng nhưng không xét lệnh nằm dưới đúng bước.
+  - Ngoài-14: Phép đo tương phản đếm bốn phép kiểm mà không xét chúng phủ đủ sáng, tối và hai cặp màu.
+  - Ngoài-15: Phép đo tắt luật của tiêu chí AC-3 chỉ tắt luật bảng thô; tám luật còn lại được đo ở phép đo riêng (E14) từ lượt
+    chấm 2.
+  - Ngoài-16: Phép đo đếm phép kiểm lint so với ma trận viết trước chứ không đếm riêng; một phép kiểm trùng lặp không bị bắt.
