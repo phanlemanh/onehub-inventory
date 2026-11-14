@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 85c9e249107a81bdf336cf5d1aa29ab2bcbd2f79
+verified_commit: 6bbc29080f6f5550a37585e0e965aceb1fedf056
 human_signoff:
 ---
 
@@ -130,3 +130,7 @@ none — every multi-run eval is uniform
 
 Round 1: E1-E7 passed. Khong co eval failed.
 Round 2: ba lenh suite (make check, npm run build, make e2e) chay lai va xanh; E1-E7 carry-forward tu round 1 vi delta khong cham paths cua eval. Khong co judgment item, khong co judge panel.
+
+### Re-pin lần 1 — 2026-11-14, do gộp nhánh chính 56415b0 (sau hàng 7e)
+run_id: repin-20261114T164336Z-10203
+sha: 6bbc29080f6f5550a37585e0e965aceb1fedf056 · suites: 3 lệnh exit 0 · evals: 7/7 eval máy đạt kỳ vọng
