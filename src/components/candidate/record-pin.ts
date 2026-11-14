@@ -47,19 +47,23 @@ export function assertNoRecordData(cookieLine: string, recordId: string): void {
 /** The narrowest grid beside a pinned column, in px (PIN_MIN_AREA less the narrowest column). */
 export const PIN_MIN_GRID = PIN_MIN_AREA - PIN_MIN_WIDTH;
 
-/** The widest pinned column for a work area of `area` px: three fifths, and never less than 480 px of grid beside it. */
-export function widestPin(area: number): number {
-  return Math.max(PIN_MIN_WIDTH, Math.min(area * PIN_MAX_SHARE, area - PIN_MIN_GRID));
+/**
+ * The widest pinned column: three fifths of the work area `area`, and never less than 480 px left for the grid in the
+ * room `room` the data region has without a pinned column (the work area also holds the App Shell's second column and
+ * the page margins, so the grid is measured on its own region, row 3a ruling D-1411-5).
+ */
+export function widestPin(area: number, room: number = area): number {
+  return Math.max(PIN_MIN_WIDTH, Math.min(area * PIN_MAX_SHARE, room - PIN_MIN_GRID));
 }
 
-/** Keeps a pinned width inside its bounds for a work area of `area` px. */
-export function clampPinWidth(width: number, area: number): number {
-  return Math.round(Math.min(Math.max(width, PIN_MIN_WIDTH), widestPin(area)));
+/** Keeps a pinned width inside its bounds for a work area of `area` px and a data region with `room` px. */
+export function clampPinWidth(width: number, area: number, room: number = area): number {
+  return Math.round(Math.min(Math.max(width, PIN_MIN_WIDTH), widestPin(area, room)));
 }
 
-/** Whether the work area is wide enough for the pin button to show. */
-export function pinAvailable(area: number): boolean {
-  return area >= PIN_MIN_AREA;
+/** Whether the data region has room for a 320 px column beside a 480 px grid, so the pin button shows. */
+export function pinAvailable(room: number): boolean {
+  return room >= PIN_MIN_AREA;
 }
 
 function cookieValue(): string | undefined {

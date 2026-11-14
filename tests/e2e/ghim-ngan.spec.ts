@@ -42,7 +42,20 @@ async function injectStyle(page: Page, css: string): Promise<void> {
   }, css);
 }
 
-async function openScreen(page: Page, path: string): Promise<void> {
+/**
+ * Opens a screen. Below 1200 px the App Shell's second column is folded first: with it open at 1024 the data region
+ * has no room for a pinned column (row 3a, D-1411-5), and the checks that pin measure the pinned shape.
+ */
+async function openScreen(
+  page: Page,
+  path: string,
+  secondColumn?: "open" | "folded",
+): Promise<void> {
+  const width = page.viewportSize()?.width ?? 1440;
+  const folded = secondColumn ? secondColumn === "folded" : width < 1200;
+  await page
+    .context()
+    .addCookies([{ name: "app_shell_cot2", value: folded ? "0" : "1", url: "http://127.0.0.1" }]);
   await page.goto(path);
   await region(page).locator("tbody tr").first().waitFor();
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
@@ -143,33 +156,39 @@ test.describe("E1 · the pin button sits before Trước, Sau, Đóng", () => {
     await expect(unpinButton(page)).toHaveCount(0);
   });
 
-  test("the pin shows only with room for a 320 px column and a 480 px grid", async ({
+  test("the pin shows only when the data region has room for a 320 px column and a 480 px grid", async ({
     page,
     browserName,
   }, info) => {
-    test.skip(
-      browserName !== "chromium" || info.project.name !== "1024",
-      "do mot lan, khung 768 va 900",
-    );
-    // 768: the work area is under 800 px whether the App Shell's second column is open or folded — no pin.
-    await page.setViewportSize({ width: 768, height: 1024 });
-    await openScreen(page, "/inventory");
+    test.skip(browserName !== "chromium" || info.project.name !== "1024", "do o 1024 va 768");
+    const room = () =>
+      region(page).evaluate(
+        (el) =>
+          el.getBoundingClientRect().width + (parseFloat(getComputedStyle(el).marginRight) || 0),
+      );
+    // 1024 with the second column open: the data region is under 800 px — no pin, the record floats.
+    await openScreen(page, "/inventory", "open");
     await openRow(page, 0);
-    expect((await box(page, '[data-slot="sidebar-inset"]')).width).toBeLessThan(
-      MIN_COLUMN + MIN_GRID,
-    );
+    expect(await room()).toBeLessThan(MIN_COLUMN + MIN_GRID);
     await expect(pinButton(page)).toHaveCount(0);
     await expect(panel(page)).toHaveAttribute("data-record-layout", "float");
-    // 900: the work area reaches 800 px — the pin shows, and the pinned column keeps both bounds.
-    await page.setViewportSize({ width: 900, height: 1024 });
-    await openScreen(page, "/inventory");
+    // 1024 with the second column folded: room enough — the pin shows, the grid keeps at least 480 px.
+    await openScreen(page, "/inventory", "folded");
     await openRow(page, 0);
-    const area = (await box(page, '[data-slot="sidebar-inset"]')).width;
-    expect(area).toBeGreaterThanOrEqual(MIN_COLUMN + MIN_GRID);
+    expect(await room()).toBeGreaterThanOrEqual(MIN_COLUMN + MIN_GRID);
     await pin(page);
     const col = await columnBox(page);
     expect(col.width).toBeGreaterThanOrEqual(MIN_COLUMN - 1);
-    expect(col.width).toBeLessThanOrEqual(area - MIN_GRID + 1);
+    expect((await box(page, '[data-slot="data-region"]')).width).toBeGreaterThanOrEqual(
+      MIN_GRID - 1,
+    );
+    // 768: no room either way.
+    await page.setViewportSize({ width: 768, height: 1024 });
+    for (const state of ["open", "folded"] as const) {
+      await openScreen(page, "/inventory", state);
+      await openRow(page, 0);
+      await expect(pinButton(page)).toHaveCount(0);
+    }
   });
 });
 
@@ -181,6 +200,8 @@ async function assertRoomMade(page: Page, before: number): Promise<void> {
   const area = await box(page, '[data-slot="sidebar-inset"]');
   if (Math.abs(col.right - area.right) > 1) throw new Error("pinned column not flush right");
   if (reg.right > col.left + 1) throw new Error("region under pinned column");
+  if (reg.width < MIN_GRID - 1)
+    throw new Error(`grid under ${MIN_GRID} px when pinned: ${Math.round(reg.width)}`);
   const floats = await panel(page).evaluate((el) =>
     // A drop shadow is a shadow with a blur and a colour that shows; rings and empty shadows do not float.
     [
@@ -270,6 +291,24 @@ test.describe("E2 · pinning makes room beside the grid", () => {
     await openRow(page, 1);
     await pin(page);
     await expect(assertRoomMade(page, headers)).rejects.toThrow("pinned column still floats");
+  });
+
+  test("break: a pinned column that leaves the grid under 480 px is caught", async ({
+    page,
+    browserName,
+  }, info) => {
+    test.skip(browserName !== "chromium" || info.project.name !== "1024", "do o 1024");
+    await openScreen(page, "/inventory");
+    const headers = await headersShown(page);
+    await openRow(page, 1);
+    await pin(page);
+    // What a pin measured on the work area did: the grid gives up more than the column's width.
+    await page.addStyleTag({
+      content:
+        '[data-slot="data-region"]{margin-right:calc(var(--record-pinned) + 260px) !important}',
+    });
+    await page.waitForTimeout(300);
+    await expect(assertRoomMade(page, headers)).rejects.toThrow(/grid under 480 px when pinned/);
   });
 
   test("break: a region that does not give room is caught", async ({ page, browserName }, info) => {
@@ -421,10 +460,20 @@ async function drag(page: Page, dx: number): Promise<void> {
   await page.mouse.up();
 }
 
-function assertWidthBounds(width: number, area: number): void {
+/** The widest pinned column: three fifths of the work area, and 480 px left for the grid in the data region. */
+const widest = (area: number, room: number) =>
+  Math.max(MIN_COLUMN, Math.min(area * 0.6, room - MIN_GRID));
+
+function assertWidthBounds(width: number, area: number, room: number = Infinity): void {
   if (width < MIN_COLUMN - 1) throw new Error(`pinned column narrower than ${MIN_COLUMN}`);
-  if (width > area * 0.6 + 1) throw new Error("pinned column wider than three fifths");
+  if (width > widest(area, room) + 1) throw new Error("pinned column wider than its bound");
 }
+
+/** The data region's width without a pinned column. */
+const roomOf = (page: Page) =>
+  region(page).evaluate(
+    (el) => el.getBoundingClientRect().width + (parseFloat(getComputedStyle(el).marginRight) || 0),
+  );
 
 test.describe("E5 · the divider widens and narrows the column", () => {
   test("by mouse and by keys, inside its bounds, kept on reload", async ({
@@ -438,14 +487,19 @@ test.describe("E5 · the divider widens and narrows the column", () => {
     const area = (await box(page, '[data-slot="sidebar-inset"]')).width;
     const start = (await columnBox(page)).width;
     await drag(page, -200);
-    expect(Math.abs((await columnBox(page)).width - (start + 200))).toBeLessThanOrEqual(2);
-    assertWidthBounds((await columnBox(page)).width, area);
+    // Wider by the drag, up to the column's bound.
+    const bound = widest(area, await roomOf(page));
+    expect(
+      Math.abs((await columnBox(page)).width - Math.min(start + 200, bound)),
+    ).toBeLessThanOrEqual(2);
+    assertWidthBounds((await columnBox(page)).width, area, await roomOf(page));
     await drag(page, 2000);
     expect(Math.abs((await columnBox(page)).width - MIN_COLUMN)).toBeLessThanOrEqual(1);
-    assertWidthBounds((await columnBox(page)).width, area);
+    assertWidthBounds((await columnBox(page)).width, area, await roomOf(page));
     await drag(page, -2000);
-    expect(Math.abs((await columnBox(page)).width - area * 0.6)).toBeLessThanOrEqual(1);
-    assertWidthBounds((await columnBox(page)).width, area);
+    const room = await roomOf(page);
+    expect(Math.abs((await columnBox(page)).width - widest(area, room))).toBeLessThanOrEqual(1);
+    assertWidthBounds((await columnBox(page)).width, area, room);
     await divider(page).focus();
     const before = (await columnBox(page)).width;
     await page.keyboard.press("ArrowRight");

@@ -87,6 +87,13 @@ describe("clampPinWidth", () => {
     expect(clampPinWidth(360, 821)).toBe(341);
   });
 
+  it("counts the 480 px on the data region, not the whole work area (D-1411-5)", () => {
+    // 1024 window, second column folded: work area 944, data region 888 → widest 408.
+    expect(clampPinWidth(5000, 944, 888)).toBe(408);
+    // A data region of 632 px cannot hold 320 + 480: no pin there.
+    expect(pinAvailable(632)).toBe(false);
+  });
+
   it("keeps a width inside the bounds", () => {
     expect(clampPinWidth(560.4, 1400)).toBe(560);
   });

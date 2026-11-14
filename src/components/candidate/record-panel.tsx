@@ -271,10 +271,23 @@ const REGION_TOOLS = '[data-slot="region-toolbar"]';
  * its right edge (owner's choice at row 3's scope gate, «Trừ thanh trên»). Measured, not fixed in a class, because the
  * top bar hides in full screen (row 2a) and the panel then runs the whole height.
  */
+/** The data region whose width the pinned column takes: the grid must keep 480 px of it (row 3a, D-1411-5). */
+const DATA_REGION = '[data-slot="data-region"]';
+
+/** The data region's width without a pinned column: its own width plus the margin it gives up to the column. */
+function regionRoom(): number {
+  const region = document.querySelector<HTMLElement>(DATA_REGION);
+  if (!region) return 0;
+  return (
+    region.getBoundingClientRect().width + (parseFloat(getComputedStyle(region).marginRight) || 0)
+  );
+}
+
 function useWorkAreaBounds(open: boolean) {
   const [bounds, setBounds] = useState({
     top: 0,
     tools: 0,
+    room: 0,
     right: 0,
     bottom: 0,
     left: 0,
@@ -291,6 +304,7 @@ function useWorkAreaBounds(open: boolean) {
         // No top bar (full screen): the panel runs the whole height, from the top of the window.
         top: Math.max(0, barRect ? barRect.bottom : 0),
         tools: document.querySelector(REGION_TOOLS)?.getBoundingClientRect().bottom ?? 0,
+        room: regionRoom(),
         right: area ? Math.max(0, window.innerWidth - area.right) : 0,
         bottom: area ? Math.max(0, window.innerHeight - area.bottom) : 0,
         left: area ? Math.max(0, area.left) : 0,
@@ -301,6 +315,11 @@ function useWorkAreaBounds(open: boolean) {
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(document.documentElement);
+    // The work area and the data region change size without the window when the App Shell's sidebar opens or folds.
+    for (const selector of [WORK_AREA, DATA_REGION]) {
+      const el = document.querySelector(selector);
+      if (el) observer.observe(el);
+    }
     window.addEventListener("resize", measure);
     // The page scrolls under the sticky top bar: the bar's bottom and the work area's bottom move with it.
     window.addEventListener("scroll", measure, { passive: true });
@@ -376,12 +395,12 @@ function RecordColumn({
     if (!open && wasOpen.current) focusRow();
     wasOpen.current = open;
   }, [openId, focusRow]);
-  const canPin = pinAvailable(bounds.width);
+  const canPin = pinAvailable(bounds.room);
   const shown = openId !== null && view !== null;
   const pinned = pin.pinned && canPin && shown;
   const area = bounds.width;
   // Unpinned before, the column keeps the floating record's width, so pinning does not reflow the record.
-  const pinnedWidth = clampPinWidth(pin.width ?? floatWidth(bounds.window), area);
+  const pinnedWidth = clampPinWidth(pin.width ?? floatWidth(bounds.window), area, bounds.room);
   const width = pinned ? pinnedWidth : floatWidth(bounds.window);
   // The column follows the state: pinned width from the cookie, the float's own width otherwise.
   useEffect(() => {
@@ -425,7 +444,7 @@ function RecordColumn({
           // The new layout, as shares of the work area: the panel's own size may still be the old one here.
           const share = layout["record-column"];
           if (share === undefined) return;
-          const size = clampPinWidth((share / 100) * area, area);
+          const size = clampPinWidth((share / 100) * area, area, bounds.room);
           onPin({ pinned: true, width: size }, size);
         }}
       >
@@ -436,7 +455,12 @@ function RecordColumn({
           panelRef={panelRef}
           defaultSize={width}
           minSize={PIN_MIN_WIDTH}
-          maxSize={area > 0 ? `${(widestPin(area) / area) * 100}` : `${PIN_MAX_SHARE * 100}`}
+          // The grid's 480 px floor binds the pinned column only; the floating record keeps row 3's width.
+          maxSize={
+            pinned && area > 0
+              ? `${(widestPin(area, bounds.room) / area) * 100}`
+              : `${PIN_MAX_SHARE * 100}`
+          }
         >
           {/* A non-modal dialog: it has its own name and «Đóng», and the grid beside it stays usable. */}
           <aside
