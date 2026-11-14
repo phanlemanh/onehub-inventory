@@ -6,7 +6,7 @@ material: real-components
 context: host-embedded
 context_scenes: []
 reaction: nac-1 (anh-gui-kem-the)
-options: _acceptance/bang-hang-the-dien-thoai/cong-pham-vi.html (Hỏi-1 A | B, Hỏi-2 L1 | L2, ở 360) · ảnh ở cong/ · khối gốc ở evidence/reui/
+options: _acceptance/bang-hang-the-dien-thoai/cong-pham-vi.html (trình lại: Hỏi-1 Ô | Gọn, Hỏi-2 Nút | Hàng ô, ở 360) · ảnh ở cong/v2-* · khối gốc ở evidence/reui/
 divergence: opened
 ds_skill: inventory-ui
 states: [hom-nay, a, b, loc-hang, loc-nut, loc-ngan-mo, ho-so-tu-the, nguong-768]
@@ -41,3 +41,15 @@ mẫu cho mọi lối. Ảnh khối gốc ReUI chụp ở 360 từ trang xem tr�
   tiêu điểm ở thẻ.
 - Đã vá: lối B không nhóm thì mỗi thẻ một khung → một khung chia vạch cho cả danh sách.
 - Để sau: ảnh tối và các trạng thái tải, trống, lỗi trên thẻ — chụp sau khi chủ kho chọn lối (luật mười điểm, điểm 4).
+
+## Trình lại (2026-11-14, sau bốn ý của chủ kho)
+
+| state | breakpoint | theme | file |
+|---|---|---|---|
+| v2-o, v2-g, v2-khong-anh | 360, 414 | light | cong/v2-o-*.png, cong/v2-g-*.png, cong/v2-khong-anh-*.png |
+| v2-loc-nut, v2-loc-ngan, v2-loc-hang | 360 | light | cong/v2-loc-*.png |
+| v2-them, v2-nhom, v2-cuon, v2-ho-so | 360 | light | cong/v2-them-360-sang.png, cong/v2-nhom-360-sang.png, cong/v2-cuon-360-sang.png, cong/v2-ho-so-360-sang.png |
+| v2-nguong | 768 | light | cong/v2-nguong-768-sang.png |
+
+Đếm căn trọn màn đầu (máy đo): 360 — 7 (Ô, Gọn, chưa ảnh), 6 khi đang lọc; 414 — 8. Đã vá: hàng ô lọc (lối Hàng ô) dính
+sát mép trái vì cuộn bắt điểm → thêm lề cuộn. Thẻ danh sách chuyển vào `ListingCard` (luật đồng nhất màn của giám sát).

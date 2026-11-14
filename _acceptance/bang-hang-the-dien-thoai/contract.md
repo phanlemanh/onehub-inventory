@@ -30,20 +30,22 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại; màn này tro
 
 ## Criteria
 
-- AC-1: Given Bảng hàng ở 360 và 414 với 60 căn mẫu, When vùng ở trạng thái có dòng, Then thân vùng là danh sách thẻ, không
-  có bảng, không có thanh cuộn ngang của trang; mỗi thẻ hiện mã căn, giá chào dạng «x,xx tỷ» và nhãn trạng thái của căn ấy
-  (lối A thêm nơi và ba thông số — theo Hỏi-1); số thẻ bằng số dòng, thứ tự thẻ bằng thứ tự dòng của bảng ở cùng lọc và sắp
-  xếp; chân vùng «60 dòng».
+- AC-1: Given Bảng hàng ở 360 và 414 với 60 căn mẫu, When vùng ở trạng thái có dòng, Then thân vùng là danh sách thẻ dùng
+  trọn bề ngang, không khung nào bao quanh danh sách, không bảng, không thanh cuộn ngang của trang; mỗi thẻ là dáng «ngang
+  gọn» của thẻ căn đang có ở đầu hồ sơ (một khối, hai dáng): ô vuông bên trái (ảnh căn khi có, khi chưa có theo Hỏi-1),
+  mã căn và giá «x,xx tỷ» một dòng, nơi và nhãn trạng thái dòng hai, diện tích · phòng ngủ dòng ba; màn đầu ở 360 thấy
+  trọn ít nhất 6 căn, ở 414 ít nhất 7; thứ tự thẻ bằng thứ tự dòng của bảng; đầu hồ sơ giữ dáng xếp dọc như hôm nay.
 - AC-2: Given Bảng hàng ở 767 và 768 px, When mở và khi đổi khổ qua lại giữa hai khổ ấy, Then 767 hiện thẻ, 768 hiện bảng
   như hôm nay (tiêu đề cột, hàng ô lọc, nút «Cột», «Toàn màn hình»); 1024 và 1440 không đổi; đổi khổ không mất lọc, nhóm,
   sắp xếp đang bật.
 - AC-3: Given danh sách thẻ ở 360, đã cuộn xuống quá một màn, When chạm một thẻ, Then hồ sơ căn của hàng 3 mở toàn màn với
   địa chỉ `?ho-so=<id>` của căn ấy, «Trước/Sau» đi theo thứ tự thẻ; When đóng bằng «Đóng» hay nút lùi của trình duyệt, Then
   danh sách vẫn ở đúng chỗ cuộn cũ (lệch không quá 1 px) và tiêu điểm nằm trên thẻ vừa mở.
-- AC-4: Given Bảng hàng dưới 768, When người lọc trên điện thoại theo Hỏi-2 (khuyến nghị: hàng ô lọc luôn hiện, cuộn ngang,
-  cùng ô như dưới tiêu đề cột; chủ kho chọn nút «Lọc» thì: nút «Lọc (n)» mở ngăn đáy đủ ô lọc), Then thẻ chỉ còn căn khớp,
-  hai ô lọc chồng nhau như ở bảng, «x / 60 dòng» và «Xoá lọc» hiện; không còn căn nào khớp thì «Không có dòng nào khớp» và
-  «Xoá lọc» ở chỗ danh sách, ô lọc ở nguyên chỗ.
+- AC-4: Given Bảng hàng dưới 768, When người dùng hàng công cụ và lọc theo Hỏi-2 (khuyến nghị: nút Lọc mở ngăn đáy đủ
+  ô lọc, lọc đang chạy hiện thành chip có nút bỏ; lối kia: hàng ô lọc luôn hiện), Then hàng công cụ là một dòng dính dưới
+  thanh trên khi cuộn, gồm số dòng và ba nút biểu tượng vùng chạm 44 px (Lọc kèm số ô đang lọc, Nhóm theo Toà, «…» chứa
+  Lưu góc nhìn), không «Cột», không «Toàn màn hình»; thẻ chỉ còn căn khớp, hai ô lọc chồng nhau như ở bảng, «x / 60 dòng»
+  và «Xoá lọc» hiện; không còn căn nào khớp thì «Không có dòng nào khớp» và «Xoá lọc».
 - AC-5: Given Bảng hàng dưới 768 mở từ lối tắt trạng thái (`?status=`), từ ô ⌘K (`?ma=`) hay từ một góc nhìn đã lưu (2c),
   When danh sách hiện, Then thẻ đúng tập căn bảng hiện ở cùng địa chỉ; góc nhìn đang mở bị đổi lọc trên điện thoại thì cột
   thứ hai vẫn đánh dấu «đã đổi» như ở bảng.
@@ -54,13 +56,21 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại; màn này tro
 - AC-8: Given thẻ căn ở 360 với dữ liệu kiểm của bản phát triển (`?mau=bien`; bản production bỏ qua tham số này) (mã căn 14 ký tự liền không khoảng trắng, giá 125,5 tỷ, giá thuê theo tháng,
   căn chưa có giá «—», đủ sáu trạng thái), When thẻ hiện, Then không chữ nào tràn khỏi thẻ, thẻ không rộng hơn khổ, mã căn
   xuống dòng chứ không bị cắt mất, giá và nhãn trạng thái đọc trọn.
-- AC-9: Given mọi vai của sàn (Quản trị sàn, Trưởng nhóm, Đầu chủ, Đầu khách — 9a, 9b), When dùng Bảng hàng dưới 768, Then thẻ
+- AC-9: Given mọi vai của sàn đọc được Bảng hàng (Đầu chủ, Đầu khách, Trưởng nhóm — 9a, 9b), When dùng Bảng hàng dưới 768, Then thẻ
   không có ô sửa, nút sửa giá hay trạng thái, nút «Cột»; hồ sơ mở từ thẻ mang đúng bộ nút theo vai như hồ sơ mở từ bảng; cả
   thẻ là một nút tên «Căn <mã>», vùng chạm cao ít nhất 44 px, Tab đi qua từng thẻ, Enter mở hồ sơ; quét axe ở 360 và 414,
-  sáng và tối, không lỗi.
+  sáng và tối, không lỗi; Quản trị sàn thấy câu không đủ quyền, không thẻ.
 - AC-10: Given tài liệu của kho, When người đọc, Then trang thực thể `wiki/entities/listing.md` có hành vi thẻ dưới 768 trỏ tới hàng 2b; `design/behaviors.md` có hành vi danh sách thẻ dưới 768 (ngưỡng, chạm
   mở hồ sơ, lùi giữ chỗ cuộn); khuôn Lưới `design/patterns/luoi.md` nói lọc trên điện thoại theo Hỏi-2; sổ khối có dòng cho
   khối thẻ đã chọn; nhật ký có dòng của hàng này.
+
+## Vai × Màn
+
+Hàng này không đổi quyền: thẻ chỉ đọc với mọi vai đọc được Bảng hàng; vai không đọc được vẫn chỉ thấy câu không đủ quyền.
+
+| Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
+|---|---|---|---|---|
+| inventory | được — thẻ căn dưới 768, chạm mở hồ sơ, không sửa trên thẻ | được — như Đầu chủ | được — như Đầu chủ | chặn — vùng báo không đủ quyền, không thẻ |
 
 ## Coverage
 
@@ -79,7 +89,7 @@ quyền đã có. Thước đối chiếu:
 
 - Sửa giá, trạng thái trên thẻ hay trên điện thoại — hàng 3d.
 - Thẻ cho các màn Lưới khác (Đã gửi, Liên hệ sau này) — vùng có khe dùng chung, nhưng chỉ Bảng hàng dùng ở hàng này.
-- Ảnh căn trên thẻ — kho chưa có ảnh căn.
+- Tải ảnh căn — hàng 15; thẻ có sẵn chỗ ảnh, ảnh trong trang cổng là ảnh minh hoạ của bản phát triển.
 - Chọn nhiều thẻ (giữ lâu) và gửi khách từ danh sách — chưa có hàng lộ trình.
 - Khoá ghim cột «Căn» ở menu tiêu đề cột (việc gắn kèm từ 2e) — theo Hỏi-3; khuyến nghị tách việc nhỏ riêng.
 
@@ -101,14 +111,14 @@ Ngưỡng SỐNG của ô cơ hội, từng vế:
 
   | Chọn | Đổi |
   |---|---|
-  | Hỏi-1 A | AC-1 và E1: mỗi thẻ thêm nơi (Toà · Dự án) và ba thông số (Diện tích, Phòng ngủ, Xác nhận lúc) đúng của dòng ấy, ca phá «phone card missing fact: <mã> <trường>» |
-  | Hỏi-1 B | AC-1 và E1: mỗi thẻ thêm nơi; không ba thông số |
-  | Hỏi-2 L1 | AC-4, E4: hàng ô lọc ở trên danh sách, tám ô theo thứ tự cột; E9 Tab bắt đầu từ ô lọc cuối của hàng |
-  | Hỏi-2 L2 | AC-4, E4: nút «Lọc» khi không lọc, «Lọc (n)» đúng n ô đang lọc ở cả bốn ca, ngăn đáy mở và đóng (Esc, nút đóng), tiêu điểm về nút; E9 Tab bắt đầu từ nút «Lọc» |
+  | Hỏi-1 Ô | AC-1 và E1: căn chưa có ảnh có ô vuông ghi mã toà; mọi thẻ cùng chiều rộng chữ; ca phá «phone card missing tile: <mã>» |
+  | Hỏi-1 Gọn | AC-1 và E1: căn chưa có ảnh không có ô; chữ bắt đầu sát lề trái |
+  | Hỏi-2 Nút | AC-4, E4: nút Lọc mang tên «Lọc» khi không lọc, «Lọc (n)» đúng n ô đang lọc ở cả bốn ca, chip mỗi cột đang lọc bỏ được từng cái, ngăn đáy mở và đóng (Esc, nút đóng), tiêu điểm về nút; E9 Tab bắt đầu từ nút Lọc |
+  | Hỏi-2 Hàng ô | AC-4, E4: hàng ô lọc dưới hàng công cụ, tám ô theo thứ tự cột, không nút Lọc; E9 Tab bắt đầu từ ô lọc cuối của hàng |
   | Hỏi-3 làm trong hàng | thêm một tiêu chí khoá ghim cột Căn ở menu tiêu đề cột và một bài đo ở 1440 |
 
   Lối không được chọn: mã bản bấm được của lối ấy (`?the=`, `?loc=`) gỡ trước lượt chấm.
 
 - Tệp ngoài vùng của hàng: `src/components/candidate/data-region.tsx` (khe danh sách điện thoại) và tệp mới
-  `src/components/candidate/phone-list.tsx`; `design/behaviors.md`, `design/patterns/luoi.md`, `design/so-khoi.yaml`,
+  `src/components/candidate/phone-list.tsx`; dáng «ngang gọn» thêm vào `ListingCard` (`src/modules/listings/ui/listing-record.tsx`), không thêm tệp thẻ thứ hai; `design/behaviors.md`, `design/patterns/luoi.md`, `design/so-khoi.yaml`,
   `_acceptance/config.yaml` (thêm dòng). Báo giám sát trước khi dựng.

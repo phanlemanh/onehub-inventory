@@ -6,7 +6,7 @@ evals:
     executor: test
     cmd: config:executors.test.the_dien_thoai
     paths: [src/components/candidate/**, src/modules/listings/ui/**, tests/the-dien-thoai.test.tsx]
-    expected: "exit 0; tests/the-dien-thoai.test.tsx dựng InventoryGrid với 60 dòng mẫu, matchMedia giả khổ 360: không phần tử vai 'table' hay 'grid'; số nút data-slot='phone-card' BẰNG 60; dãy id của thẻ BẰNG dãy id dòng của cùng vùng dựng ở khổ 1440 (cùng lọc rỗng, cùng sắp xếp); với MỌI thẻ (ma trận 60, không lấy mẫu) thẻ chứa mã căn, chữ giá đúng formatByKind('money') của dòng, nhãn trạng thái đúng của dòng, và theo lối Hỏi-1 (bảng ở Notes của hợp đồng): nơi 'Toà · Dự án' của dòng, cùng ba thông số Diện tích, Phòng ngủ, Xác nhận lúc của dòng ở lối A; chân vùng '60 dòng'. Ca phá: thẻ bỏ giá → đỏ 'phone card missing price: <mã>'; thẻ bỏ một thông số (lối A) → đỏ 'phone card missing fact: <mã> <trường>'; thẻ xếp ngược → đỏ 'phone cards out of grid order'"
+    expected: "exit 0; tests/the-dien-thoai.test.tsx dựng InventoryGrid với 60 dòng mẫu, matchMedia giả khổ 360: không phần tử vai 'table' hay 'grid'; số nút data-slot='phone-card' BẰNG 60; dãy id của thẻ BẰNG dãy id dòng của cùng vùng dựng ở khổ 1440 (cùng lọc rỗng, cùng sắp xếp); với MỌI thẻ (ma trận 60, không lấy mẫu) thẻ chứa mã căn, chữ giá đúng formatByKind('money') của dòng, nhãn trạng thái đúng của dòng, nơi 'Toà · Dự án' của dòng, dòng 'diện tích · n phòng ngủ' của dòng, và ô vuông theo lối Hỏi-1 (bảng ở Notes của hợp đồng); thẻ là ListingCard data-layout='row' (không phần tử thẻ nào khác); không phần tử nào của khung (data-slot='frame*') bao danh sách; đầu hồ sơ của cùng dòng vẫn là ListingCard dáng xếp dọc; chân vùng '60 dòng'. Ca phá: thẻ bỏ giá → đỏ 'phone card missing price: <mã>'; thẻ bỏ diện tích → đỏ 'phone card missing fact: <mã> <trường>'; bọc lại danh sách trong khung → đỏ 'phone list framed'; thẻ xếp ngược → đỏ 'phone cards out of grid order'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E2
@@ -14,7 +14,7 @@ evals:
     executor: script
     cmd: config:executors.script.the_dien_thoai_e2e
     paths: [src/components/candidate/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/the-dien-thoai.spec.ts]
-    expected: "exit 0; tests/e2e/the-dien-thoai.spec.ts ca 'nguong': ma trận khổ viết trước {360, 414, 767 → thẻ; 768, 1024, 1440 → bảng} hằng 6 — khổ thẻ: không 'table', có phone-card, document.scrollingElement.scrollWidth <= clientWidth; khổ bảng: có 'table', tiêu đề cột Căn, hàng ô lọc, nút 'Cột' và 'Toàn màn hình', không phone-card; ca 'doi-kho': lọc Trạng thái 'Đang bán' ở 767 → đổi 768 → bảng còn lọc và đúng số dòng → về 767 → số thẻ bằng số dòng ấy. Ca phá (đổi ngưỡng trong bản sao sang 640) đỏ 'phone list at 767'"
+    expected: "exit 0; tests/e2e/the-dien-thoai.spec.ts ca 'nguong': ma trận khổ viết trước {360, 414, 767 → thẻ; 768, 1024, 1440 → bảng} hằng 6 — khổ thẻ: không 'table', có phone-card, document.scrollingElement.scrollWidth <= clientWidth, bề ngang thẻ đầu bằng bề ngang khổ, số thẻ nằm trọn trong màn đầu >= 6 ở 360 và >= 7 ở 414, hàng công cụ một dòng (chiều cao <= 60 px) với ba nút cao >= 44 px và còn dính ở top 48 px sau khi cuộn 1200 px; khổ bảng: có 'table', tiêu đề cột Căn, hàng ô lọc, nút 'Cột' và 'Toàn màn hình', không phone-card; ca 'doi-kho': lọc Trạng thái 'Đang bán' ở 767 → đổi 768 → bảng còn lọc và đúng số dòng → về 767 → số thẻ bằng số dòng ấy. Ca phá (đổi ngưỡng trong bản sao sang 640) đỏ 'phone list at 767'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3
@@ -70,7 +70,7 @@ evals:
     executor: script
     cmd: config:executors.script.the_dien_thoai_e2e
     paths: [src/components/candidate/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/the-dien-thoai.spec.ts]
-    expected: "exit 0; ca 'vai': với bốn vai viết trước {CompanyAdmin, TeamLead, ListAgent, BuyerAgent} (hằng 4, `?vai=` của bản phát triển) ở 360: không phần tử nào trong danh sách thẻ là input, combobox hay nút khác ngoài nút thẻ; không nút 'Cột'; mở thẻ đầu → tập tên nút của hồ sơ BẰNG tập tên nút của hồ sơ cùng căn mở từ bảng ở 1440 với cùng vai; ca 'tiep-can': nút thẻ có accessible name 'Căn <mã>', chiều cao >= 44, Tab từ điều khiển lọc cuối (L1: ô lọc cuối của hàng; L2: nút 'Lọc') tới thẻ đầu rồi thẻ kế, Enter mở hồ sơ; axe (wcag2a/aa, 21a/aa, 22aa) ở 360 và 414, sáng và tối (hằng 4) không lỗi. Ca phá gỡ tên nút thẻ → đỏ 'axe 360 light button-name'"
+    expected: "exit 0; ca 'vai': với ba vai đọc được viết trước {TeamLead, ListAgent, BuyerAgent} (hằng 3, `?vai=` của bản phát triển) ở 360: không phần tử nào trong danh sách thẻ là input, combobox hay nút khác ngoài nút thẻ; không nút 'Cột'; mở thẻ đầu → tập tên nút của hồ sơ BẰNG tập tên nút của hồ sơ cùng căn mở từ bảng ở 1440 với cùng vai; CompanyAdmin ở 360 → vùng báo không đủ quyền, phone-card đếm 0 (đối chứng); ca 'tiep-can': nút thẻ có accessible name 'Căn <mã>', chiều cao >= 44, Tab từ điều khiển lọc cuối (L1: ô lọc cuối của hàng; L2: nút 'Lọc') tới thẻ đầu rồi thẻ kế, Enter mở hồ sơ; axe (wcag2a/aa, 21a/aa, 22aa) ở 360 và 414, sáng và tối (hằng 4) không lỗi. Ca phá gỡ tên nút thẻ → đỏ 'axe 360 light button-name'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E10

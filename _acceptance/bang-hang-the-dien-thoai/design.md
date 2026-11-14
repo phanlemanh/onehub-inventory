@@ -23,16 +23,23 @@ bảng thành danh sách thẻ dưới `md` (hàng 32 của Quỹ hàng: `produc
   từ thẻ mang đúng bộ nút theo vai (9a, 9b, 9e) như mở từ bảng. Nút «Cột» ẩn trên điện thoại (thẻ không có cột).
 - **Tìm** vẫn ở ô ⌘K của thanh trên (2e, 3f): chữ tìm điền vào ô lọc Căn, thẻ hiện đúng các căn khớp.
 
+## Trình lại sau bốn ý của chủ kho (2026-11-14)
+
+Lần trình đầu (thẻ A xếp dọc, thẻ B dòng gọn) chủ kho trả bốn ý: bộ nút chưa hợp điện thoại, cần thấy nhiều căn, tận dụng
+không gian, product-grid-4 đưa vào chưa đúng dáng (có ảnh, không ảnh). Lối mới, chủ kho đồng ý hướng và đòi ảnh:
+
+- Thẻ là dáng «ngang gọn» của chính `ListingCard` (đầu hồ sơ giữ dáng xếp dọc): ô vuông 64 px bên trái (ảnh căn khi có —
+  hàng 15), mã căn + giá một dòng, nơi + trạng thái, diện tích · phòng ngủ. Mỗi căn 86 px: 7 căn trọn màn đầu ở 360, 8 ở 414
+  (trước: 2).
+- Dưới 768 danh sách không có khung bao (trước: ba lớp), dùng trọn bề ngang, các căn ngăn bằng vạch.
+- Một hàng công cụ dính dưới thanh trên: số dòng; Lọc (kèm số), Nhóm theo Toà, «…» (Lưu góc nhìn) — ba nút 44 px. Bỏ ở điện
+  thoại: «Cột», «Toàn màn hình».
+
 ## Câu hỏi cho chủ kho (Cổng Phạm vi)
 
-- Hỏi-1 · Thẻ trông thế nào. A: thẻ căn của kho (khối `ListingCard`, gốc `product-grid-4`, đầu hồ sơ đang dùng) — mã căn
-  và giá, nơi, trạng thái, ba thông số; khoảng 2,5 căn mỗi màn 360. B: dòng gọn theo `list-5` — mã căn và nơi bên trái,
-  giá và trạng thái bên phải; khoảng 7 căn mỗi màn. Khuyến nghị A.
-- Hỏi-2 · Lọc trên điện thoại ở đâu. L1: hàng ô lọc luôn hiện trên thẻ, cuộn ngang, cùng ô như dưới tiêu đề cột (giữ luật
-  «luôn hiện, không nút bật tắt» của 2e). L2: nút «Lọc (n)» mở ngăn đáy với đủ ô lọc xếp dọc (`filter-sidebar-5`, như Quỹ
-  hàng). Khuyến nghị L1.
-- Hỏi-3 · Khoá ghim cột «Căn» ở menu tiêu đề cột (việc gắn kèm từ 2e) — tách việc nhỏ riêng (khuyến nghị) hay làm trong
-  hàng này.
+- Hỏi-1 · Căn chưa có ảnh. Ô: giữ ô vuông ghi mã toà (khuyến nghị) · Gọn: bỏ ô, chữ dồn trái.
+- Hỏi-2 · Lọc. Nút: nút Lọc mở ngăn đáy, lọc đang chạy thành chip (khuyến nghị) · Hàng ô: hàng ô lọc luôn hiện (luật 2e).
+- Hỏi-3 · Khoá ghim cột «Căn» ở bảng máy tính — tách việc nhỏ riêng (khuyến nghị) hay làm trong hàng này.
 
 ## Rủi ro đã thấy
 
@@ -67,8 +74,8 @@ bảng thành danh sách thẻ dưới `md` (hàng 32 của Quỹ hàng: `produc
 <!-- <<<UX-STATE-TABLE -->
 | Trạng thái | Màn | Hiển thị gì | Người làm gì tiếp |
 |---|---|---|---|
-| ST-the-co-dong | Bảng hàng < 768 | số dòng, Nhóm theo Toà, Lưu góc nhìn; lọc theo Hỏi-2; thẻ căn; chân «60 dòng» | chạm thẻ, lọc |
-| ST-the-dang-loc | Bảng hàng < 768 | «x / 60 dòng», «Xoá lọc», chỉ thẻ khớp | chạm thẻ, xoá lọc |
+| ST-the-co-dong | Bảng hàng < 768 | hàng công cụ dính (số dòng; Lọc, Nhóm theo Toà, «…»); thẻ ngang gọn, không khung | chạm thẻ, lọc |
+| ST-the-dang-loc | Bảng hàng < 768 | «x / 60 dòng», nút Lọc mang số, chip mỗi cột đang lọc, «Xoá lọc», chỉ thẻ khớp | chạm thẻ, bỏ chip, xoá lọc |
 | ST-the-khong-khop | Bảng hàng < 768 | lọc ở nguyên chỗ; «Không có dòng nào khớp» và «Xoá lọc» | sửa ô lọc, xoá lọc |
 | ST-the-nhom | Bảng hàng < 768 | dòng tên toà + số căn trên mỗi nhóm thẻ | chạm thẻ |
 | ST-the-loading | Bảng hàng < 768 | khung chờ của vùng, «Huỷ» sau 10 giây | chờ / huỷ |
@@ -85,17 +92,16 @@ bảng thành danh sách thẻ dưới `md` (hàng 32 của Quỹ hàng: `produc
 - Ngưỡng: dưới 768 px thẻ, từ 768 bảng; đổi khổ qua ngưỡng giữ lọc, nhóm, sắp xếp.
 - Cả thẻ là một nút, tên đọc «Căn <mã>»; Tab đi qua từng thẻ; Enter hay Space mở hồ sơ.
 - Đóng hồ sơ: chỗ cuộn giữ nguyên, tiêu điểm về thẻ vừa mở.
-- Không sửa trên thẻ, không «…» trên thẻ (Bảng hàng không có việc trên dòng); nút «Cột» ẩn dưới 768.
+- Không sửa trên thẻ, không «…» trên thẻ (Bảng hàng không có việc trên dòng); dưới 768 không «Cột», không «Toàn màn hình»; hàng công cụ dính dưới thanh trên khi cuộn.
 
 ### 5. Xuất xứ component
 
 | Component | Nấc (dùng / ghép / mở rộng / tạo) | Vì sao (1 dòng) |
 |---|---|---|
 | DataRegion | mở rộng | thêm khe danh sách điện thoại, giữ một bộ lọc, nhóm, trạng thái, hồ sơ |
-| ListingCard (lối A) | dùng | thẻ căn đã có trong sổ khối (`the-can`, gốc `product-grid-4`) |
-| Dòng gọn (lối B) | tạo theo `list-5` | chưa có trong kho |
+| ListingCard | mở rộng | thêm dáng «ngang gọn» theo `product-grid-4` (sổ khối `the-can`); đầu hồ sơ giữ dáng xếp dọc |
 | ColumnFilterCell | dùng | cùng ô lọc dưới tiêu đề cột |
-| Sheet đáy (lối L2) | dùng | `src/components/ui/sheet.tsx` |
+| Sheet đáy (ngăn lọc, «…») | dùng | `src/components/ui/sheet.tsx` |
 | RecordPanel | dùng | hồ sơ toàn màn của hàng 3 |
 
 ### 6. Khuôn IA đã chọn + căn cứ
