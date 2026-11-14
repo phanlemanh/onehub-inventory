@@ -1,0 +1,4 @@
+200 GET document http://127.0.0.1:3491/inventory
+200 GET document http://127.0.0.1:3491/inventory
+200 GET document http://127.0.0.1:3491/inventory
+200 GET document http://127.0.0.1:3491/inventory
