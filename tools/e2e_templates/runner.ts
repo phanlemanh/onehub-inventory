@@ -42,6 +42,15 @@ export function sentToSignIn(page: Page, route: string): boolean {
   return new URL(page.url()).pathname === "/login" && route.split("?")[0] !== "/login";
 }
 
+/**
+ * The path a case opens: the recipe's `?…` query joined to the screen's path. A path that already has a query (a
+ * declared `vao_vung`, row 7e) gets the recipe's parameters after `&`; a path without one is unchanged from before.
+ */
+export function withQuery(url: string, query: string | undefined): string {
+  if (!query) return url;
+  return url.includes("?") ? `${url}&${query.replace(/^\?/, "")}` : `${url}${query}`;
+}
+
 const THROTTLE = Number(process.env["E2E_CPU_THROTTLE"] ?? "0");
 const MIN_SLOWDOWN = 2.5;
 const MEASURE_TRIES = 3;
@@ -114,7 +123,7 @@ export async function open(
   if (recipe.clock) await page.clock.install();
   if (brk?.before) await brk.before(ctx);
   if (recipe.setup) await recipe.setup(ctx);
-  await page.goto(`${url}${recipe.query ?? ""}`);
+  await page.goto(withQuery(url, recipe.query));
   await followRedirect(page);
   // A screen that sent the browser to sign-in is not measured, so there is nothing to wait for.
   if (!recipe.loading && !sentToSignIn(page, url)) await waitReady(page);

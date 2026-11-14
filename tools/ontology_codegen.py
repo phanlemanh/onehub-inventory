@@ -35,6 +35,8 @@ TS_TYPES = {
     "number": "number",
     "boolean": "boolean",
     "ref": "string",
+    # An object (row 7e: a custom field's options, a listing's custom values); readers check its shape at the edge.
+    "json": "Record<string, unknown> | unknown[]",
 }
 PY_TYPES = {
     "string": "str",
@@ -46,6 +48,7 @@ PY_TYPES = {
     "number": "float",
     "boolean": "bool",
     "ref": "str",
+    "json": "object",
 }
 COMPARISON = re.compile(
     r"^\s*([A-Za-z_]\w*)\s*(>=|<=|==|!=|>|<)\s*"

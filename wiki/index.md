@@ -19,6 +19,11 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [CatalogAlias](entities/catalog-alias.md) — mã gốc giữ làm bí danh
 - [CompanyCatalogAlias](entities/company-catalog-alias.md) — mã, tên riêng một sàn gọi toà, căn
 - [SavedView](entities/saved-view.md) — góc nhìn một người lưu cho một màn Lưới
+- [CompanyLabel](entities/company-label.md) — nhãn riêng của sàn
+- [CustomField](entities/custom-field.md) — trường riêng của sàn
+- [CompanyValueAlias](entities/company-value-alias.md) — cách viết riêng, một cặp của từ điển giá trị
+- [PendingUnit](entities/pending-unit.md) — căn chờ khớp với danh mục
+- [ImportTemplate](entities/import-template.md) — mẫu nhập theo dạng tệp
 - [Listing](entities/listing.md) — một lần chào trên một căn
 - [Contact](entities/contact.md) — một người làm việc với sàn
 - [Agreement](entities/agreement.md) — cho phép một kết nối chảy
@@ -63,6 +68,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0025 Bộ nút theo quyền — một chỗ đặt, một cửa, một bảng](decisions/0025-bo-nut-theo-quyen.md)
 - [0026 Cửa thao tác dùng chung và phụ thuộc mô-đun đầu tiên](decisions/0026-cua-thao-tac-dung-chung.md)
 - [0028 Thêm gói cmdk cho ô ⌘K](decisions/0028-them-goi-cmdk-cho-o-k.md)
+- [0029 Cấu hình sàn giữ lớp riêng, dựa vào danh tính và danh mục](decisions/0029-cau-hinh-san-dua-vao-danh-tinh-va-danh-muc.md)
 - [0030 Sổ màn là một chỗ khai quyền vào màn và nút của mỗi màn](decisions/0030-so-man-khai-cua-vao-va-nut.md)
 - [0031 Thêm gói khung chia kéo được cho hồ sơ ghim](decisions/0031-them-goi-khung-chia-keo-duoc.md)
 
