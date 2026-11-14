@@ -201,3 +201,20 @@ export function columnKindOf(kind: FieldKind): DisplayKind {
 export function templateSignature(headers: readonly string[]): string[] {
   return headers.map((h) => fold(h));
 }
+
+/** A custom field in use as the inventory shows it: its code, the company's name for it, its kind and its place. */
+export interface LiveFieldShape {
+  code: string;
+  name: string;
+  kind: FieldKind;
+  position: number;
+}
+
+/** The company's own columns, by position, each with the display kind of its field (row 7e, AC-8). */
+export function customColumnsOf(
+  fields: readonly LiveFieldShape[],
+): { code: string; header: string; kind: DisplayKind }[] {
+  return [...fields]
+    .sort((a, b) => a.position - b.position || a.code.localeCompare(b.code))
+    .map((f) => ({ code: f.code, header: f.name, kind: columnKindOf(f.kind) }));
+}

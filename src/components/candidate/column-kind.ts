@@ -2,7 +2,11 @@
 // A screen declares a column by field name; the kind comes from the generated ontology table, never from the screen.
 import { FIELD_DISPLAY, RIGHT_ALIGNED_KINDS, type DisplayKind } from "@/generated/display";
 
-export type FieldKey = keyof typeof FIELD_DISPLAY;
+/** A field of the business model, whose kind comes from the generated ontology table. */
+export type StandardFieldKey = keyof typeof FIELD_DISPLAY;
+/** A company's own field (row 7e): its value sits under `custom.<code>` and its kind comes from the field itself. */
+export type CustomFieldKey = `custom.${string}`;
+export type FieldKey = StandardFieldKey | CustomFieldKey;
 export type Align = "left" | "right";
 export type Density = "dense" | "normal";
 
@@ -28,7 +32,7 @@ export const KIND_SAMPLE_LENGTH: Readonly<Record<DisplayKind, number>> = {
 /** One character of padding on each side of the cell. */
 export const CELL_PADDING_CH = 2;
 
-export function kindOf(field: FieldKey): DisplayKind {
+export function kindOf(field: StandardFieldKey): DisplayKind {
   return FIELD_DISPLAY[field];
 }
 
@@ -108,7 +112,7 @@ export const DENSITY_ROW_CLASS: Readonly<Record<Density, string>> = {
 
 /** What a screen may say about a column: the field and its header text. Nothing about kind, align or width. */
 export interface TypedColumnSpec {
-  field: FieldKey;
+  field: StandardFieldKey;
   header: string;
 }
 
@@ -128,6 +132,24 @@ export function typedColumn(spec: TypedColumnSpec): TypedColumn {
     kind,
     align: alignFor(kind),
     widthCh: columnWidthCh(spec.header, kind),
+  };
+}
+
+/**
+ * A company's own column (row 7e): the field key is `custom.<code>`, the header is the company's own name, and the
+ * kind comes from the field (company-config's columnKindOf). Align and width follow the same rules as any column.
+ */
+export function customColumn(spec: {
+  code: string;
+  header: string;
+  kind: DisplayKind;
+}): TypedColumn {
+  return {
+    field: `custom.${spec.code}`,
+    header: spec.header,
+    kind: spec.kind,
+    align: alignFor(spec.kind),
+    widthCh: columnWidthCh(spec.header, spec.kind),
   };
 }
 

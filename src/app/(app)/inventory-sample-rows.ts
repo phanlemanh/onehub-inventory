@@ -16,9 +16,25 @@ export function sampleInventoryListings() {
   return sampleInventory().listings;
 }
 
+/**
+ * Values of the sample company's own fields (row 7e), by field code: a single choice «Hướng view» on every listing and
+ * a text «Ghi chú» on every fourth. They show only for a company that has these fields in use. Kept apart from the
+ * pinned sample of row 1, so its digest does not move.
+ */
+export const SAMPLE_CUSTOM_OPTIONS = { huong_view: ["Hồ", "Phố", "Công viên"] } as const;
+
+function sampleCustomFields(i: number): Record<string, unknown> {
+  const views = SAMPLE_CUSTOM_OPTIONS.huong_view;
+  const out: Record<string, unknown> = { huong_view: views[i % views.length] };
+  if (i % 4 === 0) out.ghi_chu = "Chủ cần bán nhanh";
+  return out;
+}
+
 function sampleInventory() {
   const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
-  return { units, ...buildSampleListings({ companyId: SAMPLE_COMPANY.id, units }) };
+  const built = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
+  const listings = built.listings.map((l, i) => ({ ...l, customFields: sampleCustomFields(i) }));
+  return { units, listingUnits: built.listingUnits, listings };
 }
 
 /** Only what the top-bar search suggests from (row 3f): the code, the building and the subdivision of each row. */

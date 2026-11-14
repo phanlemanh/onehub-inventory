@@ -1,8 +1,9 @@
 import "server-only";
 
-import { actionDoor, withCompany } from "@/modules/identity/server";
+import { actionDoor, sessionDoor, withCompany } from "@/modules/identity/server";
 
 import { createCompanyLayerHandlers, type CompanyLayerHandlers } from "./company-layer-http";
+import { readLayer, type CompanyLayer, type RunAs } from "./store";
 
 // Server API of the company-config module (row 7e, decision 0029): the company layer's store. Every function takes the
 // caller's RunAs — a transaction opened through the identity module's door, withCompany — so nothing here reads a
@@ -52,4 +53,21 @@ let handlers: CompanyLayerHandlers | undefined;
 export function companyLayerHandlers(): CompanyLayerHandlers {
   handlers ??= createCompanyLayerHandlers({ door: actionDoor, withCompany });
   return handlers;
+}
+
+/**
+ * The signed-in person's company layer, for screens that read the company's words (the inventory, row 7e); null when
+ * there is no session, the person's roles cannot read it, or the database could not be read — the screen then shows
+ * the standard words, never another company's.
+ */
+export async function myCompanyLayer(): Promise<CompanyLayer | null> {
+  try {
+    const door = await sessionDoor("readCompanyLayer");
+    if (typeof door === "string") return null;
+    const run: RunAs = (fn) => withCompany(door.pool, door.ctx, fn);
+    return await readLayer(run);
+  } catch (err) {
+    console.error("[lop-rieng] không đọc được:", err instanceof Error ? err.message : "không rõ");
+    return null;
+  }
 }

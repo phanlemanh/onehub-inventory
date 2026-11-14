@@ -219,7 +219,7 @@ DisplayKind }): TypedColumn`, field key `custom.<code>`), `src/modules/listings/
   (`inventoryColumns(headers, customFields?)`, rows carry `custom.<code>` from `Listing.customFields`),
   `src/app/(app)/inventory/page.tsx` (read layer through `company-config/server`, pass overrides to `label()`),
   `src/modules/listings/sample.ts` (sample `customFields` for codes `huong_view`, `ghi_chu`)
-- Create: `src/components/candidate/column-kind.test.ts`, `tests/e2e-db/lop-rieng.spec.ts` (case
+- Create: `tests/lop-rieng-cot.test.ts`, `tests/e2e-db/lop-rieng.spec.ts` (case
   `company words on inventory`)
 
 **Interfaces:**

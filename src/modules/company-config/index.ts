@@ -9,6 +9,15 @@ export interface LabelOptions {
   transaction?: TransactionKind;
 }
 
+/** The labels a company chose, as `label()` overrides; a concept the company has no word for keeps the preferred one. */
+export function labelOverrides(
+  labels: readonly { concept: string; label: string }[],
+): Partial<Record<ConceptCode, string>> {
+  const out: Partial<Record<ConceptCode, string>> = {};
+  for (const l of labels) if (l.concept in LABELS) out[l.concept as ConceptCode] = l.label;
+  return out;
+}
+
 /** The display label of a concept: the company's own label, otherwise the preferred one. */
 export function label(concept: ConceptCode, options: LabelOptions = {}): string {
   const override = options.overrides?.[concept];
@@ -27,6 +36,7 @@ export {
   checkCustomValue,
   checkFieldDraft,
   columnKindOf,
+  customColumnsOf,
   fold,
   templateSignature,
   valueSetOf,
@@ -35,5 +45,6 @@ export {
   type FieldDraft,
   type FieldKind,
   type FieldProblem,
+  type LiveFieldShape,
   type ValueProblem,
 } from "./rules";
