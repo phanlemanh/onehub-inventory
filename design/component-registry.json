@@ -106,7 +106,8 @@
             "onSubmit",
             "formError",
             "refused",
-            "slot"
+            "slot",
+            "badge"
           ]
         }
       ]
@@ -1681,6 +1682,34 @@
       ]
     },
     {
+      "name": "Avatar",
+      "file": "src/components/ui/avatar.tsx",
+      "level": "atom",
+      "parts": [
+        {
+          "name": "Avatar",
+          "props": [
+            "size"
+          ]
+        },
+        {
+          "name": "AvatarBadge"
+        },
+        {
+          "name": "AvatarFallback"
+        },
+        {
+          "name": "AvatarGroup"
+        },
+        {
+          "name": "AvatarGroupCount"
+        },
+        {
+          "name": "AvatarImage"
+        }
+      ]
+    },
+    {
       "name": "ButtonGroup",
       "file": "src/components/ui/button-group.tsx",
       "level": "molecule",
@@ -2066,6 +2095,72 @@
           "props": [
             "type"
           ]
+        }
+      ]
+    },
+    {
+      "name": "Item",
+      "file": "src/components/ui/item.tsx",
+      "level": "molecule",
+      "parts": [
+        {
+          "name": "Item",
+          "props": [
+            "render"
+          ],
+          "variants": {
+            "variant": [
+              "default",
+              "outline",
+              "muted"
+            ],
+            "size": [
+              "default",
+              "sm",
+              "xs"
+            ]
+          },
+          "defaults": {
+            "variant": "default",
+            "size": "default"
+          }
+        },
+        {
+          "name": "ItemActions"
+        },
+        {
+          "name": "ItemContent"
+        },
+        {
+          "name": "ItemDescription"
+        },
+        {
+          "name": "ItemFooter"
+        },
+        {
+          "name": "ItemGroup"
+        },
+        {
+          "name": "ItemHeader"
+        },
+        {
+          "name": "ItemMedia",
+          "variants": {
+            "variant": [
+              "default",
+              "icon",
+              "image"
+            ]
+          },
+          "defaults": {
+            "variant": "default"
+          }
+        },
+        {
+          "name": "ItemSeparator"
+        },
+        {
+          "name": "ItemTitle"
         }
       ]
     },
