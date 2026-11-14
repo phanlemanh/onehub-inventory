@@ -21,6 +21,7 @@
 version: 1
 families:
   grid: Lưới
+  dang-nhap: Đăng nhập
 audiences: [staff, public, dev]
 statuses: [built, planned]
 khung:
@@ -88,7 +89,7 @@ screens:
   - id: sign-in
     route: /login
     title: SignIn
-    family: null
+    family: dang-nhap
     audience: staff
     status: built
     vao: null

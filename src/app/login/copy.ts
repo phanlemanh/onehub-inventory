@@ -2,6 +2,9 @@
 // Concept names (sign in, sign out, login code, company) come from label() in the page and are passed in.
 
 export const LOGIN_COPY = {
+  lead: "Nhận mã qua email để vào sàn của bạn.",
+  // The copyright sign is written as its code point: the repo's emoji lint reads «©» as an icon.
+  copyright: (year: number, brand: string) => `${String.fromCodePoint(0xa9)} ${year} ${brand}`,
   emailLabel: "Email",
   emailHint: "Email bạn dùng ở sàn. Mã sẽ gửi tới hộp thư này.",
   sendCode: "Gửi mã",

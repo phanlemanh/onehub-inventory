@@ -1,16 +1,22 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { Frame, FrameHeader, FramePanel, FrameTitle } from "@/components/reui/frame";
+import { FRAME_COPY } from "@/components/templates/frame-copy";
+import { LoginLayout } from "@/components/templates/login-layout";
 import { label } from "@/modules/company-config";
 import { CODE_LENGTH, safeNext } from "@/modules/identity";
 import { currentSession } from "@/modules/identity/server";
 
+import { LOGIN_COPY } from "./copy";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = { title: label("SignIn") };
 
-/** Sign in with an emailed code (row 8): email → code → company, one card in the middle of the page. */
+/**
+ * Sign in with an emailed code (row 8) in the sign-in family frame chosen from ReUI block auth-15 (row 1p). The
+ * block's Google, Apple and GitHub buttons and its terms footer are dropped: sign-in is by emailed code only, and no
+ * terms page exists yet.
+ */
 export default async function LoginPage({
   searchParams,
 }: {
@@ -21,26 +27,21 @@ export default async function LoginPage({
   const session = await currentSession();
   if (session?.company) redirect(next);
   return (
-    <main className="flex min-h-svh items-center justify-center bg-background p-4">
-      <Frame className="w-full max-w-sm">
-        <FrameHeader>
-          <FrameTitle>
-            <h1 className="text-lg font-semibold">{label("SignIn")}</h1>
-          </FrameTitle>
-        </FrameHeader>
-        <FramePanel>
-          <LoginForm
-            next={next}
-            codeLength={CODE_LENGTH}
-            labels={{
-              signIn: label("SignIn"),
-              signOut: label("SignOut"),
-              code: label("LoginCode"),
-            }}
-            initialCompanies={session && !session.company ? session.companies : null}
-          />
-        </FramePanel>
-      </Frame>
-    </main>
+    <LoginLayout
+      heading={label("SignIn")}
+      lead={LOGIN_COPY.lead}
+      footer={LOGIN_COPY.copyright(new Date().getFullYear(), FRAME_COPY.brand)}
+    >
+      <LoginForm
+        next={next}
+        codeLength={CODE_LENGTH}
+        labels={{
+          signIn: label("SignIn"),
+          signOut: label("SignOut"),
+          code: label("LoginCode"),
+        }}
+        initialCompanies={session && !session.company ? session.companies : null}
+      />
+    </LoginLayout>
   );
 }
