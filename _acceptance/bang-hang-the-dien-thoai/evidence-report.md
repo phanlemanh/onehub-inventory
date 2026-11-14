@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 360da0901bd8707b2dce765f03dadc3b03c2e4f9
+verified_commit: af334f969b261d075b242c8c3de66171767690f5
 human_signoff:
 ---
 
@@ -223,3 +223,7 @@ none — every multi-run eval is uniform
 
 Round 1: chấm xong, kết quả ở trạng thái chờ phán quyết (hồ sơ chấm vòng 1, commit a83b893). Quay lại triển khai.
 Round 2: toàn bộ eval máy xanh trên commit 360da09 (thẻ mang giá trong tên, ca khổ rộng giữ nghiêm); E10 và E16 hội đồng đề xuất PASS, chờ người chốt ở Cổng 2.
+
+### Re-pin lần 1 — 2026-11-14, do gộp main có hàng 9c (PR #60) trước khi trình Cổng Bằng chứng
+run_id: repin-20261114T170708Z-52120
+sha: af334f969b261d075b242c8c3de66171767690f5 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E10 (E10 không khai paths), E11, E16 (E16 không khai paths) · diff chạm vật đo ngoài làn máy: E11 — chưa chứng lại, đi vòng S4 delta
