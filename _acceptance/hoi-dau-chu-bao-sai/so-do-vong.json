@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "slug": "hoi-dau-chu-bao-sai",
+  "ghi_luc": "2026-11-14T02:49:49Z",
+  "vong_cham": 6,
+  "luot": [
+    {
+      "vong": 1,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 2,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 3,
+      "verdict": "REJECT",
+      "tang": [
+        "hop-dong-yeu-cau"
+      ]
+    },
+    {
+      "vong": 4,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 5,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 6,
+      "verdict": "PENDING-JUDGMENT",
+      "tang": []
+    }
+  ],
+  "lam_lai": [
+    {
+      "nguon": "r1",
+      "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "r2",
+      "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "r3",
+      "tang": "hop-dong-yeu-cau"
+    },
+    {
+      "nguon": "r4",
+      "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "r5",
+      "tang": "bai-kiem-ha-tang"
+    }
+  ],
+  "theo_tang": {
+    "bai-kiem-ha-tang": 4,
+    "trang-thai-hanh-vi": 0,
+    "du-lieu-api": 0,
+    "nghiep-vu": 0,
+    "thanh-phan": 0,
+    "bo-cuc": 0,
+    "hop-dong-yeu-cau": 1,
+    "link": 0,
+    "chu-dinh-dang": 0,
+    "mau-token": 0,
+    "truy-cap": 0
+  },
+  "chua_phan": [],
+  "thuoc_vat": {
+    "vat": [
+      19,
+      2
+    ],
+    "thuoc": [
+      7,
+      1
+    ],
+    "nhat": 2
+  },
+  "gio_may": {
+    "gio_may": 11.3,
+    "gio_cho": 5.9,
+    "phan_tram_tuan": 17.14
+  }
+}

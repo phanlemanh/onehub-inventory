@@ -105,12 +105,10 @@ test.describe("E1 · copy link at the head of the record", () => {
     );
   });
 
-  test("the phone check fails when the button shows its words", async ({ page }, info) => {
+  test("the phone check fails when the button grows past the screen", async ({ page }, info) => {
     test.skip(info.project.name !== "360", "phone only");
-    await injectStyle(
-      page,
-      '[data-slot="copy-link"] span { position: static !important; width: auto !important; height: auto !important; clip: auto !important; white-space: nowrap !important; margin: 0 !important; } [data-slot="copy-link"] { padding-inline: 40px !important; }',
-    );
+    // Row 3e: the button is an icon on every width, so a wide button stands in for one that shows its words.
+    await injectStyle(page, '[data-slot="copy-link"] { min-width: 420px !important; }');
     await openInventory(page);
     await openFifth(page);
     await expect(checkCopyButtonPlace(page, true)).rejects.toThrow(
@@ -338,6 +336,8 @@ test.describe("E5 · the top-bar ⌘K box", () => {
   }, info) => {
     test.skip(info.project.name !== "1440", "keys on the desktop");
     await openInventory(page);
+    // The shortcut works once the box has attached its key listener; pressing earlier tests the page's load, not the keys.
+    await expect(page.locator('[data-slot="unit-jump"][data-ready]')).toHaveCount(1);
     for (const key of ["Control+k", "Meta+k"]) {
       await page.locator("body").press(key);
       await expect(paletteInput(page)).toBeFocused();

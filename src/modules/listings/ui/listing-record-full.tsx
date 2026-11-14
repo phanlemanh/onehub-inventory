@@ -77,10 +77,26 @@ export interface RecordLabels {
 const shown = (value: string | number | null | undefined): string =>
   value === null || value === undefined || value === "" ? EMPTY : String(value);
 
-function Section({ slot, title, children }: { slot: string; title: string; children: ReactNode }) {
+function Section({
+  slot,
+  title,
+  action,
+  children,
+}: {
+  slot: string;
+  title: string;
+  /** A control on the section's head row, after the title (row 3e: ReportUnitError on the unit section). */
+  action?: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <section data-slot={slot} aria-label={title} className="flex flex-col gap-2 border-t pt-4">
-      <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{title}</h3>
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+          {title}
+        </h3>
+        {action}
+      </div>
       {children}
     </section>
   );
@@ -111,10 +127,13 @@ export function ListingRecordFull({
   view,
   data,
   labels,
+  report,
 }: {
   view: ListingView;
   data: ListingRecordData;
   labels: RecordLabels;
+  /** ReportUnitError on the unit's properties (row 3e); absent without the button words. */
+  report?: ReactNode;
 }) {
   const newestId = data.listings[0]?.id ?? view.id;
   const [pickedId, setPickedId] = useState(newestId);
@@ -201,7 +220,7 @@ export function ListingRecordFull({
             : RECORD_COPY.lacking(done.missing.map((part) => labels.parts[part]))}
         </p>
       </div>
-      <Section slot="listing-unit" title={labels.unit}>
+      <Section slot="listing-unit" title={labels.unit} action={report}>
         <Rows
           rows={[
             {

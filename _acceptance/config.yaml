@@ -55,6 +55,7 @@ executors:
     bo_nut_vai_man: "npx vitest run tests/bo-nut-vai-man.test.ts --coverage.enabled=false --reporter=verbose"   # bo-nut-theo-quyen (row 9e): role × screen × button table generated from the permission table
     bo_nut_e2e: "npx playwright test tests/e2e/bo-nut.spec.ts"   # bo-nut-theo-quyen (row 9e): template sample under four roles, axe light and dark
     bo_nut_e2e_db: "DB_LANE=${DB_LANE:-v} DB_PORT=${DB_PORT:-5570} npx playwright test -c playwright.db.config.ts tests/e2e-db/bo-nut-members.spec.ts"   # bo-nut-theo-quyen (row 9e): sidebar, members screen and 403 notice on lane V Postgres
+    hoi_dau_chu_e2e_db: "DB_LANE=${DB_LANE:-v} DB_PORT=${DB_PORT:-5570} npx playwright test -c playwright.db.config.ts tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts"   # hoi-dau-chu-bao-sai (row 3e): ask bar and report dialog signed in, lane V Postgres
     goc_nhin_db: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx vitest run -c vitest.db.config.ts tests/db/goc-nhin.db.test.ts --reporter=verbose"   # luu-goc-nhin-cot-hai (row 2c): saved views at API and database, lane K Postgres
     goc_nhin_e2e: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx playwright test -c playwright.db.config.ts tests/e2e-db/goc-nhin.spec.ts"   # luu-goc-nhin-cot-hai (row 2c): save, open, rename, remove a saved view in the browser, lane K Postgres
     cach_ly_k: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} bash db/scripts/cach-ly.sh"   # luu-goc-nhin-cot-hai (row 2c): isolation suite with the saved_view table, lane K Postgres
