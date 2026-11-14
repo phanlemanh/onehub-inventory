@@ -69,6 +69,12 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại, không luật
   Bằng chứng): Given ô lọc đầu cột của lưới chung và ô ⌘K của thanh trên, When người gõ chữ không dấu hay có dấu, Then cả
   hai so trên chữ đã bỏ dấu tiếng Việt («đ» coi như «d») qua MỘT hàm chuẩn hoá đặt ở một chỗ, hai nơi cùng gọi: «dong» khớp
   «Đông», «Đông» vẫn khớp «Đông», gõ đúng dấu chữ khác («Động») không bị coi là sai; phần ô ⌘K làm sau khi 3f ở nhánh chính.
+- AC-12 (sửa sau Cổng Phạm vi — phán quyết G K-1411-1, K-1411-2, K-1411-5 ngày 2026-11-14; đổi một điều đã ký của hàng 3
+  «hồ sơ căn», chủ kho phê ở Cổng Bằng chứng 2e hoặc chọn lối thu ngăn hồ sơ hẹp lại ở 1024): Given hàng ô lọc luôn hiện,
+  When Bảng hàng mở ở bất kỳ khổ nào, có hay không có hồ sơ căn đang mở, Then mọi cột rộng ít nhất 11 ký tự: mã căn hiện
+  trọn (không còn «0…»), nút «Bỏ ghim Căn» nằm trọn trên cùng và bấm được ở cả bốn khổ; cạnh hồ sơ đang mở thấy ít nhất 3
+  cột ở 1440 (Căn, Toà ghim) và 1 cột ở 1024 (Căn ghim; Toà nằm dưới ngăn hồ sơ) — thay cho 4 và 2 của hàng 3; cột ghim
+  vẫn đứng yên khi cuộn ngang.
 
 ## Coverage
 
