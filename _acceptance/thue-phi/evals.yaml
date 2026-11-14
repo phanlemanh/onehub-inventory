@@ -1,0 +1,190 @@
+schema_version: 1
+feature_slug: thue-phi
+# Ma trận viết trước:
+#   AC-1: 7 tập con khác rỗng × 4 tỉ lệ môi giới (0, 100, 250, 500 phần vạn) = 28 ô trên 3 tỷ Bao phí, mỗi ô một assert so số
+#         đồng viết tay; thêm 5 ca biên (Không bao phí, 1 đồng, chưa giá, chưa điều kiện, mặc định = 2.895.000.000);
+#         hằng 28 và 5 ghim — bảng co lại cũng đỏ. Hàm kiểm mức: 6 ca sai viết trước (-10, 510, 125, 0 khoản, khoản lạ,
+#         thiếu trường), mỗi ca ghim tên khoản trong lỗi.
+#   AC-4: 4 vai × 2 thao tác (đọc, ghi) = 8 ô ở API và 8 ô ở cơ sở dữ liệu; hằng 8 ghim.
+#   AC-7: 2 sàn × 3 lối (API đọc, API ghi, truy vấn thẳng) = 6 ô.
+# Bài và ca (tên ca là thông điệp ghim):
+#   src/modules/company-config/fee-schedule.test.ts: ve-tay-28-o · ve-tay-bien · kiem-muc-6-ca
+#   src/modules/company-config/ui/fee-part.test.tsx: ba-dong-dung-thu-tu · theo-luat-khong-o-sua · nguon-da-doi ·
+#     luu-khoa-khi-sai · chi-doc-khi-khong-quyen · tra-ve-mac-dinh
+#   tests/db/thue-phi.db.test.ts (Postgres dãy N): luu-mot-dong · sai-khong-ghi · vai-8-o-api · vai-8-o-db · hai-san-6-o
+#   tests/thue-phi-ontology.test.ts: listing-co-dieu-kien-phi · nhan-tu-bang-nhan · mau-du-ba-loai
+#   tests/thue-phi-cot.test.ts: cot-ve-tay-sau-gia-chao · dieu-kien-phi-an-san · ve-tay-theo-muc · sap-nhu-tien
+#   tests/e2e-db/thue-phi.spec.ts (Postgres dãy N, bốn khổ): dat-muc-roi-bang-hang-doi · vai-khac-chi-doc · axe-sang-toi
+# Cặp phá thử (bản sao; ca tương ứng phải đỏ với thông điệp ghim):
+#   pha-thu-tru-khoan-tat (netToSeller trừ cả khoản đang tắt)        → «ve-tay-28-o: [brokerageFee] 0»
+#   pha-thu-lam-tron-len (Math.round thay Math.floor)                → «ve-tay-bien: 1 đồng»
+#   pha-thu-bo-kiem-buoc (bỏ kiểm bước 10 phần vạn)                  → «kiem-muc-6-ca: 125»
+#   pha-thu-mo-ghi-vai (setFeeSchedule mở cho TeamLead ở bản sao)    → «vai-8-o-db: TeamLead ghi»
+#   pha-thu-bo-loc-san (đọc bỏ company_id ở bản sao)                 → «hai-san-6-o: B thấy A»
+#   pha-thu-doc-so (parseFloat đọc «1,5»)                           → «doc-so-kieu-viet: 1,5»
+#   pha-thu-muc-cung (Bảng hàng dùng mặc định thay mức của sàn)      → «ve-tay-theo-muc: 2,88 tỷ»
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.thue_phi
+    paths: [src/modules/company-config/**]
+    expected: "exit 0; ca 've-tay-28-o' duyệt đủ 28 ô (số ô in ra = 28), mỗi ô đúng số đồng viết tay; 've-tay-bien' đủ 5 ca, mặc định 3 tỷ Bao phí = 2.895.000.000; 'kiem-muc-6-ca' đủ 6 ca, mỗi lỗi nêu đúng khoản. Chiều đỏ: pha-thu-tru-khoan-tat đỏ với «ve-tay-28-o: [brokerageFee] 0»; pha-thu-lam-tron-len đỏ với «ve-tay-bien: 1 đồng»; pha-thu-bo-kiem-buoc đỏ với «kiem-muc-6-ca: 125»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.thue_phi
+    paths: [src/modules/company-config/ui/**]
+    expected: "exit 0; ca 'ba-dong-dung-thu-tu', 'theo-luat-khong-o-sua', 'nguon-da-doi' có mặt và ok: ba dòng đúng thứ tự, hai dòng đầu không có ô sửa tỉ lệ, dòng Phí môi giới mang «Đã đổi · [Tên] · 14/11/2026». Chiều đỏ: đổi thứ tự hằng ba khoản ở bản sao → 'ba-dong-dung-thu-tu' đỏ nêu «Lệ phí trước bạ»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2-ui
+    criterion: AC-2
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3485/tuy-chinh-san?phan=thue-phi
+    paths: [src/modules/company-config/ui/**, src/app/(app)/tuy-chinh-san/**]
+    steps:
+      - "With the lane N dev server on port 3485 and lane N Postgres, sign in as the sample CompanyAdmin of the sample company whose brokerage is set to 1,5, open the target at 1440 and 1024 wide, light and dark"
+      - "Save one frame per size and mode as _acceptance/thue-phi/evidence/E2-<khổ>-<sang|toi>.png"
+    question: "Phần Thuế phí có đúng ba dòng theo thứ tự Thuế thu nhập cá nhân, Lệ phí trước bạ, Phí môi giới; mỗi dòng một công tắc bật; hai dòng đầu ghi «theo luật» và không có ô sửa; dòng Phí môi giới hiện 1,5% và «Đã đổi · [Tên] · ngày», hai dòng kia «Mặc định»; phần nằm đúng chỗ ở cột thứ hai của App Shell trong màn Tuỳ chỉnh của sàn? Nêu khổ và chế độ màu nào lệch."
+    expected: "Mọi khung khớp; chữ đọc được ở cả sáng và tối"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    layer: backend-effect
+    cmd: config:executors.script.thue_phi_db
+    paths: [src/modules/company-config/**, src/app/api/v1/company/**, db/migrations/**]
+    expected: "exit 0; ca 'luu-mot-dong' (PUT mức môi giới 200, tắt registrationFee → 200; GET trả đúng mức; đọc bằng vai chủ: đúng một dòng của sàn, updated_by là Quản trị mẫu; PUT trả về mặc định một khoản → khoản ấy về mặc định) và 'sai-khong-ghi' (ba thân viết trước: môi giới 600, 125, tắt cả ba → 400 nêu đúng khoản; số dòng và nội dung dòng trước = sau, 3 × 2 assert) có mặt và ok. Chiều đỏ: ghi trước rồi kiểm ở bản sao → 'sai-khong-ghi' đỏ nêu «600»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3-unit
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.thue_phi
+    paths: [src/modules/company-config/ui/**]
+    expected: "exit 0; ca 'luu-khoa-khi-sai' (môi giới 6, 1,25, tắt cả ba → Lưu khoá, lý do gắn đúng dòng), 'doc-so-kieu-viet' (gõ «1,5» → Lưu mở, một lần bấm Lưu gửi đúng một PUT mang brokerage 150; đếm lời gọi = 1) và 'tra-ve-mac-dinh' có mặt và ok. Chiều đỏ: đọc ô bằng parseFloat ở bản sao → 'doc-so-kieu-viet' đỏ với «1,5»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3-ui
+    criterion: AC-3
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3485/tuy-chinh-san?phan=thue-phi
+    paths: [src/modules/company-config/ui/**]
+    steps:
+      - "With the lane N dev server on port 3485, sign in as the sample CompanyAdmin of a company on the default schedule, open the target at 1440 light"
+      - "Type «6» in Phí môi giới, save _acceptance/thue-phi/evidence/E3-sai.png; set it to «1,5», turn off Lệ phí trước bạ, press Lưu, save _acceptance/thue-phi/evidence/E3-luu.png; reload, save _acceptance/thue-phi/evidence/E3-tai-lai.png"
+    question: "Với 6, lý do có nằm ngay dưới ô Phí môi giới và Lưu có khoá không; sau Lưu có thông báo «Đã lưu thuế phí» và dòng Phí môi giới mang «Đã đổi»; sau tải lại có còn 1,5% và Lệ phí trước bạ tắt không?"
+    expected: "Ba khung khớp"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    layer: backend-effect
+    cmd: config:executors.script.thue_phi_db
+    paths: [src/modules/company-config/**, src/app/api/v1/company/**, db/migrations/**, ontology/actions.yaml]
+    expected: "exit 0; ca 'vai-8-o-api' và 'vai-8-o-db' duyệt đủ 8 ô mỗi ca (bốn vai × đọc, ghi; số ô in ra = 8): chỉ CompanyAdmin ghi được; ba vai kia PUT → 403 và ghi thẳng dưới vai ứng dụng bị luật vai chặn, dòng không đổi; cả bốn vai đọc được. Chiều đỏ: pha-thu-mo-ghi-vai đỏ với «vai-8-o-db: TeamLead ghi»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4-unit
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.thue_phi
+    paths: [src/modules/company-config/ui/**, ontology/actions.yaml]
+    expected: "exit 0; ca 'chi-doc-khi-khong-quyen' có mặt và ok: với ba vai không có setFeeSchedule, phần không có ô sửa, không nút Lưu, có dòng «Chỉ Quản trị sàn đổi được thuế phí»; bảng quyền sinh có readFeeSchedule bốn vai và setFeeSchedule chỉ CompanyAdmin"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4-ui
+    criterion: AC-4
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3485/tuy-chinh-san?phan=thue-phi
+    paths: [src/modules/company-config/ui/**]
+    steps:
+      - "With the lane N dev server on port 3485, sign in as the sample TeamLead, open the target at 1440 light and dark"
+      - "Save _acceptance/thue-phi/evidence/E4-<sang|toi>.png"
+    question: "Cột thứ hai của App Shell có mục Thuế phí cạnh các phần của Tuỳ chỉnh của sàn mà vai này vốn đọc được; phần có ba dòng không ô sửa, không nút Lưu, có dòng «Chỉ Quản trị sàn đổi được thuế phí», và công tắc nhìn rõ là không bấm được?"
+    expected: "Khung khớp ở cả sáng và tối"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.thue_phi_ontology
+    paths: [ontology/**, src/generated/**, src/app/(app)/inventory-sample-rows.ts]
+    expected: "exit 0; ca 'listing-co-dieu-kien-phi' (Listing.feeInclusion hai giá trị Included, Excluded, own, có ở glossary và labels), 'nhan-tu-bang-nhan' (FeeSchedule, PersonalIncomeTax, RegistrationFee, BrokerageFee, NetToSeller, FeeInclusion, FeeIncluded, FeeExcluded có nhãn; không mang tên RESO) và 'mau-du-ba-loai' (hàng mẫu có ≥1 Included, ≥1 Excluded, ≥1 thiếu điều kiện, ≥1 Included Giá chào 3.000.000.000, ≥1 thiếu Giá chào; năm assert, mỗi assert ghim tên loại) có mặt và ok. Chiều đỏ: xoá giá trị Excluded ở bản sao labels → 'nhan-tu-bang-nhan' đỏ nêu «FeeExcluded»; bỏ hàng 3 tỷ khỏi bản sao hàng mẫu → 'mau-du-ba-loai' đỏ nêu «3.000.000.000»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.thue_phi_ontology
+    paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**, src/modules/company-config/index.ts]
+    expected: "exit 0; ca 'cot-ve-tay-sau-gia-chao' (cột Về tay ngay sau Giá chào, hiện sẵn), 'dieu-kien-phi-an-san' (cột Điều kiện phí có trong menu Cột, ẩn sẵn), 've-tay-theo-muc' (bảng viết trước bốn hàng × hai mức: 2,88 tỷ / 2,91 tỷ / bằng giá / trống) và 'sap-nhu-tien' có mặt và ok. Chiều đỏ: pha-thu-muc-cung đỏ với «ve-tay-theo-muc: 2,88 tỷ»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6-e2e
+    criterion: AC-6
+    executor: script
+    layer: backend-effect
+    cmd: config:executors.script.thue_phi_e2e
+    paths: [src/modules/company-config/**, src/modules/listings/ui/**, src/app/**, tests/e2e-db/thue-phi.spec.ts]
+    expected: "exit 0; ca 'dat-muc-roi-bang-hang-doi' ở bốn khổ: Quản trị A lưu môi giới 2, tắt Lệ phí trước bạ qua màn; Đầu chủ A mở Bảng hàng thấy 2,88 tỷ ở hàng Bao phí 3 tỷ; Quản trị đổi về 1; Đầu chủ mở lại thấy 2,91 tỷ; Đầu chủ B thấy 2,895 tỷ; ở 1440 bề rộng cuộn ngang của lưới không vượt khung; 'vai-khac-chi-doc' và 'axe-sang-toi' (phần Thuế phí và Bảng hàng, sáng và tối, 0 lỗi) có mặt và ok"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6-ui
+    criterion: AC-6
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3485/inventory
+    paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**]
+    steps:
+      - "With the lane N dev server on port 3485, sign in as the sample ListAgent of a company whose brokerage is 2 with Lệ phí trước bạ off, open the target at 1440 and 1024 wide, light and dark"
+      - "Save _acceptance/thue-phi/evidence/E6-<khổ>-<sang|toi>.png; open the Cột menu, turn on Điều kiện phí, save _acceptance/thue-phi/evidence/E6-dieu-kien.png"
+    question: "Cột «Về tay» có đứng ngay sau «Giá chào», đọc như cột tiền, hàng Bao phí 3 tỷ hiện 2,88 tỷ, hàng Không bao phí bằng Giá chào, hàng thiếu thì trống; khi bật, cột Điều kiện phí có hiện «Bao phí» / «Không bao phí»; Bảng hàng ở 1440 có tràn ngang không?"
+    expected: "Mọi khung khớp, không tràn ngang ở 1440"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    layer: backend-effect
+    cmd: config:executors.script.cach_ly_n
+    paths: [db/**]
+    expected: "exit 0; bộ kiểm cách ly trên Postgres dãy N có ca company_fee_schedules (bật và ép buộc luật theo dòng, sàn B không đọc, không sửa dòng của A) và mọi ca xanh. Chiều đỏ: db/tests/pha-thu bản tắt ép buộc cho bảng mới → ca đỏ nêu «company_fee_schedules»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7-db
+    criterion: AC-7
+    executor: script
+    layer: backend-effect
+    cmd: config:executors.script.thue_phi_db
+    paths: [src/modules/company-config/**, src/app/api/v1/company/**, db/migrations/**]
+    expected: "exit 0; ca 'hai-san-6-o' đủ 6 ô (hai sàn × API đọc, API ghi, truy vấn thẳng): B đọc ra mặc định, không thấy, không sửa dòng của A. Chiều đỏ: pha-thu-bo-loc-san đỏ với «hai-san-6-o: B thấy A»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["**"]
+    expected: "exit 0 (make check xanh: ontology, wiki lint, nhãn không viết cứng, ranh giới mô-đun, kiểu, bài)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8-wiki
+    criterion: AC-8
+    executor: judgment
+    inputs:
+      - wiki/entities/fee-schedule.md
+      - wiki/entities/listing.md
+      - wiki/log.md
+      - design/screens.yaml
+    question: "Trang fee-schedule có nói đủ ba khoản, tỉ lệ theo luật, khoảng môi giới, mặc định, ai đặt, ai đọc, và rằng mức không ra trang khách; trang listing có nói Điều kiện phí; log có một dòng cho hàng 19; sổ màn có phần Thuế phí với setFeeSchedule?"
+    expected: "Đủ cả bốn tệp, khớp hợp đồng"
+    evidence_required: [run_id, verdict, rationale]
