@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 46bc6edc6683dee81c4403c9ee2628d86160c183
+verified_commit: b1b49efd50840fb552d9b8ed5a44373b5b3b236a
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -166,3 +166,7 @@ none — every multi-run eval is uniform
 
 Round 1: findings về phép quét lịch sử git được xử lý trong commit 46bc6ed (history scan as a class, ci-thu break env, ci-that by commit). Returned to implementation.
 Round 2: toàn bộ eval và lệnh suite xanh; ba finding ngoài hợp đồng ghi ở review-findings.md để người quyết.
+
+### Re-pin lần 1 — 2026-11-14, do gộp nhánh chính (9b, hàng 4) trước khi gộp PR #48
+run_id: repin-20261114T004254Z-20401
+sha: b1b49efd50840fb552d9b8ed5a44373b5b3b236a · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng
