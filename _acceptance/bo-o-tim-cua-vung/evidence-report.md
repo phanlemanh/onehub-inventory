@@ -6,7 +6,7 @@ failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 140380f2b9079cbf9d74cb30604cfc4649766193
+verified_commit: f83bd3cc5f5f433e952a51c93a4f53933871e6c4
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -270,3 +270,7 @@ none — every multi-run eval is uniform
 Round 1: E4 và E13 đạt, được carry-forward sang các round sau vì delta không chạm paths của chúng.
 Round 2: baseline được đo; evals.yaml không đổi từ lần đo này.
 Round 3: mọi eval máy đạt (E4, E13 carry-forward); E12 và E15 chờ người chốt ở Cổng 2 — verdict PENDING-JUDGMENT.
+
+### Re-pin lần 1 — 2026-11-14, do gộp nhánh chính 786cadf sau chữ ký
+run_id: repin-20261114T094513Z-91654
+sha: f83bd3cc5f5f433e952a51c93a4f53933871e6c4 · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E3, E12 (E12 không khai paths), E15 (E15 không khai paths)
