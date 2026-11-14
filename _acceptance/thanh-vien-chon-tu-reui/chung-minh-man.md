@@ -52,8 +52,6 @@ là hộp chọn khoảng giờ, không hỏi trường văn bản. Trang Cổng
 | dialog-2 | reui | hộp mời người (dialog-1…3, hộp mời của solution-users-8) | dialog-1 | hộp chọn khoảng giờ; hộp mời của solution-users-8 mời nhiều email và khách, trái luật mời hàng 9 | chọn khối |
 | FormDialog | trong-kho | | | | |
 | PageHeader | trong-kho | | | | |
-| PageSkeleton | trong-kho | | | | |
-| PageState | trong-kho | | | | |
 | Frame | trong-kho | | | | |
 | Item | trong-kho | | | | |
 | Avatar | trong-kho | | | | |

@@ -1,15 +1,15 @@
 ---
 nhom: danh-sach-khung
-doi_tuong: Màn danh sách ngắn những người hay thứ mà người quản trị xem từng dòng và làm một việc trên chính dòng ấy.
+doi_tuong: Màn hay phần màn có một nhóm mục ngắn mà người quản trị xem từng dòng và chỉnh ngay trên dòng ấy.
 khuon:
-  ten: MembersList
-  nhap: "@/modules/identity/ui"
+  ten: FramedList
+  nhap: "@/components/candidate/framed-list"
 nhan_dien:
   - "src/app/(app)/members/**/*.tsx"
   - "src/modules/identity/ui/members-list.tsx"
 mau_dang_chay:
-  tep: "src/modules/identity/ui/members-list.tsx"
-khe_bat_buoc: [title, count, rows, action]
+  tep: "src/components/candidate/framed-list.tsx"
+khe_bat_buoc: [title, rows]
 cam_ngoai_khuon: [DataGrid, DataGridTable, Table, DataRegion]
 ngoai_le: []
 nhan_viec: Quản trị sàn xem ai đang trong sàn với vai gì và đổi vai một người
@@ -25,8 +25,23 @@ Một khung có tên và số đếm, mỗi bản ghi một dòng: ai hay cái g
 việc trên bản ghi ở cuối chính dòng ấy. Không ô tìm (tìm ở ô ⌘K của thanh trên), không lọc cột, không bộ máy bảng tính:
 danh sách vài chục dòng nhìn là thấy. Các cột co theo bề rộng của chính khung, không theo cửa sổ.
 
-Khuôn hiện ở phần giao diện của mô-đun người dùng (`MembersList`); màn thứ hai của họ, ở mô-đun khác, đưa nó lên
-`src/components/candidate/` rồi đổi `khuon.nhap`.
+Khuôn là `FramedList` (`src/components/candidate/framed-list.tsx`); màn của họ chỉ điền khe, không thêm lớp kiểu.
+
+## Khe
+
+| Chỗ        | Khe                                                                                   | Bắt buộc | Ví dụ                               |
+| ---------- | ------------------------------------------------------------------------------------- | -------- | ----------------------------------- |
+| Đầu khung  | `title` — tên khung, cũng là tên đọc của danh sách                                    | có       | «Thành viên»                        |
+| Đầu khung  | `count` — dòng đếm dưới tên                                                           | không    | «9 người trong sàn»                 |
+| Đầu khung  | `headAction` — một nút ở đầu khung (việc chính của màn vẫn ở đầu màn)                 | không    | «Thêm khoản»                        |
+| Dòng       | `main` — phần chính: ai hay cái gì, thường là `ListFace` (chữ cái đầu, tên, dòng nhỏ) | có       | tên và email                        |
+| Dòng       | `secondary` — phần phụ: một cột chữ cố định, ẩn khi khung hẹp                         | không    | «Người mời: [Tên] · ngày»           |
+| Dòng       | `tags` — nhãn ngắn                                                                    | không    | các vai                             |
+| Dòng       | `control` — chỗ chỉnh cuối dòng: nút, công tắc hay ô số                               | không    | «Đổi vai», công tắc, ô phần trăm    |
+| Chân khung | `footer.note` và `footer.action` — lời ghi chú bên trái, nút lưu bên phải             | không    | «Áp cho mọi căn từ hôm nay» · «Lưu» |
+
+Cột theo bề rộng của chính khung: phần phụ hiện từ 56rem, dòng giữ một hàng từ 42rem, hẹp hơn thì phần chính lên một dòng
+riêng.
 
 ## Màn mẫu
 
@@ -49,8 +64,8 @@ Màn: members
 
 ## Dùng khi
 
-Màn có một danh sách ngắn (vài chục dòng) mà mỗi dòng là một người hay một thứ, người dùng nhìn từng dòng và làm một việc
-ngay trên dòng ấy — thành viên của sàn.
+Màn hay phần màn có một danh sách ngắn (vài chục dòng) mà mỗi dòng là một người hay một thứ, người dùng nhìn từng dòng
+và chỉnh ngay trên dòng ấy — thành viên của sàn, các khoản thuế phí của sàn.
 
 ## Không dùng
 

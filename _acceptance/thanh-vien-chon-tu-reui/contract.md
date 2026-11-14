@@ -56,7 +56,9 @@ Các tiêu chí viết theo lối máy khuyên ở Hỏi-1 (B · `solution-users
   không thêm đường truy vấn mới; chữ trên màn không ghim trong `src/` ngoài tệp câu chữ của màn và bảng nhãn; `make check`
   xanh.
 - AC-8: Given sổ thiết kế, When đọc, Then sổ màn ghi họ của màn Thành viên, tệp họ ở `design/patterns/` mô tả khuôn danh
-  sách khung chọn ở hàng này, sổ khối có hai dòng `solution-users-8` và `dialog-2` trỏ hồ sơ hàng này, và tệp chứng minh
+  sách khung chọn ở hàng này và các khe của nó, khối chung của họ nằm ở `src/components/candidate/` với đủ khe đầu khung
+  (tên, dòng đếm, nút), dòng (phần chính, phần phụ, nhãn, chỗ chỉnh cuối dòng) và chân khung (ghi chú, nút lưu) — màn
+  Thành viên dùng lại nó, dáng không đổi so với ảnh đã duyệt (sửa sau Cổng Phạm vi, G-1411-86), sổ khối có hai dòng `solution-users-8` và `dialog-2` trỏ hồ sơ hàng này, và tệp chứng minh
   màn `chung-minh-man.md` qua lưới chứng minh màn của kho.
 - AC-9: (judgment) Given ảnh màn Thành viên ở 1440 sáng và ảnh hộp mời, cạnh ảnh khối gốc `solution-users-8` và
   `dialog-2`, When người chấm so, Then danh sách giống khung Members của khối (khung có đầu, dòng có chữ cái đầu, cột thẳng

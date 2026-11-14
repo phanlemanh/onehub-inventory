@@ -171,8 +171,8 @@ test("danh-sach-khung", async ({ page }, info) => {
     await expect(r.locator('[data-slot="avatar"]')).toHaveCount(1);
     await expect(r).toContainText(p.name);
     await expect(r).toContainText(p.email);
-    await expect(r.locator('[data-part="invited"]')).toContainText("Người mời:");
-    const badges = await r.locator('[data-part="roles"] [data-slot="badge"]').allInnerTexts();
+    await expect(r.locator('[data-part="secondary"]')).toContainText("Người mời:");
+    const badges = await r.locator('[data-part="tags"] [data-slot="badge"]').allInnerTexts();
     expect(badges.sort()).toEqual(p.roles.map((x) => LABEL[x]).sort());
     await expect(r.getByRole("button", { name: `${CHANGE} · ${p.name}` })).toBeVisible();
   }
@@ -189,7 +189,7 @@ async function parts(page: Page): Promise<Record<string, Box>[]> {
   return rows(page).evaluateAll((els) =>
     els.map((row) =>
       Object.fromEntries(
-        ["person", "invited", "roles", "action"].map((part) => {
+        ["main", "secondary", "tags", "control"].map((part) => {
           const el = row.querySelector<HTMLElement>(`[data-part="${part}"]`)!;
           const r = el.getBoundingClientRect();
           const shown = getComputedStyle(el).display !== "none" && r.width > 0;
@@ -221,14 +221,13 @@ async function checkLayout(page: Page): Promise<void> {
   const width = await panelWidth(page);
   const all = await parts(page);
   if (width >= 896) {
-    expect(all.every((r) => r["invited"]!.shown)).toBe(true);
-    assertSpine(all, ["person", "invited", "roles", "action"]);
+    expect(all.every((r) => r["secondary"]!.shown)).toBe(true);
+    assertSpine(all, ["main", "secondary", "tags", "control"]);
   } else if (width >= 672) {
-    expect(all.some((r) => r["invited"]!.shown)).toBe(false);
-    assertSpine(all, ["person", "roles", "action"]);
+    expect(all.some((r) => r["secondary"]!.shown)).toBe(false);
+    assertSpine(all, ["main", "tags", "control"]);
   } else {
-    for (const r of all)
-      expect(r["person"]!.y + r["person"]!.h).toBeLessThanOrEqual(r["roles"]!.y + 1);
+    for (const r of all) expect(r["main"]!.y + r["main"]!.h).toBeLessThanOrEqual(r["tags"]!.y + 1);
   }
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -275,13 +274,13 @@ test("cot-thang-hang", async ({ page }, info) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await rows(page)
       .nth(1)
-      .locator('[data-part="roles"]')
+      .locator('[data-part="tags"]')
       .evaluate((el) => {
         el.style.marginLeft = "8px";
       });
     const all = await parts(page);
-    expect(() => assertSpine(all, ["person", "invited", "roles", "action"])).toThrow(
-      /column spine broken: (invited|roles)/,
+    expect(() => assertSpine(all, ["main", "secondary", "tags", "control"])).toThrow(
+      /column spine broken: (secondary|tags)/,
     );
   }
 });

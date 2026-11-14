@@ -134,11 +134,11 @@ khoi:
     mo_ta: Hồ sơ ghim thành cột cạnh bảng với vạch chia kéo được (Resizable) — dáng nội dung | cột Details của app-shell-11
     ho_so: ngan-chi-tiet-ghim-thanh-cot
     duyet: 2026-11-13
-  - ten: MembersList
-    tep: src/modules/identity/ui/members-list.tsx
+  - ten: FramedList
+    tep: src/components/candidate/framed-list.tsx
     nguon: solution-users-8
     nhu_cau: danh-sach-khung
-    mo_ta: Danh sách ngắn trong một khung có tên và số đếm, mỗi người một dòng, cột thẳng hàng, việc ở cuối dòng — khung Members của solution-users-8
+    mo_ta: Danh sách ngắn trong một khung — đầu khung (tên, dòng đếm, nút), mỗi mục một dòng (phần chính, phần phụ, nhãn, chỗ chỉnh cuối dòng), chân khung (ghi chú, nút lưu) — khung Members của solution-users-8
     ho_so: thanh-vien-chon-tu-reui
     duyet: 2026-11-14
   - ten: FormDialog nhãn
