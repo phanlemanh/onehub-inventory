@@ -124,3 +124,108 @@ wall: 702s
 - **claude-opus-5-5**: 3 agent · 32 calls · out 19,987 · in 68 · cache_read 1,154,432 · cache_create 146,253
 - **claude-sonnet-5-5**: 8 agent · 25 calls · out 29,415 · in 56 · cache_read 645,833 · cache_create 271,945
 - **claude-haiku-5-5**: 6 agent · 13 calls · out 12,014 · in 28 · cache_read 95,678 · cache_create 98,528
+### S4 round 4 — wf_bdc1ccd4-18c (17 agent, 60,880 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| synthesize:report | claude-sonnet-5-5 | 2 | 8,077 | 4 | 26,412 | 47 |
+| review:bugs | claude-opus-5-5 | 8 | 7,006 | 16 | 230,703 | 78 |
+| review:invariants | claude-opus-5-5 | 9 | 6,945 | 18 | 281,732 | 142 |
+| ui:E11 | claude-sonnet-5-5 | 10 | 6,276 | 20 | 697,875 | 119 |
+| review:measurement | claude-opus-5-5 | 5 | 5,281 | 12 | 119,482 | 58 |
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 4,484 | 6 | 41,446 | 167 |
+| machine:npx playwright test tests/e2e/ghim-ngan. | claude-haiku-5-5 | 2 | 3,361 | 4 | 15,932 | 61 |
+| machine:make e2e | claude-haiku-5-5 | 5 | 3,031 | 10 | 52,954 | 776 |
+| judge:E12:domain-correctness | claude-sonnet-5-5 | 3 | 2,681 | 8 | 43,558 | 22 |
+| machine:npx vitest run tests/vai-man-nut-sinh.te | claude-haiku-5-5 | 2 | 2,390 | 4 | 16,006 | 18 |
+| triage | claude-sonnet-5-5 | 2 | 2,203 | 4 | 15,392 | 16 |
+| judge:E12:operational-feasibility | claude-sonnet-5-5 | 2 | 2,159 | 4 | 16,443 | 17 |
+| judge:E12:spec-alignment | claude-sonnet-5-5 | 2 | 2,121 | 4 | 16,441 | 17 |
+| machine:make test | claude-haiku-5-5 | 2 | 1,893 | 4 | 15,889 | 61 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,632 | 4 | 12,589 | 96 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 997 | 4 | 15,939 | 12 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 343 | 4 | 11,535 | 4 |
+
+
+wall: 951s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| review | 3 | 19,232 | 631,917 | 142 | 05:11:50 | 05:14:13 |
+| ui | 1 | 6,276 | 697,875 | 120 | 05:11:50 | 05:13:50 |
+| baseline | 1 | 4,484 | 41,446 | 167 | 05:11:50 | 05:14:37 |
+| machine | 6 | 13,304 | 129,309 | 884 | 05:11:50 | 05:26:34 |
+| judge | 3 | 6,961 | 76,442 | 22 | 05:11:50 | 05:12:12 |
+| triage | 1 | 2,203 | 15,392 | 16 | 05:26:35 | 05:26:50 |
+| capture | 1 | 343 | 11,535 | 4 | 05:26:50 | 05:26:55 |
+| synthesize | 1 | 8,077 | 26,412 | 47 | 05:26:55 | 05:27:42 |
+
+- **claude-sonnet-5-5**: 8 agent · 26 calls · out 28,344 · in 54 · cache_read 869,102 · cache_create 272,937
+- **claude-opus-5-5**: 3 agent · 22 calls · out 19,232 · in 46 · cache_read 631,917 · cache_create 139,487
+- **claude-haiku-5-5**: 6 agent · 15 calls · out 13,304 · in 30 · cache_read 129,309 · cache_create 100,073
+
+### S4 round 5 — wf_58aaf433-d7f (15 agent, 47,380 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| synthesize:report | claude-sonnet-5-5 | 5 | 9,424 | 10 | 149,104 | 59 |
+| ui:E11 | claude-sonnet-5-5 | 10 | 6,804 | 20 | 696,410 | 169 |
+| review:bugs | claude-opus-5-5 | 7 | 4,327 | 14 | 206,480 | 45 |
+| review:invariants | claude-opus-5-5 | 7 | 3,993 | 14 | 173,265 | 44 |
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 3,420 | 6 | 37,928 | 85 |
+| machine:npx playwright test tests/e2e/ghim-ngan. | claude-haiku-5-5 | 2 | 3,244 | 4 | 15,742 | 46 |
+| judge:E12:operational-feasibility | claude-sonnet-5-5 | 3 | 2,935 | 8 | 47,008 | 21 |
+| judge:E12:domain-correctness | claude-sonnet-5-5 | 3 | 2,894 | 8 | 43,388 | 21 |
+| machine:make e2e | claude-haiku-5-5 | 2 | 2,402 | 4 | 3,300 | 604 |
+| judge:E12:spec-alignment | claude-sonnet-5-5 | 2 | 2,255 | 4 | 16,251 | 17 |
+| triage | claude-sonnet-5-5 | 2 | 1,861 | 4 | 15,090 | 14 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,634 | 4 | 12,399 | 50 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 978 | 4 | 15,703 | 13 |
+| review:measurement | claude-opus-5-5 | 3 | 868 | 6 | 41,278 | 10 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 341 | 4 | 11,565 | 3 |
+
+
+wall: 742s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| baseline | 1 | 3,420 | 37,928 | 85 | 06:18:08 | 06:19:33 |
+| ui | 1 | 6,804 | 696,410 | 169 | 06:18:08 | 06:20:57 |
+| review | 3 | 9,188 | 421,023 | 46 | 06:18:08 | 06:18:54 |
+| machine | 4 | 8,258 | 47,144 | 667 | 06:18:08 | 06:29:15 |
+| judge | 3 | 8,084 | 106,647 | 22 | 06:18:08 | 06:18:30 |
+| triage | 1 | 1,861 | 15,090 | 14 | 06:29:15 | 06:29:28 |
+| capture | 1 | 341 | 11,565 | 3 | 06:29:28 | 06:29:32 |
+| synthesize | 1 | 9,424 | 149,104 | 59 | 06:29:32 | 06:30:31 |
+
+- **claude-sonnet-5-5**: 8 agent · 30 calls · out 29,934 · in 64 · cache_read 1,016,744 · cache_create 282,308
+- **claude-opus-5-5**: 3 agent · 17 calls · out 9,188 · in 34 · cache_read 421,023 · cache_create 103,672
+- **claude-haiku-5-5**: 4 agent · 8 calls · out 8,258 · in 16 · cache_read 47,144 · cache_create 69,323
+
+### S4 round 5 re-judge E12 — wf_8c507cd0-429 (9 agent, 21,250 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| synthesize:report | claude-sonnet-5-5 | 2 | 6,310 | 4 | 31,680 | 39 |
+| review:bugs | claude-opus-5-5 | 4 | 3,188 | 8 | 91,276 | 32 |
+| judge:E12:operational-feasibility | claude-sonnet-5-5 | 3 | 2,541 | 8 | 47,228 | 19 |
+| review:invariants | claude-opus-5-5 | 8 | 2,412 | 16 | 189,688 | 28 |
+| judge:E12:domain-correctness | claude-sonnet-5-5 | 2 | 2,403 | 4 | 12,745 | 19 |
+| judge:E12:spec-alignment | claude-sonnet-5-5 | 2 | 2,105 | 4 | 16,361 | 16 |
+| triage | claude-sonnet-5-5 | 2 | 1,490 | 4 | 18,435 | 12 |
+| review:measurement | claude-opus-5-5 | 2 | 454 | 4 | 18,761 | 6 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 347 | 4 | 14,478 | 4 |
+
+
+wall: 88s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| review | 3 | 6,054 | 299,725 | 33 | 06:53:38 | 06:54:11 |
+| judge | 3 | 7,049 | 76,334 | 21 | 06:53:38 | 06:53:58 |
+| triage | 1 | 1,490 | 18,435 | 12 | 06:54:11 | 06:54:22 |
+| capture | 1 | 347 | 14,478 | 4 | 06:54:22 | 06:54:26 |
+| synthesize | 1 | 6,310 | 31,680 | 39 | 06:54:26 | 06:55:05 |
+
+- **claude-sonnet-5-5**: 6 agent · 13 calls · out 15,196 · in 28 · cache_read 140,927 · cache_create 150,509
+- **claude-opus-5-5**: 3 agent · 14 calls · out 6,054 · in 28 · cache_read 299,725 · cache_create 95,770
