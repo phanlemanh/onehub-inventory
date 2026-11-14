@@ -14,7 +14,8 @@ chính, nằm ngoài thư mục nhà cung cấp (`src/components/ui`, `src/compo
 
 ## 2. Luật mới, một câu
 
-Khi luật 0023 đang bật (kho có `design/so-khoi.yaml`), mỗi TỆP của sổ thành phần nằm ngoài thư mục nhà cung cấp phải được kê ở
+Khi luật 0023 đang bật (kho có `design/so-khoi.yaml`) và kho có danh sách có trước (sửa ở S3, sổ quyết định dòng `fix`: bài
+kho thật của hàng 1c chép kho không kèm `tools/`, nên thiếu danh sách thì luật tắt như thiếu sổ khối), mỗi TỆP của sổ thành phần nằm ngoài thư mục nhà cung cấp phải được kê ở
 ít nhất một trong ba chỗ; không chỗ nào thì lưới đỏ một dòng mã `khoi-khong-ke` gọi tên tệp và các thành phần của nó:
 
 1. **sổ khối** — có dòng mà `tep` là tệp ấy, hay `ten` là một thành phần của tệp ấy (khối đã nhập kho, mọi vòng đã đóng);

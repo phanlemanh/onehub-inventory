@@ -7,6 +7,8 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-14 — Cổng chứng minh màn bắt tệp khối tự làm chưa kê ở sổ khối, danh sách có trước hay bảng Khối của hồ sơ đang mở (hàng 1q); so với nhánh chính bằng danh sách cố định, không đọc git — [0034](decisions/0034-cong-bat-khoi-khong-ke.md), `_acceptance/cong-bat-khoi-khong-ke/`.
+
 - 2026-11-14 — Màn đăng nhập chọn lại từ khối ReUI auth-15 (logo trên, một cột hẹp giữa trang, chân trang một dòng); họ màn mới «dang-nhap» với khuôn LoginLayout; luồng mã email và bài kiểm hàng 8, 1m giữ nguyên — `_acceptance/dang-nhap-chon-tu-reui/`.
 - 2026-11-14 — Bài đơn vị của phép đếm giao–nhận (hàng 1s) không còn gắn với danh sách tệp bài hiện có của kho: chạy trên báo cáo mẫu với danh sách tệp của chính bản mẫu (`--tep-bai`), nên thêm tệp `tests/e2e-db/*.spec.ts` không còn buộc sinh lại bản mẫu; phép đếm trên CI vẫn xét mọi tệp trong kho (việc phụ VP1) — [ci-co-postgres](../_acceptance/ci-co-postgres/contract.md).
 - 2026-11-13 — Hỏi đầu chủ và Báo sai thông tin căn (hàng 3e): thanh dính đáy hồ sơ căn với một nút «Hỏi đầu chủ · [Tên]» cho người không giữ căn, nút «Báo sai thông tin» ở mục thuộc tính; cả hai chỉ soạn tin rồi mở bảng chia sẻ của máy (không có thì chép), người tự gửi (SP-3); người giữ căn là dữ liệu mẫu tới hàng 10; đầu hồ sơ hai dòng ở mọi khổ và «Chép đường dẫn» chỉ biểu tượng (chủ kho 13/11) — `_acceptance/hoi-dau-chu-bao-sai/`.
