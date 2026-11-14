@@ -17,6 +17,7 @@ import type { SavedView } from "../saved-view";
 import {
   INVENTORY_GROUP_BY,
   inventoryColumns,
+  type InventoryCustomColumn,
   type InventoryField,
   type InventoryState,
 } from "./inventory-rows";
@@ -35,6 +36,7 @@ const PARTIAL_ROWS = 40;
 export function InventoryGrid({
   title,
   headers,
+  customColumns,
   rows,
   state,
   emptyWhy,
@@ -52,6 +54,8 @@ export function InventoryGrid({
 }: {
   title: string;
   headers: Readonly<Record<InventoryField, string>>;
+  /** The company's own columns (row 7e), after the eight standard ones. */
+  customColumns?: readonly InventoryCustomColumn[];
   rows: readonly GridRow[];
   state: InventoryState;
   emptyWhy: string;
@@ -106,7 +110,7 @@ export function InventoryGrid({
   }, [staleLinkNote]);
   // The same columns on every render: this grid renders again on each change of arrangement (the «changed» mark), and
   // new columns would draw the header cells, with the filter box being typed in, again.
-  const columns = useMemo(() => inventoryColumns(headers), [headers]);
+  const columns = useMemo(() => inventoryColumns(headers, customColumns), [headers, customColumns]);
   // Below 768 px the region shows each row as the listing card's row layout (row 2b): the record head's own card.
   const phoneList = useMemo(
     (): RegionPhoneList<GridRow> => ({

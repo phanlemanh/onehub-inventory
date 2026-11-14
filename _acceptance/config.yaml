@@ -13,6 +13,7 @@ executors:
     sua_tren_o_e2e: "npx playwright test tests/e2e/sua-tren-o.spec.ts tests/e2e/sheet.spec.ts tests/e2e/ho-so-can.spec.ts"   # sua-tren-o (row 4): in-cell edit at four sizes, with the 2a and 3 key rules
     sua_tren_o_rao: "npx vitest run tests/behavior-guard.test.ts --coverage.enabled=false --reporter=verbose"   # sua-tren-o (row 4): behaviour guard reads .ts as TypeScript (K-5)
     vai_dang_nhap_unit: "npx vitest run src/modules/identity/with-company.test.ts tests/vai-dang-nhap-nguon.test.ts --coverage.enabled=false --reporter=verbose"   # ung-dung-noi-bang-vai-khong-chu (row 7c): door checks its login role, source scan of test connection strings, .env.example add-only
+    lop_rieng_unit: "npx vitest run src/modules/company-config tests/lop-rieng-ontology.test.ts tests/lop-rieng-cot.test.ts --coverage.enabled=false --reporter=verbose"   # lop-rieng-cua-san (row 7e): custom values, custom columns, ontology fence
     vai_man_so: "npx vitest run tests/vai-man-so-man.test.ts --coverage.enabled=false --reporter=verbose"   # kiem-vai-theo-man (row 9b): screen register entry rule, pair set, shared sign-in door, sidebar vs register
     vai_man_nut: "npx vitest run tests/vai-man-nut-sinh.test.ts tests/vai-man-dau-nut.test.tsx tests/bo-nut-vai-man.test.ts src/modules/identity/permitted-action.test.tsx --coverage.enabled=false --reporter=verbose"   # kiem-vai-theo-man (row 9b): role × screen × button table from the register and module UI, every screen and the App Shell frame
     the_dien_thoai: "npx vitest run tests/the-dien-thoai.test.tsx --coverage.enabled=false --reporter=verbose"   # bang-hang-the-dien-thoai (row 2b): phone card list of the grid region, unit level
@@ -34,6 +35,7 @@ executors:
     va_dang_nhap_db: "DB_LANE=r DB_PORT=5565 npx vitest run -c vitest.db.config.ts --reporter=verbose"   # va-dang-nhap (row 1m): row 8 database tests on lane R Postgres
     va_dang_nhap_e2e: "DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts"   # va-dang-nhap (row 1m): every sign-in browser test on lane R Postgres
     va_dang_nhap_cach_ly: "DB_LANE=r DB_PORT=5565 bash db/scripts/cach-ly.sh"   # va-dang-nhap (row 1m): isolation suite on lane R Postgres
+    dang_nhap_1p_e2e: "DB_LANE=h DB_PORT=5567 npx playwright test -c playwright.db.config.ts"   # dang-nhap-chon-tu-reui (row 1p): every sign-in browser test on lane H Postgres
     moi_nguoi_db: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx vitest run -c vitest.db.config.ts tests/db/moi-nguoi.db.test.ts --reporter=verbose"   # moi-nguoi-gan-vai (row 9): lane Postgres, scratch databases moi_nguoi_*
     cach_ly_n: "DB_LANE=${DB_LANE:-n} bash db/scripts/cach-ly.sh"   # moi-nguoi-gan-vai (row 9): the isolation suite on lane N's Postgres when other lanes' containers run too
     moi_nguoi_e2e: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx playwright test -c playwright.db.config.ts tests/e2e-db/members.spec.ts"   # moi-nguoi-gan-vai (row 9): members screen on lane Postgres
@@ -60,6 +62,9 @@ executors:
     goc_nhin_db: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx vitest run -c vitest.db.config.ts tests/db/goc-nhin.db.test.ts --reporter=verbose"   # luu-goc-nhin-cot-hai (row 2c): saved views at API and database, lane K Postgres
     goc_nhin_e2e: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx playwright test -c playwright.db.config.ts tests/e2e-db/goc-nhin.spec.ts"   # luu-goc-nhin-cot-hai (row 2c): save, open, rename, remove a saved view in the browser, lane K Postgres
     cach_ly_k: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} bash db/scripts/cach-ly.sh"   # luu-goc-nhin-cot-hai (row 2c): isolation suite with the saved_view table, lane K Postgres
+    lop_rieng_db: "DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} npx vitest run -c vitest.db.config.ts tests/db/lop-rieng.db.test.ts --reporter=verbose"   # lop-rieng-cua-san (row 7e): company layer at API and database, lane R Postgres
+    lop_rieng_e2e: "DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} npx playwright test -c playwright.db.config.ts tests/e2e-db/lop-rieng.spec.ts"   # lop-rieng-cua-san (row 7e): inventory words and the review screen in the browser, lane R Postgres
+    cach_ly_r: "DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} bash db/scripts/cach-ly.sh"   # lop-rieng-cua-san (row 7e): isolation suite with the five company-layer tables, lane R Postgres
     ci_db_thu: "bash db/scripts/ci-thu.sh"   # ci-co-postgres (row 1s): shallow clone of HEAD + fresh Postgres from the workflow patch, `make ci-db` green, then break copies (no test session, session cases as owner) red
     ci_db_kiem: "npx vitest run tests/ci-db.test.ts tests/dem-giao-nhan.test.ts tests/don-dung-tam.test.ts tests/ci-ban-sao-nong.test.ts tests/ci-yml-patch.test.ts --coverage.enabled=false --reporter=verbose"   # ci-co-postgres (row 1s): step runner on stubs, hand-over count, build folder sweep, shallow-clone fixtures, workflow patch
     ci_db_that: "node db/scripts/ci-that.mjs --cho 60"   # ci-co-postgres (row 1s): latest CI run on the branch head — job e2e-db green, its log lines, duration against timeout-minutes

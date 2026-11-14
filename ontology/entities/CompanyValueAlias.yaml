@@ -1,0 +1,27 @@
+name: CompanyValueAlias
+description: >-
+  One pairing of a company's dictionary: the text the company writes for a value («ĐN») and the standard value of one
+  field it stands for (Đông Nam). Belongs to that company only.
+reso: none (our own)
+
+properties:
+  id: { type: integer, required: true, unique: true, display: none }
+  companyId: { type: ref, target: Company, required: true, display: none }
+  field: { type: string, required: true, display: text }
+  raw: { type: string, required: true, max: 40, display: text }
+  rawFold: { type: string, required: true, display: none }
+  value: { type: string, required: true, display: text }
+  createdAt: { type: datetime, required: true, display: none }
+  retiredAt: { type: datetime, display: none }
+
+rules:
+  - id: value-alias-in-set
+    description: >-
+      The field is a standard field with a closed value set or a single choice custom field in use; the value belongs
+      to that set; one pairing in use per field and folded text.
+    implemented_in: src/modules/company-config/store.ts
+
+code:
+  model: src/modules/company-config/
+  tests: tests/db/lop-rieng.db.test.ts
+wiki: wiki/entities/company-value-alias.md
