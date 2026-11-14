@@ -55,8 +55,11 @@ evals:
     executor: ui-check
     layer: ui-observed
     paths: [src/components/candidate/form-dialog.tsx, src/modules/listings/ui/view-name-dialog.tsx, src/modules/listings/ui/listing-cell-edit.tsx, src/modules/listings/ui/report-unit-error.tsx]
-    expected: "Ảnh 1440 sáng của ba hộp dùng FormDialog ở màn khác (đặt tên góc nhìn, sửa trên ô, báo sai thông tin) trên nhánh của hàng và trên nhánh chính đặt cạnh nhau: không khác về dáng tiêu đề, khoảng cách, trường và chân hộp; lưu ở _acceptance/thanh-vien-chon-tu-reui/evidence/form-dialog-*.png"
-    evidence_required: [run_id, screenshot, observed, verifier, verified_at]
+    steps:
+      - "Open the three pairs of shots in _acceptance/thanh-vien-chon-tu-reui/evidence/: truoc-form-dialog-dat-ten-goc-nhin.png and sau-form-dialog-dat-ten-goc-nhin.png (name a saved view, Inventory, signed in as ListAgent), truoc-form-dialog-bao-sai.png and sau-form-dialog-bao-sai.png (report wrong unit info, record panel, BuyerAgent), truoc-form-dialog-trang-thai.png and sau-form-dialog-trang-thai.png (status dialog of in-cell edit). «truoc» was taken with the main branch's FormDialog, «sau» with this branch's, same data, 1440 light"
+      - "Compare each pair side by side: title line, description, fields, footer buttons, spacing; also compare the files' sha256 and say whether each pair is byte-identical"
+    expected: "Ảnh 1440 sáng của ba hộp dùng FormDialog ở màn khác (đặt tên góc nhìn, sửa trên ô, báo sai thông tin) trên nhánh của hàng và trên nhánh chính đặt cạnh nhau: không khác về dáng tiêu đề, khoảng cách, trường và chân hộp; không có nhãn cạnh tiêu đề"
+    evidence_required: [screenshot, observed]
 
   - id: E8
     criterion: AC-6
@@ -94,9 +97,13 @@ evals:
     criterion: AC-9
     executor: ui-check
     layer: ui-observed
-    paths: [src/app/(app)/members/**, src/components/candidate/form-dialog.tsx]
-    expected: "Ảnh màn Thành viên 1440 sáng và ảnh hộp mời đặt cạnh _acceptance/thanh-vien-chon-tu-reui/evidence/design-pass/anh/goc-users8.png và goc-dialog2.png: danh sách là một khung có đầu (tên, dòng đếm), mỗi dòng có chữ cái đầu tròn, tên trên email, cột thẳng hàng, nút cuối dòng; hộp có nhãn nhỏ cạnh tiêu đề, trường xếp dọc, dải chân hai nút; không có ô tìm, thẻ, khung khách, khung lời mời"
-    evidence_required: [run_id, screenshot, observed, verifier, verified_at]
+    paths: [src/app/(app)/members/**, src/modules/identity/ui/**, src/components/candidate/framed-list.tsx, src/components/candidate/form-dialog.tsx]
+    steps:
+      - "Open _acceptance/thanh-vien-chon-tu-reui/evidence/sau-members-1440-sang.png (the members screen, signed in as CompanyAdmin of a six-person sample company, 1440 light) beside _acceptance/thanh-vien-chon-tu-reui/evidence/design-pass/anh/goc-users8.png (ReUI solution-users-8 original)"
+      - "Open _acceptance/thanh-vien-chon-tu-reui/evidence/sau-hop-moi-1440-sang.png (the invite dialog) beside _acceptance/thanh-vien-chon-tu-reui/evidence/design-pass/anh/goc-dialog2.png (ReUI dialog-2 original)"
+      - "Also open _acceptance/thanh-vien-chon-tu-reui/evidence/design-pass/anh/lo-b-users8.png and hop-moi.png (the shots the owner approved at the scope gate) and say whether the built screen keeps that look"
+    expected: "Danh sách là một khung có đầu (tên, dòng đếm), mỗi dòng có chữ cái đầu tròn, tên trên email, cột thẳng hàng, nút cuối dòng — như khung Members của solution-users-8; hộp có nhãn nhỏ cạnh tiêu đề, trường xếp dọc, dải chân hai nút — như dialog-2; không có ô tìm, thẻ, khung khách, khung lời mời; dáng giữ như ảnh chủ kho đã duyệt ở Cổng Phạm vi"
+    evidence_required: [screenshot, observed]
 
   - id: E13
     criterion: AC-3
