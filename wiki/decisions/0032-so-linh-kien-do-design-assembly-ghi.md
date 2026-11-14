@@ -21,8 +21,9 @@ sources:
 
 ## Status
 
-Proposed, 2026-11-14, trên nhánh `chore/adopt-design-assembly`, chưa đẩy, chưa gộp. Chủ kho cho làm bước này trên nhánh
-riêng; gộp nhánh cần người giữ mã ký, vì nhánh đụng `tools/`, `mk/` và `.claude/`.
+Proposed, 2026-11-14, trên nhánh `chore/adopt-design-assembly` (PR #58), chưa gộp. Chủ kho cho làm bước này trên nhánh
+riêng; gộp nhánh cần người giữ mã ký, vì nhánh đụng `tools/`, `mk/` và `.claude/`. Cổng trước khi gộp của kit còn đòi
+một hồ sơ `_acceptance/<slug>/` có chữ ký người cho mọi PR đổi đường dẫn T3; PR này chưa có hồ sơ đó.
 
 ## Context
 
@@ -41,9 +42,9 @@ có, đều không phải linh kiện: 34 hằng số viết hoa và 30 kiểu d
 2. `make gen` ghi lại sổ bằng công cụ đó; `make check` đỏ khi sổ không còn khớp mã nguồn. Công cụ cũ
    `tools/design_registry.mjs` bị bỏ, để một tệp chỉ có một bên ghi.
 3. Dòng sổ quyết định «cấp linh kiện» trỏ tới công cụ mới. Bài kiểm sổ và skill `inventory-ui` đọc hình dạng mới.
-4. Khai sổ token và sổ linh kiện với kit, ở `design_floor` của `_acceptance/config.yaml`, trong một PR sau. Cổng trước
-   khi gộp của kit chặn một PR vừa đổi đường dẫn T3 vừa đụng `_acceptance/` mà không kèm hồ sơ; tách ra thì PR này
-   không đụng `_acceptance/`.
+4. Khai sổ token và sổ linh kiện với kit, ở `design_floor` của `_acceptance/config.yaml`, trong PR sau (#59). Tách ra
+   là để gỡ một luật của cổng trước khi gộp, nhưng không gỡ được: bỏ phần đó thì luật khác của cổng chặn, vì PR vẫn đổi
+   đường dẫn T3 mà không kèm hồ sơ.
 
 ## Consequences
 
