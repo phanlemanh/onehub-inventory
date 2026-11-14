@@ -1,0 +1,172 @@
+schema_version: 1
+feature_slug: lop-rieng-cua-san
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.lop_rieng_db
+    layer: backend-effect
+    paths: [src/modules/company-config/**, "src/app/api/v1/company-layer/**", db/migrations/010_*.sql, tests/db/lop-rieng.db.test.ts]
+    expected: "exit 0; tests/db/lop-rieng.db.test.ts khối 'labels': POST /api/v1/company-layer/labels qua route handler thật với phiên Quản trị sàn A, khái niệm Building chữ 'Block'; đọc lại bằng vai quản trị của bài: một dòng company_labels, company_id = A, chữ 'Block'; label('Building', {overrides}) với nhãn đọc qua cửa trả 'Block'; ma trận viết trước 6 ca từ chối (khái niệm 'Khong-co', khái niệm kind surface 'Inventory', chữ rỗng, chữ 41 ký tự, chữ toàn khoảng trắng, nhãn thứ hai còn dùng cho Building) hằng 6, mỗi ca 400 và không thêm dòng; ngừng dùng thì label trả 'Toà'; ca phá: bỏ kiểm kind ở cửa → khẳng định 'label accepted for non-field concept: Inventory'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.lop_rieng_db
+    layer: backend-effect
+    paths: [src/modules/company-config/**, "src/app/api/v1/company-layer/**", db/migrations/010_*.sql, tests/db/lop-rieng.db.test.ts]
+    expected: "exit 0; khối 'fields': năm kiểu text, number, date, single_select, boolean lưu được (hằng 5), kiểu 'formula' và 'object' bị 400; single_select 0 lựa chọn, 31 lựa chọn, hai lựa chọn trùng sau gấp chữ ('Biển', 'bien') bị từ chối; text có lựa chọn bị từ chối; single_select đúng 1 và đúng 30 lựa chọn được nhận; tạo 20 trường còn dùng rồi trường 21 bị cửa API trả 400 'field limit 20'; ngừng một trường rồi tạo trường mới được nhận (trường đã ngừng không tính trần); chèn thẳng single_select 31 lựa chọn bằng vai API bị cơ sở dữ liệu từ chối với lỗi ghim tên 'company_fields_options';  ma trận viết trước 4 tên trùng sau gấp chữ hằng 4 ('ghi chu' khi đã có 'Ghi chú', 'Block' khi nhãn riêng của Toà là 'Block', 'Giá chào' là nhãn chuẩn của cột, 'TOÀ') bị 400 'field name taken'; chèn trường 21 thẳng bằng vai API trong withCompany bị cơ sở dữ liệu từ chối với lỗi ghim tên 'company_fields_limit'; ngừng một trường rồi tạo lại cùng mã bị từ chối; PATCH đổi mã bị từ chối; ca phá: gỡ trigger trần trong cơ sở dữ liệu nháp → khẳng định 'database accepted field 21'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.lop_rieng_unit
+    paths: [src/modules/company-config/**, ontology/entities/Listing.yaml, src/generated/**]
+    expected: "exit 0; src/modules/company-config/custom-value.test.ts: ma trận viết trước 5 kiểu × (2 giá trị đúng + 3 giá trị sai) = 25 ca hằng 25 — text: 'Biển'/500 ký tự đúng, 501 ký tự, số 5, null sai; number: 0/-2.5 đúng, NaN, Infinity, '5' sai; date: '2026-02-28'/'2024-02-29' đúng, '2026-02-30', '28/02/2026', '' sai; single_select: hai lựa chọn có trong danh sách đúng, lựa chọn đã bỏ, chữ lạ, số sai; boolean: true/false đúng, 'có', 1, null sai; trường đã ngừng từ chối cả giá trị đúng với lý do 'field-retired'; kiểu Listing sinh từ ontology có thuộc tính customFields; ca phá: kiểm ngày bằng Date.parse → khẳng định 'invalid date accepted: 2026-02-30'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.lop_rieng_db
+    layer: backend-effect
+    paths: [src/modules/company-config/**, "src/app/api/v1/company-layer/**", db/migrations/010_*.sql, tests/db/lop-rieng.db.test.ts]
+    expected: "exit 0; khối 'value aliases': lưu Hướng 'ĐN' → hướng Đông Nam chuẩn, Trạng thái 'còn' → Active, trường riêng chọn một 'Hướng view' 'biển' → 'Biển'; ma trận viết trước 6 chữ thô ('ĐN', 'dn', '  Đn ', 'CÒN', 'con', 'BIỂN') hằng 6 tra ra đúng giá trị; giá trị 'Bắc Nam' cho Hướng, 'Bán gấp' cho Trạng thái, lựa chọn không có cho 'Hướng view' bị 400; trường chữ riêng và trường chuẩn không có tập đóng (ListPrice) bị 400; lưu 'dn' lần hai cho Hướng bị từ chối trùng; ngừng trường riêng 'Hướng view' thì tra 'biển' cho trường ấy không ra; ca phá: tra không gấp dấu → khẳng định 'alias not found after folding: ĐN'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.lop_rieng_db
+    layer: backend-effect
+    paths: [src/modules/company-config/**, src/modules/catalog/**, "src/app/api/v1/company-layer/**", db/migrations/010_*.sql, tests/db/lop-rieng.db.test.ts]
+    expected: "exit 0; khối 'pending units' trên danh mục mẫu của 7d: sàn A tạo căn chờ 'SA5-12.08' (danh mục không có) → tra mã trong A ra căn chờ (nguồn 'pending'); sàn A có mã riêng 'X1' cho căn S1.01-0905 và căn chờ cùng chữ 'X1' → tra ra căn danh mục (nguồn 'company', thứ tự bốn nguồn ghim bằng ma trận 4 ca hằng 4: company, catalog, reader, pending); bài thêm căn mới vào danh mục bằng vai quản trị của bài (mô phỏng hệ thống nạp) với mã gốc khớp 'SA5-12.08', POST .../pending-units/match → căn chờ có unit_key = khoá căn mới và matched_at, tra mã ra căn danh mục; băm toàn bộ năm bảng catalog_* trước và sau lệnh khớp BẰNG nhau; ghi unit_key không có thật bị khoá ngoại từ chối; căn chờ có mã ra hai căn vẫn chờ; ca phá: khớp ghi vào catalog_aliases → khẳng định 'catalog changed by match'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.lop_rieng_db
+    layer: backend-effect
+    paths: [src/modules/company-config/**, "src/app/api/v1/company-layer/**", db/migrations/010_*.sql, tests/db/lop-rieng.db.test.ts]
+    expected: "exit 0; khối 'import templates': lưu mẫu cho tệp ['Mã căn','Block','Giá KBP','View','Ghi chú'] với đích [Listing.unitNumber, Listing.buildingName, Listing.listPrice, trường riêng huong_view, bỏ cột]; ma trận viết trước 5 dạng tệp hằng 5: đúng nguyên văn → ra mẫu; khác hoa thường, dấu, khoảng trắng → ra mẫu; đổi chỗ hai cột → không; thiếu cột cuối → không; thừa một cột → không; đích 'Listing.khongCo', trường riêng đã ngừng, hai đích cho một cột bị 400; mẫu thứ hai cùng dạng tệp bị từ chối trùng; ngừng trường huong_view rồi tìm mẫu: mẫu vẫn ra, cột 'View' mang dấu 'target-retired', bốn cột còn lại không mang dấu; ca phá: chữ ký tệp sắp xếp tên cột → khẳng định 'template matched reordered headers'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.cach_ly_r
+    layer: backend-effect
+    paths: [db/migrations/010_*.sql, db/tests/cach-ly.sql, db/tests/pha-thu/**, db/scripts/cach-ly.sh]
+    expected: "exit 0; bộ kiểm cách ly trên Postgres dãy R có ca cho năm bảng company_labels, company_fields, company_value_aliases, company_pending_units, company_import_templates (hằng 5): sàn B và phiên chưa chọn sàn đếm 0 dòng của A, vai API không có quyền delete hay truncate, ghi bằng company_id của sàn khác bị luật theo dòng chặn; tệp phá db/tests/pha-thu/lop-rieng-khong-ep.sql bỏ force row level security trên company_fields → bộ kiểm đỏ với dòng ghim tên bảng company_fields"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.lop_rieng_db
+    layer: backend-effect
+    paths: [src/modules/company-config/**, "src/app/api/v1/company-layer/**", db/migrations/010_*.sql, ontology/actions.yaml, tests/db/lop-rieng.db.test.ts]
+    expected: "exit 0; khối 'permissions': bảng 20 ô (4 vai × 5 thao tác readCompanyLayer, addCompanyLayer, editCompanyLayer, retireCompanyLayer, matchPendingUnits) viết sẵn trong bài theo câu trả lời Hỏi-1 (khuyến nghị: đọc cho cả bốn vai; bốn thao tác ghi cho ListAgent, TeamLead, CompanyAdmin, không cho BuyerAgent), không đọc từ ontology/actions.yaml; mỗi ô thử ở cửa API (Đầu chủ POST nhãn nhận 200, Đầu khách 403) và ở cơ sở dữ liệu (luật thu hẹp theo quyền), hằng 20; bảng quyền sinh từ actions.yaml BẰNG bảng viết sẵn; vai không có addCompanyLayer POST nhãn bị 403 và chèn thẳng trong withCompany bị luật thu hẹp chặn; ca phá: bỏ luật thu hẹp insert của company_labels → khẳng định 'insert allowed without addCompanyLayer'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.lop_rieng_e2e
+    layer: backend-effect
+    paths: [src/modules/company-config/**, src/modules/listings/**, src/components/candidate/**, "src/app/(app)/inventory/**", tests/e2e-db/lop-rieng.spec.ts]
+    expected: "exit 0; ca 'company words on inventory' ở 1440 trên Postgres dãy R: tạo qua API cho sàn A nhãn 'Block' cho Building, trường riêng huong_view (chọn một, vị trí 1), ghi_chu (chữ, vị trí 2), trường thứ ba rồi ngừng; người A mở Bảng hàng: danh sách tiêu đề cột theo thứ tự BẰNG danh sách viết trước [8 cột chuẩn với 'Block' ở chỗ Toà, 'Hướng view', 'Ghi chú'] (hằng 10), không có tên trường đã ngừng; cột 'Hướng view' lọc được theo giá trị mẫu và số dòng sau lọc BẰNG số tính độc lập từ dữ liệu mẫu; người sàn B mở Bảng hàng thấy đúng 8 tiêu đề chuẩn với 'Toà'; ca phá: bỏ lọc trường đã ngừng → khẳng định 'retired field shown: <tên>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.lop_rieng_unit
+    paths: [src/components/candidate/column-kind.ts, src/modules/listings/ui/**, src/modules/company-config/**]
+    expected: "exit 0; ma trận viết trước 5 kiểu trường riêng → kind cột (text→text, number→count, date→date, single_select→select, boolean→boolean) hằng 5, căn lề theo alignFor; inventoryColumns với nhãn riêng và trường riêng xếp cột riêng sau cột chuẩn theo position; ca phá: đặt cột riêng trước cột chuẩn → khẳng định 'custom column before standard columns'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-8
+    executor: ui-check
+    layer: ui-observed
+    target: "Bảng hàng của sàn mẫu có nhãn riêng và hai trường riêng, khổ 1440 và 360, sáng và tối"
+    steps:
+      - "From the repo root, with lane R Postgres up (DB_PORT 5565), run: LOP_RIENG_ANH=1 DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts tests/e2e-db/lop-rieng.spec.ts --project 1440 — it signs in through the shared role door, fills the sample company's layer, and writes the pictures under _acceptance/lop-rieng-cua-san/evidence/; it starts and stops its own server, never start another"
+      - "Open evidence/inventory-1440.png, inventory-1440-cuoi.png (the grid scrolled to its last columns), inventory-1440-cuoi-toi.png, inventory-1440-toi.png, inventory-1024.png, inventory-414.png, inventory-360.png, inventory-360-toi.png and look at the headers and the last columns"
+    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", src/components/candidate/**]
+    expected: "Ảnh cho thấy tiêu đề 'Block' ở chỗ Toà, hai cột 'Hướng view' và 'Ghi chú' sau cột Xác nhận lúc, giá trị mẫu đọc được, cột không vỡ ở 360, tương phản đủ ở nền tối"
+    evidence_required: [screenshot, observed]
+
+  - id: E12
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.lop_rieng_e2e
+    layer: backend-effect
+    paths: [src/modules/company-config/**, "src/app/(app)/tuy-chinh-san/**", src/components/templates/**, src/modules/identity/ui/**, tests/e2e-db/lop-rieng.spec.ts]
+    expected: "exit 0; ca 'review screen' ở 1440: Quản trị sàn A mở màn Tuỳ chỉnh của sàn, năm phần có đúng số dòng của sàn A đọc bằng vai quản trị của bài; bảng nút viết sẵn trong bài theo _acceptance/lop-rieng-cua-san/thao-tac-nhap.yaml (5 phần × nút đầu vùng và nút «…») hằng 5 — mỗi phần đếm đúng nút đầu vùng (Thêm nhãn riêng, Thêm trường riêng, Thêm từ điển, Khớp với danh mục, không nút ở Mẫu nhập) và đúng mục của «…» (Sửa · Ngừng dùng; Ngừng dùng; Đổi tên · Ngừng dùng), không phần nào có mục chứa chữ 'Xoá'; ma trận 4 vai × 5 phần hằng 20: Đầu khách đếm 0 nút ghi ở mọi phần, ba vai kia đếm đúng bảng; «…» → 'Sửa' nhãn 'Block' thành 'Lô' → tải lại vẫn 'Lô' và Bảng hàng có tiêu đề 'Lô'; «…» → 'Ngừng dùng' trường ghi_chu → xác nhận → mục biến mất và Bảng hàng không còn cột ấy; 'Khớp với danh mục' → thông báo 'Đã khớp 1 căn, còn 0 căn chờ'; quyền bị gỡ giữa chừng → 'Không đủ quyền làm việc này'; axe không lỗi ở sáng và tối; ca phá: hiện nút Ngừng dùng ngoài PermittedAction → bộ kiểm nút của 9e đỏ 'write button outside PermittedAction'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-9
+    executor: ui-check
+    layer: ui-observed
+    target: "Màn Tuỳ chỉnh của sàn: năm phần với nút Thêm và menu «…» mở, hộp Thêm trường riêng, trạng thái rỗng, lỗi, không đủ quyền, ở 360, 414, 1024, 1440, sáng và tối"
+    steps:
+      - "From the repo root, with lane R Postgres up (DB_PORT 5565), run: LOP_RIENG_ANH=1 DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts tests/e2e-db/lop-rieng.spec.ts --project 1440 — it signs in through the shared role door, fills the sample company's layer, and writes the pictures under _acceptance/lop-rieng-cua-san/evidence/; it starts and stops its own server, never start another"
+      - "Open evidence/tuy-chinh-san-{360,414,1024,1440}.png and their -toi copies, tuy-chinh-san-{360,414}-ngan.png and -ngan-toi.png (the phone sheet open on the five parts), tuy-chinh-san-menu-1440.png, tuy-chinh-san-them-truong-1440.png, tuy-chinh-san-mau-1440.png (empty part) and tuy-chinh-san-chi-doc-1440.png (a role that only reads)"
+    paths: ["src/app/(app)/tuy-chinh-san/**", src/modules/company-config/**, src/components/templates/**]
+    expected: "Ảnh từng khổ cho thấy cột thứ hai (ngăn trượt ở điện thoại) liệt kê năm phần, vùng Lưới với «…» cuối dòng, trạng thái rỗng nói lý do và chỉ đường nhập, không chữ đè, không cuộn ngang ngoài vùng Lưới"
+    evidence_required: [screenshot, observed]
+
+  - id: E14
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.test.proof_gate
+    paths: [_acceptance/lop-rieng-cua-san/chung-minh-man.md, design/so-khoi.yaml, design/screens.yaml, design/patterns/**]
+    expected: "exit 0; tools/proof_gate/check.py xanh cho hồ sơ lop-rieng-cua-san: màn tuy-chinh-san khai trong design/screens.yaml với họ theo lựa chọn ở Hỏi-3, chứng minh màn đủ mục theo đường của họ, Bảng hàng có Ảnh cạnh màn mẫu ở bốn khổ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.check
+    paths: [ontology/**, src/generated/**, architecture/modules.yaml, db/migrations/010_*.sql, tools/**]
+    expected: "exit 0; make check xanh: make gen không đổi tệp sinh, kiểm ontology–wiki xanh, rào ranh giới mô-đun xanh với company-config dựa vào identity và catalog, không nhãn viết cứng trong src/"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E16
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.lop_rieng_unit
+    paths: [ontology/**, db/migrations/010_*.sql, tests/lop-rieng-ontology.test.ts]
+    expected: "exit 0; tests/lop-rieng-ontology.test.ts: năm tệp ontology CompanyLabel, CustomField, CompanyValueAlias, PendingUnit, ImportTemplate (hằng 5) có reso 'none (our own)'; tên không trùng tên RESO trong bảng nhãn; tập cột của mỗi bảng trong migration 010 BẰNG tập thuộc tính snake_case của thực thể; tập kiểu trường trong ràng buộc check của company_fields BẰNG tập đóng năm kiểu của ontology; migration 010 không có từ 'delete' trong grant, không bảng tên chứa 'rule', 'workflow', 'formula', không cột generated tính từ trường riêng; ca phá: thêm kiểu 'formula' vào check của bản sao migration → khẳng định 'field kinds differ from ontology: formula'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E17
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx", "src/app/(app)/tuy-chinh-san/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E18
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.design.floor
+    paths: ["src/app/(app)/tuy-chinh-san/**", src/modules/company-config/ui/**, src/modules/listings/ui/**]
+    expected: "exit 0; sàn thiết kế không thấy mã màu thô trên tệp giao diện mà vòng chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E19
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.lop_rieng_e2e
+    layer: backend-effect
+    paths: [src/modules/company-config/**, "src/app/(app)/tuy-chinh-san/**", "src/app/api/v1/company-layer/**", tests/e2e-db/lop-rieng.spec.ts]
+    expected: "exit 0; ca 'add and edit on screen' ở 1440: Đầu chủ A bấm 'Thêm trường riêng', điền tên 'Hướng view', kiểu Chọn một, bốn lựa chọn → dòng mới hiện trong phần và đọc lại bằng vai quản trị của bài có đúng một dòng company_fields của A; 'Thêm nhãn riêng' Toà → 'Block' và 'Thêm từ điển' Hướng 'ĐN' → Đông Nam đọc lại đúng; ma trận viết trước 4 lỗi hằng 4 (tên trùng 'ghi chu' sau gấp chữ, 31 lựa chọn, trường thứ 21 còn dùng, giá trị từ điển ngoài tập) — mỗi lỗi hiện dưới ô của hộp, chữ đã gõ còn nguyên, không dòng nào được thêm; 'Sửa' trường Hướng view: ô Kiểu bị khoá, đổi tên và thêm lựa chọn lưu được; 'Ngừng dùng' rồi đếm dòng trong bảng bằng vai quản trị: dòng còn, retired_at có giá trị; ca phá: cho đổi kiểu khi sửa → khẳng định 'field kind changed on edit'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

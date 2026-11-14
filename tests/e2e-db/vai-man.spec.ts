@@ -50,6 +50,8 @@ const BUTTON_NAME: Readonly<Record<string, string>> = {
   saveView: label("SaveView"),
   inviteMember: label("Invite"),
   changeMemberRoles: label("ChangeRoles"),
+  // «Tuỳ chỉnh của sàn» opens on «Nhãn riêng», where the add button adds a company label (row 7e).
+  addCompanyLayer: label("AddCompanyLabel"),
 };
 
 /** The screen that lists the company's people: where the witness must show for a role that may open it. */

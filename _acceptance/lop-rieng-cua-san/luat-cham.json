@@ -1,0 +1,17 @@
+{
+ "ban": "8ee15fdf20865e117d188e4fcb9769b2318e98e0",
+ "base": "d7c8f5d391a95fe1f7721bc38bb4145024667b37",
+ "den": "26ff8676fe336feeb347bd7e20fd76adff550d1c",
+ "sua_tep_luat": {
+  "may": [],
+  "nguoi": []
+ },
+ "cham": [
+  {
+   "ma": "SP-1",
+   "tep": "db/tests/pha-thu/lop-rieng-khong-ep.sql",
+   "dong": 3,
+   "chu": "alter table company_fields no force row level security;"
+  }
+ ]
+}
