@@ -647,7 +647,7 @@ test.describe("no match keeps filters", () => {
   /** The filter boxes are still there to mend, at every width (row 2e: the filter row is always shown). */
   async function checkFilters(page: Page): Promise<void> {
     const boxes = page.locator('[data-slot="data-region"] [data-slot="column-filter"]');
-    const ok = (await boxes.count()) === 8 && (await boxes.first().isVisible());
+    const ok = (await boxes.count()) === 9 && (await boxes.first().isVisible());
     if (!ok) throw new Error("filters gone on no match");
   }
 

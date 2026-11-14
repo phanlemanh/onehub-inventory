@@ -708,7 +708,7 @@ test.describe("E3 · the grid beside the record keeps its columns", () => {
   test("break: a hidden Diện tích column is caught", async ({ page }) => {
     await injectStyle(
       page,
-      '[data-slot="data-region"] th:nth-child(7), [data-slot="data-region"] td:nth-child(7) { display: none !important; }',
+      '[data-slot="data-region"] th:nth-child(8), [data-slot="data-region"] td:nth-child(8) { display: none !important; }',
     );
     await openInventory(page);
     await openFifth(page);

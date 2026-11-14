@@ -100,7 +100,8 @@ export function checkFeeDraft(
   nameOf: (code: string) => string,
 ): FeeProblem[] {
   const problems: FeeProblem[] = [];
-  const names = new Map<string, number>();
+  // Law names are taken first, so an own item that copies one is refused wherever it stands in the draft.
+  const names = new Map<string, number>(LAW_FEE_ITEMS.map((l) => [fold(nameOf(l.code)), -1]));
   let own = 0;
   draft.forEach((item, index) => {
     if (isLaw(item.code)) {
@@ -108,7 +109,6 @@ export function checkFeeDraft(
       if (item.name !== undefined || item.rateBasisPoints !== law.rateBasisPoints) {
         problems.push({ problem: "law-item-fixed", index });
       }
-      names.set(fold(nameOf(law.code)), index);
       return;
     }
     own += 1;

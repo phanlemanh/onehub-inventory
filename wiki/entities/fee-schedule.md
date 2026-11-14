@@ -17,7 +17,11 @@ trang khách không đọc (SP-4).
 ## Rules
 
 - Khoản theo luật chỉ bật hay tắt, không đổi tên, không đổi tỉ lệ, không bỏ.
-- Khoản riêng: tên 1–40 ký tự, không trùng; tỉ lệ 0–5%, bước 0,1%; tối đa 5 khoản đang dùng.
+- Ai đặt, ai đọc: chỉ Quản trị sàn đặt mức (`setFeeSchedule`); Đầu chủ, Đầu khách, Trưởng nhóm và Quản trị sàn cùng đọc
+  mức và cột Về tay (`readFeeSchedule`). Người chỉ đọc thấy phần Thuế phí nhưng không có ô sửa.
+- Phí môi giới mặc định 1%, sàn đặt trong khoảng 0–5%, bước 0,1%; sàn đổi tên hay bỏ được nó như mọi khoản riêng.
+- Khoản riêng: tên 1–40 ký tự, không trùng với khoản nào, kể cả khoản theo luật; tỉ lệ 0–5%, bước 0,1%; tối đa 5 khoản
+  đang dùng.
 - Tổng các khoản đang bật tối đa 10%; ít nhất một khoản bật. Tỉ lệ lưu bằng phần vạn số nguyên.
 - Về tay = Giá chào × (1 − tổng tỉ lệ đang bật), làm tròn xuống tới đồng, cho lần chào Bao phí; Không bao phí thì bằng Giá
   chào; thiếu giá, thiếu Điều kiện phí hay cho thuê thì trống.

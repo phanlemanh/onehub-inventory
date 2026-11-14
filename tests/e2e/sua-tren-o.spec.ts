@@ -263,11 +263,11 @@ test.describe("sua-tren-o", () => {
     await select(page, "1101", PRICE);
     await page.keyboard.press("ControlOrMeta+c");
     await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe("2,71 tỷ");
-    // Tab writes and moves to the next cell on the right.
+    // Tab writes and moves to the next cell on the right (Về tay since row 19).
     await typeInPrice(page, "1101", "2,72 tỷ");
     await page.keyboard.press("Tab");
     await expect(cellOf(page, "1101", PRICE)).toHaveText("2,72 tỷ");
-    await expect(cellOf(page, "1101", "Unit.livingArea")).toHaveAttribute(
+    await expect(cellOf(page, "1101", "custom.netToSeller")).toHaveAttribute(
       "data-cell-focused",
       /.*/,
     );

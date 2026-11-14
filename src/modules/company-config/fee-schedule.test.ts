@@ -261,6 +261,15 @@ describe("kiem-muc-khoan-luat", () => {
       { problem: "law-item-missing" },
     ]);
   });
+  it("an own item named like a law item is refused wherever it stands", () => {
+    const copy = { name: label("PersonalIncomeTax"), rateBasisPoints: 10, included: true };
+    expect(checkFeeDraft([copy, ...LAW, brokerage(100)], KNOWN, nameOf)).toEqual([
+      { problem: "name-duplicate", index: 0 },
+    ]);
+    expect(checkFeeDraft(draft(brokerage(100), copy), KNOWN, nameOf)).toEqual([
+      { problem: "name-duplicate", index: 3 },
+    ]);
+  });
   it("an own item the company does not have is refused", () => {
     expect(
       checkFeeDraft(draft({ code: "k9", rateBasisPoints: 10, included: true }), KNOWN, nameOf),
