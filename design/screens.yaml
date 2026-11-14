@@ -16,6 +16,9 @@
 #   nut_chung (staff/public) buttons that do not depend on a permission, as people read them
 #
 # `khung` declares the same for the App Shell around every staff screen: the top bar and the second column (row 9b).
+#
+# `version` is the shape of this file, read by the design-assembly tool's ledger contract.
+version: 1
 families:
   grid: Lưới
   dang-nhap: Đăng nhập

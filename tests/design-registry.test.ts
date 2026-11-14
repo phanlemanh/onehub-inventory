@@ -3,41 +3,55 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-type Part = {
+// The register is written by the design-assembly tool, in the shape of its contract: one entry per
+// exported component, with the file it is in, its level, where it comes from, its props, and its
+// variants written `axis=value`.
+type Entry = {
   name: string;
+  file: string;
+  level: string;
+  source: "library" | "own";
   props?: string[];
-  variants?: Record<string, string[]>;
+  variants?: string[];
   defaults?: Record<string, string>;
 };
-type Entry = { name: string; file: string; level: string; parts: Part[] };
 
 const { components } = JSON.parse(readFileSync("design/component-registry.json", "utf8")) as {
   components: Entry[];
 };
-const part = (entry: string, name: string) =>
-  components.find((c) => c.name === entry)?.parts.find((p) => p.name === name);
+const entry = (name: string) => components.find((c) => c.name === name);
 
 describe("component registry", () => {
-  it("has one entry per component family", () => {
-    expect(components.filter((c) => c.file.endsWith("/sidebar.tsx"))).toHaveLength(1);
-    expect(components.filter((c) => c.file.endsWith("/empty.tsx"))).toHaveLength(1);
+  it("has one entry per exported component, each naming its file", () => {
+    expect(components.filter((c) => c.name === "Sidebar")).toHaveLength(1);
+    expect(entry("SidebarMenuButton")?.file).toBe("src/components/ui/sidebar.tsx");
+    expect(entry("EmptyTitle")?.file).toBe("src/components/ui/empty.tsx");
   });
 
-  it("gives variants only to the part that uses them", () => {
-    expect(part("Empty", "EmptyMedia")?.variants?.["variant"]).toEqual(["default", "icon"]);
-    expect(part("Empty", "EmptyTitle")?.variants).toBeUndefined();
-    expect(part("Sidebar", "SidebarMenuButton")?.variants?.["size"]).toContain("lg");
-    expect(part("Sidebar", "SidebarSeparator")?.variants).toBeUndefined();
+  it("gives variants only to the component that uses them", () => {
+    expect(entry("EmptyMedia")?.variants).toEqual(["variant=default", "variant=icon"]);
+    expect(entry("EmptyTitle")?.variants).toBeUndefined();
+    expect(entry("SidebarMenuButton")?.variants).toContain("size=lg");
+    expect(entry("SidebarSeparator")?.variants).toBeUndefined();
   });
 
   it("lists own props and leaves out variants", () => {
-    const button = part("Sidebar", "SidebarMenuButton");
+    const button = entry("SidebarMenuButton");
     expect(button?.props).toContain("isActive");
     expect(button?.props).not.toContain("variant");
     expect(button?.props).not.toContain("className");
   });
 
+  it("counts both bought libraries as libraries, and the templates folder as templates", () => {
+    expect(entry("SidebarMenuButton")?.source).toBe("library");
+    expect(components.find((c) => c.file.startsWith("src/components/reui/"))?.source).toBe(
+      "library",
+    );
+    expect(entry("PageHeader")?.level).toBe("template");
+    expect(entry("PageHeader")?.source).toBe("own");
+  });
+
   it("is up to date with the code", () => {
-    expect(spawnSync("node", ["tools/design_registry.mjs", "--check"]).status).toBe(0);
+    expect(spawnSync("node", ["tools/design-assembly/components.mjs"]).status).toBe(0);
   });
 });

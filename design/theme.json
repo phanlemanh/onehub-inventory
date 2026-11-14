@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "stylesheet": "src/app/globals.css",
+  "inputs": {
+    "conformanceLevel": "AA",
+    "productType": "application"
+  },
+  "adopted": ["radius-value", "type-scale-values", "spacing-values", "color-contrast"],
+  "checks": {
+    "radius-value": [
+      {
+        "kind": "value",
+        "scope": ":root",
+        "variable": "--radius",
+        "expected": "0.625rem"
+      }
+    ],
+    "type-scale-values": [
+      {
+        "kind": "absent",
+        "variables": [
+          "--text-xs",
+          "--text-xs--line-height",
+          "--text-sm",
+          "--text-sm--line-height",
+          "--text-base",
+          "--text-base--line-height",
+          "--text-lg",
+          "--text-lg--line-height",
+          "--text-xl",
+          "--text-xl--line-height",
+          "--text-2xl",
+          "--text-2xl--line-height",
+          "--text-3xl",
+          "--text-3xl--line-height",
+          "--text-4xl",
+          "--text-4xl--line-height",
+          "--text-5xl",
+          "--text-5xl--line-height"
+        ]
+      }
+    ],
+    "spacing-values": [
+      {
+        "kind": "absent",
+        "variables": ["--spacing"]
+      }
+    ],
+    "design-tokens": [
+      {
+        "kind": "tokens",
+        "file": "design/tokens.json"
+      }
+    ],
+    "empty-state-actions": [
+      {
+        "kind": "empty-state",
+        "sources": "src",
+        "skip": ["src/components/ui/", "src/generated/"]
+      }
+    ],
+    "checks-in-gate": [
+      {
+        "kind": "gate"
+      }
+    ],
+    "color-contrast": [
+      {
+        "kind": "contrast",
+        "scope": ":root",
+        "foreground": "--primary",
+        "background": "--background",
+        "min": 4.5
+      },
+      {
+        "kind": "contrast",
+        "scope": ":root",
+        "foreground": "--primary-foreground",
+        "background": "--primary",
+        "min": 4.5
+      },
+      {
+        "kind": "contrast",
+        "scope": [":root.dark", ".dark"],
+        "foreground": "--primary",
+        "background": "--background",
+        "min": 4.5
+      },
+      {
+        "kind": "contrast",
+        "scope": [":root.dark", ".dark"],
+        "foreground": "--primary-foreground",
+        "background": "--primary",
+        "min": 4.5
+      }
+    ],
+    "color-role": [
+      {
+        "kind": "lint",
+        "rule": "onehub-ui/no-hardcoded-color",
+        "at": "src/app/(app)/account-menu.tsx"
+      }
+    ],
+    "color-palette": [
+      {
+        "kind": "lint",
+        "rule": "onehub-ui/no-raw-palette",
+        "at": "src/app/(app)/account-menu.tsx"
+      }
+    ],
+    "type-scale": [
+      {
+        "kind": "lint",
+        "rule": "onehub-ui/no-arbitrary-text-size",
+        "at": "src/app/(app)/account-menu.tsx"
+      }
+    ],
+    "spacing": [
+      {
+        "kind": "lint",
+        "rule": "onehub-ui/no-off-scale-spacing",
+        "at": "src/app/(app)/account-menu.tsx"
+      }
+    ],
+    "radius": [
+      {
+        "kind": "lint",
+        "rule": "shadcn/no-arbitrary-values",
+        "at": "src/app/(app)/account-menu.tsx"
+      }
+    ],
+    "raw-controls": [
+      {
+        "kind": "lint",
+        "rule": "onehub-ui/no-raw-controls",
+        "at": "src/app/(app)/account-menu.tsx"
+      }
+    ],
+    "raw-table": [
+      {
+        "kind": "lint",
+        "rule": "onehub-ui/no-raw-table",
+        "at": "src/app/(app)/account-menu.tsx"
+      }
+    ],
+    "no-restyled-component": [
+      {
+        "kind": "lint",
+        "rule": "shadcn/no-restyle",
+        "at": "src/app/(app)/account-menu.tsx",
+        "component": {
+          "name": "Button",
+          "from": "@/components/ui/button"
+        }
+      }
+    ],
+    "no-inline-style": [
+      {
+        "kind": "lint",
+        "rule": "shadcn/no-inline-styles",
+        "at": "src/app/(app)/account-menu.tsx"
+      }
+    ],
+    "component-manifest": [
+      {
+        "kind": "components",
+        "file": "design/component-registry.json",
+        "folder": "src/components/ui",
+        "libraries": ["src/components/reui"],
+        "own": "src/components",
+        "pages": "design/patterns"
+      }
+    ],
+    "ledger-shapes": [
+      {
+        "kind": "shapes",
+        "ledgers": {
+          "decisions": "design/decisions.yaml",
+          "tokens": "design/tokens.json",
+          "components": "design/component-registry.json",
+          "screens": "design/screens.yaml"
+        },
+        "pages": "design/patterns"
+      }
+    ]
+  }
+}
