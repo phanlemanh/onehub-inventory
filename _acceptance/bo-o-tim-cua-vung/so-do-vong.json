@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "slug": "bo-o-tim-cua-vung",
+  "ghi_luc": "2026-11-14T06:52:58Z",
+  "vong_cham": 3,
+  "luot": [
+    {
+      "vong": 1,
+      "verdict": "REJECT",
+      "tang": [
+        "bo-cuc",
+        "truy-cap",
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 2,
+      "verdict": "PENDING-JUDGMENT",
+      "tang": []
+    },
+    {
+      "vong": 3,
+      "verdict": "PENDING-JUDGMENT",
+      "tang": []
+    }
+  ],
+  "lam_lai": [
+    {
+      "nguon": "r1",
+      "tang": "bo-cuc"
+    },
+    {
+      "nguon": "r1",
+      "tang": "truy-cap"
+    },
+    {
+      "nguon": "r1",
+      "tang": "bai-kiem-ha-tang"
+    }
+  ],
+  "theo_tang": {
+    "bai-kiem-ha-tang": 1,
+    "trang-thai-hanh-vi": 0,
+    "du-lieu-api": 0,
+    "nghiep-vu": 0,
+    "thanh-phan": 0,
+    "bo-cuc": 1,
+    "hop-dong-yeu-cau": 0,
+    "link": 0,
+    "chu-dinh-dang": 0,
+    "mau-token": 0,
+    "truy-cap": 1
+  },
+  "chua_phan": [],
+  "thuoc_vat": {
+    "vat": [
+      216,
+      35
+    ],
+    "thuoc": [
+      41,
+      3
+    ],
+    "nhat": 1
+  },
+  "gio_may": null
+}

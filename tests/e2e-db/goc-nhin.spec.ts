@@ -1,7 +1,8 @@
 // Row 2c (luu-goc-nhin-cot-hai), evals E2, E5, E6, E7 on this lane's Postgres: a person arranges the inventory, saves
 // the arrangement as a view in the App Shell's second column and opens it again.
-//   saved view round trip — search, two filters, a sort, groups and two hidden columns; saved, then opened three ways
-//     (the entry, a reload, a new browser session of the same person): rows, order, groups, columns and search text equal
+//   saved view round trip — two filters, a sort, groups and two hidden columns; saved, then opened three ways
+//     (the entry, a reload, a new browser session of the same person): rows, order, groups, columns equal, and the region
+//     has no search box (row 2e); the requests sent and the stored row carry exactly the four things of a view
 //     what was recorded, and the rows equal the set worked out here from the sample data. Break: groups dropped from the
 //     stored view → «reopened view differs: groups».
 //   save changes · save as new · reselect discards changes — E5, with its two breaks.
@@ -105,12 +106,12 @@ async function settled(page: Page) {
   ).toBeVisible();
 }
 
-/** What a reopened view must give back: unit codes in reading order, groups, shown headers and the search text. */
+/** What a reopened view must give back: unit codes in reading order, groups, shown headers; no search box (row 2e). */
 interface Snapshot {
   units: string[];
   groups: string[];
   columns: string[];
-  query: string;
+  searchBoxes: number;
 }
 
 async function snapshot(page: Page): Promise<Snapshot> {
@@ -134,9 +135,9 @@ async function snapshot(page: Page): Promise<Snapshot> {
       columns: [...body.querySelectorAll<HTMLElement>("thead tr:first-child th[data-col-id]")]
         .map((th) => th.dataset["colId"]!)
         .filter((id) => id.includes(".")),
-      query:
-        document.querySelector<HTMLInputElement>('[data-slot="data-region"] input[type="search"]')
-          ?.value ?? "",
+      searchBoxes: document.querySelectorAll(
+        '[data-slot="data-region"] input[type="search"], [data-slot="data-region"] [role="searchbox"]',
+      ).length,
     };
   });
 }
@@ -144,7 +145,7 @@ async function snapshot(page: Page): Promise<Snapshot> {
 /** Throws naming the first part of the view that came back different. */
 export function checkReopened(got: Snapshot, want: Snapshot): void {
   if (process.env["GOC_NHIN_DEBUG"]) console.log(JSON.stringify({ got, want }));
-  for (const part of ["groups", "columns", "query", "units"] as const) {
+  for (const part of ["groups", "columns", "searchBoxes", "units"] as const) {
     if (JSON.stringify(got[part]) !== JSON.stringify(want[part]))
       throw new Error(`reopened view differs: ${part}`);
   }
@@ -162,7 +163,7 @@ async function fillStays(page: Page, box: Locator, value: string) {
   }).toPass();
 }
 
-/** The arrangement of E1 built by hand: status Active (shortcut), Toà «S1.0», price high to low, groups, two columns hidden. The search box is not part of a view (owner 2026-11-13). */
+/** The arrangement of E1 built by hand: status Active (shortcut), Toà «S1.0», price high to low, groups, two columns hidden. The region has no search box (owner 2026-11-13, row 2e). */
 async function arrange(page: Page) {
   await page.goto("/inventory?status=Active");
   await settled(page);
@@ -226,12 +227,44 @@ async function freshSession(browser: Browser, email: string, href: string): Prom
 
 // ---- E2 ---------------------------------------------------------------------------------------------------------------
 
+/** The four things of a stored view (row 2c); a search text is not one of them (row 2e). */
+const VIEW_KEYS = ["filters", "grouped", "hidden", "sort"];
+
+/** Bodies of the requests that save or change a view, read as JSON. */
+function savedViewBodies(page: Page): Record<string, unknown>[] {
+  const bodies: Record<string, unknown>[] = [];
+  page.on("request", (req) => {
+    if (!req.url().includes("/api/v1/saved-views")) return;
+    if (req.method() !== "POST" && req.method() !== "PATCH") return;
+    try {
+      bodies.push(JSON.parse(req.postData() ?? "{}") as Record<string, unknown>);
+    } catch {
+      bodies.push({});
+    }
+  });
+  return bodies;
+}
+
+/** The view of the first body sent, to build the break from. */
+const stored0 = (bodies: readonly Record<string, unknown>[]) =>
+  (bodies[0]?.["view"] ?? {}) as Record<string, unknown>;
+
+/** Throws when a request body or its view carries a search text. */
+function checkNoQuery(bodies: readonly Record<string, unknown>[]): void {
+  for (const body of bodies) {
+    const view = (body["view"] ?? {}) as Record<string, unknown>;
+    if ("query" in body || "query" in view) throw new Error("request carries search text");
+  }
+}
+
 test("saved view round trip", async ({ page, browser }, info) => {
   test.skip(info.project.name !== "1440", "measured at 1440");
   const me = await person(info, "vong");
+  const bodies = savedViewBodies(page);
   await signIn(page, me.email);
   await arrange(page);
   const before = await snapshot(page);
+  expect(before.searchBoxes).toBe(0);
   expect([...before.units].sort()).toEqual(expectedUnits());
   expect(before.groups.length).toBeGreaterThan(1);
   expect(before.columns).not.toContain("Listing.subdivisionName");
@@ -251,6 +284,15 @@ test("saved view round trip", async ({ page, browser }, info) => {
   checkReopened(await snapshot(page), before);
   // (c) a new session of the same person
   checkReopened(await freshSession(browser, me.email, href), before);
+
+  // What was sent and stored: exactly the four things of a view, no search text.
+  expect(bodies.length).toBeGreaterThan(0);
+  expect(() => checkNoQuery(bodies)).not.toThrow();
+  expect(() => checkNoQuery([...bodies, { view: { ...stored0(bodies), query: "0905" } }])).toThrow(
+    "request carries search text",
+  );
+  const [stored] = await storedViews(me.id);
+  expect(Object.keys(stored!.view).sort()).toEqual(VIEW_KEYS);
 
   // Break: the stored view loses its groups.
   await owner.query(
@@ -602,4 +644,49 @@ test("E15 frames", { tag: "@cho" }, async ({ page }, info) => {
     await page.keyboard.press("Escape");
     await expect(page.locator('[data-slot="view-name-dialog"]')).toHaveCount(0);
   }
+});
+
+// ---- row 2e, E10: an old address with search text ----------------------------------------------------------------------
+
+test("old address: a search parameter filters nothing and is never sent", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "1440", "measured at 1440");
+  const me = await person(info, "cu");
+  const bodies = savedViewBodies(page);
+  await signIn(page, me.email);
+  await page.goto("/inventory?q=0905&query=0905");
+  await settled(page);
+  const footer = region(page).locator('[data-slot="region-footer-count"]');
+  /** The old parameters left the grid whole: every row, every filter box empty. */
+  const checkWhole = async () => {
+    const text = (await footer.textContent())?.trim() ?? "";
+    const filled = await region(page)
+      .locator('[data-slot="column-filter"] input')
+      .evaluateAll((els) => els.filter((el) => (el as HTMLInputElement).value !== "").length);
+    if (text !== "60 dòng" || filled > 0) throw new Error("old search param filtered rows");
+  };
+  await expect(footer).toHaveText("60 dòng");
+  await expect(checkWhole()).resolves.toBeUndefined();
+  await expect(region(page).locator('input[type="search"]')).toHaveCount(0);
+  await saveAs(page, NAME);
+  expect(() => checkNoQuery(bodies)).not.toThrow();
+  const [stored] = await storedViews(me.id);
+  expect(Object.keys(stored!.view).sort()).toEqual(VIEW_KEYS);
+
+  // Break: the old parameter read into the Căn filter, as a grid that still honoured it would.
+  await page.goto("/inventory?q=0905&query=0905");
+  await settled(page);
+  await fillStays(page, region(page).getByLabel("Lọc cột Căn"), "0905");
+  await expect(checkWhole()).rejects.toThrow("old search param filtered rows");
+
+  // Break: a request that carries the search text anyway is refused by the door (row 2c's rule, unchanged).
+  const refused = await page.request.post("/api/v1/saved-views", {
+    data: {
+      screen: "inventory",
+      name: "[MAU] Còn chữ tìm",
+      view: { filters: {}, sort: [], grouped: false, hidden: [], query: "0905" },
+    },
+  });
+  expect(refused.status()).toBe(400);
 });

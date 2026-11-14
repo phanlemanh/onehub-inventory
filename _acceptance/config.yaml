@@ -65,6 +65,7 @@ executors:
     ci_db_that: "node db/scripts/ci-that.mjs --cho 60"   # ci-co-postgres (row 1s): latest CI run on the branch head — job e2e-db green, its log lines, duration against timeout-minutes
     vai_man_e2e: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} bash -c 'J=$(mktemp -t vai-man).json; PLAYWRIGHT_JSON_OUTPUT_NAME=$J npx playwright test -c playwright.db.config.ts tests/e2e-db/vai.setup.ts tests/e2e-db/vai-man.spec.ts --reporter=list,json && node tests/e2e-db/vai-man-doi-chieu.mjs $J'"   # kiem-vai-theo-man (row 9b): every role × screen pair through the shared role sign-in door, lane D Postgres
     vai_man_pha_thu: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} node tests/e2e-db/pha-thu-vai-man.mjs"   # kiem-vai-theo-man (row 9b): three breaks on a copy of the tree, each must turn its pair red with the pinned message
+    doi_bai_kiem: "node _acceptance/bo-o-tim-cua-vung/rang/doi-bai-kiem.mjs --root . --self-test"   # bo-o-tim-cua-vung (row 2e): every removed test line about the region search box has a row in the old → new table
     ghim_ngan_e2e: "npx playwright test tests/e2e/ghim-ngan.spec.ts"   # ngan-chi-tiet-ghim-thanh-cot (row 3a): pin the record panel as a column, four widths, axe light and dark
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files

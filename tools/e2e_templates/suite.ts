@@ -14,7 +14,6 @@ import {
   classifyGrid,
   pushedOut,
   readGrid,
-  regionCaseSkip,
   type Recipe,
 } from "./recipes";
 import {
@@ -263,17 +262,15 @@ function gridSuite(id: string, url: string, base: Base): void {
       if (handed) test.skip(true, GIAO);
       if (verdict && !verdict.run) test.skip(true, verdict.skip);
     };
+    // Every grid screen with a region runs every region case (row 2e: no screen is listed out of one).
     for (const recipe of REGION) {
-      const caseSkip = regionCaseSkip(id, recipe.id);
       test(`vung ${recipe.id}`, async ({ page }) => {
         skipUnlessRegion();
-        test.skip(caseSkip !== null, caseSkip ?? "");
         skipIfHanded(await runMain(page, url, recipe, base));
       });
       for (const brk of recipe.breaks) {
         test(`pha vung ${recipe.id}: ${brk.name}`, async ({ page }) => {
           skipUnlessRegion();
-          test.skip(caseSkip !== null, caseSkip ?? "");
           skipIfHanded(await runBreak(page, url, recipe, brk, base));
         });
       }

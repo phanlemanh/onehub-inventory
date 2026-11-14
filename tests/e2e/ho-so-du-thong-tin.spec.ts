@@ -240,7 +240,15 @@ test.describe("E8 · the record only reads", () => {
     await record(page).getByRole("button", { name: "Về lần mới nhất" }).click();
     expect(await readOnlyErrors(page)).toEqual([]);
     expect(writes.length ? "write request while reading record" : "").toBe("");
-    const headers = await page.locator('[data-slot="data-region"] thead th').allInnerTexts();
+    // Row 2e (ruling K-1411-13): the filter row is always shown inside the header cells; a column's name is the cell
+    // without its filter box.
+    const headers = await page.locator('[data-slot="data-region"] thead th').evaluateAll((ths) =>
+      ths.map((th) => {
+        const copy = th.cloneNode(true) as HTMLElement;
+        copy.querySelectorAll('[data-slot="column-filter"]').forEach((el) => el.remove());
+        return copy.innerText ?? copy.textContent ?? "";
+      }),
+    );
     expect(headers.map((h) => h.trim()).filter((h) => h !== "" && h !== "#")).toEqual([
       "Căn",
       "Toà",

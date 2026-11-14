@@ -1,0 +1,8 @@
+{
+  "feature_plain": "2e · Mọi bảng họ Lưới lọc bằng hàng ô dưới tiêu đề cột, luôn hiện; ô «Gõ để tìm» của vùng không còn, tìm nằm ở ô ⌘K trên thanh trên.",
+  "decisions": [
+    {"id": "E12", "q": "Tài liệu đã nói đúng: lọc ở ô đầu cột, tìm ở ⌘K, góc nhìn không giữ chữ tìm?", "why": "Hội đồng đối chiếu từng điểm với tệp thật, cả sáu khớp; máy đề xuất đạt."},
+    {"id": "E15", "q": "Mỗi bài kiểm cũ về ô tìm có bài mới đo cùng điều trên ô lọc đầu cột?", "why": "Bảng đối chiếu khớp bài thật; máy đề xuất đạt. Riêng ngưỡng cột của hàng 3 bị đổi — anh quyết riêng ở câu 1 trang cổng, không gộp vào đây."}
+  ],
+  "analyst_plain": ""
+}

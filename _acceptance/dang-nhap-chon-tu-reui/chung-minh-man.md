@@ -41,7 +41,7 @@ Trang sổ bối cảnh: `docs/tri-thuc/wiki/chu-de/dang-nhap.md`.
 | ---------- | ------- | ------ |
 | Chờ tải | không áp | màn không tải dữ liệu; nút đổi thành «Đang gửi»/«Đang vào» khi chờ máy chủ (tests/e2e-db/login.spec.ts) |
 | Trống | không áp | màn không có danh sách nào để trống |
-| Tìm không ra | không áp | màn không có ô tìm |
+| Không có dòng nào khớp | không áp | màn không có ô tìm |
 | Lỗi | đạt | tests/e2e/account.spec.ts |
 | Một phần hỏng | không áp | màn chỉ có một biểu mẫu, không có phần riêng nào hỏng được |
 | Chữ dài | đạt | tests/e2e/dang-nhap-khoi.spec.ts |

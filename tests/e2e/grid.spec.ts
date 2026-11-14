@@ -81,15 +81,19 @@ async function assertDensity(page: Page, height: number, fontPx: string): Promis
   }
 }
 
+/** The filter box under the first column's header (row 2e: the region filters by these; it has no search box). */
+const codeFilter = (page: Page) =>
+  region(page).locator('[data-slot="column-filter"] input').first();
+
 // ---- cases -----------------------------------------------------------------------------------------------------
 
 test.describe("grid", () => {
   test.setTimeout(90_000);
 
-  test("search filters rows and the count follows", async ({ page }) => {
+  test("the first column's filter filters rows and the count follows", async ({ page }) => {
     await openGrid(page);
     await expect(region(page).locator('[data-slot="region-count"]')).toHaveText(`${TOTAL} dòng`);
-    await page.getByRole("searchbox", { name: "Tìm trong vùng" }).fill("S1.01");
+    await codeFilter(page).fill("S1.01");
     const count = region(page).locator('[data-slot="region-count"]');
     await expect(count).toHaveText(new RegExp(`^\\d+ / ${TOTAL} dòng$`));
     const shown = Number((await count.textContent())?.split(" ")[0]);
@@ -105,12 +109,12 @@ test.describe("grid", () => {
 
   test("no match offers clear filter and it restores every row", async ({ page }) => {
     await openGrid(page);
-    await page.getByRole("searchbox", { name: "Tìm trong vùng" }).fill("khong-co-dong-nao");
+    await codeFilter(page).fill("khong-co-dong-nao");
     await expect(page.getByText("Không có dòng nào khớp")).toBeVisible();
     await assertNoMatchExit(page);
     await page.getByRole("button", { name: "Xoá lọc" }).click();
     await expect(region(page).locator('[data-slot="region-count"]')).toHaveText(`${TOTAL} dòng`);
-    await expect(page.getByRole("searchbox", { name: "Tìm trong vùng" })).toHaveValue("");
+    await expect(codeFilter(page)).toHaveValue("");
     // Row 2: every row is back in the one run (no pages): the footer counts them all, the last is numbered TOTAL.
     await expect(region(page).locator('[data-slot="region-footer-count"]')).toHaveText(
       `${TOTAL} dòng`,
@@ -120,10 +124,34 @@ test.describe("grid", () => {
 
   test("no-match check fails without the clear button", async ({ page }) => {
     await openGrid(page);
-    await page.getByRole("searchbox", { name: "Tìm trong vùng" }).fill("khong-co-dong-nao");
+    await codeFilter(page).fill("khong-co-dong-nao");
     await expect(page.getByText("Không có dòng nào khớp")).toBeVisible();
     await page.getByRole("button", { name: "Xoá lọc" }).evaluate((el) => el.remove());
     await expect(assertNoMatchExit(page)).rejects.toThrow("no-match exit missing");
+  });
+
+  test("no search box in the region: 2 themes × 4 sizes (row 2e, AC-1)", async ({ page }) => {
+    const SIZES = [
+      [1440, 900],
+      [1024, 768],
+      [414, 896],
+      [360, 780],
+    ] as const;
+    let cells = 0;
+    for (const colorScheme of ["light", "dark"] as const) {
+      await page.emulateMedia({ colorScheme });
+      for (const [width, height] of SIZES) {
+        await page.setViewportSize({ width, height });
+        await openGrid(page);
+        await expect(bodyRows(page).first()).toBeVisible();
+        await expect(region(page).getByRole("searchbox")).toHaveCount(0);
+        await expect(region(page).locator('input[type="search"]')).toHaveCount(0);
+        await expect(region(page).getByPlaceholder("Gõ để tìm")).toHaveCount(0);
+        await expect(codeFilter(page)).toBeVisible();
+        cells += 1;
+      }
+    }
+    expect(cells).toBe(8);
   });
 
   test("loading shows nothing before 1s then skeleton rows", async ({ page }) => {
@@ -299,7 +327,7 @@ test.describe("grid", () => {
       for (const state of STATES) {
         if (state === "no-match") {
           await openGrid(page);
-          await page.getByRole("searchbox", { name: "Tìm trong vùng" }).fill("khong-co-dong-nao");
+          await codeFilter(page).fill("khong-co-dong-nao");
           await expect(page.getByText("Không có dòng nào khớp")).toBeVisible();
         } else {
           await openGrid(page, state);

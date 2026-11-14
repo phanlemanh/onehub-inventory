@@ -23,6 +23,10 @@ Triết lý, Màn mẫu, Khổ so, Mặt so do lưới chứng minh màn của k
 
 Lưới thay Sheet và Excel cho Đầu chủ: mở ra là thấy mọi dòng, sửa tại chỗ, không phải học thêm gì.
 
+Lọc bằng ô dưới tiêu đề cột như Sheet: hàng ô lọc luôn hiện ở mọi khổ, không có nút bật tắt, các ô cộng dồn. Vùng không có
+chỗ gõ tìm riêng; tìm nằm ở ô ⌘K của thanh trên App Shell (chủ kho chốt 2026-11-13, hàng 2e). Một cách so chữ cho cả hai
+chỗ: bỏ dấu tiếng Việt, «đ» như «d».
+
 ## Màn mẫu
 
 Màn: inventory
