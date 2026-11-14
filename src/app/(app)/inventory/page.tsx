@@ -149,7 +149,8 @@ export default async function Page({ searchParams }: Props) {
   // status shortcut and the search's column filter fill the column filters the grid opens with.
   // A place of the geography tree (row 2d) fills the project and building filters with whole names.
   const places = ([] as string[]).concat(query[GEO_PARAM] ?? []);
-  const geo = geoFiltersFor(geoTree(rows, sampleBuildingPlaces()), places);
+  const tree = geoTree(rows, sampleBuildingPlaces());
+  const geo = geoFiltersFor(tree, places);
   const filters =
     openView || missing
       ? undefined
@@ -198,6 +199,7 @@ export default async function Page({ searchParams }: Props) {
         emptyWhy={`${label("Company")} chưa có ${label("Unit").toLocaleLowerCase("vi")} nào đang chào trên ${label("Inventory")}.`}
         reloadLabel="Tải lại"
         filters={filters}
+        geoTree={tree}
         staleLinkNote={stale ? ENTRY_COPY.staleLink(label("Unit"), label("Inventory")) : undefined}
         fullRecord={{ records: sampleRecords(new Date()), labels: RECORD_LABELS }}
       />

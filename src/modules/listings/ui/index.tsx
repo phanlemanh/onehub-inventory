@@ -55,8 +55,10 @@ export {
   GEO_PARAM,
   geoFiltersFor,
   geoHref,
-  geoLinks,
+  geoSections,
   geoTree,
+  placeFor,
+  withoutPlace,
   type BuildingPlace,
   type GeoNode,
 } from "./geo-tree";

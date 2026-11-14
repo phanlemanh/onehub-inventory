@@ -6,11 +6,12 @@ import {
   COLUMN_COOKIE,
   columnOpenFromCookie,
 } from "@/components/templates/app-shell/column-cookie";
+import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { label } from "@/modules/company-config";
 import { currentSession } from "@/modules/identity/server";
 import { SessionRoles } from "@/modules/identity/ui";
 import { mySavedViews } from "@/modules/listings/server";
-import { UnitJump, geoLinks, geoTree, savedViewsSection } from "@/modules/listings/ui";
+import { UnitJump, geoSections, geoTree, savedViewsSection } from "@/modules/listings/ui";
 
 import { AccountMenu } from "./account-menu";
 import { CompanySwitch } from "./company-switch";
@@ -32,12 +33,13 @@ export default async function FrameLayout({ children }: { children: React.ReactN
     savedViews: session
       ? savedViewsSection(await mySavedViews("inventory"), savedViewLabels())
       : null,
-    // The inventory by place (row 2d): project → complex → building, with the units the grid holds there.
+    // The inventory by place (row 2d): one group per project, its complexes and buildings, read from the grid's rows.
     geography: session
-      ? {
-          title: "Theo địa lý",
-          items: geoLinks(geoTree(sampleInventoryRows(), sampleBuildingPlaces())),
-        }
+      ? geoSections(geoTree(sampleInventoryRows(), sampleBuildingPlaces()), {
+          all: FRAME_COPY.secondColumn.all,
+          emptyTitle: label("Subdivision"),
+          empty: `Chưa có ${label("Unit").toLocaleLowerCase("vi")} nào trên ${label("Inventory")}.`,
+        })
       : null,
   });
   const account = session

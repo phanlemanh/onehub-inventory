@@ -22,7 +22,6 @@ import { cn } from "@/lib/utils";
 import { FRAME_COPY } from "../frame-copy";
 import { COLUMN_COOKIE, COLUMN_COOKIE_MAX_AGE, columnOpenFromCookie } from "./column-cookie";
 import { currentEntry, flattenLinks, isCurrent, type NavItem, type NavLink } from "../nav-menu";
-import { SecondColumnTree } from "./second-column-tree";
 import { usePlaceChange } from "./place-change";
 
 const COPY = FRAME_COPY.secondColumn;
@@ -52,7 +51,8 @@ export function useColumnOpen(initial = true): [boolean, (open: boolean) => void
 /**
  * The entry of the open place: among the links of the screen's path whose every query parameter the address carries,
  * the one carrying the most (a status shortcut or a saved view over «Tất cả», whatever else the address holds, such as
- * an open record); the first link of the screen when none fits. One entry, never two.
+ * an open record), the later one among equals (a place of row 2d over the status the grid also filters by); the first
+ * link of the screen when none fits. One entry, never two. Nested entries count in reading order.
  */
 export function openLinkIndex(links: readonly NavLink[], pathname: string, search: string): number {
   const here = new URLSearchParams(search);
@@ -63,7 +63,7 @@ export function openLinkIndex(links: readonly NavLink[], pathname: string, searc
     if (url.pathname !== pathname) return;
     const wanted = [...url.searchParams.entries()];
     if (!wanted.every(([k, v]) => here.getAll(k).includes(v))) return;
-    if (wanted.length > bestCount) {
+    if (wanted.length > bestCount || (wanted.length > 0 && wanted.length === bestCount)) {
       best = i;
       bestCount = wanted.length;
     }
@@ -99,83 +99,77 @@ export function SecondColumnNav({
   }
   const links = sections.flatMap((s) => flattenLinks(s.items));
   const openIndex = openLinkIndex(links, pathname, search);
-  const offsets = sections.map((_, i) =>
-    sections.slice(0, i).reduce((sum, s) => sum + flattenLinks(s.items).length, 0),
-  );
-  const activeHref = openIndex >= 0 ? (links[openIndex]?.href ?? null) : null;
+  const activeLink = links[openIndex];
+  const entryOf = (link: NavLink) => {
+    const active = link === activeLink;
+    const changed = place.changed?.href === link.href ? place.changed.mark : null;
+    const button = (
+      <SidebarMenuSubButton
+        isActive={active}
+        render={
+          <Link
+            href={link.href}
+            aria-current={active ? "true" : undefined}
+            title={link.trailing ? link.title : undefined}
+            onClick={(event) => {
+              // Pressing the open entry again opens its place afresh, unsaved changes dropped (row 2c).
+              if (active) place.reopen();
+              // The open screen may take the entry in place (row 2d), keeping what else it shows.
+              else if (place.pick(link.href)) event.preventDefault();
+              if (isMobile) setOpenMobile(false);
+            }}
+          />
+        }
+      >
+        <span className="truncate">{link.title}</span>
+        {changed ? (
+          <Badge data-slot="place-changed" variant="warning-light" className="ml-auto shrink-0">
+            {changed}
+          </Badge>
+        ) : null}
+      </SidebarMenuSubButton>
+    );
+    return (
+      <SidebarMenuSubItem key={`${link.href}-${link.title}`}>
+        {link.trailing ? (
+          // The «…» stands beside the entry, shown on hover, keyboard focus, touch and the open entry.
+          <div className="group/place flex min-w-0 items-center gap-0.5">
+            <div className="min-w-0 flex-1">{button}</div>
+            <div
+              data-slot="second-column-trailing"
+              className={cn(
+                "shrink-0 opacity-0 group-focus-within/place:opacity-100 group-hover/place:opacity-100 pointer-coarse:opacity-100 has-[[aria-expanded=true]]:opacity-100",
+                active && "opacity-100",
+              )}
+            >
+              {link.trailing}
+            </div>
+          </div>
+        ) : (
+          button
+        )}
+        {link.children?.length ? (
+          // The places inside this one (row 2d): one nested list of the same entries.
+          <SidebarMenuSub>{link.children.map(entryOf)}</SidebarMenuSub>
+        ) : null}
+      </SidebarMenuSubItem>
+    );
+  };
   return (
     <nav aria-label={entry.title} className="flex flex-col">
-      {sections.map((section, i) =>
-        section.items.some((l) => (l.children ?? []).length > 0) ? (
-          <SecondColumnTree key={section.title ?? i} section={section} activeHref={activeHref} />
-        ) : (
-          <SidebarGroup key={section.title ?? i}>
-            <SidebarGroupLabel>{section.title ?? entry.title}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              {section.items.length === 0 && section.empty ? (
-                <p data-slot="second-column-empty" className="px-2 text-xs text-muted-foreground">
-                  {section.empty}
-                </p>
-              ) : null}
-              <SidebarMenuSub>
-                {section.items.map((link, j) => {
-                  const active = offsets[i]! + j === openIndex;
-                  const changed = place.changed?.href === link.href ? place.changed.mark : null;
-                  const button = (
-                    <SidebarMenuSubButton
-                      isActive={active}
-                      render={
-                        <Link
-                          href={link.href}
-                          aria-current={active ? "true" : undefined}
-                          title={link.trailing ? link.title : undefined}
-                          onClick={() => {
-                            // Pressing the open entry again opens its place afresh, unsaved changes dropped (row 2c).
-                            if (active) place.reopen();
-                            if (isMobile) setOpenMobile(false);
-                          }}
-                        />
-                      }
-                    >
-                      <span className="truncate">{link.title}</span>
-                      {changed ? (
-                        <Badge
-                          data-slot="place-changed"
-                          variant="warning-light"
-                          className="ml-auto shrink-0"
-                        >
-                          {changed}
-                        </Badge>
-                      ) : null}
-                    </SidebarMenuSubButton>
-                  );
-                  return (
-                    <SidebarMenuSubItem key={`${link.href}-${link.title}`}>
-                      {link.trailing ? (
-                        // The «…» stands beside the entry, shown on hover, keyboard focus, touch and the open entry.
-                        <div className="group/place flex min-w-0 items-center gap-0.5">
-                          <div className="min-w-0 flex-1">{button}</div>
-                          <div
-                            data-slot="second-column-trailing"
-                            className={cn(
-                              "shrink-0 opacity-0 group-focus-within/place:opacity-100 group-hover/place:opacity-100 pointer-coarse:opacity-100 has-[[aria-expanded=true]]:opacity-100",
-                              active && "opacity-100",
-                            )}
-                          >
-                            {link.trailing}
-                          </div>
-                        </div>
-                      ) : (
-                        button
-                      )}
-                    </SidebarMenuSubItem>
-                  );
-                })}
-              </SidebarMenuSub>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ),
-      )}
+      {sections.map((section, i) => (
+        <SidebarGroup key={section.title ?? i}>
+          <SidebarGroupLabel>{section.title ?? entry.title}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            {section.items.length === 0 && section.empty ? (
+              <p data-slot="second-column-empty" className="px-2 text-xs text-muted-foreground">
+                {section.empty}
+              </p>
+            ) : null}
+            <SidebarMenuSub>{section.items.map(entryOf)}</SidebarMenuSub>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      ))}
     </nav>
   );
 }

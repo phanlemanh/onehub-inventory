@@ -1,9 +1,15 @@
-// The inventory by place (roadmap row 2d): project → complex → building, each with the number of units the grid
-// holds there, and the column filters one place asks for. Pure and safe on the server: it reads only the rows the
+// The inventory by place (roadmap row 2d): project → complex → building, the column filters one place asks for, and
+// the place a set of filters amounts to. Pure and safe on the server: it reads only the rows the
 // grid already has (SP-1: no new way of reading data) and where each building stands in the catalog.
-import type { ColumnFilters } from "@/components/candidate/grid-view";
+import type { TypedColumn } from "@/components/candidate/column-kind";
+import {
+  filterIsEmpty,
+  filterRows,
+  type ColumnFilter,
+  type ColumnFilters,
+} from "@/components/candidate/grid-view";
 import type { GridRow } from "@/components/candidate/data-region";
-import type { NavLink } from "@/components/templates/app-shell";
+import type { NavLink, NavSection } from "@/components/templates/app-shell";
 
 /** Where one building stands: its project and, when public, its complex (row 7d). */
 export interface BuildingPlace {
@@ -14,7 +20,7 @@ export interface BuildingPlace {
 
 export type GeoKind = "project" | "complex" | "building";
 
-/** One place of the tree. */
+/** One place of the tree, with the number of rows it holds (read in tests and the footer; never drawn on the entry). */
 export interface GeoNode {
   kind: GeoKind;
   /** The address parameter value that opens this place. */
@@ -130,12 +136,76 @@ export function geoHref(key: string): string {
   return `/inventory?${new URLSearchParams({ [GEO_PARAM]: key })}`;
 }
 
-/** The second column's entries for the tree: each place a link to its address, with its count and the places under it. */
-export function geoLinks(tree: readonly GeoNode[]): NavLink[] {
-  return tree.map((n) => ({
-    href: geoHref(n.key),
-    title: n.name,
-    count: n.count,
-    children: geoLinks(n.children),
+const PROJECT = "Listing.subdivisionName";
+const BUILDING = "Listing.buildingName";
+
+function flatten(nodes: readonly GeoNode[]): GeoNode[] {
+  return nodes.flatMap((n) => [n, ...flatten(n.children)]);
+}
+
+const sameFilter = (a: ColumnFilter | undefined, b: ColumnFilter | undefined): boolean =>
+  JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+
+/**
+ * The place the project and building filters amount to (AC-4): the place whose rows are exactly the rows those two
+ * filters let through — typed or picked. A place whose own filters are the ones set wins (a complex and its project
+ * may hold the same rows); otherwise the highest such place. None when no place holds exactly those rows.
+ */
+export function placeFor(
+  tree: readonly GeoNode[],
+  rows: readonly GridRow[],
+  columns: readonly TypedColumn[],
+  filters: ColumnFilters,
+): GeoNode | null {
+  const geo: ColumnFilters = {};
+  if (!filterIsEmpty(filters[PROJECT])) geo[PROJECT] = filters[PROJECT];
+  if (!filterIsEmpty(filters[BUILDING])) geo[BUILDING] = filters[BUILDING];
+  if (Object.keys(geo).length === 0) return null;
+  const ids = (filtered: readonly GridRow[]) =>
+    filtered
+      .map((r) => r.id)
+      .sort()
+      .join("\n");
+  const geoColumns = columns.filter((c) => c.field === PROJECT || c.field === BUILDING);
+  const here = ids(filterRows(rows, geoColumns, geo));
+  const nodes = flatten(tree).filter(
+    (n) => ids(filterRows(rows, geoColumns, geoFiltersFor(tree, [n.key]))) === here,
+  );
+  return (
+    nodes.find((n) => {
+      const own = geoFiltersFor(tree, [n.key]);
+      return sameFilter(own[PROJECT], geo[PROJECT]) && sameFilter(own[BUILDING], geo[BUILDING]);
+    }) ??
+    nodes[0] ??
+    null
+  );
+}
+
+/** Filters without the project and building columns: what a picked place leaves as it was (AC-5). */
+export function withoutPlace(filters: ColumnFilters): ColumnFilters {
+  return Object.fromEntries(
+    Object.entries(filters).filter(([field]) => field !== PROJECT && field !== BUILDING),
+  ) as ColumnFilters;
+}
+
+const linkOf = (n: GeoNode): NavLink => ({
+  href: geoHref(n.key),
+  title: n.name,
+  ...(n.children.length > 0 ? { children: n.children.map(linkOf) } : {}),
+});
+
+/**
+ * The second column's groups for the tree (option D, approved 2026-11-14): one group per project titled with its
+ * name, holding «Tất cả» (the whole project), then its complexes (each with its buildings under it) and buildings,
+ * like every other entry of the column — no counts. A company without units gets one group saying so.
+ */
+export function geoSections(
+  tree: readonly GeoNode[],
+  words: { all: string; emptyTitle: string; empty: string },
+): NavSection[] {
+  if (tree.length === 0) return [{ title: words.emptyTitle, items: [], empty: words.empty }];
+  return tree.map((project) => ({
+    title: project.name,
+    items: [{ href: geoHref(project.key), title: words.all }, ...project.children.map(linkOf)],
   }));
 }
