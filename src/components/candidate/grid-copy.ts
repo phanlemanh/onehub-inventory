@@ -8,8 +8,6 @@ export const GRID_COPY = {
   rowNumberHeader: "#",
   rowNumberLabel: "Số thứ tự dòng",
   filteredCount: (shown: number, total: number) => `${shown} / ${total} dòng`,
-  searchLabel: "Tìm trong vùng",
-  searchPlaceholder: "Gõ để tìm",
   yes: "Có",
   no: "Không",
   retry: "Thử lại",
@@ -21,8 +19,7 @@ export const GRID_COPY = {
   },
   noMatch: {
     title: "Không có dòng nào khớp",
-    why: "Chữ bạn gõ không có trong dòng nào của vùng này.",
-    whyFiltered: "Không dòng nào của vùng này khớp cùng lúc ô tìm và các ô lọc đang bật.",
+    why: "Chữ bạn gõ ở ô lọc đầu cột không có trong dòng nào của vùng này.",
   },
   /** The «…» of a row or a record (row 9e): its button's name, and the header of the grid's last column. */
   rowActions: {

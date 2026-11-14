@@ -9,11 +9,10 @@ import {
   type SortingState,
   type ColumnVisibilityState,
 } from "@tanstack/react-table";
-import { Columns3Icon, FilterIcon, ListTreeIcon, Maximize2Icon, Minimize2Icon } from "lucide-react";
+import { Columns3Icon, ListTreeIcon, Maximize2Icon, Minimize2Icon } from "lucide-react";
 import {
   useCallback,
   useEffect,
-  useId,
   useMemo,
   useRef,
   useState,
@@ -142,8 +141,14 @@ const REGION_HEIGHTS = {
 
 const noSubscribe = () => () => undefined;
 
-/** Narrowest a column gets while the filter row is open, in ch: room for a rule like «<=5» or «toa e». */
+/** Narrowest a number, money or date column gets under the always-shown filter row, in ch: room for a rule like «<=5». */
 const FILTER_MIN_CH = 11;
+/**
+ * Narrowest a text or value column gets for its filter box, in ch: «Chứa…» and a short code stay readable and the
+ * header's sort and pin buttons keep their 24px room, while a short text column (a unit code) is not widened to a
+ * number's rule — so the grid beside an open record keeps its columns (row 2e). Fixed, so typing never moves a column.
+ */
+const TEXT_FILTER_MIN_CH = 8;
 
 /** Room the group's open-close button takes in front of a group label, in ch. */
 const GROUP_TOGGLE_CH = 4;
@@ -321,7 +326,7 @@ function filtersFrom(state: ColumnFiltersState): ColumnFilters {
 }
 
 /**
- * The shared grid of every data region: header, typed columns, search, one continuous run of rows, the region states
+ * The shared grid of every data region: header, typed columns, one continuous run of rows, the region states
  * (design/states.md), and the sheet habits of row 2a — a selected cell moved by the keyboard, a range copied as
  * tab-separated text, sort by a header, one filter per column, rows grouped under one field, columns shown or hidden.
  * Screens give columns by field and rows; alignment, width, format, density and these habits follow the kind.
@@ -376,7 +381,7 @@ export function DataRegion({
   /** The field rows may be grouped under; the toolbar offers «Nhóm theo …» only when the screen names one. */
   groupBy?: FieldKey;
   /**
-   * The arrangement the region opens with (row 2c, a saved view): search text, filters, sort, grouping, hidden columns.
+   * The arrangement the region opens with (row 2c, a saved view): filters, sort, grouping, hidden columns.
    * Parts naming a column the region does not have are dropped. Wins over `initialFilters`. Give the region a new
    * `key` to open another one.
    */
@@ -384,11 +389,9 @@ export function DataRegion({
   /** Hears the arrangement after each change the person makes (and once on opening). */
   onViewChange?: (view: GridView) => void;
 }) {
-  const searchId = useId();
   // One confirmation for every row's removing action: a row scrolled out of the virtual body keeps it open.
   const removing = useChange();
   const [opening] = useState(() => (initialView ? viewWithin(initialView, columns) : undefined));
-  const [query, setQuery] = useState(opening?.query ?? "");
   const [sorting, setSorting] = useState<SortingState>(() =>
     (opening?.sort ?? []).map((s) => ({ id: s.field, desc: s.direction === "desc" })),
   );
@@ -397,7 +400,6 @@ export function DataRegion({
       .filter(([, value]) => !filterIsEmpty(value))
       .map(([id, value]) => ({ id, value })),
   );
-  const [filterRowOpen, setFilterRowOpen] = useState(() => columnFilters.length > 0);
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>(() =>
     Object.fromEntries((opening?.hidden ?? []).map((field) => [field, false])),
   );
@@ -481,13 +483,12 @@ export function DataRegion({
     .join("|");
   const view = useMemo(
     (): GridView => ({
-      query,
       filters,
       sort: sortBy ? [sortBy] : [],
       grouped: isGrouped,
       hidden: hiddenKey === "" ? [] : (hiddenKey.split("|") as FieldKey[]),
     }),
-    [query, filters, sortBy?.field, sortBy?.direction, isGrouped, hiddenKey], // eslint-disable-line react-hooks/exhaustive-deps
+    [filters, sortBy?.field, sortBy?.direction, isGrouped, hiddenKey], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const viewListener = useRef(onViewChange);
   useEffect(() => {
@@ -499,8 +500,8 @@ export function DataRegion({
 
   // Filter, then sort, then group: a sort orders rows inside each group, numbers run on through the groups.
   const shown = useMemo(
-    () => sortRows(filterRows(rows, columns, filters, query), columns, sortBy),
-    [rows, columns, filters, query, sortBy?.field, sortBy?.direction], // eslint-disable-line react-hooks/exhaustive-deps
+    () => sortRows(filterRows(rows, columns, filters), columns, sortBy),
+    [rows, columns, filters, sortBy?.field, sortBy?.direction], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const data = useMemo((): TableRow[] => {
     if (!isGrouped || !groupColumn) {
@@ -559,7 +560,7 @@ export function DataRegion({
   // normal text shrinks with its text instead of keeping normal-text widths. Density itself is decided in normal ch.
   const chPx = density === "dense" ? denseChPx : baseChPx;
   // Spare room on a wide screen goes to columns that cut their text (a long project name), never below the fit.
-  // With the filter row open every column is at least wide enough to type a short rule in its box.
+  // The filter row is always there (row 2e, owner 2026-11-13): every column is at least wide enough to type a short rule.
   const widths = useMemo(() => {
     const spread = spreadSpareCh(
       fitted,
@@ -569,20 +570,11 @@ export function DataRegion({
     // While grouped, the grouping column also holds the group's open-close button in front of its label.
     return spread.map((w, i) => {
       const grown = isGrouped && columns[i]?.field === groupColumn?.field ? w + GROUP_TOGGLE_CH : w;
-      return filterRowOpen ? Math.max(grown, FILTER_MIN_CH) : grown;
+      const kind = columns[i]?.kind;
+      const floor = kind && filterModeFor(kind) === "number" ? FILTER_MIN_CH : TEXT_FILTER_MIN_CH;
+      return Math.max(grown, floor);
     });
-  }, [
-    fitted,
-    full,
-    widthCh,
-    baseChPx,
-    chPx,
-    rowNumberCh,
-    filterRowOpen,
-    isGrouped,
-    columns,
-    groupColumn,
-  ]);
+  }, [fitted, full, widthCh, baseChPx, chPx, rowNumberCh, isGrouped, columns, groupColumn]);
 
   // Header cells, kept apart from the widths: a header renderer is a component to the table, so a new one each time the
   // widths move (a scroll bar coming or going as rows filter out) would draw the filter boxes again and drop the focus
@@ -600,18 +592,16 @@ export function DataRegion({
                   title={column.header}
                   className={column.align === "right" ? "ms-auto" : undefined}
                 />
-                {filterRowOpen ? (
-                  <ColumnFilterCell
-                    spec={column}
-                    column={tableColumn}
-                    options={options.get(column.field) ?? []}
-                  />
-                ) : null}
+                <ColumnFilterCell
+                  spec={column}
+                  column={tableColumn}
+                  options={options.get(column.field) ?? []}
+                />
               </div>
             ),
           }).header,
       ),
-    [columns, filterRowOpen, options],
+    [columns, options],
   );
 
   const recordAddress = record?.address;
@@ -944,11 +934,8 @@ export function DataRegion({
     setSelectedCells(snapshot.visibleCellCount);
   }, []);
 
-  const clearFilters = () => {
-    setQuery("");
-    setColumnFilters([]);
-  };
-  const narrowed = query.trim() !== "" || activeFilterCount > 0;
+  const clearFilters = () => setColumnFilters([]);
+  const narrowed = activeFilterCount > 0;
 
   const showsRows = headerShowsRows(status);
   const gridShown =
@@ -968,28 +955,13 @@ export function DataRegion({
     <RegionToolbar
       total={showsRows ? rows.length : undefined}
       shown={showsRows && narrowed ? shown.length : undefined}
-      query={query}
-      onQuery={setQuery}
       tools={tools}
       action={toolbarAction}
-      searchId={searchId}
     />
   );
   const sheetTools =
     showsRows && rows.length > 0 ? (
       <div data-slot="sheet-tools" className="flex flex-wrap items-center gap-2">
-        <Button
-          variant={filterRowOpen ? "secondary" : "outline"}
-          size="sm"
-          aria-pressed={filterRowOpen}
-          data-slot="filter-toggle"
-          onClick={() => setFilterRowOpen((open) => !open)}
-        >
-          <FilterIcon aria-hidden="true" />
-          {activeFilterCount > 0
-            ? GRID_COPY.sheet.filterOn(activeFilterCount)
-            : GRID_COPY.sheet.filter}
-        </Button>
         {/* With no row left the body offers «Xoá lọc» itself; one button, not two. */}
         {narrowed && shown.length > 0 ? (
           <Button variant="ghost" size="sm" data-slot="clear-filters" onClick={clearFilters}>
@@ -1056,7 +1028,7 @@ export function DataRegion({
         table={table}
         recordCount={shown.length}
         i18n={GRID_I18N}
-        // A filter that leaves no row keeps the toolbar, the search box and the filter row where they are (row 2c,
+        // A filter that leaves no row keeps the toolbar and the filter row where they are (row 2c,
         // Ngoài-4 of 2a): only the table's body says so, and each rule can still be mended on its own.
         emptyMessage={<RegionNoMatch onClear={clearFilters} />}
         onCellSelectionChange={onSelection}

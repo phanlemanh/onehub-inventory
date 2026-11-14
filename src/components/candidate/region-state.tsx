@@ -121,7 +121,7 @@ export function RegionEmpty({
   );
 }
 
-/** The search matched nothing; clearing it is mandatory (design/states.md). */
+/** The column filters matched nothing; clearing them is mandatory (design/states.md, «Không có dòng nào khớp»). */
 export function RegionNoMatch({ onClear }: { onClear: () => void }) {
   return (
     <StateBlock kind="no-match" title={GRID_COPY.noMatch.title} description={GRID_COPY.noMatch.why}>

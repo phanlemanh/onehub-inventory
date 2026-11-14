@@ -134,7 +134,7 @@
     {
       "name": "RegionHeader",
       "file": "src/components/candidate/region-header.tsx",
-      "level": "organism",
+      "level": "atom",
       "parts": [
         {
           "name": "RegionHeader"
@@ -150,11 +150,8 @@
           "props": [
             "total",
             "shown",
-            "query",
-            "onQuery",
             "action",
             "tools",
-            "searchId",
             "showCount"
           ]
         }

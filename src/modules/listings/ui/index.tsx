@@ -30,7 +30,7 @@ export {
 } from "./listing-record";
 export { CopyLink, recordLink } from "./copy-link";
 export { ENTRY_COPY } from "./entry-copy";
-export { SAVED_VIEW_PARAM, savedViewHref } from "./saved-view-api";
+export { SAVED_VIEW_PARAM, gridView, savedViewHref, storedView } from "./saved-view-api";
 export { savedViewCopy, type SavedViewCopy, type SavedViewLabels } from "./saved-view-copy";
 export { savedViewsSection } from "./saved-views-section";
 export {

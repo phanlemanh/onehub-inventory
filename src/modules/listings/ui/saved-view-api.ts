@@ -17,7 +17,7 @@ export type SaveOutcome =
 
 const NAME_ERRORS: readonly string[] = ["name-empty", "name-too-long", "name-taken"];
 
-/** The grid's arrangement as a view stores it (plain arrays and records, nothing else; never the search text). */
+/** The grid's arrangement as a view stores it (plain arrays and records, nothing else; the four things of a view). */
 export function storedView(view: GridView): SavedViewState {
   return {
     filters: Object.fromEntries(
@@ -32,14 +32,18 @@ export function storedView(view: GridView): SavedViewState {
   };
 }
 
-/** A stored view as the grid opens it, with an empty search box; fields the grid no longer has are dropped by the grid. */
+/**
+ * A stored view as the grid opens it: only its four things, so a search text left in old data or an old address is
+ * dropped (row 2e: the region has no search box). Fields the grid no longer has are dropped by the grid.
+ */
 export function gridView(view: SavedViewState): GridView {
-  return { ...(view as unknown as Omit<GridView, "query">), query: "" };
+  const { filters, sort, grouped, hidden } = view as unknown as GridView;
+  return { filters, sort, grouped, hidden };
 }
 
-/** True when the grid shows what the view stored: the search box is not part of a view, so it never marks a change. */
+/** True when the grid shows what the view stored. */
 export function sameAsStored(current: GridView, stored: GridView): boolean {
-  return sameView({ ...current, query: "" }, stored);
+  return sameView(current, stored);
 }
 
 /** Reads the server's answer to a save or an edit; a request that never got one is `failed`. */
