@@ -1,0 +1,28 @@
+{
+  "feature_plain": "Nhân viên sàn vẫn đăng nhập bằng mã gửi qua email như hôm nay, trên một màn đăng nhập mới lấy dáng từ khối ReUI Pro mà anh chọn.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ hiện màn đăng nhập theo dáng khối anh chọn: logo trên cùng, một cột hẹp giữa trang, ô email có biểu tượng thư, nút «Gửi mã» rộng hết cột, chân trang «© OneHub»."},
+    {"id": "AC-2", "p": "Sẽ giữ nguyên từng chữ bốn tệp bài kiểm đăng nhập của hàng 8 và 1m (máy so với bản trước hàng này)."},
+    {"id": "AC-3", "p": "Sẽ chạy lại trọn bộ bài đăng nhập có cơ sở dữ liệu (gửi mã, mã sai, chọn sàn, đăng xuất…) và tất cả phải xanh."},
+    {"id": "AC-4", "p": "Sẽ đặt mọi bước sau bước email (nhập mã, báo lỗi, chọn sàn…) trong cùng cột ấy, và giữ nguyên mọi câu đang có."},
+    {"id": "AC-6", "p": "Sẽ lấy mọi chữ trên màn từ bảng nhãn và tệp câu của màn đăng nhập, không ghim chữ trong mã."},
+    {"id": "AC-7", "p": "Sẽ ghi khối được chọn vào sổ khối của kho, và xếp họ màn theo câu trả lời Hỏi-2."}
+  ],
+  "wont_do": [
+    {"id": "AC-5", "p": "Sẽ KHÔNG để màn cuộn ngang hay đẩy nút «Gửi mã» khỏi màn đầu ở bốn khổ, và không để logo mất chữ ở nền tối."},
+    {"id": "OOS-1", "p": "KHÔNG thêm đăng nhập bằng Google, Apple, GitHub, mật khẩu, Zalo hay số điện thoại."},
+    {"id": "OOS-2", "p": "KHÔNG làm trang điều khoản hay trang xin mời vào sàn — chưa có trang để trỏ tới."},
+    {"id": "OOS-3", "p": "KHÔNG đổi luồng đăng nhập, cách gửi mã hay luật an toàn."},
+    {"id": "OOS-4", "p": "KHÔNG đụng menu tài khoản và đổi sàn trong ứng dụng."}
+  ],
+  "coverage_plain": [
+    {"i": 0, "p": "Không quét thêm: hàng này chỉ đổi khung một màn đã có; các bước của màn đã liệt đủ và AC-4 (mọi bước sau email) chụp từng bước."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Tiêu chí sổ khối lỡ trả lời trước câu tạo họ màn — đã viết lại thành hai nhánh theo câu trả lời Hỏi-2."},
+    {"i": 1, "p": "Phép đo chỉ viết cho lối A — đã ghi sẵn phép đo đổi thế nào nếu anh chọn B hay C."},
+    {"i": 2, "p": "«Giữ nguyên chữ» chỉ dựa vào mắt và thiếu hai trạng thái — đã thêm phép so câu bằng máy và hai ảnh còn thiếu."},
+    {"i": 3, "p": "Chưa đo «nút trong màn đầu» và quét trợ năng bốn khổ — đã thêm hai ca đo, mỗi ca có thử phá."},
+    {"i": 4, "p": "Đường đo của ngưỡng «trang cổng có 2–3 khối kèm ảnh» ghi nhầm chỗ — đã ghi lại cho đúng."}
+  ]
+}

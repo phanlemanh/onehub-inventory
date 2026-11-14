@@ -1,0 +1,100 @@
+schema_version: 1
+feature_slug: dang-nhap-chon-tu-reui
+# Bài và ca (tên ca là thông điệp ghim):
+#   tests/e2e/dang-nhap-khoi.spec.ts (bốn khổ, sáng và tối): dang-cua-khoi · khong-dang-nhap-ngoai · khong-cuon-ngang ·
+#     nut-trong-man-dau · logo-doc-duoc-nen-toi · axe-dang-nhap
+#   tests/dang-nhap-giu-loi.test.ts: giu-loi-bai-dang-nhap (bốn tệp, băm sha256 ghim từ 42a231f — số tệp ghim bằng hằng 4) ·
+#     giu-cau-copy (mọi khoá của LOGIN_COPY ở 42a231f, viết trước thành bảng; câu hàm so bằng một email mẫu)
+# Cặp phá thử (bản sao; ca tương ứng phải đỏ với thông điệp ghim):
+#   pha-thu-them-khung (bọc biểu mẫu lại bằng Frame)               → «dang-cua-khoi: khung bọc biểu mẫu»
+#   pha-thu-them-google (thêm nút «Continue with Google»)           → «khong-dang-nhap-ngoai: Google»
+#   pha-thu-sua-loi (đổi một chữ trong tests/e2e/account.spec.ts)  → «giu-loi-bai-dang-nhap: tests/e2e/account.spec.ts»
+#   pha-thu-logo-toi (chữ «OneHub» màu cố định #1a1a1a)            → «logo-doc-duoc-nen-toi»
+#   pha-thu-day-nut (thêm khoảng trống cao 900px trên tiêu đề)     → «nut-trong-man-dau: 360»
+#   pha-thu-axe (chữ chân trang màu nhạt dưới ngưỡng tương phản)   → «axe-dang-nhap: color-contrast»
+#   pha-thu-doi-cau (đổi «Gửi mã mới» thành «Gửi lại mã»)          → «giu-cau-copy: resend»
+# Lối khác (chỉ khi chủ kho chọn ở Cổng Phạm vi; chữ ký cổng cho lối ấy là chữ ký cho các dòng này):
+#   B auth-19: E1 expected đổi thành «thanh trên logo trái + câu nhờ quản trị mời phải; một khung Frame giữa trang chứa tiêu
+#     đề, câu dẫn, biểu mẫu; chân trang dưới khung», so với evidence/pham-vi/b-auth-19-1440-sang.png; E1b ca 'dang-cua-khoi'
+#     đòi đúng MỘT khung Frame bọc biểu mẫu, cặp phá thử đảo thành pha-thu-bo-khung → «dang-cua-khoi: thiếu khung»; E4 «trong
+#     cùng khung giữa trang» thay «cùng cột».
+#   C auth-13: E1 expected đổi thành «từ 1024: cột trái khung ảnh cao hết màn, cột phải biểu mẫu; nền nhiễu», so với
+#     evidence/pham-vi/c-auth-13-1440-sang.png; E1b thêm ca 'anh-an-duoi-1024' (ảnh không hiện ở 360, 414), phá thử
+#     pha-thu-hien-anh → «anh-an-duoi-1024: 414»; E4 «trong cùng cột phải».
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: ui-check
+    layer: ui-observed
+    target: /login
+    paths: [src/app/login/**]
+    steps: "Khổ 1440×900, nền sáng, chưa đăng nhập; mở /login, gõ nhan-vien@example.test vào ô Email, bấm ra ngoài; chụp."
+    expected: "Ảnh có: dấu hình + chữ OneHub trên cùng giữa; một cột hẹp giữa trang không khung; một tiêu đề «Đăng nhập» và câu dẫn; ô Email có biểu tượng thư và gợi ý dưới ô; nút «Gửi mã» rộng hết cột kèm mũi tên; chân trang «© <năm> OneHub»; không nút Google/Apple/GitHub. Đặt cạnh evidence/pham-vi/a-auth-15-1440-sang.png thì cùng bố cục."
+    evidence_required: [run_id, screenshot, observed, verifier, verified_at]
+
+  - id: E1b
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.script.e2e
+    paths: [src/app/login/**, tests/e2e/dang-nhap-khoi.spec.ts]
+    expected: "exit 0; ca 'dang-cua-khoi' và 'khong-dang-nhap-ngoai' xanh ở bốn khổ. Chiều đỏ: pha-thu-them-khung đỏ với «dang-cua-khoi: khung bọc biểu mẫu»; pha-thu-them-google đỏ với «khong-dang-nhap-ngoai: Google»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [tests/e2e-db/login.spec.ts, tests/e2e-db/va-dang-nhap.spec.ts, tests/e2e-db/dang-nhap-vai.ts, tests/e2e/account.spec.ts, tests/dang-nhap-giu-loi.test.ts]
+    expected: "exit 0; ca 'giu-loi-bai-dang-nhap' so đúng 4 tệp với băm ghim từ 42a231f. Chiều đỏ: pha-thu-sua-loi đỏ với «giu-loi-bai-dang-nhap: tests/e2e/account.spec.ts»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    layer: backend-effect
+    cmd: config:executors.test.dang_nhap_1p_e2e
+    paths: [src/app/login/**, src/modules/identity/**, tests/e2e-db/**]
+    expected: "exit 0; mọi bài của playwright.db.config.ts xanh trên Postgres làn H, gồm login.spec.ts và va-dang-nhap.spec.ts (đăng nhập, chọn sàn, mã sai, xin mã quá nhiều, chưa thuộc sàn, đăng xuất). Chiều đỏ: bài login.spec.ts đã đỏ khi đăng nhập hỏng ở hàng 8 — hàng này không thêm thước, chỉ chạy lại"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: ui-check
+    layer: ui-observed
+    target: /login
+    paths: [src/app/login/**]
+    steps: "Khổ 1440, nền sáng, làn H có cơ sở dữ liệu: chụp bước nhập mã (sau «Gửi mã»), mã sai, xin mã quá nhiều, chọn sàn (tài khoản hai sàn), chưa thuộc sàn, phiên không còn sàn; không cơ sở dữ liệu: lỗi máy chủ (bấm «Gửi mã» khi máy chủ không nối được)."
+    expected: "Bảy ảnh; mỗi ảnh: bước ấy nằm trong cùng cột giữa trang của AC-1, logo trên, chân trang dưới. (Chữ giữ nguyên đo bằng máy ở E4b, không bằng mắt.)"
+    evidence_required: [run_id, screenshot, observed, verifier, verified_at]
+
+  - id: E4b
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/app/login/copy.ts, tests/dang-nhap-giu-loi.test.ts]
+    expected: "exit 0; ca 'giu-cau-copy' so mọi khoá của LOGIN_COPY ở 42a231f (bảng viết trước) với copy.ts hiện tại, đủ số khoá ghim bằng hằng. Chiều đỏ: pha-thu-doi-cau đỏ với «giu-cau-copy: resend»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.script.e2e
+    paths: [src/app/login/**, tests/e2e/dang-nhap-khoi.spec.ts, tests/e2e/account.spec.ts]
+    expected: "exit 0; ca 'khong-cuon-ngang', 'nut-trong-man-dau', 'logo-doc-duoc-nen-toi' và 'axe-dang-nhap' xanh ở bốn khổ, sáng và tối. Chiều đỏ: pha-thu-logo-toi → «logo-doc-duoc-nen-toi»; pha-thu-day-nut → «nut-trong-man-dau: 360»; pha-thu-axe → «axe-dang-nhap: color-contrast»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.script.check
+    paths: [src/app/login/**]
+    expected: "exit 0 (gồm bài nhãn và bài lời của kho)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [design/so-khoi.yaml, design/screens.yaml, _acceptance/dang-nhap-chon-tu-reui/chung-minh-man.md]
+    expected: "exit 0; lưới chứng minh màn (tools/proof_gate) không báo mã nào cho hồ sơ dang-nhap-chon-tu-reui; sổ khối có dòng ho_so: dang-nhap-chon-tu-reui"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
