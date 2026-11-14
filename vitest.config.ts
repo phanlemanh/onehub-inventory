@@ -7,6 +7,8 @@ export default defineConfig({
   test: {
     // Tests failed falsely on the 5 s default while several lanes ran side by side; this ceiling only catches a hung test.
     testTimeout: 20_000,
+    // Every run gets its own temporary folder, removed when the run ends (tests/support/temp-root.ts).
+    globalSetup: ["tests/support/temp-root.ts"],
     exclude: ["tests/e2e/**", "tests/e2e-db/**", "tests/db/**", "node_modules/**", ".next/**"],
     coverage: {
       enabled: true,

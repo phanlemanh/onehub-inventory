@@ -2,12 +2,12 @@
 // (states table unreadable, an unknown contract status); this file proves the matrix check REALLY runs on the inventory
 // proof before the screen becomes the grid family's reference.
 import { spawnSync } from "node:child_process";
-import { cpSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 // Row 2e renamed the state «Tìm không ra» to «Không có dòng nào khớp» and re-proved Bảng hàng's matrix in its own record
@@ -68,10 +68,12 @@ function selfCheck(root: string): void {
 
 /** A copy of what the gate reads (design, records, the test files the matrix points at). */
 function copyRepo(): string {
-  const dir = mkdtempSync(join(tmpdir(), "proof-self-"));
+  const dir = tempDir("proof-self-");
   for (const part of [
     "design",
-    "_acceptance",
+    // The record under test whole; of every other record only the two files the gate reads (the block ledger names
+    // them). The whole folder is about 120 MB of screenshots, once per test.
+    `_acceptance/${SLUG}`,
     "tools/proof_gate",
     "tools/e2e_templates",
     "tools/repo_ontology.py",
@@ -84,6 +86,12 @@ function copyRepo(): string {
     "src/modules",
   ]) {
     cpSync(join(ROOT, part), join(dir, part), { recursive: true });
+  }
+  for (const slug of readdirSync(join(ROOT, "_acceptance"))) {
+    for (const file of ["contract.md", "chung-minh-man.md"]) {
+      const rel = join("_acceptance", slug, file);
+      if (slug !== SLUG && existsSync(join(ROOT, rel))) cpSync(join(ROOT, rel), join(dir, rel));
+    }
   }
   return dir;
 }

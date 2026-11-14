@@ -1,8 +1,7 @@
 // Members over HTTP against a fake pool (row 9): the handler, the door and the module run for real; the database is a
 // script that answers each statement by its text. The real database functions are tested on Postgres in
 // tests/db/moi-nguoi.db.test.ts.
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -12,6 +11,7 @@ import { memberRoles, type MembersDeps } from "./members";
 import { createMembersHandlers } from "./members-http";
 import { canonicalRoles, isRole } from "./roles";
 import { CHECK_LOGIN_ROLE_SQL, type DbClient, type DbPool } from "./with-company";
+import { tempDir } from "../../../tests/support/temp-dir";
 
 const A = "00000000-0000-4000-8000-00000000000a";
 const P = "00000000-0000-4000-8000-0000000000a1";
@@ -262,7 +262,7 @@ describe("roles and the development invite sender", () => {
   });
 
   it("prints the invitation and appends it to the outbox", async () => {
-    const dir = mkdtempSync(join(tmpdir(), "thu-moi-"));
+    const dir = tempDir("thu-moi-");
     const outbox = join(dir, "outbox.jsonl");
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
     await devInviteSender(outbox)({

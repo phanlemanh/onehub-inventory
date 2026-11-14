@@ -1,16 +1,7 @@
 // Permission table, unit level (row 9a): adding up roles (AC-2) and every API route inside the table (AC-5). The cell
 // matrix below is written by hand from the design, not computed from the generated table, so a change of the table
 // that nobody meant goes red here.
-import {
-  cpSync,
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -26,6 +17,7 @@ import {
   type Scope,
 } from "./permissions";
 import { ROLES } from "./roles";
+import { tempDir } from "../../../tests/support/temp-dir";
 
 const ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 
@@ -281,7 +273,7 @@ describe("route-ngoai-bang", () => {
   });
 
   it("break: a new POST route without a row names it", () => {
-    const dir = mkdtempSync(join(tmpdir(), "route-"));
+    const dir = tempDir("route-");
     copies.push(dir);
     cpSync(API_DIR, dir, { recursive: true });
     mkdirSync(join(dir, "thu"));

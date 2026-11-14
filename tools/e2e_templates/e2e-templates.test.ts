@@ -2,16 +2,7 @@
 // The list cases run `playwright test --list` on an edited copy of the register (SCREENS_ROOT); every edit has its
 // positive control on the same copy first.
 import { execFileSync, spawnSync } from "node:child_process";
-import {
-  cpSync,
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -38,6 +29,7 @@ import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { checkRecipes, regionStates } from "./structure";
 import { unlisted, untagged, waitCopies, waitingTests, type SpecFile } from "./cho-scan";
 import { CHO_TESTS } from "./settle";
+import { tempDir } from "../../tests/support/temp-dir";
 
 const STATES_MD = readFileSync(join(REPO_ROOT, "design/states.md"), "utf8");
 const SLOW = 60_000;
@@ -322,7 +314,7 @@ function bridge(root: string): Bridge {
 
 /** A root with the three declaration files and an empty page file for every route the register declares built. */
 function copyRegister(): string {
-  const root = mkdtempSync(join(tmpdir(), "so-man-"));
+  const root = tempDir("so-man-");
   for (const rel of ["ontology/labels.yaml", "ontology/roles.yaml", "design/screens.yaml"]) {
     mkdirSync(dirname(join(root, rel)), { recursive: true });
     cpSync(join(REPO_ROOT, rel), join(root, rel));
@@ -569,7 +561,7 @@ describe("sổ sai thì đỏ", () => {
 
 /** Every listed case of one screen: its name under the screen, and the path its region describe says it opens. */
 function casesOf(root: string, id: string): { name: string; vao: string | null }[] {
-  const file = join(mkdtempSync(join(tmpdir(), "ds-")), "list.json");
+  const file = join(tempDir("ds-"), "list.json");
   const r = spawnSync(
     "npx",
     ["playwright", "test", "tests/e2e/screens", "--list", "--reporter=json"],

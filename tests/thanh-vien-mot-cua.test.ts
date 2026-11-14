@@ -1,10 +1,10 @@
 // The members screen reads and writes people only through the identity module's door (row 9c, AC-7, SP-1): every
 // fetch goes to MEMBERS_BASE_PATH, and no file of the screen reaches the database or a hard-coded API path.
-import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 const SCREEN = join(__dirname, "..", "src", "app", "(app)", "members");
 
@@ -40,7 +40,7 @@ describe("members screen, one door (row 9c)", () => {
   });
 
   it("pha thu: a copy with one more fetch to another path is caught", () => {
-    const copy = mkdtempSync(join(tmpdir(), "thanh-vien-mot-cua-"));
+    const copy = tempDir("thanh-vien-mot-cua-");
     for (const f of readdirSync(SCREEN).filter((f) => /\.tsx?$/.test(f)))
       writeFileSync(join(copy, f), readFileSync(join(SCREEN, f)));
     writeFileSync(join(copy, "extra.ts"), 'export const x = () => fetch("/api/v1/khac");\n');

@@ -5,15 +5,7 @@
 // Red cases that run a command break one thing in a copy of the real files, run the copy's own command by absolute
 // path from another directory under the network blocker, and check the real repo is untouched.
 import { spawnSync } from "node:child_process";
-import {
-  cpSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  symlinkSync,
-  writeFileSync,
-} from "node:fs";
+import { cpSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -21,6 +13,7 @@ import { fileURLToPath } from "node:url";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 
 import * as lib from "./catalog.mjs";
+import { tempDir as sharedTempDir } from "../../tests/support/temp-dir";
 
 const TOOL = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(TOOL, "..", "..");
@@ -51,7 +44,7 @@ afterAll(() => {
 });
 
 function tempDir() {
-  const d = mkdtempSync(join(tmpdir(), "reui-doc-chac-"));
+  const d = sharedTempDir("reui-doc-chac-");
   temps.push(d);
   return d;
 }
