@@ -10,6 +10,9 @@ import { join } from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { REGION } from "../../tools/e2e_templates/recipes";
+import { runMain } from "../../tools/e2e_templates/runner";
+
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const SHOTS = process.env.SHOTS_DIR;
 
@@ -263,4 +266,58 @@ test.describe("vung-cham (G-1411-130)", () => {
       "touch target under 44px: phone-filter-button",
     );
   });
+});
+
+/**
+ * Supervisor ruling G-1411-12 (f): the shared register suite measures the inventory's cards below 768 px. Self-test:
+ * the region cases that read rows run on a phone through the cards' branch — the filter sheet opens, the record opens
+ * from a card — never on a table; on 1024 the same cases keep the table and never touch the sheet.
+ */
+test.describe("bo-bai-chung (G-1411-12 f)", () => {
+  const traced = async (page: Page) =>
+    page.addInitScript(() => {
+      const w = window as unknown as { __sheet: number; __table: number };
+      w.__sheet = 0;
+      w.__table = 0;
+      document.addEventListener(
+        "click",
+        (e) => {
+          if ((e.target as Element).closest('[data-slot="phone-filter-button"]')) w.__sheet += 1;
+        },
+        true,
+      );
+      new MutationObserver(() => {
+        if (document.querySelector('[data-slot="data-region"] table')) w.__table += 1;
+      }).observe(document, { childList: true, subtree: true });
+    });
+  const counts = (page: Page) =>
+    page.evaluate(() => {
+      const w = window as unknown as { __sheet: number };
+      return {
+        sheet: w.__sheet,
+        table: document.querySelectorAll('[data-slot="data-region"] table').length,
+      };
+    });
+
+  for (const [width, phone] of [
+    [360, true],
+    [414, true],
+    [1024, false],
+  ] as const)
+    for (const id of ["khong-khop", "loc-dau-cot", "chu-dai"])
+      test(`${width}: ${id} reads ${phone ? "the cards" : "the table"}`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 800 });
+        await traced(page);
+        const recipe = REGION.find((r) => r.id === id)!;
+        await runMain(page, "/inventory", recipe, { screen: "inventory", title: null });
+        const seen = await counts(page);
+        if (phone) {
+          if (seen.table > 0) throw new Error(`${id} at ${width}: a table in the region`);
+          if (id === "chu-dai") await expect(page).toHaveURL(/ho-so=/);
+          else if (seen.sheet === 0)
+            throw new Error(`${id} at ${width}: the filter sheet never opened`);
+        } else if (seen.sheet > 0 || seen.table === 0) {
+          throw new Error(`${id} at ${width}: left the table branch`);
+        }
+      });
 });

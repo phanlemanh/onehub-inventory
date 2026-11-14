@@ -22,7 +22,7 @@ import { TouchTarget } from "./touch-target";
 export interface RegionPhoneList<Row> {
   /** One row's card; the region wraps it in the link that opens the record, named by the card's own text (WCAG 2.5.3). */
   card: (row: Row) => ReactNode;
-  /** The row's short name (e.g. «Căn 0905»): it names the row's «…». */
+  /** The row's short name (the unit's label and code): it names the row's «…». */
   label: (row: Row) => string;
 }
 

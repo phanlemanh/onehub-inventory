@@ -119,8 +119,8 @@ export function inventoryEdgeRowsFrom(
 ): GridRow[] {
   if (env === "production" || param !== "bien") return [];
   const base = {
-    "Listing.buildingName": "[MAU] Toà biên",
-    "Listing.subdivisionName": "[MAU] Dự án có tên rất dài để thử cắt chữ",
+    "Listing.buildingName": "[MAU] Biên",
+    "Listing.subdivisionName": "[MAU] Một cái tên rất dài để thử cắt chữ ở thẻ",
     "Unit.livingArea": 128.5,
     "Unit.bedroomsTotal": 4,
     "Listing.lastConfirmedAt": "2026-11-01T02:00:00.000Z",
