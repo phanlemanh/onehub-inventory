@@ -263,6 +263,19 @@ export function checkListingLabels(data: SampleListings, company: Company): stri
   return errors;
 }
 
+/**
+ * Who keeps a sample listing (row 3e) until row 10 brings the real keeper: someone else (`[Tên] 0x`), the person viewing,
+ * or nobody yet. Fixed by the listing's sample number, so every screen and test agrees.
+ */
+export type SampleKeeper = { kind: "other"; name: string } | { kind: "viewer" } | null;
+
+export function sampleKeeperOf(listingId: string): SampleKeeper {
+  const n = Number.parseInt(listingId.slice(-12), 16);
+  if (!listingId.startsWith(SAMPLE_ID_PREFIX) || Number.isNaN(n) || n % 5 === 0) return null;
+  if (n % 5 === 1) return { kind: "viewer" };
+  return { kind: "other", name: `[Tên] ${String((n % 7) + 1).padStart(2, "0")}` };
+}
+
 /** Statuses of an open listing: a unit has at most one of these per company (rule one-open-listing-per-unit, row 3b). */
 export const OPEN_STATUSES: readonly ListingStandardStatus[] = [
   "Incomplete",
