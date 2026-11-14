@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 
 import { FormDialog } from "@/components/candidate/form-dialog";
+import { Badge } from "@/components/reui/badge";
 import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -140,6 +141,11 @@ export function InviteDialog({
     <FormDialog
       slot="invite-dialog"
       trigger={{ render: <Button />, label: labels.invite }}
+      badge={
+        <Badge size="sm" variant="warning-light">
+          {labels.company}
+        </Badge>
+      }
       title={labels.invite}
       description={COPY.inviteDescription}
       submitLabel={COPY.inviteSubmit}
