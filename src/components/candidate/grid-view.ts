@@ -51,7 +51,10 @@ export const MONEY_FILTER_UNIT = 1_000_000_000;
 export type ColumnFilter = string | readonly string[];
 export type ColumnFilters = Partial<Record<FieldKey, ColumnFilter>>;
 
-/** Lower case without Vietnamese marks, «đ» read as «d», so «dong» finds «Đông». */
+/**
+ * Lower case without Vietnamese marks, «đ» read as «d», so «dong» finds «Đông» (row 2e, AC-11). The one way text is
+ * compared when a person types to find rows: the column filters here and the top bar's ⌘K box both call it.
+ */
 export function foldText(text: string): string {
   return text
     .normalize("NFD")
@@ -171,33 +174,19 @@ function columnMatches(
   return foldText(cellText(column.kind, value, row.transaction)).includes(foldText(filter.trim()));
 }
 
-/** Kinds the region's one search box reads. */
-const SEARCH_KINDS: readonly DisplayKind[] = ["text", "person", "select"];
-
-/** Rows that pass the search box and every column filter, all at once (a sheet's filters stack). */
+/** Rows that pass every column filter, all at once (a sheet's filters stack). */
 export function filterRows<R extends ViewRow>(
   rows: readonly R[],
   columns: readonly TypedColumn[],
   filters: ColumnFilters,
-  query = "",
   now: number = Date.now(),
 ): R[] {
-  const needle = foldText(query.trim());
   const active = columns.filter((column) => !filterIsEmpty(filters[column.field]));
-  return rows.filter((row) => {
-    if (
-      needle !== "" &&
-      !columns.some(
-        (column) =>
-          SEARCH_KINDS.includes(column.kind) &&
-          foldText(String(row[column.field] ?? "")).includes(needle),
-      )
-    )
-      return false;
-    return active.every((column) =>
+  return rows.filter((row) =>
+    active.every((column) =>
       columnMatches(row, column, filters[column.field] as ColumnFilter, now),
-    );
-  });
+    ),
+  );
 }
 
 export type SortDirection = "asc" | "desc";
@@ -301,12 +290,11 @@ export function rowNumbers<R extends ViewRow>(
 }
 
 /**
- * How a person has arranged the grid (row 2c, a saved view): the search text, each column's filter, the sort, grouping
+ * How a person has arranged the grid (row 2c, a saved view): each column's filter, the sort, grouping
  * on or off and the hidden columns. Full screen, the selected cell, open groups and the scroll position are not part of
  * it. A screen may give one to the region to open with and hear each change of it.
  */
 export interface GridView {
-  query: string;
   filters: ColumnFilters;
   sort: readonly SortBy[];
   grouped: boolean;
@@ -314,7 +302,6 @@ export interface GridView {
 }
 
 export const EMPTY_VIEW: GridView = {
-  query: "",
   filters: {},
   sort: [],
   grouped: false,
@@ -333,11 +320,10 @@ function liveFilters(filters: ColumnFilters): [string, string | string[]][] {
 }
 
 /**
- * True when two views show the same grid: the same search text (ends trimmed), the same live filters whatever their
+ * True when two views show the same grid: the same live filters whatever their
  * order, the same sort, grouping and hidden columns (in any order).
  */
 export function sameView(a: GridView, b: GridView): boolean {
-  if (a.query.trim() !== b.query.trim()) return false;
   if (a.grouped !== b.grouped) return false;
   if (JSON.stringify(liveFilters(a.filters)) !== JSON.stringify(liveFilters(b.filters)))
     return false;
@@ -359,7 +345,6 @@ export function viewWithin(view: GridView, columns: readonly TypedColumn[]): Gri
   const fields = new Set<string>(columns.map((c) => c.field));
   const first = columns[0]?.field;
   return {
-    query: view.query,
     filters: Object.fromEntries(
       Object.entries(view.filters).filter(([field]) => fields.has(field)),
     ) as ColumnFilters,

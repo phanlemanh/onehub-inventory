@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 // The shared grid used by hand like a sheet (roadmap row 2a, _acceptance/bang-hang-dung-tay-nhu-sheet): header menu
 // sort, filter row, grouping, columns, and the region's one «open row» door. E4, E6, E7, E8, E12 of the contract.
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -139,9 +142,9 @@ describe("filter row", () => {
     if (box.getAttribute("aria-invalid") !== "true") throw new Error("invalid rule not marked");
   }
 
-  it("opens one box per column, filters by the rule, marks a bad rule, clears back to all rows", () => {
+  it("shows one box per column, filters by the rule, marks a bad rule, clears back to all rows", () => {
     region();
-    fireEvent.click(screen.getByRole("button", { name: /^Lọc/ }));
+    expect(screen.queryByRole("button", { name: /^Lọc/ })).toBeNull();
     expect(document.querySelectorAll("[data-slot=column-filter]")).toHaveLength(8);
     expect(
       document.querySelectorAll('[data-slot=column-filter][data-filter-mode="values"]'),
@@ -161,7 +164,6 @@ describe("filter row", () => {
 
   it("the check fails when a bad rule is not marked", () => {
     region();
-    fireEvent.click(screen.getByRole("button", { name: /^Lọc/ }));
     fireEvent.change(priceBox(), { target: { value: "5 tỷ" } });
     priceBox().removeAttribute("aria-invalid");
     expect(() => checkInvalid(priceBox())).toThrow("invalid rule not marked");
@@ -273,7 +275,7 @@ describe("columns menu", () => {
 describe("one template, one «open row» door", () => {
   it("another grid screen gets the sheet tools without asking for them", () => {
     render(<DataRegion title="Mẫu" columns={columns.slice(0, 3)} rows={rows} />);
-    expect(screen.getByRole("button", { name: /^Lọc/ })).toBeTruthy();
+    expect(document.querySelectorAll("[data-slot=column-filter]")).toHaveLength(3);
     expect(screen.getByRole("button", { name: "Cột" })).toBeTruthy();
     expect(document.querySelector('table[data-slot="data-grid-table"]')?.getAttribute("role")).toBe(
       "grid",
@@ -308,15 +310,15 @@ describe("one template, one «open row» door", () => {
   });
 });
 
-// Row 2c (luu-goc-nhin-cot-hai), E12 — Ngoài-4 of 2a: a filter that leaves no row keeps the toolbar, the search box and
-// the filter row where they are; the body says so and each rule can be mended on its own.
+// Row 2c (luu-goc-nhin-cot-hai), E12 — Ngoài-4 of 2a: a filter that leaves no row keeps the toolbar and the filter row
+// where they are; the body says so and each rule can be mended on its own. Row 2e: the box typed in is the Căn filter.
 describe("no match keeps the toolbar", () => {
-  const searchBox = () => screen.getByRole("searchbox") as HTMLInputElement;
-  const TOOLS = ["filter-toggle", "group-toggle", "columns-toggle"];
+  const codeBox = () => screen.getByLabelText("Lọc cột Căn") as HTMLInputElement;
+  const TOOLS = ["sheet-tools", "group-toggle", "columns-toggle"];
 
-  /** The toolbar and the filter boxes are still there, and the search box is the same element as before. */
+  /** The toolbar and the filter boxes are still there, and the Căn filter box is the same element as before. */
   function checkKept(before: HTMLInputElement): void {
-    if (searchBox() !== before) throw new Error("search box remounted on no match");
+    if (codeBox() !== before) throw new Error("filter box remounted on no match");
     for (const slot of TOOLS)
       if (!document.querySelector(`[data-slot=${slot}]`)) throw new Error(`toolbar lost ${slot}`);
     if (document.querySelectorAll("[data-slot=column-filter]").length !== 8)
@@ -325,12 +327,12 @@ describe("no match keeps the toolbar", () => {
 
   const WAYS: [string, () => void, () => void, () => number][] = [
     [
-      "search «zzz»",
+      "Căn «zzz»",
       () => {
-        act(() => searchBox().focus());
-        fireEvent.change(searchBox(), { target: { value: "zzz" } });
+        act(() => codeBox().focus());
+        fireEvent.change(codeBox(), { target: { value: "zzz" } });
       },
-      () => fireEvent.change(searchBox(), { target: { value: "" } }),
+      () => fireEvent.change(codeBox(), { target: { value: "" } }),
       () => 60,
     ],
     [
@@ -353,12 +355,11 @@ describe("no match keeps the toolbar", () => {
 
   it.each(WAYS)("%s", (name, empty, mend, left) => {
     region();
-    fireEvent.click(screen.getByRole("button", { name: /^Lọc/ }));
-    const before = searchBox();
+    const before = codeBox();
     empty();
     expect(bodyRows()).toHaveLength(0);
     checkKept(before);
-    if (name.startsWith("search")) {
+    if (name.startsWith("Căn")) {
       expect(document.activeElement).toBe(before);
       expect(before.value).toBe("zzz");
     }
@@ -374,10 +375,200 @@ describe("no match keeps the toolbar", () => {
 
   it("the check fails when the toolbar is drawn again outside the grid", () => {
     region();
-    const before = searchBox();
+    const before = codeBox();
     fireEvent.change(before, { target: { value: "zzz" } });
     const copy = before.cloneNode() as HTMLInputElement;
     before.replaceWith(copy);
-    expect(() => checkKept(before)).toThrow("search box remounted on no match");
+    expect(() => checkKept(before)).toThrow("filter box remounted on no match");
+  });
+});
+
+// Row 2e (bo-o-tim-cua-vung): the region has no search box; a person filters by the boxes under the column headers.
+describe("column filters instead of a search box (row 2e)", () => {
+  const box = (header: string) => screen.getByLabelText(`Lọc cột ${header}`) as HTMLInputElement;
+  const shownIds = () => bodyRows().map((tr) => tr.getAttribute("data-row-id") as string);
+  const idsOf = (keep: (r: GridRow) => boolean) => rows.filter(keep).map((r) => r.id);
+  const fold = (t: unknown) =>
+    String(t ?? "")
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D")
+      .toLowerCase();
+  const DAY = 86_400_000;
+  const VN = 7 * 3_600_000;
+  const days = (r: GridRow) =>
+    Math.floor((Date.now() + VN) / DAY) -
+    Math.floor((new Date(r["Listing.lastConfirmedAt"] as string).getTime() + VN) / DAY);
+  const price = (r: GridRow) => (r["Listing.listPrice"] as number) / MONEY_FILTER_UNIT;
+  const firstCode = String(rows[0]?.["Listing.unitNumber"]).slice(0, 4);
+  const firstTower = String(rows[0]?.["Listing.buildingName"]);
+  // The sample confirms rows on nine days; the date rule keeps the days strictly inside that span, whatever today is.
+  const confirmedDays = rows.map(days);
+  const dayRule = `${Math.min(...confirmedDays) + 1}-${Math.max(...confirmedDays) - 1}`;
+  const [dayLow, dayHigh] = dayRule.split("-").map(Number) as [number, number];
+
+  /** Every row the filter keeps is drawn, not only the rows of the first window, and no other row is. */
+  function checkAllMatches(shown: readonly string[], expected: readonly string[]): void {
+    const missed = expected.filter((id) => !shown.includes(id));
+    if (missed.length > 0)
+      throw new Error(`column filter missed rows outside the window: ${missed.length}`);
+    const extra = shown.filter((id) => !expected.includes(id));
+    if (extra.length > 0)
+      throw new Error(`column filter shows rows that do not match: ${extra[0]}`);
+  }
+
+  // Six ways to filter, written down before the check: what is typed (or opened with) and the rows it must keep.
+  const CASES: [string, () => void, (r: GridRow) => boolean][] = [
+    [
+      "chữ ở Căn",
+      () => fireEvent.change(box("Căn"), { target: { value: firstCode } }),
+      (r) => fold(r["Listing.unitNumber"]).includes(fold(firstCode)),
+    ],
+    [
+      "chữ ở Toà",
+      () => fireEvent.change(box("Toà"), { target: { value: firstTower } }),
+      (r) => fold(r["Listing.buildingName"]).includes(fold(firstTower)),
+    ],
+    [
+      "số khoảng ở Giá chào",
+      () => fireEvent.change(box("Giá chào"), { target: { value: "3-6" } }),
+      (r) => price(r) >= 3 && price(r) <= 6,
+    ],
+    [
+      "ngày khoảng",
+      () => fireEvent.change(box("Xác nhận lúc"), { target: { value: dayRule } }),
+      (r) => days(r) >= dayLow && days(r) <= dayHigh,
+    ],
+    [
+      "trạng thái chọn nhiều",
+      () => {},
+      (r) => ["Active", "Pending"].includes(r["Listing.standardStatus"] as string),
+    ],
+    [
+      "hai ô chồng",
+      () => {
+        fireEvent.change(box("Toà"), { target: { value: firstTower } });
+        fireEvent.change(box("Giá chào"), { target: { value: "<=6" } });
+      },
+      (r) => fold(r["Listing.buildingName"]).includes(fold(firstTower)) && price(r) <= 6,
+    ],
+  ];
+
+  it("has the six cases written down", () => {
+    expect(CASES).toHaveLength(6);
+  });
+
+  it.each(CASES)("%s keeps exactly the matching rows and counts them", (name, type, keep) => {
+    region(
+      name === "trạng thái chọn nhiều"
+        ? { initialFilters: { "Listing.standardStatus": ["Active", "Pending"] } }
+        : {},
+    );
+    type();
+    const expected = idsOf(keep);
+    expect(expected.length, name).toBeGreaterThan(0);
+    expect(expected.length, name).toBeLessThan(60);
+    expect(() => checkAllMatches(shownIds(), expected)).not.toThrow();
+    expect(footer()).toBe(`${expected.length} / 60 dòng`);
+  });
+
+  it("the check fails on a filter that only filters the rows drawn in the first window", () => {
+    region();
+    const expected = idsOf((r) => price(r) <= 6);
+    fireEvent.change(box("Giá chào"), { target: { value: "<=6" } });
+    const windowOnly = shownIds().filter((id) => rows.findIndex((r) => r.id === id) < 20);
+    expect(() => checkAllMatches(windowOnly, expected)).toThrow(
+      "column filter missed rows outside the window",
+    );
+  });
+
+  /** After «Xoá lọc» no filter box holds a rule. */
+  function checkCleared(): void {
+    for (const input of document.querySelectorAll<HTMLInputElement>(
+      "[data-slot=column-filter] input",
+    ))
+      if (input.value !== "")
+        throw new Error(`clear left a filter on: ${input.getAttribute("aria-label")}`);
+  }
+
+  it("no match: says so in the words of the design, keeps the box typed in, mends and clears", () => {
+    const design = readFileSync(
+      resolve(__dirname, "../_acceptance/bo-o-tim-cua-vung/design.md"),
+      "utf8",
+    );
+    const why = /\| ST-inventory-khong-khop \|[^|]*\| «[^»]+» · «([^»]+)» · «Xoá lọc» \|/.exec(
+      design,
+    )?.[1];
+    expect(why).toBeTruthy();
+    region();
+    act(() => box("Căn").focus());
+    fireEvent.change(box("Căn"), { target: { value: "zzz-khong-co" } });
+    expect(bodyRows()).toHaveLength(0);
+    expect(screen.getByText("Không có dòng nào khớp")).toBeTruthy();
+    const state = document.querySelector('[data-slot="region-state"][data-kind="no-match"]');
+    expect(state?.textContent).toContain(why as string);
+    expect(state?.textContent?.toLocaleLowerCase("vi")).not.toContain("tìm");
+    expect(screen.getAllByRole("button", { name: "Xoá lọc" })).toHaveLength(1);
+    expect(document.querySelector("[data-slot=region-toolbar]")).not.toBeNull();
+    expect(document.querySelectorAll("[data-slot=column-filter]")).toHaveLength(8);
+    expect(document.activeElement).toBe(box("Căn"));
+    expect(box("Căn").value).toBe("zzz-khong-co");
+    fireEvent.change(box("Căn"), { target: { value: "" } });
+    expect(bodyRows()).toHaveLength(60);
+    fireEvent.change(box("Căn"), { target: { value: "zzz" } });
+    fireEvent.change(box("Toà"), { target: { value: firstTower } });
+    fireEvent.click(screen.getByRole("button", { name: "Xoá lọc" }));
+    expect(() => checkCleared()).not.toThrow();
+    expect(box("Căn").value).toBe("");
+    expect(box("Toà").value).toBe("");
+    expect(footer()).toBe("60 dòng");
+  });
+
+  it("the check fails when «Xoá lọc» clears only one box", () => {
+    region();
+    fireEvent.change(box("Căn"), { target: { value: "zzz" } });
+    fireEvent.change(box("Toà"), { target: { value: firstTower } });
+    fireEvent.change(box("Căn"), { target: { value: "" } });
+    expect(() => checkCleared()).toThrow("clear left a filter on: Lọc cột Toà");
+  });
+
+  /** The filter row is under the headers on the first draw, and there is no «Lọc» switch to hide it. */
+  function checkFilterRowOpen(): void {
+    if (document.querySelectorAll("[data-slot=column-filter]").length !== 8)
+      throw new Error("filter row hidden on open");
+    if (screen.queryByRole("button", { name: /^Lọc/ })) throw new Error("filter switch is back");
+  }
+
+  // Three ways to open the region, written down before the check.
+  const OPENINGS: [string, Partial<Parameters<typeof DataRegion>[0]>][] = [
+    ["không lọc sẵn", {}],
+    ["lọc sẵn bằng initialFilters", { initialFilters: { "Listing.buildingName": firstTower } }],
+    [
+      "góc nhìn có lọc",
+      {
+        initialView: {
+          filters: { "Listing.listPrice": "<=6" },
+          sort: [],
+          grouped: false,
+          hidden: [],
+        },
+      },
+    ],
+  ];
+
+  it("has the three openings written down", () => {
+    expect(OPENINGS).toHaveLength(3);
+  });
+
+  it.each(OPENINGS)("%s: the filter row shows at once", (_name, props) => {
+    region(props);
+    expect(() => checkFilterRowOpen()).not.toThrow();
+  });
+
+  it("the check fails when the filter row is hidden on open", () => {
+    region();
+    for (const cell of document.querySelectorAll("[data-slot=column-filter]")) cell.remove();
+    expect(() => checkFilterRowOpen()).toThrow("filter row hidden on open");
   });
 });

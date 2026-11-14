@@ -1,12 +1,14 @@
 // @vitest-environment jsdom
 // Row 2c (luu-goc-nhin-cot-hai), E3: the shared grid opens with a given arrangement and reports each change of it.
-//   opens-with — six arrangements written ahead (search only, filters only, sort only, groups only, hidden columns only,
-//     all five): rows in order, groups and shown headers equal what filterRows, sortRows and groupRows give on the
-//     source rows, worked out here apart from the grid.
-//   reports — each of the five things a person changes is heard once with the new arrangement (5 cells).
+//   opens-with — five arrangements written ahead (filters only, sort only, groups only, hidden columns only, all four):
+//     rows in order, groups and shown headers equal what filterRows, sortRows and groupRows give on the source rows,
+//     worked out here apart from the grid.
+//   reports — each of the four things a person changes is heard with the new arrangement (4 cells).
 //   sameView — ten pairs written ahead.
+//   Row 2e (bo-o-tim-cua-vung), E9: a view holds exactly four things, never a search text; old data with one is dropped.
 //   Breaks: a grid that ignores the hidden columns it was given → «initial view ignored: hidden columns»; a sameView blind
-//   to the search text → «sameView blind to query».
+//   to a column filter's text → «sameView blind to filter text»; a view that carries a search text again → «view carries
+//   search text».
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -22,7 +24,7 @@ import {
 } from "../src/components/candidate/grid-view";
 import { sampleUnits, subdivisionNameOf } from "../src/modules/catalog";
 import { SAMPLE_COMPANY, buildSampleListings } from "../src/modules/listings";
-import { INVENTORY_FIELDS, inventoryRows } from "../src/modules/listings/ui";
+import { INVENTORY_FIELDS, gridView, inventoryRows, storedView } from "../src/modules/listings/ui";
 import { tallGridViewport } from "./virtual-viewport";
 
 // The 60-row grid renders slowly when the machine is loaded (grid-sheet hit 5.3 s on the 5 s default in rows 2c and 7c): a
@@ -123,11 +125,7 @@ function shown(): Shown {
 
 /** The same, worked out from the source rows with the pure rules, not through the grid. */
 function expected(view: GridView): Shown {
-  const kept = sortRows(
-    filterRows(rows, columns, view.filters, view.query),
-    columns,
-    view.sort[0] ?? null,
-  );
+  const kept = sortRows(filterRows(rows, columns, view.filters), columns, view.sort[0] ?? null);
   const group = columns.find((c) => c.field === GROUP_BY)!;
   const groups = view.grouped ? groupRows(kept, group) : null;
   return {
@@ -146,8 +144,16 @@ function checkOpened(got: Shown, want: Shown): void {
     throw new Error("initial view ignored: rows");
 }
 
+// The start of a unit code that an Active row of building S1.0x has, so the four filters of «all four» keep rows.
+const CODE_START = String(
+  rows.find(
+    (r) =>
+      r["Listing.standardStatus"] === "Active" &&
+      String(r["Listing.buildingName"]).startsWith("S1.0"),
+  )?.["Listing.unitNumber"],
+).slice(0, 2);
+
 const VIEWS: Record<string, GridView> = {
-  "search only": { ...EMPTY_VIEW, query: "S1.02" },
   "filters only": {
     ...EMPTY_VIEW,
     filters: { "Listing.standardStatus": ["Active", "Hold"], "Listing.listPrice": "<=5" },
@@ -158,9 +164,12 @@ const VIEWS: Record<string, GridView> = {
     ...EMPTY_VIEW,
     hidden: ["Listing.subdivisionName", "Listing.lastConfirmedAt"],
   },
-  "all five": {
-    query: "S1",
-    filters: { "Listing.standardStatus": ["Active"], "Listing.buildingName": "S1.0" },
+  "all four": {
+    filters: {
+      "Listing.unitNumber": CODE_START,
+      "Listing.standardStatus": ["Active"],
+      "Listing.buildingName": "S1.0",
+    },
     sort: [{ field: "Listing.listPrice", direction: "desc" }],
     grouped: true,
     hidden: ["Listing.subdivisionName", "Listing.lastConfirmedAt"],
@@ -186,11 +195,22 @@ describe("opens with a given arrangement", () => {
     const want = expected(view);
     expect(want.ids.length).toBeGreaterThan(0);
     checkOpened(shown(), want);
-    expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe(view.query);
+    expect(screen.queryAllByRole("searchbox")).toHaveLength(0);
+    const code = view.filters["Listing.unitNumber"];
+    expect((screen.getByLabelText("Lọc cột Căn") as HTMLInputElement).value).toBe(
+      typeof code === "string" ? code : "",
+    );
   });
 
-  it("6 arrangements written ahead", () => {
-    expect(Object.keys(VIEWS)).toHaveLength(6);
+  it("5 arrangements written ahead", () => {
+    expect(Object.keys(VIEWS)).toHaveLength(5);
+  });
+
+  it("drops a search text that old data still carries", () => {
+    const spy = vi.fn();
+    open({ ...EMPTY_VIEW, query: "S1.02" } as GridView, spy);
+    expect(shown().ids).toHaveLength(60);
+    expect(Object.keys(spy.mock.calls.at(-1)?.[0] as GridView).sort()).toEqual(VIEW_KEYS);
   });
 
   it("the check fails on a grid that ignores the hidden columns it was given", () => {
@@ -215,19 +235,16 @@ describe("opens with a given arrangement", () => {
 describe("reports each change", () => {
   const last = (spy: ReturnType<typeof vi.fn>) => spy.mock.calls.at(-1)?.[0] as GridView;
 
-  it("search, filter, sort, groups and hidden columns: 5 cells", async () => {
+  it("filters, sort, groups and hidden columns: 4 cells, each view with exactly four keys", async () => {
     const spy = vi.fn();
     open(EMPTY_VIEW, spy);
     expect(sameView(last(spy), EMPTY_VIEW)).toBe(true);
     let cells = 0;
 
-    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "S1.03" } });
-    expect(last(spy).query).toBe("S1.03");
-    cells += 1;
-
-    fireEvent.click(screen.getByRole("button", { name: /^Lọc/ }));
+    fireEvent.change(screen.getByLabelText("Lọc cột Căn"), { target: { value: "S1.03" } });
+    expect(last(spy).filters).toEqual({ "Listing.unitNumber": "S1.03" });
     fireEvent.change(screen.getByLabelText("Lọc cột Phòng ngủ"), { target: { value: "2" } });
-    expect(last(spy).filters).toEqual({ "Unit.bedroomsTotal": "2" });
+    expect(last(spy).filters).toEqual({ "Listing.unitNumber": "S1.03", "Unit.bedroomsTotal": "2" });
     cells += 1;
 
     openMenu(headerButton("Giá chào"));
@@ -248,11 +265,12 @@ describe("reports each change", () => {
     expect(last(spy).hidden).toEqual(["Listing.subdivisionName"]);
     cells += 1;
 
-    expect(cells).toBe(5);
+    expect(cells).toBe(4);
+    for (const [view] of spy.mock.calls)
+      expect(() => checkFourKeys(view as GridView)).not.toThrow();
     expect(
       sameView(last(spy), {
-        query: "S1.03",
-        filters: { "Unit.bedroomsTotal": "2" },
+        filters: { "Listing.unitNumber": "S1.03", "Unit.bedroomsTotal": "2" },
         sort: [{ field: "Listing.listPrice", direction: "desc" }],
         grouped: true,
         hidden: ["Listing.subdivisionName"],
@@ -262,7 +280,7 @@ describe("reports each change", () => {
 });
 
 describe("sameView", () => {
-  const base: GridView = VIEWS["all five"]!;
+  const base: GridView = VIEWS["all four"]!;
   const PAIRS: [string, GridView, GridView, boolean][] = [
     ["itself", base, base, true],
     [
@@ -270,7 +288,11 @@ describe("sameView", () => {
       base,
       {
         ...base,
-        filters: { "Listing.buildingName": "S1.0", "Listing.standardStatus": ["Active"] },
+        filters: {
+          "Listing.buildingName": "S1.0",
+          "Listing.standardStatus": ["Active"],
+          "Listing.unitNumber": CODE_START,
+        },
       },
       true,
     ],
@@ -292,7 +314,12 @@ describe("sameView", () => {
       { ...base, hidden: [...base.hidden].reverse() },
       true,
     ],
-    ["another search text", base, { ...base, query: "S2" }, false],
+    [
+      "another text in a column filter",
+      base,
+      { ...base, filters: { ...base.filters, "Listing.unitNumber": "S2" } },
+      false,
+    ],
     ["another filter", base, { ...base, filters: { "Listing.standardStatus": ["Active"] } }, false],
     [
       "another sort direction",
@@ -318,12 +345,44 @@ describe("sameView", () => {
     expect(PAIRS).toHaveLength(10);
   });
 
-  it("the check fails on a sameView blind to the search text", () => {
-    const blind = (a: GridView, b: GridView) => sameView({ ...a, query: "" }, { ...b, query: "" });
+  it("the check fails on a sameView blind to a column filter's text", () => {
+    const blind = (a: GridView, b: GridView) =>
+      sameView({ ...a, filters: {} }, { ...b, filters: {} });
+    const other = { ...base, filters: { ...base.filters, "Listing.unitNumber": "S2" } };
     const check = (eq: (a: GridView, b: GridView) => boolean) => {
-      if (eq(base, { ...base, query: "S2" })) throw new Error("sameView blind to query");
+      if (eq(base, other)) throw new Error("sameView blind to filter text");
     };
     expect(() => check(sameView)).not.toThrow();
-    expect(() => check(blind)).toThrow("sameView blind to query");
+    expect(() => check(blind)).toThrow("sameView blind to filter text");
+  });
+});
+
+/** The four things of a view (row 2c), sorted: a search text is not one of them (row 2e). */
+const VIEW_KEYS = ["filters", "grouped", "hidden", "sort"];
+
+function checkFourKeys(view: object): void {
+  const keys = Object.keys(view).sort();
+  if (keys.includes("query")) throw new Error("view carries search text");
+  if (JSON.stringify(keys) !== JSON.stringify(VIEW_KEYS))
+    throw new Error(`view keys: ${keys.join()}`);
+}
+
+describe("a view holds four things, never a search text (row 2e)", () => {
+  it("the empty view has exactly the four keys", () => {
+    expect(Object.keys(EMPTY_VIEW).sort()).toEqual(VIEW_KEYS);
+    expect(VIEW_KEYS).toHaveLength(4);
+  });
+
+  it("the inventory's save body and opened view carry no search text, even from old data", () => {
+    const old = { ...VIEWS["all four"]!, query: "0905" } as GridView;
+    const body = JSON.parse(JSON.stringify({ view: storedView(old) })) as { view: object };
+    expect(() => checkFourKeys(body.view)).not.toThrow();
+    const opened = gridView({ ...storedView(VIEWS["all four"]!), query: "0905" } as never);
+    expect(() => checkFourKeys(opened)).not.toThrow();
+    expect(sameView(opened, VIEWS["all four"]!)).toBe(true);
+  });
+
+  it("the check fails on a view that carries a search text again", () => {
+    expect(() => checkFourKeys({ ...EMPTY_VIEW, query: "S1" })).toThrow("view carries search text");
   });
 });
