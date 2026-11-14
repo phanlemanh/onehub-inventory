@@ -1,0 +1,41 @@
+{
+  "feature_plain": "Kho được một lệnh kiểm thiết kế tự chạy lại luật lint của chính kho và tự ghi sổ linh kiện mà kit nghiệm thu đọc được, thay cho công cụ viết tay.",
+  "will_do": [
+    { "id": "AC-1", "p": "Sẽ để cổng kiểm của kho xanh, với lệnh kiểm thiết kế giữ đúng 18 quyết định và sổ linh kiện khớp mã." },
+    { "id": "AC-2", "p": "Sẽ giữ chín quyết định về màu, chữ, khoảng cách, bo góc, nút và bảng bằng chính luật lint mà sổ quyết định nêu tên, chạy lại mỗi lần kiểm." },
+    { "id": "AC-3", "p": "Sẽ báo đỏ, gọi tên quyết định, khi ai đó tắt một luật lint đang giữ quyết định ấy." },
+    { "id": "AC-4", "p": "Sẽ giữ nguyên mọi dòng cũ của sổ quyết định, chỉ đổi chỗ trỏ của dòng «cấp linh kiện» sang công cụ mới." },
+    { "id": "AC-5", "p": "Sẽ cho người dựng màn biết từng linh kiện nằm ở đâu, cấp nào, thuộc thư viện hay của kho, nhận thuộc tính và biến thể nào." },
+    { "id": "AC-6", "p": "Sẽ báo đỏ khi có linh kiện mới mà sổ linh kiện chưa ghi lại." },
+    { "id": "AC-7", "p": "Sẽ ghi lại sổ linh kiện bằng công cụ mới mỗi lần sinh lại, và bỏ hẳn công cụ cũ để một tệp chỉ có một bên ghi." },
+    { "id": "AC-8", "p": "Sẽ để cổng chứng minh màn đọc sổ mới mà không lỗi, trên chính kho." },
+    { "id": "AC-10", "p": "Sẽ ghi đúng ba lời đáp của chủ kho (ứng dụng, mức AA, màu #0246ff) và giữ độ tương phản của màu chính ở cả chế độ sáng lẫn tối." },
+    { "id": "AC-11", "p": "Sẽ giữ sổ màu của kho khớp stylesheet, màu chính là #0246ff." }
+  ],
+  "scope_plain": "Những việc dưới đây cố ý để ngoài lần này:",
+  "wont_do": [
+    { "id": "OOS-1", "p": "KHÔNG sửa hai luật lint còn để lọt (tên lớp ghép bằng dấu cộng; ngoại lệ lint không lý do) — việc của chủ kho ở một vòng khác." },
+    { "id": "OOS-2", "p": "KHÔNG khai hai sổ với kit nghiệm thu trong lần này — việc đó nằm ở PR #59, gộp sau." },
+    { "id": "OOS-3", "p": "KHÔNG chốt vùng dữ liệu lưới (DataRegion) là khuôn hay linh kiện thường." },
+    { "id": "OOS-4", "p": "KHÔNG chấm phép so sổ mới với sổ cũ ở đây — phép so đó chạy ở kho design-assembly." },
+    { "id": "OOS-5", "p": "KHÔNG kiểm bản sửa thoát ký tự ở kho này — bài kiểm của nó ở kho design-assembly, quét mã của PR đo độc lập." },
+    { "id": "OOS-6", "p": "KHÔNG đổi giao diện, mã sản phẩm, mô hình dữ liệu hay luật sản phẩm." }
+  ],
+  "coverage_plain": [
+    { "i": 0, "p": "Phủ theo sáu bước nhánh đã làm, mỗi bước có tiêu chí hoặc lý do để ngoài." },
+    { "i": 2, "p": "Bước 1, nhận lệnh kiểm thiết kế: phủ bởi AC-1 (cổng xanh), AC-2 (quyết định được giữ), AC-11 (sổ màu khớp)." },
+    { "i": 3, "p": "Bước 2, ba lời đáp của chủ kho: phủ bởi AC-10 (lời đáp và tương phản); số phiên bản sổ màn nằm trong AC-2." },
+    { "i": 4, "p": "Bước 3, chạy lại luật lint: phủ bởi AC-2 (chín quyết định) và AC-3 (tắt luật thì đỏ)." },
+    { "i": 5, "p": "Bước 4, sổ linh kiện mới: phủ bởi AC-4 đến AC-9 (sổ cũ giữ nguyên, sổ mới đúng, khớp mã, sinh lại, mọi bên đọc)." },
+    { "i": 6, "p": "Bước 5, thoát đủ ký tự: để ngoài, vì mã và bài kiểm ở kho design-assembly." },
+    { "i": 7, "p": "Bước 6, hai lần gộp nhánh chính: phủ bởi AC-1 (cổng xanh trên cây đã gộp) và AC-6 (sổ khớp mã đã gộp)." },
+    { "i": 8, "p": "Mọi chỗ đọc sổ linh kiện đã kê trước, mỗi chỗ một tiêu chí: lệnh sinh lại, lệnh kiểm thiết kế, bài kiểm sổ, cổng chứng minh màn, skill dựng màn." }
+  ],
+  "gap_probe_plain": [
+    { "i": 0, "p": "Danh sách tiêu chí ban đầu sót ba lời đáp của chủ kho, sổ màu và bản sửa thoát ký tự. Đã thêm hai tiêu chí, bảng phủ sáu bước, và việc chọn cách phủ thành câu hỏi cho chủ kho." },
+    { "i": 1, "p": "Chiều đỏ của sổ linh kiện chỉ dựa vào lời tự báo của lệnh kiểm. Đã đo thẳng: thêm một linh kiện trên bản dựng tạm thì lệnh kiểm phải đỏ và gọi tên nó." },
+    { "i": 2, "p": "Lý do đặt phép đo mới trong hồ sơ chỉ dựa vào tiền lệ, không quyết được. Đã viết lại lý do đúng, và nói rõ sau khi gộp thì việc giữ nguyên sổ cũ không còn ai kiểm." },
+    { "i": 3, "p": "Tiêu chí về quyết định được giữ chỉ dựa vào lệnh xanh, ngưỡng lỏng một dòng. Đã đổi thành danh sách chính xác 18 quyết định, đọc trạng thái từng dòng." },
+    { "i": 4, "p": "Chưa kê hết mọi chỗ đọc sổ linh kiện. Đã kê năm chỗ và chạy cổng chứng minh màn trên sổ thật; phần thử với sổ cũ bị bác vì cổng ấy chỉ đọc tên và tệp, sổ cũ cũng có." }
+  ]
+}

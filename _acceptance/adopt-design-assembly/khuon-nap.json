@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "ghim": {
+    "dang-nhap": "f38f955e60cb5db33bb5a3ed743f88d5565546d4",
+    "luoi": "61b989cc617777208e93a530d36a47482b841455"
+  },
+  "tep": {
+    "dang-nhap": "design/patterns/dang-nhap.md",
+    "luoi": "design/patterns/luoi.md"
+  }
+}

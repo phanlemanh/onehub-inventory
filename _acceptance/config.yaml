@@ -15,6 +15,7 @@ executors:
     vai_dang_nhap_unit: "npx vitest run src/modules/identity/with-company.test.ts tests/vai-dang-nhap-nguon.test.ts --coverage.enabled=false --reporter=verbose"   # ung-dung-noi-bang-vai-khong-chu (row 7c): door checks its login role, source scan of test connection strings, .env.example add-only
     vai_man_so: "npx vitest run tests/vai-man-so-man.test.ts --coverage.enabled=false --reporter=verbose"   # kiem-vai-theo-man (row 9b): screen register entry rule, pair set, shared sign-in door, sidebar vs register
     vai_man_nut: "npx vitest run tests/vai-man-nut-sinh.test.ts tests/vai-man-dau-nut.test.tsx tests/bo-nut-vai-man.test.ts src/modules/identity/permitted-action.test.tsx --coverage.enabled=false --reporter=verbose"   # kiem-vai-theo-man (row 9b): role × screen × button table from the register and module UI, every screen and the App Shell frame
+    component_register: "npx vitest run tests/design-registry.test.ts --coverage.enabled=false --reporter=verbose"   # adopt-design-assembly: the component register in the contract's shape
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
@@ -67,6 +68,15 @@ executors:
     vai_man_pha_thu: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} node tests/e2e-db/pha-thu-vai-man.mjs"   # kiem-vai-theo-man (row 9b): three breaks on a copy of the tree, each must turn its pair red with the pinned message
     doi_bai_kiem: "node _acceptance/bo-o-tim-cua-vung/rang/doi-bai-kiem.mjs --root . --self-test"   # bo-o-tim-cua-vung (row 2e): every removed test line about the region search box has a row in the old → new table
     ghim_ngan_e2e: "npx playwright test tests/e2e/ghim-ngan.spec.ts"   # ngan-chi-tiet-ghim-thanh-cot (row 3a): pin the record panel as a column, four widths, axe light and dark
+    lint_rerun: "node _acceptance/adopt-design-assembly/rang/lint-rerun.mjs --root . && node tools/design-assembly/check.mjs"   # adopt-design-assembly: nine ledger rows whose lint rule the design-assembly tool re-runs
+    lint_rule_off: "node _acceptance/adopt-design-assembly/rang/lint-rule-off.mjs --root ."   # adopt-design-assembly: on a linked copy, the tool is green with the repository's lint and red with no-raw-table off
+    ledger_rows_kept: "node _acceptance/adopt-design-assembly/rang/ledger-rows-kept.mjs --root ."   # adopt-design-assembly: every ledger row of 1226ec5 kept byte for byte, but component-level's pointer
+    register_matches_source: "node tools/design-assembly/components.mjs && node _acceptance/adopt-design-assembly/rang/new-component.mjs --root ."   # adopt-design-assembly: the register is what the source gives; on a linked copy a new component turns the tool red
+    proof_gate_real: "python3 tools/proof_gate/check.py --root ."   # adopt-design-assembly: the screen proof gate on the repository at HEAD, reading the real register
+    owner_answers: "node _acceptance/adopt-design-assembly/rang/owner-answers.mjs --root . && node tools/design-assembly/check.mjs"   # adopt-design-assembly: the owner's three answers as recorded, and the contrast they let the tool hold
+    tokens_primary: "node tools/design-assembly/tokens.mjs && node _acceptance/adopt-design-assembly/rang/tokens-primary.mjs --root ."   # adopt-design-assembly: the tokens file is what the stylesheet gives, primary #0246ff
+    register_regenerated: "bash _acceptance/adopt-design-assembly/rang/register-regenerated.sh ."   # adopt-design-assembly: old register tool gone, make gen writes the register with the design-assembly tool, identical to commit
+    measures_two_way: "node --test _acceptance/adopt-design-assembly/rang/measures.test.mjs"   # adopt-design-assembly: each new measure green on a sound copy, red with its pinned message on a broken one
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists
