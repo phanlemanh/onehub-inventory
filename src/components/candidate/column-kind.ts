@@ -136,8 +136,9 @@ export function typedColumn(spec: TypedColumnSpec): TypedColumn {
 }
 
 /**
- * A company's own column (row 7e): the field key is `custom.<code>`, the header is the company's own name, and the
- * kind comes from the field (company-config's columnKindOf). Align and width follow the same rules as any column.
+ * A column the generated ontology table does not have (row 7e): a company's own field, or a value a screen works out
+ * from a record. The field key is `custom.<code>` and the screen names the kind (for a company's field,
+ * company-config's columnKindOf). Align and width follow the same rules as any column.
  */
 export function customColumn(spec: {
   code: string;

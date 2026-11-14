@@ -17,8 +17,8 @@ export function sampleInventoryListings() {
 }
 
 /**
- * Values of the sample company's own fields (row 7e), by field code: a single choice «Hướng view» on every listing and
- * a text «Ghi chú» on every fourth. They show only for a company that has these fields in use. Kept apart from the
+ * Values of the sample company's own fields (row 7e), by field code: a single choice field (view) on every listing and a
+ * text field (note) on every fourth. They show only for a company that has these fields in use. Kept apart from the
  * pinned sample of row 1, so its digest does not move.
  */
 export const SAMPLE_CUSTOM_OPTIONS = { huong_view: ["Hồ", "Phố", "Công viên"] } as const;

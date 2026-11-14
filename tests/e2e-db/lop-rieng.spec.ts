@@ -1,8 +1,12 @@
 // The company layer in the browser (row 7e, lop-rieng-cua-san) on this lane's Postgres:
 //   DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts tests/e2e-db/lop-rieng.spec.ts
 // People sign in through the shared role door of row 9b (dang-nhap-vai.ts); this file never signs in by itself.
+//   add and edit on screen      — E19: the add and edit forms, four refusals under their field, kind locked, retire
+//                                 keeps the row.
 //   company words on inventory — E9: company A's label and own fields on the inventory, a retired field absent,
 //                                 company B sees the eight standard headers.
+//   review screen               — E12: the button set of every part for four roles, edit, retire, match, refusal.
+// The cases run in this order on one company and build on each other; each also stands alone when run with -g.
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -10,9 +14,12 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 import pg from "pg";
 
 import { label } from "../../src/modules/company-config";
+import type { Role } from "../../src/generated/ontology";
+import { sampleCatalog } from "../../src/modules/catalog";
+import { catalogLoadStatements } from "../../src/modules/catalog/load-sql";
 import { SAMPLE_LISTINGS_PER_SUBDIVISION } from "../../src/modules/listings";
 
-import { makeSampleCompany, rolePerson, signInWithCode } from "./dang-nhap-vai";
+import { makeSampleCompany, rolePerson, ROLES, signInWithCode } from "./dang-nhap-vai";
 
 const RUN = process.env["E2E_DB_RUN"] ?? `${process.pid}`;
 const DB_PORT = process.env["DB_PORT"] ?? "5563";
@@ -48,6 +55,19 @@ async function makeOtherCompany(): Promise<void> {
     await db.end();
   }
 }
+
+/** One query as the database owner: reads back what the screen wrote, and takes a role away mid-way. */
+async function owner<T>(text: string, values: unknown[] = []): Promise<T[]> {
+  const db = new pg.Client({ connectionString: OWNER_URL });
+  await db.connect();
+  try {
+    return (await db.query(text, values)).rows as T[];
+  } finally {
+    await db.end();
+  }
+}
+
+const COMPANY_A = "select id from companies where name = '[Sàn mẫu thử vai]'";
 
 const stateOf = (who: string) => join(tmpdir(), `onehub-e2e-db-lop-rieng-${who}-${RUN}.json`);
 
@@ -88,6 +108,44 @@ async function headers(page: Page): Promise<string[]> {
   );
 }
 
+type Api = Page["request"];
+interface Layer {
+  labels: { id: string; concept: string; label: string }[];
+  fields: { code: string; name: string; kind: string; options: string[] }[];
+  aliases: { id: string; field: string; raw: string; value: string }[];
+  pendingUnits: { id: string; rawCode: string }[];
+  templates: { id: string; name: string }[];
+}
+
+const layerOf = async (api: Api) =>
+  (await (await api.get("/api/v1/company-layer")).json()) as Layer;
+
+async function post(api: Api, part: string, data: unknown): Promise<string> {
+  const res = await api.post(`/api/v1/company-layer/${part}`, { data });
+  expect(res.status(), `${part} ${await res.text()}`).toBe(201);
+  return ((await res.json()) as { id: string }).id;
+}
+
+/** Opens one part of the company layer screen and waits for its rows. */
+async function openPart(page: Page, part: string) {
+  await page.goto(part === "nhan" ? "/tuy-chinh-san" : `/tuy-chinh-san?phan=${part}`);
+  await expect(page.locator(`[data-part="${part}"][data-state="ready"]`)).toBeVisible();
+}
+
+/** Picks an option of the store's select by the field's label. */
+async function pick(page: Page, scope: ReturnType<Page["locator"]>, field: string, option: string) {
+  await scope.getByLabel(field, { exact: true }).click();
+  await page.getByRole("option", { name: option, exact: true }).click();
+}
+
+const dialogOf = (page: Page, slot: string) => page.locator(`[data-slot="${slot}"]`);
+
+/** The refusal shown under one field of an open form. */
+const errorUnder = (dialog: ReturnType<Page["locator"]>, field: string) =>
+  dialog.locator(`[data-field="${field}"] [data-slot="field-error"]`);
+
+test.describe.configure({ mode: "serial" });
+
 test.describe("lop rieng tren bang hang", () => {
   // One width: the data case runs at 1440; beforeAll would otherwise make the companies once per width.
   test.skip(() => test.info().project.name !== "1440", "one width: the data case runs at 1440");
@@ -96,27 +154,200 @@ test.describe("lop rieng tren bang hang", () => {
     if (info.project.name !== "1440") return;
     await makeSampleCompany();
     await makeOtherCompany();
+    // The shared catalog the pending unit matches against: this run's database starts without one.
+    const db = new pg.Client({ connectionString: OWNER_URL });
+    await db.connect();
+    try {
+      for (const st of catalogLoadStatements(sampleCatalog())) await db.query(st.text, st.values);
+    } finally {
+      await db.end();
+    }
     await keepSession(browser, rolePerson("CompanyAdmin").email, stateOf("a"));
     await keepSession(browser, OTHER.email, stateOf("b"));
+    for (const role of ROLES) await keepSession(browser, rolePerson(role).email, stateOf(role));
+  });
+
+  test("add and edit on screen", async ({ browser }) => {
+    const ctx = await browser.newContext({ storageState: stateOf("ListAgent") });
+    const page = await ctx.newPage();
+    const api = page.request;
+    const company = (await owner<{ id: string }>(COMPANY_A))[0]!.id;
+    const liveFields = async () =>
+      (
+        await owner<{ n: number }>(
+          "select count(*)::int as n from company_fields where company_id = $1 and retired_at is null",
+          [company],
+        )
+      )[0]!.n;
+
+    // Add a single choice field, a text field, a label and a spelling through the screen's forms.
+    await openPart(page, "truong");
+    const field = dialogOf(page, "field-dialog");
+    const addField = async (name: string, kind: string, options?: string) => {
+      await page
+        .getByRole("button", { name: label("AddCustomField") })
+        .first()
+        .click();
+      await field.getByLabel("Tên trường").fill(name);
+      await pick(page, field, "Kiểu", kind);
+      if (options !== undefined) await field.getByLabel(/^Lựa chọn/).fill(options);
+      await field.getByRole("button", { name: "Thêm", exact: true }).click();
+    };
+    await addField("Hướng view", "Chọn một", "Hồ\nPhố\nCông viên\nBiển");
+    await expect(field).toBeHidden();
+    await addField("Ghi chú", "Chữ");
+    await expect(field).toBeHidden();
+    await expect(page.locator("tbody")).toContainText("Hướng view");
+    const made = await owner<{ code: string; kind: string }>(
+      "select code, kind from company_fields where company_id = $1 and name = 'Hướng view'",
+      [company],
+    );
+    expect(made).toEqual([{ code: "huong_view", kind: "single_select" }]);
+
+    await openPart(page, "nhan");
+    const labelForm = dialogOf(page, "label-dialog");
+    await page
+      .getByRole("button", { name: label("AddCompanyLabel") })
+      .first()
+      .click();
+    await pick(page, labelForm, "Khái niệm chuẩn", label("Building"));
+    await labelForm.getByLabel("Chữ của sàn").fill("Block");
+    await labelForm.getByRole("button", { name: "Thêm", exact: true }).click();
+    await expect(labelForm).toBeHidden();
+
+    await openPart(page, "tu-dien");
+    const alias = dialogOf(page, "alias-dialog");
+    await page
+      .getByRole("button", { name: label("AddValueAlias") })
+      .first()
+      .click();
+    await pick(page, alias, "Trường", label("DirectionFaces"));
+    await alias.getByLabel("Chữ sàn viết").fill("ĐN");
+    await pick(page, alias, "Giá trị chuẩn", "Đông Nam");
+    await alias.getByRole("button", { name: "Thêm", exact: true }).click();
+    await expect(alias).toBeHidden();
+    expect((await layerOf(api)).labels.map((l) => [l.concept, l.label])).toEqual([
+      ["Building", "Block"],
+    ]);
+    expect((await layerOf(api)).aliases.map((a) => [a.field, a.raw, a.value])).toEqual([
+      ["Unit.directionFaces", "ĐN", "Đông Nam"],
+    ]);
+
+    // Four refusals, written before the code: each shows under its own field, what was typed stays, nothing is added.
+    const REFUSALS = ["name-taken", "options-count", "field-limit", "value-not-in-set"] as const;
+    expect(REFUSALS).toHaveLength(4);
+    const fieldsBefore = await liveFields();
+    await openPart(page, "truong");
+    await addField("ghi chu", "Chữ");
+    await expect(errorUnder(field, "name")).toBeVisible();
+    await expect(field.getByLabel("Tên trường")).toHaveValue("ghi chu");
+    await page.keyboard.press("Escape");
+    await addField(
+      "Nhiều lựa chọn",
+      "Chọn một",
+      Array.from({ length: 31 }, (_, i) => `L${i + 1}`).join("\n"),
+    );
+    await expect(errorUnder(field, "options")).toBeVisible();
+    await expect(field.getByLabel("Tên trường")).toHaveValue("Nhiều lựa chọn");
+    await page.keyboard.press("Escape");
+    const filler: string[] = [];
+    for (let i = 1; i <= 20 - fieldsBefore; i += 1)
+      filler.push(await post(api, "fields", { name: `Tạm ${i}`, kind: "text" }));
+    await openPart(page, "truong");
+    await addField("Thứ hai mốt", "Chữ");
+    await expect(field.locator('[data-slot="form-error"]')).toContainText("20 cột riêng");
+    await expect(field.getByLabel("Tên trường")).toHaveValue("Thứ hai mốt");
+    await page.keyboard.press("Escape");
+    for (const code of filler)
+      expect((await api.post(`/api/v1/company-layer/fields/${code}/retire`)).status()).toBe(200);
+    expect(await liveFields()).toBe(fieldsBefore);
+    await openPart(page, "tu-dien");
+    await page
+      .getByRole("button", { name: label("AddValueAlias") })
+      .first()
+      .click();
+    await pick(page, alias, "Trường", "Hướng view");
+    await alias.getByLabel("Chữ sàn viết").fill("bien");
+    await pick(page, alias, "Giá trị chuẩn", "Biển");
+    // Someone takes «Biển» out of the field while the form is open.
+    expect(
+      (
+        await api.patch("/api/v1/company-layer/fields/huong_view", {
+          data: { options: ["Hồ", "Phố", "Công viên"] },
+        })
+      ).status(),
+    ).toBe(200);
+    await alias.getByRole("button", { name: "Thêm", exact: true }).click();
+    await expect(errorUnder(alias, "value")).toBeVisible();
+    await expect(alias.getByLabel("Chữ sàn viết")).toHaveValue("bien");
+    await page.keyboard.press("Escape");
+    expect((await layerOf(api)).aliases).toHaveLength(1);
+    expect(await liveFields()).toBe(fieldsBefore);
+
+    // Edit: the kind is locked; the name and the options save.
+    await openPart(page, "truong");
+    const edit = async () => {
+      await page.locator('[data-row-actions-for="huong_view"] [data-slot="row-actions"]').click();
+      await page.getByRole("menuitem", { name: label("Edit") }).click();
+    };
+    await edit();
+    if (!(await field.getByLabel("Kiểu", { exact: true }).isDisabled()))
+      throw new Error("field kind changed on edit");
+    await field.getByLabel("Tên trường").fill("Hướng nhìn");
+    await field.getByLabel(/^Lựa chọn/).fill("Hồ\nPhố\nCông viên\nNội khu");
+    await field.getByRole("button", { name: "Lưu", exact: true }).click();
+    await expect(field).toBeHidden();
+    const edited = (await layerOf(api)).fields.find((f) => f.code === "huong_view")!;
+    expect([edited.name, edited.kind, edited.options]).toEqual([
+      "Hướng nhìn",
+      "single_select",
+      ["Hồ", "Phố", "Công viên", "Nội khu"],
+    ]);
+    expect(
+      (
+        await api.patch("/api/v1/company-layer/fields/huong_view", { data: { kind: "text" } })
+      ).status(),
+    ).toBe(400);
+    await edit();
+    await field.getByLabel("Tên trường").fill("Hướng view");
+    await field.getByRole("button", { name: "Lưu", exact: true }).click();
+    await expect(field).toBeHidden();
+
+    // Retire keeps the row: gone from the screen, still in the table with the time it stopped.
+    const temp = await post(api, "fields", { name: "Cột thử", kind: "boolean" });
+    await openPart(page, "truong");
+    await page.locator(`[data-row-actions-for="${temp}"] [data-slot="row-actions"]`).click();
+    await page.getByRole("menuitem", { name: label("RetireItem") }).click();
+    await page
+      .locator('[data-slot="confirm-change"]')
+      .getByRole("button", { name: new RegExp(`^${label("RetireItem")}`) })
+      .click();
+    await expect(page.locator(`[data-row-actions-for="${temp}"]`)).toHaveCount(0);
+    const kept = await owner<{ retired: boolean }>(
+      "select retired_at is not null as retired from company_fields where company_id = $1 and code = $2",
+      [company, temp],
+    );
+    expect(kept).toEqual([{ retired: true }]);
+    await ctx.close();
   });
 
   test("company words on inventory", async ({ browser }) => {
     const a = await browser.newContext({ storageState: stateOf("a") });
     const pageA = await a.newPage();
     const api = pageA.request;
-    const post = async (part: string, data: unknown) => {
-      const res = await api.post(`/api/v1/company-layer/${part}`, { data });
-      expect(res.status(), `${part} ${await res.text()}`).toBe(201);
-      return ((await res.json()) as { id: string }).id;
-    };
-    await post("labels", { concept: "Building", label: "Block" });
-    await post("fields", {
-      name: "Hướng view",
-      kind: "single_select",
-      options: ["Hồ", "Phố", "Công viên"],
-    });
-    await post("fields", { name: "Ghi chú", kind: "text" });
-    const gone = await post("fields", { name: "Hoa hồng tạm", kind: "number" });
+    // What the screen case made already stays; run alone, this case makes it through the API.
+    const before = await layerOf(api);
+    if (!before.labels.some((l) => l.concept === "Building"))
+      await post(api, "labels", { concept: "Building", label: "Block" });
+    if (!before.fields.some((f) => f.code === "huong_view"))
+      await post(api, "fields", {
+        name: "Hướng view",
+        kind: "single_select",
+        options: ["Hồ", "Phố", "Công viên"],
+      });
+    if (!before.fields.some((f) => f.code === "ghi_chu"))
+      await post(api, "fields", { name: "Ghi chú", kind: "text" });
+    const gone = await post(api, "fields", { name: "Hoa hồng tạm", kind: "number" });
     const retired = await api.post(`/api/v1/company-layer/fields/${gone}/retire`);
     expect(retired.status()).toBe(200);
 
@@ -131,10 +362,7 @@ test.describe("lop rieng tren bang hang", () => {
     const shownRetired = gotA.find((h) => h === "Hoa hồng tạm");
     if (shownRetired) throw new Error(`retired field shown: ${shownRetired}`);
     expect(gotA).toEqual(wantA);
-    const layer = (await (await api.get("/api/v1/company-layer")).json()) as {
-      fields: { code: string; name: string }[];
-    };
-    expect(layer.fields.map((f) => f.code)).toEqual(["huong_view", "ghi_chu"]);
+    expect((await layerOf(api)).fields.map((f) => f.code)).toEqual(["huong_view", "ghi_chu"]);
 
     // The «Hướng view» column filters by its values: every third sample listing looks onto the lake.
     const total = Object.values(SAMPLE_LISTINGS_PER_SUBDIVISION).reduce((s, n) => s + n, 0);
@@ -157,5 +385,137 @@ test.describe("lop rieng tren bang hang", () => {
     await pageB.goto("/inventory");
     expect(await headers(pageB)).toEqual(STANDARD.map((c) => label(c)));
     await b.close();
+  });
+
+  test("review screen", async ({ browser }) => {
+    const admin = await browser.newContext({ storageState: stateOf("CompanyAdmin") });
+    const page = await admin.newPage();
+    const api = page.request;
+    // Rows in every part, so each «…» is there to count.
+    const now = await layerOf(api);
+    if (!now.labels.some((l) => l.concept === "Building"))
+      await post(api, "labels", { concept: "Building", label: "Block" });
+    if (!now.fields.some((f) => f.code === "ghi_chu"))
+      await post(api, "fields", { name: "Ghi chú", kind: "text" });
+    if (!now.aliases.length)
+      await post(api, "aliases", { field: "Unit.directionFaces", raw: "ĐN", value: "Đông Nam" });
+    await post(api, "pending-units", { rawCode: "S1.01-0501" });
+    await post(api, "templates", {
+      name: "Sheet tuần",
+      headers: ["Mã căn", "Giá"],
+      columns: [{ standard: "Listing.unitNumber" }, { skip: true }],
+    });
+
+    // The button table of the row (thao-tac-nhap.yaml), written before the code: 5 parts.
+    const TABLE: Record<string, { head: string[]; row: string[] }> = {
+      nhan: { head: [label("AddCompanyLabel")], row: [label("Edit"), label("RetireItem")] },
+      truong: { head: [label("AddCustomField")], row: [label("Edit"), label("RetireItem")] },
+      "tu-dien": { head: [label("AddValueAlias")], row: [label("Edit"), label("RetireItem")] },
+      "can-cho": { head: [label("MatchPendingUnits")], row: [label("RetireItem")] },
+      mau: { head: [], row: [label("RenameTemplate"), label("RetireItem")] },
+    };
+    expect(Object.keys(TABLE)).toHaveLength(5);
+    const WRITERS: readonly Role[] = ["ListAgent", "TeamLead", "CompanyAdmin"];
+    let cells = 0;
+    for (const role of ROLES) {
+      const ctx = await browser.newContext({ storageState: stateOf(role) });
+      const p = await ctx.newPage();
+      for (const [part, want] of Object.entries(TABLE)) {
+        await openPart(p, part);
+        const writer = WRITERS.includes(role);
+        const head = await p.locator('[data-slot="page-header-action"] button').allInnerTexts();
+        expect(
+          head.map((t) => t.trim()),
+          `${role} ${part}`,
+        ).toEqual(writer ? want.head : []);
+        const more = p.locator('[data-row-actions-for] [data-slot="row-actions"]').first();
+        if (!writer) {
+          await expect(p.locator('[data-row-actions-for] [data-slot="row-actions"]')).toHaveCount(
+            0,
+          );
+        } else {
+          await more.click();
+          const items = (await p.getByRole("menuitem").allInnerTexts()).map((t) => t.trim());
+          expect(items, `${role} ${part}`).toEqual(want.row);
+          expect(
+            items.some((t) => /Xoá/.test(t)),
+            `${role} ${part}`,
+          ).toBe(false);
+          await p.keyboard.press("Escape");
+        }
+        cells += 1;
+      }
+      await ctx.close();
+    }
+    expect(cells).toBe(20);
+
+    // Edit the label «Block» into «Lô»: it stays after a reload and the inventory reads it.
+    await openPart(page, "nhan");
+    const block = (await layerOf(api)).labels.find((l) => l.concept === "Building")!;
+    await page.locator(`[data-row-actions-for="${block.id}"] [data-slot="row-actions"]`).click();
+    await page.getByRole("menuitem", { name: label("Edit") }).click();
+    const labelForm = dialogOf(page, "label-dialog");
+    await labelForm.getByLabel("Chữ của sàn").fill("Lô");
+    await labelForm.getByRole("button", { name: "Lưu", exact: true }).click();
+    await expect(labelForm).toBeHidden();
+    await page.reload();
+    await expect(page.locator("tbody")).toContainText("Lô");
+    await page.goto("/inventory");
+    expect((await headers(page))[1]).toBe("Lô");
+
+    // Retire the field «Ghi chú»: gone from the part and from the inventory.
+    await openPart(page, "truong");
+    await page.locator('[data-row-actions-for="ghi_chu"] [data-slot="row-actions"]').click();
+    await page.getByRole("menuitem", { name: label("RetireItem") }).click();
+    await page
+      .locator('[data-slot="confirm-change"]')
+      .getByRole("button", { name: new RegExp(`^${label("RetireItem")}`) })
+      .click();
+    await expect(page.locator('[data-row-actions-for="ghi_chu"]')).toHaveCount(0);
+    await page.goto("/inventory");
+    expect(await headers(page)).not.toContain("Ghi chú");
+
+    // Match the pending unit with the catalog.
+    await openPart(page, "can-cho");
+    const [answer] = await Promise.all([
+      page.waitForResponse((r) => r.url().endsWith("/pending-units/match")),
+      page
+        .getByRole("button", { name: label("MatchPendingUnits") })
+        .first()
+        .click(),
+    ]);
+    expect([answer.status(), await answer.json()]).toEqual([200, { matched: 1, waiting: 0 }]);
+    await expect(page.getByText("Đã khớp 1 căn, còn 0 căn chờ")).toBeVisible();
+    await expect(page.getByText("Đã khớp 1 căn, còn 0 căn chờ")).toBeVisible();
+    await admin.close();
+
+    // The role is taken away while the form is open: the form says so and offers nothing to send again.
+    const lead = await browser.newContext({ storageState: stateOf("TeamLead") });
+    const lp = await lead.newPage();
+    await openPart(lp, "nhan");
+    await lp
+      .getByRole("button", { name: label("AddCompanyLabel") })
+      .first()
+      .click();
+    const form = dialogOf(lp, "label-dialog");
+    await pick(lp, form, "Khái niệm chuẩn", label("Unit"));
+    await form.getByLabel("Chữ của sàn").fill("Mã căn sàn");
+    const email = rolePerson("TeamLead").email;
+    const setRoles = (roles: Role[]) =>
+      owner(
+        `update company_members set roles = $2 where user_id = (select id from identity.users where email = $1)`,
+        [email, roles],
+      );
+    await setRoles(["BuyerAgent"]);
+    try {
+      await form.getByRole("button", { name: "Thêm", exact: true }).click();
+      await expect(form.locator('[data-slot="form-error"]')).toContainText(
+        "Không đủ quyền làm việc này",
+      );
+      await expect(form.getByRole("button", { name: "Thêm", exact: true })).toHaveCount(0);
+    } finally {
+      await setRoles(["TeamLead"]);
+    }
+    await lead.close();
   });
 });

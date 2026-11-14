@@ -55,6 +55,7 @@ export const LABELS = {
   ClosePrice: {"pref": "Giá chốt"},
   CloseDate: {"pref": "Ngày bán", "lease": "Ngày cho thuê"},
   WithdrawnReason: {"pref": "Lý do ngừng"},
+  DirectionFaces: {"pref": "Hướng"},
   WithdrawnSoldElsewhere: {"pref": "Chủ bán nơi khác", "lease": "Cho thuê nơi khác"},
   WithdrawnOwnerChangedMind: {"pref": "Chủ đổi ý"},
   WithdrawnUnreachable: {"pref": "Mất liên lạc"},

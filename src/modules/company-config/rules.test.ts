@@ -50,7 +50,7 @@ describe("a field draft (E2, AC-11)", () => {
       ] as const
     ).map((c) => label(c)),
   };
-  const ok = { name: "Hướng view", kind: "single_select" as const, options: ["Biển", "Hồ"] };
+  const ok = { name: "View", kind: "single_select" as const, options: ["Biển", "Hồ"] };
 
   it("takes a good draft and both option bounds", () => {
     expect(checkFieldDraft(ok, existing)).toEqual([]);

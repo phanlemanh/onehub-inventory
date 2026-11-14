@@ -76,17 +76,16 @@ describe("so-man-du-cua-vao", () => {
 
 describe("tap-cap-bang-tich", () => {
   // Written before the code: the built staff screens and the four roles.
-  const SCREENS = ["today", "inventory", "sent", "sign-in", "members"];
+  const SCREENS = ["today", "inventory", "sent", "sign-in", "members", "tuy-chinh-san"];
   const ROLES = ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"];
 
-  it("20 pairs, and every other screen of the register with its reason", () => {
+  it("24 pairs, and every other screen of the register with its reason", () => {
     const { pairs: all, outside } = pairs(ROOT);
     const got = all.map((p) => `${p.screen}×${p.role}`).sort();
     const want = SCREENS.flatMap((s) => ROLES.map((r) => `${s}×${r}`)).sort();
     expect(got).toEqual(want);
     expect(outside).toEqual({
       contacts: "planned",
-      "tuy-chinh-san": "planned",
       proto: "dev",
       "proto-bo-nut": "dev",
     });
@@ -110,10 +109,10 @@ describe("tap-cap-bang-tich", () => {
       "export default function Page() {\n  return null;\n}\n",
     );
     const { pairs: all } = pairs(dir);
-    expect(all).toHaveLength(24);
+    expect(all).toHaveLength(28);
     expect(all.filter((p) => p.screen === "thu-them").map((p) => p.role)).toEqual(ROLES);
-    // Đối chứng: the same reader on the real register gives 20.
-    expect(pairs(ROOT).pairs).toHaveLength(20);
+    // Đối chứng: the same reader on the real register gives 24.
+    expect(pairs(ROOT).pairs).toHaveLength(24);
   });
 });
 
@@ -168,7 +167,7 @@ describe("thanh-ben-khop-so-man", () => {
   it("every sidebar entry gates its screen with the register's action", () => {
     const t = buttonTable(ROOT);
     const linked = NAV.filter((i) => t.screens.some((s) => s.route === i.href)).map((i) => i.href);
-    expect(linked.sort()).toEqual(["/", "/inventory", "/members", "/sent"]);
+    expect(linked.sort()).toEqual(["/", "/inventory", "/members", "/sent", "/tuy-chinh-san"]);
     expect(navProblems(NAV, t.screens)).toEqual([]);
   });
 

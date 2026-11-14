@@ -309,6 +309,11 @@ concepts:
     own: true
     pref: Lý do ngừng
     en: Withdrawn reason
+  DirectionFaces:
+    kind: field
+    reso: DirectionFaces
+    pref: Hướng
+    en: Direction faces
   WithdrawnSoldElsewhere:
     kind: field
     own: true
