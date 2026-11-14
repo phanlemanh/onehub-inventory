@@ -391,7 +391,7 @@ test.describe("lop rieng tren bang hang", () => {
     // The «Hướng view» column filters by its values: every third sample listing looks onto the lake.
     const total = Object.values(SAMPLE_LISTINGS_PER_SUBDIVISION).reduce((s, n) => s + n, 0);
     const lake = Math.ceil(total / 3);
-    await region(pageA).getByRole("button", { name: /^Lọc/ }).first().click();
+    // The filter row under the headers is always shown (row 2e): no «Lọc» button to open it.
     const box = region(pageA).locator(
       'th[data-col-id="custom.huong_view"] [data-filter-mode="values"] button',
     );
