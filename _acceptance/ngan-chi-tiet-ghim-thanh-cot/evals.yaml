@@ -91,10 +91,10 @@ evals:
       - "Use the dev server at the URL given (lane D, port 3483); if it does not answer, start it from the repo root with PORT=3483 npm run dev (never port 3470, never while a suite command is running), note its PID and stop only that PID when done"
       - "Navigate {url}/inventory at 1440x900, light; click the unit code of the first row; click the button named 'Ghim thành cột' → screenshot evidence/ghim-1440-sang.png"
       - "Same at 1440x900 dark → evidence/ghim-1440-toi.png"
-      - "At 1024x768 the App Shell's second column must be folded first (with it open the data region has no room and the pin button is hidden by design, ruling D-1411-5): set the cookie app_shell_cot2=0 for {url} (or press the second column's fold button), reload {url}/inventory, open the first row, click 'Ghim thành cột' → light evidence/ghim-1024-sang.png, dark evidence/ghim-1024-toi.png"
+      - "At 1024x768 the App Shell's second column must be folded first (with it open the data region has no room and the pin button is hidden by design, ruling D-1411-5): set the cookie app_shell_cot2=0 for {url} (or press the second column's fold button), reload {url}/inventory, open the first row, click 'Ghim thành cột', then read document.querySelector('[data-slot=data-region]').getBoundingClientRect().width and record it → light evidence/ghim-1024-sang.png, dark evidence/ghim-1024-toi.png"
       - "At 1024x768 with the cookie app_shell_cot2=1 (second column open), open the first row → evidence/ghim-1024-cot-hai-mo.png"
       - "Navigate {url}/inventory at 360x800 light, open the first row → evidence/ho-so-360-sang.png"
-    expected: "Ảnh 1440 và 1024: hồ sơ là cột liền mép phải dưới thanh trên, có vạch chia mảnh với tay cầm ở mép trái cột, bảng bên trái không bị che, nút Ghim (đang bấm) ở dòng hai đầu hồ sơ trước Trước, Sau, Đóng; ảnh 1024 cột thứ hai mở: hồ sơ nổi, KHÔNG có nút Ghim (vùng dữ liệu không đủ chỗ, D-1411-5); ảnh 360: hồ sơ toàn màn không có nút Ghim"
+    expected: "Ảnh 1440 và 1024: hồ sơ là cột liền mép phải dưới thanh trên, có vạch chia mảnh với tay cầm ở mép trái cột, bảng bên trái không bị che, nút Ghim (đang bấm) ở dòng hai đầu hồ sơ trước Trước, Sau, Đóng; ở 1024 cột thứ hai gập, bề rộng vùng dữ liệu đo được khi ghim ≥ 480 px; ảnh 1024 cột thứ hai mở: hồ sơ nổi, KHÔNG có nút Ghim (vùng dữ liệu không đủ chỗ, D-1411-5); ảnh 360: hồ sơ toàn màn không có nút Ghim"
     evidence_required: [screenshot, observed]
 
   - id: E12
