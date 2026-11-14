@@ -121,3 +121,10 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   Đề xuất: known-limits
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
+
+- **Máy chậm: lưới vẽ lại một nhịp sau khi đóng ô ⌘K, hàng ô lọc dịch 3 điểm ảnh, cú bấm ngay sau đó trượt khỏi ô lọc (phán quyết G K-1411-14)**
+  Người dùng thấy gì: Trên máy chậm, đóng ô ⌘K rồi bấm ngay vào ô lọc cột Căn thì đôi khi tiêu điểm rơi vào vùng lưới, phải bấm lại một lần; gõ «/» lúc ấy mở lại ô ⌘K. Tái hiện ở Chromium Linux với CPU chậm 6 lần, có cả trên mã trước bản sửa bề rộng cột.
+  Căn cứ: Không mất dữ liệu, bấm lại là được; chỉ gặp trên máy chậm trong nửa giây sau khi đóng ô ⌘K. Bài ô ⌘K nay bấm tới khi ô lọc có tiêu điểm rồi mới gõ «/», khẳng định «/» ở lại trong ô giữ nguyên.
+  file: `tests/e2e/loi-vao-ho-so.spec.ts`
+  severity: low
+  Đề xuất: known-limits
