@@ -179,4 +179,4 @@ Round 3: make test, make check, npm run build và make e2e (988 test) đều xan
 
 ### Re-pin lần 1 — 2026-11-14, do gộp nhánh chính sau 1s (PR #48) trước khi gộp PR #47
 run_id: repin-20261114T020730Z-96169
-sha: fd194149a38a03f3c31b9ee80e95e01f8c1d3858 · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E10 · diff chạm vật đo ngoài làn máy: E10 — chưa chứng lại, đi vòng S4 delta
+sha: fd194149a38a03f3c31b9ee80e95e01f8c1d3858 · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E10 · diff chạm vật đo ngoài làn máy: E10 — đã chứng lại sau gộp (G-1411-24): chụp lại 14 ảnh E10 trên 1f33c05 bằng một tệp bài tạm (ẩn chỉ báo chế độ chạy thử), bộ chấm giao diện xem riêng E10: PASS — thứ tự đọc đúng ở bốn khổ, ảnh tối đọc được, khổ hẹp có thẻ căn và ba thông số, ảnh Lần 1 có dải lần cũ và «Chưa có» nhạt hơn giá trị thật
