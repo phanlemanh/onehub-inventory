@@ -154,3 +154,5 @@ nhiên, không tra mẫu.
 - **Hỏi-5** Mặc định môi giới 1%, bước 0,1%? Khuyên: có (theo Quỹ hàng). Lối khác: mặc định 0% — sàn chưa đặt thì Về tay
   chỉ trừ thuế và lệ phí.
 - **Hỏi-4** Để dấu định nghĩa lúc tính cho hàng 10? Khuyên: có. Lối khác: dựng bảng dấu ngay.
+- **Hỏi-6** Quản trị sàn thấy kết quả bằng một dòng ví dụ tính sẵn trong phần Thuế phí? Khuyên: có, Bảng hàng cho Quản
+  trị sàn để hàng 10. Lối khác: thêm quyền xem Bảng hàng cho Quản trị sàn ngay ở hàng này.

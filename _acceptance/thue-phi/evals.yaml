@@ -37,7 +37,7 @@ evals:
     executor: test
     cmd: config:executors.test.thue_phi
     paths: [src/modules/company-config/ui/**]
-    expected: "exit 0; ca 'ba-dong-dung-thu-tu', 'theo-luat-khong-o-sua', 'nguon-da-doi' có mặt và ok: ba dòng đúng thứ tự, hai dòng đầu không có ô sửa tỉ lệ, dòng Phí môi giới mang «Đã đổi · [Tên] · 14/11/2026». Chiều đỏ: đổi thứ tự hằng ba khoản ở bản sao → 'ba-dong-dung-thu-tu' đỏ nêu «Lệ phí trước bạ»"
+    expected: "exit 0; ca 'ba-dong-dung-thu-tu', 'theo-luat-khong-o-sua', 'nguon-da-doi', 'vi-du-theo-muc-dang-go' có mặt và ok: ba dòng đúng thứ tự; dòng ví dụ cho 3 tỷ hiện 2,895 tỷ ở mặc định, 2,88 tỷ khi gõ môi giới 2 và tắt Lệ phí trước bạ (chưa Lưu, đếm PUT = 0); hai dòng đầu không có ô sửa tỉ lệ, dòng Phí môi giới mang «Đã đổi · [Tên] · 14/11/2026». Chiều đỏ: đổi thứ tự hằng ba khoản ở bản sao → 'ba-dong-dung-thu-tu' đỏ nêu «Lệ phí trước bạ»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E2-ui
@@ -135,7 +135,7 @@ evals:
     layer: backend-effect
     cmd: config:executors.script.thue_phi_e2e
     paths: [src/modules/company-config/**, src/modules/listings/ui/**, src/app/**, tests/e2e-db/thue-phi.spec.ts]
-    expected: "exit 0; ca 'dat-muc-roi-bang-hang-doi' ở bốn khổ: Quản trị A lưu môi giới 2, tắt Lệ phí trước bạ qua màn; Đầu chủ A mở Bảng hàng thấy 2,88 tỷ ở hàng Bao phí 3 tỷ; Quản trị đổi về 1; Đầu chủ mở lại thấy 2,91 tỷ; Đầu chủ B thấy 2,895 tỷ; ở 1440 bề rộng cuộn ngang của lưới không vượt khung; 'vai-khac-chi-doc' và 'axe-sang-toi' (phần Thuế phí và Bảng hàng, sáng và tối, 0 lỗi) có mặt và ok"
+    expected: "exit 0; ca 'dat-muc-roi-bang-hang-doi' ở bốn khổ: Quản trị A lưu môi giới 2, tắt Lệ phí trước bạ qua màn; Đầu chủ A mở Bảng hàng thấy 2,88 tỷ ở hàng Bao phí 3 tỷ; Quản trị đổi về 1; Đầu chủ mở lại thấy 2,91 tỷ; Đầu chủ B thấy 2,895 tỷ; ở 1440 với cột thứ hai mở, ô Về tay của hàng đầu nằm trọn trong khung nhìn (boundingBox phải ≤ bề rộng vùng cuộn) khi chưa cuộn ngang; 'vai-khac-chi-doc' và 'axe-sang-toi' (phần Thuế phí và Bảng hàng, sáng và tối, 0 lỗi) có mặt và ok"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E6-ui
@@ -147,8 +147,8 @@ evals:
     steps:
       - "With the lane N dev server on port 3485, sign in as the sample ListAgent of a company whose brokerage is 2 with Lệ phí trước bạ off, open the target at 1440 and 1024 wide, light and dark"
       - "Save _acceptance/thue-phi/evidence/E6-<khổ>-<sang|toi>.png; open the Cột menu, turn on Điều kiện phí, save _acceptance/thue-phi/evidence/E6-dieu-kien.png"
-    question: "Cột «Về tay» có đứng ngay sau «Giá chào», đọc như cột tiền, hàng Bao phí 3 tỷ hiện 2,88 tỷ, hàng Không bao phí bằng Giá chào, hàng thiếu thì trống; khi bật, cột Điều kiện phí có hiện «Bao phí» / «Không bao phí»; Bảng hàng ở 1440 có tràn ngang không?"
-    expected: "Mọi khung khớp, không tràn ngang ở 1440"
+    question: "Cột «Về tay» có đứng ngay sau «Giá chào», đọc như cột tiền, hàng Bao phí 3 tỷ hiện 2,88 tỷ, hàng Không bao phí bằng Giá chào, hàng thiếu thì trống; khi bật, cột Điều kiện phí có hiện «Bao phí» / «Không bao phí»; ở 1440 cột Về tay có thấy ngay mà không phải cuộn ngang không?"
+    expected: "Mọi khung khớp, Về tay thấy ngay ở 1440"
     evidence_required: [run_id, screenshot, observed, verdict]
 
   - id: E7
@@ -188,3 +188,19 @@ evals:
     question: "Trang fee-schedule có nói đủ ba khoản, tỉ lệ theo luật, khoảng môi giới, mặc định, ai đặt, ai đọc, và rằng mức không ra trang khách; trang listing có nói Điều kiện phí; log có một dòng cho hàng 19; sổ màn có phần Thuế phí với setFeeSchedule?"
     expected: "Đủ cả bốn tệp, khớp hợp đồng"
     evidence_required: [run_id, verdict, rationale]
+
+  - id: E6-khuon
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6-floor
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/modules/company-config/ui/**, src/modules/listings/ui/**]
+    expected: "exit 0; không hex thô trong tệp giao diện mà vòng chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

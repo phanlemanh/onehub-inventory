@@ -40,7 +40,8 @@ khách, Trưởng nhóm); Quản trị sàn đặt mức, không được mở B
   Then có đúng ba dòng theo thứ tự Thuế thu nhập cá nhân · Lệ phí trước bạ · Phí môi giới, mỗi dòng một công tắc «Tính vào
   giá bao phí» đang bật; tỉ lệ hiện 2% · 0,5% · 1,5%; hai dòng đầu ghi «theo luật» và không có ô sửa tỉ lệ; dòng Phí môi giới
   mang «Đã đổi · [Tên] · <ngày>», hai dòng kia «Mặc định»; mọi chữ trên phần đến từ `ontology/labels.yaml` hay tệp chữ của
-  mô-đun.
+  mô-đun; dưới ba dòng có dòng ví dụ «Giá chào 3 tỷ bao phí → về tay …» tính theo mức đang gõ, đổi ngay khi
+  gõ, trước khi Lưu (Hỏi-6).
 
 - **AC-3** — Quản trị sàn lưu mức một lần; sai thì không ghi. (cross-layer)
   Given Quản trị sàn ở phần Thuế phí, sàn đang dùng mặc định,
@@ -72,7 +73,9 @@ khách, Trưởng nhóm); Quản trị sàn đặt mức, không được mở B
   Then cột «Về tay» đứng ngay sau «Giá chào» và hiện sẵn; hàng Bao phí 3 tỷ hiện 2,88 tỷ rồi 2,91 tỷ sau lần đổi; hàng
   Không bao phí bằng Giá chào; hàng thiếu giá hay thiếu điều kiện thì trống; cột «Điều kiện phí» có trong menu Cột, ẩn
   sẵn, bật lên hiện «Bao phí» / «Không bao phí»; Về tay sắp được như cột tiền; Đầu chủ của B thấy 2,895 tỷ ở hàng cùng giá;
-  ở bốn khổ Bảng hàng không tràn ngang ở 1440.
+  ở khổ 1440, khi cột thứ hai của App Shell mở, cột Về tay nằm trong khung nhìn đầu cạnh Giá chào (không phải cuộn mới thấy);
+  các cột sau Về tay cuộn ngang như cột riêng của sàn ở hàng 7e; ở 360, 414 và 1024 Bảng hàng giữ cách hiện sẵn có của khổ
+  ấy và có cột Về tay.
 
 - **AC-7** — Sàn khác không đọc, không ghi được mức của nhau. (SP-1)
   Given sàn A đã đặt mức, sàn B chưa đặt,
@@ -91,8 +94,8 @@ khách, Trưởng nhóm); Quản trị sàn đặt mức, không được mở B
 
 | Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
 | --- | --- | --- | --- | --- |
-| tuy-chinh-san › Thuế phí | chỉ đọc | chỉ đọc | chỉ đọc | được — đặt mức, Lưu |
-| inventory › cột Về tay | được — đọc | được — đọc | được — đọc | chặn — không có Bảng hàng (bảng quyền 9a) |
+| tuy-chinh-san | được — đọc phần Thuế phí, không sửa | được — đọc phần Thuế phí, không sửa | được — đọc phần Thuế phí, không sửa | được — đặt mức ở phần Thuế phí, Lưu |
+| inventory | được — đọc cột Về tay | được — đọc cột Về tay | được — đọc cột Về tay | chặn — không có Bảng hàng (bảng quyền 9a) |
 
 ## Đường đo
 
@@ -135,6 +138,8 @@ Quét không gian AC (morphological, preset entity-feature, rút gọn):
 
 - Hỏi-1 (Điều kiện phí cho từng hàng), Hỏi-2 (chỗ đặt mức), Hỏi-3 (cột hiện sẵn), Hỏi-4 (dấu lúc tính) chờ chủ kho ở Cổng
   Phạm vi; khuyến nghị ở sổ quyết định.
+- Hỏi-6 (Quản trị sàn thấy kết quả thế nào) chờ chủ kho: khuyên một dòng ví dụ tính sẵn trong phần Thuế phí; lối khác mở
+  Bảng hàng cho Quản trị sàn ngay ở hàng này.
 - Hỏi-5 (mặc định môi giới 1%, bước 0,1%) chờ chủ kho; đổi mặc định thì các số ghim 2,895 tỷ ở AC-1, AC-6, E1, E6-e2e đổi
   theo.
 - Đổi `ontology/` (thuộc tính `Listing.feeInclusion`, khái niệm `FeeSchedule`, ba khoản, hai dòng bảng quyền, nhãn) cần chủ
