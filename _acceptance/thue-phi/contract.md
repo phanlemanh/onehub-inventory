@@ -91,7 +91,7 @@ khách, Trưởng nhóm); Quản trị sàn đặt mức, không được mở B
   Given khối chung `FramedList` của hàng 9c (`src/components/candidate/framed-list.tsx`) và màn Thành viên đã gộp,
   When dựng phần Thuế phí và đặt nó cạnh màn Thành viên ở 1440 và 360,
   Then phần Thuế phí chỉ điền khe của `FramedList` (đầu khung có tên «Thuế phí», dòng đếm «n khoản · m đang tính vào giá
-  bao phí» và nút «Thêm khoản»; mỗi khoản một dòng; chỗ chỉnh cuối dòng; chân khung có ghi chú và nút Lưu), không khung,
+  bao phí»; nút «Thêm khoản» ở đầu màn như màn Thành viên; mỗi khoản một dòng; chỗ chỉnh cuối dòng; chân khung có ghi chú và nút Lưu), không khung,
   viền hay nhãn tự vẽ bằng thẻ trần; lề, bo góc, cỡ chữ đầu khung và cỡ chữ dòng giống màn Thành viên; và bộ nút theo vai
   đúng bảng «Bộ nút theo vai» dưới: «Thêm khoản», chỗ chỉnh cuối dòng, «…» ở khoản riêng và nút Lưu chỉ hiện với
   `setFeeSchedule`; ba vai đọc thấy giá trị, không ô sửa, không «Thêm khoản», không «…», không Lưu.
@@ -128,7 +128,7 @@ khách, Trưởng nhóm); Quản trị sàn đặt mức, không được mở B
 | Đổi tỉ lệ môi giới | ô số cuối dòng Phí môi giới | có | thấy số, không ô | `setFeeSchedule` |
 | Trả về mặc định | «…» cuối dòng đã đổi | có | không hiện | `setFeeSchedule` |
 | Lưu | chân khung | có | không hiện; chân ghi «Chỉ Quản trị sàn đổi được thuế phí» | `setFeeSchedule` |
-| Thêm khoản | đầu khung | chờ Hỏi-7 (khuyên: có, khoản riêng) | không hiện | `setFeeSchedule` |
+| Thêm khoản | đầu màn (như màn Thành viên) | chờ Hỏi-7 (khuyên: có, khoản riêng) | không hiện | `setFeeSchedule` |
 | Đổi tên, bỏ khoản | «…» cuối dòng khoản riêng | chờ Hỏi-7 (khuyên: có; hai khoản luật thì không) | không hiện | `setFeeSchedule` |
 | Xem cột Về tay, sắp, lọc, ẩn hiện, lưu góc nhìn | Bảng hàng | không có Bảng hàng (bảng quyền 9a; Hỏi-6) | có | `viewListings` |
 | Sửa Về tay trên ô | Bảng hàng | — | bỏ — Về tay tính từ Giá chào, sửa Giá chào ở ô của hàng 4 | — |
@@ -179,6 +179,8 @@ Quét không gian AC (morphological, preset entity-feature, rút gọn):
 - Hỏi-7 (danh sách khoản cố định hay sàn thêm, đổi tên, bỏ khoản riêng) và Hỏi-8 (sửa Điều kiện phí trên ô) chờ chủ kho;
   hợp đồng hiện viết theo ba khoản cố định — chủ kho chọn B hay C thì AC-1, AC-2, AC-3, AC-9, bảng «Bộ nút theo vai» và
   migration đổi theo (một bảng khoản theo dòng), thêm tiêu chí thêm/đổi tên/bỏ và trần, rồi trình lại thẻ.
+- Chọn B thì hàng 19 mở rộng `FramedList` lúc dựng (giám sát cho phép, G-1411-114): chỉ thêm tuỳ chọn — chỗ chỉnh cuối dòng
+  rộng theo nội dung, dòng không ảnh chữ cái, dòng lỗi theo dòng; màn Thành viên không đổi dáng, có ảnh trước/sau và bài kiểm.
 - Hỏi-6 (Quản trị sàn thấy kết quả thế nào) chờ chủ kho: khuyên một dòng ví dụ tính sẵn trong phần Thuế phí; lối khác mở
   Bảng hàng cho Quản trị sàn ngay ở hàng này.
 - Hỏi-5 (mặc định môi giới 1%, bước 0,1%) chờ chủ kho; đổi mặc định thì các số ghim 2,895 tỷ ở AC-1, AC-6, E1, E6-e2e đổi
