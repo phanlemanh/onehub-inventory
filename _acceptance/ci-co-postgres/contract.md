@@ -117,3 +117,9 @@ CI thật đo ở AC-10 khi bản vá vào PR (Hỏi-1). Lượt dựng lại (A
   - Ngoài-1: Bài kiểm «không đọc lịch sử git» chưa bắt lệnh git viết xuống nhiều dòng; một bài như vậy chỉ đỏ khi chạy trên CI.
   - Ngoài-2: Bài kiểm ấy chưa bắt git chạy từ một chuỗi lệnh duy nhất; một bài như vậy chỉ đỏ khi chạy trên CI.
   - Ngoài-3: Bài kiểm ấy cho qua lệnh đọc commit cha của bản hiện tại; một bài như vậy chỉ đỏ khi chạy trên CI.
+- Sửa sau chữ ký — 2026-11-14, việc phụ VP1 của đợt «dieu-phoi-nen»: bài đơn vị `tests/dem-giao-nhan.test.ts` chạy phép
+  đếm trên hai báo cáo mẫu với danh sách tệp bài lấy từ chính báo cáo mẫu (tuỳ chọn `--tep-bai` của
+  `tests/e2e-db/dem-giao-nhan.ts`), vì trước đó mỗi hàng thêm một tệp `tests/e2e-db/*.spec.ts` làm `make check` đỏ cho tới
+  khi bản mẫu được sinh lại bằng một lượt `make ci-db` thật (25–40 phút). Phép đếm trên CI và trong `make ci-db` không đổi:
+  không có tuỳ chọn thì vẫn xét mọi tệp bài đang có trong kho, có bài khẳng định mặc định ấy; thêm ca phá «tệp bài trong
+  danh sách không có bài đạt». Lời AC-4 và hai tệp mẫu không đổi.

@@ -3,7 +3,12 @@
 //   khong-phien.json — signed-out run (main configuration), co-phien.json — signed-in run (playwright.db.config.ts),
 //   bai-db.json      — database tests (vitest), optional: absent when the step did not run.
 //
-//   node tests/e2e-db/dem-giao-nhan.ts <folder>
+//   node tests/e2e-db/dem-giao-nhan.ts <folder> [--tep-bai <list>]
+//
+// Every test file of the repo (`tests/e2e-db/*.spec.ts`, and `tests/db/*.db.test.ts` when bai-db.json is there) must
+// have at least one passed test. By default the files are the ones on disk — the only form `make ci-db` and CI use.
+// `--tep-bai <list>` (one repo-relative path per line) replaces that listing; it exists so tests/dem-giao-nhan.test.ts
+// can run the command on its stored reports with the files those reports came from, not the files of today's tree.
 //
 // A test the signed-out run skipped with the hand-over reason is «giao». Each one must have, in the signed-in run, a
 // test with the same title path in project `co-phien-<size>` that passed — the slowed copy (`cham › …`, only at the
@@ -13,7 +18,7 @@
 // and exits 0, or names every `roi: <size> <path>` / `do nham trang dang nhap: <size> <path>` and exits 1.
 // Plain Node (types stripped): no imports outside node:.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join, relative } from "node:path";
+import { basename, dirname, join, relative } from "node:path";
 
 /** Same text as GIAO in tools/e2e_templates/runner.ts (tests/dem-giao-nhan.test.ts keeps them equal). */
 export const GIAO = "can dang nhap — do o luot co phien";
@@ -125,24 +130,29 @@ export function handOver(signedOut: PwReport, signedIn: PwReport): Count {
   return { giao: handed.length, nhan: handed.length - roi.length, roi, doNham };
 }
 
-/** Files on disk matching `re` under `dir` (repo-relative) with no passed test in `passed`. */
-export function filesWithoutPass(
-  root: string,
-  dir: string,
-  re: RegExp,
-  passed: Map<string, number>,
-): string[] {
-  return readdirSync(join(root, dir))
-    .filter((f) => re.test(f))
-    .map((f) => join(dir, f))
-    .filter((f) => (passed.get(f) ?? 0) === 0);
+/**
+ * Test files matching `re` directly under `dir`, repo-relative and sorted: the files on disk under `root`, or, when
+ * `list` is given, the entries of that list instead.
+ */
+export function testFiles(root: string, dir: string, re: RegExp, list?: string[]): string[] {
+  const all = list
+    ? list.filter((p) => dirname(p) === dir && re.test(basename(p)))
+    : readdirSync(join(root, dir))
+        .filter((f) => re.test(f))
+        .map((f) => join(dir, f));
+  return [...new Set(all)].sort();
+}
+
+/** Files of `files` with no passed test in `passed`. */
+export function filesWithoutPass(files: string[], passed: Map<string, number>): string[] {
+  return files.filter((f) => (passed.get(f) ?? 0) === 0);
 }
 
 interface VitestReport {
   testResults: { name: string; assertionResults: { status: string }[] }[];
 }
 
-function main(folder: string): number {
+function main(folder: string, list?: string[]): number {
   const root = process.cwd();
   const need = ["khong-phien.json", "co-phien.json"].filter((f) => !existsSync(join(folder, f)));
   if (need.length > 0) {
@@ -175,12 +185,9 @@ function main(folder: string): number {
   ];
   if (existsSync(dbReport)) groups.unshift(["tests/db", /\.db\.test\.ts$/, perDb]);
   for (const [dir, re, m] of groups) {
-    for (const f of readdirSync(join(root, dir))
-      .filter((n) => re.test(n))
-      .sort()) {
-      console.log(`tep: ${join(dir, f)} dat ${m.get(join(dir, f)) ?? 0}`);
-    }
-    for (const f of filesWithoutPass(root, dir, re, m)) {
+    const files = testFiles(root, dir, re, list);
+    for (const f of files) console.log(`tep: ${f} dat ${m.get(f) ?? 0}`);
+    for (const f of filesWithoutPass(files, m)) {
       console.log(`tep khong co bai dat: ${f}`);
       red = true;
     }
@@ -198,10 +205,18 @@ function main(folder: string): number {
 }
 
 if (process.argv[1] && /dem-giao-nhan\.ts$/.test(process.argv[1])) {
-  const folder = process.argv[2];
-  if (!folder) {
-    console.error("cach dung: node tests/e2e-db/dem-giao-nhan.ts <thu muc bao cao>");
+  const [folder, flag, listFile, ...rest] = process.argv.slice(2);
+  if (!folder || (flag !== undefined && (flag !== "--tep-bai" || !listFile)) || rest.length > 0) {
+    console.error(
+      "cach dung: node tests/e2e-db/dem-giao-nhan.ts <thu muc bao cao> [--tep-bai <danh sach tep>]",
+    );
     process.exit(2);
   }
-  process.exit(main(folder));
+  const list = listFile
+    ? readFileSync(listFile, "utf8")
+        .split("\n")
+        .map((l) => l.trim())
+        .filter((l) => l !== "")
+    : undefined;
+  process.exit(main(folder, list));
 }

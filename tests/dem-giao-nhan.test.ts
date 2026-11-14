@@ -1,8 +1,12 @@
 // Row 1s (_acceptance/ci-co-postgres, AC-4, E4): the hand-over count on the two JSON reports of a real `make ci-db`
 // run (tests/fixtures/ci-db — copied from the run with fields the count does not read left out, never written by
 // hand). Break copies are edits of those very reports, each pinned to its line.
+//
+// The command checks every test file against a list of files. On CI that list is the files on disk; here it is the
+// files the stored reports came from (`--tep-bai`), so a row that adds a test file does not have to regenerate the
+// stored reports to keep this suite green. The last test pins the default to the files on disk.
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,6 +20,35 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const FIX = join(ROOT, "tests/fixtures/ci-db");
 const load = (name: string) =>
   JSON.parse(readFileSync(join(FIX, `${name}.json`), "utf8")) as PwReport;
+const COUNT = join(ROOT, "tests/e2e-db/dem-giao-nhan.ts");
+const E2E_DB = "tests/e2e-db";
+
+/** The test files the stored signed-in report came from: its top suites are files, named relative to tests/e2e-db. */
+const reportFiles = (report: PwReport) =>
+  report.suites
+    .map((s) => s.file ?? s.title)
+    .filter((f) => f.endsWith(".spec.ts"))
+    .map((f) => `${E2E_DB}/${f}`);
+
+/**
+ * Runs the command on two reports. `files` is the list given with `--tep-bai`; `null` runs it without, on the files
+ * on disk (the CI form).
+ */
+function runCount(out: PwReport, inn: PwReport, files: string[] | null) {
+  const dir = mkdtempSync(join(tmpdir(), "dem-giao-nhan-"));
+  try {
+    writeFileSync(join(dir, "khong-phien.json"), JSON.stringify(out));
+    writeFileSync(join(dir, "co-phien.json"), JSON.stringify(inn));
+    const args = [COUNT, dir];
+    if (files !== null) {
+      writeFileSync(join(dir, "tep-bai.txt"), files.join("\n") + "\n");
+      args.push("--tep-bai", join(dir, "tep-bai.txt"));
+    }
+    return spawnSync(process.execPath, args, { cwd: ROOT, encoding: "utf8" });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
 
 /** Counted here independently of the count: tests the signed-out run skipped with the hand-over reason. */
 function handedIndependently(report: PwReport): number {
@@ -140,19 +173,9 @@ describe("phep dem giao nhan tren bao cao that (AC-4)", () => {
         r.annotations = (r.annotations ?? []).filter((a) => a.description !== GIAO);
     });
     expect(handOver(broken, inn).giao).toBe(0);
-    const dir = mkdtempSync(join(tmpdir(), "dem-giao-nhan-"));
-    try {
-      writeFileSync(join(dir, "khong-phien.json"), JSON.stringify(broken));
-      writeFileSync(join(dir, "co-phien.json"), JSON.stringify(inn));
-      const r = spawnSync(process.execPath, [join(ROOT, "tests/e2e-db/dem-giao-nhan.ts"), dir], {
-        cwd: ROOT,
-        encoding: "utf8",
-      });
-      expect(r.stdout).toMatch(/^giao: 0 — luot khong phien khong giao bai nao$/m);
-      expect(r.status).toBe(1);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
+    const r = runCount(broken, inn, reportFiles(inn));
+    expect(r.stdout).toMatch(/^giao: 0 — luot khong phien khong giao bai nao$/m);
+    expect(r.status).toBe(1);
   });
 
   it("pha 5: moi bai cua mot tep spec bi bo qua → 'tep khong co bai dat: <tep>', ma 1", () => {
@@ -167,36 +190,57 @@ describe("phep dem giao nhan tren bao cao that (AC-4)", () => {
       for (const c of s.suites ?? []) skipAll(c);
     };
     skipAll(top);
-    const dir = mkdtempSync(join(tmpdir(), "dem-giao-nhan-"));
-    try {
-      writeFileSync(join(dir, "khong-phien.json"), JSON.stringify(out));
-      writeFileSync(join(dir, "co-phien.json"), JSON.stringify(broken));
-      const r = spawnSync(process.execPath, [join(ROOT, "tests/e2e-db/dem-giao-nhan.ts"), dir], {
-        cwd: ROOT,
-        encoding: "utf8",
-      });
-      expect(r.stdout).toMatch(/^tep khong co bai dat: tests\/e2e-db\/goc-nhin\.spec\.ts$/m);
-      expect(r.stdout).toMatch(/^giao: \d+ · nhan: \d+ · roi: 0 · do nham: 0$/m);
-      expect(r.status).toBe(1);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
+    const r = runCount(out, broken, reportFiles(inn));
+    expect(r.stdout.match(/^tep khong co bai dat: .*$/gm)).toEqual([
+      "tep khong co bai dat: tests/e2e-db/goc-nhin.spec.ts",
+    ]);
+    expect(r.stdout).toMatch(/^giao: \d+ · nhan: \d+ · roi: 0 · do nham: 0$/m);
+    expect(r.status).toBe(1);
   });
 
-  it("doi chung: lenh tren hai bao cao lanh in dong tong va ma 0", () => {
-    const dir = mkdtempSync(join(tmpdir(), "dem-giao-nhan-"));
-    try {
-      writeFileSync(join(dir, "khong-phien.json"), JSON.stringify(out));
-      writeFileSync(join(dir, "co-phien.json"), JSON.stringify(inn));
-      const r = spawnSync(process.execPath, [join(ROOT, "tests/e2e-db/dem-giao-nhan.ts"), dir], {
+  it("pha 6: mot tep bai trong danh sach ma bao cao khong co bai dat nao → 'tep khong co bai dat: <tep>', ma 1", () => {
+    const missing = `${E2E_DB}/khong-co-trong-bao-cao.spec.ts`;
+    expect(reportFiles(inn)).not.toContain(missing);
+    const r = runCount(out, inn, [...reportFiles(inn), missing]);
+    expect(r.stdout).toMatch(/^tep: tests\/e2e-db\/khong-co-trong-bao-cao\.spec\.ts dat 0$/m);
+    expect(r.stdout.match(/^tep khong co bai dat: .*$/gm)).toEqual([
+      `tep khong co bai dat: ${missing}`,
+    ]);
+    const n = handedIndependently(out);
+    expect(r.stdout).toMatch(new RegExp(`^giao: ${n} · nhan: ${n} · roi: 0 · do nham: 0$`, "m"));
+    expect(r.status).toBe(1);
+  });
+
+  it("doi chung: lenh tren hai bao cao lanh, voi danh sach tep cua chinh bao cao, in dong tong va ma 0", () => {
+    const files = reportFiles(inn);
+    expect(files).toContain(`${E2E_DB}/goc-nhin.spec.ts`);
+    const r = runCount(out, inn, files);
+    const n = handedIndependently(out);
+    expect(r.stdout.match(/^tep: .*$/gm)?.map((l) => l.replace(/ dat \d+$/, ""))).toEqual(
+      [...files].sort().map((f) => `tep: ${f}`),
+    );
+    expect(r.stdout).not.toMatch(/^tep khong co bai dat:/m);
+    expect(r.stdout).toMatch(new RegExp(`^giao: ${n} · nhan: ${n} · roi: 0 · do nham: 0$`, "m"));
+    expect(r.status).toBe(0);
+  });
+
+  it("mac dinh (CI, make ci-db): khong co --tep-bai thi lenh xet dung cac tep bai dang co trong kho", () => {
+    const onDisk = readdirSync(join(ROOT, E2E_DB))
+      .filter((f) => f.endsWith(".spec.ts"))
+      .map((f) => `tep: ${E2E_DB}/${f}`)
+      .sort();
+    expect(onDisk.length).toBeGreaterThan(0);
+    const r = runCount(out, inn, null);
+    expect(r.stdout.match(/^tep: .*$/gm)?.map((l) => l.replace(/ dat \d+$/, ""))).toEqual(onDisk);
+  });
+
+  it("lenh tu choi --tep-bai thieu duong dan hay doi so la: ma 2", () => {
+    for (const extra of [["--tep-bai"], ["--khac", "x"]]) {
+      const r = spawnSync(process.execPath, [COUNT, FIX, ...extra], {
         cwd: ROOT,
         encoding: "utf8",
       });
-      const n = handedIndependently(out);
-      expect(r.stdout).toMatch(new RegExp(`^giao: ${n} · nhan: ${n} · roi: 0 · do nham: 0$`, "m"));
-      expect(r.status).toBe(0);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
+      expect(r.status).toBe(2);
     }
   });
 });
