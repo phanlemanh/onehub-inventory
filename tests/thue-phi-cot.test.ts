@@ -117,3 +117,21 @@ describe("sap-nhu-tien", () => {
     expect(sorted.slice(2)).toEqual([null, null]);
   });
 });
+
+// Asked by the batch supervisor (G-1411-156): what the shared money rule does on a x,xx5 midpoint. Pinned as it is:
+// half up on the decimal the amount reads as, so 2.895.000.000 is «2,9 tỷ», never cut to «2,89 tỷ».
+describe("lam-tron-diem-giua", () => {
+  it("the shared money rule rounds a x,xx5 midpoint up", () => {
+    const CASES: [number, string][] = [
+      [1_005_000_000, "1,01 tỷ"],
+      [1_015_000_000, "1,02 tỷ"],
+      [1_125_000_000, "1,13 tỷ"],
+      [2_345_000_000, "2,35 tỷ"],
+      [2_895_000_000, "2,9 tỷ"],
+      [4_855_000_000, "4,86 tỷ"],
+      [9_995_000_000, "10 tỷ"],
+    ];
+    for (const [value, text] of CASES)
+      expect(formatMoney(value), `lam-tron-diem-giua: ${value}`).toBe(text);
+  });
+});

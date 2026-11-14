@@ -46,5 +46,5 @@ tính riêng. Chủ kho muốn sàn tự thêm khoản (phí dịch vụ hồ s�
 ## Consequences
 
 - Cột Về tay của Bảng hàng tính từ Giá chào và Điều kiện phí của từng hàng; ô tiền làm tròn hai số lẻ như mọi ô tiền
-  (2.895.000.000 hiện «2,89 tỷ»); dòng ví dụ của phần Thuế phí hiện ba số lẻ.
+  (2.895.000.000 hiện «2,9 tỷ», làm tròn nửa lên); dòng ví dụ của phần Thuế phí hiện ba số lẻ.
 - Dấu định nghĩa lúc tính trên từng giá chờ hàng 10, khi giá thật vào cơ sở dữ liệu.
