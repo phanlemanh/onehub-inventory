@@ -42,7 +42,8 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại; màn này tro
   địa chỉ `?ho-so=<id>` của căn ấy, «Trước/Sau» đi theo thứ tự thẻ; When đóng bằng «Đóng» hay nút lùi của trình duyệt, Then
   danh sách vẫn ở đúng chỗ cuộn cũ (lệch không quá 1 px) và tiêu điểm nằm trên thẻ vừa mở.
 - AC-4: Given Bảng hàng dưới 768, When người dùng hàng công cụ (ba nút biểu tượng có tên đọc được và nhãn khi chạm giữ) và lọc theo Hỏi-2 (khuyến nghị: nút Lọc mở ngăn đáy đủ
-  ô lọc, lọc đang chạy hiện thành chip có nút bỏ; lối kia: hàng ô lọc luôn hiện), Then hàng công cụ là một dòng dính dưới
+  ô lọc, lọc đang chạy hiện thành chip có nút bỏ; lối kia: hàng ô lọc luôn hiện), Then ngăn lọc mở đầu bằng «Sắp theo» (chọn một cột của bảng, tăng hay giảm dần — cùng sắp xếp với bảng, giữ khi qua
+  ngưỡng 768); hàng công cụ là một dòng dính dưới
   thanh trên khi cuộn, gồm số dòng và ba nút biểu tượng vùng chạm 44 px (Lọc kèm số ô đang lọc, Nhóm theo Toà, «…» chứa
   Lưu góc nhìn), không «Cột», không «Toàn màn hình»; thẻ chỉ còn căn khớp, hai ô lọc chồng nhau như ở bảng, «x / 60 dòng»
   và «Xoá lọc» hiện; không còn căn nào khớp thì «Không có dòng nào khớp» và «Xoá lọc».
