@@ -1,0 +1,1 @@
+no browser-tool network; driver = playwright test suite

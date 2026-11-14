@@ -1,0 +1,1 @@
+n-a (driver): frames captured by Playwright spec, no browser-tool network reader. Playwright log WebServer notes: idle DB connection closed (administrator command) x4 on shutdown, not HTTP failures.

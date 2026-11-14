@@ -318,11 +318,14 @@ test.describe("thue phi", () => {
     await expect(admin.getByRole("menu")).toBeVisible();
     await frame(admin, "E10-menu");
     await admin.keyboard.press("Escape");
+    // The first menu closes with an animation; open the next only once it is gone, so one menu is on screen.
+    await expect(admin.getByRole("menu")).toHaveCount(0);
     // A changed default item's «…» also offers the reset.
     await row(admin, "brokerage").locator('[data-slot="fee-more"]').click();
     await expect(admin.getByRole("menu")).toBeVisible();
     await frame(admin, "E10-menu-moi-gioi");
     await admin.keyboard.press("Escape");
+    await expect(admin.getByRole("menu")).toHaveCount(0);
     await frame(admin, "E10-luat");
   });
 });
