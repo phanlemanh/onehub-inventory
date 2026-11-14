@@ -1,19 +1,34 @@
-# Review findings: bang-hang-theo-dia-ly (round 2)
+# Review findings: bang-hang-theo-dia-ly (round 3)
 
 ## Trong hợp đồng
+
+- **A modifier-click on «Tất cả hàng» or a status entry drops the place in the current tab and then blocks every later address write**
+  file: `src/modules/listings/ui/use-geo-place.ts:58`
+  severity: medium
+  AC: AC-4
+  source: bugs
+  detail: The second column's onClick (second-column.tsx:118) calls place.pick(link.href) on every click and does not check for modifier keys. When a place is lit and the person Cmd/Ctrl/Shift-clicks «Tất cả hàng» or a status shortcut, the new key===null branch sets `leaving.current = url.pathname + url.search` and bumps `picked`. Bumping `picked` remounts the region in the current tab without the place. It then returns false, so Next's Link sees the modified click and lets the browser open the link in a new tab. The current tab therefore never navigates. The address keeps ?vung=<old place>, so the column still lights a place the grid no longer filters on. Worse, `leaving.current` is never cleared, because the write effect only clears it once window.location matches the target, and that never happens. From then on the write effect returns early on every placeKey change. Each later in-place pick filters the grid, but ?vung= stays on the stale place, so the lit entry is wrong and a reload or copied link opens the wrong place. This lasts until the person happens to navigate to exactly the leaving URL or the grid remounts. Fix: skip pick() for modified or non-primary clicks (metaKey/ctrlKey/shiftKey/altKey/button!==0), or clear `leaving` when no navigation follows.
+  rationale: AC-4 nói «không lúc nào cây sáng một nơi mà bảng hiện dòng của nơi khác»; finding mô tả cột vẫn sáng nơi cũ trong khi bảng đã bỏ lọc, và AC-6 (đường dẫn/tải lại đúng nơi) cũng hỏng theo.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **SP-1 (companies are isolated): the place tree in the App Shell ignores which company is signed in**
+- **Assertion âm-tính-một-mình: kiểm `vung` vắng và ô Toà rỗng sau khi bấm, nhưng không kiểm dương rằng chúng đã có trước khi bấm**
+  Người dùng thấy gì: Người dùng không thấy gì khác đi. Chỉ là bài kiểm tự động cho việc bấm «Tất cả hàng» sau khi chọn một nơi có thể vẫn báo xanh dù địa chỉ hay ô lọc không được cập nhật đúng, nên lỗi tương lai có thể lọt qua.
+  Căn cứ: Không ảnh hưởng người dùng hiện tại, không mất hay lộ dữ liệu; rủi ro chỉ là bỏ sót lỗi sau này, và bổ sung kiểm tra lúc nào cũng rẻ.
+  file: `tests/e2e-db/dia-ly.spec.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **SP-1 (companies are isolated): the place tree in the App Shell ignores which company is signed in (r2)**
   Người dùng thấy gì: Hiện cây dự án và toà ở cột bên chỉ dùng số liệu mẫu nên mọi sàn đều thấy cùng một cây mẫu, không lộ dữ liệu thật. Khi nối dữ liệu thật mà quên gắn với sàn đang đăng nhập, tên dự án và toà của sàn này có thể hiện sang sàn khác.
   Căn cứ: Hôm nay chỉ là dữ liệu mẫu nên người dùng chưa chịu hậu quả nào; việc cần là ghi lại để nhớ khi chuyển sang dữ liệu thật, ghi chú rẻ hơn nhiều so với sửa ngay.
   file: `src/app/(app)/layout.tsx`
   severity: low
   Đề xuất: known-limits
 
-- **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): ca phá 'ten o loc cat' dựng một <input> bằng tay thay vì phá ô lọc thật**
+- **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): ca phá 'ten o loc cat' dựng một <input> bằng tay thay vì phá ô lọc thật (r2)**
   Người dùng thấy gì: Một bài kiểm tra bảo vệ việc ô lọc không cắt tên dự án chưa chứng minh được nó sẽ báo đỏ nếu ô lọc thật bị lỗi cắt tên. Người dùng hiện vẫn thấy tên đủ; rủi ro là sau này lỗi cắt tên quay lại mà không ai được báo.
   Căn cứ: Không có gì hỏng với người dùng bây giờ, chỉ là lưới an toàn yếu hơn lời hứa; nếu lỗi quay lại thì người dùng tự thấy tên bị cắt và sửa được, không mất dữ liệu.
   file: `tests/dia-ly.test.tsx`
@@ -62,7 +77,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 4 (assertion âm tính một mình): kiểm 'không count' và 'không geo-tree' trên data-slot mà mã không bao giờ vẽ (r1 · tệp đã đổi)**
+- **Hình dạng 4 (assertion âm tính một mình): kiểm 'không count' và 'không geo-tree' trên data-slot mà mã không bao giờ vẽ (r1)**
   Người dùng thấy gì: Bài kiểm thử về «không có số đếm trên mục» có thể không bắt được lỗi nếu ai đó thêm số đếm sau này. Hiện người dùng không thấy số đếm nào.
   Căn cứ: Rủi ro chỉ nằm ở tương lai khi sửa mã, màn hình hiện tại đúng, và gia cố bài kiểm thử có thể làm lúc khác.
   file: `tests/dia-ly.test.tsx`
@@ -76,7 +91,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 5 (tuyên quét lớp nhưng thiếu phần tử): đi theo import bỏ hai màn layout.tsx và inventory/page.tsx (r1 · tệp đã đổi)**
+- **Hình dạng 5 (tuyên quét lớp nhưng thiếu phần tử): đi theo import bỏ hai màn layout.tsx và inventory/page.tsx (r1)**
   Người dùng thấy gì: Bài quét xem cây có thêm cách đọc dữ liệu mới không bỏ sót hai màn. Hiện chưa thấy cách đọc mới nào được thêm.
   Căn cứ: Là khoảng hở trong lưới kiểm tra chứ không phải lỗi thật, người dùng không bị ảnh hưởng, và bổ sung sau rất rẻ.
   file: `tests/dia-ly.test.tsx`
@@ -97,7 +112,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: high
   Đề xuất: known-limits
 
-- **Hình dạng 5: E10 hứa đối chứng ô lọc chữ của Đã gửi nhưng không có ca nào (r1 · tệp đã đổi)**
+- **Hình dạng 5: E10 hứa đối chứng ô lọc chữ của Đã gửi nhưng không có ca nào (r1)**
   Người dùng thấy gì: Ô lọc chữ của màn Đã gửi chưa có bài kiểm riêng cho việc bỏ dấu và hoa thường. Chưa thấy dấu hiệu nó hoạt động sai.
   Căn cứ: Chỉ là một khoảng trống kiểm thử, ô lọc này không đổi trong hàng này và thêm một ca kiểm rất rẻ.
   file: `tests/dia-ly.test.tsx`

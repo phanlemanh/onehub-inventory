@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 07fda26e32b92afbc8383f67c286dfe1af59b0dc
+verified_commit: 7a98b9a25e0434aff21a5637fc9f4f43366d1207
 human_signoff:
 ---
 
@@ -33,6 +33,86 @@ human_signoff:
 
 ## Evidence
 
+- eval: E4
+  run_id: minted-bang-hang-theo-dia-ly-E4-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.dia_ly_e2e_db
+  verified_at: 2026-11-14T18:06:53Z
+  output: |
+    12 passed (38.5s)
+
+- eval: E7
+  run_id: minted-bang-hang-theo-dia-ly-E7-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.dia_ly_e2e_db
+  verified_at: 2026-11-14T18:06:53Z
+  output: |
+    12 passed (38.5s)
+
+- eval: E8
+  run_id: minted-bang-hang-theo-dia-ly-E8-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.dia_ly_e2e_db
+  verified_at: 2026-11-14T18:06:53Z
+  output: |
+    12 passed (38.5s)
+
+- eval: E9
+  run_id: minted-bang-hang-theo-dia-ly-E9-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.dia_ly_e2e_db
+  verified_at: 2026-11-14T18:06:53Z
+  output: |
+    12 passed (38.5s)
+
+- eval: E11
+  run_id: minted-bang-hang-theo-dia-ly-E11-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.dia_ly_e2e_db
+  verified_at: 2026-11-14T18:06:53Z
+  output: |
+    12 passed (38.5s)
+
+- eval: E12
+  run_id: minted-bang-hang-theo-dia-ly-E12-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.dia_ly_e2e_db
+  verified_at: 2026-11-14T18:06:53Z
+  output: |
+    12 passed (38.5s)
+
+- eval: E6
+  run_id: minted-bang-hang-theo-dia-ly-E6-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.dia_ly
+  verified_at: 2026-11-14T18:06:53Z
+  output: |
+    vitest geo-tree.test.ts và dia-ly.test.tsx xanh (reporter verbose)
+
+- eval: E14
+  run_id: minted-bang-hang-theo-dia-ly-E14-r3
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.design.ui_check
+  verified_at: 2026-11-14T18:06:53Z
+  screenshot: evidence/E14-phan-khu-1440-sang.png
+  observed: |
+    E14-phan-khu-1440-sang.png: signed in as [Sàn mẫu Ocean]. Second column has "Bảng hàng" with "Tất cả hàng" not lit, then "Theo trạng thái" with 6 statuses, then one group per project with the same heading style: "Vinhomes Ocean Park 1" (Tất cả, The Sapphire 1, S1.01, S1.02, S1.03, S1.05), "Vinhomes Ocean Park 2 – The Empire" (Tất cả, [MAU] Toà E1), "Vinhomes Ocean Park 3 – The Crown" (Tất cả, [MAU] Toà C1). No counts anywhere. Only "The Sapphire 1" is lit, in full. The Toà box shows "S1.01, S1.02, S" (cut) and the Dự án box "Vinhomes Ocean P" (cut). Footer "36 / 60 dòng".
+    E14-phan-khu-1440-toi.png: the same screen in dark. Same tree, only The Sapphire 1 lit, same cut filter boxes, footer "36 / 60 dòng".
+    E14-ngan-360-sang.png: the App Shell sheet at 360 shows the same tree (status group, three project groups, no counts), with "Tất cả hàng" lit as nothing is picked yet.
+    E14-toa-360-sang.png: after clicking [MAU] Toà E1 the sheet is closed. Toà box shows "[MAU] Toà E" (cut), the grid rows are all "[MAU] Toà E1", footer "12 / 60 dòng".
+    E14-sent-1440-sang.png vs -truoc: second column identical, "Đã gửi" with "Tất cả link" lit and no tree. E14-sent-360-sang.png vs -truoc: identical sheet with "Đã gửi" and "Tất cả link" lit, no tree.
+    E14-tuy-chinh-1440-sang.png vs -truoc: second column identical ("Tuỳ chỉnh của sàn" with Nhãn riêng lit, 4 more entries, no tree); only the main area differs (empty state versus error panel). E14-tuy-chinh-360-sang.png vs -truoc: sheet identical.
+    All frames match the expected text.
+  network_observed: clean
+
 - eval: E1
   run_id: minted-bang-hang-theo-dia-ly-E1-r1
   exit_code: 0
@@ -52,94 +132,26 @@ human_signoff:
 - eval: E3
   run_id: minted-bang-hang-theo-dia-ly-E3-r2
   exit_code: 0
-  baseline: n-a
   verifier: config:executors.test.dia_ly
   verified_at: 2026-11-14T17:36:18Z
-  output: |
-    npx vitest run src/modules/listings/ui/geo-tree.test.ts tests/dia-ly.test.tsx --coverage.enabled=false --reporter=verbose
-    (chung mot lenh voi E5, E6; ket thuc sach)
-
-- eval: E4
-  run_id: minted-bang-hang-theo-dia-ly-E4-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.dia_ly_e2e_db
-  verified_at: 2026-11-14T17:36:18Z
-  output: |
-    playwright -c playwright.db.config.ts tests/e2e-db/dia-ly.spec.ts
-    11 passed (43.0s)
+  carried_from_round: 2
+  note: carry-forward tu round 2 — delta khong cham paths cua eval
 
 - eval: E5
   run_id: minted-bang-hang-theo-dia-ly-E5-r2
   exit_code: 0
-  baseline: n-a
   verifier: config:executors.test.dia_ly
   verified_at: 2026-11-14T17:36:18Z
-  output: |
-    chung mot lenh vitest voi E3, E6; ket thuc sach
-
-- eval: E6
-  run_id: minted-bang-hang-theo-dia-ly-E6-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.dia_ly
-  verified_at: 2026-11-14T17:36:18Z
-  output: |
-    chung mot lenh vitest voi E3, E5; ket thuc sach
-
-- eval: E7
-  run_id: minted-bang-hang-theo-dia-ly-E7-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.dia_ly_e2e_db
-  verified_at: 2026-11-14T17:36:18Z
-  output: |
-    chung mot lenh playwright voi E4; 11 passed (43.0s)
-
-- eval: E8
-  run_id: minted-bang-hang-theo-dia-ly-E8-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.dia_ly_e2e_db
-  verified_at: 2026-11-14T17:36:18Z
-  output: |
-    chung mot lenh playwright voi E4; 11 passed (43.0s)
-
-- eval: E9
-  run_id: minted-bang-hang-theo-dia-ly-E9-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.dia_ly_e2e_db
-  verified_at: 2026-11-14T17:36:18Z
-  output: |
-    chung mot lenh playwright voi E4; 11 passed (43.0s)
+  carried_from_round: 2
+  note: carry-forward tu round 2 — delta khong cham paths cua eval
 
 - eval: E10
   run_id: minted-bang-hang-theo-dia-ly-E10-r2
   exit_code: 0
-  baseline: green
   verifier: config:executors.test.unit
   verified_at: 2026-11-14T17:36:18Z
-  output: |
-    make test; ket thuc sach
-
-- eval: E11
-  run_id: minted-bang-hang-theo-dia-ly-E11-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.dia_ly_e2e_db
-  verified_at: 2026-11-14T17:36:18Z
-  output: |
-    chung mot lenh playwright voi E4; 11 passed (43.0s)
-
-- eval: E12
-  run_id: minted-bang-hang-theo-dia-ly-E12-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.dia_ly_e2e_db
-  verified_at: 2026-11-14T17:36:18Z
-  output: |
-    chung mot lenh playwright voi E4; 11 passed (43.0s)
+  carried_from_round: 2
+  note: carry-forward tu round 2 — delta khong cham paths cua eval
 
 - eval: E13
   run_id: minted-bang-hang-theo-dia-ly-E13-r1
@@ -148,24 +160,6 @@ human_signoff:
   verified_at: 2026-11-14T17:19:00Z
   carried_from_round: 1
   note: carry-forward tu round 1 — delta khong cham paths cua eval
-
-- eval: E14
-  run_id: minted-bang-hang-theo-dia-ly-E14-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.design.ui_check
-  verified_at: 2026-11-14T17:36:18Z
-  screenshot: evidence/E14-phan-khu-1440-sang.png
-  observed: |
-    I opened each saved frame with Read.
-    - E14-phan-khu-1440-sang.png: second column is 'Bảng hàng' with 'Tất cả hàng', then the 'Theo trạng thái' group (6 statuses, no counts). Below it are one group per project (Vinhomes Ocean Park 1, 2 – The Empire, 3 – The Crown), each with 'Tất cả' and its children, headed in the same small grey style as 'Theo trạng thái'. 'The Sapphire 1' is the only lit entry, with S1.01, S1.02, S1.03 and S1.05 under it unlit. The footer reads '36 / 60 dòng'. The Toà box shows 'S1.01, S1.02, S' and the Dự án box 'Vinhomes Ocean P', both cut by column width. The lit entry shows 'The Sapphire 1' in full.
-    - E14-phan-khu-1440-toi.png: the same layout in dark mode; The Sapphire 1 is the only lit entry; footer '36 / 60 dòng'.
-    - E14-ngan-360-sang.png: the App Shell sheet is open, with the same groups, no counts and no tree beyond the project groups; 'Tất cả hàng' is lit because no place is chosen yet.
-    - E14-toa-360-sang.png: the sheet has closed; the footer reads '12 / 60 dòng'; every row shows '[MAU] Toà E1'; the Toà box shows '[MAU] Toà E' cut by the narrow column.
-    - E14-sent-1440-sang.png and E14-sent-360-sang.png: the second column has one group 'Đã gửi' with the single entry 'Tất cả link', lit, and no tree; both are byte-identical to their before shots.
-    - E14-tuy-chinh-1440-sang.png and E14-tuy-chinh-360-sang.png: the second column has 'Tuỳ chỉnh của sàn' with 5 entries and 'Nhãn riêng' lit, and no tree. It matches the before shots in entries and highlight. Only the main-area state differs (error before, empty list now), and the network check above explains it.
-    Everything matches the Expected text.
-  network_observed: clean
 
 - eval: E15
   run_id: minted-bang-hang-theo-dia-ly-E15-r1
@@ -178,19 +172,19 @@ human_signoff:
 ### Lệnh suite (hồi quy)
 
 - cmd: make check
-  run_id: minted-bang-hang-theo-dia-ly-SUITE-make_check-r2
+  run_id: minted-bang-hang-theo-dia-ly-SUITE-make_check-r3
   exit_code: 0
-  verified_at: 2026-11-14T17:36:18Z
+  verified_at: 2026-11-14T18:06:53Z
 
 - cmd: npm run build
-  run_id: minted-bang-hang-theo-dia-ly-SUITE-build-r2
+  run_id: minted-bang-hang-theo-dia-ly-SUITE-build-r3
   exit_code: 0
-  verified_at: 2026-11-14T17:36:18Z
+  verified_at: 2026-11-14T18:06:53Z
 
 - cmd: make e2e
-  run_id: minted-bang-hang-theo-dia-ly-SUITE-make_e2e-r2
+  run_id: bpviob33o
   exit_code: 0
-  verified_at: 2026-11-14T17:36:18Z
+  verified_at: 2026-11-14T18:06:53Z
 
 ## Known limits
 
@@ -198,17 +192,16 @@ human_signoff:
 
 ## Analyst
 
-Non-discriminating (xanh ca tren HEAD lan baseline): E10 (lenh make test) — regression-guard co chu y cho bai luoi cu cua 2a, 2e; khong phai eval hanh vi moi.
+carried tu round 2 — baseline khong do lai round nay
 
-Baseline khong do
-- npx vitest run src/modules/listings/ui/geo-tree.test.ts tests/dia-ly.test.tsx --coverage.enabled=false --reporter=verbose: bo qua baseline: tep src/modules/listings/ui/geo-tree.test.ts co o cay dang kiem nhung chua co o merge-base 20a13c22aa0181e31d639306e6c25c4289a8f60f — eval moi, chay tren code cu khong phan biet gi
-- DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx playwright test -c playwright.db.config.ts tests/e2e-db/dia-ly.spec.ts: bo qua baseline: tep tests/e2e-db/dia-ly.spec.ts co o cay dang kiem nhung chua co o merge-base 20a13c22aa0181e31d639306e6c25c4289a8f60f — eval moi, chay tren code cu khong phan biet gi
+Eval khong-phan-biet (xanh tren ca code moi lan baseline): lenh `make test` phu E10 — chu y giu lam regression-guard cho bai luoi cu cua 2a, 2e; baseline round nay khong do lai (n-a).
 
 ## Variance
 
-none — every multi-run eval is uniform
+none — moi eval chay mot lan, deterministic, khong co phuong sai
 
 ## Iterations
 
-Round 1: E14 (ui-check) did not pass — the second-column frames did not match the Expected text. Returned to implementation.
-Round 2: E3, E4, E5, E6, E7, E8, E9, E10, E11, E12, E14 re-run and passed; E1, E2, E13, E15 carried forward from round 1 (delta did not touch their paths). Verdict PASS.
+Round 1: E14 khong dat — khung ui-check chua dat; tra ve implementation.
+Round 2: PASS sau khi sua; bang chung va run log round 2 da ghi.
+Round 3: sau sua «Tất cả hàng» sau khi chon mot noi (commit 7a98b9a), chay lai E4, E6, E7, E8, E9, E11, E12, E14 va suite; tat ca PASS, E1, E2, E3, E5, E10, E13, E15 carry-forward.
