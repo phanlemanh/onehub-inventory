@@ -35,7 +35,7 @@ Bảng hàng vẫn là màn mẫu của họ Lưới; hàng này chỉ thêm c�
 | --- | --- | --- |
 | Chờ tải | đạt | tests/e2e/screens/screens.spec.ts (công thức cho-tai) |
 | Trống | đạt | tests/e2e/screens/screens.spec.ts (công thức trong) |
-| Tìm không ra | đạt | tests/e2e/screens/screens.spec.ts (công thức tim-khong-ra) |
+| Không có dòng nào khớp | đạt | tests/e2e/screens/screens.spec.ts (công thức khong-khop) |
 | Lỗi | đạt | tests/e2e/screens/screens.spec.ts (công thức loi); không đọc được lớp riêng thì trang hiện chữ chuẩn (src/modules/company-config/server.ts, `myCompanyLayer`) |
 | Một phần hỏng | đạt | tests/e2e/screens/screens.spec.ts (công thức mot-phan-hong) |
 | Chữ dài | đạt | tests/e2e/screens/screens.spec.ts (công thức chu-dai); tên trường riêng tối đa 40 ký tự (src/modules/company-config/rules.ts) |

@@ -558,6 +558,108 @@ describe("sổ sai thì đỏ", () => {
   }
 });
 
+/** Every listed case of one screen: its name under the screen, and the path its region describe says it opens. */
+function casesOf(root: string, id: string): { name: string; vao: string | null }[] {
+  const file = join(mkdtempSync(join(tmpdir(), "ds-")), "list.json");
+  const r = spawnSync(
+    "npx",
+    ["playwright", "test", "tests/e2e/screens", "--list", "--reporter=json"],
+    {
+      cwd: REPO_ROOT,
+      encoding: "utf8",
+      env: { ...process.env, SCREENS_ROOT: root, PLAYWRIGHT_JSON_OUTPUT_FILE: file },
+    },
+  );
+  expect(r.status, `${r.stdout}${r.stderr}`).toBe(0);
+  type Suite = {
+    title: string;
+    specs?: {
+      title: string;
+      tests: { projectName: string; annotations: { type: string; description?: string }[] }[];
+    }[];
+    suites?: Suite[];
+  };
+  const out: { name: string; vao: string | null }[] = [];
+  const walk = (s: Suite, path: string[]): void => {
+    for (const spec of s.specs ?? [])
+      for (const t of spec.tests) {
+        const at = path.indexOf(`man ${id}`);
+        if (at < 0) continue;
+        out.push({
+          name: `${t.projectName} ${[...path.slice(at + 1), spec.title].join(" › ")}`,
+          vao: t.annotations.find((a) => a.type === "vao")?.description ?? null,
+        });
+      }
+    for (const c of s.suites ?? []) walk(c, [...path, c.title]);
+  };
+  for (const s of (JSON.parse(readFileSync(file, "utf8")) as { suites: Suite[] }).suites)
+    walk(s, [s.title]);
+  return out;
+}
+
+const ENTRY = "    vao_vung: /tuy-chinh-san?phan=can-cho\n";
+
+describe("lối vào của bộ vùng (vao_vung, hàng 7e)", () => {
+  it(
+    "a screen without vao_vung keeps the same region cases, opened at its route (control)",
+    () => {
+      const root = copyRegister();
+      const declared = casesOf(root, "tuy-chinh-san");
+      edit(root, "design/screens.yaml", (t) => t.replace(ENTRY, ""));
+      const plain = casesOf(root, "tuy-chinh-san");
+      expect(plain.map((c) => c.name).sort()).toEqual(declared.map((c) => c.name).sort());
+      const region = plain.filter((c) => c.name.includes(" vung › "));
+      expect(region.length).toBeGreaterThan(0);
+      for (const c of region) expect(c.vao, c.name).toBe("/tuy-chinh-san");
+      for (const c of casesOf(root, "inventory").filter((x) => x.name.includes(" vung › ")))
+        expect(c.vao, c.name).toBe("/inventory");
+    },
+    SLOW * 3,
+  );
+
+  it(
+    "a declared vao_vung under the route is where every region case opens; frame cases carry no entry",
+    () => {
+      const cases = casesOf(copyRegister(), "tuy-chinh-san");
+      const region = cases.filter((c) => c.name.includes(" vung › "));
+      expect(region.length).toBeGreaterThan(0);
+      for (const c of region) expect(c.vao, c.name).toBe("/tuy-chinh-san?phan=can-cho");
+      const frame = cases.filter((c) => /^\d+ (pha )?khung /.test(c.name));
+      expect(frame.length).toBeGreaterThan(0);
+      for (const c of frame) expect(c.vao, c.name).toBeNull();
+    },
+    SLOW * 2,
+  );
+
+  for (const [name, change, message] of [
+    [
+      "a vao_vung outside the screen's route",
+      (t: string) => t.replace(ENTRY, "    vao_vung: /inventory?phan=can-cho\n"),
+      "tuy-chinh-san: vao_vung ngoai man",
+    ],
+    [
+      "a vao_vung on a screen outside family grid",
+      (t: string) =>
+        t.replace("    route: /members\n", "    route: /members\n    vao_vung: /members\n"),
+      "members: vao_vung chi cho ho grid",
+    ],
+  ] as const) {
+    it(
+      `break: ${name} fails the listing with its pinned message`,
+      () => {
+        const root = copyRegister();
+        expect(list(root).status).toBe(0);
+        edit(root, "design/screens.yaml", change);
+        expect(bridge(root).errors).toContain(message);
+        const r = list(root);
+        expect(r.status).not.toBe(0);
+        expect(r.out).toContain(message);
+      },
+      SLOW * 2,
+    );
+  }
+});
+
 describe("bảng vai theo bản khai", () => {
   it(
     "the role × screen table has the declared roles in order, and a fifth role adds a column",

@@ -1,13 +1,15 @@
 {
   "schema": 1,
   "slug": "lop-rieng-cua-san",
-  "ghi_luc": "2026-11-14T05:32:08Z",
+  "ghi_luc": "2026-11-14T12:41:34Z",
   "vong_cham": 2,
   "luot": [
     {
       "vong": 1,
       "verdict": "REJECT",
-      "tang": []
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
     },
     {
       "vong": 2,
@@ -15,9 +17,14 @@
       "tang": []
     }
   ],
-  "lam_lai": [],
+  "lam_lai": [
+    {
+      "nguon": "r1",
+      "tang": "bai-kiem-ha-tang"
+    }
+  ],
   "theo_tang": {
-    "bai-kiem-ha-tang": 0,
+    "bai-kiem-ha-tang": 1,
     "trang-thai-hanh-vi": 0,
     "du-lieu-api": 0,
     "nghiep-vu": 0,
@@ -29,9 +36,7 @@
     "mau-token": 0,
     "truy-cap": 0
   },
-  "chua_phan": [
-    "r1"
-  ],
+  "chua_phan": [],
   "thuoc_vat": {
     "vat": [
       126,

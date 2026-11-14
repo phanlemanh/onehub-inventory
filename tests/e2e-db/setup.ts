@@ -39,6 +39,17 @@ export default async function setup(): Promise<void> {
       "insert into company_labels (company_id, concept, label) values ($1, $2, $3)",
       [company, concept, words],
     );
+  // Three pending units, the part the region cases open (`vao_vung` in design/screens.yaml): two short codes with
+  // digits for «lọc đầu cột», one as long as a code may be (80) for «chữ dài». No unit column is added to Bảng hàng.
+  for (const code of [
+    "A-101",
+    "A-102",
+    "Căn góc toà Ngọc Lan tầng hai mươi, hướng đông nam, nhìn ra hồ điều hoà — B-2025",
+  ])
+    await db.owner.query(
+      "insert into company_pending_units (company_id, raw_code) values ($1, $2)",
+      [company, code],
+    );
   await db.owner.end();
   rmSync(SESSION_FILE, { force: true });
   mkdirSync(dirname(OUTBOX), { recursive: true });

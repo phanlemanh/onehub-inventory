@@ -14,6 +14,8 @@
 #   mo_san    (optional) the actions of `nut` whose buttons show as soon as the screen opens; the role × screen browser
 #             suite expects exactly these for every role that holds them (row 9b)
 #   nut_chung (staff/public) buttons that do not depend on a permission, as people read them
+#   vao_vung  (optional, family grid only) the path the browser suite's region cases open, under the screen's own
+#             route; absent, they open `route`. The frame cases always open `route` (row 7e)
 #
 # `khung` declares the same for the App Shell around every staff screen: the top bar and the second column (row 9b).
 families:
@@ -76,6 +78,7 @@ screens:
     family: grid
     audience: staff
     status: built
+    vao_vung: /tuy-chinh-san?phan=can-cho
     vao: readCompanyLayer
     nut: [addCompanyLayer, editCompanyLayer, retireCompanyLayer, matchPendingUnits]
     mo_san: [addCompanyLayer]
