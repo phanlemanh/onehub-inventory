@@ -2,7 +2,7 @@
 DB_LANE ?= main
 DB_PORT ?= 5560
 DB_NAME := onehub-inventory-db-$(DB_LANE)
-.PHONY: db-up db-down db-login
+.PHONY: db-up db-down db-login ci-db
 
 db-up: ## Start this lane's Postgres (DB_LANE, DB_PORT)
 	docker run -d --rm --name $(DB_NAME) -e POSTGRES_PASSWORD=local-only -p 127.0.0.1:$(DB_PORT):5432 postgres:16
@@ -15,3 +15,6 @@ db-login: ## Let the app's login role quy_hang_login sign in on this lane's cont
 
 db-down: ## Stop and remove this lane's Postgres
 	docker rm -f $(DB_NAME)
+
+ci-db: ## Everything CI runs on a database, in one command (row 1s): DB_PORT (default 5432), BUOC, CI_DB_CONTAINER
+	bash db/scripts/ci-db.sh $(BUOC)
