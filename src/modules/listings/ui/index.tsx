@@ -13,6 +13,7 @@ export {
   inventoryOpeningFor,
   inventoryStatusHref,
   inventoryColumns,
+  type InventoryCustomColumn,
   inventoryRows,
   inventoryStateFrom,
   type CodeMatch,

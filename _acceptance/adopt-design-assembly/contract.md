@@ -23,7 +23,7 @@ này.
 
 Source input: lời chủ kho trong phiên design-assembly ngày 2026-11-14 («Cho, nhánh riêng» cho bước 1 và 2, cho lát hai,
 cho bước 3; «Giữ cả ba» cho ba lời đáp; «Đẩy và mở PR»; «Tách sang PR sau»; «Dựng hồ sơ»), bản ghi quyết định
-[0032](../../wiki/decisions/0032-component-register-written-by-design-assembly.md), design doc ở `design_doc`.
+[0034](../../wiki/decisions/0034-component-register-written-by-design-assembly.md), design doc ở `design_doc`.
 
 ## Criteria
 

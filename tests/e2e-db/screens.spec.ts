@@ -10,7 +10,7 @@ import { loadRegister, SIGNED_OUT_SCREENS, skipReason } from "../../tools/e2e_te
 import { registerSuite } from "../../tools/e2e_templates/suite";
 
 /** Written before the code: the screens this run measures (built, staff or public, less the signed-out list). */
-const MEASURED = ["today", "inventory", "sent", "members"];
+const MEASURED = ["today", "inventory", "sent", "tuy-chinh-san", "members"];
 
 test("tap man do co phien", () => {
   const register = loadRegister();

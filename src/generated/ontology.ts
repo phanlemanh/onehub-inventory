@@ -75,6 +75,34 @@ export interface CompanyCatalogAlias {
   retiredAt?: string;
 }
 
+/** The words one company uses for a standard concept instead of the preferred label («Block» for «Toà»). Belongs to that company only; the customer page never reads it. */
+export interface CompanyLabel {
+  id: number;
+  /** id of Company */
+  companyId: string;
+  concept: string;
+  label: string;
+  /** ISO datetime */
+  createdAt: string;
+  /** ISO datetime */
+  retiredAt?: string;
+}
+
+/** One pairing of a company's dictionary: the text the company writes for a value («ĐN») and the standard value of one field it stands for (Đông Nam). Belongs to that company only. */
+export interface CompanyValueAlias {
+  id: number;
+  /** id of Company */
+  companyId: string;
+  field: string;
+  raw: string;
+  rawFold: string;
+  value: string;
+  /** ISO datetime */
+  createdAt: string;
+  /** ISO datetime */
+  retiredAt?: string;
+}
+
 /** A subdivision of a project (phân khu), child of exactly one Subdivision; shared catalog, no companyId. Stored in catalog_nodes with node_type complex. */
 export interface Complex {
   slug: string;
@@ -92,6 +120,37 @@ export interface Contact {
   contactTypes: string;
   phones?: string;
   ownerMemberKey?: string;
+}
+
+export type CustomFieldKind = "text" | "number" | "date" | "single_select" | "boolean";
+
+/** A column one company keeps that the standard has no field for («Hướng view»), shown on the inventory after the standard columns. Belongs to that company only; its values live on the company's listings. */
+export interface CustomField {
+  /** id of Company */
+  companyId: string;
+  code: string;
+  name: string;
+  kind: CustomFieldKind;
+  options?: Record<string, unknown> | unknown[];
+  position: number;
+  /** ISO datetime */
+  createdAt: string;
+  /** ISO datetime */
+  retiredAt?: string;
+}
+
+/** The shape of a sheet a company imported — its column names in order — and where each column goes: a standard field, a custom field, or left out on purpose. The next sheet of the same shape needs no matching again. */
+export interface ImportTemplate {
+  id: string;
+  /** id of Company */
+  companyId: string;
+  name: string;
+  signature: Record<string, unknown> | unknown[];
+  columns: Record<string, unknown> | unknown[];
+  /** ISO datetime */
+  createdAt: string;
+  /** ISO datetime */
+  retiredAt?: string;
 }
 
 export type ListingStandardStatus = "Incomplete" | "Active" | "Pending" | "Closed" | "Hold" | "Withdrawn";
@@ -125,6 +184,7 @@ export interface Listing {
   legalStatus?: string;
   financing?: string;
   version: number;
+  customFields?: Record<string, unknown> | unknown[];
 }
 
 export type ListingOwnerContactType = "Seller" | "Landlord";
@@ -161,6 +221,24 @@ export interface Member {
   invitedBy?: string;
   /** ISO datetime */
   invitedAt?: string;
+}
+
+/** A unit a company has that the shared catalog does not have yet, kept with the code the company typed; usable at once and matched to the catalog's unit when the catalog has it. Belongs to that company only; the catalog never changes. */
+export interface PendingUnit {
+  id: string;
+  /** id of Company */
+  companyId: string;
+  rawCode: string;
+  buildingText?: string;
+  unitText?: string;
+  /** id of Unit */
+  unitKey?: string;
+  /** ISO datetime */
+  matchedAt?: string;
+  /** ISO datetime */
+  createdAt: string;
+  /** ISO datetime */
+  retiredAt?: string;
 }
 
 export type SavedViewScreen = "inventory";
@@ -295,6 +373,21 @@ export interface EditViewInput {
 export interface RemoveViewInput {
 }
 
+export interface ReadCompanyLayerInput {
+}
+
+export interface AddCompanyLayerInput {
+}
+
+export interface EditCompanyLayerInput {
+}
+
+export interface RetireCompanyLayerInput {
+}
+
+export interface MatchPendingUnitsInput {
+}
+
 export interface ViewListingsInput {
 }
 
@@ -361,6 +454,16 @@ export interface ActionHandlers {
   editView(input: EditViewInput, ctx: ActionContext): Promise<void>;
   /** Remove one's own saved view. */
   removeView(input: RemoveViewInput, ctx: ActionContext): Promise<void>;
+  /** See the company's own labels, custom fields, value spellings, pending units and import templates. */
+  readCompanyLayer(input: ReadCompanyLayerInput, ctx: ActionContext): Promise<void>;
+  /** Add a company label, custom field or value spelling. */
+  addCompanyLayer(input: AddCompanyLayerInput, ctx: ActionContext): Promise<void>;
+  /** Change a company label's words, a custom field's name and options (never its kind), a value spelling, or an import template's name. */
+  editCompanyLayer(input: EditCompanyLayerInput, ctx: ActionContext): Promise<void>;
+  /** Stop using a label, field, value spelling, pending unit or import template; nothing is deleted and values already on units stay. */
+  retireCompanyLayer(input: RetireCompanyLayerInput, ctx: ActionContext): Promise<void>;
+  /** Match the company's pending units with units the shared catalog now has; the catalog never changes. */
+  matchPendingUnits(input: MatchPendingUnitsInput, ctx: ActionContext): Promise<void>;
   /** See the listings of the company. */
   viewListings(input: ViewListingsInput, ctx: ActionContext): Promise<void>;
   /** Add a listing. */
@@ -771,6 +874,137 @@ export const ACTIONS: readonly ActionSpec[] = [
     doors: {
       api: ["DELETE /api/v1/saved-views/[id]"],
       db: ["table saved_view delete"],
+    },
+  },
+  {
+    name: "readCompanyLayer",
+    description: "See the company's own labels, custom fields, value spellings, pending units and import templates.",
+    entity: "CompanyLabel",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["GET /api/v1/company-layer"],
+      db: ["table company_labels select", "table company_fields select", "table company_value_aliases select", "table company_pending_units select", "table company_import_templates select"],
+    },
+  },
+  {
+    name: "addCompanyLayer",
+    description: "Add a company label, custom field or value spelling.",
+    entity: "CompanyLabel",
+    kind: "create",
+    roles: ["ListAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["POST /api/v1/company-layer/[part]"],
+      db: ["table company_labels insert", "table company_fields insert", "table company_value_aliases insert", "table company_pending_units insert", "table company_import_templates insert"],
+    },
+  },
+  {
+    name: "editCompanyLayer",
+    description: "Change a company label's words, a custom field's name and options (never its kind), a value spelling, or an import template's name.",
+    entity: "CompanyLabel",
+    kind: "update",
+    roles: ["ListAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["PATCH /api/v1/company-layer/[part]/[id]"],
+      db: ["table company_labels update", "table company_fields update", "table company_value_aliases update", "table company_import_templates update"],
+    },
+  },
+  {
+    name: "retireCompanyLayer",
+    description: "Stop using a label, field, value spelling, pending unit or import template; nothing is deleted and values already on units stay.",
+    entity: "CompanyLabel",
+    kind: "delete",
+    roles: ["ListAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["POST /api/v1/company-layer/[part]/[id]/retire"],
+      db: ["table company_labels update", "table company_fields update", "table company_value_aliases update", "table company_pending_units update", "table company_import_templates update"],
+    },
+  },
+  {
+    name: "matchPendingUnits",
+    description: "Match the company's pending units with units the shared catalog now has; the catalog never changes.",
+    entity: "PendingUnit",
+    kind: "command",
+    roles: ["ListAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["POST /api/v1/company-layer/pending-units/match"],
+      db: ["table company_pending_units update"],
     },
   },
   {

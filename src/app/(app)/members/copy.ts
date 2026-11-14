@@ -2,8 +2,15 @@
 // invite, change roles, the roles, company admin) come from label() in the page and are passed in.
 
 export const MEMBERS_COPY = {
-  columns: { name: "Tên", email: "Email", roles: "Vai", invited: "Người mời" },
+  columns: {
+    name: "Tên",
+    email: "Email",
+    roles: "Vai",
+    invited: "Người mời",
+    invitedAt: "Ngày mời",
+  },
   invitedBy: (name: string | null, date: string) => (name ? `${name} · ${date}` : "—"),
+  peopleCount: (n: number) => `${n} người trong sàn`,
   save: "Lưu",
   sending: "Đang gửi",
   saving: "Đang lưu",

@@ -5,3 +5,4 @@ export * from "./keys";
 export * from "./lookup";
 export * from "./sample";
 export * from "./unit-code";
+export * from "./resolve";

@@ -35,8 +35,10 @@ afterEach(async () => {
 const FOUR = ["LA", "BA", "TL", "CA"] as const;
 type Seen = "company" | "own" | null;
 // Written before the code (evals.yaml): 10 database doors × 4 roles, plus row 7d's 8 doors × 4 roles (five catalog
-// tables read; company codes read, add, change) — 40 + 32; plus row 2c's 4 saved-view doors × 4 roles — 16.
-const DB_CELLS = 88;
+// tables read; company codes read, add, change) — 40 + 32; plus row 2c's 4 saved-view doors × 4 roles — 16; plus row
+// 7e's company layer: five tables read and added (10 doors), changed by edit and retire on four tables and by retire
+// and match on pending units (10 action doors) — 20 × 4 roles — 80.
+const DB_CELLS = 168;
 // Written before the code (evals.yaml): the exempt database doors.
 const EXEMPT_DB = [
   "function app.current_company_id()",
@@ -72,6 +74,76 @@ function catalogFixture(w: World): Promise<{ unit: string; codeA: string }> {
     catalogs.set(w, p);
   }
   return p;
+}
+
+// Row 7e: one row of A and one of B in each table of the company layer, loaded once per world by the owner.
+const LAYER_ROWS: Record<string, { insert: string; update: string }> = {
+  company_labels: {
+    insert:
+      "insert into company_labels (company_id, concept, label) values ($1, 'Unit' || floor(random() * 1e6)::int, 'Căn hộ') returning id::text",
+    update: "update company_labels set label = 'Lô' where id::text = $1",
+  },
+  company_fields: {
+    insert:
+      "insert into company_fields (company_id, code, name, kind, position) values ($1, 'ghi_chu_' || floor(random() * 1e6)::int, 'Ghi chú ' || floor(random() * 1e6)::int, 'text', 9) returning code",
+    update: "update company_fields set name = 'Đổi tên' where code = $1",
+  },
+  company_value_aliases: {
+    insert:
+      "insert into company_value_aliases (company_id, field, raw, raw_fold, value) values ($1, 'standardStatus', 'còn ' || floor(random() * 1e6)::int, 'con ' || floor(random() * 1e6)::int, 'Active') returning id::text",
+    update: "update company_value_aliases set value = 'Hold' where id::text = $1",
+  },
+  company_pending_units: {
+    insert:
+      "insert into company_pending_units (company_id, raw_code) values ($1, 'SA5-' || floor(random() * 1e6)::int) returning id::text",
+    update: "update company_pending_units set retired_at = now() where id::text = $1",
+  },
+  company_import_templates: {
+    insert:
+      "insert into company_import_templates (company_id, name, signature, columns) values ($1, 'Mẫu', array['ma can ' || floor(random() * 1e6)::int], '[{\"target\":\"Listing.unitNumber\"}]') returning id::text",
+    update: "update company_import_templates set name = 'Mẫu mới' where id::text = $1",
+  },
+};
+const layers = new WeakMap<World, Promise<Record<string, string>>>();
+function layerFixture(w: World): Promise<Record<string, string>> {
+  let p = layers.get(w);
+  if (!p) {
+    p = (async () => {
+      const idsOfA: Record<string, string> = {};
+      for (const [table, sql] of Object.entries(LAYER_ROWS)) {
+        const a = await w.db.owner.query(sql.insert, [w.A]);
+        idsOfA[table] = Object.values(a.rows[0] as Record<string, string>)[0]!;
+        await w.db.owner.query(sql.insert, [w.B]);
+      }
+      return idsOfA;
+    })();
+    layers.set(w, p);
+  }
+  return p;
+}
+
+/** Reads, adds or changes one row of a company-layer table as one person of A; refused or nothing seen is no cell. */
+async function layerDoor(w: World, who: Person, table: string, cmd: string): Promise<Seen> {
+  const idsOfA = await layerFixture(w);
+  return asPerson(w, who, w.A, async (c) => {
+    try {
+      if (cmd === "select") {
+        const { rows } = await c.query(`select company_id from ${table}`);
+        const r = rows as { company_id: string }[];
+        if (r.some((x) => x.company_id !== w.A)) return "?" as Seen;
+        return (r.length >= 1 ? "company" : null) as Seen;
+      }
+      if (cmd === "insert") {
+        await c.query(LAYER_ROWS[table]!.insert, [w.A]);
+        return "company" as Seen;
+      }
+      const r = await c.query(LAYER_ROWS[table]!.update, [idsOfA[table]]);
+      return (r.rowCount === 1 ? "company" : r.rowCount === 0 ? null : "?") as Seen;
+    } catch (err) {
+      if (code(err) === "42501") return null;
+      throw err;
+    }
+  });
 }
 
 /** Reads one shared catalog table: every role reads it, a role without the cell gets permission denied. */
@@ -265,6 +337,25 @@ async function observe(w: World, who: Person, door: string): Promise<Seen> {
         );
         return (r.rowCount === 1 ? "company" : r.rowCount === 0 ? null : "?") as Seen;
       });
+    }
+    // Row 7e: the five tables of the company layer.
+    case "table company_labels select":
+    case "table company_labels insert":
+    case "table company_labels update":
+    case "table company_fields select":
+    case "table company_fields insert":
+    case "table company_fields update":
+    case "table company_value_aliases select":
+    case "table company_value_aliases insert":
+    case "table company_value_aliases update":
+    case "table company_pending_units select":
+    case "table company_pending_units insert":
+    case "table company_pending_units update":
+    case "table company_import_templates select":
+    case "table company_import_templates insert":
+    case "table company_import_templates update": {
+      const [, table, cmd] = door.split(" ");
+      return layerDoor(w, who, table!, cmd!);
     }
     // Row 2c: the saved view table; each person keeps to their own views.
     case "table saved_view select": {

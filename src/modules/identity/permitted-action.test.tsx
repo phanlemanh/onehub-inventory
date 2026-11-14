@@ -18,7 +18,8 @@ afterEach(() => cleanup());
 
 // Written before the code (evals.yaml E2): 4 roles × 22 rows (10 live after row 7d, 5 drafts of the listing board, 7
 // drafts of row 9e) × 2 records = 176. Row 2c adds four live saved-view rows (K-22): 4 × 26 × 2 = 208.
-const CELLS_WRITTEN_BEFORE = 208;
+// Row 7e adds five company-layer rows: 4 × 31 × 2 = 248.
+const CELLS_WRITTEN_BEFORE = 248;
 // The owner's choice O1 at the scope gate: own scope on someone else's record hides the button.
 const OTHERS_WRITTEN_BEFORE: Visibility = "hide";
 

@@ -12,6 +12,7 @@ import { captureSender } from "@/modules/identity/sender";
 import { openDoor } from "@/modules/identity/action-door";
 import { tokenFrom } from "@/modules/identity/http";
 import { withCompany } from "@/modules/identity/with-company";
+import { createCompanyLayerHandlers } from "@/modules/company-config/company-layer-http";
 import { createSavedViewsHandlers } from "@/modules/listings/saved-views-http";
 
 import {
@@ -26,8 +27,9 @@ import {
 import { count } from "./helpers";
 
 const ORIGIN = "http://127.0.0.1:3485";
-// Written before the code (evals.yaml): 3 API doors × 4 roles; plus row 2c's 4 saved-view doors × 4 roles.
-const API_CELLS = 28;
+// Written before the code (evals.yaml): 3 API doors × 4 roles; plus row 2c's 4 saved-view doors × 4 roles; plus row
+// 7e's 5 company-layer doors × 4 roles.
+const API_CELLS = 48;
 
 const worlds: World[] = [];
 afterEach(async () => {
@@ -55,6 +57,11 @@ async function apiWorld(suffix: string) {
   };
   const auth = createAuthHandlers(() => deps);
   const members = createMembersHandlers(() => deps);
+  // Row 7e: the company layer through the same door.
+  const layer = createCompanyLayerHandlers({
+    door: (r, action) => openDoor(() => w.pool, tokenFrom(r), action),
+    withCompany,
+  });
   // Row 2c: saved views through the identity module's shared door.
   const views = createSavedViewsHandlers({
     door: (r, action) => openDoor(() => w.pool, tokenFrom(r), action),
@@ -122,6 +129,35 @@ async function apiWorld(suffix: string) {
         return views.remove(
           req(`${ORIGIN}/api/v1/saved-views/${NO_VIEW}`, "DELETE", undefined, cookie),
           NO_VIEW,
+        );
+      // Row 7e: a label that does not exist is changed and retired — allowed answers 404, refused answers 403.
+      case "GET /api/v1/company-layer":
+        return layer.read(req(`${ORIGIN}/api/v1/company-layer`, "GET", undefined, cookie));
+      case "POST /api/v1/company-layer/[part]":
+        return layer.add(
+          req(
+            `${ORIGIN}/api/v1/company-layer/pending-units`,
+            "POST",
+            { rawCode: `SA5-${n}` },
+            cookie,
+          ),
+          "pending-units",
+        );
+      case "PATCH /api/v1/company-layer/[part]/[id]":
+        return layer.edit(
+          req(`${ORIGIN}/api/v1/company-layer/labels/0`, "PATCH", { label: `Lô ${n}` }, cookie),
+          "labels",
+          "0",
+        );
+      case "POST /api/v1/company-layer/[part]/[id]/retire":
+        return layer.retire(
+          req(`${ORIGIN}/api/v1/company-layer/labels/0/retire`, "POST", undefined, cookie),
+          "labels",
+          "0",
+        );
+      case "POST /api/v1/company-layer/pending-units/match":
+        return layer.match(
+          req(`${ORIGIN}/api/v1/company-layer/pending-units/match`, "POST", undefined, cookie),
         );
       default:
         throw new Error(`api-theo-bang: không biết gọi cửa ${door}`);

@@ -93,6 +93,36 @@ relations:
     cardinality: one-to-many
     description: A company holds the saved views of its members; each view belongs to the one member who saved it.
   - from: Company
+    name: labels_concepts_with
+    to: CompanyLabel
+    cardinality: one-to-many
+    description: A company holds its own words for standard concepts; one in use per concept.
+  - from: Company
+    name: keeps_custom_fields
+    to: CustomField
+    cardinality: one-to-many
+    description: A company holds its own columns; at most 20 in use.
+  - from: Company
+    name: spells_values_as
+    to: CompanyValueAlias
+    cardinality: one-to-many
+    description: A company holds the texts it writes for standard values.
+  - from: Company
+    name: holds_pending_units
+    to: PendingUnit
+    cardinality: one-to-many
+    description: A company holds the units it has that the shared catalog does not have yet.
+  - from: PendingUnit
+    name: matched_to
+    to: Unit
+    cardinality: many-to-one
+    description: A pending unit points to the catalog unit it was matched with, once the catalog has it.
+  - from: Company
+    name: remembers_templates
+    to: ImportTemplate
+    cardinality: one-to-many
+    description: A company holds the sheet shapes it imported and where each column went.
+  - from: Company
     name: holds_share_link
     to: ShareLink
     cardinality: one-to-many
