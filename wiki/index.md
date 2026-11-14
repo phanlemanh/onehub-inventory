@@ -73,6 +73,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0030 Sổ màn là một chỗ khai quyền vào màn và nút của mỗi màn](decisions/0030-so-man-khai-cua-vao-va-nut.md)
 - [0031 Thêm gói khung chia kéo được cho hồ sơ ghim](decisions/0031-them-goi-khung-chia-keo-duoc.md)
 - [0037 Thuế phí là dữ liệu của sàn, một hình dạng khoản](decisions/0037-thue-phi-la-du-lieu-cua-san.md)
+- [0032 Lối vào của bộ vùng lưới khai trong sổ màn](decisions/0032-loi-vao-bo-vung-luoi.md)
 
 ## Incidents
 
