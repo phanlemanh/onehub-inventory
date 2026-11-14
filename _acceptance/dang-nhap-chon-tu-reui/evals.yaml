@@ -98,3 +98,11 @@ evals:
     paths: [design/so-khoi.yaml, design/screens.yaml, _acceptance/dang-nhap-chon-tu-reui/chung-minh-man.md]
     expected: "exit 0; lưới chứng minh màn (tools/proof_gate) không báo mã nào cho hồ sơ dang-nhap-chon-tu-reui; sổ khối có dòng ho_so: dang-nhap-chon-tu-reui"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/dang-nhap.md", "src/app/login/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm dang-nhap"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
