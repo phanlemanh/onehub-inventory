@@ -345,9 +345,12 @@ describe("pending units (E5, Review Focus 4)", () => {
         )
       ).rows[0].d as string;
     // The system load gives the catalog the code: an original code for a unit the catalog has.
+    const target = c.units.find(
+      (u) => u.buildingName === "S1.01" && u.unitNumber === "0502",
+    )!.unitKey;
     await w.db.owner.query(
       "insert into catalog_aliases (object_key, kind, value, source) values ($1, 'ma_goc', 'op1/SA5-12.08', 'MAU')",
-      [c.units.find((u) => u.buildingName === "S1.01" && u.unitNumber === "0502")!.unitKey],
+      [target],
     );
     const before = await digest();
     expect(await matchPendingUnits(a)).toEqual({ matched: 2, waiting: 1 });
@@ -355,7 +358,11 @@ describe("pending units (E5, Review Focus 4)", () => {
     const after = await lookupInCompany(a, "SA5-12.08");
     expect(after?.source).toBe("catalog");
     const pending = (await readLayer(a)).pendingUnits.find((p) => p.rawCode === "SA5-12.08");
-    expect(pending?.unitKey).toBeTruthy();
+    expect(pending?.unitKey).toBe(target);
+    expect(pending?.matchedAt).toBeTruthy();
+    // The code two projects share stays waiting, with no unit.
+    const shared = (await readLayer(a)).pendingUnits.find((p) => p.rawCode === "DUP-9");
+    expect([shared?.unitKey, shared?.matchedAt]).toEqual([null, null]);
     // A unit key the catalog does not have is refused by the foreign key.
     let message = "";
     try {

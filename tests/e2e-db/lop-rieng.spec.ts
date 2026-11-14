@@ -17,12 +17,13 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 import pg from "pg";
 
 import { label } from "../../src/modules/company-config";
+import { PROBLEM_COPY } from "../../src/modules/company-config/ui/copy";
 import type { Role } from "../../src/generated/ontology";
 import { sampleCatalog } from "../../src/modules/catalog";
 import { catalogLoadStatements } from "../../src/modules/catalog/load-sql";
 import { SAMPLE_LISTINGS_PER_SUBDIVISION } from "../../src/modules/listings";
 
-import { shown } from "../../tools/e2e_templates/settle";
+import { openSheet, shown } from "../../tools/e2e_templates/settle";
 
 import { makeSampleCompany, rolePerson, ROLES, signInWithCode } from "./dang-nhap-vai";
 
@@ -244,7 +245,7 @@ test.describe("lop rieng tren bang hang", () => {
     const fieldsBefore = await liveFields();
     await openPart(page, "truong");
     await addField("ghi chu", "Chữ");
-    await expect(errorUnder(field, "name")).toBeVisible();
+    await expect(errorUnder(field, "name")).toHaveText(PROBLEM_COPY["name-taken"]!.text);
     await expect(field.getByLabel("Tên trường")).toHaveValue("ghi chu");
     await page.keyboard.press("Escape");
     await addField(
@@ -252,7 +253,7 @@ test.describe("lop rieng tren bang hang", () => {
       "Chọn một",
       Array.from({ length: 31 }, (_, i) => `L${i + 1}`).join("\n"),
     );
-    await expect(errorUnder(field, "options")).toBeVisible();
+    await expect(errorUnder(field, "options")).toHaveText(PROBLEM_COPY["options-count"]!.text);
     await expect(field.getByLabel("Tên trường")).toHaveValue("Nhiều lựa chọn");
     await page.keyboard.press("Escape");
     const filler: string[] = [];
@@ -260,7 +261,9 @@ test.describe("lop rieng tren bang hang", () => {
       filler.push(await post(api, "fields", { name: `Tạm ${i}`, kind: "text" }));
     await openPart(page, "truong");
     await addField("Thứ hai mốt", "Chữ");
-    await expect(field.locator('[data-slot="form-error"]')).toContainText("20 cột riêng");
+    await expect(field.locator('[data-slot="form-error"]')).toHaveText(
+      PROBLEM_COPY["field-limit"]!.text,
+    );
     await expect(field.getByLabel("Tên trường")).toHaveValue("Thứ hai mốt");
     await page.keyboard.press("Escape");
     for (const code of filler)
@@ -283,7 +286,7 @@ test.describe("lop rieng tren bang hang", () => {
       ).status(),
     ).toBe(200);
     await alias.getByRole("button", { name: "Thêm", exact: true }).click();
-    await expect(errorUnder(alias, "value")).toBeVisible();
+    await expect(errorUnder(alias, "value")).toHaveText(PROBLEM_COPY["value-not-in-set"]!.text);
     await expect(alias.getByLabel("Chữ sàn viết")).toHaveValue("bien");
     await page.keyboard.press("Escape");
     expect((await layerOf(api)).aliases).toHaveLength(1);
@@ -421,6 +424,12 @@ test.describe("lop rieng tren bang hang", () => {
           `tuy-chinh-san-${width}${tail}`,
           '[data-part="truong"][data-state="ready"] tbody tr',
         );
+        if (width < 1024) {
+          // On a phone the five parts ride in the App Shell's sheet: open it the shared way and show them.
+          await openSheet(page);
+          await page.screenshot({ path: `${OUT}/tuy-chinh-san-${width}-ngan${tail}.png` });
+          await page.keyboard.press("Escape");
+        }
         await snap(
           page,
           "/inventory",

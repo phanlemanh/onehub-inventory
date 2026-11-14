@@ -693,7 +693,7 @@ create function pg_temp.dem_lop_rieng() returns int[] language sql as $f$
                (select count(*) from company_import_templates)::int];
 $f$;
 do $$
-declare n int[];
+declare n int[]; cau text; bang text;
 begin
   perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a1', true);
   perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000a', true);
@@ -701,10 +701,20 @@ begin
   if n <> array[1, 1, 1, 1, 1] then
     raise exception 'HỎNG lop-rieng-theo-san: đối chứng — quản trị sàn A thấy % dòng', n;
   end if;
-  perform pg_temp.phai_loi('lop-rieng-theo-san',
+  -- Each of the five tables: no row in B's name, and no delete at all (retiring is the only way out).
+  foreach cau in array array[
     'insert into company_labels (company_id, concept, label) values (''00000000-0000-4000-8000-00000000000b'', ''Unit'', ''X'')',
-    'row-level security');
-  perform pg_temp.phai_loi('lop-rieng-theo-san', 'delete from company_fields', 'permission denied');
+    'insert into company_fields (company_id, code, name, kind, position) values (''00000000-0000-4000-8000-00000000000b'', ''x'', ''X'', ''text'', 1)',
+    'insert into company_value_aliases (company_id, field, raw, raw_fold, value) values (''00000000-0000-4000-8000-00000000000b'', ''directionFaces'', ''X'', ''x'', ''North'')',
+    'insert into company_pending_units (company_id, raw_code) values (''00000000-0000-4000-8000-00000000000b'', ''X-1'')',
+    'insert into company_import_templates (company_id, name, signature, columns) values (''00000000-0000-4000-8000-00000000000b'', ''X'', ''{x}'', ''[]'')'
+  ] loop
+    perform pg_temp.phai_loi('lop-rieng-theo-san', cau, 'row-level security');
+  end loop;
+  foreach bang in array array['company_labels', 'company_fields', 'company_value_aliases', 'company_pending_units',
+                              'company_import_templates'] loop
+    perform pg_temp.phai_loi('lop-rieng-theo-san', 'delete from ' || bang, 'permission denied');
+  end loop;
   perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000b1', true);
   perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000b', true);
   n := pg_temp.dem_lop_rieng();

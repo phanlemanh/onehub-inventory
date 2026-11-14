@@ -117,7 +117,7 @@ evals:
     target: "Màn Tuỳ chỉnh của sàn: năm phần với nút Thêm và menu «…» mở, hộp Thêm trường riêng, trạng thái rỗng, lỗi, không đủ quyền, ở 360, 414, 1024, 1440, sáng và tối"
     steps:
       - "From the repo root, with lane R Postgres up (DB_PORT 5565), run: LOP_RIENG_ANH=1 DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts tests/e2e-db/lop-rieng.spec.ts --project 1440 — it signs in through the shared role door, fills the sample company's layer, and writes the pictures under _acceptance/lop-rieng-cua-san/evidence/; it starts and stops its own server, never start another"
-      - "Open evidence/tuy-chinh-san-{360,414,1024,1440}.png and their -toi copies, tuy-chinh-san-menu-1440.png, tuy-chinh-san-them-truong-1440.png, tuy-chinh-san-mau-1440.png (empty part) and tuy-chinh-san-chi-doc-1440.png (a role that only reads)"
+      - "Open evidence/tuy-chinh-san-{360,414,1024,1440}.png and their -toi copies, tuy-chinh-san-{360,414}-ngan.png and -ngan-toi.png (the phone sheet open on the five parts), tuy-chinh-san-menu-1440.png, tuy-chinh-san-them-truong-1440.png, tuy-chinh-san-mau-1440.png (empty part) and tuy-chinh-san-chi-doc-1440.png (a role that only reads)"
     paths: ["src/app/(app)/tuy-chinh-san/**", src/modules/company-config/**, src/components/templates/**]
     expected: "Ảnh từng khổ cho thấy cột thứ hai (ngăn trượt ở điện thoại) liệt kê năm phần, vùng Lưới với «…» cuối dòng, trạng thái rỗng nói lý do và chỉ đường nhập, không chữ đè, không cuộn ngang ngoài vùng Lưới"
     evidence_required: [screenshot, observed]
