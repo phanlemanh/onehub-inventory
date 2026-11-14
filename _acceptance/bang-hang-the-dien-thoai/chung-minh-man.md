@@ -19,24 +19,55 @@ của họ Lưới, nên ma trận trạng thái của nó đo lại ở khổ �
 
 ### Ứng viên ReUI
 
-Ảnh khối gốc chụp ở 360 từ trang xem trước công khai của ReUI trước khi dựng. Chọn theo Hỏi-1 ở Cổng Phạm vi.
+Ảnh khối gốc chụp ở 360 từ trang xem trước công khai của ReUI trước khi dựng. Chủ kho chọn ở Cổng Phạm vi (2026-11-14): thẻ theo product-grid-4 — chính thẻ căn của kho thêm dáng ngang; lọc bằng
+ngăn đáy theo filter-sidebar-5 (Câu 2 «Nút»).
 
 | Cho | Ứng viên | Ảnh | Chọn |
 | --- | -------- | --- | ---- |
-| màn | product-grid-4 | evidence/reui-product-grid-4.png | |
+| màn | product-grid-4 | evidence/reui-product-grid-4.png | x |
 | màn | list-5 | evidence/reui-list-5.png | |
 | màn | data-grid-columns-3 | evidence/reui-data-grid-columns-3.png | |
+| filter-sidebar-5 | filter-sidebar-5 | evidence/reui-filter-sidebar-5.png | x |
+| filter-sidebar-5 | data-grid-columns-3 | evidence/reui/data-grid-columns-3-the-goc-360.png | |
 
 data-grid-columns-3 (bảng ↔ thẻ) không đưa thành lối: ở 360 mỗi thẻ cao gần một màn, đầu thẻ mang nút sửa, xoá thuộc 3d
 và 9e. Ngăn lọc filter-sidebar-5 (`evidence/reui-filter-sidebar-5.png`) là lối L2 của Hỏi-2.
 
 ### Ma trận trạng thái
 
-Điền trước lượt chấm.
+Đo ở khổ điện thoại (danh sách thẻ); từ 768 px bảng không đổi và giữ căn cứ của các hàng trước.
+
+| Trạng thái             | Kết quả  | Căn cứ                                                                                                     |
+| ---------------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| Chờ tải                | đạt      | tests/the-dien-thoai.test.tsx (trang-thai: loading, không thẻ); tests/e2e/screens/screens.spec.ts (cho-tai) |
+| Trống                  | đạt      | tests/the-dien-thoai.test.tsx (trang-thai: empty, câu trống của màn)                                        |
+| Không có dòng nào khớp | đạt      | tests/the-dien-thoai.test.tsx (loc: zzz-khong-co); tests/e2e/sheet.spec.ts (no match keeps filters, 360)    |
+| Lỗi                    | đạt      | tests/the-dien-thoai.test.tsx (trang-thai: error, không thẻ)                                                |
+| Một phần hỏng          | đạt      | tests/the-dien-thoai.test.tsx (trang-thai: partial, 40 thẻ và dải báo)                                      |
+| Chữ dài                | đạt      | tests/e2e/the-dien-thoai.spec.ts (du-lieu-bien: mã 14 ký tự, giá 125,5 tỷ, giá thuê, không giá)             |
+| Không đủ quyền         | đạt      | tests/the-dien-thoai.test.tsx (trang-thai: forbidden); tests/e2e/the-dien-thoai.spec.ts (CompanyAdmin)      |
+| Xung đột khi lưu       | không áp | Thẻ không sửa gì (sửa trên điện thoại là hàng 3d)                                                           |
+| Phiên hết hạn          | không áp | Của khung (App Shell), không của vùng                                                                       |
+| Mất mạng khi lưu       | không áp | Thẻ không lưu gì                                                                                            |
+| Link hết hạn           | không áp | Trạng thái của trang khách; Bảng hàng là màn nội bộ                                                         |
 
 ### Khối
 
 | Khối | Bậc | Đã tra | Ứng viên gần nhất | Vì sao không dùng | Cách |
 | --- | --- | --- | --- | --- | --- |
+| filter-sidebar-5 | reui | danh sách thẻ, ngăn lọc (`tra.mjs mobile list`, `tra.mjs card view`, `tra.mjs property listing card`) | data-grid-columns-3 | thẻ của nó cao gần một màn 360, đầu thẻ mang nút sửa, xoá thuộc 3d và 9e | ghép từ thành phần |
 | DataRegion | trong-kho | | | | |
 | ListingCard | trong-kho | | | | |
+| Sheet | trong-kho | | | | |
+| Button | trong-kho | | | | |
+| Tooltip | trong-kho | | | | |
+
+### Vùng
+
+| Khối | Vùng | Xử lý | Lý do |
+| --- | --- | --- | --- |
+| filter-sidebar-5 | ngăn lọc trượt lên | lấy | lọc trên điện thoại trong một ngăn, chủ kho chọn «Nút» |
+| filter-sidebar-5 | chip lọc đang chạy | lấy | thấy lọc nào đang chạy, bỏ từng cái một chạm |
+| filter-sidebar-5 | nút áp dụng, đặt lại | bỏ | lọc áp ngay khi gõ như ở bảng; «Xoá lọc» ở hàng chip |
+| filter-sidebar-5 | thanh trượt giá, màu, cỡ | bỏ | ô lọc của từng cột thay, cùng luật với bảng |
+| filter-sidebar-5 | Sắp theo | thêm | giám sát chốt (G-1411-100): một họ không rơi sắp xếp khi đổi khổ |
