@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 5a86687335f99a5a579867eff191dc3512fb1729
+verified_commit: 8f483c908e395d82f5341db4b91b7c56e404dfa4
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -173,3 +173,7 @@ sha: 92a67f7b4cb62ac90c5f8b364ee7d66388470a0a · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 2 — 2026-11-14, do gộp nhánh chính 1226ec5 (3a) sau chữ ký; làn trước đỏ E3 vì Postgres dãy H chưa bật
 run_id: repin-20261114T105853Z-14222
 sha: 5a86687335f99a5a579867eff191dc3512fb1729 · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng · ngoài làn máy: E1, E4
+
+### Re-pin lần 3 — 2026-11-14, do gộp nhánh chính f905ded (2e) sau chữ ký
+run_id: repin-20261114T120957Z-14226
+sha: 8f483c908e395d82f5341db4b91b7c56e404dfa4 · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng · ngoài làn máy: E1, E4
