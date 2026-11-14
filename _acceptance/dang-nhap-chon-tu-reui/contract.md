@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [sign-in]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-14T05:13:12Z
 design_doc: docs/superpowers/specs/2026-11-14-dang-nhap-chon-tu-reui-design.md
@@ -90,3 +90,6 @@ Màn đăng nhập mở cho mọi người chưa vào sàn; vai chỉ có sau kh
 
 - Ngoài-1 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Người dùng không thấy gì khác: màn đăng nhập vẫn báo lỗi máy chủ đúng chỗ. Hậu quả chỉ là bài kiểm này có thể chập chờn trên máy chậm mà bộ lặp kiểm không bắt được. — `tests/e2e/dang-nhap-khoi.spec.ts`
 - Ngoài-2 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Dáng của màn đăng nhập (logo, cột không khung, biểu tượng thư, nút rộng) chưa được kiểm tự động ở nền tối, nên nếu nền tối vỡ bố cục thì có thể không ai báo sớm. — `tests/e2e/dang-nhap-khoi.spec.ts`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-14:
+  - Ngoài-1: Bài kiểm «lỗi máy chủ trong cột» chờ bằng tay thay hàm chờ chung, có thể chập chờn trên máy chậm; người dùng không thấy gì khác.
+  - Ngoài-2: Dáng khối (logo, cột không khung, biểu tượng thư, nút rộng) chưa được đo tự động ở nền tối.
