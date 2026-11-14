@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeftIcon, ChevronRightIcon, XIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, PinIcon, PinOffIcon, XIcon } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -12,10 +12,21 @@ import {
 
 import { Frame, FramePanel } from "@/components/reui/frame";
 import { Button } from "@/components/ui/button";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { usePanelRef } from "react-resizable-panels";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog } from "@base-ui/react/dialog";
 
 import { GRID_COPY } from "./grid-copy";
+import {
+  PIN_DEFAULT_SHARE,
+  PIN_MAX_SHARE,
+  PIN_MIN_WIDTH,
+  clampPinWidth,
+  pinAvailable,
+  useRecordPin,
+  type PinState,
+} from "./record-pin";
 
 /** The address parameter that names the open record (design/behaviors.md: the record panel has its own address). */
 export const RECORD_PARAM = "ho-so";
@@ -83,9 +94,12 @@ function PanelHeader({
   onNavigate,
   close,
   actions,
+  pin,
 }: {
   title: ReactNode;
   actions?: ReactNode;
+  /** The frame's pin button (row 3a): after the record's actions, before «Trước»; absent on a phone. */
+  pin?: ReactNode;
   previous: string | undefined;
   next: string | undefined;
   onNavigate: (id: string | null) => void;
@@ -96,6 +110,7 @@ function PanelHeader({
       {title}
       <div data-slot="record-panel-actions" className="flex items-center justify-end gap-1">
         {actions}
+        {pin}
         <Button
           variant="outline"
           size="sm"
@@ -158,6 +173,7 @@ export function RecordPanel({
     returnFocusRef.current = returnFocus;
   });
   const isPhone = useIsMobile();
+  const pin = useRecordPin();
   const index = openId === null ? -1 : ids.indexOf(openId);
   const view = openId === null ? null : render(openId);
   const previous = index > 0 ? ids[index - 1] : undefined;
@@ -166,12 +182,29 @@ export function RecordPanel({
     const id = lastShown.current;
     if (id === null) return;
     if (returnFocusRef.current?.(id)) return;
-    document.querySelector<HTMLElement>(recordOpenSelector(id))?.focus();
+    // Closing a pinned record widens the grid, which may redraw its rows (row 3a): while the row that took focus is
+    // replaced and focus falls back to the page, give it to the new row, for a few frames at most.
+    let tries = 0;
+    const attempt = () => {
+      const opener = document.querySelector<HTMLElement>(recordOpenSelector(id));
+      opener?.focus();
+      watch();
+    };
+    const watch = () => {
+      if (tries++ >= 30) return;
+      requestAnimationFrame(() => {
+        if (document.activeElement === document.body) attempt();
+        else watch();
+      });
+    };
+    attempt();
   }, []);
 
   if (!isPhone)
     return (
       <RecordColumn
+        pin={pin.state}
+        onPin={pin.set}
         openId={openId}
         view={view}
         previous={previous}
@@ -228,6 +261,8 @@ export function RecordPanel({
 /** The App Shell's top bar and work area, by their slots; a page without the App Shell uses the whole window. */
 const TOP_BAR = '[data-slot="app-shell-top-bar"]';
 const WORK_AREA = '[data-slot="sidebar-inset"]';
+/** The data region's toolbar: the floating record stands below it (AC-4 of row 3a). */
+const REGION_TOOLS = '[data-slot="region-toolbar"]';
 
 /**
  * Where the floating panel stands: from just under the App Shell's top bar to the bottom of the work area, flush with
@@ -235,10 +270,14 @@ const WORK_AREA = '[data-slot="sidebar-inset"]';
  * top bar hides in full screen (row 2a) and the panel then runs the whole height.
  */
 function useWorkAreaBounds(open: boolean) {
-  const [bounds, setBounds] = useState<{ top: number; right: number; bottom: number }>({
+  const [bounds, setBounds] = useState({
     top: 0,
+    tools: 0,
     right: 0,
     bottom: 0,
+    left: 0,
+    width: 0,
+    window: 0,
   });
   useEffect(() => {
     if (!open) return;
@@ -249,8 +288,12 @@ function useWorkAreaBounds(open: boolean) {
       setBounds({
         // No top bar (full screen): the panel runs the whole height, from the top of the window.
         top: Math.max(0, barRect ? barRect.bottom : 0),
+        tools: document.querySelector(REGION_TOOLS)?.getBoundingClientRect().bottom ?? 0,
         right: area ? Math.max(0, window.innerWidth - area.right) : 0,
         bottom: area ? Math.max(0, window.innerHeight - area.bottom) : 0,
+        left: area ? Math.max(0, area.left) : 0,
+        width: area ? area.width : window.innerWidth,
+        window: window.innerWidth,
       });
     };
     measure();
@@ -270,10 +313,37 @@ function useWorkAreaBounds(open: boolean) {
   return bounds;
 }
 
+/** The frame's pin button: an icon named for what a press does, pressed while the record is a column (row 3a). */
+function PinButton({ pinned, onToggle }: { pinned: boolean; onToggle: () => void }) {
+  const name = pinned ? GRID_COPY.record.unpin : GRID_COPY.record.pin;
+  return (
+    <Button
+      variant={pinned ? "secondary" : "ghost"}
+      size="icon-sm"
+      aria-label={name}
+      title={name}
+      aria-pressed={pinned}
+      data-slot="record-pin"
+      onClick={onToggle}
+    >
+      {pinned ? <PinOffIcon aria-hidden="true" /> : <PinIcon aria-hidden="true" />}
+    </Button>
+  );
+}
+
+/** The floating record's width: two fifths of the window, between 320 and 512 px, as row 3 built it. */
+function floatWidth(windowWidth: number): number {
+  return Math.min(512, Math.max(PIN_MIN_WIDTH, windowWidth * PIN_DEFAULT_SHARE));
+}
+
 /**
- * The panel floating over the right of the work area. It does not hold focus: the grid beside it stays in the tab order. Opening it
- * from a closed state moves focus to its title so a keyboard user lands in it; walking to another row leaves focus
- * where it is.
+ * The record beside the grid, from 768 px. Floating, it lies over the right of the work area (decision 0024). Pinned
+ * (row 3a, decision 0031), it is a column flush with the work area's right edge with a divider to drag (ReUI
+ * app-shell-11, Resizable), and the data region gives up the same width (`--record-pinned`) so no row and no column
+ * hides under it. Both shapes are one tree — only classes and the column's size change — so pinning keeps the record's
+ * scroll and the focus on the pin button. It does not hold focus: the grid beside it stays in the tab order. Opening it
+ * from a closed state moves focus to its title; walking to another row leaves focus where it is. Esc closes it only
+ * from inside the record.
  */
 function RecordColumn({
   openId,
@@ -282,6 +352,8 @@ function RecordColumn({
   next,
   onNavigate,
   focusRow,
+  pin,
+  onPin,
 }: {
   openId: string | null;
   view: RecordView | null;
@@ -289,8 +361,11 @@ function RecordColumn({
   next: string | undefined;
   onNavigate: (id: string | null) => void;
   focusRow: () => void;
+  pin: PinState;
+  onPin: (next: PinState, fallbackWidth: number) => void;
 }) {
   const titleRef = useRef<HTMLHeadingElement>(null);
+  const panelRef = usePanelRef();
   const bounds = useWorkAreaBounds(openId !== null);
   const wasOpen = useRef(false);
   useEffect(() => {
@@ -299,63 +374,128 @@ function RecordColumn({
     if (!open && wasOpen.current) focusRow();
     wasOpen.current = open;
   }, [openId, focusRow]);
-  if (openId === null || view === null) return null;
+  const canPin = pinAvailable(bounds.width);
+  const shown = openId !== null && view !== null;
+  const pinned = pin.pinned && canPin && shown;
+  const area = bounds.width;
+  // Unpinned before, the column keeps the floating record's width, so pinning does not reflow the record.
+  const pinnedWidth = clampPinWidth(pin.width ?? floatWidth(bounds.window), area);
+  const width = pinned ? pinnedWidth : floatWidth(bounds.window);
+  // The column follows the state: pinned width from the cookie, the float's own width otherwise.
+  useEffect(() => {
+    if (!shown || area === 0) return;
+    panelRef.current?.resize(width);
+  }, [shown, area, width, panelRef]);
+  // The data region makes room for the pinned column; nothing to make room for when it floats or is closed.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (pinned) root.style.setProperty("--record-pinned", `${pinnedWidth}px`);
+    else root.style.removeProperty("--record-pinned");
+    return () => {
+      root.style.removeProperty("--record-pinned");
+    };
+  }, [pinned, pinnedWidth]);
+  if (!shown || view === null || openId === null) return null;
   const titleId = `record-panel-title-${openId}`;
   return (
-    // A non-modal dialog: it has its own name and «Đóng», and the grid beside it stays usable.
-    <aside
-      role="dialog"
-      aria-modal="false"
-      aria-labelledby={titleId}
+    <div
+      data-slot="record-panel-layer"
       style={
         {
-          "--record-top": `${bounds.top}px`,
+          // Floating, the record stands below the region's toolbar so the toolbar stays usable (AC-4 of row 3a, after
+          // the supervisor's ruling D-1411-1: the owner's newer word wins over row 3's «Trừ thanh trên»); pinned, the
+          // region gives up its width, so the column runs from just under the top bar.
+          "--record-top": `${pinned ? bounds.top : Math.max(bounds.top, bounds.tools)}px`,
           "--record-right": `${bounds.right}px`,
           "--record-bottom": `${bounds.bottom}px`,
+          "--record-left": `${bounds.left}px`,
         } as CSSProperties
       }
-      className="fixed top-(--record-top) right-(--record-right) bottom-(--record-bottom) z-50 flex w-2/5 min-w-80 max-w-lg flex-col border-l bg-background p-2"
-      onKeyDown={(event) => {
-        if (event.key !== "Escape") return;
-        event.stopPropagation();
-        onNavigate(null);
-      }}
+      // The layer lets clicks through to the grid; only the record and, when pinned, the divider take them. The vendor
+      // parts take no classes, so the layer styles them by their slots.
+      className={`pointer-events-none fixed top-(--record-top) right-(--record-right) bottom-(--record-bottom) left-(--record-left) [&_[data-slot=resizable-panel]:has(aside)]:pointer-events-auto ${pinned ? "z-40 [&_[data-slot=resizable-handle]]:pointer-events-auto" : "z-50 [&_[data-slot=resizable-handle]]:hidden"}`}
     >
-      <Frame
-        data-slot="record-panel"
-        data-record-layout="float"
-        data-record-id={openId}
-        className="min-h-0 flex-1 text-sm shadow-lg"
+      <ResizablePanelGroup
+        orientation="horizontal"
+        disabled={!pinned}
+        onLayoutChanged={(layout, meta) => {
+          if (!pinned || !meta.isUserInteraction) return;
+          // The new layout, as shares of the work area: the panel's own size may still be the old one here.
+          const share = layout["record-column"];
+          if (share === undefined) return;
+          const size = clampPinWidth((share / 100) * area, area);
+          onPin({ pinned: true, width: size }, size);
+        }}
       >
-        <FramePanel className="flex min-h-0 flex-1 flex-col p-0">
-          <PanelHeader
-            title={
-              <h2
-                id={titleId}
-                ref={titleRef}
-                tabIndex={-1}
-                className={`${TITLE_CLASS} outline-none`}
+        <ResizablePanel id="record-grid" minSize={`${100 - PIN_MAX_SHARE * 100}`} />
+        <ResizableHandle withHandle aria-label={GRID_COPY.record.resize} />
+        <ResizablePanel
+          id="record-column"
+          panelRef={panelRef}
+          defaultSize={width}
+          minSize={PIN_MIN_WIDTH}
+          maxSize={`${PIN_MAX_SHARE * 100}`}
+        >
+          {/* A non-modal dialog: it has its own name and «Đóng», and the grid beside it stays usable. */}
+          <aside
+            role="dialog"
+            aria-modal="false"
+            aria-labelledby={titleId}
+            className={`flex h-full flex-col bg-background ${pinned ? "" : "border-l p-2"}`}
+            onKeyDown={(event) => {
+              if (event.key !== "Escape") return;
+              event.stopPropagation();
+              onNavigate(null);
+            }}
+          >
+            <Frame
+              data-slot="record-panel"
+              data-record-layout={pinned ? "pinned" : "float"}
+              data-record-id={openId}
+              className={`min-h-0 flex-1 text-sm ${pinned ? "rounded-none border-0 p-0 shadow-none" : "shadow-lg"}`}
+            >
+              <FramePanel
+                className={`flex min-h-0 flex-1 flex-col p-0 ${pinned ? "rounded-none border-0 shadow-none" : ""}`}
               >
-                {view.title}
-              </h2>
-            }
-            previous={previous}
-            next={next}
-            onNavigate={onNavigate}
-            actions={view?.actions}
-            close={
-              <Button variant="ghost" size="sm" onClick={() => onNavigate(null)}>
-                <XIcon aria-hidden="true" />
-                {GRID_COPY.record.close}
-              </Button>
-            }
-          />
-          <div data-slot="record-panel-body" className="min-h-0 flex-1 overflow-y-auto p-4">
-            {view.body}
-          </div>
-          {view.footer}
-        </FramePanel>
-      </Frame>
-    </aside>
+                <PanelHeader
+                  title={
+                    <h2
+                      id={titleId}
+                      ref={titleRef}
+                      tabIndex={-1}
+                      className={`${TITLE_CLASS} outline-none`}
+                    >
+                      {view.title}
+                    </h2>
+                  }
+                  previous={previous}
+                  next={next}
+                  onNavigate={onNavigate}
+                  actions={view.actions}
+                  pin={
+                    canPin ? (
+                      <PinButton
+                        pinned={pinned}
+                        onToggle={() => onPin({ pinned: !pinned, width: pin.width }, pinnedWidth)}
+                      />
+                    ) : null
+                  }
+                  close={
+                    <Button variant="ghost" size="sm" onClick={() => onNavigate(null)}>
+                      <XIcon aria-hidden="true" />
+                      {GRID_COPY.record.close}
+                    </Button>
+                  }
+                />
+                <div data-slot="record-panel-body" className="min-h-0 flex-1 overflow-y-auto p-4">
+                  {view.body}
+                </div>
+                {view.footer}
+              </FramePanel>
+            </Frame>
+          </aside>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </div>
   );
 }

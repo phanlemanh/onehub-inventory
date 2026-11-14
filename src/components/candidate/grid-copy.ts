@@ -74,6 +74,9 @@ export const GRID_COPY = {
     previous: "Trước",
     next: "Sau",
     close: "Đóng",
+    pin: "Ghim thành cột",
+    unpin: "Bỏ ghim",
+    resize: "Đổi rộng hồ sơ",
   },
   partial: {
     title: "Một số dòng chưa tải được",

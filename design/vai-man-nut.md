@@ -27,21 +27,21 @@ Mỗi màn của sổ màn có một mục, cộng mục `khung` cho App Shell. 
 
 ## inventory — `/inventory`
 
-| Vai          | Nút theo quyền                                                                                                                                                                                                                | Nút không theo quyền                                      |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| Đầu chủ      | `updateListing` (toàn sàn), `editView` (của tôi), `saveView` (của tôi), `createListing` (toàn sàn, dự kiến), `activateListing` (của tôi, dự kiến), `removeListing` (của tôi, dự kiến), `viewOwnerPhone` (của tôi, dự kiến)    | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Trước, Sau, Đóng |
-| Đầu khách    | `updateListing` (toàn sàn), `editView` (của tôi), `saveView` (của tôi), `createListing` (toàn sàn, dự kiến)                                                                                                                   | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Trước, Sau, Đóng |
-| Trưởng nhóm  | `updateListing` (toàn sàn), `editView` (của tôi), `saveView` (của tôi), `createListing` (toàn sàn, dự kiến), `activateListing` (toàn sàn, dự kiến), `removeListing` (toàn sàn, dự kiến), `viewOwnerPhone` (toàn sàn, dự kiến) | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Trước, Sau, Đóng |
-| Quản trị sàn | chặn                                                                                                                                                                                                                          | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Trước, Sau, Đóng |
+| Vai          | Nút theo quyền                                                                                                                                                                                                                                                                     | Nút không theo quyền                                            |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Đầu chủ      | `updateListing` (toàn sàn), `editView` (của tôi), `saveView` (của tôi), `readCatalog` (toàn sàn), `viewListings` (toàn sàn), `createListing` (toàn sàn, dự kiến), `activateListing` (của tôi, dự kiến), `removeListing` (của tôi, dự kiến), `viewOwnerPhone` (của tôi, dự kiến)    | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng |
+| Đầu khách    | `updateListing` (toàn sàn), `editView` (của tôi), `saveView` (của tôi), `readCatalog` (toàn sàn), `viewListings` (toàn sàn), `createListing` (toàn sàn, dự kiến)                                                                                                                   | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng |
+| Trưởng nhóm  | `updateListing` (toàn sàn), `editView` (của tôi), `saveView` (của tôi), `readCatalog` (toàn sàn), `viewListings` (toàn sàn), `createListing` (toàn sàn, dự kiến), `activateListing` (toàn sàn, dự kiến), `removeListing` (toàn sàn, dự kiến), `viewOwnerPhone` (toàn sàn, dự kiến) | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng |
+| Quản trị sàn | `readCatalog` (toàn sàn)                                                                                                                                                                                                                                                           | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng |
 
 ## sent — `/sent`
 
-| Vai          | Nút theo quyền | Nút không theo quyền    |
-| ------------ | -------------- | ----------------------- |
-| Đầu chủ      | chặn           | Lọc, Cột, Toàn màn hình |
-| Đầu khách    | chặn           | Lọc, Cột, Toàn màn hình |
-| Trưởng nhóm  | chặn           | Lọc, Cột, Toàn màn hình |
-| Quản trị sàn | chặn           | Lọc, Cột, Toàn màn hình |
+| Vai          | Nút theo quyền | Nút không theo quyền          |
+| ------------ | -------------- | ----------------------------- |
+| Đầu chủ      | chặn           | Lọc, Cột, Toàn màn hình, Ghim |
+| Đầu khách    | chặn           | Lọc, Cột, Toàn màn hình, Ghim |
+| Trưởng nhóm  | chặn           | Lọc, Cột, Toàn màn hình, Ghim |
+| Quản trị sàn | chặn           | Lọc, Cột, Toàn màn hình, Ghim |
 
 ## contacts — `/contacts`
 

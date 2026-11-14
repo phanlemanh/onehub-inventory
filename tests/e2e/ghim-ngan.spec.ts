@@ -143,30 +143,22 @@ test.describe("E1 · the pin button sits before Trước, Sau, Đóng", () => {
     await expect(unpinButton(page)).toHaveCount(0);
   });
 
-  test("at 768 the pin shows only with room for a 320 px column and a 480 px grid", async ({
+  test("at 768 the work area is under 800 px: no pin, with the second column open or folded", async ({
     page,
     context,
     browserName,
   }, info) => {
     test.skip(browserName !== "chromium" || info.project.name !== "1024", "do mot lan, khung 768");
     await page.setViewportSize({ width: 768, height: 1024 });
-    await context.addCookies([{ name: "app_shell_cot2", value: "1", url: "http://127.0.0.1" }]);
-    await openScreen(page, "/inventory");
-    await openRow(page, 0);
-    const area = (await box(page, '[data-slot="sidebar-inset"]')).width;
-    if (area < MIN_COLUMN + MIN_GRID) {
+    for (const open of ["1", "0"]) {
+      await context.addCookies([{ name: "app_shell_cot2", value: open, url: "http://127.0.0.1" }]);
+      await openScreen(page, "/inventory");
+      await openRow(page, 0);
+      const area = (await box(page, '[data-slot="sidebar-inset"]')).width;
+      expect(area, `cot hai ${open}`).toBeLessThan(MIN_COLUMN + MIN_GRID);
       await expect(pinButton(page)).toHaveCount(0);
       await expect(panel(page)).toHaveAttribute("data-record-layout", "float");
     }
-    await context.addCookies([{ name: "app_shell_cot2", value: "0", url: "http://127.0.0.1" }]);
-    await openScreen(page, "/inventory");
-    await openRow(page, 0);
-    const wider = (await box(page, '[data-slot="sidebar-inset"]')).width;
-    expect(wider).toBeGreaterThanOrEqual(MIN_COLUMN + MIN_GRID);
-    await pin(page);
-    const col = await columnBox(page);
-    expect(col.width).toBeGreaterThanOrEqual(MIN_COLUMN - 1);
-    expect(col.width).toBeLessThanOrEqual(wider - MIN_GRID + 1);
   });
 });
 
@@ -178,10 +170,27 @@ async function assertRoomMade(page: Page, before: number): Promise<void> {
   const area = await box(page, '[data-slot="sidebar-inset"]');
   if (Math.abs(col.right - area.right) > 1) throw new Error("pinned column not flush right");
   if (reg.right > col.left + 1) throw new Error("region under pinned column");
-  const shadow = await panel(page).evaluate((el) => getComputedStyle(el).boxShadow);
-  if (shadow !== "none") throw new Error("pinned column still floats");
+  const floats = await panel(page).evaluate((el) =>
+    // A drop shadow is a shadow with a blur and a colour that shows; rings and empty shadows do not float.
+    [
+      ...getComputedStyle(el).boxShadow.matchAll(
+        /(rgba?\([^)]*\))\s+(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px/g,
+      ),
+    ].some(([, color, , , blur]) => Number(blur) > 0 && !/,\s*0\)$/.test(color!)),
+  );
+  if (floats) throw new Error("pinned column still floats");
   const now = await headersShown(page);
   if (now !== before) throw new Error(`columns hidden on pin: ${before} → ${now}`);
+}
+
+/** The record's scroll is kept across a change of shape, unless its new height no longer scrolls that far. */
+async function assertScrollKept(page: Page, before: number): Promise<number> {
+  const [now, max] = await panel(page)
+    .locator('[data-slot="record-panel-body"]')
+    .evaluate((el) => [el.scrollTop, el.scrollHeight - el.clientHeight]);
+  if (Math.abs(now! - Math.min(before, max!)) > 1)
+    throw new Error(`record remounted on pin: scroll ${now}`);
+  return now!;
 }
 
 test.describe("E2 · pinning makes room beside the grid", () => {
@@ -191,6 +200,8 @@ test.describe("E2 · pinning makes room beside the grid", () => {
       browserName,
     }, info) => {
       test.skip(browserName !== "chromium" || !WIDE.has(info.project.name), "do o 1440 va 1024");
+      // A short window, so the record's body scrolls and keeping its scroll means something.
+      await page.setViewportSize({ width: page.viewportSize()!.width, height: 520 });
       await openScreen(page, path);
       const headers = await headersShown(page);
       const fullWidth = (await box(page, '[data-slot="data-region"]')).width;
@@ -198,26 +209,41 @@ test.describe("E2 · pinning makes room beside the grid", () => {
       const body = panel(page).locator('[data-slot="record-panel-body"]');
       await body.evaluate((el) => (el.scrollTop = 120));
       const scrolled = await body.evaluate((el) => el.scrollTop);
+      expect(scrolled, "the record must scroll for this check to mean anything").toBeGreaterThan(
+        10,
+      );
       await pinButton(page).click();
       await expect(panel(page)).toHaveAttribute("data-record-layout", "pinned");
       await assertRoomMade(page, headers);
       await expect(unpinButton(page)).toHaveAttribute("aria-pressed", "true");
       await expect(unpinButton(page)).toBeFocused();
-      expect(Math.abs((await body.evaluate((el) => el.scrollTop)) - scrolled)).toBeLessThanOrEqual(
-        1,
-      );
+      await assertScrollKept(page, scrolled);
       await unpinButton(page).click();
       await expect(panel(page)).toHaveAttribute("data-record-layout", "float");
       await expect(panel(page)).toHaveAttribute("data-record-id", id);
       await expect(pinButton(page)).toBeFocused();
-      expect(Math.abs((await body.evaluate((el) => el.scrollTop)) - scrolled)).toBeLessThanOrEqual(
-        1,
-      );
+      await assertScrollKept(page, scrolled);
       expect(
         Math.abs((await box(page, '[data-slot="data-region"]')).width - fullWidth),
       ).toBeLessThanOrEqual(1);
     });
   }
+
+  test("break: a record redrawn on pin loses its scroll", async ({ page, browserName }, info) => {
+    test.skip(browserName !== "chromium" || info.project.name !== "1440", "do o 1440");
+    await page.setViewportSize({ width: 1440, height: 520 });
+    await openScreen(page, "/inventory");
+    await openRow(page, 1);
+    const body = panel(page).locator('[data-slot="record-panel-body"]');
+    await body.evaluate((el) => (el.scrollTop = 120));
+    const scrolled = await body.evaluate((el) => el.scrollTop);
+    await pin(page);
+    // What a remount does to the record's scroll.
+    await body.evaluate((el) => (el.scrollTop = 0));
+    await expect(assertScrollKept(page, scrolled)).rejects.toThrow(
+      "record remounted on pin: scroll 0",
+    );
+  });
 
   test("break: a region that does not give room is caught", async ({ page, browserName }, info) => {
     test.skip(browserName !== "chromium" || info.project.name !== "1440", "do o 1440");
@@ -312,14 +338,16 @@ async function assertBarsClear(page: Page): Promise<void> {
     const b = await box(page, '[data-slot="app-shell-top-bar"]');
     if (col.top < b.bottom - 1) throw new Error("top bar covered by record");
   }
-  const tools = await box(page, '[data-slot="data-region"] [data-slot="frame-panel"] > div');
-  const overlap = !(
-    tools.right <= col.left ||
-    tools.left >= col.right ||
-    tools.bottom <= col.top ||
-    tools.top >= col.bottom
-  );
-  if (overlap) throw new Error("toolbar covered by record");
+  const covered = await region(page)
+    .getByRole("button", { name: /^(Lọc|Cột|Toàn màn hình)$/ })
+    .evaluateAll((buttons) =>
+      buttons.some((b) => {
+        const r = b.getBoundingClientRect();
+        const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        return !hit || !b.contains(hit);
+      }),
+    );
+  if (covered) throw new Error("toolbar covered by record");
 }
 
 test.describe("E4 · bars clear, grid live", () => {
@@ -347,7 +375,7 @@ test.describe("E4 · bars clear, grid live", () => {
     browserName,
   }, info) => {
     test.skip(browserName !== "chromium" || info.project.name !== "1440", "do o 1440");
-    await injectStyle(page, '[role="dialog"]:has([data-record-layout="pinned"]){top:0 !important}');
+    await injectStyle(page, '[data-slot="record-panel-layer"]{top:0 !important}');
     await openScreen(page, "/inventory");
     await openRow(page, 0);
     await pin(page);
@@ -511,12 +539,18 @@ test.describe("E8 · accessibility and Esc", () => {
   }, info) => {
     test.skip(browserName !== "chromium" || info.project.name !== "1440", "do o 1440");
     await page.addInitScript(() => {
-      document.addEventListener("keydown", (event) => {
-        if (event.key !== "Escape") return;
-        document
-          .querySelector<HTMLButtonElement>('[data-slot="record-panel-actions"] button:last-child')
-          ?.click();
-      });
+      document.addEventListener(
+        "keydown",
+        (event) => {
+          if (event.key !== "Escape") return;
+          document
+            .querySelector<HTMLButtonElement>(
+              '[data-slot="record-panel-actions"] button:last-child',
+            )
+            ?.click();
+        },
+        true,
+      );
     });
     await openScreen(page, "/inventory");
     await openRow(page, 1);

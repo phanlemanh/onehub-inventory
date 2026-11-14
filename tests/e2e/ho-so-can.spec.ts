@@ -72,6 +72,7 @@ type Box = { top: number; bottom: number; left: number; right: number; width: nu
 async function floatGeometry(page: Page): Promise<{
   aside: Box;
   barBottom: number | null;
+  toolsBottom: number | null;
   areaBottom: number;
   viewport: number;
   viewportHeight: number;
@@ -100,6 +101,9 @@ async function floatGeometry(page: Page): Promise<{
     return {
       aside: rect(aside),
       barBottom: shown ? shown.getBoundingClientRect().bottom : null,
+      toolsBottom:
+        document.querySelector('[data-slot="region-toolbar"]')?.getBoundingClientRect().bottom ??
+        null,
       areaBottom: area.getBoundingClientRect().bottom,
       viewport: window.innerWidth,
       viewportHeight: window.innerHeight,
@@ -115,12 +119,18 @@ async function floatGeometry(page: Page): Promise<{
   });
 }
 
-/** The record runs from just under the top bar to the bottom of the work area or the window. */
+/**
+ * The record runs from just under the top bar — and under the region's toolbar while that is in view (row 3a, AC-4,
+ * supervisor's ruling D-1411-1) — to the bottom of the work area or the window.
+ */
 function assertEdges(g: Awaited<ReturnType<typeof floatGeometry>>): void {
   if (g.barBottom !== null && g.aside.top < g.barBottom - 2)
     throw new Error("record covers the top bar");
-  if (g.barBottom !== null && Math.abs(g.aside.top - g.barBottom) > 2) {
-    throw new Error(`record top ${g.aside.top} not under the top bar ${g.barBottom}`);
+  if (g.toolsBottom !== null && g.aside.top < g.toolsBottom - 2)
+    throw new Error("record covers the toolbar");
+  const under = Math.max(g.barBottom ?? 0, g.toolsBottom ?? 0);
+  if (Math.abs(g.aside.top - under) > 2) {
+    throw new Error(`record top ${g.aside.top} not under the top bar and toolbar ${under}`);
   }
   // The work area may run below the window (the page scrolls): the record stops at whichever comes first.
   const bottom = Math.min(g.areaBottom, g.viewportHeight);
@@ -339,8 +349,15 @@ test.describe("E2 · the record floats beside the grid", () => {
     });
     const size = page.viewportSize()!;
     await page.setViewportSize({ width: size.width, height: size.height - 1 });
+    // No top bar: the record runs from the region's toolbar (row 3a, AC-4), or from the top while it is out of view.
     await expect
-      .poll(async () => (await floatGeometry(page)).aside.top, { message: info.project.name })
+      .poll(
+        async () => {
+          const g = await floatGeometry(page);
+          return Math.abs(g.aside.top - Math.max(0, g.toolsBottom ?? 0));
+        },
+        { message: info.project.name },
+      )
       .toBeLessThanOrEqual(2);
   });
 
@@ -355,10 +372,7 @@ test.describe("E2 · the record floats beside the grid", () => {
   });
 
   test("break: a record that does not follow the scroll leaves the top bar", async ({ page }) => {
-    await injectStyle(
-      page,
-      '[role="dialog"][aria-modal="false"] { position: absolute !important; }',
-    );
+    await injectStyle(page, '[data-slot="record-panel-layer"] { position: absolute !important; }');
     await openInventory(page);
     await openFifth(page);
     await page.waitForTimeout(300);
@@ -369,7 +383,7 @@ test.describe("E2 · the record floats beside the grid", () => {
   });
 
   test("break: a record from the top of the screen covers the top bar", async ({ page }) => {
-    await injectStyle(page, '[role="dialog"][aria-modal="false"] { top: 0 !important; }');
+    await injectStyle(page, '[data-slot="record-panel-layer"] { top: 0 !important; }');
     await openInventory(page);
     await openFifth(page);
     await page.waitForTimeout(300);
@@ -650,7 +664,7 @@ test.describe("E3 · the grid beside the record keeps its columns", () => {
   test("break: a record wide enough to cover Toà is caught", async ({ page }) => {
     await injectStyle(
       page,
-      '[role="dialog"][aria-modal="false"] { width: 85vw !important; max-width: none !important; }',
+      '[data-slot="record-panel-layer"] [data-slot="resizable-panel"]:has(aside) { flex: 0 0 85vw !important; max-width: none !important; }',
     );
     await openInventory(page);
     await openFifth(page);
