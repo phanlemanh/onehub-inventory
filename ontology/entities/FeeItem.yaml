@@ -1,0 +1,49 @@
+name: FeeItem
+description: >-
+  One item of a company's fee schedule (FeeSchedule), as a percentage of the list price that comes off an Included
+  listing. Two items are fixed by law and only switched on or off; the company's own items (Phí môi giới by default) can
+  be added, renamed, re-rated and retired. The table keeps only what a company changed or added: an item with no row is
+  at its default. Internal; the customer page never reads it (SP-4).
+reso: none (our own)
+
+properties:
+  id: { type: integer, required: true, unique: true, display: none }
+  companyId: { type: ref, target: Company, required: true, display: none }
+  code: { type: string, required: true, max: 32, display: none }
+  kind: { type: enum, values: [Law, Own], required: true, display: none }
+  name: { type: string, max: 40, display: text }
+  rateBasisPoints: { type: integer, min: 0, max: 500, required: true, display: count }
+  included: { type: boolean, required: true, display: boolean }
+  removed: { type: boolean, required: true, default: false, display: none }
+  position: { type: integer, min: 0, required: true, display: none }
+  changedBy: { type: uuid, required: true, display: none }
+  changedByName: { type: string, required: true, max: 120, display: person, pii: true }
+  changedAt: { type: datetime, required: true, display: datetime }
+  retiredBy: { type: uuid, display: none }
+  retiredAt: { type: datetime, display: none }
+
+rules:
+  - id: fee-law-items-fixed
+    description: >-
+      Thuế thu nhập cá nhân (2%) and Lệ phí trước bạ (0.5%) are set by law: a company only switches them on or off,
+      never renames, re-rates or removes them.
+    implemented_in: src/modules/company-config/fee-schedule.ts
+  - id: fee-own-item-limits
+    description: >-
+      A company's own item has a name of 1 to 40 characters, unique among the items after folding, and a rate from 0 to
+      5% in steps of 0.1%; at most 5 own items in use; the switched-on items add up to at most 10%; at least one item is
+      switched on. Rates are whole basis points.
+    implemented_in: src/modules/company-config/fee-schedule.ts
+  - id: fee-net-to-seller
+    description: >-
+      Về tay of an Included listing is the list price times (1 − the sum of switched-on rates), rounded down to the
+      đồng; of an Excluded listing it is the list price; empty with no price, no fee inclusion, or a lease.
+    implemented_in: src/modules/company-config/fee-schedule.ts
+  - id: fee-item-code-once
+    description: An added item gets a code once; a retired item's code is never reused.
+    implemented_in: db/migrations/012_thue_phi.sql
+
+code:
+  model: src/modules/company-config/
+  tests: src/modules/company-config/fee-schedule.test.ts
+wiki: wiki/entities/fee-schedule.md

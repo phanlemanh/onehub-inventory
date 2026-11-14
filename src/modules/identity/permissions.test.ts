@@ -78,6 +78,14 @@ const CELLS: Record<string, Partial<Record<Role, Scope>>> = {
   editCompanyLayer: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
   retireCompanyLayer: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
   matchPendingUnits: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
+  // Row 19 (thue-phi, owner 2026-11-14): every role reads the fee schedule, only CompanyAdmin sets it.
+  readFeeSchedule: {
+    ListAgent: "company",
+    BuyerAgent: "company",
+    TeamLead: "company",
+    CompanyAdmin: "company",
+  },
+  setFeeSchedule: { CompanyAdmin: "company" },
 };
 // Row 9e (bo-nut-theo-quyen): the seven draft rows the owner chose at the scope gate, written before the table.
 const DRAFT_CELLS_9E: Record<string, Partial<Record<Role, Scope>>> = {
@@ -104,6 +112,9 @@ const API_DOORS = [
   "PATCH /api/v1/company-layer/[part]/[id]",
   "POST /api/v1/company-layer/[part]/[id]/retire",
   "POST /api/v1/company-layer/pending-units/match",
+  // Row 19: the fee schedule.
+  "GET /api/v1/company/fee-schedule",
+  "PUT /api/v1/company/fee-schedule",
   "DELETE /api/v1/saved-views/[id]",
 ];
 const EXEMPT_API = [
@@ -154,10 +165,10 @@ describe("cong-quyen-15-to-hop", () => {
     expect(Object.fromEntries(LIVE_ACTIONS.map((a) => [a.name, a.scope]))).toEqual(CELLS);
   });
 
-  it("every live action × every set of roles gets the widest scope: 19 × 15 = 285 asserts (row 2c: +4 rows, row 7e: +5)", () => {
+  it("every live action × every set of roles gets the widest scope: 21 × 15 = 315 asserts (row 2c: +4 rows, row 7e: +5, row 19: +2)", () => {
     const r = addUp(allowedScope);
     expect(r.failures).toEqual([]);
-    expect(r.count).toBe(285);
+    expect(r.count).toBe(315);
   });
 
   it("break: taking the narrowest scope names the first set that differs", () => {

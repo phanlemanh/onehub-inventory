@@ -24,6 +24,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [CompanyValueAlias](entities/company-value-alias.md) — cách viết riêng, một cặp của từ điển giá trị
 - [PendingUnit](entities/pending-unit.md) — căn chờ khớp với danh mục
 - [ImportTemplate](entities/import-template.md) — mẫu nhập theo dạng tệp
+- [FeeItem](entities/fee-schedule.md) — khoản của thuế phí của sàn, và Về tay
 - [Listing](entities/listing.md) — một lần chào trên một căn
 - [Contact](entities/contact.md) — một người làm việc với sàn
 - [Agreement](entities/agreement.md) — cho phép một kết nối chảy

@@ -98,6 +98,11 @@ relations:
     cardinality: one-to-many
     description: A company holds its own words for standard concepts; one in use per concept.
   - from: Company
+    name: sets_fees_with
+    to: FeeItem
+    cardinality: one-to-many
+    description: A company holds the fee items it changed or added; an item with no row is at its default.
+  - from: Company
     name: keeps_custom_fields
     to: CustomField
     cardinality: one-to-many

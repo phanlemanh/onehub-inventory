@@ -117,6 +117,37 @@ concepts:
     own: true
     pref: Mẫu nhập
     en: Import template
+  FeeSchedule:
+    kind: entity
+    own: true
+    pref: Thuế phí
+    en: Fees and taxes
+  FeeItem:
+    kind: entity
+    own: true
+    pref: Khoản phí
+    en: Fee item
+  PersonalIncomeTax:
+    kind: value
+    own: true
+    pref: Thuế thu nhập
+    alt: [Thuế thu nhập cá nhân, Thuế TNCN]
+    en: Personal income tax
+  RegistrationFee:
+    kind: value
+    own: true
+    pref: Lệ phí trước bạ
+    en: Registration fee
+  BrokerageFee:
+    kind: value
+    own: true
+    pref: Phí môi giới
+    en: Brokerage fee
+  AddFeeItem:
+    kind: action
+    own: true
+    pref: Thêm khoản
+    en: Add fee item
   SaveView:
     kind: action
     own: true
@@ -273,6 +304,26 @@ concepts:
     reso: ListPrice
     pref: Giá chào
     en: List price
+  FeeInclusion:
+    kind: field
+    own: true
+    pref: Điều kiện phí
+    en: Fee inclusion
+  FeeIncluded:
+    kind: value
+    own: true
+    pref: Bao phí
+    en: Fees included
+  FeeExcluded:
+    kind: value
+    own: true
+    pref: Không bao phí
+    en: Fees excluded
+  NetToSeller:
+    kind: field
+    own: true
+    pref: Về tay
+    en: Net to seller
   StandardStatus:
     kind: field
     reso: StandardStatus
