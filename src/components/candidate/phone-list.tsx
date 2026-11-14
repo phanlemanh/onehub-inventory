@@ -16,6 +16,7 @@ import type { TypedColumn } from "./column-kind";
 import { ColumnFilterCell, type FilterOption } from "./column-filter-cell";
 import { GRID_COPY, GRID_I18N } from "./grid-copy";
 import { RECORD_PARAM } from "./record-panel";
+import { TouchTarget } from "./touch-target";
 
 /** What the screen gives the region for its phone list. */
 export interface RegionPhoneList<Row> {
@@ -54,23 +55,25 @@ function IconButton({
   children: ReactElement;
 }) {
   return (
-    <Tooltip>
-      <TooltipTrigger
-        render={
-          <Button
-            variant={pressed ? "secondary" : "ghost"}
-            size="icon-lg"
-            aria-label={label}
-            aria-pressed={pressed}
-            data-slot={slot}
-            onClick={onClick}
-          />
-        }
-      >
-        {children}
-      </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
-    </Tooltip>
+    <TouchTarget>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <Button
+              variant={pressed ? "secondary" : "ghost"}
+              size="icon-lg"
+              aria-label={label}
+              aria-pressed={pressed}
+              data-slot={slot}
+              onClick={onClick}
+            />
+          }
+        >
+          {children}
+        </TooltipTrigger>
+        <TooltipContent>{label}</TooltipContent>
+      </Tooltip>
+    </TouchTarget>
   );
 }
 
@@ -173,7 +176,11 @@ export function PhoneList<Row extends PhoneRow>({
       >
         {list.card(row)}
       </a>
-      {rowAction ? <div className="shrink-0 pr-2">{rowAction(row)}</div> : null}
+      {rowAction ? (
+        <div className="shrink-0 pr-1">
+          <TouchTarget>{rowAction(row) as ReactElement}</TouchTarget>
+        </div>
+      ) : null}
     </li>
   );
   const grouped = data[0]?.group !== undefined;
@@ -181,12 +188,12 @@ export function PhoneList<Row extends PhoneRow>({
     <div data-slot="phone-list" className="flex flex-col">
       <div
         data-slot="phone-toolbar"
-        className="sticky top-12 z-10 flex items-center justify-between gap-2 border-b bg-background px-4 py-1"
+        className="sticky top-12 z-10 flex items-center justify-between gap-2 border-b bg-background px-4"
       >
         <span data-slot="region-footer-count" className="text-sm text-muted-foreground">
           {count}
         </span>
-        <div className="flex items-center gap-1">
+        <div className="-mr-1.5 flex items-center">
           <span className="relative">
             <IconButton
               label={filterName}
@@ -199,7 +206,7 @@ export function PhoneList<Row extends PhoneRow>({
             {active.length > 0 ? (
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground"
+                className="pointer-events-none absolute top-0.5 right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground"
               >
                 {active.length}
               </span>

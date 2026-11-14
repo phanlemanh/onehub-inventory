@@ -217,3 +217,50 @@ test.describe("axe (E9)", () => {
         expect(violations.map((v) => `axe ${width} ${colorScheme} ${v.id}`)).toEqual([]);
       });
 });
+
+/**
+ * Supervisor ruling G-1411-130: the toolbar's icon buttons keep the supplier's 36 px, and each sits in a 44 × 44 touch
+ * target that takes the tap — measured on the pressable box, not on the drawing; neighbours touch without overlapping.
+ */
+async function checkTouchTargets(page: Page): Promise<void> {
+  const boxes: { slot: string; x: number; y: number; w: number; h: number }[] = [];
+  for (const slot of ["phone-filter-button", "group-toggle", "phone-more"]) {
+    const box = await page.locator(`[data-slot="${slot}"]`).evaluate((el) => {
+      const t = el.closest('[data-slot="touch-target"]');
+      const r = (t ?? el).getBoundingClientRect();
+      return { x: r.left, y: r.top, w: r.width, h: r.height };
+    });
+    if (box.w < 44 || box.h < 44)
+      throw new Error(`touch target under 44px: ${slot} ${box.w}×${box.h}`);
+    boxes.push({ slot, ...box });
+  }
+  for (let i = 1; i < boxes.length; i += 1)
+    if (boxes[i]!.x < boxes[i - 1]!.x + boxes[i - 1]!.w - 0.5)
+      throw new Error(`touch targets overlap: ${boxes[i - 1]!.slot} ${boxes[i]!.slot}`);
+}
+
+test.describe("vung-cham (G-1411-130)", () => {
+  for (const width of [360, 414])
+    test(`${width}: the toolbar's touch targets are 44 × 44 and take the tap at their edge`, async ({
+      page,
+    }) => {
+      await openAt(page, width);
+      await checkTouchTargets(page);
+      // A tap on the target's empty corner, outside the 36 px button, still opens the filter sheet.
+      const target = page.locator(
+        '[data-slot="touch-target"]:has([data-slot="phone-filter-button"])',
+      );
+      await target.click({ position: { x: 2, y: 2 } });
+      await expect(page.getByRole("dialog", { name: "Lọc" })).toBeVisible();
+    });
+
+  test("break: a touch target shrunk to the button is caught", async ({ page }) => {
+    await openAt(page, 360);
+    await page.addStyleTag({
+      content: '[data-slot="touch-target"] { width: 36px !important; height: 36px !important; }',
+    });
+    await expect(checkTouchTargets(page)).rejects.toThrow(
+      "touch target under 44px: phone-filter-button",
+    );
+  });
+});

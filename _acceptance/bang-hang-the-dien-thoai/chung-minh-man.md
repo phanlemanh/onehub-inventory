@@ -29,6 +29,8 @@ ngăn đáy theo filter-sidebar-5 (Câu 2 «Nút»).
 | màn | data-grid-columns-3 | evidence/reui-data-grid-columns-3.png | |
 | filter-sidebar-5 | filter-sidebar-5 | evidence/reui-filter-sidebar-5.png | x |
 | filter-sidebar-5 | data-grid-columns-3 | evidence/reui/data-grid-columns-3-the-goc-360.png | |
+| TouchTarget | c-button-11 | evidence/reui-c-button-11.png | |
+| TouchTarget | c-button-16 | evidence/reui-c-button-16.png | |
 
 data-grid-columns-3 (bảng ↔ thẻ) không đưa thành lối: ở 360 mỗi thẻ cao gần một màn, đầu thẻ mang nút sửa, xoá thuộc 3d
 và 9e. Ngăn lọc filter-sidebar-5 (`evidence/reui-filter-sidebar-5.png`) là lối L2 của Hỏi-2.
@@ -56,6 +58,7 @@ và 9e. Ngăn lọc filter-sidebar-5 (`evidence/reui-filter-sidebar-5.png`) là 
 | Khối | Bậc | Đã tra | Ứng viên gần nhất | Vì sao không dùng | Cách |
 | --- | --- | --- | --- | --- | --- |
 | filter-sidebar-5 | reui | danh sách thẻ, ngăn lọc (`tra.mjs mobile list`, `tra.mjs card view`, `tra.mjs property listing card`) | data-grid-columns-3 | thẻ của nó cao gần một màn 360, đầu thẻ mang nút sửa, xoá thuộc 3d và 9e | ghép từ thành phần |
+| TouchTarget | ve-tay | vùng chạm 44 px (`tra.mjs icon button size`, `tra.mjs touch target`) | c-button-11 | nút biểu tượng của ReUI là cỡ của nút (36 px), không có vùng chạm rộng hơn hình; luật kho cấm đổi cỡ nút | |
 | DataRegion | trong-kho | | | | |
 | ListingCard | trong-kho | | | | |
 | Sheet | trong-kho | | | | |

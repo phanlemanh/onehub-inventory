@@ -323,6 +323,9 @@ describe("bo-nut (E14)", () => {
       </ActionPermissionProvider>,
     );
     const trigger = screen.getAllByRole("button", { name: /Việc khác/ })[0]!;
+    // On a phone the row's «…» sits in a 44 × 44 touch target (G-1411-130); the table keeps its own cell.
+    if (width < 768 && !trigger.closest("[data-slot=touch-target]"))
+      throw new Error("row «…» outside a touch target on a phone");
     await act(async () => {
       fireEvent.click(trigger);
     });

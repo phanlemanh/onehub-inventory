@@ -263,6 +263,16 @@
       ]
     },
     {
+      "name": "TouchTarget",
+      "file": "src/components/candidate/touch-target.tsx",
+      "level": "atom",
+      "parts": [
+        {
+          "name": "TouchTarget"
+        }
+      ]
+    },
+    {
       "name": "TruncatedText",
       "file": "src/components/candidate/truncated-text.tsx",
       "level": "atom",

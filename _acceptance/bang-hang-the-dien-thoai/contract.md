@@ -44,7 +44,7 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại; màn này tro
 - AC-4: Given Bảng hàng dưới 768, When người dùng hàng công cụ (ba nút biểu tượng có tên đọc được và nhãn khi chạm giữ) và lọc theo Hỏi-2 (khuyến nghị: nút Lọc mở ngăn đáy đủ
   ô lọc, lọc đang chạy hiện thành chip có nút bỏ; lối kia: hàng ô lọc luôn hiện), Then ngăn lọc mở đầu bằng «Sắp theo» (chọn một cột của bảng, tăng hay giảm dần — cùng sắp xếp với bảng, giữ khi qua
   ngưỡng 768); hàng công cụ là một dòng dính dưới
-  thanh trên khi cuộn, gồm số dòng và ba nút biểu tượng cỡ lớn nhất của kho, 36 px (nợ 44 px của cả kho, như hàng 3e — sửa sau Cổng Phạm vi) (Lọc kèm số ô đang lọc, Nhóm theo Toà, «…» chứa
+  thanh trên khi cuộn, gồm số dòng và ba nút biểu tượng 36 px của kho, mỗi nút trong vùng chạm 44 × 44 px (phán quyết giám sát G-1411-130) (Lọc kèm số ô đang lọc, Nhóm theo Toà, «…» chứa
   Lưu góc nhìn), không «Cột», không «Toàn màn hình»; thẻ chỉ còn căn khớp, hai ô lọc chồng nhau như ở bảng, «x / 60 dòng»
   và «Xoá lọc» hiện; không còn căn nào khớp thì «Không có dòng nào khớp» và «Xoá lọc».
 - AC-5: Given Bảng hàng dưới 768 mở từ lối tắt trạng thái (`?status=`), từ ô ⌘K (`?ma=`) hay từ một góc nhìn đã lưu (2c),
@@ -59,7 +59,7 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại; màn này tro
   xuống dòng chứ không bị cắt mất, giá và nhãn trạng thái đọc trọn.
 - AC-9: Given mọi vai của sàn đọc được Bảng hàng (Đầu chủ, Đầu khách, Trưởng nhóm — 9a, 9b), When dùng Bảng hàng dưới 768, Then thẻ
   không có ô sửa, nút sửa giá hay trạng thái, nút «Cột»; hồ sơ mở từ thẻ mang đúng bộ nút theo vai như hồ sơ mở từ bảng; cả
-  thẻ là một liên kết tới địa chỉ hồ sơ, tên đọc là chữ trên thẻ bắt đầu bằng mã căn (WCAG 2.5.3 — sửa sau Cổng Phạm vi), vùng chạm cao ít nhất 44 px, Tab đi qua từng thẻ, Enter mở hồ sơ; quét axe ở 360 và 414,
+  thẻ là một liên kết tới địa chỉ hồ sơ, tên đọc là chữ trên thẻ bắt đầu bằng mã căn (WCAG 2.5.3 — sửa sau Cổng Phạm vi), vùng chạm cao ít nhất 44 px, «…» của từng thẻ trong vùng chạm 44 × 44 px, Tab đi qua từng thẻ, Enter mở hồ sơ; quét axe ở 360 và 414,
   sáng và tối, không lỗi; Quản trị sàn thấy câu không đủ quyền, không thẻ.
 - AC-11: Given Bảng hàng dưới 768 khi màn có nút theo vai (khuôn 9e), When người dùng mở danh sách thẻ, Then nút thêm
   căn nằm ở đầu màn và việc của một căn (Sửa, Xoá căn) nằm theo Hỏi-3 (khuyến nghị: «…» cuối mỗi thẻ và ở đầu hồ sơ; lối

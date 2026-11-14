@@ -141,6 +141,13 @@ khoi:
     mo_ta: Thân vùng Lưới dưới 768 px — danh sách thẻ trọn bề ngang, hàng công cụ dính, ngăn Lọc từ đáy có Sắp theo và chip lọc; thẻ là dáng ngang của ListingCard
     ho_so: bang-hang-the-dien-thoai
     duyet: 2026-11-14
+  - ten: TouchTarget
+    tep: src/components/candidate/touch-target.tsx
+    nguon: tao-tay
+    nhu_cau: vung-cham-44
+    mo_ta: Vùng chạm 44 × 44 px quanh một nút nhỏ hơn trên điện thoại, nút giữ cỡ của nhà cung cấp, chạm ở mép chuyển cho nút
+    ho_so: bang-hang-the-dien-thoai
+    duyet: 2026-11-14
 # Blocks made before this ledger existed, each named with the round that made it, the commit that created it and the
 # day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
 # still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).
