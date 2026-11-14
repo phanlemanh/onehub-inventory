@@ -1,0 +1,35 @@
+{
+  "feature_plain": "Quản trị sàn xem người trong sàn trên một danh sách xếp theo khối ReUI và mời người bằng hộp theo khối dialog-2; ai được làm gì và cách mời giữ y như hôm nay.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ hiện người trong sàn trong một khung «Thành viên» có số người, mỗi người một dòng: chữ cái đầu, tên, email, ai mời, các vai, nút «Đổi vai»."},
+    {"id": "AC-2", "p": "Sẽ giữ các cột thẳng hàng giữa mọi dòng trên máy tính, ẩn cột «Người mời» khi khung hẹp, và xếp người lên một dòng riêng trên điện thoại, không cuộn ngang."},
+    {"id": "AC-3", "p": "Sẽ hiện nút «Mời người» và «Đổi vai» đúng theo bảng quyền như hôm nay; các bài kiểm quyền và mời đã có vẫn xanh, không đổi lời."},
+    {"id": "AC-4", "p": "Sẽ mở hộp mời có tên sàn cạnh tiêu đề, ba trường email, tên trong sàn, vai; mời xong người mới có ngay trong danh sách và trong sàn."},
+    {"id": "AC-6", "p": "Sẽ hiện đúng các trạng thái chờ tải, lỗi, không đủ quyền, tên dài, lỗi khi mời, Quản trị sàn cuối cùng, đọc được ở nền sáng và tối."},
+    {"id": "AC-7", "p": "Sẽ chỉ lấy và ghi người qua một cửa dữ liệu của phần người dùng, chữ trên màn lấy từ bảng nhãn."},
+    {"id": "AC-8", "p": "Sẽ ghi họ của màn Thành viên và hai khối ReUI đã chọn vào sổ thiết kế, kèm tệp chứng minh màn."},
+    {"id": "AC-9", "p": "Sẽ cho người chấm so ảnh màn và hộp mời cạnh ảnh hai khối gốc để thấy giống khối."}
+  ],
+  "wont_do": [
+    {"id": "AC-5", "p": "Sẽ KHÔNG đổi dáng ba hộp ở màn khác (đặt tên góc nhìn, sửa trên ô, báo sai thông tin) — ô nhãn mới mặc định tắt."},
+    {"id": "OOS-1", "p": "KHÔNG làm xoá người, khoá người nghỉ, bàn giao — để hàng sau."},
+    {"id": "OOS-2", "p": "KHÔNG có khách ngoài sàn hay lời mời chờ nhận — sản phẩm không có các khái niệm ấy."},
+    {"id": "OOS-3", "p": "KHÔNG có ô tìm, lọc theo vai hay xuất danh sách trên màn — tìm ở ô ⌘K."},
+    {"id": "OOS-4", "p": "KHÔNG có ảnh đại diện — dùng chữ cái đầu."},
+    {"id": "OOS-5", "p": "KHÔNG đổi cách mời — vẫn một người, một tên, nhiều vai mỗi lần."}
+  ],
+  "coverage_plain": [
+    {"i": 0, "p": "Đủ bốn phần màn: danh sách (AC-1, AC-2), hộp mời (AC-4), hộp đổi vai (AC-3, AC-6), hộp dùng chung ở màn khác (AC-5)."},
+    {"i": 1, "p": "Đủ bốn vai, có và không có từng quyền (AC-3)."},
+    {"i": 2, "p": "Đủ bốn khổ màn hình và hai nền sáng, tối (AC-2, AC-6)."},
+    {"i": 3, "p": "Đủ chín trạng thái của màn và hai hộp (AC-6)."},
+    {"i": 4, "p": "Đủ luật kho: một cửa dữ liệu và chữ từ bảng nhãn (AC-7), sổ thiết kế (AC-8), giống khối gốc (AC-9)."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Căn cứ bỏ bảy vùng của khối dẫn nhầm một câu chỉ nói về ô tìm — đã tách thành ba căn cứ đúng: ô tìm theo quyết định ⌘K của chủ kho, các vùng khách/lời mời/chỗ ngồi vì sản phẩm không có, nút xoá vì bảng quyền giữ nguyên."},
+    {"i": 1, "p": "Ngưỡng ẩn cột «Người mời» ở thiết kế và tiêu chí lệch nhau — đã chốt một ngưỡng theo bề rộng khung, có ca đo ngay biên."},
+    {"i": 2, "p": "Phép đo trạng thái chỉ quét trợ năng — đã thêm kiểm nội dung từng trạng thái và đặt ở tệp bài mới, không chạm bài của hàng 9."},
+    {"i": 3, "p": "Lời hứa «bài kiểm hàng 9 không đổi lời» chưa có phép đo — đã thêm phép so khác biệt chỉ cho phép đổi cách tìm dòng."},
+    {"i": 4, "p": "Chọn khuôn Lưới thì những gì phải viết lại chưa ghi đủ; hai tiêu chí đi qua máy chủ thiếu đo phía máy chủ — đã ghi đủ và thêm phép đo."}
+  ]
+}
