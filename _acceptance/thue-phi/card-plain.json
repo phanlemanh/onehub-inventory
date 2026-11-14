@@ -1,0 +1,131 @@
+{
+  "feature_plain": "Quản trị sàn đặt bao phí gồm khoản nào và môi giới bao nhiêu; Bảng hàng có cột Về tay tính theo mức ấy.",
+  "will_do": [
+    {
+      "id": "AC-1",
+      "p": "Sẽ tính Về tay đúng theo các khoản đang bật, kiểm trên 64 tổ hợp viết trước; mặc định 3 tỷ bao phí ra 2,895 tỷ; chặn mức sai."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ hiện hai khoản theo luật rồi các khoản riêng, nguồn từng khoản, và dòng ví dụ đổi ngay khi gõ."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ lưu cả mức một lần cho Quản trị sàn; gõ sai thì không lưu, lý do nằm đúng dòng."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ cho vai khác xem chỉ đọc và chặn họ sửa, kể cả khi gọi thẳng máy chủ."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ ghi Điều kiện phí (Bao phí / Không bao phí) cho từng hàng; hàng mẫu có đủ các loại."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ thêm cột Về tay ngay sau Giá chào ở Bảng hàng, đổi theo mức của đúng sàn đang xem."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ ghi lại thay đổi vào wiki và sổ màn; kiểm tra toàn kho xanh."
+    },
+    {
+      "id": "AC-9",
+      "p": "Sẽ dựng phần Thuế phí bằng khối chung của họ danh sách khung, giống màn Thành viên, nút đúng theo vai."
+    },
+    {
+      "id": "AC-10",
+      "p": "Sẽ cho Quản trị sàn thêm, đổi tên, bỏ khoản riêng; hai khoản luật không bỏ, không đổi tên."
+    }
+  ],
+  "wont_do": [
+    {
+      "id": "AC-7",
+      "p": "Chặn sàn này đọc hay sửa mức của sàn khác; sàn chưa đặt dùng mặc định."
+    },
+    {
+      "id": "OOS-1",
+      "p": "Chưa gắn mức lúc tính vào từng giá — để hàng 10 khi giá thật vào cơ sở dữ liệu."
+    },
+    {
+      "id": "OOS-2",
+      "p": "Chưa tính Về tay cho hàng cho thuê — mô hình chưa có loại giao dịch; khi có thì để trống."
+    },
+    {
+      "id": "OOS-3",
+      "p": "Chưa sửa Điều kiện phí trên ô, chưa hiện Về tay ở hồ sơ căn hay màn cuộc gọi."
+    },
+    {
+      "id": "OOS-4",
+      "p": "Chưa nhập Điều kiện phí từ Sheet — hàng 11."
+    },
+    {
+      "id": "OOS-5",
+      "p": "Chưa có nhật ký đổi cấu hình — trang N10."
+    },
+    {
+      "id": "OOS-6",
+      "p": "Không mở Bảng hàng cho Quản trị sàn ở hàng này — việc của bảng quyền."
+    },
+    {
+      "id": "OOS-7",
+      "p": "Mức, Về tay hay Điều kiện phí không bao giờ ra trang khách."
+    }
+  ],
+  "coverage_plain": [
+    {
+      "i": 0,
+      "p": "Ba khoản, mỗi khoản bật hay tắt — phủ ở cách tính Về tay (AC-1) và lúc lưu (AC-3)."
+    },
+    {
+      "i": 1,
+      "p": "Môi giới ở 0, giữa khoảng, 5 và các số sai (dưới 0, trên 5, lẻ quá 0,1) — phủ ở AC-1, AC-3."
+    },
+    {
+      "i": 2,
+      "p": "Hàng Bao phí, Không bao phí, thiếu điều kiện, thiếu giá; bán và cho thuê — phủ ở AC-1, AC-6."
+    },
+    {
+      "i": 3,
+      "p": "Ai: Quản trị sàn, ba vai đọc, sàn khác, gọi thẳng cơ sở dữ liệu — phủ ở AC-4, AC-7."
+    },
+    {
+      "i": 4,
+      "p": "Chỗ thấy: phần Thuế phí, Bảng hàng, menu Cột, máy chủ, cơ sở dữ liệu, trang khách — phủ ở AC-2, AC-6."
+    },
+    {
+      "i": 5,
+      "p": "Phần lõi mỗi trục đều có tiêu chí và phép đo riêng; ghi chép ở AC-8."
+    },
+    {
+      "i": 6,
+      "p": "Để sau: mức lúc tính trên từng giá, Về tay ở hồ sơ căn, sửa điều kiện trên ô, nhập từ Sheet, nhật ký."
+    },
+    {
+      "i": 7,
+      "p": "Không bao giờ: mức hay Về tay ra trang khách; khoản thứ tư hay công thức do sàn tự viết."
+    }
+  ],
+  "gap_probe_plain": [
+    {
+      "i": 0,
+      "p": "Chưa nói ba vai đọc vào màn Tuỳ chỉnh của sàn bằng cách nào — đã ghi: màn ấy vốn mở cho cả bốn vai, hàng này không đổi quyền."
+    },
+    {
+      "i": 1,
+      "p": "Chưa có ca gõ «1,5» đúng — đã thêm ca dương và một lần phá thử đọc sai dấu phẩy."
+    },
+    {
+      "i": 2,
+      "p": "Máy tự chốt mặc định 1% mà không có căn cứ trong kho — đã chuyển thành câu hỏi Hỏi-5."
+    },
+    {
+      "i": 3,
+      "p": "Chưa nói hàng cho thuê tính thế nào — đã ghi: chỉ hàng bán có Về tay, cho thuê để trống."
+    },
+    {
+      "i": 4,
+      "p": "Hàng mẫu chưa chắc có hàng 3 tỷ và hàng thiếu giá — đã ghim hai hàng ấy vào tiêu chí AC-5."
+    }
+  ]
+}

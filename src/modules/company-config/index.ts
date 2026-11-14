@@ -48,3 +48,26 @@ export {
   type LiveFieldShape,
   type ValueProblem,
 } from "./rules";
+
+export {
+  DEFAULT_OWN_ITEM,
+  FEE_NAME_LIMIT,
+  INCLUDED_TOTAL_MAX,
+  LAW_FEE_ITEMS,
+  OWN_ITEM_LIMIT,
+  OWN_RATE_MAX,
+  OWN_RATE_STEP,
+  checkFeeDraft,
+  defaultFeeSchedule,
+  formatRatePercent,
+  includedTotal,
+  netToSeller,
+  parseRatePercent,
+  type FeeInclusion,
+  type FeeItemDraft,
+  type FeeItemKind,
+  type FeeItemValue,
+  type FeeProblem,
+  type FeeProblemCode,
+  type LawFeeCode,
+} from "./fee-schedule";

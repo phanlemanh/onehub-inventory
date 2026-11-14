@@ -73,3 +73,32 @@ describe("FramedList (row 9c)", () => {
     );
   });
 });
+
+describe("FramedList options added for row 19 (thue-phi)", () => {
+  const ROW = { id: "a", main: <ListFace name="[Tên] Một" />, control: <button>Chỉnh</button> };
+
+  it("by default the end column is the fixed 6rem one, every face has initials, and no row has a note", () => {
+    render(<FramedList title="Khung" rows={[ROW]} />);
+    const control = document.querySelector('[data-part="control"]')!;
+    expect(control.className).toContain("@2xl:w-24");
+    expect(document.querySelector('[data-slot="avatar"]')).not.toBeNull();
+    expect(document.querySelector('[data-part="note"]')).toBeNull();
+  });
+
+  it("asked for, the end column fits what it holds, a face drops its initials, and a row shows its note", () => {
+    render(
+      <FramedList
+        title="Khung"
+        controlWidth="fit"
+        rows={[
+          { ...ROW, main: <ListFace name="Khoản" avatar={false} />, note: "Tỉ lệ tối đa 5%." },
+        ]}
+      />,
+    );
+    const control = document.querySelector('[data-part="control"]')!;
+    expect(control.className).not.toContain("@2xl:w-24");
+    expect(document.querySelector('[data-slot="avatar"]')).toBeNull();
+    expect(screen.getByRole("status").textContent).toBe("Tỉ lệ tối đa 5%.");
+    expect(partsOf(screen.getByRole("listitem"))).toEqual(["main", "control", "note"]);
+  });
+});

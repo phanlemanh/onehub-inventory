@@ -8,6 +8,8 @@
 #   alt    alternative labels: searchable, and a company may choose one
 #   en     English display label
 #   avoid  words that must not be used for this concept
+#   phap_ly  true for a name set by law (row 19, ruling G-1411-157): the pref is the law's own words and may run to 40
+#            characters; it then needs `nguon` (the legal text, one line) and one alt of at most 17 for narrow places
 version: 1
 concepts:
   Company:
@@ -117,6 +119,54 @@ concepts:
     own: true
     pref: Mẫu nhập
     en: Import template
+  FeeSchedule:
+    kind: entity
+    own: true
+    pref: Thuế phí
+    en: Fees and taxes
+  FeeItem:
+    kind: entity
+    own: true
+    pref: Khoản phí
+    en: Fee item
+  PersonalIncomeTax:
+    kind: value
+    own: true
+    pref: Thuế thu nhập cá nhân
+    alt: [Thuế TNCN]
+    phap_ly: true
+    nguon: Luật Thuế thu nhập cá nhân số 04/2007/QH12
+    en: Personal income tax
+  RegistrationFee:
+    kind: value
+    own: true
+    pref: Lệ phí trước bạ
+    en: Registration fee
+  BrokerageFee:
+    kind: value
+    own: true
+    pref: Phí môi giới
+    en: Brokerage fee
+  AddFeeItem:
+    kind: action
+    own: true
+    pref: Thêm khoản
+    en: Add fee item
+  RenameFeeItem:
+    kind: action
+    own: true
+    pref: Đổi tên khoản
+    en: Rename fee item
+  RemoveFeeItem:
+    kind: action
+    own: true
+    pref: Bỏ khoản
+    en: Remove fee item
+  ResetFeeItem:
+    kind: action
+    own: true
+    pref: Trả về mặc định
+    en: Reset to default
   SaveView:
     kind: action
     own: true
@@ -273,6 +323,26 @@ concepts:
     reso: ListPrice
     pref: Giá chào
     en: List price
+  FeeInclusion:
+    kind: field
+    own: true
+    pref: Điều kiện phí
+    en: Fee inclusion
+  FeeIncluded:
+    kind: value
+    own: true
+    pref: Bao phí
+    en: Fees included
+  FeeExcluded:
+    kind: value
+    own: true
+    pref: Không bao phí
+    en: Fees excluded
+  NetToSeller:
+    kind: field
+    own: true
+    pref: Về tay
+    en: Net to seller
   StandardStatus:
     kind: field
     reso: StandardStatus

@@ -15,6 +15,7 @@ const MILLION = 1_000_000;
 
 const twoDigits = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 2 });
 const oneDigit = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 1 });
+const threeDigits = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 3 });
 const whole = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 });
 const currency = new Intl.NumberFormat(LOCALE, { style: "currency", currency: "VND" });
 const dateFormat = new Intl.DateTimeFormat(LOCALE, {
@@ -38,6 +39,15 @@ const plain = (text: string): string => text.replace(/[\u00a0\u202f]/g, " ");
 
 const isNumber = (value: unknown): value is number =>
   typeof value === "number" && Number.isFinite(value);
+
+/**
+ * A worked-out amount where millions matter (row 19, the fee part's example line): billions keep three decimals, so a
+ * net to seller of 2.895.000.000 reads «2,895 tỷ»; anything under a billion as formatMoney. Grid cells keep formatMoney.
+ */
+export function formatMoneyPrecise(value: number | null | undefined): string {
+  if (isNumber(value) && value >= BILLION) return `${threeDigits.format(value / BILLION)} tỷ`;
+  return formatMoney(value);
+}
 
 /** Price in đồng: «4,85 tỷ», «320 triệu», «999.999 ₫». The unit is chosen after rounding. */
 export function formatMoney(value: number | null | undefined): string {

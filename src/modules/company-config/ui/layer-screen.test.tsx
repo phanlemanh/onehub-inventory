@@ -13,7 +13,7 @@ import { tallGridViewport } from "../../../../tests/virtual-viewport";
 import { label } from "../index";
 import type { CompanyLayer } from "../store";
 
-import { LAYER_COPY as C, PROBLEM_COPY, type ShownPart } from "./copy";
+import { LAYER_COPY as C, PROBLEM_COPY, type GridPart } from "./copy";
 import { AliasDialog, FieldDialog, LabelDialog, RenameDialog, send } from "./layer-dialogs";
 import { CompanyLayerScreen, valueText } from "./layer-screen";
 
@@ -66,7 +66,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function show(part: ShownPart, role: Role) {
+function show(part: GridPart, role: Role) {
   return render(
     <SessionRoles roles={[role]}>
       <CompanyLayerScreen part={part} concepts={["Unit", "Building"]} />
@@ -74,7 +74,7 @@ function show(part: ShownPart, role: Role) {
   );
 }
 
-const HEAD: Record<ShownPart, string | null> = {
+const HEAD: Record<GridPart, string | null> = {
   nhan: label("AddCompanyLabel"),
   truong: label("AddCustomField"),
   "tu-dien": label("AddValueAlias"),
@@ -82,7 +82,7 @@ const HEAD: Record<ShownPart, string | null> = {
   mau: null,
 };
 
-const ROW_TEXT: Record<ShownPart, string> = {
+const ROW_TEXT: Record<GridPart, string> = {
   nhan: "Block",
   truong: "View",
   "tu-dien": "ĐN",
@@ -92,7 +92,7 @@ const ROW_TEXT: Record<ShownPart, string> = {
 
 describe("phan-theo-vai", () => {
   it("each part shows its rows; a writer gets the head button, a reader none", async () => {
-    for (const part of Object.keys(HEAD) as ShownPart[]) {
+    for (const part of Object.keys(HEAD) as GridPart[]) {
       for (const role of ["CompanyAdmin", "BuyerAgent"] as const) {
         serve();
         const { container, unmount } = show(part, role);

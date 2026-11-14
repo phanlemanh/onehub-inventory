@@ -24,6 +24,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [CompanyValueAlias](entities/company-value-alias.md) — cách viết riêng, một cặp của từ điển giá trị
 - [PendingUnit](entities/pending-unit.md) — căn chờ khớp với danh mục
 - [ImportTemplate](entities/import-template.md) — mẫu nhập theo dạng tệp
+- [FeeItem](entities/fee-schedule.md) — khoản của thuế phí của sàn, và Về tay
 - [Listing](entities/listing.md) — một lần chào trên một căn
 - [Contact](entities/contact.md) — một người làm việc với sàn
 - [Agreement](entities/agreement.md) — cho phép một kết nối chảy
@@ -71,6 +72,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0029 Cấu hình sàn giữ lớp riêng, dựa vào danh tính và danh mục](decisions/0029-cau-hinh-san-dua-vao-danh-tinh-va-danh-muc.md)
 - [0030 Sổ màn là một chỗ khai quyền vào màn và nút của mỗi màn](decisions/0030-so-man-khai-cua-vao-va-nut.md)
 - [0031 Thêm gói khung chia kéo được cho hồ sơ ghim](decisions/0031-them-goi-khung-chia-keo-duoc.md)
+- [0037 Thuế phí là dữ liệu của sàn, một hình dạng khoản](decisions/0037-thue-phi-la-du-lieu-cua-san.md)
 - [0032 Lối vào của bộ vùng lưới khai trong sổ màn](decisions/0032-loi-vao-bo-vung-luoi.md)
 
 ## Incidents

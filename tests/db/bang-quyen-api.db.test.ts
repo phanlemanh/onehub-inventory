@@ -13,6 +13,7 @@ import { openDoor } from "@/modules/identity/action-door";
 import { tokenFrom } from "@/modules/identity/http";
 import { withCompany } from "@/modules/identity/with-company";
 import { createCompanyLayerHandlers } from "@/modules/company-config/company-layer-http";
+import { createFeeScheduleHandlers } from "@/modules/company-config/fee-schedule-http";
 import { createSavedViewsHandlers } from "@/modules/listings/saved-views-http";
 
 import {
@@ -28,8 +29,8 @@ import { count } from "./helpers";
 
 const ORIGIN = "http://127.0.0.1:3485";
 // Written before the code (evals.yaml): 3 API doors × 4 roles; plus row 2c's 4 saved-view doors × 4 roles; plus row
-// 7e's 5 company-layer doors × 4 roles.
-const API_CELLS = 48;
+// 7e's 5 company-layer doors × 4 roles; plus row 19's 2 fee-schedule doors × 4 roles.
+const API_CELLS = 56;
 
 const worlds: World[] = [];
 afterEach(async () => {
@@ -59,6 +60,11 @@ async function apiWorld(suffix: string) {
   const members = createMembersHandlers(() => deps);
   // Row 7e: the company layer through the same door.
   const layer = createCompanyLayerHandlers({
+    door: (r, action) => openDoor(() => w.pool, tokenFrom(r), action),
+    withCompany,
+  });
+  // Row 19: the fee schedule through the same door.
+  const fees = createFeeScheduleHandlers({
     door: (r, action) => openDoor(() => w.pool, tokenFrom(r), action),
     withCompany,
   });
@@ -158,6 +164,24 @@ async function apiWorld(suffix: string) {
       case "POST /api/v1/company-layer/pending-units/match":
         return layer.match(
           req(`${ORIGIN}/api/v1/company-layer/pending-units/match`, "POST", undefined, cookie),
+        );
+      // Row 19: the default schedule, saved as it is — allowed answers 200 and writes nothing.
+      case "GET /api/v1/company/fee-schedule":
+        return fees.read(req(`${ORIGIN}/api/v1/company/fee-schedule`, "GET", undefined, cookie));
+      case "PUT /api/v1/company/fee-schedule":
+        return fees.save(
+          req(
+            `${ORIGIN}/api/v1/company/fee-schedule`,
+            "PUT",
+            {
+              items: [
+                { code: "pit", rateBasisPoints: 200, included: true },
+                { code: "registration", rateBasisPoints: 50, included: true },
+                { code: "brokerage", rateBasisPoints: 100, included: true },
+              ],
+            },
+            cookie,
+          ),
         );
       default:
         throw new Error(`api-theo-bang: không biết gọi cửa ${door}`);

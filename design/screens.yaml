@@ -82,7 +82,7 @@ screens:
     status: built
     vao_vung: /tuy-chinh-san?phan=can-cho
     vao: readCompanyLayer
-    nut: [addCompanyLayer, editCompanyLayer, retireCompanyLayer, matchPendingUnits]
+    nut: [addCompanyLayer, editCompanyLayer, retireCompanyLayer, matchPendingUnits, setFeeSchedule]
     mo_san: [addCompanyLayer]
     nut_chung: [Lọc, Cột, Toàn màn hình]
   - id: proto

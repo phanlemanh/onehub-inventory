@@ -375,6 +375,7 @@ export function DataRegion({
   groupBy,
   initialView,
   onViewChange,
+  hiddenAtFirst,
 }: {
   title: string;
   columns: readonly TypedColumn[];
@@ -413,6 +414,11 @@ export function DataRegion({
   initialView?: GridView;
   /** Hears the arrangement after each change the person makes (and once on opening). */
   onViewChange?: (view: GridView) => void;
+  /**
+   * Columns that start hidden when no arrangement is given (row 19: a column offered in the Cột menu, off until the
+   * person turns it on). A given `initialView` decides on its own.
+   */
+  hiddenAtFirst?: readonly FieldKey[];
 }) {
   // One confirmation for every row's removing action: a row scrolled out of the virtual body keeps it open.
   const removing = useChange();
@@ -426,7 +432,7 @@ export function DataRegion({
       .map(([id, value]) => ({ id, value })),
   );
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>(() =>
-    Object.fromEntries((opening?.hidden ?? []).map((field) => [field, false])),
+    Object.fromEntries((opening?.hidden ?? hiddenAtFirst ?? []).map((field) => [field, false])),
   );
   const [grouped, setGrouped] = useState(opening?.grouped ?? false);
   const [expanded, setExpanded] = useState<ExpandedState>(true);

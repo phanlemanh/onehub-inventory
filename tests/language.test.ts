@@ -15,6 +15,26 @@ interface Concept {
   alt?: string[];
   en: string;
   avoid?: string[];
+  /** A name set by law (ruling G-1411-157): the law's own words, up to 40 characters, with its source and a short alt. */
+  phap_ly?: boolean;
+  nguon?: string;
+}
+
+const SHORT = 17;
+const LEGAL = 40;
+
+/** What is wrong with a label's length: a plain label over 17, a legal name over 40, without its source or short alt. */
+function lengthProblems(code: string, c: Concept): string[] {
+  const out: string[] = [];
+  const limit = c.phap_ly ? LEGAL : SHORT;
+  for (const label of displayed(c))
+    if (label.length > limit) out.push(`${code}: ${label} dài hơn ${limit}`);
+  if (c.phap_ly) {
+    if (!c.nguon?.trim()) out.push(`${code}: tên theo pháp luật thiếu nguon`);
+    if (!(c.alt ?? []).some((a) => a.length <= SHORT))
+      out.push(`${code}: tên theo pháp luật thiếu nhãn ngắn`);
+  }
+  return out;
 }
 
 const LOAD = [
@@ -107,15 +127,34 @@ describe("label dictionary", () => {
   });
 
   it("keeps labels short, normalised and in the agreed style", () => {
+    expect(entries.flatMap(([code, c]) => lengthProblems(code, c))).toEqual([]);
     for (const [code, c] of entries) {
       for (const label of displayed(c)) {
-        expect(label.length, code).toBeLessThanOrEqual(17);
         expect(label, code).toBe(label.normalize("NFC"));
         expect(isSentenceCase(label), `${code}: ${label}`).toBe(true);
         expect(hasOldTone(label), `${code}: ${label}`).toBe(false);
         expect(/[!\p{Extended_Pictographic}]/u.test(label), `${code}: ${label}`).toBe(false);
       }
     }
+  });
+
+  it("a legal name may be longer only with its source and a short label (ruling G-1411-157)", () => {
+    const base: Concept = { kind: "value", own: true, pref: "Nhãn thường dài mười tám", en: "x" };
+    expect("Nhãn thường dài mư".length).toBe(18);
+    expect(lengthProblems("Thuong", { ...base, pref: "Nhãn thường dài mư" })).toEqual([
+      "Thuong: Nhãn thường dài mư dài hơn 17",
+    ]);
+    const legal: Concept = {
+      ...base,
+      pref: "Thuế thu nhập cá nhân",
+      phap_ly: true,
+      nguon: "Luật số 04/2007/QH12",
+    };
+    expect(lengthProblems("PhapLy", { ...legal, alt: ["Thuế TNCN"] })).toEqual([]);
+    expect(lengthProblems("PhapLy", legal)).toEqual(["PhapLy: tên theo pháp luật thiếu nhãn ngắn"]);
+    expect(lengthProblems("PhapLy", { ...legal, alt: ["Thuế TNCN"], nguon: " " })).toEqual([
+      "PhapLy: tên theo pháp luật thiếu nguon",
+    ]);
   });
 
   it("agrees with the display names in the glossary", () => {

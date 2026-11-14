@@ -16,6 +16,8 @@ executors:
     lop_rieng_unit: "npx vitest run src/modules/company-config tests/lop-rieng-ontology.test.ts tests/lop-rieng-cot.test.ts --coverage.enabled=false --reporter=verbose"   # lop-rieng-cua-san (row 7e): custom values, custom columns, ontology fence
     vai_man_so: "npx vitest run tests/vai-man-so-man.test.ts --coverage.enabled=false --reporter=verbose"   # kiem-vai-theo-man (row 9b): screen register entry rule, pair set, shared sign-in door, sidebar vs register
     vai_man_nut: "npx vitest run tests/vai-man-nut-sinh.test.ts tests/vai-man-dau-nut.test.tsx tests/bo-nut-vai-man.test.ts src/modules/identity/permitted-action.test.tsx --coverage.enabled=false --reporter=verbose"   # kiem-vai-theo-man (row 9b): role × screen × button table from the register and module UI, every screen and the App Shell frame
+    thue_phi: "npx vitest run src/modules/company-config/fee-schedule.test.ts src/modules/company-config/ui/fee-part.test.tsx --coverage.enabled=false --reporter=verbose"   # thue-phi (row 19): net-to-seller matrix, schedule checks, fee part of the company layer screen
+    thue_phi_ontology: "npx vitest run tests/thue-phi-ontology.test.ts tests/thue-phi-cot.test.ts --coverage.enabled=false --reporter=verbose"   # thue-phi (row 19): fee condition in the model and sample rows, Về tay column
     thanh_vien_unit: "npx vitest run tests/framed-list.test.tsx tests/form-dialog.test.tsx tests/thanh-vien-mot-cua.test.ts tests/thanh-vien-khoa-bai.test.ts --coverage.enabled=false --reporter=verbose"   # thanh-vien-chon-tu-reui (row 9c): shared dialog with and without badge, members screen reads through the identity door
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
@@ -74,6 +76,8 @@ executors:
     vai_man_pha_thu: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} node tests/e2e-db/pha-thu-vai-man.mjs"   # kiem-vai-theo-man (row 9b): three breaks on a copy of the tree, each must turn its pair red with the pinned message
     doi_bai_kiem: "node _acceptance/bo-o-tim-cua-vung/rang/doi-bai-kiem.mjs --root . --self-test"   # bo-o-tim-cua-vung (row 2e): every removed test line about the region search box has a row in the old → new table
     ghim_ngan_e2e: "npx playwright test tests/e2e/ghim-ngan.spec.ts"   # ngan-chi-tiet-ghim-thanh-cot (row 3a): pin the record panel as a column, four widths, axe light and dark
+    thue_phi_db: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx vitest run -c vitest.db.config.ts tests/db/thue-phi.db.test.ts --reporter=verbose"   # thue-phi (row 19): fee schedule at API and database, lane N Postgres
+    thue_phi_e2e: "DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx playwright test -c playwright.db.config.ts tests/e2e-db/thue-phi.spec.ts"   # thue-phi (row 19): set the schedule, inventory follows, four sizes, lane N Postgres
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
