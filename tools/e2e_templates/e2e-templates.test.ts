@@ -18,8 +18,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   FRAME,
+  LONGEST_FITS,
   NO_REGION_YET,
   REGION,
+  longestProblem,
   classifyGrid,
   compareRows,
   firstColumnHas,
@@ -29,6 +31,7 @@ import {
 } from "./recipes";
 import * as registerModule from "./register";
 import { REPO_ROOT, SIGNED_OUT_SCREENS, signedOutProblems } from "./register";
+import { withQuery } from "./runner";
 import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
 import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings";
 import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
@@ -297,7 +300,13 @@ describe("so hai tập của bài tìm", () => {
 interface Bridge {
   errors: string[];
   roles: { name: string; label: string | null }[];
-  screens: { id: string; route: string; status: string; audience: string }[];
+  screens: {
+    id: string;
+    route: string;
+    status: string;
+    audience: string;
+    family?: string | null;
+  }[];
 }
 
 function bridge(root: string): Bridge {
@@ -630,6 +639,37 @@ describe("lối vào của bộ vùng (vao_vung, hàng 7e)", () => {
     },
     SLOW * 2,
   );
+
+  it("the reverse «chữ dài» case passes only when a text of the declared length shows whole", () => {
+    const long = "x".repeat(80);
+    expect(longestProblem("tuy-chinh-san", 1440, 80, [{ text: long, cut: false }])).toBeNull();
+    expect(longestProblem("tuy-chinh-san", 1440, 80, [{ text: long, cut: true }])).toBe(
+      "chu-dai: tuy-chinh-san @1440 chu 80 ky tu bi cat — go dong LONGEST_FITS",
+    );
+    expect(longestProblem("tuy-chinh-san", 1440, 80, [{ text: "A-101", cut: false }])).toBe(
+      "chu-dai: tuy-chinh-san @1440 khong co chu 80 ky tu de do",
+    );
+    const grid = new Set(
+      bridge(REPO_ROOT)
+        .screens.filter((x) => x.family === "grid")
+        .map((x) => x.id),
+    );
+    for (const [id, fit] of Object.entries(LONGEST_FITS)) {
+      expect(grid.has(id), id).toBe(true);
+      expect(fit.why.trim(), id).not.toBe("");
+      for (const z of fit.sizes) expect(SIZES, id).toContain(String(z));
+    }
+  });
+
+  it("a case's state query joins a declared entry with & and leaves a plain route as before", () => {
+    for (const r of REGION.filter((x) => x.query)) {
+      expect(withQuery("/inventory", r.query)).toBe(`/inventory${r.query}`);
+      expect(withQuery("/tuy-chinh-san?phan=can-cho", r.query)).toBe(
+        `/tuy-chinh-san?phan=can-cho&${r.query!.slice(1)}`,
+      );
+    }
+    expect(withQuery("/tuy-chinh-san?phan=can-cho", undefined)).toBe("/tuy-chinh-san?phan=can-cho");
+  });
 
   for (const [name, change, message] of [
     [

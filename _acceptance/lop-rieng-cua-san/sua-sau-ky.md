@@ -17,7 +17,21 @@ mọi chỗ đổi sau chữ ký, theo phép của giám sát (G-1411-48, XONG R
 Ba nhãn của sàn thử đổi tiêu đề ba cột (Xác nhận lúc, Phòng ngủ, Diện tích) trên Bảng hàng của sàn thử ấy; không thêm
 cột nào.
 
-## Chờ chủ kho phê — đổi luật công cụ (lối A của XONG R-1411-12)
+## Đổi công cụ kiểm khung, chủ kho cho
+
+Ba chỗ đổi công cụ, mỗi chỗ có chữ cho của chủ kho. Người dùng không thấy khác gì: đây là cách bộ kiểm mở và đo màn.
+
+| Chỗ | Chữ cho của chủ kho (nguyên văn) |
+| --- | --- |
+| Khoá tuỳ chọn `vao_vung` trong `design/screens.yaml`, chỉ cho màn họ `grid`, cùng gốc với `route`. Đúng một chỗ đọc ở `tools/e2e_templates/suite.ts`; bộ đọc sổ màn (`tools/e2e_templates/register.py`, `register.ts`) thêm đúng trường này. Màn «Tuỳ chỉnh của sàn» khai `vao_vung: /tuy-chinh-san?phan=can-cho`. Sàn thử chung có ba căn chờ khớp (`tests/e2e-db/setup.ts`): hai mã ngắn có chữ số, một mã 80 ký tự. Không thêm cột nào vào Bảng hàng. | «7e công cụ kiểm: cho» (câu h-20261114T065340Z-56) |
+| Bộ chạy ghép trạng thái giả vào đường đã có `?` bằng `&` (`withQuery` trong `tools/e2e_templates/runner.ts`). Màn không khai `vao_vung` vẫn mở đường như cũ. | «7e hai chỗ công cụ kiểm: cho» (câu h-20261114T134021Z-63) |
+| Ca «chữ dài» ở màn `tuy-chinh-san`, khổ 1440, là phép ngược có đo (`LONGEST_FITS`, `longestProblem` trong `tools/e2e_templates/recipes.ts`): ô có chữ đúng 80 ký tự phải hiện trọn. Sau đó ô bị thu hẹp để phần bàn phím và đọc khi focus vẫn chạy như cũ. Trần ký tự tăng hay cột hẹp lại làm chữ bị cắt thì phép đỏ (`chu-dai: tuy-chinh-san @1440 chu 80 ky tu bi cat — go dong LONGEST_FITS`), và ca thường áp lại. | «7e hai chỗ công cụ kiểm: cho» (câu h-20261114T134021Z-63) |
+
+Bài tự kiểm (`tools/e2e_templates/e2e-templates.test.ts`, mục «lối vào của bộ vùng»): đối chứng, mở đúng đường, hai ca
+phá với câu ghim, ghép tham số, và phép ngược với hai câu ghim. Bài chạy thật: khai thêm khổ 1024 thì phép ngược đỏ đúng
+câu.
+
+## Đề xuất lúc chờ chủ kho (lối A của XONG R-1411-12, đã dựng theo mục trên)
 
 Vì sao: bộ khung vùng lưới chỉ mở đúng đường của màn trong sổ màn (`tools/e2e_templates/suite.ts`, dòng gọi
 `gridSuite(screen.id, screen.route, base)`). Màn «Tuỳ chỉnh của sàn» mở vào phần «Nhãn riêng» (chủ kho đã duyệt):
