@@ -1,0 +1,113 @@
+schema_version: 1
+feature_slug: bang-hang-the-dien-thoai
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.the_dien_thoai
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, tests/the-dien-thoai.test.tsx]
+    expected: "exit 0; tests/the-dien-thoai.test.tsx dựng InventoryGrid với 60 dòng mẫu, matchMedia giả khổ 360: không phần tử vai 'table' hay 'grid'; số nút data-slot='phone-card' BẰNG 60; dãy id của thẻ BẰNG dãy id dòng của cùng vùng dựng ở khổ 1440 (cùng lọc rỗng, cùng sắp xếp); với MỌI thẻ (ma trận 60, không lấy mẫu) thẻ chứa mã căn, chữ giá đúng formatByKind('money') của dòng, nhãn trạng thái đúng của dòng, và theo lối Hỏi-1 (bảng ở Notes của hợp đồng): nơi 'Toà · Dự án' của dòng, cùng ba thông số Diện tích, Phòng ngủ, Xác nhận lúc của dòng ở lối A; chân vùng '60 dòng'. Ca phá: thẻ bỏ giá → đỏ 'phone card missing price: <mã>'; thẻ bỏ một thông số (lối A) → đỏ 'phone card missing fact: <mã> <trường>'; thẻ xếp ngược → đỏ 'phone cards out of grid order'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.the_dien_thoai_e2e
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/the-dien-thoai.spec.ts]
+    expected: "exit 0; tests/e2e/the-dien-thoai.spec.ts ca 'nguong': ma trận khổ viết trước {360, 414, 767 → thẻ; 768, 1024, 1440 → bảng} hằng 6 — khổ thẻ: không 'table', có phone-card, document.scrollingElement.scrollWidth <= clientWidth; khổ bảng: có 'table', tiêu đề cột Căn, hàng ô lọc, nút 'Cột' và 'Toàn màn hình', không phone-card; ca 'doi-kho': lọc Trạng thái 'Đang bán' ở 767 → đổi 768 → bảng còn lọc và đúng số dòng → về 767 → số thẻ bằng số dòng ấy. Ca phá (đổi ngưỡng trong bản sao sang 640) đỏ 'phone list at 767'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.the_dien_thoai_e2e
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, tests/e2e/the-dien-thoai.spec.ts]
+    expected: "exit 0; ca 'mo-va-lui' ở 360: cuộn tới khi scrollY >= 1000, chạm thẻ thứ k đang thấy → URL có ho-so=<id của thẻ ấy>, hộp hồ sơ hiện, tiêu đề hồ sơ có mã căn ấy; 'Sau' mở id của thẻ kế trong thứ tự thẻ; đóng bằng page.goBack() rồi lần nữa bằng nút 'Đóng' → mỗi lần |scrollY sau − scrollY trước| <= 1 và document.activeElement có data-row-id của thẻ vừa mở. Ca phá dựng lại danh sách khi đóng (đổi key) → đỏ 'scroll not kept after closing record'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.the_dien_thoai
+    paths: [src/components/candidate/**, tests/the-dien-thoai.test.tsx]
+    expected: "exit 0; khối 'loc': ở khổ 360 theo lối lọc đã chọn ở Hỏi-2 (L1: tám ô lọc trên danh sách theo thứ tự cột; L2: nút 'Lọc' khi không lọc và 'Lọc (n)' với n đúng số ô đang lọc ở từng ca, ngăn đáy mở bằng nút, đóng bằng Esc và nút đóng, tiêu điểm về nút), ma trận viết trước 4 ca (chữ ở Căn, chọn trạng thái Đang bán, khoảng giá '<=5', hai ô chồng Căn + Trạng thái) hằng 4 — mỗi ca tập mã căn trên thẻ BẰNG tập tính độc lập từ dữ liệu nguồn, chân 'x / 60 dòng' đúng x, có 'Xoá lọc'; ca không khớp 'zzz-khong-co' → 'Không có dòng nào khớp' và 'Xoá lọc', ô lọc vẫn giữ chữ; 'Xoá lọc' → 60 thẻ. Ca phá cho danh sách thẻ đọc dòng chưa lọc → đỏ 'phone list ignored filter: <ca>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.the_dien_thoai
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, tests/the-dien-thoai.test.tsx]
+    expected: "exit 0; khối 'vao-tu-cho-khac' ở 360: initialFilters từ inventoryFiltersFrom('Active'), từ inventoryOpeningFor(rows,{code:'11'}), và initialView của một góc nhìn mẫu (lọc Toà S1.01) — mỗi ca tập id thẻ BẰNG tập id dòng của cùng vùng dựng ở 1440 với cùng đầu vào (hằng 3 ca); với góc nhìn mở, đổi một ô lọc trên điện thoại → onViewChange nhận cách xem khác cách xem đã lưu (sameAsStored false). Ca phá bỏ initialFilters ở danh sách thẻ → đỏ 'phone list dropped opening filters: <ca>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.the_dien_thoai
+    paths: [src/components/candidate/**, tests/the-dien-thoai.test.tsx]
+    expected: "exit 0; khối 'nhom': bấm 'Nhóm theo Toà' ở 360 → dãy (tên toà, số căn) của các dòng nhóm trên danh sách thẻ BẰNG dãy (nhãn, count) của dòng nhóm trong bảng ở 1440 cùng dữ liệu; mỗi thẻ nằm dưới đúng nhóm có Toà của nó. Ca phá bỏ dòng nhóm → đỏ 'phone list lost group: <toà>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.the_dien_thoai
+    paths: [src/components/candidate/**, tests/the-dien-thoai.test.tsx]
+    expected: "exit 0; khối 'trang-thai': ma trận viết trước 5 trạng thái (loading, empty, error, partial, forbidden) hằng 5 ở khổ 360 — chữ và nút của từng trạng thái BẰNG chữ và nút của cùng trạng thái ở 1440 (đọc từ cùng vùng); phone-card đếm 0 ở loading, empty, error, forbidden và đếm 40 ở partial. Ca phá cho danh sách thẻ hiện ở trạng thái error → đỏ 'phone cards shown in state error'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.the_dien_thoai_e2e
+    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/the-dien-thoai.spec.ts]
+    expected: "exit 0; ca 'du-lieu-bien' ở 360 mở Bảng hàng với dữ liệu kiểm của bản phát triển (`?mau=bien`, bản dựng production bỏ qua): ma trận viết trước 9 thẻ (mã 14 ký tự liền, giá 125,5 tỷ, giá thuê theo tháng, giá trống, và sáu trạng thái) hằng 9 — với mỗi thẻ: getBoundingClientRect của mọi phần tử con nằm trong thẻ, thẻ không rộng hơn khổ, scrollWidth <= clientWidth của từng dòng chữ, chữ mã căn đọc trọn bằng innerText; chụp evidence/E8-bien-360-sang.png. Ca phá (bỏ break-all ở mã căn trong bản sao) đỏ 'card overflows: <mã>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.the_dien_thoai_e2e
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/the-dien-thoai.spec.ts]
+    expected: "exit 0; ca 'vai': với bốn vai viết trước {CompanyAdmin, TeamLead, ListAgent, BuyerAgent} (hằng 4, `?vai=` của bản phát triển) ở 360: không phần tử nào trong danh sách thẻ là input, combobox hay nút khác ngoài nút thẻ; không nút 'Cột'; mở thẻ đầu → tập tên nút của hồ sơ BẰNG tập tên nút của hồ sơ cùng căn mở từ bảng ở 1440 với cùng vai; ca 'tiep-can': nút thẻ có accessible name 'Căn <mã>', chiều cao >= 44, Tab từ điều khiển lọc cuối (L1: ô lọc cuối của hàng; L2: nút 'Lọc') tới thẻ đầu rồi thẻ kế, Enter mở hồ sơ; axe (wcag2a/aa, 21a/aa, 22aa) ở 360 và 414, sáng và tối (hằng 4) không lỗi. Ca phá gỡ tên nút thẻ → đỏ 'axe 360 light button-name'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: judgment
+    inputs: [design/behaviors.md, design/patterns/luoi.md, design/so-khoi.yaml, wiki/log.md, wiki/entities/listing.md]
+    question: "Đọc năm tệp. (1) Bảng hành vi có mục danh sách thẻ trên điện thoại nói ngưỡng 768 (dưới là thẻ, từ 768 là bảng), chạm thẻ mở hồ sơ căn, đóng hồ sơ giữ chỗ cuộn và trả tiêu điểm về thẻ không? (2) Khuôn Lưới có nói trên điện thoại thân vùng là danh sách thẻ và lọc ở đâu (hàng ô lọc luôn hiện, hoặc nút Lọc mở ngăn đáy — đúng một cách) không, và có còn câu nào nói điện thoại vẫn là bảng cuộn ngang không? (3) Sổ khối có đúng một dòng cho nhu cầu thẻ căn trên danh sách điện thoại (hoặc dòng the-can đã có được mở rộng), ghi khối nguồn và hồ sơ bang-hang-the-dien-thoai không, và không có hai dòng cùng nhu_cau không? (4) Nhật ký chung có một dòng ngày 2026-11 nói Bảng hàng trên điện thoại thành thẻ căn (hàng 2b) không? (5) Trang thực thể Listing (wiki/entities/listing.md) có câu nói dưới 768 Bảng hàng hiện thẻ căn và trỏ tới hàng 2b không? Trả PASS chỉ khi (1), (3), (4), (5) đúng và (2) đúng mà không còn câu bảng cuộn ngang."
+    expected: "PASS khi bốn điều trong câu hỏi đều đạt"
+    evidence_required: [verdict, rationale, verifier, verified_at]
+
+  - id: E11
+    criterion: AC-1
+    executor: ui-check
+    layer: ui-observed
+    cmd: config:executors.design.ui_check
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**"]
+    steps:
+      - "Use the dev server at the URL given (lane V, port 3491); if it does not answer, start it from the repo root with PORT=3491 npm run dev (never port 3470, never while a suite command is running), note its PID and stop only that PID when done"
+      - "Navigate {url}/inventory at 360x800, light → screenshot evidence/E11-the-360-sang.png; dark (emulate prefers-color-scheme dark) → evidence/E11-the-360-toi.png"
+      - "Navigate {url}/inventory at 414x896, light → screenshot evidence/E11-the-414-sang.png"
+      - "At 360x800 light, scroll down one screen, tap the third card on screen → screenshot evidence/E11-ho-so-360-sang.png; press browser back → screenshot evidence/E11-lui-360-sang.png"
+      - "Navigate {url}/inventory at 768x1024, light → screenshot evidence/E11-bang-768-sang.png"
+    expected: "ở 360 và 414 Bảng hàng là danh sách thẻ, mỗi thẻ đọc được mã căn, giá, trạng thái (sáng và tối đều rõ); ảnh hồ sơ là hồ sơ căn toàn màn của căn vừa chạm; ảnh sau khi lùi cho thấy cùng các thẻ như trước khi chạm; ở 768 vẫn là bảng"
+    evidence_required: [screenshot, observed, verifier, verified_at]
+
+  - id: E12
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: [src/components/candidate/**, "src/app/(app)/inventory/**", design/patterns/**]
+    expected: "exit 0; màn inventory vẫn theo khuôn Lưới (DataRegion), không dựng DataGrid, DataGridTable hay Table ngoài khuôn"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.the_dien_thoai
+    paths: [src/modules/listings/ui/**, tests/the-dien-thoai.test.tsx]
+    expected: "exit 0; khối 'cua-phat-trien': hàm thuần đọc ?mau= (cùng khuôn inventoryStateFrom) — ma trận viết trước 4 ca {('bien','production') → không dữ liệu kiểm; ('bien','development') → 9 dòng biên; (undefined,'development') → không; ('khac','development') → không} hằng 4; đối chứng dương là ca development; ca phá bỏ kiểm env → đỏ 'dev seam active in production: mau'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

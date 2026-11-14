@@ -1,0 +1,37 @@
+{
+  "feature_plain": "Trên điện thoại, Bảng hàng thành danh sách thẻ căn đọc được ngay mã căn, giá, trạng thái; chạm thẻ mở hồ sơ căn và lùi về đúng chỗ đang xem.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ hiện thẻ căn thay cho bảng ở 360 và 414, mỗi thẻ đủ mã căn, giá «x,xx tỷ», trạng thái, đúng thứ tự như bảng."},
+    {"id": "AC-2", "p": "Sẽ giữ bảng như hôm nay từ 768 trở lên; 767 là thẻ; xoay máy qua ngưỡng không mất lọc, nhóm, sắp xếp."},
+    {"id": "AC-3", "p": "Sẽ mở hồ sơ căn toàn màn khi chạm thẻ; đóng hay lùi thì về đúng chỗ đang cuộn và đúng thẻ vừa mở."},
+    {"id": "AC-4", "p": "Sẽ lọc trên điện thoại theo lối anh chọn ở câu 2, cùng một bộ lọc với bảng, có «x / 60 dòng», «Xoá lọc» và câu «Không có dòng nào khớp»."},
+    {"id": "AC-5", "p": "Sẽ mở thẻ đã lọc sẵn khi vào từ lối tắt trạng thái, từ ô tìm ⌘K hay từ góc nhìn đã lưu; đổi lọc thì góc nhìn báo «đã đổi»."},
+    {"id": "AC-6", "p": "Sẽ nhóm thẻ theo toà, mỗi nhóm một dòng tên toà và số căn, khớp với bảng."},
+    {"id": "AC-7", "p": "Sẽ hiện đúng câu và nút của vùng khi đang tải, trống, lỗi, hỏng một phần hay không đủ quyền."},
+    {"id": "AC-8", "p": "Sẽ không để chữ tràn khỏi thẻ ở 360 với mã căn dài, giá trăm tỷ, giá thuê, căn chưa có giá — đo bằng dữ liệu kiểm, không vẽ tay."},
+    {"id": "AC-9", "p": "Sẽ không có chỗ sửa nào trên thẻ ở mọi vai; hồ sơ mở từ thẻ có đúng bộ nút theo vai; thẻ dùng được bằng bàn phím và trình đọc màn hình."},
+    {"id": "AC-10", "p": "Sẽ ghi hành vi thẻ, ngưỡng 768 và cách lọc vào tài liệu thiết kế, sổ khối, trang Căn chào của wiki và nhật ký."}
+  ],
+  "scope_plain": "Những việc hàng này không làm:",
+  "wont_do": [
+    {"id": "OOS-1", "p": "Không sửa giá, trạng thái trên điện thoại — đó là hàng 3d, đứng ngay sau."},
+    {"id": "OOS-2", "p": "Không đổi Đã gửi hay Liên hệ sang thẻ — chỉ Bảng hàng."},
+    {"id": "OOS-3", "p": "Không có ảnh căn trên thẻ — kho chưa có ảnh căn."},
+    {"id": "OOS-4", "p": "Không chọn nhiều thẻ để gửi khách — chưa có hàng lộ trình."},
+    {"id": "OOS-5", "p": "Không làm khoá ghim cột «Căn» ở bảng máy tính, trừ khi anh chọn làm ở câu 3."}
+  ],
+  "coverage_plain": [
+    {"i": 0, "p": "Khổ: thẻ ở 360, 414, 767; bảng ở 768, 1024, 1440 (AC-1, AC-2)."},
+    {"i": 1, "p": "Việc trên điện thoại: xem, lọc, vào từ chỗ khác, nhóm, mở và lùi (AC-1, AC-3 … AC-6); sửa để hàng 3d."},
+    {"i": 2, "p": "Bảy trạng thái của vùng: có dòng, không khớp, tải, trống, lỗi, hỏng một phần, không quyền (AC-1, AC-4, AC-7)."},
+    {"i": 3, "p": "Dữ liệu biên: mã dài, giá lớn, giá thuê, thiếu giá, sáu trạng thái (AC-8) — dữ liệu mẫu không có, đo bằng dữ liệu kiểm."},
+    {"i": 4, "p": "Bốn vai của sàn, ai cũng chỉ đọc trên thẻ (AC-9)."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Lý do giữ nhóm theo toà trên thẻ trích một câu không nói gì về nhóm — đã ghi lại lý do đúng: thẻ là thân của cùng vùng đang có nút nhóm, bỏ nhóm thì nút bấm mà danh sách không đổi."},
+    {"i": 1, "p": "Ngưỡng nghiệm thu chưa nối với bài đo — đã thêm mục đường đo, từng vế một bài; vế «bày ứng viên ReUI kèm ảnh» đo ngay ở trang cổng này."},
+    {"i": 2, "p": "Bài đo chỉ viết cho lối máy khuyên — đã thêm bảng «anh chọn lối nào thì tiêu chí và bài đo nào đổi», và viết bài đo cho cả hai lối của câu 1 và câu 2."},
+    {"i": 3, "p": "Dữ liệu kiểm biên chỉ được mở ở bản phát triển mà không bài nào đo — đã thêm bài đo bản chính thức bỏ qua nó; cửa đổi vai có sẵn từ hàng 4, hàng này không đổi."},
+    {"i": 4, "p": "Bài đo tài liệu không đọc trang wiki của căn chào — đã thêm trang ấy và câu hỏi tương ứng."}
+  ]
+}
