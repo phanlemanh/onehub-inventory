@@ -41,7 +41,7 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại; màn này tro
 - AC-3: Given danh sách thẻ ở 360, đã cuộn xuống quá một màn, When chạm một thẻ, Then hồ sơ căn của hàng 3 mở toàn màn với
   địa chỉ `?ho-so=<id>` của căn ấy, «Trước/Sau» đi theo thứ tự thẻ; When đóng bằng «Đóng» hay nút lùi của trình duyệt, Then
   danh sách vẫn ở đúng chỗ cuộn cũ (lệch không quá 1 px) và tiêu điểm nằm trên thẻ vừa mở.
-- AC-4: Given Bảng hàng dưới 768, When người dùng hàng công cụ và lọc theo Hỏi-2 (khuyến nghị: nút Lọc mở ngăn đáy đủ
+- AC-4: Given Bảng hàng dưới 768, When người dùng hàng công cụ (ba nút biểu tượng có tên đọc được và nhãn khi chạm giữ) và lọc theo Hỏi-2 (khuyến nghị: nút Lọc mở ngăn đáy đủ
   ô lọc, lọc đang chạy hiện thành chip có nút bỏ; lối kia: hàng ô lọc luôn hiện), Then hàng công cụ là một dòng dính dưới
   thanh trên khi cuộn, gồm số dòng và ba nút biểu tượng vùng chạm 44 px (Lọc kèm số ô đang lọc, Nhóm theo Toà, «…» chứa
   Lưu góc nhìn), không «Cột», không «Toàn màn hình»; thẻ chỉ còn căn khớp, hai ô lọc chồng nhau như ở bảng, «x / 60 dòng»
@@ -60,6 +60,11 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại; màn này tro
   không có ô sửa, nút sửa giá hay trạng thái, nút «Cột»; hồ sơ mở từ thẻ mang đúng bộ nút theo vai như hồ sơ mở từ bảng; cả
   thẻ là một nút tên «Căn <mã>», vùng chạm cao ít nhất 44 px, Tab đi qua từng thẻ, Enter mở hồ sơ; quét axe ở 360 và 414,
   sáng và tối, không lỗi; Quản trị sàn thấy câu không đủ quyền, không thẻ.
+- AC-11: Given Bảng hàng dưới 768 khi màn có nút theo vai (khuôn 9e), When người dùng mở danh sách thẻ, Then nút thêm
+  căn nằm ở đầu màn và việc của một căn (Sửa, Xoá căn) nằm theo Hỏi-3 (khuyến nghị: «…» cuối mỗi thẻ và ở đầu hồ sơ; lối
+  kia: chỉ ở đầu hồ sơ); nút chỉ hiện với vai có quyền theo bảng quyền (Đầu chủ: Sửa, Xoá căn của mình; Đầu khách: Sửa;
+  Trưởng nhóm: cả sàn), không bao giờ hiện mà mờ; xoá hỏi lại trước khi làm. Các việc Thêm căn, Xoá căn, sửa trên điện
+  thoại sống khi hàng 12, 18b, 3d gộp — hàng này dựng chỗ đặt và bài đo chỗ đặt trên mẫu khuôn 9e.
 - AC-10: Given tài liệu của kho, When người đọc, Then trang thực thể `wiki/entities/listing.md` có hành vi thẻ dưới 768 trỏ tới hàng 2b; `design/behaviors.md` có hành vi danh sách thẻ dưới 768 (ngưỡng, chạm
   mở hồ sơ, lùi giữ chỗ cuộn); khuôn Lưới `design/patterns/luoi.md` nói lọc trên điện thoại theo Hỏi-2; sổ khối có dòng cho
   khối thẻ đã chọn; nhật ký có dòng của hàng này.
@@ -91,7 +96,7 @@ quyền đã có. Thước đối chiếu:
 - Thẻ cho các màn Lưới khác (Đã gửi, Liên hệ sau này) — vùng có khe dùng chung, nhưng chỉ Bảng hàng dùng ở hàng này.
 - Tải ảnh căn — hàng 15; thẻ có sẵn chỗ ảnh, ảnh trong trang cổng là ảnh minh hoạ của bản phát triển.
 - Chọn nhiều thẻ (giữ lâu) và gửi khách từ danh sách — chưa có hàng lộ trình.
-- Khoá ghim cột «Căn» ở menu tiêu đề cột (việc gắn kèm từ 2e) — theo Hỏi-3; khuyến nghị tách việc nhỏ riêng.
+- Khoá ghim cột «Căn» ở menu tiêu đề cột (việc gắn kèm từ 2e) — theo Hỏi-4; khuyến nghị tách việc nhỏ riêng.
 
 ## Đường đo
 
@@ -117,7 +122,13 @@ Ngưỡng SỐNG của ô cơ hội, từng vế:
   | Hỏi-2 Hàng ô | AC-4, E4: hàng ô lọc dưới hàng công cụ, tám ô theo thứ tự cột, không nút Lọc; E9 Tab bắt đầu từ ô lọc cuối của hàng |
   | Hỏi-3 làm trong hàng | thêm một tiêu chí khoá ghim cột Căn ở menu tiêu đề cột và một bài đo ở 1440 |
 
-  Lối không được chọn: mã bản bấm được của lối ấy (`?the=`, `?loc=`) gỡ trước lượt chấm.
+  | Hỏi-3 «…» trên thẻ | AC-11: mỗi thẻ có «…» theo quyền, cạnh nút mở; ca phá «…» hiện mà mờ → đỏ |
+  | Hỏi-3 chỉ ở hồ sơ | AC-11: thẻ không có «…»; đầu hồ sơ có «…» theo quyền |
+
+  Lối không được chọn: mã bản bấm được của lối ấy (`?the=`, `?loc=`, `?o=`, `?nut=`, `?anh=`) gỡ trước lượt chấm.
+- Phán quyết giám sát G-1411-91 (2026-11-14): ba nút biểu tượng của hàng công cụ có tên đọc được (trình đọc màn hình) và
+  nhãn hiện khi chạm giữ; dữ liệu hôm nay chưa căn nào có ảnh nên ảnh minh hoạ chỉ ở trang cổng — bản dựng không mang ảnh
+  giả, thẻ hiện ô mã toà (hay không ô, theo Hỏi-1) cho mọi căn tới khi hàng 15 có ảnh thật.
 
 - Tệp ngoài vùng của hàng: `src/components/candidate/data-region.tsx` (khe danh sách điện thoại) và tệp mới
   `src/components/candidate/phone-list.tsx`; dáng «ngang gọn» thêm vào `ListingCard` (`src/modules/listings/ui/listing-record.tsx`), không thêm tệp thẻ thứ hai; `design/behaviors.md`, `design/patterns/luoi.md`, `design/so-khoi.yaml`,

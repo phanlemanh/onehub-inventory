@@ -39,7 +39,9 @@ không gian, product-grid-4 đưa vào chưa đúng dáng (có ảnh, không ả
 
 - Hỏi-1 · Căn chưa có ảnh. Ô: giữ ô vuông ghi mã toà (khuyến nghị) · Gọn: bỏ ô, chữ dồn trái.
 - Hỏi-2 · Lọc. Nút: nút Lọc mở ngăn đáy, lọc đang chạy thành chip (khuyến nghị) · Hàng ô: hàng ô lọc luôn hiện (luật 2e).
-- Hỏi-3 · Khoá ghim cột «Căn» ở bảng máy tính — tách việc nhỏ riêng (khuyến nghị) hay làm trong hàng này.
+- Hỏi-3 · Bộ nút theo vai (chủ kho hỏi thêm): «…» trên mỗi thẻ và ở đầu hồ sơ (khuyến nghị, khuôn 9e) · chỉ ở đầu hồ sơ.
+  «Thêm căn» ở đầu màn. Thêm căn, Xoá căn, sửa trên điện thoại sống ở hàng 12, 18b, 3d; hàng này dựng chỗ đặt.
+- Hỏi-4 · Khoá ghim cột «Căn» ở bảng máy tính — tách việc nhỏ riêng (khuyến nghị) hay làm trong hàng này.
 
 ## Rủi ro đã thấy
 

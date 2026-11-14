@@ -111,3 +111,11 @@ evals:
     paths: [src/modules/listings/ui/**, tests/the-dien-thoai.test.tsx]
     expected: "exit 0; khối 'cua-phat-trien': hàm thuần đọc ?mau= (cùng khuôn inventoryStateFrom) — ma trận viết trước 4 ca {('bien','production') → không dữ liệu kiểm; ('bien','development') → 9 dòng biên; (undefined,'development') → không; ('khac','development') → không} hằng 4; đối chứng dương là ca development; ca phá bỏ kiểm env → đỏ 'dev seam active in production: mau'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-11
+    executor: test
+    cmd: config:executors.test.the_dien_thoai
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, tests/the-dien-thoai.test.tsx]
+    expected: "exit 0; khối 'bo-nut' ở 360 trên vùng có nút theo khuôn 9e (headAction thêm, rowActions Sửa + Xoá căn): ma trận vai viết trước {ListAgent của tôi → [Sửa, Xoá căn]; ListAgent không của tôi → [Sửa]; BuyerAgent → [Sửa]; TeamLead → [Sửa, Xoá căn]} hằng 4 — theo lối Hỏi-3: tập tên mục của «…» trên thẻ (hoặc ở đầu hồ sơ) BẰNG đúng tập ấy, không mục nào mờ (aria-disabled vắng); Xoá căn mở hộp hỏi lại trước khi gọi apply; vai không quyền nào thì không có «…». Đối chứng: cùng ma trận ở 1440 trên dòng bảng cho cùng tập. Ca phá cho «…» hiện mục không quyền ở dạng mờ → đỏ 'row action shown disabled: <vai> <mục>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

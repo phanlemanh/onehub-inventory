@@ -40,6 +40,10 @@
     {
       "id": "AC-10",
       "p": "Sẽ ghi hành vi thẻ, ngưỡng 768 và cách lọc vào tài liệu thiết kế, sổ khối, trang Căn chào của wiki và nhật ký."
+    },
+    {
+      "id": "AC-11",
+      "p": "Sẽ đặt sẵn chỗ cho bộ nút theo vai: «Thêm căn» ở đầu màn, Sửa và Xoá căn theo lối anh chọn ở câu 3; nút chỉ hiện với vai có quyền, sống khi hàng 12, 18b, 3d gộp."
     }
   ],
   "scope_plain": "Những việc hàng này không làm:",
@@ -62,7 +66,7 @@
     },
     {
       "id": "OOS-5",
-      "p": "Không làm khoá ghim cột «Căn» ở bảng máy tính, trừ khi anh chọn làm ở câu 3."
+      "p": "Không làm khoá ghim cột «Căn» ở bảng máy tính, trừ khi anh chọn làm ở câu 4."
     }
   ],
   "coverage_plain": [
