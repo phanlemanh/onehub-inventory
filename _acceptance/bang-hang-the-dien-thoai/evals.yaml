@@ -14,7 +14,7 @@ evals:
     executor: script
     cmd: config:executors.script.the_dien_thoai_e2e
     paths: [src/components/candidate/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/the-dien-thoai.spec.ts]
-    expected: "exit 0; tests/e2e/the-dien-thoai.spec.ts ca 'nguong': ma trận khổ viết trước {360, 414, 767 → thẻ; 768, 1024, 1440 → bảng} hằng 6 — khổ thẻ: không 'table', có phone-card, document.scrollingElement.scrollWidth <= clientWidth, bề ngang thẻ đầu bằng bề ngang khổ, số thẻ nằm trọn trong màn đầu >= 6 ở 360 và >= 7 ở 414, hàng công cụ một dòng (chiều cao <= 60 px) với ba nút cao >= 44 px và còn dính ở top 48 px sau khi cuộn 1200 px; khổ bảng: có 'table', tiêu đề cột Căn, hàng ô lọc, nút 'Cột' và 'Toàn màn hình', không phone-card; ca 'doi-kho': lọc Trạng thái 'Đang bán' ở 767 → đổi 768 → bảng còn lọc và đúng số dòng → về 767 → số thẻ bằng số dòng ấy. Ca phá (đổi ngưỡng trong bản sao sang 640) đỏ 'phone list at 767'"
+    expected: "exit 0; tests/e2e/the-dien-thoai.spec.ts ca 'nguong': ma trận khổ viết trước {360, 414, 767 → thẻ; 768, 1024, 1440 → bảng} hằng 6 — khổ thẻ: không 'table', có phone-card, document.scrollingElement.scrollWidth <= clientWidth, bề ngang thẻ đầu bằng bề ngang khổ, số thẻ nằm trọn trong màn đầu >= 6 ở 360 và >= 7 ở 414, hàng công cụ một dòng (chiều cao <= 60 px) với ba nút cao >= 36 px (cỡ lớn nhất của kho) và còn dính ở top 48 px sau khi cuộn 1200 px; khổ bảng: có 'table', tiêu đề cột Căn, hàng ô lọc, nút 'Cột' và 'Toàn màn hình', không phone-card; ca 'doi-kho': lọc Trạng thái 'Đang bán' ở 767 → đổi 768 → bảng còn lọc và đúng số dòng → về 767 → số thẻ bằng số dòng ấy. Ca phá (đổi ngưỡng trong bản sao sang 640) đỏ 'phone list at 767'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3
@@ -70,7 +70,7 @@ evals:
     executor: script
     cmd: config:executors.script.the_dien_thoai_e2e
     paths: [src/components/candidate/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e/the-dien-thoai.spec.ts]
-    expected: "exit 0; ca 'vai': với ba vai đọc được viết trước {TeamLead, ListAgent, BuyerAgent} (hằng 3, `?vai=` của bản phát triển) ở 360: không phần tử nào trong danh sách thẻ là input, combobox hay nút khác ngoài nút thẻ; không nút 'Cột'; mở thẻ đầu → tập tên nút của hồ sơ BẰNG tập tên nút của hồ sơ cùng căn mở từ bảng ở 1440 với cùng vai; CompanyAdmin ở 360 → vùng báo không đủ quyền, phone-card đếm 0 (đối chứng); ca 'tiep-can': nút thẻ có accessible name 'Căn <mã>', chiều cao >= 44, Tab từ điều khiển lọc cuối (L1: ô lọc cuối của hàng; L2: nút 'Lọc') tới thẻ đầu rồi thẻ kế, Enter mở hồ sơ; axe (wcag2a/aa, 21a/aa, 22aa) ở 360 và 414, sáng và tối (hằng 4) không lỗi. Ca phá gỡ tên nút thẻ → đỏ 'axe 360 light button-name'"
+    expected: "exit 0; ca 'vai': với ba vai đọc được viết trước {TeamLead, ListAgent, BuyerAgent} (hằng 3, `?vai=` của bản phát triển) ở 360: không phần tử nào trong danh sách thẻ là input, combobox hay nút khác ngoài nút thẻ; không nút 'Cột'; mở thẻ đầu → tập tên nút của hồ sơ BẰNG tập tên nút của hồ sơ cùng căn mở từ bảng ở 1440 với cùng vai; CompanyAdmin ở 360 → vùng báo không đủ quyền, phone-card đếm 0 (đối chứng); ca 'tiep-can': liên kết thẻ có accessible name bắt đầu bằng mã căn của thẻ, chiều cao >= 44, Tab từ điều khiển lọc cuối (L1: ô lọc cuối của hàng; L2: nút 'Lọc') tới thẻ đầu rồi thẻ kế, Enter mở hồ sơ; axe (wcag2a/aa, 21a/aa, 22aa) ở 360 và 414, sáng và tối (hằng 4) không lỗi. Ca phá gỡ tên đọc khỏi một nút biểu tượng → đỏ 'axe 360 light button-name'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E10
@@ -119,3 +119,19 @@ evals:
     paths: [src/components/candidate/**, src/modules/listings/ui/**, tests/the-dien-thoai.test.tsx]
     expected: "exit 0; khối 'bo-nut' ở 360 trên vùng có nút theo khuôn 9e (headAction thêm, rowActions Sửa + Xoá căn): ma trận vai viết trước {ListAgent của tôi → [Sửa, Xoá căn]; ListAgent không của tôi → [Sửa]; BuyerAgent → [Sửa]; TeamLead → [Sửa, Xoá căn]} hằng 4 — theo lối Hỏi-3: tập tên mục của «…» trên thẻ (hoặc ở đầu hồ sơ) BẰNG đúng tập ấy, không mục nào mờ (aria-disabled vắng); Xoá căn mở hộp hỏi lại trước khi gọi apply; vai không quyền nào thì không có «…». Đối chứng: cùng ma trận ở 1440 trên dòng bảng cho cùng tập. Ca phá cho «…» hiện mục không quyền ở dạng mờ → đỏ 'row action shown disabled: <vai> <mục>'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-12
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [tests/e2e/**, tools/e2e_templates/**, src/components/candidate/**, src/modules/listings/ui/**]
+    expected: "exit 0; bộ trình duyệt đầy đủ ở bốn khổ xanh, gồm các ca đã viết lại ở 360/414 (sheet, ho-so-can, ghim-ngan, ho-so-du-thong-tin, loi-vao-ho-so, sua-tren-o, inventory-width, open-cell-truncate, bộ bài chung man inventory) và ca phá của chúng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E16
+    criterion: AC-12
+    executor: judgment
+    inputs: [_acceptance/bang-hang-the-dien-thoai/doi-bai-kiem.md, tests/e2e/phone-list.ts, tests/e2e/sheet.spec.ts, tests/e2e/loi-vao-ho-so.spec.ts]
+    question: "Tệp đầu là bảng đối chiếu mỗi ca cũ ở khổ điện thoại với cách xử lý. (1) Mọi dòng có cột Xử lý và Ca mới không trống, và số dòng khớp số ca cũ tệp nêu ở đầu? (2) Dòng «không còn áp ở điện thoại» chỉ dành cho việc chỉ bảng mới có (phím bảng tính, cột ghim, nút tiêu đề, bề rộng cột, toàn màn hình) và mỗi dòng ấy trỏ tới một phép có đo (phoneStandIn hay phoneStandInBreak ở tests/e2e/phone-list.ts) chứ không phải bỏ qua trống? (3) Việc người dùng vẫn làm được ở điện thoại (lọc, lối tắt trạng thái, Tab, axe, mở hồ sơ, tìm từ ⌘K) có dòng «chuyển» với ca thay ở điện thoại, và đọc hai tệp bài kèm theo thì ca ấy thật sự đo điều đó? Trả PASS chỉ khi cả ba đúng."
+    expected: "PASS khi bảng đủ, không dòng trống và không dòng nào yếu đi"
+    evidence_required: [verdict, rationale, verifier, verified_at]

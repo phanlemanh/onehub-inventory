@@ -4,6 +4,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { assertCardsNotTable, rowsShown } from "./phone-list";
+
 import { label } from "../../src/modules/company-config";
 import { shown } from "../../tools/e2e_templates/settle";
 
@@ -232,10 +234,23 @@ test.describe("sua-tren-o", () => {
 
   test("dien-thoai-khong-sua", async ({ page }) => {
     test.skip(WIDE.has(width()), "phones only");
-    await openInventory(page);
-    for (const field of [PRICE, STATUS]) {
-      expect(await anyWayOpens(page, "1101", field), `dien-thoai-khong-sua: ${field}`).toBe(false);
-    }
+    // Row 2b: on a phone the region is a list of listing cards with no cell at all; nothing on a card edits, and
+    // tapping the card of 1101 opens its record, never an editor.
+    await page.goto(`/inventory?vai=ListAgent`);
+    await rowsShown(page);
+    await assertCardsNotTable(page, "dien-thoai-khong-sua");
+    const controls = await page
+      .locator('[data-slot="phone-list"] ul')
+      .locator("input, select, textarea, button, [role=combobox]")
+      .count();
+    expect(controls, "dien-thoai-khong-sua: an edit control on a card").toBe(0);
+    await page
+      .locator('[data-slot="phone-card"]')
+      .filter({ has: page.locator('[data-slot="listing-card-unit"]', { hasText: /^1101$/ }) })
+      .first()
+      .click();
+    await expect(page.locator('[data-slot="record-panel"]')).toBeVisible();
+    await expect(editor(page), "dien-thoai-khong-sua: an editor opened").toHaveCount(0);
   });
 
   test("cot-chi-doc", async ({ page }) => {

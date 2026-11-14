@@ -44,7 +44,7 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại; màn này tro
 - AC-4: Given Bảng hàng dưới 768, When người dùng hàng công cụ (ba nút biểu tượng có tên đọc được và nhãn khi chạm giữ) và lọc theo Hỏi-2 (khuyến nghị: nút Lọc mở ngăn đáy đủ
   ô lọc, lọc đang chạy hiện thành chip có nút bỏ; lối kia: hàng ô lọc luôn hiện), Then ngăn lọc mở đầu bằng «Sắp theo» (chọn một cột của bảng, tăng hay giảm dần — cùng sắp xếp với bảng, giữ khi qua
   ngưỡng 768); hàng công cụ là một dòng dính dưới
-  thanh trên khi cuộn, gồm số dòng và ba nút biểu tượng vùng chạm 44 px (Lọc kèm số ô đang lọc, Nhóm theo Toà, «…» chứa
+  thanh trên khi cuộn, gồm số dòng và ba nút biểu tượng cỡ lớn nhất của kho, 36 px (nợ 44 px của cả kho, như hàng 3e — sửa sau Cổng Phạm vi) (Lọc kèm số ô đang lọc, Nhóm theo Toà, «…» chứa
   Lưu góc nhìn), không «Cột», không «Toàn màn hình»; thẻ chỉ còn căn khớp, hai ô lọc chồng nhau như ở bảng, «x / 60 dòng»
   và «Xoá lọc» hiện; không còn căn nào khớp thì «Không có dòng nào khớp» và «Xoá lọc».
 - AC-5: Given Bảng hàng dưới 768 mở từ lối tắt trạng thái (`?status=`), từ ô ⌘K (`?ma=`) hay từ một góc nhìn đã lưu (2c),
@@ -59,7 +59,7 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại; màn này tro
   xuống dòng chứ không bị cắt mất, giá và nhãn trạng thái đọc trọn.
 - AC-9: Given mọi vai của sàn đọc được Bảng hàng (Đầu chủ, Đầu khách, Trưởng nhóm — 9a, 9b), When dùng Bảng hàng dưới 768, Then thẻ
   không có ô sửa, nút sửa giá hay trạng thái, nút «Cột»; hồ sơ mở từ thẻ mang đúng bộ nút theo vai như hồ sơ mở từ bảng; cả
-  thẻ là một nút tên «Căn <mã>», vùng chạm cao ít nhất 44 px, Tab đi qua từng thẻ, Enter mở hồ sơ; quét axe ở 360 và 414,
+  thẻ là một liên kết tới địa chỉ hồ sơ, tên đọc là chữ trên thẻ bắt đầu bằng mã căn (WCAG 2.5.3 — sửa sau Cổng Phạm vi), vùng chạm cao ít nhất 44 px, Tab đi qua từng thẻ, Enter mở hồ sơ; quét axe ở 360 và 414,
   sáng và tối, không lỗi; Quản trị sàn thấy câu không đủ quyền, không thẻ.
 - AC-11: Given Bảng hàng dưới 768 khi màn có nút theo vai (khuôn 9e), When người dùng mở danh sách thẻ, Then nút thêm
   căn nằm ở đầu màn và việc của một căn (Sửa, Xoá căn) nằm theo Hỏi-3 (khuyến nghị: «…» cuối mỗi thẻ và ở đầu hồ sơ; lối
@@ -69,6 +69,13 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại; màn này tro
 - AC-10: Given tài liệu của kho, When người đọc, Then trang thực thể `wiki/entities/listing.md` có hành vi thẻ dưới 768 trỏ tới hàng 2b; `design/behaviors.md` có hành vi danh sách thẻ dưới 768 (ngưỡng, chạm
   mở hồ sơ, lùi giữ chỗ cuộn); khuôn Lưới `design/patterns/luoi.md` nói lọc trên điện thoại theo Hỏi-2; sổ khối có dòng cho
   khối thẻ đã chọn; nhật ký có dòng của hàng này.
+
+- AC-12 (sửa sau Cổng Phạm vi — phán quyết giám sát XONG V-1411-12, 2026-11-14; chủ kho phê ở Cổng Bằng chứng): Given mọi bài
+  kiểm trình duyệt của các hàng trước từng khẳng định «ở 360/414 Bảng hàng là bảng», When hàng này viết lại chúng, Then
+  mỗi ca cũ có đúng một dòng trong `doi-bai-kiem.md` («chuyển — ca mới» hay «không còn áp ở điện thoại — vì sao»), không
+  dòng trống; ca chỉ của bảng ở điện thoại thành phép có đo «không bảng, có thẻ» kèm ca phá; việc người dùng vẫn làm ở
+  điện thoại (lọc qua ngăn Lọc, lối tắt trạng thái, nhóm, Tab, axe, mở hồ sơ và lùi, không cuộn ngang) có ca thay ở điện
+  thoại; không ca nào ở 1024, 1440 đổi lời hay kỳ vọng; không ca nào bị xoá hay bỏ trống.
 
 ## Vai × Màn
 

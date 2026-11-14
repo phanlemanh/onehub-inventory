@@ -19,9 +19,9 @@ import { RECORD_PARAM } from "./record-panel";
 
 /** What the screen gives the region for its phone list. */
 export interface RegionPhoneList<Row> {
-  /** One row's card; the region wraps it in the link that opens the record. */
+  /** One row's card; the region wraps it in the link that opens the record, named by the card's own text (WCAG 2.5.3). */
   card: (row: Row) => ReactNode;
-  /** The link's accessible name for one row (e.g. «Căn 0905»). */
+  /** The row's short name (e.g. «Căn 0905»): it names the row's «…». */
   label: (row: Row) => string;
 }
 
@@ -168,7 +168,6 @@ export function PhoneList<Row extends PhoneRow>({
         data-slot="phone-card"
         data-row-id={row.id}
         data-record-open={row.id}
-        aria-label={list.label(row)}
         onClick={open(row.id)}
         className="flex min-w-0 flex-1 px-4 py-2.5 outline-none hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
       >

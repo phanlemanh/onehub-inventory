@@ -7,6 +7,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { closePhoneSheet, isPhone, openerCode, openerCodes, phoneFilterBox } from "./phone-list";
+
 const INVENTORY = "/inventory";
 /** Sample codes found in two buildings or more (written before the code, from the 60 sample listings). */
 const SHARED_CODES = new Set([
@@ -56,11 +58,12 @@ async function openFifth(page: Page, unique = false): Promise<{ id: string; unit
   await openers(page).nth(4).waitFor();
   let opener = openers(page).nth(4);
   if (unique) {
-    const codes = await openers(page).allTextContents();
+    const codes = await openerCodes(page);
     opener = openers(page).nth(codes.findIndex((c) => !SHARED_CODES.has(c.trim())));
   }
   const id = (await opener.getAttribute("data-record-open")) ?? "";
-  const unit = ((await opener.textContent()) ?? "").trim();
+  // On a phone the opener is the whole listing card (row 2b): the code is its unit slot.
+  const unit = await openerCode(opener);
   await opener.click();
   await expect(panel(page)).toHaveAttribute("data-record-id", id);
   return { id, unit };
@@ -186,11 +189,8 @@ test.describe("E5, E6 · the inventory opened from a unit code", () => {
     const { id, unit } = await openFifth(page, true);
     await openInventory(page, `?ma=${encodeURIComponent(`  ${unit.toLowerCase()} `)}`);
     await expect(panel(page)).toHaveAttribute("data-record-id", id);
-    // On the phone the record covers the grid, so the filter is read by its name, not by its role in view.
-    const filter = page.locator('input[aria-label="Lọc cột Căn"]');
-    await expect(filter, "code not in the unit column filter").toHaveValue(
-      unit.toLowerCase().trim(),
-    );
+    // On the phone the record covers the list; the filter is read after it closes, in the filter sheet (row 2b).
+    await unitFilterHolds(page, unit.toLowerCase().trim(), "code not in the unit column filter");
   });
 
   test("a code in three buildings: three rows, three buildings, no record opens", async ({
@@ -198,11 +198,16 @@ test.describe("E5, E6 · the inventory opened from a unit code", () => {
   }) => {
     await openInventory(page, "?ma=0601");
     await expect(openers(page)).toHaveCount(3);
-    const buildings = await page
-      .locator('[data-slot="data-region"] tbody tr')
-      .evaluateAll((rows) =>
-        rows.map((r) => r.querySelectorAll("td")[2]?.textContent?.trim() ?? ""),
-      );
+    // The building of each row: the table's third cell, or on a phone the card's place «Toà · Dự án» (row 2b).
+    const buildings = isPhone(page)
+      ? await page
+          .locator('[data-slot="phone-card"] [data-slot="listing-card-place"]')
+          .evaluateAll((els) => els.map((e) => (e.textContent ?? "").split(" · ")[0]!.trim()))
+      : await page
+          .locator('[data-slot="data-region"] tbody tr')
+          .evaluateAll((rows) =>
+            rows.map((r) => r.querySelectorAll("td")[2]?.textContent?.trim() ?? ""),
+          );
     expect(new Set(buildings).size, "building missing from choice").toBe(3);
     await expect(panel(page), "many buildings opened the first").toHaveCount(0);
   });
@@ -244,20 +249,45 @@ const unitFilter = (page: Page) => page.locator('input[aria-label="Lọc cột C
 async function uniqueRow(page: Page): Promise<{ id: string; unit: string; building: string }> {
   await openInventory(page);
   await openers(page).nth(4).waitFor();
-  const codes = await openers(page).allTextContents();
+  const codes = await openerCodes(page);
   const index = codes.findIndex((c) => !SHARED_CODES.has(c.trim()));
   const opener = openers(page).nth(index);
   const id = (await opener.getAttribute("data-record-open")) ?? "";
-  const unit = ((await opener.textContent()) ?? "").trim();
-  const building = (
-    (await page
-      .locator('[data-slot="data-region"] tbody tr')
-      .nth(index)
-      .locator("td")
-      .nth(2)
-      .textContent()) ?? ""
-  ).trim();
+  const unit = await openerCode(opener);
+  // The building: the table's third cell from 768 px; on a phone the card's place «Toà · Dự án» (row 2b).
+  const building = isPhone(page)
+    ? ((await opener.locator('[data-slot="listing-card-place"]').textContent()) ?? "")
+        .split(" · ")[0]!
+        .trim()
+    : (
+        (await page
+          .locator('[data-slot="data-region"] tbody tr')
+          .nth(index)
+          .locator("td")
+          .nth(2)
+          .textContent()) ?? ""
+      ).trim();
   return { id, unit, building };
+}
+
+/**
+ * The «Căn» column filter holds `value`. From 768 px it is read in place; on a phone (row 2b) the filter lives in the
+ * filter sheet behind the toolbar's «Lọc» button, with a chip on the list: the record is closed first if it covers the
+ * list, the chip is seen, and the box is read in the sheet.
+ */
+async function unitFilterHolds(page: Page, value: string, why: string): Promise<void> {
+  if (!isPhone(page)) {
+    await expect(unitFilter(page), why).toHaveValue(value, { timeout: 5000 });
+    return;
+  }
+  if ((await panel(page).count()) > 0) {
+    await panel(page).getByRole("button", { name: "Đóng" }).click();
+    await expect(panel(page)).toHaveCount(0);
+  }
+  if (value !== "")
+    await expect(page.getByRole("button", { name: "Bỏ lọc Căn" }), why).toBeVisible();
+  await expect(await phoneFilterBox(page, "Căn"), why).toHaveValue(value);
+  await closePhoneSheet(page);
 }
 
 /** Shows the row of column filters (it opens by itself only when a filter is set). */
@@ -278,10 +308,8 @@ async function openSearch(page: Page): Promise<void> {
 /** E5: after a jump the grid is at /inventory, the code sits in the unit column filter, and the record is open. */
 async function checkJumped(page: Page, id: string, unit: string): Promise<void> {
   await expect(page, "jump did not navigate").toHaveURL(/\/inventory\?/, { timeout: 5000 });
-  await expect(unitFilter(page), "code not in the unit column filter").toHaveValue(unit, {
-    timeout: 5000,
-  });
   await expect(panel(page)).toHaveAttribute("data-record-id", id);
+  await unitFilterHolds(page, unit, "code not in the unit column filter");
 }
 
 /** A capture listener ahead of the page's own: how a break case swallows or steals a key. */
@@ -304,7 +332,10 @@ test.describe("E5 · the top-bar ⌘K box", () => {
       await paletteInput(page).fill(`  ${unit.toLowerCase()}  `);
       await paletteInput(page).press("Enter");
       await checkJumped(page, id, unit);
-      await expect(unitFilter(page)).toBeVisible();
+      // The filter shows: in place from 768 px, as a chip on a phone (row 2b).
+      if (isPhone(page))
+        await expect(page.getByRole("button", { name: "Bỏ lọc Căn" })).toBeVisible();
+      else await expect(unitFilter(page)).toBeVisible();
     });
   }
 
@@ -429,9 +460,9 @@ test.describe("E5 · the top-bar ⌘K box", () => {
 /** E7: an unknown code shows «no row matches» with «Xoá lọc», the code visible in the unit filter, and no record. */
 async function checkUnknown(page: Page): Promise<void> {
   await expect(page.getByText(NO_MATCH)).toBeVisible();
-  await expect(unitFilter(page)).toHaveValue(UNKNOWN);
-  await expect(unitFilter(page)).toBeVisible();
   await expect(panel(page), "unknown code opened a record").toHaveCount(0);
+  await unitFilterHolds(page, UNKNOWN, "code not in the unit column filter");
+  if (!isPhone(page)) await expect(unitFilter(page)).toBeVisible();
 }
 
 test.describe("E7 · an unknown code typed in the box", () => {
@@ -445,11 +476,13 @@ test.describe("E7 · an unknown code typed in the box", () => {
     await paletteInput(page).press("Enter");
     await expect(page).toHaveURL(/\/inventory\?ma=/);
     await checkUnknown(page);
+    // On a phone «Xoá lọc» is both on the chip row and in the empty list: either clears every filter (row 2b).
     await page
       .locator('[data-slot="data-region"]')
       .getByRole("button", { name: "Xoá lọc" })
+      .first()
       .click();
-    await expect(unitFilter(page)).toHaveValue("");
+    await unitFilterHolds(page, "", "unit filter not cleared");
     await expect(openers(page).first()).toBeVisible();
     await expect(page.getByText(NO_MATCH)).toHaveCount(0);
   });

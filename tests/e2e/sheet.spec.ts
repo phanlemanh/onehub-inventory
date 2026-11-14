@@ -5,6 +5,17 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 import { formatMoney, statusLabel } from "../../src/lib/format";
+import {
+  closePhoneSheet,
+  isPhone,
+  phoneFilterBox,
+  phoneFilterSheet,
+  phoneStandIn,
+  phoneStandInBreak,
+  assertCardsNotTable,
+  regionHydrated,
+  rowsShown,
+} from "./phone-list";
 import { SAMPLE_STATUS_COUNTS } from "../../src/modules/listings/sample";
 
 const WIDE = new Set(["1024", "1440"]);
@@ -17,7 +28,23 @@ const bodyRows = (page: Page) =>
 async function openInventory(page: Page, query = ""): Promise<void> {
   await page.goto(`/inventory${query}`);
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  // Below 768 px the inventory is a list of listing cards (row 2b); the table, and its focusable grid, from 768.
+  if (isPhone(page)) {
+    await rowsShown(page);
+    await regionHydrated(page);
+    return;
+  }
   await expect(table(page)).toHaveAttribute("tabindex", "0");
+}
+
+/** Types a rule in one column's filter: in place from 768 px, in the filter sheet on a phone (row 2b), then closed. */
+async function typeFilter(page: Page, header: string, rule: string): Promise<void> {
+  if (!isPhone(page)) {
+    await page.getByLabel(`Lọc cột ${header}`).fill(rule);
+    return;
+  }
+  await (await phoneFilterBox(page, header)).fill(rule);
+  await closePhoneSheet(page);
 }
 
 /** The element that scrolls the grid's run. */
@@ -97,6 +124,8 @@ const KEYS: [string, number | "after-1", string][] = [
 test.describe("sheet keys", () => {
   test("sheet keys move the selected cell and the grid follows it", async ({ page }) => {
     expect(KEYS).toHaveLength(9);
+    // Row 2b: sheet keys belong to the table, which exists from 768 px; a phone has the card list instead.
+    if (isPhone(page)) return phoneStandIn(page, "sheet keys");
     await openInventory(page);
     await (await cellOf(page, 1, "Listing.unitNumber")).click({ position: { x: 3, y: 3 } });
     for (const [key, row, col] of KEYS) {
@@ -110,6 +139,7 @@ test.describe("sheet keys", () => {
   });
 
   test("sheet keys: cell out of view fails the check", async ({ page }) => {
+    if (isPhone(page)) return phoneStandInBreak(page, "sheet keys");
     await openInventory(page);
     await (await cellOf(page, 2, "Listing.unitNumber")).click({ position: { x: 3, y: 3 } });
     await page.keyboard.press("End");
@@ -253,6 +283,8 @@ test.describe("sheet frozen columns", () => {
   }
 
   test("row number, Căn and Toà stay put when the grid scrolls sideways", async ({ page }) => {
+    // Row 2b: frozen columns belong to the table; at 360 the inventory is the card list.
+    if (isPhone(page)) return phoneStandIn(page, "frozen columns");
     await openInventory(page);
     await checkFrozen(page);
     await expect(
@@ -261,6 +293,7 @@ test.describe("sheet frozen columns", () => {
   });
 
   test("frozen-column check fails when the columns are not sticky", async ({ page }) => {
+    if (isPhone(page)) return phoneStandInBreak(page, "frozen columns");
     await openInventory(page);
     await page.addStyleTag({
       content: "td[data-pinned],th[data-pinned]{position:static!important}",
@@ -285,6 +318,11 @@ test.describe("status shortcuts", () => {
       .click();
   }
   async function allStatuses(page: Page): Promise<string[]> {
+    // Row 2b: on a phone every row is a card in the page (no virtual window), each with its status badge.
+    if (isPhone(page))
+      return page
+        .locator('[data-slot="phone-card"] [data-status]')
+        .evaluateAll((els) => els.map((e) => e.getAttribute("data-status") ?? ""));
     const s = await page
       .locator('[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]')
       .first();
@@ -315,7 +353,8 @@ test.describe("status shortcuts", () => {
       await openInventory(page);
       await openShortcut(page, statusLabel(status as never));
       await expect(page).toHaveURL(new RegExp(`status=${status}$`));
-      await expect(table(page)).toHaveAttribute("tabindex", "0");
+      if (isPhone(page)) await rowsShown(page);
+      else await expect(table(page)).toHaveAttribute("tabindex", "0");
       const statuses = await allStatuses(page);
       checkStatuses(statuses, status);
       expect(statuses).toHaveLength(
@@ -329,11 +368,13 @@ test.describe("status shortcuts", () => {
         statusLabel(status as never),
       );
       if (status === "Active") {
-        await page.getByLabel("Lọc cột Giá chào").fill("<=5");
-        const priced = await bodyRows(page).count();
+        await typeFilter(page, "Giá chào", "<=5");
+        // Rows left: table rows from 768 px, cards on a phone (row 2b).
+        const rowsLeft = isPhone(page) ? page.locator('[data-slot="phone-card"]') : bodyRows(page);
+        const priced = await rowsLeft.count();
         expect(priced).toBeLessThan(statuses.length);
-        for (const tr of await bodyRows(page).all())
-          await expect(tr.locator("[data-status]").first()).toHaveAttribute(
+        for (const row of await rowsLeft.all())
+          await expect(row.locator("[data-status]").first()).toHaveAttribute(
             "data-status",
             "Active",
           );
@@ -365,8 +406,8 @@ test.describe("sheet axe", () => {
     [
       "lọc mở",
       async (page) => {
-        // Row 2e: the filter row is always there; the state is a rule typed in it.
-        await page.getByLabel("Lọc cột Giá chào").fill("<=5");
+        // Row 2e: the filter row is always there; the state is a rule typed in it (on a phone, in the sheet — row 2b).
+        await typeFilter(page, "Giá chào", "<=5");
       },
     ],
     ["nhóm", async (page) => page.getByRole("button", { name: "Nhóm theo Toà" }).click()],
@@ -389,7 +430,11 @@ test.describe("sheet axe", () => {
 
   test("axe catches a filter box without a name", async ({ page }) => {
     await openInventory(page);
-    await page.getByLabel("Lọc cột Giá chào").evaluate((el) => {
+    // On a phone the filter boxes are in the open filter sheet (row 2b).
+    const box = isPhone(page)
+      ? await phoneFilterBox(page, "Giá chào")
+      : page.getByLabel("Lọc cột Giá chào");
+    await box.evaluate((el) => {
       el.removeAttribute("aria-label");
       el.removeAttribute("placeholder");
     });
@@ -425,6 +470,34 @@ test.describe("sheet tab stops", () => {
     }
     return names;
   }
+  /**
+   * Row 2b: on a phone the walk starts on the toolbar's filter button and runs through the toolbar, the filter chips and
+   * every card; a card is one stop named «card».
+   */
+  async function phoneTabStops(page: Page): Promise<string[]> {
+    const first = page.locator('[data-slot="phone-filter-button"]');
+    await first.focus();
+    const names: string[] = [((await first.getAttribute("aria-label")) ?? "").trim()];
+    for (let i = 0; i < 80; i += 1) {
+      await page.keyboard.press("Tab");
+      const name = await page.evaluate(() => {
+        const el = document.activeElement as HTMLElement | null;
+        if (!el || !el.closest('[data-slot="data-region"]')) return null;
+        if (el.matches('[data-slot="phone-card"]')) return "card";
+        return el.getAttribute("aria-label") || el.textContent?.trim() || el.tagName;
+      });
+      if (name === null) break;
+      names.push(name);
+    }
+    return names;
+  }
+  function checkPhoneStops(stops: string[], expected: string[], cards: number): void {
+    for (const want of expected)
+      if (!stops.includes(want))
+        throw new Error(`tab stop missing: ${want} (stops: ${stops.join(" | ")})`);
+    const reached = stops.filter((s) => s === "card").length;
+    if (reached !== cards) throw new Error(`cards reached by Tab: ${reached} of ${cards}`);
+  }
   function checkStops(stops: string[], expected: string[]): void {
     for (const want of expected)
       if (!stops.includes(want))
@@ -452,7 +525,20 @@ test.describe("sheet tab stops", () => {
   ] as const)
     test(`tab reaches the tools, headers, filter boxes and the grid: ${name}`, async ({ page }) => {
       await openInventory(page);
-      if (typed) await page.getByLabel("Lọc cột Giá chào").fill("<=5");
+      if (typed) await typeFilter(page, "Giá chào", "<=5");
+      if (isPhone(page)) {
+        // Row 2b: a phone has the toolbar's three buttons, the filter chips when filtering, and one stop per card.
+        const stops = await phoneTabStops(page);
+        const cards = await page.locator('[data-slot="phone-card"]').count();
+        checkPhoneStops(
+          stops,
+          typed
+            ? ["Lọc (1)", "Nhóm theo Toà", "Thêm", "Bỏ lọc Giá chào", "Xoá lọc"]
+            : ["Lọc", "Nhóm theo Toà", "Thêm"],
+          cards,
+        );
+        return;
+      }
       const stops = await tabStops(page);
       expect(stops).not.toContain("Lọc");
       const expected = [
@@ -469,6 +555,17 @@ test.describe("sheet tab stops", () => {
 
   test("tab-stop check fails when a filter box leaves the order", async ({ page }) => {
     await openInventory(page);
+    if (isPhone(page)) {
+      // Row 2b: a card taken out of the Tab order is caught.
+      await page
+        .locator('[data-slot="phone-card"]')
+        .first()
+        .evaluate((el) => el.setAttribute("tabindex", "-1"));
+      const stops = await phoneTabStops(page);
+      const cards = await page.locator('[data-slot="phone-card"]').count();
+      expect(() => checkPhoneStops(stops, ["Lọc"], cards)).toThrow("cards reached by Tab");
+      return;
+    }
     await page.getByLabel("Lọc cột Giá chào").evaluate((el) => el.setAttribute("tabindex", "-1"));
     const stops = await tabStops(page);
     expect(() => checkStops(stops, ["Lọc cột Giá chào", "grid"])).toThrow(
@@ -526,6 +623,8 @@ test.describe("sheet full screen", () => {
     if (!WIDE.has(width())) {
       await openInventory(page);
       await expect(page.locator('[data-slot="full-screen-toggle"]')).toBeHidden();
+      // Row 2b: below 768 px the region is the card list, which has no full screen of its own.
+      if (isPhone(page)) await phoneStandIn(page, "full screen");
       return;
     }
     await openInventory(page);
@@ -646,7 +745,10 @@ test.describe("sheet footer in view", () => {
 test.describe("no match keeps filters", () => {
   /** The filter boxes are still there to mend, at every width (row 2e: the filter row is always shown). */
   async function checkFilters(page: Page): Promise<void> {
-    const boxes = page.locator('[data-slot="data-region"] [data-slot="column-filter"]');
+    // On a phone the boxes are in the open filter sheet, outside the region (row 2b).
+    const boxes = isPhone(page)
+      ? phoneFilterSheet(page).locator('[data-slot="column-filter"]')
+      : page.locator('[data-slot="data-region"] [data-slot="column-filter"]');
     const ok = (await boxes.count()) === 8 && (await boxes.first().isVisible());
     if (!ok) throw new Error("filters gone on no match");
   }
@@ -654,7 +756,7 @@ test.describe("no match keeps filters", () => {
   test("Căn «zzz» letter by letter, then mend the tower filter", async ({ page }) => {
     await openInventory(page);
     if (WIDE.has(width())) await page.getByLabel("Lọc cột Toà").fill("S1.0");
-    const box = page.getByLabel("Lọc cột Căn");
+    const box = isPhone(page) ? await phoneFilterBox(page, "Căn") : page.getByLabel("Lọc cột Căn");
     await box.click();
     await page.keyboard.type("zzz", { delay: 30 });
     await expect(page.getByText("Không có dòng nào khớp")).toBeVisible();
@@ -803,12 +905,45 @@ test.describe("phone filter row", () => {
     if (Math.round(ch * 10) / 10 < 11) throw new Error(`filter box too narrow: ${ch.toFixed(1)}ch`);
   }
 
+  /**
+   * Row 2b (owner, scope gate 2026-11-14: «Nút»): on a phone the filter row is replaced by the filter sheet behind the
+   * toolbar's «Lọc» button. Typing in a box there filters as at 1440, the button counts the rule, the rule shows as a
+   * chip on the list, and the page never scrolls sideways.
+   */
+  async function checkPhoneFilter(page: Page): Promise<void> {
+    const footer = page.locator('[data-slot="region-footer-count"]');
+    await expect(footer).toHaveText("60 dòng");
+    await typeFilter(page, "Căn", "02");
+    const text = (await footer.textContent()) ?? "";
+    const left = Number(text.split(" ")[0]);
+    if (!/^\d+ \/ 60 dòng$/.test(text) || left <= 0 || left >= 60)
+      throw new Error(`phone filter did not filter: ${text}`);
+    const codes = await page
+      .locator('[data-slot="phone-card"] [data-slot="listing-card-unit"]')
+      .allTextContents();
+    if (codes.length !== left || codes.some((c) => !c.includes("02")))
+      throw new Error(`phone filter shows rows that do not match: ${codes.join(",")}`);
+    if (!(await page.getByRole("button", { name: "Bỏ lọc Căn" }).isVisible()))
+      throw new Error("phone filter not shown as a chip");
+    if ((await page.getByRole("button", { name: "Lọc (1)" }).count()) !== 1)
+      throw new Error("filter button does not count the rule");
+    const sideways = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    );
+    if (sideways) throw new Error("page scrolls sideways with a filter");
+  }
+
   test("the filter row is under the headers, scrolls with the grid and filters as on a computer", async ({
     page,
   }) => {
     expect(PHONES).toHaveLength(2);
     expect(PHONES).toContain(width());
     await openInventory(page);
+    if (isPhone(page)) {
+      await assertCardsNotTable(page, "phone filter row");
+      await checkPhoneFilter(page);
+      return;
+    }
     const codeBox = await filterBox(page, "Căn").boundingBox();
     const codeHead = await headerCell(page, "Listing.unitNumber").boundingBox();
     expect(codeBox && codeHead).toBeTruthy();
@@ -827,6 +962,14 @@ test.describe("phone filter row", () => {
     page,
   }) => {
     await openInventory(page);
+    if (isPhone(page)) {
+      // Break (row 2b): the chip row hidden — the filter no longer shows on the list.
+      await page.addStyleTag({
+        content: '[data-slot="phone-filter-chips"] { display: none !important; }',
+      });
+      await expect(checkPhoneFilter(page)).rejects.toThrow("phone filter not shown as a chip");
+      return;
+    }
     await page.addStyleTag({
       content:
         '[data-slot="column-filter"] { position: fixed !important; left: 0 !important; top: 0 !important; }',
@@ -842,6 +985,22 @@ test.describe("phone filter row", () => {
 test.describe("unit code shows whole", () => {
   /** Every unit code cell mounted now shows its whole text: nothing cut, no ellipsis. */
   async function checkCodesWhole(page: Page): Promise<void> {
+    // Row 2b: on a phone each code is the head of its card; it must show whole there too.
+    if (isPhone(page)) {
+      const cutOnCard = await page
+        .locator('[data-slot="phone-card"] [data-slot="listing-card-unit"]')
+        .evaluateAll((els) =>
+          els
+            .map((el) => {
+              const e = el as HTMLElement;
+              const text = (e.textContent ?? "").trim();
+              return e.scrollWidth > e.clientWidth + 1 || text.endsWith("…") ? text : null;
+            })
+            .filter((t) => t !== null),
+        );
+      if (cutOnCard.length > 0) throw new Error(`unit code cut: ${cutOnCard[0]}`);
+      return;
+    }
     const cut = await page
       .locator('[data-slot="data-region-body"] tbody td[data-col-id="Listing.unitNumber"]')
       .evaluateAll((tds) =>
@@ -860,6 +1019,12 @@ test.describe("unit code shows whole", () => {
 
   test("every unit code cell shows the whole code, eight columns", async ({ page }) => {
     await openInventory(page);
+    if (isPhone(page)) {
+      await assertCardsNotTable(page, "unit code shows whole");
+      await expect(page.locator('[data-slot="phone-card"]')).toHaveCount(60);
+      await expect(checkCodesWhole(page)).resolves.toBeUndefined();
+      return;
+    }
     await expect(
       page.locator(
         '[data-slot="data-region-body"] thead th[data-col-id^="Listing."], [data-slot="data-region-body"] thead th[data-col-id^="Unit."]',
@@ -871,6 +1036,14 @@ test.describe("unit code shows whole", () => {
 
   test("the check fails when the unit code column is squeezed", async ({ page }) => {
     await openInventory(page);
+    if (isPhone(page)) {
+      await page.addStyleTag({
+        content:
+          '[data-slot="listing-card-unit"] { max-width: 1.2ch !important; overflow: hidden !important; display: inline-block !important; word-break: normal !important; white-space: nowrap !important; }',
+      });
+      await expect(checkCodesWhole(page)).rejects.toThrow("unit code cut: ");
+      return;
+    }
     await page.addStyleTag({
       content:
         'td[data-col-id="Listing.unitNumber"] button, td[data-col-id="Listing.unitNumber"] [data-slot="truncated-text"] { max-width: 1.2ch !important; overflow: hidden !important; display: inline-block !important; }',
@@ -912,6 +1085,8 @@ test.describe("header buttons in view", () => {
   test("every frozen header button is on top and pressable; Căn has no «Bỏ ghim»", async ({
     page,
   }) => {
+    // Row 2b: header buttons belong to the table; a phone has the card list.
+    if (isPhone(page)) return phoneStandIn(page, "header buttons");
     await openInventory(page);
     const names = await checkHeaderButtons(page);
     expect(names.some((n) => n.startsWith("Căn"))).toBe(true);
@@ -922,6 +1097,7 @@ test.describe("header buttons in view", () => {
   test("the check fails when the next header covers the first column's buttons", async ({
     page,
   }) => {
+    if (isPhone(page)) return phoneStandInBreak(page, "header buttons");
     await openInventory(page);
     // What a first column narrower than its header does: the next header lies over its sort button.
     await page.addStyleTag({
@@ -969,6 +1145,8 @@ test.describe("project column gives room, never below its floor", () => {
   test("the project column keeps its floor; a narrow screen still scrolls sideways", async ({
     page,
   }) => {
+    // Row 2b: column widths belong to the table; a phone has the card list.
+    if (isPhone(page)) return phoneStandIn(page, "project column");
     await openInventory(page);
     await expect(bodyRows(page).first()).toBeVisible();
     const m = await project(page);
@@ -976,6 +1154,7 @@ test.describe("project column gives room, never below its floor", () => {
   });
 
   test("the check fails when the project column is squeezed below its floor", async ({ page }) => {
+    if (isPhone(page)) return phoneStandInBreak(page, "project column");
     await openInventory(page);
     await expect(bodyRows(page).first()).toBeVisible();
     const nth = await page
