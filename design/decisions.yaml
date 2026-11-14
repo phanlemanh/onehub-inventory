@@ -253,3 +253,34 @@ decisions:
     kind: closed
     source: "design/patterns/luoi.md; hàng 6 Đã gửi trên Lưới (chủ kho duyệt Cổng Phạm vi 2026-11-13): màn Lưới thứ hai chỉ truyền cho DataRegion các prop Bảng hàng cũng truyền, không prop kiểu dáng"
     check: "test:tests/sent-reuse.test.ts"
+  - id: radius-value
+    layer: foundations
+    kind: closed
+    source: "the stylesheet's corner radius, as found"
+    check: "tool:tools/design-assembly/check.mjs"
+  - id: type-scale-values
+    layer: foundations
+    kind: standard
+    source: "the framework's type scale"
+    check: "tool:tools/design-assembly/check.mjs"
+  - id: spacing-values
+    layer: foundations
+    kind: standard
+    source: "the framework's 4px unit"
+    check: "tool:tools/design-assembly/check.mjs"
+  - id: design-tokens
+    layer: foundations
+    kind: formula
+    source: "src/app/globals.css, written out by make design-tokens"
+    check: "tool:tools/design-assembly/check.mjs"
+  - id: empty-state-actions
+    layer: patterns
+    kind: closed
+    source: "an empty state offers a button only where the person can fill the list there"
+    check: "tool:tools/design-assembly/check.mjs"
+    note: "that no empty state dresses a link as a button; whether it says why it is empty and how items arrive is a person's review"
+  - id: checks-in-gate
+    layer: governance
+    kind: standard
+    source: "make check"
+    check: "tool:tools/design-assembly/check.mjs"
