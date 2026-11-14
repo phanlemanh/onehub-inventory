@@ -23,6 +23,14 @@ evals:
     layer: ui-observed
     cmd: config:executors.design.ui_check
     paths: [src/components/candidate/**, "src/app/(app)/inventory/**", "src/app/(app)/sent/**"]
+    steps:
+      - "Use the dev server at the URL given (lane K, port 3481); if it does not answer, start it from the repo root with PORT=3481 npm run dev (never port 3470, never while a suite command is running), note its PID and stop only that PID when done"
+      - "Navigate {url}/inventory at 1440x900, light → screenshot evidence/E3-inventory-1440-sang.png; dark (emulate prefers-color-scheme dark) → evidence/E3-inventory-1440-toi.png"
+      - "Navigate {url}/inventory at 360x800, light → screenshot evidence/E3-inventory-360-sang.png; dark → evidence/E3-inventory-360-toi.png"
+      - "Navigate {url}/sent at 1440x900, light → screenshot evidence/E3-sent-1440-sang.png; dark → evidence/E3-sent-1440-toi.png"
+      - "Navigate {url}/sent at 360x800, light → screenshot evidence/E3-sent-360-sang.png; dark → evidence/E3-sent-360-toi.png"
+      - "Navigate {url}/inventory at 1440x900, light; type khong-co-dong-nao into the filter box under the first column header (label 'Lọc cột Căn') → screenshot evidence/E3-inventory-khong-khop-1440-sang.png"
+      - "Navigate {url}/inventory at 360x800, dark; type khong-co-dong-nao into the filter box 'Lọc cột Căn' → screenshot evidence/E3-inventory-khong-khop-360-toi.png"
     expected: "ảnh chụp Bảng hàng và Đã gửi ở 1440 và 360, sáng và tối (8 khung) trên bản đã dựng: thanh công cụ không có ô tìm; có số dòng, Nhóm theo Toà (Bảng hàng), Cột, Toàn màn hình; hàng ô lọc dưới tiêu đề theo Hỏi-1; thêm khung trạng thái 'Không có dòng nào khớp' ở 1440 sáng và 360 tối"
     evidence_required: [screenshot, observed, verifier, verified_at]
 
