@@ -56,6 +56,25 @@ test.describe("dang nhap theo khoi auth-15", () => {
     ).toHaveText(/^© \d{4} OneHub$/);
   });
 
+  test("loi-may-chu-trong-cot", { tag: "@cho" }, async ({ page }) => {
+    // No database in this run: sending the code fails on the server, as it would in production.
+    await page.getByLabel("Email").fill("nhan-vien@example.test");
+    await page.getByRole("button", { name: "Gửi mã" }).click();
+    const column = page.locator('[data-slot="login-column"]');
+    await expect(
+      column.locator('[data-state="server-error"]'),
+      "loi-may-chu-trong-cot: bao loi trong cot",
+    ).toBeVisible({ timeout: 20_000 });
+    await expect(
+      page.locator('[data-slot="login-brand"]'),
+      "loi-may-chu-trong-cot: logo",
+    ).toBeVisible();
+    await expect(
+      page.locator('[data-slot="login-footer"]'),
+      "loi-may-chu-trong-cot: chan trang",
+    ).toBeVisible();
+  });
+
   test("khong-dang-nhap-ngoai", async ({ page }) => {
     for (const name of ["Google", "Apple", "GitHub"]) {
       await expect(page.getByText(name), `khong-dang-nhap-ngoai: ${name}`).toHaveCount(0);

@@ -12,3 +12,5 @@ Mỗi cặp: vật lành → ca xanh; phá vật thật trong một lần sửa 
 | pha-thu-axe | chữ chân trang màu #dddddd | axe-dang-nhap | `axe-dang-nhap: light` (color-contrast) |
 | pha-thu-sua-loi | đổi một chữ trong `tests/e2e/account.spec.ts` | giu-loi-bai-dang-nhap | `giu-loi-bai-dang-nhap: tests/e2e/account.spec.ts` |
 | pha-thu-doi-cau | đổi «Gửi mã mới» thành «Gửi lại mã» trong `copy.ts` | giu-cau-copy | `giu-cau-copy: resend` |
+| pha-thu-day-nut-toi | khoảng trống cao 900px chỉ hiện ở nền tối | nut-trong-man-dau | `nut-trong-man-dau: 360 dark` |
+| pha-thu-loi-ngoai-cot | đặt biểu mẫu (và câu báo lỗi) ra ngoài cột giữa trang | loi-may-chu-trong-cot | `loi-may-chu-trong-cot: bao loi trong cot` |

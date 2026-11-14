@@ -63,9 +63,17 @@ evals:
     layer: ui-observed
     target: /login
     paths: [src/app/login/**]
-    steps: "Khổ 1440, nền sáng, làn H có cơ sở dữ liệu: chụp bước nhập mã (sau «Gửi mã»), mã sai, xin mã quá nhiều, chọn sàn (tài khoản hai sàn), chưa thuộc sàn, phiên không còn sàn; không cơ sở dữ liệu: lỗi máy chủ (bấm «Gửi mã» khi máy chủ không nối được)."
-    expected: "Bảy ảnh; mỗi ảnh: bước ấy nằm trong cùng cột giữa trang của AC-1, logo trên, chân trang dưới. (Chữ giữ nguyên đo bằng máy ở E4b, không bằng mắt.)"
+    steps: "Khổ 1440, nền sáng, làn H có cơ sở dữ liệu: chụp bước nhập mã (sau «Gửi mã»), mã sai, xin mã quá nhiều, chọn sàn (tài khoản hai sàn), chưa thuộc sàn, phiên không còn sàn. (Bước lỗi máy chủ đo bằng máy ở E4c: ảnh của bước ấy luôn kèm một yêu cầu lỗi cố ý.)"
+    expected: "Sáu ảnh; mỗi ảnh: bước ấy nằm trong cùng cột giữa trang của AC-1, logo trên, chân trang dưới. (Chữ giữ nguyên đo bằng máy ở E4b, không bằng mắt.)"
     evidence_required: [run_id, screenshot, observed, verifier, verified_at]
+
+  - id: E4c
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.script.e2e
+    paths: [src/app/login/**, src/components/templates/login-layout.tsx, tests/e2e/dang-nhap-khoi.spec.ts]
+    expected: "exit 0; ca 'loi-may-chu-trong-cot' xanh ở bốn khổ: máy chủ không có cơ sở dữ liệu, bấm «Gửi mã» thì câu báo lỗi máy chủ hiện trong cột giữa trang, logo và chân trang vẫn hiện. Chiều đỏ: pha-thu-loi-ngoai-cot (đặt báo lỗi ra ngoài cột) đỏ với «loi-may-chu-trong-cot: bao loi trong cot»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E4b
     criterion: AC-4
