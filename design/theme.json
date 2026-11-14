@@ -1,8 +1,11 @@
 {
   "version": 1,
   "stylesheet": "src/app/globals.css",
-  "inputs": {},
-  "adopted": ["radius-value", "type-scale-values", "spacing-values"],
+  "inputs": {
+    "conformanceLevel": "AA",
+    "productType": "application"
+  },
+  "adopted": ["radius-value", "type-scale-values", "spacing-values", "color-contrast"],
   "checks": {
     "radius-value": [
       {
@@ -59,6 +62,36 @@
     "checks-in-gate": [
       {
         "kind": "gate"
+      }
+    ],
+    "color-contrast": [
+      {
+        "kind": "contrast",
+        "scope": ":root",
+        "foreground": "--primary",
+        "background": "--background",
+        "min": 4.5
+      },
+      {
+        "kind": "contrast",
+        "scope": ":root",
+        "foreground": "--primary-foreground",
+        "background": "--primary",
+        "min": 4.5
+      },
+      {
+        "kind": "contrast",
+        "scope": [":root.dark", ".dark"],
+        "foreground": "--primary",
+        "background": "--background",
+        "min": 4.5
+      },
+      {
+        "kind": "contrast",
+        "scope": [":root.dark", ".dark"],
+        "foreground": "--primary-foreground",
+        "background": "--primary",
+        "min": 4.5
       }
     ]
   }

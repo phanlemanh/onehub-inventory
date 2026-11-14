@@ -284,3 +284,21 @@ decisions:
     kind: standard
     source: "make check"
     check: "tool:tools/design-assembly/check.mjs"
+  - id: color-contrast
+    layer: foundations
+    kind: formula
+    source: "WCAG 2.2 level AA, contrast ratio for text"
+    check: "tool:tools/design-assembly/check.mjs"
+    note: "the primary color roles in light and dark mode"
+  - id: conformance-level
+    layer: context
+    kind: judgment
+    source: "design/theme.json"
+  - id: source-color
+    layer: foundations
+    kind: judgment
+    source: "src/app/globals.css"
+  - id: product-type
+    layer: context
+    kind: judgment
+    source: "design/theme.json"
