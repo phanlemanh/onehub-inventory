@@ -1,17 +1,17 @@
 ---
 schema_version: 1
 feature: Nhận plugin design-assembly — lệnh kiểm chạy lại lint của kho, sổ linh kiện do công cụ của plugin ghi thay công cụ viết tay
-slug: nhan-design-assembly
+slug: adopt-design-assembly
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, tooling]
 status: approved
 approved_by: Manh Phan
 approved_at: 2026-11-14
-design_doc: docs/superpowers/specs/2026-11-14-nhan-design-assembly-design.md
+design_doc: docs/superpowers/specs/2026-11-14-adopt-design-assembly-design.md
 ---
 
-# Acceptance Contract: nhan-design-assembly
+# Acceptance Contract: adopt-design-assembly
 
 ## Context
 
@@ -23,7 +23,7 @@ này.
 
 Source input: lời chủ kho trong phiên design-assembly ngày 2026-11-14 («Cho, nhánh riêng» cho bước 1 và 2, cho lát hai,
 cho bước 3; «Giữ cả ba» cho ba lời đáp; «Đẩy và mở PR»; «Tách sang PR sau»; «Dựng hồ sơ»), bản ghi quyết định
-[0032](../../wiki/decisions/0032-so-linh-kien-do-design-assembly-ghi.md), design doc ở `design_doc`.
+[0032](../../wiki/decisions/0032-component-register-written-by-design-assembly.md), design doc ở `design_doc`.
 
 ## Criteria
 

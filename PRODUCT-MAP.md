@@ -35,7 +35,7 @@ flowchart TD
 
 ## Đang làm
 
-- Nhận plugin design-assembly — lệnh kiểm chạy lại lint của kho, sổ linh kiện do công cụ của plugin ghi thay công cụ viết tay (`nhan-design-assembly`)
+- Nhận plugin design-assembly — lệnh kiểm chạy lại lint của kho, sổ linh kiện do công cụ của plugin ghi thay công cụ viết tay (`adopt-design-assembly`)
 
 ## Đã giao — chờ phiên nghiệm thu
 

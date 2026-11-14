@@ -1,6 +1,6 @@
 # Nhận design-assembly — thiết kế
 
-Hồ sơ `_acceptance/nhan-design-assembly/`, hạng T3. Thay đổi đã làm sẵn trên nhánh `chore/adopt-design-assembly`
+Hồ sơ `_acceptance/adopt-design-assembly/`, hạng T3. Thay đổi đã làm sẵn trên nhánh `chore/adopt-design-assembly`
 (PR #58), theo lời cho phép của chủ kho ngày 2026-11-14. Hồ sơ này ghi lại và chấm đúng những gì nhánh đã làm, vì cổng
 trước khi gộp của kit đòi một hồ sơ có chữ ký người cho mọi PR đổi đường dẫn T3.
 
@@ -43,16 +43,16 @@ sơ này; hồ sơ chấm những gì kho này giữ được bằng lệnh củ
 
 ## Phép đo mới của hồ sơ
 
-Ba kịch bản đo nằm ở `_acceptance/nhan-design-assembly/rang/`, ngoài vùng công cụ của kho:
+Ba kịch bản đo nằm ở `_acceptance/adopt-design-assembly/rang/`, ngoài vùng công cụ của kho:
 
-- `so-quyet-dinh-giu.mjs` — mọi dòng sổ quyết định có ở commit trước khi nhận (`1226ec5`) còn nguyên từng byte, trừ đúng
+- `ledger-rows-kept.mjs` — mọi dòng sổ quyết định có ở commit trước khi nhận (`1226ec5`) còn nguyên từng byte, trừ đúng
   dòng «cấp linh kiện», mà phép trỏ đổi sang công cụ mới;
-- `lint-chay-lai.mjs` — dữ liệu của lệnh kiểm có đúng chín phép kiểm lint, cho đúng chín quyết định đã kê, mỗi phép trỏ
+- `lint-rerun.mjs` — dữ liệu của lệnh kiểm có đúng chín phép kiểm lint, cho đúng chín quyết định đã kê, mỗi phép trỏ
   cùng luật dòng sổ nêu;
-- `sinh-lai-so.sh` — công cụ cũ không còn, `make gen` gọi công cụ mới, ghi lại sổ từ mã thì không khác bản đã commit.
+- `register-regenerated.sh` — công cụ cũ không còn, `make gen` gọi công cụ mới, ghi lại sổ từ mã thì không khác bản đã commit.
 
 Mỗi kịch bản có cặp hai chiều trên cùng một bản: bản lành xanh, bản bị phá đỏ với thông điệp ghim
-(`rang/rang.test.mjs`).
+(`rang/measures.test.mjs`).
 
 ## Không làm
 

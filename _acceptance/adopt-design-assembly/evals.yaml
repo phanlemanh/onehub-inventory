@@ -1,5 +1,5 @@
 schema_version: 1
-feature_slug: nhan-design-assembly
+feature_slug: adopt-design-assembly
 # Ma trận viết trước.
 #   Quyết định lệnh kiểm design-assembly giữ (AC-1, AC-2) — đúng 18, theo thứ tự chữ:
 #     checks-in-gate, color-contrast, color-palette, color-role, component-manifest, design-tokens, empty-state-actions,
@@ -27,7 +27,7 @@ feature_slug: nhan-design-assembly
 #       red with ChangedProbe added».
 #   Lời đáp (AC-10): «answers: AA application; rows conformance-level source-color product-type judgment; contrast 4 pairs
 #     at 4.5; --onehub-blue #0246ff»; lệch → «answers: <thứ lệch>».
-#   Cặp hai chiều của các kịch bản đo mới (rang.test.mjs): mỗi kịch bản một bản lành → xanh, một bản phá → đỏ, cùng bản,
+#   Cặp hai chiều của các kịch bản đo mới (measures.test.mjs): mỗi kịch bản một bản lành → xanh, một bản phá → đỏ, cùng bản,
 #     thông điệp ghim như trên.
 evals:
   - id: E1
@@ -42,7 +42,7 @@ evals:
   - id: E2
     criterion: AC-2
     executor: script
-    cmd: config:executors.script.lint_chay_lai
+    cmd: config:executors.script.lint_rerun
     layer: backend-effect
     paths: [design/theme.json, design/decisions.yaml, tools/design-assembly/**]
     expected: "exit 0; dòng 'held: 18 — ' kèm đúng 18 id của ma trận đầu tệp, đọc từ đầu ra '--rate' của lệnh kiểm; dòng 'lint re-run: 9 — ' kèm đúng chín cặp id=luật của ma trận, mỗi id ở trạng thái held với '(eslint:<luật>, re-run here)'. Chiều đỏ: E10 (đầu ra --rate thiếu raw-table → 'held: 17, missing raw-table'; dữ liệu trỏ raw-table tới other/rule → 'lint re-run: raw-table checks other/rule, the row names onehub-ui/no-raw-table')"
@@ -50,7 +50,7 @@ evals:
   - id: E3
     criterion: AC-3
     executor: script
-    cmd: config:executors.script.lint_tat_luat
+    cmd: config:executors.script.lint_rule_off
     long_running: 5
     layer: backend-effect
     paths: [tools/design-assembly/**, eslint.config.js, tools/eslint-ui/**, design/theme.json]
@@ -59,7 +59,7 @@ evals:
   - id: E4
     criterion: AC-4
     executor: script
-    cmd: config:executors.script.so_quyet_dinh_giu
+    cmd: config:executors.script.ledger_rows_kept
     layer: backend-effect
     paths: [design/decisions.yaml]
     expected: "exit 0; dòng 'rows kept: <k> of <n>; changed: component-level' với k = n - 1, và dòng 'component-level: tool:tools/design_registry.mjs -> tool:tools/design-assembly/components.mjs'. Chiều đỏ: E10 (sổ đổi một chữ ở dòng radius → 'row changed: radius'; sổ bỏ dòng wcag-aa → 'row missing: wcag-aa')"
@@ -67,7 +67,7 @@ evals:
   - id: E5
     criterion: AC-5
     executor: test
-    cmd: config:executors.test.so_linh_kien
+    cmd: config:executors.test.component_register
     layer: backend-effect
     paths: [design/component-registry.json, tests/design-registry.test.ts, tools/design-assembly/**]
     expected: "exit 0; năm bài của tests/design-registry.test.ts đạt: 'has one entry per exported component, each naming its file', 'gives variants only to the component that uses them', 'lists own props and leaves out variants', 'counts both bought libraries as libraries, and the templates folder as templates', 'is up to date with the code'"
@@ -75,7 +75,7 @@ evals:
   - id: E6
     criterion: AC-6
     executor: script
-    cmd: config:executors.script.so_linh_kien_khop
+    cmd: config:executors.script.register_matches_source
     long_running: 5
     layer: backend-effect
     paths: [design/component-registry.json, src/components/**, tools/design-assembly/**]
@@ -84,7 +84,7 @@ evals:
   - id: E7
     criterion: AC-7
     executor: script
-    cmd: config:executors.script.sinh_lai_so
+    cmd: config:executors.script.register_regenerated
     long_running: 5
     layer: backend-effect
     paths: [mk/design.mk, tools/**, design/component-registry.json]
@@ -108,15 +108,15 @@ evals:
   - id: E10
     criterion: AC-4
     executor: script
-    cmd: config:executors.script.rang
+    cmd: config:executors.script.measures_two_way
     layer: backend-effect
-    paths: [_acceptance/nhan-design-assembly/rang/**]
-    expected: "exit 0; mỗi kịch bản đo mới có cặp bài đạt trên cùng một bản: bản lành xanh, bản phá đỏ với đúng thông điệp ghim của ma trận đầu tệp (lint-chay-lai: 'held: 17, missing raw-table' và 'lint re-run: raw-table checks other/rule, the row names onehub-ui/no-raw-table'; so-quyet-dinh-giu: 'row changed: radius' và 'row missing: wcag-aa'; sinh-lai-so: 'old tool still there' và 'make gen does not write the register with the design-assembly tool'; loi-dap: 'answers: conformanceLevel AAA' khi bản dữ liệu ghi AAA)"
+    paths: [_acceptance/adopt-design-assembly/rang/**]
+    expected: "exit 0; mỗi kịch bản đo mới có cặp bài đạt trên cùng một bản: bản lành xanh, bản phá đỏ với đúng thông điệp ghim của ma trận đầu tệp (lint-rerun: 'held: 17, missing raw-table' và 'lint re-run: raw-table checks other/rule, the row names onehub-ui/no-raw-table'; ledger-rows-kept: 'row changed: radius' và 'row missing: wcag-aa'; register-regenerated: 'old tool still there' và 'make gen does not write the register with the design-assembly tool'; owner-answers: 'answers: conformanceLevel AAA' khi bản dữ liệu ghi AAA)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E11
     criterion: AC-8
     executor: script
-    cmd: config:executors.script.proof_gate_that
+    cmd: config:executors.script.proof_gate_real
     layer: backend-effect
     paths: [tools/proof_gate/**, design/component-registry.json, design/so-khoi.yaml]
     expected: "exit 0; dòng 'proof-gate: mọi màn đang mở đã chứng minh đúng lối', chạy trên kho ở HEAD, đọc sổ linh kiện thật"
@@ -124,7 +124,7 @@ evals:
   - id: E12
     criterion: AC-10
     executor: script
-    cmd: config:executors.script.loi_dap
+    cmd: config:executors.script.owner_answers
     layer: backend-effect
     paths: [design/theme.json, design/decisions.yaml, src/styles/**, src/app/globals.css]
     expected: "exit 0; dòng 'answers: AA application; rows conformance-level source-color product-type judgment; contrast 4 pairs at 4.5; --onehub-blue #0246ff'; rồi lệnh kiểm design-assembly thoát 0 với color-contrast được giữ. Chiều đỏ: E10 (bản dữ liệu ghi AAA → 'answers: conformanceLevel AAA')"
@@ -132,7 +132,7 @@ evals:
   - id: E13
     criterion: AC-11
     executor: script
-    cmd: config:executors.script.so_token
+    cmd: config:executors.script.tokens_primary
     layer: backend-effect
     paths: [design/tokens.json, src/app/globals.css, src/styles/**]
     expected: "exit 0; dòng 'design tokens: design/tokens.json is up to date (<n> tokens)' và dòng 'primary #0246ff'. Chiều đỏ: lệnh kiểm design-assembly giữ design-tokens và mỗi lần chạy thấy nó đỏ trên bản đổi stylesheet (E1)"

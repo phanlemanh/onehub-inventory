@@ -1,5 +1,5 @@
 ---
-slug: nhan-design-assembly
+slug: adopt-design-assembly
 at: 2026-11-14T13:55:00Z
 verdict: findings
 p0: 3
