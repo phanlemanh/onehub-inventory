@@ -113,6 +113,31 @@
       ]
     },
     {
+      "name": "FramedList",
+      "file": "src/components/candidate/framed-list.tsx",
+      "level": "organism",
+      "parts": [
+        {
+          "name": "FramedList",
+          "props": [
+            "title",
+            "count",
+            "headAction",
+            "rows",
+            "footer",
+            "slot"
+          ]
+        },
+        {
+          "name": "ListFace",
+          "props": [
+            "name",
+            "sub"
+          ]
+        }
+      ]
+    },
+    {
       "name": "RecordPanel",
       "file": "src/components/candidate/record-panel.tsx",
       "level": "molecule",
