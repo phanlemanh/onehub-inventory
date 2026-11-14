@@ -37,6 +37,9 @@ export function useGeoPlace({
   const { setPick } = usePlaceChange();
   const [state, setState] = useState<GeoPlace>({ picked: 0, view: undefined });
   const latest = useRef(view);
+  // The address another entry of the screen is opening: the place is not written back until it has arrived, or the
+  // write would cut that navigation short.
+  const leaving = useRef<string | null>(null);
   useEffect(() => {
     latest.current = view;
   }, [view]);
@@ -47,8 +50,18 @@ export function useGeoPlace({
       const url = new URL(href, "http://x");
       const key = url.searchParams.get(GEO_PARAM);
       const current = latest.current;
-      if (url.pathname !== window.location.pathname || key === null || current === null)
+      if (url.pathname !== window.location.pathname || current === null) return false;
+      if (key === null) {
+        // Another entry of the same screen («Tất cả hàng», a status shortcut): its link is followed as before, and the
+        // place goes — the region reopens with the filters that entry's address gives, as when no place was picked.
+        const placed =
+          Object.keys(withoutPlace(current.filters)).length !== Object.keys(current.filters).length;
+        if (placed) {
+          leaving.current = url.pathname + url.search;
+          setState((s) => ({ picked: s.picked + 1, view: undefined }));
+        }
         return false;
+      }
       const geo = geoFiltersFor(tree, [key]);
       if (Object.keys(geo).length === 0) return false;
       setState((s) => ({
@@ -64,6 +77,10 @@ export function useGeoPlace({
     tree && view ? (placeFor(tree, rows, columns, view.filters)?.key ?? null) : undefined;
   useEffect(() => {
     if (!active || placeKey === undefined) return;
+    if (leaving.current !== null) {
+      if (window.location.pathname + window.location.search !== leaving.current) return;
+      leaving.current = null;
+    }
     const url = new URL(window.location.href);
     if (url.searchParams.get(GEO_PARAM) === placeKey) return;
     if (placeKey === null) url.searchParams.delete(GEO_PARAM);

@@ -240,19 +240,64 @@ test("E8 a place keeps the other filters", async ({ page }, info) => {
   ).length;
   await place(column(page), P1, "S1.03").click();
   await expect.poll(() => footerCount(page)).toBe(want);
-  const kept = want < nodeOf("S1.03").count;
-  if (!kept) throw new Error("mat loc khac");
+  // The status box itself, read on the screen after the pick (Hỏi-2): still «Đang bán».
+  checkKept(await statusBox(page).textContent());
+  expect(() => checkKept("Chọn")).toThrow("mat loc khac");
+  // Every place of the matrix still shows: projects as their group, the others as an entry of the column.
   for (const name of TEN) {
-    const n = await column(page)
-      .getByRole("link", {
-        name: name === P1 || name === P2 || name === P3 ? FRAME_COPY.secondColumn.all : name,
-        exact: true,
-      })
-      .count();
+    const n =
+      name === P1 || name === P2 || name === P3
+        ? await group(column(page), name).count()
+        : await column(page).getByRole("link", { name, exact: true }).count();
     if (n === 0) throw new Error(`noi bien mat: ${name}`);
   }
   expect(TEN).toHaveLength(10);
-  for (const p of [P1, P2, P3]) await expect(group(column(page), p)).toHaveCount(1);
+});
+
+const ACTIVE = label("StatusActive");
+const statusBox = (page: Page) =>
+  region(page).locator('th[data-col-id="Listing.standardStatus"] [data-slot="column-filter"]');
+
+/** The status box still holds «Đang bán» after a place is picked; throws when the pick dropped it. */
+function checkKept(text: string | null): void {
+  if (!(text ?? "").includes(ACTIVE)) throw new Error("mat loc khac");
+}
+
+// ---- Ngoài-7 ---------------------------------------------------------------------------------------------------------
+
+/** «Tất cả hàng» shows every row with no place lit; throws when the place survived the press. */
+function checkAllRows(count: number, lit: readonly string[]): void {
+  if (count !== 60 || lit.length !== 1 || lit[0] !== ALL)
+    throw new Error("tat ca hang con loc noi");
+}
+
+test("«Tất cả hàng» after a pick drops the place; a status entry keeps its own filter", async ({
+  page,
+}, info) => {
+  atWidth(info, "1440");
+  await signIn(page, await person(info, "tat-ca"));
+  await page.goto("/inventory", { waitUntil: "networkidle" });
+  await settled(page);
+  await place(column(page), P1, "S1.03").click();
+  await expect.poll(() => footerCount(page)).toBe(10);
+  await column(page).getByRole("link", { name: ALL, exact: true }).click();
+  await expect.poll(() => footerCount(page)).toBe(60);
+  checkAllRows(await footerCount(page), await litNames(column(page)));
+  expect(new URL(page.url()).searchParams.has("vung")).toBe(false);
+  expect(await region(page).getByLabel("Lọc cột Toà").inputValue()).toBe("");
+
+  await page.goto("/inventory?status=Active", { waitUntil: "networkidle" });
+  await settled(page);
+  const active = ROWS.filter((r) => r["Listing.standardStatus"] === "Active").length;
+  await place(column(page), P1, "S1.03").click();
+  await expect.poll(() => litNames(column(page))).toEqual(["S1.03"]);
+  await column(page).getByRole("link", { name: ACTIVE, exact: true }).click();
+  await expect.poll(() => footerCount(page)).toBe(active);
+  await expect.poll(() => litNames(column(page))).toEqual([ACTIVE]);
+  expect(new URL(page.url()).searchParams.has("vung")).toBe(false);
+  checkKept(await statusBox(page).textContent());
+  // Break: the grid still on the place after the press.
+  expect(() => checkAllRows(10, ["S1.03"])).toThrow("tat ca hang con loc noi");
 });
 
 // ---- E9 ------------------------------------------------------------------------------------------------------------

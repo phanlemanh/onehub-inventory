@@ -46,5 +46,9 @@ mất, và cây với ô lọc Dự án, Toà sẽ là hai trạng thái có th�
 
 - Cây đọc chính các dòng bảng đã có và danh mục căn mẫu; không thêm lần đọc nào (SP-1, bài quét trong
   `tests/dia-ly.test.tsx`).
+- Hạn chế đã biết, để hàng 10: hôm nay cây đọc dữ liệu mẫu, mọi sàn thấy cùng cây mẫu. Khi nối dữ liệu thật, cây phải
+  dựng từ đúng các dòng bảng đọc cho sàn đang đăng nhập (qua `withCompany`, SP-1), không đọc riêng ở khung.
+- Bấm mục khác của cùng màn («Tất cả hàng», lối tắt trạng thái) sau khi chọn nơi thì nơi bỏ đi, vùng mở lại theo lọc của
+  địa chỉ mục ấy.
 - Màn khác muốn nhận mục tại chỗ dùng cùng `pick`; không khai thì mục vẫn là đường dẫn như trước.
 - Địa chỉ có thể còn `?status=` sau khi người đổi lọc Trạng thái bằng tay; tải lại thì lối tắt áp lại. Chưa sửa ở hàng này.
