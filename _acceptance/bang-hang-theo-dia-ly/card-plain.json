@@ -1,11 +1,11 @@
 {
   "feature_plain": "Đầu chủ bấm một dự án, phân khu hay toà ở cột thứ hai để Bảng hàng chỉ còn căn ở nơi ấy, mỗi nơi kèm số căn.",
   "will_do": [
-    {"id": "AC-1", "p": "Sẽ hiện cây dự án → phân khu → toà dưới «Theo trạng thái», mỗi nơi kèm số căn đúng bằng số dòng của bảng; sàn chưa có căn thì nói một câu."},
-    {"id": "AC-2", "p": "Sẽ lọc bảng đúng căn của nơi vừa bấm, chân bảng ghi đúng số trên nút, nút ấy là mục sáng duy nhất của cột."},
+    {"id": "AC-1", "p": "Sẽ hiện mỗi dự án một nhóm dưới «Theo trạng thái», cùng kiểu mục với cả cột, phân khu và toà là mục con, không số đếm; sàn chưa có căn thì nói một câu."},
+    {"id": "AC-2", "p": "Sẽ lọc bảng đúng căn của nơi vừa bấm, chân bảng ghi số căn của nơi ấy, nút ấy là mục sáng duy nhất của cột."},
     {"id": "AC-3", "p": "Sẽ hiện tên trọn vẹn ở ô lọc Dự án và Toà; tên «Park 1» không lấy nhầm căn của «Park 10»."},
     {"id": "AC-4", "p": "Sẽ cho cây sáng theo đúng ô lọc: sửa ô lọc thì nút sáng chỉ khi bảng hiện đúng căn của nơi ấy; «Xoá lọc» về «Tất cả hàng»."},
-    {"id": "AC-5", "p": "Sẽ giữ lọc khác (vd «Đang bán») khi bấm một nơi; số trên nút đếm theo lọc ấy, nơi khác vẫn giữ số, nơi còn 0 vẫn hiện."},
+    {"id": "AC-5", "p": "Sẽ giữ lọc khác (vd «Đang bán») khi bấm một nơi; cây vẫn hiện mọi nơi có căn."},
     {"id": "AC-6", "p": "Sẽ mở lại đúng nơi khi tải lại, mở đường dẫn đã chép, hay mở góc nhìn đã lưu."},
     {"id": "AC-7", "p": "Sẽ giữ ô lọc gõ tay ở Bảng hàng và Đã gửi lọc «chứa chữ» như cũ."},
     {"id": "AC-8", "p": "Sẽ đặt cây trong ngăn App Shell trên điện thoại (chọn xong ngăn đóng), và cho tên dài xuống dòng ở máy tính."},
@@ -17,7 +17,9 @@
     {"id": "OOS-2", "p": "KHÔNG đưa tầng, trục vào cây — lọc tầng bằng ô lọc Căn."},
     {"id": "OOS-3", "p": "KHÔNG có ô gõ để tìm trong cây hay trong bảng — tìm ở ⌘K."},
     {"id": "OOS-4", "p": "KHÔNG sửa cột «Căn»: mã căn đã hiện trọn trên nhánh chính (ảnh trên trang cổng)."},
-    {"id": "OOS-5", "p": "KHÔNG đặt cây ở màn khác ngoài Bảng hàng."}
+    {"id": "OOS-5", "p": "KHÔNG đặt cây ở màn khác ngoài Bảng hàng."},
+    {"id": "OOS-6", "p": "KHÔNG hiện số căn trên các mục — anh bỏ cho đồng nhất; số của nơi đang chọn ở chân bảng."},
+    {"id": "OOS-7", "p": "KHÔNG gập nhóm dự án: quá chừng 3 dự án, 8 toà thì cột cuộn ở 1440; gập để sau nếu anh đòi."}
   ],
   "scope_plain": "Năm việc để ngoài hàng này:",
   "coverage_plain": [

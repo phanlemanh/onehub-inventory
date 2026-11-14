@@ -25,19 +25,20 @@ Source input: ô cơ hội `_acceptance/bang-hang-theo-dia-ly/opportunity.md` (c
 
 Luật sản phẩm chạm: SP-1 đọc lại — cây không thêm cách đọc dữ liệu nào (AC-1). SP-3, SP-4 không chạm.
 
-Dáng cây (Hỏi-1), giữ lọc khác (Hỏi-2) và cách đếm (Hỏi-3) theo khuyến nghị; chủ kho chọn khác thì tiêu chí đổi theo lời
-chọn trước khi duyệt.
+Dáng cây theo lối D (Hỏi-1) và giữ lọc khác (Hỏi-2) theo khuyến nghị; chủ kho bỏ số đếm ở cột thứ hai cho đồng nhất
+(Cổng Phạm vi 2026-11-14), nên khác ô cơ hội ở chữ «kèm số căn». Chủ kho chọn khác thì tiêu chí đổi theo lời chọn trước khi
+duyệt.
 
 ## Criteria
 
 - AC-1 (cross-layer): Given Bảng hàng của [Sàn mẫu Ocean] với 60 dòng mẫu, When Đầu chủ đã đăng nhập mở Bảng hàng ở 1440, Then cột thứ hai
-  có nhóm «Theo địa lý» dưới «Theo trạng thái»: ba dự án theo thứ tự danh mục; Ocean Park 1 → phân khu The Sapphire 1 →
-  bốn toà; Ocean Park 2, 3 → toà đứng thẳng dưới dự án; số trên mỗi nút bằng số dòng Bảng hàng ở nơi ấy (36, 36, 6, 9, 10,
-  11, 12, 12, 12, 12); nơi không có dòng nào trên Bảng hàng không hiện; cây đọc chính các dòng bảng đã đọc và chỗ đứng của
+  có, dưới «Theo trạng thái», mỗi dự án một nhóm mang tiêu đề là tên dự án — cùng kiểu với «Theo trạng thái» — theo thứ tự
+  danh mục; trong nhóm: «Tất cả», rồi phân khu (The Sapphire 1 lồng bốn toà S1.01–S1.05) hay toà đứng thẳng dưới dự án
+  (Ocean Park 2, 3); các mục không mang số đếm, như mọi mục khác của cột; nơi không có dòng nào trên Bảng hàng không hiện; cây đọc chính các dòng bảng đã đọc và chỗ đứng của
   toà trong danh mục căn mẫu mà các dòng ấy đã dùng (`inventory-sample-rows.ts`), không thêm truy vấn hay lần đọc nào (SP-1).
-  Sàn chưa có căn nào thì nhóm «Theo địa lý» vẫn hiện, không nút nào, kèm câu «Chưa có căn nào trên Bảng hàng.».
+  Sàn chưa có căn nào thì cột thứ hai có một câu «Chưa có căn nào trên Bảng hàng.» ở chỗ các nhóm dự án.
 - AC-2: Given cây của AC-1, When Đầu chủ bấm một dự án, một phân khu, hay một toà, Then bảng còn đúng tập dòng của nơi ấy —
-  so theo mã dòng, không thiếu không thừa —, chân bảng «x / 60 dòng» với x bằng số trên nút, nút ấy sáng và là mục sáng duy
+  so theo mã dòng, không thiếu không thừa —, chân bảng «x / 60 dòng» với x bằng số căn của nơi ấy (36, 36, 6, 9, 10, 11, 12, 12, 12, 12), nút ấy sáng và là mục sáng duy
   nhất của cột thứ hai.
 - AC-3: Given một nơi vừa chọn, When nhìn hàng ô lọc dưới tiêu đề, Then ô Dự án hiện tên dự án trọn vẹn và ô Toà hiện tên
   toà (phân khu: các toà của nó, cách nhau dấu phẩy; dự án: ô Toà trống); lọc ấy khớp trọn tên — dự án tên «… Park 1» không
@@ -47,8 +48,8 @@ chọn trước khi duyệt.
   đúng những dòng ấy — gõ «… Park 1» khi có cả «… Park 10» thì không nút nào sáng); không trùng nơi nào thì không nút nào sáng;
   «Xoá lọc» thì «Tất cả hàng» sáng; không lúc nào cây sáng một nơi mà bảng hiện dòng của nơi khác.
 - AC-5: Given lọc Trạng thái «Đang bán» đang bật, When Đầu chủ bấm một toà, Then lọc Trạng thái giữ nguyên, chỉ lọc Dự án và
-  Toà đổi; số trên mỗi nút đếm theo các lọc khác đang bật nhưng KHÔNG theo chính lọc Dự án, Toà — nên số trên nút vừa bấm
-  bằng số dòng bảng hiện ra, và bấm xong các nơi khác vẫn giữ số của mình; nơi còn 0 căn dưới các lọc khác vẫn hiện, ghi 0.
+  Toà đổi — bảng còn đúng các căn «Đang bán» của toà ấy; cây vẫn hiện mọi nơi có căn trên Bảng hàng, kể cả nơi không còn
+  căn «Đang bán».
 - AC-6: Given một nơi đang chọn, When Đầu chủ tải lại trang, mở đường dẫn đã chép, hay lưu góc nhìn rồi mở lại góc nhìn ấy,
   Then bảng mở với đúng lọc Dự án, Toà ấy và cây sáng đúng nơi ấy (góc nhìn sáng ở «Góc nhìn của tôi», nơi tương ứng không
   tranh sáng); đường dẫn trỏ nơi không còn căn thì bảng mở như thường và không nút nào sáng.
@@ -95,6 +96,9 @@ chí trên.
 - Ô «Gõ để tìm» trong cây hay trong vùng: không (2e); tìm ở ⌘K (3f).
 - Nợ cột «Căn» cắt mã căn: đã hết trên nhánh chính sau 3a và 2e (ảnh trên trang cổng), không làm ở đây.
 - Cây trên màn khác ngoài Bảng hàng (Đã gửi, Liên hệ): không.
+- Số căn trên các mục của cây: không — chủ kho bỏ cho đồng nhất cột thứ hai; số của nơi đang chọn đọc ở chân bảng.
+- Gập nhóm dự án: không. Ở 1440×900 nhóm địa lý vừa chừng 15 dòng (khoảng 3 dự án và 8 toà), nhiều hơn thì cột thứ hai
+  cuộn; gập nhóm để cho sau, chỉ làm khi chủ kho đòi.
 
 > Out of scope = scope-truth (Gate 1 duyệt mục này). Rationale/trade-off từng mục → 1 entry `descope` trong `decisions.jsonl`.
 

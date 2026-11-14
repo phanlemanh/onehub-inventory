@@ -6,7 +6,7 @@ evals:
     executor: test
     cmd: config:executors.test.dia_ly
     paths: [src/modules/listings/ui/geo-tree.ts, src/modules/listings/ui/geo-tree.test.ts, "src/app/(app)/inventory-sample-rows.ts"]
-    expected: "exit 0; geo-tree.test.ts dựng cây từ ĐÚNG sampleInventoryRows() và sampleBuildingPlaces() (rút từ bên ghi thật, không dòng viết tay) và so với ma trận viết trước 10 nút {Vinhomes Ocean Park 1:36, The Sapphire 1:36, S1.01:6, S1.02:9, S1.03:10, S1.05:11, Vinhomes Ocean Park 2 – The Empire:12, [MAU] Toà E1:12, Vinhomes Ocean Park 3 – The Crown:12, [MAU] Toà C1:12} theo đúng thứ tự và cha con; mỗi nút: count === số dòng có cùng dự án và toà thuộc nút (quan hệ, không chuỗi); ca rìa: toà danh mục không biết đứng dưới dự án; nơi 0 dòng không hiện; ca rỗng: 0 dòng → cây rỗng và nhóm cột thứ hai mang câu 'Chưa có căn nào trên Bảng hàng.' (render), đối chứng 60 dòng không có câu ấy; ca phá bỏ một dòng của S1.02 khỏi đầu vào thì đỏ với 'count lech: S1.02 8 != 9' và ca phá thêm toà rỗng vào danh mục thì đỏ với 'noi rong hien: <toà>'"
+    expected: "exit 0; geo-tree.test.ts dựng cây từ ĐÚNG sampleInventoryRows() và sampleBuildingPlaces() (rút từ bên ghi thật, không dòng viết tay) và so với ma trận viết trước 10 nút {Vinhomes Ocean Park 1, The Sapphire 1, S1.01, S1.02, S1.03, S1.05, Vinhomes Ocean Park 2 – The Empire, [MAU] Toà E1, Vinhomes Ocean Park 3 – The Crown, [MAU] Toà C1} theo đúng thứ tự và cha con; mục cột thứ hai sinh từ cây không mang count (render: không phần tử data-slot place-count); ca rìa: toà danh mục không biết đứng dưới dự án; nơi 0 dòng không hiện; ca rỗng: 0 dòng → cây rỗng và nhóm cột thứ hai mang câu 'Chưa có căn nào trên Bảng hàng.' (render), đối chứng 60 dòng không có câu ấy; ca phá bỏ mọi dòng của S1.02 khỏi đầu vào thì đỏ với 'noi mat: S1.02' và ca phá thêm toà rỗng vào danh mục thì đỏ với 'noi rong hien: <toà>'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E2
@@ -23,7 +23,7 @@ evals:
     executor: test
     cmd: config:executors.test.dia_ly
     paths: [src/modules/listings/ui/geo-tree.ts, src/components/candidate/grid-view.ts, tests/dia-ly.test.tsx]
-    expected: "exit 0; tests/dia-ly.test.tsx: với MỖI nút trong ma trận 10 nút viết trước (hằng 10), filterRows(rows, columns, geoFiltersFor(tree, [key])) trả đúng tập id bằng tập id tính độc lập từ dự án + toà của nút (so tập, không đếm), và độ dài bằng count của nút; ca phá đổi luật lọc danh sách về «chứa chữ» trong bản sao thì ca 'Park 1 / Park 10' đỏ với 'thua dong: <id>'"
+    expected: "exit 0; tests/dia-ly.test.tsx: với MỖI nút trong ma trận 10 nút viết trước (hằng 10), filterRows(rows, columns, geoFiltersFor(tree, [key])) trả đúng tập id bằng tập id tính độc lập từ dự án + toà của nút (so tập, không đếm), và độ dài bằng số trong ma trận viết trước {36, 36, 6, 9, 10, 11, 12, 12, 12, 12}; ca phá đổi luật lọc danh sách về «chứa chữ» trong bản sao thì ca 'Park 1 / Park 10' đỏ với 'thua dong: <id>'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E4
@@ -31,7 +31,7 @@ evals:
     executor: script
     cmd: config:executors.test.dia_ly_e2e_db
     paths: [src/components/templates/app-shell/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e-db/dia-ly.spec.ts]
-    expected: "exit 0; tests/e2e-db/dia-ly.spec.ts dưới vai Đầu chủ đã đăng nhập (cửa vai của 9b) ở 1440: bấm lần lượt 4 nút đại diện (một dự án, một phân khu, một toà trong phân khu, một toà thẳng dưới dự án — hằng 4); mỗi lần: chân bảng 'x / 60 dòng' với x = số trên nút, nút có aria-current, trong cột thứ hai đúng MỘT phần tử aria-current; đối chứng dương ở 'Tất cả hàng'; ca phá (bản sao cột thứ hai không đặt aria-current) đỏ với 'nut khong sang: <nơi>'"
+    expected: "exit 0; tests/e2e-db/dia-ly.spec.ts dưới vai Đầu chủ đã đăng nhập (cửa vai của 9b) ở 1440: bấm lần lượt 4 nút đại diện (một dự án, một phân khu, một toà trong phân khu, một toà thẳng dưới dự án — hằng 4); mỗi lần: chân bảng 'x / 60 dòng' với x = số viết trước của nơi ấy, nút có aria-current, trong cột thứ hai đúng MỘT phần tử aria-current; đối chứng dương ở 'Tất cả hàng'; ca phá (bản sao cột thứ hai không đặt aria-current) đỏ với 'nut khong sang: <nơi>'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E5
@@ -63,7 +63,7 @@ evals:
     executor: script
     cmd: config:executors.test.dia_ly_e2e_db
     paths: [src/modules/listings/ui/**, src/components/templates/app-shell/**, tests/e2e-db/dia-ly.spec.ts]
-    expected: "exit 0; bật lọc Trạng thái 'Đang bán': số trên đủ 10 nút bằng ma trận viết trước 10 nút tính từ dữ liệu mẫu (rút từ sampleInventoryRows, nơi 0 vẫn hiện '0'), kiểm 10/10; bấm toà S1.03: ô Trạng thái vẫn 'Đang bán', chân bảng 'x / 60 dòng' với x = số trên nút S1.03; sau khi bấm, 9 nút còn lại giữ đúng số trong ma trận (không về 0, không biến mất); ca phá (bấm nơi xoá lọc khác) đỏ với 'mat loc khac', ca phá (đếm theo cả lọc địa lý) đỏ với 'nut mat sau khi chon: <nơi>'"
+    expected: "exit 0; bật lọc Trạng thái 'Đang bán', bấm toà S1.03: ô Trạng thái vẫn 'Đang bán', tập mã dòng của bảng bằng tập căn Đang bán của S1.03 tính từ sampleInventoryRows; sau khi bấm, cột thứ hai vẫn hiện đủ 10 nơi của ma trận viết trước (đếm 10/10, kể cả nơi không còn căn Đang bán); ca phá (bấm nơi xoá lọc khác) đỏ với 'mat loc khac', ca phá (cây ẩn nơi hết căn theo lọc khác) đỏ với 'noi bien mat: <nơi>'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E9
@@ -117,7 +117,7 @@ evals:
       - "Navigate {url}/inventory at 1440x900, light; click the place 'The Sapphire 1' in the second column → screenshot evidence/E14-phan-khu-1440-sang.png; dark → evidence/E14-phan-khu-1440-toi.png"
       - "At 360x800 light open the App Shell sheet → screenshot evidence/E14-ngan-360-sang.png; click '[MAU] Toà E1' → screenshot evidence/E14-toa-360-sang.png"
       - "Navigate {url}/sent at 1440x900 and 360x800 light (360: open the App Shell sheet) → screenshots evidence/E14-sent-1440-sang.png, evidence/E14-sent-360-sang.png; same for {url}/tuy-chinh-san when that route exists (row 7e) → evidence/E14-tuy-chinh-1440-sang.png, evidence/E14-tuy-chinh-360-sang.png; compare each with its 'before' shot taken on the main branch at the round's diff base (evidence/E14-*-truoc.png), 4/4 pairs"
-    expected: "Second column shows the tree under 'Theo trạng thái' with counts; the chosen place is the one highlighted entry; Dự án and Toà filter cells show the whole names; footer reads '36 / 60 dòng' after The Sapphire 1 and '12 / 60 dòng' after [MAU] Toà E1; on /sent and /tuy-chinh-san the second column has no tree and the same entries and highlight as the before shot at both widths"
+    expected: "Second column shows one group per project under 'Theo trạng thái', titled like 'Theo trạng thái', entries without counts; the chosen place is the one highlighted entry; Dự án and Toà filter cells show the whole names; footer reads '36 / 60 dòng' after The Sapphire 1 and '12 / 60 dòng' after [MAU] Toà E1; on /sent and /tuy-chinh-san the second column has no tree and the same entries and highlight as the before shot at both widths"
     evidence_required: [run_id, screenshot, observed, verifier, verified_at]
 
   - id: E15

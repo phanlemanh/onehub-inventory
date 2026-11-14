@@ -176,7 +176,7 @@ function GroupsB({ section, activeHref }: { section: NavSection; activeHref: str
 
 /**
  * Lối D — the same look as the rest of the column: each project a group titled with its name, as «Theo trạng thái» is;
- * its places are the column's own entries, the count standing at the end where a saved view's «…» stands. Only a
+ * its places are the column's own entries, without counts, as the rest of the column (owner, scope gate 2d). Only a
  * complex nests its buildings, one level, so names keep their room.
  */
 function SectionsD({ section, activeHref }: { section: NavSection; activeHref: string | null }) {
@@ -201,9 +201,6 @@ function SectionsD({ section, activeHref }: { section: NavSection; activeHref: s
           >
             <span>{title}</span>
           </SidebarMenuSubButton>
-        </div>
-        <div className="shrink-0 pe-1">
-          <Count n={l.count} />
         </div>
       </div>
       {(l.children ?? []).length > 0 ? (

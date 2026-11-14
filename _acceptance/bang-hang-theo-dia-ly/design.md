@@ -32,7 +32,7 @@ cho mục lục phụ của màn — kèm số căn, và nối cây với ô l�
 
 | Lối | Dáng | Số căn | Rất nhiều toà | Khối |
 |---|---|---|---|---|
-| D (khuyên) | Cùng UI với cả cột: mỗi dự án một nhóm có tiêu đề như «Theo trạng thái»; «Tất cả», phân khu, toà là mục con; phân khu lồng toà một cấp; không gập | chữ số mờ cuối mục | dài, cuộn trong cột | mục của cột thứ hai (bậc 1, trong kho), không thêm gói |
+| D (chủ kho chọn hướng này) | Cùng UI với cả cột: mỗi dự án một nhóm có tiêu đề như «Theo trạng thái»; «Tất cả», phân khu, toà là mục con; phân khu lồng toà một cấp; không gập | không số (chủ kho bỏ cho đồng nhất) | dài, cuộn trong cột | mục của cột thứ hai (bậc 1, trong kho), không thêm gói |
 | A | Cây gập; chỉ mở nhánh đang chọn; tên dài xuống dòng | chữ số mờ cuối dòng | gọn — nhánh khác gập | ReUI Tree «Basic» (c-tree-1) |
 | C | Cây có ô chọn, cộng/trừ; chọn nhiều toà một lúc | chữ số mờ cuối dòng | dài, cuộn trong cột | ReUI Tree «Permissions» (c-tree-7) |
 
@@ -73,7 +73,7 @@ Dự án/Phân khu/Toà của RESO và danh mục 7d.
 <!-- <<<UX-STATE-TABLE -->
 | Trạng thái | Màn | Hiển thị gì | Người làm gì tiếp |
 |---|---|---|---|
-| ST-inventory-cay-co-hang | Bảng hàng | Cây ba cấp, mỗi nút số căn | Bấm một nơi |
+| ST-inventory-cay-co-hang | Bảng hàng | Mỗi dự án một nhóm, phân khu và toà là mục, không số | Bấm một nơi |
 | ST-inventory-cay-dang-chon | Bảng hàng | Nút sáng, ô lọc Dự án/Toà hiện tên, chân bảng «x / 60 dòng» | Bấm nơi khác hay «Xoá lọc» |
 | ST-inventory-cay-trong | Bảng hàng | «Chưa có căn nào trên Bảng hàng.» dưới «Theo địa lý» | Nhập hàng (hàng 11) |
 | ST-inventory-loc-khong-trung | Bảng hàng | Lọc cột gõ tay, không nút nào sáng | Sửa ô lọc hay bấm một nơi |
@@ -82,7 +82,8 @@ Dự án/Phân khu/Toà của RESO và danh mục 7d.
 
 ### 4. Hành vi
 
-- Bấm một nơi chỉ thay lọc Dự án, Toà; lọc khác đang bật giữ nguyên (Hỏi-2). Số căn đếm theo các lọc khác đang bật, không theo chính lọc Dự án/Toà; nơi còn 0 vẫn hiện, ghi 0 (Hỏi-3).
+- Bấm một nơi chỉ thay lọc Dự án, Toà; lọc khác đang bật giữ nguyên (Hỏi-2). Mục của cây không mang số (chủ kho, Cổng Phạm vi); số căn của nơi đang chọn đọc ở chân bảng.
+- Ngưỡng cuộn của D: ở 1440×900 nhóm địa lý vừa chừng 15 dòng (khoảng 3 dự án, 8 toà); nhiều hơn thì cột thứ hai cuộn. Gập nhóm để sau.
 - Phím: D — Tab tới từng nơi, Enter mở; A, C — Tab vào cây, mũi tên đi giữa các nơi và gập/mở, Enter mở.
 - Khổ: 1440, 1024 cột thứ hai rộng 14 rem như cũ; 414, 360 cây trong ngăn.
 
