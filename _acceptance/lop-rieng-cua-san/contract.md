@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config, ui]
 screens: [inventory, tuy-chinh-san]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-13
 design_doc: docs/superpowers/specs/2026-11-13-lop-rieng-cua-san-design.md
@@ -138,5 +138,21 @@ thấy màn nhưng không có nút ghi nào; `/api/v1` trả 403.
   `tools/ontology_codegen.py`. Không đổi luật nào của công cụ. (3) `tools/e2e_templates/settle.ts`: ca «proof images» vào
   danh sách bài chờ (dùng hàm chờ chung). (4) `db/tests/pha-thu/lop-rieng-khong-ep.sql`: dòng phá thử tắt ép luật theo
   dòng (tín hiệu SP-1), chỉ chạy trên cơ sở dữ liệu thử của bộ kiểm cách ly.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-14:
+  - SP-1: chấp nhận có tên — dòng phá thử cố ý tắt ép luật cách ly ở db/tests/pha-thu/lop-rieng-khong-ep.sql chỉ chạy trên cơ sở dữ liệu thử.
+  - Ngoài-1: Hàm tra mã căn nằm ở cửa dành cho trình duyệt dù chạy truy vấn; chưa lộ gì, sẽ dời sang cửa máy chủ.
+  - Ngoài-2: Danh sách tám khái niệm đặt được nhãn riêng viết ở ba chỗ; hiện khớp nhau.
+  - Ngoài-3: Câu mô tả thao tác thêm của lớp riêng chưa nói căn chờ khớp và mẫu nhập; quyền thật vẫn đúng.
+  - Ngoài-4: Một dòng phá thử cố ý tắt luật cách ly, chỉ chạy trên cơ sở dữ liệu thử, nay đã nêu đích danh.
+  - Ngoài-5: Đăng ký ca chụp ảnh vào danh sách bài chờ là chỗ tầng cao, nay đã nêu đích danh và được giữ.
+  - Ngoài-6: Trùng với mục 2: danh sách tám khái niệm viết ở ba chỗ.
+  - Ngoài-8: Tên năm kiểu trường (Chữ, Số, Ngày, Chọn một, Có/không) viết trong mã, chưa có trong bảng nhãn.
+  - Ngoài-10: Bài lỗi máy chủ của cửa ghi chỉ kiểm không lộ chi tiết, chưa ghim đúng thân lỗi.
+  - Ngoài-11: Hai ca phá của bài từ chối ở cơ sở dữ liệu không phá đúng mã đang kiểm.
+  - Ngoài-12: Luật trang khách không đọc chữ riêng của sàn được kiểm bằng dò mã nguồn, chưa kiểm trên trang khách thật (chưa có trang khách).
+  - Ngoài-13: Bài đơn vị của nút khớp căn chờ kiểm có gửi yêu cầu, chưa kiểm câu báo; bài trình duyệt đã kiểm câu báo.
+  - Ngoài-14: Bài cơ sở dữ liệu thử ba kiểu tên trùng thay vì bốn; kiểu trùng nhãn được kiểm ở tầng luật.
+  - Ngoài-15: Cột Căn ở Bảng hàng khổ 1440 bị cắt còn «0…», có từ trước 7e; hàng 2e đang chữa.
+  - Ngoài-16: Năm chỗ tầng cao được giữ: kiểu đối tượng ở bộ sinh mã và bộ kiểm mô hình, đăng ký màn và ca chụp ảnh vào bộ kiểm trình duyệt, dòng phá thử cách ly trên cơ sở dữ liệu thử.
 - Trang khách không đọc nhãn riêng, trường riêng (SP-4): ghi ở trang thực thể, đo ở hàng của trang khách.
 - Dòng sửa đổi L4/L5 ở `docs/plan/pham-vi-mvp-dot-1.md` đã có (2026-11-12) — không thêm dòng trùng.
