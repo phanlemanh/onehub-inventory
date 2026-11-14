@@ -34,8 +34,8 @@ export function whereRulesApply(root, rules, candidates) {
   return askLint(root, { find: { rules, candidates } });
 }
 
-// For each job `{ key, at, control, probes }`: the rules that reject each probe, then the same with
-// those rules turned off. Keyed by job.
+// For each job `{ key, rule, at, control, probes }`: the rules that reject each probe, then the same
+// with `rule` turned off. Keyed by job.
 export function lintProbes(root, jobs) {
   if (jobs.length === 0) return {};
   const answer = askLint(root, { jobs });

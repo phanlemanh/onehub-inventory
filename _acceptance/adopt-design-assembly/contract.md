@@ -5,9 +5,9 @@ slug: adopt-design-assembly
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, tooling]
-status: implemented
-approved_by: Manh Phan
-approved_at: 2026-11-14
+status: draft
+approved_by:
+approved_at:
 design_doc: docs/superpowers/specs/2026-11-14-adopt-design-assembly-design.md
 ---
 
@@ -28,12 +28,15 @@ cho bước 3; «Giữ cả ba» cho ba lời đáp; «Đẩy và mở PR»; «T
 ## Criteria
 
 - AC-1: Given nhánh `chore/adopt-design-assembly` ở HEAD, When chạy `make check`, Then lệnh thoát 0, và trong đầu ra có
-  dòng `design-assembly: 18 decisions held by <m> checks, each seen failing on a changed copy` và dòng
+  dòng `design-assembly: 17 decisions held by <m> checks, each seen failing on a changed copy` và dòng
   `component manifest: design/component-registry.json is up to date (<k> components)`.
-- AC-2: Given lệnh kiểm design-assembly, When in trạng thái từng dòng sổ (`--rate`), Then đúng 18 dòng ở trạng thái
-  `held`, đúng bằng ma trận viết trước ở đầu `evals.yaml`; trong đó chín dòng `color-role`, `color-palette`, `type-scale`,
-  `spacing`, `radius`, `raw-controls`, `raw-table`, `no-restyled-component`, `no-inline-style` được giữ bằng luật lint mà
-  dòng sổ nêu, chạy lại ở đây; và `design/theme.json` có đúng chín phép kiểm loại lint, mỗi phép trỏ cùng luật ấy.
+- AC-2: Given lệnh kiểm design-assembly, When in trạng thái từng dòng sổ (`--rate`), Then đúng 17 dòng ở trạng thái
+  `held`, đúng bằng ma trận viết trước ở đầu `evals.yaml`; trong đó tám dòng `color-role`, `color-palette`, `type-scale`,
+  `radius`, `raw-controls`, `raw-table`, `no-restyled-component`, `no-inline-style` được giữ bằng luật lint mà dòng sổ
+  nêu, chạy lại ở đây; và `design/theme.json` có đúng tám phép kiểm loại lint, mỗi phép trỏ cùng luật ấy. Given một bản
+  dựng tạm của kho mà mọi tệp trỏ về kho, trừ cấu hình lint, When cấu hình lint thêm một mục tắt riêng luật dòng sổ nêu
+  của một trong tám dòng (mỗi dòng một bản), Then lệnh kiểm thoát khác 0 và in `<id>: the repository's lint lets through`
+  kèm `<luật> does not reject it`.
 - AC-3: Given một bản dựng tạm của kho mà mọi tệp trỏ về kho, trừ cấu hình lint, When cấu hình lint là bản của kho, Then
   lệnh kiểm design-assembly chạy trên bản ấy thoát 0; When cấu hình lint thêm một mục tắt luật `onehub-ui/no-raw-table`,
   Then lệnh kiểm thoát khác 0 và in `raw-table: the repository's lint lets through` kèm đoạn `<table />`.
@@ -88,12 +91,17 @@ Người đọc sổ linh kiện, kê trước từ việc tìm tên tệp trên
 - Phép so sổ mới với sổ cũ (đo ở kho design-assembly, ghi ở design doc).
 - Bài kiểm cho bản sửa thoát ký tự (bước 5): nó ở kho design-assembly.
 - Mọi thay đổi giao diện, mã sản phẩm, mô hình dữ liệu hay luật sản phẩm.
+- Cho dòng sổ `spacing` trỏ tới luật thật sự chặn giá trị khoảng cách tuỳ ý, hay mở rộng luật nó nêu tên: lựa chọn của chủ
+  kho, plugin không viết lại dòng sổ.
 
 ## Notes
 
-- Hai quyết định lint vẫn chỉ khai, không được chạy lại, vì lint để lọt đoạn mã phạm: `whole-class-names`,
-  `lint-exceptions`.
+- Ba quyết định lint vẫn chỉ khai, không được chạy lại, vì lint để lọt đoạn mã phạm: `whole-class-names`,
+  `lint-exceptions`, và `spacing` — luật dòng sổ nêu tên chỉ bắt bậc lệch thang, còn giá trị tuỳ ý do luật khác chặn.
+- AC-2 sửa ngày 2026-11-15, sau lượt chấm 1: lệnh kiểm từng tính «giữ» khi bất kỳ luật nào chặn đoạn mã phạm, nên tắt
+  riêng luật dòng sổ nêu tên mà cổng vẫn xanh. Plugin nay chỉ tính luật nêu tên (quyết định 0035 của kho
+  design-assembly); `spacing` về lại «tự khai», 18 thành 17, chín luật thành tám.
 - Hướng nhập giữa các phần (`tier-direction`) chưa có đoạn mã phạm, nên luật của nó không được chạy lại.
-- Ba phép đo mới của hồ sơ nằm ở `rang/`: chúng chạy ở lượt chấm và lượt ghim lại, không chạy trong `make check`. Sau khi
-  gộp, `make check` vẫn giữ chín phép kiểm lint qua lệnh kiểm design-assembly, và lệnh ấy đỏ khi dữ liệu của nó trỏ luật
+- Các phép đo mới của hồ sơ nằm ở `rang/`: chúng chạy ở lượt chấm và lượt ghim lại, không chạy trong `make check`. Sau khi
+  gộp, `make check` vẫn giữ tám phép kiểm lint qua lệnh kiểm design-assembly, và lệnh ấy đỏ khi dữ liệu của nó trỏ luật
   khác luật dòng sổ nêu; thứ không ai giữ nữa là việc các dòng sổ cũ còn nguyên (AC-4).

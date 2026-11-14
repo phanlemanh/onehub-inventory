@@ -43,12 +43,15 @@ sơ này; hồ sơ chấm những gì kho này giữ được bằng lệnh củ
 
 ## Phép đo mới của hồ sơ
 
-Ba kịch bản đo nằm ở `_acceptance/adopt-design-assembly/rang/`, ngoài vùng công cụ của kho:
+Các kịch bản đo nằm ở `_acceptance/adopt-design-assembly/rang/`, ngoài vùng công cụ của kho:
 
 - `ledger-rows-kept.mjs` — mọi dòng sổ quyết định có ở commit trước khi nhận (`1226ec5`) còn nguyên từng byte, trừ đúng
   dòng «cấp linh kiện», mà phép trỏ đổi sang công cụ mới;
-- `lint-rerun.mjs` — dữ liệu của lệnh kiểm có đúng chín phép kiểm lint, cho đúng chín quyết định đã kê, mỗi phép trỏ
+- `lint-rerun.mjs` — dữ liệu của lệnh kiểm có đúng tám phép kiểm lint, cho đúng tám quyết định đã kê, mỗi phép trỏ
   cùng luật dòng sổ nêu;
+- `named-rule-off.mjs` (thêm 2026-11-15, sau lượt chấm 1) — với mỗi quyết định trong tám, một bản dựng tạm tắt riêng luật
+  dòng sổ nêu tên; lệnh kiểm phải đỏ và gọi tên dòng ấy. Lượt chấm 1 cho thấy lệnh kiểm từng tính «giữ» khi luật khác chặn
+  thay, nên tắt riêng luật nêu tên mà cổng vẫn xanh; plugin đã sửa, và `spacing` về lại «tự khai» (18 thành 17);
 - `register-regenerated.sh` — công cụ cũ không còn, `make gen` gọi công cụ mới, ghi lại sổ từ mã thì không khác bản đã commit.
 
 Mỗi kịch bản có cặp hai chiều trên cùng một bản: bản lành xanh, bản bị phá đỏ với thông điệp ghim

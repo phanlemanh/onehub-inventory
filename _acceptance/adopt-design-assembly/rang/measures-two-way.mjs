@@ -3,7 +3,7 @@
 // seen red proves nothing.
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { execPath } from "node:process";
@@ -48,7 +48,7 @@ test("lint-rerun: green as it is, red when a held decision is missing or a rule 
     .split("\n")
     .filter((line) => !/^\s+held\s+\S+\s+raw-table\b/.test(line))
     .join("\n");
-  red("held: 17, missing raw-table", "lint-rerun.mjs", "--root", ROOT, "--rate-file", broken("rate.txt", withoutRawTable));
+  red("held: 16, missing raw-table", "lint-rerun.mjs", "--root", ROOT, "--rate-file", broken("rate.txt", withoutRawTable));
   const theme = JSON.parse(real("design/theme.json"));
   theme.checks["raw-table"] = theme.checks["raw-table"].map((check) => ({ ...check, rule: "other/rule" }));
   red(
@@ -58,6 +58,27 @@ test("lint-rerun: green as it is, red when a held decision is missing or a rule 
     ROOT,
     "--theme",
     broken("theme.json", JSON.stringify(theme)),
+  );
+});
+
+test("named-rule-off: green as it is, red with the tool that let another rule hold a row", () => {
+  green("named-rule-off.mjs", "--root", ROOT);
+  // The tool as round 1 of the grading found it, from the commit that recorded that round.
+  const oldTool = path.join(scratch, "old-tool");
+  for (const file of ["check.mjs", "lint.mjs", "adapters/eslint.mjs"]) {
+    const text = execFileSync("git", ["-C", ROOT, "show", `7777792:tools/design-assembly/${file}`], {
+      encoding: "utf8",
+    });
+    mkdirSync(path.dirname(path.join(oldTool, file)), { recursive: true });
+    writeFileSync(path.join(oldTool, file), text);
+  }
+  red(
+    "named rule off: color-role still green with onehub-ui/no-hardcoded-color off",
+    "named-rule-off.mjs",
+    "--root",
+    ROOT,
+    "--tool",
+    oldTool,
   );
 });
 

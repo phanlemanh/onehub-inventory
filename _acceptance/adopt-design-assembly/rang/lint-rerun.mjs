@@ -1,5 +1,5 @@
-// AC-2: exactly the 18 decisions of the matrix written first are held by the design-assembly tool,
-// and the nine lint ones by the rule their ledger row names, re-run here.
+// AC-2: exactly the 17 decisions of the matrix written first are held by the design-assembly tool,
+// and the eight lint ones by the rule their ledger row names, re-run here.
 // Usage: node lint-rerun.mjs --root <repository> [--rate-file F] [--theme F] [--ledger F]
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -7,38 +7,7 @@ import path from "node:path";
 import { execPath, exit, stdout } from "node:process";
 
 import { option } from "./linked-copy.mjs";
-
-const HELD = [
-  "checks-in-gate",
-  "color-contrast",
-  "color-palette",
-  "color-role",
-  "component-manifest",
-  "design-tokens",
-  "empty-state-actions",
-  "ledger-shapes",
-  "no-inline-style",
-  "no-restyled-component",
-  "radius",
-  "radius-value",
-  "raw-controls",
-  "raw-table",
-  "spacing",
-  "spacing-values",
-  "type-scale",
-  "type-scale-values",
-];
-const LINT = {
-  "color-palette": "onehub-ui/no-raw-palette",
-  "color-role": "onehub-ui/no-hardcoded-color",
-  "no-inline-style": "shadcn/no-inline-styles",
-  "no-restyled-component": "shadcn/no-restyle",
-  radius: "shadcn/no-arbitrary-values",
-  "raw-controls": "onehub-ui/no-raw-controls",
-  "raw-table": "onehub-ui/no-raw-table",
-  spacing: "onehub-ui/no-off-scale-spacing",
-  "type-scale": "onehub-ui/no-arbitrary-text-size",
-};
+import { HELD, LINT } from "./matrix.mjs";
 
 const root = path.resolve(option("--root", "."));
 const rateFile = option("--rate-file");
@@ -65,7 +34,7 @@ const missing = HELD.filter((id) => !held.has(id));
 const extra = [...held.keys()].filter((id) => !HELD.includes(id));
 if (missing.length) fail(`held: ${held.size}, missing ${missing.join(" ")}`);
 if (extra.length) fail(`held: ${held.size}, extra ${extra.join(" ")}`);
-stdout.write(`held: 18 — ${HELD.join(" ")}\n`);
+stdout.write(`held: ${HELD.length} — ${HELD.join(" ")}\n`);
 
 // The rule each ledger row names after `eslint:`.
 const named = {};
@@ -89,7 +58,7 @@ for (const [id, rule] of lintChecks) {
   }
 }
 stdout.write(
-  `lint re-run: 9 — ${Object.entries(LINT)
+  `lint re-run: ${Object.keys(LINT).length} — ${Object.entries(LINT)
     .map(([id, rule]) => `${id}=${rule}`)
     .join(" ")}\n`,
 );

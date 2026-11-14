@@ -65,7 +65,7 @@ nguồn của mọi thông điệp ghim dưới đây).
       `git status --short` không đổi.
 - [ ] **Step 4:** Commit `test(adopt-design-assembly): measure the tool red on a linked copy with a rule off or a new component`.
 
-### Task 2: Chín quyết định lint và 18 quyết định được giữ (AC-2)
+### Task 2: Tám quyết định lint và 17 quyết định được giữ (AC-2)
 
 `independent: true`
 
@@ -76,15 +76,40 @@ nguồn của mọi thông điệp ghim dưới đây).
 **Interfaces:**
 
 - Produces: CLI `--root R [--rate-file F] [--theme F] [--ledger F]`; vắng `--rate-file` thì chạy
-  `node tools/design-assembly/check.mjs --rate --target R`. Ma trận 18 id và chín cặp id=luật chép từ đầu `evals.yaml`.
+  `node tools/design-assembly/check.mjs --rate --target R`. Ma trận 17 id và tám cặp id=luật ở `rang/matrix.mjs`, chép từ đầu `evals.yaml` (sửa 2026-11-15:
+  18 thành 17, chín thành tám, sau lượt chấm 1).
 
-- [ ] **Step 1:** Đọc dòng `--rate` mở đầu `held`; tập id được giữ phải bằng đúng 18 id. In `held: 18 — <id …>`; thiếu →
+- [ ] **Step 1:** Đọc dòng `--rate` mở đầu `held`; tập id được giữ phải bằng đúng 17 id. In `held: 17 — <id …>`; thiếu →
       `held: <n>, missing <id>`; thừa → `held: <n>, extra <id>`.
-- [ ] **Step 2:** Với chín id lint: dòng `--rate` phải mang `(eslint:<luật>, re-run here)`; `theme.json` có đúng chín phép
-      `kind: "lint"`, `rule` bằng luật sau `eslint:` của dòng sổ. In `lint re-run: 9 — <id>=<luật> …`; thiếu →
+- [ ] **Step 2:** Với tám id lint: dòng `--rate` phải mang `(eslint:<luật>, re-run here)`; `theme.json` có đúng tám phép
+      `kind: "lint"`, `rule` bằng luật sau `eslint:` của dòng sổ. In `lint re-run: 8 — <id>=<luật> …`; thiếu →
       `lint re-run: <n>, missing <id>`; lệch luật → `lint re-run: <id> checks <luật dữ liệu>, the row names <luật sổ>`.
 - [ ] **Step 3:** Chạy lệnh `lint_rerun` của cấu hình. Expected: hai dòng xanh, mã 0.
 - [ ] **Step 4:** Commit `test(adopt-design-assembly): read which decisions the tool holds, and the nine lint rules`.
+
+### Task 2a: Tắt riêng luật nêu tên (AC-2, thêm 2026-11-15)
+
+`independent: true`
+
+**Files:**
+
+- Create: `_acceptance/adopt-design-assembly/rang/matrix.mjs`, `_acceptance/adopt-design-assembly/rang/named-rule-off.mjs`
+- Modify: `_acceptance/adopt-design-assembly/rang/lint-rerun.mjs` (đọc ma trận từ `matrix.mjs`),
+  `_acceptance/adopt-design-assembly/rang/measures-two-way.mjs`, `_acceptance/config.yaml` (`named_rule_off`)
+
+**Interfaces:**
+
+- Consumes: `linkedCopy`, `runCheck`, `option` của `linked-copy.mjs`; `LINT` của `matrix.mjs`.
+- Produces: CLI `--root R [--tool D]`; `--tool` thay `check.mjs`, `lint.mjs`, `adapters/eslint.mjs` của công cụ trong mọi
+  bản tạm.
+
+- [ ] **Step 1:** Với mỗi cặp id=luật: bản tạm có cấu hình lint thêm `{ files: UI_FILES, rules: { "<luật>": "off" } }` ở
+      cuối; lệnh kiểm phải thoát khác 0 và có dòng mở đầu `<id>: the repository's lint lets through` chứa
+      `<luật> does not reject it`. Đủ tám thì in `named rule off: 8 rows, each red with its own rule off`; xanh →
+      `named rule off: <id> still green with <luật> off`; không gọi tên → `named rule off: <id> not named with <luật> off`.
+- [ ] **Step 2:** Cặp hai chiều: kho ở HEAD xanh; công cụ của commit `7777792` đỏ với
+      `named rule off: color-role still green with onehub-ui/no-hardcoded-color off`.
+- [ ] **Step 3:** Commit cùng bản sửa của plugin và dữ liệu lệnh kiểm.
 
 ### Task 3: Sổ quyết định cũ còn nguyên (AC-4)
 
