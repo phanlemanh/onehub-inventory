@@ -487,7 +487,14 @@ function RecordColumn({
                     </Button>
                   }
                 />
-                <div data-slot="record-panel-body" className="min-h-0 flex-1 overflow-y-auto p-4">
+                {/* The body scrolls when the record is taller than its column: keyboard users reach it with Tab. */}
+                <div
+                  data-slot="record-panel-body"
+                  role="region"
+                  aria-labelledby={titleId}
+                  tabIndex={0}
+                  className="min-h-0 flex-1 overflow-y-auto p-4 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
                   {view.body}
                 </div>
                 {view.footer}
