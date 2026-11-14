@@ -111,4 +111,11 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: new-contract
 
+- **High-tier changes waiting for the owner, by name: tools/ontology_codegen.py, tools/wiki_lint.py, tools/e2e_templates/e2e-templates.test.ts, tools/e2e_templates/settle.ts, db/tests/pha-thu/lop-rieng-khong-ep.sql**
+  Người dùng thấy gì: Người dùng không thấy gì khác. Đây là năm chỗ ở tầng cao cần chủ kho phê: bộ sinh mã nhận kiểu đối tượng (anh đã cho khi duyệt kế hoạch); bộ kiểm mô hình nhận kiểu ấy (tools/wiki_lint.py); đăng ký màn «Tuỳ chỉnh của sàn» đã dựng vào bộ khung trình duyệt (tools/e2e_templates/e2e-templates.test.ts); đăng ký ca chụp ảnh màn vào danh sách bài chờ (tools/e2e_templates/settle.ts); một dòng phá thử cố ý tắt luật cách ly để bộ kiểm cách ly chứng minh đỏ đúng chỗ, chỉ chạy trên cơ sở dữ liệu thử (db/tests/pha-thu/lop-rieng-khong-ep.sql, chạm luật SP-1).
+  Căn cứ: Ba dòng đăng ký giám sát đã nhận tạm theo phép chung (G-1311-120, G-1411-1, R-1411 báo settle.ts); không dòng nào đổi luật của công cụ. Anh không cho thì hoàn lại từng dòng; bỏ dòng phá thử thì bộ kiểm cách ly mất ca chứng minh bắt được bảng thiếu ép luật.
+  file: `tools/e2e_templates/settle.ts`
+  severity: medium
+  Đề xuất: known-limits
+
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).

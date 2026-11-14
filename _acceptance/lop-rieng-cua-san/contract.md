@@ -135,6 +135,8 @@ thấy màn nhưng không có nút ghi nào; `/api/v1` trả 403.
   đối tượng mà chủ kho cho thêm vào bộ sinh mã; (2) trong `tools/e2e_templates/e2e-templates.test.ts`: thêm
   `"tuy-chinh-san"` vào danh sách màn đã dựng, ba con số đếm đổi theo (80 thành 96, 96 thành 112) — thay cho dòng tạm
   `"bo qua: tuy-chinh-san — planned"` đã gỡ khi màn dựng xong. Phép gốc của chủ kho (duyệt kế hoạch) chỉ nói bộ sinh mã
-  `tools/ontology_codegen.py`. Không đổi luật nào của công cụ.
+  `tools/ontology_codegen.py`. Không đổi luật nào của công cụ. (3) `tools/e2e_templates/settle.ts`: ca «proof images» vào
+  danh sách bài chờ (dùng hàm chờ chung). (4) `db/tests/pha-thu/lop-rieng-khong-ep.sql`: dòng phá thử tắt ép luật theo
+  dòng (tín hiệu SP-1), chỉ chạy trên cơ sở dữ liệu thử của bộ kiểm cách ly.
 - Trang khách không đọc nhãn riêng, trường riêng (SP-4): ghi ở trang thực thể, đo ở hàng của trang khách.
 - Dòng sửa đổi L4/L5 ở `docs/plan/pham-vi-mvp-dot-1.md` đã có (2026-11-12) — không thêm dòng trùng.
