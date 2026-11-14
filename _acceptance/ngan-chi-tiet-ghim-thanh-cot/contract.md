@@ -67,8 +67,8 @@ Nút Ghim không theo quyền (nút chung của khung): mọi vai mở được 
 
 | Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
 |---|---|---|---|---|
-| inventory | được — có nút Ghim | được — có nút Ghim | được — có nút Ghim | như Bảng hàng hôm nay (hàng 10 chặn theo quyền xem) |
-| sent | được — có nút Ghim | được — có nút Ghim | được — có nút Ghim | như Đã gửi hôm nay |
+| inventory | được — có nút Ghim | được — có nút Ghim | được — có nút Ghim | được — có nút Ghim, như Bảng hàng hôm nay (hàng 10 chặn theo quyền xem) |
+| sent | được — có nút Ghim | được — có nút Ghim | được — có nút Ghim | được — có nút Ghim, như Đã gửi hôm nay |
 
 ## Coverage
 
