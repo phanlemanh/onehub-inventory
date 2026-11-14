@@ -1,0 +1,2 @@
+console: favicon.ico 404 (static asset, note only)
+no app XHR/fetch failures; /inventory 200

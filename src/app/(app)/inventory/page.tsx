@@ -24,6 +24,7 @@ import {
   inventoryFiltersFrom,
   inventoryOpeningFor,
   inventoryStateFrom,
+  inventoryEdgeRowsFrom,
   type InventoryField,
   type RecordLabels,
 } from "@/modules/listings/ui";
@@ -124,7 +125,11 @@ export default async function Page({ searchParams }: Props) {
   const savedViews = listed === "unreadable" ? [] : listed;
   const viewLabels = savedViewLabels();
   const viewCopy = savedViewCopy(viewLabels);
-  const rows = sampleInventoryRows();
+  // Development only: `?mau=bien` adds edge rows (row 2b) so the phone cards can be measured with long codes and prices.
+  const rows = [
+    ...sampleInventoryRows(),
+    ...inventoryEdgeRowsFrom(first(query.mau), process.env.NODE_ENV),
+  ];
   // The top-bar search (row 3f) opens the grid with its text in a column filter; one unit found opens its record
   // through the record's own address (row 3), so the back button and «Chép đường dẫn» work as usual.
   const opening = inventoryOpeningFor(rows, {

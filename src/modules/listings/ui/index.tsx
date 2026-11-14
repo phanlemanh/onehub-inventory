@@ -16,6 +16,7 @@ export {
   type InventoryCustomColumn,
   inventoryRows,
   inventoryStateFrom,
+  inventoryEdgeRowsFrom,
   type CodeMatch,
   type InventoryAsk,
   type InventoryField,

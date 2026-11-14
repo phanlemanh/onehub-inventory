@@ -108,6 +108,50 @@ export function inventoryFiltersFrom(param: string | undefined): ColumnFilters {
   return wanted.length > 0 ? { "Listing.standardStatus": wanted } : {};
 }
 
+/**
+ * Development only (row 2b, AC-8): `?mau=bien` adds nine rows the sample company does not have — a 14-character unit
+ * code, a price in the hundreds of billions, a monthly rent, a unit without a price, and the six statuses — so the phone
+ * cards can be measured at 360 px. Honoured only outside production, like `?state=`; anything else adds nothing.
+ */
+export function inventoryEdgeRowsFrom(
+  param: string | undefined,
+  env: string | undefined,
+): GridRow[] {
+  if (env === "production" || param !== "bien") return [];
+  const base = {
+    "Listing.buildingName": "[MAU] Biên",
+    "Listing.subdivisionName": "[MAU] Một cái tên rất dài để thử cắt chữ ở thẻ",
+    "Unit.livingArea": 128.5,
+    "Unit.bedroomsTotal": 4,
+    "Listing.lastConfirmedAt": "2026-11-01T02:00:00.000Z",
+  };
+  const row = (
+    n: number,
+    code: string,
+    status: string,
+    price: number | null,
+    transaction?: "lease",
+  ) => ({
+    ...base,
+    id: `bien-${n}`,
+    ...(transaction ? { transaction } : {}),
+    "Listing.unitNumber": code,
+    "Listing.standardStatus": status,
+    "Listing.listPrice": price,
+  });
+  return [
+    row(1, "S1.01-2508APH2", "Active", 6_170_000_000),
+    row(2, "BIEN-02", "Pending", 125_500_000_000),
+    row(3, "BIEN-03", "Active", 25_000_000, "lease"),
+    row(4, "BIEN-04", "Incomplete", null),
+    row(5, "BIEN-05", "Hold", 3_080_000_000),
+    row(6, "BIEN-06", "Closed", 4_550_000_000),
+    row(7, "BIEN-07", "Withdrawn", 3_830_000_000),
+    row(8, "BIEN-08", "Pending", 999_990_000_000),
+    row(9, "BIEN-09", "Incomplete", 0),
+  ];
+}
+
 /** Address of the inventory grid filtered to one status: what each status shortcut of the App Shell opens. */
 export function inventoryStatusHref(status: string): string {
   return `/inventory?status=${encodeURIComponent(status)}`;

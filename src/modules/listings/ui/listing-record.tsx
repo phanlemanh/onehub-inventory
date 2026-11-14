@@ -5,6 +5,7 @@ import { TypedCell } from "@/components/candidate/typed-cell";
 import { EMPTY, formatByKind } from "@/lib/format";
 import type { TypedColumn } from "@/components/candidate/column-kind";
 
+import Image from "next/image";
 import type { ReactNode } from "react";
 
 import { sampleKeeperOf } from "../sample";
@@ -100,7 +101,91 @@ export function listingView(
  * status under them, then three facts side by side. It carries no frame of its own; the caller places it (the head of
  * the record here, the card list on the phone in row 2b).
  */
-export function ListingCard({ view, priceLabel }: { view: ListingView; priceLabel: string }) {
+export function ListingCard({
+  view,
+  priceLabel,
+  layout = "stacked",
+  photo,
+  noPhoto = "tile",
+  building,
+}: {
+  view: ListingView;
+  priceLabel: string;
+  /**
+   * «stacked»: the head of the record (row 3). «row»: product-grid-4's horizontal tile for a list on a phone (row 2b) —
+   * a square image on the left, unit code and price on one line, place and status under them, area and bedrooms last.
+   */
+  layout?: "stacked" | "row";
+  /** The unit's photo (row 15); a unit without one shows its building on a muted tile, or no tile («none»). */
+  photo?: string;
+  noPhoto?: "tile" | "none";
+  /** The building code the muted tile shows. */
+  building?: string;
+}) {
+  if (layout === "row") {
+    const facts = view.facts
+      .filter(({ column }) => column.field !== "Listing.lastConfirmedAt")
+      .filter(({ value }) => value !== null && value !== undefined && value !== "")
+      .map(({ column, value }) =>
+        column.kind === "count"
+          ? `${formatByKind(column.kind, value)} ${column.header.toLocaleLowerCase("vi")}`
+          : formatByKind(column.kind, value),
+      );
+    const tile = photo ? (
+      <Image
+        src={photo}
+        alt=""
+        width={64}
+        height={64}
+        unoptimized
+        className="size-16 shrink-0 rounded-md object-cover"
+      />
+    ) : noPhoto === "tile" ? (
+      <span
+        aria-hidden="true"
+        className="flex size-16 shrink-0 items-center justify-center rounded-md bg-muted p-1 text-center text-xs font-medium text-muted-foreground"
+      >
+        {building}
+      </span>
+    ) : null;
+    return (
+      <div
+        data-slot="listing-card"
+        data-layout="row"
+        data-listing-id={view.id}
+        className="flex w-full items-center gap-3"
+      >
+        {tile}
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <div className="flex items-baseline justify-between gap-2">
+            <span data-slot="listing-card-unit" className="font-semibold break-all">
+              {view.unitNumber}
+            </span>
+            {/* No label over the value: inside the phone list's link it would replace the price in the card's name. */}
+            <span data-slot="listing-card-price" className="shrink-0 font-semibold tabular-nums">
+              <TypedCell kind="money" value={view.price} transaction={view.transaction} />
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <span data-slot="listing-card-place" className="truncate text-sm text-muted-foreground">
+              {view.place}
+            </span>
+            <span data-slot="listing-card-status" className="shrink-0">
+              <TypedCell kind="status" value={view.status} transaction={view.transaction} />
+            </span>
+          </div>
+          {facts.length > 0 ? (
+            <span
+              data-slot="listing-card-facts"
+              className="text-xs text-muted-foreground tabular-nums"
+            >
+              {facts.join(" · ")}
+            </span>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
   return (
     <div data-slot="listing-card" data-listing-id={view.id} className="flex flex-col gap-3">
       <div className="flex items-start justify-between gap-3">

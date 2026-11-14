@@ -23,9 +23,14 @@ Triết lý, Màn mẫu, Khổ so, Mặt so do lưới chứng minh màn của k
 
 Lưới thay Sheet và Excel cho Đầu chủ: mở ra là thấy mọi dòng, sửa tại chỗ, không phải học thêm gì.
 
-Lọc bằng ô dưới tiêu đề cột như Sheet: hàng ô lọc luôn hiện ở mọi khổ, không có nút bật tắt, các ô cộng dồn. Vùng không có
+Lọc bằng ô dưới tiêu đề cột như Sheet: từ 768 px hàng ô lọc luôn hiện, không có nút bật tắt, các ô cộng dồn. Vùng không có
 chỗ gõ tìm riêng; tìm nằm ở ô ⌘K của thanh trên App Shell (chủ kho chốt 2026-11-13, hàng 2e). Một cách so chữ cho cả hai
 chỗ: bỏ dấu tiếng Việt, «đ» như «d».
+
+Điện thoại: dưới 768 px màn có khai thẻ (Bảng hàng) đổi thân vùng thành danh sách thẻ, cùng một bộ lọc, sắp xếp, nhóm và
+hồ sơ của vùng. Lọc nằm ở ngăn Lọc mở từ nút «Lọc (n)» của hàng công cụ, «Sắp theo» ở đầu ngăn, lọc đang chạy là chip
+(chủ kho chọn ở Cổng Phạm vi hàng 2b, 2026-11-14). Màn họ Lưới chưa khai thẻ giữ thân vùng là bảng ở mọi khổ, cho tới
+khi màn ấy khai thẻ của nó.
 
 ## Màn mẫu
 

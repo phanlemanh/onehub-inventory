@@ -99,8 +99,15 @@ async function signIn(page: Page, email: string, next = "/") {
 const region = (page: Page) => page.locator('[data-slot="data-region"]');
 const secondColumn = (page: Page) => page.locator('[data-slot="app-shell-second-column"]');
 
+/** Below 768 px the inventory shows listing cards, not a table (row 2b, _acceptance/bang-hang-the-dien-thoai). */
+const onPhone = (page: Page) => (page.viewportSize()?.width ?? 1440) < 768;
+
 async function settled(page: Page) {
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  if (onPhone(page)) {
+    await expect(region(page).locator('[data-slot="phone-card"]').first()).toBeVisible();
+    return;
+  }
   await expect(
     region(page).locator('[data-slot="data-region-body"] table[data-slot="data-grid-table"]'),
   ).toBeVisible();
@@ -116,6 +123,20 @@ interface Snapshot {
 
 async function snapshot(page: Page): Promise<Snapshot> {
   await settled(page);
+  // On a phone the same rows are cards, in the region's order; groups are the list's section heads; no headers.
+  if (onPhone(page))
+    return page.evaluate(() => ({
+      units: [
+        ...document.querySelectorAll('[data-slot="phone-card"] [data-slot="listing-card-unit"]'),
+      ].map((el) => el.textContent?.trim() ?? ""),
+      groups: [...document.querySelectorAll('[data-slot="phone-group"] h3 span:first-child')].map(
+        (el) => el.textContent?.trim() ?? "",
+      ),
+      columns: [],
+      searchBoxes: document.querySelectorAll(
+        '[data-slot="data-region"] input[type="search"], [data-slot="data-region"] [role="searchbox"]',
+      ).length,
+    }));
   // The virtual body draws its rows once it has measured itself.
   await expect(
     region(page).locator('[data-slot="data-region-body"] tbody tr[data-row-id]').first(),

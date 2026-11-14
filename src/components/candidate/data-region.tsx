@@ -73,7 +73,9 @@ import {
   type GridView,
   type SortBy,
 } from "./grid-view";
+import { PhoneList, type RegionPhoneList } from "./phone-list";
 import { RecordPanel, useRecordAddress, type RecordView } from "./record-panel";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { RegionTitle, RegionToolbar } from "./region-header";
 import { RowActions, type RecordAction } from "./row-actions";
 import {
@@ -375,6 +377,7 @@ export function DataRegion({
   groupBy,
   initialView,
   onViewChange,
+  phoneList,
 }: {
   title: string;
   columns: readonly TypedColumn[];
@@ -413,7 +416,10 @@ export function DataRegion({
   initialView?: GridView;
   /** Hears the arrangement after each change the person makes (and once on opening). */
   onViewChange?: (view: GridView) => void;
+  /** Row 2b: below 768 px the rows show as the screen's cards instead of the table. */
+  phoneList?: RegionPhoneList<GridRow>;
 }) {
+  const isPhone = useIsMobile();
   // One confirmation for every row's removing action: a row scrolled out of the virtual body keeps it open.
   const removing = useChange();
   const [opening] = useState(() => (initialView ? viewWithin(initialView, columns) : undefined));
@@ -1103,6 +1109,60 @@ export function DataRegion({
   else if (status === "partial" && rows.length === 0)
     body = <RegionPartialEmpty onRetry={onRetry} />;
   else if (rows.length === 0) body = <RegionEmpty why={emptyWhy} action={emptyAction} />;
+  else if (phoneList && isPhone)
+    body = (
+      <DataGrid table={table} recordCount={shown.length} i18n={GRID_I18N}>
+        <PhoneList
+          list={phoneList as RegionPhoneList<TableRow>}
+          data={data}
+          columns={columns}
+          column={(field) => table.getColumn(field)}
+          options={options}
+          activeFields={columns.filter((c) => !filterIsEmpty(filters[c.field])).map((c) => c.field)}
+          count={
+            narrowed
+              ? GRID_COPY.filteredCount(shown.length, rows.length)
+              : GRID_COPY.rowCount(rows.length)
+          }
+          group={
+            groupColumn
+              ? {
+                  label: GRID_COPY.sheet.groupBy(groupColumn.header),
+                  on: isGrouped,
+                  toggle: () => {
+                    setGrouped((on) => !on);
+                    setExpanded(true);
+                  },
+                }
+              : undefined
+          }
+          more={toolbarAction}
+          rowAction={
+            rowActions
+              ? (row) => {
+                  const { actions, mine } = rowActions(row);
+                  return (
+                    <RowActions
+                      actions={actions}
+                      mine={mine}
+                      title={phoneList.label(row)}
+                      run={removing.run}
+                    />
+                  );
+                }
+              : undefined
+          }
+          sort={{
+            columns,
+            value: sorting[0] ? { field: sorting[0].id, desc: sorting[0].desc } : null,
+            set: (v) => setSorting(v ? [{ id: v.field, desc: v.desc }] : []),
+          }}
+          onOpen={openRecord}
+          onClear={clearFilters}
+          noMatch={<RegionNoMatch onClear={clearFilters} />}
+        />
+      </DataGrid>
+    );
   else
     body = (
       <DataGrid
@@ -1251,28 +1311,41 @@ export function DataRegion({
           0
         </span>
         {/* Arrangement after data-grid-editing-6: name on the frame's header strip; toolbar, table and pages in one panel. */}
-        <Frame className="min-w-0">
-          <FrameHeader>
-            <RegionTitle title={title} />
-          </FrameHeader>
-          <FramePanel className="flex min-w-0 flex-col gap-3 p-0">
-            {gridShown ? null : <div className="px-3 pt-3 empty:hidden">{toolbar(null)}</div>}
-            {status === "partial" && rows.length > 0 ? (
-              <div className="px-3">
+        {phoneList && isPhone && gridShown ? (
+          // A phone list has no frame around it (row 2b): it runs to the screen's edges, under the page head.
+          <div ref={boxRef} data-slot="data-region-body" className="-mx-4 min-w-0">
+            <h2 className="sr-only">{title}</h2>
+            {status === "partial" ? (
+              <div className="px-4 pb-2">
                 <RegionPartial onRetry={onRetry} />
               </div>
             ) : null}
-            {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
-            <div
-              ref={boxRef}
-              data-slot="data-region-body"
-              data-density={density}
-              className="w-0 min-w-full"
-            >
-              {body}
-            </div>
-          </FramePanel>
-        </Frame>
+            {body}
+          </div>
+        ) : (
+          <Frame className="min-w-0">
+            <FrameHeader>
+              <RegionTitle title={title} />
+            </FrameHeader>
+            <FramePanel className="flex min-w-0 flex-col gap-3 p-0">
+              {gridShown ? null : <div className="px-3 pt-3 empty:hidden">{toolbar(null)}</div>}
+              {status === "partial" && rows.length > 0 ? (
+                <div className="px-3">
+                  <RegionPartial onRetry={onRetry} />
+                </div>
+              ) : null}
+              {/* Zero width, at least full width: the grid never widens the page; it scrolls sideways inside the region. */}
+              <div
+                ref={boxRef}
+                data-slot="data-region-body"
+                data-density={density}
+                className="w-0 min-w-full"
+              >
+                {body}
+              </div>
+            </FramePanel>
+          </Frame>
+        )}
       </section>
     </>
   );

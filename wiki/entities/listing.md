@@ -41,3 +41,7 @@ Hàng 4, 13/11/2026: sửa Giá chào và Trạng thái trên ô của Bảng h�
 Hàng 3e, 13/11/2026: hồ sơ căn có nút «Hỏi đầu chủ» (người giữ căn) và «Báo sai thông tin» (thuộc tính danh mục). Ai giữ căn
 chưa có trong mô hình: tới hàng 10 dùng dữ liệu mẫu `sampleKeeperOf` (`src/modules/listings/sample.ts`); hai tin soạn ở
 `src/modules/listings/messages.ts`.
+
+Hàng 2b, 14/11/2026: dưới 768 px Bảng hàng hiện mỗi lần chào thành thẻ căn ở dáng ngang (ô ảnh, mã căn và giá, nơi và
+trạng thái, diện tích và phòng ngủ) — cùng `ListingCard` của đầu hồ sơ; chạm thẻ mở hồ sơ toàn màn, lùi về đúng chỗ.
+Không sửa trên thẻ (hàng 3d). Hồ sơ: `_acceptance/bang-hang-the-dien-thoai/`.

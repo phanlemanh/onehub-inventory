@@ -70,7 +70,8 @@
             "initialFilters",
             "groupBy",
             "initialView",
-            "onViewChange"
+            "onViewChange",
+            "phoneList"
           ]
         },
         {
@@ -133,6 +134,32 @@
           "props": [
             "name",
             "sub"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "PhoneList",
+      "file": "src/components/candidate/phone-list.tsx",
+      "level": "organism",
+      "parts": [
+        {
+          "name": "PhoneList",
+          "props": [
+            "list",
+            "data",
+            "columns",
+            "column",
+            "options",
+            "activeFields",
+            "count",
+            "group",
+            "more",
+            "rowAction",
+            "sort",
+            "onOpen",
+            "onClear",
+            "noMatch"
           ]
         }
       ]
@@ -258,6 +285,16 @@
             "run",
             "inGrid"
           ]
+        }
+      ]
+    },
+    {
+      "name": "TouchTarget",
+      "file": "src/components/candidate/touch-target.tsx",
+      "level": "atom",
+      "parts": [
+        {
+          "name": "TouchTarget"
         }
       ]
     },

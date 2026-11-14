@@ -2,6 +2,8 @@
 // narrow sizes the page itself never scrolls sideways; the test prints how many data columns are fully in view.
 import { expect, test, type Page } from "@playwright/test";
 
+import { assertCardsNotTable, isPhone, rowsShown } from "../phone-list";
+
 const URL = "/inventory";
 
 /** Data columns fully inside the grid's viewport (the row-number column left out), and the viewport's overflow. */
@@ -64,6 +66,19 @@ test.describe("inventory width", () => {
   test("the page never scrolls sideways; data columns in view are printed", async ({
     page,
   }, info) => {
+    if (isPhone(page)) {
+      // Row 2b: below 768 px the inventory is a list of cards, so there are no columns to count; the page still never
+      // scrolls sideways, and the list is there instead of the table.
+      await page.goto(URL);
+      await rowsShown(page);
+      await assertCardsNotTable(page, "inventory width");
+      const pageOverflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - window.innerWidth,
+      );
+      expect(pageOverflow).toBeLessThanOrEqual(0);
+      console.log(`inventory ${info.project.name}: listing cards, no columns`);
+      return;
+    }
     const m = await measure(page);
     expect(m.pageOverflow).toBeLessThanOrEqual(0);
     console.log(`inventory ${info.project.name}: ${m.full}/${m.total} data columns in view`);
