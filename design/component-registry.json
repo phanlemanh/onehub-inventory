@@ -1395,6 +1395,14 @@
       "props": ["items", "roles", "initialOpen"]
     },
     {
+      "name": "LoginLayout",
+      "category": "component",
+      "file": "src/components/templates/login-layout.tsx",
+      "level": "template",
+      "source": "own",
+      "props": ["heading", "lead", "footer"]
+    },
+    {
       "name": "NavMenu",
       "category": "component",
       "file": "src/components/templates/nav-menu.tsx",

@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "den": "78384bca0c698963ae1a36d7eccba5010355e2f5",
+  "base": "66e5a8df42fe0b0d470c8c92b5f88bc3fcd140d9",
+  "ghim": {
+    "luoi": "4fc9a14418a61892ab1e76132041f3e091b4ae12"
+  },
+  "theo_khuon": [
+    "src/app/login/page.tsx"
+  ],
+  "lech_moi": [],
+  "no_cu": [
+    {
+      "tep": "src/app/login/login-form.tsx",
+      "khoi": "LoginLayout",
+      "loai": "khuon",
+      "so": 1,
+      "nhom": "dang-nhap"
+    }
+  ],
+  "khong_do": [],
+  "ngoai_ban_do": 2,
+  "nhom": [
+    "dang-nhap",
+    "luoi"
+  ]
+}

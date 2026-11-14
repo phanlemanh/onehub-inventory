@@ -1,10 +1,12 @@
 "use client";
 
+import { ArrowRightIcon, MailIcon } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { AUTH_BASE_PATH } from "@/modules/identity";
 
 import { LOGIN_COPY as COPY } from "./copy";
@@ -312,18 +314,24 @@ export function LoginForm({
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="login-email">{COPY.emailLabel}</FieldLabel>
-          <Input
-            id="login-email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            inputMode="email"
-            required
-            value={email}
-            disabled={busy}
-            aria-describedby="login-email-hint"
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          {/* auth-15: the email field carries a mail icon. */}
+          <InputGroup>
+            <InputGroupAddon>
+              <MailIcon aria-hidden="true" />
+            </InputGroupAddon>
+            <InputGroupInput
+              id="login-email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              inputMode="email"
+              required
+              value={email}
+              disabled={busy}
+              aria-describedby="login-email-hint"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </InputGroup>
           <FieldDescription id="login-email-hint">{COPY.emailHint}</FieldDescription>
         </Field>
       </FieldGroup>
@@ -333,8 +341,9 @@ export function LoginForm({
         </p>
       ) : null}
       {serverError}
-      <Button type="submit" disabled={busy}>
+      <Button type="submit" disabled={busy} className="w-full">
         {busy ? COPY.sending : COPY.sendCode}
+        <ArrowRightIcon aria-hidden="true" data-icon="inline-end" />
       </Button>
     </form>
   );
