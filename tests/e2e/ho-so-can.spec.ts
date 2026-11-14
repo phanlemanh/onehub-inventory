@@ -12,9 +12,12 @@ const WIDE = new Set(["1440", "1024"]);
 const PHONE = new Set(["414", "360"]);
 /**
  * Data columns fully in view left of the open record, at least (AC-3). 4 and 2 since the coordinator's ruling
- * D-1211-12: the first 5/3 was pinned before the owner chose a floating panel two fifths wide.
+ * D-1211-12: the first 5/3 was pinned before the owner chose a floating panel two fifths wide. 3 and 1 since the
+ * coordinator's rulings K-1411-1 and K-1411-2 (row 2e, «sửa sau Cổng Phạm vi», the owner signs at row 2e's evidence
+ * gate): the filter row is always shown (owner 2026-11-13), so every column is at least 11 ch — the unit code shows
+ * whole and the header's «Bỏ ghim» button is in full view instead of hidden under the next header.
  */
-const MIN_VISIBLE: Readonly<Record<string, number>> = { "1440": 4, "1024": 2 };
+const MIN_VISIBLE: Readonly<Record<string, number>> = { "1440": 3, "1024": 1 };
 const FROZEN = ["#", "Căn", "Toà"];
 const DATA_HEADERS = [
   "Căn",
@@ -216,21 +219,45 @@ const scrollGridTo = (page: Page, left: number | "end") =>
       el.scrollLeft = to === "end" ? el.scrollWidth : to;
     }, left);
 
+/** Where each frozen header stands on the screen, by its name. */
+const frozenLefts = (page: Page) =>
+  page.evaluate((names) => {
+    const ths = [...document.querySelectorAll('[data-slot="data-region"] thead th')];
+    return Object.fromEntries(
+      names.map((name) => {
+        const th = ths.find((el) => (el.textContent ?? "").trim().startsWith(name));
+        return [name, th ? Math.round(th.getBoundingClientRect().left) : null];
+      }),
+    );
+  }, FROZEN);
+
+/**
+ * Scrolled to the end, the frozen columns have not moved. Measured on their place on the screen, not on «in view beside
+ * the record»: at 1024 Toà lies under the open record since ruling K-1411-5 (row 2e), and must still stay frozen there.
+ */
 async function assertFrozenAtEnd(page: Page): Promise<void> {
+  const before = await frozenLefts(page);
   await scrollGridTo(page, "end");
   await page.waitForTimeout(200);
+  const after = await frozenLefts(page);
   const { texts } = await columnsInView(page);
   for (const name of FROZEN) {
-    if (!texts.some((t) => t === name || t.startsWith(name))) {
+    if (before[name] === null || after[name] === null || Math.abs(after[name]! - before[name]!) > 1)
       throw new Error(`frozen column scrolled away: ${name}`);
-    }
   }
+  if (!texts.some((t) => t === "Căn" || t.startsWith("Căn")))
+    throw new Error("frozen column scrolled away: Căn");
 }
 
 /** With the record open, Căn and Toà are fully in view left of it: the promise of AC-3 (ruling D-1211-12). */
+/**
+ * The frozen columns stay beside the open record: Căn and Toà; at 1024 only Căn since the coordinator's ruling K-1411-5
+ * (row 2e, «sửa sau Cổng Phạm vi»: one column beside the record at 1024, Toà lies under the record there).
+ */
 async function assertUnitAndBuildingInView(page: Page): Promise<void> {
   const { texts } = await columnsInView(page);
-  for (const name of ["Căn", "Toà"]) {
+  const frozen = test.info().project.name === "1024" ? ["Căn"] : ["Căn", "Toà"];
+  for (const name of frozen) {
     if (!texts.some((t) => t === name || t.startsWith(name))) {
       throw new Error(`record hides a frozen column: ${name}`);
     }

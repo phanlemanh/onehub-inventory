@@ -141,14 +141,12 @@ const REGION_HEIGHTS = {
 
 const noSubscribe = () => () => undefined;
 
-/** Narrowest a number, money or date column gets under the always-shown filter row, in ch: room for a rule like «<=5». */
-const FILTER_MIN_CH = 11;
 /**
- * Narrowest a text or value column gets for its filter box, in ch: «Chứa…» and a short code stay readable and the
- * header's sort and pin buttons keep their 24px room, while a short text column (a unit code) is not widened to a
- * number's rule — so the grid beside an open record keeps its columns (row 2e). Fixed, so typing never moves a column.
+ * Narrowest a column gets under the always-shown filter row, in ch (row 2e, rulings K-1411-1 and K-1411-2): room for a
+ * rule like «<=5», a unit code shown whole, and the header's sort and pin buttons in full view — a narrower first column
+ * left its «Bỏ ghim» button hidden under the next header.
  */
-const TEXT_FILTER_MIN_CH = 8;
+const FILTER_MIN_CH = 11;
 
 /** Room the group's open-close button takes in front of a group label, in ch. */
 const GROUP_TOGGLE_CH = 4;
@@ -570,9 +568,7 @@ export function DataRegion({
     // While grouped, the grouping column also holds the group's open-close button in front of its label.
     return spread.map((w, i) => {
       const grown = isGrouped && columns[i]?.field === groupColumn?.field ? w + GROUP_TOGGLE_CH : w;
-      const kind = columns[i]?.kind;
-      const floor = kind && filterModeFor(kind) === "number" ? FILTER_MIN_CH : TEXT_FILTER_MIN_CH;
-      return Math.max(grown, floor);
+      return Math.max(grown, FILTER_MIN_CH);
     });
   }, [fitted, full, widthCh, baseChPx, chPx, rowNumberCh, isGrouped, columns, groupColumn]);
 

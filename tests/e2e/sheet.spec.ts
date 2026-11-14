@@ -768,7 +768,15 @@ test.describe("phone filter row", () => {
       .locator('[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]')
       .first();
     const before = await filterBox(page, "Giá chào").boundingBox();
-    await headerCell(page, "Listing.listPrice").scrollIntoViewIfNeeded();
+    // Scroll the grid's own box (the nearest one that scrolls sideways) until the price column sits in its middle.
+    await headerCell(page, "Listing.listPrice").evaluate((th) => {
+      let box = th.parentElement;
+      while (box && box.scrollWidth <= box.clientWidth) box = box.parentElement;
+      if (!box) return;
+      const b = box.getBoundingClientRect();
+      const r = th.getBoundingClientRect();
+      box.scrollLeft += r.left + r.width / 2 - (b.left + b.width / 2);
+    });
     const after = await filterBox(page, "Giá chào").boundingBox();
     const head = await headerCell(page, "Listing.listPrice").boundingBox();
     const view = await viewport.boundingBox();
@@ -778,7 +786,9 @@ test.describe("phone filter row", () => {
     const underHead = after.y >= head.y && after.x >= head.x - 1 && after.x < head.x + head.width;
     const inside = after.x >= view.x - 1 && after.x + after.width <= view.x + view.width + 1;
     if (!moved || !underHead || !inside)
-      throw new Error("filter row does not scroll with the grid");
+      throw new Error(
+        `filter row does not scroll with the grid (${JSON.stringify({ moved, underHead, inside, before, after, head, view })})`,
+      );
     // The price column, filter box included, is at least 11 ch of the grid's own text (a rule like «<=5, 2-5»).
     const ch = await headerCell(page, "Listing.listPrice").evaluate((th) => {
       const cell = document.querySelector('tbody td[data-col-id="Listing.listPrice"]') ?? th;
@@ -824,5 +834,86 @@ test.describe("phone filter row", () => {
     await expect(checkScrollsWithGrid(page)).rejects.toThrow(
       "filter row does not scroll with the grid",
     );
+  });
+});
+
+// Row 2e (bo-o-tim-cua-vung), ruling K-1411-1 (4): with the eight standard columns of the inventory the unit code shows
+// whole at every width — no «0…» — now that every column is at least 11 ch under the always-shown filter row.
+test.describe("unit code shows whole", () => {
+  /** Every unit code cell mounted now shows its whole text: nothing cut, no ellipsis. */
+  async function checkCodesWhole(page: Page): Promise<void> {
+    const cut = await page
+      .locator('[data-slot="data-region-body"] tbody td[data-col-id="Listing.unitNumber"]')
+      .evaluateAll((tds) =>
+        tds
+          .map((td) => {
+            const inner = (td.querySelector('[data-slot="truncated-text"]') ??
+              td.querySelector("button") ??
+              td) as HTMLElement;
+            const text = (inner.textContent ?? "").trim();
+            return inner.scrollWidth > inner.clientWidth + 1 || text.endsWith("…") ? text : null;
+          })
+          .filter((t) => t !== null),
+      );
+    if (cut.length > 0) throw new Error(`unit code cut: ${cut[0]}`);
+  }
+
+  test("every unit code cell shows the whole code, eight columns", async ({ page }) => {
+    await openInventory(page);
+    await expect(
+      page.locator(
+        '[data-slot="data-region-body"] thead th[data-col-id^="Listing."], [data-slot="data-region-body"] thead th[data-col-id^="Unit."]',
+      ),
+    ).toHaveCount(8);
+    await expect(bodyRows(page).first()).toBeVisible();
+    await expect(checkCodesWhole(page)).resolves.toBeUndefined();
+  });
+
+  test("the check fails when the unit code column is squeezed", async ({ page }) => {
+    await openInventory(page);
+    await page.addStyleTag({
+      content:
+        'td[data-col-id="Listing.unitNumber"] button, td[data-col-id="Listing.unitNumber"] [data-slot="truncated-text"] { max-width: 1.2ch !important; overflow: hidden !important; display: inline-block !important; }',
+    });
+    await expect(checkCodesWhole(page)).rejects.toThrow("unit code cut: ");
+  });
+});
+
+// Row 2e (bo-o-tim-cua-vung), ruling K-1411-2 (3): the header's buttons of the frozen first column are really pressable
+// at every width — axe passes a button hidden whole under the next header, so this looks at what is on top.
+test.describe("header buttons in view", () => {
+  /** Each named header button is the element on top at its left edge, middle and right edge, and takes a click. */
+  async function checkHeaderButtons(page: Page): Promise<void> {
+    for (const name of ["Bỏ ghim Căn"]) {
+      const button = page.getByRole("button", { name, exact: true });
+      if ((await button.count()) !== 1) throw new Error(`header button missing: ${name}`);
+      const covered = await button.evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const y = r.top + r.height / 2;
+        return [r.left + 2, r.left + r.width / 2, r.right - 2].some((x) => {
+          const top = document.elementFromPoint(x, y);
+          return !top || (top !== el && !el.contains(top));
+        });
+      });
+      if (covered) throw new Error(`header button covered: ${name}`);
+      await button.click({ trial: true, timeout: 2_000 });
+    }
+  }
+
+  test("the first column's «Bỏ ghim» button is on top and pressable", async ({ page }) => {
+    await openInventory(page);
+    await expect(checkHeaderButtons(page)).resolves.toBeUndefined();
+  });
+
+  test("the check fails when the next header covers the first column's buttons", async ({
+    page,
+  }) => {
+    await openInventory(page);
+    // What a first column narrower than its header does: the next frozen header lies over the «Bỏ ghim» button.
+    await page.addStyleTag({
+      content:
+        'thead th[data-col-id="Listing.buildingName"] { transform: translateX(-40px) !important; z-index: 50 !important; }',
+    });
+    await expect(checkHeaderButtons(page)).rejects.toThrow("header button covered: Bỏ ghim Căn");
   });
 });
