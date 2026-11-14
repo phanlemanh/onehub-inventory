@@ -1,36 +1,3 @@
 {
-  "feature_plain": "Đầu chủ bấm Ghim ở đầu hồ sơ căn để hồ sơ thành một cột đứng cạnh bảng khi làm lâu trên một căn; bỏ ghim thì hồ sơ nổi lại.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ có nút Ghim chỉ biểu tượng ở dòng hai đầu hồ sơ, ngay trước Trước, Sau, Đóng, trên Bảng hàng và Đã gửi; điện thoại không có nút."},
-    {"id": "AC-3", "p": "Sẽ giữ ghim và độ rộng khi đi Sau, bấm căn khác, đóng rồi mở lại, tải lại trang hay sang Đã gửi."},
-    {"id": "AC-5", "p": "Sẽ cho kéo vạch chia (chuột hay phím mũi tên) để cột rộng ra, hẹp lại, trong khoảng 320 px tới ba phần năm vùng làm việc."},
-    {"id": "AC-6", "p": "Sẽ nhớ ghim bằng một cookie chỉ có «ghim hay không» và độ rộng, không mang mã căn hay dữ liệu sàn."},
-    {"id": "AC-8", "p": "Sẽ khai nút Ghim vào sổ màn để bảng vai × màn × nút khớp."}
-  ],
-  "wont_do": [
-    {"id": "AC-2", "p": "Sẽ KHÔNG để cột ghim che dòng nào hay tự giấu cột nào của bảng; bỏ ghim thì bảng về đủ rộng, tiêu điểm và vị trí cuộn không nhảy."},
-    {"id": "AC-4", "p": "Sẽ KHÔNG che thanh trên, thanh công cụ, và KHÔNG khoá bảng, kể cả ở Toàn màn hình."},
-    {"id": "AC-7", "p": "Sẽ KHÔNG đóng hồ sơ ghim khi bấm Esc ở bảng hay ô đang sửa; trợ năng sạch ở nền sáng và tối."},
-    {"id": "OOS-1", "p": "KHÔNG làm lớp trò chuyện với AI trong ngăn — hàng sau."},
-    {"id": "OOS-2", "p": "KHÔNG ghim trên điện thoại, KHÔNG biến hồ sơ thành trang riêng."},
-    {"id": "OOS-3", "p": "KHÔNG lưu ghim lên máy chủ để theo người qua thiết bị khác."},
-    {"id": "OOS-4", "p": "KHÔNG ghim nhiều hồ sơ, KHÔNG ghim sang trái, KHÔNG kéo đổi rộng khi đang nổi."},
-    {"id": "OOS-5", "p": "KHÔNG sửa đầu hồ sơ hai dòng, thanh đáy hay nút trong hồ sơ — việc của hàng 3e."}
-  ],
-  "scope_plain": "Phần cắt ra để hàng nhỏ, đúng một việc:",
-  "coverage_plain": [
-    {"i": 0, "p": "Ba dáng: nổi, ghim, đã đóng khi đang ghim — AC-2, AC-3 đo từng dáng."},
-    {"i": 1, "p": "Năm đường đi qua căn khi đang ghim (Sau, bấm dòng khác, đóng mở, tải lại, sang Đã gửi) — AC-3 đo cả năm."},
-    {"i": 2, "p": "Khổ màn: điện thoại không có ghim, 768 chỉ khi đủ chỗ, 1024 và 1440 có; sáng, tối; Toàn màn hình — AC-1, AC-4, AC-7, AC-9."},
-    {"i": 3, "p": "Tiêu điểm và phím: đổi dáng không làm nhảy tiêu điểm hay cuộn; Esc từ hồ sơ, từ bảng, từ ô đang sửa — AC-2, AC-7."},
-    {"i": 4, "p": "Kéo bằng chuột và phím, chạm biên hẹp và rộng — AC-5."},
-    {"i": 5, "p": "Nhớ ghim: có, hỏng, ngoài giới hạn — AC-6."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Thiếu luật Esc khi đang ghim mà con trỏ ở bảng: đã thêm — Esc ở bảng hay ô đang sửa không đóng hồ sơ ghim, có bài đo."},
-    {"i": 1, "p": "Đổi dáng có thể dựng lại hồ sơ làm mất vị trí cuộn và tiêu điểm: đã thêm tiêu chí giữ cả hai, có bài đo."},
-    {"i": 2, "p": "Khổ 768 và Toàn màn hình chưa ai đo, hai giới hạn rộng có thể chọi nhau: đã thêm luật nút chỉ hiện khi đủ 800 px, đo 768 và Toàn màn hình."},
-    {"i": 3, "p": "Bảng co lại khi ghim chỉ đo trên Bảng hàng: đã đo thêm trên Đã gửi."},
-    {"i": 4, "p": "Bài so dáng chỉ có một ảnh: đã đưa đủ năm ảnh (1440, 1024 sáng tối, 360) cho người chấm."}
-  ]
+  "feature_plain": "3a · Đầu chủ bấm Ghim ở đầu hồ sơ căn để hồ sơ thành một cột đứng cạnh bảng, kéo đổi rộng được; bỏ ghim thì hồ sơ nổi lại. Ngăn nổi nay đứng dưới thanh công cụ nên không che nút Cột, Toàn màn hình."
 }
