@@ -41,11 +41,13 @@ có, đều không phải linh kiện: 34 hằng số viết hoa và 30 kiểu d
 2. `make gen` ghi lại sổ bằng công cụ đó; `make check` đỏ khi sổ không còn khớp mã nguồn. Công cụ cũ
    `tools/design_registry.mjs` bị bỏ, để một tệp chỉ có một bên ghi.
 3. Dòng sổ quyết định «cấp linh kiện» trỏ tới công cụ mới. Bài kiểm sổ và skill `inventory-ui` đọc hình dạng mới.
-4. Khai sổ token và sổ linh kiện với kit, ở `design_floor` của `_acceptance/config.yaml`.
+4. Khai sổ token và sổ linh kiện với kit, ở `design_floor` của `_acceptance/config.yaml`, trong một PR sau. Cổng trước
+   khi gộp của kit chặn một PR vừa đổi đường dẫn T3 vừa đụng `_acceptance/` mà không kèm hồ sơ; tách ra thì PR này
+   không đụng `_acceptance/`.
 
 ## Consequences
 
-- Kit đọc được cả hai sổ; trên bản sao, kho lên bậc M2.
+- Khi PR khai với kit được gộp, kit đọc được cả hai sổ; trên bản sao, kho lên bậc M2. Trước đó kho vẫn ở M1.
 - Tác tử dựng màn đọc sổ theo linh kiện thay vì theo tệp; tên tệp vẫn có ở mỗi mục.
 - `DataRegion`: trang kiểu màn «lưới» gọi nó là khuôn, sổ cũ xếp nó là organism. Sổ mới theo trang kiểu màn, nên nó là
   khuôn. Chủ kho chưa chốt điều này.
