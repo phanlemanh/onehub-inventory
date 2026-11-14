@@ -24,6 +24,7 @@ import {
   PIN_MIN_WIDTH,
   clampPinWidth,
   pinAvailable,
+  widestPin,
   useRecordPin,
   type PinState,
 } from "./record-pin";
@@ -435,7 +436,7 @@ function RecordColumn({
           panelRef={panelRef}
           defaultSize={width}
           minSize={PIN_MIN_WIDTH}
-          maxSize={`${PIN_MAX_SHARE * 100}`}
+          maxSize={area > 0 ? `${(widestPin(area) / area) * 100}` : `${PIN_MAX_SHARE * 100}`}
         >
           {/* A non-modal dialog: it has its own name and «Đóng», and the grid beside it stays usable. */}
           <aside

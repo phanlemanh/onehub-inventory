@@ -2,12 +2,12 @@
 schema_version: 2
 feature_slug: ngan-chi-tiet-ghim-thanh-cot
 verdict: REJECT
-failed_evals: ["E6","E10"]
+failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 02d01e1c4a6dfa9321b06e3d9afeb18428c60032
+verified_commit: 56dc1e95215e20741d241372fb5b4cadc3bc1472
 human_signoff:
 ---
 
@@ -20,163 +20,152 @@ human_signoff:
 | E3 | AC-3 | script | PASS |
 | E4 | AC-4 | script | PASS |
 | E5 | AC-5 | script | PASS |
-| E6 | AC-6 | test | FAIL |
+| E6 | AC-6 | test | PASS |
 | E7 | AC-6 | script | PASS |
 | E8 | AC-7 | script | PASS |
 | E9 | AC-8 | test | PASS |
-| E10 | AC-8 | script | FAIL |
+| E10 | AC-8 | script | PASS |
 | E11 | AC-9 | ui-check | PASS |
-| E12 | AC-9 | judgment | PASS (de xuat cua hoi dong, cho nguoi chot) |
+| E12 | AC-9 | judgment | PASS (đề xuất của hội đồng, chờ người chốt) |
 
 ## Evidence
 
 - eval: E1
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E1-r1
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E1-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.ghim_ngan_e2e
-  verified_at: 2026-11-14T04:01:04Z
+  verified_at: 2026-11-14T04:15:25Z
   output: |
-    cmd: npx playwright test tests/e2e/ghim-ngan.spec.ts
-    27 passed (34.4s)
+    npx playwright test tests/e2e/ghim-ngan.spec.ts
+    27 passed (33.3s)
 
 - eval: E2
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E2-r1
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E2-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.ghim_ngan_e2e
-  verified_at: 2026-11-14T04:01:04Z
+  verified_at: 2026-11-14T04:15:25Z
   output: |
-    cmd: npx playwright test tests/e2e/ghim-ngan.spec.ts
-    27 passed (34.4s)
+    npx playwright test tests/e2e/ghim-ngan.spec.ts
+    27 passed (33.3s)
 
 - eval: E3
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E3-r1
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E3-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.ghim_ngan_e2e
-  verified_at: 2026-11-14T04:01:04Z
+  verified_at: 2026-11-14T04:15:25Z
   output: |
-    cmd: npx playwright test tests/e2e/ghim-ngan.spec.ts
-    27 passed (34.4s)
+    npx playwright test tests/e2e/ghim-ngan.spec.ts
+    27 passed (33.3s)
 
 - eval: E4
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E4-r1
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E4-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.ghim_ngan_e2e
-  verified_at: 2026-11-14T04:01:04Z
+  verified_at: 2026-11-14T04:15:25Z
   output: |
-    cmd: npx playwright test tests/e2e/ghim-ngan.spec.ts
-    27 passed (34.4s)
+    npx playwright test tests/e2e/ghim-ngan.spec.ts
+    27 passed (33.3s)
 
 - eval: E5
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E5-r1
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E5-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.ghim_ngan_e2e
-  verified_at: 2026-11-14T04:01:04Z
+  verified_at: 2026-11-14T04:15:25Z
   output: |
-    cmd: npx playwright test tests/e2e/ghim-ngan.spec.ts
-    27 passed (34.4s)
+    npx playwright test tests/e2e/ghim-ngan.spec.ts
+    27 passed (33.3s)
 
 - eval: E6
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E6-r1
-  exit_code: 2
-  baseline: green
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E6-r2
+  exit_code: 0
+  baseline: n-a
   verifier: config:executors.test.unit
-  verified_at: 2026-11-14T04:01:04Z
+  verified_at: 2026-11-14T04:15:25Z
   output: |
-    cmd: make test
-    proof-gate: 1 loi, mau tep chung minh tools/proof_gate/khuon-chung-minh.md
-    FAIL tools/proof_gate/proof-gate.test.ts > kho that > luoi xanh tren chinh kho (stderr khong rong)
-    FAIL tools/proof_gate/proof-gate.test.ts > kho that > them vong implemented khai Bang hang ma thieu chung minh thi do
-    Test Files  3 failed | 94 passed (97)
-    Tests  7 failed | 1684 passed (1691)
+    make test
+    (tóm tắt chạy bộ kiểm đơn vị kết thúc thành công)
 
 - eval: E7
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E7-r1
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E7-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.ghim_ngan_e2e
-  verified_at: 2026-11-14T04:01:04Z
+  verified_at: 2026-11-14T04:15:25Z
   output: |
-    cmd: npx playwright test tests/e2e/ghim-ngan.spec.ts
-    27 passed (34.4s)
+    npx playwright test tests/e2e/ghim-ngan.spec.ts
+    27 passed (33.3s)
 
 - eval: E8
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E8-r1
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E8-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.ghim_ngan_e2e
-  verified_at: 2026-11-14T04:01:04Z
+  verified_at: 2026-11-14T04:15:25Z
   output: |
-    cmd: npx playwright test tests/e2e/ghim-ngan.spec.ts
-    27 passed (34.4s)
+    npx playwright test tests/e2e/ghim-ngan.spec.ts
+    27 passed (33.3s)
 
 - eval: E9
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E9-r1
-  exit_code: 0
-  baseline: green
-  verifier: config:executors.test.vai_man_nut
-  verified_at: 2026-11-14T04:01:04Z
-  output: |
-    cmd: npx vitest run tests/vai-man-nut-sinh.test.ts tests/vai-man-dau-nut.test.tsx tests/bo-nut-vai-man.test.ts src/modules/identity/permitted-action.test.tsx
-    cac tep kiem xanh
-
-- eval: E10
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E10-r1
-  exit_code: 2
-  baseline: green
-  verifier: config:executors.script.check
-  verified_at: 2026-11-14T04:01:04Z
-  output: |
-    cmd: make check
-    proof-gate: 1 loi, mau tep chung minh tools/proof_gate/khuon-chung-minh.md
-    FAIL tools/proof_gate/proof-gate.test.ts > kho that > luoi xanh tren chinh kho
-    FAIL tools/proof_gate/proof-gate.test.ts > kho that > them vong implemented khai Bang hang ma thieu chung minh thi do
-    Test Files  3 failed | 94 passed (97)
-    Tests  7 failed | 1684 passed (1691)
-
-- eval: E11
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E11-r1
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E9-r2
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check.browser
-  verified_at: 2026-11-14T04:01:04Z
-  screenshot: evidence/E11-step1.png
+  verifier: config:executors.test.vai_man_nut
+  verified_at: 2026-11-14T04:15:25Z
+  output: |
+    npx vitest run tests/vai-man-nut-sinh.test.ts tests/vai-man-dau-nut.test.tsx tests/bo-nut-vai-man.test.ts src/modules/identity/permitted-action.test.tsx
+    (bốn tệp kiểm chạy xong thành công)
+
+- eval: E10
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E10-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.check
+  verified_at: 2026-11-14T04:15:25Z
+  output: |
+    make check
+    CODEOWNERS matches governance/autonomy.yaml
+
+- eval: E11
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-E11-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.ui-check
+  verified_at: 2026-11-14T04:15:25Z
+  screenshot: evidence/ghim-1440-sang.png
   observed: |
-    E11-step1 (1440 sang): ho so 0905 · S1.01 la cot lien mep phai duoi thanh tren, co vach chia manh va tay cam o mep trai cot; bang ben trai khong bi che; dong hai dau ho so co lien ket, nut bo ghim, Truoc, Sau, Dong.
-    E11-step2 (1440 toi) va E11-step3, E11-step4 (1024 sang, toi): cung dang cot, vach chia va tay cam thay ro, bang khong bi che. E11-step5 (360 sang): ho so toan man, dong nut chi co lien ket, Truoc, Sau, Dong, khong nut ghim, khong vach chia. Nam khung khop expected.
+    I opened all 5 frames with Read. ghim-1440-sang: the profile (0905 · S1.01) is a column flush to the right edge, directly under the top bar, with a thin divider line and a small grip handle at its left edge (x~919). The table on the left is fully visible and not covered. Row two of the profile header reads: link icon, pinned/unpin icon, Trước, Sau, Đóng. ghim-1440-toi: same layout in dark theme, divider and grip visible, table intact, readable. ghim-1024-sang: same column layout; the table is narrowed (toolbar wraps, columns Căn and Toà visible) but not covered by the profile; the pin icon sits before Trước, Sau, Đóng; the grip is at x~606. ghim-1024-toi: same in dark. ho-so-360-sang: profile is full screen with no table behind it; header row has link icon, Trước, Sau, Đóng and no Ghim button. This matches Expected.
   network_observed: no-app-traffic
+
+- eval: E12
+  judged_by: hội đồng ba góc nhìn (fresh context), đề xuất PASS
+  verdict: PASS
+  rationale: Cả ba góc nhìn thấy cột hồ sơ liền mép phải, vạch chia mảnh có tay cầm, nút Ghim ở dòng hai trước Trước, Sau, Đóng; ảnh 360 toàn màn không có nút Ghim.
+  human_override:  # chi nguoi ghi
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-SUITE-build-r1
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-SUITE-build-r2
   exit_code: 0
-  verified_at: 2026-11-14T04:01:04Z
+  verified_at: 2026-11-14T04:15:25Z
 
 - cmd: make e2e
-  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-SUITE-make_e2e-r1
-  exit_code: 2
-  verified_at: 2026-11-14T04:01:04Z
-  output: |
-    1035 passed, 679 skipped, 2 failed (7.4m), ca hai o khổ 1440
-    [1440] tests/e2e/behavior.spec.ts:117 behavior > focus check fails when focus is left elsewhere
-    [1440] tests/e2e/ho-so-du-thong-tin.spec.ts:227 E8 the record only reads: bao "unexpected button: Ghim thành cột" (nut Ghim moi bi coi la nut la o ho so chi doc)
+  run_id: minted-ngan-chi-tiet-ghim-thanh-cot-SUITE-make_e2e-r2
+  exit_code: 0
+  verified_at: 2026-11-14T04:15:25Z
 
-Lệnh fail không gắn eval nào: make e2e (khong gan eval). Hai lenh khac that bai deu da gan eval: make test (E6), make check (E10).
+## Judge panels (đề xuất)
 
-### Judgment
+E12 (AC-9) — đề xuất PASS; human_override để trống cho người chốt ở Cổng 2.
 
-- eval: E12
-  judged_by: hoi dong de xuat (3 lens), cho nguoi chot
-  proposal: PASS
-  - domain-correctness: PASS — Bốn ảnh ghim (1440 sáng/tối, 1024 sáng/tối) đều có cột liền mép phải, không bóng nổi, có vạch chia mảnh với tay cầm giống app-shell-11, và nút Bỏ ghim nằm ở dòng hai ngay trước Trước/Sau/Đóng đúng AC-1. Ảnh ho-so-360-sang là hồ sơ toàn màn, không có nút Ghim. Vạch chia ở nền tối mảnh và mờ nhưng vẫn thấy, ngang mức vạch trong ảnh tham chiếu.
-  - operational-feasibility: PASS — Cả bốn ảnh ghim (1440 và 1024, sáng và tối) có cột hồ sơ liền mép phải, không bóng nổi, và vạch chia mảnh có tay cầm giữa bảng và cột. Dáng này giống cột Details của app-shell-11. Tay cầm vẫn thấy được ở nền tối, tuy mờ hơn. Nút Ghim (biểu tượng bỏ ghim) nằm ở dòng hai, sau nút liên kết của bản ghi và ngay trước Trước, Sau, Đóng, đúng chỗ AC-1. Ảnh ho-so-360-sang là hồ sơ toàn màn, không có nút Ghim.
-  - spec-alignment: PASS — Bốn ảnh 1440 và 1024, sáng và tối, đều cho thấy cột chi tiết liền mép phải, không bóng nổi, có vạch mảnh kèm tay cầm giữa bảng và cột như cột Details của app-shell-11. Tay cầm thấy rõ ở nền tối (1024 tối hơi mờ nhưng vẫn nhìn ra). Nút Ghim đứng sau nút liên kết và ngay trước Trước, Sau, Đóng ở dòng hai, đúng AC-1. Ảnh ho-so-360-sang là hồ sơ toàn màn, không có nút Ghim.
-  human_override:  # chi nguoi ghi
+- domain-correctness: PASS — Cả bốn ảnh (ghim-1440-sang, ghim-1440-toi, ghim-1024-sang, ghim-1024-toi) có cùng dáng với cột Details của app-shell-11: cột liền mép phải, không bóng nổi, vạch chia mảnh có tay cầm giữa nội dung và cột (x≈919 ở 1440, x≈605 ở 1024), tay cầm thấy rõ cả nền sáng lẫn tối. Ở ảnh tối tôi chỉ thấy rõ tay cầm, không chắc thấy đường vạch mảnh vì không phóng to được. Nút Ghim nằm ở dòng hai của đầu hồ sơ, sau nút liên kết và trước Trước, Sau, Đóng, đúng AC-1. Ảnh ho-so-360-sang là hồ sơ toàn màn và không có nút Ghim.
+- operational-feasibility: PASS — Cả bốn ảnh ghim (1440 và 1024, sáng và tối) cho thấy cột hồ sơ liền mép phải, không bóng nổi. Có vạch chia mảnh với tay cầm nhỏ giữa bảng và cột, nhìn thấy được cả ở nền tối, giống cột Details của app-shell-11. Dòng hai của đầu hồ sơ có nút liên kết, rồi nút Ghim chỉ biểu tượng (đang ở trạng thái «Bỏ ghim»), rồi Trước, Sau, Đóng, đúng chỗ AC-1. Ảnh ho-so-360-sang là hồ sơ toàn màn, không có nút Ghim.
+- spec-alignment: PASS — Cả bốn ảnh ghim (1440 sáng/tối, 1024 sáng/tối) cho thấy cột chi tiết liền mép phải, không bóng nổi. Giữa bảng và cột có vạch chia mảnh với tay cầm nhỏ ở giữa, giống cột Details của app-shell-11. Vạch và tay cầm vẫn thấy được ở nền tối, tuy mờ. Dòng hai của đầu hồ sơ có nút link, rồi nút Ghim (biểu tượng ghim gạch chéo, trạng thái "Bỏ ghim"), rồi Trước, Sau, Đóng, đúng chỗ AC-1 đặt. Ảnh ho-so-360-sang là hồ sơ toàn màn, dòng hai chỉ có link, Trước, Sau, Đóng, không có nút Ghim.
 
 ## Known limits
 
@@ -184,12 +173,10 @@ Lệnh fail không gắn eval nào: make e2e (khong gan eval). Hai lenh khac tha
 
 ## Analyst
 
-Eval không phân biệt (xanh trên cả bản mới lẫn bản cũ): E9 (npx vitest run tests/vai-man-nut-sinh.test.ts tests/vai-man-dau-nut.test.tsx tests/bo-nut-vai-man.test.ts src/modules/identity/permitted-action.test.tsx). Cần viết lại để khẳng định hành vi mới, hoặc xác nhận là lưới hồi quy có chủ ý.
+carried tu round 1 — baseline khong do lai round nay (evals.yaml khong doi tu lan baseline cuoi). Mọi field baseline của eval đều ghi n-a vì round này không đo.
 
-Baseline không đo:
-- npx playwright test tests/e2e/ghim-ngan.spec.ts: bo qua baseline: tep tests/e2e/ghim-ngan.spec.ts co o cay dang kiem nhung chua co o merge-base 66e5a8df42fe0b0d470c8c92b5f88bc3fcd140d9 — eval moi, chay tren code cu khong phan biet gi
-
-Nhận định: E6 và E10 xanh trên bản cũ (baseline green) nhưng đỏ trên bản mới, nên là hồi quy do thay đổi này: cổng chứng minh (proof-gate) báo lỗi ở mẫu tệp chứng minh tools/proof_gate/khuon-chung-minh.md. make e2e cũng có hai ca đỏ ở khổ 1440: nút Ghim thành cột mới bị bài kiểm "hồ sơ chỉ đọc" coi là nút lạ (ho-so-du-thong-tin.spec.ts:227), và ca kiểm tiêu điểm behavior.spec.ts:117.
+Eval không phân biệt (xanh cả trên HEAD lẫn baseline, theo danh sách máy cung cấp):
+- E9 (AC-8): lệnh vitest cho bộ sinh bảng vai × màn × nút. Cần viết lại để khẳng định hành vi mới, hoặc xác nhận đây là regression-guard có chủ ý.
 
 ## Variance
 
@@ -197,4 +184,5 @@ none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: E6, E10 failed — cổng proof-gate đỏ trên chính kho (mẫu tệp chứng minh), kéo theo make test và make check; make e2e còn hai ca đỏ ở 1440 (nút Ghim bị bài kiểm hồ sơ chỉ đọc coi là nút lạ, và ca tiêu điểm). Returned to implementation.
+Round 1: sửa theo vòng một (bằng chứng đã gửi, nút chỉ đọc, tiêu điểm chỉ cho dòng bị thay) — commit 56dc1e9.
+Round 2: mọi lệnh máy xanh và E12 được đề xuất PASS, nhưng phép kiểm xét lại tìm thấy lỗ hổng chứng minh trong hợp đồng (AC-1, AC-2, AC-5, AC-7 — xem review-findings.md). Verdict REJECT, trả về triển khai.

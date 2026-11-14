@@ -82,6 +82,11 @@ describe("clampPinWidth", () => {
     expect(clampPinWidth(5000, 1400)).toBe(840);
   });
 
+  it("never leaves less than 480 px of grid beside it", () => {
+    expect(clampPinWidth(5000, 821)).toBe(341);
+    expect(clampPinWidth(360, 821)).toBe(341);
+  });
+
   it("keeps a width inside the bounds", () => {
     expect(clampPinWidth(560.4, 1400)).toBe(560);
   });

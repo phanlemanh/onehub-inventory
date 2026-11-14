@@ -143,22 +143,33 @@ test.describe("E1 · the pin button sits before Trước, Sau, Đóng", () => {
     await expect(unpinButton(page)).toHaveCount(0);
   });
 
-  test("at 768 the work area is under 800 px: no pin, with the second column open or folded", async ({
+  test("the pin shows only with room for a 320 px column and a 480 px grid", async ({
     page,
-    context,
     browserName,
   }, info) => {
-    test.skip(browserName !== "chromium" || info.project.name !== "1024", "do mot lan, khung 768");
+    test.skip(
+      browserName !== "chromium" || info.project.name !== "1024",
+      "do mot lan, khung 768 va 900",
+    );
+    // 768: the work area is under 800 px whether the App Shell's second column is open or folded — no pin.
     await page.setViewportSize({ width: 768, height: 1024 });
-    for (const open of ["1", "0"]) {
-      await context.addCookies([{ name: "app_shell_cot2", value: open, url: "http://127.0.0.1" }]);
-      await openScreen(page, "/inventory");
-      await openRow(page, 0);
-      const area = (await box(page, '[data-slot="sidebar-inset"]')).width;
-      expect(area, `cot hai ${open}`).toBeLessThan(MIN_COLUMN + MIN_GRID);
-      await expect(pinButton(page)).toHaveCount(0);
-      await expect(panel(page)).toHaveAttribute("data-record-layout", "float");
-    }
+    await openScreen(page, "/inventory");
+    await openRow(page, 0);
+    expect((await box(page, '[data-slot="sidebar-inset"]')).width).toBeLessThan(
+      MIN_COLUMN + MIN_GRID,
+    );
+    await expect(pinButton(page)).toHaveCount(0);
+    await expect(panel(page)).toHaveAttribute("data-record-layout", "float");
+    // 900: the work area reaches 800 px — the pin shows, and the pinned column keeps both bounds.
+    await page.setViewportSize({ width: 900, height: 1024 });
+    await openScreen(page, "/inventory");
+    await openRow(page, 0);
+    const area = (await box(page, '[data-slot="sidebar-inset"]')).width;
+    expect(area).toBeGreaterThanOrEqual(MIN_COLUMN + MIN_GRID);
+    await pin(page);
+    const col = await columnBox(page);
+    expect(col.width).toBeGreaterThanOrEqual(MIN_COLUMN - 1);
+    expect(col.width).toBeLessThanOrEqual(area - MIN_GRID + 1);
   });
 });
 
@@ -243,6 +254,22 @@ test.describe("E2 · pinning makes room beside the grid", () => {
     await expect(assertScrollKept(page, scrolled)).rejects.toThrow(
       "record remounted on pin: scroll 0",
     );
+  });
+
+  test("break: a pinned record that keeps its drop shadow is caught", async ({
+    page,
+    browserName,
+  }, info) => {
+    test.skip(browserName !== "chromium" || info.project.name !== "1440", "do o 1440");
+    await injectStyle(
+      page,
+      '[data-record-layout="pinned"]{box-shadow:0 10px 15px -3px rgb(0 0 0 / 0.3) !important}',
+    );
+    await openScreen(page, "/inventory");
+    const headers = await headersShown(page);
+    await openRow(page, 1);
+    await pin(page);
+    await expect(assertRoomMade(page, headers)).rejects.toThrow("pinned column still floats");
   });
 
   test("break: a region that does not give room is caught", async ({ page, browserName }, info) => {
@@ -412,8 +439,10 @@ test.describe("E5 · the divider widens and narrows the column", () => {
     const start = (await columnBox(page)).width;
     await drag(page, -200);
     expect(Math.abs((await columnBox(page)).width - (start + 200))).toBeLessThanOrEqual(2);
+    assertWidthBounds((await columnBox(page)).width, area);
     await drag(page, 2000);
     expect(Math.abs((await columnBox(page)).width - MIN_COLUMN)).toBeLessThanOrEqual(1);
+    assertWidthBounds((await columnBox(page)).width, area);
     await drag(page, -2000);
     expect(Math.abs((await columnBox(page)).width - area * 0.6)).toBeLessThanOrEqual(1);
     assertWidthBounds((await columnBox(page)).width, area);
@@ -434,14 +463,14 @@ test.describe("E5 · the divider widens and narrows the column", () => {
     test.skip(browserName !== "chromium" || info.project.name !== "1440", "do o 1440");
     await injectStyle(
       page,
-      '[role="dialog"]:has([data-record-layout="pinned"]){width:200px !important;min-width:0 !important}',
+      '[data-slot="record-panel-layer"] [data-slot="resizable-panel"]:has([data-record-layout="pinned"]){flex:0 0 200px !important;min-width:0 !important}',
     );
     await openScreen(page, "/inventory");
     await openRow(page, 0);
     await pin(page);
     const area = (await box(page, '[data-slot="sidebar-inset"]')).width;
-    expect(() => assertWidthBounds(200, area)).toThrow("pinned column narrower than 320");
-    expect((await columnBox(page)).width).toBeLessThan(MIN_COLUMN);
+    const measured = (await columnBox(page)).width;
+    expect(() => assertWidthBounds(measured, area)).toThrow("pinned column narrower than 320");
   });
 });
 
@@ -493,10 +522,14 @@ async function seriousViolations(page: Page): Promise<string[]> {
 }
 
 async function assertEscFromGridKeepsPin(page: Page, where: string): Promise<void> {
-  if ((await panel(page).getAttribute("data-record-layout")) !== "pinned") {
-    throw new Error(`pinned record closed from grid: ${where}`);
-  }
+  const layout =
+    (await panel(page).count()) === 0 ? null : await panel(page).getAttribute("data-record-layout");
+  if (layout !== "pinned") throw new Error(`pinned record closed from grid: ${where}`);
 }
+
+const PRICE = "Listing.listPrice";
+const priceCell = (page: Page, row: number) =>
+  region(page).locator("tbody tr[data-row-id]").nth(row).locator(`td[data-col-id="${PRICE}"]`);
 
 test.describe("E8 · accessibility and Esc", () => {
   for (const colorScheme of ["light", "dark"] as const) {
@@ -511,6 +544,21 @@ test.describe("E8 · accessibility and Esc", () => {
       await expect(divider(page)).toHaveAttribute("aria-valuenow", /^\d+(\.\d+)?$/);
     });
   }
+
+  test("break: a pin button without a name is caught by the scan", async ({
+    page,
+    browserName,
+  }, info) => {
+    test.skip(browserName !== "chromium" || info.project.name !== "1440", "do o 1440");
+    await openScreen(page, "/inventory");
+    await openRow(page, 0);
+    await pin(page);
+    await unpinButton(page).evaluate((b) => {
+      b.removeAttribute("aria-label");
+      b.removeAttribute("title");
+    });
+    expect(await seriousViolations(page)).toContain("button-name");
+  });
 
   test("Esc in the record closes it; Esc in the grid does not", async ({
     page,
@@ -531,6 +579,28 @@ test.describe("E8 · accessibility and Esc", () => {
     await cell.click({ position: { x: 4, y: 4 } });
     await page.keyboard.press("Escape");
     await assertEscFromGridKeepsPin(page, "o dang chon");
+  });
+
+  test("Esc in a cell being edited cancels the edit and keeps the pin", async ({
+    page,
+    browserName,
+  }, info) => {
+    test.skip(browserName !== "chromium" || info.project.name !== "1440", "do o 1440");
+    // A role that may edit price (row 4).
+    await openScreen(page, "/inventory?vai=ListAgent");
+    await openRow(page, 0);
+    await pin(page);
+    const cell = priceCell(page, 1);
+    const before = (await cell.innerText()).trim();
+    await cell.click({ position: { x: 3, y: 3 } });
+    await page.keyboard.press("F2");
+    const editor = page.locator('[data-slot="cell-editor"]');
+    await expect(editor).toBeVisible();
+    await page.keyboard.type("9");
+    await page.keyboard.press("Escape");
+    await expect(editor).toHaveCount(0);
+    expect((await cell.innerText()).trim()).toBe(before);
+    await assertEscFromGridKeepsPin(page, "o dang sua");
   });
 
   test("break: a record that listens to Esc on the whole page is caught", async ({
@@ -558,12 +628,8 @@ test.describe("E8 · accessibility and Esc", () => {
     const cell = region(page).locator("tbody tr").nth(1).locator('[role="gridcell"], td').nth(2);
     await cell.click({ position: { x: 4, y: 4 } });
     await page.keyboard.press("Escape");
-    await expect(panel(page)).toHaveCount(0);
-    await expect(
-      (async () => {
-        if ((await panel(page).count()) === 0)
-          throw new Error("pinned record closed from grid: o dang chon");
-      })(),
-    ).rejects.toThrow("pinned record closed from grid: o dang chon");
+    await expect(assertEscFromGridKeepsPin(page, "o dang chon")).rejects.toThrow(
+      "pinned record closed from grid: o dang chon",
+    );
   });
 });

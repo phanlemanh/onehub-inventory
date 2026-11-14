@@ -44,10 +44,17 @@ export function assertNoRecordData(cookieLine: string, recordId: string): void {
   if (cookieLine.includes(recordId)) throw new Error("pin cookie carries record data");
 }
 
+/** The narrowest grid beside a pinned column, in px (PIN_MIN_AREA less the narrowest column). */
+export const PIN_MIN_GRID = PIN_MIN_AREA - PIN_MIN_WIDTH;
+
+/** The widest pinned column for a work area of `area` px: three fifths, and never less than 480 px of grid beside it. */
+export function widestPin(area: number): number {
+  return Math.max(PIN_MIN_WIDTH, Math.min(area * PIN_MAX_SHARE, area - PIN_MIN_GRID));
+}
+
 /** Keeps a pinned width inside its bounds for a work area of `area` px. */
 export function clampPinWidth(width: number, area: number): number {
-  const widest = Math.max(PIN_MIN_WIDTH, area * PIN_MAX_SHARE);
-  return Math.round(Math.min(Math.max(width, PIN_MIN_WIDTH), widest));
+  return Math.round(Math.min(Math.max(width, PIN_MIN_WIDTH), widestPin(area)));
 }
 
 /** Whether the work area is wide enough for the pin button to show. */
