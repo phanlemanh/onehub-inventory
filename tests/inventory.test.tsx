@@ -155,7 +155,12 @@ function renderGrid(rows: GridRow[]) {
 
 /** What the inventory grid shows: headers, the one continuous run, the footer count, typed cells. */
 function checkGrid(container: HTMLElement, n: number): void {
-  const headers = [...container.querySelectorAll("thead th")].map((th) => th.textContent?.trim());
+  // Row 2e: the filter row sits in the header cells at all times; a header's name is the cell without its filter box.
+  const headers = [...container.querySelectorAll("thead th")].map((th) => {
+    const copy = th.cloneNode(true) as HTMLElement;
+    copy.querySelectorAll('[data-slot="column-filter"]').forEach((el) => el.remove());
+    return copy.textContent?.trim();
+  });
   if (headers[0] !== "#") throw new Error("row-number column missing");
   const data = headers.slice(1);
   if (data.join("|") !== APPROVED_HEADERS.join("|")) throw new Error(`headers: ${data.join("|")}`);

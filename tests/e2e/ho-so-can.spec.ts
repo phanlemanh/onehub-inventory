@@ -73,6 +73,7 @@ async function floatGeometry(page: Page): Promise<{
   viewport: number;
   viewportHeight: number;
   searchHit: boolean;
+  filterHit: boolean;
   accountHit: boolean;
   overflow: number;
 }> {
@@ -100,7 +101,11 @@ async function floatGeometry(page: Page): Promise<{
       areaBottom: area.getBoundingClientRect().bottom,
       viewport: window.innerWidth,
       viewportHeight: window.innerHeight,
-      searchHit: hits(document.querySelector('[data-slot="data-region"] input[type="search"]')),
+      // Row 2e: searching lives in the top bar's ⌘K box, and the region is typed into through its filter boxes.
+      searchHit: hits(document.querySelector('[data-slot="unit-jump"] button')),
+      filterHit: hits(
+        document.querySelector('[data-slot="data-region"] [data-slot="column-filter"] input'),
+      ),
       accountHit: hits(
         document.querySelector('[data-slot="app-shell-top-bar"] [data-slot^="account"]'),
       ),
@@ -134,6 +139,7 @@ function assertFloat(g: Awaited<ReturnType<typeof floatGeometry>>): void {
     throw new Error(`record width ${g.aside.width} of ${g.viewport}`);
   }
   if (!g.searchHit) throw new Error("record covers the search box");
+  if (!g.filterHit) throw new Error("record covers the filter box");
   if (!g.accountHit) throw new Error("record covers the account corner");
   if (g.overflow > 0) throw new Error(`record scrolls sideways by ${g.overflow}px`);
 }
@@ -293,11 +299,11 @@ test.describe("E2 · the record floats beside the grid", () => {
     // The panel measures the top bar once it has mounted; wait for that, then the check must hold.
     await expect.poll(async () => (await floatGeometry(page)).aside.top).toBeGreaterThan(0);
     assertFloat(await floatGeometry(page));
-    // Search while the record is open: the rows change.
+    // Filter the Căn column while the record is open (row 2e: the region has no search box): the rows change.
     const before = await openers(page).count();
-    await page.locator('[data-slot="data-region"] input[type="search"]').fill("S1.01");
+    await page.getByLabel("Lọc cột Căn").fill("S1.01");
     await expect.poll(() => openers(page).count()).not.toBe(before);
-    await page.locator('[data-slot="data-region"] input[type="search"]').fill("");
+    await page.getByLabel("Lọc cột Căn").fill("");
     // Another unit code opens that unit without closing.
     const first = openers(page).first();
     const id = await first.getAttribute("data-record-open");

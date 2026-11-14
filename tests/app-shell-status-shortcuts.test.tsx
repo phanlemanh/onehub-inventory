@@ -71,7 +71,7 @@ function gridStatusOrder(): string[] {
       rows={rows}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: /^Lọc/ }));
+  // Row 2e: the filter row is always shown, so the status filter's values open straight away.
   const trigger = document.querySelector('[data-filter-mode="values"] button') as HTMLElement;
   act(() => {
     fireEvent.pointerDown(trigger, { button: 0, pointerType: "mouse" });

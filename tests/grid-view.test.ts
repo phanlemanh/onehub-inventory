@@ -215,7 +215,7 @@ describe("filterRows on the 60 sample rows", () => {
         expect(expected.length, name).toBeGreaterThan(0);
         expect(expected.length, name).toBeLessThan(60);
       } else expect(expected.length, name).toBe(60);
-      expect(ids(filterRows(rows, columns, filters, "", NOW)), name).toEqual(expected);
+      expect(ids(filterRows(rows, columns, filters, NOW)), name).toEqual(expected);
     });
     expect(filterIsInvalid(col("Listing.listPrice"), "5 tỷ")).toBe(true);
     expect(filterIsInvalid(col("Listing.listPrice"), "<=5")).toBe(false);
@@ -226,7 +226,6 @@ describe("filterRows on the 60 sample rows", () => {
       rows,
       columns,
       { "Listing.standardStatus": ["Active"], "Listing.listPrice": "<=5" },
-      "",
       NOW,
     );
     expect(ids(both)).toEqual(
@@ -239,7 +238,7 @@ describe("filterRows on the 60 sample rows", () => {
       ),
     );
     for (const partial of [">", "2-", "<="])
-      expect(filterRows(rows, columns, { "Unit.livingArea": partial }, "", NOW)).toHaveLength(60);
+      expect(filterRows(rows, columns, { "Unit.livingArea": partial }, NOW)).toHaveLength(60);
   });
 
   /** The three promises a broken filter would break, each measured on the real rows. */
@@ -258,7 +257,7 @@ describe("filterRows on the 60 sample rows", () => {
       throw new Error("filters do not stack");
   }
   it("the filter check fails on marks kept, money in dong and filters joined by or", () => {
-    expect(() => checkFilter((f) => filterRows(rows, columns, f, "", NOW))).not.toThrow();
+    expect(() => checkFilter((f) => filterRows(rows, columns, f, NOW))).not.toThrow();
     const noFold = (f: ColumnFilters) =>
       rows.filter((r) =>
         String(r["Listing.buildingName"])
@@ -267,24 +266,24 @@ describe("filterRows on the 60 sample rows", () => {
       );
     expect(() =>
       checkFilter((f) =>
-        "Listing.buildingName" in f ? noFold(f) : filterRows(rows, columns, f, "", NOW),
+        "Listing.buildingName" in f ? noFold(f) : filterRows(rows, columns, f, NOW),
       ),
     ).toThrow("text filter not accent-folded");
     const inDong = (f: ColumnFilters) =>
       "Listing.listPrice" in f
         ? rows.filter((r) => num(r, "Listing.listPrice") <= 5)
-        : filterRows(rows, columns, f, "", NOW);
+        : filterRows(rows, columns, f, NOW);
     expect(() => checkFilter(inDong)).toThrow("money rule not in billions");
     const orJoined = (f: ColumnFilters) =>
       Object.keys(f).length > 1
         ? [
             ...new Set(
               Object.entries(f).flatMap(([k, v]) =>
-                filterRows(rows, columns, { [k]: v } as ColumnFilters, "", NOW),
+                filterRows(rows, columns, { [k]: v } as ColumnFilters, NOW),
               ),
             ),
           ]
-        : filterRows(rows, columns, f, "", NOW);
+        : filterRows(rows, columns, f, NOW);
     expect(() => checkFilter(orJoined)).toThrow("filters do not stack");
     expect(foldText("Toà Đông")).toBe("toa dong");
   });

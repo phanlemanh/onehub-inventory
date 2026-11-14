@@ -10,7 +10,9 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
-const SLUG = "bang-hang-ban-doc";
+// Row 2e renamed the state «Tìm không ra» to «Không có dòng nào khớp» and re-proved Bảng hàng's matrix in its own record
+// (bo-o-tim-cua-vung, màn mẫu mới); the signed row-2 record keeps the old name and no longer proves the current table.
+const SLUG = "bo-o-tim-cua-vung";
 const SCREEN = "inventory";
 const CONTRACT = `_acceptance/${SLUG}/contract.md`;
 const PROOF = `_acceptance/${SLUG}/chung-minh-man.md`;

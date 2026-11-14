@@ -365,7 +365,7 @@ test.describe("sheet axe", () => {
     [
       "lọc mở",
       async (page) => {
-        await page.getByRole("button", { name: /^Lọc/ }).click();
+        // Row 2e: the filter row is always there; the state is a rule typed in it.
         await page.getByLabel("Lọc cột Giá chào").fill("<=5");
       },
     ],
@@ -389,7 +389,6 @@ test.describe("sheet axe", () => {
 
   test("axe catches a filter box without a name", async ({ page }) => {
     await openInventory(page);
-    await page.getByRole("button", { name: /^Lọc/ }).click();
     await page.getByLabel("Lọc cột Giá chào").evaluate((el) => {
       el.removeAttribute("aria-label");
       el.removeAttribute("placeholder");
@@ -399,10 +398,16 @@ test.describe("sheet axe", () => {
 });
 
 test.describe("sheet tab stops", () => {
-  /** Tab from the search box through the grid region, naming each stop until the stop leaves the region. */
+  /**
+   * Tab from the region's first toolbar button through the grid region, naming each stop until the stop leaves the
+   * region. Row 2e: the region has no search box, so the walk starts on the toolbar's first button, named first.
+   */
   async function tabStops(page: Page): Promise<string[]> {
-    await page.getByRole("searchbox").focus();
-    const names: string[] = [];
+    const first = page.locator('[data-slot="region-toolbar"] button').first();
+    await first.focus();
+    const names: string[] = [
+      ((await first.getAttribute("aria-label")) || (await first.textContent()) || "").trim(),
+    ];
     for (let i = 0; i < 60; i += 1) {
       await page.keyboard.press("Tab");
       const name = await page.evaluate(() => {
@@ -438,27 +443,22 @@ test.describe("sheet tab stops", () => {
     "Phòng ngủ",
     "Xác nhận lúc",
   ];
-  const tools = () => [
-    "Lọc",
-    "Cột",
-    "Nhóm theo Toà",
-    ...(WIDE.has(width()) ? ["Toàn màn hình"] : []),
-  ];
+  const tools = () => ["Cột", "Nhóm theo Toà", ...(WIDE.has(width()) ? ["Toàn màn hình"] : [])];
 
-  for (const [name, filterOpen] of [
+  // Row 2e: the filter row is always there, so both ways of opening reach the filter boxes; «Lọc» is gone.
+  for (const [name, typed] of [
     ["mặc định", false],
-    ["lọc mở", true],
+    ["đang lọc", true],
   ] as const)
-    test(`tab reaches the tools, headers${filterOpen ? ", filter boxes" : ""} and the grid: ${name}`, async ({
-      page,
-    }) => {
+    test(`tab reaches the tools, headers, filter boxes and the grid: ${name}`, async ({ page }) => {
       await openInventory(page);
-      if (filterOpen) await page.getByRole("button", { name: /^Lọc/ }).click();
+      if (typed) await page.getByLabel("Lọc cột Giá chào").fill("<=5");
       const stops = await tabStops(page);
+      expect(stops).not.toContain("Lọc");
       const expected = [
-        ...tools().map((t) => (t === "Lọc" && filterOpen ? "Lọc" : t)),
+        ...tools(),
         ...HEADERS,
-        ...(filterOpen ? HEADERS.filter((h) => h !== "Trạng thái").map((h) => `Lọc cột ${h}`) : []),
+        ...HEADERS.filter((h) => h !== "Trạng thái").map((h) => `Lọc cột ${h}`),
         "grid",
       ];
       checkStops(
@@ -469,7 +469,6 @@ test.describe("sheet tab stops", () => {
 
   test("tab-stop check fails when a filter box leaves the order", async ({ page }) => {
     await openInventory(page);
-    await page.getByRole("button", { name: /^Lọc/ }).click();
     await page.getByLabel("Lọc cột Giá chào").evaluate((el) => el.setAttribute("tabindex", "-1"));
     const stops = await tabStops(page);
     expect(() => checkStops(stops, ["Lọc cột Giá chào", "grid"])).toThrow(
@@ -618,8 +617,9 @@ test.describe("sheet footer in view", () => {
     page,
   }) => {
     await openInventory(page);
+    // Row 2e: the filter row is always there; the second pass has a rule typed in it.
     for (const filters of [false, true]) {
-      if (filters) await page.getByRole("button", { name: "Lọc", exact: true }).click();
+      if (filters) await page.getByLabel("Lọc cột Giá chào").fill("<=9");
       await (await cellOf(page, 3, "Listing.unitNumber")).click({ position: { x: 3, y: 3 } });
       await page.keyboard.press("Shift+ArrowDown");
       await expect(page.locator('[data-slot="region-footer"]')).toContainText("2 ô đã chọn");
@@ -641,24 +641,20 @@ test.describe("sheet footer in view", () => {
   });
 });
 
-// Row 2c (luu-goc-nhin-cot-hai), E13 — Ngoài-4 of 2a: a search that leaves no row keeps the search box, its focus and
-// the filter boxes; one rule mended brings the rows back.
+// Row 2c (luu-goc-nhin-cot-hai), E13 — Ngoài-4 of 2a: a filter that leaves no row keeps the box typed in, its focus and
+// the other filter boxes; one rule mended brings the rows back. Row 2e: the box typed in is the Căn filter, at every width.
 test.describe("no match keeps filters", () => {
-  /** The filter boxes are still there to mend (seen at 1024 and 1440; the Lọc button on a phone). */
+  /** The filter boxes are still there to mend, at every width (row 2e: the filter row is always shown). */
   async function checkFilters(page: Page): Promise<void> {
     const boxes = page.locator('[data-slot="data-region"] [data-slot="column-filter"]');
-    const toggle = page.locator('[data-slot="filter-toggle"]');
-    const ok = WIDE.has(width())
-      ? (await boxes.count()) === 8 && (await boxes.first().isVisible())
-      : (await toggle.count()) === 1 && (await toggle.isEnabled());
+    const ok = (await boxes.count()) === 8 && (await boxes.first().isVisible());
     if (!ok) throw new Error("filters gone on no match");
   }
 
-  test("search «zzz» letter by letter, then mend the tower filter", async ({ page }) => {
+  test("Căn «zzz» letter by letter, then mend the tower filter", async ({ page }) => {
     await openInventory(page);
-    await page.getByRole("button", { name: /^Lọc/ }).click();
     if (WIDE.has(width())) await page.getByLabel("Lọc cột Toà").fill("S1.0");
-    const box = page.getByRole("searchbox");
+    const box = page.getByLabel("Lọc cột Căn");
     await box.click();
     await page.keyboard.type("zzz", { delay: 30 });
     await expect(page.getByText("Không có dòng nào khớp")).toBeVisible();
@@ -682,9 +678,7 @@ test.describe("no match keeps filters", () => {
     // Break: the filter boxes removed while nothing matches.
     await box.fill("zzz");
     await page.evaluate(() =>
-      document
-        .querySelectorAll('[data-slot="column-filter"], [data-slot="filter-toggle"]')
-        .forEach((el) => el.remove()),
+      document.querySelectorAll('[data-slot="column-filter"]').forEach((el) => el.remove()),
     );
     await expect(checkFilters(page)).rejects.toThrow("filters gone on no match");
   });
@@ -756,4 +750,79 @@ test.describe("leaving full screen restores the shell", () => {
       );
       await expect(page.locator('[data-slot="app-shell-top-bar"]')).toBeVisible();
     });
+});
+
+// Row 2e (bo-o-tim-cua-vung), E8 — AC-5: on a phone the filter row sits under the headers and scrolls with the grid;
+// typing in a box filters as at 1440, and no box is covered or cut.
+test.describe("phone filter row", () => {
+  test.skip(() => WIDE.has(width()), "measured at 360 and 414");
+
+  const PHONES = ["360", "414"];
+  const filterBox = (page: Page, header: string) => page.getByLabel(`Lọc cột ${header}`);
+  const headerCell = (page: Page, field: string) =>
+    page.locator(`[data-slot="data-region-body"] thead th[data-col-id="${field}"]`).first();
+
+  /** The filter row scrolls with the grid: the price box comes into view beside its header, whole and wide enough. */
+  async function checkScrollsWithGrid(page: Page): Promise<void> {
+    const viewport = page
+      .locator('[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]')
+      .first();
+    const before = await filterBox(page, "Giá chào").boundingBox();
+    await headerCell(page, "Listing.listPrice").scrollIntoViewIfNeeded();
+    const after = await filterBox(page, "Giá chào").boundingBox();
+    const head = await headerCell(page, "Listing.listPrice").boundingBox();
+    const view = await viewport.boundingBox();
+    if (!before || !after || !head || !view)
+      throw new Error("filter row does not scroll with the grid");
+    const moved = Math.abs(after.x - before.x) > 1 || after.x >= view.x;
+    const underHead = after.y >= head.y && after.x >= head.x - 1 && after.x < head.x + head.width;
+    const inside = after.x >= view.x - 1 && after.x + after.width <= view.x + view.width + 1;
+    if (!moved || !underHead || !inside)
+      throw new Error("filter row does not scroll with the grid");
+    // The price column, filter box included, is at least 11 ch of the grid's own text (a rule like «<=5, 2-5»).
+    const ch = await headerCell(page, "Listing.listPrice").evaluate((th) => {
+      const cell = document.querySelector('tbody td[data-col-id="Listing.listPrice"]') ?? th;
+      const probe = document.createElement("span");
+      probe.textContent = "0";
+      probe.style.font = getComputedStyle(cell).font;
+      document.body.append(probe);
+      const one = probe.getBoundingClientRect().width;
+      probe.remove();
+      return th.getBoundingClientRect().width / one;
+    });
+    if (Math.round(ch * 10) / 10 < 11) throw new Error(`filter box too narrow: ${ch.toFixed(1)}ch`);
+  }
+
+  test("the filter row is under the headers, scrolls with the grid and filters as on a computer", async ({
+    page,
+  }) => {
+    expect(PHONES).toHaveLength(2);
+    expect(PHONES).toContain(width());
+    await openInventory(page);
+    const codeBox = await filterBox(page, "Căn").boundingBox();
+    const codeHead = await headerCell(page, "Listing.unitNumber").boundingBox();
+    expect(codeBox && codeHead).toBeTruthy();
+    expect(codeBox!.y).toBeGreaterThanOrEqual(codeHead!.y);
+    await expect(checkScrollsWithGrid(page)).resolves.toBeUndefined();
+    const footer = page.locator('[data-slot="region-footer-count"]');
+    await expect(footer).toHaveText("60 dòng");
+    await filterBox(page, "Căn").fill("02");
+    await expect(footer).toHaveText(/^\d+ \/ 60 dòng$/);
+    const left = Number((await footer.textContent())?.split(" ")[0]);
+    expect(left).toBeGreaterThan(0);
+    expect(left).toBeLessThan(60);
+  });
+
+  test("the check fails when the filter row is pinned outside the scrolling grid", async ({
+    page,
+  }) => {
+    await openInventory(page);
+    await page.addStyleTag({
+      content:
+        '[data-slot="column-filter"] { position: fixed !important; left: 0 !important; top: 0 !important; }',
+    });
+    await expect(checkScrollsWithGrid(page)).rejects.toThrow(
+      "filter row does not scroll with the grid",
+    );
+  });
 });
