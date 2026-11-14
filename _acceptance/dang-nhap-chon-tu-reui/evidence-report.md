@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 78384bca0c698963ae1a36d7eccba5010355e2f5
+verified_commit: 92a67f7b4cb62ac90c5f8b364ee7d66388470a0a
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -39,7 +39,7 @@ Eval không phân biệt (xanh cả trên HEAD lẫn baseline — chứng minh h
 - eval: E1
   run_id: minted-dang-nhap-chon-tu-reui-E1-r1
   exit_code: 0
-  verifier: config:executors.ui-check
+  verifier: config:executors.design.ui_check
   verified_at: 2026-11-14T06:31:37Z
   carried_from_round: 1
   # carry-forward tu round 1 — delta khong cham paths cua eval
@@ -79,7 +79,7 @@ Eval không phân biệt (xanh cả trên HEAD lẫn baseline — chứng minh h
   run_id: e4-20261114-1
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
+  verifier: config:executors.design.ui_check
   verified_at: 2026-11-14T06:55:58Z
   screenshot: evidence/E4-step1.png
   observed: |
@@ -165,3 +165,7 @@ none — mọi eval nhiều lần chạy đều đồng nhất (không eval nào
 
 Round 1: E1 và E8 đạt, được giữ lại (carry-forward) sang round 2.
 Round 2: chạy lại E1b, E2, E3, E4, E4c, E4b, E5, E6, E7 và lệnh build — tất cả đạt; verdict PASS.
+
+### Re-pin lần 1 — 2026-11-14, do gộp nhánh chính sau chữ ký
+run_id: repin-20261114T095640Z-12823
+sha: 92a67f7b4cb62ac90c5f8b364ee7d66388470a0a · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng · ngoài làn máy: E1, E4
