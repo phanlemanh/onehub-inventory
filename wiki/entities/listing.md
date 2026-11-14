@@ -21,6 +21,10 @@ Trong một sàn, một căn có nhiều nhất một lần chào đang mở (Ch
 chào Đã bán hay Ngừng hẳn ở lại làm lần chào cũ của căn (`one-open-listing-per-unit`, chủ kho chốt Hỏi-5 ở Cổng Phạm vi
 hàng 3b).
 
+Điều kiện phí (`feeInclusion`, hàng 19): Giá chào đã gồm thuế phí của sàn (Bao phí) hay chưa (Không bao phí); riêng của
+ta, RESO không có. Bảng hàng tính Về tay từ Giá chào, Điều kiện phí và thuế phí của sàn
+([fee-schedule](fee-schedule.md)); trang khách không đọc cả hai.
+
 ## Where in the code
 
 `src/modules/listings/`: luật sửa giá và trạng thái ở `edit-rules.ts`, cổng lưu ở `save-door.ts`, sửa trên ô của Bảng hàng ở `ui/use-listing-cell-edit.tsx`.
