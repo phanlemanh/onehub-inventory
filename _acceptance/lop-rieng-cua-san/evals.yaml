@@ -94,6 +94,9 @@ evals:
     executor: ui-check
     layer: ui-observed
     target: "Bảng hàng của sàn mẫu có nhãn riêng và hai trường riêng, khổ 1440 và 360, sáng và tối"
+    steps:
+      - "From the repo root, with lane R Postgres up (DB_PORT 5565), run: LOP_RIENG_ANH=1 DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts tests/e2e-db/lop-rieng.spec.ts --project 1440 — it signs in through the shared role door, fills the sample company's layer, and writes the pictures under _acceptance/lop-rieng-cua-san/evidence/; it starts and stops its own server, never start another"
+      - "Open evidence/inventory-1440.png, inventory-1440-cuoi.png (the grid scrolled to its last columns), inventory-1440-cuoi-toi.png, inventory-1440-toi.png, inventory-1024.png, inventory-414.png, inventory-360.png, inventory-360-toi.png and look at the headers and the last columns"
     paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", src/components/candidate/**]
     expected: "Ảnh cho thấy tiêu đề 'Block' ở chỗ Toà, hai cột 'Hướng view' và 'Ghi chú' sau cột Xác nhận lúc, giá trị mẫu đọc được, cột không vỡ ở 360, tương phản đủ ở nền tối"
     evidence_required: [screenshot, observed]
@@ -112,6 +115,9 @@ evals:
     executor: ui-check
     layer: ui-observed
     target: "Màn Tuỳ chỉnh của sàn: năm phần với nút Thêm và menu «…» mở, hộp Thêm trường riêng, trạng thái rỗng, lỗi, không đủ quyền, ở 360, 414, 1024, 1440, sáng và tối"
+    steps:
+      - "From the repo root, with lane R Postgres up (DB_PORT 5565), run: LOP_RIENG_ANH=1 DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts tests/e2e-db/lop-rieng.spec.ts --project 1440 — it signs in through the shared role door, fills the sample company's layer, and writes the pictures under _acceptance/lop-rieng-cua-san/evidence/; it starts and stops its own server, never start another"
+      - "Open evidence/tuy-chinh-san-{360,414,1024,1440}.png and their -toi copies, tuy-chinh-san-menu-1440.png, tuy-chinh-san-them-truong-1440.png, tuy-chinh-san-mau-1440.png (empty part) and tuy-chinh-san-chi-doc-1440.png (a role that only reads)"
     paths: ["src/app/(app)/tuy-chinh-san/**", src/modules/company-config/**, src/components/templates/**]
     expected: "Ảnh từng khổ cho thấy cột thứ hai (ngăn trượt ở điện thoại) liệt kê năm phần, vùng Lưới với «…» cuối dòng, trạng thái rỗng nói lý do và chỉ đường nhập, không chữ đè, không cuộn ngang ngoài vùng Lưới"
     evidence_required: [screenshot, observed]
@@ -119,7 +125,7 @@ evals:
   - id: E14
     criterion: AC-9
     executor: script
-    cmd: config:executors.script.proof_gate
+    cmd: config:executors.test.proof_gate
     paths: [_acceptance/lop-rieng-cua-san/chung-minh-man.md, design/so-khoi.yaml, design/screens.yaml, design/patterns/**]
     expected: "exit 0; tools/proof_gate/check.py xanh cho hồ sơ lop-rieng-cua-san: màn tuy-chinh-san khai trong design/screens.yaml với họ theo lựa chọn ở Hỏi-3, chứng minh màn đủ mục theo đường của họ, Bảng hàng có Ảnh cạnh màn mẫu ở bốn khổ"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

@@ -5,6 +5,9 @@
 //                                 keeps the row.
 //   company words on inventory — E9: company A's label and own fields on the inventory, a retired field absent,
 //                                 company B sees the eight standard headers.
+//   proof images                — only with LOP_RIENG_ANH=1: the screen and the inventory at the four widths of the
+//                                 grid family, light and dark, signed in as the company admin, for the screen proof
+//                                 and the grader's look (E11, E13); before the review case changes «Block» and «Ghi chú».
 //   review screen               — E12: the button set of every part for four roles, edit, retire, match, refusal.
 // The cases run in this order on one company and build on each other; each also stands alone when run with -g.
 import { tmpdir } from "node:os";
@@ -18,6 +21,8 @@ import type { Role } from "../../src/generated/ontology";
 import { sampleCatalog } from "../../src/modules/catalog";
 import { catalogLoadStatements } from "../../src/modules/catalog/load-sql";
 import { SAMPLE_LISTINGS_PER_SUBDIVISION } from "../../src/modules/listings";
+
+import { shown } from "../../tools/e2e_templates/settle";
 
 import { makeSampleCompany, rolePerson, ROLES, signInWithCode } from "./dang-nhap-vai";
 
@@ -385,6 +390,90 @@ test.describe("lop rieng tren bang hang", () => {
     await pageB.goto("/inventory");
     expect(await headers(pageB)).toEqual(STANDARD.map((c) => label(c)));
     await b.close();
+  });
+
+  test("proof images", { tag: "@cho" }, async ({ browser }) => {
+    test.skip(process.env["LOP_RIENG_ANH"] !== "1", "pictures only when asked: LOP_RIENG_ANH=1");
+    const OUT = "_acceptance/lop-rieng-cua-san/evidence";
+    const WIDTHS = [
+      [360, 800],
+      [414, 896],
+      [1024, 768],
+      [1440, 900],
+    ] as const;
+    const snap = async (page: Page, url: string, file: string, ready: string) => {
+      await page.goto(url);
+      await shown(page.locator(ready).first(), file);
+      await page.screenshot({ path: `${OUT}/${file}.png` });
+    };
+    for (const scheme of ["light", "dark"] as const) {
+      for (const [width, height] of WIDTHS) {
+        const ctx = await browser.newContext({
+          storageState: stateOf("CompanyAdmin"),
+          viewport: { width, height },
+          colorScheme: scheme,
+        });
+        const page = await ctx.newPage();
+        const tail = scheme === "dark" ? "-toi" : "";
+        await snap(
+          page,
+          "/tuy-chinh-san?phan=truong",
+          `tuy-chinh-san-${width}${tail}`,
+          '[data-part="truong"][data-state="ready"] tbody tr',
+        );
+        await snap(
+          page,
+          "/inventory",
+          `inventory-${width}${tail}`,
+          '[data-slot="data-region-body"] tbody tr',
+        );
+        if (width === 1440) {
+          // The company's own columns sit after the eight standard ones: the grid scrolled to its end shows them.
+          await page
+            .locator('[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]')
+            .first()
+            .evaluate((el) => {
+              el.scrollLeft = el.scrollWidth;
+            });
+          await page.waitForTimeout(300);
+          await page.screenshot({ path: `${OUT}/inventory-1440-cuoi${tail}.png` });
+          await snap(
+            page,
+            "/tuy-chinh-san?phan=mau",
+            `tuy-chinh-san-mau-1440${tail}`,
+            '[data-part="mau"][data-state="ready"]',
+          );
+          await openPart(page, "truong");
+          await page
+            .locator('[data-row-actions-for="huong_view"] [data-slot="row-actions"]')
+            .click();
+          await shown(page.getByRole("menu"), "menu");
+          await page.screenshot({ path: `${OUT}/tuy-chinh-san-menu-1440${tail}.png` });
+          await page.keyboard.press("Escape");
+          await page
+            .getByRole("button", { name: label("AddCustomField") })
+            .first()
+            .click();
+          await shown(dialogOf(page, "field-dialog"), "hop them truong");
+          await page.screenshot({ path: `${OUT}/tuy-chinh-san-them-truong-1440${tail}.png` });
+          await page.keyboard.press("Escape");
+        }
+        await ctx.close();
+      }
+    }
+    // A role that may only read: the same part with no write button and no «…».
+    const reader = await browser.newContext({
+      storageState: stateOf("BuyerAgent"),
+      viewport: { width: 1440, height: 900 },
+    });
+    const rp = await reader.newPage();
+    await snap(
+      rp,
+      "/tuy-chinh-san?phan=truong",
+      "tuy-chinh-san-chi-doc-1440",
+      '[data-part="truong"][data-state="ready"] tbody tr',
+    );
+    await reader.close();
   });
 
   test("review screen", async ({ browser }) => {
