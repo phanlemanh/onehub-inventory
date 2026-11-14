@@ -41,7 +41,7 @@ commit `1729b11f` (hợp đồng đã ký 06/11), mã và hồ sơ hàng 7e trê
    `withCompany`.
 5. **Màn**: phần mới «Thuế phí» (`?phan=thue-phi`) trong màn «Tuỳ chỉnh của sàn» của 7e — một mục ở cột thứ hai của App
    Shell (Hỏi-2). Màn 7e mở theo dòng `readCompanyLayer`, vốn cho cả bốn vai (Đầu chủ, Đầu khách, Trưởng nhóm, Quản trị
-   sàn) phạm vi sàn; ba vai đọc đã thấy các phần khác của 7e, hàng này không đổi quyền vào màn. Khối ReUI `settings-3` (mỗi dòng một khoản: tên, tỉ lệ hay «theo luật», công tắc, nguồn). Vai khác thấy
+   sàn) phạm vi sàn; ba vai đọc đã thấy các phần khác của 7e, hàng này không đổi quyền vào màn. Khối chung `FramedList` của họ danh sách khung (hàng 9c, `src/components/candidate/framed-list.tsx`) (mỗi dòng một khoản: tên, tỉ lệ hay «theo luật», công tắc, nguồn). Vai khác thấy
    chỉ đọc, không nút Lưu.
 6. **Mô hình nghiệp vụ**: `Listing.feeInclusion` — Điều kiện phí, `Included` (Bao phí) / `Excluded` (Không bao phí), riêng
    của ta (RESO 2.1 không có) (Hỏi-1). Khái niệm mới `FeeSchedule` (Thuế phí) và ba khoản. Nhãn mới ở `labels.yaml`. Hàng
@@ -121,12 +121,12 @@ lệnh shadcn (không sửa tay). Không sửa `tools/**`, `Makefile`, cấu hì
 
 ### 5. Xuất xứ component
 
-| Component         | Nấc  | Vì sao                                                               |
-| ----------------- | ---- | -------------------------------------------------------------------- |
-| ReUI `settings-3` | ghép | Mỗi dòng một khoản kèm điều khiển riêng — đúng khối Quỹ hàng đã dùng |
-| `Switch` (shadcn) | dùng | Công tắc «Tính vào giá bao phí»; thêm bằng lệnh shadcn               |
-| `PermittedAction` | dùng | Nút Lưu theo `setFeeSchedule`                                        |
-| Cột tiền của lưới | dùng | Về tay hiện và sắp như Giá chào                                      |
+| Component                                  | Nấc  | Vì sao                                                                                   |
+| ------------------------------------------ | ---- | ---------------------------------------------------------------------------------------- |
+| `FramedList` (họ danh sách khung, hàng 9c) | dùng | Một nhóm cố định các khoản, mỗi khoản một dòng có chỗ chỉnh — luật đồng nhất (G-1411-87) |
+| `Switch` (shadcn)                          | dùng | Công tắc «Tính vào giá bao phí»; thêm bằng lệnh shadcn                                   |
+| `PermittedAction`                          | dùng | Nút Lưu theo `setFeeSchedule`                                                            |
+| Cột tiền của lưới                          | dùng | Về tay hiện và sắp như Giá chào                                                          |
 
 ### 6. Khuôn IA đã chọn + căn cứ
 

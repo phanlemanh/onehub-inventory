@@ -12,7 +12,7 @@ ds_skill: inventory-ui
 states: [h2-a, h2-b, h3-a, h3-b, chi-doc, sai]
 breakpoints: [mobile-360, desktop-1440]
 themes: [light]
-patched: 4
+patched: 5
 deferred: 0
 ---
 
@@ -22,9 +22,9 @@ deferred: 0
   chủ kho cần thấy sức chứa của Bảng hàng ở 1440, không phải bố cục.
 - Phần Thuế phí dựng trong cột thứ hai thật của App Shell, màn Tuỳ chỉnh của sàn của 7e (bản mẫu ở worktree tạm từ nhánh
   `claude/nervous-chaum-ec346e`, chưa gộp; bản dựng làm lại sau khi PR #53 vào nhánh chính).
-- Khối ReUI `settings-3` dựng theo hình, chưa phải mã khối: máy chủ ReUI lỗi đăng nhập (401). Ảnh gốc chụp trước khi dựng:
-  `cong/reui-settings-3-goc.webp`. Giữ khung ngoài nền nhạt có tiêu đề, thẻ trong chia dòng, mỗi dòng hai cột (tên và mô
-  tả | điều khiển); bỏ nhãn Required/Pro.
+- Lần trình đầu tự vẽ khung theo hình ReUI `settings-3` bằng thẻ trần; giám sát trả lại theo luật đồng nhất (G-1411-87).
+  Bản bấm được nay ghép đúng khối chung `FramedList` của hàng 9c (chép từ nhánh `claude/gallant-swirles-35bbe8` vào worktree
+  tạm để chụp); ảnh tham chiếu màn Thành viên của 9c đặt cạnh ở trang cổng (`cong/tham-chieu-thanh-vien-1440-sang.webp`).
 - Bảng hàng: cột «Về tay» sau «Giá chào» trên hàng mẫu của sàn mẫu, mức mẫu: Thuế TNCN 2% + Phí môi giới 2%, Lệ phí trước
   bạ tắt.
 - Ảnh chụp bằng Playwright, 1440 × 900 và 360 × 800, nền sáng (ảnh tối để sau khi chủ kho chọn lối), người đã đăng nhập của [Sàn mẫu Ocean]; nút «N» của công cụ dựng ẩn.
@@ -48,3 +48,6 @@ deferred: 0
 - Rủi ro nêu đầu trang cổng: ở 1440 khi cột thứ hai mở, Về tay đẩy cột «Xác nhận lúc» ra sau mép phải; AC-6 viết lại theo
   ảnh (Về tay thấy ngay, cột sau cuộn ngang).
 - Bảng hàng ở 360 giữ cách hiện sẵn có (cuộn ngang), Về tay không thấy ở khung đầu — đúng hành vi khổ nhỏ hôm nay.
+- Đặt cạnh màn Thành viên: cùng khung, cùng đầu khung, cùng đường kẻ giữa dòng. Lệch còn lại: màn Thành viên cách đầu màn
+  và khung 1,5rem (`gap-6`), bản mẫu 1rem — bản dựng theo Thành viên. Khe chỗ chỉnh cuối dòng của `FramedList` rộng cố
+  định 6rem: dòng Phí môi giới (ô số, công tắc, «…») tràn sang cột nhãn — đã báo G để 9c mở khe trước khi gộp.

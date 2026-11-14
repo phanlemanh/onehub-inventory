@@ -16,7 +16,7 @@ design_doc: docs/superpowers/specs/2026-11-14-thue-phi-design.md
 
 Hàng 19 của `docs/plan/lo-trinh.json` (T3, dãy N, đợt `dieu-phoi-nen`), ô cơ hội `_acceptance/thue-phi/opportunity.md` đã
 quyết «build» (Manh Phan, 13/11/2026). Đứng trên hàng 9 và 9a; hàng 11 (nhập Sheet) đứng trên hàng này. Dựng sau khi hàng 7e
-(PR #53, màn «Tuỳ chỉnh của sàn») vào nhánh chính. Mức thuế phí của sàn gồm ba khoản cố định — Thuế thu nhập cá nhân 2% và
+(PR #53, màn «Tuỳ chỉnh của sàn») và hàng 9c (PR #60, khối `FramedList` của họ danh sách khung) vào nhánh chính. Mức thuế phí của sàn gồm ba khoản cố định — Thuế thu nhập cá nhân 2% và
 Lệ phí trước bạ 0,5% theo luật, Phí môi giới 0–5% (mặc định 1%) — mỗi khoản bật hay tắt khỏi giá bao phí. Về tay của một hàng
 Bao phí = Giá chào × (1 − tổng tỉ lệ các khoản đang bật). Tỉ lệ lưu bằng phần vạn số nguyên.
 
@@ -83,6 +83,15 @@ khách, Trưởng nhóm); Quản trị sàn đặt mức, không được mở B
   Then B nhận mức mặc định, không thấy dòng của A, không sửa được dòng của A; bảng mới có `company_id`, luật theo dòng bật và
   ép buộc trong cùng migration; bộ kiểm cách ly có ca cho bảng mới và xanh trên Postgres của dãy N.
 
+- **AC-9** — Phần Thuế phí ghép từ khối của họ danh sách khung, đủ bộ nút theo vai.
+  Given khối chung `FramedList` của hàng 9c (`src/components/candidate/framed-list.tsx`) và màn Thành viên đã gộp,
+  When dựng phần Thuế phí và đặt nó cạnh màn Thành viên ở 1440 và 360,
+  Then phần Thuế phí chỉ điền khe của `FramedList` (đầu khung có tên «Thuế phí» và dòng đếm «3 khoản · n đang tính vào giá
+  bao phí»; mỗi khoản một dòng; chỗ chỉnh cuối dòng; chân khung có ghi chú và nút Lưu), không khung, viền hay nhãn tự vẽ
+  bằng thẻ trần; lề, bo góc, cỡ chữ đầu khung và cỡ chữ dòng giống màn Thành viên; và bộ nút theo vai đúng bảng «Bộ nút theo
+  vai» dưới: chỗ chỉnh cuối dòng, «…» (Trả về mặc định) ở dòng đã đổi và nút Lưu chỉ hiện với `setFeeSchedule`; ba vai đọc
+  thấy giá trị không ô sửa, không «…», không Lưu.
+
 - **AC-8** — Điều đang đúng đã ghi.
   Given hàng xong,
   When đọc wiki và sổ màn,
@@ -96,6 +105,21 @@ khách, Trưởng nhóm); Quản trị sàn đặt mức, không được mở B
 | --- | --- | --- | --- | --- |
 | tuy-chinh-san | được — đọc phần Thuế phí, không sửa | được — đọc phần Thuế phí, không sửa | được — đọc phần Thuế phí, không sửa | được — đặt mức ở phần Thuế phí, Lưu |
 | inventory | được — đọc cột Về tay | được — đọc cột Về tay | được — đọc cột Về tay | chặn — không có Bảng hàng (bảng quyền 9a) |
+
+## Bộ nút theo vai
+
+| Việc | Ở đâu | Quản trị sàn | Đầu chủ · Đầu khách · Trưởng nhóm | Dòng bảng quyền |
+| --- | --- | --- | --- | --- |
+| Xem mức (ba khoản, tỉ lệ, nguồn, dòng ví dụ) | phần Thuế phí | có | có (chỉ đọc) | `readFeeSchedule` |
+| Bật hay tắt khoản khỏi bao phí | công tắc cuối dòng | có | thấy công tắc khoá | `setFeeSchedule` |
+| Đổi tỉ lệ môi giới | ô số cuối dòng Phí môi giới | có | thấy số, không ô | `setFeeSchedule` |
+| Trả về mặc định | «…» cuối dòng đã đổi | có | không hiện | `setFeeSchedule` |
+| Lưu | chân khung | có | không hiện; chân ghi «Chỉ Quản trị sàn đổi được thuế phí» | `setFeeSchedule` |
+| Thêm khoản | đầu khung | bỏ — ba khoản cố định (ADR-0018) | bỏ | — |
+| Xoá khoản | — | bỏ — tắt khỏi bao phí thay cho xoá | bỏ | — |
+| Xem cột Về tay, sắp, lọc, ẩn hiện, lưu góc nhìn | Bảng hàng | không có Bảng hàng (bảng quyền 9a; Hỏi-6) | có | `viewListings` |
+| Sửa Về tay trên ô | Bảng hàng | — | bỏ — Về tay tính từ Giá chào, sửa Giá chào ở ô của hàng 4 | — |
+| Sửa Điều kiện phí trên ô | Bảng hàng | — | bỏ ở hàng này — sau hàng 10 (chưa có hàng lộ trình riêng) | — |
 
 ## Đường đo
 
@@ -117,7 +141,7 @@ Quét không gian AC (morphological, preset entity-feature, rút gọn):
   luật 12; mô hình hôm nay chưa có loại giao dịch, mọi hàng là bán]
 - Trục D — ai: Quản trị sàn · ba vai đọc · sàn khác · vai ứng dụng gọi thẳng [thước CE: bảng quyền, SP-1]
 - Trục E — chỗ thấy: phần Thuế phí · Bảng hàng · menu Cột · API · cơ sở dữ liệu · trang khách [thước CE: SP-4]
-- Core: A×B ở AC-1, AC-3; C ở AC-1, AC-6; D ở AC-4, AC-7; E ở AC-2, AC-6; ghi chép AC-8.
+- Core: A×B ở AC-1, AC-3; C ở AC-1, AC-6; D ở AC-4, AC-7, AC-9; E ở AC-2, AC-6, AC-9; ghi chép AC-8.
 - Later: dấu định nghĩa lúc tính trên từng giá (hàng 10) · Về tay ở hồ sơ căn · sửa Điều kiện phí trên ô · nhập Điều kiện
   phí từ Sheet (hàng 11) · nhật ký đổi cấu hình (N10).
 - Never: tỉ lệ, khoản hay Về tay ra trang khách · khoản thứ tư hay công thức do sàn tự viết.

@@ -204,3 +204,32 @@ evals:
     paths: [src/modules/company-config/ui/**, src/modules/listings/ui/**]
     expected: "exit 0; không hex thô trong tệp giao diện mà vòng chạm"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.thue_phi
+    paths: [src/modules/company-config/ui/**, src/components/candidate/framed-list.tsx]
+    expected: "exit 0; ca 'khung-tu-khoi-chung' (tệp phần Thuế phí nhập FramedList từ @/components/candidate/framed-list; không nhập Frame, Item hay Card trực tiếp; không có lớp viền hay bo góc tự đặt trên thẻ trần — danh sách lớp cấm viết trước: border, rounded-, bg-card, bg-muted, divide-y) và 'bo-nut-theo-vai' (bảng viết trước bốn vai × năm việc của mục «Bộ nút theo vai» = 20 ô; CompanyAdmin thấy ô số, công tắc bật được, «…» ở dòng đã đổi, Lưu; ba vai kia thấy công tắc khoá, không ô số, không «…», không Lưu; số ô in ra = 20) có mặt và ok. Chiều đỏ: chép bản tự vẽ (section viền bo góc) vào bản sao → 'khung-tu-khoi-chung' đỏ nêu lớp «rounded-»; mở «…» cho TeamLead ở bản sao → 'bo-nut-theo-vai' đỏ nêu «TeamLead · Trả về mặc định»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9-ui
+    criterion: AC-9
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3485/tuy-chinh-san?phan=thue-phi
+    paths: [src/modules/company-config/ui/**, src/components/candidate/framed-list.tsx]
+    steps:
+      - "With the lane N dev server on port 3485, sign in as the sample CompanyAdmin, open the target and /members at 1440 and 360 wide, light"
+      - "Save _acceptance/thue-phi/evidence/E9-thue-phi-<khổ>.png and _acceptance/thue-phi/evidence/E9-thanh-vien-<khổ>.png"
+    question: "Đặt ảnh phần Thuế phí cạnh ảnh màn Thành viên cùng khổ: khung, lề trong, bo góc, cỡ chữ tên khung và dòng đếm, cỡ chữ dòng, đường kẻ giữa dòng và chỗ đặt chỗ chỉnh cuối dòng có giống nhau không? Nêu chỗ khác."
+    expected: "Hai khung cùng một dáng; khác nhau chỉ ở nội dung khe"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E9-khuon
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/danh-sach-khung.md", "src/modules/company-config/ui/**"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm danh-sach-khung"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
