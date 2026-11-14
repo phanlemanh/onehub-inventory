@@ -52,7 +52,7 @@ Ba kịch bản đo nằm ở `_acceptance/adopt-design-assembly/rang/`, ngoài 
 - `register-regenerated.sh` — công cụ cũ không còn, `make gen` gọi công cụ mới, ghi lại sổ từ mã thì không khác bản đã commit.
 
 Mỗi kịch bản có cặp hai chiều trên cùng một bản: bản lành xanh, bản bị phá đỏ với thông điệp ghim
-(`rang/measures.test.mjs`).
+(`rang/measures-two-way.mjs`).
 
 ## Không làm
 

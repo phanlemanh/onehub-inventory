@@ -27,7 +27,7 @@ feature_slug: adopt-design-assembly
 #       red with ChangedProbe added».
 #   Lời đáp (AC-10): «answers: AA application; rows conformance-level source-color product-type judgment; contrast 4 pairs
 #     at 4.5; --onehub-blue #0246ff»; lệch → «answers: <thứ lệch>».
-#   Cặp hai chiều của các kịch bản đo mới (measures.test.mjs): mỗi kịch bản một bản lành → xanh, một bản phá → đỏ, cùng bản,
+#   Cặp hai chiều của các kịch bản đo mới (measures-two-way.mjs): mỗi kịch bản một bản lành → xanh, một bản phá → đỏ, cùng bản,
 #     thông điệp ghim như trên.
 evals:
   - id: E1

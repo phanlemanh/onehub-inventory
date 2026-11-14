@@ -7,7 +7,7 @@ xong và không đổi.
 
 **Architecture:** Mỗi kịch bản là một tệp Node (một tệp bash) trong `_acceptance/adopt-design-assembly/rang/`, đọc kho ở
 `--root`, nhận thêm cờ trỏ tệp để bộ bài đưa bản phá vào. Hai kịch bản dựng bản tạm dùng chung một hàm dựng thư mục đường
-nối. `measures.test.mjs` (node:test) giữ cặp hai chiều: bản lành xanh, bản phá đỏ với thông điệp ghim.
+nối. `measures-two-way.mjs` (node:test) giữ cặp hai chiều: bản lành xanh, bản phá đỏ với thông điệp ghim.
 
 **Tech Stack:** Node 24 (`node:test`, `node:fs`, `node:child_process`), bash, `make`.
 
@@ -37,7 +37,7 @@ nguồn của mọi thông điệp ghim dưới đây).
 
 ### Task 1: Hàm dựng bản tạm, và hai phép đo trên bản tạm (AC-3, AC-6)
 
-`independent: false` (Task 2–5 không dùng nó, nhưng `measures.test.mjs` của Task 6 dùng)
+`independent: false` (Task 2–5 không dùng nó, nhưng `measures-two-way.mjs` của Task 6 dùng)
 
 **Files:**
 
@@ -158,7 +158,7 @@ nguồn của mọi thông điệp ghim dưới đây).
 
 **Files:**
 
-- Create: `_acceptance/adopt-design-assembly/rang/measures.test.mjs`
+- Create: `_acceptance/adopt-design-assembly/rang/measures-two-way.mjs`
 
 **Interfaces:**
 

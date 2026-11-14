@@ -76,7 +76,7 @@ executors:
     owner_answers: "node _acceptance/adopt-design-assembly/rang/owner-answers.mjs --root . && node tools/design-assembly/check.mjs"   # adopt-design-assembly: the owner's three answers as recorded, and the contrast they let the tool hold
     tokens_primary: "node tools/design-assembly/tokens.mjs && node _acceptance/adopt-design-assembly/rang/tokens-primary.mjs --root ."   # adopt-design-assembly: the tokens file is what the stylesheet gives, primary #0246ff
     register_regenerated: "bash _acceptance/adopt-design-assembly/rang/register-regenerated.sh ."   # adopt-design-assembly: old register tool gone, make gen writes the register with the design-assembly tool, identical to commit
-    measures_two_way: "node --test _acceptance/adopt-design-assembly/rang/measures.test.mjs"   # adopt-design-assembly: each new measure green on a sound copy, red with its pinned message on a broken one
+    measures_two_way: "node --test _acceptance/adopt-design-assembly/rang/measures-two-way.mjs"   # adopt-design-assembly: each new measure green on a sound copy, red with its pinned message on a broken one
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists
