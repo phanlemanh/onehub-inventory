@@ -18,8 +18,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   FRAME,
+  LONGEST_FITS,
   NO_REGION_YET,
   REGION,
+  longestProblem,
   classifyGrid,
   compareRows,
   firstColumnHas,
@@ -29,6 +31,7 @@ import {
 } from "./recipes";
 import * as registerModule from "./register";
 import { REPO_ROOT, SIGNED_OUT_SCREENS, signedOutProblems } from "./register";
+import { withQuery } from "./runner";
 import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
 import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings";
 import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
@@ -297,7 +300,13 @@ describe("so hai tập của bài tìm", () => {
 interface Bridge {
   errors: string[];
   roles: { name: string; label: string | null }[];
-  screens: { id: string; route: string; status: string; audience: string }[];
+  screens: {
+    id: string;
+    route: string;
+    status: string;
+    audience: string;
+    family?: string | null;
+  }[];
 }
 
 function bridge(root: string): Bridge {
@@ -362,19 +371,20 @@ describe("sổ giả thêm màn thì có bộ", () => {
     () => {
       /**
        * Written before the code: the built staff and public screens on main after row 9. Row 1r: members is listed
-       * too — it needs a session, so the signed-out run hands it over by name at run time (64 became 80).
+       * too — it needs a session, so the signed-out run hands it over by name at run time (64 became 80). Row 7e adds
+       * the company layer screen (80 became 96).
        */
-      const SCREENS = ["today", "inventory", "sent", "sign-in", "members"];
+      const SCREENS = ["today", "inventory", "sent", "sign-in", "members", "tuy-chinh-san"];
       const expected = SCREENS.flatMap((s) =>
         SIZES.flatMap((z) => FRAME_TESTS.map((t) => `${z} ${s} ${t}`)),
       );
-      expect(expected).toHaveLength(80);
+      expect(expected).toHaveLength(96);
 
       const root = copyRegister();
       const before = list(root);
       expect(before.status).toBe(0);
       expect(frameCases(before.lines, "khung").sort()).toEqual([...expected].sort());
-      expect(frameCases(before.lines, "pha khung")).toHaveLength(80);
+      expect(frameCases(before.lines, "pha khung")).toHaveLength(96);
       // Every built screen has a suite or a named skip line.
       for (const s of bridge(root).screens.filter((x) => x.status === "built")) {
         const has = before.lines.some((l) => l.includes(` › man ${s.id} › `));
@@ -393,11 +403,11 @@ describe("sổ giả thêm màn thì có bộ", () => {
       expect(added.status).toBe(0);
       const ghost = frameCases(added.lines, "khung").filter((c) => c.includes(" ghost-built "));
       expect(ghost).toHaveLength(16);
-      expect(frameCases(added.lines, "khung")).toHaveLength(96);
+      expect(frameCases(added.lines, "khung")).toHaveLength(112);
 
       edit(root, "design/screens.yaml", (t) => t.split("  - id: ghost-built\n")[0]!);
       rmSync(join(root, "src/app/ghost"), { recursive: true });
-      expect(frameCases(list(root).lines, "khung")).toHaveLength(80);
+      expect(frameCases(list(root).lines, "khung")).toHaveLength(96);
     },
     SLOW * 3,
   );
@@ -551,6 +561,139 @@ describe("sổ sai thì đỏ", () => {
         expect(r.status).not.toBe(0);
         for (const p of problems) expect(r.out).toContain(p);
         expect(r.lines.some((l) => / › man /.test(l))).toBe(false);
+      },
+      SLOW * 2,
+    );
+  }
+});
+
+/** Every listed case of one screen: its name under the screen, and the path its region describe says it opens. */
+function casesOf(root: string, id: string): { name: string; vao: string | null }[] {
+  const file = join(mkdtempSync(join(tmpdir(), "ds-")), "list.json");
+  const r = spawnSync(
+    "npx",
+    ["playwright", "test", "tests/e2e/screens", "--list", "--reporter=json"],
+    {
+      cwd: REPO_ROOT,
+      encoding: "utf8",
+      env: { ...process.env, SCREENS_ROOT: root, PLAYWRIGHT_JSON_OUTPUT_FILE: file },
+    },
+  );
+  expect(r.status, `${r.stdout}${r.stderr}`).toBe(0);
+  type Suite = {
+    title: string;
+    specs?: {
+      title: string;
+      tests: { projectName: string; annotations: { type: string; description?: string }[] }[];
+    }[];
+    suites?: Suite[];
+  };
+  const out: { name: string; vao: string | null }[] = [];
+  const walk = (s: Suite, path: string[]): void => {
+    for (const spec of s.specs ?? [])
+      for (const t of spec.tests) {
+        const at = path.indexOf(`man ${id}`);
+        if (at < 0) continue;
+        out.push({
+          name: `${t.projectName} ${[...path.slice(at + 1), spec.title].join(" › ")}`,
+          vao: t.annotations.find((a) => a.type === "vao")?.description ?? null,
+        });
+      }
+    for (const c of s.suites ?? []) walk(c, [...path, c.title]);
+  };
+  for (const s of (JSON.parse(readFileSync(file, "utf8")) as { suites: Suite[] }).suites)
+    walk(s, [s.title]);
+  return out;
+}
+
+const ENTRY = "    vao_vung: /tuy-chinh-san?phan=can-cho\n";
+
+describe("lối vào của bộ vùng (vao_vung, hàng 7e)", () => {
+  it(
+    "a screen without vao_vung keeps the same region cases, opened at its route (control)",
+    () => {
+      const root = copyRegister();
+      const declared = casesOf(root, "tuy-chinh-san");
+      edit(root, "design/screens.yaml", (t) => t.replace(ENTRY, ""));
+      const plain = casesOf(root, "tuy-chinh-san");
+      expect(plain.map((c) => c.name).sort()).toEqual(declared.map((c) => c.name).sort());
+      const region = plain.filter((c) => c.name.includes(" vung › "));
+      expect(region.length).toBeGreaterThan(0);
+      for (const c of region) expect(c.vao, c.name).toBe("/tuy-chinh-san");
+      for (const c of casesOf(root, "inventory").filter((x) => x.name.includes(" vung › ")))
+        expect(c.vao, c.name).toBe("/inventory");
+    },
+    SLOW * 3,
+  );
+
+  it(
+    "a declared vao_vung under the route is where every region case opens; frame cases carry no entry",
+    () => {
+      const cases = casesOf(copyRegister(), "tuy-chinh-san");
+      const region = cases.filter((c) => c.name.includes(" vung › "));
+      expect(region.length).toBeGreaterThan(0);
+      for (const c of region) expect(c.vao, c.name).toBe("/tuy-chinh-san?phan=can-cho");
+      const frame = cases.filter((c) => /^\d+ (pha )?khung /.test(c.name));
+      expect(frame.length).toBeGreaterThan(0);
+      for (const c of frame) expect(c.vao, c.name).toBeNull();
+    },
+    SLOW * 2,
+  );
+
+  it("the reverse «chữ dài» case passes only when a text of the declared length shows whole", () => {
+    const long = "x".repeat(80);
+    expect(longestProblem("tuy-chinh-san", 1440, 80, [{ text: long, cut: false }])).toBeNull();
+    expect(longestProblem("tuy-chinh-san", 1440, 80, [{ text: long, cut: true }])).toBe(
+      "chu-dai: tuy-chinh-san @1440 chu 80 ky tu bi cat — go dong LONGEST_FITS",
+    );
+    expect(longestProblem("tuy-chinh-san", 1440, 80, [{ text: "A-101", cut: false }])).toBe(
+      "chu-dai: tuy-chinh-san @1440 khong co chu 80 ky tu de do",
+    );
+    const grid = new Set(
+      bridge(REPO_ROOT)
+        .screens.filter((x) => x.family === "grid")
+        .map((x) => x.id),
+    );
+    for (const [id, fit] of Object.entries(LONGEST_FITS)) {
+      expect(grid.has(id), id).toBe(true);
+      expect(fit.why.trim(), id).not.toBe("");
+      for (const z of fit.sizes) expect(SIZES, id).toContain(String(z));
+    }
+  });
+
+  it("a case's state query joins a declared entry with & and leaves a plain route as before", () => {
+    for (const r of REGION.filter((x) => x.query)) {
+      expect(withQuery("/inventory", r.query)).toBe(`/inventory${r.query}`);
+      expect(withQuery("/tuy-chinh-san?phan=can-cho", r.query)).toBe(
+        `/tuy-chinh-san?phan=can-cho&${r.query!.slice(1)}`,
+      );
+    }
+    expect(withQuery("/tuy-chinh-san?phan=can-cho", undefined)).toBe("/tuy-chinh-san?phan=can-cho");
+  });
+
+  for (const [name, change, message] of [
+    [
+      "a vao_vung outside the screen's route",
+      (t: string) => t.replace(ENTRY, "    vao_vung: /inventory?phan=can-cho\n"),
+      "tuy-chinh-san: vao_vung ngoai man",
+    ],
+    [
+      "a vao_vung on a screen outside family grid",
+      (t: string) =>
+        t.replace("    route: /members\n", "    route: /members\n    vao_vung: /members\n"),
+      "members: vao_vung chi cho ho grid",
+    ],
+  ] as const) {
+    it(
+      `break: ${name} fails the listing with its pinned message`,
+      () => {
+        const root = copyRegister();
+        expect(list(root).status).toBe(0);
+        edit(root, "design/screens.yaml", change);
+        expect(bridge(root).errors).toContain(message);
+        const r = list(root);
+        expect(r.status).not.toBe(0);
+        expect(r.out).toContain(message);
       },
       SLOW * 2,
     );

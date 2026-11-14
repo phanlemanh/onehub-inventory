@@ -192,6 +192,7 @@ describe("screens", () => {
         "/proto/bo-nut-theo-quyen",
         "/login",
         "/members",
+        "/tuy-chinh-san",
       ]),
     );
   });
