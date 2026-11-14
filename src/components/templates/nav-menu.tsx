@@ -17,6 +17,7 @@ import { isCurrent, visibleNav, type NavItem } from "./nav-items";
 
 export {
   currentEntry,
+  flattenLinks,
   isCurrent,
   visibleNav,
   type NavItem,

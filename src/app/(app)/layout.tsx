@@ -10,11 +10,15 @@ import { label } from "@/modules/company-config";
 import { currentSession } from "@/modules/identity/server";
 import { SessionRoles } from "@/modules/identity/ui";
 import { mySavedViews } from "@/modules/listings/server";
-import { UnitJump, savedViewsSection } from "@/modules/listings/ui";
+import { UnitJump, geoLinks, geoTree, savedViewsSection } from "@/modules/listings/ui";
 
 import { AccountMenu } from "./account-menu";
 import { CompanySwitch } from "./company-switch";
-import { sampleSearchRows } from "./inventory-sample-rows";
+import {
+  sampleBuildingPlaces,
+  sampleInventoryRows,
+  sampleSearchRows,
+} from "./inventory-sample-rows";
 import { navFor, searchShownFor } from "./nav";
 import { savedViewLabels } from "./saved-view-labels";
 
@@ -27,6 +31,13 @@ export default async function FrameLayout({ children }: { children: React.ReactN
   const nav = navFor({
     savedViews: session
       ? savedViewsSection(await mySavedViews("inventory"), savedViewLabels())
+      : null,
+    // The inventory by place (row 2d): project → complex → building, with the units the grid holds there.
+    geography: session
+      ? {
+          title: "Theo địa lý",
+          items: geoLinks(geoTree(sampleInventoryRows(), sampleBuildingPlaces())),
+        }
       : null,
   });
   const account = session

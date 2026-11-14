@@ -14,6 +14,15 @@ export interface NavLink {
    * on hover, on keyboard focus and on the open entry. Absent, the entry is drawn as before.
    */
   trailing?: ReactNode;
+  /** How many items the entry opens (row 2d: units under a place of the geography tree); shown at the end. */
+  count?: number;
+  /** Entries under this one (row 2d: project → complex → building). The column draws the section as a tree. */
+  children?: readonly NavLink[];
+}
+
+/** Every entry of a list and of the entries under it, depth first, in the order they are drawn. */
+export function flattenLinks(links: readonly NavLink[]): NavLink[] {
+  return links.flatMap((l) => [l, ...flattenLinks(l.children ?? [])]);
 }
 
 /** A titled group of the second column; without a title it sits under the screen name. */

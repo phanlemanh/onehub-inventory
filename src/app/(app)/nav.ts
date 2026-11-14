@@ -18,10 +18,20 @@ const COPY = FRAME_COPY.secondColumn;
  * The App Shell's entries for one person: the inventory's second column gains their saved views (row 2c) after the
  * status shortcuts when their roles can list them.
  */
-export function navFor({ savedViews }: { savedViews?: NavSection | null } = {}): NavItem[] {
+export function navFor({
+  savedViews,
+  geography,
+}: { savedViews?: NavSection | null; geography?: NavSection | null } = {}): NavItem[] {
   return NAV.map((item) =>
-    item.href === "/inventory" && savedViews
-      ? { ...item, sections: [...(item.sections ?? []), savedViews] }
+    item.href === "/inventory"
+      ? {
+          ...item,
+          sections: [
+            ...(item.sections ?? []),
+            ...(geography ? [geography] : []),
+            ...(savedViews ? [savedViews] : []),
+          ],
+        }
       : item,
   );
 }

@@ -65,7 +65,7 @@ export function ColumnFilterCell<TData extends object>({
         aria-invalid={invalid || undefined}
         title={invalid ? GRID_COPY.sheet.invalidRule : undefined}
         placeholder={placeholder}
-        value={typeof value === "string" ? value : ""}
+        value={typeof value === "string" ? value : (value ?? []).join(", ")}
         onChange={(event) => column.setFilterValue(event.target.value)}
         // Typing in the box must not move the grid's selected cell.
         onKeyDown={(event) => event.stopPropagation()}

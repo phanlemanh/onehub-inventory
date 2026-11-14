@@ -160,7 +160,11 @@ function columnMatches(
     const chosen = typeof filter === "string" ? [filter] : filter;
     return chosen.includes(String(value ?? ""));
   }
-  if (typeof filter !== "string") return true;
+  if (typeof filter !== "string") {
+    // A list on a words column comes from picking places, not typing (row 2d's geography tree): whole names only, so
+    // «Park 1» never takes «Park 10». Typed text stays «contains».
+    return mode === "text" ? filter.includes(String(value ?? "")) : true;
+  }
   if (mode === "number") {
     const test = parseNumberRule(filter);
     if (test === null) return true;

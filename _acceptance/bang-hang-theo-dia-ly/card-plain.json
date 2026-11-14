@@ -1,0 +1,35 @@
+{
+  "feature_plain": "Đầu chủ bấm một dự án, phân khu hay toà ở cột thứ hai để Bảng hàng chỉ còn căn ở nơi ấy, mỗi nơi kèm số căn.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ hiện cây dự án → phân khu → toà dưới «Theo trạng thái», mỗi nơi kèm số căn đúng bằng số dòng của bảng; sàn chưa có căn thì nói một câu."},
+    {"id": "AC-2", "p": "Sẽ lọc bảng đúng căn của nơi vừa bấm, chân bảng ghi đúng số trên nút, nút ấy là mục sáng duy nhất của cột."},
+    {"id": "AC-3", "p": "Sẽ hiện tên trọn vẹn ở ô lọc Dự án và Toà; tên «Park 1» không lấy nhầm căn của «Park 10»."},
+    {"id": "AC-4", "p": "Sẽ cho cây sáng theo đúng ô lọc: sửa ô lọc thì nút sáng chỉ khi bảng hiện đúng căn của nơi ấy; «Xoá lọc» về «Tất cả hàng»."},
+    {"id": "AC-5", "p": "Sẽ giữ lọc khác (vd «Đang bán») khi bấm một nơi; số trên nút đếm theo lọc ấy, nơi khác vẫn giữ số, nơi còn 0 vẫn hiện."},
+    {"id": "AC-6", "p": "Sẽ mở lại đúng nơi khi tải lại, mở đường dẫn đã chép, hay mở góc nhìn đã lưu."},
+    {"id": "AC-7", "p": "Sẽ giữ ô lọc gõ tay ở Bảng hàng và Đã gửi lọc «chứa chữ» như cũ."},
+    {"id": "AC-8", "p": "Sẽ đặt cây trong ngăn App Shell trên điện thoại (chọn xong ngăn đóng), và cho tên dài xuống dòng ở máy tính."},
+    {"id": "AC-10", "p": "Sẽ để nguyên cột thứ hai của Đã gửi và Tuỳ chỉnh của sàn, có ảnh trước/sau."}
+  ],
+  "wont_do": [
+    {"id": "AC-9", "p": "Chặn mọi lỗi trợ năng: đi bằng phím tới từng nơi, Enter mở, sáng tối đều đạt bài axe."},
+    {"id": "OOS-1", "p": "KHÔNG thêm cột Phân khu vào Bảng hàng — chọn phân khu thì ô Toà hiện các toà của nó."},
+    {"id": "OOS-2", "p": "KHÔNG đưa tầng, trục vào cây — lọc tầng bằng ô lọc Căn."},
+    {"id": "OOS-3", "p": "KHÔNG có ô gõ để tìm trong cây hay trong bảng — tìm ở ⌘K."},
+    {"id": "OOS-4", "p": "KHÔNG sửa cột «Căn»: mã căn đã hiện trọn trên nhánh chính (ảnh trên trang cổng)."},
+    {"id": "OOS-5", "p": "KHÔNG đặt cây ở màn khác ngoài Bảng hàng."}
+  ],
+  "scope_plain": "Năm việc để ngoài hàng này:",
+  "coverage_plain": [
+    {"i": 0, "p": "Mọi kiểu nơi đều có tiêu chí: dự án, phân khu, toà trong phân khu, toà đứng thẳng dưới dự án, toà danh mục chưa biết (AC-1, AC-2, AC-3)."},
+    {"i": 1, "p": "Cây và ô lọc đo cả hai chiều, cùng lọc khác, đường dẫn, góc nhìn đã lưu và chữ gõ tay (AC-2 tới AC-7)."},
+    {"i": 2, "p": "Bốn khổ, sáng tối, phím, trợ năng, và màn khác dùng cột thứ hai (AC-8, AC-9, AC-10)."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Chưa nói số trên cây có bỏ chính lọc địa lý không, nơi còn 0 hiện hay ẩn — đã sửa: không tính lọc địa lý, nơi 0 vẫn hiện, đo đủ 10 nút."},
+    {"i": 1, "p": "Gõ tay «Park 1» có thể làm cây sáng trong khi bảng hiện cả «Park 10» — đã sửa: nút chỉ sáng khi bảng hiện đúng căn của nơi ấy."},
+    {"i": 2, "p": "Lời hứa không thêm cách đọc dữ liệu chưa có bài đo đỏ được — đã sửa: bài quét theo luật SP-1 (cách ly sàn) có ca phá thử."},
+    {"i": 3, "p": "Trạng thái sàn chưa có căn chưa có tiêu chí — đã thêm vào AC-1 và bài đo."},
+    {"i": 4, "p": "Màn khác dùng cột thứ hai chưa có ảnh trước/sau ở hai khổ — đã thêm bốn cặp ảnh."}
+  ]
+}

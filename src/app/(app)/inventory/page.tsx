@@ -9,6 +9,7 @@ import { SessionRoles } from "@/modules/identity/ui";
 import { mySavedView, mySavedViews } from "@/modules/listings/server";
 
 import {
+  sampleBuildingPlaces,
   sampleInventoryListings,
   sampleInventoryRows,
   sampleRecords,
@@ -20,6 +21,9 @@ import {
   cellEditLabels,
   SAVED_VIEW_PARAM,
   savedViewCopy,
+  GEO_PARAM,
+  geoFiltersFor,
+  geoTree,
   inventoryFiltersFrom,
   inventoryOpeningFor,
   inventoryStateFrom,
@@ -133,8 +137,13 @@ export default async function Page({ searchParams }: Props) {
   }
   // One way to open the grid arranged (row 2c's initial view): a saved view's own arrangement wins; otherwise the
   // status shortcut and the search's column filter fill the column filters the grid opens with.
+  // A place of the geography tree (row 2d) fills the project and building filters with whole names.
+  const places = ([] as string[]).concat(query[GEO_PARAM] ?? []);
+  const geo = geoFiltersFor(geoTree(rows, sampleBuildingPlaces()), places);
   const filters =
-    openView || missing ? undefined : { ...inventoryFiltersFrom(status), ...opening.filters };
+    openView || missing
+      ? undefined
+      : { ...inventoryFiltersFrom(status), ...opening.filters, ...geo };
   // A shared link (row 3f) to a listing no longer on the inventory: the grid opens as usual and says why.
   const asked = first(query["ho-so"]);
   const stale = asked !== undefined && !rows.some((row) => row.id === asked);
