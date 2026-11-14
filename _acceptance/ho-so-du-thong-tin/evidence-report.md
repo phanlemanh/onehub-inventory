@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 8030e36da81e02e06246f1c074cea992a45cfbea
+verified_commit: fd194149a38a03f3c31b9ee80e95e01f8c1d3858
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -115,7 +115,7 @@ human_signoff: Manh Phan 2026-11-14
   run_id: minted-ho-so-du-thong-tin-E10-r2
   exit_code: 0
   baseline: n-a
-  verifier: ui-check
+  verifier: config:executors.design.ui_check
   verified_at: 2026-11-13T11:57:48Z
   carried_from_round: 2
   note: carry-forward từ round 2 — delta không chạm paths của eval
@@ -176,3 +176,7 @@ none — every multi-run eval is uniform
 Round 1: eval về thứ tự lần chào, giá so với dữ liệu mẫu, giá và ngày trên một dòng, đầu hồ sơ cuộn về tầm nhìn đỏ. Returned to implementation (commit 472bab8).
 Round 2: E2, E3, E4, E5, E6 failed — `make test` không hoàn tất: 14 tệp test lỗi, 35 test lỗi, 3 lỗi chưa xử lý; vitest không khởi động được worker cho tests/ho-so-du-thong-tin.test.tsx và tests/label.test.ts (hết thời gian chờ). Nguyên nhân là hạ tầng (máy ngủ). E1, E7, E8, E9, E10, E11, E12 và npm run build xanh. Returned to implementation.
 Round 3: make test, make check, npm run build và make e2e (988 test) đều xanh; E2 đến E6 chạy lại xanh, các eval còn lại mang từ round 2 vì delta không chạm paths của chúng. Verdict PASS.
+
+### Re-pin lần 1 — 2026-11-14, do gộp nhánh chính sau 1s (PR #48) trước khi gộp PR #47
+run_id: repin-20261114T020730Z-96169
+sha: fd194149a38a03f3c31b9ee80e95e01f8c1d3858 · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E10 · diff chạm vật đo ngoài làn máy: E10 — chưa chứng lại, đi vòng S4 delta
