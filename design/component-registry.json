@@ -15,6 +15,22 @@
       ]
     },
     {
+      "name": "CellEditor",
+      "file": "src/components/candidate/cell-editor.tsx",
+      "level": "atom",
+      "parts": [
+        {
+          "name": "CellEditor",
+          "props": [
+            "anchor",
+            "find",
+            "label",
+            "onClose"
+          ]
+        }
+      ]
+    },
+    {
       "name": "ColumnFilterCell",
       "file": "src/components/candidate/column-filter-cell.tsx",
       "level": "organism",
@@ -50,6 +66,7 @@
             "rowActions",
             "record",
             "editable",
+            "cellEdit",
             "initialFilters",
             "groupBy",
             "initialView",

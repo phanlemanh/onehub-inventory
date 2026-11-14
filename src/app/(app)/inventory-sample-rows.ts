@@ -14,9 +14,18 @@ import { inventoryRows, type ListingRecordData } from "@/modules/listings/ui";
  * the search suggests only what the grid shows.
  */
 export function sampleInventoryRows() {
-  const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
-  const { listings, listingUnits } = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
+  const { listings, listingUnits, units } = sampleInventory();
   return inventoryRows({ listings, listingUnits, units });
+}
+
+/** The listings behind those rows: the in-cell edit's sample save door holds them (row 4). */
+export function sampleInventoryListings() {
+  return sampleInventory().listings;
+}
+
+function sampleInventory() {
+  const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
+  return { units, ...buildSampleListings({ companyId: SAMPLE_COMPANY.id, units }) };
 }
 
 /** Only what the top-bar search suggests from (row 3f): the code, the building and the subdivision of each row. */

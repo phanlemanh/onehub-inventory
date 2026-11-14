@@ -113,6 +113,13 @@ khoi:
     mo_ta: Ô tìm duy nhất của sản phẩm ở thanh trên App Shell — gõ mã căn, toà hay dự án, có gợi ý ghi loại, mở bằng ⌘K
     ho_so: loi-vao-ho-so
     duyet: 2026-11-13
+  - ten: CellEditor
+    tep: src/components/candidate/cell-editor.tsx
+    nguon: data-grid-editing-2
+    nhu_cau: sua-tren-o
+    mo_ta: Sửa một ô ngay trong Lưới — ô nhập nằm trong ô, một dòng ngay dưới ô đọc lại, báo lỗi hay hỏi lại
+    ho_so: sua-tren-o
+    duyet: 2026-11-13
 # Blocks made before this ledger existed, each named with the round that made it, the commit that created it and the
 # day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
 # still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).

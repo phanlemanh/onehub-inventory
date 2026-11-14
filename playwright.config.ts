@@ -40,6 +40,8 @@ writeFileSync(
 export default defineConfig({
   testDir: "tests/e2e",
   reporter: "list",
+  // Marks this run's build folder as owned, sweeps folders of dead runs, deletes its own at exit (row 1s, AC-8).
+  globalSetup: "./tests/e2e-db/don-dung-tam.ts",
   use: { baseURL: URL },
   projects: SIZES.map(({ name, width, height }) => ({
     name,

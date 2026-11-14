@@ -23,7 +23,7 @@ hàng 3b).
 
 ## Where in the code
 
-`src/modules/listings/` (chưa chuyển mã).
+`src/modules/listings/`: luật sửa giá và trạng thái ở `edit-rules.ts`, cổng lưu ở `save-door.ts`, sửa trên ô của Bảng hàng ở `ui/use-listing-cell-edit.tsx`.
 
 ## History
 
@@ -35,3 +35,5 @@ Hàng 3b, 13/11/2026: thêm năm trường của lần chào — `furnished` và
 `financing` chữ tự do (riêng của ta), `originalEntryTimestamp` để xếp các lần chào của căn; thêm luật một lần chào mở
 trên một căn. Cơ sở dữ liệu chưa có bảng lần chào: cột đi cùng bảng ở hàng 10. Hồ sơ:
 `_acceptance/ho-so-du-thong-tin/`.
+
+Hàng 4, 13/11/2026: sửa Giá chào và Trạng thái trên ô của Bảng hàng. Mười hai lối chuyển trạng thái; Đã bán và Ngừng hẳn là nấc cuối, Đã bán khoá cả giá; Ngừng hẳn hỏi Lý do ngừng (ba lý do, khái niệm riêng). Mọi lần sửa đi qua một cổng lưu bốn kết cục; hôm nay ghi vào dữ liệu mẫu trong bộ nhớ, hàng 10 cắm đường ghi thật.
