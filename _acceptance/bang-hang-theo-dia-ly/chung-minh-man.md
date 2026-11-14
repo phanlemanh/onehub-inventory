@@ -49,10 +49,9 @@ Bản bấm được của bốn lối (A, B, C, D): ảnh ở `figures/proto/`,
 ### Khối
 
 Không khối mới: nhóm địa lý dựng bằng chính mục của cột thứ hai (khuôn App Shell của hàng 1o), mục con lồng bằng danh sách
-con của cùng thành phần Sidebar.
+con của cùng thành phần Sidebar (nhóm `SidebarGroup`, danh sách con `SidebarMenuSub`).
 
 | Khối | Bậc | Đã tra | Ứng viên gần nhất | Vì sao không dùng | Cách |
 | --- | --- | --- | --- | --- | --- |
-| SidebarGroup | trong-kho | | | | |
-| SidebarMenuSub | trong-kho | | | | |
+| Sidebar | trong-kho | | | | |
 | DataRegion | trong-kho | | | | |
