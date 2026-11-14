@@ -31,7 +31,7 @@ export interface Break {
 
 export interface Recipe {
   id: string;
-  /** Name of the region state in design/states.md this recipe covers; absent for frame recipes and search. */
+  /** Name of the region state in design/states.md this recipe covers; absent for frame recipes and the filter case. */
   state?: string;
   /** Appended to the screen URL. */
   query?: string;
@@ -206,12 +206,17 @@ const region = (page: Page) => page.locator('[data-slot="data-region"]');
 const bodyRows = (page: Page) => page.locator('[data-slot="data-region-body"] tbody tr');
 const stateOf = (page: Page, kind: string) =>
   page.locator(`[data-slot="region-state"][data-kind="${kind}"]`);
-const search = (page: Page) => region(page).getByRole("searchbox");
+/** Any search box inside the region: row 2e dropped it, so the region cases count these and want none. */
+const searchBoxes = (page: Page) =>
+  region(page).locator('[role="searchbox"], input[type="search"]');
+/** The filter box under the first column's header (row 2e: a region filters by these, not by a search box). */
+const firstFilter = (page: Page) =>
+  region(page).locator('[data-slot="column-filter"] input').first();
 /** The grid's own scroll viewport: rows scroll inside it in one continuous run (row 2, «đọc như Sheet»). */
 const viewport = (page: Page) =>
   page.locator('[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]').first();
 
-/** Kinds whose shown text is the searched value (column-kind.ts SEARCHABLE_KINDS, without `select`, which shows a label). */
+/** Kinds whose shown text is the value a text filter reads (words, not numbers, dates or a select's label). */
 const TEXT_KINDS = ["text", "person"];
 
 /** How many data rows a person sees in the grid's viewport at the top of the run (not the extra rows mounted ahead). */
@@ -254,29 +259,41 @@ async function scrollUntil(page: Page, done: () => Promise<boolean>): Promise<vo
   }
 }
 
-/** The texts of the rows mounted now, with their row number; hidden rows are left out. */
+/**
+ * The texts of the rows mounted now, with their row number; hidden rows are left out. The first text is the first
+ * column's cell (the one the first filter box reads), then every text cell of the row.
+ */
 async function mountedRows(page: Page): Promise<[number, string[]][]> {
   return bodyRows(page).evaluateAll(
     (trs, kinds) =>
       trs
         .filter((tr) => getComputedStyle(tr).display !== "none")
-        .map((tr): [number, string[]] => [
-          Number(tr.querySelector('[data-slot="row-number"]')?.textContent ?? "0"),
-          [...tr.querySelectorAll<HTMLElement>('[data-slot="typed-cell"]')]
-            .filter((cell) => kinds.includes(cell.dataset["kind"] ?? ""))
-            .map((cell) => {
-              const copy = cell.cloneNode(true) as HTMLElement;
-              copy.querySelectorAll('[data-slot="cell-lock-reason"]').forEach((n) => n.remove());
-              return (copy.textContent ?? "").trim();
-            }),
-        ])
+        .map((tr): [number, string[]] => {
+          const text = (cell: HTMLElement) => {
+            const copy = cell.cloneNode(true) as HTMLElement;
+            copy.querySelectorAll('[data-slot="cell-lock-reason"]').forEach((n) => n.remove());
+            return (copy.textContent ?? "").trim();
+          };
+          const cells = [...tr.querySelectorAll<HTMLElement>('[data-slot="typed-cell"]')];
+          // The first data cell after the row number: a typed cell, or the record's opener (Sent's recipient).
+          const first = [...tr.querySelectorAll<HTMLElement>("td")].find(
+            (td) => !td.querySelector('[data-slot="row-number"]'),
+          );
+          return [
+            Number(tr.querySelector('[data-slot="row-number"]')?.textContent ?? "0"),
+            [
+              first ? text(first) : "",
+              ...cells.filter((cell) => kinds.includes(cell.dataset["kind"] ?? "")).map(text),
+            ],
+          ];
+        })
         .filter(([n]) => n > 0),
     TEXT_KINDS,
   );
 }
 
 /**
- * Every row's searchable texts in the one continuous run, read the way a person reads it: the mouse wheel scrolls the
+ * Every row's texts (first column first) in the one continuous run, read the way a person reads it: the mouse wheel scrolls the
  * grid's viewport from top to bottom while the virtual body mounts the rows in view. Back at the top afterwards.
  * Also returns how many rows a person sees in the viewport before any scrolling (the first window).
  */
@@ -314,12 +331,27 @@ const key = (row: string[]) => row.join(" ¦ ");
 /** Rows a first window holds when the caller gives none (the calibration grid's old page size, kept for its needle). */
 const PAGE_SIZE = 50;
 
+/** Text as the grid's text filter compares it: lower case, Vietnamese marks off, «đ» as «d» (worked out here apart). */
+export function foldForFilter(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[đĐ]/g, "d")
+    .toLocaleLowerCase("vi");
+}
+
+/** True when a row's first column holds the needle the way the first filter box reads it. */
+export const firstColumnHas = (row: string[], needle: string): boolean =>
+  foldForFilter(row[0] ?? "").includes(foldForFilter(needle));
+
 /**
- * A search string from the data whose matches lie beyond the first window before the search AND fill more than one window
- * after it, so both "filters only the rows in view" and "keeps only the first window of results" show as dropped rows.
- * `pageSize` is the first window: the rows a person sees before any scrolling (row 2: continuous run, no pages).
+ * A string from the first column whose matches lie beyond the first window before filtering AND fill more than one
+ * window after it, so both "filters only the rows in view" and "keeps only the first window of results" show as dropped
+ * rows. `pageSize` is the first window: the rows a person sees before any scrolling (row 2: continuous run, no pages).
+ * `short`: the grid is under two windows (Sent's sample, row 2e), so no string can do that — then any string kept by two
+ * rows or more and not by all of them, and the "first window" break cuts the results in half instead (see the recipe).
  */
-export function pickNeedle(rows: string[][], pageSize = PAGE_SIZE): string | null {
+export function pickNeedle(rows: string[][], pageSize = PAGE_SIZE, short = false): string | null {
   const seen = new Set<string>();
   for (const row of rows) {
     const first = row[0] ?? "";
@@ -328,10 +360,11 @@ export function pickNeedle(rows: string[][], pageSize = PAGE_SIZE): string | nul
         const needle = first.slice(at, at + len);
         if (!/\d/.test(needle) || seen.has(needle)) continue;
         seen.add(needle);
-        const lower = needle.toLocaleLowerCase("vi");
-        const hits = rows
-          .map((r, i) => (r.some((t) => t.toLocaleLowerCase("vi").includes(lower)) ? i : -1))
-          .filter((i) => i >= 0);
+        const hits = rows.map((r, i) => (firstColumnHas(r, needle) ? i : -1)).filter((i) => i >= 0);
+        if (short) {
+          if (hits.length >= 2 && hits.length < rows.length) return needle;
+          continue;
+        }
         const pages = new Set(hits.map((i) => Math.floor(i / pageSize)));
         if (hits.length > pageSize && hits.length < rows.length && pages.size >= 2) return needle;
       }
@@ -347,23 +380,32 @@ export function compareRows(expected: string[][], shown: string[][]): string | n
   for (const r of shown) {
     const k = key(r);
     const n = count.get(k) ?? 0;
-    if (n === 0) return `tim: hien dong khong khop — ${r[0] ?? k}`;
+    if (n === 0) return `loc-dau-cot: hien dong khong khop — ${r[0] ?? k}`;
     count.set(k, n - 1);
   }
-  for (const [k, n] of count) if (n > 0) return `tim: bo sot dong khop — ${k.split(" ¦ ")[0]}`;
+  for (const [k, n] of count)
+    if (n > 0) return `loc-dau-cot: bo sot dong khop — ${k.split(" ¦ ")[0]}`;
   return null;
 }
 
-async function searchCheck({ page }: Ctx): Promise<void> {
+/**
+ * The first column's filter box keeps exactly the rows whose first column holds the typed text, across the whole run
+ * (row 2e: the case the region search box had, measured the same way on the filter under the first header).
+ */
+async function firstFilterCheck({ page }: Ctx): Promise<void> {
   const { rows: before, window } = await allRowsWithWindow(page);
-  const needle = pickNeedle(before, Math.max(1, window));
+  // A grid under two windows (Sent's 14 links) cannot hold matches past the first window that fill another one: then a
+  // string kept by some rows and not all, and the first-window break cuts the results in half.
+  const page1 = Math.max(1, window);
+  const needle =
+    pickNeedle(before, page1) ??
+    (before.length < 2 * page1 ? pickNeedle(before, page1, true) : null);
   if (needle === null)
     fail(
-      "tim: khong du du lieu de thu (can mot chuoi khop nhieu hon mot khung cuon, nam ngoai khung dau)",
+      "loc-dau-cot: khong du du lieu de thu (can mot chuoi o cot dau khop nhieu hon mot khung cuon, nam ngoai khung dau)",
     );
-  const lower = needle.toLocaleLowerCase("vi");
-  const expected = before.filter((r) => r.some((t) => t.toLocaleLowerCase("vi").includes(lower)));
-  await search(page).fill(needle);
+  const expected = before.filter((r) => firstColumnHas(r, needle));
+  await firstFilter(page).fill(needle);
   await page
     .waitForFunction(
       (n) =>
@@ -378,15 +420,18 @@ async function searchCheck({ page }: Ctx): Promise<void> {
   if (problem) fail(problem);
   const count = await region(page).locator('[data-slot="region-count"]').textContent();
   if (!count?.startsWith(`${expected.length} /`)) {
-    fail(`tim: so dong dau vung "${count}" khac ${expected.length}`);
+    fail(`loc-dau-cot: so dong dau vung "${count}" khac ${expected.length}`);
   }
 }
 
-/** Matches a region while its search box holds a query (the box shows its placeholder only when empty). */
-const SEARCHING = '[data-slot="data-region"]:has(input[type="search"]:not(:placeholder-shown))';
+/** Matches a region while its first filter box holds text (the box shows its placeholder only when empty). */
+const FILTERING =
+  '[data-slot="data-region"]:has([data-slot="column-filter"] input:not(:placeholder-shown))';
+/** The first filter box, as the page scripts of the breaks find it. */
+const FIRST_FILTER_JS = `document.querySelector('[data-slot="data-region"] [data-slot="column-filter"] input')`;
 
 /**
- * Break the search result after typing: `fn` runs on every change of the page while the search box holds a query.
+ * Break the filter result after typing: `fn` runs on every change of the page while the first filter box holds text.
  * It watches the whole document, because the grid replaces its body node when it switches density.
  */
 async function onResult(page: Page, fn: string): Promise<void> {
@@ -496,24 +541,25 @@ export const REGION: Recipe[] = [
     ],
   },
   {
-    id: "tim-khong-ra",
-    state: "Tìm không ra",
+    id: "khong-khop",
+    state: "Không có dòng nào khớp",
     async check({ page }) {
-      await search(page).fill("khong-co-dong-nao-zzz");
+      await firstFilter(page).fill("khong-co-dong-nao-zzz");
       const exit = region(page).getByRole("button", { name: "Xoá lọc" });
       try {
         await exit.waitFor({ timeout: SHORT });
       } catch {
-        fail("tim-khong-ra: thieu loi thoat Xoa loc");
+        fail("khong-khop: thieu loi thoat Xoa loc");
       }
       await exit.click();
-      if ((await search(page).inputValue()) !== "") fail("tim-khong-ra: Xoa loc khong xoa o tim");
-      if ((await bodyRows(page).count()) === 0) fail("tim-khong-ra: Xoa loc khong tra lai dong");
+      if ((await firstFilter(page).inputValue()) !== "")
+        fail("khong-khop: Xoa loc khong xoa o loc");
+      if ((await bodyRows(page).count()) === 0) fail("khong-khop: Xoa loc khong tra lai dong");
     },
     breaks: [
       {
         name: "go nut Xoa loc",
-        message: /tim-khong-ra: thieu loi thoat Xoa loc/,
+        message: /khong-khop: thieu loi thoat Xoa loc/,
         before: async ({ page }) => {
           await page.addInitScript(() => {
             new MutationObserver(() => {
@@ -638,7 +684,7 @@ export const REGION: Recipe[] = [
       if ((await region(page).locator('[data-slot="region-count"]').count()) !== 0) {
         fail("khong-du-quyen: lo so dong");
       }
-      if ((await search(page).count()) !== 0) fail("khong-du-quyen: con o tim");
+      if ((await searchBoxes(page).count()) !== 0) fail("khong-du-quyen: con o tim");
     },
     breaks: [
       {
@@ -656,19 +702,19 @@ export const REGION: Recipe[] = [
     ],
   },
   {
-    id: "tim",
+    id: "loc-dau-cot",
     async check(ctx) {
-      await searchCheck(ctx);
+      await firstFilterCheck(ctx);
     },
     breaks: [
       {
         name: "go mot dong khop",
-        message: /tim: bo sot dong khop — /,
+        message: /loc-dau-cot: bo sot dong khop — /,
         // A style rule, not a DOM edit: the grid re-renders after measuring its width and would put a removed row back.
         // Row 2: the run is virtual, so the rule names one result row (number 1) instead of the DOM's last row.
         apply: async ({ page }) => {
           await page.addStyleTag({
-            content: `${SEARCHING} tbody tr:has([data-row-number="1"]) { display: none !important; }`,
+            content: `${FILTERING} tbody tr:has([data-row-number="1"]) { display: none !important; }`,
           });
         },
       },
@@ -676,38 +722,68 @@ export const REGION: Recipe[] = [
         // Row 2: equivalent of "only the first page of results" for a continuous run — the results cannot scroll past
         // the first window, so rows below it never mount.
         name: "chi con khung dau",
-        message: /tim: bo sot dong khop — /,
+        message: /loc-dau-cot: bo sot dong khop — /,
         // Hides every result row numbered past the first window (the rows a person sees before any scrolling),
-        // re-applied on every re-render: the results never reach past that window.
+        // re-applied on every re-render: the results never reach past that window. When every result fits in that
+        // window (a short grid, row 2e), the cut falls at half the results, so the results still stop short.
         apply: async ({ page }) => {
           const window = await visibleRows(page);
           await onResult(
             page,
-            `const box = document.querySelector('[data-slot="data-region"] input[type="search"]');
+            `const box = ${FIRST_FILTER_JS};
              if (!box || !box.value) return;
+             const left = Number((document.querySelector('[data-slot="region-count"]')?.textContent ?? '').split(' /')[0]);
+             const cut = left > 1 && left <= ${window} ? Math.floor(left / 2) : ${window};
              document.querySelectorAll('[data-slot="data-region-body"] tbody tr').forEach((tr) => {
                const n = Number(tr.querySelector('[data-slot="row-number"]')?.textContent ?? '0');
-               if (n > ${window}) tr.style.display = 'none';
+               if (n > cut) tr.style.display = 'none';
              });`,
           );
         },
       },
       {
         name: "them mot dong khong khop",
-        message: /tim: hien dong khong khop — /,
+        message: /loc-dau-cot: hien dong khong khop — /,
         apply: async ({ page }) => {
           // Re-applied on every re-render, so the grid cannot drop the extra row.
           await onResult(
             page,
-            `const box = document.querySelector('[data-slot="data-region"] input[type="search"]');
+            `const box = ${FIRST_FILTER_JS};
              if (!box || !box.value || document.querySelector('tr[data-pha]')) return;
              const row = document.querySelector('[data-slot="data-region-body"] tbody tr:has([data-slot="row-number"])');
              if (!row) return;
              const extra = row.cloneNode(true);
              extra.setAttribute('data-pha', '1');
-             extra.querySelectorAll('[data-slot="typed-cell"]').forEach((c) => { if (c.dataset.kind === 'text') c.textContent = 'zz-khong-khop'; });
+             extra.querySelectorAll('[data-slot="typed-cell"]').forEach((c) => { c.textContent = 'zz-khong-khop'; });
              row.parentNode.appendChild(extra);`,
           );
+        },
+      },
+    ],
+  },
+  {
+    // Row 2e (owner 2026-11-13): no region of the grid family has a search box, whatever it shows; searching is the
+    // top bar's ⌘K box.
+    id: "o-tim-vang",
+    async check({ page }) {
+      await region(page).first().waitFor({ state: "attached", timeout: SHORT });
+      if ((await searchBoxes(page).count()) !== 0) fail("o-tim-vang: con o tim");
+      if ((await region(page).getByPlaceholder("Gõ để tìm").count()) !== 0)
+        fail("o-tim-vang: con o tim");
+    },
+    breaks: [
+      {
+        name: "chen o tim",
+        message: /o-tim-vang: con o tim/,
+        apply: async ({ page }) => {
+          await region(page)
+            .first()
+            .evaluate((el) => {
+              const box = document.createElement("input");
+              box.type = "search";
+              box.placeholder = "Gõ để tìm";
+              el.prepend(box);
+            });
         },
       },
     ],
@@ -718,25 +794,6 @@ export const REGION: Recipe[] = [
 
 /** Grid screens allowed to have no data region yet, each with why. Remove a line when the screen builds its region. */
 export const NO_REGION_YET: Record<string, string> = {};
-
-/**
- * Grid screens that do not run the search case, each with why (supervisor ruling D-1311-7). The region search box is
- * dropped across the grid family by the owner's decision of 2026-11-13; row 2e removes the search case and this list.
- */
-export const NO_SEARCH_CASE: Record<string, string> = {
-  sent: "ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này",
-};
-
-/** Why a region case does not run on a screen, or null when it runs: only the search case can be listed out. */
-export function regionCaseSkip(
-  id: string,
-  recipeId: string,
-  listed: Record<string, string> = NO_SEARCH_CASE,
-): string | null {
-  if (recipeId !== "tim") return null;
-  const why = listed[id];
-  return why === undefined ? null : `khong chay ca tim — ${why}`;
-}
 
 export type GridVerdict = { run: true } | { run: false; skip: string };
 

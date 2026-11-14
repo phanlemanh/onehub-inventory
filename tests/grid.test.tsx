@@ -257,25 +257,16 @@ describe("region header", () => {
 
   it("names the region and counts its rows", () => {
     const { container } = render(
-      <RegionHeader
-        title="Vùng"
-        total={12}
-        query=""
-        onQuery={() => {}}
-        searchId="s"
-        action={<button>Thêm</button>}
-      />,
+      <RegionHeader title="Vùng" total={12} action={<button>Thêm</button>} />,
     );
     expect(() => checkHeader(container)).not.toThrow();
     expect(screen.getByText("12 dòng")).toBeTruthy();
-    expect(screen.getByRole("searchbox", { name: "Tìm trong vùng" })).toBeTruthy();
+    expect(screen.queryAllByRole("searchbox")).toHaveLength(0);
     expect(container.querySelector('[data-slot="region-action"]')).not.toBeNull();
   });
 
-  it("counts matches over the total while searching and leaves no empty action slot", () => {
-    const { container } = render(
-      <RegionHeader title="Vùng" total={12} shown={3} query="a" onQuery={() => {}} searchId="s" />,
-    );
+  it("counts matches over the total while filtering and leaves no empty action slot", () => {
+    const { container } = render(<RegionHeader title="Vùng" total={12} shown={3} />);
     expect(screen.getByText("3 / 12 dòng")).toBeTruthy();
     expect(container.querySelector('[data-slot="region-action"]')).toBeNull();
   });
@@ -504,16 +495,109 @@ describe("region states inside the grid", () => {
       <DataRegion title="Vùng" columns={columns} rows={rows} emptyWhy="x" />,
     );
     const { fireEvent } = await import("@testing-library/react");
-    fireEvent.change(getByRole("searchbox"), { target: { value: "s2.03" } });
+    const codeFilter = () => getByRole("textbox", { name: "Lọc cột Mã" }) as HTMLInputElement;
+    fireEvent.change(codeFilter(), { target: { value: "s2.03" } });
     expect(container.querySelectorAll("tbody tr").length).toBe(1);
     expect(container.textContent).toContain("1 / 2 dòng");
-    fireEvent.change(getByRole("searchbox"), { target: { value: "khong-co" } });
+    fireEvent.change(codeFilter(), { target: { value: "khong-co" } });
     expect(kindShown(container)).toEqual(["no-match"]);
     getByRole("button", { name: "Xoá lọc" }).click();
     await new Promise((resolve) => setTimeout(resolve, 0));
-    expect((getByRole("searchbox") as HTMLInputElement).value).toBe("");
+    expect(codeFilter().value).toBe("");
     expect(container.querySelectorAll("tbody tr").length).toBe(2);
     expect(container.querySelector('[data-slot="region-count"]')?.textContent).toBe("2 dòng");
+  });
+});
+
+describe("no search box in any region state (row 2e, AC-1)", () => {
+  const columns = [
+    typedColumn({ field: "Listing.unitNumber", header: "Mã" }),
+    typedColumn({ field: "Listing.listPrice", header: "Giá" }),
+  ];
+  const rows: GridRow[] = [
+    { id: "a", "Listing.unitNumber": "S1.01-0201", "Listing.listPrice": 2_000_000_000 },
+    { id: "b", "Listing.unitNumber": "S2.03-1105", "Listing.listPrice": 3_100_000_000 },
+  ];
+  /** The seven region states of design/states.md, written down before the check. */
+  const STATES: readonly [string, () => ReactElement][] = [
+    ["có dòng", () => <DataRegion title="Vùng" columns={columns} rows={rows} emptyWhy="x" />],
+    [
+      "đang lọc",
+      () => (
+        <DataRegion
+          title="Vùng"
+          columns={columns}
+          rows={rows}
+          emptyWhy="x"
+          initialFilters={{ "Listing.unitNumber": "s2" }}
+        />
+      ),
+    ],
+    [
+      "không khớp",
+      () => (
+        <DataRegion
+          title="Vùng"
+          columns={columns}
+          rows={rows}
+          emptyWhy="x"
+          initialFilters={{ "Listing.unitNumber": "khong-co" }}
+        />
+      ),
+    ],
+    [
+      "đang tải",
+      () => <DataRegion title="Vùng" columns={columns} rows={rows} status="loading" emptyWhy="x" />,
+    ],
+    ["trống", () => <DataRegion title="Vùng" columns={columns} rows={[]} emptyWhy="x" />],
+    [
+      "lỗi",
+      () => <DataRegion title="Vùng" columns={columns} rows={rows} status="error" emptyWhy="x" />,
+    ],
+    [
+      "không đủ quyền",
+      () => (
+        <DataRegion title="Vùng" columns={columns} rows={rows} status="forbidden" emptyWhy="x" />
+      ),
+    ],
+  ];
+
+  /** A region with no search box: no searchbox role, no search words, no search input. */
+  function checkNoSearch(root: HTMLElement, state: string): void {
+    const box =
+      root.querySelector('[role="searchbox"], input[type="search"]') ??
+      root.querySelector('[placeholder="Gõ để tìm"], [aria-label="Tìm trong vùng"]');
+    if (box) throw new Error(`region still has a search box: ${state}`);
+  }
+
+  it("has the seven states written down", () => {
+    expect(STATES).toHaveLength(7);
+  });
+
+  it.each(STATES)("%s: no search box", (state, draw) => {
+    const { container } = render(draw());
+    expect(() => checkNoSearch(container, state)).not.toThrow();
+    expect(screen.queryAllByRole("searchbox")).toHaveLength(0);
+    if (state === "có dòng" || state === "đang lọc") {
+      // Positive control: the toolbar still counts rows and holds the sheet tools of row 2a.
+      expect(container.querySelector('[data-slot="region-footer-count"]')?.textContent).toMatch(
+        /dòng$/,
+      );
+      expect(container.querySelector('[data-slot="sheet-tools"]')).not.toBeNull();
+      expect(screen.getByRole("button", { name: "Cột" })).toBeTruthy();
+    }
+  });
+
+  it("the check fails on a toolbar that draws a search box again", () => {
+    const { container } = render(STATES[0]![1]());
+    const toolbar = container.querySelector('[data-slot="region-toolbar"]')!;
+    const again = document.createElement("input");
+    again.type = "search";
+    again.placeholder = "Gõ để tìm";
+    toolbar.prepend(again);
+    expect(() => checkNoSearch(container, "có dòng")).toThrow(
+      "region still has a search box: có dòng",
+    );
   });
 });
 
@@ -631,13 +715,17 @@ describe("content-fitted width of text columns", () => {
     }
   }
 
-  it("keeps column widths while searching: widths come from every row the region holds", () => {
+  it("keeps column widths while filtering: widths come from every row the region holds", () => {
     const { container } = render(<DataRegion title="Vùng" columns={columns} rows={rows} />);
     const before = widthsOf(container);
     expect(before.every((w) => w !== "")).toBe(true);
-    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "E1" } });
+    const towerFilter = () => screen.getByRole("textbox", { name: "Lọc cột Toà nhà" });
+    fireEvent.change(towerFilter(), { target: { value: "E1" } });
+    expect(container.querySelector('[data-slot="region-footer-count"]')?.textContent).toBe(
+      "30 / 60 dòng",
+    );
     checkSteady(before, widthsOf(container), "search");
-    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "" } });
+    fireEvent.change(towerFilter(), { target: { value: "" } });
     checkSteady(before, widthsOf(container), "search cleared");
   });
 

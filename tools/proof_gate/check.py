@@ -34,6 +34,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from legacy import History
 from model import (
     CLOSED,
     CONTEXT_PAGES_DIR,
@@ -509,6 +510,7 @@ def check_regions(name: str, block: dict[str, str], region_rows: list[dict[str, 
 
 def check_ledger(repo: Repo, by_slug: dict[str, Contract]) -> list[Finding]:
     out: list[Finding] = []
+    history: History | None = None  # read only when a pair asks for it
 
     def emit(entry: str, code: str, text: str) -> None:
         out.append(Finding(LEDGER_FILE, entry, code, text))
@@ -549,8 +551,15 @@ def check_ledger(repo: Repo, by_slug: dict[str, Contract]) -> list[Finding]:
             emit(name, "so-ngay-lech", f"ngày duyệt {day} khác ngày hồ sơ '{slug}' qua Cổng Phạm vi ({owner.approved_at or 'chưa duyệt'})")
         rows = [r for part in list(owner.proofs.values()) + list(owner.templates.values()) for r in block_rows(part)]
         want_name, want_rung = (source, "reui") if source != HAND_MADE else (name, "ve-tay")
-        if (name, slug) in repo.legacy_blocks and owner.status not in OPEN:
-            continue  # made before the ledger by a closed round, named pair by pair (so-khoi.yaml, khoi_co_truoc)
+        legacy = repo.legacy_blocks.get((name, slug))
+        if legacy is not None and owner.status not in OPEN:
+            # Made before the ledger by a closed round, named pair by pair (so-khoi.yaml, khoi_co_truoc); git must
+            # prove the commit, its file and its day (row 2e, AC-10).
+            if history is None:
+                history = History.read(repo.root)
+            for code, text in history.check_pair(name, legacy["commit"], legacy["ngay"], tep):
+                emit(name, code, text)
+            continue
         if not any(bare(r.get("khối", "")) == want_name and fold(bare(r.get("bậc", ""))) == want_rung for r in rows):
             emit(name, "so-khong-chung-tu", f"bảng Khối của hồ sơ '{slug}' không có dòng '{want_name}' bậc {want_rung}")
     return out

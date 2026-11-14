@@ -85,7 +85,7 @@
       "name": "RegionTitle",
       "category": "component",
       "file": "src/components/candidate/region-header.tsx",
-      "level": "organism",
+      "level": "atom",
       "source": "own",
       "props": ["title"]
     },
@@ -93,15 +93,15 @@
       "name": "RegionToolbar",
       "category": "component",
       "file": "src/components/candidate/region-header.tsx",
-      "level": "organism",
+      "level": "atom",
       "source": "own",
-      "props": ["total", "shown", "query", "onQuery", "action", "tools", "searchId", "showCount"]
+      "props": ["total", "shown", "action", "tools", "showCount"]
     },
     {
       "name": "RegionHeader",
       "category": "component",
       "file": "src/components/candidate/region-header.tsx",
-      "level": "organism",
+      "level": "atom",
       "source": "own",
       "parts": ["RegionTitle", "RegionToolbar"]
     },

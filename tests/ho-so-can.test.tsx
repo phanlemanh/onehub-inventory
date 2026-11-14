@@ -257,7 +257,7 @@ const shownIds = () =>
     el.getAttribute("data-record-open"),
   ) as string[];
 
-/** «Sau» from `from` lands on the row shown right after it, never on a row the search hid. */
+/** «Sau» from `from` lands on the row shown right after it, never on a row the column filter hid. */
 function assertWalk(shown: readonly string[], from: string, landed: string | null): void {
   const expected = shown[shown.indexOf(from) + 1] ?? null;
   if (landed !== expected)
@@ -283,9 +283,9 @@ describe("E5 · «Trước» and «Sau» walk the rows the grid shows", () => {
     expect(button("Trước").disabled).toBe(false);
   });
 
-  it("follows the search and skips the rows it hides", async () => {
+  it("follows the column filter and skips the rows it hides", async () => {
     render(<Region initial="a" />);
-    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "S1." } });
+    fireEvent.change(screen.getByLabelText("Lọc cột Căn"), { target: { value: "S1." } });
     const shown = shownIds();
     expect(shown).toEqual(["a", "c", "e"]);
     fireEvent.click(button("Sau"));
@@ -293,10 +293,10 @@ describe("E5 · «Trước» and «Sau» walk the rows the grid shows", () => {
     assertWalk(shown, "a", panel()!.getAttribute("data-record-id"));
   });
 
-  it("keeps the open row when the search hides it, with both steps off", async () => {
+  it("keeps the open row when the column filter hides it, with both steps off", async () => {
     render(<Region initial="b" />);
     await waitFor(() => expect(panel()?.getAttribute("data-record-id")).toBe("b"));
-    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "S1." } });
+    fireEvent.change(screen.getByLabelText("Lọc cột Căn"), { target: { value: "S1." } });
     expect(shownIds()).not.toContain("b");
     expect(panel()?.getAttribute("data-record-id")).toBe("b");
     expect(button("Trước").disabled).toBe(true);

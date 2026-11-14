@@ -19,11 +19,10 @@ import { describe, expect, it } from "vitest";
 import {
   FRAME,
   NO_REGION_YET,
-  NO_SEARCH_CASE,
-  regionCaseSkip,
   REGION,
   classifyGrid,
   compareRows,
+  firstColumnHas,
   pickNeedle,
   pinned,
   type Recipe,
@@ -48,7 +47,7 @@ describe("công thức phủ bảng trạng thái", () => {
     const SEVEN = [
       "chờ tải",
       "trống",
-      "tìm không ra",
+      "không có dòng nào khớp",
       "lỗi",
       "một phần hỏng",
       "chữ dài",
@@ -65,8 +64,8 @@ describe("công thức phủ bảng trạng thái", () => {
 
   it("a region state added to the register without a recipe is named", () => {
     const edited = STATES_MD.replace("không đủ quyền)", "không đủ quyền, Thử ma)").replace(
-      "| Không đủ quyền   |",
-      "| Thử ma | Trạng thái giả của bài kiểm | Bài kiểm của vùng |\n| Không đủ quyền   |",
+      /\| Không đủ quyền +\|/,
+      "| Thử ma | Trạng thái giả của bài kiểm | Bài kiểm của vùng |\n$&",
     );
     expect(edited).not.toBe(STATES_MD);
     expect(checkRecipes(REGION, edited)).toEqual(["thieu cong thuc: Thử ma"]);
@@ -156,29 +155,79 @@ describe("danh sách chưa có vùng", () => {
   });
 });
 
-// ---- grid screens that do not run the search case (row 6, ruling D-1311-7) ------------------------------------------
+// ---- every grid screen runs every region case (row 2e, AC-8) -------------------------------------------------------
 
-describe("man khong chay ca tim", () => {
-  it("sent skips the search case with its reason, and only the search case", () => {
-    expect(Object.keys(NO_SEARCH_CASE)).toEqual(["sent"]);
-    expect(regionCaseSkip("sent", "tim")).toBe(`khong chay ca tim — ${NO_SEARCH_CASE["sent"]}`);
-    expect(regionCaseSkip("sent", "trong")).toBeNull();
-    expect(regionCaseSkip("sent", "chu-dai")).toBeNull();
+describe("moi man Luoi chay du ca vung (hang 2e)", () => {
+  /** Written before the code: the region cases after row 2e — no «tim», the filter case and the renamed state case. */
+  const REGION_IDS = [
+    "cho-tai",
+    "trong",
+    "khong-khop",
+    "loi",
+    "mot-phan-hong",
+    "chu-dai",
+    "khong-du-quyen",
+    "loc-dau-cot",
+    "o-tim-vang",
+  ];
+
+  it("the region cases are the list written ahead", () => {
+    expect(REGION.map((r) => r.id).sort()).toEqual([...REGION_IDS].sort());
+    expect(REGION_IDS).not.toContain("tim");
+    expect(REGION_IDS).not.toContain("tim-khong-ra");
   });
-  it("another grid screen still runs the search case", () => {
-    expect(regionCaseSkip("inventory", "tim")).toBeNull();
-    expect(regionCaseSkip("contacts", "tim")).toBeNull();
+
+  it("the no-match case carries the state name of design/states.md", () => {
+    const state = REGION.find((r) => r.id === "khong-khop")?.state;
+    expect(state).toBe("Không có dòng nào khớp");
+    expect(STATES_MD).toContain(`| ${state} `);
+    expect(STATES_MD).not.toContain("Tìm không ra");
   });
-  it("only the search case of a listed screen is skipped", () => {
-    expect(regionCaseSkip("inventory", "tim", { inventory: "x" })).toBe("khong chay ca tim — x");
-    expect(regionCaseSkip("man-gia", "loi", { "man-gia": "x" })).toBeNull();
+
+  it("recipes.ts exports no exemption list and suite.ts reads none", () => {
+    const recipes = readFileSync(join(REPO_ROOT, "tools/e2e_templates/recipes.ts"), "utf8");
+    const suite = readFileSync(join(REPO_ROOT, "tools/e2e_templates/suite.ts"), "utf8");
+    expect(recipes).not.toMatch(/NO_SEARCH_CASE|regionCaseSkip/);
+    expect(suite).not.toMatch(/NO_SEARCH_CASE|regionCaseSkip|caseSkip/);
+  });
+
+  /** The region tests a suite builds for the grid screens: every case, and every break of it, for every screen. */
+  function regionTests(screens: readonly string[], skip: Record<string, string[]> = {}): string[] {
+    return screens.flatMap((id) =>
+      REGION.filter((r) => !(skip[id] ?? []).includes(r.id)).flatMap((r) => [
+        `${id}: vung ${r.id}`,
+        ...r.breaks.map((b) => `${id}: pha vung ${r.id}: ${b.name}`),
+      ]),
+    );
+  }
+
+  function checkNoSkips(tests: readonly string[], screens: readonly string[]): void {
+    for (const id of screens)
+      for (const r of REGION)
+        if (!tests.includes(`${id}: vung ${r.id}`))
+          throw new Error(`${id} skips a region case: ${r.id}`);
+  }
+
+  it("a register with inventory and sent builds every region case for both screens", () => {
+    const screens = ["inventory", "sent"];
+    const tests = regionTests(screens);
+    const perScreen = REGION.reduce((n, r) => n + 1 + r.breaks.length, 0);
+    expect(tests).toHaveLength(perScreen * 2);
+    expect(() => checkNoSkips(tests, screens)).not.toThrow();
+  });
+
+  it("the check fails when sent is listed out of a region case again", () => {
+    const screens = ["inventory", "sent"];
+    expect(() => checkNoSkips(regionTests(screens, { sent: ["loc-dau-cot"] }), screens)).toThrow(
+      "sent skips a region case: loc-dau-cot",
+    );
   });
 });
 
-// ---- search on the inventory run (row 2, E5) ----------------------------------------------------------------------
+// ---- the first column's filter on the inventory run (row 2, E5; row 2e) --------------------------------------------
 
-describe("bai tim tren Bang hang cuon lien (hang 2)", () => {
-  // The texts the search recipe reads (text cells: unit, building, project), built by the screen's own row builder.
+describe("bai loc dau cot tren Bang hang cuon lien (hang 2, hang 2e)", () => {
+  // The texts the filter recipe reads (first column, then the text cells), built by the screen's own row builder.
   const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
   const sample = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
   const rows = inventoryRows({ ...sample, units }).map((r) =>
@@ -191,9 +240,7 @@ describe("bai tim tren Bang hang cuon lien (hang 2)", () => {
     it(`finds a needle past the first window of ${window} visible rows`, () => {
       const needle = pickNeedle(rows, window);
       expect(needle).not.toBeNull();
-      const hits = rows
-        .map((r, i) => (r.some((t) => t.toLocaleLowerCase("vi").includes(needle!)) ? i : -1))
-        .filter((i) => i >= 0);
+      const hits = rows.map((r, i) => (firstColumnHas(r, needle!) ? i : -1)).filter((i) => i >= 0);
       expect(hits.length).toBeGreaterThan(window);
       expect(hits.length).toBeLessThan(rows.length);
       expect(hits.some((i) => i >= window)).toBe(true);
@@ -225,8 +272,23 @@ describe("so hai tập của bài tìm", () => {
   it("names the matching row the result dropped, and the extra row it showed", () => {
     expect(pickNeedle(rows.slice(0, 40))).toBeNull();
     expect(compareRows([["a"], ["b"]], [["a"], ["b"]])).toBeNull();
-    expect(compareRows([["a"], ["b"]], [["a"]])).toBe("tim: bo sot dong khop — b");
-    expect(compareRows([["a"]], [["a"], ["z"]])).toBe("tim: hien dong khong khop — z");
+    expect(compareRows([["a"], ["b"]], [["a"]])).toBe("loc-dau-cot: bo sot dong khop — b");
+    expect(compareRows([["a"]], [["a"], ["z"]])).toBe("loc-dau-cot: hien dong khong khop — z");
+  });
+  it("a short grid that fits one window (Sent's sample, row 2e) still gets a needle kept by some rows, not all", () => {
+    const short = Array.from({ length: 14 }, (_, i) => [
+      `[Tên] Khách ${String(i + 1).padStart(2, "0")}`,
+    ]);
+    expect(pickNeedle(short, 30)).toBeNull();
+    const needle = pickNeedle(short, 30, true);
+    expect(needle).not.toBeNull();
+    const hits = short.filter((r) => firstColumnHas(r, needle!)).length;
+    expect(hits).toBeGreaterThanOrEqual(2);
+    expect(hits).toBeLessThan(short.length);
+  });
+  it("reads the first column only, without marks, as the filter box does", () => {
+    expect(firstColumnHas(["Toà Đông 01", "x"], "dong 0")).toBe(true);
+    expect(firstColumnHas(["A1", "dong 01"], "dong")).toBe(false);
   });
 });
 
@@ -420,7 +482,8 @@ describe("ca pha hang 1f giu nguyen", () => {
   /**
    * Every (recipe, break, pinned message for screen «man-thu») of FRAME and REGION on main at d85d815 — the main this
    * row merged before its shared-wait step; row 2 (signed, merged) renamed «chi con trang dau» to «chi con khung dau»
-   * after a97c71d. Drawn by machine when written: the file of `git show d85d815:tools/e2e_templates/recipes.ts` was
+   * after a97c71d; row 2e (owner 2026-11-13) renamed the search case «tim» to the first-column filter case «loc-dau-cot»
+   * and «tim-khong-ra» to «khong-khop», same breaks, same message after the case name. Drawn by machine when written: the file of `git show d85d815:tools/e2e_templates/recipes.ts` was
    * imported and each break's `pinned(brk, "man-thu").source` printed — not copied by hand.
    */
   const ROW_1F: readonly (readonly [string, string, string])[] = [
@@ -431,14 +494,14 @@ describe("ca pha hang 1f giu nguyen", () => {
     ["cho-tai", "khung cho khong bao gio hien", "cho-tai: khung cho khong hien"],
     ["cho-tai", "bo do tre cua dong ho vung", "cho-tai: hien chi bao truoc 1 giay"],
     ["trong", "go buoc tiep", "trong: khong co buoc tiep"],
-    ["tim-khong-ra", "go nut Xoa loc", "tim-khong-ra: thieu loi thoat Xoa loc"],
+    ["khong-khop", "go nut Xoa loc", "khong-khop: thieu loi thoat Xoa loc"],
     ["loi", "go ly do", "loi: thieu ly do"],
     ["mot-phan-hong", "go bang bao", "mot-phan-hong: khong bao phan hong"],
     ["chu-dai", "go tabindex", "chu-dai: khong toi duoc bang ban phim"],
     ["khong-du-quyen", "chen so dong", "khong-du-quyen: lo so dong"],
-    ["tim", "go mot dong khop", "tim: bo sot dong khop — "],
-    ["tim", "chi con khung dau", "tim: bo sot dong khop — "],
-    ["tim", "them mot dong khong khop", "tim: hien dong khong khop — "],
+    ["loc-dau-cot", "go mot dong khop", "loc-dau-cot: bo sot dong khop — "],
+    ["loc-dau-cot", "chi con khung dau", "loc-dau-cot: bo sot dong khop — "],
+    ["loc-dau-cot", "them mot dong khong khop", "loc-dau-cot: hien dong khong khop — "],
   ];
 
   /** The rows of ROW_1F missing from `recipes`, by recipe and break name. */
