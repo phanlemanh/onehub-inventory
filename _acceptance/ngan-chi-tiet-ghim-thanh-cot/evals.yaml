@@ -14,7 +14,7 @@ evals:
     executor: script
     cmd: config:executors.script.ghim_ngan_e2e
     paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, src/components/ui/resizable.tsx, tests/e2e/ghim-ngan.spec.ts]
-    expected: "exit 0; ở 1440 và 1024, trên /inventory và trên /sent (cùng các vế): đếm số đầu cột đang hiện của lưới trước khi mở hồ sơ (n); bấm Ghim thì hồ sơ có data-record-layout=pinned, không có box-shadow, mép phải cột = mép phải vùng làm việc App Shell (lệch ≤ 1 px), mép phải [data-slot=data-region] ≤ mép trái cột + 1 px, bề rộng [data-slot=data-region] ≥ 480 px, số đầu cột đang hiện vẫn là n, nút mang tên 'Bỏ ghim' và aria-pressed=true; bấm 'Bỏ ghim' thì cùng data-record-id, data-record-layout=float, bề rộng vùng dữ liệu bằng bề rộng đo lúc chưa mở hồ sơ (lệch ≤ 1 px); trước khi ghim cuộn thân hồ sơ ([data-slot=record-panel-body]) xuống 120 px, sau khi ghim và sau khi bỏ ghim scrollTop vẫn là 120 ± 1 và document.activeElement là nút ghim (tên mới); ca đối chứng bản dựng gắn lại cây khi đổi dáng cho 'record remounted on pin: scroll 0', ca đối chứng bản dựng giấu cột khi ghim cho 'columns hidden on pin: n → n-1', bản dựng không co vùng cho 'region under pinned column', bản dựng để vùng dữ liệu dưới 480 px khi ghim cho 'grid under 480 px when pinned'"
+    expected: "exit 0; ở 1440 và 1024 (1024: cột thứ hai App Shell gập — mở thì không có nút Ghim, D-1411-5), trên /inventory và trên /sent (cùng các vế): đếm số đầu cột đang hiện của lưới trước khi mở hồ sơ (n); bấm Ghim thì hồ sơ có data-record-layout=pinned, không có box-shadow, mép phải cột = mép phải vùng làm việc App Shell (lệch ≤ 1 px), mép phải [data-slot=data-region] ≤ mép trái cột + 1 px, bề rộng [data-slot=data-region] ≥ 480 px, số đầu cột đang hiện vẫn là n, nút mang tên 'Bỏ ghim' và aria-pressed=true; bấm 'Bỏ ghim' thì cùng data-record-id, data-record-layout=float, bề rộng vùng dữ liệu bằng bề rộng đo lúc chưa mở hồ sơ (lệch ≤ 1 px); trước khi ghim cuộn thân hồ sơ ([data-slot=record-panel-body]) xuống 120 px, sau khi ghim và sau khi bỏ ghim scrollTop vẫn là 120 ± 1 và document.activeElement là nút ghim (tên mới); ca đối chứng bản dựng gắn lại cây khi đổi dáng cho 'record remounted on pin: scroll 0', ca đối chứng bản dựng giấu cột khi ghim cho 'columns hidden on pin: n → n-1', bản dựng không co vùng cho 'region under pinned column', bản dựng để vùng dữ liệu dưới 480 px khi ghim cho 'grid under 480 px when pinned'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3
@@ -30,7 +30,7 @@ evals:
     executor: script
     cmd: config:executors.script.ghim_ngan_e2e
     paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, tests/e2e/ghim-ngan.spec.ts]
-    expected: "exit 0; ở 1440 và 1024, với hồ sơ nổi rồi ghim: đỉnh hồ sơ ≥ đáy [data-slot=app-shell-top-bar] và hộp của thanh công cụ vùng không giao hộp của hồ sơ; bấm ô cột Toà của dòng 2 thì ô ấy có aria-selected=true, ArrowDown chuyển chọn sang dòng 3; bấm 'Toàn màn hình' khi đang ghim thì cột vẫn data-record-layout=pinned và mép phải vùng dữ liệu ≤ mép trái cột + 1 px; ca đối chứng bản dựng hồ sơ ghim phủ từ đỉnh cửa sổ cho 'top bar covered by record'"
+    expected: "exit 0; ở 1440 và 1024 (1024: cột thứ hai App Shell gập để ghim được), với hồ sơ nổi rồi ghim: đỉnh hồ sơ ≥ đáy [data-slot=app-shell-top-bar] và hộp của thanh công cụ vùng không giao hộp của hồ sơ; bấm ô cột Toà của dòng 2 thì ô ấy có aria-selected=true, ArrowDown chuyển chọn sang dòng 3; bấm 'Toàn màn hình' khi đang ghim thì cột vẫn data-record-layout=pinned và mép phải vùng dữ liệu ≤ mép trái cột + 1 px; ca đối chứng bản dựng hồ sơ ghim phủ từ đỉnh cửa sổ cho 'top bar covered by record'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E5
@@ -38,7 +38,7 @@ evals:
     executor: script
     cmd: config:executors.script.ghim_ngan_e2e
     paths: [src/components/candidate/record-panel.tsx, src/components/ui/resizable.tsx, tests/e2e/ghim-ngan.spec.ts]
-    expected: "exit 0; ở 1440 khi đang ghim: kéo vạch chia ([role=separator] trong khung) sang trái 200 px thì cột rộng thêm 200 ± 2 px; kéo sang phải 2000 px thì cột còn đúng 320 ± 1 px; kéo sang trái 2000 px thì cột bằng 60% bề rộng vùng làm việc ± 1 px; tiêu điểm vào vạch rồi ArrowLeft thì cột rộng thêm, ArrowRight hẹp lại; tải lại trang thì bề rộng bằng lần đo cuối ± 1 px; ca đối chứng bản dựng bỏ trần hẹp cho 'pinned column narrower than 320'"
+    expected: "exit 0; ở 1440 khi đang ghim: kéo vạch chia ([role=separator] trong khung) sang trái 200 px thì cột rộng thêm 200 ± 2 px; kéo sang phải 2000 px thì cột còn đúng 320 ± 1 px; kéo sang trái 2000 px thì cột bằng trần ± 1 px — trần là nhỏ hơn của 60% bề rộng vùng làm việc và (bề rộng vùng dữ liệu khi chưa ghim − 480) (D-1411-5); tiêu điểm vào vạch rồi ArrowLeft thì cột rộng thêm, ArrowRight hẹp lại; tải lại trang thì bề rộng bằng lần đo cuối ± 1 px; ca đối chứng bản dựng bỏ trần hẹp cho 'pinned column narrower than 320'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E6
