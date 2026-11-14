@@ -327,6 +327,16 @@ function checkKept(statusKept: boolean): void {
   if (!statusKept) throw new Error("mat loc khac");
 }
 
+/** A modified click leaves this tab's rows and address as they were; throws otherwise. */
+function checkTabKept(
+  count: string | undefined,
+  address: string,
+  wantCount: string,
+  wantPlace: string,
+): void {
+  if (count !== wantCount || !address.includes(wantPlace)) throw new Error("bam kem phim doi tab");
+}
+
 describe("one filter state", () => {
   it("picking a building keeps the status filter and fills the project and building boxes", async () => {
     const filters = inventoryFiltersFrom("Active");
@@ -359,6 +369,30 @@ describe("one filter state", () => {
     expect(footer()).toBe("36");
     checkReadsWhole(box("Dự án"), P1);
     checkReadsWhole(box("Toà"), "S1.01, S1.02, S1.03, S1.05");
+  });
+
+  it("a modified click opens elsewhere: this tab keeps its place, and a later pick still writes the address", async () => {
+    shell(ROWS);
+    const vung = () => new URL(window.location.href).searchParams.get("vung") ?? "";
+    fireEvent.click(within(groupOf(P1)).getByRole("link", { name: "S1.03" }));
+    await waitFor(() => expect(vung()).toContain("S1.03"));
+    expect(footer()).toBe("10");
+    const all = [...column().querySelectorAll<HTMLAnchorElement>("a")].find(
+      (a) => a.getAttribute("href") === "/inventory",
+    )!;
+    for (const key of ["metaKey", "ctrlKey", "shiftKey", "altKey"] as const) {
+      fireEvent.click(all, { [key]: true });
+      fireEvent.click(within(groupOf(P1)).getByRole("link", { name: "S1.02" }), { [key]: true });
+      checkTabKept(footer(), vung(), "10", "S1.03");
+    }
+    fireEvent.click(within(groupOf(P1)).getByRole("link", { name: "S1.02" }));
+    await waitFor(() => expect(vung()).toContain("S1.02"));
+    expect(footer()).toBe("9");
+    expect(box("Toà").value).toBe("S1.02");
+  });
+
+  it("break: a modified click that changes this tab is caught", () => {
+    expect(() => checkTabKept("60", "", "10", "S1.03")).toThrow("bam kem phim doi tab");
   });
 
   it("break: a box that reads a cut name is caught", () => {

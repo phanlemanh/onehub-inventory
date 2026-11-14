@@ -280,8 +280,13 @@ test("«Tất cả hàng» after a pick drops the place; a status entry keeps it
   await settled(page);
   await place(column(page), P1, "S1.03").click();
   await expect.poll(() => footerCount(page)).toBe(10);
+  // The pick is really on before the press: the address names the place and the building box holds it.
+  await expect.poll(() => new URL(page.url()).searchParams.get("vung") ?? "").toContain("S1.03");
+  expect(await region(page).getByLabel("Lọc cột Toà").inputValue()).toBe("S1.03");
   await column(page).getByRole("link", { name: ALL, exact: true }).click();
   await expect.poll(() => footerCount(page)).toBe(60);
+  // The rows come back at once; the lit entry follows when the address lands.
+  await expect.poll(() => litNames(column(page)), { timeout: 10_000 }).toEqual([ALL]);
   checkAllRows(await footerCount(page), await litNames(column(page)));
   expect(new URL(page.url()).searchParams.has("vung")).toBe(false);
   expect(await region(page).getByLabel("Lọc cột Toà").inputValue()).toBe("");
@@ -298,6 +303,42 @@ test("«Tất cả hàng» after a pick drops the place; a status entry keeps it
   checkKept(await statusBox(page).textContent());
   // Break: the grid still on the place after the press.
   expect(() => checkAllRows(10, ["S1.03"])).toThrow("tat ca hang con loc noi");
+});
+
+/** A modified click opens a new tab and leaves this one as it was; throws otherwise. */
+function checkTabKept(count: number, vung: string, lit: readonly string[]): void {
+  if (count !== 10 || !vung.includes("S1.03") || lit.join() !== "S1.03")
+    throw new Error("bam kem phim doi tab");
+}
+
+test("a modified click opens a new tab; this tab keeps its place and a later pick reloads right", async ({
+  page,
+  context,
+}, info) => {
+  atWidth(info, "1440");
+  await signIn(page, await person(info, "kem-phim"));
+  await page.goto("/inventory", { waitUntil: "networkidle" });
+  await settled(page);
+  await place(column(page), P1, "S1.03").click();
+  await expect.poll(() => new URL(page.url()).searchParams.get("vung") ?? "").toContain("S1.03");
+  const vung = () => new URL(page.url()).searchParams.get("vung") ?? "";
+  for (const target of [
+    column(page).getByRole("link", { name: ALL, exact: true }),
+    place(column(page), P1, "S1.02"),
+  ]) {
+    const opened = context.waitForEvent("page");
+    await target.click({ modifiers: ["ControlOrMeta"] });
+    await (await opened).close();
+    checkTabKept(await footerCount(page), vung(), await litNames(column(page)));
+  }
+  await place(column(page), P1, "S1.02").click();
+  await expect.poll(() => vung()).toContain("S1.02");
+  await page.reload({ waitUntil: "networkidle" });
+  await settled(page);
+  await expect.poll(() => footerCount(page)).toBe(9);
+  expect(await litNames(column(page))).toEqual(["S1.02"]);
+  // Break: the tab lost its place to the click.
+  expect(() => checkTabKept(60, "", [ALL])).toThrow("bam kem phim doi tab");
 });
 
 // ---- E9 ------------------------------------------------------------------------------------------------------------

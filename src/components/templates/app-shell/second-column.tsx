@@ -112,6 +112,15 @@ export function SecondColumnNav({
             aria-current={active ? "true" : undefined}
             title={link.trailing ? link.title : undefined}
             onClick={(event) => {
+              // A modified or non-primary click opens the entry elsewhere (new tab, window): this screen stays as it is.
+              if (
+                event.metaKey ||
+                event.ctrlKey ||
+                event.shiftKey ||
+                event.altKey ||
+                event.button !== 0
+              )
+                return;
               // Pressing the open entry again opens its place afresh, unsaved changes dropped (row 2c).
               if (active) place.reopen();
               // The open screen may take the entry in place (row 2d), keeping what else it shows.
