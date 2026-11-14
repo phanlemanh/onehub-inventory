@@ -188,13 +188,14 @@ export function RecordPanel({
     const attempt = () => {
       const opener = document.querySelector<HTMLElement>(recordOpenSelector(id));
       opener?.focus();
-      watch();
+      watch(opener);
     };
-    const watch = () => {
+    // Only a replaced row gets focus again: focus that someone moved away, even to the page, stays where it went.
+    const watch = (opener: HTMLElement | null) => {
       if (tries++ >= 30) return;
       requestAnimationFrame(() => {
-        if (document.activeElement === document.body) attempt();
-        else watch();
+        if (opener && !opener.isConnected && document.activeElement === document.body) attempt();
+        else if (opener?.isConnected) watch(opener);
       });
     };
     attempt();

@@ -78,6 +78,13 @@ Cổng Phạm vi: `chon-ghim.html`.
 | --- | --- | --- |
 | grid | theo mẫu | Đã gửi dùng cùng khung hồ sơ chung với Bảng hàng |
 
+### Ứng viên ReUI
+
+| Cho | Ứng viên | Ảnh | Chọn |
+| --- | --- | --- | --- |
+| app-shell-11 | app-shell-11 | evidence/reui/app-shell-11.png | x |
+| app-shell-11 | ai-chat-2 | evidence/reui/ai-chat-2.png | |
+
 ### Ảnh cạnh màn mẫu
 
 | Khổ | Màn này | Màn mẫu | Dữ liệu |
