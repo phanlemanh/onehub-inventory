@@ -5,7 +5,6 @@ khuon:
   ten: FramedList
   nhap: "@/components/candidate/framed-list"
 nhan_dien:
-  - "src/app/(app)/members/**/*.tsx"
   - "src/modules/identity/ui/members-list.tsx"
 mau_dang_chay:
   tep: "src/components/candidate/framed-list.tsx"

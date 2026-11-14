@@ -129,3 +129,11 @@ evals:
     paths: [src/components/candidate/framed-list.tsx, tests/framed-list.test.tsx]
     expected: "exit 0; tests/framed-list.test.tsx dựng FramedList với đủ khe — tên, dòng đếm, nút đầu khung, một dòng có phần chính, phần phụ, nhãn, chỗ chỉnh cuối dòng, một dòng chỉ có phần chính, chân khung có ghi chú và nút lưu — thấy mỗi khe ở đúng chỗ, thứ tự phần của dòng đủ là main, secondary, tags, control, dòng thiếu khe không để lại phần rỗng, không chân khung khi không truyền; chiều đỏ: thứ tự phần sai thì thấy 'framed list row out of spine'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E16
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/danh-sach-khung.md", "src/modules/identity/ui/members-list.tsx", "src/components/candidate/framed-list.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm danh-sach-khung"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
