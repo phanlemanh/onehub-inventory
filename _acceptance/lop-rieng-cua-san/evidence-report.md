@@ -141,7 +141,7 @@ human_signoff: Manh Phan 2026-11-14
   run_id: minted-lop-rieng-cua-san-E13-r2
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
+  verifier: config:capture.ui
   verified_at: 2026-11-14T01:50:16Z
   screenshot: evidence/E13-step1.png
   observed: |
@@ -171,7 +171,7 @@ human_signoff: Manh Phan 2026-11-14
 - eval: E11
   run_id: minted-lop-rieng-cua-san-E11-r1
   exit_code: 0
-  verifier: config:executors.ui-check
+  verifier: config:capture.ui
   verified_at: 2026-11-14T01:19:59Z
   carried_from_round: 1
   screenshot: evidence/E11-step1.png
