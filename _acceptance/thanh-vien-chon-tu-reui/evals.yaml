@@ -102,8 +102,8 @@ evals:
     criterion: AC-3
     executor: test
     cmd: config:executors.test.thanh_vien_unit
-    paths: [tests/e2e-db/members.spec.ts, tests/e2e-db/bo-nut-members.spec.ts, tests/db/moi-nguoi.db.test.ts, tests/thanh-vien-khoa-bai.test.ts]
-    expected: "exit 0; tests/thanh-vien-khoa-bai.test.ts lấy git diff giữa merge-base với nhánh chính và HEAD của ba tệp: với tests/e2e-db/members.spec.ts và tests/e2e-db/bo-nut-members.spec.ts mọi dòng thêm/bớt khớp đúng một cặp chỉ khác nhau ở li[data-member= thành [data-member=; với tests/db/moi-nguoi.db.test.ts diff rỗng; chiều đỏ trên chuỗi diff mẫu sửa một chuỗi trong expect thì thấy 'row 9 test changed beyond the row locator: <dòng>'"
+    paths: [tests/e2e-db/members.spec.ts, tests/e2e-db/bo-nut-members.spec.ts, tests/e2e-db/app-shell-doi-san.spec.ts, tests/db/moi-nguoi.db.test.ts, tests/thanh-vien-khoa-bai.test.ts]
+    expected: "exit 0; tests/thanh-vien-khoa-bai.test.ts lấy git diff giữa merge-base với nhánh chính và HEAD của bốn tệp: với tests/e2e-db/members.spec.ts, tests/e2e-db/bo-nut-members.spec.ts và tests/e2e-db/app-shell-doi-san.spec.ts mọi dòng thêm/bớt khớp đúng một cặp chỉ khác nhau ở li[data-member= thành [data-member=; với tests/db/moi-nguoi.db.test.ts diff rỗng; chiều đỏ trên chuỗi diff mẫu sửa một chuỗi trong expect thì thấy 'row 9 test changed beyond the row locator: <dòng>'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E14

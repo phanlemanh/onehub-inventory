@@ -134,6 +134,20 @@ khoi:
     mo_ta: Hồ sơ ghim thành cột cạnh bảng với vạch chia kéo được (Resizable) — dáng nội dung | cột Details của app-shell-11
     ho_so: ngan-chi-tiet-ghim-thanh-cot
     duyet: 2026-11-13
+  - ten: MembersList
+    tep: src/modules/identity/ui/members-list.tsx
+    nguon: solution-users-8
+    nhu_cau: danh-sach-khung
+    mo_ta: Danh sách ngắn trong một khung có tên và số đếm, mỗi người một dòng, cột thẳng hàng, việc ở cuối dòng — khung Members của solution-users-8
+    ho_so: thanh-vien-chon-tu-reui
+    duyet: 2026-11-14
+  - ten: FormDialog nhãn
+    tep: src/components/candidate/form-dialog.tsx
+    nguon: dialog-2
+    nhu_cau: hop-co-nhan-tieu-de
+    mo_ta: Hộp biểu mẫu có nhãn nhỏ cạnh tiêu đề (tên sàn khi mời người), trường xếp dọc, dải chân hai nút — dáng của dialog-2
+    ho_so: thanh-vien-chon-tu-reui
+    duyet: 2026-11-14
 # Blocks made before this ledger existed, each named with the round that made it, the commit that created it and the
 # day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
 # still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).
