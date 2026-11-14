@@ -40,8 +40,8 @@ tính riêng. Chủ kho muốn sàn tự thêm khoản (phí dịch vụ hồ s�
 - Lõi tính và kiểm mức ở một hàm thuần trong `company-config`, màn và API dùng chung.
 - Màn ghép từ khối `FramedList` của họ danh sách khung; khối được mở thêm ba tuỳ chọn (cột cuối rộng theo nội dung, dòng
   không chữ cái đầu, dòng ghi chú dưới mỗi hàng), màn Thành viên không đổi dáng.
-- Nhãn «Thuế thu nhập» (17 ký tự trở xuống theo `design/language.md`), tên đầy đủ «Thuế thu nhập cá nhân» và «Thuế TNCN»
-  là nhãn thay thế để tìm.
+- Tên theo pháp luật giữ đúng chữ của luật: «Thuế thu nhập cá nhân» (21 ký tự) qua ngoại lệ có khai `phap_ly` và
+  `nguon` ở `ontology/labels.yaml` (giám sát quyết G-1411-157); chỗ hẹp dùng nhãn thay thế «Thuế TNCN».
 
 ## Consequences
 

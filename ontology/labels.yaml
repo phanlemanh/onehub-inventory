@@ -8,6 +8,8 @@
 #   alt    alternative labels: searchable, and a company may choose one
 #   en     English display label
 #   avoid  words that must not be used for this concept
+#   phap_ly  true for a name set by law (row 19, ruling G-1411-157): the pref is the law's own words and may run to 40
+#            characters; it then needs `nguon` (the legal text, one line) and one alt of at most 17 for narrow places
 version: 1
 concepts:
   Company:
@@ -130,8 +132,10 @@ concepts:
   PersonalIncomeTax:
     kind: value
     own: true
-    pref: Thuế thu nhập
-    alt: [Thuế thu nhập cá nhân, Thuế TNCN]
+    pref: Thuế thu nhập cá nhân
+    alt: [Thuế TNCN]
+    phap_ly: true
+    nguon: Luật Thuế thu nhập cá nhân số 04/2007/QH12
     en: Personal income tax
   RegistrationFee:
     kind: value

@@ -19,6 +19,9 @@ Một nhãn được chọn khi đạt cả bốn tiêu chí:
 | Ngắn                      | Tối đa 17 ký tự                                                  |
 | Hai miền hiểu đúng        | Thử với khoảng 5 người mỗi miền, đích từ 80 % (đề xuất, chưa đo) |
 
+Tên theo pháp luật dùng đúng chữ của luật, có thể dài hơn (tới 40 ký tự); khai `phap_ly` và `nguon`; chỗ hẹp dùng nhãn
+thay thế không quá 17 ký tự (giám sát quyết G-1411-157, hàng 19).
+
 Ngoại lệ phải ghi lý do:
 
 - **«Sàn»** trùng «sàn giao dịch bất động sản», loại hình có quy định riêng trong luật (65 lần). Giữ trên màn nội bộ vì đã quen dùng; trong văn bản pháp lý và trang khách dùng «công ty».

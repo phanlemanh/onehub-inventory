@@ -22,7 +22,7 @@ export const LABELS = {
   ImportTemplate: {"pref": "Mẫu nhập"},
   FeeSchedule: {"pref": "Thuế phí"},
   FeeItem: {"pref": "Khoản phí"},
-  PersonalIncomeTax: {"pref": "Thuế thu nhập"},
+  PersonalIncomeTax: {"pref": "Thuế thu nhập cá nhân"},
   RegistrationFee: {"pref": "Lệ phí trước bạ"},
   BrokerageFee: {"pref": "Phí môi giới"},
   AddFeeItem: {"pref": "Thêm khoản"},

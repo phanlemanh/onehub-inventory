@@ -213,6 +213,8 @@ test.describe("thue phi", () => {
     await proof(members, info, "members");
     const agent = await as(browser, "a-ListAgent", info);
     await agent.goto("/inventory");
+    await expect(agent.locator('[hidden][id^="S:"]')).toHaveCount(0);
+    await proof(agent, info, "inventory");
     const head = agent.locator('th[data-col-id="custom.netToSeller"]');
     await expect(head).toHaveCount(1);
     await expect(agent.locator('th[data-col-id="Listing.feeInclusion"]')).toHaveCount(0);
