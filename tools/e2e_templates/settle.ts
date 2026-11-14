@@ -96,6 +96,10 @@ export const CHO_TESTS: Readonly<Record<string, readonly string[]>> = {
   "tests/e2e-db/goc-nhin.spec.ts": ["phone sheet", "E15 frames"],
   "tests/e2e-db/vai-man.spec.ts": ["thanh ben theo vai"],
   "tests/e2e-db/lop-rieng.spec.ts": ["proof images"],
+  "tests/e2e-db/dia-ly.spec.ts": [
+    "E11 phone sheet closes on a pick",
+    "E12 axe on the phone sheet, light and dark",
+  ],
   "tests/e2e/sua-tren-o.spec.ts": ["axe-sang-toi: light", "axe-sang-toi: dark"],
   "tests/e2e/settle.spec.ts": [
     "ngan mo",

@@ -32,6 +32,11 @@ const HEADERS = Object.fromEntries(INVENTORY_FIELDS.map((f) => [f, f])) as Recor
   string
 >;
 const COLUMNS = inventoryColumns(HEADERS);
+// Names of the two lone buildings, read from the catalog's places so the words stay the catalog's own (the label rule
+// of tests/language.test.ts); the matrix still pins where they stand and what they hold.
+const lone = (project: string) => PLACES.find((p) => p.project.startsWith(project))!.building;
+const E1 = lone("Vinhomes Ocean Park 2");
+const C1 = lone("Vinhomes Ocean Park 3");
 const P1 = "Vinhomes Ocean Park 1";
 const P2 = "Vinhomes Ocean Park 2 – The Empire";
 const P3 = "Vinhomes Ocean Park 3 – The Crown";
@@ -45,9 +50,9 @@ const MATRIX: [string, number, number][] = [
   ["S1.03", 2, 10],
   ["S1.05", 2, 11],
   [P2, 0, 12],
-  ["[MAU] Toà E1", 1, 12],
+  [E1, 1, 12],
   [P3, 0, 12],
-  ["[MAU] Toà C1", 1, 12],
+  [C1, 1, 12],
 ];
 
 function walk(nodes: readonly GeoNode[], depth = 0): [string, number, number][] {
@@ -103,15 +108,21 @@ describe("tree", () => {
       { project: P1, complex: "The Sapphire 1", building: "S1.09" },
     ];
     expect(walk(geoTree(ROWS, places)).map((w) => w[0])).not.toContain("S1.09");
-    const stray = [...ROWS, { ...ROWS[0]!, id: "la", "Listing.buildingName": "[MAU] Toà lạ" }];
+    const stray = [...ROWS, { ...ROWS[0]!, id: "la", "Listing.buildingName": "[MAU] Lạ" }];
     const p1 = geoTree(stray, PLACES)[0]!;
-    expect(p1.children.map((c) => c.name)).toEqual(["The Sapphire 1", "[MAU] Toà lạ"]);
+    expect(p1.children.map((c) => c.name)).toEqual(["The Sapphire 1", "[MAU] Lạ"]);
   });
 
   it("no rows: an empty tree, and the second column says so in one group", () => {
     expect(geoTree([], PLACES)).toEqual([]);
-    const words = { all: "Tất cả", emptyTitle: "Dự án", empty: "Chưa có căn nào trên Bảng hàng." };
-    expect(geoSections([], words)).toEqual([{ title: "Dự án", items: [], empty: words.empty }]);
+    const words = {
+      all: "Tất cả",
+      emptyTitle: "[nhóm rỗng]",
+      empty: "[câu sàn rỗng]",
+    };
+    expect(geoSections([], words)).toEqual([
+      { title: "[nhóm rỗng]", items: [], empty: words.empty },
+    ]);
     const full = geoSections(tree, words);
     expect(full.map((s) => s.title)).toEqual([P1, P2, P3]);
     expect(full.some((s) => s.empty)).toBe(false);
@@ -126,7 +137,7 @@ describe("tree", () => {
       "S1.03",
       "S1.05",
     ]);
-    expect(p2!.items.map((i) => i.title)).toEqual(["Tất cả", "[MAU] Toà E1"]);
+    expect(p2!.items.map((i) => i.title)).toEqual(["Tất cả", E1]);
     expect(JSON.stringify(p1)).not.toMatch(/"count"/);
   });
 });

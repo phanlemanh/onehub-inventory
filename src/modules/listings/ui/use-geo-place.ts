@@ -3,7 +3,6 @@
 // One filter state for the grid and the second column (row 2d, AC-2..AC-6): a place picked in the column changes only
 // the project and building filters, the grid's other filters kept; whatever the two filters amount to — picked or
 // typed — is written to the address as `?vung=`, so the column lights that place and a reload or copied link opens it.
-import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import type { TypedColumn } from "@/components/candidate/column-kind";
@@ -35,7 +34,6 @@ export function useGeoPlace({
   /** False while a saved view is open: the view keeps the lit entry, and no place is written. */
   active: boolean;
 }): GeoPlace {
-  const pathname = usePathname();
   const { setPick } = usePlaceChange();
   const [state, setState] = useState<GeoPlace>({ picked: 0, view: undefined });
   const latest = useRef(view);
@@ -49,7 +47,8 @@ export function useGeoPlace({
       const url = new URL(href, "http://x");
       const key = url.searchParams.get(GEO_PARAM);
       const current = latest.current;
-      if (url.pathname !== pathname || key === null || current === null) return false;
+      if (url.pathname !== window.location.pathname || key === null || current === null)
+        return false;
       const geo = geoFiltersFor(tree, [key]);
       if (Object.keys(geo).length === 0) return false;
       setState((s) => ({
@@ -59,7 +58,7 @@ export function useGeoPlace({
       return true;
     });
     return () => setPick(null);
-  }, [tree, active, pathname, setPick]);
+  }, [tree, active, setPick]);
 
   const placeKey =
     tree && view ? (placeFor(tree, rows, columns, view.filters)?.key ?? null) : undefined;

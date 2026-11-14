@@ -145,7 +145,7 @@ async function settled(page: Page) {
 }
 
 /** The footer's «x / 60 dòng», or 60 when nothing is filtered. */
-async function shown(page: Page): Promise<number> {
+async function footerCount(page: Page): Promise<number> {
   const text = (await region(page).textContent()) ?? "";
   const m = /(\d+) \/ 60 dòng/.exec(text);
   return m ? Number(m[1]) : 60;
@@ -174,7 +174,7 @@ async function drawnBuildings(page: Page): Promise<string[]> {
 
 /** The grid shows the lit place's rows only; throws when the tree and the grid differ. */
 async function checkSame(page: Page, lit: GeoNode | null): Promise<void> {
-  const count = await shown(page);
+  const count = await footerCount(page);
   if (!lit) return;
   const buildings = new Set(
     flat([lit])
@@ -198,7 +198,7 @@ test("E4 four places: count and the one lit entry", async ({ page }, info) => {
   checkLit(await litNames(column(page)), ALL);
   for (const [project, name, count] of FOUR) {
     await place(column(page), project, name).click();
-    await expect.poll(() => shown(page)).toBe(count);
+    await expect.poll(() => footerCount(page)).toBe(count);
     await expect(place(column(page), project, name)).toHaveAttribute("aria-current", "true");
     checkLit(await litNames(column(page)), name);
   }
@@ -211,7 +211,7 @@ test("E7 the tree follows the filter boxes", async ({ page }, info) => {
   atWidth(info, "1440");
   await signIn(page, await person(info, "e7"));
   await place(column(page), P1, "The Sapphire 1").click();
-  await expect.poll(() => shown(page)).toBe(36);
+  await expect.poll(() => footerCount(page)).toBe(36);
   await checkSame(page, nodeOf("The Sapphire 1"));
   const box = region(page).getByLabel("Lọc cột Toà");
   await box.fill("S1.01, S1.02, S1.03, S1.05x");
@@ -222,7 +222,7 @@ test("E7 the tree follows the filter boxes", async ({ page }, info) => {
   await checkSame(page, nodeOf("S1.02"));
   await region(page).getByRole("button", { name: "Xoá lọc" }).first().click();
   await expect.poll(() => litNames(column(page))).toEqual([ALL]);
-  expect(await shown(page)).toBe(60);
+  expect(await footerCount(page)).toBe(60);
   // Break: a tree that does not hear the boxes would still light S1.02 over 60 rows.
   await expect(checkSame(page, nodeOf("S1.02"))).rejects.toThrow("cay lech bang");
 });
@@ -239,7 +239,7 @@ test("E8 a place keeps the other filters", async ({ page }, info) => {
     (r) => r["Listing.standardStatus"] === "Active" && r["Listing.buildingName"] === "S1.03",
   ).length;
   await place(column(page), P1, "S1.03").click();
-  await expect.poll(() => shown(page)).toBe(want);
+  await expect.poll(() => footerCount(page)).toBe(want);
   const kept = want < nodeOf("S1.03").count;
   if (!kept) throw new Error("mat loc khac");
   for (const name of TEN) {
@@ -271,13 +271,13 @@ test("E9 reload, a copied link, a saved view, an unknown place", async ({
   const link = page.url();
   await page.reload();
   await settled(page);
-  if ((await shown(page)) !== 36) throw new Error("dia chi mat noi");
+  if ((await footerCount(page)) !== 36) throw new Error("dia chi mat noi");
   checkLit(await litNames(column(page)), "The Sapphire 1");
 
   const other = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const fresh = await other.newPage();
   await signIn(fresh, email, link.replace(/^https?:\/\/[^/]+/, ""));
-  expect(await shown(fresh)).toBe(36);
+  expect(await footerCount(fresh)).toBe(36);
   checkLit(await litNames(column(fresh)), "The Sapphire 1");
   await other.close();
 
@@ -289,11 +289,11 @@ test("E9 reload, a copied link, a saved view, an unknown place", async ({
   await dialog.getByLabel("Tên").press("Enter");
   await page.waitForURL((u) => u.searchParams.has("goc-nhin"));
   await column(page).getByRole("link", { name: ALL }).click();
-  await expect.poll(() => shown(page)).toBe(60);
+  await expect.poll(() => footerCount(page)).toBe(60);
   await column(page)
     .getByRole("link", { name: /^Sapphire/ })
     .click();
-  await expect.poll(() => shown(page)).toBe(36);
+  await expect.poll(() => footerCount(page)).toBe(36);
   expect(await region(page).getByLabel("Lọc cột Toà").inputValue()).toBe(
     "S1.01, S1.02, S1.03, S1.05",
   );
@@ -301,14 +301,14 @@ test("E9 reload, a copied link, a saved view, an unknown place", async ({
 
   await page.goto("/inventory?vung=khong-co");
   await settled(page);
-  expect(await shown(page)).toBe(60);
+  expect(await footerCount(page)).toBe(60);
   checkLit(await litNames(column(page)), ALL);
   expect(() => checkLit([ALL], "The Sapphire 1")).toThrow("nut khong sang");
 });
 
 // ---- E11 -----------------------------------------------------------------------------------------------------------
 
-test("E11 phone sheet closes on a pick", async ({ page }, info) => {
+test("E11 phone sheet closes on a pick", { tag: "@cho" }, async ({ page }, info) => {
   atWidth(info, "360", "414");
   await signIn(page, await person(info, "e11"));
   await openSheet(page);
@@ -317,7 +317,7 @@ test("E11 phone sheet closes on a pick", async ({ page }, info) => {
   expect(labels.indexOf(P1)).toBeGreaterThan(labels.indexOf(FRAME_COPY.secondColumn.byStatus));
   await place(sheet, P2, "[MAU] Toà E1").click();
   await expect(sheet).toBeHidden();
-  await expect.poll(() => shown(page)).toBe(12);
+  await expect.poll(() => footerCount(page)).toBe(12);
 });
 
 /** Project names drawn whole; throws naming the first one cut. */
@@ -347,19 +347,34 @@ test("E11 project names show whole at 1024 and 1440", async ({ page }, info) => 
 
 // ---- E12 -----------------------------------------------------------------------------------------------------------
 
-for (const scheme of ["light", "dark"] as const) {
-  test(`E12 axe: ${scheme}`, async ({ page }, info) => {
-    atWidth(info, "360", "1440");
-    await page.emulateMedia({ colorScheme: scheme });
-    await signIn(page, await person(info, `e12-${scheme}`));
-    await expect(page).toHaveTitle(/\S/);
-    if (info.project.name === "360") await openSheet(page);
-    else await place(column(page), P1, "The Sapphire 1").click();
-    const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
-    const serious = violations.filter((v) => v.impact === "serious" || v.impact === "critical");
-    expect(serious.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([]);
-  });
+async function seriousViolations(page: Page): Promise<string[]> {
+  const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+  return violations
+    .filter((v) => v.impact === "serious" || v.impact === "critical")
+    .map((v) => `${v.id}: ${v.nodes.length}`);
 }
+
+test("E12 axe at 1440, light and dark", async ({ page }, info) => {
+  atWidth(info, "1440");
+  await signIn(page, await person(info, "e12"));
+  await place(column(page), P1, "The Sapphire 1").click();
+  for (const scheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme: scheme });
+    await expect(page).toHaveTitle(/\S/);
+    expect(await seriousViolations(page), scheme).toEqual([]);
+  }
+});
+
+test("E12 axe on the phone sheet, light and dark", { tag: "@cho" }, async ({ page }, info) => {
+  atWidth(info, "360");
+  await signIn(page, await person(info, "e12-ngan"));
+  await openSheet(page);
+  for (const scheme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme: scheme });
+    await expect(page).toHaveTitle(/\S/);
+    expect(await seriousViolations(page), scheme).toEqual([]);
+  }
+});
 
 /** Tab from the column's first entry until S1.01 has focus; throws when it never does. */
 async function tabTo(page: Page, name: string, presses = 40): Promise<void> {
@@ -376,7 +391,7 @@ test("E12 keyboard: Tab reaches S1.01, Enter opens it", async ({ page }, info) =
   await signIn(page, await person(info, "e12k"));
   await tabTo(page, "S1.01");
   await page.keyboard.press("Enter");
-  await expect.poll(() => shown(page)).toBe(6);
+  await expect.poll(() => footerCount(page)).toBe(6);
   await expect(place(column(page), P1, "S1.01")).toHaveAttribute("aria-current", "true");
   // Break: a name no entry carries is never reached.
   await expect(tabTo(page, "[MAU] Không có", 5)).rejects.toThrow("khong toi duoc bang phim");
