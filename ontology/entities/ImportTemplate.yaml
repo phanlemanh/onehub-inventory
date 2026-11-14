@@ -1,0 +1,27 @@
+name: ImportTemplate
+description: >-
+  The shape of a sheet a company imported — its column names in order — and where each column goes: a standard field,
+  a custom field, or left out on purpose. The next sheet of the same shape needs no matching again.
+reso: none (our own)
+
+properties:
+  id: { type: uuid, required: true, unique: true, display: none }
+  companyId: { type: ref, target: Company, required: true, display: none }
+  name: { type: string, required: true, max: 60, display: text }
+  signature: { type: json, required: true, display: none }
+  columns: { type: json, required: true, display: none }
+  createdAt: { type: datetime, required: true, display: none }
+  retiredAt: { type: datetime, display: none }
+
+rules:
+  - id: template-by-shape
+    description: >-
+      The signature is the folded column names in order; one template in use per company and signature; each column
+      goes to exactly one target that exists; a column pointing to a retired field is marked for the import to ask
+      again.
+    implemented_in: src/modules/company-config/store.ts
+
+code:
+  model: src/modules/company-config/
+  tests: tests/db/lop-rieng.db.test.ts
+wiki: wiki/entities/import-template.md

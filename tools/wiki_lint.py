@@ -45,6 +45,7 @@ PROPERTY_TYPES = {
     "uuid",
     "enum",
     "ref",
+    "json",
 }
 CARDINALITIES = {"one-to-one", "one-to-many", "many-to-one", "many-to-many"}
 SPECIAL_PAGES = {"index", "log"}

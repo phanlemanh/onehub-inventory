@@ -126,7 +126,7 @@ function suites(covered: Screen[], cpu: number, mode: Mode): void {
         }
       }
 
-      if (screen.family === "grid") gridSuite(screen.id, screen.route, base);
+      if (screen.family === "grid") gridSuite(screen.id, screen.vao_vung ?? screen.route, base);
     });
   }
 }
@@ -235,7 +235,7 @@ function signedOutCases(screens: Screen[]): void {
  * break then gets a fresh page, so no break's setup (init scripts, the clock) can leak into another case.
  */
 function gridSuite(id: string, url: string, base: Base): void {
-  test.describe("vung", () => {
+  test.describe("vung", { annotation: { type: "vao", description: url } }, () => {
     let verdict: ReturnType<typeof classifyGrid> | null = null;
     let handed = false;
     test.beforeAll(async ({ browser }, info) => {

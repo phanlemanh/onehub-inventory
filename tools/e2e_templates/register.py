@@ -34,13 +34,27 @@ def title_text(root: Path, key: Any) -> str | None:
     return str(concept["pref"]) if isinstance(concept, dict) and concept.get("pref") else None
 
 
+def entry_problems(screens: dict[str, dict[str, Any]]) -> list[str]:
+    """`vao_vung` (optional): the path the grid region suite opens, only on a grid screen and under its own route."""
+    problems: list[str] = []
+    for sid, item in screens.items():
+        if "vao_vung" not in item:
+            continue
+        entry, route = str(item["vao_vung"] or ""), str(item["route"] or "")
+        if item["family"] != "grid":
+            problems.append(f"{sid}: vao_vung chi cho ho grid")
+        elif entry != route and not entry.startswith((f"{route}?", f"{route}#", f"{route}/")):
+            problems.append(f"{sid}: vao_vung ngoai man")
+    return problems
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", default=str(HERE.parent.parent))
     root = Path(parser.parse_args().root).resolve()
     reg = load_registry(root)
     out = {
-        "errors": reg.errors,
+        "errors": reg.errors + entry_problems(reg.screens),
         "roles": [{"name": n, "label": reg.role_labels.get(n)} for n in reg.role_names],
         "screens": [
             {
@@ -51,6 +65,7 @@ def main() -> int:
                 "family": item["family"],
                 "audience": item["audience"],
                 "status": item["status"],
+                **({"vao_vung": item["vao_vung"]} if "vao_vung" in item else {}),
             }
             for sid, item in reg.screens.items()
         ],

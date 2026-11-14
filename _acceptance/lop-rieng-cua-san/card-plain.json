@@ -1,0 +1,112 @@
+{
+  "feature_plain": "Mỗi sàn gọi đồ vật bằng chữ của mình và thêm được cột riêng, mà dữ liệu bên dưới vẫn theo chuẩn chung; Bảng hàng nói đúng chữ của sàn.",
+  "will_do": [
+    {
+      "id": "AC-1",
+      "p": "Sẽ cho sàn đặt chữ riêng cho một tên cột chuẩn (ví dụ «Toà» thành «Block»), và mọi chỗ trong sàn đọc chữ ấy."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ cho sàn thêm cột riêng thuộc năm kiểu (chữ, số, ngày, chọn một, có/không), tối đa 20 cột đang dùng và 30 lựa chọn, tên không trùng cột khác."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ kiểm mỗi giá trị nhập vào cột riêng theo đúng kiểu của cột (ngày có thật, lựa chọn có trong danh sách…)."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ nhớ chữ sàn quen viết ứng với giá trị chuẩn nào («ĐN» là Đông Nam, «còn» là Đang bán), không phân biệt hoa thường hay dấu."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ giữ căn sàn có mà danh mục chung chưa có làm «căn chờ khớp», dùng được ngay; khi danh mục có căn ấy thì khớp vào mà sàn không nhập lại."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ nhớ dạng tệp Sheet của sàn và cột nào đi vào đâu, để lần nhập sau cùng dạng tệp không phải ghép lại."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ giữ mọi thứ riêng của sàn A kín với sàn B, và chỉ người có quyền mới sửa được."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ cho Bảng hàng hiện chữ riêng của sàn ở tiêu đề cột và hiện cột riêng sau tám cột chuẩn, lọc và sắp được như cột thường."
+    },
+    {
+      "id": "AC-9",
+      "p": "Sẽ có màn «Tuỳ chỉnh của sàn» xem năm phần, với đủ bộ nút theo khuôn chung: Thêm ở đầu phần, Sửa và Ngừng dùng trong «…», không có Xoá — vai nào thấy nút nào theo bảng quyền."
+    },
+    {
+      "id": "AC-10",
+      "p": "Sẽ ghi năm khái niệm mới vào mô hình nghiệp vụ và giữ rào: không cột tính bằng công thức, không đối tượng tự tạo, không bộ luật tự vẽ."
+    },
+    {
+      "id": "AC-11",
+      "p": "Sẽ cho người có quyền thêm và sửa nhãn riêng, trường riêng, dòng từ điển bằng hộp biểu mẫu ngay trên màn, đúng các luật trần và trùng tên; trường riêng không đổi được kiểu."
+    }
+  ],
+  "scope_plain": "Những việc dưới đây cố ý để hàng khác làm:",
+  "wont_do": [
+    {
+      "id": "OOS-1",
+      "p": "KHÔNG lưu giá trị cột riêng trên căn thật — hàng 10 làm khi Bảng hàng nối dữ liệu thật, dùng đúng bộ kiểm của hàng này."
+    },
+    {
+      "id": "OOS-2",
+      "p": "KHÔNG làm màn nhập Sheet — hàng 11 làm, ghi vào lớp riêng qua cửa của hàng này."
+    },
+    {
+      "id": "OOS-3",
+      "p": "KHÔNG ghi gì vào danh mục căn chung; ba lỗ hổng của danh mục để hàng 12 «Thêm căn» (hay hàng 11) đóng trước khi ghi."
+    },
+    {
+      "id": "OOS-4",
+      "p": "KHÔNG làm màn Cài đặt sàn đầy đủ, nhật ký đổi cấu hình, nhập có AI."
+    },
+    {
+      "id": "OOS-5",
+      "p": "KHÔNG có bước Quản trị duyệt từng chữ trong từ điển như Quỹ hàng."
+    },
+    {
+      "id": "OOS-6",
+      "p": "Trạng thái riêng của sàn: theo câu trả lời Hỏi-6 (máy khuyên để hàng sau)."
+    }
+  ],
+  "coverage_plain": [
+    {
+      "i": 0,
+      "p": "Đủ sáu phần của lớp riêng: chữ riêng, cột riêng, giá trị cột riêng, từ điển, căn chờ khớp, mẫu nhập (AC-1 tới AC-6)."
+    },
+    {
+      "i": 1,
+      "p": "Mỗi phần được đo đủ mặt: lưu và đọc, luật hợp lệ và trần, kín giữa các sàn, ai được sửa (AC-7), Bảng hàng (AC-8), màn xem lại (AC-9), rào mô hình (AC-10)."
+    },
+    {
+      "i": 2,
+      "p": "Ai dùng: Bảng hàng dùng ngay ở hàng này; màn nhập (hàng 11) và dữ liệu thật (hàng 10) dùng sau — phần để lại ghi rõ ở mục cố ý không làm."
+    }
+  ],
+  "gap_probe_plain": [
+    {
+      "i": 0,
+      "p": "Bài đo quyền so với chính bảng quyền vòng này viết, nên viết sai cũng xanh — đã sửa: bài đo dùng bảng 8 ô viết sẵn theo Hỏi-1, và đo cả vai được sửa thấy nút."
+    },
+    {
+      "i": 1,
+      "p": "Trần 20 cột chỉ đo phía từ chối — đã thêm ca 1 và 30 lựa chọn được nhận, ngừng một cột thì tạo cột mới được, 31 lựa chọn bị chặn ở cơ sở dữ liệu."
+    },
+    {
+      "i": 2,
+      "p": "Chưa nói gì khi ngừng một cột riêng mà mẫu nhập hay từ điển còn trỏ vào — đã thêm luật: từ điển thôi tra ra, mẫu đánh dấu cột ấy để màn nhập hỏi lại."
+    },
+    {
+      "i": 3,
+      "p": "Máy đã tự gạch «trạng thái riêng» với căn cứ không đủ — đã đổi thành câu hỏi Hỏi-6 cho anh."
+    },
+    {
+      "i": 4,
+      "p": "Chưa cấm tên cột riêng trùng tên cột khác — đã thêm luật và bài đo, kể cả lỗi hiện ngay dưới ô khi đổi chữ."
+    }
+  ]
+}
