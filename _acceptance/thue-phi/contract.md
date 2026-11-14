@@ -27,29 +27,33 @@ khách, Trưởng nhóm); Quản trị sàn đặt mức, không được mở B
 
 ## Criteria
 
-- **AC-1** — Lõi tính Về tay theo tập khoản đang bật.
-  Given mức bất kỳ trong bảy tập con khác rỗng của ba khoản, với môi giới ở 0, 1, 2,5 và 5%,
+- **AC-1** — Lõi tính Về tay theo các khoản đang bật.
+  Given hai khoản theo luật (Thuế thu nhập cá nhân 2%, Lệ phí trước bạ 0,5%) và các khoản riêng của sàn (mặc định chỉ có Phí
+  môi giới 1%), với bảng viết trước: mọi tập con của hai khoản luật × khoản riêng 0, 1, 2 hay 5 khoản đang bật ở các tỉ lệ
+  0, 1, 2,5, 5%,
   When tính Về tay cho Giá chào 3 tỷ Bao phí, 3 tỷ Không bao phí, 1 đồng, chưa có giá, và chưa có điều kiện,
-  Then khoản đang tắt không trừ; mặc định cho 3 tỷ Bao phí → 2.895.000.000 đồng; Không bao phí → bằng Giá chào; làm tròn
-  xuống tới đồng; chưa có giá hay chưa có điều kiện → trống; và hàm kiểm mức từ chối môi giới dưới 0, trên 5, lẻ quá 0,1, và
-  mức tắt cả ba khoản, mỗi lỗi nêu đúng khoản sai.
+  Then chỉ khoản đang bật bị trừ; mặc định cho 3 tỷ Bao phí → 2.895.000.000 đồng; Không bao phí → bằng Giá chào; làm tròn
+  xuống tới đồng; chưa có giá hay chưa có điều kiện → trống; và hàm kiểm mức từ chối: tỉ lệ khoản riêng dưới 0, trên 5, lẻ
+  quá 0,1; tên khoản riêng rỗng, quá 40 ký tự hay trùng tên khoản khác; quá 5 khoản riêng đang dùng; tổng tỉ lệ các khoản
+  đang bật quá 10%; không khoản nào đang bật — mỗi lỗi nêu đúng khoản sai.
 
-- **AC-2** — Màn Thuế phí hiện ba khoản, tỉ lệ và nguồn.
-  Given Quản trị sàn mẫu ở Tuỳ chỉnh của sàn › Thuế phí, sàn đã đổi Phí môi giới thành 1,5%, hai khoản kia chưa đổi,
+- **AC-2** — Màn Thuế phí hiện các khoản, tỉ lệ và nguồn.
+  Given Quản trị sàn mẫu ở Tuỳ chỉnh của sàn › Thuế phí, sàn đã đổi Phí môi giới thành 1,5% và thêm khoản riêng «Phí dịch vụ
+  hồ sơ» 0,3%,
   When mở phần,
-  Then có đúng ba dòng theo thứ tự Thuế thu nhập cá nhân · Lệ phí trước bạ · Phí môi giới, mỗi dòng một công tắc «Tính vào
-  giá bao phí» đang bật; tỉ lệ hiện 2% · 0,5% · 1,5%; hai dòng đầu ghi «theo luật» và không có ô sửa tỉ lệ; dòng Phí môi giới
-  mang «Đã đổi · [Tên] · <ngày>», hai dòng kia «Mặc định»; mọi chữ trên phần đến từ `ontology/labels.yaml` hay tệp chữ của
-  mô-đun; dưới ba dòng có dòng ví dụ «Giá chào 3 tỷ bao phí → về tay …» tính theo mức đang gõ, đổi ngay khi
-  gõ, trước khi Lưu (Hỏi-6).
+  Then hai dòng đầu là Thuế thu nhập cá nhân 2% và Lệ phí trước bạ 0,5% ghi «theo luật», không ô sửa tỉ lệ, không «…»; sau
+  đó các khoản riêng theo thứ tự thêm (Phí môi giới 1,5%, Phí dịch vụ hồ sơ 0,3%), mỗi dòng có ô tỉ lệ; mỗi dòng một công
+  tắc «Tính vào giá bao phí»; dòng mang nguồn «Mặc định» / «Đã đổi · [Tên] · <ngày>» / «Sàn thêm · [Tên] · <ngày>»; mọi
+  chữ đến từ `ontology/labels.yaml` hay tệp chữ của mô-đun; chân khung có dòng ví dụ «Giá chào 3 tỷ bao phí → về tay …»
+  tính theo mức đang gõ, đổi ngay khi gõ, trước khi Lưu (Hỏi-6).
 
 - **AC-3** — Quản trị sàn lưu mức một lần; sai thì không ghi. (cross-layer)
   Given Quản trị sàn ở phần Thuế phí, sàn đang dùng mặc định,
   When đặt Phí môi giới 2 (và ở ca thứ hai gõ «1,5») và tắt Lệ phí trước bạ rồi bấm Lưu,
-  Then đúng một lần `PUT /api/v1/company/fee-schedule` mang cả mức («1,5» gửi 150 phần vạn); thông báo «Đã lưu thuế phí»; tải lại giữ giá trị; cơ sở
-  dữ liệu có đúng một dòng của sàn ghi người và lúc đổi; «Trả về mặc định» ở dòng đã đổi rồi Lưu đưa khoản ấy về mặc định;
-  môi giới 6, 1,25 hay tắt cả ba thì Lưu khoá, lý do gắn đúng dòng, và API nhận thẳng mức ấy trả 400 nêu khoản sai, cơ sở dữ
-  liệu không đổi.
+  Then đúng một lần `PUT /api/v1/company/fee-schedule` mang cả mức («1,5» gửi 150 phần vạn); thông báo «Đã lưu thuế phí»;
+  tải lại giữ giá trị; cơ sở dữ liệu ghi người và lúc đổi trên đúng các khoản đã đổi; «Trả về mặc định» ở dòng đã đổi rồi Lưu
+  đưa khoản ấy về mặc định; mức sai theo AC-1 thì Lưu khoá, lý do gắn đúng dòng, và API nhận thẳng mức ấy trả 400 nêu khoản
+  sai, cơ sở dữ liệu không đổi.
 
 - **AC-4** — Vai khác chỉ đọc. (cross-layer)
   Given người mang Đầu chủ, Đầu khách hay Trưởng nhóm (không Quản trị sàn) của sàn mẫu,
@@ -80,17 +84,26 @@ khách, Trưởng nhóm); Quản trị sàn đặt mức, không được mở B
 - **AC-7** — Sàn khác không đọc, không ghi được mức của nhau. (SP-1)
   Given sàn A đã đặt mức, sàn B chưa đặt,
   When người sàn B đọc, ghi mức qua API và truy vấn thẳng bảng dưới vai ứng dụng,
-  Then B nhận mức mặc định, không thấy dòng của A, không sửa được dòng của A; bảng mới có `company_id`, luật theo dòng bật và
+  Then B nhận mức mặc định, không thấy dòng của A, không sửa được dòng của A; bảng khoản phí của sàn (`company_fee_items`, một dòng mỗi khoản sàn đã đổi hay thêm) có `company_id`, luật theo dòng bật và
   ép buộc trong cùng migration; bộ kiểm cách ly có ca cho bảng mới và xanh trên Postgres của dãy N.
 
 - **AC-9** — Phần Thuế phí ghép từ khối của họ danh sách khung, đủ bộ nút theo vai.
   Given khối chung `FramedList` của hàng 9c (`src/components/candidate/framed-list.tsx`) và màn Thành viên đã gộp,
   When dựng phần Thuế phí và đặt nó cạnh màn Thành viên ở 1440 và 360,
-  Then phần Thuế phí chỉ điền khe của `FramedList` (đầu khung có tên «Thuế phí» và dòng đếm «3 khoản · n đang tính vào giá
-  bao phí»; mỗi khoản một dòng; chỗ chỉnh cuối dòng; chân khung có ghi chú và nút Lưu), không khung, viền hay nhãn tự vẽ
-  bằng thẻ trần; lề, bo góc, cỡ chữ đầu khung và cỡ chữ dòng giống màn Thành viên; và bộ nút theo vai đúng bảng «Bộ nút theo
-  vai» dưới: chỗ chỉnh cuối dòng, «…» (Trả về mặc định) ở dòng đã đổi và nút Lưu chỉ hiện với `setFeeSchedule`; ba vai đọc
-  thấy giá trị không ô sửa, không «…», không Lưu.
+  Then phần Thuế phí chỉ điền khe của `FramedList` (đầu khung có tên «Thuế phí», dòng đếm «n khoản · m đang tính vào giá
+  bao phí» và nút «Thêm khoản»; mỗi khoản một dòng; chỗ chỉnh cuối dòng; chân khung có ghi chú và nút Lưu), không khung,
+  viền hay nhãn tự vẽ bằng thẻ trần; lề, bo góc, cỡ chữ đầu khung và cỡ chữ dòng giống màn Thành viên; và bộ nút theo vai
+  đúng bảng «Bộ nút theo vai» dưới: «Thêm khoản», chỗ chỉnh cuối dòng, «…» ở khoản riêng và nút Lưu chỉ hiện với
+  `setFeeSchedule`; ba vai đọc thấy giá trị, không ô sửa, không «Thêm khoản», không «…», không Lưu.
+
+- **AC-10** — Quản trị sàn thêm, đổi tên, bỏ khoản riêng. (cross-layer)
+  Given Quản trị sàn ở phần Thuế phí, sàn có Phí môi giới mặc định,
+  When bấm «Thêm khoản», gõ tên «Phí dịch vụ hồ sơ» và 0,3, Lưu; rồi «…» › Đổi tên thành «Phí hồ sơ», Lưu; rồi «…» › Bỏ
+  khoản, Lưu,
+  Then sau lần đầu Bảng hàng trừ thêm 0,3% ở hàng Bao phí; sau lần hai dòng mang tên mới, Về tay không đổi; sau lần ba khoản
+  ra khỏi danh sách và khỏi Về tay, còn dòng ở cơ sở dữ liệu đánh dấu ngừng dùng kèm người và lúc, mã khoản không dùng lại;
+  hai khoản theo luật không có «Đổi tên», «Bỏ khoản» ở màn và API trả 400 nếu gửi thẳng; khoản thứ sáu, tên trùng hay tổng
+  quá 10% thì «Thêm khoản» báo lý do và không ghi.
 
 - **AC-8** — Điều đang đúng đã ghi.
   Given hàng xong,
@@ -115,11 +128,11 @@ khách, Trưởng nhóm); Quản trị sàn đặt mức, không được mở B
 | Đổi tỉ lệ môi giới | ô số cuối dòng Phí môi giới | có | thấy số, không ô | `setFeeSchedule` |
 | Trả về mặc định | «…» cuối dòng đã đổi | có | không hiện | `setFeeSchedule` |
 | Lưu | chân khung | có | không hiện; chân ghi «Chỉ Quản trị sàn đổi được thuế phí» | `setFeeSchedule` |
-| Thêm khoản | đầu khung | bỏ — ba khoản cố định (ADR-0018) | bỏ | — |
-| Xoá khoản | — | bỏ — tắt khỏi bao phí thay cho xoá | bỏ | — |
+| Thêm khoản | đầu khung | chờ Hỏi-7 (khuyên: có, khoản riêng) | không hiện | `setFeeSchedule` |
+| Đổi tên, bỏ khoản | «…» cuối dòng khoản riêng | chờ Hỏi-7 (khuyên: có; hai khoản luật thì không) | không hiện | `setFeeSchedule` |
 | Xem cột Về tay, sắp, lọc, ẩn hiện, lưu góc nhìn | Bảng hàng | không có Bảng hàng (bảng quyền 9a; Hỏi-6) | có | `viewListings` |
 | Sửa Về tay trên ô | Bảng hàng | — | bỏ — Về tay tính từ Giá chào, sửa Giá chào ở ô của hàng 4 | — |
-| Sửa Điều kiện phí trên ô | Bảng hàng | — | bỏ ở hàng này — sau hàng 10 (chưa có hàng lộ trình riêng) | — |
+| Sửa Điều kiện phí trên ô | Bảng hàng | — | chờ Hỏi-8 (khuyên: để hàng 10) | `updateListing` |
 
 ## Đường đo
 
@@ -144,7 +157,8 @@ Quét không gian AC (morphological, preset entity-feature, rút gọn):
 - Core: A×B ở AC-1, AC-3; C ở AC-1, AC-6; D ở AC-4, AC-7, AC-9; E ở AC-2, AC-6, AC-9; ghi chép AC-8.
 - Later: dấu định nghĩa lúc tính trên từng giá (hàng 10) · Về tay ở hồ sơ căn · sửa Điều kiện phí trên ô · nhập Điều kiện
   phí từ Sheet (hàng 11) · nhật ký đổi cấu hình (N10).
-- Never: tỉ lệ, khoản hay Về tay ra trang khách · khoản thứ tư hay công thức do sàn tự viết.
+- Never: tỉ lệ, khoản hay Về tay ra trang khách · cách tính do sàn tự viết (số tiền cố định, bậc thang, tính trên giá khác).
+- Chờ chủ kho: sàn thêm, đổi tên, bỏ khoản riêng (Hỏi-7); sửa Điều kiện phí trên ô (Hỏi-8).
 
 ## Out of scope
 
@@ -162,6 +176,9 @@ Quét không gian AC (morphological, preset entity-feature, rút gọn):
 
 - Hỏi-1 (Điều kiện phí cho từng hàng), Hỏi-2 (chỗ đặt mức), Hỏi-3 (cột hiện sẵn), Hỏi-4 (dấu lúc tính) chờ chủ kho ở Cổng
   Phạm vi; khuyến nghị ở sổ quyết định.
+- Hỏi-7 (danh sách khoản cố định hay sàn thêm, đổi tên, bỏ khoản riêng) và Hỏi-8 (sửa Điều kiện phí trên ô) chờ chủ kho;
+  hợp đồng hiện viết theo ba khoản cố định — chủ kho chọn B hay C thì AC-1, AC-2, AC-3, AC-9, bảng «Bộ nút theo vai» và
+  migration đổi theo (một bảng khoản theo dòng), thêm tiêu chí thêm/đổi tên/bỏ và trần, rồi trình lại thẻ.
 - Hỏi-6 (Quản trị sàn thấy kết quả thế nào) chờ chủ kho: khuyên một dòng ví dụ tính sẵn trong phần Thuế phí; lối khác mở
   Bảng hàng cho Quản trị sàn ngay ở hàng này.
 - Hỏi-5 (mặc định môi giới 1%, bước 0,1%) chờ chủ kho; đổi mặc định thì các số ghim 2,895 tỷ ở AC-1, AC-6, E1, E6-e2e đổi

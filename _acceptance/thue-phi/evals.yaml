@@ -1,7 +1,7 @@
 schema_version: 1
 feature_slug: thue-phi
 # Ma trận viết trước:
-#   AC-1: 7 tập con khác rỗng × 4 tỉ lệ môi giới (0, 100, 250, 500 phần vạn) = 28 ô trên 3 tỷ Bao phí, mỗi ô một assert so số
+#   AC-1: 4 tập con khoản luật × 4 số khoản riêng (0, 1, 2, 5) × 4 tỉ lệ (0, 100, 250, 500 phần vạn) = 64 ô trên 3 tỷ Bao phí, mỗi ô một assert so số
 #         đồng viết tay; thêm 5 ca biên (Không bao phí, 1 đồng, chưa giá, chưa điều kiện, mặc định = 2.895.000.000);
 #         hằng 28 và 5 ghim — bảng co lại cũng đỏ. Hàm kiểm mức: 6 ca sai viết trước (-10, 510, 125, 0 khoản, khoản lạ,
 #         thiếu trường), mỗi ca ghim tên khoản trong lỗi.
@@ -16,9 +16,9 @@ feature_slug: thue-phi
 #   tests/thue-phi-cot.test.ts: cot-ve-tay-sau-gia-chao · dieu-kien-phi-an-san · ve-tay-theo-muc · sap-nhu-tien
 #   tests/e2e-db/thue-phi.spec.ts (Postgres dãy N, bốn khổ): dat-muc-roi-bang-hang-doi · vai-khac-chi-doc · axe-sang-toi
 # Cặp phá thử (bản sao; ca tương ứng phải đỏ với thông điệp ghim):
-#   pha-thu-tru-khoan-tat (netToSeller trừ cả khoản đang tắt)        → «ve-tay-28-o: [brokerageFee] 0»
+#   pha-thu-tru-khoan-tat (netToSeller trừ cả khoản đang tắt)        → «ve-tay-bang-viet-truoc: [brokerageFee] 0»
 #   pha-thu-lam-tron-len (Math.round thay Math.floor)                → «ve-tay-bien: 1 đồng»
-#   pha-thu-bo-kiem-buoc (bỏ kiểm bước 10 phần vạn)                  → «kiem-muc-6-ca: 125»
+#   pha-thu-bo-kiem-buoc (bỏ kiểm bước 10 phần vạn)                  → «kiem-muc-9-ca: 125»
 #   pha-thu-mo-ghi-vai (setFeeSchedule mở cho TeamLead ở bản sao)    → «vai-8-o-db: TeamLead ghi»
 #   pha-thu-bo-loc-san (đọc bỏ company_id ở bản sao)                 → «hai-san-6-o: B thấy A»
 #   pha-thu-doc-so (parseFloat đọc «1,5»)                           → «doc-so-kieu-viet: 1,5»
@@ -29,7 +29,7 @@ evals:
     executor: test
     cmd: config:executors.test.thue_phi
     paths: [src/modules/company-config/**]
-    expected: "exit 0; ca 've-tay-28-o' duyệt đủ 28 ô (số ô in ra = 28), mỗi ô đúng số đồng viết tay; 've-tay-bien' đủ 5 ca, mặc định 3 tỷ Bao phí = 2.895.000.000; 'kiem-muc-6-ca' đủ 6 ca, mỗi lỗi nêu đúng khoản. Chiều đỏ: pha-thu-tru-khoan-tat đỏ với «ve-tay-28-o: [brokerageFee] 0»; pha-thu-lam-tron-len đỏ với «ve-tay-bien: 1 đồng»; pha-thu-bo-kiem-buoc đỏ với «kiem-muc-6-ca: 125»"
+    expected: "exit 0; ca 've-tay-bang-viet-truoc' duyệt đủ bảng viết trước (4 tập con khoản luật × 4 số khoản riêng × 4 tỉ lệ = 64 ô; số ô in ra = 64), mỗi ô đúng số đồng viết tay; 've-tay-bien' đủ 5 ca, mặc định 3 tỷ Bao phí = 2.895.000.000; 'kiem-muc-9-ca' đủ 9 ca viết trước (-10, 510, 125, tên rỗng, tên 41 ký tự, tên trùng, khoản riêng thứ sáu, tổng 10,1%, không khoản nào bật), mỗi lỗi nêu đúng khoản. Chiều đỏ: pha-thu-tru-khoan-tat đỏ với «ve-tay-bang-viet-truoc: [brokerageFee] 0»; pha-thu-lam-tron-len đỏ với «ve-tay-bien: 1 đồng»; pha-thu-bo-kiem-buoc đỏ với «kiem-muc-9-ca: 125»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E2
@@ -233,3 +233,25 @@ evals:
     paths: ["design/patterns/danh-sach-khung.md", "src/modules/company-config/ui/**"]
     expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm danh-sach-khung"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: script
+    layer: backend-effect
+    cmd: config:executors.script.thue_phi_db
+    paths: [src/modules/company-config/**, src/app/api/v1/company/**, db/migrations/**]
+    expected: "exit 0; ca 'khoan-rieng-vong-doi' (PUT thêm «Phí dịch vụ hồ sơ» 30 → GET có khoản, dòng company_fee_items ghi người tạo; đổi tên → GET tên mới, mã giữ nguyên; bỏ → GET không còn, dòng còn với retired_at và người bỏ; thêm lại cùng tên → mã mới, không dùng lại mã cũ) và 'khoan-luat-khong-bo' (PUT bỏ hay đổi tên personalIncomeTax, registrationFee → 400 nêu khoản, cơ sở dữ liệu không đổi; khoản riêng thứ sáu, tên trùng, tổng 1010 phần vạn → 400) có mặt và ok. Chiều đỏ: bỏ kiểm khoản luật ở bản sao → 'khoan-luat-khong-bo' đỏ nêu «registrationFee»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10-ui
+    criterion: AC-10
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3485/tuy-chinh-san?phan=thue-phi
+    paths: [src/modules/company-config/ui/**]
+    steps:
+      - "With the lane N dev server on port 3485, sign in as the sample CompanyAdmin, open the target at 1440 light"
+      - "Press «Thêm khoản», type «Phí dịch vụ hồ sơ» and «0,3», save _acceptance/thue-phi/evidence/E10-them.png, press Lưu, save E10-luu.png; open «…» on that row, save E10-menu.png; open «…» on Thuế thu nhập cá nhân row if any, save E10-luat.png"
+    question: "Khoản mới có hiện cuối danh sách với nguồn «Sàn thêm», dòng ví dụ có trừ thêm 0,3%; «…» của khoản riêng có Đổi tên, Bỏ khoản, Trả về mặc định; hai khoản theo luật không có «…»?"
+    expected: "Bốn khung khớp"
+    evidence_required: [run_id, screenshot, observed, verdict]

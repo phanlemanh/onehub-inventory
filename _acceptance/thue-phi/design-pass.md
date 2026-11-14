@@ -9,7 +9,7 @@ reaction: nac-1 (anh-gui-kem-the)
 options: _acceptance/thue-phi/cong-pham-vi.html (A | B cho Hỏi-2, Hỏi-3, Hỏi-6 theo lời giám sát G-1411-81) · ảnh ở cong/ · khối gốc cong/reui-settings-3-goc.webp
 divergence: opened
 ds_skill: inventory-ui
-states: [h2-a, h2-b, h3-a, h3-b, chi-doc, sai]
+states: [h2-a, h2-b, h3-a, h3-b, h7-b, h7-c, chi-doc, sai]
 breakpoints: [mobile-360, desktop-1440]
 themes: [light]
 patched: 5
@@ -51,3 +51,5 @@ deferred: 0
 - Đặt cạnh màn Thành viên: cùng khung, cùng đầu khung, cùng đường kẻ giữa dòng. Lệch còn lại: màn Thành viên cách đầu màn
   và khung 1,5rem (`gap-6`), bản mẫu 1rem — bản dựng theo Thành viên. Khe chỗ chỉnh cuối dòng của `FramedList` rộng cố
   định 6rem: dòng Phí môi giới (ô số, công tắc, «…») tràn sang cột nhãn — đã báo G để 9c mở khe trước khi gộp.
+- Hỏi-7 (G-1411-109): thêm lối B (khung, «Thêm khoản», «…» ở khoản riêng) và C (họ Lưới như phần Nhãn riêng của 7e), cùng
+  1440, cùng vai Quản trị sàn, cùng bốn khoản mẫu; A là ảnh h2-a.

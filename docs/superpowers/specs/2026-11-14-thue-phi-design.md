@@ -25,13 +25,15 @@ commit `1729b11f` (hợp đồng đã ký 06/11), mã và hồ sơ hàng 7e trê
   **Không bao phí**: Về tay = Giá chào. Thiếu Giá chào hay thiếu Điều kiện phí: trống.
 - Ba khoản là thuế phí của chuyển nhượng. Mô hình chưa có loại giao dịch (mọi hàng hôm nay là bán); khi có hàng cho thuê,
   Về tay của hàng ấy để trống.
-- Không thêm khoản, không công thức tự do, không luật nếu-thì (ADR-0018 của Quỹ hàng, giới hạn chép vào AGENTS.md).
+- Hỏi-7 (khuyến nghị, hợp đồng soạn theo lối này): sàn thêm, đổi tên, bỏ khoản riêng cùng khuôn (tên, phần trăm Giá chào,
+  bật/tắt), tối đa 5 khoản riêng, tổng các khoản đang bật không quá 10%; hai khoản theo luật không bỏ, không đổi tên; bỏ là
+  ngừng dùng, không xoá. Không cách tính khác (số tiền cố định, bậc thang, tính trên giá khác), không luật nếu-thì (ADR-0018 của Quỹ hàng, giới hạn chép vào AGENTS.md).
 
 ## Phương án đã chọn
 
 1. **Lõi tính ở `company-config`** (`index.ts`, an toàn trên trình duyệt): hằng ba khoản, mặc định, khoảng 0–500 phần vạn
    bước 10, hàm kiểm một mức, hàm `netToSeller(listPrice, feeInclusion, schedule)`. Mỗi luật một chỗ.
-2. **Lưu**: bảng mới `company_fee_schedules` (một dòng mỗi sàn: ba công tắc, tỉ lệ môi giới, người và lúc đổi). Migration
+2. **Lưu**: bảng mới `company_fee_items` (một dòng mỗi khoản sàn đã đổi hay thêm: mã, tên, tỉ lệ, bật/tắt, người và lúc, ngừng dùng). Migration
    mới số kế tiếp trên `origin/main` lúc tạo (hiện 012; 7e giữ 010), tạo bằng `/new-migration`: `company_id`, luật theo dòng
    ép buộc, luật vai thu hẹp — đọc theo `readFeeSchedule`, ghi theo `setFeeSchedule`. Ca mới ở bộ kiểm cách ly.
 3. **Bảng quyền**: hai dòng mới ở `ontology/actions.yaml` — `readFeeSchedule` (Đầu chủ, Đầu khách, Trưởng nhóm, Quản trị sàn:

@@ -3,11 +3,11 @@
   "will_do": [
     {
       "id": "AC-1",
-      "p": "Sẽ tính Về tay đúng theo các khoản đang bật, kiểm trên 28 tổ hợp viết trước; mặc định 3 tỷ bao phí ra 2,895 tỷ."
+      "p": "Sẽ tính Về tay đúng theo các khoản đang bật, kiểm trên 64 tổ hợp viết trước; mặc định 3 tỷ bao phí ra 2,895 tỷ; chặn mức sai."
     },
     {
       "id": "AC-2",
-      "p": "Sẽ hiện ba khoản đúng thứ tự, hai khoản «theo luật», nguồn từng khoản, và dòng ví dụ đổi ngay khi gõ."
+      "p": "Sẽ hiện hai khoản theo luật rồi các khoản riêng, nguồn từng khoản, và dòng ví dụ đổi ngay khi gõ."
     },
     {
       "id": "AC-3",
@@ -32,6 +32,10 @@
     {
       "id": "AC-9",
       "p": "Sẽ dựng phần Thuế phí bằng khối chung của họ danh sách khung, giống màn Thành viên, nút đúng theo vai."
+    },
+    {
+      "id": "AC-10",
+      "p": "Sẽ cho Quản trị sàn thêm, đổi tên, bỏ khoản riêng; hai khoản luật không bỏ, không đổi tên."
     }
   ],
   "wont_do": [
