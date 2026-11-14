@@ -157,7 +157,7 @@ evals:
     layer: backend-effect
     cmd: config:executors.script.cach_ly_n
     paths: [db/**]
-    expected: "exit 0; bộ kiểm cách ly trên Postgres dãy N có ca company_fee_schedules (bật và ép buộc luật theo dòng, sàn B không đọc, không sửa dòng của A) và mọi ca xanh. Chiều đỏ: db/tests/pha-thu bản tắt ép buộc cho bảng mới → ca đỏ nêu «company_fee_schedules»"
+    expected: "exit 0; bộ kiểm cách ly trên Postgres dãy N có ca company_fee_items (bật và ép buộc luật theo dòng, sàn B không đọc, không sửa dòng của A) và mọi ca xanh. Chiều đỏ: db/tests/pha-thu bản tắt ép buộc cho bảng mới → ca đỏ nêu «company_fee_items»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E7-db
