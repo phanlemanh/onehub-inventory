@@ -20,6 +20,7 @@
 # `khung` declares the same for the App Shell around every staff screen: the top bar and the second column (row 9b).
 families:
   grid: Lưới
+  list-frame: Danh sách khung
   dang-nhap: Đăng nhập
 audiences: [staff, public, dev]
 statuses: [built, planned]
@@ -108,7 +109,7 @@ screens:
   - id: members
     route: /members
     title: Member
-    family: null
+    family: list-frame
     audience: staff
     status: built
     vao: listMembers

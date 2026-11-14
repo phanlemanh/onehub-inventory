@@ -16,6 +16,7 @@ executors:
     lop_rieng_unit: "npx vitest run src/modules/company-config tests/lop-rieng-ontology.test.ts tests/lop-rieng-cot.test.ts --coverage.enabled=false --reporter=verbose"   # lop-rieng-cua-san (row 7e): custom values, custom columns, ontology fence
     vai_man_so: "npx vitest run tests/vai-man-so-man.test.ts --coverage.enabled=false --reporter=verbose"   # kiem-vai-theo-man (row 9b): screen register entry rule, pair set, shared sign-in door, sidebar vs register
     vai_man_nut: "npx vitest run tests/vai-man-nut-sinh.test.ts tests/vai-man-dau-nut.test.tsx tests/bo-nut-vai-man.test.ts src/modules/identity/permitted-action.test.tsx --coverage.enabled=false --reporter=verbose"   # kiem-vai-theo-man (row 9b): role × screen × button table from the register and module UI, every screen and the App Shell frame
+    thanh_vien_unit: "npx vitest run tests/framed-list.test.tsx tests/form-dialog.test.tsx tests/thanh-vien-mot-cua.test.ts tests/thanh-vien-khoa-bai.test.ts --coverage.enabled=false --reporter=verbose"   # thanh-vien-chon-tu-reui (row 9c): shared dialog with and without badge, members screen reads through the identity door
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
@@ -68,11 +69,14 @@ executors:
     ci_db_kiem: "npx vitest run tests/ci-db.test.ts tests/dem-giao-nhan.test.ts tests/don-dung-tam.test.ts tests/ci-ban-sao-nong.test.ts tests/ci-yml-patch.test.ts --coverage.enabled=false --reporter=verbose"   # ci-co-postgres (row 1s): step runner on stubs, hand-over count, build folder sweep, shallow-clone fixtures, workflow patch
     ci_db_that: "node db/scripts/ci-that.mjs --cho 60"   # ci-co-postgres (row 1s): latest CI run on the branch head — job e2e-db green, its log lines, duration against timeout-minutes
     vai_man_e2e: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} bash -c 'J=$(mktemp -t vai-man).json; PLAYWRIGHT_JSON_OUTPUT_NAME=$J npx playwright test -c playwright.db.config.ts tests/e2e-db/vai.setup.ts tests/e2e-db/vai-man.spec.ts --reporter=list,json && node tests/e2e-db/vai-man-doi-chieu.mjs $J'"   # kiem-vai-theo-man (row 9b): every role × screen pair through the shared role sign-in door, lane D Postgres
+    thanh_vien_e2e_c: "DB_LANE=${DB_LANE:-c} DB_PORT=${DB_PORT:-5569} npx playwright test -c playwright.db.config.ts tests/e2e-db/thanh-vien.spec.ts tests/e2e-db/members.spec.ts tests/e2e-db/bo-nut-members.spec.ts"   # thanh-vien-chon-tu-reui (row 9c): members list and invite dialog, row 9 and 9e browser tests, lane C Postgres
+    moi_nguoi_db_c: "DB_LANE=${DB_LANE:-c} DB_PORT=${DB_PORT:-5569} npx vitest run -c vitest.db.config.ts tests/db/moi-nguoi.db.test.ts --reporter=verbose"   # thanh-vien-chon-tu-reui (row 9c): row 9 database tests unchanged, lane C Postgres
     vai_man_pha_thu: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} node tests/e2e-db/pha-thu-vai-man.mjs"   # kiem-vai-theo-man (row 9b): three breaks on a copy of the tree, each must turn its pair red with the pinned message
     doi_bai_kiem: "node _acceptance/bo-o-tim-cua-vung/rang/doi-bai-kiem.mjs --root . --self-test"   # bo-o-tim-cua-vung (row 2e): every removed test line about the region search box has a row in the old → new table
     ghim_ngan_e2e: "npx playwright test tests/e2e/ghim-ngan.spec.ts"   # ngan-chi-tiet-ghim-thanh-cot (row 3a): pin the record panel as a column, four widths, axe light and dark
     dia_ly: "npx vitest run src/modules/listings/ui/geo-tree.test.ts tests/dia-ly.test.tsx --coverage.enabled=false --reporter=verbose"   # bang-hang-theo-dia-ly (row 2d): geography tree, whole-name filter, one filter state
     dia_ly_e2e_db: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx playwright test -c playwright.db.config.ts tests/e2e-db/dia-ly.spec.ts"   # bang-hang-theo-dia-ly (row 2d): tree in the signed-in App Shell at four widths, saved view, axe light and dark, lane K Postgres
+  ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
     khuon: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-khuon.mjs\" --kiem --root ."   # template map; silent until design/patterns/ exists

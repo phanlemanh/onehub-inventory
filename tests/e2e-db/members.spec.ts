@@ -121,7 +121,7 @@ async function openMembers(page: Page) {
 }
 
 function row(page: Page, email: string) {
-  return page.locator(`li[data-member="${email}"]`);
+  return page.locator(`[data-member="${email}"]`);
 }
 
 async function shot(page: Page, info: TestInfo, name: string, sizes: string[] = ["1440"]) {
@@ -257,7 +257,7 @@ test("khong-du-quyen", { tag: "@cho" }, async ({ page }, info) => {
   await signIn(page, people["P"]!.email);
   await expect(await navMembers(page, info)).toHaveCount(1);
   await openMembers(page);
-  await expect(page.locator("li[data-member]")).toHaveCount(3);
+  await expect(page.locator("[data-member]")).toHaveCount(3);
 });
 
 test("loi-va-thu-lai", async ({ page }, info) => {

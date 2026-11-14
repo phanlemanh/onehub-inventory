@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "ghim": {
+    "luoi": "61b989cc617777208e93a530d36a47482b841455"
+  },
+  "tep": {
+    "luoi": "design/patterns/luoi.md"
+  },
+  "chon": {
+    "moi": "danh-sach-khung",
+    "gan": "luoi"
+  }
+}
