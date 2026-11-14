@@ -23,6 +23,7 @@ import { sampleCatalog } from "../../src/modules/catalog";
 import { catalogLoadStatements } from "../../src/modules/catalog/load-sql";
 import { SAMPLE_LISTINGS_PER_SUBDIVISION } from "../../src/modules/listings";
 
+import { waitReady } from "../../tools/e2e_templates/runner";
 import { openSheet, shown } from "../../tools/e2e_templates/settle";
 
 import { ROLES, signInWithCode } from "./dang-nhap-vai";
@@ -391,7 +392,9 @@ test.describe("lop rieng tren bang hang", () => {
     // The «Hướng view» column filters by its values: every third sample listing looks onto the lake.
     const total = Object.values(SAMPLE_LISTINGS_PER_SUBDIVISION).reduce((s, n) => s + n, 0);
     const lake = Math.ceil(total / 3);
-    // The filter row under the headers is always shown (row 2e): no «Lọc» button to open it.
+    // The filter row under the headers is always shown (row 2e): no «Lọc» button to open it, so wait until the grid
+    // has hydrated before opening the values box (the «Lọc» click used to give that wait).
+    await waitReady(pageA);
     const box = region(pageA).locator(
       'th[data-col-id="custom.huong_view"] [data-filter-mode="values"] button',
     );
