@@ -89,6 +89,10 @@ Quét trục tại chỗ theo khuôn quét hình thái (không gọi skill: khô
 - Thước: CI bản sao nông không đọc lịch sử git · số từ: bài chạy không có git · bảo đảm bởi: AC-4
 - Thước cho kit (số tệp chưa kê) · số từ: `check.py --report --json`, khoá `khoi_khong_ke` · bảo đảm bởi: AC-6
 
+## Vai × Màn
+
+Không áp: hàng này không dựng hay sửa màn nào (`screens: []`); nó sửa công cụ kiểm chứng minh màn trong `tools/proof_gate/`.
+
 ## Out of scope
 
 - Khối tạo tay nằm ngoài `src/components` (vd `src/modules/*/ui`) — sổ thành phần không quét chỗ ấy; đổi phạm vi quét là việc
