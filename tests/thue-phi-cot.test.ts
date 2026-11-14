@@ -82,7 +82,9 @@ describe("ve-tay-theo-muc", () => {
       formatMoney(null),
       formatMoney(null),
     ]);
-    expect(shown(defaultFeeSchedule())[0]).toBe("2,895 tỷ");
+    // Firm B on the defaults: the exact amount; the grid cell rounds it like every money cell.
+    const b = withFees([{ id: "bao-phi" }], ROWS, defaultFeeSchedule());
+    expect(b[0]![NET_TO_SELLER_FIELD]).toBe(2_895_000_000);
   });
   it("without a readable schedule Về tay stays empty, and the fee inclusion shows by its label", () => {
     expect(shown(null)).toEqual(ROWS.map(() => formatMoney(null)));

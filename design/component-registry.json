@@ -70,7 +70,8 @@
             "initialFilters",
             "groupBy",
             "initialView",
-            "onViewChange"
+            "onViewChange",
+            "hiddenAtFirst"
           ]
         },
         {
@@ -125,14 +126,16 @@
             "headAction",
             "rows",
             "footer",
-            "slot"
+            "slot",
+            "controlWidth"
           ]
         },
         {
           "name": "ListFace",
           "props": [
             "name",
-            "sub"
+            "sub",
+            "avatar"
           ]
         }
       ]
@@ -2556,6 +2559,19 @@
       "parts": [
         {
           "name": "Spinner"
+        }
+      ]
+    },
+    {
+      "name": "Switch",
+      "file": "src/components/ui/switch.tsx",
+      "level": "atom",
+      "parts": [
+        {
+          "name": "Switch",
+          "props": [
+            "size"
+          ]
         }
       ]
     },

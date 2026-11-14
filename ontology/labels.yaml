@@ -148,6 +148,21 @@ concepts:
     own: true
     pref: Thêm khoản
     en: Add fee item
+  RenameFeeItem:
+    kind: action
+    own: true
+    pref: Đổi tên khoản
+    en: Rename fee item
+  RemoveFeeItem:
+    kind: action
+    own: true
+    pref: Bỏ khoản
+    en: Remove fee item
+  ResetFeeItem:
+    kind: action
+    own: true
+    pref: Trả về mặc định
+    en: Reset to default
   SaveView:
     kind: action
     own: true

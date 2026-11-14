@@ -6,6 +6,7 @@ import { label } from "@/modules/company-config";
 import { LABELABLE_CONCEPTS } from "@/modules/company-config/server";
 import {
   CompanyLayerScreen,
+  FeePart,
   forcedStateFrom,
   LAYER_PARTS_SHOWN,
   type ShownPart,
@@ -32,6 +33,9 @@ export default async function Page({ searchParams }: Props) {
   const part: ShownPart = (LAYER_PARTS_SHOWN as readonly unknown[]).includes(asked)
     ? (asked as ShownPart)
     : "nhan";
+  // The fee part (row 19) is a framed list, not a grid; its API answers by readFeeSchedule, which every role that
+  // opens this screen holds.
+  if (part === "thue-phi") return <FeePart screenTitle={label("CompanyLayer")} />;
   return (
     <CompanyLayerScreen
       key={part}

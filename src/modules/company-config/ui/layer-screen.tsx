@@ -16,7 +16,7 @@ import { label } from "../index";
 import { STANDARD_VALUE_SETS, type FieldKind } from "../rules";
 import type { CompanyLayer, LayerPart } from "../store";
 
-import { LAYER_COPY as C, PART_TITLE, type ForcedState, type ShownPart } from "./copy";
+import { LAYER_COPY as C, PART_TITLE, type ForcedState, type GridPart } from "./copy";
 import {
   AliasDialog,
   FieldDialog,
@@ -28,7 +28,7 @@ import {
 } from "./layer-dialogs";
 
 /** The part of the URL (`?phan=`) for each part of the layer, and the API's name for it. */
-const API_PART: Record<ShownPart, LayerPart> = {
+const API_PART: Record<GridPart, LayerPart> = {
   nhan: "labels",
   truong: "fields",
   "tu-dien": "aliases",
@@ -81,7 +81,7 @@ function spellingFields(layer: CompanyLayer): SpellingField[] {
 
 /** Columns and rows of one part, in the words of the screen. */
 function partGrid(
-  part: ShownPart,
+  part: GridPart,
   layer: CompanyLayer,
 ): { columns: TypedColumn[]; rows: GridRow[] } {
   switch (part) {
@@ -155,7 +155,7 @@ function partGrid(
 type Load = { kind: "loading" } | { kind: "error" } | { kind: "ready"; layer: CompanyLayer };
 
 /** An edit dialog opened from a row's «…»: which part, which row. */
-type Editing = { part: ShownPart; id: string } | null;
+type Editing = { part: GridPart; id: string } | null;
 
 /**
  * The company layer screen (row 7e, shape A): the screen's title heads the page, and the part chosen in the App Shell's second column fills the content
@@ -167,7 +167,7 @@ export function CompanyLayerScreen({
   concepts,
   forced: forcedAtOpen,
 }: {
-  part: ShownPart;
+  part: GridPart;
   /** The concepts a company may give its own words. */
   concepts: readonly string[];
   /** A region state a development build opens with `?state=`, as the inventory does; never set in production. */
@@ -296,7 +296,7 @@ const EMPTY: CompanyLayer = {
   templates: [],
 };
 
-function rowName(part: ShownPart, row: GridRow): string {
+function rowName(part: GridPart, row: GridRow): string {
   const key = {
     nhan: "CompanyLabel.label",
     truong: "CustomField.name",
@@ -309,7 +309,7 @@ function rowName(part: ShownPart, row: GridRow): string {
 
 /** The button at the head of a part, from the button table of the row: add, or match on pending units; none on templates. */
 function headButton(
-  part: ShownPart,
+  part: GridPart,
   layer: CompanyLayer | null,
   concepts: readonly string[],
   done: (message: string) => void,

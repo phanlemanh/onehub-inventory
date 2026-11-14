@@ -29,7 +29,7 @@ export interface FeeItemView {
   name: string;
   rateBasisPoints: number;
   included: boolean;
-  /** The default rate and inclusion, so the screen can offer «Trả về mặc định». Null for an added item. */
+  /** The default rate and inclusion, so the screen can offer the reset. Null for an added item. */
   defaults: { rateBasisPoints: number; included: boolean; name: string } | null;
   source: FeeItemSource;
 }
