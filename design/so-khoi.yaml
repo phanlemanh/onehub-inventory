@@ -148,6 +148,20 @@ khoi:
     mo_ta: Vùng chạm 44 × 44 px quanh một nút nhỏ hơn trên điện thoại, nút giữ cỡ của nhà cung cấp, chạm ở mép chuyển cho nút
     ho_so: bang-hang-the-dien-thoai
     duyet: 2026-11-14
+  - ten: FramedList
+    tep: src/components/candidate/framed-list.tsx
+    nguon: solution-users-8
+    nhu_cau: danh-sach-khung
+    mo_ta: Danh sách ngắn trong một khung — đầu khung (tên, dòng đếm, nút), mỗi mục một dòng (phần chính, phần phụ, nhãn, chỗ chỉnh cuối dòng), chân khung (ghi chú, nút lưu) — khung Members của solution-users-8
+    ho_so: thanh-vien-chon-tu-reui
+    duyet: 2026-11-14
+  - ten: FormDialog nhãn
+    tep: src/components/candidate/form-dialog.tsx
+    nguon: dialog-2
+    nhu_cau: hop-co-nhan-tieu-de
+    mo_ta: Hộp biểu mẫu có nhãn nhỏ cạnh tiêu đề (tên sàn khi mời người), trường xếp dọc, dải chân hai nút — dáng của dialog-2
+    ho_so: thanh-vien-chon-tu-reui
+    duyet: 2026-11-14
   - ten: LoginLayout
     tep: src/components/templates/login-layout.tsx
     nguon: auth-15
