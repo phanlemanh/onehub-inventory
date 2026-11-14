@@ -7,7 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
-- 2026-11-14 — Khai sổ token và sổ linh kiện với kit nghiệm thu ở `design_floor`, tách khỏi PR nhận design-assembly để cổng trước khi gộp không chặn — [0032](decisions/0032-so-linh-kien-do-design-assembly-ghi.md).
+- 2026-11-14 — Khai sổ token và sổ linh kiện với kit nghiệm thu ở `design_floor`, tách khỏi PR nhận design-assembly, gộp sau nó — [0032](decisions/0032-component-register-written-by-design-assembly.md).
 - 2026-11-14 — Màn đăng nhập chọn lại từ khối ReUI auth-15 (logo trên, một cột hẹp giữa trang, chân trang một dòng); họ màn mới «dang-nhap» với khuôn LoginLayout; luồng mã email và bài kiểm hàng 8, 1m giữ nguyên — `_acceptance/dang-nhap-chon-tu-reui/`.
 - 2026-11-14 — Sổ linh kiện do công cụ design-assembly ghi, theo hình dạng của hợp đồng (mỗi linh kiện một mục, có thuộc tính, ReUI là thư viện); công cụ cũ `tools/design_registry.mjs` bị bỏ; khai sổ với kit để PR sau — [0032](decisions/0032-component-register-written-by-design-assembly.md).
 - 2026-11-14 — Công cụ design-assembly chạy lại lint của chính kho trên đoạn mã phạm từng quyết định, mỗi lần `make check`: chín dòng sổ do luật lint giữ (màu là vai trò, bảng màu, thang chữ, khoảng cách, bo góc, điều khiển thô, bảng thô, đổi diện mạo linh kiện, style viết thẳng) giờ đỏ khi luật bị tắt hay thôi chặn; dòng sổ không đổi. Hai dòng lint để lọt nên vẫn chỉ khai: tên lớp ghép bằng dấu cộng, và ngoại lệ lint không lý do cho luật ngoài `onehub-ui/` hay tắt mọi luật cho cả tệp — `design/theme.json`, `tools/design-assembly/probes.mjs`.
