@@ -15,6 +15,8 @@ const MILLION = 1_000_000;
 
 const twoDigits = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 2 });
 const oneDigit = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 1 });
+// Billions keep the millions (row 19: a net-to-seller of 2,895 tỷ must not read 2,89 tỷ); round prices show as before.
+const threeDigits = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 3 });
 const whole = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 });
 const currency = new Intl.NumberFormat(LOCALE, { style: "currency", currency: "VND" });
 const dateFormat = new Intl.DateTimeFormat(LOCALE, {
@@ -45,7 +47,7 @@ export function formatMoney(value: number | null | undefined): string {
   if (value >= MILLION) {
     const millions = Math.round((value / MILLION) * 10) / 10;
     if (millions < 1000) return `${oneDigit.format(millions)} triệu`;
-    return `${twoDigits.format(value / BILLION)} tỷ`;
+    return `${threeDigits.format(value / BILLION)} tỷ`;
   }
   return plain(currency.format(value));
 }

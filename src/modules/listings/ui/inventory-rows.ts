@@ -79,16 +79,36 @@ export interface InventoryCustomColumn {
   kind: DisplayKind;
 }
 
+/** The worked-out net-to-seller value of a row (row 19): not a field of the model, so it is keyed like a computed column. */
+export const NET_TO_SELLER_FIELD = "custom.netToSeller" as const;
+/** The fee inclusion of a row (row 19), shown by its label. */
+export const FEE_INCLUSION_FIELD = "Listing.feeInclusion" as const;
+
+/** Headers of the two fee columns (row 19), from the label table. */
+export interface InventoryFeeHeaders {
+  netToSeller: string;
+  feeInclusion: string;
+}
+
 /**
  * The eight columns of the inventory grid, in order, with the headers the page gives, then the company's own columns
- * in the order given (row 7e: never before a standard column).
+ * in the order given (row 7e: never before a standard column). With fee headers (row 19), the net-to-seller column
+ * comes right after the list price, and the fee inclusion column after the eight standard ones.
  */
 export function inventoryColumns(
   headers: Readonly<Record<InventoryField, string>>,
   custom: readonly InventoryCustomColumn[] = [],
+  fees?: InventoryFeeHeaders,
 ): TypedColumn[] {
+  const standard = INVENTORY_FIELDS.flatMap((field) => {
+    const column = typedColumn({ field, header: headers[field] });
+    return fees && field === "Listing.listPrice"
+      ? [column, customColumn({ code: "netToSeller", header: fees.netToSeller, kind: "money" })]
+      : [column];
+  });
   return [
-    ...INVENTORY_FIELDS.map((field) => typedColumn({ field, header: headers[field] })),
+    ...standard,
+    ...(fees ? [typedColumn({ field: FEE_INCLUSION_FIELD, header: fees.feeInclusion })] : []),
     ...custom.map((c) => customColumn(c)),
   ];
 }

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/templates/page-header";
 import { customColumnsOf, label, labelOverrides } from "@/modules/company-config";
-import { myCompanyLayer } from "@/modules/company-config/server";
+import { myCompanyLayer, myFeeSchedule } from "@/modules/company-config/server";
 import { isRole } from "@/modules/identity";
 import { currentSession } from "@/modules/identity/server";
 import { SessionRoles } from "@/modules/identity/ui";
@@ -14,6 +14,7 @@ import {
   sampleInventoryRows,
   sampleRecords,
 } from "../inventory-sample-rows";
+import { feeHeaders, withFees } from "../inventory-fees";
 import { savedViewLabels } from "../saved-view-labels";
 import {
   ENTRY_COPY,
@@ -96,6 +97,8 @@ const RECORD_LABELS: RecordLabels = {
   },
 };
 
+const FEE_HEADERS = feeHeaders();
+
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
 /** A query parameter's first value; a repeated parameter keeps its first value. */
@@ -111,10 +114,11 @@ export default async function Page({ searchParams }: Props) {
   const status = first(query.status);
   // A saved view opens by its own address (row 2c): gone, or someone else's, opens every unit with a sentence.
   const viewId = first(query[SAVED_VIEW_PARAM]);
-  const [listed, openView, layer] = await Promise.all([
+  const [listed, openView, layer, fees] = await Promise.all([
     mySavedViews("inventory"),
     viewId ? mySavedView(viewId) : Promise.resolve(null),
     myCompanyLayer(),
+    myFeeSchedule(),
   ]);
   // The company's own words and columns (row 7e); without a readable layer, the standard ones.
   const headers = headersFor({ overrides: labelOverrides(layer?.labels ?? []) });
@@ -124,7 +128,9 @@ export default async function Page({ searchParams }: Props) {
   const savedViews = listed === "unreadable" ? [] : listed;
   const viewLabels = savedViewLabels();
   const viewCopy = savedViewCopy(viewLabels);
-  const rows = sampleInventoryRows();
+  const listings = sampleInventoryListings();
+  // Net to seller under the company's fee schedule (row 19); no readable schedule leaves the column empty.
+  const rows = withFees(sampleInventoryRows(), listings, fees?.items ?? null);
   // The top-bar search (row 3f) opens the grid with its text in a column filter; one unit found opens its record
   // through the record's own address (row 3), so the back button and «Chép đường dẫn» work as usual.
   const opening = inventoryOpeningFor(rows, {
@@ -182,8 +188,9 @@ export default async function Page({ searchParams }: Props) {
         title={label("Listing")}
         headers={headers}
         customColumns={customColumns}
+        feeHeaders={FEE_HEADERS}
         rows={rows}
-        listings={sampleInventoryListings()}
+        listings={listings}
         editLabels={cellEditLabels((concept, transaction) => label(concept, { transaction }))}
         state={inventoryStateFrom(state, process.env.NODE_ENV)}
         emptyWhy={`${label("Company")} chưa có ${label("Unit").toLocaleLowerCase("vi")} nào đang chào trên ${label("Inventory")}.`}

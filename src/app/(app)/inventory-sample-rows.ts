@@ -7,6 +7,7 @@ import {
   listingsOfUnit,
   sampleEarlierListings,
 } from "@/modules/listings";
+import type { Listing } from "@/generated/ontology";
 import { inventoryRows, type ListingRecordData } from "@/modules/listings/ui";
 
 /**
@@ -37,10 +38,36 @@ function sampleCustomFields(i: number): Record<string, unknown> {
   return out;
 }
 
+/**
+ * The fee inclusion of each sample listing (row 19), kept apart from the pinned sample of row 1 like the own fields:
+ * most listings include the fees, every third does not, every fifth has none yet. Two listings are set for the
+ * contract's cases: the eighth asks 3 tỷ with the fees included, the eleventh has no price yet.
+ */
+export const SAMPLE_FEE_CASES = { threeBillion: 7, noPrice: 10 } as const;
+
+function withSampleFees<L extends Listing>(listings: readonly L[]): L[] {
+  return listings.map((l, i) => {
+    const feeInclusion: Listing["feeInclusion"] =
+      i % 5 === 4 ? undefined : i % 3 === 2 ? "Excluded" : "Included";
+    const out: L = { ...l };
+    if (feeInclusion) out.feeInclusion = feeInclusion;
+    else delete out.feeInclusion;
+    if (i === SAMPLE_FEE_CASES.threeBillion) {
+      out.listPrice = 3_000_000_000;
+      out.feeInclusion = "Included";
+    }
+    if (i === SAMPLE_FEE_CASES.noPrice) delete out.listPrice;
+    return out;
+  });
+}
+
 function sampleInventory() {
   const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
   const built = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
-  const listings = built.listings.map((l, i) => ({ ...l, customFields: sampleCustomFields(i) }));
+  const listings = withSampleFees(built.listings).map((l, i) => ({
+    ...l,
+    customFields: sampleCustomFields(i),
+  }));
   return { units, listingUnits: built.listingUnits, listings };
 }
 
@@ -60,7 +87,8 @@ export function sampleSearchRows() {
  */
 export function sampleRecords(now: Date): Record<string, ListingRecordData> {
   const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
-  const current = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
+  const built = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
+  const current = { ...built, listings: withSampleFees(built.listings) };
   const earlier = sampleEarlierListings(current);
   const listings = [...current.listings, ...earlier.listings];
   const links = [...current.listingUnits, ...earlier.listingUnits];
