@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory]
-status: implemented
+status: verified
 approved_by: Manh Phan
 approved_at: 2026-11-14
 design_doc: _acceptance/bang-hang-the-dien-thoai/design.md
@@ -141,3 +141,24 @@ Ngưỡng SỐNG của ô cơ hội, từng vế:
 - Tệp ngoài vùng của hàng: `src/components/candidate/data-region.tsx` (khe danh sách điện thoại) và tệp mới
   `src/components/candidate/phone-list.tsx`; dáng «ngang gọn» thêm vào `ListingCard` (`src/modules/listings/ui/listing-record.tsx`), không thêm tệp thẻ thứ hai; `design/behaviors.md`, `design/patterns/luoi.md`, `design/so-khoi.yaml`,
   `_acceptance/config.yaml` (thêm dòng). Báo giám sát trước khi dựng.
+- Ngoài-1 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Người dùng không gặp lỗi gì ở màn hình. Rủi ro là về sau nếu danh sách thẻ đổi dạng, bài kiểm tên đọc của thẻ vẫn báo xanh dù không kiểm được thẻ nào, nên một lỗi tên đọc có thể lọt qua mà không ai biết. — `tests/the-dien-thoai.test.tsx`
+- Ngoài-2 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Một tệp của bộ đo dùng chung bị sửa mà hợp đồng ghi mức rủi ro thấp hơn thực tế và chưa có người có thẩm quyền duyệt riêng. Người dùng cuối không thấy gì khác, nhưng chủ kho cần biết để duyệt. — `tools/e2e_templates/recipes.ts`
+- Ngoài-3 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Còn sót mã cho một kiểu hiển thị mà chủ kho không chọn; người dùng không thấy và không bị ảnh hưởng. — `src/modules/listings/ui/listing-record.tsx`
+- Ngoài-4 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Khi mở một căn ở tab mới hoặc sao chép liên kết từ thẻ, người nhận thấy danh sách không còn bộ lọc, sắp xếp hay góc nhìn đang dùng. Chạm bình thường vẫn đúng. — `src/components/candidate/phone-list.tsx`
+- Ngoài-5 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Bài kiểm tra việc nhóm theo Toà trên điện thoại chưa chặt, nên nếu thẻ nằm nhầm nhóm hay số căn lệch thì có thể không bị phát hiện. — `tests/the-dien-thoai.test.tsx`
+- Ngoài-6 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Bài kiểm tra lọc, sắp xếp và vào từ chỗ khác trên điện thoại chỉ phủ một phần các tình huống đã hứa, nên một số lỗi có thể lọt. — `tests/the-dien-thoai.test.tsx`
+- Ngoài-7 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Nếu vùng ở các trạng thái đang tải, lỗi hay không đủ quyền hiện trắng trên điện thoại thì bài kiểm tra vẫn qua, người dùng sẽ thấy màn trống. — `tests/the-dien-thoai.test.tsx`
+- Ngoài-8 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Phép kiểm tra thẻ không có mặt ở một ca luôn qua, và ca hỏi lại trước khi xoá căn chưa được kiểm. — `tests/the-dien-thoai.test.tsx`
+- Ngoài-9 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Bài kiểm tra chưa chắc bắt được trường hợp thẻ mang sai trạng thái hay sai nơi, nên lỗi hiển thị loại này có thể lọt. — `tests/the-dien-thoai.test.tsx`
+- Ngoài-10 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Chưa được kiểm chắc rằng sắp xếp và nhóm còn nguyên khi xoay hay đổi cỡ màn qua ngưỡng điện thoại, chỉ bộ lọc được kiểm. — `tests/e2e/the-dien-thoai.spec.ts`
+- Ngoài-11 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Bài kiểm tra chưa chắc rằng Quản trị sàn thấy đúng câu không đủ quyền, trang trắng hay lỗi cũng làm bài qua. — `tests/e2e/the-dien-thoai.spec.ts`
+
+### Tệp hạng cao đã đổi
+
+`python3 tools/autonomy.py --base origin/main` xếp thay đổi này hạng CAO vì một đường được bảo vệ; hợp đồng giữ T2
+(phán quyết giám sát G-1411-144). Căn cứ quyền: chủ kho 14/11 — «Kiểm lại quyền tôi đã giao cho bạn xử lý, nên sau này
+không xin». Chữ ký Cổng Bằng chứng là lúc chủ kho thấy và duyệt mục này.
+
+| Tệp | Đổi gì | Phán quyết |
+|---|---|---|
+| `tools/e2e_templates/recipes.ts` | Nhánh thẻ cho các công thức vùng (lọc đầu cột, không khớp, lỗi, một phần hỏng, chữ dài) và cho ca phá của chúng; chỉ chạy khi vùng có danh sách thẻ; khổ ≥768 không đổi; cùng tên ca, cùng lời ghim | G-1411-12 điều f |
