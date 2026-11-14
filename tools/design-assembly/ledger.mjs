@@ -11,6 +11,10 @@ import { adapterOf } from "./adapters/index.mjs";
 
 const lint = adapterOf("lint");
 
+// A text matched as itself inside a regular expression: every character that means something there,
+// the backslash included, is escaped.
+export const literally = (text) => String(text).replace(/[.*+?^${}()|[\]\\/-]/g, "\\$&");
+
 export const LEDGER = "design/decisions.yaml";
 // The pointer a row carries when this plugin's own tool holds the decision.
 export const TOOL = "tool:tools/design-assembly/check.mjs";
@@ -146,7 +150,7 @@ export function pointerProblem(root, id, check) {
     const text = read(root, value);
     if (text === null) return `${check}: no such file`;
     if (prefix === "tool") return inGate(root, value) ? null : `${check}: not run by the gate`;
-    const tagged = new RegExp(`decision:${id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w-])`);
+    const tagged = new RegExp(`decision:${literally(id)}(?![\\w-])`);
     return tagged.test(text) ? null : `${check}: the file does not name decision:${id}`;
   }
   if (prefix === lint.prefix) {

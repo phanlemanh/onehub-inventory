@@ -2,6 +2,7 @@
 // screen takes its words from one place, and that an error message has both of its parts.
 import { adapter as source } from "./adapters/react.mjs";
 import { closing, openingTag } from "./components.mjs";
+import { literally } from "./ledger.mjs";
 import { builtScreens, readScreenLedger, SCREEN_LEDGER } from "./screen-ledger.mjs";
 
 // The file a person owns: the states every screen must declare, and the screens excused from them.
@@ -176,7 +177,7 @@ export const TOAST_MODULES = source.toastModules;
 // the browser itself, or a toast library called directly.
 export function channelsProblem(files, skip = []) {
   const found = [];
-  const modules = TOAST_MODULES.map((name) => name.replace(/[-/]/g, "\\$&")).join("|");
+  const modules = TOAST_MODULES.map(literally).join("|");
   const direct = new RegExp(`from\\s+["'](${modules})["']`, "g");
   // A module that draws nothing may be the one door to the toast library. A second one is a second
   // door, whatever it is called.

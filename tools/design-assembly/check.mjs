@@ -15,6 +15,7 @@ import {
   LAYERS,
   LEDGER,
   ledgerProblems,
+  literally,
   oldLayerNames,
   parseLedger,
   pointerProblem,
@@ -191,7 +192,7 @@ const KINDS = {
     run(state, check) {
       const own = withoutBlock(state.css);
       const found = check.variables.filter((name) =>
-        new RegExp(`(^|[\\s;{])${name.replace(/[-]/g, "\\-")}\\s*:`, "m").test(own),
+        new RegExp(`(^|[\\s;{])${literally(name)}\\s*:`, "m").test(own),
       );
       if (found.length === 0) return null;
       return `${found.join(", ")} declared in ${state.stylesheet}: the decision keeps the framework's standard, so change the decision instead`;
