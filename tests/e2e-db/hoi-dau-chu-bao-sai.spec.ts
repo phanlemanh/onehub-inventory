@@ -280,7 +280,9 @@ function watchRequests(page: Page): string[] {
   });
   return out;
 }
-const recordText = (page: Page) => page.locator('[data-slot="listing-record-fields"]').innerText();
+// The record body as the record shows it: row 3b's full record on the inventory, the eight fields elsewhere.
+const recordText = (page: Page) =>
+  page.locator('[data-slot="record-panel-body"] [data-slot="listing-record"]').innerText();
 
 test("E8 · no write request and no change through every branch", async ({ page }, info) => {
   test.skip(info.project.name !== "1440", "do o 1440");
