@@ -1189,7 +1189,7 @@ export function DataRegion({
         data-slot="data-region"
         data-full-screen={fullScreen || undefined}
         style={REGION_HEIGHTS}
-        className="group/region flex min-w-0 flex-col bg-background"
+        className="group/region mr-(--record-pinned,0px) flex min-w-0 flex-col bg-background"
       >
         <span ref={chRef} aria-hidden="true" className="invisible absolute text-base">
           0
