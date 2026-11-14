@@ -15,6 +15,11 @@ export const LABELS = {
   CatalogAlias: {"pref": "Mã gốc"},
   CompanyCatalogAlias: {"pref": "Mã riêng"},
   SavedView: {"pref": "Góc nhìn"},
+  CompanyLabel: {"pref": "Nhãn riêng"},
+  CustomField: {"pref": "Trường riêng"},
+  CompanyValueAlias: {"pref": "Cách viết riêng"},
+  PendingUnit: {"pref": "Căn chờ khớp"},
+  ImportTemplate: {"pref": "Mẫu nhập"},
   SaveView: {"pref": "Lưu góc nhìn"},
   SaveViewChanges: {"pref": "Lưu thay đổi"},
   SaveAsNewView: {"pref": "Lưu thành mới"},
@@ -99,6 +104,14 @@ export const LABELS = {
   OpenCount: {"pref": "Lượt mở"},
   InterestCount: {"pref": "Quan tâm"},
   LastOpenedAt: {"pref": "Mở gần nhất"},
+  CompanyLayer: {"pref": "Tuỳ chỉnh của sàn"},
+  ValueDictionary: {"pref": "Từ điển giá trị"},
+  AddCompanyLabel: {"pref": "Thêm nhãn riêng"},
+  AddCustomField: {"pref": "Thêm trường riêng"},
+  AddValueAlias: {"pref": "Thêm cách viết"},
+  MatchPendingUnits: {"pref": "Khớp với danh mục"},
+  RetireItem: {"pref": "Ngừng dùng"},
+  RenameTemplate: {"pref": "Đổi tên mẫu"},
 } as const;
 
 export type ConceptCode = keyof typeof LABELS;

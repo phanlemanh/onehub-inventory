@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/templates/page-header";
-import { label } from "@/modules/company-config";
+import { customColumnsOf, label, labelOverrides } from "@/modules/company-config";
+import { myCompanyLayer } from "@/modules/company-config/server";
 import { isRole } from "@/modules/identity";
 import { currentSession } from "@/modules/identity/server";
 import { SessionRoles } from "@/modules/identity/ui";
@@ -41,17 +42,22 @@ const ASK_WORDS = {
   listAgent: label("ListAgent"),
 };
 
-/** Headers of the eight inventory columns, from the label table (approved at the scope gate, Hỏi-2). */
-const HEADERS: Record<InventoryField, string> = {
-  "Listing.unitNumber": label("Unit"),
-  "Listing.buildingName": label("Building"),
-  "Listing.subdivisionName": label("Subdivision"),
-  "Listing.standardStatus": label("StandardStatus"),
-  "Listing.listPrice": label("ListPrice"),
-  "Unit.livingArea": label("LivingArea"),
-  "Unit.bedroomsTotal": label("BedroomsTotal"),
-  "Listing.lastConfirmedAt": label("LastConfirmedAt"),
-};
+/**
+ * Headers of the eight inventory columns, from the label table (approved at the scope gate, Hỏi-2), with the
+ * company's own words where it chose some (row 7e).
+ */
+function headersFor(overrides: Parameters<typeof label>[1]): Record<InventoryField, string> {
+  return {
+    "Listing.unitNumber": label("Unit", overrides),
+    "Listing.buildingName": label("Building", overrides),
+    "Listing.subdivisionName": label("Subdivision", overrides),
+    "Listing.standardStatus": label("StandardStatus", overrides),
+    "Listing.listPrice": label("ListPrice", overrides),
+    "Unit.livingArea": label("LivingArea", overrides),
+    "Unit.bedroomsTotal": label("BedroomsTotal", overrides),
+    "Listing.lastConfirmedAt": label("LastConfirmedAt", overrides),
+  };
+}
 
 /** Labels of the full unit record (row 3b), from the label table. */
 const RECORD_LABELS: RecordLabels = {
@@ -109,10 +115,14 @@ export default async function Page({ searchParams }: Props) {
   const status = first(query.status);
   // A saved view opens by its own address (row 2c): gone, or someone else's, opens every unit with a sentence.
   const viewId = first(query[SAVED_VIEW_PARAM]);
-  const [listed, openView] = await Promise.all([
+  const [listed, openView, layer] = await Promise.all([
     mySavedViews("inventory"),
     viewId ? mySavedView(viewId) : Promise.resolve(null),
+    myCompanyLayer(),
   ]);
+  // The company's own words and columns (row 7e); without a readable layer, the standard ones.
+  const headers = headersFor({ overrides: labelOverrides(layer?.labels ?? []) });
+  const customColumns = customColumnsOf(layer?.fields ?? []);
   const missing = viewId !== undefined && openView === null;
   // Views that could not be read still leave saving open; the server checks names again.
   const savedViews = listed === "unreadable" ? [] : listed;
@@ -179,7 +189,8 @@ export default async function Page({ searchParams }: Props) {
         viewLabels={viewLabels}
         askWords={ASK_WORDS}
         title={label("Listing")}
-        headers={HEADERS}
+        headers={headers}
+        customColumns={customColumns}
         rows={rows}
         listings={sampleInventoryListings()}
         editLabels={cellEditLabels((concept, transaction) => label(concept, { transaction }))}

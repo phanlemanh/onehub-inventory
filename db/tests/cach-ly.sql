@@ -1,4 +1,4 @@
--- Company isolation suite (SP-1): 20 SQL cases (14 of row 7, 5 of row 7a, 1 of row 7b), run by db/scripts/cach-ly.sh on a scratch database that has the
+-- Company isolation suite (SP-1): 21 SQL cases (14 of row 7, 5 of row 7a, 1 of row 7b, 1 of row 7e), run by db/scripts/cach-ly.sh on a scratch database that has the
 -- migrations applied. Each case builds companies A and B as the table owner inside one transaction, switches to the
 -- API role with the door's own statements (src/modules/identity/with-company.ts), checks reads and writes, and
 -- rolls back. A passing case prints `ok <case>`; a failing one raises `HỎNG <case>: <table or reason>`.
@@ -94,7 +94,29 @@ insert into luat_thu_hep values
   ('saved_view', 'saved_view_own_update',
    '(((user_id)::text = current_setting(''app.user_id''::text, true)) AND (app.allowed(''editView''::text) IS NOT NULL))'),
   ('saved_view', 'saved_view_own_delete',
-   '(((user_id)::text = current_setting(''app.user_id''::text, true)) AND (app.allowed(''removeView''::text) IS NOT NULL))');
+   '(((user_id)::text = current_setting(''app.user_id''::text, true)) AND (app.allowed(''removeView''::text) IS NOT NULL))'),
+  -- 010_lop_rieng_cua_san.sql (hàng 7e): the company layer is read with readCompanyLayer, added with addCompanyLayer and
+  -- changed with the write actions that table uses.
+  ('company_labels', 'company_labels_read_by_permission', '(app.allowed(''readCompanyLayer''::text) = ''company''::text)'),
+  ('company_labels', 'company_labels_insert_by_permission', '(app.allowed(''addCompanyLayer''::text) = ''company''::text)'),
+  ('company_labels', 'company_labels_update_by_permission',
+   '((app.allowed(''editCompanyLayer''::text) = ''company''::text) OR (app.allowed(''retireCompanyLayer''::text) = ''company''::text))'),
+  ('company_fields', 'company_fields_read_by_permission', '(app.allowed(''readCompanyLayer''::text) = ''company''::text)'),
+  ('company_fields', 'company_fields_insert_by_permission', '(app.allowed(''addCompanyLayer''::text) = ''company''::text)'),
+  ('company_fields', 'company_fields_update_by_permission',
+   '((app.allowed(''editCompanyLayer''::text) = ''company''::text) OR (app.allowed(''retireCompanyLayer''::text) = ''company''::text))'),
+  ('company_value_aliases', 'company_value_aliases_read_by_permission', '(app.allowed(''readCompanyLayer''::text) = ''company''::text)'),
+  ('company_value_aliases', 'company_value_aliases_insert_by_permission', '(app.allowed(''addCompanyLayer''::text) = ''company''::text)'),
+  ('company_value_aliases', 'company_value_aliases_update_by_permission',
+   '((app.allowed(''editCompanyLayer''::text) = ''company''::text) OR (app.allowed(''retireCompanyLayer''::text) = ''company''::text))'),
+  ('company_pending_units', 'company_pending_units_read_by_permission', '(app.allowed(''readCompanyLayer''::text) = ''company''::text)'),
+  ('company_pending_units', 'company_pending_units_insert_by_permission', '(app.allowed(''addCompanyLayer''::text) = ''company''::text)'),
+  ('company_pending_units', 'company_pending_units_update_by_permission',
+   '((app.allowed(''retireCompanyLayer''::text) = ''company''::text) OR (app.allowed(''matchPendingUnits''::text) = ''company''::text))'),
+  ('company_import_templates', 'company_import_templates_read_by_permission', '(app.allowed(''readCompanyLayer''::text) = ''company''::text)'),
+  ('company_import_templates', 'company_import_templates_insert_by_permission', '(app.allowed(''addCompanyLayer''::text) = ''company''::text)'),
+  ('company_import_templates', 'company_import_templates_update_by_permission',
+   '((app.allowed(''editCompanyLayer''::text) = ''company''::text) OR (app.allowed(''retireCompanyLayer''::text) = ''company''::text))');
 
 create function pg_temp.dung_dang(bang name, luat name, lenh text, bieu_thuc text, cot text,
                                   kieu text default 'PERMISSIVE') returns boolean
@@ -643,3 +665,67 @@ begin
   end if;
   raise notice 'ok dang-xem-ghi-khong-vuot-luat — % dạng xem, đối chứng %', dem, doi_chung;
 end $$;
+
+-- 21. The company layer (row 7e, hồ sơ lop-rieng-cua-san): each of the five tables, with one row of A as the owner,
+--     shows that row to A's admin and nothing to B's admin or to a session without a company; A cannot write a row in
+--     B's name; the API role cannot delete from any of them. Positive control: A's admin reads its five rows back.
+begin;
+select pg_temp.dung_hai_san();
+select pg_temp.them_quan_tri_a();
+insert into identity.users (id, email, name)
+  values ('00000000-0000-4000-8000-0000000000b1', 'quan-tri-b@example.test', '[Tên]');
+insert into company_members (company_id, user_id, name, roles)
+  values ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-0000000000b1', '[Tên]', '{CompanyAdmin}');
+insert into company_labels (company_id, concept, label)
+  values ('00000000-0000-4000-8000-00000000000a', 'Building', 'Block');
+insert into company_fields (company_id, code, name, kind, options, position)
+  values ('00000000-0000-4000-8000-00000000000a', 'huong_view', 'Hướng view', 'single_select', '["Biển"]', 1);
+insert into company_value_aliases (company_id, field, raw, raw_fold, value)
+  values ('00000000-0000-4000-8000-00000000000a', 'directionFaces', 'ĐN', 'dn', 'Southeast');
+insert into company_pending_units (company_id, raw_code)
+  values ('00000000-0000-4000-8000-00000000000a', 'SA5-12.08');
+insert into company_import_templates (company_id, name, signature, columns)
+  values ('00000000-0000-4000-8000-00000000000a', 'Mẫu A', '{ma can}', '[{"target":"Listing.unitNumber"}]');
+set local role quy_hang_app;
+create function pg_temp.dem_lop_rieng() returns int[] language sql as $f$
+  select array[(select count(*) from company_labels)::int, (select count(*) from company_fields)::int,
+               (select count(*) from company_value_aliases)::int, (select count(*) from company_pending_units)::int,
+               (select count(*) from company_import_templates)::int];
+$f$;
+do $$
+declare n int[]; cau text; bang text;
+begin
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a1', true);
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000a', true);
+  n := pg_temp.dem_lop_rieng();
+  if n <> array[1, 1, 1, 1, 1] then
+    raise exception 'HỎNG lop-rieng-theo-san: đối chứng — quản trị sàn A thấy % dòng', n;
+  end if;
+  -- Each of the five tables: no row in B's name, and no delete at all (retiring is the only way out).
+  foreach cau in array array[
+    'insert into company_labels (company_id, concept, label) values (''00000000-0000-4000-8000-00000000000b'', ''Unit'', ''X'')',
+    'insert into company_fields (company_id, code, name, kind, position) values (''00000000-0000-4000-8000-00000000000b'', ''x'', ''X'', ''text'', 1)',
+    'insert into company_value_aliases (company_id, field, raw, raw_fold, value) values (''00000000-0000-4000-8000-00000000000b'', ''directionFaces'', ''X'', ''x'', ''North'')',
+    'insert into company_pending_units (company_id, raw_code) values (''00000000-0000-4000-8000-00000000000b'', ''X-1'')',
+    'insert into company_import_templates (company_id, name, signature, columns) values (''00000000-0000-4000-8000-00000000000b'', ''X'', ''{x}'', ''[]'')'
+  ] loop
+    perform pg_temp.phai_loi('lop-rieng-theo-san', cau, 'row-level security');
+  end loop;
+  foreach bang in array array['company_labels', 'company_fields', 'company_value_aliases', 'company_pending_units',
+                              'company_import_templates'] loop
+    perform pg_temp.phai_loi('lop-rieng-theo-san', 'delete from ' || bang, 'permission denied');
+  end loop;
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000b1', true);
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000b', true);
+  n := pg_temp.dem_lop_rieng();
+  if n <> array[0, 0, 0, 0, 0] then
+    raise exception 'HỎNG lop-rieng-theo-san: sàn B thấy % dòng của A', n;
+  end if;
+  perform set_config('app.company_id', '', true);
+  n := pg_temp.dem_lop_rieng();
+  if n <> array[0, 0, 0, 0, 0] then
+    raise exception 'HỎNG lop-rieng-theo-san: phiên chưa chọn sàn thấy % dòng', n;
+  end if;
+  raise notice 'ok lop-rieng-theo-san — 5 bảng';
+end $$;
+rollback;

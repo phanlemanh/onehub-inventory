@@ -1,0 +1,37 @@
+name: CustomField
+description: >-
+  A column one company keeps that the standard has no field for («Hướng view»), shown on the inventory after the
+  standard columns. Belongs to that company only; its values live on the company's listings.
+reso: none (our own)
+
+properties:
+  companyId: { type: ref, target: Company, required: true, display: none }
+  code: { type: string, required: true, display: none }
+  name: { type: string, required: true, max: 40, display: text }
+  kind:
+    {
+      type: enum,
+      values: [text, number, date, single_select, boolean],
+      required: true,
+      display: select,
+    }
+  options: { type: json, display: none }
+  position: { type: integer, required: true, min: 0, display: none }
+  createdAt: { type: datetime, required: true, display: none }
+  retiredAt: { type: datetime, display: none }
+
+rules:
+  - id: custom-field-limits
+    description: >-
+      At most 20 fields in use per company; a single choice field has 1 to 30 options, other kinds none; the code is
+      given once and never changed or reused; the kind never changes; the name is unique after folding among the
+      company's fields in use, its labels and the inventory's standard headers.
+    implemented_in: db/migrations/010_lop_rieng_cua_san.sql
+  - id: custom-value-fits-kind
+    description: A value fits its field's kind; a retired field takes no new value.
+    implemented_in: src/modules/company-config/rules.ts
+
+code:
+  model: src/modules/company-config/
+  tests: src/modules/company-config/
+wiki: wiki/entities/custom-field.md

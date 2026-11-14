@@ -1,7 +1,8 @@
 // Pure parts of the inventory grid (roadmap row 2): rows, columns and the state a URL asks for. Safe on the server.
-import { typedColumn, type TypedColumn } from "@/components/candidate/column-kind";
+import { customColumn, typedColumn, type TypedColumn } from "@/components/candidate/column-kind";
 import { STATUS_ORDER, foldText, type ColumnFilters } from "@/components/candidate/grid-view";
 import type { GridRow, RegionStatus } from "@/components/candidate/data-region";
+import type { DisplayKind } from "@/generated/display";
 import type { Listing, ListingUnit, Unit } from "@/generated/ontology";
 
 /** Region states a development build may open with `?state=`; anything else is the loaded grid. */
@@ -37,6 +38,7 @@ export function inventoryRows(input: {
     const upi = upiByListing.get(l.id);
     const unit = upi === undefined ? undefined : unitByUpi.get(upi);
     return {
+      ...customValues(l),
       id: l.id,
       "Listing.unitNumber": l.unitNumber ?? null,
       "Listing.buildingName": l.buildingName ?? null,
@@ -48,6 +50,13 @@ export function inventoryRows(input: {
       "Listing.lastConfirmedAt": l.lastConfirmedAt ?? null,
     };
   });
+}
+
+/** A listing's own-field values under `custom.<code>` (row 7e); a value list or nothing gives no key. */
+function customValues(l: Listing): Record<`custom.${string}`, unknown> {
+  const own = l.customFields;
+  if (!own || Array.isArray(own)) return {};
+  return Object.fromEntries(Object.entries(own).map(([code, value]) => [`custom.${code}`, value]));
 }
 
 /** Fields of the eight inventory columns, in order; the page gives each its header from the label table. */
@@ -63,9 +72,25 @@ export const INVENTORY_FIELDS = [
 ] as const;
 export type InventoryField = (typeof INVENTORY_FIELDS)[number];
 
-/** The eight columns of the inventory grid, in order, with the headers the page gives. */
-export function inventoryColumns(headers: Readonly<Record<InventoryField, string>>): TypedColumn[] {
-  return INVENTORY_FIELDS.map((field) => typedColumn({ field, header: headers[field] }));
+/** A company's own column as the inventory receives it: code, the company's name for it, and its display kind. */
+export interface InventoryCustomColumn {
+  code: string;
+  header: string;
+  kind: DisplayKind;
+}
+
+/**
+ * The eight columns of the inventory grid, in order, with the headers the page gives, then the company's own columns
+ * in the order given (row 7e: never before a standard column).
+ */
+export function inventoryColumns(
+  headers: Readonly<Record<InventoryField, string>>,
+  custom: readonly InventoryCustomColumn[] = [],
+): TypedColumn[] {
+  return [
+    ...INVENTORY_FIELDS.map((field) => typedColumn({ field, header: headers[field] })),
+    ...custom.map((c) => customColumn(c)),
+  ];
 }
 
 /** The field the inventory grid groups rows under: the building, as the owner's sheet does. */

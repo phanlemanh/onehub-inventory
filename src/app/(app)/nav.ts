@@ -1,4 +1,10 @@
-import { CalendarCheckIcon, LayoutGridIcon, SendIcon, UsersIcon } from "lucide-react";
+import {
+  CalendarCheckIcon,
+  LayoutGridIcon,
+  SendIcon,
+  SlidersHorizontalIcon,
+  UsersIcon,
+} from "lucide-react";
 import { createElement } from "react";
 
 import type { NavItem, NavSection } from "@/components/templates/app-shell";
@@ -6,6 +12,7 @@ import { visibleNav } from "@/components/templates/nav-items";
 import { STATUS_ORDER } from "@/components/candidate/grid-view";
 import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { label } from "@/modules/company-config";
+import { LAYER_PARTS_SHOWN, PART_TITLE } from "@/modules/company-config/ui";
 import { inventoryStatusHref } from "@/modules/listings/ui";
 
 import type { Role } from "@/generated/ontology";
@@ -74,4 +81,19 @@ export const NAV: NavItem[] = [
   },
   // Shows when the permission table gives the session listMembers (row 9e), not by a role's name.
   { href: "/members", title: label("Member"), icon: icon(UsersIcon), action: "listMembers" },
+  // The company's own layer (row 7e): one entry per part in the second column.
+  {
+    href: "/tuy-chinh-san",
+    title: label("CompanyLayer"),
+    icon: icon(SlidersHorizontalIcon),
+    action: "readCompanyLayer",
+    sections: [
+      {
+        items: LAYER_PARTS_SHOWN.map((p) => ({
+          href: p === "nhan" ? "/tuy-chinh-san" : `/tuy-chinh-san?phan=${p}`,
+          title: label(PART_TITLE[p]),
+        })),
+      },
+    ],
+  },
 ];
