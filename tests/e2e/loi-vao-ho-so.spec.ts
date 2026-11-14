@@ -347,6 +347,9 @@ test.describe("E5 · the top-bar ⌘K box", () => {
     await page.locator("body").press("/");
     await expect(paletteInput(page)).toBeFocused();
     await page.keyboard.press("Escape");
+    // Closed before the next step, as after Ctrl+K above: since row 2e the filter row is already shown, so nothing
+    // here waits any more, and a palette still closing would take the next «/».
+    await expect(palette(page)).toHaveCount(0);
     await showFilters(page);
     await unitFilter(page).click();
     await page.keyboard.press("/");

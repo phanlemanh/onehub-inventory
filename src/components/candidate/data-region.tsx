@@ -558,7 +558,26 @@ export function DataRegion({
   );
   // The row-number column counts too: digits of the last row number plus padding.
   const rowNumberCh = String(rows.length).length + 3;
-  const totalMinCh = rowNumberCh + fitted.reduce((sum, w) => sum + w, 0);
+  /**
+   * The narrowest a column may be, in ch of the given text size: a number's rule, a short code, and for the first
+   * column its whole title and sort button (fixed pixels, so dense text needs more ch). Applied BEFORE the spare room is
+   * shared and before density is chosen, so the columns always fit the region they are measured for (row 2e: applied
+   * after, they pushed the eighth column out at 1440 wherever the font ran a little wider).
+   */
+  const floorCh = useCallback(
+    (i: number, px: number): number => {
+      const column = columns[i];
+      if (!column) return 0;
+      const kindFloor =
+        filterModeFor(column.kind) === "number" ? FILTER_MIN_CH : TEXT_FILTER_MIN_CH;
+      // The first column's header keeps its whole title and sort button; others may cut their title.
+      const headerFloor = i === 0 ? (column.header.length * baseChPx + HEADER_CONTROLS_PX) / px : 0;
+      return Math.max(kindFloor, headerFloor);
+    },
+    [columns, baseChPx],
+  );
+  const totalMinCh =
+    rowNumberCh + fitted.reduce((sum, w, i) => sum + Math.max(w, floorCh(i, baseChPx)), 0);
   // Full screen is for seeing the most rows, as on a sheet: rows stay dense there whatever the width.
   const density = fullScreen
     ? "dense"
@@ -571,23 +590,28 @@ export function DataRegion({
   // Spare room on a wide screen goes to columns that cut their text (a long project name), never below the fit.
   // The filter row is always there (row 2e, owner 2026-11-13): every column is at least wide enough to type a short rule.
   const widths = useMemo(() => {
+    const floored = fitted.map((w, i) => Math.max(w, floorCh(i, chPx)));
     const spread = spreadSpareCh(
-      fitted,
-      full,
+      floored,
+      full.map((w, i) => Math.max(w, floored[i] ?? 0)),
       widthCh === null ? null : (widthCh * baseChPx) / chPx - rowNumberCh - 1,
     );
     // While grouped, the grouping column also holds the group's open-close button in front of its label.
-    return spread.map((w, i) => {
-      const grown = isGrouped && columns[i]?.field === groupColumn?.field ? w + GROUP_TOGGLE_CH : w;
-      const column = columns[i];
-      const kindFloor =
-        column && filterModeFor(column.kind) === "number" ? FILTER_MIN_CH : TEXT_FILTER_MIN_CH;
-      const headerFloor =
-        // The first column's header keeps its whole title and sort button; others may cut their title.
-        i === 0 && column ? (column.header.length * baseChPx + HEADER_CONTROLS_PX) / chPx : 0;
-      return Math.max(grown, kindFloor, headerFloor);
-    });
-  }, [fitted, full, widthCh, baseChPx, chPx, rowNumberCh, isGrouped, columns, groupColumn]);
+    return spread.map((w, i) =>
+      isGrouped && columns[i]?.field === groupColumn?.field ? w + GROUP_TOGGLE_CH : w,
+    );
+  }, [
+    fitted,
+    full,
+    widthCh,
+    baseChPx,
+    chPx,
+    rowNumberCh,
+    floorCh,
+    isGrouped,
+    columns,
+    groupColumn,
+  ]);
 
   // Header cells, kept apart from the widths: a header renderer is a component to the table, so a new one each time the
   // widths move (a scroll bar coming or going as rows filter out) would draw the filter boxes again and drop the focus
