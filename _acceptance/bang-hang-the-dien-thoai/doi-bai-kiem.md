@@ -9,6 +9,10 @@ cùng các tệp ở 1024/1440: 208 xanh, không đổi lời; 22 ca của bộ 
 `tools/e2e_templates/recipes.ts`, cùng tên ca, cùng lời ghim; bài tự kiểm «bo-bai-chung» trong `tests/e2e/the-dien-thoai.spec.ts`
 đỏ khi tắt nhánh thẻ). Tổng: 108 đỏ trước, 108 xanh sau, không ca nào bỏ qua rỗng.
 
+Thêm một ca của bộ có cơ sở dữ liệu (CI `e2e-db`, không thuộc 108 ca trên): `tests/e2e-db/goc-nhin.spec.ts › phone sheet`
+ở 360 đỏ trên CI vì chờ bảng; nay đọc mã căn trên thẻ, so với dãy mã của cùng góc nhìn ở 1440. Ca phá (mở lại Bảng
+hàng không góc nhìn) đỏ ở phép so; ca ở 1440 không đổi.
+
 | Ca cũ (tệp:dòng › tên) | Khổ | Xử lý | Ca mới |
 |---|---|---|---|
 | tests/e2e/ghim-ngan.spec.ts:150 › E1 · the pin button sits before Trước, Sau, Đóng › no pin on a phone; the record is full screen | 360 | chuyển — mở hồ sơ từ thẻ; chờ thẻ thay dòng bảng | cùng ca, rowsShown/regionHydrated |
