@@ -1,11 +1,11 @@
 "use client";
 
-import { createContext, useCallback, useContext, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, type ReactNode } from "react";
 
 import { ActionPermissionProvider } from "@/components/candidate/action-permission";
 
 import type { Role } from "../../../generated/ontology";
-import { actionVisibility, type ActionName } from "../permissions";
+import { actionVisibility, allowedScope, type ActionName } from "../permissions";
 
 /** The roles of the session in its company, set once by the internal frame's layout. */
 const SessionRolesContext = createContext<readonly Role[]>([]);
@@ -52,5 +52,37 @@ export function PermittedAction({
   children: ReactNode;
 }) {
   const permitted = usePermitted();
-  return permitted(action, mine) ? <>{children}</> : null;
+  const roles = useSessionRoles();
+  const shown = permitted(action, mine);
+  useEffect(() => {
+    // Inlined at build time: a build without the browser suite's flag has `"undefined" === "1"` here, so the record
+    // below is dead code there and never runs (row 9b, AC-11).
+    if (process.env.NEXT_PUBLIC_E2E_BUTTON_RECORD === "1") recordButton(action, mine, shown, roles);
+  }, [action, mine, shown, roles]);
+  return shown ? <>{children}</> : null;
+}
+
+/** One decision of PermittedAction, as the role × screen browser suite reads it (row 9b). */
+export interface ButtonDecision {
+  action: ActionName;
+  mine: boolean;
+  shown: boolean;
+  /** The widest scope the session's roles give for the action, or null when none does. */
+  scope: "company" | "own" | null;
+}
+
+/**
+ * Keeps each decision on the page, both ways — shown and not shown — so the browser suite can compare a role's
+ * buttons with the generated role × screen × button table without anything added to the page itself: no element, no
+ * attribute, so no change to how a button looks. Only builds made with NEXT_PUBLIC_E2E_BUTTON_RECORD=1 call this (the
+ * signed-in browser suite's dev server, playwright.db.config.ts).
+ */
+function recordButton(
+  action: ActionName,
+  mine: boolean,
+  shown: boolean,
+  roles: readonly Role[],
+): void {
+  const w = window as unknown as { __onehubButtons?: ButtonDecision[] };
+  (w.__onehubButtons ??= []).push({ action, mine, shown, scope: allowedScope(roles, action) });
 }

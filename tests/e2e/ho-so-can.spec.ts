@@ -731,7 +731,8 @@ test.describe("E7 · on a phone the record is the whole screen", () => {
         status: card?.querySelectorAll("[data-status]").length ?? 0,
         facts:
           card?.querySelectorAll('[data-slot="listing-card-facts"] > [data-field]').length ?? 0,
-        fields: el.querySelectorAll('[data-slot="listing-record-fields"] > [data-field]').length,
+        // Row 3b (G approved N-1211-13): the full record lists the unit in its own block of eight facts, after the card.
+        fields: el.querySelectorAll('[data-slot="listing-unit"] [data-field]').length,
       };
     });
     expect(shape).toMatchObject({

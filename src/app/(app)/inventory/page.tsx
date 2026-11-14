@@ -3,19 +3,28 @@ import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/templates/page-header";
 import { label } from "@/modules/company-config";
+import { isRole } from "@/modules/identity";
+import { currentSession } from "@/modules/identity/server";
+import { SessionRoles } from "@/modules/identity/ui";
 import { mySavedView, mySavedViews } from "@/modules/listings/server";
 
-import { sampleInventoryRows } from "../inventory-sample-rows";
+import {
+  sampleInventoryListings,
+  sampleInventoryRows,
+  sampleRecords,
+} from "../inventory-sample-rows";
 import { savedViewLabels } from "../saved-view-labels";
 import {
   ENTRY_COPY,
   InventoryGrid,
+  cellEditLabels,
   SAVED_VIEW_PARAM,
   savedViewCopy,
   inventoryFiltersFrom,
   inventoryOpeningFor,
   inventoryStateFrom,
   type InventoryField,
+  type RecordLabels,
 } from "@/modules/listings/ui";
 
 export const metadata: Metadata = { title: label("Inventory") };
@@ -40,6 +49,47 @@ const HEADERS: Record<InventoryField, string> = {
   "Listing.lastConfirmedAt": label("LastConfirmedAt"),
 };
 
+/** Labels of the full unit record (row 3b), from the label table. */
+const RECORD_LABELS: RecordLabels = {
+  unit: label("Unit"),
+  unitKind: label("UnitKind"),
+  livingArea: label("LivingArea"),
+  bedrooms: label("BedroomsTotal"),
+  floor: label("UnitFloorLocation"),
+  direction: label("DirectionFaces"),
+  building: label("Building"),
+  subdivision: label("Subdivision"),
+  propertyType: label("PropertySubType"),
+  listPrice: label("ListPrice"),
+  completeness: label("Completeness"),
+  currentListing: label("CurrentListing"),
+  viewedListing: label("ViewedListing"),
+  listingsOfUnit: label("ListingsOfUnit"),
+  parts: {
+    listPrice: label("ListPrice"),
+    furnished: label("Furnished"),
+    legalStatus: label("LegalStatus"),
+    financing: label("Financing"),
+    occupantType: label("OccupantType"),
+  },
+  furnishedValues: {
+    Furnished: label("FurnishedFull"),
+    Partially: label("FurnishedPartial"),
+    Unfurnished: label("FurnishedNone"),
+  },
+  occupantValues: {
+    Owner: label("OccupantOwner"),
+    Tenant: label("OccupantTenant"),
+    Vacant: label("OccupantVacant"),
+  },
+  propertyTypeValues: {
+    Condominium: label("SubTypeCondominium"),
+    Townhouse: label("SubTypeTownhouse"),
+    "Single Family Residence": label("SubTypeSingleFamily"),
+    "Unimproved Land": label("SubTypeLand"),
+  },
+};
+
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
 /** A query parameter's first value; a repeated parameter keeps its first value. */
@@ -50,6 +100,7 @@ const first = (value: string | string[] | undefined): string | undefined =>
 export default async function Page({ searchParams }: Props) {
   const query = await searchParams;
   const state = first(query.state);
+  const vai = first(query.vai);
   // A status shortcut opens the grid filtered (row 2a).
   const status = first(query.status);
   // A saved view opens by its own address (row 2c): gone, or someone else's, opens every unit with a sentence.
@@ -87,7 +138,16 @@ export default async function Page({ searchParams }: Props) {
   // A shared link (row 3f) to a listing no longer on the inventory: the grid opens as usual and says why.
   const asked = first(query["ho-so"]);
   const stale = asked !== undefined && !rows.some((row) => row.id === asked);
-  return (
+  // Without a signed-in session, outside production, ?vai=<role> stands in for the session's role, so the browser
+  // tests and the screenshots of row 4 can open the cells the permission table gives that role. A real session wins.
+  const standIn =
+    process.env.NODE_ENV !== "production" &&
+    vai !== undefined &&
+    isRole(vai) &&
+    (await currentSession()) === null
+      ? [vai]
+      : null;
+  const page = (
     <>
       <PageHeader title={openView ? openView.name : label("Inventory")} />
       {/* Always present, so the sentence about a view that is gone is read out when it appears. */}
@@ -112,12 +172,16 @@ export default async function Page({ searchParams }: Props) {
         title={label("Listing")}
         headers={HEADERS}
         rows={rows}
+        listings={sampleInventoryListings()}
+        editLabels={cellEditLabels((concept, transaction) => label(concept, { transaction }))}
         state={inventoryStateFrom(state, process.env.NODE_ENV)}
         emptyWhy={`${label("Company")} chưa có ${label("Unit").toLocaleLowerCase("vi")} nào đang chào trên ${label("Inventory")}.`}
         reloadLabel="Tải lại"
         filters={filters}
         staleLinkNote={stale ? ENTRY_COPY.staleLink(label("Unit"), label("Inventory")) : undefined}
+        fullRecord={{ records: sampleRecords(new Date()), labels: RECORD_LABELS }}
       />
     </>
   );
+  return standIn ? <SessionRoles roles={standIn}>{page}</SessionRoles> : page;
 }

@@ -96,7 +96,7 @@ function asRoles(roles: readonly Role[], ui: ReactElement) {
 }
 /** The record of a row as the inventory grid renders it: body and footer. */
 function openRecord(row: GridRow, roles: readonly Role[] = ["BuyerAgent"]) {
-  const view = listingRecord(HEADERS, WORDS).render(row);
+  const view = listingRecord(HEADERS, undefined, WORDS).render(row);
   return asRoles(
     roles,
     <div>
@@ -310,7 +310,7 @@ describe("E5 · the ask button follows the permission table and the keeper", () 
   });
 
   it("outside the permission provider nothing shows", () => {
-    const view = listingRecord(HEADERS, WORDS).render(rowKept("other"));
+    const view = listingRecord(HEADERS, undefined, WORDS).render(rowKept("other"));
     render(<div>{view.footer}</div>);
     expect(askButton()).toBeNull();
   });
@@ -409,7 +409,7 @@ describe("E6 · the report dialog", () => {
 
   it("a role without catalog reading has no report button", () => {
     // No role lacks readCatalog in today's table; a viewer outside the frame stands in for it.
-    const view = listingRecord(HEADERS, WORDS).render(rowKept("other"));
+    const view = listingRecord(HEADERS, undefined, WORDS).render(rowKept("other"));
     render(<div>{view.body}</div>);
     expect(screen.queryByRole("button", { name: WORDS.report })).toBeNull();
   });

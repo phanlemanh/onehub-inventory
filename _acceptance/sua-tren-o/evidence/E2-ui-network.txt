@@ -1,0 +1,4 @@
+[200] 1440-sang GET document http://127.0.0.1:3487/inventory?vai=ListAgent
+[200] 1440-toi GET document http://127.0.0.1:3487/inventory?vai=ListAgent
+[200] 1024-sang GET document http://127.0.0.1:3487/inventory?vai=ListAgent
+[200] 1024-toi GET document http://127.0.0.1:3487/inventory?vai=ListAgent

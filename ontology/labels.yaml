@@ -1,7 +1,7 @@
 # Display labels of the product, one entry per concept. Model: SKOS (one preferred label, many alternatives).
 # Rules and how to change them: design/language.md. Checked by tests/language.test.ts.
 #
-#   kind   entity | role | side | party | status | surface | action | field
+#   kind   entity | role | side | party | status | surface | action | field | value
 #   reso   RESO Data Dictionary 2.1 name. A concept with no RESO name sets `own: true` instead.
 #   pref   preferred label, the default everywhere
 #   lease  label used when the listing is for lease, for labels that say "bán"
@@ -278,6 +278,138 @@ concepts:
     pref: Ngày bán
     lease: Ngày cho thuê
     en: Close date
+  DirectionFaces:
+    kind: field
+    reso: DirectionFaces
+    pref: Hướng
+    en: Direction faces
+  PropertySubType:
+    kind: field
+    reso: PropertySubType
+    pref: Loại hình
+    en: Property type
+  SubTypeCondominium:
+    kind: value
+    reso: PropertySubType.Condominium
+    pref: Căn hộ
+    en: Condominium
+  SubTypeTownhouse:
+    kind: value
+    reso: PropertySubType.Townhouse
+    pref: Nhà phố
+    en: Townhouse
+  SubTypeSingleFamily:
+    kind: value
+    reso: PropertySubType.SingleFamilyResidence
+    pref: Biệt thự
+    en: Single family residence
+  SubTypeLand:
+    kind: value
+    reso: PropertySubType.UnimprovedLand
+    pref: Đất
+    en: Unimproved land
+  UnitKind:
+    kind: field
+    own: true
+    pref: Loại căn
+    en: Unit kind
+  Furnished:
+    kind: field
+    reso: Furnished
+    pref: Nội thất
+    en: Furnished
+  FurnishedFull:
+    kind: value
+    reso: Furnished.Furnished
+    pref: Đầy đủ nội thất
+    en: Furnished
+  FurnishedPartial:
+    kind: value
+    reso: Furnished.Partially
+    pref: Một phần nội thất
+    en: Partially furnished
+  FurnishedNone:
+    kind: value
+    reso: Furnished.Unfurnished
+    pref: Không nội thất
+    en: Unfurnished
+  OccupantType:
+    kind: field
+    reso: OccupantType
+    pref: Hiện trạng
+    alt: [Tình trạng sử dụng]
+    en: Occupancy
+  OccupantOwner:
+    kind: value
+    reso: OccupantType.Owner
+    pref: Chủ đang ở
+    en: Owner occupied
+  OccupantTenant:
+    kind: value
+    reso: OccupantType.Tenant
+    pref: Người thuê đang ở
+    en: Tenant occupied
+  OccupantVacant:
+    kind: value
+    reso: OccupantType.Vacant
+    pref: Để trống
+    en: Vacant
+  LegalStatus:
+    kind: field
+    own: true
+    pref: Pháp lý
+    en: Legal status
+  Financing:
+    kind: field
+    own: true
+    pref: Tài chính
+    en: Financing
+  OriginalEntryTimestamp:
+    kind: field
+    reso: OriginalEntryTimestamp
+    pref: Ngày tạo
+    en: Created
+  Completeness:
+    kind: field
+    own: true
+    pref: Mức đủ thông tin
+    en: Completeness
+  CurrentListing:
+    kind: surface
+    own: true
+    pref: Lần chào đang mở
+    en: Open listing
+  ViewedListing:
+    kind: surface
+    own: true
+    pref: Lần chào đang xem
+    en: Listing in view
+  ListingsOfUnit:
+    kind: surface
+    own: true
+    pref: Các lần chào
+    en: Listings of the unit
+  WithdrawnReason:
+    kind: field
+    own: true
+    pref: Lý do ngừng
+    en: Withdrawn reason
+  WithdrawnSoldElsewhere:
+    kind: field
+    own: true
+    pref: Chủ bán nơi khác
+    lease: Cho thuê nơi khác
+    en: Sold elsewhere
+  WithdrawnOwnerChangedMind:
+    kind: field
+    own: true
+    pref: Chủ đổi ý
+    en: Owner changed mind
+  WithdrawnUnreachable:
+    kind: field
+    own: true
+    pref: Mất liên lạc
+    en: Unreachable
   LoginCode:
     kind: field
     own: true
