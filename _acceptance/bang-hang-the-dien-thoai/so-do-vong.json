@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "slug": "bang-hang-the-dien-thoai",
+  "ghi_luc": "2026-11-14T16:59:56Z",
+  "vong_cham": 2,
+  "luot": [
+    {
+      "vong": 1,
+      "verdict": "PENDING-JUDGMENT",
+      "tang": []
+    },
+    {
+      "vong": 2,
+      "verdict": "PASS",
+      "tang": []
+    }
+  ],
+  "lam_lai": [],
+  "theo_tang": {
+    "bai-kiem-ha-tang": 0,
+    "trang-thai-hanh-vi": 0,
+    "du-lieu-api": 0,
+    "nghiep-vu": 0,
+    "thanh-phan": 0,
+    "bo-cuc": 0,
+    "hop-dong-yeu-cau": 0,
+    "link": 0,
+    "chu-dinh-dang": 0,
+    "mau-token": 0,
+    "truy-cap": 0
+  },
+  "chua_phan": [],
+  "thuoc_vat": {
+    "vat": [
+      49,
+      11
+    ],
+    "thuoc": [
+      0,
+      0
+    ],
+    "nhat": 0
+  },
+  "gio_may": {
+    "gio_may": 22.71,
+    "gio_cho": 15.74,
+    "phan_tram_tuan": 46.92
+  }
+}
