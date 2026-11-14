@@ -838,7 +838,7 @@ test.describe("phone filter row", () => {
 });
 
 // Row 2e (bo-o-tim-cua-vung), ruling K-1411-1 (4): with the eight standard columns of the inventory the unit code shows
-// whole at every width — no «0…» — now that every column is at least 11 ch under the always-shown filter row.
+// whole at every width — no «0…» — now that a text column is at least 8.3 ch under the always-shown filter row.
 test.describe("unit code shows whole", () => {
   /** Every unit code cell mounted now shows its whole text: nothing cut, no ellipsis. */
   async function checkCodesWhole(page: Page): Promise<void> {
@@ -879,14 +879,20 @@ test.describe("unit code shows whole", () => {
   });
 });
 
-// Row 2e (bo-o-tim-cua-vung), ruling K-1411-2 (3): the header's buttons of the frozen first column are really pressable
-// at every width — axe passes a button hidden whole under the next header, so this looks at what is on top.
+// Row 2e (bo-o-tim-cua-vung), rulings K-1411-2 (3) and K-1411-7: every button in a frozen header is really pressable at
+// every width, with the App Shell's sidebar open as it opens — axe passes a button hidden whole under the next header,
+// so this looks at what is on top. The first column, always frozen, shows no «Bỏ ghim» button.
 test.describe("header buttons in view", () => {
-  /** Each named header button is the element on top at its left edge, middle and right edge, and takes a click. */
-  async function checkHeaderButtons(page: Page): Promise<void> {
-    for (const name of ["Bỏ ghim Căn"]) {
-      const button = page.getByRole("button", { name, exact: true });
-      if ((await button.count()) !== 1) throw new Error(`header button missing: ${name}`);
+  /** Each button of a frozen header is on top at its left edge, middle and right edge, and takes a click. */
+  async function checkHeaderButtons(page: Page): Promise<string[]> {
+    const buttons = page.locator(
+      '[data-slot="data-region-body"] thead th[data-pinned="start"] button',
+    );
+    const names: string[] = [];
+    for (const button of await buttons.all()) {
+      if (!(await button.isVisible())) continue;
+      const name =
+        (await button.getAttribute("aria-label")) ?? ((await button.textContent()) ?? "").trim();
       const covered = await button.evaluate((el) => {
         const r = el.getBoundingClientRect();
         const y = r.top + r.height / 2;
@@ -897,23 +903,31 @@ test.describe("header buttons in view", () => {
       });
       if (covered) throw new Error(`header button covered: ${name}`);
       await button.click({ trial: true, timeout: 2_000 });
+      names.push(name);
     }
+    if (names.length === 0) throw new Error("no frozen header button");
+    return names;
   }
 
-  test("the first column's «Bỏ ghim» button is on top and pressable", async ({ page }) => {
+  test("every frozen header button is on top and pressable; Căn has no «Bỏ ghim»", async ({
+    page,
+  }) => {
     await openInventory(page);
-    await expect(checkHeaderButtons(page)).resolves.toBeUndefined();
+    const names = await checkHeaderButtons(page);
+    expect(names.some((n) => n.startsWith("Căn"))).toBe(true);
+    if (WIDE.has(width())) expect(names).toContain("Bỏ ghim Toà");
+    await expect(page.getByRole("button", { name: "Bỏ ghim Căn", exact: true })).toHaveCount(0);
   });
 
   test("the check fails when the next header covers the first column's buttons", async ({
     page,
   }) => {
     await openInventory(page);
-    // What a first column narrower than its header does: the next frozen header lies over the «Bỏ ghim» button.
+    // What a first column narrower than its header does: the next header lies over its sort button.
     await page.addStyleTag({
       content:
-        'thead th[data-col-id="Listing.buildingName"] { transform: translateX(-40px) !important; z-index: 50 !important; }',
+        'thead th[data-col-id="Listing.buildingName"], thead th[data-col-id="Listing.subdivisionName"] { transform: translateX(-60px) !important; z-index: 50 !important; position: relative; }',
     });
-    await expect(checkHeaderButtons(page)).rejects.toThrow("header button covered: Bỏ ghim Căn");
+    await expect(checkHeaderButtons(page)).rejects.toThrow("header button covered: Căn");
   });
 });

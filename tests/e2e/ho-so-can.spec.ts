@@ -14,8 +14,9 @@ const PHONE = new Set(["414", "360"]);
  * Data columns fully in view left of the open record, at least (AC-3). 4 and 2 since the coordinator's ruling
  * D-1211-12: the first 5/3 was pinned before the owner chose a floating panel two fifths wide. 3 and 1 since the
  * coordinator's rulings K-1411-1 and K-1411-2 (row 2e, «sửa sau Cổng Phạm vi», the owner signs at row 2e's evidence
- * gate): the filter row is always shown (owner 2026-11-13), so every column is at least 11 ch — the unit code shows
- * whole and the header's «Bỏ ghim» button is in full view instead of hidden under the next header.
+ * gate): the filter row is always shown (owner 2026-11-13), so a number column is at least 11 ch, a text column 8.3
+ * ch and the first column fits its title and sort button — the unit code shows whole; the first column, always frozen,
+ * has no «Bỏ ghim» button (K-1411-7), and eight columns still fit at 1440.
  */
 const MIN_VISIBLE: Readonly<Record<string, number>> = { "1440": 3, "1024": 1 };
 const FROZEN = ["#", "Căn", "Toà"];

@@ -41,6 +41,7 @@ import { DataGridTableVirtual } from "@/components/reui/data-grid/data-grid-tabl
 import { Frame, FrameHeader, FramePanel } from "@/components/reui/frame";
 import { useShellFocus } from "@/components/templates/shell-focus";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 import {
   DENSITY_ROW_CLASS,
@@ -141,12 +142,22 @@ const REGION_HEIGHTS = {
 
 const noSubscribe = () => () => undefined;
 
-/**
- * Narrowest a column gets under the always-shown filter row, in ch (row 2e, rulings K-1411-1 and K-1411-2): room for a
- * rule like «<=5», a unit code shown whole, and the header's sort and pin buttons in full view — a narrower first column
- * left its «Bỏ ghim» button hidden under the next header.
- */
+/** Narrowest a number, money or date column gets under the always-shown filter row, in ch: room for a rule like «<=5». */
 const FILTER_MIN_CH = 11;
+/** Narrowest a text or value column gets, in ch: «Chứa…» and a four-digit unit code inside its opener stay whole. */
+const TEXT_FILTER_MIN_CH = 8.3;
+/**
+ * What the first column's header needs beside its words, in px: the sort button's icon and padding and the cell's own
+ * padding, so its sort button is never cut or covered by the next frozen header (row 2e). Fixed pixels, not ch: dense
+ * rows shrink the ch, not the buttons.
+ */
+const HEADER_CONTROLS_PX = 48;
+/**
+ * The first column never hides and always stays frozen (row 2a: the second frozen column may be unpinned while the first stays), so its header
+ * shows no «Bỏ ghim» button — that button lay hidden under the next header and could not be pressed (row 2e, ruling
+ * K-1411-7). The vendor header draws it inside a span; this hides that span for the first column only.
+ */
+const NO_UNPIN_CLASS = "[&_span:has(>button>svg.lucide-pin-off)]:hidden";
 
 /** Room the group's open-close button takes in front of a group label, in ch. */
 const GROUP_TOGGLE_CH = 4;
@@ -568,7 +579,13 @@ export function DataRegion({
     // While grouped, the grouping column also holds the group's open-close button in front of its label.
     return spread.map((w, i) => {
       const grown = isGrouped && columns[i]?.field === groupColumn?.field ? w + GROUP_TOGGLE_CH : w;
-      return Math.max(grown, FILTER_MIN_CH);
+      const column = columns[i];
+      const kindFloor =
+        column && filterModeFor(column.kind) === "number" ? FILTER_MIN_CH : TEXT_FILTER_MIN_CH;
+      const headerFloor =
+        // The first column's header keeps its whole title and sort button; others may cut their title.
+        i === 0 && column ? (column.header.length * baseChPx + HEADER_CONTROLS_PX) / chPx : 0;
+      return Math.max(grown, kindFloor, headerFloor);
     });
   }, [fitted, full, widthCh, baseChPx, chPx, rowNumberCh, isGrouped, columns, groupColumn]);
 
@@ -757,7 +774,10 @@ export function DataRegion({
           },
           meta: {
             headerTitle: column.header,
-            headerClassName: column.align === "right" ? "text-right" : "text-left",
+            headerClassName: cn(
+              column.align === "right" ? "text-right" : "text-left",
+              index === 0 && NO_UNPIN_CLASS,
+            ),
             cellClassName: column.align === "right" ? "text-right" : "text-left",
             // A copy carries the words the cell shows; nothing in the grid is written from here (rows 4, 5 edit).
             cellEdit: {

@@ -7,7 +7,8 @@
 // The removed lines come from `git diff -U0 <base>` over tests/** and tools/e2e_templates/** (base: the merge-base with
 // origin/main). A line counts when it holds one of the seven marks written below. Rows are matched by file and the
 // line's text (trimmed), as many rows as removed copies. Exit 0 and one count line when every line has its row and every
-// row's new case exists; exit 1 with the first problem otherwise. --self-test also runs the two breaks on a copy of the
+// row's new case is a real case of its file (a test title or a recipe id — not a comment or a line of code); exit 1
+// with the first problem otherwise. --self-test also runs the two breaks on a copy of the
 // table: one row removed, one row pointed at a case that does not exist; each must fail with its pinned message.
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
@@ -86,6 +87,18 @@ export function tableRows(text) {
     });
 }
 
+/**
+ * The cases a file holds: the titles of its it/test/describe calls (written literally, even across a line break), and
+ * in a recipe file each recipe's `id`. A comment, an import or a line of code is not a case.
+ */
+export function casesIn(text) {
+  const found = new Set();
+  const call = /\b(?:it|test|describe)(?:\.(?:each\([\s\S]*?\)|describe|only|skip))?\(\s*(["'`])((?:\\.|(?!\1)[^\\])*)\1/g;
+  for (const m of text.matchAll(call)) found.add(m[2]);
+  for (const m of text.matchAll(/^\s*id:\s*"([^"]+)",?\s*$/gm)) found.add(m[1]);
+  return found;
+}
+
 /** The first problem, or null: a removed line without its row, or a row whose new case is not in the tree. */
 export function problem(root, lines, rows) {
   const left = new Map();
@@ -102,10 +115,19 @@ export function problem(root, lines, rows) {
   for (const r of rows) {
     const path = join(root, r.newFile);
     if (!r.newFile || !existsSync(path)) return `doi-bai-kiem: tep moi khong co: ${r.newFile}`;
-    if (!r.newCase || !readFileSync(path, "utf8").includes(r.newCase))
+    if (!r.newCase || !casesIn(readFileSync(path, "utf8")).has(r.newCase))
       return `doi-bai-kiem: ca khong co: ${r.newCase}`;
   }
   return null;
+}
+
+/** The first non-empty line of a file of the tree (a comment or an import, never a case title). */
+function firstLineOf(file) {
+  const root = resolve(arg("--root", "."));
+  return readFileSync(join(root, file), "utf8")
+    .split("\n")
+    .map((l) => l.trim())
+    .find((l) => l !== "" && !l.includes("|"));
 }
 
 function run(root, base, tablePath) {
@@ -143,6 +165,14 @@ function main() {
         i === firstRow ? l.split(first.newCase).join("ca-khong-co-zzz") : l,
       ),
       want: /^doi-bai-kiem: ca khong co: ca-khong-co-zzz$/,
+    },
+    {
+      // A line that IS in the file but is not a case (its first line, a comment): no longer accepted (review t6).
+      name: "tro toi dong khong phai ca",
+      lines: table.map((l, i) =>
+        i === firstRow ? l.split(first.newCase).join(firstLineOf(first.newFile)) : l,
+      ),
+      want: /^doi-bai-kiem: ca khong co: /,
     },
   ];
   for (const brk of breaks) {
