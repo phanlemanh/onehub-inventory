@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory]
-status: implemented
+status: verified
 approved_by: Manh Phan
 approved_at: 2026-11-14
 design_doc: _acceptance/bang-hang-theo-dia-ly/design.md
