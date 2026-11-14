@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 45e5ff4ce338aaeb8d069fb8c8410c234f312fec
+verified_commit: cb88024b0c4664fc0843f7bf67aa5c3e2233d847
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -193,3 +193,7 @@ Round 5: machine evals and E11 re-run; E12 panel proposes PASS on the pinned 144
   Cả ba phiếu đề xuất trượt vì ảnh cũ.
 - Lần chấm lại: chỉ hội đồng E12, trên ảnh hiện tại; mọi phép đo máy (E1–E11) mang kết quả vòng 5, không chạy bộ kiểm chung,
   không đổi mã. Kết quả: hội đồng E12 đề xuất ĐẠT.
+
+### Re-pin lần 1 — 2026-11-14, do gop nhanh chinh 786cadf sau chu ky
+run_id: repin-20261114T093351Z-35812
+sha: cb88024b0c4664fc0843f7bf67aa5c3e2233d847 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E11, E12 (E12 không khai paths) · AC không có chốt máy: AC-9
