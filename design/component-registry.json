@@ -2139,6 +2139,25 @@
       ]
     },
     {
+      "name": "ResizableHandle",
+      "file": "src/components/ui/resizable.tsx",
+      "level": "atom",
+      "parts": [
+        {
+          "name": "ResizableHandle",
+          "props": [
+            "withHandle"
+          ]
+        },
+        {
+          "name": "ResizablePanel"
+        },
+        {
+          "name": "ResizablePanelGroup"
+        }
+      ]
+    },
+    {
       "name": "ScrollArea",
       "file": "src/components/ui/scroll-area.tsx",
       "level": "atom",
