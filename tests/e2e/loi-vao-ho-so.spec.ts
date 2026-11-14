@@ -476,12 +476,12 @@ test.describe("E7 · an unknown code typed in the box", () => {
     await paletteInput(page).press("Enter");
     await expect(page).toHaveURL(/\/inventory\?ma=/);
     await checkUnknown(page);
-    // On a phone «Xoá lọc» is both on the chip row and in the empty list: either clears every filter (row 2b).
-    await page
+    // On a phone «Xoá lọc» is both on the chip row and in the empty list: either clears every filter (row 2b). From
+    // 768 px the region has exactly one, so the locator stays strict there.
+    const clear = page
       .locator('[data-slot="data-region"]')
-      .getByRole("button", { name: "Xoá lọc" })
-      .first()
-      .click();
+      .getByRole("button", { name: "Xoá lọc" });
+    await (isPhone(page) ? clear.first() : clear).click();
     await unitFilterHolds(page, "", "unit filter not cleared");
     await expect(openers(page).first()).toBeVisible();
     await expect(page.getByText(NO_MATCH)).toHaveCount(0);

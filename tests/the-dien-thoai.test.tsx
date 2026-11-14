@@ -124,6 +124,26 @@ function gridOrder(props: Props = {}) {
   return ids;
 }
 
+/** What is wrong with the cards' accessible names, as a screen reader hears them (the browser's own name rules). */
+function cardNameProblems(): string[] {
+  const names = new Map<Element, string>();
+  screen.queryAllByRole("link", {
+    name: (name, el) => {
+      names.set(el, name);
+      return true;
+    },
+  });
+  return cards().flatMap((card) => {
+    const row = rows.find((r) => r.id === card.getAttribute("data-row-id"))!;
+    const unit = String(row["Listing.unitNumber"]);
+    const name = names.get(card) ?? "";
+    if (!name.startsWith(unit)) return [`phone card name does not start with its unit: ${unit}`];
+    const price = formatByKind("money", row["Listing.listPrice"]);
+    if (price && !name.includes(price)) return [`phone card name lacks price: ${unit}`];
+    return [];
+  });
+}
+
 describe("danh-sach (E1)", () => {
   it("shows every row as a row-layout listing card, in grid order, with no table and no frame", () => {
     const expected = gridOrder();
@@ -162,6 +182,26 @@ describe("danh-sach (E1)", () => {
         throw new Error(`phone card missing price: ${String(row["Listing.unitNumber"])}`);
     };
     expect(check).toThrow(/^phone card missing price: /);
+  });
+
+  it("each card's link is named by the card's own text: the unit code first, then the price (AC-9, WCAG 2.5.3)", () => {
+    region();
+    const problems = cardNameProblems();
+    if (problems.length > 0) throw new Error(problems[0]);
+  });
+
+  it("break: a label over the price takes the price out of the card's name", () => {
+    const masked: RegionPhoneList<GridRow> = {
+      ...phoneList,
+      card: (row) => (
+        <span>
+          {String(row["Listing.unitNumber"])}{" "}
+          <span aria-label="Giá chào">{formatByKind("money", row["Listing.listPrice"])}</span>
+        </span>
+      ),
+    };
+    region({ phoneList: masked });
+    expect(cardNameProblems()[0]).toMatch(/^phone card name lacks price: /);
   });
 
   it("from 768 the region is the table, with no card", () => {

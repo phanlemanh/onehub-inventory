@@ -161,11 +161,8 @@ export function ListingCard({
             <span data-slot="listing-card-unit" className="font-semibold break-all">
               {view.unitNumber}
             </span>
-            <span
-              data-slot="listing-card-price"
-              aria-label={priceLabel}
-              className="shrink-0 font-semibold tabular-nums"
-            >
+            {/* No label over the value: inside the phone list's link it would replace the price in the card's name. */}
+            <span data-slot="listing-card-price" className="shrink-0 font-semibold tabular-nums">
               <TypedCell kind="money" value={view.price} transaction={view.transaction} />
             </span>
           </div>

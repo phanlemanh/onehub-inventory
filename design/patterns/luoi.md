@@ -29,7 +29,8 @@ chỗ: bỏ dấu tiếng Việt, «đ» như «d».
 
 Điện thoại: dưới 768 px màn có khai thẻ (Bảng hàng) đổi thân vùng thành danh sách thẻ, cùng một bộ lọc, sắp xếp, nhóm và
 hồ sơ của vùng. Lọc nằm ở ngăn Lọc mở từ nút «Lọc (n)» của hàng công cụ, «Sắp theo» ở đầu ngăn, lọc đang chạy là chip
-(chủ kho chọn ở Cổng Phạm vi hàng 2b, 2026-11-14). Màn họ Lưới chưa khai thẻ vẫn là bảng cuộn ngang ở điện thoại.
+(chủ kho chọn ở Cổng Phạm vi hàng 2b, 2026-11-14). Màn họ Lưới chưa khai thẻ giữ thân vùng là bảng ở mọi khổ, cho tới
+khi màn ấy khai thẻ của nó.
 
 ## Màn mẫu
 
