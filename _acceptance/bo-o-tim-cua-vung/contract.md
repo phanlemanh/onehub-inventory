@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: [inventory, sent]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-13
 design_doc: _acceptance/bo-o-tim-cua-vung/design.md
@@ -124,3 +124,19 @@ chí trên.
 - Đổi `ontology/entities/SavedView.yaml` (chỉ chữ mô tả, Ngoài-1 và Ngoài-6) phải xin giám sát; PR có mục «Đổi ontology —
   chủ kho soi».
 - Không migration mới: migration 011 của 2c đã bỏ chữ tìm khỏi dữ liệu.
+
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-14:
+  - Ngoài-1: Chủ kho có thể ký nhận nhầm rằng không bài kiểm nào bị nới, trong khi số cột nhìn thấy cạnh hồ sơ căn đã giảm (3 ở màn lớn, 1 ở màn vừa). Mức giảm này đã ghi rõ ở chỗ khác để chủ kho xem.
+  - Ngoài-3: Nếu ô lọc trên điện thoại lọc sai kiểu (ví dụ khớp theo cột khác) thì bài kiểm vẫn báo đạt, nên lỗi như vậy có thể lọt qua mà không ai biết.
+  - Ngoài-4: Nếu sau này ô lọc bị đặt lên trên tên cột trên điện thoại, bài kiểm vẫn không báo lỗi, người dùng sẽ thấy bố cục ngược.
+  - Ngoài-5: Hồ sơ căn mở bên phải có thể che ô lọc của cột nằm dưới nó (như cột Toà ở màn vừa) mà bài kiểm không phát hiện, khiến người dùng không gõ được vào ô đó.
+  - Ngoài-6: Hồ sơ đối chiếu bài kiểm nói chưa có ngưỡng nào bị nới, nhưng thực ra số cột tối thiểu cạnh hồ sơ căn đã giảm. Người duyệt có thể hiểu sai là không có gì đổi so với điều đã ký ở hàng 3.
+  - Ngoài-7: Nút Bỏ ghim của cột đầu được giấu dựa vào cấu trúc bên trong của thư viện giao diện. Nếu sau này thư viện đổi, nút có thể hiện lại dưới tiêu đề cột Toà.
+  - Ngoài-8: Khi không dòng nào khớp do lọc chọn từ danh sách hoặc lọc số, ngày, câu giải thích vẫn nói về chữ bạn gõ ở ô lọc. Người dùng chưa gõ gì có thể thấy câu này lạ.
+  - Ngoài-10: Công cụ kiểm bảng đối chiếu bài kiểm chỉ xác nhận tên ca có trong tệp, chưa chắc khẳng định mới còn đo đúng điều cũ. Một khẳng định bị xoá có thể vẫn không bị bắt.
+  - Ngoài-11: Thay đổi này cần chủ kho duyệt trước khi gộp; nếu gộp tự động thì phần mô hình nghiệp vụ được đổi mà chưa có người chịu trách nhiệm xem qua.
+  - Ngoài-12: Cạnh hồ sơ căn đang mở ở khổ 1024, người dùng chỉ còn thấy cột Căn chứ không còn thấy cả Toà như trước, cho tới khi chủ kho đồng ý.
+  - Ngoài-14: Người dùng không thấy khác biệt; chỉ là mã của phân hệ hàng lộ thêm hai thứ chỉ để bài kiểm dùng.
+  - Ngoài-15: Bài kiểm khẳng định mọi màn lưới chạy đủ ca nhưng không đo bộ sinh thật, nên nếu sau này có người cho một màn bỏ qua ca thì bài vẫn xanh và lỗi lọt qua.
+  - Ngoài-16: Bài kiểm xác nhận khối FormDialog qua cổng chứng từ có thể vẫn xanh dù khối ấy bị xoá khỏi sổ, nên một lỗi như vậy có thể không bị bắt.
+  - Ngoài-17: Trên máy chậm, đóng ô ⌘K rồi bấm ngay vào ô lọc cột Căn thì đôi khi tiêu điểm rơi vào vùng lưới, phải bấm lại một lần; gõ «/» lúc ấy mở lại ô ⌘K. Tái hiện ở Chromium Linux với CPU chậm 6 lần, có cả trên mã trước bản sửa bề rộng cột.
