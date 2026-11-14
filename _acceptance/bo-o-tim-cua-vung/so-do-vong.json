@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "bo-o-tim-cua-vung",
-  "ghi_luc": "2026-11-14T02:35:40Z",
-  "vong_cham": 2,
+  "ghi_luc": "2026-11-14T06:52:58Z",
+  "vong_cham": 3,
   "luot": [
     {
       "vong": 1,
@@ -15,6 +15,11 @@
     },
     {
       "vong": 2,
+      "verdict": "PENDING-JUDGMENT",
+      "tang": []
+    },
+    {
+      "vong": 3,
       "verdict": "PENDING-JUDGMENT",
       "tang": []
     }
@@ -49,8 +54,8 @@
   "chua_phan": [],
   "thuoc_vat": {
     "vat": [
-      63,
-      22
+      216,
+      35
     ],
     "thuoc": [
       41,
