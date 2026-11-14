@@ -71,6 +71,14 @@ Phạm vi cho lối ấy là chữ ký cho bộ đo đã đổi.
 Bỏ quét không gian tiêu chí — xem dòng `descope` «bỏ coverage-scan» trong sổ quyết định: hàng đổi khung một màn đã có,
 luồng và trạng thái đã khai đủ ở hàng 8 và 1m; độ phủ trạng thái nằm ở bảng trạng thái của đặc tả UX và AC-4.
 
+## Vai × Màn
+
+Màn đăng nhập mở cho mọi người chưa vào sàn; vai chỉ có sau khi chọn sàn, nên mọi vai thấy cùng một màn (hàng 8).
+
+| Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
+|---|---|---|---|---|
+| sign-in | được — cùng màn, chưa có vai | được — cùng màn, chưa có vai | được — cùng màn, chưa có vai | được — cùng màn, chưa có vai |
+
 ## Đường đo
 
 - Ngưỡng «thẻ Phạm vi bày hai đến ba khối ReUI kèm ảnh, có auth-15» · số từ trang `cong-pham-vi.html` (ba lối, ảnh khối
