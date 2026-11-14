@@ -1,0 +1,47 @@
+# Own files of the component register made before row 1q (_acceptance/cong-bat-khoi-khong-ke, owner's choice Hỏi-1 at
+# the scope gate, 2026-11-14): the files outside src/components/ui and src/components/reui that the main branch had
+# with no line in design/so-khoi.yaml. tools/proof_gate/check.py reads this list as "already on the main branch", so
+# the gate needs no git history. The list does not grow: every file made after row 1q is declared in the «Khối» table
+# of its round, then in the block ledger. tools/proof_gate/proof-gate-1q.test.ts pins the exact set.
+#
+#   tep    the file, as written in design/component-registry.json
+#   ten    its component names when listed
+#   ly_do  why it is here
+version: 1
+tep:
+  - tep: src/components/candidate/action-permission.tsx
+    ten: ActionPermissionProvider
+    ly_do: có trên nhánh chính trước hàng 1q, chưa có dòng sổ khối
+  - tep: src/components/candidate/column-filter-cell.tsx
+    ten: ColumnFilterCell
+    ly_do: có trên nhánh chính trước hàng 1q, chưa có dòng sổ khối
+  - tep: src/components/candidate/region-header.tsx
+    ten: RegionHeader, RegionTitle, RegionToolbar
+    ly_do: có trên nhánh chính trước hàng 1q, chưa có dòng sổ khối
+  - tep: src/components/candidate/region-state.tsx
+    ten: LOADING_STEPS_MS, RegionEmpty, RegionError, RegionForbidden, RegionLoading, RegionNoMatch, RegionPartial, RegionPartialEmpty
+    ly_do: có trên nhánh chính trước hàng 1q, chưa có dòng sổ khối
+  - tep: src/components/templates/app-shell.tsx
+    ten: AppShell, MAIN_ID, NavItem, NavLink, NavSection
+    ly_do: có trên nhánh chính trước hàng 1q, chưa có dòng sổ khối
+  - tep: src/components/templates/app-shell/place-change.tsx
+    ten: PlaceChangeProvider
+    ly_do: có trên nhánh chính trước hàng 1q, chưa có dòng sổ khối
+  - tep: src/components/templates/app-shell/second-column.tsx
+    ten: SecondColumn, SecondColumnNav
+    ly_do: có trên nhánh chính trước hàng 1q, chưa có dòng sổ khối
+  - tep: src/components/templates/nav-menu.tsx
+    ten: NavMenu, NavItem, NavLink, NavSection
+    ly_do: có trên nhánh chính trước hàng 1q, chưa có dòng sổ khối
+  - tep: src/components/templates/page-skeleton.tsx
+    ten: PageSkeleton
+    ly_do: có trên nhánh chính trước hàng 1q, chưa có dòng sổ khối
+  - tep: src/components/templates/page-state.tsx
+    ten: PageState
+    ly_do: có trên nhánh chính trước hàng 1q, chưa có dòng sổ khối
+  - tep: src/components/templates/screen-banner.tsx
+    ten: ScreenBanner, ConnectionWatcher
+    ly_do: có trên nhánh chính trước hàng 1q, chưa có dòng sổ khối
+  - tep: src/components/templates/theme.tsx
+    ten: ThemeProvider, ThemeSwitch
+    ly_do: có trên nhánh chính trước hàng 1q, chưa có dòng sổ khối

@@ -34,6 +34,10 @@ Kho có `design/so-khoi.yaml` thì quyết định 0023 bật cho mọi hồ sơ
 Bậc `trong-kho` khi ấy là thành phần nhà cung cấp (`src/components/ui/`, `src/components/reui/`) hay một dòng của
 `design/so-khoi.yaml` do hồ sơ khác nhập. Khối vòng này vừa tạo hay vừa lấy về ghi `reui` hay `ve-tay`, không ghi `trong-kho`.
 
+Hàng 1q: mọi tệp mới trong `src/components` ngoài thư mục nhà cung cấp phải có dòng trong bảng Khối (nêu một thành phần
+của tệp), từ lúc tệp xuất hiện trong `design/component-registry.json`; không thì lưới đỏ `khoi-khong-ke`. Khối mới là tệp
+mới: đừng viết khối mới chung vào tệp của một khối đã có.
+
 ## Lối theo mẫu
 
 <!-- <<<KHUON-THEO-MAU -->
