@@ -5,8 +5,11 @@ import { dirname } from "node:path";
 
 import { DB_NAME, OUTBOX, SESSION_FILE, TEST_PERSON } from "../../playwright.db.config";
 import { scratchDb } from "../db/helpers";
+import { claimRunFolder } from "./don-dung-tam";
 
 export default async function setup(): Promise<void> {
+  // This run's build folder: owned, dead runs swept, deleted at exit (row 1s, AC-8).
+  claimRunFolder("onehub-e2e-db", process.env["E2E_DB_RUN"] ?? `${process.pid}`);
   const db = await scratchDb(DB_NAME.replace(/^dang_nhap_/, ""));
   // The register-driven suite's test person (row 1r): one test company, all four roles, so every screen opens in its
   // normal state and none in «not allowed».

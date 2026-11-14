@@ -195,6 +195,14 @@ const RUNNER_BASE = "d85d815";
 /** The runner on the main branch when row 7c opened (_acceptance/ung-dung-noi-bang-vai-khong-chu, E5). */
 const RUNNER_BASE_7C = "83d1764";
 
+/**
+ * The runner at a base commit, read from its byte-exact copy in tests/fixtures (row 1s): CI checks out shallow, so the
+ * commit is not there to `git show`. tests/ci-ban-sao-nong.test.ts pins each copy's git blob id.
+ */
+function runnerCopy(commit: string): string {
+  return join(ROOT, "tests/fixtures", `cach-ly-${commit}.sh`);
+}
+
 interface RunnerShape {
   cases: string[];
   /** break file → its pinned lines, for every break file of every break case. */
@@ -258,12 +266,7 @@ export function loosened(base: RunnerShape, now: RunnerShape): string[] {
 }
 
 describe("isolation runner keeps every case and pinned line of rows 7 and 7a (E5)", () => {
-  const base = runnerShape(
-    execFileSync("git", ["show", `${RUNNER_BASE}:db/scripts/cach-ly.sh`], {
-      cwd: ROOT,
-      encoding: "utf8",
-    }),
-  );
+  const base = runnerShape(readFileSync(runnerCopy(RUNNER_BASE), "utf8"));
   const current = readFileSync(join(ROOT, "db/scripts/cach-ly.sh"), "utf8");
 
   it(`reads the runner at ${RUNNER_BASE}: 29 cases, 18 break files, 21 pinned lines`, () => {
@@ -295,12 +298,7 @@ const CURRENT_CASES = runnerShape(readFileSync(join(ROOT, "db/scripts/cach-ly.sh
 const LAST_LINE = `cach-ly: ${CURRENT_CASES.length} ca đạt, vai quy_hang_app, nối bằng quy_hang_login`;
 
 describe("isolation runner after row 7c keeps everything the main branch measured (E5)", () => {
-  const base = runnerShape(
-    execFileSync("git", ["show", `${RUNNER_BASE_7C}:db/scripts/cach-ly.sh`], {
-      cwd: ROOT,
-      encoding: "utf8",
-    }),
-  );
+  const base = runnerShape(readFileSync(runnerCopy(RUNNER_BASE_7C), "utf8"));
 
   it(`reads the runner at ${RUNNER_BASE_7C}: 31 cases, 24 break files`, () => {
     expect(base.cases).toHaveLength(31);
