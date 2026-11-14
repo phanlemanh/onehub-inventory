@@ -203,7 +203,9 @@ test.describe("E7 · every listing of the unit, newest first", () => {
 
 // ---- E8 · read-only ------------------------------------------------------------------------------------------------
 
-const ALLOWED_BUTTONS = /^(Trước|Sau|Đóng|Chép đường dẫn|Về lần mới nhất|Lần \d+)$/;
+// Ghim thành cột and Bỏ ghim change only how the record stands beside the grid, never the data (row 3a).
+const ALLOWED_BUTTONS =
+  /^(Trước|Sau|Đóng|Chép đường dẫn|Ghim thành cột|Bỏ ghim|Về lần mới nhất|Lần \d+)$/;
 
 async function readOnlyErrors(page: Page): Promise<string[]> {
   const found = await panel(page).evaluate((el) => ({
