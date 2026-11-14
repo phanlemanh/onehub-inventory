@@ -3,9 +3,18 @@
 // one-line footer; no outside sign-in. The flow itself is tested by rows 8 and 1m (account.spec.ts, tests/e2e-db).
 // Every case name below is the pinned message its break-test turns red with.
 import AxeBuilder from "@axe-core/playwright";
+import type { Page } from "@playwright/test";
 import { expect, test } from "../../tools/e2e_templates/fixture";
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
+
+/** Switches the colour scheme and waits for the theme to follow it (the app themes by a class on <html>). */
+async function scheme(page: Page, colorScheme: "light" | "dark") {
+  await page.emulateMedia({ colorScheme });
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.classList.contains("dark")))
+    .toBe(colorScheme === "dark");
+}
 
 test.describe("dang nhap theo khoi auth-15", () => {
   test.beforeEach(async ({ page }) => {
@@ -54,23 +63,32 @@ test.describe("dang nhap theo khoi auth-15", () => {
   });
 
   test("khong-cuon-ngang", async ({ page }, info) => {
-    const { scroll, client } = await page.evaluate(() => ({
-      scroll: document.documentElement.scrollWidth,
-      client: document.documentElement.clientWidth,
-    }));
-    expect(scroll, `khong-cuon-ngang: ${info.project.name}`).toBeLessThanOrEqual(client);
+    for (const colorScheme of ["light", "dark"] as const) {
+      await scheme(page, colorScheme);
+      const { scroll, client } = await page.evaluate(() => ({
+        scroll: document.documentElement.scrollWidth,
+        client: document.documentElement.clientWidth,
+      }));
+      expect(scroll, `khong-cuon-ngang: ${info.project.name} ${colorScheme}`).toBeLessThanOrEqual(
+        client,
+      );
+    }
   });
 
   test("nut-trong-man-dau", async ({ page }, info) => {
-    const send = await page.getByRole("button", { name: "Gửi mã" }).boundingBox();
-    const height = page.viewportSize()!.height;
-    expect(send!.y + send!.height, `nut-trong-man-dau: ${info.project.name}`).toBeLessThanOrEqual(
-      height,
-    );
+    for (const colorScheme of ["light", "dark"] as const) {
+      await scheme(page, colorScheme);
+      const send = await page.getByRole("button", { name: "Gửi mã" }).boundingBox();
+      const height = page.viewportSize()!.height;
+      expect(
+        send!.y + send!.height,
+        `nut-trong-man-dau: ${info.project.name} ${colorScheme}`,
+      ).toBeLessThanOrEqual(height);
+    }
   });
 
   test("logo-doc-duoc-nen-toi", async ({ page }) => {
-    await page.emulateMedia({ colorScheme: "dark" });
+    await scheme(page, "dark");
     const { violations } = await new AxeBuilder({ page })
       .include('[data-slot="login-brand"]')
       .withRules(["color-contrast"])
@@ -83,7 +101,7 @@ test.describe("dang nhap theo khoi auth-15", () => {
 
   test("axe-dang-nhap", async ({ page }) => {
     for (const colorScheme of ["light", "dark"] as const) {
-      await page.emulateMedia({ colorScheme });
+      await scheme(page, colorScheme);
       const { violations } = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
       expect(
         violations.map((v) => `${colorScheme} ${v.id}`),

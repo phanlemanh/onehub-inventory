@@ -55,8 +55,10 @@ Trang sổ bối cảnh: `docs/tri-thuc/wiki/chu-de/dang-nhap.md`.
 
 | Khối | Bậc | Đã tra | Ứng viên gần nhất | Vì sao không dùng | Cách |
 | ---- | --- | ------ | ----------------- | ----------------- | ---- |
-| auth-15 | reui | design/reui-catalog.json nhóm auth (20 khối) | auth-19 | | chọn khối |
-| Field, InputGroup, Button | trong-kho | | | | |
+| auth-15 | reui | design/so-khoi.yaml và design/reui-catalog.json nhóm auth (20 khối) | auth-19 | kho chưa có khung trang trước khi vào sàn; chủ kho chọn auth-15 ở Cổng Phạm vi | chọn khối |
+| Field | trong-kho | | | | |
+| InputGroup | trong-kho | | | | |
+| Button | trong-kho | | | | |
 
 ### Vùng
 
