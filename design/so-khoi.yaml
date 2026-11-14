@@ -148,6 +148,13 @@ khoi:
     mo_ta: Hộp biểu mẫu có nhãn nhỏ cạnh tiêu đề (tên sàn khi mời người), trường xếp dọc, dải chân hai nút — dáng của dialog-2
     ho_so: thanh-vien-chon-tu-reui
     duyet: 2026-11-14
+  - ten: LoginLayout
+    tep: src/components/templates/login-layout.tsx
+    nguon: auth-15
+    nhu_cau: man-truoc-khi-vao-san
+    mo_ta: Khung trang trước khi vào sàn — logo trên, một cột hẹp giữa trang không khung, chân trang một dòng
+    ho_so: dang-nhap-chon-tu-reui
+    duyet: 2026-11-14
 # Blocks made before this ledger existed, each named with the round that made it, the commit that created it and the
 # day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
 # still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).

@@ -1577,6 +1577,21 @@
       ]
     },
     {
+      "name": "LoginLayout",
+      "file": "src/components/templates/login-layout.tsx",
+      "level": "template",
+      "parts": [
+        {
+          "name": "LoginLayout",
+          "props": [
+            "heading",
+            "lead",
+            "footer"
+          ]
+        }
+      ]
+    },
+    {
       "name": "NavMenu",
       "file": "src/components/templates/nav-menu.tsx",
       "level": "template",
