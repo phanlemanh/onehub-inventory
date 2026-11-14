@@ -124,6 +124,8 @@ design:
     - "src/components/templates/**"
     - "src/modules/*/ui/**"
 design_floor:
+  tokens: design/tokens.json                   # written from the stylesheet by make design-tokens
+  registry: design/component-registry.json     # written from the source by make gen
   sinh_lai:
     - "make gen"                     # S3 regenerates derived files inside the round
 design_pass:
