@@ -6,9 +6,9 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
 screens: []
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-14
 design_doc: docs/superpowers/specs/2026-11-14-cong-bat-khoi-khong-ke-design.md
 ---
 
