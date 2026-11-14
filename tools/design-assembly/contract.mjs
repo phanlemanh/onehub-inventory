@@ -96,6 +96,7 @@ export const LEDGERS = {
             level: { ...text, values: ATOMIC_LEVELS },
             source: { ...text, values: ["library", "own"] },
             parts: list(text),
+            props: list(text),
             variants: list({ ...text, pattern: "^[^=]+=[^=]+$" }),
             defaults: { type: "object", open: true },
             control: { type: "boolean" },

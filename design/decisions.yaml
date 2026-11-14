@@ -78,7 +78,7 @@ decisions:
     layer: core
     kind: formula
     source: "import depth"
-    check: "tool:tools/design_registry.mjs"
+    check: "tool:tools/design-assembly/components.mjs"
   - id: tier-direction
     layer: templates
     kind: closed
@@ -302,3 +302,14 @@ decisions:
     layer: context
     kind: judgment
     source: "design/theme.json"
+  - id: component-manifest
+    layer: components
+    kind: formula
+    source: "src/components, written out by make design-components"
+    check: "tool:tools/design-assembly/check.mjs"
+  - id: ledger-shapes
+    layer: governance
+    kind: closed
+    source: "the design-assembly contract, one shape per ledger with its version"
+    check: "tool:tools/design-assembly/check.mjs"
+    note: "that each ledger present has its shape and a version this tool reads; what a ledger says is held by the rows about it"

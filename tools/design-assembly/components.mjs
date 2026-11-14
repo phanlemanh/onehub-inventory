@@ -28,6 +28,25 @@ export const COMPONENTS_DECISION = "component-manifest";
 // The shape of the file: the acceptance kit reads the version as a string.
 const VERSION = "2";
 
+// The folders of every component library the repository installed: the library's own, then the
+// folder of each other registry its settings name, when that folder is there.
+export function libraryFolders(root) {
+  const file = path.join(root, library.settingsFile);
+  let settings;
+  try {
+    settings = existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : null;
+  } catch {
+    settings = null;
+  }
+  const others = library
+    .registryFoldersIn(settings)
+    .filter((folder) => existsSync(path.join(root, folder)));
+  return [library.folderIn(settings) ?? library.folder, ...others];
+}
+
+// A folder of templates: the frames screens are built in, whatever they import.
+const TEMPLATES = /(^|\/)templates\//;
+
 // Where a repository keeps components of its own beside the library's: the folder that holds the
 // library's folder, when the library sits in a folder named for it.
 export function ownFolder(folder) {
@@ -60,6 +79,35 @@ function skipString(text, at) {
     else if (text[i] === quote) return i + 1;
   }
   return text.length;
+}
+
+// The text with every comment blanked out, strings left as they are: a comment is never read as
+// structure, and every index stays where it was.
+export function withoutComments(text) {
+  let out = "";
+  let i = 0;
+  while (i < text.length) {
+    const char = text[i];
+    if (char === '"' || char === "'" || char === "`") {
+      const end = skipString(text, i);
+      out += text.slice(i, end);
+      i = end;
+    } else if (char === "/" && text[i + 1] === "/") {
+      const end = text.indexOf("\n", i);
+      const stop = end === -1 ? text.length : end;
+      out += " ".repeat(stop - i);
+      i = stop;
+    } else if (char === "/" && text[i + 1] === "*") {
+      const end = text.indexOf("*/", i + 2);
+      const stop = end === -1 ? text.length : end + 2;
+      out += text.slice(i, stop).replace(/[^\n]/g, " ");
+      i = stop;
+    } else {
+      out += char;
+      i += 1;
+    }
+  }
+  return out;
 }
 
 // The index of the bracket that closes the one at `at`.
@@ -283,8 +331,8 @@ function importsAmong(file, text, files) {
 }
 
 // A file's atomic level, computed and never declared: how deep it imports other components. None
-// is an atom, one step a molecule, two or more an organism. A component a page of a screen kind
-// names as the frame of its screens is a template.
+// is an atom, one step a molecule, two or more an organism. A file in a folder of templates is a
+// template, and so is a component a page of a screen kind names as the frame of its screens.
 function levels(files) {
   const depth = new Map();
   const visit = (file, seen) => {
@@ -296,7 +344,10 @@ function levels(files) {
     depth.set(file, value);
     return value;
   };
-  return (file) => ["atom", "molecule", "organism"][Math.min(visit(file, new Set()), 2)];
+  return (file) =>
+    TEMPLATES.test(file)
+      ? "template"
+      : ["atom", "molecule", "organism"][Math.min(visit(file, new Set()), 2)];
 }
 
 // The components the pages of screen kinds name as the frame of their screens.
@@ -308,15 +359,56 @@ export function templateNames(pages) {
   );
 }
 
-function survey(files, { library, pages } = {}) {
+// The props a component's signature names one by one, in its order: the names a caller writes,
+// from the object its first parameter takes apart. Props taken whole name none.
+function propsOf(signature) {
+  const open = /^[^(]*\(\s*(?:function\s*\w*\s*\(\s*|\(\s*)?\{/.exec(signature);
+  if (!open) return [];
+  const at = open.index + open[0].length - 1;
+  const end = closing(signature, at);
+  if (end === -1) return [];
+  const names = [];
+  let from = at + 1;
+  let depth = 0;
+  for (let i = from; i <= end; i += 1) {
+    const char = signature[i];
+    if (char === '"' || char === "'" || char === "`") i = skipString(signature, i) - 1;
+    else if ("{([".includes(char)) depth += 1;
+    else if ("})]".includes(char) && i < end) depth -= 1;
+    else if ((char === "," && depth === 0) || i === end) {
+      const piece = signature.slice(from, i).trim();
+      const name = /^(?:"([^"]+)"|'([^']+)'|([A-Za-z_$][\w$]*))/.exec(piece);
+      if (name && !piece.startsWith("...")) names.push(name[1] ?? name[2] ?? name[3]);
+      from = i + 1;
+    }
+  }
+  return names;
+}
+
+// Props every component takes, which say nothing about this one.
+const COMMON_PROPS = new Set(["className", "children"]);
+
+function survey(given, { library, pages } = {}) {
+  const libraries = [library].flat().filter(Boolean);
+  const files = Object.fromEntries(
+    Object.entries(given).map(([file, text]) => [file, withoutComments(text)]),
+  );
   const level = levels(files);
   const templates = templateNames(pages);
-  const sets = {};
-  for (const text of Object.values(files)) Object.assign(sets, declaredSets(text));
+  // Variant sets by file: a component reads a set of its own file before one of the same name
+  // declared elsewhere.
+  const setsOf = Object.fromEntries(
+    Object.entries(files).map(([file, text]) => [file, declaredSets(text)]),
+  );
+  const elsewhere = {};
+  for (const found of Object.values(setsOf)) {
+    for (const [name, set] of Object.entries(found)) elsewhere[name] ??= set;
+  }
   const components = [];
   // For each control with a declared height: the smallest one, and where it is declared.
   const sizes = new Map();
   for (const [file, text] of Object.entries(files).sort(([a], [b]) => (a < b ? -1 : 1))) {
+    const sets = { ...elsewhere, ...setsOf[file] };
     const names = exported(text);
     for (const name of names) {
       const source = declaration(text, name);
@@ -324,23 +416,34 @@ function survey(files, { library, pages } = {}) {
       const drawnWith = names.filter(
         (other) => other !== name && new RegExp(`<${other}\\b`).test(source),
       );
-      const axes = {};
-      const defaults = {};
-      for (const [setName, set] of Object.entries(sets)) {
-        if (!new RegExp(`\\b${setName}\\b`).test(source)) continue;
-        Object.assign(axes, set.axes);
-        Object.assign(defaults, set.defaults);
-      }
       const signature = source.slice(
         0,
         source.search(/\)\s*(?::[^{]+)?\{|=>/) + 1 || source.length,
       );
+      const named = propsOf(signature);
+      const axes = {};
+      const defaults = {};
+      for (const [setName, set] of Object.entries(sets)) {
+        if (!new RegExp(`\\b${setName}\\b`).test(source)) continue;
+        // A set of another file is this component's only for the axes it takes as props: one it
+        // calls with values of its own does not let a caller choose them.
+        const own = setName in (setsOf[file] ?? {});
+        for (const [axis, values] of Object.entries(set.axes)) {
+          if (!own && !named.includes(axis)) continue;
+          axes[axis] = values;
+          if (axis in set.defaults) defaults[axis] = set.defaults[axis];
+        }
+      }
+      // The axes of a variant set are said once, under variants; a prop typed as a list of words
+      // is a prop as well.
+      const setAxes = new Set(Object.keys(axes));
       for (const prop of signature.matchAll(/(\w+)\??:\s*((?:"[^"]+"\s*\|\s*)+"[^"]+")/g)) {
         axes[prop[1]] ??= [...prop[2].matchAll(/"([^"]+)"/g)].map((value) => value[1]);
       }
       for (const given of signature.matchAll(/(\w+)\s*=\s*"([^"]+)"/g)) {
         if (given[1] in axes) defaults[given[1]] ??= given[2];
       }
+      const props = named.filter((prop) => !COMMON_PROPS.has(prop) && !setAxes.has(prop));
       const variants = Object.entries(axes).flatMap(([axis, values]) =>
         values.map((value) => `${axis}=${value}`),
       );
@@ -367,8 +470,12 @@ function survey(files, { library, pages } = {}) {
         category: "component",
         file,
         level: templates.has(name) ? "template" : level(file),
-        source: !library || file.startsWith(`${library}/`) ? "library" : "own",
+        source:
+          libraries.length === 0 || libraries.some((folder) => file.startsWith(`${folder}/`))
+            ? "library"
+            : "own",
         ...(drawnWith.length > 0 ? { parts: drawnWith } : {}),
+        ...(props.length > 0 ? { props } : {}),
         ...(control ? { control: true } : {}),
         ...(smallest ? { min_height: `${smallest.px}px` } : {}),
         ...(variants.length > 0 ? { variants } : {}),
@@ -470,7 +577,7 @@ function main() {
   const read = check.own ?? check.folder;
   const files = readFolder(root, read);
   const options = {
-    library: check.folder,
+    library: [check.folder, ...(check.libraries ?? [])],
     pages: check.pages ? readPages(root, check.pages) : {},
   };
   const manifest = readComponents(files, options);

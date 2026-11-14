@@ -240,7 +240,7 @@ const KINDS = {
       const read = check.own ?? check.folder;
       const files = state.folders?.[read] ?? {};
       return componentsProblem(state.files?.[check.file], files, check.file, read, {
-        library: check.folder,
+        library: [check.folder, ...(check.libraries ?? [])],
         pages: check.pages ? (state.pages?.[check.pages] ?? {}) : {},
       });
     },

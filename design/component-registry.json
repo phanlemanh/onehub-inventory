@@ -1,2469 +1,2545 @@
 {
-  "version": 2,
+  "version": "2",
   "components": [
     {
       "name": "ActionPermissionProvider",
+      "category": "component",
       "file": "src/components/candidate/action-permission.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "ActionPermissionProvider",
-          "props": [
-            "permitted"
-          ]
-        }
-      ]
+      "source": "own",
+      "props": ["permitted"]
     },
     {
       "name": "CellEditor",
+      "category": "component",
       "file": "src/components/candidate/cell-editor.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "CellEditor",
-          "props": [
-            "anchor",
-            "find",
-            "label",
-            "onClose"
-          ]
-        }
-      ]
+      "source": "own",
+      "props": ["anchor", "find", "label", "onClose"]
     },
     {
       "name": "ColumnFilterCell",
+      "category": "component",
       "file": "src/components/candidate/column-filter-cell.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "ColumnFilterCell",
-          "props": [
-            "spec",
-            "column",
-            "options"
-          ]
-        }
-      ]
+      "source": "own",
+      "props": ["spec", "column", "options"]
     },
     {
       "name": "DataRegion",
+      "category": "component",
       "file": "src/components/candidate/data-region.tsx",
-      "level": "organism",
-      "parts": [
-        {
-          "name": "DataRegion",
-          "props": [
-            "title",
-            "columns",
-            "rows",
-            "status",
-            "onRetry",
-            "onCancel",
-            "emptyWhy",
-            "emptyAction",
-            "action",
-            "headAction",
-            "rowActions",
-            "record",
-            "editable",
-            "cellEdit",
-            "initialFilters",
-            "groupBy",
-            "initialView",
-            "onViewChange"
-          ]
-        },
-        {
-          "name": "FROZEN_COLUMNS"
-        },
-        {
-          "name": "GRID_COPY"
-        },
-        {
-          "name": "ROW_ACTIONS_ID"
-        },
-        {
-          "name": "ROW_NUMBER_ID"
-        }
+      "level": "template",
+      "source": "own",
+      "props": [
+        "title",
+        "columns",
+        "rows",
+        "status",
+        "onRetry",
+        "onCancel",
+        "emptyWhy",
+        "emptyAction",
+        "action",
+        "headAction",
+        "rowActions",
+        "record",
+        "editable",
+        "cellEdit",
+        "initialFilters",
+        "groupBy",
+        "initialView",
+        "onViewChange"
       ]
     },
     {
       "name": "FormDialog",
+      "category": "component",
       "file": "src/components/candidate/form-dialog.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "FormDialog",
-          "props": [
-            "trigger",
-            "title",
-            "description",
-            "submitLabel",
-            "busyLabel",
-            "busy",
-            "open",
-            "onOpenChange",
-            "onSubmit",
-            "formError",
-            "refused",
-            "slot"
-          ]
-        }
+      "source": "own",
+      "props": [
+        "trigger",
+        "title",
+        "description",
+        "submitLabel",
+        "busyLabel",
+        "busy",
+        "open",
+        "onOpenChange",
+        "onSubmit",
+        "formError",
+        "refused",
+        "slot"
       ]
     },
     {
       "name": "RecordPanel",
+      "category": "component",
       "file": "src/components/candidate/record-panel.tsx",
       "level": "molecule",
-      "parts": [
-        {
-          "name": "RECORD_PARAM"
-        },
-        {
-          "name": "RecordPanel",
-          "props": [
-            "ids",
-            "openId",
-            "onNavigate",
-            "render",
-            "returnFocus"
-          ]
-        }
-      ]
+      "source": "own",
+      "props": ["ids", "openId", "onNavigate", "render", "returnFocus"]
+    },
+    {
+      "name": "RegionTitle",
+      "category": "component",
+      "file": "src/components/candidate/region-header.tsx",
+      "level": "organism",
+      "source": "own",
+      "props": ["title"]
+    },
+    {
+      "name": "RegionToolbar",
+      "category": "component",
+      "file": "src/components/candidate/region-header.tsx",
+      "level": "organism",
+      "source": "own",
+      "props": ["total", "shown", "query", "onQuery", "action", "tools", "searchId", "showCount"]
     },
     {
       "name": "RegionHeader",
+      "category": "component",
       "file": "src/components/candidate/region-header.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "RegionHeader"
-        },
-        {
-          "name": "RegionTitle",
-          "props": [
-            "title"
-          ]
-        },
-        {
-          "name": "RegionToolbar",
-          "props": [
-            "total",
-            "shown",
-            "query",
-            "onQuery",
-            "action",
-            "tools",
-            "searchId",
-            "showCount"
-          ]
-        }
-      ]
+      "source": "own",
+      "parts": ["RegionTitle", "RegionToolbar"]
     },
     {
-      "name": "LOADING_STEPS_MS",
+      "name": "RegionLoading",
+      "category": "component",
       "file": "src/components/candidate/region-state.tsx",
       "level": "molecule",
-      "parts": [
-        {
-          "name": "LOADING_STEPS_MS"
-        },
-        {
-          "name": "RegionEmpty",
-          "props": [
-            "why",
-            "action"
-          ]
-        },
-        {
-          "name": "RegionError",
-          "props": [
-            "onRetry"
-          ]
-        },
-        {
-          "name": "RegionForbidden"
-        },
-        {
-          "name": "RegionLoading",
-          "props": [
-            "columns",
-            "rows",
-            "onCancel"
-          ]
-        },
-        {
-          "name": "RegionNoMatch",
-          "props": [
-            "onClear"
-          ]
-        },
-        {
-          "name": "RegionPartial",
-          "props": [
-            "onRetry"
-          ]
-        },
-        {
-          "name": "RegionPartialEmpty",
-          "props": [
-            "onRetry"
-          ]
-        }
-      ]
+      "source": "own",
+      "props": ["columns", "rows", "onCancel"]
+    },
+    {
+      "name": "RegionEmpty",
+      "category": "component",
+      "file": "src/components/candidate/region-state.tsx",
+      "level": "molecule",
+      "source": "own",
+      "props": ["why", "action"]
+    },
+    {
+      "name": "RegionNoMatch",
+      "category": "component",
+      "file": "src/components/candidate/region-state.tsx",
+      "level": "molecule",
+      "source": "own",
+      "props": ["onClear"]
+    },
+    {
+      "name": "RegionError",
+      "category": "component",
+      "file": "src/components/candidate/region-state.tsx",
+      "level": "molecule",
+      "source": "own",
+      "props": ["onRetry"]
+    },
+    {
+      "name": "RegionPartialEmpty",
+      "category": "component",
+      "file": "src/components/candidate/region-state.tsx",
+      "level": "molecule",
+      "source": "own",
+      "props": ["onRetry"]
+    },
+    {
+      "name": "RegionForbidden",
+      "category": "component",
+      "file": "src/components/candidate/region-state.tsx",
+      "level": "molecule",
+      "source": "own"
+    },
+    {
+      "name": "RegionPartial",
+      "category": "component",
+      "file": "src/components/candidate/region-state.tsx",
+      "level": "molecule",
+      "source": "own",
+      "props": ["onRetry"]
     },
     {
       "name": "RowActions",
+      "category": "component",
       "file": "src/components/candidate/row-actions.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "RecordActions",
-          "props": [
-            "main",
-            "actions",
-            "mine",
-            "title"
-          ]
-        },
-        {
-          "name": "RowActions",
-          "props": [
-            "actions",
-            "mine",
-            "title",
-            "run",
-            "inGrid"
-          ]
-        }
-      ]
+      "source": "own",
+      "props": ["actions", "mine", "title", "run", "inGrid"]
+    },
+    {
+      "name": "RecordActions",
+      "category": "component",
+      "file": "src/components/candidate/row-actions.tsx",
+      "level": "organism",
+      "source": "own",
+      "parts": ["RowActions"],
+      "props": ["main", "actions", "mine", "title"]
     },
     {
       "name": "TruncatedText",
+      "category": "component",
       "file": "src/components/candidate/truncated-text.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "TruncatedText",
-          "props": [
-            "text"
-          ]
-        }
-      ]
+      "source": "own",
+      "props": ["text"]
     },
     {
       "name": "TypedCell",
+      "category": "component",
       "file": "src/components/candidate/typed-cell.tsx",
       "level": "molecule",
-      "parts": [
-        {
-          "name": "TypedCell",
-          "props": [
-            "kind",
-            "value",
-            "transaction",
-            "lockedReason",
-            "editMode"
-          ]
-        }
-      ]
+      "source": "own",
+      "props": ["kind", "value", "transaction", "lockedReason", "editMode"],
+      "variants": ["transaction=sale", "transaction=lease"]
     },
     {
       "name": "Badge",
+      "category": "component",
       "file": "src/components/reui/badge.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Badge",
-          "props": [
-            "render"
-          ],
-          "variants": {
-            "variant": [
-              "default",
-              "outline",
-              "secondary",
-              "info",
-              "success",
-              "warning",
-              "destructive",
-              "focus",
-              "invert",
-              "primary-light",
-              "warning-light",
-              "success-light",
-              "info-light",
-              "destructive-light",
-              "invert-light",
-              "focus-light",
-              "primary-outline",
-              "warning-outline",
-              "success-outline",
-              "info-outline",
-              "destructive-outline",
-              "invert-outline",
-              "focus-outline"
-            ],
-            "size": [
-              "xs",
-              "sm",
-              "default",
-              "lg",
-              "xl"
-            ],
-            "radius": [
-              "default",
-              "full"
-            ]
-          },
-          "defaults": {
-            "variant": "default",
-            "size": "default",
-            "radius": "default"
-          }
-        },
-        {
-          "name": "BadgeProps"
-        }
-      ]
+      "source": "library",
+      "props": ["render"],
+      "variants": [
+        "variant=default",
+        "variant=outline",
+        "variant=secondary",
+        "variant=info",
+        "variant=success",
+        "variant=warning",
+        "variant=destructive",
+        "variant=focus",
+        "variant=invert",
+        "variant=primary-light",
+        "variant=warning-light",
+        "variant=success-light",
+        "variant=info-light",
+        "variant=destructive-light",
+        "variant=invert-light",
+        "variant=focus-light",
+        "variant=primary-outline",
+        "variant=warning-outline",
+        "variant=success-outline",
+        "variant=info-outline",
+        "variant=destructive-outline",
+        "variant=invert-outline",
+        "variant=focus-outline",
+        "size=xs",
+        "size=sm",
+        "size=default",
+        "size=lg",
+        "size=xl",
+        "radius=default",
+        "radius=full"
+      ],
+      "defaults": {
+        "variant": "default",
+        "size": "default",
+        "radius": "default"
+      }
+    },
+    {
+      "name": "CascaderColumnPanel",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-columns.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["column", "virtualized"]
     },
     {
       "name": "CascaderColumns",
+      "category": "component",
       "file": "src/components/reui/cascader/cascader-columns.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "CascaderColumnPanel",
-          "props": [
-            "column",
-            "virtualized"
-          ]
-        },
-        {
-          "name": "CascaderColumns",
-          "props": [
-            "columnWidth",
-            "maxHeight"
-          ]
-        }
-      ]
+      "source": "library",
+      "parts": ["CascaderColumnPanel"],
+      "props": ["columnWidth", "maxHeight"]
     },
     {
       "name": "CascaderActionsContext",
+      "category": "component",
       "file": "src/components/reui/cascader/cascader-context.tsx",
       "level": "molecule",
-      "parts": [
-        {
-          "name": "CascaderActionsContext"
-        },
-        {
-          "name": "CascaderHighlightContext"
-        },
-        {
-          "name": "CascaderRenderContext"
-        },
-        {
-          "name": "CascaderStateContext"
-        }
-      ]
+      "source": "library"
+    },
+    {
+      "name": "CascaderHighlightContext",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-context.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "CascaderRenderContext",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-context.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "CascaderStateContext",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-context.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "CascaderAction",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-footer.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["icon", "onSelect", "onClick", "onKeyDown", "disabled"],
+      "control": true
     },
     {
       "name": "CascaderFooter",
+      "category": "component",
       "file": "src/components/reui/cascader/cascader-footer.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "CascaderAction",
-          "props": [
-            "icon",
-            "onSelect",
-            "onClick",
-            "onKeyDown",
-            "disabled"
-          ]
-        },
-        {
-          "name": "CascaderFooter",
-          "props": [
-            "onKeyDown"
-          ]
-        },
-        {
-          "name": "CascaderSubmenu",
-          "props": [
-            "open",
-            "defaultOpen",
-            "onOpenChange"
-          ]
-        },
-        {
-          "name": "CascaderSubmenuContent",
-          "props": [
-            "onKeyDown",
-            "side",
-            "align",
-            "sideOffset",
-            "alignOffset"
-          ]
-        },
-        {
-          "name": "CascaderSubmenuTrigger",
-          "props": [
-            "icon",
-            "onKeyDown",
-            "onClick",
-            "disabled"
-          ]
-        }
-      ]
+      "source": "library",
+      "props": ["onKeyDown"]
     },
     {
-      "name": "CASCADER_LABELS",
-      "file": "src/components/reui/cascader/cascader-i18n.tsx",
-      "level": "molecule",
-      "parts": [
-        {
-          "name": "CASCADER_LABELS"
-        }
-      ]
+      "name": "CascaderSubmenu",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-footer.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["open", "defaultOpen", "onOpenChange"]
+    },
+    {
+      "name": "CascaderSubmenuContent",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-footer.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["onKeyDown", "side", "align", "sideOffset", "alignOffset"]
+    },
+    {
+      "name": "CascaderSubmenuTrigger",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-footer.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["icon", "onKeyDown", "onClick", "disabled"],
+      "control": true
+    },
+    {
+      "name": "CascaderGroup",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-item.tsx",
+      "level": "organism",
+      "source": "library"
     },
     {
       "name": "CascaderItem",
+      "category": "component",
       "file": "src/components/reui/cascader/cascader-item.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "CASCADER_ACTION_CLASS"
-        },
-        {
-          "name": "CascaderGroup"
-        },
-        {
-          "name": "CascaderItem"
-        },
-        {
-          "name": "CascaderItems"
-        },
-        {
-          "name": "CascaderLabel"
-        },
-        {
-          "name": "CascaderSeparator"
-        }
-      ]
+      "source": "library",
+      "props": [
+        "node",
+        "index",
+        "depth",
+        "showPath",
+        "as",
+        "expanded",
+        "indent",
+        "branch",
+        "selectable",
+        "selected",
+        "indeterminate",
+        "selectedCount",
+        "loading",
+        "error",
+        "childrenLoading",
+        "childrenError",
+        "onClick",
+        "onMouseUp",
+        "style"
+      ],
+      "control": true
     },
     {
-      "name": "CASCADER_LIST_HEIGHT_CLASS",
-      "file": "src/components/reui/cascader/cascader-lib.tsx",
-      "level": "molecule",
-      "parts": [
-        {
-          "name": "CASCADER_LIST_HEIGHT_CLASS"
-        },
-        {
-          "name": "CASCADER_LIST_PAD_CLASS"
-        },
-        {
-          "name": "CASCADER_MORE_PREFIX"
-        },
-        {
-          "name": "CASCADER_ROOT_KEY"
-        },
-        {
-          "name": "CASCADER_ROWS_CLASS"
-        },
-        {
-          "name": "CASCADER_SCROLL_CLASS"
-        }
-      ]
+      "name": "CascaderItems",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-item.tsx",
+      "level": "organism",
+      "source": "library",
+      "parts": ["CascaderItem"]
+    },
+    {
+      "name": "CascaderLabel",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-item.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "CascaderSeparator",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-item.tsx",
+      "level": "organism",
+      "source": "library"
     },
     {
       "name": "CascaderNav",
+      "category": "component",
       "file": "src/components/reui/cascader/cascader-nav.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "CascaderBack"
-        },
-        {
-          "name": "CascaderBreadcrumb",
-          "props": [
-            "maxSegments",
-            "collapse",
-            "interactive"
-          ]
-        },
-        {
-          "name": "CascaderInput",
-          "props": [
-            "showBack",
-            "placeholder",
-            "onKeyDown",
-            "\"aria-describedby\""
-          ]
-        },
-        {
-          "name": "CascaderNav"
-        },
-        {
-          "name": "CascaderValue",
-          "props": [
-            "display",
-            "maxSegments",
-            "collapse",
-            "separator",
-            "showIcon",
-            "placeholder"
-          ]
-        }
-      ]
+      "source": "library"
+    },
+    {
+      "name": "CascaderBack",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-nav.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "CascaderBreadcrumb",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-nav.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["maxSegments", "collapse", "interactive"]
+    },
+    {
+      "name": "CascaderInput",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-nav.tsx",
+      "level": "organism",
+      "source": "library",
+      "parts": ["CascaderBack"],
+      "props": ["showBack", "placeholder", "onKeyDown", "aria-describedby"]
+    },
+    {
+      "name": "CascaderValue",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-nav.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["display", "maxSegments", "collapse", "separator", "showIcon", "placeholder"]
     },
     {
       "name": "CascaderVirtualColumn",
+      "category": "component",
       "file": "src/components/reui/cascader/cascader-virtual.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "CascaderVirtualColumn",
-          "props": [
-            "column",
-            "estimateSize",
-            "overscan"
-          ]
-        },
-        {
-          "name": "CascaderVirtualItems"
-        }
-      ]
+      "source": "library",
+      "props": ["column", "estimateSize", "overscan"]
+    },
+    {
+      "name": "CascaderVirtualItems",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader-virtual.tsx",
+      "level": "organism",
+      "source": "library"
     },
     {
       "name": "Cascader",
+      "category": "component",
       "file": "src/components/reui/cascader/cascader.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "Cascader",
-          "props": [
-            "items",
-            "getParent",
-            "getChildren",
-            "onSearch",
-            "searchDebounce",
-            "resolveValue",
-            "loadKey",
-            "prefetch",
-            "onLoadError",
-            "value",
-            "defaultValue",
-            "onValueChange",
-            "multiple",
-            "selectable",
-            "indicator",
-            "actions",
-            "cascade",
-            "max",
-            "mode",
-            "expandTrigger",
-            "path",
-            "defaultPath",
-            "onPathChange",
-            "expanded",
-            "defaultExpanded",
-            "onExpandedChange",
-            "open",
-            "defaultOpen",
-            "onOpenChange",
-            "closeOnSelect",
-            "inputValue",
-            "defaultInputValue",
-            "onInputValueChange",
-            "searchScope",
-            "filter",
-            "revealSelected",
-            "maxHeight",
-            "virtualize",
-            "virtualizeThreshold",
-            "estimateRowSize",
-            "overscan",
-            "labels",
-            "renderItem",
-            "renderLabel",
-            "disabled",
-            "name",
-            "form",
-            "id",
-            "required",
-            "readOnly",
-            "invalid",
-            "inputRef",
-            "inline"
-          ]
-        },
-        {
-          "name": "CascaderActionsContextValue"
-        },
-        {
-          "name": "CascaderChip",
-          "props": [
-            "node",
-            "showPath",
-            "maxSegments",
-            "showRemove",
-            "onRemove"
-          ]
-        },
-        {
-          "name": "CascaderChips",
-          "props": [
-            "placeholder",
-            "strategy"
-          ]
-        },
-        {
-          "name": "CascaderColumn"
-        },
-        {
-          "name": "CascaderContent",
-          "props": [
-            "side",
-            "sideOffset",
-            "align",
-            "alignOffset",
-            "anchor",
-            "collisionBoundary",
-            "collisionPadding",
-            "sticky",
-            "positionMethod",
-            "container",
-            "ref"
-          ]
-        },
-        {
-          "name": "CascaderEmpty",
-          "props": [
-            "skeletonRows"
-          ]
-        },
-        {
-          "name": "CascaderHighlight"
-        },
-        {
-          "name": "CascaderHighlightStore"
-        },
-        {
-          "name": "CascaderItemState"
-        },
-        {
-          "name": "CascaderList",
-          "props": [
-            "style",
-            "maxHeight"
-          ]
-        },
-        {
-          "name": "CascaderPanel"
-        },
-        {
-          "name": "CascaderRenderContextValue"
-        },
-        {
-          "name": "CascaderStateContextValue"
-        },
-        {
-          "name": "CascaderStatus"
-        },
-        {
-          "name": "CascaderTrigger",
-          "props": [
-            "showIcon",
-            "ref"
-          ]
-        }
+      "source": "library",
+      "parts": ["CascaderList"],
+      "props": [
+        "items",
+        "getParent",
+        "getChildren",
+        "onSearch",
+        "searchDebounce",
+        "resolveValue",
+        "loadKey",
+        "prefetch",
+        "onLoadError",
+        "value",
+        "defaultValue",
+        "onValueChange",
+        "multiple",
+        "selectable",
+        "indicator",
+        "actions",
+        "cascade",
+        "max",
+        "mode",
+        "expandTrigger",
+        "path",
+        "defaultPath",
+        "onPathChange",
+        "expanded",
+        "defaultExpanded",
+        "onExpandedChange",
+        "open",
+        "defaultOpen",
+        "onOpenChange",
+        "closeOnSelect",
+        "inputValue",
+        "defaultInputValue",
+        "onInputValueChange",
+        "searchScope",
+        "filter",
+        "revealSelected",
+        "maxHeight",
+        "virtualize",
+        "virtualizeThreshold",
+        "estimateRowSize",
+        "overscan",
+        "labels",
+        "renderItem",
+        "renderLabel",
+        "disabled",
+        "name",
+        "form",
+        "id",
+        "required",
+        "readOnly",
+        "invalid",
+        "inputRef",
+        "inline"
       ]
+    },
+    {
+      "name": "CascaderTrigger",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["showIcon", "ref"],
+      "control": true
+    },
+    {
+      "name": "CascaderChip",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["node", "showPath", "maxSegments", "showRemove", "onRemove"]
+    },
+    {
+      "name": "CascaderChips",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader.tsx",
+      "level": "organism",
+      "source": "library",
+      "parts": ["CascaderChip"],
+      "props": ["placeholder", "strategy"]
+    },
+    {
+      "name": "CascaderContent",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": [
+        "side",
+        "sideOffset",
+        "align",
+        "alignOffset",
+        "anchor",
+        "collisionBoundary",
+        "collisionPadding",
+        "sticky",
+        "positionMethod",
+        "container",
+        "ref"
+      ]
+    },
+    {
+      "name": "CascaderPanel",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "CascaderList",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["style", "maxHeight"]
+    },
+    {
+      "name": "CascaderEmpty",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["skeletonRows"]
+    },
+    {
+      "name": "CascaderStatus",
+      "category": "component",
+      "file": "src/components/reui/cascader/cascader.tsx",
+      "level": "organism",
+      "source": "library"
     },
     {
       "name": "DataGridCellSelection",
+      "category": "component",
       "file": "src/components/reui/data-grid/data-grid-cell-selection.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "DataGridCellSelection",
-          "props": [
-            "apiRef",
-            "clipboard",
-            "keyboard"
-          ]
-        },
-        {
-          "name": "DataGridCellSelectionApi"
-        },
-        {
-          "name": "DataGridFocusCellOptions"
-        },
-        {
-          "name": "DataGridPasteTarget"
-        },
-        {
-          "name": "DataGridSelectionBar",
-          "props": [
-            "label",
-            "clearLabel",
-            "onClear"
-          ]
-        }
-      ]
+      "source": "library",
+      "props": ["apiRef", "clipboard", "keyboard"]
+    },
+    {
+      "name": "DataGridSelectionBar",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-cell-selection.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["label", "clearLabel", "onClear"]
     },
     {
       "name": "DataGridColumnFilter",
+      "category": "component",
       "file": "src/components/reui/data-grid/data-grid-column-filter.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "DataGridColumnFilter",
-          "props": [
-            "column",
-            "title",
-            "options"
-          ]
-        },
-        {
-          "name": "DataGridColumnFilterProps"
-        }
-      ]
+      "source": "library",
+      "props": ["column", "title", "options"]
     },
     {
       "name": "DataGridColumnHeader",
+      "category": "component",
       "file": "src/components/reui/data-grid/data-grid-column-header.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "DataGridColumnHeader"
-        },
-        {
-          "name": "DataGridColumnHeaderProps"
-        }
-      ]
+      "source": "library"
     },
     {
       "name": "DataGridColumnVisibility",
+      "category": "component",
       "file": "src/components/reui/data-grid/data-grid-column-visibility.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "DataGridColumnVisibility",
-          "props": [
-            "table",
-            "trigger"
-          ]
-        }
-      ]
+      "source": "library",
+      "props": ["table", "trigger"]
     },
     {
       "name": "DataGridPagination",
+      "category": "component",
       "file": "src/components/reui/data-grid/data-grid-pagination.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "DataGridPagination"
-        },
-        {
-          "name": "DataGridPaginationProps"
-        }
-      ]
+      "source": "library"
     },
     {
       "name": "DataGridScrollArea",
+      "category": "component",
       "file": "src/components/reui/data-grid/data-grid-scroll-area.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "DataGridScrollArea",
-          "props": [
-            "orientation"
-          ]
-        },
-        {
-          "name": "DataGridScrollAreaOrientation"
-        },
-        {
-          "name": "DataGridScrollAreaProps"
-        }
-      ]
+      "source": "library",
+      "props": ["orientation"]
+    },
+    {
+      "name": "DataGridTableDndRowHandle",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table-dnd-rows.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["disabled", "disabledLabel"],
+      "control": true,
+      "min_height": "28px"
     },
     {
       "name": "DataGridTableDndRows",
+      "category": "component",
       "file": "src/components/reui/data-grid/data-grid-table-dnd-rows.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "DataGridTableDndRowData"
-        },
-        {
-          "name": "DataGridTableDndRowDecoration"
-        },
-        {
-          "name": "DataGridTableDndRowHandle",
-          "props": [
-            "disabled",
-            "disabledLabel"
-          ]
-        },
-        {
-          "name": "DataGridTableDndRows",
-          "props": [
-            "handleDragEnd",
-            "dataIds",
-            "footerContent",
-            "collisionDetection",
-            "modifiers",
-            "sortingStrategy",
-            "renderRowDecoration",
-            "dropIndicator",
-            "onDragStart",
-            "onDragMove",
-            "onDragOver",
-            "onDragCancel",
-            "accessibility"
-          ]
-        }
+      "source": "library",
+      "props": [
+        "handleDragEnd",
+        "dataIds",
+        "footerContent",
+        "collisionDetection",
+        "modifiers",
+        "sortingStrategy",
+        "renderRowDecoration",
+        "dropIndicator",
+        "onDragStart",
+        "onDragMove",
+        "onDragOver",
+        "onDragCancel",
+        "accessibility"
       ]
     },
     {
       "name": "DataGridTableDnd",
+      "category": "component",
       "file": "src/components/reui/data-grid/data-grid-table-dnd.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "DataGridTableDnd",
-          "props": [
-            "handleDragEnd",
-            "footerContent",
-            "accessibility"
-          ]
-        }
-      ]
+      "source": "library",
+      "props": ["handleDragEnd", "footerContent", "accessibility"]
     },
     {
       "name": "DataGridTableVirtual",
+      "category": "component",
       "file": "src/components/reui/data-grid/data-grid-table-virtual.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "DataGridTableVirtual",
-          "props": [
-            "height",
-            "estimateSize",
-            "overscan",
-            "scrollBehavior",
-            "scrollToRowAlign",
-            "scrollToRowIndex",
-            "columnVirtualizerOptions",
-            "scrollToColumnAlign",
-            "scrollToColumnIndex",
-            "footerContent",
-            "renderHeader",
-            "onFetchMore",
-            "isFetchingMore",
-            "hasMore",
-            "fetchMoreOffset",
-            "virtualizerOptions"
-          ]
-        },
-        {
-          "name": "DataGridTableVirtualProps"
-        },
-        {
-          "name": "DataGridTableVirtualScrollAlignment"
-        },
-        {
-          "name": "DataGridTableVirtualScrollElements"
-        },
-        {
-          "name": "DataGridTableVirtualizerOptions"
-        }
+      "source": "library",
+      "props": [
+        "height",
+        "estimateSize",
+        "overscan",
+        "scrollBehavior",
+        "scrollToRowAlign",
+        "scrollToRowIndex",
+        "columnVirtualizerOptions",
+        "scrollToColumnAlign",
+        "scrollToColumnIndex",
+        "footerContent",
+        "renderHeader",
+        "onFetchMore",
+        "isFetchingMore",
+        "hasMore",
+        "fetchMoreOffset",
+        "virtualizerOptions"
       ]
     },
     {
       "name": "DataGridTable",
+      "category": "component",
       "file": "src/components/reui/data-grid/data-grid-table.tsx",
       "level": "organism",
+      "source": "library",
       "parts": [
-        {
-          "name": "DataGridTable",
-          "props": [
-            "footerContent",
-            "renderHeader"
-          ]
-        },
-        {
-          "name": "DataGridTableAddRow"
-        },
-        {
-          "name": "DataGridTableBase"
-        },
-        {
-          "name": "DataGridTableBody"
-        },
-        {
-          "name": "DataGridTableBodyRow",
-          "props": [
-            "row",
-            "pinnedBoundary",
-            "rowRef",
-            "dndRef",
-            "dndStyle",
-            "dndDragging",
-            "dataIndex"
-          ]
-        },
-        {
-          "name": "DataGridTableBodyRowCell",
-          "props": [
-            "cell",
-            "dndRef",
-            "dndStyle",
-            "columnIndex"
-          ]
-        },
-        {
-          "name": "DataGridTableBodyRowExpandded",
-          "props": [
-            "row"
-          ]
-        },
-        {
-          "name": "DataGridTableBodyRowSkeleton"
-        },
-        {
-          "name": "DataGridTableBodyRowSkeletonCell",
-          "props": [
-            "column"
-          ]
-        },
-        {
-          "name": "DataGridTableEmpty"
-        },
-        {
-          "name": "DataGridTableFillBodyCell"
-        },
-        {
-          "name": "DataGridTableFillHeadCell",
-          "props": [
-            "rowSpan"
-          ]
-        },
-        {
-          "name": "DataGridTableFoot"
-        },
-        {
-          "name": "DataGridTableFootRow"
-        },
-        {
-          "name": "DataGridTableFootRowCell",
-          "props": [
-            "colSpan"
-          ]
-        },
-        {
-          "name": "DataGridTableHead"
-        },
-        {
-          "name": "DataGridTableHeadRow",
-          "props": [
-            "rowId"
-          ]
-        },
-        {
-          "name": "DataGridTableHeadRowCell",
-          "props": [
-            "header",
-            "coveredHeaders",
-            "dndRef",
-            "dndStyle"
-          ]
-        },
-        {
-          "name": "DataGridTableHeadRowCellResize",
-          "props": [
-            "header"
-          ]
-        },
-        {
-          "name": "DataGridTableHeader"
-        },
-        {
-          "name": "DataGridTableLoader"
-        },
-        {
-          "name": "DataGridTablePinnedBoundary"
-        },
-        {
-          "name": "DataGridTableRenderedRow",
-          "props": [
-            "row",
-            "pinnedBoundary",
-            "rowRef",
-            "rowIndex",
-            "centerWindow"
-          ]
-        },
-        {
-          "name": "DataGridTableRowExpand",
-          "props": [
-            "row",
-            "indent"
-          ]
-        },
-        {
-          "name": "DataGridTableRowPin",
-          "props": [
-            "row"
-          ]
-        },
-        {
-          "name": "DataGridTableRowSelect",
-          "props": [
-            "row"
-          ]
-        },
-        {
-          "name": "DataGridTableRowSelectAll"
-        },
-        {
-          "name": "DataGridTableRowSpacer"
-        },
-        {
-          "name": "DataGridTableViewport",
-          "props": [
-            "viewportRef",
-            "style"
-          ]
-        }
+        "DataGridTableAddRow",
+        "DataGridTableBase",
+        "DataGridTableBody",
+        "DataGridTableFillHeadCell",
+        "DataGridTableFoot",
+        "DataGridTableHead",
+        "DataGridTableHeadRow",
+        "DataGridTableHeadRowCell",
+        "DataGridTableHeadRowCellResize",
+        "DataGridTableRowSpacer",
+        "DataGridTableViewport"
+      ],
+      "props": ["footerContent", "renderHeader"]
+    },
+    {
+      "name": "DataGridTableAddRow",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "DataGridTableBase",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "DataGridTableBody",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "DataGridTableBodyRow",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["row", "pinnedBoundary", "rowRef", "dndRef", "dndStyle", "dndDragging", "dataIndex"]
+    },
+    {
+      "name": "DataGridTableBodyRowCell",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["cell", "dndRef", "dndStyle", "columnIndex"]
+    },
+    {
+      "name": "DataGridTableBodyRowExpandded",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["row"]
+    },
+    {
+      "name": "DataGridTableRenderedRow",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "parts": [
+        "DataGridTableBodyRow",
+        "DataGridTableBodyRowCell",
+        "DataGridTableBodyRowExpandded",
+        "DataGridTableFillBodyCell"
+      ],
+      "props": ["row", "pinnedBoundary", "rowRef", "rowIndex", "centerWindow"]
+    },
+    {
+      "name": "DataGridTableBodyRowSkeleton",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "DataGridTableBodyRowSkeletonCell",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["column"]
+    },
+    {
+      "name": "DataGridTableEmpty",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "DataGridTableFillBodyCell",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "DataGridTableFillHeadCell",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["rowSpan"]
+    },
+    {
+      "name": "DataGridTableFoot",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "DataGridTableFootRow",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "DataGridTableFootRowCell",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["colSpan"]
+    },
+    {
+      "name": "DataGridTableHeader",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "parts": [
+        "DataGridTableBase",
+        "DataGridTableFillHeadCell",
+        "DataGridTableHead",
+        "DataGridTableHeadRow",
+        "DataGridTableHeadRowCell",
+        "DataGridTableHeadRowCellResize",
+        "DataGridTableViewport"
       ]
+    },
+    {
+      "name": "DataGridTableHead",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "DataGridTableHeadRow",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["rowId"]
+    },
+    {
+      "name": "DataGridTableHeadRowCell",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["header", "coveredHeaders", "dndRef", "dndStyle"]
+    },
+    {
+      "name": "DataGridTableHeadRowCellResize",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["header"]
+    },
+    {
+      "name": "DataGridTableLoader",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "DataGridTableRowExpand",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["row", "indent"]
+    },
+    {
+      "name": "DataGridTableRowPin",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["row"],
+      "control": true,
+      "min_height": "28px"
+    },
+    {
+      "name": "DataGridTableRowSelect",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["row"]
+    },
+    {
+      "name": "DataGridTableRowSelectAll",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "DataGridTableRowSpacer",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "DataGridTableViewport",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid-table.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["viewportRef", "style"]
+    },
+    {
+      "name": "DataGridProvider",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid.tsx",
+      "level": "molecule",
+      "source": "library",
+      "props": ["table"]
     },
     {
       "name": "DataGrid",
+      "category": "component",
       "file": "src/components/reui/data-grid/data-grid.tsx",
       "level": "molecule",
-      "parts": [
-        {
-          "name": "DataGrid",
-          "props": [
-            "table"
-          ]
-        },
-        {
-          "name": "DataGridContainer"
-        },
-        {
-          "name": "DataGridProvider",
-          "props": [
-            "table"
-          ]
-        }
-      ]
+      "source": "library",
+      "parts": ["DataGridProvider"],
+      "props": ["table"]
+    },
+    {
+      "name": "DataGridContainer",
+      "category": "component",
+      "file": "src/components/reui/data-grid/data-grid.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "FilterAdvancedRow",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-advanced.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FiltersAdvancedPanel",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-advanced.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["mode", "renderEmpty", "reorderable"]
     },
     {
       "name": "FiltersAdvanced",
+      "category": "component",
       "file": "src/components/reui/filters/filters-advanced.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "FilterAdvancedRow"
-        },
-        {
-          "name": "FiltersAdvanced",
-          "props": [
-            "mode",
-            "trigger",
-            "reorderable",
-            "align"
-          ]
-        },
-        {
-          "name": "FiltersAdvancedPanel",
-          "props": [
-            "mode",
-            "renderEmpty",
-            "reorderable"
-          ]
-        }
+      "source": "library",
+      "parts": ["FiltersAdvancedPanel"],
+      "props": ["mode", "trigger", "reorderable", "align"]
+    },
+    {
+      "name": "FilterFieldPicker",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-builder.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": [
+        "path",
+        "onPathChange",
+        "query",
+        "onQueryChange",
+        "onSelect",
+        "maxHeight",
+        "labels",
+        "actions"
       ]
     },
     {
       "name": "FiltersBuilder",
+      "category": "component",
       "file": "src/components/reui/filters/filters-builder.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "FilterFieldPicker",
-          "props": [
-            "path",
-            "onPathChange",
-            "query",
-            "onQueryChange",
-            "onSelect",
-            "maxHeight",
-            "labels",
-            "actions"
-          ]
-        },
-        {
-          "name": "FiltersBuilder",
-          "props": [
-            "trigger"
-          ]
-        }
-      ]
+      "source": "library",
+      "props": ["trigger"]
+    },
+    {
+      "name": "FilterValuePopover",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-chip.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["rule", "field", "operator", "trigger"]
+    },
+    {
+      "name": "FilterOperatorPopover",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-chip.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["rule", "field", "trigger"]
+    },
+    {
+      "name": "FilterMoveToMenuItems",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-chip.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["nodeId"]
+    },
+    {
+      "name": "FilterRuleMenuItems",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-chip.tsx",
+      "level": "organism",
+      "source": "library",
+      "parts": ["FilterMoveToMenuItems"],
+      "props": ["ruleId", "allowGrouping"]
     },
     {
       "name": "FilterChip",
+      "category": "component",
       "file": "src/components/reui/filters/filters-chip.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "FilterChip"
-        },
-        {
-          "name": "FilterMoveToMenuItems",
-          "props": [
-            "nodeId"
-          ]
-        },
-        {
-          "name": "FilterOperatorPopover",
-          "props": [
-            "rule",
-            "field",
-            "trigger"
-          ]
-        },
-        {
-          "name": "FilterRuleMenuItems",
-          "props": [
-            "ruleId",
-            "allowGrouping"
-          ]
-        },
-        {
-          "name": "FilterValuePopover",
-          "props": [
-            "rule",
-            "field",
-            "operator",
-            "trigger"
-          ]
-        }
-      ]
+      "source": "library"
     },
     {
       "name": "FilterActionsContext",
+      "category": "component",
       "file": "src/components/reui/filters/filters-context.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "FilterActionsContext"
-        },
-        {
-          "name": "FilterFocusContext"
-        },
-        {
-          "name": "FilterRenderContext"
-        },
-        {
-          "name": "FilterReorderProvider"
-        },
-        {
-          "name": "FilterRowStateProvider"
-        },
-        {
-          "name": "FilterStateContext"
-        }
-      ]
+      "source": "library"
     },
     {
-      "name": "FILTER_DATE_FORMAT",
-      "file": "src/components/reui/filters/filters-date.tsx",
-      "level": "atom",
-      "parts": [
-        {
-          "name": "FILTER_DATE_FORMAT"
-        },
-        {
-          "name": "RELATIVE_NEXT_WEEK"
-        },
-        {
-          "name": "RELATIVE_TODAY"
-        },
-        {
-          "name": "RELATIVE_TOMORROW"
-        },
-        {
-          "name": "RELATIVE_YESTERDAY"
-        }
-      ]
+      "name": "FilterFocusContext",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-context.tsx",
+      "level": "organism",
+      "source": "library"
     },
     {
-      "name": "FILTER_DND_ACTIVATION",
-      "file": "src/components/reui/filters/filters-dnd.tsx",
-      "level": "atom",
-      "parts": [
-        {
-          "name": "FILTER_DND_ACTIVATION"
-        },
-        {
-          "name": "FILTER_DROP_ZONE_SELECTOR"
-        },
-        {
-          "name": "FILTER_GROUP_SELECTOR"
-        },
-        {
-          "name": "FILTER_ROW_SEAM_PX"
-        },
-        {
-          "name": "FILTER_ROW_SELECTOR"
-        }
-      ]
+      "name": "FilterRenderContext",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-context.tsx",
+      "level": "organism",
+      "source": "library"
     },
     {
-      "name": "AnyFilterEditor",
+      "name": "FilterStateContext",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-context.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FilterReorderProvider",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-context.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FilterRowStateProvider",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-context.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FilterTextEditor",
+      "category": "component",
       "file": "src/components/reui/filters/filters-editors.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "AnyFilterEditor"
-        },
-        {
-          "name": "DEFAULT_FILTER_EDITORS"
-        },
-        {
-          "name": "FilterBooleanEditor",
-          "props": [
-            "value",
-            "onValueChange",
-            "commit",
-            "labels",
-            "autoFocusProps",
-            "field"
-          ]
-        },
-        {
-          "name": "FilterEditorRegistry"
-        },
-        {
-          "name": "FilterMenu",
-          "props": [
-            "items",
-            "selected",
-            "multiple",
-            "onSelectionChange",
-            "labels",
-            "ariaLabel",
-            "searchPlaceholder",
-            "searchable",
-            "maxHeight",
-            "pinSelected",
-            "sortSelected",
-            "preFiltered",
-            "autoFocusProps",
-            "query",
-            "onQueryChange",
-            "state"
-          ]
-        },
-        {
-          "name": "FilterMultiSelectEditor"
-        },
-        {
-          "name": "FilterNumberEditor",
-          "props": [
-            "value",
-            "onValueChange",
-            "commit",
-            "cancel",
-            "autoFocusProps",
-            "labels",
-            "host",
-            "field"
-          ]
-        },
-        {
-          "name": "FilterRangeEditor",
-          "props": [
-            "value",
-            "onValueChange",
-            "commit",
-            "cancel",
-            "autoFocusProps",
-            "labels",
-            "host",
-            "field"
-          ]
-        },
-        {
-          "name": "FilterSelectEditor"
-        },
-        {
-          "name": "FilterTextEditor",
-          "props": [
-            "value",
-            "onValueChange",
-            "commit",
-            "cancel",
-            "autoFocusProps",
-            "labels",
-            "host",
-            "field"
-          ]
-        }
+      "source": "library",
+      "props": [
+        "value",
+        "onValueChange",
+        "commit",
+        "cancel",
+        "autoFocusProps",
+        "labels",
+        "host",
+        "field"
       ]
     },
     {
-      "name": "DEFAULT_FILTER_LABELS",
-      "file": "src/components/reui/filters/filters-i18n.tsx",
-      "level": "molecule",
-      "parts": [
-        {
-          "name": "DEFAULT_FILTER_LABELS"
-        }
-      ]
-    },
-    {
-      "name": "FILTER_FIELD_PICKER_CLASS",
-      "file": "src/components/reui/filters/filters-lib.tsx",
+      "name": "FilterNumberEditor",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-editors.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "FILTER_FIELD_PICKER_CLASS"
-        },
-        {
-          "name": "FILTER_MENU_CLASS"
-        },
-        {
-          "name": "FILTER_MENU_LABEL_CLASS"
-        },
-        {
-          "name": "FILTER_ROOT_KEY"
-        }
+      "source": "library",
+      "props": [
+        "value",
+        "onValueChange",
+        "commit",
+        "cancel",
+        "autoFocusProps",
+        "labels",
+        "host",
+        "field"
       ]
     },
     {
-      "name": "DEFAULT_FILTER_OPERATORS",
-      "file": "src/components/reui/filters/filters-operators.tsx",
-      "level": "molecule",
-      "parts": [
-        {
-          "name": "DEFAULT_FILTER_OPERATORS"
-        },
-        {
-          "name": "DEFAULT_FILTER_OPERATOR_LABELS"
-        },
-        {
-          "name": "DEFAULT_FILTER_VALUE_TYPE"
-        }
+      "name": "FilterRangeEditor",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-editors.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": [
+        "value",
+        "onValueChange",
+        "commit",
+        "cancel",
+        "autoFocusProps",
+        "labels",
+        "host",
+        "field"
       ]
+    },
+    {
+      "name": "FilterMenu",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-editors.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": [
+        "items",
+        "selected",
+        "multiple",
+        "onSelectionChange",
+        "labels",
+        "ariaLabel",
+        "searchPlaceholder",
+        "searchable",
+        "maxHeight",
+        "pinSelected",
+        "sortSelected",
+        "preFiltered",
+        "autoFocusProps",
+        "query",
+        "onQueryChange",
+        "state"
+      ]
+    },
+    {
+      "name": "FilterSelectEditor",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-editors.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FilterMultiSelectEditor",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-editors.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FilterBooleanEditor",
+      "category": "component",
+      "file": "src/components/reui/filters/filters-editors.tsx",
+      "level": "organism",
+      "source": "library",
+      "parts": ["FilterMenu"],
+      "props": ["value", "onValueChange", "commit", "labels", "autoFocusProps", "field"]
+    },
+    {
+      "name": "FilterChip",
+      "category": "component",
+      "file": "src/components/reui/filters/filters.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FilterOperatorPopover",
+      "category": "component",
+      "file": "src/components/reui/filters/filters.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FilterRuleMenuItems",
+      "category": "component",
+      "file": "src/components/reui/filters/filters.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FilterValuePopover",
+      "category": "component",
+      "file": "src/components/reui/filters/filters.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FiltersAdvanced",
+      "category": "component",
+      "file": "src/components/reui/filters/filters.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FiltersAdvancedPanel",
+      "category": "component",
+      "file": "src/components/reui/filters/filters.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FilterAdvancedRow",
+      "category": "component",
+      "file": "src/components/reui/filters/filters.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FiltersBuilder",
+      "category": "component",
+      "file": "src/components/reui/filters/filters.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "FilterFieldPicker",
+      "category": "component",
+      "file": "src/components/reui/filters/filters.tsx",
+      "level": "organism",
+      "source": "library"
     },
     {
       "name": "Filters",
+      "category": "component",
       "file": "src/components/reui/filters/filters.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "DEFAULT_FILTER_EDITORS"
-        },
-        {
-          "name": "DEFAULT_FILTER_LABELS"
-        },
-        {
-          "name": "DEFAULT_FILTER_OPERATORS"
-        },
-        {
-          "name": "DEFAULT_FILTER_OPERATOR_LABELS"
-        },
-        {
-          "name": "FilterAdvancedRow"
-        },
-        {
-          "name": "FilterArityResolver"
-        },
-        {
-          "name": "FilterChip"
-        },
-        {
-          "name": "FilterFieldPicker"
-        },
-        {
-          "name": "FilterOperatorPopover"
-        },
-        {
-          "name": "FilterRuleMenuItems"
-        },
-        {
-          "name": "FilterValidateResolver"
-        },
-        {
-          "name": "FilterValuePopover"
-        },
-        {
-          "name": "Filters",
-          "props": [
-            "fields",
-            "query",
-            "defaultQuery",
-            "onQueryChange",
-            "labels",
-            "operatorLabels",
-            "editors",
-            "variant",
-            "advancedMode",
-            "advancedAlign",
-            "reorderable",
-            "size",
-            "disabled",
-            "readOnly",
-            "onBeforeQueryChange",
-            "onConvertToAdvanced",
-            "menuClassName",
-            "fieldPickerClassName",
-            "pathCollapse",
-            "maxPathSegments",
-            "trigger",
-            "showClear",
-            "renderValue",
-            "renderChip",
-            "renderEmpty"
-          ]
-        },
-        {
-          "name": "FiltersAdvanced"
-        },
-        {
-          "name": "FiltersAdvancedPanel"
-        },
-        {
-          "name": "FiltersBuilder"
-        },
-        {
-          "name": "FiltersRow",
-          "props": [
-            "trigger",
-            "showClear"
-          ],
-          "variants": {
-            "size": [
-              "sm",
-              "default"
-            ]
-          },
-          "defaults": {
-            "size": "default"
-          }
-        }
+      "source": "library",
+      "parts": ["FiltersAdvanced", "FiltersRow"],
+      "props": [
+        "fields",
+        "query",
+        "defaultQuery",
+        "onQueryChange",
+        "labels",
+        "operatorLabels",
+        "editors",
+        "variant",
+        "advancedMode",
+        "advancedAlign",
+        "reorderable",
+        "size",
+        "disabled",
+        "readOnly",
+        "onBeforeQueryChange",
+        "onConvertToAdvanced",
+        "menuClassName",
+        "fieldPickerClassName",
+        "pathCollapse",
+        "maxPathSegments",
+        "trigger",
+        "showClear",
+        "renderValue",
+        "renderChip",
+        "renderEmpty"
       ]
+    },
+    {
+      "name": "FiltersRow",
+      "category": "component",
+      "file": "src/components/reui/filters/filters.tsx",
+      "level": "organism",
+      "source": "library",
+      "parts": ["FilterChip", "FiltersBuilder"],
+      "props": ["trigger", "showClear"],
+      "variants": ["size=sm", "size=default"],
+      "defaults": {
+        "size": "default"
+      }
     },
     {
       "name": "Frame",
+      "category": "component",
       "file": "src/components/reui/frame.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Frame",
-          "variants": {
-            "variant": [
-              "default",
-              "inverse",
-              "ghost"
-            ],
-            "spacing": [
-              "xs",
-              "sm",
-              "default",
-              "lg"
-            ],
-            "stacked": [
-              "true",
-              "false"
-            ],
-            "dense": [
-              "true",
-              "false"
-            ]
-          },
-          "defaults": {
-            "variant": "default",
-            "spacing": "default",
-            "stacked": "false",
-            "dense": "false"
-          }
-        },
-        {
-          "name": "FrameDescription"
-        },
-        {
-          "name": "FrameFooter"
-        },
-        {
-          "name": "FrameHeader"
-        },
-        {
-          "name": "FramePanel",
-          "props": [
-            "fit"
-          ]
-        },
-        {
-          "name": "FrameTitle"
-        }
-      ]
+      "source": "library",
+      "variants": [
+        "variant=default",
+        "variant=inverse",
+        "variant=ghost",
+        "spacing=xs",
+        "spacing=sm",
+        "spacing=default",
+        "spacing=lg",
+        "stacked=true",
+        "stacked=false",
+        "dense=true",
+        "dense=false"
+      ],
+      "defaults": {
+        "variant": "default",
+        "spacing": "default"
+      }
+    },
+    {
+      "name": "FramePanel",
+      "category": "component",
+      "file": "src/components/reui/frame.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["fit"]
+    },
+    {
+      "name": "FrameHeader",
+      "category": "component",
+      "file": "src/components/reui/frame.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "FrameTitle",
+      "category": "component",
+      "file": "src/components/reui/frame.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "FrameDescription",
+      "category": "component",
+      "file": "src/components/reui/frame.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "FrameFooter",
+      "category": "component",
+      "file": "src/components/reui/frame.tsx",
+      "level": "atom",
+      "source": "library"
     },
     {
       "name": "AppShell",
+      "category": "component",
       "file": "src/components/templates/app-shell.tsx",
       "level": "template",
-      "parts": [
-        {
-          "name": "AppShell",
-          "props": [
-            "nav",
-            "roles",
-            "company",
-            "account",
-            "search",
-            "columnOpen"
-          ]
-        },
-        {
-          "name": "MAIN_ID"
-        },
-        {
-          "name": "NavItem"
-        },
-        {
-          "name": "NavLink"
-        },
-        {
-          "name": "NavSection"
-        }
-      ]
+      "source": "own",
+      "props": ["nav", "roles", "company", "account", "search", "columnOpen"]
     },
     {
       "name": "PlaceChangeProvider",
+      "category": "component",
       "file": "src/components/templates/app-shell/place-change.tsx",
       "level": "template",
-      "parts": [
-        {
-          "name": "PlaceChangeProvider"
-        }
-      ]
+      "source": "own"
+    },
+    {
+      "name": "SecondColumnNav",
+      "category": "component",
+      "file": "src/components/templates/app-shell/second-column.tsx",
+      "level": "template",
+      "source": "own",
+      "props": ["items", "roles"]
     },
     {
       "name": "SecondColumn",
+      "category": "component",
       "file": "src/components/templates/app-shell/second-column.tsx",
       "level": "template",
-      "parts": [
-        {
-          "name": "SecondColumn",
-          "props": [
-            "items",
-            "roles",
-            "initialOpen"
-          ]
-        },
-        {
-          "name": "SecondColumnNav",
-          "props": [
-            "items",
-            "roles"
-          ]
-        }
-      ]
+      "source": "own",
+      "parts": ["SecondColumnNav"],
+      "props": ["items", "roles", "initialOpen"]
     },
     {
       "name": "NavMenu",
+      "category": "component",
       "file": "src/components/templates/nav-menu.tsx",
       "level": "template",
-      "parts": [
-        {
-          "name": "NavItem"
-        },
-        {
-          "name": "NavLink"
-        },
-        {
-          "name": "NavMenu",
-          "props": [
-            "items",
-            "roles"
-          ]
-        },
-        {
-          "name": "NavSection"
-        }
-      ]
+      "source": "own",
+      "props": ["items", "roles"]
     },
     {
       "name": "PageHeader",
+      "category": "component",
       "file": "src/components/templates/page-header.tsx",
       "level": "template",
-      "parts": [
-        {
-          "name": "PageHeader",
-          "props": [
-            "title",
-            "action"
-          ]
-        }
-      ]
+      "source": "own",
+      "props": ["title", "action"]
     },
     {
       "name": "PageSkeleton",
+      "category": "component",
       "file": "src/components/templates/page-skeleton.tsx",
       "level": "template",
-      "parts": [
-        {
-          "name": "PageSkeleton"
-        }
-      ]
+      "source": "own"
     },
     {
       "name": "PageState",
+      "category": "component",
       "file": "src/components/templates/page-state.tsx",
       "level": "template",
-      "parts": [
-        {
-          "name": "PageState",
-          "props": [
-            "kind",
-            "onRetry",
-            "returnTo",
-            "homeHref"
-          ]
-        }
-      ]
+      "source": "own",
+      "props": ["kind", "onRetry", "returnTo", "homeHref"]
+    },
+    {
+      "name": "ConnectionWatcher",
+      "category": "component",
+      "file": "src/components/templates/screen-banner.tsx",
+      "level": "template",
+      "source": "own"
     },
     {
       "name": "ScreenBanner",
+      "category": "component",
       "file": "src/components/templates/screen-banner.tsx",
       "level": "template",
-      "parts": [
-        {
-          "name": "ConnectionWatcher"
-        },
-        {
-          "name": "ScreenBanner"
-        }
-      ]
+      "source": "own"
+    },
+    {
+      "name": "ShellFocusProvider",
+      "category": "component",
+      "file": "src/components/templates/shell-focus.tsx",
+      "level": "template",
+      "source": "own"
     },
     {
       "name": "HiddenInFocus",
+      "category": "component",
       "file": "src/components/templates/shell-focus.tsx",
       "level": "template",
-      "parts": [
-        {
-          "name": "HiddenInFocus"
-        },
-        {
-          "name": "ShellContent"
-        },
-        {
-          "name": "ShellFocusProvider"
-        }
-      ]
+      "source": "own"
+    },
+    {
+      "name": "ShellContent",
+      "category": "component",
+      "file": "src/components/templates/shell-focus.tsx",
+      "level": "template",
+      "source": "own"
     },
     {
       "name": "ThemeProvider",
+      "category": "component",
       "file": "src/components/templates/theme.tsx",
       "level": "template",
-      "parts": [
-        {
-          "name": "ThemeProvider"
-        },
-        {
-          "name": "ThemeSwitch"
-        }
-      ]
+      "source": "own"
+    },
+    {
+      "name": "ThemeSwitch",
+      "category": "component",
+      "file": "src/components/templates/theme.tsx",
+      "level": "template",
+      "source": "own"
     },
     {
       "name": "ButtonGroup",
+      "category": "component",
       "file": "src/components/ui/button-group.tsx",
       "level": "molecule",
-      "parts": [
-        {
-          "name": "ButtonGroup",
-          "variants": {
-            "orientation": [
-              "horizontal",
-              "vertical"
-            ]
-          },
-          "defaults": {
-            "orientation": "horizontal"
-          }
-        },
-        {
-          "name": "ButtonGroupSeparator",
-          "props": [
-            "orientation"
-          ]
-        },
-        {
-          "name": "ButtonGroupText",
-          "props": [
-            "render"
-          ]
-        }
-      ]
+      "source": "library",
+      "variants": ["orientation=horizontal", "orientation=vertical"],
+      "defaults": {
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "name": "ButtonGroupSeparator",
+      "category": "component",
+      "file": "src/components/ui/button-group.tsx",
+      "level": "molecule",
+      "source": "library",
+      "props": ["orientation"]
+    },
+    {
+      "name": "ButtonGroupText",
+      "category": "component",
+      "file": "src/components/ui/button-group.tsx",
+      "level": "molecule",
+      "source": "library",
+      "props": ["render"]
     },
     {
       "name": "Button",
+      "category": "component",
       "file": "src/components/ui/button.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Button",
-          "variants": {
-            "variant": [
-              "default",
-              "outline",
-              "secondary",
-              "ghost",
-              "destructive",
-              "link"
-            ],
-            "size": [
-              "default",
-              "xs",
-              "sm",
-              "lg",
-              "icon",
-              "icon-xs",
-              "icon-sm",
-              "icon-lg"
-            ]
-          },
-          "defaults": {
-            "variant": "default",
-            "size": "default"
-          }
-        }
-      ]
+      "source": "library",
+      "control": true,
+      "min_height": "24px",
+      "variants": [
+        "variant=default",
+        "variant=outline",
+        "variant=secondary",
+        "variant=ghost",
+        "variant=destructive",
+        "variant=link",
+        "size=default",
+        "size=xs",
+        "size=sm",
+        "size=lg",
+        "size=icon",
+        "size=icon-xs",
+        "size=icon-sm",
+        "size=icon-lg"
+      ],
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
     },
     {
       "name": "Checkbox",
+      "category": "component",
       "file": "src/components/ui/checkbox.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Checkbox"
-        }
-      ]
+      "source": "library",
+      "control": true,
+      "min_height": "32px"
     },
     {
       "name": "Command",
+      "category": "component",
       "file": "src/components/ui/command.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "Command"
-        },
-        {
-          "name": "CommandDialog",
-          "props": [
-            "title",
-            "description",
-            "showCloseButton"
-          ]
-        },
-        {
-          "name": "CommandEmpty"
-        },
-        {
-          "name": "CommandGroup"
-        },
-        {
-          "name": "CommandInput"
-        },
-        {
-          "name": "CommandItem"
-        },
-        {
-          "name": "CommandList"
-        },
-        {
-          "name": "CommandSeparator"
-        },
-        {
-          "name": "CommandShortcut"
-        }
-      ]
+      "source": "library"
+    },
+    {
+      "name": "CommandDialog",
+      "category": "component",
+      "file": "src/components/ui/command.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["title", "description", "showCloseButton"]
+    },
+    {
+      "name": "CommandInput",
+      "category": "component",
+      "file": "src/components/ui/command.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "CommandList",
+      "category": "component",
+      "file": "src/components/ui/command.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "CommandEmpty",
+      "category": "component",
+      "file": "src/components/ui/command.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "CommandGroup",
+      "category": "component",
+      "file": "src/components/ui/command.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "CommandItem",
+      "category": "component",
+      "file": "src/components/ui/command.tsx",
+      "level": "organism",
+      "source": "library",
+      "control": true
+    },
+    {
+      "name": "CommandShortcut",
+      "category": "component",
+      "file": "src/components/ui/command.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "CommandSeparator",
+      "category": "component",
+      "file": "src/components/ui/command.tsx",
+      "level": "organism",
+      "source": "library"
     },
     {
       "name": "Dialog",
+      "category": "component",
       "file": "src/components/ui/dialog.tsx",
       "level": "molecule",
-      "parts": [
-        {
-          "name": "Dialog"
-        },
-        {
-          "name": "DialogClose"
-        },
-        {
-          "name": "DialogContent",
-          "props": [
-            "showCloseButton"
-          ]
-        },
-        {
-          "name": "DialogDescription"
-        },
-        {
-          "name": "DialogFooter",
-          "props": [
-            "showCloseButton"
-          ]
-        },
-        {
-          "name": "DialogHeader"
-        },
-        {
-          "name": "DialogOverlay"
-        },
-        {
-          "name": "DialogPortal"
-        },
-        {
-          "name": "DialogTitle"
-        },
-        {
-          "name": "DialogTrigger"
-        }
-      ]
+      "source": "library"
+    },
+    {
+      "name": "DialogClose",
+      "category": "component",
+      "file": "src/components/ui/dialog.tsx",
+      "level": "molecule",
+      "source": "library",
+      "control": true
+    },
+    {
+      "name": "DialogContent",
+      "category": "component",
+      "file": "src/components/ui/dialog.tsx",
+      "level": "molecule",
+      "source": "library",
+      "parts": ["DialogOverlay", "DialogPortal"],
+      "props": ["showCloseButton"]
+    },
+    {
+      "name": "DialogDescription",
+      "category": "component",
+      "file": "src/components/ui/dialog.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "DialogFooter",
+      "category": "component",
+      "file": "src/components/ui/dialog.tsx",
+      "level": "molecule",
+      "source": "library",
+      "props": ["showCloseButton"]
+    },
+    {
+      "name": "DialogHeader",
+      "category": "component",
+      "file": "src/components/ui/dialog.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "DialogOverlay",
+      "category": "component",
+      "file": "src/components/ui/dialog.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "DialogPortal",
+      "category": "component",
+      "file": "src/components/ui/dialog.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "DialogTitle",
+      "category": "component",
+      "file": "src/components/ui/dialog.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "DialogTrigger",
+      "category": "component",
+      "file": "src/components/ui/dialog.tsx",
+      "level": "molecule",
+      "source": "library",
+      "control": true
     },
     {
       "name": "DropdownMenu",
+      "category": "component",
       "file": "src/components/ui/dropdown-menu.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "DropdownMenu"
-        },
-        {
-          "name": "DropdownMenuCheckboxItem",
-          "props": [
-            "checked",
-            "inset"
-          ]
-        },
-        {
-          "name": "DropdownMenuContent",
-          "props": [
-            "align",
-            "alignOffset",
-            "side",
-            "sideOffset"
-          ]
-        },
-        {
-          "name": "DropdownMenuGroup"
-        },
-        {
-          "name": "DropdownMenuItem",
-          "props": [
-            "inset",
-            "variant"
-          ]
-        },
-        {
-          "name": "DropdownMenuLabel",
-          "props": [
-            "inset"
-          ]
-        },
-        {
-          "name": "DropdownMenuPortal"
-        },
-        {
-          "name": "DropdownMenuRadioGroup"
-        },
-        {
-          "name": "DropdownMenuRadioItem",
-          "props": [
-            "inset"
-          ]
-        },
-        {
-          "name": "DropdownMenuSeparator"
-        },
-        {
-          "name": "DropdownMenuShortcut"
-        },
-        {
-          "name": "DropdownMenuSub"
-        },
-        {
-          "name": "DropdownMenuSubContent",
-          "props": [
-            "align",
-            "alignOffset",
-            "side",
-            "sideOffset"
-          ]
-        },
-        {
-          "name": "DropdownMenuSubTrigger",
-          "props": [
-            "inset"
-          ]
-        },
-        {
-          "name": "DropdownMenuTrigger"
-        }
-      ]
+      "source": "library"
+    },
+    {
+      "name": "DropdownMenuPortal",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "DropdownMenuTrigger",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library",
+      "control": true
+    },
+    {
+      "name": "DropdownMenuContent",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["align", "alignOffset", "side", "sideOffset"]
+    },
+    {
+      "name": "DropdownMenuGroup",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "DropdownMenuLabel",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["inset"]
+    },
+    {
+      "name": "DropdownMenuItem",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["inset", "variant"],
+      "control": true,
+      "variants": ["variant=default", "variant=destructive"],
+      "defaults": {
+        "variant": "default"
+      }
+    },
+    {
+      "name": "DropdownMenuCheckboxItem",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["checked", "inset"],
+      "control": true
+    },
+    {
+      "name": "DropdownMenuRadioGroup",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "DropdownMenuRadioItem",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["inset"],
+      "control": true
+    },
+    {
+      "name": "DropdownMenuSeparator",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "DropdownMenuShortcut",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "DropdownMenuSub",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "DropdownMenuSubTrigger",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["inset"]
+    },
+    {
+      "name": "DropdownMenuSubContent",
+      "category": "component",
+      "file": "src/components/ui/dropdown-menu.tsx",
+      "level": "atom",
+      "source": "library",
+      "parts": ["DropdownMenuContent"],
+      "props": ["align", "alignOffset", "side", "sideOffset"]
     },
     {
       "name": "Empty",
+      "category": "component",
       "file": "src/components/ui/empty.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Empty"
-        },
-        {
-          "name": "EmptyContent"
-        },
-        {
-          "name": "EmptyDescription"
-        },
-        {
-          "name": "EmptyHeader"
-        },
-        {
-          "name": "EmptyMedia",
-          "variants": {
-            "variant": [
-              "default",
-              "icon"
-            ]
-          },
-          "defaults": {
-            "variant": "default"
-          }
-        },
-        {
-          "name": "EmptyTitle"
-        }
-      ]
+      "source": "library"
+    },
+    {
+      "name": "EmptyHeader",
+      "category": "component",
+      "file": "src/components/ui/empty.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "EmptyTitle",
+      "category": "component",
+      "file": "src/components/ui/empty.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "EmptyDescription",
+      "category": "component",
+      "file": "src/components/ui/empty.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "EmptyContent",
+      "category": "component",
+      "file": "src/components/ui/empty.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "EmptyMedia",
+      "category": "component",
+      "file": "src/components/ui/empty.tsx",
+      "level": "atom",
+      "source": "library",
+      "variants": ["variant=default", "variant=icon"],
+      "defaults": {
+        "variant": "default"
+      }
     },
     {
       "name": "Field",
+      "category": "component",
       "file": "src/components/ui/field.tsx",
       "level": "molecule",
-      "parts": [
-        {
-          "name": "Field",
-          "variants": {
-            "orientation": [
-              "vertical",
-              "horizontal",
-              "responsive"
-            ]
-          },
-          "defaults": {
-            "orientation": "vertical"
-          }
-        },
-        {
-          "name": "FieldContent"
-        },
-        {
-          "name": "FieldDescription"
-        },
-        {
-          "name": "FieldError",
-          "props": [
-            "errors"
-          ]
-        },
-        {
-          "name": "FieldGroup"
-        },
-        {
-          "name": "FieldLabel"
-        },
-        {
-          "name": "FieldLegend",
-          "props": [
-            "variant"
-          ]
-        },
-        {
-          "name": "FieldSeparator"
-        },
-        {
-          "name": "FieldSet"
-        },
-        {
-          "name": "FieldTitle"
-        }
-      ]
+      "source": "library",
+      "variants": ["orientation=vertical", "orientation=horizontal", "orientation=responsive"],
+      "defaults": {
+        "orientation": "vertical"
+      }
+    },
+    {
+      "name": "FieldLabel",
+      "category": "component",
+      "file": "src/components/ui/field.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "FieldDescription",
+      "category": "component",
+      "file": "src/components/ui/field.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "FieldError",
+      "category": "component",
+      "file": "src/components/ui/field.tsx",
+      "level": "molecule",
+      "source": "library",
+      "props": ["errors"]
+    },
+    {
+      "name": "FieldGroup",
+      "category": "component",
+      "file": "src/components/ui/field.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "FieldLegend",
+      "category": "component",
+      "file": "src/components/ui/field.tsx",
+      "level": "molecule",
+      "source": "library",
+      "props": ["variant"],
+      "variants": ["variant=legend", "variant=label"],
+      "defaults": {
+        "variant": "legend"
+      }
+    },
+    {
+      "name": "FieldSeparator",
+      "category": "component",
+      "file": "src/components/ui/field.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "FieldSet",
+      "category": "component",
+      "file": "src/components/ui/field.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "FieldContent",
+      "category": "component",
+      "file": "src/components/ui/field.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "FieldTitle",
+      "category": "component",
+      "file": "src/components/ui/field.tsx",
+      "level": "molecule",
+      "source": "library"
     },
     {
       "name": "InputGroup",
+      "category": "component",
       "file": "src/components/ui/input-group.tsx",
       "level": "molecule",
-      "parts": [
-        {
-          "name": "InputGroup"
-        },
-        {
-          "name": "InputGroupAddon",
-          "variants": {
-            "align": [
-              "inline-start",
-              "inline-end",
-              "block-start",
-              "block-end"
-            ]
-          },
-          "defaults": {
-            "align": "inline-start"
-          }
-        },
-        {
-          "name": "InputGroupButton",
-          "props": [
-            "type",
-            "variant"
-          ],
-          "variants": {
-            "size": [
-              "xs",
-              "sm",
-              "icon-xs",
-              "icon-sm"
-            ]
-          },
-          "defaults": {
-            "size": "xs"
-          }
-        },
-        {
-          "name": "InputGroupInput"
-        },
-        {
-          "name": "InputGroupText"
-        },
-        {
-          "name": "InputGroupTextarea"
-        }
-      ]
+      "source": "library"
+    },
+    {
+      "name": "InputGroupAddon",
+      "category": "component",
+      "file": "src/components/ui/input-group.tsx",
+      "level": "molecule",
+      "source": "library",
+      "variants": [
+        "align=inline-start",
+        "align=inline-end",
+        "align=block-start",
+        "align=block-end"
+      ],
+      "defaults": {
+        "align": "inline-start"
+      }
+    },
+    {
+      "name": "InputGroupButton",
+      "category": "component",
+      "file": "src/components/ui/input-group.tsx",
+      "level": "molecule",
+      "source": "library",
+      "props": ["type", "variant"],
+      "control": true,
+      "min_height": "24px",
+      "variants": [
+        "size=xs",
+        "size=sm",
+        "size=icon-xs",
+        "size=icon-sm",
+        "type=button",
+        "type=submit",
+        "type=reset"
+      ],
+      "defaults": {
+        "size": "xs",
+        "type": "button"
+      }
+    },
+    {
+      "name": "InputGroupText",
+      "category": "component",
+      "file": "src/components/ui/input-group.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "InputGroupInput",
+      "category": "component",
+      "file": "src/components/ui/input-group.tsx",
+      "level": "molecule",
+      "source": "library",
+      "control": true
+    },
+    {
+      "name": "InputGroupTextarea",
+      "category": "component",
+      "file": "src/components/ui/input-group.tsx",
+      "level": "molecule",
+      "source": "library",
+      "control": true
     },
     {
       "name": "Input",
+      "category": "component",
       "file": "src/components/ui/input.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Input",
-          "props": [
-            "type"
-          ]
-        }
-      ]
+      "source": "library",
+      "props": ["type"],
+      "control": true,
+      "min_height": "32px"
     },
     {
       "name": "Label",
+      "category": "component",
       "file": "src/components/ui/label.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Label"
-        }
-      ]
+      "source": "library"
     },
     {
       "name": "Popover",
+      "category": "component",
       "file": "src/components/ui/popover.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Popover"
-        },
-        {
-          "name": "PopoverContent",
-          "props": [
-            "align",
-            "alignOffset",
-            "side",
-            "sideOffset"
-          ]
-        },
-        {
-          "name": "PopoverDescription"
-        },
-        {
-          "name": "PopoverHeader"
-        },
-        {
-          "name": "PopoverTitle"
-        },
-        {
-          "name": "PopoverTrigger"
-        }
-      ]
+      "source": "library"
+    },
+    {
+      "name": "PopoverContent",
+      "category": "component",
+      "file": "src/components/ui/popover.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["align", "alignOffset", "side", "sideOffset"]
+    },
+    {
+      "name": "PopoverDescription",
+      "category": "component",
+      "file": "src/components/ui/popover.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "PopoverHeader",
+      "category": "component",
+      "file": "src/components/ui/popover.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "PopoverTitle",
+      "category": "component",
+      "file": "src/components/ui/popover.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "PopoverTrigger",
+      "category": "component",
+      "file": "src/components/ui/popover.tsx",
+      "level": "atom",
+      "source": "library",
+      "control": true
     },
     {
       "name": "Progress",
+      "category": "component",
       "file": "src/components/ui/progress.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Progress",
-          "props": [
-            "value"
-          ]
-        },
-        {
-          "name": "ProgressIndicator"
-        },
-        {
-          "name": "ProgressLabel"
-        },
-        {
-          "name": "ProgressTrack"
-        },
-        {
-          "name": "ProgressValue"
-        }
-      ]
+      "source": "library",
+      "parts": ["ProgressTrack", "ProgressIndicator"],
+      "props": ["value"]
+    },
+    {
+      "name": "ProgressTrack",
+      "category": "component",
+      "file": "src/components/ui/progress.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "ProgressIndicator",
+      "category": "component",
+      "file": "src/components/ui/progress.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "ProgressLabel",
+      "category": "component",
+      "file": "src/components/ui/progress.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "ProgressValue",
+      "category": "component",
+      "file": "src/components/ui/progress.tsx",
+      "level": "atom",
+      "source": "library"
     },
     {
       "name": "ResizableHandle",
+      "category": "component",
       "file": "src/components/ui/resizable.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "ResizableHandle",
-          "props": [
-            "withHandle"
-          ]
-        },
-        {
-          "name": "ResizablePanel"
-        },
-        {
-          "name": "ResizablePanelGroup"
-        }
-      ]
+      "source": "library",
+      "props": ["withHandle"]
+    },
+    {
+      "name": "ResizablePanel",
+      "category": "component",
+      "file": "src/components/ui/resizable.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "ResizablePanelGroup",
+      "category": "component",
+      "file": "src/components/ui/resizable.tsx",
+      "level": "atom",
+      "source": "library"
     },
     {
       "name": "ScrollArea",
+      "category": "component",
       "file": "src/components/ui/scroll-area.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "ScrollArea"
-        },
-        {
-          "name": "ScrollBar",
-          "props": [
-            "orientation"
-          ]
-        }
-      ]
+      "source": "library",
+      "parts": ["ScrollBar"]
+    },
+    {
+      "name": "ScrollBar",
+      "category": "component",
+      "file": "src/components/ui/scroll-area.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["orientation"]
     },
     {
       "name": "Select",
+      "category": "component",
       "file": "src/components/ui/select.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Select"
-        },
-        {
-          "name": "SelectContent",
-          "props": [
-            "side",
-            "sideOffset",
-            "align",
-            "alignOffset",
-            "alignItemWithTrigger"
-          ]
-        },
-        {
-          "name": "SelectGroup"
-        },
-        {
-          "name": "SelectItem"
-        },
-        {
-          "name": "SelectLabel"
-        },
-        {
-          "name": "SelectScrollDownButton"
-        },
-        {
-          "name": "SelectScrollUpButton"
-        },
-        {
-          "name": "SelectSeparator"
-        },
-        {
-          "name": "SelectTrigger",
-          "props": [
-            "size"
-          ]
-        },
-        {
-          "name": "SelectValue"
-        }
-      ]
+      "source": "library"
+    },
+    {
+      "name": "SelectContent",
+      "category": "component",
+      "file": "src/components/ui/select.tsx",
+      "level": "atom",
+      "source": "library",
+      "parts": ["SelectScrollDownButton", "SelectScrollUpButton"],
+      "props": ["side", "sideOffset", "align", "alignOffset", "alignItemWithTrigger"]
+    },
+    {
+      "name": "SelectGroup",
+      "category": "component",
+      "file": "src/components/ui/select.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "SelectItem",
+      "category": "component",
+      "file": "src/components/ui/select.tsx",
+      "level": "atom",
+      "source": "library",
+      "control": true
+    },
+    {
+      "name": "SelectLabel",
+      "category": "component",
+      "file": "src/components/ui/select.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "SelectScrollDownButton",
+      "category": "component",
+      "file": "src/components/ui/select.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "SelectScrollUpButton",
+      "category": "component",
+      "file": "src/components/ui/select.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "SelectSeparator",
+      "category": "component",
+      "file": "src/components/ui/select.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "SelectTrigger",
+      "category": "component",
+      "file": "src/components/ui/select.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["size"],
+      "control": true,
+      "min_height": "28px",
+      "variants": ["size=sm", "size=default"],
+      "defaults": {
+        "size": "default"
+      }
+    },
+    {
+      "name": "SelectValue",
+      "category": "component",
+      "file": "src/components/ui/select.tsx",
+      "level": "atom",
+      "source": "library"
     },
     {
       "name": "Separator",
+      "category": "component",
       "file": "src/components/ui/separator.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Separator",
-          "props": [
-            "orientation"
-          ]
-        }
-      ]
+      "source": "library",
+      "props": ["orientation"]
     },
     {
       "name": "Sheet",
+      "category": "component",
       "file": "src/components/ui/sheet.tsx",
       "level": "molecule",
-      "parts": [
-        {
-          "name": "Sheet"
-        },
-        {
-          "name": "SheetClose"
-        },
-        {
-          "name": "SheetContent",
-          "props": [
-            "side",
-            "showCloseButton"
-          ]
-        },
-        {
-          "name": "SheetDescription"
-        },
-        {
-          "name": "SheetFooter"
-        },
-        {
-          "name": "SheetHeader"
-        },
-        {
-          "name": "SheetTitle"
-        },
-        {
-          "name": "SheetTrigger"
-        }
-      ]
+      "source": "library"
+    },
+    {
+      "name": "SheetTrigger",
+      "category": "component",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "source": "library",
+      "control": true
+    },
+    {
+      "name": "SheetClose",
+      "category": "component",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "source": "library",
+      "control": true
+    },
+    {
+      "name": "SheetContent",
+      "category": "component",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "source": "library",
+      "props": ["side", "showCloseButton"],
+      "variants": ["side=top", "side=right", "side=bottom", "side=left"],
+      "defaults": {
+        "side": "right"
+      }
+    },
+    {
+      "name": "SheetHeader",
+      "category": "component",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "SheetFooter",
+      "category": "component",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "SheetTitle",
+      "category": "component",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "SheetDescription",
+      "category": "component",
+      "file": "src/components/ui/sheet.tsx",
+      "level": "molecule",
+      "source": "library"
     },
     {
       "name": "Sidebar",
+      "category": "component",
       "file": "src/components/ui/sidebar.tsx",
       "level": "organism",
-      "parts": [
-        {
-          "name": "Sidebar",
-          "props": [
-            "side",
-            "variant",
-            "collapsible",
-            "dir"
-          ]
-        },
-        {
-          "name": "SidebarContent"
-        },
-        {
-          "name": "SidebarFooter"
-        },
-        {
-          "name": "SidebarGroup"
-        },
-        {
-          "name": "SidebarGroupAction",
-          "props": [
-            "render"
-          ]
-        },
-        {
-          "name": "SidebarGroupContent"
-        },
-        {
-          "name": "SidebarGroupLabel",
-          "props": [
-            "render"
-          ]
-        },
-        {
-          "name": "SidebarHeader"
-        },
-        {
-          "name": "SidebarInput"
-        },
-        {
-          "name": "SidebarInset"
-        },
-        {
-          "name": "SidebarMenu"
-        },
-        {
-          "name": "SidebarMenuAction",
-          "props": [
-            "render",
-            "showOnHover"
-          ]
-        },
-        {
-          "name": "SidebarMenuBadge"
-        },
-        {
-          "name": "SidebarMenuButton",
-          "props": [
-            "render",
-            "isActive",
-            "tooltip"
-          ],
-          "variants": {
-            "variant": [
-              "default",
-              "outline"
-            ],
-            "size": [
-              "default",
-              "sm",
-              "lg"
-            ]
-          },
-          "defaults": {
-            "variant": "default",
-            "size": "default"
-          }
-        },
-        {
-          "name": "SidebarMenuItem"
-        },
-        {
-          "name": "SidebarMenuSkeleton",
-          "props": [
-            "showIcon"
-          ]
-        },
-        {
-          "name": "SidebarMenuSub"
-        },
-        {
-          "name": "SidebarMenuSubButton",
-          "props": [
-            "render",
-            "size",
-            "isActive"
-          ]
-        },
-        {
-          "name": "SidebarMenuSubItem"
-        },
-        {
-          "name": "SidebarProvider",
-          "props": [
-            "defaultOpen",
-            "open",
-            "onOpenChange",
-            "style"
-          ]
-        },
-        {
-          "name": "SidebarRail"
-        },
-        {
-          "name": "SidebarSeparator"
-        },
-        {
-          "name": "SidebarTrigger",
-          "props": [
-            "onClick"
-          ]
-        }
-      ]
+      "source": "library",
+      "props": ["side", "variant", "collapsible", "dir"],
+      "variants": [
+        "side=left",
+        "side=right",
+        "variant=sidebar",
+        "variant=floating",
+        "variant=inset",
+        "collapsible=offcanvas",
+        "collapsible=icon",
+        "collapsible=none"
+      ],
+      "defaults": {
+        "side": "left",
+        "variant": "sidebar",
+        "collapsible": "offcanvas"
+      }
+    },
+    {
+      "name": "SidebarContent",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "SidebarFooter",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "SidebarGroup",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "SidebarGroupAction",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["render"]
+    },
+    {
+      "name": "SidebarGroupContent",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "SidebarGroupLabel",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["render"]
+    },
+    {
+      "name": "SidebarHeader",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "SidebarInput",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library",
+      "control": true,
+      "min_height": "32px"
+    },
+    {
+      "name": "SidebarInset",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "SidebarMenu",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "SidebarMenuAction",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["render", "showOnHover"]
+    },
+    {
+      "name": "SidebarMenuBadge",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "SidebarMenuButton",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["render", "isActive", "tooltip"],
+      "variants": ["variant=default", "variant=outline", "size=default", "size=sm", "size=lg"],
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "SidebarMenuItem",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "SidebarMenuSkeleton",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["showIcon"]
+    },
+    {
+      "name": "SidebarMenuSub",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "SidebarMenuSubButton",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["render", "size", "isActive"],
+      "variants": ["size=sm", "size=md"],
+      "defaults": {
+        "size": "md"
+      }
+    },
+    {
+      "name": "SidebarMenuSubItem",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "SidebarProvider",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["defaultOpen", "open", "onOpenChange", "style"]
+    },
+    {
+      "name": "SidebarRail",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library",
+      "control": true
+    },
+    {
+      "name": "SidebarSeparator",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library"
+    },
+    {
+      "name": "SidebarTrigger",
+      "category": "component",
+      "file": "src/components/ui/sidebar.tsx",
+      "level": "organism",
+      "source": "library",
+      "props": ["onClick"],
+      "control": true
     },
     {
       "name": "Skeleton",
+      "category": "component",
       "file": "src/components/ui/skeleton.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Skeleton"
-        }
-      ]
+      "source": "library"
     },
     {
       "name": "Toaster",
+      "category": "component",
       "file": "src/components/ui/sonner.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Toaster"
-        }
-      ]
+      "source": "library"
     },
     {
       "name": "Spinner",
+      "category": "component",
       "file": "src/components/ui/spinner.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Spinner"
-        }
-      ]
+      "source": "library"
     },
     {
       "name": "Textarea",
+      "category": "component",
       "file": "src/components/ui/textarea.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Textarea"
-        }
-      ]
+      "source": "library",
+      "control": true,
+      "min_height": "64px"
     },
     {
       "name": "Tooltip",
+      "category": "component",
       "file": "src/components/ui/tooltip.tsx",
       "level": "atom",
-      "parts": [
-        {
-          "name": "Tooltip"
-        },
-        {
-          "name": "TooltipContent",
-          "props": [
-            "side",
-            "sideOffset",
-            "align",
-            "alignOffset"
-          ]
-        },
-        {
-          "name": "TooltipProvider",
-          "props": [
-            "delay"
-          ]
-        },
-        {
-          "name": "TooltipTrigger"
-        }
-      ]
+      "source": "library"
+    },
+    {
+      "name": "TooltipTrigger",
+      "category": "component",
+      "file": "src/components/ui/tooltip.tsx",
+      "level": "atom",
+      "source": "library",
+      "control": true
+    },
+    {
+      "name": "TooltipContent",
+      "category": "component",
+      "file": "src/components/ui/tooltip.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["side", "sideOffset", "align", "alignOffset"]
+    },
+    {
+      "name": "TooltipProvider",
+      "category": "component",
+      "file": "src/components/ui/tooltip.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["delay"]
     }
   ]
 }

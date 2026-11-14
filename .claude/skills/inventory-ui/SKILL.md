@@ -7,7 +7,7 @@ description: Project UI standard. Use for any UI work in src/app, src/components
 
 Read only what the task needs, in this order:
 
-1. `design/component-registry.json`: what exists, its level, and each part's props, variants and defaults. Do not read component source to find this out.
+1. `design/component-registry.json`: every exported component, its file, its level, whether it comes from a library or is our own, and its props, variants and defaults. Do not read component source to find this out.
 2. The reference screen of the screen type, declared in `design/patterns/`.
 3. `design/behaviors.md` and `design/states.md`: closed answers. Do not choose row height, alignment, column width or formats.
 4. `design/language.md` and `ontology/labels.yaml`: words.

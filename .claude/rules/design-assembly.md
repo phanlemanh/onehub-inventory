@@ -21,4 +21,5 @@ it.
 ## After a change
 
 - A value in the stylesheet changed: run `make design-tokens`.
+- A component or one of its variants changed: run `make design-components`. Look a component and its variants up in `design/component-registry.json` before reading its source.
 - Never edit by hand the files those commands write, `design/theme.json`, `tools/design-assembly/` or `mk/design-assembly.mk`.

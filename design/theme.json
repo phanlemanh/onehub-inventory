@@ -160,6 +160,28 @@
         "rule": "shadcn/no-inline-styles",
         "at": "src/app/(app)/account-menu.tsx"
       }
+    ],
+    "component-manifest": [
+      {
+        "kind": "components",
+        "file": "design/component-registry.json",
+        "folder": "src/components/ui",
+        "libraries": ["src/components/reui"],
+        "own": "src/components",
+        "pages": "design/patterns"
+      }
+    ],
+    "ledger-shapes": [
+      {
+        "kind": "shapes",
+        "ledgers": {
+          "decisions": "design/decisions.yaml",
+          "tokens": "design/tokens.json",
+          "components": "design/component-registry.json",
+          "screens": "design/screens.yaml"
+        },
+        "pages": "design/patterns"
+      }
     ]
   }
 }

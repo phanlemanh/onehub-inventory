@@ -18,6 +18,16 @@ export const adapter = {
   variantSet: /\bconst\s+(\w+)\s*=\s*cva\(/g,
   // The toast component the library installs, from the package it wraps.
   toast: { package: "sonner", template: "sonner.tsx.template", file: "sonner.tsx" },
+  // The folders other registries install into: each registry the settings name, by its name, in
+  // the folder of the components alias.
+  registryFoldersIn: (settings) => {
+    const alias = settings?.aliases?.components;
+    if (typeof alias !== "string" || !alias.startsWith("@/")) return [];
+    return Object.keys(settings?.registries ?? {})
+      .map((name) => name.replace(/^@/, ""))
+      .filter((name) => /^[\w-]+$/.test(name))
+      .map((name) => `src/${alias.slice(2)}/${name}`);
+  },
   // How a screen imports a component of the library, from the alias the settings name.
   importPathIn: (settings) => settings?.aliases?.ui ?? "@/components/ui",
   // The component a probe restyles, when the library has it.

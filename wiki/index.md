@@ -65,6 +65,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0028 Thêm gói cmdk cho ô ⌘K](decisions/0028-them-goi-cmdk-cho-o-k.md)
 - [0030 Sổ màn là một chỗ khai quyền vào màn và nút của mỗi màn](decisions/0030-so-man-khai-cua-vao-va-nut.md)
 - [0031 Thêm gói khung chia kéo được cho hồ sơ ghim](decisions/0031-them-goi-khung-chia-keo-duoc.md)
+- [0032 Sổ linh kiện do công cụ design-assembly ghi, theo hình dạng của hợp đồng](decisions/0032-so-linh-kien-do-design-assembly-ghi.md)
 
 ## Incidents
 
