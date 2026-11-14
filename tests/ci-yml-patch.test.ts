@@ -103,7 +103,7 @@ describe("ban va workflow (AC-9)", () => {
 
   it("job moi: tran, dich vu postgres:16, mat khau, cong, cac buoc", () => {
     const block = job(after, "e2e-db");
-    expect(block).toMatch(/^ {4}timeout-minutes: 30$/m);
+    expect(block).toMatch(/^ {4}timeout-minutes: 40$/m);
     expect(block).toMatch(/^ {8}image: postgres:16$/m);
     expect(block).toMatch(/^ {10}POSTGRES_PASSWORD: local-only$/m);
     expect(block).toMatch(/^ {10}- 5432:5432$/m);
@@ -135,7 +135,7 @@ describe("ci-thu doc chinh ban va (AC-9, AC-5)", () => {
         "mat khau: local-only",
         "cong trong container: 5432",
         "lenh: make ci-db",
-        "tran 30 phut",
+        "tran 40 phut",
         "",
       ].join("\n"),
     );
@@ -154,7 +154,7 @@ describe("ci-thu doc chinh ban va (AC-9, AC-5)", () => {
     const copy = join(dir, "ban-va-tran-3.patch");
     writeFileSync(
       copy,
-      readFileSync(PATCH, "utf8").replace("timeout-minutes: 30", "timeout-minutes: 3"),
+      readFileSync(PATCH, "utf8").replace("timeout-minutes: 40", "timeout-minutes: 3"),
     );
     const red = spawnSync("bash", [CI_THU, "--kiem-tran", "2.5", copy], { encoding: "utf8" });
     expect(red.status).toBe(1);
