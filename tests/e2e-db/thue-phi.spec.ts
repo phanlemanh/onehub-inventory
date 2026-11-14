@@ -9,7 +9,8 @@
 //   bon-kho                   — the part and the inventory's Về tay column at the four widths of the grid family.
 //   axe-sang-toi              — the part and the inventory, light and dark, no axe violation.
 // With THUE_PHI_ANH=1 the proof images go to _acceptance/thue-phi/evidence/ (the part, the members screen beside it,
-// the inventory), at the four widths, light and dark.
+// the inventory), at the four widths, light and dark; and the case anh-ui-check saves the frames the six ui-check
+// evals of the grading round look at (E2, E3, E4, E6, E9, E10-*.png), at 360, 1024 and 1440.
 import { existsSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -106,7 +107,10 @@ async function setSchedule(page: Page, brokerage: string, registrationOn: boolea
   await row(page, "brokerage").getByRole("textbox").fill(brokerage);
   const sw = row(page, "registration").getByRole("switch");
   if ((await sw.getAttribute("aria-checked")) !== String(registrationOn)) await sw.click();
-  await page.locator('[data-slot="fee-save"]').click();
+  // Already at this schedule (another width set it first): nothing to save.
+  const save = page.locator('[data-slot="fee-save"]');
+  if (await save.isDisabled()) return;
+  await save.click();
   await expect(page.getByText(FEE_COPY.saved).first()).toBeVisible();
 }
 
@@ -229,5 +233,96 @@ test.describe("thue phi", () => {
     await agent.goto("/inventory");
     await expect(agent.locator('[hidden][id^="S:"]')).toHaveCount(0);
     await axeClean(agent, "inventory");
+  });
+
+  test("anh-ui-check", async ({ browser }, info) => {
+    test.skip(process.env["THUE_PHI_ANH"] !== "1", "frames only on demand");
+    const size = info.project.name;
+    test.skip(
+      !["360", "1024", "1440"].includes(size),
+      "the ui-check frames use 360, 1024 and 1440",
+    );
+    const dir = join(process.cwd(), "_acceptance/thue-phi/evidence");
+    mkdirSync(dir, { recursive: true });
+    const frame = async (page: Page, name: string, both = false) => {
+      for (const scheme of both ? (["light", "dark"] as const) : (["light"] as const)) {
+        await page.emulateMedia({ colorScheme: scheme });
+        await page.waitForTimeout(250);
+        const suffix = both ? (scheme === "light" ? "-sang" : "-toi") : "";
+        await page.screenshot({ path: join(dir, `${name}${suffix}.png`) });
+      }
+      await page.emulateMedia({ colorScheme: "light" });
+    };
+    const admin = await as(browser, "a-CompanyAdmin", info);
+
+    // E9: the part beside the members screen, same width.
+    if (size === "360" || size === "1440") {
+      await openPart(admin);
+      await frame(admin, `E9-thue-phi-${size}`);
+      const members = await as(browser, "a-CompanyAdmin", info);
+      await members.goto("/members");
+      await expect(members.locator('[data-state="ready"]')).toBeVisible();
+      await frame(members, `E9-thanh-vien-${size}`);
+    }
+    if (size === "360") return;
+
+    // E2: brokerage 1,5, both law items on.
+    await setSchedule(admin, "1,5", true);
+    await frame(admin, `E2-${size}`, true);
+
+    // E6: brokerage 2, registration fee off, as the ListAgent; then the fee inclusion column turned on.
+    await setSchedule(admin, "2", false);
+    const agent = await as(browser, "a-ListAgent", info);
+    await netCell(agent);
+    await frame(agent, `E6-${size}`, true);
+    if (size !== "1440") return;
+    await agent
+      .locator('[data-slot="data-region"]')
+      .first()
+      .getByRole("button", { name: "Cột", exact: true })
+      .click();
+    await agent.getByRole("menuitemcheckbox", { name: label("FeeInclusion") }).click();
+    await agent.keyboard.press("Escape");
+    await agent.locator('th[data-col-id="Listing.feeInclusion"]').scrollIntoViewIfNeeded();
+    await frame(agent, "E6-dieu-kien");
+
+    // E4: TeamLead reads only.
+    const lead = await as(browser, "a-TeamLead", info);
+    await openPart(lead);
+    await frame(lead, "E4", true);
+
+    // E3: company B's admin, on the default schedule.
+    const b = await as(browser, "b-CompanyAdmin", info);
+    await openPart(b);
+    await row(b, "brokerage").getByRole("textbox").fill("6");
+    await frame(b, "E3-sai");
+    await row(b, "brokerage").getByRole("textbox").fill("1,5");
+    await row(b, "registration").getByRole("switch").click();
+    await b.locator('[data-slot="fee-save"]').click();
+    await expect(b.getByText(FEE_COPY.saved).first()).toBeVisible();
+    await frame(b, "E3-luu");
+    await openPart(b);
+    await frame(b, "E3-tai-lai");
+
+    // E10: add an own item, save, its «…», and the law rows without one.
+    await openPart(admin);
+    await admin.locator('[data-slot="fee-add"]').click();
+    const added = admin.getByRole("listitem").last();
+    await added.getByRole("textbox").first().fill("Phí dịch vụ hồ sơ");
+    await added.getByRole("textbox").nth(1).fill("0,3");
+    await frame(admin, "E10-them");
+    await admin.locator('[data-slot="fee-save"]').click();
+    await expect(admin.getByText(FEE_COPY.saved).first()).toBeVisible();
+    await frame(admin, "E10-luu");
+    await admin.getByRole("listitem").last().locator('[data-slot="fee-more"]').click();
+    await expect(admin.getByRole("menu")).toBeVisible();
+    await frame(admin, "E10-menu");
+    await admin.keyboard.press("Escape");
+    // A changed default item's «…» also offers the reset.
+    await row(admin, "brokerage").locator('[data-slot="fee-more"]').click();
+    await expect(admin.getByRole("menu")).toBeVisible();
+    await frame(admin, "E10-menu-moi-gioi");
+    await admin.keyboard.press("Escape");
+    await frame(admin, "E10-luat");
   });
 });

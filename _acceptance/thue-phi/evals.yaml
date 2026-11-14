@@ -47,8 +47,8 @@ evals:
     target: http://127.0.0.1:3485/tuy-chinh-san?phan=thue-phi
     paths: [src/modules/company-config/ui/**, src/app/(app)/tuy-chinh-san/**]
     steps:
-      - "With the lane N dev server on port 3485 and lane N Postgres, sign in as the sample CompanyAdmin of the sample company whose brokerage is set to 1,5, open the target at 1440 and 1024 wide, light and dark"
-      - "Save one frame per size and mode as _acceptance/thue-phi/evidence/E2-<khổ>-<sang|toi>.png"
+      - "From the repo root, with lane N Postgres up (DB_PORT 5563), run: THUE_PHI_ANH=1 DB_LANE=n DB_PORT=5563 npx playwright test -c playwright.db.config.ts tests/e2e-db/thue-phi.spec.ts --project 360 --project 1024 --project 1440 — it makes its own sample companies, signs each role in through the shared sign-in door (dang-nhap-vai.ts), and its case anh-ui-check saves the frames below in _acceptance/thue-phi/evidence/"
+      - "Open E2-1440-sang.png, E2-1440-toi.png, E2-1024-sang.png and E2-1024-toi.png (company A admin, brokerage 1,5, both law items on)"
     question: "Phần Thuế phí có đúng ba dòng theo thứ tự Thuế thu nhập cá nhân, Lệ phí trước bạ, Phí môi giới; mỗi dòng một công tắc bật; hai dòng đầu ghi «theo luật» và không có ô sửa; dòng Phí môi giới hiện 1,5% và «Đã đổi · [Tên] · ngày», hai dòng kia «Mặc định»; phần nằm đúng chỗ ở cột thứ hai của App Shell trong màn Tuỳ chỉnh của sàn? Nêu khổ và chế độ màu nào lệch."
     expected: "Mọi khung khớp; chữ đọc được ở cả sáng và tối"
     evidence_required: [run_id, screenshot, observed, verdict]
@@ -77,8 +77,8 @@ evals:
     target: http://127.0.0.1:3485/tuy-chinh-san?phan=thue-phi
     paths: [src/modules/company-config/ui/**]
     steps:
-      - "With the lane N dev server on port 3485, sign in as the sample CompanyAdmin of a company on the default schedule, open the target at 1440 light"
-      - "Type «6» in Phí môi giới, save _acceptance/thue-phi/evidence/E3-sai.png; set it to «1,5», turn off Lệ phí trước bạ, press Lưu, save _acceptance/thue-phi/evidence/E3-luu.png; reload, save _acceptance/thue-phi/evidence/E3-tai-lai.png"
+      - "From the repo root, with lane N Postgres up (DB_PORT 5563), run: THUE_PHI_ANH=1 DB_LANE=n DB_PORT=5563 npx playwright test -c playwright.db.config.ts tests/e2e-db/thue-phi.spec.ts --project 360 --project 1024 --project 1440 — it makes its own sample companies, signs each role in through the shared sign-in door (dang-nhap-vai.ts), and its case anh-ui-check saves the frames below in _acceptance/thue-phi/evidence/"
+      - "Open E3-sai.png (company B admin on the default schedule typed 6), E3-luu.png (1,5 saved with Lệ phí trước bạ off) and E3-tai-lai.png (the part opened again)"
     question: "Với 6, lý do có nằm ngay dưới ô Phí môi giới và Lưu có khoá không; sau Lưu có thông báo «Đã lưu thuế phí» và dòng Phí môi giới mang «Đã đổi»; sau tải lại có còn 1,5% và Lệ phí trước bạ tắt không?"
     expected: "Ba khung khớp"
     evidence_required: [run_id, screenshot, observed, verdict]
@@ -107,8 +107,8 @@ evals:
     target: http://127.0.0.1:3485/tuy-chinh-san?phan=thue-phi
     paths: [src/modules/company-config/ui/**]
     steps:
-      - "With the lane N dev server on port 3485, sign in as the sample TeamLead, open the target at 1440 light and dark"
-      - "Save _acceptance/thue-phi/evidence/E4-<sang|toi>.png"
+      - "From the repo root, with lane N Postgres up (DB_PORT 5563), run: THUE_PHI_ANH=1 DB_LANE=n DB_PORT=5563 npx playwright test -c playwright.db.config.ts tests/e2e-db/thue-phi.spec.ts --project 360 --project 1024 --project 1440 — it makes its own sample companies, signs each role in through the shared sign-in door (dang-nhap-vai.ts), and its case anh-ui-check saves the frames below in _acceptance/thue-phi/evidence/"
+      - "Open E4-sang.png and E4-toi.png (company A TeamLead on the part)"
     question: "Cột thứ hai của App Shell có mục Thuế phí cạnh các phần của Tuỳ chỉnh của sàn mà vai này vốn đọc được; phần có ba dòng không ô sửa, không nút Lưu, có dòng «Chỉ Quản trị sàn đổi được thuế phí», và công tắc nhìn rõ là không bấm được?"
     expected: "Khung khớp ở cả sáng và tối"
     evidence_required: [run_id, screenshot, observed, verdict]
@@ -145,8 +145,8 @@ evals:
     target: http://127.0.0.1:3485/inventory
     paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**]
     steps:
-      - "With the lane N dev server on port 3485, sign in as the sample ListAgent of a company whose brokerage is 2 with Lệ phí trước bạ off, open the target at 1440 and 1024 wide, light and dark"
-      - "Save _acceptance/thue-phi/evidence/E6-<khổ>-<sang|toi>.png; open the Cột menu, turn on Điều kiện phí, save _acceptance/thue-phi/evidence/E6-dieu-kien.png"
+      - "From the repo root, with lane N Postgres up (DB_PORT 5563), run: THUE_PHI_ANH=1 DB_LANE=n DB_PORT=5563 npx playwright test -c playwright.db.config.ts tests/e2e-db/thue-phi.spec.ts --project 360 --project 1024 --project 1440 — it makes its own sample companies, signs each role in through the shared sign-in door (dang-nhap-vai.ts), and its case anh-ui-check saves the frames below in _acceptance/thue-phi/evidence/"
+      - "Open E6-1440-sang.png, E6-1440-toi.png, E6-1024-sang.png, E6-1024-toi.png (company A ListAgent on the inventory, brokerage 2, Lệ phí trước bạ off; the 3 tỷ fees-included row is 0602 of S1.02) and E6-dieu-kien.png (the Điều kiện phí column turned on from the Cột menu, scrolled to it)"
     question: "Cột «Về tay» có đứng ngay sau «Giá chào», đọc như cột tiền, hàng Bao phí 3 tỷ hiện 2,88 tỷ, hàng Không bao phí bằng Giá chào, hàng thiếu thì trống; khi bật, cột Điều kiện phí có hiện «Bao phí» / «Không bao phí»; ở 1440 cột Về tay có thấy ngay mà không phải cuộn ngang không?"
     expected: "Mọi khung khớp, Về tay thấy ngay ở 1440"
     evidence_required: [run_id, screenshot, observed, verdict]
@@ -220,8 +220,8 @@ evals:
     target: http://127.0.0.1:3485/tuy-chinh-san?phan=thue-phi
     paths: [src/modules/company-config/ui/**, src/components/candidate/framed-list.tsx]
     steps:
-      - "With the lane N dev server on port 3485, sign in as the sample CompanyAdmin, open the target and /members at 1440 and 360 wide, light"
-      - "Save _acceptance/thue-phi/evidence/E9-thue-phi-<khổ>.png and _acceptance/thue-phi/evidence/E9-thanh-vien-<khổ>.png"
+      - "From the repo root, with lane N Postgres up (DB_PORT 5563), run: THUE_PHI_ANH=1 DB_LANE=n DB_PORT=5563 npx playwright test -c playwright.db.config.ts tests/e2e-db/thue-phi.spec.ts --project 360 --project 1024 --project 1440 — it makes its own sample companies, signs each role in through the shared sign-in door (dang-nhap-vai.ts), and its case anh-ui-check saves the frames below in _acceptance/thue-phi/evidence/"
+      - "Open E9-thue-phi-1440.png beside E9-thanh-vien-1440.png, and E9-thue-phi-360.png beside E9-thanh-vien-360.png"
     question: "Đặt ảnh phần Thuế phí cạnh ảnh màn Thành viên cùng khổ: khung, lề trong, bo góc, cỡ chữ tên khung và dòng đếm, cỡ chữ dòng, đường kẻ giữa dòng và chỗ đặt chỗ chỉnh cuối dòng có giống nhau không? Nêu chỗ khác."
     expected: "Hai khung cùng một dáng; khác nhau chỉ ở nội dung khe"
     evidence_required: [run_id, screenshot, observed, verdict]
@@ -250,8 +250,8 @@ evals:
     target: http://127.0.0.1:3485/tuy-chinh-san?phan=thue-phi
     paths: [src/modules/company-config/ui/**]
     steps:
-      - "With the lane N dev server on port 3485, sign in as the sample CompanyAdmin, open the target at 1440 light"
-      - "Press «Thêm khoản», type «Phí dịch vụ hồ sơ» and «0,3», save _acceptance/thue-phi/evidence/E10-them.png, press Lưu, save E10-luu.png; open «…» on that row, save E10-menu.png; open «…» on Thuế thu nhập cá nhân row if any, save E10-luat.png"
+      - "From the repo root, with lane N Postgres up (DB_PORT 5563), run: THUE_PHI_ANH=1 DB_LANE=n DB_PORT=5563 npx playwright test -c playwright.db.config.ts tests/e2e-db/thue-phi.spec.ts --project 360 --project 1024 --project 1440 — it makes its own sample companies, signs each role in through the shared sign-in door (dang-nhap-vai.ts), and its case anh-ui-check saves the frames below in _acceptance/thue-phi/evidence/"
+      - "Open E10-them.png (Thêm khoản pressed, «Phí dịch vụ hồ sơ» and 0,3 typed), E10-luu.png (after Lưu), E10-menu.png («…» of that added item), E10-menu-moi-gioi.png («…» of Phí môi giới, a changed default item) and E10-luat.png (the two law rows)"
     question: "Khoản mới có hiện cuối danh sách với nguồn «Sàn thêm», dòng ví dụ có trừ thêm 0,3%; «…» của khoản riêng có Đổi tên, Bỏ khoản, Trả về mặc định; hai khoản theo luật không có «…»?"
     expected: "Bốn khung khớp"
     evidence_required: [run_id, screenshot, observed, verdict]
