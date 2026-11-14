@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 26ff8676fe336feeb347bd7e20fd76adff550d1c
+verified_commit: af0c23278156d4fd420f9f16c033ed9968f4535e
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -250,3 +250,10 @@ none — every multi-run eval is uniform
 
 Round 1: E13 (kiểm giao diện màn Tuỳ chỉnh của sàn) không đạt — trả về cho bước sửa, commit 26ff867 (cách ly năm bảng, khoá đơn vị khớp, câu từ chối, ảnh điện thoại).
 Round 2: E1, E2, E4, E5, E6, E7, E8, E9, E12, E13, E15, E19 chạy lại và đạt; E3, E10, E11, E14, E16, E17, E18 mang từ round 1; lệnh build và e2e xanh. Verdict PASS.
+
+### Re-pin lần 1 — 2026-11-14, do ghim lại bằng làn eval
+run_id: repin-20261114T150439Z-52008
+sha: af0c23278156d4fd420f9f16c033ed9968f4535e · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E11, E13 · diff chạm vật đo ngoài làn máy: E11, E13 — chưa chứng lại, đi vòng S4 delta
+Chấm lại bằng mắt E11, E13 trên ảnh dựng lại từ af0c232 (2026-11-14, dãy R, theo G-1411-48; ảnh trong `evidence/`): đạt.
+- E11: «Block» đứng ở chỗ Toà; «Hướng view», «Ghi chú» sau «Xác nhận lúc» (inventory-1440-cuoi.png); giá trị mẫu đọc được; ở 360 cột không vỡ; nền tối đủ tương phản.
+- E13: cột thứ hai (ngăn trượt ở 360) liệt kê năm phần; vùng Lưới có «…» cuối dòng, menu mở «Sửa», «Ngừng dùng»; phần trống nói lý do, chỉ đường nhập và có «Tải lại»; vai chỉ đọc không có nút ghi; không chữ đè, không cuộn ngang ngoài vùng Lưới. Khác bản đã ký đúng hai chỗ dáng đã báo chủ kho: tiêu đề lớn «Tuỳ chỉnh của sàn», nút «Tải lại» ở trạng thái trống.
