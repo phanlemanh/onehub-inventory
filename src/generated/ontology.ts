@@ -243,7 +243,7 @@ export interface PendingUnit {
 
 export type SavedViewScreen = "inventory";
 
-/** A way of looking at one grid screen that one person saved under a name — the search text, the filter of each column, the sort, whether rows are grouped, and the hidden columns — shown as an item of the App Shell's second column and opened again exactly as saved. Belongs to the person who saved it, inside one company. */
+/** A way of looking at one grid screen that one person saved under a name — the filter of each column, the sort, whether rows are grouped, and the hidden columns — shown as an item of the App Shell's second column and opened again exactly as saved. Belongs to the person who saved it, inside one company. */
 export interface SavedView {
   id: string;
   /** id of Company */

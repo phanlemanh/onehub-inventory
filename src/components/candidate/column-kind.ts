@@ -169,6 +169,3 @@ export const IN_CELL_KINDS: readonly DisplayKind[] = [
 export function editModeFor(kind: DisplayKind): EditMode {
   return IN_CELL_KINDS.includes(kind) ? "cell" : "panel";
 }
-
-/** Kinds the search box reads: words, not numbers or dates. */
-export const SEARCHABLE_KINDS: readonly DisplayKind[] = ["text", "person", "select"];

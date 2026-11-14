@@ -203,7 +203,9 @@ test.describe("E7 · every listing of the unit, newest first", () => {
 
 // ---- E8 · read-only ------------------------------------------------------------------------------------------------
 
-const ALLOWED_BUTTONS = /^(Trước|Sau|Đóng|Chép đường dẫn|Về lần mới nhất|Lần \d+)$/;
+// Ghim thành cột and Bỏ ghim change only how the record stands beside the grid, never the data (row 3a).
+const ALLOWED_BUTTONS =
+  /^(Trước|Sau|Đóng|Chép đường dẫn|Ghim thành cột|Bỏ ghim|Về lần mới nhất|Lần \d+)$/;
 
 async function readOnlyErrors(page: Page): Promise<string[]> {
   const found = await panel(page).evaluate((el) => ({
@@ -238,7 +240,15 @@ test.describe("E8 · the record only reads", () => {
     await record(page).getByRole("button", { name: "Về lần mới nhất" }).click();
     expect(await readOnlyErrors(page)).toEqual([]);
     expect(writes.length ? "write request while reading record" : "").toBe("");
-    const headers = await page.locator('[data-slot="data-region"] thead th').allInnerTexts();
+    // Row 2e (ruling K-1411-13): the filter row is always shown inside the header cells; a column's name is the cell
+    // without its filter box.
+    const headers = await page.locator('[data-slot="data-region"] thead th').evaluateAll((ths) =>
+      ths.map((th) => {
+        const copy = th.cloneNode(true) as HTMLElement;
+        copy.querySelectorAll('[data-slot="column-filter"]').forEach((el) => el.remove());
+        return copy.innerText ?? copy.textContent ?? "";
+      }),
+    );
     expect(headers.map((h) => h.trim()).filter((h) => h !== "" && h !== "#")).toEqual([
       "Căn",
       "Toà",

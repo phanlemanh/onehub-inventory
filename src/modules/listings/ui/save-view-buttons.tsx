@@ -4,7 +4,7 @@ import { BookmarkIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import type { GridView } from "@/components/candidate/grid-view";
+import { EMPTY_VIEW, type GridView } from "@/components/candidate/grid-view";
 import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { notifyResult } from "@/components/templates/notify";
 import { Button } from "@/components/ui/button";
@@ -62,9 +62,7 @@ function SaveViewDialog({
             body: JSON.stringify({
               screen: "inventory",
               name,
-              view: storedView(
-                view ?? { query: "", filters: {}, sort: [], grouped: false, hidden: [] },
-              ),
+              view: storedView(view ?? EMPTY_VIEW),
             }),
           }),
         )

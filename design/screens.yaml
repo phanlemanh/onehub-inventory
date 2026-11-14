@@ -51,7 +51,7 @@ screens:
       - readCatalog
       - viewListings
     mo_san: [saveView]
-    nut_chung: [Chép đường dẫn, Lọc, Cột, Toàn màn hình, Trước, Sau, Đóng]
+    nut_chung: [Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng]
   - id: sent
     route: /sent
     title: Sent
@@ -60,7 +60,7 @@ screens:
     status: built
     vao: null
     nut: []
-    nut_chung: [Lọc, Cột, Toàn màn hình]
+    nut_chung: [Lọc, Cột, Toàn màn hình, Ghim]
   - id: contacts
     route: /contacts
     title: Contact

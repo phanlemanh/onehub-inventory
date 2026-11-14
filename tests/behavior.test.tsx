@@ -173,10 +173,12 @@ function assertNoProgressBefore10s(step: (ms: number) => string): void {
 
 function assertHeader(container: HTMLElement, status: RegionStatus): void {
   const count = container.querySelector('[data-slot="region-count"]') !== null;
-  const search = container.querySelector('input[type="search"]') !== null;
+  const search = container.querySelector('input[type="search"], [role="searchbox"]') !== null;
   const rows = headerShowsRows(status);
-  if (!rows && (count || search)) throw new Error(`header leaks count: ${status}`);
-  if (rows && !(count && search)) throw new Error(`header lost count: ${status}`);
+  // Row 2e: the region never has a search box, with or without rows; the count follows the rows.
+  if (search) throw new Error(`header has a search box: ${status}`);
+  if (!rows && count) throw new Error(`header leaks count: ${status}`);
+  if (rows && !count) throw new Error(`header lost count: ${status}`);
 }
 
 function assertActionHidden(container: HTMLElement): void {
@@ -307,10 +309,10 @@ describe("record panel walks rows", () => {
     expect(screen.getByRole("button", { name: "Trước" })).toHaveProperty("disabled", true);
   });
 
-  it("follows the search: «Sau» goes to the next row left, never to a hidden one", async () => {
+  it("follows the column filter: «Sau» goes to the next row left, never to a hidden one", async () => {
     const calls: (string | null)[] = [];
     render(<GridWithRecord calls={calls} />);
-    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "S1." } });
+    fireEvent.change(screen.getByLabelText("Lọc cột Căn"), { target: { value: "S1." } });
     const shownIds = [...document.querySelectorAll("[data-record-open]")].map((el) =>
       el.getAttribute("data-record-open"),
     ) as string[];
@@ -444,7 +446,7 @@ describe("error and partial failure", () => {
     ["partial", true],
   ];
 
-  it("shows the count and search only when the rows are on screen", () => {
+  it("shows the count only when the rows are on screen, and never a search box", () => {
     expect(HEADER_MATRIX).toHaveLength(5);
     for (const [status, rows] of HEADER_MATRIX) {
       expect(headerShowsRows(status), status).toBe(rows);

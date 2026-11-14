@@ -1,12 +1,8 @@
 import type { ReactNode } from "react";
 
-import { SearchIcon } from "lucide-react";
-
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
-
 import { GRID_COPY } from "./grid-copy";
 
-/** Row count words: «60 dòng», or «12 / 60 dòng» while a search is on; null when the viewer may not see rows. */
+/** Row count words: «60 dòng», or «12 / 60 dòng» while a column filter is on; null when the viewer may not see rows. */
 function countText(total?: number, shown?: number): string | null {
   if (total === undefined) return null;
   return shown !== undefined && shown !== total
@@ -20,29 +16,24 @@ export function RegionTitle({ title }: { title: string }) {
 }
 
 /**
- * The region's toolbar: search box and row count on the left, the region's primary action on the right. Without rows
- * to show (loading, error, no permission) the toolbar holds no count and no search box.
+ * The region's toolbar: row count and sheet tools on the left, the region's primary action on the right. Without rows
+ * to show (loading, error, no permission) the toolbar holds no count. There is no search box: a region filters by the
+ * boxes under its column headers, and searching is the top bar's ⌘K box (row 2e, owner 2026-11-13).
  */
 export function RegionToolbar({
   total,
   shown,
-  query,
-  onQuery,
   action,
   tools,
-  searchId,
   showCount = true,
 }: {
   /** Rows in the region; absent when the viewer may not see the region, so no count is shown. */
   total?: number;
-  /** Rows left after the search, when a search is on. */
+  /** Rows left after the column filters, when a filter is on. */
   shown?: number;
-  query: string;
-  onQuery: (query: string) => void;
   action?: ReactNode;
   /** The grid's sheet tools (filter row, grouping, columns), after the count. */
   tools?: ReactNode;
-  searchId: string;
   /** False when the count sits elsewhere (the grid's footer, row 2), so the region shows it once. */
   showCount?: boolean;
 }) {
@@ -50,23 +41,6 @@ export function RegionToolbar({
   if (count === null && total === undefined && !action) return null;
   return (
     <div data-slot="region-toolbar" className="flex flex-wrap items-center gap-x-3 gap-y-2">
-      {total !== undefined ? (
-        <div className="w-full sm:w-64">
-          <InputGroup>
-            <InputGroupAddon>
-              <SearchIcon aria-hidden="true" />
-            </InputGroupAddon>
-            <InputGroupInput
-              id={searchId}
-              type="search"
-              aria-label={GRID_COPY.searchLabel}
-              placeholder={GRID_COPY.searchPlaceholder}
-              value={query}
-              onChange={(event) => onQuery(event.target.value)}
-            />
-          </InputGroup>
-        </div>
-      ) : null}
       {count ? (
         <span data-slot="region-count" className="text-sm text-muted-foreground">
           {count}
@@ -82,15 +56,12 @@ export function RegionToolbar({
   );
 }
 
-/** The head of a data region: its name, how many rows, a search box and the region's primary action. */
+/** The head of a data region: its name, how many rows and the region's primary action. */
 export function RegionHeader(props: {
   title: string;
   total?: number;
   shown?: number;
-  query: string;
-  onQuery: (query: string) => void;
   action?: ReactNode;
-  searchId: string;
 }) {
   const { title, ...toolbar } = props;
   return (

@@ -15,9 +15,13 @@ const WIDE = new Set(["1440", "1024"]);
 const PHONE = new Set(["414", "360"]);
 /**
  * Data columns fully in view left of the open record, at least (AC-3). 4 and 2 since the coordinator's ruling
- * D-1211-12: the first 5/3 was pinned before the owner chose a floating panel two fifths wide.
+ * D-1211-12: the first 5/3 was pinned before the owner chose a floating panel two fifths wide. 3 and 1 since the
+ * coordinator's rulings K-1411-1 and K-1411-2 (row 2e, «sửa sau Cổng Phạm vi», the owner signs at row 2e's evidence
+ * gate): the filter row is always shown (owner 2026-11-13), so a number column is at least 11 ch, a text column 8.3
+ * ch and the first column fits its title and sort button — the unit code shows whole; the first column, always frozen,
+ * has no «Bỏ ghim» button (K-1411-7), and eight columns still fit at 1440.
  */
-const MIN_VISIBLE: Readonly<Record<string, number>> = { "1440": 4, "1024": 2 };
+const MIN_VISIBLE: Readonly<Record<string, number>> = { "1440": 3, "1024": 1 };
 const FROZEN = ["#", "Căn", "Toà"];
 const DATA_HEADERS = [
   "Căn",
@@ -72,10 +76,12 @@ type Box = { top: number; bottom: number; left: number; right: number; width: nu
 async function floatGeometry(page: Page): Promise<{
   aside: Box;
   barBottom: number | null;
+  toolsBottom: number | null;
   areaBottom: number;
   viewport: number;
   viewportHeight: number;
   searchHit: boolean;
+  filterHit: boolean;
   accountHit: boolean;
   overflow: number;
 }> {
@@ -100,10 +106,17 @@ async function floatGeometry(page: Page): Promise<{
     return {
       aside: rect(aside),
       barBottom: shown ? shown.getBoundingClientRect().bottom : null,
+      toolsBottom:
+        document.querySelector('[data-slot="region-toolbar"]')?.getBoundingClientRect().bottom ??
+        null,
       areaBottom: area.getBoundingClientRect().bottom,
       viewport: window.innerWidth,
       viewportHeight: window.innerHeight,
-      searchHit: hits(document.querySelector('[data-slot="data-region"] input[type="search"]')),
+      // Row 2e: searching lives in the top bar's ⌘K box, and the region is typed into through its filter boxes.
+      searchHit: hits(document.querySelector('[data-slot="unit-jump"] button')),
+      filterHit: hits(
+        document.querySelector('[data-slot="data-region"] [data-slot="column-filter"] input'),
+      ),
       accountHit: hits(
         document.querySelector('[data-slot="app-shell-top-bar"] [data-slot^="account"]'),
       ),
@@ -115,12 +128,18 @@ async function floatGeometry(page: Page): Promise<{
   });
 }
 
-/** The record runs from just under the top bar to the bottom of the work area or the window. */
+/**
+ * The record runs from just under the top bar — and under the region's toolbar while that is in view (row 3a, AC-4,
+ * supervisor's ruling D-1411-1) — to the bottom of the work area or the window.
+ */
 function assertEdges(g: Awaited<ReturnType<typeof floatGeometry>>): void {
   if (g.barBottom !== null && g.aside.top < g.barBottom - 2)
     throw new Error("record covers the top bar");
-  if (g.barBottom !== null && Math.abs(g.aside.top - g.barBottom) > 2) {
-    throw new Error(`record top ${g.aside.top} not under the top bar ${g.barBottom}`);
+  if (g.toolsBottom !== null && g.aside.top < g.toolsBottom - 2)
+    throw new Error("record covers the toolbar");
+  const under = Math.max(g.barBottom ?? 0, g.toolsBottom ?? 0);
+  if (Math.abs(g.aside.top - under) > 2) {
+    throw new Error(`record top ${g.aside.top} not under the top bar and toolbar ${under}`);
   }
   // The work area may run below the window (the page scrolls): the record stops at whichever comes first.
   const bottom = Math.min(g.areaBottom, g.viewportHeight);
@@ -137,6 +156,7 @@ function assertFloat(g: Awaited<ReturnType<typeof floatGeometry>>): void {
     throw new Error(`record width ${g.aside.width} of ${g.viewport}`);
   }
   if (!g.searchHit) throw new Error("record covers the search box");
+  if (!g.filterHit) throw new Error("record covers the filter box");
   if (!g.accountHit) throw new Error("record covers the account corner");
   if (g.overflow > 0) throw new Error(`record scrolls sideways by ${g.overflow}px`);
 }
@@ -235,21 +255,45 @@ const scrollGridTo = (page: Page, left: number | "end") =>
       el.scrollLeft = to === "end" ? el.scrollWidth : to;
     }, left);
 
+/** Where each frozen header stands on the screen, by its name. */
+const frozenLefts = (page: Page) =>
+  page.evaluate((names) => {
+    const ths = [...document.querySelectorAll('[data-slot="data-region"] thead th')];
+    return Object.fromEntries(
+      names.map((name) => {
+        const th = ths.find((el) => (el.textContent ?? "").trim().startsWith(name));
+        return [name, th ? Math.round(th.getBoundingClientRect().left) : null];
+      }),
+    );
+  }, FROZEN);
+
+/**
+ * Scrolled to the end, the frozen columns have not moved. Measured on their place on the screen, not on «in view beside
+ * the record»: at 1024 Toà lies under the open record since ruling K-1411-5 (row 2e), and must still stay frozen there.
+ */
 async function assertFrozenAtEnd(page: Page): Promise<void> {
+  const before = await frozenLefts(page);
   await scrollGridTo(page, "end");
   await page.waitForTimeout(200);
+  const after = await frozenLefts(page);
   const { texts } = await columnsInView(page);
   for (const name of FROZEN) {
-    if (!texts.some((t) => t === name || t.startsWith(name))) {
+    if (before[name] === null || after[name] === null || Math.abs(after[name]! - before[name]!) > 1)
       throw new Error(`frozen column scrolled away: ${name}`);
-    }
   }
+  if (!texts.some((t) => t === "Căn" || t.startsWith("Căn")))
+    throw new Error("frozen column scrolled away: Căn");
 }
 
 /** With the record open, Căn and Toà are fully in view left of it: the promise of AC-3 (ruling D-1211-12). */
+/**
+ * The frozen columns stay beside the open record: Căn and Toà; at 1024 only Căn since the coordinator's ruling K-1411-5
+ * (row 2e, «sửa sau Cổng Phạm vi»: one column beside the record at 1024, Toà lies under the record there).
+ */
 async function assertUnitAndBuildingInView(page: Page): Promise<void> {
   const { texts } = await columnsInView(page);
-  for (const name of ["Căn", "Toà"]) {
+  const frozen = test.info().project.name === "1024" ? ["Căn"] : ["Căn", "Toà"];
+  for (const name of frozen) {
     if (!texts.some((t) => t === name || t.startsWith(name))) {
       throw new Error(`record hides a frozen column: ${name}`);
     }
@@ -318,11 +362,11 @@ test.describe("E2 · the record floats beside the grid", () => {
     // The panel measures the top bar once it has mounted; wait for that, then the check must hold.
     await expect.poll(async () => (await floatGeometry(page)).aside.top).toBeGreaterThan(0);
     assertFloat(await floatGeometry(page));
-    // Search while the record is open: the rows change.
+    // Filter the Căn column while the record is open (row 2e: the region has no search box): the rows change.
     const before = await openers(page).count();
-    await page.locator('[data-slot="data-region"] input[type="search"]').fill("S1.01");
+    await page.getByLabel("Lọc cột Căn").fill("S1.01");
     await expect.poll(() => openers(page).count()).not.toBe(before);
-    await page.locator('[data-slot="data-region"] input[type="search"]').fill("");
+    await page.getByLabel("Lọc cột Căn").fill("");
     // Another unit code opens that unit without closing.
     const first = openers(page).first();
     const id = await first.getAttribute("data-record-open");
@@ -339,8 +383,15 @@ test.describe("E2 · the record floats beside the grid", () => {
     });
     const size = page.viewportSize()!;
     await page.setViewportSize({ width: size.width, height: size.height - 1 });
+    // No top bar: the record runs from the region's toolbar (row 3a, AC-4), or from the top while it is out of view.
     await expect
-      .poll(async () => (await floatGeometry(page)).aside.top, { message: info.project.name })
+      .poll(
+        async () => {
+          const g = await floatGeometry(page);
+          return Math.abs(g.aside.top - Math.max(0, g.toolsBottom ?? 0));
+        },
+        { message: info.project.name },
+      )
       .toBeLessThanOrEqual(2);
   });
 
@@ -355,10 +406,7 @@ test.describe("E2 · the record floats beside the grid", () => {
   });
 
   test("break: a record that does not follow the scroll leaves the top bar", async ({ page }) => {
-    await injectStyle(
-      page,
-      '[role="dialog"][aria-modal="false"] { position: absolute !important; }',
-    );
+    await injectStyle(page, '[data-slot="record-panel-layer"] { position: absolute !important; }');
     await openInventory(page);
     await openFifth(page);
     await page.waitForTimeout(300);
@@ -369,7 +417,7 @@ test.describe("E2 · the record floats beside the grid", () => {
   });
 
   test("break: a record from the top of the screen covers the top bar", async ({ page }) => {
-    await injectStyle(page, '[role="dialog"][aria-modal="false"] { top: 0 !important; }');
+    await injectStyle(page, '[data-slot="record-panel-layer"] { top: 0 !important; }');
     await openInventory(page);
     await openFifth(page);
     await page.waitForTimeout(300);
@@ -650,7 +698,7 @@ test.describe("E3 · the grid beside the record keeps its columns", () => {
   test("break: a record wide enough to cover Toà is caught", async ({ page }) => {
     await injectStyle(
       page,
-      '[role="dialog"][aria-modal="false"] { width: 85vw !important; max-width: none !important; }',
+      '[data-slot="record-panel-layer"] [data-slot="resizable-panel"]:has(aside) { flex: 0 0 85vw !important; max-width: none !important; }',
     );
     await openInventory(page);
     await openFifth(page);

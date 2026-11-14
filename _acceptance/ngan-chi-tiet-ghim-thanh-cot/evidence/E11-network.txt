@@ -1,0 +1,7 @@
+1440-sang 200 document http://127.0.0.1:3483/inventory
+1440-toi 200 document http://127.0.0.1:3483/inventory
+1024-sang 200 document http://127.0.0.1:3483/inventory
+1024-toi 200 document http://127.0.0.1:3483/inventory
+1024-cot2-mo 200 document http://127.0.0.1:3483/inventory
+360-sang 200 document http://127.0.0.1:3483/inventory
+--- console ---

@@ -9,8 +9,8 @@ sources: ["_acceptance/luu-goc-nhin-cot-hai/contract.md", "https://dd.reso.org/D
 
 ## Definition
 
-Một cách xem một màn Lưới mà một người đặt tên và lưu: lọc từng cột, sắp xếp, có nhóm hay không, các cột ẩn. Chữ trong ô
-tìm không thuộc góc nhìn (chủ kho chốt 2026-11-13: việc tìm chuyển lên ô ⌘K ở thanh trên; migration 011). Hiện thành một mục ở cột thứ hai của App Shell và mở lại đúng cách xem ấy. Không phải RESO `SavedSearch` (tiêu chí tìm
+Một cách xem một màn Lưới mà một người đặt tên và lưu: lọc từng cột, sắp xếp, có nhóm hay không, các cột ẩn. Góc nhìn
+không gồm chữ tìm (chủ kho chốt 2026-11-13: việc tìm chuyển lên ô ⌘K ở thanh trên; migration 011 đã bỏ chữ ấy khỏi dữ liệu). Hiện thành một mục ở cột thứ hai của App Shell và mở lại đúng cách xem ấy. Không phải RESO `SavedSearch` (tiêu chí tìm
 của khách để báo căn mới).
 
 ## Rules

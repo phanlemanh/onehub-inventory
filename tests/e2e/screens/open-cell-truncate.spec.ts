@@ -76,8 +76,14 @@ test.describe("E13 · the open cell is cut inside its cell", () => {
     const col = await page
       .locator(`[data-record-open="${id}"]`)
       .evaluate((el) => el.closest("td")?.getAttribute("data-col-id") ?? "");
+    // Row 2e: the grid's fixed table layout takes each column's width from its <col>, so a width on the cells alone
+    // never narrowed the column; this case passed only while unit codes were cut anyway. Narrow the <col> as well.
+    const nth = await page
+      .locator(`thead th[data-col-id="${col}"]`)
+      .first()
+      .evaluate((th) => [...th.parentElement!.children].indexOf(th) + 1);
     await page.addStyleTag({
-      content: `td[data-col-id="${col}"], th[data-col-id="${col}"] { width: 44px !important; min-width: 44px !important; max-width: 44px !important; }`,
+      content: `table[data-slot="data-grid-table"] colgroup col:nth-child(${nth}) { width: 44px !important; } td[data-col-id="${col}"], th[data-col-id="${col}"] { width: 44px !important; min-width: 44px !important; max-width: 44px !important; }`,
     });
     const title = await checkCut(page, "inventory", id);
     await opensWithFullTitle(page, "inventory", id, title);

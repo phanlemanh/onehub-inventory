@@ -213,8 +213,13 @@ describe("changed mark and save buttons", () => {
     expect(screen.queryByRole("button", { name: LABELS.saveChanges })).toBeNull();
     expect(screen.getByRole("button", { name: LABELS.save })).toBeTruthy();
 
-    // The search box is not part of a view (owner 2026-11-13): typing in it marks nothing.
-    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "S1.02" } });
+    // Row 2e: the region has no search box (owner 2026-11-13); text typed in a column filter is part of the view.
+    expect(screen.queryAllByRole("searchbox")).toHaveLength(0);
+    const code = screen.getByLabelText("Lọc cột unitNumber") as HTMLInputElement;
+    const before = code.value;
+    fireEvent.change(code, { target: { value: `${before}S1.02` } });
+    expect(mark()).toHaveLength(1);
+    fireEvent.change(code, { target: { value: before } });
     expect(mark()).toHaveLength(0);
     expect(screen.queryByRole("button", { name: LABELS.saveChanges })).toBeNull();
 

@@ -1,6 +1,6 @@
 // Pure parts of the inventory grid (roadmap row 2): rows, columns and the state a URL asks for. Safe on the server.
 import { customColumn, typedColumn, type TypedColumn } from "@/components/candidate/column-kind";
-import { STATUS_ORDER, type ColumnFilters } from "@/components/candidate/grid-view";
+import { STATUS_ORDER, foldText, type ColumnFilters } from "@/components/candidate/grid-view";
 import type { GridRow, RegionStatus } from "@/components/candidate/data-region";
 import type { DisplayKind } from "@/generated/display";
 import type { Listing, ListingUnit, Unit } from "@/generated/ontology";
@@ -113,8 +113,11 @@ export function inventoryStatusHref(status: string): string {
   return `/inventory?status=${encodeURIComponent(status)}`;
 }
 
-/** A code compared the way a person types it: no spaces at the ends, letter case ignored. */
-const codeKey = (text: string): string => text.trim().toLocaleLowerCase("vi");
+/**
+ * Text compared the way a person types it: no spaces at the ends, letter case and Vietnamese marks ignored, through the
+ * grid's one folding rule (row 2e, AC-11), so «dong» finds «Đông» here as in the column filter.
+ */
+const codeKey = (text: string): string => foldText(text.trim());
 
 /** What a typed unit code finds among the inventory rows (row 3f): one unit, a code in several buildings, or nothing. */
 export type CodeMatch =

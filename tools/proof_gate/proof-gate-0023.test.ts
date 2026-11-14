@@ -1374,9 +1374,12 @@ describe("luật giao diện theo 0023", () => {
 
 describe("khối có trước luật sổ khối: miễn theo từng cặp gọi tên", () => {
   const OLD = "hang-cu";
+  const BLOCK_FILE = "src/components/candidate/hop-cu.tsx";
+  const BLOCK_DAY = "2026-11-11";
+  const LAW_DAY = "2026-11-12";
   const legacyLine = (over: Entry = {}): Entry => ({
     ten: "HopCu",
-    tep: "src/components/candidate/hop-cu.tsx",
+    tep: BLOCK_FILE,
     nguon: "tao-tay",
     nhu_cau: "hop-cu",
     mo_ta: "Hộp có trước luật sổ khối",
@@ -1384,11 +1387,34 @@ describe("khối có trước luật sổ khối: miễn theo từng cặp gọi
     duyet: APPROVED_AT,
     ...over,
   });
-  /** A healthy repo, a signed round without any «ve-tay» row, the legacy block's file, and a ledger naming `pairs`. */
-  function withOldRound(lines: Entry[], pairs: { ten: string; ho_so: string }[]): string {
-    const root = healthy();
-    contract(root, OLD, "signed-off", []);
-    write(root, "src/components/candidate/hop-cu.tsx", "export {};\n");
+
+  function git(cwd: string, args: string[], day = LAW_DAY) {
+    const at = `${day}T10:00:00+07:00`;
+    const r = spawnSync("git", args, {
+      cwd,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        GIT_AUTHOR_NAME: "[Tên]",
+        GIT_AUTHOR_EMAIL: "ten@example.test",
+        GIT_COMMITTER_NAME: "[Tên]",
+        GIT_COMMITTER_EMAIL: "ten@example.test",
+        GIT_AUTHOR_DATE: at,
+        GIT_COMMITTER_DATE: at,
+        GIT_CONFIG_GLOBAL: "/dev/null",
+        GIT_CONFIG_NOSYSTEM: "1",
+      },
+    });
+    if (r.status !== 0) throw new Error(`git ${args.join(" ")}: ${r.stderr}`);
+    return r.stdout.trim();
+  }
+  function commitAll(root: string, msg: string, day: string, paths = ["-A"]) {
+    git(root, ["add", ...paths], day);
+    git(root, ["commit", "--quiet", "--no-verify", "-m", msg], day);
+    return git(root, ["rev-parse", "HEAD"], day);
+  }
+  type Pair = { ten: string; ho_so: string; commit?: string; ngay?: string };
+  function writeLedger(root: string, lines: Entry[], pairs: Pair[], sha: string) {
     write(
       root,
       "design/so-khoi.yaml",
@@ -1398,18 +1424,38 @@ describe("khối có trước luật sổ khối: miễn theo từng cặp gọi
         ...pairs.flatMap((p) => [
           `  - ten: ${p.ten}`,
           `    ho_so: ${p.ho_so}`,
-          "    commit: abc1234",
-          `    ngay: ${APPROVED_AT}`,
+          `    commit: ${p.commit ?? sha}`,
+          `    ngay: ${p.ngay ?? BLOCK_DAY}`,
           "    vi_sao: có trước luật sổ khối",
         ]),
         "",
       ].join("\n"),
     );
+  }
+  /**
+   * A healthy repo in real git: one commit on BLOCK_DAY adds the legacy block's file (`blockDay`), the next on
+   * LAW_DAY adds everything else, the block ledger among them. `pairs` name that first commit unless they say otherwise.
+   */
+  function withOldRound(
+    lines: Entry[],
+    pairs: Pair[],
+    opts: { blockDay?: string; lawDay?: string; firstFile?: string } = {},
+  ): string {
+    const root = healthy();
+    contract(root, OLD, "signed-off", []);
+    write(root, BLOCK_FILE, "export {};\n");
+    git(root, ["init", "--quiet", "-b", "main"]);
+    const first = opts.firstFile ?? BLOCK_FILE;
+    if (first !== BLOCK_FILE) write(root, first, "khác\n");
+    const sha = commitAll(root, "block", opts.blockDay ?? BLOCK_DAY, [first]);
+    writeLedger(root, lines, pairs, sha);
+    commitAll(root, "ledger", opts.lawDay ?? LAW_DAY);
     return root;
   }
+  const PAIR = [{ ten: "HopCu", ho_so: OLD }];
 
-  it("(a) cặp có tên thì xanh", () => {
-    const r = run(withOldRound([gridLine(), legacyLine()], [{ ten: "HopCu", ho_so: OLD }]));
+  it("(a) cặp có tên và git chứng được thì xanh", () => {
+    const r = run(withOldRound([gridLine(), legacyLine()], PAIR));
     expect(codes(r.stdout)).toEqual([]);
     expect(r.status).toBe(0);
   });
@@ -1420,16 +1466,16 @@ describe("khối có trước luật sổ khối: miễn theo từng cặp gọi
 
   it("(c) khối khác trỏ về cùng hồ sơ mà không có tên thì vẫn đỏ", () => {
     const other = legacyLine({ ten: "HopKhac", nhu_cau: "hop-khac" });
-    const r = run(withOldRound([gridLine(), legacyLine(), other], [{ ten: "HopCu", ho_so: OLD }]));
+    const r = run(withOldRound([gridLine(), legacyLine(), other], PAIR));
     expect(codes(r.stdout)).toEqual(["so-khong-chung-tu"]);
     expect(r.stdout).toContain("HopKhac");
   });
 
   it("(d) cặp có tên mà tệp khối không có thì đỏ", () => {
     const gone = legacyLine({ tep: "src/components/candidate/khong-co.tsx" });
-    expect(codesOf(withOldRound([gridLine(), gone], [{ ten: "HopCu", ho_so: OLD }]))).toEqual([
-      "so-tep-khong-co",
-    ]);
+    expect(codesOf(withOldRound([gridLine(), gone], PAIR))).toEqual(
+      expect.arrayContaining(["so-tep-khong-co"]),
+    );
   });
 
   it("cặp trỏ một hồ sơ còn mở thì không được miễn", () => {
@@ -1439,12 +1485,108 @@ describe("khối có trước luật sổ khối: miễn theo từng cặp gọi
   });
 
   it("một dòng của mục thiếu commit thì không đọc được", () => {
-    const root = withOldRound([gridLine(), legacyLine()], [{ ten: "HopCu", ho_so: OLD }]);
+    const root = withOldRound([gridLine(), legacyLine()], PAIR);
     const text = readFileSync(join(root, "design/so-khoi.yaml"), "utf8").replace(
-      "    commit: abc1234\n",
+      / {4}commit: [0-9a-f]+\n/,
       "",
     );
     write(root, "design/so-khoi.yaml", text);
     expect(codesOf(root)).toEqual(expect.arrayContaining(["doc-loi", "so-khong-chung-tu"]));
+  });
+
+  // ---- row 2e, AC-10: git must prove each pair. Written before the code; each break names the block.
+  const broken: [string, (over?: object) => string, string][] = [
+    [
+      "commit không có",
+      () => withOldRound([gridLine(), legacyLine()], [{ ...PAIR[0]!, commit: "abc1234" }]),
+      "so-mien-commit-khong-co",
+    ],
+    [
+      "commit không thêm tệp của khối",
+      () =>
+        withOldRound([gridLine(), legacyLine()], PAIR, {
+          firstFile: "src/components/candidate/khac.tsx",
+        }),
+      "so-mien-commit-khong-tao-tep",
+    ],
+    [
+      "ngày khai khác ngày commit",
+      () => withOldRound([gridLine(), legacyLine()], [{ ...PAIR[0]!, ngay: "2026-11-10" }]),
+      "so-mien-ngay-lech",
+    ],
+    [
+      "commit không trước ngày sổ khối ra đời",
+      () =>
+        withOldRound([gridLine(), legacyLine()], [{ ...PAIR[0]!, ngay: LAW_DAY }], {
+          blockDay: LAW_DAY,
+        }),
+      "so-mien-sau-luat",
+    ],
+  ];
+  it.each(broken)("phá: %s", (_name, build, code) => {
+    const r = run(build());
+    expect(codes(r.stdout)).toEqual([code]);
+    expect(r.stdout).toContain("HopCu");
+    expect(r.status).toBe(1);
+  });
+
+  // ---- shallow copies (the CI checkout), owner ruling Hỏi-2 option b: fetch the missing history, else red.
+  /** Origin history: c0 root (other file), c1 adds the block, c2 adds the ledger, c3 edits it. */
+  function origin(): string {
+    const root = healthy();
+    contract(root, OLD, "signed-off", []);
+    git(root, ["init", "--quiet", "-b", "main"]);
+    write(root, "README.md", "kho\n");
+    commitAll(root, "root", "2026-11-10", ["README.md"]);
+    write(root, BLOCK_FILE, "export {};\n");
+    const sha = commitAll(root, "block", BLOCK_DAY, [BLOCK_FILE]);
+    writeLedger(root, [gridLine(), legacyLine()], PAIR, sha);
+    commitAll(root, "ledger", LAW_DAY);
+    write(
+      root,
+      "design/so-khoi.yaml",
+      `${readFileSync(join(root, "design/so-khoi.yaml"), "utf8")}# sửa\n`,
+    );
+    commitAll(root, "edit", "2026-11-13");
+    return root;
+  }
+  function shallow(src: string, depth: number, keepOrigin: boolean): string {
+    const dst = mkdtempSync(join(tmpdir(), "pg-nong-"));
+    git(tmpdir(), ["clone", "--quiet", "--no-local", `--depth=${depth}`, `file://${src}`, dst]);
+    if (!keepOrigin) git(dst, ["remote", "remove", "origin"]);
+    return dst;
+  }
+
+  it("bản sao nông lấy được lịch sử từ kho gốc thì xanh", () => {
+    const r = run(shallow(origin(), 1, true));
+    expect(codes(r.stdout)).toEqual([]);
+    expect(r.status).toBe(0);
+  });
+
+  it("phá: bản sao nông không lấy được commit khai", () => {
+    const r = run(shallow(origin(), 1, false));
+    expect(codes(r.stdout)).toEqual(expect.arrayContaining(["so-mien-khong-lay-duoc-commit"]));
+    expect(r.stdout).toContain("HopCu");
+    expect(r.status).toBe(1);
+  });
+
+  it("phá: commit đầu của bản sao không được lấy làm ngày sổ khối", () => {
+    // Depth 2: c3 and c2 are here, c2 (adds the ledger) is the copy's root and has no parent to compare with.
+    const r = run(shallow(origin(), 2, false));
+    expect(codes(r.stdout)).toEqual(expect.arrayContaining(["so-mien-khong-ro-ngay-luat"]));
+    expect(r.status).toBe(1);
+  });
+
+  it("phá: commit khai không có cha thì không coi mọi tệp là được thêm", () => {
+    // Depth 3: c1 (the declared commit) is the copy's root; its parent c0 is missing.
+    const r = run(shallow(origin(), 3, false));
+    expect(codes(r.stdout)).toEqual(["so-mien-khong-co-cha"]);
+    expect(r.stdout).toContain("HopCu");
+    expect(r.status).toBe(1);
+  });
+
+  it("chạy trên chính kho thì cặp FormDialog xanh", () => {
+    const r = run(ROOT);
+    expect(codes(r.stdout).filter((c) => c.startsWith("so-mien-"))).toEqual([]);
   });
 });
