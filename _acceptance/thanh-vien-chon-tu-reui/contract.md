@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [members]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-14T13:02:38Z
 design_doc: _acceptance/thanh-vien-chon-tu-reui/design.md
@@ -107,3 +107,9 @@ quyết định. Các trục cố định đã phủ bằng tiêu chí:
 - Ngoài-3 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): The automatic check on the Members list would not notice if a row showed the wrong inviter or a dash by mistake. The screen itself is not shown to be wrong. — `tests/e2e-db/thanh-vien.spec.ts`
 - Ngoài-4 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): The automatic check that the workspace label sits next to the invite dialog title is looser than promised. The dialog itself is not shown to look wrong. — `tests/e2e-db/thanh-vien.spec.ts`
 - Ngoài-6 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): The check that all nine screen states were exercised only counts them, so a misnamed or duplicated state could still pass. The states on screen are not shown to be wrong. — `tests/e2e-db/thanh-vien.spec.ts`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-14:
+  - Ngoài-1: Phép đo chỉ khoá lời của một bài kiểm mời người, chưa khoá các bài kiểm quyền khác của sàn. Hiện chưa bài nào bị sửa, nên người dùng chưa gặp gì; chỉ có nguy cơ về sau nếu ai đó lặng lẽ sửa các bài kiểm quyền ấy mà không bị báo.
+  - Ngoài-3: The automatic check on the Members list would not notice if a row showed the wrong inviter or a dash by mistake. The screen itself is not shown to be wrong.
+  - Ngoài-4: The automatic check that the workspace label sits next to the invite dialog title is looser than promised. The dialog itself is not shown to look wrong.
+  - Ngoài-6: The check that all nine screen states were exercised only counts them, so a misnamed or duplicated state could still pass. The states on screen are not shown to be wrong.
+- Sửa tên trong sàn của người đã mời: chủ kho chọn để hàng sau (Cổng Bằng chứng 2026-11-14); gỡ người để hàng 18a.
