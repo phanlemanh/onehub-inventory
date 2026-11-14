@@ -55,7 +55,7 @@ function edit(dir: string, rel: string, change: (text: string) => string): void 
   writeFileSync(file, after);
 }
 
-const STRAY = '\nexport const strayButton = { action: "readCatalog" };\n';
+const STRAY = '\nexport const strayButton = { action: "manageCompanyCodes" };\n';
 
 describe("doc-giao-dien-mo-dun", () => {
   it("inventory: saved-view buttons and the cell edit (row 4) found in the listings UI, other listing buttons declared ahead", () => {
@@ -87,7 +87,7 @@ describe("khong-gan-ca-mo-dun", () => {
     edit(dir, "src/app/(app)/inventory/page.tsx", (t) => t + STRAY);
     const r = run(dir, "--check");
     expect(r.status).not.toBe(0);
-    expect(r.out).toContain("inventory: ma co readCatalog chua khai");
+    expect(r.out).toContain("inventory: ma co manageCompanyCodes chua khai");
   });
 
   it("pha b: an undeclared action in a listings UI file the page imports is red", () => {
@@ -95,14 +95,14 @@ describe("khong-gan-ca-mo-dun", () => {
     edit(dir, "src/modules/listings/ui/inventory-grid.tsx", (t) => t + STRAY);
     const r = run(dir, "--check");
     expect(r.status).not.toBe(0);
-    expect(r.out).toContain("inventory: ma co readCatalog chua khai");
+    expect(r.out).toContain("inventory: ma co manageCompanyCodes chua khai");
   });
 
   it("pha c: the same action through an intermediate component is red", () => {
     const dir = copy();
     writeFileSync(
       join(dir, "src/components/candidate/stray-button.tsx"),
-      'export function StrayButton() {\n  return { action: "readCatalog" };\n}\n',
+      'export function StrayButton() {\n  return { action: "manageCompanyCodes" };\n}\n',
     );
     edit(
       dir,
@@ -112,14 +112,14 @@ describe("khong-gan-ca-mo-dun", () => {
     );
     const r = run(dir, "--check");
     expect(r.status).not.toBe(0);
-    expect(r.out).toContain("inventory: ma co readCatalog chua khai");
+    expect(r.out).toContain("inventory: ma co manageCompanyCodes chua khai");
   });
 
   it("đối chứng: a listings UI file no screen imports counts for no screen", () => {
     const dir = copy();
     writeFileSync(join(dir, "src/modules/listings/ui/nobody-imports.tsx"), STRAY);
     const r = run(dir, "--check");
-    expect(r.out).not.toContain("readCatalog");
+    expect(r.out).not.toContain("manageCompanyCodes");
     expect(r.status).toBe(0);
   });
 });

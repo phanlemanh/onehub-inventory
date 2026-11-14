@@ -1,6 +1,6 @@
 name: Listing
 description: One offer by a company to sell or lease one unit.
-reso: Property (StandardStatus, ListPrice, ClosePrice, CloseDate)
+reso: Property (StandardStatus, ListPrice, ClosePrice, CloseDate, Furnished, OccupantType, OriginalEntryTimestamp)
 
 properties:
   id: { type: uuid, required: true, unique: true }
@@ -22,6 +22,12 @@ properties:
   withdrawnReason:
     { type: enum, values: [sold_elsewhere, owner_changed_mind, unreachable], display: select }
   lastConfirmedAt: { type: datetime, display: datetime }
+  originalEntryTimestamp: { type: datetime, display: datetime, reso: OriginalEntryTimestamp }
+  furnished:
+    { type: enum, values: [Furnished, Partially, Unfurnished], display: select, reso: Furnished }
+  occupantType: { type: enum, values: [Owner, Tenant, Vacant], display: select, reso: OccupantType }
+  legalStatus: { type: string, display: text }
+  financing: { type: string, display: text }
   version: { type: integer, min: 1, required: true, display: none }
   # The company's own columns (row 7e), keyed by CustomField code; each value fits its field's kind. Stored on the
   # listings table from row 10.
@@ -32,6 +38,9 @@ rules:
     description: A Closed listing must have closePrice and closeDate.
   - id: withdrawn-needs-reason
     description: A Withdrawn listing must have withdrawnReason.
+  - id: one-open-listing-per-unit
+    description: Within one company a unit has at most one open listing (Incomplete, Active, Pending or Hold); Closed and Withdrawn listings stay as earlier listings of the unit.
+    implemented_in: src/modules/listings/sample.ts
   - id: no-seventh-status
     description: Companies add labels anchored to the six standard values; they never add a seventh value.
 

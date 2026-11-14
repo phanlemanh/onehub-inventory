@@ -1,0 +1,5457 @@
+{
+  "suites": [
+    {
+      "title": "screens/screens.spec.ts",
+      "file": "screens/screens.spec.ts",
+      "specs": [],
+      "suites": [
+        {
+          "title": "man today",
+          "file": "../../tools/e2e_templates/suite.ts",
+          "specs": [
+            {
+              "title": "khung tieu-de",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung tieu-de: doi chu h1",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung khong-cuon-ngang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung khong-cuon-ngang: chen phan tu rong 2000px",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung khong-loi-trinh-duyet",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung khong-loi-trinh-duyet: nem loi tren trang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung axe-sang-toi",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung axe-sang-toi: chu trang tren nen trang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "man inventory",
+          "file": "../../tools/e2e_templates/suite.ts",
+          "specs": [
+            {
+              "title": "khung tieu-de",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung tieu-de: doi chu h1",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung khong-cuon-ngang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung khong-cuon-ngang: chen phan tu rong 2000px",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung khong-loi-trinh-duyet",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung khong-loi-trinh-duyet: nem loi tren trang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung axe-sang-toi",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung axe-sang-toi: chu trang tren nen trang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "suites": [
+            {
+              "title": "vung",
+              "file": "../../tools/e2e_templates/suite.ts",
+              "specs": [
+                {
+                  "title": "vung cho-tai",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung cho-tai: khung cho khong bao gio hien",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung cho-tai: bo do tre cua dong ho vung",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung trong",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung trong: go buoc tiep",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung tim-khong-ra",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung tim-khong-ra: go nut Xoa loc",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung loi",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung loi: go ly do",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung mot-phan-hong",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung mot-phan-hong: go bang bao",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung chu-dai",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung chu-dai: go tabindex",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung khong-du-quyen",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung khong-du-quyen: chen so dong",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung tim",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung tim: go mot dong khop",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung tim: chi con khung dau",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung tim: them mot dong khong khop",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "man sent",
+          "file": "../../tools/e2e_templates/suite.ts",
+          "specs": [
+            {
+              "title": "khung tieu-de",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung tieu-de: doi chu h1",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung khong-cuon-ngang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung khong-cuon-ngang: chen phan tu rong 2000px",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung khong-loi-trinh-duyet",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung khong-loi-trinh-duyet: nem loi tren trang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung axe-sang-toi",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung axe-sang-toi: chu trang tren nen trang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "suites": [
+            {
+              "title": "vung",
+              "file": "../../tools/e2e_templates/suite.ts",
+              "specs": [
+                {
+                  "title": "vung cho-tai",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung cho-tai: khung cho khong bao gio hien",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung cho-tai: bo do tre cua dong ho vung",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung trong",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung trong: go buoc tiep",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung tim-khong-ra",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung tim-khong-ra: go nut Xoa loc",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung loi",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung loi: go ly do",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung mot-phan-hong",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung mot-phan-hong: go bang bao",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung chu-dai",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung chu-dai: go tabindex",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung khong-du-quyen",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung khong-du-quyen: chen so dong",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung tim",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung tim: go mot dong khop",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung tim: chi con khung dau",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung tim: them mot dong khong khop",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                        }
+                      ],
+                      "results": [
+                        {
+                          "status": "skipped",
+                          "annotations": [
+                            {
+                              "type": "skip",
+                              "description": "khong chay ca tim — ô tìm của vùng bị bỏ theo lời chốt của chủ kho 2026-11-13; hàng 2e gỡ ca tìm khỏi cả họ Lưới và gỡ luôn dòng này"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "man sign-in",
+          "file": "../../tools/e2e_templates/suite.ts",
+          "specs": [
+            {
+              "title": "khung tieu-de",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung tieu-de: doi chu h1",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung khong-cuon-ngang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung khong-cuon-ngang: chen phan tu rong 2000px",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung khong-loi-trinh-duyet",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung khong-loi-trinh-duyet: nem loi tren trang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung axe-sang-toi",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung axe-sang-toi: chu trang tren nen trang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "man members",
+          "file": "../../tools/e2e_templates/suite.ts",
+          "specs": [
+            {
+              "title": "khung tieu-de",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung tieu-de: doi chu h1",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung khong-cuon-ngang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung khong-cuon-ngang: chen phan tu rong 2000px",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung khong-loi-trinh-duyet",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung khong-loi-trinh-duyet: nem loi tren trang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "khung axe-sang-toi",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "pha khung axe-sang-toi: chu trang tren nen trang",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "can dang nhap — do o luot co phien"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "status": "skipped",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "can dang nhap — do o luot co phien"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "vung hieu-chuan",
+          "file": "../../tools/e2e_templates/suite.ts",
+          "specs": [
+            {
+              "title": "mo lai cung trang khong do lai ham cpu",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "title": "ngoai khuon: bang khong qua vung dung chung thi do",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "suites": [
+            {
+              "title": "vung",
+              "file": "../../tools/e2e_templates/suite.ts",
+              "specs": [
+                {
+                  "title": "vung cho-tai",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung cho-tai: khung cho khong bao gio hien",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung cho-tai: bo do tre cua dong ho vung",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung trong",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung trong: go buoc tiep",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung tim-khong-ra",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung tim-khong-ra: go nut Xoa loc",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung loi",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung loi: go ly do",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung mot-phan-hong",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung mot-phan-hong: go bang bao",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung chu-dai",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung chu-dai: go tabindex",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung khong-du-quyen",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung khong-du-quyen: chen so dong",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "vung tim",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung tim: go mot dong khop",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung tim: chi con khung dau",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "pha vung tim: them mot dong khong khop",
+                  "tests": [
+                    {
+                      "projectName": "360",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "414",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1024",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    },
+                    {
+                      "projectName": "1440",
+                      "status": "expected",
+                      "annotations": [],
+                      "results": [
+                        {
+                          "status": "passed",
+                          "annotations": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "giao man can dang nhap",
+          "file": "../../tools/e2e_templates/suite.ts",
+          "specs": [
+            {
+              "title": "mo trang dang nhap thay man",
+              "tests": [
+                {
+                  "projectName": "360",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "414",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1024",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                },
+                {
+                  "projectName": "1440",
+                  "status": "expected",
+                  "annotations": [],
+                  "results": [
+                    {
+                      "status": "passed",
+                      "annotations": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

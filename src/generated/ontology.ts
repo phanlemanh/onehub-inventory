@@ -157,6 +157,10 @@ export type ListingStandardStatus = "Incomplete" | "Active" | "Pending" | "Close
 
 export type ListingWithdrawnReason = "sold_elsewhere" | "owner_changed_mind" | "unreachable";
 
+export type ListingFurnished = "Furnished" | "Partially" | "Unfurnished";
+
+export type ListingOccupantType = "Owner" | "Tenant" | "Vacant";
+
 /** One offer by a company to sell or lease one unit. */
 export interface Listing {
   id: string;
@@ -173,6 +177,12 @@ export interface Listing {
   withdrawnReason?: ListingWithdrawnReason;
   /** ISO datetime */
   lastConfirmedAt?: string;
+  /** ISO datetime */
+  originalEntryTimestamp?: string;
+  furnished?: ListingFurnished;
+  occupantType?: ListingOccupantType;
+  legalStatus?: string;
+  financing?: string;
   version: number;
   customFields?: Record<string, unknown> | unknown[];
 }
