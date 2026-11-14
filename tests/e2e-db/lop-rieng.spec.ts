@@ -1,6 +1,6 @@
 // The company layer in the browser (row 7e, lop-rieng-cua-san) on this lane's Postgres:
 //   DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts tests/e2e-db/lop-rieng.spec.ts
-// People sign in through the shared role door of row 9b (dang-nhap-vai.ts); this file never signs in by itself.
+// People sign in through the shared sign-in function of row 9b (dang-nhap-vai.ts); this file never signs in by itself.
 //   add and edit on screen      — E19: the add and edit forms, four refusals under their field, kind locked, retire
 //                                 keeps the row.
 //   company words on inventory — E9: company A's label and own fields on the inventory, a retired field absent,
@@ -25,38 +25,55 @@ import { SAMPLE_LISTINGS_PER_SUBDIVISION } from "../../src/modules/listings";
 
 import { openSheet, shown } from "../../tools/e2e_templates/settle";
 
-import { makeSampleCompany, rolePerson, ROLES, signInWithCode } from "./dang-nhap-vai";
+import { ROLES, signInWithCode } from "./dang-nhap-vai";
 
 const RUN = process.env["E2E_DB_RUN"] ?? `${process.pid}`;
 const DB_PORT = process.env["DB_PORT"] ?? "5563";
 const OWNER_URL = `postgres://postgres:local-only@127.0.0.1:${DB_PORT}/dang_nhap_e2e_${RUN}`;
 
-/** A second company with one administrator, written as the database owner: the company that must see none of A's words. */
-const OTHER = {
-  company: "[Sàn B thử lớp riêng]",
-  name: "[Tên] Quản trị sàn B",
-  email: `lop-rieng-b-${RUN}@example.test`,
-};
+/**
+ * Company A of this file, one person per role, and company B with one administrator — this file's own people,
+ * written as the database owner. The shared role door's sample company (dang-nhap-vai.ts) belongs to the role × screen
+ * suite; this file only uses its sign-in function.
+ */
+const COMPANY = { a: "[Sàn A thử lớp riêng]", b: "[Sàn B thử lớp riêng]" } as const;
+const personOf = (role: Role) => ({
+  name: `[Tên] Lớp riêng ${role}`,
+  email: `lop-rieng-${role.toLowerCase()}-${RUN}@example.test`,
+});
+const OTHER = { name: "[Tên] Quản trị sàn B", email: `lop-rieng-b-${RUN}@example.test` };
 
-async function makeOtherCompany(): Promise<void> {
+async function makeCompanies(): Promise<void> {
   const db = new pg.Client({ connectionString: OWNER_URL });
   await db.connect();
   try {
-    const company = (
-      await db.query<{ id: string }>("insert into companies (name) values ($1) returning id", [
-        OTHER.company,
-      ])
-    ).rows[0]!.id;
-    const user = (
-      await db.query<{ id: string }>(
-        "insert into identity.users (email, name) values ($1, $2) returning id",
-        [OTHER.email, OTHER.name],
-      )
-    ).rows[0]!.id;
-    await db.query(
-      "insert into company_members (company_id, user_id, name, roles) values ($1, $2, $3, $4)",
-      [company, user, OTHER.name, ["CompanyAdmin"]],
+    const add = async (
+      company: string,
+      people: { name: string; email: string; roles: Role[] }[],
+    ) => {
+      const id = (
+        await db.query<{ id: string }>("insert into companies (name) values ($1) returning id", [
+          company,
+        ])
+      ).rows[0]!.id;
+      for (const p of people) {
+        const user = (
+          await db.query<{ id: string }>(
+            "insert into identity.users (email, name) values ($1, $2) returning id",
+            [p.email, p.name],
+          )
+        ).rows[0]!.id;
+        await db.query(
+          "insert into company_members (company_id, user_id, name, roles) values ($1, $2, $3, $4)",
+          [id, user, p.name, p.roles],
+        );
+      }
+    };
+    await add(
+      COMPANY.a,
+      ROLES.map((r) => ({ ...personOf(r), roles: [r] })),
     );
+    await add(COMPANY.b, [{ ...OTHER, roles: ["CompanyAdmin"] }]);
   } finally {
     await db.end();
   }
@@ -73,7 +90,7 @@ async function owner<T>(text: string, values: unknown[] = []): Promise<T[]> {
   }
 }
 
-const COMPANY_A = "select id from companies where name = '[Sàn mẫu thử vai]'";
+const COMPANY_A = "select id from companies where name = '[Sàn A thử lớp riêng]'";
 
 const stateOf = (who: string) => join(tmpdir(), `onehub-e2e-db-lop-rieng-${who}-${RUN}.json`);
 
@@ -158,8 +175,7 @@ test.describe("lop rieng tren bang hang", () => {
 
   test.beforeAll(async ({ browser }, info) => {
     if (info.project.name !== "1440") return;
-    await makeSampleCompany();
-    await makeOtherCompany();
+    await makeCompanies();
     // The shared catalog the pending unit matches against: this run's database starts without one.
     const db = new pg.Client({ connectionString: OWNER_URL });
     await db.connect();
@@ -168,9 +184,9 @@ test.describe("lop rieng tren bang hang", () => {
     } finally {
       await db.end();
     }
-    await keepSession(browser, rolePerson("CompanyAdmin").email, stateOf("a"));
+    await keepSession(browser, personOf("CompanyAdmin").email, stateOf("a"));
     await keepSession(browser, OTHER.email, stateOf("b"));
-    for (const role of ROLES) await keepSession(browser, rolePerson(role).email, stateOf(role));
+    for (const role of ROLES) await keepSession(browser, personOf(role).email, stateOf(role));
   });
 
   test("add and edit on screen", async ({ browser }) => {
@@ -598,7 +614,7 @@ test.describe("lop rieng tren bang hang", () => {
     const form = dialogOf(lp, "label-dialog");
     await pick(lp, form, "Khái niệm chuẩn", label("Unit"));
     await form.getByLabel("Chữ của sàn").fill("Mã căn sàn");
-    const email = rolePerson("TeamLead").email;
+    const email = personOf("TeamLead").email;
     const setRoles = (roles: Role[]) =>
       owner(
         `update company_members set roles = $2 where user_id = (select id from identity.users where email = $1)`,

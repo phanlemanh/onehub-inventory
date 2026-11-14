@@ -8,6 +8,16 @@ import type { LayerProblem } from "../store";
 export const LAYER_PARTS_SHOWN = ["nhan", "truong", "tu-dien", "can-cho", "mau"] as const;
 export type ShownPart = (typeof LAYER_PARTS_SHOWN)[number];
 
+/** Region states a development build may open with `?state=`, like the inventory's. */
+export const FORCED_STATES = ["loading", "empty", "error", "partial", "forbidden"] as const;
+export type ForcedState = (typeof FORCED_STATES)[number];
+
+/** The forced state asked for by `?state=`, honoured only outside production so users never see a fake state. */
+export function forcedStateFrom(param: unknown, env: string | undefined): ForcedState | undefined {
+  if (env === "production") return undefined;
+  return (FORCED_STATES as readonly unknown[]).includes(param) ? (param as ForcedState) : undefined;
+}
+
 /** The concept each part is named by in the label table. */
 export const PART_TITLE: Record<ShownPart, ConceptCode> = {
   nhan: "CompanyLabel",
@@ -59,6 +69,7 @@ export const LAYER_COPY = {
   save: "Lưu",
   add: "Thêm",
   saving: "Đang lưu",
+  reload: "Tải lại",
   adding: "Đang thêm",
   labelWhy: (inventory: string) =>
     `Chữ này thay tên chuẩn trên ${inventory} của sàn. Trang gửi khách vẫn dùng tên chuẩn.`,

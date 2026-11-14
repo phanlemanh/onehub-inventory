@@ -16,7 +16,7 @@ import { label } from "../index";
 import { STANDARD_VALUE_SETS, type FieldKind } from "../rules";
 import type { CompanyLayer, LayerPart } from "../store";
 
-import { LAYER_COPY as C, PART_TITLE, type ShownPart } from "./copy";
+import { LAYER_COPY as C, PART_TITLE, type ForcedState, type ShownPart } from "./copy";
 import {
   AliasDialog,
   FieldDialog,
@@ -158,24 +158,31 @@ type Load = { kind: "loading" } | { kind: "error" } | { kind: "ready"; layer: Co
 type Editing = { part: ShownPart; id: string } | null;
 
 /**
- * The screen the company layer screen (row 7e, shape A): the part chosen in the App Shell's second column fills the content
+ * The company layer screen (row 7e, shape A): the screen's title heads the page, and the part chosen in the App Shell's second column fills the content
  * area as one grid, with its add button at the head and «…» at the end of each row, each through the permission
  * table (row 9e). Nothing is deleted: retiring stops using a row and keeps its history.
  */
 export function CompanyLayerScreen({
   part,
   concepts,
+  forced: forcedAtOpen,
 }: {
   part: ShownPart;
   /** The concepts a company may give its own words. */
   concepts: readonly string[];
+  /** A region state a development build opens with `?state=`, as the inventory does; never set in production. */
+  forced?: ForcedState | undefined;
 }) {
   const [load, setLoad] = useState<Load>({ kind: "loading" });
+  // «Thử lại» and «Tải lại» drop a forced state, as the inventory does: the next read is a real one.
+  const [forced, setForced] = useState<ForcedState | undefined>(forcedAtOpen);
   const [tick, setTick] = useState(0);
   const [editing, setEditing] = useState<Editing>(null);
   const reload = useCallback(() => setTick((t) => t + 1), []);
 
   useEffect(() => {
+    // A forced loading state stays loading: nothing is read.
+    if (forced === "loading") return;
     let alive = true;
     fetch(LAYER_API, { cache: "no-store" })
       .then(async (res) => {
@@ -189,19 +196,32 @@ export function CompanyLayerScreen({
     return () => {
       alive = false;
     };
-  }, [tick]);
+  }, [tick, forced]);
 
   const done = (message: string) => {
     notifyResult({ message });
     reload();
   };
   const title = label(PART_TITLE[part]);
+  const screenTitle = label("CompanyLayer");
   const layer = load.kind === "ready" ? load.layer : null;
 
   const head = headButton(part, layer, concepts, done);
-  const status: RegionStatus =
+  const loaded: RegionStatus =
     load.kind === "loading" ? "loading" : load.kind === "error" ? "error" : "ready";
-  const grid = layer ? partGrid(part, layer) : { columns: partGrid(part, EMPTY).columns, rows: [] };
+  const status: RegionStatus =
+    forced === "loading" || forced === "error" || forced === "forbidden" || forced === "partial"
+      ? forced
+      : forced === "empty"
+        ? "ready"
+        : loaded;
+  const full = layer ? partGrid(part, layer) : { columns: partGrid(part, EMPTY).columns, rows: [] };
+  const grid =
+    forced === "empty"
+      ? { ...full, rows: [] }
+      : forced === "partial"
+        ? { ...full, rows: full.rows.slice(0, Math.ceil(full.rows.length / 2)) }
+        : full;
 
   const rowActions = (row: GridRow): RecordAction[] => {
     const name = rowName(part, row);
@@ -236,7 +256,7 @@ export function CompanyLayerScreen({
 
   return (
     <div className="flex flex-col gap-4" data-part={part} data-state={load.kind}>
-      <PageHeader title={title} action={head} />
+      <PageHeader title={screenTitle} action={head} />
       <p className="text-sm text-muted-foreground">{C.partWhy[part]}</p>
       <DataRegion
         title={title}
@@ -244,9 +264,21 @@ export function CompanyLayerScreen({
         rows={grid.rows}
         status={status}
         onRetry={() => {
+          setForced(undefined);
           setLoad({ kind: "loading" });
           reload();
         }}
+        emptyAction={
+          <Button
+            variant="outline"
+            onClick={() => {
+              setForced(undefined);
+              reload();
+            }}
+          >
+            {C.reload}
+          </Button>
+        }
         emptyWhy={C.empty[part]}
         headAction={head}
         rowActions={(row) => ({ actions: rowActions(row), mine: true })}

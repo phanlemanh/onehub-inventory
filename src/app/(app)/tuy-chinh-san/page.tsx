@@ -4,7 +4,12 @@ import { redirect } from "next/navigation";
 import { loginHref, PageState } from "@/components/templates/page-state";
 import { label } from "@/modules/company-config";
 import { LABELABLE_CONCEPTS } from "@/modules/company-config/server";
-import { CompanyLayerScreen, LAYER_PARTS_SHOWN, type ShownPart } from "@/modules/company-config/ui";
+import {
+  CompanyLayerScreen,
+  forcedStateFrom,
+  LAYER_PARTS_SHOWN,
+  type ShownPart,
+} from "@/modules/company-config/ui";
 import { allowedScope } from "@/modules/identity";
 import { currentSession } from "@/modules/identity/server";
 
@@ -22,9 +27,17 @@ export default async function Page({ searchParams }: Props) {
   if (allowedScope(session.roles, "readCompanyLayer") === null) {
     return <PageState kind="forbidden" homeHref="/" />;
   }
-  const asked = (await searchParams).phan;
+  const query = await searchParams;
+  const asked = query.phan;
   const part: ShownPart = (LAYER_PARTS_SHOWN as readonly unknown[]).includes(asked)
     ? (asked as ShownPart)
     : "nhan";
-  return <CompanyLayerScreen key={part} part={part} concepts={LABELABLE_CONCEPTS} />;
+  return (
+    <CompanyLayerScreen
+      key={part}
+      part={part}
+      concepts={LABELABLE_CONCEPTS}
+      forced={forcedStateFrom(query.state, process.env.NODE_ENV)}
+    />
+  );
 }
