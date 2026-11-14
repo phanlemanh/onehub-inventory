@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [api, config, ui]
 screens: [inventory, tuy-chinh-san]
-status: approved
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-13
 design_doc: docs/superpowers/specs/2026-11-13-lop-rieng-cua-san-design.md
@@ -130,10 +130,11 @@ thấy màn nhưng không có nút ghi nào; `/api/v1` trả 403.
 - Sửa ngoài mô-đun `company-config`: `architecture/modules.yaml`, `ontology/` (năm thực thể, hai thao tác, nhãn), `db/tests/cach-ly.sql`,
   Bảng hàng (`src/modules/listings/ui/`, `src/app/(app)/inventory/`), `src/components/candidate/column-kind.ts` (cột có kiểu
   khai sẵn), thanh bên.
-- Chỗ tầng cao chờ chủ kho phê (giám sát R-1311-20; nêu đích danh ở Cổng Bằng chứng, không cho thì hoàn lại): (1) dòng
-  `"json"` ở danh sách kiểu thuộc tính của `tools/wiki_lint.py` — bộ kiểm ontology phải nhận kiểu đối tượng mà chủ kho cho
-  thêm vào bộ sinh mã; (2) dòng `"bo qua: tuy-chinh-san — planned"` trong `tools/e2e_templates/e2e-templates.test.ts` —
-  danh sách màn chưa dựng bị bỏ qua khi chưa đăng nhập. Phép gốc của chủ kho (duyệt kế hoạch) chỉ nói bộ sinh mã
-  `tools/ontology_codegen.py`. Không chỗ nào khác trong `tools/` cần sửa cho kiểu đối tượng.
+- Chỗ tầng cao chờ chủ kho phê (giám sát R-1311-20, G-1311-120, G-1411-1; nêu đích danh ở Cổng Bằng chứng, không cho
+  thì hoàn lại): (1) dòng `"json"` ở danh sách kiểu thuộc tính của `tools/wiki_lint.py` — bộ kiểm ontology phải nhận kiểu
+  đối tượng mà chủ kho cho thêm vào bộ sinh mã; (2) trong `tools/e2e_templates/e2e-templates.test.ts`: thêm
+  `"tuy-chinh-san"` vào danh sách màn đã dựng, ba con số đếm đổi theo (80 thành 96, 96 thành 112) — thay cho dòng tạm
+  `"bo qua: tuy-chinh-san — planned"` đã gỡ khi màn dựng xong. Phép gốc của chủ kho (duyệt kế hoạch) chỉ nói bộ sinh mã
+  `tools/ontology_codegen.py`. Không đổi luật nào của công cụ.
 - Trang khách không đọc nhãn riêng, trường riêng (SP-4): ghi ở trang thực thể, đo ở hàng của trang khách.
 - Dòng sửa đổi L4/L5 ở `docs/plan/pham-vi-mvp-dot-1.md` đã có (2026-11-12) — không thêm dòng trùng.

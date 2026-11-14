@@ -25,7 +25,7 @@ Chữ ký là tên cột đã gấp theo đúng thứ tự; một mẫu đang d�
 
 ## Where in the code
 
-`src/modules/company-config/`, bảng trong `db/migrations/010_lop_rieng_cua_san.sql`, ghi qua `/api/v1/company-layer`.
+`src/modules/company-config/`, bảng trong `db/migrations/010_lop_rieng_cua_san.sql`, ghi qua `/api/v1/company-layer`. Màn xem lại và sửa: `/tuy-chinh-san` (`src/modules/company-config/ui/`), nút theo bảng quyền như hàng 9e.
 
 ## History
 
