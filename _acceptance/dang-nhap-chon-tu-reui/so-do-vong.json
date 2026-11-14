@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "slug": "dang-nhap-chon-tu-reui",
+  "ghi_luc": "2026-11-14T07:21:05Z",
+  "vong_cham": 2,
+  "luot": [
+    {
+      "vong": 1,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 2,
+      "verdict": "PASS",
+      "tang": []
+    }
+  ],
+  "lam_lai": [
+    {
+      "nguon": "r1",
+      "tang": "bai-kiem-ha-tang"
+    }
+  ],
+  "theo_tang": {
+    "bai-kiem-ha-tang": 1,
+    "trang-thai-hanh-vi": 0,
+    "du-lieu-api": 0,
+    "nghiep-vu": 0,
+    "thanh-phan": 0,
+    "bo-cuc": 0,
+    "hop-dong-yeu-cau": 0,
+    "link": 0,
+    "chu-dinh-dang": 0,
+    "mau-token": 0,
+    "truy-cap": 0
+  },
+  "chua_phan": [],
+  "thuoc_vat": {
+    "vat": [
+      49,
+      12
+    ],
+    "thuoc": [
+      19,
+      3
+    ],
+    "nhat": 2
+  },
+  "gio_may": {
+    "gio_may": 17.04,
+    "gio_cho": 11.95,
+    "phan_tram_tuan": 23.1
+  }
+}
