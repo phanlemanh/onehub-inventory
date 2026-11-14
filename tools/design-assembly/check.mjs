@@ -41,6 +41,8 @@ import {
   sizesProblem,
 } from "./screens.mjs";
 import { DEFAULT_STYLESHEET, findStylesheet, loadStyles, resolve } from "./styles.mjs";
+import { lintProbes } from "./lint.mjs";
+import { probesFor, ruleOf } from "./probes.mjs";
 import { buildTheme, readBlock, renderBlock, withoutBlock } from "./theme.mjs";
 import { tokensProblem } from "./tokens.mjs";
 
@@ -537,6 +539,24 @@ const KINDS = {
       return { ...state, sources: { ...state.sources, [check.sources]: changed } };
     },
   },
+  // A rule of the repository's own lint holds the decision: the lint rejects every probe that
+  // breaks it. The changed copy is the same lint with the rules that rejected them turned off.
+  lint: {
+    run(state, check, id) {
+      const result = state.lint?.[lintKey(id, check)];
+      if (!result) return `the repository's lint was not run for ${check.rule}`;
+      if (result.error) return result.error;
+      const through = result.labels.filter((_, index) => result.fired[index].length === 0);
+      if (through.length === 0) return null;
+      return `the repository's lint lets through ${through.map((label) => `\`${label}\``).join(", ")}, at ${check.at}`;
+    },
+    change(state, check, id) {
+      const key = lintKey(id, check);
+      const result = state.lint?.[key];
+      if (!result || result.error) return state;
+      return { ...state, lint: { ...state.lint, [key]: { ...result, fired: result.off } } };
+    },
+  },
   // Every line of the record of what slipped past the checks can be acted on.
   slips: {
     run(state, check) {
@@ -568,6 +588,58 @@ const KINDS = {
     },
   },
 };
+
+const lintKey = (id, check) => `${id}:${check.rule}`;
+
+// The lint rules the ledger points at, for the probe about exceptions.
+const pointedRules = (rows) =>
+  [...new Set((rows ?? []).map((row) => ruleOf(row.check)))].filter(Boolean);
+
+// Runs the repository's lint once for every lint check of `checks` (by decision id), and returns
+// what it rejected, keyed for the checks. `rows` are the ledger's rows.
+export function lintResults(root, checks, rows) {
+  const jobs = [];
+  const labels = {};
+  const missing = {};
+  for (const [id, list] of Object.entries(checks ?? {})) {
+    for (const check of list.filter((item) => item.kind === "lint")) {
+      const key = lintKey(id, check);
+      const rules = pointedRules(rows).filter((rule) => rule !== check.rule);
+      const probes = probesFor(id, { component: check.component ?? null, rules });
+      if (!probes) {
+        missing[key] = { error: `this tool has no probe that breaks ${id}` };
+        continue;
+      }
+      labels[key] = probes.probes.map((probe) => probe.label);
+      jobs.push({
+        key,
+        at: check.at,
+        control: probes.control,
+        probes: probes.probes.map((probe) => probe.text),
+      });
+    }
+  }
+  const linted = lintProbes(root, jobs);
+  return {
+    ...missing,
+    ...Object.fromEntries(
+      Object.entries(linted).map(([key, result]) => [key, { ...result, labels: labels[key] }]),
+    ),
+  };
+}
+
+// Whether this tool holds a row: the row points at the tool, or at the lint rule the tool re-runs
+// for it.
+export function heldHere(row, checks) {
+  if (row.check === TOOL) return true;
+  const rule = ruleOf(row.check);
+  const mine = checks?.[String(row.id)] ?? [];
+  return (
+    Boolean(rule) &&
+    mine.length > 0 &&
+    mine.every((check) => check.kind === "lint" && check.rule === rule)
+  );
+}
 
 // The source folders a set of checks reads, each once.
 export function checkFolders(checks) {
@@ -611,10 +683,13 @@ export function readState(root) {
   const pages = checks
     .filter((check) => check.pages)
     .map((check) => [check.pages, readPages(root, check.pages)]);
+  const rows = ledger === null ? null : parseLedger(ledger);
   return {
     root,
     theme: data,
-    ledger: ledger === null ? null : parseLedger(ledger),
+    ledger: rows,
+    // What the repository's own lint rejects, for the decisions it holds.
+    lint: lintResults(root, data?.checks, rows),
     stylesheet,
     // `css` is the repository's own text with its relative imports put in place; `base` is the
     // framework's theme, read only when a value points into it.
@@ -642,9 +717,9 @@ export function runChecks(state) {
         problems.push(`unknown check ${check.kind}`);
         continue;
       }
-      const problem = kind.run(state, check);
+      const problem = kind.run(state, check, id);
       if (problem) problems.push(problem);
-      if (kind.run(kind.change(state, check), check) === null) seenFailing = false;
+      if (kind.run(kind.change(state, check, id), check, id) === null) seenFailing = false;
     }
     return {
       id,
@@ -659,14 +734,18 @@ export function runChecks(state) {
 function crossProblems(state, results) {
   const rows = state.ledger ?? [];
   const pointed = rows.filter((row) => row.check === TOOL).map((row) => row.id);
+  const mine = rows.filter((row) => heldHere(row, state.theme?.checks)).map((row) => row.id);
   const held = results.map((r) => r.id);
   return [
     ...pointed
       .filter((id) => !held.includes(id))
       .map((id) => `${id}: the ledger points at this tool, which holds no check for it`),
     ...held
-      .filter((id) => !pointed.includes(id))
-      .map((id) => `${id}: held by this tool but not a row of ${FILES.ledger} that points at it`),
+      .filter((id) => !mine.includes(id))
+      .map(
+        (id) =>
+          `${id}: held by this tool but not a row of ${FILES.ledger} that points at it, or at the lint rule it re-runs`,
+      ),
   ];
 }
 
@@ -677,9 +756,10 @@ export function ledgerView(state) {
     const id = String(row.id);
     if (!row.check)
       return { id, kind: row.kind, state: row.kind === "judgment" ? "recorded" : "not held" };
-    if (row.check === TOOL) {
+    if (heldHere(row, state.theme?.checks)) {
       const mine = results.find((r) => r.id === id);
-      return { id, kind: row.kind, state: mine?.held ? "held" : "FAILING" };
+      const by = row.check === TOOL ? undefined : `${row.check}, re-run here`;
+      return { id, kind: row.kind, state: mine?.held ? "held" : "FAILING", ...(by ? { by } : {}) };
     }
     const broken = pointerProblem(state.root, id, row.check);
     return { id, kind: row.kind, state: broken ? "FAILING" : "claimed", by: row.check };

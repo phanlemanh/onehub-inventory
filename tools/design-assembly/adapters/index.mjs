@@ -1,6 +1,7 @@
 // The adapters: everything this plugin knows about one library or build tool, kept out of its core.
 // The core works with the ledgers; an adapter knows where a kind of repository keeps a thing and
 // how to reach it. A test fails when a name an adapter declares appears in the core.
+import { adapter as eslint } from "./eslint.mjs";
 import { adapter as playwright } from "./playwright.mjs";
 import { adapter as react } from "./react.mjs";
 import { adapter as shadcn } from "./shadcn.mjs";
@@ -15,9 +16,13 @@ export const ADAPTER_KINDS = {
   components:
     "knows which folder is the component library's, and how a component declares its variants",
   source: "reads screens and components to check words, states and controls",
+  lint: "runs the repository's own lint on a text, to see which of its rules reject it",
 };
 
-export const ADAPTERS = [vite, playwright, tailwind, shadcn, react];
+export const ADAPTERS = [vite, playwright, tailwind, shadcn, react, eslint];
+
+// The adapter of a kind.
+export const adapterOf = (kind) => ADAPTERS.find((adapter) => adapter.kind === kind);
 
 // Every name an adapter declares that appears in a text: a library or build tool named where only
 // an adapter may name it. A name is matched whole, in any case, so `reactive` is not `react`.

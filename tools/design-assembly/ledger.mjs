@@ -1,11 +1,15 @@
 // The ledger: design/decisions.yaml, one row per design decision, in block-style YAML that a person
 // can edit. A row points at the proof that holds the decision; it does not hold the value.
 //   kind   standard | formula | closed | judgment
-//   check  test:<path> | e2e:<path> | tool:<path> | eslint:<rule>, or absent
+//   check  test:<path> | e2e:<path> | tool:<path> | <lint>:<rule>, or absent
 // The format is one already in use in a product repository of the owner. Nothing here depends on
 // one repository's layout.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
+
+import { adapterOf } from "./adapters/index.mjs";
+
+const lint = adapterOf("lint");
 
 export const LEDGER = "design/decisions.yaml";
 // The pointer a row carries when this plugin's own tool holds the decision.
@@ -35,7 +39,7 @@ const QUOTED = ["source", "check", "note"];
 const HEADER = [
   "# Determinism ledger: one row per design decision.",
   "#   kind   standard | formula | closed | judgment",
-  "#   check  test:<path> | e2e:<path> | tool:<path> | eslint:<rule>. Leave it out until a check exists.",
+  `#   check  test:<path> | e2e:<path> | tool:<path> | ${lint.prefix}:<rule>. Leave it out until a check exists.`,
   "#          A test or e2e file names the decision it proves with `decision:<id>`. A tool is run by the gate.",
   "#          Keep this file in block style.",
   "version: 1",
@@ -145,9 +149,8 @@ export function pointerProblem(root, id, check) {
     const tagged = new RegExp(`decision:${id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w-])`);
     return tagged.test(text) ? null : `${check}: the file does not name decision:${id}`;
   }
-  if (prefix === "eslint") {
-    const configs = ["eslint.config.js", "eslint.config.mjs", "eslint.config.ts"];
-    if (configs.some((file) => (read(root, file) ?? "").includes(value))) return null;
+  if (prefix === lint.prefix) {
+    if (lint.configFiles.some((file) => (read(root, file) ?? "").includes(value))) return null;
     const bare = value.split("/").at(-1);
     const names = ["mjs", "cjs", "js", "ts"].map((extension) => `${bare}.${extension}`);
     return filesNamed(root, names) ? null : `${check}: no such rule`;

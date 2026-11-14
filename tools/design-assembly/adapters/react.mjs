@@ -6,6 +6,35 @@ export const adapter = {
   names: ["react", "react-dom", "sonner", "react-hot-toast", "react-toastify"],
   toastModules: ["sonner", "react-hot-toast", "react-toastify"],
   harness,
+  probe: {
+    // A screen file that draws `body`, with a word and a number it may build from. The control is
+    // the same file drawing nothing that breaks a decision.
+    file: (body, imports = "") =>
+      `${imports}export function Probe({ tone, n }: { tone: string; n: number }) {\n  return ${body};\n}\n`,
+    control: "<div />",
+    importOf: (name, from) => `import { ${name} } from "${from}";\n\n`,
+    withClass: (value) => `<div className="${value}" />`,
+    component: (name, attribute) => `<${name} ${attribute}>a</${name}>`,
+    classAttribute: (value) => `className="${value}"`,
+    // A class name built in pieces, which no tool can read whole.
+    pieces: (start) => [`className={"${start}" + tone}`, `className={\`${start}\${tone}\`}`],
+    element: (attribute) => `<div ${attribute} />`,
+    breaking: {
+      "raw-controls": [
+        '<button type="button">a</button>',
+        "<input />",
+        "<select />",
+        "<textarea />",
+      ],
+      "raw-table": ["<table />"],
+      "no-inline-style": ['<div style={{ color: "red" }} />'],
+      "format-number-date": [
+        "<p>{n.toLocaleString()}</p>",
+        "<p>{new Intl.NumberFormat().format(n)}</p>",
+        "<p>{new Date(n).toLocaleDateString()}</p>",
+      ],
+    },
+  },
 };
 
 // The page's code: it loads a component through `importModule`, an expression of the build

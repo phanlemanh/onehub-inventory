@@ -7,6 +7,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
+import { adapterOf } from "./adapters/index.mjs";
 import { parseLedger } from "./ledger.mjs";
 import { readScreenLedger } from "./screen-ledger.mjs";
 import { frontMatter } from "./screens.mjs";
@@ -49,7 +50,7 @@ export const LEDGERS = {
             layer: required(text),
             kind: required({ ...text, values: ["standard", "formula", "closed", "judgment"] }),
             source: required(text),
-            check: { ...text, pattern: "^(test|e2e|tool|eslint):" },
+            check: { ...text, pattern: `^(test|e2e|tool|${adapterOf("lint").prefix}):` },
             note: text,
           },
         }),

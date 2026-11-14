@@ -18,4 +18,8 @@ export const adapter = {
   variantSet: /\bconst\s+(\w+)\s*=\s*cva\(/g,
   // The toast component the library installs, from the package it wraps.
   toast: { package: "sonner", template: "sonner.tsx.template", file: "sonner.tsx" },
+  // How a screen imports a component of the library, from the alias the settings name.
+  importPathIn: (settings) => settings?.aliases?.ui ?? "@/components/ui",
+  // The component a probe restyles, when the library has it.
+  probeComponent: { name: "Button", file: "button" },
 };
