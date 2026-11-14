@@ -1,4 +1,4 @@
-import { sampleUnits, subdivisionNameOf } from "@/modules/catalog";
+import { SAMPLE_SUBDIVISIONS, sampleUnits, subdivisionNameOf } from "@/modules/catalog";
 import { formatDate } from "@/lib/format";
 import {
   SAMPLE_COMPANY,
@@ -7,7 +7,7 @@ import {
   listingsOfUnit,
   sampleEarlierListings,
 } from "@/modules/listings";
-import { inventoryRows, type ListingRecordData } from "@/modules/listings/ui";
+import { inventoryRows, type BuildingPlace, type ListingRecordData } from "@/modules/listings/ui";
 
 /**
  * The inventory rows of the sample company: the grid (row 1) and the top-bar search (row 3f) read the same rows, so
@@ -95,4 +95,11 @@ export function sampleRecords(now: Date): Record<string, ListingRecordData> {
     };
   }
   return records;
+}
+
+/** Where each sample building stands (row 7d): its project and, when public, its complex — for the geography tree (row 2d). */
+export function sampleBuildingPlaces(): BuildingPlace[] {
+  return SAMPLE_SUBDIVISIONS.flatMap((s) =>
+    s.buildings.map((b) => ({ project: s.name, complex: s.complex?.name, building: b.name })),
+  );
 }

@@ -22,13 +22,23 @@ const icon = (Icon: typeof SendIcon) => createElement(Icon, { "aria-hidden": tru
 const COPY = FRAME_COPY.secondColumn;
 
 /**
- * The App Shell's entries for one person: the inventory's second column gains their saved views (row 2c) after the
- * status shortcuts when their roles can list them.
+ * The App Shell's entries for one person: the inventory's second column gains one group per project of the places
+ * the grid holds (row 2d) after the status shortcuts, then their saved views (row 2c) when their roles can list them.
  */
-export function navFor({ savedViews }: { savedViews?: NavSection | null } = {}): NavItem[] {
+export function navFor({
+  savedViews,
+  geography,
+}: { savedViews?: NavSection | null; geography?: readonly NavSection[] | null } = {}): NavItem[] {
   return NAV.map((item) =>
-    item.href === "/inventory" && savedViews
-      ? { ...item, sections: [...(item.sections ?? []), savedViews] }
+    item.href === "/inventory"
+      ? {
+          ...item,
+          sections: [
+            ...(item.sections ?? []),
+            ...(geography ?? []),
+            ...(savedViews ? [savedViews] : []),
+          ],
+        }
       : item,
   );
 }

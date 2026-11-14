@@ -51,3 +51,14 @@ export {
 } from "./cell-edit-copy";
 export { UnitJump } from "./unit-jump";
 export { ASK_COPY, type AskWords } from "./ask-copy";
+export {
+  GEO_PARAM,
+  geoFiltersFor,
+  geoHref,
+  geoSections,
+  geoTree,
+  placeFor,
+  withoutPlace,
+  type BuildingPlace,
+  type GeoNode,
+} from "./geo-tree";

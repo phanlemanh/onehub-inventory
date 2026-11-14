@@ -1,0 +1,11 @@
+200 GET http://127.0.0.1:3481/inventory
+200 GET http://127.0.0.1:3481/inventory
+200 GET http://127.0.0.1:3481/inventory
+200 GET http://127.0.0.1:3481/sent
+200 GET http://127.0.0.1:3481/sent
+200 GET http://127.0.0.1:3481/tuy-chinh-san
+200 GET http://127.0.0.1:3481/api/v1/company-layer
+200 GET http://127.0.0.1:3481/api/v1/company-layer
+200 GET http://127.0.0.1:3481/tuy-chinh-san
+200 GET http://127.0.0.1:3481/api/v1/company-layer
+200 GET http://127.0.0.1:3481/api/v1/company-layer

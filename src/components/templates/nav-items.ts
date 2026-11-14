@@ -14,6 +14,16 @@ export interface NavLink {
    * on hover, on keyboard focus and on the open entry. Absent, the entry is drawn as before.
    */
   trailing?: ReactNode;
+  /**
+   * The places inside this one (row 2d: a complex's buildings), drawn as one nested list of the same entries. Absent,
+   * the entry is drawn as before.
+   */
+  children?: readonly NavLink[];
+}
+
+/** Every entry of a list, the nested ones right after their parent, in reading order. */
+export function flattenLinks(links: readonly NavLink[]): NavLink[] {
+  return links.flatMap((l) => [l, ...flattenLinks(l.children ?? [])]);
 }
 
 /** A titled group of the second column; without a title it sits under the screen name. */

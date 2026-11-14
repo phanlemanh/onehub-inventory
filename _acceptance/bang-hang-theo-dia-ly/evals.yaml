@@ -1,0 +1,129 @@
+schema_version: 1
+feature_slug: bang-hang-theo-dia-ly
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.dia_ly
+    paths: [src/modules/listings/ui/geo-tree.ts, src/modules/listings/ui/geo-tree.test.ts, "src/app/(app)/inventory-sample-rows.ts"]
+    expected: "exit 0; geo-tree.test.ts dựng cây từ ĐÚNG sampleInventoryRows() và sampleBuildingPlaces() (rút từ bên ghi thật, không dòng viết tay) và so với ma trận viết trước 10 nút {Vinhomes Ocean Park 1, The Sapphire 1, S1.01, S1.02, S1.03, S1.05, Vinhomes Ocean Park 2 – The Empire, [MAU] Toà E1, Vinhomes Ocean Park 3 – The Crown, [MAU] Toà C1} theo đúng thứ tự và cha con; mục cột thứ hai sinh từ cây không mang count (render: không phần tử data-slot place-count); ca rìa: toà danh mục không biết đứng dưới dự án; nơi 0 dòng không hiện; ca rỗng: 0 dòng → cây rỗng và nhóm cột thứ hai mang câu 'Chưa có căn nào trên Bảng hàng.' (render), đối chứng 60 dòng không có câu ấy; ca phá bỏ mọi dòng của S1.02 khỏi đầu vào thì đỏ với 'noi mat: S1.02' và ca phá thêm toà rỗng vào danh mục thì đỏ với 'noi rong hien: <toà>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-1
+    layer: backend-effect
+    executor: test
+    cmd: config:executors.test.dia_ly
+    paths: [src/modules/listings/ui/geo-tree.ts, "src/app/(app)/layout.tsx", "src/app/(app)/inventory/page.tsx", "src/app/(app)/inventory-sample-rows.ts", src/components/templates/app-shell/**]
+    expected: "exit 0; tests/dia-ly.test.tsx đọc danh sách viết trước 5 tệp mà cây đi qua (hằng 5: geo-tree.ts, layout.tsx, inventory/page.tsx, inventory-sample-rows.ts, second-column.tsx) và mọi tệp chúng nhập trong src/ (đi theo import, in danh sách đã quét), không tệp nào chạm dấu hiệu SP-1 của PRODUCT-INVARIANTS.md (rút regex từ chính tệp luật, không chép tay) và không tệp nào gọi withCompany hay mySavedViews mới so với nhánh chính; đối chứng dương: chuỗi 'new pg.Client(' chèn vào bản sao geo-tree.ts trong bộ nhớ thì đỏ với 'truy van moi: geo-tree.ts'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.dia_ly
+    paths: [src/modules/listings/ui/geo-tree.ts, src/components/candidate/grid-view.ts, tests/dia-ly.test.tsx]
+    expected: "exit 0; tests/dia-ly.test.tsx: với MỖI nút trong ma trận 10 nút viết trước (hằng 10), filterRows(rows, columns, geoFiltersFor(tree, [key])) trả đúng tập id bằng tập id tính độc lập từ dự án + toà của nút (so tập, không đếm), và độ dài bằng số trong ma trận viết trước {36, 36, 6, 9, 10, 11, 12, 12, 12, 12}; ca phá đổi luật lọc danh sách về «chứa chữ» trong bản sao thì ca 'Park 1 / Park 10' đỏ với 'thua dong: <id>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.test.dia_ly_e2e_db
+    paths: [src/components/templates/app-shell/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e-db/dia-ly.spec.ts]
+    expected: "exit 0; tests/e2e-db/dia-ly.spec.ts dưới vai Đầu chủ đã đăng nhập (cửa vai của 9b) ở 1440: bấm lần lượt 4 nút đại diện (một dự án, một phân khu, một toà trong phân khu, một toà thẳng dưới dự án — hằng 4); mỗi lần: chân bảng 'x / 60 dòng' với x = số viết trước của nơi ấy, nút có aria-current, trong cột thứ hai đúng MỘT phần tử aria-current; đối chứng dương ở 'Tất cả hàng'; ca phá (bản sao cột thứ hai không đặt aria-current) đỏ với 'nut khong sang: <nơi>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.dia_ly
+    paths: [src/components/candidate/grid-view.ts, src/components/candidate/column-filter-cell.tsx, tests/dia-ly.test.tsx]
+    expected: "exit 0; ô lọc chữ nhận danh sách tên hiện các tên nối ', ' (phân khu: 'S1.01, S1.02, S1.03, S1.05') và tên đọc được của ô (value và title) bằng trọn tên nơi, ca phá ô đọc tên cắt đỏ với 'ten o loc cat: <nơi>'; danh sách khớp trọn tên: hai dòng dự án '… Park 1' và '… Park 10', lọc ['… Park 1'] giữ đúng một dòng; đối chứng: chữ gõ '… Park 1' (chứa chữ) giữ cả hai; ca phá đổi so khớp trọn thành chứa chữ thì đỏ với 'khop tron hong'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.dia_ly
+    paths: [src/modules/listings/ui/**, src/components/templates/app-shell/**, tests/dia-ly.test.tsx]
+    expected: "exit 0; hàm tìm nơi từ lọc (placeFor) qua ma trận viết trước 7 ca hằng 7: đúng bộ tên của dự án / phân khu / toà → đúng khoá nơi; danh sách toà thiếu một toà của phân khu → null; chữ gõ tay chứa một phần tên → null; chữ gõ tay đúng trọn một tên toà (bỏ dấu hoa thường) → nơi ấy; không lọc → null; thêm ca hai dự án '… Park 1' và '… Park 10': chữ gõ tay '… Park 1' → null (tập dòng gồm cả Park 10), danh sách ['… Park 1'] → Park 1; luật: nơi sáng khi và chỉ khi tập dòng lọc ra bằng tập dòng của nơi; mỗi ca ghim thông điệp 'noi lech: <ca>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.test.dia_ly_e2e_db
+    paths: [src/components/templates/app-shell/**, src/modules/listings/ui/**, tests/e2e-db/dia-ly.spec.ts]
+    expected: "exit 0; sau khi bấm phân khu, gõ thêm vào ô lọc Toà làm danh sách thành chữ → không nút nào trong cây có aria-current; xoá ô rồi gõ đúng 'S1.02' → nút S1.02 sáng; bấm 'Xoá lọc' → 'Tất cả hàng' sáng, cây không nút sáng; mỗi bước so TẬP mã dòng của bảng với tập mã dòng của nút sáng (nếu có), không chỉ chân bảng; ca phá (cây không nghe lọc) đỏ với 'cay lech bang'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.test.dia_ly_e2e_db
+    paths: [src/modules/listings/ui/**, src/components/templates/app-shell/**, tests/e2e-db/dia-ly.spec.ts]
+    expected: "exit 0; bật lọc Trạng thái 'Đang bán', bấm toà S1.03: ô Trạng thái vẫn 'Đang bán', tập mã dòng của bảng bằng tập căn Đang bán của S1.03 tính từ sampleInventoryRows; sau khi bấm, cột thứ hai vẫn hiện đủ 10 nơi của ma trận viết trước (đếm 10/10, kể cả nơi không còn căn Đang bán); ca phá (bấm nơi xoá lọc khác) đỏ với 'mat loc khac', ca phá (cây ẩn nơi hết căn theo lọc khác) đỏ với 'noi bien mat: <nơi>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.test.dia_ly_e2e_db
+    paths: [src/modules/listings/ui/**, "src/app/(app)/inventory/**", tests/e2e-db/dia-ly.spec.ts]
+    expected: "exit 0; chọn phân khu, tải lại → cùng lọc, cùng nút sáng; mở đường dẫn chép trong ngữ cảnh mới (cùng vai) → như trên; lưu góc nhìn 'Sapphire' rồi mở 'Tất cả hàng' rồi mở góc nhìn → lọc Dự án/Toà trở lại, góc nhìn sáng, đúng một mục sáng; đường dẫn trỏ nơi không có (vung=khong-co) → 60 dòng, không nút sáng; ca phá (trang bỏ qua ?vung=) đỏ với 'dia chi mat noi'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/candidate/grid-view.ts, tests/grid.test.tsx, tests/dia-ly.test.tsx, design/behaviors.md]
+    expected: "exit 0; toàn bộ bài lưới cũ của 2a, 2e xanh không đổi lời; dia-ly.test.tsx thêm đối chứng: ô lọc chữ gõ tay của Bảng hàng (Căn 'S1', Toà 's1.0', Dự án 'park') và của Đã gửi lọc theo chứa chữ bỏ dấu như cũ; design/behaviors.md có dòng luật 'danh sách tên khớp trọn' (bài đọc chữ trong tệp)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.test.dia_ly_e2e_db
+    paths: [src/components/templates/app-shell/**, tests/e2e-db/dia-ly.spec.ts]
+    expected: "exit 0; ở 414 và 360: mở ngăn App Shell, cây nằm dưới 'Theo trạng thái', bấm toà [MAU] Toà E1 → ngăn đóng, chân bảng '12 / 60 dòng'; ở 1024 và 1440: mỗi tên dự án hiện trọn (scrollWidth <= clientWidth, không dấu '…'); ca phá (bản sao cắt chữ) đỏ với 'ten bi cat: <dự án>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.test.dia_ly_e2e_db
+    paths: [src/components/templates/app-shell/**, tests/e2e-db/dia-ly.spec.ts]
+    expected: "exit 0; axe trên Bảng hàng có cây ở 1440 và 360, sáng và tối: 0 vi phạm; tới nút S1.01 bằng bàn phím theo lối đã chọn (Tab với D, mũi tên với A, C) rồi Enter → bảng lọc S1.01 và nút mang aria-current; ca phá (nút không vào được bằng Tab) đỏ với 'khong toi duoc bang phim'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/components/templates/**, tests/app-shell.test.tsx, tests/app-shell-status-shortcuts.test.tsx]
+    expected: "exit 0; bài App Shell cũ xanh không đổi lời; thêm ca: nhóm không có mục con vẽ như trước (không phần tử data-slot geo-tree), mục sáng duy nhất tính trên cả mục con"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-10
+    executor: ui-check
+    layer: ui-observed
+    cmd: config:executors.design.ui_check
+    paths: [src/components/templates/app-shell/**, src/modules/listings/ui/**, "src/app/(app)/inventory/**", "src/app/(app)/sent/**"]
+    steps:
+      - "Use the lane K dev server (port 3481) on lane K Postgres, signed in as the ListAgent of [Sàn mẫu Ocean]; if it does not answer, start it from the repo root on port 3481 (never 3470), note its PID and stop only that PID"
+      - "Navigate {url}/inventory at 1440x900, light; click the place 'The Sapphire 1' in the second column → screenshot evidence/E14-phan-khu-1440-sang.png; dark → evidence/E14-phan-khu-1440-toi.png"
+      - "At 360x800 light open the App Shell sheet → screenshot evidence/E14-ngan-360-sang.png; click '[MAU] Toà E1' → screenshot evidence/E14-toa-360-sang.png"
+      - "Navigate {url}/sent at 1440x900 and 360x800 light (360: open the App Shell sheet) → screenshots evidence/E14-sent-1440-sang.png, evidence/E14-sent-360-sang.png; same for {url}/tuy-chinh-san when that route exists (row 7e) → evidence/E14-tuy-chinh-1440-sang.png, evidence/E14-tuy-chinh-360-sang.png; compare each with its 'before' shot taken on the main branch at the round's diff base (evidence/E14-*-truoc.png), 4/4 pairs"
+    expected: "Second column shows one group per project under 'Theo trạng thái', titled like 'Theo trạng thái', entries without counts; the chosen place is the one highlighted entry; Dự án and Toà filter cells hold the whole names (the box may be cut by the column-width rule; hovering it shows the whole name), and the lit entry of the second column shows the place name in full; footer reads '36 / 60 dòng' after The Sapphire 1 and '12 / 60 dòng' after [MAU] Toà E1; on /sent and /tuy-chinh-san the second column has no tree and the same entries and highlight as the before shot at both widths"
+    evidence_required: [run_id, screenshot, observed, verifier, verified_at]
+
+  - id: E15
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
