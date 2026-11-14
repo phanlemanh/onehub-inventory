@@ -293,16 +293,32 @@ function useWidthInCh() {
     const box = boxRef.current;
     const ch = chRef.current;
     if (!box || !ch) return;
+    // The room the columns really get is the grid's scroll viewport, inside the frame's border and padding: measured on
+    // the outer box, the spare width shared out ran past it by those insets, which a slightly wider font (Linux, CI)
+    // turned into a sideways scroll at 1440 (row 2e). The viewport mounts after the first measure, so it is watched too.
+    let watched: Element | null = null;
     const measure = () => {
       const one = ch.getBoundingClientRect().width || 8;
       setChPx(one);
       setDenseChPx(denseChRef.current?.getBoundingClientRect().width || one);
-      setWidthCh(box.getBoundingClientRect().width / one);
+      const viewport = box.querySelector<HTMLElement>('[data-slot="scroll-area-viewport"]');
+      if (viewport && viewport !== watched) {
+        watched = viewport;
+        observer.observe(viewport);
+      }
+      setWidthCh((viewport ? viewport.clientWidth : box.getBoundingClientRect().width) / one);
     };
-    measure();
     const observer = new ResizeObserver(measure);
+    const mounts = new MutationObserver(() => {
+      if (box.querySelector('[data-slot="scroll-area-viewport"]') !== watched) measure();
+    });
+    measure();
     observer.observe(box);
-    return () => observer.disconnect();
+    mounts.observe(box, { childList: true, subtree: true });
+    return () => {
+      observer.disconnect();
+      mounts.disconnect();
+    };
   }, []);
   return { boxRef, chRef, denseChRef, widthCh, chPx, denseChPx };
 }
@@ -591,10 +607,35 @@ export function DataRegion({
   // The filter row is always there (row 2e, owner 2026-11-13): every column is at least wide enough to type a short rule.
   const widths = useMemo(() => {
     const floored = fitted.map((w, i) => Math.max(w, floorCh(i, chPx)));
+    const room = widthCh === null ? null : (widthCh * baseChPx) / chPx - rowNumberCh - 1;
+    // When the floors push the columns past the room (dense text still too wide, as on a font a little wider than
+    // here), the columns that already cut their text — a long project name — give the difference back first, never
+    // below their own floor; columns that show their text whole keep it (row 2e: eight columns at 1440 on CI).
+    // Only when giving back makes them fit: a phone's grid scrolls sideways anyway, and squeezing a column there helps
+    // nobody.
+    const cutting = floored
+      .map((w, i) => ({ i, cut: (full[i] ?? w) - w }))
+      .filter((c) => c.cut > 0)
+      .sort((a, b) => b.cut - a.cut);
+    const canGive = cutting.reduce(
+      (sum, { i }) => sum + Math.max(0, (floored[i] ?? 0) - floorCh(i, chPx)),
+      0,
+    );
+    const over = room === null ? 0 : floored.reduce((sum, w) => sum + w, 0) - room;
+    if (over > 0 && over <= canGive) {
+      let short = over;
+      for (const { i } of cutting) {
+        if (short <= 0) break;
+        const give = Math.min(short, (floored[i] ?? 0) - floorCh(i, chPx));
+        if (give <= 0) continue;
+        floored[i] = (floored[i] ?? 0) - give;
+        short -= give;
+      }
+    }
     const spread = spreadSpareCh(
       floored,
       full.map((w, i) => Math.max(w, floored[i] ?? 0)),
-      widthCh === null ? null : (widthCh * baseChPx) / chPx - rowNumberCh - 1,
+      room,
     );
     // While grouped, the grouping column also holds the group's open-close button in front of its label.
     return spread.map((w, i) =>

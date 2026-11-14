@@ -351,7 +351,13 @@ test.describe("E5 · the top-bar ⌘K box", () => {
     // here waits any more, and a palette still closing would take the next «/».
     await expect(palette(page)).toHaveCount(0);
     await showFilters(page);
-    await unitFilter(page).click();
+    // The box must really hold the focus before «/» is typed. On a slow machine (CI, Linux) the grid lays itself out
+    // once more about half a second after the palette closes and the filter row shifts a few pixels, so a click in that
+    // moment lands on the grid instead (row 2e, ruling K-1411-14; listed out of contract for the owner).
+    await expect(async () => {
+      await unitFilter(page).click();
+      await expect(unitFilter(page)).toBeFocused({ timeout: 500 });
+    }).toPass();
     await page.keyboard.press("/");
     await expect(palette(page), "slash stolen from a text field").toHaveCount(0);
     await expect(unitFilter(page), "slash stolen from a text field").toHaveValue("/");

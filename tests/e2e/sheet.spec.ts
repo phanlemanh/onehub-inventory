@@ -931,3 +931,61 @@ test.describe("header buttons in view", () => {
     await expect(checkHeaderButtons(page)).rejects.toThrow("header button covered: Căn");
   });
 });
+
+// Row 2e, ruling K-1411-14: when the floors push the columns past the room, the column that cuts its text (Dự án) gives
+// the difference back — never below its own floor — and only when that makes them fit; a narrow screen keeps
+// scrolling sideways with the project column as wide as before.
+test.describe("project column gives room, never below its floor", () => {
+  /** The project column against the grid's own ch, and whether the grid scrolls sideways. */
+  async function project(page: Page): Promise<{ ch: number; scrolls: boolean }> {
+    return page.evaluate(() => {
+      const th = document.querySelector<HTMLElement>(
+        '[data-slot="data-region-body"] thead th[data-col-id="Listing.subdivisionName"]',
+      )!;
+      const cell = document.querySelector('tbody td[data-col-id="Listing.subdivisionName"]') ?? th;
+      const probe = document.createElement("span");
+      probe.textContent = "0";
+      probe.style.font = getComputedStyle(cell).font;
+      document.body.append(probe);
+      const one = probe.getBoundingClientRect().width;
+      probe.remove();
+      const v = document.querySelector<HTMLElement>(
+        '[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]',
+      )!;
+      return {
+        ch: th.getBoundingClientRect().width / one,
+        scrolls: v.scrollWidth > v.clientWidth + 1,
+      };
+    });
+  }
+  function checkProject(m: { ch: number; scrolls: boolean }, narrow: boolean): void {
+    if (Math.round(m.ch * 10) / 10 < 8.3)
+      throw new Error(`project column below its floor: ${m.ch.toFixed(1)}ch`);
+    if (narrow && !m.scrolls) throw new Error("narrow grid stopped scrolling sideways");
+    if (narrow && m.ch < 15)
+      throw new Error(`project column squeezed on a narrow screen: ${m.ch.toFixed(1)}ch`);
+  }
+
+  test("the project column keeps its floor; a narrow screen still scrolls sideways", async ({
+    page,
+  }) => {
+    await openInventory(page);
+    await expect(bodyRows(page).first()).toBeVisible();
+    const m = await project(page);
+    expect(() => checkProject(m, !WIDE.has(width()))).not.toThrow();
+  });
+
+  test("the check fails when the project column is squeezed below its floor", async ({ page }) => {
+    await openInventory(page);
+    await expect(bodyRows(page).first()).toBeVisible();
+    const nth = await page
+      .locator('thead th[data-col-id="Listing.subdivisionName"]')
+      .first()
+      .evaluate((th) => [...th.parentElement!.children].indexOf(th) + 1);
+    await page.addStyleTag({
+      content: `table[data-slot="data-grid-table"] colgroup col:nth-child(${nth}) { width: 40px !important; } [data-col-id="Listing.subdivisionName"] { width: 40px !important; min-width: 40px !important; max-width: 40px !important; }`,
+    });
+    const m = await project(page);
+    expect(() => checkProject(m, false)).toThrow("project column below its floor");
+  });
+});
