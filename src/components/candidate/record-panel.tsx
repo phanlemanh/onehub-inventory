@@ -26,6 +26,11 @@ export interface RecordView {
   body: ReactNode;
   /** The record's actions, usually a RecordActions (row 9e): at the head, before «Trước», «Sau» and «Đóng». */
   actions?: ReactNode;
+  /**
+   * One button stuck to the foot of the record, outside the scrolling body: the next step with a person (row 3e,
+   * the ask-the-listing-agent button). Absent, the record looks as before.
+   */
+  footer?: ReactNode;
 }
 
 /** The selector of the button that opened a record, so focus can go back to the row it came from. */
@@ -67,7 +72,10 @@ export function useRecordAddress(param: string = RECORD_PARAM) {
   return { openId, navigate };
 }
 
-/** The panel's header: the record's name, «Trước» and «Sau» in the grid's order, and «Đóng». */
+/**
+ * The panel's header, two lines on every width (owner, 2026-11-13, «Có, mọi khổ»): the record's name on its own line,
+ * then the record's actions, «Trước» and «Sau» in the grid's order, and «Đóng» on the line below, at the right.
+ */
 function PanelHeader({
   title,
   previous,
@@ -84,10 +92,9 @@ function PanelHeader({
   close: ReactNode;
 }) {
   return (
-    <div data-slot="record-panel-header" className="flex items-start gap-2 border-b p-4">
+    <div data-slot="record-panel-header" className="flex flex-col gap-2 border-b p-4">
       {title}
-      {/* «Trước», «Sau», «Đóng» always sit top right, on every width and theme; a long name wraps instead. */}
-      <div className="ml-auto flex shrink-0 items-center gap-1">
+      <div data-slot="record-panel-actions" className="flex items-center justify-end gap-1">
         {actions}
         <Button
           variant="outline"
@@ -113,7 +120,7 @@ function PanelHeader({
   );
 }
 
-const TITLE_CLASS = "min-w-0 flex-1 text-lg font-semibold break-words";
+const TITLE_CLASS = "min-w-0 text-lg font-semibold break-words";
 
 /**
  * The one record panel of the app (design/behaviors.md, open the record panel; owner's choice at row 3's scope gate:
@@ -211,6 +218,7 @@ export function RecordPanel({
           <div data-slot="record-panel-body" className="min-h-0 flex-1 overflow-y-auto p-4">
             {view?.body}
           </div>
+          {view?.footer}
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
@@ -345,6 +353,7 @@ function RecordColumn({
           <div data-slot="record-panel-body" className="min-h-0 flex-1 overflow-y-auto p-4">
             {view.body}
           </div>
+          {view.footer}
         </FramePanel>
       </Frame>
     </aside>

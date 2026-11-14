@@ -27,7 +27,8 @@ type Sample = ReturnType<typeof buildSample>;
 
 const clone = (s: Sample): Sample => structuredClone(s);
 const digest = (text: string) => createHash("sha256").update(text).digest("hex");
-const PINNED_DIGEST = "428b20ae0e96076795e22ef1fd1734acf5743d8afb94366173973434eb3855c9";
+// Row 3b added the offer details and creation time to every sample listing; ids, statuses and prices are unchanged.
+const PINNED_DIGEST = "e97a72da56f940a36ebc0501f782f8188ea754a1d406edd47429c0d6cce94623";
 
 function scanGroups(s: Sample): contacts.ScanGroup[] {
   return [

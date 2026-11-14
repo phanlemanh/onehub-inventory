@@ -2114,6 +2114,31 @@
       ]
     },
     {
+      "name": "Progress",
+      "file": "src/components/ui/progress.tsx",
+      "level": "atom",
+      "parts": [
+        {
+          "name": "Progress",
+          "props": [
+            "value"
+          ]
+        },
+        {
+          "name": "ProgressIndicator"
+        },
+        {
+          "name": "ProgressLabel"
+        },
+        {
+          "name": "ProgressTrack"
+        },
+        {
+          "name": "ProgressValue"
+        }
+      ]
+    },
+    {
       "name": "ScrollArea",
       "file": "src/components/ui/scroll-area.tsx",
       "level": "atom",

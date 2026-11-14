@@ -1181,6 +1181,692 @@
       ]
     },
     {
+      "title": "hoi-dau-chu-bao-sai.spec.ts",
+      "file": "hoi-dau-chu-bao-sai.spec.ts",
+      "specs": [
+        {
+          "title": "E1 · the foot bar sticks under the body at every width",
+          "tests": [
+            {
+              "projectName": "360",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            },
+            {
+              "projectName": "414",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            },
+            {
+              "projectName": "1024",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            },
+            {
+              "projectName": "1440",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "E1 break · a bar inside the body says «footer scrolls with the body»",
+          "tests": [
+            {
+              "projectName": "360",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "414",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1024",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1440",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "E2b · the shared link opens the same unit's record",
+          "tests": [
+            {
+              "projectName": "360",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            },
+            {
+              "projectName": "414",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440 va 360"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440 va 360"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1024",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440 va 360"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440 va 360"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1440",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "E5b · no bar on the viewer's own unit; «Sau» to someone else's brings it back",
+          "tests": [
+            {
+              "projectName": "360",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "414",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1024",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1440",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "company admin: no ask bar, the report button stays",
+          "tests": [
+            {
+              "projectName": "360",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "414",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1024",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1440",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "a unit nobody keeps: the button is off and says why",
+          "tests": [
+            {
+              "projectName": "360",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            },
+            {
+              "projectName": "414",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            },
+            {
+              "projectName": "1024",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            },
+            {
+              "projectName": "1440",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "E8 · no write request and no change through every branch",
+          "tests": [
+            {
+              "projectName": "360",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "414",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1024",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1440",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "E9 · axe on the record with its foot bar and on the report dialog",
+          "tests": [
+            {
+              "projectName": "360",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            },
+            {
+              "projectName": "414",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            },
+            {
+              "projectName": "1024",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            },
+            {
+              "projectName": "1440",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "E9 break · low contrast on the ask button is a violation",
+          "tests": [
+            {
+              "projectName": "360",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "414",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1024",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1440",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "failure frames: no share sheet and no clipboard",
+          "tests": [
+            {
+              "projectName": "360",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            },
+            {
+              "projectName": "414",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440 va 360"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440 va 360"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1024",
+              "status": "skipped",
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "do o 1440 va 360"
+                }
+              ],
+              "results": [
+                {
+                  "status": "skipped",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "do o 1440 va 360"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "projectName": "1440",
+              "status": "expected",
+              "annotations": [],
+              "results": [
+                {
+                  "status": "passed",
+                  "annotations": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "login.spec.ts",
       "file": "login.spec.ts",
       "specs": [

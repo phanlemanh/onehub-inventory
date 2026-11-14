@@ -2,7 +2,7 @@
 
 import { SearchIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import type { GridRow } from "@/components/candidate/data-region";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,8 @@ function typingIn(target: EventTarget | null): boolean {
  * inventory with the text in the column filter of its kind; one unit found opens its record (the page does that).
  * Opens with a click, ⌘K or Ctrl+K anywhere, and «/» outside a field.
  */
+const noSubscribe = () => () => {};
+
 export function UnitJump({
   rows,
   words,
@@ -47,6 +49,13 @@ export function UnitJump({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
+  // True once the box runs in the browser, after the first render that attaches the key listener below: from then on
+  // ⌘K and «/» open the box (the same signal as the account menu's data-ready).
+  const keysReady = useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false,
+  );
   const list = useMemo(() => searchSuggestions(rows, text), [rows, text]);
   const kindWord: Record<SearchKind, string> = {
     unit: words.unit,
@@ -77,7 +86,7 @@ export function UnitJump({
 
   return (
     <>
-      <span data-slot="unit-jump" className="contents">
+      <span data-slot="unit-jump" data-ready={keysReady || undefined} className="contents">
         <Button
           variant="outline"
           size="sm"

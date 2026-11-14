@@ -4,6 +4,9 @@
 // One listing's record beside the inventory grid (roadmap row 3, _acceptance/ho-so-can): the floating panel under the
 // App Shell's top bar (E2), the columns left beside it (E3), the address (E4), the full-screen record on a phone (E7)
 // and an accessibility scan with the record open (E9). Every check has a break case with a pinned message.
+import { mkdirSync } from "node:fs";
+import { join } from "node:path";
+
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
@@ -138,30 +141,52 @@ function assertFloat(g: Awaited<ReturnType<typeof floatGeometry>>): void {
   if (g.overflow > 0) throw new Error(`record scrolls sideways by ${g.overflow}px`);
 }
 
-/** «Trước», «Sau», «Đóng» on one line, top right of the record, beside its name. */
-async function assertActionsTopRight(page: Page): Promise<void> {
+/**
+ * The record's head on two lines, on every width (owner, 2026-11-13, «Có, mọi khổ», row 3e AC-10): the name on one line
+ * of its own; under it, one line of buttons ending «Trước», «Sau», «Đóng», «Đóng» at the right edge; «Chép đường dẫn» an
+ * icon with a readable name and a hover hint; no button outside the record.
+ */
+/** Head frames for row 3e's evidence, in the run folder. */
+const HEAD_SHOTS = join(".acceptance-runs", "hoi-dau-chu-bao-sai", "dau-ho-so");
+
+async function assertHeaderTwoLines(page: Page): Promise<void> {
   const g = await page.evaluate(() => {
     const record = document.querySelector('[data-slot="record-panel"]')!;
     const header = record.querySelector('[data-slot="record-panel-header"]')!;
-    const title = header.querySelector("h2")!.getBoundingClientRect();
+    const h2 = header.querySelector("h2")!;
+    const title = h2.getBoundingClientRect();
     const all = [...header.querySelectorAll("button")];
-    const buttons = all.map((b) => b.getBoundingClientRect());
+    const copy = header.querySelector<HTMLElement>('[data-slot="copy-link"]');
     return {
-      // The last three are «Trước», «Sau», «Đóng»; row 3f's «Chép đường dẫn» may stand before them, on the same line.
       lastThree: all
         .slice(-3)
         .map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim() ?? ""),
-      titleTop: title.top,
-      tops: buttons.map((b) => b.top),
-      closeRight: buttons.at(-1)!.right,
-      recordRight: record.getBoundingClientRect().right,
+      titleBottom: title.bottom,
+      titleHeight: title.height,
+      lineHeight:
+        parseFloat(getComputedStyle(h2).lineHeight) ||
+        parseFloat(getComputedStyle(h2).fontSize) * 1.5,
+      boxes: all.map((b) => b.getBoundingClientRect().toJSON() as DOMRect),
+      record: record.getBoundingClientRect().toJSON() as DOMRect,
+      copyText: copy?.innerText.trim() ?? null,
+      copyName: copy?.getAttribute("aria-label") ?? null,
+      copyHint: copy?.getAttribute("title") ?? null,
     };
   });
-  const offTop = g.tops.some((top) => Math.abs(top - g.titleTop) > 4);
-  const offRight = g.recordRight - g.closeRight > 24;
   const named = ["Trước", "Sau", "Đóng"].every((name, i) => g.lastThree[i]?.includes(name));
-  if (g.tops.length < 3 || !named || offTop || offRight)
-    throw new Error("record actions left the top right");
+  const tops = g.boxes.map((b) => b.top);
+  const oneRow = tops.every((top) => Math.abs(top - tops[0]!) <= 4);
+  const below = g.boxes.every((b) => b.top >= g.titleBottom - 1);
+  if (g.boxes.length < 3 || !named || !oneRow || !below)
+    throw new Error("record header is not two lines");
+  if (g.titleHeight > g.lineHeight * 1.6) throw new Error("unit name squeezed");
+  if (g.record.right - g.boxes.at(-1)!.right > 24)
+    throw new Error("record actions left the right edge");
+  for (const b of g.boxes)
+    if (b.right > g.record.right + 0.5 || b.left < g.record.left - 0.5)
+      throw new Error("record head buttons overflow the record");
+  if (g.copyText !== "" || !g.copyName?.includes("Chép đường dẫn") || g.copyHint !== g.copyName)
+    throw new Error("copy link is not an icon with a name");
 }
 
 /** Tab from «Đóng» leaves the record and reaches the grid's region within ten steps. */
@@ -379,24 +404,36 @@ test.describe("E2 · the record floats beside the grid", () => {
   });
 });
 
-test.describe("E2 · «Trước», «Sau», «Đóng» sit top right on every size", () => {
+test.describe("E2, AC-10 of row 3e · the record head on two lines on every size", () => {
   for (const colorScheme of ["light", "dark"] as const) {
-    test(`on one line beside the name (${colorScheme})`, async ({ page }) => {
+    test(`name on one line, buttons on the next (${colorScheme})`, async ({ page }, info) => {
       await page.emulateMedia({ colorScheme });
       await openInventory(page);
       await openFifth(page);
-      await assertActionsTopRight(page);
+      await assertHeaderTwoLines(page);
+      await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+      mkdirSync(HEAD_SHOTS, { recursive: true });
+      await page.screenshot({
+        path: join(HEAD_SHOTS, `dau-ho-so-${info.project.name}-${colorScheme}.png`),
+      });
     });
   }
 
-  test("break: a header that wraps moves the actions off the top right", async ({ page }) => {
+  test("break: a head on one line says «record header is not two lines»", async ({ page }) => {
     await injectStyle(
       page,
-      '[data-slot="record-panel-header"] { flex-wrap: wrap !important; } [data-slot="record-panel-header"] > :first-child { flex-basis: 100% !important; }',
+      '[data-slot="record-panel-header"] { flex-direction: row !important; align-items: flex-start !important; }',
     );
     await openInventory(page);
     await openFifth(page);
-    await expect(assertActionsTopRight(page)).rejects.toThrow("record actions left the top right");
+    await expect(assertHeaderTwoLines(page)).rejects.toThrow("record header is not two lines");
+  });
+
+  test("break: a squeezed name says «unit name squeezed»", async ({ page }) => {
+    await injectStyle(page, '[data-slot="record-panel-header"] h2 { width: 40px !important; }');
+    await openInventory(page);
+    await openFifth(page);
+    await expect(assertHeaderTwoLines(page)).rejects.toThrow("unit name squeezed");
   });
 });
 
@@ -694,7 +731,8 @@ test.describe("E7 · on a phone the record is the whole screen", () => {
         status: card?.querySelectorAll("[data-status]").length ?? 0,
         facts:
           card?.querySelectorAll('[data-slot="listing-card-facts"] > [data-field]').length ?? 0,
-        fields: el.querySelectorAll('[data-slot="listing-record-fields"] > [data-field]').length,
+        // Row 3b (G approved N-1211-13): the full record lists the unit in its own block of eight facts, after the card.
+        fields: el.querySelectorAll('[data-slot="listing-unit"] [data-field]').length,
       };
     });
     expect(shape).toMatchObject({

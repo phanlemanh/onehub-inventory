@@ -5,6 +5,8 @@ import { LABELS } from "../../generated/labels";
 import type {
   Company,
   Listing,
+  ListingFurnished,
+  ListingOccupantType,
   ListingStandardStatus,
   ListingUnit,
   ListingWithdrawnReason,
@@ -15,7 +17,13 @@ import type {
 export const SAMPLE_ID_PREFIX = "4d415500-";
 
 /** Kind digits in the second group of a sample id. */
-export const SAMPLE_ID_KIND = { company: 0, listing: 1, listingUnit: 2 } as const;
+export const SAMPLE_ID_KIND = {
+  company: 0,
+  listing: 1,
+  listingUnit: 2,
+  earlierListing: 3,
+  earlierListingUnit: 4,
+} as const;
 
 /** A sample uuid: `4d415500-<kind>-4000-8000-<n>`. */
 export const sampleId = (kind: number, n: number) =>
@@ -58,6 +66,32 @@ const WITHDRAWN_REASONS: readonly ListingWithdrawnReason[] = [
   "sold_elsewhere",
   "owner_changed_mind",
   "unreachable",
+];
+
+// Offer details of the sample listings (row 3b), by position: each detail is present on some listings and missing on others.
+const FURNISHED_BY_POSITION: readonly (ListingFurnished | undefined)[] = [
+  "Furnished",
+  "Partially",
+  "Unfurnished",
+  undefined,
+];
+const LEGAL_BY_POSITION: readonly (string | undefined)[] = [
+  "Sổ hồng",
+  "Hợp đồng mua bán",
+  undefined,
+  "Sổ hồng",
+];
+const FINANCING_BY_POSITION: readonly (string | undefined)[] = [
+  "Không vay",
+  undefined,
+  "Đang vay ngân hàng",
+  undefined,
+];
+const OCCUPANT_BY_POSITION: readonly (ListingOccupantType | undefined)[] = [
+  "Vacant",
+  "Owner",
+  undefined,
+  "Tenant",
 ];
 
 /** The link between a listing and the catalog unit it offers: the generated ontology concept `ListingUnit`. */
@@ -134,8 +168,18 @@ export function buildSampleListings(input: {
       standardStatus: status,
       listPrice,
       lastConfirmedAt: `2026-11-${two(1 + (i % 9))}T09:00:00+07:00`,
+      originalEntryTimestamp: `2026-10-${two(1 + (i % 20))}T09:00:00+07:00`,
       version: 1,
     };
+    // Row 3b: the four offer details by position, with deliberate gaps (no random draw, so prices stay as they were).
+    const furnished = FURNISHED_BY_POSITION[i % 4];
+    const legal = LEGAL_BY_POSITION[i % 4];
+    const financing = FINANCING_BY_POSITION[i % 4];
+    const occupant = OCCUPANT_BY_POSITION[i % 4];
+    if (furnished) listing.furnished = furnished;
+    if (legal) listing.legalStatus = legal;
+    if (financing) listing.financing = financing;
+    if (occupant) listing.occupantType = occupant;
     if (unit.subdivisionName) listing.subdivisionName = unit.subdivisionName;
     if (status === "Closed") {
       listing.closePrice = listPrice - r.int(6) * 10_000_000;
@@ -217,4 +261,101 @@ export function checkListingLabels(data: SampleListings, company: Company): stri
   for (const x of data.listingUnits)
     if (!x.id.startsWith(SAMPLE_ID_PREFIX)) errors.push(`thiếu nhãn MAU: liên kết căn ${x.id}`);
   return errors;
+}
+
+/**
+ * Who keeps a sample listing (row 3e) until row 10 brings the real keeper: someone else (`[Tên] 0x`), the person viewing,
+ * or nobody yet. Fixed by the listing's sample number, so every screen and test agrees.
+ */
+export type SampleKeeper = { kind: "other"; name: string } | { kind: "viewer" } | null;
+
+export function sampleKeeperOf(listingId: string): SampleKeeper {
+  const n = Number.parseInt(listingId.slice(-12), 16);
+  if (!listingId.startsWith(SAMPLE_ID_PREFIX) || Number.isNaN(n) || n % 5 === 0) return null;
+  if (n % 5 === 1) return { kind: "viewer" };
+  return { kind: "other", name: `[Tên] ${String((n % 7) + 1).padStart(2, "0")}` };
+}
+
+/** Statuses of an open listing: a unit has at most one of these per company (rule one-open-listing-per-unit, row 3b). */
+export const OPEN_STATUSES: readonly ListingStandardStatus[] = [
+  "Incomplete",
+  "Active",
+  "Pending",
+  "Hold",
+];
+
+/**
+ * Earlier listings of the sample units (row 3b): every third current listing has one earlier Withdrawn listing on the
+ * same unit, every sixth also an earliest Closed one, so ten units have three listings. They are a set of their own:
+ * buildSampleListings and the inventory grid keep exactly the 60 current listings (Hỏi-7 at the scope gate).
+ */
+export function sampleEarlierListings(current: SampleListings): SampleListings {
+  const upiOf = new Map(current.listingUnits.map((x) => [x.listingId, x]));
+  const listings: Listing[] = [];
+  const listingUnits: ListingUnit[] = [];
+  let n = 0;
+  const add = (
+    from: Listing,
+    listing: Omit<Listing, "id" | "companyId" | "buildingName" | "version">,
+  ) => {
+    const link = upiOf.get(from.id);
+    if (!link) return;
+    n += 1;
+    const id = sampleId(SAMPLE_ID_KIND.earlierListing, n);
+    const earlier: Listing = {
+      ...listing,
+      id,
+      companyId: from.companyId,
+      buildingName: from.buildingName,
+      version: 1,
+    };
+    if (from.unitNumber) earlier.unitNumber = from.unitNumber;
+    if (from.subdivisionName) earlier.subdivisionName = from.subdivisionName;
+    listings.push(earlier);
+    listingUnits.push({
+      id: sampleId(SAMPLE_ID_KIND.earlierListingUnit, n),
+      companyId: link.companyId,
+      listingId: id,
+      upi: link.upi,
+    });
+  };
+  current.listings.forEach((l, i) => {
+    if (i % 3 !== 0) return;
+    const price = l.listPrice ?? 4_000_000_000;
+    // Withdrawn earlier, never confirmed with the owner: «Chưa xác nhận» on the record.
+    add(l, {
+      standardStatus: "Withdrawn",
+      withdrawnReason: "owner_changed_mind",
+      listPrice: price - 200_000_000,
+      originalEntryTimestamp: "2026-06-14T09:00:00+07:00",
+      furnished: "Partially",
+      legalStatus: "Sổ hồng",
+      occupantType: "Owner",
+    });
+    if (i % 6 !== 0) return;
+    // Closed earliest: four of five parts (no financing), confirmed long ago.
+    add(l, {
+      standardStatus: "Closed",
+      listPrice: price - 600_000_000,
+      closePrice: price - 650_000_000,
+      closeDate: "2025-05-20",
+      originalEntryTimestamp: "2025-03-02T09:00:00+07:00",
+      lastConfirmedAt: "2025-05-10T09:00:00+07:00",
+      furnished: "Unfurnished",
+      legalStatus: "Hợp đồng mua bán",
+      occupantType: "Vacant",
+    });
+  });
+  return { listings, listingUnits };
+}
+
+/** Rule one-open-listing-per-unit over current and earlier listings together: one message per unit that breaks it. */
+export function checkOneOpenListingPerUnit(data: SampleListings): string[] {
+  const statusOf = new Map(data.listings.map((l) => [l.id, l.standardStatus]));
+  const open = new Map<string, number>();
+  for (const x of data.listingUnits) {
+    const status = statusOf.get(x.listingId);
+    if (status && OPEN_STATUSES.includes(status)) open.set(x.upi, (open.get(x.upi) ?? 0) + 1);
+  }
+  return [...open].filter(([, n]) => n > 1).map(([upi]) => `two open listings on one unit: ${upi}`);
 }
