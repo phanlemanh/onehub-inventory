@@ -401,7 +401,15 @@ test.describe("thue phi", () => {
     const phone = size === "360";
     // A wrong amount on the row is caught, on the card or in the cell.
     const wrong = await openB(browser, info, phone);
-    expect(await netProblems(wrong, phone, formatMoney(2_880_000_000))).not.toEqual([]);
+    const where = phone ? "card 0602 · S1.02" : "row 0602 · S1.02";
+    const say = (shown: string, want: string) =>
+      phone
+        ? `${where} shows «${label("NetToSeller")} ${shown}», not ${want}`
+        : `${where} shows «${shown}», not ${want}`;
+    // The right amount, asked for a wrong one: the finding names both, so the row was found and read.
+    expect(await netProblems(wrong, phone, formatMoney(2_880_000_000))).toEqual([
+      say(formatMoney(2_895_000_000), formatMoney(2_880_000_000)),
+    ]);
     const slot = phone ? '[data-slot="listing-card-net"]' : 'td[data-col-id="custom.netToSeller"]';
     const target = (
       phone
@@ -415,7 +423,9 @@ test.describe("thue phi", () => {
     await target.evaluate((el) => {
       el.textContent = el.textContent!.replace(/[\d,]+ tỷ$/, "2,88 tỷ");
     });
-    expect(await netProblems(wrong, phone, formatMoney(2_895_000_000))).not.toEqual([]);
+    expect(await netProblems(wrong, phone, formatMoney(2_895_000_000))).toEqual([
+      say("2,88 tỷ", formatMoney(2_895_000_000)),
+    ]);
     if (phone) return;
     // A fee inclusion column drawn at first is caught.
     const shown = await openB(browser, info, false);
