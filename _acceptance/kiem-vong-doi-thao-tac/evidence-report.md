@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: e0798d77979779d0d08410de03cef318b0784d9e
+verified_commit: a33a05fa05921f31a1bc04f2991a13ec4c08efba
 human_signoff:
 ---
 
@@ -28,106 +28,107 @@ human_signoff:
 ## Evidence
 
 - eval: E1
-  run_id: minted-kiem-vong-doi-thao-tac-E1-r1
+  run_id: minted-kiem-vong-doi-thao-tac-E1-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.vong_doi
-  verified_at: 2026-11-15T06:08:53Z
+  verified_at: 2026-11-15T06:25:08Z
   output: |
     npx vitest run tests/vong-doi-thao-tac.test.ts --coverage.enabled=false --reporter=verbose
-    ca man-khai-hien xanh tren kho that; hai ca pha do dung cau ghim; doi chung xanh
+    chay 1 lan, 1/1 lan xanh, khong dao dong; tat ca ca cua tep bai xanh
 
 - eval: E2
-  run_id: minted-kiem-vong-doi-thao-tac-E2-r1
+  run_id: minted-kiem-vong-doi-thao-tac-E2-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.vong_doi
-  verified_at: 2026-11-15T06:08:53Z
+  verified_at: 2026-11-15T06:25:08Z
   output: |
     npx vitest run tests/vong-doi-thao-tac.test.ts --coverage.enabled=false --reporter=verbose
-    ca may-thay-man-hien xanh: tap suy ra khop bang viet truoc cho tam man; ba ca pha do dung cau
+    chay 1 lan, 1/1 lan xanh, khong dao dong; tat ca ca cua tep bai xanh
 
 - eval: E3
-  run_id: minted-kiem-vong-doi-thao-tac-E3-r1
+  run_id: minted-kiem-vong-doi-thao-tac-E3-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.vong_doi
-  verified_at: 2026-11-15T06:08:53Z
+  verified_at: 2026-11-15T06:25:08Z
   output: |
     npx vitest run tests/vong-doi-thao-tac.test.ts --coverage.enabled=false --reporter=verbose
-    ca du-bon-o xanh tren kho that; bon ca pha do dung cau; doi chung xanh
+    chay 1 lan, 1/1 lan xanh, khong dao dong; tat ca ca cua tep bai xanh
 
 - eval: E4
-  run_id: minted-kiem-vong-doi-thao-tac-E4-r1
+  run_id: minted-kiem-vong-doi-thao-tac-E4-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.vong_doi
-  verified_at: 2026-11-15T06:08:53Z
+  verified_at: 2026-11-15T06:25:08Z
   output: |
     npx vitest run tests/vong-doi-thao-tac.test.ts --coverage.enabled=false --reporter=verbose
-    ca o-co-tro-nut-that xanh; nam ca pha do dung cau; doi chung xanh
+    chay 1 lan, 1/1 lan xanh, khong dao dong; tat ca ca cua tep bai xanh
 
 - eval: E5
-  run_id: minted-kiem-vong-doi-thao-tac-E5-r1
+  run_id: minted-kiem-vong-doi-thao-tac-E5-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.vong_doi
-  verified_at: 2026-11-15T06:08:53Z
+  verified_at: 2026-11-15T06:25:08Z
   output: |
     npx vitest run tests/vong-doi-thao-tac.test.ts --coverage.enabled=false --reporter=verbose
-    ca o-hang-va-khong-co-can-cu xanh; cac ca pha do dung cau; dong so hong khong lam do
+    chay 1 lan, 1/1 lan xanh, khong dao dong; tat ca ca cua tep bai xanh
 
 - eval: E6
-  run_id: minted-kiem-vong-doi-thao-tac-E6-r1
+  run_id: minted-kiem-vong-doi-thao-tac-E6-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.vong_doi
-  verified_at: 2026-11-15T06:08:53Z
+  verified_at: 2026-11-15T06:25:08Z
   output: |
     npx vitest run tests/vong-doi-thao-tac.test.ts --coverage.enabled=false --reporter=verbose
-    ca chay-tren-ban-sao-nong, khong-goi-git, don-thu-muc-tam xanh
+    chay 1 lan, 1/1 lan xanh, khong dao dong; tat ca ca cua tep bai xanh
+    (ca don-thu-muc-tam co mat o a33a05f, duoc chay trong vong nay)
 
 - eval: E6b
-  run_id: minted-kiem-vong-doi-thao-tac-E6b-r1
+  run_id: minted-kiem-vong-doi-thao-tac-E6b-r2
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.script.check
-  verified_at: 2026-11-15T06:08:53Z
+  verified_at: 2026-11-15T06:25:08Z
   output: |
     make check
     CODEOWNERS matches governance/autonomy.yaml
 
 - eval: E7
-  run_id: minted-kiem-vong-doi-thao-tac-E7-r1
+  run_id: minted-kiem-vong-doi-thao-tac-E7-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.vong_doi
-  verified_at: 2026-11-15T06:08:53Z
+  verified_at: 2026-11-15T06:25:08Z
   output: |
     npx vitest run tests/vong-doi-thao-tac.test.ts --coverage.enabled=false --reporter=verbose
-    ca bang-da-duyet xanh: moi o khop bang Hoi-3; bay cho thieu that cua RS2 duoc khang dinh tung cho
+    chay 1 lan, 1/1 lan xanh, khong dao dong; tat ca ca cua tep bai xanh
 
 - eval: E8
-  run_id: minted-kiem-vong-doi-thao-tac-E8-r1
+  run_id: minted-kiem-vong-doi-thao-tac-E8-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.vong_doi
-  verified_at: 2026-11-15T06:08:53Z
+  verified_at: 2026-11-15T06:25:08Z
   output: |
     npx vitest run tests/vong-doi-thao-tac.test.ts --coverage.enabled=false --reporter=verbose
-    ca xem-theo-vai va bao-cao-theo-vai xanh; hai ca pha do dung cau
+    chay 1 lan, 1/1 lan xanh, khong dao dong; tat ca ca cua tep bai xanh
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-kiem-vong-doi-thao-tac-SUITE-build-r1
+  run_id: minted-kiem-vong-doi-thao-tac-SUITE-build-r2
   exit_code: 0
-  verified_at: 2026-11-15T06:08:53Z
+  verified_at: 2026-11-15T06:25:08Z
 
 - cmd: make e2e
-  run_id: minted-kiem-vong-doi-thao-tac-SUITE-make_e2e-r1
+  run_id: minted-kiem-vong-doi-thao-tac-SUITE-make_e2e-r2
   exit_code: 0
-  verified_at: 2026-11-15T06:08:53Z
+  verified_at: 2026-11-15T06:25:08Z
 
 ## Known limits
 
@@ -135,18 +136,17 @@ human_signoff:
 
 ## Analyst
 
-Non-discriminating evals (xanh ca tren nhanh lan baseline):
+carried tu round 1 — baseline khong do lai round nay
 
-- E6b (make check): regression-guard co chu y, chay xanh tren ca code cu lan code moi.
+Eval khong-phan-biet (green tren ca code moi lan baseline): E6b (make check) — la regression-guard, can xac nhan day la y dinh hay viet lai de assert hanh vi moi.
 
-Baseline khong do:
-
-- npx vitest run tests/vong-doi-thao-tac.test.ts --coverage.enabled=false --reporter=verbose: bo qua baseline: tep tests/vong-doi-thao-tac.test.ts co o cay dang kiem nhung chua co o merge-base 0861fdcb6906a3d86d6c88df830c9ac40447d263 — eval moi, chay tren code cu khong phan biet gi
+Baseline khong do: moi eval round nay ghi n-a (evals.yaml khong doi tu lan baseline cuoi o round 1).
 
 ## Variance
 
-none — every multi-run eval is uniform
+none — moi eval chay 1 lan, deterministic, khong dao dong.
 
 ## Iterations
 
-Round 1: moi eval xanh, verdict PASS.
+Round 1: moi eval xanh tren e0798d7; review nêu ca don-thu-muc-tam chi do mot thu muc rieng. Tep bai doi sau do (a33a05f).
+Round 2: cham lai tren a33a05f — E1-E8 va E6b xanh, build va make e2e (1151 passed) xanh.
