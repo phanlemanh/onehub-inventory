@@ -24,7 +24,11 @@ Thiết kế: `docs/superpowers/specs/2026-11-15-bang-hang-du-lieu-that-design.m
   `ontology/actions.yaml` (`viewListings`, `updateListing`, `activateListing` sang `live`, khai cửa API và cửa bảng; ô
   Quản trị sàn theo Hỏi-1), `ontology/labels.yaml` (nhãn «Người giữ căn», «Chưa ai giữ»), `ontology/glossary.md`.
   `make gen` sinh lại.
-- Kiểm: `make ontology`, `make gen` không lệch.
+- Vòng đời (quyết định 0038, khai từ hàng 1t): trong `ontology/entities/Listing.yaml`, ô `xem` và `sua` bỏ `hang: "10"`
+  (hàng này mở thật); ô `xem` bỏ luôn mục chặn `CompanyAdmin` vì Hỏi-1 A cho Quản trị sàn xem chỉ đọc. Ô
+  `rieng.dua_len_ban` giữ `hang: "15"`: hàng 10 chỉ mở quyền đưa lên «Đang bán» theo người giữ căn; điều kiện Sẵn sàng bán
+  (ảnh, pháp lý) vẫn là của hàng 15. Không thêm ô «không» nào, nên không cần chữ chủ kho mới.
+- Kiểm: `make ontology`, `make gen` không lệch, `python3 tools/coverage_matrix/lifecycle.py --check` xanh.
 - Phục vụ: E5, E9b. `independent: false`.
 
 ### 3. Migration 013 (`/new-migration`)
@@ -78,8 +82,9 @@ Thiết kế: `docs/superpowers/specs/2026-11-15-bang-hang-du-lieu-that-design.m
 
 - Tệp: `_acceptance/bang-hang-du-lieu-that/chung-minh-man.md` (ma trận trạng thái, Khối), `wiki/entities/listing.md`,
   `wiki/decisions/0039-…` (số do G cấp) (ranh giới luật: nấc ở máy chủ, quyền và dữ liệu ở cơ sở dữ liệu), `wiki/log.md`,
-  `design/screens.yaml` nếu khai thêm.
-- Kiểm: `make check`.
+  `design/screens.yaml`: mục `inventory` thêm `Member` vào `hien` (hồ sơ căn hiện tên người giữ căn; vòng đời của `Member`
+  đã khai ở màn Thành viên).
+- Kiểm: `python3 tools/coverage_matrix/lifecycle.py --check`, `make check`.
 - Phục vụ: E8-khuon, E8-floor. `independent: false`.
 
 ## Nếu chủ kho chọn khác
