@@ -65,13 +65,19 @@ Thiết kế: `docs/superpowers/specs/2026-11-15-bang-hang-du-lieu-that-design.m
 
 - Tệp: trang Bảng hàng (bắt đăng nhập khi có cơ sở dữ liệu), `tools/e2e_templates/` chỉ khi bài khung đọc Bảng hàng trống
   (dòng đăng ký, báo G), bài trình duyệt cũ dùng `?vai=` giữ nguyên (lối B).
+- Cửa vào dùng lại luật vào của 2b (`entryAction`/`entryRefused` trong `src/app/(app)/nav.ts`, `vao` trong
+  `design/screens.yaml`), không dựng cửa thứ hai. Hỏi-1 A: Quản trị sàn được `viewListings`, nên đặt `vao: viewListings`
+  cho Bảng hàng không chặn vai nào của nhân viên.
+- Trước khi đặt luật vào hay cấp quyền xem cho Quản trị sàn: bài `tests/e2e-db/lop-rieng.spec.ts` (ca «company words on
+  inventory», hàm `headers()` đọc tiêu đề cột trước khi lưới vẽ xong) sẽ đỏ. G cho sửa bài ấy thành việc phụ trước khi
+  dãy R dựng; dãy R không tự vá.
 - Kiểm: `make e2e` trong lượt chấm của dãy, `bang_hang_that_e2e`.
 - Phục vụ: E8, E9, E9b, E10b. `independent: false`.
 
 ### 8. Sổ và chứng minh màn
 
 - Tệp: `_acceptance/bang-hang-du-lieu-that/chung-minh-man.md` (ma trận trạng thái, Khối), `wiki/entities/listing.md`,
-  `wiki/decisions/0037-…` (ranh giới luật: nấc ở máy chủ, quyền và dữ liệu ở cơ sở dữ liệu), `wiki/log.md`,
+  `wiki/decisions/0039-…` (số do G cấp) (ranh giới luật: nấc ở máy chủ, quyền và dữ liệu ở cơ sở dữ liệu), `wiki/log.md`,
   `design/screens.yaml` nếu khai thêm.
 - Kiểm: `make check`.
 - Phục vụ: E8-khuon, E8-floor. `independent: false`.
