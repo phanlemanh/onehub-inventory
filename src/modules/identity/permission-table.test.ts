@@ -2,14 +2,14 @@
 // row (row 9a, AC-1). The YAML is read back with the repo's own reader (tools/repo_ontology.py), and the shape check
 // is the one `make ontology` runs (tools/ontology_actions.py), run on a copy of ontology/ for each break.
 import { spawnSync } from "node:child_process";
-import { cpSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { afterAll, describe, expect, it } from "vitest";
 
 import { ACTIONS, PERMISSION_EXEMPT, type ActionSpec } from "../../generated/ontology";
-import { tempDir } from "../../../tests/support/temp-dir";
 
 const ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 const TOOLS = join(ROOT, "tools");
@@ -98,7 +98,7 @@ afterAll(() => {
 
 /** A copy of ontology/ whose actions.yaml is `edit` of the real one. */
 function brokenCopy(edit: (text: string) => string): string {
-  const dir = tempDir("bang-quyen-");
+  const dir = mkdtempSync(join(tmpdir(), "bang-quyen-"));
   copies.push(dir);
   cpSync(join(ROOT, "ontology"), join(dir, "ontology"), { recursive: true });
   const file = join(dir, "ontology", "actions.yaml");

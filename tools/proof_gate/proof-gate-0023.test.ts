@@ -3,14 +3,21 @@
 // Every rule: a healthy proof is green, and breaking one thing on a copy turns it red with a pinned code.
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { crc32, deflateSync } from "node:zlib";
 
 import { describe, expect, it } from "vitest";
-import { tempDir } from "../../tests/support/temp-dir";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const SCRIPT = join(ROOT, "tools/proof_gate/check.py");
@@ -112,7 +119,7 @@ function shellLine(slug = SLUG, over: Entry = {}): Entry {
  */
 function sampleRepo(opts: { reference?: string; ledger?: boolean } = {}): string {
   const reference = opts.reference ?? "chưa có";
-  const root = tempDir("proof-gate-0023-");
+  const root = mkdtempSync(join(tmpdir(), "proof-gate-0023-"));
   write(
     root,
     "design/screens.yaml",
@@ -1168,7 +1175,7 @@ describe("kho thật và khuôn tệp chứng minh", () => {
   });
 
   it("bản sao kho thật: thêm vòng luật 0023 lành theo luật 1c thì đỏ", () => {
-    const copy = tempDir("proof-gate-0023-real-");
+    const copy = mkdtempSync(join(tmpdir(), "proof-gate-0023-real-"));
     for (const d of [
       "design",
       "_acceptance",
@@ -1544,7 +1551,7 @@ describe("khối có trước luật sổ khối: miễn theo từng cặp gọi
     return root;
   }
   function shallow(src: string, depth: number, keepOrigin: boolean): string {
-    const dst = tempDir("pg-nong-");
+    const dst = mkdtempSync(join(tmpdir(), "pg-nong-"));
     git(tmpdir(), ["clone", "--quiet", "--no-local", `--depth=${depth}`, `file://${src}`, dst]);
     if (!keepOrigin) git(dst, ["remote", "remove", "origin"]);
     return dst;

@@ -8,6 +8,7 @@ import {
   cpSync,
   existsSync,
   mkdirSync,
+  mkdtempSync,
   readFileSync,
   readdirSync,
   rmSync,
@@ -19,7 +20,6 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
-import { tempDir } from "../../tests/support/temp-dir";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const SCRIPT = join(ROOT, "tools/round_metrics/round_metrics.py");
@@ -75,7 +75,7 @@ const dong = (k: string, patch: Record<string, unknown> = {}) =>
 const tally = (round: number, verdict: string) => dong("reject", { round, verdict });
 
 function tempRoot() {
-  const root = tempDir("round-metrics-");
+  const root = mkdtempSync(join(tmpdir(), "round-metrics-"));
   mkdirSync(join(root, "_acceptance"));
   return root;
 }
@@ -522,7 +522,7 @@ describe("kiem", () => {
   it(
     "kho thật lấy nông: kiem-moc vẫn chạy",
     () => {
-      const root = tempDir("round-metrics-nong-");
+      const root = mkdtempSync(join(tmpdir(), "round-metrics-nong-"));
       rmSync(root, { recursive: true });
       git(tmpdir(), "clone", "-q", "--depth", "1", `file://${ROOT}`, root);
       if (git(root, "rev-parse", "--is-shallow-repository") !== "true")
@@ -629,7 +629,7 @@ describe("gop", () => {
 
 describe("kiem-moc", () => {
   function mocRepo() {
-    const root = tempDir("round-metrics-moc-");
+    const root = mkdtempSync(join(tmpdir(), "round-metrics-moc-"));
     git(root, "init", "-q");
     writeFileSync(join(root, "README.md"), "x\n");
     git(root, "add", ".");
@@ -754,7 +754,7 @@ describe("kiem-moc", () => {
     "kiem-moc: ma trận trạng thái hồ sơ 1a ở bốn dạng viết",
     () => {
       // One repository, one commit per case: the baseline points at the commit, the plans stay uncommitted.
-      const root = tempDir("round-metrics-1a-");
+      const root = mkdtempSync(join(tmpdir(), "round-metrics-1a-"));
       git(root, "init", "-q");
       cpSync(join(ROOT, MOC), join(root, MOC), { recursive: true });
       const mocPath = join(root, MOC, latestMoc(root), "moc.json");

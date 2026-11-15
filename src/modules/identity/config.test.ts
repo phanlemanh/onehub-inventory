@@ -1,11 +1,11 @@
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { AuthConfigError, PRODUCTION_VARS, assertProductionConfig, readAuthConfig } from "./config";
-import { tempDir } from "../../../tests/support/temp-dir";
 
 // The start hook loads the module's server door; outside Next.js its "server-only" guard has nothing to guard.
 vi.mock("server-only", () => ({}));
@@ -135,7 +135,7 @@ describe("production configuration", () => {
 
   it("may-dev-theo-cau-hinh", async () => {
     vi.spyOn(console, "log").mockImplementation(() => {});
-    const dir = tempDir("thu-moi-");
+    const dir = mkdtempSync(join(tmpdir(), "thu-moi-"));
     const mail = {
       email: "moi@example.test",
       companyName: "[Công ty A]",

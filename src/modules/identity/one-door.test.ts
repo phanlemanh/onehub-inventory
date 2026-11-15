@@ -9,13 +9,20 @@
 //      client inside withCompany could otherwise leave quy_hang_app or move to another company. Only statements
 //      written out in the source are seen; text built at run time is a known limit of this scan.
 // Idea copied from packages/api/src/one-door.test.ts of onehub-quy-hang (commit 1729b11f).
-import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import {
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, extname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { format } from "prettier";
 import { describe, expect, it } from "vitest";
-import { tempDir } from "../../../tests/support/temp-dir";
 
 /** Postgres drivers and pools. `pg-format` and other helpers that cannot connect are not listed. */
 const DRIVER_IMPORT =
@@ -80,7 +87,7 @@ describe("one query door", () => {
   });
 
   it("control: clean file passes, broken files are named", () => {
-    const dir = tempDir("mot-cua-");
+    const dir = mkdtempSync(join(tmpdir(), "mot-cua-"));
     mkdirSync(join(dir, "routes"));
     writeFileSync(
       join(dir, "routes/lanh.ts"),
@@ -102,7 +109,7 @@ describe("one query door", () => {
   });
 
   it("control: loading a Postgres driver outside the door is named, in every source file type", () => {
-    const dir = tempDir("mot-cua-");
+    const dir = mkdtempSync(join(tmpdir(), "mot-cua-"));
     writeFileSync(join(dir, "a.ts"), 'import pg from "pg";\n');
     writeFileSync(join(dir, "b.mjs"), 'const x = 1;\nconst { Pool } = await import("postgres");\n');
     writeFileSync(join(dir, "c.cjs"), 'const Pool = require("pg-pool");\n');
@@ -120,7 +127,7 @@ describe("one query door", () => {
   });
 
   it("control: typed, nested, optional and spaced calls are named too", () => {
-    const dir = tempDir("mot-cua-");
+    const dir = mkdtempSync(join(tmpdir(), "mot-cua-"));
     writeFileSync(
       join(dir, "typed.ts"),
       [
@@ -140,7 +147,7 @@ describe("one query door", () => {
   });
 
   it("control: a call that the repo's Prettier breaks over several lines is named", async () => {
-    const dir = tempDir("mot-cua-");
+    const dir = mkdtempSync(join(tmpdir(), "mot-cua-"));
     const formatted = await format(
       'const r = await appPool.query("select id, company_id, kind, direction from agreements where status = $1", ["active"]).then((x) => x.rows).catch(() => []);\n',
       { parser: "typescript" },
@@ -153,7 +160,7 @@ describe("one query door", () => {
   });
 
   it("control: a role or company switch outside the door is named, in every written form", () => {
-    const dir = tempDir("mot-cua-");
+    const dir = mkdtempSync(join(tmpdir(), "mot-cua-"));
     writeFileSync(
       join(dir, "lanh.ts"),
       [
@@ -191,7 +198,7 @@ describe("one query door", () => {
   });
 
   it("control: a copy of this test outside the exemption is reported", () => {
-    const dir = tempDir("mot-cua-");
+    const dir = mkdtempSync(join(tmpdir(), "mot-cua-"));
     mkdirSync(join(dir, "x"));
     writeFileSync(
       join(dir, "x/copy.test.ts"),

@@ -12,13 +12,11 @@ import { tempDir } from "./support/temp-dir";
 import { ROOT_PREFIX, staleRoots } from "./support/temp-root";
 
 const HELPER = "tests/support/temp-dir.ts";
+const RUN_ROOT = "tests/support/temp-root.ts"; // makes the run's own root, removed at teardown
 const GUARD = "tests/temp-dir-guard.test.ts"; // its breaking cases are text, not calls
 
 /** Files that make a temporary folder on their own on purpose, and why that folder does not stay behind. */
 const ALLOWED: Record<string, string> = {
-  // Signed at row 1c and hash-pinned by proof-gate-0023.test.ts, so its text may not change: its folders live under
-  // the run's own temporary root, removed when the run ends.
-  "tools/proof_gate/proof-gate.test.ts": "signed file; covered by the run's temporary root",
   // A plain node script, not a vitest file: the folder is a git worktree, removed with `git worktree remove` in its
   // own `finally` and when building it fails.
   "tests/e2e-db/pha-thu-vai-man.mjs": "git worktree removed in finally",
@@ -27,12 +25,20 @@ const ALLOWED: Record<string, string> = {
   "db/scripts/ci-db.sh": "report folder is the output",
 };
 
+/**
+ * T3 paths of _acceptance/config.yaml: a change there needs a signed acceptance record, and
+ * tools/proof_gate/proof-gate.test.ts is also hash-pinned. Their tests are not moved to the helper here; the folders
+ * they make live under the run's own temporary root (tests/support/temp-root.ts), removed when the run ends.
+ */
+const SIGNED_PATHS = ["tools/", "src/modules/identity/", "db/"];
+
 const SCRIPT = /\.(ts|tsx|mts|js|mjs|cjs)$/;
 const IN_SCOPE = /(^|\/)(tests|tools|db)\/|\.test\.(ts|tsx|mjs|js)$/;
 
 /** Why `text` (the content of `path`) breaks the rule, or null when it keeps it. */
 function violation(path: string, text: string): string | null {
-  if (path === HELPER || path === GUARD || path in ALLOWED) return null;
+  if ([HELPER, RUN_ROOT, GUARD].includes(path) || path in ALLOWED) return null;
+  if (SIGNED_PATHS.some((p) => path.startsWith(p)) && !path.endsWith(".sh")) return null;
   if (SCRIPT.test(path)) {
     if (/\bmkdtemp(Sync)?\s*\(/.test(text)) return "mkdtemp outside tempDir()";
     if (/mkdirSync\(\s*join\(\s*tmpdir\(\)/.test(text))
@@ -91,8 +97,8 @@ describe("temporary folders are removed after the test run", () => {
     const breaks: [string, string][] = [
       ["tests/x.test.ts", 'const d = mkdtempSync(join(tmpdir(), "x-"));'],
       ["src/modules/a/b.test.ts", 'const d = await mkdtemp(join(tmpdir(), "x-"));'],
-      ["tools/a/a.test.mjs", 'mkdirSync(join(tmpdir(), "fixed-name"));'],
-      ["tools/a/check.py", 'root = tempfile.mkdtemp(prefix="x-")'],
+      ["tests/a.test.mjs", 'mkdirSync(join(tmpdir(), "fixed-name"));'],
+      ["tests/a/check.py", 'root = tempfile.mkdtemp(prefix="x-")'],
       ["db/scripts/x.sh", 'tmp=$(mktemp -d "${TMPDIR:-/tmp}/x.XXXXXX")\necho "$tmp"\n'],
     ];
     for (const [path, text] of breaks) expect(violation(path, text), path).not.toBeNull();
@@ -102,10 +108,17 @@ describe("temporary folders are removed after the test run", () => {
     const clean: [string, string][] = [
       ["tests/x.test.ts", 'const d = tempDir("x-");'],
       [HELPER, "const dir = mkdtempSync(join(tmpdir(), prefix));"],
+      // A signed path: left to the run's temporary root, see SIGNED_PATHS.
+      ["tools/a/a.test.ts", 'const d = mkdtempSync(join(tmpdir(), "x-"));'],
       ["tools/a/check.py", "with tempfile.TemporaryDirectory() as d:\n    pass\n"],
       ["db/scripts/x.sh", "tmp=$(mktemp -d)\ntrap 'rm -rf \"$tmp\"' EXIT\n"],
     ];
     for (const [path, text] of clean) expect(violation(path, text), path).toBeNull();
+  });
+
+  it("the paths left to the run's root are exactly signed paths of the acceptance config", () => {
+    const config = readFileSync("_acceptance/config.yaml", "utf8");
+    for (const p of SIGNED_PATHS) expect(config, p).toContain(`- "${p}**"`);
   });
 
   it("every vitest config gives the run its own temporary root", () => {
