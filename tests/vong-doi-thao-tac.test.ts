@@ -34,8 +34,12 @@ interface Table {
 const table = (root: string): Table => JSON.parse(run(root, "--json").out) as Table;
 
 const copies: string[] = [];
+/** Removes every temporary copy listed; the one cleanup every case shares. */
+function release(list: string[]) {
+  for (const dir of list) rmSync(dir, { recursive: true, force: true });
+}
 afterAll(() => {
-  for (const dir of copies) rmSync(dir, { recursive: true, force: true });
+  release(copies);
 });
 
 const PARTS = [
@@ -49,9 +53,9 @@ const PARTS = [
 ];
 
 /** A copy of what the tool reads, without .git. */
-function copy(): string {
+function copy(list: string[] = copies): string {
   const dir = mkdtempSync(join(tmpdir(), "vong-doi-"));
-  copies.push(dir);
+  list.push(dir);
   for (const part of PARTS) {
     mkdirSync(dirname(join(dir, part)), { recursive: true });
     cpSync(join(ROOT, part), join(dir, part), { recursive: true });
@@ -523,5 +527,20 @@ describe("xem-theo-vai", () => {
     breakFile(dir, ent("Member"), (t) => t.replace("  sua: { co: changeMemberRoles }\n", ""));
     expect(run(dir, "--report").status).toBe(0);
     expect(run(dir, "--check").status).toBe(1);
+  });
+});
+
+describe("don-thu-muc-tam", () => {
+  const made: string[] = [];
+  describe("tao ban sao", () => {
+    afterAll(() => release(made));
+    it("a copy exists on disk while its cases run (control)", () => {
+      const dir = copy(made);
+      expect(existsSync(join(dir, "design/screens.yaml"))).toBe(true);
+    });
+  });
+  it("after afterAll no temporary copy is left on disk", () => {
+    expect(made.length).toBe(1);
+    for (const dir of made) expect(existsSync(dir), dir).toBe(false);
   });
 });
