@@ -106,6 +106,12 @@ const rowsOf = async (w: World) =>
 describe("luu-mot-dong (E3)", () => {
   it("one PUT saves the whole schedule; only changed items get a row; reset brings an item back", async () => {
     const { w, h, cookie } = await apiWorld("luu");
+    // Every member of the test world is «[Tên]»; give the one who saves a name of their own, and another member of the
+    // same company a third name, so «who changed it» can only pass by reading the session's own member.
+    await w.db.owner.query(
+      "update company_members set name = case when user_id = $2 then '[Tên] CA' else '[Tên] khác' end where company_id = $1",
+      [w.A, w.id.CA],
+    );
     const c = await cookie("CA");
     const before = await items(await h.read(req("GET", undefined, c)));
     expect(before.map((i) => [i.code, i.rateBasisPoints, i.included, i.source.kind])).toEqual([
@@ -129,8 +135,9 @@ describe("luu-mot-dong (E3)", () => {
       ["registration", 50, false, "changed"],
       ["brokerage", 200, true, "changed"],
     ]);
-    // Who changed it: the member's own name, read through identity's door (G-1511-59), not the placeholder.
-    expect(after[2]!.source).toEqual(expect.objectContaining({ kind: "changed", by: "[Tên]" }));
+    // Who changed it: the saving member's own name, read through identity's door (G-1511-59) — not the placeholder,
+    // not another member of the company.
+    expect(after[2]!.source).toEqual(expect.objectContaining({ kind: "changed", by: "[Tên] CA" }));
     const rows = await rowsOf(w);
     expect(
       rows.map((r) => [r.company_id, r.code, r.rate_bp, r.included, r.changed_by, r.retired]),

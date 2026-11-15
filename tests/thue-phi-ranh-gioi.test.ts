@@ -11,16 +11,31 @@ import { describe, expect, it } from "vitest";
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const MODULE = join(ROOT, "src/modules/company-config");
 
-/** Identity's tables that hold people and their membership. */
-const IDENTITY_TABLES = ["company_members", "users", "companies"];
+/**
+ * Identity's tables, read from the migrations: every table in the identity schema, plus the two public tables the
+ * identity module owns (companies and company_members, migrations 001 and 002). A table in the identity schema is
+ * matched with or without its schema prefix.
+ */
+const IDENTITY_TABLES: string[] = (() => {
+  const dir = join(ROOT, "db/migrations");
+  const sql = readdirSync(dir)
+    .filter((f) => f.endsWith(".sql"))
+    .map((f) => readFileSync(join(dir, f), "utf8"))
+    .join("\n");
+  const inSchema = [...sql.matchAll(/create table (?:if not exists )?identity\.(\w+)/gi)].map(
+    (m) => m[1]!,
+  );
+  const owned = ["companies", "company_members"].filter((t) =>
+    new RegExp(`create table (?:if not exists )?(?:public\\.)?${t}\\b`, "i").test(sql),
+  );
+  return [...new Set([...owned, ...inSchema])];
+})();
 
-/** Each statement in `text` that reads or writes one of identity's tables, as «table». */
+/** Each of identity's tables that `text` reads or writes in SQL. */
 export function identityTablesIn(text: string): string[] {
-  const found: string[] = [];
-  for (const table of IDENTITY_TABLES) {
-    if (new RegExp(`\\b(from|join|into|update)\\s+${table}\\b`, "i").test(text)) found.push(table);
-  }
-  return found;
+  return IDENTITY_TABLES.filter((table) =>
+    new RegExp(`\\b(from|join|into|update)\\s+(identity\\.)?${table}\\b`, "i").test(text),
+  );
 }
 
 function sourceFiles(dir: string): string[] {
@@ -32,7 +47,28 @@ function sourceFiles(dir: string): string[] {
 }
 
 describe("company-config reaches people only through identity's door", () => {
+  it("identity's tables come from the migrations", () => {
+    expect(IDENTITY_TABLES).toEqual(
+      expect.arrayContaining([
+        "companies",
+        "company_members",
+        "users",
+        "sessions",
+        "login_codes",
+        "code_requests",
+      ]),
+    );
+  });
+
   it("no company-config file names identity's tables in SQL", () => {
+    const files = sourceFiles(MODULE).map((path) => relative(ROOT, path));
+    // The scan really reads the module: the fee store and the HTTP handlers are among the files.
+    expect(files).toEqual(
+      expect.arrayContaining([
+        "src/modules/company-config/fee-store.ts",
+        "src/modules/company-config/fee-schedule-http.ts",
+      ]),
+    );
     const hits = sourceFiles(MODULE).flatMap((path) =>
       identityTablesIn(readFileSync(path, "utf8")).map((t) => `${relative(ROOT, path)}: ${t}`),
     );
@@ -43,9 +79,11 @@ describe("company-config reaches people only through identity's door", () => {
     const before =
       "select name from company_members where user_id::text = current_setting('app.user_id', true)";
     expect(identityTablesIn(before)).toEqual(["company_members"]);
+    expect(identityTablesIn("select name from identity.users where id = $1")).toEqual(["users"]);
+    expect(identityTablesIn("delete from identity.sessions")).toEqual(["sessions"]);
     expect(
       identityTablesIn("select c.name from companies c join company_members m on true"),
-    ).toEqual(["company_members", "companies"]);
+    ).toEqual(["companies", "company_members"]);
   });
 
   it("control: company-config's own tables are not caught", () => {
