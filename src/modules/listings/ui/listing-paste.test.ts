@@ -1,14 +1,41 @@
+// @vitest-environment jsdom
 // Row 5, AC-3: every cell a paste may not write lands in «Bị bỏ» with the reason written before the build — ten reasons,
 // one case each, the sentence pinned word for word.
-import { describe, expect, it } from "vitest";
+import { act, cleanup, fireEvent, render, renderHook, screen } from "@testing-library/react";
+import type { ReactElement } from "react";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import type { FieldKey } from "@/components/candidate/column-kind";
 import type { GridRow, PastedCell, RegionPaste } from "@/components/candidate/data-region";
 import { LABELS } from "@/generated/labels";
+import type { Listing } from "@/generated/ontology";
 
 import { cellEditLabels } from "./cell-edit-copy";
 import { lockedReasons } from "./listing-cell-edit";
+import type { InventoryField } from "./inventory-rows";
 import { planPaste } from "./listing-paste";
+import { useListingCellEdit } from "./use-listing-cell-edit";
+import { sampleSaveDoor, type SaveRequest } from "../save-door";
+
+const toast = vi.hoisted(() => Object.assign(vi.fn(), { error: vi.fn() }));
+vi.mock("sonner", () => ({ toast }));
+
+beforeAll(() => {
+  Element.prototype.getAnimations ??= () => [];
+  Element.prototype.scrollIntoView ??= () => {};
+  window.matchMedia ??= ((query: string) => ({
+    matches: true,
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  })) as unknown as typeof window.matchMedia;
+});
+
+afterEach(() => {
+  cleanup();
+  toast.mockReset();
+  toast.error.mockReset();
+});
 
 const labels = cellEditLabels((c, tx) => {
   const entry: { pref: string; lease?: string } = LABELS[c];
@@ -146,5 +173,69 @@ describe("bo-khong-giau-o-khac", () => {
     );
     expect(plan.skipped.map((s) => s.why)).toEqual(["vai của bạn không sửa được ô này"]);
     expect(plan.writes.size).toBe(0);
+  });
+});
+
+// Row 5, AC-5: the paste path of the inventory grid writes through the sample door; two cells of one listing chain.
+const HEADERS = {
+  "Listing.unitNumber": "Mã",
+  "Listing.listPrice": "Giá",
+  "Listing.standardStatus": "Tình trạng",
+} as unknown as Readonly<Record<InventoryField, string>>;
+const LISTING: Listing = {
+  id: "4d415500-0000-4000-8000-0000000001a1",
+  companyId: "4d415500-0000-4000-8000-000000000001",
+  buildingName: "S1.01",
+  unitNumber: "1101",
+  standardStatus: "Active",
+  listPrice: 2_710_000_000,
+  version: 1,
+};
+const LISTED: GridRow = {
+  id: LISTING.id,
+  transaction: "sale",
+  "Listing.unitNumber": "1101",
+  "Listing.listPrice": LISTING.listPrice,
+  "Listing.standardStatus": "Active",
+};
+
+describe("noi-phien-ban", () => {
+  it("noi-phien-ban: two cells of one listing write one after the other on the sample door, versions chained", async () => {
+    const seen: SaveRequest[] = [];
+    const door = sampleSaveDoor([LISTING], { online: () => true, seen: (r) => seen.push(r) });
+    const hook = renderHook(() =>
+      useListingCellEdit({
+        rows: [LISTED],
+        listings: [LISTING],
+        headers: HEADERS,
+        labels,
+        door,
+        headerOf: (f) => f,
+      }),
+    );
+    act(() =>
+      hook.result.current.cellEdit!.paste!({
+        cells: [
+          { row: LISTED, field: "Listing.listPrice", raw: "2,8 tỷ", open: true },
+          { row: LISTED, field: "Listing.standardStatus", raw: "Tạm ngừng", open: true },
+        ],
+        beyond: { rows: 0, columns: 0 },
+      }),
+    );
+    render(hook.result.current.dialogs as ReactElement);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Áp 2 ô" }));
+    });
+    await vi.waitFor(() => expect(seen).toHaveLength(2));
+    expect(
+      seen.map((r) => r.version),
+      "noi-phien-ban: versions",
+    ).toEqual([1, 2]);
+    const current = door.current(LISTING.id)!;
+    expect(current.version, "noi-phien-ban: conflict").toBe(3);
+    expect(current.listPrice).toBe(2_800_000_000);
+    expect(current.standardStatus).toBe("Hold");
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(toast.mock.calls.at(-1)![0]).toBe("Đã đổi 2 ô của 1 căn.");
   });
 });
