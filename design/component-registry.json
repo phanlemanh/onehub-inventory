@@ -1245,7 +1245,7 @@
       "file": "src/components/reui/filters/filters.tsx",
       "level": "organism",
       "source": "library",
-      "parts": ["FiltersRow"],
+      "parts": ["FiltersRow", "FiltersAdvanced"],
       "props": [
         "fields",
         "query",
@@ -1280,6 +1280,7 @@
       "file": "src/components/reui/filters/filters.tsx",
       "level": "organism",
       "source": "library",
+      "parts": ["FilterChip", "FiltersBuilder"],
       "props": ["trigger", "showClear"],
       "variants": ["size=sm", "size=default"],
       "defaults": {

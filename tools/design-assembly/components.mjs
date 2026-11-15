@@ -321,6 +321,21 @@ function exported(text) {
   );
 }
 
+// Components a file imports and exports again, in a list of its own or one read from the file that
+// defines them: listed at the files that define them, but drawn here under the names the file
+// imported them by.
+function handedOn(text) {
+  const names = [];
+  const imported = importedNames(text);
+  for (const list of text.matchAll(/^export\s*\{([^}]*)\}/gm)) {
+    for (const item of list[1].split(",")) {
+      const [local] = item.trim().split(/\s+as\s+/);
+      if (local && imported.has(local) && /^[A-Z]/.test(local)) names.push(local);
+    }
+  }
+  return [...new Set(names)];
+}
+
 // The source of one component: from its declaration to the next declaration at the left margin.
 function declaration(text, name) {
   const start = new RegExp(
@@ -432,10 +447,13 @@ function survey(given, { library, pages } = {}) {
   for (const [file, text] of Object.entries(files).sort(([a], [b]) => (a < b ? -1 : 1))) {
     const sets = { ...elsewhere, ...setsOf[file] };
     const names = exported(text);
+    // What a component of this file can be drawn with: the file's own components, then the ones it
+    // hands on from other files.
+    const drawable = [...names, ...handedOn(text).filter((name) => !names.includes(name))];
     for (const name of names) {
       const source = declaration(text, name);
-      // The other components of the same file this one is drawn with.
-      const drawnWith = names.filter(
+      // The other components of the file this one is drawn with.
+      const drawnWith = drawable.filter(
         (other) => other !== name && new RegExp(`<${other}\\b`).test(source),
       );
       const signature = source.slice(
@@ -581,21 +599,14 @@ export function componentsProblem(text, files, file, folder, options = {}) {
   return `${file} is not what ${folder} gives${detail}: the source is where a component changes, so ${again}`;
 }
 
-function main() {
-  const args = argv.slice(2);
-  const at = args.indexOf("--target");
-  const root = at === -1 ? cwd() : path.resolve(args[at + 1] ?? "");
+// The component manifest this tool writes in the repository at `root`, as it would write it now:
+// `{ file, content, data, ... }`, or null when it manages no manifest there. Nothing is written:
+// the command and an upgrade's preview both ask this.
+export function regenerated(root) {
   const themeFile = path.join(root, "design/theme.json");
   const theme = existsSync(themeFile) ? JSON.parse(readFileSync(themeFile, "utf8")) : null;
   const check = theme?.checks?.[COMPONENTS_DECISION]?.[0];
-  // Nothing to manage is not a failure: a repository with a registry of its own runs this
-  // command too, and it must not turn its gate red.
-  if (!check) {
-    stdout.write(
-      "design-assembly: this tool manages no component manifest here: the repository has no components to list, or keeps a registry of its own\n",
-    );
-    exit(0);
-  }
+  if (!check) return null;
   const read = check.own ?? check.folder;
   const files = readFolder(root, read);
   const options = {
@@ -603,6 +614,31 @@ function main() {
     pages: check.pages ? readPages(root, check.pages) : {},
   };
   const manifest = readComponents(files, options);
+  return {
+    file: check.file,
+    content: renderJson(manifest, lineWidth(root)),
+    data: manifest,
+    check,
+    read,
+    files,
+    options,
+  };
+}
+
+function main() {
+  const args = argv.slice(2);
+  const at = args.indexOf("--target");
+  const root = at === -1 ? cwd() : path.resolve(args[at + 1] ?? "");
+  const made = regenerated(root);
+  // Nothing to manage is not a failure: a repository with a registry of its own runs this
+  // command too, and it must not turn its gate red.
+  if (!made) {
+    stdout.write(
+      "design-assembly: this tool manages no component manifest here: the repository has no components to list, or keeps a registry of its own\n",
+    );
+    exit(0);
+  }
+  const { check, read, files, options, data: manifest } = made;
   const full = path.join(root, check.file);
   const before = existsSync(full) ? readFileSync(full, "utf8") : null;
   const count = `${manifest.components.length} components`;
@@ -620,7 +656,7 @@ function main() {
     exit(1);
   }
   mkdirSync(path.dirname(full), { recursive: true });
-  writeFileSync(full, renderJson(manifest, lineWidth(root)));
+  writeFileSync(full, made.content);
   stdout.write(`component manifest: wrote ${check.file} from ${read} (${count})\n`);
 }
 
