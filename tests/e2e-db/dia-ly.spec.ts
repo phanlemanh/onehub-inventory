@@ -409,8 +409,28 @@ test("E11 phone sheet closes on a pick", { tag: "@cho" }, async ({ page }, info)
   expect(labels.indexOf(P1)).toBeGreaterThan(labels.indexOf(FRAME_COPY.secondColumn.byStatus));
   await place(sheet, P2, "[MAU] Toà E1").click();
   await expect(sheet).toBeHidden();
-  await expect.poll(() => footerCount(page)).toBe(12);
+  // Below 768 px the rows are cards (row 2b): count the cards and read the building on each.
+  await expect.poll(async () => (await cardPlaces(page)).length).toBe(12);
+  checkCards(await cardPlaces(page), 12, "[MAU] Toà E1");
+  // Break: one card of another building, or a card missing, is caught.
+  expect(() => checkCards(["[MAU] Toà E1", "S1.03"], 2, "[MAU] Toà E1")).toThrow(
+    "the khong theo toa",
+  );
+  expect(() => checkCards(["[MAU] Toà E1"], 12, "[MAU] Toà E1")).toThrow("the khong theo toa");
 });
+
+/** The place line of each card the phone list shows. */
+async function cardPlaces(page: Page): Promise<string[]> {
+  return region(page)
+    .locator('[data-slot="phone-card"] [data-slot="listing-card-place"]')
+    .allTextContents();
+}
+
+/** Exactly `count` cards, each in `building`; throws otherwise (fixed after the scope gate, row 2b). */
+function checkCards(places: readonly string[], count: number, building: string): void {
+  if (places.length !== count || places.some((p) => !p.includes(building)))
+    throw new Error("the khong theo toa");
+}
 
 /** Project names drawn whole; throws naming the first one cut. */
 async function checkWhole(scope: Locator): Promise<void> {
