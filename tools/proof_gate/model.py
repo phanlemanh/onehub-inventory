@@ -31,6 +31,7 @@ RESERVED_PATTERN_FILES = {"README.md", "lech-lot.md"}
 LEDGER_FILE = "design/so-khoi.yaml"  # decision 0023: one line per thing taken into the store
 TRANSITION_FILE = "tools/proof_gate/chuyen-tiep.yaml"  # rounds past the scope gate when row 1n merged: 1c rules
 WRAPPERS_FILE = "tools/proof_gate/khuon-boc.yaml"  # templates that wrap screens (App Shell), kept by people
+BEFORE_1Q_FILE = "tools/proof_gate/thanh-phan-co-truoc.yaml"  # row 1q: own files of the register before it, frozen
 CONTEXT_PAGES_DIR = "docs/tri-thuc/wiki/chu-de"  # context book of Quy hang, one page per screen
 VENDOR_DIRS = ("src/components/ui/", "src/components/reui/")  # supplier components: kept as delivered
 
@@ -134,6 +135,11 @@ class Repo:
     catalog_names: set[str] = field(default_factory=set)
     decision_ids: set[str] = field(default_factory=set)
     registry_files: dict[str, str] = field(default_factory=dict)
+    # Row 1q: every file of the register → the component names it carries, in either shape of the register (one entry
+    # per file with `parts`, or one entry per exported component, PR #58).
+    registry_by_file: dict[str, list[str]] = field(default_factory=dict)
+    before_1q: set[str] = field(default_factory=set)  # files of tools/proof_gate/thanh-phan-co-truoc.yaml
+    before_1q_present: bool = False  # the list exists: row 1q is on (with the ledger)
     ledger_present: bool = False
     ledger: list[dict[str, Any]] = field(default_factory=list)
     transition: dict[str, str] = field(default_factory=dict)  # slug -> reason
@@ -145,6 +151,10 @@ class Repo:
 
     def is_vendor(self, name: str) -> bool:
         return self.registry_files.get(name, "").startswith(VENDOR_DIRS)
+
+    def own_files(self) -> dict[str, list[str]]:
+        """Files of the register outside the supplier folders, each with its component names (row 1q)."""
+        return {f: names for f, names in self.registry_by_file.items() if f and not f.startswith(VENDOR_DIRS)}
 
     def family_of(self, screen_id: str) -> Family | None:
         screen = self.screens.get(screen_id) or {}
@@ -234,6 +244,11 @@ def load_repo(root: Path) -> Repo:
                 if isinstance(comp, dict) and comp.get("name"):
                     repo.registry_names.add(str(comp["name"]))
                     repo.registry_files[str(comp["name"])] = str(comp.get("file") or "")
+                    names = repo.registry_by_file.setdefault(str(comp.get("file") or ""), [])
+                    parts = [str(x["name"]) for x in comp.get("parts") or [] if isinstance(x, dict) and x.get("name")]
+                    for n in [str(comp["name"]), *parts]:
+                        if n not in names:
+                            names.append(n)
         else:
             repo.catalog_names = _names_from_catalog(data)
     dec_path = root / DECISIONS_FILE
@@ -244,7 +259,8 @@ def load_repo(root: Path) -> Repo:
 
 
 def _load_lists(repo: Repo, root: Path) -> None:
-    """The block ledger, the transition list and the wrapper list. A missing ledger means decision 0023 is not on."""
+    """The block ledger, the transition list, the wrapper list and the files made before row 1q. A missing ledger means
+    decision 0023 is not on."""
     path = root / LEDGER_FILE
     if path.is_file():
         repo.ledger_present = True
@@ -259,10 +275,16 @@ def _load_lists(repo: Repo, root: Path) -> None:
             items = []
         repo.ledger = [i if isinstance(i, dict) else {} for i in items]
         _load_legacy_blocks(repo, doc)
-    for rel, key, field_name in ((TRANSITION_FILE, "ho_so", "slug"), (WRAPPERS_FILE, "khuon", "id")):
+    for rel, key, field_name in (
+        (TRANSITION_FILE, "ho_so", "slug"),
+        (WRAPPERS_FILE, "khuon", "id"),
+        (BEFORE_1Q_FILE, "tep", "tep"),
+    ):
         path = root / rel
         if not path.is_file():
             continue
+        if key == "tep":
+            repo.before_1q_present = True
         try:
             doc = load_yaml_file(path)
         except YamlError as exc:
@@ -277,6 +299,8 @@ def _load_lists(repo: Repo, root: Path) -> None:
                 repo.errors.append(f"{rel}: '{item[field_name]}' thiếu lý do")
             if key == "ho_so":
                 repo.transition[str(item[field_name])] = reason
+            elif key == "tep":
+                repo.before_1q.add(str(item[field_name]))
             else:
                 repo.wrappers.add(str(item[field_name]))
 
