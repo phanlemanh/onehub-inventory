@@ -199,6 +199,7 @@ export function PastePreview({
       busyLabel={PASTE_COPY.busy}
       busy={busy}
       canSubmit={count > 0}
+      focusSubmit
       onSubmit={() => onApply(changes.filter((c) => picked.has(c.id)).map((c) => c.id))}
       slot="paste-preview"
     >

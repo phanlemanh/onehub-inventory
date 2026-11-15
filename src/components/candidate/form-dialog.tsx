@@ -1,6 +1,6 @@
 "use client";
 
-import type { FormEvent, ReactElement, ReactNode } from "react";
+import { useRef, type FormEvent, type ReactElement, type ReactNode } from "react";
 
 import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,7 @@ export function FormDialog({
   slot,
   badge,
   canSubmit = true,
+  focusSubmit = false,
   children,
 }: {
   /**
@@ -61,8 +62,11 @@ export function FormDialog({
   badge?: ReactNode;
   /** False while there is nothing to submit (e.g. a paste preview with every change unticked, row 5). */
   canSubmit?: boolean;
+  /** Focus starts on the submit button instead of the first field (a paste preview: the fields are its tick boxes). */
+  focusSubmit?: boolean;
   children: ReactNode;
 }) {
+  const submitRef = useRef<HTMLButtonElement>(null);
   function submit(e: FormEvent) {
     e.preventDefault();
     if (!busy && !refused && canSubmit) onSubmit();
@@ -70,7 +74,10 @@ export function FormDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger ? <DialogTrigger render={trigger.render}>{trigger.label}</DialogTrigger> : null}
-      <DialogContent data-slot={slot ?? "form-dialog"}>
+      <DialogContent
+        data-slot={slot ?? "form-dialog"}
+        {...(focusSubmit ? { initialFocus: submitRef } : {})}
+      >
         <form onSubmit={submit} noValidate className="flex flex-col gap-4">
           <DialogHeader>
             {badge ? (
@@ -94,7 +101,7 @@ export function FormDialog({
               {FRAME_COPY.confirm.cancel}
             </DialogClose>
             {refused ? null : (
-              <Button type="submit" disabled={busy || !canSubmit}>
+              <Button ref={submitRef} type="submit" disabled={busy || !canSubmit}>
                 {busy ? busyLabel : formError ? FRAME_COPY.retry : submitLabel}
               </Button>
             )}
