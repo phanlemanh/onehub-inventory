@@ -60,7 +60,10 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại; màn này tro
 - AC-9: Given mọi vai của sàn đọc được Bảng hàng (Đầu chủ, Đầu khách, Trưởng nhóm — 9a, 9b), When dùng Bảng hàng dưới 768, Then thẻ
   không có ô sửa, nút sửa giá hay trạng thái, nút «Cột»; hồ sơ mở từ thẻ mang đúng bộ nút theo vai như hồ sơ mở từ bảng; cả
   thẻ là một liên kết tới địa chỉ hồ sơ, tên đọc là chữ trên thẻ bắt đầu bằng mã căn (WCAG 2.5.3 — sửa sau Cổng Phạm vi), vùng chạm cao ít nhất 44 px, «…» của từng thẻ trong vùng chạm 44 × 44 px, Tab đi qua từng thẻ, Enter mở hồ sơ; quét axe ở 360 và 414,
-  sáng và tối, không lỗi; Quản trị sàn thấy câu không đủ quyền, không thẻ.
+  sáng và tối, không lỗi; ai vào được Bảng hàng là theo luật vào của màn trong sổ màn, đọc qua bảng quyền như cửa của
+  9b — vai bị luật ấy chặn thấy khối không đủ quyền, không thẻ, ở mọi khổ; hôm nay sổ màn để Bảng hàng mở cho mọi vai
+  (`vao: null`), nên Quản trị sàn thấy thẻ, chỉ đọc, không nút, đúng sổ vai × màn đã ký của 9b. (Sửa sau chữ ký
+  2026-11-15 · chờ chủ kho xác nhận — bản đã ký viết «Quản trị sàn thấy câu không đủ quyền, không thẻ»; xem Notes.)
 - AC-11: Given Bảng hàng dưới 768 khi màn có nút theo vai (khuôn 9e), When người dùng mở danh sách thẻ, Then nút thêm
   căn nằm ở đầu màn và việc của một căn (Sửa, Xoá căn) nằm theo Hỏi-3 (khuyến nghị: «…» cuối mỗi thẻ và ở đầu hồ sơ; lối
   kia: chỉ ở đầu hồ sơ); nút chỉ hiện với vai có quyền theo bảng quyền (Đầu chủ: Sửa, Xoá căn của mình; Đầu khách: Sửa;
@@ -163,7 +166,15 @@ Ngưỡng SỐNG của ô cơ hội, từng vế:
   - Ngoài-8: Một phép kiểm thẻ vắng mặt luôn qua; ca hỏi lại trước khi xoá căn chưa được kiểm.
   - Ngoài-9: Bài kiểm chưa chắc bắt được thẻ mang sai trạng thái hay sai nơi.
   - Ngoài-10: Chỉ bộ lọc được kiểm còn nguyên khi xoay hay đổi cỡ màn qua ngưỡng điện thoại; sắp xếp và nhóm chưa.
-  - Ngoài-11: Bài kiểm chưa chắc Quản trị sàn thấy đúng câu không đủ quyền; trang trắng hay lỗi cũng qua.
+- Sửa sau chữ ký 2026-11-15 · chờ chủ kho xác nhận (giám sát chốt V-1511-1, V-1511-2):
+  - Lượt ghim lại sau khi gộp main cho thấy ca «Quản trị sàn thấy câu không đủ quyền, không thẻ» chỉ qua khi thẻ chưa kịp
+    vẽ: mã chưa hề chặn Quản trị sàn. Chữ ký 15/11 đặt trên một ca qua giả ở AC-9.
+  - Sổ vai × màn của 9b đã ký ghi Quản trị sàn được xem Bảng hàng cho tới khi hàng 10 đặt luật vào. Hàng này nay dựng cửa
+    vào của Bảng hàng theo luật ấy (cùng cửa với màn Thành viên), không tự chặn Quản trị sàn; ca phá (luật vào đổi thành
+    quyền xem bảng hàng) chứng cửa chặn đúng: câu không đủ quyền, không thẻ.
+  - Câu «Quản trị sàn có được xem Bảng hàng không» chuyển sang Cổng Phạm vi của hàng 10.
+  - Ngoài-11 gỡ khỏi Known limits: bài kiểm vai nay chờ vùng ổn định và có thẻ rồi mới đếm, ca cửa chờ câu rồi mới đếm.
+    Rà cả bộ bài của hàng này không thấy ca nào khác cùng hình qua giả.
 
 ### Tệp hạng cao đã đổi
 

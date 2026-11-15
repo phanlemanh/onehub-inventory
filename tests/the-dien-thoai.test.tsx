@@ -24,6 +24,11 @@ import {
   listingView,
 } from "../src/modules/listings/ui";
 import { formatByKind } from "../src/lib/format";
+import { NAV, entryRefused } from "../src/app/(app)/nav";
+import { PageState } from "../src/components/templates/page-state";
+import { FRAME_COPY } from "../src/components/templates/frame-copy";
+import type { NavItem } from "../src/components/templates/app-shell";
+import type { Role } from "../src/generated/ontology";
 import { tallGridViewport } from "./virtual-viewport";
 
 vi.setConfig({ testTimeout: 20_000 });
@@ -386,4 +391,73 @@ describe("bo-nut (E14)", () => {
       expect(await menuOf(role, mine)).toEqual(expected);
     },
   );
+});
+
+describe("cua-vao (E9, AC-9)", () => {
+  // The inventory page's door: the register's entry rule (`vao`, the sidebar entry's action) through the permission
+  // table. A copy of the sidebar gating the inventory by viewListings, which the table does not give CompanyAdmin,
+  // is the break case: that role must get «not allowed» and no card.
+  const gated: NavItem[] = NAV.map((item) =>
+    item.href === "/inventory" ? { ...item, action: "viewListings" } : item,
+  );
+  const grid = (
+    <DataRegion
+      title="Hàng"
+      columns={columns}
+      rows={rows}
+      emptyWhy="x"
+      groupBy="Listing.buildingName"
+      phoneList={phoneList}
+    />
+  );
+  /** What the inventory page renders for these roles: its door, then the region. */
+  const page = (nav: readonly NavItem[], roles: Role[], door = entryRefused) =>
+    render(door(nav, "/inventory", roles) ? <PageState kind="forbidden" homeHref="/" /> : grid);
+  /** A refused role: the sentence first, then the count — a count read before anything draws proves nothing. */
+  async function refusedShowsNoCard(role: Role): Promise<void> {
+    const sentence = await screen
+      .findByRole("heading", { level: 1, name: FRAME_COPY.forbidden.title })
+      .catch(() => null);
+    if (!sentence) throw new Error(`vai thieu quyen khong thay cau: ${role}`);
+    if (cards().length > 0) throw new Error(`vai thieu quyen ma con the: ${role}`);
+  }
+
+  it.each(["TeamLead", "ListAgent", "BuyerAgent", "CompanyAdmin"] as const)(
+    "today the register lets %s in: cards, no «not allowed»",
+    (role) => {
+      expect(entryRefused(NAV, "/inventory", [role])).toBe(false);
+      page(NAV, [role]);
+      expect(cards().length).toBeGreaterThan(0);
+      expect(document.querySelector('[data-slot="page-state"]')).toBeNull();
+    },
+  );
+
+  it("gated by viewListings, CompanyAdmin sees «not allowed» and no card; ListAgent still reads cards", async () => {
+    expect(entryRefused(gated, "/inventory", ["CompanyAdmin"])).toBe(true);
+    page(gated, ["CompanyAdmin"]);
+    await refusedShowsNoCard("CompanyAdmin");
+    cleanup();
+    page(gated, ["ListAgent"]);
+    expect(cards().length).toBeGreaterThan(0);
+  });
+
+  it("pha: a door that ignores the rule shows cards without the sentence, and the measure is red", async () => {
+    page(gated, ["CompanyAdmin"], () => false);
+    expect(cards().length).toBeGreaterThan(0);
+    await expect(refusedShowsNoCard("CompanyAdmin")).rejects.toThrow(
+      "vai thieu quyen khong thay cau: CompanyAdmin",
+    );
+  });
+
+  it("pha: the sentence with cards still under it is red", async () => {
+    render(
+      <>
+        <PageState kind="forbidden" homeHref="/" />
+        {grid}
+      </>,
+    );
+    await expect(refusedShowsNoCard("CompanyAdmin")).rejects.toThrow(
+      "vai thieu quyen ma con the: CompanyAdmin",
+    );
+  });
 });

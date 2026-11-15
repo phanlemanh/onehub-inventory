@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/templates/page-header";
+import { PageState } from "@/components/templates/page-state";
 import { customColumnsOf, label, labelOverrides } from "@/modules/company-config";
 import { myCompanyLayer } from "@/modules/company-config/server";
 import { isRole } from "@/modules/identity";
@@ -14,6 +15,7 @@ import {
   sampleInventoryRows,
   sampleRecords,
 } from "../inventory-sample-rows";
+import { entryRefused, NAV } from "../nav";
 import { savedViewLabels } from "../saved-view-labels";
 import {
   ENTRY_COPY,
@@ -108,6 +110,18 @@ export default async function Page({ searchParams }: Props) {
   const query = await searchParams;
   const state = first(query.state);
   const vai = first(query.vai);
+  // Without a signed-in session, outside production, ?vai=<role> stands in for the session's role, so the browser
+  // tests and the screenshots of row 4 can open the cells the permission table gives that role. A real session wins.
+  const session = await currentSession();
+  const standIn =
+    process.env.NODE_ENV !== "production" && vai !== undefined && isRole(vai) && session === null
+      ? [vai]
+      : null;
+  // The screen's entry rule, before any listing is read: a role the register keeps out sees «not allowed» at every
+  // width, the same block as the members page (row 9b). Today the register lets every staff role in (`vao: null`).
+  if (entryRefused(NAV, "/inventory", standIn ?? session?.roles ?? [])) {
+    return <PageState kind="forbidden" homeHref="/" />;
+  }
   // A status shortcut opens the grid filtered (row 2a).
   const status = first(query.status);
   // A saved view opens by its own address (row 2c): gone, or someone else's, opens every unit with a sentence.
@@ -153,15 +167,6 @@ export default async function Page({ searchParams }: Props) {
   // A shared link (row 3f) to a listing no longer on the inventory: the grid opens as usual and says why.
   const asked = first(query["ho-so"]);
   const stale = asked !== undefined && !rows.some((row) => row.id === asked);
-  // Without a signed-in session, outside production, ?vai=<role> stands in for the session's role, so the browser
-  // tests and the screenshots of row 4 can open the cells the permission table gives that role. A real session wins.
-  const standIn =
-    process.env.NODE_ENV !== "production" &&
-    vai !== undefined &&
-    isRole(vai) &&
-    (await currentSession()) === null
-      ? [vai]
-      : null;
   const page = (
     <>
       <PageHeader title={openView ? openView.name : label("Inventory")} />

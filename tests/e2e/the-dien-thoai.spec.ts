@@ -168,25 +168,41 @@ test("du-lieu-bien (E8): long codes, big prices, rent and no price fit at 360", 
 });
 
 test.describe("vai (E9)", () => {
-  for (const role of ["TeamLead", "ListAgent", "BuyerAgent"] as const) {
+  // Every role the register lets into the inventory (`vao: null`, row 9b's signed table) reads the cards. Counted
+  // only once the region has settled and shows cards: a count taken before the cards draw passes on nothing.
+  for (const role of ["TeamLead", "ListAgent", "BuyerAgent", "CompanyAdmin"] as const) {
     test(`${role} reads cards and edits nothing on them`, async ({ page }) => {
       await page.setViewportSize({ width: 360, height: 800 });
       await page.goto(`/inventory?vai=${role}`);
       await cards(page).first().waitFor();
+      await page.waitForLoadState("networkidle");
+      if ((await cards(page).count()) === 0) throw new Error(`no card for ${role}`);
+      await expect(page.locator('[data-slot="page-state"][data-kind="forbidden"]')).toHaveCount(0);
       const controls = await page
         .locator('[data-slot="phone-list"] ul')
         .locator("input, select, textarea, button, [role=combobox]")
         .count();
       if (controls > 0) throw new Error(`edit control on a card for ${role}: ${controls}`);
       await expect(page.getByRole("button", { name: "Cột" })).toHaveCount(0);
+      if (SHOTS && role === "CompanyAdmin") {
+        mkdirSync(SHOTS, { recursive: true });
+        await page.screenshot({ path: join(SHOTS, "E9-quan-tri-360.png") });
+      }
     });
   }
 
-  test("CompanyAdmin sees the region's forbidden sentence, no card", async ({ page }) => {
-    await page.setViewportSize({ width: 360, height: 800 });
+  test("CompanyAdmin at 1440 reads the same inventory as a table, no «not allowed»", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(`/inventory?vai=CompanyAdmin`);
-    await page.locator('[data-slot="data-region"]').waitFor();
-    await expect(cards(page)).toHaveCount(0);
+    await page.locator('[data-slot="data-region"] table tbody tr').first().waitFor();
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator('[data-slot="page-state"][data-kind="forbidden"]')).toHaveCount(0);
+    if (SHOTS) {
+      mkdirSync(SHOTS, { recursive: true });
+      await page.screenshot({ path: join(SHOTS, "E9-quan-tri-1440.png") });
+    }
   });
 });
 
