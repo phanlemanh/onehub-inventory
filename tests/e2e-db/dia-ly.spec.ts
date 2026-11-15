@@ -141,7 +141,10 @@ const esc = (t: string) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 async function settled(page: Page) {
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
-  await expect(region(page).locator('table[data-slot="data-grid-table"]')).toBeVisible();
+  // From 768 px the rows are a table; below it, the phone card list (row 2b).
+  await expect(
+    region(page).locator('table[data-slot="data-grid-table"], [data-slot="phone-list"]'),
+  ).toBeVisible();
 }
 
 /** The footer's «x / 60 dòng», or 60 when nothing is filtered. */

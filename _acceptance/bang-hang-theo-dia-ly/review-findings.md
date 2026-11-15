@@ -1,46 +1,74 @@
-# Review findings: bang-hang-theo-dia-ly (round 4)
+# Review findings: bang-hang-theo-dia-ly (round 5)
 
 ## Trong hợp đồng
 
-(không có finding nào map được vào AC)
+(không có finding nào)
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Tier: the change is high tier but no human approval is recorded**
+- **Editing a picked place's filter box turns the list into one comma-joined 'contains' text, so the grid silently shows no rows**
+  Người dùng thấy gì: Sau khi chọn một phân khu, nếu người dùng sửa dù một ký tự trong ô lọc Toà thì bảng trống trơn và không có lời giải thích nào. Xoá lọc hoặc bấm lại nơi cần xem là có lại dòng.
+  Căn cứ: Hậu quả nhẹ đến vừa: không mất hay lộ dữ liệu, người dùng tự gỡ được bằng «Xoá lọc» hoặc chọn lại ở cột thứ hai, và chỉ xảy ra khi tự gõ sửa vào ô đang giữ danh sách.
+  file: `src/components/candidate/column-filter-cell.tsx`
+  severity: medium
+  Đề xuất: known-limits
+
+- **The tree trims project and building names but the filter matches whole names untrimmed, so a name with stray spaces shows a place that filters to nothing**
+  Người dùng thấy gì: Nếu dữ liệu nhập từ Sheet có tên toà thừa khoảng trắng, cột thứ hai vẫn hiện nơi đó nhưng bấm vào thì bảng không hiện các căn đã được tính cho nơi ấy.
+  Căn cứ: Chỉ xảy ra với dữ liệu nhập có khoảng trắng thừa, chưa có ở dữ liệu mẫu; không mất dữ liệu và người dùng có thể dọn tên trong Sheet rồi nhập lại, nên ghi lại là đủ.
+  file: `src/modules/listings/ui/geo-tree.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Tier: the change is high tier but no human approval is recorded (r4)**
   Người dùng thấy gì: Một tệp của bộ kiểm thử thuộc vùng cần chủ kho phê duyệt đã được sửa mà chưa có ghi nhận phê duyệt. Người dùng cuối không thấy khác biệt, nhưng chủ kho cần ký xác nhận.
   Căn cứ: Việc thêm chỉ làm bài kiểm chặt hơn chứ không nới lỏng, người dùng không bị ảnh hưởng, và chủ kho ký một lần ở cổng là xong.
   file: `tools/e2e_templates/settle.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **SP-1 (companies are isolated): the geography tree ignores the signed-in company**
+- **Records: the evidence card and page do not match HEAD (r4 · tệp đã đổi)**
+  Người dùng thấy gì: Thẻ bằng chứng còn mô tả hai điểm đã được sửa là chưa sửa, nên chủ kho có thể ký dựa trên thông tin cũ. Người dùng cuối không bị ảnh hưởng.
+  Căn cứ: Không mất hay lộ dữ liệu cho người dùng, chỉ là hồ sơ lỗi thời; làm lại thẻ rất rẻ và nên làm trước khi chủ kho ký.
+  file: `_acceptance/bang-hang-theo-dia-ly/card.html`
+  severity: medium
+  Đề xuất: known-limits
+
+- **SP-1 (companies are isolated): the geography tree ignores the signed-in company (r4)**
   Người dùng thấy gì: Hiện cây địa lý chạy trên dữ liệu mẫu nên chưa lộ gì. Khi chuyển sang dữ liệu thật, tên dự án và toà của sàn này có thể hiện cho sàn khác nếu không được giới hạn theo sàn.
   Căn cứ: Hiện chưa có dữ liệu thật nên không rò rỉ; chỉ cần ghi lại để khi đổi sang dữ liệu thật thì làm cho đúng sàn, sửa lúc đó không đắt.
   file: `src/app/(app)/layout.tsx`
   severity: low
   Đề xuất: known-limits
 
-- **Design: a module test reaches into src/app**
+- **Design: a module test reaches into src/app (r4)**
   Người dùng thấy gì: Một bài kiểm thử đặt chưa đúng chỗ về mặt tổ chức mã. Người dùng không thấy và không bị ảnh hưởng gì.
   Căn cứ: Không có hậu quả cho người dùng, kiểm tra ranh giới vẫn xanh; chỉ là gọn gàng nội bộ nên chấp nhận và ghi vết.
   file: `src/modules/listings/ui/geo-tree.test.ts`
   severity: low
-  Đề xuất: known-limits
+  Đề xuất: wont-fix
 
-- **Domain: geography code uses a name the glossary does not**
+- **Domain: geography code uses a name the glossary does not (r4)**
   Người dùng thấy gì: Trong mã, khái niệm «Dự án» được gọi bằng tên khác với từ điển nghiệp vụ. Người dùng vẫn thấy đúng chữ «Dự án» trên màn hình.
   Căn cứ: Không ảnh hưởng gì đến những gì người dùng thấy hay dữ liệu; chỉ gây nhầm cho người viết mã sau này, đổi tên về sau khá rẻ.
   file: `src/modules/listings/ui/geo-tree.ts`
   severity: low
   Đề xuất: known-limits
 
-- **Hình dạng 5: tuyên quét LỚP «bấm kèm phím hoặc bấm chuột giữa» nhưng ma trận thiếu phần tử chuột giữa**
+- **Hình dạng 5: tuyên quét LỚP «bấm kèm phím hoặc bấm chuột giữa» nhưng ma trận thiếu phần tử chuột giữa (r4 · tệp đã đổi)**
   Người dùng thấy gì: Khi bấm chuột giữa vào một nơi ở cột thứ hai, chưa có bài kiểm tự động nào bảo vệ việc tab hiện tại giữ nguyên. Nếu sau này ai làm hỏng nhánh này thì người dùng có thể thấy bảng bị lọc ngay khi họ định mở tab mới.
   Căn cứ: Hành vi hiện đã đúng và người dùng tự khắc phục được bằng cách xoá lọc; thêm một ca kiểm thử là rẻ nhưng hậu quả hiện tại nhẹ.
   file: `tests/dia-ly.test.tsx`
   severity: medium
+  Đề xuất: known-limits
+
+- **Assertion âm-tính-một-mình: kiểm `vung` vắng và ô Toà rỗng sau khi bấm, nhưng không kiểm dương rằng chúng đã có trước khi bấm (r3 · tệp đã đổi)**
+  Người dùng thấy gì: Người dùng không thấy gì khác đi. Chỉ là bài kiểm tự động cho việc bấm «Tất cả hàng» sau khi chọn một nơi có thể vẫn báo xanh dù địa chỉ hay ô lọc không được cập nhật đúng, nên lỗi tương lai có thể lọt qua.
+  Căn cứ: Không ảnh hưởng người dùng hiện tại, không mất hay lộ dữ liệu; rủi ro chỉ là bỏ sót lỗi sau này, và bổ sung kiểm tra lúc nào cũng rẻ.
+  file: `tests/e2e-db/dia-ly.spec.ts`
+  severity: low
   Đề xuất: known-limits
 
 - **SP-1 (companies are isolated): the place tree in the App Shell ignores which company is signed in (r2)**
@@ -83,6 +111,20 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   Căn cứ: Không đụng tới hành vi sản phẩm, công cụ kiểm ranh giới vẫn xanh, dời chỗ sau này rất rẻ.
   file: `src/modules/listings/ui/geo-tree.test.ts`
   severity: low
+  Đề xuất: known-limits
+
+- **After a place is picked, pressing «Tất cả hàng» (or the status entry the grid opened with) does nothing: the grid stays filtered and the address gets the place back (r1 · tệp đã đổi)**
+  Người dùng thấy gì: Sau khi chọn một toà, bấm «Tất cả hàng» ở cột bên không làm gì cả: bảng vẫn lọc theo toà đó. Người dùng phải bấm «Xoá lọc» mới quay về đủ 60 dòng.
+  Căn cứ: Người dùng dễ tưởng ứng dụng bị treo nhưng không mất dữ liệu, và có cách thoát bằng «Xoá lọc» hay tải lại trang; nên làm thành việc riêng vì đây là lối đi thường gặp.
+  file: `src/modules/listings/ui/inventory-grid.tsx`
+  severity: high
+  Đề xuất: new-contract
+
+- **Cmd/Ctrl/Shift-click on a place entry is swallowed: no new tab, the grid is filtered in place (r1)**
+  Người dùng thấy gì: Giữ Cmd hoặc Ctrl khi bấm một nơi sẽ không mở tab mới mà chỉ lọc bảng hiện tại. Đường dẫn vẫn chép và mở được bình thường.
+  Căn cứ: Là thói quen của người dùng thành thạo, nhẹ, có cách vòng bằng cách chép đường dẫn, và không mất dữ liệu.
+  file: `src/components/templates/app-shell/second-column.tsx`
+  severity: medium
   Đề xuất: known-limits
 
 - **Hình dạng 4 (assertion âm tính một mình): kiểm 'không count' và 'không geo-tree' trên data-slot mà mã không bao giờ vẽ (r1 · tệp đã đổi)**
@@ -129,4 +171,4 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
 
 ## Chưa adversarial-verify (refuter chết)
 
-⚠ Cụm ngoài vùng phủ: 2/6 lỗi rơi vào file không bộ đo nào phủ (tools/e2e_templates/settle.ts, _acceptance/bang-hang-theo-dia-ly/card.html) — dừng và quyết: mở rộng hợp đồng hay rút phạm vi.
+Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).

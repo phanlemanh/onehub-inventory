@@ -13,3 +13,6 @@
 
 ### S4 lượt 4 — wf_368c2d94-085 (13 agent, 404389 out-tok)
 - Verdict PASS. Lượt vượt trần ba lượt, giám sát cho (G-1411-41). Cùng cách đếm như lượt 1.
+
+### S4 lượt 5 — wf_e1cb5626-9e5 (14 agent, 450951 out-tok)
+- Verdict REJECT. Lượt delta gom bản sửa «Tất cả hàng» và bài điện thoại sau khi gộp 2b (G-1511-3). Đỏ duy nhất: bài E11 ở 360 chờ một bảng mà từ 2b màn điện thoại không còn vẽ; sáu eval chung một lệnh nên cùng đỏ.
