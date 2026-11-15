@@ -1,0 +1,42 @@
+{
+  "feature_plain": "Bộ kiểm của kho thôi làm hàng khác đỏ oan: không chọn trúng cổng trình duyệt cấm, không còn cảnh báo dựng trang lệch, hai trang quyết định thôi trùng số, và chủ kho có sẵn cách sửa việc phát hành.",
+  "will_do": [
+    { "id": "AC-1", "p": "Sẽ chọn cổng chạy thử không bao giờ trúng cổng trình duyệt cấm (3659, 4045, 4190), có bài thử hết mọi khả năng ở cả hai khoảng cổng." },
+    { "id": "AC-2", "p": "Sẽ cho hai bộ kiểm trình duyệt cùng dùng một cách chọn cổng, và cổng đặt tay vẫn luôn thắng." },
+    { "id": "AC-3", "p": "Sẽ giữ nguyên ca phá «khung chờ không bao giờ hiện» và lời báo của nó, nhưng ca phá thôi làm lệch trang lúc dựng." },
+    { "id": "AC-4", "p": "Sẽ cho bộ kiểm trình duyệt đầy đủ trên nhánh chính chạy xanh mà không còn cảnh báo dựng trang lệch nào." },
+    { "id": "AC-5", "p": "Sẽ làm cả lượt kiểm đỏ, kèm tên bài, ngay khi một cảnh báo dựng trang lệch xuất hiện lại." }
+  ],
+  "wont_do": [
+    { "id": "AC-6", "p": "Chặn hai trang quyết định cùng số: trang của hàng 1q mang số 0042, có trong mục lục, mọi liên kết trỏ đúng." },
+    { "id": "AC-7", "p": "Chặn trùng số về sau: kiểm wiki đỏ khi hai trang quyết định dùng chung một số." },
+    { "id": "AC-9", "p": "Sẽ KHÔNG chạm tệp của chủ kho (luồng tự động, quản trị, luật sản phẩm) và tệp của PR #66." },
+    { "id": "OOS-1", "p": "KHÔNG sửa luồng tự động, KHÔNG đặt khoá bí mật, KHÔNG đổi cài đặt kho GitHub — việc của chủ kho." },
+    { "id": "OOS-2", "p": "KHÔNG xử cảnh báo «không đọc được tên commit gộp» của việc phát hành — nó không làm đỏ." },
+    { "id": "OOS-3", "p": "KHÔNG xử các lỗi trình duyệt mà bài kiểm cố tình gây ra." },
+    { "id": "OOS-4", "p": "KHÔNG đổi màn nào hay mã sản phẩm nào." }
+  ],
+  "scope_plain": "Hàng nợ hạ tầng: chỉ bộ kiểm, cấu hình bộ kiểm và wiki đổi; người dùng sản phẩm không thấy gì khác.",
+  "coverage_plain": [
+    { "i": 0, "p": "Phủ theo bốn nợ chủ kho đã chọn ở Cổng Đáng, cộng mọi chỗ trong kho đọc thứ bị đổi." },
+    { "i": 1, "p": "Không quét thêm không gian tiêu chí: bốn nợ là cố định; thay bằng một lượt dò toàn kho." },
+    { "i": 2, "p": "Các chỗ đọc thứ bị đổi được dò toàn kho bằng tìm chữ, kê ở bảng dưới." },
+    { "i": 4, "p": "Chọn cổng bỏ cổng cấm — bài thử hết mọi khả năng (AC-1)." },
+    { "i": 5, "p": "Hai bộ kiểm trình duyệt là hai chỗ duy nhất tính cổng — cả hai dùng cách chung, cổng đặt tay vẫn thắng (AC-2)." },
+    { "i": 6, "p": "Ca phá gây cảnh báo — sửa ở gốc, giữ lời báo, sổ ca phá không mất ca nào (AC-3)." },
+    { "i": 7, "p": "Nhánh chính hết cảnh báo — bộ kiểm đầy đủ xanh và phép gác báo 0 (AC-4)." },
+    { "i": 8, "p": "Cảnh báo quay lại thì đỏ — có ca phá chứng phép gác thấy thật (AC-5)." },
+    { "i": 9, "p": "Đánh lại số trang — sổ nhật ký và mục lục là hai chỗ duy nhất phải sửa (AC-6)." },
+    { "i": 10, "p": "Chặn trùng số — bộ kiểm wiki đỏ khi trùng (AC-7)." },
+    { "i": 11, "p": "Việc phát hành — chủ kho có bản hướng dẫn tự làm (AC-8)." },
+    { "i": 12, "p": "Ranh giới — không chạm tệp của chủ kho, của PR #66, và bộ kiểm toàn kho xanh (AC-9)." }
+  ],
+  "gap_probe_plain": [
+    { "i": 0, "p": "Nặng: cách sửa ban đầu làm mất một ca phá của bộ kiểm (lời báo «không có khung chờ»). Đã đổi cách: ca phá giữ nguyên lời báo, chỉ chặn trang dựng lại nên không còn cảnh báo — không ca nào mất." },
+    { "i": 1, "p": "Nặng: chưa dò xem còn chỗ nào khác tự tính cổng hay trỏ trang cũ. Đã dò toàn kho, kê từng chỗ ở bảng độ phủ, và thêm phép kiểm cả kho chỉ một chỗ được tính cổng." },
+    { "i": 2, "p": "Vừa: phép đo «cổng đặt tay vẫn thắng» chỉ đọc chữ. Đã đổi thành nạp thật từng bộ kiểm, có và không có cổng đặt tay, rồi so cổng thật." },
+    { "i": 3, "p": "Vừa: phép gác chỉ chứng ở một bộ kiểm, và «không có cảnh báo» chưa chứng được phép gác có chạy. Đã thêm dòng «0 cảnh báo» bắt buộc và chứng tên bài khi chạy song song; bộ kiểm có cơ sở dữ liệu chỉ chứng có gắn phép gác (chạy thật cần cơ sở dữ liệu riêng — ghi rõ)." },
+    { "i": 4, "p": "Nhẹ: người chấm bản hướng dẫn phát hành không có nguồn để đối chiếu. Đã đưa bản thiết kế vào cho người chấm so dòng lỗi và quyền." }
+  ],
+  "decisions_plain": []
+}
