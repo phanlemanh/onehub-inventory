@@ -4,8 +4,12 @@
 // with «Hoàn tác». The door today is the sample one in memory (Hỏi-1); row 10 hands in the real /api/v1 door.
 import { useCallback, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 
-import type { GridRow, RegionCellEdit } from "@/components/candidate/data-region";
-import { runDoorChange, type WriteOutcome } from "@/components/candidate/use-change";
+import type { FieldKey } from "@/components/candidate/column-kind";
+import type { GridRow, RegionCellEdit, RegionPaste } from "@/components/candidate/data-region";
+import { PASTE_COPY } from "@/components/candidate/paste-copy";
+import { PastePreview } from "@/components/candidate/paste-preview";
+import { notifyResult } from "@/components/templates/notify";
+import { runDoorBatch, runDoorChange, type WriteOutcome } from "@/components/candidate/use-change";
 import type { Listing, ListingStandardStatus } from "@/generated/ontology";
 import { formatMoney, statusLabel } from "@/lib/format";
 
@@ -18,6 +22,7 @@ import {
 
 import { CELL_EDIT_COPY as COPY, type CellEditLabels } from "./cell-edit-copy";
 import type { InventoryField } from "./inventory-rows";
+import { pasteWords, planPaste, type PastePlan } from "./listing-paste";
 import {
   ListingCellEdit,
   StatusNeedsDialog,
@@ -34,6 +39,7 @@ const subscribeWide = (onChange: () => void) => {
   return () => query.removeEventListener("change", onChange);
 };
 
+const NO_LINES: never[] = [];
 const PRICE = "Listing.listPrice";
 const STATUS = "Listing.standardStatus";
 const CONFIRMED = "Listing.lastConfirmedAt";
@@ -64,6 +70,7 @@ export function useListingCellEdit({
   headers,
   labels,
   door: given,
+  headerOf,
 }: {
   rows: readonly GridRow[];
   /** Absent: the grid is read-only. */
@@ -72,6 +79,8 @@ export function useListingCellEdit({
   /** Words of the editors from the label table; absent with `listings` absent. */
   labels: CellEditLabels | undefined;
   door?: ListingSaveDoor;
+  /** A column's header as the grid shows it (custom columns included), for the paste preview (row 5). */
+  headerOf?: (field: FieldKey) => string;
 }): { rows: readonly GridRow[]; cellEdit: RegionCellEdit | undefined; dialogs: ReactNode } {
   const [door] = useState<ListingSaveDoor & { current?: (id: string) => Listing | undefined }>(
     () =>
@@ -166,6 +175,84 @@ export function useListingCellEdit({
     [headers, labels, patch, write],
   );
 
+  // Pasting a region (row 5): the preview first, then every ticked cell through the same door, undone at once.
+  const [plan, setPlan] = useState<PastePlan | null>(null);
+  const [applying, setApplying] = useState(false);
+  const onPaste = useCallback(
+    (paste: RegionPaste) => {
+      if (!labels) return;
+      const plan = planPaste(
+        paste,
+        labels,
+        (field) => headerOf?.(field) ?? headers[field as InventoryField] ?? field,
+      );
+      setPlan({ ...plan, key: Date.now() });
+    },
+    [labels, headerOf, headers],
+  );
+  const applyPaste = useCallback(
+    async (ids: readonly string[]) => {
+      if (!plan || !labels) return;
+      const say = pasteWords(labels);
+      const picked = ids.flatMap((id) => {
+        const w = plan.writes.get(id);
+        return w ? [{ id, ...w }] : [];
+      });
+      const at = new Date().toISOString();
+      // Each row's values before the paste, to put back on a failed write and on undo.
+      const before = new Map<string, Partial<GridRow>>();
+      for (const { row } of picked)
+        before.set(row.id, {
+          [PRICE]: row[PRICE],
+          [STATUS]: row[STATUS],
+          [CONFIRMED]: row[CONFIRMED],
+        });
+      setApplying(true);
+      for (const { row, change } of picked)
+        patch(row.id, { ...fromChange(change), [CONFIRMED]: at });
+      const lines = new Map(plan.changes.map((c) => [c.id, c]));
+      const outcomes = await runDoorBatch({
+        writes: picked.map(({ id, row, field, change, undoable }) => ({
+          what: `${lines.get(id)?.where ?? ""} · ${lines.get(id)?.field ?? ""}`,
+          write: () => write(row.id, change, at),
+          undo: undoable
+            ? async () => {
+                const was = before.get(row.id) ?? {};
+                const back: ListingChange =
+                  field === PRICE
+                    ? { field: "listPrice", listPrice: was[PRICE] as number }
+                    : {
+                        field: "standardStatus",
+                        standardStatus: was[STATUS] as ListingStandardStatus,
+                      };
+                const result = await write(row.id, back, new Date().toISOString());
+                if (result === "saved")
+                  patch(row.id, { [field]: was[field], [CONFIRMED]: was[CONFIRMED] });
+                return result;
+              }
+            : undefined,
+        })),
+        done: (saved) =>
+          PASTE_COPY.done(saved, say.records(new Set(picked.map((p) => p.row.id)).size)),
+        partly: (saved, failed, why) => PASTE_COPY.partly(saved, failed, PASTE_COPY.why[why]),
+        noneSaved: (why) => PASTE_COPY.noneSaved(PASTE_COPY.why[why]),
+        undone: (count, kept) =>
+          kept > 0 ? PASTE_COPY.undoneExcept(count, kept) : PASTE_COPY.undone(count),
+        undoFailed: (still, why) => PASTE_COPY.undoFailed(still.join(", "), PASTE_COPY.why[why]),
+      });
+      // A write that did not go through puts its cell back.
+      picked.forEach(({ row, field }, i) => {
+        if (outcomes[i] !== "saved") {
+          const was = before.get(row.id) ?? {};
+          patch(row.id, { [field]: was[field], [CONFIRMED]: was[CONFIRMED] });
+        }
+      });
+      setApplying(false);
+      setPlan(null);
+    },
+    [plan, labels, patch, write],
+  );
+
   const cellEdit = useMemo<RegionCellEdit | undefined>(() => {
     if (!wide || !listings || !labels) return undefined;
     return {
@@ -185,16 +272,32 @@ export function useListingCellEdit({
           onAsk={setAsk}
         />
       ),
+      paste: onPaste,
+      pasteRefused: () => notifyResult({ message: pasteWords(labels).refused }),
     };
-  }, [wide, listings, labels, headers, save]);
+  }, [wide, listings, labels, headers, save, onPaste]);
 
   const dialogs = labels ? (
-    <StatusNeedsDialog
-      labels={labels}
-      ask={ask}
-      onClose={() => setAsk(null)}
-      onSave={(row, edit) => void save(row, edit)}
-    />
+    <>
+      <StatusNeedsDialog
+        labels={labels}
+        ask={ask}
+        onClose={() => setAsk(null)}
+        onSave={(row, edit) => void save(row, edit)}
+      />
+      <PastePreview
+        key={plan?.key ?? 0}
+        open={plan !== null}
+        title={plan?.title ?? ""}
+        changes={plan?.changes ?? NO_LINES}
+        skipped={plan?.skipped ?? NO_LINES}
+        wrong={plan?.wrong ?? NO_LINES}
+        same={plan?.same ?? 0}
+        busy={applying}
+        onApply={(ids) => void applyPaste(ids)}
+        onClose={() => setPlan(null)}
+      />
+    </>
   ) : null;
   return { rows: data, cellEdit, dialogs };
 }

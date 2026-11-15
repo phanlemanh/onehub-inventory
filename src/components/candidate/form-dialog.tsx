@@ -36,6 +36,7 @@ export function FormDialog({
   refused = false,
   slot,
   badge,
+  canSubmit = true,
   children,
 }: {
   /**
@@ -58,11 +59,13 @@ export function FormDialog({
   slot?: string;
   /** A short tag beside the title, as in the ReUI block dialog-2 (row 9c); absent by default. */
   badge?: ReactNode;
+  /** False while there is nothing to submit (e.g. a paste preview with every change unticked, row 5). */
+  canSubmit?: boolean;
   children: ReactNode;
 }) {
   function submit(e: FormEvent) {
     e.preventDefault();
-    if (!busy && !refused) onSubmit();
+    if (!busy && !refused && canSubmit) onSubmit();
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -91,7 +94,7 @@ export function FormDialog({
               {FRAME_COPY.confirm.cancel}
             </DialogClose>
             {refused ? null : (
-              <Button type="submit" disabled={busy}>
+              <Button type="submit" disabled={busy || !canSubmit}>
                 {busy ? busyLabel : formError ? FRAME_COPY.retry : submitLabel}
               </Button>
             )}

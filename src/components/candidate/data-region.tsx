@@ -17,6 +17,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type ClipboardEvent,
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
@@ -28,6 +29,7 @@ import {
   DataGridContainer,
   dataGridFeatures,
   type DataGridCellSelectionSnapshot,
+  type DataGridCellsChangeDetails,
 } from "@/components/reui/data-grid/data-grid";
 import {
   DataGridCellSelection,
@@ -114,6 +116,29 @@ export type RegionCellEdit = {
   /** The label of the editor: the field and the row, for screen readers. */
   label: (row: GridRow, field: FieldKey) => string;
   render: (session: CellEditSession) => ReactNode;
+  /**
+   * Pasting a region from a sheet (row 5): the grid says which cell each pasted word lands on and hands them over;
+   * nothing is written here. The screen reads the words with its own rules and shows its preview.
+   */
+  paste?: (paste: RegionPaste) => void;
+  /** A paste landed while the session may not run `action`: nothing opens, the screen says why. */
+  pasteRefused?: () => void;
+};
+
+/** One pasted word and the cell it lands on. `open` says whether the cell may be edited now (permission, lock). */
+export type PastedCell = {
+  row: GridRow;
+  field: FieldKey;
+  raw: string;
+  open: boolean;
+  /** The label of the group when the word landed on a group's header row. */
+  group?: string;
+};
+
+/** A pasted region read onto the grid: its cells in reading order, and how much of it fell outside the grid. */
+export type RegionPaste = {
+  cells: PastedCell[];
+  beyond: { rows: number; columns: number };
 };
 
 export type RegionStatus = "ready" | "loading" | "error" | "partial" | "forbidden";
@@ -1013,7 +1038,82 @@ export function DataRegion({
 
   const onSelection = useCallback((snapshot: DataGridCellSelectionSnapshot) => {
     setSelectedCells(snapshot.visibleCellCount);
+    selectionRef.current = snapshot;
   }, []);
+
+  // Pasting (row 5): the grid maps a pasted block onto the selected region with sheet rules (a 1×1 block fills the
+  // region, a block tiles a region that is a multiple of it, otherwise it pastes once from the top-left and stops at
+  // the grid's edge). The region keeps the block's size to say how much fell outside, and hands every cell on.
+  const selectionRef = useRef<DataGridCellSelectionSnapshot | null>(null);
+  const pastedBlock = useRef<{ rows: number; columns: number } | null>(null);
+  const onPasteCapture = (event: ClipboardEvent<HTMLDivElement>) => {
+    const text = event.clipboardData.getData("text/plain").replace(/\r?\n$/, "");
+    const lines = text.split(/\r?\n/);
+    pastedBlock.current = {
+      rows: lines.length,
+      columns: Math.max(1, ...lines.map((line) => line.split("\t").length)),
+    };
+  };
+  const onCellsChange = (details: DataGridCellsChangeDetails<TableRow>) => {
+    // Cut, Delete and fill write nothing: the grid writes only through the paste preview and the cell editor.
+    if (details.source !== "paste" || !cellEdit?.paste) return;
+    if (!permitted(cellEdit.action, true)) {
+      cellEdit.pasteRefused?.();
+      return;
+    }
+    const order = new Map(table.getRowsInDisplayOrder().map((r) => [r.id, r.original]));
+    const index = [...order.keys()];
+    const field = (id: string) => id as FieldKey;
+    const cells: PastedCell[] = [
+      ...details.changes.map((c) => ({
+        row: c.row,
+        field: field(c.columnId),
+        raw: String(c.value ?? ""),
+        open: true,
+      })),
+      ...details.rejected.flatMap((r) => {
+        const row = order.get(r.rowId);
+        if (!row) return [];
+        return [
+          {
+            row,
+            field: field(r.columnId),
+            raw: r.raw,
+            open: false,
+            ...(row.group ? { group: row.group.label } : {}),
+          },
+        ];
+      }),
+    ]
+      // The row's «…» column takes no words: a pasted column landing on it counts as beyond the grid.
+      .filter((c) => visibleFields.includes(c.field))
+      .sort(
+        (a, b) =>
+          index.indexOf(a.row.id) - index.indexOf(b.row.id) ||
+          visibleFields.indexOf(a.field) - visibleFields.indexOf(b.field),
+      );
+    const block = pastedBlock.current;
+    pastedBlock.current = null;
+    const bound = selectionRef.current?.activeBound;
+    const regionRows = bound ? bound.maxRowIndex - bound.minRowIndex + 1 : 1;
+    const regionColumns = bound ? bound.maxColumnIndex - bound.minColumnIndex + 1 : 1;
+    const tiles =
+      block !== null &&
+      ((block.rows === 1 && block.columns === 1) ||
+        (regionRows % block.rows === 0 && regionColumns % block.columns === 0));
+    const rowsHit = new Set(cells.map((c) => c.row.id)).size;
+    const columnsHit = new Set(cells.map((c) => c.field)).size;
+    cellEdit.paste({
+      cells,
+      beyond:
+        block && !tiles
+          ? {
+              rows: Math.max(0, block.rows - rowsHit),
+              columns: Math.max(0, block.columns - columnsHit),
+            }
+          : { rows: 0, columns: 0 },
+    });
+  };
 
   const clearFilters = () => setColumnFilters([]);
   const narrowed = activeFilterCount > 0;
@@ -1113,6 +1213,7 @@ export function DataRegion({
         // Ngoài-4 of 2a): only the table's body says so, and each rule can still be mended on its own.
         emptyMessage={<RegionNoMatch onClear={clearFilters} />}
         onCellSelectionChange={onSelection}
+        onCellsChange={cellEdit?.paste ? onCellsChange : undefined}
         onCellEditRequest={
           cellEdit
             ? (request) => {
@@ -1187,7 +1288,11 @@ export function DataRegion({
           <DataGridScrollArea className={`${VIEWPORT_HEIGHT_CLASS} ${FULL_SCREEN_HEIGHT_CLASS}`}>
             {/* Keyed by density: the virtual body keeps the estimate it started with for rows it has not measured, so a
                 switch from normal to dense rows must start it again or the run's height (and its last rows) go wrong. */}
-            <div data-slot="data-region-scroll-content" onKeyDownCapture={onGridKeyDownCapture}>
+            <div
+              data-slot="data-region-scroll-content"
+              onKeyDownCapture={onGridKeyDownCapture}
+              onPasteCapture={cellEdit?.paste ? onPasteCapture : undefined}
+            >
               <DataGridTableVirtual key={density} estimateSize={ROW_HEIGHT_PX[density]} />
             </div>
           </DataGridScrollArea>

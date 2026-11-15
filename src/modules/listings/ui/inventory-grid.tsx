@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import type { FieldKey } from "@/components/candidate/column-kind";
 import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
 import type { ColumnFilters, GridView } from "@/components/candidate/grid-view";
 import { usePlaceChange } from "@/components/templates/app-shell/place-change";
@@ -110,7 +111,11 @@ export function InventoryGrid({
   // The same columns on every render: this grid renders again on each change of arrangement (the «changed» mark), and
   // new columns would draw the header cells, with the filter box being typed in, again.
   const columns = useMemo(() => inventoryColumns(headers, customColumns), [headers, customColumns]);
-  const edit = useListingCellEdit({ rows, listings, headers, labels: editLabels, door });
+  const headerOf = useCallback(
+    (field: FieldKey) => columns.find((c) => c.field === field)?.header ?? field,
+    [columns],
+  );
+  const edit = useListingCellEdit({ rows, listings, headers, labels: editLabels, door, headerOf });
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
     current === "empty" ? [] : current === "partial" ? edit.rows.slice(0, PARTIAL_ROWS) : edit.rows;

@@ -222,3 +222,73 @@ export async function runDoorChange(change: DoorChange): Promise<WriteOutcome> {
   notifyResult({ message: change.done, undo: () => void tryUndo() });
   return outcome;
 }
+
+/** One write of a batch (row 5): `what` names the cell when its undo fails («Căn 1101 · Giá chào»). */
+export interface DoorBatchWrite {
+  write: () => Promise<WriteOutcome>;
+  /** Absent when the change cannot be undone. */
+  undo?: () => Promise<WriteOutcome>;
+  what: string;
+}
+
+/**
+ * Many writes applied at once and undone at once (row 5, a pasted region): the sentences the door says, by outcome.
+ * `kept` is how many saved writes could not be undone.
+ */
+export interface DoorBatch {
+  writes: readonly DoorBatchWrite[];
+  done: (saved: number) => string;
+  partly: (saved: number, failed: number, why: Failure) => string;
+  noneSaved: (why: Failure) => string;
+  undone: (count: number, kept: number) => string;
+  undoFailed: (still: readonly string[], why: Failure) => string;
+}
+
+/**
+ * The save rule of design/behaviors.md for a batch: every write goes through the same door one after another; one
+ * notice tells how it went and offers ONE «Hoàn tác» for every saved write that can be undone, undone in reverse
+ * order. A failed undo is never silent: the notice stays, names what still holds the new value, and «Thử lại» tries
+ * again only those. Returns each write's outcome, in order, so the screen puts the old value back where it failed.
+ */
+export async function runDoorBatch(batch: DoorBatch): Promise<WriteOutcome[]> {
+  const outcomes: WriteOutcome[] = [];
+  for (const w of batch.writes) outcomes.push(await attempt(w.write));
+  const saved = batch.writes.filter((_, i) => outcomes[i] === "saved");
+  const failures = outcomes.filter((o): o is Failure => o !== "saved");
+  const why = failures[0];
+  if (saved.length === 0) {
+    if (why) sayFailure(why, batch.noneSaved);
+    return outcomes;
+  }
+  const message = why ? batch.partly(saved.length, failures.length, why) : batch.done(saved.length);
+  const undoable = saved.filter((w) => w.undo);
+  const kept = saved.length - undoable.length;
+  if (undoable.length === 0) {
+    notifyResult({ message });
+    return outcomes;
+  }
+  const tryUndo = async (pending: readonly DoorBatchWrite[]): Promise<void> => {
+    const left: DoorBatchWrite[] = [];
+    let failed: Failure | undefined;
+    for (const w of [...pending].reverse()) {
+      const back = await attempt(w.undo!);
+      if (back !== "saved") {
+        left.unshift(w);
+        failed ??= back;
+      }
+    }
+    if (!failed) notifyResult({ message: batch.undone(undoable.length, kept) });
+    else
+      sayFailure(
+        failed,
+        (y) =>
+          batch.undoFailed(
+            left.map((w) => w.what),
+            y,
+          ),
+        () => void tryUndo(left),
+      );
+  };
+  notifyResult({ message, undo: () => void tryUndo(undoable) });
+  return outcomes;
+}
