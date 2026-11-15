@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
 screens: []
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-15
 design_doc: _acceptance/kiem-vong-doi-thao-tac/design.md
@@ -97,3 +97,9 @@ của sổ màn, khối `vong_doi` của mô hình nghiệp vụ). Vai chỉ đi
 - Không chạm `tools/proof_gate/`, `buttons.py`, `registry.py`, `check.py`. Tệp công cụ duy nhất: `tools/coverage_matrix/lifecycle.py` (mới).
 - Đổi `ontology/` (khối `vong_doi`) cần chủ kho soi trong PR (AGENTS.md); mô tả PR có mục «Đổi ontology — chủ kho soi».
 - Known limits (đề xuất, Hỏi-2): thứ hiện chỉ bằng chữ, không chuỗi trường, không thao tác thì máy không thấy.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-15:
+  - Ngoài-1: Tên vai trong danh sách vai bị chặn không được kiểm — gõ sai tên vai thì bộ kiểm vẫn xanh; hàng đầu tiên khai thêm danh sách vai bị chặn sửa luôn phép kiểm.
+  - Ngoài-2: Cùng kẽ với Ngoài-1 — một vai đã xem được mà vẫn kê là bị chặn cũng không bị bắt.
+  - Ngoài-3: Luật «danh sách vai bị chặn đặt sai ô thì đỏ» mới đo ở hai vị trí; thao tác riêng và ô lồng chưa có ca kiểm riêng.
+  - Ngoài-4: Phép kiểm chỉ đọc các tệp trang của màn nhập vào; tệp nằm trong thư mục màn mà trang không nhập thì không được đọc.
+  - Ngoài-5: Bài kiểm «phép kiểm không mở tiến trình khác» chỉ dò ba cách mở thông dụng; cam kết «không gọi git» vẫn được đo.
