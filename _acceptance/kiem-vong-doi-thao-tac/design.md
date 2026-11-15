@@ -102,6 +102,6 @@ Khoản thuế phí (hàng 19) chưa có trên main: dãy N khai `hien` và `von
 | `ontology/entities/*.yaml` (12 tệp) + `_template.yaml` | cao | thêm khối `vong_doi` theo bảng đã duyệt — chủ kho soi trong PR (AGENTS.md) |
 | `tests/vong-doi-thao-tac.test.ts` (MỚI) | thấp | `--check` trên kho thật + ca phá trên bản sao tự dọn |
 | `_acceptance/config.yaml` | — | thêm một dòng `executors.test.vong_doi` |
-| `wiki/decisions/0035-…md`, `wiki/log.md` | thấp | quyết định và nhật ký |
+| `wiki/decisions/0038-lifecycle-check.md` (kèm ba dòng hướng dẫn khai cho các dãy), `wiki/log.md` | thấp | quyết định và nhật ký |
 
 Không chạm `tools/proof_gate/`, `buttons.py`, `registry.py`, `check.py`, `.github/`, `governance/`.
