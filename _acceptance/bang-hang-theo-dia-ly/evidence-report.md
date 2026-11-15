@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 0494ef8b1dd31aedb29c8cfd33f18bba4ff75b44
+verified_commit: 6ed389d74f97942053367da4ccc0bc422e8184e7
 human_signoff:
 ---
 
@@ -214,3 +214,7 @@ Round 1: E14 khong dat — khung ui-check chua dat; tra ve implementation.
 Round 2: PASS sau khi sua; bang chung va run log round 2 da ghi.
 Round 3: sau sua «Tất cả hàng» sau khi chon mot noi (commit 7a98b9a), chay lai E4, E6, E7, E8, E9, E11, E12, E14 va suite; tat ca PASS, E1, E2, E3, E5, E10, E13, E15 carry-forward.
 Round 4: sau sua bam kem phim khong doi tab (commit 0494ef8), chay lai E2, E3, E4, E5, E6, E7, E8, E9, E10, E11, E12, E13, E14 va suite; tat ca PASS; E1, E15 carry-forward tu round 1.
+
+### Re-pin lần 1 — 2026-11-15, do gộp main 2715cf4 (PR #58 adopt design-assembly) sau lượt chấm 4
+run_id: repin-20261115T012852Z-46476
+sha: 6ed389d74f97942053367da4ccc0bc422e8184e7 · suites: 3 lệnh exit 0 · evals: 14/14 eval máy đạt kỳ vọng · ngoài làn máy: E14
