@@ -1,22 +1,18 @@
 // Row 1u, AC-7: the wiki check is red when two decision pages share a number, and only then.
 import { spawnSync } from "node:child_process";
-import { copyFileSync, cpSync, mkdtempSync, readdirSync, rmSync, symlinkSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { copyFileSync, cpSync, readdirSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
 
-import { afterAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
+
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(__dirname, "..");
 const DECISIONS = join("wiki", "decisions");
-const temps: string[] = [];
-afterAll(() => {
-  for (const t of temps) rmSync(t, { recursive: true, force: true });
-});
 
 /** A copy of the repository where only wiki/ is a real copy; everything else links back, so page links resolve. */
 function copyRepo(): string {
-  const dir = mkdtempSync(join(tmpdir(), "wiki-so-trung-"));
-  temps.push(dir);
+  const dir = tempDir("wiki-so-trung-");
   for (const name of readdirSync(ROOT)) {
     if (name === "wiki" || name === ".git") continue;
     symlinkSync(join(ROOT, name), join(dir, name));

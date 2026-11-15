@@ -16,12 +16,10 @@ export const ON_PURPOSE = new Set(["tests/e2e/gac-hydration-pha.spec.ts"]);
 
 /**
  * Files another open pull request is changing; they move to the door once it is merged (supervisor ruling V-1511-16:
- * row 1u merges only when this list is empty). PR #66: lop-rieng.spec.ts, suite.ts. PR #70: phone-list.ts,
+ * row 1u merges only when this list is empty). PR #66 is merged and its two files moved. PR #70: phone-list.ts,
  * the-dien-thoai.spec.ts.
  */
 export const CHO_PR: ReadonlyMap<string, string> = new Map([
-  ["tests/e2e-db/lop-rieng.spec.ts", "#66"],
-  ["tools/e2e_templates/suite.ts", "#66"],
   ["tests/e2e/phone-list.ts", "#70"],
   ["tests/e2e/the-dien-thoai.spec.ts", "#70"],
 ]);
@@ -102,7 +100,7 @@ export function viTri(file: string, src: string): Site[] {
   return out;
 }
 
-/** The problems of one file: `sua-trang: <file>:<line> <why>`; a file waiting on another PR is reported once. */
+/** The problems of one file: `sua-trang: <file>:<line> <why>`. */
 export function quetTep(file: string, src: string): string[] {
   return viTri(file, src).map((s) => `sua-trang: ${file}:${s.line} ${s.why}`);
 }
