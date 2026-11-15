@@ -171,7 +171,10 @@ test.describe("dan-tu-excel", () => {
     const big = Math.round((rows[0]!.price! * 2.1) / 10_000_000) * 10_000_000;
     await pastePrices(page, rows, [big, nudged(rows[1]!)]);
     const far = changeLine(page, rows[0]!.id, PRICE);
-    await expect(far).toContainText(/\+\d+(,\d+)?%/);
+    const percent = new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 2 }).format(
+      ((big - rows[0]!.price!) / rows[0]!.price!) * 100,
+    );
+    await expect(far, "gia-lech-lon-bo-chon-san: độ lệch").toContainText(`+${percent}%`);
     await expect(
       far.getByRole("checkbox"),
       `gia-lech-lon-bo-chon-san: ${money(big)} chọn sẵn`,
@@ -213,6 +216,14 @@ test.describe("dan-tu-excel", () => {
       .toEqual(rows.map((r) => [r.id, nudged(r)]));
     for (const r of rows) await expect(cellOf(page, r.id, PRICE)).toHaveText(money(nudged(r)));
     await expect(cellOf(page, rows[0]!.id, CONFIRMED)).not.toHaveText(confirmed);
+    const today = new Intl.DateTimeFormat("vi-VN", {
+      timeZone: "Asia/Ho_Chi_Minh",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(new Date());
+    for (const r of rows)
+      await expect(cellOf(page, r.id, CONFIRMED), "ap-n-o: Xác nhận lúc").toContainText(today);
     const done = toasts(page).filter({ hasText: "Đã đổi 3 ô của 3 căn." });
     await expect(done).toHaveCount(1);
     await expect(done.getByRole("button", { name: "Hoàn tác" })).toBeVisible();
@@ -226,6 +237,8 @@ test.describe("dan-tu-excel", () => {
     await preview(page).getByRole("button", { name: "Thôi" }).click();
     await expect(preview(page)).toHaveCount(0);
     await pastePrices(page, rows, rows.map(nudged));
+    // Esc closes the dialog that holds the keyboard: wait until focus is inside it, as a person sees it open.
+    await expect(preview(page).getByRole("button", { name: "Áp 2 ô" })).toBeFocused();
     await page.keyboard.press("Escape");
     await expect(preview(page)).toHaveCount(0);
     expect(await saves(page), "thoi-khong-ghi").toEqual([]);
@@ -305,7 +318,17 @@ test.describe("dan-tu-excel", () => {
     await phoneCards(page).first().waitFor();
     await assertCardsNotTable(page, "dien-thoai-khong-dan");
     await phoneCards(page).first().focus();
+    // Positive control: the paste does reach the page; only nothing opens from it.
+    await page.evaluate(() => {
+      const w = window as unknown as { __pastes?: number };
+      w.__pastes = 0;
+      document.addEventListener("paste", () => (w.__pastes = (w.__pastes ?? 0) + 1), true);
+    });
     await pasteText(page, tsv([["3 tỷ"], ["4 tỷ"]]));
+    expect(
+      await page.evaluate(() => (window as unknown as { __pastes?: number }).__pastes),
+      "dien-thoai-khong-dan: lần dán không tới trang",
+    ).toBe(1);
     await expect(preview(page), `dien-thoai-khong-dan: mở ở ${width()}`).toHaveCount(0);
     expect(await saves(page)).toEqual([]);
   });
@@ -396,36 +419,46 @@ test.describe("dan-tu-excel", () => {
     at1440();
     await openInventory(page);
     const all = await shownRows(page);
+    const order = new Map(all.map((r, i) => [r.id, i]));
     const filter = page
       .locator('[data-slot="data-region"] [data-slot="column-filter"] input')
       .first();
-    // Filter by the floor digits of a unit that has hidden neighbours on both sides.
-    const pick = all.find((r) => r.unit.length >= 3 && priced(r))!;
-    await filter.fill(pick.unit.slice(0, 2));
-    await expect.poll(async () => (await shownRows(page)).length).toBeLessThan(all.length);
-    const shown = await shownRows(page);
-    const run = shown.filter(priced).slice(0, 3);
+    // A filter that leaves three priced rows next to each other on screen with a hidden row between them in the data:
+    // the paste must skip the hidden one.
+    let block: Shown[] = [];
+    let shown: Shown[] = [];
+    for (const words of ["01", "02", "03", "1", "2", "0"]) {
+      await filter.fill(words);
+      await expect.poll(async () => (await shownRows(page)).length).toBeLessThan(all.length);
+      shown = await shownRows(page);
+      for (let i = 0; i + 3 <= shown.length && block.length === 0; i += 1) {
+        const run = shown.slice(i, i + 3);
+        const span = order.get(run[2]!.id)! - order.get(run[0]!.id)!;
+        if (run.every(priced) && span > 2) block = run;
+      }
+      if (block.length > 0) break;
+    }
+    expect(block.length, "loc-khong-ghi-dong-an: không có dòng ẩn xen giữa vùng dán").toBe(3);
     const visibleIds = new Set(shown.map((r) => r.id));
-    await select(page, run[0]!.id, PRICE);
-    const block = shown.slice(
-      shown.indexOf(shown.find((r) => r.id === run[0]!.id)!),
-      shown.indexOf(shown.find((r) => r.id === run[0]!.id)!) + 3,
-    );
-    await pasteText(page, tsv(block.map((r) => [money((r.price ?? 4_000_000_000) + 100_000_000)])));
+    const hidden = all
+      .slice(order.get(block[0]!.id)!, order.get(block[2]!.id)! + 1)
+      .filter((r) => !visibleIds.has(r.id));
+    expect(hidden.length).toBeGreaterThan(0);
+    await select(page, block[0]!.id, PRICE);
+    await pasteText(page, tsv(block.map((r) => [money(nudged(r))])));
     await expect(preview(page)).toBeVisible();
     const lineIds = await preview(page)
-      .locator("[data-paste-line]")
+      .locator('[data-slot="paste-changes"] [data-paste-line]')
       .evaluateAll((els) => els.map((e) => e.getAttribute("data-paste-line")!.split("|")[0]!));
-    expect(lineIds.every((id) => visibleIds.has(id) || id.startsWith("beyond"))).toBe(true);
-    const apply = preview(page).getByRole("button", { name: /^Áp \d+ ô$/ });
-    await apply.click();
-    await expect.poll(async () => (await saves(page)).length).toBeGreaterThan(0);
+    expect(lineIds).toEqual(block.map((r) => r.id));
+    await preview(page).getByRole("button", { name: "Áp 3 ô" }).click();
+    await expect.poll(async () => (await saves(page)).length).toBe(3);
     const written = (await saves(page)).map((s) => s.id);
     expect(
-      written.filter((id) => !visibleIds.has(id)),
+      written.filter((id) => hidden.some((h) => h.id === id)),
       "loc-khong-ghi-dong-an: ghi dòng ẩn",
     ).toEqual([]);
-    expect(written.includes(run[0]!.id)).toBe(true);
+    expect(written, "loc-khong-ghi-dong-an: đối chứng dòng hiện").toEqual(block.map((r) => r.id));
   });
 
   test("ngoai-tuyen-tu-dau", async ({ page, context }) => {
