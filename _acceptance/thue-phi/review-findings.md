@@ -1,28 +1,49 @@
-# Review findings: thue-phi (round 6)
+# Review findings: thue-phi (round 7)
 
 ## Trong hợp đồng
 
-(không có)
+Không có.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Evidence: CI is not green on the reviewed HEAD**
+- **Design / module boundaries: company-config reads identity's table directly**
+  Người dùng thấy gì: Lưu Thuế phí hiện chạy đúng. Nhưng nếu sau này đội đổi cách lưu danh sách thành viên, việc lưu Thuế phí có thể hỏng mà không ai được báo trước.
+  Căn cứ: Người dùng chưa gặp lỗi nào hôm nay, nên hậu quả nhẹ và chỉ hiện khi có thay đổi sau này; ghi lại để người sửa phần thành viên biết còn chỗ này phụ thuộc.
+  file: `src/modules/company-config/fee-store.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Records: an editor's name can be saved as a placeholder**
+  Người dùng thấy gì: Hiếm khi, nếu hệ thống không đọc được tên người sửa, mức Thuế phí vẫn được lưu nhưng dòng nguồn hiện dấu gạch thay vì tên người đã đổi.
+  Căn cứ: Số tiền và mức thuế phí vẫn đúng, chỉ thiếu tên người đổi ở một dòng và tình huống này hiếm; không mất dữ liệu tính toán nhưng không tự sửa lại được tên đã ghi.
+  file: `src/modules/company-config/fee-store.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **SP-1 touch record does not cover HEAD**
+  Người dùng thấy gì: Sổ ghi các chỗ chạm luật cách ly dữ liệu giữa các sàn chưa tính hai lần sửa mới nhất, nên người ký phải tự nhớ rằng hai lần đó chỉ thêm bài kiểm.
+  Căn cứ: Không ảnh hưởng gì tới người dùng cuối và hai lần sửa ấy là bài kiểm cố ý; chỉ cần tạo lại sổ trước khi ký nếu muốn gọn.
+  file: `_acceptance/thue-phi/luat-cham.json`
+  severity: low
+  Đề xuất: known-limits
+
+- **Evidence: CI is not green on the reviewed HEAD (r6 · tệp đã đổi)**
   Người dùng thấy gì: Một số bước kiểm tra tự động trên bản chờ gộp chưa xong hoặc chưa qua, nên chưa thể coi các thử nghiệm với cơ sở dữ liệu thật là đã đạt. Đây là việc chờ chạy xong, không phải lỗi người dùng sẽ gặp.
   Căn cứ: Chỉ là trạng thái chờ kiểm tra tự động, không làm mất dữ liệu hay hỏng chức năng, và sẽ tự rõ khi các bước chạy xong hoặc chạy lại.
   file: `_acceptance/thue-phi/evidence-report.md`
   severity: medium
   Đề xuất: wont-fix
 
-- **CI and agent privileges / Tier: a protected check tool was loosened on a supervisor ruling that is not in any ledger**
+- **CI and agent privileges / Tier: a protected check tool was loosened on a supervisor ruling that is not in any ledger (r6)**
   Người dùng thấy gì: Công cụ kiểm tra vòng đời thao tác đã được nới lỏng theo một phán quyết của giám sát chưa được ghi vào sổ quyết định. Người dùng cuối không thấy gì, nhưng chủ kho nên biết để duyệt rõ ràng.
   Căn cứ: Không ảnh hưởng dữ liệu hay màn hình của người dùng, chỉ thiếu dấu vết duyệt; ghi lại phán quyết vào sổ sau này là rẻ và không mất gì.
   file: `tools/coverage_matrix/lifecycle.py`
   severity: medium
   Đề xuất: known-limits
 
-- **Records: wiki/log.md newest-first order**
+- **Records: wiki/log.md newest-first order (r6 · tệp đã đổi)**
   Người dùng thấy gì: Dòng ghi nhật ký của hàng này nằm lệch chỗ so với thứ tự mới nhất lên đầu. Chỉ ảnh hưởng người đọc nhật ký, không ảnh hưởng người dùng.
   Căn cứ: Chỉ là thứ tự dòng trong nhật ký, không mất dữ liệu, ai đọc cũng tự hiểu được, và sửa lúc nào cũng rẻ.
   file: `wiki/log.md`
@@ -57,7 +78,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Contract names the wrong SP-1 table (r4)**
+- **Contract names the wrong SP-1 table (r4 · tệp đã đổi)**
   Người dùng thấy gì: Đoạn mô tả luật chạm trong hợp đồng gọi sai tên bảng lưu mức thuế phí của sàn. Người ký đọc thấy tên không khớp với bảng thật, nhưng cách ly giữa các sàn vẫn đúng.
   Căn cứ: Chỉ là chữ sai trong tài liệu, không ảnh hưởng người dùng cuối hay dữ liệu, và sửa một dòng là xong.
   file: `_acceptance/thue-phi/contract.md`
@@ -141,7 +162,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): «cột Điều kiện phí ẩn sẵn» được đo bằng cách tìm chữ trong mã nguồn hàm (r2)**
+- **Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): «cột Điều kiện phí ẩn sẵn» được đo bằng cách tìm chữ trong mã nguồn hàm (r2 · tệp đã đổi)**
   Người dùng thấy gì: Kiểm tra tự động chưa chứng minh thật rằng cột Điều kiện phí ẩn lúc đầu và bật được, nên nếu cột này hỏng có thể không ai biết ngay.
   Căn cứ: Chỉ là kiểm tra lỏng, người dùng không gặp lỗi hiện tại; rủi ro là bỏ sót hỏng hóc về sau và có thể bổ sung kiểm tra sau.
   file: `tests/thue-phi-cot.test.ts`
@@ -169,7 +190,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: high
   Đề xuất: known-limits
 
-- **Hình dạng 4 (thông điệp ghim không khớp assert): chiều đỏ của E1 ghim một chuỗi mà bài không bao giờ in ra (r2)**
+- **Hình dạng 4 (thông điệp ghim không khớp assert): chiều đỏ của E1 ghim một chuỗi mà bài không bao giờ in ra (r2 · tệp đã đổi)**
   Người dùng thấy gì: Sổ ghi cách kiểm tra mô tả một thông báo lỗi mà bài kiểm thật không in ra, nên người đọc sổ khó đối chiếu một lần đỏ thật.
   Căn cứ: Chỉ là ghi chép lệch, không đụng tới người dùng hay số liệu; sửa rẻ nhưng không cấp bách.
   file: `_acceptance/thue-phi/evals.yaml`
@@ -198,5 +219,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   Đề xuất: known-limits
 
 ## Chưa adversarial-verify (refuter chết)
+
+Không có.
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
