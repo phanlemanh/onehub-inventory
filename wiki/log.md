@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-15 — Khai sổ token và sổ linh kiện với kit nghiệm thu ở `design_floor`, tách khỏi PR nhận design-assembly, gộp sau nó — [0034](decisions/0034-component-register-written-by-design-assembly.md).
 - 2026-11-15 — Lệnh kiểm design-assembly chỉ tính «giữ» khi chính luật dòng sổ nêu tên chặn mọi đoạn mã phạm (lượt chấm 1 của hồ sơ `adopt-design-assembly` tìm ra luật khác chặn thay). «Khoảng cách» về lại «tự khai», vì luật nó nêu tên chỉ bắt bậc lệch thang: 17 quyết định máy giữ, tám luật lint chạy lại; tiêu chí AC-2 sửa theo, chờ duyệt lại — `design/theme.json`, `tools/design-assembly/check.mjs`, [#58](https://github.com/phanlemanh/onehub-inventory/pull/58).
 - 2026-11-14 — The browser suite opens a grid screen's region cases at its declared `vao_vung` (state query joined with «&»), and «chữ dài» measures the reverse where the longest allowed text fits (row 7e, after signature) — [0032](decisions/0032-loi-vao-bo-vung-luoi.md).
 - 2026-11-14 — Thành viên chọn từ ReUI (hàng 9c): danh sách người xếp theo khối `solution-users-8` trong một khung có số đếm, mỗi người một dòng với chữ cái đầu, người mời, vai, «Đổi vai» trên dòng; hộp mời theo dáng `dialog-2` với tên sàn cạnh tiêu đề; họ màn mới Danh sách khung, màn Thành viên là màn mẫu; quyền và luật mời giữ nguyên — [thanh-vien-chon-tu-reui](../_acceptance/thanh-vien-chon-tu-reui/contract.md), [0033](decisions/0033-ho-man-danh-sach-khung.md).
