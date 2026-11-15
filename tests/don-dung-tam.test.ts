@@ -1,14 +1,14 @@
 // Row 1s (_acceptance/ci-co-postgres, AC-8, E8): build folders of browser runs. Six kinds of folder, liveness read
 // from `.chu`, never from the name. The break copy reads liveness from the name and must lose a live run's folder.
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { CACHE_ROOT, OWNER_FILE, sweepDead } from "./e2e-db/don-dung-tam";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MODULE = join(ROOT, "tests/e2e-db/don-dung-tam.ts");
@@ -47,7 +47,7 @@ function sixKinds() {
 }
 
 beforeEach(() => {
-  root = mkdtempSync(join(tmpdir(), "don-dung-tam-"));
+  root = tempDir("don-dung-tam-");
   base = join(root, CACHE_ROOT, "onehub-e2e");
   mkdirSync(base, { recursive: true });
 });

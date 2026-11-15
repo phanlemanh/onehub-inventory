@@ -4,14 +4,14 @@
 //   doi-o-doi-bang — on a copy of the table giving TeamLead listMembers, members × TeamLead changes.
 //   tep-sinh-lech-do — a hand-edited generated file makes `--check` fail with «lệch bảng quyền: <màn>».
 import { spawnSync } from "node:child_process";
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { afterAll, describe, expect, it } from "vitest";
 
 import type { Role } from "../src/generated/ontology";
 import { allowedScope, type ActionName } from "../src/modules/identity/permissions";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(import.meta.dirname, "..");
 const TOOL = join(ROOT, "tools/coverage_matrix/buttons.py");
@@ -39,7 +39,7 @@ afterAll(() => {
 
 /** A copy of what the tool reads: the ontology, the screen register, the pages and the generated file. */
 function copy(): string {
-  const dir = mkdtempSync(join(tmpdir(), "vai-man-nut-"));
+  const dir = tempDir("vai-man-nut-");
   copies.push(dir);
   for (const part of ["ontology", "design/screens.yaml", "design/vai-man-nut.md", "src/app"])
     cpSync(join(ROOT, part), join(dir, part), { recursive: true });

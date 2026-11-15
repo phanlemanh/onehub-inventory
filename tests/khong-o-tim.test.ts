@@ -4,11 +4,11 @@
 //   Positive: the state table names «Không có dòng nào khớp» with «Xoá lọc»; the Grid pattern sends search to ⌘K; the
 //   changelog and the shared log each have a line with «migration 011» and «chữ tìm».
 //   Break: a copy with «the search text» put back in SavedView.yaml → «stale search wording in …».
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = resolve(__dirname, "..");
 
@@ -94,7 +94,7 @@ describe("no region search box in the docs (row 2e, AC-7)", () => {
   );
 
   it("the check fails when «the search text» comes back in SavedView.yaml", () => {
-    const copy = mkdtempSync(join(tmpdir(), "khong-o-tim-"));
+    const copy = tempDir("khong-o-tim-");
     for (const file of FILES) {
       mkdirSync(dirname(join(copy, file)), { recursive: true });
       cpSync(join(ROOT, file), join(copy, file));
