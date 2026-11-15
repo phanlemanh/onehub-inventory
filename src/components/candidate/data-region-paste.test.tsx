@@ -6,7 +6,7 @@ import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { Input } from "@/components/ui/input";
-import { ACTIONS, type Role } from "@/generated/ontology";
+import { ACTIONS, ROLE_INHERITS, type Role } from "@/generated/ontology";
 
 import { tallGridViewport } from "../../../tests/virtual-viewport";
 
@@ -180,13 +180,17 @@ describe("bo-theo-cot-va-khoa", () => {
   });
 });
 
+/** Every role of the model and whether the permission table opens editing a listing to it today (row 9a). */
 const ROLES: readonly [Role, boolean][] = [
   ["ListAgent", true],
+  ["BuyerAgent", true],
   ["TeamLead", true],
   ["CompanyAdmin", false],
 ];
 
 describe("khong-quyen-khong-mo", () => {
+  it("covers every role of the model", () =>
+    expect(ROLES.map(([r]) => r).sort()).toEqual(Object.keys(ROLE_INHERITS).sort()));
   for (const [role, opens] of ROLES) {
     it(`khong-quyen-khong-mo: ${role}`, async () => {
       const { paste, pasteRefused } = show(asRole(role));
@@ -204,8 +208,14 @@ describe("cat-xoa-khong-ghi", () => {
     const cell = cellOf(0, PRICE);
     await select(cell);
     const cut = new Event("cut", { bubbles: true, cancelable: true });
+    let copied = "";
     Object.defineProperty(cut, "clipboardData", {
-      value: { setData: () => {}, getData: () => "" },
+      value: {
+        setData: (type: string, text: string) => {
+          if (type === "text/plain") copied = text;
+        },
+        getData: () => "",
+      },
     });
     await act(async () => {
       cell.dispatchEvent(cut);
@@ -216,5 +226,10 @@ describe("cat-xoa-khong-ghi", () => {
     });
     expect(paste, "cat-xoa-khong-ghi").not.toHaveBeenCalled();
     expect(editorOpened).not.toHaveBeenCalled();
+    // Positive control: the cut reached the grid (it put the cell on the clipboard), and a paste on the same cell
+    // right after is handed over — the events land where the paste path listens.
+    expect(copied, "cat-xoa-khong-ghi: lần cắt không tới lưới").not.toBe("");
+    await pasteText(cell, "2,8 tỷ");
+    expect(paste).toHaveBeenCalledOnce();
   });
 });

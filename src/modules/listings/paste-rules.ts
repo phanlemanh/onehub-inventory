@@ -12,6 +12,7 @@ import {
   priceLocked,
   priceSwing,
   priceUnchanged,
+  priceUndoable,
   readPrice,
   statusLocked,
   statusNeeds,
@@ -74,8 +75,7 @@ export function readPastePrice(target: PasteTarget, raw: string): PasteCell {
   return {
     kind: "change",
     change: { field: "listPrice", listPrice: read.value },
-    // No price before: the save door takes no «no price» change, so the way back does not exist.
-    undoable: typeof previous === "number" && previous > 0,
+    undoable: priceUndoable(previous),
     ...(priceAsksAgain(previous, read.value) && previous
       ? { swing: priceSwing(previous, read.value) }
       : {}),
@@ -92,8 +92,12 @@ export function readPasteStatus(target: PasteTarget, raw: string): PasteCell {
   if (statusLocked(from)) return { kind: "skip", why: "locked" };
   if (!canMove(from, to)) return { kind: "skip", why: "move" };
   // A move that needs more than a word (close price and date, a reason) is the cell editor's to ask (Hỏi-2).
-  if (statusNeeds(to, {}).length > 0)
-    return { kind: "skip", why: to === "Closed" ? "closed-needs" : "withdrawn-needs" };
+  const needs = statusNeeds(to, {});
+  if (needs.length > 0)
+    return {
+      kind: "skip",
+      why: needs.includes("withdrawnReason") ? "withdrawn-needs" : "closed-needs",
+    };
   return {
     kind: "change",
     change: { field: "standardStatus", standardStatus: to },

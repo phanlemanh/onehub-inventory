@@ -130,6 +130,13 @@ export function statusNeeds(
   return [];
 }
 
+/**
+ * Whether a price change can be undone: the way back is the old price, so there must be one. The save door takes no
+ * «no price» change, so a price set on a listing that had none stays.
+ */
+export const priceUndoable = (previous: number | null | undefined): previous is number =>
+  typeof previous === "number" && previous > 0;
+
 /** Whether a status change can be undone: the way back must itself be an allowed move. */
 export const statusUndoable = (from: ListingStandardStatus, to: ListingStandardStatus): boolean =>
   canMove(to, from);

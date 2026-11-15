@@ -94,7 +94,7 @@ const REASONS: readonly (readonly [string, RegionPaste, string])[] = [
   [
     "xac-nhan-luc",
     paste([cell(ACTIVE, "Listing.lastConfirmedAt", "05/11/2026")]),
-    "máy tự ghi khi giá hay trạng thái đổi",
+    `máy tự ghi khi ${LABELS.ListPrice.pref.toLocaleLowerCase("vi")} hay ${LABELS.StandardStatus.pref.toLocaleLowerCase("vi")} đổi`,
   ],
   [
     "cot-tinh",
@@ -225,6 +225,51 @@ const LISTED: GridRow = {
   "Listing.listPrice": LISTING.listPrice,
   "Listing.standardStatus": "Active",
 };
+
+describe("xac-nhan-luc-giu-khi-mot-o-luu", () => {
+  it("xac-nhan-luc-giu-khi-mot-o-luu: price saved and status failed on one listing keeps the new confirmed time", async () => {
+    let calls = 0;
+    const inner = sampleSaveDoor([LISTING], { online: () => true });
+    const door = {
+      ...inner,
+      save: async (r: SaveRequest) => {
+        calls += 1;
+        return calls === 2 ? ({ kind: "offline" } as const) : inner.save(r);
+      },
+    };
+    const before = "2026-11-01T02:00:00.000Z";
+    const start: GridRow = { ...LISTED, "Listing.lastConfirmedAt": before };
+    const hook = renderHook(() =>
+      useListingCellEdit({
+        rows: [start],
+        listings: [LISTING],
+        headers: HEADERS,
+        labels,
+        door,
+        headerOf: (f) => f,
+      }),
+    );
+    act(() =>
+      hook.result.current.cellEdit!.paste!({
+        cells: [
+          { row: start, field: "Listing.listPrice", raw: "2,8 tỷ", open: true },
+          { row: start, field: "Listing.standardStatus", raw: S("Hold"), open: true },
+        ],
+        beyond: { rows: 0, columns: 0 },
+      }),
+    );
+    render(hook.result.current.dialogs as ReactElement);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Áp 2 ô" }));
+    });
+    await vi.waitFor(() => expect(calls).toBe(2));
+    await vi.waitFor(() => expect(toast).toHaveBeenCalled());
+    const shown = hook.result.current.rows[0]!;
+    expect(shown["Listing.listPrice"]).toBe(2_800_000_000);
+    expect(shown["Listing.standardStatus"], "the failed cell goes back").toBe("Active");
+    expect(shown["Listing.lastConfirmedAt"], "xac-nhan-luc-giu-khi-mot-o-luu").not.toBe(before);
+  });
+});
 
 describe("noi-phien-ban", () => {
   it("noi-phien-ban: two cells of one listing write one after the other on the sample door, versions chained", async () => {

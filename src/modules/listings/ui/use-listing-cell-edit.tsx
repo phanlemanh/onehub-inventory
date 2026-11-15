@@ -20,6 +20,8 @@ import {
   type SaveRequest,
 } from "../save-door";
 
+import { priceUndoable } from "../edit-rules";
+
 import { CELL_EDIT_COPY as COPY, type CellEditLabels } from "./cell-edit-copy";
 import type { InventoryField } from "./inventory-rows";
 import { planPaste, type PastePlan } from "./listing-paste";
@@ -150,7 +152,8 @@ export function useListingCellEdit({
       };
       const at = new Date().toISOString();
       const change = toChange(edit);
-      const undoable = edit.field === PRICE || edit.undoable;
+      const undoable =
+        edit.field === PRICE ? priceUndoable(row[PRICE] as number | null) : edit.undoable;
       const back: ListingChange =
         edit.field === PRICE
           ? { field: "listPrice", listPrice: row[PRICE] as number }
@@ -208,6 +211,8 @@ export function useListingCellEdit({
           [STATUS]: row[STATUS],
           [CONFIRMED]: row[CONFIRMED],
         });
+      // How many pasted cells of each row hold a saved value, to know when the row's confirmed time goes back.
+      const holding = new Map<string, number>();
       setApplying(true);
       for (const { row, change } of picked)
         patch(row.id, { ...fromChange(change), [CONFIRMED]: at });
@@ -227,8 +232,15 @@ export function useListingCellEdit({
                         standardStatus: was[STATUS] as ListingStandardStatus,
                       };
                 const result = await write(row.id, back, new Date().toISOString());
-                if (result === "saved")
-                  patch(row.id, { [field]: was[field], [CONFIRMED]: was[CONFIRMED] });
+                if (result === "saved") {
+                  // The confirmed time goes back only with the row's last cell that still held a pasted value.
+                  const left = (holding.get(row.id) ?? 1) - 1;
+                  holding.set(row.id, left);
+                  patch(row.id, {
+                    [field]: was[field],
+                    ...(left === 0 ? { [CONFIRMED]: was[CONFIRMED] } : {}),
+                  });
+                }
                 return result;
               }
             : undefined,
@@ -241,11 +253,15 @@ export function useListingCellEdit({
           kept > 0 ? PASTE_COPY.undoneExcept(count, kept) : PASTE_COPY.undone(count),
         undoFailed: (still, why) => PASTE_COPY.undoFailed(still.join(", "), PASTE_COPY.why[why]),
       });
-      // A write that did not go through puts its cell back.
+      // A write that did not go through puts its cell back; the confirmed time too, unless another cell of the row saved.
+      picked.forEach(({ row }, i) => {
+        if (outcomes[i] === "saved") holding.set(row.id, (holding.get(row.id) ?? 0) + 1);
+      });
       picked.forEach(({ row, field }, i) => {
         if (outcomes[i] !== "saved") {
           const was = before.get(row.id) ?? {};
-          patch(row.id, { [field]: was[field], [CONFIRMED]: was[CONFIRMED] });
+          const kept = (holding.get(row.id) ?? 0) > 0;
+          patch(row.id, { [field]: was[field], ...(kept ? {} : { [CONFIRMED]: was[CONFIRMED] }) });
         }
       });
       setApplying(false);

@@ -85,7 +85,7 @@ export function planPaste(
       const why = UNIT_FACTS.includes(field)
         ? say.unitFact(row.transaction)
         : field === CONFIRMED
-          ? say.confirmed
+          ? say.confirmed(row.transaction)
           : computed.includes(field)
             ? say.computed
             : field.startsWith("custom.")

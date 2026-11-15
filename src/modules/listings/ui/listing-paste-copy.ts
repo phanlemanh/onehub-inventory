@@ -18,7 +18,8 @@ export function pasteWords(labels: CellEditLabels) {
     where: (row: GridRow) => `${unit(row.transaction)} ${String(row["Listing.unitNumber"] ?? "")}`,
     unitFact: (tx?: GridRow["transaction"]) =>
       `thuộc tính ${lower(unit(tx))} — không sửa trên bảng`,
-    confirmed: "máy tự ghi khi giá hay trạng thái đổi",
+    confirmed: (tx?: GridRow["transaction"]) =>
+      `máy tự ghi khi ${lower(word(labels, "ListPrice", tx))} hay ${lower(word(labels, "StandardStatus", tx))} đổi`,
     custom: "cột riêng của sàn chưa sửa được trên bảng",
     computed: "cột máy tính từ các cột khác — không dán được",
     other: "cột này không sửa trên bảng",
