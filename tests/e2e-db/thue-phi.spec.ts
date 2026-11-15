@@ -33,7 +33,8 @@ const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 const COMPANY = { a: "[Sàn A thử thuế phí]", b: "[Sàn B thử thuế phí]" } as const;
 const personOf = (role: Role, company: "a" | "b" = "a") => ({
-  name: `[Tên] Thuế phí ${company.toUpperCase()} ${role}`,
+  // A neutral sample name: the owner reads these frames, so no role code shows in the name.
+  name: `[Tên] ${company.toUpperCase()}${ROLES.indexOf(role) + 1}`,
   email: `thue-phi-${company}-${role.toLowerCase()}-${RUN}@example.test`,
 });
 
@@ -134,6 +135,7 @@ async function proof(page: Page, info: TestInfo, name: string) {
   if (process.env["THUE_PHI_ANH"] !== "1") return;
   const dir = join(process.cwd(), "_acceptance/thue-phi/evidence");
   mkdirSync(dir, { recursive: true });
+  await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.waitForTimeout(250);
@@ -245,6 +247,8 @@ test.describe("thue phi", () => {
     const dir = join(process.cwd(), "_acceptance/thue-phi/evidence");
     mkdirSync(dir, { recursive: true });
     const frame = async (page: Page, name: string, both = false) => {
+      // The development build's «N» badge is not part of the product: hidden in every frame the owner reads.
+      await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
       for (const scheme of both ? (["light", "dark"] as const) : (["light"] as const)) {
         await page.emulateMedia({ colorScheme: scheme });
         await page.waitForTimeout(250);
@@ -327,5 +331,20 @@ test.describe("thue phi", () => {
     await admin.keyboard.press("Escape");
     await expect(admin.getByRole("menu")).toHaveCount(0);
     await frame(admin, "E10-luat");
+    // For the owner's page: the added item renamed, then taken out, each saved.
+    await admin.getByRole("listitem").last().locator('[data-slot="fee-more"]').click();
+    await admin.getByRole("menuitem", { name: label("RenameFeeItem") }).click();
+    await expect(admin.getByRole("menu")).toHaveCount(0);
+    await admin.locator('[data-slot="fee-name"]').fill("Phí hồ sơ");
+    await frame(admin, "E10-doi-ten");
+    await admin.locator('[data-slot="fee-save"]').click();
+    await expect(admin.getByRole("listitem").last()).toContainText("Phí hồ sơ");
+    await admin.getByRole("listitem").last().locator('[data-slot="fee-more"]').click();
+    await admin.getByRole("menuitem", { name: label("RemoveFeeItem") }).click();
+    await expect(admin.getByRole("menu")).toHaveCount(0);
+    await expect(admin.getByText("Phí hồ sơ")).toHaveCount(0);
+    await frame(admin, "E10-bo");
+    await admin.locator('[data-slot="fee-save"]').click();
+    await expect(admin.getByText(FEE_COPY.saved).first()).toBeVisible();
   });
 });

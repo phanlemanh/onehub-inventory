@@ -18,6 +18,10 @@ import { FEE_COPY as C, FEE_PROBLEM_COPY as P } from "./fee-copy";
 import { FeePart } from "./fee-part";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: () => {} }) }));
+const notified = vi.hoisted(() => [] as string[]);
+vi.mock("@/components/templates/notify", () => ({
+  notifyResult: ({ message }: { message: string }) => notified.push(message),
+}));
 
 const AT = "2026-11-14T03:00:00.000Z";
 const defaults = (rate: number, name: string) => ({ rateBasisPoints: rate, included: true, name });
@@ -192,6 +196,17 @@ describe("luu-khoa-khi-sai", () => {
       expect(where.textContent, `luu-khoa-khi-sai: ${name}`).toContain(P[problem]);
     });
   }
+});
+
+describe("tu-choi-khong-ly-do", () => {
+  it("a refusal that names no item shows the general failure, it does not pass silently", async () => {
+    await show("CompanyAdmin", DEFAULT_VIEW);
+    serve(DEFAULT_VIEW, { status: 400, body: { error: "bad-request" } });
+    notified.length = 0;
+    fireEvent.change(rate("brokerage")!, { target: { value: "1,5" } });
+    fireEvent.click(save()!);
+    await waitFor(() => expect(notified).toEqual([C.failed]));
+  });
 });
 
 describe("doc-so-kieu-viet", () => {

@@ -452,3 +452,78 @@ describe("khoan-rieng (E10)", () => {
     expect(await rowsOf(w)).toEqual(before);
   });
 });
+
+describe("giu-ten-va-doi-o-tran (E10, Ngoài-9, Ngoài-8)", () => {
+  it("a renamed default item keeps its name when a later save leaves the name out, and after a reload", async () => {
+    const { h, cookie } = await apiWorld("giu-ten");
+    const c = await cookie("CA");
+    const named = await h.save(
+      req(
+        "PUT",
+        {
+          items: [
+            ...LAW(),
+            { code: "brokerage", name: "Hoa hồng", rateBasisPoints: 100, included: true },
+          ],
+        },
+        c,
+      ),
+    );
+    expect(named.status).toBe(200);
+    expect((await items(named)).find((i) => i.code === "brokerage")?.name).toBe("Hoa hồng");
+    // The screen sends no name for an item it is not renaming; a switch flipped elsewhere must not drop it.
+    const flipped = await h.save(
+      req(
+        "PUT",
+        {
+          items: [...LAW(true, false), { code: "brokerage", rateBasisPoints: 100, included: true }],
+        },
+        c,
+      ),
+    );
+    expect(flipped.status).toBe(200);
+    expect((await items(flipped)).find((i) => i.code === "brokerage")?.name).toBe("Hoa hồng");
+    const reloaded = await items(await h.read(req("GET", undefined, c)));
+    expect(reloaded.find((i) => i.code === "brokerage")).toMatchObject({
+      name: "Hoa hồng",
+      source: { kind: "changed" },
+    });
+  });
+
+  it("at five own items, taking one out and adding one in the same save is saved once", async () => {
+    const { w, h, cookie } = await apiWorld("doi-o-tran");
+    const c = await cookie("CA");
+    const brokerage = { code: "brokerage", rateBasisPoints: 100, included: true };
+    const four = ["Phí một", "Phí hai", "Phí ba", "Phí bốn"].map((name) => ({
+      name,
+      rateBasisPoints: 10,
+      included: true,
+    }));
+    const full = await h.save(req("PUT", { items: [...LAW(), brokerage, ...four] }, c));
+    expect(full.status).toBe(200);
+    const kept = (await items(full)).filter((i) => i.kind === "Own" && i.name !== "Phí bốn");
+    expect(kept).toHaveLength(4);
+    const swapped = await h.save(
+      req(
+        "PUT",
+        {
+          items: [
+            ...LAW(),
+            ...kept.map((i) => ({
+              code: i.code,
+              rateBasisPoints: i.rateBasisPoints,
+              included: i.included,
+            })),
+            { name: "Phí năm", rateBasisPoints: 10, included: true },
+          ],
+        },
+        c,
+      ),
+    );
+    expect(swapped.status).toBe(200);
+    const after = (await items(swapped)).filter((i) => i.kind === "Own").map((i) => i.name);
+    expect(after).toEqual(["Phí môi giới", "Phí một", "Phí hai", "Phí ba", "Phí năm"]);
+    const live = (await rowsOf(w)).filter((r) => !r.retired);
+    expect(live.filter((r) => r.code !== "pit" && r.code !== "registration")).toHaveLength(4);
+  });
+});

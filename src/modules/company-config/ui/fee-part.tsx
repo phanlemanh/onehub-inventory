@@ -386,7 +386,8 @@ function SaveFeeButton({
       });
       if (res.status === 400) {
         const json = (await res.json()) as { problems?: FeeProblem[] };
-        onProblems(json.problems ?? []);
+        if (!json.problems?.length) throw new Error("400 without problems");
+        onProblems(json.problems);
         return;
       }
       if (!res.ok) throw new Error(String(res.status));

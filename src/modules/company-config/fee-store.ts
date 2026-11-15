@@ -205,7 +205,13 @@ export async function saveFeeSchedule(
       desired.set(code, {
         code,
         kind: "Own",
-        name: code === DEFAULT_OWN_ITEM.code ? name : (trimmed ?? names.get(code) ?? null),
+        // A draft without a name keeps the name the item has now: the screen sends a name only when it changes.
+        name:
+          code === DEFAULT_OWN_ITEM.code
+            ? trimmed === undefined
+              ? (rows.find((r) => r.code === code)?.name ?? null)
+              : name
+            : (trimmed ?? names.get(code) ?? null),
         rateBasisPoints: d.rateBasisPoints,
         included: d.included,
         removed: false,
@@ -225,7 +231,10 @@ export async function saveFeeSchedule(
 
     const live = new Map(rows.map((r) => [r.code, r]));
     const dflt = new Map(defaultFeeSchedule().map((d) => [d.code, d]));
-    for (const want of desired.values()) {
+    // Items taken out are written first, then changes, then new rows: the limit of own items is counted as each row
+    // is written, so a swap at the limit must free its place before the new item takes it.
+    const order = (w: Desired) => (w.removed ? 0 : live.has(w.code) ? 1 : 2);
+    for (const want of [...desired.values()].sort((a, b) => order(a) - order(b))) {
       const row = live.get(want.code);
       const d = dflt.get(want.code);
       const atDefault =
