@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 6a7754d858bf05a2fe903c5756a30125422328f5
+verified_commit: d048c005d2e80343cae10d59982f9be0557c37a0
 human_signoff: Manh Phan 2026-11-15
 ---
 
@@ -251,3 +251,7 @@ Diff từ lần chấm delta E11 (commit 4d40b13) tới 0292e68 ở `src/app/(ap
 ### Re-pin lần 5 — 2026-11-15, do gộp main df55d54 (PR #67)
 run_id: repin-20261115T072534Z-61443
 sha: 6a7754d858bf05a2fe903c5756a30125422328f5 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E10 (E10 không khai paths), E11, E16 (E16 không khai paths)
+
+### Re-pin lần 6 — 2026-11-15, do VP4 sua sau chu ky, gop main 2da9534
+run_id: repin-20261115T202828Z-24224
+sha: d048c005d2e80343cae10d59982f9be0557c37a0 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E10 (E10 không khai paths), E11, E16 (E16 không khai paths) · diff chạm vật đo ngoài làn máy: E11 — chưa chứng lại, đi vòng S4 delta
