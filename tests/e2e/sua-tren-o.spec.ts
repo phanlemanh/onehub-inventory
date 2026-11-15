@@ -239,8 +239,8 @@ test.describe("sua-tren-o", () => {
   });
 
   test("cot-chi-doc", async ({ page }) => {
-    test.skip(width() !== "1440", "the eight columns show whole at 1440");
-    // 8 columns × three ways in, each waiting a moment for an editor that should not come.
+    test.skip(width() !== "1440", "the editable columns show whole at 1440");
+    // Each column × three ways in, each waiting a moment for an editor that should not come.
     test.setTimeout(120_000);
     await openInventory(page);
     const opened: string[] = [];
