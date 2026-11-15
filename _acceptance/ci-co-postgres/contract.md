@@ -135,3 +135,12 @@ CI thật đo ở AC-10 khi bản vá vào PR (Hỏi-1). Lượt dựng lại (A
   Dòng `globalSetup` ở `vitest.config.ts` là đường được bảo vệ (hạng cao): chủ kho duyệt ngày 2026-11-15 (~00:54Z, phiên
   giám sát), nguyên văn «Cho», trả lời câu «Cho PR 66 thêm một dòng vào tệp cấu hình bộ kiểm?» — đúng một dòng ấy, không
   gì khác trong tệp.
+- Sửa sau chữ ký — 2026-11-15, việc phụ VP2 của đợt «dieu-phoi-nen» (PR #66), lần hai: bản sao nông của
+  `db/scripts/ci-thu.sh` nay có `origin` trỏ về kho gốc, như bản lấy về của CI. Từ 978d2d2 (2026-11-13), cổng chứng minh
+  màn đọc commit miễn của khối FormDialog từ lịch sử; ở bản sao nông nó lấy commit ấy từ kho xa
+  (`tools/proof_gate/legacy.py`), và bản sao không có kho xa thì đỏ «bản sao thiếu lịch sử và không có kho gốc để lấy».
+  Vì thế `make check` trong bản sao đỏ ở mọi lần ghim lại hồ sơ này từ 2026-11-13, dù nhánh nào. Đúng một dòng
+  `git remote add origin`; không đổi phép kiểm nào, không đổi luật của cổng. Chứng minh trên bản sao nông của 4a93fc3:
+  không có dòng ấy thì 9 bài cổng chứng minh đỏ (proof-gate, proof-gate-0023, proof-gate-1q, proof-matrix-self); thêm
+  `origin` thì cổng xanh và bốn tệp ấy đạt 145/145. Tệp này là đường được bảo vệ (`db/**`): giám sát cho theo quyền
+  đứng của chủ kho cho tệp công cụ trong đợt («Quyền, lần năm»), báo chủ kho cùng giờ.
