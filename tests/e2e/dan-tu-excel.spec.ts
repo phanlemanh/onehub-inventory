@@ -454,6 +454,30 @@ test.describe("dan-tu-excel", () => {
       ).toHaveText(money(nudged(r)));
   });
 
+  test("dong-ngan-cot-an", async ({ page }) => {
+    at1440();
+    await openInventory(page);
+    const rows = await rowsWhere(page, 2, priced, "dong-ngan-cot-an");
+    // Hiding the price puts Diện tích right after the status: the block's second column lands on it.
+    await page.getByRole("button", { name: "Cột", exact: true }).click();
+    await page.getByRole("menuitemcheckbox", { name: "Giá chào" }).click();
+    await page.keyboard.press("Escape");
+    await expect(
+      page.locator(`[data-slot="data-region-body"] th[data-col-id="${PRICE}"]`),
+    ).toHaveCount(0);
+    await select(page, rows[0]!.id, STATUS);
+    await pasteText(
+      page,
+      `${statusLabel(rows[0]!.status, "sale")}\t60\n${statusLabel(rows[1]!.status, "sale")}\n`,
+    );
+    await expect(preview(page)).toBeVisible();
+    await expect(changeLine(page, rows[0]!.id, "Unit.livingArea")).toContainText("«60»");
+    await expect(
+      changeLine(page, rows[1]!.id, "Unit.livingArea"),
+      "dong-ngan-cot-an: ô thiếu hiện chữ lạ",
+    ).toHaveCount(0);
+  });
+
   test("loc-khong-ghi-dong-an", async ({ page }) => {
     at1440();
     await openInventory(page);

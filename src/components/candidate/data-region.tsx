@@ -76,6 +76,7 @@ import {
   type GridView,
   type SortBy,
 } from "./grid-view";
+import { emptyMissingCells } from "./paste-block";
 import { PhoneList, type RegionPhoneList } from "./phone-list";
 import { RecordPanel, useRecordAddress, type RecordView } from "./record-panel";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -1105,20 +1106,18 @@ export function DataRegion({
     // A row of the block shorter than the others has no word for its last columns: those cells are empty, never the
     // words the grid fills them with (it repeats the row's own cells), so they change nothing and are not listed.
     if (block) {
-      const rowsInOrder = [...new Set(cells.map((c) => c.row.id))];
       // Columns in the order the grid shows them, pinned ones first, as the grid lays the block over them.
       const shown = [
         ...table.getStartVisibleLeafColumns(),
         ...table.getCenterVisibleLeafColumns(),
         ...table.getEndVisibleLeafColumns(),
       ].map((column) => column.id);
-      const fieldsInOrder = [...new Set(cells.map((c) => c.field))].sort(
-        (a, b) => shown.indexOf(a) - shown.indexOf(b),
+      const places = emptyMissingCells(
+        cells.map((c) => ({ rowId: c.row.id, field: c.field, raw: c.raw })),
+        block.lines,
+        shown,
       );
-      for (const c of cells) {
-        const line = block.lines[rowsInOrder.indexOf(c.row.id) % block.rows] ?? [];
-        if (fieldsInOrder.indexOf(c.field) % block.columns >= line.length) c.raw = "";
-      }
+      places.forEach((p, i) => (cells[i]!.raw = p.raw));
     }
     const bound = selectionRef.current?.activeBound;
     const regionRows = bound ? bound.maxRowIndex - bound.minRowIndex + 1 : 1;
