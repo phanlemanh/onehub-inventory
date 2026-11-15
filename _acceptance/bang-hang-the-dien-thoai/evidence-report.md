@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 2b5a55d8628cc22d26d1bd837a606de3741bbb10
+verified_commit: 0292e682fc9739d37a8ab15a9c4f711372dc8640
 human_signoff: Manh Phan 2026-11-15
 ---
 
@@ -240,3 +240,10 @@ sha: 2b5a55d8628cc22d26d1bd837a606de3741bbb10 · suites: 3 lệnh exit 0 · eval
 - eval: E11 · verdict: PASS · verifier: feature-loop:cham-ui (ngữ cảnh sạch) · verified_at: 2026-11-15T03:55:48Z · commit: 4d40b13
 - observed: 360 sáng và tối, 414 là danh sách thẻ đọc rõ mã căn, giá, trạng thái; chạm thẻ thứ ba mở hồ sơ toàn màn đúng căn; lùi về cùng các thẻ, giữ chỗ cuộn; 768 vẫn là bảng. Chấm khi chưa đăng nhập, không thử cửa vào theo vai (cửa vào do E9 và ca `cua-vao` đo).
 - screenshot: `evidence/delta-2026-11-15/E11-*.png`; ảnh Quản trị sàn ở 360 và 1440 cho mục «Sửa sau chữ ký»: `evidence/delta-2026-11-15/E9-quan-tri-360.png`, `E9-quan-tri-1440.png`.
+
+### Re-pin lần 4 — 2026-11-15, do cửa vào chỉ đọc phiên khi màn có luật vào (CI e2e-db)
+run_id: repin-20261115T055607Z-69459
+sha: 0292e682fc9739d37a8ab15a9c4f711372dc8640 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E10 (E10 không khai paths), E11, E16 (E16 không khai paths) · diff chạm vật đo ngoài làn máy: E11 — chưa chứng lại, đi vòng S4 delta
+
+### Ghi chú E11 sau re-pin lần 4 — 2026-11-15
+Diff từ lần chấm delta E11 (commit 4d40b13) tới 0292e68 ở `src/app/(app)/inventory/page.tsx` chỉ đổi khi nào trang đọc phiên cho cửa vào: nhánh cửa chỉ chạy khi thanh bên khai luật vào cho Bảng hàng, hôm nay không khai (`vao: null`), nên trang E11 chụp vẽ y như bản đã chấm đạt; không chấm lại.
