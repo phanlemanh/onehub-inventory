@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 09ab763de53ede2da0d60f3b81e378df4e142a41
+verified_commit: 2b5a55d8628cc22d26d1bd837a606de3741bbb10
 human_signoff: Manh Phan 2026-11-15
 ---
 
@@ -231,3 +231,7 @@ sha: af334f969b261d075b242c8c3de66171767690f5 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 2 — 2026-11-14, do ca góc nhìn trên điện thoại đọc thẻ; gộp main có PR #62
 run_id: repin-20261114T175616Z-87730
 sha: 09ab763de53ede2da0d60f3b81e378df4e142a41 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E10 (E10 không khai paths), E11, E16 (E16 không khai paths)
+
+### Re-pin lần 3 — 2026-11-15, do cửa vào Bảng hàng theo sổ màn, sửa sau chữ ký (V-1511-1, V-1511-2)
+run_id: repin-20261115T034210Z-84046
+sha: 2b5a55d8628cc22d26d1bd837a606de3741bbb10 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E10 (E10 không khai paths), E11, E16 (E16 không khai paths) · diff chạm vật đo ngoài làn máy: E11 — chưa chứng lại, đi vòng S4 delta
