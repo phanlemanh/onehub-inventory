@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 0292e682fc9739d37a8ab15a9c4f711372dc8640
+verified_commit: 6a7754d858bf05a2fe903c5756a30125422328f5
 human_signoff: Manh Phan 2026-11-15
 ---
 
@@ -247,3 +247,7 @@ sha: 0292e682fc9739d37a8ab15a9c4f711372dc8640 · suites: 3 lệnh exit 0 · eval
 
 ### Ghi chú E11 sau re-pin lần 4 — 2026-11-15
 Diff từ lần chấm delta E11 (commit 4d40b13) tới 0292e68 ở `src/app/(app)/inventory/page.tsx` chỉ đổi khi nào trang đọc phiên cho cửa vào: nhánh cửa chỉ chạy khi thanh bên khai luật vào cho Bảng hàng, hôm nay không khai (`vao: null`), nên trang E11 chụp vẽ y như bản đã chấm đạt; không chấm lại.
+
+### Re-pin lần 5 — 2026-11-15, do gộp main df55d54 (PR #67)
+run_id: repin-20261115T072534Z-61443
+sha: 6a7754d858bf05a2fe903c5756a30125422328f5 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E10 (E10 không khai paths), E11, E16 (E16 không khai paths)
