@@ -2,12 +2,12 @@
 // superuser); everything the product does goes through the door, withCompany, exactly as the server does — on a pool
 // logged in as the app's login role quy_hang_login (`appUrl`, row 7c), never as the owner.
 import { execFileSync } from "node:child_process";
-import { cpSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import pg from "pg";
+import { tempDir } from "../support/temp-dir";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const PORT = process.env["DB_PORT"] ?? "5563";
@@ -100,7 +100,7 @@ export interface ScratchDb {
 export function migrate(name: string, upTo?: number): void {
   let dir: string | undefined;
   if (upTo !== undefined) {
-    dir = mkdtempSync(join(tmpdir(), "migrations-"));
+    dir = tempDir("migrations-");
     for (const f of readdirSync(join(ROOT, "db/migrations")))
       if (Number(f.slice(0, 3)) <= upTo) cpSync(join(ROOT, "db/migrations", f), join(dir, f));
   }

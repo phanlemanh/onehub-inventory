@@ -1,14 +1,14 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { chmodSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 const HOOK = resolve(".claude/hooks/guard-edits.sh");
 
 function repoWithMigration(): string {
-  const root = mkdtempSync(join(tmpdir(), "hook-"));
+  const root = tempDir("hook-");
   const git = (...args: string[]) => execFileSync("git", args, { cwd: root });
   git("init", "-q");
   git("config", "user.email", "test@example.invalid");
@@ -51,7 +51,7 @@ describe("check-changed hook", () => {
   const OWN = "src/modules/listings/b.ts";
 
   function repoWith(changed: string[]): string {
-    const root = mkdtempSync(join(tmpdir(), "stop-hook-"));
+    const root = tempDir("stop-hook-");
     execFileSync("git", ["init", "-q"], { cwd: root });
     mkdirSync(join(root, "node_modules/.bin"), { recursive: true });
     writeFileSync(join(root, ".gitignore"), "node_modules\n");

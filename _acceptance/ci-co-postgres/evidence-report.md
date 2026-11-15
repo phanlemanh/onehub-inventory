@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: dd333930b60b6b2f20d19006a13e3d8cfa7b4de8
+verified_commit: fee86ff1f5da431aedd7b56e0d56b26c6cc233eb
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -174,3 +174,7 @@ sha: b1b49efd50840fb552d9b8ed5a44373b5b3b236a · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 2 — 2026-11-14, do VP1: phép đếm nhận --tep-bai, bài đơn vị chạy theo danh sách tệp của bản mẫu (sửa sau chữ ký)
 run_id: repin-20261114T071608Z-61278
 sha: dd333930b60b6b2f20d19006a13e3d8cfa7b4de8 · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng
+
+### Re-pin lần 3 — 2026-11-15, do VP2 (PR #66, sửa sau chữ ký): per-run temp root, proof gate waits for the shallow history lock, header and grid-probe early reads fixed
+run_id: repin-20261115T193207Z-65976
+sha: fee86ff1f5da431aedd7b56e0d56b26c6cc233eb · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng

@@ -3,21 +3,13 @@
 // A screen only declares what it needs; the behaviour (record panel, dialogs, loading, empty states, toasts) is
 // built once in src/components/candidate and src/components/templates. This guard turns red when a screen file
 // builds one of them again from the primitives.
-import {
-  mkdtempSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, posix, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -295,7 +287,7 @@ describe("screens declare, they do not rebuild behaviour", () => {
   });
 
   it("break: a screen importing a forbidden source in any spelling turns the guard red", () => {
-    const root = mkdtempSync(join(tmpdir(), "behaviour-guard-"));
+    const root = tempDir("behaviour-guard-");
     const dir = join(root, "src/app/man");
     const page = "src/app/man/page.tsx";
     mkdirSync(dir, { recursive: true });
@@ -381,7 +373,7 @@ describe("ts-doc-nhu-typescript", () => {
   const statement = `import { Dialog } from "${dialog}";`;
   /** Writes one screen file with `before` ahead of the forbidden import, and runs the guard with `kindOf`. */
   function guard(name: string, before: string, kindOf?: (f: string) => ts.ScriptKind): string[] {
-    const root = mkdtempSync(join(tmpdir(), "behaviour-guard-ts-"));
+    const root = tempDir("behaviour-guard-ts-");
     try {
       const dir = join(root, "src/app/man");
       mkdirSync(dir, { recursive: true });

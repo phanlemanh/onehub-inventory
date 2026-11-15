@@ -5,20 +5,12 @@
 //   2. no test or tool CI runs reads git history (show, log, cat-file, rev-list, blame, rev-parse <commit>), except the
 //      callers listed with their fall-back — with a matrix of call forms and a red case in a copy.
 import { createHash } from "node:crypto";
-import {
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -112,7 +104,7 @@ describe("ban sao nong: ban chep bo chay cach ly dung tung byte (AC-7)", () => {
   });
 
   it("pha: doi mot byte cua ban chep thi bai neu ten tep", () => {
-    const dir = mkdtempSync(join(tmpdir(), "ban-sao-nong-"));
+    const dir = tempDir("ban-sao-nong-");
     try {
       mkdirSync(join(dir, "tests/fixtures"), { recursive: true });
       for (const file of Object.keys(BLOBS)) {
@@ -182,7 +174,7 @@ describe("ban sao nong: khong bai nao CI chay doc lich su git (AC-7)", () => {
   });
 
   it("pha: mot tep tests/*.test.ts doc lich su toi commit cu thi bai neu dung tep va dong", () => {
-    const dir = mkdtempSync(join(tmpdir(), "ban-sao-nong-"));
+    const dir = tempDir("ban-sao-nong-");
     try {
       mkdirSync(join(dir, "tests"), { recursive: true });
       mkdirSync(join(dir, "tools/m"), { recursive: true });

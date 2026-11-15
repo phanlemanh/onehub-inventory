@@ -2,14 +2,14 @@
 // the field kinds are a closed set of five, and the code generator's new object type gives real TypeScript types. Every
 // check runs on the real files and on a copy broken in exactly one place, with a pinned message.
 import { execFileSync } from "node:child_process";
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import type { CustomField, Listing } from "@/generated/ontology";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 // The repo's own YAML reader (tools/repo_ontology.py), as tests/link-types.test.ts does: no new dependency.
@@ -83,7 +83,7 @@ export function modelFailures(root: string): string[] {
 
 /** Runs the code generator on a root and returns the TypeScript it would write. */
 function generated(root: string): string {
-  const out = join(mkdtempSync(join(tmpdir(), "lop-rieng-gen-")), "ontology.ts");
+  const out = join(tempDir("lop-rieng-gen-"), "ontology.ts");
   execFileSync(
     "python3",
     [join(root, "tools/ontology_codegen.py"), "--lang", "ts", "--out", out, "--root", root],
@@ -93,7 +93,7 @@ function generated(root: string): string {
 }
 
 function brokenCopy(edit: (dir: string) => void): string {
-  const dir = mkdtempSync(join(tmpdir(), "lop-rieng-"));
+  const dir = tempDir("lop-rieng-");
   for (const part of ["ontology", "tools"])
     cpSync(join(ROOT, part), join(dir, part), { recursive: true });
   edit(dir);
@@ -222,7 +222,7 @@ describe("migration 010 matches the model and keeps the fence (E16)", () => {
   });
 
   it("break: a 'formula' kind in a copy of the migration is named", () => {
-    const dir = mkdtempSync(join(tmpdir(), "lop-rieng-mig-"));
+    const dir = tempDir("lop-rieng-mig-");
     cpSync(join(ROOT, "ontology"), join(dir, "ontology"), { recursive: true });
     cpSync(join(ROOT, "tools"), join(dir, "tools"), { recursive: true });
     cpSync(join(ROOT, "db/migrations"), join(dir, "db/migrations"), { recursive: true });
@@ -242,7 +242,7 @@ describe("migration 010 matches the model and keeps the fence (E16)", () => {
   });
 
   it("break: a delete grant in a copy of the migration is named", () => {
-    const dir = mkdtempSync(join(tmpdir(), "lop-rieng-mig-"));
+    const dir = tempDir("lop-rieng-mig-");
     cpSync(join(ROOT, "ontology"), join(dir, "ontology"), { recursive: true });
     cpSync(join(ROOT, "tools"), join(dir, "tools"), { recursive: true });
     cpSync(join(ROOT, "db/migrations"), join(dir, "db/migrations"), { recursive: true });
