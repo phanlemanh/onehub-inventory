@@ -15,7 +15,7 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const ROOT = join(import.meta.dirname, "..");
 const TOOL = join(ROOT, "tools/coverage_matrix/lifecycle.py");
@@ -33,14 +33,34 @@ interface Table {
 }
 const table = (root: string): Table => JSON.parse(run(root, "--json").out) as Table;
 
-const copies: string[] = [];
-/** Removes every temporary copy listed; the one cleanup every case shares. */
+/** Every temporary copy any case made, in order; the last case checks all of them are gone from disk. */
+const made: string[] = [];
+/** The copies of the group whose cases are running; null outside a cleaned group. */
+let current: string[] | null = null;
+/** Copies made outside a cleaned group: nothing removes them, so the last case names them. */
+const orphans: string[] = [];
+
 function release(list: string[]) {
   for (const dir of list) rmSync(dir, { recursive: true, force: true });
 }
-afterAll(() => {
-  release(copies);
-});
+
+/**
+ * The one cleanup every group of cases uses: copies made while the group runs are listed for it and removed after
+ * its last case. A group that makes copies without calling this leaves them on disk, and the last case fails.
+ */
+function cleanedGroup() {
+  const dirs: string[] = [];
+  beforeAll(() => {
+    current = dirs;
+  });
+  afterAll(() => {
+    current = null;
+    release(dirs);
+  });
+}
+
+// Safety net only: runs after the last case has measured, so it never hides a leak from it.
+afterAll(() => release(made));
 
 const PARTS = [
   "ontology",
@@ -53,9 +73,10 @@ const PARTS = [
 ];
 
 /** A copy of what the tool reads, without .git. */
-function copy(list: string[] = copies): string {
+function copy(): string {
   const dir = mkdtempSync(join(tmpdir(), "vong-doi-"));
-  list.push(dir);
+  made.push(dir);
+  (current ?? orphans).push(dir);
   for (const part of PARTS) {
     mkdirSync(dirname(join(dir, part)), { recursive: true });
     cpSync(join(ROOT, part), join(dir, part), { recursive: true });
@@ -81,6 +102,7 @@ function expectRed(dir: string, line: string) {
 const ent = (name: string) => `ontology/entities/${name}.yaml`;
 
 describe("man-khai-hien", () => {
+  cleanedGroup();
   it("every user screen and the App Shell list what they show; the real repository is green", () => {
     const r = run(ROOT, "--check");
     expect(r.out).toContain("vong-doi: du o");
@@ -119,6 +141,7 @@ describe("man-khai-hien", () => {
 });
 
 describe("may-thay-man-hien", () => {
+  cleanedGroup();
   it("what each screen shows, read from the code and the button table, is the table written beforehand", () => {
     const want: Record<string, string[]> = {
       khung: ["Listing", "SavedView", "Unit"],
@@ -172,6 +195,7 @@ describe("may-thay-man-hien", () => {
 });
 
 describe("du-bon-o", () => {
+  cleanedGroup();
   it("an entity a screen shows without a vong_doi block is red", () => {
     const dir = copy();
     breakFile(
@@ -216,6 +240,7 @@ describe("du-bon-o", () => {
 });
 
 describe("o-co-tro-nut-that", () => {
+  cleanedGroup();
   it("removing the remove-listing action from the permission table is red (the row's own case)", () => {
     const dir = copy();
     breakFile(dir, "ontology/actions.yaml", (t) =>
@@ -264,6 +289,7 @@ describe("o-co-tro-nut-that", () => {
 });
 
 describe("o-hang-va-khong-co-can-cu", () => {
+  cleanedGroup();
   const share = (dir: string, from: string, to: string) =>
     breakFile(dir, ent("ShareLink"), (t) => t.replace(from, to));
 
@@ -328,6 +354,7 @@ describe("o-hang-va-khong-co-can-cu", () => {
 });
 
 describe("chay-tren-ban-sao-nong", () => {
+  cleanedGroup();
   it("runs on a copy without .git", () => {
     const dir = copy();
     expect(existsSync(join(dir, ".git"))).toBe(false);
@@ -483,6 +510,7 @@ describe("bang-da-duyet", () => {
 });
 
 describe("xem-theo-vai", () => {
+  cleanedGroup();
   it("who may open each screen is the matrix written beforehand", () => {
     const all = ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"];
     const want: Record<string, string[]> = {
@@ -531,16 +559,20 @@ describe("xem-theo-vai", () => {
 });
 
 describe("don-thu-muc-tam", () => {
-  const made: string[] = [];
-  describe("tao ban sao", () => {
-    afterAll(() => release(made));
-    it("a copy exists on disk while its cases run (control)", () => {
-      const dir = copy(made);
-      expect(existsSync(join(dir, "design/screens.yaml"))).toBe(true);
+  let broken: string[] = [];
+  describe("nhom quen don (ca pha)", () => {
+    it("a group that makes a copy without the shared cleanup", () => {
+      broken = [copy()];
+      expect(existsSync(broken[0]!)).toBe(true);
     });
   });
-  it("after afterAll no temporary copy is left on disk", () => {
-    expect(made.length).toBe(1);
-    for (const dir of made) expect(existsSync(dir), dir).toBe(false);
+
+  it("every copy the other groups made is gone; the one the broken group left is named", () => {
+    const left = made.filter((dir) => existsSync(dir));
+    expect(made.length).toBeGreaterThan(20);
+    expect(orphans, "copies made outside a cleaned group").toEqual(broken);
+    expect(left, `ban sao con sot: ${left.join(", ")}`).toEqual(broken);
+    release(broken);
+    expect(made.filter((dir) => existsSync(dir))).toEqual([]);
   });
 });
