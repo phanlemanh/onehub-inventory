@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "dan-tu-excel",
-  "ghi_luc": "2026-11-15T11:32:44Z",
-  "vong_cham": 4,
+  "ghi_luc": "2026-11-15T13:45:27Z",
+  "vong_cham": 5,
   "luot": [
     {
       "vong": 1,
@@ -27,6 +27,13 @@
       "vong": 4,
       "verdict": "PASS",
       "tang": []
+    },
+    {
+      "vong": 5,
+      "verdict": "BLOCKED",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
     }
   ],
   "lam_lai": [
@@ -41,10 +48,14 @@
     {
       "nguon": "r1",
       "tang": "nghiep-vu"
+    },
+    {
+      "nguon": "r5",
+      "tang": "bai-kiem-ha-tang"
     }
   ],
   "theo_tang": {
-    "bai-kiem-ha-tang": 1,
+    "bai-kiem-ha-tang": 2,
     "trang-thai-hanh-vi": 1,
     "du-lieu-api": 0,
     "nghiep-vu": 1,
