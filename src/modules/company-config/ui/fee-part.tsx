@@ -73,9 +73,8 @@ function toBody(draft: readonly DraftItem[]): FeeItemDraft[] {
     const parsed = parseRatePercent(d.rate);
     const out: FeeItemDraft = { rateBasisPoints: parsed ?? Number.NaN, included: d.included };
     if (d.code !== undefined) out.code = d.code;
-    const renamed =
-      d.kind === "Own" && (d.source === null || d.source.kind === "added" || d.naming);
-    if (renamed) out.name = d.name;
+    // Every own item carries the name it shows: a reset sends the default name, a kept name stays as it is.
+    if (d.kind === "Own") out.name = d.name;
     return out;
   });
 }

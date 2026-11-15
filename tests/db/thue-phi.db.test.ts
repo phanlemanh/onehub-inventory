@@ -3,6 +3,7 @@
 // permission-table world (LA, BA, TL, CA); Y is CompanyAdmin of B.
 import { afterEach, describe, expect, it } from "vitest";
 
+import { label } from "@/modules/company-config";
 import { createFeeScheduleHandlers } from "@/modules/company-config/fee-schedule-http";
 import { openDoor } from "@/modules/identity/action-door";
 import { createAuthHandlers, tokenFrom } from "@/modules/identity/http";
@@ -487,6 +488,28 @@ describe("giu-ten-va-doi-o-tran (E10, Ngoài-9, Ngoài-8)", () => {
     expect(reloaded.find((i) => i.code === "brokerage")).toMatchObject({
       name: "Hoa hồng",
       source: { kind: "changed" },
+    }); // «Trả về mặc định» then Lưu: the screen sends the default name and rate; the item is the default again.
+    const reset = await h.save(
+      req(
+        "PUT",
+        {
+          items: [
+            ...LAW(true, false),
+            {
+              code: "brokerage",
+              name: label("BrokerageFee"),
+              rateBasisPoints: 100,
+              included: true,
+            },
+          ],
+        },
+        c,
+      ),
+    );
+    expect(reset.status).toBe(200);
+    expect((await items(reset)).find((i) => i.code === "brokerage")).toMatchObject({
+      name: label("BrokerageFee"),
+      source: { kind: "default" },
     });
   });
 

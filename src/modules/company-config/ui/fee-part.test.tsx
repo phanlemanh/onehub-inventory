@@ -235,6 +235,20 @@ describe("tra-ve-mac-dinh", () => {
     fireEvent.click(await screen.findByRole("menuitem", { name: label("ResetFeeItem") }));
     expect(rate("brokerage")!.value).toBe("1");
   });
+  it("a renamed default item sends its default name when reset, so the save brings the name back", async () => {
+    const renamed: FeeScheduleView = {
+      items: VIEW.items.map((i) => (i.code === "brokerage" ? { ...i, name: "Hoa hồng" } : i)),
+    };
+    await show("CompanyAdmin", renamed);
+    fireEvent.click(within(rowOf("brokerage")).getByRole("button", { name: C.more("Hoa hồng") }));
+    fireEvent.click(await screen.findByRole("menuitem", { name: label("ResetFeeItem") }));
+    fireEvent.click(save()!);
+    await waitFor(() => expect(calls.some((c) => c.method === "PUT")).toBe(true));
+    const put = calls.find((c) => c.method === "PUT")!.body as {
+      items: { code?: string; name?: string }[];
+    };
+    expect(put.items.find((i) => i.code === "brokerage")?.name).toBe(label("BrokerageFee"));
+  });
 });
 
 describe("chi-doc-khi-khong-quyen", () => {
