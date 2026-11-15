@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-15 — Công cụ design-assembly chép lại từ plugin: linh kiện xuất lại qua tệp gom chỉ ghi một lần, ở tệp định nghĩa nó, nên sổ linh kiện hết ghi trùng chín linh kiện bộ lọc (298 xuống 289 mục). Kèm phần đọc sổ màn nối với mô hình nghiệp vụ của plugin, chưa bật ở kho này — `tools/design-assembly/components.mjs`, `design/component-registry.json`, [0034](decisions/0034-component-register-written-by-design-assembly.md).
 - 2026-11-15 — Khai sổ token và sổ linh kiện với kit nghiệm thu ở `design_floor`, tách khỏi PR nhận design-assembly, gộp sau nó — [0034](decisions/0034-component-register-written-by-design-assembly.md).
 - 2026-11-15 — Lệnh kiểm design-assembly chỉ tính «giữ» khi chính luật dòng sổ nêu tên chặn mọi đoạn mã phạm (lượt chấm 1 của hồ sơ `adopt-design-assembly` tìm ra luật khác chặn thay). «Khoảng cách» về lại «tự khai», vì luật nó nêu tên chỉ bắt bậc lệch thang: 17 quyết định máy giữ, tám luật lint chạy lại; tiêu chí AC-2 sửa theo, chờ duyệt lại — `design/theme.json`, `tools/design-assembly/check.mjs`, [#58](https://github.com/phanlemanh/onehub-inventory/pull/58).
 - 2026-11-14 — Cổng chứng minh màn bắt tệp khối tự làm chưa kê ở sổ khối, danh sách có trước hay bảng Khối của hồ sơ đang mở (hàng 1q); so với nhánh chính bằng danh sách cố định, không đọc git — [0034](decisions/0034-cong-bat-khoi-khong-ke.md), `_acceptance/cong-bat-khoi-khong-ke/`.
