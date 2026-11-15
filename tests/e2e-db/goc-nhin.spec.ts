@@ -18,6 +18,7 @@ import { type Browser, type Locator, type Page, type TestInfo } from "@playwrigh
 import pg from "pg";
 
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
+import { regionReady } from "../e2e/phone-list";
 import { FRAME_COPY } from "../../src/components/templates/frame-copy";
 import { label } from "../../src/modules/company-config";
 import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
@@ -104,6 +105,7 @@ const onPhone = (page: Page) => (page.viewportSize()?.width ?? 1440) < 768;
 
 async function settled(page: Page) {
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  await regionReady(page);
   if (onPhone(page)) {
     await expect(region(page).locator('[data-slot="phone-card"]').first()).toBeVisible();
     return;
