@@ -14,6 +14,7 @@ export {
   inventoryStatusHref,
   FEE_INCLUSION_FIELD,
   NET_TO_SELLER_FIELD,
+  cardNetOf,
   inventoryColumns,
   type InventoryCustomColumn,
   type InventoryFeeHeaders,

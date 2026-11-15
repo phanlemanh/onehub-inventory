@@ -145,6 +145,80 @@ async function proof(page: Page, info: TestInfo, name: string) {
   await page.emulateMedia({ colorScheme: "light" });
 }
 
+interface Card {
+  code: string;
+  net: string | null;
+  h: number;
+  priceRight: number;
+  statusRight: number;
+  netRight: number | null;
+  factsRight: number;
+  netLeft: number | null;
+  netCut: boolean;
+  factsCut: boolean;
+  netTop: number | null;
+  factsTop: number;
+}
+
+/** Row 19 × 2b: every drawn card's third line: where the amount sits next to the price, the status and the facts. */
+const readCards = (page: Page) =>
+  page.locator('[data-slot="phone-card"]').evaluateAll((els): Card[] =>
+    els.map((card) => {
+      const at = (slot: string) =>
+        card.querySelector<HTMLElement>(`[data-slot="${slot}"]`)?.getBoundingClientRect() ?? null;
+      const net = card.querySelector<HTMLElement>('[data-slot="listing-card-net"]');
+      const facts = card.querySelector<HTMLElement>('[data-slot="listing-card-facts"]')!;
+      const n = net?.getBoundingClientRect() ?? null;
+      return {
+        code: card.querySelector<HTMLElement>('[data-slot="listing-card-unit"]')!.innerText,
+        net: net?.innerText ?? null,
+        h: card.getBoundingClientRect().height,
+        priceRight: at("listing-card-price")!.right,
+        statusRight: at("listing-card-status")!.right,
+        netRight: n?.right ?? null,
+        netLeft: n?.left ?? null,
+        factsRight: facts.getBoundingClientRect().right,
+        netCut: net ? net.scrollWidth > net.clientWidth + 0.5 : false,
+        factsCut: facts.scrollWidth > facts.clientWidth + 0.5,
+        netTop: n?.top ?? null,
+        factsTop: facts.getBoundingClientRect().top,
+      };
+    }),
+  );
+
+function checkCards(cards: readonly Card[], width: number): void {
+  const problems: string[] = [];
+  const withNet = cards.filter((c) => c.net !== null);
+  if (withNet.length === 0) problems.push(`no card shows ${label("NetToSeller")} at ${width}`);
+  if (cards.length === withNet.length)
+    problems.push(`every card shows ${label("NetToSeller")} at ${width}`);
+  const heights = cards.map((c) => c.h);
+  if (Math.max(...heights) - Math.min(...heights) > 0.5)
+    problems.push(
+      `cards differ in height at ${width}: ${Math.min(...heights)}–${Math.max(...heights)}`,
+    );
+  for (const c of withNet) {
+    if (!c.net!.startsWith(`${label("NetToSeller")} `))
+      problems.push(`amount without its label: ${c.code} «${c.net}»`);
+    if (Math.abs(c.netRight! - c.priceRight) > 1 || Math.abs(c.netRight! - c.statusRight) > 1)
+      problems.push(`amount off the right edge of price and status: ${c.code}`);
+    if (c.netCut) problems.push(`amount cut: ${c.code} «${c.net}»`);
+    if (c.netLeft! < c.factsRight - 0.5) problems.push(`amount over the facts: ${c.code}`);
+    if (Math.abs(c.netTop! - c.factsTop) > 2)
+      problems.push(`amount not on the facts line: ${c.code}`);
+  }
+  if (problems.length > 0) throw new Error(problems.join("\n"));
+}
+
+/** The ListAgent of company A on the inventory, which below 768 px is the list of cards (row 2b). */
+async function openCards(browser: Browser, info: TestInfo): Promise<Page> {
+  const agent = await as(browser, "a-ListAgent", info);
+  await agent.goto("/inventory");
+  await expect(agent.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  await agent.locator('[data-slot="phone-card"]').first().waitFor();
+  return agent;
+}
+
 test.describe.configure({ mode: "serial" });
 
 test.describe("thue phi", () => {
@@ -221,6 +295,12 @@ test.describe("thue phi", () => {
     await agent.goto("/inventory");
     await expect(agent.locator('[hidden][id^="S:"]')).toHaveCount(0);
     await proof(agent, info, "inventory");
+    if (info.project.name === "360" || info.project.name === "414") {
+      // Below 768 px the inventory is the list of cards (row 2b): Về tay is on the card, the table is not drawn.
+      await expect(agent.locator('[data-slot="listing-card-net"]').first()).toBeVisible();
+      await expect(agent.locator('th[data-col-id="custom.netToSeller"]')).toHaveCount(0);
+      return;
+    }
     const head = agent.locator('th[data-col-id="custom.netToSeller"]');
     await expect(head).toHaveCount(1);
     await expect(agent.locator('th[data-col-id="Listing.feeInclusion"]')).toHaveCount(0);
@@ -235,6 +315,108 @@ test.describe("thue phi", () => {
     await agent.goto("/inventory");
     await expect(agent.locator('[hidden][id^="S:"]')).toHaveCount(0);
     await axeClean(agent, "inventory");
+  });
+
+  // Row 19 × 2b (sixth fix after the scope gate): on a phone the card shows Về tay at the right end of its third line.
+  test("the-ve-tay", async ({ browser }, info) => {
+    const size = info.project.name;
+    test.skip(size !== "360" && size !== "414", "the cards are the inventory at 360 and 414");
+    const width = Number(size);
+    const agent = await openCards(browser, info);
+    checkCards(await readCards(agent), width);
+    if (size !== "360") return;
+    // The longest text the sample can give on that line, beside the largest amount, in the first card with one.
+    await agent
+      .locator('[data-slot="listing-card-net"]')
+      .first()
+      .evaluate((net) => {
+        const facts = net.parentElement!.querySelector<HTMLElement>(
+          '[data-slot="listing-card-facts"]',
+        )!;
+        facts.textContent = "110,4 m² · 3 phòng ngủ · 110,4 m² · 3 phòng ngủ";
+        net.textContent = net.textContent!.replace(/\S+ \S+$/, "999,99 tỷ");
+      });
+    checkCards(await readCards(agent), 360);
+  });
+
+  test("the-ve-tay-pha", async ({ browser }, info) => {
+    test.skip(info.project.name !== "360", "break cases run at 360");
+    expect(() => checkCards([], 360)).toThrow(/no card shows/);
+    // An amount allowed to shrink beside facts that may not: cut, or over the facts.
+    const shrink = await openCards(browser, info);
+    await shrink.addStyleTag({
+      content:
+        '[data-slot="listing-card-net"] { flex-shrink: 1 !important; overflow: hidden; min-width: 0; } [data-slot="listing-card-facts"] { flex-shrink: 0 !important; }',
+    });
+    await shrink
+      .locator('[data-slot="listing-card-net"]')
+      .first()
+      .evaluate((net) => {
+        const facts = net.parentElement!.querySelector<HTMLElement>(
+          '[data-slot="listing-card-facts"]',
+        )!;
+        facts.textContent = "110,4 m² · 3 phòng ngủ · 110,4 m² · 3 phòng ngủ";
+      });
+    const shrunk = await readCards(shrink);
+    expect(() => checkCards(shrunk, 360)).toThrow(
+      /amount cut|amount over the facts|off the right edge/,
+    );
+    // An amount on a line of its own, as a line under the price would be: the card grows.
+    const own = await openCards(browser, info);
+    await own.addStyleTag({
+      content:
+        ':has(> [data-slot="listing-card-net"]) { flex-wrap: wrap !important; } [data-slot="listing-card-net"] { width: 100%; }',
+    });
+    const tall = await readCards(own);
+    expect(() => checkCards(tall, 360)).toThrow(/differ in height|not on the facts line/);
+  });
+
+  // Owner photos: the three kinds of card in one frame (with Về tay, fees not included, no price), light and dark.
+  test("anh-the-ve-tay", async ({ browser }, info) => {
+    test.skip(process.env["THUE_PHI_ANH"] !== "1", "frames only on demand");
+    const size = info.project.name;
+    test.skip(size !== "360" && size !== "414", "the cards are the inventory at 360 and 414");
+    const width = Number(size);
+    const agent = await openCards(browser, info);
+    await agent.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+    const kinds = await agent.locator('[data-slot="phone-card"]').evaluateAll((els) =>
+      els.map((card) => ({
+        net: card.querySelector('[data-slot="listing-card-net"]') !== null,
+        priced: /\d/.test(
+          card.querySelector<HTMLElement>('[data-slot="listing-card-price"]')?.innerText ?? "",
+        ),
+      })),
+    );
+    // The shortest run of cards holding all three kinds.
+    let best: [number, number] | null = null;
+    for (let i = 0; i < kinds.length; i += 1)
+      for (let j = i; j < kinds.length; j += 1) {
+        const run = kinds.slice(i, j + 1);
+        if (
+          run.some((k) => k.net) &&
+          run.some((k) => !k.net && k.priced) &&
+          run.some((k) => !k.priced) &&
+          (!best || j - i < best[1] - best[0])
+        )
+          best = [i, j];
+      }
+    if (!best) throw new Error("no run of cards holds all three kinds");
+    const all = agent.locator('[data-slot="phone-card"]');
+    await all.nth(best[0]).evaluate((el) => el.scrollIntoView({ block: "center" }));
+    await agent.waitForTimeout(300);
+    const dir = join(process.cwd(), "_acceptance/thue-phi/evidence");
+    mkdirSync(dir, { recursive: true });
+    for (const scheme of ["light", "dark"] as const) {
+      await agent.emulateMedia({ colorScheme: scheme });
+      await agent.waitForTimeout(250);
+      const top = (await all.nth(best[0]).boundingBox())!;
+      const bottom = (await all.nth(best[1]).boundingBox())!;
+      const y = Math.max(0, top.y - 12);
+      await agent.screenshot({
+        path: join(dir, `the-ve-tay-${width}-${scheme === "light" ? "sang" : "toi"}.png`),
+        clip: { x: 0, y, width, height: bottom.y + bottom.height + 12 - y },
+      });
+    }
   });
 
   test("anh-ui-check", async ({ browser }, info) => {

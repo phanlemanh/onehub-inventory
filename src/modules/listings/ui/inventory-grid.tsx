@@ -17,6 +17,7 @@ import type { SavedView } from "../saved-view";
 import {
   FEE_INCLUSION_FIELD,
   INVENTORY_GROUP_BY,
+  cardNetOf,
   inventoryColumns,
   type InventoryCustomColumn,
   type InventoryFeeHeaders,
@@ -122,19 +123,31 @@ export function InventoryGrid({
     [headers, customColumns, feeHeaders],
   );
   // Below 768 px the region shows each row as the listing card's row layout (row 2b): the record head's own card.
+  // With the fee columns (row 19) a card whose price includes the fees also shows what the seller nets; a card without
+  // fees included, without a price or without a fee condition stays as row 2b drew it.
+  const inclusionOf = useMemo(
+    () => new Map((listings ?? []).map((l) => [l.id, l.feeInclusion])),
+    [listings],
+  );
   const phoneList = useMemo(
     (): RegionPhoneList<GridRow> => ({
       label: (row) => `${headers["Listing.unitNumber"]} ${String(row["Listing.unitNumber"] ?? "")}`,
-      card: (row) => (
-        <ListingCard
-          layout="row"
-          view={listingView(row, headers)}
-          priceLabel={headers["Listing.listPrice"]}
-          building={String(row["Listing.buildingName"] ?? "")}
-        />
-      ),
+      card: (row) => {
+        const net = feeHeaders
+          ? cardNetOf(row, inclusionOf.get(row.id), feeHeaders.netToSeller)
+          : null;
+        return (
+          <ListingCard
+            layout="row"
+            view={listingView(row, headers)}
+            priceLabel={headers["Listing.listPrice"]}
+            building={String(row["Listing.buildingName"] ?? "")}
+            net={net}
+          />
+        );
+      },
     }),
-    [headers],
+    [headers, feeHeaders, inclusionOf],
   );
   const edit = useListingCellEdit({ rows, listings, headers, labels: editLabels, door });
   const status: RegionStatus = current === "empty" ? "ready" : current;

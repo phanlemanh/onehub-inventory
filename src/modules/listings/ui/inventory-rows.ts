@@ -113,6 +113,21 @@ export function inventoryColumns(
   ];
 }
 
+/**
+ * What a phone card shows at the right end of its facts line (row 19): the net-to-seller amount of a sale whose price
+ * includes the fees. A price without the fees, a missing price, a missing fee condition or a rent shows nothing there.
+ */
+export function cardNetOf(
+  row: GridRow,
+  feeInclusion: Listing["feeInclusion"] | undefined,
+  label: string,
+): { label: string; value: number } | null {
+  const value = row[NET_TO_SELLER_FIELD];
+  return feeInclusion === "Included" && typeof value === "number" && value > 0
+    ? { label, value }
+    : null;
+}
+
 /** The field the inventory grid groups rows under: the building, as the owner's sheet does. */
 export const INVENTORY_GROUP_BY = "Listing.buildingName" as const;
 
