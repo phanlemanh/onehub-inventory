@@ -119,10 +119,8 @@ lệch, phép gác làm lượt đỏ. Vá từng chỗ không hội tụ, nên:
 - Cửa chung `tests/e2e/sua-trang.ts`: `pageReady` (cùng họ với `regionReady` của VP4) chờ dấu, chờ hết phần trang đang tải
   dở, và — khi có — chờ chính phần tử bị đụng được React nhận; có trần, hết trần thì đỏ và nói thiếu điều nào. Mọi lối sửa
   trang đi qua `suaTrang`, `suaCacPhanTu`, `themKieu`, `chupAnh`. `waitReady` của bộ bài theo sổ màn dùng `pageReady`.
-- Chuyển 82 trên 86 chỗ: 71 ở lượt đầu, 11 chỗ ở bốn tệp của PR #66 và #70 sau khi hai PR ấy gộp; danh sách chờ nay rỗng.
-- Từ #70 vùng dữ liệu gắn xong sau cả trang và mang dấu `data-hydrated` riêng: `pageReady` chờ thêm mọi vùng có dấu, hai ca
-  phá của vùng («gỡ nút Xoá lọc», «gỡ tabindex») bắt đầu theo dấu của vùng. Ba ca phá của #70 (`tests/e2e/bang-loe.spec.ts`)
-  làm hiện bố cục bị ẩn bằng một style thêm vào phần đầu trang thay vì gỡ lớp khỏi HTML của máy chủ.
+- Chuyển 71 trên 86 chỗ; 11 chỗ ở bốn tệp của PR #66 và #70 nằm trong danh sách chờ có tên, chuyển sau khi hai PR ấy gộp
+  (1u chỉ gộp khi danh sách rỗng).
 - Phép kiểm tĩnh `tests/sua-trang.test.ts` (chạy trong `make check`) đỏ khi một bài sửa trang không qua cửa, khi một mã
   chèn trước lúc tải đổi trang mà không chờ dấu, và khi danh sách chờ còn tên tệp đã hết việc.
 - 4 chỗ chụp ảnh ở bốn tệp bị khoá lời bởi hàng đã ký (bài đăng nhập của hàng 8, bài thành viên của hàng 9) giữ nguyên,
