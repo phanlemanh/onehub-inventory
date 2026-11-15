@@ -51,8 +51,8 @@ evals:
     cmd: config:executors.script.gac_hydration_pha
     long_running: 10
     layer: backend-effect
-    paths: [tests/e2e/gac-hydration.ts, tests/e2e/gac-hydration-pha.spec.ts, playwright.config.ts, playwright.db.config.ts, tests/cong-chay.test.ts, _acceptance/don-no-bo-kiem/rang/gac-hydration-pha.mjs]
-    expected: "exit 0 của kịch bản đo: lượt có GAC_HYDRATION_PHA=1 (bài phá chạy cùng hai bài khác, ba luồng) thoát khác 0 và dòng ra có 'gac-hydration: 1 canh bao, bai: gac-hydration pha'; lượt không bật thì thoát 0 và có 'gac-hydration: 0 canh bao'; nạp playwright.db.config.ts thấy bộ báo cáo tests/e2e/gac-hydration.ts trong danh sách, bản sao bỏ nó → 'gac-hydration: playwright.db.config.ts thieu bo bao cao'"
+    paths: [tests/e2e/gac-hydration.ts, tests/e2e/gac-hydration-pha.spec.ts, playwright.config.ts, playwright.db.config.ts, tests/cong-chay.test.ts, db/scripts/ci-db.sh, tests/gac-ci-db.test.ts, _acceptance/don-no-bo-kiem/rang/gac-hydration-pha.mjs]
+    expected: "exit 0 của kịch bản đo: lượt có GAC_HYDRATION_PHA=1 (bài phá chạy cùng hai bài khác, ba luồng) thoát khác 0 và dòng ra có 'gac-hydration: 1 canh bao, bai: gac-hydration pha'; lượt không bật thì thoát 0 và có 'gac-hydration: 0 canh bao'; nạp playwright.db.config.ts thấy bộ báo cáo tests/e2e/gac-hydration.ts trong danh sách, bản sao bỏ nó → 'gac-hydration: playwright.db.config.ts thieu bo bao cao'; bước trình duyệt của bộ có cơ sở dữ liệu (db/scripts/ci-db.sh khong-phien, GAC_HYDRATION_PHA=1) thoát khác 0 với dòng 'gac-hydration: <n> canh bao, bai: … gac-hydration pha', còn bản sao ci-db.sh chỉ ghi list,json thì bước ấy xanh (chỗ hở phép gác đóng lại, lượt 7, Ngoài-18)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E6
     criterion: AC-6

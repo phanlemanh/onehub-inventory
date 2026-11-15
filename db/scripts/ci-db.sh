@@ -85,6 +85,15 @@ chuan_bi() {
   $PSQL_LOGIN -d postgres -X -q -A -t -c "select 'vai nối: ' || current_user" || return 1
 }
 
+# A reporter given on the command line replaces the configuration's reporters, so the hydration guard is named here too
+# (row 1u): without it a hydration warning in these two runs would leave the step green.
+GAC_HYDRATION=./tests/e2e/gac-hydration.ts
+if [ -n "${GAC_HYDRATION_PHA:-}" ]; then
+  KHONG_PHIEN_TEP=(tests/e2e/gac-hydration-pha.spec.ts)
+else
+  KHONG_PHIEN_TEP=(tests/e2e/screens/screens.spec.ts)
+fi
+
 chay() {
   case "$1" in
     chuan-bi) chuan_bi ;;
@@ -94,13 +103,15 @@ chay() {
         --outputFile.json="$OUT/bai-db.json"
       ;;
     co-phien)
-      PLAYWRIGHT_JSON_OUTPUT_NAME="$OUT/co-phien.json" npx playwright test -c playwright.db.config.ts --reporter=list,json
+      PLAYWRIGHT_JSON_OUTPUT_NAME="$OUT/co-phien.json" npx playwright test -c playwright.db.config.ts \
+        --reporter="list,json,$GAC_HYDRATION"
       ;;
     khong-phien)
       # Without the slowed copy (describe «cham», CPU slowed four times): the e2e job already runs it, and the count
-      # receives a slowed test by the normal test of the same size anyway.
-      PLAYWRIGHT_JSON_OUTPUT_NAME="$OUT/khong-phien.json" npx playwright test tests/e2e/screens/screens.spec.ts \
-        --grep-invert "(^| )cham( |$)" --reporter=list,json
+      # receives a slowed test by the normal test of the same size anyway. GAC_HYDRATION_PHA=1 runs the guard's break
+      # test instead, through this same command line (row 1u): the step must then be red with «gac-hydration: 1 canh bao».
+      PLAYWRIGHT_JSON_OUTPUT_NAME="$OUT/khong-phien.json" npx playwright test "${KHONG_PHIEN_TEP[@]}" \
+        --grep-invert "(^| )cham( |$)" --reporter="list,json,$GAC_HYDRATION"
       ;;
     dem) node tests/e2e-db/dem-giao-nhan.ts "$OUT" ;;
   esac
