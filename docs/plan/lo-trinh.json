@@ -1185,11 +1185,12 @@
       "vung": [
         "src/modules/catalog/**",
         "src/modules/listings/ui/**"
-      ]
+      ],
+      "bat_khi": "Căn thêm ở hàng này có đủ vòng đời, ghi đích danh vế nào ở hàng nào: thêm ở hàng này — gõ mã căn có trong danh mục, hoặc tạo căn tay thành căn chờ khớp của sàn (hàng 7e) khi danh mục chưa có; xem trên Bảng hàng và hồ sơ căn; sửa giá và trạng thái theo hàng 4, sửa thông tin khác ở hàng 3g; gỡ căn tạo nhầm để hàng 18b; đưa lên bán để hàng 15"
     },
     {
       "ma": "13",
-      "cau_giao": "Đầu chủ ghi và mở số chủ nhà trên hồ sơ căn",
+      "cau_giao": "Đầu chủ ghi và mở số chủ nhà trên hồ sơ căn, và gỡ được chủ nhà ghi nhầm khỏi căn",
       "vai": "Đầu chủ",
       "tieu_chi": 8,
       "vi_sao": "Cần cho việc gọi giữ tươi. Dữ liệu cá nhân, lưu dạng rõ theo quyết định 0014; ai được thấy số chốt ở Cổng Phạm vi của hàng",
@@ -1207,7 +1208,7 @@
         "src/modules/contacts/**",
         "src/modules/listings/ui/**"
       ],
-      "bat_khi": "Số chủ nhà ghi vào liên hệ, không ghi vào căn; một người có nhiều căn chỉ có một liên hệ"
+      "bat_khi": "Số chủ nhà ghi vào liên hệ, không ghi vào căn; một người có nhiều căn chỉ có một liên hệ; chủ nhà của căn có đủ vòng đời, ghi đích danh vế nào ở hàng nào: ghi chủ nhà và mở số ở hàng này, gỡ chủ nhà khỏi căn ở hàng này, sửa tên và số là sửa liên hệ ở hàng 13a"
     },
     {
       "ma": "13a",
@@ -1253,7 +1254,7 @@
     },
     {
       "ma": "15",
-      "cau_giao": "Đầu chủ tải ảnh lên hồ sơ căn và thấy căn thành Sẵn sàng bán khi đủ điều kiện",
+      "cau_giao": "Đầu chủ tải ảnh lên hồ sơ căn, đổi ảnh bìa, gỡ ảnh và thấy căn thành Sẵn sàng bán khi đủ điều kiện",
       "vai": "Đầu chủ",
       "tieu_chi": 10,
       "vi_sao": "Chỉ căn Sẵn sàng bán mới được gửi cho khách",
@@ -1273,7 +1274,8 @@
       "vung": [
         "src/modules/listings/**",
         "src/modules/listings/ui/**"
-      ]
+      ],
+      "bat_khi": "Ảnh của căn có đủ vòng đời: tải lên, xem, đổi ảnh bìa và gỡ ảnh; đổi thứ tự ảnh có làm hay không là câu hỏi ở Cổng Phạm vi của hàng; pháp lý và tình trạng sử dụng mà điều kiện Sẵn sàng bán đòi thì điền ở hàng 3g"
     },
     {
       "ma": "16",
