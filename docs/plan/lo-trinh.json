@@ -231,6 +231,30 @@
       "dot": "mvp-dot-1"
     },
     {
+      "ma": "1u",
+      "cau_giao": "Bộ kiểm của kho hết bốn nợ làm hàng khác đỏ oan: cổng mạng bị cấm, cảnh báo dựng trang lệch, việc Release đỏ sau mỗi lần gộp, và hai trang quyết định trùng số",
+      "vai": "nen",
+      "tieu_chi": 5,
+      "vi_sao": "Bốn nợ ghi ở sổ đợt nen 2026-11-15: bài kiểm trình duyệt chọn trúng cổng 3659 «Bad port» chừng 1 trên 400 lượt; 15 cảnh báo Hydration trên nhánh chính; việc Release đỏ ở ba lần gộp gần nhất; hai trang quyết định cùng số 0034. Chủ kho 2026-11-15 ở Cổng Đáng: «Cho cả gói, build»",
+      "hang": "T2",
+      "dung_tren": [
+        "1s"
+      ],
+      "slug": "don-no-bo-kiem",
+      "bat_khi": "Khoảng chọn cổng của bài kiểm trình duyệt loại các cổng trình duyệt cấm, có bài kiểm quét cả khoảng; bài trình duyệt trên nhánh chính không còn cảnh báo «Hydration failed» và có bài kiểm đỏ khi cảnh báo ấy xuất hiện lại; hai trang quyết định cùng số 0034 được đánh lại số và có phép kiểm chặn trùng số; việc Release: máy soạn bản đề xuất và nêu nguyên nhân, chủ kho đặt tệp (máy không sửa .github/workflows/)",
+      "nhom": "nen",
+      "vung": [
+        "playwright.config.ts",
+        "tests/e2e/**",
+        "tools/**",
+        "wiki/decisions/**",
+        "wiki/index.md",
+        "src/app/**",
+        "src/components/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "1g",
       "cau_giao": "Agent tra được danh mục ReUI Pro ngay trong kho theo phiên bản đã ghim, không phụ thuộc kết nối ngoài",
       "tieu_chi": 6,
@@ -1516,6 +1540,30 @@
         "tools/**",
         "db/migrations/**"
       ]
+    },
+    {
+      "ma": "22",
+      "cau_giao": "Người của sàn mở inventory.onehub.center, nhận mã qua email và vào đúng sàn của mình trên bản chạy thật; mỗi bản mới đi qua bản thử trước khi lên bản thật, và lùi được về bản trước",
+      "vai": "nen",
+      "tieu_chi": 8,
+      "vi_sao": "Lộ trình không có hàng nào dựng môi trường chạy thật. Chủ kho 2026-11-15 ở phiên giám sát: «Tôi muốn chuyển sang dùng domain inventory.onehub.center như là một cổng quản trị hàng hóa cho đối tác vẫn giữ lại quyhang.onehub.center» và «Hiện nay quyhang cũng chưa ai sử dụng nên dùng nó để so sánh tính năng chứ không cần chuyển dữ liệu». Tài khoản, tên miền, khoá bí mật và hai tệp trong .github/workflows/ là việc của chủ kho ngoài kho, máy chỉ soạn bản đề xuất; chi phí hằng tháng trình ở Cổng Phạm vi",
+      "hang": "T3",
+      "dung_tren": [
+        "10"
+      ],
+      "slug": "moi-truong-thu-va-ban-that",
+      "bat_khi": "Một lệnh đưa bản mới lên bản thử rồi bản thật: áp thay đổi cơ sở dữ liệu trước, kiểm nhanh chỉ đọc sau, kiểm đỏ thì dừng và bản thật không đổi; bản thật thiếu một cấu hình bắt buộc thì không khởi động và nói rõ thiếu gì; bản thật không có bộ dữ liệu mẫu và không có lối chọn vai để thử; bản thật nối cơ sở dữ liệu bằng vai không sở hữu bảng, đúng luật cách ly giữa các sàn, và bộ kiểm cách ly chạy được trên bản thử; thư mã đăng nhập và thư mời gửi từ tên miền đã xác minh, đường trong thư trỏ đúng địa chỉ mới; cơ sở dữ liệu thật có sao lưu hằng ngày và một lần thử khôi phục có ghi lại kết quả; có sổ tay vận hành cho đưa bản lên, lùi bản, xoay khoá bí mật, khôi phục dữ liệu; không khoá bí mật nào nằm trong kho mã",
+      "nhom": "ra-mat",
+      "vung": [
+        "mk/deploy.mk",
+        "db/scripts/**",
+        "tools/**",
+        "docs/van-hanh/**",
+        ".env.example",
+        "src/instrumentation.ts",
+        "src/modules/identity/config.ts"
+      ],
+      "dot": "mvp-dot-1"
     }
   ],
   "chan_troi": [
