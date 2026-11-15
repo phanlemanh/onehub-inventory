@@ -6,9 +6,9 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api]
 screens: [inventory]
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-15
 design_doc: docs/superpowers/specs/2026-11-15-bang-hang-du-lieu-that-design.md
 ---
 
