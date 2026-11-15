@@ -11,6 +11,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { LABELS } from "../../src/generated/labels";
 import type { Role } from "../../src/generated/ontology";
 import { actionVisibility, type ActionName } from "../../src/modules/identity/permissions";
+import { daGan } from "./da-gan";
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const ROLES: Role[] = ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"];
@@ -161,6 +162,8 @@ test("nut-them-toan-man-hinh", async ({ page }, info) => {
       .locator('[data-slot="data-region"] [data-slot="region-toolbar"]')
       .getByRole("button", { name: LABELS.CreateListing.pref }),
   ).toHaveCount(0);
+  // A screenshot hides the caret with an inline style on every input: only once React has hydrated them (row 1u).
+  await daGan(page.locator('[data-slot="data-region"] input'));
   await page.screenshot({ path: `${shots}/thuong-1440.png` });
   await page.locator('[data-slot="full-screen-toggle"]').click();
   await expect(page.locator('[data-slot="data-region"][data-full-screen]')).toBeVisible();

@@ -13,6 +13,7 @@ import { type Page } from "@playwright/test";
 
 import { expect, test } from "../../tools/e2e_templates/fixture";
 import { openSheet, SETTLE_MS, shown } from "../../tools/e2e_templates/settle";
+import { daGan } from "./da-gan";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const PROTO = "/proto/khung-va-giao-dien";
@@ -292,6 +293,8 @@ test.describe("frame", () => {
   test("contrast check fails on a badge with unreadable text", async ({ page }) => {
     await page.goto(PROTO);
     await expect(page.locator('[data-slot="status-badges"] [data-status]')).toHaveCount(6);
+    // Restyle only once React has hydrated the badge, or React reports a mismatch (row 1u).
+    await daGan(page.locator('[data-status="Active"]'));
     await page.evaluate(() => {
       const badge = document.querySelector<HTMLElement>('[data-status="Active"]');
       if (!badge) return;
@@ -419,6 +422,7 @@ test.describe("frame", () => {
     await page.goto(`${PROTO}?state=error`);
     const retry = page.getByRole("button", { name: "Thử lại" });
     await expect(retry).toBeVisible();
+    await daGan(retry);
     // No transition, fixed colours: axe must read the broken pair, not a colour half-way through the button's fade.
     await retry.evaluate((el) => {
       el.style.transition = "none";
