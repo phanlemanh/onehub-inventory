@@ -109,6 +109,8 @@ const STANDARD = [
   "Subdivision",
   "StandardStatus",
   "ListPrice",
+  // Row 19: the company's Về tay column stands right after Giá chào.
+  "NetToSeller",
   "LivingArea",
   "BedroomsTotal",
   "LastConfirmedAt",
@@ -382,7 +384,7 @@ test.describe("lop rieng tren bang hang", () => {
       "Hướng view",
       "Ghi chú",
     ];
-    expect(wantA).toHaveLength(10);
+    expect(wantA).toHaveLength(11);
     const gotA = await headers(pageA);
     const shownRetired = gotA.find((h) => h === "Hoa hồng tạm");
     if (shownRetired) throw new Error(`retired field shown: ${shownRetired}`);
