@@ -2,14 +2,15 @@
 // temporary folder (about 77 000 folders, 200 GB) filled the disk. A test makes its temporary folder through
 // `tempDir()` in tests/support/temp-dir.ts, which removes it when the test file ends; Python uses
 // `TemporaryDirectory`, and a shell script that runs `mktemp -d` removes the folder in a `trap`.
-import { execFileSync } from "node:child_process";
-import { mkdirSync, readFileSync } from "node:fs";
+import { execFileSync, spawn, spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
 import { tempDir } from "./support/temp-dir";
-import { ROOT_PREFIX, staleRoots } from "./support/temp-root";
+import { OWNER_FILE } from "./e2e-db/don-dung-tam";
+import { claimRunRoot, releaseRunRoot, RUNS_DIR } from "./support/temp-root";
 
 const HELPER = "tests/support/temp-dir.ts";
 const RUN_ROOT = "tests/support/temp-root.ts"; // makes the run's own root, removed at teardown
@@ -56,6 +57,22 @@ function violation(path: string, text: string): string | null {
     return null;
   }
   return null;
+}
+
+/** A process id that no longer exists: a child that has already exited. */
+function deadPid(): number {
+  const r = spawnSync(process.execPath, ["-e", "process.stdout.write(String(process.pid))"], {
+    encoding: "utf8",
+  });
+  return Number(r.stdout);
+}
+
+/** A run folder under `runs`, with an owner file naming `pid` (none when null). */
+function run(runs: string, name: string, pid: number | null): string {
+  const dir = join(runs, name);
+  mkdirSync(join(dir, "inside"), { recursive: true });
+  if (pid !== null) writeFileSync(join(dir, OWNER_FILE), `${pid}\n`);
+  return dir;
 }
 
 function trackedFiles(): string[] {
@@ -128,13 +145,48 @@ describe("temporary folders are removed after the test run", () => {
       );
   });
 
-  it("a later run removes only roots of runs that are gone", () => {
+  it("a new run removes only folders whose owner process is gone, never a live run's", () => {
     const base = tempDir("temp-root-");
-    const gone = `${ROOT_PREFIX}999999999-abc`; // no such process
-    const live = `${ROOT_PREFIX}${process.ppid}-abc`;
-    for (const name of [gone, live, "proof-gate-abc", `${ROOT_PREFIX}x`])
-      mkdirSync(join(base, name));
-    expect(staleRoots(base)).toEqual([join(base, gone)]);
+    const runs = join(base, RUNS_DIR);
+    // Another worktree's run, still going: a separate live process owns it.
+    const other = spawn(process.execPath, ["-e", "setInterval(() => {}, 1000)"], {
+      stdio: "ignore",
+    });
+    try {
+      const dead = deadPid();
+      const kinds = {
+        deadOwner: run(runs, "run-dead", dead),
+        liveOther: run(runs, "run-other", other.pid!),
+        // The folder name carries a process id that is gone, the owner file a live one: liveness is never read
+        // from the name.
+        reusedNumber: run(runs, `run-${dead}`, other.pid!),
+        noOwner: run(runs, "run-foreign", null),
+      };
+      const mine = claimRunRoot(base);
+      expect(existsSync(kinds.deadOwner)).toBe(false);
+      for (const kept of [kinds.liveOther, kinds.reusedNumber, kinds.noOwner])
+        expect(existsSync(kept), kept).toBe(true);
+      expect(readFileSync(join(mine, OWNER_FILE), "utf8").trim()).toBe(String(process.pid));
+      releaseRunRoot(mine);
+      expect(existsSync(mine)).toBe(false);
+      expect(existsSync(runs), "the shared folder stays while other runs are in it").toBe(true);
+    } finally {
+      other.kill();
+    }
+  });
+
+  it("the shared folder goes with the last run", () => {
+    const base = tempDir("temp-root-last-");
+    const mine = claimRunRoot(base);
+    releaseRunRoot(mine);
+    expect(readdirSync(base)).toEqual([]);
+  });
+
+  it("this run's folder is owned by a live process that is this worker or its parent", () => {
+    const root = process.env["TMPDIR"] ?? "";
+    expect(root).toContain(`${RUNS_DIR}/run-`);
+    const pid = Number(readFileSync(join(root, OWNER_FILE), "utf8").trim());
+    expect([process.pid, process.ppid]).toContain(pid);
   });
 
   it("the helper removes its folders when the file ends", () => {
