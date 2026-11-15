@@ -1,0 +1,31 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bảng vòng đời 1t</title>
+<style>
+body{font:15px/1.5 system-ui,sans-serif;margin:0;padding:24px;background:#fafaf9;color:#1c1917}
+h1{font-size:20px;margin:0 0 4px}p{margin:4px 0 12px;max-width:72ch}
+.wrap{overflow-x:auto}table{border-collapse:collapse;min-width:900px;background:#fff}
+th,td{border:1px solid #e7e5e4;padding:8px 10px;vertical-align:top;text-align:left}
+th{background:#f5f5f4;font-weight:600}td:first-child{font-weight:600;white-space:nowrap}
+.co{color:#166534}.hang{color:#1e40af}.thieu{color:#b91c1c;font-weight:600}.khong{color:#92400e;font-weight:600}
+small{color:#57534e;display:block}
+</style>
+<h1>Hỏi-3 · Bảng vòng đời đề xuất — chủ kho duyệt một lần</h1>
+<p>Mỗi dòng là một thứ người dùng thấy trên màn. <span class="co">Có</span> = đã có thao tác (hoặc thao tác đã khai, chờ hàng mở).
+<span class="hang">Để hàng</span> = hàng lộ trình sẽ làm. <span class="thieu">Thiếu thật</span> = bản rà soát 14/11 bắt được, máy đề xuất hàng đích.
+<span class="khong">Không</span> = cố ý không có — cần chữ chủ kho.</p>
+<div class="wrap"><table>
+<tr><th>Thứ trên màn</th><th>Thêm</th><th>Xem</th><th>Sửa</th><th>Gỡ</th><th>Thao tác riêng</th></tr>
+<tr><td>Góc nhìn đã lưu<small>Bảng hàng, App Shell</small></td><td class="co">Có — Lưu cách xem</td><td class="co">Có<small>Quản trị sàn thấy Bảng hàng mà không có góc nhìn → để hàng 10</small></td><td class="co">Có — đổi tên, ghi đè</td><td class="co">Có — xoá</td><td>—</td></tr>
+<tr><td>Căn<small>Bảng hàng, App Shell, Tuỳ chỉnh</small></td><td class="hang">Để hàng 12 — thêm căn</td><td class="hang">Để hàng 10 — dữ liệu thật<small>Quản trị sàn mở Bảng hàng mà bảng quyền không cho xem căn → hàng 10</small></td><td class="hang">Giá, trạng thái: có (hàng 4), mở thật ở hàng 10</td><td class="hang">Để hàng 18b — gỡ căn tạo nhầm</td><td><span class="thieu">Sửa pháp lý, nội thất, tài chính, tình trạng → hàng 3g</span><br><span class="hang">Đưa lên bán → hàng 15</span><br><span class="thieu">Nhận căn chưa ai giữ → hàng 18a</span><br><span class="thieu">Đổi người giữ căn → hàng 18a</span></td></tr>
+<tr><td>Chủ nhà và số chủ<small>Bảng hàng</small></td><td class="hang">Để hàng 13</td><td class="hang">Để hàng 13 — mở số<br><span class="khong">Không: Đầu khách, Quản trị sàn không xem số chủ</span><small>chỉ người giữ căn và Trưởng nhóm (bảng quyền 9e)</small></td><td class="hang">Để hàng 18b — sửa qua liên hệ</td><td class="thieu">Gỡ chủ khỏi căn → hàng 13</td><td>—</td></tr>
+<tr><td>Danh mục toà, căn<small>Bảng hàng, App Shell, Tuỳ chỉnh</small></td><td class="hang">Để hàng 12 — tạo căn tay khi danh mục chưa có</td><td class="co">Có</td><td class="khong">Không — danh mục chung, sàn không sửa toà, căn</td><td class="khong">Không — gộp, tách, ngừng toà căn ngoài MVP</td><td>Mã riêng của sàn: chỉ qua nhập (hàng 11)</td></tr>
+<tr><td>Lần gửi<small>Đã gửi</small></td><td class="hang">Để hàng 16 — gửi link</td><td class="thieu">Chưa có dòng quyền xem → hàng 16</td><td class="khong">Không — link đã gửi không sửa<small>Quỹ hàng chốt «đúng thiết kế»</small></td><td class="thieu">Tắt link → hàng 18</td><td>—</td></tr>
+<tr><td>Liên hệ<small>màn Liên hệ (dự kiến)</small></td><td class="hang">Để hàng 13a</td><td class="thieu">Màn Liên hệ → hàng 13a</td><td class="hang">Để hàng 13a</td><td class="hang">Để hàng 13a</td><td><span class="thieu">Gộp hai liên hệ → hàng 13a</span><br><span class="hang">Xoá dữ liệu cá nhân → hàng 18b</span></td></tr>
+<tr><td>Nhãn riêng, trường riêng, từ điển<small>Tuỳ chỉnh của sàn</small></td><td class="co">Có</td><td class="co">Có</td><td class="co">Có</td><td class="co">Có — Ngừng dùng thay Xoá (chủ kho 13/11)</td><td>—</td></tr>
+<tr><td>Mẫu nhập<small>Tuỳ chỉnh của sàn</small></td><td class="hang">Để hàng 11 — tự học khi nhập</td><td class="co">Có</td><td class="co">Có — đổi tên<small>sửa ánh xạ: hàng 11</small></td><td class="co">Có — Ngừng dùng</td><td>—</td></tr>
+<tr><td>Căn chờ khớp<small>Tuỳ chỉnh của sàn</small></td><td class="hang">Để hàng 12</td><td class="co">Có</td><td class="co">Có</td><td class="co">Có — Ngừng dùng</td><td class="co">Khớp với danh mục: có</td></tr>
+<tr><td>Thành viên<small>Thành viên</small></td><td class="co">Có — Mời người</td><td class="co">Có</td><td class="co">Có — Đổi vai</td><td class="thieu">Khoá, gỡ khỏi sàn — chưa có dòng quyền → hàng 18a</td><td>—</td></tr>
+</table></div>
+<p><b>Ô «Không» cần chữ chủ kho (4):</b> danh mục — sửa; danh mục — gỡ; lần gửi — sửa; số chủ — Đầu khách và Quản trị sàn không xem.</p>
+<p><b>Hàng đích cần giám sát thêm vế vào điều kiện bật:</b> 13 (gỡ chủ khỏi căn) · 16 (dòng quyền xem lần gửi) · 18 (tắt link) · 18a (nhận căn, đổi người giữ, khoá và gỡ thành viên).</p>
+<p>Màn không hiện gì: Hôm nay, Đăng nhập. Khoản thuế phí (hàng 19) chưa vào nhánh chính — dãy của hàng 19 khai khi gộp.</p>
