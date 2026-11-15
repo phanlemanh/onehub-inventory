@@ -79,6 +79,11 @@ Quét theo khuôn test-matrix (preset của morphological-scan), không rút g�
 - «lần chạy đầu kê đúng các chỗ thiếu thật … trỏ tới hàng nhận nó hoặc thành câu hỏi» → AC-7 (E7) và Hỏi-3 ở cổng.
 - «theo từng vai» → AC-8 (E8): đỏ ở ô xem, báo cáo ở các ô còn lại (Hỏi-4).
 
+## Vai × Màn
+
+Hàng nền, không dựng hay đổi màn nào (`screens: []`): nó thêm một phép kiểm trong `make check` và dữ liệu khai (khoá `hien`
+của sổ màn, khối `vong_doi` của mô hình nghiệp vụ). Vai chỉ đi vào phép kiểm qua bảng quyền (AC-8).
+
 ## Out of scope
 
 - Kiểm câu bật của hàng đích có nhắc vế được trỏ (vd gộp liên hệ trỏ 13a mà câu bật 13a không nhắc) — bước sau của đề xuất 3.3 RS2; ai quyết: máy (không loại thao tác nào của thứ trên màn; G rà câu bật theo LUAT vii).
