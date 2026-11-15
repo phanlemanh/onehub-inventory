@@ -4,7 +4,7 @@ feature: "Bộ kiểm của kho hết bốn nợ làm hàng khác đỏ oan: c�
 slug: don-no-bo-kiem
 owner: phanlemanh@gmail.com
 risk_tier: T2
-surfaces: [config, tooling]
+surfaces: [config, ci]
 status: draft
 approved_by:
 approved_at:
@@ -44,10 +44,13 @@ Source input: `_acceptance/don-no-bo-kiem/opportunity.md`; design doc ở `desig
   số 0042 (tên tệp và tiêu đề), có dòng trong `wiki/index.md`, và mọi liên kết tới nó trỏ đường mới (`make ontology`
   xanh, không còn đường dẫn `0034-cong-bat-khoi-khong-ke`).
 - AC-7: Given `tools/wiki_lint.py`, When một bản sao kho có hai trang quyết định cùng số, Then lệnh thoát khác 0 với thông
-  điệp ghim «decision number <NNNN> used by» gọi tên hai tệp; kho thật thì xanh.
+  điệp ghim «decision number <NNNN> used by» gọi tên hai tệp. Given bản sao có hai trang quyết định KHÁC số (kể cả hai
+  số liền nhau, và cùng tên đuôi nhưng khác số), Then lệnh KHÔNG đỏ; kho thật thì xanh.
 - AC-8 (judgment): Given bản đề xuất `_acceptance/don-no-bo-kiem/release-de-xuat.md`, When chủ kho đọc nó, Then nó nêu
   nguyên nhân việc Release đỏ bằng dòng lỗi nguyên văn, tên khoá bí mật cần đặt, quyền tối thiểu của khoá, chỗ đặt, lối
-  khác và giá của lối khác — đủ để chủ kho tự làm mà không phải đọc log.
+  khác và giá của lối khác — đủ để chủ kho tự làm mà không phải đọc log. Phần máy đọc được của nó được kiểm ở mỗi lượt
+  ghim lại: tệp có tên khoá `RELEASE_PLEASE_TOKEN`, đúng ba quyền đọc-ghi (Contents, Pull requests, Issues) và không quyền
+  nào trên tệp workflow, và dòng lỗi trùng nguyên văn dòng đã ghim ở design doc.
 - AC-9: Given nhánh của hàng so với nhánh chính, When kê tệp đổi, Then không tệp nào dưới `.github/workflows/`,
   `governance/` hay `PRODUCT-INVARIANTS.md`, không tệp nào của PR #66 (`tools/e2e_templates/suite.ts`,
   `tests/e2e-db/lop-rieng.spec.ts`, `tools/proof_gate/legacy.py`, `db/scripts/ci-thu.sh`, `vitest.config.*`), và
@@ -74,6 +77,8 @@ Bên đọc dò toàn kho bằng tìm chữ (design doc mục «Bên đọc đã
 
 ## Out of scope
 
+- Việc của anh ngoài kho (không chặn hàng): đặt khoá `RELEASE_PLEASE_TOKEN` — ba quyền đọc-ghi, chỉ kho này; hướng dẫn ở
+  `_acceptance/don-no-bo-kiem/release-de-xuat.md`.
 - Sửa `.github/workflows/`, đặt khoá bí mật, đổi cài đặt kho GitHub — việc của chủ kho.
 - Cảnh báo «commit could not be parsed» của release-please (không gây đỏ).
 - Lỗi trình duyệt cố ý khác (ví dụ «pha thu» của ca phá `khong-loi-trinh-duyet`).

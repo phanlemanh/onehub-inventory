@@ -98,6 +98,7 @@ executors:
     so_quyet_dinh: "node _acceptance/don-no-bo-kiem/rang/so-quyet-dinh.mjs --root . && make ontology"   # don-no-bo-kiem: 0042 renumbered, indexed, no old link, no shared number
     wiki_so_trung: "npx vitest run tests/wiki-lint-so-trung.test.ts --coverage.enabled=false --reporter=verbose"   # don-no-bo-kiem: wiki_lint red on two decision pages with one number
     ranh_gioi_1u: "node _acceptance/don-no-bo-kiem/rang/ranh-gioi.mjs --root ."   # don-no-bo-kiem: no owner file and no file of PR #66 changed
+    release_de_xuat: "node _acceptance/don-no-bo-kiem/rang/release-de-xuat.mjs --root ."   # don-no-bo-kiem: the release proposal names the secret, exactly three read-write permissions, and the pinned error line
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files

@@ -68,7 +68,7 @@ evals:
     cmd: config:executors.script.wiki_so_trung
     layer: backend-effect
     paths: [tools/wiki_lint.py, tests/wiki-lint-so-trung.test.ts]
-    expected: "exit 0; bài xanh trên bản sao lành và thấy wiki_lint đỏ với 'decision number 0034 used by' gọi tên hai tệp trên bản sao thêm một trang 0034 trùng"
+    expected: "exit 0; bài xanh trên bản sao lành; bản sao thêm một trang 0034 trùng → wiki_lint đỏ với 'decision number 0034 used by' gọi tên hai tệp; ba bản sao KHÁC số (0042 và 0043 liền nhau; cùng tên đuôi khác số; kho thật) → wiki_lint KHÔNG đỏ"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E8
     criterion: AC-8
@@ -77,6 +77,14 @@ evals:
     question: "Đối chiếu bản đề xuất với design doc: dòng lỗi có trùng nguyên văn dòng ở mục «Gốc đã tìm» 3 không; tên khoá và quyền có đúng và CHỈ đúng các quyền ở mục «Nợ 3» không (không quyền trên tệp workflow); có chỗ đặt, lối khác và giá lối khác không; và một chủ kho làm theo được mà không đọc log không?"
     expected: "PASS khi đủ sáu điều và không bảo chủ kho sửa tệp workflow"
     evidence_required: [run_id, verdict, votes]
+  - id: E8b
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.release_de_xuat
+    layer: backend-effect
+    paths: [_acceptance/don-no-bo-kiem/release-de-xuat.md, docs/superpowers/specs/2026-11-15-don-no-bo-kiem-design.md, _acceptance/don-no-bo-kiem/rang/**]
+    expected: "exit 0; dòng 'release-de-xuat: khoa RELEASE_PLEASE_TOKEN, ba quyen doc-ghi, dong loi khop'. Chiều đỏ (cùng kịch bản, bản sao): bỏ quyền Issues → 'release-de-xuat: thieu quyen Issues'; thêm 'Workflows: Read and write' → 'release-de-xuat: quyen thua Workflows'; sửa một chữ của dòng lỗi → 'release-de-xuat: dong loi khong khop design doc'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E9
     criterion: AC-9
     executor: script
