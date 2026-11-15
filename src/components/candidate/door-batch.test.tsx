@@ -42,7 +42,7 @@ function cellDoor(answers: Partial<Record<string, WriteOutcome>> = {}) {
     });
   const writes = (cells: readonly string[]): DoorBatchWrite[] =>
     cells.map((cell) => ({
-      what: `Căn ${cell} · Giá chào`,
+      what: `Dòng ${cell} · Cột 1`,
       write: save(cell, 2, answers[cell]),
       undo: save(cell, 1, answers[`undo:${cell}`]),
     }));
@@ -51,7 +51,7 @@ function cellDoor(answers: Partial<Record<string, WriteOutcome>> = {}) {
 
 const batch = (writes: DoorBatchWrite[]): DoorBatch => ({
   writes,
-  done: (saved) => PASTE_COPY.done(saved, `${saved} căn`),
+  done: (saved) => PASTE_COPY.done(saved, `${saved} dòng`),
   partly: (saved, failed, why) => PASTE_COPY.partly(saved, failed, PASTE_COPY.why[why]),
   noneSaved: (why) => PASTE_COPY.noneSaved(PASTE_COPY.why[why]),
   undone: (count, kept) =>
@@ -82,7 +82,7 @@ describe("ap-mot-lan-n-lan-ghi", () => {
     ]);
     const notices = toast.mock.calls.length + toast.error.mock.calls.length;
     expect(notices, `ap-mot-lan-n-lan-ghi: ${notices} thông báo`).toBe(1);
-    expect(toast.mock.calls[0]![0]).toBe("Đã đổi 3 ô của 3 căn.");
+    expect(toast.mock.calls[0]![0]).toBe("Đã đổi 3 ô của 3 dòng.");
   });
 });
 
@@ -155,7 +155,7 @@ describe("hoan-tac-hong-bao-ro", () => {
       { duration: number; action: { label: string } },
     ];
     expect(message, "hoan-tac-hong-bao-ro").toBe(
-      "Chưa hoàn tác được — mất kết nối mạng. Vẫn mang giá trị mới: Căn 1102 · Giá chào.",
+      "Chưa hoàn tác được — mất kết nối mạng. Vẫn mang giá trị mới: Dòng 1102 · Cột 1.",
     );
     expect(options.duration).toBe(Number.POSITIVE_INFINITY);
     expect(options.action.label).toBe(FRAME_COPY.retry);

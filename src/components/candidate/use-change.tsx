@@ -223,7 +223,7 @@ export async function runDoorChange(change: DoorChange): Promise<WriteOutcome> {
   return outcome;
 }
 
-/** One write of a batch (row 5): `what` names the cell when its undo fails («Căn 1101 · Giá chào»). */
+/** One write of a batch (row 5): `what` names the cell when its undo fails (row and column, in the screen's words). */
 export interface DoorBatchWrite {
   write: () => Promise<WriteOutcome>;
   /** Absent when the change cannot be undone. */

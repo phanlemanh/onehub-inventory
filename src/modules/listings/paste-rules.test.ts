@@ -3,6 +3,10 @@
 import { describe, expect, it } from "vitest";
 
 import { readPastePrice, readPasteStatus, readStatusText, type PasteCell } from "./index";
+import type { ListingStandardStatus } from "@/generated/ontology";
+import { statusLabel } from "@/lib/format";
+/** A status as the label table words it (labels are never written by hand in src, tests/language.test.ts). */
+const S = (status: ListingStandardStatus, tx?: "sale" | "lease") => statusLabel(status, tx);
 
 type Case = readonly [
   name: string,
@@ -38,7 +42,7 @@ const CASES: readonly Case[] = [
   ["gia 4,65", "price", ACTIVE, "4,65", "wrong"],
   ["gia -5 tỷ", "price", ACTIVE, "-5 tỷ", "wrong"],
   ["gia 1001 tỷ", "price", ACTIVE, "1001 tỷ", "wrong"],
-  ["trang thai Đang giao dịch", "status", ACTIVE, "Đang giao dịch", "change", "Pending"],
+  ["trang thai giao dich", "status", ACTIVE, S("Pending"), "change", "Pending"],
   ["trang thai khong dau", "status", ACTIVE, "dang giao dich", "change", "Pending"],
   ["trang thai chu hoa", "status", ACTIVE, "TẠM NGỪNG", "change", "Hold"],
   [
@@ -53,18 +57,18 @@ const CASES: readonly Case[] = [
     "trang thai cho thue",
     "status",
     { standardStatus: "Hold", transaction: "lease" },
-    "Đang cho thuê",
+    S("Active", "lease"),
     "change",
     "Active",
   ],
-  ["trang thai giu cho", "status", { standardStatus: "Pending" }, "Đang bán", "change", "Active"],
+  ["trang thai giu cho", "status", { standardStatus: "Pending" }, S("Active"), "change", "Active"],
   ["trang thai la", "status", ACTIVE, "Còn hàng", "wrong"],
   ["trang thai so", "status", ACTIVE, "1", "wrong"],
   [
     "trang thai ban o can thue",
     "status",
     { standardStatus: "Hold", transaction: "lease" },
-    "Đang bán",
+    S("Active"),
     "wrong",
   ],
   ["o trong gia", "price", ACTIVE, "", "same"],
@@ -103,10 +107,10 @@ const SKIPS: readonly (readonly [
     "4,2 tỷ",
     "locked",
   ],
-  ["khoa-da-ban-trang-thai", "status", { standardStatus: "Closed" }, "Đang bán", "locked"],
-  ["nac-khong-di-duoc", "status", { standardStatus: "Pending" }, "Tạm ngừng", "move"],
-  ["nac-da-ban", "status", { standardStatus: "Active" }, "Đã bán", "closed-needs"],
-  ["nac-ngung-han", "status", { standardStatus: "Hold" }, "Ngừng hẳn", "withdrawn-needs"],
+  ["khoa-da-ban-trang-thai", "status", { standardStatus: "Closed" }, S("Active"), "locked"],
+  ["nac-khong-di-duoc", "status", { standardStatus: "Pending" }, S("Hold"), "move"],
+  ["nac-da-ban", "status", { standardStatus: "Active" }, S("Closed"), "closed-needs"],
+  ["nac-ngung-han", "status", { standardStatus: "Hold" }, S("Withdrawn"), "withdrawn-needs"],
 ];
 
 describe("ly-do-bo-tu-luat", () => {
@@ -136,16 +140,16 @@ describe("nguong-dan-dau-phan-tram", () => {
 
 describe("hoan-tac-duoc-khi-dan", () => {
   it("a move whose way back is not allowed is pasted as not undoable", () => {
-    const read = readPasteStatus({ standardStatus: "Incomplete" }, "Đang bán");
+    const read = readPasteStatus({ standardStatus: "Incomplete" }, S("Active"));
     expect(read).toMatchObject({ kind: "change", undoable: false });
   });
   it("a move whose way back is allowed is undoable", () => {
-    expect(readPasteStatus({ standardStatus: "Active" }, "Tạm ngừng")).toMatchObject({
+    expect(readPasteStatus({ standardStatus: "Active" }, S("Hold"))).toMatchObject({
       undoable: true,
     });
   });
   it("the dictionary reads each status word back to its status", () => {
-    expect(readStatusText("Chưa đủ để rao")).toBe("Incomplete");
-    expect(readStatusText("Đã cho thuê", "lease")).toBe("Closed");
+    expect(readStatusText(S("Incomplete"))).toBe("Incomplete");
+    expect(readStatusText(S("Closed", "lease"), "lease")).toBe("Closed");
   });
 });

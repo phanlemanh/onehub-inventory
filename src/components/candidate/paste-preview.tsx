@@ -13,7 +13,7 @@ import { Item } from "@/components/ui/item";
 import { FormDialog } from "./form-dialog";
 import { PASTE_COPY } from "./paste-copy";
 
-/** One cell that will change. `where` names the row (e.g. «Căn 1101»), `field` the column's header. */
+/** One cell that will change. `where` names the row (the unit code, as the screen words it), `field` the column's header. */
 export interface PasteChangeLine {
   id: string;
   where: string;
@@ -39,7 +39,7 @@ export interface PasteOutLine {
 
 export interface PastePreviewProps {
   open: boolean;
-  /** «Dán vào 3 căn»: the screen names its rows. */
+  /** «Dán vào» and the count of rows, in the screen's own word for a row. */
   title: string;
   changes: readonly PasteChangeLine[];
   skipped: readonly PasteOutLine[];

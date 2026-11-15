@@ -16,6 +16,10 @@ import type { InventoryField } from "./inventory-rows";
 import { planPaste } from "./listing-paste";
 import { useListingCellEdit } from "./use-listing-cell-edit";
 import { sampleSaveDoor, type SaveRequest } from "../save-door";
+import type { ListingStandardStatus } from "@/generated/ontology";
+import { statusLabel } from "@/lib/format";
+/** A status as the label table words it (labels are never written by hand in src, tests/language.test.ts). */
+const S = (status: ListingStandardStatus, tx?: "sale" | "lease") => statusLabel(status, tx);
 
 const toast = vi.hoisted(() => Object.assign(vi.fn(), { error: vi.fn() }));
 vi.mock("sonner", () => ({ toast }));
@@ -105,26 +109,26 @@ const REASONS: readonly (readonly [string, RegionPaste, string])[] = [
   [
     "khoa-da-ban",
     paste([cell(CLOSED, "Listing.listPrice", "5 tỷ")]),
-    "Đã bán — giữ nguyên như lúc bán",
+    `${S("Closed")} — giữ nguyên như lúc bán`,
   ],
   [
     "nac-khong-di-duoc",
-    paste([cell(HOLD, "Listing.standardStatus", "Đang giao dịch")]),
-    "từ Tạm ngừng không sang Đang giao dịch được",
+    paste([cell(HOLD, "Listing.standardStatus", S("Pending"))]),
+    `từ ${S("Hold")} không sang ${S("Pending")} được`,
   ],
   [
     "nac-da-ban",
-    paste([cell(ACTIVE, "Listing.standardStatus", "Đã bán")]),
-    "Đã bán cần giá chốt và ngày bán — mở ô để đổi",
+    paste([cell(ACTIVE, "Listing.standardStatus", S("Closed"))]),
+    `${S("Closed")} cần giá chốt và ngày bán — mở ô để đổi`,
   ],
   [
     "nac-ngung-han",
-    paste([cell(ACTIVE, "Listing.standardStatus", "Ngừng hẳn")]),
-    "Ngừng hẳn cần lý do ngừng — mở ô để đổi",
+    paste([cell(ACTIVE, "Listing.standardStatus", S("Withdrawn"))]),
+    `${S("Withdrawn")} cần lý do ngừng — mở ô để đổi`,
   ],
   [
     "dong-nhom",
-    paste([cell(ACTIVE, "Listing.listPrice", "5 tỷ", { group: "Toà A" })]),
+    paste([cell(ACTIVE, "Listing.listPrice", "5 tỷ", { group: "A1" })]),
     "cột này không sửa trên bảng",
   ],
   ["phan-thua", paste([cell(ACTIVE, "Listing.listPrice", "4,7 tỷ")], { rows: 2, columns: 1 }), ""],
@@ -145,7 +149,7 @@ describe("ly-do-bo-du-10", () => {
         return;
       }
       expect(plan.skipped.map((s) => s.why)).toEqual([why]);
-      if (name === "dong-nhom") expect(plan.skipped[0]?.where).toBe("Dòng nhóm «Toà A»");
+      if (name === "dong-nhom") expect(plan.skipped[0]?.where).toBe("Dòng nhóm «A1»");
     });
   }
 });
@@ -217,7 +221,7 @@ describe("noi-phien-ban", () => {
       hook.result.current.cellEdit!.paste!({
         cells: [
           { row: LISTED, field: "Listing.listPrice", raw: "2,8 tỷ", open: true },
-          { row: LISTED, field: "Listing.standardStatus", raw: "Tạm ngừng", open: true },
+          { row: LISTED, field: "Listing.standardStatus", raw: S("Hold"), open: true },
         ],
         beyond: { rows: 0, columns: 0 },
       }),

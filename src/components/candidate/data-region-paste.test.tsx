@@ -121,18 +121,18 @@ describe("chua-ghi-truoc-khi-ap", () => {
   it("chua-ghi-truoc-khi-ap: a paste hands every cell to the screen and changes no row", async () => {
     const { paste, editorOpened } = show(asRole("ListAgent"));
     await select(cellOf(0, PRICE));
-    await pasteText(cellOf(0, PRICE), "2,8 tỷ\tTạm ngừng\n7 tỷ\tĐang bán\n4,3 tỷ\tĐã bán\n");
+    await pasteText(cellOf(0, PRICE), "2,8 tỷ\tchữ a\n7 tỷ\tchữ b\n4,3 tỷ\tchữ c\n");
     // One hand-over for the whole region: the screen opens the preview once and writes only on «Áp».
     const calls = paste.mock.calls.length;
     expect(calls, `chua-ghi-truoc-khi-ap: ${calls} lần ghi`).toBe(1);
     const handed = paste.mock.calls[0]![0];
     expect(handed.cells.map((c) => `${c.row.id}|${c.field}|${c.raw}`)).toEqual([
       "a|Listing.listPrice|2,8 tỷ",
-      "a|Listing.standardStatus|Tạm ngừng",
+      "a|Listing.standardStatus|chữ a",
       "b|Listing.listPrice|7 tỷ",
-      "b|Listing.standardStatus|Đang bán",
+      "b|Listing.standardStatus|chữ b",
       "c|Listing.listPrice|4,3 tỷ",
-      "c|Listing.standardStatus|Đã bán",
+      "c|Listing.standardStatus|chữ c",
     ]);
     expect(handed.beyond).toEqual({ rows: 0, columns: 0 });
     expect(editorOpened, "chua-ghi-truoc-khi-ap: no editor opens").not.toHaveBeenCalled();
@@ -142,7 +142,7 @@ describe("chua-ghi-truoc-khi-ap", () => {
   it("a region larger than the grid says how much fell outside", async () => {
     const { paste } = show(asRole("ListAgent"));
     await select(cellOf(2, PRICE));
-    await pasteText(cellOf(2, PRICE), "1 tỷ\tĐang bán\tx\n2 tỷ\tĐang bán\tx\n");
+    await pasteText(cellOf(2, PRICE), "1 tỷ\tchữ b\tx\n2 tỷ\tchữ b\tx\n");
     expect(paste.mock.calls[0]![0].beyond).toEqual({ rows: 1, columns: 1 });
   });
 });
