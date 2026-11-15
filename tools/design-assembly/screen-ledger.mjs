@@ -15,6 +15,9 @@ const HEADER = [
   "#   family  the `nhom` of the page of its kind under design/patterns, or null",
   "#   status  built (the screen exists) | planned (declared ahead, not built yet)",
   "#   states  the names of the states it shows, as the code that reaches them names them",
+  "#   shows   the entities of ontology/ it shows",
+  "#   entry   the action of ontology/actions.yaml a role must hold to open it, or null for every role",
+  "#   actions the actions of ontology/actions.yaml it has buttons for",
   "# The code that reaches each state is the screen list of the application. Keep this file in",
   "# block style.",
 ];
@@ -69,6 +72,14 @@ export function renderScreenLedger({ families = {}, screens = [] }) {
     lines.push(`    title: ${quote(screen.title)}`);
     lines.push(`    family: ${quote(screen.family)}`);
     lines.push(`    status: ${screen.status ?? "built"}`);
+    // What the screen shows, opens with and offers, when it says so.
+    for (const key of ["shows", "entry", "actions"]) {
+      if (!(key in screen)) continue;
+      if (Array.isArray(screen[key])) {
+        if (screen[key].length === 0) lines.push(`    ${key}: []`);
+        else lines.push(`    ${key}:`, ...screen[key].map((name) => `      - ${quote(name)}`));
+      } else lines.push(`    ${key}: ${quote(screen[key])}`);
+    }
     if ((screen.states ?? []).length > 0) {
       lines.push("    states:");
       for (const state of screen.states) lines.push(`      - ${quote(state)}`);

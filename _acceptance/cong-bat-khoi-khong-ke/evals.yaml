@@ -1,0 +1,58 @@
+schema_version: 1
+feature_slug: cong-bat-khoi-khong-ke
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'tệp tự làm phải có chỗ kê' trong tools/proof_gate/proof-gate-1q.test.ts dựng kho mẫu có design/so-khoi.yaml và mục sổ thành phần src/components/candidate/khoi-moi.tsx (KhoiMoi) không ở chỗ nào: lưới thoát 1, đầu ra có đúng một dòng mã 'khoi-khong-ke', dòng chứa 'src/components/candidate/khoi-moi.tsx', 'KhoiMoi' và chuỗi 'chưa kê ở sổ khối, danh sách có trước hay bảng Khối của hồ sơ đang mở nào'; ma trận đối chứng viết trước bốn chỗ (sổ khối theo tep, sổ khối theo ten, danh sách có trước của kho mẫu, bảng Khối của hồ sơ draft), khẳng định số ca bằng 4, mỗi ca trên bản sao của CÙNG kho không còn dòng 'khoi-khong-ke'; trên CÙNG kho đỏ thêm một tệp dưới src/components/ui/ và một dưới src/components/reui/: lưới vẫn thoát 1 với đúng một dòng 'khoi-khong-ke' nêu 'khoi-moi.tsx', không dòng nào nêu tệp nhà cung cấp; thêm tệp src/components/templates/x/khoi-long.tsx không ở chỗ nào → có dòng 'khoi-khong-ke' chứa đúng 'src/components/templates/x/khoi-long.tsx'; bỏ design/so-khoi.yaml khỏi kho đỏ thì không có dòng 'khoi-khong-ke'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'chỗ kê theo trạng thái hồ sơ' với ma trận viết trước 6 trạng thái × 2 chỗ (bảng Khối của '## Màn', bảng Khối của '## Khuôn app-shell'), khẳng định số ô bằng 12; draft, approved, implemented, verified → không dòng 'khoi-khong-ke'; signed-off, machine-cleared → đúng một dòng 'khoi-khong-ke' nêu tệp; kết quả hai chỗ trùng nhau theo từng trạng thái"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'hai hình sổ thành phần': băm sha256 của tools/proof_gate/fixtures/so-thanh-phan-pr58.json bằng băm ghim (bản sao từng byte của design/component-registry.json ở a7e2c81d15f93bf3e3ec9195851b3dc430eaf627); bộ đọc của cổng (model.load_repo qua một kho mẫu chỉ chứa sổ ấy) cho region-header.tsx đúng tập {RegionTitle, RegionToolbar, RegionHeader} ở hình PR #58, và trên design/component-registry.json thật của kho cho region-header.tsx tập chứa RegionHeader; ma trận viết trước 2 hình (sổ thật của kho làm khuôn cộng một mục KhoiA/KhoiB theo đúng hình ấy · sổ PR #58 cộng hai mục cùng file) × 2 ca (bảng Khối nêu KhoiB · không bảng nào nêu), khẳng định số ô bằng 4; ca nêu KhoiB → không dòng 'khoi-khong-ke'; ca không nêu → đúng một dòng 'khoi-khong-ke' chứa tên tệp, 'KhoiA' và 'KhoiB', ở cả hai hình"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'không cần git' dựng thư mục bin tạm chỉ chứa liên kết tới python3, chạy lưới trên kho đỏ và kho đã kê của AC-1 với PATH = thư mục ấy và với PATH thường; mã thoát và stdout trùng nhau từng cặp; đối chứng: kho đỏ vẫn thoát 1 với 'khoi-khong-ke' khi không có git; bài đọc tools/proof_gate/check.py và model.py, khẳng định không có 'subprocess' và không có 'import legacy' mới ngoài dòng 'from legacy import History' đã có"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**, design/component-registry.json, design/so-khoi.yaml]
+    expected: "exit 0; bài 'kho thật' chạy lưới trên gốc kho, thoát 0; đọc tools/proof_gate/thanh-phan-co-truoc.yaml, tập tep bằng đúng tập ghim trong bài; mỗi tep có trong design/component-registry.json, không bắt đầu bằng src/components/ui/ hay src/components/reui/, không là tep của dòng nào ở design/so-khoi.yaml, và ly_do không rỗng; kho mẫu với danh sách có trước một dòng thiếu tep → thoát 1, mã 'doc-loi', dòng chứa 'thanh-phan-co-truoc.yaml'; một dòng thiếu ly_do → cùng mã và tên tệp"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; bài 'số cho kit và khuôn' chạy check.py --report --json: một tệp chưa kê có hai thành phần (hình PR #58) → khoá 'khoi_khong_ke' bằng 1; hai tệp chưa kê → 2; đã kê → 0; tools/proof_gate/khuon-chung-minh.md chứa chuỗi 'ngoài thư mục nhà cung cấp'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.proof_gate
+    paths: [tools/proof_gate/**]
+    expected: "exit 0; mọi bài của tools/proof_gate/proof-gate.test.ts và tools/proof_gate/proof-gate-0023.test.ts đạt trong cùng lượt, gồm bài ghim băm git '0f59c79f8582471005018f1f7323ee2baf0037b4' của proof-gate.test.ts"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

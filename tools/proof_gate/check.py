@@ -20,6 +20,10 @@ the whole screen (new family, new reference) or the wrapping template; from `imp
 taken into the store, «Vùng» and «Cách» for every ReUI block, its line in the block ledger, and «trong kho» looked up
 in the ledger instead of the generated registry. A contract with `khuon_boc: <id>` (an id of
 tools/proof_gate/khuon-boc.yaml) proves the template in `## Khuôn <id>`, not the screens it wraps.
+Row 1q, while both design/so-khoi.yaml and tools/proof_gate/thanh-phan-co-truoc.yaml exist: every file of the generated component register outside the supplier
+folders must be declared somewhere — a ledger line (its `tep`, or its `ten` naming a component of the file), the list
+of files made before row 1q (tools/proof_gate/thanh-phan-co-truoc.yaml, frozen), or the «Khối» table of an open
+contract naming a component of the file. No git: the frozen list stands for "already on the main branch".
 Each problem is one line `<where> · <screen> · <code>: <sentence>`. Template: tools/proof_gate/khuon-chung-minh.md.
 """
 
@@ -36,6 +40,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from legacy import History
 from model import (
+    BEFORE_1Q_FILE,
     CLOSED,
     CONTEXT_PAGES_DIR,
     LEDGER_FILE,
@@ -44,6 +49,7 @@ from model import (
     NEW_REFERENCE,
     OPEN,
     PROOF_FILE,
+    REGISTRY_FILE,
     Contract,
     Repo,
     ScreenProof,
@@ -113,6 +119,7 @@ class Tally:
     rung_drops: int = 0
     transition: int = 0
     ledger_lines: int = 0
+    undeclared: int = 0
 
 
 def path_of(repo: Repo, screen: str) -> str:
@@ -599,6 +606,37 @@ def judge_template(repo: Repo, c: Contract, tid: str, *, new: bool, full: bool, 
             check_intake(repo, c, p, emit)
 
 
+# ---------------------------------------------------------------- row 1q
+
+UNDECLARED = "khoi-khong-ke"
+
+
+def check_undeclared(repo: Repo, contracts: list[Contract]) -> list[Finding]:
+    """Row 1q: an own file of the register that no ledger line, no line of the list made before row 1q and no «Khối»
+    table of an open contract declares. The unit is the file, so both shapes of the register read the same."""
+    declared_names: set[str] = {str(e.get("ten") or "") for e in repo.ledger}
+    declared_files: set[str] = {str(e.get("tep") or "") for e in repo.ledger} | repo.before_1q
+    for c in contracts:
+        if c.status not in OPEN:
+            continue
+        for part in list(c.proofs.values()) + list(c.templates.values()):
+            declared_names.update(bare(r.get("khối", "")) for r in block_rows(part))
+    out: list[Finding] = []
+    for path, names in sorted(repo.own_files().items()):
+        if path in declared_files or any(n in declared_names for n in names):
+            continue
+        out.append(
+            Finding(
+                REGISTRY_FILE,
+                path,
+                UNDECLARED,
+                f"tệp {path} ({', '.join(names)}) mới trong sổ thành phần mà chưa kê ở sổ khối, danh sách có trước hay "
+                f"bảng Khối của hồ sơ đang mở nào — kê nó vào bảng Khối của hồ sơ đang dựng ({BEFORE_1Q_FILE} không lớn thêm)",
+            )
+        )
+    return out
+
+
 # ---------------------------------------------------------------- whole repo
 
 
@@ -627,6 +665,10 @@ def run(root: Path) -> tuple[list[Finding], Tally, dict[str, int]]:
     tally.ledger_lines = len(repo.ledger)
     if repo.ledger_present:
         findings.extend(check_ledger(repo, by_slug))
+    if repo.ledger_present and repo.before_1q_present:
+        undeclared = check_undeclared(repo, contracts)
+        tally.undeclared = len(undeclared)
+        findings.extend(undeclared)
 
     for c in contracts:
         new = repo.ledger_present and c.slug not in repo.transition
@@ -717,6 +759,7 @@ def main(argv: list[str] | None = None) -> int:
             "roi_bac": tally.rung_drops,
             "nhap_kho": tally.ledger_lines,
             "chuyen_tiep": tally.transition,
+            "khoi_khong_ke": tally.undeclared,
             "loi": len(findings),
         }
         if args.json:
@@ -726,6 +769,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"theo lối: họ mới {tally.by_path[NEW_FAMILY]} · màn mẫu mới {tally.by_path[NEW_REFERENCE]} · theo mẫu {tally.by_path[FOLLOWS]}")
             print(f"chỗ lệch: có lý do {tally.with_reason} · vô cớ {tally.unjustified} · rơi bậc: {tally.rung_drops}")
             print(f"sổ khối: {tally.ledger_lines} dòng nhập kho · hồ sơ chuyển tiếp còn mở: {tally.transition}")
+            print(f"tệp tự làm chưa kê: {tally.undeclared}")
         return 0
     for f in findings:
         print(f.line())

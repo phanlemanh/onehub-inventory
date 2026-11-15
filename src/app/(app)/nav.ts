@@ -12,6 +12,7 @@ import { visibleNav } from "@/components/templates/nav-items";
 import { STATUS_ORDER } from "@/components/candidate/grid-view";
 import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { label } from "@/modules/company-config";
+import { allowedScope } from "@/modules/identity";
 import { LAYER_PARTS_SHOWN, PART_TITLE } from "@/modules/company-config/ui";
 import { inventoryStatusHref } from "@/modules/listings/ui";
 
@@ -41,6 +42,25 @@ export function navFor({
         }
       : item,
   );
+}
+
+/**
+ * Whether the screen at `href` turns these roles away (row 2b, AC-9): its sidebar entry's action, which the register's
+ * `vao` must equal (tests/vai-man-so-man.test.ts), read through the permission table as the members page does (row 9b).
+ * An entry without an action lets every role in, so the rule moves with design/screens.yaml and nav.ts, not a role list.
+ */
+export function entryRefused(
+  nav: readonly NavItem[],
+  href: string,
+  roles: readonly Role[],
+): boolean {
+  const action = entryAction(nav, href);
+  return action !== undefined && allowedScope(roles, action) === null;
+}
+
+/** The action that opens the screen at `href`, or undefined when every role may enter it. */
+export function entryAction(nav: readonly NavItem[], href: string): NavItem["action"] {
+  return nav.find((item) => item.href === href)?.action;
 }
 
 /** The top-bar search (row 3f) leads to the inventory, so it shows by the same rule as the inventory's entry. */
