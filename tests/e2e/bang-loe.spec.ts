@@ -12,8 +12,12 @@
 //   tro-nang-ve-doi — in each frame drawn twice, what a screen reader can reach in the region repeats no id, every id an
 //     aria-controls, aria-labelledby, aria-describedby or label points to is there, and the region's name is heard once.
 // The break cases remove one layout's hiding class in every frame and expect the pinned message.
+//   mot-nhanh-sau-nhan-trang — once the region is marked hydrated the page holds one layout only (tables, cards counted
+//     in the page, hidden or not), and the wait for that mark fails with a pinned message when it is missing.
 // Each test sets its own viewport and runs once, in the 360 project.
 import { expect, test, type Page } from "@playwright/test";
+
+import { regionReady } from "./phone-list";
 
 test.beforeEach(() => {
   test.skip(test.info().project.name !== "360", "sets its own viewport; runs once");
@@ -171,6 +175,69 @@ test.describe("tro-nang-ve-doi", () => {
     });
     expect(() => assertTree(1440, frames)).toThrow(
       /^1440: ve doi lo cay tro nang — .*ten vung doc 2 lan/,
+    );
+  });
+});
+
+// Once the region is marked hydrated it holds one layout only, in the page and not just on screen: the old browser tests
+// count tables and cards in the page after waiting for that mark (tests/e2e/phone-list.ts, D-1511-13).
+/** Throws a pinned message when, after the mark, the page still holds the other layout. */
+async function assertOneBranch(page: Page, width: number, phone: boolean): Promise<void> {
+  const tables = await page.locator('[data-slot="data-region"] table').count();
+  const cards = await page.locator('[data-slot="phone-card"]').count();
+  if (phone && (tables > 0 || cards === 0))
+    throw new Error(`${width}: sau khi nhan trang con nhanh bang (bang ${tables}, the ${cards})`);
+  if (!phone && (cards > 0 || tables === 0))
+    throw new Error(`${width}: sau khi nhan trang con nhanh the (bang ${tables}, the ${cards})`);
+}
+
+async function openReady(page: Page, width: number, height: number): Promise<void> {
+  await page.setViewportSize({ width, height });
+  await page.goto("/inventory?vai=ListAgent");
+  await regionReady(page);
+}
+
+test.describe("mot-nhanh-sau-nhan-trang", () => {
+  for (const { width, height, phone } of SIZES)
+    test(`${width}: once hydrated the page holds ${phone ? "cards only" : "the table only"}`, async ({
+      page,
+    }) => {
+      await openReady(page, width, height);
+      await assertOneBranch(page, width, phone);
+    });
+
+  test("break: a hidden table left in the region at 360 is named", async ({ page }) => {
+    await openReady(page, 360, 800);
+    await page.evaluate(() => {
+      const t = document.createElement("table");
+      t.hidden = true;
+      document.querySelector('[data-slot="data-region"]')!.append(t);
+    });
+    await expect(assertOneBranch(page, 360, true)).rejects.toThrow(
+      /^360: sau khi nhan trang con nhanh bang \(bang 1, the \d+\)$/,
+    );
+  });
+
+  test("break: the mark taken off, the wait fails and says the region is not hydrated", async ({
+    page,
+  }) => {
+    await openReady(page, 360, 800);
+    await page.evaluate(() =>
+      document.querySelector('[data-slot="data-region"]')!.removeAttribute("data-hydrated"),
+    );
+    await expect(regionReady(page, 1_000)).rejects.toThrow(
+      "region not hydrated (vung chua nhan trang): shown 1, hydrated 0",
+    );
+  });
+
+  test("break: two regions shown, the wait fails and counts them", async ({ page }) => {
+    await openReady(page, 360, 800);
+    await page.evaluate(() => {
+      const r = document.querySelector('[data-slot="data-region"]')!;
+      r.after(r.cloneNode(true));
+    });
+    await expect(regionReady(page, 1_000)).rejects.toThrow(
+      "region not hydrated (vung chua nhan trang): shown 2, hydrated 2",
     );
   });
 });

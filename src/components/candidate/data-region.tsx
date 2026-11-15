@@ -1304,6 +1304,9 @@ export function DataRegion({
       ) : null}
       <section
         data-slot="data-region"
+        // VP4: set once the browser has taken over the server's HTML and drawn one layout only. Tests that read the
+        // region wait for it (tests/e2e/phone-list.ts); the frames before it are watched by tests/e2e/bang-loe.spec.ts.
+        data-hydrated={phoneLayout === undefined ? undefined : ""}
         data-full-screen={fullScreen || undefined}
         style={REGION_HEIGHTS}
         className="group/region mr-(--record-pinned,0px) flex min-w-0 flex-col bg-background"

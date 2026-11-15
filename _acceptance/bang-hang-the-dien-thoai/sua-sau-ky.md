@@ -19,3 +19,26 @@ duyệt, chỉ đổi sau khi trang chạy JS. HTML máy chủ vì thế luôn l
 Chứng ngược: chạy bài mới trên mã cũ của nhánh chính → đỏ «360: bang hien o khung 1» và «414: bang hien o khung 1».
 Bài cũ không đổi cách tìm: `tests/e2e/the-dien-thoai.spec.ts` 32/32 xanh ở 360, bài đơn vị và thành phần 1045/1045 xanh.
 Hàm đo bề rộng dùng chung (`src/hooks/use-mobile.ts`, thanh bên và hồ sơ căn) không đổi.
+
+## Lượt 2 — CI đỏ trên PR #70 (`a049714`)
+
+CI chạy trên máy chậm, trình duyệt nhận trang muộn. Trước lúc ấy vùng còn chứa cả hai bố cục, một cái bị ẩn. 19 bài cũ
+đếm phần tử (kể cả phần ẩn) ngay khi dòng hiện, nên thấy «bảng 1, thẻ 60» hoặc hai chỗ đếm dòng. Không phải mất mạng hay
+máy ngủ: lỗi lặp y nguyên, 0 lần thử lại. Chứng: giữ các tệp script 6 giây ở máy → cách chờ cũ ra đúng «table 1, cards
+60», cách chờ mới ra «table 0, cards 60».
+
+| Chỗ | Người dùng thấy khác gì | Phép |
+| --- | --- | --- |
+| Vùng gắn dấu `data-hydrated` khi trình duyệt đã nhận trang và chỉ còn một bố cục (`src/components/candidate/data-region.tsx`) | Không | XONG D-1511-13 |
+| `tests/e2e/phone-list.ts`: `regionReady` chờ đúng một vùng đang hiện mang dấu ấy, trần 20 giây, hết trần thì đỏ «region not hydrated (vung chua nhan trang): shown N, hydrated M»; `rowsShown` chờ nó trước khi đếm — đổi LÚC đo, không đổi cách tìm | Không | XONG D-1511-13 |
+| `tests/e2e/the-dien-thoai.spec.ts`: `openAt()` chờ `regionReady` thay vì chờ phần tử vùng đầu tiên (bài :92 đỏ chập chờn trên PR #66 vì trúng hai vùng đang ẩn) | Không | G-1511-47 |
+| `tests/e2e/bang-loe.spec.ts`: sau khi nhận trang, trang chỉ còn một nhánh (bảng 0 ở 360/414, thẻ 0 ở 1440, đếm cả phần ẩn); ba ca phá: bảng ẩn còn sót, mất dấu, hai vùng hiện | Không | XONG D-1511-13 |
+
+Bài đổi lúc đo (qua `rowsShown`, cách tìm giữ nguyên), 360 và 414:
+`screens/inventory-width.spec.ts:66`, `screens/open-cell-truncate.spec.ts:75`, `sheet.spec.ts:125`, `sheet.spec.ts:285`,
+`sheet.spec.ts:620`, `sheet.spec.ts:1085`, `sheet.spec.ts:1145`, `sua-tren-o.spec.ts:235`; qua `openAt()`:
+`the-dien-thoai.spec.ts:51` (768, 1024, 1440) và `the-dien-thoai.spec.ts:92`.
+
+Chưa xong, ngoài ranh giới đã cho: `loi-vao-ho-so.spec.ts:196`, `:215`, `:490` (hai chỗ «Không có dòng nào khớp») và
+`e2e-db/goc-nhin.spec.ts:445`, `:672` (hai chỗ đếm dòng). Lớp «vẽ chân vùng và trạng thái rỗng một lần» không làm: hai
+chỗ ấy nằm ở hai vị trí khác nhau trên màn (thanh trên của thẻ, chân bảng), gộp lại là đổi điều người dùng thấy.

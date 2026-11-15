@@ -13,6 +13,8 @@ import { expect, test, type Page } from "@playwright/test";
 import { REGION } from "../../tools/e2e_templates/recipes";
 import { runMain } from "../../tools/e2e_templates/runner";
 
+import { regionReady } from "./phone-list";
+
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const SHOTS = process.env.SHOTS_DIR;
 
@@ -25,7 +27,8 @@ const cards = (page: Page) => page.locator('[data-slot="phone-card"]');
 async function openAt(page: Page, width: number, query = "", height = 800): Promise<void> {
   await page.setViewportSize({ width, height });
   await page.goto(`/inventory?vai=ListAgent${query}`);
-  await page.locator('[data-slot="data-region"]').waitFor();
+  // One region shown, holding one layout (G-1511-47): read early, the page can hold the region twice, both hidden.
+  await regionReady(page);
   await page.waitForLoadState("networkidle");
 }
 
