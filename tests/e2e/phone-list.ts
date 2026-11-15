@@ -3,6 +3,7 @@
 // filter through the filter sheet, and — for checks that only a table has (sheet keys, frozen columns, column widths,
 // full screen) — measure on a phone that the table is absent and the card list present, never skip empty.
 import { expect, type Page } from "@playwright/test";
+import { suaTrang } from "./sua-trang";
 
 /** Cards below this width, the table from it (src/hooks/use-mobile.ts). */
 export const PHONE_BELOW = 768;
@@ -11,8 +12,36 @@ export const isPhone = (page: Page): boolean => (page.viewportSize()?.width ?? 1
 
 export const phoneCards = (page: Page) => page.locator('[data-slot="phone-card"]');
 
-/** The region has drawn its rows: table rows from 768 px, cards below it. */
+/**
+ * VP4: until the browser takes over the server's HTML the region holds both layouts, one hidden by the stylesheet, so a
+ * count read then sees both. The region marks the moment it draws one layout only (`data-hydrated`, set by
+ * src/components/candidate/data-region.tsx). Waits until exactly one region is shown and it carries the mark; throws a
+ * pinned message naming what it measured when that does not happen within `timeout`.
+ */
+export async function regionReady(page: Page, timeout = 20_000): Promise<void> {
+  const measure = () =>
+    page.locator('[data-slot="data-region"]').evaluateAll((els) => {
+      const shown = els.filter((e) => e.checkVisibility());
+      return {
+        shown: shown.length,
+        ready: shown.filter((e) => e.hasAttribute("data-hydrated")).length,
+      };
+    });
+  const until = Date.now() + timeout;
+  let last = await measure();
+  while (!(last.shown === 1 && last.ready === 1)) {
+    if (Date.now() > until)
+      throw new Error(
+        `region not hydrated (vung chua nhan trang): shown ${last.shown}, hydrated ${last.ready}`,
+      );
+    await page.waitForTimeout(50);
+    last = await measure();
+  }
+}
+
+/** The region has drawn its rows: table rows from 768 px, cards below it, once the region holds one layout. */
 export async function rowsShown(page: Page): Promise<void> {
+  await regionReady(page);
   if (isPhone(page)) await phoneCards(page).first().waitFor();
   else await page.locator('[data-slot="data-region"] tbody tr').first().waitFor();
 }
@@ -111,7 +140,7 @@ export async function phoneStandInBreak(
 ): Promise<void> {
   await page.goto(path);
   await rowsShown(page);
-  await page.evaluate(() =>
+  await suaTrang(page, () =>
     document.querySelectorAll('[data-slot="phone-card"]').forEach((el) => el.remove()),
   );
   await expect(assertCardsNotTable(page, check)).rejects.toThrow(

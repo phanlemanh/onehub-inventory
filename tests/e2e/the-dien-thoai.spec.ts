@@ -13,6 +13,9 @@ import { expect, test, type Page } from "@playwright/test";
 import { REGION } from "../../tools/e2e_templates/recipes";
 import { runMain } from "../../tools/e2e_templates/runner";
 
+import { regionReady } from "./phone-list";
+import { chupAnh, themKieu } from "./sua-trang";
+
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const SHOTS = process.env.SHOTS_DIR;
 
@@ -25,7 +28,8 @@ const cards = (page: Page) => page.locator('[data-slot="phone-card"]');
 async function openAt(page: Page, width: number, query = "", height = 800): Promise<void> {
   await page.setViewportSize({ width, height });
   await page.goto(`/inventory?vai=ListAgent${query}`);
-  await page.locator('[data-slot="data-region"]').waitFor();
+  // One region shown, holding one layout (G-1511-47): read early, the page can hold the region twice, both hidden.
+  await regionReady(page);
   await page.waitForLoadState("networkidle");
 }
 
@@ -163,7 +167,7 @@ test("du-lieu-bien (E8): long codes, big prices, rent and no price fit at 360", 
   if (SHOTS) {
     mkdirSync(SHOTS, { recursive: true });
     await edge.first().scrollIntoViewIfNeeded();
-    await page.screenshot({ path: join(SHOTS, "E8-bien-360-sang.png") });
+    await chupAnh(page, { path: join(SHOTS, "E8-bien-360-sang.png") });
   }
 });
 
@@ -186,7 +190,7 @@ test.describe("vai (E9)", () => {
       await expect(page.getByRole("button", { name: "Cột" })).toHaveCount(0);
       if (SHOTS && role === "CompanyAdmin") {
         mkdirSync(SHOTS, { recursive: true });
-        await page.screenshot({ path: join(SHOTS, "E9-quan-tri-360.png") });
+        await chupAnh(page, { path: join(SHOTS, "E9-quan-tri-360.png") });
       }
     });
   }
@@ -201,7 +205,7 @@ test.describe("vai (E9)", () => {
     await expect(page.locator('[data-slot="page-state"][data-kind="forbidden"]')).toHaveCount(0);
     if (SHOTS) {
       mkdirSync(SHOTS, { recursive: true });
-      await page.screenshot({ path: join(SHOTS, "E9-quan-tri-1440.png") });
+      await chupAnh(page, { path: join(SHOTS, "E9-quan-tri-1440.png") });
     }
   });
 });
@@ -275,7 +279,7 @@ test.describe("vung-cham (G-1411-130)", () => {
 
   test("break: a touch target shrunk to the button is caught", async ({ page }) => {
     await openAt(page, 360);
-    await page.addStyleTag({
+    await themKieu(page, {
       content: '[data-slot="touch-target"] { width: 36px !important; height: 36px !important; }',
     });
     await expect(checkTouchTargets(page)).rejects.toThrow(

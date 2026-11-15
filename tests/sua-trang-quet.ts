@@ -16,13 +16,9 @@ export const ON_PURPOSE = new Set(["tests/e2e/gac-hydration-pha.spec.ts"]);
 
 /**
  * Files another open pull request is changing; they move to the door once it is merged (supervisor ruling V-1511-16:
- * row 1u merges only when this list is empty). PR #66 is merged and its two files moved. PR #70: phone-list.ts,
- * the-dien-thoai.spec.ts.
+ * row 1u merges only when this list is empty). Empty: PR #66 and PR #70 are merged and their files moved.
  */
-export const CHO_PR: ReadonlyMap<string, string> = new Map([
-  ["tests/e2e/phone-list.ts", "#70"],
-  ["tests/e2e/the-dien-thoai.spec.ts", "#70"],
-]);
+export const CHO_PR: ReadonlyMap<string, string> = new Map();
 
 /**
  * The body of an init script without its changes to elements it created itself and to `document.head`: a style added

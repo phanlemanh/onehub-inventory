@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-16 — Inventory no longer flashes the table before the cards on a phone (VP4, debt of row 2b): the region draws both layouts until the browser takes over, then marks itself hydrated — [PR #70](https://github.com/phanlemanh/onehub-inventory/pull/70).
 - 2026-11-15 — Bộ kiểm hết bốn nợ làm hàng khác đỏ oan (hàng 1u): cổng chạy thử bỏ ba cổng Chrome từ chối (`tests/e2e/cong-chay.ts`); ca phá khung chờ thôi làm lệch trang lúc gắn và phép gác làm lượt trình duyệt đỏ khi «Hydration failed» quay lại (`tests/e2e/gac-hydration.ts`); trang quyết định của hàng 1q đổi số thành [0042](decisions/0042-cong-bat-khoi-khong-ke.md) và `tools/wiki_lint.py` chặn trùng số; việc Release đỏ vì kho chưa có khoá `RELEASE_PLEASE_TOKEN` — đề xuất cho chủ kho ở `_acceptance/don-no-bo-kiem/release-de-xuat.md`.
 - 2026-11-15 — Bản thật ở `inventory.onehub.center`, Quỹ hàng giữ địa chỉ cũ chỉ để đối chiếu, không chuyển dữ liệu; thêm hàng 22 và 1u, hàng 21 thành chân trời H13 — [0041](decisions/0041-ban-that-o-dia-chi-rieng.md).
 - 2026-11-15 — Three early reads fixed (row 7e, 2e after signature): the inventory header check reads each column title from the header's structure once the grid hydrates, the grid probe waits for sign-in or a grid before its verdict, and the proof gate waits for another run's git history lock in a shallow copy — [#66](https://github.com/phanlemanh/onehub-inventory/pull/66).
