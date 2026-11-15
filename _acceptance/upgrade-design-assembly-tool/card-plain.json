@@ -1,0 +1,40 @@
+{
+  "feature_plain": "Inventory chạy đúng bản công cụ thiết kế mà plugin design-assembly phát hành (bản 0.1.0), ghi lại bản ấy, và sổ linh kiện lại biết bộ lọc dựng từ những phần nào.",
+  "will_do": [
+    { "id": "AC-1", "p": "Sẽ giữ cổng kiểm của kho xanh, vẫn 17 quyết định thiết kế máy giữ, và sổ linh kiện khớp mã (291 linh kiện)." },
+    { "id": "AC-2", "p": "Sẽ chứng minh công cụ trong kho trùng từng byte với bản 0.1.0, đối chiếu với chính sổ phát hành của plugin, và dấu phiên bản nói đúng như thế." },
+    { "id": "AC-3", "p": "Sẽ cho sổ linh kiện ghi lại ba quan hệ «dựng từ» của bộ lọc mà lần chép tay 15/11 làm mất, và không đổi gì khác trong sổ." },
+    { "id": "AC-4", "p": "Sẽ chứng minh lần lên đời chỉ ghi tám tệp: sáu tệp công cụ, sổ linh kiện và dấu phiên bản." },
+    { "id": "AC-5", "p": "Sẽ giữ bài kiểm sổ linh kiện và cổng chứng minh màn vẫn đạt." },
+    { "id": "AC-6", "p": "Sẽ chứng minh cả nhánh, ngoài tám tệp ấy, chỉ đổi tệp của chính hồ sơ này." }
+  ],
+  "wont_do": [
+    { "id": "OOS-1", "p": "Không chấm cách lệnh lên đời của plugin chạy; lệnh ấy có bài kiểm ở kho design-assembly." },
+    { "id": "OOS-2", "p": "Không chép bước cổng mới của plugin sang kho này (xem Hỏi-1)." },
+    { "id": "OOS-3", "p": "Không thêm phép kiểm thường trực canh công cụ sau khi gộp (xem Hỏi-1)." },
+    { "id": "OOS-4", "p": "Không ghim lại hay sửa hồ sơ chép công cụ ngày 15/11 đã ký." },
+    { "id": "OOS-5", "p": "Không đụng các giới hạn đã ghi ở hai hồ sơ trước, trừ quan hệ «dựng từ» mà AC-3 đo." },
+    { "id": "OOS-6", "p": "Không đổi giao diện, mã sản phẩm, dữ liệu hay luật sản phẩm." },
+    { "id": "OOS-7", "p": "Không sửa lời báo sai của lệnh lên đời khi kho chưa cài thư viện; việc ấy đã ghi ở sổ giới hạn của plugin." }
+  ],
+  "scope_plain": "Những gì cố ý để ngoài:",
+  "coverage_plain": [
+    { "i": 0, "p": "Phủ theo ba thứ lệnh lên đời đã viết và những bên đọc chúng; không quét không gian tiêu chí vì danh sách tệp đổi đã đóng." },
+    { "i": 3, "p": "Sáu tệp công cụ: AC-2 (trùng bản 0.1.0) so cả thư mục." },
+    { "i": 4, "p": "Sổ linh kiện ghi lại: AC-3 (ba quan hệ dựng từ) và AC-1 (sổ khớp mã)." },
+    { "i": 5, "p": "Dấu phiên bản mới: AC-2 (dấu nói đúng bản)." },
+    { "i": 6, "p": "Những thứ lệnh không được ghi (stylesheet, sổ token, dữ liệu lệnh kiểm, dòng người viết, bước cổng): AC-4 cho lần lên đời, AC-6 cho cả nhánh." },
+    { "i": 7, "p": "Nguồn của con số ghim: AC-2 đọc sổ phát hành thật của plugin." },
+    { "i": 8, "p": "Lệnh kiểm vẫn giữ đủ quyết định: AC-1 (vẫn 17 quyết định, 20 lệnh kiểm)." },
+    { "i": 9, "p": "Bên đọc sổ linh kiện: AC-5 (bài kiểm sổ, cổng chứng minh màn) và AC-1 (cổng kiểm của kho)." },
+    { "i": 10, "p": "Cách lệnh lên đời chạy: ngoài phạm vi, lệnh có bài kiểm ở kho design-assembly." },
+    { "i": 11, "p": "Dòng nhật ký wiki: ngoài phạm vi, cổng kiểm giữ định dạng của nó." }
+  ],
+  "gap_probe_plain": [
+    { "i": 0, "p": "Ba lựa chọn máy tự quyết dựa vào câu của một hồ sơ cũ, như thể người đã quyết. Đã sửa: mỗi lựa chọn nay nêu lý do riêng của vòng này." },
+    { "i": 1, "p": "Việc sau khi gộp không gì canh công cụ là việc chỉ anh quyết được, mà chưa ai hỏi. Đã đưa thành Hỏi-1; lời hứa ghi một giới hạn sang plugin đã làm xong." },
+    { "i": 2, "p": "Chưa nói rõ lỗi ở công cụ thì sửa thế nào. Đã ghi: không sửa tay, sửa ở plugin rồi lên đời lại." },
+    { "i": 3, "p": "Chỉ đo lần lên đời, chưa đo cả nhánh. Đã thêm AC-6 và phép đo đỏ khi nhánh chạm sổ token hay bước cổng." },
+    { "i": 4, "p": "Con số phiên bản chỉ chép từ nhánh, chưa đối chiếu nguồn. Đã thêm phép đo đọc sổ phát hành thật của plugin." }
+  ]
+}
