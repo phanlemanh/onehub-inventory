@@ -211,6 +211,26 @@
       "dot": "mvp-dot-1"
     },
     {
+      "ma": "1t",
+      "cau_giao": "Sổ màn khai mỗi màn hiện những thứ gì, và bộ kiểm của kho (make check) đỏ khi một thứ trên màn thiếu thêm, xem, sửa hoặc gỡ theo từng vai, trừ khi ô thiếu mang lý do đã duyệt trỏ tới một hàng lộ trình",
+      "vai": "nen",
+      "tieu_chi": 8,
+      "vi_sao": "Bản rà soát thêm · xem · sửa · xoá theo vai ngày 2026-11-14 kê 21 thứ người dùng thấy trên màn: 7 thao tác thiếu thật, 5 thao tác chỉ «để hàng sau» trên giấy, 7 ô máy tự loại mà không thành câu hỏi; chủ kho đã tự bắt ba lần (hàng 7e, 2b, 19). Phép kiểm bộ nút hiện chỉ so nút đã khai và sổ màn không khai màn hiện thứ gì, nên thao tác chưa từng khai thì không ai thấy thiếu; luật bằng chữ đã có ba lần và vẫn rơi. Bản rà soát xếp phép kiểm máy này là đề xuất số một. Chủ kho 2026-11-15 ở Cổng Đáng của đợt hàng kế: «Cho cả đợt». Phép kiểm nằm trong thư mục công cụ của kho, nên hàng này là T3",
+      "hang": "T3",
+      "dung_tren": [
+        "9b",
+        "9e"
+      ],
+      "slug": "kiem-vong-doi-thao-tac",
+      "bat_khi": "Sổ màn có trường khai các thứ mỗi màn hiện; mô hình nghiệp vụ khai vòng đời của từng thứ, mỗi thao tác thêm, sửa, gỡ trỏ một trong ba: tên thao tác trong bảng quyền, mã một hàng lộ trình, hoặc «không» kèm mã quyết định của chủ kho; phép kiểm chạy trong make check và đỏ đúng câu khi một thứ trên màn thiếu một thao tác mà không trỏ được chỗ nào, hay ghi «không» mà không trỏ quyết định nào; ca phá gỡ thao tác gỡ căn khỏi bảng quyền làm phép kiểm đỏ đúng câu; lần chạy đầu kê đúng các chỗ thiếu thật của bản rà soát ngày 2026-11-14, mỗi chỗ được trỏ tới hàng nhận nó hoặc thành câu hỏi cho chủ kho trước khi phép kiểm xanh",
+      "nhom": "nen",
+      "vung": [
+        "tools/coverage_matrix/**",
+        "design/screens.yaml"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "1g",
       "cau_giao": "Agent tra được danh mục ReUI Pro ngay trong kho theo phiên bản đã ghim, không phụ thuộc kết nối ngoài",
       "tieu_chi": 6,
@@ -695,6 +715,27 @@
       "dot": "mvp-dot-1"
     },
     {
+      "ma": "3g",
+      "cau_giao": "Đầu chủ sửa được thông tin của căn ngoài giá và trạng thái — pháp lý, nội thất, tài chính, tình trạng sử dụng — ngay trong sản phẩm, không phải nhập lại tệp",
+      "vai": "Đầu chủ",
+      "tieu_chi": 8,
+      "vi_sao": "Bản rà soát thêm · xem · sửa · xoá theo vai ngày 2026-11-14: hàng 4 và hàng 3d chỉ cho sửa giá và trạng thái; pháp lý, nội thất, tài chính, tình trạng sử dụng không hàng nào cho điền ngoài đường nhập tệp, dù hồ sơ căn của hàng 3b đã hiện bốn trường ấy. Đứng trước hàng 15 vì điều kiện Sẵn sàng bán đòi pháp lý và tình trạng sử dụng. Luật sửa, câu lỗi và hoàn tác đã có ở hàng 4; chỗ sửa — trên ô hay trong hồ sơ căn — chốt ở Cổng Phạm vi của hàng. Chủ kho 2026-11-15 ở Cổng Đáng của đợt hàng kế: «Cho cả đợt»",
+      "hang": "T2",
+      "dung_tren": [
+        "10",
+        "4",
+        "3b"
+      ],
+      "slug": "sua-thong-tin-can",
+      "bat_khi": "Vai được sửa căn điền và đổi được pháp lý, nội thất, tài chính, tình trạng sử dụng của lần chào đang mở, ở máy tính và điện thoại; lưu xong thì hồ sơ căn và mức đủ thông tin hiện giá trị mới; kiểm tra, câu lỗi và hoàn tác dùng đúng luật của hàng 4, không viết luật thứ hai; nút sửa chỉ hiện cho vai được sửa, qua bộ nút theo quyền của hàng 9e; căn điền đủ pháp lý và tình trạng sử dụng ở đây thì không còn thiếu hai phần ấy khi sang hàng 15",
+      "nhom": "bang-hang",
+      "vung": [
+        "src/modules/listings/**",
+        "src/modules/listings/ui/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "2b",
       "cau_giao": "Đầu chủ và Đầu khách mở Bảng hàng trên điện thoại thấy danh sách thẻ căn và chạm thẻ để mở hồ sơ căn",
       "vai": "Đầu chủ",
@@ -1169,6 +1210,26 @@
       "bat_khi": "Số chủ nhà ghi vào liên hệ, không ghi vào căn; một người có nhiều căn chỉ có một liên hệ"
     },
     {
+      "ma": "13a",
+      "cau_giao": "Đầu chủ và Đầu khách mở màn Liên hệ và thấy liên hệ của sàn trên Lưới, thêm, sửa, gỡ được liên hệ và gộp được hai liên hệ trùng, theo quyền của vai",
+      "vai": "Đầu chủ",
+      "tieu_chi": 10,
+      "vi_sao": "Bản rà soát thêm · xem · sửa · xoá theo vai ngày 2026-11-14: sổ màn khai màn Liên hệ là «dự kiến» từ hàng 1d nhưng không hàng lộ trình nào dựng màn ấy; dòng quyền gộp liên hệ có từ hàng 9e mà không hàng nào nhận; liên hệ chỉ được tạo ngầm qua hàng 13 và hàng 18. Bản rà soát đề xuất một hàng T3 «Liên hệ trên Lưới» đứng trước hàng 18b, để hàng 18b chỉ còn xoá dữ liệu cá nhân. Đứng sau hàng 13 vì liên hệ đầu tiên là chủ nhà ghi ở hàng 13. Chủ kho 2026-11-15 ở Cổng Đáng của đợt hàng kế: «Cho cả đợt»",
+      "hang": "T3",
+      "dung_tren": [
+        "10",
+        "13"
+      ],
+      "slug": "lien-he-tren-luoi",
+      "bat_khi": "Màn Liên hệ mở được cho vai có quyền xem liên hệ, vai khác thấy «Không đủ quyền»; danh sách dùng Lưới chung của họ Lưới, lọc ở ô dưới tiêu đề cột (hàng 2e); liên hệ có đủ vòng đời trên màn này: xem, thêm, sửa, gỡ và gộp hai bản ghi của cùng một người thành một, nút đi qua bộ nút theo quyền của hàng 9e và đúng các ô của bảng quyền; gỡ thì liên hệ rời danh sách, còn ghi ai gỡ và lúc nào; xoá dữ liệu cá nhân theo yêu cầu để hàng 18b; đủ bốn khổ màn hình",
+      "nhom": "giu-tuoi",
+      "vung": [
+        "src/modules/contacts/**",
+        "src/app/(app)/contacts/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "14",
       "cau_giao": "Đầu chủ mở Hôm nay, thấy một danh sách việc và ghi kết quả cuộc gọi",
       "vai": "Đầu chủ",
@@ -1199,7 +1260,8 @@
       "hang": "T3",
       "dung_tren": [
         "10",
-        "3b"
+        "3b",
+        "3g"
       ],
       "slug": "anh-va-san-sang-ban",
       "nhom": "giu-tuoi",
@@ -1317,7 +1379,8 @@
         "9a",
         "13",
         "18",
-        "9e"
+        "9e",
+        "13a"
       ],
       "slug": "sua-go-xoa-du-lieu",
       "phu": [
