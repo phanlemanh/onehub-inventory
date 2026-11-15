@@ -39,6 +39,9 @@ Bài đổi lúc đo (qua `rowsShown`, cách tìm giữ nguyên), 360 và 414:
 `sheet.spec.ts:620`, `sheet.spec.ts:1085`, `sheet.spec.ts:1145`, `sua-tren-o.spec.ts:235`; qua `openAt()`:
 `the-dien-thoai.spec.ts:51` (768, 1024, 1440) và `the-dien-thoai.spec.ts:92`.
 
-Chưa xong, ngoài ranh giới đã cho: `loi-vao-ho-so.spec.ts:196`, `:215`, `:490` (hai chỗ «Không có dòng nào khớp») và
-`e2e-db/goc-nhin.spec.ts:445`, `:672` (hai chỗ đếm dòng). Lớp «vẽ chân vùng và trạng thái rỗng một lần» không làm: hai
-chỗ ấy nằm ở hai vị trí khác nhau trên màn (thanh trên của thẻ, chân bảng), gộp lại là đổi điều người dùng thấy.
+Thêm theo XONG D-1511-14, mỗi hàm một dòng `await regionReady(page)`, cách tìm giữ nguyên:
+`loi-vao-ho-so.spec.ts` qua `openInventory` (`:196`, `:215`, `:490`, hai chỗ «Không có dòng nào khớp») và
+`e2e-db/goc-nhin.spec.ts` qua `settled` (`:445`, `:672`, hai chỗ đếm dòng).
+
+Lớp «vẽ chân vùng và trạng thái rỗng một lần» không làm (G cho bỏ, XONG D-1511-14): hai chỗ ấy nằm ở hai vị trí khác
+nhau trên màn (thanh trên của thẻ, chân bảng), gộp lại là đổi điều người dùng thấy.
