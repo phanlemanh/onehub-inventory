@@ -1,1 +1,1 @@
-no-network: playwright spec, no browser tool
+driver: playwright test (no browser-tool network); webserver started by playwright config; no app traffic dump

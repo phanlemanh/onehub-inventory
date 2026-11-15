@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "thue-phi",
-  "ghi_luc": "2026-11-15T19:45:05Z",
-  "vong_cham": 7,
+  "ghi_luc": "2026-11-15T21:26:11Z",
+  "vong_cham": 8,
   "luot": [
     {
       "vong": 1,
@@ -44,6 +44,11 @@
       "vong": 7,
       "verdict": "PENDING-JUDGMENT",
       "tang": []
+    },
+    {
+      "vong": 8,
+      "verdict": "PENDING-JUDGMENT",
+      "tang": []
     }
   ],
   "lam_lai": [
@@ -76,18 +81,18 @@
   "chua_phan": [],
   "thuoc_vat": {
     "vat": [
-      1110,
-      49
+      1242,
+      72
     ],
     "thuoc": [
-      16,
-      16
+      18,
+      18
     ],
     "nhat": 1
   },
   "gio_may": {
-    "gio_may": 38.76,
-    "gio_cho": 26.72,
-    "phan_tram_tuan": 86.86
+    "gio_may": 39.85,
+    "gio_cho": 27.32,
+    "phan_tram_tuan": 88.26
   }
 }

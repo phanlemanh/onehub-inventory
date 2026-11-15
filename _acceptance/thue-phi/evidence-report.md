@@ -3,10 +3,11 @@ schema_version: 2
 feature_slug: thue-phi
 verdict: PENDING-JUDGMENT
 failed_evals: []
+reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: b171fb04125daf21073039ab6a9aec3837036be9
+verified_commit: 4efd99daaaa147b6e3511ae230a4fede080f3b6b
 human_signoff:
 ---
 
@@ -14,149 +15,216 @@ human_signoff:
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
-| E1 | AC-1 | test | PASS (carry-forward từ round 6) |
-| E2 | AC-2 | test | PASS (carry-forward từ round 6) |
-| E2-ui | AC-2 | ui-check | PASS (carry-forward từ round 6) |
-| E3 | AC-3 | script | PASS (carry-forward từ round 6) |
-| E3-unit | AC-3 | test | PASS (carry-forward từ round 6) |
-| E3-ui | AC-3 | ui-check | PASS (carry-forward từ round 6) |
-| E4 | AC-4 | script | PASS (carry-forward từ round 6) |
-| E4-unit | AC-4 | test | PASS (carry-forward từ round 6) |
-| E4-ui | AC-4 | ui-check | PASS (carry-forward từ round 6) |
-| E5 | AC-5 | test | PASS (carry-forward từ round 6) |
-| E6 | AC-6 | test | PASS |
+| E1 | AC-1 | test | PASS |
+| E2 | AC-2 | test | PASS |
+| E2-ui | AC-2 | ui-check | PASS |
+| E3 | AC-3 | script | PASS |
+| E3-unit | AC-3 | test | PASS |
+| E3-ui | AC-3 | ui-check | PASS |
+| E4 | AC-4 | script | PASS |
+| E4-unit | AC-4 | test | PASS |
+| E4-ui | AC-4 | ui-check | PASS |
+| E5 | AC-5 | test | PASS (carried từ round 6) |
+| E6 | AC-6 | test | PASS (carried từ round 7) |
 | E6-e2e | AC-6 | script | PASS |
-| E6-ui | AC-6 | ui-check | PASS (carry-forward từ round 6) |
-| E7 | AC-7 | script | PASS (carry-forward từ round 2) |
-| E7-db | AC-7 | script | PASS (carry-forward từ round 6) |
+| E6-ui | AC-6 | ui-check | PASS (carried từ round 6) |
+| E7 | AC-7 | script | PASS |
+| E7-db | AC-7 | script | PASS |
 | E8 | AC-8 | script | PASS |
-| E8-wiki | AC-8 | judgment | PASS (đề xuất của hội đồng, chờ người chốt) |
-| E6-khuon | AC-6 | script | PASS (carry-forward từ round 6) |
-| E6-floor | AC-6 | script | PASS (carry-forward từ round 6) |
-| E9 | AC-9 | test | PASS (carry-forward từ round 6) |
-| E9-ui | AC-9 | ui-check | PASS (carry-forward từ round 6) |
-| E9-khuon | AC-9 | script | PASS (carry-forward từ round 6) |
-| E10 | AC-10 | script | PASS (carry-forward từ round 6) |
-| E10-ui | AC-10 | ui-check | PASS (carry-forward từ round 6) |
+| E8-wiki | AC-8 | judgment | UNCERTAIN |
+| E6-khuon | AC-6 | script | PASS (carried từ round 6) |
+| E6-floor | AC-6 | script | PASS |
+| E9 | AC-9 | test | PASS |
+| E9-ui | AC-9 | ui-check | PASS |
+| E9-khuon | AC-9 | script | PASS |
+| E10 | AC-10 | script | PASS |
+| E10-ui | AC-10 | ui-check | PASS |
 
 ## Evidence
 
-- eval: E6
-  run_id: minted-thue-phi-E6-r7
+- eval: E1
+  run_id: minted-thue-phi-E1-r8
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.test.thue_phi_ontology
-  verified_at: 2026-11-15T19:33:06Z
+  verifier: config:executors.test.thue_phi
+  verified_at: 2026-11-15T21:12:43Z
   output: |
-    npx vitest run tests/thue-phi-ontology.test.ts tests/thue-phi-cot.test.ts tests/thue-phi-cot-an.test.tsx --coverage.enabled=false --reporter=verbose
-    1 lần chạy, 1 lần đạt; ba tệp xanh.
+    vitest fee-schedule.test.ts + fee-part.test.tsx, 1 run, all passed.
+
+- eval: E2
+  run_id: minted-thue-phi-E2-r8
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.thue_phi
+  verified_at: 2026-11-15T21:12:43Z
+  output: |
+    vitest fee-schedule.test.ts + fee-part.test.tsx, 1 run, all passed.
+
+- eval: E3-unit
+  run_id: minted-thue-phi-E3-unit-r8
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.thue_phi
+  verified_at: 2026-11-15T21:12:43Z
+  output: |
+    vitest fee-schedule.test.ts + fee-part.test.tsx, 1 run, all passed.
+
+- eval: E4-unit
+  run_id: minted-thue-phi-E4-unit-r8
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.thue_phi
+  verified_at: 2026-11-15T21:12:43Z
+  output: |
+    vitest fee-schedule.test.ts + fee-part.test.tsx, 1 run, all passed.
+
+- eval: E9
+  run_id: minted-thue-phi-E9-r8
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.thue_phi
+  verified_at: 2026-11-15T21:12:43Z
+  output: |
+    vitest fee-schedule.test.ts + fee-part.test.tsx, 1 run, all passed.
+
+- eval: E3
+  run_id: minted-thue-phi-E3-r8
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.thue_phi_db
+  verified_at: 2026-11-15T21:12:43Z
+  output: |
+    vitest -c vitest.db.config.ts tests/db/thue-phi.db.test.ts, lane n, 1 run, all passed.
+
+- eval: E4
+  run_id: minted-thue-phi-E4-r8
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.thue_phi_db
+  verified_at: 2026-11-15T21:12:43Z
+  output: |
+    vitest -c vitest.db.config.ts tests/db/thue-phi.db.test.ts, lane n, 1 run, all passed.
+
+- eval: E7-db
+  run_id: minted-thue-phi-E7-db-r8
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.thue_phi_db
+  verified_at: 2026-11-15T21:12:43Z
+  output: |
+    vitest -c vitest.db.config.ts tests/db/thue-phi.db.test.ts, lane n, 1 run, all passed.
+
+- eval: E10
+  run_id: minted-thue-phi-E10-r8
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.thue_phi_db
+  verified_at: 2026-11-15T21:12:43Z
+  output: |
+    vitest -c vitest.db.config.ts tests/db/thue-phi.db.test.ts, lane n, 1 run, all passed.
 
 - eval: E6-e2e
-  run_id: minted-thue-phi-E6-e2e-r7
+  run_id: minted-thue-phi-E6-e2e-r8
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.thue_phi_e2e
-  verified_at: 2026-11-15T19:33:06Z
+  verified_at: 2026-11-15T21:12:43Z
   output: |
-    18 passed (30.9s)
+    18 passed (40.3s)
+
+- eval: E7
+  run_id: minted-thue-phi-E7-r8
+  exit_code: 0
+  baseline: red
+  verifier: config:executors.script.cach_ly_n
+  verified_at: 2026-11-15T21:12:43Z
+  output: |
+    cach-ly: 37 ca đạt, vai quy_hang_app, nối bằng quy_hang_login
 
 - eval: E8
-  run_id: minted-thue-phi-E8-r7
+  run_id: minted-thue-phi-E8-r8
   exit_code: 0
   baseline: green
   verifier: config:executors.script.check
-  verified_at: 2026-11-15T19:33:06Z
+  verified_at: 2026-11-15T21:12:43Z
   output: |
     CODEOWNERS matches governance/autonomy.yaml
 
-- eval: E1
-  run_id: minted-thue-phi-E1-r6
+- eval: E6-floor
+  run_id: minted-thue-phi-E6-floor-r8
   exit_code: 0
-  verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
+  baseline: green
+  verifier: config:executors.design.floor
+  verified_at: 2026-11-15T21:12:43Z
+  output: |
+    design-floor-s4: không hex thô trong tệp giao diện đã chạm.
 
-- eval: E2
-  run_id: minted-thue-phi-E2-r6
+- eval: E9-khuon
+  run_id: minted-thue-phi-E9-khuon-r8
   exit_code: 0
-  verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
+  baseline: green
+  verifier: config:executors.design.khuon
+  verified_at: 2026-11-15T21:12:43Z
+  output: |
+    17 tệp giao diện ngoài bản đồ
 
 - eval: E2-ui
-  run_id: minted-thue-phi-E2-ui-r6
+  run_id: minted-thue-phi-E2-ui-r8
   exit_code: 0
-  verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
+  baseline: n-a
+  verifier: config:executors.ui-check
+  verified_at: 2026-11-15T21:12:43Z
   screenshot: evidence/E2-ui-step1.png
   observed: |
-    All four frames are the Thue phi page under "Tuy chinh cua san", company "[San A thu thue phi]". Header says "3 khoan · 3 dang tinh vao gia bao phi". Rows: Thue thu nhap ca nhan 2% (on), Le phi truoc ba 0,5% (on), Phi moi gioi with input 1,5 % (on, "Da doi · [Ten] A4 · 15/11/2026"). Footer says "Gia chao 3 ty bao phi → ve tay 2,88 ty" with a Luu button, and a toast "Da luu thue phi" appears at the bottom right.
-    - E2-1440-sang: light theme, rows on one line with the value and toggle at the right. Text is dark on white and clearly readable. The Luu button is pale blue because it is disabled. No overlap or clipping.
-    - E2-1440-toi: dark theme with the same layout. Text is light on near-black and readable. The "Them khoan" and Luu buttons keep legible labels. No clipping.
-    - E2-1024-sang: light theme. Each row stacks, with the value and toggle under the title. Everything is readable with no overflow, and the layout fits 1024 wide.
-    - E2-1024-toi: dark theme with the same stacked layout. Text and toggles are legible, and no element is cut off.
-    The frames match each other and the Expected: "Moi khung khop; chu doc duoc o ca sang va toi".
+    E2-1440-sang (light, 1440x900): Admin of "[Sàn A thử thuế phí]", sidebar with "Thuế phí" selected. Heading "Tuỳ chỉnh của sàn", a "Thuế phí" card reading "3 khoản · 3 đang tính vào giá bao phí". Rows: Thuế thu nhập cá nhân 2% on (theo luật · Mặc định), Lệ phí trước bạ 0,5% on (theo luật · Mặc định), Phí môi giới input 1,5 % on (Đã đổi · [Tên] A4 · 16/11/2026). Footer "Giá chào 3 tỷ bao phí → về tay 2,88 tỷ" and a pale (disabled) "Lưu" button; toast "Đã lưu thuế phí". Text dark on white, sharp and readable. E2-1440-toi (dark): same layout and content; light text on near-black, blue toggles and blue "Thêm khoản" button, "Lưu" muted blue, toast readable; no clipping or contrast problems. E2-1024-sang (light, 1024x768): same content, rows stacked (value and toggle under the title), still the 3 items with 2%, 0,5%, 1,5, footer 2,88 tỷ, toast; readable. E2-1024-toi (dark): same as the light frame in dark colours, all text readable, toggles on. All four frames match each other in content and layout and match Expected: every frame agrees, text readable in both light and dark.
   network_observed: n-a (driver)
-
-- eval: E3
-  run_id: minted-thue-phi-E3-r6
-  exit_code: 0
-  verifier: config:executors.script.thue_phi_db
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
-
-- eval: E3-unit
-  run_id: minted-thue-phi-E3-unit-r6
-  exit_code: 0
-  verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
 
 - eval: E3-ui
-  run_id: minted-thue-phi-E3-ui-r6
+  run_id: minted-thue-phi-E3-ui-r8
   exit_code: 0
-  verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
+  baseline: n-a
+  verifier: config:executors.ui-check
+  verified_at: 2026-11-15T21:12:43Z
   screenshot: evidence/E3-ui-step1.png
   observed: |
-    E3-sai.png (1440 wide, company B "[Sàn B thử thuế phí]", Tuỳ chỉnh của sàn, Thuế phí): the Phí môi giới row has a red-bordered input with 6, the red message "Tỉ lệ tối đa 5%.", the Lưu button greyed out, the summary "3 khoản · 3 đang tính vào giá bao phí" and the footer "Giá chào 3 tỷ bao phí → về tay 2,745 tỷ". The other two rows (Thuế thu nhập cá nhân 2%, Lệ phí trước bạ 0,5%) are on. E3-luu.png: Phí môi giới shows 1,5 with the note "Đã đổi · [Tên] B4 · 15/11/2026"; Lệ phí trước bạ is off, noted "Đã đổi"; the summary reads "3 khoản · 2 đang tính", the footer "về tay 2,895 tỷ", and the toast "Đã lưu thuế phí" is visible. E3-tai-lai.png: after reopening, the same state persists: 1,5, Lệ phí trước bạ off, "2 đang tính", "về tay 2,895 tỷ", the "Đã đổi" notes, and no toast. All three frames match the expected "Ba khung khớp".
+    E3-sai.png: Tuy chinh cua san > Thue phi, workspace "[San B thu thue phi]". 3 khoan, 3 dang tinh. Thue TNCN 2% on, Le phi truoc ba 0,5% on, Phi moi gioi input shows 6 with red border and red message "Ti le toi da 5%."; footer "Gia chao 3 ty bao phi -> ve tay 2,745 ty"; Luu button greyed out. E3-luu.png: Phi moi gioi 1,5 (note "Da doi - [Ten] B4 - 16/11/2026"), Le phi truoc ba toggle off (note "Da doi", 0,5% still shown), header "3 khoan - 2 dang tinh", footer "ve tay 2,895 ty", toast "Da luu thue phi", Luu greyed. E3-tai-lai.png: identical to E3-luu minus the toast: 1,5, Le phi truoc ba off, 2 dang tinh, ve tay 2,895 ty, same change notes. All three frames match Expected "Ba khung khop".
   network_observed: n-a (driver)
-
-- eval: E4
-  run_id: minted-thue-phi-E4-r6
-  exit_code: 0
-  verifier: config:executors.script.thue_phi_db
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
-
-- eval: E4-unit
-  run_id: minted-thue-phi-E4-unit-r6
-  exit_code: 0
-  verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
 
 - eval: E4-ui
-  run_id: minted-thue-phi-E4-ui-r6
+  run_id: minted-thue-phi-E4-ui-r8
   exit_code: 0
-  verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
-  screenshot: evidence/E4-sang.png
+  baseline: n-a
+  verifier: config:executors.ui-check
+  verified_at: 2026-11-15T21:12:43Z
+  screenshot: evidence/E4-ui-step1.png
   observed: |
-    Light frame (E4-sang.png, 1440x900): the page "Tùy chỉnh của sàn", sub-menu with "Thuế phí" highlighted, and the card "Thuế phí – 3 khoản · 2 đang tính vào giá bao phí". It lists three rows. "Thuế thu nhập cá nhân" shows 2% with the toggle on, "Lệ phí trước bạ" shows 0,5% with the toggle off, and "Phí môi giới" shows 2% with the toggle on. The footer reads "Giá chào 3 tỷ bao phí → về tay 2,88 tỷ" and "Chỉ Quản trị sàn đổi được thuế phí". There is no save button or input field, so it reads as read-only for the TeamLead. Dark frame (E4-toi.png): the same page, the same three rows, the same values and toggle states, the same footer text and the same positions. The only difference is the dark background and light text, so the frame matches in light and dark, as expected.
+    E4-sang.png (light): header "[Sàn A thử thuế phí]", left nav with "Thuế phí" highlighted, page "Tuỳ chỉnh của sàn", card "Thuế phí – 3 khoản · 2 đang tính vào giá bao phí". Rows: Thuế thu nhập cá nhân 2% (on), Lệ phí trước bạ 0,5% (off), Phí môi giới 2% (on). Footer "Giá chào 3 tỷ bao phí → về tay 2,88 tỷ" and "Chỉ Quản trị sàn đổi được thuế phí" (read-only note for TeamLead). E4-toi.png (dark): the same layout, text, toggles, positions and rows, with dark background and light text. Contrast is readable and no element is missing or shifted. Matches Expected "Khung khớp ở cả sáng và tối".
   network_observed: n-a (driver)
+
+- eval: E9-ui
+  run_id: minted-thue-phi-E9-ui-r8
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.ui-check
+  verified_at: 2026-11-15T21:12:43Z
+  screenshot: evidence/E9-ui-step1.png
+  observed: |
+    1440 pair: both frames have the same App Shell (left icon rail, top bar with the company name, search and theme toggle, avatar), the same second column at the same position (sub-nav column, vertical divider and collapse handle at x~308), the same h1 at x=352 y~103, the primary button at the right edge of the title row (Thêm khoản / Mời người), and the same bordered card: header with title plus subtitle, then an inner bordered list with row separators. Thuế phí shows a sub-nav list, a description line and a footer row (Giá chào 3 tỷ... / Lưu); Thành viên shows "Màn này chưa có mục con." and member rows. These are slot content differences only.
+    360 pair: both have the same top bar, the same 16px gutter, the same h1, and the same card with a header plus inner bordered list with row separators and controls on the lower line of each row (toggle and percent vs role badge and Đổi vai button). One observation: in Thuế phí the primary button Thêm khoản sits below the title, while in Thành viên the button Mời người sits on the title row. This is the shared PageHeader flex-wrap reacting to the longer title text, not a different frame. Overall the two frames have the same shape; they differ in slot content.
+  network_observed: n-a (driver)
+
+- eval: E10-ui
+  run_id: minted-thue-phi-E10-ui-r8
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.ui-check
+  verified_at: 2026-11-15T21:12:43Z
+  screenshot: evidence/E10-ui-step1.png
+  observed: |
+    E10-them.png (step1): Thuế phí card with 4 khoản. The new row shows the name input "Phí dịch vụ hồ sơ", the value input "0,3" focused (blue ring) with "%", toggle on, "…" and the caption "Chưa lưu". The "Thêm khoản" button is pressed (lighter blue). The footer reads "Giá chào 3 tỷ bao phí → về tay 2,871 tỷ" with a Lưu button. E10-luu.png (step2): after Lưu the row is saved as "Phí dịch vụ hồ sơ", "Sàn thêm · [Tên] A4 · 16/11/2026", value 0,3%. The Lưu button is disabled (lighter), and a toast "Đã lưu thuế phí" shows at the bottom right. E10-menu.png (step3): the "…" of the added row is open with two items, "Đổi tên khoản" and "Bỏ khoản" (red). E10-menu-moi-gioi.png (step4): the "…" of Phí môi giới ("Đã đổi", value 2%) is open with three items, "Đổi tên khoản", "Trả về mặc định" and "Bỏ khoản" (red). E10-luat.png (step5): the two law rows, "Thuế thu nhập cá nhân" (theo luật · Mặc định, 2%, toggle on) and "Lệ phí trước bạ" (theo luật · Đã đổi, 0,5%, toggle off), show a read-only percent and a toggle with no "…" menu. All four frames match "Bốn khung khớp".
+  network_observed: n-a (driver)
+
+### Carry-forward
 
 - eval: E5
   run_id: minted-thue-phi-E5-r6
@@ -164,15 +232,24 @@ human_signoff:
   verifier: config:executors.test.thue_phi_ontology
   verified_at: 2026-11-15T10:42:02Z
   carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
+  output: |
+    carry-forward tu round 6 — delta khong cham paths cua eval
+
+- eval: E6
+  run_id: minted-thue-phi-E6-r7
+  exit_code: 0
+  verifier: config:executors.test.thue_phi_ontology
+  verified_at: 2026-11-15T19:33:06Z
+  carried_from_round: 7
+  output: |
+    carry-forward tu round 7 — delta khong cham paths cua eval
 
 - eval: E6-ui
   run_id: minted-thue-phi-E6-ui-r6
   exit_code: 0
-  verifier: config:executors.test.thue_phi
+  verifier: config:executors.ui-check
   verified_at: 2026-11-15T10:42:02Z
   carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
   screenshot: evidence/E6-ui-step1.png
   observed: |
     E6-1440-sang.png (light, 1440): the Bảng hàng table shows the toolbar with the 60 dòng count, the Nhóm theo Toà, Cột, Toàn màn hình and Lưu góc nhìn buttons. The columns Căn, Toà, Dự án, Trạng thái, Giá chào, Về tay, Diện tích, Phòng ngủ and Xác nhận lúc are all visible. Row 8 is 0602, S1.02, status Chưa đủ để rao, Giá chào 3 tỷ and Về tay 2,88 tỷ, so Về tay is visible straight away. No broken layout.
@@ -183,112 +260,36 @@ human_signoff:
     This matches the expected result: the frames agree across light and dark and across 1440 and 1024, and Về tay is visible at once at 1440.
   network_observed: n-a (driver)
 
-- eval: E7
-  run_id: minted-thue-phi-E7-r2
-  exit_code: 0
-  verifier: config:executors.script.cach_ly_n
-  verified_at: 2026-11-14T23:28:17Z
-  carried_from_round: 2
-  # carry-forward từ round 2 — delta không chạm paths của eval
-
-- eval: E7-db
-  run_id: minted-thue-phi-E7-db-r6
-  exit_code: 0
-  verifier: config:executors.script.thue_phi_db
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
-
 - eval: E6-khuon
   run_id: minted-thue-phi-E6-khuon-r6
   exit_code: 0
   verifier: config:executors.design.khuon
   verified_at: 2026-11-15T10:42:02Z
   carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
+  output: |
+    carry-forward tu round 6 — delta khong cham paths cua eval
 
-- eval: E6-floor
-  run_id: minted-thue-phi-E6-floor-r6
-  exit_code: 0
-  verifier: config:executors.design.floor
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
-
-- eval: E9
-  run_id: minted-thue-phi-E9-r6
-  exit_code: 0
-  verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
-
-- eval: E9-ui
-  run_id: minted-thue-phi-E9-ui-r6
-  exit_code: 0
-  verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
-  screenshot: evidence/E9-ui-step1.png
-  observed: |
-    E9-thue-phi-1440 vs E9-thanh-vien-1440: both show the same App Shell. The left icon rail is the same, with the same nav icons. The top bar has the company name, a search box and a theme toggle. There is a secondary sub-nav column with the same width and divider. The content has an h1 title at the left and a blue primary button at the right at the same position (Thêm khoản / Mời người). Below that is one bordered card with a grey header (title plus count line), and inside it a rounded list of rows separated by dividers. The slot content differs: Thuế phí has a sub-nav list (Nhãn riêng ... Thuế phí), a description line, fee rows with toggles and an input, and a footer with a Lưu button. Thành viên has the "no sub-items" text, avatar rows, role badges and Đổi vai buttons. Verdict at 1440: same shape.
-    E9-thue-phi-360 vs E9-thanh-vien-360: both have the same top bar (menu toggle, company name, search icon, theme toggle, avatar), the same 16px gutter, an h1 title, and one card with a header (title plus count) and an inner rounded row list. Rows stack their content vertically in both. The difference at 360: in Thuế phí the Thêm khoản button wraps under the title (the title is longer and there is a description), while in Thành viên the Mời người button stays beside the title. The card, rows and header have the same shape. Verdict: same shape with a small content-driven wrap in the title row.
-  network_observed: n-a (driver)
-
-- eval: E9-khuon
-  run_id: minted-thue-phi-E9-khuon-r6
-  exit_code: 0
-  verifier: config:executors.design.khuon
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
-
-- eval: E10
-  run_id: minted-thue-phi-E10-r6
-  exit_code: 0
-  verifier: config:executors.script.thue_phi_db
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
-
-- eval: E10-ui
-  run_id: minted-thue-phi-E10-ui-r6
-  exit_code: 0
-  verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T10:42:02Z
-  carried_from_round: 6
-  # carry-forward từ round 6 — delta không chạm paths của eval
-  screenshot: evidence/E10-ui-step1.png
-  observed: |
-    E10-them.png (1440 wide): Thuế phí card, subtitle "4 khoản · 3 đang tính vào giá bao phí". Rows: Thuế thu nhập cá nhân 2% and Lệ phí trước bạ 0,5% (both marked "theo luật", no «…» menu), Phí môi giới "Đã đổi" with an input showing 2, and a new row with a name field "Phí dịch vụ hồ sơ", rate field 0,3 focused, marked "Chưa lưu". The Lưu button is active and the footer reads "Giá chào 3 tỷ bao phí → về tay 2,871 tỷ". The Thêm khoản button is at top right. This matches.
-    E10-luu.png: the new row is now saved as "Phí dịch vụ hồ sơ 0,3%", marked "Sàn thêm · [Tên] A4 · 15/11/2026". The toast "Đã lưu thuế phí" appears, Lưu is greyed out, and the footer still reads 2,871 tỷ. This matches.
-    E10-menu.png: the «…» of the added item is open with two entries, "Đổi tên khoản" and "Bỏ khoản" (red). This matches.
-    E10-menu-moi-gioi.png: the «…» of Phí môi giới is open with three entries, "Đổi tên khoản", "Trả về mặc định" and "Bỏ khoản" (red), which is right for a changed default item. This matches.
-    E10-luat.png: the two law rows, Thuế thu nhập cá nhân (2%, toggle on) and Lệ phí trước bạ (0,5%, toggle off), are labelled "theo luật" and have no input or menu. Focus sits on the «…» of Phí môi giới. This matches. All frames are consistent in layout, with no overlap or clipping.
-  network_observed: n-a (driver)
+### Judgment
 
 - eval: E8-wiki
-  judged_by: judge panel (3 lens, fresh context)
-  verdict: PASS
-  rationale: Cả ba góc nhìn cùng đề xuất PASS; panel chờ người chốt ở Cổng 2.
-  votes:
-    - domain-correctness: PASS — Trang fee-schedule nêu đủ hai khoản luật (TNCN 2%, trước bạ 0,5%) và Phí môi giới mặc định 1% trong khoảng 0–5%, ai đặt (setFeeSchedule: Quản trị sàn), ai đọc (readFeeSchedule), và "Nội bộ; trang khách không đọc (SP-4)". Trang listing có đoạn Điều kiện phí (feeInclusion, hàng 19). Log có dòng 2026-11-15 riêng cho hàng 19, screens.yaml có phần Thuế phí (?phan=thue-phi) với nút setFeeSchedule.
-    - operational-feasibility: PASS — Trang fee-schedule nêu hai khoản theo luật và Phí môi giới mặc định 1%, khoảng 0–5%, Quản trị sàn đặt, bốn vai đọc, và "Nội bộ; trang khách không đọc (SP-4)". Trang listing có đoạn Điều kiện phí (hàng 19). Log dòng 11 ghi riêng hàng 19 (dòng 10 cũng nhắc hàng 19 như phần bổ sung). screens.yaml có phần ?phan=thue-phi với nút setFeeSchedule.
-    - spec-alignment: PASS — fee-schedule.md nêu đủ TNCN 2% và Lệ phí trước bạ 0,5% theo luật, Phí môi giới mặc định 1% trong khoảng 0–5%, Quản trị sàn đặt, bốn vai đọc, và "trang khách không đọc (SP-4)". listing.md có đoạn Điều kiện phí (hàng 19). wiki/log.md dòng 11 là dòng riêng cho hàng 19, screens.yaml có phần ?phan=thue-phi với nút setFeeSchedule.
+  judged_by: judge panel (domain-correctness, operational-feasibility, spec-alignment)
+  verdict: UNCERTAIN
+  rationale: Cả ba lens đề xuất PASS. domain-correctness: PASS — trang fee-schedule nêu đủ ba khoản (TNCN 2%, trước bạ 0,5%, Phí môi giới mặc định 1% trong 0–5%), ai đặt (setFeeSchedule), ai đọc (readFeeSchedule, bốn vai) và "Nội bộ; trang khách không đọc (SP-4)". operational-feasibility: PASS — cùng căn cứ, thêm trang listing có đoạn Điều kiện phí (feeInclusion, hàng 19) và dòng log 2026-11-15. spec-alignment: PASS — đủ các ý hợp đồng, design/screens.yaml có phần Thuế phí (?phan=thue-phi) với nút setFeeSchedule. Đề xuất panel là PASS; người quyết ở Cổng 2.
+  required_evidence:
+    - (judge không nêu bằng-chứng-thiếu)
   human_override:  # chi nguoi ghi
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-thue-phi-SUITE-build-r7
+  run_id: minted-thue-phi-SUITE-build-r8
   exit_code: 0
-  verified_at: 2026-11-15T19:33:06Z
+  verified_at: 2026-11-15T21:12:43Z
 
 - cmd: make e2e
-  run_id: minted-thue-phi-SUITE-make_e2e-r7
+  run_id: minted-thue-phi-SUITE-make_e2e-r8
   exit_code: 0
-  verified_at: 2026-11-15T19:33:06Z
+  verified_at: 2026-11-15T21:12:43Z
 
 ## Known limits
 
@@ -296,17 +297,21 @@ human_signoff:
 
 ## Analyst
 
-Không phân biệt (xanh trên cả bản hiện tại lẫn baseline): E8 (make check). Đây là lệnh kiểm chung của repo, nên coi là regression-guard có chủ ý; các eval riêng của tính năng không có số đo baseline để so (xem dưới).
+Eval không-phân-biệt (xanh cả trên HEAD lẫn baseline; là lưới hồi quy có chủ ý hoặc chứng minh harness, không chứng minh tính năng mới):
+- E8 (make check)
+- E6-floor (design-floor-s4)
+- E9-khuon (design-floor-khuon)
 
-Baseline không đo:
-- npx vitest run tests/thue-phi-ontology.test.ts tests/thue-phi-cot.test.ts tests/thue-phi-cot-an.test.tsx --coverage.enabled=false --reporter=verbose: bo qua baseline: tep tests/thue-phi-ontology.test.ts co o cay dang kiem nhung chua co o merge-base 9cf7a596f3602e455f4ae61c2442332d93f80871 — eval moi, chay tren code cu khong phan biet gi
-- DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx playwright test -c playwright.db.config.ts tests/e2e-db/thue-phi.spec.ts: bo qua baseline: tep tests/e2e-db/thue-phi.spec.ts co o cay dang kiem nhung chua co o merge-base 9cf7a596f3602e455f4ae61c2442332d93f80871 — eval moi, chay tren code cu khong phan biet gi
+Baseline khong do
+- npx vitest run src/modules/company-config/fee-schedule.test.ts src/modules/company-config/ui/fee-part.test.tsx --coverage.enabled=false --reporter=verbose: bo qua baseline: tep src/modules/company-config/fee-schedule.test.ts co o cay dang kiem nhung chua co o merge-base 2da953437e868503f508569ba3fe8ba799392fcd — eval moi, chay tren code cu khong phan biet gi
+- DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx vitest run -c vitest.db.config.ts tests/db/thue-phi.db.test.ts --reporter=verbose: bo qua baseline: tep tests/db/thue-phi.db.test.ts co o cay dang kiem nhung chua co o merge-base 2da953437e868503f508569ba3fe8ba799392fcd — eval moi, chay tren code cu khong phan biet gi
+- DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT:-5563} npx playwright test -c playwright.db.config.ts tests/e2e-db/thue-phi.spec.ts: bo qua baseline: tep tests/e2e-db/thue-phi.spec.ts co o cay dang kiem nhung chua co o merge-base 2da953437e868503f508569ba3fe8ba799392fcd — eval moi, chay tren code cu khong phan biet gi
 
 ## Variance
 
-none — mọi eval nhiều lần chạy đều đồng nhất (mọi eval round này chạy 1 lần, xác định).
+none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 7: chạy lại E6, E6-e2e, E8 và hai lệnh suite sau các commit kiểm thử cột Về tay và điều kiện phí; tất cả xanh, các eval còn lại mang từ round 6 (E7 từ round 2). Chờ người chốt mục E8-wiki ở Cổng 2.
-Rounds 1–6: lịch sử trong _acceptance/thue-phi/run-log.jsonl.
+Round 2: E10-ui chưa đạt trong run-log — trả về triển khai. Rounds 3-7: chi tiết từng vòng nằm trong run-log.jsonl.
+Round 8: mọi eval máy đạt, các eval không chạm paths được mang từ vòng cũ; còn một mục judgment (E8-wiki) chờ người quyết.
