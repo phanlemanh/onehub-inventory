@@ -172,7 +172,9 @@ Ngưỡng SỐNG của ô cơ hội, từng vế:
   - Sổ vai × màn của 9b đã ký ghi Quản trị sàn được xem Bảng hàng cho tới khi hàng 10 đặt luật vào. Hàng này nay dựng cửa
     vào của Bảng hàng theo luật ấy (cùng cửa với màn Thành viên), không tự chặn Quản trị sàn; ca phá (luật vào đổi thành
     quyền xem bảng hàng) chứng cửa chặn đúng: câu không đủ quyền, không thẻ.
-  - Câu «Quản trị sàn có được xem Bảng hàng không» chuyển sang Cổng Phạm vi của hàng 10.
+  - Chủ kho đã quyết ở Cổng Phạm vi hàng 10 ngày 2026-11-15: Quản trị sàn được xem Bảng hàng, chỉ đọc (sổ hồ sơ
+    bang-hang-du-lieu-that, dòng d-20261115T042755Z-29). Vế «Quản trị sàn thấy câu không đủ quyền» của AC-9 bỏ theo quyết
+    định ấy; cửa chặn theo luật vào vẫn giữ. Còn chờ chủ kho xác nhận lại chữ ký trên bằng chứng mới.
   - Ngoài-11 gỡ khỏi Known limits: bài kiểm vai nay chờ vùng ổn định và có thẻ rồi mới đếm, ca cửa chờ câu rồi mới đếm.
     Rà cả bộ bài của hàng này không thấy ca nào khác cùng hình qua giả.
 
