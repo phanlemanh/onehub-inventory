@@ -733,11 +733,21 @@ export const REGION: Recipe[] = [
                   .querySelectorAll('[data-slot="data-region"] button')
                   .forEach((b) => b.textContent?.includes("Xoá lọc") && b.remove());
               }).observe(document, { childList: true, subtree: true });
-            const wait = () =>
-              document.documentElement.hasAttribute("data-hydrated")
-                ? start()
-                : setTimeout(wait, 20);
-            wait();
+            // Started by the mark itself, not by a timer (a fake clock would hold a timer back, and the check runs as
+            // soon as the mark is there). The script runs before <html> exists, so it watches the whole document.
+            const marked = () => document.documentElement?.hasAttribute("data-hydrated") === true;
+            if (marked()) start();
+            else
+              new MutationObserver((_, self) => {
+                if (!marked()) return;
+                self.disconnect();
+                start();
+              }).observe(document, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ["data-hydrated"],
+              });
           });
         },
       },
@@ -874,11 +884,21 @@ export const REGION: Recipe[] = [
                 attributeFilter: ["tabindex", "data-cut"],
               });
             };
-            const wait = () =>
-              document.documentElement.hasAttribute("data-hydrated")
-                ? start()
-                : setTimeout(wait, 20);
-            wait();
+            // Started by the mark itself, not by a timer (a fake clock would hold a timer back, and the check runs as
+            // soon as the mark is there). The script runs before <html> exists, so it watches the whole document.
+            const marked = () => document.documentElement?.hasAttribute("data-hydrated") === true;
+            if (marked()) start();
+            else
+              new MutationObserver((_, self) => {
+                if (!marked()) return;
+                self.disconnect();
+                start();
+              }).observe(document, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ["data-hydrated"],
+              });
           });
         },
       },

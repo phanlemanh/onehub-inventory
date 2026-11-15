@@ -96,10 +96,13 @@ export async function throttle(page: Page, wanted = 0): Promise<void> {
 export async function waitReady(page: Page): Promise<void> {
   // The one hydration wait of the browser tests (row 1u): the page's hydrated mark, nothing streamed still pending,
   // and the region (or main, or the heading) taken over by React.
-  await pageReady(page, {
-    el: page.locator('[data-slot="data-region"], main, h1'),
-    timeout: 30_000,
-  });
+  // In that order: the region when the screen has one (it hydrates inside the page's loading boundary, after <main>),
+  // else <main>, else the heading. A selector list would match in page order and land on <main>.
+  const region = page.locator('[data-slot="data-region"]');
+  const main = page.locator("main");
+  const el =
+    (await region.count()) > 0 ? region : (await main.count()) > 0 ? main : page.locator("h1");
+  await pageReady(page, { el, timeout: 30_000 });
 }
 
 /** Open `url` for `recipe`, applying a break's setup first when given, and return the context. */

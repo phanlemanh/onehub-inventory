@@ -1,12 +1,49 @@
-# Review findings: don-no-bo-kiem (round 2)
+# Review findings: don-no-bo-kiem (round 3)
 
 ## Trong hợp đồng
+
+(không có)
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **The new hydration helper copies the React check that the shared test runner already has**
+- **waitReady no longer waits for the data region itself to hydrate: the combined locator plus .first() picks <main> in document order**
+  Người dùng thấy gì: Bộ kiểm trình duyệt có thể coi trang là sẵn sàng sớm hơn thực tế, nên thỉnh thoảng một bài đỏ oan do bấm hay sửa trang quá sớm. Người dùng cuối không bị ảnh hưởng.
+  Căn cứ: Chỉ ảnh hưởng bộ kiểm nội bộ, không mất dữ liệu, chạy lại bài là qua; lượt chạy đầy đủ hiện vẫn xanh nên có thể ghi nhận và theo dõi.
+  file: `tools/e2e_templates/runner.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **The hydrated-mark comment says the data region uses the same mark (row VP4), but no code anywhere sets data-hydrated except this file**
+  Người dùng thấy gì: Một dòng ghi chú trong mã nói sai về dấu hiệu của vùng dữ liệu, có thể làm người đọc sau này hiểu nhầm. Người dùng không thấy gì.
+  Căn cứ: Không ảnh hưởng hành vi hay dữ liệu của ai, chỉ là câu chữ; sửa không đáng để mở việc riêng.
+  file: `src/app/hydration-mark.tsx`
+  severity: low
+  Đề xuất: wont-fix
+
+- **quetTep's doc comment promises to report a file waiting on another PR once, but the code does nothing of the sort**
+  Người dùng thấy gì: Ghi chú của máy quét hứa một việc mà mã không làm, người đọc có thể hiểu nhầm. Người dùng không bị ảnh hưởng.
+  Căn cứ: Chỉ là chú thích lệch, bài kiểm vẫn tự lọc đúng nên không có hậu quả thực; chi phí sửa nhỏ nhưng lợi ích gần như không có.
+  file: `tests/sua-trang-quet.ts`
+  severity: low
+  Đề xuất: wont-fix
+
+- **waitReady now waits on <main> instead of the data region: it can say ready before the region is hydrated**
+  Người dùng thấy gì: Bộ kiểm trình duyệt có thể báo trang sẵn sàng trước khi vùng dữ liệu thật sự sẵn sàng, gây thỉnh thoảng đỏ oan hoặc cảnh báo dựng trang. Người dùng cuối không bị ảnh hưởng.
+  Căn cứ: Chỉ làm bộ kiểm chập chờn, không mất hay lộ dữ liệu, chạy lại là hết; lượt chạy hiện tại vẫn xanh nên đưa vào hạn chế đã biết.
+  file: `tools/e2e_templates/runner.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Hình dạng 5 (tuyên quét LỚP nhưng chỉ có điểm-case): máy quét «mọi lệnh đổi trang đều qua cửa chung» chỉ thử 3 trên khoảng 17 dấu hiệu đổi trang và bỏ hẳn một loại lệnh**
+  Người dùng thấy gì: Máy canh việc sửa trang chỉ thử vài kiểu sửa nên sau này một kiểu sửa mới có thể lọt qua cửa chung mà không bị báo. Hiện chưa có trường hợp nào thật sự lọt.
+  Căn cứ: Hiện chưa có lệnh nào lọt nên chưa gây hại; chỉ là lưới chắn chưa kín, mở rộng sau khi có nhu cầu là đủ.
+  file: `tests/sua-trang.test.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **The new hydration helper copies the React check that the shared test runner already has (r2 · tệp đã đổi)**
   Người dùng thấy gì: Quy tắc nhận biết trang đã tải xong nằm ở hai chỗ trong bộ kiểm tự động. Người dùng sản phẩm không bị ảnh hưởng; chỉ khi thư viện giao diện đổi cách làm thì một chỗ có thể được sửa còn chỗ kia bị quên, khiến bài kiểm đỏ oan.
   Căn cứ: Không ảnh hưởng người dùng cuối và không mất dữ liệu; nếu lệch thì chỉ làm bài kiểm đỏ và dễ thấy ngay, còn việc gom về một chỗ có thể làm sau với chi phí thấp.
   file: `tests/e2e/da-gan.ts`
@@ -40,7 +77,5 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   file: `tests/cong-chay.test.ts`
   severity: low
   Đề xuất: wont-fix
-
-## Chưa adversarial-verify (refuter chết)
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
