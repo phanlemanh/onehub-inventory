@@ -122,15 +122,16 @@ const toggle = (code: string) => within(rowOf(code)).getByRole("switch");
 describe("ba-dong-dung-thu-tu", () => {
   it("law items first, then own items in the order they were added", async () => {
     await show("CompanyAdmin");
+    // Names first, so a swapped order fails naming the item a person sees on that row.
+    expect(rows()[0]!.textContent, "ba-dong-dung-thu-tu").toContain(label("PersonalIncomeTax"));
+    expect(rows()[1]!.textContent, "ba-dong-dung-thu-tu").toContain(label("RegistrationFee"));
+    expect(rows()[2]!.textContent, "ba-dong-dung-thu-tu").toContain(label("BrokerageFee"));
     expect(rows().map((r) => r.getAttribute("data-fee"))).toEqual([
       "pit",
       "registration",
       "brokerage",
       "k1",
     ]);
-    expect(rows()[0]!.textContent, "ba-dong-dung-thu-tu").toContain(label("PersonalIncomeTax"));
-    expect(rows()[1]!.textContent, "ba-dong-dung-thu-tu").toContain(label("RegistrationFee"));
-    expect(rows()[2]!.textContent).toContain(label("BrokerageFee"));
   });
 });
 

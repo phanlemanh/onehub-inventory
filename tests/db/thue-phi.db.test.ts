@@ -1,7 +1,7 @@
 // Row 19 (thue-phi), evals E3, E4, E7-db and AC-10 at the API and in the database: the fee schedule through the identity
 // module's door, withCompany, under the API role, on this lane's Postgres. Company A holds the people of the
 // permission-table world (LA, BA, TL, CA); Y is CompanyAdmin of B.
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { label } from "@/modules/company-config";
 import { createFeeScheduleHandlers } from "@/modules/company-config/fee-schedule-http";
@@ -13,6 +13,10 @@ import { captureSender } from "@/modules/identity/sender";
 import { withCompany } from "@/modules/identity/with-company";
 
 import { asPerson, dropWorld, world, type Person, type World } from "./bang-quyen-world";
+
+// The fee store reads the editor's name through identity's server door; outside Next.js its "server-only" guard has
+// nothing to guard.
+vi.mock("server-only", () => ({}));
 
 const worlds: World[] = [];
 afterEach(async () => {
@@ -125,6 +129,8 @@ describe("luu-mot-dong (E3)", () => {
       ["registration", 50, false, "changed"],
       ["brokerage", 200, true, "changed"],
     ]);
+    // Who changed it: the member's own name, read through identity's door (G-1511-59), not the placeholder.
+    expect(after[2]!.source).toEqual(expect.objectContaining({ kind: "changed", by: "[Tên]" }));
     const rows = await rowsOf(w);
     expect(
       rows.map((r) => [r.company_id, r.code, r.rate_bp, r.included, r.changed_by, r.retired]),
@@ -198,16 +204,35 @@ describe("sai-khong-ghi (E3)", () => {
       ).toEqual(want);
       expect(await rowsOf(w), `sai-khong-ghi: ${name}`).toEqual(rowsBefore);
     }
-    // A law item renamed or left out, sent straight to the API.
-    for (const body of [
+    // A law item renamed or left out, sent straight to the API: 400 naming the law item, and nothing written.
+    const LAW_BAD: [string, unknown[], { problem: string; code?: string | null }[]][] = [
       [
-        { code: "pit", name: "Thuế khác", rateBasisPoints: 200, included: true },
-        LAW()[1],
-        { code: "brokerage", rateBasisPoints: 100, included: true },
+        "đổi tên khoản luật",
+        [
+          { code: "pit", name: "Thuế khác", rateBasisPoints: 200, included: true },
+          LAW()[1],
+          { code: "brokerage", rateBasisPoints: 100, included: true },
+        ],
+        [{ problem: "law-item-fixed", code: "pit" }],
       ],
-      [LAW()[1], { code: "brokerage", rateBasisPoints: 100, included: true }],
-    ]) {
-      expect((await h.save(req("PUT", { items: body }, c))).status).toBe(400);
+      [
+        "bỏ khoản luật",
+        [LAW()[1], { code: "brokerage", rateBasisPoints: 100, included: true }],
+        [{ problem: "law-item-missing" }],
+      ],
+    ];
+    for (const [name, body, want] of LAW_BAD) {
+      const rowsBefore = await rowsOf(w);
+      const res = await h.save(req("PUT", { items: body }, c));
+      expect(res.status, `sai-khong-ghi: ${name}`).toBe(400);
+      const json = (await res.json()) as { problems: { problem: string; code?: string | null }[] };
+      expect(
+        json.problems.map((p) =>
+          p.code === undefined ? { problem: p.problem } : { problem: p.problem, code: p.code },
+        ),
+        `sai-khong-ghi: ${name}`,
+      ).toEqual(want);
+      expect(await rowsOf(w), `sai-khong-ghi: ${name}`).toEqual(rowsBefore);
     }
   });
 });

@@ -29,7 +29,7 @@ evals:
     executor: test
     cmd: config:executors.test.thue_phi
     paths: [src/modules/company-config/**]
-    expected: "exit 0; ca 've-tay-bang-viet-truoc' duyệt đủ bảng viết trước (4 tập con khoản luật × 4 số khoản riêng × 4 tỉ lệ = 64 ô; số ô in ra = 64), mỗi ô đúng số đồng viết tay; 've-tay-bien' đủ 5 ca, mặc định 3 tỷ Bao phí = 2.895.000.000; 'kiem-muc-9-ca' đủ 9 ca viết trước (-10, 510, 125, tên rỗng, tên 41 ký tự, tên trùng, khoản riêng thứ sáu, tổng 10,1%, không khoản nào bật), mỗi lỗi nêu đúng khoản. Chiều đỏ: pha-thu-tru-khoan-tat đỏ với «ve-tay-bang-viet-truoc: [brokerageFee] 0»; pha-thu-lam-tron-len đỏ với «ve-tay-bien: 1 đồng»; pha-thu-bo-kiem-buoc đỏ với «kiem-muc-9-ca: 125»"
+    expected: "exit 0; ca 've-tay-bang-viet-truoc' duyệt đủ bảng viết trước (4 tập con khoản luật × 4 số khoản riêng × 4 tỉ lệ = 64 ô; số ô in ra = 64), mỗi ô đúng số đồng viết tay; 've-tay-bien' đủ 5 ca, mặc định 3 tỷ Bao phí = 2.895.000.000; 'kiem-muc-9-ca' đủ 9 ca viết trước (-10, 510, 125, tên rỗng, tên 41 ký tự, tên trùng, khoản riêng thứ sáu, tổng 10,1%, không khoản nào bật), mỗi lỗi nêu đúng khoản. Chiều đỏ: pha-thu-tru-khoan-tat (trừ cả khoản đang tắt) đỏ với «ve-tay-bang-viet-truoc: [none, 0 × 0] 2775000000»; pha-thu-lam-tron-len đỏ với «ve-tay-bien: 1 đồng»; pha-thu-bo-kiem-buoc đỏ với «kiem-muc-9-ca: 125»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E2

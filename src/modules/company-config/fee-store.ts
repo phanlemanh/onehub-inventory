@@ -2,7 +2,7 @@
 // runs through the identity module's door, withCompany, under the API role: migration 012's row rules keep each company
 // to its own rows and the permission table to readFeeSchedule and setFeeSchedule. The table keeps only what a company
 // changed or added; nothing is deleted — resetting an item or removing one records who and when.
-import type { DbClient } from "@/modules/identity/server";
+import { sessionMemberName, type DbClient } from "@/modules/identity/server";
 
 import { label } from "./index";
 import {
@@ -163,11 +163,8 @@ export async function saveFeeSchedule(
     const problems = checkFeeDraft(draft, known, (code) => names.get(code) ?? defaultName(code));
     if (problems.length > 0) return { ok: false, problems };
 
-    const me = await rowsOf<{ name: string }>(
-      client,
-      `select name from company_members where user_id::text = current_setting('app.user_id', true)`,
-    );
-    const myName = me.rows[0]?.name ?? "—";
+    // Who changed it: the name comes through the identity module's door, never from its table.
+    const myName = (await sessionMemberName(client)) ?? "—";
 
     // What every code should be after the save.
     const desired = new Map<string, Desired>();

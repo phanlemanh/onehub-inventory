@@ -1,6 +1,6 @@
 // Permission table at the API (row 9a, _acceptance/bang-quyen-theo-vai/evals.yaml E3). Every person signs in through the
 // real sign-in handlers of row 8 and calls the real members handlers of row 9; the database is this lane's Postgres.
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ACTIONS, type ActionSpec } from "@/generated/ontology";
 import { createAuthHandlers } from "@/modules/identity/http";
@@ -26,6 +26,10 @@ import {
   type World,
 } from "./bang-quyen-world";
 import { count } from "./helpers";
+
+// The fee store (row 19) reads the editor's name through identity's server door; outside Next.js its "server-only"
+// guard has nothing to guard.
+vi.mock("server-only", () => ({}));
 
 const ORIGIN = "http://127.0.0.1:3485";
 // Written before the code (evals.yaml): 3 API doors × 4 roles; plus row 2c's 4 saved-view doors × 4 roles; plus row

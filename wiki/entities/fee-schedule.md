@@ -33,7 +33,8 @@ trang khách không đọc (SP-4).
 Lõi tính và kiểm mức: `src/modules/company-config/fee-schedule.ts`. Bảng `company_fee_items`:
 `db/migrations/012_thue_phi.sql`. Đọc, ghi: `src/modules/company-config/fee-store.ts`, qua
 `/api/v1/company/fee-schedule` (bảng quyền `readFeeSchedule`, `setFeeSchedule`). Bảng hàng đọc mức của sàn đang đăng
-nhập để tính cột Về tay.
+nhập để tính cột Về tay. Tên người sửa lấy qua cửa công khai của danh tính (`sessionMemberName` ở
+`src/modules/identity/server.ts`), không đọc bảng thành viên; `tests/thue-phi-ranh-gioi.test.ts` giữ điều này.
 
 ## History
 

@@ -1,11 +1,15 @@
 // The fee schedule's store without a database (row 19): a small in-memory company_fee_items answers the store's own
 // statements, so these cases pin what the store decides — which item gets a row, which row is retired, the codes it
 // hands out, and the schedule it reads back. The same store on a real database: tests/db/thue-phi.db.test.ts.
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { DbClient } from "@/modules/identity/server";
 
 import { readFeeSchedule, saveFeeSchedule } from "./fee-store";
+
+// The store reads the editor's name through identity's server door; outside Next.js its "server-only" guard has
+// nothing to guard.
+vi.mock("server-only", () => ({}));
 import { label } from "./index";
 import type { RunAs } from "./store";
 
@@ -156,7 +160,10 @@ describe("fee store", () => {
       brokerage(100),
       { name: "Phí khác", rateBasisPoints: 10, included: true },
     ]);
-    expect(again.ok && again.schedule.items.at(-1)?.code).not.toBe(added.code);
+    // The add itself must go through, else «not the old code» would pass on a failed save.
+    if (!again.ok) throw new Error("thêm khoản mới không lưu được");
+    expect(again.schedule.items.at(-1)).toMatchObject({ kind: "Own", name: "Phí khác" });
+    expect(again.schedule.items.at(-1)?.code).not.toBe(added.code);
   });
 
   it("removes the default brokerage item with a row of its own, and keeps it out of the schedule", async () => {
