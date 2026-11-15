@@ -93,3 +93,32 @@ wall: 808s
 - **claude-sonnet-5-5**: 3 agent · 9 calls · out 5,287 · in 18 · cache_read 128,429 · cache_create 67,267
 - **claude-opus-5-5**: 3 agent · 22 calls · out 7,194 · in 46 · cache_read 483,870 · cache_create 102,301
 - **claude-haiku-5-5**: 4 agent · 9 calls · out 6,389 · in 18 · cache_read 63,368 · cache_create 69,521
+### S4 round 4 — wf_d3a83f22-c60 (10 agent, 21,024 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| synthesize:report | claude-sonnet-5-5 | 2 | 4,248 | 4 | 21,914 | 26 |
+| review:bugs | claude-opus-5-5 | 6 | 3,408 | 14 | 121,286 | 60 |
+| machine:npx vitest run tests/vong-doi-thao-tac.t | claude-haiku-5-5 | 2 | 2,593 | 4 | 15,949 | 29 |
+| review:conventions | claude-opus-5-5 | 5 | 2,460 | 10 | 82,871 | 48 |
+| machine:make e2e | claude-haiku-5-5 | 2 | 2,383 | 4 | 3,300 | 580 |
+| review:measurement | claude-opus-5-5 | 4 | 1,970 | 8 | 72,219 | 43 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,448 | 4 | 12,588 | 52 |
+| triage | claude-sonnet-5-5 | 2 | 1,287 | 4 | 14,831 | 11 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 895 | 4 | 15,892 | 9 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 332 | 4 | 11,400 | 3 |
+
+
+wall: 681s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| review | 3 | 7,838 | 276,376 | 65 | 07:39:57 | 07:41:02 |
+| machine | 4 | 7,319 | 47,729 | 641 | 07:39:57 | 07:50:37 |
+| triage | 1 | 1,287 | 14,831 | 11 | 07:50:37 | 07:50:48 |
+| capture | 1 | 332 | 11,400 | 3 | 07:50:48 | 07:50:52 |
+| synthesize | 1 | 4,248 | 21,914 | 26 | 07:50:52 | 07:51:17 |
+
+- **claude-sonnet-5-5**: 3 agent · 6 calls · out 5,867 · in 12 · cache_read 48,145 · cache_create 68,659
+- **claude-opus-5-5**: 3 agent · 15 calls · out 7,838 · in 32 · cache_read 276,376 · cache_create 93,270
+- **claude-haiku-5-5**: 4 agent · 8 calls · out 7,319 · in 16 · cache_read 47,729 · cache_create 69,588
