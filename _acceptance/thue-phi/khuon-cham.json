@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "den": "10869c2d9ec6fa5c20f6de719ef1415100784516",
-  "base": "2715cf4d09f0168c3ceee897d9a29640749a5cf5",
+  "den": "d5e8ed03275aa6e11067edb2290c85fe104d5920",
+  "base": "9cf7a596f3602e455f4ae61c2442332d93f80871",
   "ghim": {
     "luoi": "61b989cc617777208e93a530d36a47482b841455"
   },
@@ -17,7 +17,7 @@
     }
   ],
   "khong_do": [],
-  "ngoai_ban_do": 16,
+  "ngoai_ban_do": 17,
   "nhom": [
     "dang-nhap",
     "danh-sach-khung",

@@ -3,17 +3,14 @@ schema_version: 2
 feature_slug: thue-phi
 verdict: PENDING-JUDGMENT
 failed_evals: []
-reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 10869c2d9ec6fa5c20f6de719ef1415100784516
+verified_commit: d5e8ed03275aa6e11067edb2290c85fe104d5920
 human_signoff:
 ---
 
 # Evidence Report: thue-phi
-
-Round 5. Mọi eval máy đều xanh; còn một mục judgment (E8-wiki) chờ người chốt nên verdict là PENDING-JUDGMENT. Lịch sử các round nằm ở mục Iterations.
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
@@ -26,15 +23,15 @@ Round 5. Mọi eval máy đều xanh; còn một mục judgment (E8-wiki) chờ 
 | E4 | AC-4 | script | PASS |
 | E4-unit | AC-4 | test | PASS |
 | E4-ui | AC-4 | ui-check | PASS |
-| E5 | AC-5 | test | PASS (carry-forward từ round 2) |
-| E6 | AC-6 | test | PASS (carry-forward từ round 2) |
+| E5 | AC-5 | test | PASS |
+| E6 | AC-6 | test | PASS |
 | E6-e2e | AC-6 | script | PASS |
-| E6-ui | AC-6 | ui-check | PASS (carry-forward từ round 2) |
+| E6-ui | AC-6 | ui-check | PASS |
 | E7 | AC-7 | script | PASS (carry-forward từ round 2) |
 | E7-db | AC-7 | script | PASS |
 | E8 | AC-8 | script | PASS |
-| E8-wiki | AC-8 | judgment | PASS (đề xuất của hội đồng, chờ người chốt) |
-| E6-khuon | AC-6 | script | PASS (carry-forward từ round 2) |
+| E8-wiki | AC-8 | judgment | PENDING-JUDGMENT (panel đề xuất PASS, chờ người) |
+| E6-khuon | AC-6 | script | PASS |
 | E6-floor | AC-6 | script | PASS |
 | E9 | AC-9 | test | PASS |
 | E9-ui | AC-9 | ui-check | PASS |
@@ -45,260 +42,263 @@ Round 5. Mọi eval máy đều xanh; còn một mục judgment (E8-wiki) chờ 
 ## Evidence
 
 - eval: E1
-  run_id: minted-thue-phi-E1-r5
+  run_id: minted-thue-phi-E1-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
   output: |
-    vitest: fee-schedule.test.ts và ui/fee-part.test.tsx chạy xong, mọi ca xanh.
+    vitest fee-schedule.test.ts + fee-part.test.tsx, reporter verbose: tất cả ca xanh.
 
 - eval: E2
-  run_id: minted-thue-phi-E2-r5
+  run_id: minted-thue-phi-E2-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
   output: |
-    vitest: fee-schedule.test.ts và ui/fee-part.test.tsx chạy xong, mọi ca xanh.
+    vitest fee-schedule.test.ts + fee-part.test.tsx, reporter verbose: tất cả ca xanh.
 
 - eval: E3-unit
-  run_id: minted-thue-phi-E3-unit-r5
+  run_id: minted-thue-phi-E3-unit-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
   output: |
-    vitest: fee-schedule.test.ts và ui/fee-part.test.tsx chạy xong, mọi ca xanh.
+    vitest fee-schedule.test.ts + fee-part.test.tsx, reporter verbose: tất cả ca xanh.
 
 - eval: E4-unit
-  run_id: minted-thue-phi-E4-unit-r5
+  run_id: minted-thue-phi-E4-unit-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
   output: |
-    vitest: fee-schedule.test.ts và ui/fee-part.test.tsx chạy xong, mọi ca xanh.
+    vitest fee-schedule.test.ts + fee-part.test.tsx, reporter verbose: tất cả ca xanh.
 
 - eval: E9
-  run_id: minted-thue-phi-E9-r5
+  run_id: minted-thue-phi-E9-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.thue_phi
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
   output: |
-    vitest: fee-schedule.test.ts và ui/fee-part.test.tsx chạy xong, mọi ca xanh.
+    vitest fee-schedule.test.ts + fee-part.test.tsx, reporter verbose: tất cả ca xanh.
 
 - eval: E3
-  run_id: minted-thue-phi-E3-r5
+  run_id: minted-thue-phi-E3-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.thue_phi_db
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
   output: |
-    vitest (vitest.db.config.ts, dãy N, cổng 5563): tests/db/thue-phi.db.test.ts xanh.
+    vitest.db.config.ts tests/db/thue-phi.db.test.ts trên Postgres dãy n: tất cả ca xanh.
 
 - eval: E4
-  run_id: minted-thue-phi-E4-r5
+  run_id: minted-thue-phi-E4-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.thue_phi_db
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
   output: |
-    vitest (vitest.db.config.ts, dãy N, cổng 5563): tests/db/thue-phi.db.test.ts xanh.
+    vitest.db.config.ts tests/db/thue-phi.db.test.ts trên Postgres dãy n: tất cả ca xanh.
 
 - eval: E7-db
-  run_id: minted-thue-phi-E7-db-r5
+  run_id: minted-thue-phi-E7-db-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.thue_phi_db
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
   output: |
-    vitest (vitest.db.config.ts, dãy N, cổng 5563): tests/db/thue-phi.db.test.ts xanh.
+    vitest.db.config.ts tests/db/thue-phi.db.test.ts trên Postgres dãy n: tất cả ca xanh.
 
 - eval: E10
-  run_id: minted-thue-phi-E10-r5
+  run_id: minted-thue-phi-E10-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.thue_phi_db
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
   output: |
-    vitest (vitest.db.config.ts, dãy N, cổng 5563): tests/db/thue-phi.db.test.ts xanh.
+    vitest.db.config.ts tests/db/thue-phi.db.test.ts trên Postgres dãy n: tất cả ca xanh.
+
+- eval: E5
+  run_id: minted-thue-phi-E5-r6
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.thue_phi_ontology
+  verified_at: 2026-11-15T10:42:02Z
+  output: |
+    vitest tests/thue-phi-ontology.test.ts + tests/thue-phi-cot.test.ts: tất cả ca xanh.
+
+- eval: E6
+  run_id: minted-thue-phi-E6-r6
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.thue_phi_ontology
+  verified_at: 2026-11-15T10:42:02Z
+  output: |
+    vitest tests/thue-phi-ontology.test.ts + tests/thue-phi-cot.test.ts: tất cả ca xanh.
 
 - eval: E6-e2e
-  run_id: minted-thue-phi-E6-e2e-r5
+  run_id: minted-thue-phi-E6-e2e-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.thue_phi_e2e
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
   output: |
-    playwright (playwright.db.config.ts): 7 passed (21.8s)
+    playwright.db.config.ts tests/e2e-db/thue-phi.spec.ts:
+    10 passed (25.0s)
 
 - eval: E8
-  run_id: minted-thue-phi-E8-r5
+  run_id: minted-thue-phi-E8-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.check
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
   output: |
-    make check xanh, dòng cuối: CODEOWNERS matches governance/autonomy.yaml
+    make check
+    CODEOWNERS matches governance/autonomy.yaml
 
-- eval: E6-floor
-  run_id: minted-thue-phi-E6-floor-r5
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.design.floor
-  verified_at: 2026-11-15T01:39:20Z
-  output: |
-    design-floor-s4: không hex thô trong tệp giao diện mà vòng chạm.
-
-- eval: E9-khuon
-  run_id: minted-thue-phi-E9-khuon-r5
+- eval: E6-khuon
+  run_id: minted-thue-phi-E6-khuon-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.design.khuon
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
   output: |
-    design-floor-khuon --kiem: 16 tệp giao diện ngoài bản đồ; không dòng «lệch:» cho nhóm danh-sach-khung.
+    design-floor-khuon.mjs --kiem --root .
+    17 tệp giao diện ngoài bản đồ
 
-- eval: E2-ui
-  run_id: minted-thue-phi-E2-ui-r5
+- eval: E9-khuon
+  run_id: minted-thue-phi-E9-khuon-r6
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
-  verified_at: 2026-11-15T01:39:20Z
+  verifier: config:executors.design.khuon
+  verified_at: 2026-11-15T10:42:02Z
+  output: |
+    design-floor-khuon.mjs --kiem --root .
+    17 tệp giao diện ngoài bản đồ
+
+- eval: E6-floor
+  run_id: minted-thue-phi-E6-floor-r6
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.design.floor
+  verified_at: 2026-11-15T10:42:02Z
+  output: |
+    design-floor-s4.mjs --root . chạy xong, không báo hex thô.
+
+- eval: E2-ui
+  run_id: minted-thue-phi-E2-ui-r6
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.ui
+  verified_at: 2026-11-15T10:42:02Z
   screenshot: evidence/E2-ui-step1.png
   observed: |
-    E2-1440-sang (light): the "Tuỳ chỉnh của sàn" screen, "Thuế phí" tab selected. The header reads "3 khoản · 3 đang tính vào giá bao phí". Three rows: Thuế thu nhập cá nhân 2% (theo luật, on), Lệ phí trước bạ 0,5% (theo luật, on), Phí môi giới with input 1,5% (Đã đổi, on, "..." menu). The footer reads "Giá chào 3 tỷ bao phí → về tay 2,88 tỷ". The Lưu button is pale because it is disabled after saving. A toast reads "Đã lưu thuế phí". Dark text on a light background, all readable, no overlap.
-    E2-1440-toi (dark): same layout and content on a dark background. Text is light and readable, toggles are blue, the Lưu and Thêm khoản buttons are visible, and the toast is readable.
-    E2-1024-sang (light): the same content in a narrower layout. Each row stacks as a title and subtitle, then the % value and toggle on the next line. The Phí môi giới row shows 1,5 % with its toggle and the "..." menu. The footer, Lưu button and toast are fine and nothing is clipped.
-    E2-1024-toi (dark): the same stacked layout in dark mode, all text readable.
-    All four frames match the Expected: frames consistent, text readable in light and dark.
+    All four frames are the Thue phi page under "Tuy chinh cua san", company "[San A thu thue phi]". Header says "3 khoan · 3 dang tinh vao gia bao phi". Rows: Thue thu nhap ca nhan 2% (on), Le phi truoc ba 0,5% (on), Phi moi gioi with input 1,5 % (on, "Da doi · [Ten] A4 · 15/11/2026"). Footer says "Gia chao 3 ty bao phi → ve tay 2,88 ty" with a Luu button, and a toast "Da luu thue phi" appears at the bottom right.
+    - E2-1440-sang: light theme, rows on one line with the value and toggle at the right. Text is dark on white and clearly readable. The Luu button is pale blue because it is disabled. No overlap or clipping.
+    - E2-1440-toi: dark theme with the same layout. Text is light on near-black and readable. The "Them khoan" and Luu buttons keep legible labels. No clipping.
+    - E2-1024-sang: light theme. Each row stacks, with the value and toggle under the title. Everything is readable with no overflow, and the layout fits 1024 wide.
+    - E2-1024-toi: dark theme with the same stacked layout. Text and toggles are legible, and no element is cut off.
+    The frames match each other and the Expected: "Moi khung khop; chu doc duoc o ca sang va toi".
   network_observed: n-a (driver)
 
 - eval: E3-ui
-  run_id: minted-thue-phi-E3-ui-r5
+  run_id: minted-thue-phi-E3-ui-r6
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
-  verified_at: 2026-11-15T01:39:20Z
+  verifier: config:executors.ui
+  verified_at: 2026-11-15T10:42:02Z
   screenshot: evidence/E3-ui-step1.png
   observed: |
-    E3-sai.png (also E3-ui-step1): Company B, "Thuế phí" part on the default schedule. The "Phí môi giới" row has a red-outlined input showing 6 and the error "Tỉ lệ tối đa 5%." The Save button is greyed out. Header reads 3 items, 3 counted, with a 2,745 tỷ net. This matches "typed 6". E3-luu.png (also E3-ui-step2): "Phí môi giới" shows 1,5 with no error. "Lệ phí trước bạ" has its toggle off, with the note "Đã đổi · [Tên] B4 · 15/11/2026". Header reads 3 items, 2 counted, net 2,895 tỷ. The toast "Đã lưu thuế phí" appears. This matches "1,5 saved with Lệ phí trước bạ off". E3-tai-lai.png (also E3-ui-step3): same part opened again with no toast. "Phí môi giới" is 1,5, "Lệ phí trước bạ" is off, header is 2 counted, net 2,895 tỷ. The saved state persisted. The three frames agree with Expected.
+    E3-sai.png (1440 wide, company B "[Sàn B thử thuế phí]", Tuỳ chỉnh của sàn, Thuế phí): the Phí môi giới row has a red-bordered input with 6, the red message "Tỉ lệ tối đa 5%.", the Lưu button greyed out, the summary "3 khoản · 3 đang tính vào giá bao phí" and the footer "Giá chào 3 tỷ bao phí → về tay 2,745 tỷ". The other two rows (Thuế thu nhập cá nhân 2%, Lệ phí trước bạ 0,5%) are on. E3-luu.png: Phí môi giới shows 1,5 with the note "Đã đổi · [Tên] B4 · 15/11/2026"; Lệ phí trước bạ is off, noted "Đã đổi"; the summary reads "3 khoản · 2 đang tính", the footer "về tay 2,895 tỷ", and the toast "Đã lưu thuế phí" is visible. E3-tai-lai.png: after reopening, the same state persists: 1,5, Lệ phí trước bạ off, "2 đang tính", "về tay 2,895 tỷ", the "Đã đổi" notes, and no toast. All three frames match the expected "Ba khung khớp".
   network_observed: n-a (driver)
 
 - eval: E4-ui
-  run_id: minted-thue-phi-E4-ui-r5
+  run_id: minted-thue-phi-E4-ui-r6
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
-  verified_at: 2026-11-15T01:39:20Z
-  screenshot: evidence/E4-ui-step1.png
+  verifier: config:executors.ui
+  verified_at: 2026-11-15T10:42:02Z
+  screenshot: evidence/E4-sang.png
   observed: |
-    E4-sang.png (light): company A TeamLead, screen "Tuỳ chỉnh của sàn", Thuế phí part selected in the left menu. Three rows: Thuế thu nhập cá nhân 2% (on, "theo luật · Mặc định"), Lệ phí trước bạ 0,5% (off, "theo luật · Đã đổi · [Tên] A4 · 15/11/2026"), Phí môi giới 2% (on, "Đã đổi · [Tên] A4 · 15/11/2026"). Footer reads "Giá chào 3 tỷ bao phí → về tay 2,88 tỷ" and "Chỉ Quản trị sàn đổi được thuế phí" (read only). The header shows "3 khoản · 2 đang tính vào giá bao phí". E4-toi.png (dark): the same layout, text, values, toggle states and positions on a dark background. The text and toggles are readable and the part is selected in the menu. No overlap or clipping. The dev "N" badge is hidden. Light and dark match, as expected.
+    Light frame (E4-sang.png, 1440x900): the page "Tùy chỉnh của sàn", sub-menu with "Thuế phí" highlighted, and the card "Thuế phí – 3 khoản · 2 đang tính vào giá bao phí". It lists three rows. "Thuế thu nhập cá nhân" shows 2% with the toggle on, "Lệ phí trước bạ" shows 0,5% with the toggle off, and "Phí môi giới" shows 2% with the toggle on. The footer reads "Giá chào 3 tỷ bao phí → về tay 2,88 tỷ" and "Chỉ Quản trị sàn đổi được thuế phí". There is no save button or input field, so it reads as read-only for the TeamLead. Dark frame (E4-toi.png): the same page, the same three rows, the same values and toggle states, the same footer text and the same positions. The only difference is the dark background and light text, so the frame matches in light and dark, as expected.
+  network_observed: n-a (driver)
+
+- eval: E6-ui
+  run_id: minted-thue-phi-E6-ui-r6
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.ui
+  verified_at: 2026-11-15T10:42:02Z
+  screenshot: evidence/E6-ui-step1.png
+  observed: |
+    E6-1440-sang.png (light, 1440): the Bảng hàng table shows the toolbar with the 60 dòng count, the Nhóm theo Toà, Cột, Toàn màn hình and Lưu góc nhìn buttons. The columns Căn, Toà, Dự án, Trạng thái, Giá chào, Về tay, Diện tích, Phòng ngủ and Xác nhận lúc are all visible. Row 8 is 0602, S1.02, status Chưa đủ để rao, Giá chào 3 tỷ and Về tay 2,88 tỷ, so Về tay is visible straight away. No broken layout.
+    E6-1440-toi.png (dark, 1440): the same content as the light frame, with 0602 showing 3 tỷ and 2,88 tỷ. Contrast is readable and the status badges are readable.
+    E6-1024-sang.png (light, 1024): the same table, now narrower. The columns end at Giá chào (cut off), so Về tay is not visible without scrolling. There is a horizontal scrollbar and no overflow break. Row 0602 shows no visible value because Giá chào is clipped.
+    E6-1024-toi.png (dark, 1024): the same as the light 1024 frame, with a correct dark theme.
+    E6-dieu-kien.png (1440, light): the Cột button is highlighted and the table is scrolled right to show Giá chào, Về tay, Diện tích, Phòng ngủ, Xác nhận lúc and Điều kiện phí. Row 0602 reads Giá chào 3 tỷ, Về tay 2,88 tỷ and Điều kiện phí "Bao phí". Other rows show "Không bao phí" or a dash.
+    This matches the expected result: the frames agree across light and dark and across 1440 and 1024, and Về tay is visible at once at 1440.
   network_observed: n-a (driver)
 
 - eval: E9-ui
-  run_id: minted-thue-phi-E9-ui-r5
+  run_id: minted-thue-phi-E9-ui-r6
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
-  verified_at: 2026-11-15T01:39:20Z
+  verifier: config:executors.ui
+  verified_at: 2026-11-15T10:42:02Z
   screenshot: evidence/E9-ui-step1.png
   observed: |
-    1440 pair. Thuế phí and Thành viên share the same elements. Left icon rail with the logo and 5 icons, the same position and highlight style. Top bar with the sidebar toggle, "[Sàn A thử thuế phí]", the search field, the theme toggle and the avatar "T". A rounded white panel. A sub-nav column at the left of the panel with a collapse handle. An H1 at the same x (352) with a blue primary action button at the right edge. A rounded card with a bold title, a muted subtitle and an inset rounded list with hairline-separated rows. Differences are slot content only. Sub-nav: 6 links with "Thuế phí" active, versus "Màn này chưa có mục con.". Title and button: "Tuỳ chỉnh của sàn" with "Thêm khoản", versus "Thành viên" with "Mời người". Thuế phí adds a one-line description above the card. The rows hold names, toggles and a % input, versus avatars, emails and role badges. Thuế phí has a footer with the "Giá chào" total and a "Lưu" button.
-    360 pair. The same top bar (toggle, name, search, theme, avatar), the same 16px gutter, the same H1 and the same card, with its title, subtitle and inset list. In Thuế phí the "Thêm khoản" button sits on its own row under the H1, plus a description and a footer. In Thành viên the "Mời người" button is inline at the right of the H1. Otherwise the frames match in shape and spacing, and the differences are slot content.
+    E9-thue-phi-1440 vs E9-thanh-vien-1440: both show the same App Shell. The left icon rail is the same, with the same nav icons. The top bar has the company name, a search box and a theme toggle. There is a secondary sub-nav column with the same width and divider. The content has an h1 title at the left and a blue primary button at the right at the same position (Thêm khoản / Mời người). Below that is one bordered card with a grey header (title plus count line), and inside it a rounded list of rows separated by dividers. The slot content differs: Thuế phí has a sub-nav list (Nhãn riêng ... Thuế phí), a description line, fee rows with toggles and an input, and a footer with a Lưu button. Thành viên has the "no sub-items" text, avatar rows, role badges and Đổi vai buttons. Verdict at 1440: same shape.
+    E9-thue-phi-360 vs E9-thanh-vien-360: both have the same top bar (menu toggle, company name, search icon, theme toggle, avatar), the same 16px gutter, an h1 title, and one card with a header (title plus count) and an inner rounded row list. Rows stack their content vertically in both. The difference at 360: in Thuế phí the Thêm khoản button wraps under the title (the title is longer and there is a description), while in Thành viên the Mời người button stays beside the title. The card, rows and header have the same shape. Verdict: same shape with a small content-driven wrap in the title row.
   network_observed: n-a (driver)
 
 - eval: E10-ui
-  run_id: minted-thue-phi-E10-ui-r5
+  run_id: minted-thue-phi-E10-ui-r6
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
-  verified_at: 2026-11-15T01:39:20Z
+  verifier: config:executors.ui
+  verified_at: 2026-11-15T10:42:02Z
   screenshot: evidence/E10-ui-step1.png
   observed: |
-    E10-them: Tuỳ chỉnh của sàn, Thuế phí section «4 khoản · 3 đang tính vào giá bao phí». Rows: Thuế thu nhập cá nhân 2% (theo luật), Lệ phí trước bạ 0,5% (theo luật, off), Phí môi giới with input 2 (Đã đổi), and a new row with name field «Phí dịch vụ hồ sơ» and input 0,3, labelled «Chưa lưu». The footer shows «Giá chào 3 tỷ bao phí → về tay 2,871 tỷ» and the Lưu button is active. E10-luu: the new row now reads «Phí dịch vụ hồ sơ · Sàn thêm · [Tên] A4 · 15/11/2026», value 0,3, with a «…» button. Lưu is disabled and the toast «Đã lưu thuế phí» shows. E10-menu: the «…» menu of the added item shows two entries, Đổi tên khoản and Bỏ khoản (red). E10-menu-moi-gioi: the «…» menu of Phí môi giới shows three entries, Đổi tên khoản, Trả về mặc định, Bỏ khoản (red). E10-luat: the two law rows (Thuế thu nhập cá nhân, Lệ phí trước bạ) show a plain percentage and a toggle only, with no input and no «…»; the «…» button on the Phí môi giới row has focus. All four expected frames match «Bốn khung khớp».
+    E10-them.png (1440 wide): Thuế phí card, subtitle "4 khoản · 3 đang tính vào giá bao phí". Rows: Thuế thu nhập cá nhân 2% and Lệ phí trước bạ 0,5% (both marked "theo luật", no «…» menu), Phí môi giới "Đã đổi" with an input showing 2, and a new row with a name field "Phí dịch vụ hồ sơ", rate field 0,3 focused, marked "Chưa lưu". The Lưu button is active and the footer reads "Giá chào 3 tỷ bao phí → về tay 2,871 tỷ". The Thêm khoản button is at top right. This matches.
+    E10-luu.png: the new row is now saved as "Phí dịch vụ hồ sơ 0,3%", marked "Sàn thêm · [Tên] A4 · 15/11/2026". The toast "Đã lưu thuế phí" appears, Lưu is greyed out, and the footer still reads 2,871 tỷ. This matches.
+    E10-menu.png: the «…» of the added item is open with two entries, "Đổi tên khoản" and "Bỏ khoản" (red). This matches.
+    E10-menu-moi-gioi.png: the «…» of Phí môi giới is open with three entries, "Đổi tên khoản", "Trả về mặc định" and "Bỏ khoản" (red), which is right for a changed default item. This matches.
+    E10-luat.png: the two law rows, Thuế thu nhập cá nhân (2%, toggle on) and Lệ phí trước bạ (0,5%, toggle off), are labelled "theo luật" and have no input or menu. Focus sits on the «…» of Phí môi giới. This matches. All frames are consistent in layout, with no overlap or clipping.
   network_observed: n-a (driver)
-
-### Eval mang sang (carry-forward)
-
-- eval: E5
-  run_id: minted-thue-phi-E5-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.thue_phi_ontology
-  verified_at: 2026-11-14T23:28:17Z
-  carried_from_round: 2
-  output: |
-    carry-forward tu round 2 — delta khong cham paths cua eval
-
-- eval: E6
-  run_id: minted-thue-phi-E6-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.thue_phi_ontology
-  verified_at: 2026-11-14T23:28:17Z
-  carried_from_round: 2
-  output: |
-    carry-forward tu round 2 — delta khong cham paths cua eval
-
-- eval: E6-ui
-  run_id: minted-thue-phi-E6-ui-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.ui-check
-  verified_at: 2026-11-14T23:28:17Z
-  carried_from_round: 2
-  screenshot: evidence/E6-ui-step1.png
-  observed: |
-    Bảng hàng 60 dòng ở 1440 sáng và tối: cột Về tay hiện ngay sau Giá chào (hàng S1.02: 3 tỷ, về tay 2,88 tỷ), Điều kiện phí ẩn sẵn. Ở 1024 bảng cắt ở Giá chào, Về tay nằm bên phải cần cuộn ngang, bố cục nguyên vẹn. Khung E6-dieu-kien (1440 sáng, mở menu Cột) hiện thêm cột Điều kiện phí với giá trị Bao phí hoặc Không bao phí, dấu — ở hàng không có giá trị. Các khung khớp nhau; Về tay thấy ngay ở 1440.
-  network_observed: n-a (driver)
-  # carry-forward tu round 2 — delta khong cham paths cua eval
 
 - eval: E7
   run_id: minted-thue-phi-E7-r2
   exit_code: 0
-  baseline: n-a
   verifier: config:executors.script.cach_ly_n
   verified_at: 2026-11-14T23:28:17Z
   carried_from_round: 2
-  output: |
-    carry-forward tu round 2 — delta khong cham paths cua eval
-
-- eval: E6-khuon
-  run_id: minted-thue-phi-E6-khuon-r2
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.design.khuon
-  verified_at: 2026-11-14T23:28:17Z
-  carried_from_round: 2
-  output: |
-    carry-forward tu round 2 — delta khong cham paths cua eval
-
-### Judgment
+  # carry-forward tu round 2 — delta khong cham paths cua eval
 
 - eval: E8-wiki
-  judged_by: hội đồng judge (đề xuất PASS, chỉ để tham khảo)
-  proposal: PASS
-  rationale: Cả ba góc nhìn đều thấy đủ bốn tệp khớp hợp đồng.
+  judged_by: judge panel (3 lens, fresh context)
+  verdict: PASS
+  rationale: Panel đề xuất PASS. Ba lens cùng thấy trang fee-schedule, đoạn Điều kiện phí ở trang listing, dòng log hàng 19 và phần Thuế phí trong screens.yaml.
   votes:
-    - domain-correctness: PASS — Trang fee-schedule nêu đủ: hai khoản theo luật (TNCN 2%, trước bạ 0,5%), Phí môi giới mặc định 1% trong khoảng 0–5%, Quản trị sàn đặt (setFeeSchedule), bốn vai đọc (readFeeSchedule), và nội bộ, trang khách không đọc (SP-4). Trang listing có đoạn Điều kiện phí (feeInclusion, hàng 19). log.md có đúng một dòng hàng 19 ngày 2026-11-14. screens.yaml có phần ?phan=thue-phi với nút setFeeSchedule.
-    - operational-feasibility: PASS — Trang fee-schedule nêu đủ ba khoản, ai đặt (chỉ Quản trị sàn, setFeeSchedule), ai đọc (bốn vai, readFeeSchedule) và rằng đây là dữ liệu nội bộ, trang khách không đọc (SP-4). Trang listing có đoạn Điều kiện phí (feeInclusion, hàng 19) và nói trang khách không đọc. Log có đúng một dòng 2026-11-14 cho hàng 19. Sổ màn có phần Thuế phí (?phan=thue-phi) với nút setFeeSchedule.
-    - spec-alignment: PASS — Trang fee-schedule nêu hai khoản theo luật, Phí môi giới mặc định 1% trong khoảng 0–5%, ai đặt và ai đọc, và ghi "Nội bộ; trang khách không đọc (SP-4)". Trang listing có đoạn Điều kiện phí (feeInclusion, hàng 19), log.md có dòng 2026-11-14 cho hàng 19, và screens.yaml có phần ?phan=thue-phi với nút setFeeSchedule.
+    - domain-correctness: PASS — Trang fee-schedule nêu đủ ba khoản (TNCN 2%, trước bạ 0,5%, Phí môi giới mặc định 1%, khoảng 0–5%), ai đặt (setFeeSchedule) và ai đọc (readFeeSchedule), và ghi nội bộ, trang khách không đọc (SP-4). Trang listing có đoạn Điều kiện phí (feeInclusion, hàng 19), log.md có dòng 2026-11-14 cho hàng 19, và screens.yaml có phần Thuế phí (?phan=thue-phi) với nút setFeeSchedule.
+    - operational-feasibility: PASS — Trang fee-schedule nêu đủ ba khoản (TNCN 2%, Lệ phí trước bạ 0,5%, Phí môi giới mặc định 1% trong khoảng 0–5%). Trang đó cũng nêu ai đặt (setFeeSchedule, Quản trị sàn), ai đọc (readFeeSchedule, bốn vai) và rằng mức là nội bộ, trang khách không đọc (SP-4). Trang listing có đoạn Điều kiện phí (feeInclusion, hàng 19). Log có dòng 2026-11-14 riêng cho hàng 19. Sổ màn có phần Thuế phí (?phan=thue-phi, hàng 19) với nút setFeeSchedule.
+    - spec-alignment: PASS — Trang fee-schedule có đủ: hai khoản theo luật (TNCN 2%, trước bạ 0,5%), Phí môi giới trong khoảng 0–5% và mặc định 1%, setFeeSchedule cho Quản trị sàn đặt, readFeeSchedule cho bốn vai đọc, và "Nội bộ; trang khách không đọc (SP-4)". Trang listing có đoạn Điều kiện phí (feeInclusion, hàng 19, Bao phí / Không bao phí) và nói trang khách không đọc. Log.md dòng 18 ghi hàng 19 (Thuế phí của sàn), và design/screens.yaml có phần Thuế phí (?phan=thue-phi) với nút setFeeSchedule trong nut.
   human_override:  # chi nguoi ghi
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-thue-phi-SUITE-build-r5
+  run_id: minted-thue-phi-SUITE-build-r6
   exit_code: 0
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
 
 - cmd: make e2e
-  run_id: minted-thue-phi-SUITE-make_e2e-r5
+  run_id: minted-thue-phi-SUITE-make_e2e-r6
   exit_code: 0
-  verified_at: 2026-11-15T01:39:20Z
+  verified_at: 2026-11-15T10:42:02Z
 
 ## Known limits
 
@@ -308,12 +308,12 @@ Round 5. Mọi eval máy đều xanh; còn một mục judgment (E8-wiki) chờ 
 
 carried tu round 1 — baseline khong do lai round nay
 
-Eval không phân biệt (xanh cả trên HEAD lẫn baseline, chứng minh harness hơn là tính năng; viết lại để assert hành vi mới hoặc xác nhận là regression-guard có chủ ý):
-- E8 (lệnh make check)
-- E6-khuon, E9-khuon (lệnh design-floor-khuon --kiem)
-- E6-floor (lệnh design-floor-s4)
+Baseline khong do: evals.yaml không đổi từ lần đo baseline cuối (round 1), mọi eval ghi baseline n-a.
 
-Baseline khong do: mọi eval ghi baseline n-a vì round này không đo lại.
+Eval không-phân-biệt (xanh cả trên HEAD lẫn baseline; chứng minh harness, không phải feature — viết lại để assert hành vi mới hoặc xác nhận là regression-guard có chủ ý):
+- make check — E8
+- design-floor-khuon.mjs --kiem — E6-khuon, E9-khuon
+- design-floor-s4.mjs — E6-floor
 
 ## Variance
 
@@ -321,8 +321,4 @@ none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: lượt gốc, chạy đầy đủ và đo baseline.
-Round 2: chạy lại đầy đủ; E5, E6, E6-ui, E7, E6-khuon xanh và được mang sang các round sau.
-Round 3: mang sang phần không đổi, chạy lại phần có đổi.
-Round 4: chấm trả về vì đặt lại mặc định sau khi đổi tên làm rơi tên khoản; sửa ở commit 2f49510, thêm bài đo ở d76ed4b.
-Round 5: mọi eval máy xanh trên cây 10869c2; E8-wiki chờ người chốt ở Cổng 2.
+Round 6: mọi eval máy xanh; E7 mang từ round 2; E8-wiki chờ người quyết nên verdict PENDING-JUDGMENT. Các round trước xem run-log.jsonl.

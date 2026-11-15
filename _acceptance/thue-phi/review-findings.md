@@ -1,4 +1,4 @@
-# Review findings: thue-phi (round 5)
+# Review findings: thue-phi (round 6)
 
 ## Trong hợp đồng
 
@@ -8,21 +8,42 @@
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Design / module boundary: company-config reads identity's company_members table directly**
+- **Evidence: CI is not green on the reviewed HEAD**
+  Người dùng thấy gì: Một số bước kiểm tra tự động trên bản chờ gộp chưa xong hoặc chưa qua, nên chưa thể coi các thử nghiệm với cơ sở dữ liệu thật là đã đạt. Đây là việc chờ chạy xong, không phải lỗi người dùng sẽ gặp.
+  Căn cứ: Chỉ là trạng thái chờ kiểm tra tự động, không làm mất dữ liệu hay hỏng chức năng, và sẽ tự rõ khi các bước chạy xong hoặc chạy lại.
+  file: `_acceptance/thue-phi/evidence-report.md`
+  severity: medium
+  Đề xuất: wont-fix
+
+- **CI and agent privileges / Tier: a protected check tool was loosened on a supervisor ruling that is not in any ledger**
+  Người dùng thấy gì: Công cụ kiểm tra vòng đời thao tác đã được nới lỏng theo một phán quyết của giám sát chưa được ghi vào sổ quyết định. Người dùng cuối không thấy gì, nhưng chủ kho nên biết để duyệt rõ ràng.
+  Căn cứ: Không ảnh hưởng dữ liệu hay màn hình của người dùng, chỉ thiếu dấu vết duyệt; ghi lại phán quyết vào sổ sau này là rẻ và không mất gì.
+  file: `tools/coverage_matrix/lifecycle.py`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Records: wiki/log.md newest-first order**
+  Người dùng thấy gì: Dòng ghi nhật ký của hàng này nằm lệch chỗ so với thứ tự mới nhất lên đầu. Chỉ ảnh hưởng người đọc nhật ký, không ảnh hưởng người dùng.
+  Căn cứ: Chỉ là thứ tự dòng trong nhật ký, không mất dữ liệu, ai đọc cũng tự hiểu được, và sửa lúc nào cũng rẻ.
+  file: `wiki/log.md`
+  severity: low
+  Đề xuất: wont-fix
+
+- **Design / module boundary: company-config reads identity's company_members table directly (r5)**
   Người dùng thấy gì: Khi Quản trị sàn lưu thuế phí, hệ thống lấy tên người lưu bằng đường tắt không chính thức. Người dùng vẫn thấy đúng tên, chỉ khi không tìm ra tên thì dòng nguồn ghi «—».
   Căn cứ: Dữ liệu vẫn không lọt sang sàn khác và người dùng hầu như không thấy khác biệt; chỉ là nợ cấu trúc, sửa sau vẫn rẻ.
   file: `src/modules/company-config/fee-store.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): bên gửi «màn» trong bảng tên-qua-một-lần-Lưu được chép tay, không lấy từ màn**
+- **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): bên gửi «màn» trong bảng tên-qua-một-lần-Lưu được chép tay, không lấy từ màn (r5)**
   Người dùng thấy gì: Bài kiểm chưa tự bắt được trường hợp màn thôi gửi tên của khoản không đổi. Nếu lỗi đó quay lại, người dùng có thể thấy tên khoản riêng bị đặt về mặc định mà không có cảnh báo từ kiểm thử.
   Căn cứ: Hiện chưa có lỗi nào xảy ra với người dùng, hai đầu vẫn được đo riêng; thêm bài đo vòng kín có thể làm sau và không mất dữ liệu.
   file: `src/modules/company-config/fee-store.test.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 4 (âm-tính-một-mình, không ghim thông điệp): «is up to date with the code» chỉ đo mã thoát 0, mà công cụ cũng thoát 0 khi không kiểm gì**
+- **Hình dạng 4 (âm-tính-một-mình, không ghim thông điệp): «is up to date with the code» chỉ đo mã thoát 0, mà công cụ cũng thoát 0 khi không kiểm gì (r5)**
   Người dùng thấy gì: Bài kiểm danh mục thành phần giao diện có thể báo xanh dù công cụ không kiểm gì. Người dùng không thấy gì khác; chỉ là danh mục có thể lệch với mã mà không ai hay.
   Căn cứ: Không ảnh hưởng người dùng và không mất dữ liệu; lệch danh mục sẽ lộ ra ở lượt sau và sửa lúc đó không tốn kém.
   file: `tests/design-registry.test.ts`
@@ -64,7 +85,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Design: địa chỉ API viết lặp, không dùng hằng FEE_API đã khai (r3 · tệp đã đổi)**
+- **Design: địa chỉ API viết lặp, không dùng hằng FEE_API đã khai (r3)**
   Người dùng thấy gì: Địa chỉ lưu thuế phí được viết lặp ở hai chỗ trong mã. Người dùng không thấy gì khác; chỉ gây nhầm cho người sửa mã nếu sau này đổi đường dẫn.
   Căn cứ: Không ảnh hưởng người dùng, chi phí sửa nhỏ nhưng cũng không đáng mở việc riêng.
   file: `src/modules/company-config/ui/fee-part.tsx`
@@ -85,7 +106,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: high
   Đề xuất: known-limits
 
-- **anh-ui-check is not idempotent: adding the item «Phí dịch vụ hồ sơ» fails on any second run against the same company/DB (r3)**
+- **anh-ui-check is not idempotent: adding the item «Phí dịch vụ hồ sơ» fails on any second run against the same company/DB (r3 · tệp đã đổi)**
   Người dùng thấy gì: Bài kiểm tra bằng trình duyệt chỉ chạy đúng lần đầu trên một sàn mẫu; chạy lại trên cùng dữ liệu sẽ báo lỗi tên trùng dù sản phẩm đúng. Người dùng cuối không gặp.
   Căn cứ: Chỉ ảnh hưởng người chạy kiểm thử, tránh được bằng cách dựng lại dữ liệu mẫu trước mỗi lần, không ảnh hưởng người dùng.
   file: `tests/e2e-db/thue-phi.spec.ts`
@@ -113,7 +134,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: high
   Đề xuất: known-limits
 
-- **A 400 with no problem list is silently ignored when saving (r2 · tệp đã đổi)**
+- **A 400 with no problem list is silently ignored when saving (r2)**
   Người dùng thấy gì: Hiếm khi máy chủ từ chối lần lưu mà không nói lý do, khi đó bấm Lưu không thấy gì xảy ra và không có thông báo.
   Căn cứ: Chỉ xảy ra khi yêu cầu bị hỏng bất thường chứ không do người dùng nhập sai; không mất dữ liệu và tải lại rồi thử lại được.
   file: `src/modules/company-config/ui/fee-part.tsx`
@@ -127,21 +148,21 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: high
   Đề xuất: known-limits
 
-- **Hình dạng 4 (assert âm tính đứng một mình): cột Điều kiện phí vắng mặt trong bon-kho, không có đối chứng dương ở đường luôn chạy (r2)**
+- **Hình dạng 4 (assert âm tính đứng một mình): cột Điều kiện phí vắng mặt trong bon-kho, không có đối chứng dương ở đường luôn chạy (r2 · tệp đã đổi)**
   Người dùng thấy gì: Lời hứa cột Điều kiện phí ẩn sẵn nhưng bật được chỉ được kiểm đầy đủ khi chạy ca ảnh đặc biệt, lần chạy thường chỉ kiểm vế ẩn.
   Căn cứ: Không ảnh hưởng người dùng hôm nay; chỉ làm giảm độ tin của phép đo thường và bổ sung sau không tốn nhiều.
   file: `tests/e2e-db/thue-phi.spec.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 4 (assert âm tính đứng một mình): «mã đã bỏ không bị cấp lại» qua cả khi việc thêm thất bại (r2 · tệp đã đổi)**
+- **Hình dạng 4 (assert âm tính đứng một mình): «mã đã bỏ không bị cấp lại» qua cả khi việc thêm thất bại (r2)**
   Người dùng thấy gì: Kiểm tra tự động về việc khoản đã bỏ không bị dùng lại mã có thể vẫn xanh dù việc thêm khoản thất bại, nên không bắt được lỗi này nếu xảy ra.
   Căn cứ: Người dùng không gặp gì hôm nay; chỉ là lưới kiểm lỏng và làm chặt thêm là việc rẻ, làm khi tiện.
   file: `src/modules/company-config/fee-store.test.ts`
   severity: high
   Đề xuất: known-limits
 
-- **Hình dạng 4 (không ghim thông điệp, không đối chứng): khoản luật bị đổi tên hay bị bỏ chỉ kiểm status 400 (r2 · tệp đã đổi)**
+- **Hình dạng 4 (không ghim thông điệp, không đối chứng): khoản luật bị đổi tên hay bị bỏ chỉ kiểm status 400 (r2)**
   Người dùng thấy gì: Kiểm tra việc từ chối đổi tên hay bỏ khoản theo luật chỉ xem có báo lỗi hay không, chưa xem có nêu đúng khoản và dữ liệu có giữ nguyên không.
   Căn cứ: Người dùng không bị ảnh hưởng hôm nay; nếu về sau hỏng, lỗi có thể lọt qua kiểm tra nhưng sửa phần kiểm rẻ.
   file: `tests/db/thue-phi.db.test.ts`
@@ -155,25 +176,27 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: high
   Đề xuất: known-limits
 
-- **Hình dạng 5 (tuyên cả lớp nhưng chỉ đo một điểm): E6-e2e hứa «ở bốn khổ» nhưng ca chỉ chạy ở 1440 (r2)**
+- **Hình dạng 5 (tuyên cả lớp nhưng chỉ đo một điểm): E6-e2e hứa «ở bốn khổ» nhưng ca chỉ chạy ở 1440 (r2 · tệp đã đổi)**
   Người dùng thấy gì: Số Về tay cụ thể chỉ được kiểm ở màn hình lớn; ở ba cỡ màn hình nhỏ chỉ kiểm có cột chứ chưa kiểm giá trị.
   Căn cứ: Giá trị tính cùng một lõi cho mọi cỡ màn hình nên rủi ro thấp, và bổ sung kiểm tra là việc rẻ.
   file: `tests/e2e-db/thue-phi.spec.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 4 (thông điệp ghim không khớp assert): chiều đỏ của E2 ghim «Lệ phí trước bạ», nhưng assert sẽ hỏng trước lại so mã (r2 · tệp đã đổi)**
+- **Hình dạng 4 (thông điệp ghim không khớp assert): chiều đỏ của E2 ghim «Lệ phí trước bạ», nhưng assert sẽ hỏng trước lại so mã (r2)**
   Người dùng thấy gì: Nếu thứ tự ba khoản bị đảo, bài kiểm vẫn báo đỏ nhưng thông báo không nêu tên khoản như sổ ghi, nên người đọc khó hiểu ngay.
   Căn cứ: Không ảnh hưởng người dùng; chỉ làm thông báo lỗi khó đọc hơn mong đợi nên chấp nhận được.
   file: `src/modules/company-config/ui/fee-part.test.tsx`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): «phần không tự vẽ khung» được đo bằng grep tệp nguồn (r2 · tệp đã đổi)**
+- **Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): «phần không tự vẽ khung» được đo bằng grep tệp nguồn (r2)**
   Người dùng thấy gì: Việc phần Thuế phí dùng đúng khung chung chỉ được kiểm bằng đọc chữ trong mã, chưa kiểm giao diện thật, nên một viền tự thêm bằng cách khác có thể lọt.
   Căn cứ: Hiện chưa có lỗi hiển thị nào được chỉ ra, rủi ro là lệch giao diện nhẹ mà người dùng tải lại vẫn dùng được; làm chặt kiểm tra sau là rẻ.
   file: `src/modules/company-config/ui/fee-part.test.tsx`
   severity: medium
   Đề xuất: known-limits
+
+## Chưa adversarial-verify (refuter chết)
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).

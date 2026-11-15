@@ -1,1 +1,1 @@
-app-origin traffic: n/a (driver playwright test, no network reader)
+no-network: playwright spec, no browser tool

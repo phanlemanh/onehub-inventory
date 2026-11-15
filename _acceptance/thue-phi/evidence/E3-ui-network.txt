@@ -1,1 +1,1 @@
-driver: playwright test runner, no network reader
+driver: playwright spec (no browser-tool network); n-a (driver)
