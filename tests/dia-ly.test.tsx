@@ -337,6 +337,18 @@ function checkTabKept(
   if (count !== wantCount || !address.includes(wantPlace)) throw new Error("bam kem phim doi tab");
 }
 
+/** «Tất cả hàng» shows every row; throws when the picked place survived the press. */
+/** The footer's row count when no filter narrows the grid («60 dòng»), or the shown count while one does. */
+const allCount = () =>
+  footer() ??
+  /(\d+) dòng/.exec(
+    document.querySelector('[data-slot="region-footer-count"]')?.textContent ?? "",
+  )?.[1];
+
+function checkAllRows(count: string | undefined): void {
+  if (count !== "60") throw new Error("tat ca hang con loc noi");
+}
+
 describe("one filter state", () => {
   it("picking a building keeps the status filter and fills the project and building boxes", async () => {
     const filters = inventoryFiltersFrom("Active");
@@ -389,6 +401,25 @@ describe("one filter state", () => {
     await waitFor(() => expect(vung()).toContain("S1.02"));
     expect(footer()).toBe("9");
     expect(box("Toà").value).toBe("S1.02");
+  });
+
+  it("«Tất cả hàng» pressed while it is still the lit entry drops the picked place too", async () => {
+    // The column lights its entry from the address the router reports, a beat after the pick writes it: in that beat
+    // «Tất cả hàng» is still the open entry, and pressing it reopens the screen. It must reopen with every row.
+    shell(ROWS);
+    fireEvent.click(within(groupOf(P1)).getByRole("link", { name: "S1.03" }));
+    await waitFor(() => expect(footer()).toBe("10"));
+    const all = [...column().querySelectorAll<HTMLAnchorElement>("a")].find(
+      (a) => a.getAttribute("href") === "/inventory",
+    )!;
+    expect(all.getAttribute("aria-current")).toBe("true");
+    fireEvent.click(all);
+    await waitFor(() => expect(box("Toà").value).toBe(""));
+    checkAllRows(allCount());
+  });
+
+  it("break: «Tất cả hàng» that reopens on the picked place is caught", () => {
+    expect(() => checkAllRows("10")).toThrow("tat ca hang con loc noi");
   });
 
   it("break: a modified click that changes this tab is caught", () => {

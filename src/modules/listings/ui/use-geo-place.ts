@@ -34,15 +34,25 @@ export function useGeoPlace({
   /** False while a saved view is open: the view keeps the lit entry, and no place is written. */
   active: boolean;
 }): GeoPlace {
-  const { setPick } = usePlaceChange();
-  const [state, setState] = useState<GeoPlace>({ picked: 0, view: undefined });
+  const { setPick, reopened } = usePlaceChange();
+  // `at`: the reopen count the pick was made under. Reopening an entry drops the pick, so a press on the entry that is
+  // still lit (the address of a pick reaches the column a beat later) opens the entry afresh, not the picked place.
+  const [state, setState] = useState<GeoPlace & { at: number }>({
+    picked: 0,
+    view: undefined,
+    at: reopened,
+  });
   const latest = useRef(view);
   // The address another entry of the screen is opening: the place is not written back until it has arrived, or the
   // write would cut that navigation short.
   const leaving = useRef<string | null>(null);
+  const reopenedNow = useRef(reopened);
   useEffect(() => {
     latest.current = view;
   }, [view]);
+  useEffect(() => {
+    reopenedNow.current = reopened;
+  }, [reopened]);
 
   useEffect(() => {
     if (!tree || !active) return;
@@ -58,7 +68,7 @@ export function useGeoPlace({
           Object.keys(withoutPlace(current.filters)).length !== Object.keys(current.filters).length;
         if (placed) {
           leaving.current = url.pathname + url.search;
-          setState((s) => ({ picked: s.picked + 1, view: undefined }));
+          setState((s) => ({ ...s, picked: s.picked + 1, view: undefined }));
         }
         return false;
       }
@@ -67,6 +77,7 @@ export function useGeoPlace({
       setState((s) => ({
         picked: s.picked + 1,
         view: { ...current, filters: { ...withoutPlace(current.filters), ...geo } },
+        at: reopenedNow.current,
       }));
       return true;
     });
@@ -89,5 +100,5 @@ export function useGeoPlace({
     window.history.replaceState(null, "", url);
   }, [active, placeKey]);
 
-  return state;
+  return { picked: state.picked, view: state.at === reopened ? state.view : undefined };
 }
