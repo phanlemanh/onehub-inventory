@@ -25,3 +25,12 @@ code:
   model: src/modules/company-config/
   tests: tests/db/lop-rieng.db.test.ts
 wiki: wiki/entities/company-value-alias.md
+
+# Lifecycle of this entity on the screens that show it (roadmap row 1t, tools/coverage_matrix/lifecycle.py). Each cell:
+# co = an action of ontology/actions.yaml (a planned one names the row that opens it), hang = a roadmap row will do it,
+# khong = deliberately absent, with the owner's gate line in duyet. Cells as approved at the 1t scope gate.
+vong_doi:
+  them: { co: addCompanyLayer }
+  xem: { co: readCompanyLayer }
+  sua: { co: editCompanyLayer }
+  go: { co: retireCompanyLayer }

@@ -51,3 +51,27 @@ code:
   model: src/modules/listings/
   tests: tests/
 wiki: wiki/entities/listing.md
+
+# Lifecycle of this entity on the screens that show it (roadmap row 1t, tools/coverage_matrix/lifecycle.py). Each cell:
+# co = an action of ontology/actions.yaml (a planned one names the row that opens it), hang = a roadmap row will do it,
+# khong = deliberately absent, with the owner's gate line in duyet. Cells as approved at the 1t scope gate.
+vong_doi:
+  them: { co: createListing, hang: "12" }
+  xem:
+    co: viewListings
+    hang: "10"
+    chan:
+      CompanyAdmin:
+        hang: "10"
+        ly_do: "The company admin opens the listing board; row 10 gives that role read-only access."
+  sua: { co: updateListing, hang: "10" }
+  go: { co: removeListing, hang: "18b" }
+  rieng:
+    sua_ngoai_gia:
+      hang: "3g"
+      ly_do: "Legal, furniture, finance and occupancy are edited in row 3g; rows 4 and 3d edit price and status only."
+    dua_len_ban: { co: activateListing, hang: "15" }
+    nhan: { hang: "18a", ly_do: "Taking a unit nobody keeps yet." }
+    doi_nguoi_giu:
+      hang: "18a"
+      ly_do: "Changing who keeps a unit at an ordinary time, not only when someone leaves."

@@ -47,3 +47,18 @@ code:
   model: src/modules/company-config/
   tests: src/modules/company-config/fee-schedule.test.ts
 wiki: wiki/entities/fee-schedule.md
+
+# Lifecycle on the screens that show it (row 1t, tools/coverage_matrix/lifecycle.py). The Thuế phí part saves the whole
+# schedule at once with setFeeSchedule, so adding and retiring an own item are cells done inside that one save
+# (qua_luu, G N-1511-3); law items are only switched on or off.
+vong_doi:
+  them:
+    co: setFeeSchedule
+    qua_luu: true
+    ly_do: "An own item is added on the Thuế phí part and kept by the one save of the whole schedule."
+  xem: { co: readFeeSchedule }
+  sua: { co: setFeeSchedule }
+  go:
+    co: setFeeSchedule
+    qua_luu: true
+    ly_do: "An own item is retired on the Thuế phí part and kept by the one save of the whole schedule; law items are never removed."

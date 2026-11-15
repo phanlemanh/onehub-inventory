@@ -38,3 +38,6 @@ nhập để tính cột Về tay.
 ## History
 
 Thêm ở hàng 19 (thue-phi), 14/11/2026; chủ kho duyệt phạm vi và kế hoạch cùng ngày (Hỏi-7 B: sàn thêm khoản riêng).
+
+Phép kiểm vòng đời (hàng 1t) đọc khoản riêng ở dạng ô «qua lưu cả bảng»: thêm và bỏ khoản riêng đi trong một lần Lưu
+cả bảng bằng `setFeeSchedule` (G N-1511-3, [`ontology/entities/FeeItem.yaml`](../../ontology/entities/FeeItem.yaml)).

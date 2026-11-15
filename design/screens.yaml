@@ -14,6 +14,9 @@
 #   mo_san    (optional) the actions of `nut` whose buttons show as soon as the screen opens; the role × screen browser
 #             suite expects exactly these for every role that holds them (row 9b)
 #   nut_chung (staff/public) buttons that do not depend on a permission, as people read them
+#   hien      (staff/public, and khung) the entities of ontology/entities/ the screen shows; tools/coverage_matrix/
+#             lifecycle.py also reads them from the code and fails on one not listed, and each needs a `vong_doi`
+#             block in its ontology file (row 1t)
 #   vao_vung  (optional, family grid only) the path the browser suite's region cases open, under the screen's own
 #             route; absent, they open `route`. The frame cases always open `route` (row 7e)
 #
@@ -30,6 +33,7 @@ statuses: [built, planned]
 khung:
   nut: [editView, removeView]
   nut_chung: [Tìm (⌘K), Đổi sàn, Đăng xuất]
+  hien: [SavedView, Listing, Unit]
 screens:
   - id: today
     route: /
@@ -40,6 +44,7 @@ screens:
     vao: null
     nut: []
     nut_chung: []
+    hien: []
   - id: inventory
     route: /inventory
     title: Inventory
@@ -59,6 +64,7 @@ screens:
       - viewListings
     mo_san: [saveView]
     nut_chung: [Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng]
+    hien: [Listing, Unit, ListingOwner, SavedView]
   - id: sent
     route: /sent
     title: Sent
@@ -68,6 +74,7 @@ screens:
     vao: null
     nut: []
     nut_chung: [Lọc, Cột, Toàn màn hình, Ghim]
+    hien: [ShareLink]
   - id: contacts
     route: /contacts
     title: Contact
@@ -77,6 +84,7 @@ screens:
     vao: viewContacts
     nut: [createContact, updateContact, removeContact, mergeContacts, eraseContactPersonalData]
     nut_chung: []
+    hien: [Contact]
   - id: tuy-chinh-san
     route: /tuy-chinh-san
     title: CompanyLayer
@@ -90,6 +98,15 @@ screens:
     nut: [addCompanyLayer, editCompanyLayer, retireCompanyLayer, matchPendingUnits, setFeeSchedule]
     mo_san: [addCompanyLayer]
     nut_chung: [Lọc, Cột, Toàn màn hình]
+    hien:
+      - CompanyLabel
+      - CustomField
+      - CompanyValueAlias
+      - ImportTemplate
+      - PendingUnit
+      - FeeItem
+      - Listing
+      - Unit
   - id: proto
     route: /proto/[slug]
     title: null
@@ -111,6 +128,7 @@ screens:
     vao: null
     nut: []
     nut_chung: []
+    hien: []
   - id: members
     route: /members
     title: Member
@@ -121,3 +139,4 @@ screens:
     nut: [inviteMember, changeMemberRoles]
     mo_san: [inviteMember, changeMemberRoles]
     nut_chung: []
+    hien: [Member]
