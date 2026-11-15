@@ -62,6 +62,7 @@ export function pasteWords(labels: CellEditLabels) {
       `thuộc tính ${lower(unit(tx))} — không sửa trên bảng`,
     confirmed: "máy tự ghi khi giá hay trạng thái đổi",
     custom: "cột riêng của sàn chưa sửa được trên bảng",
+    computed: "cột máy tính từ các cột khác — không dán được",
     other: "cột này không sửa trên bảng",
     notAllowed: "vai của bạn không sửa được ô này",
     price: "chưa hiểu — gõ như 4,65 tỷ hoặc 950 triệu",
@@ -91,11 +92,15 @@ const percent = new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 2 });
 const swingMark = (swing: number) =>
   `${swing > 0 ? "+" : "−"}${percent.format(Math.abs(swing) * 100)}%`;
 
-/** Reads a pasted region onto the inventory rows. `headerOf` names a column as the grid shows it. */
+/**
+ * Reads a pasted region onto the inventory rows. `headerOf` names a column as the grid shows it; `computed` lists the
+ * columns the machine works out from others (row 19's «Về tay»), which a paste never writes.
+ */
 export function planPaste(
   paste: RegionPaste,
   labels: CellEditLabels,
   headerOf: (field: FieldKey) => string,
+  computed: readonly FieldKey[] = [],
 ): PastePlan {
   const say = pasteWords(labels);
   const changes: PasteChangeLine[] = [];
@@ -122,9 +127,11 @@ export function planPaste(
         ? say.unitFact(row.transaction)
         : field === CONFIRMED
           ? say.confirmed
-          : field.startsWith("custom.")
-            ? say.custom
-            : say.other;
+          : computed.includes(field)
+            ? say.computed
+            : field.startsWith("custom.")
+              ? say.custom
+              : say.other;
       skipped.push({ ...line, why });
       continue;
     }
