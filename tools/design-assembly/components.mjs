@@ -278,16 +278,38 @@ function declaredSets(text) {
   return sets;
 }
 
-// Names a file exports that are components: they start with a capital letter.
-function exported(text) {
-  const names = [];
-  for (const list of text.matchAll(/^export\s*\{([^}]*)\}/gm)) {
-    for (const item of list[1].split(",")) {
+// The names a file brings in from other files with its imports, as the file itself calls them.
+function importedNames(text) {
+  const names = new Set();
+  for (const match of text.matchAll(/^import\s+(?!type\b)([^"';]*?)\s+from\s*["']/gm)) {
+    const clause = match[1];
+    const list = /\{([^}]*)\}/.exec(clause);
+    for (const item of list ? list[1].split(",") : []) {
       const name = item
         .trim()
+        .replace(/^type\s+/, "")
         .split(/\s+as\s+/)
         .at(-1);
-      if (name) names.push(name);
+      if (name) names.add(name);
+    }
+    const rest = clause.replace(/\{[^}]*\}/, "");
+    for (const name of rest.matchAll(/(?:\*\s+as\s+)?([A-Za-z_$][\w$]*)/g)) names.add(name[1]);
+  }
+  return names;
+}
+
+// Names a file exports that are components: they start with a capital letter. A component is
+// listed at the file that defines it, so a file that only hands one on is not where it is: a list
+// exported from another file (`export { X } from`, `export * from`) or a name the file imports and
+// exports again.
+function exported(text) {
+  const names = [];
+  const imported = importedNames(text);
+  for (const list of text.matchAll(/^export\s*\{([^}]*)\}/gm)) {
+    if (/^\s*from\b/.test(text.slice(list.index + list[0].length))) continue;
+    for (const item of list[1].split(",")) {
+      const [local, name = local] = item.trim().split(/\s+as\s+/);
+      if (name && !imported.has(local)) names.push(name);
     }
   }
   for (const direct of text.matchAll(/^export\s+(?:default\s+)?(?:function|const)\s+(\w+)/gm)) {
