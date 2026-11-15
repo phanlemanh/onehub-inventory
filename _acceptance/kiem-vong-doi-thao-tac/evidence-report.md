@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 2e3aab21407f5e2fae60321236f83de7d58f1024
+verified_commit: 5315e508b8e42480439d0065c679c494a5e54e5a
 human_signoff:
 ---
 
@@ -149,3 +149,7 @@ none — every multi-run eval is uniform
 ## Iterations
 
 Round 4: E1-E8 va E6b xanh, lenh suite build va e2e xanh tren cung cay ma da ghim. Cac round truoc: xem run-log.jsonl.
+
+### Re-pin lần 1 — 2026-11-15, do gop main c53b35d (2b) sau luot cham 4
+run_id: repin-20261115T081713Z-25278
+sha: 5315e508b8e42480439d0065c679c494a5e54e5a · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng
