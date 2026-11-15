@@ -40,3 +40,17 @@ code:
   model: src/modules/listings/
   tests: tests/db/goc-nhin.db.test.ts
 wiki: wiki/entities/saved-view.md
+
+# Lifecycle of this entity on the screens that show it (roadmap row 1t, tools/coverage_matrix/lifecycle.py). Each cell:
+# co = an action of ontology/actions.yaml (a planned one names the row that opens it), hang = a roadmap row will do it,
+# khong = deliberately absent, with the owner's gate line in duyet. Cells as approved at the 1t scope gate.
+vong_doi:
+  them: { co: saveView }
+  xem:
+    co: listSavedViews
+    chan:
+      CompanyAdmin:
+        hang: "10"
+        ly_do: "The company admin opens the listing board; row 10 gives that role read-only access."
+  sua: { co: editView }
+  go: { co: removeView }

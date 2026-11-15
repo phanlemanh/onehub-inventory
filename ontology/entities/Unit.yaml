@@ -34,3 +34,18 @@ code:
   model: src/modules/catalog/
   tests: tests/
 wiki: wiki/entities/unit.md
+
+# Lifecycle of this entity on the screens that show it (roadmap row 1t, tools/coverage_matrix/lifecycle.py). Each cell:
+# co = an action of ontology/actions.yaml (a planned one names the row that opens it), hang = a roadmap row will do it,
+# khong = deliberately absent, with the owner's gate line in duyet. Cells as approved at the 1t scope gate.
+vong_doi:
+  them:
+    hang: "12"
+    ly_do: "Row 12 creates a unit by hand when the catalog does not have it yet."
+  xem: { co: readCatalog }
+  sua:
+    khong: "The catalog of buildings and units is shared; a company does not edit it."
+    duyet: "kiem-vong-doi-thao-tac#d-20261115T042837Z-14"
+  go:
+    khong: "Merging, splitting or retiring buildings and units is outside the MVP."
+    duyet: "kiem-vong-doi-thao-tac#d-20261115T042837Z-14"
