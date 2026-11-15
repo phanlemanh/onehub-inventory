@@ -26,6 +26,12 @@ export const GRID_COPY = {
     more: (title: string) => `Việc khác — ${title}`,
     column: "Việc",
   },
+  /** The grid as a list of cards below 768 px (row 2b): toolbar, filter sheet, sort. */
+  phone: {
+    more: "Thêm",
+    sortBy: "Sắp theo",
+    removeFilter: (header: string) => `Bỏ lọc ${header}`,
+  },
   /** Using the grid by hand like a sheet (row 2a): filter row, columns, grouping, selection. */
   sheet: {
     filter: "Lọc",

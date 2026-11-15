@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { FieldKey } from "@/components/candidate/column-kind";
 import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
+import type { RegionPhoneList } from "@/components/candidate/phone-list";
 import type { ColumnFilters, GridView } from "@/components/candidate/grid-view";
 import { usePlaceChange } from "@/components/templates/app-shell/place-change";
 import { notifyResult } from "@/components/templates/notify";
@@ -22,7 +23,7 @@ import {
   type InventoryState,
 } from "./inventory-rows";
 import type { AskWords } from "./ask-copy";
-import { listingRecord, type FullRecordInput } from "./listing-record";
+import { ListingCard, listingRecord, listingView, type FullRecordInput } from "./listing-record";
 import { SaveViewButtons } from "./save-view-buttons";
 import { gridView, sameAsStored, savedViewHref } from "./saved-view-api";
 import { savedViewCopy, type SavedViewLabels } from "./saved-view-copy";
@@ -115,6 +116,21 @@ export function InventoryGrid({
     (field: FieldKey) => columns.find((c) => c.field === field)?.header ?? field,
     [columns],
   );
+  // Below 768 px the region shows each row as the listing card's row layout (row 2b): the record head's own card.
+  const phoneList = useMemo(
+    (): RegionPhoneList<GridRow> => ({
+      label: (row) => `${headers["Listing.unitNumber"]} ${String(row["Listing.unitNumber"] ?? "")}`,
+      card: (row) => (
+        <ListingCard
+          layout="row"
+          view={listingView(row, headers)}
+          priceLabel={headers["Listing.listPrice"]}
+          building={String(row["Listing.buildingName"] ?? "")}
+        />
+      ),
+    }),
+    [headers],
+  );
   const edit = useListingCellEdit({ rows, listings, headers, labels: editLabels, door, headerOf });
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
@@ -158,6 +174,7 @@ export function InventoryGrid({
           </Button>
         }
         cellEdit={edit.cellEdit}
+        phoneList={phoneList}
       />
     </>
   );
