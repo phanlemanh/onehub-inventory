@@ -7,13 +7,13 @@
 ```mermaid
 flowchart TD
   A["Đang cân nhắc cơ hội<br/>chưa có"] --> GD{"Cổng Đáng"}
-  GD --> B["Sắp mở vòng<br/>13 việc"]
+  GD --> B["Sắp mở vòng<br/>12 việc"]
   GD --> XL["Xếp lại sau<br/>chưa có"]
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
   GP --> DL["Đang làm<br/>1 việc"] --> GB{"Cổng Bằng chứng"}
-  GB --> DG["Đã giao<br/>2 việc"]
-  GB --> CN["Chờ phiên nghiệm thu<br/>44 việc"] --> GG{"Cổng Giá trị"}
+  GB --> DG["Đã giao<br/>3 việc"]
+  GB --> CN["Chờ phiên nghiệm thu<br/>45 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
 
@@ -25,7 +25,6 @@ flowchart TD
 ## Sắp mở vòng
 
 - Đầu chủ tải ảnh lên hồ sơ căn, đổi ảnh bìa, gỡ ảnh và thấy căn thành Sẵn sàng bán khi đủ điều kiện (`anh-va-san-sang-ban`)
-- Đầu chủ và Đầu khách mở Bảng hàng trên điện thoại thấy danh sách thẻ căn và chạm thẻ để mở hồ sơ căn (`bang-hang-the-dien-thoai`)
 - Đầu chủ đi Bảng hàng theo địa lý: chọn dự án, phân khu, toà ở cột thứ hai của App Shell và lọc các cột địa lý trên bảng (`bang-hang-theo-dia-ly`)
 - Đầu chủ dán một vùng từ Excel vào bảng và thấy trước những ô sẽ đổi (`dan-tu-excel`)
 - Sổ màn khai mỗi màn hiện những thứ gì, và bộ kiểm của kho (make check) đỏ khi một thứ trên màn thiếu thêm, xem, sửa hoặc gỡ theo từng vai, trừ khi ô thiếu mang lý do đã duyệt trỏ tới một hàng lộ trình (`kiem-vong-doi-thao-tac`)
@@ -47,6 +46,7 @@ flowchart TD
 - Nhân viên sàn làm việc trong một App Shell chọn từ ReUI Pro, giữ đủ thanh bên theo vai, băng báo và các trạng thái toàn trang đang có (`app-shell-chon-tu-reui`)
 - Đầu chủ mở Bảng hàng và thấy các căn của sàn trên Lưới, đủ trạng thái màn, ở bốn khổ màn hình (`bang-hang-ban-doc`)
 - Đầu chủ dùng Bảng hàng bằng tay như Sheet: đi giữa các ô bằng phím mũi tên, bôi một vùng ô rồi chép sang Zalo hay Excel, bấm tiêu đề để sắp xếp, lọc từng cột, nhóm dòng theo toà, ẩn hiện cột (`bang-hang-dung-tay-nhu-sheet`)
+- Đầu chủ và Đầu khách mở Bảng hàng trên điện thoại thấy danh sách thẻ căn và chạm thẻ để mở hồ sơ căn (`bang-hang-the-dien-thoai`)
 - Mọi thao tác đọc và ghi đều được quyết định từ một bảng quyền theo vai, phạm vi và trạng thái (`bang-quyen-theo-vai`)
 - Mỗi màn trong sổ có sẵn bộ bài kiểm trạng thái sinh ra từ sổ, kèm bài phá thử chứng minh bài kiểm đỏ được (`bo-bai-kiem-tu-so-man`)
 - Bộ kiểm chung sinh từ sổ màn chạy được trên màn cần đăng nhập và không lỡ nhịp khi máy chậm (`bo-kiem-chung-khi-dang-nhap`)
@@ -93,3 +93,4 @@ flowchart TD
 
 - Nhận plugin design-assembly — lệnh kiểm chạy lại lint của kho, sổ linh kiện do công cụ của plugin ghi thay công cụ viết tay (`adopt-design-assembly`)
 - `go-hoi-khi-gop`
+- Chép lại công cụ design-assembly từ plugin — sổ linh kiện hết ghi trùng linh kiện xuất lại qua tệp gom (`refresh-design-assembly-tool`)

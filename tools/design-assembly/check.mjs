@@ -41,6 +41,13 @@ import {
   screenLedgerProblem,
   sizesProblem,
 } from "./screens.mjs";
+import {
+  offersOf,
+  readModel,
+  screenActionsDebts,
+  screenActionsProblem,
+} from "./screen-actions.mjs";
+import { readScreenLedger } from "./screen-ledger.mjs";
 import { DEFAULT_STYLESHEET, findStylesheet, loadStyles, resolve } from "./styles.mjs";
 import { lintProbes } from "./lint.mjs";
 import { probesFor, ruleOf } from "./probes.mjs";
@@ -388,6 +395,39 @@ const KINDS = {
       return { ...state, files: { ...state.files, [check.file]: cut } };
     },
   },
+  // The ledger of screens agrees with the domain model: every action is offered to every role that
+  // may run it, no screen shows a record to a role that may not view it, and no button is one no
+  // role that opens its screen may press.
+  "screen-actions": {
+    run(state, check) {
+      const text = state.files?.[check.file];
+      const model = state.models?.[check.model];
+      // Installed once the ledger declared it: a ledger that stops declaring it, or a model
+      // without actions, no longer proves anything.
+      if (!model?.present) return `${check.model}/actions.yaml is missing, so nothing is joined`;
+      if (text === null || text === undefined) return `${check.file} is missing`;
+      if (!offersOf(readScreenLedger(text)).declared) {
+        return `${check.file} no longer says what any screen shows, opens with or offers`;
+      }
+      return screenActionsProblem(text, model, check.file);
+    },
+    // What the model plans for later, and the ledger's own actions without a screen: listed on
+    // every run, never failing.
+    notes(state, check) {
+      return screenActionsDebts(state.files?.[check.file], state.models?.[check.model]);
+    },
+    // One more screen, which shows a record the model does not have.
+    change(state, check) {
+      const added =
+        "  - id: changed-copy\n    route: /changed-copy\n    title: null\n    family: null\n    status: built\n    shows:\n      - ChangedCopy\n";
+      // First in the list, so that keys written after the screens stay where they are.
+      const before = state.files?.[check.file] ?? "";
+      const text = /^screens:\n/m.test(before)
+        ? before.replace(/^screens:\n/m, `screens:\n${added}`)
+        : `${before}screens:\n${added}`;
+      return { ...state, files: { ...state.files, [check.file]: text } };
+    },
+  },
   // No screen writes its own words.
   words: {
     run(state, check) {
@@ -686,6 +726,11 @@ export function readState(root) {
   const pages = checks
     .filter((check) => check.pages)
     .map((check) => [check.pages, readPages(root, check.pages)]);
+  // The domain models a check names, read once each.
+  const models = [...new Set(checks.map((check) => check.model).filter(Boolean))].map((folder) => [
+    folder,
+    readModel(root, folder),
+  ]);
   const rows = ledger === null ? null : parseLedger(ledger);
   return {
     root,
@@ -701,6 +746,7 @@ export function readState(root) {
     folders: Object.fromEntries(folders),
     pages: Object.fromEntries(pages),
     sources: Object.fromEntries(sources),
+    models: Object.fromEntries(models),
     // The column type each field of the data model names.
     displays: readDisplays(root),
     gate: read(FILES.gate),
@@ -713,6 +759,8 @@ export function readState(root) {
 export function runChecks(state) {
   return Object.entries(state.theme?.checks ?? {}).map(([id, checks]) => {
     const problems = [];
+    // What a check lists on every run without failing, such as work planned for later.
+    const notes = [];
     let seenFailing = true;
     for (const check of checks) {
       const kind = KINDS[check.kind];
@@ -722,6 +770,7 @@ export function runChecks(state) {
       }
       const problem = kind.run(state, check, id);
       if (problem) problems.push(problem);
+      if (kind.notes) notes.push(...kind.notes(state, check, id));
       if (kind.run(kind.change(state, check, id), check, id) === null) seenFailing = false;
     }
     return {
@@ -729,6 +778,7 @@ export function runChecks(state) {
       problem: problems.length > 0 ? problems.join("; ") : null,
       seenFailing,
       held: problems.length === 0 && seenFailing,
+      notes,
     };
   });
 }
@@ -811,6 +861,7 @@ function main() {
     for (const line of problems) stderr.write(`  ${line}\n`);
     exit(1);
   }
+  for (const r of results) for (const note of r.notes) stdout.write(`  ${r.id}, debt: ${note}\n`);
   const count = results.reduce((sum, r) => sum + state.theme.checks[r.id].length, 0);
   stdout.write(
     `design-assembly: ${results.length} decisions held by ${count} checks, each seen failing on a changed copy\n`,

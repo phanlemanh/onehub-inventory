@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "ghim": {
+    "dang-nhap": "f38f955e60cb5db33bb5a3ed743f88d5565546d4",
+    "danh-sach-khung": "718fde285963e50e4e31eeac95aa5c02b003671b",
+    "luoi": "61b989cc617777208e93a530d36a47482b841455"
+  },
+  "tep": {
+    "dang-nhap": "design/patterns/dang-nhap.md",
+    "danh-sach-khung": "design/patterns/danh-sach-khung.md",
+    "luoi": "design/patterns/luoi.md"
+  }
+}
