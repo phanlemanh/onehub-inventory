@@ -5,7 +5,7 @@ slug: refresh-design-assembly-tool
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, tooling]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-15
 design_doc: docs/superpowers/specs/2026-11-15-refresh-design-assembly-tool-design.md
@@ -71,3 +71,15 @@ Phủ theo ba việc nhánh đã làm (design doc, mục «Thay đổi») và nh
   định, và hồ sơ này chấm sau khi làm.
 - Các phép đo của hồ sơ nằm ở `rang/`: chúng chạy ở lượt chấm và lượt ghim lại, không chạy trong `make check`. Sau khi
   gộp, `make check` vẫn giữ sổ linh kiện khớp mã; thứ không ai giữ nữa là việc thư mục công cụ còn khớp plugin.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-15:
+  - Ngoài-1: Phép đo «mỗi tên một mục» có hai kiểu báo lỗi chưa từng được thấy đỏ, và hồ sơ ghi «chín ca phá» trong khi
+    thật ra có mười.
+  - Ngoài-3: Sổ linh kiện sinh lại không còn ghi «dựng từ» cho hai linh kiện bộ lọc: bộ lọc mất bộ lọc nâng cao, hàng lọc
+    mất ô lọc và bộ dựng lọc; mã nguồn vẫn dùng chúng, và hiện chưa bên nào đọc thông tin này.
+  - Ngoài-4: Nếu kho bật phép kiểm hành động của màn và đặt lại tên khoá «màn hiện gì», cổng kiểm có thể báo đỏ nhầm trên
+    một sổ lành.
+  - Ngoài-5: Khi cổng kiểm đỏ, các dòng nhắc nợ thiết kế không được in ra, dù chú thích nói luôn in.
+  - Ngoài-6: Phép đo chỉ chứng minh công cụ cũ ghi trùng ít nhất chín tên, không chứng minh đúng chín.
+  - Ngoài-7: Ma trận viết trước thiếu hai thông điệp lỗi của phép đo «mỗi tên một mục», nên lời «mỗi thông điệp một ca»
+    nói quá.
+  - Ngoài-8: Sau khi nhánh đã gộp, phép đo «chỉ sổ linh kiện bị đổi» báo xanh mà không còn gì để so.
