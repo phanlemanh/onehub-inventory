@@ -4,18 +4,28 @@ A pair of the ledger's `khoi_co_truoc:` list is exempt only when git shows it: t
 block's file, its author day is the day written, and that day comes before the day the ledger itself was added.
 A tree without git is read against the repo this tool lives in. A shallow copy (the CI checkout) first fetches the
 missing history from its remote (owner ruling 2026-11-13, Hỏi-2 option b); when that fails the pair is red with the
-reason. The root commit of a shallow copy is never read as
+reason. Several runs of the gate fetch into the same copy at once (vitest runs its files in parallel): a run that
+finds git's history lock held waits for it and reads the copy again, so the run that fetched first serves them all; a
+lock still held after the last try is red with that reason. The root commit of a shallow copy is never read as
 "adds every file", and its day is never taken as the day of the ledger.
 """
 
 from __future__ import annotations
 
+import os
 import subprocess
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
 LEDGER_PATH = "design/so-khoi.yaml"
 TOOL_REPO = Path(__file__).resolve().parents[2]
+# Tries at fetching the missing history while another run holds git's lock on it, one second apart. The variable is
+# for the tool's own tests (a break sets 1: no waiting).
+UNSHALLOW_TRIES = int(os.environ.get("PROOF_GATE_UNSHALLOW_TRIES", "30"))
+UNSHALLOW_WAIT_S = 1.0
+# What git says when another process is changing the copy's history at the same moment.
+LOCK_HELD = ("shallow.lock", "shallow file has changed")
 
 
 def _git(root: Path, *args: str) -> tuple[int, str, str]:
@@ -71,9 +81,20 @@ class History:
         if not remote:
             self.fetch_error = "bản sao thiếu lịch sử và không có kho gốc để lấy"
         else:
-            rc, _, err = _git(self.root, "fetch", "--quiet", "--no-tags", "--unshallow", remote)
-            if rc != 0:
-                self.fetch_error = f"bản sao thiếu lịch sử, lấy từ kho gốc '{remote}' không được ({_first_line(err)})"
+            for attempt in range(1, UNSHALLOW_TRIES + 1):
+                rc, _, err = _git(self.root, "fetch", "--quiet", "--no-tags", "--unshallow", remote)
+                if rc == 0 or not self._shallow():
+                    break  # fetched here, or another run of the gate finished the same fetch
+                if not any(m in err for m in LOCK_HELD):
+                    self.fetch_error = f"bản sao thiếu lịch sử, lấy từ kho gốc '{remote}' không được ({_first_line(err)})"
+                    break
+                if attempt == UNSHALLOW_TRIES:
+                    self.fetch_error = (
+                        f"bản sao thiếu lịch sử, lấy từ kho gốc '{remote}' không được: khoá lịch sử vẫn bị tiến trình "
+                        f"khác giữ sau {UNSHALLOW_TRIES} lần thử ({_first_line(err)})"
+                    )
+                    break
+                time.sleep(UNSHALLOW_WAIT_S)
         if self._shallow():
             _, gitdir, _ = _git(self.root, "rev-parse", "--git-path", "shallow")
             path = Path(gitdir) if Path(gitdir).is_absolute() else self.root / gitdir

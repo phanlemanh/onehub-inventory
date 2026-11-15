@@ -6,8 +6,7 @@
 // files the stored reports came from (`--tep-bai`), so a row that adds a test file does not have to regenerate the
 // stored reports to keep this suite green. The last test pins the default to the files on disk.
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -15,6 +14,7 @@ import { describe, expect, it } from "vitest";
 
 import { GIAO as RUNNER_GIAO } from "../tools/e2e_templates/runner";
 import { GIAO, handOver, type PwReport, rows } from "./e2e-db/dem-giao-nhan";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const FIX = join(ROOT, "tests/fixtures/ci-db");
@@ -35,7 +35,7 @@ const reportFiles = (report: PwReport) =>
  * on disk (the CI form).
  */
 function runCount(out: PwReport, inn: PwReport, files: string[] | null) {
-  const dir = mkdtempSync(join(tmpdir(), "dem-giao-nhan-"));
+  const dir = tempDir("dem-giao-nhan-");
   try {
     writeFileSync(join(dir, "khong-phien.json"), JSON.stringify(out));
     writeFileSync(join(dir, "co-phien.json"), JSON.stringify(inn));

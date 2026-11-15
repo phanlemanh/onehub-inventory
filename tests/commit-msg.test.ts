@@ -1,12 +1,12 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 function check(message: string) {
-  const file = join(mkdtempSync(join(tmpdir(), "commit-msg-")), "MSG");
+  const file = join(tempDir("commit-msg-"), "MSG");
   writeFileSync(file, message);
   return spawnSync("python3", ["tools/commit_msg.py", file]).status;
 }
