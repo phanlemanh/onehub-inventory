@@ -123,3 +123,12 @@ CI thật đo ở AC-10 khi bản vá vào PR (Hỏi-1). Lượt dựng lại (A
   khi bản mẫu được sinh lại bằng một lượt `make ci-db` thật (25–40 phút). Phép đếm trên CI và trong `make ci-db` không đổi:
   không có tuỳ chọn thì vẫn xét mọi tệp bài đang có trong kho, có bài khẳng định mặc định ấy; thêm ca phá «tệp bài trong
   danh sách không có bài đạt». Lời AC-4 và hai tệp mẫu không đổi.
+- Sửa sau chữ ký — 2026-11-15, việc phụ VP2 của đợt «dieu-phoi-nen» (PR #66): luật dọn thư mục dựng tạm của AC-8 nay
+  cũng áp cho thư mục tạm của mỗi lượt chạy bài đơn vị. Trước đó các bài kiểm tra để lại thư mục trong thư mục tạm của
+  máy sau mỗi lượt — một lượt `make test` để lại 303 thư mục (~1 GB), và ngày 2026-11-14 đĩa đầy vì chúng. Nay mỗi lượt
+  `vitest` đặt `TMPDIR` vào một thư mục riêng dưới `onehub-test-runs/`, ghi số tiến trình chính vào `.chu` và xoá thư mục
+  khi lượt xong; lượt sau chỉ xoá thư mục có chủ đã chết, bằng chính `sweepDead` của `tests/e2e-db/don-dung-tam.ts`
+  (không đổi), không bao giờ đọc từ tên thư mục. Tệp: `tests/support/temp-root.ts` (cắm ở `vitest.config.ts` và
+  `vitest.db.config.ts`), `tests/support/temp-dir.ts` (lối chung `tempDir()` cho bài trong `tests/`), bài chặn
+  `tests/temp-dir-guard.test.ts`. Sau sửa, một lượt `make test` để lại 0 thư mục của bài kiểm tra. Lời AC-8 không đổi;
+  thư mục dựng tạm của Playwright vẫn theo luật cũ.
