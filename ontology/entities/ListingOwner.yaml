@@ -20,3 +20,23 @@ code:
   model: src/modules/contacts/
   tests: tests/
 wiki: wiki/entities/listing-owner.md
+
+# Lifecycle of this entity on the screens that show it (roadmap row 1t, tools/coverage_matrix/lifecycle.py). Each cell:
+# co = an action of ontology/actions.yaml (a planned one names the row that opens it), hang = a roadmap row will do it,
+# khong = deliberately absent, with the owner's gate line in duyet. Cells as approved at the 1t scope gate.
+vong_doi:
+  them:
+    hang: "13"
+    ly_do: "Row 13 records the owner and the owner's number on the unit profile."
+  xem:
+    co: viewOwnerPhone
+    hang: "13"
+    chan:
+      BuyerAgent:
+        khong: "Only the agent keeping the unit and the team lead see the owner's number."
+        duyet: "kiem-vong-doi-thao-tac#d-20261115T042837Z-14"
+      CompanyAdmin:
+        khong: "Only the agent keeping the unit and the team lead see the owner's number."
+        duyet: "kiem-vong-doi-thao-tac#d-20261115T042837Z-14"
+  sua: { hang: "18b", ly_do: "The owner's details are edited through the contact." }
+  go: { hang: "13", ly_do: "Removing an owner from a unit." }

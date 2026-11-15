@@ -73,6 +73,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0031 Thêm gói khung chia kéo được cho hồ sơ ghim](decisions/0031-them-goi-khung-chia-keo-duoc.md)
 - [0032 Lối vào của bộ vùng lưới khai trong sổ màn](decisions/0032-loi-vao-bo-vung-luoi.md)
 - [0034 Sổ linh kiện do công cụ design-assembly ghi, theo hình dạng của hợp đồng](decisions/0034-component-register-written-by-design-assembly.md)
+- [0038 Mỗi thứ hiện trên màn có đủ thêm, xem, sửa, gỡ — máy đọc mã màn và đỏ khi thiếu](decisions/0038-lifecycle-check.md)
 
 ## Incidents
 

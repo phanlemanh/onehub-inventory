@@ -716,18 +716,19 @@
     },
     {
       "ma": "3g",
-      "cau_giao": "Đầu chủ sửa được thông tin của căn ngoài giá và trạng thái — pháp lý, nội thất, tài chính, tình trạng sử dụng — ngay trong sản phẩm, không phải nhập lại tệp",
+      "cau_giao": "Đầu chủ sửa được thông tin của căn ngoài giá và trạng thái — pháp lý, nội thất, tài chính, tình trạng sử dụng, và giá trị các trường riêng của sàn — ngay trong sản phẩm, không phải nhập lại tệp",
       "vai": "Đầu chủ",
       "tieu_chi": 8,
-      "vi_sao": "Bản rà soát thêm · xem · sửa · xoá theo vai ngày 2026-11-14: hàng 4 và hàng 3d chỉ cho sửa giá và trạng thái; pháp lý, nội thất, tài chính, tình trạng sử dụng không hàng nào cho điền ngoài đường nhập tệp, dù hồ sơ căn của hàng 3b đã hiện bốn trường ấy. Đứng trước hàng 15 vì điều kiện Sẵn sàng bán đòi pháp lý và tình trạng sử dụng. Luật sửa, câu lỗi và hoàn tác đã có ở hàng 4; chỗ sửa — trên ô hay trong hồ sơ căn — chốt ở Cổng Phạm vi của hàng. Chủ kho 2026-11-15 ở Cổng Đáng của đợt hàng kế: «Cho cả đợt»",
+      "vi_sao": "Bản rà soát thêm · xem · sửa · xoá theo vai ngày 2026-11-14: hàng 4 và hàng 3d chỉ cho sửa giá và trạng thái; pháp lý, nội thất, tài chính, tình trạng sử dụng không hàng nào cho điền ngoài đường nhập tệp, dù hồ sơ căn của hàng 3b đã hiện bốn trường ấy. Đứng trước hàng 15 vì điều kiện Sẵn sàng bán đòi pháp lý và tình trạng sử dụng. Luật sửa, câu lỗi và hoàn tác đã có ở hàng 4; chỗ sửa — trên ô hay trong hồ sơ căn — chốt ở Cổng Phạm vi của hàng. Chủ kho 2026-11-15 ở Cổng Đáng của đợt hàng kế: «Cho cả đợt». Cổng Phạm vi của hàng 10 ngày 2026-11-15 (Hỏi-3): chủ kho chọn để việc sửa giá trị trường riêng của sàn ngay trên ô về hàng này, hàng 10 chỉ lưu và hiện. Cổng Phạm vi của hàng 5 cùng ngày (Hỏi-3): dán vào cột riêng của sàn cũng để hàng này",
       "hang": "T2",
       "dung_tren": [
         "10",
         "4",
-        "3b"
+        "3b",
+        "7e"
       ],
       "slug": "sua-thong-tin-can",
-      "bat_khi": "Vai được sửa căn điền và đổi được pháp lý, nội thất, tài chính, tình trạng sử dụng của lần chào đang mở, ở máy tính và điện thoại; lưu xong thì hồ sơ căn và mức đủ thông tin hiện giá trị mới; kiểm tra, câu lỗi và hoàn tác dùng đúng luật của hàng 4, không viết luật thứ hai; nút sửa chỉ hiện cho vai được sửa, qua bộ nút theo quyền của hàng 9e; căn điền đủ pháp lý và tình trạng sử dụng ở đây thì không còn thiếu hai phần ấy khi sang hàng 15",
+      "bat_khi": "Vai được sửa căn điền và đổi được pháp lý, nội thất, tài chính, tình trạng sử dụng của lần chào đang mở, ở máy tính và điện thoại; lưu xong thì hồ sơ căn và mức đủ thông tin hiện giá trị mới; kiểm tra, câu lỗi và hoàn tác dùng đúng luật của hàng 4, không viết luật thứ hai; nút sửa chỉ hiện cho vai được sửa, qua bộ nút theo quyền của hàng 9e; căn điền đủ pháp lý và tình trạng sử dụng ở đây thì không còn thiếu hai phần ấy khi sang hàng 15; vai được sửa căn cũng sửa được giá trị các trường riêng của sàn (hàng 7e) ngay trên ô, mỗi trường sửa theo kiểu của nó (chữ, số, ngày, chọn một, có/không); khi ô ấy sửa được thì dán từ Excel (hàng 5) cũng dán được vào các cột ấy, theo kiểu của trường",
       "nhom": "bang-hang",
       "vung": [
         "src/modules/listings/**",
@@ -1163,7 +1164,7 @@
       "vung": [
         "src/modules/imports/**"
       ],
-      "bat_khi": "Năm chỗ ghép trong một lần nhập: cột, tên cột, giá trị, căn, dạng tệp; mỗi ô mang một trong bốn dấu giữ nguyên · máy sửa kèm lý do · cần người · chặn, không có đường nhập thẳng; trên bộ tệp thử bẩn có đáp án 100% ô có đích (trường chuẩn, trường riêng, hay giữ nguyên kèm dấu cần người), không ô nào bị bỏ lặng lẽ; lựa chọn của người ghi vào lớp riêng của sàn (hàng 7e) khi lần nhập thành công; lần nhập thứ hai cùng dạng tệp không hỏi lại câu nào đã trả lời; hoàn tác gỡ cả ô lẫn phần vừa học; không dùng AI (H5). Cổng Phạm vi cân việc tách làm hai hàng nếu vượt 12 tiêu chí"
+      "bat_khi": "Năm chỗ ghép trong một lần nhập: cột, tên cột, giá trị, căn, dạng tệp; mỗi ô mang một trong bốn dấu giữ nguyên · máy sửa kèm lý do · cần người · chặn, không có đường nhập thẳng; trên bộ tệp thử bẩn có đáp án 100% ô có đích (trường chuẩn, trường riêng, hay giữ nguyên kèm dấu cần người), không ô nào bị bỏ lặng lẽ; lựa chọn của người ghi vào lớp riêng của sàn (hàng 7e) khi lần nhập thành công; lần nhập thứ hai cùng dạng tệp không hỏi lại câu nào đã trả lời; hoàn tác gỡ cả ô lẫn phần vừa học; không dùng AI (H5). Cổng Phạm vi cân việc tách làm hai hàng nếu vượt 12 tiêu chí. Khi hàng này có, trạng thái trống «Sàn chưa có căn» của Bảng hàng dẫn tới «Nạp tệp» (hôm nay chỉ có «Tải lại»)"
     },
     {
       "ma": "12",
@@ -1282,12 +1283,13 @@
       "cau_giao": "Đầu khách chọn căn, tạo link và tự bấm gửi qua bảng chia sẻ của thiết bị",
       "vai": "Đầu khách",
       "tieu_chi": 10,
-      "vi_sao": "Luật SP-3: người luôn là người bấm gửi",
+      "vi_sao": "Luật SP-3: người luôn là người bấm gửi. Cổng Phạm vi của hàng 1t ngày 2026-11-15, bảng vòng đời đã duyệt: dòng quyền xem lần gửi trỏ về hàng này",
       "hang": "T3",
       "dung_tren": [
         "15"
       ],
       "slug": "gui-link",
+      "bat_khi": "Bảng quyền có dòng quyền xem lần gửi (hôm nay chưa có): mỗi vai xem được lần gửi của mình hay của cả sàn, ghi rõ từng ô; ai không có quyền thì không thấy lần gửi của người khác",
       "nhom": "phat-khach",
       "dot": "mvp-dot-1",
       "phu": [
@@ -1324,16 +1326,17 @@
     },
     {
       "ma": "18",
-      "cau_giao": "Đầu khách thấy link đã gửi với lượt mở thật và lưu khách để gửi tiếp",
+      "cau_giao": "Đầu khách thấy link đã gửi với lượt mở thật và lưu khách để gửi tiếp; tắt được link đã gửi",
       "vai": "Đầu khách",
       "tieu_chi": 9,
-      "vi_sao": "Nối màn Đã gửi với dữ liệu thật",
+      "vi_sao": "Nối màn Đã gửi với dữ liệu thật. Cổng Phạm vi của hàng 1t ngày 2026-11-15, bảng vòng đời đã duyệt: tắt link trỏ về hàng này",
       "hang": "T3",
       "dung_tren": [
         "6",
         "17"
       ],
       "slug": "da-gui-va-luu-khach",
+      "bat_khi": "Link đã gửi tắt được trên màn Đã gửi («tắt link»); link đã tắt thì người nhận mở không còn xem được",
       "nhom": "phat-khach",
       "dot": "mvp-dot-1",
       "phu": [
@@ -1347,17 +1350,19 @@
     },
     {
       "ma": "18a",
-      "cau_giao": "Quản trị sàn khoá người đã nghỉ và Trưởng nhóm bàn giao căn, khách của người đó cho người khác, không còn căn hay khách nào bỏ trống",
+      "cau_giao": "Quản trị sàn khoá người đã nghỉ và Trưởng nhóm bàn giao căn, khách của người đó cho người khác, không còn căn hay khách nào bỏ trống; thêm ba việc: gỡ thành viên khỏi sàn, Đầu chủ nhận căn chưa ai giữ, và Trưởng nhóm đổi người giữ căn trong lúc làm việc thường ngày",
       "vai": "Quản trị sàn",
       "tieu_chi": 9,
-      "vi_sao": "Quyết định 0016: chủ sàn cần dữ liệu ở lại khi nhân viên rời đi",
+      "vi_sao": "Quyết định 0016: chủ sàn cần dữ liệu ở lại khi nhân viên rời đi. Cổng Phạm vi của hàng 10 ngày 2026-11-15 (Hỏi-4): chủ kho chọn để việc Đầu chủ nhận một căn chưa ai giữ về hàng này và mở rộng hàng thành «giao và bàn giao căn». Cổng Phạm vi của hàng 1t cùng ngày, bảng vòng đời đã duyệt: nhận căn, đổi người giữ căn, khoá và gỡ thành viên đều trỏ về hàng này",
       "dung_tren": [
         "9a",
         "13",
         "18",
-        "9e"
+        "9e",
+        "10"
       ],
       "slug": "khoa-nguoi-ban-giao",
+      "bat_khi": "Giao và bàn giao căn: Đầu chủ nhận được một căn chưa ai giữ («nhận căn») và thành người giữ căn ấy; Trưởng nhóm đổi được người giữ căn trong lúc làm việc thường ngày, không chỉ khi có người nghỉ; khoá thành viên và gỡ thành viên khỏi sàn mỗi việc có dòng quyền trong bảng quyền (hôm nay chưa có); nhận căn và đổi người giữ căn cũng là thao tác có tên trong bảng quyền, nút đi qua bộ nút theo quyền của hàng 9e; sau khi khoá hay gỡ một người và bàn giao xong, không căn hay khách nào còn đứng tên người ấy",
       "phu": [
         "N8"
       ],
@@ -1438,6 +1443,28 @@
       ],
       "hang": "T3",
       "nhom": "quan-tri",
+      "dot": "mvp-dot-1"
+    },
+    {
+      "ma": "19b",
+      "cau_giao": "Quản trị sàn đổi mức Thuế phí mà Về tay của các giá đã đặt trước đó không đổi, và trên căn thấy được con số tính theo mức nào",
+      "vai": "Quản trị sàn",
+      "tieu_chi": 8,
+      "vi_sao": "Tách khỏi hàng 10 ở Cổng Phạm vi của hàng ấy ngày 2026-11-15 (Hỏi-5): chủ kho trước đó chọn làm việc này ở hàng 10, nay nhận khuyến nghị chuyển sang một hàng riêng, vì phần Thuế phí của hàng 19 chỉ giữ mức đang áp, chưa giữ lịch sử mức. Giới hạn đã biết cho tới khi hàng này xong: đổi mức thì Về tay của các giá cũ đổi theo. Cần một bảng lịch sử mới trong cơ sở dữ liệu nên là T3. Hàng chưa qua Cổng Đáng",
+      "hang": "T3",
+      "dung_tren": [
+        "19",
+        "10"
+      ],
+      "slug": "lich-su-muc-thue-phi",
+      "bat_khi": "Mỗi lần sàn đổi mức thuế phí, mức cũ được giữ lại cùng khoảng thời gian nó áp dụng; Về tay của một giá tính theo các mức đang áp lúc giá ấy được đặt, nên đổi mức sau đó không làm đổi Về tay của giá đã đặt trước, còn giá đặt sau lần đổi tính theo mức mới; trên căn thấy được con số Về tay tính theo những mức nào; lịch sử mức là dữ liệu của từng sàn, qua bộ kiểm cách ly, sàn khác không thấy; mức và Về tay vẫn là nội bộ, không ra trang khách",
+      "nhom": "cau-hinh",
+      "vung": [
+        "src/modules/company-config/**",
+        "src/modules/listings/**",
+        "db/**",
+        "tests/db/**"
+      ],
       "dot": "mvp-dot-1"
     },
     {
