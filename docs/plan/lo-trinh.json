@@ -1446,6 +1446,28 @@
       "dot": "mvp-dot-1"
     },
     {
+      "ma": "19b",
+      "cau_giao": "Quản trị sàn đổi mức Thuế phí mà Về tay của các giá đã đặt trước đó không đổi, và trên căn thấy được con số tính theo mức nào",
+      "vai": "Quản trị sàn",
+      "tieu_chi": 8,
+      "vi_sao": "Tách khỏi hàng 10 ở Cổng Phạm vi của hàng ấy ngày 2026-11-15 (Hỏi-5): chủ kho trước đó chọn làm việc này ở hàng 10, nay nhận khuyến nghị chuyển sang một hàng riêng, vì phần Thuế phí của hàng 19 chỉ giữ mức đang áp, chưa giữ lịch sử mức. Giới hạn đã biết cho tới khi hàng này xong: đổi mức thì Về tay của các giá cũ đổi theo. Cần một bảng lịch sử mới trong cơ sở dữ liệu nên là T3. Hàng chưa qua Cổng Đáng",
+      "hang": "T3",
+      "dung_tren": [
+        "19",
+        "10"
+      ],
+      "slug": "lich-su-muc-thue-phi",
+      "bat_khi": "Mỗi lần sàn đổi mức thuế phí, mức cũ được giữ lại cùng khoảng thời gian nó áp dụng; Về tay của một giá tính theo các mức đang áp lúc giá ấy được đặt, nên đổi mức sau đó không làm đổi Về tay của giá đã đặt trước, còn giá đặt sau lần đổi tính theo mức mới; trên căn thấy được con số Về tay tính theo những mức nào; lịch sử mức là dữ liệu của từng sàn, qua bộ kiểm cách ly, sàn khác không thấy; mức và Về tay vẫn là nội bộ, không ra trang khách",
+      "nhom": "cau-hinh",
+      "vung": [
+        "src/modules/company-config/**",
+        "src/modules/listings/**",
+        "db/**",
+        "tests/db/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "20",
       "cau_giao": "Một lệnh đọc được số đo của đợt bỏ Sheet và Core Web Vitals theo từng sàn",
       "vai": "nen",
