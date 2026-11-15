@@ -1283,12 +1283,13 @@
       "cau_giao": "Đầu khách chọn căn, tạo link và tự bấm gửi qua bảng chia sẻ của thiết bị",
       "vai": "Đầu khách",
       "tieu_chi": 10,
-      "vi_sao": "Luật SP-3: người luôn là người bấm gửi",
+      "vi_sao": "Luật SP-3: người luôn là người bấm gửi. Cổng Phạm vi của hàng 1t ngày 2026-11-15, bảng vòng đời đã duyệt: dòng quyền xem lần gửi trỏ về hàng này",
       "hang": "T3",
       "dung_tren": [
         "15"
       ],
       "slug": "gui-link",
+      "bat_khi": "Bảng quyền có dòng quyền xem lần gửi (hôm nay chưa có): mỗi vai xem được lần gửi của mình hay của cả sàn, ghi rõ từng ô; ai không có quyền thì không thấy lần gửi của người khác",
       "nhom": "phat-khach",
       "dot": "mvp-dot-1",
       "phu": [
@@ -1325,16 +1326,17 @@
     },
     {
       "ma": "18",
-      "cau_giao": "Đầu khách thấy link đã gửi với lượt mở thật và lưu khách để gửi tiếp",
+      "cau_giao": "Đầu khách thấy link đã gửi với lượt mở thật và lưu khách để gửi tiếp; tắt được link đã gửi",
       "vai": "Đầu khách",
       "tieu_chi": 9,
-      "vi_sao": "Nối màn Đã gửi với dữ liệu thật",
+      "vi_sao": "Nối màn Đã gửi với dữ liệu thật. Cổng Phạm vi của hàng 1t ngày 2026-11-15, bảng vòng đời đã duyệt: tắt link trỏ về hàng này",
       "hang": "T3",
       "dung_tren": [
         "6",
         "17"
       ],
       "slug": "da-gui-va-luu-khach",
+      "bat_khi": "Link đã gửi tắt được trên màn Đã gửi («tắt link»); link đã tắt thì người nhận mở không còn xem được",
       "nhom": "phat-khach",
       "dot": "mvp-dot-1",
       "phu": [
