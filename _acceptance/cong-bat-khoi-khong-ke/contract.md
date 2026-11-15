@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
 screens: []
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-14
 design_doc: docs/superpowers/specs/2026-11-14-cong-bat-khoi-khong-ke-design.md
@@ -111,3 +111,8 @@ Không áp: hàng này không dựng hay sửa màn nào (`screens: []`); nó s�
   tiêu chí: đầu nhánh đổi tới phút gộp, bằng chứng nằm trong tin BÁO G.
 - Danh sách có trước tính lúc gộp trên nhánh chính mới nhất, chỉ gồm tệp đã có ở `01c11df` mà chưa có ở sổ khối; tệp thêm vào
   nhánh chính sau đó mà không kê thì không vào danh sách — máy báo giám sát.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-15:
+  - Ngoài-1: một tên khối đã kê ở tệp này được tính là đã kê cho mọi tệp, nên tệp mới mang tên trùng lọt qua cổng.
+  - Ngoài-2: cách đọc sổ thành phần hôm nay chỉ được đo bằng một mục dựng tay.
+  - Ngoài-3: bài kiểm tập tên chỉ kiểm có đủ tên, không kiểm hai tập bằng nhau.
+  - Ngoài-4: bài kiểm «không có dòng sổ khối» chỉ dò vắng một chuỗi.
