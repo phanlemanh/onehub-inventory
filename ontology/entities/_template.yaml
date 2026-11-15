@@ -22,3 +22,10 @@ code:
   model: src/ # where the type/model is defined
   tests: tests/
 wiki: wiki/entities/customer.md
+
+# Lifecycle on the screens that show this entity (row 1t): needed when a screen of design/screens.yaml lists it in `hien`.
+vong_doi:
+  them: { co: createCustomer }
+  xem: { co: viewCustomers }
+  sua: { hang: "12", ly_do: "Row 12 adds editing." }
+  go: { khong: "Customers are never removed.", duyet: "<record>#<gate ledger line>" }

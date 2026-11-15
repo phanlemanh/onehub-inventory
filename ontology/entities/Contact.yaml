@@ -14,3 +14,15 @@ code:
   model: src/modules/contacts/
   tests: tests/
 wiki: wiki/entities/contact.md
+
+# Lifecycle of this entity on the screens that show it (roadmap row 1t, tools/coverage_matrix/lifecycle.py). Each cell:
+# co = an action of ontology/actions.yaml (a planned one names the row that opens it), hang = a roadmap row will do it,
+# khong = deliberately absent, with the owner's gate line in duyet. Cells as approved at the 1t scope gate.
+vong_doi:
+  them: { co: createContact, hang: "13a" }
+  xem: { co: viewContacts, hang: "13a" }
+  sua: { co: updateContact, hang: "13a" }
+  go: { co: removeContact, hang: "13a" }
+  rieng:
+    gop: { co: mergeContacts, hang: "13a" }
+    xoa_du_lieu_ca_nhan: { co: eraseContactPersonalData, hang: "18b" }
