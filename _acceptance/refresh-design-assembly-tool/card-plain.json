@@ -1,0 +1,92 @@
+{
+  "feature_plain": "Sổ linh kiện của kho thôi ghi một linh kiện hai lần, nhờ chép lại công cụ ghi sổ từ plugin design-assembly.",
+  "will_do": [
+    {
+      "id": "AC-1",
+      "p": "Sẽ để cổng kiểm của kho xanh, với lệnh kiểm thiết kế vẫn giữ 17 quyết định và sổ linh kiện khớp mã."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ có bộ công cụ thiết kế giống hệt bản của plugin ở một phiên bản nêu tên, kiểm lại được bằng mã mà chính kho plugin cho ra."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ chỉ đổi sổ linh kiện trong các sổ thiết kế, và chưa bật phép kiểm mới nào đi kèm công cụ."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ để các bên đang đọc sổ linh kiện (bài kiểm sổ, cổng chứng minh màn) chạy đạt như trước."
+    }
+  ],
+  "wont_do": [
+    {
+      "id": "AC-2",
+      "p": "Sẽ KHÔNG còn linh kiện nào được ghi hai lần trong sổ: chín linh kiện bộ lọc mỗi cái một mục, ở đúng tệp định nghĩa nó, và không linh kiện nào bị mất so với công cụ cũ."
+    },
+    {
+      "id": "OOS-1",
+      "p": "KHÔNG bật phép kiểm «sổ màn nối với mô hình nghiệp vụ» ở kho này — đó là một việc riêng."
+    },
+    {
+      "id": "OOS-2",
+      "p": "KHÔNG kiểm hành vi của phần đọc sổ màn đi kèm công cụ — bài kiểm của nó nằm ở kho plugin."
+    },
+    {
+      "id": "OOS-3",
+      "p": "KHÔNG sửa các hạn chế đã ghi ở hồ sơ nhận plugin lần trước."
+    },
+    {
+      "id": "OOS-4",
+      "p": "KHÔNG đổi giao diện, mã sản phẩm, mô hình dữ liệu hay luật sản phẩm."
+    }
+  ],
+  "scope_plain": "Việc này chỉ chép công cụ và sinh lại một sổ; mọi thứ bật thêm tính năng đều để lại.",
+  "coverage_plain": [
+    {
+      "i": 3,
+      "p": "Bộ đọc linh kiện mới và sổ sinh lại: phủ bởi AC-2 (hết ghi trùng, không mất tên) và AC-1 (sổ khớp mã)."
+    },
+    {
+      "i": 4,
+      "p": "Cả bộ công cụ chép từ plugin: phủ bởi AC-3 (khớp bản của plugin)."
+    },
+    {
+      "i": 5,
+      "p": "Phần đọc sổ màn đi kèm: phủ bởi AC-1 (số quyết định máy giữ không đổi) và AC-4 (chưa phép kiểm mới nào được bật)."
+    },
+    {
+      "i": 6,
+      "p": "Các sổ thiết kế khác: phủ bởi AC-4 (nhánh không đổi sổ nào khác)."
+    },
+    {
+      "i": 7,
+      "p": "Các bên đọc sổ linh kiện: phủ bởi AC-5 và AC-1; cổng chứng minh màn chỉ đọc bộ tên, mà AC-2 giữ bộ tên không đổi."
+    },
+    {
+      "i": 8,
+      "p": "Dòng nhật ký wiki: ngoài phạm vi, vì chỉ là ghi chép."
+    }
+  ],
+  "gap_probe_plain": [
+    {
+      "i": 0,
+      "p": "Căn cứ cho chỗ đặt phép đo chỉ là tiền lệ của hồ sơ trước, và hệ quả «sau khi gộp không ai giữ công cụ khớp plugin» chưa được hỏi. Đã sửa: căn cứ viết lại, hệ quả thành câu hỏi thứ hai cho chủ kho."
+    },
+    {
+      "i": 1,
+      "p": "Căn cứ cho việc «chấm thay đổi đã làm, không làm lại» trích một câu không quyết điều đó. Đã sửa: căn cứ viết lại, và hợp đồng nói rõ các con số đọc từ kết quả đã có."
+    },
+    {
+      "i": 2,
+      "p": "Phép đo «khớp plugin» có thể tự so với chính bản chép. Đã sửa: nay so với mã mà chính kho plugin cho thư mục công cụ của nó."
+    },
+    {
+      "i": 3,
+      "p": "Hai phép kiểm chỉ thấy xanh, chưa từng thấy đỏ với công cụ mới. Đã sửa: thêm hai ca phá chạy bằng công cụ mới; phần so chi tiết cổng chứng minh màn không làm, vì cổng chỉ đọc bộ tên."
+    },
+    {
+      "i": 4,
+      "p": "Hai thông điệp lỗi của phép đo sổ chưa từng được thấy đỏ. Đã sửa: thêm hai ca phá, ghi rõ chín ca cho chín thông điệp."
+    }
+  ]
+}
