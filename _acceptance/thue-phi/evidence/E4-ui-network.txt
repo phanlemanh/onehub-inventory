@@ -1,1 +1,1 @@
-driver: playwright test run (own webServer on E2E port, not 3470); no browser-tool network reader. Suite log shows only DB idle-connection close notices, no failed app requests.
+driver: playwright spec (no browser-tool network); app traffic not read

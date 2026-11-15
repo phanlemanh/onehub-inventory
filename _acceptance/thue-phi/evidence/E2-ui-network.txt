@@ -1,1 +1,1 @@
-driver playwright test; no browser-tool network
+driver: playwright test (no browser-tool network reader). Test run passed 9, skipped 6, 0 failed. Server log only: [WebServer] idle db connection closed (administrator command) at teardown.
