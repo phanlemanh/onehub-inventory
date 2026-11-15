@@ -144,3 +144,16 @@ CI thật đo ở AC-10 khi bản vá vào PR (Hỏi-1). Lượt dựng lại (A
   không có dòng ấy thì 9 bài cổng chứng minh đỏ (proof-gate, proof-gate-0023, proof-gate-1q, proof-matrix-self); thêm
   `origin` thì cổng xanh và bốn tệp ấy đạt 145/145. Tệp này là đường được bảo vệ (`db/**`): giám sát cho theo quyền
   đứng của chủ kho cho tệp công cụ trong đợt («Quyền, lần năm»), báo chủ kho cùng giờ.
+- Sửa sau chữ ký — 2026-11-15, việc phụ VP2 của đợt «dieu-phoi-nen» (PR #66), lần ba: phần lấy lịch sử cho bản sao nông
+  của cổng chứng minh màn (`tools/proof_gate/legacy.py`) nay chờ khi tiến trình khác đang giữ khoá lịch sử. vitest chạy
+  song song các tệp bài của cổng, và mỗi tệp gọi cổng trên chính kho. Trong bản sao nông của `db/scripts/ci-thu.sh` (như
+  bản lấy về của CI), vài cổng cùng chạy `git fetch --unshallow` một lúc; cổng thứ hai gặp «Unable to create
+  …/.git/shallow.lock: File exists» và đỏ dù lịch sử lấy được. Tái hiện 3/3 trên bản sao nông của 595f2c5 (ba cổng cùng
+  chạy); đó là lý do `make check` đỏ trong bản sao ở lần ghim lại hồ sơ này trên 595f2c5. Nay khi git báo khoá đang bị
+  giữ, cổng chờ một giây rồi đọc lại: bản sao hết nông (cổng kia đã lấy xong) thì đủ; còn khoá thì thử lại, tối đa 30
+  lần; hết lần thử vẫn khoá thì đỏ với câu nói rõ khoá bị giữ, không nuốt lỗi. Lỗi lấy khác giữ nguyên như cũ. Luật của
+  cổng và mọi bài cũ không đổi; `ci-thu.sh` không lấy đủ lịch sử. Bài mới `tools/proof_gate/proof-gate-shallow-lock.test.ts`:
+  ba cổng cùng lúc trên một bản sao nông đều đủ lịch sử; khoá giữ 2,5 giây thì cổng chờ rồi lấy; phá: bỏ chờ (một lần
+  thử) thì đỏ «shallow.lock»; khoá giữ suốt thì đỏ có lý do. Trên `legacy.py` cũ, ba bài ấy đỏ (bài phá xanh như mong
+  đợi). Tệp `tools/**` là đường được bảo vệ: giám sát cho theo «Quyền, lần năm» (phán 09:40Z); mục này chuyển từ hồ sơ
+  bo-o-tim-cua-vung sang đây theo phán 12:20Z.
