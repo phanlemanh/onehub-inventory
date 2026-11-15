@@ -126,7 +126,7 @@ evals:
     executor: test
     cmd: config:executors.test.thue_phi_ontology
     paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**, src/modules/company-config/index.ts]
-    expected: "exit 0; ca 'cot-ve-tay-sau-gia-chao' (cột Về tay ngay sau Giá chào, hiện sẵn), 'dieu-kien-phi-an-san' (cột Điều kiện phí có trong menu Cột, ẩn sẵn), 've-tay-theo-muc' (bảng viết trước bốn hàng × hai mức: 2,88 tỷ / 2,91 tỷ / bằng giá / trống) và 'sap-nhu-tien' có mặt và ok. Chiều đỏ: pha-thu-muc-cung đỏ với «ve-tay-theo-muc: 2,88 tỷ»"
+    expected: "exit 0; ca 'cot-ve-tay-sau-gia-chao' (cột Về tay ngay sau Giá chào, hiện sẵn), 'dieu-kien-phi-an-san' (cột Điều kiện phí có trong cột của lưới, sau các cột chuẩn), 'dieu-kien-phi-an-roi-bat' (trên lưới dựng thật: không vẽ lúc đầu, có trong menu Cột chưa đánh dấu, đánh dấu thì vẽ tiêu đề; ca phá: cùng cột mà thiếu danh sách ẩn sẵn thì đỏ «fee inclusion shown at first»), 've-tay-theo-muc' (bảng viết trước bốn hàng × hai mức: 2,88 tỷ / 2,91 tỷ / bằng giá / trống) và 'sap-nhu-tien' có mặt và ok. Chiều đỏ: pha-thu-muc-cung đỏ với «ve-tay-theo-muc: 2,88 tỷ»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E6-e2e
@@ -135,7 +135,7 @@ evals:
     layer: backend-effect
     cmd: config:executors.script.thue_phi_e2e
     paths: [src/modules/company-config/**, src/modules/listings/ui/**, src/app/**, tests/e2e-db/thue-phi.spec.ts]
-    expected: "exit 0; ca 'dat-muc-roi-bang-hang-doi' ở bốn khổ: Quản trị A lưu môi giới 2, tắt Lệ phí trước bạ qua màn; Đầu chủ A mở Bảng hàng thấy 2,88 tỷ ở hàng Bao phí 3 tỷ; Quản trị đổi về 1; Đầu chủ mở lại thấy 2,91 tỷ; Đầu chủ B thấy 2,895 tỷ; ở 1440 với cột thứ hai mở, ô Về tay của hàng đầu nằm trọn trong khung nhìn (boundingBox phải ≤ bề rộng vùng cuộn) khi chưa cuộn ngang; 'vai-khac-chi-doc' và 'axe-sang-toi' (phần Thuế phí và Bảng hàng, sáng và tối, 0 lỗi) có mặt và ok"
+    expected: "exit 0; ca 'dat-muc-roi-bang-hang-doi' ở bốn khổ: Quản trị A lưu môi giới 2, tắt Lệ phí trước bạ qua màn; Đầu chủ A mở Bảng hàng thấy 2,88 tỷ ở hàng Bao phí 3 tỷ; Quản trị đổi về 1; Đầu chủ mở lại thấy 2,91 tỷ; Đầu chủ B thấy 2,895 tỷ; ở 1440 với cột thứ hai mở, ô Về tay của hàng đầu nằm trọn trong khung nhìn (boundingBox phải ≤ bề rộng vùng cuộn) khi chưa cuộn ngang; 've-tay-bon-kho' (Đầu chủ B, mức mặc định, hàng 0602 · S1.02 Bao phí 3 tỷ: ô Về tay ở 1024 và 1440, thẻ căn ở 360 và 414, đúng 2,9 tỷ); 'dieu-kien-phi-an-roi-bat' ở 1024 và 1440 (cột Điều kiện phí không vẽ lúc đầu, bật từ menu Cột thì hiện tiêu đề); 've-tay-va-dieu-kien-phi-pha' ở 360 và 1440 (số Về tay sai trên thẻ hay ô bị bắt; cột hiện sẵn bị bắt; cột bật mà không hiện bị bắt); 'vai-khac-chi-doc' và 'axe-sang-toi' (phần Thuế phí và Bảng hàng, sáng và tối, 0 lỗi) có mặt và ok"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E6-ui

@@ -34,7 +34,7 @@ describe("cot-ve-tay-sau-gia-chao", () => {
 });
 
 describe("dieu-kien-phi-an-san", () => {
-  it("the fee inclusion column is in the grid, after the standard ones, and starts hidden", async () => {
+  it("the fee inclusion column is in the grid, after the standard ones", () => {
     const cols = inventoryColumns(
       HEADERS,
       [{ code: "ghi_chu", header: "Ghi chú", kind: "text" }],
@@ -43,8 +43,8 @@ describe("dieu-kien-phi-an-san", () => {
     const fields = cols.map((c) => c.field);
     expect(fields.indexOf(FEE_INCLUSION_FIELD)).toBe(fields.indexOf("Listing.lastConfirmedAt") + 1);
     expect(fields.at(-1)).toBe("custom.ghi_chu");
-    const grid = await import("@/modules/listings/ui/inventory-grid");
-    expect(String(grid.InventoryGrid)).toContain("hiddenAtFirst");
+    // Hidden at first and ticked on from the Cột menu: measured on the drawn grid in tests/thue-phi-cot-an.test.tsx
+    // and in the browser (tests/e2e-db/thue-phi.spec.ts, dieu-kien-phi-an-roi-bat), not by reading the source.
   });
 });
 

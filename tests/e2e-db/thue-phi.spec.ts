@@ -219,6 +219,78 @@ async function openCards(browser: Browser, info: TestInfo): Promise<Page> {
   return agent;
 }
 
+/**
+ * Row 19 × AC-6 at every width, on company B (default schedule, no case changes it): the Về tay amount of the 3 tỷ
+ * fees-included sample row 0602 · S1.02 — in the table cell from 768 px, on the card below. Empty when it is right.
+ */
+async function netProblems(page: Page, phone: boolean, want: string): Promise<string[]> {
+  if (phone) {
+    const card = page
+      .locator('[data-slot="phone-card"]')
+      .filter({ hasText: "0602" })
+      .filter({ hasText: "S1.02" })
+      .first();
+    const net = card.locator('[data-slot="listing-card-net"]');
+    if ((await net.count()) === 0) return ["card 0602 · S1.02 has no amount"];
+    const text = (await net.innerText()).trim();
+    return text === `${label("NetToSeller")} ${want}`
+      ? []
+      : [`card 0602 · S1.02 shows «${text}», not ${want}`];
+  }
+  const tr = page
+    .locator('[data-slot="data-region-body"] tbody tr')
+    .filter({ hasText: "S1.02" })
+    .filter({ hasText: "0602" })
+    .first();
+  const cell = tr.locator('td[data-col-id="custom.netToSeller"]');
+  if ((await cell.count()) === 0) return ["row 0602 · S1.02 has no amount cell"];
+  const text = (await cell.innerText()).trim();
+  return text === want ? [] : [`row 0602 · S1.02 shows «${text}», not ${want}`];
+}
+
+/** Opens the inventory as company B's ListAgent, at the first drawn row or card. */
+async function openB(browser: Browser, info: TestInfo, phone: boolean): Promise<Page> {
+  const page = await as(browser, "b-ListAgent", info);
+  await page.goto("/inventory");
+  await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  await page
+    .locator(phone ? '[data-slot="phone-card"]' : '[data-slot="data-region-body"] tbody tr')
+    .first()
+    .waitFor();
+  return page;
+}
+
+const FEE_HEAD = 'th[data-col-id="Listing.feeInclusion"]';
+
+/**
+ * Row 19 × AC-6 from 768 px: the fee inclusion column is not drawn at first, is in the Cột menu unticked, and ticking
+ * it draws its header. Empty when both halves hold.
+ */
+async function feeColumnProblems(page: Page): Promise<string[]> {
+  if ((await page.locator(FEE_HEAD).count()) > 0) return ["fee inclusion shown at first"];
+  await page
+    .locator('[data-slot="data-region"]')
+    .first()
+    .getByRole("button", { name: "Cột", exact: true })
+    .click();
+  await page.getByRole("menuitemcheckbox").first().waitFor();
+  const item = page.getByRole("menuitemcheckbox", { name: label("FeeInclusion") });
+  if ((await item.count()) === 0) return ["fee inclusion not in the Cột menu"];
+  if ((await item.getAttribute("aria-checked")) === "true")
+    return ["fee inclusion ticked at first"];
+  await item.click();
+  await page.keyboard.press("Escape");
+  const head = page.locator(FEE_HEAD);
+  if ((await head.count()) === 0) return ["fee inclusion not drawn after ticking it"];
+  // Scroll without waiting for the cell to be visible: a cell that never shows is a finding, not a hang.
+  await head.evaluate((el) => el.scrollIntoView({ block: "nearest", inline: "nearest" }));
+  if (!(await head.isVisible())) return ["fee inclusion not visible after ticking it"];
+  // The header cell also holds its filter box (row 2e): its name is the first line.
+  const name = (await head.innerText()).trim().split("\n")[0]!.trim();
+  if (name !== label("FeeInclusion")) return [`fee inclusion header reads «${name}»`];
+  return [];
+}
+
 test.describe.configure({ mode: "serial" });
 
 test.describe("thue phi", () => {
@@ -304,6 +376,63 @@ test.describe("thue phi", () => {
     const head = agent.locator('th[data-col-id="custom.netToSeller"]');
     await expect(head).toHaveCount(1);
     await expect(agent.locator('th[data-col-id="Listing.feeInclusion"]')).toHaveCount(0);
+  });
+
+  // AC-6, the amount at every width (Ngoài-25 of round 6): company B on the defaults, 3 tỷ fees included.
+  test("ve-tay-bon-kho", async ({ browser }, info) => {
+    const phone = info.project.name === "360" || info.project.name === "414";
+    const page = await openB(browser, info, phone);
+    expect(await netProblems(page, phone, formatMoney(2_895_000_000))).toEqual([]);
+  });
+
+  // AC-6, the fee inclusion column on every ordinary run (Ngoài-20, Ngoài-21 of round 6): hidden at first, then on.
+  test("dieu-kien-phi-an-roi-bat", async ({ browser }, info) => {
+    test.skip(
+      info.project.name === "360" || info.project.name === "414",
+      "the table is drawn from 768 px",
+    );
+    const page = await openB(browser, info, false);
+    expect(await feeColumnProblems(page)).toEqual([]);
+  });
+
+  test("ve-tay-va-dieu-kien-phi-pha", async ({ browser }, info) => {
+    const size = info.project.name;
+    test.skip(size !== "360" && size !== "1440", "break cases run at 360 and 1440");
+    const phone = size === "360";
+    // A wrong amount on the row is caught, on the card or in the cell.
+    const wrong = await openB(browser, info, phone);
+    expect(await netProblems(wrong, phone, formatMoney(2_880_000_000))).not.toEqual([]);
+    const slot = phone ? '[data-slot="listing-card-net"]' : 'td[data-col-id="custom.netToSeller"]';
+    const target = (
+      phone
+        ? wrong.locator('[data-slot="phone-card"]')
+        : wrong.locator('[data-slot="data-region-body"] tbody tr')
+    )
+      .filter({ hasText: "0602" })
+      .filter({ hasText: "S1.02" })
+      .first()
+      .locator(slot);
+    await target.evaluate((el) => {
+      el.textContent = el.textContent!.replace(/[\d,]+ tỷ$/, "2,88 tỷ");
+    });
+    expect(await netProblems(wrong, phone, formatMoney(2_895_000_000))).not.toEqual([]);
+    if (phone) return;
+    // A fee inclusion column drawn at first is caught.
+    const shown = await openB(browser, info, false);
+    await shown
+      .locator('[data-slot="data-region-body"] thead tr')
+      .first()
+      .evaluate((tr, word) => {
+        const th = document.createElement("th");
+        th.setAttribute("data-col-id", "Listing.feeInclusion");
+        th.textContent = word;
+        tr.appendChild(th);
+      }, label("FeeInclusion"));
+    expect(await feeColumnProblems(shown)).toEqual(["fee inclusion shown at first"]);
+    // A column ticked in the menu that never becomes visible is caught.
+    const hidden = await openB(browser, info, false);
+    await hidden.addStyleTag({ content: `${FEE_HEAD} { display: none !important; }` });
+    expect(await feeColumnProblems(hidden)).toEqual(["fee inclusion not visible after ticking it"]);
   });
 
   test("axe-sang-toi", async ({ browser }, info) => {
