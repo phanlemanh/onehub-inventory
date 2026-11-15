@@ -179,11 +179,25 @@ export const LEDGERS = {
             audience: text,
             status: required({ ...text, values: ["built", "planned"] }),
             states: list(text),
+            // What the screen shows, the action a role must hold to open it (null: every role),
+            // and the actions it has buttons for: names of the repository's domain model.
+            shows: list(text),
+            entry: { type: "string|null" },
+            actions: list(text),
           },
           // A repository may keep keys of its own on a screen, such as who may open it.
           open: true,
         }),
       ),
+      // The frame around every screen, the actions that have no screen, and the repository's own
+      // spelling of these keys.
+      frame: {
+        type: "object",
+        fields: { shows: list(text), actions: list(text) },
+        open: true,
+      },
+      no_screen: { type: "object", open: true },
+      keys: { type: "object", open: true },
     },
     // And keys of its own beside the screens.
     open: true,

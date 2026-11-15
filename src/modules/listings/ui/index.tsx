@@ -19,6 +19,7 @@ export {
   type InventoryFeeHeaders,
   inventoryRows,
   inventoryStateFrom,
+  inventoryEdgeRowsFrom,
   type CodeMatch,
   type InventoryAsk,
   type InventoryField,

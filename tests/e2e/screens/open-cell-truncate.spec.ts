@@ -6,6 +6,8 @@
 // lifts the width limit with a style tag on the real page.
 import { expect, test, type Page } from "@playwright/test";
 
+import { assertCardsNotTable, isPhone, rowsShown } from "../phone-list";
+
 const SIZES = new Set(["1440", "360"]);
 const LONG_NAME_ROW = "4d415500-0010-4000-8000-000000000003";
 
@@ -71,6 +73,25 @@ test.describe("E13 · the open cell is cut inside its cell", () => {
   });
 
   test("inventory: a unit code in a narrowed column fits its cell and is cut", async ({ page }) => {
+    if (isPhone(page)) {
+      // Row 2b: below 768 px the inventory has no cells; each unit code is the head of its listing card and wraps
+      // inside the card rather than being cut. Measured: cards, no table, and every code inside its card.
+      await page.goto("/inventory");
+      await rowsShown(page);
+      await assertCardsNotTable(page, "E13 inventory");
+      const outside = await page.locator('[data-slot="phone-card"]').evaluateAll(
+        (cards) =>
+          cards.filter((c) => {
+            const code = c
+              .querySelector('[data-slot="listing-card-unit"]')!
+              .getBoundingClientRect();
+            const box = c.getBoundingClientRect();
+            return code.right > box.right + 0.5 || code.left < box.left - 0.5;
+          }).length,
+      );
+      expect(outside, "open cell overflows its cell: inventory card").toBe(0);
+      return;
+    }
     await openGrid(page, "/inventory");
     const id = (await page.locator("[data-record-open]").first().getAttribute("data-record-open"))!;
     const col = await page

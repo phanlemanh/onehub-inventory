@@ -10,6 +10,8 @@ import { join } from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { regionHydrated, rowsShown } from "./phone-list";
+
 const URL = "/inventory";
 const WIDE = new Set(["1440", "1024"]);
 const PHONE = new Set(["414", "360"]);
@@ -50,19 +52,22 @@ async function injectStyle(page: Page, css: string): Promise<void> {
 
 async function openInventory(page: Page, query = ""): Promise<void> {
   await page.goto(`${URL}${query}`);
-  await page.locator('[data-slot="data-region"] tbody tr').first().waitFor();
+  // Table rows from 768 px, listing cards below it (row 2b).
+  await rowsShown(page);
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
-  // Hydrated: the grid's sideways scroll area takes keyboard focus.
-  await expect(
-    page.locator('[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]').first(),
-  ).toHaveAttribute("tabindex", "0");
+  // Hydrated: the grid's sideways scroll area takes keyboard focus (on a phone, the filter button answers).
+  await regionHydrated(page);
 }
 
 /** Opens the fifth listing by its unit code and returns that row's id and unit. */
 async function openFifth(page: Page): Promise<{ id: string; unit: string }> {
   const opener = openers(page).nth(4);
   const id = (await opener.getAttribute("data-record-open")) ?? "";
-  const unit = ((await opener.textContent()) ?? "").trim();
+  // On a phone the opener is the whole card (row 2b): its unit code is the card's unit slot.
+  const code = opener.locator('[data-slot="listing-card-unit"]');
+  const unit = (
+    ((await code.count()) > 0 ? await code.textContent() : await opener.textContent()) ?? ""
+  ).trim();
   await opener.click();
   await expect(panel(page)).toHaveAttribute("data-record-id", id);
   return { id, unit };

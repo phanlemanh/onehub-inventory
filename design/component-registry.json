@@ -50,7 +50,8 @@
         "groupBy",
         "initialView",
         "onViewChange",
-        "hiddenAtFirst"
+        "hiddenAtFirst",
+        "phoneList"
       ]
     },
     {
@@ -94,6 +95,29 @@
       "defaults": {
         "controlWidth": "fixed"
       }
+    },
+    {
+      "name": "PhoneList",
+      "category": "component",
+      "file": "src/components/candidate/phone-list.tsx",
+      "level": "organism",
+      "source": "own",
+      "props": [
+        "list",
+        "data",
+        "columns",
+        "column",
+        "options",
+        "activeFields",
+        "count",
+        "group",
+        "more",
+        "rowAction",
+        "sort",
+        "onOpen",
+        "onClear",
+        "noMatch"
+      ]
     },
     {
       "name": "RecordPanel",
@@ -198,6 +222,13 @@
       "source": "own",
       "parts": ["RowActions"],
       "props": ["main", "actions", "mine", "title"]
+    },
+    {
+      "name": "TouchTarget",
+      "category": "component",
+      "file": "src/components/candidate/touch-target.tsx",
+      "level": "atom",
+      "source": "own"
     },
     {
       "name": "TruncatedText",
@@ -1214,75 +1245,12 @@
       "props": ["value", "onValueChange", "commit", "labels", "autoFocusProps", "field"]
     },
     {
-      "name": "FilterChip",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FilterOperatorPopover",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FilterRuleMenuItems",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FilterValuePopover",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FiltersAdvanced",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FiltersAdvancedPanel",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FilterAdvancedRow",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FiltersBuilder",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FilterFieldPicker",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
       "name": "Filters",
       "category": "component",
       "file": "src/components/reui/filters/filters.tsx",
       "level": "organism",
       "source": "library",
-      "parts": ["FiltersAdvanced", "FiltersRow"],
+      "parts": ["FiltersRow"],
       "props": [
         "fields",
         "query",
@@ -1317,7 +1285,6 @@
       "file": "src/components/reui/filters/filters.tsx",
       "level": "organism",
       "source": "library",
-      "parts": ["FilterChip", "FiltersBuilder"],
       "props": ["trigger", "showClear"],
       "variants": ["size=sm", "size=default"],
       "defaults": {

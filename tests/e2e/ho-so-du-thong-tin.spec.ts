@@ -6,6 +6,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { rowsShown } from "./phone-list";
+
 import { formatMoney } from "../../src/lib/format";
 import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog/sample";
 import { listingsOfUnit } from "../../src/modules/listings/record";
@@ -48,7 +50,8 @@ const record = (page: Page) => page.locator('[data-slot="listing-record"]');
 
 async function openRecord(page: Page, id: string): Promise<void> {
   await page.goto(`${URL}?ho-so=${id}`);
-  await page.locator('[data-slot="data-region"] tbody tr').first().waitFor();
+  // Table rows from 768 px, listing cards below it (row 2b).
+  await rowsShown(page);
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
   await expect(panel(page)).toHaveAttribute("data-record-id", id);
   await expect(record(page)).toBeVisible();

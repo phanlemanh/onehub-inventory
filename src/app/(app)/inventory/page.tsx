@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/templates/page-header";
+import { PageState } from "@/components/templates/page-state";
 import { customColumnsOf, label, labelOverrides } from "@/modules/company-config";
 import { myCompanyLayer, myFeeSchedule } from "@/modules/company-config/server";
 import { isRole } from "@/modules/identity";
@@ -15,6 +16,7 @@ import {
   sampleRecords,
 } from "../inventory-sample-rows";
 import { feeHeaders, withFees } from "../inventory-fees";
+import { entryAction, entryRefused, NAV } from "../nav";
 import { savedViewLabels } from "../saved-view-labels";
 import {
   ENTRY_COPY,
@@ -25,6 +27,7 @@ import {
   inventoryFiltersFrom,
   inventoryOpeningFor,
   inventoryStateFrom,
+  inventoryEdgeRowsFrom,
   type InventoryField,
   type RecordLabels,
 } from "@/modules/listings/ui";
@@ -110,6 +113,15 @@ export default async function Page({ searchParams }: Props) {
   const query = await searchParams;
   const state = first(query.state);
   const vai = first(query.vai);
+  // The screen's entry rule, before any listing is read (row 2b, AC-9): a role the register keeps out sees «not
+  // allowed» at every width, the same block as the members page (row 9b). The session is read only when the register
+  // gates the screen; today it lets every staff role in (`vao: null`), so the page reads nothing more than before.
+  if (entryAction(NAV, "/inventory") !== undefined) {
+    const session = await currentSession();
+    const byAddress = process.env.NODE_ENV !== "production" && vai !== undefined && isRole(vai);
+    const roles = session ? session.roles : byAddress ? [vai] : [];
+    if (entryRefused(NAV, "/inventory", roles)) return <PageState kind="forbidden" homeHref="/" />;
+  }
   // A status shortcut opens the grid filtered (row 2a).
   const status = first(query.status);
   // A saved view opens by its own address (row 2c): gone, or someone else's, opens every unit with a sentence.
@@ -129,8 +141,13 @@ export default async function Page({ searchParams }: Props) {
   const viewLabels = savedViewLabels();
   const viewCopy = savedViewCopy(viewLabels);
   const listings = sampleInventoryListings();
+  // Development only: `?mau=bien` adds edge rows (row 2b) so the phone cards can be measured with long codes and prices.
   // Net to seller under the company's fee schedule (row 19); no readable schedule leaves the column empty.
-  const rows = withFees(sampleInventoryRows(), listings, fees?.items ?? null);
+  const rows = withFees(
+    [...sampleInventoryRows(), ...inventoryEdgeRowsFrom(first(query.mau), process.env.NODE_ENV)],
+    listings,
+    fees?.items ?? null,
+  );
   // The top-bar search (row 3f) opens the grid with its text in a column filter; one unit found opens its record
   // through the record's own address (row 3), so the back button and «Chép đường dẫn» work as usual.
   const opening = inventoryOpeningFor(rows, {
