@@ -36,6 +36,7 @@ beforeAll(() => {
 });
 
 afterEach(() => {
+  vi.useRealTimers();
   cleanup();
   toast.mockReset();
   toast.error.mockReset();
@@ -177,6 +178,24 @@ describe("dau-tren-dong", () => {
   });
 });
 
+describe("o-trong-khong-liet-ke", () => {
+  it("o-trong-khong-liet-ke: an empty cell of a short block row lists nothing, on any column or a group row", () => {
+    const plan = planPaste(
+      paste([
+        cell(ACTIVE, "Unit.livingArea", ""),
+        cell(ACTIVE, "Listing.listPrice", "", { group: "A1" }),
+        cell(CLOSED, "Listing.standardStatus", ""),
+      ]),
+      labels,
+      headerOf,
+    );
+    expect(plan.skipped, "o-trong-khong-liet-ke").toEqual([]);
+    expect(plan.wrong).toEqual([]);
+    expect(plan.changes).toEqual([]);
+    expect(plan.same).toBe(3);
+  });
+});
+
 describe("bo-khong-giau-o-khac", () => {
   it("a region mixing reasons keeps the cells that change", () => {
     const plan = planPaste(
@@ -228,6 +247,10 @@ const LISTED: GridRow = {
 
 describe("xac-nhan-luc-giu-khi-mot-o-luu", () => {
   it("xac-nhan-luc-giu-khi-mot-o-luu: price saved and status failed on one listing keeps the new confirmed time", async () => {
+    // A fixed clock: the time the apply stamps is known, so the test pins it, not only «not the old time».
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const stamp = new Date("2026-11-15T03:04:05.000Z");
+    vi.setSystemTime(stamp);
     let calls = 0;
     const inner = sampleSaveDoor([LISTING], { online: () => true });
     const door = {
@@ -267,7 +290,10 @@ describe("xac-nhan-luc-giu-khi-mot-o-luu", () => {
     const shown = hook.result.current.rows[0]!;
     expect(shown["Listing.listPrice"]).toBe(2_800_000_000);
     expect(shown["Listing.standardStatus"], "the failed cell goes back").toBe("Active");
-    expect(shown["Listing.lastConfirmedAt"], "xac-nhan-luc-giu-khi-mot-o-luu").not.toBe(before);
+    expect(shown["Listing.lastConfirmedAt"], "xac-nhan-luc-giu-khi-mot-o-luu").toBe(
+      stamp.toISOString(),
+    );
+    vi.useRealTimers();
   });
 });
 

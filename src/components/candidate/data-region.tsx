@@ -1052,13 +1052,14 @@ export function DataRegion({
   // region, a block tiles a region that is a multiple of it, otherwise it pastes once from the top-left and stops at
   // the grid's edge). The region keeps the block's size to say how much fell outside, and hands every cell on.
   const selectionRef = useRef<DataGridCellSelectionSnapshot | null>(null);
-  const pastedBlock = useRef<{ rows: number; columns: number } | null>(null);
+  const pastedBlock = useRef<{ rows: number; columns: number; lines: string[][] } | null>(null);
   const onPasteCapture = (event: ClipboardEvent<HTMLDivElement>) => {
     // The grid's own reader of Excel's text: a quoted cell may hold tabs and line breaks and is still one cell.
-    const block = parseDataGridClipboardText(event.clipboardData.getData("text/plain"));
+    const lines = parseDataGridClipboardText(event.clipboardData.getData("text/plain"));
     pastedBlock.current = {
-      rows: Math.max(1, block.length),
-      columns: Math.max(1, ...block.map((line) => line.length)),
+      rows: Math.max(1, lines.length),
+      columns: Math.max(1, ...lines.map((line) => line.length)),
+      lines,
     };
   };
   const onCellsChange = (details: DataGridCellsChangeDetails<TableRow>) => {
@@ -1101,6 +1102,18 @@ export function DataRegion({
       );
     const block = pastedBlock.current;
     pastedBlock.current = null;
+    // A row of the block shorter than the others has no word for its last columns: those cells are empty, never the
+    // words the grid fills them with (it repeats the row's own cells), so they change nothing and are not listed.
+    if (block) {
+      const rowsInOrder = [...new Set(cells.map((c) => c.row.id))];
+      const fieldsInOrder = [...new Set(cells.map((c) => c.field))].sort(
+        (a, b) => visibleFields.indexOf(a) - visibleFields.indexOf(b),
+      );
+      for (const c of cells) {
+        const line = block.lines[rowsInOrder.indexOf(c.row.id) % block.rows] ?? [];
+        if (fieldsInOrder.indexOf(c.field) % block.columns >= line.length) c.raw = "";
+      }
+    }
     const bound = selectionRef.current?.activeBound;
     const regionRows = bound ? bound.maxRowIndex - bound.minRowIndex + 1 : 1;
     const regionColumns = bound ? bound.maxColumnIndex - bound.minColumnIndex + 1 : 1;

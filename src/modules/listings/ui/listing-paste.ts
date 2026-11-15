@@ -72,16 +72,16 @@ export function planPaste(
     const { row, field, raw } = cell;
     const id = `${row.id}|${field}`;
     const line = { id, where: say.where(row), field: headerOf(field), raw };
+    // An empty word changes nothing, wherever it lands: it is only counted.
+    if (raw.trim() === "" && (cell.group !== undefined || (field !== PRICE && field !== STATUS))) {
+      same += 1;
+      continue;
+    }
     if (cell.group !== undefined) {
       skipped.push({ id, where: PASTE_COPY.groupRow(cell.group), raw, why: say.other });
       continue;
     }
     if (field !== PRICE && field !== STATUS) {
-      // An empty word on a column that is not edited changes nothing either way.
-      if (raw.trim() === "") {
-        same += 1;
-        continue;
-      }
       const why = UNIT_FACTS.includes(field)
         ? say.unitFact(row.transaction)
         : field === CONFIRMED

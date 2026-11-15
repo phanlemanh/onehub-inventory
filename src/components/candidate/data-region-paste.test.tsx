@@ -163,6 +163,20 @@ describe("khoi-o-nhieu-dong", () => {
   });
 });
 
+describe("dong-ngan-la-o-trong", () => {
+  it("dong-ngan-la-o-trong: a block row with fewer cells leaves its last cells empty, not the grid's repeated words", async () => {
+    const { paste } = show(asRole("ListAgent"));
+    await select(cellOf(0, UNIT));
+    await pasteText(cellOf(0, UNIT), "9999\t5 tỷ\tchữ a\n8888\t7 tỷ\n");
+    const raw = Object.fromEntries(
+      paste.mock.calls[0]![0].cells.map((c) => [`${c.row.id}|${c.field}`, c.raw]),
+    );
+    expect(raw["a|Listing.standardStatus"]).toBe("chữ a");
+    expect(raw["b|Listing.listPrice"]).toBe("7 tỷ");
+    expect(raw["b|Listing.standardStatus"], "dong-ngan-la-o-trong: chữ lạ ở ô thiếu").toBe("");
+  });
+});
+
 describe("bo-theo-cot-va-khoa", () => {
   it("bo-theo-cot-va-khoa: a column the screen did not open and a locked cell come marked not open", async () => {
     const { paste } = show(asRole("ListAgent"));

@@ -415,6 +415,24 @@ test.describe("dan-tu-excel", () => {
     }
   });
 
+  test("dong-ngan-khong-chu-la", async ({ page }) => {
+    at1440();
+    await openInventory(page);
+    const rows = await rowsWhere(page, 2, priced, "dong-ngan-khong-chu-la");
+    await select(page, rows[0]!.id, STATUS);
+    // Excel puts a short row when its last cells are empty: the second row has two cells, the first has three.
+    await pasteText(
+      page,
+      `${statusLabel(rows[0]!.status, "sale")}\t${money(nudged(rows[0]!))}\t60\n${statusLabel(rows[1]!.status, "sale")}\t${money(nudged(rows[1]!))}\n`,
+    );
+    await expect(preview(page)).toBeVisible();
+    await expect(changeLine(page, rows[0]!.id, "Unit.livingArea")).toContainText("«60»");
+    await expect(
+      changeLine(page, rows[1]!.id, "Unit.livingArea"),
+      "dong-ngan-khong-chu-la: ô thiếu hiện chữ lạ",
+    ).toHaveCount(0);
+  });
+
   test("loc-khong-ghi-dong-an", async ({ page }) => {
     at1440();
     await openInventory(page);
