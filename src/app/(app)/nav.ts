@@ -44,8 +44,13 @@ export function entryRefused(
   href: string,
   roles: readonly Role[],
 ): boolean {
-  const action = nav.find((item) => item.href === href)?.action;
+  const action = entryAction(nav, href);
   return action !== undefined && allowedScope(roles, action) === null;
+}
+
+/** The action that opens the screen at `href`, or undefined when every role may enter it. */
+export function entryAction(nav: readonly NavItem[], href: string): NavItem["action"] {
+  return nav.find((item) => item.href === href)?.action;
 }
 
 /** The top-bar search (row 3f) leads to the inventory, so it shows by the same rule as the inventory's entry. */
