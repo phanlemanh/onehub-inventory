@@ -140,3 +140,15 @@ chí trên.
   - Ngoài-15: Bài kiểm khẳng định mọi màn lưới chạy đủ ca nhưng không đo bộ sinh thật, nên nếu sau này có người cho một màn bỏ qua ca thì bài vẫn xanh và lỗi lọt qua.
   - Ngoài-16: Bài kiểm xác nhận khối FormDialog qua cổng chứng từ có thể vẫn xanh dù khối ấy bị xoá khỏi sổ, nên một lỗi như vậy có thể không bị bắt.
   - Ngoài-17: Trên máy chậm, đóng ô ⌘K rồi bấm ngay vào ô lọc cột Căn thì đôi khi tiêu điểm rơi vào vùng lưới, phải bấm lại một lần; gõ «/» lúc ấy mở lại ô ⌘K. Tái hiện ở Chromium Linux với CPU chậm 6 lần, có cả trên mã trước bản sửa bề rộng cột.
+- Sửa sau chữ ký — 2026-11-15, việc phụ VP2 của đợt «dieu-phoi-nen» (PR #66): phần lấy lịch sử cho bản sao nông của
+  AC-10 (`tools/proof_gate/legacy.py`) nay chờ khi tiến trình khác đang giữ khoá lịch sử. vitest chạy song song các tệp
+  bài của cổng chứng minh màn, và mỗi tệp gọi cổng trên chính kho. Trên bản sao nông (như bản lấy về của CI), vài cổng
+  cùng chạy `git fetch --unshallow` một lúc; cổng thứ hai gặp «Unable to create …/.git/shallow.lock: File exists» và
+  đỏ khối FormDialog dù lịch sử lấy được. Tái hiện 3/3 trên bản sao nông của 595f2c5 (ba cổng cùng chạy); đó là lý do
+  `make check` đỏ trong bản sao của lần ghim lại hồ sơ ci-co-postgres ngày 2026-11-15. Nay khi git báo khoá đang bị
+  giữ, cổng chờ một giây rồi đọc lại: bản sao hết nông (cổng kia đã lấy xong) thì đủ; còn khoá thì thử lại, tối đa 30
+  lần; hết lần thử vẫn khoá thì đỏ với câu nói rõ khoá bị giữ, không nuốt lỗi. Lỗi lấy khác giữ nguyên như cũ. Luật của
+  cổng và mọi bài cũ không đổi. Bài mới `tools/proof_gate/proof-gate-shallow-lock.test.ts`: ba cổng cùng lúc trên một
+  bản sao nông đều đủ lịch sử; khoá giữ 2,5 giây thì cổng chờ rồi lấy; phá: bỏ chờ (một lần thử) thì đỏ «shallow.lock»;
+  khoá giữ suốt thì đỏ có lý do. Trên `legacy.py` cũ, ba bài ấy đỏ (bài phá xanh như mong đợi). Tệp `tools/**` hạng T3:
+  giám sát cho theo «Quyền, lần năm» (phán 09:40Z).
