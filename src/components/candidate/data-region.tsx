@@ -74,8 +74,8 @@ import {
   type SortBy,
 } from "./grid-view";
 import { PhoneList, type RegionPhoneList } from "./phone-list";
+import { usePhoneLayout } from "./use-phone-layout";
 import { RecordPanel, useRecordAddress, type RecordView } from "./record-panel";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { RegionTitle, RegionToolbar } from "./region-header";
 import { RowActions, type RecordAction } from "./row-actions";
 import {
@@ -419,7 +419,10 @@ export function DataRegion({
   /** Row 2b: below 768 px the rows show as the screen's cards instead of the table. */
   phoneList?: RegionPhoneList<GridRow>;
 }) {
-  const isPhone = useIsMobile();
+  // VP4: undefined until the browser knows the width; meanwhile both layouts are drawn and CSS shows one.
+  const phoneLayout = usePhoneLayout();
+  const isPhone = phoneLayout === true;
+  const twoLayouts = phoneLayout === undefined && phoneList !== undefined;
   // One confirmation for every row's removing action: a row scrolled out of the virtual body keeps it open.
   const removing = useChange();
   const [opening] = useState(() => (initialView ? viewWithin(initialView, columns) : undefined));
@@ -1101,6 +1104,60 @@ export function DataRegion({
         ) : null}
       </div>
     ) : null;
+  /** The phone list (row 2b): the same table, drawn as the screen's cards. */
+  const phoneGrid = (list: RegionPhoneList<GridRow>) => (
+    <DataGrid table={table} recordCount={shown.length} i18n={GRID_I18N}>
+      <PhoneList
+        list={list as RegionPhoneList<TableRow>}
+        data={data}
+        columns={columns}
+        column={(field) => table.getColumn(field)}
+        options={options}
+        activeFields={columns.filter((c) => !filterIsEmpty(filters[c.field])).map((c) => c.field)}
+        count={
+          narrowed
+            ? GRID_COPY.filteredCount(shown.length, rows.length)
+            : GRID_COPY.rowCount(rows.length)
+        }
+        group={
+          groupColumn
+            ? {
+                label: GRID_COPY.sheet.groupBy(groupColumn.header),
+                on: isGrouped,
+                toggle: () => {
+                  setGrouped((on) => !on);
+                  setExpanded(true);
+                },
+              }
+            : undefined
+        }
+        more={toolbarAction}
+        rowAction={
+          rowActions
+            ? (row) => {
+                const { actions, mine } = rowActions(row);
+                return (
+                  <RowActions
+                    actions={actions}
+                    mine={mine}
+                    title={list.label(row)}
+                    run={removing.run}
+                  />
+                );
+              }
+            : undefined
+        }
+        sort={{
+          columns,
+          value: sorting[0] ? { field: sorting[0].id, desc: sorting[0].desc } : null,
+          set: (v) => setSorting(v ? [{ id: v.field, desc: v.desc }] : []),
+        }}
+        onOpen={openRecord}
+        onClear={clearFilters}
+        noMatch={<RegionNoMatch onClear={clearFilters} />}
+      />
+    </DataGrid>
+  );
   let body: ReactNode;
   if (status === "forbidden") body = <RegionForbidden />;
   else if (status === "loading")
@@ -1109,60 +1166,7 @@ export function DataRegion({
   else if (status === "partial" && rows.length === 0)
     body = <RegionPartialEmpty onRetry={onRetry} />;
   else if (rows.length === 0) body = <RegionEmpty why={emptyWhy} action={emptyAction} />;
-  else if (phoneList && isPhone)
-    body = (
-      <DataGrid table={table} recordCount={shown.length} i18n={GRID_I18N}>
-        <PhoneList
-          list={phoneList as RegionPhoneList<TableRow>}
-          data={data}
-          columns={columns}
-          column={(field) => table.getColumn(field)}
-          options={options}
-          activeFields={columns.filter((c) => !filterIsEmpty(filters[c.field])).map((c) => c.field)}
-          count={
-            narrowed
-              ? GRID_COPY.filteredCount(shown.length, rows.length)
-              : GRID_COPY.rowCount(rows.length)
-          }
-          group={
-            groupColumn
-              ? {
-                  label: GRID_COPY.sheet.groupBy(groupColumn.header),
-                  on: isGrouped,
-                  toggle: () => {
-                    setGrouped((on) => !on);
-                    setExpanded(true);
-                  },
-                }
-              : undefined
-          }
-          more={toolbarAction}
-          rowAction={
-            rowActions
-              ? (row) => {
-                  const { actions, mine } = rowActions(row);
-                  return (
-                    <RowActions
-                      actions={actions}
-                      mine={mine}
-                      title={phoneList.label(row)}
-                      run={removing.run}
-                    />
-                  );
-                }
-              : undefined
-          }
-          sort={{
-            columns,
-            value: sorting[0] ? { field: sorting[0].id, desc: sorting[0].desc } : null,
-            set: (v) => setSorting(v ? [{ id: v.field, desc: v.desc }] : []),
-          }}
-          onOpen={openRecord}
-          onClear={clearFilters}
-          noMatch={<RegionNoMatch onClear={clearFilters} />}
-        />
-      </DataGrid>
-    );
+  else if (phoneList && isPhone) body = phoneGrid(phoneList);
   else
     body = (
       <DataGrid
@@ -1300,6 +1304,9 @@ export function DataRegion({
       ) : null}
       <section
         data-slot="data-region"
+        // VP4: set once the browser has taken over the server's HTML and drawn one layout only. Tests that read the
+        // region wait for it (tests/e2e/phone-list.ts); the frames before it are watched by tests/e2e/bang-loe.spec.ts.
+        data-hydrated={phoneLayout === undefined ? undefined : ""}
         data-full-screen={fullScreen || undefined}
         style={REGION_HEIGHTS}
         className="group/region mr-(--record-pinned,0px) flex min-w-0 flex-col bg-background"
@@ -1311,19 +1318,30 @@ export function DataRegion({
           0
         </span>
         {/* Arrangement after data-grid-editing-6: name on the frame's header strip; toolbar, table and pages in one panel. */}
-        {phoneList && isPhone && gridShown ? (
-          // A phone list has no frame around it (row 2b): it runs to the screen's edges, under the page head.
-          <div ref={boxRef} data-slot="data-region-body" className="-mx-4 min-w-0">
+        {phoneList && (isPhone || twoLayouts) && gridShown ? (
+          // A phone list has no frame around it (row 2b): it runs to the screen's edges, under the page head. While the
+          // width is not known (VP4) it is drawn next to the table and shown below 768 px only; the table's ref stays
+          // on the table, which measures its columns.
+          <div
+            ref={twoLayouts ? undefined : boxRef}
+            data-slot="data-region-body"
+            data-layout={twoLayouts ? "phone" : undefined}
+            className={cn("-mx-4 min-w-0", twoLayouts && "md:hidden")}
+          >
             <h2 className="sr-only">{title}</h2>
             {status === "partial" ? (
               <div className="px-4 pb-2">
                 <RegionPartial onRetry={onRetry} />
               </div>
             ) : null}
-            {body}
+            {twoLayouts ? phoneGrid(phoneList) : body}
           </div>
-        ) : (
-          <Frame className="min-w-0">
+        ) : null}
+        {phoneList && isPhone && gridShown ? null : (
+          <Frame
+            className={cn("min-w-0", twoLayouts && gridShown && "max-md:hidden")}
+            data-layout={twoLayouts && gridShown ? "table" : undefined}
+          >
             <FrameHeader>
               <RegionTitle title={title} />
             </FrameHeader>
