@@ -1,0 +1,38 @@
+{
+  "feature_plain": "Một khối giao diện tạo tay mà vòng dựng màn quên kê ra trong hồ sơ thì bộ kiểm chung của kho báo đỏ, thay vì im lặng cho qua.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ báo đỏ một dòng gọi tên tệp và tên khối khi một tệp khối tự làm mới không được kê ở đâu; kê ở sổ khối, ở danh sách có trước hay ở hồ sơ đang mở thì im; khối của nhà cung cấp không bị đòi."},
+    {"id": "AC-2", "p": "Sẽ nhận lời kê của hồ sơ còn đang làm (bốn nấc từ nháp tới đã chấm), không nhận lời kê của hồ sơ đã đóng — hồ sơ đóng phải có dòng sổ khối."},
+    {"id": "AC-3", "p": "Sẽ đọc đúng cả sổ thành phần hôm nay lẫn sổ kiểu mới của PR #58 (đổi sổ thành phần), kiểm trên bản thật của hai sổ chứ không trên bản dựng tay."},
+    {"id": "AC-4", "p": "Sẽ chạy được trên máy CI không có lịch sử git, cho cùng kết quả."},
+    {"id": "AC-5", "p": "Sẽ xanh trên kho hôm nay, và danh sách mười hai tệp được miễn bị ghim cứng — thêm tệp vào danh sách phải sửa cả bài kiểm."},
+    {"id": "AC-6", "p": "Sẽ đếm số tệp chưa kê vào bảng số gửi bộ công cụ, và khuôn chứng minh màn dặn tác tử dựng màn phải kê mọi tệp khối mới."},
+    {"id": "AC-7", "p": "Sẽ giữ nguyên mọi bài kiểm cũ của cổng chứng minh màn."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "KHÔNG bắt khối tạo tay nằm ngoài thư mục thành phần (ví dụ trong thư mục giao diện của từng mô-đun) — sổ thành phần không quét chỗ ấy."},
+    {"id": "OOS-2", "p": "KHÔNG ghi bù dòng sổ khối cho mười hai tệp đã có — tuỳ câu Hỏi-1."},
+    {"id": "OOS-3", "p": "KHÔNG sửa bài kiểm của hàng 1c, sổ thành phần, bộ sinh sổ hay tệp dựng của kho."},
+    {"id": "OOS-4", "p": "KHÔNG so hình khối với ReUI hay hiểu nghĩa khối — người soi ở cổng của vòng màn."}
+  ],
+  "scope_plain": "Các phần để ngoài hàng này:",
+  "coverage_plain": [
+    {"i": 0, "p": "Mọi chỗ một khối có thể được kê, và ca không kê ở đâu, đều có ca kiểm (AC-1, AC-2)."},
+    {"i": 1, "p": "Hồ sơ đang mở và hồ sơ đã đóng được xét riêng (AC-2)."},
+    {"i": 2, "p": "Khối tự làm và khối của nhà cung cấp được xét riêng (AC-1)."},
+    {"i": 3, "p": "Có và không có sổ khối: không có sổ thì luật tắt (AC-1)."},
+    {"i": 4, "p": "Cả hai hình sổ thành phần (AC-3)."},
+    {"i": 5, "p": "Có git và không git (AC-4)."},
+    {"i": 6, "p": "Kho mẫu, kho thật và danh sách miễn viết sai (AC-5)."},
+    {"i": 7, "p": "Dòng báo đỏ, số gửi bộ công cụ và lời dặn cho tác tử dựng màn (AC-1, AC-6)."},
+    {"i": 8, "p": "Bài kiểm cũ không vỡ (AC-7)."},
+    {"i": 9, "p": "Người soi: khối nằm ngoài thư mục thành phần, và vòng kê tên khối mà không thật dùng."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Kê theo tệp thì một khối mới viết chung vào tệp của khối cũ sẽ lọt qua; máy không tự quyết chỗ này — thành câu Hỏi-2 cho chủ kho."},
+    {"i": 1, "p": "Bài kiểm sổ kiểu mới từng dựng tay; nay dùng bản sao từng byte của sổ thật trên PR #58 và sổ thật của kho."},
+    {"i": 2, "p": "Lời hứa báo giám sát trước khi gộp chưa có tiêu chí; giữ làm một bước của lúc gộp, đã đo trước hai nhánh đang mở: không nhánh nào đỏ."},
+    {"i": 3, "p": "Số gửi bộ công cụ chưa chứng là đếm tệp; đã thêm ca một tệp hai khối và ca hai tệp."},
+    {"i": 4, "p": "Ca khối nhà cung cấp chưa có đối chứng, chưa có ca thư mục lồng; đã thêm cả hai."}
+  ]
+}
