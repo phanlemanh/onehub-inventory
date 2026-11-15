@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 09ab763de53ede2da0d60f3b81e378df4e142a41
-human_signoff:
+human_signoff: Manh Phan 2026-11-15
 ---
 
 # Evidence Report: bang-hang-the-dien-thoai

@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-14
 design_doc: _acceptance/bang-hang-the-dien-thoai/design.md
@@ -152,6 +152,18 @@ Ngưỡng SỐNG của ô cơ hội, từng vế:
 - Ngoài-9 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Bài kiểm tra chưa chắc bắt được trường hợp thẻ mang sai trạng thái hay sai nơi, nên lỗi hiển thị loại này có thể lọt. — `tests/the-dien-thoai.test.tsx`
 - Ngoài-10 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Chưa được kiểm chắc rằng sắp xếp và nhóm còn nguyên khi xoay hay đổi cỡ màn qua ngưỡng điện thoại, chỉ bộ lọc được kiểm. — `tests/e2e/the-dien-thoai.spec.ts`
 - Ngoài-11 (máy định tuyến 2026-11-14, đề xuất S4 known-limits): Bài kiểm tra chưa chắc rằng Quản trị sàn thấy đúng câu không đủ quyền, trang trắng hay lỗi cũng làm bài qua. — `tests/e2e/the-dien-thoai.spec.ts`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-15:
+  - Ngoài-1: Nếu danh sách thẻ đổi dạng, bài kiểm tên đọc của thẻ có thể xanh mà không kiểm thẻ nào.
+  - Ngoài-2: Tệp bộ đo dùng chung là đường hạng cao; chủ kho duyệt nó bằng chính chữ ký này.
+  - Ngoài-3: Còn sót mã của kiểu hiển thị chủ kho không chọn; người dùng không thấy.
+  - Ngoài-4: Mở căn ở tab mới hay chép liên kết từ thẻ thì danh sách mất bộ lọc, sắp xếp và góc nhìn đang dùng.
+  - Ngoài-5: Bài kiểm nhóm theo Toà trên điện thoại chưa bắt được thẻ nằm nhầm nhóm hay số căn lệch.
+  - Ngoài-6: Bài kiểm lọc, sắp xếp và vào từ chỗ khác trên điện thoại chỉ phủ một phần các tình huống đã hứa.
+  - Ngoài-7: Vùng hiện trắng ở trạng thái đang tải, lỗi hay không đủ quyền trên điện thoại vẫn làm bài kiểm qua.
+  - Ngoài-8: Một phép kiểm thẻ vắng mặt luôn qua; ca hỏi lại trước khi xoá căn chưa được kiểm.
+  - Ngoài-9: Bài kiểm chưa chắc bắt được thẻ mang sai trạng thái hay sai nơi.
+  - Ngoài-10: Chỉ bộ lọc được kiểm còn nguyên khi xoay hay đổi cỡ màn qua ngưỡng điện thoại; sắp xếp và nhóm chưa.
+  - Ngoài-11: Bài kiểm chưa chắc Quản trị sàn thấy đúng câu không đủ quyền; trang trắng hay lỗi cũng qua.
 
 ### Tệp hạng cao đã đổi
 
