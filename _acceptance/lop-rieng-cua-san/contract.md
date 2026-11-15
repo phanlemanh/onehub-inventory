@@ -156,3 +156,19 @@ thấy màn nhưng không có nút ghi nào; `/api/v1` trả 403.
   - Ngoài-16: Năm chỗ tầng cao được giữ: kiểu đối tượng ở bộ sinh mã và bộ kiểm mô hình, đăng ký màn và ca chụp ảnh vào bộ kiểm trình duyệt, dòng phá thử cách ly trên cơ sở dữ liệu thử.
 - Trang khách không đọc nhãn riêng, trường riêng (SP-4): ghi ở trang thực thể, đo ở hàng của trang khách.
 - Dòng sửa đổi L4/L5 ở `docs/plan/pham-vi-mvp-dot-1.md` đã có (2026-11-12) — không thêm dòng trùng.
+- Sửa sau chữ ký — 2026-11-15, việc phụ VP2 của đợt «dieu-phoi-nen» (PR #66, gồm cả việc VP3): hai chỗ trong bộ kiểm
+  trình duyệt đọc trang quá sớm. Giám sát cho theo «Quyền, lần năm» (phán 09:33Z).
+  1. `tests/e2e-db/lop-rieng.spec.ts` «company words on inventory» (bài ở dòng 359 trước khi sửa) đỏ chập chờn trên
+     GitHub, ở 4a93fc3 và 595f2c5, cả trên nhánh khác: đầu cột đọc ra «Trạng tháiChọn», «Hướng viewChọn». Hàm đọc lấy
+     dòng đầu `innerText` của ô đầu cột, mà `innerText` theo bố cục lúc đọc; lúc trang đang dựng lại, chữ «Chọn» của ô
+     lọc dính vào tên cột. Nay `headers()` chờ lưới nhận điều khiển phía máy khách (`waitReady`), rồi đọc tên cột theo
+     cấu trúc ô — phần đầu của `sheet-header`, không lấy ô lọc (`tests/e2e-db/column-headers.ts`). Vẫn so đúng từng chữ
+     đầu cột như trước, không nới. Bài đơn vị `tests/column-headers.test.ts`: tên cột không kèm ô lọc; đổi bố cục không đổi
+     kết quả; phá: ô không tách tên cột thì đọc cả ô, ra «Trạng tháiChọn», phép so đúng chữ đỏ. Chạy riêng bài ấy ở 1440, 30 lần, mỗi lần một tiến trình (cơ sở dữ liệu dãy z): 30/30 xanh.
+  2. Phép dò của bộ vùng lưới (`tools/e2e_templates/suite.ts`) đọc trang đầu tiên trình duyệt hiện. Trên máy tải nặng,
+     lệnh chuyển sang trang đăng nhập đến sau lần đọc đầu, nên phép dò gọi màn là «chua co vung du lieu» và đỏ cả khối
+     vùng của một khổ (21 bài ở `tuy-chinh-san`, lần ghim lại ngày 2026-11-14). Nay phép dò chờ một trong hai kết cục,
+     tối đa 15 giây: đang ở trang đăng nhập, hoặc trang đã hiện lưới (`landing` ở `tools/e2e_templates/runner.ts`). Hết hạn
+     mà chưa có kết cục nào thì đọc trang như cũ. Bài trình duyệt `tests/e2e/landing.spec.ts` trên trang dựng sẵn: chuyển
+     sang đăng nhập sau 1,5 giây thì đọc là đăng nhập; lưới hiện sau 1,5 giây thì đọc là có lưới; trang đăng nhập mở thẳng
+     thì là chính nó; phá: cách đọc cũ trên cùng trang gọi màn là không có lưới («chua co vung du lieu»).
