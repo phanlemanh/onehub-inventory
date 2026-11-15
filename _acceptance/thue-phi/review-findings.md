@@ -1,82 +1,104 @@
-# Review findings: thue-phi (round 3)
+# Review findings: thue-phi (round 4)
 
 ## Trong hợp đồng
+
+- **Resetting a renamed brokerage item no longer restores its default name: the new keep-name rule in the save path overrides the reset**
+  AC: AC-3
+  file: `src/modules/company-config/fee-store.ts:209`
+  severity: high
+  source: bugs
+  detail: Commit c332ae4 changed the save so that, for the default own item (brokerage), a draft with no name keeps the row's current name (`trimmed === undefined ? rows.find(...).name : name`). The screen's reset action (fee-part.tsx, around lines 244-250) sets `name: d.defaults.name, naming: false`. Because the source is still 'changed' and `naming` is false, `toBody` (fee-part.tsx, around lines 71-80) does not send a name. The server then keeps the renamed name (for example «Hoa hồng»), so `want.name !== null` and `atDefault` is false. The row is updated, not retired, with the old custom name and the default rate. Before this commit, `name` came out null and the row was retired, so reset worked. What the user sees: they press Reset on a renamed brokerage item and save. The screen briefly shows the default name, then the server reply brings back the custom name, the source line still reads 'changed', and the success notice still appears. Nothing reports that the reset failed. Neither the new DB test nor the UI test covers resetting after a rename. Fix: either send `name` (the default name, or empty) when resetting, or let the server tell 'no name sent' apart from 'reset'.
+  rationale: AC-3 requires that Trả về mặc định on a changed item then Lưu returns that item to default; a renamed brokerage item keeps its custom name, so this fails.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Domain / Product language: tên khái niệm viết cứng trong câu chữ của phần Thuế phí**
+- **SP-1 touch record (luat-cham) does not cover HEAD**
+  Người dùng thấy gì: Bản ghi các luật sản phẩm bị chạm chưa được cập nhật tới bản cuối, nhưng nội dung vẫn đúng. Người dùng không thấy gì khác.
+  Căn cứ: Hậu quả nhẹ: chỉ là sổ ghi chép chưa làm mới, không mất hay lộ dữ liệu, rà lại sau rất rẻ.
+  file: `_acceptance/thue-phi/luat-cham.json`
+  severity: low
+  Đề xuất: known-limits
+
+- **Contract names the wrong SP-1 table**
+  Người dùng thấy gì: Đoạn mô tả luật chạm trong hợp đồng gọi sai tên bảng lưu mức thuế phí của sàn. Người ký đọc thấy tên không khớp với bảng thật, nhưng cách ly giữa các sàn vẫn đúng.
+  Căn cứ: Chỉ là chữ sai trong tài liệu, không ảnh hưởng người dùng cuối hay dữ liệu, và sửa một dòng là xong.
+  file: `_acceptance/thue-phi/contract.md`
+  severity: low
+  Đề xuất: known-limits
+
+- **Domain / Product language: tên khái niệm viết cứng trong câu chữ của phần Thuế phí (r3)**
   Người dùng thấy gì: Một vài câu hướng dẫn ở phần Thuế phí viết sẵn chữ «giá chào», «bao phí», «thuế phí». Nếu sau này sàn đổi tên gọi các khái niệm này, những câu đó có thể lệch với tiêu đề cột.
   Căn cứ: Hậu quả nhẹ: chỉ lệch chữ khi nhãn đổi, không mất hay lộ dữ liệu, và sửa lúc đó rất rẻ.
   file: `src/modules/company-config/ui/fee-copy.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Domain: mỗi luật nghiệp vụ ở đúng một chỗ, nhưng các ngưỡng thuế phí bị chép thành số cứng trong câu báo lỗi**
+- **Domain: mỗi luật nghiệp vụ ở đúng một chỗ, nhưng các ngưỡng thuế phí bị chép thành số cứng trong câu báo lỗi (r3)**
   Người dùng thấy gì: Các câu báo lỗi ghi sẵn số như tối đa 5 khoản, tối đa 5%. Nếu về sau đổi các ngưỡng này mà quên sửa câu, màn hình sẽ báo sai con số.
   Căn cứ: Ngưỡng hiếm khi đổi và các con số hiện đang đúng, người dùng không bị thiệt gì lúc này; chỉ cần nhớ sửa chữ khi đổi ngưỡng.
   file: `src/modules/company-config/ui/fee-copy.ts`
   severity: low
   Đề xuất: wont-fix
 
-- **Domain: khuôn của khoản riêng trong migration chưa đủ, thiếu ràng buộc tên bắt buộc**
+- **Domain: khuôn của khoản riêng trong migration chưa đủ, thiếu ràng buộc tên bắt buộc (r3)**
   Người dùng thấy gì: Chỉ khi ai đó ghi thẳng vào cơ sở dữ liệu, bỏ qua màn hình và API, mới tạo được khoản riêng không có tên và hiện ra một dòng trống. Đi qua màn hình thì không xảy ra.
   Căn cứ: Không mất hay lộ dữ liệu, người dùng bình thường không gặp, và chỉ đường ghi thẳng mới gây ra; thêm ràng buộc sau này vẫn rẻ.
   file: `db/migrations/012_thue_phi.sql`
   severity: low
   Đề xuất: known-limits
 
-- **Design: địa chỉ API viết lặp, không dùng hằng FEE_API đã khai**
+- **Design: địa chỉ API viết lặp, không dùng hằng FEE_API đã khai (r3 · tệp đã đổi)**
   Người dùng thấy gì: Địa chỉ lưu thuế phí được viết lặp ở hai chỗ trong mã. Người dùng không thấy gì khác; chỉ gây nhầm cho người sửa mã nếu sau này đổi đường dẫn.
   Căn cứ: Không ảnh hưởng người dùng, chi phí sửa nhỏ nhưng cũng không đáng mở việc riêng.
   file: `src/modules/company-config/ui/fee-part.tsx`
   severity: low
   Đề xuất: wont-fix
 
-- **Committed E10-them.png comes from a failed repeat run: it shows a duplicate «Phí dịch vụ hồ sơ» row with «Đã có khoản cùng tên.» and Lưu disabled**
+- **Committed E10-them.png comes from a failed repeat run: it shows a duplicate «Phí dịch vụ hồ sơ» row with «Đã có khoản cùng tên.» and Lưu disabled (r3 · tệp đã đổi)**
   Người dùng thấy gì: Một ảnh chụp làm bằng chứng cho bước thêm khoản đang hiện trạng thái lỗi tên trùng thay vì trạng thái thêm thành công. Người dùng cuối không thấy, nhưng người chấm có thể mở nhầm ảnh sai.
   Căn cứ: Không ảnh hưởng người dùng cuối, người chấm tự kiểm lại được bằng cách chạy lại và chụp lại ảnh, sửa rất rẻ.
   file: `_acceptance/thue-phi/evidence/E10-them.png`
   severity: high
   Đề xuất: known-limits
 
-- **Decision d-34 says three repeats at 1440 were all green, but the frames on disk show the repeat failed at the save step**
+- **Decision d-34 says three repeats at 1440 were all green, but the frames on disk show the repeat failed at the save step (r3 · tệp đã đổi)**
   Người dùng thấy gì: Sổ quyết định nói ba lần chạy lặp đều xanh, nhưng ảnh còn lại cho thấy lần lặp dừng giữa chừng. Người dùng không bị ảnh hưởng, chỉ có nguy cơ tin nhầm rằng lỗi đã hết.
   Căn cứ: Chỉ là sai lệch trong hồ sơ nội bộ, không mất dữ liệu; chạy lại rồi cập nhật ghi chú là xong.
   file: `_acceptance/thue-phi/decisions.jsonl`
   severity: high
   Đề xuất: known-limits
 
-- **anh-ui-check is not idempotent: adding the item «Phí dịch vụ hồ sơ» fails on any second run against the same company/DB**
+- **anh-ui-check is not idempotent: adding the item «Phí dịch vụ hồ sơ» fails on any second run against the same company/DB (r3 · tệp đã đổi)**
   Người dùng thấy gì: Bài kiểm tra bằng trình duyệt chỉ chạy đúng lần đầu trên một sàn mẫu; chạy lại trên cùng dữ liệu sẽ báo lỗi tên trùng dù sản phẩm đúng. Người dùng cuối không gặp.
   Căn cứ: Chỉ ảnh hưởng người chạy kiểm thử, tránh được bằng cách dựng lại dữ liệu mẫu trước mỗi lần, không ảnh hưởng người dùng.
   file: `tests/e2e-db/thue-phi.spec.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **9. Design: errors are handled — a valid save at the five-item limit fails with 500 (r2)**
+- **9. Design: errors are handled — a valid save at the five-item limit fails with 500 (r2 · tệp đã đổi)**
   Người dùng thấy gì: Khi sàn đã có đủ năm khoản riêng, quản trị bỏ một khoản và thêm khoản mới trong cùng một lần Lưu sẽ báo lỗi chung chung, thử lại vẫn không được.
   Căn cứ: Không mất dữ liệu và có đường vòng: lưu việc bỏ khoản trước rồi thêm khoản mới ở lần lưu sau; chỉ gặp ở sàn đã dùng hết năm khoản.
   file: `src/modules/company-config/fee-store.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Saving drops the custom name of a renamed brokerage item (r2)**
+- **Saving drops the custom name of a renamed brokerage item (r2 · tệp đã đổi)**
   Người dùng thấy gì: Quản trị đổi tên Phí môi giới rồi về sau bật tắt một công tắc và Lưu, tên tự đặt bị lặng lẽ đổi lại tên mặc định mà không báo.
   Căn cứ: Mất tên đã đặt mà không có cảnh báo, người dùng phải tự phát hiện và đặt lại; không mất số liệu tiền, sửa rẻ nhưng cần quyết định riêng vì ngoài tiêu chí hiện có.
   file: `src/modules/company-config/fee-store.ts`
   severity: high
   Đề xuất: new-contract
 
-- **Swapping an own item at the five-item limit fails with a server error (r2)**
+- **Swapping an own item at the five-item limit fails with a server error (r2 · tệp đã đổi)**
   Người dùng thấy gì: Ở sàn đã đủ năm khoản riêng, bỏ một khoản và thêm một khoản khác cùng lúc không lưu được và chỉ hiện thông báo lỗi chung.
   Căn cứ: Không mất dữ liệu, tách thành hai lần lưu là qua được, và chỉ xảy ra ở sàn dùng đủ năm khoản.
   file: `src/modules/company-config/fee-store.ts`
   severity: high
   Đề xuất: known-limits
 
-- **A 400 with no problem list is silently ignored when saving (r2)**
+- **A 400 with no problem list is silently ignored when saving (r2 · tệp đã đổi)**
   Người dùng thấy gì: Hiếm khi máy chủ từ chối lần lưu mà không nói lý do, khi đó bấm Lưu không thấy gì xảy ra và không có thông báo.
   Căn cứ: Chỉ xảy ra khi yêu cầu bị hỏng bất thường chứ không do người dùng nhập sai; không mất dữ liệu và tải lại rồi thử lại được.
   file: `src/modules/company-config/ui/fee-part.tsx`
@@ -104,7 +126,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: high
   Đề xuất: known-limits
 
-- **Hình dạng 4 (không ghim thông điệp, không đối chứng): khoản luật bị đổi tên hay bị bỏ chỉ kiểm status 400 (r2)**
+- **Hình dạng 4 (không ghim thông điệp, không đối chứng): khoản luật bị đổi tên hay bị bỏ chỉ kiểm status 400 (r2 · tệp đã đổi)**
   Người dùng thấy gì: Kiểm tra việc từ chối đổi tên hay bỏ khoản theo luật chỉ xem có báo lỗi hay không, chưa xem có nêu đúng khoản và dữ liệu có giữ nguyên không.
   Căn cứ: Người dùng không bị ảnh hưởng hôm nay; nếu về sau hỏng, lỗi có thể lọt qua kiểm tra nhưng sửa phần kiểm rẻ.
   file: `tests/db/thue-phi.db.test.ts`
@@ -125,14 +147,14 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 4 (thông điệp ghim không khớp assert): chiều đỏ của E2 ghim «Lệ phí trước bạ», nhưng assert sẽ hỏng trước lại so mã (r2)**
+- **Hình dạng 4 (thông điệp ghim không khớp assert): chiều đỏ của E2 ghim «Lệ phí trước bạ», nhưng assert sẽ hỏng trước lại so mã (r2 · tệp đã đổi)**
   Người dùng thấy gì: Nếu thứ tự ba khoản bị đảo, bài kiểm vẫn báo đỏ nhưng thông báo không nêu tên khoản như sổ ghi, nên người đọc khó hiểu ngay.
   Căn cứ: Không ảnh hưởng người dùng; chỉ làm thông báo lỗi khó đọc hơn mong đợi nên chấp nhận được.
   file: `src/modules/company-config/ui/fee-part.test.tsx`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): «phần không tự vẽ khung» được đo bằng grep tệp nguồn (r2)**
+- **Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): «phần không tự vẽ khung» được đo bằng grep tệp nguồn (r2 · tệp đã đổi)**
   Người dùng thấy gì: Việc phần Thuế phí dùng đúng khung chung chỉ được kiểm bằng đọc chữ trong mã, chưa kiểm giao diện thật, nên một viền tự thêm bằng cách khác có thể lọt.
   Căn cứ: Hiện chưa có lỗi hiển thị nào được chỉ ra, rủi ro là lệch giao diện nhẹ mà người dùng tải lại vẫn dùng được; làm chặt kiểm tra sau là rẻ.
   file: `src/modules/company-config/ui/fee-part.test.tsx`
