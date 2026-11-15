@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phủ tiêu chí · Cây quyết định</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Lora:ital,wght@0,400;1,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap&subset=vietnamese" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-soft:    #636b80;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Lora', 'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1200px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 0.5rem;
+    }
+    .sub { color: var(--color-soft); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    svg { width: 100%; min-width: 900px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Cây quyết định · Hỏi-1 · Coverage</p>
+    <h1>Phủ tiêu chí: giữ bảng sáu bước hay chạy morphological-scan</h1>
+    <p class="sub">Một câu hỏi, hai cách trả lời; mỗi nhánh dẫn tới điều xảy ra ở Cổng Phạm vi.</p>
+
+    <svg viewBox="0 48 1000 536" xmlns="http://www.w3.org/2000/svg" font-family="'Geist', sans-serif">
+      <rect x="0" y="48" width="1000" height="536" fill="#f5f5f5"/>
+
+      <!-- Connectors first (behind nodes) -->
+      <!-- Root stem -->
+      <path d="M 500 144 L 500 176" fill="none" stroke="#4f5d75" stroke-width="1"/>
+      <!-- Root → branch A (recommended) -->
+      <path d="M 500 176 L 268 176 Q 260 176 260 184 L 260 208" fill="none" stroke="#eb6c36" stroke-width="1.2"/>
+      <!-- Root → branch B -->
+      <path d="M 500 176 L 732 176 Q 740 176 740 184 L 740 208" fill="none" stroke="#4f5d75" stroke-width="1"/>
+      <!-- Branch A chain -->
+      <path d="M 260 264 L 260 304" fill="none" stroke="#4f5d75" stroke-width="1"/>
+      <path d="M 260 392 L 260 432" fill="none" stroke="#4f5d75" stroke-width="1"/>
+      <!-- Branch B chain -->
+      <path d="M 740 264 L 740 304" fill="none" stroke="#4f5d75" stroke-width="1"/>
+      <path d="M 740 392 L 740 432" fill="none" stroke="#4f5d75" stroke-width="1"/>
+
+      <!-- Root: the question -->
+      <rect x="340" y="88" width="320" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="340" y="88" width="320" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="348" y="96" width="32" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="364" y="108" fill="#2d3142" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">GỐC</text>
+      <text x="500" y="128" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Mỗi thứ nhánh đổi đã có tiêu chí chưa?</text>
+
+      <!-- Tier 1 · Branch A (machine recommends, focal) -->
+      <rect x="100" y="208" width="320" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="100" y="208" width="320" height="56" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <rect x="108" y="216" width="128" height="16" rx="2" fill="transparent" stroke="rgba(235,108,54,0.50)" stroke-width="0.8"/>
+      <text x="172" y="228" fill="#ba4513" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">NHÁNH A · MÁY KHUYÊN</text>
+      <text x="260" y="252" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Giữ bảng sáu bước</text>
+
+      <!-- Tier 1 · Branch B -->
+      <rect x="580" y="208" width="320" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="580" y="208" width="320" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="588" y="216" width="56" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="616" y="228" fill="#2d3142" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">NHÁNH B</text>
+      <text x="740" y="252" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Chạy morphological-scan</text>
+
+      <!-- Tier 2 · A: what the six steps cover -->
+      <rect x="100" y="304" width="320" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="100" y="304" width="320" height="88" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
+      <text x="260" y="332" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Sáu bước trỏ AC-1…AC-11</text>
+      <text x="260" y="348" fill="#4f5d75" font-size="9" text-anchor="middle">bước 5 ngoài phạm vi</text>
+      <text x="260" y="364" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">1 → AC-1, 2, 11 · 2 → AC-10, 2 · 3 → AC-2, 3</text>
+      <text x="260" y="380" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">4 → AC-4…AC-9 · 6 → AC-1, 6</text>
+
+      <!-- Tier 2 · B: an extra machine pass -->
+      <rect x="580" y="304" width="320" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="580" y="304" width="320" height="88" rx="6" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
+      <text x="740" y="352" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Thêm một lượt máy, có thể thêm tiêu chí</text>
+
+      <!-- Tier 3 · leaves (outcome at the gate) -->
+      <rect x="100" y="432" width="320" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="100" y="432" width="320" height="56" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="0.8"/>
+      <text x="260" y="464" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Chấm ngay, 11 tiêu chí</text>
+
+      <rect x="580" y="432" width="320" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="580" y="432" width="320" height="56" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="0.8"/>
+      <text x="740" y="464" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Cổng Phạm vi kéo dài</text>
+
+      <!-- Legend strip -->
+      <line x1="40" y1="516" x2="960" y2="516" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
+      <text x="40" y="536" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.18em">CHÚ GIẢI</text>
+
+      <rect x="40" y="552" width="16" height="12" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.2"/>
+      <text x="64" y="562" fill="#4f5d75" font-size="9">Nhánh máy khuyên</text>
+
+      <rect x="200" y="552" width="16" height="12" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="224" y="562" fill="#4f5d75" font-size="9">Câu hỏi · lựa chọn · điều kéo theo</text>
+
+      <rect x="420" y="552" width="16" height="12" rx="2" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="0.8"/>
+      <text x="444" y="562" fill="#4f5d75" font-size="9">Điều xảy ra ở Cổng Phạm vi</text>
+    </svg>
+  </div>
+</body>
+</html>
