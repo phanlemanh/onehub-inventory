@@ -40,7 +40,7 @@ chữ trong bản xem trước); dialog-6 là lưới thẻ chọn một. Tra: `
 | ---------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
 | Chờ tải          | đạt      | tests/e2e/screens/screens.spec.ts (công thức cho-tai); chưa có dòng thì không có ô để dán                  |
 | Trống            | đạt      | tests/e2e/screens/screens.spec.ts (công thức trong)                                                        |
-| Tìm không ra     | đạt      | tests/e2e/screens/screens.spec.ts (công thức tim-khong-ra)                                                 |
+| Không có dòng nào khớp | đạt | tests/e2e/screens/screens.spec.ts (công thức khong-khop); tests/e2e/dan-tu-excel.spec.ts (loc-khong-ghi-dong-an: dán khi đang lọc chỉ chạm dòng đang hiện) |
 | Lỗi              | đạt      | tests/e2e/screens/screens.spec.ts (công thức loi)                                                          |
 | Một phần hỏng    | đạt      | tests/e2e/dan-tu-excel.spec.ts (ap-hong-mot-phan); src/components/candidate/door-batch.test.tsx (ap-hong-mot-phan) |
 | Chữ dài          | đạt      | tests/e2e/screens/screens.spec.ts (công thức chu-dai); danh sách trong bản xem trước cuộn trong khung cao tối đa 24rem |
