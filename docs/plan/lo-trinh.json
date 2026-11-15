@@ -1515,33 +1515,6 @@
       ]
     },
     {
-      "ma": "21",
-      "cau_giao": "Lệnh một lần chuyển dữ liệu của một sàn từ Quỹ hàng sang kho này, chạy lại không nhân đôi",
-      "vai": "nen",
-      "tieu_chi": 10,
-      "vi_sao": "Chặng 5: thay Quỹ hàng. Giải mã số chủ nhà theo quyết định 0014",
-      "hang": "T3",
-      "dung_tren": [
-        "14",
-        "18",
-        "19",
-        "18a",
-        "18b",
-        "19a"
-      ],
-      "slug": "chuyen-du-lieu",
-      "bat_khi": "Chạy hai lần trên bản dựng từ dữ liệu mẫu, số bản ghi không đổi; đối chiếu đủ số căn, số liên hệ; khoá và dữ liệu đã giải mã không nằm trong kho",
-      "nhom": "ra-mat",
-      "dot": "mvp-dot-1",
-      "phu": [
-        "R1"
-      ],
-      "vung": [
-        "tools/**",
-        "db/migrations/**"
-      ]
-    },
-    {
       "ma": "22",
       "cau_giao": "Người của sàn mở inventory.onehub.center, nhận mã qua email và vào đúng sàn của mình trên bản chạy thật; mỗi bản mới đi qua bản thử trước khi lên bản thật, và lùi được về bản trước",
       "vai": "nen",
@@ -1686,6 +1659,16 @@
         "L12"
       ],
       "mo_lai_khi": "Có người thật làm cho hai sàn"
+    },
+    {
+      "ma": "H13",
+      "dot": "mvp-dot-1",
+      "cau_giao": "Lệnh một lần chuyển dữ liệu của một sàn từ Quỹ hàng sang kho này, chạy lại không nhân đôi",
+      "ly_do": "Quỹ hàng chưa có người dùng nên không có dữ liệu để chuyển; chủ kho 2026-11-15: không cần chuyển dữ liệu",
+      "phu": [
+        "R1"
+      ],
+      "mo_lai_khi": "Có sàn mang dữ liệu thật ở Quỹ hàng cần đưa sang"
     }
   ],
   "da_bac": [
