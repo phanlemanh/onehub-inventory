@@ -15,13 +15,6 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Records: the evidence card and page do not match HEAD**
-  Người dùng thấy gì: Thẻ bằng chứng còn mô tả hai điểm đã được sửa là chưa sửa, nên chủ kho có thể ký dựa trên thông tin cũ. Người dùng cuối không bị ảnh hưởng.
-  Căn cứ: Không mất hay lộ dữ liệu cho người dùng, chỉ là hồ sơ lỗi thời; làm lại thẻ rất rẻ và nên làm trước khi chủ kho ký.
-  file: `_acceptance/bang-hang-theo-dia-ly/card.html`
-  severity: medium
-  Đề xuất: known-limits
-
 - **SP-1 (companies are isolated): the geography tree ignores the signed-in company**
   Người dùng thấy gì: Hiện cây địa lý chạy trên dữ liệu mẫu nên chưa lộ gì. Khi chuyển sang dữ liệu thật, tên dự án và toà của sàn này có thể hiện cho sàn khác nếu không được giới hạn theo sàn.
   Căn cứ: Hiện chưa có dữ liệu thật nên không rò rỉ; chỉ cần ghi lại để khi đổi sang dữ liệu thật thì làm cho đúng sàn, sửa lúc đó không đắt.
@@ -34,7 +27,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   Căn cứ: Không có hậu quả cho người dùng, kiểm tra ranh giới vẫn xanh; chỉ là gọn gàng nội bộ nên chấp nhận và ghi vết.
   file: `src/modules/listings/ui/geo-tree.test.ts`
   severity: low
-  Đề xuất: wont-fix
+  Đề xuất: known-limits
 
 - **Domain: geography code uses a name the glossary does not**
   Người dùng thấy gì: Trong mã, khái niệm «Dự án» được gọi bằng tên khác với từ điển nghiệp vụ. Người dùng vẫn thấy đúng chữ «Dự án» trên màn hình.
