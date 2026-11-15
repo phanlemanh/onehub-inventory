@@ -1,24 +1,53 @@
-# Review findings: bang-hang-theo-dia-ly (round 3)
+# Review findings: bang-hang-theo-dia-ly (round 4)
 
 ## Trong hợp đồng
 
-- **A modifier-click on «Tất cả hàng» or a status entry drops the place in the current tab and then blocks every later address write**
-  file: `src/modules/listings/ui/use-geo-place.ts:58`
-  severity: medium
-  AC: AC-4
-  source: bugs
-  detail: The second column's onClick (second-column.tsx:118) calls place.pick(link.href) on every click and does not check for modifier keys. When a place is lit and the person Cmd/Ctrl/Shift-clicks «Tất cả hàng» or a status shortcut, the new key===null branch sets `leaving.current = url.pathname + url.search` and bumps `picked`. Bumping `picked` remounts the region in the current tab without the place. It then returns false, so Next's Link sees the modified click and lets the browser open the link in a new tab. The current tab therefore never navigates. The address keeps ?vung=<old place>, so the column still lights a place the grid no longer filters on. Worse, `leaving.current` is never cleared, because the write effect only clears it once window.location matches the target, and that never happens. From then on the write effect returns early on every placeKey change. Each later in-place pick filters the grid, but ?vung= stays on the stale place, so the lit entry is wrong and a reload or copied link opens the wrong place. This lasts until the person happens to navigate to exactly the leaving URL or the grid remounts. Fix: skip pick() for modified or non-primary clicks (metaKey/ctrlKey/shiftKey/altKey/button!==0), or clear `leaving` when no navigation follows.
-  rationale: AC-4 nói «không lúc nào cây sáng một nơi mà bảng hiện dòng của nơi khác»; finding mô tả cột vẫn sáng nơi cũ trong khi bảng đã bỏ lọc, và AC-6 (đường dẫn/tải lại đúng nơi) cũng hỏng theo.
+(không có finding nào map được vào AC)
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Assertion âm-tính-một-mình: kiểm `vung` vắng và ô Toà rỗng sau khi bấm, nhưng không kiểm dương rằng chúng đã có trước khi bấm**
-  Người dùng thấy gì: Người dùng không thấy gì khác đi. Chỉ là bài kiểm tự động cho việc bấm «Tất cả hàng» sau khi chọn một nơi có thể vẫn báo xanh dù địa chỉ hay ô lọc không được cập nhật đúng, nên lỗi tương lai có thể lọt qua.
-  Căn cứ: Không ảnh hưởng người dùng hiện tại, không mất hay lộ dữ liệu; rủi ro chỉ là bỏ sót lỗi sau này, và bổ sung kiểm tra lúc nào cũng rẻ.
-  file: `tests/e2e-db/dia-ly.spec.ts`
+- **Tier: the change is high tier but no human approval is recorded**
+  Người dùng thấy gì: Một tệp của bộ kiểm thử thuộc vùng cần chủ kho phê duyệt đã được sửa mà chưa có ghi nhận phê duyệt. Người dùng cuối không thấy khác biệt, nhưng chủ kho cần ký xác nhận.
+  Căn cứ: Việc thêm chỉ làm bài kiểm chặt hơn chứ không nới lỏng, người dùng không bị ảnh hưởng, và chủ kho ký một lần ở cổng là xong.
+  file: `tools/e2e_templates/settle.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Records: the evidence card and page do not match HEAD**
+  Người dùng thấy gì: Thẻ bằng chứng còn mô tả hai điểm đã được sửa là chưa sửa, nên chủ kho có thể ký dựa trên thông tin cũ. Người dùng cuối không bị ảnh hưởng.
+  Căn cứ: Không mất hay lộ dữ liệu cho người dùng, chỉ là hồ sơ lỗi thời; làm lại thẻ rất rẻ và nên làm trước khi chủ kho ký.
+  file: `_acceptance/bang-hang-theo-dia-ly/card.html`
+  severity: medium
+  Đề xuất: known-limits
+
+- **SP-1 (companies are isolated): the geography tree ignores the signed-in company**
+  Người dùng thấy gì: Hiện cây địa lý chạy trên dữ liệu mẫu nên chưa lộ gì. Khi chuyển sang dữ liệu thật, tên dự án và toà của sàn này có thể hiện cho sàn khác nếu không được giới hạn theo sàn.
+  Căn cứ: Hiện chưa có dữ liệu thật nên không rò rỉ; chỉ cần ghi lại để khi đổi sang dữ liệu thật thì làm cho đúng sàn, sửa lúc đó không đắt.
+  file: `src/app/(app)/layout.tsx`
   severity: low
+  Đề xuất: known-limits
+
+- **Design: a module test reaches into src/app**
+  Người dùng thấy gì: Một bài kiểm thử đặt chưa đúng chỗ về mặt tổ chức mã. Người dùng không thấy và không bị ảnh hưởng gì.
+  Căn cứ: Không có hậu quả cho người dùng, kiểm tra ranh giới vẫn xanh; chỉ là gọn gàng nội bộ nên chấp nhận và ghi vết.
+  file: `src/modules/listings/ui/geo-tree.test.ts`
+  severity: low
+  Đề xuất: wont-fix
+
+- **Domain: geography code uses a name the glossary does not**
+  Người dùng thấy gì: Trong mã, khái niệm «Dự án» được gọi bằng tên khác với từ điển nghiệp vụ. Người dùng vẫn thấy đúng chữ «Dự án» trên màn hình.
+  Căn cứ: Không ảnh hưởng gì đến những gì người dùng thấy hay dữ liệu; chỉ gây nhầm cho người viết mã sau này, đổi tên về sau khá rẻ.
+  file: `src/modules/listings/ui/geo-tree.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 5: tuyên quét LỚP «bấm kèm phím hoặc bấm chuột giữa» nhưng ma trận thiếu phần tử chuột giữa**
+  Người dùng thấy gì: Khi bấm chuột giữa vào một nơi ở cột thứ hai, chưa có bài kiểm tự động nào bảo vệ việc tab hiện tại giữ nguyên. Nếu sau này ai làm hỏng nhánh này thì người dùng có thể thấy bảng bị lọc ngay khi họ định mở tab mới.
+  Căn cứ: Hành vi hiện đã đúng và người dùng tự khắc phục được bằng cách xoá lọc; thêm một ca kiểm thử là rẻ nhưng hậu quả hiện tại nhẹ.
+  file: `tests/dia-ly.test.tsx`
+  severity: medium
   Đề xuất: known-limits
 
 - **SP-1 (companies are isolated): the place tree in the App Shell ignores which company is signed in (r2)**
@@ -28,7 +57,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): ca phá 'ten o loc cat' dựng một <input> bằng tay thay vì phá ô lọc thật (r2)**
+- **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): ca phá 'ten o loc cat' dựng một <input> bằng tay thay vì phá ô lọc thật (r2 · tệp đã đổi)**
   Người dùng thấy gì: Một bài kiểm tra bảo vệ việc ô lọc không cắt tên dự án chưa chứng minh được nó sẽ báo đỏ nếu ô lọc thật bị lỗi cắt tên. Người dùng hiện vẫn thấy tên đủ; rủi ro là sau này lỗi cắt tên quay lại mà không ai được báo.
   Căn cứ: Không có gì hỏng với người dùng bây giờ, chỉ là lưới an toàn yếu hơn lời hứa; nếu lỗi quay lại thì người dùng tự thấy tên bị cắt và sửa được, không mất dữ liệu.
   file: `tests/dia-ly.test.tsx`
@@ -63,21 +92,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **After a place is picked, pressing «Tất cả hàng» (or the status entry the grid opened with) does nothing: the grid stays filtered and the address gets the place back (r1)**
-  Người dùng thấy gì: Sau khi chọn một toà, bấm «Tất cả hàng» ở cột bên không làm gì cả: bảng vẫn lọc theo toà đó. Người dùng phải bấm «Xoá lọc» mới quay về đủ 60 dòng.
-  Căn cứ: Người dùng dễ tưởng ứng dụng bị treo nhưng không mất dữ liệu, và có cách thoát bằng «Xoá lọc» hay tải lại trang; nên làm thành việc riêng vì đây là lối đi thường gặp.
-  file: `src/modules/listings/ui/inventory-grid.tsx`
-  severity: high
-  Đề xuất: new-contract
-
-- **Cmd/Ctrl/Shift-click on a place entry is swallowed: no new tab, the grid is filtered in place (r1)**
-  Người dùng thấy gì: Giữ Cmd hoặc Ctrl khi bấm một nơi sẽ không mở tab mới mà chỉ lọc bảng hiện tại. Đường dẫn vẫn chép và mở được bình thường.
-  Căn cứ: Là thói quen của người dùng thành thạo, nhẹ, có cách vòng bằng cách chép đường dẫn, và không mất dữ liệu.
-  file: `src/components/templates/app-shell/second-column.tsx`
-  severity: medium
-  Đề xuất: known-limits
-
-- **Hình dạng 4 (assertion âm tính một mình): kiểm 'không count' và 'không geo-tree' trên data-slot mà mã không bao giờ vẽ (r1)**
+- **Hình dạng 4 (assertion âm tính một mình): kiểm 'không count' và 'không geo-tree' trên data-slot mà mã không bao giờ vẽ (r1 · tệp đã đổi)**
   Người dùng thấy gì: Bài kiểm thử về «không có số đếm trên mục» có thể không bắt được lỗi nếu ai đó thêm số đếm sau này. Hiện người dùng không thấy số đếm nào.
   Căn cứ: Rủi ro chỉ nằm ở tương lai khi sửa mã, màn hình hiện tại đúng, và gia cố bài kiểm thử có thể làm lúc khác.
   file: `tests/dia-ly.test.tsx`
@@ -91,7 +106,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 5 (tuyên quét lớp nhưng thiếu phần tử): đi theo import bỏ hai màn layout.tsx và inventory/page.tsx (r1)**
+- **Hình dạng 5 (tuyên quét lớp nhưng thiếu phần tử): đi theo import bỏ hai màn layout.tsx và inventory/page.tsx (r1 · tệp đã đổi)**
   Người dùng thấy gì: Bài quét xem cây có thêm cách đọc dữ liệu mới không bỏ sót hai màn. Hiện chưa thấy cách đọc mới nào được thêm.
   Căn cứ: Là khoảng hở trong lưới kiểm tra chứ không phải lỗi thật, người dùng không bị ảnh hưởng, và bổ sung sau rất rẻ.
   file: `tests/dia-ly.test.tsx`
@@ -112,11 +127,13 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: high
   Đề xuất: known-limits
 
-- **Hình dạng 5: E10 hứa đối chứng ô lọc chữ của Đã gửi nhưng không có ca nào (r1)**
+- **Hình dạng 5: E10 hứa đối chứng ô lọc chữ của Đã gửi nhưng không có ca nào (r1 · tệp đã đổi)**
   Người dùng thấy gì: Ô lọc chữ của màn Đã gửi chưa có bài kiểm riêng cho việc bỏ dấu và hoa thường. Chưa thấy dấu hiệu nó hoạt động sai.
   Căn cứ: Chỉ là một khoảng trống kiểm thử, ô lọc này không đổi trong hàng này và thêm một ca kiểm rất rẻ.
   file: `tests/dia-ly.test.tsx`
   severity: low
   Đề xuất: known-limits
 
-Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
+## Chưa adversarial-verify (refuter chết)
+
+⚠ Cụm ngoài vùng phủ: 2/6 lỗi rơi vào file không bộ đo nào phủ (tools/e2e_templates/settle.ts, _acceptance/bang-hang-theo-dia-ly/card.html) — dừng và quyết: mở rộng hợp đồng hay rút phạm vi.
