@@ -124,5 +124,6 @@
       "i": 4,
       "p": "Hai ô cùng căn ghi nối nhau và ba lý do hỏng chưa được đo riêng. Đã thêm ca nối phiên bản và ma trận ba lý do."
     }
-  ]
+  ],
+  "analyst_plain": "Ba phép kiểm chung (kiểm toàn kho, khuôn họ Lưới, sàn thiết kế) xanh cả trước lẫn sau hàng này: chúng giữ cho kho không lùi, không chứng minh việc dán. Việc dán được chứng minh bằng các bài riêng của hàng 5."
 }

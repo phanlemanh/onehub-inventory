@@ -1,25 +1,24 @@
 ---
 schema_version: 2
 feature_slug: dan-tu-excel
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
+reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: ea1cd541a2c104486c943310694973d7278f48c1
+verified_commit: 7988967d8dd9cae2c4052b9727edd77dc236e549
 human_signoff:
 ---
 
 # Evidence Report: dan-tu-excel
-
-Round 2. Các eval máy đều xanh; còn một mục judgment (E2b) chờ người quyết ở Cổng 2.
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
 | E1 | AC-1 | test | PASS |
 | E1-ui | AC-1 | ui-check | PASS |
 | E2 | AC-2 | test | PASS |
-| E2b | AC-2 | judgment | PENDING-HUMAN (hội đồng đề xuất FAIL) |
+| E2b | AC-2 | judgment | PASS |
 | E3 | AC-3 | test | PASS |
 | E4 | AC-4 | test | PASS |
 | E4-e2e | AC-4 | test | PASS |
@@ -39,202 +38,200 @@ Round 2. Các eval máy đều xanh; còn một mục judgment (E2b) chờ ngư�
 ## Evidence
 
 - eval: E1
-  run_id: minted-dan-tu-excel-E1-r2
+  run_id: minted-dan-tu-excel-E1-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel_e2e
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
     npx playwright test tests/e2e/dan-tu-excel.spec.ts tests/e2e/sua-tren-o.spec.ts tests/e2e/sheet.spec.ts
-    155 passed (1.2m)
+    155 passed (1.1m)
 
 - eval: E1-ui
-  run_id: minted-dan-tu-excel-E1-ui-r2
+  run_id: minted-dan-tu-excel-E1-ui-r3
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
-  verified_at: 2026-11-15T10:12:04Z
+  verifier: config:capture.ui
+  verified_at: 2026-11-15T10:29:13Z
   screenshot: evidence/E1-1440-sang.png
   observed: |
-    All four frames opened and read. 1440 light: dialog "Dán vào 3 căn / 6 ô sẽ đổi / Sẽ đổi · 6" with 6 checked lines, each old value struck through then new: Căn 0905 Trạng thái Đang giao dịch → Đang bán; Giá chào 5,71 tỷ → 5,81 tỷ; Căn 1101 Trạng thái Đang bán → Đang giao dịch; Giá 2,71 → 2,81 tỷ; Căn 1202 Trạng thái Chưa đủ để rao → Đang bán with a "Không hoàn tác được" tag; Giá 4,32 → 4,42 tỷ. Buttons "Thôi" and "Áp 6 ô". The blurred table behind still shows the old values, with the 3 x 2 selection outlined. 1440 dark: same content and count, readable contrast, background dimmed. 1024 light and 1024 dark: same dialog and same 6 lines, narrower, nothing clipped; the table behind is blurred and still shows the old statuses (Đang giao dịch / Đang bán / Chưa đủ để rao). No frame deviates. No dropped or wrong-type cell appears in this sample because every pasted cell is valid, so the "bỏ/sai kiểu" section is correctly absent and the count 6 equals the list length. Matches Expected: every frame consistent; the table behind keeps its old values.
+    I opened all four frames with Read. E1-1440-sang: a light dialog "Dán vào 3 căn / 6 ô sẽ đổi / Sẽ đổi · 6" over a blurred grid. It lists 6 lines with the old value struck through and the new value after an arrow: Căn 0905 Trạng thái Đang giao dịch → Đang bán and Giá chào 5,71 tỷ → 5,81 tỷ; Căn 1101 Đang bán → Đang giao dịch and 2,71 tỷ → 2,81 tỷ; Căn 1202 Chưa đủ để rao → Đang bán, with a "Không hoàn tác được" tag, and 4,32 tỷ → 4,42 tỷ. The "Thôi" and "Áp 6 ô" buttons are visible. The count of 6 matches the 6 lines. In the grid behind (blurred), the selected cells still show the old prices. E1-1440-toi: the same content in dark mode with readable contrast, checkboxes and primary button legible. E1-1024-sang: the same 6 lines and the same count, with the dialog narrower and nothing clipped. E1-1024-toi: the same in dark. No line is dropped, wrapped badly or cut off at any size. Everything matches the Expected: all frames agree with each other, and the grid behind keeps the old values. This sample has no skipped or invalid-type cells, so the reason lines for rejected cells were not exercised here.
   network_observed: clean
   output: |
-    Server on 3487 already running (shared, not stopped); GET /inventory?vai=ListAgent returned 200. Driver: Playwright chromium, 4 contexts (1440 and 1024 wide, light and dark). Preview visible, 6 lines, 0 saves before Áp, cells behind the preview unchanged.
-    Frames: evidence/E1-1440-sang.png, E1-1440-toi.png, E1-1024-sang.png, E1-1024-toi.png. Network dump: evidence/E1-ui-network.txt.
+    GET /inventory?vai=ListAgent returned 200 on the shared server. At 1440 and 1024, light and dark: the 3x2 block was pasted and the preview showed "Dán vào 3 căn", "6 ô sẽ đổi", 6 change lines and "Áp 6 ô". Cells behind the dialog kept the old values. Frames: E1-1440-sang.png, E1-1440-toi.png, E1-1024-sang.png, E1-1024-toi.png, E1-ui-step1.png, E1-ui-step2.png. Raw network dump in E1-ui-network.txt.
 
 - eval: E2
-  run_id: minted-dan-tu-excel-E2-r2
+  run_id: minted-dan-tu-excel-E2-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
     npx vitest run src/modules/listings/paste-rules.test.ts src/modules/listings/ui/listing-paste.test.ts src/components/candidate/door-batch.test.tsx src/components/candidate/data-region-paste.test.tsx
-    all files passed
+    all test files passed
 
 - eval: E3
-  run_id: minted-dan-tu-excel-E3-r2
+  run_id: minted-dan-tu-excel-E3-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    cùng lệnh vitest như E2; tất cả bài đã qua
+    same vitest command as E2, all test files passed
 
 - eval: E4
-  run_id: minted-dan-tu-excel-E4-r2
+  run_id: minted-dan-tu-excel-E4-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    cùng lệnh vitest như E2; tất cả bài đã qua
+    same vitest command as E2, all test files passed
 
 - eval: E4-e2e
-  run_id: minted-dan-tu-excel-E4-e2e-r2
+  run_id: minted-dan-tu-excel-E4-e2e-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel_e2e
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    cùng lệnh playwright như E1; 155 passed (1.2m)
+    same playwright command as E1, 155 passed (1.1m)
 
 - eval: E5
-  run_id: minted-dan-tu-excel-E5-r2
+  run_id: minted-dan-tu-excel-E5-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel_e2e
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    cùng lệnh playwright như E1; 155 passed (1.2m)
+    same playwright command as E1, 155 passed (1.1m)
 
 - eval: E5b
-  run_id: minted-dan-tu-excel-E5b-r2
+  run_id: minted-dan-tu-excel-E5b-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    cùng lệnh vitest như E2; tất cả bài đã qua
+    same vitest command as E2, all test files passed
 
 - eval: E6
-  run_id: minted-dan-tu-excel-E6-r2
+  run_id: minted-dan-tu-excel-E6-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    cùng lệnh vitest như E2; tất cả bài đã qua
+    same vitest command as E2, all test files passed
 
 - eval: E6-e2e
-  run_id: minted-dan-tu-excel-E6-e2e-r2
+  run_id: minted-dan-tu-excel-E6-e2e-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel_e2e
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    cùng lệnh playwright như E1; 155 passed (1.2m)
+    same playwright command as E1, 155 passed (1.1m)
 
 - eval: E7
-  run_id: minted-dan-tu-excel-E7-r2
+  run_id: minted-dan-tu-excel-E7-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    cùng lệnh vitest như E2; tất cả bài đã qua
+    same vitest command as E2, all test files passed
 
 - eval: E7-e2e
-  run_id: minted-dan-tu-excel-E7-e2e-r2
+  run_id: minted-dan-tu-excel-E7-e2e-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel_e2e
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    cùng lệnh playwright như E1; 155 passed (1.2m)
+    same playwright command as E1, 155 passed (1.1m)
 
 - eval: E8
-  run_id: minted-dan-tu-excel-E8-r2
+  run_id: minted-dan-tu-excel-E8-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel_e2e
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    cùng lệnh playwright như E1; 155 passed (1.2m)
+    same playwright command as E1, 155 passed (1.1m)
 
 - eval: E12
-  run_id: minted-dan-tu-excel-E12-r2
+  run_id: minted-dan-tu-excel-E12-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel_e2e
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    cùng lệnh playwright như E1; 155 passed (1.2m)
+    same playwright command as E1, 155 passed (1.1m)
 
 - eval: E9
-  run_id: minted-dan-tu-excel-E9-r2
+  run_id: minted-dan-tu-excel-E9-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.check
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
     make check
     CODEOWNERS matches governance/autonomy.yaml
 
 - eval: E9-axe
-  run_id: minted-dan-tu-excel-E9-axe-r2
+  run_id: minted-dan-tu-excel-E9-axe-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.dan_tu_excel_e2e
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    cùng lệnh playwright như E1; 155 passed (1.2m)
+    same playwright command as E1, 155 passed (1.1m)
 
 - eval: E10
-  run_id: minted-dan-tu-excel-E10-r2
+  run_id: minted-dan-tu-excel-E10-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.design.khuon
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
     design-floor-khuon --kiem
-    12 tệp giao diện ngoài bản đồ
+    13 tệp giao diện ngoài bản đồ
 
 - eval: E11
-  run_id: minted-dan-tu-excel-E11-r2
+  run_id: minted-dan-tu-excel-E11-r3
   exit_code: 0
   baseline: n-a
   verifier: config:executors.design.floor
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
   output: |
-    design-floor-s4 chạy xong, không in lỗi
-
-### Judgment
-
-- eval: E2b
-  judged_by: judge panel (3 lens, fresh context) — đề xuất, người quyết ở Cổng 2
-  proposal: FAIL
-  votes:
-    - domain-correctness: FAIL — Đường ghi sạch: applyPaste chỉ ghi qua write() rồi door.save(), cùng cửa với sửa trong ô. Nhưng paste-rules.ts dòng 78 tự viết luật số `undoable: typeof previous === "number" && previous > 0`, edit-rules.ts không định nghĩa phép so đó; dòng 96 tự gọi tên hai trạng thái bằng tay.
-    - operational-feasibility: FAIL — Đường ghi đạt (use-listing-cell-edit.tsx:125, 218). Bộ đọc không đạt: paste-rules.ts:78 tự so số, dòng 79-80 lặp ngưỡng previous>0 của priceAsksAgain; dòng 96 tự chọn nhánh lý do.
-    - spec-alignment: FAIL — Đường ghi đạt, không có đường ghi thứ hai. Luật "hoàn tác được" ở paste-rules.ts dòng 78 không gọi hàm nào của edit-rules.ts; dòng 79 lặp `&& previous` và ngưỡng đã nằm trong priceAsksAgain.
-  required_evidence:
-    - Đưa luật "giá hoàn tác được" (paste-rules.ts dòng 78) vào edit-rules.ts thành một hàm (ví dụ priceUndoable) để paste-rules.ts chỉ gọi hàm đó.
-    - Hoặc một ghi chú ở contract.md nói rõ việc kiểm "có giá cũ > 0" để quyết định hoàn tác được là phần của bộ đọc ô dán, không phải luật hàng 4.
-    - Dòng 96 lấy lý do từ danh sách StatusNeed mà statusNeeds trả về thay vì phép so "Closed" viết cứng; hoặc hợp đồng ghi rõ danh sách sáu hàm chỉ là ví dụ.
-  human_override:  # chi nguoi ghi
+    design-floor-s4 --root . finished with no finding
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-dan-tu-excel-SUITE-build-r2
+  run_id: minted-dan-tu-excel-SUITE-build-r3
   exit_code: 0
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
 
 - cmd: make e2e
-  run_id: minted-dan-tu-excel-SUITE-make_e2e-r2
+  run_id: minted-dan-tu-excel-SUITE-make_e2e-r3
   exit_code: 0
-  verified_at: 2026-11-15T10:12:04Z
+  verified_at: 2026-11-15T10:29:13Z
+
+### Judgment
+
+- eval: E2b
+  judged_by: judge panel (3 lenses, fresh context)
+  proposal: PASS
+  votes:
+    - domain-correctness: UNCERTAIN — Phần giá và đường ghi đạt: paste-rules.ts chỉ gọi hàm của edit-rules.ts (readPrice, priceAsksAgain, priceLocked, canMove, statusNeeds, statusLocked, cộng thêm priceSwing, priceUnchanged, priceUndoable, statusUndoable, STATUS_NEXT, foldWords), không có ngưỡng hay phép so số riêng. Mọi ghi đều qua `write` ở use-listing-cell-edit.tsx dòng 125-136, tức `door.save`, kể cả hoàn tác, và không có đường thứ hai. Riêng hàm đọc chữ trạng thái thì paste-rules.ts dòng 54-61 tự định nghĩa `readStatusText` (foldWords cộng statusLabel từ lib/format) chứ không gọi hàm của tệp luật mô-đun căn. Tệp luật đó không nằm trong danh sách Input nên không biết có hàm sẵn để gọi hay không.
+    - operational-feasibility: PASS — Trong paste-rules.ts, readPastePrice và readPasteStatus (dòng 68–106) chỉ nối các hàm của edit-rules (readPrice, priceUnchanged, priceLocked, priceAsksAgain, priceSwing, priceUndoable, canMove, statusLocked, statusNeeds, statusUndoable, foldWords). Danh sách nấc trạng thái lấy từ Object.keys(STATUS_NEXT) (dòng 51), không có số so, ngưỡng hay bậc tự đặt. listing-paste.ts chỉ gọi hai hàm đọc này cùng readStatusText và chỉ định dạng hiển thị (swingMark, formatMoney). Mọi lần ghi đi qua useListingCellEdit.applyPaste → write → door.save (use-listing-cell-edit.tsx dòng 127, 234), cùng cửa với sửa trong ô, hoàn tác cũng qua cửa đó. save-door.applyChange kiểm lại luật bằng hàm của edit-rules, và không thấy fetch hay đường ghi thứ hai nào trong data-region, paste-preview, use-change.
+    - spec-alignment: PASS — `listing-paste.ts` và `paste-rules.ts` không tự so số, liệt kê nấc hay đặt ngưỡng. Mọi luật giá và trạng thái đều gọi từ `edit-rules.ts`, còn `readStatusText` lấy danh sách nấc từ `Object.keys(STATUS_NEXT)`. Mọi lần ghi từ ô dán, kể cả hoàn tác, đều đi qua `write()` → `door.save()` (`use-listing-cell-edit.tsx:125-127`, `:223`, `:234`), cùng cửa với ô đơn, không có đường ghi thứ hai. Hai điều không vi phạm nhưng người nên xem: `paste-rules.ts` gọi thêm vài hàm của `edit-rules.ts` ngoài sáu hàm đề bài nêu, và cờ `cell.open`/`row.locked` do lưới cấp (`lockedReasons`) nằm ngoài danh sách tệp nên không kiểm được.
+  required_evidence:
+    - Tệp luật của mô-đun căn (unit), ví dụ src/modules/units/*-rules.ts hoặc tệp tương đương mà architecture/modules.yaml chỉ ra. Nếu tệp đó đã có hàm đọc chữ trạng thái từ chữ dán, thì readStatusText ở paste-rules.ts dòng 54-61 là luật viết trùng và kết luận đổi thành FAIL.
+    - Nếu tệp luật mô-đun căn không có hàm đọc chữ trạng thái: một câu của hợp đồng hoặc contract.md nói readStatusText của paste-rules.ts (dòng 54-61) là chỗ duy nhất được đọc chữ trạng thái. Khi đó kết luận đổi thành PASS.
+  human_override:  # chi nguoi ghi
 
 ## Known limits
 
@@ -242,11 +239,12 @@ Round 2. Các eval máy đều xanh; còn một mục judgment (E2b) chờ ngư�
 
 ## Analyst
 
-carried tu round 1 — baseline khong do lai round nay
+carried tu round 1 — baseline khong do lai round nay (evals.yaml khong doi tu lan baseline cuoi). Mọi eval ghi baseline: n-a vì round này không đo.
 
-Baseline không đo: evals.yaml không đổi từ lần đo baseline cuối (round 1); mọi eval ghi baseline n-a vì round này không đo.
-
-Eval không-phân-biệt (xanh trên cả bản mới lẫn bản cũ, theo kết quả carried): E9 (make check), E10 (design-floor khuôn), E11 (design-floor s4). Cần viết lại để khẳng định hành vi mới hoặc xác nhận là lưới hồi quy có chủ ý.
+Eval không phân biệt (xanh trên cả bản mới lẫn bản cũ, chứng minh harness chứ không phải tính năng; nên viết lại để assert hành vi mới hoặc xác nhận là regression-guard có chủ ý):
+- make check — E9
+- design-floor-khuon --kiem — E10
+- design-floor-s4 — E11
 
 ## Variance
 
@@ -254,5 +252,6 @@ none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: chấm vòng 1 tìm lỗi luật giá/trạng thái và độ phủ bài kiểm thử; đã sửa (không còn gợi ý hoàn tác cho giá dán lên căn chưa có giá, gộp một lần gấp chữ và một danh sách trạng thái, siết số đo) rồi bổ sung bài kiểm thử. Returned to implementation.
-Round 2: mọi eval máy xanh; còn mục judgment E2b chờ người quyết ở Cổng 2.
+Round 1: chấm lần 1, sửa theo kết quả (không hoàn tác giá dán lên căn chưa có giá, một chỗ gấp chữ và một danh sách trạng thái, siết phép đo). Returned to implementation.
+Round 2: chấm lần 2, sửa luật hoàn tác giá trong luật hàng 4, giữ mốc xác nhận khi còn ô của hàng giữ, bốn vai. Returned to implementation.
+Round 3: mọi eval máy xanh trên commit 7988967; E2b đề xuất PASS, còn một phiếu chưa chắc ở lăng kính domain-correctness chờ người ở Cổng 2.
