@@ -1474,7 +1474,7 @@
       "cau_giao": "Quản trị sàn đổi mức Thuế phí mà Về tay của các giá đã đặt trước đó không đổi, và trên căn thấy được con số tính theo mức nào",
       "vai": "Quản trị sàn",
       "tieu_chi": 8,
-      "vi_sao": "Tách khỏi hàng 10 ở Cổng Phạm vi của hàng ấy ngày 2026-11-15 (Hỏi-5): chủ kho trước đó chọn làm việc này ở hàng 10, nay nhận khuyến nghị chuyển sang một hàng riêng, vì phần Thuế phí của hàng 19 chỉ giữ mức đang áp, chưa giữ lịch sử mức. Giới hạn đã biết cho tới khi hàng này xong: đổi mức thì Về tay của các giá cũ đổi theo. Cần một bảng lịch sử mới trong cơ sở dữ liệu nên là T3. Hàng chưa qua Cổng Đáng",
+      "vi_sao": "Tách khỏi hàng 10 ở Cổng Phạm vi của hàng ấy ngày 2026-11-15 (Hỏi-5): chủ kho trước đó chọn làm việc này ở hàng 10, nay nhận khuyến nghị chuyển sang một hàng riêng, vì phần Thuế phí của hàng 19 chỉ giữ mức đang áp, chưa giữ lịch sử mức. Giới hạn đã biết cho tới khi hàng này xong: đổi mức thì Về tay của các giá cũ đổi theo. Cần một bảng lịch sử mới trong cơ sở dữ liệu nên là T3. Chủ kho 2026-11-15 ở Cổng Đáng: «Cho cả gói, build»",
       "hang": "T3",
       "dung_tren": [
         "19",
