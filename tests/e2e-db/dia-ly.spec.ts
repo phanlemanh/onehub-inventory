@@ -147,11 +147,17 @@ async function settled(page: Page) {
   ).toBeVisible();
 }
 
-/** The footer's «x / 60 dòng», or 60 when nothing is filtered. */
+/** The row count the region shows: «x / 60 dòng» while filtered, «60 dòng» when not; throws when there is none. */
 async function footerCount(page: Page): Promise<number> {
-  const text = (await region(page).textContent()) ?? "";
-  const m = /(\d+) \/ 60 dòng/.exec(text);
-  return m ? Number(m[1]) : 60;
+  const counts = await region(page).locator('[data-slot="region-footer-count"]').allTextContents();
+  return readCount(counts);
+}
+
+/** The one row count among the region's count texts; throws when the count is missing or unreadable. */
+function readCount(counts: readonly string[]): number {
+  const m = counts.length === 1 ? /^(\d+)(?: \/ 60)? dòng$/.exec(counts[0]!.trim()) : null;
+  if (!m) throw new Error(`khong doc duoc chan bang: ${JSON.stringify(counts)}`);
+  return Number(m[1]);
 }
 
 /** Names of the lit entries of the second column. */
@@ -206,6 +212,12 @@ test("E4 four places: count and the one lit entry", async ({ page }, info) => {
     checkLit(await litNames(column(page)), name);
   }
   expect(() => checkLit([], "S1.03")).toThrow("nut khong sang: S1.03");
+  // Break: with the footer gone the count cannot be read, and the test goes red instead of assuming 60.
+  await region(page)
+    .locator('[data-slot="region-footer-count"]')
+    .evaluate((el) => el.remove());
+  await expect(footerCount(page)).rejects.toThrow("khong doc duoc chan bang");
+  expect(() => readCount(["12 căn"])).toThrow("khong doc duoc chan bang");
 });
 
 // ---- E7 ------------------------------------------------------------------------------------------------------------

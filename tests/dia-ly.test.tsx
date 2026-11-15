@@ -263,6 +263,23 @@ const groupOf = (title: string) =>
     .getByText(title, { selector: '[data-sidebar="group-label"]' })
     .closest<HTMLElement>('[data-sidebar="group"]')!;
 
+/** Every place name of the tree, the group titles and «Tất cả»: the only words a project group may show. */
+const NAMES = new Set<string>([
+  WORDS.all,
+  ...(function walk(nodes: readonly { name: string; children?: readonly unknown[] }[]): string[] {
+    return nodes.flatMap((n) => [n.name, ...walk((n.children ?? []) as typeof nodes)]);
+  })(TREE),
+]);
+
+/** Each piece of text in the group is a whole place name; throws when a count shows in any form. */
+function checkNoCounts(group: HTMLElement, names: ReadonlySet<string>): void {
+  const walker = document.createTreeWalker(group, NodeFilter.SHOW_TEXT);
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    const text = (n.textContent ?? "").trim();
+    if (text && !names.has(text)) throw new Error(`muc co so dem: ${text}`);
+  }
+}
+
 describe("E1 / E13 — the second column", () => {
   it("one group per project after the statuses, no counts, a complex holding its buildings", () => {
     shell(ROWS);
@@ -276,8 +293,8 @@ describe("E1 / E13 — the second column", () => {
       "Vinhomes Ocean Park 3 – The Crown",
     ]);
     const p1 = groupOf(P1);
-    expect(p1.querySelectorAll('[data-slot="place-count"]')).toHaveLength(0);
-    expect(p1.textContent).not.toMatch(/\d+ (căn|dòng)/);
+    // Every word shown in a project group is a place name or «Tất cả»: no count, badge or number in any form.
+    for (const title of titles.slice(at + 1, at + 4)) checkNoCounts(groupOf(title!), NAMES);
     const complex = within(p1).getByRole("link", { name: "The Sapphire 1" }).closest("li")!;
     const nested = complex.querySelector('[data-sidebar="menu-sub"]')!;
     expect([...nested.querySelectorAll("a")].map((a) => a.textContent)).toEqual([
@@ -286,7 +303,21 @@ describe("E1 / E13 — the second column", () => {
       "S1.03",
       "S1.05",
     ]);
-    expect(document.querySelectorAll('[data-slot="geo-tree"]')).toHaveLength(0);
+    // The tree is the column's own entries: the project groups sit in the same list as the status shortcuts.
+    expect(p1.closest("nav")).toBe(groupOf(FRAME_COPY.secondColumn.byStatus).closest("nav"));
+  });
+
+  it("break: a count drawn in a new form (badge, «(12)», a bare number) is caught", () => {
+    for (const draw of [
+      (a: HTMLElement) => a.insertAdjacentHTML("beforeend", "<span>12</span>"),
+      (a: HTMLElement) => a.append(" (12)"),
+      (a: HTMLElement) => a.parentElement!.insertAdjacentHTML("beforeend", "<div>12 căn</div>"),
+    ]) {
+      cleanup();
+      shell(ROWS);
+      draw(within(groupOf(P1)).getByRole("link", { name: "S1.03" }));
+      expect(() => checkNoCounts(groupOf(P1), NAMES)).toThrow("muc co so dem");
+    }
   });
 
   it("exactly one entry lit, counted across nested entries", () => {
