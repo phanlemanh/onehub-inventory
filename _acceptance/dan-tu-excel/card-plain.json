@@ -1,40 +1,128 @@
 {
   "feature_plain": "Đầu chủ dán một vùng chép từ Excel hay Sheet vào Bảng hàng, thấy trước từng ô sẽ đổi, ô bị bỏ và vì sao, rồi áp một lần và hoàn tác một lần.",
   "will_do": [
-    {"id": "AC-1", "p": "Sẽ chưa ghi gì khi dán: bản xem trước mở, mỗi ô sẽ đổi một dòng «căn · cột · cũ → mới», dòng đếm nói đúng số ô sẽ đổi, bị bỏ, sai kiểu, giữ nguyên."},
-    {"id": "AC-2", "p": "Sẽ đọc chữ dán bằng đúng bộ đọc giá và từ điển trạng thái đang dùng khi sửa trên ô; chữ không hiểu nằm ở «Sai kiểu» kèm câu gợi ý cách gõ."},
-    {"id": "AC-3", "p": "Sẽ nói rõ từng ô bị bỏ và vì sao: thuộc tính căn, cột máy tự ghi, cột tính, cột riêng của sàn, căn đã bán, nấc trạng thái không đi được, phần vùng dán thừa ra ngoài bảng."},
-    {"id": "AC-4", "p": "Sẽ đánh dấu phần trăm trên dòng giá lệch quá 20% và (theo Hỏi-6) để dòng ấy bỏ chọn sẵn; không hộp hỏi lại nào bật lên sau khi áp."},
-    {"id": "AC-5", "p": "Sẽ ghi đúng các ô đang chọn, mỗi ô một lần qua cùng cửa lưu như sửa trên ô, rồi báo «Đã đổi N ô của K căn» kèm Hoàn tác; «Thôi» không ghi gì."},
-    {"id": "AC-6", "p": "Sẽ hoàn tác cả vùng một lần; ô ghi hỏng thì về giá trị cũ và thông báo nói đúng số ô và lý do (mất mạng, căn vừa đổi chỗ khác, không đủ quyền); hoàn tác hỏng thì báo đứng yên kèm «Thử lại»."},
-    {"id": "AC-8", "p": "Sẽ dùng được trọn bằng bàn phím và trình đọc màn hình; phím cũ của Bảng hàng (Enter mở hồ sơ, F2 sửa ô, chép vùng) giữ nguyên."},
-    {"id": "AC-9", "p": "Sẽ là một khối dùng chung có tên trong sổ khối, chữ đến từ bảng nhãn, qua bài kiểm trợ năng ở nền sáng và tối."},
-    {"id": "AC-10", "p": "Sẽ dán đúng khuôn Excel: một ô điền cả vùng chọn, khối lặp theo vùng chọn, chỉ dòng đang hiện khi đang lọc, mất mạng từ đầu thì không ô nào đổi."}
+    {
+      "id": "AC-1",
+      "p": "Sẽ chưa ghi gì khi dán: bản xem trước mở, mỗi ô sẽ đổi một dòng «căn · cột · cũ → mới», dòng đếm nói đúng số ô sẽ đổi, bị bỏ, sai kiểu, giữ nguyên."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ đọc chữ dán bằng đúng bộ đọc giá và từ điển trạng thái đang dùng khi sửa trên ô; chữ không hiểu nằm ở «Sai kiểu» kèm câu gợi ý cách gõ."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ nói rõ từng ô bị bỏ và vì sao: thuộc tính căn, cột máy tự ghi, cột tính, cột riêng của sàn, căn đã bán, nấc trạng thái không đi được, phần vùng dán thừa ra ngoài bảng."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ đánh dấu phần trăm trên dòng giá lệch quá 20% và (theo Hỏi-6) để dòng ấy bỏ chọn sẵn; không hộp hỏi lại nào bật lên sau khi áp."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ ghi đúng các ô đang chọn, mỗi ô một lần qua cùng cửa lưu như sửa trên ô, rồi báo «Đã đổi N ô của K căn» kèm Hoàn tác; «Thôi» không ghi gì."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ hoàn tác cả vùng một lần; ô ghi hỏng thì về giá trị cũ và thông báo nói đúng số ô và lý do (mất mạng, căn vừa đổi chỗ khác, không đủ quyền); hoàn tác hỏng thì báo đứng yên kèm «Thử lại»."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ dùng được trọn bằng bàn phím và trình đọc màn hình; phím cũ của Bảng hàng (Enter mở hồ sơ, F2 sửa ô, chép vùng) giữ nguyên."
+    },
+    {
+      "id": "AC-9",
+      "p": "Sẽ là một khối dùng chung có tên trong sổ khối, chữ đến từ bảng nhãn, qua bài kiểm trợ năng ở nền sáng và tối."
+    },
+    {
+      "id": "AC-10",
+      "p": "Sẽ dán đúng khuôn Excel: một ô điền cả vùng chọn, khối lặp theo vùng chọn, chỉ dòng đang hiện khi đang lọc, mất mạng từ đầu thì không ô nào đổi."
+    }
   ],
   "wont_do": [
-    {"id": "AC-7", "p": "Chặn dán với vai không sửa được căn (Quản trị sàn): không bản xem trước, không ghi, có thông báo vì sao; dưới 768 px không dán; cắt và Delete không ghi gì."},
-    {"id": "OOS-1", "p": "KHÔNG nạp cả tệp, ghép cột hay nhớ cách ghép — việc của hàng 11 «Nạp tệp Excel hay Sheet»."},
-    {"id": "OOS-2", "p": "KHÔNG thêm căn khi dán dưới đáy bảng — việc của hàng 12 «Thêm căn»."},
-    {"id": "OOS-3", "p": "KHÔNG sửa diện tích, phòng ngủ, toà bằng dán — đã chốt ở hàng 4."},
-    {"id": "OOS-4", "p": "KHÔNG có Ctrl/Cmd+Z và báo hai người cùng sửa — chờ đường ghi thật của hàng 10."},
-    {"id": "OOS-5", "p": "KHÔNG dán ở điện thoại — theo khuyến nghị Hỏi-4."}
+    {
+      "id": "AC-7",
+      "p": "Chặn dán với vai không sửa được căn (Quản trị sàn): không bản xem trước, không ghi, có thông báo vì sao; dưới 768 px không dán; cắt và Delete không ghi gì."
+    },
+    {
+      "id": "OOS-1",
+      "p": "KHÔNG nạp cả tệp, ghép cột hay nhớ cách ghép — việc của hàng 11 «Nạp tệp Excel hay Sheet»."
+    },
+    {
+      "id": "OOS-2",
+      "p": "KHÔNG thêm căn khi dán dưới đáy bảng — việc của hàng 12 «Thêm căn»."
+    },
+    {
+      "id": "OOS-3",
+      "p": "KHÔNG sửa diện tích, phòng ngủ, toà bằng dán — đã chốt ở hàng 4."
+    },
+    {
+      "id": "OOS-4",
+      "p": "KHÔNG có Ctrl/Cmd+Z và báo hai người cùng sửa — chờ đường ghi thật của hàng 10."
+    },
+    {
+      "id": "OOS-5",
+      "p": "KHÔNG dán ở điện thoại — theo khuyến nghị Hỏi-4."
+    },
+    {
+      "id": "OOS-6",
+      "p": "KHÔNG dán vào cột «Điều kiện phí» ở hàng này — ô bị bỏ có lý do; khi hàng 10 mở sửa cột ấy thì dán theo đúng luật của hàng 10."
+    }
   ],
   "scope_plain": "Năm việc để hàng khác hay đã chốt từ trước:",
   "coverage_plain": [
-    {"i": 0, "p": "Mọi loại cột trên Bảng hàng đều có câu trả lời khi bị dán trúng: hai cột sửa được, bốn loại cột bị bỏ có lý do riêng (AC-2, AC-3)."},
-    {"i": 1, "p": "Mọi kiểu chữ trong ô — đọc được, giống hệt, trống, chưa hiểu, nấc không đi được, nấc cần thêm thông tin — có ca viết trước (AC-2, AC-3)."},
-    {"i": 2, "p": "Căn mở và căn khoá, vai có và không quyền, dòng nhóm, dòng ẩn vì lọc đều có ca (AC-3, AC-7, AC-10)."},
-    {"i": 3, "p": "Bốn hình vùng dán quen của Excel — một ô, vừa khít, lặp, thừa — đều đo (AC-1, AC-3, AC-10)."},
-    {"i": 4, "p": "Sau khi áp: ghi hết, hỏng một phần, mất mạng từ đầu, hoàn tác, hoàn tác hỏng đều đo (AC-5, AC-6, AC-10)."},
-    {"i": 5, "p": "Phím, trình đọc màn hình, khổ màn và chữ từ bảng nhãn áp cho mọi ca (AC-8, AC-9)."},
-    {"i": 6, "p": "Để sau: dán cột riêng của sàn, kéo điền, Ctrl/Cmd+Z, ngưỡng tốc độ 500 ô trên dữ liệu thật."},
-    {"i": 7, "p": "Không bao giờ: dán để thêm căn, ghép cột theo tiêu đề tệp."}
+    {
+      "i": 0,
+      "p": "Mọi loại cột trên Bảng hàng đều có câu trả lời khi bị dán trúng: hai cột sửa được, bốn loại cột bị bỏ có lý do riêng (AC-2, AC-3)."
+    },
+    {
+      "i": 1,
+      "p": "Mọi kiểu chữ trong ô — đọc được, giống hệt, trống, chưa hiểu, nấc không đi được, nấc cần thêm thông tin — có ca viết trước (AC-2, AC-3)."
+    },
+    {
+      "i": 2,
+      "p": "Căn mở và căn khoá, vai có và không quyền, dòng nhóm, dòng ẩn vì lọc đều có ca (AC-3, AC-7, AC-10)."
+    },
+    {
+      "i": 3,
+      "p": "Bốn hình vùng dán quen của Excel — một ô, vừa khít, lặp, thừa — đều đo (AC-1, AC-3, AC-10)."
+    },
+    {
+      "i": 4,
+      "p": "Sau khi áp: ghi hết, hỏng một phần, mất mạng từ đầu, hoàn tác, hoàn tác hỏng đều đo (AC-5, AC-6, AC-10)."
+    },
+    {
+      "i": 5,
+      "p": "Phím, trình đọc màn hình, khổ màn và chữ từ bảng nhãn áp cho mọi ca (AC-8, AC-9)."
+    },
+    {
+      "i": 6,
+      "p": "Để sau: dán cột riêng của sàn, kéo điền, Ctrl/Cmd+Z, ngưỡng tốc độ 500 ô trên dữ liệu thật."
+    },
+    {
+      "i": 7,
+      "p": "Không bao giờ: dán để thêm căn, ghép cột theo tiêu đề tệp."
+    }
   ],
   "gap_probe_plain": [
-    {"i": 0, "p": "Nặng: «giá lệch quá 20% chỉ cần bấm Áp» là bỏ cái chặn ghi sai giá của hàng 4 mà máy lại tự quyết. Đã chuyển thành Hỏi-6 cho chủ kho, khuyên để dòng lệch lớn bỏ chọn sẵn."},
-    {"i": 1, "p": "Phép chấm «không có đường ghi thứ hai» thiếu tệp cửa lưu để đọc. Đã thêm đủ tệp."},
-    {"i": 2, "p": "Bốn hình vùng dán (một ô, lặp, đang lọc, mất mạng từ đầu) chưa có tiêu chí. Đã thêm AC-10 với bốn ca đếm số lần ghi."},
-    {"i": 3, "p": "«Không hộp hỏi lại nào sau Áp» chỉ đo bằng bài luật, không trên màn. Đã thêm ca trên màn đếm hộp thoại."},
-    {"i": 4, "p": "Hai ô cùng căn ghi nối nhau và ba lý do hỏng chưa được đo riêng. Đã thêm ca nối phiên bản và ma trận ba lý do."}
+    {
+      "i": 0,
+      "p": "Nặng: «giá lệch quá 20% chỉ cần bấm Áp» là bỏ cái chặn ghi sai giá của hàng 4 mà máy lại tự quyết. Đã chuyển thành Hỏi-6 cho chủ kho, khuyên để dòng lệch lớn bỏ chọn sẵn."
+    },
+    {
+      "i": 1,
+      "p": "Phép chấm «không có đường ghi thứ hai» thiếu tệp cửa lưu để đọc. Đã thêm đủ tệp."
+    },
+    {
+      "i": 2,
+      "p": "Bốn hình vùng dán (một ô, lặp, đang lọc, mất mạng từ đầu) chưa có tiêu chí. Đã thêm AC-10 với bốn ca đếm số lần ghi."
+    },
+    {
+      "i": 3,
+      "p": "«Không hộp hỏi lại nào sau Áp» chỉ đo bằng bài luật, không trên màn. Đã thêm ca trên màn đếm hộp thoại."
+    },
+    {
+      "i": 4,
+      "p": "Hai ô cùng căn ghi nối nhau và ba lý do hỏng chưa được đo riêng. Đã thêm ca nối phiên bản và ma trận ba lý do."
+    }
   ]
 }

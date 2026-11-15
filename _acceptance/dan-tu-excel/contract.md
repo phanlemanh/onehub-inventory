@@ -124,6 +124,7 @@ Google Sheets):
 - Sửa thuộc tính căn (diện tích, phòng ngủ, toà) bằng dán — ai quyết: chủ kho (hàng 4, Never đã ký).
 - Hoàn tác bằng Ctrl/Cmd+Z, báo khi hai người cùng sửa — ai quyết: chủ kho (hàng 4, Later đã ký); cần đường ghi thật (hàng 10).
 - Dán ở điện thoại — ai quyết: chủ kho ở Cổng Phạm vi (Hỏi-4).
+- Dán vào cột «Điều kiện phí» (Bao phí / Không bao phí) — ai quyết: chủ kho (hàng 10 mở sửa cột ấy trên ô); hôm nay ô bị bỏ kèm lý do «cột này không sửa trên bảng», và khi hàng 10 gộp thì dán vào cột ấy theo đúng luật của hàng 10.
 
 ## Notes
 
@@ -135,5 +136,9 @@ Google Sheets):
 - Hỏi-3 chọn mở ngay: AC-3 bỏ lý do «cột riêng của sàn», thêm một AC đọc theo kiểu cột (số, tiền, ngày, có/không, chọn một)
   và một đường ghi trường riêng ở cửa lưu; hàng lên T3 nếu chạm `ontology/`.
 - Hỏi-2 chọn hỏi thêm: AC-3 bỏ lý do «Đã bán, Ngừng hẳn», thêm một AC cho phần hỏi giá chốt, ngày, lý do trong bản xem trước.
+- Quyền dán không ghi cứng vai nào: dán đi qua đúng thao tác sửa căn của bảng quyền mà ô dùng; hàng 10 đổi «ai được sửa giá
+  và trạng thái» thì dán theo cùng câu trả lời ấy, không sửa mã hàng 5.
+- Khối mới `PastePreview` (bản xem trước dùng chung) khai ở bảng Khối của hồ sơ chứng minh màn và sổ khối khi dựng; giám sát
+  đã ghi sổ đối chiếu: hàng 5 làm chủ, hàng 11 dùng lại.
 - Ba hàng chờ gộp cùng chạm Bảng hàng: 2b (PR #63) — phần dựng chờ 2b vào main; 2d (PR #65), 19 (PR #64) — hàng gộp sau
   ghép tay; câu lý do của cột Về tay viết khi 19 vào main.
