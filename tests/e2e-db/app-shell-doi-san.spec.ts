@@ -93,8 +93,8 @@ async function assertWorksIn(
   await expect(page.locator('[data-state="ready"]')).toBeVisible();
   const bar = page.locator('[data-slot="app-shell-top-bar"]');
   const named = (await bar.locator('[data-slot="company-name"]').textContent()) ?? "";
-  const hasOwn = await page.locator(`li[data-member="${company.only}"]`).count();
-  const hasOther = await page.locator(`li[data-member="${other.only}"]`).count();
+  const hasOwn = await page.locator(`[data-member="${company.only}"]`).count();
+  const hasOther = await page.locator(`[data-member="${other.only}"]`).count();
   if (!named.includes(company.name) || hasOwn !== 1 || hasOther !== 0)
     throw new Error("company switch did not reach the session");
 }

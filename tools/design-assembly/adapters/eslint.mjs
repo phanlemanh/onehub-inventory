@@ -62,7 +62,8 @@ async function rejected(lint, root, at, texts) {
 // `request.find`: for each rule, the first of the candidate files the lint reads with that rule as
 // an error, or null.
 // `request.jobs`: for each, the rules that reject each probe beyond those that reject the control
-// text, then the same with those rules turned off: the changed copy, which must let them through.
+// text, then the same with the job's rule turned off: the changed copy, which must let them
+// through. A job without a rule turns off every rule that rejected a probe.
 async function run(root, request) {
   const ESLint = await loadLint(root);
   if (!ESLint) return { error: "the repository has no lint installed that this tool can run" };
@@ -85,7 +86,7 @@ async function run(root, request) {
     try {
       const [base, ...probes] = await rejected(lint, root, job.at, [job.control, ...job.probes]);
       const fired = probes.map((rules) => rules.filter((rule) => !base.includes(rule)));
-      const turnedOff = [...new Set(fired.flat())].sort();
+      const turnedOff = job.rule ? [job.rule] : [...new Set(fired.flat())].sort();
       const changed = new ESLint({
         cwd: root,
         overrideConfig: { rules: Object.fromEntries(turnedOff.map((rule) => [rule, "off"])) },

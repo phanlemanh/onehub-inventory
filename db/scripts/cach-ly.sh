@@ -9,7 +9,7 @@
 #      rolled-back transaction with the catalog case (roles belong to the whole cluster, so a break is never committed),
 #      then the catalog case once more — a trace left on the cluster fails it.
 # Every case prints `ok <case>` exactly once; the last line is
-# `cach-ly: 35 ca đạt, vai quy_hang_app, nối bằng quy_hang_login`.
+# `cach-ly: 36 ca đạt, vai quy_hang_app, nối bằng quy_hang_login`.
 # Missing, repeated or failing cases are named and the exit code is not 0.
 #
 #   DB_LANE=n bash db/scripts/cach-ly.sh       (see db/scripts/psql.sh for DB_LANE and PSQL)
@@ -50,6 +50,7 @@ CA_SQL=(
   dang-xem-khong-vuot-luat
   ham-dac-quyen-trong-danh-sach
   dang-xem-ghi-khong-vuot-luat
+  lop-rieng-theo-san
 )
 CA_LENH=(
   ap-hai-lan
@@ -89,7 +90,7 @@ vai_dang_nhap_ghim() {
 # Break case → its break files (db/tests/pha-thu/<file>.sql), each on its own scratch database.
 pha_thu_tep() {
   case "$1" in
-    bo-ep-luat) printf '%s\n' bo-ep-luat goc-nhin-bo-ep-luat ;;
+    bo-ep-luat) printf '%s\n' bo-ep-luat goc-nhin-bo-ep-luat lop-rieng-khong-ep ;;
     luat-them-khong-kiem)
       printf '%s\n' luat-them-khong-kiem luat-them-khong-kiem-doi-tac luat-ghi-for-all-doi-tac luat-xoa-doi-tac ;;
     luat-doc-mo) printf '%s\n' luat-doc-mo luat-doc-mo-hoac-true luat-doc-mo-khac-san ma-rieng-doc-mo ;;
@@ -107,6 +108,7 @@ pha_thu_ghim() {
   case "$1" in
     bo-ep-luat) printf '%s\n' "HỎNG moi-bang-cong-ty-ep-luat-theo-dong: agreements" ;;
     goc-nhin-bo-ep-luat) printf '%s\n' "HỎNG moi-bang-cong-ty-ep-luat-theo-dong: saved_view" ;;
+    lop-rieng-khong-ep) printf '%s\n' "HỎNG moi-bang-cong-ty-ep-luat-theo-dong: company_fields" ;;
     luat-them-khong-kiem) printf '%s\n' "HỎNG a-khong-them-dong-ten-b" "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     luat-them-khong-kiem-doi-tac) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     luat-ghi-for-all-doi-tac) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: bang_doi_tac_mau" ;;

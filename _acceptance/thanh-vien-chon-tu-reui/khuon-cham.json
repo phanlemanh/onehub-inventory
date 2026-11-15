@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "den": "476666e8a81655f7e284fa787a8043074a8c3881",
+  "base": "01c11df5a667416193ca8746a64e7fa97a7f2ad1",
+  "ghim": {
+    "luoi": "61b989cc617777208e93a530d36a47482b841455"
+  },
+  "theo_khuon": [
+    "src/modules/identity/ui/members-list.tsx"
+  ],
+  "lech_moi": [],
+  "no_cu": [],
+  "khong_do": [],
+  "ngoai_ban_do": 7,
+  "nhom": [
+    "dang-nhap",
+    "danh-sach-khung",
+    "luoi"
+  ]
+}

@@ -20,6 +20,8 @@ vi.mock("../src/modules/listings/server", () => ({
   mySavedViews: async () => null,
   mySavedView: async () => null,
 }));
+// The company layer (row 7e) is read behind the session too; without one the page shows the standard words.
+vi.mock("../src/modules/company-config/server", () => ({ myCompanyLayer: async () => null }));
 // The role stand-in of row 4 asks for the session only when ?vai= is given; there is none here.
 vi.mock("../src/modules/identity/server", () => ({ currentSession: async () => null }));
 

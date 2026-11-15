@@ -67,6 +67,17 @@ const CELLS: Record<string, Partial<Record<Role, Scope>>> = {
   saveView: { ListAgent: "own", BuyerAgent: "own", TeamLead: "own" },
   editView: { ListAgent: "own", BuyerAgent: "own", TeamLead: "own" },
   removeView: { ListAgent: "own", BuyerAgent: "own", TeamLead: "own" },
+  // Row 7e (Hỏi-1, owner 2026-11-13): the company layer; every role reads, three roles change it.
+  readCompanyLayer: {
+    ListAgent: "company",
+    BuyerAgent: "company",
+    TeamLead: "company",
+    CompanyAdmin: "company",
+  },
+  addCompanyLayer: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
+  editCompanyLayer: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
+  retireCompanyLayer: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
+  matchPendingUnits: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
 };
 // Row 9e (bo-nut-theo-quyen): the seven draft rows the owner chose at the scope gate, written before the table.
 const DRAFT_CELLS_9E: Record<string, Partial<Record<Role, Scope>>> = {
@@ -87,6 +98,12 @@ const API_DOORS = [
   "GET /api/v1/saved-views",
   "POST /api/v1/saved-views",
   "PATCH /api/v1/saved-views/[id]",
+  // Row 7e: the company layer.
+  "GET /api/v1/company-layer",
+  "POST /api/v1/company-layer/[part]",
+  "PATCH /api/v1/company-layer/[part]/[id]",
+  "POST /api/v1/company-layer/[part]/[id]/retire",
+  "POST /api/v1/company-layer/pending-units/match",
   "DELETE /api/v1/saved-views/[id]",
 ];
 const EXEMPT_API = [
@@ -137,10 +154,10 @@ describe("cong-quyen-15-to-hop", () => {
     expect(Object.fromEntries(LIVE_ACTIONS.map((a) => [a.name, a.scope]))).toEqual(CELLS);
   });
 
-  it("every live action × every set of roles gets the widest scope: 14 × 15 = 210 asserts (row 2c: +4 rows)", () => {
+  it("every live action × every set of roles gets the widest scope: 19 × 15 = 285 asserts (row 2c: +4 rows, row 7e: +5)", () => {
     const r = addUp(allowedScope);
     expect(r.failures).toEqual([]);
-    expect(r.count).toBe(210);
+    expect(r.count).toBe(285);
   });
 
   it("break: taking the narrowest scope names the first set that differs", () => {

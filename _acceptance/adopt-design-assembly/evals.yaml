@@ -1,16 +1,22 @@
 schema_version: 1
 feature_slug: adopt-design-assembly
 # Ma trận viết trước.
-#   Quyết định lệnh kiểm design-assembly giữ (AC-1, AC-2) — đúng 18, theo thứ tự chữ:
+#   (Sửa 2026-11-15 sau lượt chấm 1: `spacing` về lại «tự khai», 18 thành 17, chín luật thành tám; thêm lượt tắt riêng
+#   luật nêu tên. Ma trận nằm ở rang/matrix.mjs, cả hai phép đo của AC-2 đọc nó.)
+#   Quyết định lệnh kiểm design-assembly giữ (AC-1, AC-2) — đúng 17, theo thứ tự chữ:
 #     checks-in-gate, color-contrast, color-palette, color-role, component-manifest, design-tokens, empty-state-actions,
-#     ledger-shapes, no-inline-style, no-restyled-component, radius, radius-value, raw-controls, raw-table, spacing,
+#     ledger-shapes, no-inline-style, no-restyled-component, radius, radius-value, raw-controls, raw-table,
 #     spacing-values, type-scale, type-scale-values.
-#   Chín trong số đó giữ bằng luật lint của kho, chạy lại ở đây (AC-2), mỗi id = luật dòng sổ nêu:
+#   Tám trong số đó giữ bằng luật lint của kho, chạy lại ở đây (AC-2), mỗi id = luật dòng sổ nêu:
 #     color-palette=onehub-ui/no-raw-palette color-role=onehub-ui/no-hardcoded-color no-inline-style=shadcn/no-inline-styles
 #     no-restyled-component=shadcn/no-restyle radius=shadcn/no-arbitrary-values raw-controls=onehub-ui/no-raw-controls
-#     raw-table=onehub-ui/no-raw-table spacing=onehub-ui/no-off-scale-spacing type-scale=onehub-ui/no-arbitrary-text-size
-#     Dòng in: «held: 18 — <id> …» rồi «lint re-run: 9 — <id>=<luật> …»; lệch → «held: <n>, missing <id>» ·
+#     raw-table=onehub-ui/no-raw-table type-scale=onehub-ui/no-arbitrary-text-size
+#     Dòng in: «held: 17 — <id> …» rồi «lint re-run: 8 — <id>=<luật> …»; lệch → «held: <n>, missing <id>» ·
 #     «held: <n>, extra <id>» · «lint re-run: <n>, missing <id>» · «lint re-run: <id> checks <luật>, the row names <luật>».
+#   Tắt riêng luật nêu tên (AC-2): mỗi id trong tám, một bản dựng tạm có cấu hình lint thêm mục tắt đúng luật đó; lệnh
+#     kiểm thoát khác 0 với «<id>: the repository's lint lets through … <luật> does not reject it». Dòng cuối: «named rule
+#     off: 8 rows, each red with its own rule off»; lệch → «named rule off: <id> still green with <luật> off» ·
+#     «named rule off: <id> not named with <luật> off».
 #   Người đọc sổ linh kiện (Coverage của hợp đồng): mk/design.mk, tools/design-assembly/, tests/design-registry.test.ts,
 #     tools/proof_gate/, .claude/skills/inventory-ui/SKILL.md.
 #   Sổ quyết định giữ (AC-4): mọi dòng của 1226ec5:design/decisions.yaml còn nguyên ở HEAD, trừ component-level.
@@ -27,7 +33,7 @@ feature_slug: adopt-design-assembly
 #       red with ChangedProbe added».
 #   Lời đáp (AC-10): «answers: AA application; rows conformance-level source-color product-type judgment; contrast 4 pairs
 #     at 4.5; --onehub-blue #0246ff»; lệch → «answers: <thứ lệch>».
-#   Cặp hai chiều của các kịch bản đo mới (measures.test.mjs): mỗi kịch bản một bản lành → xanh, một bản phá → đỏ, cùng bản,
+#   Cặp hai chiều của các kịch bản đo mới (measures-two-way.mjs): mỗi kịch bản một bản lành → xanh, một bản phá → đỏ, cùng bản,
 #     thông điệp ghim như trên.
 evals:
   - id: E1
@@ -37,7 +43,7 @@ evals:
     long_running: 30
     layer: backend-effect
     paths: [tools/**, mk/**, design/**, tests/**, eslint.config.js, src/**]
-    expected: "exit 0; đầu ra có dòng 'design-assembly: 18 decisions held by <m> checks, each seen failing on a changed copy' và dòng 'component manifest: design/component-registry.json is up to date (<k> components)'. Chiều đỏ: E3 và E6 (bản dựng tạm tắt một luật lint, hoặc thêm một linh kiện, làm chính lệnh kiểm ấy đỏ)"
+    expected: "exit 0; đầu ra có dòng 'design-assembly: 17 decisions held by <m> checks, each seen failing on a changed copy' và dòng 'component manifest: design/component-registry.json is up to date (<k> components)'. Chiều đỏ: E3 và E6 (bản dựng tạm tắt một luật lint, hoặc thêm một linh kiện, làm chính lệnh kiểm ấy đỏ)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E2
     criterion: AC-2
@@ -45,7 +51,16 @@ evals:
     cmd: config:executors.script.lint_rerun
     layer: backend-effect
     paths: [design/theme.json, design/decisions.yaml, tools/design-assembly/**]
-    expected: "exit 0; dòng 'held: 18 — ' kèm đúng 18 id của ma trận đầu tệp, đọc từ đầu ra '--rate' của lệnh kiểm; dòng 'lint re-run: 9 — ' kèm đúng chín cặp id=luật của ma trận, mỗi id ở trạng thái held với '(eslint:<luật>, re-run here)'. Chiều đỏ: E10 (đầu ra --rate thiếu raw-table → 'held: 17, missing raw-table'; dữ liệu trỏ raw-table tới other/rule → 'lint re-run: raw-table checks other/rule, the row names onehub-ui/no-raw-table')"
+    expected: "exit 0; dòng 'held: 17 — ' kèm đúng 17 id của ma trận đầu tệp, đọc từ đầu ra '--rate' của lệnh kiểm; dòng 'lint re-run: 8 — ' kèm đúng tám cặp id=luật của ma trận, mỗi id ở trạng thái held với '(eslint:<luật>, re-run here)'. Chiều đỏ: E10 (đầu ra --rate thiếu raw-table → 'held: 16, missing raw-table'; dữ liệu trỏ raw-table tới other/rule → 'lint re-run: raw-table checks other/rule, the row names onehub-ui/no-raw-table')"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E14
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.named_rule_off
+    long_running: 5
+    layer: backend-effect
+    paths: [tools/design-assembly/**, eslint.config.js, tools/eslint-ui/**, design/theme.json, design/decisions.yaml]
+    expected: "exit 0; tám dòng, mỗi dòng '<id>: the repository's lint lets through … <luật> does not reject it' cho đúng tám cặp id=luật của ma trận, mỗi dòng từ một bản dựng tạm chỉ tắt luật ấy; dòng cuối 'named rule off: 8 rows, each red with its own rule off'. Chiều đỏ: E10 (công cụ của commit 7777792, khi luật khác còn tính là giữ → 'named rule off: color-role still green with onehub-ui/no-hardcoded-color off')"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E3
     criterion: AC-3
@@ -111,7 +126,7 @@ evals:
     cmd: config:executors.script.measures_two_way
     layer: backend-effect
     paths: [_acceptance/adopt-design-assembly/rang/**]
-    expected: "exit 0; mỗi kịch bản đo mới có cặp bài đạt trên cùng một bản: bản lành xanh, bản phá đỏ với đúng thông điệp ghim của ma trận đầu tệp (lint-rerun: 'held: 17, missing raw-table' và 'lint re-run: raw-table checks other/rule, the row names onehub-ui/no-raw-table'; ledger-rows-kept: 'row changed: radius' và 'row missing: wcag-aa'; register-regenerated: 'old tool still there' và 'make gen does not write the register with the design-assembly tool'; owner-answers: 'answers: conformanceLevel AAA' khi bản dữ liệu ghi AAA)"
+    expected: "exit 0; mỗi kịch bản đo mới có cặp bài đạt trên cùng một bản: bản lành xanh, bản phá đỏ với đúng thông điệp ghim của ma trận đầu tệp (lint-rerun: 'held: 16, missing raw-table' và 'lint re-run: raw-table checks other/rule, the row names onehub-ui/no-raw-table'; named-rule-off: 'named rule off: color-role still green with onehub-ui/no-hardcoded-color off' khi công cụ là bản của commit 7777792; ledger-rows-kept: 'row changed: radius' và 'row missing: wcag-aa'; register-regenerated: 'old tool still there' và 'make gen does not write the register with the design-assembly tool'; owner-answers: 'answers: conformanceLevel AAA' khi bản dữ liệu ghi AAA)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E11
     criterion: AC-8

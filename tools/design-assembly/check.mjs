@@ -540,16 +540,17 @@ const KINDS = {
       return { ...state, sources: { ...state.sources, [check.sources]: changed } };
     },
   },
-  // A rule of the repository's own lint holds the decision: the lint rejects every probe that
-  // breaks it. The changed copy is the same lint with the rules that rejected them turned off.
+  // The rule the row names holds the decision: that rule of the repository's own lint rejects
+  // every probe that breaks it. Another rule that rejects a probe does not hold this row. The
+  // changed copy is the same lint with that one rule turned off.
   lint: {
     run(state, check, id) {
       const result = state.lint?.[lintKey(id, check)];
       if (!result) return `the repository's lint was not run for ${check.rule}`;
       if (result.error) return result.error;
-      const through = result.labels.filter((_, index) => result.fired[index].length === 0);
+      const through = result.labels.filter((_, index) => !result.fired[index].includes(check.rule));
       if (through.length === 0) return null;
-      return `the repository's lint lets through ${through.map((label) => `\`${label}\``).join(", ")}, at ${check.at}`;
+      return `the repository's lint lets through ${through.map((label) => `\`${label}\``).join(", ")}: ${check.rule} does not reject it, at ${check.at}`;
     },
     change(state, check, id) {
       const key = lintKey(id, check);
@@ -614,6 +615,7 @@ export function lintResults(root, checks, rows) {
       labels[key] = probes.probes.map((probe) => probe.label);
       jobs.push({
         key,
+        rule: check.rule,
         at: check.at,
         control: probes.control,
         probes: probes.probes.map((probe) => probe.text),

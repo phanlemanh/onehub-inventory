@@ -630,7 +630,32 @@ export const REGION: Recipe[] = [
   {
     id: "chu-dai",
     state: "Chữ dài",
-    async check({ page }) {
+    async check({ page, screen }) {
+      const width = page.viewportSize()?.width ?? 0;
+      const fits = LONGEST_FITS[screen];
+      if (fits?.sizes.includes(width)) {
+        // The reverse check (row 7e): the longest text the company may enter is shown whole at this size. Then the
+        // cells are narrowed so the keyboard and focus checks below still run on a cut cell.
+        const cells = page.locator('[data-slot="truncated-text"]');
+        await cells
+          .first()
+          .waitFor({ state: "attached", timeout: SHORT })
+          .catch(() => undefined);
+        await scrollUntil(page, async () =>
+          (await cells.allTextContents()).some((t) => t.length === fits.max),
+        );
+        const seen = await cells.evaluateAll((els) =>
+          els.map((el) => ({
+            text: el.textContent ?? "",
+            cut: el.getAttribute("data-cut") === "true" || el.scrollWidth > el.clientWidth,
+          })),
+        );
+        const problem = longestProblem(screen, width, fits.max, seen);
+        if (problem) fail(problem);
+        await cells.evaluateAll((els) => {
+          for (const el of els) (el as HTMLElement).style.maxWidth = "8ch";
+        });
+      }
       const cut = page.locator('[data-slot="truncated-text"][data-cut="true"]').first();
       // The grid marks a cell cut only after it has measured its width. Row 2: the run is virtual, so a long value
       // may sit below the first window — scroll the run until one is mounted.
@@ -789,6 +814,35 @@ export const REGION: Recipe[] = [
     ],
   },
 ];
+
+// ---- grid screens whose longest allowed text fits ---------------------------------------------------------------
+
+/**
+ * Grid screens and sizes where the longest text the company may enter still fits its cell, so «chữ dài» has no cut
+ * cell to read. There the case measures the reverse: a cell with text of exactly `max` characters shows whole. When a
+ * longer limit or a narrower column cuts it, the case goes red and the line must go: the normal case applies again.
+ */
+export const LONGEST_FITS: Record<string, { sizes: number[]; max: number; why: string }> = {
+  "tuy-chinh-san": {
+    sizes: [1440],
+    max: 80,
+    why: "«Căn chờ khớp»: mã sàn gõ tối đa 80 ký tự (db/migrations/010_lop_rieng_cua_san.sql)",
+  },
+};
+
+/** What is wrong with the cells of a reverse «chữ dài» case, or null when the longest text shows whole. */
+export function longestProblem(
+  screen: string,
+  width: number,
+  max: number,
+  cells: { text: string; cut: boolean }[],
+): string | null {
+  const longest = cells.filter((c) => c.text.length === max);
+  if (longest.length === 0) return `chu-dai: ${screen} @${width} khong co chu ${max} ky tu de do`;
+  if (longest.some((c) => c.cut))
+    return `chu-dai: ${screen} @${width} chu ${max} ky tu bi cat — go dong LONGEST_FITS`;
+  return null;
+}
 
 // ---- which grid screens may lack a region -----------------------------------------------------------------------
 

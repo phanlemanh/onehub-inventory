@@ -115,13 +115,6 @@
         "at": "src/app/(app)/account-menu.tsx"
       }
     ],
-    "spacing": [
-      {
-        "kind": "lint",
-        "rule": "onehub-ui/no-off-scale-spacing",
-        "at": "src/app/(app)/account-menu.tsx"
-      }
-    ],
     "radius": [
       {
         "kind": "lint",

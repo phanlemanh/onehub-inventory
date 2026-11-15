@@ -17,7 +17,7 @@ sources:
   ]
 ---
 
-# 0032 Sổ linh kiện do công cụ design-assembly ghi, theo hình dạng của hợp đồng
+# 0034 Sổ linh kiện do công cụ design-assembly ghi, theo hình dạng của hợp đồng
 
 ## Status
 

@@ -22,6 +22,7 @@ export default async function Page() {
     <MembersScreen
       labels={{
         title: label("Member"),
+        company: session.company.name,
         invite: label("Invite"),
         changeRoles: label("ChangeRoles"),
         companyAdmin: admin,

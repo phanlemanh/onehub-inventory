@@ -1,0 +1,28 @@
+name: PendingUnit
+description: >-
+  A unit a company has that the shared catalog does not have yet, kept with the code the company typed; usable at once
+  and matched to the catalog's unit when the catalog has it. Belongs to that company only; the catalog never changes.
+reso: none (our own)
+
+properties:
+  id: { type: uuid, required: true, unique: true, display: none }
+  companyId: { type: ref, target: Company, required: true, display: none }
+  rawCode: { type: string, required: true, max: 80, display: text }
+  buildingText: { type: string, display: text }
+  unitText: { type: string, display: text }
+  unitKey: { type: ref, target: Unit, display: none }
+  matchedAt: { type: datetime, display: datetime }
+  createdAt: { type: datetime, required: true, display: none }
+  retiredAt: { type: datetime, display: none }
+
+rules:
+  - id: pending-unit-matches-once
+    description: >-
+      Matching looks the typed code up in the catalog; exactly one unit found sets the unit key, none or several leave
+      it pending. The unit key always points to a unit the catalog has.
+    implemented_in: src/modules/company-config/store.ts
+
+code:
+  model: src/modules/company-config/
+  tests: tests/db/lop-rieng.db.test.ts
+wiki: wiki/entities/pending-unit.md

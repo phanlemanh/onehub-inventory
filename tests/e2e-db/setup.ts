@@ -28,6 +28,28 @@ export default async function setup(): Promise<void> {
     "insert into company_members (company_id, user_id, name, roles) values ($1, $2, '[Tên] Phiên thử', $3)",
     [company, person, ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"]],
   );
+  // A few words of the company's own layer (row 7e), so the region cases of «Tuỳ chỉnh của sàn» have rows to read:
+  // one label as long as a label may be. Test data only; no other test reads this company's layer.
+  for (const [concept, words] of [
+    ["LastConfirmedAt", "Lần gần nhất đầu chủ gọi lại chủ nhà xác"],
+    ["BedroomsTotal", "Số phòng ngủ"],
+    ["LivingArea", "Diện tích thông thuỷ"],
+  ])
+    await db.owner.query(
+      "insert into company_labels (company_id, concept, label) values ($1, $2, $3)",
+      [company, concept, words],
+    );
+  // Three pending units, the part the region cases open (`vao_vung` in design/screens.yaml): two short codes with
+  // digits for «lọc đầu cột», one as long as a code may be (80) for «chữ dài». No unit column is added to Bảng hàng.
+  for (const code of [
+    "A-101",
+    "A-102",
+    "Căn góc toà Ngọc Lan tầng hai mươi, hướng đông nam, nhìn ra hồ điều hoà — B-2025",
+  ])
+    await db.owner.query(
+      "insert into company_pending_units (company_id, raw_code) values ($1, $2)",
+      [company, code],
+    );
   await db.owner.end();
   rmSync(SESSION_FILE, { force: true });
   mkdirSync(dirname(OUTBOX), { recursive: true });

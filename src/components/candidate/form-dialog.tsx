@@ -35,6 +35,7 @@ export function FormDialog({
   formError,
   refused = false,
   slot,
+  badge,
   children,
 }: {
   /**
@@ -55,6 +56,8 @@ export function FormDialog({
   refused?: boolean;
   /** data-slot of the dialog, for tests and the proof screenshots. */
   slot?: string;
+  /** A short tag beside the title, as in the ReUI block dialog-2 (row 9c); absent by default. */
+  badge?: ReactNode;
   children: ReactNode;
 }) {
   function submit(e: FormEvent) {
@@ -67,7 +70,14 @@ export function FormDialog({
       <DialogContent data-slot={slot ?? "form-dialog"}>
         <form onSubmit={submit} noValidate className="flex flex-col gap-4">
           <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
+            {badge ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <DialogTitle>{title}</DialogTitle>
+                {badge}
+              </div>
+            ) : (
+              <DialogTitle>{title}</DialogTitle>
+            )}
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
           {children}

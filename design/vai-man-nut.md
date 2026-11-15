@@ -52,6 +52,15 @@ Mỗi màn của sổ màn có một mục, cộng mục `khung` cho App Shell. 
 | Trưởng nhóm  | `createContact` (toàn sàn, dự kiến), `updateContact` (toàn sàn, dự kiến), `removeContact` (toàn sàn, dự kiến), `mergeContacts` (toàn sàn, dự kiến), `eraseContactPersonalData` (toàn sàn, dự kiến) | —                    |
 | Quản trị sàn | chặn                                                                                                                                                                                               | —                    |
 
+## tuy-chinh-san — `/tuy-chinh-san`
+
+| Vai          | Nút theo quyền                                                                                                                                              | Nút không theo quyền    |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| Đầu chủ      | `readCompanyLayer` (toàn sàn), `addCompanyLayer` (toàn sàn), `matchPendingUnits` (toàn sàn), `editCompanyLayer` (toàn sàn), `retireCompanyLayer` (toàn sàn) | Lọc, Cột, Toàn màn hình |
+| Đầu khách    | `readCompanyLayer` (toàn sàn)                                                                                                                               | Lọc, Cột, Toàn màn hình |
+| Trưởng nhóm  | `readCompanyLayer` (toàn sàn), `addCompanyLayer` (toàn sàn), `matchPendingUnits` (toàn sàn), `editCompanyLayer` (toàn sàn), `retireCompanyLayer` (toàn sàn) | Lọc, Cột, Toàn màn hình |
+| Quản trị sàn | `readCompanyLayer` (toàn sàn), `addCompanyLayer` (toàn sàn), `matchPendingUnits` (toàn sàn), `editCompanyLayer` (toàn sàn), `retireCompanyLayer` (toàn sàn) | Lọc, Cột, Toàn màn hình |
+
 ## proto — `/proto/[slug]`
 
 | Vai          | Nút theo quyền | Nút không theo quyền |

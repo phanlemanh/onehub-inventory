@@ -70,8 +70,25 @@
         "onSubmit",
         "formError",
         "refused",
-        "slot"
+        "slot",
+        "badge"
       ]
+    },
+    {
+      "name": "ListFace",
+      "category": "component",
+      "file": "src/components/candidate/framed-list.tsx",
+      "level": "organism",
+      "source": "own",
+      "props": ["name", "sub"]
+    },
+    {
+      "name": "FramedList",
+      "category": "component",
+      "file": "src/components/candidate/framed-list.tsx",
+      "level": "template",
+      "source": "own",
+      "props": ["title", "count", "headAction", "rows", "footer", "slot"]
     },
     {
       "name": "RecordPanel",
@@ -1483,6 +1500,53 @@
       "source": "own"
     },
     {
+      "name": "Avatar",
+      "category": "component",
+      "file": "src/components/ui/avatar.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["size"],
+      "variants": ["size=default", "size=sm", "size=lg"],
+      "defaults": {
+        "size": "default"
+      }
+    },
+    {
+      "name": "AvatarImage",
+      "category": "component",
+      "file": "src/components/ui/avatar.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "AvatarFallback",
+      "category": "component",
+      "file": "src/components/ui/avatar.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "AvatarGroup",
+      "category": "component",
+      "file": "src/components/ui/avatar.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "AvatarGroupCount",
+      "category": "component",
+      "file": "src/components/ui/avatar.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "AvatarBadge",
+      "category": "component",
+      "file": "src/components/ui/avatar.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
       "name": "ButtonGroup",
       "category": "component",
       "file": "src/components/ui/button-group.tsx",
@@ -2012,6 +2076,93 @@
       "props": ["type"],
       "control": true,
       "min_height": "32px"
+    },
+    {
+      "name": "Item",
+      "category": "component",
+      "file": "src/components/ui/item.tsx",
+      "level": "molecule",
+      "source": "library",
+      "props": ["render"],
+      "variants": [
+        "variant=default",
+        "variant=outline",
+        "variant=muted",
+        "size=default",
+        "size=sm",
+        "size=xs"
+      ],
+      "defaults": {
+        "variant": "default",
+        "size": "default"
+      }
+    },
+    {
+      "name": "ItemMedia",
+      "category": "component",
+      "file": "src/components/ui/item.tsx",
+      "level": "molecule",
+      "source": "library",
+      "variants": ["variant=default", "variant=icon", "variant=image"],
+      "defaults": {
+        "variant": "default"
+      }
+    },
+    {
+      "name": "ItemContent",
+      "category": "component",
+      "file": "src/components/ui/item.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "ItemActions",
+      "category": "component",
+      "file": "src/components/ui/item.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "ItemGroup",
+      "category": "component",
+      "file": "src/components/ui/item.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "ItemSeparator",
+      "category": "component",
+      "file": "src/components/ui/item.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "ItemTitle",
+      "category": "component",
+      "file": "src/components/ui/item.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "ItemDescription",
+      "category": "component",
+      "file": "src/components/ui/item.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "ItemHeader",
+      "category": "component",
+      "file": "src/components/ui/item.tsx",
+      "level": "molecule",
+      "source": "library"
+    },
+    {
+      "name": "ItemFooter",
+      "category": "component",
+      "file": "src/components/ui/item.tsx",
+      "level": "molecule",
+      "source": "library"
     },
     {
       "name": "Label",

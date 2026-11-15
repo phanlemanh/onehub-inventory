@@ -1,4 +1,5 @@
-// The identity module's React components (its `ui` door): the session's roles and the action button gate.
+// The identity module's React components (its `ui` door): the session's roles, the action button gate and the
+// framed list of the members screen (row 9c).
 export {
   PermittedAction,
   SessionRoles,
@@ -6,3 +7,4 @@ export {
   useSessionRoles,
   type ButtonDecision,
 } from "./permitted-action";
+export { MembersList, type ListedMember } from "./members-list";

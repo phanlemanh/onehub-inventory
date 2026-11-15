@@ -14,6 +14,8 @@ export interface Screen {
   family: string | null;
   audience: Audience;
   status: Status;
+  /** Grid screens only: the path the region suite opens, under `route` (row 7e). Absent: the region suite opens `route`. */
+  vao_vung?: string;
 }
 
 export interface Role {
