@@ -1,0 +1,96 @@
+schema_version: 1
+feature_slug: don-no-bo-kiem
+# Ma trận viết trước.
+#   Cổng Chrome từ chối trong hai khoảng (AC-1): 3659 (3500–3899); 4045, 4190 (4000–4899). Nguồn: kRestrictedPorts,
+#     chromium net/base/port_util.cc. Quét 400 + 900 = 1300 giá trị băm, mỗi giá trị một khẳng định.
+#     Thông điệp lệch: «cong-chay: <cổng> la cong Chrome tu choi» · «cong-chay: <cổng> ngoai khoang <gốc>-<cuối>».
+#   Ca phá cho-tai (AC-3): «khung cho khong bao gio hien» → «cho-tai: khung cho khong hien» (giữ nguyên); sổ đăng ký ca
+#     phá của cho-tai giữ đủ hai ca như ở main.
+#   Phép gác (AC-4, AC-5): mẫu bắt — dòng chứa «Hydration failed» hoặc «hydrated but some attributes» (React 19) trong dòng
+#     ra của máy dev và của bài. Có → «gac-hydration: <n> canh bao, bai: <tên>», lượt đỏ; không → «gac-hydration: 0 canh bao».
+#   Biến đè (AC-2): hai cấu hình × {có biến, không biến} = 4 ca; mỗi ca so cổng máy dev và địa chỉ gốc.
+#   Trùng số (AC-7): «decision number <NNNN> used by <tệp>, <tệp>».
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.script.cong_chay
+    layer: backend-effect
+    paths: [tests/e2e/cong-chay.ts, tests/cong-chay.test.ts]
+    expected: "exit 0; 1300 khẳng định đạt cho hai khoảng, danh sách cấm có 3659, 4045, 4190. Chiều đỏ trong cùng tệp bài: hàm không lọc trên cùng phép quét → bài phá thấy lỗi 'cong-chay: 3659 la cong Chrome tu choi' (và 4045, 4190 ở khoảng sau)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.script.cong_chay
+    layer: backend-effect
+    paths: [playwright.config.ts, playwright.db.config.ts, tests/e2e/cong-chay.ts, tests/cong-chay.test.ts]
+    expected: "exit 0; bốn ca nạp cấu hình đạt (có biến: webServer và baseURL bằng biến; không biến: cả hai bằng chonCong cùng băm); quét kho chỉ tests/e2e/cong-chay.ts có phép tính khoảng cổng. Chiều đỏ: bản sao cấu hình về công thức cũ → 'cong-chay: playwright.config.ts tinh cong ngoai ham chung'; bản sao để hàm thắng biến → 'cong-chay: E2E_PORT khong thang'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.cho_tai_pha
+    long_running: 10
+    layer: backend-effect
+    paths: [tools/e2e_templates/recipes.ts, tools/e2e_templates/e2e-templates.test.ts, tests/e2e/gac-hydration.ts]
+    expected: "exit 0; ca phá 'khung cho khong bao gio hien' đạt (bị bắt với 'cho-tai: khung cho khong hien') ở 360 và 1440, phép gác in 'gac-hydration: 0 canh bao', sổ đăng ký ca phá cho-tai bằng sổ ở main. Chiều đỏ: bản sao recipes.ts trở lại MutationObserver xoá khung → phép gác đỏ 'gac-hydration: <n> canh bao, bai: ... khung cho khong bao gio hien'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.e2e
+    long_running: 40
+    layer: backend-effect
+    paths: [tools/e2e_templates/**, tests/e2e/**, playwright.config.ts, src/**]
+    expected: "exit 0; dòng ra có 'gac-hydration: 0 canh bao' và không có 'Hydration failed'. Chiều đỏ: E5 (phép gác làm lượt đỏ khi cảnh báo có mặt)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.gac_hydration_pha
+    long_running: 10
+    layer: backend-effect
+    paths: [tests/e2e/gac-hydration.ts, tests/e2e/gac-hydration.pha.ts, playwright.config.ts, playwright.db.config.ts]
+    expected: "exit 0 của kịch bản đo: lượt có GAC_HYDRATION_PHA=1 (bài phá chạy cùng hai bài khác, ba luồng) thoát khác 0 và dòng ra có 'gac-hydration: 1 canh bao, bai: gac-hydration pha'; lượt không bật thì thoát 0 và có 'gac-hydration: 0 canh bao'; nạp playwright.db.config.ts thấy bộ báo cáo tests/e2e/gac-hydration.ts trong danh sách, bản sao bỏ nó → 'gac-hydration: playwright.db.config.ts thieu bo bao cao'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.so_quyet_dinh
+    layer: backend-effect
+    paths: [wiki/**, _acceptance/don-no-bo-kiem/rang/**]
+    expected: "exit 0; dòng 'so-quyet-dinh: 0042-cong-bat-khoi-khong-ke.md co trong muc luc, khong lien ket cu, khong so trung' và make ontology thoát 0. Chiều đỏ: bản sao còn đường dẫn 0034-cong-bat-khoi-khong-ke ở wiki/log.md → 'so-quyet-dinh: lien ket cu o wiki/log.md'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.script.wiki_so_trung
+    layer: backend-effect
+    paths: [tools/wiki_lint.py, tests/wiki-lint-so-trung.test.ts]
+    expected: "exit 0; bài xanh trên bản sao lành và thấy wiki_lint đỏ với 'decision number 0034 used by' gọi tên hai tệp trên bản sao thêm một trang 0034 trùng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-8
+    executor: judgment
+    inputs: [_acceptance/don-no-bo-kiem/release-de-xuat.md, _acceptance/don-no-bo-kiem/contract.md, docs/superpowers/specs/2026-11-15-don-no-bo-kiem-design.md]
+    question: "Đối chiếu bản đề xuất với design doc: dòng lỗi có trùng nguyên văn dòng ở mục «Gốc đã tìm» 3 không; tên khoá và quyền có đúng và CHỈ đúng các quyền ở mục «Nợ 3» không (không quyền trên tệp workflow); có chỗ đặt, lối khác và giá lối khác không; và một chủ kho làm theo được mà không đọc log không?"
+    expected: "PASS khi đủ sáu điều và không bảo chủ kho sửa tệp workflow"
+    evidence_required: [run_id, verdict, votes]
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.ranh_gioi_1u
+    layer: backend-effect
+    paths: [.github/**, governance/**, PRODUCT-INVARIANTS.md, tools/e2e_templates/suite.ts, tests/e2e-db/lop-rieng.spec.ts, tools/proof_gate/legacy.py, db/scripts/ci-thu.sh, "vitest.config.*"]
+    expected: "exit 0; dòng 'ranh-gioi-1u: khong tep cam nao doi'. Chiều đỏ: danh sách tệp đổi giả có .github/workflows/release.yml → 'ranh-gioi-1u: doi tep cam .github/workflows/release.yml'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
