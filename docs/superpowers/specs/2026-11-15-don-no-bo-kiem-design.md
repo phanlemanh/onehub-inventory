@@ -108,3 +108,20 @@ Không đổi mã sản phẩm, không nới hay xoá bài kiểm nào.
   ở Next 16). Ca phá của phép gác chứng nó thật sự thấy cảnh báo; nếu bản Next sau tắt việc chuyển, ca phá đỏ trước.
 - Hạng: hàng ghi T2, nhưng `tools/**` nằm trong đường T3 của `_acceptance/config.yaml`. Máy giữ T2 theo hàng lộ trình và
   nêu ra ở Cổng Phạm vi.
+
+## Sửa sau lượt chấm 2 — cửa chung cho mọi bài sửa trang (phán quyết G, V-1511-16)
+
+Hai lượt chấm đầu đỏ cùng một lớp: bài kiểm đổi kiểu, gỡ lớp hay chụp ảnh trước khi React gắn xong trang, React báo
+lệch, phép gác làm lượt đỏ. Vá từng chỗ không hội tụ, nên:
+
+- Dấu «trang đã gắn xong»: `data-hydrated` trên thẻ gốc, do `src/app/hydration-mark.tsx` đặt sau khi gốc ứng dụng gắn
+  (cùng tên dấu với vùng lưới ở VP4).
+- Cửa chung `tests/e2e/sua-trang.ts`: `pageReady` (cùng họ với `regionReady` của VP4) chờ dấu, chờ hết phần trang đang tải
+  dở, và — khi có — chờ chính phần tử bị đụng được React nhận; có trần, hết trần thì đỏ và nói thiếu điều nào. Mọi lối sửa
+  trang đi qua `suaTrang`, `suaCacPhanTu`, `themKieu`, `chupAnh`. `waitReady` của bộ bài theo sổ màn dùng `pageReady`.
+- Chuyển 71 trên 86 chỗ; 11 chỗ ở bốn tệp của PR #66 và #70 nằm trong danh sách chờ có tên, chuyển sau khi hai PR ấy gộp
+  (1u chỉ gộp khi danh sách rỗng).
+- Phép kiểm tĩnh `tests/sua-trang.test.ts` (chạy trong `make check`) đỏ khi một bài sửa trang không qua cửa, khi một mã
+  chèn trước lúc tải đổi trang mà không chờ dấu, và khi danh sách chờ còn tên tệp đã hết việc.
+- 4 chỗ chụp ảnh ở bốn tệp bị khoá lời bởi hàng đã ký (bài đăng nhập của hàng 8, bài thành viên của hàng 9) giữ nguyên,
+  ghi ở danh sách «khoá lời» có tên bài khoá; mở khoá là việc của chủ kho.

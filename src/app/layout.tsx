@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/templates/theme";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
+import { HydrationMark } from "./hydration-mark";
+
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin", "vietnamese"], variable: "--font-sans" });
@@ -18,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <TooltipProvider>{children}</TooltipProvider>
           <Toaster />
+          <HydrationMark />
         </ThemeProvider>
       </body>
     </html>

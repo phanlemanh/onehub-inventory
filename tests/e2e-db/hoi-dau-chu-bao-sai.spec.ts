@@ -18,6 +18,7 @@ import { SAMPLE_COMPANY, buildSampleListings, sampleKeeperOf } from "../../src/m
 import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { ASK_COPY } from "../../src/modules/listings/ui/ask-copy";
 import { expect, test } from "../../tools/e2e_templates/fixture";
+import { chupAnh, suaTrang, themKieu } from "../e2e/sua-trang";
 
 const SHOTS = join(".acceptance-runs", "hoi-dau-chu-bao-sai", "e2e");
 const ASK = label("AskListAgent");
@@ -128,10 +129,10 @@ async function openRecord(page: Page, id: string) {
 async function frame(page: Page, info: TestInfo, name: string, scheme: "light" | "dark") {
   await page.emulateMedia({ colorScheme: scheme });
   // The dev server's own badge is not part of the product.
-  await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+  await themKieu(page, { content: "nextjs-portal { display: none !important; }" });
   await page.waitForTimeout(250);
   mkdirSync(SHOTS, { recursive: true });
-  await page.screenshot({ path: join(SHOTS, `${name}-${info.project.name}-${scheme}.png`) });
+  await chupAnh(page, { path: join(SHOTS, `${name}-${info.project.name}-${scheme}.png`) });
   await page.emulateMedia({ colorScheme: "light" });
 }
 
@@ -182,7 +183,7 @@ test("E1 break · a bar inside the body says «footer scrolls with the body»", 
   test.skip(info.project.name !== "1440", "do o 1440");
   await signIn(page, await person(info, "e1b", ["BuyerAgent"]));
   await openRecord(page, rowKept("other").id);
-  await page.evaluate(() => {
+  await suaTrang(page, () => {
     const panel = document.querySelector('[data-slot="record-panel"]')!;
     panel
       .querySelector('[data-slot="record-panel-body"]')!
@@ -369,7 +370,7 @@ test("E9 break · low contrast on the ask button is a violation", async ({ page 
   test.skip(info.project.name !== "1440", "do o 1440");
   await signIn(page, await person(info, "e9b", ["BuyerAgent"]));
   await openRecord(page, rowKept("other").id);
-  await page.addStyleTag({
+  await themKieu(page, {
     content: '[data-slot="ask-list-agent"]{color:#9a9a9a !important;background:#a8a8a8 !important}',
   });
   expect(await seriousViolations(page)).toContain("color-contrast");

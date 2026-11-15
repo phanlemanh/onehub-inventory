@@ -8,6 +8,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 import { closePhoneSheet, isPhone, openerCode, openerCodes, phoneFilterBox } from "./phone-list";
+import { suaTrang } from "./sua-trang";
 
 const INVENTORY = "/inventory";
 /** Sample codes found in two buildings or more (written before the code, from the 60 sample listings). */
@@ -491,7 +492,7 @@ test.describe("E7 · an unknown code typed in the box", () => {
     test.skip(info.project.name !== "1440", "one width is enough");
     await openInventory(page, `?ma=${UNKNOWN}`);
     // A record panel standing beside the empty grid, as if the first row had been opened anyway.
-    await page.evaluate(() => {
+    await suaTrang(page, () => {
       const fake = document.createElement("section");
       fake.dataset["slot"] = "record-panel";
       document.body.append(fake);
@@ -546,7 +547,7 @@ test.describe("E8 · the grid after an unknown code, and the open box", () => {
     test.skip(info.project.name !== "1440", "one width is enough");
     await openInventory(page);
     await openFifth(page);
-    await page.evaluate(() => {
+    await suaTrang(page, () => {
       const p = document.createElement("p");
       p.textContent = "Chữ xám nhạt";
       p.style.cssText = "color:#eeeeee;background:#ffffff";
