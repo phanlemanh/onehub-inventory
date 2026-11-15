@@ -107,3 +107,32 @@ wall: 630s
 - **claude-haiku-5-5**: 5 agent · 17 calls · out 14,561 · in 34 · cache_read 222,519 · cache_create 85,621
 - **claude-sonnet-5-5**: 6 agent · 14 calls · out 12,068 · in 28 · cache_read 176,692 · cache_create 152,403
 - **claude-opus-5-5**: 3 agent · 22 calls · out 12,426 · in 44 · cache_read 576,826 · cache_create 120,264
+### S4 round 3 lan 2 (G cho) — wf_1db83da3-242 (10 agent, 35,179 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| machine:make e2e | claude-haiku-5-5 | 9 | 10,033 | 18 | 165,492 | 563 |
+| review:bugs | claude-opus-5-5 | 9 | 6,170 | 18 | 209,921 | 104 |
+| synthesize:report | claude-sonnet-5-5 | 2 | 5,328 | 4 | 24,041 | 33 |
+| review:conventions | claude-opus-5-5 | 10 | 4,720 | 20 | 262,822 | 99 |
+| machine:make check | claude-haiku-5-5 | 3 | 2,858 | 6 | 35,970 | 47 |
+| triage | claude-sonnet-5-5 | 2 | 2,137 | 4 | 14,983 | 16 |
+| machine:bash _acceptance/don-no-bo-kiem/rang/cho | claude-haiku-5-5 | 3 | 2,118 | 6 | 36,168 | 66 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 1,070 | 4 | 16,087 | 10 |
+| review:measurement | claude-opus-5-5 | 2 | 411 | 4 | 16,757 | 16 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 334 | 4 | 11,597 | 3 |
+
+
+wall: 672s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| machine | 4 | 16,079 | 253,717 | 620 | 20:09:04 | 20:19:24 |
+| review | 3 | 11,301 | 489,500 | 108 | 20:09:04 | 20:10:52 |
+| triage | 1 | 2,137 | 14,983 | 16 | 20:19:24 | 20:19:39 |
+| capture | 1 | 334 | 11,597 | 4 | 20:19:39 | 20:19:43 |
+| synthesize | 1 | 5,328 | 24,041 | 33 | 20:19:43 | 20:20:16 |
+
+- **claude-haiku-5-5**: 4 agent · 17 calls · out 16,079 · in 34 · cache_read 253,717 · cache_create 75,885
+- **claude-opus-5-5**: 3 agent · 21 calls · out 11,301 · in 42 · cache_read 489,500 · cache_create 89,862
+- **claude-sonnet-5-5**: 3 agent · 6 calls · out 7,799 · in 12 · cache_read 50,621 · cache_create 70,107

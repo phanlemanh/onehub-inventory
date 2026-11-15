@@ -8,42 +8,35 @@
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **waitReady no longer waits for the data region itself to hydrate: the combined locator plus .first() picks <main> in document order**
-  Người dùng thấy gì: Bộ kiểm trình duyệt có thể coi trang là sẵn sàng sớm hơn thực tế, nên thỉnh thoảng một bài đỏ oan do bấm hay sửa trang quá sớm. Người dùng cuối không bị ảnh hưởng.
-  Căn cứ: Chỉ ảnh hưởng bộ kiểm nội bộ, không mất dữ liệu, chạy lại bài là qua; lượt chạy đầy đủ hiện vẫn xanh nên có thể ghi nhận và theo dõi.
-  file: `tools/e2e_templates/runner.ts`
+- **onResult passes its page-changing code as a string through a raw page.evaluate, so the 'one door' static check cannot see it**
+  Người dùng thấy gì: Phép kiểm tra tự động có một kẽ hở: một chỗ trong bộ bài kiểm vẫn đổi trang mà phép kiểm tra không thấy. Hiện chỗ đó chạy an toàn, người dùng sản phẩm không bị ảnh hưởng.
+  Căn cứ: Chỉ là kẽ hở trong công cụ kiểm tra nội bộ, hiện chưa gây lỗi gì và người dùng không thấy; sửa sau vẫn rẻ nếu có người thêm bài mới đi qua kẽ này.
+  file: `tools/e2e_templates/recipes.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **The 'go nut Xoa loc' break never removes a button that is already on the page when the hydrated mark appears**
+  Người dùng thấy gì: Một bài phá thử trong bộ kiểm có thể thỉnh thoảng báo đỏ sai vì nút chưa bị gỡ kịp. Chỉ ảnh hưởng người chạy bộ kiểm, không ảnh hưởng người dùng sản phẩm.
+  Căn cứ: Hậu quả nhẹ: chỉ làm bộ kiểm đỏ oan lúc nào đó và chạy lại là qua; không mất dữ liệu và không chạm người dùng cuối.
+  file: `tools/e2e_templates/recipes.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **The hydrated-mark comment says the data region uses the same mark (row VP4), but no code anywhere sets data-hydrated except this file**
-  Người dùng thấy gì: Một dòng ghi chú trong mã nói sai về dấu hiệu của vùng dữ liệu, có thể làm người đọc sau này hiểu nhầm. Người dùng không thấy gì.
-  Căn cứ: Không ảnh hưởng hành vi hay dữ liệu của ai, chỉ là câu chữ; sửa không đáng để mở việc riêng.
-  file: `src/app/hydration-mark.tsx`
+- **The two page-stripping breaks start on the root mark, which can come before the data region's loading boundary has hydrated**
+  Người dùng thấy gì: Hai bài phá thử có thể bắt đầu sửa trang quá sớm và gây lại cảnh báo dựng trang lệch, làm bộ kiểm đỏ oan. Người dùng sản phẩm không bị ảnh hưởng.
+  Căn cứ: Chỉ làm bộ kiểm đỏ oan thỉnh thoảng, chạy lại là hết, không lộ hay mất dữ liệu; nhưng nếu lặp lại thì đúng nợ mà hàng này muốn dọn nên đáng theo dõi.
+  file: `tools/e2e_templates/recipes.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **The pageReady deadline is not enforced when the given element is missing: locator.evaluate waits until the test timeout, and .catch(() => false) hides the cause**
+  Người dùng thấy gì: Khi một màn thiếu tiêu đề, bài kiểm sẽ treo đến hết giờ dài thay vì báo lỗi sớm với nguyên nhân rõ. Chỉ làm người chạy bộ kiểm chờ lâu hơn.
+  Căn cứ: Chỉ xảy ra ở màn hiếm khi thiếu mọi phần tử chờ và chỉ làm chậm, không sai kết quả; chi phí sửa nhỏ nhưng hậu quả cũng rất nhẹ.
+  file: `tests/e2e/sua-trang.ts`
   severity: low
   Đề xuất: wont-fix
 
-- **quetTep's doc comment promises to report a file waiting on another PR once, but the code does nothing of the sort**
-  Người dùng thấy gì: Ghi chú của máy quét hứa một việc mà mã không làm, người đọc có thể hiểu nhầm. Người dùng không bị ảnh hưởng.
-  Căn cứ: Chỉ là chú thích lệch, bài kiểm vẫn tự lọc đúng nên không có hậu quả thực; chi phí sửa nhỏ nhưng lợi ích gần như không có.
-  file: `tests/sua-trang-quet.ts`
-  severity: low
-  Đề xuất: wont-fix
-
-- **waitReady now waits on <main> instead of the data region: it can say ready before the region is hydrated**
-  Người dùng thấy gì: Bộ kiểm trình duyệt có thể báo trang sẵn sàng trước khi vùng dữ liệu thật sự sẵn sàng, gây thỉnh thoảng đỏ oan hoặc cảnh báo dựng trang. Người dùng cuối không bị ảnh hưởng.
-  Căn cứ: Chỉ làm bộ kiểm chập chờn, không mất hay lộ dữ liệu, chạy lại là hết; lượt chạy hiện tại vẫn xanh nên đưa vào hạn chế đã biết.
-  file: `tools/e2e_templates/runner.ts`
-  severity: medium
-  Đề xuất: known-limits
-
-- **Hình dạng 5 (tuyên quét LỚP nhưng chỉ có điểm-case): máy quét «mọi lệnh đổi trang đều qua cửa chung» chỉ thử 3 trên khoảng 17 dấu hiệu đổi trang và bỏ hẳn một loại lệnh**
-  Người dùng thấy gì: Máy canh việc sửa trang chỉ thử vài kiểu sửa nên sau này một kiểu sửa mới có thể lọt qua cửa chung mà không bị báo. Hiện chưa có trường hợp nào thật sự lọt.
-  Căn cứ: Hiện chưa có lệnh nào lọt nên chưa gây hại; chỉ là lưới chắn chưa kín, mở rộng sau khi có nhu cầu là đủ.
-  file: `tests/sua-trang.test.ts`
-  severity: medium
-  Đề xuất: known-limits
-
-- **The new hydration helper copies the React check that the shared test runner already has (r2 · tệp đã đổi)**
+- **The new hydration helper copies the React check that the shared test runner already has (r2)**
   Người dùng thấy gì: Quy tắc nhận biết trang đã tải xong nằm ở hai chỗ trong bộ kiểm tự động. Người dùng sản phẩm không bị ảnh hưởng; chỉ khi thư viện giao diện đổi cách làm thì một chỗ có thể được sửa còn chỗ kia bị quên, khiến bài kiểm đỏ oan.
   Căn cứ: Không ảnh hưởng người dùng cuối và không mất dữ liệu; nếu lệch thì chỉ làm bài kiểm đỏ và dễ thấy ngay, còn việc gom về một chỗ có thể làm sau với chi phí thấp.
   file: `tests/e2e/da-gan.ts`
