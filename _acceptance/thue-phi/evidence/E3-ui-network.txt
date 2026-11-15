@@ -1,1 +1,1 @@
-driver: playwright spec (no browser-tool network read); app traffic via webServer, no failures reported
+driver: playwright test runner, no network reader

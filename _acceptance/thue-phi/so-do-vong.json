@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "thue-phi",
-  "ghi_luc": "2026-11-15T00:50:30Z",
-  "vong_cham": 3,
+  "ghi_luc": "2026-11-15T01:51:09Z",
+  "vong_cham": 5,
   "luot": [
     {
       "vong": 1,
@@ -22,6 +22,18 @@
       "vong": 3,
       "verdict": "PENDING-JUDGMENT",
       "tang": []
+    },
+    {
+      "vong": 4,
+      "verdict": "REJECT",
+      "tang": [
+        "du-lieu-api"
+      ]
+    },
+    {
+      "vong": 5,
+      "verdict": "PENDING-JUDGMENT",
+      "tang": []
     }
   ],
   "lam_lai": [
@@ -32,12 +44,16 @@
     {
       "nguon": "r2",
       "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "r4",
+      "tang": "du-lieu-api"
     }
   ],
   "theo_tang": {
     "bai-kiem-ha-tang": 2,
     "trang-thai-hanh-vi": 0,
-    "du-lieu-api": 0,
+    "du-lieu-api": 1,
     "nghiep-vu": 0,
     "thanh-phan": 0,
     "bo-cuc": 0,
@@ -50,8 +66,8 @@
   "chua_phan": [],
   "thuoc_vat": {
     "vat": [
-      193,
-      21
+      501,
+      28
     ],
     "thuoc": [
       13,
@@ -60,8 +76,8 @@
     "nhat": 1
   },
   "gio_may": {
-    "gio_may": 26.53,
-    "gio_cho": 19.77,
-    "phan_tram_tuan": 31.45
+    "gio_may": 27.65,
+    "gio_cho": 19.94,
+    "phan_tram_tuan": 32.62
   }
 }

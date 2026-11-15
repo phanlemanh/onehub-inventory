@@ -1,1 +1,1 @@
-no browser-tool network; Playwright run, test passed; WebServer log: idle db connection closed on shutdown (admin command), not an app request failure
+app-origin traffic: n/a (driver playwright test, no network reader)

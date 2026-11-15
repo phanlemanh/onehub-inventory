@@ -1,1 +1,1 @@
-driver: Playwright spec (no network reader); n-a (driver)
+driver: Playwright spec (no browser-tool network reader); network not observed

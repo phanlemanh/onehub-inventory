@@ -1,1 +1,1 @@
-driver: playwright spec (no browser-tool network); app traffic not read
+driver: playwright test (own web server); no browser-tool network reader. WebServer log: connection idle closed (db admin termination, test teardown) - not app request.
