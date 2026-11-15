@@ -724,7 +724,7 @@ export const REGION: Recipe[] = [
         name: "go nut Xoa loc",
         message: /khong-khop: thieu loi thoat Xoa loc/,
         before: async ({ page }) => {
-          // Only once the page is hydrated (data-hydrated, row 1u): a button removed before React takes the page over is
+          // Only once the region is hydrated (data-hydrated, row 1u): a button removed before React takes the page over is
           // a hydration mismatch, not a screen without the way out.
           await page.addInitScript(() => {
             const start = () =>
@@ -733,9 +733,11 @@ export const REGION: Recipe[] = [
                   .querySelectorAll('[data-slot="data-region"] button')
                   .forEach((b) => b.textContent?.includes("Xoá lọc") && b.remove());
               }).observe(document, { childList: true, subtree: true });
-            // Started by the mark itself, not by a timer (a fake clock would hold a timer back, and the check runs as
-            // soon as the mark is there). The script runs before <html> exists, so it watches the whole document.
-            const marked = () => document.documentElement?.hasAttribute("data-hydrated") === true;
+            // Started by the region's own mark (src/components/candidate/data-region.tsx), not the root's: the region
+            // hydrates inside the page's loading boundary, after the root (VP4); and not by a timer (a fake clock
+            // would hold a timer back). The script runs before <html> exists, so it watches the whole document.
+            const marked = () =>
+              document.querySelector('[data-slot="data-region"][data-hydrated]') !== null;
             if (marked()) start();
             else
               new MutationObserver((_, self) => {
@@ -873,7 +875,7 @@ export const REGION: Recipe[] = [
                 .querySelectorAll('[data-slot="phone-card"]:not([tabindex="-1"])')
                 .forEach((el) => el.setAttribute("tabindex", "-1"));
             };
-            // Only once the page is hydrated (data-hydrated, row 1u): an attribute changed before React takes the page
+            // Only once the region is hydrated (data-hydrated, row 1u): an attribute changed before React takes the page
             // over is a hydration mismatch.
             const start = () => {
               strip();
@@ -884,9 +886,11 @@ export const REGION: Recipe[] = [
                 attributeFilter: ["tabindex", "data-cut"],
               });
             };
-            // Started by the mark itself, not by a timer (a fake clock would hold a timer back, and the check runs as
-            // soon as the mark is there). The script runs before <html> exists, so it watches the whole document.
-            const marked = () => document.documentElement?.hasAttribute("data-hydrated") === true;
+            // Started by the region's own mark (src/components/candidate/data-region.tsx), not the root's: the region
+            // hydrates inside the page's loading boundary, after the root (VP4); and not by a timer (a fake clock
+            // would hold a timer back). The script runs before <html> exists, so it watches the whole document.
+            const marked = () =>
+              document.querySelector('[data-slot="data-region"][data-hydrated]') !== null;
             if (marked()) start();
             else
               new MutationObserver((_, self) => {

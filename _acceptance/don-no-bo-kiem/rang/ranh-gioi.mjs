@@ -1,4 +1,6 @@
-// Row 1u, E9 (AC-9): the branch changes no owner file and no file of PR #66. Two-way on an invented change list.
+// Row 1u, E9 (AC-9): the branch changes no owner file and no file of an open pull request. Two-way on an invented change
+// list. The two files of PR #66 (tools/e2e_templates/suite.ts, tests/e2e-db/lop-rieng.spec.ts) left the list when #66 was
+// merged: the supervisor's ruling V-1511-16 moves them through the shared door in this row.
 import { execFileSync } from "node:child_process";
 
 const root = process.argv.includes("--root") ? process.argv[process.argv.indexOf("--root") + 1] : ".";
@@ -6,8 +8,6 @@ const FORBIDDEN = [
   /^\.github\/workflows\//,
   /^governance\//,
   /^PRODUCT-INVARIANTS\.md$/,
-  /^tools\/e2e_templates\/suite\.ts$/,
-  /^tests\/e2e-db\/lop-rieng\.spec\.ts$/,
   /^tools\/proof_gate\/legacy\.py$/,
   /^db\/scripts\/ci-thu\.sh$/,
   /^vitest\.config\./,

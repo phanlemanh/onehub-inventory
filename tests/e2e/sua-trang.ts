@@ -14,8 +14,9 @@ const TRAN_MS = 20_000;
 
 /**
  * Wait until the page is hydrated: the root's `data-hydrated` mark (src/app/hydration-mark.tsx), no streamed part of
- * the page still waiting to be swapped in, and — when given — the element itself taken over by React (the page's
- * loading boundary hydrates after the root). Red after `timeout`, saying which of the three is missing.
+ * the page still waiting to be swapped in, every data region carrying its own mark (it draws one layout only from
+ * then, src/components/candidate/data-region.tsx), and — when given — the element itself taken over by React (the
+ * page's loading boundary hydrates after the root). Red after `timeout`, saying which of the four is missing.
  */
 export async function pageReady(
   page: Page,
@@ -23,11 +24,12 @@ export async function pageReady(
 ): Promise<void> {
   const timeout = opts.timeout ?? TRAN_MS;
   const deadline = Date.now() + timeout;
-  let last = { mark: false, pending: 0, el: true };
+  let last = { mark: false, pending: 0, regions: 0, el: true };
   while (Date.now() < deadline) {
     last = await page.evaluate(() => ({
       mark: document.documentElement.hasAttribute("data-hydrated"),
       pending: document.querySelectorAll('[hidden][id^="S:"]').length,
+      regions: document.querySelectorAll('[data-slot="data-region"]:not([data-hydrated])').length,
       el: true,
     }));
     if (opts.el) {
@@ -36,11 +38,11 @@ export async function pageReady(
         .evaluate((n) => Object.keys(n).some((k) => k.startsWith("__reactFiber")))
         .catch(() => false);
     }
-    if (last.mark && last.pending === 0 && last.el) return;
+    if (last.mark && last.pending === 0 && last.regions === 0 && last.el) return;
     await page.waitForTimeout(50);
   }
   throw new Error(
-    `page not hydrated (trang chua gan xong) after ${timeout}ms: mark ${last.mark ? 1 : 0}, pending ${last.pending}, element ${last.el ? 1 : 0}`,
+    `page not hydrated (trang chua gan xong) after ${timeout}ms: mark ${last.mark ? 1 : 0}, pending ${last.pending}, regions unmarked ${last.regions}, element ${last.el ? 1 : 0}`,
   );
 }
 
