@@ -75,6 +75,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0034 Sổ linh kiện do công cụ design-assembly ghi, theo hình dạng của hợp đồng](decisions/0034-component-register-written-by-design-assembly.md)
 - [0038 Mỗi thứ hiện trên màn có đủ thêm, xem, sửa, gỡ — máy đọc mã màn và đỏ khi thiếu](decisions/0038-lifecycle-check.md)
 - [0041 Bản thật ở địa chỉ riêng, Quỹ hàng chỉ để đối chiếu](decisions/0041-ban-that-o-dia-chi-rieng.md)
+- [0042 Cổng chứng minh màn bắt tệp khối tự làm chưa kê, so với nhánh chính bằng danh sách cố định](decisions/0042-cong-bat-khoi-khong-ke.md)
 
 ## Incidents
 

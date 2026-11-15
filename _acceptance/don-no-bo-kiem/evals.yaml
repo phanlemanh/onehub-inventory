@@ -33,8 +33,8 @@ evals:
     cmd: config:executors.script.cho_tai_pha
     long_running: 10
     layer: backend-effect
-    paths: [tools/e2e_templates/recipes.ts, tools/e2e_templates/e2e-templates.test.ts, tests/e2e/gac-hydration.ts]
-    expected: "exit 0; ca phá 'khung cho khong bao gio hien' đạt (bị bắt với 'cho-tai: khung cho khong hien') ở 360 và 1440, phép gác in 'gac-hydration: 0 canh bao', sổ đăng ký ca phá cho-tai bằng sổ ở main. Chiều đỏ: bản sao recipes.ts trở lại MutationObserver xoá khung → phép gác đỏ 'gac-hydration: <n> canh bao, bai: ... khung cho khong bao gio hien'"
+    paths: [tools/e2e_templates/recipes.ts, tools/e2e_templates/e2e-templates.test.ts, tests/e2e/gac-hydration.ts, _acceptance/don-no-bo-kiem/rang/cho-tai-pha.sh]
+    expected: "exit 0; ca phá 'khung cho khong bao gio hien' đạt (bị bắt với 'cho-tai: khung cho khong hien') ở 360 và 1440, phép gác in 'gac-hydration: 0 canh bao', sổ đăng ký ca phá cho-tai bằng sổ ở main. Chiều đỏ của «không cảnh báo»: E5 — bài phá gac-hydration-pha.spec.ts dùng đúng cách cũ của ca phá (MutationObserver xoá khung trước khi gắn) và phép gác làm lượt đỏ"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E4
     criterion: AC-4
@@ -51,7 +51,7 @@ evals:
     cmd: config:executors.script.gac_hydration_pha
     long_running: 10
     layer: backend-effect
-    paths: [tests/e2e/gac-hydration.ts, tests/e2e/gac-hydration.pha.ts, playwright.config.ts, playwright.db.config.ts]
+    paths: [tests/e2e/gac-hydration.ts, tests/e2e/gac-hydration-pha.spec.ts, playwright.config.ts, playwright.db.config.ts, tests/cong-chay.test.ts, _acceptance/don-no-bo-kiem/rang/gac-hydration-pha.mjs]
     expected: "exit 0 của kịch bản đo: lượt có GAC_HYDRATION_PHA=1 (bài phá chạy cùng hai bài khác, ba luồng) thoát khác 0 và dòng ra có 'gac-hydration: 1 canh bao, bai: gac-hydration pha'; lượt không bật thì thoát 0 và có 'gac-hydration: 0 canh bao'; nạp playwright.db.config.ts thấy bộ báo cáo tests/e2e/gac-hydration.ts trong danh sách, bản sao bỏ nó → 'gac-hydration: playwright.db.config.ts thieu bo bao cao'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E6

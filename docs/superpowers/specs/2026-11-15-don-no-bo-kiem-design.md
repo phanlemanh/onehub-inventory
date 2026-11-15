@@ -18,7 +18,7 @@ Không đổi mã sản phẩm, không nới hay xoá bài kiểm nào.
    (`tools/e2e_templates/recipes.ts:634-643`): nó gắn MutationObserver từ initScript và xoá khung khỏi HTML máy chủ trước
    khi React gắn vào, React thấy cây lệch và dựng lại. Không thuộc màn của hàng đang mở (2d, 19, 5, 10).
 3. **Việc «Release» đỏ.** 30/30 lượt gần nhất đều đỏ, cùng một dòng:
-   `release-please failed: GitHub Actions is not permitted to create or approve pull requests`. Kho không có khoá
+   `release-please failed: GitHub Actions is not permitted to create or approve pull requests.`. Kho không có khoá
    `RELEASE_PLEASE_TOKEN`, việc rơi về khoá mặc định của Actions, và cài đặt kho đang tắt quyền mở PR cho Actions
    (`can_approve_pull_request_reviews: false`). Nhánh phát hành vẫn được đẩy; chỉ bước mở PR bị chặn. Các dòng «commit
    could not be parsed» là commit gộp, chỉ là cảnh báo. Không cần sửa `.github/workflows/`.
@@ -52,7 +52,7 @@ Không đổi mã sản phẩm, không nới hay xoá bài kiểm nào.
   máy dev chuyển ra (`[browser] … Hydration failed`) và cảnh báo hydrat hoá của React ở dòng ra của từng bài; có dòng nào
   thì cả lượt ĐỎ, thông điệp «gac-hydration: <n> canh bao, bai: <tên bài đang chạy>»; không có thì in
   «gac-hydration: 0 canh bao» ở cuối mỗi lượt (đối chứng dương: phép gác có chạy). Mẫu chữ phép gác bắt viết trước ở đầu
-  `evals.yaml`. Ca phá: một bài phá riêng (`tests/e2e/gac-hydration.pha.ts`, chỉ chạy khi có biến `GAC_HYDRATION_PHA=1`)
+  `evals.yaml`. Ca phá: một bài phá riêng (`tests/e2e/gac-hydration-pha.spec.ts`, chỉ chạy khi có biến `GAC_HYDRATION_PHA=1`)
   cố tình đổi HTML trước khi gắn → lượt đỏ với đúng thông điệp ấy, chạy cùng vài bài khác nhiều luồng để chứng tên bài
   trong thông điệp đúng là bài phá. Cấu hình có cơ sở dữ liệu: phép đo nạp cấu hình và thấy bộ báo cáo gác có trong danh
   sách (chạy bài phá ở đó cần Postgres của dãy — ghi ở Notes).

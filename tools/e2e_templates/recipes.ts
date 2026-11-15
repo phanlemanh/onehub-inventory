@@ -635,11 +635,20 @@ export const REGION: Recipe[] = [
         name: "khung cho khong bao gio hien",
         message: /cho-tai: khung cho khong hien/,
         withinMs: 15_000,
+        // A page whose server HTML has no skeleton, left unhydrated (row 1u): removing the skeleton from a page React
+        // then hydrates makes React print «Hydration failed» and rebuild the tree, so the page's own code is held back
+        // instead — no hydration, no mismatch — and the check still finds no skeleton.
         before: async ({ page }) => {
-          await page.addInitScript(() => {
-            new MutationObserver(() => {
-              document.querySelectorAll('[data-slot="region-skeleton"]').forEach((n) => n.remove());
-            }).observe(document, { childList: true, subtree: true });
+          await page.route("**/*", async (route) => {
+            const kind = route.request().resourceType();
+            if (kind === "script") return route.abort();
+            if (kind !== "document") return route.fallback();
+            const response = await route.fetch();
+            const body = (await response.text()).replaceAll(
+              'data-slot="region-skeleton"',
+              'data-slot="region-skeleton-bo"',
+            );
+            return route.fulfill({ response, body });
           });
         },
       },
