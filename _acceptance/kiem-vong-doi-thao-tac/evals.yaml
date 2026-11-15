@@ -14,7 +14,7 @@ evals:
     executor: test
     cmd: config:executors.test.vong_doi
     paths: [design/screens.yaml, ontology/actions.yaml, src/app/**, src/modules/**/ui/**, src/components/**, tools/coverage_matrix/lifecycle.py, tests/vong-doi-thao-tac.test.ts]
-    expected: "exit 0; ca 'may-thay-man-hien' khẳng định --json trên kho thật cho tập suy ra = bảng viết trước: khung {SavedView, Listing, Unit}; today {}; inventory {Listing, Unit, ListingOwner, SavedView}; sent {ShareLink}; contacts {Contact}; tuy-chinh-san {CompanyLabel, CompanyValueAlias, CustomField, ImportTemplate, PendingUnit, Listing, Unit}; sign-in {}; members {Member} (số màn được so = 9); ba ca phá trên bản sao đỏ đúng câu: bỏ ShareLink khỏi hien của sent → 'sent: hien ShareLink ma chua khai (truong)'; bỏ Member khỏi hien của members → 'members: hien Member ma chua khai (nut inviteMember)'; thêm một tệp vào màn sent chứa chuỗi \"Contact.fullName\" được trang nhập → 'sent: hien Contact ma chua khai (truong)'"
+    expected: "exit 0; ca 'may-thay-man-hien' khẳng định --json trên kho thật cho tập suy ra = bảng viết trước: khung {SavedView, Listing, Unit}; today {}; inventory {Listing, Unit, ListingOwner, SavedView}; sent {ShareLink}; contacts {Contact}; tuy-chinh-san {CompanyLabel, CompanyValueAlias, CustomField, ImportTemplate, PendingUnit, Listing, Unit}; sign-in {}; members {Member} (số màn được so = 8: bảy màn người dùng và khung); ba ca phá trên bản sao đỏ đúng câu: bỏ ShareLink khỏi hien của sent → 'sent: hien ShareLink ma chua khai (truong)'; bỏ Member khỏi hien của members → 'members: hien Member ma chua khai (nut listMembers)'; thêm một tệp vào màn sent chứa chuỗi \"Contact.fullName\" được trang nhập → 'sent: hien Contact ma chua khai (truong)'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3
@@ -30,7 +30,7 @@ evals:
     executor: test
     cmd: config:executors.test.vong_doi
     paths: [ontology/actions.yaml, ontology/entities/**, design/screens.yaml, tools/coverage_matrix/lifecycle.py, tests/vong-doi-thao-tac.test.ts]
-    expected: "exit 0; ca 'o-co-tro-nut-that' xanh trên kho thật; năm ca phá trên bản sao đỏ đúng câu: gỡ dòng removeListing khỏi ontology/actions.yaml → 'Listing.go: thao tac removeListing khong co trong bang quyen' (ca của câu bật); ô them của Member trỏ listMembers → 'Member.them: listMembers la query, o nay can create'; bỏ removeView khỏi nut của khung → 'SavedView.go: removeView khong la nut o man nao hien SavedView'; bỏ hang của ô them của Listing → 'Listing.them: createListing con du kien, thieu hang'; thêm hang 10 vào ô them của Member (inviteMember đang chạy) → 'Member.them: inviteMember dang chay, bo hang'; đối chứng: ô xem của Member trỏ listMembers (query, không phải nút) vẫn xanh"
+    expected: "exit 0; ca 'o-co-tro-nut-that' xanh trên kho thật; năm ca phá trên bản sao đỏ đúng câu: gỡ dòng removeListing khỏi ontology/actions.yaml → 'Listing.go: thao tac removeListing khong co trong bang quyen' (ca của câu bật); ô them của Member trỏ listMembers → 'Member.them: listMembers la query, o nay can create'; ô go của SavedView trỏ removeContact (nút chỉ ở màn Liên hệ, màn không hiện SavedView) → 'SavedView.go: removeContact khong la nut o man nao hien SavedView'; bỏ hang của ô them của Listing → 'Listing.them: createListing con du kien, thieu hang'; thêm hang 10 vào ô them của Member (inviteMember đang chạy) → 'Member.them: inviteMember dang chay, bo hang'; đối chứng: ô xem của Member trỏ listMembers (query, không phải nút) vẫn xanh"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E5
@@ -62,7 +62,7 @@ evals:
     executor: test
     cmd: config:executors.test.vong_doi
     paths: [ontology/entities/**, _acceptance/kiem-vong-doi-thao-tac/decisions.jsonl, tests/vong-doi-thao-tac.test.ts]
-    expected: "exit 0; ca 'bang-da-duyet' so mọi ô vong_doi trong kho với bảng viết trước trong bài (chép từ bảng Hỏi-3 đã duyệt — 12 thực thể, số ô bằng đúng số dòng của bảng); bảy chỗ thiếu thật của RS2 khẳng định từng chỗ: Listing.rieng.sua_ngoai_gia hàng 3g, Listing.rieng.nhan hàng 18a, Listing.rieng.doi_nguoi_giu hàng 18a, Contact.xem hàng 13a, Contact.rieng.gop hàng 13a, ShareLink.go hàng 18, ListingOwner.go hàng 13; mọi ô khong có duyet trỏ dòng sổ gate1 của hồ sơ này mang decided_by"
+    expected: "exit 0; ca 'bang-da-duyet' so mọi ô vong_doi trong kho với bảng viết trước trong bài (chép từ bảng Hỏi-3 đã duyệt — 12 thực thể, 55 ô); bảy chỗ thiếu thật của RS2 khẳng định từng chỗ: Listing.rieng.sua_ngoai_gia hàng 3g, Listing.rieng.nhan hàng 18a, Listing.rieng.doi_nguoi_giu hàng 18a, Contact.xem hàng 13a, Contact.rieng.gop hàng 13a, ShareLink.go hàng 18, ListingOwner.go hàng 13; mọi ô khong có duyet trỏ dòng sổ gate1 của hồ sơ này mang decided_by"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E8

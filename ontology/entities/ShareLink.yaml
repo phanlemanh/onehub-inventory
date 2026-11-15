@@ -29,3 +29,14 @@ code:
   model: src/modules/sharing/
   tests: tests/
 wiki: wiki/entities/share-link.md
+
+# Lifecycle of this entity on the screens that show it (roadmap row 1t, tools/coverage_matrix/lifecycle.py). Each cell:
+# co = an action of ontology/actions.yaml (a planned one names the row that opens it), hang = a roadmap row will do it,
+# khong = deliberately absent, with the owner's gate line in duyet. Cells as approved at the 1t scope gate.
+vong_doi:
+  them: { hang: "16", ly_do: "Row 16 creates and sends the link." }
+  xem: { hang: "16", ly_do: "There is no read permission for sent links yet; row 16 adds it." }
+  sua:
+    khong: "A sent link is not edited."
+    duyet: "kiem-vong-doi-thao-tac#d-20261115T042837Z-14"
+  go: { hang: "18", ly_do: "Turning a sent link off." }
