@@ -1,0 +1,127 @@
+{
+  "feature_plain": "Đầu chủ đăng nhập là thấy đúng hàng thật của sàn mình trên Bảng hàng, sửa giá, trạng thái và điều kiện phí thì lưu thật, tải lại vẫn còn, và không ai thấy hàng của sàn khác.",
+  "will_do": [
+    {
+      "id": "AC-1",
+      "p": "Sẽ lưu căn chào của từng sàn trong cơ sở dữ liệu với khoá cách ly sàn; sàn này đoán đúng mã căn của sàn kia vẫn không đọc hay sửa được, và căn sai luật (Đã bán thiếu giá chốt, Ngừng hẳn thiếu lý do, hai lần chào mở cùng căn) bị từ chối."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ cho Đầu chủ thấy đúng các căn đang chào của sàn mình, kèm cột riêng của sàn và Về tay; đổi sàn ở góc trên thì bảng chỉ còn căn của sàn mới."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ cho ô tìm ⌘K, cây Dự án → Phân khu → Toà và hồ sơ căn đọc cùng một lần đọc theo sàn đang mở — không lộ toà của sàn khác, toà hết căn thì không hiện, mục cây không mang số."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ lưu thật giá vừa sửa trên ô: tải lại hay người khác mở vẫn thấy giá mới."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ chỉ cho người giữ căn (hoặc căn chưa ai giữ) và Trưởng nhóm đưa căn lên «Đang bán», giữ ở cả máy chủ chứ không chỉ ẩn nút; hồ sơ căn hiện tên người giữ thật hay «Chưa ai giữ»."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ báo ngay tại ô khi hai người cùng sửa một căn và hiện giá trị mới nhất, không ghi đè mù; hoàn tác lần đổi giá không kéo trạng thái về cũ."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ cho đổi Bao phí / Không bao phí ngay trên ô, Về tay tính lại theo điều kiện mới."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ hiện đúng năm trạng thái của vùng trên dữ liệu thật — đang tải, sàn chưa có căn, không đọc được (có Tải lại), lọc không còn dòng, không đủ quyền — ở bốn khổ, sáng và tối."
+    },
+    {
+      "id": "AC-10",
+      "p": "Sẽ mở được sàn 5.000 căn: đọc dưới 1,5 giây và cuộn tới dòng cuối không lỗi."
+    }
+  ],
+  "wont_do": [
+    {
+      "id": "AC-9",
+      "p": "Chặn người chưa đăng nhập khi máy có cơ sở dữ liệu; đường thay vai bằng địa chỉ chỉ còn ở máy không có cơ sở dữ liệu, nên không bao giờ đứng cạnh dữ liệu thật."
+    },
+    {
+      "id": "OOS-1",
+      "p": "Thêm căn — hàng 12."
+    },
+    {
+      "id": "OOS-2",
+      "p": "Sửa pháp lý, nội thất, tài chính, tình trạng sử dụng — hàng 3g."
+    },
+    {
+      "id": "OOS-3",
+      "p": "Sửa nhanh trên điện thoại — hàng 3d."
+    },
+    {
+      "id": "OOS-4",
+      "p": "Gỡ căn khỏi danh sách — hàng 18b."
+    },
+    {
+      "id": "OOS-5",
+      "p": "Đổi người giữ căn, bàn giao khi nghỉ — hàng 18a."
+    },
+    {
+      "id": "OOS-6",
+      "p": "Nạp tệp Excel, Sheet — hàng 11."
+    },
+    {
+      "id": "OOS-7",
+      "p": "Màn Liên hệ — hàng 13a."
+    },
+    {
+      "id": "OOS-8",
+      "p": "Nhận căn chưa ai giữ — anh quyết ở Hỏi-4."
+    },
+    {
+      "id": "OOS-9",
+      "p": "Sửa giá trị cột riêng của sàn trên ô — anh quyết ở Hỏi-3."
+    },
+    {
+      "id": "OOS-10",
+      "p": "Giữ mức thuế phí lúc tính cho từng giá — anh quyết ở Hỏi-5."
+    },
+    {
+      "id": "OOS-11",
+      "p": "Chia trang phía máy chủ — không làm, vì anh đã chốt «cuộn liền như Sheet»."
+    },
+    {
+      "id": "OOS-12",
+      "p": "Làm việc khi mất mạng — sau MVP."
+    }
+  ],
+  "coverage_plain": [
+    {
+      "i": 0,
+      "p": "Ngưỡng 1,5 giây cho sàn 5.000 căn (AC-10) là số máy mượn từ bài thử của Quỹ hàng, chưa đo trên máy này — anh gạch nếu muốn ngưỡng khác."
+    },
+    {
+      "i": 1,
+      "p": "Mỗi căn có đúng một người giữ (không nhóm người giữ), theo chuẩn RESO — anh gạch nếu sàn có căn nhiều người cùng giữ."
+    }
+  ],
+  "gap_probe_plain": [
+    {
+      "i": 0,
+      "p": "Thiết kế từng nói hai chỗ khác nhau về nơi giữ luật đổi trạng thái — đã chốt: luật đổi nấc ở máy chủ, quyền và luật dữ liệu ở cơ sở dữ liệu; hai lựa chọn lược đồ có ghi lý do."
+    },
+    {
+      "i": 1,
+      "p": "Căn cứ cho ô tìm, cây và hồ sơ từng gộp làm một — đã tách: mỗi chỗ có căn cứ riêng, cách gộp lần đọc để kế hoạch, có bài đo một lần đọc."
+    },
+    {
+      "i": 2,
+      "p": "Quyền sửa giá và điều kiện phí chưa được đo ở máy chủ — đã thêm bảng 48 ô (vai × loại căn × loại thay đổi), viết đáp án theo câu anh trả lời."
+    },
+    {
+      "i": 3,
+      "p": "Hoàn tác chưa có bài đo trên màn — đã thêm ca: đổi giá, đổi trạng thái, hoàn tác giá thì trạng thái mới vẫn giữ."
+    },
+    {
+      "i": 4,
+      "p": "Trạng thái lỗi chỉ thử bằng công tắc giả và thiếu khổ — đã thêm ca đọc hỏng thật, đủ bốn khổ, sàn trống để chụp."
+    }
+  ]
+}
