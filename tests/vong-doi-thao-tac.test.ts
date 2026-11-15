@@ -89,7 +89,7 @@ function breakFile(dir: string, file: string, edit: (text: string) => string) {
   const path = join(dir, file);
   const before = readFileSync(path, "utf8");
   const after = edit(before);
-  expect(after, `bản phá không đổi được ${file}`).not.toBe(before);
+  expect(after, `the break did not change ${file}`).not.toBe(before);
   writeFileSync(path, after);
 }
 
@@ -280,6 +280,28 @@ describe("o-co-tro-nut-that", () => {
       t.replace("them: { co: inviteMember }", 'them: { co: inviteMember, hang: "10" }'),
     );
     expectRed(dir, "Member.them: inviteMember dang chay, bo hang");
+  });
+
+  it("a role list on a cell other than a view cell is red, it would have no effect", () => {
+    const dir = copy();
+    breakFile(dir, ent("Member"), (t) =>
+      t.replace(
+        "them: { co: inviteMember }",
+        'them:\n    co: inviteMember\n    chan:\n      TeamLead: { hang: "18a", ly_do: "x" }',
+      ),
+    );
+    expectRed(dir, "Member.them: chan chi co hieu luc o o xem co thao tac");
+  });
+
+  it("a role list on a view cell without an action is red", () => {
+    const dir = copy();
+    breakFile(dir, ent("ShareLink"), (t) =>
+      t.replace(
+        'xem: { hang: "16", ly_do: "There is no read permission for sent links yet; row 16 adds it." }',
+        'xem:\n    hang: "16"\n    ly_do: "x"\n    chan:\n      TeamLead: { hang: "16", ly_do: "x" }',
+      ),
+    );
+    expectRed(dir, "ShareLink.xem: chan chi co hieu luc o o xem co thao tac");
   });
 
   it("a view cell pointing at a query that is no button stays green (control)", () => {
@@ -560,7 +582,7 @@ describe("xem-theo-vai", () => {
 
 describe("don-thu-muc-tam", () => {
   let broken: string[] = [];
-  describe("nhom quen don (ca pha)", () => {
+  describe("group that skips the shared cleanup (broken case)", () => {
     it("a group that makes a copy without the shared cleanup", () => {
       broken = [copy()];
       expect(existsSync(broken[0]!)).toBe(true);
@@ -571,7 +593,7 @@ describe("don-thu-muc-tam", () => {
     const left = made.filter((dir) => existsSync(dir));
     expect(made.length).toBeGreaterThan(20);
     expect(orphans, "copies made outside a cleaned group").toEqual(broken);
-    expect(left, `ban sao con sot: ${left.join(", ")}`).toEqual(broken);
+    expect(left, `copies left on disk: ${left.join(", ")}`).toEqual(broken);
     release(broken);
     expect(made.filter((dir) => existsSync(dir))).toEqual([]);
   });

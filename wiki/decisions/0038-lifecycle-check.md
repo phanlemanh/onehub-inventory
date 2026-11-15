@@ -40,6 +40,7 @@ nên một thao tác chưa từng khai thì không ai thấy thiếu. Luật b�
   chữ người trong sổ quyết định của một hồ sơ.
 - Theo vai: vai mở được một màn phải xem được mọi thứ màn ấy hiện, hoặc ô xem kê vai ấy dưới `chan` với hàng hay «không».
   Thêm, sửa, gỡ theo vai giữ ở bảng quyền (đã qua cổng 9a, 9e); `--report` in vai của từng ô.
+  `chan` đặt ở ô khác ô xem có thao tác thì đỏ, vì ở đó nó không có hiệu lực.
 - Phép kiểm chỉ đọc tệp trong cây — không gọi git, không đọc sổ đợt ngoài kho — nên chạy được trên bản sao nông của CI. Nó
   chạy trong `make test` qua `tests/vong-doi-thao-tac.test.ts`.
 

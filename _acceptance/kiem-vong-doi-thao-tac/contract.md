@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli]
 screens: []
-status: verified
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-15
 design_doc: _acceptance/kiem-vong-doi-thao-tac/design.md

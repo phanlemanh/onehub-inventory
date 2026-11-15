@@ -18,7 +18,8 @@ the cell's kind; for them, sua, go and rieng a button the button table knows on 
 action carries `hang`), `{hang: <row>, ly_do: <reason>}` (a row of docs/plan/lo-trinh.json will do it), or
 `{khong: <reason>, duyet: <record>#<ledger line>}` (the line is a gate line with `decided_by` in
 _acceptance/<record>/decisions.jsonl). Every role that opens a screen showing X holds the action of X's `xem` cell, or
-the cell lists the role under `chan` with a `hang` or `khong` cell. The tool reads files only: no git, no other process.
+the cell lists the role under `chan` with a `hang` or `khong` cell; `chan` anywhere else fails, as it would have no
+effect. The tool reads files only: no git, no other process.
 """
 
 from __future__ import annotations
@@ -139,7 +140,9 @@ class Check:
             out |= set((self.rows_9b.get(sid) or {}).get("actions") or [])
         return out
 
-    def cell(self, where: str, value: Any, kind: str | None, buttons_here: set[str] | None) -> None:
+    def cell(
+        self, where: str, value: Any, kind: str | None, buttons_here: set[str] | None, chan_ok: bool = False
+    ) -> None:
         err = self.errors.append
         if not isinstance(value, dict) or not (set(value) <= KEYS):
             err(f"{where}: o phai la co, hang hoac khong")
@@ -148,6 +151,9 @@ class Check:
         if not has or ("khong" in has and len(has) > 1):
             err(f"{where}: o phai la co, hang hoac khong")
             return
+        if "chan" in value and not (chan_ok and "co" in has):
+            # A role list only has an effect on a view cell that names an action; anywhere else it would be ignored.
+            err(f"{where}: chan chi co hieu luc o o xem co thao tac")
         row = text(value.get("hang"))
         if "hang" in has and row not in self.rows:
             err(f"{where}: hang {row} khong co trong lo trinh")
@@ -214,7 +220,7 @@ class Check:
                 if c not in life:
                     err(f"{name}: thieu o {c}")
                 else:
-                    self.cell(f"{name}.{c}", life[c], KIND[c], None if c == "xem" else here)
+                    self.cell(f"{name}.{c}", life[c], KIND[c], None if c == "xem" else here, chan_ok=c == "xem")
             extra = life.get("rieng") or {}
             if not isinstance(extra, dict):
                 err(f"{name}.rieng: o phai la co, hang hoac khong")
