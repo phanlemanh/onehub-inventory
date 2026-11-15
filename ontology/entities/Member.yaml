@@ -28,3 +28,14 @@ code:
   model: src/modules/identity/
   tests: tests/db/
 wiki: wiki/entities/member.md
+
+# Lifecycle of this entity on the screens that show it (roadmap row 1t, tools/coverage_matrix/lifecycle.py). Each cell:
+# co = an action of ontology/actions.yaml (a planned one names the row that opens it), hang = a roadmap row will do it,
+# khong = deliberately absent, with the owner's gate line in duyet. Cells as approved at the 1t scope gate.
+vong_doi:
+  them: { co: inviteMember }
+  xem: { co: listMembers }
+  sua: { co: changeMemberRoles }
+  go:
+    hang: "18a"
+    ly_do: "Locking a person who left and removing a person from the company; no draft permission yet."
