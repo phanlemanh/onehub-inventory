@@ -33,18 +33,27 @@ function readNumber(text: string, thousands: boolean): number | null {
 }
 
 /**
- * A price as brokers type it: «4,65 tỷ», «4.65 tỷ», «4,65t», «4 tỷ 650», «4ty65», «950 triệu», «950tr»,
- * «4650000000», «4.650.000.000». Anything else — empty, words, a bare small number, negative, above the ceiling,
- * two units — is not understood, never guessed.
+ * One way to read a typed or pasted word: no Vietnamese marks, «đ» as «d», no case, outer spaces cut and inner spaces
+ * single. A whole cell is read with it (a price, a status), so it trims and collapses spaces; the grid's filter
+ * (`foldText`) finds words inside longer text and keeps spaces as typed.
  */
-export function readPrice(raw: string): PriceRead {
-  const text = raw
+export function foldWords(text: string): string {
+  return text
     .trim()
     .toLowerCase()
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .replace(/đ/g, "d")
     .replace(/\s+/g, " ");
+}
+
+/**
+ * A price as brokers type it: «4,65 tỷ», «4.65 tỷ», «4,65t», «4 tỷ 650», «4ty65», «950 triệu», «950tr»,
+ * «4650000000», «4.650.000.000». Anything else — empty, words, a bare small number, negative, above the ceiling,
+ * two units — is not understood, never guessed.
+ */
+export function readPrice(raw: string): PriceRead {
+  const text = foldWords(raw);
   if (text === "") return { ok: false };
   let value: number | null = null;
   // «4 ty 650», «4ty65»: whole billions, then the digits after the decimal point.

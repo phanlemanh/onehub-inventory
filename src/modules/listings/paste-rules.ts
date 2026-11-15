@@ -5,7 +5,9 @@ import type { ListingStandardStatus } from "../../generated/ontology";
 import { statusLabel } from "../../lib/format";
 
 import {
+  STATUS_NEXT,
   canMove,
+  foldWords,
   priceAsksAgain,
   priceLocked,
   priceSwing,
@@ -44,34 +46,17 @@ export type PasteCell =
   | { kind: "wrong"; field: "listPrice" | "standardStatus" }
   | { kind: "skip"; why: PasteSkip };
 
-const STATUSES: readonly ListingStandardStatus[] = [
-  "Incomplete",
-  "Active",
-  "Pending",
-  "Closed",
-  "Hold",
-  "Withdrawn",
-];
-
-/** One way to compare words: no Vietnamese marks, «đ» as «d», no case, single spaces (the grid's filter rule). */
-function fold(text: string): string {
-  return text
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/\s+/g, " ");
-}
+/** Every status of the listing, in the order of row 4's moves table: the one list of statuses. */
+const STATUSES = Object.keys(STATUS_NEXT) as ListingStandardStatus[];
 
 /** The status a pasted word names in the listing's dictionary (sale or lease wording), or null. */
 export function readStatusText(
   raw: string,
   transaction?: "sale" | "lease",
 ): ListingStandardStatus | null {
-  const word = fold(raw);
+  const word = foldWords(raw);
   if (word === "") return null;
-  return STATUSES.find((s) => fold(statusLabel(s, transaction)) === word) ?? null;
+  return STATUSES.find((s) => foldWords(statusLabel(s, transaction)) === word) ?? null;
 }
 
 /** The status words a listing's dictionary has, in the order of the rules, for the «gõ một trong» hint. */
@@ -89,7 +74,8 @@ export function readPastePrice(target: PasteTarget, raw: string): PasteCell {
   return {
     kind: "change",
     change: { field: "listPrice", listPrice: read.value },
-    undoable: true,
+    // No price before: the save door takes no «no price» change, so the way back does not exist.
+    undoable: typeof previous === "number" && previous > 0,
     ...(priceAsksAgain(previous, read.value) && previous
       ? { swing: priceSwing(previous, read.value) }
       : {}),

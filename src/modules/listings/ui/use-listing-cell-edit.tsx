@@ -22,7 +22,8 @@ import {
 
 import { CELL_EDIT_COPY as COPY, type CellEditLabels } from "./cell-edit-copy";
 import type { InventoryField } from "./inventory-rows";
-import { pasteWords, planPaste, type PastePlan } from "./listing-paste";
+import { planPaste, type PastePlan } from "./listing-paste";
+import { pasteWords } from "./listing-paste-copy";
 import {
   ListingCellEdit,
   StatusNeedsDialog,

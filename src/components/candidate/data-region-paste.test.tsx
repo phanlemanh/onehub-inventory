@@ -147,6 +147,22 @@ describe("chua-ghi-truoc-khi-ap", () => {
   });
 });
 
+describe("khoi-o-nhieu-dong", () => {
+  it("khoi-o-nhieu-dong: a quoted Excel cell with a line break is one cell, nothing falls outside", async () => {
+    const { paste } = show(asRole("ListAgent"));
+    await select(cellOf(1, PRICE));
+    await pasteText(cellOf(1, PRICE), '"dòng 1\ndòng 2"\tchữ a\n7 tỷ\tchữ b\n');
+    const handed = paste.mock.calls[0]![0];
+    expect(handed.cells.map((c) => `${c.row.id}|${c.raw}`)).toEqual([
+      "b|dòng 1\ndòng 2",
+      "b|chữ a",
+      "c|7 tỷ",
+      "c|chữ b",
+    ]);
+    expect(handed.beyond, "khoi-o-nhieu-dong: phần thừa").toEqual({ rows: 0, columns: 0 });
+  });
+});
+
 describe("bo-theo-cot-va-khoa", () => {
   it("bo-theo-cot-va-khoa: a column the screen did not open and a locked cell come marked not open", async () => {
     const { paste } = show(asRole("ListAgent"));

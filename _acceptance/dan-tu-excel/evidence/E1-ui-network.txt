@@ -1,0 +1,1 @@
+No fetch/XHR requests, no failed requests, no console errors captured by Playwright page listeners in 4 runs (1440/1024 x light/dark). Result: no-app-traffic.

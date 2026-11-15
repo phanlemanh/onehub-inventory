@@ -122,26 +122,46 @@ describe("ly-do-bo-tu-luat", () => {
 });
 
 /** Written first: the asking threshold of row 4, read by the paste preview — the edges both ways, and no price yet. */
-const SWINGS: readonly (readonly [string, number | null, string, boolean])[] = [
-  ["+20%", 1_000_000_000, "1,2 tỷ", false],
-  ["+20,01%", 1_000_000_000, "1.200.100.000", true],
-  ["-20%", 1_000_000_000, "800 triệu", false],
-  ["-20,01%", 1_000_000_000, "799.900.000", true],
-  ["chua co gia", null, "1 tỷ", false],
+/** Name, price before, pasted word, marked, and the swing the mark shows (old → new, signed, over the old price). */
+const SWINGS: readonly (readonly [string, number | null, string, boolean, number | null])[] = [
+  ["+20%", 1_000_000_000, "1,2 tỷ", false, null],
+  ["+20,01%", 1_000_000_000, "1.200.100.000", true, 0.2001],
+  ["-20%", 1_000_000_000, "800 triệu", false, null],
+  ["-20,01%", 1_000_000_000, "799.900.000", true, -0.2001],
+  ["+110,28%", 4_280_000_000, "9 tỷ", true, 1.1028],
+  ["chua co gia", null, "1 tỷ", false, null],
 ];
 
 describe("nguong-dan-dau-phan-tram", () => {
-  it.each(SWINGS)("nguong-dan-dau-phan-tram: %s", (_name, before, raw, marked) => {
-    const read = readPastePrice({ standardStatus: "Active", listPrice: before }, raw);
-    expect(read.kind).toBe("change");
-    expect(read.kind === "change" && read.swing !== undefined).toBe(marked);
-  });
+  for (const [name, before, raw, marked, swing] of SWINGS) {
+    it(`nguong-dan-dau-phan-tram: ${name}`, () => {
+      const read = readPastePrice({ standardStatus: "Active", listPrice: before }, raw);
+      expect(read.kind).toBe("change");
+      const shown = read.kind === "change" ? read.swing : undefined;
+      expect(shown !== undefined, `nguong-dan-dau-phan-tram: ${name}`).toBe(marked);
+      if (swing !== null)
+        expect(shown, `nguong-dan-dau-phan-tram: ${name} — độ lệch`).toBeCloseTo(swing, 4);
+    });
+  }
 });
 
 describe("hoan-tac-duoc-khi-dan", () => {
   it("a move whose way back is not allowed is pasted as not undoable", () => {
     const read = readPasteStatus({ standardStatus: "Incomplete" }, S("Active"));
     expect(read).toMatchObject({ kind: "change", undoable: false });
+  });
+  it("a price pasted on a listing with no price has no way back", () => {
+    for (const before of [null, undefined, 0]) {
+      expect(
+        readPastePrice({ standardStatus: "Active", listPrice: before }, "1 tỷ"),
+        `hoan-tac-duoc-khi-dan: giá trước ${String(before)}`,
+      ).toMatchObject({ kind: "change", undoable: false });
+    }
+    expect(
+      readPastePrice({ standardStatus: "Active", listPrice: 900_000_000 }, "1 tỷ"),
+    ).toMatchObject({
+      undoable: true,
+    });
   });
   it("a move whose way back is allowed is undoable", () => {
     expect(readPasteStatus({ standardStatus: "Active" }, S("Hold"))).toMatchObject({

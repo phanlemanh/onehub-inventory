@@ -34,6 +34,7 @@ import {
 import {
   DataGridCellSelection,
   type DataGridCellSelectionApi,
+  parseDataGridClipboardText,
 } from "@/components/reui/data-grid/data-grid-cell-selection";
 import { DataGridColumnHeader } from "@/components/reui/data-grid/data-grid-column-header";
 import { DataGridColumnVisibility } from "@/components/reui/data-grid/data-grid-column-visibility";
@@ -1053,11 +1054,11 @@ export function DataRegion({
   const selectionRef = useRef<DataGridCellSelectionSnapshot | null>(null);
   const pastedBlock = useRef<{ rows: number; columns: number } | null>(null);
   const onPasteCapture = (event: ClipboardEvent<HTMLDivElement>) => {
-    const text = event.clipboardData.getData("text/plain").replace(/\r?\n$/, "");
-    const lines = text.split(/\r?\n/);
+    // The grid's own reader of Excel's text: a quoted cell may hold tabs and line breaks and is still one cell.
+    const block = parseDataGridClipboardText(event.clipboardData.getData("text/plain"));
     pastedBlock.current = {
-      rows: lines.length,
-      columns: Math.max(1, ...lines.map((line) => line.split("\t").length)),
+      rows: Math.max(1, block.length),
+      columns: Math.max(1, ...block.map((line) => line.length)),
     };
   };
   const onCellsChange = (details: DataGridCellsChangeDetails<TableRow>) => {

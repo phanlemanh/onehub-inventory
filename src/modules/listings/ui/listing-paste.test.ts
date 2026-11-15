@@ -154,6 +154,29 @@ describe("ly-do-bo-du-10", () => {
   }
 });
 
+describe("dau-tren-dong", () => {
+  it("dau-tren-dong: a far price carries its signed swing and starts unticked; no price before means no way back", () => {
+    const far = row("2201", "Active", 4_280_000_000);
+    const down = row("2202", "Active", 1_000_000_000);
+    const none = row("2203", "Active", null);
+    const plan = planPaste(
+      paste([
+        cell(far, "Listing.listPrice", "9 tỷ"),
+        cell(down, "Listing.listPrice", "799.900.000"),
+        cell(none, "Listing.listPrice", "1 tỷ"),
+      ]),
+      labels,
+      headerOf,
+    );
+    const by = Object.fromEntries(plan.changes.map((c) => [c.id.split("|")[0], c]));
+    expect(by["2201"]).toMatchObject({ mark: "+110,28%", held: true });
+    expect(by["2202"]).toMatchObject({ mark: "−20,01%", held: true });
+    expect(by["2203"]?.mark).toBeUndefined();
+    expect(by["2203"], "dau-tren-dong: không hoàn tác được").toMatchObject({ final: true });
+    expect(plan.writes.get("2203|Listing.listPrice")?.undoable).toBe(false);
+  });
+});
+
 describe("bo-khong-giau-o-khac", () => {
   it("a region mixing reasons keeps the cells that change", () => {
     const plan = planPaste(
