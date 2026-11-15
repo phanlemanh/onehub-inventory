@@ -137,6 +137,14 @@ export function parseNumberRule(rule: string): NumberTest | null {
 }
 
 /** True when a filter holds nothing to filter by. */
+/**
+ * A name as the whole-name match compares it: no spaces at either end, runs of spaces as one (row 2d). The stored value
+ * is never changed; cleaning names when they are loaded is row 11's work.
+ */
+export function wholeName(text: string): string {
+  return text.trim().replace(/\s+/g, " ");
+}
+
 export function filterIsEmpty(filter: ColumnFilter | undefined): boolean {
   if (filter === undefined) return true;
   return typeof filter === "string" ? filter.trim() === "" : filter.length === 0;
@@ -163,7 +171,9 @@ function columnMatches(
   if (typeof filter !== "string") {
     // A list on a words column comes from picking places, not typing (row 2d's geography tree): whole names only, so
     // «Park 1» never takes «Park 10». Typed text stays «contains».
-    return mode === "text" ? filter.includes(String(value ?? "")) : true;
+    if (mode !== "text") return true;
+    const name = wholeName(String(value ?? ""));
+    return filter.some((f) => wholeName(f) === name);
   }
   if (mode === "number") {
     const test = parseNumberRule(filter);

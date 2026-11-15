@@ -142,6 +142,11 @@ describe("tree", () => {
   });
 });
 
+/** Every row in `want` is among `got`; throws otherwise. */
+function checkTakesAll(got: readonly string[], want: readonly string[]): void {
+  if (want.some((id) => !got.includes(id))) throw new Error("bo sot dong ten thua cach");
+}
+
 describe("filters", () => {
   const tree = geoTree(ROWS, PLACES);
 
@@ -173,6 +178,29 @@ describe("filters", () => {
     });
     expect(geoFiltersFor(tree, [node(tree, P2).key])).toEqual({ "Listing.subdivisionName": [P2] });
     expect(geoFiltersFor(tree, ["khong-co"])).toEqual({});
+  });
+
+  it("names with stray spaces (a Sheet import, row 7d) show once and a pick takes their rows", () => {
+    // Two rows of S1.03 whose names carry spaces at the ends and inside; the stored values stay as they are.
+    const messy = ROWS.filter((r) => r["Listing.buildingName"] === "S1.03")
+      .slice(0, 2)
+      .map((r, i) => ({
+        ...r,
+        id: `long-${i}`,
+        "Listing.subdivisionName": ` ${P1.replace(" ", "  ")} `,
+        "Listing.buildingName": "S1.03  ",
+      }));
+    const rows = [...ROWS, ...messy];
+    const t = geoTree(rows, PLACES);
+    expect(flat(t).filter((x) => x.name === "S1.03")).toHaveLength(1);
+    const got = filterRows(rows, COLUMNS, geoFiltersFor(t, [node(t, "S1.03").key]));
+    checkTakesAll(ids(got), ["long-0", "long-1"]);
+    expect(got).toHaveLength(node(tree, "S1.03").count + 2);
+    expect(messy[0]!["Listing.buildingName"]).toBe("S1.03  ");
+  });
+
+  it("break: a pick that misses the rows with stray spaces is caught", () => {
+    expect(() => checkTakesAll(["a"], ["long-0", "long-1"])).toThrow("bo sot dong ten thua cach");
   });
 
   it("withoutPlace keeps every other filter", () => {

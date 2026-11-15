@@ -13,13 +13,14 @@
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
-import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { navFor } from "../src/app/(app)/nav";
 import { sampleBuildingPlaces, sampleInventoryRows } from "../src/app/(app)/inventory-sample-rows";
 import type { GridRow } from "../src/components/candidate/data-region";
 import { filterRows } from "../src/components/candidate/grid-view";
+import { GRID_COPY } from "../src/components/candidate/grid-copy";
 import { AppShell } from "../src/components/templates/app-shell";
 import { PlaceChangeProvider } from "../src/components/templates/app-shell/place-change";
 import { FRAME_COPY } from "../src/components/templates/frame-copy";
@@ -349,6 +350,12 @@ function checkAllRows(count: string | undefined): void {
   if (count !== "60") throw new Error("tat ca hang con loc noi");
 }
 
+/** The empty grid says why and offers «Xoá lọc»; throws otherwise. */
+function checkWayOut(text: string, clear: HTMLElement | null): void {
+  if (!text.includes(GRID_COPY.noMatch.title) || clear === null)
+    throw new Error("bang trong khong loi ra");
+}
+
 describe("one filter state", () => {
   it("picking a building keeps the status filter and fills the project and building boxes", async () => {
     const filters = inventoryFiltersFrom("Active");
@@ -424,6 +431,24 @@ describe("one filter state", () => {
 
   it("break: a modified click that changes this tab is caught", () => {
     expect(() => checkTabKept("60", "", "10", "S1.03")).toThrow("bam kem phim doi tab");
+  });
+
+  it("editing a box that holds a complex's buildings by hand: no rows, said so, with the way out", async () => {
+    // Known limit (Ngoài-1): the edited text is a «contains» rule no building matches; the region says there is no
+    // matching row and offers «Xoá lọc», which brings every row back.
+    shell(ROWS);
+    fireEvent.click(within(groupOf(P1)).getByRole("link", { name: "The Sapphire 1" }));
+    await waitFor(() => expect(box("Toà").value).toBe("S1.01, S1.02, S1.03, S1.05"));
+    fireEvent.change(box("Toà"), { target: { value: "S1.01, S1.02, S1.03, S1.0" } });
+    await waitFor(() => expect(document.body.textContent).toContain(GRID_COPY.noMatch.title));
+    const clear = screen.getByRole("button", { name: GRID_COPY.clearFilter });
+    checkWayOut(document.body.textContent ?? "", clear);
+    fireEvent.click(clear);
+    await waitFor(() => expect(allCount()).toBe("60"));
+  });
+
+  it("break: an empty grid with no words or no way out is caught", () => {
+    expect(() => checkWayOut("", null)).toThrow("bang trong khong loi ra");
   });
 
   it("break: a box that reads a cut name is caught", () => {

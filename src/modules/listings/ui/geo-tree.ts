@@ -7,6 +7,7 @@ import {
   filterRows,
   type ColumnFilter,
   type ColumnFilters,
+  wholeName,
 } from "@/components/candidate/grid-view";
 import type { GridRow } from "@/components/candidate/data-region";
 import type { NavLink, NavSection } from "@/components/templates/app-shell";
@@ -44,12 +45,16 @@ const keyOf = (...parts: (string | undefined)[]): string =>
 export function geoTree(rows: readonly GridRow[], places: readonly BuildingPlace[]): GeoNode[] {
   const count = new Map<string, number>();
   for (const r of rows) {
-    const p = String(r["Listing.subdivisionName"] ?? "").trim();
-    const b = String(r["Listing.buildingName"] ?? "").trim();
+    const p = wholeName(String(r["Listing.subdivisionName"] ?? ""));
+    const b = wholeName(String(r["Listing.buildingName"] ?? ""));
     if (!p || !b) continue;
     count.set(keyOf(p, b), (count.get(keyOf(p, b)) ?? 0) + 1);
   }
-  const known = [...places];
+  const known = places.map((x) => ({
+    ...x,
+    project: wholeName(x.project),
+    building: wholeName(x.building),
+  }));
   for (const k of count.keys()) {
     const [project, building] = k.split(SEP) as [string, string];
     if (!known.some((x) => x.project === project && x.building === building))
