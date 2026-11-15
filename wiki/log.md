@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-15 — Bản thật ở `inventory.onehub.center`, Quỹ hàng giữ địa chỉ cũ chỉ để đối chiếu, không chuyển dữ liệu; thêm hàng 22 và 1u, hàng 21 thành chân trời H13 — [0041](decisions/0041-ban-that-o-dia-chi-rieng.md).
 - 2026-11-15 — Lifecycle check: every screen lists what it shows, every shown entity has add, view, edit and remove or an approved reason (row 1t) — [0038](decisions/0038-lifecycle-check.md).
 - 2026-11-15 — Công cụ design-assembly chép lại từ plugin: linh kiện xuất lại qua tệp gom chỉ ghi một lần, ở tệp định nghĩa nó, nên sổ linh kiện hết ghi trùng chín linh kiện bộ lọc (298 xuống 289 mục). Kèm phần đọc sổ màn nối với mô hình nghiệp vụ của plugin, chưa bật ở kho này — `tools/design-assembly/components.mjs`, `design/component-registry.json`, [0034](decisions/0034-component-register-written-by-design-assembly.md).
 - 2026-11-15 — Khai sổ token và sổ linh kiện với kit nghiệm thu ở `design_floor`, tách khỏi PR nhận design-assembly, gộp sau nó — [0034](decisions/0034-component-register-written-by-design-assembly.md).

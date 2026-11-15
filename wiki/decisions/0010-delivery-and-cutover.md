@@ -9,7 +9,7 @@ sources: [setup-blueprint.yaml]
 
 ## Status
 
-Accepted, 2026-11-09, chủ kho duyệt bản kế hoạch dựng kho.
+Superseded by [0041](0041-ban-that-o-dia-chi-rieng.md), 2026-11-15. Trước đó: Accepted, 2026-11-09, chủ kho duyệt bản kế hoạch dựng kho.
 
 ## Context
 
