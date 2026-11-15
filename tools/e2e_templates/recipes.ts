@@ -3,7 +3,7 @@
 // measures. The main case runs the check; each break case runs the SAME check and needs it to throw its pinned
 // message. A recipe never opens a page itself: the runner does, and waits until the page is ready first.
 import AxeBuilder from "@axe-core/playwright";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 export interface Ctx {
   page: Page;
@@ -203,7 +203,13 @@ export const SESSION: Recipe[] = [
 // ---- region recipes: grid screens with a data region, and the grid sample -------------------------------------
 
 const region = (page: Page) => page.locator('[data-slot="data-region"]');
-const bodyRows = (page: Page) => page.locator('[data-slot="data-region-body"] tbody tr');
+/** The table's body rows: what the table branch reads cell by cell. */
+const tableRows = (page: Page) => page.locator('[data-slot="data-region-body"] tbody tr');
+/** The region's rows as a person sees them: table rows from 768 px, the phone list's cards below it (row 2b). */
+const bodyRows = (page: Page) =>
+  page.locator(
+    '[data-slot="data-region-body"] tbody tr, [data-slot="data-region-body"] [data-slot="phone-card"]',
+  );
 const stateOf = (page: Page, kind: string) =>
   page.locator(`[data-slot="region-state"][data-kind="${kind}"]`);
 /** Any search box inside the region: row 2e dropped it, so the region cases count these and want none. */
@@ -216,11 +222,91 @@ const firstFilter = (page: Page) =>
 const viewport = (page: Page) =>
   page.locator('[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]').first();
 
+// ---- the phone list (row 2b, _acceptance/bang-hang-the-dien-thoai) ---------------------------------------------
+// Below 768 px a region given a phone list shows its rows as cards and keeps its filter boxes in a bottom sheet. The
+// region cases then measure the same state on the cards: same check, same pinned messages, same breaks (each break
+// also reaches the cards). A screen without a phone list keeps its table at every size and its table branch.
+
+const phoneList = (page: Page) => region(page).locator('[data-slot="phone-list"]');
+const phoneCards = (page: Page) => region(page).locator('[data-slot="phone-card"]');
+/** The filter sheet, by its title «Lọc». */
+const phoneSheet = (page: Page) => page.getByRole("dialog", { name: "Lọc" });
+
+/**
+ * True when the region shows its phone list. Read after two frames: the region learns the width in an effect, so a
+ * phone first paints the table for a moment.
+ */
+async function onPhone(page: Page): Promise<boolean> {
+  if ((page.viewportSize()?.width ?? 1440) >= 768) return false;
+  await page.evaluate(
+    () =>
+      new Promise<void>((done) => requestAnimationFrame(() => requestAnimationFrame(() => done()))),
+  );
+  return (await phoneList(page).count()) > 0;
+}
+
+/** Opens the filter sheet when shut and returns its first filter box: the first column's, as on the table. */
+async function phoneFirstFilter(page: Page): Promise<Locator> {
+  if (!(await phoneSheet(page).isVisible()))
+    await page.locator('[data-slot="phone-filter-button"]').click();
+  await phoneSheet(page).waitFor({ timeout: SHORT });
+  return phoneSheet(page)
+    .locator('[data-slot="phone-filters"] [data-slot="column-filter"] input')
+    .first();
+}
+
+/** Shuts the filter sheet with its close button (a filter box keeps Escape for itself). */
+async function shutPhoneSheet(page: Page): Promise<void> {
+  await phoneSheet(page).locator('[data-slot="sheet-close"]').last().click();
+  await phoneSheet(page).waitFor({ state: "hidden", timeout: SHORT });
+}
+
+/** Types into the first filter box through the sheet, then shuts it so the cards show. */
+async function phoneFilterFill(page: Page, text: string): Promise<void> {
+  await (await phoneFirstFilter(page)).fill(text);
+  await shutPhoneSheet(page);
+}
+
+/** What the first filter box holds, read in the sheet (then shut). */
+async function phoneFilterValue(page: Page): Promise<string> {
+  const value = await (await phoneFirstFilter(page)).inputValue();
+  await shutPhoneSheet(page);
+  return value;
+}
+
+/** The region's row count: in its head on the table, in the sticky toolbar on the phone list. */
+const countOf = (page: Page, phone: boolean) =>
+  region(page)
+    .locator(phone ? '[data-slot="region-footer-count"]' : '[data-slot="region-count"]')
+    .first();
+
+/**
+ * Every shown card's texts, first the unit code (what the first filter box reads), then the card's whole text; and how
+ * many cards a person sees on the first screen. Cards are not virtual: all are mounted, a hidden one is left out.
+ */
+async function phoneRowsWithWindow(page: Page): Promise<{ rows: string[][]; window: number }> {
+  await phoneCards(page).first().waitFor({ state: "attached", timeout: SHORT });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  return phoneCards(page).evaluateAll((cards) => {
+    const shown = cards.filter((c) => c.getClientRects().length > 0);
+    const rows = shown.map((c) => [
+      (c.querySelector('[data-slot="listing-card-unit"]')?.textContent ?? "").trim(),
+      (c.textContent ?? "").trim(),
+    ]);
+    const window = shown.filter((c) => {
+      const r = c.getBoundingClientRect();
+      return r.bottom > 0 && r.top < innerHeight;
+    }).length;
+    return { rows, window };
+  });
+}
+
 /** Kinds whose shown text is the value a text filter reads (words, not numbers, dates or a select's label). */
 const TEXT_KINDS = ["text", "person"];
 
 /** How many data rows a person sees in the grid's viewport at the top of the run (not the extra rows mounted ahead). */
 async function visibleRows(page: Page): Promise<number> {
+  if (await onPhone(page)) return (await phoneRowsWithWindow(page)).window;
   return viewport(page).evaluate((el) => {
     const box = el.getBoundingClientRect();
     return [...el.querySelectorAll("tbody tr")].filter((tr) => {
@@ -264,7 +350,7 @@ async function scrollUntil(page: Page, done: () => Promise<boolean>): Promise<vo
  * column's cell (the one the first filter box reads), then every text cell of the row.
  */
 async function mountedRows(page: Page): Promise<[number, string[]][]> {
-  return bodyRows(page).evaluateAll(
+  return tableRows(page).evaluateAll(
     (trs, kinds) =>
       trs
         .filter((tr) => getComputedStyle(tr).display !== "none")
@@ -298,7 +384,8 @@ async function mountedRows(page: Page): Promise<[number, string[]][]> {
  * Also returns how many rows a person sees in the viewport before any scrolling (the first window).
  */
 async function allRowsWithWindow(page: Page): Promise<{ rows: string[][]; window: number }> {
-  await bodyRows(page).first().waitFor({ state: "attached", timeout: SHORT });
+  if (await onPhone(page)) return phoneRowsWithWindow(page);
+  await tableRows(page).first().waitFor({ state: "attached", timeout: SHORT });
   // Keyed by number AND texts: windows overlap (same row seen twice), but a row that is not in the data (an extra row
   // sharing a number) stays a row of its own.
   const seen = new Map<string, [number, string[]]>();
@@ -405,20 +492,23 @@ async function firstFilterCheck({ page }: Ctx): Promise<void> {
       "loc-dau-cot: khong du du lieu de thu (can mot chuoi o cot dau khop nhieu hon mot khung cuon, nam ngoai khung dau)",
     );
   const expected = before.filter((r) => firstColumnHas(r, needle));
-  await firstFilter(page).fill(needle);
+  const phone = await onPhone(page);
+  if (phone) await phoneFilterFill(page, needle);
+  else await firstFilter(page).fill(needle);
   await page
     .waitForFunction(
-      (n) =>
-        document.querySelector('[data-slot="region-count"]')?.textContent?.startsWith(`${n} /`) ??
-        false,
-      expected.length,
+      ([n, slot]) =>
+        document
+          .querySelector(`[data-slot="data-region"] [data-slot="${slot}"]`)
+          ?.textContent?.startsWith(`${n} /`) ?? false,
+      [expected.length, phone ? "region-footer-count" : "region-count"] as const,
       { timeout: SHORT },
     )
     .catch(() => undefined);
   const shown = await allRows(page);
   const problem = compareRows(expected, shown);
   if (problem) fail(problem);
-  const count = await region(page).locator('[data-slot="region-count"]').textContent();
+  const count = await countOf(page, phone).textContent();
   if (!count?.startsWith(`${expected.length} /`)) {
     fail(`loc-dau-cot: so dong dau vung "${count}" khac ${expected.length}`);
   }
@@ -427,6 +517,11 @@ async function firstFilterCheck({ page }: Ctx): Promise<void> {
 /** Matches a region while its first filter box holds text (the box shows its placeholder only when empty). */
 const FILTERING =
   '[data-slot="data-region"]:has([data-slot="column-filter"] input:not(:placeholder-shown))';
+/** Matches the phone list while a filter is on: its chips show (the filter boxes sit in the sheet, shut by then). */
+const PHONE_FILTERING =
+  '[data-slot="data-region"]:has([data-slot="phone-filter-chips"]) [data-slot="phone-list"]';
+/** The phone list's result items while a filter is on, as the page scripts of the breaks find them. */
+const PHONE_ITEMS_JS = `[...document.querySelectorAll('${PHONE_FILTERING} ul > li')]`;
 /** The first filter box, as the page scripts of the breaks find it. */
 const FIRST_FILTER_JS = `document.querySelector('[data-slot="data-region"] [data-slot="column-filter"] input')`;
 
@@ -440,6 +535,54 @@ async function onResult(page: Page, fn: string): Promise<void> {
     new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
     document.addEventListener("input", () => setTimeout(run, 0), true);
   }, fn);
+}
+
+/**
+ * «Chữ dài» on the phone list (design/states.md: no broken layout, a way to read it whole). Every card keeps its text
+ * inside its own box and the page never scrolls sideways; the unit code wraps whole, and a line the card cuts (the
+ * place) is read whole in the card's name — the screen reader's way — and in the record the card opens from the
+ * keyboard. Measured on the card with the longest cut line, or the longest line when none is cut.
+ */
+async function phoneLongText(page: Page): Promise<void> {
+  await phoneCards(page).first().waitFor({ timeout: SHORT });
+  const seen = await phoneCards(page).evaluateAll((cards) => {
+    const broken: string[] = [];
+    let pick = { index: -1, text: "", cut: false };
+    cards.forEach((card, index) => {
+      const box = card.getBoundingClientRect();
+      const code = (
+        card.querySelector('[data-slot="listing-card-unit"]')?.textContent ?? ""
+      ).trim();
+      for (const el of card.querySelectorAll<HTMLElement>("*")) {
+        const b = el.getBoundingClientRect();
+        if (b.width > 0 && (b.right > box.right + 0.5 || b.left < box.left - 0.5))
+          broken.push(code);
+      }
+      for (const el of card.querySelectorAll<HTMLElement>('[data-slot^="listing-card-"]')) {
+        const text = (el.textContent ?? "").trim();
+        const cut = el.scrollWidth > el.clientWidth + 0.5;
+        if ((cut && !pick.cut) || (cut === pick.cut && text.length > pick.text.length))
+          pick = { index, text, cut };
+      }
+    });
+    const sideways =
+      document.scrollingElement!.scrollWidth > document.scrollingElement!.clientWidth;
+    return { broken: [...new Set(broken)], pick, sideways };
+  });
+  if (seen.broken.length > 0 || seen.sideways)
+    fail(`chu-dai: vo bo cuc tren the — ${seen.broken[0] ?? "trang cuon ngang"}`);
+  const card = phoneCards(page).nth(seen.pick.index);
+  if (((await card.getAttribute("tabindex")) ?? "0") === "-1" || !(await card.getAttribute("href")))
+    fail("chu-dai: khong toi duoc bang ban phim");
+  if ((await phoneList(page).getByRole("link", { name: seen.pick.text }).count()) === 0)
+    fail("chu-dai: khong doc du khi focus");
+  await card.focus();
+  await page.keyboard.press("Enter");
+  await page
+    .getByRole("dialog")
+    .first()
+    .waitFor({ timeout: SHORT })
+    .catch(() => fail("chu-dai: the khong mo ho so"));
 }
 
 export const REGION: Recipe[] = [
@@ -544,6 +687,18 @@ export const REGION: Recipe[] = [
     id: "khong-khop",
     state: "Không có dòng nào khớp",
     async check({ page }) {
+      if (await onPhone(page)) {
+        await phoneFilterFill(page, "khong-co-dong-nao-zzz");
+        // Two ways out on the phone list: the chips' «Xoá lọc» and the state's own; either one.
+        const out = region(page).getByRole("button", { name: "Xoá lọc" }).first();
+        await out
+          .waitFor({ timeout: SHORT })
+          .catch(() => fail("khong-khop: thieu loi thoat Xoa loc"));
+        await out.click();
+        if ((await phoneFilterValue(page)) !== "") fail("khong-khop: Xoa loc khong xoa o loc");
+        if ((await phoneCards(page).count()) === 0) fail("khong-khop: Xoa loc khong tra lai dong");
+        return;
+      }
       await firstFilter(page).fill("khong-co-dong-nao-zzz");
       const exit = region(page).getByRole("button", { name: "Xoá lọc" });
       try {
@@ -631,6 +786,7 @@ export const REGION: Recipe[] = [
     id: "chu-dai",
     state: "Chữ dài",
     async check({ page, screen }) {
+      if (await onPhone(page)) return phoneLongText(page);
       const width = page.viewportSize()?.width ?? 0;
       const fits = LONGEST_FITS[screen];
       if (fits?.sizes.includes(width)) {
@@ -684,10 +840,15 @@ export const REGION: Recipe[] = [
         // Kept off on every re-render: the grid marks cut cells again once it has measured its width.
         before: async ({ page }) => {
           await page.addInitScript(() => {
-            const strip = () =>
+            const strip = () => {
               document
                 .querySelectorAll('[data-slot="truncated-text"][data-cut="true"][tabindex]')
                 .forEach((el) => el.removeAttribute("tabindex"));
+              // The phone list (row 2b): its cards are what the keyboard reaches; set once, so no change loops.
+              document
+                .querySelectorAll('[data-slot="phone-card"]:not([tabindex="-1"])')
+                .forEach((el) => el.setAttribute("tabindex", "-1"));
+            };
             new MutationObserver(strip).observe(document, {
               childList: true,
               subtree: true,
@@ -739,7 +900,8 @@ export const REGION: Recipe[] = [
         // Row 2: the run is virtual, so the rule names one result row (number 1) instead of the DOM's last row.
         apply: async ({ page }) => {
           await page.addStyleTag({
-            content: `${FILTERING} tbody tr:has([data-row-number="1"]) { display: none !important; }`,
+            content: `${FILTERING} tbody tr:has([data-row-number="1"]) { display: none !important; }
+              ${PHONE_FILTERING} ul > li:first-child { display: none !important; }`,
           });
         },
       },
@@ -755,7 +917,14 @@ export const REGION: Recipe[] = [
           const window = await visibleRows(page);
           await onResult(
             page,
-            `const box = ${FIRST_FILTER_JS};
+            `const items = ${PHONE_ITEMS_JS};
+             if (items.length > 0) {
+               const left = items.length;
+               const cut = left > 1 && left <= ${window} ? Math.floor(left / 2) : ${window};
+               items.forEach((li, i) => { if (i >= cut) li.style.display = 'none'; });
+               return;
+             }
+             const box = ${FIRST_FILTER_JS};
              if (!box || !box.value) return;
              const left = Number((document.querySelector('[data-slot="region-count"]')?.textContent ?? '').split(' /')[0]);
              const cut = left > 1 && left <= ${window} ? Math.floor(left / 2) : ${window};
@@ -773,7 +942,18 @@ export const REGION: Recipe[] = [
           // Re-applied on every re-render, so the grid cannot drop the extra row.
           await onResult(
             page,
-            `const box = ${FIRST_FILTER_JS};
+            `const items = ${PHONE_ITEMS_JS};
+             if (items.length > 0) {
+               if (document.querySelector('li[data-pha]')) return;
+               const extra = items[0].cloneNode(true);
+               extra.setAttribute('data-pha', '1');
+               extra.style.display = '';
+               const unit = extra.querySelector('[data-slot="listing-card-unit"]');
+               if (unit) unit.textContent = 'zz-khong-khop';
+               items[0].parentNode.appendChild(extra);
+               return;
+             }
+             const box = ${FIRST_FILTER_JS};
              if (!box || !box.value || document.querySelector('tr[data-pha]')) return;
              const row = document.querySelector('[data-slot="data-region-body"] tbody tr:has([data-slot="row-number"])');
              if (!row) return;

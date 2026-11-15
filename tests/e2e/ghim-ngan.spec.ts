@@ -6,6 +6,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
+import { regionHydrated, rowsShown } from "./phone-list";
+
 const WIDE = new Set(["1440", "1024"]);
 const PHONE = new Set(["414", "360"]);
 const PIN = "Ghim thành cột";
@@ -57,11 +59,10 @@ async function openScreen(
     .context()
     .addCookies([{ name: "app_shell_cot2", value: folded ? "0" : "1", url: "http://127.0.0.1" }]);
   await page.goto(path);
-  await region(page).locator("tbody tr").first().waitFor();
+  // Table rows from 768 px, listing cards below it (row 2b).
+  await rowsShown(page);
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
-  await expect(
-    page.locator('[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]').first(),
-  ).toHaveAttribute("tabindex", "0");
+  await regionHydrated(page);
 }
 
 async function openRow(page: Page, n: number): Promise<string> {

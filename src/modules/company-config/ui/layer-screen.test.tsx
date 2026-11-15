@@ -53,6 +53,17 @@ function serve(answer: { status: number; body: unknown } = { status: 200, body: 
 }
 
 beforeAll(() => {
+  // The grid region reads the screen width (row 2b: cards below 768 px); jsdom has no matchMedia.
+  window.matchMedia ??= ((query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    onchange: null,
+    dispatchEvent: () => false,
+  })) as unknown as typeof window.matchMedia;
   tallGridViewport();
   Element.prototype.getAnimations ??= () => [];
   globalThis.ResizeObserver ??= class {

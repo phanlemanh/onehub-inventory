@@ -49,7 +49,8 @@
         "initialFilters",
         "groupBy",
         "initialView",
-        "onViewChange"
+        "onViewChange",
+        "phoneList"
       ]
     },
     {
@@ -89,6 +90,29 @@
       "level": "template",
       "source": "own",
       "props": ["title", "count", "headAction", "rows", "footer", "slot"]
+    },
+    {
+      "name": "PhoneList",
+      "category": "component",
+      "file": "src/components/candidate/phone-list.tsx",
+      "level": "organism",
+      "source": "own",
+      "props": [
+        "list",
+        "data",
+        "columns",
+        "column",
+        "options",
+        "activeFields",
+        "count",
+        "group",
+        "more",
+        "rowAction",
+        "sort",
+        "onOpen",
+        "onClear",
+        "noMatch"
+      ]
     },
     {
       "name": "RecordPanel",
@@ -193,6 +217,13 @@
       "source": "own",
       "parts": ["RowActions"],
       "props": ["main", "actions", "mine", "title"]
+    },
+    {
+      "name": "TouchTarget",
+      "category": "component",
+      "file": "src/components/candidate/touch-target.tsx",
+      "level": "atom",
+      "source": "own"
     },
     {
       "name": "TruncatedText",
