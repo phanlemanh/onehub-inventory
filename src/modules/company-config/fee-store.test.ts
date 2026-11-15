@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import type { DbClient } from "@/modules/identity/server";
 
 import { readFeeSchedule, saveFeeSchedule } from "./fee-store";
+import { label } from "./index";
 import type { RunAs } from "./store";
 
 interface Row {
@@ -174,4 +175,109 @@ describe("fee store", () => {
     expect(r).toEqual({ ok: false, problems: [{ problem: "rate-above-max", index: 2 }] });
     expect(t.rows).toHaveLength(0);
   });
+});
+
+// The name of an item through one save (ruling G N-1511-2): start (default name · own name · an added item) ×
+// what the save does → the name after the save and after a reload. Two senders: the screen, which sends the name of
+// every own item, and an API caller that sends a name only when it renames or resets. Every cell must hold.
+describe("ten-qua-mot-lan-luu", () => {
+  const DEFAULT = label("BrokerageFee");
+  type Start = "ten-mac-dinh" | "ten-tu-dat" | "khoan-them";
+  type Op =
+    | "bat-tat"
+    | "doi-muc"
+    | "tra-ve-mac-dinh"
+    | "them-khoan-khac"
+    | "bo-khoan-khac"
+    | "doi-ten-lan-nua"
+    | "khong-doi-gi";
+  type Sender = "man" | "api";
+  interface D {
+    code?: string;
+    name?: string;
+    rateBasisPoints: number;
+    included: boolean;
+  }
+
+  /** The schedule before the save: brokerage (default or renamed), an extra item to take out, maybe an added item. */
+  async function begin(start: Start) {
+    const t = table();
+    const r = await saveFeeSchedule(t.run, "u1", [
+      ...LAW(),
+      { ...brokerage(100), ...(start === "ten-tu-dat" ? { name: "Hoa hồng" } : {}) },
+      { name: "Phí phụ", rateBasisPoints: 10, included: true },
+      ...(start === "khoan-them"
+        ? [{ name: "Phí hồ sơ", rateBasisPoints: 30, included: true }]
+        : []),
+    ]);
+    if (!r.ok) throw new Error(`không dựng được ${start}`);
+    const subject = start === "khoan-them" ? r.schedule.items.at(-1)!.code : "brokerage";
+    const extra = r.schedule.items.find((i) => i.name === "Phí phụ")!.code;
+    return { t, items: r.schedule.items, subject, extra };
+  }
+
+  const EXPECT: Record<Start, Record<Op, string | null>> = {
+    "ten-mac-dinh": {
+      "bat-tat": DEFAULT,
+      "doi-muc": DEFAULT,
+      "tra-ve-mac-dinh": DEFAULT,
+      "them-khoan-khac": DEFAULT,
+      "bo-khoan-khac": DEFAULT,
+      "doi-ten-lan-nua": "Tên mới",
+      "khong-doi-gi": DEFAULT,
+    },
+    "ten-tu-dat": {
+      "bat-tat": "Hoa hồng",
+      "doi-muc": "Hoa hồng",
+      "tra-ve-mac-dinh": DEFAULT,
+      "them-khoan-khac": "Hoa hồng",
+      "bo-khoan-khac": "Hoa hồng",
+      "doi-ten-lan-nua": "Tên mới",
+      "khong-doi-gi": "Hoa hồng",
+    },
+    // An added item has no default to go back to: the reset is not offered for it.
+    "khoan-them": {
+      "bat-tat": "Phí hồ sơ",
+      "doi-muc": "Phí hồ sơ",
+      "tra-ve-mac-dinh": null,
+      "them-khoan-khac": "Phí hồ sơ",
+      "bo-khoan-khac": "Phí hồ sơ",
+      "doi-ten-lan-nua": "Tên mới",
+      "khong-doi-gi": "Phí hồ sơ",
+    },
+  };
+
+  for (const sender of ["man", "api"] as const satisfies readonly Sender[]) {
+    for (const start of Object.keys(EXPECT) as Start[]) {
+      for (const op of Object.keys(EXPECT[start]) as Op[]) {
+        const want = EXPECT[start][op];
+        if (want === null) continue;
+        it(`${sender} · ${start} · ${op} → «${want}»`, async () => {
+          const { t, items, subject, extra } = await begin(start);
+          let draft: D[] = items.map((i) => {
+            const d: D = { code: i.code, rateBasisPoints: i.rateBasisPoints, included: i.included };
+            if (i.kind === "Own" && sender === "man") d.name = i.name;
+            return d;
+          });
+          const at = (code: string) => draft.findIndex((d) => d.code === code);
+          const s = at(subject);
+          if (op === "bat-tat") draft[s] = { ...draft[s]!, included: !draft[s]!.included };
+          if (op === "doi-muc") draft[s] = { ...draft[s]!, rateBasisPoints: 150 };
+          if (op === "tra-ve-mac-dinh")
+            draft[s] = { ...draft[s]!, name: DEFAULT, rateBasisPoints: 100, included: true };
+          if (op === "them-khoan-khac")
+            draft.push({ name: "Phí khác", rateBasisPoints: 10, included: true });
+          if (op === "bo-khoan-khac") draft = draft.filter((d) => d.code !== extra);
+          if (op === "doi-ten-lan-nua") draft[s] = { ...draft[s]!, name: "Tên mới" };
+          const saved = await saveFeeSchedule(t.run, "u1", draft);
+          if (!saved.ok) throw new Error(`${start} · ${op}: ${JSON.stringify(saved.problems)}`);
+          expect(saved.schedule.items.find((i) => i.code === subject)?.name, "sau Lưu").toBe(want);
+          const reloaded = (await readFeeSchedule(t.run)).items.find((i) => i.code === subject);
+          expect(reloaded?.name, "sau tải lại").toBe(want);
+          if (op === "tra-ve-mac-dinh")
+            expect(reloaded?.source.kind, "về mặc định").toBe("default");
+        });
+      }
+    }
+  }
 });

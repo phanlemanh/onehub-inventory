@@ -488,7 +488,8 @@ describe("giu-ten-va-doi-o-tran (E10, Ngoài-9, Ngoài-8)", () => {
     expect(reloaded.find((i) => i.code === "brokerage")).toMatchObject({
       name: "Hoa hồng",
       source: { kind: "changed" },
-    }); // «Trả về mặc định» then Lưu: the screen sends the default name and rate; the item is the default again.
+    });
+    // The reset then Lưu: the screen sends the default name and rate; the item is the default again.
     const reset = await h.save(
       req(
         "PUT",

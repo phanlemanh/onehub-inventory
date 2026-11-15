@@ -251,6 +251,45 @@ describe("tra-ve-mac-dinh", () => {
   });
 });
 
+// The reset cells of the name table (ruling G N-1511-2), at the screen: whatever name the default item
+// had, a reset then Lưu sends the default name, the default rate and the default switch.
+describe("ten-qua-mot-lan-luu-tren-man", () => {
+  for (const [start, shown] of [
+    ["ten-mac-dinh", label("BrokerageFee")],
+    ["ten-tu-dat", "Hoa hồng"],
+  ] as const) {
+    it(`${start} · tra-ve-mac-dinh`, async () => {
+      const view: FeeScheduleView = {
+        items: VIEW.items.map((i) =>
+          i.code === "brokerage"
+            ? {
+                ...i,
+                name: shown,
+                rateBasisPoints: 250,
+                included: false,
+                source: { kind: "changed", by: "[Tên]", at: AT },
+              }
+            : i,
+        ),
+      };
+      await show("CompanyAdmin", view);
+      fireEvent.click(within(rowOf("brokerage")).getByRole("button", { name: C.more(shown) }));
+      fireEvent.click(await screen.findByRole("menuitem", { name: label("ResetFeeItem") }));
+      fireEvent.click(save()!);
+      await waitFor(() => expect(calls.some((c) => c.method === "PUT")).toBe(true));
+      const put = calls.find((c) => c.method === "PUT")!.body as {
+        items: { code?: string; name?: string; rateBasisPoints: number; included: boolean }[];
+      };
+      expect(put.items.find((i) => i.code === "brokerage")).toEqual({
+        code: "brokerage",
+        name: label("BrokerageFee"),
+        rateBasisPoints: 100,
+        included: true,
+      });
+    });
+  }
+});
+
 describe("chi-doc-khi-khong-quyen", () => {
   for (const role of ["ListAgent", "BuyerAgent", "TeamLead"] as const) {
     it(role, async () => {
