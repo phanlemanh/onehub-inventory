@@ -1240,75 +1240,12 @@
       "props": ["value", "onValueChange", "commit", "labels", "autoFocusProps", "field"]
     },
     {
-      "name": "FilterChip",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FilterOperatorPopover",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FilterRuleMenuItems",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FilterValuePopover",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FiltersAdvanced",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FiltersAdvancedPanel",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FilterAdvancedRow",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FiltersBuilder",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
-      "name": "FilterFieldPicker",
-      "category": "component",
-      "file": "src/components/reui/filters/filters.tsx",
-      "level": "organism",
-      "source": "library"
-    },
-    {
       "name": "Filters",
       "category": "component",
       "file": "src/components/reui/filters/filters.tsx",
       "level": "organism",
       "source": "library",
-      "parts": ["FiltersAdvanced", "FiltersRow"],
+      "parts": ["FiltersRow"],
       "props": [
         "fields",
         "query",
@@ -1343,7 +1280,6 @@
       "file": "src/components/reui/filters/filters.tsx",
       "level": "organism",
       "source": "library",
-      "parts": ["FilterChip", "FiltersBuilder"],
       "props": ["trigger", "showClear"],
       "variants": ["size=sm", "size=default"],
       "defaults": {
