@@ -21,6 +21,7 @@ import { regionReady } from "./phone-list";
 
 test.beforeEach(() => {
   test.skip(test.info().project.name !== "360", "sets its own viewport; runs once");
+  test.slow();
 });
 
 const SIZES = [
@@ -91,8 +92,9 @@ async function record(
     requestAnimationFrame(tick);
   }, brk);
   await page.goto("/inventory?vai=ListAgent");
-  await page.locator('[data-slot="data-region"]').waitFor();
-  await page.waitForLoadState("networkidle");
+  // Recording runs until the region is hydrated (one layout only); with the CPU slowed six times on CI that can take
+  // most of a minute, so these tests get three times the timeout and the wait its own 60 s cap.
+  await regionReady(page, 60_000);
   const frames = await page.evaluate(() => (window as unknown as { __frames: Frame[] }).__frames);
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
   return frames;

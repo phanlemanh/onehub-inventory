@@ -508,6 +508,7 @@ test("remove", async ({ page }, info) => {
   await expect(page.locator('[data-slot="saved-view-missing"]')).toContainText(
     `${label("SavedView")} này không còn`,
   );
+  await regionReady(page);
   await expect(region(page).locator('[data-slot="region-footer-count"]')).toHaveText("60 dòng");
 
   // Removing a view that is not open keeps the place.

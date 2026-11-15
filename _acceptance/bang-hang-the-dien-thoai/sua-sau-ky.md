@@ -43,5 +43,12 @@ Thêm theo XONG D-1511-14, mỗi hàm một dòng `await regionReady(page)`, cá
 `loi-vao-ho-so.spec.ts` qua `openInventory` (`:196`, `:215`, `:490`, hai chỗ «Không có dòng nào khớp») và
 `e2e-db/goc-nhin.spec.ts` qua `settled` (`:445`, `:672`, hai chỗ đếm dòng).
 
+Lượt CI trên `7c45689` (XONG D-1511-15): `goc-nhin.spec.ts` bài `remove` đọc «60 dòng» ngay sau `page.goto`, không qua
+`settled` — thêm một dòng `regionReady` trước chỗ đọc. Rà cả `tests/e2e` và `tests/e2e-db` tìm chỗ đọc số dòng hay đếm
+thẻ ngay sau `page.goto` mà không chờ trang nhận xong: còn `screens/inventory-width.spec.ts` hàm `measure`, thêm một dòng
+như trên. Các chỗ khác đã chờ dấu nhận trang của bảng (`tabindex="0"`) hoặc một hàm chờ chung. `bang-loe.spec.ts` (tệp
+của lượt này): ba bài ghi khung hết giờ ở CI vì chờ mạng yên khi CPU chậm 6 lần — nay chờ dấu nhận trang (trần 60 giây),
+thời hạn bài gấp ba.
+
 Lớp «vẽ chân vùng và trạng thái rỗng một lần» không làm (G cho bỏ, XONG D-1511-14): hai chỗ ấy nằm ở hai vị trí khác
 nhau trên màn (thanh trên của thẻ, chân bảng), gộp lại là đổi điều người dùng thấy.
