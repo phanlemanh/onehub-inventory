@@ -3,14 +3,14 @@
 //   tap-cap-bang-tich     — the suite's pairs are exactly the built staff screens × the four roles (AC-2).
 //   cua-dang-nhap-chung   — the role × screen suite never signs in by itself and never names a screen by hand (AC-3).
 //   thanh-ben-khop-so-man — the sidebar gates each screen with the same action as the register (AC-7).
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { afterAll, describe, expect, it } from "vitest";
 
 import { NAV } from "../src/app/(app)/nav";
 import { buttonTable, pairs } from "./e2e-db/vai-man";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(import.meta.dirname, "..");
 const SPEC = "tests/e2e-db/vai-man.spec.ts";
@@ -22,7 +22,7 @@ afterAll(() => {
 
 /** A copy of what the register readers read, with design/screens.yaml changed by `change`. */
 function registerCopy(change: (text: string) => string): string {
-  const dir = mkdtempSync(join(tmpdir(), "vai-man-so-man-"));
+  const dir = tempDir("vai-man-so-man-");
   copies.push(dir);
   for (const part of ["ontology", "design", "src", "tools"])
     cpSync(join(ROOT, part), join(dir, part), { recursive: true });

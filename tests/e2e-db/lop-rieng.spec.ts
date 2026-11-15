@@ -26,6 +26,7 @@ import { SAMPLE_LISTINGS_PER_SUBDIVISION } from "../../src/modules/listings";
 import { waitReady } from "../../tools/e2e_templates/runner";
 import { openSheet, shown } from "../../tools/e2e_templates/settle";
 
+import { readHeaders } from "./column-headers";
 import { ROLES, signInWithCode } from "./dang-nhap-vai";
 
 const RUN = process.env["E2E_DB_RUN"] ?? `${process.pid}`;
@@ -118,20 +119,15 @@ const STANDARD = [
 
 const region = (page: Page) => page.locator('[data-slot="data-region"]').first();
 
-/** The headers of the grid's columns in order, read from the first header row. */
+/**
+ * The headers of the grid's columns in order, read from the first header row once the grid has hydrated: before that
+ * the server's HTML may still be replaced by the client's (column-headers.ts says how a title is read).
+ */
 async function headers(page: Page): Promise<string[]> {
-  await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  await waitReady(page);
   const head = region(page).locator('[data-slot="data-region-body"] thead tr:first-child');
   await expect(head.locator("th[data-col-id]").first()).toBeVisible();
-  return head.evaluate((tr) =>
-    [...tr.querySelectorAll<HTMLElement>("th[data-col-id]")]
-      .filter((th) => th.dataset["colId"]!.includes("."))
-      .map(
-        (th) =>
-          th.querySelector("[data-slot=column-header-label]")?.textContent?.trim() ??
-          th.innerText.split("\n")[0]!.trim(),
-      ),
-  );
+  return head.evaluate(readHeaders);
 }
 
 type Api = Page["request"];

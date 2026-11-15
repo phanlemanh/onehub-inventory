@@ -3,19 +3,12 @@
 // row 9b, the `vong_doi` block of each entity, the permission table, the roadmap and the gate ledger lines. Each case
 // below breaks one rule on a copy of what the tool reads and pins the line it must print; the copy has no .git.
 import { spawnSync } from "node:child_process";
-import {
-  cpSync,
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(import.meta.dirname, "..");
 const TOOL = join(ROOT, "tools/coverage_matrix/lifecycle.py");
@@ -74,7 +67,7 @@ const PARTS = [
 
 /** A copy of what the tool reads, without .git. */
 function copy(): string {
-  const dir = mkdtempSync(join(tmpdir(), "vong-doi-"));
+  const dir = tempDir("vong-doi-");
   made.push(dir);
   (current ?? orphans).push(dir);
   for (const part of PARTS) {

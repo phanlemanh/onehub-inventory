@@ -11,16 +11,7 @@
 //
 // The real tree must be clean: PENDING held the findings the build step of row 9e converted (the members screen and
 // the sidebar, plan step 8) and is empty since; a new violation turns red with its file and line.
-import {
-  mkdtempSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -29,6 +20,7 @@ import { afterAll, describe, expect, it } from "vitest";
 
 import { ACTIONS, PERMISSION_EXEMPT } from "../src/generated/ontology";
 import { ROLES } from "../src/modules/identity";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -295,7 +287,7 @@ describe("bộ kiểm nút đi đường khác (hàng 9e, AC-3)", () => {
 
     /** A throwaway tree: the identity constants, plus the given screen files. */
     function tree(files: Record<string, string>): string {
-      const root = mkdtempSync(join(tmpdir(), "bo-nut-kiem-"));
+      const root = tempDir("bo-nut-kiem-");
       made.push(root);
       const all: Record<string, string> = {
         "src/modules/identity/constants.ts":

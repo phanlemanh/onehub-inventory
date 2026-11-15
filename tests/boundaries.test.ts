@@ -1,9 +1,9 @@
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import { describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 const MODULES = `modules:
   - name: listings
@@ -15,7 +15,7 @@ const MODULES = `modules:
 `;
 
 function errorsFor(files: Record<string, string>): string[] {
-  const root = mkdtempSync(join(tmpdir(), "boundaries-"));
+  const root = tempDir("boundaries-");
   const all: Record<string, string> = {
     "architecture/modules.yaml": MODULES,
     "src/modules/listings/index.ts": "export {};\n",

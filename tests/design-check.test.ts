@@ -1,13 +1,13 @@
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 function run(decisions: string, setup: (root: string) => void = () => {}) {
-  const root = mkdtempSync(join(tmpdir(), "design-check-"));
+  const root = tempDir("design-check-");
   mkdirSync(join(root, "design"));
   mkdirSync(join(root, "tests"));
   mkdirSync(join(root, "tools"));
