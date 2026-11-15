@@ -132,3 +132,6 @@ CI thật đo ở AC-10 khi bản vá vào PR (Hỏi-1). Lượt dựng lại (A
   `vitest.db.config.ts`), `tests/support/temp-dir.ts` (lối chung `tempDir()` cho bài trong `tests/`), bài chặn
   `tests/temp-dir-guard.test.ts`. Sau sửa, một lượt `make test` để lại 0 thư mục của bài kiểm tra. Lời AC-8 không đổi;
   thư mục dựng tạm của Playwright vẫn theo luật cũ.
+  Dòng `globalSetup` ở `vitest.config.ts` là đường được bảo vệ (hạng cao): chủ kho duyệt ngày 2026-11-15 (~00:54Z, phiên
+  giám sát), nguyên văn «Cho», trả lời câu «Cho PR 66 thêm một dòng vào tệp cấu hình bộ kiểm?» — đúng một dòng ấy, không
+  gì khác trong tệp.
