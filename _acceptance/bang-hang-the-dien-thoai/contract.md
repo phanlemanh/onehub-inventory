@@ -63,7 +63,7 @@ Luật sản phẩm chạm: không (SP-1, SP-3, SP-4 đọc lại; màn này tro
   sáng và tối, không lỗi; ai vào được Bảng hàng là theo luật vào của màn trong sổ màn, đọc qua bảng quyền như cửa của
   9b — vai bị luật ấy chặn thấy khối không đủ quyền, không thẻ, ở mọi khổ; hôm nay sổ màn để Bảng hàng mở cho mọi vai
   (`vao: null`), nên Quản trị sàn thấy thẻ, chỉ đọc, không nút, đúng sổ vai × màn đã ký của 9b. (Sửa sau chữ ký
-  2026-11-15 · chờ chủ kho xác nhận — bản đã ký viết «Quản trị sàn thấy câu không đủ quyền, không thẻ»; xem Notes.)
+  2026-11-15 · chủ kho đã xác nhận — bản đã ký viết «Quản trị sàn thấy câu không đủ quyền, không thẻ»; xem Notes.)
 - AC-11: Given Bảng hàng dưới 768 khi màn có nút theo vai (khuôn 9e), When người dùng mở danh sách thẻ, Then nút thêm
   căn nằm ở đầu màn và việc của một căn (Sửa, Xoá căn) nằm theo Hỏi-3 (khuyến nghị: «…» cuối mỗi thẻ và ở đầu hồ sơ; lối
   kia: chỉ ở đầu hồ sơ); nút chỉ hiện với vai có quyền theo bảng quyền (Đầu chủ: Sửa, Xoá căn của mình; Đầu khách: Sửa;
@@ -166,7 +166,7 @@ Ngưỡng SỐNG của ô cơ hội, từng vế:
   - Ngoài-8: Một phép kiểm thẻ vắng mặt luôn qua; ca hỏi lại trước khi xoá căn chưa được kiểm.
   - Ngoài-9: Bài kiểm chưa chắc bắt được thẻ mang sai trạng thái hay sai nơi.
   - Ngoài-10: Chỉ bộ lọc được kiểm còn nguyên khi xoay hay đổi cỡ màn qua ngưỡng điện thoại; sắp xếp và nhóm chưa.
-- Sửa sau chữ ký 2026-11-15 · chờ chủ kho xác nhận (giám sát chốt V-1511-1, V-1511-2):
+- Sửa sau chữ ký 2026-11-15 · chủ kho đã xác nhận (giám sát chốt V-1511-1, V-1511-2):
   - Lượt ghim lại sau khi gộp main cho thấy ca «Quản trị sàn thấy câu không đủ quyền, không thẻ» chỉ qua khi thẻ chưa kịp
     vẽ: mã chưa hề chặn Quản trị sàn. Chữ ký 15/11 đặt trên một ca qua giả ở AC-9.
   - Sổ vai × màn của 9b đã ký ghi Quản trị sàn được xem Bảng hàng cho tới khi hàng 10 đặt luật vào. Hàng này nay dựng cửa
@@ -174,7 +174,7 @@ Ngưỡng SỐNG của ô cơ hội, từng vế:
     quyền xem bảng hàng) chứng cửa chặn đúng: câu không đủ quyền, không thẻ.
   - Chủ kho đã quyết ở Cổng Phạm vi hàng 10 ngày 2026-11-15: Quản trị sàn được xem Bảng hàng, chỉ đọc (sổ hồ sơ
     bang-hang-du-lieu-that, dòng d-20261115T042755Z-29). Vế «Quản trị sàn thấy câu không đủ quyền» của AC-9 bỏ theo quyết
-    định ấy; cửa chặn theo luật vào vẫn giữ. Còn chờ chủ kho xác nhận lại chữ ký trên bằng chứng mới.
+    định ấy; cửa chặn theo luật vào vẫn giữ. Chủ kho xác nhận lại chữ ký trên bằng chứng mới ngày 2026-11-15 («giữ chữ ký»).
   - Ngoài-11 gỡ khỏi Known limits: bài kiểm vai nay chờ vùng ổn định và có thẻ rồi mới đếm, ca cửa chờ câu rồi mới đếm.
     Rà cả bộ bài của hàng này không thấy ca nào khác cùng hình qua giả.
 
