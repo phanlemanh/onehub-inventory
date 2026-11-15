@@ -1106,8 +1106,14 @@ export function DataRegion({
     // words the grid fills them with (it repeats the row's own cells), so they change nothing and are not listed.
     if (block) {
       const rowsInOrder = [...new Set(cells.map((c) => c.row.id))];
+      // Columns in the order the grid shows them, pinned ones first, as the grid lays the block over them.
+      const shown = [
+        ...table.getStartVisibleLeafColumns(),
+        ...table.getCenterVisibleLeafColumns(),
+        ...table.getEndVisibleLeafColumns(),
+      ].map((column) => column.id);
       const fieldsInOrder = [...new Set(cells.map((c) => c.field))].sort(
-        (a, b) => visibleFields.indexOf(a) - visibleFields.indexOf(b),
+        (a, b) => shown.indexOf(a) - shown.indexOf(b),
       );
       for (const c of cells) {
         const line = block.lines[rowsInOrder.indexOf(c.row.id) % block.rows] ?? [];

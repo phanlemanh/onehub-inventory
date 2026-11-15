@@ -433,6 +433,27 @@ test.describe("dan-tu-excel", () => {
     ).toHaveCount(0);
   });
 
+  test("dong-ngan-cot-ghim", async ({ page }) => {
+    at1440();
+    await openInventory(page);
+    const rows = await rowsWhere(page, 2, priced, "dong-ngan-cot-ghim");
+    // Pinning «Giá chào» puts it before columns that come earlier in the table's own order.
+    const header = page
+      .locator(`[data-slot="data-region-body"] th[data-col-id="${PRICE}"]`)
+      .first();
+    await header.getByRole("button").first().click();
+    await page.getByRole("menuitem", { name: "Ghim bên trái" }).click();
+    await page.keyboard.press("Escape");
+    await select(page, rows[0]!.id, PRICE);
+    await pasteText(page, `${money(nudged(rows[0]!))}\tchữ a\n${money(nudged(rows[1]!))}\n`);
+    await expect(preview(page)).toBeVisible();
+    for (const r of rows)
+      await expect(
+        changeLine(page, r.id, PRICE).locator('[data-part="to"]'),
+        "dong-ngan-cot-ghim: giá dán bị mất",
+      ).toHaveText(money(nudged(r)));
+  });
+
   test("loc-khong-ghi-dong-an", async ({ page }) => {
     at1440();
     await openInventory(page);

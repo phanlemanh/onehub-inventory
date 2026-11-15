@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "dan-tu-excel",
-  "ghi_luc": "2026-11-15T10:51:23Z",
-  "vong_cham": 3,
+  "ghi_luc": "2026-11-15T11:32:44Z",
+  "vong_cham": 4,
   "luot": [
     {
       "vong": 1,
@@ -20,6 +20,11 @@
     },
     {
       "vong": 3,
+      "verdict": "PASS",
+      "tang": []
+    },
+    {
+      "vong": 4,
       "verdict": "PASS",
       "tang": []
     }
