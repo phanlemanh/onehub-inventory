@@ -189,6 +189,20 @@ describe("temporary folders are removed after the test run", () => {
     expect([process.pid, process.ppid]).toContain(pid);
   });
 
+  it("the helper also works outside vitest (Playwright loads it) and removes its folders on exit", () => {
+    const base = tempDir("temp-dir-node-");
+    const script = `const m = await import(${JSON.stringify(join(process.cwd(), HELPER))}); console.log(m.tempDir("x-"));`;
+    const env = { ...process.env, TMPDIR: base };
+    delete env["VITEST"];
+    const r = spawnSync(process.execPath, ["--input-type=module", "-e", script], {
+      env,
+      encoding: "utf8",
+    });
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.stdout.trim().startsWith(base)).toBe(true);
+    expect(readdirSync(base)).toEqual([]);
+  });
+
   it("the helper removes its folders when the file ends", () => {
     const helper = readFileSync(HELPER, "utf8");
     expect(helper).toMatch(/afterAll\(removeAll\)/);

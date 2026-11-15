@@ -13,8 +13,10 @@ function removeAll(): void {
   for (const dir of made.splice(0)) rmSync(dir, { recursive: true, force: true });
 }
 
-// Imported at the top of a test file, so this hook belongs to that file's root suite.
-afterAll(removeAll);
+// Imported at the top of a vitest file, so this hook belongs to that file's root suite. Playwright's database tests
+// share tests/db/helpers.ts and load this file too, where vitest hooks cannot be called: there the folders go when the
+// worker process exits.
+if (process.env["VITEST"]) afterAll(removeAll);
 process.once("exit", removeAll);
 
 /** A new empty folder in the system's temporary folder, removed when the test file ends. */
