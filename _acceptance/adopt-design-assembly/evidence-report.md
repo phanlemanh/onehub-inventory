@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: ff0339aa7e2ccb104e0b96864bcfdd9c0b5ac433
+verified_commit: e64a411a48e460485f4068eb42e2faa88242842e
 human_signoff: Manh Phan 2026-11-15
 ---
 
@@ -200,3 +200,7 @@ none — mọi eval nhiều lượt đều đồng nhất (không eval nào ch�
 
 Round 1: REJECT — một phát hiện nặng thuộc AC-2: lệnh kiểm chạy lại luật lint coi một quyết định là «được giữ» bởi luật nêu tên ngay cả khi luật ấy không chạy (spacing vẫn xanh khi no-off-scale-spacing bị tắt). Trả về triển khai; AC-2 được sửa lại (17 quyết định, tám luật) và chủ kho duyệt lại.
 Round 2: mọi eval chạy lại (E1, E2, E3, E5, E6, E7, E10, E12, E14) đều đạt; E4, E8, E11, E13 mang từ round 1 vì delta không chạm paths của chúng. E9 còn chờ người quyết ở Cổng 2, nên kết luận là PENDING-JUDGMENT.
+
+### Re-pin lần 1 — 2026-11-15, do gộp main lần ba sau chữ ký Cổng Bằng chứng
+run_id: repin-20261114T235331Z-22703
+sha: e64a411a48e460485f4068eb42e2faa88242842e · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E9 (E9 không khai paths) · AC không có chốt máy: AC-9
