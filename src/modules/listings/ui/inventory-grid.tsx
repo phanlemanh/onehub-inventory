@@ -62,6 +62,7 @@ export function InventoryGrid({
   editLabels,
   door,
   live = false,
+  readFailed = false,
   noActivate,
   geoTree,
 }: {
@@ -98,6 +99,8 @@ export function InventoryGrid({
   door?: ListingSaveDoor;
   /** The rows are the company's real listings (row 10): edits go to /api/v1 and «Tải lại» reads them again. */
   live?: boolean;
+  /** The company's listings could not be read (row 10): «Thử lại» reads them again from the server. */
+  readFailed?: boolean;
   /** Rows whose status cell does not offer Active to this person (row 10, AC-5). */
   noActivate?: readonly string[];
   /** 2d: the places of the grid's rows; the second column's place entries then filter the grid in place. */
@@ -199,7 +202,7 @@ export function InventoryGrid({
         columns={columns}
         rows={shown}
         status={status}
-        onRetry={() => (live ? router.refresh() : setCurrent("ready"))}
+        onRetry={() => (readFailed ? router.refresh() : setCurrent("ready"))}
         record={record}
         emptyWhy={emptyWhy}
         initialFilters={filters}

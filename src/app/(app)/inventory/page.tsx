@@ -241,6 +241,7 @@ export default async function Page({ searchParams }: Props) {
           source.kind === "unreadable" ? "error" : inventoryStateFrom(state, process.env.NODE_ENV)
         }
         live={live}
+        readFailed={source.kind === "unreadable"}
         noActivate={noActivate}
         emptyWhy={`${label("Company")} chưa có ${label("Unit").toLocaleLowerCase("vi")} nào đang chào trên ${label("Inventory")}.`}
         reloadLabel="Tải lại"
