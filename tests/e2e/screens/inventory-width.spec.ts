@@ -2,7 +2,7 @@
 // narrow sizes the page itself never scrolls sideways; the test prints how many data columns are fully in view.
 import { expect, test, type Page } from "@playwright/test";
 
-import { assertCardsNotTable, isPhone, rowsShown } from "../phone-list";
+import { assertCardsNotTable, isPhone, regionReady, rowsShown } from "../phone-list";
 
 const URL = "/inventory";
 
@@ -11,6 +11,7 @@ async function measure(
   page: Page,
 ): Promise<{ full: number; total: number; overflow: number; pageOverflow: number }> {
   await page.goto(URL);
+  await regionReady(page);
   await page.locator('[data-slot="data-region"] tbody tr').first().waitFor();
   await page.waitForFunction(
     () =>

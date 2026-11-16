@@ -8,11 +8,11 @@
 //   bang-du-muc            — the generated file has 10 sections of 3 columns and 4 role rows.
 //   nut-khong-co-trong-bang — a declared button outside the permission table is red.
 import { spawnSync } from "node:child_process";
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { afterAll, describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(import.meta.dirname, "..");
 const TOOL = join(ROOT, "tools/coverage_matrix/buttons.py");
@@ -40,7 +40,7 @@ afterAll(() => {
 
 /** A copy of everything the tool reads: the ontology, the register, the generated file and the sources. */
 function copy(): string {
-  const dir = mkdtempSync(join(tmpdir(), "vai-man-nut-sinh-"));
+  const dir = tempDir("vai-man-nut-sinh-");
   copies.push(dir);
   for (const part of ["ontology", "design/screens.yaml", "design/vai-man-nut.md", "src"])
     cpSync(join(ROOT, part), join(dir, part), { recursive: true });

@@ -2,12 +2,12 @@
 // npx, the isolation runner and the count are fakes that fail on demand. The matrix of red steps is written before the
 // code (evals.yaml).
 import { spawnSync } from "node:child_process";
-import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { chmodSync, copyFileSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const STEPS = ["chuan-bi", "cach-ly", "bai-db", "co-phien", "khong-phien", "dem"];
@@ -30,7 +30,7 @@ function exe(path: string, body: string): void {
 
 /** A copy of the repository's shape with the real ci-db.sh and fakes around it. */
 function world(realCount = false): string {
-  const d = mkdtempSync(join(tmpdir(), "ci-db-"));
+  const d = tempDir("ci-db-");
   mkdirSync(join(d, "db/scripts"), { recursive: true });
   copyFileSync(join(ROOT, "db/scripts/ci-db.sh"), join(d, "db/scripts/ci-db.sh"));
   exe(join(d, "db/scripts/migrate.sh"), 'echo "xong — 0 migration mới"');

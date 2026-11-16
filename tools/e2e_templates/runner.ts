@@ -42,6 +42,32 @@ export function sentToSignIn(page: Page, route: string): boolean {
   return new URL(page.url()).pathname === "/login" && route.split("?")[0] !== "/login";
 }
 
+/** What a page that shows content has: a grid or table, the thing a grid screen's verdict is read from. */
+export const CONTENT = '[data-slot="data-region"], table, [role="grid"], [role="table"]';
+
+/**
+ * Where the page that opened `route` lands: the sign-in page, or a page that shows its content. A redirect to sign-in
+ * can come after the first read — once the page hydrates, or late on a loaded machine — so a verdict never rests on
+ * the first page the browser shows: it waits, up to `timeout`, for one of the two to be there. A page that shows
+ * neither by then is read as it is, as before.
+ */
+export async function landing(
+  page: Page,
+  route: string,
+  timeout = 15_000,
+): Promise<"sign-in" | "page"> {
+  await followRedirect(page);
+  await page
+    .waitForFunction(
+      ({ content, signIn }) =>
+        (signIn && location.pathname === "/login") || document.querySelector(content) !== null,
+      { content: CONTENT, signIn: route.split("?")[0] !== "/login" },
+      { timeout },
+    )
+    .catch(() => undefined);
+  return sentToSignIn(page, route) ? "sign-in" : "page";
+}
+
 /**
  * The path a case opens: the recipe's `?…` query joined to the screen's path. A path that already has a query (a
  * declared `vao_vung`, row 7e) gets the recipe's parameters after `&`; a path without one is unchanged from before.

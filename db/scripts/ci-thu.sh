@@ -90,7 +90,10 @@ kho="$tmp/kho"
 echo "ci-thu: ── ban sao nong cua $sha"
 git init -q "$kho" &&
   git -C "$kho" fetch -q --depth 1 "file://$root" "$sha" &&
-  git -C "$kho" checkout -q FETCH_HEAD || {
+  git -C "$kho" checkout -q FETCH_HEAD &&
+  # Like the CI checkout, the copy has `origin`: in a shallow copy the proof gate fetches a block exemption's commit
+  # from the remote (tools/proof_gate/legacy.py, since 978d2d2), and fails without one.
+  git -C "$kho" remote add origin "file://$root" || {
   echo "ci-thu: không lấy được bản sao nông"
   exit 1
 }
