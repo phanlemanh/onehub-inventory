@@ -1,47 +1,46 @@
-# Review findings: moi-truong-thu-va-ban-that (round 7)
-
 ## Trong hợp đồng
 
-- **Runbook step 4 does not list the new restore version-mismatch lines; the source-server line has no remedy**
-  AC: AC-9
-  file: `docs/van-hanh/khoi-phuc.md:71`
+- **Runbook gives opposite fixes for one version mismatch: 'back up again' and 'do NOT back up again' both print**
+  file: `docs/van-hanh/khoi-phuc.md:83`
   severity: medium
-  source: conventions
-  detail: khoi-phuc-thu.sh now stops (exit 2) with four new pinned lines before it creates the scratch database. Step 4's «Đỏ thì» list (lines 71-77) does not include any of them. The prerequisites paragraph (lines 26-28) mentions only `pg_restore bản …` and `tệp sao lưu lấy bằng pg_dump …` with the fix «sao lưu lại». No part of the runbook covers the line `khoi-phuc: tệp sao lưu từ máy chủ bản <a>, máy chủ khôi phục bản <b> — khôi phục vào máy chủ cùng bản với máy chủ gốc`, and that one needs a different fix: restore onto a server of the same version, not back up again. It also omits `không đọc được bản của pg_restore` / `máy chủ khôi phục`, `pg_restore không đọc được tệp sao lưu`, and `tệp sao lưu không ghi bản pg_dump …`. That breaks the runbook pattern in which every red line the script prints has a «Đỏ thì» entry at the step where it appears (step 3 was updated for the matching sao-luu line, line 63). An operator who hits one of these at step 4 finds no guidance there.
-
-- **Restore runbook step 4 does not list the new red lines of khoi-phuc-thu.sh, including the 'backup from another server version' stop**
   AC: AC-9
-  file: `docs/van-hanh/khoi-phuc.md:71`
-  severity: low
   source: bugs
-  detail: khoi-phuc-thu.sh can now stop with exit 2 on several new lines: 'tệp sao lưu từ máy chủ bản <a>, máy chủ khôi phục bản <b> — khôi phục vào máy chủ cùng bản với máy chủ gốc', 'không đọc được bản của máy chủ khôi phục', 'không đọc được bản của pg_restore', 'pg_restore không đọc được tệp sao lưu' and 'tệp sao lưu không ghi bản pg_dump…'. The 'Đỏ thì' list of step 4 has none of them. The prerequisites paragraph covers only the 'pg_restore bản …' and 'tệp sao lưu lấy bằng pg_dump …' lines. The 'từ máy chủ bản' line will fire once Supabase upgrades the major version of the staging server and an older backup is restored, and an operator has no documented fix for it. The runbook's own rule (where, what to type, done when, red when) is missing for these outcomes, and E10 is judged on exactly that rule. Smaller point: the example line in the prerequisites ('pg_dump bản 18, máy chủ bản 17 — …') leaves out the 'sao-luu: ' prefix the script actually prints.
+  detail: Since 44385ef, sao-luu.sh stops unless pg_dump has the same major version as the source server (sao-luu.sh:98). So every file made by `make sao-luu` has ban_dump == ban_goc. In khoi-phuc-thu.sh:105-113 the two checks run one after the other and do not exclude each other. They set lech_ban and only exit after both. When a file comes from a server of another version (the case this commit means to cover), the operator therefore always sees TWO stop lines together. The first is `tệp sao lưu lấy bằng pg_dump bản <a>, máy chủ khôi phục bản <b> — sao lưu lại bằng công cụ cùng bản`. The second is `tệp sao lưu từ máy chủ bản <a>, máy chủ khôi phục bản <b>`. The new step-4 remedies tell the operator, for the first line, to 'cài công cụ cùng bản rồi làm lại từ bước 3 (sao lưu lại)'. For the second line they say '**KHÔNG sao lưu lại** (sao lưu lại sẽ lấy dữ liệu hiện tại…)'. The runbook does not say which wins, and the script's own text for the first line also says to back up again. The pg_dump line can never appear on its own for a file from `make sao-luu`, so it always comes with the server line. An operator who follows the first remedy re-dumps the current data, which is exactly the mistake the commit warns about. The same contradiction holds for the 'unsupported version' line (khoi-phuc-thu.sh:92; doc line 'tệp sao lưu lấy bằng pg_dump mới hơn bản <b>' -> 'sao lưu lại'). For a `make sao-luu` file, that line means the source server is newer than the restore server. The 'Cần có trước' paragraph repeats 'tệp sao lưu lấy bằng pg_dump … — sao lưu lại'. Fix: when ban_goc != ban_may_chu, print only the server line (or let it take precedence), and make the doc and script messages agree.
+  rationale: AC-9 đòi người vận hành chưa từng làm theo được quy trình khôi phục mà không đọc mã; hai cách xử lý trái nhau cho cùng một lần lệch bản làm điều đó thất bại.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Test client now picks the container differently from ci-db.sh, but the header still says they choose the same way**
+- **Assert 'chuỗi có mặt' trong khi lời hứa là QUAN HỆ (dòng dừng -> cách xử lý của chính nó)**
+  Người dùng thấy gì: Nếu ai đó xoá cách xử lý của một dòng dừng khi khôi phục khỏi sổ tay, bài kiểm vẫn báo xanh. Người vận hành có thể gặp dòng dừng mà sổ tay không chỉ cách làm, và không ai biết trước.
+  Căn cứ: Không mất dữ liệu và không ảnh hưởng người dùng cuối, chỉ làm lưới bảo vệ sổ tay lỏng hơn; lỗi chỉ lộ khi sổ tay bị sửa sai sau này, và siết lại bài kiểm sau cũng rẻ.
+  file: `tests/van-hanh.test.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Test client now picks the container differently from ci-db.sh, but the header still says they choose the same way (r7)**
   Người dùng thấy gì: Công cụ kiểm thử và lệnh dựng cơ sở dữ liệu của CI chọn máy khách theo hai cách hơi khác nhau, nên lời mô tả ở đầu tệp không còn đúng. Người dùng cuối không thấy gì; chỉ người bảo trì có thể bị nhầm khi đọc.
   Căn cứ: Hậu quả chỉ là mô tả sai cho người bảo trì, không mất dữ liệu và không ảnh hưởng người dùng; sửa lại sau rất rẻ.
   file: `tests/db/may-khach-pg.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Evidence page carries E8 (and E10) forward as PASS although HEAD changed the backup and restore scripts, their test and the restore runbook**
+- **Evidence page carries E8 (and E10) forward as PASS although HEAD changed the backup and restore scripts, their test and the restore runbook (r7)**
   Người dùng thấy gì: Trang bằng chứng ghi sao lưu và khôi phục là đạt dựa trên lần chạy cũ, trước khi mã được sửa. Người ký có thể ký trên một kết quả chưa được đo lại với mã hiện tại.
   Căn cứ: Không mất dữ liệu của người dùng, nhưng chữ ký dựa trên số đo cũ; chạy lại phép đo là việc nhẹ và người ký tự thấy được ngay.
   file: `_acceptance/moi-truong-thu-va-ban-that/evidence-page.html`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): ca «pg_dump mới hơn, pg_restore không đọc được đầu tệp» dùng câu lỗi tự viết khớp đúng chữ mà script grep**
+- **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): ca «pg_dump mới hơn, pg_restore không đọc được đầu tệp» dùng câu lỗi tự viết khớp đúng chữ mà script grep (r7)**
   Người dùng thấy gì: Phép thử cho trường hợp tệp sao lưu từ máy chủ bản mới hơn dùng câu báo lỗi tự viết, chưa kiểm với công cụ thật. Nếu công cụ thật báo khác đi, người vận hành có thể thấy thông báo lỗi kém rõ hơn khi khôi phục.
   Căn cứ: Chỉ ảnh hưởng thông báo lỗi trong ca hiếm, khôi phục vẫn dừng an toàn và không làm mất dữ liệu; người vận hành thử lại được.
   file: `tests/db/sao-luu.db.test.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **pgClient chooses the port without reading PSQL or TEST_ADMIN_URL, so the scripts can hit a different cluster from the scratch DB (r6 · tệp đã đổi)**
+- **pgClient chooses the port without reading PSQL or TEST_ADMIN_URL, so the scripts can hit a different cluster from the scratch DB (r6)**
   Người dùng thấy gì: Người vận hành không dùng cấu hình chuẩn có thể thấy các bài kiểm sao lưu, khôi phục và cách ly báo đỏ vì chúng nối nhầm sang một máy cơ sở dữ liệu khác. Sản phẩm chạy thật không bị ảnh hưởng, chỉ có phép kiểm trên máy cá nhân.
   Căn cứ: Hậu quả nhẹ: chỉ làm bài kiểm báo sai trên máy dùng cấu hình lệch, không mất hay lộ dữ liệu, và đường chạy chuẩn của CI vẫn đúng; người chạy tự tránh được bằng cách đặt cùng một cổng.
   file: `tests/db/may-khach-pg.ts`
@@ -118,14 +117,14 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Kept restore drill database leaks when the restore fails, because cleanup runs only after the asserts (r2 · tệp đã đổi)**
+- **Kept restore drill database leaks when the restore fails, because cleanup runs only after the asserts (r2)**
   Người dùng thấy gì: Nếu một lần thử khôi phục thất bại, một cơ sở dữ liệu nháp có thể còn nằm lại trên máy kiểm thử mà không ai được báo. Chỉ xảy ra trên máy dev khi bài kiểm đã đỏ, không chạm bản chạy thật.
   Căn cứ: Hậu quả nhẹ: chỉ để sót một cơ sở nháp trên máy kiểm thử, không mất hay lộ dữ liệu, người làm xoá tay được, và chỉ xảy ra khi bài kiểm đã đỏ sẵn.
   file: `tests/db/sao-luu.db.test.ts`
   severity: low
   Đề xuất: wont-fix
 
-- **Shape 3 (checks that a string is present when the promise is a relation between values): the 'pinned' vercel version is never compared with the version the automated deploy uses (r2)**
+- **Shape 3 (checks that a string is present when the promise is a relation between values): the 'pinned' vercel version is never compared with the version the automated deploy uses (r2 · tệp đã đổi)**
   Người dùng thấy gì: Sổ tay có thể ghi một bản công cụ đưa bản lên khác với bản tệp tự động triển khai dùng mà không ai hay. Người vận hành làm tay khi đó có thể chạy bản khác với bản đã được thử.
   Căn cứ: Hậu quả vừa phải: lệch bản chỉ làm các bước làm tay hơi khác bản tự động, thấy ngay khi chạy và thử lại được, không mất dữ liệu; ghi thành han chế đã biết là đủ.
   file: `tests/van-hanh.test.ts`
@@ -188,7 +187,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Hình dạng 5 (tuyên một lớp đường dẫn nhưng chỉ đo một điểm): phép thử từ chối đường trong kho chỉ thử đúng gốc của worktree (r6 · tệp đã đổi)**
+- **Hình dạng 5 (tuyên một lớp đường dẫn nhưng chỉ đo một điểm): phép thử từ chối đường trong kho chỉ thử đúng gốc của worktree (r6)**
   Người dùng thấy gì: Chức năng sao lưu từ chối ghi vào trong kho, nhưng mới được thử ở một vị trí. Các cách viết đường dẫn khác như đường tương đối hay thư mục con chưa được thử riêng nên có thể lọt một lỗi hiếm.
   Căn cứ: Lỗi nếu có chỉ làm tệp sao lưu nằm nhầm trong kho, không mất hay lộ dữ liệu và người vận hành tự thấy và dời được; thêm ca thử sau cũng rẻ.
   file: `tests/db/sao-luu.db.test.ts`
@@ -265,14 +264,14 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Kept restore drill database leaks when the restore fails, because cleanup runs only after the asserts (r2 · tệp đã đổi)**
+- **Kept restore drill database leaks when the restore fails, because cleanup runs only after the asserts (r2)**
   Người dùng thấy gì: Nếu một lần thử khôi phục thất bại, một cơ sở dữ liệu nháp có thể còn nằm lại trên máy kiểm thử mà không ai được báo. Chỉ xảy ra trên máy dev khi bài kiểm đã đỏ, không chạm bản chạy thật.
   Căn cứ: Hậu quả nhẹ: chỉ để sót một cơ sở nháp trên máy kiểm thử, không mất hay lộ dữ liệu, người làm xoá tay được, và chỉ xảy ra khi bài kiểm đã đỏ sẵn.
   file: `tests/db/sao-luu.db.test.ts`
   severity: low
   Đề xuất: wont-fix
 
-- **Shape 3 (checks that a string is present when the promise is a relation between values): the 'pinned' vercel version is never compared with the version the automated deploy uses (r2)**
+- **Shape 3 (checks that a string is present when the promise is a relation between values): the 'pinned' vercel version is never compared with the version the automated deploy uses (r2 · tệp đã đổi)**
   Người dùng thấy gì: Sổ tay có thể ghi một bản công cụ đưa bản lên khác với bản tệp tự động triển khai dùng mà không ai hay. Người vận hành làm tay khi đó có thể chạy bản khác với bản đã được thử.
   Căn cứ: Hậu quả vừa phải: lệch bản chỉ làm các bước làm tay hơi khác bản tự động, thấy ngay khi chạy và thử lại được, không mất dữ liệu; ghi thành han chế đã biết là đủ.
   file: `tests/van-hanh.test.ts`
@@ -321,6 +320,4 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-## Chưa adversarial-verify (refuter chết)
-
-⚠ Cụm ngoài vùng phủ: 2/5 lỗi rơi vào file không bộ đo nào phủ (tests/db/may-khach-pg.ts, _acceptance/moi-truong-thu-va-ban-that/evidence-page.html) — dừng và quyết: mở rộng hợp đồng hay rút phạm vi.
+Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
