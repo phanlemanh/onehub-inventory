@@ -21,7 +21,14 @@ import { cn } from "@/lib/utils";
 
 import { FRAME_COPY } from "../frame-copy";
 import { COLUMN_COOKIE, COLUMN_COOKIE_MAX_AGE, columnOpenFromCookie } from "./column-cookie";
-import { currentEntry, flattenLinks, isCurrent, type NavItem, type NavLink } from "../nav-menu";
+import {
+  currentEntry,
+  flattenLinks,
+  isCurrent,
+  linkHref,
+  type NavItem,
+  type NavLink,
+} from "../nav-menu";
 import { usePlaceChange } from "./place-change";
 
 const COPY = FRAME_COPY.secondColumn;
@@ -108,7 +115,9 @@ export function SecondColumnNav({
         isActive={active}
         render={
           <Link
-            href={link.href}
+            // With the open address's other parameters where the entry keeps them (VP5): a press before the page
+            // comes alive opens the same place as one after it.
+            href={linkHref(link, pathname, search)}
             aria-current={active ? "true" : undefined}
             title={link.trailing ? link.title : undefined}
             onClick={(event) => {

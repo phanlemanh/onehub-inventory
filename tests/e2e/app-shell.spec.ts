@@ -11,6 +11,7 @@ import { expect, test } from "../../tools/e2e_templates/fixture";
 import { openSheet } from "../../tools/e2e_templates/settle";
 
 import { LABELS } from "../../src/generated/labels";
+import { chupAnh } from "./sua-trang";
 
 const SCREENS = [
   { href: "/", title: LABELS.Today.pref },
@@ -87,7 +88,7 @@ async function shot(page: Page, name: string) {
   const dir = process.env["SHOTS_DIR"];
   if (!dir) return;
   mkdirSync(dir, { recursive: true });
-  await page.screenshot({ path: join(dir, `E10-${name}.png`) });
+  await chupAnh(page, { path: join(dir, `E10-${name}.png`) });
 }
 
 async function noSideways(page: Page) {

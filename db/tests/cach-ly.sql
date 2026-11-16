@@ -1,4 +1,4 @@
--- Company isolation suite (SP-1): 21 SQL cases (14 of row 7, 5 of row 7a, 1 of row 7b, 1 of row 7e), run by db/scripts/cach-ly.sh on a scratch database that has the
+-- Company isolation suite (SP-1): 23 SQL cases (14 of row 7, 5 of row 7a, 1 of row 7b, 1 of row 7e, 1 of row 19, 1 of row 10), run by db/scripts/cach-ly.sh on a scratch database that has the
 -- migrations applied. Each case builds companies A and B as the table owner inside one transaction, switches to the
 -- API role with the door's own statements (src/modules/identity/with-company.ts), checks reads and writes, and
 -- rolls back. A passing case prints `ok <case>`; a failing one raises `HỎNG <case>: <table or reason>`.
@@ -116,7 +116,19 @@ insert into luat_thu_hep values
   ('company_import_templates', 'company_import_templates_read_by_permission', '(app.allowed(''readCompanyLayer''::text) = ''company''::text)'),
   ('company_import_templates', 'company_import_templates_insert_by_permission', '(app.allowed(''addCompanyLayer''::text) = ''company''::text)'),
   ('company_import_templates', 'company_import_templates_update_by_permission',
-   '((app.allowed(''editCompanyLayer''::text) = ''company''::text) OR (app.allowed(''retireCompanyLayer''::text) = ''company''::text))');
+   '((app.allowed(''editCompanyLayer''::text) = ''company''::text) OR (app.allowed(''retireCompanyLayer''::text) = ''company''::text))'),
+  -- 012_thue_phi.sql (hàng 19): the fee items are read with readFeeSchedule and written with setFeeSchedule.
+  ('company_fee_items', 'company_fee_items_read_by_permission', '(app.allowed(''readFeeSchedule''::text) = ''company''::text)'),
+  ('company_fee_items', 'company_fee_items_insert_by_permission', '(app.allowed(''setFeeSchedule''::text) = ''company''::text)'),
+  ('company_fee_items', 'company_fee_items_update_by_permission', '(app.allowed(''setFeeSchedule''::text) = ''company''::text)'),
+  -- 013_bang_can_chao.sql (hàng 10): listings and their unit links are read with viewListings, changed with
+  -- updateListing; no action adds one yet (createListing, row 12).
+  ('listings', 'listings_read_by_permission', '(app.allowed(''viewListings''::text) = ''company''::text)'),
+  ('listings', 'listings_insert_by_permission', '(app.allowed(''createListing''::text) = ''company''::text)'),
+  ('listings', 'listings_update_by_permission', '(app.allowed(''updateListing''::text) = ''company''::text)'),
+  ('listing_units', 'listing_units_read_by_permission', '(app.allowed(''viewListings''::text) = ''company''::text)'),
+  ('listing_units', 'listing_units_insert_by_permission', '(app.allowed(''createListing''::text) = ''company''::text)'),
+  ('listing_units', 'listing_units_update_by_permission', '(app.allowed(''updateListing''::text) = ''company''::text)');
 
 create function pg_temp.dung_dang(bang name, luat name, lenh text, bieu_thuc text, cot text,
                                   kieu text default 'PERMISSIVE') returns boolean
@@ -727,5 +739,151 @@ begin
     raise exception 'HỎNG lop-rieng-theo-san: phiên chưa chọn sàn thấy % dòng', n;
   end if;
   raise notice 'ok lop-rieng-theo-san — 5 bảng';
+end $$;
+rollback;
+
+-- 22. Fees and taxes (row 19, hồ sơ thue-phi): A's changed brokerage shows to A's admin and to nobody else; B's admin
+--     cannot write a row in A's name nor change A's row; a person of A without setFeeSchedule cannot write at all; the
+--     API role cannot delete. Positive control: A's admin reads its row back and writes one of its own.
+begin;
+select pg_temp.dung_hai_san();
+select pg_temp.them_quan_tri_a();
+insert into identity.users (id, email, name) values
+  ('00000000-0000-4000-8000-0000000000b1', 'quan-tri-b@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000a2', 'dau-chu-a@example.test', '[Tên]');
+insert into company_members (company_id, user_id, name, roles) values
+  ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-0000000000b1', '[Tên]', '{CompanyAdmin}'),
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a2', '[Tên]', '{ListAgent,TeamLead}');
+insert into company_fee_items (company_id, code, kind, rate_bp, included, position, changed_by, changed_by_name)
+  values ('00000000-0000-4000-8000-00000000000a', 'brokerage', 'Own', 200, true, 0,
+          '00000000-0000-4000-8000-0000000000a1', '[Tên]');
+set local role quy_hang_app;
+do $$
+declare n int;
+begin
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a1', true);
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000a', true);
+  select count(*) into n from company_fee_items;
+  if n <> 1 then raise exception 'HỎNG thue-phi-theo-san: đối chứng — quản trị sàn A thấy % dòng', n; end if;
+  insert into company_fee_items (company_id, code, kind, rate_bp, included, position, changed_by, changed_by_name)
+    values ('00000000-0000-4000-8000-00000000000a', 'k1', 'Own', 30, true, 1,
+            '00000000-0000-4000-8000-0000000000a1', '[Tên]');
+  perform pg_temp.phai_loi('thue-phi-theo-san',
+    'insert into company_fee_items (company_id, code, kind, rate_bp, included, position, changed_by, changed_by_name) '
+    'values (''00000000-0000-4000-8000-00000000000b'', ''brokerage'', ''Own'', 500, true, 0, '
+    '''00000000-0000-4000-8000-0000000000a1'', ''X'')', 'row-level security');
+  perform pg_temp.phai_loi('thue-phi-theo-san', 'delete from company_fee_items', 'permission denied');
+  -- A person of A whose roles only read the schedule: reads, never writes.
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a2', true);
+  select count(*) into n from company_fee_items;
+  if n <> 2 then raise exception 'HỎNG thue-phi-theo-san: đầu chủ sàn A thấy % dòng', n; end if;
+  perform pg_temp.phai_loi('thue-phi-theo-san',
+    'insert into company_fee_items (company_id, code, kind, rate_bp, included, position, changed_by, changed_by_name) '
+    'values (''00000000-0000-4000-8000-00000000000a'', ''k2'', ''Own'', 10, true, 2, '
+    '''00000000-0000-4000-8000-0000000000a2'', ''X'')', 'row-level security');
+  update company_fee_items set rate_bp = 0;
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'HỎNG thue-phi-theo-san: đầu chủ sàn A sửa được % dòng', n; end if;
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000b1', true);
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000b', true);
+  select count(*) into n from company_fee_items;
+  if n <> 0 then raise exception 'HỎNG thue-phi-theo-san: sàn B thấy % dòng của A', n; end if;
+  update company_fee_items set rate_bp = 0;
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'HỎNG thue-phi-theo-san: sàn B sửa được % dòng của A', n; end if;
+  perform set_config('app.company_id', '', true);
+  select count(*) into n from company_fee_items;
+  if n <> 0 then raise exception 'HỎNG thue-phi-theo-san: phiên chưa chọn sàn thấy % dòng', n; end if;
+  raise notice 'ok thue-phi-theo-san — đọc, ghi, vai chỉ đọc, sàn khác';
+end $$;
+rollback;
+
+-- 23. Listings (row 10, hồ sơ bang-hang-du-lieu-that): A's listing shows to A's people and to nobody else; B cannot read
+--     or change it by id; the API role cannot add or delete one; the rules of the data hold in the table (Closed needs a
+--     close price and date, Withdrawn needs a reason, one open listing per unit per company); moving to Active keeps to
+--     the keeper rule of activateListing. Positive control: A's listing agent changes the price of its own listing.
+begin;
+select pg_temp.dung_hai_san();
+insert into catalog_nodes (slug, node_type, name) values ('mau-du-an', 'project', '[MAU] Dự án');
+insert into catalog_buildings (building_key, subdivision_key, building_name, upi)
+  values ('bld_00000000000000000000000001', 'mau-du-an', '[MAU] Toà', 'upi-mau-toa');
+insert into catalog_units (unit_key, upi, subdivision_key, building_key, building_name, unit_number, property_type,
+                           property_sub_type) values
+  ('unt_00000000000000000000000001', 'upi-mau-1', 'mau-du-an', 'bld_00000000000000000000000001', '[MAU] Toà', 'A-01',
+   'Residential', 'Condominium'),
+  ('unt_00000000000000000000000002', 'upi-mau-2', 'mau-du-an', 'bld_00000000000000000000000001', '[MAU] Toà', 'A-02',
+   'Residential', 'Condominium');
+insert into identity.users (id, email, name) values
+  ('00000000-0000-4000-8000-0000000000a2', 'dau-chu-a@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000a3', 'dau-chu-a2@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000b2', 'dau-chu-b@example.test', '[Tên]');
+insert into company_members (company_id, user_id, name, roles) values
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a2', '[Tên]', '{ListAgent}'),
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a3', '[Tên] 02', '{ListAgent}'),
+  ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-0000000000b2', '[Tên]', '{ListAgent,TeamLead}');
+insert into listings (id, company_id, standard_status, list_price, list_agent_user_id, list_agent_full_name) values
+  ('00000000-0000-4000-8000-0000000a0001', '00000000-0000-4000-8000-00000000000a', 'Incomplete', 3000000000,
+   '00000000-0000-4000-8000-0000000000a2', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000a0002', '00000000-0000-4000-8000-00000000000a', 'Hold', 3100000000,
+   '00000000-0000-4000-8000-0000000000a3', '[Tên] 02');
+insert into listing_units (listing_id, company_id, upi, open) values
+  ('00000000-0000-4000-8000-0000000a0001', '00000000-0000-4000-8000-00000000000a', 'upi-mau-1', true),
+  ('00000000-0000-4000-8000-0000000a0002', '00000000-0000-4000-8000-00000000000a', 'upi-mau-2', true);
+-- Rules of the data, written as the owner: each one refused in the table itself.
+do $$
+begin
+  perform pg_temp.phai_loi('can-chao-theo-san',
+    'update listings set standard_status = ''Closed'' where id = ''00000000-0000-4000-8000-0000000a0002''',
+    'listings_closed_needs_price_and_date');
+  perform pg_temp.phai_loi('can-chao-theo-san',
+    'update listings set standard_status = ''Withdrawn'' where id = ''00000000-0000-4000-8000-0000000a0002''',
+    'listings_withdrawn_needs_reason');
+  perform pg_temp.phai_loi('can-chao-theo-san',
+    'insert into listings (id, company_id, standard_status) values (''00000000-0000-4000-8000-0000000a0003'', '
+    '''00000000-0000-4000-8000-00000000000a'', ''Incomplete''); '
+    'insert into listing_units (listing_id, company_id, upi, open) values (''00000000-0000-4000-8000-0000000a0003'', '
+    '''00000000-0000-4000-8000-00000000000a'', ''upi-mau-1'', true)',
+    'listing_units_one_open');
+end $$;
+set local role quy_hang_app;
+do $$
+declare n int;
+begin
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a2', true);
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000a', true);
+  select count(*) into n from listings;
+  if n <> 2 then raise exception 'HỎNG can-chao-theo-san: đối chứng — đầu chủ sàn A thấy % lần chào', n; end if;
+  select count(*) into n from listing_units;
+  if n <> 2 then raise exception 'HỎNG can-chao-theo-san: đối chứng — đầu chủ sàn A thấy % liên kết căn', n; end if;
+  update listings set list_price = 2800000000, version = version + 1
+   where id = '00000000-0000-4000-8000-0000000a0001';
+  get diagnostics n = row_count;
+  if n <> 1 then raise exception 'HỎNG can-chao-theo-san: đối chứng — đầu chủ sàn A sửa được % dòng của mình', n; end if;
+  -- Active: one's own listing goes; the listing someone else keeps is refused.
+  update listings set standard_status = 'Active' where id = '00000000-0000-4000-8000-0000000a0001';
+  perform pg_temp.phai_loi('can-chao-theo-san',
+    'update listings set standard_status = ''Active'' where id = ''00000000-0000-4000-8000-0000000a0002''',
+    'listings_activate');
+  perform pg_temp.phai_loi('can-chao-theo-san',
+    'insert into listings (id, company_id, standard_status) values (''00000000-0000-4000-8000-0000000a0004'', '
+    '''00000000-0000-4000-8000-00000000000a'', ''Incomplete'')', 'permission denied');
+  perform pg_temp.phai_loi('can-chao-theo-san', 'delete from listings', 'permission denied');
+  perform pg_temp.phai_loi('can-chao-theo-san',
+    'update listing_units set upi = ''upi-mau-2'' where listing_id = ''00000000-0000-4000-8000-0000000a0001''',
+    'permission denied');
+  -- Company B, by id: nothing seen, nothing changed.
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000b2', true);
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000b', true);
+  select count(*) into n from listings where id = '00000000-0000-4000-8000-0000000a0001';
+  if n <> 0 then raise exception 'HỎNG can-chao-theo-san: sàn B thấy % lần chào của A', n; end if;
+  select count(*) into n from listing_units;
+  if n <> 0 then raise exception 'HỎNG can-chao-theo-san: sàn B thấy % liên kết căn của A', n; end if;
+  update listings set list_price = 1 where id = '00000000-0000-4000-8000-0000000a0001';
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'HỎNG can-chao-theo-san: sàn B sửa được % lần chào của A', n; end if;
+  perform set_config('app.company_id', '', true);
+  select count(*) into n from listings;
+  if n <> 0 then raise exception 'HỎNG can-chao-theo-san: phiên chưa chọn sàn thấy % lần chào', n; end if;
+  raise notice 'ok can-chao-theo-san — đọc, sửa, luật dữ liệu, người giữ căn, sàn khác';
 end $$;
 rollback;

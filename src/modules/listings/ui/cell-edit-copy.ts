@@ -19,6 +19,9 @@ export const CELL_EDIT_CONCEPTS = [
   "WithdrawnSoldElsewhere",
   "WithdrawnOwnerChangedMind",
   "WithdrawnUnreachable",
+  "FeeInclusion",
+  "FeeIncluded",
+  "FeeExcluded",
 ] as const;
 export type CellEditConcept = (typeof CELL_EDIT_CONCEPTS)[number];
 /** Each concept's word for a sale and for a lease. */

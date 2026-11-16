@@ -5,6 +5,7 @@
 import { openSheet, SETTLE_MS, SHEET, SHEET_BUTTON, shown } from "../../tools/e2e_templates/settle";
 import { expect, test } from "../../tools/e2e_templates/fixture";
 import { waitReady } from "../../tools/e2e_templates/runner";
+import { suaCacPhanTu, themKieu } from "./sua-trang";
 
 const PROTO = "/proto/khung-va-giao-dien";
 const PHONE = { width: 360, height: 800 };
@@ -38,7 +39,7 @@ test.describe("cho ngan", () => {
   });
 
   test("ngan chua dung", { tag: "@cho" }, async ({ page }) => {
-    await page.addStyleTag({
+    await themKieu(page, {
       content: `@keyframes cho-mai { from { opacity: 1 } to { opacity: 0.99 } }
         ${SHEET} { animation: cho-mai 1s linear infinite !important }`,
     });
@@ -46,9 +47,9 @@ test.describe("cho ngan", () => {
   });
 
   test("ngan khong mo", { tag: "@cho" }, async ({ page }) => {
-    await page
-      .getByRole("button", { name: SHEET_BUTTON })
-      .evaluateAll((els) => els.forEach((el) => el.remove()));
+    await suaCacPhanTu(page.getByRole("button", { name: SHEET_BUTTON }), (els) =>
+      els.forEach((el) => el.remove()),
+    );
     expect(await thrown(openSheet(page))).toBe("ngan khong mo");
   });
 });

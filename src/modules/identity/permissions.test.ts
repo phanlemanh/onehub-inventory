@@ -78,6 +78,24 @@ const CELLS: Record<string, Partial<Record<Role, Scope>>> = {
   editCompanyLayer: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
   retireCompanyLayer: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
   matchPendingUnits: { ListAgent: "company", TeamLead: "company", CompanyAdmin: "company" },
+  // Row 19 (thue-phi, owner 2026-11-14): every role reads the fee schedule, only CompanyAdmin sets it.
+  readFeeSchedule: {
+    ListAgent: "company",
+    BuyerAgent: "company",
+    TeamLead: "company",
+    CompanyAdmin: "company",
+  },
+  setFeeSchedule: { CompanyAdmin: "company" },
+  // Row 10 (bang-hang-du-lieu-that, owner 2026-11-15): every role reads the inventory, the admin read-only (Hỏi-1 A);
+  // three roles change listings company-wide (Hỏi-2 A); Active stays the keeper's or the team lead's.
+  viewListings: {
+    ListAgent: "company",
+    BuyerAgent: "company",
+    TeamLead: "company",
+    CompanyAdmin: "company",
+  },
+  updateListing: { ListAgent: "company", BuyerAgent: "company", TeamLead: "company" },
+  activateListing: { ListAgent: "own", TeamLead: "company" },
 };
 // Row 9e (bo-nut-theo-quyen): the seven draft rows the owner chose at the scope gate, written before the table.
 const DRAFT_CELLS_9E: Record<string, Partial<Record<Role, Scope>>> = {
@@ -104,6 +122,11 @@ const API_DOORS = [
   "PATCH /api/v1/company-layer/[part]/[id]",
   "POST /api/v1/company-layer/[part]/[id]/retire",
   "POST /api/v1/company-layer/pending-units/match",
+  // Row 19: the fee schedule.
+  "GET /api/v1/company/fee-schedule",
+  "PUT /api/v1/company/fee-schedule",
+  // Row 10: one listing changed by one change.
+  "PATCH /api/v1/listings/[id]",
   "DELETE /api/v1/saved-views/[id]",
 ];
 const EXEMPT_API = [
@@ -154,10 +177,10 @@ describe("cong-quyen-15-to-hop", () => {
     expect(Object.fromEntries(LIVE_ACTIONS.map((a) => [a.name, a.scope]))).toEqual(CELLS);
   });
 
-  it("every live action × every set of roles gets the widest scope: 19 × 15 = 285 asserts (row 2c: +4 rows, row 7e: +5)", () => {
+  it("every live action × every set of roles gets the widest scope: 24 × 15 = 360 asserts (row 2c: +4 rows, row 7e: +5, row 19: +2, row 10: +3)", () => {
     const r = addUp(allowedScope);
     expect(r.failures).toEqual([]);
-    expect(r.count).toBe(285);
+    expect(r.count).toBe(360);
   });
 
   it("break: taking the narrowest scope names the first set that differs", () => {
@@ -183,11 +206,16 @@ describe("dong-nhap-9e", () => {
   });
 });
 
-/** Decision 0016: the company admin looks after people and settings, not listings, owners or contacts. */
+/**
+ * Decision 0016: the company admin looks after people and settings, not listings, owners or contacts. One cell is the
+ * owner's own exception (row 10, Hỏi-1 A, 2026-11-15, decision 0039): the admin reads the inventory, and changes nothing.
+ */
+const ADMIN_READS = new Set(["viewListings"]);
 function adminOnBusiness(table: readonly ActionSpec[]): string[] {
   return table
     .filter((a) => ["Listing", "ListingOwner", "Contact"].includes(a.entity ?? ""))
     .filter((a) => a.scope.CompanyAdmin !== undefined)
+    .filter((a) => !(ADMIN_READS.has(a.name) && a.kind === "query"))
     .map((a) => `quan-tri-khong-o-nghiep-vu: ${a.name}`);
 }
 

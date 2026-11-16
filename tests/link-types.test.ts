@@ -319,8 +319,11 @@ describe("AC-5 the sample data is byte-identical to the signed sample-data row",
 // Dependencies between modules approved since this row, written before the code; any other one is new. Row 2c
 // (K-21, K-24): listings goes through the identity module's shared action door (decision 0026). Row 7e (decision 0029,
 // owner's plan approval 2026-11-13): company-config goes through the same door and uses the catalog's code lookup.
+// Row 10 (decision 0039, owner's plan approval 2026-11-15): the inventory read takes the units a listing offers from the
+// catalog's own reader, on the listings module's client.
 const APPROVED_DEPENDENCIES = new Set([
   "listings → identity",
+  "listings → catalog",
   "company-config → identity",
   "company-config → catalog",
 ]);

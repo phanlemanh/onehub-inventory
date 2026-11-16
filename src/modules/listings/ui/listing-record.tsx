@@ -8,6 +8,7 @@ import type { TypedColumn } from "@/components/candidate/column-kind";
 import Image from "next/image";
 import type { ReactNode } from "react";
 
+import type { Keeper } from "../inventory-data";
 import { sampleKeeperOf } from "../sample";
 import { AskListAgent } from "./ask-list-agent";
 import type { AskWords } from "./ask-copy";
@@ -108,6 +109,7 @@ export function ListingCard({
   photo,
   noPhoto = "tile",
   building,
+  net,
 }: {
   view: ListingView;
   priceLabel: string;
@@ -121,6 +123,11 @@ export function ListingCard({
   noPhoto?: "tile" | "none";
   /** The building code the muted tile shows. */
   building?: string;
+  /**
+   * Row layout only, off when absent (row 19): the amount the seller nets, at the right end of the facts line under the
+   * price and status. A row without one keeps the card exactly as it is.
+   */
+  net?: { label: string; value: number } | null;
 }) {
   if (layout === "row") {
     const facts = view.facts
@@ -174,7 +181,17 @@ export function ListingCard({
               <TypedCell kind="status" value={view.status} transaction={view.transaction} />
             </span>
           </div>
-          {facts.length > 0 ? (
+          {net ? (
+            // The facts give way to the amount: they cut with an ellipsis, the amount stays whole.
+            <div className="flex items-baseline justify-between gap-2 text-xs text-muted-foreground tabular-nums">
+              <span data-slot="listing-card-facts" className="min-w-0 truncate">
+                {facts.join(" · ")}
+              </span>
+              <span data-slot="listing-card-net" className="shrink-0 whitespace-nowrap">
+                {net.label} {formatByKind("money", net.value)}
+              </span>
+            </div>
+          ) : facts.length > 0 ? (
             <span
               data-slot="listing-card-facts"
               className="text-xs text-muted-foreground tabular-nums"
@@ -282,6 +299,8 @@ export function reportFieldsOf(view: ListingView): { name: string; shown: string
 export interface FullRecordInput {
   records: Readonly<Record<string, ListingRecordData>>;
   labels: RecordLabels;
+  /** Who keeps each listing, as the viewer sees it (row 10); absent, the sample keepers of row 3e. */
+  keepers?: Readonly<Record<string, Keeper>>;
 }
 
 /**
@@ -335,7 +354,7 @@ export function listingRecord(
           <AskListAgent
             key={view.id}
             listing={{ id: view.id, unitNumber: view.unitNumber, buildingName: building }}
-            keeper={sampleKeeperOf(view.id)}
+            keeper={full?.keepers ? (full.keepers[view.id] ?? null) : sampleKeeperOf(view.id)}
             words={words}
           />
         ) : undefined,

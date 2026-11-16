@@ -17,6 +17,7 @@ import {
   rowsShown,
 } from "./phone-list";
 import { SAMPLE_STATUS_COUNTS } from "../../src/modules/listings/sample";
+import { suaTrang, themKieu } from "./sua-trang";
 
 const WIDE = new Set(["1024", "1440"]);
 const width = () => test.info().project.name;
@@ -295,7 +296,7 @@ test.describe("sheet frozen columns", () => {
   test("frozen-column check fails when the columns are not sticky", async ({ page }) => {
     if (isPhone(page)) return phoneStandInBreak(page, "frozen columns");
     await openInventory(page);
-    await page.addStyleTag({
+    await themKieu(page, {
       content: "td[data-pinned],th[data-pinned]{position:static!important}",
     });
     await expect(checkFrozen(page)).rejects.toThrow("frozen column moved");
@@ -434,7 +435,7 @@ test.describe("sheet axe", () => {
     const box = isPhone(page)
       ? await phoneFilterBox(page, "Giá chào")
       : page.getByLabel("Lọc cột Giá chào");
-    await box.evaluate((el) => {
+    await suaTrang(box, (el) => {
       el.removeAttribute("aria-label");
       el.removeAttribute("placeholder");
     });
@@ -557,16 +558,15 @@ test.describe("sheet tab stops", () => {
     await openInventory(page);
     if (isPhone(page)) {
       // Row 2b: a card taken out of the Tab order is caught.
-      await page
-        .locator('[data-slot="phone-card"]')
-        .first()
-        .evaluate((el) => el.setAttribute("tabindex", "-1"));
+      await suaTrang(page.locator('[data-slot="phone-card"]').first(), (el) =>
+        el.setAttribute("tabindex", "-1"),
+      );
       const stops = await phoneTabStops(page);
       const cards = await page.locator('[data-slot="phone-card"]').count();
       expect(() => checkPhoneStops(stops, ["Lọc"], cards)).toThrow("cards reached by Tab");
       return;
     }
-    await page.getByLabel("Lọc cột Giá chào").evaluate((el) => el.setAttribute("tabindex", "-1"));
+    await suaTrang(page.getByLabel("Lọc cột Giá chào"), (el) => el.setAttribute("tabindex", "-1"));
     const stops = await tabStops(page);
     expect(() => checkStops(stops, ["Lọc cột Giá chào", "grid"])).toThrow(
       "tab stop missing: Lọc cột Giá chào",
@@ -680,7 +680,7 @@ test.describe("sheet full screen", () => {
     await page.getByRole("button", { name: "Toàn màn hình" }).click();
     await expect.poll(() => page.evaluate(() => !!document.fullscreenElement)).toBe(true);
     // Break: the scroll box keeps the normal page's height in full screen (the bug of round 2).
-    await page.evaluate(() => {
+    await suaTrang(page, () => {
       let box = document.querySelector<HTMLElement>(
         '[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]',
       );
@@ -729,7 +729,7 @@ test.describe("sheet footer in view", () => {
   test("footer check fails when the grid is as tall as the screen", async ({ page }) => {
     await openInventory(page);
     // Break the fit: the grid's scroll box grows to the screen's height, as before row 2a.
-    await page.evaluate(() => {
+    await suaTrang(page, () => {
       let box = document.querySelector<HTMLElement>(
         '[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]',
       );
@@ -745,11 +745,13 @@ test.describe("sheet footer in view", () => {
 test.describe("no match keeps filters", () => {
   /** The filter boxes are still there to mend, at every width (row 2e: the filter row is always shown). */
   async function checkFilters(page: Page): Promise<void> {
-    // On a phone the boxes are in the open filter sheet, outside the region (row 2b).
-    const boxes = isPhone(page)
+    // On a phone the boxes are in the open filter sheet, outside the region (row 2b). The sheet lists every column, the
+    // fee condition kept hidden in the table among them (row 19): ten boxes there, nine in the table's filter row.
+    const phone = isPhone(page);
+    const boxes = phone
       ? phoneFilterSheet(page).locator('[data-slot="column-filter"]')
       : page.locator('[data-slot="data-region"] [data-slot="column-filter"]');
-    const ok = (await boxes.count()) === 8 && (await boxes.first().isVisible());
+    const ok = (await boxes.count()) === (phone ? 10 : 9) && (await boxes.first().isVisible());
     if (!ok) throw new Error("filters gone on no match");
   }
 
@@ -779,7 +781,7 @@ test.describe("no match keeps filters", () => {
     }
     // Break: the filter boxes removed while nothing matches.
     await box.fill("zzz");
-    await page.evaluate(() =>
+    await suaTrang(page, () =>
       document.querySelectorAll('[data-slot="column-filter"]').forEach((el) => el.remove()),
     );
     await expect(checkFilters(page)).rejects.toThrow("filters gone on no match");
@@ -892,7 +894,7 @@ test.describe("phone filter row", () => {
         `filter row does not scroll with the grid (${JSON.stringify({ moved, underHead, inside, before, after, head, view })})`,
       );
     // The price column, filter box included, is at least 11 ch of the grid's own text (a rule like «<=5, 2-5»).
-    const ch = await headerCell(page, "Listing.listPrice").evaluate((th) => {
+    const ch = await suaTrang(headerCell(page, "Listing.listPrice"), (th) => {
       const cell = document.querySelector('tbody td[data-col-id="Listing.listPrice"]') ?? th;
       const probe = document.createElement("span");
       probe.textContent = "0";
@@ -964,13 +966,13 @@ test.describe("phone filter row", () => {
     await openInventory(page);
     if (isPhone(page)) {
       // Break (row 2b): the chip row hidden — the filter no longer shows on the list.
-      await page.addStyleTag({
+      await themKieu(page, {
         content: '[data-slot="phone-filter-chips"] { display: none !important; }',
       });
       await expect(checkPhoneFilter(page)).rejects.toThrow("phone filter not shown as a chip");
       return;
     }
-    await page.addStyleTag({
+    await themKieu(page, {
       content:
         '[data-slot="column-filter"] { position: fixed !important; left: 0 !important; top: 0 !important; }',
     });
@@ -1037,14 +1039,14 @@ test.describe("unit code shows whole", () => {
   test("the check fails when the unit code column is squeezed", async ({ page }) => {
     await openInventory(page);
     if (isPhone(page)) {
-      await page.addStyleTag({
+      await themKieu(page, {
         content:
           '[data-slot="listing-card-unit"] { max-width: 1.2ch !important; overflow: hidden !important; display: inline-block !important; word-break: normal !important; white-space: nowrap !important; }',
       });
       await expect(checkCodesWhole(page)).rejects.toThrow("unit code cut: ");
       return;
     }
-    await page.addStyleTag({
+    await themKieu(page, {
       content:
         'td[data-col-id="Listing.unitNumber"] button, td[data-col-id="Listing.unitNumber"] [data-slot="truncated-text"] { max-width: 1.2ch !important; overflow: hidden !important; display: inline-block !important; }',
     });
@@ -1100,7 +1102,7 @@ test.describe("header buttons in view", () => {
     if (isPhone(page)) return phoneStandInBreak(page, "header buttons");
     await openInventory(page);
     // What a first column narrower than its header does: the next header lies over its sort button.
-    await page.addStyleTag({
+    await themKieu(page, {
       content:
         'thead th[data-col-id="Listing.buildingName"], thead th[data-col-id="Listing.subdivisionName"] { transform: translateX(-60px) !important; z-index: 50 !important; position: relative; }',
     });
@@ -1114,7 +1116,7 @@ test.describe("header buttons in view", () => {
 test.describe("project column gives room, never below its floor", () => {
   /** The project column against the grid's own ch, and whether the grid scrolls sideways. */
   async function project(page: Page): Promise<{ ch: number; scrolls: boolean }> {
-    return page.evaluate(() => {
+    return suaTrang(page, () => {
       const th = document.querySelector<HTMLElement>(
         '[data-slot="data-region-body"] thead th[data-col-id="Listing.subdivisionName"]',
       )!;
@@ -1161,7 +1163,7 @@ test.describe("project column gives room, never below its floor", () => {
       .locator('thead th[data-col-id="Listing.subdivisionName"]')
       .first()
       .evaluate((th) => [...th.parentElement!.children].indexOf(th) + 1);
-    await page.addStyleTag({
+    await themKieu(page, {
       content: `table[data-slot="data-grid-table"] colgroup col:nth-child(${nth}) { width: 40px !important; } [data-col-id="Listing.subdivisionName"] { width: 40px !important; min-width: 40px !important; max-width: 40px !important; }`,
     });
     const m = await project(page);

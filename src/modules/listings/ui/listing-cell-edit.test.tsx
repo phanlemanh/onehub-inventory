@@ -199,9 +199,10 @@ describe("ngay-ban-mac-dinh", () => {
 });
 
 describe("locked reasons", () => {
-  it("Closed locks price and status, Withdrawn only status, Active nothing", () => {
+  it("Closed locks price, fee inclusion (row 10) and status, Withdrawn only status, Active nothing", () => {
     expect(Object.keys(lockedReasons(row({ "Listing.standardStatus": "Closed" })) ?? {})).toEqual([
       "Listing.listPrice",
+      "Listing.feeInclusion",
       "Listing.standardStatus",
     ]);
     expect(
@@ -272,6 +273,30 @@ describe("cell edit of the grid", () => {
     await act(async () => undo.onClick());
     expect(save).toHaveBeenCalledTimes(2);
     expect(hook.result.current.rows[0]!["Listing.listPrice"]).toBe(2_710_000_000);
+  });
+
+  it("a price set on a listing with none offers no undo (the door takes no «no price» back)", async () => {
+    const save = vi.fn(async (): Promise<SaveOutcome> => ({
+      kind: "saved",
+      listing: { ...LISTING, version: 2 },
+    }));
+    const hook = renderHook(() =>
+      useListingCellEdit({
+        rows: [row({ "Listing.listPrice": null })],
+        listings: [{ ...LISTING, listPrice: undefined }],
+        headers: HEADERS,
+        labels,
+        door: { save },
+      }),
+    );
+    await editPrice(hook, "2,8 tỷ");
+    expect(save).toHaveBeenCalledOnce();
+    const [message, options] = toast.mock.calls.at(-1)! as [
+      string,
+      { action?: unknown } | undefined,
+    ];
+    expect(message).toContain("Không hoàn tác được.");
+    expect(options?.action, "no «Hoàn tác» for a price that had none").toBeUndefined();
   });
 
   it("hoan-tac-hong-bao-ro: a failed undo names the unit and the value the cell still shows", async () => {

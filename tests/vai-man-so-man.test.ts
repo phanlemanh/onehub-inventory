@@ -63,9 +63,9 @@ describe("so-man-du-cua-vao", () => {
     expect(buttonTable(missing).errors).toContain("members: thieu khoa vao");
     const unknown = registerCopy(inScreen("members", "vao", "khongCo"));
     expect(buttonTable(unknown).errors).toContain("members: vao khongCo khong co trong bang quyen");
-    const planned = registerCopy(inScreen("today", "vao", "viewListings"));
+    const planned = registerCopy(inScreen("today", "vao", "createListing"));
     expect(buttonTable(planned).errors).toContain(
-      "today: man built tro thao tac planned viewListings",
+      "today: man built tro thao tac planned createListing",
     );
     const noButtons = registerCopy((t) =>
       t.replace(/(- id: inventory\n(?: {4}.*\n)*?) {4}nut:\n(?: {6}- .*\n)+/, "$1"),

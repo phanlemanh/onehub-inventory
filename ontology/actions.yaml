@@ -228,6 +228,30 @@ actions:
           "table company_import_templates update",
         ]
 
+  # Fees and taxes (row 19, thue-phi): everyone of the company reads the schedule, only CompanyAdmin sets it. Approved by
+  # the owner at the scope gate, 2026-11-14. Database doors: migration 012; API doors: /api/v1/company/fee-schedule.
+  - name: readFeeSchedule
+    description: See the company's fee items, their rates, which are switched on, and who changed them.
+    entity: FeeItem
+    kind: query
+    status: live
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      api: ["GET /api/v1/company/fee-schedule"]
+      db: ["table company_fee_items select"]
+
+  - name: setFeeSchedule
+    description: >-
+      Set the company's fee schedule in one save: switch items on or off, change or reset an own item's rate, add,
+      rename and retire own items; nothing is deleted.
+    entity: FeeItem
+    kind: update
+    status: live
+    scope: { CompanyAdmin: company }
+    doors:
+      api: ["PUT /api/v1/company/fee-schedule"]
+      db: ["table company_fee_items insert", "table company_fee_items update"]
+
   - name: matchPendingUnits
     description: Match the company's pending units with units the shared catalog now has; the catalog never changes.
     entity: PendingUnit
@@ -240,12 +264,17 @@ actions:
 
   # Draft rows for the listing board, from Quỹ hàng's permission review of 05/11 (table two) and its signed
   # bang-quyen-hang.json, without the Telesales role. Row 10 onwards decides each cell when it opens the door.
+  # Row 10 (bang-hang-du-lieu-that), cells chosen by the owner at its scope gate on 2026-11-15: the company admin reads
+  # the inventory (Hỏi-1 A); the three working roles change price, status and fee inclusion company-wide (Hỏi-2 A); moving
+  # a listing to Active keeps the keeper rule (own = the unit one keeps, or one nobody keeps yet).
   - name: viewListings
     description: See the listings of the company.
     entity: Listing
     kind: query
-    status: planned
-    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company }
+    status: live
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      db: ["table listings select", "table listing_units select"]
 
   - name: createListing
     description: Add a listing.
@@ -258,16 +287,20 @@ actions:
     description: Change a listing's price, fees or details.
     entity: Listing
     kind: update
-    status: planned
+    status: live
     scope: { ListAgent: company, BuyerAgent: company, TeamLead: company }
+    doors:
+      api: ["PATCH /api/v1/listings/[id]"]
+      db: ["table listings update"]
 
   - name: activateListing
     description: Put a listing on sale (own scope is the unit one keeps, or a unit nobody keeps yet).
     entity: Listing
     kind: command
-    status: planned
+    status: live
     scope: { ListAgent: own, TeamLead: company }
-    states: [Incomplete, Hold]
+    doors:
+      api: ["PATCH /api/v1/listings/[id]"]
 
   - name: viewOwnerPhone
     description: See the phone number of a listing's owner (own scope is the unit one keeps).

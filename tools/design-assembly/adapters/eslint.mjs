@@ -59,27 +59,40 @@ async function rejected(lint, root, at, texts) {
   return found;
 }
 
-// `request.find`: for each rule, the first of the candidate files the lint reads with that rule as
-// an error, or null.
+// What a lint that threw is reported as: the first line of what it said.
+const failed = (error) =>
+  `the repository's lint failed: ${String(error?.message ?? error).split("\n")[0]}`;
+
+// For each rule, the first of the candidate files the lint reads with that rule as an error, or
+// null.
+async function firstErrors(lint, root, { rules, candidates }) {
+  const at = Object.fromEntries(rules.map((rule) => [rule, null]));
+  for (const file of candidates) {
+    if (Object.values(at).every(Boolean)) break;
+    const full = path.join(root, file);
+    if (await lint.isPathIgnored(full)) continue;
+    const config = await lint.calculateConfigForFile(full);
+    for (const rule of rules) {
+      if (!at[rule] && severity(config?.rules?.[rule]) === ERROR) at[rule] = file;
+    }
+  }
+  return at;
+}
+
+// `request.find`: what `firstErrors` answers, or `{ error }` when the lint throws, as it does on a
+// configuration it cannot read.
 // `request.jobs`: for each, the rules that reject each probe beyond those that reject the control
 // text, then the same with the job's rule turned off: the changed copy, which must let them
 // through. A job without a rule turns off every rule that rejected a probe.
 async function run(root, request) {
   const ESLint = await loadLint(root);
   if (!ESLint) return { error: "the repository has no lint installed that this tool can run" };
-  const lint = new ESLint({ cwd: root });
-  if (request.find) {
-    const at = Object.fromEntries(request.find.rules.map((rule) => [rule, null]));
-    for (const file of request.find.candidates) {
-      if (Object.values(at).every(Boolean)) break;
-      const full = path.join(root, file);
-      if (await lint.isPathIgnored(full)) continue;
-      const config = await lint.calculateConfigForFile(full);
-      for (const rule of request.find.rules) {
-        if (!at[rule] && severity(config?.rules?.[rule]) === ERROR) at[rule] = file;
-      }
-    }
-    return { at };
+  let lint;
+  try {
+    lint = new ESLint({ cwd: root });
+    if (request.find) return { at: await firstErrors(lint, root, request.find) };
+  } catch (error) {
+    return { error: failed(error) };
   }
   const results = {};
   for (const job of request.jobs) {
@@ -98,7 +111,7 @@ async function run(root, request) {
       const off = offProbes.map((rules) => rules.filter((rule) => !offBase.includes(rule)));
       results[job.key] = { fired, off, turnedOff };
     } catch (error) {
-      results[job.key] = { error: `the repository's lint failed: ${error.message.split("\n")[0]}` };
+      results[job.key] = { error: failed(error) };
     }
   }
   return { results };

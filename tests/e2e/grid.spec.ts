@@ -4,6 +4,7 @@
 // decision:no-sideways-scroll
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { suaCacPhanTu, suaTrang } from "./sua-trang";
 
 const GRID = "/proto/luoi-va-o-theo-kieu";
 const PHONE = new Set(["360", "414"]);
@@ -126,7 +127,7 @@ test.describe("grid", () => {
     await openGrid(page);
     await codeFilter(page).fill("khong-co-dong-nao");
     await expect(page.getByText("Không có dòng nào khớp")).toBeVisible();
-    await page.getByRole("button", { name: "Xoá lọc" }).evaluate((el) => el.remove());
+    await suaTrang(page.getByRole("button", { name: "Xoá lọc" }), (el) => el.remove());
     await expect(assertNoMatchExit(page)).rejects.toThrow("no-match exit missing");
   });
 
@@ -173,7 +174,7 @@ test.describe("grid", () => {
     await page.goto(`${GRID}?state=loading`);
     const skeleton = page.locator('[data-slot="region-skeleton"]');
     await skeleton.waitFor({ state: "attached" });
-    await skeleton.evaluate((el) => el.classList.remove("invisible"));
+    await suaTrang(skeleton, (el) => el.classList.remove("invisible"));
     await expect(assertSkeletonHiddenEarly(page)).rejects.toThrow("skeleton shown before 1s");
   });
 
@@ -252,7 +253,7 @@ test.describe("grid", () => {
     await openGrid(page);
     const cut = page.locator('[data-slot="truncated-text"][data-cut="true"]').first();
     await expect(cut).toBeAttached();
-    await cut.evaluate((el) => el.removeAttribute("tabindex"));
+    await suaTrang(cut, (el) => el.removeAttribute("tabindex"));
     await expect(assertLongTextReadable(page)).rejects.toThrow(
       "long text not reachable by keyboard",
     );
@@ -287,7 +288,7 @@ test.describe("grid", () => {
     test.skip(!PHONE.has(info.project.name), "desktop");
     await openGrid(page);
     await expect(bodyRows(page).first()).toBeVisible();
-    await bodyRows(page).evaluateAll((rows) => {
+    await suaCacPhanTu(bodyRows(page), (rows) => {
       for (const row of rows) {
         row.classList.remove("h-8", "text-sm");
         row.classList.add("h-12", "text-base");
@@ -348,7 +349,7 @@ test.describe("grid", () => {
     const cell = bodyRows(page).first().locator('[data-slot="typed-cell"]').first();
     // The grid re-renders once it has measured its width: break the colour until it sticks.
     await expect(async () => {
-      await cell.evaluate((el) => {
+      await suaTrang(cell, (el) => {
         el.style.transition = "none";
         el.style.backgroundColor = "rgb(255, 255, 255)";
         el.style.color = "rgb(250, 250, 250)";

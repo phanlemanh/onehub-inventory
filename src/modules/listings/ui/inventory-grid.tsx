@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import type { FieldKey } from "@/components/candidate/column-kind";
 import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
 import type { RegionPhoneList } from "@/components/candidate/phone-list";
 import type { ColumnFilters, GridView } from "@/components/candidate/grid-view";
@@ -12,12 +13,16 @@ import { Button } from "@/components/ui/button";
 import type { Listing } from "@/generated/ontology";
 
 import type { ListingSaveDoor } from "../save-door";
+import { httpSaveDoor } from "./http-save-door";
 import type { SavedView } from "../saved-view";
 
 import {
+  FEE_INCLUSION_FIELD,
   INVENTORY_GROUP_BY,
+  cardNetOf,
   inventoryColumns,
   type InventoryCustomColumn,
+  type InventoryFeeHeaders,
   type InventoryField,
   type InventoryState,
 } from "./inventory-rows";
@@ -33,12 +38,15 @@ import { useGeoPlace } from "./use-geo-place";
 
 /** Rows kept when part of the load fails: the first page and a half, so the partial state still spans two pages. */
 const PARTIAL_ROWS = 40;
+/** The fee inclusion column is in the Cột menu, off until the person turns it on (row 19, Hỏi-3). */
+const HIDDEN_AT_FIRST = [FEE_INCLUSION_FIELD] as const;
 
 /** The inventory grid: the screen declares columns, rows, its empty reason and what one listing's record shows. */
 export function InventoryGrid({
   title,
   headers,
   customColumns,
+  feeHeaders,
   rows,
   state,
   emptyWhy,
@@ -53,12 +61,17 @@ export function InventoryGrid({
   listings,
   editLabels,
   door,
+  live = false,
+  readFailed = false,
+  noActivate,
   geoTree,
 }: {
   title: string;
   headers: Readonly<Record<InventoryField, string>>;
   /** The company's own columns (row 7e), after the eight standard ones. */
   customColumns?: readonly InventoryCustomColumn[];
+  /** Headers of the fee columns (row 19); without them the grid has no net-to-seller or fee inclusion column. */
+  feeHeaders?: InventoryFeeHeaders;
   rows: readonly GridRow[];
   state: InventoryState;
   emptyWhy: string;
@@ -82,13 +95,26 @@ export function InventoryGrid({
   listings?: readonly Listing[];
   /** Words of the cell editors from the label table (needed with `listings`). */
   editLabels?: CellEditLabels;
-  /** The save door of those edits; the sample door in memory when absent (row 10 hands in the real one). */
+  /** The save door of those edits (tests); otherwise the real /api/v1 door when `live`, the sample door when not. */
   door?: ListingSaveDoor;
+  /** The rows are the company's real listings (row 10): edits go to /api/v1 and «Tải lại» reads them again. */
+  live?: boolean;
+  /** The company's listings could not be read (row 10): «Thử lại» reads them again from the server. */
+  readFailed?: boolean;
+  /** Rows whose status cell does not offer Active to this person (row 10, AC-5). */
+  noActivate?: readonly string[];
   /** 2d: the places of the grid's rows; the second column's place entries then filter the grid in place. */
   geoTree?: readonly GeoNode[];
 }) {
   const router = useRouter();
   const [current, setCurrent] = useState<InventoryState>(state);
+  // A new read of the page (Tải lại, or after a change the server works out) brings its own state.
+  const [givenState, setGivenState] = useState(state);
+  if (givenState !== state) {
+    setGivenState(state);
+    setCurrent(state);
+  }
+  const [realDoor] = useState(() => (live && !door ? httpSaveDoor() : undefined));
   const place = usePlaceChange();
   const [view, setView] = useState<GridView | null>(null);
   const saved = useMemo(() => (openView ? gridView(openView.view) : undefined), [openView]);
@@ -115,25 +141,54 @@ export function InventoryGrid({
   }, [staleLinkNote]);
   // The same columns on every render: this grid renders again on each change of arrangement (the «changed» mark), and
   // new columns would draw the header cells, with the filter box being typed in, again.
-  const columns = useMemo(() => inventoryColumns(headers, customColumns), [headers, customColumns]);
+  const columns = useMemo(
+    () => inventoryColumns(headers, customColumns, feeHeaders),
+    [headers, customColumns, feeHeaders],
+  );
+  const headerOf = useCallback(
+    (field: FieldKey) => columns.find((c) => c.field === field)?.header ?? field,
+    [columns],
+  );
   // 2d: a place picked in the second column changes the project and building filters only; the address follows.
   const geo = useGeoPlace({ tree: geoTree, rows, columns, view, active: !openView });
   // Below 768 px the region shows each row as the listing card's row layout (row 2b): the record head's own card.
+  // With the fee columns (row 19) a card whose price includes the fees also shows what the seller nets; a card without
+  // fees included, without a price or without a fee condition stays as row 2b drew it.
+  const inclusionOf = useMemo(
+    () => new Map((listings ?? []).map((l) => [l.id, l.feeInclusion])),
+    [listings],
+  );
   const phoneList = useMemo(
     (): RegionPhoneList<GridRow> => ({
       label: (row) => `${headers["Listing.unitNumber"]} ${String(row["Listing.unitNumber"] ?? "")}`,
-      card: (row) => (
-        <ListingCard
-          layout="row"
-          view={listingView(row, headers)}
-          priceLabel={headers["Listing.listPrice"]}
-          building={String(row["Listing.buildingName"] ?? "")}
-        />
-      ),
+      card: (row) => {
+        const net = feeHeaders
+          ? cardNetOf(row, inclusionOf.get(row.id), feeHeaders.netToSeller)
+          : null;
+        return (
+          <ListingCard
+            layout="row"
+            view={listingView(row, headers)}
+            priceLabel={headers["Listing.listPrice"]}
+            building={String(row["Listing.buildingName"] ?? "")}
+            net={net}
+          />
+        );
+      },
     }),
-    [headers],
+    [headers, feeHeaders, inclusionOf],
   );
-  const edit = useListingCellEdit({ rows, listings, headers, labels: editLabels, door });
+  const edit = useListingCellEdit({
+    rows,
+    listings,
+    headers,
+    labels: editLabels,
+    door: door ?? realDoor,
+    headerOf,
+    noActivate,
+    feeEditable: feeHeaders !== undefined && live,
+    onServerWork: live ? () => router.refresh() : undefined,
+  });
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
     current === "empty" ? [] : current === "partial" ? edit.rows.slice(0, PARTIAL_ROWS) : edit.rows;
@@ -147,11 +202,12 @@ export function InventoryGrid({
         columns={columns}
         rows={shown}
         status={status}
-        onRetry={() => setCurrent("ready")}
+        onRetry={() => (readFailed ? router.refresh() : setCurrent("ready"))}
         record={record}
         emptyWhy={emptyWhy}
         initialFilters={filters}
         initialView={geo.view ?? saved}
+        hiddenAtFirst={feeHeaders ? HIDDEN_AT_FIRST : undefined}
         onViewChange={setView}
         action={
           savedViews && copy

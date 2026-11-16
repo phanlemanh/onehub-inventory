@@ -26,8 +26,10 @@ import { SAMPLE_LISTINGS_PER_SUBDIVISION } from "../../src/modules/listings";
 import { waitReady } from "../../tools/e2e_templates/runner";
 import { openSheet, shown } from "../../tools/e2e_templates/settle";
 
+import { seedSampleInventory } from "../db/can-mau";
 import { readHeaders } from "./column-headers";
 import { ROLES, signInWithCode } from "./dang-nhap-vai";
+import { chupAnh } from "../e2e/sua-trang";
 
 const RUN = process.env["E2E_DB_RUN"] ?? `${process.pid}`;
 const DB_PORT = process.env["DB_PORT"] ?? "5563";
@@ -70,6 +72,8 @@ async function makeCompanies(): Promise<void> {
           [id, user, p.name, p.roles],
         );
       }
+      // Row 10: the inventory is the signed-in company's own; it holds the sample listings.
+      await seedSampleInventory(db, id);
     };
     await add(
       COMPANY.a,
@@ -110,6 +114,8 @@ const STANDARD = [
   "Subdivision",
   "StandardStatus",
   "ListPrice",
+  // Row 19: the company's Về tay column stands right after Giá chào.
+  "NetToSeller",
   "LivingArea",
   "BedroomsTotal",
   "LastConfirmedAt",
@@ -378,7 +384,7 @@ test.describe("lop rieng tren bang hang", () => {
       "Hướng view",
       "Ghi chú",
     ];
-    expect(wantA).toHaveLength(10);
+    expect(wantA).toHaveLength(11);
     const gotA = await headers(pageA);
     const shownRetired = gotA.find((h) => h === "Hoa hồng tạm");
     if (shownRetired) throw new Error(`retired field shown: ${shownRetired}`);
@@ -422,7 +428,7 @@ test.describe("lop rieng tren bang hang", () => {
     const snap = async (page: Page, url: string, file: string, ready: string) => {
       await page.goto(url);
       await shown(page.locator(ready).first(), file);
-      await page.screenshot({ path: `${OUT}/${file}.png` });
+      await chupAnh(page, { path: `${OUT}/${file}.png` });
     };
     for (const scheme of ["light", "dark"] as const) {
       for (const [width, height] of WIDTHS) {
@@ -442,7 +448,7 @@ test.describe("lop rieng tren bang hang", () => {
         if (width < 1024) {
           // On a phone the five parts ride in the App Shell's sheet: open it the shared way and show them.
           await openSheet(page);
-          await page.screenshot({ path: `${OUT}/tuy-chinh-san-${width}-ngan${tail}.png` });
+          await chupAnh(page, { path: `${OUT}/tuy-chinh-san-${width}-ngan${tail}.png` });
           await page.keyboard.press("Escape");
         }
         await snap(
@@ -460,7 +466,7 @@ test.describe("lop rieng tren bang hang", () => {
               el.scrollLeft = el.scrollWidth;
             });
           await page.waitForTimeout(300);
-          await page.screenshot({ path: `${OUT}/inventory-1440-cuoi${tail}.png` });
+          await chupAnh(page, { path: `${OUT}/inventory-1440-cuoi${tail}.png` });
           await snap(
             page,
             "/tuy-chinh-san?phan=mau",
@@ -472,14 +478,14 @@ test.describe("lop rieng tren bang hang", () => {
             .locator('[data-row-actions-for="huong_view"] [data-slot="row-actions"]')
             .click();
           await shown(page.getByRole("menu"), "menu");
-          await page.screenshot({ path: `${OUT}/tuy-chinh-san-menu-1440${tail}.png` });
+          await chupAnh(page, { path: `${OUT}/tuy-chinh-san-menu-1440${tail}.png` });
           await page.keyboard.press("Escape");
           await page
             .getByRole("button", { name: label("AddCustomField") })
             .first()
             .click();
           await shown(dialogOf(page, "field-dialog"), "hop them truong");
-          await page.screenshot({ path: `${OUT}/tuy-chinh-san-them-truong-1440${tail}.png` });
+          await chupAnh(page, { path: `${OUT}/tuy-chinh-san-them-truong-1440${tail}.png` });
           await page.keyboard.press("Escape");
         }
         await ctx.close();

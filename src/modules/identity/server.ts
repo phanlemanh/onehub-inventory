@@ -13,7 +13,7 @@ export {
 } from "./with-company";
 export { assertProductionConfig, AuthConfigError, PRODUCTION_VARS } from "./config";
 export { authHandlers, currentSession, membersHandlers, type CurrentSession } from "./runtime";
-export { actionDoor, sessionDoor } from "./runtime";
+export { actionDoor, databaseConfigured, sessionDoor } from "./runtime";
 export { isDoorError, openDoor, type DoorError, type OpenedDoor } from "./action-door";
 export {
   captureInviteSender,
@@ -22,7 +22,7 @@ export {
   type SentInvite,
 } from "./invite-mail";
 export { createMembersHandlers, type MembersHandlers } from "./members-http";
-export { type MemberRow, type MembersDeps } from "./members";
+export { sessionMemberName, type MemberRow, type MembersDeps } from "./members";
 export { requireAction } from "./require-action";
 export { createAuthHandlers, type AuthHandlers } from "./http";
 export { sessionContext, type CompanyRef, type Session } from "./login";

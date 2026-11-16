@@ -2,6 +2,8 @@
 // a recipe. Recipes never open pages, so every case waits for the same "ready" before it touches anything.
 import { expect, type Page } from "@playwright/test";
 
+import { pageReady } from "../../tests/e2e/sua-trang";
+
 import { pinned, pushedOut, SESSION_ID, type Break, type Ctx, type Recipe } from "./recipes";
 import type { Mode } from "./register";
 
@@ -118,18 +120,15 @@ export async function throttle(page: Page, wanted = 0): Promise<void> {
 
 /** Wait until the streamed page is swapped in and React has hydrated it, so a click does something. */
 export async function waitReady(page: Page): Promise<void> {
-  await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0, { timeout: 30_000 });
-  await page.waitForFunction(
-    () => {
-      const el =
-        document.querySelector('[data-slot="data-region"]') ??
-        document.querySelector("main") ??
-        document.querySelector("h1");
-      return el !== null && Object.keys(el).some((k) => k.startsWith("__reactFiber"));
-    },
-    undefined,
-    { timeout: 30_000 },
-  );
+  // The one hydration wait of the browser tests (row 1u): the page's hydrated mark, nothing streamed still pending,
+  // and the region (or main, or the heading) taken over by React.
+  // In that order: the region when the screen has one (it hydrates inside the page's loading boundary, after <main>),
+  // else <main>, else the heading. A selector list would match in page order and land on <main>.
+  const region = page.locator('[data-slot="data-region"]');
+  const main = page.locator("main");
+  const el =
+    (await region.count()) > 0 ? region : (await main.count()) > 0 ? main : page.locator("h1");
+  await pageReady(page, { el, timeout: 30_000 });
 }
 
 /** Open `url` for `recipe`, applying a break's setup first when given, and return the context. */

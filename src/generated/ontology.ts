@@ -139,6 +139,29 @@ export interface CustomField {
   retiredAt?: string;
 }
 
+export type FeeItemKind = "Law" | "Own";
+
+/** One item of a company's fee schedule (FeeSchedule), as a percentage of the list price that comes off an Included listing. Two items are fixed by law and only switched on or off; the company's own items (Phí môi giới by default) can be added, renamed, re-rated and retired. The table keeps only what a company changed or added: an item with no row is at its default. Internal; the customer page never reads it (SP-4). */
+export interface FeeItem {
+  id: number;
+  /** id of Company */
+  companyId: string;
+  code: string;
+  kind: FeeItemKind;
+  name?: string;
+  rateBasisPoints: number;
+  included: boolean;
+  removed: boolean;
+  position: number;
+  changedBy: string;
+  changedByName: string;
+  /** ISO datetime */
+  changedAt: string;
+  retiredBy?: string;
+  /** ISO datetime */
+  retiredAt?: string;
+}
+
 /** The shape of a sheet a company imported — its column names in order — and where each column goes: a standard field, a custom field, or left out on purpose. The next sheet of the same shape needs no matching again. */
 export interface ImportTemplate {
   id: string;
@@ -161,6 +184,8 @@ export type ListingFurnished = "Furnished" | "Partially" | "Unfurnished";
 
 export type ListingOccupantType = "Owner" | "Tenant" | "Vacant";
 
+export type ListingFeeInclusion = "Included" | "Excluded";
+
 /** One offer by a company to sell or lease one unit. */
 export interface Listing {
   id: string;
@@ -181,8 +206,11 @@ export interface Listing {
   originalEntryTimestamp?: string;
   furnished?: ListingFurnished;
   occupantType?: ListingOccupantType;
+  feeInclusion?: ListingFeeInclusion;
   legalStatus?: string;
   financing?: string;
+  listAgentKey?: string;
+  listAgentFullName?: string;
   version: number;
   customFields?: Record<string, unknown> | unknown[];
 }
@@ -385,6 +413,12 @@ export interface EditCompanyLayerInput {
 export interface RetireCompanyLayerInput {
 }
 
+export interface ReadFeeScheduleInput {
+}
+
+export interface SetFeeScheduleInput {
+}
+
 export interface MatchPendingUnitsInput {
 }
 
@@ -462,6 +496,10 @@ export interface ActionHandlers {
   editCompanyLayer(input: EditCompanyLayerInput, ctx: ActionContext): Promise<void>;
   /** Stop using a label, field, value spelling, pending unit or import template; nothing is deleted and values already on units stay. */
   retireCompanyLayer(input: RetireCompanyLayerInput, ctx: ActionContext): Promise<void>;
+  /** See the company's fee items, their rates, which are switched on, and who changed them. */
+  readFeeSchedule(input: ReadFeeScheduleInput, ctx: ActionContext): Promise<void>;
+  /** Set the company's fee schedule in one save: switch items on or off, change or reset an own item's rate, add, rename and retire own items; nothing is deleted. */
+  setFeeSchedule(input: SetFeeScheduleInput, ctx: ActionContext): Promise<void>;
   /** Match the company's pending units with units the shared catalog now has; the catalog never changes. */
   matchPendingUnits(input: MatchPendingUnitsInput, ctx: ActionContext): Promise<void>;
   /** See the listings of the company. */
@@ -982,6 +1020,57 @@ export const ACTIONS: readonly ActionSpec[] = [
     },
   },
   {
+    name: "readFeeSchedule",
+    description: "See the company's fee items, their rates, which are switched on, and who changed them.",
+    entity: "FeeItem",
+    kind: "query",
+    roles: ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      BuyerAgent: "company",
+      TeamLead: "company",
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["GET /api/v1/company/fee-schedule"],
+      db: ["table company_fee_items select"],
+    },
+  },
+  {
+    name: "setFeeSchedule",
+    description: "Set the company's fee schedule in one save: switch items on or off, change or reset an own item's rate, add, rename and retire own items; nothing is deleted.",
+    entity: "FeeItem",
+    kind: "update",
+    roles: ["CompanyAdmin"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      CompanyAdmin: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["PUT /api/v1/company/fee-schedule"],
+      db: ["table company_fee_items insert", "table company_fee_items update"],
+    },
+  },
+  {
     name: "matchPendingUnits",
     description: "Match the company's pending units with units the shared catalog now has; the catalog never changes.",
     entity: "PendingUnit",
@@ -1012,7 +1101,7 @@ export const ACTIONS: readonly ActionSpec[] = [
     description: "See the listings of the company.",
     entity: "Listing",
     kind: "query",
-    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    roles: ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"],
     agent: "forbidden",
     idempotent: false,
     output: null,
@@ -1025,12 +1114,13 @@ export const ACTIONS: readonly ActionSpec[] = [
       ListAgent: "company",
       BuyerAgent: "company",
       TeamLead: "company",
+      CompanyAdmin: "company",
     },
-    status: "planned",
+    status: "live",
     states: [],
     doors: {
       api: [],
-      db: [],
+      db: ["table listings select", "table listing_units select"],
     },
   },
   {
@@ -1078,11 +1168,11 @@ export const ACTIONS: readonly ActionSpec[] = [
       BuyerAgent: "company",
       TeamLead: "company",
     },
-    status: "planned",
+    status: "live",
     states: [],
     doors: {
-      api: [],
-      db: [],
+      api: ["PATCH /api/v1/listings/[id]"],
+      db: ["table listings update"],
     },
   },
   {
@@ -1103,10 +1193,10 @@ export const ACTIONS: readonly ActionSpec[] = [
       ListAgent: "own",
       TeamLead: "company",
     },
-    status: "planned",
-    states: ["Incomplete", "Hold"],
+    status: "live",
+    states: [],
     doors: {
-      api: [],
+      api: ["PATCH /api/v1/listings/[id]"],
       db: [],
     },
   },
@@ -1400,6 +1490,8 @@ export function can(role: Role, action: ActionSpec): boolean {
 /** Personal-data properties per entity (`pii: true` in the ontology). */
 export const PII_FIELDS: Readonly<Record<string, readonly string[]>> = {
   Contact: ["fullName", "phones"],
+  FeeItem: ["changedByName"],
+  Listing: ["listAgentFullName"],
   Member: ["name"],
   ShareLink: ["recipientName"],
 };

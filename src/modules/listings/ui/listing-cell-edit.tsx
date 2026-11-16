@@ -11,7 +11,11 @@ import { FormDialog } from "@/components/candidate/form-dialog";
 import { Badge } from "@/components/reui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { ListingStandardStatus, ListingWithdrawnReason } from "@/generated/ontology";
+import type {
+  ListingFeeInclusion,
+  ListingStandardStatus,
+  ListingWithdrawnReason,
+} from "@/generated/ontology";
 import { statusLabel, statusTone } from "@/lib/format";
 
 import {
@@ -38,6 +42,7 @@ import {
 /** The writes an editor asks for; the grid applies them through the save door and offers «Hoàn tác». */
 export type ListingEdit =
   | { field: "Listing.listPrice"; value: number }
+  | { field: "Listing.feeInclusion"; value: ListingFeeInclusion }
   | {
       field: "Listing.standardStatus";
       value: ListingStandardStatus;
@@ -171,11 +176,13 @@ function StatusEditor({
   labels,
   onSave,
   onAsk,
+  canActivate,
 }: {
   session: CellEditSession;
   labels: CellEditLabels;
   onSave: (edit: ListingEdit) => void;
   onAsk: (ask: StatusAsk) => void;
+  canActivate: boolean;
 }) {
   const from = session.row["Listing.standardStatus"] as ListingStandardStatus;
   const tx = session.row.transaction;
@@ -194,41 +201,104 @@ function StatusEditor({
       )}
       className="absolute top-0 flex w-max min-w-(--anchor-width) flex-col items-start gap-0.5 rounded-md border bg-popover p-1 shadow-md ring-2 ring-primary group-data-[edge=end]/cell-editor:right-0 group-data-[edge=start]/cell-editor:left-0"
     >
-      {nextStatuses(from).map((status, index) => (
+      {nextStatuses(from)
+        // Active needs activateListing: one's own unit or one nobody keeps, or the team lead (row 10, AC-5).
+        .filter((status) => canActivate || status !== "Active")
+        .map((status, index) => (
+          <Button
+            key={status}
+            type="button"
+            variant="ghost"
+            size="sm"
+            role="option"
+            aria-selected={false}
+            autoFocus={index === 0}
+            data-status-option={status}
+            onClick={() => pick(status)}
+          >
+            <Badge variant={statusTone(status)}>{statusLabel(status, tx)}</Badge>
+          </Button>
+        ))}
+    </div>
+  );
+}
+
+/** The two fee inclusions (row 10, AC-7), as a list in the cell like the status. */
+function FeeEditor({
+  session,
+  labels,
+  onSave,
+}: {
+  session: CellEditSession;
+  labels: CellEditLabels;
+  onSave: (edit: ListingEdit) => void;
+}) {
+  const tx = session.row.transaction;
+  const shown = session.row["Listing.feeInclusion"];
+  const options: { value: ListingFeeInclusion; text: string }[] = [
+    { value: "Included", text: word(labels, "FeeIncluded", tx) },
+    { value: "Excluded", text: word(labels, "FeeExcluded", tx) },
+  ];
+  const pick = (value: ListingFeeInclusion, text: string) => {
+    session.close();
+    if (text !== shown) onSave({ field: "Listing.feeInclusion", value });
+  };
+  return (
+    <div
+      role="listbox"
+      aria-label={COPY.editLabel(
+        labels,
+        word(labels, "FeeInclusion", tx),
+        String(session.row["Listing.unitNumber"] ?? ""),
+      )}
+      className="absolute top-0 flex w-max min-w-(--anchor-width) flex-col items-start gap-0.5 rounded-md border bg-popover p-1 shadow-md ring-2 ring-primary group-data-[edge=end]/cell-editor:right-0 group-data-[edge=start]/cell-editor:left-0"
+    >
+      {options.map((o, index) => (
         <Button
-          key={status}
+          key={o.value}
           type="button"
           variant="ghost"
           size="sm"
           role="option"
-          aria-selected={false}
+          aria-selected={o.text === shown}
           autoFocus={index === 0}
-          data-status-option={status}
-          onClick={() => pick(status)}
+          data-fee-option={o.value}
+          onClick={() => pick(o.value, o.text)}
         >
-          <Badge variant={statusTone(status)}>{statusLabel(status, tx)}</Badge>
+          {o.text}
         </Button>
       ))}
     </div>
   );
 }
 
-/** The editor of one inventory cell: price or status. */
+/** The editor of one inventory cell: price, status or fee inclusion. */
 export function ListingCellEdit({
   session,
   labels,
   onSave,
   onAsk,
+  canActivate = true,
 }: {
   session: CellEditSession;
   labels: CellEditLabels;
   onSave: (edit: ListingEdit) => void;
   onAsk: (ask: StatusAsk) => void;
+  /** Whether Active is offered for this row (row 10, AC-5); the server checks it again. */
+  canActivate?: boolean;
 }) {
-  return session.field === "Listing.listPrice" ? (
-    <PriceEditor session={session} labels={labels} onSave={onSave} />
-  ) : (
-    <StatusEditor session={session} labels={labels} onSave={onSave} onAsk={onAsk} />
+  if (session.field === "Listing.listPrice")
+    return <PriceEditor session={session} labels={labels} onSave={onSave} />;
+  if (session.field === "Listing.feeInclusion")
+    return <FeeEditor session={session} labels={labels} onSave={onSave} />;
+  return (
+    <StatusEditor
+      session={session}
+      labels={labels}
+      onSave={onSave}
+      onAsk={onAsk}
+      canActivate={canActivate}
+    />
   );
 }
 
@@ -380,7 +450,10 @@ export function lockedReasons(row: GridRow): GridRow["locked"] {
   const status = row["Listing.standardStatus"] as ListingStandardStatus;
   const name = statusLabel(status, row.transaction);
   const locked: NonNullable<GridRow["locked"]> = {};
-  if (priceLocked(status)) locked["Listing.listPrice"] = COPY.lockedClosed(name);
+  if (priceLocked(status)) {
+    locked["Listing.listPrice"] = COPY.lockedClosed(name);
+    locked["Listing.feeInclusion"] = COPY.lockedClosed(name);
+  }
   if (statusLocked(status)) locked["Listing.standardStatus"] = COPY.lockedFinal(name);
   return Object.keys(locked).length > 0 ? locked : undefined;
 }

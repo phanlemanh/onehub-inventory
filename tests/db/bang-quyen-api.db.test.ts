@@ -1,6 +1,6 @@
 // Permission table at the API (row 9a, _acceptance/bang-quyen-theo-vai/evals.yaml E3). Every person signs in through the
 // real sign-in handlers of row 8 and calls the real members handlers of row 9; the database is this lane's Postgres.
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ACTIONS, type ActionSpec } from "@/generated/ontology";
 import { createAuthHandlers } from "@/modules/identity/http";
@@ -13,6 +13,8 @@ import { openDoor } from "@/modules/identity/action-door";
 import { tokenFrom } from "@/modules/identity/http";
 import { withCompany } from "@/modules/identity/with-company";
 import { createCompanyLayerHandlers } from "@/modules/company-config/company-layer-http";
+import { createFeeScheduleHandlers } from "@/modules/company-config/fee-schedule-http";
+import { createListingsHandlers } from "@/modules/listings/listings-http";
 import { createSavedViewsHandlers } from "@/modules/listings/saved-views-http";
 
 import {
@@ -26,10 +28,15 @@ import {
 } from "./bang-quyen-world";
 import { count } from "./helpers";
 
+// The fee store (row 19) reads the editor's name through identity's server door; outside Next.js its "server-only"
+// guard has nothing to guard.
+vi.mock("server-only", () => ({}));
+
 const ORIGIN = "http://127.0.0.1:3485";
 // Written before the code (evals.yaml): 3 API doors × 4 roles; plus row 2c's 4 saved-view doors × 4 roles; plus row
-// 7e's 5 company-layer doors × 4 roles.
-const API_CELLS = 48;
+// 7e's 5 company-layer doors × 4 roles; plus row 19's 2 fee-schedule doors × 4 roles; plus row 10's one listing door,
+// declared by updateListing and by activateListing, × 4 roles each.
+const API_CELLS = 64;
 
 const worlds: World[] = [];
 afterEach(async () => {
@@ -62,6 +69,17 @@ async function apiWorld(suffix: string) {
     door: (r, action) => openDoor(() => w.pool, tokenFrom(r), action),
     withCompany,
   });
+  // Row 19: the fee schedule through the same door.
+  const fees = createFeeScheduleHandlers({
+    door: (r, action) => openDoor(() => w.pool, tokenFrom(r), action),
+    withCompany,
+  });
+  // Row 10: one listing changed through the same door; a listing that does not exist is answered after the door.
+  const listings = createListingsHandlers({
+    door: (r, action) => openDoor(() => w.pool, tokenFrom(r), action),
+    withCompany,
+  });
+  const NO_LISTING = "00000000-0000-4000-8000-0000000000fe";
   // Row 2c: saved views through the identity module's shared door.
   const views = createSavedViewsHandlers({
     door: (r, action) => openDoor(() => w.pool, tokenFrom(r), action),
@@ -158,6 +176,34 @@ async function apiWorld(suffix: string) {
       case "POST /api/v1/company-layer/pending-units/match":
         return layer.match(
           req(`${ORIGIN}/api/v1/company-layer/pending-units/match`, "POST", undefined, cookie),
+        );
+      // Row 19: the default schedule, saved as it is — allowed answers 200 and writes nothing.
+      case "GET /api/v1/company/fee-schedule":
+        return fees.read(req(`${ORIGIN}/api/v1/company/fee-schedule`, "GET", undefined, cookie));
+      case "PUT /api/v1/company/fee-schedule":
+        return fees.save(
+          req(
+            `${ORIGIN}/api/v1/company/fee-schedule`,
+            "PUT",
+            {
+              items: [
+                { code: "pit", rateBasisPoints: 200, included: true },
+                { code: "registration", rateBasisPoints: 50, included: true },
+                { code: "brokerage", rateBasisPoints: 100, included: true },
+              ],
+            },
+            cookie,
+          ),
+        );
+      case "PATCH /api/v1/listings/[id]":
+        return listings.change(
+          req(
+            `${ORIGIN}/api/v1/listings/${NO_LISTING}`,
+            "PATCH",
+            { version: 1, change: { field: "listPrice", listPrice: 2_800_000_000 } },
+            cookie,
+          ),
+          NO_LISTING,
         );
       default:
         throw new Error(`api-theo-bang: không biết gọi cửa ${door}`);

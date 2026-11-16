@@ -22,10 +22,12 @@ import { regionReady } from "../e2e/phone-list";
 import { FRAME_COPY } from "../../src/components/templates/frame-copy";
 import { label } from "../../src/modules/company-config";
 import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
+import { seedSampleInventory } from "../db/can-mau";
 import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings";
 import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { expect, test } from "../../tools/e2e_templates/fixture";
 import { openSheet } from "../../tools/e2e_templates/settle";
+import { chupAnh, suaTrang } from "../e2e/sua-trang";
 
 const SAVE = label("SaveView");
 const SAVE_CHANGES = label("SaveViewChanges");
@@ -64,6 +66,8 @@ async function person(info: TestInfo, tag: string): Promise<{ email: string; id:
     "insert into company_members (company_id, user_id, name, roles) values ($1, $2, $3, $4)",
     [company, id, "[Tên] LA", ["ListAgent"]],
   );
+  // Row 10: the inventory is the signed-in company's own; it holds the sample listings.
+  await seedSampleInventory(owner, company, { id, name: "[Tên] LA" });
   return { email, id };
 }
 
@@ -459,7 +463,7 @@ test("remove", async ({ page }, info) => {
   const items = page.getByRole("menuitem");
   await expect(items.last()).toHaveText(REMOVE);
   await expect(page.getByRole("menu").locator('[role="separator"]')).toHaveCount(1);
-  const colors = await items.last().evaluate((el) => {
+  const colors = await suaTrang(items.last(), (el) => {
     const probe = document.createElement("span");
     probe.style.color = "var(--destructive)";
     document.body.append(probe);
@@ -609,10 +613,9 @@ test.describe("axe", () => {
     await signIn(page, me.email);
     await arrange(page);
     await saveAs(page, NAME);
-    await secondColumn(page)
-      .locator('[data-slot="row-actions"]')
-      .first()
-      .evaluate((el) => el.removeAttribute("aria-label"));
+    await suaTrang(secondColumn(page).locator('[data-slot="row-actions"]').first(), (el) =>
+      el.removeAttribute("aria-label"),
+    );
     expect(await seriousViolations(page)).toContain("button-name");
   });
 });
@@ -644,7 +647,7 @@ test("E15 frames", { tag: "@cho" }, async ({ page }, info) => {
     await page.emulateMedia({ colorScheme: scheme });
     const shot = async (state: string) => {
       await page.waitForTimeout(250);
-      await page.screenshot({
+      await chupAnh(page, {
         path: `${dir}/E15-${width}-${scheme === "light" ? "sang" : "toi"}-${state}.png`,
       });
     };

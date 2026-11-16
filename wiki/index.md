@@ -24,6 +24,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [CompanyValueAlias](entities/company-value-alias.md) — cách viết riêng, một cặp của từ điển giá trị
 - [PendingUnit](entities/pending-unit.md) — căn chờ khớp với danh mục
 - [ImportTemplate](entities/import-template.md) — mẫu nhập theo dạng tệp
+- [FeeItem](entities/fee-schedule.md) — khoản của thuế phí của sàn, và Về tay
 - [Listing](entities/listing.md) — một lần chào trên một căn
 - [Contact](entities/contact.md) — một người làm việc với sàn
 - [Agreement](entities/agreement.md) — cho phép một kết nối chảy
@@ -71,10 +72,14 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0029 Cấu hình sàn giữ lớp riêng, dựa vào danh tính và danh mục](decisions/0029-cau-hinh-san-dua-vao-danh-tinh-va-danh-muc.md)
 - [0030 Sổ màn là một chỗ khai quyền vào màn và nút của mỗi màn](decisions/0030-so-man-khai-cua-vao-va-nut.md)
 - [0031 Thêm gói khung chia kéo được cho hồ sơ ghim](decisions/0031-them-goi-khung-chia-keo-duoc.md)
+- [0037 Thuế phí là dữ liệu của sàn, một hình dạng khoản](decisions/0037-thue-phi-la-du-lieu-cua-san.md)
 - [0032 Lối vào của bộ vùng lưới khai trong sổ màn](decisions/0032-loi-vao-bo-vung-luoi.md)
 - [0034 Sổ linh kiện do công cụ design-assembly ghi, theo hình dạng của hợp đồng](decisions/0034-component-register-written-by-design-assembly.md)
 - [0038 Mỗi thứ hiện trên màn có đủ thêm, xem, sửa, gỡ — máy đọc mã màn và đỏ khi thiếu](decisions/0038-lifecycle-check.md)
+- [0039 Bảng hàng đọc và ghi căn chào thật — nấc ở máy chủ, quyền và dữ liệu ở cơ sở dữ liệu](decisions/0039-bang-hang-tren-du-lieu-that.md)
+- [0040 Dán từ Excel đi qua bản xem trước và cửa lưu của sửa trên ô](decisions/0040-dan-qua-ban-xem-truoc.md)
 - [0041 Bản thật ở địa chỉ riêng, Quỹ hàng chỉ để đối chiếu](decisions/0041-ban-that-o-dia-chi-rieng.md)
+- [0042 Cổng chứng minh màn bắt tệp khối tự làm chưa kê, so với nhánh chính bằng danh sách cố định](decisions/0042-cong-bat-khoi-khong-ke.md)
 
 ## Incidents
 

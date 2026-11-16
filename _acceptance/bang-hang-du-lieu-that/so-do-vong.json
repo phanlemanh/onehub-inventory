@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "slug": "bang-hang-du-lieu-that",
+  "ghi_luc": "2026-11-16T11:26:51Z",
+  "vong_cham": 4,
+  "luot": [
+    {
+      "vong": 1,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 2,
+      "verdict": "REJECT",
+      "tang": [
+        "hop-dong-yeu-cau"
+      ]
+    },
+    {
+      "vong": 3,
+      "verdict": "PASS",
+      "tang": []
+    },
+    {
+      "vong": 4,
+      "verdict": "PASS",
+      "tang": []
+    }
+  ],
+  "lam_lai": [
+    {
+      "nguon": "r1",
+      "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "r2",
+      "tang": "hop-dong-yeu-cau"
+    }
+  ],
+  "theo_tang": {
+    "bai-kiem-ha-tang": 1,
+    "trang-thai-hanh-vi": 0,
+    "du-lieu-api": 0,
+    "nghiep-vu": 0,
+    "thanh-phan": 0,
+    "bo-cuc": 0,
+    "hop-dong-yeu-cau": 1,
+    "link": 0,
+    "chu-dinh-dang": 0,
+    "mau-token": 0,
+    "truy-cap": 0
+  },
+  "chua_phan": [],
+  "thuoc_vat": {
+    "vat": [
+      403,
+      86
+    ],
+    "thuoc": [
+      4,
+      4
+    ],
+    "nhat": 1
+  },
+  "gio_may": {
+    "gio_may": 23.52,
+    "gio_cho": 9.15,
+    "phan_tram_tuan": 32.12
+  }
+}

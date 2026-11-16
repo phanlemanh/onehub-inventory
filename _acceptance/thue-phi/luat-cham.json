@@ -1,0 +1,17 @@
+{
+ "ban": "8ee15fdf20865e117d188e4fcb9769b2318e98e0",
+ "base": "2da953437e868503f508569ba3fe8ba799392fcd",
+ "den": "f70147d3edc215cf5cab3096d6e0b7694f60ba6e",
+ "sua_tep_luat": {
+  "may": [],
+  "nguoi": []
+ },
+ "cham": [
+  {
+   "ma": "SP-1",
+   "tep": "db/tests/pha-thu/thue-phi-khong-ep.sql",
+   "dong": 3,
+   "chu": "alter table company_fee_items no force row level security;"
+  }
+ ]
+}

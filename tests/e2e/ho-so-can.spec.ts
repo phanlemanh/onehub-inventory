@@ -11,6 +11,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 import { regionHydrated, rowsShown } from "./phone-list";
+import { chupAnh, suaTrang, themKieu } from "./sua-trang";
 
 const URL = "/inventory";
 const WIDE = new Set(["1440", "1024"]);
@@ -21,7 +22,7 @@ const PHONE = new Set(["414", "360"]);
  * coordinator's rulings K-1411-1 and K-1411-2 (row 2e, «sửa sau Cổng Phạm vi», the owner signs at row 2e's evidence
  * gate): the filter row is always shown (owner 2026-11-13), so a number column is at least 11 ch, a text column 8.3
  * ch and the first column fits its title and sort button — the unit code shows whole; the first column, always frozen,
- * has no «Bỏ ghim» button (K-1411-7), and eight columns still fit at 1440.
+ * has no «Bỏ ghim» button (K-1411-7), and at 1440 the columns from Căn to Về tay stay in view (row 19).
  */
 const MIN_VISIBLE: Readonly<Record<string, number>> = { "1440": 3, "1024": 1 };
 const FROZEN = ["#", "Căn", "Toà"];
@@ -383,7 +384,7 @@ test.describe("E2 · the record floats beside the grid", () => {
   test("runs the whole height when the top bar is hidden", async ({ page }, info) => {
     await openInventory(page);
     await openFifth(page);
-    await page.addStyleTag({
+    await themKieu(page, {
       content: '[data-slot="app-shell-top-bar"] { display: none !important; }',
     });
     const size = page.viewportSize()!;
@@ -464,9 +465,9 @@ test.describe("E2, AC-10 of row 3e · the record head on two lines on every size
       await openInventory(page);
       await openFifth(page);
       await assertHeaderTwoLines(page);
-      await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+      await themKieu(page, { content: "nextjs-portal { display: none !important; }" });
       mkdirSync(HEAD_SHOTS, { recursive: true });
-      await page.screenshot({
+      await chupAnh(page, {
         path: join(HEAD_SHOTS, `dau-ho-so-${info.project.name}-${colorScheme}.png`),
       });
     });
@@ -656,7 +657,7 @@ test.describe("E2 · the unit code opens in one click, the cell selects like a s
 
   test("break: a unit code that keeps the grid's two-step press is caught", async ({ page }) => {
     await openInventory(page);
-    await page.evaluate(() => {
+    await suaTrang(page, () => {
       for (const el of document.querySelectorAll("[data-record-open]"))
         el.removeAttribute("data-cell-interactive");
     });
@@ -689,7 +690,7 @@ test.describe("E3 · the grid beside the record keeps its columns", () => {
   });
 
   test("break: Toà no longer frozen scrolls away", async ({ page }, info) => {
-    // At 1440 the eight columns fit, the grid does not scroll sideways, so there is nothing to scroll away from.
+    // At 1440 Toà never leaves the first view (the columns after Về tay scroll, row 19); 1024 is where it would scroll away.
     test.skip(info.project.name !== "1024", "luoi chi cuon ngang o 1024");
     await injectStyle(
       page,
@@ -713,7 +714,7 @@ test.describe("E3 · the grid beside the record keeps its columns", () => {
   test("break: a hidden Diện tích column is caught", async ({ page }) => {
     await injectStyle(
       page,
-      '[data-slot="data-region"] th:nth-child(7), [data-slot="data-region"] td:nth-child(7) { display: none !important; }',
+      '[data-slot="data-region"] th:nth-child(8), [data-slot="data-region"] td:nth-child(8) { display: none !important; }',
     );
     await openInventory(page);
     await openFifth(page);
@@ -845,9 +846,9 @@ test.describe("E9 · no serious accessibility fault with the record open", () =>
     test.skip(info.project.name !== "1440", "quet o 1440");
     await openInventory(page);
     await openFifth(page);
-    await page
-      .locator('[role="dialog"][aria-modal="false"]')
-      .evaluate((el) => el.removeAttribute("aria-labelledby"));
+    await suaTrang(page.locator('[role="dialog"][aria-modal="false"]'), (el) =>
+      el.removeAttribute("aria-labelledby"),
+    );
     expect(await seriousViolations(page)).toContain("aria-dialog-name");
   });
 });

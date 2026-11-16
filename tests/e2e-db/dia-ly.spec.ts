@@ -5,7 +5,9 @@
 //   E7 both ways — typing in the building box after a complex unlights the tree; typing «S1.02» whole lights S1.02;
 //     «Xoá lọc» lights «Tất cả hàng». Each step compares the grid's rows with the lit place's. Break: «cay lech bang».
 //   E8 other filters — with status Active on, a building keeps the status filter; all 10 places still show. Breaks:
-//     «mat loc khac», «noi bien mat: <nơi>».
+//     «mat loc khac», «noi bien mat: <nơi>». VP5: the same press before the page comes alive (its scripts held back,
+//     so the browser follows the entry's own address) keeps the status filter too. Break: the place's bare address,
+//     as before the fix, «mat loc khac».
 //   E9 address — reload, a copied link in a new session, a saved view reopened; an unknown place opens as usual. Break:
 //     «dia chi mat noi».
 //   E11 phone and width — at 414 and 360 the sheet closes on a pick; at 1024 and 1440 project names show whole. Break:
@@ -21,6 +23,7 @@ import pg from "pg";
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
 import { FRAME_COPY } from "../../src/components/templates/frame-copy";
 import { label } from "../../src/modules/company-config";
+import { seedSampleInventory } from "../db/can-mau";
 import { SAMPLE_SUBDIVISIONS, sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
 import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings";
 import { geoTree, type GeoNode } from "../../src/modules/listings/ui/geo-tree";
@@ -28,6 +31,7 @@ import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { expect, test } from "../../tools/e2e_templates/fixture";
 import { openSheet } from "../../tools/e2e_templates/settle";
 import { regionReady } from "../e2e/phone-list";
+import { pageReady, suaTrang } from "../e2e/sua-trang";
 
 const ALL = `${FRAME_COPY.secondColumn.all} ${label("Listing").toLocaleLowerCase("vi")}`;
 // The same rows and catalog the screen reads, built here without the screen's own files (they pull in React).
@@ -94,6 +98,8 @@ async function person(info: TestInfo, tag: string): Promise<string> {
     "insert into company_members (company_id, user_id, name, roles) values ($1, $2, $3, $4)",
     [company, id, "[Tên] DL", ["ListAgent"]],
   );
+  // Row 10: the inventory is the signed-in company's own; it holds the sample listings.
+  await seedSampleInventory(owner, company, { id, name: "[Tên] DL" });
   return email;
 }
 
@@ -216,9 +222,7 @@ test("E4 four places: count and the one lit entry", async ({ page }, info) => {
   }
   expect(() => checkLit([], "S1.03")).toThrow("nut khong sang: S1.03");
   // Break: with the footer gone the count cannot be read, and the test goes red instead of assuming 60.
-  await region(page)
-    .locator('[data-slot="region-footer-count"]')
-    .evaluate((el) => el.remove());
+  await suaTrang(region(page).locator('[data-slot="region-footer-count"]'), (el) => el.remove());
   await expect(footerCount(page)).rejects.toThrow("khong doc duoc chan bang");
   expect(() => readCount(["12 căn"])).toThrow("khong doc duoc chan bang");
 });
@@ -250,7 +254,6 @@ test("E7 the tree follows the filter boxes", async ({ page }, info) => {
 test("E8 a place keeps the other filters", async ({ page }, info) => {
   atWidth(info, "1440");
   await signIn(page, await person(info, "e8"));
-  // Wait for the page to come alive: a press before then follows the link as a plain address.
   await page.goto("/inventory?status=Active", { waitUntil: "networkidle" });
   await settled(page);
   const want = ROWS.filter(
@@ -271,6 +274,41 @@ test("E8 a place keeps the other filters", async ({ page }, info) => {
   }
   expect(TEN).toHaveLength(10);
 });
+
+// VP5: before the page comes alive a press follows the entry's address as it stands, so that address itself must keep
+// the other filters (AC-5). The page's scripts are held back, so the press is surely before.
+test("E8 a press before the page comes alive keeps the other filters", async ({ page }, info) => {
+  atWidth(info, "1440");
+  await signIn(page, await person(info, "e8-som"));
+  const scripts = "**/_next/static/**/*.js";
+  await page.route(scripts, (r) => r.abort());
+  await page.goto("/inventory?status=Active");
+  // Not alive: no script ran, so the root carries no hydration mark.
+  expect(await page.locator("html[data-hydrated]").count()).toBe(0);
+  const s103 = place(column(page), P1, "S1.03");
+  await s103.click();
+  await page.waitForURL((u) => u.searchParams.has("vung"));
+  checkAddressKept(page.url());
+  // The address the press reached opens, alive, on the place with the status filter still on.
+  await page.unroute(scripts);
+  await page.reload();
+  await pageReady(page);
+  await settled(page);
+  const want = ROWS.filter(
+    (r) => r["Listing.standardStatus"] === "Active" && r["Listing.buildingName"] === "S1.03",
+  ).length;
+  await expect.poll(() => footerCount(page)).toBe(want);
+  checkKept(await statusBox(page).textContent());
+  await expect(s103).toHaveAttribute("aria-current", "true");
+  // Break: the place's bare address, as the column drew it before VP5, drops the status filter.
+  const bare = `/inventory?vung=${encodeURIComponent(nodeOf("S1.03").key)}`;
+  expect(() => checkAddressKept(new URL(bare, page.url()).href)).toThrow("mat loc khac");
+});
+
+/** The address a place's press reached still asks for status «Đang bán»; throws when the press dropped it. */
+function checkAddressKept(href: string): void {
+  if (new URL(href).searchParams.get("status") !== "Active") throw new Error("mat loc khac");
+}
 
 const ACTIVE = label("StatusActive");
 const statusBox = (page: Page) =>
@@ -465,7 +503,7 @@ test("E11 project names show whole at 1024 and 1440", async ({ page }, info) => 
   await signIn(page, await person(info, "e11w"));
   await checkWhole(column(page));
   // Break: a copy of the column 120px wide cuts the names.
-  await column(page).evaluate((el) => {
+  await suaTrang(column(page), (el) => {
     el.style.width = "120px";
     el.querySelectorAll<HTMLElement>('[data-sidebar="group-label"]').forEach((l) => {
       l.style.whiteSpace = "nowrap";
