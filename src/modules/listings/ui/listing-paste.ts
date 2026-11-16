@@ -53,7 +53,7 @@ const swingMark = (swing: number) =>
 
 /**
  * Reads a pasted region onto the inventory rows. `headerOf` names a column as the grid shows it; `computed` lists the
- * columns the machine works out from others (row 19's «Về tay»), which a paste never writes.
+ * columns the machine works out from others (row 19's net-to-seller column), which a paste never writes.
  */
 export function planPaste(
   paste: RegionPaste,

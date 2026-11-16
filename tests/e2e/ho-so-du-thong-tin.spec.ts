@@ -258,6 +258,7 @@ test.describe("E8 · the record only reads", () => {
       "Dự án",
       "Trạng thái",
       "Giá chào",
+      "Về tay",
       "Diện tích",
       "Phòng ngủ",
       "Xác nhận lúc",

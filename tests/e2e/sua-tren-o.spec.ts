@@ -254,8 +254,8 @@ test.describe("sua-tren-o", () => {
   });
 
   test("cot-chi-doc", async ({ page }) => {
-    test.skip(width() !== "1440", "the eight columns show whole at 1440");
-    // 8 columns × three ways in, each waiting a moment for an editor that should not come.
+    test.skip(width() !== "1440", "the editable columns show whole at 1440");
+    // Each column × three ways in, each waiting a moment for an editor that should not come.
     test.setTimeout(120_000);
     await openInventory(page);
     const opened: string[] = [];
@@ -278,11 +278,11 @@ test.describe("sua-tren-o", () => {
     await select(page, "1101", PRICE);
     await page.keyboard.press("ControlOrMeta+c");
     await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe("2,71 tỷ");
-    // Tab writes and moves to the next cell on the right.
+    // Tab writes and moves to the next cell on the right (Về tay since row 19).
     await typeInPrice(page, "1101", "2,72 tỷ");
     await page.keyboard.press("Tab");
     await expect(cellOf(page, "1101", PRICE)).toHaveText("2,72 tỷ");
-    await expect(cellOf(page, "1101", "Unit.livingArea")).toHaveAttribute(
+    await expect(cellOf(page, "1101", "custom.netToSeller")).toHaveAttribute(
       "data-cell-focused",
       /.*/,
     );

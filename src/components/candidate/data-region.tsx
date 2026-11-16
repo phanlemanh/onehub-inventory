@@ -404,6 +404,7 @@ export function DataRegion({
   groupBy,
   initialView,
   onViewChange,
+  hiddenAtFirst,
   phoneList,
 }: {
   title: string;
@@ -443,6 +444,11 @@ export function DataRegion({
   initialView?: GridView;
   /** Hears the arrangement after each change the person makes (and once on opening). */
   onViewChange?: (view: GridView) => void;
+  /**
+   * Columns that start hidden when no arrangement is given (row 19: a column offered in the Cột menu, off until the
+   * person turns it on). A given `initialView` decides on its own.
+   */
+  hiddenAtFirst?: readonly FieldKey[];
   /** Row 2b: below 768 px the rows show as the screen's cards instead of the table. */
   phoneList?: RegionPhoneList<GridRow>;
 }) {
@@ -462,7 +468,7 @@ export function DataRegion({
       .map(([id, value]) => ({ id, value })),
   );
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>(() =>
-    Object.fromEntries((opening?.hidden ?? []).map((field) => [field, false])),
+    Object.fromEntries((opening?.hidden ?? hiddenAtFirst ?? []).map((field) => [field, false])),
   );
   const [grouped, setGrouped] = useState(opening?.grouped ?? false);
   const [expanded, setExpanded] = useState<ExpandedState>(true);

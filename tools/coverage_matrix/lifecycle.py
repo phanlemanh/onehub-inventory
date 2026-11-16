@@ -17,7 +17,10 @@ Every entity some screen shows has a `vong_doi` block in its ontology file with 
 the cell's kind; for them, sua, go and rieng a button the button table knows on a screen that shows the entity; a planned
 action carries `hang`), `{hang: <row>, ly_do: <reason>}` (a row of docs/plan/lo-trinh.json will do it), or
 `{khong: <reason>, duyet: <record>#<ledger line>}` (the line is a gate line with `decided_by` in
-_acceptance/<record>/decisions.jsonl). Every role that opens a screen showing X holds the action of X's `xem` cell, or
+_acceptance/<record>/decisions.jsonl). An add or remove cell may also read `{co: <action>, qua_luu: true, ly_do: <reason>}`
+(row 19, G N-1511-3): the thing is added or removed inside one save of the whole table, so the action is the `update`
+of the same entity's `sua` cell, it still needs a button the button table knows, and the report lists these cells in a
+group of their own. Every role that opens a screen showing X holds the action of X's `xem` cell, or
 the cell lists the role under `chan` with a `hang` or `khong` cell; `chan` anywhere else fails, as it would have no
 effect. The tool reads files only: no git, no other process.
 """
@@ -44,7 +47,9 @@ ROADMAP_FILE = "docs/plan/lo-trinh.json"
 LEDGER = "_acceptance/{slug}/decisions.jsonl"
 CELLS = ("them", "xem", "sua", "go")
 KIND = {"them": "create", "xem": "query", "sua": "update", "go": "delete"}
-KEYS = {"co", "hang", "ly_do", "khong", "duyet", "chan"}
+KEYS = {"co", "hang", "ly_do", "khong", "duyet", "chan", "qua_luu"}
+# Cells that may be done inside one save of the whole table (`qua_luu`), and the edit cell whose action they reuse.
+WHOLE_SAVE_CELLS = ("them", "go")
 FRAME = buttons.FRAME_ID
 
 
@@ -141,7 +146,13 @@ class Check:
         return out
 
     def cell(
-        self, where: str, value: Any, kind: str | None, buttons_here: set[str] | None, chan_ok: bool = False
+        self,
+        where: str,
+        value: Any,
+        kind: str | None,
+        buttons_here: set[str] | None,
+        chan_ok: bool = False,
+        edit_action: str | None = None,
     ) -> None:
         err = self.errors.append
         if not isinstance(value, dict) or not (set(value) <= KEYS):
@@ -154,6 +165,20 @@ class Check:
         if "chan" in value and not (chan_ok and "co" in has):
             # A role list only has an effect on a view cell that names an action; anywhere else it would be ignored.
             err(f"{where}: chan chi co hieu luc o o xem co thao tac")
+        if "qua_luu" in value:
+            # Added or removed inside one save of the whole table: only on an add or remove cell, as the edit action.
+            if edit_action is None:
+                err(f"{where}: qua_luu chi dung o them va go")
+                return
+            if value.get("qua_luu") is not True or "co" not in has or len(has) > 1:
+                err(f"{where}: qua_luu can dang {{co, qua_luu: true, ly_do}}")
+                return
+            if not text(value.get("ly_do")):
+                err(f"{where}: qua_luu thieu ly_do")
+            name = text(value.get("co"))
+            if name != edit_action:
+                err(f"{where}: qua_luu can {name} la thao tac o sua ({edit_action or 'trong'})")
+            kind = "update"
         row = text(value.get("hang"))
         if "hang" in has and row not in self.rows:
             err(f"{where}: hang {row} khong co trong lo trinh")
@@ -220,7 +245,14 @@ class Check:
                 if c not in life:
                     err(f"{name}: thieu o {c}")
                 else:
-                    self.cell(f"{name}.{c}", life[c], KIND[c], None if c == "xem" else here, chan_ok=c == "xem")
+                    self.cell(
+                        f"{name}.{c}",
+                        life[c],
+                        KIND[c],
+                        None if c == "xem" else here,
+                        chan_ok=c == "xem",
+                        edit_action=edit_of(life) if c in WHOLE_SAVE_CELLS else None,
+                    )
             extra = life.get("rieng") or {}
             if not isinstance(extra, dict):
                 err(f"{name}.rieng: o phai la co, hang hoac khong")
@@ -250,6 +282,16 @@ class Check:
                     self.errors.append(f"{name}.xem: {role} mo duoc {sid} ma khong xem duoc")
 
 
+def edit_of(life: dict[str, Any]) -> str:
+    """The action of an entity's edit cell, the one a whole-table save cell must reuse; empty when there is none."""
+    edit = life.get("sua")
+    return text(edit.get("co")) if isinstance(edit, dict) else ""
+
+
+def whole_save(value: Any) -> bool:
+    return isinstance(value, dict) and value.get("qua_luu") is True
+
+
 def roles_of(check: Check, action: str) -> list[str]:
     scope = (check.actions.get(action) or {}).get("scope") or {}
     labels = check.reg.role_labels
@@ -265,7 +307,8 @@ def describe(check: Check, value: Any) -> str:
     if "co" in value:
         name = text(value["co"])
         tail = f" · hàng {text(value['hang'])}" if "hang" in value else ""
-        return f"{name}{tail} — " + ", ".join(roles_of(check, name))
+        head = "qua lưu cả bảng · " if whole_save(value) else ""
+        return f"{head}{name}{tail} — " + ", ".join(roles_of(check, name))
     if "khong" in value:
         return f"không — {text(value.get('khong'))} (duyệt {text(value.get('duyet'))})"
     return f"hàng {text(value.get('hang'))} — {text(value.get('ly_do'))}"
@@ -284,6 +327,14 @@ def report(check: Check, table: dict[str, Any]) -> str:
         for r, value in (life.get("rieng") or {}).items():
             lines.append(f"- {r}: {describe(check, value)}")
         lines.append("")
+    grouped = [
+        f"- {name}.{c}: {text(item['vong_doi'][c].get('co'))} — {text(item['vong_doi'][c].get('ly_do'))}"
+        for name, item in table["entities"].items()
+        for c in WHOLE_SAVE_CELLS
+        if whole_save(item["vong_doi"].get(c))
+    ]
+    if grouped:
+        lines += ["## Qua lưu cả bảng", *grouped, ""]
     if table["errors"]:
         lines.append(f"Còn {len(table['errors'])} lỗi — chạy --check để xem.")
     return "\n".join(lines)

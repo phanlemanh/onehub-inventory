@@ -92,6 +92,13 @@ function copyRepo(): string {
       const rel = join("_acceptance", slug, file);
       if (slug !== SLUG && existsSync(join(ROOT, rel))) cpSync(join(ROOT, rel), join(dir, rel));
     }
+    // A record still open is judged too, and its proof page names screenshots: copy exactly those.
+    const proof = join(ROOT, "_acceptance", slug, "chung-minh-man.md");
+    if (slug === SLUG || !existsSync(proof)) continue;
+    for (const [shot] of readFileSync(proof, "utf8").matchAll(/evidence\/[\w./-]+\.png/g)) {
+      const rel = join("_acceptance", slug, shot);
+      if (existsSync(join(ROOT, rel))) cpSync(join(ROOT, rel), join(dir, rel));
+    }
   }
   return dir;
 }

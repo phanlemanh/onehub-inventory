@@ -50,6 +50,7 @@
         "groupBy",
         "initialView",
         "onViewChange",
+        "hiddenAtFirst",
         "phoneList"
       ]
     },
@@ -83,7 +84,7 @@
       "file": "src/components/candidate/framed-list.tsx",
       "level": "organism",
       "source": "own",
-      "props": ["name", "sub"]
+      "props": ["name", "sub", "avatar"]
     },
     {
       "name": "FramedList",
@@ -91,7 +92,11 @@
       "file": "src/components/candidate/framed-list.tsx",
       "level": "template",
       "source": "own",
-      "props": ["title", "count", "headAction", "rows", "footer", "slot"]
+      "props": ["title", "count", "headAction", "rows", "footer", "slot", "controlWidth"],
+      "variants": ["controlWidth=fixed", "controlWidth=fit"],
+      "defaults": {
+        "controlWidth": "fixed"
+      }
     },
     {
       "name": "PastePreviewBody",
@@ -2655,6 +2660,20 @@
       "file": "src/components/ui/spinner.tsx",
       "level": "atom",
       "source": "library"
+    },
+    {
+      "name": "Switch",
+      "category": "component",
+      "file": "src/components/ui/switch.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["size"],
+      "control": true,
+      "min_height": "30px",
+      "variants": ["size=sm", "size=default"],
+      "defaults": {
+        "size": "default"
+      }
     },
     {
       "name": "Textarea",

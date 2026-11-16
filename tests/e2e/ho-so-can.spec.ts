@@ -21,7 +21,7 @@ const PHONE = new Set(["414", "360"]);
  * coordinator's rulings K-1411-1 and K-1411-2 (row 2e, «sửa sau Cổng Phạm vi», the owner signs at row 2e's evidence
  * gate): the filter row is always shown (owner 2026-11-13), so a number column is at least 11 ch, a text column 8.3
  * ch and the first column fits its title and sort button — the unit code shows whole; the first column, always frozen,
- * has no «Bỏ ghim» button (K-1411-7), and eight columns still fit at 1440.
+ * has no «Bỏ ghim» button (K-1411-7), and at 1440 the columns from Căn to Về tay stay in view (row 19).
  */
 const MIN_VISIBLE: Readonly<Record<string, number>> = { "1440": 3, "1024": 1 };
 const FROZEN = ["#", "Căn", "Toà"];
@@ -689,7 +689,7 @@ test.describe("E3 · the grid beside the record keeps its columns", () => {
   });
 
   test("break: Toà no longer frozen scrolls away", async ({ page }, info) => {
-    // At 1440 the eight columns fit, the grid does not scroll sideways, so there is nothing to scroll away from.
+    // At 1440 Toà never leaves the first view (the columns after Về tay scroll, row 19); 1024 is where it would scroll away.
     test.skip(info.project.name !== "1024", "luoi chi cuon ngang o 1024");
     await injectStyle(
       page,
@@ -713,7 +713,7 @@ test.describe("E3 · the grid beside the record keeps its columns", () => {
   test("break: a hidden Diện tích column is caught", async ({ page }) => {
     await injectStyle(
       page,
-      '[data-slot="data-region"] th:nth-child(7), [data-slot="data-region"] td:nth-child(7) { display: none !important; }',
+      '[data-slot="data-region"] th:nth-child(8), [data-slot="data-region"] td:nth-child(8) { display: none !important; }',
     );
     await openInventory(page);
     await openFifth(page);
