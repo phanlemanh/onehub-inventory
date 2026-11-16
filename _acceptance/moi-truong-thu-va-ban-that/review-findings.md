@@ -1,49 +1,70 @@
-# Review findings: moi-truong-thu-va-ban-that (round 4)
+# Review findings: moi-truong-thu-va-ban-that
 
 ## Trong hợp đồng
 
-(không có)
+Không có.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Runbooks still point operators at a deploy message that no longer exists; the new stop message is not documented**
+- **make rollback skips the commit check when the chosen deployment has no commit metadata, but the runbook says the commit is always checked**
+  Người dùng thấy gì: Khi lùi về một bản cũ không có ghi mã commit (bản tạo từ trang Vercel hay trước khi có công cụ), lệnh vẫn báo lùi xong mà không so commit. Sổ tay lại nói là có so, nên người vận hành có thể tin kiểm tra chặt hơn thực tế.
+  Căn cứ: Hậu quả nhẹ: tên miền vẫn được xác nhận đang ở đúng bản đã chọn và kiểm sức khoẻ vẫn chạy, chỉ thiếu bước đối chiếu commit; không mất dữ liệu, và sửa lại dòng chữ trong sổ tay là rẻ.
+  file: `tools/deploy/lui-ban.mjs`
+  severity: low
+  Đề xuất: known-limits
+
+- **After a rollback, the commit check is silently skipped when the deployment's commit cannot be found**
+  Người dùng thấy gì: Sau khi tự lùi bản, nếu không tra được commit của bản trước thì phép kiểm chỉ còn xác nhận máy chủ sống, không báo cho người vận hành là commit chưa được so.
+  Căn cứ: Hậu quả nhẹ và người vận hành tự phát hiện được: bản đích đã được xác nhận bằng mã bản trên tên miền, không mất dữ liệu; chỉ là kiểm tra yếu hơn mà không báo.
+  file: `tools/deploy/len-ban.mjs`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 3: lời hứa là quan hệ (commit trên tên miền sau khi lùi = commit của bản đích), nhưng phép đo chỉ thấy chuỗi có mặt, không có ca lệch commit**
+  Người dùng thấy gì: Bộ kiểm tự động không có ca nào thử trường hợp tên miền sau khi lùi chạy sai commit, nên nếu sau này ai đó làm hỏng phép so commit thì kiểm tra vẫn xanh.
+  Căn cứ: Không ảnh hưởng người dùng hiện tại vì chức năng chạy đúng; rủi ro chỉ là hỏng âm thầm về sau, và thêm ca kiểm là việc nhỏ có thể làm khi mở rộng hợp đồng.
+  file: `tools/deploy/deploy.test.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Runbooks still point operators at a deploy message that no longer exists; the new stop message is not documented (r4 · tệp đã đổi)**
   Người dùng thấy gì: Sổ tay vẫn bảo người vận hành tìm một dòng thông báo cũ không còn xuất hiện, và chưa nói rõ phải làm gì khi lệnh báo dừng việc lùi bản. Người vận hành có thể lúng túng đúng lúc tên miền đang ở bản lỗi.
   Căn cứ: Hậu quả nhẹ đến vừa: không mất dữ liệu và chỉ gây chậm trễ khi sự cố, còn sửa một dòng sổ tay thì rẻ và làm lúc nào cũng được.
   file: `docs/van-hanh/lui-ban.md`
   severity: medium
   Đề xuất: known-limits
 
-- **New auto-rollback stop branch has no test**
+- **New auto-rollback stop branch has no test (r4 · tệp đã đổi)**
   Người dùng thấy gì: Trường hợp lệnh lùi bản tự dừng vì không tìm được bản cũ chưa có bài kiểm. Nếu sau này ai đó đổi lại thành đoán bản để lùi thì sẽ không có gì báo đỏ.
   Căn cứ: Người dùng không gặp ngay lỗi nào và không mất dữ liệu, chỉ thiếu lưới bảo vệ cho lần sửa sau, nên thêm bài kiểm vào lúc nào cũng được.
   file: `tools/deploy/len-ban.mjs`
   severity: medium
   Đề xuất: known-limits
 
-- **Comment still describes the removed "else the newest other one" fallback**
+- **Comment still describes the removed "else the newest other one" fallback (r4 · tệp đã đổi)**
   Người dùng thấy gì: Một ghi chú trong mã còn mô tả cách đoán bản cũ đã bỏ. Người dùng không thấy gì, chỉ có nguy cơ người sửa sau hiểu nhầm.
   Căn cứ: Không ảnh hưởng người dùng và không mất dữ liệu; chỉ là ghi chú lỗi thời, sửa tiện tay khi chạm vào tệp là đủ.
   file: `tools/deploy/len-ban.mjs`
   severity: low
   Đề xuất: wont-fix
 
-- **Auto-rollback picks a deployment by commit, not by the deployment the domain actually served: on a same-commit redeploy it can go back to an earlier failed, never-promoted build and still print «đã lùi về bản trước»**
+- **Auto-rollback picks a deployment by commit, not by the deployment the domain actually served: on a same-commit redeploy it can go back to an earlier failed, never-promoted build and still print «đã lùi về bản trước» (r4 · tệp đã đổi)**
   Người dùng thấy gì: Khi chạy lại cùng một bản (ví dụ lúc xoay khoá) và bước kiểm sau gắn tên miền đỏ, lệnh có thể lùi về một bản đã từng hỏng mà vẫn báo đã lùi về bản trước. Người vận hành tin rằng trang đã về bản tốt trong khi khách vẫn vào bản lỗi.
   Căn cứ: Hậu quả nặng vì báo sai trạng thái đúng lúc sự cố, khách có thể gặp bản lỗi mà không ai biết, nhưng không mất dữ liệu và người vận hành lùi tay được; sửa cần đổi cách ghi lại bản đang chạy nên nên làm thành việc riêng.
   file: `tools/deploy/len-ban.mjs`
   severity: high
   Đề xuất: new-contract
 
-- **Rollback with BAN=<url|id> is never checked against the production deployment list, and the commit check after the rollback quietly turns off (r3)**
+- **Rollback with BAN=<url|id> is never checked against the production deployment list, and the commit check after the rollback quietly turns off (r3 · tệp đã đổi)**
   Người dùng thấy gì: Khi người vận hành chỉ đích danh một bản để lùi về, lệnh không kiểm bản ấy có thật và đang chạy được hay không. Nếu gõ sai, lệnh vẫn báo xanh dù tên miền đang chạy bản khác.
   Căn cứ: Hậu quả nặng nếu xảy ra giữa lúc khẩn cấp vì người vận hành tin vào dòng xanh, nhưng đường chỉ định bản không nằm trong các tiêu chí đã ký nên nên làm thành một việc riêng; sửa khá rẻ.
   file: `tools/deploy/lui-ban.mjs`
   severity: medium
   Đề xuất: new-contract
 
-- **rollback with BAN does not check the commit when the list cannot be read or does not hold the named deployment, yet reports success (r3)**
+- **rollback with BAN does not check the commit when the list cannot be read or does not hold the named deployment, yet reports success (r3 · tệp đã đổi)**
   Người dùng thấy gì: Khi lùi về một bản chỉ định mà danh sách bản của nhà cung cấp không đọc được, lệnh vẫn báo xanh mà không xác nhận tên miền đã chuyển thật. Người vận hành có thể tin nhầm rằng đã lùi xong.
   Căn cứ: Chỉ xảy ra ở đường chỉ định bản, người vận hành tự mở trang kiểm tra lại được nên ghi thành hạn chế đã biết là đủ; trùng gốc với lỗi chỉ định bản ở trên.
   file: `tools/deploy/lui-ban.mjs`
@@ -78,7 +99,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Rollback falls back to the newest production deployment when the domain's health cannot be read, and that deployment may never have been promoted (r1)**
+- **Rollback falls back to the newest production deployment when the domain's health cannot be read, and that deployment may never have been promoted (r1 · tệp đã đổi)**
   Người dùng thấy gì: If the live site is down or not answering properly when someone rolls back, the tool may pick a build that is already the broken one and point the site at it again. The rollback looks successful but the site stays broken.
   Căn cứ: It hits exactly when a rollback is most needed and can leave the live site down, but nothing is lost and the operator can retry by hand; the fix needs its own design, so it belongs in a separate piece of work.
   file: `tools/deploy/lui-ban.mjs`

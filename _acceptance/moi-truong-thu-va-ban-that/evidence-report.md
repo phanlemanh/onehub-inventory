@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 0bd32e79cf26cd451239bafaa28ab2151ac4397c
+verified_commit: 15ff7089afd8a6755d7a477f79d05db56245e9a6
 human_signoff:
 ---
 
@@ -19,56 +19,56 @@ human_signoff:
 | E2 | AC-2 | test | PASS |
 | E3 | AC-3 | test | PASS |
 | E4 | AC-4 | test | PASS |
-| E5 | AC-5 | test | PASS (carry-forward từ round 1) |
+| E5 | AC-5 | test | PASS |
 | E6 | AC-6 | script | PASS |
-| E7 | AC-7 | script | PASS (carry-forward từ round 3) |
-| E8 | AC-8 | script | PASS (carry-forward từ round 3) |
+| E7 | AC-7 | script | PASS |
+| E8 | AC-8 | script | PASS |
 | E9 | AC-9 | test | PASS |
 | E10 | AC-9 | judgment | UNCERTAIN |
-| E11 | AC-10 | test | PASS (carry-forward từ round 3) |
+| E11 | AC-10 | test | PASS |
 | E12 | AC-1 | script | PASS |
 
 ## Evidence
 
 - eval: E1
-  run_id: minted-moi-truong-thu-va-ban-that-E1-r4
+  run_id: minted-moi-truong-thu-va-ban-that-E1-r5
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.deploy_kiem
-  verified_at: 2026-11-16T15:39:21Z
+  verified_at: 2026-11-16T16:03:38Z
   output: |
     npx vitest run tools/deploy --coverage.enabled=false --reporter=verbose
-    mọi ca của tools/deploy đạt (lệnh chung với E2, E3, E4)
+    (chạy chung với E2, E3, E4 trong một lệnh; kết thúc thành công)
 
 - eval: E2
-  run_id: minted-moi-truong-thu-va-ban-that-E2-r4
+  run_id: minted-moi-truong-thu-va-ban-that-E2-r5
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.deploy_kiem
-  verified_at: 2026-11-16T15:39:21Z
+  verified_at: 2026-11-16T16:03:38Z
   output: |
     npx vitest run tools/deploy --coverage.enabled=false --reporter=verbose
-    mọi ca của tools/deploy đạt (lệnh chung với E1, E3, E4)
+    (cùng lệnh với E1; kết thúc thành công)
 
 - eval: E3
-  run_id: minted-moi-truong-thu-va-ban-that-E3-r4
+  run_id: minted-moi-truong-thu-va-ban-that-E3-r5
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.deploy_kiem
-  verified_at: 2026-11-16T15:39:21Z
+  verified_at: 2026-11-16T16:03:38Z
   output: |
     npx vitest run tools/deploy --coverage.enabled=false --reporter=verbose
-    mọi ca của tools/deploy đạt (lệnh chung với E1, E2, E4)
+    (cùng lệnh với E1; kết thúc thành công)
 
 - eval: E4
-  run_id: minted-moi-truong-thu-va-ban-that-E4-r4
+  run_id: minted-moi-truong-thu-va-ban-that-E4-r5
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.deploy_kiem
-  verified_at: 2026-11-16T15:39:21Z
+  verified_at: 2026-11-16T16:03:38Z
   output: |
     npx vitest run tools/deploy --coverage.enabled=false --reporter=verbose
-    mọi ca của tools/deploy đạt (lệnh chung với E1, E2, E3)
+    (cùng lệnh với E1; kết thúc thành công)
 
 - eval: E5
   run_id: minted-moi-truong-thu-va-ban-that-E5-r1
@@ -77,44 +77,47 @@ human_signoff:
   verifier: config:executors.test.cau_hinh_ban_that
   verified_at: 2026-11-16T14:33:01Z
   carried_from_round: 1
-  # carry-forward tu round 1 — delta khong cham paths cua eval
+  output: |
+    carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E6
-  run_id: minted-moi-truong-thu-va-ban-that-E6-r4
+  run_id: minted-moi-truong-thu-va-ban-that-E6-r5
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.ban_dung_that
-  verified_at: 2026-11-16T15:39:21Z
+  verified_at: 2026-11-16T16:03:38Z
   output: |
     ban-dung-that: 33 phép kiểm đạt
 
 - eval: E7
-  run_id: minted-moi-truong-thu-va-ban-that-E7-r3
+  run_id: minted-moi-truong-thu-va-ban-that-E7-r5
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.cach_ly_dich
-  verified_at: 2026-11-16T15:18:36Z
-  carried_from_round: 3
-  # carry-forward tu round 3 — delta khong cham paths cua eval
+  verified_at: 2026-11-16T16:03:38Z
+  output: |
+    npx vitest run -c vitest.db.config.ts tests/db/cach-ly-dich.db.test.ts --reporter=verbose
+    (Postgres làn K; kết thúc thành công)
 
 - eval: E8
-  run_id: minted-moi-truong-thu-va-ban-that-E8-r3
+  run_id: minted-moi-truong-thu-va-ban-that-E8-r5
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.sao_luu_khoi_phuc
-  verified_at: 2026-11-16T15:18:36Z
-  carried_from_round: 3
-  # carry-forward tu round 3 — delta khong cham paths cua eval
+  verified_at: 2026-11-16T16:03:38Z
+  output: |
+    npx vitest run -c vitest.db.config.ts tests/db/sao-luu.db.test.ts --reporter=verbose
+    (Postgres làn K; kết thúc thành công)
 
 - eval: E9
-  run_id: minted-moi-truong-thu-va-ban-that-E9-r4
+  run_id: minted-moi-truong-thu-va-ban-that-E9-r5
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.van_hanh
-  verified_at: 2026-11-16T15:39:21Z
+  verified_at: 2026-11-16T16:03:38Z
   output: |
     npx vitest run tests/van-hanh.test.ts --coverage.enabled=false --reporter=verbose
-    mọi ca của tests/van-hanh.test.ts đạt
+    (kết thúc thành công)
 
 - eval: E11
   run_id: minted-moi-truong-thu-va-ban-that-E11-r3
@@ -123,46 +126,47 @@ human_signoff:
   verifier: config:executors.test.khoa_bi_mat
   verified_at: 2026-11-16T15:18:36Z
   carried_from_round: 3
-  # carry-forward tu round 3 — delta khong cham paths cua eval
+  output: |
+    carry-forward tu round 3 — delta khong cham paths cua eval
 
 - eval: E12
-  run_id: minted-moi-truong-thu-va-ban-that-E12-r4
+  run_id: minted-moi-truong-thu-va-ban-that-E12-r5
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.check
-  verified_at: 2026-11-16T15:39:21Z
+  verified_at: 2026-11-16T16:03:38Z
   output: |
-    make check
     CODEOWNERS matches governance/autonomy.yaml
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-moi-truong-thu-va-ban-that-SUITE-build-r4
+  run_id: minted-moi-truong-thu-va-ban-that-SUITE-build-r5
   exit_code: 0
-  verified_at: 2026-11-16T15:39:21Z
+  verified_at: 2026-11-16T16:03:38Z
 
 - cmd: make e2e
-  run_id: minted-moi-truong-thu-va-ban-that-SUITE-make_e2e-r4
+  run_id: minted-moi-truong-thu-va-ban-that-SUITE-make_e2e-r5
   exit_code: 0
-  verified_at: 2026-11-16T15:39:21Z
+  verified_at: 2026-11-16T16:03:38Z
 
-### Judgment (đề xuất panel — chờ người chốt)
-
-Panel đề xuất cho E10: PASS theo đa số (hai phiếu PASS, một phiếu FAIL). Mọi bất đồng giữ nguyên, người quyết ở Cổng 2.
+### Judgment
 
 - eval: E10
-  judged_by: judge-subagent (fresh context), đề xuất PASS
+  judged_by: judge-subagent (fresh context)
   verdict: UNCERTAIN
-  rationale: Hai trong ba góc nhìn cho PASS, góc spec-alignment cho FAIL vì một bước trong khoi-phuc.md thiếu hai điều trong bốn. Người cần chốt xem chỗ thiếu có đủ nặng để chặn.
+  rationale: Đề xuất của hội đồng là PASS nhưng một góc nhìn (spec-alignment) phản đối; mọi ý kiến được giữ nguyên bên dưới để người quyết ở Cổng 2.
   votes:
-    - domain-correctness: PASS — Cả bốn quy trình (đưa bản lên, lùi bản, xoay khoá, khôi phục) đều ghi từng bước đủ bốn điều: ở đâu, gõ hay bấm gì, đạt khi thấy gì, đỏ thì làm gì. Mỗi quy trình có bảng «Đỏ thì làm gì», người vận hành không cần đọc mã. 14 việc ngoài kho xếp theo thứ tự làm được, mỗi việc có «Đạt khi» và «Đỏ thì», chỉ ghi tên biến, không ghi giá trị. Còn một chỗ hơi lệch ở đường phụ: `STAGING_APP_URL` không được ghi cho máy chủ kho trong bảng biến, dù `make deploy ENV=production` chạy tay cần nó. Chỗ này không làm hỏng đường chính trên GitHub Actions.
-    - operational-feasibility: PASS — Bốn quy trình đều ghi từng bước với bốn thứ: làm ở đâu, gõ hay bấm gì, Đạt khi (dòng nhật ký hay URL cụ thể), Đỏ thì (bảng dòng đỏ → việc cần làm). Lùi bản nói rõ cách cài `vercel` và dựng tệp biến. 14 việc ngoài kho xếp theo thứ tự làm được: mỗi việc chỉ dựa vào các việc đứng trước. Chỉ tên biến xuất hiện, không có giá trị nào; chỉ có chỗ giữ như `[YOUR-PASSWORD]` và `quan-tri@example.test`. Còn vài chỗ nhỏ chưa gọn: việc 12 viết vòng, việc 9 không nêu lệnh sinh `AUTH_SECRET` (xoay-khoa.md có `openssl rand`), và bước 1 với bước 3 của xoay-khoa lệch nhau đôi chút về mật khẩu vai chủ. Các chỗ này không chặn người làm.
-    - spec-alignment: FAIL — Phần lớn các bước ghi đủ chỗ làm, thao tác, dấu hiệu đạt và việc khi đỏ. Danh sách việc ngoài kho đi đúng thứ tự phụ thuộc (1→14) và chỉ ghi tên biến, không có giá trị. Nhưng README khẳng định mỗi bước trong bốn quy trình có đủ bốn điều, trong khi bước 5 «Ghi lại» ở mục «Khôi phục thật» của khoi-phuc.md chỉ có «Ở đâu» và việc cần làm, thiếu «Đạt khi» và «Đỏ thì». Vì tiêu chí là «mỗi bước», đây là vi phạm rõ.
+    - domain-correctness: PASS — Ba quy trình đưa bản lên, lùi bản và khôi phục dữ liệu đều đánh số từng bước với đủ bốn ý: Ở đâu, Gõ hay bấm, Đạt khi, Đỏ thì. Quy trình xoay khoá cũng theo khung đó, kèm bảng chỗ đặt cho từng khoá. Lệnh, chuỗi cần thấy và bảng «Đỏ thì làm gì» đều ghi sẵn trong năm tệp nên người vận hành không phải đọc mã. 14 việc ngoài kho của README đi đúng thứ tự phụ thuộc (Supabase, chuỗi nối, mật khẩu vai, Vercel, khoá, bảo vệ bản mới, Resend, tên miền và biến, môi trường GitHub, Release và deploy.yml, lần đưa bản đầu, tài khoản đầu, thử khôi phục). Mỗi việc có «Đạt khi» và «Đỏ thì», và toàn bộ chỉ ghi tên biến, giá trị chỉ là chỗ giữ như `[Tên]`, `<mật khẩu …>` hay `quan-tri@example.test`. Chỗ lệch nhỏ nhất: ở xoay-khoa.md, «Đạt khi» của bước 1 nói khoá cũ còn hiệu lực, không đúng với mật khẩu vai chủ; nhưng cùng bước đã chỉ sang bước 3 cho hai mật khẩu cơ sở dữ liệu nên không chặn được người làm theo.
+    - operational-feasibility: PASS — Cả bốn quy trình (dua-ban-len, lui-ban, xoay-khoa, khoi-phuc) đều ghi từng bước đủ bốn điều: làm ở đâu, gõ hay bấm gì, dòng nào là đạt, đỏ thì làm gì. Mục «Cần có trước» nói rõ cách cài công cụ và nạp biến từ tệp ngoài kho. 14 việc ngoài kho trong README đi theo thứ tự làm được: mỗi việc chỉ dựa vào việc đứng trước, và việc 11, 13 nói rõ chúng chờ gì. Chỉ có tên biến và chỗ giữ chỗ như `<mật khẩu chỉ chữ và số>`, không có giá trị thật. Có vài chỗ chưa gọn: việc 8 không nói cách thêm `onehub.center` vào Vercel, và bước 1 của xoay-khoa hơi mơ hồ về mật khẩu vai chủ. Cả hai đều có «Đỏ thì» hoặc bước 3 đỡ lại, nên không đủ để làm người mới kẹt.
+    - spec-alignment: FAIL — Phần lớn năm tệp làm theo được. Mỗi bước của đưa bản lên, lùi bản, xoay khoá và thử khôi phục đều có đủ ở đâu, gõ gì, đạt khi, đỏ thì. 14 việc ngoài kho đi đúng thứ tự phụ thuộc và chỉ ghi tên biến. Nhưng chưa đạt tiêu chí «mỗi bước đủ bốn điều» mà README dòng 24 tự cam kết. Ở «Khôi phục thật», bước 5 «Ghi lại» (khoi-phuc.md dòng 113-114) không có «Đạt khi» hay «Đỏ thì», và không nói cách viết trang sự cố trong `wiki/incidents/`. Bước 1 ghi «Ở đâu: chủ kho», là một người chứ không phải một chỗ. Dòng cuối của xoay-khoa.md (dòng 126, ghi `wiki/log.md`) nằm trong mục «Đỏ thì làm gì» và cũng thiếu đủ bốn điều.
   required_evidence:
-    - khoi-phuc.md, mục «Khôi phục thật», bước 5: thêm «Đạt khi» (ví dụ nhật ký có dòng mới nơi thử «bản thật» và có trang trong wiki/incidents/) và «Đỏ thì» (ví dụ PR bị chặn hay thiếu thông tin thì làm gì). Có hai dòng này thì phán quyết đổi, vì đó là chỗ duy nhất thiếu.
-    - README.md, việc 9: nói cách sinh `AUTH_SECRET` (xoay-khoa.md dùng `openssl rand -base64 48`; README chỉ ghi «chuỗi ngẫu nhiên dài»). Thêm lệnh hoặc dẫn sang xoay-khoa.md thì bỏ được chỗ phải đoán này.
+    - Bản sửa khoi-phuc.md, mục «Khôi phục thật» bước 5 (dòng 113-114): có Ở đâu, Gõ hay bấm, Đạt khi, Đỏ thì, và nói rõ cách viết trang sự cố trong wiki/incidents/ (tệp mẫu hoặc các dòng cần có) để người chưa từng làm không phải mở mã hay ontology/page-types.yaml. Lấy ở khoi-phuc.md sau khi sửa.
+    - Bản sửa khoi-phuc.md, mục «Khôi phục thật» bước 1 (dòng 96): ô «Ở đâu» ghi một chỗ cụ thể (ví dụ trang Backups của Supabase để xem các ngày có sao lưu, hay chỗ ghi thời điểm đã chọn), không ghi «chủ kho». Lấy ở khoi-phuc.md sau khi sửa.
+    - Bản sửa xoay-khoa.md dòng 126: việc ghi một dòng vào wiki/log.md thành một bước có đủ ở đâu, gõ gì, đạt khi, đỏ thì (hoặc ghi rõ đây là việc của người giữ kho mã). Lấy ở xoay-khoa.md sau khi sửa.
   human_override:  # chi nguoi ghi
+
+Đề xuất panel: PASS (hai góc nhìn PASS, một góc nhìn phản đối); human_override để TRỐNG cho người quyết ở Cổng 2.
 
 ## Known limits
 
@@ -172,11 +176,9 @@ Panel đề xuất cho E10: PASS theo đa số (hai phiếu PASS, một phiếu 
 
 carried tu round 1 — baseline khong do lai round nay
 
-Eval không phân biệt (pass trên cả code HEAD lẫn baseline; chứng minh harness chứ chưa chứng minh feature, hoặc là regression-guard có chủ ý):
+Baseline round này không đo lại (evals.yaml không đổi từ lần đo cuối, round 1); field baseline của từng eval ghi n-a.
 
-- make check (E12)
-
-Baseline không đo: mọi eval ở round này ghi n-a vì evals.yaml không đổi từ lần đo cuối ở round 1.
+Eval không-phân-biệt (xanh ở cả HEAD lẫn baseline): E12 (make check) — lệnh hồi quy có chủ ý, cần xác nhận hoặc viết lại để khẳng định hành vi mới.
 
 ## Variance
 
@@ -184,7 +186,6 @@ none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: E5 và E12 đạt, baseline đo một lần; các eval còn lại trả về triển khai.
-Round 2: E7 bị từ chối — cụm riêng cho E7, rollback nêu tên bản đích, thêm runbook; trả về triển khai.
-Round 3: eval máy xanh, còn một phát hiện trong hợp đồng; đã sửa.
-Round 4: eval máy xanh trên commit 0bd32e7; E10 chờ người chốt ở Cổng 2 (một góc nhìn bất đồng).
+Round 3: machine evals green, one in-contract finding fixed in round 4.
+Round 4: machine evals green, runbook PASS (judgment pending).
+Round 5: machine evals green on 15ff708 (E5, E11 carried); E10 judgment awaits human at Gate 2 (one dissent on spec-alignment).
