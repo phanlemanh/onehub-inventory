@@ -26,6 +26,7 @@ import { SAMPLE_LISTINGS_PER_SUBDIVISION } from "../../src/modules/listings";
 import { waitReady } from "../../tools/e2e_templates/runner";
 import { openSheet, shown } from "../../tools/e2e_templates/settle";
 
+import { seedSampleInventory } from "../db/can-mau";
 import { readHeaders } from "./column-headers";
 import { ROLES, signInWithCode } from "./dang-nhap-vai";
 
@@ -70,6 +71,8 @@ async function makeCompanies(): Promise<void> {
           [id, user, p.name, p.roles],
         );
       }
+      // Row 10: the inventory is the signed-in company's own; it holds the sample listings.
+      await seedSampleInventory(db, id);
     };
     await add(
       COMPANY.a,

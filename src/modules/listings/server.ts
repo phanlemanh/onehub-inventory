@@ -93,3 +93,6 @@ export async function mySavedView(id: string): Promise<SavedView | null> {
     return null;
   }
 }
+
+// Row 10: statements that load a company's listings, run by the table owner (development machine, tests).
+export { listingLoadStatements, type Statement as ListingStatement } from "./load-sql";

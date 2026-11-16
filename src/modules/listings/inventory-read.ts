@@ -83,6 +83,13 @@ export async function readInventory(client: DbClient, viewerId: string): Promise
     listingRows.map((r) => r.upi),
   );
   const unitByUpi = new Map(units.map((u) => [u.upi, u]));
+  // The grid's first order: by project, then by unit (as the sample company is ordered).
+  listingRows.sort(
+    (a, b) =>
+      (unitByUpi.get(a.upi)?.subdivisionName ?? "").localeCompare(
+        unitByUpi.get(b.upi)?.subdivisionName ?? "",
+      ) || a.upi.localeCompare(b.upi),
+  );
   const listings = listingRows.map((r) => toListing(r, unitByUpi.get(r.upi)));
   const listingUnits = listingRows.map((r) => ({ listingId: r.id, upi: r.upi }));
   const { current, earlier } = splitCurrent(listings, listingUnits);

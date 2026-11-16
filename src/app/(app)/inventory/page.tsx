@@ -5,13 +5,13 @@ import { PageHeader } from "@/components/templates/page-header";
 import { PageState, loginHref } from "@/components/templates/page-state";
 import { customColumnsOf, label, labelOverrides } from "@/modules/company-config";
 import { myCompanyLayer, myFeeSchedule } from "@/modules/company-config/server";
-import { allowedScope, isRole } from "@/modules/identity";
+import { allowedScope } from "@/modules/identity";
 import { currentSession } from "@/modules/identity/server";
 import { SessionRoles } from "@/modules/identity/ui";
 import { mySavedView, mySavedViews } from "@/modules/listings/server";
 
 import { feeHeaders, withFees } from "../inventory-fees";
-import { inventorySource } from "../inventory-source";
+import { inventorySource, standInRole } from "../inventory-source";
 import { placesOf, recordsOf, rowsOf } from "../inventory-view";
 import { entryAction, entryRefused, NAV } from "../nav";
 import { savedViewLabels } from "../saved-view-labels";
@@ -127,14 +127,13 @@ export default async function Page({ searchParams }: Props) {
   // With a database there is no stand-in: no session goes to sign-in, whatever ?vai= says (row 10, AC-9).
   if (source.kind === "signed-out") redirect(loginHref(hereOf(query)));
   const live = source.kind !== "ready" || source.live;
-  const vai = live ? undefined : first(query.vai);
+  const vai = standInRole(source, first(query.vai), process.env.NODE_ENV);
   // The screen's entry rule, before any listing is shown (row 2b, AC-9): a role the register keeps out sees «not
   // allowed» at every width, the same block as the members page (row 9b); so does a role without viewListings.
   if (source.kind === "forbidden") return <PageState kind="forbidden" homeHref="/" />;
   if (entryAction(NAV, "/inventory") !== undefined) {
     const session = await currentSession();
-    const byAddress = process.env.NODE_ENV !== "production" && vai !== undefined && isRole(vai);
-    const roles = session ? session.roles : byAddress ? [vai] : [];
+    const roles = session ? session.roles : vai ? [vai] : [];
     if (entryRefused(NAV, "/inventory", roles)) return <PageState kind="forbidden" homeHref="/" />;
   }
   const data = source.kind === "ready" ? source.data : null;
@@ -198,10 +197,7 @@ export default async function Page({ searchParams }: Props) {
   const stale = asked !== undefined && !rows.some((row) => row.id === asked);
   // On the sample company only (no database, outside production), ?vai=<role> stands in for the session's role, so the
   // browser tests and the screenshots of row 4 can open the cells the permission table gives that role.
-  const standIn =
-    !live && process.env.NODE_ENV !== "production" && vai !== undefined && isRole(vai)
-      ? [vai]
-      : null;
+  const standIn = vai ? [vai] : null;
   // Moving a status cell to Active needs activateListing: own scope offers it on one's own unit or one nobody keeps.
   const activate = live
     ? allowedScope((await currentSession())?.roles ?? [], "activateListing")

@@ -6,6 +6,8 @@ import "server-only";
 // Shell (top-bar search, geography tree) and the inventory page share one read per render.
 import { cache } from "react";
 
+import type { Role } from "@/generated/ontology";
+import { isRole } from "@/modules/identity";
 import { databaseConfigured } from "@/modules/identity/server";
 import type { InventoryData } from "@/modules/listings";
 import { myInventory } from "@/modules/listings/server";
@@ -38,3 +40,16 @@ export const inventorySource = cache(async (): Promise<InventorySource> => {
   const read = await myInventory();
   return read.kind === "ready" ? { kind: "ready", data: read.data, live: true } : read;
 });
+
+/**
+ * The role ?vai= stands in for (rows 4 and 10): only on the sample company, which exists only where no database is
+ * configured and outside production. With a database ?vai= does nothing, so real data never meets a stand-in role.
+ */
+export function standInRole(
+  source: InventorySource,
+  vai: string | undefined,
+  env: string | undefined,
+): Role | null {
+  if (source.kind !== "ready" || source.live || env === "production") return null;
+  return vai !== undefined && isRole(vai) ? vai : null;
+}
