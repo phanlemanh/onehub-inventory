@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 82ea4fdd4521f1b55fa1132d97935d5dfe0a24de
-human_signoff:
+human_signoff: Manh Phan 2026-11-16
 ---
 
 # Evidence Report: dan-tu-excel
@@ -68,7 +68,7 @@ none — every multi-run eval is uniform
   run_id: minted-dan-tu-excel-E1-ui-r6
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check.default
+  verifier: config:executors.ui-check
   verified_at: 2026-11-15T18:04:22Z
   screenshot: evidence/E1-ui-step1.png
   observed: |

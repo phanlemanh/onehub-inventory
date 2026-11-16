@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-15T04:11:20Z
 design_doc: docs/superpowers/specs/2026-11-15-dan-tu-excel-design.md
@@ -142,3 +142,8 @@ Google Sheets):
   đã ghi sổ đối chiếu: hàng 5 làm chủ, hàng 11 dùng lại.
 - Ba hàng chờ gộp cùng chạm Bảng hàng: 2b (PR #63) — phần dựng chờ 2b vào main; 2d (PR #65), 19 (PR #64) — hàng gộp sau
   ghép tay; câu lý do của cột Về tay viết khi 19 vào main.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-16:
+  - Ngoài-1: Bài thử về dán khi cột đã ghim, ẩn hay đổi thứ tự có thể báo xanh dù chưa thật sự thử hết các cách sắp xếp ấy.
+  - Ngoài-2: Bài thử ghép dòng dán ngắn chưa lấy thứ tự cột từ bảng thật khi ghim phải hay đổi chỗ cột; trình duyệt thật mới
+    phủ ghim trái và ẩn cột.
+  - Ngoài-4: Bài thử «bảng chưa đổi trước khi bấm Áp» chỉ nhìn ô giá đầu tiên, không soi các dòng khác.
