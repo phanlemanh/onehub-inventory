@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 9ba5850e7694baf63c0dfd0194ccf860f360fc33
+verified_commit: 9a9385eafff8dd8cf1a3ca391a74c7cc5c037aae
 human_signoff: Manh Phan 2026-11-16
 ---
 
@@ -303,3 +303,7 @@ none — every multi-run eval is uniform
 ## Iterations
 
 Round 4: mọi eval máy và ui đạt; E8-khuon và E8-floor mang từ round 1 vì delta không chạm paths của chúng. Lịch sử các round trước nằm trong run-log.jsonl.
+
+### Re-pin lần 1 — 2026-11-16, do gộp main ee661ce sau chữ ký hàng 10; 2b, 3e hoá cũ do bài lượt 4
+run_id: repin-20261116T125923Z-77997
+sha: 9a9385eafff8dd8cf1a3ca391a74c7cc5c037aae · suites: 3 lệnh exit 0 · evals: 21/21 eval máy đạt kỳ vọng · ngoài làn máy: E2-ui, E8-ui · diff chạm vật đo ngoài làn máy: E2-ui — chưa chứng lại, đi vòng S4 delta
