@@ -34,3 +34,6 @@ playwright-report/
 # Run logs of the acceptance kit and batches
 .acceptance-runs/
 .playwright-mcp/
+
+# Vercel CLI: project link and build output (make deploy)
+.vercel/

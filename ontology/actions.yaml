@@ -375,6 +375,8 @@ exempt:
     reason: Signs out; works with or without a chosen company.
   - door: PUT /api/v1/auth/session/company
     reason: Chooses the company of the session among the person's own companies.
+  - door: GET /api/v1/health
+    reason: Read-only health of the running build (row 22) — commit, environment and whether the connection role passes the query door; reads no company data and needs no session.
   - door: function app.current_company_id()
     reason: Reads the company of the session, set by the one query door.
   - door: function app.allowed(text)

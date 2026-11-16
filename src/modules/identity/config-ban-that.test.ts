@@ -98,6 +98,15 @@ const BLOCKING: Case[] = [
     why: /vai quy_hang_login/,
   },
   {
+    name: "DATABASE_URL vai postgres qua bộ gom của Supabase",
+    env: {
+      ...STAGING,
+      DATABASE_URL: `postgres://postgres.abcdefghijklmnopqrst:${MARK}DATABASE_URL@pooler.example.test:5432/postgres`,
+    },
+    variable: "DATABASE_URL",
+    why: /vai quy_hang_login/,
+  },
+  {
     name: "bản thật APP_URL http",
     env: { ...PRODUCTION, APP_URL: "http://inventory.onehub.center" },
     variable: "APP_URL",
@@ -126,6 +135,13 @@ const BLOCKING: Case[] = [
 const STARTING: { name: string; env: Env }[] = [
   { name: "đủ và đúng: bản thử", env: STAGING },
   { name: "đủ và đúng: bản thật", env: PRODUCTION },
+  {
+    name: "DATABASE_URL quy_hang_login qua bộ gom của Supabase",
+    env: {
+      ...STAGING,
+      DATABASE_URL: `postgres://quy_hang_login.abcdefghijklmnopqrst:${MARK}DATABASE_URL@pooler.example.test:5432/postgres`,
+    },
+  },
   { name: "MAIL_FROM onehub.center", env: { ...STAGING, MAIL_FROM: `${MARK}a@onehub.center` } },
   {
     name: "MAIL_FROM tên miền con",
@@ -143,7 +159,7 @@ describe("cấu hình khởi động bản dựng thật (AC-5)", () => {
     expect([...STARTUP_VARS].sort()).toEqual(
       ["APP_ENV", "APP_URL", "AUTH_SECRET", "DATABASE_URL", "MAIL_FROM", "RESEND_API_KEY"].sort(),
     );
-    expect(BLOCKING).toHaveLength(6 + 1 + 3 + 2 + 2 + 2);
+    expect(BLOCKING).toHaveLength(6 + 1 + 3 + 3 + 2 + 2);
   });
 
   for (const c of BLOCKING)

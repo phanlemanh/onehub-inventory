@@ -97,10 +97,13 @@ export const PRODUCTION_APP_URL = "https://inventory.onehub.center";
 /** Mail leaves from this domain or one of its subdomains, the ones Resend can verify (Hỏi-7). */
 export const MAIL_DOMAIN = "onehub.center";
 
-/** The user name in a database address, or null when the address cannot be read. */
+/**
+ * The database role in an address, or null when the address cannot be read. Supabase's shared pooler names the user
+ * `<role>.<project ref>` (a ref is 20 lower-case letters); the role is the part before it.
+ */
 function databaseUser(raw: string): string | null {
   try {
-    const user = decodeURIComponent(new URL(raw.trim()).username);
+    const user = decodeURIComponent(new URL(raw.trim()).username).replace(/\.[a-z]{20}$/, "");
     return user === "" ? null : user;
   } catch {
     return null;
