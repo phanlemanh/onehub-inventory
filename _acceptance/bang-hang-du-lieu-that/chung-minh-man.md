@@ -28,3 +28,31 @@ thái, bảng Khối và Vùng điền trước lượt chấm (từ `implemente
 
 Không chọn lại: ba ứng viên và lựa chọn là của hàng 4 (ảnh chép từ `_acceptance/sua-tren-o/evidence/reui/`); hàng 10
 không đổi khối nào của màn.
+
+### Ma trận trạng thái
+
+Đo trên dữ liệu thật của sàn (Postgres của dãy, bộ mẫu nạp vào sàn thử bằng `tests/db/can-mau.ts`), ở bốn khổ, sáng và tối.
+
+| Trạng thái | Kết quả | Căn cứ |
+| --- | --- | --- |
+| Chờ tải | đạt | tests/e2e-db/bang-hang-that.spec.ts (nam-trang-thai: ?state=loading, sáng và tối); tools/e2e_templates/suite.ts (man inventory · vung cho-tai, phiên thật) |
+| Trống | đạt | tests/e2e-db/bang-hang-that.spec.ts (nam-trang-thai: sàn [MAU-TRONG] chưa có căn, axe sáng và tối) |
+| Không có dòng nào khớp | đạt | tests/e2e-db/bang-hang-that.spec.ts (nam-trang-thai: lọc mã căn không có, nút Xoá lọc, axe) |
+| Lỗi | đạt | tests/e2e-db/bang-hang-that.spec.ts (nam-trang-thai: cơ sở dữ liệu từ chối lần đọc thật của sàn, vùng lỗi có Thử lại); tests/bang-hang-that.test.ts (loi-doc-that: lần đọc hỏng trả unreadable, không ném) |
+| Một phần hỏng | đạt | tools/e2e_templates/suite.ts (man inventory · vung mot-phan-hong, phiên thật) |
+| Chữ dài | đạt | tools/e2e_templates/suite.ts (man inventory · vung chu-dai, phiên thật) |
+| Không đủ quyền | đạt | tests/bang-hang-that.test.ts (loi-doc-that: viewListings bị từ chối → forbidden); tests/the-dien-thoai.test.tsx (cua-vao: «không đủ quyền», không thẻ). Không vai thật nào gặp ở trạng thái này từ Hỏi-1 A (sổ quyết định) |
+| Xung đột khi lưu | đạt | tests/e2e-db/bang-hang-that.spec.ts (xung-dot-tai-o: phiên hai nhận câu tại ô, ô hiện giá mới nhất); tests/db/bang-hang-that.db.test.ts (xung-dot: 409 kèm bản hiện tại) |
+| Phiên hết hạn | đạt | tests/e2e-db/bang-hang-that.spec.ts (chua-dang-nhap-ve-dang-nhap: không phiên → trang đăng nhập, kể cả ?vai=) |
+| Mất mạng khi lưu | đạt | src/modules/listings/listings-http.test.ts (httpSaveDoor: mạng hỏng hay máy báo ngoại tuyến → offline, không gửi gì); src/components/candidate/use-change.test.tsx (luu-hong-ve-cu) |
+| Link hết hạn | không áp | Trạng thái của trang khách; Bảng hàng là màn nội bộ |
+
+### Khối
+
+Hàng 10 không thêm khối giao diện nào: ô chọn Điều kiện phí dùng đúng khuôn danh sách trong ô của ô Trạng thái (hàng 4).
+
+| Khối | Bậc | Đã tra | Ứng viên gần nhất | Vì sao không dùng | Cách |
+| --- | --- | --- | --- | --- | --- |
+| DataRegion | trong-kho | | | | |
+| Button | trong-kho | | | | |
+| Badge | trong-kho | | | | |
