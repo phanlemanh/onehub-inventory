@@ -44,23 +44,5 @@ NETWORK (app-origin, non-static)
 200 GET http://127.0.0.1:3482/inventory?ma=KHONG-CO-CAN-NAY
 200 GET http://127.0.0.1:3482/inventory?ma=KHONG-CO-CAN-NAY
 200 GET http://127.0.0.1:3482/inventory?ma=KHONG-CO-CAN-NAY
-200 GET http://127.0.0.1:3482/inventory
-200 GET http://127.0.0.1:3482/inventory
-200 GET http://127.0.0.1:3482/inventory
-200 GET http://127.0.0.1:3482/inventory
-200 GET http://127.0.0.1:3482/inventory
-200 GET http://127.0.0.1:3482/inventory
-200 GET http://127.0.0.1:3482/inventory
-200 GET http://127.0.0.1:3482/inventory
-200 GET http://127.0.0.1:3482/inventory
-200 GET http://127.0.0.1:3482/inventory
-200 GET http://127.0.0.1:3482/members
-200 GET http://127.0.0.1:3482/members
-200 GET http://127.0.0.1:3482/members
-200 GET http://127.0.0.1:3482/members
-200 GET http://127.0.0.1:3482/members
-200 GET http://127.0.0.1:3482/members
-200 GET http://127.0.0.1:3482/members
-200 GET http://127.0.0.1:3482/members
 
 CONSOLE errors/warnings
