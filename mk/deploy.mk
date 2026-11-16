@@ -10,7 +10,7 @@ deploy: ## Deploy to ENV (staging|production): config, migrations, build, check,
 smoke: ## Read-only check of ENV's public address (APP_URL)
 	node $(DEPLOY_TOOLS)/kiem-nhanh.mjs $(ENV)
 
-rollback: ## Point ENV's domain back at the previous deployment (or BAN=<url|id>), then check it
+rollback: ## List ENV's deployments; with BAN=<id>, point the domain at that deployment and confirm it
 	node $(DEPLOY_TOOLS)/lui-ban.mjs $(ENV)
 
 .PHONY: cach-ly-dich sao-luu khoi-phuc-thu

@@ -2,7 +2,7 @@
 // health server (row moi-truong-thu-va-ban-that, E1–E4). The matrix of red steps is the header of
 // _acceptance/moi-truong-thu-va-ban-that/evals.yaml: each ENV × each red step on its own.
 import { spawn, spawnSync } from "node:child_process";
-import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { join, resolve } from "node:path";
@@ -65,14 +65,36 @@ const SECRETS = [
 ];
 const OLD = "0123456789abcdef0123456789abcdef01234567";
 
+// The domain (APP_URL, path /ten-mien) is an alias: the file ten-mien holds the id of the deployment it points to, or is
+// absent when it was never attached. `inspect <id or host> --json` answers like vercel@65.9.0 — GET
+// /v13/deployments/<id or host>, an alias resolving to the deployment it points to — with `{ id, name, url, target,
+// readyState, createdAt }` on stdout, and exits 1 with an error on stderr when there is none. `promote` and
+// `rollback` take an id or url and move the alias; `rollback-khong-doi` makes rollback exit 0 without moving it.
 const FAKE_VERCEL = `#!/usr/bin/env node
 const fs = require("fs"), path = require("path");
 const dir = process.env.FAKE_DIR, a = process.argv.slice(2), cmd = a[0];
+const has = (n) => fs.existsSync(path.join(dir, n));
+const read = (n) => fs.readFileSync(path.join(dir, n), "utf8");
 fs.appendFileSync(path.join(dir, "calls.log"), Date.now() + " vercel " + a.join(" ") + "\\n");
-if (fs.existsSync(path.join(dir, "fail-" + cmd))) { console.error("fake vercel " + cmd + " failed"); process.exit(1); }
-if (cmd === "deploy") { console.error("Inspect: https://vercel.example.test/x"); console.log(fs.readFileSync(path.join(dir, "deploy-url"), "utf8").trim()); }
-if (cmd === "promote" || cmd === "rollback") fs.writeFileSync(path.join(dir, "ten-mien"), a[1]);
-if (cmd === "list") process.stdout.write(fs.existsSync(path.join(dir, "list.json")) ? fs.readFileSync(path.join(dir, "list.json"), "utf8") : '{"deployments":[]}');
+if (has("fail-" + cmd)) { console.error("fake vercel " + cmd + " failed"); process.exit(1); }
+const bare = (u) => String(u).replace(/^https?:\\/\\//, "").replace(/\\/+$/, "");
+const all = () => (has("list.json") ? JSON.parse(read("list.json")).deployments : []);
+const find = (x) => {
+  if (/\\/ten-mien$/.test(bare(x))) return has("ten-mien") ? all().find((d) => d.id === read("ten-mien").trim()) : undefined;
+  return all().find((d) => d.id === x || bare(d.url) === bare(x));
+};
+if (cmd === "deploy") { console.error("Inspect: https://vercel.example.test/x"); console.log(read("deploy-url").trim()); }
+if (cmd === "promote" || cmd === "rollback") {
+  const d = find(a[1]);
+  if (!d) { console.error("Error: Can't find the deployment " + a[1]); process.exit(1); }
+  if (!(cmd === "rollback" && has("rollback-khong-doi"))) fs.writeFileSync(path.join(dir, "ten-mien"), d.id);
+}
+if (cmd === "inspect") {
+  const d = has("fail-inspect-" + bare(a[1]).split("/").pop()) ? undefined : find(a[1]);
+  if (!d) { console.error('Error: Can\\'t find the deployment "' + a[1] + '" under the context'); process.exit(1); }
+  console.log(JSON.stringify({ id: d.id, name: "onehub-inventory", url: d.url, target: "production", readyState: d.state, createdAt: d.createdAt }, null, 2));
+}
+if (cmd === "list") process.stdout.write(has("list.json") ? read("list.json") : '{"deployments":[]}');
 `;
 
 // Answers the statements of db/scripts/migrate.sh and of len-ban.mjs; the ledger is the file schema_migrations.
@@ -126,6 +148,65 @@ interface Ctx {
   domainSeq?: (Health | "drop" | "text")[];
   requests: { t: number; path: string }[];
 }
+
+interface Listed {
+  id: string;
+  url: string;
+  createdAt: number;
+  state: string;
+  meta: { onehub_commit: string };
+}
+
+const T0 = Date.UTC(2026, 10, 1, 8, 0, 0);
+const HOUR = 3_600_000;
+
+/** The READY production deployments `vercel list --json` returns; `path` is the fake server's prefix of each. */
+function setList(
+  ctx: Ctx,
+  ds: { id: string; path: string; createdAt: number; commit: string }[],
+): void {
+  const deployments: Listed[] = ds.map((d) => ({
+    id: d.id,
+    // `vercel list --json` gives bare hosts, `vercel deploy` prints `https://host`.
+    url: `${ctx.host}/${d.path}`,
+    createdAt: d.createdAt,
+    state: "READY",
+    meta: { onehub_commit: d.commit },
+  }));
+  writeFileSync(join(ctx.fake, "list.json"), JSON.stringify({ deployments }));
+}
+
+function listed(ctx: Ctx): Listed[] {
+  const file = join(ctx.fake, "list.json");
+  return existsSync(file)
+    ? (JSON.parse(readFileSync(file, "utf8")) as { deployments: Listed[] }).deployments
+    : [];
+}
+
+/** Points the domain alias at a deployment id, or detaches it (never attached). */
+function pointDomain(ctx: Ctx, id: string | null): void {
+  const file = join(ctx.fake, "ten-mien");
+  if (id) writeFileSync(file, id);
+  else rmSync(file, { force: true });
+}
+
+function domainId(ctx: Ctx): string | null {
+  const file = join(ctx.fake, "ten-mien");
+  return existsSync(file) ? readFileSync(file, "utf8").trim() : null;
+}
+
+/** The printed list, newest first, as the operator sees it; `holder` is the id the domain points to. */
+function listLines(prefix: string, ctx: Ctx, holder: string | null): string[] {
+  return [...listed(ctx)]
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .map(
+      (d) =>
+        `${prefix}: bản ${d.id} · ${d.url} · commit ${d.meta.onehub_commit.slice(0, 7)} · tạo ${new Date(d.createdAt).toISOString()}${d.id === holder ? " · tên miền đang ở đây" : ""}`,
+    );
+}
+
+const ask = (prefix: string, appEnv: Env) =>
+  `${prefix}: chọn bản chạy tốt gần nhất trong danh sách, rồi gõ: make rollback ENV=${appEnv} BAN=<id>`;
 
 const servers: Server[] = [];
 afterEach(async () => {
@@ -227,9 +308,10 @@ async function fresh(appEnv: Env, setup: Setup = {}): Promise<Ctx> {
         res.end(JSON.stringify(ctx.domainOverride));
         return;
       }
-      const target = existsSync(join(fake, "ten-mien"))
+      const id = existsSync(join(fake, "ten-mien"))
         ? readFileSync(join(fake, "ten-mien"), "utf8").trim()
         : "";
+      const target = listed(ctx).find((d) => d.id === id)?.url ?? "";
       prefix = "/" + (target.replace(/^(?:https?:\/\/)?[^/]+/, "").split("/")[1] ?? "");
     }
     const h = ctx.health[prefix];
@@ -256,21 +338,11 @@ async function fresh(appEnv: Env, setup: Setup = {}): Promise<Ctx> {
   ctx.health["/ban-cu"] = { ok: true, commit: OLD, env: appEnv, vai: "dat" };
   ctx.health["/ban-thu"] = { ok: true, commit: head, env: "staging", vai: "dat" };
   writeFileSync(join(fake, "deploy-url"), `${ctx.base}/ban-moi\n`);
-  writeFileSync(join(fake, "ten-mien"), `${ctx.base}/ban-cu`);
-  writeFileSync(
-    join(fake, "list.json"),
-    JSON.stringify({
-      deployments: [
-        { url: `${ctx.host}/ban-cu`, createdAt: 1, state: "READY", meta: { onehub_commit: OLD } },
-        {
-          url: `${ctx.host}/ban-moi`,
-          createdAt: 2,
-          state: "READY",
-          meta: { onehub_commit: head },
-        },
-      ],
-    }),
-  );
+  setList(ctx, [
+    { id: "dpl_cu", path: "ban-cu", createdAt: T0, commit: OLD },
+    { id: "dpl_moi", path: "ban-moi", createdAt: T0 + 2 * HOUR, commit: head },
+  ]);
+  pointDomain(ctx, "dpl_cu");
 
   ctx.env = {
     PATH: `${bin}:${process.env["PATH"]}`,
@@ -351,8 +423,12 @@ function expectGreen(ctx: Ctx, appEnv: Env, r: Run): void {
     "vercel pull --yes --environment=production",
     "vercel build --prod",
     `vercel deploy --prebuilt --prod --skip-domain --meta onehub_commit=${ctx.head} --env COMMIT_SHA=${ctx.head}`,
+    // Before the promote: the new deployment's id, then the deployment the domain points to, read from the domain.
+    `vercel inspect ${ctx.host}/ban-moi --json`,
+    `vercel inspect ${ctx.host}/ten-mien --json`,
     `vercel promote ${url} --yes`,
   ]);
+  expect(domainId(ctx)).toBe("dpl_moi");
   // The pending migration ran before the first vercel call.
   const firstVercel = r.calls.findIndex((c) => c.startsWith("vercel "));
   const apply = r.calls.indexOf("psql ap 002_b.sql");
@@ -606,210 +682,312 @@ describe("make deploy — ma trận bước đỏ", () => {
         expectNoMarker(ctx, r);
       });
     }
-
-    it(`${appEnv} · kiem-nhanh-ten-mien đỏ sau gắn tên miền → lùi đúng một lần`, async () => {
-      const ctx = await fresh(appEnv);
-      ctx.domainSeq = [
-        { ok: true, commit: OLD, env: appEnv, vai: "dat" },
-        { ok: true, commit: ctx.head, env: appEnv, vai: "không nối được" },
-      ];
-      const r = await deploy(ctx, appEnv);
-      expect(r.code).not.toBe(0);
-      const steps = STEPS[appEnv];
-      expect(r.lines.slice(0, 6)).toEqual(
-        steps.slice(0, 6).map((s) => `deploy ${appEnv}: ${s} đạt`),
-      );
-      expect(r.lines.slice(6)).toEqual([
-        `deploy ${appEnv}: kiem-nhanh-ten-mien ĐỎ — vai nối chưa đạt: không nối được`,
-        `deploy ${appEnv}: đã lùi về bản trước`,
-      ]);
-      expect(r.vercel.filter((v) => v.startsWith("vercel promote"))).toHaveLength(1);
-      expect(r.vercel.filter((v) => v.startsWith("vercel rollback"))).toEqual([
-        `vercel rollback ${ctx.host}/ban-cu --yes`,
-      ]);
-      expectNoMarker(ctx, r);
-    });
-
-    it(`${appEnv} · lùi sau gắn tên miền không bao giờ chọn chính bản vừa lên (url trần như vercel list --json)`, async () => {
-      // Redeploy of the commit the domain already serves: the new deployment and the one serving carry the same
-      // commit. Comparing \`https://host\` with a bare host never drops the new one, and it is the newest: the
-      // rollback would point the domain back at the failed build and still print «đã lùi».
-      const ctx = await fresh(appEnv);
-      ctx.health["/ban-truoc"] = { ok: true, commit: ctx.head, env: appEnv, vai: "dat" };
-      writeFileSync(
-        join(ctx.fake, "list.json"),
-        JSON.stringify({
-          deployments: [
-            {
-              url: `${ctx.host}/ban-truoc`,
-              createdAt: 1,
-              state: "READY",
-              meta: { onehub_commit: ctx.head },
-            },
-            {
-              url: `${ctx.host}/ban-moi`,
-              createdAt: 2,
-              state: "READY",
-              meta: { onehub_commit: ctx.head },
-            },
-          ],
-        }),
-      );
-      ctx.domainSeq = [
-        { ok: true, commit: ctx.head, env: appEnv, vai: "dat" },
-        { ok: true, commit: ctx.head, env: appEnv, vai: "không nối được" },
-      ];
-      const r = await deploy(ctx, appEnv);
-      expect(r.code).not.toBe(0);
-      const rb = r.vercel.filter((v) => v.startsWith("vercel rollback"));
-      expect(rb, "rollback phải về bản đang chạy trước khi gắn, không về bản vừa lên").toEqual([
-        `vercel rollback ${ctx.host}/ban-truoc --yes`,
-      ]);
-      expect(rb.some((v) => v.includes("/ban-moi"))).toBe(false);
-    });
   }
 });
 
-describe("make deploy — lùi sau gắn tên miền không đoán", () => {
+describe("make deploy — lùi sau gắn tên miền về đúng bản tên miền trỏ tới trước khi gắn", () => {
   for (const appEnv of ["staging", "production"] as const) {
+    const P = `deploy ${appEnv}`;
+    const redLine = `${P}: kiem-nhanh-ten-mien ĐỎ — vai nối chưa đạt: không nối được`;
     const redAfter = (ctx: Ctx): Health => ({
       ok: true,
       commit: ctx.head,
       env: appEnv,
       vai: "không nối được",
     });
+    const stays = "không tự lùi; tên miền vẫn ở bản mới";
+    const rollbacks = (r: Run) => r.vercel.filter((v) => v.startsWith("vercel rollback"));
 
-    it(`${appEnv}: không đọc được tên miền trước khi gắn → không tự lùi, nêu đích danh`, async () => {
-      const ctx = await fresh(appEnv);
-      ctx.domainSeq = ["drop", redAfter(ctx)];
-      const r = await deploy(ctx, appEnv);
+    function expectFirstSixGreen(r: Run): void {
       expect(r.code).not.toBe(0);
-      expect(r.lines.slice(6)).toEqual([
-        `deploy ${appEnv}: kiem-nhanh-ten-mien ĐỎ — vai nối chưa đạt: không nối được`,
-        `deploy ${appEnv}: lùi bản DỪNG — không đọc được bản tên miền chạy trước khi gắn, không đoán; tên miền vẫn ở bản mới — nêu đích danh bản cần lùi về: make rollback ENV=${appEnv} BAN=<url hoặc id>`,
-      ]);
+      expect(r.lines.slice(0, 6)).toEqual(STEPS[appEnv].slice(0, 6).map((s) => `${P}: ${s} đạt`));
       expect(r.vercel.filter((v) => v.startsWith("vercel promote"))).toHaveLength(1);
-      expect(r.vercel.some((v) => v.startsWith("vercel rollback"))).toBe(false);
-      expectNoMarker(ctx, r);
-    });
-
-    it(`${appEnv}: không đọc được danh sách bản sau gắn → dòng riêng, không phải «không có bản trước»`, async () => {
-      const ctx = await fresh(appEnv);
-      ctx.domainSeq = [{ ok: true, commit: OLD, env: appEnv, vai: "dat" }, redAfter(ctx)];
-      writeFileSync(join(ctx.fake, "fail-list"), "");
-      const r = await deploy(ctx, appEnv);
-      expect(r.code).not.toBe(0);
-      expect(r.lines.slice(6)).toEqual([
-        `deploy ${appEnv}: kiem-nhanh-ten-mien ĐỎ — vai nối chưa đạt: không nối được`,
-        `deploy ${appEnv}: lùi bản ĐỎ — không đọc được danh sách bản của Vercel; tên miền vẫn ở bản mới`,
-      ]);
-      expect(r.vercel.some((v) => v.startsWith("vercel rollback"))).toBe(false);
-      expectNoMarker(ctx, r);
-    });
-  }
-});
-
-describe("make rollback", () => {
-  for (const appEnv of ["staging", "production"] as const) {
-    it(`${appEnv}: lùi một lần về bản trước rồi kiểm tên miền`, async () => {
-      const ctx = await fresh(appEnv);
-      writeFileSync(join(ctx.fake, "ten-mien"), `${ctx.base}/ban-moi`);
-      const r = await run(ctx, "make", ["-s", "-f", DEPLOY_MK, "rollback", `ENV=${appEnv}`]);
-      expect(r.code, r.stdout + r.stderr).toBe(0);
-      expect(r.vercel.filter((v) => v.startsWith("vercel rollback"))).toEqual([
-        `vercel rollback ${ctx.host}/ban-cu --yes`,
-      ]);
-      expect(ctx.requests.filter((q) => q.path === "/ten-mien/api/v1/health").length).toBe(2);
-      expect(r.lines).toEqual([`rollback ${appEnv}: tên miền chạy ${OLD.slice(0, 7)}`]);
-      expectNoMarker(ctx, r);
-    });
-
-    it(`${appEnv}: không có bản trước thì từ chối, không gọi rollback`, async () => {
-      const ctx = await fresh(appEnv);
-      writeFileSync(join(ctx.fake, "ten-mien"), `${ctx.base}/ban-moi`);
-      writeFileSync(
-        join(ctx.fake, "list.json"),
-        JSON.stringify({
-          deployments: [
-            {
-              url: `${ctx.host}/ban-moi`,
-              createdAt: 2,
-              state: "READY",
-              meta: { onehub_commit: ctx.head },
-            },
-          ],
-        }),
-      );
-      const r = await rollback(ctx, appEnv);
-      expect(r.code).not.toBe(0);
-      expect(r.lines).toEqual([`rollback ${appEnv}: không có bản trước để lùi`]);
-      expect(r.vercel.some((v) => v.startsWith("vercel rollback"))).toBe(false);
-    });
-  }
-
-  for (const appEnv of ["staging", "production"] as const) {
-    for (const [how, answer, reason] of [
-      ["máy chủ không trả lời", "drop", "sức khoẻ không trả lời"],
-      ["không phải JSON", "text", "sức khoẻ trả 502, không phải JSON"],
-    ] as const) {
-      it(`${appEnv}: không đọc được tên miền (${how}) thì dừng, không đoán, không gọi rollback`, async () => {
-        const ctx = await fresh(appEnv);
-        writeFileSync(join(ctx.fake, "ten-mien"), `${ctx.base}/ban-moi`);
-        ctx.domainSeq = [answer];
-        const r = await run(ctx, "make", ["-s", "-f", DEPLOY_MK, "rollback", `ENV=${appEnv}`]);
-        expect(r.code).not.toBe(0);
-        expect(r.lines).toEqual([
-          `rollback ${appEnv}: DỪNG — không đọc được bản tên miền đang chạy (${reason}), không đoán — nêu đích danh bản cần lùi về: make rollback ENV=${appEnv} BAN=<url hoặc id>`,
-        ]);
-        expect(r.vercel.some((v) => v.startsWith("vercel rollback"))).toBe(false);
-        expectNoMarker(ctx, r);
-      });
     }
 
-    it(`${appEnv}: BAN nêu đích danh thì lùi đúng một lần về bản ấy dù tên miền không đọc được`, async () => {
+    it(`${appEnv}: kiem-nhanh-ten-mien đỏ → lùi đúng một lần về bản tên miền trỏ tới trước khi gắn, đọc lại tên miền`, async () => {
       const ctx = await fresh(appEnv);
-      // The domain serves ban-moi, which does not answer; with BAN the domain is read once, after the rollback.
-      writeFileSync(join(ctx.fake, "ten-mien"), `${ctx.base}/ban-moi`);
-      ctx.health["/ban-moi"] = "drop";
-      const ban = `${ctx.base}/ban-cu`;
-      const r = await run(ctx, "make", [
-        "-s",
-        "-f",
-        DEPLOY_MK,
-        "rollback",
-        `ENV=${appEnv}`,
-        `BAN=${ban}`,
-      ]);
-      expect(r.code, r.stdout + r.stderr).toBe(0);
-      expect(r.vercel.filter((v) => v.startsWith("vercel rollback"))).toEqual([
-        `vercel rollback ${ban} --yes`,
-      ]);
-      expect(ctx.requests.filter((q) => q.path === "/ten-mien/api/v1/health").length).toBe(1);
-      expect(r.lines).toEqual([`rollback ${appEnv}: tên miền chạy ${OLD.slice(0, 7)}`]);
+      ctx.domainSeq = [redAfter(ctx)];
+      const r = await deploy(ctx, appEnv);
+      expectFirstSixGreen(r);
+      expect(r.lines.slice(6)).toEqual([redLine, `${P}: đã lùi về bản trước`]);
+      expect(rollbacks(r)).toEqual(["vercel rollback dpl_cu --yes"]);
+      // The alias was read again after the rollback, and points at the recorded id.
+      const at = r.vercel.indexOf("vercel rollback dpl_cu --yes");
+      expect(r.vercel.slice(at + 1)).toContain(`vercel inspect ${ctx.host}/ten-mien --json`);
+      expect(domainId(ctx)).toBe("dpl_cu");
       expectNoMarker(ctx, r);
     });
 
-    it(`${appEnv}: không đọc được danh sách bản thì báo dòng riêng`, async () => {
+    it(`${appEnv}: hai bản READY cùng commit (xoay khoá) → về bản đang phục vụ, không về bản hỏng chưa từng gắn`, async () => {
+      // Same-commit redeploy (key rotation): ban-truoc serves the domain; ban-hong, newer and with the same commit, is a
+      // READY build that failed its check and was never promoted; ban-moi is this deploy.
       const ctx = await fresh(appEnv);
-      writeFileSync(join(ctx.fake, "ten-mien"), `${ctx.base}/ban-moi`);
-      writeFileSync(join(ctx.fake, "fail-list"), "");
-      const r = await rollback(ctx, appEnv);
-      expect(r.code).not.toBe(0);
-      expect(r.lines).toEqual([`rollback ${appEnv}: ĐỎ — không đọc được danh sách bản của Vercel`]);
-      expect(r.vercel.some((v) => v.startsWith("vercel rollback"))).toBe(false);
+      ctx.health["/ban-truoc"] = { ok: true, commit: ctx.head, env: appEnv, vai: "dat" };
+      ctx.health["/ban-hong"] = { ok: true, commit: ctx.head, env: appEnv, vai: "khoá sai" };
+      setList(ctx, [
+        { id: "dpl_truoc", path: "ban-truoc", createdAt: T0, commit: ctx.head },
+        { id: "dpl_hong", path: "ban-hong", createdAt: T0 + HOUR, commit: ctx.head },
+        { id: "dpl_moi", path: "ban-moi", createdAt: T0 + 2 * HOUR, commit: ctx.head },
+      ]);
+      pointDomain(ctx, "dpl_truoc");
+      ctx.domainSeq = [redAfter(ctx)];
+      const r = await deploy(ctx, appEnv);
+      expectFirstSixGreen(r);
+      expect(rollbacks(r), "về bản tên miền trỏ tới trước khi gắn, không về bản hỏng").toEqual([
+        "vercel rollback dpl_truoc --yes",
+      ]);
+      expect(domainId(ctx)).toBe("dpl_truoc");
+      expect(r.lines.slice(6)).toEqual([redLine, `${P}: đã lùi về bản trước`]);
+    });
+
+    it(`${appEnv}: lần gắn đầu (tên miền chưa trỏ bản nào) → DỪNG, in danh sách, hỏi BAN`, async () => {
+      const ctx = await fresh(appEnv);
+      pointDomain(ctx, null);
+      ctx.domainSeq = [redAfter(ctx)];
+      const r = await deploy(ctx, appEnv);
+      expectFirstSixGreen(r);
+      expect(r.lines.slice(6)).toEqual([
+        redLine,
+        `${P}: lùi bản DỪNG — không đọc được bản tên miền trỏ tới trước khi gắn (lần gắn đầu, hay Vercel không trả lời), ${stays}`,
+        ...listLines(P, ctx, "dpl_moi"),
+        ask(P, appEnv),
+      ]);
+      expect(rollbacks(r)).toEqual([]);
+      expectNoMarker(ctx, r);
+    });
+
+    it(`${appEnv}: không đọc được tên miền → DỪNG, in danh sách, hỏi BAN`, async () => {
+      const ctx = await fresh(appEnv);
+      writeFileSync(join(ctx.fake, "fail-inspect-ten-mien"), "");
+      ctx.domainSeq = [redAfter(ctx)];
+      const r = await deploy(ctx, appEnv);
+      expectFirstSixGreen(r);
+      expect(r.lines.slice(6)).toEqual([
+        redLine,
+        `${P}: lùi bản DỪNG — không đọc được bản tên miền trỏ tới trước khi gắn (lần gắn đầu, hay Vercel không trả lời), ${stays}`,
+        ...listLines(P, ctx, null),
+        ask(P, appEnv),
+      ]);
+      expect(rollbacks(r)).toEqual([]);
+    });
+
+    it(`${appEnv}: không đọc được mã bản mới → DỪNG, in danh sách, hỏi BAN`, async () => {
+      const ctx = await fresh(appEnv);
+      writeFileSync(join(ctx.fake, "fail-inspect-ban-moi"), "");
+      ctx.domainSeq = [redAfter(ctx)];
+      const r = await deploy(ctx, appEnv);
+      expectFirstSixGreen(r);
+      expect(r.lines.slice(6)).toEqual([
+        redLine,
+        `${P}: lùi bản DỪNG — không đọc được mã bản mới, ${stays}`,
+        ...listLines(P, ctx, "dpl_moi"),
+        ask(P, appEnv),
+      ]);
+      expect(rollbacks(r)).toEqual([]);
+    });
+
+    it(`${appEnv}: bản ghi lại trùng bản mới → DỪNG, không lùi về chính bản hỏng`, async () => {
+      const ctx = await fresh(appEnv);
+      pointDomain(ctx, "dpl_moi");
+      ctx.domainSeq = [redAfter(ctx)];
+      const r = await deploy(ctx, appEnv);
+      expectFirstSixGreen(r);
+      expect(r.lines.slice(6)).toEqual([
+        redLine,
+        `${P}: lùi bản DỪNG — trước khi gắn, tên miền đã trỏ vào chính bản mới dpl_moi, ${stays}`,
+        ...listLines(P, ctx, "dpl_moi"),
+        ask(P, appEnv),
+      ]);
+      expect(rollbacks(r)).toEqual([]);
     });
   }
+
+  const P = "deploy staging";
+  const redAfter = (ctx: Ctx): Health => ({
+    ok: true,
+    commit: ctx.head,
+    env: "staging",
+    vai: "không nối được",
+  });
+  const redLine = `${P}: kiem-nhanh-ten-mien ĐỎ — vai nối chưa đạt: không nối được`;
+
+  it("DỪNG mà không đọc được danh sách bản → dòng riêng, vẫn hỏi BAN", async () => {
+    const ctx = await fresh("staging");
+    pointDomain(ctx, null);
+    writeFileSync(join(ctx.fake, "fail-list"), "");
+    ctx.domainSeq = [redAfter(ctx)];
+    const r = await deploy(ctx, "staging");
+    expect(r.code).not.toBe(0);
+    expect(r.lines.slice(6)).toEqual([
+      redLine,
+      `${P}: lùi bản DỪNG — không đọc được bản tên miền trỏ tới trước khi gắn (lần gắn đầu, hay Vercel không trả lời), không tự lùi; tên miền vẫn ở bản mới`,
+      `${P}: lùi bản ĐỎ — không đọc được danh sách bản của Vercel`,
+      ask(P, "staging"),
+    ]);
+    expect(r.vercel.some((v) => v.startsWith("vercel rollback"))).toBe(false);
+  });
+
+  it("vercel rollback lỗi → ĐỎ, in danh sách, hỏi BAN; không báo đã lùi", async () => {
+    const ctx = await fresh("staging");
+    writeFileSync(join(ctx.fake, "fail-rollback"), "");
+    ctx.domainSeq = [redAfter(ctx)];
+    const r = await deploy(ctx, "staging");
+    expect(r.code).not.toBe(0);
+    expect(r.lines.slice(6)).toEqual([
+      redLine,
+      `${P}: lùi bản ĐỎ — vercel rollback lỗi (mã 1)`,
+      ...listLines(P, ctx, "dpl_moi"),
+      ask(P, "staging"),
+    ]);
+  });
+
+  it("rollback trả 0 mà tên miền không về bản ghi lại → ĐỎ, không báo đã lùi", async () => {
+    const ctx = await fresh("staging");
+    writeFileSync(join(ctx.fake, "rollback-khong-doi"), "");
+    ctx.domainSeq = [redAfter(ctx)];
+    const r = await deploy(ctx, "staging");
+    expect(r.code).not.toBe(0);
+    expect(r.lines.slice(6)).toEqual([
+      redLine,
+      `${P}: lùi bản ĐỎ — tên miền chưa về bản dpl_cu (đang ở dpl_moi)`,
+      ...listLines(P, ctx, "dpl_moi"),
+      ask(P, "staging"),
+    ]);
+    expect(r.lines.some((l) => l.includes("đã lùi"))).toBe(false);
+  });
+
+  it("tên miền về bản ghi lại nhưng kiểm nhanh đỏ → ĐỎ, không báo đã lùi", async () => {
+    const ctx = await fresh("staging");
+    ctx.proto["/ban-cu"] = 200;
+    ctx.domainSeq = [redAfter(ctx)];
+    const r = await deploy(ctx, "staging");
+    expect(r.code).not.toBe(0);
+    expect(domainId(ctx)).toBe("dpl_cu");
+    expect(r.lines.slice(6)).toEqual([
+      redLine,
+      `${P}: lùi bản ĐỎ — tên miền đã về bản dpl_cu nhưng kiểm nhanh đỏ: /proto/x trả 200, cần 404`,
+      ...listLines(P, ctx, "dpl_cu"),
+      ask(P, "staging"),
+    ]);
+  });
+});
+
+describe("make rollback — không BAN thì không đoán", () => {
+  const viaMake = (ctx: Ctx, appEnv: Env, ...extra: string[]) =>
+    run(ctx, "make", ["-s", "-f", DEPLOY_MK, "rollback", `ENV=${appEnv}`, ...extra]);
+  const rollbacks = (r: Run) => r.vercel.filter((v) => v.startsWith("vercel rollback"));
+
+  for (const appEnv of ["staging", "production"] as const) {
+    const P = `rollback ${appEnv}`;
+
+    it(`${appEnv}: không BAN → DỪNG, in danh sách và bản tên miền đang ở, hỏi BAN`, async () => {
+      const ctx = await fresh(appEnv);
+      pointDomain(ctx, "dpl_moi");
+      const r = await viaMake(ctx, appEnv);
+      expect(r.code).not.toBe(0);
+      expect(r.lines).toEqual([
+        `${P}: DỪNG — chưa nêu bản cần lùi về, không đoán`,
+        ...listLines(P, ctx, "dpl_moi"),
+        ask(P, appEnv),
+      ]);
+      expect(rollbacks(r)).toEqual([]);
+      expect(domainId(ctx)).toBe("dpl_moi");
+      expectNoMarker(ctx, r);
+    });
+
+    it(`${appEnv}: BAN hợp lệ → lùi đúng một lần, tên miền đọc lại trỏ về BAN, kiểm commit của BAN`, async () => {
+      const ctx = await fresh(appEnv);
+      pointDomain(ctx, "dpl_moi");
+      const r = await viaMake(ctx, appEnv, "BAN=dpl_cu");
+      expect(r.code, r.stdout + r.stderr).toBe(0);
+      expect(rollbacks(r)).toEqual(["vercel rollback dpl_cu --yes"]);
+      const at = r.vercel.indexOf("vercel rollback dpl_cu --yes");
+      expect(r.vercel.slice(at + 1)).toEqual([`vercel inspect ${ctx.host}/ten-mien --json`]);
+      expect(domainId(ctx)).toBe("dpl_cu");
+      expect(ctx.requests.filter((q) => q.path === "/ten-mien/api/v1/health").length).toBe(1);
+      expect(r.lines).toEqual([`${P}: tên miền ở bản dpl_cu, chạy ${OLD.slice(0, 7)}`]);
+      expectNoMarker(ctx, r);
+    });
+  }
+
+  const P = "rollback staging";
+
+  for (const [how, ban] of [
+    ["mã không có", "dpl_khong_co"],
+    ["url thay cho mã", "URL"],
+  ] as const) {
+    it(`BAN không có trong danh sách bản production READY (${how}) → DỪNG, không gọi rollback`, async () => {
+      const ctx = await fresh("staging");
+      pointDomain(ctx, "dpl_moi");
+      const name = ban === "URL" ? `${ctx.host}/ban-cu` : ban;
+      const r = await viaMake(ctx, "staging", `BAN=${name}`);
+      expect(r.code).not.toBe(0);
+      expect(r.lines).toEqual([
+        `${P}: DỪNG — không thấy bản ${name} trong danh sách bản production READY`,
+        ...listLines(P, ctx, "dpl_moi"),
+        ask(P, "staging"),
+      ]);
+      expect(rollbacks(r)).toEqual([]);
+    });
+  }
+
+  it("BAN là bản tên miền đang trỏ tới → DỪNG, không gọi rollback", async () => {
+    const ctx = await fresh("staging");
+    pointDomain(ctx, "dpl_moi");
+    const r = await viaMake(ctx, "staging", "BAN=dpl_moi");
+    expect(r.code).not.toBe(0);
+    expect(r.lines).toEqual([
+      `${P}: DỪNG — tên miền đã ở bản dpl_moi, không lùi`,
+      ...listLines(P, ctx, "dpl_moi"),
+      ask(P, "staging"),
+    ]);
+    expect(rollbacks(r)).toEqual([]);
+  });
+
+  it("không đọc được bản tên miền đang trỏ tới → DỪNG, không gọi rollback", async () => {
+    const ctx = await fresh("staging");
+    pointDomain(ctx, "dpl_moi");
+    writeFileSync(join(ctx.fake, "fail-inspect-ten-mien"), "");
+    const r = await viaMake(ctx, "staging", "BAN=dpl_cu");
+    expect(r.code).not.toBe(0);
+    expect(r.lines).toEqual([`${P}: DỪNG — không đọc được bản tên miền đang trỏ tới, không lùi`]);
+    expect(rollbacks(r)).toEqual([]);
+  });
+
+  it("không đọc được danh sách bản → ĐỎ, không gọi rollback", async () => {
+    const ctx = await fresh("staging");
+    writeFileSync(join(ctx.fake, "fail-list"), "");
+    const r = await viaMake(ctx, "staging", "BAN=dpl_cu");
+    expect(r.code).not.toBe(0);
+    expect(r.lines).toEqual([`${P}: ĐỎ — không đọc được danh sách bản của Vercel`]);
+    expect(rollbacks(r)).toEqual([]);
+  });
+
+  it("vercel rollback lỗi → ĐỎ", async () => {
+    const ctx = await fresh("staging");
+    pointDomain(ctx, "dpl_moi");
+    writeFileSync(join(ctx.fake, "fail-rollback"), "");
+    const r = await viaMake(ctx, "staging", "BAN=dpl_cu");
+    expect(r.code).not.toBe(0);
+    expect(r.lines).toEqual([`${P}: ĐỎ — vercel rollback lỗi (mã 1)`]);
+  });
+
+  it("rollback trả 0 mà tên miền không về BAN → ĐỎ", async () => {
+    const ctx = await fresh("staging");
+    pointDomain(ctx, "dpl_moi");
+    writeFileSync(join(ctx.fake, "rollback-khong-doi"), "");
+    const r = await viaMake(ctx, "staging", "BAN=dpl_cu");
+    expect(r.code).not.toBe(0);
+    expect(r.lines).toEqual([`${P}: ĐỎ — tên miền chưa về bản dpl_cu (đang ở dpl_moi)`]);
+  });
 
   it("tên miền sau khi lùi đỏ thì báo đỏ", async () => {
     const ctx = await fresh("staging");
-    writeFileSync(join(ctx.fake, "ten-mien"), `${ctx.base}/ban-moi`);
-    ctx.health["/ban-cu"] = { ok: true, commit: OLD, env: "staging", vai: "dat" };
+    pointDomain(ctx, "dpl_moi");
     ctx.proto["/ban-cu"] = 200;
-    const r = await rollback(ctx, "staging");
+    const r = await viaMake(ctx, "staging", "BAN=dpl_cu");
     expect(r.code).not.toBe(0);
-    expect(r.lines).toEqual([
-      "rollback staging: kiem-nhanh-ten-mien ĐỎ — /proto/x trả 200, cần 404",
-    ]);
+    expect(r.lines).toEqual([`${P}: kiem-nhanh-ten-mien ĐỎ — /proto/x trả 200, cần 404`]);
   });
 
   it("thiếu biến thì đỏ gọi tên biến, không gọi vercel", async () => {
@@ -825,11 +1003,11 @@ describe("make rollback", () => {
 describe("make smoke", () => {
   it("đạt trên tên miền đang chạy HEAD, đỏ khi commit khác", async () => {
     const ctx = await fresh("staging");
-    writeFileSync(join(ctx.fake, "ten-mien"), `${ctx.base}/ban-moi`);
+    pointDomain(ctx, "dpl_moi");
     const ok = await run(ctx, "make", ["-s", "-f", DEPLOY_MK, "smoke", "ENV=staging"]);
     expect(ok.code, ok.stdout + ok.stderr).toBe(0);
     expect(ok.lines).toEqual([`smoke staging: đạt ${ctx.head.slice(0, 7)}`]);
-    writeFileSync(join(ctx.fake, "ten-mien"), `${ctx.base}/ban-cu`);
+    pointDomain(ctx, "dpl_cu");
     const red = await run(ctx, "node", [KIEM_NHANH, "staging"]);
     expect(red.code).not.toBe(0);
     expect(red.lines).toEqual([

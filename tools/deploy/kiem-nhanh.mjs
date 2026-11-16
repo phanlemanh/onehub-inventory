@@ -119,7 +119,11 @@ function commitOf(d) {
   return d?.meta?.onehub_commit ?? d?.meta?.githubCommitSha ?? undefined;
 }
 
-/** READY production deployments, newest first, from `vercel list --json`; null when the list cannot be read. */
+/**
+ * READY production deployments from `vercel list --json` (vercel@65.9.0 prints `{ contextName, deployments: [{ id, url,
+ * state, target, createdAt, meta, … }], pagination }`), newest first for display only; null when the list cannot be
+ * read. Nothing here chooses a deployment: the list is shown to the operator, or searched by an exact id.
+ */
 export function productionDeployments({ cwd, env = process.env } = {}) {
   const r = spawnSync(
     "vercel",
@@ -139,41 +143,57 @@ export function productionDeployments({ cwd, env = process.env } = {}) {
   }
   const list = Array.isArray(parsed) ? parsed : (parsed?.deployments ?? []);
   return list
-    .filter((d) => d && d.url && (d.state ?? d.readyState ?? "READY") === "READY")
+    .filter((d) => d && (d.id ?? d.uid) && (d.state ?? d.readyState ?? "READY") === "READY")
     .sort((a, b) => (b.createdAt ?? b.created ?? 0) - (a.createdAt ?? a.created ?? 0))
-    .map((d) => ({ url: d.url, id: d.uid ?? d.id, commit: commitOf(d) }));
+    .map((d) => ({
+      id: d.id ?? d.uid,
+      url: d.url,
+      commit: commitOf(d),
+      createdAt: d.createdAt ?? d.created,
+    }));
 }
 
-/** A deployment url without scheme or trailing slash: `vercel deploy` prints `https://host`, `vercel list --json` a bare host. */
+/** A deployment url without scheme or trailing slash: `vercel deploy` prints `https://host`, the CLI reads hosts. */
 export function bare(url) {
   return String(url ?? "")
     .replace(/^https?:\/\//, "")
     .replace(/\/+$/, "");
 }
 
-/** The deployment of `list` named by `ban` (its url, with or without https://, or its id), or undefined. */
-export function namedIn(list, ban) {
-  const want = bare(ban);
-  return (list ?? []).find((d) => bare(d.url) === want || (d.id && d.id === ban));
-}
-
-/** The line that stops a rollback that would have to guess which deployment the domain serves. */
-export function nameTheTarget(appEnv) {
-  return `nêu đích danh bản cần lùi về: make rollback ENV=${appEnv} BAN=<url hoặc id>`;
-}
-
 /**
- * The deployment to go back to. `current` is the commit the domain serves now; `exclude` a url never to pick (the new,
- * failed deployment). The current deployment is the newest one with that commit, or the newest of all when commits are
- * unknown; the target is the next older one with another commit.
+ * The deployment a domain (alias) or deployment url points to, read by `vercel inspect <host> --json`, or null when it
+ * cannot be read (the domain was never attached, the token is wrong, the CLI is missing). vercel@65.9.0 resolves the
+ * host with GET /v13/deployments/<host> — its help: «Get information about the deployment an alias points to» — and
+ * prints `{ id, name, url, target, readyState, createdAt, … }` on stdout.
  */
-export function previousOf(list, { current, exclude } = {}) {
-  const ds = list.filter((d) => !exclude || bare(d.url) !== bare(exclude));
-  let i = current ? ds.findIndex((d) => d.commit === current) : -1;
-  if (i < 0) i = 0;
-  const cur = ds[i];
-  if (!cur) return null;
-  return ds.slice(i + 1).find((d) => !cur.commit || !d.commit || d.commit !== cur.commit) ?? null;
+export function deploymentAt(url, { cwd, env = process.env } = {}) {
+  const r = spawnSync("vercel", ["inspect", bare(url), "--json"], { cwd, env, encoding: "utf8" });
+  if (r.status !== 0) {
+    const output = redact(r.stderr ?? "", env).trim();
+    if (output) process.stderr.write(`${output}\n`);
+    return null;
+  }
+  let d;
+  try {
+    d = JSON.parse(r.stdout);
+  } catch {
+    return null;
+  }
+  return typeof d?.id === "string" && d.id ? { id: d.id, url: d.url } : null;
+}
+
+/** One printed line per deployment of `list`, marking the one `holderId` (the domain) points to. */
+export function deploymentLines(list, holderId) {
+  return list.map((d) => {
+    const created = d.createdAt ? new Date(d.createdAt).toISOString() : "?";
+    const mark = holderId && d.id === holderId ? " · tên miền đang ở đây" : "";
+    return `bản ${d.id} · ${d.url ?? "?"} · commit ${short(d.commit) || "?"} · tạo ${created}${mark}`;
+  });
+}
+
+/** The line that asks the operator to name the deployment to go back to. */
+export function nameTheTarget(appEnv) {
+  return `chọn bản chạy tốt gần nhất trong danh sách, rồi gõ: make rollback ENV=${appEnv} BAN=<id>`;
 }
 
 async function main() {

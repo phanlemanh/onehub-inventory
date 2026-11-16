@@ -1,14 +1,15 @@
 # Lùi bản
 
-Trỏ tên miền của một môi trường về bản đã chạy trước bản hiện tại, rồi kiểm lại. Lùi bản chỉ đổi mã đang phục vụ; cơ sở
+Trỏ tên miền của một môi trường về một bản đã chạy tốt, do người vận hành nêu đích danh, rồi kiểm lại. Lùi bản chỉ đổi mã đang phục vụ; cơ sở
 dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật migration (mục «Cần có trước» của [dua-ban-len.md](dua-ban-len.md)) bảo
 đảm bản trước chạy được trên cơ sở dữ liệu ấy. Mục lục và bảng biến: [README.md](README.md).
 
 ## Khi nào dùng
 
 - Bản vừa lên chạy hỏng: trang lỗi, đăng nhập không được, sức khoẻ không trả `"ok":true`.
-- Lệnh đưa bản lên báo `lùi bản ĐỎ` hay `không có bản trước để lùi` sau khi đã gắn tên miền.
-- Không dùng khi lệnh đưa bản lên đã tự báo `đã lùi về bản trước`: việc ấy đã xong; chỉ cần kiểm như bước 4.
+- Lệnh đưa bản lên báo `lùi bản DỪNG` hay `lùi bản ĐỎ` sau khi đã gắn tên miền: lệnh không tự lùi được, tên miền còn ở
+  bản hỏng, và lệnh đã in sẵn danh sách bản để chọn (bước 3).
+- Không dùng khi lệnh đưa bản lên đã tự báo `đã lùi về bản trước`: việc ấy đã xong; chỉ cần kiểm như bước 5.
 
 ## Cần có trước
 
@@ -41,23 +42,39 @@ dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật m
 - **Đạt khi:** lệnh không in gì. Không gõ giá trị nào vào dòng lệnh; không in biến ra màn hình để kiểm.
 - **Đỏ thì:** `No such file` — đường tới tệp biến sai; tệp chưa có thì tạo theo «Cần có trước».
 
-### 3. Lùi bản
+### 3. Xem danh sách bản và chọn bản để lùi về
 
 - **Ở đâu:** cùng cửa sổ dòng lệnh.
-- **Gõ hay bấm:** `make rollback ENV=production` (bản thử: `make rollback ENV=staging`).
-- **Đạt khi:** dòng cuối là `rollback production: tên miền chạy <7 ký tự commit>`, commit khác commit ghi ở bước 1. Lệnh
-  đã tự kiểm tên miền sau khi lùi (sức khoẻ đúng commit, đúng môi trường, vai nối đạt, lối thử của máy dev đóng).
-- **Đỏ thì:** xem mục «Đỏ thì làm gì». Chạy lại lệnh lần nữa là lùi thêm một bản nữa — chỉ làm khi bản vừa lùi về cũng
-  hỏng.
+- **Gõ hay bấm:** `make rollback ENV=production` (bản thử: `make rollback ENV=staging`), không kèm `BAN`. Lệnh không
+  lùi gì: nó in dòng `rollback production: DỪNG — chưa nêu bản cần lùi về, không đoán`, rồi mỗi bản production sẵn sàng
+  một dòng `bản <id> · <url> · commit <7 ký tự> · tạo <giờ UTC>`, mới nhất trước; bản tên miền đang trỏ tới có thêm
+  `· tên miền đang ở đây`.
+- **Đạt khi:** thấy dòng mang `tên miền đang ở đây` (thường là bản hỏng ghi ở bước 1) và chọn được bản cần lùi về: bản
+  đã chạy tốt gần nhất — thường là bản tên miền trỏ tới ngay trước lần đưa bản lên hỏng. Chép `<id>` của bản ấy (dạng
+  `dpl_…`). Không chọn bản chỉ vì nó mới nhất hay cùng commit: một bản dựng hỏng chưa từng gắn tên miền cũng nằm trong
+  danh sách.
+- **Đỏ thì:** `ĐỎ — không đọc được danh sách bản của Vercel` — xem mục «Đỏ thì làm gì». Không biết bản nào chạy tốt: mở
+  vercel.com › dự án › Deployments, so giờ tạo với giờ của lượt đưa bản lên trước (tab Actions trên GitHub), hoặc hỏi
+  người giữ kho mã.
 
-### 4. Kiểm bằng mắt
+### 4. Lùi về bản đã chọn
+
+- **Ở đâu:** cùng cửa sổ dòng lệnh.
+- **Gõ hay bấm:** `make rollback ENV=production BAN=<id>` với `<id>` chép ở bước 3.
+- **Đạt khi:** dòng cuối là `rollback production: tên miền ở bản <id>, chạy <7 ký tự commit>`, commit khác commit ghi ở
+  bước 1. Lệnh chỉ lùi khi `<id>` có trong danh sách và khác bản tên miền đang trỏ tới; sau khi lùi nó đọc lại tên miền
+  để chắc tên miền trỏ đúng `<id>`, rồi kiểm sức khoẻ (đúng commit của bản ấy, đúng môi trường, vai nối đạt, lối thử
+  của máy dev đóng).
+- **Đỏ thì:** xem mục «Đỏ thì làm gì». Bản vừa lùi về cũng hỏng thì làm lại bước 3 và 4 với một bản cũ hơn.
+
+### 5. Kiểm bằng mắt
 
 - **Ở đâu:** trình duyệt.
 - **Gõ hay bấm:** mở lại `<APP_URL>/api/v1/health`, rồi mở trang chủ và đăng nhập.
 - **Đạt khi:** `"ok":true`, `"vai":"dat"`, `commit` là bản cũ; đăng nhập được.
 - **Đỏ thì:** lùi bản bằng trang Vercel (mục «Đỏ thì làm gì», dòng cuối) và báo người giữ kho mã ngay.
 
-### 5. Báo và ghi lại
+### 6. Báo và ghi lại
 
 - **Ở đâu:** GitHub (issue mới) và người giữ kho mã.
 - **Gõ hay bấm:** mở một issue: môi trường, commit hỏng, commit đang chạy sau khi lùi, giờ lùi, triệu chứng. Sự cố trên bản
@@ -67,17 +84,19 @@ dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật m
 
 ## Đỏ thì làm gì
 
-Khi không đọc được sức khoẻ của tên miền (máy chủ không trả lời hay không trả JSON), `make rollback` và bước tự lùi của
-`make deploy` dừng lại chứ không đoán bản nào đang chạy, vì bản mới nhất trên Vercel có thể chưa từng được gắn tên miền.
-Khi ấy người vận hành nêu đích danh bản cần lùi về: `make rollback ENV=<ENV> BAN=<url hoặc id>` (lấy url hay id ở trang
-Deployments của dự án trên Vercel, chọn bản đã chạy tốt gần nhất). Đạt khi dòng cuối là
-`rollback <ENV>: tên miền chạy <commit>`.
+`make rollback` không bao giờ tự đoán bản cần lùi về: mọi bản đưa lên đều là một bản production sẵn sàng trên Vercel, dù
+đã gắn tên miền hay chưa, nên bản mới nhất, hay bản mang cùng commit, có thể là một bản dựng hỏng chưa từng phục vụ. Mỗi
+dòng `DỪNG` dưới đây không đổi gì; làm theo cột bên phải rồi chạy lại.
 
-| Dòng                                                           | Làm gì                                                                                                                                                                                                              |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rollback <ENV>: ĐỎ — thiếu biến <tên>`                        | Tệp biến thiếu biến ấy, hoặc chưa nạp (bước 2). Bổ sung, nạp lại, chạy lại.                                                                                                                                         |
-| `rollback <ENV>: ĐỎ — không đọc được danh sách bản của Vercel` | `vercel` chưa cài, hoặc `VERCEL_TOKEN` hết hạn hay sai nhóm. Cài lại hay xoay khoá ([xoay-khoa.md](xoay-khoa.md)); gấp thì dùng dòng cuối.                                                                          |
-| `rollback <ENV>: không có bản trước để lùi`                    | Môi trường mới có một bản. Không có gì để lùi: sửa lỗi rồi đưa bản mới lên.                                                                                                                                         |
-| `rollback <ENV>: ĐỎ — vercel rollback lỗi (mã <n>)`            | Đọc dòng lỗi của Vercel ngay phía trên. Gấp thì dùng dòng cuối.                                                                                                                                                     |
-| `rollback <ENV>: kiem-nhanh-ten-mien ĐỎ — <lý do>`             | Tên miền đã về bản cũ nhưng bản cũ cũng không khoẻ. Đọc lý do như bảng của [dua-ban-len.md](dua-ban-len.md) (dòng `kiem-nhanh`); thường là biến trên Vercel hay cơ sở dữ liệu, không phải mã. Báo người giữ kho mã. |
-| Lệnh không chạy được ở máy nào                                 | Ở vercel.com › dự án của môi trường › Deployments: chọn bản «Ready» ngay trước bản hỏng › menu ba chấm › Instant Rollback › xác nhận. Rồi làm bước 4.                                                               |
+| Dòng                                                                              | Làm gì                                                                                                                                                                                                                |
+| --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rollback <ENV>: ĐỎ — thiếu biến <tên>`                                           | Tệp biến thiếu biến ấy, hoặc chưa nạp (bước 2). Bổ sung, nạp lại, chạy lại.                                                                                                                                           |
+| `rollback <ENV>: ĐỎ — không đọc được danh sách bản của Vercel`                    | `vercel` chưa cài, hoặc `VERCEL_TOKEN` hết hạn hay sai nhóm. Cài lại hay xoay khoá ([xoay-khoa.md](xoay-khoa.md)); gấp thì dùng dòng cuối.                                                                            |
+| `rollback <ENV>: DỪNG — chưa nêu bản cần lùi về, không đoán`                      | Đúng như bước 3: đọc danh sách in ngay dưới, chọn bản đã chạy tốt gần nhất, gõ `make rollback ENV=<ENV> BAN=<id>` (bước 4).                                                                                           |
+| `rollback <ENV>: DỪNG — không thấy bản <id> trong danh sách bản production READY` | `BAN` phải là đúng `<id>` (dạng `dpl_…`) của một dòng trong danh sách in ngay dưới, không phải url. Chép lại `<id>` từ danh sách, chạy lại bước 4.                                                                    |
+| `rollback <ENV>: DỪNG — tên miền đã ở bản <id>, không lùi`                        | Tên miền đã trỏ vào bản ấy. Đọc lại danh sách in ngay dưới, chọn một bản khác đã chạy tốt, chạy lại bước 4.                                                                                                           |
+| `rollback <ENV>: DỪNG — không đọc được bản tên miền đang trỏ tới, không lùi`      | Vercel không trả lời về tên miền: thường là `VERCEL_TOKEN` hay `VERCEL_PROJECT_ID` sai dự án, hoặc `APP_URL` sai địa chỉ. Sửa tệp biến, nạp lại, chạy lại; gấp thì dùng dòng cuối.                                    |
+| `rollback <ENV>: ĐỎ — vercel rollback lỗi (mã <n>)`                               | Đọc dòng lỗi của Vercel ngay phía trên. Gấp thì dùng dòng cuối.                                                                                                                                                       |
+| `rollback <ENV>: ĐỎ — tên miền chưa về bản <id> (đang ở <id khác>)`               | Vercel nhận lệnh lùi nhưng tên miền chưa đổi. Chờ một phút rồi chạy lại bước 4; vẫn vậy thì dùng dòng cuối và báo người giữ kho mã.                                                                                   |
+| `rollback <ENV>: kiem-nhanh-ten-mien ĐỎ — <lý do>`                                | Tên miền đã về bản chọn nhưng bản ấy cũng không khoẻ. Đọc lý do như bảng của [dua-ban-len.md](dua-ban-len.md) (dòng `kiem-nhanh`); thường là biến trên Vercel hay cơ sở dữ liệu, không phải mã. Báo người giữ kho mã. |
+| Lệnh không chạy được ở máy nào                                                    | Ở vercel.com › dự án của môi trường › Deployments: chọn bản «Ready» đã chạy tốt gần nhất › menu ba chấm › Instant Rollback › xác nhận. Rồi làm bước 5.                                                                |

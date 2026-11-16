@@ -1,6 +1,8 @@
 // make deploy ENV=staging|production (row moi-truong-thu-va-ban-that, AC-1..AC-3). Fixed steps, each printing exactly one
 // line `deploy <ENV>: <step> đạt` or `deploy <ENV>: <step> ĐỎ — <reason>`; a red step before the domain moves ends with
-// `deploy <ENV>: DỪNG ở <step> — tên miền không đổi`, a red check after it rolls the domain back once.
+// `deploy <ENV>: DỪNG ở <step> — tên miền không đổi`. A red check after it rolls the domain back once, to the deployment
+// the domain pointed to just before the promote (read from the domain with `vercel inspect`); when that is not certain
+// it stops, prints the READY production deployments and asks the operator for `make rollback ENV=<ENV> BAN=<id>`.
 //
 //   staging:    cau-hinh, migration, cach-ly, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien
 //   production: cau-hinh, ban-thu-truoc, migration, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien
@@ -19,7 +21,8 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  bare,
+  deploymentAt,
+  deploymentLines,
   ENVS,
   git,
   kiemNhanh,
@@ -201,6 +204,56 @@ function stepCachLy(root, env) {
   }
 }
 
+/**
+ * After a red check on the domain: point it back at the deployment that held it before the promote — the id read from
+ * the domain itself, never one chosen from the list — then confirm the domain points there and check it. Without a
+ * certain id nothing is rolled back: the list is printed and the operator names the target. Always returns 1.
+ */
+async function rollBack(appEnv, { root, env, say, before, newId }) {
+  const stop = (line) => {
+    say(line);
+    const list = productionDeployments({ cwd: root, env });
+    if (!list) {
+      say("lùi bản ĐỎ — không đọc được danh sách bản của Vercel");
+    } else {
+      for (const l of deploymentLines(list, deploymentAt(env["APP_URL"], { cwd: root, env })?.id))
+        say(l);
+    }
+    say(nameTheTarget(appEnv));
+    return 1;
+  };
+  const stays = "không tự lùi; tên miền vẫn ở bản mới";
+  if (!before) {
+    return stop(
+      `lùi bản DỪNG — không đọc được bản tên miền trỏ tới trước khi gắn (lần gắn đầu, hay Vercel không trả lời), ${stays}`,
+    );
+  }
+  if (!newId) return stop(`lùi bản DỪNG — không đọc được mã bản mới, ${stays}`);
+  if (before.id === newId) {
+    return stop(
+      `lùi bản DỪNG — trước khi gắn, tên miền đã trỏ vào chính bản mới ${newId}, ${stays}`,
+    );
+  }
+  const rb = vercel(["rollback", before.id, "--yes"], { cwd: root, env });
+  if (rb.status !== 0) return stop(`lùi bản ĐỎ — vercel rollback lỗi (mã ${rb.status})`);
+  const now = deploymentAt(env["APP_URL"], { cwd: root, env });
+  if (now?.id !== before.id) {
+    return stop(
+      `lùi bản ĐỎ — tên miền chưa về bản ${before.id} (đang ở ${now?.id ?? "không đọc được"})`,
+    );
+  }
+  // The commit the recorded deployment carries, looked up by its exact id, to check the domain against.
+  const commit = productionDeployments({ cwd: root, env })?.find((d) => d.id === before.id)?.commit;
+  const check = await kiemNhanh(env["APP_URL"], { env: appEnv, commit }, env);
+  if (!check.ok) {
+    return stop(
+      `lùi bản ĐỎ — tên miền đã về bản ${before.id} nhưng kiểm nhanh đỏ: ${check.reason}`,
+    );
+  }
+  say("đã lùi về bản trước");
+  return 1;
+}
+
 export async function lenBan(
   appEnv,
   { cwd = process.cwd(), env = process.env, out = console.log } = {},
@@ -210,7 +263,9 @@ export async function lenBan(
   let head;
   let newUrl;
   let promoted = false;
-  let domainCommitBefore;
+  // Read before the promote, from the domain itself: the deployment that held it, and the new deployment's id.
+  let before;
+  let newId;
 
   const steps = {
     "cau-hinh": async () => {
@@ -265,8 +320,8 @@ export async function lenBan(
       if (!r.ok) throw new Red(r.reason);
     },
     "gan-ten-mien": async () => {
-      const before = await readHealth(env["APP_URL"], env);
-      domainCommitBefore = before.body?.commit;
+      newId = deploymentAt(newUrl, { cwd: root, env })?.id;
+      before = deploymentAt(env["APP_URL"], { cwd: root, env });
       const r = vercel(["promote", newUrl, "--yes"], { cwd: root, env });
       if (r.status !== 0) throw new Red(`vercel promote lỗi (mã ${r.status})`);
       promoted = true;
@@ -289,39 +344,7 @@ export async function lenBan(
         say(`DỪNG ở ${step} — tên miền không đổi`);
         return 1;
       }
-      // Back to what the domain served before the promote: the newest other deployment with that commit, else the
-      // newest other one. Not read before the promote → no guess (the newest one may never have been promoted).
-      if (!domainCommitBefore) {
-        say(
-          `lùi bản DỪNG — không đọc được bản tên miền chạy trước khi gắn, không đoán; tên miền vẫn ở bản mới — ${nameTheTarget(appEnv)}`,
-        );
-        return 1;
-      }
-      const list = productionDeployments({ cwd: root, env });
-      if (!list) {
-        say("lùi bản ĐỎ — không đọc được danh sách bản của Vercel; tên miền vẫn ở bản mới");
-        return 1;
-      }
-      // `newUrl` is `https://host` (vercel deploy), the list holds bare hosts (vercel list --json): compare bare hosts.
-      const others = list.filter((d) => bare(d.url) !== bare(newUrl));
-      const back = others.find((d) => d.commit && d.commit === domainCommitBefore) ?? null;
-      if (!back) {
-        say(
-          `lùi bản DỪNG — không thấy bản nào khác bản mới mang commit ${short(domainCommitBefore)} tên miền chạy trước khi gắn, không đoán; tên miền vẫn ở bản mới — ${nameTheTarget(appEnv)}`,
-        );
-        return 1;
-      }
-      if (bare(back.url) === bare(newUrl)) {
-        say("lùi bản DỪNG — bản chọn để lùi chính là bản vừa đưa lên; tên miền vẫn ở bản mới");
-        return 1;
-      }
-      const rb = vercel(["rollback", back.url, "--yes"], { cwd: root, env });
-      if (rb.status !== 0) {
-        say(`lùi bản ĐỎ — vercel rollback lỗi (mã ${rb.status})`);
-        return 1;
-      }
-      say("đã lùi về bản trước");
-      return 1;
+      return await rollBack(appEnv, { root, env, say, before, newId });
     }
   }
   say(`xong ${short(head)}`);
