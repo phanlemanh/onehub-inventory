@@ -5,7 +5,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-import { assertCardsNotTable, phoneCards } from "./phone-list";
+import { assertCardsNotTable, phoneCards, regionReady } from "./phone-list";
 
 import { STATUS_NEXT, readPrice, readStatusText } from "../../src/modules/listings";
 import type { ListingStandardStatus } from "../../src/generated/ontology";
@@ -35,6 +35,8 @@ const saves = (page: Page) =>
 async function openInventory(page: Page, role = "ListAgent"): Promise<void> {
   await page.goto(`/inventory?vai=${role}`);
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  // VP4: until the browser takes over, the region holds both the table and the cards; read either only after that.
+  await regionReady(page);
   if (WIDE.has(width()))
     await expect(
       page.locator('[data-slot="data-region-body"] table[data-slot="data-grid-table"]'),
