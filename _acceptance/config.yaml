@@ -103,6 +103,13 @@ executors:
     tool_matches_plugin: "node _acceptance/refresh-design-assembly-tool/rang/tool-tree.mjs --root ."   # refresh-design-assembly-tool: the tool folder has the id git gives the plugin's tool folder
     only_register_changed: "node _acceptance/refresh-design-assembly-tool/rang/only-register-changed.mjs --root ."   # refresh-design-assembly-tool: of the design ledgers the branch changes the register alone; no screen-actions check declared
     refresh_measures_two_way: "node --test _acceptance/refresh-design-assembly-tool/rang/measures-two-way.mjs"   # refresh-design-assembly-tool: each measure green as it is, red with its pinned message on a broken copy
+    cong_chay: "npx vitest run tests/cong-chay.test.ts --coverage.enabled=false --reporter=verbose"   # don-no-bo-kiem: port picker skips Chrome's blocked ports over both whole ranges
+    cho_tai_pha: "bash _acceptance/don-no-bo-kiem/rang/cho-tai-pha.sh"   # don-no-bo-kiem: the cho-tai break is caught and no hydration warning appears
+    gac_hydration_pha: "node _acceptance/don-no-bo-kiem/rang/gac-hydration-pha.mjs"   # don-no-bo-kiem: the hydration guard turns a run red on a planted mismatch, silent otherwise
+    so_quyet_dinh: "node _acceptance/don-no-bo-kiem/rang/so-quyet-dinh.mjs --root . && make ontology"   # don-no-bo-kiem: 0042 renumbered, indexed, no old link, no shared number
+    wiki_so_trung: "npx vitest run tests/wiki-lint-so-trung.test.ts --coverage.enabled=false --reporter=verbose"   # don-no-bo-kiem: wiki_lint red on two decision pages with one number
+    ranh_gioi_1u: "node _acceptance/don-no-bo-kiem/rang/ranh-gioi.mjs --root ."   # don-no-bo-kiem: no owner file and no file of PR #66 changed
+    release_de_xuat: "node _acceptance/don-no-bo-kiem/rang/release-de-xuat.mjs --root ."   # don-no-bo-kiem: the release proposal names the secret, exactly three read-write permissions, and the pinned error line
     tool_is_release: "node _acceptance/upgrade-design-assembly-tool/rang/tool-tree.mjs --root ."   # upgrade-design-assembly-tool: the tool folder has the tree of plugin version 0.1.0, and the stamp says so
     register_gains_parts: "node _acceptance/upgrade-design-assembly-tool/rang/register-gains-parts.mjs --root ."   # upgrade-design-assembly-tool: against main, the register gains three parts and nothing else
     upgrade_changes: "node _acceptance/upgrade-design-assembly-tool/rang/upgrade-changes.mjs --root ."   # upgrade-design-assembly-tool: the upgrade commit changes the six tool files, the register and the stamp only

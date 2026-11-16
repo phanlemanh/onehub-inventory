@@ -29,6 +29,7 @@ import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { expect, test } from "../../tools/e2e_templates/fixture";
 import { openSheet } from "../../tools/e2e_templates/settle";
 import { regionReady } from "../e2e/phone-list";
+import { suaTrang } from "../e2e/sua-trang";
 
 const ALL = `${FRAME_COPY.secondColumn.all} ${label("Listing").toLocaleLowerCase("vi")}`;
 // The same rows and catalog the screen reads, built here without the screen's own files (they pull in React).
@@ -219,9 +220,7 @@ test("E4 four places: count and the one lit entry", async ({ page }, info) => {
   }
   expect(() => checkLit([], "S1.03")).toThrow("nut khong sang: S1.03");
   // Break: with the footer gone the count cannot be read, and the test goes red instead of assuming 60.
-  await region(page)
-    .locator('[data-slot="region-footer-count"]')
-    .evaluate((el) => el.remove());
+  await suaTrang(region(page).locator('[data-slot="region-footer-count"]'), (el) => el.remove());
   await expect(footerCount(page)).rejects.toThrow("khong doc duoc chan bang");
   expect(() => readCount(["12 căn"])).toThrow("khong doc duoc chan bang");
 });
@@ -468,7 +467,7 @@ test("E11 project names show whole at 1024 and 1440", async ({ page }, info) => 
   await signIn(page, await person(info, "e11w"));
   await checkWhole(column(page));
   // Break: a copy of the column 120px wide cuts the names.
-  await column(page).evaluate((el) => {
+  await suaTrang(column(page), (el) => {
     el.style.width = "120px";
     el.querySelectorAll<HTMLElement>('[data-sidebar="group-label"]').forEach((l) => {
       l.style.whiteSpace = "nowrap";

@@ -4,6 +4,8 @@ import { join } from "node:path";
 
 import { defineConfig, devices } from "@playwright/test";
 
+import { chonCong, KHOANG_E2E } from "./tests/e2e/cong-chay";
+
 const SIZES = [
   { name: "360", width: 360, height: 800 },
   { name: "414", width: 414, height: 896 },
@@ -17,7 +19,7 @@ const SIZES = [
 process.env["E2E_RUN"] ??= `${process.pid}`;
 const RUN = process.env["E2E_RUN"];
 const digest = createHash("sha1").update(`${process.cwd()}:${RUN}`).digest();
-const PORT = Number(process.env["E2E_PORT"] ?? 3500 + (digest.readUInt16BE(0) % 400));
+const PORT = Number(process.env["E2E_PORT"] ?? chonCong(digest, KHOANG_E2E.first, KHOANG_E2E.size));
 const URL = `http://127.0.0.1:${PORT}`;
 const CACHE = join("node_modules", ".cache", "onehub-e2e", RUN);
 const UP = "../../../../";
@@ -39,7 +41,8 @@ writeFileSync(
 
 export default defineConfig({
   testDir: "tests/e2e",
-  reporter: "list",
+  // The hydration guard turns the run red when React reports a server/page mismatch (row 1u).
+  reporter: [["list"], ["./tests/e2e/gac-hydration.ts"]],
   // Marks this run's build folder as owned, sweeps folders of dead runs, deletes its own at exit (row 1s, AC-8).
   globalSetup: "./tests/e2e-db/don-dung-tam.ts",
   use: { baseURL: URL },

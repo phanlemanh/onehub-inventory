@@ -11,3 +11,9 @@ và VP4) trước lượt gộp của mình. Giám sát cho các thay đổi dư
 | Bài trình duyệt của Thuế phí (`tests/e2e-db/thue-phi.spec.ts`) chờ vùng dữ liệu nhận trang (luật VP4) trước khi đếm dòng hay thẻ | Không | G-1611-14 |
 | Chú thích của luật dán hàng 5 (`src/modules/listings/ui/listing-paste.ts`) gọi Về tay bằng tên tiếng Anh, vì nhãn nay nằm trong bảng nhãn | Không | N-1611-3 |
 | Bài của hàng khác đã đổi: ba ca dán của hàng 5, ghi ở `_acceptance/dan-tu-excel/sua-sau-ky.md` | Không | G-1611-21 |
+
+## Hàng 1u (Dọn nợ của bộ kiểm), 16/11/2026
+
+| Chỗ | Người dùng thấy khác gì | Bài kiểm | Phép |
+| --- | --- | --- | --- |
+| `tests/e2e-db/thue-phi.spec.ts`: mười ba chỗ bài đổi trang hay chụp ảnh (năm thẻ kiểu, bốn lần chụp, bốn ca phá đổi chữ hay thêm cột) đi qua cửa chung (`themKieu`, `chupAnh`, `suaTrang` ở `tests/e2e/sua-trang.ts`) thay vì gọi thẳng; cửa chung chờ trang gắn xong rồi mới đổi | Không. Bài vẫn đổi đúng chỗ ấy, cùng cách, và vẫn chờ cùng kết quả; chỉ thêm bước chờ trang gắn xong trước khi đổi | Bộ quét `tests/sua-trang.test.ts` đỏ nếu một chỗ quay về gọi thẳng. Hồ sơ 19 được ghim lại trên bản có thay đổi này trước khi PR #71 gộp | G-1611-19, G-1611-41; trình ở Cổng Bằng chứng hàng 1u, mục «Bài của hàng khác đã đổi» |

@@ -9,6 +9,8 @@ import { join } from "node:path";
 
 import { defineConfig, devices } from "@playwright/test";
 
+import { chonCong, KHOANG_E2E_DB } from "./tests/e2e/cong-chay";
+
 const SIZES = [
   { name: "360", width: 360, height: 800 },
   { name: "414", width: 414, height: 896 },
@@ -22,7 +24,9 @@ const SIZES = [
 process.env["E2E_DB_RUN"] ??= `${process.pid}`;
 const RUN = process.env["E2E_DB_RUN"];
 const digest = createHash("sha1").update(`${process.cwd()}:db:${RUN}`).digest();
-const PORT = Number(process.env["E2E_DB_PORT"] ?? 4000 + (digest.readUInt16BE(0) % 900));
+const PORT = Number(
+  process.env["E2E_DB_PORT"] ?? chonCong(digest, KHOANG_E2E_DB.first, KHOANG_E2E_DB.size),
+);
 const URL = `http://127.0.0.1:${PORT}`;
 const DB_PORT = process.env["DB_PORT"] ?? "5563";
 // Outside .next: `next build` empties .next when it starts, so a build running beside these tests (a gate round runs
@@ -67,7 +71,8 @@ const ROLE_SUITE = /vai-man\.spec\.ts$/;
 
 export default defineConfig({
   testDir: "tests/e2e-db",
-  reporter: "list",
+  // The hydration guard turns the run red when React reports a server/page mismatch (row 1u).
+  reporter: [["list"], ["./tests/e2e/gac-hydration.ts"]],
   workers: 1,
   // A dev server compiles each route on first use; with other servers building at the same time that takes longer
   // than the 5-second default.

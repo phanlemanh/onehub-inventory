@@ -30,6 +30,7 @@ import {
   type Pair,
   type Size,
 } from "./vai-man";
+import { chupAnh } from "../e2e/sua-trang";
 
 const ALL = pairs().pairs;
 const TABLE = buttonTable();
@@ -189,7 +190,7 @@ async function blockedStep(page: Page, p: Pair, size: Size, info: TestInfo): Pro
         throw new Error(stepName(p, size, "lo nguoi chung"));
   });
   if (size === FULL_SIZE || size === "360")
-    await page.screenshot({ path: info.outputPath(`${p.screen}-${p.role}-${size}.png`) });
+    await chupAnh(page, { path: info.outputPath(`${p.screen}-${p.role}-${size}.png`) });
 }
 
 /** The positive control of the leak check: the same two readers find the witness where the role may see them. */

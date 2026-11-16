@@ -162,6 +162,24 @@ def check_ontology(root: Path, rep: Report) -> dict[str, dict[str, Any]]:
     return entities
 
 
+NUMBERED = re.compile(r"^(\d{4})-")
+
+
+def check_decision_numbers(root: Path, rep: Report, page_types: dict[str, Any]) -> None:
+    """Two decision pages never share a number (row 1u: two pages 0034 reached main from two branches)."""
+    folder = ((page_types.get("decision") or {}) if isinstance(page_types, dict) else {}).get("folder")
+    if not folder or not (root / str(folder)).is_dir():
+        return
+    by_number: dict[str, list[str]] = {}
+    for page in sorted((root / str(folder)).glob("*.md")):
+        m = NUMBERED.match(page.name)
+        if m:
+            by_number.setdefault(m.group(1), []).append(page.name)
+    for number, names in sorted(by_number.items()):
+        if len(names) > 1:
+            rep.error(f"{str(folder).rstrip('/')}/", f"decision number {number} used by {', '.join(names)}")
+
+
 def check_wiki(root: Path, rep: Report, entities: dict[str, dict[str, Any]]) -> None:
     wiki = root / "wiki"
     if not wiki.is_dir():
@@ -246,6 +264,8 @@ def check_wiki(root: Path, rep: Report, entities: dict[str, dict[str, Any]]) -> 
                 reachable.add(dest)
                 if page == index:
                     linked_from_index.add(dest)
+
+    check_decision_numbers(root, rep, page_types)
 
     if index.exists():
         n = len(index.read_text(encoding="utf-8").splitlines())

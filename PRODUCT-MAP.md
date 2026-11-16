@@ -7,13 +7,13 @@
 ```mermaid
 flowchart TD
   A["Đang cân nhắc cơ hội<br/>chưa có"] --> GD{"Cổng Đáng"}
-  GD --> B["Sắp mở vòng<br/>8 việc"]
+  GD --> B["Sắp mở vòng<br/>10 việc"]
   GD --> XL["Xếp lại sau<br/>chưa có"]
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
   GP --> DL["Đang làm<br/>1 việc"] --> GB{"Cổng Bằng chứng"}
   GB --> DG["Đã giao<br/>4 việc"]
-  GB --> CN["Chờ phiên nghiệm thu<br/>49 việc"] --> GG{"Cổng Giá trị"}
+  GB --> CN["Chờ phiên nghiệm thu<br/>50 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
 
@@ -26,7 +26,9 @@ flowchart TD
 
 - Đầu chủ tải ảnh lên hồ sơ căn, đổi ảnh bìa, gỡ ảnh và thấy căn thành Sẵn sàng bán khi đủ điều kiện (`anh-va-san-sang-ban`)
 - Đầu chủ mở hồ sơ căn và thấy lịch sử của căn: tạo lần chào, đổi giá, đổi trạng thái, đổi thông tin, xác nhận với chủ nhà, mỗi việc kèm vai người làm và lúc làm (`lich-su-cua-can`)
+- Quản trị sàn đổi mức Thuế phí mà Về tay của các giá đã đặt trước đó không đổi, và trên căn thấy được con số tính theo mức nào (`lich-su-muc-thue-phi`)
 - Đầu chủ và Đầu khách mở màn Liên hệ và thấy liên hệ của sàn trên Lưới, thêm, sửa, gỡ được liên hệ và gộp được hai liên hệ trùng, theo quyền của vai (`lien-he-tren-luoi`)
+- Người của sàn mở inventory.onehub.center, nhận mã qua email và vào đúng sàn của mình trên bản chạy thật; mỗi bản mới đi qua bản thử trước khi lên bản thật, và lùi được về bản trước (`moi-truong-thu-va-ban-that`)
 - Đầu chủ nạp tệp Excel hay Sheet đang dùng, ghép cột, tên cột, giá trị và mã căn của mình vào chuẩn ngay ở màn xem trước, áp vào bảng và hoàn tác được; lần sau cùng dạng tệp không phải ghép lại (`nhap-excel`)
 - Đầu chủ ghi và mở số chủ nhà trên hồ sơ căn, và gỡ được chủ nhà ghi nhầm khỏi căn (`so-chu-nha`)
 - Đầu chủ đổi giá và đổi trạng thái ngay trong hồ sơ căn trên điện thoại, theo cùng luật với sửa trên ô của Bảng hàng (`sua-nhanh-tren-dien-thoai`)
@@ -62,6 +64,7 @@ flowchart TD
 - Danh mục căn dùng chung lưu cùng cách với onehub-invest: có cấp phân khu dưới dự án, tầng lưu theo RESO, toà · trục · căn có khoá riêng, mã căn gốc giữ làm bí danh (`danh-muc-can-nhu-onehub-invest`)
 - Agent tra được danh mục ReUI Pro ngay trong kho theo phiên bản đã ghim, không phụ thuộc kết nối ngoài (`danh-muc-reui`)
 - Ghim lại danh mục ReUI từ nguồn đã đổi cách ghi tiêu đề mục thì máy dừng và gọi tên nhóm bị mất thay vì lặng lẽ bỏ cả nhóm, và phép chặn mã hay khoá phủ đủ các dạng đã kê (`danh-muc-reui-doc-chac`)
+- Bộ kiểm của kho hết bốn nợ làm hàng khác đỏ oan: cổng mạng bị cấm, cảnh báo dựng trang lệch, việc Release đỏ sau mỗi lần gộp, và hai trang quyết định trùng số (`don-no-bo-kiem`)
 - `du-lieu-mau`
 - Hồ sơ cạnh bảng, lọc rỗng, chờ tải, lỗi, lưu và hoàn tác chỉ có một cách dựng, màn chỉ khai mình cần gì (`hanh-vi-trong-luoi-khung`)
 - Đầu chủ bấm một căn và thấy hồ sơ căn cạnh bảng, trên điện thoại thấy thẻ căn (`ho-so-can`)

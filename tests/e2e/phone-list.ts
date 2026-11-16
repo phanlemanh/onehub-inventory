@@ -3,6 +3,7 @@
 // filter through the filter sheet, and — for checks that only a table has (sheet keys, frozen columns, column widths,
 // full screen) — measure on a phone that the table is absent and the card list present, never skip empty.
 import { expect, type Page } from "@playwright/test";
+import { suaTrang } from "./sua-trang";
 
 /** Cards below this width, the table from it (src/hooks/use-mobile.ts). */
 export const PHONE_BELOW = 768;
@@ -139,7 +140,7 @@ export async function phoneStandInBreak(
 ): Promise<void> {
   await page.goto(path);
   await rowsShown(page);
-  await page.evaluate(() =>
+  await suaTrang(page, () =>
     document.querySelectorAll('[data-slot="phone-card"]').forEach((el) => el.remove()),
   );
   await expect(assertCardsNotTable(page, check)).rejects.toThrow(
