@@ -489,16 +489,46 @@ test("dieu-kien-phi-tren-o: Bao phí → Không bao phí is saved, the net to se
   expect((await rowOf(id)).fee_inclusion).toBe("Excluded");
 });
 
-test("dieu-kien-phi-tren-o: a role that may not change listings opens no fee cell", async ({
+/**
+ * Shows the Điều kiện phí column, focuses that cell of the unit and presses F2; returns how many fee options the
+ * editor offers (0 when no editor opens). The same steps for every role, so a role that may edit is the control.
+ */
+async function feeOptionsAfterF2(page: Page, unit: string): Promise<number> {
+  await openOn(page, unit);
+  await page
+    .locator('[data-slot="data-region"]')
+    .first()
+    .getByRole("button", { name: "Cột", exact: true })
+    .click();
+  await page.getByRole("menuitemcheckbox", { name: label("FeeInclusion") }).click();
+  await page.keyboard.press("Escape");
+  await select(page, unit, FEE);
+  await page.keyboard.press("F2");
+  const options = page.locator("[data-fee-option]");
+  await options
+    .first()
+    .waitFor({ timeout: 3_000 })
+    .catch(() => undefined);
+  return options.count();
+}
+
+test("dieu-kien-phi-tren-o: a role that may not change listings opens no fee cell; a role that may, does", async ({
   page,
+  browser,
 }, info) => {
   test.skip(info.project.name !== "1440", "do o 1440");
+  const l = DATA.current.find((x) => x.standardStatus !== "Closed" && x.listPrice)!;
+  const unit = UNIT_OF.get(l.id)!.unitNumber;
+  // Control: the keeper's role edits listings company-wide (Hỏi-2 A), so the same steps open the two options.
+  const agent = await world(info, "phi-ca-dc");
+  const other = await browser.newPage();
+  await signIn(other, agent.email, agent.mau);
+  expect(await feeOptionsAfterF2(other, unit), "dieu-kien-phi-tren-o: doi chung").toBe(2);
+  await other.close();
+  // The company admin views listings read-only (Hỏi-1 A): the fee cell takes focus but opens no editor.
   const w = await world(info, "phi-ca", ["CompanyAdmin"]);
   await signIn(page, w.email, w.mau);
-  await openInventory(page);
-  const unit = UNIT_OF.get(DATA.current[0]!.id)!.unitNumber;
-  await select(page, unit, PRICE);
-  await page.keyboard.press("F2");
+  expect(await feeOptionsAfterF2(page, unit), "dieu-kien-phi-tren-o: quan tri mo o phi").toBe(0);
   await expect(editor(page)).toHaveCount(0);
 });
 

@@ -104,7 +104,7 @@ describe("khong-con-vai-thay-phien (E9)", () => {
   });
 });
 
-describe("loi-doc-that (E8, red side)", () => {
+describe("doc-hong-co-ten (E8, red side)", () => {
   it("a database that fails while reading gives «unreadable», never a thrown page", async () => {
     vi.resetModules();
     vi.doMock("@/modules/identity/server", () => ({

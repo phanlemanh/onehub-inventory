@@ -6,13 +6,16 @@ feature_slug: bang-hang-du-lieu-that
 #   AC-5: 4 vai × 3 loại căn (mình giữ, chưa ai giữ, người khác giữ) × 4 loại thay đổi (giá, điều kiện phí, nấc khác,
 #         Đang bán) = 48 ô; mỗi ô ghim mã 200 hay 403 và «dòng không đổi» khi 403. Đáp án viết ở S2 theo câu trả lời Hỏi-1,
 #         Hỏi-2 của Cổng Phạm vi, TRƯỚC mã, ở tests/db/bang-hang-that.db.test.ts; hằng 48 ghim.
-#   AC-8: 5 trạng thái × 4 khổ × 2 chế độ màu = 40 khung (E8-ui chụp đủ 40).
+#   AC-8: 4 trạng thái × 4 khổ × 2 chế độ màu = 32 khung (E8-ui chụp đủ 32); trạng thái thứ năm «Không đủ quyền» đo bằng
+#         máy, ca khong-du-quyen-tren-man (chủ kho chọn 2026-11-16).
 # Bài và ca (tên ca là thông điệp ghim):
 #   tests/db/bang-hang-that.db.test.ts: cach-ly-hai-bang · luat-du-lieu-ba-ca · doc-dung-san · doi-san-chi-con-san-moi ·
 #     ghi-gia-tang-phien-ban · bang-quyen-48-o · loi-doc-that · xung-dot-phien-ban · hoan-tac-giu-trang-thai · dieu-kien-phi-luu ·
 #     nam-nghin-can
 #   src/modules/listings/listings-http.test.ts: ma-loi-co-dinh · mot-loai-thay-doi · 409-mang-ban-hien-tai
-#   tests/bang-hang-that.test.ts: khong-con-mau-trong-trang · khong-con-vai-thay-phien · mot-lan-doc-moi-luot
+#   tests/bang-hang-that.test.ts: khong-con-mau-trong-trang · khong-con-vai-thay-phien · doc-hong-co-ten
+#   tests/mot-lan-doc.test.tsx: mot-lan-doc-moi-luot
+#   tests/bang-hang-khong-du-quyen.test.tsx: khong-du-quyen-tren-man
 #   tests/e2e-db/bang-hang-that.spec.ts (bốn khổ): thay-can-cua-san · cmdk-va-cay-theo-san · sua-gia-tai-lai-con ·
 #     dang-ban-chi-nguoi-giu · xung-dot-tai-o · hoan-tac-chi-gia · dieu-kien-phi-tren-o · chua-dang-nhap-ve-dang-nhap · nam-trang-thai ·
 #     chuot-giua-the-moi · axe-sang-toi
@@ -55,8 +58,8 @@ evals:
     criterion: AC-2
     executor: test
     cmd: config:executors.test.bang_hang_that_unit
-    paths: [src/app/(app)/**, src/modules/listings/**, tests/bang-hang-that.test.ts]
-    expected: "exit 0; ca 'khong-con-mau-trong-trang': dưới src/app chỉ đúng một hàm nguồn hàng gọi bộ mẫu, và hàm ấy trả bộ mẫu chỉ khi không cấu hình cơ sở dữ liệu và không phải bản chạy thật (bảng bốn ca: có/không cơ sở dữ liệu × chạy thật/dev; đúng một ca ra mẫu). Chiều đỏ: pha-thu-doc-mau → «khong-con-mau-trong-trang: page.tsx»"
+    paths: [src/app/(app)/**, src/modules/listings/**, tests/bang-hang-that.test.ts, tests/bang-hang-khong-du-quyen.test.tsx]
+    expected: "exit 0; ca 'khong-con-mau-trong-trang': dưới src/app chỉ đúng một hàm nguồn hàng gọi bộ mẫu, và hàm ấy trả bộ mẫu chỉ khi không cấu hình cơ sở dữ liệu và không phải bản chạy thật (bảng bốn ca: có/không cơ sở dữ liệu × chạy thật/dev; đúng một ca ra mẫu). Chiều đỏ: pha-thu-doc-mau → «khong-con-mau-trong-trang: page.tsx». Và ca 'khong-du-quyen-tren-man' (AC-8, trạng thái thứ năm đo bằng máy): trang Bảng hàng dựng như máy chủ dựng, cửa đọc trả «forbidden» → màn chỉ có khối «Không đủ quyền» (tiêu đề chung của khung), không vùng hàng, không mã căn nào. Chiều đỏ: pha-thu-khong-du-quyen → «khong-du-quyen-tren-man: tiêu đề …»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E2-ui
@@ -144,7 +147,7 @@ evals:
     executor: test
     cmd: config:executors.test.bang_hang_that_e2e
     paths: [src/modules/listings/**, src/app/(app)/**, tests/e2e-db/bang-hang-that.spec.ts]
-    expected: "exit 0; ca 'dieu-kien-phi-tren-o': đổi Bao phí → Không bao phí, Về tay của dòng đổi, tải lại vẫn giữ; vai không được sửa không mở được ô"
+    expected: "exit 0; ca 'dieu-kien-phi-tren-o': đổi Bao phí → Không bao phí, Về tay của dòng đổi, tải lại vẫn giữ; Quản trị sàn (chỉ xem) chọn đúng ô Điều kiện phí, F2 không mở ô sửa; đối chứng: Đầu chủ làm đúng các bước ấy trên cùng căn thì ô mở với hai lựa chọn"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E7b
@@ -161,7 +164,7 @@ evals:
     executor: test
     cmd: config:executors.test.bang_hang_that_e2e
     paths: [src/app/(app)/inventory/**, src/components/candidate/**, tests/e2e-db/bang-hang-that.spec.ts]
-    expected: "exit 0 ở bốn khổ; ca 'nam-trang-thai' (chờ tải, trống trên sàn [MAU-TRONG], lỗi có Tải lại khi cửa đọc thật trả không đọc được — không dùng công tắc ?state=, không khớp có Xoá lọc; «Không đủ quyền» không vai thật nào gặp từ Hỏi-1 A, đo bằng bài máy loi-doc-that của E2b theo chữ chủ kho 2026-11-16) và 'axe-sang-toi' không lỗi nghiêm trọng. Chiều đỏ: myInventory ném lỗi thay vì trả unreadable → «nam-trang-thai: lỗi» (trang lỗi chung của Next)"
+    expected: "exit 0 ở bốn khổ; ca 'nam-trang-thai' (chờ tải, trống trên sàn [MAU-TRONG], lỗi có Tải lại khi cửa đọc thật trả không đọc được — không dùng công tắc ?state=, không khớp có Xoá lọc; «Không đủ quyền» không vai thật nào gặp từ Hỏi-1 A, đo bằng ca máy khong-du-quyen-tren-man của E2b theo chữ chủ kho 2026-11-16) và 'axe-sang-toi' không lỗi nghiêm trọng. Chiều đỏ: myInventory ném lỗi thay vì trả unreadable → «nam-trang-thai: lỗi» (trang lỗi chung của Next)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E8-ui
@@ -171,7 +174,7 @@ evals:
     target: http://127.0.0.1:3482/inventory
     paths: [src/app/(app)/inventory/**, src/components/candidate/**]
     steps:
-      - "With the lane R dev server on port 3482, signed in as the [MAU] ListAgent, open /inventory with ?state=loading, ?state=error, an empty company ([MAU-TRONG]) and a column filter that matches nothing, at 1440, 1024, 414 and 360 wide, light and dark (32 frames); save each frame as _acceptance/bang-hang-du-lieu-that/evidence/E8-<trạng thái>-<khổ>-<sang|toi>.png. No frame of «Không đủ quyền»: no real role meets it on this screen since Hỏi-1 A; the owner chose on 2026-11-16 to measure it by the machine test only (tests/bang-hang-that.test.ts loi-doc-that), recorded as a known limit."
+      - "With the lane R dev server on port 3482, signed in as the [MAU] ListAgent, open /inventory with ?state=loading, ?state=error, an empty company ([MAU-TRONG]) and a column filter that matches nothing, at 1440, 1024, 414 and 360 wide, light and dark (32 frames); save each frame as _acceptance/bang-hang-du-lieu-that/evidence/E8-<trạng thái>-<khổ>-<sang|toi>.png. No frame of «Không đủ quyền»: no real role meets it on this screen since Hỏi-1 A; the owner chose on 2026-11-16 to measure it by the machine test only (tests/bang-hang-khong-du-quyen.test.tsx khong-du-quyen-tren-man, eval E2b), recorded as a known limit."
     question: "Mỗi khung có đúng trạng thái của vùng (chờ tải, trống với câu của màn, lỗi có Tải lại, không khớp có Xoá lọc), cùng dáng với các màn họ Lưới đã gộp, chữ đọc được ở cả hai chế độ màu không? Nêu khung nào lệch."
     expected: "Mọi khung đúng trạng thái và đúng dáng họ Lưới"
     evidence_required: [run_id, screenshot, observed, verdict]

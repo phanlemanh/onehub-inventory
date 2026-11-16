@@ -41,7 +41,7 @@ không đổi khối nào của màn.
 | Lỗi | đạt | tests/e2e-db/bang-hang-that.spec.ts (nam-trang-thai: cơ sở dữ liệu từ chối lần đọc thật của sàn, vùng lỗi có Thử lại); tests/bang-hang-that.test.ts (loi-doc-that: lần đọc hỏng trả unreadable, không ném) |
 | Một phần hỏng | đạt | tests/e2e/screens/screens.spec.ts (công thức mot-phan-hong; bộ khuôn có phiên thật chạy cùng công thức trên màn inventory) |
 | Chữ dài | đạt | tests/e2e/screens/screens.spec.ts (công thức chu-dai; bộ khuôn có phiên thật chạy cùng công thức trên màn inventory) |
-| Không đủ quyền | đạt | tests/bang-hang-that.test.ts (loi-doc-that: viewListings bị từ chối → forbidden); tests/the-dien-thoai.test.tsx (cua-vao: «không đủ quyền», không thẻ). Không vai thật nào gặp ở trạng thái này từ Hỏi-1 A (sổ quyết định) |
+| Không đủ quyền | đạt | tests/bang-hang-khong-du-quyen.test.tsx (khong-du-quyen-tren-man: cửa đọc trả forbidden → màn chỉ có khối «Không đủ quyền», không vùng hàng); tests/the-dien-thoai.test.tsx (cua-vao: «không đủ quyền», không thẻ). Không vai thật nào gặp ở trạng thái này từ Hỏi-1 A (sổ quyết định) |
 | Xung đột khi lưu | đạt | tests/e2e-db/bang-hang-that.spec.ts (xung-dot-tai-o: phiên hai nhận câu tại ô, ô hiện giá mới nhất); tests/db/bang-hang-that.db.test.ts (xung-dot: 409 kèm bản hiện tại) |
 | Phiên hết hạn | đạt | tests/e2e-db/bang-hang-that.spec.ts (chua-dang-nhap-ve-dang-nhap: không phiên → trang đăng nhập, kể cả ?vai=) |
 | Mất mạng khi lưu | đạt | src/modules/listings/listings-http.test.ts (httpSaveDoor: mạng hỏng hay máy báo ngoại tuyến → offline, không gửi gì); src/components/candidate/use-change.test.tsx (luu-hong-ve-cu) |
