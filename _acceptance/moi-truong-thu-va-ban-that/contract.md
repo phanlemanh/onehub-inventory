@@ -5,9 +5,9 @@ slug: moi-truong-thu-va-ban-that
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci, api]
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-16
 design_doc: _acceptance/moi-truong-thu-va-ban-that/design.md
 ---
 
@@ -39,9 +39,8 @@ Source input: hàng 22 của `docs/plan/lo-trinh.json`; ô cơ hội `_acceptanc
   `deploy` lỗi, `kiem-nhanh` đỏ — Then lệnh dừng ngay ở bước ấy với dòng `deploy <ENV>: <bước> ĐỎ — <lý do>` rồi
   `deploy <ENV>: DỪNG ở <bước> — tên miền không đổi`, không bước nào sau nó chạy, nhật ký `vercel` giả không có `promote`,
   mã thoát khác 0; và khi `kiem-nhanh-ten-mien` đỏ sau khi đã gắn tên miền, lệnh gọi `vercel rollback` đúng một lần, in
-  `deploy <ENV>: đã lùi về bản trước` và thoát khác 0. Nếu chủ kho chọn «có» ở Hỏi-4: một tệp migration chưa áp có xoá
-  hay đổi tên bảng hoặc cột mà không có dòng `-- bo-sau:` thì bước `migration` đỏ trước khi áp, gọi tên tệp; có dòng ấy
-  thì đi tiếp.
+  `deploy <ENV>: đã lùi về bản trước` và thoát khác 0. Một tệp migration chưa áp có xoá hay đổi tên bảng hoặc cột mà
+  không có dòng `-- bo-sau:` thì bước `migration` đỏ trước khi áp, gọi tên tệp; có dòng ấy thì đi tiếp (Hỏi-4).
 - AC-3: Given máy chủ giả của bản thử trả một commit khác HEAD (hay không trả lời), When chạy `make deploy ENV=production`,
   Then bước `ban-thu-truoc` đỏ với `bản thử chưa chạy <commit ngắn>` trước mọi migration và mọi lần gọi `vercel`; trả đúng
   HEAD thì bản thật đi đủ bảy bước của nó (như AC-1 nhưng có `ban-thu-truoc` thay cho `cach-ly`), và không lệnh nào in giá trị của một
@@ -52,7 +51,7 @@ Source input: hàng 22 của `docs/plan/lo-trinh.json`; ô cơ hội `_acceptanc
 - AC-5: Given `NODE_ENV=production`, When máy chủ khởi động với từng ca của ma trận cấu hình (thiếu từng biến bắt buộc;
   `APP_ENV` lạ; có `LOGIN_CODE_OUTBOX`, `NEXT_PUBLIC_E2E_BUTTON_RECORD` hay `MIGRATE_DATABASE_URL`; `DATABASE_URL` nối bằng
   vai khác `quy_hang_login`; `APP_ENV=production` mà `APP_URL` khác `https://inventory.onehub.center`; tên miền của
-  `MAIL_FROM` ngoài tập Hỏi-7 chốt), Then máy chủ không khởi động, lỗi gọi đúng tên biến và vì sao, không chứa giá trị nào
+  `MAIL_FROM` không phải `onehub.center` hay một tên miền con của nó — Hỏi-7), Then máy chủ không khởi động, lỗi gọi đúng tên biến và vì sao, không chứa giá trị nào
   của biến; đủ và đúng thì khởi động; ngoài `NODE_ENV=production` không ca nào bị chặn (máy dev và bài kiểm chạy như cũ);
   và với `APP_URL` của bản thử và của bản thật, mọi đường dẫn trong thư mã đăng nhập và thư mời mà bên gửi dựng ra (đọc
   từ thân thư gửi tới `fetch` giả) bắt đầu bằng đúng `APP_URL` ấy.

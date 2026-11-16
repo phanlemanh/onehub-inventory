@@ -18,7 +18,7 @@ feature_slug: moi-truong-thu-va-ban-that
 #     chuỗi «moc-bi-mat-».
 #   Ma trận cấu hình khởi động (AC-5): 6 biến bắt buộc × thiếu (6 ca) · APP_ENV lạ (1) · 3 biến cấm × có mặt (3) ·
 #     DATABASE_URL vai postgres, vai quy_hang_app (2) · production APP_URL khác (2: http, tên miền khác) ·
-#     MAIL_FROM: tên miền ngoài tập Hỏi-7 chặn, mỗi dạng tên miền trong tập (gốc, tên miền con) khởi động — số ca theo câu trả lời · đủ và đúng staging, production (2, khởi động) · NODE_ENV=development
+#     MAIL_FROM (Hỏi-7): tên miền khác onehub.center chặn (2: tên miền lạ, tên miền đuôi giống «xonehub.center»), onehub.center và một tên miền con khởi động (2) · đủ và đúng staging, production (2, khởi động) · NODE_ENV=development
 #     với mọi ca trên (không ca nào chặn). Mỗi ca chặn: lỗi gọi đúng tên biến; không chứa giá trị mốc.
 #   Lối thử của máy dev trên bản dựng production (AC-6): /proto/<mọi slug của sổ bản mẫu> → 404;
 #     /inventory?vai=<mọi vai của bảng quyền> · ?mau=<mọi giá trị đọc được> · ?state=<mọi trạng thái ép> → về /login như
@@ -40,7 +40,7 @@ evals:
     cmd: config:executors.test.deploy_kiem
     layer: backend-effect
     paths: [tools/deploy/**, mk/deploy.mk]
-    expected: "exit 0; mỗi ca của ma trận bước đỏ (đầu tệp) đúng một dòng 'deploy <ENV>: <bước> ĐỎ — …', dòng 'DỪNG ở <bước> — tên miền không đổi', không dòng của bước sau, nhật ký vercel giả không có 'promote', mã ≠ 0; ca kiem-nhanh-ten-mien đỏ: promote 1, rollback 1, dòng 'đã lùi về bản trước'; nếu Hỏi-4 chọn có: migration xoá cột không có dòng '-- bo-sau:' → migration ĐỎ gọi tên tệp, chưa áp (schema_migrations không đổi), có dòng ấy → đi tiếp (đối chứng dương). Chiều đỏ: bản phá đổi thứ tự gan-ten-mien trước kiem-nhanh → ca 'promote chi sau kiem-nhanh' đỏ"
+    expected: "exit 0; mỗi ca của ma trận bước đỏ (đầu tệp) đúng một dòng 'deploy <ENV>: <bước> ĐỎ — …', dòng 'DỪNG ở <bước> — tên miền không đổi', không dòng của bước sau, nhật ký vercel giả không có 'promote', mã ≠ 0; ca kiem-nhanh-ten-mien đỏ: promote 1, rollback 1, dòng 'đã lùi về bản trước'; Hỏi-4 (chủ kho chọn có): migration xoá cột không có dòng '-- bo-sau:' → migration ĐỎ gọi tên tệp, chưa áp (schema_migrations không đổi), có dòng ấy → đi tiếp (đối chứng dương). Chiều đỏ: bản phá đổi thứ tự gan-ten-mien trước kiem-nhanh → ca 'promote chi sau kiem-nhanh' đỏ"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E3
     criterion: AC-3
