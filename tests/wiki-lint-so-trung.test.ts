@@ -57,7 +57,7 @@ describe("wiki_lint · one number, one decision page", () => {
     const dir = copyRepo();
     copyFileSync(
       join(dir, DECISIONS, "0042-cong-bat-khoi-khong-ke.md"),
-      join(dir, DECISIONS, "0043-cong-bat-khoi-khong-ke.md"),
+      join(dir, DECISIONS, "0999-cong-bat-khoi-khong-ke.md"),
     );
     expect(numberErrors(lint(dir).errors)).toEqual([]);
   });
