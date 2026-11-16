@@ -19,6 +19,7 @@ export {
   currentEntry,
   flattenLinks,
   isCurrent,
+  linkHref,
   visibleNav,
   type NavItem,
   type NavLink,
