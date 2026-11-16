@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 5e2dd3b6e91e8345f5a1222f7d58ab3b9fe36891
+verified_commit: 34b762bc6b33d5849f6582b0217f48db2945e32a
 human_signoff: Manh Phan 2026-11-16
 ---
 
@@ -222,3 +222,7 @@ Round 7: moi eval may chay lai xanh (E3-E12); E1, E2, E13, E14, E15 carry-forwar
 ### Re-pin lần 1 — 2026-11-16, do gop main b6f4f29 (VP4) sau chu ky
 run_id: repin-20261116T005008Z-52041
 sha: 5e2dd3b6e91e8345f5a1222f7d58ab3b9fe36891 · suites: 3 lệnh exit 0 · evals: 14/14 eval máy đạt kỳ vọng · ngoài làn máy: E14
+
+### Re-pin lần 2 — 2026-11-16, do hang 1u chuyen hai ca pha cua bai dia ly qua cua chung (sua sau ky)
+run_id: repin-20261116T041749Z-80952
+sha: 34b762bc6b33d5849f6582b0217f48db2945e32a · suites: 3 lệnh exit 0 · evals: 14/14 eval máy đạt kỳ vọng · ngoài làn máy: E14 · diff chạm vật đo ngoài làn máy: E14 — chưa chứng lại, đi vòng S4 delta
