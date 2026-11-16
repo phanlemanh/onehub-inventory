@@ -16,7 +16,7 @@ import {
   buildSampleListings,
   sampleEarlierListings,
 } from "../../src/modules/listings/sample";
-import { suaCacPhanTu, suaTrang } from "./sua-trang";
+import { suaTrang } from "./sua-trang";
 
 const URL = "/inventory";
 const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
@@ -246,7 +246,7 @@ test.describe("E8 · the record only reads", () => {
     expect(writes.length ? "write request while reading record" : "").toBe("");
     // Row 2e (ruling K-1411-13): the filter row is always shown inside the header cells; a column's name is the cell
     // without its filter box.
-    const headers = await suaCacPhanTu(page.locator('[data-slot="data-region"] thead th'), (ths) =>
+    const headers = await page.locator('[data-slot="data-region"] thead th').evaluateAll((ths) =>
       ths.map((th) => {
         const copy = th.cloneNode(true) as HTMLElement;
         copy.querySelectorAll('[data-slot="column-filter"]').forEach((el) => el.remove());

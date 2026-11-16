@@ -32,6 +32,30 @@ export function ngoaiPhanTuMoi(body: string): string {
   return out;
 }
 
+/** Calls that put a node into a tree: a detached copy passed to one of them is back in the page. */
+const ATTACH =
+  /\.(?:append|appendChild|prepend|insertBefore|insertAdjacentElement|replaceWith|replaceChildren|after|before)\(/;
+
+/**
+ * The body of a page callback without its changes to detached copies: a node from `cloneNode(…)` or a document from
+ * `DOMParser…parseFromString(…)`, held in a variable that is never passed to a call that puts a node into a tree. Such
+ * a copy is not in the page, so changing it changes no node React hydrates. A copy that is put back (`el.append(copy)`)
+ * keeps its changes counted, and so does every change made on the page itself.
+ */
+export function ngoaiBanSao(body: string): string {
+  let out = body;
+  const copies = body.matchAll(
+    /(?:const|let)\s+(\w+)\s*=\s*[^;\n]*?(?:\.cloneNode\(|\.parseFromString\()/g,
+  );
+  for (const m of copies) {
+    const name = m[1]!;
+    const back = new RegExp(`${ATTACH.source}[^)]*\\b${name}\\b`);
+    if (back.test(body)) continue;
+    out = out.replace(new RegExp(`\\b${name}\\.[^;\\n]*`, "g"), "");
+  }
+  return out;
+}
+
 /**
  * Files whose words other signed rows lock byte for byte: the sign-in tests (tests/dang-nhap-giu-loi.test.ts, row 8)
  * and the row 9 members tests (tests/thanh-vien-khoa-bai.test.ts). Each has one screenshot outside the door; moving it
@@ -91,7 +115,7 @@ export function viTri(file: string, src: string): Site[] {
         !ON_PURPOSE.has(file)
       )
         site("addInitScript doi trang truoc khi gan");
-    } else if (MUTATION.test(body)) site(`${kind} doi trang khong qua cua chung`);
+    } else if (MUTATION.test(ngoaiBanSao(body))) site(`${kind} doi trang khong qua cua chung`);
   }
   return out;
 }

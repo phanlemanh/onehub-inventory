@@ -87,6 +87,16 @@ describe("sua-trang · breaks", () => {
       "await page.addInitScript(() => { const s = document.createElement('style'); document.head.append(s); document.querySelector('main').remove(); });",
       [`sua-trang: ${f}:1 addInitScript doi trang truoc khi gan`],
     ],
+    [
+      "a copy changed and then put back into the page (delta round 8)",
+      "await el.evaluate((n) => { const copy = n.cloneNode(true); copy.querySelectorAll('b').forEach((b) => b.remove()); n.replaceWith(copy); });",
+      [`sua-trang: ${f}:1 evaluate doi trang khong qua cua chung`],
+    ],
+    [
+      "a copy read, but the page itself changed in the same callback (delta round 8)",
+      "await el.evaluate((n) => { const copy = n.cloneNode(true); copy.querySelectorAll('b').forEach((b) => b.remove()); n.querySelectorAll('b').forEach((b) => b.remove()); return copy.textContent; });",
+      [`sua-trang: ${f}:1 evaluate doi trang khong qua cua chung`],
+    ],
   ];
   for (const [name, src, want] of cases) {
     it(`caught: ${name}`, () => {
@@ -101,6 +111,14 @@ describe("sua-trang · breaks", () => {
     ],
     ["a comparison, not an assignment", "await el.evaluate((n) => n.textContent === 'x');"],
     ["the door", 'await suaTrang(el, (n) => n.classList.remove("invisible"));'],
+    [
+      "a detached copy changed to read its text (delta round 8)",
+      "await rows.evaluateAll((trs) => trs.map((tr) => { const copy = tr.cloneNode(true) as HTMLElement; copy.querySelectorAll('i').forEach((n) => n.remove()); return copy.textContent; }));",
+    ],
+    [
+      "a parsed document changed to read its text (delta round 8)",
+      "await page.evaluate((h) => { const doc = new DOMParser().parseFromString(h, 'text/html'); doc.querySelectorAll('i').forEach((n) => n.remove()); return doc.body.textContent; }, html);",
+    ],
     [
       "an init script that adds a style it created to the head",
       'await page.addInitScript(() => { document.addEventListener("DOMContentLoaded", () => { const style = document.createElement("style"); style.textContent = "x"; document.head.append(style); }); });',

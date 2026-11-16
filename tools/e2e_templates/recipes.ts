@@ -348,8 +348,9 @@ async function scrollUntil(page: Page, done: () => Promise<boolean>): Promise<vo
  * column's cell (the one the first filter box reads), then every text cell of the row.
  */
 async function mountedRows(page: Page): Promise<[number, string[]][]> {
-  return suaCacPhanTu(
-    tableRows(page),
+  // Reads only: the cell is copied before its lock reason is taken out. Called on every wheel step of a scroll, so it
+  // reads straight, without the door's wait for the page to be hydrated (row 1u, delta round 8).
+  return tableRows(page).evaluateAll(
     (trs, kinds) =>
       trs
         .filter((tr) => getComputedStyle(tr).display !== "none")
