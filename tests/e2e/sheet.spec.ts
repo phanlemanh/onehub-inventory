@@ -745,11 +745,13 @@ test.describe("sheet footer in view", () => {
 test.describe("no match keeps filters", () => {
   /** The filter boxes are still there to mend, at every width (row 2e: the filter row is always shown). */
   async function checkFilters(page: Page): Promise<void> {
-    // On a phone the boxes are in the open filter sheet, outside the region (row 2b).
-    const boxes = isPhone(page)
+    // On a phone the boxes are in the open filter sheet, outside the region (row 2b). The sheet lists every column, the
+    // fee condition kept hidden in the table among them (row 19): ten boxes there, nine in the table's filter row.
+    const phone = isPhone(page);
+    const boxes = phone
       ? phoneFilterSheet(page).locator('[data-slot="column-filter"]')
       : page.locator('[data-slot="data-region"] [data-slot="column-filter"]');
-    const ok = (await boxes.count()) === 8 && (await boxes.first().isVisible());
+    const ok = (await boxes.count()) === (phone ? 10 : 9) && (await boxes.first().isVisible());
     if (!ok) throw new Error("filters gone on no match");
   }
 

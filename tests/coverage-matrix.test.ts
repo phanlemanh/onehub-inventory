@@ -1,20 +1,12 @@
 // Role × screen coverage check (roadmap row 1d, decision 0017): tools/coverage_matrix/check.py.
 // Every red case has a green control on the same copy, and asserts the pinned message.
 import { spawnSync } from "node:child_process";
-import {
-  cpSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  readdirSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { afterAll, describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const CHECK = join(REPO, "tools/coverage_matrix/check.py");
@@ -35,7 +27,7 @@ function pagesUnder(dir: string): string[] {
 
 /** A minimal copy of the repo: the two registers, the labels and the real pages. */
 function copyRepo(): string {
-  const root = mkdtempSync(join(tmpdir(), "coverage-matrix-"));
+  const root = tempDir("coverage-matrix-");
   made.push(root);
   for (const rel of ["ontology/labels.yaml", "ontology/roles.yaml", "design/screens.yaml"]) {
     mkdirSync(dirname(join(root, rel)), { recursive: true });

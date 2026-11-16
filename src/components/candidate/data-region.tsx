@@ -17,6 +17,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type ClipboardEvent,
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
@@ -28,10 +29,12 @@ import {
   DataGridContainer,
   dataGridFeatures,
   type DataGridCellSelectionSnapshot,
+  type DataGridCellsChangeDetails,
 } from "@/components/reui/data-grid/data-grid";
 import {
   DataGridCellSelection,
   type DataGridCellSelectionApi,
+  parseDataGridClipboardText,
 } from "@/components/reui/data-grid/data-grid-cell-selection";
 import { DataGridColumnHeader } from "@/components/reui/data-grid/data-grid-column-header";
 import { DataGridColumnVisibility } from "@/components/reui/data-grid/data-grid-column-visibility";
@@ -73,9 +76,10 @@ import {
   type GridView,
   type SortBy,
 } from "./grid-view";
+import { emptyMissingCells } from "./paste-block";
 import { PhoneList, type RegionPhoneList } from "./phone-list";
+import { usePhoneLayout } from "./use-phone-layout";
 import { RecordPanel, useRecordAddress, type RecordView } from "./record-panel";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { RegionTitle, RegionToolbar } from "./region-header";
 import { RowActions, type RecordAction } from "./row-actions";
 import {
@@ -116,6 +120,29 @@ export type RegionCellEdit = {
   /** The label of the editor: the field and the row, for screen readers. */
   label: (row: GridRow, field: FieldKey) => string;
   render: (session: CellEditSession) => ReactNode;
+  /**
+   * Pasting a region from a sheet (row 5): the grid says which cell each pasted word lands on and hands them over;
+   * nothing is written here. The screen reads the words with its own rules and shows its preview.
+   */
+  paste?: (paste: RegionPaste) => void;
+  /** A paste landed while the session may not run `action`: nothing opens, the screen says why. */
+  pasteRefused?: () => void;
+};
+
+/** One pasted word and the cell it lands on. `open` says whether the cell may be edited now (permission, lock). */
+export type PastedCell = {
+  row: GridRow;
+  field: FieldKey;
+  raw: string;
+  open: boolean;
+  /** The label of the group when the word landed on a group's header row. */
+  group?: string;
+};
+
+/** A pasted region read onto the grid: its cells in reading order, and how much of it fell outside the grid. */
+export type RegionPaste = {
+  cells: PastedCell[];
+  beyond: { rows: number; columns: number };
 };
 
 export type RegionStatus = "ready" | "loading" | "error" | "partial" | "forbidden";
@@ -377,6 +404,7 @@ export function DataRegion({
   groupBy,
   initialView,
   onViewChange,
+  hiddenAtFirst,
   phoneList,
 }: {
   title: string;
@@ -416,10 +444,18 @@ export function DataRegion({
   initialView?: GridView;
   /** Hears the arrangement after each change the person makes (and once on opening). */
   onViewChange?: (view: GridView) => void;
+  /**
+   * Columns that start hidden when no arrangement is given (row 19: a column offered in the Cột menu, off until the
+   * person turns it on). A given `initialView` decides on its own.
+   */
+  hiddenAtFirst?: readonly FieldKey[];
   /** Row 2b: below 768 px the rows show as the screen's cards instead of the table. */
   phoneList?: RegionPhoneList<GridRow>;
 }) {
-  const isPhone = useIsMobile();
+  // VP4: undefined until the browser knows the width; meanwhile both layouts are drawn and CSS shows one.
+  const phoneLayout = usePhoneLayout();
+  const isPhone = phoneLayout === true;
+  const twoLayouts = phoneLayout === undefined && phoneList !== undefined;
   // One confirmation for every row's removing action: a row scrolled out of the virtual body keeps it open.
   const removing = useChange();
   const [opening] = useState(() => (initialView ? viewWithin(initialView, columns) : undefined));
@@ -432,7 +468,7 @@ export function DataRegion({
       .map(([id, value]) => ({ id, value })),
   );
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>(() =>
-    Object.fromEntries((opening?.hidden ?? []).map((field) => [field, false])),
+    Object.fromEntries((opening?.hidden ?? hiddenAtFirst ?? []).map((field) => [field, false])),
   );
   const [grouped, setGrouped] = useState(opening?.grouped ?? false);
   const [expanded, setExpanded] = useState<ExpandedState>(true);
@@ -1019,7 +1055,99 @@ export function DataRegion({
 
   const onSelection = useCallback((snapshot: DataGridCellSelectionSnapshot) => {
     setSelectedCells(snapshot.visibleCellCount);
+    selectionRef.current = snapshot;
   }, []);
+
+  // Pasting (row 5): the grid maps a pasted block onto the selected region with sheet rules (a 1×1 block fills the
+  // region, a block tiles a region that is a multiple of it, otherwise it pastes once from the top-left and stops at
+  // the grid's edge). The region keeps the block's size to say how much fell outside, and hands every cell on.
+  const selectionRef = useRef<DataGridCellSelectionSnapshot | null>(null);
+  const pastedBlock = useRef<{ rows: number; columns: number; lines: string[][] } | null>(null);
+  const onPasteCapture = (event: ClipboardEvent<HTMLDivElement>) => {
+    // The grid's own reader of Excel's text: a quoted cell may hold tabs and line breaks and is still one cell.
+    const lines = parseDataGridClipboardText(event.clipboardData.getData("text/plain"));
+    pastedBlock.current = {
+      rows: Math.max(1, lines.length),
+      columns: Math.max(1, ...lines.map((line) => line.length)),
+      lines,
+    };
+  };
+  const onCellsChange = (details: DataGridCellsChangeDetails<TableRow>) => {
+    // Cut, Delete and fill write nothing: the grid writes only through the paste preview and the cell editor.
+    if (details.source !== "paste" || !cellEdit?.paste) return;
+    if (!permitted(cellEdit.action, true)) {
+      cellEdit.pasteRefused?.();
+      return;
+    }
+    const order = new Map(table.getRowsInDisplayOrder().map((r) => [r.id, r.original]));
+    const index = [...order.keys()];
+    const field = (id: string) => id as FieldKey;
+    const cells: PastedCell[] = [
+      ...details.changes.map((c) => ({
+        row: c.row,
+        field: field(c.columnId),
+        raw: String(c.value ?? ""),
+        open: true,
+      })),
+      ...details.rejected.flatMap((r) => {
+        const row = order.get(r.rowId);
+        if (!row) return [];
+        return [
+          {
+            row,
+            field: field(r.columnId),
+            raw: r.raw,
+            open: false,
+            ...(row.group ? { group: row.group.label } : {}),
+          },
+        ];
+      }),
+    ]
+      // The row's «…» column takes no words: a pasted column landing on it counts as beyond the grid.
+      .filter((c) => visibleFields.includes(c.field))
+      .sort(
+        (a, b) =>
+          index.indexOf(a.row.id) - index.indexOf(b.row.id) ||
+          visibleFields.indexOf(a.field) - visibleFields.indexOf(b.field),
+      );
+    const block = pastedBlock.current;
+    pastedBlock.current = null;
+    // A row of the block shorter than the others has no word for its last columns: those cells are empty, never the
+    // words the grid fills them with (it repeats the row's own cells), so they change nothing and are not listed.
+    if (block) {
+      // Columns in the order the grid shows them, pinned ones first, as the grid lays the block over them.
+      const shown = [
+        ...table.getStartVisibleLeafColumns(),
+        ...table.getCenterVisibleLeafColumns(),
+        ...table.getEndVisibleLeafColumns(),
+      ].map((column) => column.id);
+      const places = emptyMissingCells(
+        cells.map((c) => ({ rowId: c.row.id, field: c.field, raw: c.raw })),
+        block.lines,
+        shown,
+      );
+      places.forEach((p, i) => (cells[i]!.raw = p.raw));
+    }
+    const bound = selectionRef.current?.activeBound;
+    const regionRows = bound ? bound.maxRowIndex - bound.minRowIndex + 1 : 1;
+    const regionColumns = bound ? bound.maxColumnIndex - bound.minColumnIndex + 1 : 1;
+    const tiles =
+      block !== null &&
+      ((block.rows === 1 && block.columns === 1) ||
+        (regionRows % block.rows === 0 && regionColumns % block.columns === 0));
+    const rowsHit = new Set(cells.map((c) => c.row.id)).size;
+    const columnsHit = new Set(cells.map((c) => c.field)).size;
+    cellEdit.paste({
+      cells,
+      beyond:
+        block && !tiles
+          ? {
+              rows: Math.max(0, block.rows - rowsHit),
+              columns: Math.max(0, block.columns - columnsHit),
+            }
+          : { rows: 0, columns: 0 },
+    });
+  };
 
   const clearFilters = () => setColumnFilters([]);
   const narrowed = activeFilterCount > 0;
@@ -1101,6 +1229,60 @@ export function DataRegion({
         ) : null}
       </div>
     ) : null;
+  /** The phone list (row 2b): the same table, drawn as the screen's cards. */
+  const phoneGrid = (list: RegionPhoneList<GridRow>) => (
+    <DataGrid table={table} recordCount={shown.length} i18n={GRID_I18N}>
+      <PhoneList
+        list={list as RegionPhoneList<TableRow>}
+        data={data}
+        columns={columns}
+        column={(field) => table.getColumn(field)}
+        options={options}
+        activeFields={columns.filter((c) => !filterIsEmpty(filters[c.field])).map((c) => c.field)}
+        count={
+          narrowed
+            ? GRID_COPY.filteredCount(shown.length, rows.length)
+            : GRID_COPY.rowCount(rows.length)
+        }
+        group={
+          groupColumn
+            ? {
+                label: GRID_COPY.sheet.groupBy(groupColumn.header),
+                on: isGrouped,
+                toggle: () => {
+                  setGrouped((on) => !on);
+                  setExpanded(true);
+                },
+              }
+            : undefined
+        }
+        more={toolbarAction}
+        rowAction={
+          rowActions
+            ? (row) => {
+                const { actions, mine } = rowActions(row);
+                return (
+                  <RowActions
+                    actions={actions}
+                    mine={mine}
+                    title={list.label(row)}
+                    run={removing.run}
+                  />
+                );
+              }
+            : undefined
+        }
+        sort={{
+          columns,
+          value: sorting[0] ? { field: sorting[0].id, desc: sorting[0].desc } : null,
+          set: (v) => setSorting(v ? [{ id: v.field, desc: v.desc }] : []),
+        }}
+        onOpen={openRecord}
+        onClear={clearFilters}
+        noMatch={<RegionNoMatch onClear={clearFilters} />}
+      />
+    </DataGrid>
+  );
   let body: ReactNode;
   if (status === "forbidden") body = <RegionForbidden />;
   else if (status === "loading")
@@ -1109,60 +1291,7 @@ export function DataRegion({
   else if (status === "partial" && rows.length === 0)
     body = <RegionPartialEmpty onRetry={onRetry} />;
   else if (rows.length === 0) body = <RegionEmpty why={emptyWhy} action={emptyAction} />;
-  else if (phoneList && isPhone)
-    body = (
-      <DataGrid table={table} recordCount={shown.length} i18n={GRID_I18N}>
-        <PhoneList
-          list={phoneList as RegionPhoneList<TableRow>}
-          data={data}
-          columns={columns}
-          column={(field) => table.getColumn(field)}
-          options={options}
-          activeFields={columns.filter((c) => !filterIsEmpty(filters[c.field])).map((c) => c.field)}
-          count={
-            narrowed
-              ? GRID_COPY.filteredCount(shown.length, rows.length)
-              : GRID_COPY.rowCount(rows.length)
-          }
-          group={
-            groupColumn
-              ? {
-                  label: GRID_COPY.sheet.groupBy(groupColumn.header),
-                  on: isGrouped,
-                  toggle: () => {
-                    setGrouped((on) => !on);
-                    setExpanded(true);
-                  },
-                }
-              : undefined
-          }
-          more={toolbarAction}
-          rowAction={
-            rowActions
-              ? (row) => {
-                  const { actions, mine } = rowActions(row);
-                  return (
-                    <RowActions
-                      actions={actions}
-                      mine={mine}
-                      title={phoneList.label(row)}
-                      run={removing.run}
-                    />
-                  );
-                }
-              : undefined
-          }
-          sort={{
-            columns,
-            value: sorting[0] ? { field: sorting[0].id, desc: sorting[0].desc } : null,
-            set: (v) => setSorting(v ? [{ id: v.field, desc: v.desc }] : []),
-          }}
-          onOpen={openRecord}
-          onClear={clearFilters}
-          noMatch={<RegionNoMatch onClear={clearFilters} />}
-        />
-      </DataGrid>
-    );
+  else if (phoneList && isPhone) body = phoneGrid(phoneList);
   else
     body = (
       <DataGrid
@@ -1173,6 +1302,7 @@ export function DataRegion({
         // Ngoài-4 of 2a): only the table's body says so, and each rule can still be mended on its own.
         emptyMessage={<RegionNoMatch onClear={clearFilters} />}
         onCellSelectionChange={onSelection}
+        onCellsChange={cellEdit?.paste ? onCellsChange : undefined}
         onCellEditRequest={
           cellEdit
             ? (request) => {
@@ -1247,7 +1377,11 @@ export function DataRegion({
           <DataGridScrollArea className={`${VIEWPORT_HEIGHT_CLASS} ${FULL_SCREEN_HEIGHT_CLASS}`}>
             {/* Keyed by density: the virtual body keeps the estimate it started with for rows it has not measured, so a
                 switch from normal to dense rows must start it again or the run's height (and its last rows) go wrong. */}
-            <div data-slot="data-region-scroll-content" onKeyDownCapture={onGridKeyDownCapture}>
+            <div
+              data-slot="data-region-scroll-content"
+              onKeyDownCapture={onGridKeyDownCapture}
+              onPasteCapture={cellEdit?.paste ? onPasteCapture : undefined}
+            >
               <DataGridTableVirtual key={density} estimateSize={ROW_HEIGHT_PX[density]} />
             </div>
           </DataGridScrollArea>
@@ -1300,6 +1434,9 @@ export function DataRegion({
       ) : null}
       <section
         data-slot="data-region"
+        // VP4: set once the browser has taken over the server's HTML and drawn one layout only. Tests that read the
+        // region wait for it (tests/e2e/phone-list.ts); the frames before it are watched by tests/e2e/bang-loe.spec.ts.
+        data-hydrated={phoneLayout === undefined ? undefined : ""}
         data-full-screen={fullScreen || undefined}
         style={REGION_HEIGHTS}
         className="group/region mr-(--record-pinned,0px) flex min-w-0 flex-col bg-background"
@@ -1311,19 +1448,30 @@ export function DataRegion({
           0
         </span>
         {/* Arrangement after data-grid-editing-6: name on the frame's header strip; toolbar, table and pages in one panel. */}
-        {phoneList && isPhone && gridShown ? (
-          // A phone list has no frame around it (row 2b): it runs to the screen's edges, under the page head.
-          <div ref={boxRef} data-slot="data-region-body" className="-mx-4 min-w-0">
+        {phoneList && (isPhone || twoLayouts) && gridShown ? (
+          // A phone list has no frame around it (row 2b): it runs to the screen's edges, under the page head. While the
+          // width is not known (VP4) it is drawn next to the table and shown below 768 px only; the table's ref stays
+          // on the table, which measures its columns.
+          <div
+            ref={twoLayouts ? undefined : boxRef}
+            data-slot="data-region-body"
+            data-layout={twoLayouts ? "phone" : undefined}
+            className={cn("-mx-4 min-w-0", twoLayouts && "md:hidden")}
+          >
             <h2 className="sr-only">{title}</h2>
             {status === "partial" ? (
               <div className="px-4 pb-2">
                 <RegionPartial onRetry={onRetry} />
               </div>
             ) : null}
-            {body}
+            {twoLayouts ? phoneGrid(phoneList) : body}
           </div>
-        ) : (
-          <Frame className="min-w-0">
+        ) : null}
+        {phoneList && isPhone && gridShown ? null : (
+          <Frame
+            className={cn("min-w-0", twoLayouts && gridShown && "max-md:hidden")}
+            data-layout={twoLayouts && gridShown ? "table" : undefined}
+          >
             <FrameHeader>
               <RegionTitle title={title} />
             </FrameHeader>

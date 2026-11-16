@@ -33,6 +33,8 @@ export interface FramedListRow {
   control?: ReactNode;
   /** Data attributes for the row, e.g. `{ "data-member": email }`. */
   data?: Readonly<Record<`data-${string}`, string>>;
+  /** A line under the row, e.g. why its value cannot be saved (row 19); read out when it appears. */
+  note?: ReactNode;
 }
 
 const COL = {
@@ -40,6 +42,8 @@ const COL = {
   secondary: "hidden w-56 shrink-0 text-xs text-muted-foreground @4xl:flex",
   tags: "me-auto flex min-w-0 shrink-0 flex-wrap gap-1 @2xl:me-0 @2xl:w-72",
   control: "flex shrink-0 justify-end @2xl:w-24",
+  // Row 19: a control column as wide as what it holds (a number field, a switch and a «…»), for lists that ask it.
+  controlFit: "flex shrink-0 items-center justify-end gap-3",
 };
 
 /** The initials of a name: first letters of its first and last words; a bracketed placeholder such as «[Tên]» is skipped. */
@@ -51,12 +55,23 @@ export function initialsOf(name: string): string {
 }
 
 /** The main part of a row for a person or a named thing: initials, the name, a smaller line under it. */
-export function ListFace({ name, sub }: { name: string; sub?: string }) {
+export function ListFace({
+  name,
+  sub,
+  avatar = true,
+}: {
+  name: string;
+  sub?: string;
+  /** Without the initials, for a thing that is not a person (row 19: a fee item). */
+  avatar?: boolean;
+}) {
   return (
     <span className="flex min-w-0 items-center gap-3">
-      <Avatar>
-        <AvatarFallback>{initialsOf(name)}</AvatarFallback>
-      </Avatar>
+      {avatar ? (
+        <Avatar>
+          <AvatarFallback>{initialsOf(name)}</AvatarFallback>
+        </Avatar>
+      ) : null}
       <span className="flex min-w-0 flex-col gap-1">
         <span className="truncate text-sm font-medium" title={name}>
           {name}
@@ -78,6 +93,7 @@ export function FramedList({
   rows,
   footer,
   slot,
+  controlWidth = "fixed",
 }: {
   /** The frame's name and the list's accessible name. */
   title: string;
@@ -90,6 +106,8 @@ export function FramedList({
   footer?: { note?: ReactNode; action?: ReactNode };
   /** data-slot of the frame, for tests and the proof screenshots. */
   slot?: string;
+  /** The end column's width: the same 6rem on every row (default), or as wide as each row's control (row 19). */
+  controlWidth?: "fixed" | "fit";
 }) {
   return (
     <Frame spacing="default" data-slot={slot ?? "framed-list"}>
@@ -121,11 +139,19 @@ export function FramedList({
                     </span>
                   ) : null}
                   {r.control !== undefined ? (
-                    <span data-part="control" className={COL.control}>
+                    <span
+                      data-part="control"
+                      className={controlWidth === "fit" ? COL.controlFit : COL.control}
+                    >
                       {r.control}
                     </span>
                   ) : null}
                 </div>
+                {r.note !== undefined ? (
+                  <div data-part="note" role="status" className="w-full text-sm text-destructive">
+                    {r.note}
+                  </div>
+                ) : null}
               </Item>
             </div>
           ))}

@@ -10,6 +10,7 @@ export default defineConfig({
   test: {
     include: ["tests/db/**/*.db.test.ts"],
     fileParallelism: false,
+    globalSetup: ["tests/support/temp-root.ts"],
     testTimeout: 60_000,
     hookTimeout: 120_000,
     coverage: { enabled: false },

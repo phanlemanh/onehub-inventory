@@ -7,7 +7,14 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-import { closePhoneSheet, isPhone, openerCode, openerCodes, phoneFilterBox } from "./phone-list";
+import {
+  closePhoneSheet,
+  isPhone,
+  openerCode,
+  openerCodes,
+  phoneFilterBox,
+  regionReady,
+} from "./phone-list";
 
 const INVENTORY = "/inventory";
 /** Sample codes found in two buildings or more (written before the code, from the 60 sample listings). */
@@ -51,6 +58,7 @@ async function openInventory(page: Page, query = ""): Promise<void> {
   await page.goto(`${INVENTORY}${query}`);
   await page.locator('[data-slot="data-region"]').first().waitFor();
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  await regionReady(page);
 }
 
 /** Opens the fifth listing, or with `unique` the first whose code is in one building only; returns its id and unit. */

@@ -1,0 +1,199 @@
+schema_version: 1
+feature_slug: dan-tu-excel
+# Ma trận viết trước:
+#   AC-2: bảng chữ dán 24 ca ở src/modules/listings/paste-rules.test.ts (giá: 8 đọc được, 4 chưa hiểu; trạng thái: 6
+#         khớp nhãn — có dấu, không dấu, hoa, nhãn cho thuê —, 3 chữ lạ; 2 ô trống; 1 giá trị giống hệt), viết trước mã;
+#         số ca ghim bằng hằng 24 — bảng co lại cũng đỏ.
+#   AC-3: 10 lý do bỏ × ít nhất một ca (thuộc tính căn, Xác nhận lúc, cột tính, cột riêng, khoá Đã bán, nấc không đi được,
+#         nấc Đã bán, nấc Ngừng hẳn, dòng nhóm, phần thừa ngoài bảng); hằng 10 ghim.
+#   AC-4: 5 ca ngưỡng (+20%, +20,01%, −20%, −20,01%, chưa có giá); ca màn giá lệch lớn bỏ chọn sẵn (Hỏi-6).
+#   AC-6: 3 nguyên nhân hỏng (offline, conflict, refused) × số ô chưa ghi và câu lý do; hằng 3 ghim.
+#   AC-10: 4 hình vùng dán (một ô cả vùng, khối lặp, lọc có dòng ẩn, ngoại tuyến từ đầu).
+# Bài và ca (tên ca là thông điệp ghim):
+#   src/modules/listings/paste-rules.test.ts: doc-o-dan-viet-truoc · ly-do-bo-du-10 · nguong-dan-dau-phan-tram
+#   src/components/candidate/door-batch.test.tsx: ap-mot-lan-n-lan-ghi · hoan-tac-mot-lan · ap-hong-mot-phan ·
+#     hoan-tac-hong-bao-ro · noi-phien-ban
+#   src/components/candidate/data-region-paste.test.tsx: chua-ghi-truoc-khi-ap · bo-theo-cot-va-khoa · khong-quyen-khong-mo ·
+#     cat-xoa-khong-ghi
+#   tests/e2e/dan-tu-excel.spec.ts (bốn khổ): xem-truoc-dung-o · ap-n-o · thoi-khong-ghi · bo-chon-mot-o · hoan-tac-ca-vung ·
+#     ap-hong-mot-phan · gia-lech-lon-bo-chon-san · mot-o-ca-vung · khoi-lap · loc-khong-ghi-dong-an · ngoai-tuyen-tu-dau ·
+#     khong-quyen · dien-thoai-khong-dan · phim-trong-ban-xem-truoc · axe-sang-toi
+# Cặp phá thử (bản sao; ca tương ứng phải đỏ với thông điệp ghim):
+#   pha-thu-doc-gia-rieng (bộ đọc dán tự đọc giá thay vì gọi readPrice, làm tròn tới 10 triệu) → «doc-o-dan-viet-truoc: 4,655 tỷ»
+#   pha-thu-bo-ly-do (lý do khoá Đã bán rơi về «sai kiểu»)                                    → «ly-do-bo-du-10: khoa-da-ban»
+#   pha-thu-nguong-bang (> thành >=)                                                          → «nguong-dan-dau-phan-tram: +20%»
+#   pha-thu-ghi-som (DataRegion ghi ngay khi dán)                                             → «chua-ghi-truoc-khi-ap: 6 lần ghi»
+#   pha-thu-hoan-tac-im (hoàn tác lô nuốt lỗi)                                                → «hoan-tac-hong-bao-ro»
+#   pha-thu-bo-quyen (dán bỏ kiểm bảng quyền)                                                 → «khong-quyen-khong-mo: CompanyAdmin»
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.dan_tu_excel_e2e
+    layer: backend-effect
+    paths: [src/modules/listings/**, src/components/candidate/**, src/app/(app)/inventory/**, tests/e2e/dan-tu-excel.spec.ts]
+    expected: "exit 0 ở 1024 và 1440; ca 'xem-truoc-dung-o': dán vùng 3 × 2 lên ô Trạng thái của căn đầu thì window.__sampleSaves có 0 phần tử, bản xem trước có đúng các dòng «căn · cột · cũ → mới» viết trước và dòng đếm đúng bốn số. Chiều đỏ: pha-thu-ghi-som → «chua-ghi-truoc-khi-ap: 6 lần ghi»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E1-ui
+    criterion: AC-1
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3487/inventory?vai=ListAgent
+    paths: [src/modules/listings/ui/**, src/components/candidate/**]
+    steps:
+      - "With the lane H dev server on port 3487, open http://127.0.0.1:3487/inventory?vai=ListAgent at 1440 and 1024 wide, light and dark"
+      - "Select the Trạng thái cell of the first unit, paste the 3 × 2 sample block of tests/e2e/dan-tu-excel.spec.ts, save the open preview as _acceptance/dan-tu-excel/evidence/E1-<khổ>-<sang|toi>.png"
+    question: "Bản xem trước có nói rõ từng ô sẽ đổi (cũ → mới), từng ô bị bỏ hay sai kiểu kèm lý do, dòng đếm khớp danh sách, và bảng phía sau chưa đổi không? Nêu khổ và chế độ màu nào lệch."
+    expected: "Mọi khung khớp; bảng phía sau giữ giá trị cũ"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.dan_tu_excel
+    paths: [src/modules/listings/**]
+    expected: "exit 0; ca 'doc-o-dan-viet-truoc' duyệt đủ 24 ca của bảng viết trước (số ca in ra = 24), mỗi ca đúng ngăn và đúng giá trị. Chiều đỏ: pha-thu-doc-gia-rieng → «doc-o-dan-viet-truoc: 4,655 tỷ»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2b
+    criterion: AC-2
+    executor: judgment
+    inputs:
+      - src/modules/listings/edit-rules.ts
+      - src/modules/listings/paste-rules.ts
+      - src/modules/listings/save-door.ts
+      - src/modules/listings/index.ts
+      - src/modules/listings/ui/listing-paste.ts
+      - src/modules/listings/ui/use-listing-cell-edit.tsx
+      - src/modules/listings/ui/inventory-grid.tsx
+      - src/components/candidate/data-region.tsx
+      - src/components/candidate/paste-preview.tsx
+      - src/components/candidate/use-change.tsx
+    question: "Trong đúng các tệp đã cho: bộ đọc ô dán có chỉ gọi các hàm của tệp luật hàng 4 (readPrice, priceAsksAgain, canMove, statusNeeds, priceLocked, statusLocked) và hàm đọc chữ trạng thái của tệp luật mô-đun căn, không tự so số, liệt kê nấc hay đặt ngưỡng không? Đường ghi có đi qua đúng cửa lưu của hàng 4 không, không có đường ghi thứ hai? Nêu tệp và dòng nào tự viết luật hay ghi đường khác."
+    expected: "PASS khi mọi luật ở tệp luật và mọi lần ghi qua cửa lưu; FAIL nêu tệp và dòng"
+    evidence_required: [run_id, verdict, verifier, verified_at]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.dan_tu_excel
+    paths: [src/modules/listings/**, src/components/candidate/**]
+    expected: "exit 0; ca 'ly-do-bo-du-10' cho đủ 10 lý do viết trước, mỗi lý do đúng câu; ca 'bo-theo-cot-va-khoa' của DataRegion đưa ô của cột không sửa được và ô khoá vào ngăn bị bỏ với lý do của màn. Chiều đỏ: pha-thu-bo-ly-do → «ly-do-bo-du-10: khoa-da-ban»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.dan_tu_excel
+    paths: [src/modules/listings/**]
+    expected: "exit 0; ca 'nguong-dan-dau-phan-tram' cho đúng 5 ca biên: +20% không dấu, +20,01% có dấu «+20,01%», −20% không dấu, −20,01% có dấu, chưa có giá không dấu. Chiều đỏ: pha-thu-nguong-bang → «nguong-dan-dau-phan-tram: +20%»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4-e2e
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.dan_tu_excel_e2e
+    layer: backend-effect
+    paths: [src/modules/listings/**, src/components/candidate/**, tests/e2e/dan-tu-excel.spec.ts]
+    expected: "exit 0; ca 'gia-lech-lon-bo-chon-san': vùng dán có giá 4,28 tỷ → 9 tỷ thì dòng ấy mang «+110,28%» và ô chọn của nó không đánh dấu (đối chứng dương: dòng 2,71 → 2,8 tỷ đã đánh dấu); Áp ghi các ô khác, window.__sampleSaves không có phần tử 9000000000, 0 hộp thoại mở sau Áp; dán lại, chọn dòng ấy rồi Áp thì có đúng một phần tử 9000000000. Chiều đỏ: dòng lệch lớn chọn sẵn → «gia-lech-lon-bo-chon-san: 9 tỷ được ghi khi chưa chọn»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.dan_tu_excel_e2e
+    layer: backend-effect
+    paths: [src/modules/listings/**, src/components/candidate/**, tests/e2e/dan-tu-excel.spec.ts]
+    expected: "exit 0; ca 'ap-n-o': Áp ghi đúng N phần tử vào window.__sampleSaves với đúng giá trị đã thấy, ô hiện giá trị mới, Xác nhận lúc đổi, thông báo «Đã đổi N ô của K căn.» kèm Hoàn tác; ca 'thoi-khong-ghi': Thôi và Esc để 0 lần ghi; ca 'bo-chon-mot-o': bỏ một ô thì nút «Áp N−1 ô» và ô ấy không ghi. Chiều đỏ: Áp ghi cả ô đã bỏ chọn → «bo-chon-mot-o: ô đã bỏ được ghi»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5b
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.dan_tu_excel
+    paths: [src/components/candidate/**]
+    expected: "exit 0; ca 'ap-mot-lan-n-lan-ghi' của runDoorBatch: N lần ghi gọi đúng N lần cửa, một thông báo có Hoàn tác; ca 'noi-phien-ban' trên cửa mẫu sampleSaveDoor: hai ô của cùng một căn — lần ghi thứ hai mang phiên bản do lần thứ nhất trả về và ra «saved». Chiều đỏ: hai thông báo cho một lần áp → «ap-mot-lan-n-lan-ghi: 2 thông báo»; lần ghi thứ hai dùng phiên bản cũ → «noi-phien-ban: conflict»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.dan_tu_excel
+    paths: [src/components/candidate/**, src/modules/listings/ui/**]
+    expected: "exit 0; ca 'hoan-tac-mot-lan' (mỗi ô đã ghi một lần ghi ngược, theo thứ tự ngược), 'ap-hong-mot-phan' — ma trận ba nguyên nhân viết trước (offline · conflict · refused), mỗi nguyên nhân: đúng số ô chưa ghi và đúng câu lý do («mất kết nối mạng» · «dòng vừa đổi từ chỗ khác» · câu không đủ quyền), hằng 3 ghim, 'hoan-tac-hong-bao-ro' (thông báo đứng yên có Thử lại, nêu căn còn mang giá trị mới). Chiều đỏ: pha-thu-hoan-tac-im → «hoan-tac-hong-bao-ro»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6-e2e
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.dan_tu_excel_e2e
+    layer: backend-effect
+    paths: [src/modules/listings/**, src/components/candidate/**, tests/e2e/dan-tu-excel.spec.ts]
+    expected: "exit 0; ca 'hoan-tac-ca-vung': Hoàn tác thêm đúng N phần tử ghi giá trị trước vào window.__sampleSaves và mọi ô về cũ; ca 'ap-hong-mot-phan': trình duyệt ngoại tuyến giữa lần áp thì ô hỏng về cũ và thông báo nói số ô chưa ghi được. Chiều đỏ: Hoàn tác chỉ ghi ô đầu → «hoan-tac-ca-vung: 1/N lần ghi ngược»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.dan_tu_excel
+    paths: [src/components/candidate/**, src/modules/listings/**]
+    expected: "exit 0; ca 'khong-quyen-khong-mo': vai CompanyAdmin dán thì không bản xem trước, cửa 0 lần, có thông báo; ListAgent thì mở (đối chứng dương); ca 'cat-xoa-khong-ghi': cắt, Delete, Backspace không gọi cửa. Chiều đỏ: pha-thu-bo-quyen → «khong-quyen-khong-mo: CompanyAdmin»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7-e2e
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.dan_tu_excel_e2e
+    paths: [src/modules/listings/**, src/components/candidate/**, tests/e2e/dan-tu-excel.spec.ts]
+    expected: "exit 0 ở bốn khổ; ca 'khong-quyen' (CompanyAdmin, 1440): không bản xem trước, 0 lần ghi; ca 'dien-thoai-khong-dan' (360, 414): dán không mở gì, 0 lần ghi. Chiều đỏ: điện thoại mở bản xem trước → «dien-thoai-khong-dan: mở ở 360»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.dan_tu_excel_e2e
+    paths: [src/components/candidate/**, src/modules/listings/ui/**, tests/e2e/dan-tu-excel.spec.ts, tests/e2e/sheet.spec.ts, tests/e2e/sua-tren-o.spec.ts]
+    expected: "exit 0; ca 'phim-trong-ban-xem-truoc': tiêu điểm vào ở Áp, Tab/Shift+Tab đi qua ô chọn và hai nút, Space bật tắt, Esc đóng, tiêu điểm về ô đang chọn và ArrowDown chuyển ô; hộp thoại có tên và mô tả; bài của 2a và 4 vẫn xanh. Chiều đỏ: Esc để tiêu điểm ở body → «phim-trong-ban-xem-truoc: tiêu điểm không về ô»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.dan_tu_excel_e2e
+    layer: backend-effect
+    paths: [src/components/candidate/**, src/modules/listings/**, tests/e2e/dan-tu-excel.spec.ts]
+    expected: "exit 0 ở 1440; bốn ca viết trước: 'mot-o-ca-vung' (1 ô «3 tỷ» lên vùng chọn 4 ô Giá chào → 4 dòng sẽ đổi), 'khoi-lap' (khối 1 × 2 lên vùng 2 × 2 → 4 ô, hai dòng giống nhau), 'loc-khong-ghi-dong-an' (lọc Toà, dán 3 dòng → bản xem trước chỉ có căn đang hiện, Áp không ghi id của dòng ẩn; đối chứng dương: id dòng hiện có trong window.__sampleSaves), 'ngoai-tuyen-tu-dau' (context.setOffline(true) rồi Áp → 0 ô đổi trên bảng, thông báo «Chưa ô nào được ghi — mất kết nối mạng.»). Chiều đỏ: dán ghi theo thứ tự dòng của dữ liệu thay vì dòng đang hiện → «loc-khong-ghi-dong-an: ghi dòng ẩn»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["**"]
+    expected: "exit 0; make check xanh, gồm bài nhãn (mỗi nhãn ≤17 ký tự, không chữ cứng trong src/), sổ khối và lưới chứng minh màn"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9-axe
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.dan_tu_excel_e2e
+    paths: [src/components/candidate/**, tests/e2e/dan-tu-excel.spec.ts]
+    expected: "exit 0; ca 'axe-sang-toi': bản xem trước mở trên Bảng hàng không có vi phạm axe ở sáng và tối. Chiều đỏ: bỏ tên hộp thoại → «axe-sang-toi: aria-dialog-name»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/components/candidate/**, src/modules/listings/ui/**]
+    expected: "exit 0; không mã màu thô trên tệp giao diện mà vòng chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

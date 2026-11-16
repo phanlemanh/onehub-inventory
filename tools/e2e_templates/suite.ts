@@ -27,10 +27,10 @@ import {
 import {
   followRedirect,
   GIAO,
+  landing,
   open,
   runBreak,
   runMain,
-  sentToSignIn,
   throttled,
   waitReady,
   type Base,
@@ -246,8 +246,7 @@ function gridSuite(id: string, url: string, base: Base): void {
       });
       try {
         await probe.goto(url);
-        await followRedirect(probe);
-        if (sentToSignIn(probe, url)) {
+        if ((await landing(probe, url)) === "sign-in") {
           if (base.mode === "co-phien") throw new Error(pushedOut(id));
           handed = true;
           return;

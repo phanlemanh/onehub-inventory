@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: af0c23278156d4fd420f9f16c033ed9968f4535e
+verified_commit: fee86ff1f5da431aedd7b56e0d56b26c6cc233eb
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -257,3 +257,7 @@ sha: af0c23278156d4fd420f9f16c033ed9968f4535e · suites: 3 lệnh exit 0 · eval
 Chấm lại bằng mắt E11, E13 trên ảnh dựng lại từ af0c232 (2026-11-14, dãy R, theo G-1411-48; ảnh trong `evidence/`): đạt.
 - E11: «Block» đứng ở chỗ Toà; «Hướng view», «Ghi chú» sau «Xác nhận lúc» (inventory-1440-cuoi.png); giá trị mẫu đọc được; ở 360 cột không vỡ; nền tối đủ tương phản.
 - E13: cột thứ hai (ngăn trượt ở 360) liệt kê năm phần; vùng Lưới có «…» cuối dòng, menu mở «Sửa», «Ngừng dùng»; phần trống nói lý do, chỉ đường nhập và có «Tải lại»; vai chỉ đọc không có nút ghi; không chữ đè, không cuộn ngang ngoài vùng Lưới. Khác bản đã ký đúng hai chỗ dáng đã báo chủ kho: tiêu đề lớn «Tuỳ chỉnh của sàn», nút «Tải lại» ở trạng thái trống.
+
+### Re-pin lần 2 — 2026-11-15, do VP2 (PR #66, sửa sau chữ ký): per-run temp root, proof gate waits for the shallow history lock, header and grid-probe early reads fixed
+run_id: repin-20261115T193207Z-65976
+sha: fee86ff1f5da431aedd7b56e0d56b26c6cc233eb · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng

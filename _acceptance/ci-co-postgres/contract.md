@@ -123,3 +123,37 @@ CI thật đo ở AC-10 khi bản vá vào PR (Hỏi-1). Lượt dựng lại (A
   khi bản mẫu được sinh lại bằng một lượt `make ci-db` thật (25–40 phút). Phép đếm trên CI và trong `make ci-db` không đổi:
   không có tuỳ chọn thì vẫn xét mọi tệp bài đang có trong kho, có bài khẳng định mặc định ấy; thêm ca phá «tệp bài trong
   danh sách không có bài đạt». Lời AC-4 và hai tệp mẫu không đổi.
+- Sửa sau chữ ký — 2026-11-15, việc phụ VP2 của đợt «dieu-phoi-nen» (PR #66): luật dọn thư mục dựng tạm của AC-8 nay
+  cũng áp cho thư mục tạm của mỗi lượt chạy bài đơn vị. Trước đó các bài kiểm tra để lại thư mục trong thư mục tạm của
+  máy sau mỗi lượt — một lượt `make test` để lại 303 thư mục (~1 GB), và ngày 2026-11-14 đĩa đầy vì chúng. Nay mỗi lượt
+  `vitest` đặt `TMPDIR` vào một thư mục riêng dưới `onehub-test-runs/`, ghi số tiến trình chính vào `.chu` và xoá thư mục
+  khi lượt xong; lượt sau chỉ xoá thư mục có chủ đã chết, bằng chính `sweepDead` của `tests/e2e-db/don-dung-tam.ts`
+  (không đổi), không bao giờ đọc từ tên thư mục. Tệp: `tests/support/temp-root.ts` (cắm ở `vitest.config.ts` và
+  `vitest.db.config.ts`), `tests/support/temp-dir.ts` (lối chung `tempDir()` cho bài trong `tests/`), bài chặn
+  `tests/temp-dir-guard.test.ts`. Sau sửa, một lượt `make test` để lại 0 thư mục của bài kiểm tra. Lời AC-8 không đổi;
+  thư mục dựng tạm của Playwright vẫn theo luật cũ.
+  Dòng `globalSetup` ở `vitest.config.ts` là đường được bảo vệ (hạng cao): chủ kho duyệt ngày 2026-11-15 (~00:54Z, phiên
+  giám sát), nguyên văn «Cho», trả lời câu «Cho PR 66 thêm một dòng vào tệp cấu hình bộ kiểm?» — đúng một dòng ấy, không
+  gì khác trong tệp.
+- Sửa sau chữ ký — 2026-11-15, việc phụ VP2 của đợt «dieu-phoi-nen» (PR #66), lần hai: bản sao nông của
+  `db/scripts/ci-thu.sh` nay có `origin` trỏ về kho gốc, như bản lấy về của CI. Từ 978d2d2 (2026-11-13), cổng chứng minh
+  màn đọc commit miễn của khối FormDialog từ lịch sử; ở bản sao nông nó lấy commit ấy từ kho xa
+  (`tools/proof_gate/legacy.py`), và bản sao không có kho xa thì đỏ «bản sao thiếu lịch sử và không có kho gốc để lấy».
+  Vì thế `make check` trong bản sao đỏ ở mọi lần ghim lại hồ sơ này từ 2026-11-13, dù nhánh nào. Đúng một dòng
+  `git remote add origin`; không đổi phép kiểm nào, không đổi luật của cổng. Chứng minh trên bản sao nông của 4a93fc3:
+  không có dòng ấy thì 9 bài cổng chứng minh đỏ (proof-gate, proof-gate-0023, proof-gate-1q, proof-matrix-self); thêm
+  `origin` thì cổng xanh và bốn tệp ấy đạt 145/145. Tệp này là đường được bảo vệ (`db/**`): giám sát cho theo quyền
+  đứng của chủ kho cho tệp công cụ trong đợt («Quyền, lần năm»), báo chủ kho cùng giờ.
+- Sửa sau chữ ký — 2026-11-15, việc phụ VP2 của đợt «dieu-phoi-nen» (PR #66), lần ba: phần lấy lịch sử cho bản sao nông
+  của cổng chứng minh màn (`tools/proof_gate/legacy.py`) nay chờ khi tiến trình khác đang giữ khoá lịch sử. vitest chạy
+  song song các tệp bài của cổng, và mỗi tệp gọi cổng trên chính kho. Trong bản sao nông của `db/scripts/ci-thu.sh` (như
+  bản lấy về của CI), vài cổng cùng chạy `git fetch --unshallow` một lúc; cổng thứ hai gặp «Unable to create
+  …/.git/shallow.lock: File exists» và đỏ dù lịch sử lấy được. Tái hiện 3/3 trên bản sao nông của 595f2c5 (ba cổng cùng
+  chạy); đó là lý do `make check` đỏ trong bản sao ở lần ghim lại hồ sơ này trên 595f2c5. Nay khi git báo khoá đang bị
+  giữ, cổng chờ một giây rồi đọc lại: bản sao hết nông (cổng kia đã lấy xong) thì đủ; còn khoá thì thử lại, tối đa 30
+  lần; hết lần thử vẫn khoá thì đỏ với câu nói rõ khoá bị giữ, không nuốt lỗi. Lỗi lấy khác giữ nguyên như cũ. Luật của
+  cổng và mọi bài cũ không đổi; `ci-thu.sh` không lấy đủ lịch sử. Bài mới `tools/proof_gate/proof-gate-shallow-lock.test.ts`:
+  ba cổng cùng lúc trên một bản sao nông đều đủ lịch sử; khoá giữ 2,5 giây thì cổng chờ rồi lấy; phá: bỏ chờ (một lần
+  thử) thì đỏ «shallow.lock»; khoá giữ suốt thì đỏ có lý do. Trên `legacy.py` cũ, ba bài ấy đỏ (bài phá xanh như mong
+  đợi). Tệp `tools/**` là đường được bảo vệ: giám sát cho theo «Quyền, lần năm» (phán 09:40Z); mục này chuyển từ hồ sơ
+  bo-o-tim-cua-vung sang đây theo phán 12:20Z.

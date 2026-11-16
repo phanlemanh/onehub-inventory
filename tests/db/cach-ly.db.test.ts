@@ -6,8 +6,7 @@
 //      and a file that does not parse (gap-probe P1 of row 7a).
 // Every comparison returns the list of differences, so the break cases assert the exact message, not only "red".
 import { execFileSync } from "node:child_process";
-import { cpSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { cpSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -15,6 +14,7 @@ import type pg from "pg";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { scratchDb, type ScratchDb } from "./helpers";
+import { tempDir } from "../support/temp-dir";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const MODEL = join(ROOT, "ontology/entities/Agreement.yaml");
@@ -346,7 +346,7 @@ describe("isolation runner names every broken break file (E9b)", () => {
     }
   }
   function copyTests(): string {
-    const dir = mkdtempSync(join(tmpdir(), "cach-ly-tests-"));
+    const dir = tempDir("cach-ly-tests-");
     cpSync(join(ROOT, "db/tests"), dir, { recursive: true });
     return dir;
   }

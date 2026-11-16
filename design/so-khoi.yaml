@@ -169,6 +169,13 @@ khoi:
     mo_ta: Khung trang trước khi vào sàn — logo trên, một cột hẹp giữa trang không khung, chân trang một dòng
     ho_so: dang-nhap-chon-tu-reui
     duyet: 2026-11-14
+  - ten: PastePreview
+    tep: src/components/candidate/paste-preview.tsx
+    nguon: tao-tay
+    nhu_cau: xem-truoc-khi-dan
+    mo_ta: Bản xem trước một lần dán vào bảng — ô sẽ đổi (cũ → mới, bỏ chọn được từng ô), ô bị bỏ kèm lý do, ô sai kiểu; áp một lần hay thôi
+    ho_so: dan-tu-excel
+    duyet: 2026-11-15
 # Blocks made before this ledger existed, each named with the round that made it, the commit that created it and the
 # day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
 # still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).
