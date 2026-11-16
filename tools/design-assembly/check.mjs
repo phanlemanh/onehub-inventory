@@ -819,6 +819,21 @@ export function ledgerView(state) {
   });
 }
 
+// Everything that makes this step of the gate fail on a state, one line each, with the results of
+// the checks it ran. Empty means the step passes. An upgrade asks it of a state before writing.
+export function gateProblems(state) {
+  const results = runChecks(state);
+  const problems = [
+    ...results.flatMap((r) => {
+      if (r.problem) return [`${r.id}: ${r.problem}`];
+      return r.seenFailing ? [] : [`${r.id}: the check cannot fail, so it proves nothing`];
+    }),
+    ...crossProblems(state, results),
+    ...ledgerProblems(state.root, state.ledger, [...LAYERS, ...Object.keys(LAYER_ALIASES)]),
+  ];
+  return { results, problems };
+}
+
 function main() {
   const args = argv.slice(2);
   const at = args.indexOf("--target");
@@ -830,15 +845,7 @@ function main() {
     );
     exit(1);
   }
-  const results = runChecks(state);
-  const problems = [
-    ...results.flatMap((r) => {
-      if (r.problem) return [`${r.id}: ${r.problem}`];
-      return r.seenFailing ? [] : [`${r.id}: the check cannot fail, so it proves nothing`];
-    }),
-    ...crossProblems(state, results),
-    ...ledgerProblems(root, state.ledger, [...LAYERS, ...Object.keys(LAYER_ALIASES)]),
-  ];
+  const { results, problems } = gateProblems(state);
   if (args.includes("--rate")) {
     const view = ledgerView(state);
     const count = (name) => view.filter((row) => row.state === name).length;
