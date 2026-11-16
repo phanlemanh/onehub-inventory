@@ -15,11 +15,8 @@ import { UnitJump, geoSections, geoTree, savedViewsSection } from "@/modules/lis
 
 import { AccountMenu } from "./account-menu";
 import { CompanySwitch } from "./company-switch";
-import {
-  sampleBuildingPlaces,
-  sampleInventoryRows,
-  sampleSearchRows,
-} from "./inventory-sample-rows";
+import { inventorySource } from "./inventory-source";
+import { placesOf, rowsOf, searchRowsOf } from "./inventory-view";
 import { navFor, searchShownFor } from "./nav";
 import { savedViewLabels } from "./saved-view-labels";
 
@@ -27,6 +24,10 @@ import { savedViewLabels } from "./saved-view-labels";
 export default async function FrameLayout({ children }: { children: React.ReactNode }) {
   const session = await currentSession();
   const columnOpen = columnOpenFromCookie((await cookies()).get(COLUMN_COOKIE)?.value);
+  // The same read as the inventory page in this render (React cache): the search and the tree show only its rows.
+  const source = await inventorySource();
+  const data = source.kind === "ready" ? source.data : null;
+  const rows = data ? rowsOf(data) : [];
   // Read on the server so the second column, on the desktop and in the phone sheet, has them on the first paint; a
   // save, rename or removal refreshes the page (row 2c).
   const nav = navFor({
@@ -35,7 +36,7 @@ export default async function FrameLayout({ children }: { children: React.ReactN
       : null,
     // The inventory by place (row 2d): one group per project, its complexes and buildings, read from the grid's rows.
     geography: session
-      ? geoSections(geoTree(sampleInventoryRows(), sampleBuildingPlaces()), {
+      ? geoSections(geoTree(rows, data ? placesOf(data) : []), {
           all: FRAME_COPY.secondColumn.all,
           emptyTitle: label("Subdivision"),
           empty: `Chưa có ${label("Unit").toLocaleLowerCase("vi")} nào trên ${label("Inventory")}.`,
@@ -63,7 +64,7 @@ export default async function FrameLayout({ children }: { children: React.ReactN
           search={
             canSearch ? (
               <UnitJump
-                rows={sampleSearchRows()}
+                rows={searchRowsOf(rows)}
                 words={{
                   unit: label("Unit"),
                   building: label("Building"),

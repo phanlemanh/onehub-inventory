@@ -1,0 +1,229 @@
+schema_version: 1
+feature_slug: bang-hang-du-lieu-that
+# Ma trận viết trước:
+#   AC-1: 2 bảng × (bật RLS, ép RLS, 4 luật theo sàn, luật thu hẹp đọc, luật thu hẹp sửa) = 2 × 7 = 14 dấu, hằng 14 ghim;
+#         3 luật dữ liệu (Đã bán thiếu giá chốt/ngày, Ngừng hẳn thiếu lý do, căn thứ hai đang mở) = 3 ca từ chối.
+#   AC-5: 4 vai × 3 loại căn (mình giữ, chưa ai giữ, người khác giữ) × 4 loại thay đổi (giá, điều kiện phí, nấc khác,
+#         Đang bán) = 48 ô; mỗi ô ghim mã 200 hay 403 và «dòng không đổi» khi 403. Đáp án viết ở S2 theo câu trả lời Hỏi-1,
+#         Hỏi-2 của Cổng Phạm vi, TRƯỚC mã, ở tests/db/bang-hang-that.db.test.ts; hằng 48 ghim.
+#   AC-8: 4 trạng thái × 4 khổ × 2 chế độ màu = 32 khung (E8-ui chụp đủ 32); trạng thái thứ năm «Không đủ quyền» đo bằng
+#         máy, ca khong-du-quyen-tren-man (chủ kho chọn 2026-11-16).
+# Bài và ca (tên ca là thông điệp ghim):
+#   tests/db/bang-hang-that.db.test.ts: cach-ly-hai-bang · luat-du-lieu-ba-ca · doc-dung-san · doi-san-chi-con-san-moi ·
+#     ghi-gia-tang-phien-ban · bang-quyen-48-o · loi-doc-that · xung-dot-phien-ban · hoan-tac-giu-trang-thai · dieu-kien-phi-luu ·
+#     nam-nghin-can
+#   src/modules/listings/listings-http.test.ts: ma-loi-co-dinh · mot-loai-thay-doi · 409-mang-ban-hien-tai
+#   tests/bang-hang-that.test.ts: khong-con-mau-trong-trang · khong-con-vai-thay-phien · doc-hong-co-ten
+#   tests/mot-lan-doc.test.tsx: mot-lan-doc-moi-luot
+#   tests/bang-hang-khong-du-quyen.test.tsx: khong-du-quyen-tren-man
+#   tests/e2e-db/bang-hang-that.spec.ts (bốn khổ): thay-can-cua-san · cmdk-va-cay-theo-san · sua-gia-tai-lai-con ·
+#     dang-ban-chi-nguoi-giu · xung-dot-tai-o · hoan-tac-chi-gia · dieu-kien-phi-tren-o · chua-dang-nhap-ve-dang-nhap · nam-trang-thai ·
+#     chuot-giua-the-moi · axe-sang-toi
+# Cặp phá thử (bản sao; ca tương ứng phải đỏ với thông điệp ghim):
+#   pha-thu-bo-ep-rls (bỏ force row level security trên listings)       → «cach-ly-hai-bang: listings»
+#   pha-thu-bo-check-da-ban (gỡ ràng buộc Đã bán)                         → «luat-du-lieu-ba-ca: Closed thiếu giá chốt»
+#   pha-thu-activate-moi-nguoi (activateListing mở toàn sàn cho Đầu chủ) → «bang-quyen-48-o: ListAgent·người khác·Active»
+#   pha-thu-bo-version (PATCH bỏ so phiên bản)                            → «xung-dot-phien-ban: ghi đè»
+#   pha-thu-doc-mau (trang đọc lại sampleInventoryRows)                   → «khong-con-mau-trong-trang: page.tsx»
+#   pha-thu-doc-hai-lan (khung đọc riêng không qua cache)                 → «mot-lan-doc-moi-luot: 2 lần»
+#   pha-thu-vai-thay-phien (trả lại ?vai=)                                → «khong-con-vai-thay-phien»
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.cach_ly_r
+    paths: [db/**]
+    expected: "exit 0; bộ cách ly liệt listings và listing_units trong bảng của sàn, đủ 14 dấu. Chiều đỏ: pha-thu-bo-ep-rls đỏ với «listings»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E1b
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.bang_hang_that_db
+    layer: backend-effect
+    paths: [db/**, src/modules/listings/**, tests/db/bang-hang-that.db.test.ts]
+    expected: "exit 0; ca 'cach-ly-hai-bang' (phiên sàn B đọc, sửa căn sàn A theo id: 0 dòng thấy, 0 dòng đổi) và 'luat-du-lieu-ba-ca' (ba lần ghi sai luật bị từ chối). Chiều đỏ: pha-thu-bo-check-da-ban → «luat-du-lieu-ba-ca: Closed thiếu giá chốt»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.bang_hang_that_db
+    layer: backend-effect
+    paths: [db/**, src/modules/listings/**, tests/db/bang-hang-that.db.test.ts]
+    expected: "exit 0; ca 'loi-doc-that' (vai nối mất quyền select trên listings: myInventory trả unreadable, không ném) và 'doc-dung-san' (myInventory của [MAU] trả đúng số căn đang chào của [MAU], kèm giá trị trường riêng) và 'doi-san-chi-con-san-moi'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2b
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.bang_hang_that_unit
+    paths: [src/app/(app)/**, src/modules/listings/**, tests/bang-hang-that.test.ts, tests/bang-hang-khong-du-quyen.test.tsx]
+    expected: "exit 0; ca 'khong-con-mau-trong-trang': dưới src/app chỉ đúng một hàm nguồn hàng gọi bộ mẫu, và hàm ấy trả bộ mẫu chỉ khi không cấu hình cơ sở dữ liệu và không phải bản chạy thật (bảng bốn ca: có/không cơ sở dữ liệu × chạy thật/dev; đúng một ca ra mẫu). Chiều đỏ: pha-thu-doc-mau → «khong-con-mau-trong-trang: page.tsx». Và ca 'khong-du-quyen-tren-man' (AC-8, trạng thái thứ năm đo bằng máy): trang Bảng hàng dựng như máy chủ dựng, cửa đọc trả «forbidden» → màn chỉ có khối «Không đủ quyền» (tiêu đề chung của khung), không vùng hàng, không mã căn nào. Chiều đỏ: pha-thu-khong-du-quyen → «khong-du-quyen-tren-man: tiêu đề …»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2-ui
+    criterion: AC-2
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3482/inventory
+    paths: [src/app/(app)/**, src/modules/listings/ui/**]
+    steps:
+      - "With the lane R dev server on port 3482 against the lane R Postgres seeded by the row's load command, sign in as the [MAU] ListAgent, open /inventory at 1440 wide, save _acceptance/bang-hang-du-lieu-that/evidence/E2-mau-1440.png"
+      - "Switch company to [MAU-2] in the App Shell account menu, save _acceptance/bang-hang-du-lieu-that/evidence/E2-mau2-1440.png"
+    question: "Khung một có hiện các căn của [MAU] với dòng tổng «n / N căn», khung hai chỉ còn các căn của [MAU-2] (toà, mã khác hẳn) không? Nêu căn nào lẫn sàn."
+    expected: "Hai khung khác bộ căn, không căn nào lẫn sàn"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.bang_hang_that_e2e
+    paths: [src/app/(app)/**, src/modules/listings/**, src/components/templates/app-shell/**, tests/e2e-db/bang-hang-that.spec.ts]
+    expected: "exit 0; ca 'cmdk-va-cay-theo-san' (gợi ý ⌘K và nút cây không có toà nào của [MAU-2]; toà không còn căn không hiện; mục cây không mang chữ số) và 'chuot-giua-the-moi'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3b
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.bang_hang_that_unit
+    paths: [src/app/(app)/**, src/modules/listings/**, tests/bang-hang-that.test.ts]
+    expected: "exit 0; ca 'mot-lan-doc-moi-luot': một lượt dựng khung và trang Bảng hàng gọi cửa đọc căn chào đúng một lần. Chiều đỏ: pha-thu-doc-hai-lan → «mot-lan-doc-moi-luot: 2 lần»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.bang_hang_that_db
+    layer: backend-effect
+    paths: [db/**, src/modules/listings/**, src/app/api/v1/listings/**, tests/db/bang-hang-that.db.test.ts]
+    expected: "exit 0; ca 'ghi-gia-tang-phien-ban': PATCH giá 2.800.000.000 với phiên bản đúng → 200, dòng trong bảng có giá mới, phiên bản +1, last_confirmed_at đổi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4b
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.bang_hang_that_e2e
+    paths: [src/modules/listings/**, src/app/(app)/inventory/**, tests/e2e-db/bang-hang-that.spec.ts]
+    expected: "exit 0; ca 'sua-gia-tai-lai-con': gõ «2,8 tỷ» trên ô, đúng một yêu cầu PATCH, tải lại và phiên thứ hai vẫn thấy 2,8 tỷ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.bang_hang_that_db
+    layer: backend-effect
+    paths: [db/**, src/modules/listings/**, src/app/api/v1/listings/**, tests/db/bang-hang-that.db.test.ts]
+    expected: "exit 0; ca 'bang-nac-24-o' duyệt đủ 24 ô viết trước ở API và cơ sở dữ liệu. Chiều đỏ: pha-thu-activate-moi-nguoi → «bang-quyen-48-o: ListAgent·người khác·Active»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5b
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.bang_hang_that_e2e
+    paths: [src/modules/listings/ui/**, tests/e2e-db/bang-hang-that.spec.ts]
+    expected: "exit 0; ca 'dang-ban-chi-nguoi-giu': ô Trạng thái của căn người khác giữ không có nấc Đang bán; hồ sơ căn hiện tên người giữ hay «Chưa ai giữ»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.bang_hang_that_db
+    layer: backend-effect
+    paths: [db/**, src/modules/listings/**, src/app/api/v1/listings/**, tests/db/bang-hang-that.db.test.ts]
+    expected: "exit 0; ca 'xung-dot-phien-ban' (PATCH phiên bản cũ → 409 kèm bản hiện tại, dòng không đổi) và 'hoan-tac-giu-trang-thai'. Chiều đỏ: pha-thu-bo-version → «xung-dot-phien-ban: ghi đè»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6b
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.bang_hang_that_e2e
+    paths: [src/modules/listings/ui/**, tests/e2e-db/bang-hang-that.spec.ts]
+    expected: "exit 0; ca 'xung-dot-tai-o' (phiên hai nhận câu xung đột tại ô, ô hiện giá trị mới nhất) và 'hoan-tac-chi-gia' (đổi giá, đổi trạng thái, Hoàn tác lần đổi giá: yêu cầu PATCH chỉ mang loại thay đổi giá trên phiên bản mới nhất, ô Trạng thái và dòng trong bảng giữ trạng thái mới, giá về cũ; đối chứng: Hoàn tác lần đổi trạng thái thì trạng thái về cũ). Chiều đỏ: hoàn tác gửi lại cả bản ghi cũ → «hoan-tac-chi-gia: trạng thái cũ»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.bang_hang_that_e2e
+    paths: [src/modules/listings/**, src/app/(app)/**, tests/e2e-db/bang-hang-that.spec.ts]
+    expected: "exit 0; ca 'dieu-kien-phi-tren-o': đổi Bao phí → Không bao phí, Về tay của dòng đổi, tải lại vẫn giữ; Quản trị sàn (chỉ xem) chọn đúng ô Điều kiện phí, F2 không mở ô sửa; đối chứng: Đầu chủ làm đúng các bước ấy trên cùng căn thì ô mở với hai lựa chọn"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7b
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.bang_hang_that_db
+    layer: backend-effect
+    paths: [db/**, src/modules/listings/**, tests/db/bang-hang-that.db.test.ts]
+    expected: "exit 0; ca 'dieu-kien-phi-luu': PATCH điều kiện phí lưu fee_inclusion, phiên bản +1"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.bang_hang_that_e2e
+    paths: [src/app/(app)/inventory/**, src/components/candidate/**, tests/e2e-db/bang-hang-that.spec.ts]
+    expected: "exit 0 ở bốn khổ; ca 'nam-trang-thai' (chờ tải, trống trên sàn [MAU-TRONG], lỗi có Tải lại khi cửa đọc thật trả không đọc được — không dùng công tắc ?state=, không khớp có Xoá lọc; «Không đủ quyền» không vai thật nào gặp từ Hỏi-1 A, đo bằng ca máy khong-du-quyen-tren-man của E2b theo chữ chủ kho 2026-11-16) và 'axe-sang-toi' không lỗi nghiêm trọng. Chiều đỏ: myInventory ném lỗi thay vì trả unreadable → «nam-trang-thai: lỗi» (trang lỗi chung của Next)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8-ui
+    criterion: AC-8
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3482/inventory
+    paths: [src/app/(app)/inventory/**, src/components/candidate/**]
+    steps:
+      - "With the lane R dev server on port 3482, signed in as the [MAU] ListAgent, open /inventory with ?state=loading, ?state=error, an empty company ([MAU-TRONG]) and a column filter that matches nothing, at 1440, 1024, 414 and 360 wide, light and dark (32 frames); save each frame as _acceptance/bang-hang-du-lieu-that/evidence/E8-<trạng thái>-<khổ>-<sang|toi>.png. No frame of «Không đủ quyền»: no real role meets it on this screen since Hỏi-1 A; the owner chose on 2026-11-16 to measure it by the machine test only (tests/bang-hang-khong-du-quyen.test.tsx khong-du-quyen-tren-man, eval E2b), recorded as a known limit."
+    question: "Mỗi khung có đúng trạng thái của vùng (chờ tải, trống với câu của màn, lỗi có Tải lại, không khớp có Xoá lọc), cùng dáng với các màn họ Lưới đã gộp, chữ đọc được ở cả hai chế độ màu không? Nêu khung nào lệch."
+    expected: "Mọi khung đúng trạng thái và đúng dáng họ Lưới"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.bang_hang_that_unit
+    paths: [src/**, tests/bang-hang-that.test.ts]
+    expected: "exit 0; ca 'khong-con-vai-thay-phien': tham số vai chỉ được đọc ở hàm nguồn hàng và chỉ thay vai khi không cấu hình cơ sở dữ liệu (bảng bốn ca như E2b; đúng một ca thay vai). Chiều đỏ: pha-thu-vai-thay-phien → «khong-con-vai-thay-phien»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9b
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.bang_hang_that_e2e
+    paths: [src/app/(app)/**, tests/e2e-db/bang-hang-that.spec.ts]
+    expected: "exit 0; ca 'chua-dang-nhap-ve-dang-nhap': /inventory và /inventory?vai=TeamLead không phiên → trang đăng nhập; Quản trị sàn theo Hỏi-1"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.bang_hang_that_db
+    layer: backend-effect
+    paths: [db/**, src/modules/listings/**, tests/db/bang-hang-that.db.test.ts]
+    expected: "exit 0; ca 'nam-nghin-can': 5.000 căn một sàn, myInventory dưới 1.500 ms (in số đo), sàn khác vẫn 0 căn lẫn"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10b
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.bang_hang_that_e2e
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/bang-hang-that.spec.ts]
+    expected: "exit 0; ca 'cuon-nam-nghin' (khổ 1440): trang 5.000 căn cuộn tới dòng cuối, không lỗi trong console"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8-khuon
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8-floor
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.design.floor
+    paths: ["src/app/(app)/inventory/**", "src/modules/listings/ui/**"]
+    expected: "exit 0; không hex thô trên tệp giao diện vòng chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

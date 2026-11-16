@@ -2,21 +2,17 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/templates/page-header";
-import { PageState } from "@/components/templates/page-state";
+import { PageState, loginHref } from "@/components/templates/page-state";
 import { customColumnsOf, label, labelOverrides } from "@/modules/company-config";
 import { myCompanyLayer, myFeeSchedule } from "@/modules/company-config/server";
-import { isRole } from "@/modules/identity";
+import { allowedScope } from "@/modules/identity";
 import { currentSession } from "@/modules/identity/server";
 import { SessionRoles } from "@/modules/identity/ui";
 import { mySavedView, mySavedViews } from "@/modules/listings/server";
 
-import {
-  sampleBuildingPlaces,
-  sampleInventoryListings,
-  sampleInventoryRows,
-  sampleRecords,
-} from "../inventory-sample-rows";
 import { feeHeaders, withFees } from "../inventory-fees";
+import { inventorySource, standInRole } from "../inventory-source";
+import { placesOf, recordsOf, rowsOf } from "../inventory-view";
 import { entryAction, entryRefused, NAV } from "../nav";
 import { savedViewLabels } from "../saved-view-labels";
 import {
@@ -112,20 +108,35 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 const first = (value: string | string[] | undefined): string | undefined =>
   Array.isArray(value) ? value[0] : value;
 
-/** Inventory, read-only: the sample company's listings (roadmap row 1) on the shared grid. */
+/** Where this request came from, so the sign-in page brings the person back to it. */
+function hereOf(query: Record<string, string | string[] | undefined>): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    const v = first(value);
+    if (v !== undefined) params.set(key, v);
+  }
+  const q = params.toString();
+  return q ? `/inventory?${q}` : "/inventory";
+}
+
+/** Inventory: the signed-in company's listings (row 10), or the sample company where no database is configured. */
 export default async function Page({ searchParams }: Props) {
   const query = await searchParams;
   const state = first(query.state);
-  const vai = first(query.vai);
-  // The screen's entry rule, before any listing is read (row 2b, AC-9): a role the register keeps out sees «not
-  // allowed» at every width, the same block as the members page (row 9b). The session is read only when the register
-  // gates the screen; today it lets every staff role in (`vao: null`), so the page reads nothing more than before.
+  const source = await inventorySource();
+  // With a database there is no stand-in: no session goes to sign-in, whatever ?vai= says (row 10, AC-9).
+  if (source.kind === "signed-out") redirect(loginHref(hereOf(query)));
+  const live = source.kind !== "ready" || source.live;
+  const vai = standInRole(source, first(query.vai), process.env.NODE_ENV);
+  // The screen's entry rule, before any listing is shown (row 2b, AC-9): a role the register keeps out sees «not
+  // allowed» at every width, the same block as the members page (row 9b); so does a role without viewListings.
+  if (source.kind === "forbidden") return <PageState kind="forbidden" homeHref="/" />;
   if (entryAction(NAV, "/inventory") !== undefined) {
     const session = await currentSession();
-    const byAddress = process.env.NODE_ENV !== "production" && vai !== undefined && isRole(vai);
-    const roles = session ? session.roles : byAddress ? [vai] : [];
+    const roles = session ? session.roles : vai ? [vai] : [];
     if (entryRefused(NAV, "/inventory", roles)) return <PageState kind="forbidden" homeHref="/" />;
   }
+  const data = source.kind === "ready" ? source.data : null;
   // A status shortcut opens the grid filtered (row 2a).
   const status = first(query.status);
   // A saved view opens by its own address (row 2c): gone, or someone else's, opens every unit with a sentence.
@@ -144,11 +155,14 @@ export default async function Page({ searchParams }: Props) {
   const savedViews = listed === "unreadable" ? [] : listed;
   const viewLabels = savedViewLabels();
   const viewCopy = savedViewCopy(viewLabels);
-  const listings = sampleInventoryListings();
-  // Development only: `?mau=bien` adds edge rows (row 2b) so the phone cards can be measured with long codes and prices.
-  // Net to seller under the company's fee schedule (row 19); no readable schedule leaves the column empty.
+  const listings = data?.current ?? [];
+  // Development only, on the sample company: `?mau=bien` adds edge rows (row 2b) so the phone cards can be measured with
+  // long codes and prices. Net to seller under the company's fee schedule (row 19); no readable schedule leaves it empty.
   const rows = withFees(
-    [...sampleInventoryRows(), ...inventoryEdgeRowsFrom(first(query.mau), process.env.NODE_ENV)],
+    [
+      ...(data ? rowsOf(data) : []),
+      ...(live ? [] : inventoryEdgeRowsFrom(first(query.mau), process.env.NODE_ENV)),
+    ],
     listings,
     fees?.items ?? null,
   );
@@ -172,7 +186,7 @@ export default async function Page({ searchParams }: Props) {
   // status shortcut and the search's column filter fill the column filters the grid opens with.
   // A place of the geography tree (row 2d) fills the project and building filters with whole names.
   const places = ([] as string[]).concat(query[GEO_PARAM] ?? []);
-  const tree = geoTree(rows, sampleBuildingPlaces());
+  const tree = geoTree(rows, data ? placesOf(data) : []);
   const geo = geoFiltersFor(tree, places);
   const filters =
     openView || missing
@@ -181,15 +195,19 @@ export default async function Page({ searchParams }: Props) {
   // A shared link (row 3f) to a listing no longer on the inventory: the grid opens as usual and says why.
   const asked = first(query["ho-so"]);
   const stale = asked !== undefined && !rows.some((row) => row.id === asked);
-  // Without a signed-in session, outside production, ?vai=<role> stands in for the session's role, so the browser
-  // tests and the screenshots of row 4 can open the cells the permission table gives that role. A real session wins.
-  const standIn =
-    process.env.NODE_ENV !== "production" &&
-    vai !== undefined &&
-    isRole(vai) &&
-    (await currentSession()) === null
-      ? [vai]
-      : null;
+  // On the sample company only (no database, outside production), ?vai=<role> stands in for the session's role, so the
+  // browser tests and the screenshots of row 4 can open the cells the permission table gives that role.
+  const standIn = vai ? [vai] : null;
+  // Moving a status cell to Active needs activateListing: own scope offers it on one's own unit or one nobody keeps.
+  const activate = live
+    ? allowedScope((await currentSession())?.roles ?? [], "activateListing")
+    : "company";
+  const noActivate =
+    activate === "company"
+      ? []
+      : listings
+          .filter((l) => activate === null || data?.keepers[l.id]?.kind === "other")
+          .map((l) => l.id);
   const page = (
     <>
       <PageHeader title={openView ? openView.name : label("Inventory")} />
@@ -219,13 +237,22 @@ export default async function Page({ searchParams }: Props) {
         rows={rows}
         listings={listings}
         editLabels={cellEditLabels((concept, transaction) => label(concept, { transaction }))}
-        state={inventoryStateFrom(state, process.env.NODE_ENV)}
+        state={
+          source.kind === "unreadable" ? "error" : inventoryStateFrom(state, process.env.NODE_ENV)
+        }
+        live={live}
+        readFailed={source.kind === "unreadable"}
+        noActivate={noActivate}
         emptyWhy={`${label("Company")} chưa có ${label("Unit").toLocaleLowerCase("vi")} nào đang chào trên ${label("Inventory")}.`}
         reloadLabel="Tải lại"
         filters={filters}
         geoTree={tree}
         staleLinkNote={stale ? ENTRY_COPY.staleLink(label("Unit"), label("Inventory")) : undefined}
-        fullRecord={{ records: sampleRecords(new Date()), labels: RECORD_LABELS }}
+        fullRecord={{
+          records: data ? recordsOf(data, new Date()) : {},
+          labels: RECORD_LABELS,
+          keepers: data?.keepers,
+        }}
       />
     </>
   );

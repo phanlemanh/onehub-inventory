@@ -14,6 +14,7 @@ import pg from "pg";
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
 import { label } from "../../src/modules/company-config";
 import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
+import { companyListingId, seedSampleInventory } from "../db/can-mau";
 import { SAMPLE_COMPANY, buildSampleListings, sampleKeeperOf } from "../../src/modules/listings";
 import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { ASK_COPY } from "../../src/modules/listings/ui/ask-copy";
@@ -28,6 +29,9 @@ const mobile = (info: TestInfo) => Number(info.project.name) < 768;
 // ---- people and sample rows ------------------------------------------------------------------------------------
 
 let owner: pg.Client;
+// Row 10: the inventory is the signed-in company's, loaded from the sample; a sample row's id in that company.
+let current = "";
+const real = (sampleId: string) => companyListingId(current, sampleId);
 test.beforeAll(async () => {
   owner = new pg.Client({ connectionString: DB_URL });
   await owner.connect();
@@ -53,6 +57,8 @@ async function person(info: TestInfo, tag: string, roles: string[]): Promise<str
     "insert into company_members (company_id, user_id, name, roles) values ($1, $2, $3, $4)",
     [company, id, `[Tên] ${tag}`, roles],
   );
+  await seedSampleInventory(owner, company, { id, name: `[Tên] ${tag}` });
+  current = company;
   return email;
 }
 
@@ -121,7 +127,8 @@ const shared = (page: Page) =>
     () => (window as unknown as { __shared: { text: string; url: string }[] }).__shared,
   );
 
-async function openRecord(page: Page, id: string) {
+async function openRecord(page: Page, sampleId: string) {
+  const id = real(sampleId);
   await page.goto(`/inventory?ho-so=${encodeURIComponent(id)}`);
   await expect(page.locator(`[data-slot="record-panel"][data-record-id="${id}"]`)).toBeVisible();
 }
@@ -213,14 +220,14 @@ test("E2b · the shared link opens the same unit's record", async ({ page }, inf
   const calls = await shared(page);
   expect(calls).toHaveLength(1);
   expect(calls[0]!.text).toContain(String(row["Listing.unitNumber"]));
-  expect(await linkOpens(page, calls[0]!.url, row.id)).toBeNull();
+  expect(await linkOpens(page, calls[0]!.url, real(row.id))).toBeNull();
   // Break: the first row's link instead of this one's.
   const other = ROWS.find((r) => r.id !== row.id)!;
   expect(
     await linkOpens(
       page,
-      calls[0]!.url.replace(encodeURIComponent(row.id), encodeURIComponent(other.id)),
-      row.id,
+      calls[0]!.url.replace(encodeURIComponent(real(row.id)), encodeURIComponent(real(other.id))),
+      real(row.id),
     ),
   ).toBe("link opens another unit");
 });
@@ -245,7 +252,7 @@ test("E5b · no bar on the viewer's own unit; «Sau» to someone else's brings i
   await frame(page, info, "minh-giu", "light");
   await page.getByRole("button", { name: /Sau/ }).click();
   await expect(
-    page.locator(`[data-slot="record-panel"][data-record-id="${next.id}"]`),
+    page.locator(`[data-slot="record-panel"][data-record-id="${real(next.id)}"]`),
   ).toBeVisible();
   const button = page.locator('[data-slot="ask-list-agent"]');
   await expect(button).toHaveText(`${ASK} · ${keeperName(next.id)}`);
@@ -253,12 +260,16 @@ test("E5b · no bar on the viewer's own unit; «Sau» to someone else's brings i
   expect(`${ASK} · ${keeperName(next.id)}`).not.toBe(`${ASK} · ${sampleKeeperOf(own.id)?.kind}`);
 });
 
-test("company admin: no ask bar, the report button stays", async ({ page }, info) => {
+test("company admin: reads the record and asks its keeper (row 10, Hỏi-1 A)", async ({
+  page,
+}, info) => {
   test.skip(info.project.name !== "1440", "do o 1440");
   await signIn(page, await person(info, "ad", ["CompanyAdmin"]), "/");
-  await page.goto(`/inventory?ho-so=${encodeURIComponent(rowKept("other").id)}`);
-  // The admin may not view listings: the region says so and no record opens (row 3).
-  await expect(page.locator('[data-slot="record-footer"]')).toHaveCount(0);
+  await page.goto(`/inventory?ho-so=${encodeURIComponent(real(rowKept("other").id))}`);
+  // Since row 10 the admin reads the inventory: the record opens with its keeper's name.
+  await expect(page.locator('[data-slot="ask-list-agent"]')).toHaveText(
+    `${ASK} · ${keeperName(rowKept("other").id)}`,
+  );
 });
 
 test("a unit nobody keeps: the button is off and says why", async ({ page }, info) => {

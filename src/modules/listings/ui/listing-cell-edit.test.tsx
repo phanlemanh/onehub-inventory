@@ -199,9 +199,10 @@ describe("ngay-ban-mac-dinh", () => {
 });
 
 describe("locked reasons", () => {
-  it("Closed locks price and status, Withdrawn only status, Active nothing", () => {
+  it("Closed locks price, fee inclusion (row 10) and status, Withdrawn only status, Active nothing", () => {
     expect(Object.keys(lockedReasons(row({ "Listing.standardStatus": "Closed" })) ?? {})).toEqual([
       "Listing.listPrice",
+      "Listing.feeInclusion",
       "Listing.standardStatus",
     ]);
     expect(

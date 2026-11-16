@@ -87,6 +87,18 @@ export async function currentSession(): Promise<CurrentSession | null> {
   }
 }
 
+/**
+ * Whether this server runs with a database (row 10, Hỏi-6). A configuration that cannot be read counts as configured, so
+ * a broken server says it cannot read rather than falling back to the sample data.
+ */
+export function databaseConfigured(): boolean {
+  try {
+    return liveDeps() !== null;
+  } catch {
+    return true;
+  }
+}
+
 /** The pool of the running server, or null when the database is not configured here; a bad configuration throws. */
 function livePool(): DbPool | null {
   return liveDeps()?.pool ?? null;

@@ -1,0 +1,7 @@
+{
+  "feature_plain": "Bảng hàng, hồ sơ căn, ô ⌘K và cây địa lý nay đọc căn thật của sàn đang đăng nhập; sửa giá, trạng thái và Điều kiện phí trên ô ghi thật qua /api/v1 theo bảng quyền từng vai.",
+  "will_do": [],
+  "wont_do": [],
+  "decisions": [],
+  "analyst_plain": "Hai phép đo về khuôn và sàn thiết kế không phân biệt được bản đúng với bản sai ở vòng này (chúng xanh cả trên nhánh chính); kết quả của chúng không chứng minh thêm gì cho hàng 10."
+}

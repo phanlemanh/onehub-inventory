@@ -8,6 +8,7 @@ import type { TypedColumn } from "@/components/candidate/column-kind";
 import Image from "next/image";
 import type { ReactNode } from "react";
 
+import type { Keeper } from "../inventory-data";
 import { sampleKeeperOf } from "../sample";
 import { AskListAgent } from "./ask-list-agent";
 import type { AskWords } from "./ask-copy";
@@ -298,6 +299,8 @@ export function reportFieldsOf(view: ListingView): { name: string; shown: string
 export interface FullRecordInput {
   records: Readonly<Record<string, ListingRecordData>>;
   labels: RecordLabels;
+  /** Who keeps each listing, as the viewer sees it (row 10); absent, the sample keepers of row 3e. */
+  keepers?: Readonly<Record<string, Keeper>>;
 }
 
 /**
@@ -351,7 +354,7 @@ export function listingRecord(
           <AskListAgent
             key={view.id}
             listing={{ id: view.id, unitNumber: view.unitNumber, buildingName: building }}
-            keeper={sampleKeeperOf(view.id)}
+            keeper={full?.keepers ? (full.keepers[view.id] ?? null) : sampleKeeperOf(view.id)}
             words={words}
           />
         ) : undefined,

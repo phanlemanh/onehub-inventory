@@ -2,8 +2,17 @@ import "server-only";
 
 // Server API of the listings module. Saved views (row 2c) go through the identity module's shared action door and its
 // query door, withCompany; nothing here reads a session or a table by itself.
-import { actionDoor, sessionDoor, withCompany } from "@/modules/identity/server";
+import {
+  actionDoor,
+  sessionDoor,
+  withCompany,
+  type DoorError,
+  type OpenedDoor,
+} from "@/modules/identity/server";
 
+import type { InventoryData } from "./inventory-data";
+import { readInventory } from "./inventory-read";
+import { createListingsHandlers, type ListingsHandlers } from "./listings-http";
 import type { SavedView, SavedViewScreen } from "./saved-view";
 import { listSavedViews, readSavedView, type RunAs } from "./saved-views";
 import { createSavedViewsHandlers, type SavedViewsHandlers } from "./saved-views-http";
@@ -14,7 +23,54 @@ export {
   type SavedViewsHandlers,
 } from "./saved-views-http";
 
+export { createListingsHandlers, type ListingsDeps, type ListingsHandlers } from "./listings-http";
+
 let handlers: SavedViewsHandlers | undefined;
+let listingHandlers: ListingsHandlers | undefined;
+
+/** The handlers behind /api/v1/listings (row 10). */
+export function listingsHandlers(): ListingsHandlers {
+  listingHandlers ??= createListingsHandlers({ door: actionDoor, withCompany });
+  return listingHandlers;
+}
+
+/** What the inventory read gives a screen: the company's inventory, or why there is none to show. */
+export type MyInventory =
+  | { kind: "ready"; data: InventoryData }
+  | { kind: "signed-out" }
+  | { kind: "forbidden" }
+  | { kind: "unreadable" };
+
+/**
+ * The signed-in company's inventory (row 10), through the shared door with viewListings and withCompany. No session is
+ * «signed-out»; a role that may not view listings is «forbidden»; a database that cannot be read is «unreadable» — never
+ * a throw, so the screen shows its error state with «Tải lại».
+ */
+export async function myInventory(): Promise<MyInventory> {
+  try {
+    return await inventoryThrough(await sessionDoor("viewListings"), withCompany);
+  } catch (err) {
+    console.error("[bang-hang] không đọc được:", err instanceof Error ? err.message : "không rõ");
+    return { kind: "unreadable" };
+  }
+}
+
+/** The inventory read through a door already opened with viewListings; the database tests call it directly. */
+export async function inventoryThrough(
+  door: OpenedDoor | DoorError,
+  run: typeof withCompany,
+): Promise<MyInventory> {
+  try {
+    if (door === "server-error") return { kind: "unreadable" };
+    if (door === "unauthenticated") return { kind: "signed-out" };
+    if (door === "forbidden") return { kind: "forbidden" };
+    const data = await run(door.pool, door.ctx, (c) => readInventory(c, door.ctx.userId));
+    return { kind: "ready", data };
+  } catch (err) {
+    console.error("[bang-hang] không đọc được:", err instanceof Error ? err.message : "không rõ");
+    return { kind: "unreadable" };
+  }
+}
 
 /** The handlers behind /api/v1/saved-views. */
 export function savedViewsHandlers(): SavedViewsHandlers {
@@ -55,3 +111,6 @@ export async function mySavedView(id: string): Promise<SavedView | null> {
     return null;
   }
 }
+
+// Row 10: statements that load a company's listings, run by the table owner (development machine, tests).
+export { listingLoadStatements, type Statement as ListingStatement } from "./load-sql";

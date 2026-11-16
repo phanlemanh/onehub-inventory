@@ -1,0 +1,589 @@
+Bỏ qua tới nội dung chính
+Hôm nay
+Bảng hàng
+Đã gửi
+Tuỳ chỉnh của sàn
+Toggle Sidebar
+[MAU]
+Gõ mã căn…
+⌘K
+T
+Bảng hàng
+Tất cả hàng
+Theo trạng thái
+Chưa đủ để rao
+Đang bán
+Đang giao dịch
+Đã bán
+Tạm ngừng
+Ngừng hẳn
+Vinhomes Ocean Park 1
+Tất cả
+The Sapphire 1
+S1.01
+S1.02
+S1.03
+S1.05
+Vinhomes Ocean Park 2 – The Empire
+Tất cả
+[MAU] Toà E1
+Vinhomes Ocean Park 3 – The Crown
+Tất cả
+[MAU] Toà C1
+Góc nhìn của tôi
+
+Chưa có góc nhìn nào. Lọc, sắp xếp hay ẩn cột rồi bấm «Lưu góc nhìn».
+
+Bảng hàng
+Hàng
+60 dòng
+Nhóm theo Toà
+Cột
+Toàn màn hình
+Lưu góc nhìn
+#
+Căn
+
+Toà
+
+Dự án
+
+Trạng thái
+Chọn
+
+Giá chào
+
+Về tay
+
+Diện tích
+
+Phòng ngủ
+
+Xác nhận lúc
+
+1
+0905
+
+S1.01
+
+Vinhomes Ocean Park 1
+
+Đang giao dịch
+
+5,71 tỷ
+
+5,51 tỷ
+
+96,8 m²
+
+3
+
+09:00 01/11/2026
+
+2
+1101
+
+S1.01
+
+Vinhomes Ocean Park 1
+
+Đang bán
+
+2,71 tỷ
+
+2,62 tỷ
+
+54,2 m²
+
+1
+
+09:00 02/11/2026
+
+3
+1202
+
+S1.01
+
+Vinhomes Ocean Park 1
+
+Chưa đủ để rao
+
+4,32 tỷ
+
+4,32 tỷ
+
+68,5 m²
+
+2
+
+09:00 03/11/2026
+
+4
+1303
+
+S1.01
+
+Vinhomes Ocean Park 1
+
+Đang bán
+
+5,03 tỷ
+
+4,85 tỷ
+
+75 m²
+
+2
+
+09:00 04/11/2026
+
+5
+1603
+
+S1.01
+
+Vinhomes Ocean Park 1
+
+Đang bán
+
+4,28 tỷ
+
+—
+
+75 m²
+
+2
+
+09:00 05/11/2026
+
+6
+1604
+
+S1.01
+
+Vinhomes Ocean Park 1
+
+Chưa đủ để rao
+
+6,17 tỷ
+
+6,17 tỷ
+
+82,3 m²
+
+2
+
+09:00 06/11/2026
+
+7
+0601
+
+S1.02
+
+Vinhomes Ocean Park 1
+
+Tạm ngừng
+
+3,36 tỷ
+
+3,24 tỷ
+
+54,2 m²
+
+1
+
+09:00 07/11/2026
+
+8
+0602
+
+S1.02
+
+Vinhomes Ocean Park 1
+
+Chưa đủ để rao
+
+3 tỷ
+
+2,9 tỷ
+
+68,5 m²
+
+2
+
+09:00 08/11/2026
+
+9
+0606
+
+S1.02
+
+Vinhomes Ocean Park 1
+
+Ô đang khoá: Đã bán là nấc cuối
+Đã bán
+
+Ô đang khoá: Đã bán — giữ nguyên như lúc bán
+6,73 tỷ
+
+6,73 tỷ
+
+110,4 m²
+
+3
+
+09:00 09/11/2026
+
+10
+0701
+
+S1.02
+
+Vinhomes Ocean Park 1
+
+Tạm ngừng
+
+3,14 tỷ
+
+—
+
+54,2 m²
+
+1
+
+09:00 01/11/2026
+
+11
+0801
+
+S1.02
+
+Vinhomes Ocean Park 1
+
+Đang bán
+
+—
+
+—
+
+54,2 m²
+
+1
+
+09:00 02/11/2026
+
+12
+1201
+
+S1.02
+
+Vinhomes Ocean Park 1
+
+Ô đang khoá: Ngừng hẳn là nấc cuối
+Ngừng hẳn
+
+2,76 tỷ
+
+2,76 tỷ
+
+54,2 m²
+
+1
+
+09:00 03/11/2026
+
+13
+1204
+
+S1.02
+
+Vinhomes Ocean Park 1
+
+Tạm ngừng
+
+5,68 tỷ
+
+5,48 tỷ
+
+82,3 m²
+
+2
+
+09:00 04/11/2026
+
+14
+1505
+
+S1.02
+
+Vinhomes Ocean Park 1
+
+Ô đang khoá: Ngừng hẳn là nấc cuối
+Ngừng hẳn
+
+4,74 tỷ
+
+4,57 tỷ
+
+96,8 m²
+
+3
+
+09:00 05/11/2026
+
+15
+1606
+
+S1.02
+
+Vinhomes Ocean Park 1
+
+Đang bán
+
+5,52 tỷ
+
+—
+
+110,4 m²
+
+3
+
+09:00 06/11/2026
+
+16
+0601
+
+S1.03
+
+Vinhomes Ocean Park 1
+
+Ô đang khoá: Ngừng hẳn là nấc cuối
+Ngừng hẳn
+
+3,14 tỷ
+
+3,03 tỷ
+
+54,2 m²
+
+1
+
+09:00 07/11/2026
+
+17
+0605
+
+S1.03
+
+Vinhomes Ocean Park 1
+
+Ô đang khoá: Đã bán là nấc cuối
+Đã bán
+
+Ô đang khoá: Đã bán — giữ nguyên như lúc bán
+4,55 tỷ
+
+4,39 tỷ
+
+96,8 m²
+
+3
+
+09:00 08/11/2026
+
+18
+0703
+
+S1.03
+
+Vinhomes Ocean Park 1
+
+Đang bán
+
+4,43 tỷ
+
+4,43 tỷ
+
+75 m²
+
+2
+
+09:00 09/11/2026
+
+19
+0704
+
+S1.03
+
+Vinhomes Ocean Park 1
+
+Đang bán
+
+5,93 tỷ
+
+5,72 tỷ
+
+82,3 m²
+
+2
+
+09:00 01/11/2026
+
+20
+0901
+
+S1.03
+
+Vinhomes Ocean Park 1
+
+Đang bán
+
+3,14 tỷ
+
+—
+
+54,2 m²
+
+1
+
+09:00 02/11/2026
+
+21
+0902
+
+S1.03
+
+Vinhomes Ocean Park 1
+
+Tạm ngừng
+
+3,56 tỷ
+
+3,56 tỷ
+
+68,5 m²
+
+2
+
+09:00 03/11/2026
+
+22
+0903
+
+S1.03
+
+Vinhomes Ocean Park 1
+
+Ô đang khoá: Ngừng hẳn là nấc cuối
+Ngừng hẳn
+
+3,83 tỷ
+
+3,7 tỷ
+
+75 m²
+
+2
+
+09:00 04/11/2026
+
+23
+1204
+
+S1.03
+
+Vinhomes Ocean Park 1
+
+Ô đang khoá: Ngừng hẳn là nấc cuối
+Ngừng hẳn
+
+5,68 tỷ
+
+5,48 tỷ
+
+82,3 m²
+
+2
+
+09:00 05/11/2026
+
+24
+1306
+
+S1.03
+
+Vinhomes Ocean Park 1
+
+Ô đang khoá: Đã bán là nấc cuối
+Đã bán
+
+Ô đang khoá: Đã bán — giữ nguyên như lúc bán
+7,95 tỷ
+
+7,95 tỷ
+
+110,4 m²
+
+3
+
+09:00 06/11/2026
+
+25
+1606
+
+S1.03
+
+Vinhomes Ocean Park 1
+
+Tạm ngừng
+
+6,96 tỷ
+
+—
+
+110,4 m²
+
+3
+
+09:00 07/11/2026
+
+26
+0503
+
+S1.05
+
+Vinhomes Ocean Park 1
+
+Đang bán
+
+3,83 tỷ
+
+3,7 tỷ
+
+75 m²
+
+2
+
+09:00 08/11/2026
+
+27
+0603
+
+S1.05
+
+Vinhomes Ocean Park 1
+
+Đang bán
+
+4,13 tỷ
+
+4,13 tỷ
+
+75 m²
+
+2
+
+09:00 09/11/2026
+
+
+60 dòng

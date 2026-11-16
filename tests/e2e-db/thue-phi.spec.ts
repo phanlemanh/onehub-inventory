@@ -24,6 +24,7 @@ import { formatMoney } from "../../src/lib/format";
 import { label } from "../../src/modules/company-config";
 import { FEE_COPY } from "../../src/modules/company-config/ui/fee-copy";
 
+import { seedSampleInventory } from "../db/can-mau";
 import { regionReady } from "../e2e/phone-list";
 import { chupAnh, suaTrang, themKieu } from "../e2e/sua-trang";
 import { ROLES, signInWithCode } from "./dang-nhap-vai";
@@ -73,6 +74,8 @@ async function makeCompanies(): Promise<void> {
         [id, user, p.name, [role]],
       );
     }
+    // Row 10: the inventory is the signed-in company's own; it holds the sample listings.
+    await seedSampleInventory({ query: (text, values) => owner(text, values ?? []) }, id);
   }
 }
 

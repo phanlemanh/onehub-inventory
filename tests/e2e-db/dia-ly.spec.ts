@@ -23,6 +23,7 @@ import pg from "pg";
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
 import { FRAME_COPY } from "../../src/components/templates/frame-copy";
 import { label } from "../../src/modules/company-config";
+import { seedSampleInventory } from "../db/can-mau";
 import { SAMPLE_SUBDIVISIONS, sampleUnits, subdivisionNameOf } from "../../src/modules/catalog";
 import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings";
 import { geoTree, type GeoNode } from "../../src/modules/listings/ui/geo-tree";
@@ -97,6 +98,8 @@ async function person(info: TestInfo, tag: string): Promise<string> {
     "insert into company_members (company_id, user_id, name, roles) values ($1, $2, $3, $4)",
     [company, id, "[Tên] DL", ["ListAgent"]],
   );
+  // Row 10: the inventory is the signed-in company's own; it holds the sample listings.
+  await seedSampleInventory(owner, company, { id, name: "[Tên] DL" });
   return email;
 }
 

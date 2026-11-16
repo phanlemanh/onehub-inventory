@@ -25,6 +25,14 @@ vi.mock("../src/modules/company-config/server", () => ({
   myCompanyLayer: async () => null,
   myFeeSchedule: async () => null,
 }));
+// The inventory source (row 10): this page test has no database, so the page reads the sample company through it.
+vi.mock("../src/app/(app)/inventory-source", async () => {
+  const { sampleInventoryData } = await import("../src/app/(app)/inventory-sample-data");
+  return {
+    inventorySource: async () => ({ kind: "ready", data: sampleInventoryData(), live: false }),
+    standInRole: () => null,
+  };
+});
 // The role stand-in of row 4 asks for the session only when ?vai= is given; there is none here.
 vi.mock("../src/modules/identity/server", () => ({ currentSession: async () => null }));
 

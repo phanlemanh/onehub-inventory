@@ -209,6 +209,8 @@ export interface Listing {
   feeInclusion?: ListingFeeInclusion;
   legalStatus?: string;
   financing?: string;
+  listAgentKey?: string;
+  listAgentFullName?: string;
   version: number;
   customFields?: Record<string, unknown> | unknown[];
 }
@@ -1099,7 +1101,7 @@ export const ACTIONS: readonly ActionSpec[] = [
     description: "See the listings of the company.",
     entity: "Listing",
     kind: "query",
-    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    roles: ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"],
     agent: "forbidden",
     idempotent: false,
     output: null,
@@ -1112,12 +1114,13 @@ export const ACTIONS: readonly ActionSpec[] = [
       ListAgent: "company",
       BuyerAgent: "company",
       TeamLead: "company",
+      CompanyAdmin: "company",
     },
-    status: "planned",
+    status: "live",
     states: [],
     doors: {
       api: [],
-      db: [],
+      db: ["table listings select", "table listing_units select"],
     },
   },
   {
@@ -1165,11 +1168,11 @@ export const ACTIONS: readonly ActionSpec[] = [
       BuyerAgent: "company",
       TeamLead: "company",
     },
-    status: "planned",
+    status: "live",
     states: [],
     doors: {
-      api: [],
-      db: [],
+      api: ["PATCH /api/v1/listings/[id]"],
+      db: ["table listings update"],
     },
   },
   {
@@ -1190,10 +1193,10 @@ export const ACTIONS: readonly ActionSpec[] = [
       ListAgent: "own",
       TeamLead: "company",
     },
-    status: "planned",
-    states: ["Incomplete", "Hold"],
+    status: "live",
+    states: [],
     doors: {
-      api: [],
+      api: ["PATCH /api/v1/listings/[id]"],
       db: [],
     },
   },
@@ -1488,6 +1491,7 @@ export function can(role: Role, action: ActionSpec): boolean {
 export const PII_FIELDS: Readonly<Record<string, readonly string[]>> = {
   Contact: ["fullName", "phones"],
   FeeItem: ["changedByName"],
+  Listing: ["listAgentFullName"],
   Member: ["name"],
   ShareLink: ["recipientName"],
 };

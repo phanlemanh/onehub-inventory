@@ -38,8 +38,9 @@ type Seen = "company" | "own" | null;
 // tables read; company codes read, add, change) — 40 + 32; plus row 2c's 4 saved-view doors × 4 roles — 16; plus row
 // 7e's company layer: five tables read and added (10 doors), changed by edit and retire on four tables and by retire
 // and match on pending units (10 action doors) — 20 × 4 roles — 80; plus row 19's fee items: read by readFeeSchedule,
-// added and changed by setFeeSchedule (3 action doors) × 4 roles — 12.
-const DB_CELLS = 180;
+// added and changed by setFeeSchedule (3 action doors) × 4 roles — 12; plus row 10's listings: two tables read by
+// viewListings and listings changed by updateListing (3 doors) × 4 roles — 12.
+const DB_CELLS = 192;
 // Written before the code (evals.yaml): the exempt database doors.
 const EXEMPT_DB = [
   "function app.current_company_id()",
@@ -73,6 +74,35 @@ function catalogFixture(w: World): Promise<{ unit: string; codeA: string }> {
       return { unit, codeA };
     })();
     catalogs.set(w, p);
+  }
+  return p;
+}
+
+// Row 10: one listing of A and one of B, each on its own unit, loaded once per world by the owner.
+const listingsOf = new WeakMap<World, Promise<string>>();
+function listingFixture(w: World): Promise<string> {
+  let p = listingsOf.get(w);
+  if (!p) {
+    p = (async () => {
+      await catalogFixture(w);
+      const units = sampleCatalog().units;
+      const add = async (company: string, upi: string) => {
+        const id = crypto.randomUUID();
+        await w.db.owner.query(
+          "insert into listings (id, company_id, standard_status, list_price) values ($1, $2, 'Incomplete', 3000000000)",
+          [id, company],
+        );
+        await w.db.owner.query(
+          "insert into listing_units (listing_id, company_id, upi, open) values ($1, $2, $3, true)",
+          [id, company, upi],
+        );
+        return id;
+      };
+      const idOfA = await add(w.A, units[0]!.upi);
+      await add(w.B, units[1]!.upi);
+      return idOfA;
+    })();
+    listingsOf.set(w, p);
   }
   return p;
 }
@@ -366,6 +396,25 @@ async function observe(w: World, who: Person, door: string): Promise<Seen> {
     case "table company_fee_items update": {
       const [, table, cmd] = door.split(" ");
       return layerDoor(w, who, table!, cmd!);
+    }
+    // Row 10: the listings of the company and their unit links, read with viewListings; listings changed with updateListing.
+    case "table listings select":
+    case "table listing_units select": {
+      await listingFixture(w);
+      const table = door.split(" ")[1]!;
+      return asPerson(w, who, A, async (c) => {
+        const { rows } = await c.query(`select company_id from ${table}`);
+        const r = rows as { company_id: string }[];
+        if (r.some((x) => x.company_id !== A)) return "?" as Seen;
+        return (r.length === 1 ? "company" : r.length === 0 ? null : `?${r.length}`) as Seen;
+      });
+    }
+    case "table listings update": {
+      const id = await listingFixture(w);
+      return asPerson(w, who, A, async (c) => {
+        const r = await c.query("update listings set list_price = 2800000000 where id = $1", [id]);
+        return (r.rowCount === 1 ? "company" : r.rowCount === 0 ? null : "?") as Seen;
+      });
     }
     // Row 2c: the saved view table; each person keeps to their own views.
     case "table saved_view select": {

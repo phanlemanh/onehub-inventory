@@ -5,6 +5,7 @@ import { dirname } from "node:path";
 
 import { DB_NAME, OUTBOX, SESSION_FILE, TEST_PERSON } from "../../playwright.db.config";
 import { scratchDb } from "../db/helpers";
+import { seedSampleInventory } from "../db/can-mau";
 import { claimRunFolder } from "./don-dung-tam";
 
 export default async function setup(): Promise<void> {
@@ -28,6 +29,8 @@ export default async function setup(): Promise<void> {
     "insert into company_members (company_id, user_id, name, roles) values ($1, $2, '[Tên] Phiên thử', $3)",
     [company, person, ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"]],
   );
+  // Row 10: the inventory is the signed-in company's own; the test company holds the sample listings.
+  await seedSampleInventory(db.owner, company, { id: person, name: "[Tên] Phiên thử" });
   // A few words of the company's own layer (row 7e), so the region cases of «Tuỳ chỉnh của sàn» have rows to read:
   // one label as long as a label may be. Test data only; no other test reads this company's layer.
   for (const [concept, words] of [
