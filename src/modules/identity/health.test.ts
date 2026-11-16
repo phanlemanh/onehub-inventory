@@ -81,4 +81,39 @@ describe("healthOf", () => {
     const health = await healthOf({ env: { COMMIT_SHA: "def5678" }, pool: () => null });
     expect(health.commit).toBe("def5678");
   });
+
+  it("never returns a project name, connection string or key, in any outcome", async () => {
+    // Every value a real environment carries, each with a unique marker; none may reach the body.
+    const env = {
+      VERCEL_GIT_COMMIT_SHA: "abc1234",
+      APP_ENV: "staging",
+      DATABASE_URL:
+        "postgres://quy_hang_login.abcdefghijklmnopqrst:moc-mat-khau@moc-may-chu.example.test:6543/postgres",
+      AUTH_SECRET: "moc-auth-secret-0123456789",
+      RESEND_API_KEY: "moc-resend-key",
+      MAIL_FROM: "OneHub <moc-thu@onehub.center>",
+      APP_URL: "https://moc-dia-chi.example.test",
+      VERCEL_PROJECT_ID: "moc-du-an",
+      VERCEL_ORG_ID: "moc-to-chuc",
+    };
+    const leaks = ["moc-", "abcdefghijklmnopqrst", "6543", "postgres://"];
+    const outcomes = [
+      () => fakePool([{ vai: "quy_hang_login", loi: null }]).pool,
+      () => fakePool([{ vai: "postgres", loi: "về được vai chủ postgres" }]).pool,
+      () =>
+        ({
+          connect: async () => {
+            throw new Error(`connect failed: ${env.DATABASE_URL}`);
+          },
+        }) as DbPool,
+      () => null,
+      () => {
+        throw new Error(`bad config: ${env.DATABASE_URL}`);
+      },
+    ];
+    for (const pool of outcomes) {
+      const body = JSON.stringify(await healthOf({ env, pool }));
+      for (const leak of leaks) expect(body, `body leaks ${leak}`).not.toContain(leak);
+    }
+  });
 });
