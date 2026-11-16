@@ -478,6 +478,10 @@ test("E11 project names show whole at 1024 and 1440", async ({ page }, info) => 
 // ---- E12 -----------------------------------------------------------------------------------------------------------
 
 async function seriousViolations(page: Page): Promise<string[]> {
+  // The sheet's opening slide can start after openSheet saw no motion; axe on a half-faded sheet reads wrong colours.
+  await page.waitForFunction(() =>
+    document.getAnimations().every((a) => a.playState !== "running"),
+  );
   const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
   return violations
     .filter((v) => v.impact === "serious" || v.impact === "critical")
