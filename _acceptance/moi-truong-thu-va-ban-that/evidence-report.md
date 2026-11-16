@@ -1,67 +1,42 @@
 ---
 schema_version: 2
 feature_slug: moi-truong-thu-va-ban-that
-verdict: REJECT
+verdict: PENDING-JUDGMENT
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: a8b17726bb509111f678e2dff863f2cff809ef50
+verified_commit: cb94dd5fce2b2a43fc7f3a292a02190dd5162efb
 human_signoff:
 ---
 
 # Evidence Report: moi-truong-thu-va-ban-that
 
-Vòng 6. Kết luận REJECT vì lệnh suite `make e2e` đỏ (một ca trong tests/e2e/settle.spec.ts). Lệnh này không gắn eval nào nên `failed_evals` để trống; lỗi được ghi ở khối suite bên dưới.
-
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
-| E1 | AC-1 | test | PASS (carry-forward từ round 5) |
-| E2 | AC-2 | test | PASS (carry-forward từ round 5) |
-| E3 | AC-3 | test | PASS (carry-forward từ round 5) |
-| E4 | AC-4 | test | PASS (carry-forward từ round 5) |
-| E5 | AC-5 | test | PASS (carry-forward từ round 1) |
-| E6 | AC-6 | script | PASS (carry-forward từ round 5) |
+| E1 | AC-1 | test | PASS |
+| E2 | AC-2 | test | PASS |
+| E3 | AC-3 | test | PASS |
+| E4 | AC-4 | test | PASS |
+| E5 | AC-5 | test | PASS |
+| E6 | AC-6 | script | PASS |
 | E7 | AC-7 | script | PASS |
 | E8 | AC-8 | script | PASS |
-| E9 | AC-9 | test | PASS (carry-forward từ round 5) |
-| E10 | AC-9 | judgment | đề xuất PASS, chờ người chốt (hội đồng giữ nguyên từ round 5) |
-| E11 | AC-10 | test | PASS (carry-forward từ round 3) |
+| E9 | AC-9 | test | PASS |
+| E10 | AC-9 | judgment | UNCERTAIN |
+| E11 | AC-10 | test | PASS |
 | E12 | AC-1 | script | PASS |
 
-Lệnh fail không gắn eval: `make e2e` (mã thoát 2) — xem khối suite bên dưới.
-
 ## Evidence
-
-- eval: E7
-  run_id: minted-moi-truong-thu-va-ban-that-E7-r6
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.cach_ly_dich
-  verified_at: 2026-11-16T17:26:41Z
-  output: |
-    DB_LANE=k DB_PORT=5564 npx vitest run -c vitest.db.config.ts tests/db/cach-ly-dich.db.test.ts --reporter=verbose
-    1 lần chạy, 1 lần đạt, không dao động.
-
-- eval: E8
-  run_id: minted-moi-truong-thu-va-ban-that-E8-r6
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.sao_luu_khoi_phuc
-  verified_at: 2026-11-16T17:26:41Z
-  output: |
-    DB_LANE=k DB_PORT=5564 npx vitest run -c vitest.db.config.ts tests/db/sao-luu.db.test.ts --reporter=verbose
-    1 lần chạy, 1 lần đạt, không dao động.
 
 - eval: E12
   run_id: minted-moi-truong-thu-va-ban-that-E12-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.check
-  verified_at: 2026-11-16T17:26:41Z
+  verified_at: 2026-11-16T17:43:04Z
   output: |
-    make check
     CODEOWNERS matches governance/autonomy.yaml
 
 - eval: E1
@@ -118,6 +93,24 @@ Lệnh fail không gắn eval: `make e2e` (mã thoát 2) — xem khối suite b�
   carried_from_round: 5
   # carry-forward tu round 5 — delta khong cham paths cua eval
 
+- eval: E7
+  run_id: minted-moi-truong-thu-va-ban-that-E7-r5
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.cach_ly_dich
+  verified_at: 2026-11-16T16:03:38Z
+  carried_from_round: 5
+  # carry-forward tu round 5 — delta khong cham paths cua eval
+
+- eval: E8
+  run_id: minted-moi-truong-thu-va-ban-that-E8-r5
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.sao_luu_khoi_phuc
+  verified_at: 2026-11-16T16:03:38Z
+  carried_from_round: 5
+  # carry-forward tu round 5 — delta khong cham paths cua eval
+
 - eval: E9
   run_id: minted-moi-truong-thu-va-ban-that-E9-r5
   exit_code: 0
@@ -138,13 +131,24 @@ Lệnh fail không gắn eval: `make e2e` (mã thoát 2) — xem khối suite b�
 
 ### Judgment
 
+Hội đồng đề xuất PASS cho E10, nhưng có một phiếu phản đối; panel giữ nguyên từ round 5 — inputs không đổi, không chấm lại; rationale xem round đó. Ô human_override để trống cho người quyết ở Cổng 2.
+
+- E10 panel đề xuất: PASS (carried từ round 5)
+  - domain-correctness: PASS (r5)
+  - operational-feasibility: PASS (r5)
+  - spec-alignment: FAIL (r5) — bằng chứng còn thiếu mà phiếu này nêu:
+    - Bản sửa khoi-phuc.md, mục «Khôi phục thật» bước 5 (dòng 113-114): có Ở đâu, Gõ hay bấm, Đạt khi, Đỏ thì, và nói rõ cách viết trang sự cố trong wiki/incidents/ (tệp mẫu hoặc các dòng cần có) để người chưa từng làm không phải mở mã hay ontology/page-types.yaml.
+    - Bản sửa khoi-phuc.md, mục «Khôi phục thật» bước 1 (dòng 96): ô «Ở đâu» ghi một chỗ cụ thể (ví dụ trang Backups của Supabase để xem các ngày có sao lưu, hay chỗ ghi thời điểm đã chọn), không ghi «chủ kho».
+    - Bản sửa xoay-khoa.md dòng 126: việc ghi một dòng vào wiki/log.md thành một bước có đủ ở đâu, gõ gì, đạt khi, đỏ thì (hoặc ghi rõ đây là việc của người giữ kho mã).
+
 - eval: E10
-  judged_by: hội đồng ba góc nhìn, giữ nguyên từ round 5 — inputs không đổi, không chấm lại; lý do xem round 5
-  proposal: PASS
-  votes:
-    - domain-correctness: PASS (r5)
-    - operational-feasibility: PASS (r5)
-    - spec-alignment: FAIL (r5)
+  judged_by: judge-subagent (fresh context), panel giữ nguyên từ round 5
+  verdict: UNCERTAIN
+  rationale: Hai góc nhìn đồng ý đạt, góc spec-alignment phản đối vì ba chỗ trong sổ tay chưa đủ bốn điều (ở đâu, gõ gì, đạt khi, đỏ thì); người quyết ở Cổng 2.
+  required_evidence:
+    - Bản sửa khoi-phuc.md bước 5 (dòng 113-114) đủ bốn điều và nói cách viết trang sự cố trong wiki/incidents/.
+    - Bản sửa khoi-phuc.md bước 1 (dòng 96) ô «Ở đâu» ghi chỗ cụ thể.
+    - Bản sửa xoay-khoa.md dòng 126 thành bước đủ bốn điều hoặc ghi rõ là việc của người giữ kho mã.
   human_override:  # chi nguoi ghi
 
 ### Lệnh suite (hồi quy)
@@ -152,16 +156,12 @@ Lệnh fail không gắn eval: `make e2e` (mã thoát 2) — xem khối suite b�
 - cmd: npm run build
   run_id: minted-moi-truong-thu-va-ban-that-SUITE-build-r6
   exit_code: 0
-  verified_at: 2026-11-16T17:26:41Z
+  verified_at: 2026-11-16T17:43:04Z
 
 - cmd: make e2e
   run_id: minted-moi-truong-thu-va-ban-that-SUITE-make_e2e-r6
-  exit_code: 2
-  verified_at: 2026-11-16T17:26:41Z
-  output: |
-    Một ca đỏ: tests/e2e/settle.spec.ts:32 › cho ngan › ngan mo @cho (màn 414).
-    Mong đợi 0 hoạt ảnh đang chạy sau khi ngăn mở, nhận 3.
-    1 đỏ, 1127 bỏ qua, 1244 đạt (9.0 phút). gac-hydration: 0 cảnh báo.
+  exit_code: 0
+  verified_at: 2026-11-16T17:43:04Z
 
 ## Known limits
 
@@ -171,10 +171,9 @@ Lệnh fail không gắn eval: `make e2e` (mã thoát 2) — xem khối suite b�
 
 carried tu round 1 — baseline khong do lai round nay.
 
-Baseline khong do: evals.yaml không đổi từ lần đo cuối (round 1), mọi block eval ghi baseline n-a.
+Eval không phân biệt (xanh cả trên code hiện tại lẫn code cũ): E12 (make check) — chứng minh khung kiểm chung, không phải riêng tính năng; giữ làm lưới hồi quy có chủ ý. Baseline của mọi eval ghi n-a vì round này không đo lại.
 
-Eval không phân biệt (xanh cả trên bản mới lẫn bản gốc, chứng minh khung chạy chứ không phải tính năng; cần viết lại để khẳng định hành vi mới hoặc xác nhận là lớp chắn hồi quy có chủ ý):
-- E12 (`make check`)
+Lưu ý cho người quyết: nhật ký run-log.jsonl ở round 6 còn một dòng cũ của lệnh make e2e mang cùng mã chạy với kết quả thất bại (cùng với dòng tổng kết round là từ chối); kết quả máy báo cho lần chạy trên bản cb94dd5 là đạt. Cần đối chiếu lần chạy lại trước khi ký.
 
 ## Variance
 
@@ -182,7 +181,5 @@ none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: E7 đỏ — chạy lại ở round sau.
-Round 2: E7 đỏ — chạy lại ở round sau.
-Round 3 đến 5: E7 đạt từ round 3; chi tiết từng vòng xem run-log.jsonl.
-Round 6: mọi eval đạt, nhưng lệnh suite `make e2e` đỏ ở một ca animation của ngăn (settle.spec.ts). Trả về triển khai.
+Round 1-5: lịch sử xem _acceptance/moi-truong-thu-va-ban-that/run-log.jsonl (E5 giữ từ round 1, E11 từ round 3, E1-E4 và E6-E9 từ round 5).
+Round 6: E12, npm run build và make e2e chạy lại; các eval còn lại carry-forward; E10 còn một phiếu phản đối chờ người quyết, verdict PENDING-JUDGMENT.

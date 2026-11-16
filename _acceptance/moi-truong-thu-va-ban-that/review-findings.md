@@ -1,14 +1,36 @@
 ## Trong hợp đồng
 
+- **Hình dạng 5 (tuyên quét lớp nhưng không có ma trận viết trước, số ca không được đối chiếu): E6 lấy danh sách ca bằng grep mã nguồn và không bao giờ so số ca với số phải có**
+  file: `tools/deploy/thu-ban-dung.sh:118`
+  severity: medium
+  AC: AC-6
+  source: measurement
+  detail: Theo evals.yaml, E6 hứa «số ca = số mục sổ bản mẫu + bảng quyền và > 0». Nhưng script dựng các danh sách PROTO_SLUGS, ROLES, STATES, MAUS (dòng 118-144) bằng cách grep/sed theo khuôn chữ ngay trong mã đang bị kiểm, ví dụ `grep -o 'param !== "[a-z-]*"'` trên inventoryEdgeRowsFrom, hay `grep 'const STATE_PARAMS = \['` vốn đòi mảng nằm trên một dòng. Chặn duy nhất là `[ "${#X[@]}" -gt 0 ]`. Dòng cuối `ban-dung-that: $N phép kiểm đạt` (dòng 387) chỉ in ra N và không so N với con số nào viết sẵn. Nếu mã đổi cách viết (mảng xuống dòng, đổi `!==` thành `===`, thêm vai bằng spread), danh sách sẽ âm thầm co lại còn một phần tử mà phép đo vẫn xanh. Không có ma trận đầy đủ viết trước để số assert bằng số phần tử như mẫu P105.
+  rationale: AC-6 đòi số ca bằng số mục của sổ bản mẫu và bảng quyền và lớn hơn 0, mà phép đo chỉ kiểm lớn hơn 0 nên vế đối chiếu số lượng không được bảo đảm.
+
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **pgClient chooses the port without reading PSQL or TEST_ADMIN_URL, so the scripts can hit a different cluster from the scratch DB**
-  Người dùng thấy gì: Người vận hành không dùng cấu hình chuẩn có thể thấy các bài kiểm sao lưu, khôi phục và cách ly báo đỏ vì chúng nối nhầm sang một máy cơ sở dữ liệu khác. Sản phẩm chạy thật không bị ảnh hưởng, chỉ có phép kiểm trên máy cá nhân.
-  Căn cứ: Hậu quả nhẹ: chỉ làm bài kiểm báo sai trên máy dùng cấu hình lệch, không mất hay lộ dữ liệu, và đường chạy chuẩn của CI vẫn đúng; người chạy tự tránh được bằng cách đặt cùng một cổng.
-  file: `tests/db/may-khach-pg.ts`
-  severity: medium
+- **Login role name defined twice in the identity module (rule lives in two places)**
+  Người dùng thấy gì: Hiện không có gì sai với người dùng: hệ thống vẫn chặn đúng khi nối nhầm vai. Nếu sau này đổi tên vai ở một nơi mà quên nơi kia thì kiểm lúc khởi động và kiểm lúc truy vấn có thể báo khác nhau.
+  Căn cứ: Không ảnh hưởng người dùng và không mất dữ liệu; chỉ có rủi ro khi có người đổi tên vai, lúc đó lỗi hiện ngay khi khởi động nên tự lộ ra.
+  file: `src/modules/identity/config.ts`
+  severity: low
+  Đề xuất: wont-fix
+
+- **The runbook promises a red line that the first production deploy can never print**
+  Người dùng thấy gì: Sổ tay vận hành nói lần đưa bản thật đầu tiên sẽ dừng với một dòng báo đỏ cụ thể, nhưng thực tế người vận hành sẽ thấy một dòng chữ khác. Người làm theo có thể bối rối một lúc dù việc dừng vẫn đúng.
+  Căn cứ: Chỉ gây nhầm lẫn nhẹ cho người vận hành, hệ thống vẫn dừng đúng chỗ, không mất dữ liệu và sửa lại câu chữ sổ tay rất rẻ.
+  file: `docs/van-hanh/README.md`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 5 (tuyên một lớp đường dẫn nhưng chỉ đo một điểm): phép thử từ chối đường trong kho chỉ thử đúng gốc của worktree**
+  Người dùng thấy gì: Chức năng sao lưu từ chối ghi vào trong kho, nhưng mới được thử ở một vị trí. Các cách viết đường dẫn khác như đường tương đối hay thư mục con chưa được thử riêng nên có thể lọt một lỗi hiếm.
+  Căn cứ: Lỗi nếu có chỉ làm tệp sao lưu nằm nhầm trong kho, không mất hay lộ dữ liệu và người vận hành tự thấy và dời được; thêm ca thử sau cũng rẻ.
+  file: `tests/db/sao-luu.db.test.ts`
+  severity: low
   Đề xuất: known-limits
 
 - **make rollback skips the commit check when the chosen deployment has no commit metadata, but the runbook says the commit is always checked (r5)**
@@ -81,7 +103,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Kept restore drill database leaks when the restore fails, because cleanup runs only after the asserts (r2 · tệp đã đổi)**
+- **Kept restore drill database leaks when the restore fails, because cleanup runs only after the asserts (r2)**
   Người dùng thấy gì: Nếu một lần thử khôi phục thất bại, một cơ sở dữ liệu nháp có thể còn nằm lại trên máy kiểm thử mà không ai được báo. Chỉ xảy ra trên máy dev khi bài kiểm đã đỏ, không chạm bản chạy thật.
   Căn cứ: Hậu quả nhẹ: chỉ để sót một cơ sở nháp trên máy kiểm thử, không mất hay lộ dữ liệu, người làm xoá tay được, và chỉ xảy ra khi bài kiểm đã đỏ sẵn.
   file: `tests/db/sao-luu.db.test.ts`
@@ -136,7 +158,5 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   file: `tools/deploy/deploy.test.ts`
   severity: low
   Đề xuất: known-limits
-
-## Chưa adversarial-verify (refuter chết)
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
