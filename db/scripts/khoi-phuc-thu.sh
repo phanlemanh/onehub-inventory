@@ -15,12 +15,15 @@
 #                         `docker exec -i onehub-inventory-db-<lane> …` with addresses seen from inside the container.
 #
 # Before the scratch database is created, three major versions must equal the restore target's (`show
-# server_version_num`), each mismatch one line, exit 2, nothing created:
+# server_version_num`); a mismatch prints ONE line, exit 2, nothing created. The backup file is what must be rescued, so
+# no line tells the operator to back up again unless the source server has the target's version (make sao-luu always
+# uses tools of the source server's version: a newer pg_dump means a newer source server).
 #   khoi-phuc: pg_restore bản <a>, máy chủ khôi phục bản <b> — dùng công cụ cùng bản với máy chủ
-#   khoi-phuc: tệp sao lưu lấy bằng pg_dump bản <a>, máy chủ khôi phục bản <b> — sao lưu lại bằng công cụ cùng bản
-#   khoi-phuc: tệp sao lưu lấy bằng pg_dump mới hơn bản <b> của máy chủ khôi phục — sao lưu lại bằng công cụ cùng bản
+#   khoi-phuc: tệp sao lưu lấy bằng pg_dump mới hơn bản <b> của máy chủ khôi phục — khôi phục vào máy chủ cùng bản với máy chủ gốc, KHÔNG sao lưu lại
 #                                                         (pg_restore cannot even read that archive's header)
-#   khoi-phuc: tệp sao lưu từ máy chủ bản <a>, máy chủ khôi phục bản <b> — khôi phục vào máy chủ cùng bản với máy chủ gốc
+#   khoi-phuc: tệp sao lưu từ máy chủ bản <a>, máy chủ khôi phục bản <b> — khôi phục vào máy chủ cùng bản với máy chủ gốc, KHÔNG sao lưu lại
+#   khoi-phuc: tệp sao lưu lấy bằng pg_dump bản <a>, máy chủ khôi phục bản <b> — sao lưu lại bằng công cụ cùng bản
+#                                                         (only when the source server has the target's version)
 # The backup's two versions come from its own archive header (`pg_restore -l`: «Dumped from database version», «Dumped
 # by pg_dump version»), not from the sidecar, so any custom-format file is checked, sao-luu.sh's or not.
 #
@@ -89,7 +92,7 @@ fi
 if ! dau_tep=$("${restore_lenh[@]}" -l <"$tep" 2>&1); then
   if printf '%s\n' "$dau_tep" | grep -q 'unsupported version'; then
     # The archive format of a newer pg_dump (pg_dump 17 writes 1.16, unknown to pg_restore 16).
-    echo "khoi-phuc: tệp sao lưu lấy bằng pg_dump mới hơn bản $ban_may_chu của máy chủ khôi phục — sao lưu lại bằng công cụ cùng bản" >&2
+    echo "khoi-phuc: tệp sao lưu lấy bằng pg_dump mới hơn bản $ban_may_chu của máy chủ khôi phục — khôi phục vào máy chủ cùng bản với máy chủ gốc, KHÔNG sao lưu lại" >&2
     exit 2
   fi
   echo "khoi-phuc: pg_restore không đọc được tệp sao lưu" >&2
@@ -102,16 +105,16 @@ if [ -z "$ban_dump" ] || [ -z "$ban_goc" ]; then
   echo "khoi-phuc: tệp sao lưu không ghi bản pg_dump và bản máy chủ gốc — không phải tệp của pg_dump -Fc" >&2
   exit 2
 fi
-lech_ban=0
+# The source server first: when it differs, backing up again would take today's data, not the data to restore, so the
+# pg_dump line (whose remedy is to back up again) prints only when it stands alone.
+if [ "$ban_goc" != "$ban_may_chu" ]; then
+  echo "khoi-phuc: tệp sao lưu từ máy chủ bản $ban_goc, máy chủ khôi phục bản $ban_may_chu — khôi phục vào máy chủ cùng bản với máy chủ gốc, KHÔNG sao lưu lại" >&2
+  exit 2
+fi
 if [ "$ban_dump" != "$ban_may_chu" ]; then
   echo "khoi-phuc: tệp sao lưu lấy bằng pg_dump bản $ban_dump, máy chủ khôi phục bản $ban_may_chu — sao lưu lại bằng công cụ cùng bản" >&2
-  lech_ban=1
+  exit 2
 fi
-if [ "$ban_goc" != "$ban_may_chu" ]; then
-  echo "khoi-phuc: tệp sao lưu từ máy chủ bản $ban_goc, máy chủ khôi phục bản $ban_may_chu — khôi phục vào máy chủ cùng bản với máy chủ gốc" >&2
-  lech_ban=1
-fi
-[ "$lech_ban" -eq 0 ] || exit 2
 
 tao=0
 don() {

@@ -7,7 +7,10 @@
 //   3. Break: a backup that lost one table (pg_dump -T) → red, naming the table.
 //   4. Version trap: a pg_dump, a pg_restore or a backup of another major version than the server → red with the pinned
 //      line before anything is written or created. Fake tools (a script printing `… (PostgreSQL) <server+1>.2`) stand
-//      for a newer client; the real pg_dump 17 against Postgres 16 reproduction is in the PR description.
+//      for a newer client; the real pg_dump 17 against Postgres 16 reproduction is in the PR description. For the restore
+//      drill each situation is RUN: exactly one line is printed, «sao lưu lại» only when the source server has the restore
+//      server's version (the backup is what must be rescued), and docs/van-hanh/khoi-phuc.md gives that line the same
+//      remedy. Break: a runbook copy whose server-version entry says «sao lưu lại» is named.
 // The scripts reach Postgres through psql, pg_dump and pg_restore chosen by ./may-khach-pg.ts: inside the lane's
 // container on a lane (127.0.0.1:5432, trust), the CI cluster over TCP with its password under `make ci-db`.
 import { spawnSync } from "node:child_process";
@@ -26,6 +29,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const BACKUP = join(ROOT, "db/scripts/sao-luu.sh");
 const RESTORE = join(ROOT, "db/scripts/khoi-phuc-thu.sh");
 const LOG_PAGE = join(ROOT, "docs/van-hanh/nhat-ky-khoi-phuc.md");
+const RUNBOOK = join(ROOT, "docs/van-hanh/khoi-phuc.md");
 const PG = pgClient("k");
 const SEED = readFileSync(join(ROOT, "db/tests/vai-dang-nhap-mau.sql"), "utf8");
 
@@ -147,6 +151,48 @@ function header(fromServer: string, byDump: string): string {
     `;     Dumped by pg_dump version: ${byDump}`,
     ";",
   ].join("\n");
+}
+
+/**
+ * For each printed stop line `<head> — <remedy>`, the runbook bullet whose backquoted line (`<a>`, `<b>` standing for
+ * numbers) is that head must contain the same remedy, so the operator reads one remedy per situation. Returns what is
+ * wrong, by the bullet's line.
+ */
+function remedyMismatches(doc: string, printed: string[]): string[] {
+  const rows = doc.split("\n");
+  const entries: { line: string; head: RegExp; text: string }[] = [];
+  rows.forEach((row, i) => {
+    const m = row.match(/^(\s*)- `(khoi-phuc: [^`]*)`/);
+    if (!m) return;
+    const indent = m[1]!.length;
+    const body = [row];
+    for (const more of rows.slice(i + 1)) {
+      if (more.trim() === "" || more.search(/\S/) <= indent) break;
+      body.push(more);
+    }
+    const pattern = m[2]!
+      .split(/(<[^>]+>)/)
+      .map((p) =>
+        /^<[^>]+>$/.test(p) ? String.raw`\d+` : p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+      )
+      .join("");
+    entries.push({
+      line: m[2]!,
+      head: new RegExp(`^${pattern}$`),
+      text: body.join(" ").replace(/\s+/g, " "),
+    });
+  });
+  const wrong: string[] = [];
+  for (const l of printed) {
+    const cut = l.indexOf(" — ");
+    const head = cut < 0 ? l : l.slice(0, cut);
+    const remedy = cut < 0 ? "" : l.slice(cut + " — ".length);
+    const found = entries.filter((e) => e.head.test(head));
+    if (found.length === 0) wrong.push(`${head}: sổ tay không có mục`);
+    for (const e of found)
+      if (!e.text.includes(remedy)) wrong.push(`${e.line}: sổ tay không ghi «${remedy}»`);
+  }
+  return wrong;
 }
 
 describe("sao-luu và khoi-phuc-thu", () => {
@@ -292,65 +338,111 @@ describe("sao-luu và khoi-phuc-thu", () => {
     expect(existsSync(`${file}.dem`)).toBe(false);
   });
 
-  it("lệch bản: pg_restore khác bản máy chủ khôi phục → đỏ một dòng, không tạo cơ sở nháp", async () => {
-    const file = join(outside, "lech-ban-restore.dump");
+  // Every version-mismatch situation of the restore drill, produced with fake tools and RUN: the exact stderr lines, «sao
+  // lưu lại» only where the source server has the restore server's version, and the runbook gives each printed line
+  // the same remedy the script prints.
+  type Situation = {
+    name: string;
+    tool: () => string;
+    lines: () => string[];
+    backUpAgain: boolean;
+  };
+  const serverRemedy = "khôi phục vào máy chủ cùng bản với máy chủ gốc, KHÔNG sao lưu lại";
+  const situations: Situation[] = [
+    {
+      name: "(a) pg_restore khác bản máy chủ khôi phục",
+      tool: () => fakeTool(outside, "pg_restore", `${other}.2`),
+      lines: () => [
+        `khoi-phuc: pg_restore bản ${other}, máy chủ khôi phục bản ${major} — dùng công cụ cùng bản với máy chủ`,
+      ],
+      backUpAgain: false,
+    },
+    {
+      name: "(b) pg_dump của tệp khác bản, máy chủ gốc cùng bản (đứng một mình)",
+      tool: () => fakeTool(outside, "pg_restore", `${major}.4`, header(`${major}.4`, `${other}.2`)),
+      lines: () => [
+        `khoi-phuc: tệp sao lưu lấy bằng pg_dump bản ${other}, máy chủ khôi phục bản ${major} — sao lưu lại bằng công cụ cùng bản`,
+      ],
+      backUpAgain: true,
+    },
+    {
+      name: "(c) máy chủ gốc khác bản, pg_dump cùng bản máy chủ gốc",
+      tool: () => fakeTool(outside, "pg_restore", `${major}.4`, header(`${other}.1`, `${other}.1`)),
+      lines: () => [
+        `khoi-phuc: tệp sao lưu từ máy chủ bản ${other}, máy chủ khôi phục bản ${major} — ${serverRemedy}`,
+      ],
+      backUpAgain: false,
+    },
+    {
+      name: "(c') máy chủ gốc khác bản, pg_dump cùng bản máy chủ khôi phục",
+      tool: () => fakeTool(outside, "pg_restore", `${major}.4`, header(`${other}.1`, `${major}.4`)),
+      lines: () => [
+        `khoi-phuc: tệp sao lưu từ máy chủ bản ${other}, máy chủ khôi phục bản ${major} — ${serverRemedy}`,
+      ],
+      backUpAgain: false,
+    },
+    {
+      // The real case of a newer pg_dump: pg_restore of the server's version cannot read the archive header at all.
+      name: "(d) pg_dump mới hơn máy chủ khôi phục, pg_restore không đọc được đầu tệp",
+      tool: () => {
+        const path = join(outside, "gia-pg_restore-doc-khong-duoc");
+        writeFileSync(
+          path,
+          [
+            "#!/usr/bin/env bash",
+            `if [ "\${1:-}" = "--version" ]; then echo "pg_restore (PostgreSQL) ${major}.4"; exit 0; fi`,
+            `echo "pg_restore: error: unsupported version (1.16) in file header" >&2`,
+            "exit 1",
+            "",
+          ].join("\n"),
+        );
+        chmodSync(path, 0o755);
+        return path;
+      },
+      lines: () => [
+        `khoi-phuc: tệp sao lưu lấy bằng pg_dump mới hơn bản ${major} của máy chủ khôi phục — ${serverRemedy}`,
+      ],
+      backUpAgain: false,
+    },
+  ];
+
+  /** Stderr lines of khoi-phuc-thu.sh run in one situation; no scratch database may be created. */
+  async function runSituation(s: Situation): Promise<string[]> {
+    const file = join(outside, "lech-ban.dump");
     writeFileSync(file, "không đọc tới\n");
     writeFileSync(`${file}.dem`, "public.agreements\t0\n");
     const before = await drillDatabases(db.owner);
-    const r = restore(file, { PG_RESTORE_CMD: fakeTool(outside, "pg_restore", `${other}.2`) });
-    expect(r.code).not.toBe(0);
-    expect(r.err.trim()).toBe(
-      `khoi-phuc: pg_restore bản ${other}, máy chủ khôi phục bản ${major} — dùng công cụ cùng bản với máy chủ`,
-    );
+    const r = restore(file, { PG_RESTORE_CMD: s.tool() });
+    expect(r.code).toBe(2);
     expect(r.out).not.toContain("co-so-nhap:");
     expect(await drillDatabases(db.owner)).toEqual(before);
-  });
+    return r.err.split("\n").filter((l) => l !== "");
+  }
 
-  it("lệch bản: tệp sao lưu lấy bằng pg_dump khác bản máy chủ khôi phục → đỏ, không tạo cơ sở nháp", async () => {
-    const file = join(outside, "lech-ban-tep.dump");
-    writeFileSync(file, "không đọc tới\n");
-    writeFileSync(`${file}.dem`, "public.agreements\t0\n");
-    const before = await drillDatabases(db.owner);
-    const tool = fakeTool(outside, "pg_restore", `${major}.4`, header(`${major}.4`, `${other}.2`));
-    const r = restore(file, { PG_RESTORE_CMD: tool });
-    expect(r.code).not.toBe(0);
-    expect(r.err.trim()).toBe(
-      `khoi-phuc: tệp sao lưu lấy bằng pg_dump bản ${other}, máy chủ khôi phục bản ${major} — sao lưu lại bằng công cụ cùng bản`,
-    );
-    expect(r.out).not.toContain("co-so-nhap:");
-    expect(await drillDatabases(db.owner)).toEqual(before);
+  for (const s of situations)
+    it(`lệch bản ${s.name}: đúng các dòng in, cách sửa trùng sổ tay, không tạo cơ sở nháp`, async () => {
+      const printed = await runSituation(s);
+      expect(printed).toEqual(s.lines());
+      expect(
+        printed.some((l) => l.includes("sao lưu lại") && !l.includes("KHÔNG sao lưu lại")),
+      ).toBe(s.backUpAgain);
+      expect(remedyMismatches(readFileSync(RUNBOOK, "utf8"), printed)).toEqual([]);
+    });
 
-    const fromOther = fakeTool(
-      outside,
-      "pg_restore",
-      `${major}.4`,
-      header(`${other}.1`, `${major}.4`),
-    );
-    const g = restore(file, { PG_RESTORE_CMD: fromOther });
-    expect(g.code).not.toBe(0);
-    expect(g.err.trim()).toBe(
-      `khoi-phuc: tệp sao lưu từ máy chủ bản ${other}, máy chủ khôi phục bản ${major} — khôi phục vào máy chủ cùng bản với máy chủ gốc`,
-    );
-    expect(await drillDatabases(db.owner)).toEqual(before);
-
-    // The real case of a newer pg_dump: pg_restore of the server's version cannot read the archive header at all.
-    const unreadable = join(outside, "gia-pg_restore-doc-khong-duoc");
+  it("bản phá: sổ tay bảo «sao lưu lại» ở dòng máy chủ gốc khác bản → gọi tên chỗ lệch", async () => {
+    const printed = await runSituation(situations[2]!);
+    const doc = readFileSync(RUNBOOK, "utf8");
+    const at = doc.indexOf("    - `khoi-phuc: tệp sao lưu từ máy chủ bản <a>");
+    expect(at).toBeGreaterThanOrEqual(0);
+    const head = "`khoi-phuc: tệp sao lưu từ máy chủ bản <a>, máy chủ khôi phục bản <b>` — ";
+    const next = doc.indexOf("\n    - `khoi-phuc:", at + 1);
+    const copy = join(tempDir("so-tay-pha-"), "khoi-phuc.md");
     writeFileSync(
-      unreadable,
-      [
-        "#!/usr/bin/env bash",
-        `if [ "\${1:-}" = "--version" ]; then echo "pg_restore (PostgreSQL) ${major}.4"; exit 0; fi`,
-        `echo "pg_restore: error: unsupported version (1.16) in file header" >&2`,
-        "exit 1",
-        "",
-      ].join("\n"),
+      copy,
+      `${doc.slice(0, at)}    - ${head}sao lưu lại bằng công cụ cùng bản rồi làm lại từ bước 3.${doc.slice(next)}`,
     );
-    chmodSync(unreadable, 0o755);
-    const u = restore(file, { PG_RESTORE_CMD: unreadable });
-    expect(u.code).not.toBe(0);
-    expect(u.err.trim()).toBe(
-      `khoi-phuc: tệp sao lưu lấy bằng pg_dump mới hơn bản ${major} của máy chủ khôi phục — sao lưu lại bằng công cụ cùng bản`,
-    );
-    expect(await drillDatabases(db.owner)).toEqual(before);
+    expect(remedyMismatches(readFileSync(copy, "utf8"), printed)).toEqual([
+      `khoi-phuc: tệp sao lưu từ máy chủ bản <a>, máy chủ khôi phục bản <b>: sổ tay không ghi «${serverRemedy}»`,
+    ]);
   });
 });
