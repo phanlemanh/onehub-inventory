@@ -89,7 +89,7 @@ describe("healthOf", () => {
       APP_ENV: "staging",
       DATABASE_URL:
         "postgres://quy_hang_login.abcdefghijklmnopqrst:moc-mat-khau@moc-may-chu.example.test:6543/postgres",
-      AUTH_SECRET: "moc-auth-secret-0123456789",
+      AUTH_SECRET: `moc-${"a".repeat(30)}`,
       RESEND_API_KEY: "moc-resend-key",
       MAIL_FROM: "OneHub <moc-thu@onehub.center>",
       APP_URL: "https://moc-dia-chi.example.test",
