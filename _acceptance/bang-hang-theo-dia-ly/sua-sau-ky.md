@@ -1,25 +1,20 @@
 # 2d · Sửa sau chữ ký
 
-Chủ kho đã ký Cổng Bằng chứng của hàng 2d. Dưới đây là mọi chỗ đổi sau chữ ký, mỗi chỗ có phép của giám sát và được chủ
-kho soi ở Cổng Bằng chứng của hàng mang nó.
+Chủ kho đã ký Cổng Bằng chứng của hàng 2d và hàng đã vào nhánh chính. Sau đó bài «E8 a place keeps the other filters» ở
+khổ 1440 đỏ chập chờn trên CI (đợi 3 dòng, nhận 10). Dãy V đo lại và kết luận đây là lỗi sản phẩm có sẵn trên nhánh
+chính (V-1611-10). Giám sát mở việc phụ VP5 và cho lối sửa dưới đây (G-1611-52, G-1611-53, G-1611-56).
 
-## Hàng 1u (Dọn nợ của bộ kiểm), 16/11/2026
+## Việc phụ VP5 (Bấm nơi sớm làm mất lọc), 16/11/2026
+
+Lỗi chạm AC-5. Bấm một nơi ở cột thứ hai trước khi màn Bảng hàng nhận trang thì trình duyệt mở địa chỉ riêng của mục
+(`/inventory?vung=…`), nên các lọc khác của địa chỉ đang mở (ví dụ lọc Trạng thái «Đang bán») bị mất. Màn chỉ tự xử lý
+cú bấm khi trang đã chạy và vùng bảng đã báo góc nhìn. Đã dựng lại tại máy bằng cách chặn script: bảng ra 10 dòng thay
+vì 3.
 
 | Chỗ | Người dùng thấy khác gì | Bài kiểm | Phép |
 | --- | --- | --- | --- |
-| `tests/e2e-db/dia-ly.spec.ts`: hai ca phá («gỡ chân bảng» ở E6, «thu hẹp cột» ở E11) đổi trang qua cửa chung `suaTrang` (`tests/e2e/sua-trang.ts`) thay vì gọi thẳng; cửa chung chờ trang gắn xong rồi mới đổi | Không. Bài vẫn đổi đúng chỗ ấy, cùng cách, và vẫn chờ cùng thông báo lỗi; chỉ thêm bước chờ trang gắn xong trước khi đổi | Bài của 2d giữ nguyên ý; bộ quét `tests/sua-trang.test.ts` đỏ nếu một trong hai chỗ quay về gọi thẳng. Hồ sơ 2d được ghim lại trên bản có thay đổi này trước khi PR #71 gộp | G-1611-19; trình ở Cổng Bằng chứng hàng 1u, mục «Bài của hàng khác đã đổi» |
+| Địa chỉ của mục nơi mang các tham số của địa chỉ đang mở, trừ nơi, toà và dự án của ô tìm kiếm, và góc nhìn đã lưu (`src/modules/listings/ui/geo-tree.ts`; trường `keepAddress` và hàm `linkHref` ở `src/components/templates/nav-items.ts`; cột thứ hai vẽ địa chỉ ấy ở `src/components/templates/app-shell/second-column.tsx`) | Có, đúng điều AC-5 đòi: bấm một nơi trước hay sau khi trang nhận xong đều giữ các lọc khác. Mở một nơi khi đang ở góc nhìn đã lưu vẫn rời góc nhìn, như trước. Các mục khác của cột thứ hai («Tất cả hàng», mục trạng thái, góc nhìn đã lưu) không đổi địa chỉ | `src/modules/listings/ui/geo-tree.test.ts` «a place's address (VP5)» (bốn ca, có ca phá «mat loc khac»); `tests/e2e-db/dia-ly.spec.ts` «E8 a press before the page comes alive keeps the other filters» (chặn script rồi bấm S1.03, có ca phá). Bỏ phần sửa thì cả hai đỏ «mat loc khac». Ca E8 ở khổ 1440 chạy lặp 30 lần tại máy, không lần nào đỏ | G-1611-52, G-1611-53 |
+| `tests/e2e-db/dia-ly.spec.ts`: E8 bỏ dòng chú thích «chờ trang chạy, vì bấm sớm thì mất lọc» | Không | Như trên | G-1611-52 |
 
-## Chấm lại E14 ở lượt ghim lại cuối của hàng 1u, 16/11/2026
-
-Nhánh của hàng 1u đã gộp nhánh chính `7ea2f53` (hàng 19 Thuế phí, hàng 5 Dán từ Excel, PR #72, #73) rồi ghim lại hồ sơ này
-trên bản `038f075` (lượt `repin-20261116T070937Z-41988`, 14/14 mục máy đạt). E14 là mục giao diện, lượt máy không chứng
-được, nên được chấm lại một lần bằng người chấm giao diện ngữ cảnh sạch (G-1611-26).
-
-- **Kết quả: ĐẠT.** Tám khung ở `_acceptance/don-no-bo-kiem/evidence/2d-E14/` (kèm `facts.json`), chụp trên bản `038f075`
-  bằng một lượt trình duyệt tạm, không commit, đăng nhập như một Đầu chủ của một sàn mẫu mới.
-- Cột thứ hai vẫn đúng như lúc ký: mỗi dự án một nhóm, không số đếm, «The Sapphire 1» là mục sáng duy nhất, chân bảng
-  «36 / 60 dòng»; ở 360 chọn «[MAU] Toà E1» thì ngăn đóng và chân bảng «12 / 60 dòng»; ô lọc Dự án và Toà giữ trọn tên
-  khi rê chuột. Màn Đã gửi và Tuỳ chỉnh của sàn không có cây nơi, mục sáng như ảnh trước.
-- Khác với lúc ký, đều do hàng khác đã ký: Tuỳ chỉnh của sàn có thêm mục «Thuế phí» (hàng 19); Bảng hàng có thêm cột «Về
-  tay» (hàng 19) nên ở 1440 cột «Xác nhận lúc» ra ngoài mép phải và bảng cuộn ngang; thẻ căn ở điện thoại có thêm dòng Về
-  tay.
+Hồ sơ được ghim lại trên bản có thay đổi này, cùng lượt với hồ sơ `upgrade-design-assembly-tool`, vì hồ sơ ấy ghim
+cùng các tệp mã.
