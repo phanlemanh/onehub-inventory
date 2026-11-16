@@ -1,7 +1,7 @@
 # Lùi bản
 
 Trỏ tên miền của một môi trường về bản đã chạy trước bản hiện tại, rồi kiểm lại. Lùi bản chỉ đổi mã đang phục vụ; cơ sở
-dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật migration (Hỏi-4, xem [dua-ban-len.md](dua-ban-len.md)) bảo
+dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật migration (mục «Cần có trước» của [dua-ban-len.md](dua-ban-len.md)) bảo
 đảm bản trước chạy được trên cơ sở dữ liệu ấy. Mục lục và bảng biến: [README.md](README.md).
 
 ## Khi nào dùng
@@ -12,8 +12,10 @@ dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật m
 
 ## Cần có trước
 
-- Một máy có `git`, Node.js (bản ghi trong `.nvmrc`) và `vercel` (cài như dòng `npm install --global vercel@…` của tệp tự
-  động triển khai); bản sao của kho này (`git clone`), đã chạy `make setup` một lần.
+- Một máy có `git` và Node 24 (`node --version` in `v24.…`; tải ở nodejs.org, bản 24 LTS).
+- `vercel` đúng bản tệp tự động triển khai dùng: gõ `npm install --global vercel@65.9.0`; đạt khi `vercel --version` in
+  `65.9.0`. Đỏ thì: `EACCES` — máy cài Node vào thư mục hệ thống; cài Node qua trình quản lý bản (như `nvm`) rồi gõ lại.
+- Bản sao của kho này (`git clone`), đã chạy `make setup` một lần.
 - Một tệp biến ngoài kho cho mỗi môi trường, quyền chỉ chủ đọc, có bốn biến `VERCEL_TOKEN`, `VERCEL_ORG_ID`,
   `VERCEL_PROJECT_ID` (dự án của môi trường cần lùi) và `APP_URL` (địa chỉ của môi trường ấy); thêm
   `VERCEL_AUTOMATION_BYPASS_SECRET` nếu dự án bật bảo vệ bản mới. Giá trị lấy từ trình giữ mật khẩu, giống giá trị đã đặt
@@ -28,7 +30,7 @@ dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật m
 - **Đạt khi:** thấy rõ bản đang hỏng — trang không trả lời, `"ok":false`, hay trang chủ lỗi — và ghi lại 7 ký tự đầu của
   `commit` nếu có.
 - **Đỏ thì:** sức khoẻ trả `"ok":true`, `"vai":"dat"` mà người dùng vẫn báo lỗi: lùi bản vẫn được nếu lỗi bắt đầu từ bản
-  này; không chắc thì hỏi người dựng trước khi lùi.
+  này; không chắc thì hỏi người giữ kho mã trước khi lùi.
 
 ### 2. Nạp biến của môi trường
 
@@ -51,11 +53,11 @@ dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật m
 - **Ở đâu:** trình duyệt.
 - **Gõ hay bấm:** mở lại `<APP_URL>/api/v1/health`, rồi mở trang chủ và đăng nhập.
 - **Đạt khi:** `"ok":true`, `"vai":"dat"`, `commit` là bản cũ; đăng nhập được.
-- **Đỏ thì:** lùi bản bằng trang Vercel (mục «Đỏ thì làm gì», dòng cuối) và báo người dựng ngay.
+- **Đỏ thì:** lùi bản bằng trang Vercel (mục «Đỏ thì làm gì», dòng cuối) và báo người giữ kho mã ngay.
 
 ### 5. Báo và ghi lại
 
-- **Ở đâu:** GitHub (issue mới) và người dựng.
+- **Ở đâu:** GitHub (issue mới) và người giữ kho mã.
 - **Gõ hay bấm:** mở một issue: môi trường, commit hỏng, commit đang chạy sau khi lùi, giờ lùi, triệu chứng. Sự cố trên bản
   thật được ghi thành một trang trong `wiki/incidents/` khi sửa xong.
 - **Đạt khi:** có issue; lượt đưa bản lên kế tiếp mang bản sửa, đi lại từ đầu theo [dua-ban-len.md](dua-ban-len.md).
@@ -63,11 +65,11 @@ dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật m
 
 ## Đỏ thì làm gì
 
-| Dòng                                                           | Làm gì                                                                                                                                                                                                        |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rollback <ENV>: ĐỎ — thiếu biến <tên>`                        | Tệp biến thiếu biến ấy, hoặc chưa nạp (bước 2). Bổ sung, nạp lại, chạy lại.                                                                                                                                   |
-| `rollback <ENV>: ĐỎ — không đọc được danh sách bản của Vercel` | `vercel` chưa cài, hoặc `VERCEL_TOKEN` hết hạn hay sai nhóm. Cài lại hay xoay khoá ([xoay-khoa.md](xoay-khoa.md)); gấp thì dùng dòng cuối.                                                                    |
-| `rollback <ENV>: không có bản trước để lùi`                    | Môi trường mới có một bản. Không có gì để lùi: sửa lỗi rồi đưa bản mới lên.                                                                                                                                   |
-| `rollback <ENV>: ĐỎ — vercel rollback lỗi (mã <n>)`            | Đọc dòng lỗi của Vercel ngay phía trên. Gấp thì dùng dòng cuối.                                                                                                                                               |
-| `rollback <ENV>: kiem-nhanh-ten-mien ĐỎ — <lý do>`             | Tên miền đã về bản cũ nhưng bản cũ cũng không khoẻ. Đọc lý do như bảng của [dua-ban-len.md](dua-ban-len.md) (dòng `kiem-nhanh`); thường là biến trên Vercel hay cơ sở dữ liệu, không phải mã. Báo người dựng. |
-| Lệnh không chạy được ở máy nào                                 | Ở vercel.com › dự án của môi trường › Deployments: chọn bản «Ready» ngay trước bản hỏng › menu ba chấm › Instant Rollback › xác nhận. Rồi làm bước 4.                                                         |
+| Dòng                                                           | Làm gì                                                                                                                                                                                                              |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rollback <ENV>: ĐỎ — thiếu biến <tên>`                        | Tệp biến thiếu biến ấy, hoặc chưa nạp (bước 2). Bổ sung, nạp lại, chạy lại.                                                                                                                                         |
+| `rollback <ENV>: ĐỎ — không đọc được danh sách bản của Vercel` | `vercel` chưa cài, hoặc `VERCEL_TOKEN` hết hạn hay sai nhóm. Cài lại hay xoay khoá ([xoay-khoa.md](xoay-khoa.md)); gấp thì dùng dòng cuối.                                                                          |
+| `rollback <ENV>: không có bản trước để lùi`                    | Môi trường mới có một bản. Không có gì để lùi: sửa lỗi rồi đưa bản mới lên.                                                                                                                                         |
+| `rollback <ENV>: ĐỎ — vercel rollback lỗi (mã <n>)`            | Đọc dòng lỗi của Vercel ngay phía trên. Gấp thì dùng dòng cuối.                                                                                                                                                     |
+| `rollback <ENV>: kiem-nhanh-ten-mien ĐỎ — <lý do>`             | Tên miền đã về bản cũ nhưng bản cũ cũng không khoẻ. Đọc lý do như bảng của [dua-ban-len.md](dua-ban-len.md) (dòng `kiem-nhanh`); thường là biến trên Vercel hay cơ sở dữ liệu, không phải mã. Báo người giữ kho mã. |
+| Lệnh không chạy được ở máy nào                                 | Ở vercel.com › dự án của môi trường › Deployments: chọn bản «Ready» ngay trước bản hỏng › menu ba chấm › Instant Rollback › xác nhận. Rồi làm bước 4.                                                               |

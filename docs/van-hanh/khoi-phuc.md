@@ -1,7 +1,7 @@
 # Khôi phục dữ liệu
 
 Hai việc: thử khôi phục định kỳ, để biết chắc bản sao lưu dùng được, và khôi phục thật khi dữ liệu mất hay hỏng. Sao lưu
-hằng ngày là của Supabase (giữ 7 ngày, Hỏi-3); lệnh của kho làm thêm một bản sao lưu tại chỗ để thử khôi phục vào một cơ
+hằng ngày là của Supabase (giữ 7 ngày); lệnh của kho làm thêm một bản sao lưu tại chỗ để thử khôi phục vào một cơ
 sở nháp, đếm dòng từng bảng và chạy bộ kiểm cách ly trên bản khôi phục. Mỗi lần thử ghi vào
 [nhat-ky-khoi-phuc.md](nhat-ky-khoi-phuc.md). Mục lục và bảng biến: [README.md](README.md).
 
@@ -60,7 +60,7 @@ sở nháp, đếm dòng từng bảng và chạy bộ kiểm cách ly trên b�
   `khoi-phuc: <ngày> · <n> bảng · <m> dòng · cach-ly đạt`, với `n`, `m` trùng bước 3.
 - **Đỏ thì:**
   - `thieu bang: <bảng>` hay `lech dong: <bảng> (goc … · khoi phuc …)` — bản sao lưu không đủ: không ghi là đạt; báo
-    người dựng kèm nguyên dòng.
+    người giữ kho mã kèm nguyên dòng.
   - `pg_restore lỗi` — đọc dòng lỗi ngay dưới; `role … does not exist` nghĩa là khôi phục nhầm sang máy chủ khác máy chủ
     sao lưu.
   - `không tạo được cơ sở nháp` — vai trong `KHOI_PHUC_ADMIN_URL` không được tạo cơ sở dữ liệu; dùng vai chủ `postgres`.
@@ -73,13 +73,13 @@ sở nháp, đếm dòng từng bảng và chạy bộ kiểm cách ly trên b�
 - **Gõ hay bấm:** thêm một dòng cuối bảng «Các lần thử»: chép nguyên dòng `khoi-phuc: …` của bước 4, nơi thử («bản thử»),
   bản sao lưu («sao lưu tại chỗ, `make sao-luu`»), người thử, ghi chú.
 - **Đạt khi:** PR gộp; bảng có dòng mới nhất ở dưới cùng.
-- **Đỏ thì:** lần thử đỏ không ghi như lần đạt: ghi vào cột Ghi chú lý do và việc đã làm, mở issue cho người dựng.
+- **Đỏ thì:** lần thử đỏ không ghi như lần đạt: ghi vào cột Ghi chú lý do và việc đã làm, mở issue cho người giữ kho mã.
 
 ### 6. Xoá tệp sao lưu tại chỗ
 
 - **Ở đâu:** máy chủ kho.
 - **Gõ hay bấm:** `rm <tệp của bước 3> <tệp của bước 3>.dem`.
-- **Đạt khi:** hai tệp không còn. Kho không giữ bản sao lưu ngoài sao lưu hằng ngày của Supabase (Hỏi-3).
+- **Đạt khi:** hai tệp không còn. Kho không giữ bản sao lưu ngoài sao lưu hằng ngày của Supabase.
 - **Đỏ thì:** tệp nằm trên ổ dùng chung hay đã đồng bộ lên mây — xoá cả bản ở đó; tệp có dữ liệu thật.
 
 ## Khôi phục thật
@@ -89,23 +89,28 @@ khôi phục, và mọi thứ ghi sau thời điểm sao lưu mất.
 
 1. **Quyết định.** Ở đâu: chủ kho. Gõ hay bấm: chọn thời điểm sao lưu (ngày trước sự cố) và báo các sàn đang dùng. Đạt
    khi: chủ kho đồng ý thời điểm và phần dữ liệu sẽ mất. Đỏ thì: chưa đồng ý thì không làm gì; dữ liệu hỏng của một sàn
-   có khi sửa được bằng tay, hỏi người dựng.
+   có khi sửa được bằng tay, hỏi người giữ kho mã.
 2. **Khôi phục.** Ở đâu: Supabase › dự án bản thật › Database › Backups › Scheduled backups. Gõ hay bấm: Restore ở bản
    của ngày đã chọn, xác nhận. Đạt khi: Supabase báo dự án đã khôi phục xong và chạy lại. Đỏ thì: Supabase báo lỗi — mở
    yêu cầu hỗ trợ với Supabase; không thử lại bằng cách khác trên bản thật.
 3. **Đưa lại bản.** Ở đâu: GitHub › Actions › Deploy › Run workflow, thẻ phát hành đang chạy. Gõ hay bấm: chạy, duyệt
    `production`. Đạt khi: `deploy production: xong <commit>` — bước `migration` áp lại migration nào mới hơn bản sao lưu.
    Đỏ thì: bảng «Đỏ thì làm gì» của [dua-ban-len.md](dua-ban-len.md).
-4. **Kiểm cách ly bản thật.** Ở đâu: máy chủ kho, đã nạp tệp biến của bản thật (vai chủ và vai đăng nhập của bản thật).
-   Gõ hay bấm: `make cach-ly-dich`, rồi `make smoke ENV=production`. Đạt khi: `cach-ly-dich: 4 ca đạt` và
-   `smoke production: đạt <commit>`. Đỏ thì: dòng gọi tên bảng hay vai — báo người dựng ngay, cân nhắc tạm ngừng bản thật.
+4. **Kiểm cách ly bản thật.** Ở đâu: máy chủ kho, cửa sổ dòng lệnh, trong thư mục bản sao của kho. Trước hết dựng tệp
+   biến ngoài kho của bản thật (một lần; quyền chỉ chủ đọc: `chmod 600 <tệp>`), mỗi dòng dạng `TÊN=giá trị` lấy từ trình
+   giữ mật khẩu: `MIGRATE_DATABASE_URL` (chuỗi Session pooler vai chủ của dự án bản thật, việc 3 của README),
+   `LOGIN_DATABASE_URL` (chuỗi vai `quy_hang_login` của bản thật — cùng chuỗi `DATABASE_URL` đặt ở Vercel, việc 4 của
+   README), `APP_URL` (`https://inventory.onehub.center`), thêm `VERCEL_AUTOMATION_BYPASS_SECRET` nếu dự án bật bảo vệ.
+   Gõ hay bấm: `set -a; source <tệp biến của bản thật>; set +a`, rồi `make cach-ly-dich`, rồi
+   `make smoke ENV=production`. Đạt khi: `cach-ly-dich: 4 ca đạt` và
+   `smoke production: đạt <commit>`. Đỏ thì: dòng gọi tên bảng hay vai — báo người giữ kho mã ngay, cân nhắc tạm ngừng bản thật.
 5. **Ghi lại.** Thêm một dòng vào [nhat-ky-khoi-phuc.md](nhat-ky-khoi-phuc.md) (nơi thử «bản thật», bản sao lưu «sao lưu
    hằng ngày của Supabase, ngày …») và một trang sự cố trong `wiki/incidents/`.
 
 ## Đỏ thì làm gì
 
-- Mọi lệnh ở đây không in địa chỉ hay mật khẩu. Dán dòng đỏ cho người dựng được; không dán tệp biến.
+- Mọi lệnh ở đây không in địa chỉ hay mật khẩu. Dán dòng đỏ cho người giữ kho mã được; không dán tệp biến.
 - `thiếu biến <tên>` ở bất kỳ lệnh nào: tệp biến thiếu biến ấy hay chưa nạp (bước 1).
 - Thử khôi phục đỏ hai quý liền: coi như chưa có sao lưu dùng được; chủ kho cân nhắc lối khôi phục theo thời điểm của
-  Supabase (chi phí ở `_acceptance/moi-truong-thu-va-ban-that/chi-phi.md`).
+  Supabase (Project Settings › Add-ons › Point in time recovery; giá ghi ngay trên trang ấy).
 - Cơ sở nháp còn sót trên bản thử (`khoi_phuc_thu_…` trong danh sách cơ sở dữ liệu): xoá như dòng cuối của bước 4.

@@ -8,11 +8,11 @@
 // The scripts reach Postgres through psql, pg_dump and pg_restore inside the lane's container, so the addresses are the
 // container's own (127.0.0.1:5432, trust) and carry no password.
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type pg from "pg";
+import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { tempDir } from "../support/temp-dir";
@@ -43,7 +43,7 @@ function backup(db: string, file: string, extra: Record<string, string> = {}): R
   return { code: r.status, out: r.stdout, err: r.stderr };
 }
 
-function restore(file: string): Run {
+function restore(file: string, extra: Record<string, string> = {}): Run {
   const r = spawnSync("bash", [RESTORE, file], {
     env: {
       ...process.env,
@@ -52,6 +52,7 @@ function restore(file: string): Run {
       KHOI_PHUC_ADMIN_URL: `${IN_CONTAINER}/postgres`,
       KHOI_PHUC_LOGIN_URL: `postgres://${LOGIN_ROLE}@127.0.0.1:5432/postgres`,
       KHOI_PHUC_GIU: "",
+      ...extra,
     },
     encoding: "utf8",
   });
@@ -77,6 +78,22 @@ async function drillDatabases(owner: pg.Client): Promise<string[]> {
     "select datname from pg_database where datname like 'khoi\\_phuc\\_thu\\_%' order by 1",
   );
   return r.rows.map((x) => x.datname);
+}
+
+/** Row count of every table outside the system schemas, by `schema.table`. */
+async function perTable(client: pg.Client): Promise<Record<string, number>> {
+  const tables = await client.query<{ ten: string }>(
+    `select format('%I.%I', n.nspname, c.relname) as ten
+     from pg_class c join pg_namespace n on n.oid = c.relnamespace
+     where c.relkind in ('r', 'p') and n.nspname not in ('pg_catalog', 'information_schema')
+       and n.nspname not like 'pg\\_%' order by 1`,
+  );
+  const rows: Record<string, number> = {};
+  for (const { ten } of tables.rows)
+    rows[ten] = Number(
+      (await client.query<{ n: string }>(`select count(*) as n from ${ten}`)).rows[0]!.n,
+    );
+  return rows;
 }
 
 /** Number of tables outside the system schemas and their total rows. */
@@ -158,6 +175,48 @@ describe("sao-luu và khoi-phuc-thu", () => {
     expect(r.code).toBe(1);
     expect(r.out.split("\n")).toContain("thieu bang: public.agreements");
     expect(r.err).toContain("khoi-phuc: đỏ — số dòng không khớp bản sao lưu");
+    expect(r.out).not.toMatch(/cach-ly đạt$/m);
+    expect(await drillDatabases(db.owner)).toEqual(before);
+  });
+
+  it("cơ sở nháp giữ lại: từng bảng có đúng số dòng của gốc (đọc thẳng bản khôi phục)", async () => {
+    const file = join(outside, "giu.dump");
+    expect(backup(db.name, file).code).toBe(0);
+    const r = restore(file, { KHOI_PHUC_GIU: "1" });
+    expect(r.code).toBe(0);
+    const scratch = r.out
+      .split("\n")
+      .find((l) => l.startsWith("co-so-nhap: "))!
+      .slice("co-so-nhap: ".length);
+    const url = new URL(db.url);
+    url.pathname = `/${scratch}`;
+    const copy = new pg.Client({ connectionString: url.toString() });
+    await copy.connect();
+    try {
+      const restored = await perTable(copy);
+      const source = await perTable(db.owner);
+      expect(Object.keys(restored).length).toBeGreaterThan(0);
+      expect(restored).toEqual(source);
+    } finally {
+      await copy.end();
+      await db.owner.query(`drop database if exists ${scratch} with (force)`);
+    }
+  });
+
+  it("bản phá: số dòng một bảng trong tệp đếm lệch → đỏ «lech dong» gọi tên bảng", async () => {
+    const file = join(outside, "lech.dump");
+    expect(backup(db.name, file).code).toBe(0);
+    const dem = readFileSync(`${file}.dem`, "utf8").trim().split("\n");
+    const i = dem.findIndex((l) => l.startsWith("public.agreements\t"));
+    expect(i).toBeGreaterThanOrEqual(0);
+    const [ten, n] = dem[i]!.split("\t");
+    dem[i] = `${ten}\t${Number(n) + 1}`;
+    writeFileSync(`${file}.dem`, `${dem.join("\n")}\n`);
+    const before = await drillDatabases(db.owner);
+
+    const r = restore(file);
+    expect(r.code).toBe(1);
+    expect(r.out.split("\n").some((l) => l.startsWith("lech dong: public.agreements "))).toBe(true);
     expect(r.out).not.toMatch(/cach-ly đạt$/m);
     expect(await drillDatabases(db.owner)).toEqual(before);
   });

@@ -1,6 +1,8 @@
 // Row 22, AC-9 (E9): the runbook in docs/van-hanh/ — four procedures with their required headings and four parts per
 // step, the outside-repo list numbered 1..n with the variable names each item hands back, every `make <target>` it
 // mentions defined in Makefile or mk/*.mk, and every variable of its variable table declared in .env.example.
+// E10: the runbook stands on its own — no step sends the operator to `_acceptance/`, every outside-repo item says what
+// passes and what to do on red, and the two procedures that install tools pin the vercel version and the Node version.
 import { cpSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -99,6 +101,59 @@ function outsideItems(root: string): { n: number; text: string }[] {
   return items;
 }
 
+/** The two labels every item of the README's «## Việc ngoài kho» carries, as in a procedure step. */
+const OUTSIDE_PARTS = ["**Đạt khi:**", "**Đỏ thì:**"];
+/** Procedures that install tools on the operator's machine, so they name the exact versions. */
+const TOOL_PROCEDURES = ["dua-ban-len.md", "lui-ban.md"];
+const TOOL_VERSIONS: { label: string; pattern: RegExp }[] = [
+  { label: "vercel@<x.y.z>", pattern: /\bvercel@\d+\.\d+\.\d+\b/ },
+  { label: "Node 24", pattern: /\bNode 24\b/ },
+];
+
+function runbookFiles(root: string): string[] {
+  return readdirSync(join(root, RUNBOOK))
+    .filter((f) => f.endsWith(".md"))
+    .sort();
+}
+
+/** Every line of a runbook .md file that sends the reader to `_acceptance/`: "<file>:<line>". */
+export function acceptanceMentions(root: string): string[] {
+  const found: string[] = [];
+  for (const file of runbookFiles(root))
+    read(root, RUNBOOK, file)
+      .split("\n")
+      .forEach((line, k) => {
+        if (line.includes("_acceptance/")) found.push(`${RUNBOOK}/${file}:${k + 1}`);
+      });
+  return found;
+}
+
+/** Every outside-repo item missing a label: "item <n>: <label>". */
+export function outsideItemsMissingParts(root: string): string[] {
+  const missing: string[] = [];
+  for (const item of outsideItems(root))
+    for (const part of OUTSIDE_PARTS)
+      if (!item.text.includes(part)) missing.push(`item ${item.n}: ${part}`);
+  return missing;
+}
+
+/** Every tool-installing procedure missing a pinned version: "<file>: <label>". */
+export function missingToolVersions(root: string): string[] {
+  const missing: string[] = [];
+  for (const file of TOOL_PROCEDURES) {
+    const text = read(root, RUNBOOK, file);
+    for (const v of TOOL_VERSIONS) if (!v.pattern.test(text)) missing.push(`${file}: ${v.label}`);
+  }
+  return missing;
+}
+
+/** A temporary copy of the runbook folder, for the break cases. */
+function runbookCopy(): string {
+  const root = tempDir("van-hanh-");
+  cpSync(join(ROOT, RUNBOOK), join(root, RUNBOOK), { recursive: true });
+  return root;
+}
+
 describe("runbook docs/van-hanh (AC-9)", () => {
   it.each(PROCEDURES)("%s has every required heading", (file) => {
     const path = join(ROOT, RUNBOOK, file);
@@ -155,5 +210,55 @@ describe("runbook docs/van-hanh (AC-9)", () => {
       `${readFileSync(file, "utf8")}\nGõ \`make khong-co-dich ENV=production\`.\n`,
     );
     expect(missingMakeTargets(root)).toEqual([`khong-co-dich (${RUNBOOK}/lui-ban.md)`]);
+  });
+
+  it("no runbook file sends the reader to _acceptance/ (E10)", () => {
+    expect(acceptanceMentions(ROOT)).toEqual([]);
+  });
+
+  it("every outside-repo item says what passes and what to do on red (E10)", () => {
+    expect(outsideItems(ROOT).length).toBeGreaterThan(5);
+    expect(outsideItemsMissingParts(ROOT)).toEqual([]);
+  });
+
+  it("the procedures that install tools pin the vercel version and Node 24 (E10)", () => {
+    expect(missingToolVersions(ROOT)).toEqual([]);
+  });
+
+  it("break: a copy that points at _acceptance/ names the file and the line", () => {
+    const root = runbookCopy();
+    const file = join(root, RUNBOOK, "xoay-khoa.md");
+    const lines = readFileSync(file, "utf8").split("\n").length;
+    writeFileSync(file, `${readFileSync(file, "utf8")}Làm theo \`_acceptance/x/de-xuat.md\`.\n`);
+    expect(acceptanceMentions(root)).toEqual([`${RUNBOOK}/xoay-khoa.md:${lines}`]);
+  });
+
+  it("break: an outside-repo item without its red line names the item and the label", () => {
+    const root = runbookCopy();
+    const file = join(root, RUNBOOK, "README.md");
+    const text = readFileSync(file, "utf8");
+    const start = text.indexOf("\n7. ");
+    const red = text.indexOf("**Đỏ thì:**", start);
+    expect(start).toBeGreaterThan(0);
+    writeFileSync(
+      file,
+      `${text.slice(0, red)}**Sai thì:**${text.slice(red + "**Đỏ thì:**".length)}`,
+    );
+    expect(outsideItemsMissingParts(root)).toEqual(["item 7: **Đỏ thì:**"]);
+  });
+
+  it("break: a procedure that installs an unpinned vercel on an unnamed Node names the file and both labels", () => {
+    const root = runbookCopy();
+    const file = join(root, RUNBOOK, "lui-ban.md");
+    writeFileSync(
+      file,
+      readFileSync(file, "utf8")
+        .replace(/vercel@\d+\.\d+\.\d+/g, "vercel@latest")
+        .replace(/Node 24/g, "Node.js"),
+    );
+    expect(missingToolVersions(root)).toEqual([
+      "lui-ban.md: vercel@<x.y.z>",
+      "lui-ban.md: Node 24",
+    ]);
   });
 });

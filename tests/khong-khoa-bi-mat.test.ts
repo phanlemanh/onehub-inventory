@@ -192,6 +192,10 @@ describe(".env.example lists the variables of row 22", () => {
     "VERCEL_TOKEN",
     "VERCEL_ORG_ID",
     "VERCEL_PROJECT_ID",
+    "COMMIT_SHA",
+    "VERCEL_GIT_COMMIT_SHA",
+    "STAGING_APP_URL",
+    "VERCEL_AUTOMATION_BYPASS_SECRET",
   ];
   const text = readFileSync(join(ROOT, ".env.example"), "utf8");
 
@@ -208,5 +212,47 @@ describe(".env.example lists the variables of row 22", () => {
         (name === "APP_ENV" && value === "development");
       expect(safe, `${name}=${value} in .env.example`).toBe(true);
     }
+  });
+});
+
+/** Set by Node or Next itself, never by an operator. */
+const RUNTIME_SET = new Set(["NODE_ENV", "NEXT_PHASE", "NEXT_RUNTIME"]);
+
+/** Variables read under `src/` (tests excluded) that `.env.example` does not list, as `name (file)`. */
+export function undocumentedVariables(root: string): string[] {
+  const listed = readFileSync(join(root, ".env.example"), "utf8");
+  const missing = new Set<string>();
+  const files = execFileSync("git", ["ls-files", "-co", "--exclude-standard", "src"], {
+    cwd: root,
+    encoding: "utf8",
+  })
+    .split("\n")
+    .filter((f) => /\.(ts|tsx|mjs)$/.test(f) && !/\.test\.tsx?$/.test(f));
+  for (const file of files) {
+    const text = readFileSync(join(root, file), "utf8");
+    for (const m of text.matchAll(/(?:process\.env\.|env\[["'])([A-Z_][A-Z0-9_]*)/g)) {
+      const name = m[1]!;
+      if (RUNTIME_SET.has(name)) continue;
+      if (!new RegExp(`^(?:#\\s*)?${name}=`, "m").test(listed)) missing.add(`${name} (${file})`);
+    }
+  }
+  return [...missing].sort();
+}
+
+describe("every variable the app reads is in .env.example (AC-10)", () => {
+  it("none missing on the tree", () => {
+    expect(undocumentedVariables(ROOT)).toEqual([]);
+  });
+
+  it("break: a copy whose code reads a new variable names it and its file", () => {
+    const dir = tempDir("bien-chua-khai-");
+    execFileSync("git", ["init", "-q"], { cwd: dir });
+    mkdirSync(join(dir, "src"), { recursive: true });
+    writeFileSync(join(dir, ".env.example"), "# APP_URL=https://example.test\n");
+    writeFileSync(
+      join(dir, "src", "a.ts"),
+      'export const a = process.env.APP_URL ?? process.env["BIEN_MOI"];\n',
+    );
+    expect(undocumentedVariables(dir)).toEqual(["BIEN_MOI (src/a.ts)"]);
   });
 });
