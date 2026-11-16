@@ -12,7 +12,7 @@ import { databaseConfigured } from "@/modules/identity/server";
 import type { InventoryData } from "@/modules/listings";
 import { myInventory } from "@/modules/listings/server";
 
-import { sampleInventoryData } from "./inventory-sample-rows";
+import { sampleInventoryData } from "./inventory-sample-data";
 
 export type InventorySource =
   | { kind: "ready"; data: InventoryData; live: boolean }

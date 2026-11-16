@@ -28,14 +28,17 @@ function appSources(): Map<string, string> {
 
 const SAMPLE_CALLS =
   /\b(sampleInventoryData|sampleInventoryRows|sampleInventoryListings|sampleRecords|sampleSearchRows|sampleBuildingPlaces)\(/;
-const SAMPLE_FILE = "src/app/(app)/inventory-sample-rows.ts";
+const SAMPLE_FILES = new Set([
+  "src/app/(app)/inventory-sample-rows.ts",
+  "src/app/(app)/inventory-sample-data.ts",
+]);
 const SOURCE_FILE = "src/app/(app)/inventory-source.ts";
 
 /** Files of src/app other than the sample file and the source that call a sample builder. */
 function sampleReaders(sources: Map<string, string>): string[] {
   return [...sources]
     .filter(
-      ([path, text]) => path !== SAMPLE_FILE && path !== SOURCE_FILE && SAMPLE_CALLS.test(text),
+      ([path, text]) => !SAMPLE_FILES.has(path) && path !== SOURCE_FILE && SAMPLE_CALLS.test(text),
     )
     .map(([path]) => `khong-con-mau-trong-trang: ${path.split("/").pop()}`);
 }

@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-16 — Row 10: the inventory reads and writes the company's real listings (migration 013, PATCH /api/v1/listings/[id], one read per render, keeper on the record, fee inclusion on its cell) — [0039](decisions/0039-bang-hang-tren-du-lieu-that.md).
 - 2026-11-16 — Inventory by place (row 2d): the App Shell's second column lists projects, then subdivisions and buildings, with no counts; picking one filters the grid's Building column (whole names, stray spaces folded), «Tất cả hàng» drops it, and the footer shows the count — [PR #65](https://github.com/phanlemanh/onehub-inventory/pull/65).
 - 2026-11-16 — Inventory no longer flashes the table before the cards on a phone (VP4, debt of row 2b): the region draws both layouts until the browser takes over, then marks itself hydrated — [PR #70](https://github.com/phanlemanh/onehub-inventory/pull/70).
 - 2026-11-15 — Phép kiểm vòng đời nhận dạng ô «qua lưu cả bảng» cho ô thêm và gỡ (thao tác là thao tác sửa của cùng thực thể, có lý do, có nút; báo cáo in thành nhóm riêng); khoản Thuế phí khai theo dạng này (hàng 19, G N-1511-3, sau chữ ký 1t) — [sửa sau ký](../_acceptance/kiem-vong-doi-thao-tac/sua-sau-ky.md).

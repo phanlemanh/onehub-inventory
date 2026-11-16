@@ -4,7 +4,7 @@
 // Test data only.
 import { createHash } from "node:crypto";
 
-import { sampleInventoryData } from "@/app/(app)/inventory-sample-rows";
+import { sampleInventoryData } from "@/app/(app)/inventory-sample-data";
 import { sampleCatalog } from "@/modules/catalog";
 import { catalogLoadStatements } from "@/modules/catalog/load-sql";
 import { listingLoadStatements } from "@/modules/listings/load-sql";

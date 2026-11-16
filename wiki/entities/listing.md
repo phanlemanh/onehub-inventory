@@ -1,7 +1,7 @@
 ---
 type: entity
 title: Listing (Hàng)
-links: [ontology/entities/Listing.yaml]
+links: [ontology/entities/Listing.yaml, db/migrations/013_bang_can_chao.sql]
 sources: [onehub-quy-hang/CONTEXT.md, "https://dd.reso.org/DD2.1/Property/StandardStatus/"]
 ---
 
@@ -25,9 +25,16 @@ hàng 3b).
 ta, RESO không có. Bảng hàng tính Về tay từ Giá chào, Điều kiện phí và thuế phí của sàn
 ([fee-schedule](fee-schedule.md)); trang khách không đọc cả hai.
 
+Người giữ căn (`listAgentKey`, RESO `ListAgentKey`, hàng 10): một thành viên của chính sàn, hay trống — «chưa ai giữ»; tên sàn
+gọi người ấy chép kèm (`listAgentFullName`). Đưa lên Đang bán cần `activateListing`: Đầu chủ với căn mình giữ hoặc chưa ai
+giữ, Trưởng nhóm toàn sàn (`keeper-activates`).
+
 ## Where in the code
 
-`src/modules/listings/`: luật sửa giá và trạng thái ở `edit-rules.ts`, cổng lưu ở `save-door.ts`, sửa trên ô của Bảng hàng ở `ui/use-listing-cell-edit.tsx`.
+`src/modules/listings/`: luật sửa giá và trạng thái ở `edit-rules.ts`, cổng lưu ở `save-door.ts`, sửa trên ô của Bảng hàng ở
+`ui/use-listing-cell-edit.tsx`. Bảng `listings`, `listing_units` ở `db/migrations/013_bang_can_chao.sql`; đọc ở
+`inventory-read.ts`, ghi ở `listings-http.ts` (`PATCH /api/v1/listings/[id]`), cổng lưu của trình duyệt ở
+`ui/http-save-door.ts`.
 
 ## History
 
@@ -58,3 +65,8 @@ Hàng 2d, 14/11/2026: Bảng hàng đi theo địa lý — cột thứ hai có m
 các dòng của bảng và chỗ đứng của toà trong danh mục; chọn một nơi chỉ thay lọc Dự án, Toà (danh sách tên khớp trọn),
 giữ lọc khác; địa chỉ mang `?vung=<nơi>`. Không thêm trường hay luật của lần chào. Quyết định
 [0036](../decisions/0036-mot-trang-thai-loc-theo-dia-ly.md); hồ sơ `_acceptance/bang-hang-theo-dia-ly/`.
+
+Hàng 10, 16/11/2026: Bảng hàng trên dữ liệu thật — hai bảng của sàn, đọc theo sàn đang đăng nhập (lưới, hồ sơ, ô ⌘K, cây
+địa lý từ một lần đọc), ghi qua `/api/v1` theo bảng quyền, xung đột trả bản hiện tại, hoàn tác chỉ trường đã đổi; sửa Điều
+kiện phí trên ô; người giữ căn thật trên hồ sơ. Quyết định [0039](../decisions/0039-bang-hang-tren-du-lieu-that.md); hồ sơ
+`_acceptance/bang-hang-du-lieu-that/`.
