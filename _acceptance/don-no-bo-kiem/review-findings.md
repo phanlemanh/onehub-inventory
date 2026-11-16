@@ -6,14 +6,49 @@
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **E5 script writes its broken copy of ci-db.sh into the working tree under a fixed name**
+- **The door scanner misses a live page node moved into a detached copy**
+  Người dùng thấy gì: Phép kiểm tra tự động có thể bỏ sót một kiểu sửa trang trước khi dựng xong. Người dùng sản phẩm không bị ảnh hưởng, chỉ người chạy bộ kiểm có thể không được báo.
+  Căn cứ: Chỉ nằm trong bộ kiểm nội bộ, không làm mất hay lộ dữ liệu của người dùng, và phép gác lúc chạy vẫn bắt lỗi thật; sửa tốn công mà lợi ít.
+  file: `tests/sua-trang-quet.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **ranh-gioi.mjs: trim() eats the leading space of the first porcelain line, so one uncommitted forbidden-file change can pass unseen**
+  Người dùng thấy gì: Công cụ kiểm ranh giới có thể không thấy một thay đổi chưa lưu vào tệp bị cấm, nên báo xanh nhầm. Thay đổi đã commit vẫn bị bắt, và người dùng sản phẩm không bị ảnh hưởng.
+  Căn cứ: Chỉ ảnh hưởng một lượt kiểm trước khi commit, sau khi commit thì lỗi tự lộ; không mất dữ liệu và sửa rất rẻ nên ghi lại là đủ.
+  file: `_acceptance/don-no-bo-kiem/rang/ranh-gioi.mjs`
+  severity: medium
+  Đề xuất: known-limits
+
+- **The page-change scanner misses common DOM mutations, so its 'red on any call that does not' promise has holes**
+  Người dùng thấy gì: Phép kiểm tra tự động bỏ sót vài kiểu sửa trang. Người dùng sản phẩm không bị ảnh hưởng, chỉ có thể bộ kiểm xanh trong khi đáng ra đỏ ở khâu quét sớm.
+  Căn cứ: Hậu quả nhẹ, chỉ nằm ở công cụ kiểm nội bộ và còn lớp gác thứ hai lúc chạy thật; không mất dữ liệu.
+  file: `tests/sua-trang-quet.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 5: claims to sweep a whole class (every page-changing call goes through the door) but scans a point-case token list, and misses a real call already in the tree**
+  Người dùng thấy gì: Phép kiểm tra tự động chưa bắt hết các cách sửa trang, và đã có một chỗ trong bài kiểm đang đổi trang mà phép kiểm không thấy. Hiện chỗ đó chạy an toàn và người dùng sản phẩm không bị ảnh hưởng.
+  Căn cứ: Không ảnh hưởng người dùng cuối, chỗ sót hiện chạy an toàn và lớp gác lúc chạy vẫn bắt lệch thật; có thể gom làm một việc riêng sau nếu muốn quét đủ.
+  file: `tests/sua-trang-quet.ts`
+  severity: high
+  Đề xuất: known-limits
+
+- **Hình dạng 3: 'the init script waits for the hydrated mark' is checked by the string being present, not by mutation and wait being in the right order**
+  Người dùng thấy gì: Phép kiểm tra tự động chỉ xem có nhắc đến dấu trang đã dựng xong chứ không kiểm thứ tự, nên có thể bỏ sót bài sửa trang quá sớm. Người dùng sản phẩm không bị ảnh hưởng.
+  Căn cứ: Chỉ làm bộ kiểm có thể đỏ oan hoặc sót ở bài thử, chạy lại là thấy; không mất dữ liệu và lớp gác lúc chạy vẫn bắt.
+  file: `tests/sua-trang-quet.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **E5 script writes its broken copy of ci-db.sh into the working tree under a fixed name (r6)**
   Người dùng thấy gì: Nếu lượt chấm bị ngắt giữa chừng, một tệp tạm có thể sót lại trong kho, và hai lượt chấm chạy cùng lúc có thể xoá nhầm tệp của nhau. Người dùng sản phẩm không bị ảnh hưởng, chỉ người chạy bộ kiểm.
   Căn cứ: Hậu quả nhẹ và chỉ chạm người chạy bộ kiểm, không mất dữ liệu; chỉ cần xoá tệp sót hoặc chạy lại là xong, nên ghi lại như một hạn chế đã biết.
   file: `_acceptance/don-no-bo-kiem/rang/gac-hydration-pha.mjs`
   severity: low
   Đề xuất: known-limits
 
-- **Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): bước co-phien chỉ được kiểm bằng cách grep dòng lệnh, không chạy thật**
+- **Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): bước co-phien chỉ được kiểm bằng cách grep dòng lệnh, không chạy thật (r6)**
   Người dùng thấy gì: Lượt kiểm trình duyệt có cơ sở dữ liệu chưa từng được thử thật với bài phá, nên nếu cảnh báo dựng trang lệch không đến được phép gác ở lượt đó thì bộ kiểm vẫn xanh. Người dùng sản phẩm không bị ảnh hưởng.
   Căn cứ: Rủi ro chỉ là bộ kiểm bỏ sót một cảnh báo lệch giao diện ở một lượt chạy, không ảnh hưởng người dùng thật; chủ kho đã chấp nhận cách đo này vì thử thật cần cơ sở dữ liệu riêng và tốn kém.
   file: `tests/gac-ci-db.test.ts`
@@ -41,7 +76,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **New row 1u log line has no PR or issue link (r4)**
+- **New row 1u log line has no PR or issue link (r4 · tệp đã đổi)**
   Người dùng thấy gì: Dòng nhật ký của hàng này trỏ tới một tệp đề xuất chứ không tới PR. Người dùng sản phẩm không thấy gì; người đọc nhật ký phải tự tìm PR.
   Căn cứ: Hậu quả rất nhẹ, chỉ là thiếu một đường dẫn trong nhật ký nội bộ, và có thể bổ sung bất cứ lúc nào.
   file: `wiki/log.md`
@@ -55,28 +90,28 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 5 (claims a whole class, tests only a few cases): the 'every call that changes the page' scanner has a hand-picked token list and few break cases (r4)**
+- **Shape 5 (claims a whole class, tests only a few cases): the 'every call that changes the page' scanner has a hand-picked token list and few break cases (r4 · tệp đã đổi)**
   Người dùng thấy gì: Phép kiểm tra tự động còn kẽ hở: một số cách đổi trang trong bộ bài kiểm không bị phát hiện. Người dùng sản phẩm không bị ảnh hưởng, chỉ bộ kiểm có thể bỏ sót.
   Căn cứ: Chỉ ảnh hưởng độ chặt của bộ kiểm nội bộ, không mất dữ liệu người dùng, và có thể mở rộng dần khi gặp ca thật.
   file: `tests/sua-trang-quet.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 3 (checks that a string is present when the promise is an order between steps): an addInitScript passes just by containing 'data-hydrated' (r4)**
+- **Shape 3 (checks that a string is present when the promise is an order between steps): an addInitScript passes just by containing 'data-hydrated' (r4 · tệp đã đổi)**
   Người dùng thấy gì: Một bài thử có thể sửa trang quá sớm mà phép kiểm tra vẫn cho qua, gây lại cảnh báo dựng trang lệch và làm bộ kiểm đỏ oan. Người dùng sản phẩm không bị ảnh hưởng.
   Căn cứ: Chỉ làm bộ kiểm kém tin cậy với người chạy nó, tự lộ ra khi chạy lại, và không đụng tới người dùng sản phẩm.
   file: `tests/sua-trang-quet.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 3 (checks that a string is present when the promise is a lock): KHOA_LOI 'still locked' is only checked by a substring (r4)**
+- **Shape 3 (checks that a string is present when the promise is a lock): KHOA_LOI 'still locked' is only checked by a substring (r4 · tệp đã đổi)**
   Người dùng thấy gì: Phép kiểm tra rằng các tệp được miễn vẫn bị khoá chỉ dựa vào việc tên tệp có xuất hiện. Người dùng sản phẩm không ảnh hưởng; bộ kiểm có thể xanh dù khoá thật đã mất.
   Căn cứ: Rủi ro chỉ nằm trong bộ kiểm nội bộ và cần có người vô tình gỡ khoá mới xảy ra, nên chi phí sửa không đáng so với hậu quả.
   file: `tests/sua-trang.test.ts`
   severity: low
   Đề xuất: wont-fix
 
-- **Shape 1 (checks the instructions, not the result): the hydrated mark is checked by searching the source text (r4)**
+- **Shape 1 (checks the instructions, not the result): the hydrated mark is checked by searching the source text (r4 · tệp đã đổi)**
   Người dùng thấy gì: Phép kiểm tra dấu trang đã tải xong chỉ đọc chữ trong mã, chưa xem trang thật. Người dùng sản phẩm không bị ảnh hưởng; bộ kiểm có thể đỏ oan hoặc xanh nhầm khi thư viện giao diện đổi.
   Căn cứ: Chỉ ảnh hưởng người chạy bộ kiểm, không mất dữ liệu, và lỗi sẽ lộ ra khi các bài e2e chạy trên trang thật.
   file: `tests/sua-trang.test.ts`
@@ -104,7 +139,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: wont-fix
 
-- **quetTep's doc comment promises to report a file waiting on another PR once, but the code does nothing of the sort (r3)**
+- **quetTep's doc comment promises to report a file waiting on another PR once, but the code does nothing of the sort (r3 · tệp đã đổi)**
   Người dùng thấy gì: Ghi chú của máy quét hứa một việc mà mã không làm, người đọc có thể hiểu nhầm. Người dùng không bị ảnh hưởng.
   Căn cứ: Chỉ là chú thích lệch, bài kiểm vẫn tự lọc đúng nên không có hậu quả thực; chi phí sửa nhỏ nhưng lợi ích gần như không có.
   file: `tests/sua-trang-quet.ts`
@@ -118,7 +153,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 5 (tuyên quét LỚP nhưng chỉ có điểm-case): máy quét «mọi lệnh đổi trang đều qua cửa chung» chỉ thử 3 trên khoảng 17 dấu hiệu đổi trang và bỏ hẳn một loại lệnh (r3)**
+- **Hình dạng 5 (tuyên quét LỚP nhưng chỉ có điểm-case): máy quét «mọi lệnh đổi trang đều qua cửa chung» chỉ thử 3 trên khoảng 17 dấu hiệu đổi trang và bỏ hẳn một loại lệnh (r3 · tệp đã đổi)**
   Người dùng thấy gì: Máy canh việc sửa trang chỉ thử vài kiểu sửa nên sau này một kiểu sửa mới có thể lọt qua cửa chung mà không bị báo. Hiện chưa có trường hợp nào thật sự lọt.
   Căn cứ: Hiện chưa có lệnh nào lọt nên chưa gây hại; chỉ là lưới chắn chưa kín, mở rộng sau khi có nhu cầu là đủ.
   file: `tests/sua-trang.test.ts`
@@ -139,7 +174,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Hydration guard is silently missing from the CI database job because the command-line reporter flag replaces the config's reporters (r1 · tệp đã đổi)**
+- **Hydration guard is silently missing from the CI database job because the command-line reporter flag replaces the config's reporters (r1)**
   Người dùng thấy gì: Khi chạy kiểm tra tự động trên CI có cơ sở dữ liệu, cảnh báo dựng trang lệch vẫn có thể lọt qua mà không làm lượt chạy đỏ. Người dùng không thấy ngay, nhưng lỗi giao diện kiểu này có thể đến tay họ mà không ai hay.
   Căn cứ: Không mất dữ liệu và chỉ ảnh hưởng độ chắc của lưới kiểm tra trên CI, vẫn còn chạy được ở máy dev; sửa rẻ nhưng nằm ngoài những gì hàng này đã hứa nên nên đăng thành việc riêng.
   file: `db/scripts/ci-db.sh`
@@ -160,21 +195,21 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: wont-fix
 
-- **onResult passes its page-changing code as a string through a raw page.evaluate, so the 'one door' static check cannot see it (r3)**
+- **onResult passes its page-changing code as a string through a raw page.evaluate, so the 'one door' static check cannot see it (r3 · tệp đã đổi)**
   Người dùng thấy gì: Phép kiểm tra tự động có một kẽ hở: một chỗ trong bộ bài kiểm vẫn đổi trang mà phép kiểm tra không thấy. Hiện chỗ đó chạy an toàn, người dùng sản phẩm không bị ảnh hưởng.
   Căn cứ: Chỉ là kẽ hở trong công cụ kiểm tra nội bộ, hiện chưa gây lỗi gì và người dùng không thấy; sửa sau vẫn rẻ nếu có người thêm bài mới đi qua kẽ này.
   file: `tools/e2e_templates/recipes.ts`
   severity: low
   Đề xuất: known-limits
 
-- **The 'go nut Xoa loc' break never removes a button that is already on the page when the hydrated mark appears (r3)**
+- **The 'go nut Xoa loc' break never removes a button that is already on the page when the hydrated mark appears (r3 · tệp đã đổi)**
   Người dùng thấy gì: Một bài phá thử trong bộ kiểm có thể thỉnh thoảng báo đỏ sai vì nút chưa bị gỡ kịp. Chỉ ảnh hưởng người chạy bộ kiểm, không ảnh hưởng người dùng sản phẩm.
   Căn cứ: Hậu quả nhẹ: chỉ làm bộ kiểm đỏ oan lúc nào đó và chạy lại là qua; không mất dữ liệu và không chạm người dùng cuối.
   file: `tools/e2e_templates/recipes.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **The two page-stripping breaks start on the root mark, which can come before the data region's loading boundary has hydrated (r3)**
+- **The two page-stripping breaks start on the root mark, which can come before the data region's loading boundary has hydrated (r3 · tệp đã đổi)**
   Người dùng thấy gì: Hai bài phá thử có thể bắt đầu sửa trang quá sớm và gây lại cảnh báo dựng trang lệch, làm bộ kiểm đỏ oan. Người dùng sản phẩm không bị ảnh hưởng.
   Căn cứ: Chỉ làm bộ kiểm đỏ oan thỉnh thoảng, chạy lại là hết, không lộ hay mất dữ liệu; nhưng nếu lặp lại thì đúng nợ mà hàng này muốn dọn nên đáng theo dõi.
   file: `tools/e2e_templates/recipes.ts`
@@ -187,42 +222,5 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   file: `tests/e2e/sua-trang.ts`
   severity: low
   Đề xuất: wont-fix
-
-- **The new hydration helper copies the React check that the shared test runner already has (r2)**
-  Người dùng thấy gì: Quy tắc nhận biết trang đã tải xong nằm ở hai chỗ trong bộ kiểm tự động. Người dùng sản phẩm không bị ảnh hưởng; chỉ khi thư viện giao diện đổi cách làm thì một chỗ có thể được sửa còn chỗ kia bị quên, khiến bài kiểm đỏ oan.
-  Căn cứ: Không ảnh hưởng người dùng cuối và không mất dữ liệu; nếu lệch thì chỉ làm bài kiểm đỏ và dễ thấy ngay, còn việc gom về một chỗ có thể làm sau với chi phí thấp.
-  file: `tests/e2e/da-gan.ts`
-  severity: low
-  Đề xuất: known-limits
-
-- **Thay đổi chạm tools/** nên cả PR rơi vào bậc high: cần chủ mã duyệt, tác tử không được tự gộp (r1)**
-  Người dùng thấy gì: Thay đổi này cần chủ kho duyệt trước khi gộp, tác tử không tự gộp được. Người dùng cuối không bị ảnh hưởng gì.
-  Căn cứ: Chỉ là bước duyệt thêm theo quy trình, không mất hay lộ dữ liệu của ai, và đã được nêu ở cổng phạm vi nên ghi lại là đủ.
-  file: `tools/wiki_lint.py`
-  severity: low
-  Đề xuất: known-limits
-
-- **Hydration guard is silently missing from the CI database job because the command-line reporter flag replaces the config's reporters (r1 · tệp đã đổi)**
-  Người dùng thấy gì: Khi chạy kiểm tra tự động trên CI có cơ sở dữ liệu, cảnh báo dựng trang lệch vẫn có thể lọt qua mà không làm lượt chạy đỏ. Người dùng không thấy ngay, nhưng lỗi giao diện kiểu này có thể đến tay họ mà không ai hay.
-  Căn cứ: Không mất dữ liệu và chỉ ảnh hưởng độ chắc của lưới kiểm tra trên CI, vẫn còn chạy được ở máy dev; sửa rẻ nhưng nằm ngoài những gì hàng này đã hứa nên nên đăng thành việc riêng.
-  file: `db/scripts/ci-db.sh`
-  severity: medium
-  Đề xuất: new-contract
-
-- **Hình dạng 5 (tuyên quét lớp nhưng chỉ có điểm-case): phép gác hydration bắt hai mẫu, nhưng chỉ một mẫu có chiều đỏ (r1)**
-  Người dùng thấy gì: Phép gác cảnh báo dựng trang lệch mới được thử đỏ cho một loại cảnh báo, loại thứ hai chưa được thử. Nếu loại này xảy ra, giao diện có thể lệch mà bộ kiểm vẫn xanh.
-  Căn cứ: Hậu quả nhẹ vì chỉ là một loại cảnh báo hiếm chưa được chứng minh, không mất dữ liệu, và có thể bổ sung sau khi gặp ca thật.
-  file: `tests/e2e/gac-hydration.ts`
-  severity: medium
-  Đề xuất: known-limits
-
-- **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): chiều đỏ của «cấu hình thiếu phép gác» đưa chuỗi 'list' gõ tay, không nạp bản sao cấu hình (r1)**
-  Người dùng thấy gì: Bài thử kiểm tra việc thiếu phép gác dùng dữ liệu viết tay nên có thể không bắt được nếu cấu hình thật đổi sang dạng khác. Người dùng không bị ảnh hưởng trực tiếp.
-  Căn cứ: Rủi ro rất nhỏ, chỉ xảy ra nếu sau này ai đó đổi dạng cấu hình, không ảnh hưởng người dùng và không mất dữ liệu; công sửa không đáng so với hậu quả.
-  file: `tests/cong-chay.test.ts`
-  severity: low
-  Đề xuất: wont-fix
-
-## Chưa adversarial-verify (refuter chết)
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).

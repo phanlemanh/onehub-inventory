@@ -5,7 +5,7 @@ slug: don-no-bo-kiem
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [config, ci]
-status: implemented
+status: verified
 approved_by: Manh Phan
 approved_at: 2026-11-15T11:07:32Z
 design_doc: docs/superpowers/specs/2026-11-15-don-no-bo-kiem-design.md
