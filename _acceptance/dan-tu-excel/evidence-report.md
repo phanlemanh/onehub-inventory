@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: c69427dc2eeb06de40995e49d07e75404b34dd9e
+verified_commit: b3b67027267e5cd062e66b83a8ab3ff7c67cbc73
 human_signoff: Manh Phan 2026-11-16
 ---
 
@@ -259,3 +259,7 @@ Round 6: chạy lại sau khi máy ngủ làm gián đoạn round 5; mọi eval 
 ### Re-pin lần 1 — 2026-11-16, do hàng 5 đổi mã hàng 4 và gộp main 7f113f7 sau chữ ký
 run_id: repin-20261116T014736Z-71377
 sha: c69427dc2eeb06de40995e49d07e75404b34dd9e · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E1-ui, E2b (E2b không khai paths) · diff chạm vật đo ngoài làn máy: E1-ui — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 2 — 2026-11-16, do bài điện thoại của hàng 5 chờ vùng vẽ xong một lối (VP4) sau khi gộp main 7f113f7
+run_id: repin-20261116T023308Z-46061
+sha: b3b67027267e5cd062e66b83a8ab3ff7c67cbc73 · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E1-ui, E2b (E2b không khai paths)
