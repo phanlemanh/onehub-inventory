@@ -13,7 +13,7 @@ import { GRID_COPY } from "../../src/components/candidate/grid-copy";
 import { statusLabel } from "../../src/lib/format";
 import { label } from "../../src/modules/company-config";
 import { companyListingId, seedSampleInventory } from "../db/can-mau";
-import { isPhone, phoneCards, regionReady } from "../e2e/phone-list";
+import { cardCodes, isPhone, phoneCards, regionReady } from "../e2e/phone-list";
 
 let owner: pg.Client;
 test.beforeAll(async () => {
@@ -33,7 +33,8 @@ function sampleRow(keeper: "viewer" | "other" | "none", statuses = ["Incomplete"
   const l = DATA.current.find((x) => {
     const k = DATA.keepers[x.id];
     const kind = k?.kind ?? "none";
-    return kind === keeper && statuses.includes(x.standardStatus);
+    // A listing with a price: a price set where there was none cannot be undone (row 4).
+    return kind === keeper && statuses.includes(x.standardStatus) && (x.listPrice ?? 0) > 0;
   });
   if (!l) throw new Error(`không có căn mẫu ${keeper}`);
   return { id: l.id, unit: UNIT_OF.get(l.id)!.unitNumber, keeper: DATA.keepers[l.id] };
@@ -131,28 +132,49 @@ const FEE = "Listing.feeInclusion";
 
 async function openInventory(page: Page, path = "/inventory") {
   await page.goto(path);
+  // A search address that finds one unit moves on to its record's address (row 3f) before the page settles.
+  await page.waitForLoadState("networkidle");
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
   await regionReady(page);
 }
 
-/** The unit codes the region shows: the record openers of the table, or the cards below 768 px. */
+/** The unit codes the region has drawn: the record openers of the table, or the cards below 768 px. */
 async function shownCodes(page: Page): Promise<string[]> {
   if (isPhone(page)) {
     await phoneCards(page).first().waitFor();
-    return phoneCards(page).evaluateAll((els) =>
-      els.map((e) =>
-        (
-          e.querySelector('[data-slot="listing-card-code"]')?.textContent ??
-          e.textContent ??
-          ""
-        ).trim(),
-      ),
-    );
+    return cardCodes(page);
   }
   await page.locator('[data-slot="data-region-body"] tbody tr[data-row-id]').first().waitFor();
   return page
     .locator('[data-slot="data-region-body"] button[data-record-open]')
     .evaluateAll((els) => els.map((e) => (e.textContent ?? "").trim()));
+}
+
+/** How many listings the region holds, from its footer («60 dòng»); the table draws only the rows in view. */
+async function rowCount(page: Page): Promise<number> {
+  const text =
+    (await page.locator('[data-slot="region-footer-count"]').first().textContent()) ?? "";
+  const n = text.match(/(\d[\d.]*)\s*\S*\s*$/)?.[1] ?? text.match(/\d+/)?.[0] ?? "";
+  return Number(n.replace(/\./g, ""));
+}
+
+/**
+ * The grid filtered to one unit, as the top-bar search opens it (row 3f): one unit found opens its record, which is
+ * closed so the one row is on screen whatever its place in the grid's order.
+ */
+async function openOn(page: Page, unit: string) {
+  await openInventory(page, `/inventory?ma=${encodeURIComponent(unit)}`);
+  // A code shared by two buildings finds both and opens no record; the rows are on screen either way.
+  const record = page.locator('[data-slot="record-panel"]');
+  if (
+    await record.waitFor({ timeout: 3_000 }).then(
+      () => true,
+      () => false,
+    )
+  ) {
+    await page.keyboard.press("Escape");
+    await expect(record).toHaveCount(0);
+  }
 }
 
 const cellOf = (page: Page, unit: string, field: string) =>
@@ -176,6 +198,10 @@ async function typePrice(page: Page, unit: string, text: string) {
   await expect(editor(page).getByRole("textbox")).toBeFocused();
   await page.keyboard.type(text.slice(1));
   await page.keyboard.press("Enter");
+  // A big change asks once more under the cell (row 4): «Đổi giá» confirms it.
+  const ask = page.locator('[data-slot="price-ask"]');
+  await ask.waitFor({ timeout: 1_500 }).catch(() => {});
+  if (await ask.isVisible()) await editor(page).getByRole("button", { name: "Đổi giá" }).click();
 }
 
 async function statusOptions(page: Page, unit: string): Promise<string[]> {
@@ -220,7 +246,7 @@ test("doc-dung-san: the grid shows the signed-in company's listings, and only th
   const w = await world(info, "doc");
   await signIn(page, w.email, w.mau);
   await openInventory(page);
-  expect(await shownCodes(page)).toHaveLength(60);
+  expect(await rowCount(page)).toBe(60);
   // Switch the company in the App Shell (row 1o): the grid holds the three listings of [MAU-2].
   await page.locator('[data-slot="app-shell-top-bar"] [data-slot="company-name"]').click();
   await page.getByRole("menuitemradio", { name: w.mau2.name }).click();
@@ -253,11 +279,8 @@ test("cmdk-va-cay-theo-san: the search and the tree show only the signed-in comp
   await expect(
     column.getByRole("link", { name: otherBuilding.buildingName, exact: true }),
   ).toHaveCount(0);
-  // No count rides on a tree entry: each entry reads its place's name and nothing more.
-  const entries = await column
-    .locator('[data-sidebar="menu-sub-button"], [data-sidebar="menu-button"]')
-    .evaluateAll((els) => els.map((e) => (e.textContent ?? "").trim()));
-  expect(entries.filter((t) => /\s\d+$/.test(t))).toEqual([]);
+  // No count rides on a tree entry (row 2d): no badge in the column.
+  await expect(column.locator('[data-sidebar="menu-badge"]')).toHaveCount(0);
   // The search: a code of [MAU] that [MAU-2] does not have finds nothing.
   const other = others.find((u) => !mine.some((m) => m.unitNumber === u.unitNumber))!;
   await page.keyboard.press("ControlOrMeta+k");
@@ -300,7 +323,7 @@ test("sua-gia-tai-lai-con: «2,8 tỷ» on the cell is one PATCH; a reload and a
   const row = sampleRow("viewer", ["Incomplete", "Active", "Hold", "Pending"]);
   const sent = patches(page);
   await signIn(page, w.email, w.mau);
-  await openInventory(page);
+  await openOn(page, row.unit);
   const id = companyListingId(w.mau.id, row.id);
   const before = await rowOf(id);
   await typePrice(page, row.unit, "2,8 tỷ");
@@ -308,11 +331,11 @@ test("sua-gia-tai-lai-con: «2,8 tỷ» on the cell is one PATCH; a reload and a
   expect(sent).toHaveLength(1);
   expect(sent[0]!.body).toMatchObject({ version: before.version, change: { field: "listPrice" } });
   expect((await rowOf(id)).version).toBe(before.version + 1);
-  await openInventory(page);
+  await openOn(page, row.unit);
   await expect(cellOf(page, row.unit, PRICE)).toContainText("2,8");
   const second = await (browser as Browser).newPage();
   await signIn(second, w.email, w.mau);
-  await openInventory(second);
+  await openOn(second, row.unit);
   await expect(cellOf(second, row.unit, PRICE)).toContainText("2,8");
   await second.close();
 });
@@ -349,10 +372,10 @@ test("xung-dot-tai-o: the second session gets the conflict at the cell and sees 
   const row = sampleRow("viewer", ["Active"]);
   const id = companyListingId(w.mau.id, row.id);
   await signIn(page, w.email, w.mau);
-  await openInventory(page);
+  await openOn(page, row.unit);
   const second = await (browser as Browser).newPage({ viewport: page.viewportSize()! });
   await signIn(second, w.email, w.mau);
-  await openInventory(second);
+  await openOn(second, row.unit);
   await typePrice(page, row.unit, "2,8 tỷ");
   await expect.poll(async () => Number((await rowOf(id)).list_price)).toBe(2_800_000_000);
   // The second session still holds the old version: its status change is a conflict, not an overwrite.
@@ -374,20 +397,30 @@ test("hoan-tac-chi-gia: undoing the price after a status change keeps the new st
   const id = companyListingId(w.mau.id, row.id);
   const sent = patches(page);
   await signIn(page, w.email, w.mau);
-  await openInventory(page);
+  await openOn(page, row.unit);
   const oldPrice = Number((await rowOf(id)).list_price);
   await typePrice(page, row.unit, "2,8 tỷ");
   const priceToast = page
     .locator("[data-sonner-toast]")
     .filter({ hasText: label("ListPrice") })
     .first();
+  // The person changes the status while the price's notice is still on screen, then undoes the price from it; the
+  // database is read only once both are done, so the notice is still there to press.
   await expect(priceToast).toBeVisible();
-  await expect.poll(async () => (await rowOf(id)).version).toBe(2);
   await select(page, row.unit, STATUS);
   await page.keyboard.press("F2");
   await editor(page).locator('[data-status-option="Hold"]').click();
+  await expect(
+    page
+      .locator("[data-sonner-toast]")
+      .filter({ hasText: statusLabel("Hold") })
+      .first(),
+  ).toBeVisible();
+  // The notices stack, the older one under the newer: reach its «Hoàn tác» with the keyboard, as the notice allows.
+  const undoPrice = priceToast.getByRole("button", { name: "Hoàn tác" });
+  await undoPrice.focus();
+  await page.keyboard.press("Enter");
   await expect.poll(async () => (await rowOf(id)).standard_status).toBe("Hold");
-  await priceToast.getByRole("button", { name: "Hoàn tác" }).click();
   await expect.poll(async () => Number((await rowOf(id)).list_price)).toBe(oldPrice);
   const undo = sent.at(-1)!.body as { version: number; change: { field: string } };
   expect(undo).toMatchObject({ version: 3, change: { field: "listPrice" } });
@@ -471,7 +504,9 @@ test("nam-trang-thai: loading, empty, a real read error with Tải lại, no mat
     await expect(page.locator('[data-slot="region-loading"]').first()).toBeVisible();
   }
   await page.emulateMedia({ colorScheme: "light" });
-  // A real read error: the database refuses this company's reads (a policy that raises), no ?state= switch.
+  // A real read error: the database refuses this company's reads (a policy that raises on its rows), no ?state= switch.
+  // The company needs one listing for the policy to be asked about.
+  await seedSampleInventory(owner, w.trong.id);
   const fn = `e2e_hong_${w.trong.id.replace(/-/g, "")}`;
   await owner.query(
     `create function public.${fn}() returns boolean language plpgsql as $f$ begin raise exception 'hong'; end $f$`,
@@ -516,7 +551,7 @@ test("chua-dang-nhap-ve-dang-nhap: without a session /inventory, with or without
   const w = await world(info, "qt", ["CompanyAdmin"]);
   await signIn(page, w.email, w.mau);
   await openInventory(page);
-  expect(await shownCodes(page)).toHaveLength(60);
+  expect(await rowCount(page)).toBe(60);
 });
 
 // ---- E10b · 5,000 listings scroll to the end -------------------------------------------------------------------------
