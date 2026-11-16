@@ -31,6 +31,11 @@ properties:
   feeInclusion: { type: enum, values: [Included, Excluded], display: select }
   legalStatus: { type: string, display: text }
   financing: { type: string, display: text }
+  # Who keeps the listing (row 10): the user id of a Member of the same company, empty when nobody keeps it yet. The name
+  # the company knows them by is copied beside it when the keeper is set, because a listing agent may not list the
+  # company's members (listMembers) yet must see who keeps a unit; row 18a, which hands units over, sets both.
+  listAgentKey: { type: uuid, display: none, reso: ListAgentKey }
+  listAgentFullName: { type: string, pii: true, display: person, reso: ListAgentFullName }
   version: { type: integer, min: 1, required: true, display: none }
   # The company's own columns (row 7e), keyed by CustomField code; each value fits its field's kind. Stored on the
   # listings table from row 10.
@@ -39,11 +44,16 @@ properties:
 rules:
   - id: closed-needs-price-and-date
     description: A Closed listing must have closePrice and closeDate.
+    implemented_in: db/migrations/013_bang_can_chao.sql
   - id: withdrawn-needs-reason
     description: A Withdrawn listing must have withdrawnReason.
+    implemented_in: db/migrations/013_bang_can_chao.sql
   - id: one-open-listing-per-unit
     description: Within one company a unit has at most one open listing (Incomplete, Active, Pending or Hold); Closed and Withdrawn listings stay as earlier listings of the unit.
-    implemented_in: src/modules/listings/sample.ts
+    implemented_in: db/migrations/013_bang_can_chao.sql
+  - id: keeper-activates
+    description: Moving a listing to Active needs activateListing; with own scope only on a listing one keeps or that nobody keeps yet.
+    implemented_in: db/migrations/013_bang_can_chao.sql
   - id: no-seventh-status
     description: Companies add labels anchored to the six standard values; they never add a seventh value.
 
@@ -57,20 +67,14 @@ wiki: wiki/entities/listing.md
 # khong = deliberately absent, with the owner's gate line in duyet. Cells as approved at the 1t scope gate.
 vong_doi:
   them: { co: createListing, hang: "12" }
-  xem:
-    co: viewListings
-    hang: "10"
-    chan:
-      CompanyAdmin:
-        hang: "10"
-        ly_do: "The company admin opens the listing board; row 10 gives that role read-only access."
-  sua: { co: updateListing, hang: "10" }
+  xem: { co: viewListings }
+  sua: { co: updateListing }
   go: { co: removeListing, hang: "18b" }
   rieng:
     sua_ngoai_gia:
       hang: "3g"
       ly_do: "Legal, furniture, finance and occupancy are edited in row 3g; rows 4 and 3d edit price and status only."
-    dua_len_ban: { co: activateListing, hang: "15" }
+    dua_len_ban: { co: activateListing }
     nhan: { hang: "18a", ly_do: "Taking a unit nobody keeps yet." }
     doi_nguoi_giu:
       hang: "18a"

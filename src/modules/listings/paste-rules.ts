@@ -18,7 +18,7 @@ import {
   statusNeeds,
   statusUndoable,
 } from "./edit-rules";
-import type { ListingChange } from "./save-door";
+import type { PriceOrStatusChange } from "./save-door";
 
 /** The listing a cell belongs to, as the grid row holds it. */
 export interface PasteTarget {
@@ -40,7 +40,7 @@ export type PasteSkip =
 
 export type PasteCell =
   /** The cell will change; `swing` is set when a price moves by more than the asking threshold. */
-  | { kind: "change"; change: ListingChange; swing?: number; undoable: boolean }
+  | { kind: "change"; change: PriceOrStatusChange; swing?: number; undoable: boolean }
   /** The pasted word leaves the cell as it is (same value, or an empty cell). */
   | { kind: "same" }
   /** The pasted word is not a price, or not a status of this listing's dictionary. */

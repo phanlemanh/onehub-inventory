@@ -470,11 +470,11 @@ describe("bang-da-duyet", () => {
     SavedView: { them: "saveView", xem: "listSavedViews", sua: "editView", go: "removeView" },
     Listing: {
       them: "createListing·12",
-      xem: "viewListings·10",
-      sua: "updateListing·10",
+      xem: "viewListings",
+      sua: "updateListing",
       go: "removeListing·18b",
       sua_ngoai_gia: "hang 3g",
-      dua_len_ban: "activateListing·15",
+      dua_len_ban: "activateListing",
       nhan: "hang 18a",
       doi_nguoi_giu: "hang 18a",
     },
@@ -626,8 +626,13 @@ describe("xem-theo-vai", () => {
 
   it("a role that opens a screen and may not view what it shows is red", () => {
     const dir = copy();
-    breakFile(dir, ent("Listing"), (t) =>
-      t.replace(/ {4}chan:\n {6}CompanyAdmin:\n[^\n]*\n[^\n]*\n {2}sua/, "  sua"),
+    // Row 10 lets the admin view listings (Hỏi-1 A); a copy that takes the admin's cell away while the screen stays open
+    // to every role is red.
+    breakFile(dir, "ontology/actions.yaml", (t) =>
+      t.replace(
+        '    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }\n    doors:\n      db: ["table listings select"',
+        '    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company }\n    doors:\n      db: ["table listings select"',
+      ),
     );
     expectRed(dir, "Listing.xem: CompanyAdmin mo duoc inventory ma khong xem duoc");
   });

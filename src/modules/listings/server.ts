@@ -4,6 +4,9 @@ import "server-only";
 // query door, withCompany; nothing here reads a session or a table by itself.
 import { actionDoor, sessionDoor, withCompany } from "@/modules/identity/server";
 
+import type { InventoryData } from "./inventory-data";
+import { readInventory } from "./inventory-read";
+import { createListingsHandlers, type ListingsHandlers } from "./listings-http";
 import type { SavedView, SavedViewScreen } from "./saved-view";
 import { listSavedViews, readSavedView, type RunAs } from "./saved-views";
 import { createSavedViewsHandlers, type SavedViewsHandlers } from "./saved-views-http";
@@ -14,7 +17,42 @@ export {
   type SavedViewsHandlers,
 } from "./saved-views-http";
 
+export { createListingsHandlers, type ListingsDeps, type ListingsHandlers } from "./listings-http";
+
 let handlers: SavedViewsHandlers | undefined;
+let listingHandlers: ListingsHandlers | undefined;
+
+/** The handlers behind /api/v1/listings (row 10). */
+export function listingsHandlers(): ListingsHandlers {
+  listingHandlers ??= createListingsHandlers({ door: actionDoor, withCompany });
+  return listingHandlers;
+}
+
+/** What the inventory read gives a screen: the company's inventory, or why there is none to show. */
+export type MyInventory =
+  | { kind: "ready"; data: InventoryData }
+  | { kind: "signed-out" }
+  | { kind: "forbidden" }
+  | { kind: "unreadable" };
+
+/**
+ * The signed-in company's inventory (row 10), through the shared door with viewListings and withCompany. No session is
+ * «signed-out»; a role that may not view listings is «forbidden»; a database that cannot be read is «unreadable» — never
+ * a throw, so the screen shows its error state with «Tải lại».
+ */
+export async function myInventory(): Promise<MyInventory> {
+  try {
+    const door = await sessionDoor("viewListings");
+    if (door === "server-error") return { kind: "unreadable" };
+    if (door === "unauthenticated") return { kind: "signed-out" };
+    if (door === "forbidden") return { kind: "forbidden" };
+    const data = await withCompany(door.pool, door.ctx, (c) => readInventory(c, door.ctx.userId));
+    return { kind: "ready", data };
+  } catch (err) {
+    console.error("[bang-hang] không đọc được:", err instanceof Error ? err.message : "không rõ");
+    return { kind: "unreadable" };
+  }
+}
 
 /** The handlers behind /api/v1/saved-views. */
 export function savedViewsHandlers(): SavedViewsHandlers {

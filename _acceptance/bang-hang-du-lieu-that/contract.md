@@ -68,12 +68,12 @@ Source input: ô cơ hội `_acceptance/bang-hang-du-lieu-that/opportunity.md` (
 
 ## Vai × Màn
 
-| Vai | Bảng hàng | Hồ sơ căn | Sửa trên ô |
-| --- | --- | --- | --- |
-| Đầu chủ (ListAgent) | xem | xem | giá, điều kiện phí, trạng thái theo Hỏi-2; «Đang bán» với căn mình giữ hoặc chưa ai giữ |
-| Đầu khách (BuyerAgent) | xem | xem | theo Hỏi-2 |
-| Trưởng nhóm (TeamLead) | xem | xem | toàn sàn |
-| Quản trị sàn (CompanyAdmin) | theo Hỏi-1 | theo Hỏi-1 | không |
+Bảng hàng, hồ sơ căn và sửa trên ô cùng ở màn `inventory`. Ô Quản trị sàn theo Hỏi-1 (chủ kho chọn lối A ngày
+2026-11-15: xem chỉ đọc); ô sửa của ba vai theo Hỏi-2 (lối A: toàn sàn).
+
+| Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
+| --- | --- | --- | --- | --- |
+| inventory | được — xem Bảng hàng và hồ sơ căn; sửa giá, điều kiện phí, trạng thái toàn sàn; «Đang bán» với căn mình giữ hoặc chưa ai giữ | được — xem Bảng hàng và hồ sơ căn; sửa giá, điều kiện phí, trạng thái toàn sàn trừ «Đang bán» | được — xem và sửa toàn sàn, kể cả «Đang bán» | được — xem Bảng hàng và hồ sơ căn, chỉ đọc, không sửa ô nào |
 
 ## Đường đo
 

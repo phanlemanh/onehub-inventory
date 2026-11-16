@@ -301,12 +301,17 @@ describe("E5 · the ask button follows the permission table and the keeper", () 
     });
   }
 
-  it("the company admin never sees it", () => {
+  // Row 10 (Hỏi-1 A, owner 2026-11-15): the company admin reads the inventory, so it asks a keeper like any reader; a
+  // person with no role in the company still sees nothing.
+  it("a person without a role never sees it; the company admin, who reads listings since row 10, does", () => {
     for (const kind of KINDS) {
       cleanup();
-      openRecord(rowKept(kind), ["CompanyAdmin"]);
+      openRecord(rowKept(kind), []);
       expect(askButton()).toBeNull();
     }
+    cleanup();
+    openRecord(rowKept("other"), ["CompanyAdmin"]);
+    expect(askButton()).not.toBeNull();
   });
 
   it("outside the permission provider nothing shows", () => {

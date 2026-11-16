@@ -30,6 +30,7 @@ export const FIELD_DISPLAY = {
   "Listing.furnished": "select",
   "Listing.lastConfirmedAt": "datetime",
   "Listing.legalStatus": "text",
+  "Listing.listAgentFullName": "person",
   "Listing.listPrice": "money",
   "Listing.occupantType": "select",
   "Listing.originalEntryTimestamp": "datetime",

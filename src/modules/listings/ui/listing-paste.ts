@@ -9,7 +9,7 @@ import type { ListingStandardStatus } from "@/generated/ontology";
 import { formatMoney, statusLabel } from "@/lib/format";
 
 import { readPastePrice, readPasteStatus, readStatusText } from "../paste-rules";
-import type { ListingChange } from "../save-door";
+import type { PriceOrStatusChange } from "../save-door";
 
 import type { CellEditLabels } from "./cell-edit-copy";
 import { pasteWords } from "./listing-paste-copy";
@@ -30,7 +30,7 @@ const UNIT_FACTS: readonly FieldKey[] = [
 export interface PasteWrite {
   row: GridRow;
   field: typeof PRICE | typeof STATUS;
-  change: ListingChange;
+  change: PriceOrStatusChange;
   undoable: boolean;
 }
 

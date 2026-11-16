@@ -4,6 +4,7 @@
 // nothing goes to the browser's lasting storage, and a reload is back to the sample (supervisor note G-1311-17).
 import type {
   Listing,
+  ListingFeeInclusion,
   ListingStandardStatus,
   ListingWithdrawnReason,
 } from "../../generated/ontology";
@@ -17,8 +18,8 @@ import {
   type StatusNeed,
 } from "./edit-rules";
 
-/** One edit from a cell: a new price, or a status move with what it needs. */
-export type ListingChange =
+/** A new price, or a status move with what it needs: what a cell or a pasted region changes (rows 4, 5). */
+export type PriceOrStatusChange =
   | { field: "listPrice"; listPrice: number }
   | {
       field: "standardStatus";
@@ -27,6 +28,10 @@ export type ListingChange =
       closeDate?: string;
       withdrawnReason?: ListingWithdrawnReason;
     };
+
+/** One edit of a listing: a price or status change, or the fee inclusion chosen on its cell (row 10, AC-7). */
+export type ListingChange =
+  PriceOrStatusChange | { field: "feeInclusion"; feeInclusion: ListingFeeInclusion };
 
 /** Why a change breaks a rule; the cell never sends one, so this answer means a cell let it through. */
 export type Invalid =
@@ -68,6 +73,11 @@ export function applyChange(
     if (!Number.isInteger(change.listPrice) || !readPrice(String(change.listPrice)).ok)
       return { ok: false, why: { rule: "price" } };
     return { ok: true, listing: { ...confirmed, listPrice: change.listPrice } };
+  }
+  if (change.field === "feeInclusion") {
+    // The fee inclusion goes with the price: a sold listing keeps both as they were.
+    if (priceLocked(listing.standardStatus)) return { ok: false, why: { rule: "locked" } };
+    return { ok: true, listing: { ...confirmed, feeInclusion: change.feeInclusion } };
   }
   const from = listing.standardStatus;
   const to = change.standardStatus;

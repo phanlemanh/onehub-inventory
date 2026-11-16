@@ -1,14 +1,15 @@
 import { SAMPLE_SUBDIVISIONS, sampleUnits, subdivisionNameOf } from "@/modules/catalog";
-import { formatDate } from "@/lib/format";
 import {
   SAMPLE_COMPANY,
   buildSampleListings,
-  confirmationAge,
-  listingsOfUnit,
   sampleEarlierListings,
+  sampleKeeperOf,
+  type InventoryData,
 } from "@/modules/listings";
 import type { Listing } from "@/generated/ontology";
 import { inventoryRows, type BuildingPlace, type ListingRecordData } from "@/modules/listings/ui";
+
+import { recordsOf, searchRowsOf } from "./inventory-view";
 
 /**
  * The inventory rows of the sample company: the grid (row 1) and the top-bar search (row 3f) read the same rows, so
@@ -73,12 +74,37 @@ function sampleInventory() {
 
 /** Only what the top-bar search suggests from (row 3f): the code, the building and the subdivision of each row. */
 export function sampleSearchRows() {
-  return sampleInventoryRows().map((r) => ({
-    id: r.id,
-    "Listing.unitNumber": r["Listing.unitNumber"],
-    "Listing.buildingName": r["Listing.buildingName"],
-    "Listing.subdivisionName": r["Listing.subdivisionName"],
-  }));
+  return searchRowsOf(sampleInventoryRows());
+}
+
+/**
+ * The sample company's inventory in the shape the database read gives (row 10): its 60 current listings, the earlier
+ * listings of their units, the catalog units and the sample keepers. Read only where no database is configured.
+ */
+export function sampleInventoryData(): InventoryData {
+  const { units, listingUnits, listings } = sampleInventory();
+  const earlier = sampleEarlierListings({ listings, listingUnits });
+  const complexOf = new Map(
+    SAMPLE_SUBDIVISIONS.flatMap((s) => (s.complex ? [[s.key, s.complex.name] as const] : [])),
+  );
+  return {
+    current: listings,
+    earlier: earlier.listings,
+    listingUnits: [...listingUnits, ...earlier.listingUnits],
+    units: units.map((u) => ({
+      upi: u.upi,
+      unitNumber: u.unitNumber,
+      buildingName: u.buildingName,
+      ...(u.subdivisionName ? { subdivisionName: u.subdivisionName } : {}),
+      ...(complexOf.get(u.subdivisionKey) ? { complexName: complexOf.get(u.subdivisionKey) } : {}),
+      ...(u.floor !== undefined ? { floor: u.floor } : {}),
+      ...(u.livingArea !== undefined ? { livingArea: u.livingArea } : {}),
+      ...(u.bedroomsTotal !== undefined ? { bedroomsTotal: u.bedroomsTotal } : {}),
+      ...(u.directionFaces !== undefined ? { directionFaces: u.directionFaces } : {}),
+      propertySubType: u.propertySubType,
+    })),
+    keepers: Object.fromEntries(listings.map((l) => [l.id, sampleKeeperOf(l.id)])),
+  };
 }
 
 /**
@@ -86,43 +112,7 @@ export function sampleSearchRows() {
  * it, newest first, with the confirmation age counted for `now` on the Vietnam calendar.
  */
 export function sampleRecords(now: Date): Record<string, ListingRecordData> {
-  const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
-  const built = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
-  const current = { ...built, listings: withSampleFees(built.listings) };
-  const earlier = sampleEarlierListings(current);
-  const listings = [...current.listings, ...earlier.listings];
-  const links = [...current.listingUnits, ...earlier.listingUnits];
-  const unitByUpi = new Map(units.map((u) => [u.upi, u]));
-  const records: Record<string, ListingRecordData> = {};
-  for (const link of current.listingUnits) {
-    const unit = unitByUpi.get(link.upi);
-    if (!unit) continue;
-    records[link.listingId] = {
-      unit: {
-        unitNumber: unit.unitNumber,
-        bedroomsTotal: unit.bedroomsTotal ?? null,
-        livingArea: unit.livingArea ?? null,
-        floor: unit.floor ?? null,
-        directionFaces: unit.directionFaces ?? null,
-        buildingName: unit.buildingName,
-        subdivisionName: unit.subdivisionName ?? null,
-        propertySubType: unit.propertySubType ?? null,
-      },
-      listings: listingsOfUnit(unit.upi, listings, links).map(({ listing: l, number }) => ({
-        id: l.id,
-        number,
-        standardStatus: l.standardStatus,
-        listPrice: l.listPrice,
-        createdOn: formatDate(l.originalEntryTimestamp),
-        confirmedDays: confirmationAge(l.lastConfirmedAt, now),
-        furnished: l.furnished,
-        occupantType: l.occupantType,
-        legalStatus: l.legalStatus,
-        financing: l.financing,
-      })),
-    };
-  }
-  return records;
+  return recordsOf(sampleInventoryData(), now);
 }
 
 /** Where each sample building stands (row 7d): its project and, when public, its complex — for the geography tree (row 2d). */

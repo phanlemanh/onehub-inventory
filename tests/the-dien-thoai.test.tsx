@@ -395,10 +395,12 @@ describe("bo-nut (E14)", () => {
 
 describe("cua-vao (E9, AC-9)", () => {
   // The inventory page's door: the register's entry rule (`vao`, the sidebar entry's action) through the permission
-  // table. A copy of the sidebar gating the inventory by viewListings, which the table does not give CompanyAdmin,
-  // is the break case: that role must get «not allowed» and no card.
+  // table. A copy of the sidebar gating the inventory by an action the table does not give CompanyAdmin is the break
+  // case: that role must get «not allowed» and no card.
+  // Row 10 lets every role view listings (the admin read-only, Hỏi-1 A), so the mechanics are measured with an action the
+  // company admin does not hold: a copy of the register gating the inventory by updateListing.
   const gated: NavItem[] = NAV.map((item) =>
-    item.href === "/inventory" ? { ...item, action: "viewListings" } : item,
+    item.href === "/inventory" ? { ...item, action: "updateListing" } : item,
   );
   const grid = (
     <DataRegion
@@ -432,7 +434,7 @@ describe("cua-vao (E9, AC-9)", () => {
     },
   );
 
-  it("gated by viewListings, CompanyAdmin sees «not allowed» and no card; ListAgent still reads cards", async () => {
+  it("gated by an action the admin lacks, CompanyAdmin sees «not allowed» and no card; ListAgent still reads cards", async () => {
     expect(entryRefused(gated, "/inventory", ["CompanyAdmin"])).toBe(true);
     page(gated, ["CompanyAdmin"]);
     await refusedShowsNoCard("CompanyAdmin");

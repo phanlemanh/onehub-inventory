@@ -1,6 +1,8 @@
 // Public, browser-safe API of the listings module. Server code goes in ./server.ts.
 // Sample data (roadmap row 1): compose catalog → listings → contacts by passing ids, see _acceptance/du-lieu-mau/design.md.
 export * from "./sample";
+// Row 10: what the inventory reads for one company, from the database or the sample company.
+export * from "./inventory-data";
 // Full unit record (row 3b): completeness, confirmation age, listings of a unit, unit kind.
 export * from "./record";
 // Edit rules (roadmap row 4, _acceptance/sua-tren-o): reading a typed price, asking again, status moves and needs.

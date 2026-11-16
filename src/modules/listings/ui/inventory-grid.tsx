@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import type { Listing } from "@/generated/ontology";
 
 import type { ListingSaveDoor } from "../save-door";
+import { httpSaveDoor } from "./http-save-door";
 import type { SavedView } from "../saved-view";
 
 import {
@@ -60,6 +61,8 @@ export function InventoryGrid({
   listings,
   editLabels,
   door,
+  live = false,
+  noActivate,
   geoTree,
 }: {
   title: string;
@@ -91,13 +94,24 @@ export function InventoryGrid({
   listings?: readonly Listing[];
   /** Words of the cell editors from the label table (needed with `listings`). */
   editLabels?: CellEditLabels;
-  /** The save door of those edits; the sample door in memory when absent (row 10 hands in the real one). */
+  /** The save door of those edits (tests); otherwise the real /api/v1 door when `live`, the sample door when not. */
   door?: ListingSaveDoor;
+  /** The rows are the company's real listings (row 10): edits go to /api/v1 and «Tải lại» reads them again. */
+  live?: boolean;
+  /** Rows whose status cell does not offer Active to this person (row 10, AC-5). */
+  noActivate?: readonly string[];
   /** 2d: the places of the grid's rows; the second column's place entries then filter the grid in place. */
   geoTree?: readonly GeoNode[];
 }) {
   const router = useRouter();
   const [current, setCurrent] = useState<InventoryState>(state);
+  // A new read of the page (Tải lại, or after a change the server works out) brings its own state.
+  const [givenState, setGivenState] = useState(state);
+  if (givenState !== state) {
+    setGivenState(state);
+    setCurrent(state);
+  }
+  const [realDoor] = useState(() => (live && !door ? httpSaveDoor() : undefined));
   const place = usePlaceChange();
   const [view, setView] = useState<GridView | null>(null);
   const saved = useMemo(() => (openView ? gridView(openView.view) : undefined), [openView]);
@@ -161,7 +175,17 @@ export function InventoryGrid({
     }),
     [headers, feeHeaders, inclusionOf],
   );
-  const edit = useListingCellEdit({ rows, listings, headers, labels: editLabels, door, headerOf });
+  const edit = useListingCellEdit({
+    rows,
+    listings,
+    headers,
+    labels: editLabels,
+    door: door ?? realDoor,
+    headerOf,
+    noActivate,
+    feeEditable: feeHeaders !== undefined && live,
+    onServerWork: live ? () => router.refresh() : undefined,
+  });
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
     current === "empty" ? [] : current === "partial" ? edit.rows.slice(0, PARTIAL_ROWS) : edit.rows;
@@ -175,7 +199,7 @@ export function InventoryGrid({
         columns={columns}
         rows={shown}
         status={status}
-        onRetry={() => setCurrent("ready")}
+        onRetry={() => (live ? router.refresh() : setCurrent("ready"))}
         record={record}
         emptyWhy={emptyWhy}
         initialFilters={filters}
