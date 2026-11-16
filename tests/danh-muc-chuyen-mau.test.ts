@@ -4,8 +4,7 @@
 // snapshot from that commit and requires it to equal the committed file; CI checks out without history, so there the
 // committed file stands alone. UPDATE_FIXTURE=1 rewrites the file from BEFORE.
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -14,6 +13,7 @@ import { describe, expect, it } from "vitest";
 import type { Unit } from "@/generated/ontology";
 import * as catalog from "@/modules/catalog";
 import * as listings from "@/modules/listings";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const FIXTURE = join(ROOT, "tests/fixtures/danh-muc-truoc-7d.json");
@@ -53,7 +53,7 @@ async function snapshotFromGit(): Promise<OldSnapshot | null> {
   const sample = show("src/modules/catalog/sample.ts");
   const labels = show("src/generated/labels.ts");
   if (!sample || !labels) return null;
-  const dir = mkdtempSync(join(tmpdir(), "danh-muc-truoc-"));
+  const dir = tempDir("danh-muc-truoc-");
   try {
     mkdirSync(join(dir, "src/modules/catalog"), { recursive: true });
     mkdirSync(join(dir, "src/generated"), { recursive: true });

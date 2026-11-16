@@ -1,12 +1,9 @@
-import { mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-
 import { describe, expect, it } from "vitest";
 
 import { chooseInstall } from "../tools/kit-root.mjs";
+import { tempDir } from "./support/temp-dir";
 
-const dir = (name: string) => mkdtempSync(join(tmpdir(), name));
+const dir = (name: string) => tempDir(name);
 
 describe("chooseInstall", () => {
   const project = dir("project-");

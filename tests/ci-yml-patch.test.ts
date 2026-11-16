@@ -2,12 +2,12 @@
 // the workflow at HEAD, only adds lines, adds exactly one job with the agreed service and steps, leaves every other
 // job byte for byte, and db/scripts/ci-thu.sh reads its values from this very file.
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { tempDir } from "./support/temp-dir";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PATCH = join(ROOT, "_acceptance/ci-co-postgres/ci-yml.patch");
@@ -21,7 +21,7 @@ let after: string;
 /** The workflow as it was before the patch: the patch reversed when it is already in, else the file itself. */
 function original(): string {
   const now = readFileSync(join(ROOT, WORKFLOW), "utf8");
-  const d = mkdtempSync(join(tmpdir(), "ci-yml-goc-"));
+  const d = tempDir("ci-yml-goc-");
   try {
     mkdirSync(join(d, ".github/workflows"), { recursive: true });
     writeFileSync(join(d, WORKFLOW), now);
@@ -35,7 +35,7 @@ function original(): string {
 }
 
 beforeAll(() => {
-  dir = mkdtempSync(join(tmpdir(), "ci-yml-"));
+  dir = tempDir("ci-yml-");
   mkdirSync(join(dir, ".github/workflows"), { recursive: true });
   before = original();
   writeFileSync(join(dir, WORKFLOW), before);
