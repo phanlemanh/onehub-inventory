@@ -18,6 +18,7 @@ import {
   RELEASE,
   STAMP,
   TOOL_FOLDER,
+  UPGRADE,
   UPGRADE_CHANGES,
 } from "./matrix.mjs";
 
@@ -105,7 +106,10 @@ test("register-gains-parts: green as it is; red with no part added, a part lost,
     "--after",
     broken("before.json", before),
   );
-  const now = () => JSON.parse(real(REGISTRY));
+  // Broken copies start from the register the upgrade commit wrote, the one the measure compares,
+  // so a later merge of main into the branch does not change what they prove.
+  const now = () =>
+    JSON.parse(execFileSync("git", ["-C", ROOT, "show", `${UPGRADE}:${REGISTRY}`], { encoding: "utf8" }));
   const lost = now();
   lost.components.find((entry) => entry.name === "FiltersRow").parts = ["FilterChip"];
   red(
