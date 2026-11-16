@@ -107,37 +107,47 @@ export function tokensProblem(text, styles, file, stylesheet) {
   return `${file} is not what ${stylesheet} gives${detail}: the stylesheet is where a value changes, so ${again}`;
 }
 
+// The design tokens file this tool writes in the repository at `root`, as it would write it now:
+// `{ file, content, data, stylesheet, unresolved }`, or null when it manages no such file there.
+// Nothing is written: the command and an upgrade's preview both ask this.
+export function regenerated(root) {
+  const themeFile = path.join(root, "design/theme.json");
+  const theme = existsSync(themeFile) ? JSON.parse(readFileSync(themeFile, "utf8")) : null;
+  const check = theme?.checks?.[TOKENS_DECISION]?.[0];
+  if (!check) return null;
+  const stylesheet = theme.stylesheet ?? "src/index.css";
+  const { tokens, unresolved } = readTokens(loadStyles(root, stylesheet));
+  return { file: check.file, content: renderTokens(tokens), data: tokens, stylesheet, unresolved };
+}
+
 function main() {
   const args = argv.slice(2);
   const at = args.indexOf("--target");
   const root = at === -1 ? cwd() : path.resolve(args[at + 1] ?? "");
-  const themeFile = path.join(root, "design/theme.json");
-  const theme = existsSync(themeFile) ? JSON.parse(readFileSync(themeFile, "utf8")) : null;
-  const check = theme?.checks?.[TOKENS_DECISION]?.[0];
-  if (!check) {
+  const made = regenerated(root);
+  if (!made) {
     stderr.write(
       "design-assembly: this tool manages no design tokens file here: the repository has none yet, or keeps one of its own\n",
     );
     exit(1);
   }
-  const stylesheet = theme.stylesheet ?? "src/index.css";
-  const { tokens, unresolved } = readTokens(loadStyles(root, stylesheet));
-  const full = path.join(root, check.file);
+  const { file, data: tokens, stylesheet, unresolved } = made;
+  const full = path.join(root, file);
   const before = existsSync(full) ? readFileSync(full, "utf8") : null;
   const same = before !== null && JSON.stringify(JSON.parse(before)) === JSON.stringify(tokens);
   const count = Object.values(tokens).reduce((sum, group) => sum + Object.keys(group).length, 0);
   for (const variable of unresolved) stdout.write(`not read: ${variable} points nowhere\n`);
   if (same) {
-    stdout.write(`design tokens: ${check.file} is up to date (${count} tokens)\n`);
+    stdout.write(`design tokens: ${file} is up to date (${count} tokens)\n`);
     return;
   }
   if (!args.includes("--write")) {
-    stderr.write(`design tokens: ${check.file} is not what ${stylesheet} gives\n`);
+    stderr.write(`design tokens: ${file} is not what ${stylesheet} gives\n`);
     exit(1);
   }
   mkdirSync(path.dirname(full), { recursive: true });
-  writeFileSync(full, renderTokens(tokens));
-  stdout.write(`design tokens: wrote ${check.file} from ${stylesheet} (${count} tokens)\n`);
+  writeFileSync(full, made.content);
+  stdout.write(`design tokens: wrote ${file} from ${stylesheet} (${count} tokens)\n`);
 }
 
 if (argv[1] && realpathSync(argv[1]) === realpathSync(fileURLToPath(import.meta.url))) main();
