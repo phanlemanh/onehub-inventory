@@ -57,7 +57,9 @@ Source input: ô cơ hội `_acceptance/bang-hang-du-lieu-that/opportunity.md` (
 - AC-8: Given Bảng hàng trên dữ liệu thật, When đọc đang chạy · sàn chưa có căn nào · không đọc được cơ sở dữ liệu ·
   lọc không còn dòng · vai không có quyền xem, Then vùng hiện đúng một trong năm trạng thái của `DataRegion` — chờ tải,
   trống (câu của màn), lỗi có «Tải lại» (khi lần đọc thật hỏng, không chỉ công tắc của bản dev), không khớp có «Xoá lọc», «Không đủ quyền» — ở bốn khổ 1440, 1024, 414, 360, sáng
-  và tối, không lỗi trợ năng mức nghiêm trọng.
+  và tối, không lỗi trợ năng mức nghiêm trọng. Sửa sau Cổng Phạm vi (chủ kho chọn 2026-11-16, «Bỏ khung, đo bằng máy»):
+  từ Hỏi-1 A không vai thật nào gặp «Không đủ quyền» ở màn này (người bị gỡ khỏi sàn về trang đăng nhập, khung «Tài
+  khoản chưa thuộc sàn nào» có phép đo riêng), nên trạng thái này chỉ đo bằng bài máy, không chụp trên màn — hạn chế đã biết.
 - AC-9: Given bản chạy CÓ cơ sở dữ liệu và không có phiên đăng nhập, When mở `/inventory` (kể cả `/inventory?vai=TeamLead`),
   Then về trang đăng nhập và `?vai=` không thay vai nào; bộ mẫu trong bộ nhớ và `?vai=` chỉ còn sống ở đúng một chỗ —
   máy không cấu hình cơ sở dữ liệu, ngoài bản chạy thật (theo Hỏi-6) — nên không bao giờ đứng cạnh dữ liệu thật. Quản trị

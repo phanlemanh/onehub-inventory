@@ -161,7 +161,7 @@ evals:
     executor: test
     cmd: config:executors.test.bang_hang_that_e2e
     paths: [src/app/(app)/inventory/**, src/components/candidate/**, tests/e2e-db/bang-hang-that.spec.ts]
-    expected: "exit 0 ở bốn khổ; ca 'nam-trang-thai' (chờ tải, trống trên sàn [MAU-TRONG], lỗi có Tải lại khi cửa đọc thật trả không đọc được — không dùng công tắc ?state=, không khớp có Xoá lọc, Không đủ quyền) và 'axe-sang-toi' không lỗi nghiêm trọng. Chiều đỏ: myInventory ném lỗi thay vì trả unreadable → «nam-trang-thai: lỗi» (trang lỗi chung của Next)"
+    expected: "exit 0 ở bốn khổ; ca 'nam-trang-thai' (chờ tải, trống trên sàn [MAU-TRONG], lỗi có Tải lại khi cửa đọc thật trả không đọc được — không dùng công tắc ?state=, không khớp có Xoá lọc; «Không đủ quyền» không vai thật nào gặp từ Hỏi-1 A, đo bằng bài máy loi-doc-that của E2b theo chữ chủ kho 2026-11-16) và 'axe-sang-toi' không lỗi nghiêm trọng. Chiều đỏ: myInventory ném lỗi thay vì trả unreadable → «nam-trang-thai: lỗi» (trang lỗi chung của Next)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E8-ui
@@ -171,8 +171,8 @@ evals:
     target: http://127.0.0.1:3482/inventory
     paths: [src/app/(app)/inventory/**, src/components/candidate/**]
     steps:
-      - "With the lane R dev server on port 3482, signed in as the [MAU] ListAgent, open /inventory with ?state=loading, ?state=error, an empty company ([MAU-TRONG]), a column filter that matches nothing, and signed in as a role without viewListings, at 1440, 1024, 414 and 360 wide, light and dark (40 frames); save each frame as _acceptance/bang-hang-du-lieu-that/evidence/E8-<trạng thái>-<khổ>-<sang|toi>.png"
-    question: "Mỗi khung có đúng trạng thái của vùng (chờ tải, trống với câu của màn, lỗi có Tải lại, không khớp có Xoá lọc, Không đủ quyền), cùng dáng với các màn họ Lưới đã gộp, chữ đọc được ở cả hai chế độ màu không? Nêu khung nào lệch."
+      - "With the lane R dev server on port 3482, signed in as the [MAU] ListAgent, open /inventory with ?state=loading, ?state=error, an empty company ([MAU-TRONG]) and a column filter that matches nothing, at 1440, 1024, 414 and 360 wide, light and dark (32 frames); save each frame as _acceptance/bang-hang-du-lieu-that/evidence/E8-<trạng thái>-<khổ>-<sang|toi>.png. No frame of «Không đủ quyền»: no real role meets it on this screen since Hỏi-1 A; the owner chose on 2026-11-16 to measure it by the machine test only (tests/bang-hang-that.test.ts loi-doc-that), recorded as a known limit."
+    question: "Mỗi khung có đúng trạng thái của vùng (chờ tải, trống với câu của màn, lỗi có Tải lại, không khớp có Xoá lọc), cùng dáng với các màn họ Lưới đã gộp, chữ đọc được ở cả hai chế độ màu không? Nêu khung nào lệch."
     expected: "Mọi khung đúng trạng thái và đúng dáng họ Lưới"
     evidence_required: [run_id, screenshot, observed, verdict]
 
