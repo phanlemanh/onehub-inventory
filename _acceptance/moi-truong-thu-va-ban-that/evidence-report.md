@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 413394c5f10eaa74e3996ecd19a8b52361ac39df
+verified_commit: ae4dc7c24b0a933fa5f82c69fe68504e4c664198
 human_signoff:
 ---
 
@@ -15,37 +15,37 @@ human_signoff:
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
-| E1 | AC-1 | test | PASS (carry-forward từ round 5) |
-| E2 | AC-2 | test | PASS (carry-forward từ round 5) |
-| E3 | AC-3 | test | PASS (carry-forward từ round 5) |
-| E4 | AC-4 | test | PASS (carry-forward từ round 5) |
-| E5 | AC-5 | test | PASS (carry-forward từ round 1) |
-| E6 | AC-6 | script | PASS (carry-forward từ round 5) |
-| E7 | AC-7 | script | PASS (carry-forward từ round 5) |
-| E8 | AC-8 | script | PASS (carry-forward từ round 7) |
+| E1 | AC-1 | test | PASS (carry-forward tu round 5) |
+| E2 | AC-2 | test | PASS (carry-forward tu round 5) |
+| E3 | AC-3 | test | PASS (carry-forward tu round 5) |
+| E4 | AC-4 | test | PASS (carry-forward tu round 5) |
+| E5 | AC-5 | test | PASS (carry-forward tu round 1) |
+| E6 | AC-6 | script | PASS (carry-forward tu round 5) |
+| E7 | AC-7 | script | PASS (carry-forward tu round 5) |
+| E8 | AC-8 | script | PASS (carry-forward tu round 7) |
 | E9 | AC-9 | test | PASS |
-| E10 | AC-9 | judgment | PENDING-JUDGMENT (hội đồng đề xuất PASS, chờ người chốt) |
-| E11 | AC-10 | test | PASS (carry-forward từ round 3) |
+| E10 | AC-9 | judgment | chờ người chốt (hội đồng đề xuất PASS) |
+| E11 | AC-10 | test | PASS (carry-forward tu round 3) |
 | E12 | AC-1 | script | PASS |
 
 ## Evidence
 
 - eval: E9
-  run_id: minted-moi-truong-thu-va-ban-that-E9-r8
+  run_id: minted-moi-truong-thu-va-ban-that-E9-r9
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.van_hanh
-  verified_at: 2026-11-16T19:14:11Z
+  verified_at: 2026-11-16T19:43:30Z
   output: |
     npx vitest run tests/van-hanh.test.ts --coverage.enabled=false --reporter=verbose
-    toàn bộ ca của tests/van-hanh.test.ts đạt
+    (không có dòng đỏ; bộ kiểm sổ tay vận hành xanh)
 
 - eval: E12
-  run_id: minted-moi-truong-thu-va-ban-that-E12-r8
+  run_id: minted-moi-truong-thu-va-ban-that-E12-r9
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.check
-  verified_at: 2026-11-16T19:14:11Z
+  verified_at: 2026-11-16T19:43:30Z
   output: |
     make check
     CODEOWNERS matches governance/autonomy.yaml
@@ -140,30 +140,29 @@ human_signoff:
   output: |
     carry-forward tu round 3 — delta khong cham paths cua eval
 
-### Judgment
-
-Đề xuất panel (người chốt ở Cổng 2; T3 thì mọi mục judgment đều cần người):
-
-- eval: E10
-  judged_by: judge-subagent (fresh context), panel đề xuất PASS
-  proposal: PASS
-  votes:
-    - domain-correctness: PASS — Cả bốn quy trình (đưa bản lên, lùi bản, xoay khoá, khôi phục) ghi từng bước bốn điều: ở đâu, gõ hay bấm gì, đạt khi, đỏ thì. Dòng đỏ đều có hướng xử lý; danh sách 14 việc ngoài kho đi theo thứ tự làm được và chỉ ghi tên biến, các chỗ trông như giá trị đều là chỗ giữ chỗ. Có vài chỗ rườm (việc 12 tham chiếu tiến tới việc 13; đặt mật khẩu vào DATABASE_URL hai lần) nhưng không chặn người làm lần đầu.
-    - operational-feasibility: PASS — Mỗi quy trình có bảng tra theo từng dòng lỗi và đường lui thủ công qua trang Vercel hay Supabase; 14 việc xếp theo thứ tự phụ thuộc. Hai chỗ nhỏ: lui-ban.md đòi make setup dù khoi-phuc.md nói không cần; quy trình khôi phục nhắc nhat-ky-khoi-phuc.md và wiki/incidents/ ngoài năm tệp. Chỉ là ghi chép phụ.
-    - spec-alignment: PASS — Bốn quy trình đủ bốn điều, kèm bảng đỏ theo từng dòng lỗi, người chưa từng làm không cần đọc mã. 14 việc ngoài kho đúng thứ tự phụ thuộc và không có giá trị bí mật. Chỉ xét đủ ý và thứ tự trong năm tệp được giao, không đối chiếu với mã.
-  human_override:  # chi nguoi ghi
-
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-moi-truong-thu-va-ban-that-SUITE-build-r8
+  run_id: minted-moi-truong-thu-va-ban-that-SUITE-build-r9
   exit_code: 0
-  verified_at: 2026-11-16T19:14:11Z
+  verified_at: 2026-11-16T19:43:30Z
 
 - cmd: make e2e
-  run_id: minted-moi-truong-thu-va-ban-that-SUITE-make_e2e-r8
+  run_id: minted-moi-truong-thu-va-ban-that-SUITE-make_e2e-r9
   exit_code: 0
-  verified_at: 2026-11-16T19:14:11Z
+  verified_at: 2026-11-16T19:43:30Z
+
+### Phán đoán (E10) — hội đồng đề xuất PASS, để human_override TRỐNG
+
+- eval: E10
+  judged_by: judge-subagent (fresh context)
+  proposal: PASS
+  panel: domain-correctness, operational-feasibility, spec-alignment
+  votes:
+    - domain-correctness: PASS — Cả bốn quy trình (đưa bản lên, lùi bản, xoay khoá, khôi phục) đều ghi đủ làm ở đâu, gõ hay bấm gì, thấy gì là đạt, đỏ thì làm gì. 14 việc ngoài kho đi theo thứ tự làm được, mỗi việc chỉ dựa vào việc đứng trước nó, và chỉ ghi tên biến cùng chỗ giữ chỗ, không có giá trị thật. Chỉ đọc năm tệp được giao nên không đối chiếu được với mã.
+    - operational-feasibility: PASS — Bốn quy trình đều có từng bước đủ ở đâu, gõ hay bấm gì, đạt khi, đỏ thì, kèm bảng dòng đỏ cho từng lệnh. 14 việc ngoài kho đi theo thứ tự phụ thuộc làm được, mỗi việc có «Đạt khi» và «Đỏ thì», không ghi giá trị thật. Còn vài chỗ hở nhỏ (tên miền `onehub.center` phải có sẵn trong Vercel, «thẻ phát hành đang chạy» sau khi lùi bản, mật khẩu vai đăng nhập sau Supabase Restore) nhưng không chặn người vận hành làm đúng quy trình.
+    - spec-alignment: PASS — Bốn quy trình đều ghi từng bước theo bốn mục «Ở đâu / Gõ hay bấm / Đạt khi / Đỏ thì», kèm bảng «Đỏ thì làm gì» tra theo dòng đỏ. 14 việc ngoài kho đi theo thứ tự làm được. Còn chỗ lỏng: bước 1 của «Khôi phục thật» ghi «Ở đâu: chủ kho», và mục «Đưa bản lên từ máy chủ kho» không nhắc `make setup`; không kiểm được `make deploy` chạy tay có cần `make setup` hay không.
+  human_override:  # chi nguoi ghi
 
 ## Known limits
 
@@ -171,13 +170,11 @@ human_signoff:
 
 ## Analyst
 
-carried tu round 1 — baseline khong do lai round nay
+carried tu round 1 — baseline khong do lai round nay (evals.yaml khong doi tu lan baseline cuoi).
 
-Eval không-phân-biệt (xanh trên cả HEAD lẫn baseline, chứng minh harness chứ không phải tính năng; xác nhận là regression-guard có chủ ý hoặc viết lại để assert hành vi mới):
+Baseline khong do: mọi eval ghi baseline n-a vì round này không đo lại.
 
-- make check (E12)
-
-Baseline không đo lại round này: evals.yaml không đổi từ lần đo cuối (round 1); mọi eval ghi baseline n-a.
+Eval không phân biệt (xanh cả trên HEAD lẫn baseline): E12 (make check) — regression-guard có chủ ý, kiểm ranh giới mô-đun, nhãn và ontology; không phải eval của tính năng.
 
 ## Variance
 
@@ -190,3 +187,4 @@ Round 5: bộ eval deploy và bản dựng thật xanh; mốc carry-forward cho 
 Round 6: bước e2e có lần đỏ rồi xanh lại sau sửa.
 Round 7: E8 (sao lưu, khôi phục) chạy lại xanh; sổ tay có thêm cách xử lý cho dòng dừng.
 Round 8: E9 và E12 chạy lại trên HEAD, xanh; E10 chờ người chốt; còn một lỗi trong hợp đồng (sổ tay khôi phục cho hai cách xử lý trái nhau khi lệch bản) ghi ở review-findings.md.
+Round 9: E9 và E12 chạy lại trên ae4dc7c, xanh; build và e2e xanh; E10 chờ người chốt (hội đồng đề xuất PASS); bốn lỗi ngoài hợp đồng (lời nhắc «sao lưu lại» còn trong khoi-phuc-thu.sh mâu thuẫn với sổ tay; bộ kiểm chỉ phủ một trong hai mục sổ tay đã đổi) chờ người quyết ở Cổng 2.
