@@ -72,7 +72,9 @@
         "formError",
         "refused",
         "slot",
-        "badge"
+        "badge",
+        "canSubmit",
+        "focusSubmit"
       ]
     },
     {
@@ -90,6 +92,33 @@
       "level": "template",
       "source": "own",
       "props": ["title", "count", "headAction", "rows", "footer", "slot"]
+    },
+    {
+      "name": "PastePreviewBody",
+      "category": "component",
+      "file": "src/components/candidate/paste-preview.tsx",
+      "level": "organism",
+      "source": "own",
+      "props": ["changes", "skipped", "wrong", "picked", "setPicked", "busy"]
+    },
+    {
+      "name": "PastePreview",
+      "category": "component",
+      "file": "src/components/candidate/paste-preview.tsx",
+      "level": "organism",
+      "source": "own",
+      "parts": ["PastePreviewBody"],
+      "props": [
+        "open",
+        "title",
+        "changes",
+        "skipped",
+        "wrong",
+        "same",
+        "busy",
+        "onApply",
+        "onClose"
+      ]
     },
     {
       "name": "PhoneList",

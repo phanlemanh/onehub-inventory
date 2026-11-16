@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 7fa8253b80ea5947e231e620a60bb2661c911d50
+verified_commit: b3b67027267e5cd062e66b83a8ab3ff7c67cbc73
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -268,3 +268,11 @@ Round 4: mọi eval máy xanh (164 e2e, 989 trong make e2e, make check, build); 
 ### Re-pin lần 1 — 2026-11-13, do gộp nhánh chính có hàng 9b trước khi gộp PR 52
 run_id: repin-20261113T231140Z-15817
 sha: 7fa8253b80ea5947e231e620a60bb2661c911d50 · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E1b (E1b không khai paths), E2-ui, E7-ui, E10c (E10c không khai paths)
+
+### Re-pin lần 2 — 2026-11-16, do hàng 5 đổi mã hàng 4 và gộp main 7f113f7 sau chữ ký
+run_id: repin-20261116T014736Z-71377
+sha: c69427dc2eeb06de40995e49d07e75404b34dd9e · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E1b (E1b không khai paths), E2-ui, E7-ui, E10c (E10c không khai paths) · diff chạm vật đo ngoài làn máy: E2-ui, E7-ui — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 3 — 2026-11-16, do bài điện thoại của hàng 5 chờ vùng vẽ xong một lối (VP4) sau khi gộp main 7f113f7
+run_id: repin-20261116T023308Z-46061
+sha: b3b67027267e5cd062e66b83a8ab3ff7c67cbc73 · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E1b (E1b không khai paths), E2-ui, E7-ui, E10c (E10c không khai paths)

@@ -7,6 +7,8 @@ export * from "./record";
 export * from "./edit-rules";
 // The save door of an edit (row 4): the four outcomes of the real write path, on the sample listings until row 10.
 export * from "./save-door";
+// Reading one pasted cell (row 5, _acceptance/dan-tu-excel): a pasted word on a price or a status, by the row 4 rules.
+export * from "./paste-rules";
 // Saved views (row 2c): what a view holds and the one name rule, shared by the naming dialog and the API.
 export {
   checkViewName,

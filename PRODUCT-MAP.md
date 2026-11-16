@@ -7,13 +7,13 @@
 ```mermaid
 flowchart TD
   A["Đang cân nhắc cơ hội<br/>chưa có"] --> GD{"Cổng Đáng"}
-  GD --> B["Sắp mở vòng<br/>15 việc"]
+  GD --> B["Sắp mở vòng<br/>12 việc"]
   GD --> XL["Xếp lại sau<br/>chưa có"]
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
-  GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
+  GP --> DL["Đang làm<br/>1 việc"] --> GB{"Cổng Bằng chứng"}
   GB --> DG["Đã giao<br/>3 việc"]
-  GB --> CN["Chờ phiên nghiệm thu<br/>46 việc"] --> GG{"Cổng Giá trị"}
+  GB --> CN["Chờ phiên nghiệm thu<br/>48 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
 
@@ -26,9 +26,6 @@ flowchart TD
 
 - Đầu chủ tải ảnh lên hồ sơ căn, đổi ảnh bìa, gỡ ảnh và thấy căn thành Sẵn sàng bán khi đủ điều kiện (`anh-va-san-sang-ban`)
 - Đầu chủ đăng nhập và thấy, sửa được hàng thật của sàn mình trên Bảng hàng (`bang-hang-du-lieu-that`)
-- Đầu chủ đi Bảng hàng theo địa lý: chọn dự án, phân khu, toà ở cột thứ hai của App Shell và lọc các cột địa lý trên bảng (`bang-hang-theo-dia-ly`)
-- Đầu chủ dán một vùng từ Excel vào bảng và thấy trước những ô sẽ đổi (`dan-tu-excel`)
-- Bộ kiểm của kho hết bốn nợ làm hàng khác đỏ oan: cổng mạng bị cấm, cảnh báo dựng trang lệch, việc Release đỏ sau mỗi lần gộp, và hai trang quyết định trùng số (`don-no-bo-kiem`)
 - Đầu chủ mở hồ sơ căn và thấy lịch sử của căn: tạo lần chào, đổi giá, đổi trạng thái, đổi thông tin, xác nhận với chủ nhà, mỗi việc kèm vai người làm và lúc làm (`lich-su-cua-can`)
 - Quản trị sàn đổi mức Thuế phí mà Về tay của các giá đã đặt trước đó không đổi, và trên căn thấy được con số tính theo mức nào (`lich-su-muc-thue-phi`)
 - Đầu chủ và Đầu khách mở màn Liên hệ và thấy liên hệ của sàn trên Lưới, thêm, sửa, gỡ được liên hệ và gộp được hai liên hệ trùng, theo quyền của vai (`lien-he-tren-luoi`)
@@ -40,12 +37,17 @@ flowchart TD
 - Đầu chủ gõ mã căn để thêm căn, hoặc tạo căn tay khi danh mục chưa có (`them-can`)
 - Quản trị sàn đặt Thuế phí và thấy Bảng hàng tính theo mức đó (`thue-phi`)
 
+## Đang làm
+
+- Bộ kiểm của kho hết bốn nợ làm hàng khác đỏ oan: cổng mạng bị cấm, cảnh báo dựng trang lệch, việc Release đỏ sau mỗi lần gộp, và hai trang quyết định trùng số (`don-no-bo-kiem`)
+
 ## Đã giao — chờ phiên nghiệm thu
 
 - Nhân viên sàn làm việc trong một App Shell chọn từ ReUI Pro, giữ đủ thanh bên theo vai, băng báo và các trạng thái toàn trang đang có (`app-shell-chon-tu-reui`)
 - Đầu chủ mở Bảng hàng và thấy các căn của sàn trên Lưới, đủ trạng thái màn, ở bốn khổ màn hình (`bang-hang-ban-doc`)
 - Đầu chủ dùng Bảng hàng bằng tay như Sheet: đi giữa các ô bằng phím mũi tên, bôi một vùng ô rồi chép sang Zalo hay Excel, bấm tiêu đề để sắp xếp, lọc từng cột, nhóm dòng theo toà, ẩn hiện cột (`bang-hang-dung-tay-nhu-sheet`)
 - Đầu chủ và Đầu khách mở Bảng hàng trên điện thoại thấy danh sách thẻ căn và chạm thẻ để mở hồ sơ căn (`bang-hang-the-dien-thoai`)
+- Đầu chủ đi Bảng hàng theo địa lý: chọn dự án, phân khu, toà ở cột thứ hai của App Shell và lọc các cột địa lý trên bảng (`bang-hang-theo-dia-ly`)
 - Mọi thao tác đọc và ghi đều được quyết định từ một bảng quyền theo vai, phạm vi và trạng thái (`bang-quyen-theo-vai`)
 - Mỗi màn trong sổ có sẵn bộ bài kiểm trạng thái sinh ra từ sổ, kèm bài phá thử chứng minh bài kiểm đỏ được (`bo-bai-kiem-tu-so-man`)
 - Bộ kiểm chung sinh từ sổ màn chạy được trên màn cần đăng nhập và không lỡ nhịp khi máy chậm (`bo-kiem-chung-khi-dang-nhap`)
@@ -58,6 +60,7 @@ flowchart TD
 - Cổng chứng minh màn bắt được khối mới mà vòng dựng không kê ra trong hồ sơ (`cong-bat-khoi-khong-ke`)
 - Vòng dựng màn phải chứng minh giải được và đồng nhất với màn mẫu trước khi trình, rời khỏi thang Trong kho, ReUI, Vẽ tay thì phải nêu căn cứ (`cong-chung-minh-man-mau`)
 - Đầu khách mở Đã gửi và thấy các link đã gửi trên cùng Lưới với Bảng hàng (`da-gui-tren-luoi`)
+- Đầu chủ dán một vùng từ Excel vào bảng và thấy trước những ô sẽ đổi (`dan-tu-excel`)
 - Nhân viên sàn đăng nhập bằng mã email trên màn đăng nhập chọn từ ReUI Pro, luồng và luật an toàn giữ nguyên (`dang-nhap-chon-tu-reui`)
 - Nhân viên sàn nhập mã gửi qua email và vào đúng sàn của mình (`dang-nhap-ma-email`)
 - Danh mục căn dùng chung lưu cùng cách với onehub-invest: có cấp phân khu dưới dự án, tầng lưu theo RESO, toà · trục · căn có khoá riêng, mã căn gốc giữ làm bí danh (`danh-muc-can-nhu-onehub-invest`)
