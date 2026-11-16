@@ -1,0 +1,17 @@
+{
+ "ban": "8ee15fdf20865e117d188e4fcb9769b2318e98e0",
+ "base": "c8c745ac1ab6bfaaf7802a129bf9f5df5382c1b1",
+ "den": "15ff7089afd8a6755d7a477f79d05db56245e9a6",
+ "sua_tep_luat": {
+  "may": [],
+  "nguoi": []
+ },
+ "cham": [
+  {
+   "ma": "SP-1",
+   "tep": "db/scripts/cach-ly-dich.sh",
+   "dong": 134,
+   "chu": "where r.rolname = :'vai' and (x.rolsuper or x.rolbypassrls or x.rolcreaterole or x.rolcreatedb)"
+  }
+ ]
+}
