@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 038f0756f995c1fef3b8028b48d689a3280ddade
+verified_commit: a00b21736339730f558224a83be763d05479bd38
 human_signoff: Manh Phan 2026-11-16
 ---
 
@@ -167,3 +167,19 @@ Round 7: E3, E4, E6, E10 chay lai va dat; E1, E2, E5, E7, E8, E8b, E9 carry-forw
 ### Re-pin lần 1 — 2026-11-16, do lượt ghim lại cuối của hàng 1u sau khi gộp nhánh chính 7ea2f53 (G-1611-41)
 run_id: repin-20261116T070937Z-41988
 sha: 038f0756f995c1fef3b8028b48d689a3280ddade · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)
+
+### Re-pin lần 2 — 2026-11-16, do tests/wiki-lint-so-trung.test.ts: so dich 0043 thanh 0999 (hang 22, K-30, G-1611-71)
+run_id: repin-20261116T161618Z-52851
+sha: 3ceeee39da0f6c5d65eeb78f6308574a8911e6c3 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)
+
+### Re-pin lần 3 — 2026-11-16, do hang 22 sua bai DB cho CI (tests/db), ghim lai 1u
+run_id: repin-20261116T175753Z-34800
+sha: d8444a91547391b8ca0671933cd7b1cb1bb5c827 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)
+
+### Re-pin lần 4 — 2026-11-16, do hang 22 so ban cong cu sao luu (db/scripts, tests/db), ghim lai 1u
+run_id: repin-20261116T192708Z-87025
+sha: fa302e8e94c40cfc7ce6e51b3d53271d13cab48a · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)
+
+### Re-pin lần 5 — 2026-11-16, do hang 22: Next 16.4.6 va cau in khoi-phuc-thu.sh, ghim lai 1u
+run_id: repin-20261116T203737Z-82999
+sha: a00b21736339730f558224a83be763d05479bd38 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)

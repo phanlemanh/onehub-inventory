@@ -135,6 +135,7 @@ const EXEMPT_API = [
   "GET /api/v1/auth/session",
   "DELETE /api/v1/auth/session",
   "PUT /api/v1/auth/session/company",
+  "GET /api/v1/health",
 ];
 
 /** The 15 non-empty sets of the four roles. */

@@ -1,0 +1,123 @@
+schema_version: 1
+feature_slug: moi-truong-thu-va-ban-that
+# Ma trận viết trước.
+#   Bước của make deploy (thứ tự cố định):
+#     staging:    cau-hinh, migration, cach-ly, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien (7)
+#     production: cau-hinh, ban-thu-truoc, migration, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien (7)
+#   Dòng: «deploy <ENV>: <bước> đạt» | «deploy <ENV>: <bước> ĐỎ — <lý do>»; cuối «deploy <ENV>: xong <commit ngắn>» |
+#     «deploy <ENV>: DỪNG ở <bước> — tên miền không đổi» | sau gắn tên miền: «deploy <ENV>: đã lùi về bản trước».
+#   Ma trận bước đỏ (AC-2), mỗi ENV × mỗi bước đỏ một mình, chạy trên tempDir() với vercel giả (PATH) và máy chủ giả:
+#     cau-hinh (thiếu từng tên biến của ENV; vercel.json thiếu sin1; vercel.json bật tự triển khai)
+#     ban-thu-truoc (commit khác; không trả lời) · migration (một tệp lỗi) · cach-ly (một bảng bỏ ép luật dòng)
+#     dung (build lỗi; deploy lỗi) · kiem-nhanh (từng phép kiểm của AC-6 đỏ một mình) · kiem-nhanh-ten-mien (đỏ → rollback 1 lần)
+#     Mỗi ca: đúng các dòng «đạt» của bước trước nó, đúng một dòng «ĐỎ» gọi tên bước, không dòng của bước sau,
+#     nhật ký vercel giả không có «promote» (trừ ca kiem-nhanh-ten-mien: promote 1, rollback 1), mã ≠ 0.
+#   Đối chứng dương: hai ENV xanh, nhật ký vercel giả đúng thứ tự «pull, build, deploy --prebuilt --prod --skip-domain,
+#     promote <url>», và migration của tempDir được áp (đọc schema_migrations) trước dòng «pull» đầu tiên (dấu thời gian).
+#   Mốc bí mật (AC-3): mọi biến chạy với giá trị «moc-bi-mat-<tên>»; toàn bộ stdout, stderr và nhật ký vercel giả không chứa
+#     chuỗi «moc-bi-mat-».
+#   Ma trận cấu hình khởi động (AC-5): 6 biến bắt buộc × thiếu (6 ca) · APP_ENV lạ (1) · 3 biến cấm × có mặt (3) ·
+#     DATABASE_URL vai postgres, vai quy_hang_app (2) · production APP_URL khác (2: http, tên miền khác) ·
+#     MAIL_FROM (Hỏi-7): tên miền khác onehub.center chặn (2: tên miền lạ, tên miền đuôi giống «xonehub.center»), onehub.center và một tên miền con khởi động (2) · đủ và đúng staging, production (2, khởi động) · NODE_ENV=development
+#     với mọi ca trên (không ca nào chặn). Mỗi ca chặn: lỗi gọi đúng tên biến; không chứa giá trị mốc.
+#   Lối thử của máy dev trên bản dựng production (AC-6): /proto/<mọi slug của sổ bản mẫu> → 404;
+#     /inventory?vai=<mọi vai của bảng quyền> · ?mau=<mọi giá trị đọc được> · ?state=<mọi trạng thái ép> → về /login như
+#     /inventory không tham số; sức khoẻ: đúng bốn khoá ok, commit, env, vai.
+#   Cách ly đích (AC-7): danh sách ca viết trước ở tools/deploy/../db/scripts/cach-ly-dich.sh, ba bản phá mỗi bản một thông
+#     điệp ghim: «bang khong ep luat dong: <bảng>» · «vai anon co quyen tren: <bảng>» · «vai dang nhap la chu: <bảng>».
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.deploy_kiem
+    layer: backend-effect
+    paths: [tools/deploy/**, mk/deploy.mk, vercel.json, db/scripts/migrate.sh]
+    expected: "exit 0; ca 'staging xanh' in bảy dòng 'deploy staging: <bước> đạt' đúng thứ tự, nhật ký vercel giả đúng 'pull, build, deploy --prebuilt --prod --skip-domain, promote <url>', migration áp trước lần gọi vercel đầu, dòng cuối 'deploy staging: xong <commit ngắn>'; ca vercel.json thiếu sin1 và ca bật tự triển khai mỗi ca đỏ ở cau-hinh gọi tên khoá"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.deploy_kiem
+    layer: backend-effect
+    paths: [tools/deploy/**, mk/deploy.mk]
+    expected: "exit 0; mỗi ca của ma trận bước đỏ (đầu tệp) đúng một dòng 'deploy <ENV>: <bước> ĐỎ — …', dòng 'DỪNG ở <bước> — tên miền không đổi', không dòng của bước sau, nhật ký vercel giả không có 'promote', mã ≠ 0; ca kiem-nhanh-ten-mien đỏ: promote 1, rollback 1, dòng 'đã lùi về bản trước'; Hỏi-4 (chủ kho chọn có): migration xoá cột không có dòng '-- bo-sau:' → migration ĐỎ gọi tên tệp, chưa áp (schema_migrations không đổi), có dòng ấy → đi tiếp (đối chứng dương). Chiều đỏ: bản phá đổi thứ tự gan-ten-mien trước kiem-nhanh → ca 'promote chi sau kiem-nhanh' đỏ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.deploy_kiem
+    layer: backend-effect
+    paths: [tools/deploy/**, mk/deploy.mk]
+    expected: "exit 0; production với bản thử trả commit khác và không trả lời: đỏ ở ban-thu-truoc với 'bản thử chưa chạy <commit ngắn>', không migration, nhật ký vercel giả rỗng; trả đúng HEAD: bảy dòng đạt của production; mọi ca không có chuỗi 'moc-bi-mat-' trong stdout, stderr, nhật ký vercel giả. Chiều đỏ: bản phá in giá trị một biến ở dòng cau-hinh → ca mốc bí mật đỏ gọi tên biến"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.deploy_kiem
+    layer: backend-effect
+    paths: [tools/deploy/**, mk/deploy.mk]
+    expected: "exit 0; rollback hai ENV: rollback gọi 1 lần, kiem-nhanh-ten-mien chạy, dòng 'rollback <ENV>: tên miền chạy <commit>'; không có bản trước: 'không có bản trước để lùi', nhật ký không có rollback, mã ≠ 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.cau_hinh_ban_that
+    layer: backend-effect
+    paths: [src/modules/identity/config.ts, src/modules/identity/config*.test.ts, src/modules/identity/sender.ts, src/modules/identity/invite-mail.ts, src/instrumentation.ts]
+    expected: "exit 0; mọi ca của ma trận cấu hình khởi động (đầu tệp): ca chặn ném lỗi gọi đúng tên biến, không chứa giá trị mốc; hai ca đủ khởi động; NODE_ENV=development không ca nào chặn; với APP_URL của bản thử và bản thật, mọi đường dẫn trong thân thư mã và thư mời gửi tới fetch giả bắt đầu bằng đúng APP_URL ấy (số đường dẫn > 0). Chiều đỏ: bản phá dựng đường dẫn thư từ địa chỉ của yêu cầu → ca 'đường trong thư theo APP_URL' đỏ; bản phá bỏ kiểm vai nối → ca 'DATABASE_URL vai postgres' đỏ với tên ca"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.ban_dung_that
+    long_running: 20
+    layer: backend-effect
+    paths: [src/app/api/v1/health/**, src/modules/identity/**, src/app/(app)/proto/**, src/app/(app)/inventory/**, tools/deploy/**]
+    expected: "exit 0; bản dựng production trên Postgres làn K: sức khoẻ đúng bốn khoá với ok true, commit = HEAD, env staging, vai dat; mọi /proto/<slug> 404; chưa đăng nhập: mọi ?vai=, ?mau=, ?state= về /login như không tham số; với phiên bài kiểm tự ký: vai, dữ liệu, trạng thái hiện ra giống hệt đường không tham số; số ca = số mục sổ bản mẫu + bảng quyền và > 0 (sổ rỗng thì đỏ 'so ban mau rong'); đối chứng dương trên máy chủ dev: ít nhất một ?vai= và một /proto/<slug> có tác dụng; lần nối bằng vai chủ: ok false kèm lý do của cửa truy vấn; dòng cuối 'ban-dung-that: <n> phép kiểm đạt'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.cach_ly_dich
+    layer: backend-effect
+    paths: [db/scripts/cach-ly-dich.sh, db/tests/**, tests/db/cach-ly-dich.db.test.ts, mk/deploy.mk]
+    expected: "exit 0; trên Postgres làn K: 'ok <ca>' đúng một lần cho mọi ca của danh sách viết trước, dòng 'cach-ly-dich: <n> ca đạt', số cơ sở dữ liệu và số dòng mọi bảng trước = sau; ba bản phá mỗi bản đỏ với thông điệp ghim gọi tên bảng hay vai"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.sao_luu_khoi_phuc
+    layer: backend-effect
+    paths: [db/scripts/sao-luu.sh, db/scripts/khoi-phuc-thu.sh, tests/db/sao-luu.db.test.ts, mk/deploy.mk, docs/van-hanh/nhat-ky-khoi-phuc.md]
+    expected: "exit 0; đường trong cây bị từ chối với 'không ghi sao lưu vào trong kho'; khôi phục vào cơ sở nháp có số dòng từng bảng bằng gốc, cach-ly-dich đạt, dòng 'khoi-phuc: <ngày> · <n> bảng · <m> dòng · cach-ly đạt' khớp khuôn của nhật ký khôi phục; bản phá xoá một bảng khỏi tệp đỏ gọi tên bảng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.van_hanh
+    layer: backend-effect
+    paths: [docs/van-hanh/**, Makefile, mk/**, .env.example]
+    expected: "exit 0; bốn tệp quy trình có mặt với tiêu đề bắt buộc; README có danh sách việc ngoài kho đánh số liền; mọi 'make <đích>' nhắc trong docs/van-hanh có trong Makefile hay mk/*.mk; mọi biến VIẾT_HOA nhắc trong bảng biến có trong .env.example. Chiều đỏ: bản sao có sổ tay nhắc một đích không có → ca đỏ gọi tên đích và tệp"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-9
+    executor: judgment
+    inputs: [docs/van-hanh/README.md, docs/van-hanh/dua-ban-len.md, docs/van-hanh/lui-ban.md, docs/van-hanh/xoay-khoa.md, docs/van-hanh/khoi-phuc.md]
+    question: "Một người vận hành chưa từng làm, chỉ có năm tệp này, có làm theo được từng quy trình (đưa bản lên, lùi bản, xoay khoá bí mật, khôi phục dữ liệu) mà không phải đọc mã không? Mỗi bước có nói làm ở đâu, gõ gì, thấy gì là đạt, đỏ thì làm gì không? Danh sách việc ngoài kho có theo đúng thứ tự làm được và chỉ ghi tên biến, không giá trị không?"
+    expected: "PASS khi cả bốn quy trình và danh sách việc ngoài kho đủ bốn điều (ở đâu, gõ gì, thấy gì là đạt, đỏ thì làm gì) và không tệp nào chứa giá trị khoá"
+    evidence_required: [run_id, verdict, judges, verified_at]
+  - id: E11
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.khoa_bi_mat
+    layer: backend-effect
+    paths: [tests/khong-khoa-bi-mat.test.ts, .env.example]
+    expected: "exit 0; mọi tệp được theo dõi (git ls-files) không khớp mẫu khoá Vercel, Supabase, Resend, khoá ký JWT, địa chỉ Postgres có mật khẩu khác local-only; .env.example kê APP_ENV, MIGRATE_DATABASE_URL, LOGIN_DATABASE_URL, VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID với giá trị rỗng hay example.test. Chiều đỏ: bản sao trong tempDir() thêm một dòng khoá giả đúng mẫu → ca đỏ gọi tên tệp và số dòng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E12
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    layer: backend-effect
+    expected: "exit 0 — make check xanh trên HEAD (ranh giới mô-đun: health đi qua server.ts của identity; nhãn; ontology)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

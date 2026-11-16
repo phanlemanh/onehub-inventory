@@ -10,12 +10,14 @@ import { AuthConfigError, PRODUCTION_VARS, assertProductionConfig, readAuthConfi
 // The start hook loads the module's server door; outside Next.js its "server-only" guard has nothing to guard.
 vi.mock("server-only", () => ({}));
 
+// A trial copy (row 22): the start check also wants APP_ENV, the login role and a sender on onehub.center.
 const FULL = {
   NODE_ENV: "production",
-  DATABASE_URL: "postgres://app@db.example.test/app",
+  APP_ENV: "staging",
+  DATABASE_URL: "postgres://quy_hang_login@db.example.test/app",
   AUTH_SECRET: "x".repeat(40),
   RESEND_API_KEY: "re_test_key",
-  MAIL_FROM: "OneHub <no-reply@example.test>",
+  MAIL_FROM: "OneHub <no-reply@onehub.center>",
   APP_URL: "https://app.example.test",
 };
 
@@ -215,6 +217,13 @@ describe("production configuration", () => {
     vi.stubEnv("NEXT_PHASE", "");
     vi.stubEnv("NODE_ENV", "production");
     for (const [name, value] of Object.entries(FULL)) vi.stubEnv(name, value);
+    // A development shell may carry these; a production start refuses them (row 22).
+    for (const name of [
+      "LOGIN_CODE_OUTBOX",
+      "NEXT_PUBLIC_E2E_BUTTON_RECORD",
+      "MIGRATE_DATABASE_URL",
+    ])
+      vi.stubEnv(name, undefined);
     // Positive control: complete production configuration starts.
     await expect(register()).resolves.toBeUndefined();
     for (const name of PRODUCTION_VARS) {

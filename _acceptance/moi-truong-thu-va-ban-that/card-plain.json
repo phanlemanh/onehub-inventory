@@ -1,0 +1,45 @@
+{
+  "feature_plain": "Inventory có bản thử và bản thật riêng ở inventory.onehub.center: mỗi bản mới lên bản thử trước, kiểm xong mới lên bản thật, hỏng thì lùi về bản trước — máy dựng phần trong kho, anh làm phần tài khoản và khoá.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ có một lệnh đưa bản mới lên bản thử: kiểm cấu hình, áp thay đổi cơ sở dữ liệu, kiểm cách ly giữa các sàn, dựng bản mới chưa gắn tên miền, kiểm nhanh, rồi mới gắn tên miền và kiểm lại."},
+    {"id": "AC-2", "p": "Sẽ dừng ngay khi một bước đỏ và nói rõ bước nào; trước lúc gắn tên miền thì người dùng vẫn chạy bản cũ, sau lúc gắn mà kiểm đỏ thì tự lùi về bản trước."},
+    {"id": "AC-4", "p": "Sẽ có lệnh lùi bản: gắn tên miền về bản trước rồi kiểm lại; không có bản trước thì từ chối."},
+    {"id": "AC-5", "p": "Sẽ không cho bản thử hay bản thật khởi động khi thiếu cấu hình, còn công tắc của máy dev, nối cơ sở dữ liệu bằng vai chủ bảng, sai địa chỉ bản thật hay gửi thư từ tên miền lạ — lỗi gọi tên biến, không lộ giá trị; đường dẫn trong thư luôn trỏ đúng địa chỉ của môi trường."},
+    {"id": "AC-6", "p": "Sẽ có một đường kiểm sức khoẻ chỉ đọc cho biết bản nào đang chạy và vai nối có đúng luật cách ly không; trên bản dựng thật mọi lối thử của máy dev (trang bản mẫu, chọn vai qua địa chỉ, bộ mẫu, ép trạng thái) đều tắt, kể cả khi đã đăng nhập."},
+    {"id": "AC-7", "p": "Sẽ chạy được bộ kiểm cách ly giữa các sàn trên bản thử mà không ghi gì: bảng nào thiếu luật dòng, vai Supabase nào có quyền trên bảng của sàn, vai đăng nhập nào làm chủ bảng thì đỏ và gọi tên."},
+    {"id": "AC-8", "p": "Sẽ có lệnh sao lưu ra ngoài kho và lệnh thử khôi phục vào một cơ sở nháp, đếm dòng từng bảng và kiểm cách ly trên bản khôi phục, in một dòng để ghi nhật ký khôi phục."},
+    {"id": "AC-9", "p": "Sẽ có sổ tay vận hành cho bốn việc — đưa bản lên, lùi bản, xoay khoá bí mật, khôi phục dữ liệu — và danh sách việc ngoài kho theo thứ tự, mỗi việc ghi máy cần nhận lại tên biến nào."}
+  ],
+  "wont_do": [
+    {"id": "AC-3", "p": "Chặn đưa lên bản thật khi bản thử chưa chạy đúng bản ấy; và không lệnh nào in giá trị của khoá bí mật ra nhật ký."},
+    {"id": "AC-10", "p": "Chặn mọi khoá bí mật nằm trong kho mã: bộ dò đỏ và gọi tên tệp, dòng."},
+    {"id": "OOS-1", "p": "Sẽ KHÔNG tạo tài khoản, dự án, cơ sở dữ liệu hay khoá, không trỏ tên miền, không xác minh tên miền thư, không tự chạy lần đưa bản đầu hay lần thử khôi phục thật — đó là việc của anh."},
+    {"id": "OOS-2", "p": "Sẽ KHÔNG sửa hai tệp tự động triển khai; máy soạn sẵn bản đề xuất để anh tự đặt."},
+    {"id": "OOS-3", "p": "Sẽ KHÔNG chuyển dữ liệu từ Quỹ hàng (đã chốt ở quyết định thay 0010)."},
+    {"id": "OOS-4", "p": "Sẽ KHÔNG có khôi phục theo từng phút và cảnh báo khi bản thật ngừng — tuỳ lối chi phí anh chọn."},
+    {"id": "OOS-5", "p": "Sẽ KHÔNG làm lại khoá cho việc Release đang đỏ — hướng dẫn đã có ở hàng 1u."}
+  ],
+  "scope_plain": "Phần ngoài kho là của anh; máy chỉ soạn sẵn danh sách theo thứ tự và bản đề xuất.",
+  "coverage_plain": [
+    {"i": 0, "p": "Máy đã quét đủ các ngả có thể hỏng của việc đưa bản lên, theo từng trục dưới đây."},
+    {"i": 2, "p": "Hai môi trường: bản thử và bản thật đều có lệnh và phép đo riêng (AC-1, AC-3)."},
+    {"i": 3, "p": "Mọi bước của lệnh, kể cả bước lùi, đều có ca kiểm (AC-1 đến AC-4)."},
+    {"i": 4, "p": "Mỗi bước có ca đạt, ca đỏ trước khi gắn tên miền và ca đỏ sau khi gắn (AC-1, AC-2)."},
+    {"i": 5, "p": "Cấu hình lúc khởi động: thiếu, cấm, vai sai, địa chỉ sai, tên miền thư sai và ca đủ (AC-5)."},
+    {"i": 6, "p": "Mọi lối thử của máy dev đều được thử tắt trên bản dựng thật (AC-6)."},
+    {"i": 7, "p": "Cách ly giữa các sàn: luật dòng, quyền của vai Supabase, vai không chủ, phiên đăng nhập (AC-7)."},
+    {"i": 8, "p": "Dữ liệu: sao lưu, khôi phục, đếm dòng và kiểm cách ly trên bản khôi phục (AC-8)."},
+    {"i": 9, "p": "Người vận hành: bốn quy trình và danh sách việc ngoài kho (AC-9)."},
+    {"i": 10, "p": "Khoá bí mật: không trong kho, không trong nhật ký lệnh, mẫu biến kê đủ (AC-10, AC-3)."},
+    {"i": 11, "p": "Thước đủ: mỗi bước × mỗi kết cục có ít nhất một ca; mỗi ca cấu hình là một ca riêng."},
+    {"i": 12, "p": "Chưa kiểm được tại máy: thư gửi thật từ tên miền đã xác minh và lần khôi phục thật trên bản thử."},
+    {"i": 13, "p": "Hai việc này chỉ đo được sau khi anh làm phần ngoài kho."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Luật «thư phải gửi từ đúng tên miền» máy tự đặt mà không có căn cứ — tên miền thư là việc anh chọn ở Resend. Đã chuyển thành câu hỏi cho anh (Hỏi-7)."},
+    {"i": 1, "p": "Máy ghi «chỉ có một cách» dựng hai môi trường trên Vercel, nhưng cách một dự án vẫn chạy được. Đã chuyển thành câu hỏi cho anh (Hỏi-6)."},
+    {"i": 2, "p": "Phép chặn thay đổi cơ sở dữ liệu nguy hiểm ở Hỏi-4 chưa có phép đo. Đã thêm ca đo, có hiệu lực nếu anh chọn «có»."},
+    {"i": 3, "p": "Chưa đo việc đường dẫn trong thư mã và thư mời trỏ đúng địa chỉ mới. Đã thêm phép đo."},
+    {"i": 4, "p": "Lối chọn vai chỉ được thử khi chưa đăng nhập, thiếu đối chứng. Đã thêm ca có đăng nhập, ca đối chứng trên máy dev, và đếm đủ số ca."}
+  ]
+}

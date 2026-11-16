@@ -29,6 +29,10 @@ executors:
     dia_ly: "npx vitest run src/modules/listings/ui/geo-tree.test.ts tests/dia-ly.test.tsx --coverage.enabled=false --reporter=verbose"   # bang-hang-theo-dia-ly (row 2d): geography tree, whole-name filter, one filter state
     dia_ly_e2e_db: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx playwright test -c playwright.db.config.ts tests/e2e-db/dia-ly.spec.ts"   # bang-hang-theo-dia-ly (row 2d): tree in the signed-in App Shell at four widths, saved view, axe light and dark, lane K Postgres
     vong_doi: "npx vitest run tests/vong-doi-thao-tac.test.ts --coverage.enabled=false --reporter=verbose"   # kiem-vong-doi-thao-tac (row 1t): every entity a screen shows has add, view, edit, remove or an approved reason
+    deploy_kiem: "npx vitest run tools/deploy --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): make deploy and rollback with a fake vercel and a fake health server, every step red on its own
+    cau_hinh_ban_that: "npx vitest run src/modules/identity/config.test.ts src/modules/identity/config-ban-that.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): start-up configuration matrix of a real build
+    van_hanh: "npx vitest run tests/van-hanh.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): runbook procedures, make targets and variables it names exist
+    khoa_bi_mat: "npx vitest run tests/khong-khoa-bi-mat.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): no secret pattern in a tracked file, .env.example lists the new variables
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
@@ -103,6 +107,9 @@ executors:
     tool_matches_plugin: "node _acceptance/refresh-design-assembly-tool/rang/tool-tree.mjs --root ."   # refresh-design-assembly-tool: the tool folder has the id git gives the plugin's tool folder
     only_register_changed: "node _acceptance/refresh-design-assembly-tool/rang/only-register-changed.mjs --root ."   # refresh-design-assembly-tool: of the design ledgers the branch changes the register alone; no screen-actions check declared
     refresh_measures_two_way: "node --test _acceptance/refresh-design-assembly-tool/rang/measures-two-way.mjs"   # refresh-design-assembly-tool: each measure green as it is, red with its pinned message on a broken copy
+    ban_dung_that: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} bash tools/deploy/thu-ban-dung.sh"   # moi-truong-thu-va-ban-that (row 22): production build on lane K Postgres, health and every dev-only switch closed
+    cach_ly_dich: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx vitest run -c vitest.db.config.ts tests/db/cach-ly-dich.db.test.ts --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): read-only isolation suite on a target database, three break copies
+    sao_luu_khoi_phuc: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx vitest run -c vitest.db.config.ts tests/db/sao-luu.db.test.ts --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): backup outside the repo, restore drill into a scratch database
     cong_chay: "npx vitest run tests/cong-chay.test.ts --coverage.enabled=false --reporter=verbose"   # don-no-bo-kiem: port picker skips Chrome's blocked ports over both whole ranges
     cho_tai_pha: "bash _acceptance/don-no-bo-kiem/rang/cho-tai-pha.sh"   # don-no-bo-kiem: the cho-tai break is caught and no hydration warning appears
     gac_hydration_pha: "node _acceptance/don-no-bo-kiem/rang/gac-hydration-pha.mjs"   # don-no-bo-kiem: the hydration guard turns a run red on a planted mismatch, silent otherwise

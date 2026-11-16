@@ -1,0 +1,6 @@
+{
+  "feature_plain": "Inventory có bản thử và bản thật riêng ở inventory.onehub.center: mỗi bản mới lên bản thử trước, kiểm xong mới lên bản thật, hỏng thì lùi đúng về bản tên miền đang chạy trước đó — máy dựng phần trong kho, anh làm phần tài khoản và khoá.",
+  "decisions": [
+    {"id": "E10", "q": "Sổ tay vận hành đủ để người chưa từng làm tự làm theo không?", "why": "Lượt 5 hội đồng đề xuất đạt; một góc nhìn còn ngại vài chỗ chưa chạy thử trên Supabase và Vercel thật."}
+  ]
+}

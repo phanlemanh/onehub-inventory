@@ -1431,6 +1431,11 @@ export const PERMISSION_EXEMPT: readonly ExemptDoor[] = [
     reads: [],
   },
   {
+    door: "GET /api/v1/health",
+    reason: "Read-only health of the running build (row 22) — commit, environment and whether the connection role passes the query door; reads no company data and needs no session.",
+    reads: [],
+  },
+  {
     door: "function app.current_company_id()",
     reason: "Reads the company of the session, set by the one query door.",
     reads: [],

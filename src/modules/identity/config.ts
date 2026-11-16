@@ -75,6 +75,88 @@ export function assertProductionConfig(env: Env): void {
   if (parseAppUrl(env["APP_URL"] as string, true) === null) throw badAppUrl(true);
 }
 
+/** What the start of a production server needs on top of sign-in: which environment it is (row 22). */
+export const STARTUP_VARS = [...PRODUCTION_VARS, "APP_ENV"] as const;
+
+/** The environments a production build runs as: the trial copy and the real one. */
+export const APP_ENVS = ["staging", "production"] as const;
+
+/** Variables of a development or test machine only; a production server with any of them does not start. */
+export const FORBIDDEN_IN_PRODUCTION = [
+  "LOGIN_CODE_OUTBOX",
+  "NEXT_PUBLIC_E2E_BUTTON_RECORD",
+  "MIGRATE_DATABASE_URL",
+] as const;
+
+/** The database role the server signs in as; it owns no table and switches to the query role (SP-1). */
+export const LOGIN_ROLE = "quy_hang_login";
+
+/** The real product's own address (decision 0041). */
+export const PRODUCTION_APP_URL = "https://inventory.onehub.center";
+
+/** Mail leaves from this domain or one of its subdomains, the ones Resend can verify (Hỏi-7). */
+export const MAIL_DOMAIN = "onehub.center";
+
+/**
+ * The database role in an address, or null when the address cannot be read. Supabase's shared pooler names the user
+ * `<role>.<project ref>` (a ref is 20 lower-case letters); the role is the part before it.
+ */
+function databaseUser(raw: string): string | null {
+  try {
+    const user = decodeURIComponent(new URL(raw.trim()).username).replace(/\.[a-z]{20}$/, "");
+    return user === "" ? null : user;
+  } catch {
+    return null;
+  }
+}
+
+/** The domain of a sender address, `Name <a@b>` or `a@b`, lower case; null when there is none. */
+function mailDomain(raw: string): string | null {
+  const value = raw.trim();
+  const address = (/<([^<>]*)>\s*$/.exec(value)?.[1] ?? value).trim();
+  const at = address.lastIndexOf("@");
+  if (at <= 0 || at === address.length - 1 || /\s/.test(address)) return null;
+  return address.slice(at + 1).toLowerCase();
+}
+
+/**
+ * The start-up check of a production build, staging or production (AC-5 of row 22): sign-in configuration, which
+ * environment it is, no variable of a development machine, the login role, the real address and the mail domain.
+ * Every problem names its variable and why; no value of any variable goes into the error. Outside NODE_ENV=production
+ * nothing is checked: development machines and tests run as before.
+ */
+export function assertStartupConfig(env: Env): void {
+  if (env["NODE_ENV"] !== "production") return;
+  const missing = STARTUP_VARS.filter((name) => !present(env, name));
+  if (missing.length > 0) throw new AuthConfigError(missing);
+  assertProductionConfig(env);
+  const problems: { name: string; why: string }[] = [];
+  const appEnv = (env["APP_ENV"] as string).trim();
+  if (!(APP_ENVS as readonly string[]).includes(appEnv))
+    problems.push({ name: "APP_ENV", why: `phải là ${APP_ENVS.join(" hoặc ")}` });
+  for (const name of FORBIDDEN_IN_PRODUCTION)
+    if (present(env, name))
+      problems.push({
+        name,
+        why: "chỉ dùng cho máy dev hay máy kiểm, bản dựng thật không được có",
+      });
+  if (databaseUser(env["DATABASE_URL"] as string) !== LOGIN_ROLE)
+    problems.push({ name: "DATABASE_URL", why: `phải nối bằng vai ${LOGIN_ROLE}` });
+  if (appEnv === "production" && parseAppUrl(env["APP_URL"] as string, true) !== PRODUCTION_APP_URL)
+    problems.push({ name: "APP_URL", why: `bản thật phải là ${PRODUCTION_APP_URL}` });
+  const domain = mailDomain(env["MAIL_FROM"] as string);
+  if (domain === null || (domain !== MAIL_DOMAIN && !domain.endsWith(`.${MAIL_DOMAIN}`)))
+    problems.push({
+      name: "MAIL_FROM",
+      why: `địa chỉ gửi phải thuộc tên miền ${MAIL_DOMAIN} hay một tên miền con của nó`,
+    });
+  if (problems.length > 0)
+    throw new AuthConfigError(
+      problems.map((p) => p.name),
+      `cấu hình bản dựng thật sai: ${problems.map((p) => `${p.name} ${p.why}`).join("; ")}`,
+    );
+}
+
 export function readAuthConfig(env: Env, fetchImpl?: typeof fetch): AuthConfig {
   const production = env["NODE_ENV"] === "production";
   assertProductionConfig(env);
