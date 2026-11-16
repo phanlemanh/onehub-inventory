@@ -61,7 +61,10 @@ const PATTERNS: Pattern[] = [
   },
 ];
 
-const POSTGRES_URL = /postgres(?:ql)?:\/\/[^:/\s@"'`]+:([^@\s"'`]+)@/g;
+const POSTGRES_URL = /postgres(?:ql)?:\/\/[^:/\s@"'`]+:([^@\s"'`]+)@([^:/\s"'`]+)/g;
+
+/** A host on the `.test` top-level domain (RFC 2606) cannot be a real server, so its password is a test value. */
+const TEST_HOST = /\.test$/;
 
 interface Finding {
   file: string;
@@ -91,7 +94,13 @@ function scan(root: string, files: string[]): Finding[] {
           if (regex.test(text)) findings.push({ file, line, pattern: name });
         for (const match of text.matchAll(POSTGRES_URL)) {
           const password = match[1] ?? "";
-          if (password === LOCAL_PASSWORD || NOT_A_PASSWORD.some((p) => p.test(password))) continue;
+          const host = match[2] ?? "";
+          if (
+            password === LOCAL_PASSWORD ||
+            TEST_HOST.test(host) ||
+            NOT_A_PASSWORD.some((p) => p.test(password))
+          )
+            continue;
           findings.push({
             file,
             line,
@@ -146,7 +155,7 @@ describe("no secret in a tracked file (AC-10)", () => {
       ["JWT signing secret", "AUTH_" + "SECRET=" + "k9".repeat(16)],
       [
         "Postgres URL with a password other than local-only",
-        "postgres" + "://postgres:hunter2" + "@db.example.test/x",
+        "postgres" + "://postgres:hunter2" + "@db.vi-du.com/x",
       ],
     ];
     for (const [pattern, fake] of fakes) {
@@ -168,6 +177,7 @@ describe("no secret in a tracked file (AC-10)", () => {
         "postgres" + "://user:<password>@db.example.test/x",
         "postgresql" + "://user:${PGPASSWORD}@db.example.test/x",
         "postgres" + "://app@db.example.test/x",
+        "postgres" + "://app:mat-khau-gia@db.example.test:5432/x",
       ].join("\n"),
     );
     expect(scan(dir, ["urls.txt"])).toEqual([]);
