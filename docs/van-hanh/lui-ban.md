@@ -15,8 +15,10 @@ dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật m
 - Một máy có `git` và Node 24 (`node --version` in `v24.…`; tải ở nodejs.org, bản 24 LTS).
 - `vercel` đúng bản tệp tự động triển khai dùng: gõ `npm install --global vercel@65.9.0`; đạt khi `vercel --version` in
   `65.9.0`. Đỏ thì: `EACCES` — máy cài Node vào thư mục hệ thống; cài Node qua trình quản lý bản (như `nvm`) rồi gõ lại.
-- Bản sao của kho này (`git clone`), đã chạy `make setup` một lần.
-- Một tệp biến ngoài kho cho mỗi môi trường, quyền chỉ chủ đọc, có bốn biến `VERCEL_TOKEN`, `VERCEL_ORG_ID`,
+- Bản sao của kho này, đã chạy `make setup` một lần. Địa chỉ để sao: trang kho trên GitHub › nút Code › tab HTTPS ›
+  bấm biểu tượng chép; rồi gõ `git clone <địa chỉ vừa chép>` và `cd` vào thư mục vừa tạo.
+- Một tệp biến ngoài kho cho mỗi môi trường, mỗi dòng dạng `TÊN=giá trị` (không dấu cách quanh `=`), quyền chỉ chủ
+  đọc (`chmod 600 <tệp>`), nạp bằng `set -a; source <tệp>; set +a` (bước 2). Tệp có bốn biến `VERCEL_TOKEN`, `VERCEL_ORG_ID`,
   `VERCEL_PROJECT_ID` (dự án của môi trường cần lùi) và `APP_URL` (địa chỉ của môi trường ấy); thêm
   `VERCEL_AUTOMATION_BYPASS_SECRET` nếu dự án bật bảo vệ bản mới. Giá trị lấy từ trình giữ mật khẩu, giống giá trị đã đặt
   ở môi trường GitHub cùng tên.
@@ -64,6 +66,12 @@ dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật m
 - **Đỏ thì:** không đưa lại commit hỏng. Bản thật đang chạy bản cũ hơn bản thử là bình thường cho tới khi có bản sửa.
 
 ## Đỏ thì làm gì
+
+Khi không đọc được sức khoẻ của tên miền (máy chủ không trả lời hay không trả JSON), `make rollback` và bước tự lùi của
+`make deploy` dừng lại chứ không đoán bản nào đang chạy, vì bản mới nhất trên Vercel có thể chưa từng được gắn tên miền.
+Khi ấy người vận hành nêu đích danh bản cần lùi về: `make rollback ENV=<ENV> BAN=<url hoặc id>` (lấy url hay id ở trang
+Deployments của dự án trên Vercel, chọn bản đã chạy tốt gần nhất). Đạt khi dòng cuối là
+`rollback <ENV>: tên miền chạy <commit>`.
 
 | Dòng                                                           | Làm gì                                                                                                                                                                                                              |
 | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

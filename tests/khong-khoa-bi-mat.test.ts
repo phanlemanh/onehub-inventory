@@ -230,13 +230,45 @@ export function undocumentedVariables(root: string): string[] {
     .filter((f) => /\.(ts|tsx|mjs)$/.test(f) && !/\.test\.tsx?$/.test(f));
   for (const file of files) {
     const text = readFileSync(join(root, file), "utf8");
-    for (const m of text.matchAll(/(?:process\.env\.|env\[["'])([A-Z_][A-Z0-9_]*)/g)) {
-      const name = m[1]!;
+    for (const name of variablesRead(text)) {
       if (RUNTIME_SET.has(name)) continue;
       if (!new RegExp(`^(?:#\\s*)?${name}=`, "m").test(listed)) missing.add(`${name} (${file})`);
     }
   }
   return [...missing].sort();
+}
+
+/** An upper-snake name with at least one underscore, the shape of every variable in .env.example. */
+const UPPER_SNAKE = /^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$/;
+
+/**
+ * Names a source file reads from the environment, in the three forms the code uses:
+ * - `process.env.X`, `process.env["X"]`, `env["X"]`;
+ * - a helper given the environment and a name, `present(env, "X")`;
+ * - a name list read through `env[name]`, such as `PRODUCTION_VARS = ["X", …] as const`: in a file that reads
+ *   `env[`, every array literal made only of upper-snake strings (and `...LIST` spreads) counts.
+ */
+function variablesRead(text: string): Set<string> {
+  const names = new Set<string>();
+  for (const m of text.matchAll(/(?:process\.env\.|env\[["'])([A-Z_][A-Z0-9_]*)/g))
+    names.add(m[1]!);
+  for (const m of text.matchAll(/\w+\(\s*env\s*,\s*["']([A-Z_][A-Z0-9_]*)["']/g)) names.add(m[1]!);
+  if (!text.includes("env[")) return names;
+  for (const m of text.matchAll(/\[([^[\]]*)\]/g)) {
+    const items = m[1]!
+      .replace(/\/\/[^\n]*/g, "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const strings = items.map((s) => /^["']([^"']*)["']$/.exec(s)?.[1]);
+    const isList =
+      strings.some((s) => s !== undefined) &&
+      items.every(
+        (s, i) => /^\.\.\.[A-Za-z_$][\w$]*$/.test(s) || UPPER_SNAKE.test(strings[i] ?? ""),
+      );
+    if (isList) for (const s of strings) if (s !== undefined) names.add(s);
+  }
+  return names;
 }
 
 describe("every variable the app reads is in .env.example (AC-10)", () => {
@@ -254,5 +286,38 @@ describe("every variable the app reads is in .env.example (AC-10)", () => {
       'export const a = process.env.APP_URL ?? process.env["BIEN_MOI"];\n',
     );
     expect(undocumentedVariables(dir)).toEqual(["BIEN_MOI (src/a.ts)"]);
+  });
+
+  it("break: a helper given env and a new name names it and its file", () => {
+    const dir = tempDir("bien-chua-khai-ham-");
+    execFileSync("git", ["init", "-q"], { cwd: dir });
+    mkdirSync(join(dir, "src"), { recursive: true });
+    writeFileSync(join(dir, ".env.example"), "APP_URL=\n");
+    writeFileSync(
+      join(dir, "src", "b.ts"),
+      'const ok = present(env, "APP_URL") && present(env, "BIEN_MOI");\n',
+    );
+    expect(undocumentedVariables(dir)).toEqual(["BIEN_MOI (src/b.ts)"]);
+  });
+
+  it("break: a name list read through env[name] names the new entry and its file", () => {
+    const dir = tempDir("bien-chua-khai-danh-sach-");
+    execFileSync("git", ["init", "-q"], { cwd: dir });
+    mkdirSync(join(dir, "src"), { recursive: true });
+    writeFileSync(join(dir, ".env.example"), "APP_URL=\n# MAIL_FROM=a@example.test\n");
+    writeFileSync(
+      join(dir, "src", "c.ts"),
+      [
+        'export const BASE = ["APP_URL"] as const;',
+        "export const VARS = [",
+        "  ...BASE,",
+        '  "MAIL_FROM", // the sender',
+        '  "BIEN_MOI_KHAC",',
+        "] as const;",
+        'const LABELS = ["Tên", "APP_URL thì sao"];',
+        "export const missing = VARS.filter((name) => !env[name]);",
+      ].join("\n"),
+    );
+    expect(undocumentedVariables(dir)).toEqual(["BIEN_MOI_KHAC (src/c.ts)"]);
   });
 });

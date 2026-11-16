@@ -225,14 +225,40 @@ Bảng biến ở mục sau nói mỗi biến dùng cho gì.
       đặt lại ở tab Variables của kho.
 
 12. **Lần đưa bản đầu và mật khẩu vai đăng nhập.** Theo [dua-ban-len.md](dua-ban-len.md), mục «Lần đầu ở một môi
-    trường»: lần chạy đầu dừng ở bước cần vai đăng nhập (bản thử: `cach-ly`; bản thật: `kiem-nhanh`) vì vai vừa được tạo
-    chưa có mật khẩu. Đặt mật khẩu của việc 4 cho vai ấy trong SQL Editor của Supabase rồi chạy lại. Máy nhận lại: không
-    biến mới.
+    trường». Bắt đầu ở trang kho: Actions › Deploy › Run workflow, ô «Use workflow from» để tab Branches, chọn nhánh
+    `main` (lần đầu chưa có thẻ phát hành nào), bấm Run workflow. Lần chạy đầu dừng ở bước cần vai đăng nhập (bản thử:
+    `cach-ly`; bản thật: `kiem-nhanh`) vì vai vừa được tạo chưa có mật khẩu. Đặt mật khẩu của việc 4 cho vai ấy trong SQL
+    Editor của Supabase rồi chạy lại cùng cách. Khi bản thử đã xong và lượt chờ duyệt `production`, làm việc 13 cho bản
+    thử trước khi nhìn bản thử và duyệt. Máy nhận lại: không biến mới.
     - **Đạt khi:** nhật ký lượt Deploy có `deploy staging: xong <commit>` rồi `deploy production: xong <commit>`; mở
       `<APP_URL>/api/v1/health` của hai môi trường thấy `"ok":true` và `"vai":"dat"`.
     - **Đỏ thì:** đọc dòng đỏ trong nhật ký lượt Deploy và làm theo bảng «Đỏ thì làm gì» của
       [dua-ban-len.md](dua-ban-len.md); không có lượt Deploy nào — xem lại phần ba của việc 11.
-13. **Lần thử khôi phục đầu.** Theo [khoi-phuc.md](khoi-phuc.md) trên bản thử, chép dòng kết quả vào
+13. **Tài khoản đăng nhập đầu ở mỗi môi trường.** Kho không có lệnh hay màn tạo sàn đầu tiên: lời mời chỉ do một
+    Quản trị sàn đã đăng nhập gửi, và cơ sở dữ liệu mới chưa có ai. Nên chủ kho tạo sàn và Quản trị sàn đầu tiên bằng SQL,
+    một lần cho bản thử, một lần cho bản thật, sau khi bước `migration` của môi trường ấy đạt (việc 12). Ở đâu: Supabase ›
+    dự án của môi trường › SQL Editor › New query. Gõ câu dưới, thay `[Tên sàn]`, `[Tên]` và địa chỉ thư bằng tên sàn, tên
+    và hộp thư thật của người quản trị (gõ thẳng ở SQL Editor, không ghi vào kho; địa chỉ thư viết thường, không khoảng
+    trắng), rồi Run. Những người khác vào sau bằng thư mời của người này trong ứng dụng. Máy nhận lại: không biến mới.
+
+    ```sql
+    with c as (insert into companies (name) values ('[Tên sàn]') returning id),
+         u as (insert into identity.users (email, name) values ('quan-tri@example.test', '[Tên]') returning id)
+    insert into company_members (company_id, user_id, name, roles)
+    select c.id, u.id, '[Tên]', array['CompanyAdmin'] from c, u
+    returning company_id, user_id;
+    ```
+
+    - **Đạt khi:** SQL Editor trả đúng một dòng có hai mã `company_id`, `user_id`; ở trang đăng nhập của môi trường ấy,
+      xin mã bằng địa chỉ thư vừa gõ thì thư mã tới và đăng nhập vào được.
+    - **Đỏ thì:** `relation "companies" does not exist` hay `relation "identity.users" does not exist` — migration chưa áp,
+      làm xong việc 12 trước; `duplicate key value violates unique constraint "users_email_key"` — địa chỉ ấy đã có tài
+      khoản: không chạy lại, báo người giữ kho mã; `violates check constraint` — địa chỉ có chữ hoa hay khoảng trắng, hoặc
+      tên rỗng hay quá 120 ký tự: sửa rồi Run lại (lỗi nào cũng không ghi dòng nào); dòng có `row-level security` — vai
+      của SQL Editor không vượt được luật theo dòng: dừng, báo người giữ kho mã; không có thư mã — kiểm việc 8 và
+      `RESEND_API_KEY`, `MAIL_FROM` của dự án Vercel ấy.
+
+14. **Lần thử khôi phục đầu.** Theo [khoi-phuc.md](khoi-phuc.md) trên bản thử, chép dòng kết quả vào
     [nhat-ky-khoi-phuc.md](nhat-ky-khoi-phuc.md). Đặt lịch nhắc thử lại mỗi quý. Máy nhận lại: một dòng mới trong nhật ký
     khôi phục.
     - **Đạt khi:** bảng «Các lần thử» của nhật ký khôi phục có một dòng `khoi-phuc: … cach-ly đạt` với ngày hôm nay; lịch

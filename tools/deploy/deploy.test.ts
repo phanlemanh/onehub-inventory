@@ -121,6 +121,8 @@ interface Ctx {
   health: Record<string, Health | "drop">;
   proto: Record<string, number>;
   domainOverride?: Health;
+  /** Answers for the domain's next health reads, one each, before the usual ones: "drop" closes, "text" is not JSON. */
+  domainSeq?: (Health | "drop" | "text")[];
   requests: { t: number; path: string }[];
 }
 
@@ -204,6 +206,21 @@ async function fresh(appEnv: Env, setup: Setup = {}): Promise<Ctx> {
     let prefix = "/" + (path.split("/")[1] ?? "");
     const rest = path.slice(prefix.length);
     if (prefix === "/ten-mien") {
+      const next = rest === "/api/v1/health" ? ctx.domainSeq?.shift() : undefined;
+      if (next === "drop") {
+        req.socket.destroy();
+        return;
+      }
+      if (next === "text") {
+        res.statusCode = 502;
+        res.end("Bad gateway");
+        return;
+      }
+      if (next) {
+        res.setHeader("content-type", "application/json");
+        res.end(JSON.stringify(next));
+        return;
+      }
       if (rest === "/api/v1/health" && ctx.domainOverride) {
         res.setHeader("content-type", "application/json");
         res.end(JSON.stringify(ctx.domainOverride));
@@ -609,6 +626,45 @@ describe("make deploy — ma trận bước đỏ", () => {
   }
 });
 
+describe("make deploy — lùi sau gắn tên miền không đoán", () => {
+  for (const appEnv of ["staging", "production"] as const) {
+    const redAfter = (ctx: Ctx): Health => ({
+      ok: true,
+      commit: ctx.head,
+      env: appEnv,
+      vai: "không nối được",
+    });
+
+    it(`${appEnv}: không đọc được tên miền trước khi gắn → không tự lùi, nêu đích danh`, async () => {
+      const ctx = await fresh(appEnv);
+      ctx.domainSeq = ["drop", redAfter(ctx)];
+      const r = await deploy(ctx, appEnv);
+      expect(r.code).not.toBe(0);
+      expect(r.lines.slice(6)).toEqual([
+        `deploy ${appEnv}: kiem-nhanh-ten-mien ĐỎ — vai nối chưa đạt: không nối được`,
+        `deploy ${appEnv}: lùi bản DỪNG — không đọc được bản tên miền chạy trước khi gắn, không đoán; tên miền vẫn ở bản mới — nêu đích danh bản cần lùi về: make rollback ENV=${appEnv} BAN=<url hoặc id>`,
+      ]);
+      expect(r.vercel.filter((v) => v.startsWith("vercel promote"))).toHaveLength(1);
+      expect(r.vercel.some((v) => v.startsWith("vercel rollback"))).toBe(false);
+      expectNoMarker(ctx, r);
+    });
+
+    it(`${appEnv}: không đọc được danh sách bản sau gắn → dòng riêng, không phải «không có bản trước»`, async () => {
+      const ctx = await fresh(appEnv);
+      ctx.domainSeq = [{ ok: true, commit: OLD, env: appEnv, vai: "dat" }, redAfter(ctx)];
+      writeFileSync(join(ctx.fake, "fail-list"), "");
+      const r = await deploy(ctx, appEnv);
+      expect(r.code).not.toBe(0);
+      expect(r.lines.slice(6)).toEqual([
+        `deploy ${appEnv}: kiem-nhanh-ten-mien ĐỎ — vai nối chưa đạt: không nối được`,
+        `deploy ${appEnv}: lùi bản ĐỎ — không đọc được danh sách bản của Vercel; tên miền vẫn ở bản mới`,
+      ]);
+      expect(r.vercel.some((v) => v.startsWith("vercel rollback"))).toBe(false);
+      expectNoMarker(ctx, r);
+    });
+  }
+});
+
 describe("make rollback", () => {
   for (const appEnv of ["staging", "production"] as const) {
     it(`${appEnv}: lùi một lần về bản trước rồi kiểm tên miền`, async () => {
@@ -643,6 +699,59 @@ describe("make rollback", () => {
       const r = await rollback(ctx, appEnv);
       expect(r.code).not.toBe(0);
       expect(r.lines).toEqual([`rollback ${appEnv}: không có bản trước để lùi`]);
+      expect(r.vercel.some((v) => v.startsWith("vercel rollback"))).toBe(false);
+    });
+  }
+
+  for (const appEnv of ["staging", "production"] as const) {
+    for (const [how, answer, reason] of [
+      ["máy chủ không trả lời", "drop", "sức khoẻ không trả lời"],
+      ["không phải JSON", "text", "sức khoẻ trả 502, không phải JSON"],
+    ] as const) {
+      it(`${appEnv}: không đọc được tên miền (${how}) thì dừng, không đoán, không gọi rollback`, async () => {
+        const ctx = await fresh(appEnv);
+        writeFileSync(join(ctx.fake, "ten-mien"), `${ctx.base}/ban-moi`);
+        ctx.domainSeq = [answer];
+        const r = await run(ctx, "make", ["-s", "-f", DEPLOY_MK, "rollback", `ENV=${appEnv}`]);
+        expect(r.code).not.toBe(0);
+        expect(r.lines).toEqual([
+          `rollback ${appEnv}: DỪNG — không đọc được bản tên miền đang chạy (${reason}), không đoán — nêu đích danh bản cần lùi về: make rollback ENV=${appEnv} BAN=<url hoặc id>`,
+        ]);
+        expect(r.vercel.some((v) => v.startsWith("vercel rollback"))).toBe(false);
+        expectNoMarker(ctx, r);
+      });
+    }
+
+    it(`${appEnv}: BAN nêu đích danh thì lùi đúng một lần về bản ấy dù tên miền không đọc được`, async () => {
+      const ctx = await fresh(appEnv);
+      // The domain serves ban-moi, which does not answer; with BAN the domain is read once, after the rollback.
+      writeFileSync(join(ctx.fake, "ten-mien"), `${ctx.base}/ban-moi`);
+      ctx.health["/ban-moi"] = "drop";
+      const ban = `${ctx.base}/ban-cu`;
+      const r = await run(ctx, "make", [
+        "-s",
+        "-f",
+        DEPLOY_MK,
+        "rollback",
+        `ENV=${appEnv}`,
+        `BAN=${ban}`,
+      ]);
+      expect(r.code, r.stdout + r.stderr).toBe(0);
+      expect(r.vercel.filter((v) => v.startsWith("vercel rollback"))).toEqual([
+        `vercel rollback ${ban} --yes`,
+      ]);
+      expect(ctx.requests.filter((q) => q.path === "/ten-mien/api/v1/health").length).toBe(1);
+      expect(r.lines).toEqual([`rollback ${appEnv}: tên miền chạy ${OLD.slice(0, 7)}`]);
+      expectNoMarker(ctx, r);
+    });
+
+    it(`${appEnv}: không đọc được danh sách bản thì báo dòng riêng`, async () => {
+      const ctx = await fresh(appEnv);
+      writeFileSync(join(ctx.fake, "ten-mien"), `${ctx.base}/ban-moi`);
+      writeFileSync(join(ctx.fake, "fail-list"), "");
+      const r = await rollback(ctx, appEnv);
+      expect(r.code).not.toBe(0);
+      expect(r.lines).toEqual([`rollback ${appEnv}: ĐỎ — không đọc được danh sách bản của Vercel`]);
       expect(r.vercel.some((v) => v.startsWith("vercel rollback"))).toBe(false);
     });
   }

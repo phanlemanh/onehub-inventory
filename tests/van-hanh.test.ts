@@ -2,7 +2,9 @@
 // step, the outside-repo list numbered 1..n with the variable names each item hands back, every `make <target>` it
 // mentions defined in Makefile or mk/*.mk, and every variable of its variable table declared in .env.example.
 // E10: the runbook stands on its own — no step sends the operator to `_acceptance/`, every outside-repo item says what
-// passes and what to do on red, and the two procedures that install tools pin the vercel version and the Node version.
+// passes and what to do on red, and the two procedures that install tools pin the vercel version and the Node version —
+// the same vercel version the deploy.yml block in README.md installs (and the proposed workflow in _acceptance/, while it
+// exists), and the Node major of package.json engines.node.
 import { cpSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -137,13 +139,58 @@ export function outsideItemsMissingParts(root: string): string[] {
   return missing;
 }
 
-/** Every tool-installing procedure missing a pinned version: "<file>: <label>". */
+/** The proposed workflows the README's deploy.yml block was copied from; checked only while the file exists. */
+const PROPOSED_WORKFLOWS = join(
+  "_acceptance",
+  "moi-truong-thu-va-ban-that",
+  "workflows-de-xuat.md",
+);
+
+/** Distinct `vercel@x.y.z` versions in a text, in order of first appearance. */
+function vercelVersions(text: string): string[] {
+  return [...new Set([...text.matchAll(/\bvercel@(\d+\.\d+\.\d+)\b/g)].map((m) => m[1]!))];
+}
+
+/** The fenced yaml block of the README that starts with `name: Deploy` (the deploy.yml the owner pastes). */
+function readmeDeployBlock(root: string): string {
+  const readme = read(root, RUNBOOK, "README.md");
+  for (const m of readme.matchAll(/```yaml\n([\s\S]*?)```/g))
+    if (/^\s*name: Deploy\s*$/m.test(m[1]!)) return m[1]!;
+  return "";
+}
+
+/**
+ * Every tool-installing procedure missing a pinned version ("<file>: <label>"), and every version that disagrees with
+ * its source: vercel against the deploy.yml block of README.md, Node against package.json engines.node.
+ */
 export function missingToolVersions(root: string): string[] {
   const missing: string[] = [];
+  const block = vercelVersions(readmeDeployBlock(root));
+  const ref = block.length === 1 ? block[0]! : undefined;
+  const source = "README.md (deploy.yml)";
+  if (!ref)
+    missing.push(
+      `${source}: ${block.length ? `several vercel versions ${block.join(", ")}` : "no vercel@<x.y.z>"}`,
+    );
+  const engines = (JSON.parse(read(root, "package.json")) as { engines?: { node?: string } })
+    .engines?.node;
+  const major = /^(\d+)/.exec(engines ?? "")?.[1];
+  if (!major) missing.push(`package.json: engines.node has no major version`);
   for (const file of TOOL_PROCEDURES) {
     const text = read(root, RUNBOOK, file);
     for (const v of TOOL_VERSIONS) if (!v.pattern.test(text)) missing.push(`${file}: ${v.label}`);
+    if (ref)
+      for (const v of vercelVersions(text))
+        if (v !== ref) missing.push(`${file}: vercel@${v}, ${source} installs vercel@${ref}`);
+    if (major)
+      for (const m of new Set([...text.matchAll(/\bNode (\d+)\b/g)].map((x) => x[1]!)))
+        if (m !== major)
+          missing.push(`${file}: Node ${m}, package.json engines.node is ${engines}`);
   }
+  if (ref && existsSync(join(root, PROPOSED_WORKFLOWS)))
+    for (const v of vercelVersions(read(root, PROPOSED_WORKFLOWS)))
+      if (v !== ref)
+        missing.push(`${PROPOSED_WORKFLOWS}: vercel@${v}, ${source} installs vercel@${ref}`);
   return missing;
 }
 
@@ -151,6 +198,9 @@ export function missingToolVersions(root: string): string[] {
 function runbookCopy(): string {
   const root = tempDir("van-hanh-");
   cpSync(join(ROOT, RUNBOOK), join(root, RUNBOOK), { recursive: true });
+  cpSync(join(ROOT, "package.json"), join(root, "package.json"));
+  if (existsSync(join(ROOT, PROPOSED_WORKFLOWS)))
+    cpSync(join(ROOT, PROPOSED_WORKFLOWS), join(root, PROPOSED_WORKFLOWS));
   return root;
 }
 
@@ -221,7 +271,7 @@ describe("runbook docs/van-hanh (AC-9)", () => {
     expect(outsideItemsMissingParts(ROOT)).toEqual([]);
   });
 
-  it("the procedures that install tools pin the vercel version and Node 24 (E10)", () => {
+  it("the procedures that install tools pin the vercel version of deploy.yml and the Node of package.json (E10)", () => {
     expect(missingToolVersions(ROOT)).toEqual([]);
   });
 
@@ -259,6 +309,32 @@ describe("runbook docs/van-hanh (AC-9)", () => {
     expect(missingToolVersions(root)).toEqual([
       "lui-ban.md: vercel@<x.y.z>",
       "lui-ban.md: Node 24",
+    ]);
+  });
+
+  it("break: a README whose deploy.yml installs another vercel names each file and both versions", () => {
+    const root = runbookCopy();
+    const file = join(root, RUNBOOK, "README.md");
+    const text = readFileSync(file, "utf8");
+    const [ref] = vercelVersions(readmeDeployBlock(root));
+    expect(ref).toMatch(/^\d+\.\d+\.\d+$/);
+    writeFileSync(file, text.replaceAll(`vercel@${ref}`, "vercel@99.0.0"));
+    const red = missingToolVersions(root);
+    for (const f of TOOL_PROCEDURES)
+      expect(red).toContain(`${f}: vercel@${ref}, README.md (deploy.yml) installs vercel@99.0.0`);
+    if (existsSync(join(ROOT, PROPOSED_WORKFLOWS)))
+      expect(red).toContain(
+        `${PROPOSED_WORKFLOWS}: vercel@${ref}, README.md (deploy.yml) installs vercel@99.0.0`,
+      );
+  });
+
+  it("break: a procedure naming another Node than package.json names the file and both versions", () => {
+    const root = runbookCopy();
+    const file = join(root, RUNBOOK, "dua-ban-len.md");
+    writeFileSync(file, readFileSync(file, "utf8").replace(/Node 24/g, "Node 22"));
+    expect(missingToolVersions(root)).toEqual([
+      "dua-ban-len.md: Node 24",
+      "dua-ban-len.md: Node 22, package.json engines.node is 24.x",
     ]);
   });
 });

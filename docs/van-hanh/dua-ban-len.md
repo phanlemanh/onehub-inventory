@@ -43,7 +43,8 @@ gắn tên miền, một bước đỏ không đổi gì ở bản đang phục 
 ### 3. Nhìn bản thử bằng mắt
 
 - **Ở đâu:** trình duyệt, địa chỉ bản thử (`STAGING_APP_URL`).
-- **Gõ hay bấm:** mở `<địa chỉ bản thử>/api/v1/health`; rồi mở trang chủ bản thử và đăng nhập bằng thư mời của mình.
+- **Gõ hay bấm:** mở `<địa chỉ bản thử>/api/v1/health`; rồi mở trang chủ bản thử và đăng nhập bằng thư mời của mình
+  (lần đầu ở môi trường: tài khoản tạo ở việc 13 của [README.md](README.md)).
 - **Đạt khi:** sức khoẻ trả `"ok":true`, `"env":"staging"`, `"vai":"dat"` và `commit` trùng commit của lượt Deploy; thư mã
   đăng nhập tới, đăng nhập vào được.
 - **Đỏ thì:** không duyệt bản thật. Sức khoẻ sai — xem dòng `kiem-nhanh` ở mục «Đỏ thì làm gì»; không có thư — kiểm
@@ -105,15 +106,21 @@ lùi. Sửa nguyên nhân rồi chạy lại từ bước 1 (Run workflow); migr
 ## Lần đầu ở một môi trường
 
 Vai `quy_hang_login` do migration tạo ở lần đưa bản đầu và chưa có mật khẩu, nên lần chạy đầu dừng ở bước đầu tiên cần vai
-ấy: bản thử ở `cach-ly`, bản thật ở `kiem-nhanh`. Tên miền chưa đổi.
+ấy: bản thử ở `cach-ly`, bản thật ở `kiem-nhanh`. Tên miền chưa đổi. Lần chạy đầu bắt đầu như bước 2 dưới: lần đầu chưa
+có thẻ phát hành nào, nên chọn nhánh `main`.
 
 1. **Ở đâu:** Supabase › dự án của môi trường ấy › SQL Editor. **Gõ:** `alter role quy_hang_login password '<mật khẩu
 của việc 4 trong README>';` rồi Run. **Đạt khi:** Supabase báo «Success. No rows returned». **Đỏ thì:**
    `role "quy_hang_login" does not exist` — bước `migration` chưa đạt; đọc lại nhật ký lượt Deploy.
-2. **Ở đâu:** GitHub › Actions › Deploy › Run workflow. **Gõ:** không gì; chạy lại. **Đạt khi:** đủ các dòng đạt như bước
+2. **Ở đâu:** trang kho trên GitHub › Actions › Deploy › Run workflow. **Gõ:** ô «Use workflow from» để tab Branches,
+   chọn nhánh `main` (chưa có thẻ phát hành để chọn); bấm Run workflow. **Đạt khi:** đủ các dòng đạt như bước
    2 hay 5 ở trên. **Đỏ thì:** vẫn `vai nối chưa đạt` — mật khẩu trong `DATABASE_URL` (Vercel) hay `LOGIN_DATABASE_URL`
    (GitHub) khác mật khẩu vừa đặt; sửa cho trùng rồi chạy lại. Lỗi khởi động gọi tên `DATABASE_URL phải nối bằng vai
 quy_hang_login` mà tên người dùng trong chuỗi đã đúng: dừng, báo người giữ kho mã.
+3. **Tài khoản đăng nhập đầu.** Cơ sở dữ liệu mới chưa có sàn hay người nào, nên chưa ai đăng nhập được và chưa ai gửi
+   được thư mời. Khi bản thử đã xong (lượt chờ duyệt `production`), làm việc 13 của [README.md](README.md) cho bản thử,
+   rồi mới làm bước 3 «Nhìn bản thử» ở trên, đăng nhập bằng địa chỉ thư vừa tạo. Bản thật: làm việc 13 cho bản thật sau
+   khi bước 5 xong, rồi bước 6. **Đạt khi** và **Đỏ thì:** như ghi ở việc 13.
 
 ## Đưa bản lên từ máy chủ kho
 

@@ -72,6 +72,9 @@ function logLineFormat(): RegExp {
   return new RegExp(`^${parts.join("")}$`);
 }
 
+/** The name khoi-phuc-thu.sh gives its scratch database. */
+const DRILL_NAME = /^khoi_phuc_thu_\d{8}_\d{6}_\d+$/;
+
 /** Restore drill databases left on the cluster. */
 async function drillDatabases(owner: pg.Client): Promise<string[]> {
   const r = await owner.query<{ datname: string }>(
@@ -115,13 +118,21 @@ async function totals(owner: pg.Client): Promise<{ tables: number; rows: number 
 describe("sao-luu và khoi-phuc-thu", () => {
   let db: ScratchDb;
   let outside: string;
+  let already = new Set<string>();
   beforeAll(async () => {
     db = await scratchDb("nguon", undefined, { prefix: "sao_luu" });
     await seed(db.owner);
     await db.owner.query(SEED);
     outside = tempDir("sao-luu-");
+    already = new Set(await drillDatabases(db.owner));
   });
   afterAll(async () => {
+    // Guard: a drill database this file's run created and a red test left behind. Ones that existed before the run
+    // belong to another suite or lane and are left alone.
+    if (db)
+      for (const name of await drillDatabases(db.owner))
+        if (!already.has(name) && DRILL_NAME.test(name))
+          await db.owner.query(`drop database if exists ${name} with (force)`);
     await db?.drop();
   });
 
@@ -161,7 +172,7 @@ describe("sao-luu và khoi-phuc-thu", () => {
     expect(Number(m![3])).toBe(source.rows);
 
     const scratch = lines.find((l) => l.startsWith("co-so-nhap: "))?.slice("co-so-nhap: ".length);
-    expect(scratch).toMatch(/^khoi_phuc_thu_\d{8}_\d{6}_\d+$/);
+    expect(scratch).toMatch(DRILL_NAME);
     expect(await drillDatabases(db.owner)).toEqual(before);
   });
 
@@ -183,23 +194,30 @@ describe("sao-luu và khoi-phuc-thu", () => {
     const file = join(outside, "giu.dump");
     expect(backup(db.name, file).code).toBe(0);
     const r = restore(file, { KHOI_PHUC_GIU: "1" });
-    expect(r.code).toBe(0);
+    // Read the kept database's name first, so it is dropped even when the restore went red.
     const scratch = r.out
       .split("\n")
-      .find((l) => l.startsWith("co-so-nhap: "))!
-      .slice("co-so-nhap: ".length);
-    const url = new URL(db.url);
-    url.pathname = `/${scratch}`;
-    const copy = new pg.Client({ connectionString: url.toString() });
-    await copy.connect();
+      .find((l) => l.startsWith("co-so-nhap: "))
+      ?.slice("co-so-nhap: ".length);
     try {
-      const restored = await perTable(copy);
-      const source = await perTable(db.owner);
-      expect(Object.keys(restored).length).toBeGreaterThan(0);
-      expect(restored).toEqual(source);
+      expect(r.err).toBe("");
+      expect(r.code).toBe(0);
+      expect(scratch).toMatch(DRILL_NAME);
+      const url = new URL(db.url);
+      url.pathname = `/${scratch}`;
+      const copy = new pg.Client({ connectionString: url.toString() });
+      await copy.connect();
+      try {
+        const restored = await perTable(copy);
+        const source = await perTable(db.owner);
+        expect(Object.keys(restored).length).toBeGreaterThan(0);
+        expect(restored).toEqual(source);
+      } finally {
+        await copy.end();
+      }
     } finally {
-      await copy.end();
-      await db.owner.query(`drop database if exists ${scratch} with (force)`);
+      if (scratch !== undefined && DRILL_NAME.test(scratch))
+        await db.owner.query(`drop database if exists ${scratch} with (force)`);
     }
   });
 

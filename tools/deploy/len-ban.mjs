@@ -22,6 +22,7 @@ import {
   ENVS,
   git,
   kiemNhanh,
+  nameTheTarget,
   productionDeployments,
   readHealth,
   redact,
@@ -288,10 +289,19 @@ export async function lenBan(
         return 1;
       }
       // Back to what the domain served before the promote: the newest other deployment with that commit, else the
-      // newest other one.
-      const others = (productionDeployments({ cwd: root, env }) ?? []).filter(
-        (d) => d.url !== newUrl,
-      );
+      // newest other one. Not read before the promote → no guess (the newest one may never have been promoted).
+      if (!domainCommitBefore) {
+        say(
+          `lùi bản DỪNG — không đọc được bản tên miền chạy trước khi gắn, không đoán; tên miền vẫn ở bản mới — ${nameTheTarget(appEnv)}`,
+        );
+        return 1;
+      }
+      const list = productionDeployments({ cwd: root, env });
+      if (!list) {
+        say("lùi bản ĐỎ — không đọc được danh sách bản của Vercel; tên miền vẫn ở bản mới");
+        return 1;
+      }
+      const others = list.filter((d) => d.url !== newUrl);
       const back =
         others.find((d) => d.commit && d.commit === domainCommitBefore) ?? others[0] ?? null;
       if (!back) {

@@ -3,15 +3,20 @@
 //
 // The current deployment is the newest READY production deployment whose commit (deploy metadata onehub_commit, set by
 // len-ban.mjs) is the commit the domain's health reports; the previous one is the next older with another commit.
-// Without metadata the newest READY production deployment counts as current.
+// Without metadata the newest READY production deployment counts as current. When the domain's health cannot be read
+// there is no guess: every deploy is a READY production deployment (--prod --skip-domain), promoted or not, so the
+// newest one may be the very build the domain serves. The run stops and asks for the target by name.
 //
 //   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, APP_URL — checked for presence only, never printed.
+//   BAN — optional: the deployment (url or id) to go back to, named by the operator (make rollback ENV=… BAN=…).
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
   ENVS,
   kiemNhanh,
+  namedIn,
+  nameTheTarget,
   previousOf,
   productionDeployments,
   readHealth,
@@ -31,16 +36,30 @@ export async function luiBan(
     say(`ĐỎ — thiếu biến ${missing.join(", ")}`);
     return 1;
   }
-  const now = await readHealth(env["APP_URL"], env);
-  const list = productionDeployments({ cwd, env });
-  if (!list) {
-    say("ĐỎ — không đọc được danh sách bản của Vercel");
-    return 1;
-  }
-  const target = previousOf(list, { current: now.body?.commit });
-  if (!target) {
-    say("không có bản trước để lùi");
-    return 1;
+  const ban = env["BAN"]?.trim();
+  let target;
+  if (ban) {
+    // Named by the operator: no guess. The list only lends the commit to check the domain against, when it has one.
+    target = { url: ban, commit: namedIn(productionDeployments({ cwd, env }), ban)?.commit };
+  } else {
+    const now = await readHealth(env["APP_URL"], env);
+    const current = now.body?.commit;
+    if (!current) {
+      say(
+        `DỪNG — không đọc được bản tên miền đang chạy (${now.error ?? "sức khoẻ không có commit"}), không đoán — ${nameTheTarget(appEnv)}`,
+      );
+      return 1;
+    }
+    const list = productionDeployments({ cwd, env });
+    if (!list) {
+      say("ĐỎ — không đọc được danh sách bản của Vercel");
+      return 1;
+    }
+    target = previousOf(list, { current });
+    if (!target) {
+      say("không có bản trước để lùi");
+      return 1;
+    }
   }
   const rb = vercel(["rollback", target.url, "--yes"], { cwd, env });
   if (rb.status !== 0) {

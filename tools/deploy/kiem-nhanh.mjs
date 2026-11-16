@@ -141,7 +141,24 @@ export function productionDeployments({ cwd, env = process.env } = {}) {
   return list
     .filter((d) => d && d.url && (d.state ?? d.readyState ?? "READY") === "READY")
     .sort((a, b) => (b.createdAt ?? b.created ?? 0) - (a.createdAt ?? a.created ?? 0))
-    .map((d) => ({ url: d.url, commit: commitOf(d) }));
+    .map((d) => ({ url: d.url, id: d.uid ?? d.id, commit: commitOf(d) }));
+}
+
+function bare(url) {
+  return String(url ?? "")
+    .replace(/^https?:\/\//, "")
+    .replace(/\/+$/, "");
+}
+
+/** The deployment of `list` named by `ban` (its url, with or without https://, or its id), or undefined. */
+export function namedIn(list, ban) {
+  const want = bare(ban);
+  return (list ?? []).find((d) => bare(d.url) === want || (d.id && d.id === ban));
+}
+
+/** The line that stops a rollback that would have to guess which deployment the domain serves. */
+export function nameTheTarget(appEnv) {
+  return `nêu đích danh bản cần lùi về: make rollback ENV=${appEnv} BAN=<url hoặc id>`;
 }
 
 /**
