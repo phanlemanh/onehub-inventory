@@ -32,6 +32,19 @@ const saves = (page: Page) =>
     () => ((window as unknown as { __sampleSaves?: Save[] }).__sampleSaves ?? []) as Save[],
   );
 
+/**
+ * Row 19 draws «Về tay» right after the price. It is worked out by the machine, so a paste never writes it, and a
+ * block meant for the columns after the price must not land on it. The short-row cases hide it first.
+ */
+async function hideNetToSeller(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "Cột", exact: true }).click();
+  await page.getByRole("menuitemcheckbox", { name: "Về tay" }).click();
+  await page.keyboard.press("Escape");
+  await expect(
+    page.locator('[data-slot="data-region-body"] th[data-col-id="custom.netToSeller"]'),
+  ).toHaveCount(0);
+}
+
 async function openInventory(page: Page, role = "ListAgent"): Promise<void> {
   await page.goto(`/inventory?vai=${role}`);
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
@@ -421,6 +434,7 @@ test.describe("dan-tu-excel", () => {
     at1440();
     await openInventory(page);
     const rows = await rowsWhere(page, 2, priced, "dong-ngan-khong-chu-la");
+    await hideNetToSeller(page);
     await select(page, rows[0]!.id, STATUS);
     // Excel puts a short row when its last cells are empty: the second row has two cells, the first has three.
     await pasteText(
@@ -460,6 +474,7 @@ test.describe("dan-tu-excel", () => {
     at1440();
     await openInventory(page);
     const rows = await rowsWhere(page, 2, priced, "dong-ngan-cot-an");
+    await hideNetToSeller(page);
     // Hiding the price puts Diện tích right after the status: the block's second column lands on it.
     await page.getByRole("button", { name: "Cột", exact: true }).click();
     await page.getByRole("menuitemcheckbox", { name: "Giá chào" }).click();
