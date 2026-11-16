@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: [inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-14
 design_doc: _acceptance/bang-hang-theo-dia-ly/design.md
@@ -113,3 +113,13 @@ chí trên.
   sách, hiện danh sách); `package.json`, `package-lock.json`, `src/components/reui/tree.tsx`, `design/component-registry.json`
   (chỉ khi chủ kho chọn A hay C; chọn D thì gỡ gói Cây khỏi nhánh); `_acceptance/config.yaml` (hai dòng lệnh chấm, chỉ thêm).
 - Bản bấm được có tham số chỉ để so (`?loi=`, `?nhieu=`); gỡ khi dựng.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-16:
+  - Ngoài-1: Một chỉnh nhỏ ở bộ công cụ kiểm thử thuộc mức cần chủ mã duyệt; chữ ký ở cổng này là bản duyệt, người dùng không thấy gì khác.
+  - Ngoài-2: Mọi sàn đều thấy cây dự án và toà của sàn mẫu ở cột thứ hai; mới là dữ liệu mẫu, hàng 10 cho cây đọc theo sàn khi có dữ liệu thật.
+  - Ngoài-5: Ở chế độ thử nghiệm dành cho nhà phát triển, cột thứ hai và bảng có thể khác nhau về danh sách nơi; người dùng thật không gặp.
+  - Ngoài-6: Cây địa lý được dựng hai lần từ hai nguồn dòng; với dữ liệu mẫu hai bên khớp, khi nối dữ liệu thật (hàng 10) phải về một chỗ.
+  - Ngoài-8: Một bài kiểm của danh sách nơi đọc mã ở lớp màn hình, trái luật chia lớp; người dùng không thấy gì khác.
+  - Ngoài-9: Bài kiểm «giữ lọc tình trạng sau khi chọn toà» ở mức thành phần không đọc màn hình; bài kiểm trên trình duyệt vẫn phủ việc ấy.
+  - Ngoài-10: Bài kiểm «toà trống không hiện ở cột thứ hai» dựng ca phá bằng tay; một bài khác vẫn xác nhận hành vi thật.
+  - Ngoài-11: Bài kiểm «cột thứ hai không thêm đường đọc dữ liệu sàn» soi ít tệp hơn đã hứa; hôm nay không có đường đọc thêm nào.
+  - Ngoài-12: Bài kiểm trên trình duyệt so số dòng sau khi chọn nơi, chưa so đúng từng căn; một lẫn lộn cùng số dòng sẽ lọt.
