@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 6ef972aabf4b2a8c8e51c983f836252b2efd549a
+verified_commit: 038f0756f995c1fef3b8028b48d689a3280ddade
 human_signoff:
 ---
 
@@ -163,3 +163,7 @@ none — every multi-run eval is uniform
 
 Round 1-6: lich su nam trong run-log (E1, E2 o round 1; E7 o round 4; E9 o round 5; E5, E8b o round 6).
 Round 7: E3, E4, E6, E10 chay lai va dat; E1, E2, E5, E7, E8, E8b, E9 carry-forward; lenh suite npm run build dat.
+
+### Re-pin lần 1 — 2026-11-16, do lượt ghim lại cuối của hàng 1u sau khi gộp nhánh chính 7ea2f53 (G-1611-41)
+run_id: repin-20261116T070937Z-41988
+sha: 038f0756f995c1fef3b8028b48d689a3280ddade · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)

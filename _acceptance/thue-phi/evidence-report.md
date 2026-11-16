@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 19b5266d5821f3a68b13b0e6328b3a3701254f0d
+verified_commit: 038f0756f995c1fef3b8028b48d689a3280ddade
 human_signoff: Manh Phan 2026-11-16
 ---
 
@@ -350,3 +350,7 @@ Round 9: delta grading tren f70147d; chi E8 chay lai, ba lenh suite xanh; cac ev
 ### Re-pin lần 1 — 2026-11-16, do gộp main ebbbe77 sau chữ ký; nối cột tính vào luật dán
 run_id: repin-20261116T033759Z-18765
 sha: 19b5266d5821f3a68b13b0e6328b3a3701254f0d · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E2-ui, E3-ui, E4-ui, E6-ui, E8-wiki (E8-wiki không khai paths), E9-ui, E10-ui · diff chạm vật đo ngoài làn máy: E6-ui — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 2 — 2026-11-16, do lượt ghim lại cuối của hàng 1u sau khi gộp nhánh chính 7ea2f53 (G-1611-41)
+run_id: repin-20261116T070937Z-41988
+sha: 038f0756f995c1fef3b8028b48d689a3280ddade · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E2-ui, E3-ui, E4-ui, E6-ui, E8-wiki (E8-wiki không khai paths), E9-ui, E10-ui
