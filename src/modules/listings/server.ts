@@ -2,7 +2,13 @@ import "server-only";
 
 // Server API of the listings module. Saved views (row 2c) go through the identity module's shared action door and its
 // query door, withCompany; nothing here reads a session or a table by itself.
-import { actionDoor, sessionDoor, withCompany } from "@/modules/identity/server";
+import {
+  actionDoor,
+  sessionDoor,
+  withCompany,
+  type DoorError,
+  type OpenedDoor,
+} from "@/modules/identity/server";
 
 import type { InventoryData } from "./inventory-data";
 import { readInventory } from "./inventory-read";
@@ -42,11 +48,23 @@ export type MyInventory =
  */
 export async function myInventory(): Promise<MyInventory> {
   try {
-    const door = await sessionDoor("viewListings");
+    return await inventoryThrough(await sessionDoor("viewListings"), withCompany);
+  } catch (err) {
+    console.error("[bang-hang] không đọc được:", err instanceof Error ? err.message : "không rõ");
+    return { kind: "unreadable" };
+  }
+}
+
+/** The inventory read through a door already opened with viewListings; the database tests call it directly. */
+export async function inventoryThrough(
+  door: OpenedDoor | DoorError,
+  run: typeof withCompany,
+): Promise<MyInventory> {
+  try {
     if (door === "server-error") return { kind: "unreadable" };
     if (door === "unauthenticated") return { kind: "signed-out" };
     if (door === "forbidden") return { kind: "forbidden" };
-    const data = await withCompany(door.pool, door.ctx, (c) => readInventory(c, door.ctx.userId));
+    const data = await run(door.pool, door.ctx, (c) => readInventory(c, door.ctx.userId));
     return { kind: "ready", data };
   } catch (err) {
     console.error("[bang-hang] không đọc được:", err instanceof Error ? err.message : "không rõ");

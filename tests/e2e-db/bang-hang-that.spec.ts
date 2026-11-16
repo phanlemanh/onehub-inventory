@@ -429,6 +429,28 @@ test("hoan-tac-chi-gia: undoing the price after a status change keeps the new st
   await expect(cellOf(page, row.unit, STATUS)).toContainText(statusLabel("Hold"));
 });
 
+test("hoan-tac-chi-gia: đối chứng — undoing the status change brings the status back", async ({
+  page,
+}, info) => {
+  test.skip(!wide(info), "ô sửa từ 768 px");
+  const w = await world(info, "hoan-dc");
+  const row = sampleRow("viewer", ["Active"]);
+  const id = companyListingId(w.mau.id, row.id);
+  await signIn(page, w.email, w.mau);
+  await openOn(page, row.unit);
+  await select(page, row.unit, STATUS);
+  await page.keyboard.press("F2");
+  await editor(page).locator('[data-status-option="Hold"]').click();
+  const statusToast = page
+    .locator("[data-sonner-toast]")
+    .filter({ hasText: statusLabel("Hold") })
+    .first();
+  await expect(statusToast).toBeVisible();
+  await expect.poll(async () => (await rowOf(id)).standard_status).toBe("Hold");
+  await statusToast.getByRole("button", { name: "Hoàn tác" }).click();
+  await expect.poll(async () => (await rowOf(id)).standard_status).toBe("Active");
+});
+
 // ---- E7 · fee inclusion on its cell ----------------------------------------------------------------------------------
 
 test("dieu-kien-phi-tren-o: Bao phí → Không bao phí is saved, the net to seller changes, a reload keeps it", async ({
@@ -486,7 +508,7 @@ async function seriousAxe(page: Page): Promise<string[]> {
     .map((v) => v.id);
 }
 
-test("nam-trang-thai: loading, empty, a real read error with Tải lại, no match with Xoá lọc — light and dark", async ({
+test("nam-trang-thai + axe-sang-toi: loading, empty, a real read error with Tải lại, no match with Xoá lọc — light and dark", async ({
   page,
 }, info) => {
   const w = await world(info, "trang-thai");

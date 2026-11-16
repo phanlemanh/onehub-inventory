@@ -13,6 +13,7 @@ import { captureSender } from "@/modules/identity/sender";
 import { withCompany } from "@/modules/identity/with-company";
 import { readInventory } from "@/modules/listings/inventory-read";
 import { createListingsHandlers } from "@/modules/listings/listings-http";
+import { inventoryThrough } from "@/modules/listings/server";
 
 import { asPerson, dropWorld, world, type Person, type World } from "./bang-quyen-world";
 import { seedSampleInventory } from "./can-mau";
@@ -142,7 +143,7 @@ const rowOf = async (w: World, id: string) =>
   ).rows[0]!;
 
 describe("doc-dung-san (E2)", () => {
-  it("each company reads its own sample listings, through the door, and nothing of the other", async () => {
+  it("doc-dung-san: each company reads its own sample listings, through the door, and nothing of the other", async () => {
     const { w } = await apiWorld("doc");
     const a = await seedSampleInventory(w.db.owner, w.A, { id: w.id.LA, name: "[Tên] LA" });
     const b = await seedSampleInventory(w.db.owner, w.B);
@@ -185,6 +186,15 @@ function want(role: (typeof ROLES)[number], kind: Kind, change: Change): 200 | 4
   return kind === "other" ? 403 : 200;
 }
 
+const ROLE = { LA: "ListAgent", BA: "BuyerAgent", TL: "TeamLead", CA: "CompanyAdmin" } as const;
+const KIND: Record<Kind, string> = { mine: "của mình", other: "người khác", none: "chưa ai giữ" };
+const CHANGE: Record<Change, string> = {
+  price: "giá",
+  fee: "điều kiện phí",
+  hold: "Hold",
+  active: "Active",
+};
+
 const BODY: Record<Change, unknown> = {
   price: { field: "listPrice", listPrice: 2_800_000_000 },
   fee: { field: "feeInclusion", feeInclusion: "Excluded" },
@@ -192,34 +202,48 @@ const BODY: Record<Change, unknown> = {
   active: { field: "standardStatus", standardStatus: "Active" },
 };
 
-describe("quyen-48-o (E5)", () => {
-  it("4 roles × 3 listing kinds × 4 changes = 48 cells, each saved or refused as the table says", async () => {
-    const { w, patch } = await apiWorld("quyen");
-    const failures: string[] = [];
-    let cells = 0;
-    for (const role of ROLES)
-      for (const kind of KINDS)
-        for (const change of CHANGES) {
-          const keeper =
-            kind === "mine" ? role : kind === "other" ? (role === "TL" ? "LA" : "TL") : null;
-          const id = await listing(w, { keeper });
-          const before = await rowOf(w, id);
-          const res = await patch(role, id, { version: 1, change: BODY[change] });
-          cells += 1;
-          const expected = want(role, kind, change);
-          const after = await rowOf(w, id);
-          if (res.status !== expected)
-            failures.push(
-              `quyen-48-o: ${role} × ${kind} × ${change}: muốn ${expected}, thấy ${res.status}`,
-            );
-          else if (expected === 403 && after.version !== before.version)
-            failures.push(`quyen-48-o: ${role} × ${kind} × ${change}: bị từ chối mà dòng đã đổi`);
-          else if (expected === 200 && after.version !== before.version + 1)
-            failures.push(`quyen-48-o: ${role} × ${kind} × ${change}: lưu mà phiên bản không tăng`);
-        }
-    console.log(`quyen-48-o: ${cells - failures.length}/${cells} ô khớp`);
+/** Runs the 48 cells against `expect_`; returns how many ran and the cells that did not match, as pinned lines. */
+async function matrix(
+  expect_: typeof want,
+  suffix: string,
+): Promise<{ cells: number; failures: string[] }> {
+  const { w, patch } = await apiWorld(suffix);
+  const failures: string[] = [];
+  let cells = 0;
+  for (const role of ROLES)
+    for (const kind of KINDS)
+      for (const change of CHANGES) {
+        const keeper =
+          kind === "mine" ? role : kind === "other" ? (role === "TL" ? "LA" : "TL") : null;
+        const id = await listing(w, { keeper });
+        const before = await rowOf(w, id);
+        const res = await patch(role, id, { version: 1, change: BODY[change] });
+        cells += 1;
+        const expected = expect_(role, kind, change);
+        const after = await rowOf(w, id);
+        const cell = `bang-quyen-48-o: ${ROLE[role]}·${KIND[kind]}·${CHANGE[change]}`;
+        if (res.status !== expected) failures.push(cell);
+        else if (expected === 403 && after.version !== before.version)
+          failures.push(`${cell} — bị từ chối mà dòng đã đổi`);
+        else if (expected === 200 && after.version !== before.version + 1)
+          failures.push(`${cell} — lưu mà phiên bản không tăng`);
+      }
+  return { cells, failures };
+}
+
+describe("bang-nac-24-o (E5)", () => {
+  it("bang-quyen-48-o: 4 roles × 3 listing kinds × 4 changes = 48 cells, each saved or refused as the table says", async () => {
+    const { cells, failures } = await matrix(want, "quyen");
+    console.log(`bang-quyen-48-o: ${cells - failures.length}/${cells} ô khớp`);
     expect(cells).toBe(48);
     expect(failures).toEqual([]);
+  });
+
+  it("pha-thu-activate-moi-nguoi: an answer letting a listing agent put anyone's unit on sale names that cell", async () => {
+    const loose: typeof want = (role, kind, change) =>
+      role === "LA" && kind === "other" && change === "active" ? 200 : want(role, kind, change);
+    const { failures } = await matrix(loose, "quyen_pha");
+    expect(failures).toEqual(["bang-quyen-48-o: ListAgent·người khác·Active"]);
   });
 
   it("the database refuses Active on someone else's listing even when the server's own check is skipped (E5b)", async () => {
@@ -238,8 +262,8 @@ describe("quyen-48-o (E5)", () => {
   });
 });
 
-describe("luu-gia (E4)", () => {
-  it("one PATCH saves the price with the version moved on and the confirmed time of the change", async () => {
+describe("ghi-gia-tang-phien-ban (E4)", () => {
+  it("ghi-gia-tang-phien-ban: one PATCH saves the price with the version moved on and the confirmed time of the change", async () => {
     const { w, patch } = await apiWorld("gia");
     const id = await listing(w, { keeper: "LA" });
     const res = await patch("LA", id, { version: 1, change: BODY.price });
@@ -271,8 +295,8 @@ describe("luu-gia (E4)", () => {
   });
 });
 
-describe("xung-dot (E6)", () => {
-  it("a change on an old version is a conflict carrying the listing as it is now; nothing is overwritten", async () => {
+describe("xung-dot-phien-ban (E6)", () => {
+  it("xung-dot-phien-ban: a change on an old version is a conflict carrying the listing as it is now; nothing is overwritten", async () => {
     const { w, patch } = await apiWorld("xung");
     const id = await listing(w, { keeper: "LA", status: "Active" });
     expect((await patch("LA", id, { version: 1, change: BODY.price })).status).toBe(200);
@@ -284,10 +308,11 @@ describe("xung-dot (E6)", () => {
     const body = (await second.json()) as { current: { version: number; listPrice: number } };
     expect(body.current.version).toBe(2);
     expect(body.current.listPrice).toBe(2_800_000_000);
-    expect((await rowOf(w, id)).standard_status).toBe("Active");
+    if ((await rowOf(w, id)).standard_status !== "Active")
+      throw new Error("xung-dot-phien-ban: ghi đè");
   });
 
-  it("hoan-tac-chi-gia (E6b): undoing a price after a status change keeps the new status", async () => {
+  it("hoan-tac-giu-trang-thai: undoing a price after a status change keeps the new status", async () => {
     const { w, patch } = await apiWorld("hoan");
     const id = await listing(w, { keeper: "LA", status: "Active", price: 3_000_000_000 });
     expect((await patch("LA", id, { version: 1, change: BODY.price })).status).toBe(200);
@@ -314,8 +339,8 @@ describe("xung-dot (E6)", () => {
   });
 });
 
-describe("dieu-kien-phi (E7)", () => {
-  it("the fee inclusion is saved through the same PATCH and read back", async () => {
+describe("dieu-kien-phi-luu (E7b)", () => {
+  it("dieu-kien-phi-luu: the fee inclusion is saved through the same PATCH and read back", async () => {
     const { w, patch } = await apiWorld("phi");
     const id = await listing(w, { keeper: "BA", fee: "Included" });
     expect((await patch("BA", id, { version: 1, change: BODY.fee })).status).toBe(200);
@@ -333,7 +358,7 @@ describe("dieu-kien-phi (E7)", () => {
 });
 
 describe("nam-nghin-can (E10)", () => {
-  it("5,000 listings of one company are read under 1.5 s, and the other company still sees none of them", async () => {
+  it("nam-nghin-can: 5,000 listings of one company are read under 1.5 s, and the other company still sees none of them", async () => {
     const { w } = await apiWorld("nam_nghin");
     const o = w.db.owner;
     await o.query(
@@ -369,5 +394,109 @@ describe("nam-nghin-can (E10)", () => {
     expect(ms).toBeLessThan(1500);
     const other = await asPerson(w, "Y", w.B, (c) => readInventory(c, w.id.Y));
     expect(other.current).toHaveLength(0);
+  });
+});
+
+describe("cach-ly-hai-bang (E1b)", () => {
+  it("cach-ly-hai-bang: a session of company B reads and changes A's listing by id — 0 rows seen, 0 rows changed", async () => {
+    const { w, patch } = await apiWorld("cach_ly");
+    const id = await listing(w, { keeper: "LA" });
+    const seen = await asPerson(w, "Y", w.B, async (c) => ({
+      listings: (await c.query("select id from listings where id = $1", [id])).rows.length,
+      links: (await c.query("select listing_id from listing_units where listing_id = $1", [id]))
+        .rows.length,
+      changed: (await c.query("update listings set list_price = 1 where id = $1", [id])).rowCount,
+    }));
+    expect(seen).toEqual({ listings: 0, links: 0, changed: 0 });
+    expect((await patch("Y", id, { version: 1, change: BODY.price }, w.B)).status).toBe(403);
+    expect((await rowOf(w, id)).version).toBe(1);
+  });
+});
+
+/** Three writes that break a rule of the data, written as the table owner: each refused by the table itself. */
+async function dataRules(w: World, upi: string): Promise<string[]> {
+  const out: string[] = [];
+  const refused = async (label: string, sql: string, values: unknown[]) => {
+    await w.db.owner.query("begin");
+    try {
+      await w.db.owner.query(sql, values);
+      out.push(`luat-du-lieu-ba-ca: ${label}`);
+    } catch {
+      // refused, as it should be
+    } finally {
+      await w.db.owner.query("rollback");
+    }
+  };
+  await refused(
+    "Closed thiếu giá chốt",
+    "insert into listings (id, company_id, standard_status, close_date) values ($1, $2, 'Closed', '2026-11-01')",
+    [crypto.randomUUID(), w.A],
+  );
+  await refused(
+    "Withdrawn thiếu lý do",
+    "insert into listings (id, company_id, standard_status) values ($1, $2, 'Withdrawn')",
+    [crypto.randomUUID(), w.A],
+  );
+  await refused(
+    "căn thứ hai đang mở",
+    "with l as (insert into listings (id, company_id, standard_status) values ($1, $2, 'Incomplete') returning id) " +
+      "insert into listing_units (listing_id, company_id, upi, open) select id, $2, $3, true from l",
+    [crypto.randomUUID(), w.A, upi],
+  );
+  return out;
+}
+
+const upiOf = async (w: World, id: string) =>
+  (
+    await w.db.owner.query<{ upi: string }>("select upi from listing_units where listing_id = $1", [
+      id,
+    ])
+  ).rows[0]!.upi;
+
+describe("luat-du-lieu-ba-ca (E1b)", () => {
+  it("luat-du-lieu-ba-ca: Closed without a close price, Withdrawn without a reason, a second open listing — all refused", async () => {
+    const { w } = await apiWorld("luat");
+    const id = await listing(w, { keeper: "LA" });
+    expect(await dataRules(w, await upiOf(w, id))).toEqual([]);
+  });
+
+  it("pha-thu-bo-check-da-ban: without the Closed rule the case names it", async () => {
+    const { w } = await apiWorld("luat_pha");
+    const id = await listing(w, { keeper: "LA" });
+    await w.db.owner.query(
+      "alter table listings drop constraint listings_closed_needs_price_and_date",
+    );
+    expect(await dataRules(w, await upiOf(w, id))).toEqual([
+      "luat-du-lieu-ba-ca: Closed thiếu giá chốt",
+    ]);
+  });
+});
+
+describe("loi-doc-that (E2)", () => {
+  it("loi-doc-that: when the app role loses select on listings, the read gives «unreadable» and does not throw", async () => {
+    const { w } = await apiWorld("loi_doc");
+    await listing(w, { keeper: "LA" });
+    const door = {
+      pool: w.pool,
+      ctx: { userId: w.id.LA, companyId: w.A },
+      scope: "company" as const,
+    };
+    expect((await inventoryThrough(door, withCompany)).kind).toBe("ready");
+    await w.db.owner.query("revoke select on listings from quy_hang_app");
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(await inventoryThrough(door, withCompany)).toEqual({ kind: "unreadable" });
+    error.mockRestore();
+  });
+});
+
+describe("doi-san-chi-con-san-moi (E2)", () => {
+  it("doi-san-chi-con-san-moi: one person in two companies reads only the company of the session", async () => {
+    const { w } = await apiWorld("doi_san");
+    const ofA = await listing(w, { company: w.A });
+    const ofB = await listing(w, { company: w.B });
+    const inA = await asPerson(w, "X", w.A, (c) => readInventory(c, w.id.X));
+    const inB = await asPerson(w, "X", w.B, (c) => readInventory(c, w.id.X));
+    expect(inA.current.map((l) => l.id)).toEqual([ofA]);
+    expect(inB.current.map((l) => l.id)).toEqual([ofB]);
   });
 });
