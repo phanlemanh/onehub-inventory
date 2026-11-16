@@ -6,6 +6,7 @@
 // decision:no-sideways-scroll
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { suaTrang } from "./sua-trang";
 
 const PROTO = "/proto/hanh-vi-trong-luoi-khung";
 const PHONE = new Set(["360", "414"]);
@@ -265,7 +266,7 @@ test.describe("behavior", () => {
     await openRow(page, 0);
     const title = recordPanel(page).locator("h2");
     await expect(async () => {
-      await title.evaluate((el) => {
+      await suaTrang(title, (el) => {
         el.style.transition = "none";
         el.style.backgroundColor = "rgb(255, 255, 255)";
         el.style.color = "rgb(250, 250, 250)";

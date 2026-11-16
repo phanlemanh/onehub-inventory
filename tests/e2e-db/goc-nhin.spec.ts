@@ -26,6 +26,7 @@ import { SAMPLE_COMPANY, buildSampleListings } from "../../src/modules/listings"
 import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { expect, test } from "../../tools/e2e_templates/fixture";
 import { openSheet } from "../../tools/e2e_templates/settle";
+import { chupAnh, suaTrang } from "../e2e/sua-trang";
 
 const SAVE = label("SaveView");
 const SAVE_CHANGES = label("SaveViewChanges");
@@ -459,7 +460,7 @@ test("remove", async ({ page }, info) => {
   const items = page.getByRole("menuitem");
   await expect(items.last()).toHaveText(REMOVE);
   await expect(page.getByRole("menu").locator('[role="separator"]')).toHaveCount(1);
-  const colors = await items.last().evaluate((el) => {
+  const colors = await suaTrang(items.last(), (el) => {
     const probe = document.createElement("span");
     probe.style.color = "var(--destructive)";
     document.body.append(probe);
@@ -609,10 +610,9 @@ test.describe("axe", () => {
     await signIn(page, me.email);
     await arrange(page);
     await saveAs(page, NAME);
-    await secondColumn(page)
-      .locator('[data-slot="row-actions"]')
-      .first()
-      .evaluate((el) => el.removeAttribute("aria-label"));
+    await suaTrang(secondColumn(page).locator('[data-slot="row-actions"]').first(), (el) =>
+      el.removeAttribute("aria-label"),
+    );
     expect(await seriousViolations(page)).toContain("button-name");
   });
 });
@@ -644,7 +644,7 @@ test("E15 frames", { tag: "@cho" }, async ({ page }, info) => {
     await page.emulateMedia({ colorScheme: scheme });
     const shot = async (state: string) => {
       await page.waitForTimeout(250);
-      await page.screenshot({
+      await chupAnh(page, {
         path: `${dir}/E15-${width}-${scheme === "light" ? "sang" : "toi"}-${state}.png`,
       });
     };

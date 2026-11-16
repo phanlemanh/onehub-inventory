@@ -13,6 +13,7 @@ import { type Page } from "@playwright/test";
 
 import { expect, test } from "../../tools/e2e_templates/fixture";
 import { openSheet, SETTLE_MS, shown } from "../../tools/e2e_templates/settle";
+import { pageReady, suaTrang } from "./sua-trang";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const PROTO = "/proto/khung-va-giao-dien";
@@ -26,10 +27,10 @@ const PHONE = new Set(["360", "414"]);
 
 /**
  * A slow server streams the page: until React swaps it in, a hidden copy (`<div hidden id="S:0">`) sits next to the
- * shown one. Wait for the swap, then for the one page heading.
+ * shown one. Wait for the swap and the page hydrated (the shared wait, row 1u), then for the one page heading.
  */
-async function pageReady(page: Page): Promise<void> {
-  await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+async function pageShown(page: Page): Promise<void> {
+  await pageReady(page);
   await expect(page.locator("h1")).toBeVisible();
 }
 
@@ -148,9 +149,9 @@ test.describe("frame", () => {
     { tag: "@cho" },
     async ({ page }, info) => {
       await page.goto("/inventory");
-      await pageReady(page);
+      await pageShown(page);
       if (PHONE.has(info.project.name)) await openSheet(page);
-      await page.evaluate(() => {
+      await suaTrang(page, () => {
         document.querySelector('[aria-current="page"]')?.removeAttribute("aria-current");
         document.querySelector('a[href="/sent"]')?.setAttribute("aria-current", "page");
       });
@@ -162,7 +163,7 @@ test.describe("frame", () => {
 
   test("first Tab reaches the skip link and it moves focus to main", async ({ page }) => {
     await page.goto("/inventory");
-    await pageReady(page);
+    await pageShown(page);
     await assertSkipLink(page);
     await page.keyboard.press("Tab");
     await expect(page.locator(":focus")).toHaveText("Bỏ qua tới nội dung chính");
@@ -172,8 +173,8 @@ test.describe("frame", () => {
 
   test("skip-link check fails without a target", async ({ page }) => {
     await page.goto("/inventory");
-    await pageReady(page);
-    await page.evaluate(() => document.querySelector("main")?.removeAttribute("id"));
+    await pageShown(page);
+    await suaTrang(page, () => document.querySelector("main")?.removeAttribute("id"));
     await expect(assertSkipLink(page)).rejects.toThrow("skip link target");
   });
 
@@ -183,7 +184,7 @@ test.describe("frame", () => {
     async ({ page }, info) => {
       test.skip(!PHONE.has(info.project.name), "desktop");
       await page.goto("/");
-      await pageReady(page);
+      await pageShown(page);
       await expect(page.getByRole("link", { name: "Bảng hàng" })).toBeHidden();
       await openSheet(page);
       const sheet = page.locator('[data-mobile="true"]');
@@ -196,15 +197,15 @@ test.describe("frame", () => {
   test("does not scroll sideways", async ({ page }) => {
     for (const href of ["/", "/inventory", "/sent", PROTO, `${PROTO}?state=error`]) {
       await page.goto(href);
-      await pageReady(page);
+      await pageShown(page);
       await assertNoSidewaysScroll(page);
     }
   });
 
   test("sideways check fails on a page wider than the screen", async ({ page }) => {
     await page.goto("/inventory");
-    await pageReady(page);
-    await page.evaluate(() => {
+    await pageShown(page);
+    await suaTrang(page, () => {
       const wide = document.createElement("div");
       wide.style.width = "2000px";
       wide.style.height = "1px";
@@ -240,7 +241,7 @@ test.describe("frame", () => {
 
   test("not-found check fails on a screen in the internal frame", async ({ page }) => {
     await page.goto("/inventory");
-    await pageReady(page);
+    await pageShown(page);
     await expect(assertNoInternalFrame(page, dictionaryTerms())).rejects.toThrow(
       "internal frame found",
     );
@@ -248,7 +249,7 @@ test.describe("frame", () => {
 
   test("slow screen shows no indicator before 1s and a skeleton after", async ({ page }) => {
     await page.goto(PROTO);
-    await pageReady(page);
+    await pageShown(page);
     await page.goto(`${PROTO}?state=slow`, { waitUntil: "commit" });
     await page.waitForTimeout(500);
     await expect(page.locator('[data-slot="page-skeleton"]')).toBeHidden();
@@ -292,7 +293,9 @@ test.describe("frame", () => {
   test("contrast check fails on a badge with unreadable text", async ({ page }) => {
     await page.goto(PROTO);
     await expect(page.locator('[data-slot="status-badges"] [data-status]')).toHaveCount(6);
-    await page.evaluate(() => {
+    // Restyle only once React has hydrated the badge, or React reports a mismatch (row 1u).
+    await pageReady(page, { el: page.locator('[data-status="Active"]') });
+    await suaTrang(page, () => {
       const badge = document.querySelector<HTMLElement>('[data-status="Active"]');
       if (!badge) return;
       badge.style.transition = "none";
@@ -311,7 +314,7 @@ test.describe("frame", () => {
     { tag: "@cho" },
     async ({ page, context }) => {
       await page.goto("/inventory");
-      await pageReady(page);
+      await pageShown(page);
       await context.setOffline(true);
       await shown(page.getByRole("alert").filter({ hasText: "Mất kết nối mạng" }), "bang mat mang");
       await assertBanner(page, "chưa lưu được");
@@ -324,7 +327,7 @@ test.describe("frame", () => {
 
   test("banner check fails while the network is up", async ({ page }) => {
     await page.goto("/inventory");
-    await pageReady(page);
+    await pageShown(page);
     await expect(assertBanner(page, "Mất kết nối mạng")).rejects.toThrow("banner missing");
   });
 
@@ -362,7 +365,7 @@ test.describe("frame", () => {
   test("chosen theme survives a reload", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
-    await pageReady(page);
+    await pageShown(page);
     await page.getByRole("button", { name: "Đổi giao diện" }).click();
     await page.getByRole("menuitemradio", { name: "Tối" }).click();
     await expect(page.locator("html")).toHaveClass(/\bdark\b/);
@@ -396,7 +399,7 @@ test.describe("frame", () => {
         await page.emulateMedia({ colorScheme });
         for (const screen of SCAN_LIST) {
           await page.goto(screen.href);
-          await pageReady(page);
+          await pageShown(page);
           if (screen.offline) {
             await context.setOffline(true);
             await shown(page.locator('[data-slot="screen-banner"]'), "bang mat mang");
@@ -419,8 +422,9 @@ test.describe("frame", () => {
     await page.goto(`${PROTO}?state=error`);
     const retry = page.getByRole("button", { name: "Thử lại" });
     await expect(retry).toBeVisible();
+    await pageReady(page, { el: retry });
     // No transition, fixed colours: axe must read the broken pair, not a colour half-way through the button's fade.
-    await retry.evaluate((el) => {
+    await suaTrang(retry, (el) => {
       el.style.transition = "none";
       el.style.backgroundColor = "rgb(255, 255, 255)";
       el.style.color = "rgb(250, 250, 250)";

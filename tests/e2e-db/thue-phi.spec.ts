@@ -25,6 +25,7 @@ import { label } from "../../src/modules/company-config";
 import { FEE_COPY } from "../../src/modules/company-config/ui/fee-copy";
 
 import { regionReady } from "../e2e/phone-list";
+import { chupAnh, suaTrang, themKieu } from "../e2e/sua-trang";
 import { ROLES, signInWithCode } from "./dang-nhap-vai";
 
 const RUN = process.env["E2E_DB_RUN"] ?? `${process.pid}`;
@@ -137,12 +138,12 @@ async function proof(page: Page, info: TestInfo, name: string) {
   if (process.env["THUE_PHI_ANH"] !== "1") return;
   const dir = join(process.cwd(), "_acceptance/thue-phi/evidence");
   mkdirSync(dir, { recursive: true });
-  await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+  await themKieu(page, { content: "nextjs-portal { display: none !important; }" });
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.waitForTimeout(250);
     const suffix = scheme === "light" ? "" : "-toi";
-    await page.screenshot({ path: join(dir, `${name}-${info.project.name}${suffix}.png`) });
+    await chupAnh(page, { path: join(dir, `${name}-${info.project.name}${suffix}.png`) });
   }
   await page.emulateMedia({ colorScheme: "light" });
 }
@@ -425,7 +426,7 @@ test.describe("thue phi", () => {
       .filter({ hasText: "S1.02" })
       .first()
       .locator(slot);
-    await target.evaluate((el) => {
+    await suaTrang(target, (el) => {
       el.textContent = el.textContent!.replace(/[\d,]+ tỷ$/, "2,88 tỷ");
     });
     expect(await netProblems(wrong, phone, formatMoney(2_895_000_000))).toEqual([
@@ -434,19 +435,20 @@ test.describe("thue phi", () => {
     if (phone) return;
     // A fee inclusion column drawn at first is caught.
     const shown = await openB(browser, info, false);
-    await shown
-      .locator('[data-slot="data-region-body"] thead tr')
-      .first()
-      .evaluate((tr, word) => {
+    await suaTrang(
+      shown.locator('[data-slot="data-region-body"] thead tr').first(),
+      (tr, word) => {
         const th = document.createElement("th");
         th.setAttribute("data-col-id", "Listing.feeInclusion");
         th.textContent = word;
         tr.appendChild(th);
-      }, label("FeeInclusion"));
+      },
+      label("FeeInclusion"),
+    );
     expect(await feeColumnProblems(shown)).toEqual(["fee inclusion shown at first"]);
     // A column ticked in the menu that never becomes visible is caught.
     const hidden = await openB(browser, info, false);
-    await hidden.addStyleTag({ content: `${FEE_HEAD} { display: none !important; }` });
+    await themKieu(hidden, { content: `${FEE_HEAD} { display: none !important; }` });
     expect(await feeColumnProblems(hidden)).toEqual(["fee inclusion not visible after ticking it"]);
   });
 
@@ -471,16 +473,13 @@ test.describe("thue phi", () => {
     checkCards(await readCards(agent), width);
     if (size !== "360") return;
     // The longest text the sample can give on that line, beside the largest amount, in the first card with one.
-    await agent
-      .locator('[data-slot="listing-card-net"]')
-      .first()
-      .evaluate((net) => {
-        const facts = net.parentElement!.querySelector<HTMLElement>(
-          '[data-slot="listing-card-facts"]',
-        )!;
-        facts.textContent = "110,4 m² · 3 phòng ngủ · 110,4 m² · 3 phòng ngủ";
-        net.textContent = net.textContent!.replace(/\S+ \S+$/, "999,99 tỷ");
-      });
+    await suaTrang(agent.locator('[data-slot="listing-card-net"]').first(), (net) => {
+      const facts = net.parentElement!.querySelector<HTMLElement>(
+        '[data-slot="listing-card-facts"]',
+      )!;
+      facts.textContent = "110,4 m² · 3 phòng ngủ · 110,4 m² · 3 phòng ngủ";
+      net.textContent = net.textContent!.replace(/\S+ \S+$/, "999,99 tỷ");
+    });
     checkCards(await readCards(agent), 360);
   });
 
@@ -489,26 +488,23 @@ test.describe("thue phi", () => {
     expect(() => checkCards([], 360)).toThrow(/no card shows/);
     // An amount allowed to shrink beside facts that may not: cut, or over the facts.
     const shrink = await openCards(browser, info);
-    await shrink.addStyleTag({
+    await themKieu(shrink, {
       content:
         '[data-slot="listing-card-net"] { flex-shrink: 1 !important; overflow: hidden; min-width: 0; } [data-slot="listing-card-facts"] { flex-shrink: 0 !important; }',
     });
-    await shrink
-      .locator('[data-slot="listing-card-net"]')
-      .first()
-      .evaluate((net) => {
-        const facts = net.parentElement!.querySelector<HTMLElement>(
-          '[data-slot="listing-card-facts"]',
-        )!;
-        facts.textContent = "110,4 m² · 3 phòng ngủ · 110,4 m² · 3 phòng ngủ";
-      });
+    await suaTrang(shrink.locator('[data-slot="listing-card-net"]').first(), (net) => {
+      const facts = net.parentElement!.querySelector<HTMLElement>(
+        '[data-slot="listing-card-facts"]',
+      )!;
+      facts.textContent = "110,4 m² · 3 phòng ngủ · 110,4 m² · 3 phòng ngủ";
+    });
     const shrunk = await readCards(shrink);
     expect(() => checkCards(shrunk, 360)).toThrow(
       /amount cut|amount over the facts|off the right edge/,
     );
     // An amount on a line of its own, as a line under the price would be: the card grows.
     const own = await openCards(browser, info);
-    await own.addStyleTag({
+    await themKieu(own, {
       content:
         ':has(> [data-slot="listing-card-net"]) { flex-wrap: wrap !important; } [data-slot="listing-card-net"] { width: 100%; }',
     });
@@ -523,7 +519,7 @@ test.describe("thue phi", () => {
     test.skip(size !== "360" && size !== "414", "the cards are the inventory at 360 and 414");
     const width = Number(size);
     const agent = await openCards(browser, info);
-    await agent.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+    await themKieu(agent, { content: "nextjs-portal { display: none !important; }" });
     const kinds = await agent.locator('[data-slot="phone-card"]').evaluateAll((els) =>
       els.map((card) => ({
         net: card.querySelector('[data-slot="listing-card-net"]') !== null,
@@ -557,7 +553,7 @@ test.describe("thue phi", () => {
       const top = (await all.nth(best[0]).boundingBox())!;
       const bottom = (await all.nth(best[1]).boundingBox())!;
       const y = Math.max(0, top.y - 12);
-      await agent.screenshot({
+      await chupAnh(agent, {
         path: join(dir, `the-ve-tay-${width}-${scheme === "light" ? "sang" : "toi"}.png`),
         clip: { x: 0, y, width, height: bottom.y + bottom.height + 12 - y },
       });
@@ -575,12 +571,12 @@ test.describe("thue phi", () => {
     mkdirSync(dir, { recursive: true });
     const frame = async (page: Page, name: string, both = false) => {
       // The development build's «N» badge is not part of the product: hidden in every frame the owner reads.
-      await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
+      await themKieu(page, { content: "nextjs-portal { display: none !important; }" });
       for (const scheme of both ? (["light", "dark"] as const) : (["light"] as const)) {
         await page.emulateMedia({ colorScheme: scheme });
         await page.waitForTimeout(250);
         const suffix = both ? (scheme === "light" ? "-sang" : "-toi") : "";
-        await page.screenshot({ path: join(dir, `${name}${suffix}.png`) });
+        await chupAnh(page, { path: join(dir, `${name}${suffix}.png`) });
       }
       await page.emulateMedia({ colorScheme: "light" });
     };

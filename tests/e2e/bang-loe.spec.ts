@@ -11,13 +11,15 @@
 //     the browser's first render matches the server's HTML (no Hydration warning in the console).
 //   tro-nang-ve-doi — in each frame drawn twice, what a screen reader can reach in the region repeats no id, every id an
 //     aria-controls, aria-labelledby, aria-describedby or label points to is there, and the region's name is heard once.
-// The break cases remove one layout's hiding class in every frame and expect the pinned message.
+// The break cases undo one layout's hiding class with a style added to the head (React does not hydrate it, so the
+// break itself raises no Hydration warning) and expect the pinned message.
 //   mot-nhanh-sau-nhan-trang — once the region is marked hydrated the page holds one layout only (tables, cards counted
 //     in the page, hidden or not), and the wait for that mark fails with a pinned message when it is missing.
 // Each test sets its own viewport and runs once, in the 360 project.
 import { expect, test, type Page } from "@playwright/test";
 
 import { regionReady } from "./phone-list";
+import { suaTrang } from "./sua-trang";
 
 test.beforeEach(() => {
   test.skip(test.info().project.name !== "360", "sets its own viewport; runs once");
@@ -37,12 +39,12 @@ interface Frame {
   tree: string[];
 }
 
-/** One frame per animation frame, from the first one; `brk` removes a hiding class in each frame (a break case). */
+/** One frame per animation frame, from the first one; `brk` shows a hidden layout from the head (a break case). */
 async function record(
   page: Page,
   width: number,
   height: number,
-  brk: { selector: string; cls: string } | null = null,
+  brk: { selector: string } | null = null,
 ): Promise<Frame[]> {
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 6 });
@@ -75,7 +77,12 @@ async function record(
       return out;
     };
     const tick = () => {
-      if (brk) document.querySelector(brk.selector)?.classList.remove(brk.cls);
+      if (brk && document.head && !document.getElementById("bang-loe-pha")) {
+        const style = document.createElement("style");
+        style.id = "bang-loe-pha";
+        style.textContent = `${brk.selector} { display: revert !important; }`;
+        document.head.append(style);
+      }
       const region = document.querySelector('[data-slot="data-region"]');
       const twice =
         !!document.querySelector('[data-layout="phone"]') &&
@@ -146,7 +153,6 @@ test.describe("tung-khung", () => {
   }) => {
     const frames = await record(page, 360, 800, {
       selector: '[data-layout="table"]',
-      cls: "max-md:hidden",
     });
     expect(() => assertLayout(360, true, frames)).toThrow(/^360: bang hien o khung \d+$/);
   });
@@ -156,7 +162,6 @@ test.describe("tung-khung", () => {
   }) => {
     const frames = await record(page, 1440, 900, {
       selector: '[data-layout="phone"]',
-      cls: "md:hidden",
     });
     expect(() => assertLayout(1440, false, frames)).toThrow(/^1440: the hien o khung \d+$/);
   });
@@ -173,7 +178,6 @@ test.describe("tro-nang-ve-doi", () => {
   test("break: both layouts shown at 1440 names the region twice", async ({ page }) => {
     const frames = await record(page, 1440, 900, {
       selector: '[data-layout="phone"]',
-      cls: "md:hidden",
     });
     expect(() => assertTree(1440, frames)).toThrow(
       /^1440: ve doi lo cay tro nang — .*ten vung doc 2 lan/,
@@ -210,7 +214,7 @@ test.describe("mot-nhanh-sau-nhan-trang", () => {
 
   test("break: a hidden table left in the region at 360 is named", async ({ page }) => {
     await openReady(page, 360, 800);
-    await page.evaluate(() => {
+    await suaTrang(page, () => {
       const t = document.createElement("table");
       t.hidden = true;
       document.querySelector('[data-slot="data-region"]')!.append(t);
@@ -224,7 +228,7 @@ test.describe("mot-nhanh-sau-nhan-trang", () => {
     page,
   }) => {
     await openReady(page, 360, 800);
-    await page.evaluate(() =>
+    await suaTrang(page, () =>
       document.querySelector('[data-slot="data-region"]')!.removeAttribute("data-hydrated"),
     );
     await expect(regionReady(page, 1_000)).rejects.toThrow(

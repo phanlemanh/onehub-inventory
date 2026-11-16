@@ -7,6 +7,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { assertCardsNotTable, isPhone, rowsShown } from "../phone-list";
+import { themKieu } from "../sua-trang";
 
 const SIZES = new Set(["1440", "360"]);
 const LONG_NAME_ROW = "4d415500-0010-4000-8000-000000000003";
@@ -103,7 +104,7 @@ test.describe("E13 · the open cell is cut inside its cell", () => {
       .locator(`thead th[data-col-id="${col}"]`)
       .first()
       .evaluate((th) => [...th.parentElement!.children].indexOf(th) + 1);
-    await page.addStyleTag({
+    await themKieu(page, {
       content: `table[data-slot="data-grid-table"] colgroup col:nth-child(${nth}) { width: 44px !important; } td[data-col-id="${col}"], th[data-col-id="${col}"] { width: 44px !important; min-width: 44px !important; max-width: 44px !important; }`,
     });
     const title = await checkCut(page, "inventory", id);
@@ -112,7 +113,7 @@ test.describe("E13 · the open cell is cut inside its cell", () => {
 
   test("break: lifting the width limit is caught", async ({ page }) => {
     await openGrid(page, "/sent");
-    await page.addStyleTag({
+    await themKieu(page, {
       content:
         "[data-record-open], span:has(> [data-record-open]) { max-width: none !important; min-width: max-content !important; flex-shrink: 0 !important; }",
     });

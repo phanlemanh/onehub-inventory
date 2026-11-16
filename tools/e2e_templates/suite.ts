@@ -35,6 +35,7 @@ import {
   waitReady,
   type Base,
 } from "./runner";
+import { suaTrang } from "../../tests/e2e/sua-trang";
 
 /** The slowed copy of the suite: the whole suite again at this CPU slowdown, on the 1440 size only. */
 const SLOW_RATE = 4;
@@ -151,9 +152,9 @@ function calibration(cpu: number): void {
     test("ngoai khuon: bang khong qua vung dung chung thi do", async ({ page }) => {
       await page.goto(CALIBRATION_URL);
       await waitReady(page);
-      await page
-        .locator('[data-slot="data-region"]')
-        .evaluate((el) => el.removeAttribute("data-slot"));
+      await suaTrang(page.locator('[data-slot="data-region"]'), (el) =>
+        el.removeAttribute("data-slot"),
+      );
       let message = "";
       try {
         classifyGrid("hieu-chuan", await readGrid(page));

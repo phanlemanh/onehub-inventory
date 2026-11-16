@@ -12,6 +12,7 @@ import pg from "pg";
 
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
 import { expect, test } from "../../tools/e2e_templates/fixture";
+import { suaTrang, themKieu } from "../e2e/sua-trang";
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const INVITE = "Mời người";
@@ -272,12 +273,9 @@ test("cot-thang-hang", async ({ page }, info) => {
     }
     // pha thu: one row moved 8 px breaks the spine.
     await page.setViewportSize({ width: 1440, height: 900 });
-    await rows(page)
-      .nth(1)
-      .locator('[data-part="tags"]')
-      .evaluate((el) => {
-        el.style.marginLeft = "8px";
-      });
+    await suaTrang(rows(page).nth(1).locator('[data-part="tags"]'), (el) => {
+      el.style.marginLeft = "8px";
+    });
     const all = await parts(page);
     expect(() => assertSpine(all, ["main", "secondary", "tags", "control"])).toThrow(
       /column spine broken: (secondary|tags)/,
@@ -425,7 +423,7 @@ test("chin-trang-thai", async ({ page }, info) => {
   await checkState("ST-members-error", main, [{ button: "Thử lại" }]);
   await axeClean(page, "ST-members-error");
   ran.push("ST-members-error");
-  await page.addStyleTag({
+  await themKieu(page, {
     content: '[data-slot="page-state"] button { display: none !important; }',
   });
   await expect(checkState("ST-members-error", main, [{ button: "Thử lại" }])).rejects.toThrow(
