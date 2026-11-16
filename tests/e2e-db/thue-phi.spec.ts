@@ -24,6 +24,7 @@ import { formatMoney } from "../../src/lib/format";
 import { label } from "../../src/modules/company-config";
 import { FEE_COPY } from "../../src/modules/company-config/ui/fee-copy";
 
+import { regionReady } from "../e2e/phone-list";
 import { ROLES, signInWithCode } from "./dang-nhap-vai";
 
 const RUN = process.env["E2E_DB_RUN"] ?? `${process.pid}`;
@@ -98,6 +99,7 @@ const row = (page: Page, code: string) => page.locator(`[data-fee="${code}"]`);
 async function netCell(page: Page) {
   await page.goto("/inventory");
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  await regionReady(page);
   const body = page.locator('[data-slot="data-region-body"] tbody tr');
   const tr = body.filter({ hasText: "S1.02" }).filter({ hasText: "0602" }).first();
   return tr.locator('td[data-col-id="custom.netToSeller"]');
@@ -215,6 +217,7 @@ async function openCards(browser: Browser, info: TestInfo): Promise<Page> {
   const agent = await as(browser, "a-ListAgent", info);
   await agent.goto("/inventory");
   await expect(agent.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  await regionReady(agent);
   await agent.locator('[data-slot="phone-card"]').first().waitFor();
   return agent;
 }
@@ -253,6 +256,7 @@ async function openB(browser: Browser, info: TestInfo, phone: boolean): Promise<
   const page = await as(browser, "b-ListAgent", info);
   await page.goto("/inventory");
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  await regionReady(page);
   await page
     .locator(phone ? '[data-slot="phone-card"]' : '[data-slot="data-region-body"] tbody tr')
     .first()
@@ -366,6 +370,7 @@ test.describe("thue phi", () => {
     const agent = await as(browser, "a-ListAgent", info);
     await agent.goto("/inventory");
     await expect(agent.locator('[hidden][id^="S:"]')).toHaveCount(0);
+    await regionReady(agent);
     await proof(agent, info, "inventory");
     if (info.project.name === "360" || info.project.name === "414") {
       // Below 768 px the inventory is the list of cards (row 2b): Về tay is on the card, the table is not drawn.
@@ -453,6 +458,7 @@ test.describe("thue phi", () => {
     const agent = await as(browser, "a-ListAgent", info);
     await agent.goto("/inventory");
     await expect(agent.locator('[hidden][id^="S:"]')).toHaveCount(0);
+    await regionReady(agent);
     await axeClean(agent, "inventory");
   });
 
