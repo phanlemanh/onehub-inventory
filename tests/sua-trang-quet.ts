@@ -1,8 +1,10 @@
-// Row 1u: the static check behind «a test changes the page only through the shared door». A browser test that changes
-// the DOM (a style, a class, a node, an attribute) or takes a screenshot (which hides the caret with an inline style)
-// before React has hydrated the page makes React report a hydration mismatch, and the hydration guard turns the run
-// red. The door (tests/e2e/sua-trang.ts) waits for the page to be hydrated first; this scanner finds every call that
-// changes the page without it.
+// Row 1u: the static check behind «a test changes the page through the shared door, in the ways it lists». A browser
+// test that changes the DOM (a style, a class, a node, an attribute) or takes a screenshot (which hides the caret with an
+// inline style) before React has hydrated the page makes React report a hydration mismatch, and the hydration guard
+// turns the run red. The door (tests/e2e/sua-trang.ts) waits for the page to be hydrated first. This scanner finds the calls that
+// change the page without it in one of the LISTED ways (MUTATION below, and raw screenshots and style tags). It does not
+// prove that every way of changing the page goes through the door: a way not on the list passes unseen (open item for
+// the second test-suite tightening row).
 
 /** Tokens that change the DOM when they run inside a page callback. */
 export const MUTATION =

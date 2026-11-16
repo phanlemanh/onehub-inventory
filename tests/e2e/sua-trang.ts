@@ -1,8 +1,8 @@
 // The one door through which a browser test changes the page (row 1u). Changing the DOM — a style, a class, a node, an
 // attribute — or taking a screenshot (which hides the caret with an inline style on every input) before React has
 // hydrated the page makes React report a hydration mismatch, and the hydration guard (gac-hydration.ts) turns the
-// run red. Every such call goes through here, and waits first for the page to be hydrated; a static check
-// (tests/sua-trang.test.ts) is red on any call that does not.
+// run red. Such calls go through here, and wait first for the page to be hydrated; a static check
+// (tests/sua-trang.test.ts) is red on a call that does not, for the ways of changing the page it lists.
 import type {
   Locator,
   LocatorScreenshotOptions,

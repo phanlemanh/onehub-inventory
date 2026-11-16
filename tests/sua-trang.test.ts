@@ -1,5 +1,6 @@
-// Row 1u: every browser test changes the page only through the shared door (tests/e2e/sua-trang.ts), which waits for
-// the page to be hydrated first. Red on any call that changes the page without it.
+// Row 1u: browser tests change the page through the shared door (tests/e2e/sua-trang.ts), which waits for the page to be
+// hydrated first. Red on a call that changes the page without it in one of the ways the scanner lists; a way not on
+// the list is not seen (tests/sua-trang-quet.ts).
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -26,8 +27,8 @@ const FILES = execFileSync(
   .filter((f) => /\.ts$/.test(f));
 const read = (f: string) => readFileSync(join(ROOT, f), "utf8");
 
-describe("sua-trang · the browser tests change the page only through the door", () => {
-  it("no call outside the door changes the page, but in the files waiting on another pull request", () => {
+describe("sua-trang · the listed ways of changing the page go through the door", () => {
+  it("no call outside the door changes the page in a listed way, but in the files waiting on another pull request", () => {
     const problems = FILES.filter((f) => !CHO_PR.has(f) && !KHOA_LOI.has(f)).flatMap((f) =>
       quetTep(f, read(f)),
     );
