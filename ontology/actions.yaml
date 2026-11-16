@@ -228,6 +228,30 @@ actions:
           "table company_import_templates update",
         ]
 
+  # Fees and taxes (row 19, thue-phi): everyone of the company reads the schedule, only CompanyAdmin sets it. Approved by
+  # the owner at the scope gate, 2026-11-14. Database doors: migration 012; API doors: /api/v1/company/fee-schedule.
+  - name: readFeeSchedule
+    description: See the company's fee items, their rates, which are switched on, and who changed them.
+    entity: FeeItem
+    kind: query
+    status: live
+    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
+    doors:
+      api: ["GET /api/v1/company/fee-schedule"]
+      db: ["table company_fee_items select"]
+
+  - name: setFeeSchedule
+    description: >-
+      Set the company's fee schedule in one save: switch items on or off, change or reset an own item's rate, add,
+      rename and retire own items; nothing is deleted.
+    entity: FeeItem
+    kind: update
+    status: live
+    scope: { CompanyAdmin: company }
+    doors:
+      api: ["PUT /api/v1/company/fee-schedule"]
+      db: ["table company_fee_items insert", "table company_fee_items update"]
+
   - name: matchPendingUnits
     description: Match the company's pending units with units the shared catalog now has; the catalog never changes.
     entity: PendingUnit

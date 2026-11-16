@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 5315e508b8e42480439d0065c679c494a5e54e5a
+verified_commit: 356dd6365b86919a558cfe552d66843e3dffb7af
 human_signoff: Manh Phan 2026-11-15
 ---
 
@@ -153,3 +153,7 @@ Round 4: E1-E8 va E6b xanh, lenh suite build va e2e xanh tren cung cay ma da ghi
 ### Re-pin lần 1 — 2026-11-15, do gop main c53b35d (2b) sau luot cham 4
 run_id: repin-20261115T081713Z-25278
 sha: 5315e508b8e42480439d0065c679c494a5e54e5a · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng
+
+### Re-pin lần 2 — 2026-11-16, do hàng 19 sửa công cụ kiểm vòng đời (sửa sau ký N-1511-3)
+run_id: repin-20261116T040653Z-53403
+sha: 356dd6365b86919a558cfe552d66843e3dffb7af · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng

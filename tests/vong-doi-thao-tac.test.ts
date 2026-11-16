@@ -146,6 +146,7 @@ describe("may-thay-man-hien", () => {
         "CompanyLabel",
         "CompanyValueAlias",
         "CustomField",
+        "FeeItem",
         "ImportTemplate",
         "Listing",
         "PendingUnit",
@@ -303,6 +304,72 @@ describe("o-co-tro-nut-that", () => {
   });
 });
 
+describe("qua-luu-ca-bang", () => {
+  cleanedGroup();
+  const FEE = ent("FeeItem");
+  it("an own fee item added and retired inside the one save of the whole schedule is green, listed apart", () => {
+    expect(run(ROOT, "--check").status).toBe(0);
+    const r = run(ROOT, "--report");
+    expect(r.out).toContain("- them: qua lưu cả bảng · setFeeSchedule — ");
+    const group = r.out.split("## Qua lưu cả bảng\n")[1] ?? "";
+    expect(group).toContain("- FeeItem.them: setFeeSchedule — ");
+    expect(group).toContain("- FeeItem.go: setFeeSchedule — ");
+  });
+
+  it("break: an update action that is not the edit cell's action is red", () => {
+    const dir = copy();
+    breakFile(dir, FEE, (t) =>
+      t.replace("  them:\n    co: setFeeSchedule\n", "  them:\n    co: editCompanyLayer\n"),
+    );
+    expectRed(dir, "FeeItem.them: qua_luu can editCompanyLayer la thao tac o sua (setFeeSchedule)");
+  });
+
+  it("break: a whole-table cell without a reason is red", () => {
+    const dir = copy();
+    breakFile(dir, FEE, (t) =>
+      t.replace(/( {2}go:\n {4}co: setFeeSchedule\n {4}qua_luu: true\n) {4}ly_do: .*\n/, "$1"),
+    );
+    expectRed(dir, "FeeItem.go: qua_luu thieu ly_do");
+  });
+
+  it("break: a whole-table cell with no button on a screen showing the entity is red", () => {
+    const dir = copy();
+    breakFile(dir, "design/screens.yaml", (t) =>
+      t.replace(", matchPendingUnits, setFeeSchedule]", ", matchPendingUnits]"),
+    );
+    breakFile(dir, "src/modules/company-config/ui/fee-part.tsx", (t) =>
+      t.replaceAll(
+        '<PermittedAction action="setFeeSchedule">',
+        '<PermittedAction action="readFeeSchedule">',
+      ),
+    );
+    expectRed(dir, "FeeItem.them: setFeeSchedule khong la nut o man nao hien FeeItem");
+  });
+
+  it.each([
+    [
+      "xem",
+      "  xem: { co: readFeeSchedule }\n",
+      '  xem: { co: readFeeSchedule, qua_luu: true, ly_do: "x" }\n',
+    ],
+    [
+      "sua",
+      "  sua: { co: setFeeSchedule }\n",
+      '  sua: { co: setFeeSchedule, qua_luu: true, ly_do: "x" }\n',
+    ],
+  ])("break: qua_luu on the %s cell is red", (cell, from, to) => {
+    const dir = copy();
+    breakFile(dir, FEE, (t) => t.replace(from, to));
+    expectRed(dir, `FeeItem.${cell}: qua_luu chi dung o them va go`);
+  });
+
+  it("control: an ordinary co cell keeps its kind rule, qua_luu changes nothing for it", () => {
+    const dir = copy();
+    breakFile(dir, FEE, (t) => t.replace(/ {4}qua_luu: true\n/, ""));
+    expectRed(dir, "FeeItem.them: setFeeSchedule la update, o nay can create");
+  });
+});
+
 describe("o-hang-va-khong-co-can-cu", () => {
   cleanedGroup();
   const share = (dir: string, from: string, to: string) =>
@@ -454,6 +521,14 @@ describe("bang-da-duyet", () => {
       khop: "matchPendingUnits",
     },
     Member: { them: "inviteMember", xem: "listMembers", sua: "changeMemberRoles", go: "hang 18a" },
+    // Row 19 (G N-1511-3): added and retired inside the one save of the whole fee schedule; the owner sees these four
+    // cells at row 19's evidence gate.
+    FeeItem: {
+      them: "setFeeSchedule·qua_luu",
+      xem: "readFeeSchedule",
+      sua: "setFeeSchedule",
+      go: "setFeeSchedule·qua_luu",
+    },
   };
   type Cell = {
     co?: string;
@@ -461,9 +536,18 @@ describe("bang-da-duyet", () => {
     khong?: string;
     duyet?: string;
     chan?: Record<string, Cell>;
+    qua_luu?: boolean;
   };
   const short = (c: Cell) =>
-    c.khong ? "khong" : c.co ? (c.hang ? `${c.co}·${c.hang}` : c.co) : `hang ${c.hang}`;
+    c.khong
+      ? "khong"
+      : c.co
+        ? c.hang
+          ? `${c.co}·${c.hang}`
+          : c.qua_luu
+            ? `${c.co}·qua_luu`
+            : c.co
+        : `hang ${c.hang}`;
 
   it("every cell in the repository is the cell approved at the scope gate", () => {
     const entities = table(ROOT).entities;
@@ -479,7 +563,7 @@ describe("bang-da-duyet", () => {
       expect(have, name).toEqual(want);
       cells += Object.keys(want).length;
     }
-    expect(cells).toBe(55);
+    expect(cells).toBe(59);
   });
 
   it("the seven real gaps of the 14/11 review each point to the row approved for it", () => {

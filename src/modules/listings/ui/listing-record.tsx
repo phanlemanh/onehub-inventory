@@ -108,6 +108,7 @@ export function ListingCard({
   photo,
   noPhoto = "tile",
   building,
+  net,
 }: {
   view: ListingView;
   priceLabel: string;
@@ -121,6 +122,11 @@ export function ListingCard({
   noPhoto?: "tile" | "none";
   /** The building code the muted tile shows. */
   building?: string;
+  /**
+   * Row layout only, off when absent (row 19): the amount the seller nets, at the right end of the facts line under the
+   * price and status. A row without one keeps the card exactly as it is.
+   */
+  net?: { label: string; value: number } | null;
 }) {
   if (layout === "row") {
     const facts = view.facts
@@ -174,7 +180,17 @@ export function ListingCard({
               <TypedCell kind="status" value={view.status} transaction={view.transaction} />
             </span>
           </div>
-          {facts.length > 0 ? (
+          {net ? (
+            // The facts give way to the amount: they cut with an ellipsis, the amount stays whole.
+            <div className="flex items-baseline justify-between gap-2 text-xs text-muted-foreground tabular-nums">
+              <span data-slot="listing-card-facts" className="min-w-0 truncate">
+                {facts.join(" · ")}
+              </span>
+              <span data-slot="listing-card-net" className="shrink-0 whitespace-nowrap">
+                {net.label} {formatByKind("money", net.value)}
+              </span>
+            </div>
+          ) : facts.length > 0 ? (
             <span
               data-slot="listing-card-facts"
               className="text-xs text-muted-foreground tabular-nums"

@@ -12,7 +12,7 @@ modules:
     depends_on: []
   - name: company-config
     description: Per-company settings, labels, custom statuses and fields, value aliases, templates
-    owns: [CompanyLabel, CustomField, CompanyValueAlias, PendingUnit, ImportTemplate]
+    owns: [CompanyLabel, CustomField, CompanyValueAlias, PendingUnit, ImportTemplate, FeeItem]
     depends_on: [identity, catalog] # row 7e: the shared action door and withCompany; the catalog's code lookup, decision 0029
   - name: agreements
     description: Connection kinds and agreements
