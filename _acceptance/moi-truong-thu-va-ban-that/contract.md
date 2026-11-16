@@ -5,7 +5,7 @@ slug: moi-truong-thu-va-ban-that
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci, api]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-16
 design_doc: _acceptance/moi-truong-thu-va-ban-that/design.md
@@ -129,3 +129,11 @@ một ca kiểm riêng. `[CE chưa kiểm chứng]` thư gửi thật từ tên 
 
 - Phần dựng bắt đầu khi hàng 10 đã gộp (lời giám sát 2026-11-16).
 - Không màn mới: bảng thao tác của thực thể và nghi thức thiết kế không áp (dòng sổ «bỏ đặc-tả-UX», «bỏ design-pass»).
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-17:
+  - Ngoài-1: Tên vai đăng nhập khai ở hai nơi trong mã; đổi một nơi mà quên nơi kia thì kiểm khởi động và kiểm truy vấn báo khác nhau (đích: hàng siết bộ kiểm lần hai).
+  - Ngoài-2: Địa chỉ bản thật ghi ở hai nơi; đổi một nơi thì kiểm nhanh đỏ hay máy chủ không khởi động.
+  - Ngoài-3: Chạy lệnh đưa bản lên, kiểm nhanh hay lùi bản qua đường dẫn tắt (symlink) thì lệnh không làm gì mà vẫn thoát thành công; luôn chạy từ đúng thư mục kho.
+  - Ngoài-4: Bước «bản thử trước» của bản thật chỉ so commit, chưa đòi bản thử đang khoẻ.
+  - Ngoài-5: Tự lùi bản mà không tra được commit của bản cũ thì không đối chiếu commit sau khi lùi (vẫn xác nhận đúng mã bản trên tên miền).
+  - Ngoài-6: Bài dò khoá bí mật chưa có ca phá cho mỗi mẫu khoá (đích: hàng siết bộ kiểm lần hai).
+  - SP-1: chấp nhận có tên — bộ kiểm cách ly trên đích đọc thuộc tính vai; không tệp luật nào bị sửa.
