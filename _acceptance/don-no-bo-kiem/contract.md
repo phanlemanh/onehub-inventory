@@ -5,7 +5,7 @@ slug: don-no-bo-kiem
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [config, ci]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-15T11:07:32Z
 design_doc: docs/superpowers/specs/2026-11-15-don-no-bo-kiem-design.md
@@ -93,6 +93,9 @@ Bên đọc dò toàn kho bằng tìm chữ (design doc mục «Bên đọc đã
 - Ngoài-1 (máy định tuyến 2026-11-15, đề xuất S4 known-limits): Phép kiểm tra tự động có một kẽ hở: một chỗ trong bộ bài kiểm vẫn đổi trang mà phép kiểm tra không thấy. Hiện chỗ đó chạy an toàn, người dùng sản phẩm không bị ảnh hưởng. — `tools/e2e_templates/recipes.ts`
 - Ngoài-2 (máy định tuyến 2026-11-15, đề xuất S4 known-limits): Một bài phá thử trong bộ kiểm có thể thỉnh thoảng báo đỏ sai vì nút chưa bị gỡ kịp. Chỉ ảnh hưởng người chạy bộ kiểm, không ảnh hưởng người dùng sản phẩm. — `tools/e2e_templates/recipes.ts`
 - Ngoài-3 (máy định tuyến 2026-11-15, đề xuất S4 known-limits): Hai bài phá thử có thể bắt đầu sửa trang quá sớm và gây lại cảnh báo dựng trang lệch, làm bộ kiểm đỏ oan. Người dùng sản phẩm không bị ảnh hưởng. — `tools/e2e_templates/recipes.ts`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-16:
+  - Ngoài-9: Hai dòng trong sổ quyết định ghi giờ muộn hơn một tiếng so với thực tế, nên khi xem lại theo thời gian chúng nằm sau vòng chấm thay vì trước. Người dùng sản phẩm không bị ảnh hưởng.
+  - Ngoài-10: Thư viện bài kiểm dùng chung giờ phụ thuộc ngược vào thư mục test. Người dùng sản phẩm không bị ảnh hưởng; chỉ người bảo trì bộ kiểm thấy cấu trúc hơi lệch hướng.
 - Ngoài-5 (máy định tuyến 2026-11-15, đề xuất S4 known-limits): Quy tắc nhận biết trang đã tải xong nằm ở hai chỗ trong bộ kiểm tự động. Người dùng sản phẩm không bị ảnh hưởng; chỉ khi thư viện giao diện đổi cách làm thì một chỗ có thể được sửa còn chỗ kia bị quên, khiến bài kiểm đỏ oan. — `tests/e2e/da-gan.ts`
 - Ngoài-6 (máy định tuyến 2026-11-15, đề xuất S4 known-limits): Thay đổi này cần chủ kho duyệt trước khi gộp, tác tử không tự gộp được. Người dùng cuối không bị ảnh hưởng gì. — `tools/wiki_lint.py`
 - Ngoài-8 (máy định tuyến 2026-11-15, đề xuất S4 known-limits): Phép gác cảnh báo dựng trang lệch mới được thử đỏ cho một loại cảnh báo, loại thứ hai chưa được thử. Nếu loại này xảy ra, giao diện có thể lệch mà bộ kiểm vẫn xanh. — `tests/e2e/gac-hydration.ts`
