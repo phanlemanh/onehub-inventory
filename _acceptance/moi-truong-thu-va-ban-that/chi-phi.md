@@ -51,3 +51,24 @@ Mỗi người làm thêm trên Vercel cộng 20. Đợt mời đông (trên 100
 - https://supabase.com/docs/guides/platform/manage-your-usage/compute
 - https://supabase.com/docs/guides/platform/regions
 - https://resend.com/pricing
+
+## Tài nguyên chủ kho đã có (đọc 2026-11-16, chỉ đọc bằng công cụ dòng lệnh đã đăng nhập sẵn)
+
+Không ghi tên dự án hay mã nhận dạng nào vào kho (kho công khai).
+
+- Vercel: nhóm của chủ kho đã ở gói Pro. Tên miền `onehub.center` quản lý DNS ngay trong Vercel.
+- Supabase: tổ chức của chủ kho đang chạy nhiều hơn số dự án gói miễn phí cho phép, nên đang trả phí — suy luận, chưa
+  đọc được tên gói. Tín dụng máy của gói đã được các dự án có sẵn dùng hết.
+- Resend: Quỹ hàng đã dùng Resend (có/không, không đọc giá trị). Gói Resend chưa kiểm được.
+
+## Chi phí THÊM mỗi tháng khi dùng tài nguyên sẵn có
+
+| | A | B · khuyên | C |
+|---|---|---|---|
+| Vercel | 0 — đã Pro, cùng một chỗ | 0 | 0 |
+| Supabase | bản thật một máy Micro: 10; bản thử ở tổ chức miễn phí riêng: 0 | hai máy Micro: 20 | 20 + khôi phục từng phút cho bản thật 100 = 120 |
+| Resend | 0 nếu dùng chung khoá và tên miền đã xác minh | 0 | 0, hoặc 20 nếu lên Pro |
+| **Thêm mỗi tháng** | **10** | **20** | **120–140** |
+
+Lưu ý: 20 đô tín dụng dùng của Vercel Pro là chung cho mọi dự án của nhóm; Inventory lúc ra mắt dùng ít, nhưng nếu nhóm
+đã vượt tín dụng thì phần vượt tính theo dùng. Tổng ở bảng phía trên (45 · 55 · 175) là giá khi dựng từ đầu.
