@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 3ceeee39da0f6c5d65eeb78f6308574a8911e6c3
+verified_commit: d8444a91547391b8ca0671933cd7b1cb1bb5c827
 human_signoff: Manh Phan 2026-11-16
 ---
 
@@ -171,3 +171,7 @@ sha: 038f0756f995c1fef3b8028b48d689a3280ddade · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 2 — 2026-11-16, do tests/wiki-lint-so-trung.test.ts: so dich 0043 thanh 0999 (hang 22, K-30, G-1611-71)
 run_id: repin-20261116T161618Z-52851
 sha: 3ceeee39da0f6c5d65eeb78f6308574a8911e6c3 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)
+
+### Re-pin lần 3 — 2026-11-16, do hang 22 sua bai DB cho CI (tests/db), ghim lai 1u
+run_id: repin-20261116T175753Z-34800
+sha: d8444a91547391b8ca0671933cd7b1cb1bb5c827 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)
