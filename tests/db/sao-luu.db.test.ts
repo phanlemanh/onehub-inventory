@@ -5,10 +5,13 @@
 //      scratch database: every table has the source's row count, cach-ly-dich passes on the restored copy, the last line
 //      matches the format written in docs/van-hanh/nhat-ky-khoi-phuc.md, and the scratch database is dropped.
 //   3. Break: a backup that lost one table (pg_dump -T) → red, naming the table.
+//   4. Version trap: a pg_dump, a pg_restore or a backup of another major version than the server → red with the pinned
+//      line before anything is written or created. Fake tools (a script printing `… (PostgreSQL) <server+1>.2`) stand
+//      for a newer client; the real pg_dump 17 against Postgres 16 reproduction is in the PR description.
 // The scripts reach Postgres through psql, pg_dump and pg_restore chosen by ./may-khach-pg.ts: inside the lane's
 // container on a lane (127.0.0.1:5432, trust), the CI cluster over TCP with its password under `make ci-db`.
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -114,16 +117,56 @@ async function totals(owner: pg.Client): Promise<{ tables: number; rows: number 
   return { tables: tables.rowCount ?? 0, rows };
 }
 
+/** A fake client tool: `--version` prints `<name> (PostgreSQL) <version>`, `-l` prints `listing`, anything else fails. */
+function fakeTool(dir: string, name: string, version: string, listing = ""): string {
+  const path = join(dir, `gia-${name}`);
+  writeFileSync(
+    path,
+    [
+      "#!/usr/bin/env bash",
+      `if [ "\${1:-}" = "--version" ]; then echo "${name} (PostgreSQL) ${version}"; exit 0; fi`,
+      `if [ "\${1:-}" = "-l" ]; then cat <<'HET'`,
+      listing,
+      "HET",
+      "exit 0; fi",
+      "echo 'gia: không được gọi tới đây' >&2",
+      "exit 9",
+      "",
+    ].join("\n"),
+  );
+  chmodSync(path, 0o755);
+  return path;
+}
+
+/** An archive header as `pg_restore -l` prints it. */
+function header(fromServer: string, byDump: string): string {
+  return [
+    ";",
+    ";     Format: CUSTOM",
+    `;     Dumped from database version: ${fromServer}`,
+    `;     Dumped by pg_dump version: ${byDump}`,
+    ";",
+  ].join("\n");
+}
+
 describe("sao-luu và khoi-phuc-thu", () => {
   let db: ScratchDb;
   let outside: string;
   let already = new Set<string>();
+  /** The server's major version, and one that is not it. */
+  let major = 0;
+  let other = 0;
   beforeAll(async () => {
     db = await scratchDb("nguon", undefined, { prefix: "sao_luu" });
     await seed(db.owner);
     await db.owner.query(SEED);
     outside = tempDir("sao-luu-");
     already = new Set(await drillDatabases(db.owner));
+    const v = await db.owner.query<{ n: string }>(
+      "select current_setting('server_version_num') as n",
+    );
+    major = Math.floor(Number(v.rows[0]!.n) / 10000);
+    other = major + 1;
   });
   afterAll(async () => {
     // Guard: a drill database this file's run created and a red test left behind. Ones that existed before the run
@@ -235,6 +278,79 @@ describe("sao-luu và khoi-phuc-thu", () => {
     expect(r.code).toBe(1);
     expect(r.out.split("\n").some((l) => l.startsWith("lech dong: public.agreements "))).toBe(true);
     expect(r.out).not.toMatch(/cach-ly đạt$/m);
+    expect(await drillDatabases(db.owner)).toEqual(before);
+  });
+
+  it("lệch bản: pg_dump khác bản máy chủ → đỏ một dòng, không ghi tệp", () => {
+    const file = join(outside, "lech-ban-dump.dump");
+    const r = backup(db.name, file, { PG_DUMP_CMD: fakeTool(outside, "pg_dump", `${other}.2`) });
+    expect(r.code).not.toBe(0);
+    expect(r.err.trim()).toBe(
+      `sao-luu: pg_dump bản ${other}, máy chủ bản ${major} — dùng công cụ cùng bản với máy chủ`,
+    );
+    expect(existsSync(file)).toBe(false);
+    expect(existsSync(`${file}.dem`)).toBe(false);
+  });
+
+  it("lệch bản: pg_restore khác bản máy chủ khôi phục → đỏ một dòng, không tạo cơ sở nháp", async () => {
+    const file = join(outside, "lech-ban-restore.dump");
+    writeFileSync(file, "không đọc tới\n");
+    writeFileSync(`${file}.dem`, "public.agreements\t0\n");
+    const before = await drillDatabases(db.owner);
+    const r = restore(file, { PG_RESTORE_CMD: fakeTool(outside, "pg_restore", `${other}.2`) });
+    expect(r.code).not.toBe(0);
+    expect(r.err.trim()).toBe(
+      `khoi-phuc: pg_restore bản ${other}, máy chủ khôi phục bản ${major} — dùng công cụ cùng bản với máy chủ`,
+    );
+    expect(r.out).not.toContain("co-so-nhap:");
+    expect(await drillDatabases(db.owner)).toEqual(before);
+  });
+
+  it("lệch bản: tệp sao lưu lấy bằng pg_dump khác bản máy chủ khôi phục → đỏ, không tạo cơ sở nháp", async () => {
+    const file = join(outside, "lech-ban-tep.dump");
+    writeFileSync(file, "không đọc tới\n");
+    writeFileSync(`${file}.dem`, "public.agreements\t0\n");
+    const before = await drillDatabases(db.owner);
+    const tool = fakeTool(outside, "pg_restore", `${major}.4`, header(`${major}.4`, `${other}.2`));
+    const r = restore(file, { PG_RESTORE_CMD: tool });
+    expect(r.code).not.toBe(0);
+    expect(r.err.trim()).toBe(
+      `khoi-phuc: tệp sao lưu lấy bằng pg_dump bản ${other}, máy chủ khôi phục bản ${major} — sao lưu lại bằng công cụ cùng bản`,
+    );
+    expect(r.out).not.toContain("co-so-nhap:");
+    expect(await drillDatabases(db.owner)).toEqual(before);
+
+    const fromOther = fakeTool(
+      outside,
+      "pg_restore",
+      `${major}.4`,
+      header(`${other}.1`, `${major}.4`),
+    );
+    const g = restore(file, { PG_RESTORE_CMD: fromOther });
+    expect(g.code).not.toBe(0);
+    expect(g.err.trim()).toBe(
+      `khoi-phuc: tệp sao lưu từ máy chủ bản ${other}, máy chủ khôi phục bản ${major} — khôi phục vào máy chủ cùng bản với máy chủ gốc`,
+    );
+    expect(await drillDatabases(db.owner)).toEqual(before);
+
+    // The real case of a newer pg_dump: pg_restore of the server's version cannot read the archive header at all.
+    const unreadable = join(outside, "gia-pg_restore-doc-khong-duoc");
+    writeFileSync(
+      unreadable,
+      [
+        "#!/usr/bin/env bash",
+        `if [ "\${1:-}" = "--version" ]; then echo "pg_restore (PostgreSQL) ${major}.4"; exit 0; fi`,
+        `echo "pg_restore: error: unsupported version (1.16) in file header" >&2`,
+        "exit 1",
+        "",
+      ].join("\n"),
+    );
+    chmodSync(unreadable, 0o755);
+    const u = restore(file, { PG_RESTORE_CMD: unreadable });
+    expect(u.code).not.toBe(0);
+    expect(u.err.trim()).toBe(
+      `khoi-phuc: tệp sao lưu lấy bằng pg_dump mới hơn bản ${major} của máy chủ khôi phục — sao lưu lại bằng công cụ cùng bản`,
+    );
     expect(await drillDatabases(db.owner)).toEqual(before);
   });
 });

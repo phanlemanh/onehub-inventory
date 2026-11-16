@@ -15,6 +15,12 @@
 #   PSQL_DICH            — the psql command line (default `psql`); PG_DUMP_CMD — the pg_dump command line (default
 #                          `pg_dump`). Tests use `docker exec -i onehub-inventory-db-<lane> psql` / `… pg_dump`.
 #
+# Before anything is dumped, pg_dump's major version (`pg_dump --version`) must equal the server's (`show
+# server_version_num` through the same psql). A newer pg_dump writes settings the server's own pg_restore refuses (pg_dump
+# 17 writes `SET transaction_timeout`, unknown to 16), so a mismatch stops with one line and writes nothing:
+#   sao-luu: pg_dump bản <a>, máy chủ bản <b> — dùng công cụ cùng bản với máy chủ
+# The archive header records both versions; db/scripts/khoi-phuc-thu.sh reads them back (`pg_restore -l`).
+#
 # Sidecar format: one line per table, `<schema>.<table><TAB><rows>`, sorted. No address is ever printed.
 set -uo pipefail
 
@@ -76,7 +82,25 @@ done
 
 can_bien
 
-# --- 2. One snapshot for the dump and the counts. ----------------------------------------------------------------
+# --- 2. pg_dump of the server's major version, before anything is written. --------------------------------------
+ban_dump="$("${dump_lenh[@]}" --version </dev/null 2>/dev/null | sed -nE '1s/.*\(PostgreSQL\) ([0-9]+).*/\1/p')"
+if [ -z "$ban_dump" ]; then
+  echo "sao-luu: không đọc được bản của pg_dump (${dump_lenh[*]} --version)" >&2
+  exit 2
+fi
+if ! so_may_chu="$("${psql_lenh[@]}" -X -q -A -t -d "$MIGRATE_DATABASE_URL" -c "show server_version_num" </dev/null 2>&1)" ||
+  ! [[ "$so_may_chu" =~ ^[0-9]+$ ]]; then
+  echo "sao-luu: không đọc được bản của máy chủ" >&2
+  printf '%s\n' "$so_may_chu" | sed -E 's/^(psql:[^ ]* )?(ERROR|FATAL|LỖI):  //' >&2
+  exit 1
+fi
+ban_may_chu=$((so_may_chu / 10000))
+if [ "$ban_dump" != "$ban_may_chu" ]; then
+  echo "sao-luu: pg_dump bản $ban_dump, máy chủ bản $ban_may_chu — dùng công cụ cùng bản với máy chủ" >&2
+  exit 2
+fi
+
+# --- 3. One snapshot for the dump and the counts. ----------------------------------------------------------------
 tam="$(mktemp -d)"
 psql_pid=""
 don() {

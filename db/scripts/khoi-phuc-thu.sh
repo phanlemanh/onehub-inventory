@@ -14,6 +14,16 @@
 #   PSQL_DICH, PG_RESTORE_CMD — the psql and pg_restore command lines (default `psql`, `pg_restore`). Tests use
 #                         `docker exec -i onehub-inventory-db-<lane> …` with addresses seen from inside the container.
 #
+# Before the scratch database is created, three major versions must equal the restore target's (`show
+# server_version_num`), each mismatch one line, exit 2, nothing created:
+#   khoi-phuc: pg_restore bản <a>, máy chủ khôi phục bản <b> — dùng công cụ cùng bản với máy chủ
+#   khoi-phuc: tệp sao lưu lấy bằng pg_dump bản <a>, máy chủ khôi phục bản <b> — sao lưu lại bằng công cụ cùng bản
+#   khoi-phuc: tệp sao lưu lấy bằng pg_dump mới hơn bản <b> của máy chủ khôi phục — sao lưu lại bằng công cụ cùng bản
+#                                                         (pg_restore cannot even read that archive's header)
+#   khoi-phuc: tệp sao lưu từ máy chủ bản <a>, máy chủ khôi phục bản <b> — khôi phục vào máy chủ cùng bản với máy chủ gốc
+# The backup's two versions come from its own archive header (`pg_restore -l`: «Dumped from database version», «Dumped
+# by pg_dump version»), not from the sidecar, so any custom-format file is checked, sao-luu.sh's or not.
+#
 # Green: the last line is `khoi-phuc: <YYYY-MM-DD> · <n> bảng · <m> dòng · cach-ly đạt` (n, m from the sidecar), exit 0.
 # Red, one pinned line per finding, exit 1:
 #   thieu bang: <schema.table>                              — in the source, not in the restored copy
@@ -58,6 +68,50 @@ NHAP_DANG_NHAP="$(doi_csdl "$KHOI_PHUC_LOGIN_URL" "$ten")"
 quan_tri() {
   "${psql_lenh[@]}" -X -q -A -t -v ON_ERROR_STOP=1 -d "$KHOI_PHUC_ADMIN_URL" -c "$1" </dev/null 2>&1
 }
+
+# --- 0. Same major version: pg_restore, the backup's pg_dump and source server, the restore target. ---------------
+ban_cua() { sed -nE "s/.*$1[^0-9]*([0-9]+).*/\\1/p" | head -n 1; }
+if ! so_may_chu=$(quan_tri "show server_version_num") || ! [[ "$so_may_chu" =~ ^[0-9]+$ ]]; then
+  echo "khoi-phuc: không đọc được bản của máy chủ khôi phục" >&2
+  printf '%s\n' "$so_may_chu" >&2
+  exit 1
+fi
+ban_may_chu=$((so_may_chu / 10000))
+ban_restore="$("${restore_lenh[@]}" --version </dev/null 2>/dev/null | ban_cua '\(PostgreSQL\)')"
+if [ -z "$ban_restore" ]; then
+  echo "khoi-phuc: không đọc được bản của pg_restore (${restore_lenh[*]} --version)" >&2
+  exit 2
+fi
+if [ "$ban_restore" != "$ban_may_chu" ]; then
+  echo "khoi-phuc: pg_restore bản $ban_restore, máy chủ khôi phục bản $ban_may_chu — dùng công cụ cùng bản với máy chủ" >&2
+  exit 2
+fi
+if ! dau_tep=$("${restore_lenh[@]}" -l <"$tep" 2>&1); then
+  if printf '%s\n' "$dau_tep" | grep -q 'unsupported version'; then
+    # The archive format of a newer pg_dump (pg_dump 17 writes 1.16, unknown to pg_restore 16).
+    echo "khoi-phuc: tệp sao lưu lấy bằng pg_dump mới hơn bản $ban_may_chu của máy chủ khôi phục — sao lưu lại bằng công cụ cùng bản" >&2
+    exit 2
+  fi
+  echo "khoi-phuc: pg_restore không đọc được tệp sao lưu" >&2
+  printf '%s\n' "$dau_tep" | head -n 5 >&2
+  exit 2
+fi
+ban_dump="$(printf '%s\n' "$dau_tep" | ban_cua 'Dumped by pg_dump version:')"
+ban_goc="$(printf '%s\n' "$dau_tep" | ban_cua 'Dumped from database version:')"
+if [ -z "$ban_dump" ] || [ -z "$ban_goc" ]; then
+  echo "khoi-phuc: tệp sao lưu không ghi bản pg_dump và bản máy chủ gốc — không phải tệp của pg_dump -Fc" >&2
+  exit 2
+fi
+lech_ban=0
+if [ "$ban_dump" != "$ban_may_chu" ]; then
+  echo "khoi-phuc: tệp sao lưu lấy bằng pg_dump bản $ban_dump, máy chủ khôi phục bản $ban_may_chu — sao lưu lại bằng công cụ cùng bản" >&2
+  lech_ban=1
+fi
+if [ "$ban_goc" != "$ban_may_chu" ]; then
+  echo "khoi-phuc: tệp sao lưu từ máy chủ bản $ban_goc, máy chủ khôi phục bản $ban_may_chu — khôi phục vào máy chủ cùng bản với máy chủ gốc" >&2
+  lech_ban=1
+fi
+[ "$lech_ban" -eq 0 ] || exit 2
 
 tao=0
 don() {

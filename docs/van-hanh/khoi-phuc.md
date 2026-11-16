@@ -16,12 +16,17 @@ sở nháp, đếm dòng từng bảng và chạy bộ kiểm cách ly trên b�
 - Một máy có `git`, `make`, `bash` và bản sao của kho này (GitHub › trang kho › Code › HTTPS › chép, rồi `git clone`).
   `make sao-luu`, `make khoi-phuc-thu` và `make cach-ly-dich` chỉ chạy `bash` với `psql`, `pg_dump`, `pg_restore`: **không
   cần Node, không cần `make setup`**.
-- `psql`, `pg_dump`, `pg_restore` **bản chính 17 trở lên** — bằng hay mới hơn bản Postgres của Supabase (Supabase › Project
-  Settings › Infrastructure ghi bản; hiện là 17). macOS: `brew install postgresql@17`; Ubuntu: gói `postgresql-client-17`.
-  - **Đạt khi:** `pg_dump --version` in `pg_dump (PostgreSQL) 17.` hoặc số lớn hơn.
-  - **Đỏ thì:** `command not found` — chưa cài hoặc chưa vào `PATH` (brew in sẵn dòng thêm `PATH`); số nhỏ hơn 17 — cài
-    bản 17, vì `pg_dump` cũ từ chối máy chủ mới hơn nó («server version mismatch»). Máy chỉ có Docker thì đặt `PSQL_DICH`,
-    `PG_DUMP_CMD`, `PG_RESTORE_CMD` thành lệnh chạy qua Docker với ảnh `postgres:17`.
+- `psql`, `pg_dump`, `pg_restore` **cùng bản chính với máy chủ Postgres của Supabase** — không cũ hơn, cũng không mới
+  hơn (Supabase › Project Settings › Infrastructure ghi bản; hiện là 17). `pg_dump` mới hơn ghi ra lệnh mà máy chủ cũ
+  không hiểu, nên tệp không khôi phục được. macOS: `brew install postgresql@17`; Ubuntu: gói `postgresql-client-17` (đổi
+  17 thành bản của máy chủ).
+  - **Đạt khi:** `pg_dump --version` in `pg_dump (PostgreSQL) <bản>.`, với `<bản>` đúng số bản chính Supabase ghi.
+  - **Đỏ thì:** `command not found` — chưa cài hoặc chưa vào `PATH` (brew in sẵn dòng thêm `PATH`); số khác bản máy chủ
+    — cài đúng bản đó. Quên kiểm thì `make sao-luu` và `make khoi-phuc-thu` tự dừng trước khi ghi hay tạo gì, với một
+    dòng như `pg_dump bản 18, máy chủ bản 17 — dùng công cụ cùng bản với máy chủ`. Cùng kiểu đó: dòng
+    `pg_restore bản …` — sửa như trên; dòng `tệp sao lưu lấy bằng pg_dump …` — tệp do công cụ khác bản làm ra, sao lưu
+    lại. Máy chỉ có Docker thì đặt `PSQL_DICH`, `PG_DUMP_CMD`, `PG_RESTORE_CMD` thành lệnh chạy qua Docker với ảnh
+    `postgres:<bản của máy chủ>`.
 - Một thư mục **ngoài kho** để giữ tệp sao lưu: tệp có dữ liệu thật; lệnh từ chối ghi vào trong kho.
 - Tệp biến ngoài kho của bản thử, quyền chỉ chủ đọc, có:
   - `MIGRATE_DATABASE_URL` — chuỗi Session pooler vai chủ của dự án bản thử;
@@ -55,7 +60,7 @@ sở nháp, đếm dòng từng bảng và chạy bộ kiểm cách ly trên b�
   bảng). Ghi lại `n` và `m`.
 - **Đỏ thì:** `không ghi sao lưu vào trong kho` — chọn thư mục ngoài bản sao kho; `không có thư mục …` — tạo thư mục
   trước; `không mở được ảnh chụp` — chuỗi `MIGRATE_DATABASE_URL` phải là Session pooler hay nối thẳng, không phải
-  Transaction pooler; `pg_dump lỗi` với `server version mismatch` — cài `pg_dump` cùng bản chính với máy chủ.
+  Transaction pooler; `sao-luu: pg_dump bản …, máy chủ bản …` — cài `pg_dump` cùng bản chính với máy chủ (xem «Cần có trước»).
 
 ### 4. Thử khôi phục vào cơ sở nháp
 
