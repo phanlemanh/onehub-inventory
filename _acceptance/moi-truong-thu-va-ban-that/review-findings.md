@@ -1,62 +1,84 @@
-# Review findings: moi-truong-thu-va-ban-that (round 3)
+# Review findings: moi-truong-thu-va-ban-that (round 4)
 
 ## Trong hợp đồng
 
-- **Auto-rollback after a failed promote can 'roll back' to the failed new deployment itself (url format mismatch)**
-  file: `tools/deploy/len-ban.mjs:304`
-  severity: medium
-  AC: AC-2
-  source: bugs
-  detail: `others = list.filter((d) => d.url !== newUrl)` compares two different url formats. `newUrl` comes from `vercel deploy` stdout and is `https://<host>` (the regex only keeps `^https?://` lines). `list` comes from `productionDeployments` → `vercel list --json`. In the installed vercel 65.9.0 (dist/commands/list/index.js) the JSON output emits `url: dep.url`, which is the API's bare host with no protocol; only the table output adds `https://`. So the filter never removes the new deployment, which is the newest READY production deployment (`--prod --skip-domain`) and carries `onehub_commit=head`. Result: (a) when `domainCommitBefore === head` (redeploying the same commit after an earlier failed run), `others.find(commit === domainCommitBefore)` picks the new, failed deployment; (b) when no other deployment carries `domainCommitBefore` (for example older builds made without metadata, or ones that dropped out of the list), the `others[0]` fallback is again the new deployment. In both cases `vercel rollback` points the domain at the same failed build and the run prints `đã lùi về bản trước` while the broken build stays live. `namedIn` in kiem-nhanh.mjs already strips the protocol with `bare()`; this comparison needs the same treatment. The tests miss it because the fixtures in tools/deploy/deploy.test.ts (lines 261-263, 691) put full `http://…` urls in the fake list, unlike the real CLI.
-  rationale: AC-2 requires that when the post-attach check fails, the auto rollback returns to the previous build; with real URL format it can point to the failed build itself while printing success.
+(không có)
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Rollback with BAN=<url|id> is never checked against the production deployment list, and the commit check after the rollback quietly turns off**
+- **Runbooks still point operators at a deploy message that no longer exists; the new stop message is not documented**
+  Người dùng thấy gì: Sổ tay vẫn bảo người vận hành tìm một dòng thông báo cũ không còn xuất hiện, và chưa nói rõ phải làm gì khi lệnh báo dừng việc lùi bản. Người vận hành có thể lúng túng đúng lúc tên miền đang ở bản lỗi.
+  Căn cứ: Hậu quả nhẹ đến vừa: không mất dữ liệu và chỉ gây chậm trễ khi sự cố, còn sửa một dòng sổ tay thì rẻ và làm lúc nào cũng được.
+  file: `docs/van-hanh/lui-ban.md`
+  severity: medium
+  Đề xuất: known-limits
+
+- **New auto-rollback stop branch has no test**
+  Người dùng thấy gì: Trường hợp lệnh lùi bản tự dừng vì không tìm được bản cũ chưa có bài kiểm. Nếu sau này ai đó đổi lại thành đoán bản để lùi thì sẽ không có gì báo đỏ.
+  Căn cứ: Người dùng không gặp ngay lỗi nào và không mất dữ liệu, chỉ thiếu lưới bảo vệ cho lần sửa sau, nên thêm bài kiểm vào lúc nào cũng được.
+  file: `tools/deploy/len-ban.mjs`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Comment still describes the removed "else the newest other one" fallback**
+  Người dùng thấy gì: Một ghi chú trong mã còn mô tả cách đoán bản cũ đã bỏ. Người dùng không thấy gì, chỉ có nguy cơ người sửa sau hiểu nhầm.
+  Căn cứ: Không ảnh hưởng người dùng và không mất dữ liệu; chỉ là ghi chú lỗi thời, sửa tiện tay khi chạm vào tệp là đủ.
+  file: `tools/deploy/len-ban.mjs`
+  severity: low
+  Đề xuất: wont-fix
+
+- **Auto-rollback picks a deployment by commit, not by the deployment the domain actually served: on a same-commit redeploy it can go back to an earlier failed, never-promoted build and still print «đã lùi về bản trước»**
+  Người dùng thấy gì: Khi chạy lại cùng một bản (ví dụ lúc xoay khoá) và bước kiểm sau gắn tên miền đỏ, lệnh có thể lùi về một bản đã từng hỏng mà vẫn báo đã lùi về bản trước. Người vận hành tin rằng trang đã về bản tốt trong khi khách vẫn vào bản lỗi.
+  Căn cứ: Hậu quả nặng vì báo sai trạng thái đúng lúc sự cố, khách có thể gặp bản lỗi mà không ai biết, nhưng không mất dữ liệu và người vận hành lùi tay được; sửa cần đổi cách ghi lại bản đang chạy nên nên làm thành việc riêng.
+  file: `tools/deploy/len-ban.mjs`
+  severity: high
+  Đề xuất: new-contract
+
+- **Rollback with BAN=<url|id> is never checked against the production deployment list, and the commit check after the rollback quietly turns off (r3)**
   Người dùng thấy gì: Khi người vận hành chỉ đích danh một bản để lùi về, lệnh không kiểm bản ấy có thật và đang chạy được hay không. Nếu gõ sai, lệnh vẫn báo xanh dù tên miền đang chạy bản khác.
   Căn cứ: Hậu quả nặng nếu xảy ra giữa lúc khẩn cấp vì người vận hành tin vào dòng xanh, nhưng đường chỉ định bản không nằm trong các tiêu chí đã ký nên nên làm thành một việc riêng; sửa khá rẻ.
   file: `tools/deploy/lui-ban.mjs`
   severity: medium
   Đề xuất: new-contract
 
-- **rollback with BAN does not check the commit when the list cannot be read or does not hold the named deployment, yet reports success**
+- **rollback with BAN does not check the commit when the list cannot be read or does not hold the named deployment, yet reports success (r3)**
   Người dùng thấy gì: Khi lùi về một bản chỉ định mà danh sách bản của nhà cung cấp không đọc được, lệnh vẫn báo xanh mà không xác nhận tên miền đã chuyển thật. Người vận hành có thể tin nhầm rằng đã lùi xong.
   Căn cứ: Chỉ xảy ra ở đường chỉ định bản, người vận hành tự mở trang kiểm tra lại được nên ghi thành hạn chế đã biết là đủ; trùng gốc với lỗi chỉ định bản ở trên.
   file: `tools/deploy/lui-ban.mjs`
   severity: low
   Đề xuất: known-limits
 
-- **Hình dạng 3 (assert «chuỗi có mặt» khi lời hứa là QUAN HỆ) và hình dạng 4 (không có đối chứng): ở nhánh BAN của make rollback, không có phép đo nào cho thấy commit tên miền được so với commit của bản đã nêu**
+- **Hình dạng 3 (assert «chuỗi có mặt» khi lời hứa là QUAN HỆ) và hình dạng 4 (không có đối chứng): ở nhánh BAN của make rollback, không có phép đo nào cho thấy commit tên miền được so với commit của bản đã nêu (r3 · tệp đã đổi)**
   Người dùng thấy gì: Bài kiểm cho đường lùi về bản chỉ định chưa chứng minh được việc so sánh bản đang chạy với bản đã nêu, nên lỗi ở đó có thể lọt qua mà không ai biết.
   Căn cứ: Không ảnh hưởng trực tiếp người dùng cuối, chỉ làm giảm độ tin cậy của một đường phụ; ghi lại để bổ sung khi đường này được đưa vào tiêu chí.
   file: `tools/deploy/deploy.test.ts`
   severity: low
   Đề xuất: known-limits
 
-- **Kept restore drill database leaks when the restore fails, because cleanup runs only after the asserts (r2 · tệp đã đổi)**
+- **Kept restore drill database leaks when the restore fails, because cleanup runs only after the asserts (r2)**
   Người dùng thấy gì: Nếu một lần thử khôi phục thất bại, một cơ sở dữ liệu nháp có thể còn nằm lại trên máy kiểm thử mà không ai được báo. Chỉ xảy ra trên máy dev khi bài kiểm đã đỏ, không chạm bản chạy thật.
   Căn cứ: Hậu quả nhẹ: chỉ để sót một cơ sở nháp trên máy kiểm thử, không mất hay lộ dữ liệu, người làm xoá tay được, và chỉ xảy ra khi bài kiểm đã đỏ sẵn.
   file: `tests/db/sao-luu.db.test.ts`
   severity: low
   Đề xuất: wont-fix
 
-- **Shape 3 (checks that a string is present when the promise is a relation between values): the 'pinned' vercel version is never compared with the version the automated deploy uses (r2 · tệp đã đổi)**
+- **Shape 3 (checks that a string is present when the promise is a relation between values): the 'pinned' vercel version is never compared with the version the automated deploy uses (r2)**
   Người dùng thấy gì: Sổ tay có thể ghi một bản công cụ đưa bản lên khác với bản tệp tự động triển khai dùng mà không ai hay. Người vận hành làm tay khi đó có thể chạy bản khác với bản đã được thử.
   Căn cứ: Hậu quả vừa phải: lệch bản chỉ làm các bước làm tay hơi khác bản tự động, thấy ngay khi chạy và thử lại được, không mất dữ liệu; ghi thành han chế đã biết là đủ.
   file: `tests/van-hanh.test.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 5 (claims to cover a class but only tests sample cases): 'every variable the app reads' is two regex forms, and the code's own way of reading a variable by name falls outside them (r2 · tệp đã đổi)**
+- **Shape 5 (claims to cover a class but only tests sample cases): 'every variable the app reads' is two regex forms, and the code's own way of reading a variable by name falls outside them (r2)**
   Người dùng thấy gì: Một biến cấu hình mới được đọc theo cách khác có thể không được ghi vào tệp mẫu cấu hình, và bộ kiểm sẽ không báo. Người dựng môi trường mới có thể thiếu biến và chỉ biết khi máy chủ không khởi động.
   Căn cứ: Hậu quả nhẹ: hiện mọi biến đều đã có trong tệp mẫu, và nếu sót thì máy chủ báo rõ tên biến lúc khởi động nên người vận hành tự sửa được, không lộ dữ liệu.
   file: `tests/khong-khoa-bi-mat.test.ts`
   severity: low
   Đề xuất: known-limits
 
-- **Rollback falls back to the newest production deployment when the domain's health cannot be read, and that deployment may never have been promoted (r1 · tệp đã đổi)**
+- **Rollback falls back to the newest production deployment when the domain's health cannot be read, and that deployment may never have been promoted (r1)**
   Người dùng thấy gì: If the live site is down or not answering properly when someone rolls back, the tool may pick a build that is already the broken one and point the site at it again. The rollback looks successful but the site stays broken.
   Căn cứ: It hits exactly when a rollback is most needed and can leave the live site down, but nothing is lost and the operator can retry by hand; the fix needs its own design, so it belongs in a separate piece of work.
   file: `tools/deploy/lui-ban.mjs`
@@ -90,5 +112,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   file: `tools/deploy/deploy.test.ts`
   severity: low
   Đề xuất: known-limits
+
+## Chưa adversarial-verify (refuter chết)
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
