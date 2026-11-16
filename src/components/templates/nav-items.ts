@@ -19,6 +19,28 @@ export interface NavLink {
    * the entry is drawn as before.
    */
   children?: readonly NavLink[];
+  /**
+   * The open address's parameters the entry carries while its own screen is open (row 2d, VP5): every one of them rides
+   * along except those listed, and the entry's own parameters win. So a press before the page comes alive — when the
+   * browser follows the address as it is — opens what a press after it does. Absent, the address is the href alone.
+   */
+  keepAddress?: { except: readonly string[] };
+}
+
+/**
+ * The address an entry opens from the open one (`pathname`, `search`): its href, with the open address's parameters
+ * it keeps (`keepAddress`) when it points at the open screen. Elsewhere, or without `keepAddress`, the href itself.
+ */
+export function linkHref(link: NavLink, pathname: string, search: string): string {
+  if (!link.keepAddress) return link.href;
+  const url = new URL(link.href, "http://x");
+  if (url.pathname !== pathname) return link.href;
+  const dropped = new Set([...link.keepAddress.except, ...url.searchParams.keys()]);
+  const next = new URLSearchParams();
+  for (const [k, v] of new URLSearchParams(search)) if (!dropped.has(k)) next.append(k, v);
+  for (const [k, v] of url.searchParams) next.append(k, v);
+  const query = next.toString();
+  return query ? `${url.pathname}?${query}` : url.pathname;
 }
 
 /** Every entry of a list, the nested ones right after their parent, in reading order. */

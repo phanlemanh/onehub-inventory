@@ -12,6 +12,9 @@ import {
 import type { GridRow } from "@/components/candidate/data-region";
 import type { NavLink, NavSection } from "@/components/templates/app-shell";
 
+import { SEARCH_PARAM } from "./inventory-rows";
+import { SAVED_VIEW_PARAM } from "./saved-view-api";
+
 /** Where one building stands: its project and, when public, its complex (row 7d). */
 export interface BuildingPlace {
   project: string;
@@ -193,9 +196,20 @@ export function withoutPlace(filters: ColumnFilters): ColumnFilters {
   ) as ColumnFilters;
 }
 
+/**
+ * What a place does not carry over from the open inventory address (AC-5, VP5): the place itself and the top-bar
+ * search's building and project, which the place replaces, and a saved view, which a place leaves. The rest — a status
+ * shortcut, a unit code, an open record — rides along, so a press before the page comes alive keeps the other filters
+ * as a press after it does.
+ */
+const PLACE_KEEPS: NavLink["keepAddress"] = {
+  except: [GEO_PARAM, SEARCH_PARAM.building, SEARCH_PARAM.subdivision, SAVED_VIEW_PARAM],
+};
+
 const linkOf = (n: GeoNode): NavLink => ({
   href: geoHref(n.key),
   title: n.name,
+  keepAddress: PLACE_KEEPS,
   ...(n.children.length > 0 ? { children: n.children.map(linkOf) } : {}),
 });
 
@@ -211,6 +225,9 @@ export function geoSections(
   if (tree.length === 0) return [{ title: words.emptyTitle, items: [], empty: words.empty }];
   return tree.map((project) => ({
     title: project.name,
-    items: [{ href: geoHref(project.key), title: words.all }, ...project.children.map(linkOf)],
+    items: [
+      { href: geoHref(project.key), title: words.all, keepAddress: PLACE_KEEPS },
+      ...project.children.map(linkOf),
+    ],
   }));
 }

@@ -13,6 +13,7 @@ import {
 } from "../../../app/(app)/inventory-sample-rows";
 import type { GridRow } from "../../../components/candidate/data-region";
 import { filterRows, type ColumnFilters } from "../../../components/candidate/grid-view";
+import { flattenLinks, linkHref, type NavLink } from "../../../components/templates/nav-items";
 
 import {
   geoFiltersFor,
@@ -139,6 +140,57 @@ describe("tree", () => {
     ]);
     expect(p2!.items.map((i) => i.title)).toEqual(["Tất cả", E1]);
     expect(JSON.stringify(p1)).not.toMatch(/"count"/);
+  });
+});
+
+/**
+ * VP5 (AC-5): a place's address opened from `search` on the inventory keeps the other filters of the open address and
+ * names the place alone; throws «mat loc khac» when a filter is dropped, «noi lech» when the place is not its own.
+ */
+function checkPlaceAddress(link: NavLink, search: string, kept: Record<string, string>): void {
+  const url = new URL(linkHref(link, "/inventory", search), "http://x");
+  if (url.pathname !== "/inventory") throw new Error("noi lech");
+  for (const [k, v] of Object.entries(kept))
+    if (url.searchParams.get(k) !== v) throw new Error("mat loc khac");
+  const own = new URL(link.href, "http://x").searchParams.getAll("vung");
+  if (JSON.stringify(url.searchParams.getAll("vung")) !== JSON.stringify(own))
+    throw new Error("noi lech");
+  for (const gone of ["toa", "du-an", "goc-nhin"])
+    if (url.searchParams.has(gone)) throw new Error("noi lech");
+}
+
+describe("a place's address (VP5)", () => {
+  const tree = geoTree(ROWS, PLACES);
+  const links = geoSections(tree, { all: "Tất cả", emptyTitle: "", empty: "" }).flatMap((s) =>
+    flattenLinks(s.items),
+  );
+  // Everything the inventory address can hold: a status shortcut, a unit code, an open record (kept); a place, the
+  // top-bar search's building and project, a saved view (dropped).
+  const open = "status=Active&ma=S1.0301&ho-so=r1&vung=old&toa=S1.01&du-an=P&goc-nhin=v1";
+  const kept = { status: "Active", ma: "S1.0301", "ho-so": "r1" };
+
+  it("every place keeps the open address's other filters, so a press before the page comes alive keeps them", () => {
+    expect(links).toHaveLength(10);
+    for (const link of links) checkPlaceAddress(link, open, kept);
+  });
+
+  it("with nothing else open a place's address is its own; from another screen too", () => {
+    for (const link of links) {
+      expect(linkHref(link, "/inventory", "")).toBe(link.href);
+      expect(linkHref(link, "/contacts", "status=Active")).toBe(link.href);
+    }
+  });
+
+  it("an entry that does not keep the address opens its own href, as the status shortcuts do", () => {
+    const shortcut: NavLink = { href: "/inventory?status=Pending", title: "[trạng thái]" };
+    expect(linkHref(shortcut, "/inventory", open)).toBe(shortcut.href);
+  });
+
+  it("break: a place without what it keeps drops the status filter", () => {
+    const bare: NavLink = { ...links[2]!, keepAddress: undefined };
+    expect(() => checkPlaceAddress(bare, open, kept)).toThrow("mat loc khac");
+    const greedy: NavLink = { ...links[2]!, keepAddress: { except: [] } };
+    expect(() => checkPlaceAddress(greedy, open, kept)).toThrow("noi lech");
   });
 });
 
