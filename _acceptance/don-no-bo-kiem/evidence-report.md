@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: d8444a91547391b8ca0671933cd7b1cb1bb5c827
+verified_commit: fa302e8e94c40cfc7ce6e51b3d53271d13cab48a
 human_signoff: Manh Phan 2026-11-16
 ---
 
@@ -175,3 +175,7 @@ sha: 3ceeee39da0f6c5d65eeb78f6308574a8911e6c3 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 3 — 2026-11-16, do hang 22 sua bai DB cho CI (tests/db), ghim lai 1u
 run_id: repin-20261116T175753Z-34800
 sha: d8444a91547391b8ca0671933cd7b1cb1bb5c827 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)
+
+### Re-pin lần 4 — 2026-11-16, do hang 22 so ban cong cu sao luu (db/scripts, tests/db), ghim lai 1u
+run_id: repin-20261116T192708Z-87025
+sha: fa302e8e94c40cfc7ce6e51b3d53271d13cab48a · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)
