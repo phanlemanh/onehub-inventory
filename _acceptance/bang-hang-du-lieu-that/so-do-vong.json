@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "bang-hang-du-lieu-that",
-  "ghi_luc": "2026-11-16T08:47:52Z",
-  "vong_cham": 3,
+  "ghi_luc": "2026-11-16T11:26:51Z",
+  "vong_cham": 4,
   "luot": [
     {
       "vong": 1,
@@ -20,6 +20,11 @@
     },
     {
       "vong": 3,
+      "verdict": "PASS",
+      "tang": []
+    },
+    {
+      "vong": 4,
       "verdict": "PASS",
       "tang": []
     }
@@ -60,8 +65,8 @@
     "nhat": 1
   },
   "gio_may": {
-    "gio_may": 21.65,
-    "gio_cho": 8.07,
-    "phan_tram_tuan": 30.52
+    "gio_may": 23.52,
+    "gio_cho": 9.15,
+    "phan_tram_tuan": 32.12
   }
 }
