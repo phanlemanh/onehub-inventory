@@ -10,6 +10,8 @@ import { assertCardsNotTable, phoneCards, regionReady } from "./phone-list";
 import { STATUS_NEXT, readPrice, readStatusText } from "../../src/modules/listings";
 import type { ListingStandardStatus } from "../../src/generated/ontology";
 import { formatMoney, statusLabel } from "../../src/lib/format";
+import { pasteWords } from "../../src/modules/listings/ui/listing-paste-copy";
+import { cellEditLabels } from "../../src/modules/listings/ui/cell-edit-copy";
 
 const WIDE = new Set(["1024", "1440"]);
 const width = () => test.info().project.name;
@@ -468,6 +470,45 @@ test.describe("dan-tu-excel", () => {
         changeLine(page, r.id, PRICE).locator('[data-part="to"]'),
         "dong-ngan-cot-ghim: giá dán bị mất",
       ).toHaveText(money(nudged(r)));
+  });
+
+  test("khoi-qua-cot-ve-tay", async ({ page }) => {
+    at1440();
+    await openInventory(page);
+    const rows = await rowsWhere(page, 2, priced, "khoi-qua-cot-ve-tay");
+    // Row 19 draws «Về tay» right after the price and leaves it shown: a three-column block from the status lands its
+    // third cell there. The preview says that cell is worked out by the machine, and nothing is written in its place.
+    await expect(
+      page.locator('[data-slot="data-region-body"] th[data-col-id="custom.netToSeller"]'),
+    ).toHaveCount(1);
+    await select(page, rows[0]!.id, STATUS);
+    await pasteText(
+      page,
+      tsv(rows.map((r) => [statusLabel(r.status, "sale"), money(nudged(r)), "60"])),
+    );
+    await expect(preview(page)).toBeVisible();
+    const computed = pasteWords(cellEditLabels(() => "")).computed;
+    for (const r of rows) {
+      const out = preview(page).locator(
+        `[data-slot="paste-skipped"] [data-paste-line="${r.id}|custom.netToSeller"]`,
+      );
+      await expect(out, "khoi-qua-cot-ve-tay: ô rơi vào Về tay không nói lý do").toContainText(
+        computed,
+      );
+      await expect(
+        changeLine(page, r.id, "Unit.livingArea"),
+        "khoi-qua-cot-ve-tay: ô thứ ba bị ghi nhầm sang cột sau",
+      ).toHaveCount(0);
+      await expect(
+        preview(page).locator(
+          `[data-slot="paste-changes"] [data-paste-line="${r.id}|custom.netToSeller"]`,
+        ),
+        "khoi-qua-cot-ve-tay: Về tay có trong danh sách sẽ ghi",
+      ).toHaveCount(0);
+      await expect(changeLine(page, r.id, PRICE).locator('[data-part="to"]')).toHaveText(
+        money(nudged(r)),
+      );
+    }
   });
 
   test("dong-ngan-cot-an", async ({ page }) => {

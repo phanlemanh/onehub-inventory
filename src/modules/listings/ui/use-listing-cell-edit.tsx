@@ -23,7 +23,7 @@ import {
 import { priceUndoable } from "../edit-rules";
 
 import { CELL_EDIT_COPY as COPY, type CellEditLabels } from "./cell-edit-copy";
-import type { InventoryField } from "./inventory-rows";
+import { NET_TO_SELLER_FIELD, type InventoryField } from "./inventory-rows";
 import { planPaste, type PastePlan } from "./listing-paste";
 import { pasteWords } from "./listing-paste-copy";
 import {
@@ -33,6 +33,8 @@ import {
   type ListingEdit,
   type StatusAsk,
 } from "./listing-cell-edit";
+
+const PASTE_COMPUTED: readonly FieldKey[] = [NET_TO_SELLER_FIELD];
 
 /** Phones do not edit in a cell (the quick phone edit is row 3d): cells open from 768 px. */
 const WIDE = "(min-width: 768px)";
@@ -189,6 +191,8 @@ export function useListingCellEdit({
         paste,
         labels,
         (field) => headerOf?.(field) ?? headers[field as InventoryField] ?? field,
+        // Row 19's net-to-seller column is worked out from the price and the fees: a paste never writes it.
+        PASTE_COMPUTED,
       );
       setPlan({ ...plan, key: Date.now() });
     },
