@@ -376,3 +376,47 @@ describe("restore stop lines are in the runbook", () => {
     expect(restoreStopsMissing(dir)).toEqual(["một dòng dừng mới chưa có trong sổ tay"]);
   });
 });
+
+/**
+ * The pair of restore stop lines that come together when a backup is from a server of another version: the runbook's
+ * entry for «tệp sao lưu lấy bằng pg_dump bản …» must say that, together with «tệp sao lưu từ máy chủ bản …», the
+ * operator does NOT back up again (backing up again takes today's data, not the data to restore). Returns what is wrong.
+ */
+export function versionPairContradicts(root: string): string[] {
+  const doc = readFileSync(join(root, "docs/van-hanh/khoi-phuc.md"), "utf8");
+  const start = doc.indexOf("`khoi-phuc: tệp sao lưu lấy bằng pg_dump bản <a>");
+  if (start < 0) return ["no entry for «tệp sao lưu lấy bằng pg_dump bản»"];
+  const next = doc.indexOf("\n    - `khoi-phuc:", start + 1);
+  const entry = doc.slice(start, next < 0 ? undefined : next).replace(/\s+/g, " ");
+  const wrong: string[] = [];
+  if (!entry.includes("tệp sao lưu từ máy chủ bản"))
+    wrong.push("entry does not name the server-version line");
+  if (!/CÙNG LÚC[^;]*KHÔNG sao lưu lại/.test(entry))
+    wrong.push("entry does not say: together with the server-version line, do NOT back up again");
+  return wrong;
+}
+
+describe("the two version stop lines do not contradict each other in the runbook", () => {
+  it("the pg_dump line yields to the server-version line", () => {
+    expect(versionPairContradicts(ROOT)).toEqual([]);
+  });
+
+  it("break: an entry that only says «sao lưu lại» is caught", () => {
+    const dir = tempDir("cap-dong-");
+    cpSync(join(ROOT, "docs"), join(dir, "docs"), { recursive: true });
+    const p = join(dir, "docs/van-hanh/khoi-phuc.md");
+    const doc = readFileSync(p, "utf8");
+    const start = doc.indexOf("    - `khoi-phuc: tệp sao lưu lấy bằng pg_dump bản <a>");
+    const next = doc.indexOf("\n    - `khoi-phuc:", start + 1);
+    writeFileSync(
+      p,
+      doc.slice(0, start) +
+        "    - `khoi-phuc: tệp sao lưu lấy bằng pg_dump bản <a>, máy chủ khôi phục bản <b>` — sao lưu lại." +
+        doc.slice(next),
+    );
+    expect(versionPairContradicts(dir)).toEqual([
+      "entry does not name the server-version line",
+      "entry does not say: together with the server-version line, do NOT back up again",
+    ]);
+  });
+});

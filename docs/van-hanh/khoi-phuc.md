@@ -24,8 +24,8 @@ sở nháp, đếm dòng từng bảng và chạy bộ kiểm cách ly trên b�
   - **Đỏ thì:** `command not found` — chưa cài hoặc chưa vào `PATH` (brew in sẵn dòng thêm `PATH`); số khác bản máy chủ
     — cài đúng bản đó. Quên kiểm thì `make sao-luu` và `make khoi-phuc-thu` tự dừng trước khi ghi hay tạo gì, với một
     dòng như `pg_dump bản 18, máy chủ bản 17 — dùng công cụ cùng bản với máy chủ`. Cùng kiểu đó: dòng
-    `pg_restore bản …` — sửa như trên; dòng `tệp sao lưu lấy bằng pg_dump …` — tệp do công cụ khác bản làm ra, sao lưu
-    lại. Máy chỉ có Docker thì đặt `PSQL_DICH`, `PG_DUMP_CMD`, `PG_RESTORE_CMD` thành lệnh chạy qua Docker với ảnh
+    `pg_restore bản …` — sửa như trên; dòng `tệp sao lưu lấy bằng pg_dump …` — xem bảng «Đỏ thì» của bước 4 (sao lưu lại hay không tuỳ dòng đi
+    kèm). Máy chỉ có Docker thì đặt `PSQL_DICH`, `PG_DUMP_CMD`, `PG_RESTORE_CMD` thành lệnh chạy qua Docker với ảnh
     `postgres:<bản của máy chủ>`.
 - Một thư mục **ngoài kho** để giữ tệp sao lưu: tệp có dữ liệu thật; lệnh từ chối ghi vào trong kho.
 - Tệp biến ngoài kho của bản thử, quyền chỉ chủ đọc, có:
@@ -80,8 +80,14 @@ sở nháp, đếm dòng từng bảng và chạy bộ kiểm cách ly trên b�
   - Lệnh dừng trước khi tạo cơ sở nháp khi bản không khớp (không có gì bị ghi):
     - `khoi-phuc: pg_restore bản <a>, máy chủ khôi phục bản <b>` — cài `pg_restore` cùng bản chính với máy chủ (xem «Cần có
       trước»), chạy lại bước 4.
-    - `khoi-phuc: tệp sao lưu lấy bằng pg_dump bản <a>, máy chủ khôi phục bản <b>` hay `tệp sao lưu lấy bằng pg_dump mới
-hơn bản <b>` — tệp lấy bằng công cụ khác bản: cài công cụ cùng bản rồi làm lại từ bước 3 (sao lưu lại).
+    - `khoi-phuc: tệp sao lưu lấy bằng pg_dump bản <a>, máy chủ khôi phục bản <b>`:
+      - nếu **CÙNG LÚC** có dòng `tệp sao lưu từ máy chủ bản …` — **KHÔNG sao lưu lại**: theo dòng ấy (khôi phục vào một
+        máy chủ cùng bản với tệp, mục dưới);
+      - chỉ khi dòng này **đứng MỘT MÌNH** (tệp lấy từ máy chủ cùng bản nhưng bằng công cụ khác bản) — cài công cụ cùng
+        bản rồi làm lại từ bước 3 (sao lưu lại).
+    - `khoi-phuc: tệp sao lưu lấy bằng pg_dump mới hơn bản <b>` — `make sao-luu` luôn dùng công cụ cùng bản với máy chủ
+      nguồn, nên tệp đến từ một máy chủ mới hơn máy chủ đang khôi phục vào: **KHÔNG sao lưu lại**, khôi phục vào một máy
+      chủ cùng bản với tệp.
     - `khoi-phuc: tệp sao lưu từ máy chủ bản <a>, máy chủ khôi phục bản <b>` — tệp lấy từ một máy chủ khác bản với máy chủ
       đang khôi phục vào: **khôi phục vào một máy chủ CÙNG bản với tệp, KHÔNG sao lưu lại** (sao lưu lại sẽ lấy dữ liệu
       hiện tại, không phải dữ liệu cần khôi phục). Bản của máy chủ ở Supabase › Project Settings › Infrastructure.
