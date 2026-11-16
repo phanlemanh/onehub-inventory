@@ -164,6 +164,25 @@ export function cellProblems(files, rule, skip = []) {
   return found.length > 0 ? `${found.slice(0, 5).join("; ")}: ${from}` : null;
 }
 
+// The column types file this tool writes in the repository at `root`, as it would write it now:
+// `{ file, content, data }`, `{ file, problem }` when the table it is written from cannot be used,
+// or null when no check of this tool names the file there. Nothing is written: an upgrade's
+// preview asks this.
+export function regenerated(root) {
+  const themeText = read(root, "design/theme.json");
+  const theme = themeText === null ? null : JSON.parse(themeText);
+  const named = Object.values(theme?.checks ?? {})
+    .flat()
+    .some((check) => check.kind === "columns" && check.file === COLUMNS_FILE);
+  if (!named) return null;
+  const typesText = read(root, TYPES_FILE);
+  const displays = readDisplays(root);
+  const problem = typesProblem(typesText, displays);
+  if (problem) return { file: COLUMNS_FILE, problem };
+  const data = buildColumns(JSON.parse(typesText), displays);
+  return { file: COLUMNS_FILE, content: renderJson(data, lineWidth(root)), data };
+}
+
 function main() {
   const args = argv.slice(2);
   const at = args.indexOf("--target");
