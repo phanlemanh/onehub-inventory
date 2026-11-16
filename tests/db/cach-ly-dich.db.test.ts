@@ -6,11 +6,11 @@
 //      cluster, so a database of ANY name that appears or goes is the script's doing (rounds 1 and 2 of E7 went red
 //      falsely on lane K's shared cluster, where other suites make and drop scratch databases).
 //   2. A copy of the script that makes a database `la_<pid>` turns the same measure red, naming it.
-//   3. Three break copies, each on its own scratch database on this lane's Postgres (lane K): a company table without
+//   3. Three break copies, each on its own scratch database on this lane's Postgres (lane K; the CI cluster under `make ci-db`): a company table without
 //      forced row level security, `anon` granted select, the login role made owner of a table. Each one turns the
 //      script red with its pinned line naming the table.
-// The script reaches Postgres through psql inside a container, so the addresses are the container's own
-// (127.0.0.1:5432, trust) and carry no password.
+// On the file's own cluster the script reaches Postgres through psql inside that cluster's container (127.0.0.1:5432,
+// trust). The break copies use ./may-khach-pg.ts: the lane's container on a lane, the CI cluster under `make ci-db`.
 import { spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -21,12 +21,12 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { tempDir } from "../support/temp-dir";
 import { LOGIN_ROLE, scratchDb, type ScratchDb } from "./helpers";
+import { pgClient, type PgClient } from "./may-khach-pg";
 import { startOwnCluster, type OwnCluster } from "./rieng-cum";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const SCRIPT = join(ROOT, "db/scripts/cach-ly-dich.sh");
-const LANE = process.env["DB_LANE"] ?? "k";
-const LANE_PSQL = `docker exec -i onehub-inventory-db-${LANE} psql`;
+const PG = pgClient("k");
 /** The case list written at the top of the script. */
 const CASES = [
   "bang-cong-ty-ep-luat-dong",
@@ -36,17 +36,29 @@ const CASES = [
 ];
 const SEED = readFileSync(join(ROOT, "db/tests/vai-dang-nhap-mau.sql"), "utf8");
 
+/** The cluster's own container, reached from inside it (127.0.0.1:5432, trust). */
+function inside(cluster: OwnCluster): PgClient {
+  const url = (role: string, db: string) => `postgres://${role}@127.0.0.1:5432/${db}`;
+  return {
+    psql: cluster.psqlInside,
+    pgDump: "",
+    pgRestore: "",
+    ownerUrl: (db) => url("postgres", db),
+    loginUrl: (db) => url(LOGIN_ROLE, db),
+  };
+}
+
 function run(
   db: string,
-  psql: string,
+  pgc: PgClient,
   script = SCRIPT,
 ): { code: number | null; out: string; err: string } {
   const r = spawnSync("bash", [script], {
     env: {
       ...process.env,
-      PSQL_DICH: psql,
-      MIGRATE_DATABASE_URL: `postgres://postgres@127.0.0.1:5432/${db}`,
-      LOGIN_DATABASE_URL: `postgres://${LOGIN_ROLE}@127.0.0.1:5432/${db}`,
+      PSQL_DICH: pgc.psql,
+      MIGRATE_DATABASE_URL: pgc.ownerUrl(db),
+      LOGIN_DATABASE_URL: pgc.loginUrl(db),
     },
     encoding: "utf8",
   });
@@ -132,7 +144,7 @@ describe("cach-ly-dich trên cụm Postgres riêng của tệp này", () => {
     const before = await snapshot(owner!);
     expect(Object.values(before.rows).some((n) => n > 0)).toBe(true);
     expect(before.databases).toContain(TARGET);
-    const r = run(TARGET, cluster!.psqlInside);
+    const r = run(TARGET, inside(cluster!));
     const after = await snapshot(owner!);
 
     expect(r.err).toBe("");
@@ -161,7 +173,7 @@ describe("cach-ly-dich trên cụm Postgres riêng của tệp này", () => {
     );
     const before = await snapshot(owner!);
     try {
-      run(TARGET, cluster!.psqlInside, copy);
+      run(TARGET, inside(cluster!), copy);
       const after = await snapshot(owner!);
       expect(databasesChanged(before.databases, after.databases)).toEqual([
         `co so du lieu moi: ${odd}`,
@@ -226,7 +238,7 @@ describe("cach-ly-dich trên bản phá", () => {
       const db = await seeded(`pha_${b.name}`);
       try {
         await b.sql(db.owner);
-        const r = run(db.name, LANE_PSQL);
+        const r = run(db.name, PG);
         expect(r.code).not.toBe(0);
         expect(r.out.split("\n")).toContain(b.pinned);
         expect(r.err).toMatch(/^cach-ly-dich: \d\/4 ca đạt — chưa đạt: /m);

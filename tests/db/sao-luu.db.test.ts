@@ -5,8 +5,8 @@
 //      scratch database: every table has the source's row count, cach-ly-dich passes on the restored copy, the last line
 //      matches the format written in docs/van-hanh/nhat-ky-khoi-phuc.md, and the scratch database is dropped.
 //   3. Break: a backup that lost one table (pg_dump -T) → red, naming the table.
-// The scripts reach Postgres through psql, pg_dump and pg_restore inside the lane's container, so the addresses are the
-// container's own (127.0.0.1:5432, trust) and carry no password.
+// The scripts reach Postgres through psql, pg_dump and pg_restore chosen by ./may-khach-pg.ts: inside the lane's
+// container on a lane (127.0.0.1:5432, trust), the CI cluster over TCP with its password under `make ci-db`.
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -16,15 +16,14 @@ import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { tempDir } from "../support/temp-dir";
-import { LOGIN_ROLE, scratchDb, seed, type ScratchDb } from "./helpers";
+import { scratchDb, seed, type ScratchDb } from "./helpers";
+import { pgClient } from "./may-khach-pg";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const BACKUP = join(ROOT, "db/scripts/sao-luu.sh");
 const RESTORE = join(ROOT, "db/scripts/khoi-phuc-thu.sh");
 const LOG_PAGE = join(ROOT, "docs/van-hanh/nhat-ky-khoi-phuc.md");
-const LANE = process.env["DB_LANE"] ?? "k";
-const CONTAINER = `onehub-inventory-db-${LANE}`;
-const IN_CONTAINER = "postgres://postgres@127.0.0.1:5432";
+const PG = pgClient("k");
 const SEED = readFileSync(join(ROOT, "db/tests/vai-dang-nhap-mau.sql"), "utf8");
 
 type Run = { code: number | null; out: string; err: string };
@@ -33,9 +32,9 @@ function backup(db: string, file: string, extra: Record<string, string> = {}): R
   const r = spawnSync("bash", [BACKUP, file], {
     env: {
       ...process.env,
-      PSQL_DICH: `docker exec -i ${CONTAINER} psql`,
-      PG_DUMP_CMD: `docker exec -i ${CONTAINER} pg_dump`,
-      MIGRATE_DATABASE_URL: `${IN_CONTAINER}/${db}`,
+      PSQL_DICH: PG.psql,
+      PG_DUMP_CMD: PG.pgDump,
+      MIGRATE_DATABASE_URL: PG.ownerUrl(db),
       ...extra,
     },
     encoding: "utf8",
@@ -47,10 +46,10 @@ function restore(file: string, extra: Record<string, string> = {}): Run {
   const r = spawnSync("bash", [RESTORE, file], {
     env: {
       ...process.env,
-      PSQL_DICH: `docker exec -i ${CONTAINER} psql`,
-      PG_RESTORE_CMD: `docker exec -i ${CONTAINER} pg_restore`,
-      KHOI_PHUC_ADMIN_URL: `${IN_CONTAINER}/postgres`,
-      KHOI_PHUC_LOGIN_URL: `postgres://${LOGIN_ROLE}@127.0.0.1:5432/postgres`,
+      PSQL_DICH: PG.psql,
+      PG_RESTORE_CMD: PG.pgRestore,
+      KHOI_PHUC_ADMIN_URL: PG.ownerUrl("postgres"),
+      KHOI_PHUC_LOGIN_URL: PG.loginUrl("postgres"),
       KHOI_PHUC_GIU: "",
       ...extra,
     },
