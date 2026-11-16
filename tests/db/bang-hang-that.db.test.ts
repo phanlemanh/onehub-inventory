@@ -1,6 +1,8 @@
 // Row 10 (bang-hang-du-lieu-that), evals E2, E4, E4b, E5, E5b, E6, E6b, E7, E7b, E10 at the API and in the database: the
 // inventory read and PATCH /api/v1/listings/[id] through the identity module's door, withCompany, under the API role, on
 // this lane's Postgres. Company A holds the people of the permission-table world (LA, BA, TL, CA); Y is admin of B.
+import { isDeepStrictEqual } from "node:util";
+
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { sampleCatalog } from "@/modules/catalog";
@@ -16,6 +18,8 @@ import { createListingsHandlers } from "@/modules/listings/listings-http";
 import { inventoryThrough } from "@/modules/listings/server";
 
 import { asPerson, dropWorld, world, type Person, type World } from "./bang-quyen-world";
+import { sampleInventoryData } from "@/app/(app)/inventory-sample-data";
+
 import { seedSampleInventory } from "./can-mau";
 
 // The catalog's server door is imported by the read; outside Next.js its "server-only" guard has nothing to guard.
@@ -160,6 +164,26 @@ describe("doc-dung-san (E2)", () => {
     expect(ofA.current.every((l) => l.buildingName !== "" && l.unitNumber)).toBe(true);
     const kinds = new Set(Object.values(ofA.keepers).map((k) => k?.kind ?? "none"));
     expect([...kinds].sort()).toEqual(["none", "other", "viewer"]);
+    // Every listing reads back as the sample wrote it: status, price, fee inclusion and own fields, unit by unit.
+    const sample = sampleInventoryData();
+    const byId = new Map([...ofA.current, ...ofA.earlier].map((l) => [l.id, l]));
+    const differ = [...sample.current, ...sample.earlier].flatMap((l) => {
+      const got = byId.get(a.idOf(l.id));
+      const want = {
+        standardStatus: l.standardStatus,
+        listPrice: l.listPrice,
+        feeInclusion: l.feeInclusion,
+        customFields: l.customFields ?? {},
+      };
+      const have = got && {
+        standardStatus: got.standardStatus,
+        listPrice: got.listPrice,
+        feeInclusion: got.feeInclusion,
+        customFields: got.customFields,
+      };
+      return isDeepStrictEqual(have, want) ? [] : [`doc-dung-san: ${l.id}`];
+    });
+    expect(differ).toEqual([]);
     // Custom fields and the fee inclusion are read as stored.
     expect(ofA.current.some((l) => l.feeInclusion === "Excluded")).toBe(true);
     expect(ofA.current.some((l) => (l.customFields as Record<string, unknown>)["huong_view"])).toBe(
@@ -416,29 +440,35 @@ describe("cach-ly-hai-bang (E1b)", () => {
 /** Three writes that break a rule of the data, written as the table owner: each refused by the table itself. */
 async function dataRules(w: World, upi: string): Promise<string[]> {
   const out: string[] = [];
-  const refused = async (label: string, sql: string, values: unknown[]) => {
+  // Refused by the rule named, not by anything else: the error must carry that constraint's name.
+  const refused = async (label: string, rule: string, sql: string, values: unknown[]) => {
     await w.db.owner.query("begin");
     try {
       await w.db.owner.query(sql, values);
       out.push(`luat-du-lieu-ba-ca: ${label}`);
-    } catch {
-      // refused, as it should be
+    } catch (err) {
+      const got = (err as { constraint?: string }).constraint;
+      if (got !== rule)
+        out.push(`luat-du-lieu-ba-ca: ${label} (lỗi khác: ${got ?? (err as Error).message})`);
     } finally {
       await w.db.owner.query("rollback");
     }
   };
   await refused(
     "Closed thiếu giá chốt",
+    "listings_closed_needs_price_and_date",
     "insert into listings (id, company_id, standard_status, close_date) values ($1, $2, 'Closed', '2026-11-01')",
     [crypto.randomUUID(), w.A],
   );
   await refused(
     "Withdrawn thiếu lý do",
+    "listings_withdrawn_needs_reason",
     "insert into listings (id, company_id, standard_status) values ($1, $2, 'Withdrawn')",
     [crypto.randomUUID(), w.A],
   );
   await refused(
     "căn thứ hai đang mở",
+    "listing_units_one_open",
     "with l as (insert into listings (id, company_id, standard_status) values ($1, $2, 'Incomplete') returning id) " +
       "insert into listing_units (listing_id, company_id, upi, open) select id, $2, $3, true from l",
     [crypto.randomUUID(), w.A, upi],

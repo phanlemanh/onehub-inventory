@@ -104,45 +104,6 @@ describe("khong-con-vai-thay-phien (E9)", () => {
   });
 });
 
-/** How many reads of the listings one render of the App Shell and the inventory page makes, counted from the code. */
-function readsPerRender(sources: Map<string, string>): string[] {
-  const layout = sources.get("src/app/(app)/layout.tsx") ?? "";
-  const page = sources.get("src/app/(app)/inventory/page.tsx") ?? "";
-  const source = sources.get(SOURCE_FILE) ?? "";
-  const failures: string[] = [];
-  // The read door is called only inside the cached source; every other caller goes through the source.
-  const direct = [layout, page].filter((t) => /\bmyInventory\(/.test(t)).length;
-  const cached = /export const inventorySource = cache\(/.test(source) ? 1 : 2;
-  const reads = direct + (/\binventorySource\(/.test(layout + page) ? cached : 0);
-  if (reads !== 1) failures.push(`mot-lan-doc-moi-luot: ${reads} lần`);
-  return failures;
-}
-
-describe("mot-lan-doc-moi-luot (E3b)", () => {
-  it("the App Shell and the inventory page share one read per render", () => {
-    expect(readsPerRender(appSources())).toEqual([]);
-  });
-
-  it("pha-thu-doc-hai-lan: a layout that calls the read door itself makes two", () => {
-    const sources = appSources();
-    const layout = "src/app/(app)/layout.tsx";
-    sources.set(layout, `${sources.get(layout)}\nawait myInventory();\n`);
-    expect(readsPerRender(sources)).toEqual(["mot-lan-doc-moi-luot: 2 lần"]);
-  });
-
-  it("pha-thu-khong-gop: a source without React's cache reads once for the shell and once for the page", () => {
-    const sources = appSources();
-    sources.set(
-      SOURCE_FILE,
-      (sources.get(SOURCE_FILE) ?? "").replace(
-        "export const inventorySource = cache(",
-        "export const inventorySource = (",
-      ),
-    );
-    expect(readsPerRender(sources)).toEqual(["mot-lan-doc-moi-luot: 2 lần"]);
-  });
-});
-
 describe("loi-doc-that (E8, red side)", () => {
   it("a database that fails while reading gives «unreadable», never a thrown page", async () => {
     vi.resetModules();

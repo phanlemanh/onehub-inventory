@@ -308,7 +308,10 @@ test("chuot-giua-the-moi: a middle click on a tree entry opens a new tab and lea
     .click({ button: "middle" });
   const tab = await opened;
   await tab.waitForLoadState();
-  expect(tab.url()).not.toBe(before);
+  // The new tab opens the entry's own address: the grid filtered to that building; this tab stays where it was.
+  const opens = new URL(tab.url());
+  expect(opens.pathname).toBe("/inventory");
+  expect(opens.searchParams.get("vung") ?? "").toContain(building);
   expect(page.url()).toBe(before);
 });
 
@@ -478,7 +481,10 @@ test("dieu-kien-phi-tren-o: Bao phí → Không bao phí is saved, the net to se
   await page.keyboard.press("F2");
   await editor(page).locator('[data-fee-option="Excluded"]').click();
   await expect.poll(async () => (await rowOf(id)).fee_inclusion).toBe("Excluded");
-  await expect.poll(async () => (await net.innerText()).trim()).not.toBe(netBefore);
+  // Không bao phí: the seller nets the whole list price (netToSeller), so the cell reads the price of the row.
+  const price = (await cellOf(page, unit, PRICE).innerText()).trim();
+  expect(netBefore).not.toBe(price);
+  await expect.poll(async () => (await net.innerText()).trim()).toBe(price);
   await openInventory(page);
   expect((await rowOf(id)).fee_inclusion).toBe("Excluded");
 });
@@ -621,13 +627,19 @@ test("cuon-nam-nghin: an inventory of 5,000 listings scrolls to its last row wit
   const viewport = page
     .locator('[data-slot="data-region-body"] [data-slot="scroll-area-viewport"]')
     .first();
+  // The grid's first order is by project, then by unit (UPI as text): the last row is the unit whose UPI sorts last.
+  const upis = Array.from({ length: 5000 }, (_, i) => `upi-${slug}-${i + 1}`).sort();
+  const firstCode = `L-${upis[0]!.split("-").at(-1)}`;
+  const lastCode = `L-${upis.at(-1)!.split("-").at(-1)}`;
+  expect(await rowCount(page)).toBe(5000);
+  expect(await shownCodes(page)).toContain(firstCode);
   await viewport.evaluate((el) => el.scrollTo(0, el.scrollHeight));
+  // At the end: the last row is drawn and the first is no longer (the body is virtual, so only rows in view are).
   await expect
-    .poll(
-      async () =>
-        (await shownCodes(page)).includes("L-5000") ||
-        (await shownCodes(page)).some((c) => c.startsWith("L-")),
-    )
+    .poll(async () => {
+      const codes = await shownCodes(page);
+      return codes.includes(lastCode) && !codes.includes(firstCode);
+    })
     .toBe(true);
   expect(errors).toEqual([]);
 });
