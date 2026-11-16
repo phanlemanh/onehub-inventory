@@ -1,0 +1,654 @@
+{
+  "E14-phan-khu-1440-sang": {
+    "url": "http://127.0.0.1:4844/inventory?vung=Vinhomes+Ocean+Park+1%E2%80%BAThe+Sapphire+1",
+    "groups": [
+      "Bảng hàng",
+      "Theo trạng thái",
+      "Vinhomes Ocean Park 1",
+      "Vinhomes Ocean Park 2 – The Empire",
+      "Vinhomes Ocean Park 3 – The Crown",
+      "Góc nhìn của tôi"
+    ],
+    "entries": [
+      "Tất cả hàng",
+      "Chưa đủ để rao",
+      "Đang bán",
+      "Đang giao dịch",
+      "Đã bán",
+      "Tạm ngừng",
+      "Ngừng hẳn",
+      "Tất cả",
+      "The Sapphire 1",
+      "S1.01",
+      "S1.02",
+      "S1.03",
+      "S1.05",
+      "Tất cả",
+      "[MAU] Toà E1",
+      "Tất cả",
+      "[MAU] Toà C1"
+    ],
+    "lit": [
+      "The Sapphire 1"
+    ],
+    "footer": [
+      "36 / 60 dòng"
+    ],
+    "filterCells": [
+      {
+        "text": "",
+        "title": "Bỏ ghim Căn"
+      },
+      {
+        "text": "",
+        "title": "Bỏ ghim Toà"
+      },
+      {
+        "text": "",
+        "title": "S1.01, S1.02, S1.03, S1.05"
+      },
+      {
+        "text": "",
+        "title": "Vinhomes Ocean Park 1"
+      },
+      {
+        "text": "0905",
+        "title": "0905"
+      },
+      {
+        "text": "S1.01",
+        "title": "S1.01"
+      },
+      {
+        "text": "Vinhomes Ocean Park 1",
+        "title": "Vinhomes Ocean Park 1"
+      },
+      {
+        "text": "1101",
+        "title": "1101"
+      },
+      {
+        "text": "S1.01",
+        "title": "S1.01"
+      },
+      {
+        "text": "Vinhomes Ocean Park 1",
+        "title": "Vinhomes Ocean Park 1"
+      },
+      {
+        "text": "1202",
+        "title": "1202"
+      },
+      {
+        "text": "S1.01",
+        "title": "S1.01"
+      }
+    ]
+  },
+  "filter-titles-1440": [
+    {
+      "text": "",
+      "title": "S1.01, S1.02, S1.03, S1.05"
+    },
+    {
+      "text": "",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.01",
+      "title": "S1.01"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.01",
+      "title": "S1.01"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.01",
+      "title": "S1.01"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.01",
+      "title": "S1.01"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.01",
+      "title": "S1.01"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.01",
+      "title": "S1.01"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.02",
+      "title": "S1.02"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.02",
+      "title": "S1.02"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.02",
+      "title": "S1.02"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.02",
+      "title": "S1.02"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.02",
+      "title": "S1.02"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.02",
+      "title": "S1.02"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.02",
+      "title": "S1.02"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.02",
+      "title": "S1.02"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.02",
+      "title": "S1.02"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.03",
+      "title": "S1.03"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.03",
+      "title": "S1.03"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.03",
+      "title": "S1.03"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.03",
+      "title": "S1.03"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.03",
+      "title": "S1.03"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.03",
+      "title": "S1.03"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.03",
+      "title": "S1.03"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.03",
+      "title": "S1.03"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.03",
+      "title": "S1.03"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.03",
+      "title": "S1.03"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.05",
+      "title": "S1.05"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    },
+    {
+      "text": "S1.05",
+      "title": "S1.05"
+    },
+    {
+      "text": "Vinhomes Ocean Park 1",
+      "title": "Vinhomes Ocean Park 1"
+    }
+  ],
+  "E14-phan-khu-1440-toi": {
+    "url": "http://127.0.0.1:4844/inventory?vung=Vinhomes+Ocean+Park+1%E2%80%BAThe+Sapphire+1",
+    "groups": [
+      "Bảng hàng",
+      "Theo trạng thái",
+      "Vinhomes Ocean Park 1",
+      "Vinhomes Ocean Park 2 – The Empire",
+      "Vinhomes Ocean Park 3 – The Crown",
+      "Góc nhìn của tôi"
+    ],
+    "entries": [
+      "Tất cả hàng",
+      "Chưa đủ để rao",
+      "Đang bán",
+      "Đang giao dịch",
+      "Đã bán",
+      "Tạm ngừng",
+      "Ngừng hẳn",
+      "Tất cả",
+      "The Sapphire 1",
+      "S1.01",
+      "S1.02",
+      "S1.03",
+      "S1.05",
+      "Tất cả",
+      "[MAU] Toà E1",
+      "Tất cả",
+      "[MAU] Toà C1"
+    ],
+    "lit": [
+      "The Sapphire 1"
+    ],
+    "footer": [
+      "36 / 60 dòng"
+    ],
+    "filterCells": [
+      {
+        "text": "",
+        "title": "Bỏ ghim Căn"
+      },
+      {
+        "text": "",
+        "title": "Bỏ ghim Toà"
+      },
+      {
+        "text": "",
+        "title": "S1.01, S1.02, S1.03, S1.05"
+      },
+      {
+        "text": "",
+        "title": "Vinhomes Ocean Park 1"
+      },
+      {
+        "text": "0905",
+        "title": "0905"
+      },
+      {
+        "text": "S1.01",
+        "title": "S1.01"
+      },
+      {
+        "text": "Vinhomes Ocean Park 1",
+        "title": "Vinhomes Ocean Park 1"
+      },
+      {
+        "text": "1101",
+        "title": "1101"
+      },
+      {
+        "text": "S1.01",
+        "title": "S1.01"
+      },
+      {
+        "text": "Vinhomes Ocean Park 1",
+        "title": "Vinhomes Ocean Park 1"
+      },
+      {
+        "text": "1202",
+        "title": "1202"
+      },
+      {
+        "text": "S1.01",
+        "title": "S1.01"
+      }
+    ]
+  },
+  "E14-ngan-360-sang": {
+    "url": "http://127.0.0.1:4844/inventory",
+    "groups": [
+      "Bảng hàng",
+      "Theo trạng thái",
+      "Vinhomes Ocean Park 1",
+      "Vinhomes Ocean Park 2 – The Empire",
+      "Vinhomes Ocean Park 3 – The Crown",
+      "Góc nhìn của tôi"
+    ],
+    "entries": [
+      "Hôm nay",
+      "Bảng hàng",
+      "Đã gửi",
+      "Tuỳ chỉnh của sàn",
+      "Tất cả hàng",
+      "Chưa đủ để rao",
+      "Đang bán",
+      "Đang giao dịch",
+      "Đã bán",
+      "Tạm ngừng",
+      "Ngừng hẳn",
+      "Tất cả",
+      "The Sapphire 1",
+      "S1.01",
+      "S1.02",
+      "S1.03",
+      "S1.05",
+      "Tất cả",
+      "[MAU] Toà E1",
+      "Tất cả",
+      "[MAU] Toà C1"
+    ],
+    "lit": [
+      "Tất cả hàng"
+    ],
+    "footer": [
+      "60 dòng"
+    ],
+    "filterCells": []
+  },
+  "E14-toa-360-sang": {
+    "url": "http://127.0.0.1:4844/inventory?vung=Vinhomes+Ocean+Park+2+%E2%80%93+The+Empire%E2%80%BA%E2%80%BA%5BMAU%5D+To%C3%A0+E1",
+    "groups": [
+      "Bảng hàng",
+      "Theo trạng thái",
+      "Vinhomes Ocean Park 1",
+      "Vinhomes Ocean Park 2 – The Empire",
+      "Vinhomes Ocean Park 3 – The Crown",
+      "Góc nhìn của tôi"
+    ],
+    "entries": [
+      "Tất cả hàng",
+      "Chưa đủ để rao",
+      "Đang bán",
+      "Đang giao dịch",
+      "Đã bán",
+      "Tạm ngừng",
+      "Ngừng hẳn",
+      "Tất cả",
+      "The Sapphire 1",
+      "S1.01",
+      "S1.02",
+      "S1.03",
+      "S1.05",
+      "Tất cả",
+      "[MAU] Toà E1",
+      "Tất cả",
+      "[MAU] Toà C1"
+    ],
+    "lit": [
+      "[MAU] Toà E1"
+    ],
+    "footer": [
+      "12 / 60 dòng"
+    ],
+    "filterCells": []
+  },
+  "E14-sent-1440-sang": {
+    "url": "http://127.0.0.1:4844/sent",
+    "groups": [
+      "Đã gửi"
+    ],
+    "entries": [
+      "Tất cả link"
+    ],
+    "lit": [
+      "Tất cả link"
+    ],
+    "footer": [
+      "14 dòng"
+    ],
+    "filterCells": [
+      {
+        "text": "",
+        "title": "Bỏ ghim Người nhận"
+      },
+      {
+        "text": "",
+        "title": "Bỏ ghim Lượt mở"
+      },
+      {
+        "text": "[Tên] Khách 01",
+        "title": "[Tên] Khách 01"
+      },
+      {
+        "text": "[Tên] Khách 02",
+        "title": "[Tên] Khách 02"
+      },
+      {
+        "text": "[Tên] Khách 03 — anh chị cần căn hai phòng ngủ gần trường quốc tế, xem cuối tuần",
+        "title": "[Tên] Khách 03 — anh chị cần căn hai phòng ngủ gần trường quốc tế, xem cuối tuần"
+      },
+      {
+        "text": "[Tên] Khách 04",
+        "title": "[Tên] Khách 04"
+      },
+      {
+        "text": "[Tên] Khách 05",
+        "title": "[Tên] Khách 05"
+      },
+      {
+        "text": "[Tên] Khách 06",
+        "title": "[Tên] Khách 06"
+      },
+      {
+        "text": "[Tên] Khách 07",
+        "title": "[Tên] Khách 07"
+      },
+      {
+        "text": "[Tên] Khách 08",
+        "title": "[Tên] Khách 08"
+      },
+      {
+        "text": "[Tên] Khách 09",
+        "title": "[Tên] Khách 09"
+      },
+      {
+        "text": "[Tên] Khách 10",
+        "title": "[Tên] Khách 10"
+      }
+    ]
+  },
+  "E14-sent-360-sang": {
+    "url": "http://127.0.0.1:4844/sent",
+    "groups": [
+      "Đã gửi"
+    ],
+    "entries": [
+      "Hôm nay",
+      "Bảng hàng",
+      "Đã gửi",
+      "Tuỳ chỉnh của sàn",
+      "Tất cả link"
+    ],
+    "lit": [
+      "Tất cả link"
+    ],
+    "footer": [
+      "14 dòng"
+    ],
+    "filterCells": [
+      {
+        "text": "",
+        "title": "Bỏ ghim Người nhận"
+      },
+      {
+        "text": "",
+        "title": "Bỏ ghim Lượt mở"
+      },
+      {
+        "text": "[Tên] Khách 01",
+        "title": "[Tên] Khách 01"
+      },
+      {
+        "text": "[Tên] Khách 02",
+        "title": "[Tên] Khách 02"
+      },
+      {
+        "text": "[Tên] Khách 03 — anh chị cần căn hai phòng ngủ gần trường quốc tế, xem cuối tuần",
+        "title": "[Tên] Khách 03 — anh chị cần căn hai phòng ngủ gần trường quốc tế, xem cuối tuần"
+      },
+      {
+        "text": "[Tên] Khách 04",
+        "title": "[Tên] Khách 04"
+      },
+      {
+        "text": "[Tên] Khách 05",
+        "title": "[Tên] Khách 05"
+      },
+      {
+        "text": "[Tên] Khách 06",
+        "title": "[Tên] Khách 06"
+      },
+      {
+        "text": "[Tên] Khách 07",
+        "title": "[Tên] Khách 07"
+      },
+      {
+        "text": "[Tên] Khách 08",
+        "title": "[Tên] Khách 08"
+      },
+      {
+        "text": "[Tên] Khách 09",
+        "title": "[Tên] Khách 09"
+      },
+      {
+        "text": "[Tên] Khách 10",
+        "title": "[Tên] Khách 10"
+      }
+    ]
+  },
+  "E14-tuy-chinh-1440-sang": {
+    "url": "http://127.0.0.1:4844/tuy-chinh-san",
+    "groups": [
+      "Tuỳ chỉnh của sàn"
+    ],
+    "entries": [
+      "Nhãn riêng",
+      "Trường riêng",
+      "Từ điển giá trị",
+      "Căn chờ khớp",
+      "Mẫu nhập",
+      "Thuế phí"
+    ],
+    "lit": [
+      "Nhãn riêng"
+    ],
+    "footer": [],
+    "filterCells": []
+  },
+  "E14-tuy-chinh-360-sang": {
+    "url": "http://127.0.0.1:4844/tuy-chinh-san",
+    "groups": [
+      "Tuỳ chỉnh của sàn"
+    ],
+    "entries": [
+      "Hôm nay",
+      "Bảng hàng",
+      "Đã gửi",
+      "Tuỳ chỉnh của sàn",
+      "Nhãn riêng",
+      "Trường riêng",
+      "Từ điển giá trị",
+      "Căn chờ khớp",
+      "Mẫu nhập",
+      "Thuế phí"
+    ],
+    "lit": [
+      "Nhãn riêng"
+    ],
+    "footer": [],
+    "filterCells": []
+  }
+}

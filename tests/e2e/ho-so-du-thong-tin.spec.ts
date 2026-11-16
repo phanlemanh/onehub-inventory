@@ -16,6 +16,7 @@ import {
   buildSampleListings,
   sampleEarlierListings,
 } from "../../src/modules/listings/sample";
+import { suaTrang } from "./sua-trang";
 
 const URL = "/inventory";
 const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
@@ -157,7 +158,7 @@ test.describe("E7 · every listing of the unit, newest first", () => {
     await panel(page).getByRole("button", { name: "Sau" }).click();
     await expect(panel(page)).not.toHaveAttribute("data-record-id", THREE);
     // Mark the oldest line as the one in view and show the note, the way a record that kept the choice would.
-    await record(page).evaluate((el) => {
+    await suaTrang(record(page), (el) => {
       const buttons = [...el.querySelectorAll('[data-slot="listings-of-unit"] li button')];
       for (const b of buttons) b.removeAttribute("aria-current");
       buttons.at(-1)?.setAttribute("aria-current", "true");
@@ -181,7 +182,7 @@ test.describe("E7 · every listing of the unit, newest first", () => {
   }) => {
     await openRecord(page, THREE);
     // A sort turned the wrong way: the listings come oldest first while «Lần 3, 2, 1» still counts down by position.
-    await record(page).evaluate((el) => {
+    await suaTrang(record(page), (el) => {
       const lines = [...el.querySelectorAll('[data-slot="listings-of-unit"] li')];
       const ids = lines.map((li) => li.getAttribute("data-listing-id")).reverse();
       lines.forEach((li, i) => li.setAttribute("data-listing-id", ids[i] ?? ""));
@@ -192,7 +193,7 @@ test.describe("E7 · every listing of the unit, newest first", () => {
   test("break: an old listing whose price never shows is named", async ({ page }) => {
     await openRecord(page, THREE);
     // Freeze the card's price, the way a record that keeps the newest listing's price would show it.
-    await record(page).evaluate((el) => {
+    await suaTrang(record(page), (el) => {
       const price = el.querySelector('[data-slot="listing-card-price"]')!;
       const frozen = price.cloneNode(true);
       price.replaceWith(frozen);
@@ -268,7 +269,7 @@ test.describe("E8 · the record only reads", () => {
 
   test("break: a field put into the record is named", async ({ page }) => {
     await openRecord(page, THREE);
-    await record(page).evaluate((el) => el.appendChild(document.createElement("input")));
+    await suaTrang(record(page), (el) => el.appendChild(document.createElement("input")));
     expect(await readOnlyErrors(page)).toContain("record is not read-only");
   });
 
@@ -331,10 +332,13 @@ test.describe("E9 · the full record passes the accessibility scan", () => {
 
   test("break: a completeness bar without a name is caught", async ({ page }) => {
     await openRecord(page, THREE);
-    await page.locator('[data-slot="listing-completeness"] [role="progressbar"]').evaluate((el) => {
-      el.removeAttribute("aria-label");
-      el.removeAttribute("aria-labelledby");
-    });
+    await suaTrang(
+      page.locator('[data-slot="listing-completeness"] [role="progressbar"]'),
+      (el) => {
+        el.removeAttribute("aria-label");
+        el.removeAttribute("aria-labelledby");
+      },
+    );
     expect(await seriousViolations(page)).toContain("aria-progressbar-name");
   });
 });

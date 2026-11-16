@@ -17,7 +17,7 @@ sources:
   ]
 ---
 
-# 0034 Cổng chứng minh màn bắt tệp khối tự làm chưa kê, so với nhánh chính bằng danh sách cố định
+# 0042 Cổng chứng minh màn bắt tệp khối tự làm chưa kê, so với nhánh chính bằng danh sách cố định
 
 ## Status
 

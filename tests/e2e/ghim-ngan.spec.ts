@@ -7,6 +7,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
 import { regionHydrated, rowsShown } from "./phone-list";
+import { suaTrang, themKieu } from "./sua-trang";
 
 const WIDE = new Set(["1440", "1024"]);
 const PHONE = new Set(["414", "360"]);
@@ -304,7 +305,7 @@ test.describe("E2 · pinning makes room beside the grid", () => {
     await openRow(page, 1);
     await pin(page);
     // What a pin measured on the work area did: the grid gives up more than the column's width.
-    await page.addStyleTag({
+    await themKieu(page, {
       content:
         '[data-slot="data-region"]{margin-right:calc(var(--record-pinned) + 260px) !important}',
     });
@@ -608,7 +609,7 @@ test.describe("E8 · accessibility and Esc", () => {
     await openScreen(page, "/inventory");
     await openRow(page, 0);
     await pin(page);
-    await unpinButton(page).evaluate((b) => {
+    await suaTrang(unpinButton(page), (b) => {
       b.removeAttribute("aria-label");
       b.removeAttribute("title");
     });

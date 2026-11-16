@@ -4,6 +4,7 @@
 // message. A recipe never opens a page itself: the runner does, and waits until the page is ready first.
 import AxeBuilder from "@axe-core/playwright";
 import type { Locator, Page } from "@playwright/test";
+import { suaCacPhanTu, suaTrang, themKieu } from "../../tests/e2e/sua-trang";
 
 export interface Ctx {
   page: Page;
@@ -78,12 +79,9 @@ export const FRAME: Recipe[] = [
         name: "doi chu h1",
         message: (id) => new RegExp(`^${escapeRe(id)}: tieu-de — `),
         apply: async ({ page }) => {
-          await page
-            .locator("h1")
-            .first()
-            .evaluate((el) => {
-              el.textContent = "Tiêu đề sai";
-            });
+          await suaTrang(page.locator("h1").first(), (el) => {
+            el.textContent = "Tiêu đề sai";
+          });
         },
       },
     ],
@@ -101,7 +99,7 @@ export const FRAME: Recipe[] = [
         name: "chen phan tu rong 2000px",
         message: (id) => new RegExp(`^${escapeRe(id)}: cuon-ngang — `),
         apply: async ({ page }) => {
-          await page.evaluate(() => {
+          await suaTrang(page, () => {
             const wide = document.createElement("div");
             wide.style.width = "2000px";
             wide.style.height = "1px";
@@ -157,7 +155,7 @@ export const FRAME: Recipe[] = [
         name: "chu trang tren nen trang",
         message: (id) => new RegExp(`^${escapeRe(id)}: axe .*color-contrast`),
         apply: async ({ page }) => {
-          await page.addStyleTag({
+          await themKieu(page, {
             content:
               "h1 { color: rgb(250, 250, 250) !important; background: rgb(255, 255, 255) !important; transition: none !important; }",
           });
@@ -350,6 +348,8 @@ async function scrollUntil(page: Page, done: () => Promise<boolean>): Promise<vo
  * column's cell (the one the first filter box reads), then every text cell of the row.
  */
 async function mountedRows(page: Page): Promise<[number, string[]][]> {
+  // Reads only: the cell is copied before its lock reason is taken out. Called on every wheel step of a scroll, so it
+  // reads straight, without the door's wait for the page to be hydrated (row 1u, delta round 8).
   return tableRows(page).evaluateAll(
     (trs, kinds) =>
       trs
@@ -635,11 +635,20 @@ export const REGION: Recipe[] = [
         name: "khung cho khong bao gio hien",
         message: /cho-tai: khung cho khong hien/,
         withinMs: 15_000,
+        // A page whose server HTML has no skeleton, left unhydrated (row 1u): removing the skeleton from a page React
+        // then hydrates makes React print «Hydration failed» and rebuild the tree, so the page's own code is held back
+        // instead — no hydration, no mismatch — and the check still finds no skeleton.
         before: async ({ page }) => {
-          await page.addInitScript(() => {
-            new MutationObserver(() => {
-              document.querySelectorAll('[data-slot="region-skeleton"]').forEach((n) => n.remove());
-            }).observe(document, { childList: true, subtree: true });
+          await page.route("**/*", async (route) => {
+            const kind = route.request().resourceType();
+            if (kind === "script") return route.abort();
+            if (kind !== "document") return route.fallback();
+            const response = await route.fetch();
+            const body = (await response.text()).replaceAll(
+              'data-slot="region-skeleton"',
+              'data-slot="region-skeleton-bo"',
+            );
+            return route.fulfill({ response, body });
           });
         },
       },
@@ -676,9 +685,9 @@ export const REGION: Recipe[] = [
         name: "go buoc tiep",
         message: /trong: khong co buoc tiep/,
         apply: async ({ page }) => {
-          await stateOf(page, "empty")
-            .getByRole("button")
-            .evaluateAll((els) => els.forEach((el) => el.remove()));
+          await suaCacPhanTu(stateOf(page, "empty").getByRole("button"), (els) =>
+            els.forEach((el) => el.remove()),
+          );
         },
       },
     ],
@@ -716,12 +725,32 @@ export const REGION: Recipe[] = [
         name: "go nut Xoa loc",
         message: /khong-khop: thieu loi thoat Xoa loc/,
         before: async ({ page }) => {
+          // Only once the region is hydrated (data-hydrated, row 1u): a button removed before React takes the page over is
+          // a hydration mismatch, not a screen without the way out.
           await page.addInitScript(() => {
-            new MutationObserver(() => {
-              document
-                .querySelectorAll('[data-slot="data-region"] button')
-                .forEach((b) => b.textContent?.includes("Xoá lọc") && b.remove());
-            }).observe(document, { childList: true, subtree: true });
+            const start = () =>
+              new MutationObserver(() => {
+                document
+                  .querySelectorAll('[data-slot="data-region"] button')
+                  .forEach((b) => b.textContent?.includes("Xoá lọc") && b.remove());
+              }).observe(document, { childList: true, subtree: true });
+            // Started by the region's own mark (src/components/candidate/data-region.tsx), not the root's: the region
+            // hydrates inside the page's loading boundary, after the root (VP4); and not by a timer (a fake clock
+            // would hold a timer back). The script runs before <html> exists, so it watches the whole document.
+            const marked = () =>
+              document.querySelector('[data-slot="data-region"][data-hydrated]') !== null;
+            if (marked()) start();
+            else
+              new MutationObserver((_, self) => {
+                if (!marked()) return;
+                self.disconnect();
+                start();
+              }).observe(document, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ["data-hydrated"],
+              });
           });
         },
       },
@@ -750,9 +779,7 @@ export const REGION: Recipe[] = [
         name: "go ly do",
         message: /loi: thieu ly do/,
         apply: async ({ page }) => {
-          await stateOf(page, "error")
-            .locator('[data-part="why"]')
-            .evaluate((el) => el.remove());
+          await suaTrang(stateOf(page, "error").locator('[data-part="why"]'), (el) => el.remove());
         },
       },
     ],
@@ -777,7 +804,7 @@ export const REGION: Recipe[] = [
         name: "go bang bao",
         message: /mot-phan-hong: khong bao phan hong/,
         apply: async ({ page }) => {
-          await stateOf(page, "partial").evaluate((el) => el.remove());
+          await suaTrang(stateOf(page, "partial"), (el) => el.remove());
         },
       },
     ],
@@ -808,7 +835,7 @@ export const REGION: Recipe[] = [
         );
         const problem = longestProblem(screen, width, fits.max, seen);
         if (problem) fail(problem);
-        await cells.evaluateAll((els) => {
+        await suaCacPhanTu(cells, (els) => {
           for (const el of els) (el as HTMLElement).style.maxWidth = "8ch";
         });
       }
@@ -849,12 +876,34 @@ export const REGION: Recipe[] = [
                 .querySelectorAll('[data-slot="phone-card"]:not([tabindex="-1"])')
                 .forEach((el) => el.setAttribute("tabindex", "-1"));
             };
-            new MutationObserver(strip).observe(document, {
-              childList: true,
-              subtree: true,
-              attributes: true,
-              attributeFilter: ["tabindex", "data-cut"],
-            });
+            // Only once the region is hydrated (data-hydrated, row 1u): an attribute changed before React takes the page
+            // over is a hydration mismatch.
+            const start = () => {
+              strip();
+              new MutationObserver(strip).observe(document, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ["tabindex", "data-cut"],
+              });
+            };
+            // Started by the region's own mark (src/components/candidate/data-region.tsx), not the root's: the region
+            // hydrates inside the page's loading boundary, after the root (VP4); and not by a timer (a fake clock
+            // would hold a timer back). The script runs before <html> exists, so it watches the whole document.
+            const marked = () =>
+              document.querySelector('[data-slot="data-region"][data-hydrated]') !== null;
+            if (marked()) start();
+            else
+              new MutationObserver((_, self) => {
+                if (!marked()) return;
+                self.disconnect();
+                start();
+              }).observe(document, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ["data-hydrated"],
+              });
           });
         },
       },
@@ -877,7 +926,7 @@ export const REGION: Recipe[] = [
         name: "chen so dong",
         message: /khong-du-quyen: lo so dong/,
         apply: async ({ page }) => {
-          await region(page).evaluate((el) => {
+          await suaTrang(region(page), (el) => {
             const count = document.createElement("span");
             count.dataset["slot"] = "region-count";
             count.textContent = "120 dòng";
@@ -899,7 +948,7 @@ export const REGION: Recipe[] = [
         // A style rule, not a DOM edit: the grid re-renders after measuring its width and would put a removed row back.
         // Row 2: the run is virtual, so the rule names one result row (number 1) instead of the DOM's last row.
         apply: async ({ page }) => {
-          await page.addStyleTag({
+          await themKieu(page, {
             content: `${FILTERING} tbody tr:has([data-row-number="1"]) { display: none !important; }
               ${PHONE_FILTERING} ul > li:first-child { display: none !important; }`,
           });
@@ -981,14 +1030,12 @@ export const REGION: Recipe[] = [
         name: "chen o tim",
         message: /o-tim-vang: con o tim/,
         apply: async ({ page }) => {
-          await region(page)
-            .first()
-            .evaluate((el) => {
-              const box = document.createElement("input");
-              box.type = "search";
-              box.placeholder = "Gõ để tìm";
-              el.prepend(box);
-            });
+          await suaTrang(region(page).first(), (el) => {
+            const box = document.createElement("input");
+            box.type = "search";
+            box.placeholder = "Gõ để tìm";
+            el.prepend(box);
+          });
         },
       },
     ],
