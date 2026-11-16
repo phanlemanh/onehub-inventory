@@ -21,6 +21,10 @@ Trong một sàn, một căn có nhiều nhất một lần chào đang mở (Ch
 chào Đã bán hay Ngừng hẳn ở lại làm lần chào cũ của căn (`one-open-listing-per-unit`, chủ kho chốt Hỏi-5 ở Cổng Phạm vi
 hàng 3b).
 
+Điều kiện phí (`feeInclusion`, hàng 19): Giá chào đã gồm thuế phí của sàn (Bao phí) hay chưa (Không bao phí); riêng của
+ta, RESO không có. Bảng hàng tính Về tay từ Giá chào, Điều kiện phí và thuế phí của sàn
+([fee-schedule](fee-schedule.md)); trang khách không đọc cả hai.
+
 ## Where in the code
 
 `src/modules/listings/`: luật sửa giá và trạng thái ở `edit-rules.ts`, cổng lưu ở `save-door.ts`, sửa trên ô của Bảng hàng ở `ui/use-listing-cell-edit.tsx`.
@@ -38,6 +42,10 @@ trên một căn. Cơ sở dữ liệu chưa có bảng lần chào: cột đi c
 
 Hàng 4, 13/11/2026: sửa Giá chào và Trạng thái trên ô của Bảng hàng. Mười hai lối chuyển trạng thái; Đã bán và Ngừng hẳn là nấc cuối, Đã bán khoá cả giá; Ngừng hẳn hỏi Lý do ngừng (ba lý do, khái niệm riêng). Mọi lần sửa đi qua một cổng lưu bốn kết cục; hôm nay ghi vào dữ liệu mẫu trong bộ nhớ, hàng 10 cắm đường ghi thật.
 
+Hàng 5, 15/11/2026: dán một vùng từ Excel vào Bảng hàng — mỗi ô đọc bằng luật sửa trên ô của hàng 4, bản xem trước nói ô
+nào đổi, ô nào bị bỏ và vì sao; áp một lần qua cùng cổng lưu, hoàn tác một lần. Hồ sơ: `_acceptance/dan-tu-excel/`,
+quyết định [0040](../decisions/0040-dan-qua-ban-xem-truoc.md).
+
 Hàng 3e, 13/11/2026: hồ sơ căn có nút «Hỏi đầu chủ» (người giữ căn) và «Báo sai thông tin» (thuộc tính danh mục). Ai giữ căn
 chưa có trong mô hình: tới hàng 10 dùng dữ liệu mẫu `sampleKeeperOf` (`src/modules/listings/sample.ts`); hai tin soạn ở
 `src/modules/listings/messages.ts`.
@@ -45,3 +53,8 @@ chưa có trong mô hình: tới hàng 10 dùng dữ liệu mẫu `sampleKeeperO
 Hàng 2b, 14/11/2026: dưới 768 px Bảng hàng hiện mỗi lần chào thành thẻ căn ở dáng ngang (ô ảnh, mã căn và giá, nơi và
 trạng thái, diện tích và phòng ngủ) — cùng `ListingCard` của đầu hồ sơ; chạm thẻ mở hồ sơ toàn màn, lùi về đúng chỗ.
 Không sửa trên thẻ (hàng 3d). Hồ sơ: `_acceptance/bang-hang-the-dien-thoai/`.
+
+Hàng 2d, 14/11/2026: Bảng hàng đi theo địa lý — cột thứ hai có mỗi dự án một nhóm (phân khu lồng toà), đọc từ chính
+các dòng của bảng và chỗ đứng của toà trong danh mục; chọn một nơi chỉ thay lọc Dự án, Toà (danh sách tên khớp trọn),
+giữ lọc khác; địa chỉ mang `?vung=<nơi>`. Không thêm trường hay luật của lần chào. Quyết định
+[0036](../decisions/0036-mot-trang-thai-loc-theo-dia-ly.md); hồ sơ `_acceptance/bang-hang-theo-dia-ly/`.

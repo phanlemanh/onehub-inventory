@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "ghim": {
+    "luoi": "61b989cc617777208e93a530d36a47482b841455"
+  },
+  "tep": {
+    "luoi": "design/patterns/luoi.md"
+  },
+  "chon": {
+    "nhom": "luoi",
+    "tep": "design/patterns/luoi.md",
+    "mau": {
+      "tep": "src/app/(app)/proto/[slug]/grid-showcase.tsx",
+      "bam": "bdecd139b28064b7f206d5566ecd70b0ec52a658"
+    }
+  }
+}

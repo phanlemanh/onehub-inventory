@@ -5,7 +5,11 @@ import type { ConceptCode } from "@/generated/labels";
 import type { FieldKind } from "../rules";
 import type { LayerProblem } from "../store";
 
-export const LAYER_PARTS_SHOWN = ["nhan", "truong", "tu-dien", "can-cho", "mau"] as const;
+/** The five parts shown as a grid (row 7e). */
+export const GRID_PARTS = ["nhan", "truong", "tu-dien", "can-cho", "mau"] as const;
+export type GridPart = (typeof GRID_PARTS)[number];
+/** Every part of the screen, in the order of the second column: the grid parts, then the fee part (row 19). */
+export const LAYER_PARTS_SHOWN = [...GRID_PARTS, "thue-phi"] as const;
 export type ShownPart = (typeof LAYER_PARTS_SHOWN)[number];
 
 /** Region states a development build may open with `?state=`, like the inventory's. */
@@ -25,6 +29,7 @@ export const PART_TITLE: Record<ShownPart, ConceptCode> = {
   "tu-dien": "ValueDictionary",
   "can-cho": "PendingUnit",
   mau: "ImportTemplate",
+  "thue-phi": "FeeSchedule",
 };
 
 export const LAYER_COPY = {
@@ -35,14 +40,14 @@ export const LAYER_COPY = {
     "tu-dien": "Chữ sàn quen viết ứng với giá trị chuẩn nào.",
     "can-cho": "Những căn sàn có mà danh mục chung chưa có.",
     mau: "Dạng tệp Sheet đã nhập và cột nào đi vào đâu.",
-  } satisfies Record<ShownPart, string>,
+  } satisfies Record<GridPart, string>,
   empty: {
     nhan: "Chưa đặt chữ riêng nào. Chữ riêng cũng sinh ra khi nhập bảng hàng.",
     truong: "Chưa có cột riêng nào. Cột riêng cũng sinh ra khi nhập bảng hàng.",
     "tu-dien": "Chưa có cặp chữ nào. Các cặp chữ cũng sinh ra khi nhập bảng hàng.",
     "can-cho": "Không có căn nào chờ khớp với danh mục.",
     mau: "Chưa có mẫu nào. Mẫu sinh ra sau lần nhập bảng hàng đầu tiên.",
-  } satisfies Record<ShownPart, string>,
+  } satisfies Record<GridPart, string>,
   col: {
     concept: "Khái niệm chuẩn",
     own: "Chữ của sàn",

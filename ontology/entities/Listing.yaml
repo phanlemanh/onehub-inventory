@@ -26,6 +26,9 @@ properties:
   furnished:
     { type: enum, values: [Furnished, Partially, Unfurnished], display: select, reso: Furnished }
   occupantType: { type: enum, values: [Owner, Tenant, Vacant], display: select, reso: OccupantType }
+  # Whether the list price already holds the company's fee items (row 19, thue-phi): Included (Bao phí) or Excluded
+  # (Không bao phí). Our own; RESO 2.1 has no such field. Stored on the listings table from row 10.
+  feeInclusion: { type: enum, values: [Included, Excluded], display: select }
   legalStatus: { type: string, display: text }
   financing: { type: string, display: text }
   version: { type: integer, min: 1, required: true, display: none }

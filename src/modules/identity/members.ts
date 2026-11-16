@@ -5,7 +5,7 @@ import type { Role } from "../../generated/ontology";
 
 import type { InviteSender } from "./invite-mail";
 import { canonicalRoles, isRole } from "./roles";
-import { withCompany, type CompanyContext, type DbPool } from "./with-company";
+import { withCompany, type CompanyContext, type DbClient, type DbPool } from "./with-company";
 
 export interface MembersDeps {
   pool: DbPool;
@@ -121,4 +121,17 @@ export async function setMemberRoles(
     ]);
     return (rows[0] as { status: SetRolesResult }).status;
   });
+}
+
+/**
+ * The display name of the session's own member, read inside a transaction another module already opened with
+ * withCompany. Other modules record "who changed it" through this function and never read company_members themselves.
+ * Null when the session's person has no member row in the session's company.
+ */
+export async function sessionMemberName(client: DbClient): Promise<string | null> {
+  const { rows } = await client.query(
+    "select name from company_members where user_id::text = current_setting('app.user_id', true)",
+  );
+  const row = rows[0] as { name: string } | undefined;
+  return row?.name ?? null;
 }

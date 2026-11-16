@@ -54,12 +54,12 @@ Mỗi màn của sổ màn có một mục, cộng mục `khung` cho App Shell. 
 
 ## tuy-chinh-san — `/tuy-chinh-san`
 
-| Vai          | Nút theo quyền                                                                                                                                              | Nút không theo quyền    |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| Đầu chủ      | `readCompanyLayer` (toàn sàn), `addCompanyLayer` (toàn sàn), `matchPendingUnits` (toàn sàn), `editCompanyLayer` (toàn sàn), `retireCompanyLayer` (toàn sàn) | Lọc, Cột, Toàn màn hình |
-| Đầu khách    | `readCompanyLayer` (toàn sàn)                                                                                                                               | Lọc, Cột, Toàn màn hình |
-| Trưởng nhóm  | `readCompanyLayer` (toàn sàn), `addCompanyLayer` (toàn sàn), `matchPendingUnits` (toàn sàn), `editCompanyLayer` (toàn sàn), `retireCompanyLayer` (toàn sàn) | Lọc, Cột, Toàn màn hình |
-| Quản trị sàn | `readCompanyLayer` (toàn sàn), `addCompanyLayer` (toàn sàn), `matchPendingUnits` (toàn sàn), `editCompanyLayer` (toàn sàn), `retireCompanyLayer` (toàn sàn) | Lọc, Cột, Toàn màn hình |
+| Vai          | Nút theo quyền                                                                                                                                                                           | Nút không theo quyền    |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| Đầu chủ      | `readCompanyLayer` (toàn sàn), `addCompanyLayer` (toàn sàn), `matchPendingUnits` (toàn sàn), `editCompanyLayer` (toàn sàn), `retireCompanyLayer` (toàn sàn)                              | Lọc, Cột, Toàn màn hình |
+| Đầu khách    | `readCompanyLayer` (toàn sàn)                                                                                                                                                            | Lọc, Cột, Toàn màn hình |
+| Trưởng nhóm  | `readCompanyLayer` (toàn sàn), `addCompanyLayer` (toàn sàn), `matchPendingUnits` (toàn sàn), `editCompanyLayer` (toàn sàn), `retireCompanyLayer` (toàn sàn)                              | Lọc, Cột, Toàn màn hình |
+| Quản trị sàn | `readCompanyLayer` (toàn sàn), `setFeeSchedule` (toàn sàn), `addCompanyLayer` (toàn sàn), `matchPendingUnits` (toàn sàn), `editCompanyLayer` (toàn sàn), `retireCompanyLayer` (toàn sàn) | Lọc, Cột, Toàn màn hình |
 
 ## proto — `/proto/[slug]`
 
