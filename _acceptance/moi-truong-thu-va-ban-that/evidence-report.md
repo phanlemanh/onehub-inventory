@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: ae4dc7c24b0a933fa5f82c69fe68504e4c664198
+verified_commit: e1db5ebadebcf5438fd907011320c412b1422947
 human_signoff:
 ---
 
@@ -15,40 +15,20 @@ human_signoff:
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
-| E1 | AC-1 | test | PASS (carry-forward tu round 5) |
-| E2 | AC-2 | test | PASS (carry-forward tu round 5) |
-| E3 | AC-3 | test | PASS (carry-forward tu round 5) |
-| E4 | AC-4 | test | PASS (carry-forward tu round 5) |
-| E5 | AC-5 | test | PASS (carry-forward tu round 1) |
-| E6 | AC-6 | script | PASS (carry-forward tu round 5) |
-| E7 | AC-7 | script | PASS (carry-forward tu round 5) |
-| E8 | AC-8 | script | PASS (carry-forward tu round 7) |
+| E1 | AC-1 | test | PASS (carry-forward round 5) |
+| E2 | AC-2 | test | PASS (carry-forward round 5) |
+| E3 | AC-3 | test | PASS (carry-forward round 5) |
+| E4 | AC-4 | test | PASS (carry-forward round 5) |
+| E5 | AC-5 | test | PASS (carry-forward round 1) |
+| E6 | AC-6 | script | PASS (carry-forward round 5) |
+| E7 | AC-7 | script | PASS (carry-forward round 5) |
+| E8 | AC-8 | script | PASS |
 | E9 | AC-9 | test | PASS |
-| E10 | AC-9 | judgment | chờ người chốt (hội đồng đề xuất PASS) |
-| E11 | AC-10 | test | PASS (carry-forward tu round 3) |
+| E10 | AC-9 | judgment | PENDING-HUMAN (panel đề xuất PASS, chờ người chốt) |
+| E11 | AC-10 | test | PASS (carry-forward round 3) |
 | E12 | AC-1 | script | PASS |
 
 ## Evidence
-
-- eval: E9
-  run_id: minted-moi-truong-thu-va-ban-that-E9-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.van_hanh
-  verified_at: 2026-11-16T19:43:30Z
-  output: |
-    npx vitest run tests/van-hanh.test.ts --coverage.enabled=false --reporter=verbose
-    (không có dòng đỏ; bộ kiểm sổ tay vận hành xanh)
-
-- eval: E12
-  run_id: minted-moi-truong-thu-va-ban-that-E12-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.check
-  verified_at: 2026-11-16T19:43:30Z
-  output: |
-    make check
-    CODEOWNERS matches governance/autonomy.yaml
 
 - eval: E1
   run_id: minted-moi-truong-thu-va-ban-that-E1-r5
@@ -121,14 +101,30 @@ human_signoff:
     carry-forward tu round 5 — delta khong cham paths cua eval
 
 - eval: E8
-  run_id: minted-moi-truong-thu-va-ban-that-E8-r7
+  run_id: minted-moi-truong-thu-va-ban-that-E8-r10
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.sao_luu_khoi_phuc
-  verified_at: 2026-11-16T18:58:13Z
-  carried_from_round: 7
+  verified_at: 2026-11-16T20:01:13Z
   output: |
-    carry-forward tu round 7 — delta khong cham paths cua eval
+    lệnh: DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx vitest run -c vitest.db.config.ts tests/db/sao-luu.db.test.ts --reporter=verbose
+    kết thúc sạch, mã thoát 0 (__EXIT=0)
+
+- eval: E9
+  run_id: minted-moi-truong-thu-va-ban-that-E9-r10
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.van_hanh
+  verified_at: 2026-11-16T20:01:13Z
+  output: |
+    lệnh: npx vitest run tests/van-hanh.test.ts --coverage.enabled=false --reporter=verbose
+    kết thúc sạch, mã thoát 0 (__EXIT=0)
+
+- eval: E10
+  judged_by: panel đề xuất (domain-correctness, operational-feasibility, spec-alignment)
+  verdict: PENDING-HUMAN
+  rationale: ba góc nhìn đều đề xuất PASS (xem mục Judge panel bên dưới); T-cấp yêu cầu người chốt trực tiếp
+  human_override:  # chi nguoi ghi
 
 - eval: E11
   run_id: minted-moi-truong-thu-va-ban-that-E11-r3
@@ -140,29 +136,35 @@ human_signoff:
   output: |
     carry-forward tu round 3 — delta khong cham paths cua eval
 
+- eval: E12
+  run_id: minted-moi-truong-thu-va-ban-that-E12-r10
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.check
+  verified_at: 2026-11-16T20:01:13Z
+  output: |
+    CODEOWNERS matches governance/autonomy.yaml
+    __EXIT=0
+
+### Judge panel (đề xuất, E10)
+
+Panel đề xuất: PASS. human_override để TRỐNG cho người điền ở Cổng 2.
+
+- domain-correctness: PASS — Cả bốn quy trình ghi mỗi bước làm ở đâu, gõ hay bấm gì, đạt khi, đỏ thì, kèm bảng xử lý theo từng dòng đỏ. Mười bốn việc ngoài kho xếp theo thứ tự phụ thuộc, chỉ ghi tên biến, SQL dùng `[Tên]` và địa chỉ giả. Hai chỗ nhỏ không coi là lỗi: dòng 233 README lệch thụt đầu dòng trong đoạn mã nội tuyến, và SQL ở việc 13 chưa kiểm được là chạy thật.
+- operational-feasibility: PASS — Bốn quy trình đủ bước, người đọc không cần mở mã; 14 việc đi đúng thứ tự phụ thuộc, mỗi việc có Đạt khi và Đỏ thì. Chỗ mỏng nhỏ: việc 9 chỉ ghi `AUTH_SECRET` là chuỗi ngẫu nhiên dài mà không nêu lệnh sinh (lệnh nằm ở xoay-khoa.md); SQL việc 13 chưa kiểm với lược đồ thật.
+- spec-alignment: PASS — Bốn quy trình đủ bốn điều ở mỗi bước, có chữ nguyên văn và bảng xử lý; 14 việc ngoài kho đúng thứ tự, đều có Đạt khi và Đỏ thì; cả năm tệp chỉ ghi tên biến, SQL mẫu dùng `[Tên]` và `example.test`.
+
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-moi-truong-thu-va-ban-that-SUITE-build-r9
+  run_id: minted-moi-truong-thu-va-ban-that-SUITE-build-r10
   exit_code: 0
-  verified_at: 2026-11-16T19:43:30Z
+  verified_at: 2026-11-16T20:01:13Z
 
 - cmd: make e2e
-  run_id: minted-moi-truong-thu-va-ban-that-SUITE-make_e2e-r9
+  run_id: minted-moi-truong-thu-va-ban-that-SUITE-make_e2e-r10
   exit_code: 0
-  verified_at: 2026-11-16T19:43:30Z
-
-### Phán đoán (E10) — hội đồng đề xuất PASS, để human_override TRỐNG
-
-- eval: E10
-  judged_by: judge-subagent (fresh context)
-  proposal: PASS
-  panel: domain-correctness, operational-feasibility, spec-alignment
-  votes:
-    - domain-correctness: PASS — Cả bốn quy trình (đưa bản lên, lùi bản, xoay khoá, khôi phục) đều ghi đủ làm ở đâu, gõ hay bấm gì, thấy gì là đạt, đỏ thì làm gì. 14 việc ngoài kho đi theo thứ tự làm được, mỗi việc chỉ dựa vào việc đứng trước nó, và chỉ ghi tên biến cùng chỗ giữ chỗ, không có giá trị thật. Chỉ đọc năm tệp được giao nên không đối chiếu được với mã.
-    - operational-feasibility: PASS — Bốn quy trình đều có từng bước đủ ở đâu, gõ hay bấm gì, đạt khi, đỏ thì, kèm bảng dòng đỏ cho từng lệnh. 14 việc ngoài kho đi theo thứ tự phụ thuộc làm được, mỗi việc có «Đạt khi» và «Đỏ thì», không ghi giá trị thật. Còn vài chỗ hở nhỏ (tên miền `onehub.center` phải có sẵn trong Vercel, «thẻ phát hành đang chạy» sau khi lùi bản, mật khẩu vai đăng nhập sau Supabase Restore) nhưng không chặn người vận hành làm đúng quy trình.
-    - spec-alignment: PASS — Bốn quy trình đều ghi từng bước theo bốn mục «Ở đâu / Gõ hay bấm / Đạt khi / Đỏ thì», kèm bảng «Đỏ thì làm gì» tra theo dòng đỏ. 14 việc ngoài kho đi theo thứ tự làm được. Còn chỗ lỏng: bước 1 của «Khôi phục thật» ghi «Ở đâu: chủ kho», và mục «Đưa bản lên từ máy chủ kho» không nhắc `make setup`; không kiểm được `make deploy` chạy tay có cần `make setup` hay không.
-  human_override:  # chi nguoi ghi
+  verified_at: 2026-11-16T20:01:13Z
 
 ## Known limits
 
@@ -170,11 +172,11 @@ human_signoff:
 
 ## Analyst
 
-carried tu round 1 — baseline khong do lai round nay (evals.yaml khong doi tu lan baseline cuoi).
+carried tu round 1 — baseline khong do lai round nay
 
-Baseline khong do: mọi eval ghi baseline n-a vì round này không đo lại.
+Eval không phân biệt (xanh cả trên HEAD lẫn baseline, hoặc xác nhận là lưới hồi quy có chủ ý): E12 (make check).
 
-Eval không phân biệt (xanh cả trên HEAD lẫn baseline): E12 (make check) — regression-guard có chủ ý, kiểm ranh giới mô-đun, nhãn và ontology; không phải eval của tính năng.
+Baseline không đo: mọi eval ghi baseline n-a vì evals.yaml không đổi từ lần đo cuối (round 1).
 
 ## Variance
 
@@ -182,9 +184,5 @@ none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: các eval xanh lần đầu, người chốt chưa ký; chuyển sang vòng sửa.
-Round 5: bộ eval deploy và bản dựng thật xanh; mốc carry-forward cho E1-E4, E6, E7.
-Round 6: bước e2e có lần đỏ rồi xanh lại sau sửa.
-Round 7: E8 (sao lưu, khôi phục) chạy lại xanh; sổ tay có thêm cách xử lý cho dòng dừng.
-Round 8: E9 và E12 chạy lại trên HEAD, xanh; E10 chờ người chốt; còn một lỗi trong hợp đồng (sổ tay khôi phục cho hai cách xử lý trái nhau khi lệch bản) ghi ở review-findings.md.
-Round 9: E9 và E12 chạy lại trên ae4dc7c, xanh; build và e2e xanh; E10 chờ người chốt (hội đồng đề xuất PASS); bốn lỗi ngoài hợp đồng (lời nhắc «sao lưu lại» còn trong khoi-phuc-thu.sh mâu thuẫn với sổ tay; bộ kiểm chỉ phủ một trong hai mục sổ tay đã đổi) chờ người quyết ở Cổng 2.
+Round 10: E8, E9, E12 chạy lại trên commit e1db5eb và đạt; E1-E7, E11 mang sang từ các round trước (delta không chạm paths); E10 chờ người chốt. Verdict PENDING-JUDGMENT.
+Round 1-9: lịch sử nằm trong run-log.jsonl và các commit docs(moi-truong-thu-va-ban-that).
