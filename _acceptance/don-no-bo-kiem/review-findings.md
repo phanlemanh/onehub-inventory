@@ -1,21 +1,33 @@
-# Review findings: don-no-bo-kiem (round 5)
-
 ## Trong hợp đồng
 
-Không có finding nào map được vào AC.
+(không có)
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **The page-ready wait gained a fourth condition (every data region marked) with no failing-direction test**
+- **E5 script writes its broken copy of ci-db.sh into the working tree under a fixed name**
+  Người dùng thấy gì: Nếu lượt chấm bị ngắt giữa chừng, một tệp tạm có thể sót lại trong kho, và hai lượt chấm chạy cùng lúc có thể xoá nhầm tệp của nhau. Người dùng sản phẩm không bị ảnh hưởng, chỉ người chạy bộ kiểm.
+  Căn cứ: Hậu quả nhẹ và chỉ chạm người chạy bộ kiểm, không mất dữ liệu; chỉ cần xoá tệp sót hoặc chạy lại là xong, nên ghi lại như một hạn chế đã biết.
+  file: `_acceptance/don-no-bo-kiem/rang/gac-hydration-pha.mjs`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): bước co-phien chỉ được kiểm bằng cách grep dòng lệnh, không chạy thật**
+  Người dùng thấy gì: Lượt kiểm trình duyệt có cơ sở dữ liệu chưa từng được thử thật với bài phá, nên nếu cảnh báo dựng trang lệch không đến được phép gác ở lượt đó thì bộ kiểm vẫn xanh. Người dùng sản phẩm không bị ảnh hưởng.
+  Căn cứ: Rủi ro chỉ là bộ kiểm bỏ sót một cảnh báo lệch giao diện ở một lượt chạy, không ảnh hưởng người dùng thật; chủ kho đã chấp nhận cách đo này vì thử thật cần cơ sở dữ liệu riêng và tốn kém.
+  file: `tests/gac-ci-db.test.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **The page-ready wait gained a fourth condition (every data region marked) with no failing-direction test (r5)**
   Người dùng thấy gì: Bộ kiểm có thể vô tình bỏ mất bước chờ vùng dữ liệu dựng xong mà không ai biết, khiến cảnh báo dựng trang lệch quay lại và bộ kiểm đỏ oan. Người dùng sản phẩm không bị ảnh hưởng.
   Căn cứ: Chỉ ảnh hưởng người chạy bộ kiểm, không mất dữ liệu, nếu đỏ oan thì thấy ngay và sửa được; thêm phép thử sau này rẻ nên ghi lại là đủ.
   file: `tests/e2e/sua-trang.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Decision d-…-32/33: the `at` time is one hour after the time in the id and after the commit**
+- **Decision d-…-32/33: the `at` time is one hour after the time in the id and after the commit (r5 · tệp đã đổi)**
   Người dùng thấy gì: Hai dòng trong sổ quyết định ghi giờ muộn hơn một tiếng so với thực tế, nên khi xem lại theo thời gian chúng nằm sau vòng chấm thay vì trước. Người dùng sản phẩm không bị ảnh hưởng.
   Căn cứ: Chỉ làm lệch thứ tự đọc lại sổ nội bộ, không mất dữ liệu hay ảnh hưởng người dùng, và chỉnh lại sau rất rẻ.
   file: `_acceptance/don-no-bo-kiem/decisions.jsonl`
@@ -127,7 +139,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Hydration guard is silently missing from the CI database job because the command-line reporter flag replaces the config's reporters (r1)**
+- **Hydration guard is silently missing from the CI database job because the command-line reporter flag replaces the config's reporters (r1 · tệp đã đổi)**
   Người dùng thấy gì: Khi chạy kiểm tra tự động trên CI có cơ sở dữ liệu, cảnh báo dựng trang lệch vẫn có thể lọt qua mà không làm lượt chạy đỏ. Người dùng không thấy ngay, nhưng lỗi giao diện kiểu này có thể đến tay họ mà không ai hay.
   Căn cứ: Không mất dữ liệu và chỉ ảnh hưởng độ chắc của lưới kiểm tra trên CI, vẫn còn chạy được ở máy dev; sửa rẻ nhưng nằm ngoài những gì hàng này đã hứa nên nên đăng thành việc riêng.
   file: `db/scripts/ci-db.sh`
@@ -148,28 +160,28 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: wont-fix
 
-- **onResult passes its page-changing code as a string through a raw page.evaluate, so the 'one door' static check cannot see it (r3 · tệp đã đổi)**
+- **onResult passes its page-changing code as a string through a raw page.evaluate, so the 'one door' static check cannot see it (r3)**
   Người dùng thấy gì: Phép kiểm tra tự động có một kẽ hở: một chỗ trong bộ bài kiểm vẫn đổi trang mà phép kiểm tra không thấy. Hiện chỗ đó chạy an toàn, người dùng sản phẩm không bị ảnh hưởng.
   Căn cứ: Chỉ là kẽ hở trong công cụ kiểm tra nội bộ, hiện chưa gây lỗi gì và người dùng không thấy; sửa sau vẫn rẻ nếu có người thêm bài mới đi qua kẽ này.
   file: `tools/e2e_templates/recipes.ts`
   severity: low
   Đề xuất: known-limits
 
-- **The 'go nut Xoa loc' break never removes a button that is already on the page when the hydrated mark appears (r3 · tệp đã đổi)**
+- **The 'go nut Xoa loc' break never removes a button that is already on the page when the hydrated mark appears (r3)**
   Người dùng thấy gì: Một bài phá thử trong bộ kiểm có thể thỉnh thoảng báo đỏ sai vì nút chưa bị gỡ kịp. Chỉ ảnh hưởng người chạy bộ kiểm, không ảnh hưởng người dùng sản phẩm.
   Căn cứ: Hậu quả nhẹ: chỉ làm bộ kiểm đỏ oan lúc nào đó và chạy lại là qua; không mất dữ liệu và không chạm người dùng cuối.
   file: `tools/e2e_templates/recipes.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **The two page-stripping breaks start on the root mark, which can come before the data region's loading boundary has hydrated (r3 · tệp đã đổi)**
+- **The two page-stripping breaks start on the root mark, which can come before the data region's loading boundary has hydrated (r3)**
   Người dùng thấy gì: Hai bài phá thử có thể bắt đầu sửa trang quá sớm và gây lại cảnh báo dựng trang lệch, làm bộ kiểm đỏ oan. Người dùng sản phẩm không bị ảnh hưởng.
   Căn cứ: Chỉ làm bộ kiểm đỏ oan thỉnh thoảng, chạy lại là hết, không lộ hay mất dữ liệu; nhưng nếu lặp lại thì đúng nợ mà hàng này muốn dọn nên đáng theo dõi.
   file: `tools/e2e_templates/recipes.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **The pageReady deadline is not enforced when the given element is missing: locator.evaluate waits until the test timeout, and .catch(() => false) hides the cause (r3 · tệp đã đổi)**
+- **The pageReady deadline is not enforced when the given element is missing: locator.evaluate waits until the test timeout, and .catch(() => false) hides the cause (r3)**
   Người dùng thấy gì: Khi một màn thiếu tiêu đề, bài kiểm sẽ treo đến hết giờ dài thay vì báo lỗi sớm với nguyên nhân rõ. Chỉ làm người chạy bộ kiểm chờ lâu hơn.
   Căn cứ: Chỉ xảy ra ở màn hiếm khi thiếu mọi phần tử chờ và chỉ làm chậm, không sai kết quả; chi phí sửa nhỏ nhưng hậu quả cũng rất nhẹ.
   file: `tests/e2e/sua-trang.ts`
@@ -190,7 +202,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Hydration guard is silently missing from the CI database job because the command-line reporter flag replaces the config's reporters (r1)**
+- **Hydration guard is silently missing from the CI database job because the command-line reporter flag replaces the config's reporters (r1 · tệp đã đổi)**
   Người dùng thấy gì: Khi chạy kiểm tra tự động trên CI có cơ sở dữ liệu, cảnh báo dựng trang lệch vẫn có thể lọt qua mà không làm lượt chạy đỏ. Người dùng không thấy ngay, nhưng lỗi giao diện kiểu này có thể đến tay họ mà không ai hay.
   Căn cứ: Không mất dữ liệu và chỉ ảnh hưởng độ chắc của lưới kiểm tra trên CI, vẫn còn chạy được ở máy dev; sửa rẻ nhưng nằm ngoài những gì hàng này đã hứa nên nên đăng thành việc riêng.
   file: `db/scripts/ci-db.sh`
@@ -210,5 +222,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   file: `tests/cong-chay.test.ts`
   severity: low
   Đề xuất: wont-fix
+
+## Chưa adversarial-verify (refuter chết)
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
