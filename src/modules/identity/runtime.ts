@@ -15,6 +15,7 @@ import {
 import { memberRoles, type MembersDeps } from "./members";
 import { createMembersHandlers, type MembersHandlers } from "./members-http";
 import type { ActionName } from "./permissions";
+import { healthOf, type Health } from "./health";
 import { createPool, type DbPool } from "./with-company";
 import type { Role } from "../../generated/ontology";
 
@@ -112,4 +113,9 @@ export function actionDoor(req: Request, action: ActionName): Promise<OpenedDoor
 /** The same door for a server component of this request, through the session cookie. */
 export async function sessionDoor(action: ActionName): Promise<OpenedDoor | DoorError> {
   return openDoor(livePool, (await cookies()).get(SESSION_COOKIE)?.value, action);
+}
+
+/** The health of the running process, through the same pool the server signs in with (AC-6). */
+export function liveHealth(): Promise<Health> {
+  return healthOf({ env: process.env, pool: livePool });
 }
