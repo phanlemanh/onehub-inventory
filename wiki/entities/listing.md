@@ -38,6 +38,10 @@ trên một căn. Cơ sở dữ liệu chưa có bảng lần chào: cột đi c
 
 Hàng 4, 13/11/2026: sửa Giá chào và Trạng thái trên ô của Bảng hàng. Mười hai lối chuyển trạng thái; Đã bán và Ngừng hẳn là nấc cuối, Đã bán khoá cả giá; Ngừng hẳn hỏi Lý do ngừng (ba lý do, khái niệm riêng). Mọi lần sửa đi qua một cổng lưu bốn kết cục; hôm nay ghi vào dữ liệu mẫu trong bộ nhớ, hàng 10 cắm đường ghi thật.
 
+Hàng 5, 15/11/2026: dán một vùng từ Excel vào Bảng hàng — mỗi ô đọc bằng luật sửa trên ô của hàng 4, bản xem trước nói ô
+nào đổi, ô nào bị bỏ và vì sao; áp một lần qua cùng cổng lưu, hoàn tác một lần. Hồ sơ: `_acceptance/dan-tu-excel/`,
+quyết định [0040](../decisions/0040-dan-qua-ban-xem-truoc.md).
+
 Hàng 3e, 13/11/2026: hồ sơ căn có nút «Hỏi đầu chủ» (người giữ căn) và «Báo sai thông tin» (thuộc tính danh mục). Ai giữ căn
 chưa có trong mô hình: tới hàng 10 dùng dữ liệu mẫu `sampleKeeperOf` (`src/modules/listings/sample.ts`); hai tin soạn ở
 `src/modules/listings/messages.ts`.

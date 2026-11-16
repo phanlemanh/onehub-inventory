@@ -74,6 +74,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0032 Lối vào của bộ vùng lưới khai trong sổ màn](decisions/0032-loi-vao-bo-vung-luoi.md)
 - [0034 Sổ linh kiện do công cụ design-assembly ghi, theo hình dạng của hợp đồng](decisions/0034-component-register-written-by-design-assembly.md)
 - [0038 Mỗi thứ hiện trên màn có đủ thêm, xem, sửa, gỡ — máy đọc mã màn và đỏ khi thiếu](decisions/0038-lifecycle-check.md)
+- [0040 Dán từ Excel đi qua bản xem trước và cửa lưu của sửa trên ô](decisions/0040-dan-qua-ban-xem-truoc.md)
 
 ## Incidents
 

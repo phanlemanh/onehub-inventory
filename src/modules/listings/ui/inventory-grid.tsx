@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import type { FieldKey } from "@/components/candidate/column-kind";
 import { DataRegion, type GridRow, type RegionStatus } from "@/components/candidate/data-region";
 import type { RegionPhoneList } from "@/components/candidate/phone-list";
 import type { ColumnFilters, GridView } from "@/components/candidate/grid-view";
@@ -116,6 +117,10 @@ export function InventoryGrid({
   // The same columns on every render: this grid renders again on each change of arrangement (the «changed» mark), and
   // new columns would draw the header cells, with the filter box being typed in, again.
   const columns = useMemo(() => inventoryColumns(headers, customColumns), [headers, customColumns]);
+  const headerOf = useCallback(
+    (field: FieldKey) => columns.find((c) => c.field === field)?.header ?? field,
+    [columns],
+  );
   // 2d: a place picked in the second column changes the project and building filters only; the address follows.
   const geo = useGeoPlace({ tree: geoTree, rows, columns, view, active: !openView });
   // Below 768 px the region shows each row as the listing card's row layout (row 2b): the record head's own card.
@@ -133,7 +138,7 @@ export function InventoryGrid({
     }),
     [headers],
   );
-  const edit = useListingCellEdit({ rows, listings, headers, labels: editLabels, door });
+  const edit = useListingCellEdit({ rows, listings, headers, labels: editLabels, door, headerOf });
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
     current === "empty" ? [] : current === "partial" ? edit.rows.slice(0, PARTIAL_ROWS) : edit.rows;
