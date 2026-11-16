@@ -14,6 +14,7 @@ import { statusLabel } from "../../src/lib/format";
 import { label } from "../../src/modules/company-config";
 import { companyListingId, seedSampleInventory } from "../db/can-mau";
 import { cardCodes, isPhone, phoneCards, regionReady } from "../e2e/phone-list";
+import { pageReady, suaTrang } from "../e2e/sua-trang";
 
 let owner: pg.Client;
 test.beforeAll(async () => {
@@ -136,6 +137,7 @@ async function openInventory(page: Page, path = "/inventory") {
   await page.waitForLoadState("networkidle");
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
   await regionReady(page);
+  await pageReady(page);
 }
 
 /** The unit codes the region has drawn: the record openers of the table, or the cards below 768 px. */
@@ -663,7 +665,7 @@ test("cuon-nam-nghin: an inventory of 5,000 listings scrolls to its last row wit
   const lastCode = `L-${upis.at(-1)!.split("-").at(-1)}`;
   expect(await rowCount(page)).toBe(5000);
   expect(await shownCodes(page)).toContain(firstCode);
-  await viewport.evaluate((el) => el.scrollTo(0, el.scrollHeight));
+  await suaTrang(viewport, (el) => el.scrollTo(0, el.scrollHeight));
   // At the end: the last row is drawn and the first is no longer (the body is virtual, so only rows in view are).
   await expect
     .poll(async () => {
