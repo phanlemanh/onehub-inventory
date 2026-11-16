@@ -2,7 +2,7 @@
 loai: chu-de
 ma: [C1]
 nguon: [raw/2026-11-11-so-boi-canh-quy-hang/chi-muc.md]
-cap_nhat: 2026-11-11
+cap_nhat: 2026-11-16
 ---
 # Cài đặt sàn
 
@@ -53,5 +53,20 @@ Quy ước nguồn như [trang Sản phẩm](../nen/san-pham.md): `qh:` là Qu�
   `docs/plan/pham-vi-mvp-dot-1.md:58` · `docs/design-standard-proposal.md:96`
 - Bỏ cách gọi, trạng thái riêng, trường riêng, từ điển theo sàn (L4). `docs/plan/pham-vi-mvp-dot-1.md:65`
 - Nhật ký đổi cấu hình nằm ở trang N10. `docs/plan/pham-vi-mvp-dot-1.md:30`
-- Quyết định 0016 ghi điểm chọn của sàn chưa có màn chỉnh ở MVP; Thuế phí có phải ngoại lệ có màn: chưa xác nhận.
-  `wiki/decisions/0016-permission-model.md:49`
+- Thuế phí là ngoại lệ có màn: hàng 19 dựng phần Thuế phí ở màn Tuỳ chỉnh sàn, chủ kho ký ngày 16/11/2026 (PR #64).
+  Quyết định 0016 vẫn đúng cho các điểm chọn khác của sàn. `wiki/decisions/0016-permission-model.md:49` ·
+  `_acceptance/thue-phi/contract.md`
+
+## MVP đã dựng (hàng 19)
+
+- Hai khoản theo luật (Thuế thu nhập cá nhân 2%, Lệ phí trước bạ 0,5%) chỉ bật hay tắt, ghi «theo luật». Sàn thêm, đổi tên
+  hay bỏ khoản riêng (Hỏi-7 B, khác Quỹ hàng chỉ có ba khoản cố định). Phí môi giới mặc định 1% là một khoản riêng như
+  mọi khoản khác. `wiki/entities/fee-schedule.md`
+- Giới hạn: khoản riêng 0–5%, bước 0,1%, tối đa 5 khoản đang dùng; tổng các khoản đang bật tối đa 10%; ít nhất một khoản
+  bật. `src/modules/company-config/fee-schedule.ts`
+- Chỉ Quản trị sàn đặt mức; cả bốn vai đọc mức, người chỉ đọc thấy phần Thuế phí mà không có ô sửa. Bảng hàng có cột Về
+  tay tính từ mức của sàn đang đăng nhập; cột Điều kiện phí có trong menu Cột, ẩn sẵn. `wiki/entities/fee-schedule.md`
+- Về tay là cột máy tính: dán từ Excel không bao giờ ghi vào nó, bản xem trước nói lý do.
+  `_acceptance/dan-tu-excel/sua-sau-ky.md`
+- Chưa làm: dấu định nghĩa lúc tính trên từng giá (hàng 10), sửa Điều kiện phí trên ô, nhập «Phí CN», «BP» từ Sheet
+  (hàng 11), nhật ký đổi cấu hình (N10). `_acceptance/thue-phi/contract.md`

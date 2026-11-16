@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-16 — Trang tri thức Cài đặt sàn ghi Thuế phí MVP đã dựng (hàng 19, việc phụ N-12): ngoại lệ có màn, khoản riêng, giới hạn, cột Về tay — `docs/tri-thuc/wiki/chu-de/cai-dat-san.md`
 - 2026-11-16 — The design-assembly tool upgraded to plugin version 0.1.0 through the plugin's own upgrade command: six tool files, the component register gains back three "built from" parts of the filters, and `design/tool-stamp.json` records the version taken; record `_acceptance/upgrade-design-assembly-tool/`.
 - 2026-11-16 — Inventory by place (row 2d): the App Shell's second column lists projects, then subdivisions and buildings, with no counts; picking one filters the grid's Building column (whole names, stray spaces folded), «Tất cả hàng» drops it, and the footer shows the count — [PR #65](https://github.com/phanlemanh/onehub-inventory/pull/65).
 - 2026-11-16 — Inventory no longer flashes the table before the cards on a phone (VP4, debt of row 2b): the region draws both layouts until the browser takes over, then marks itself hydrated — [PR #70](https://github.com/phanlemanh/onehub-inventory/pull/70).
