@@ -5,7 +5,7 @@ slug: upgrade-design-assembly-tool
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-16
 design_doc: docs/superpowers/specs/2026-11-16-upgrade-design-assembly-tool-design.md
@@ -90,3 +90,16 @@ chí: dòng sổ `descope` «bỏ coverage-scan».
   `main` và HEAD, và phép đo nói đúng điều đó thay vì báo xanh.
 - Phép đo nguồn của AC-2 đọc kho design-assembly trên máy chủ kho (`~/dev/design-assembly`, hoặc thư mục trong biến
   `DESIGN_ASSEMBLY_REPO`). Máy không có kho ấy thì phép đo đỏ với lời «cannot read», không xanh suông.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-16:
+  - Ngoài-1: Sau khi nhánh đã gộp, phép kiểm danh sách tệp đổi vẫn báo đạt dù không so được gì, trái với ghi chú phía
+    trên.
+  - Ngoài-2: Hành vi hết giờ và báo lỗi mới của công cụ không có bài kiểm riêng ở kho này; chúng được kiểm ở kho plugin.
+  - Ngoài-3: Hai biến cấu hình mới (giới hạn giờ của lint, chỗ để kho plugin) chưa có trong tệp mẫu cấu hình.
+  - Ngoài-5: Việc đưa công cụ vào bằng lệnh lên đời, và việc không phép kiểm thường trực nào canh nó, chưa có trang quyết
+    định trong wiki.
+  - Ngoài-6: Phép đo cây công cụ không thấy được việc đổi quyền thực thi hay thay một tệp bằng liên kết cùng nội dung.
+  - Ngoài-7: Trang lộ trình cảnh báo hồ sơ này chưa thuộc hàng nào trong kế hoạch của kho.
+  - Ngoài-8: Cùng lỗi với Ngoài-1, do lượt soát thứ hai nêu lại: chấm lại sau khi gộp thì phép kiểm cả nhánh báo đạt
+    mà không so gì.
+  - Ngoài-10: Ma trận của hồ sơ hứa mười chín ca phá thử, bộ kiểm chứng thật có mười bảy.
+  - Ngoài-11: Bài kiểm chứng của phép kiểm cả nhánh coi kết quả đạt là xanh cả khi không so được gì.
