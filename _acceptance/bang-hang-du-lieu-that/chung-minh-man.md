@@ -35,12 +35,12 @@ không đổi khối nào của màn.
 
 | Trạng thái | Kết quả | Căn cứ |
 | --- | --- | --- |
-| Chờ tải | đạt | tests/e2e-db/bang-hang-that.spec.ts (nam-trang-thai: ?state=loading, sáng và tối); tools/e2e_templates/suite.ts (man inventory · vung cho-tai, phiên thật) |
+| Chờ tải | đạt | tests/e2e-db/bang-hang-that.spec.ts (nam-trang-thai: ?state=loading, sáng và tối); tests/e2e/screens/screens.spec.ts (công thức cho-tai) |
 | Trống | đạt | tests/e2e-db/bang-hang-that.spec.ts (nam-trang-thai: sàn [MAU-TRONG] chưa có căn, axe sáng và tối) |
 | Không có dòng nào khớp | đạt | tests/e2e-db/bang-hang-that.spec.ts (nam-trang-thai: lọc mã căn không có, nút Xoá lọc, axe) |
 | Lỗi | đạt | tests/e2e-db/bang-hang-that.spec.ts (nam-trang-thai: cơ sở dữ liệu từ chối lần đọc thật của sàn, vùng lỗi có Thử lại); tests/bang-hang-that.test.ts (loi-doc-that: lần đọc hỏng trả unreadable, không ném) |
-| Một phần hỏng | đạt | tools/e2e_templates/suite.ts (man inventory · vung mot-phan-hong, phiên thật) |
-| Chữ dài | đạt | tools/e2e_templates/suite.ts (man inventory · vung chu-dai, phiên thật) |
+| Một phần hỏng | đạt | tests/e2e/screens/screens.spec.ts (công thức mot-phan-hong; bộ khuôn có phiên thật chạy cùng công thức trên màn inventory) |
+| Chữ dài | đạt | tests/e2e/screens/screens.spec.ts (công thức chu-dai; bộ khuôn có phiên thật chạy cùng công thức trên màn inventory) |
 | Không đủ quyền | đạt | tests/bang-hang-that.test.ts (loi-doc-that: viewListings bị từ chối → forbidden); tests/the-dien-thoai.test.tsx (cua-vao: «không đủ quyền», không thẻ). Không vai thật nào gặp ở trạng thái này từ Hỏi-1 A (sổ quyết định) |
 | Xung đột khi lưu | đạt | tests/e2e-db/bang-hang-that.spec.ts (xung-dot-tai-o: phiên hai nhận câu tại ô, ô hiện giá mới nhất); tests/db/bang-hang-that.db.test.ts (xung-dot: 409 kèm bản hiện tại) |
 | Phiên hết hạn | đạt | tests/e2e-db/bang-hang-that.spec.ts (chua-dang-nhap-ve-dang-nhap: không phiên → trang đăng nhập, kể cả ?vai=) |
