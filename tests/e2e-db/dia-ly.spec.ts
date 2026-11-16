@@ -27,6 +27,7 @@ import { geoTree, type GeoNode } from "../../src/modules/listings/ui/geo-tree";
 import { inventoryRows } from "../../src/modules/listings/ui/inventory-rows";
 import { expect, test } from "../../tools/e2e_templates/fixture";
 import { openSheet } from "../../tools/e2e_templates/settle";
+import { regionReady } from "../e2e/phone-list";
 
 const ALL = `${FRAME_COPY.secondColumn.all} ${label("Listing").toLocaleLowerCase("vi")}`;
 // The same rows and catalog the screen reads, built here without the screen's own files (they pull in React).
@@ -141,6 +142,8 @@ const esc = (t: string) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 async function settled(page: Page) {
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+  // VP4: before the browser takes over, the region holds the table and the cards both; measure once it holds one.
+  await regionReady(page);
   // From 768 px the rows are a table; below it, the phone card list (row 2b).
   await expect(
     region(page).locator('table[data-slot="data-grid-table"], [data-slot="phone-list"]'),
