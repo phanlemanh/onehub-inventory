@@ -28,6 +28,8 @@ import { gridView, sameAsStored, savedViewHref } from "./saved-view-api";
 import { savedViewCopy, type SavedViewLabels } from "./saved-view-copy";
 import type { CellEditLabels } from "./cell-edit-copy";
 import { useListingCellEdit } from "./use-listing-cell-edit";
+import type { GeoNode } from "./geo-tree";
+import { useGeoPlace } from "./use-geo-place";
 
 /** Rows kept when part of the load fails: the first page and a half, so the partial state still spans two pages. */
 const PARTIAL_ROWS = 40;
@@ -51,6 +53,7 @@ export function InventoryGrid({
   listings,
   editLabels,
   door,
+  geoTree,
 }: {
   title: string;
   headers: Readonly<Record<InventoryField, string>>;
@@ -81,6 +84,8 @@ export function InventoryGrid({
   editLabels?: CellEditLabels;
   /** The save door of those edits; the sample door in memory when absent (row 10 hands in the real one). */
   door?: ListingSaveDoor;
+  /** 2d: the places of the grid's rows; the second column's place entries then filter the grid in place. */
+  geoTree?: readonly GeoNode[];
 }) {
   const router = useRouter();
   const [current, setCurrent] = useState<InventoryState>(state);
@@ -111,6 +116,8 @@ export function InventoryGrid({
   // The same columns on every render: this grid renders again on each change of arrangement (the «changed» mark), and
   // new columns would draw the header cells, with the filter box being typed in, again.
   const columns = useMemo(() => inventoryColumns(headers, customColumns), [headers, customColumns]);
+  // 2d: a place picked in the second column changes the project and building filters only; the address follows.
+  const geo = useGeoPlace({ tree: geoTree, rows, columns, view, active: !openView });
   // Below 768 px the region shows each row as the listing card's row layout (row 2b): the record head's own card.
   const phoneList = useMemo(
     (): RegionPhoneList<GridRow> => ({
@@ -135,7 +142,7 @@ export function InventoryGrid({
       {edit.dialogs}
       <DataRegion
         // Pressing the open entry of the second column again opens it afresh, its unsaved changes dropped.
-        key={`${openView?.id ?? ""}:${place.reopened}`}
+        key={`${openView?.id ?? ""}:${place.reopened}:${geo.picked}`}
         title={title}
         columns={columns}
         rows={shown}
@@ -144,7 +151,7 @@ export function InventoryGrid({
         record={record}
         emptyWhy={emptyWhy}
         initialFilters={filters}
-        initialView={saved}
+        initialView={geo.view ?? saved}
         onViewChange={setView}
         action={
           savedViews && copy

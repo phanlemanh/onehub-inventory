@@ -1,0 +1,20 @@
+# Kế hoạch thi công — bang-hang-theo-dia-ly (hàng 2d)
+
+Hợp đồng đã duyệt 2026-11-14 (Manh Phan): lối D — mỗi dự án một nhóm của cột thứ hai, cùng kiểu mục, không số; bấm một nơi
+giữ các lọc khác. Dựng chỉ sau khi PR #53 (7e) đã gộp và `origin/main` đã gộp về; hỏi G thứ tự gộp với 2b (dãy V) nếu chạm
+cùng tệp. Mỗi phép đo mới đi kèm cặp hai chiều trên cùng dữ liệu (đối chứng dương + ca phá ghim thông điệp).
+
+| # | Việc | Tệp | Kiểm từng việc | Phục vụ | independent |
+|---|---|---|---|---|---|
+| 1 | Gỡ bản mẫu: bỏ `?loi=`, `?nhieu=`, ba lối A/B/C, khối Cây ReUI và gói `@headless-tree` (về như nhánh chính; registry sinh lại bằng `make gen`) | `src/components/templates/app-shell/second-column-tree.tsx` (xoá), `src/components/reui/tree.tsx` (xoá), `package.json`, `package-lock.json`, `design/component-registry.json` | `make typecheck`, `git diff origin/main -- package.json` rỗng | — | false |
+| 2 | Luật lọc chung: danh sách tên trên cột chữ khớp trọn tên; ô lọc chữ hiện danh sách nối «, »; gõ tay vẫn chứa chữ; dòng luật ở `design/behaviors.md` | `src/components/candidate/grid-view.ts`, `column-filter-cell.tsx`, `design/behaviors.md`, `tests/dia-ly.test.tsx` | `make test` (bài lưới cũ không đổi lời) + ca Park 1/Park 10 + ca phá 'khop tron hong' | E5, E10 | true |
+| 3 | Cây thuần: `geoTree` (nơi có căn, thứ tự danh mục, toà lạ dưới dự án), `geoFiltersFor`, `placeFor` (lọc → nơi khi tập dòng bằng nhau), mục cột thứ hai theo lối D (một nhóm mỗi dự án: «Tất cả», phân khu lồng toà, toà; không count) | `src/modules/listings/ui/geo-tree.ts`, `geo-tree.test.ts`, `index.tsx` | `config:executors.test.dia_ly` với ma trận 10 nơi, 7 ca placeFor, ca rỗng, ca phá | E1, E3, E6 | true |
+| 4 | Cột thứ hai: mục có mục con vẽ thành danh sách con một cấp bằng chính mục của cột (không lớp nào trên mục gốc); mục sáng duy nhất tính trên cả mục con; dùng đúng lối cắm nhóm mục của 7e (`navFor` thêm nhóm) | `src/components/templates/nav-items.ts`, `nav-menu.tsx`, `app-shell/second-column.tsx`, `src/app/(app)/nav.ts`, `layout.tsx`, `tests/app-shell.test.tsx` | `make test` (bài App Shell cũ không đổi lời) + ca nhóm không mục con vẽ như cũ | E13 | false (sau 3) |
+| 5 | Một trạng thái lọc: bấm nơi khi Bảng hàng đang mở thì lưới chỉ thay lọc Dự án/Toà (qua kênh của App Shell như `place-change`), giữ lọc khác; lưới đổi lọc thì ghi `?vung=<nơi>` hay bỏ (thay địa chỉ, không tải lại) để cột sáng theo; góc nhìn đang mở thì không ghi `vung` (góc nhìn giữ mục sáng); trang đọc `?vung=` khi mở; đường dẫn tới nơi không có thì mở thường | `src/components/templates/app-shell/place-change.tsx`, `src/modules/listings/ui/inventory-grid.tsx`, `src/app/(app)/inventory/page.tsx` | `config:executors.test.dia_ly` (render: bấm nơi giữ lọc trạng thái) | E7, E8, E9 | false (sau 3, 4) |
+| 6 | Sàn rỗng và điện thoại: câu «Chưa có căn nào trên Bảng hàng.» chỗ các nhóm dự án; trong ngăn App Shell chọn nơi thì ngăn đóng | `src/modules/listings/ui/geo-tree.ts`, `src/app/(app)/layout.tsx` | render test ca rỗng | E1, E11 | false |
+| 7 | Bài trình duyệt có đăng nhập: bốn nơi đại diện, hai chiều, lọc khác, địa chỉ + góc nhìn, bốn khổ, axe sáng tối, phím; ca phá ghim thông điệp | `tests/e2e-db/dia-ly.spec.ts` | `config:executors.test.dia_ly_e2e_db` (chỉ khi giữ lượt chấm; ngoài lượt chạy riêng tệp này) | E4, E7, E8, E9, E11, E12 | false (sau 5, 6) |
+| 8 | Bài quét SP-1 theo import với regex rút từ `PRODUCT-INVARIANTS.md`, ca phá 'truy van moi' | `tests/dia-ly.test.tsx` | `config:executors.test.dia_ly` | E2 | true |
+| 9 | Hồ sơ màn và sổ: `chung-minh-man.md` (màn inventory theo màn mẫu họ Lưới, khối trong kho), dòng `wiki/log.md`, trang thực thể nếu hành vi đổi, `make gen` + bản đồ sinh lại commit riêng | `_acceptance/bang-hang-theo-dia-ly/chung-minh-man.md`, `wiki/log.md`, `wiki/entities/listing.md` | `python3 tools/proof_gate/check.py --root .`, `make check` | — | false |
+
+Thứ tự: 1 → (2, 3, 8 song song được nhưng nhỏ — làm tuần tự trong vòng chính) → 4 → 5 → 6 → 7 → 9 → `make check` → S4.
+Ảnh trước/sau cho AC-10 (Đã gửi, Tuỳ chỉnh của sàn ở 1440 và 360) chụp ở S4 bằng E14: ảnh «trước» từ nhánh chính tại gốc so.

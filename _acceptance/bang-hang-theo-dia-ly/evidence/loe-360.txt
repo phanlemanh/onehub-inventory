@@ -1,0 +1,8 @@
+Đo bảng loé ở khổ 360 trước khi đổi sang thẻ (XONG K-1511-9 (c)), 2026-11-15T10:58:27Z, commit 22117df, máy chủ thử dãy K, Chromium của Playwright.
+Cách đo: tải lại /inventory 5 lần; mỗi khung hình (requestAnimationFrame) trong 4 giây đầu ghi bảng (table[data-slot="data-grid-table"], có kích thước) và danh sách thẻ ([data-slot="phone-list"]) có trên màn không; cộng chỉ số xê dịch bố cục (layout-shift).
+LOE 0: frames=235 tableFrames=3 firstTable=30 lastTable=56 firstPhone=172 cls=0.000
+LOE 1: frames=236 tableFrames=3 firstTable=19 lastTable=55 firstPhone=166 cls=0.000
+LOE 2: frames=236 tableFrames=4 firstTable=28 lastTable=71 firstPhone=180 cls=0.000
+LOE 3: frames=236 tableFrames=3 firstTable=19 lastTable=55 firstPhone=160 cls=0.000
+LOE 4: frames=236 tableFrames=3 firstTable=21 lastTable=53 firstPhone=160 cls=0.000
+Kết luận: có. Mỗi lần tải, bảng hiện 3–4 khung hình (khoảng 20–70 ms đầu) rồi mất, thẻ hiện từ khoảng 160–180 ms. Chỉ số xê dịch bố cục 0, vì vùng được thay hẳn chứ không dời. Gốc: máy chủ vẽ bảng (chưa biết bề rộng màn), trang chỉ đổi sang thẻ khi mã phía trình duyệt chạy. Máy chậm hơn thì bảng ở lâu hơn. Đây là nợ của hàng 2b (bang-hang-the-dien-thoai), không sửa trong 2d.

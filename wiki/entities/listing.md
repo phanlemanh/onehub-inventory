@@ -45,3 +45,8 @@ chưa có trong mô hình: tới hàng 10 dùng dữ liệu mẫu `sampleKeeperO
 Hàng 2b, 14/11/2026: dưới 768 px Bảng hàng hiện mỗi lần chào thành thẻ căn ở dáng ngang (ô ảnh, mã căn và giá, nơi và
 trạng thái, diện tích và phòng ngủ) — cùng `ListingCard` của đầu hồ sơ; chạm thẻ mở hồ sơ toàn màn, lùi về đúng chỗ.
 Không sửa trên thẻ (hàng 3d). Hồ sơ: `_acceptance/bang-hang-the-dien-thoai/`.
+
+Hàng 2d, 14/11/2026: Bảng hàng đi theo địa lý — cột thứ hai có mỗi dự án một nhóm (phân khu lồng toà), đọc từ chính
+các dòng của bảng và chỗ đứng của toà trong danh mục; chọn một nơi chỉ thay lọc Dự án, Toà (danh sách tên khớp trọn),
+giữ lọc khác; địa chỉ mang `?vung=<nơi>`. Không thêm trường hay luật của lần chào. Quyết định
+[0036](../decisions/0036-mot-trang-thai-loc-theo-dia-ly.md); hồ sơ `_acceptance/bang-hang-theo-dia-ly/`.
