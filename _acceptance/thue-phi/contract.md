@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api, config]
 screens: [tuy-chinh-san, inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-14T14:20:10Z
 design_doc: docs/superpowers/specs/2026-11-14-thue-phi-design.md
@@ -189,3 +189,11 @@ Quét không gian AC (morphological, preset entity-feature, rút gọn):
   theo.
 - Đổi `ontology/` (thuộc tính `Listing.feeInclusion`, khái niệm `FeeSchedule`, ba khoản, hai dòng bảng quyền, nhãn) cần chủ
   kho duyệt ở cổng này.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-16:
+  - Ngoài-1: Một bài thử cố ý tắt chế độ ép cách ly giữa các sàn, nhưng chỉ chạy trên cơ sở dữ liệu tạm. Dữ liệu thật của các sàn không bị ảnh hưởng, chủ kho chỉ cần xem và duyệt khi ký.
+  - Ngoài-6: Một bài thử cố tình phá lớp cách ly giữa các sàn cần chủ kho xem và đồng ý khi ký. Cách ly dữ liệu giữa các sàn không bị hỏng.
+  - Ngoài-11: Hiếm khi, nếu hệ thống không đọc được tên người sửa, mức Thuế phí vẫn được lưu nhưng dòng nguồn hiện dấu gạch thay vì tên người đã đổi.
+  - Ngoài-14: Công cụ kiểm tra vòng đời thao tác đã được nới lỏng theo một phán quyết của giám sát chưa được ghi vào sổ quyết định. Người dùng cuối không thấy gì, nhưng chủ kho nên biết để duyệt rõ ràng.
+  - Ngoài-21: Một vài câu hướng dẫn ở phần Thuế phí viết sẵn chữ «giá chào», «bao phí», «thuế phí». Nếu sau này sàn đổi tên gọi các khái niệm này, những câu đó có thể lệch với tiêu đề cột.
+  - Ngoài-23: Chỉ khi ai đó ghi thẳng vào cơ sở dữ liệu, bỏ qua màn hình và API, mới tạo được khoản riêng không có tên và hiện ra một dòng trống. Đi qua màn hình thì không xảy ra.
+  - SP-1: chấp nhận có tên — dòng phá thử cố ý tắt ép luật cách ly ở db/tests/pha-thu/thue-phi-khong-ep.sql chỉ chạy trên cơ sở dữ liệu thử.
