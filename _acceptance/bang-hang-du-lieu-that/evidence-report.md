@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 9ba5850e7694baf63c0dfd0194ccf860f360fc33
-human_signoff:
+human_signoff: Manh Phan 2026-11-16
 ---
 
 # Evidence Report: bang-hang-du-lieu-that

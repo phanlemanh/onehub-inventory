@@ -11,9 +11,9 @@ flowchart TD
   GD --> XL["Xếp lại sau<br/>chưa có"]
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
-  GP --> DL["Đang làm<br/>1 việc"] --> GB{"Cổng Bằng chứng"}
+  GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
   GB --> DG["Đã giao<br/>4 việc"]
-  GB --> CN["Chờ phiên nghiệm thu<br/>50 việc"] --> GG{"Cổng Giá trị"}
+  GB --> CN["Chờ phiên nghiệm thu<br/>51 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
 
@@ -35,14 +35,11 @@ flowchart TD
 - Đầu chủ sửa được thông tin của căn ngoài giá và trạng thái — pháp lý, nội thất, tài chính, tình trạng sử dụng — ngay trong sản phẩm, không phải nhập lại tệp (`sua-thong-tin-can`)
 - Đầu chủ gõ mã căn để thêm căn, hoặc tạo căn tay khi danh mục chưa có (`them-can`)
 
-## Đang làm
-
-- Đầu chủ đăng nhập và thấy, sửa được hàng thật của sàn mình trên Bảng hàng (`bang-hang-du-lieu-that`)
-
 ## Đã giao — chờ phiên nghiệm thu
 
 - Nhân viên sàn làm việc trong một App Shell chọn từ ReUI Pro, giữ đủ thanh bên theo vai, băng báo và các trạng thái toàn trang đang có (`app-shell-chon-tu-reui`)
 - Đầu chủ mở Bảng hàng và thấy các căn của sàn trên Lưới, đủ trạng thái màn, ở bốn khổ màn hình (`bang-hang-ban-doc`)
+- Đầu chủ đăng nhập và thấy, sửa được hàng thật của sàn mình trên Bảng hàng (`bang-hang-du-lieu-that`)
 - Đầu chủ dùng Bảng hàng bằng tay như Sheet: đi giữa các ô bằng phím mũi tên, bôi một vùng ô rồi chép sang Zalo hay Excel, bấm tiêu đề để sắp xếp, lọc từng cột, nhóm dòng theo toà, ẩn hiện cột (`bang-hang-dung-tay-nhu-sheet`)
 - Đầu chủ và Đầu khách mở Bảng hàng trên điện thoại thấy danh sách thẻ căn và chạm thẻ để mở hồ sơ căn (`bang-hang-the-dien-thoai`)
 - Đầu chủ đi Bảng hàng theo địa lý: chọn dự án, phân khu, toà ở cột thứ hai của App Shell và lọc các cột địa lý trên bảng (`bang-hang-theo-dia-ly`)

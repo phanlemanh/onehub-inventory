@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api]
 screens: [inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-15
 design_doc: docs/superpowers/specs/2026-11-15-bang-hang-du-lieu-that-design.md
@@ -144,3 +144,9 @@ Quỹ hàng (cận kề). Bảng thao tác đủ vòng đời ở thiết kế m
 - Tệp tầng cao sẽ sửa: `db/migrations/013_*.sql`, `db/tests/cach-ly.sql`, `db/scripts/` (lệnh nạp mẫu),
   `ontology/entities/Listing.yaml`, `ontology/actions.yaml`, có thể `ontology/roles.yaml` (theo Hỏi-1). Không chạm
   `src/modules/identity/**` ngoài việc gọi cửa công khai; không chạm `tools/**`.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-16:
+  - Ngoài-1: bài máy «Không đủ quyền» chưa có ca chứng hai kiểm tra phụ («không vùng hàng», «không mã căn») biết báo đỏ; màn đúng hôm nay — đích hàng 3g.
+  - Ngoài-5: quy tắc báo lỗi khi lưu trên Bảng hàng là bản riêng, chưa dùng chung với các màn khác — đích hàng 3g.
+  - Ngoài-6: máy chủ lỗi hay phiên hết hạn lúc sửa giá thì báo «không có quyền»; ca hiếm đã lưu mà ô hiện giá cũ, lần sửa kế báo xung đột; không mất dữ liệu — đích hàng 3g.
+  - Ngoài-8: bài nhỏ của cửa lưu dùng câu trả lời viết tay, không lấy từ máy chủ thật — đích hàng 3g.
+  - SP-1: tệp phá thử của bộ kiểm cách ly tắt cách ly bảng căn chào trên bản thử, có chủ ý; bảng thật bật cách ly bắt buộc.
