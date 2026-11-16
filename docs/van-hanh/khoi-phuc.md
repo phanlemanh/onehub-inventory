@@ -77,6 +77,21 @@ sở nháp, đếm dòng từng bảng và chạy bộ kiểm cách ly trên b�
   - `không tạo được cơ sở nháp` — vai trong `KHOI_PHUC_ADMIN_URL` không được tạo cơ sở dữ liệu; dùng vai chủ `postgres`.
   - `không xoá được cơ sở nháp <tên> — xoá tay` — Supabase › SQL Editor: `drop database <tên> with (force);`.
   - Dòng ca cách ly đỏ — như bước 2.
+  - Lệnh dừng trước khi tạo cơ sở nháp khi bản không khớp (không có gì bị ghi):
+    - `khoi-phuc: pg_restore bản <a>, máy chủ khôi phục bản <b>` — cài `pg_restore` cùng bản chính với máy chủ (xem «Cần có
+      trước»), chạy lại bước 4.
+    - `khoi-phuc: tệp sao lưu lấy bằng pg_dump bản <a>, máy chủ khôi phục bản <b>` hay `tệp sao lưu lấy bằng pg_dump mới
+hơn bản <b>` — tệp lấy bằng công cụ khác bản: cài công cụ cùng bản rồi làm lại từ bước 3 (sao lưu lại).
+    - `khoi-phuc: tệp sao lưu từ máy chủ bản <a>, máy chủ khôi phục bản <b>` — tệp lấy từ một máy chủ khác bản với máy chủ
+      đang khôi phục vào: **khôi phục vào một máy chủ CÙNG bản với tệp, KHÔNG sao lưu lại** (sao lưu lại sẽ lấy dữ liệu
+      hiện tại, không phải dữ liệu cần khôi phục). Bản của máy chủ ở Supabase › Project Settings › Infrastructure.
+    - `khoi-phuc: pg_restore không đọc được tệp sao lưu` hay `tệp sao lưu không ghi bản pg_dump và bản máy chủ gốc` — tệp
+      hỏng hay không do `make sao-luu` tạo: dùng một tệp khác; không có tệp nào khác thì báo người giữ kho mã.
+    - `khoi-phuc: không đọc được bản của máy chủ khôi phục` hay `không đọc được bản của pg_restore` — kiểm
+      `KHOI_PHUC_ADMIN_URL` và `pg_restore --version` như «Cần có trước».
+  - `khoi-phuc: không thấy tệp`, `thiếu tệp đếm <tệp>.dem` — dùng đúng tệp của bước 3; tệp `.dem` nằm cạnh tệp sao lưu.
+  - `khoi-phuc: thiếu biến <tên>` — nạp lại tệp biến (bước 1).
+  - `khoi-phuc: đếm dòng trên bản khôi phục lỗi` — báo người giữ kho mã kèm nguyên dòng.
 
 ### 5. Ghi nhật ký khôi phục
 

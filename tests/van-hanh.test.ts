@@ -338,3 +338,41 @@ describe("runbook docs/van-hanh (AC-9)", () => {
     ]);
   });
 });
+
+/**
+ * Every stop line `db/scripts/khoi-phuc-thu.sh` prints on stderr (its fixed text, up to the first variable or « — ») must appear
+ * in `docs/van-hanh/khoi-phuc.md`, so an operator who meets it mid-restore finds what to do. Returns the missing texts.
+ */
+export function restoreStopsMissing(root: string): string[] {
+  const script = readFileSync(join(root, "db/scripts/khoi-phuc-thu.sh"), "utf8");
+  const doc = readFileSync(join(root, "docs/van-hanh/khoi-phuc.md"), "utf8").replace(/\s+/g, " ");
+  const missing: string[] = [];
+  for (const m of script.matchAll(/^\s*echo "khoi-phuc: ([^"]*)" >&2/gm)) {
+    const fixed = m[1]!
+      .split("$")[0]!
+      .split(" — ")[0]!
+      .replace(/[\s(—,]+$/, "")
+      .trim();
+    if (fixed.length < 8 || fixed.startsWith("đỏ")) continue;
+    if (!doc.includes(fixed)) missing.push(fixed);
+  }
+  return [...new Set(missing)];
+}
+
+describe("restore stop lines are in the runbook", () => {
+  it("every stop line of khoi-phuc-thu.sh is in khoi-phuc.md", () => {
+    expect(restoreStopsMissing(ROOT)).toEqual([]);
+  });
+
+  it("break: a copy whose script gains a new stop line names it", () => {
+    const dir = tempDir("dong-dung-");
+    cpSync(join(ROOT, "docs"), join(dir, "docs"), { recursive: true });
+    cpSync(join(ROOT, "db/scripts"), join(dir, "db/scripts"), { recursive: true });
+    const p = join(dir, "db/scripts/khoi-phuc-thu.sh");
+    writeFileSync(
+      p,
+      `${readFileSync(p, "utf8")}\n  echo "khoi-phuc: một dòng dừng mới chưa có trong sổ tay" >&2\n`,
+    );
+    expect(restoreStopsMissing(dir)).toEqual(["một dòng dừng mới chưa có trong sổ tay"]);
+  });
+});
