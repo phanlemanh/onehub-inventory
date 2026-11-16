@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: fa302e8e94c40cfc7ce6e51b3d53271d13cab48a
+verified_commit: a00b21736339730f558224a83be763d05479bd38
 human_signoff: Manh Phan 2026-11-16
 ---
 
@@ -179,3 +179,7 @@ sha: d8444a91547391b8ca0671933cd7b1cb1bb5c827 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 4 — 2026-11-16, do hang 22 so ban cong cu sao luu (db/scripts, tests/db), ghim lai 1u
 run_id: repin-20261116T192708Z-87025
 sha: fa302e8e94c40cfc7ce6e51b3d53271d13cab48a · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)
+
+### Re-pin lần 5 — 2026-11-16, do hang 22: Next 16.4.6 va cau in khoi-phuc-thu.sh, ghim lai 1u
+run_id: repin-20261116T203737Z-82999
+sha: a00b21736339730f558224a83be763d05479bd38 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E8 (E8 không khai paths)
