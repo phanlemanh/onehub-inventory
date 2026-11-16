@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 82ea4fdd4521f1b55fa1132d97935d5dfe0a24de
+verified_commit: c69427dc2eeb06de40995e49d07e75404b34dd9e
 human_signoff: Manh Phan 2026-11-16
 ---
 
@@ -255,3 +255,7 @@ Round 3: đạt; hồ sơ bằng chứng và thẻ cổng (commit 0641b01).
 Round 4: delta — dòng Excel ngắn khớp cột theo thứ tự lưới hiển thị (commit ddef774).
 Round 5: mọi eval gắn AC xanh; BLOCKED vì lệnh suite make e2e quá 30 phút chưa kết thúc, cần khai long_running rồi chờ hoặc chạy lại với thời hạn dài hơn.
 Round 6: chạy lại sau khi máy ngủ làm gián đoạn round 5; mọi eval và hai lệnh suite xanh trên commit 82ea4fd; E2 và E10 mang từ round 4 và round 3.
+
+### Re-pin lần 1 — 2026-11-16, do hàng 5 đổi mã hàng 4 và gộp main 7f113f7 sau chữ ký
+run_id: repin-20261116T014736Z-71377
+sha: c69427dc2eeb06de40995e49d07e75404b34dd9e · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E1-ui, E2b (E2b không khai paths) · diff chạm vật đo ngoài làn máy: E1-ui — chưa chứng lại, đi vòng S4 delta
