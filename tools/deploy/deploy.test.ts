@@ -121,6 +121,7 @@ interface Ctx {
   health: Record<string, Health | "drop">;
   proto: Record<string, number>;
   domainOverride?: Health;
+  host: string;
   /** Answers for the domain's next health reads, one each, before the usual ones: "drop" closes, "text" is not JSON. */
   domainSeq?: (Health | "drop" | "text")[];
   requests: { t: number; path: string }[];
@@ -229,7 +230,7 @@ async function fresh(appEnv: Env, setup: Setup = {}): Promise<Ctx> {
       const target = existsSync(join(fake, "ten-mien"))
         ? readFileSync(join(fake, "ten-mien"), "utf8").trim()
         : "";
-      prefix = "/" + (target.replace(/^https?:\/\/[^/]+/, "").split("/")[1] ?? "");
+      prefix = "/" + (target.replace(/^(?:https?:\/\/)?[^/]+/, "").split("/")[1] ?? "");
     }
     const h = ctx.health[prefix];
     if (h === "drop") {
@@ -248,6 +249,8 @@ async function fresh(appEnv: Env, setup: Setup = {}): Promise<Ctx> {
   servers.push(server);
   await new Promise((r) => server.listen(0, "127.0.0.1", () => r(null)));
   ctx.base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+  // `vercel list --json` gives bare hosts, `vercel deploy` prints `https://host`: the fake list uses bare hosts.
+  ctx.host = ctx.base.replace(/^https?:\/\//, "");
 
   ctx.health["/ban-moi"] = { ok: true, commit: head, env: appEnv, vai: "dat" };
   ctx.health["/ban-cu"] = { ok: true, commit: OLD, env: appEnv, vai: "dat" };
@@ -258,9 +261,9 @@ async function fresh(appEnv: Env, setup: Setup = {}): Promise<Ctx> {
     join(fake, "list.json"),
     JSON.stringify({
       deployments: [
-        { url: `${ctx.base}/ban-cu`, createdAt: 1, state: "READY", meta: { onehub_commit: OLD } },
+        { url: `${ctx.host}/ban-cu`, createdAt: 1, state: "READY", meta: { onehub_commit: OLD } },
         {
-          url: `${ctx.base}/ban-moi`,
+          url: `${ctx.host}/ban-moi`,
           createdAt: 2,
           state: "READY",
           meta: { onehub_commit: head },
@@ -606,7 +609,10 @@ describe("make deploy — ma trận bước đỏ", () => {
 
     it(`${appEnv} · kiem-nhanh-ten-mien đỏ sau gắn tên miền → lùi đúng một lần`, async () => {
       const ctx = await fresh(appEnv);
-      ctx.domainOverride = { ok: true, commit: ctx.head, env: appEnv, vai: "không nối được" };
+      ctx.domainSeq = [
+        { ok: true, commit: OLD, env: appEnv, vai: "dat" },
+        { ok: true, commit: ctx.head, env: appEnv, vai: "không nối được" },
+      ];
       const r = await deploy(ctx, appEnv);
       expect(r.code).not.toBe(0);
       const steps = STEPS[appEnv];
@@ -619,9 +625,47 @@ describe("make deploy — ma trận bước đỏ", () => {
       ]);
       expect(r.vercel.filter((v) => v.startsWith("vercel promote"))).toHaveLength(1);
       expect(r.vercel.filter((v) => v.startsWith("vercel rollback"))).toEqual([
-        `vercel rollback ${ctx.base}/ban-cu --yes`,
+        `vercel rollback ${ctx.host}/ban-cu --yes`,
       ]);
       expectNoMarker(ctx, r);
+    });
+
+    it(`${appEnv} · lùi sau gắn tên miền không bao giờ chọn chính bản vừa lên (url trần như vercel list --json)`, async () => {
+      // Redeploy of the commit the domain already serves: the new deployment and the one serving carry the same
+      // commit. Comparing \`https://host\` with a bare host never drops the new one, and it is the newest: the
+      // rollback would point the domain back at the failed build and still print «đã lùi».
+      const ctx = await fresh(appEnv);
+      ctx.health["/ban-truoc"] = { ok: true, commit: ctx.head, env: appEnv, vai: "dat" };
+      writeFileSync(
+        join(ctx.fake, "list.json"),
+        JSON.stringify({
+          deployments: [
+            {
+              url: `${ctx.host}/ban-truoc`,
+              createdAt: 1,
+              state: "READY",
+              meta: { onehub_commit: ctx.head },
+            },
+            {
+              url: `${ctx.host}/ban-moi`,
+              createdAt: 2,
+              state: "READY",
+              meta: { onehub_commit: ctx.head },
+            },
+          ],
+        }),
+      );
+      ctx.domainSeq = [
+        { ok: true, commit: ctx.head, env: appEnv, vai: "dat" },
+        { ok: true, commit: ctx.head, env: appEnv, vai: "không nối được" },
+      ];
+      const r = await deploy(ctx, appEnv);
+      expect(r.code).not.toBe(0);
+      const rb = r.vercel.filter((v) => v.startsWith("vercel rollback"));
+      expect(rb, "rollback phải về bản đang chạy trước khi gắn, không về bản vừa lên").toEqual([
+        `vercel rollback ${ctx.host}/ban-truoc --yes`,
+      ]);
+      expect(rb.some((v) => v.includes("/ban-moi"))).toBe(false);
     });
   }
 });
@@ -673,7 +717,7 @@ describe("make rollback", () => {
       const r = await run(ctx, "make", ["-s", "-f", DEPLOY_MK, "rollback", `ENV=${appEnv}`]);
       expect(r.code, r.stdout + r.stderr).toBe(0);
       expect(r.vercel.filter((v) => v.startsWith("vercel rollback"))).toEqual([
-        `vercel rollback ${ctx.base}/ban-cu --yes`,
+        `vercel rollback ${ctx.host}/ban-cu --yes`,
       ]);
       expect(ctx.requests.filter((q) => q.path === "/ten-mien/api/v1/health").length).toBe(2);
       expect(r.lines).toEqual([`rollback ${appEnv}: tên miền chạy ${OLD.slice(0, 7)}`]);
@@ -688,7 +732,7 @@ describe("make rollback", () => {
         JSON.stringify({
           deployments: [
             {
-              url: `${ctx.base}/ban-moi`,
+              url: `${ctx.host}/ban-moi`,
               createdAt: 2,
               state: "READY",
               meta: { onehub_commit: ctx.head },

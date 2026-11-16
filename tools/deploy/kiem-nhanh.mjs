@@ -144,7 +144,8 @@ export function productionDeployments({ cwd, env = process.env } = {}) {
     .map((d) => ({ url: d.url, id: d.uid ?? d.id, commit: commitOf(d) }));
 }
 
-function bare(url) {
+/** A deployment url without scheme or trailing slash: `vercel deploy` prints `https://host`, `vercel list --json` a bare host. */
+export function bare(url) {
   return String(url ?? "")
     .replace(/^https?:\/\//, "")
     .replace(/\/+$/, "");
@@ -167,7 +168,7 @@ export function nameTheTarget(appEnv) {
  * unknown; the target is the next older one with another commit.
  */
 export function previousOf(list, { current, exclude } = {}) {
-  const ds = list.filter((d) => d.url !== exclude);
+  const ds = list.filter((d) => !exclude || bare(d.url) !== bare(exclude));
   let i = current ? ds.findIndex((d) => d.commit === current) : -1;
   if (i < 0) i = 0;
   const cur = ds[i];

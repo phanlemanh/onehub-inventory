@@ -228,7 +228,12 @@ Bảng biến ở mục sau nói mỗi biến dùng cho gì.
     trường». Bắt đầu ở trang kho: Actions › Deploy › Run workflow, ô «Use workflow from» để tab Branches, chọn nhánh
     `main` (lần đầu chưa có thẻ phát hành nào), bấm Run workflow. Lần chạy đầu dừng ở bước cần vai đăng nhập (bản thử:
     `cach-ly`; bản thật: `kiem-nhanh`) vì vai vừa được tạo chưa có mật khẩu. Đặt mật khẩu của việc 4 cho vai ấy trong SQL
-    Editor của Supabase rồi chạy lại cùng cách. Khi bản thử đã xong và lượt chờ duyệt `production`, làm việc 13 cho bản
+    Editor của Supabase rồi chạy lại cùng cách. Với bản thật: bản thử đã xong, chủ kho duyệt `production`, bản thật dừng ở
+    `kiem-nhanh` với dòng `deploy production: kiem-nhanh ĐỎ — vai nối chưa đạt …` và `DỪNG ở kiem-nhanh — tên miền không
+đổi` (tên miền chưa gắn bản mới, không ai bị ảnh hưởng); mở SQL Editor của **dự án bản thật**, chạy
+    `alter role quy_hang_login password '<mật khẩu chỉ chữ và số>';`, đặt cùng mật khẩu vào `DATABASE_URL` của dự án
+    Vercel bản thật (việc 9), rồi Run workflow lại như trên. Lượt chạy lại đi lại cả bản thử (nhanh, đã xanh) rồi lại chờ
+    duyệt `production` — duyệt lần nữa. Khi bản thử đã xong và lượt chờ duyệt `production`, làm việc 13 cho bản
     thử trước khi nhìn bản thử và duyệt. Máy nhận lại: không biến mới.
     - **Đạt khi:** nhật ký lượt Deploy có `deploy staging: xong <commit>` rồi `deploy production: xong <commit>`; mở
       `<APP_URL>/api/v1/health` của hai môi trường thấy `"ok":true` và `"vai":"dat"`.

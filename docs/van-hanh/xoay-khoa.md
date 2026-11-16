@@ -75,7 +75,13 @@ dùng chung hai môi trường» ở trên.
   mới của bước 1, lưu.
 - **Đạt khi:** Supabase báo đã lưu. Từ lúc này mật khẩu cũ hết dùng: với vai đăng nhập, bản đang chạy không nối được cơ sở
   dữ liệu cho tới khi bước 4 xong (vài phút) — làm lúc vắng người dùng, hoặc ngay nếu khoá lộ.
-- **Đỏ thì:** báo lỗi cú pháp — kiểm dấu nháy đơn quanh mật khẩu; mật khẩu có dấu nháy đơn thì sinh mật khẩu khác.
+- **Mật khẩu chỉ gồm chữ cái a–z, A–Z và chữ số 0–9, dài ít nhất 32 ký tự** — cho cả hai vai. Vì mật khẩu nằm giữa chuỗi
+  nối `postgres://<vai>:<mật khẩu>@<máy>`, các ký tự như `@ : / ? # % '` làm hỏng chuỗi hay câu lệnh. Bộ sinh của
+  Supabase (Generate a password) có thể ra ký tự đặc biệt: đừng dùng nó, dán mật khẩu tự sinh trong trình giữ mật khẩu với
+  tuỳ chọn «chỉ chữ và số».
+- **Đỏ thì:** báo lỗi cú pháp — kiểm dấu nháy đơn quanh mật khẩu; nếu sau bước 4 bản không nối được cơ sở dữ liệu với lỗi
+  «invalid port», «password authentication failed» hay chuỗi nối bị cắt — mật khẩu có ký tự đặc biệt: sinh lại mật khẩu
+  chỉ chữ và số, làm lại bước 1–4.
 
 ### 4. Đưa lại bản
 

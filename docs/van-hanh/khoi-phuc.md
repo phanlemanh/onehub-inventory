@@ -13,9 +13,15 @@ sở nháp, đếm dòng từng bảng và chạy bộ kiểm cách ly trên b�
 
 ## Cần có trước
 
-- Một máy có `git`, bản sao của kho này, và các lệnh `psql`, `pg_dump`, `pg_restore` cùng bản chính với Postgres của
-  Supabase (Supabase › Project Settings › Infrastructure ghi bản Postgres). Máy chỉ có Docker thì đặt `PSQL_DICH`,
-  `PG_DUMP_CMD`, `PG_RESTORE_CMD` thành lệnh chạy qua Docker.
+- Một máy có `git`, `make`, `bash` và bản sao của kho này (GitHub › trang kho › Code › HTTPS › chép, rồi `git clone`).
+  `make sao-luu`, `make khoi-phuc-thu` và `make cach-ly-dich` chỉ chạy `bash` với `psql`, `pg_dump`, `pg_restore`: **không
+  cần Node, không cần `make setup`**.
+- `psql`, `pg_dump`, `pg_restore` **bản chính 17 trở lên** — bằng hay mới hơn bản Postgres của Supabase (Supabase › Project
+  Settings › Infrastructure ghi bản; hiện là 17). macOS: `brew install postgresql@17`; Ubuntu: gói `postgresql-client-17`.
+  - **Đạt khi:** `pg_dump --version` in `pg_dump (PostgreSQL) 17.` hoặc số lớn hơn.
+  - **Đỏ thì:** `command not found` — chưa cài hoặc chưa vào `PATH` (brew in sẵn dòng thêm `PATH`); số nhỏ hơn 17 — cài
+    bản 17, vì `pg_dump` cũ từ chối máy chủ mới hơn nó («server version mismatch»). Máy chỉ có Docker thì đặt `PSQL_DICH`,
+    `PG_DUMP_CMD`, `PG_RESTORE_CMD` thành lệnh chạy qua Docker với ảnh `postgres:17`.
 - Một thư mục **ngoài kho** để giữ tệp sao lưu: tệp có dữ liệu thật; lệnh từ chối ghi vào trong kho.
 - Tệp biến ngoài kho của bản thử, quyền chỉ chủ đọc, có:
   - `MIGRATE_DATABASE_URL` — chuỗi Session pooler vai chủ của dự án bản thử;

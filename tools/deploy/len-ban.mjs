@@ -19,6 +19,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  bare,
   ENVS,
   git,
   kiemNhanh,
@@ -301,11 +302,17 @@ export async function lenBan(
         say("lùi bản ĐỎ — không đọc được danh sách bản của Vercel; tên miền vẫn ở bản mới");
         return 1;
       }
-      const others = list.filter((d) => d.url !== newUrl);
-      const back =
-        others.find((d) => d.commit && d.commit === domainCommitBefore) ?? others[0] ?? null;
+      // `newUrl` is `https://host` (vercel deploy), the list holds bare hosts (vercel list --json): compare bare hosts.
+      const others = list.filter((d) => bare(d.url) !== bare(newUrl));
+      const back = others.find((d) => d.commit && d.commit === domainCommitBefore) ?? null;
       if (!back) {
-        say("không có bản trước để lùi");
+        say(
+          `lùi bản DỪNG — không thấy bản nào khác bản mới mang commit ${short(domainCommitBefore)} tên miền chạy trước khi gắn, không đoán; tên miền vẫn ở bản mới — ${nameTheTarget(appEnv)}`,
+        );
+        return 1;
+      }
+      if (bare(back.url) === bare(newUrl)) {
+        say("lùi bản DỪNG — bản chọn để lùi chính là bản vừa đưa lên; tên miền vẫn ở bản mới");
         return 1;
       }
       const rb = vercel(["rollback", back.url, "--yes"], { cwd: root, env });
