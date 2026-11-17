@@ -15,7 +15,7 @@ Lưới, màn mẫu của họ — hàng này chỉ thêm nút «Nạp tệp» v
 
 | Họ đề xuất | Lối | Vì sao |
 | --- | --- | --- |
-| rỗng | họ mới | ba họ của kho (Lưới, Danh sách khung, Đăng nhập) không nhận một luồng nhiều bước; máy khuyên họ mới «Luồng nhiều bước» (`luong-nhieu-buoc`) với màn này là màn mẫu — chủ kho chốt ở Cổng Phạm vi (Hỏi-10) |
+| luong-nhieu-buoc | họ mới | ba họ của kho (Lưới, Danh sách khung, Đăng nhập) không nhận một luồng nhiều bước; họ mới «Luồng nhiều bước» với màn này là màn mẫu — chủ kho duyệt ở Cổng Phạm vi 2026-11-17 (Hỏi-10) |
 
 ### Ứng viên ReUI
 

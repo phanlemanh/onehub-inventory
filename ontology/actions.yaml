@@ -312,22 +312,47 @@ actions:
 
   - name: importListings
     description: >-
-      Import a sheet file into the inventory — preview, apply in batches, undo a whole import (own scope imports for
+      Start importing a sheet file into the inventory — preview the marks and open an import (own scope imports for
       oneself; company scope picks a list agent of the company).
     entity: ImportRun
-    kind: command
+    kind: create
     status: live
     scope: { ListAgent: own, TeamLead: company }
     doors:
-      api:
-        [
-          "POST /api/v1/imports",
-          "POST /api/v1/imports/preview",
-          "POST /api/v1/imports/[id]/batches",
-          "POST /api/v1/imports/[id]/undo",
-          "GET /api/v1/imports",
-        ]
-      db: ["table import_runs insert", "table import_runs update", "table listings delete"]
+      api: ["POST /api/v1/imports/preview", "POST /api/v1/imports"]
+      db: ["table import_runs insert"]
+
+  - name: viewImports
+    description: See the company's recent imports and what each one added, taught and kept as written.
+    entity: ImportRun
+    kind: query
+    status: live
+    scope: { ListAgent: company, TeamLead: company }
+    doors:
+      api: ["GET /api/v1/imports"]
+      db: ["table import_runs select"]
+
+  - name: continueImport
+    description: Write the next batches of an open import, or send a failed batch again.
+    entity: ImportRun
+    kind: update
+    status: live
+    scope: { ListAgent: own, TeamLead: company }
+    doors:
+      api: ["POST /api/v1/imports/[id]/batches"]
+      db: ["table import_runs update"]
+
+  - name: undoImport
+    description: >-
+      Undo a whole import: remove its listings nobody changed since and retire what it taught (own scope is an import
+      one made).
+    entity: ImportRun
+    kind: delete
+    status: live
+    scope: { ListAgent: own, TeamLead: company }
+    doors:
+      api: ["POST /api/v1/imports/[id]/undo"]
+      db: ["table import_runs update", "table listings delete"]
 
   - name: viewOwnerPhone
     description: See the phone number of a listing's owner (own scope is the unit one keeps).

@@ -96,6 +96,13 @@ const CELLS: Record<string, Partial<Record<Role, Scope>>> = {
   },
   updateListing: { ListAgent: "company", BuyerAgent: "company", TeamLead: "company" },
   activateListing: { ListAgent: "own", TeamLead: "company" },
+  // Row 11 (nhap-excel, owner's scope approval 2026-11-17, Hỏi-1 and Hỏi-7): creating listings goes live through the
+  // import, and the four import actions.
+  createListing: { ListAgent: "own", TeamLead: "company" },
+  importListings: { ListAgent: "own", TeamLead: "company" },
+  viewImports: { ListAgent: "company", TeamLead: "company" },
+  continueImport: { ListAgent: "own", TeamLead: "company" },
+  undoImport: { ListAgent: "own", TeamLead: "company" },
 };
 // Row 9e (bo-nut-theo-quyen): the seven draft rows the owner chose at the scope gate, written before the table.
 const DRAFT_CELLS_9E: Record<string, Partial<Record<Role, Scope>>> = {
@@ -128,6 +135,12 @@ const API_DOORS = [
   // Row 10: one listing changed by one change.
   "PATCH /api/v1/listings/[id]",
   "DELETE /api/v1/saved-views/[id]",
+  // Row 11: the import of a sheet file.
+  "GET /api/v1/imports",
+  "POST /api/v1/imports",
+  "POST /api/v1/imports/preview",
+  "POST /api/v1/imports/[id]/batches",
+  "POST /api/v1/imports/[id]/undo",
 ];
 const EXEMPT_API = [
   "POST /api/v1/auth/code",
@@ -178,10 +191,10 @@ describe("cong-quyen-15-to-hop", () => {
     expect(Object.fromEntries(LIVE_ACTIONS.map((a) => [a.name, a.scope]))).toEqual(CELLS);
   });
 
-  it("every live action × every set of roles gets the widest scope: 24 × 15 = 360 asserts (row 2c: +4 rows, row 7e: +5, row 19: +2, row 10: +3)", () => {
+  it("every live action × every set of roles gets the widest scope: 29 × 15 = 435 asserts (row 2c: +4 rows, row 7e: +5, row 19: +2, row 10: +3, row 11: +5)", () => {
     const r = addUp(allowedScope);
     expect(r.failures).toEqual([]);
-    expect(r.count).toBe(360);
+    expect(r.count).toBe(435);
   });
 
   it("break: taking the narrowest scope names the first set that differs", () => {

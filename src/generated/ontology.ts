@@ -474,6 +474,15 @@ export interface ActivateListingInput {
 export interface ImportListingsInput {
 }
 
+export interface ViewImportsInput {
+}
+
+export interface ContinueImportInput {
+}
+
+export interface UndoImportInput {
+}
+
 export interface ViewOwnerPhoneInput {
 }
 
@@ -550,8 +559,14 @@ export interface ActionHandlers {
   updateListing(input: UpdateListingInput, ctx: ActionContext): Promise<void>;
   /** Put a listing on sale (own scope is the unit one keeps, or a unit nobody keeps yet). */
   activateListing(input: ActivateListingInput, ctx: ActionContext): Promise<void>;
-  /** Import a sheet file into the inventory — preview, apply in batches, undo a whole import (own scope imports for oneself; company scope picks a list agent of the company). */
+  /** Start importing a sheet file into the inventory — preview the marks and open an import (own scope imports for oneself; company scope picks a list agent of the company). */
   importListings(input: ImportListingsInput, ctx: ActionContext): Promise<void>;
+  /** See the company's recent imports and what each one added, taught and kept as written. */
+  viewImports(input: ViewImportsInput, ctx: ActionContext): Promise<void>;
+  /** Write the next batches of an open import, or send a failed batch again. */
+  continueImport(input: ContinueImportInput, ctx: ActionContext): Promise<void>;
+  /** Undo a whole import: remove its listings nobody changed since and retire what it taught (own scope is an import one made). */
+  undoImport(input: UndoImportInput, ctx: ActionContext): Promise<void>;
   /** See the phone number of a listing's owner (own scope is the unit one keeps). */
   viewOwnerPhone(input: ViewOwnerPhoneInput, ctx: ActionContext): Promise<void>;
   /** Remove a listing from the list; who removed it and when is kept (own scope is the unit one keeps). */
@@ -1243,9 +1258,9 @@ export const ACTIONS: readonly ActionSpec[] = [
   },
   {
     name: "importListings",
-    description: "Import a sheet file into the inventory — preview, apply in batches, undo a whole import (own scope imports for oneself; company scope picks a list agent of the company).",
+    description: "Start importing a sheet file into the inventory — preview the marks and open an import (own scope imports for oneself; company scope picks a list agent of the company).",
     entity: "ImportRun",
-    kind: "command",
+    kind: "create",
     roles: ["ListAgent", "TeamLead"],
     agent: "forbidden",
     idempotent: false,
@@ -1262,8 +1277,83 @@ export const ACTIONS: readonly ActionSpec[] = [
     status: "live",
     states: [],
     doors: {
-      api: ["POST /api/v1/imports", "POST /api/v1/imports/preview", "POST /api/v1/imports/[id]/batches", "POST /api/v1/imports/[id]/undo", "GET /api/v1/imports"],
-      db: ["table import_runs insert", "table import_runs update", "table listings delete"],
+      api: ["POST /api/v1/imports/preview", "POST /api/v1/imports"],
+      db: ["table import_runs insert"],
+    },
+  },
+  {
+    name: "viewImports",
+    description: "See the company's recent imports and what each one added, taught and kept as written.",
+    entity: "ImportRun",
+    kind: "query",
+    roles: ["ListAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "company",
+      TeamLead: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["GET /api/v1/imports"],
+      db: ["table import_runs select"],
+    },
+  },
+  {
+    name: "continueImport",
+    description: "Write the next batches of an open import, or send a failed batch again.",
+    entity: "ImportRun",
+    kind: "update",
+    roles: ["ListAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      TeamLead: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["POST /api/v1/imports/[id]/batches"],
+      db: ["table import_runs update"],
+    },
+  },
+  {
+    name: "undoImport",
+    description: "Undo a whole import: remove its listings nobody changed since and retire what it taught (own scope is an import one made).",
+    entity: "ImportRun",
+    kind: "delete",
+    roles: ["ListAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      TeamLead: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["POST /api/v1/imports/[id]/undo"],
+      db: ["table import_runs update", "table listings delete"],
     },
   },
   {

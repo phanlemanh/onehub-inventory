@@ -30,7 +30,7 @@ wiki: wiki/entities/import-template.md
 # co = an action of ontology/actions.yaml (a planned one names the row that opens it), hang = a roadmap row will do it,
 # khong = deliberately absent, with the owner's gate line in duyet. Cells as approved at the 1t scope gate.
 vong_doi:
-  them: { co: importListings }
+  them: { hang: "11", ly_do: "An import template is learned while importing a file." }
   xem: { co: readCompanyLayer }
   sua: { co: editCompanyLayer }
   go: { co: retireCompanyLayer }

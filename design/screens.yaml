@@ -148,6 +148,6 @@ screens:
     audience: staff
     status: planned
     vao: importListings
-    nut: [importListings]
+    nut: [importListings, continueImport, undoImport]
     nut_chung: [Quay lại, Tiếp]
     hien: [ImportRun]

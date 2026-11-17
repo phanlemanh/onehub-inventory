@@ -106,6 +106,7 @@ describe("man-khai-hien", () => {
         "inventory",
         "khung",
         "members",
+        "nhap-tep",
         "sent",
         "sign-in",
         "today",
@@ -154,9 +155,10 @@ describe("may-thay-man-hien", () => {
       ],
       "sign-in": [],
       members: ["Member"],
+      "nhap-tep": ["ImportRun"],
     };
     const screens = table(ROOT).screens;
-    expect(Object.keys(screens).length).toBe(8);
+    expect(Object.keys(screens).length).toBe(9);
     for (const [sid, names] of Object.entries(want))
       expect(Object.keys(screens[sid]!.suy).sort(), sid).toEqual(names);
   });
@@ -227,7 +229,7 @@ describe("du-bon-o", () => {
 
   it("a planned action with its row is green (control)", () => {
     expect(readFileSync(join(ROOT, ent("Listing")), "utf8")).toContain(
-      'them: { co: createListing, hang: "12" }',
+      'go: { co: removeListing, hang: "18b" }',
     );
     expect(table(ROOT).errors).toEqual([]);
   });
@@ -263,9 +265,9 @@ describe("o-co-tro-nut-that", () => {
   it("a planned action without its row is red", () => {
     const dir = copy();
     breakFile(dir, ent("Listing"), (t) =>
-      t.replace('them: { co: createListing, hang: "12" }', "them: { co: createListing }"),
+      t.replace('go: { co: removeListing, hang: "18b" }', "go: { co: removeListing }"),
     );
-    expectRed(dir, "Listing.them: createListing con du kien, thieu hang");
+    expectRed(dir, "Listing.go: removeListing con du kien, thieu hang");
   });
 
   it("a live action with a row is red", () => {
@@ -469,7 +471,7 @@ describe("bang-da-duyet", () => {
   const approved: Record<string, Record<string, unknown>> = {
     SavedView: { them: "saveView", xem: "listSavedViews", sua: "editView", go: "removeView" },
     Listing: {
-      them: "createListing·12",
+      them: "createListing",
       xem: "viewListings",
       sua: "updateListing",
       go: "removeListing·18b",
@@ -520,6 +522,14 @@ describe("bang-da-duyet", () => {
       go: "retireCompanyLayer",
       khop: "matchPendingUnits",
     },
+    // Row 11 (nhap-excel): an import is started, seen, continued and undone on the Nạp tệp screen; the owner sees these
+    // cells at row 11's evidence gate.
+    ImportRun: {
+      them: "importListings",
+      xem: "viewImports",
+      sua: "continueImport",
+      go: "undoImport",
+    },
     Member: { them: "inviteMember", xem: "listMembers", sua: "changeMemberRoles", go: "hang 18a" },
     // Row 19 (G N-1511-3): added and retired inside the one save of the whole fee schedule; the owner sees these four
     // cells at row 19's evidence gate.
@@ -563,7 +573,7 @@ describe("bang-da-duyet", () => {
       expect(have, name).toEqual(want);
       cells += Object.keys(want).length;
     }
-    expect(cells).toBe(59);
+    expect(cells).toBe(63);
   });
 
   it("the seven real gaps of the 14/11 review each point to the row approved for it", () => {

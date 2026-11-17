@@ -114,8 +114,8 @@ describe("bang-sinh-du-dong", () => {
 
   it("the generated table carries every row and field of ontology/actions.yaml", () => {
     expect(compareTable(yaml.actions, ACTIONS)).toEqual([]);
-    expect(ACTIONS.filter((a) => a.status === "live")).toHaveLength(24); // row 2c adds four saved-view rows, row 7e five company-layer rows, row 19 two fee rows, row 10 three listing rows
-    expect(ACTIONS.filter((a) => a.status === "planned")).toHaveLength(9); // row 10 turns viewListings, updateListing and activateListing live
+    expect(ACTIONS.filter((a) => a.status === "live")).toHaveLength(29); // row 2c adds four saved-view rows, row 7e five company-layer rows, row 19 two fee rows, row 10 three listing rows, row 11 createListing and four import rows
+    expect(ACTIONS.filter((a) => a.status === "planned")).toHaveLength(8); // row 10 turns viewListings, updateListing and activateListing live; row 11 turns createListing live
     expect(PERMISSION_EXEMPT.map((e) => [e.door, e.reason, [...e.reads]])).toEqual(
       yaml.exempt.map((e) => [String(e["door"]), String(e["reason"]), list(e["reads"])]),
     );
@@ -158,10 +158,10 @@ describe("kiem-khuon-bang", () => {
       "dòng nháp có cửa",
       (t) =>
         t.replace(
-          "  - name: createListing\n",
-          '  - name: createListing\n    doors:\n      api: ["POST /api/v1/listings"]\n',
+          "  - name: removeListing\n",
+          '  - name: removeListing\n    doors:\n      api: ["POST /api/v1/listings"]\n',
         ),
-      "planned action createListing has a door",
+      "planned action removeListing has a door",
     ],
     [
       "dòng sống khai trạng thái",

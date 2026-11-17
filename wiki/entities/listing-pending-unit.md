@@ -1,6 +1,6 @@
 ---
 type: entity
-title: ListingPendingUnit (Căn chờ khớp của hàng)
+title: ListingPendingUnit (Hàng căn chờ)
 links:
   [
     ontology/entities/ListingPendingUnit.yaml,
@@ -10,7 +10,7 @@ links:
 sources: ["_acceptance/nhap-excel/contract.md"]
 ---
 
-# ListingPendingUnit (Căn chờ khớp của hàng)
+# ListingPendingUnit (Hàng căn chờ)
 
 ## Definition
 

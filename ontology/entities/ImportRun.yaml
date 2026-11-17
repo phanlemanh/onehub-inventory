@@ -44,10 +44,6 @@ wiki: wiki/entities/import-run.md
 
 vong_doi:
   them: { co: importListings }
-  xem: { co: importListings }
-  sua:
-    {
-      khong: true,
-      duyet: "Cổng Phạm vi hàng 11 (2026-11-17): một lần nhập không sửa, chỉ hoàn tác.",
-    }
-  go: { co: importListings }
+  xem: { co: viewImports }
+  sua: { co: continueImport }
+  go: { co: undoImport }

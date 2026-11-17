@@ -5,7 +5,7 @@
 //   khong-gan-ca-mo-dun    — today names no listing action; an action in a listings UI file no screen imports counts
 //                            for no screen; the same action reached three ways is caught for inventory.
 //   giu-moi-man            — every screen of the register has a section, plus the frame.
-//   bang-du-muc            — the generated file has 10 sections of 3 columns and 4 role rows.
+//   bang-du-muc            — the generated file has 11 sections of 3 columns and 4 role rows (row 11 adds nhap-tep).
 //   nut-khong-co-trong-bang — a declared button outside the permission table is red.
 import { spawnSync } from "node:child_process";
 import { cpSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -137,15 +137,16 @@ describe("giu-moi-man", () => {
       "proto-bo-nut",
       "sign-in",
       "members",
+      "nhap-tep",
     ]);
   });
 });
 
 describe("bang-du-muc", () => {
-  it("the generated file: 10 sections, 3 columns, 4 role rows each", () => {
+  it("the generated file: 11 sections, 3 columns, 4 role rows each", () => {
     const text = readFileSync(join(ROOT, "design/vai-man-nut.md"), "utf8");
     const heads = text.split("\n").filter((l) => l.startsWith("## "));
-    expect(heads).toHaveLength(10);
+    expect(heads).toHaveLength(11);
     for (const block of text.split("\n## ").slice(1)) {
       const rows = block.split("\n").filter((l) => l.startsWith("| "));
       expect(rows[0], block.split("\n")[0]).toMatch(

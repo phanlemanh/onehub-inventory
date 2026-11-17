@@ -99,9 +99,9 @@ Mỗi màn của sổ màn có một mục, cộng mục `khung` cho App Shell. 
 
 ## nhap-tep — `/nhap-tep`
 
-| Vai          | Nút theo quyền                       | Nút không theo quyền |
-| ------------ | ------------------------------------ | -------------------- |
-| Đầu chủ      | `importListings` (của tôi, dự kiến)  | Quay lại, Tiếp       |
-| Đầu khách    | chặn                                 | Quay lại, Tiếp       |
-| Trưởng nhóm  | `importListings` (toàn sàn, dự kiến) | Quay lại, Tiếp       |
-| Quản trị sàn | chặn                                 | Quay lại, Tiếp       |
+| Vai          | Nút theo quyền                                                                                               | Nút không theo quyền |
+| ------------ | ------------------------------------------------------------------------------------------------------------ | -------------------- |
+| Đầu chủ      | `importListings` (của tôi, dự kiến), `continueImport` (của tôi, dự kiến), `undoImport` (của tôi, dự kiến)    | Quay lại, Tiếp       |
+| Đầu khách    | chặn                                                                                                         | Quay lại, Tiếp       |
+| Trưởng nhóm  | `importListings` (toàn sàn, dự kiến), `continueImport` (toàn sàn, dự kiến), `undoImport` (toàn sàn, dự kiến) | Quay lại, Tiếp       |
+| Quản trị sàn | chặn                                                                                                         | Quay lại, Tiếp       |

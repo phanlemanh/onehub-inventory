@@ -122,12 +122,12 @@ concepts:
   ListingPendingUnit:
     kind: entity
     own: true
-    pref: Căn chờ khớp của hàng
+    pref: Hàng căn chờ
     en: Listing on a pending unit
   ImportRun:
     kind: entity
     own: true
-    pref: Lần nhập
+    pref: Lần nạp tệp
     en: Import
   ImportScreen:
     kind: surface
