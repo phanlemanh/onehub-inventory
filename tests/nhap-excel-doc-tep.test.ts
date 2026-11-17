@@ -24,7 +24,7 @@ const ok = (t: ReadTable) => {
 const GON_HEADERS = ["Mã căn", "Toà", "Giá chào", "Trạng thái", "Ngày check"];
 const GON_ROWS = [
   ["S1.01-0905", "Sapphire 1", "4650000000", "Đang bán", "2026-11-15"],
-  ["S1.01-0906", "Sapphire 1", "3900000000", "Tạm giữ", "2026-11-14"],
+  ["S1.01-0906", "Sapphire 1", "3900000000", "Tạm ngừng", "2026-11-14"],
   ["SA5-12.08", "Sapphire 5", "5100000000", "Đang bán", ""],
 ];
 

@@ -59,7 +59,7 @@ function xlsx(sheets) {
 const GON = [
   ["Mã căn", "Toà", "Giá chào", "Trạng thái", "Ngày check"],
   ["S1.01-0905", "Sapphire 1", 4650000000, "Đang bán", { date: "2026-11-15" }],
-  ["S1.01-0906", "Sapphire 1", 3900000000, "Tạm giữ", { date: "2026-11-14" }],
+  ["S1.01-0906", "Sapphire 1", 3900000000, "Tạm ngừng", { date: "2026-11-14" }],
   ["SA5-12.08", "Sapphire 5", 5100000000, "Đang bán", ""],
 ];
 // Dirty file: abbreviations, mixed accents, prices as words, eight code forms, two columns to one target, an owner
