@@ -601,3 +601,52 @@ describe("sua-thong-tin-can · ô riêng theo vai", () => {
     ).toBe("show");
   });
 });
+
+describe("sua-thong-tin-can · nối thật cửa lưu và hộp", () => {
+  it("noi-that-cua-luu: the record's write over the real save door reads a 401 as expired and a 400 as a fault", async () => {
+    const { renderHook } = await import("@testing-library/react");
+    const { httpSaveDoor } = await import("../src/modules/listings/ui/http-save-door");
+    const { useListingCellEdit } = await import("../src/modules/listings/ui/use-listing-cell-edit");
+    const listing = {
+      id: rows[0]!.id,
+      companyId: "c",
+      buildingName: "S1.01",
+      standardStatus: "Active" as const,
+      version: 1,
+    };
+    const answers = [
+      new Response(JSON.stringify({ error: "unauthenticated" }), { status: 401 }),
+      new Response(JSON.stringify({ error: "invalid", why: { rule: "details" } }), { status: 400 }),
+    ];
+    const door = httpSaveDoor({
+      online: () => true,
+      fetch: (async () => answers.shift()!) as typeof fetch,
+    });
+    const hook = renderHook(() =>
+      useListingCellEdit({
+        rows: [rows[0]!],
+        listings: [listing],
+        headers: HEADERS,
+        labels: EDIT_LABELS,
+        door,
+      }),
+    );
+    const at = NOW.toISOString();
+    expect(
+      await hook.result.current.writeListing(
+        listing.id,
+        { field: "details", legalStatus: "x" },
+        at,
+      ),
+      "noi-that-cua-luu: 401",
+    ).toBe("expired");
+    expect(
+      await hook.result.current.writeListing(
+        listing.id,
+        { field: "details", legalStatus: "x" },
+        at,
+      ),
+      "noi-that-cua-luu: 400",
+    ).toBe("fault");
+  });
+});

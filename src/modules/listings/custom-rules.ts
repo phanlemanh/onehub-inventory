@@ -6,9 +6,6 @@ import { foldWords } from "./edit-rules";
 /** The kinds of a company's own field (CustomField.kind, row 7e). */
 export type CustomKind = "text" | "number" | "date" | "single_select" | "boolean";
 
-/** Longest text value a text field takes (TEXT_VALUE_LIMIT of the company layer, row 7e). */
-export const CUSTOM_TEXT_LIMIT = 500;
-
 /** Why a typed value does not fit its field. */
 export type CustomProblem =
   "too-long" | "not-a-number" | "not-a-date" | "not-an-option" | "not-yes-no";
@@ -49,8 +46,9 @@ export function readCustomValue(
   kind: CustomKind,
   raw: string,
   options: readonly string[] = [],
-  /** Longest text this field takes: the company layer's 500, or 200 for legal status and financing (row 3g). */
-  textLimit: number = CUSTOM_TEXT_LIMIT,
+  /** Longest text this field takes, from its owner: the company layer's limit (the page passes it) or 200 for legal
+   * status and financing. Absent: no length rule here; the server checks again. */
+  textLimit: number = Number.POSITIVE_INFINITY,
 ): CustomRead {
   const text = raw.trim();
   if (text === "") return { ok: true, value: null };

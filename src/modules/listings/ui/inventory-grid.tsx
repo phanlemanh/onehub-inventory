@@ -188,7 +188,15 @@ export function InventoryGrid({
     () =>
       (customColumns ?? []).flatMap((c) =>
         c.fieldKind
-          ? [{ code: c.code, header: c.header, kind: c.fieldKind, options: c.options ?? [] }]
+          ? [
+              {
+                code: c.code,
+                header: c.header,
+                kind: c.fieldKind,
+                options: c.options ?? [],
+                ...(c.limit === undefined ? {} : { limit: c.limit }),
+              },
+            ]
           : [],
       ),
     [customColumns],

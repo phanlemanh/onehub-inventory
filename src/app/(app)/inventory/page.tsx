@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/templates/page-header";
 import { PageState, loginHref } from "@/components/templates/page-state";
-import { customColumnsOf, label, labelOverrides } from "@/modules/company-config";
+import { TEXT_VALUE_LIMIT, customColumnsOf, label, labelOverrides } from "@/modules/company-config";
 import { myCompanyLayer, myFeeSchedule } from "@/modules/company-config/server";
 import { allowedScope } from "@/modules/identity";
 import { currentSession } from "@/modules/identity/server";
@@ -156,6 +156,7 @@ export default async function Page({ searchParams }: Props) {
     ...c,
     fieldKind: fieldOf.get(c.code)?.kind,
     options: fieldOf.get(c.code)?.options ?? [],
+    ...(fieldOf.get(c.code)?.kind === "text" ? { limit: TEXT_VALUE_LIMIT } : {}),
   }));
   const missing = viewId !== undefined && openView === null;
   // Views that could not be read still leave saving open; the server checks names again.

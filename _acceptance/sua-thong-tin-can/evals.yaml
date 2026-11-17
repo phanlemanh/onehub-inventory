@@ -95,7 +95,7 @@ evals:
     executor: test
     cmd: config:executors.test.sua_thong_tin_unit
     paths: [src/modules/listings/**, src/lib/write-failure.ts, src/components/candidate/use-change.tsx, tests/sua-thong-tin-can.test.tsx]
-    expected: "exit 0; ca 'hop-nam-ket-cuc' ghim năm câu (mất mạng, căn vừa đổi, phiên hết hạn, máy chủ lỗi kèm «Thử lại»; 403 chỉ còn «Thôi») và chữ đã gõ còn nguyên, hằng 5"
+    expected: "exit 0; ca 'hop-nam-ket-cuc' ghim năm câu (mất mạng, căn vừa đổi, phiên hết hạn, máy chủ lỗi kèm «Thử lại»; 403 chỉ còn «Thôi») và chữ đã gõ còn nguyên, hằng 5; 'noi-that-cua-luu' (cửa lưu thật qua móc sửa: 401 là phiên hết hạn, 400 là lỗi máy chủ, không phải «không đủ quyền»)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E4b

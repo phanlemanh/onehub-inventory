@@ -22,8 +22,9 @@ export const RECORD_COPY = {
   detailsWhat: (unit: string, unitNumber: string) =>
     `${unit.toLocaleLowerCase("vi")} ${unitNumber}`,
   detailsTitle: (edit: string, what: string) => `${edit} thông tin ${what}`,
-  detailsDescription:
-    "Đổi pháp lý, nội thất, tài chính, tình trạng sử dụng. Xoá chữ trong ô là chưa có. Tính là vừa xác nhận với chủ nhà.",
+  /** The four parts by the company's own words (label table), lower case inside the sentence. */
+  detailsDescription: (parts: readonly string[]) =>
+    `Đổi ${parts.map((p) => p.toLocaleLowerCase("vi")).join(", ")}. Xoá chữ trong ô là chưa có. Tính là vừa xác nhận với chủ nhà.`,
   detailsSubmit: "Lưu",
   detailsBusy: "Đang lưu",
   detailsNone: "Chưa có",
@@ -35,7 +36,7 @@ export const RECORD_COPY = {
     why === "offline"
       ? "Chưa lưu được — mất kết nối mạng. Có mạng lại thì bấm «Thử lại»."
       : why === "conflict"
-        ? "Chưa lưu: căn vừa đổi từ chỗ khác. Đóng hộp để thấy bản mới, rồi sửa lại."
+        ? "Chưa lưu: bản này vừa đổi từ chỗ khác. Đóng hộp để thấy bản mới, rồi sửa lại."
         : why === "expired"
           ? "Chưa lưu được — phiên đăng nhập đã hết; bạn đăng nhập lại rồi bấm «Thử lại»."
           : why === "refused"

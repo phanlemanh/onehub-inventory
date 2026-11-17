@@ -85,6 +85,8 @@ export interface InventoryCustomColumn {
   /** The field's own kind and choices (row 3g): with them the cell edits and takes a paste by that kind. */
   fieldKind?: CustomKind;
   options?: readonly string[];
+  /** Longest text a text field takes, from the company layer (row 3g: one rule, one owner). */
+  limit?: number;
 }
 
 /** The worked-out net-to-seller value of a row (row 19): not a field of the model, so it is keyed like a computed column. */

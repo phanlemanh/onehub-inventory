@@ -273,7 +273,12 @@ export function ListingDetailsEdit({
           ),
         }}
         title={RECORD_COPY.detailsTitle(words.edit, what)}
-        description={RECORD_COPY.detailsDescription}
+        description={RECORD_COPY.detailsDescription([
+          words.legalStatus,
+          words.furnished,
+          words.financing,
+          words.occupantType,
+        ])}
         submitLabel={RECORD_COPY.detailsSubmit}
         busyLabel={RECORD_COPY.detailsBusy}
         busy={busy}
