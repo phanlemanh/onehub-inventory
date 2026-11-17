@@ -20,6 +20,7 @@ export interface NewListing {
   feeInclusion: "Included" | "Excluded" | null;
   furnished: "Furnished" | "Partially" | "Unfurnished" | null;
   occupantType: "Owner" | "Tenant" | "Vacant" | null;
+  withdrawnReason: "sold_elsewhere" | "owner_changed_mind" | "unreachable" | null;
   legalStatus: string | null;
   financing: string | null;
   customFields: Record<string, unknown>;
@@ -41,8 +42,8 @@ export async function createListings(
     await c.query(
       `insert into listings (id, company_id, standard_status, list_price, fee_inclusion, furnished, occupant_type,
          legal_status, financing, custom_fields, list_agent_user_id, list_agent_full_name, last_confirmed_at,
-         import_run_id)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, $12, $13::date, $14)`,
+         import_run_id, withdrawn_reason)
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, $12, $13::date, $14, $15)`,
       [
         l.id,
         companyId,
@@ -58,6 +59,7 @@ export async function createListings(
         l.listAgentFullName,
         l.lastConfirmedAt,
         importRunId,
+        l.withdrawnReason,
       ],
     );
     const open = OPEN.includes(l.standardStatus);

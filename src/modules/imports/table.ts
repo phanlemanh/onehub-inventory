@@ -86,7 +86,7 @@ export function markTable(table: TableInput, ctx: TableContext, choices: Choices
         choice: choices.values[valueKey(c.index, text)],
       });
     });
-    // Ngừng hẳn needs a reason (row 4's statusNeeds): without a reason cell the status cell asks.
+    // Withdrawn needs a reason (row 4 statusNeeds): without a reason cell the status cell asks.
     const at = (t: string) =>
       columns.findIndex((c) => c.target && "standard" in c.target && c.target.standard === t);
     const statusAt = at("Listing.standardStatus");
