@@ -74,10 +74,12 @@ thì hỏi lại cột ấy (hàng 7e AC-6).
 
 - `POST /api/v1/imports/preview` — nhận bảng chữ và các lựa chọn của người, trả dấu từng ô, câu hỏi gom và con số. Không
   ghi gì.
-- `POST /api/v1/imports` — áp trong MỘT giao dịch: tính lại dấu ở máy chủ (con số khác số người đã thấy thì 409 «tệp hay
-  lớp riêng vừa đổi, xem lại»), còn ô chặn thì 400, tạo lần nhập, tạo căn chờ khớp mới, tạo lần chào, ghi phần học vào lớp
-  riêng (qua hàm của mô-đun `company-config` và `catalog`), rồi trả mã lần nhập và con số. Hỏng giữa chừng thì không gì
-  được ghi, không học gì.
+- `POST /api/v1/imports` — mở một lần nhập, rồi `POST /api/v1/imports/[id]/batches` ghi theo gói 200 dòng như Quỹ hàng
+  (Hỏi-14): mỗi gói một giao dịch tính lại dấu ở máy chủ (con số khác số người đã thấy thì 409 «tệp hay lớp riêng vừa đổi,
+  xem lại»), còn ô chặn thì 400, tạo căn chờ khớp mới và lần chào; gửi lại cùng gói không ghi trùng. Gói cuối thành công
+  thì ghi phần học vào lớp riêng một lần (qua hàm của mô-đun `company-config` và `catalog`) và trả con số. Một gói hỏng
+  thì các gói trước giữ, «Thử lại» gửi đúng gói hỏng. Cột ngày xác nhận của tệp ghép vào Xác nhận lúc, không sau hôm nay
+  (Hỏi-13).
 - `POST /api/v1/imports/[id]/undo` — gỡ lần chào của lần nhập chưa ai sửa, ngừng dùng các mục lớp riêng do chính lần
   nhập tạo (mục có từ trước giữ nguyên), căn chờ khớp do lần nhập tạo mà không còn lần chào nào thì ngừng dùng; căn đã sửa
   sau lần nhập thì giữ và liệt kê. Hoàn tác lần hai trả 409.

@@ -33,7 +33,7 @@ trang khách). Không chạm SP-3. Hàng này làm chủ cửa tạo lần chào
 - AC-2: Given bảng tiêu đề viết trước (ít nhất 20 ca), When máy ghép cột, Then mỗi cột có đúng một đích (trường chuẩn,
   trường riêng đang dùng, trường riêng mới, bỏ cột) và một dấu theo thứ tự mẫu nhập → nhãn riêng → nhãn chuẩn → từ điển
   tiêu đề chuẩn; tên cột lạ là «cần người»; hai cột trỏ cùng một đích là «chặn» ở cả hai cột cho tới khi người đổi một
-  bên; thiếu cột mã căn là «chặn»; cột chủ nhà hay số điện thoại là «chặn» kèm lý do «ghi ở hồ sơ căn» cho tới khi người
+  bên; thiếu cột mã căn là «chặn»; cột chủ nhà hay số điện thoại là «chặn» kèm lý do «ghi ở hồ sơ căn, hàng 11b» (Hỏi-12) cho tới khi người
   bỏ cột; tạo trường riêng mới qua đúng luật của 7e (năm kiểu, trần 20 trường, 30 lựa chọn, tên không trùng).
 - AC-3 (cross-layer): Given người chọn đích cho cột «Block» là Toà, When lần nhập thành công với ô «Gọi cột này là “Block”
   trên Bảng hàng» để mặc định, Then sàn có nhãn riêng Toà = «Block» và tiêu đề cột Toà của Bảng hàng là «Block»; bỏ chọn
@@ -43,7 +43,8 @@ trang khách). Không chạm SP-3. Hàng này làm chủ cửa tạo lần chào
   giá trị: tập đóng (trạng thái, lý do ngừng, hướng, phí, nội thất, người ở, chọn một của sàn) khớp sau gấp chữ là «máy sửa»
   hay «giữ nguyên», khớp từ điển của sàn là «máy sửa» kèm lý do «theo cách viết của sàn», không khớp là «cần người»; giá
   đọc bằng `readPrice` của hàng 4; số, ngày, có/không của trường riêng qua `checkCustomValue` của 7e; Đã bán thiếu giá bán
-  hay ngày, Ngừng hẳn thiếu lý do là «cần người»; ô trống là «giữ nguyên» với đích trống. Câu hỏi gom theo (cột, chữ gấp):
+  hay ngày, Ngừng hẳn thiếu lý do là «cần người»; cột ngày xác nhận (Hỏi-13) đọc ra ngày có thật không sau hôm nay là
+  «máy sửa», ngày sau hôm nay hay không đọc được là «cần người»; ô trống là «giữ nguyên» với đích trống. Câu hỏi gom theo (cột, chữ gấp):
   một câu cho mọi ô cùng chữ.
 - AC-5 (cross-layer): Given danh mục mẫu của 7d và lớp riêng của sàn A, When máy tra cột mã căn, Then thứ tự là mã riêng →
   mã gốc → bộ đọc 8 dạng → căn chờ khớp (hàm của 7e); ra một căn là «giữ nguyên» (mã gốc) hay «máy sửa» kèm lý do (mã
@@ -54,17 +55,19 @@ trang khách). Không chạm SP-3. Hàng này làm chủ cửa tạo lần chào
   người rồi với bộ lựa chọn viết trước, Then 100% ô có đúng một dấu và một đích như đáp án (trường chuẩn, trường riêng, hay
   giữ chữ gốc kèm «cần người»), không ô nào thiếu dấu hay đích; con số bốn dấu trên màn xem trước bằng con số máy chủ trả;
   còn ô «chặn» thì nút Áp tắt, máy chủ trả 400 nếu vẫn gửi; không có đường áp nào bỏ qua bước xem trước.
-- AC-7 (cross-layer): Given xem trước không còn ô chặn, When bấm Áp, Then `POST /api/v1/imports` trong MỘT giao dịch tính
-  lại dấu, tạo lần nhập và đúng N lần chào (căn danh mục và căn chờ khớp; dòng có căn đã có lần chào mở không tạo lần chào
+- AC-7 (cross-layer): Given xem trước không còn ô chặn, When bấm Áp, Then `POST /api/v1/imports` mở một lần nhập rồi ghi
+  theo gói 200 dòng (Hỏi-14) — mỗi gói một giao dịch tính lại dấu, gửi lại cùng gói không ghi trùng — và tạo đúng N lần chào (căn danh mục và căn chờ khớp; dòng có căn đã có lần chào mở không tạo lần chào
   nào và không tính vào N), đầu chủ theo Hỏi-7 (Trưởng nhóm chọn một Đầu chủ của chính sàn; Đầu chủ chỉ nhập cho mình), trạng thái theo Hỏi-5, Xác
-  nhận lúc để trống; con số khác số người đã thấy thì 409 và không ghi gì; hỏng giữa chừng thì không ghi gì; bảng quyền
+  nhận lúc theo cột ngày của tệp hay để trống (Hỏi-13); con số khác số người đã thấy thì 409 và gói ấy không ghi gì; một gói
+  hỏng thì các gói đã ghi giữ nguyên, gói hỏng không ghi dòng nào, màn nói đúng số dòng đã ghi và «Thử lại» gửi đúng gói hỏng; bảng quyền
   viết sẵn 4 vai × `importListings`, `createListing` thử ở cửa API và ở cơ sở dữ liệu; bộ kiểm cách ly có ca cho bảng lần
   nhập và quyền tạo, xoá lần chào, đỏ có dòng ghim khi phá; ontology có thực thể Lần nhập, lần chào trỏ được căn chờ khớp,
   `make gen` khớp, `modules.yaml` khai sở hữu và phụ thuộc.
 - AC-8 (cross-layer): Given một lần nhập có người chọn đích cột, nhãn riêng, trường riêng mới, cách viết giá trị, mã riêng
   của căn và căn chờ khớp, When lần nhập thành công, Then đúng các mục ấy được ghi vào lớp riêng của sàn (mẫu nhập, nhãn
   riêng, trường riêng, từ điển, mã riêng, căn chờ khớp) và màn Xong liệt kê chúng; bỏ chọn «nhớ» ở một câu thì mục ấy không
-  ghi; áp hỏng hay 409 thì không mục nào được ghi; mục đã có từ trước không bị ghi lần hai.
+  ghi; phần học ghi một lần sau gói cuối thành công, nên lần nhập còn gói chưa ghi hay gặp 409 thì chưa mục nào được ghi;
+  mục đã có từ trước không bị ghi lần hai.
 - AC-9 (cross-layer): Given lần nhập thứ nhất của một dạng tệp đã thành công, When nạp tệp thứ hai cùng dạng (cùng tên
   cột, cùng thứ tự) với dữ liệu khác, Then số câu đã trả lời được hỏi lại là 0 (cột, tên cột, cách viết, mã căn đã chọn);
   chữ mới chưa gặp vẫn hỏi; cột trỏ trường riêng đã ngừng thì hỏi lại cột ấy; tệp khác thứ tự cột thì hỏi lại đích cột
@@ -131,10 +134,11 @@ Hỏi-7 (khuyên): Đầu chủ và Trưởng nhóm có cả hai; Đầu khách,
 
 ## Out of scope
 
-- Cập nhật giá, trạng thái của lần chào đã có từ tệp (Hỏi-6 khuyên để hàng sau; hàng này chỉ đánh dấu «cần người»).
+- Hàng 11b «Nhập lại cập nhật căn và số chủ nhà» (Hỏi-8, sau hàng 13): cập nhật giá, trạng thái của căn chính người
+  nhập giữ (Hỏi-6), số và tên chủ nhà vào liên hệ (Hỏi-12), tin bổ sung cho căn người khác giữ (Hỏi-11).
 - Thuộc tính căn (diện tích, phòng ngủ, hướng) cho căn chờ khớp (Hỏi-9 khuyên giữ chữ gốc ở lần nhập).
 - Đọc qua đường dẫn Google Sheet (bắt sàn mở bảng có số chủ nhà ra ngoài); nhiều trang tính trong một lần nhập.
-- Số chủ nhà và tên chủ nhà từ tệp (hàng 13); màn tạo căn tay (hàng 12 — dùng lại cửa tạo của hàng này).
+- Màn tạo căn tay (hàng 12 — dùng lại cửa tạo của hàng này).
 - Nhập có AI (H5); bước «trùng» riêng và «tin bổ sung cho căn người khác» của Quỹ hàng.
 
 ## Notes
