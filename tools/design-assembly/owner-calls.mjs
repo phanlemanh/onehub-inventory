@@ -10,10 +10,12 @@
 //                   that very item
 //
 // What a branch adds is read from git, against where the branch left the main one, with what is
-// not committed yet. Outside git nothing is compared, and the checks say so instead of failing.
+// not committed yet. A shallow checkout fetches the history it needs from the remote named origin.
+// Outside git nothing is compared, and the checks say so instead of failing.
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
+import { env } from "node:process";
 
 import { parseLedger } from "./ledger.mjs";
 import { NOT_A_KIND } from "./screens.mjs";
@@ -86,7 +88,7 @@ export function rootColour(css) {
 // Where a main branch is, by the first of these names git knows.
 // The remote's own names first: a local main that was not pulled lags behind where the branch left.
 const MAINS = ["origin/HEAD", "origin/main", "origin/master", "main", "master"];
-const NO_MAIN = `name the main branch with "main" on the check in design/theme.json, or fetch it (a checkout in continuous integration needs its history: fetch-depth: 0)`;
+const NO_MAIN = `name the main branch with "main" on the check in design/theme.json, or fetch it (a shallow checkout fetches it from the remote named origin)`;
 const pageName = (file) => path.posix.basename(file, ".md");
 const isPage = (name) => name.endsWith(".md") && !NOT_A_KIND.includes(name);
 
@@ -94,9 +96,27 @@ const isPage = (name) => name.endsWith(".md") && !NOT_A_KIND.includes(name);
 // the root colour line there and now, and the judgments of the ledger it writes or changes.
 // Null outside git. With `problem` when git is there and cannot say. With `born` when the base has
 // no decision ledger, and nothing else. `main` names the main branch where it has another name.
-export function branchFacts(root, { pages, stylesheet, ledger, main: named = null }) {
-  const git = (...args) =>
-    spawnSync("git", ["-C", root, ...args], { encoding: "utf8", maxBuffer: 1 << 30 });
+// `history` is how a shallow checkout's history is fetched, as for HISTORY.
+export function branchFacts(
+  root,
+  { pages, stylesheet, ledger, main: named = null, history = HISTORY },
+) {
+  // Never waits on a prompt for a password or a passphrase: a fetch that needs one fails, and
+  // says so. `timed` also gives up after a while, for a call that goes to the remote.
+  const run = (timeout, args) =>
+    spawnSync("git", ["-C", root, ...args], {
+      encoding: "utf8",
+      maxBuffer: 1 << 30,
+      timeout,
+      env: {
+        ...env,
+        GIT_TERMINAL_PROMPT: "0",
+        GIT_SSH_COMMAND: env.GIT_SSH_COMMAND ?? "ssh -o BatchMode=yes",
+      },
+    });
+  const git = Object.assign((...args) => run(undefined, args), {
+    timed: (timeout, ...args) => run(timeout, args),
+  });
   const inside = git("rev-parse", "--is-inside-work-tree");
   if (inside.error) return null;
   if (inside.status !== 0) {
@@ -108,18 +128,31 @@ export function branchFacts(root, { pages, stylesheet, ledger, main: named = nul
   // before it to compare with.
   if (git("rev-parse", "--verify", "--quiet", "HEAD").status !== 0) return unborn(null, null);
   const known = (name) => git("rev-parse", "--verify", "--quiet", `${name}^{commit}`).status === 0;
-  if (named !== null && !known(named)) {
+  // Each main branch git knows, with where this branch left it. The newest of those is the base: a
+  // fork point every other one is an ancestor of.
+  const forksOf = (names) =>
+    names
+      .filter(known)
+      .map((name) => ({ name, base: git("merge-base", "HEAD", name).stdout.trim() }))
+      .filter((fork) => fork.base !== "");
+  let names = named === null ? MAINS : [named];
+  // A shallow checkout, as continuous integration makes one, lacks the history: it is fetched, and
+  // the main branch is then the one fetched.
+  let fetched;
+  if (forksOf(names).length === 0 && isShallow(git)) {
+    const got = fetchMain(git, named, history);
+    if (got.problem) return { problem: got.problem };
+    fetched = got.fetched;
+    names = named === null ? [...new Set([...MAINS, got.ref])] : [got.ref];
+  }
+  if (named !== null && !names.some(known)) {
     return {
       problem: `the main branch the tool data names, ${named}, is not one git knows: ${NO_MAIN}`,
     };
   }
-  // Each main branch git knows, with where this branch left it. The newest of those is the base: a
-  // fork point every other one is an ancestor of.
-  const forks = (named === null ? MAINS.filter(known) : [named])
-    .map((name) => ({ name, base: git("merge-base", "HEAD", name).stdout.trim() }))
-    .filter((fork) => fork.base !== "");
+  const forks = forksOf(names);
   if (forks.length === 0) {
-    const tried = named === null ? MAINS.filter(known) : [named];
+    const tried = names.filter(known);
     return {
       problem:
         tried.length === 0
@@ -146,10 +179,86 @@ export function branchFacts(root, { pages, stylesheet, ledger, main: named = nul
     );
   };
   try {
-    return compare({ root, git, base, main, pages, stylesheet, ledger, atBase });
+    const facts = compare({ root, git, base, main, pages, stylesheet, ledger, atBase });
+    return fetched && !facts.problem ? { ...facts, fetched } : facts;
   } catch (error) {
     return { problem: error.message };
   }
+}
+
+// How a shallow checkout's history is fetched: `step` commits first, a step doubled each later
+// round, and after the last round the whole history.
+const HISTORY = Object.freeze({ step: 50, rounds: 5 });
+const REMOTE = "origin";
+// How long one call to the remote may take before the check gives up and fails.
+const NETWORK_MS = 120_000;
+const QUIET = ["--quiet", "--no-tags"];
+
+const ok = (run) => run.status === 0 && !run.error;
+const isShallow = (git) => git("rev-parse", "--is-shallow-repository").stdout.trim() === "true";
+const said = (run) =>
+  String(run.error?.message ?? run.stderr ?? "")
+    .trim()
+    .split("\n")[0] || "git gave no reason";
+const cannot = (what, run) => ({
+  problem: `a shallow checkout, and git could not fetch ${what} from ${REMOTE}: ${said(run)}`,
+});
+
+// The remote's main branch: main, else master. The branch the remote's HEAD points at is never
+// taken: the HEAD of a working folder used as a remote is the branch being worked on, and this
+// branch compared with itself adds nothing. A main branch of another name is named in the tool data.
+function remoteMain(remote) {
+  const run = remote("ls-remote", REMOTE, "refs/heads/main", "refs/heads/master");
+  if (!ok(run)) return cannot("its branches", run);
+  const name = ["main", "master"].find((branch) =>
+    new RegExp(`\\trefs/heads/${branch}$`, "m").test(run.stdout),
+  );
+  return name
+    ? { name }
+    : { problem: `a shallow checkout, and ${REMOTE} has neither main nor master: ${NO_MAIN}` };
+}
+
+// Deepen this commit and the main branch until they meet, then fetch the whole history if they
+// have not. This commit may not be on the remote; then only the main branch is deepened.
+function deepenUntilMet(git, remote, { ref, spec, step, rounds }) {
+  const head = git("rev-parse", "HEAD").stdout.trim();
+  const met = () => git("merge-base", "HEAD", ref).stdout.trim() !== "";
+  const deepen = (how) => {
+    const both = remote("fetch", ...QUIET, how, REMOTE, head, spec);
+    return ok(both) ? both : remote("fetch", ...QUIET, how, REMOTE, spec);
+  };
+  for (let round = 0; round < rounds && !met() && isShallow(git); round += 1) {
+    const run = deepen(`--deepen=${step * 2 ** round}`);
+    if (!ok(run)) return cannot("more history", run);
+  }
+  if (met() || !isShallow(git)) return null;
+  const run = deepen("--unshallow");
+  return ok(run) ? null : cannot("the whole history", run);
+}
+
+// Fetch the main branch from the remote into a shallow checkout, then the history back to where
+// this branch left it. Returns the ref it fetched and what it did, or a problem with what git said.
+function fetchMain(git, named, { step, rounds }) {
+  if (!ok(git("remote", "get-url", REMOTE))) {
+    return {
+      problem: `a shallow checkout with no remote named ${REMOTE} to fetch the main branch from: ${NO_MAIN}`,
+    };
+  }
+  // A call to the remote never waits on a stalled connection.
+  const remote = (...args) => git.timed(NETWORK_MS, ...args);
+  const branch =
+    named === null ? remoteMain(remote) : { name: named.replace(/^(refs\/heads\/|origin\/)/, "") };
+  if (branch.problem) return branch;
+  const ref = `refs/remotes/${REMOTE}/${branch.name}`;
+  const spec = `+refs/heads/${branch.name}:${ref}`;
+  const first = remote("fetch", ...QUIET, `--depth=${step}`, REMOTE, spec);
+  if (!ok(first)) return cannot(branch.name, first);
+  const short = deepenUntilMet(git, remote, { ref, spec, step, rounds });
+  if (short) return short;
+  return {
+    ref: `${REMOTE}/${branch.name}`,
+    fetched: `a shallow checkout: ${branch.name} and the history back to where this branch left it were fetched from ${REMOTE}`,
+  };
 }
 
 // What the branch adds, once its base is known.
@@ -319,14 +428,17 @@ export function wallProblem({ branch, waiting }) {
   return problems.length === 0 ? null : problems.join("; ");
 }
 
-// What the checks say on a pass that did not compare.
-export const branchNotes = (branch) =>
-  branch === null
-    ? ["not in a git repository: what a branch adds is not compared with the main branch"]
-    : branch.born
-      ? [
-          branch.base === null
-            ? "no commit yet: the repository starts here, so what it adds is not compared"
-            : "the main branch has no decision ledger: this branch is where the repository meets the plugin, so what it adds is not compared",
-        ]
-      : [];
+// What the checks say on a pass that did not compare, and where history was fetched to compare.
+export function branchNotes(branch) {
+  if (branch === null) {
+    return ["not in a git repository: what a branch adds is not compared with the main branch"];
+  }
+  const born = !branch.born
+    ? []
+    : [
+        branch.base === null
+          ? "no commit yet: the repository starts here, so what it adds is not compared"
+          : "the main branch has no decision ledger: this branch is where the repository meets the plugin, so what it adds is not compared",
+      ];
+  return branch.fetched ? [...born, branch.fetched] : born;
+}
