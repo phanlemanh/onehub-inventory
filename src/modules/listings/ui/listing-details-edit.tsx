@@ -177,16 +177,22 @@ export function ListingDetailsEdit({
     setOpen(false);
     api.changed();
     const back = undoOf(details, change);
+    // Words longer than the limit, kept from an imported sheet, cannot be written back: no undo then (row 3g).
+    const undoable = ![back.legalStatus, back.financing].some(
+      (v) => typeof v === "string" && !detailText(v).ok,
+    );
     // The save already went through: the shared door says it and offers undo by row 4's one rule.
     await runDoorChange({
       done: RECORD_COPY.detailsDone(what),
       undone: RECORD_COPY.detailsUndone(what),
       write: () => Promise.resolve("saved"),
-      undo: async () => {
-        const result = await api.write(id, back, new Date().toISOString());
-        if (result === "saved") api.changed();
-        return result;
-      },
+      undo: undoable
+        ? async () => {
+            const result = await api.write(id, back, new Date().toISOString());
+            if (result === "saved") api.changed();
+            return result;
+          }
+        : undefined,
       failed: (why) => RECORD_COPY.detailsFailed(why),
       undoFailed: (why) => RECORD_COPY.detailsUndoFailed(what, why),
     });

@@ -176,6 +176,8 @@ export function useListingCellEdit({
   );
   const [versions] = useState(() => new Map((listings ?? []).map((l) => [l.id, l.version])));
   const [saved] = useState(() => new Map<string, Listing>());
+  /** The door's last answer: the record's dialog tells «the server would not take it» from «not allowed» (row 3g). */
+  const lastKind = useRef<string>("");
   const customs = useMemo(
     () => new Map<FieldKey, CustomCellField>(typedFields.map((f) => [cellKeyOf(f) as FieldKey, f])),
     [typedFields],
@@ -225,6 +227,7 @@ export function useListingCellEdit({
   const write = useCallback(
     async (id: string, change: ListingChange, at: string): Promise<WriteOutcome> => {
       const outcome = await door.save({ id, version: versions.get(id) ?? 1, change, at });
+      lastKind.current = outcome.kind;
       if (outcome.kind === "saved") {
         versions.set(id, outcome.listing.version);
         saved.set(id, outcome.listing);
@@ -243,6 +246,16 @@ export function useListingCellEdit({
               ...row,
               ...cellsOf(current, labels, row.transaction),
               ...(detailWords ? detailCells(current, detailWords) : {}),
+              // The company's own values as the server keeps them now (row 3g, finding of round 1).
+              ...Object.fromEntries(
+                customKeys
+                  .filter((k) => k.startsWith("custom."))
+                  .map((k) => [
+                    k,
+                    (current.customFields as Record<string, unknown> | undefined)?.[k.slice(7)] ??
+                      null,
+                  ]),
+              ),
             } as GridRow;
             return { ...next, locked: lock(next) };
           }),
@@ -252,7 +265,7 @@ export function useListingCellEdit({
       // The cell never sends a change the rules refuse; if one slips through, the door refused it (row 4).
       return outcome.kind === "invalid" ? "refused" : outcome.kind;
     },
-    [door, versions, labels, saved, lock, onSaved, detailWords],
+    [door, versions, labels, saved, lock, onSaved, detailWords, customKeys],
   );
 
   const save = useCallback(
@@ -542,7 +555,9 @@ export function useListingCellEdit({
   // The record's details (row 3g) are no column of the grid; their save moves the row's confirmed time like any edit.
   const writeListing = useCallback(
     async (id: string, change: ListingChange, at: string) => {
-      const outcome = await write(id, change, at);
+      const written = await write(id, change, at);
+      // The cell keeps row 4's reading of a 400; the record's dialog says the server would not take it, not «not allowed».
+      const outcome = written === "refused" && lastKind.current === "invalid" ? "fault" : written;
       const now = saved.get(id);
       if (outcome === "saved")
         patch(id, {
