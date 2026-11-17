@@ -154,18 +154,13 @@ export function AccountMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent side="right" align="end" className="w-80">
         <DropdownMenuGroup>
+          {/* No avatar beside the name: the button that opens the menu already shows it, and the room it took cut a
+              39-character email on Linux, where Inter sets about 4.5% wider than on macOS. */}
           <DropdownMenuLabel>
-            <span className="flex items-center gap-2.5">
-              <Avatar size="sm">
-                <AvatarFallback>{initial(account)}</AvatarFallback>
-              </Avatar>
-              <span className="flex min-w-0 flex-col gap-0.5">
-                <span className="truncate text-sm font-semibold text-foreground">
-                  {account.name}
-                </span>
-                <span className="truncate" title={account.email}>
-                  {account.email}
-                </span>
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span className="truncate text-sm font-semibold text-foreground">{account.name}</span>
+              <span className="truncate" title={account.email}>
+                {account.email}
               </span>
             </span>
           </DropdownMenuLabel>

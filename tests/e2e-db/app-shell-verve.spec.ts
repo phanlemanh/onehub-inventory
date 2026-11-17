@@ -28,8 +28,11 @@ const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 768;
 /** One company admin with a long sample email, in one or two new companies (sample data, MAU). */
 async function admin(info: TestInfo, companies: 1 | 2, longName = false) {
   const stamp = `${info.project.name}-${Date.now()}`;
-  // A long work email (about 38 characters), as long as the longest addresses a company is likely to use.
-  const email = `quan-tri-san-${info.project.name}-${Date.now().toString(36)}@example.test`;
+  // A long work email of exactly 42 characters, as long as the longest addresses a company is likely to use; the
+  // same length at every width, so the check does not pass on a shorter name.
+  const local = `quan-tri-san-${info.project.name}-${Date.now().toString(36)}`.padEnd(29, "x");
+  const email = `${local}@example.test`;
+  expect(email).toHaveLength(42);
   const user = (
     await owner.query<{ id: string }>(
       "insert into identity.users (email, name) values ($1, '[Tên] Quản trị MAU') returning id",
