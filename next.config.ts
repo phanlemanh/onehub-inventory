@@ -8,6 +8,8 @@ const distDir = process.env["NEXT_DIST_DIR"];
 
 const config: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
+  // The account menu sits at the foot of the App Shell's rail, bottom left: the dev-only indicator goes the other side.
+  devIndicators: { position: "bottom-right" },
   ...(distDir
     ? {
         distDir,

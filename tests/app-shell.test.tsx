@@ -7,6 +7,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vite
 import { AppShell, MAIN_ID, type NavItem } from "../src/components/templates/app-shell";
 import { COLUMN_COOKIE } from "../src/components/templates/app-shell/column-cookie";
 import { FRAME_COPY } from "../src/components/templates/frame-copy";
+import { PageHeader } from "../src/components/templates/page-header";
 import { PageState } from "../src/components/templates/page-state";
 import { clearScreenBanner } from "../src/components/templates/screen-banner";
 import type { Role } from "../src/generated/ontology";
@@ -245,5 +246,86 @@ describe("the repo's own parts inside the App Shell", () => {
       "not-found",
     );
     expect(document.querySelectorAll('[data-sidebar="menu-button"]').length).toBeGreaterThan(0);
+  });
+});
+
+// Owner's review of 2026-11-17 against the ReUI Verve template (A1–A6): the account at the foot of the rail, the top
+// bar left with the company and the search, the rail never unfolding on the desktop, and a thin head naming the place.
+describe("the App Shell laid out as the Verve template", () => {
+  it("puts the account at the foot of the rail and keeps it out of the top bar", () => {
+    render(
+      <AppShell
+        nav={ITEMS}
+        company={<span>[Sàn]</span>}
+        search={<button>tìm</button>}
+        account={<button>tài khoản</button>}
+      />,
+    );
+    const foot = document.querySelector('[data-slot="app-shell-account"]');
+    const bar = document.querySelector('[data-slot="app-shell-top-bar"]')!;
+    expect(foot?.textContent).toBe("tài khoản");
+    expect(foot?.closest('[data-slot="sidebar"]')).not.toBeNull();
+    expect(bar.textContent).not.toContain("tài khoản");
+    expect(bar.querySelector('[data-slot="app-shell-search"]')?.textContent).toBe("tìm");
+    // The theme moved into the account menu: no look button in the top bar any more.
+    expect(bar.querySelector(`[aria-label="${FRAME_COPY.theme.button}"]`)).toBeNull();
+  });
+
+  it("shows the sheet button on a phone only", () => {
+    render(<AppShell nav={ITEMS} />);
+    const trigger = screen.getByRole("button", { name: FRAME_COPY.openSidebar });
+    expect(trigger.parentElement?.className).toContain("md:hidden");
+  });
+
+  it("keeps the desktop rail as icons when asked to unfold it", () => {
+    render(<AppShell nav={ITEMS} />);
+    const sidebar = document.querySelector('[data-slot="sidebar"]:not([data-mobile])');
+    expect(sidebar?.getAttribute("data-state")).toBe("collapsed");
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "b", metaKey: true }));
+    });
+    expect(sidebar?.getAttribute("data-state")).toBe("collapsed");
+  });
+
+  it("names the place open in the second column after the screen's name", () => {
+    nav.pathname = "/inventory";
+    render(
+      <AppShell nav={ITEMS}>
+        <PageHeader title="Mục chung hai" />
+      </AppShell>,
+    );
+    const head = document.querySelector('[data-slot="page-header"]')!;
+    expect(head.querySelector("h1")?.textContent).toBe("Mục chung hai");
+    expect(head.querySelector('[data-slot="page-header-place"]')?.textContent).toBe(
+      "Tất cả mục hai",
+    );
+  });
+
+  it("names no place when the screen has none, or when it says the screen's name again", () => {
+    nav.pathname = "/";
+    const first = render(
+      <AppShell nav={ITEMS}>
+        <PageHeader title="Mục chung một" />
+      </AppShell>,
+    );
+    expect(document.querySelector('[data-slot="page-header-place"]')).toBeNull();
+    first.unmount();
+    nav.pathname = "/inventory";
+    render(
+      <AppShell nav={ITEMS}>
+        <PageHeader title="Tất cả mục hai" />
+      </AppShell>,
+    );
+    expect(document.querySelector('[data-slot="page-header-place"]')).toBeNull();
+  });
+
+  it("the fold handle stands on the second column's edge, the edge running the whole height", () => {
+    nav.pathname = "/inventory";
+    render(<AppShell nav={ITEMS} />);
+    const edge = document.querySelector('[data-slot="app-shell-second-column-edge"]')!;
+    const handle = screen.getByRole("button", { name: FRAME_COPY.secondColumn.collapse });
+    expect(edge.contains(handle)).toBe(true);
+    expect(edge.className).toContain("self-stretch");
+    expect(edge.className).toContain("border-r");
   });
 });
