@@ -7,10 +7,12 @@ import { PageState } from "@/components/templates/page-state";
 import { BehaviorShowcase } from "./behavior-showcase";
 import { BrokenOnClient, FrameShowcase } from "./frame-showcase";
 import { GridShowcase } from "./grid-showcase";
+import { ImportWizardProto } from "@/modules/imports/ui/import-wizard-proto";
 
 const FRAME_SLUG = "khung-va-giao-dien";
 const GRID_SLUG = "luoi-va-o-theo-kieu";
 const BEHAVIOR_SLUG = "hanh-vi-trong-luoi-khung";
+const IMPORT_SLUG = "nhap-excel";
 const SLOW_MS = 4000;
 
 type Props = {
@@ -26,7 +28,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProtoPage({ params, searchParams }: Props) {
   if (process.env.NODE_ENV === "production") notFound();
   const { slug } = await params;
-  const { state, columns, quyen } = await searchParams;
+  const { state, columns, quyen, loi, buoc } = await searchParams;
+  if (slug === IMPORT_SLUG) {
+    // Row 11 scope gate: the two layouts of the «Nạp tệp» screen, same blocks, same sample data.
+    return (
+      <>
+        <PageHeader title="Nạp tệp" />
+        <ImportWizardProto
+          key={`${String(loi)}-${String(buoc)}`}
+          layout={loi === "b" ? "b" : "a"}
+          start={typeof buoc === "string" ? Number(buoc) : 1}
+        />
+      </>
+    );
+  }
   if (slug === BEHAVIOR_SLUG) {
     return (
       <>
