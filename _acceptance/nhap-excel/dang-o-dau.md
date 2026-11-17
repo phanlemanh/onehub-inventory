@@ -10,8 +10,10 @@ Cập nhật sau mỗi bước có nghĩa (G-1711-39: hạn mức tuần ≥ 95%
   `src/modules/imports/ui/import-wizard.tsx` (ApplyBatches trong PermittedAction continueImport, UndoImport trong
   undoImport), screens.yaml nhap-tep = built; các bài đã ký đi theo màn mới (sua-sau-ky: kiem-vai-theo-man,
   bo-kiem-chung-khi-dang-nhap, khai-vai-va-man). make check XANH (bài đơn vị của màn `tests/nhap-excel-man.test.tsx`, phủ mã 80,16%).
-  Sau đó: thanh bên (src/app/(app)/nav.ts) mục Nạp tệp theo importListings; design/patterns/luong-nhieu-buoc.md;
-  design/so-khoi.yaml dòng khối khung năm bước (ho_so: nhap-excel); chung-minh-man.md đủ mục khi implemented;
+  Xong: thanh bên mục Nạp tệp (importListings), dòng wiki/log.md. Hồ sơ họ màn design/patterns/luong-nhieu-buoc.md (bản
+  nháp ở scratchpad của phiên D) và dòng design/so-khoi.yaml (ImportWizard, nguồn solution-crm-6) PHẢI vào cùng lượt với
+  ma trận trạng thái của chung-minh-man.md và bài trình duyệt — có hồ sơ họ trước thì lưới đỏ «man-mau-chua-dat».
+  Kế: chung-minh-man.md đủ mục khi implemented;
   tests/e2e-db/nhap-excel.spec.ts (E2, E15, E16, E20, E21) + axe. Lưu ý: commit c2414e82 dùng --no-verify (pre-commit chỉ
   chạy lint; lint đã sạch ở commit sau).
 - Việc kế sau màn: (c) việc 8 màn `/nhap-tep` (khung solution-crm-6, `@/components/reui/stepper` đã cài; gỡ dòng «bo qua: nhap-tep — planned» của e2e-templates.test và đổi screens.yaml sang built); (d) việc 9 Bảng hàng sau khi 3g gộp; (e) việc 10, S4.

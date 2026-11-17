@@ -174,7 +174,14 @@ describe("thanh-ben-khop-so-man", () => {
   it("every sidebar entry gates its screen with the register's action", () => {
     const t = buttonTable(ROOT);
     const linked = NAV.filter((i) => t.screens.some((s) => s.route === i.href)).map((i) => i.href);
-    expect(linked.sort()).toEqual(["/", "/inventory", "/members", "/sent", "/tuy-chinh-san"]);
+    expect(linked.sort()).toEqual([
+      "/",
+      "/inventory",
+      "/members",
+      "/nhap-tep",
+      "/sent",
+      "/tuy-chinh-san",
+    ]);
     expect(navProblems(NAV, t.screens)).toEqual([]);
   });
 

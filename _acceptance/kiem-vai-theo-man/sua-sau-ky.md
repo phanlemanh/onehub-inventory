@@ -12,3 +12,5 @@
 - 2026-11-17 — hàng 11 (màn dựng xong): `nhap-tep` thành màn built nên ca tap-cap-bang-tich có 28 cặp (thêm 4 cặp
   nhap-tep), hai cặp chặn mới `nhap-tep×BuyerAgent`, `nhap-tep×CompanyAdmin` (Vai × Màn đã duyệt), và nhap-tep rời
   danh sách màn ngoài cặp.
+- 2026-11-17 — hàng 11: thanh bên có mục Nạp tệp (`/nhap-tep`, chặn theo `importListings` như sổ màn) nên ca
+  thanh-ben-khop-so-man thêm `/nhap-tep` vào tập trang có mục. Luật đo không đổi.
