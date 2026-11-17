@@ -44,7 +44,7 @@ năng. Hàng 3g thêm hộp «Sửa» trong hồ sơ, bốn cột chi tiết và
 | Một phần hỏng | đạt | không đổi từ hàng 10: tests/e2e/screens/screens.spec.ts (mot-phan-hong) |
 | Chữ dài | đạt | tests/sua-thong-tin-can.test.tsx (hop-qua-dai, hop-truong-cu-dai: pháp lý 350 ký tự sẵn không chặn lần lưu); tests/e2e/screens/screens.spec.ts (chu-dai) |
 | Không đủ quyền | đạt | tests/sua-thong-tin-can.test.tsx (nut-sua-12-o: Quản trị sàn không có nút); tests/e2e-db/sua-thong-tin-can.spec.ts (quan-tri-khong-nut: không nút, ô không mở); tests/bang-hang-khong-du-quyen-doi-chung.test.tsx (đối chứng của màn không đủ quyền) |
-| Xung đột khi lưu | đạt | src/modules/listings/sua-thong-tin.test.ts (hop-409-ban-hien-tai, hop-409-tai-ban-moi); tests/sua-thong-tin-can.test.tsx (hop-nam-ket-cuc: căn vừa đổi) |
+| Xung đột khi lưu | đạt | tests/sua-thong-tin-may-chu.test.ts (hop-409-ban-hien-tai, hop-409-tai-ban-moi); tests/sua-thong-tin-can.test.tsx (hop-nam-ket-cuc: căn vừa đổi) |
 | Phiên hết hạn | đạt | src/lib/write-failure.test.ts (mot-bang-ma: 401); tests/sua-thong-tin-can.test.tsx (hop-nam-ket-cuc: phiên hết hạn) |
 | Mất mạng khi lưu | đạt | tests/sua-thong-tin-can.test.tsx (hop-nam-ket-cuc: mất mạng); src/modules/listings/ui/http-save-door.test.ts (offline không gửi gì) |
 | Link hết hạn | không áp | Trạng thái của trang khách; Bảng hàng là màn nội bộ |
