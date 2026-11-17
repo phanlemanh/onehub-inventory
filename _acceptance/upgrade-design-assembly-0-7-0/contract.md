@@ -5,7 +5,7 @@ slug: upgrade-design-assembly-0-7-0
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci]
-status: signed-off
+status: approved
 approved_by: Phan Le Manh
 approved_at: 2026-11-17
 design_doc: docs/superpowers/specs/2026-11-17-upgrade-design-assembly-0-7-0-design.md
@@ -71,8 +71,12 @@ của phiên làm 8.4 (ghi chú bàn giao `8.4-reference-upgrade-dry-run.md`); d
   `contract: 8 of 8 ledger file(s) have the one shape every reader relies on`.
 - AC-10: Given commit `ec2c4597` và cha `69253032`, When kê tệp commit đổi (không gộp đổi tên), Then đúng 81 tệp ma trận
   kê, mỗi tệp thuộc đúng một trong 13 nhóm việc của bảng Coverage và số tệp từng nhóm đúng như ma trận ghi; và từ chỗ rời `main` tới HEAD, nhánh không đổi tệp nào ngoài 81 tệp ấy và tệp của chính hồ sơ này (thư mục hồ sơ,
-  `_acceptance/config.yaml`, design doc, kế hoạch, `wiki/log.md`, bản đồ sản phẩm, trang lộ trình). Khi nhánh đã vào
-  `origin/main`, phép đo chỉ so commit và nói đúng điều đó.
+  `_acceptance/config.yaml`, design doc, kế hoạch, `wiki/log.md`, bản đồ sản phẩm, trang lộ trình), cộng đúng một tệp sửa
+  sau ký `tests/e2e-db/screens.spec.ts` (`sua-sau-ky.md`). Nhánh được so từ chỗ nó rời `origin/main` hiện tại. Khi nhánh
+  đã vào `origin/main`, phép đo chỉ so commit và nói đúng điều đó.
+- AC-11: Given Postgres của dãy H và nhánh ở HEAD, When chạy bộ kiểm mọi màn có phiên đăng nhập
+  (`tests/e2e-db/screens.spec.ts`), Then mọi bài đạt; bài `tap man do co phien` chờ năm màn theo thứ tự mã màn
+  (`inventory`, `members`, `sent`, `today`, `tuy-chinh-san`) — thứ tự sổ màn được đọc từ bản 0.7.0.
 
 ## Coverage
 
@@ -94,6 +98,7 @@ coverage-scan».
 | Bản đồ `affected` và hình dạng sổ trong `design/theme.json` (1) | AC-7; AC-9 (audit thấy 8 sổ một hình dạng) |
 | Bảng luật của `design/behaviors.md` thành danh sách (1) | AC-10; AC-1 (`make check` đọc tệp) |
 | Sáu liên kết đầu trang wiki (6), hai bài kiểm thứ tự (1), tên `owner-calls.mjs` trong bài kiểm bản sao nông (1) | AC-10; AC-1 |
+| Bên đọc sổ màn thật trong bộ kiểm có phiên (`tests/e2e-db/screens.spec.ts`), sửa sau ký | AC-11; AC-10 (tệp sửa sau ký) |
 | Hai hàng 8.3 (`decision-sheet`, `owner-calls`) | Ngoài phạm vi: chủ kho hoãn (dòng sổ `descope`, Hỏi-2) |
 | Lời văn lịch sử trong thân trang wiki, hồ sơ và tài liệu cũ còn tên cũ | Ngoài phạm vi: ghi chép lịch sử, không phải bên đọc |
 | Cách lệnh upgrade chạy | Ngoài phạm vi: lệnh nằm ở plugin, có bài kiểm ở kho design-assembly |

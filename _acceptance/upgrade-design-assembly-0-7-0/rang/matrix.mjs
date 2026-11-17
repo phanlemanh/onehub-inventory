@@ -183,4 +183,6 @@ export const BRANCH_MAY_CHANGE = [
   "wiki/log.md",
   "PRODUCT-MAP.md",
   "LO-TRINH.html",
+  // Fixed after the Gate 2 signature (sua-sau-ky.md): the signed-in suite read the ledger of screens in the old order.
+  "tests/e2e-db/screens.spec.ts",
 ];

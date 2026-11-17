@@ -201,3 +201,12 @@ evals:
     paths: ["_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
     expected: "exit 0; bài 'change-list' đỏ ở sáu ca: 'upgrade commit changed outside the list: design/tokens.json'; 'upgrade commit did not change: mk/derived.mk'; 'branch changed beyond the upgrade and this record: Makefile'; nhóm thiếu behaviors.md → 'upgrade commit files not in exactly one group: design/behaviors.md (0 groups)'; nhóm wiki ghi 5 → 'groups off their count: wiki front-matter links 6/5'; và khi đã gộp, tệp ngoài danh sách vẫn đỏ; xanh khi đã gộp với dòng 'the branch is in origin/main already, so only the commit was compared'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E23
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.kiem_chung_phien
+    long_running: 40
+    layer: backend-effect
+    paths: ["tests/e2e-db/**", "tools/e2e_templates/**", "design/screens/**", "tools/design-assembly/**"]
+    expected: "exit 0; mọi bài của tests/e2e-db/screens.spec.ts đạt ở bốn khổ, gồm 'tap man do co phien'. Chiều đỏ: cùng lệnh với MEASURED cũ (today, inventory, sent, tuy-chinh-san, members) đỏ ở cả bốn khổ với 'Expected - 2 / Received + 2' — đã thấy trên CI (run 44027688200, e2e-db) và tại chỗ trên dãy H trước khi sửa"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

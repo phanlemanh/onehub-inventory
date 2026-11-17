@@ -35,7 +35,11 @@
   },
   {
    "id": "AC-10",
-   "p": "Sẽ chỉ đổi đúng 81 tệp của commit lên đời, mỗi tệp thuộc một nhóm việc đã khai, cộng tệp của chính hồ sơ này."
+   "p": "Sẽ chỉ đổi đúng 81 tệp của commit lên đời, mỗi tệp thuộc một nhóm việc đã khai, cộng tệp của hồ sơ và đúng một tệp sửa sau ký (bài kiểm màn có phiên)."
+  },
+  {
+   "id": "AC-11",
+   "p": "Sẽ chạy xanh bộ kiểm mọi màn khi đã đăng nhập (trên Postgres), với danh sách màn theo thứ tự mã màn mà sổ màn nay dùng."
   }
  ],
  "wont_do": [
@@ -124,14 +128,18 @@
   },
   {
    "i": 16,
-   "p": "Hai phép kiểm của bước 8.3: ngoài phạm vi, anh đã hoãn."
+   "p": "Bộ kiểm màn có phiên đọc sổ màn thật (1 tệp, sửa sau ký): đủ khi chạy xanh trên Postgres — AC-11, AC-10."
   },
   {
    "i": 17,
-   "p": "Chữ lịch sử trong wiki và hồ sơ cũ còn tên cũ: ngoài phạm vi, đó là ghi chép, không phải nơi đọc sổ."
+   "p": "Hai phép kiểm của bước 8.3: ngoài phạm vi, anh đã hoãn."
   },
   {
    "i": 18,
+   "p": "Chữ lịch sử trong wiki và hồ sơ cũ còn tên cũ: ngoài phạm vi, đó là ghi chép, không phải nơi đọc sổ."
+  },
+  {
+   "i": 19,
    "p": "Cách lệnh lên đời chạy: ngoài phạm vi, có bài kiểm ở kho plugin."
   }
  ],
