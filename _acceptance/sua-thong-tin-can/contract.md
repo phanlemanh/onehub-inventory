@@ -120,3 +120,7 @@ sai luật) × vai (ba vai sửa · Quản trị sàn) × khổ (360 · 1440). T
   kèm lý do). Lối khác: nhảy qua cột tính; giá: khối lệch một cột so với lưới đang thấy, sửa khối lưới dùng chung.
 
 ## Notes
+- Hồ sơ «Bộ ô tìm của vùng» (bo-o-tim-cua-vung) giữ nguyên như nhánh chính: bài E18 của nó đo thay đổi của chính PR của nó
+  nên không ghim lại được ở nhánh khác (phán quyết (e) của giám sát, nợ cho hàng «siết bộ kiểm lần hai»). Hàng 3g đổi hai
+  tệp bài nó dùng chung (`tests/e2e/sheet.spec.ts`, `tests/e2e/screens/inventory-width.spec.ts`) — cùng sửa ấy đã ghi sửa
+  sau ký và ghim lại ở `bang-hang-ban-doc` và `luu-goc-nhin-cot-hai`.
