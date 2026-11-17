@@ -1,0 +1,7 @@
+ten: FormDialog
+tep: src/components/candidate/form-dialog.tsx
+nguon: tao-tay
+nhu_cau: hop-bieu-mau
+mo_ta: Một hộp hỏi vài trường (tiêu đề, một câu nói việc sẽ xảy ra, các trường, «Thôi» và nút gửi), giữ chữ đã gõ khi gửi hỏng
+ho_so: moi-nguoi-gan-vai
+duyet: 2026-11-11

@@ -1,7 +1,7 @@
 """Readers for the screen proof gate (roadmap rows 1c and 1n, decisions 0019 and 0023). Standard library only.
 
 Reads the screen register, the family files of the template map (`design/patterns/<family>.md`), the state matrix,
-the component registry, the ReUI catalog, the block ledger (`design/so-khoi.yaml`), the transition list and the list
+the component registry, the ReUI catalog, the block ledger (`design/intake.yaml`), the transition list and the list
 of wrapping templates (`tools/proof_gate/`), contracts and their proof files (`_acceptance/<slug>/chung-minh-man.md`).
 The rules live in check.py.
 """
@@ -28,7 +28,11 @@ DECISIONS_FILE = "design/decisions.yaml"
 PATTERNS_DIR = "design/patterns"
 PROOF_FILE = "chung-minh-man.md"
 RESERVED_PATTERN_FILES = {"README.md", "lech-lot.md"}
-LEDGER_FILE = "design/so-khoi.yaml"  # decision 0023: one line per thing taken into the store
+LEDGER_FILE = "design/intake.yaml"  # decision 0023: one line per thing taken into the store
+# The design-assembly tool keeps the block ledger and the ledger of screens as folders of fragments (one file per entry
+# beside _shared.yaml), each with a copy at the old path, out of git, that make writes before the tests. Run alone on a
+# clean checkout the copy is not there yet: the folder is then read here, so decision 0023 is never off only because
+# nothing drew the copy. Entries are read in the order of their file names, as the tool reads them.
 TRANSITION_FILE = "tools/proof_gate/chuyen-tiep.yaml"  # rounds past the scope gate when row 1n merged: 1c rules
 WRAPPERS_FILE = "tools/proof_gate/khuon-boc.yaml"  # templates that wrap screens (App Shell), kept by people
 BEFORE_1Q_FILE = "tools/proof_gate/thanh-phan-co-truoc.yaml"  # row 1q: own files of the register before it, frozen
@@ -201,10 +205,28 @@ def _names_from_catalog(data: Any) -> set[str]:
     return names
 
 
+def _ledger_doc(root: Path, rel: str, entries_key: str) -> Any:
+    """The ledger at `rel`, or, when only its folder of fragments is there, the folder read as one; None when neither."""
+    path = root / rel
+    if path.is_file():
+        return load_yaml_file(path)
+    folder = root / rel.removesuffix(".yaml")
+    shared_path = folder / "_shared.yaml"
+    if not shared_path.is_file():
+        return None
+    shared = load_yaml_file(shared_path)
+    if not isinstance(shared, dict):
+        raise YamlError(f"{shared_path.relative_to(root)}: không phải một bảng khoá")
+    keys = shared.get("keys") if isinstance(shared.get("keys"), dict) else {}
+    key = str(keys.get(entries_key) or entries_key)
+    entries = [load_yaml_file(f) for f in sorted(folder.glob("*.yaml")) if f.name != "_shared.yaml"]
+    return {**shared, key: entries}
+
+
 def load_repo(root: Path) -> Repo:
     repo = Repo(root=root)
     try:
-        doc = load_yaml_file(root / SCREENS_FILE)
+        doc = _ledger_doc(root, SCREENS_FILE, "screens")
     except YamlError as exc:
         repo.errors.append(f"{SCREENS_FILE}: không đọc được ({exc})")
         doc = None
@@ -262,10 +284,10 @@ def _load_lists(repo: Repo, root: Path) -> None:
     """The block ledger, the transition list, the wrapper list and the files made before row 1q. A missing ledger means
     decision 0023 is not on."""
     path = root / LEDGER_FILE
-    if path.is_file():
+    if path.is_file() or (root / LEDGER_FILE.removesuffix(".yaml") / "_shared.yaml").is_file():
         repo.ledger_present = True
         try:
-            doc = load_yaml_file(path)
+            doc = _ledger_doc(root, LEDGER_FILE, "blocks")
         except YamlError as exc:
             repo.errors.append(f"{LEDGER_FILE}: không đọc được ({exc})")
             doc = None

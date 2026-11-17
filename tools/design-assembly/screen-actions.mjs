@@ -13,6 +13,7 @@ import path from "node:path";
 import { argv, cwd, exit, stdout } from "node:process";
 import { fileURLToPath } from "node:url";
 
+import { ledgerText } from "./screen-fragments.mjs";
 import { readScreenLedger } from "./screen-ledger.mjs";
 import { readYaml } from "./yaml.mjs";
 
@@ -387,10 +388,8 @@ function main(args) {
       .filter(Boolean)
       .map((pair) => pair.split("=")),
   );
-  const ledgerFile = path.join(root, "design/screens.yaml");
-  const ledger = existsSync(ledgerFile)
-    ? readScreenLedger(readFileSync(ledgerFile, "utf8"))
-    : { screens: [] };
+  // The ledger in whichever shape the repository keeps it: one file, or one file per screen.
+  const ledger = readScreenLedger(ledgerText(root)) ?? { screens: [] };
   // A measure may add, outside the repository it reads, what that repository does not declare.
   const overlay = value("--overlay");
   if (overlay) {

@@ -22,7 +22,7 @@ const KEY = {
   why: "ly_do",
 };
 // Files in the folder that are not a kind of screen.
-const NOT_A_KIND = ["README.md", "lech-lot.md"];
+export const NOT_A_KIND = ["README.md", "lech-lot.md"];
 
 // The file a person owns: the widths every page is checked at.
 export const SIZES_FILE = "design/screen-sizes.json";

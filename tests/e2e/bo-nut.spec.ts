@@ -1,6 +1,6 @@
 // Row 9e (bo-nut-theo-quyen), evals E11: the template sample /proto/bo-nut-theo-quyen under the four roles.
 //   bon-vai-hai-kho — at 360 and 1440, for both sample screens, each role sees the buttons the generated role × screen
-//     table (design/vai-man-nut.md) gives it: the add button in the page head, the region or «not allowed», and on a
+//     table (design/role-screen-buttons.md) gives it: the add button in the page head, the region or «not allowed», and on a
 //     row of its own and a row of someone else's the «…» menu with exactly the permitted actions, ordinary ones first.
 //   axe-sang-toi — no axe violation with a row menu open, in light and dark.
 import { readFileSync } from "node:fs";
@@ -20,9 +20,9 @@ const lower = (s: string) => s.toLocaleLowerCase("vi");
 
 /** The proto-bo-nut section of the generated table: role display name → actions in its cell. */
 function generatedCells(): Map<string, Set<string>> {
-  const text = readFileSync("design/vai-man-nut.md", "utf8");
+  const text = readFileSync("design/role-screen-buttons.md", "utf8");
   const section = text.split(/^## /m).find((s) => s.startsWith("proto-bo-nut"));
-  if (!section) throw new Error("design/vai-man-nut.md không có mục proto-bo-nut");
+  if (!section) throw new Error("design/role-screen-buttons.md không có mục proto-bo-nut");
   const cells = new Map<string, Set<string>>();
   for (const line of section.split("\n")) {
     const m = /^\| (.+?) +\| (.+?) +\|$/.exec(line);

@@ -162,6 +162,10 @@
         "libraries": ["src/components/reui"],
         "own": "src/components",
         "pages": "design/patterns"
+      },
+      {
+        "kind": "untracked",
+        "file": "design/component-registry.json"
       }
     ],
     "ledger-shapes": [
@@ -174,7 +178,43 @@
           "screens": "design/screens.yaml"
         },
         "pages": "design/patterns"
+      },
+      {
+        "kind": "screen-fragments",
+        "file": "design/screens.yaml",
+        "fragments": "design/screens"
+      },
+      {
+        "kind": "untracked",
+        "file": "design/screens.yaml"
+      },
+      {
+        "kind": "screen-fragments",
+        "of": "intake",
+        "file": "design/intake.yaml",
+        "fragments": "design/intake"
+      },
+      {
+        "kind": "untracked",
+        "of": "intake",
+        "file": "design/intake.yaml"
       }
+    ]
+  },
+  "affected": {
+    "global": [],
+    "none": [
+      "_acceptance/**",
+      "docs/**",
+      "wiki/**",
+      "architecture/**",
+      "governance/**",
+      "evals/**",
+      "tools/**",
+      ".claude/**",
+      "*.md",
+      "LO-TRINH.html",
+      "design/decisions.yaml"
     ]
   }
 }

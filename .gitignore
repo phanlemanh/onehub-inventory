@@ -37,3 +37,9 @@ playwright-report/
 
 # Vercel CLI: project link and build output (make deploy)
 .vercel/
+
+# Derived design files, written again by tools/design-assembly/derived.mjs before anything reads them
+design/component-registry.json
+design/screens.yaml
+design/role-screen-buttons.md
+design/intake.yaml

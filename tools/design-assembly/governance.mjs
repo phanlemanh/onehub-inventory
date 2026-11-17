@@ -55,41 +55,104 @@ export function starterParts(componentsFolder) {
   };
 }
 
-const withoutComments = (text) =>
-  text.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+// The text with its block comments and its whole-line comments taken out. A block comment is only
+// one outside a string: a glob or an address in quotes can hold the signs of one.
+function withoutComments(text) {
+  let code = "";
+  let quote = null;
+  for (let i = 0; i < text.length; i += 1) {
+    const c = text[i];
+    if (quote) {
+      code += c;
+      if (c === "\\") code += text[++i] ?? "";
+      else if (c === quote) quote = null;
+    } else if (c === '"' || c === "'" || c === "`") {
+      quote = c;
+      code += c;
+    } else if (c === "/" && text[i + 1] === "*") {
+      const close = text.indexOf("*/", i + 2);
+      i = close === -1 ? text.length : close + 1;
+    } else code += c;
+  }
+  return code.replace(/^\s*\/\/.*$/gm, "");
+}
 
-// The modules a file imports, as written: `from "x"`, `import "x"` and `import("x")`.
-export function importsOf(text) {
+// The modules a file imports, as written: `from "x"`, `import "x"` and `import("x")`. `wide` also
+// takes `require("x")` and an `import()` written as a template, whose name may hold `${...}`.
+export function importsOf(text, { wide = false } = {}) {
   const code = withoutComments(text);
   const found = new Set();
   const forms = [
     /\bfrom\s*["']([^"']+)["']/g,
     /\bimport\s*["']([^"']+)["']/g,
     /\bimport\(\s*["']([^"']+)["']\s*\)/g,
+    ...(wide ? [/\brequire\(\s*["']([^"']+)["']\s*\)/g, /\bimport\(\s*`([^`]+)`\s*\)/g] : []),
   ];
   for (const form of forms) for (const match of code.matchAll(form)) found.add(match[1]);
   return [...found];
 }
 
+const ENDINGS = ["", ".ts", ".tsx", ".js", ".jsx", ".mjs", "/index.ts", "/index.tsx", "/index.js"];
+// What the builds of today also take: a name ending as the built file does, and more index files.
+const WIDE_ENDINGS = [...ENDINGS, ".cjs", "/index.jsx", "/index.mjs"];
+// The alias every repository of the guide has: `@/` is the source folder.
+const OWN_ALIAS = [["@/", `${SOURCE_FOLDER}/`]];
+
 // The source file an import names, or null when it names a package or something outside the
-// sources read.
-function resolveImport(from, name, sources) {
+// sources read. `aliases` are the prefixes the repository's build reads as a folder; `wide` also
+// tries the endings above, and a name ending `.js` for the `.ts` file it is built from.
+export function resolveImport(from, name, sources, { aliases = OWN_ALIAS, wide = false } = {}) {
+  const alias = aliases.find(([prefix]) => name.startsWith(prefix));
   let base;
-  if (name.startsWith("@/")) base = `${SOURCE_FOLDER}/${name.slice(2)}`;
+  if (alias) base = `${alias[1]}${name.slice(alias[0].length)}`;
   else if (name.startsWith(".")) base = path.posix.join(path.posix.dirname(from), name);
   else return null;
-  const endings = [
-    "",
-    ".ts",
-    ".tsx",
-    ".js",
-    ".jsx",
-    ".mjs",
-    "/index.ts",
-    "/index.tsx",
-    "/index.js",
-  ];
-  return endings.map((ending) => `${base}${ending}`).find((file) => file in sources) ?? null;
+  const bases = wide ? [base, base.replace(/\.[cm]?jsx?$/, "")] : [base];
+  const endings = wide ? WIDE_ENDINGS : ENDINGS;
+  return (
+    bases
+      .flatMap((one) => endings.map((ending) => `${one}${ending}`))
+      .find((file) => file in sources) ?? null
+  );
+}
+
+// The path an import of the repository's own names, as written, from the top of the repository.
+function fileOf(from, name, aliases) {
+  const alias = aliases.find(([prefix]) => name.startsWith(prefix));
+  if (alias) return path.posix.normalize(`${alias[1]}${name.slice(alias[0].length)}`);
+  return name.startsWith(".") ? path.posix.join(path.posix.dirname(from), name) : null;
+}
+
+// Whether an import names something of the repository's own rather than a package: written from
+// the file, through an alias, or with a sign no package name starts with.
+const ownName = (name, aliases) =>
+  name.startsWith(".") || /^[~#]/.test(name) || aliases.some(([prefix]) => name.startsWith(prefix));
+
+// Every source file the files of `roots` reach through their imports, the roots included: what a
+// change to any of them may show on the screen they draw. `opaque` lists each import of the
+// repository's own that names no file the sources have, or whose name is built while the code runs:
+// what lies behind it is not known. A name that is a file of another kind on the disk, as the data
+// or the stylesheet a module imports, is reached as it is: `exists` says which are there.
+export function importClosure(roots, sources, aliases = OWN_ALIAS, exists = () => false) {
+  const files = new Set();
+  const opaque = [];
+  const waiting = roots.filter((file) => file in sources);
+  while (waiting.length > 0) {
+    const file = waiting.pop();
+    if (files.has(file)) continue;
+    files.add(file);
+    for (const name of importsOf(sources[file], { wide: true })) {
+      const next = name.includes("${")
+        ? null
+        : resolveImport(file, name, sources, { aliases, wide: true });
+      if (next === null && (name.includes("${") || ownName(name, aliases))) {
+        const other = name.includes("${") ? null : fileOf(file, name, aliases);
+        if (other && exists(other)) files.add(other);
+        else opaque.push({ file, name });
+      } else if (next && !files.has(next)) waiting.push(next);
+    }
+  }
+  return { files, opaque };
 }
 
 function readParts(partsText, file) {

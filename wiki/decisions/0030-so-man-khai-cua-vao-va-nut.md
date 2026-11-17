@@ -4,7 +4,7 @@ title: Sổ màn là một chỗ khai quyền vào màn và nút của mỗi mà
 links:
   [
     design/screens.yaml,
-    design/vai-man-nut.md,
+    tools/coverage_matrix/buttons.py,
     tools/coverage_matrix/buttons.py,
     src/modules/identity/ui/permitted-action.tsx,
     tests/e2e-db/vai-man.ts,

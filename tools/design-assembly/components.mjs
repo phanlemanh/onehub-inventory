@@ -1,7 +1,7 @@
 // The component manifest: the components the source exports and the variants each one declares,
 // in the registry format the acceptance kit reads. It is derived: a component is changed in its
 // source file, and this file is written again from the source.
-// Usage: node tools/design-assembly/components.mjs [--write] [--target DIR]
+// Usage: node tools/design-assembly/components.mjs [--write | --out-of-git | --in-git] [--target DIR]
 import {
   existsSync,
   mkdirSync,
@@ -625,6 +625,53 @@ export function regenerated(root) {
   };
 }
 
+// The check that says a derived file is kept out of git, as the tool data lists it.
+export const UNTRACKED = "untracked";
+
+// The check to carry over when the list of the manifest's checks is built again: one for `file`
+// when the repository keeps its manifest out of git, whatever file it named for it before. So the
+// choice follows the manifest to a new path, and is never dropped without a word.
+export function outOfGitChecks(theme, file) {
+  const asked = (theme?.checks?.[COMPONENTS_DECISION] ?? []).some(
+    (check) => check.kind === UNTRACKED,
+  );
+  return asked ? [{ kind: UNTRACKED, file }] : [];
+}
+
+// The tool data with the manifest kept out of git, or back in it. Only the manifest's own list of
+// checks changes; a repository whose data already says so gets the very same data back.
+export function withManifestOutOfGit(theme, file, out) {
+  const checks = theme.checks?.[COMPONENTS_DECISION] ?? [];
+  const has = checks.some((check) => check.kind === UNTRACKED && check.file === file);
+  if (out === has) return theme;
+  const others = checks.filter((check) => check.kind !== UNTRACKED);
+  const next = out ? [...others, { kind: UNTRACKED, file }] : others;
+  return { ...theme, checks: { ...theme.checks, [COMPONENTS_DECISION]: next } };
+}
+
+// Keeps the manifest out of git from now on, or takes that back. It writes the choice to the tool
+// data and says what is left for a person to do in git; it never touches the index or .gitignore.
+function choose(root, made, out) {
+  const themeFile = path.join(root, "design/theme.json");
+  const theme = JSON.parse(readFileSync(themeFile, "utf8"));
+  const file = made.check.file;
+  const next = withManifestOutOfGit(theme, file, out);
+  if (next !== theme) writeFileSync(themeFile, renderJson(next, lineWidth(root)));
+  if (out) {
+    stdout.write(
+      `component manifest: ${file} is kept out of git from now on. The gate writes it again from ${made.read} before it checks, and is red while git tracks the file or does not ignore it.
+  to finish: add ${file} to .gitignore, then run git rm --cached ${file}
+`,
+    );
+  } else {
+    stdout.write(
+      `component manifest: ${file} is kept in git again, and is held to ${made.read} as before.
+  to finish: take ${file} out of .gitignore, then run git add ${file}
+`,
+    );
+  }
+}
+
 function main() {
   const args = argv.slice(2);
   const at = args.indexOf("--target");
@@ -638,6 +685,13 @@ function main() {
     );
     exit(0);
   }
+  const out = args.includes("--out-of-git");
+  const back = args.includes("--in-git");
+  if (out && back) {
+    stderr.write("component manifest: give one of --out-of-git and --in-git, not both\n");
+    exit(1);
+  }
+  if (out || back) return choose(root, made, out);
   const { check, read, files, options, data: manifest } = made;
   const full = path.join(root, check.file);
   const before = existsSync(full) ? readFileSync(full, "utf8") : null;

@@ -9,8 +9,11 @@ import { expect, test } from "@playwright/test";
 import { loadRegister, SIGNED_OUT_SCREENS, skipReason } from "../../tools/e2e_templates/register";
 import { registerSuite } from "../../tools/e2e_templates/suite";
 
-/** Written before the code: the screens this run measures (built, staff or public, less the signed-out list). */
-const MEASURED = ["today", "inventory", "sent", "tuy-chinh-san", "members"];
+/**
+ * Written before the code: the screens this run measures (built, staff or public, less the signed-out list), in the
+ * order of their ids — the order the ledger of screens is read in since design-assembly 0.7.0 (one file per screen).
+ */
+const MEASURED = ["inventory", "members", "sent", "today", "tuy-chinh-san"];
 
 test("tap man do co phien", () => {
   const register = loadRegister();

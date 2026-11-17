@@ -1,0 +1,7 @@
+ten: RecordPanel
+tep: src/components/candidate/record-panel.tsx
+nguon: sheet-9
+nhu_cau: xem-chi-tiet-mot-dong
+mo_ta: Ngăn nổi bên phải để xem chi tiết một dòng mà bảng bên trái vẫn dùng được
+ho_so: ho-so-can
+duyet: 2026-11-12

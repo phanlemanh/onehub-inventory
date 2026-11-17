@@ -1,0 +1,22 @@
+id: tuy-chinh-san
+route: /tuy-chinh-san
+title: CompanyLayer
+family: grid
+audience: staff
+status: built
+vao_vung: /tuy-chinh-san?phan=can-cho
+vao: readCompanyLayer
+# Parts (?phan=): the grid parts nhan, truong, tu-dien, can-cho, mau hold the CompanyLayer buttons; the Thuế phí part
+# (?phan=thue-phi, row 19) has one button, setFeeSchedule.
+nut: [addCompanyLayer, editCompanyLayer, retireCompanyLayer, matchPendingUnits, setFeeSchedule]
+mo_san: [addCompanyLayer]
+nut_chung: [Lọc, Cột, Toàn màn hình]
+hien:
+  - CompanyLabel
+  - CustomField
+  - CompanyValueAlias
+  - ImportTemplate
+  - PendingUnit
+  - FeeItem
+  - Listing
+  - Unit

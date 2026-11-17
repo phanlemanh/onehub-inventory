@@ -1,0 +1,20 @@
+id: inventory
+route: /inventory
+title: Inventory
+family: grid
+audience: staff
+status: built
+vao: null
+nut:
+  - saveView
+  - editView
+  - createListing
+  - updateListing
+  - activateListing
+  - removeListing
+  - viewOwnerPhone
+  - readCatalog
+  - viewListings
+mo_san: [saveView]
+nut_chung: [Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng]
+hien: [Listing, Unit, ListingOwner, SavedView]
