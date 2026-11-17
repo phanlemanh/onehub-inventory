@@ -25,7 +25,10 @@ let before = option("--before") ? readFileSync(option("--before"), "utf8") : nul
 let after = option("--after") ? readFileSync(option("--after"), "utf8") : null;
 if (!before || !after) {
   pluginDir = scratch("plugin");
-  const tar = spawnSync("bash", ["-o", "pipefail", "-c", `git -C "$1" archive "$2" plugins/design-assembly | tar -x -C "$3"`, "bash", repo, PLUGIN_SOURCE.commit, pluginDir]);
+  // No shell: git writes the archive to a file, tar reads it; each gets its arguments as a list.
+  const archive = path.join(pluginDir, "plugin.tar");
+  const out = spawnSync("git", ["-C", repo, "archive", "--output", archive, PLUGIN_SOURCE.commit, "plugins/design-assembly"]);
+  const tar = out.status === 0 ? spawnSync("tar", ["-x", "-f", archive, "-C", pluginDir]) : out;
   if (tar.status !== 0) found.push(`cannot take the plugin out of ${repo} at ${PLUGIN_SOURCE.commit.slice(0, 7)}`);
   const undrawn = DERIVED.filter((file) => !existsSync(path.join(root, file)));
   if (undrawn.length) found.push(`derived files not drawn yet (make design-derived): ${undrawn.join(" ")}`);
