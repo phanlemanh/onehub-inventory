@@ -746,12 +746,13 @@ test.describe("no match keeps filters", () => {
   /** The filter boxes are still there to mend, at every width (row 2e: the filter row is always shown). */
   async function checkFilters(page: Page): Promise<void> {
     // On a phone the boxes are in the open filter sheet, outside the region (row 2b). The sheet lists every column, the
-    // fee condition kept hidden in the table among them (row 19): ten boxes there, nine in the table's filter row.
+    // fee condition kept hidden in the table among them (row 19): fourteen boxes there, thirteen in the table's filter row
+    // since row 3g added the four detail columns (sửa sau ký, owner's option C, 2026-11-17).
     const phone = isPhone(page);
     const boxes = phone
       ? phoneFilterSheet(page).locator('[data-slot="column-filter"]')
       : page.locator('[data-slot="data-region"] [data-slot="column-filter"]');
-    const ok = (await boxes.count()) === (phone ? 10 : 9) && (await boxes.first().isVisible());
+    const ok = (await boxes.count()) === (phone ? 14 : 13) && (await boxes.first().isVisible());
     if (!ok) throw new Error("filters gone on no match");
   }
 
@@ -1019,7 +1020,8 @@ test.describe("unit code shows whole", () => {
     if (cut.length > 0) throw new Error(`unit code cut: ${cut[0]}`);
   }
 
-  test("every unit code cell shows the whole code, eight columns", async ({ page }) => {
+  // Twelve columns of the model since row 3g (the four details, owner's option C, 2026-11-17; sửa sau ký).
+  test("every unit code cell shows the whole code, twelve columns", async ({ page }) => {
     await openInventory(page);
     if (isPhone(page)) {
       await assertCardsNotTable(page, "unit code shows whole");
@@ -1031,7 +1033,7 @@ test.describe("unit code shows whole", () => {
       page.locator(
         '[data-slot="data-region-body"] thead th[data-col-id^="Listing."], [data-slot="data-region-body"] thead th[data-col-id^="Unit."]',
       ),
-    ).toHaveCount(8);
+    ).toHaveCount(12);
     await expect(bodyRows(page).first()).toBeVisible();
     await expect(checkCodesWhole(page)).resolves.toBeUndefined();
   });

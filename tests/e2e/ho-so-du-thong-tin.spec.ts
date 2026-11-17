@@ -262,6 +262,11 @@ test.describe("E8 · the record only reads", () => {
       "Về tay",
       "Diện tích",
       "Phòng ngủ",
+      // Row 3g (option C, 2026-11-17; sửa sau ký): the four details as columns after the bedrooms.
+      "Nội thất",
+      "Pháp lý",
+      "Tài chính",
+      "Hiện trạng",
       "Xác nhận lúc",
     ]);
     await expect(page.locator('[data-slot="data-region"]')).toContainText("60 dòng");
