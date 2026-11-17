@@ -4,12 +4,12 @@
 // messages (evals.yaml).
 import { describe, expect, it, vi } from "vitest";
 
-import { checkCustomValue } from "@/modules/company-config";
-import type { DbClient } from "@/modules/identity/server";
+import { checkCustomValue } from "../src/modules/company-config";
+import type { DbClient } from "../src/modules/identity/server";
 
-import { createListingsHandlers } from "./listings-http";
-import { applyChange, type CustomCheck } from "./save-door";
-import { httpSaveDoor } from "./ui/http-save-door";
+import { createListingsHandlers } from "../src/modules/listings/server";
+import { applyChange, type CustomCheck } from "../src/modules/listings";
+import { httpSaveDoor } from "../src/modules/listings/ui/http-save-door";
 
 vi.mock("server-only", () => ({}));
 

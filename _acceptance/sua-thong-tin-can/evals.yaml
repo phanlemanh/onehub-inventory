@@ -12,7 +12,7 @@ feature_slug: sua-thong-tin-can
 #   AC-7: 7 trả lời (401, 403, 409, 404, 400, 500, thân hỏng) = 7 kết cục ghim, hằng 7; quét src/ tìm bảng mã thứ hai.
 #   AC-9: 2 vật (hộp, ô riêng) × 2 nền = 4 lượt quét; 4 khổ.
 # Bài và ca (tên ca là thông điệp ghim):
-#   src/modules/listings/sua-thong-tin.test.ts: details-bon-truong · details-ngoai-tap-400 · details-qua-dai-400 ·
+#   tests/sua-thong-tin-may-chu.test.ts: details-bon-truong · details-ngoai-tap-400 · details-qua-dai-400 ·
 #     custom-nam-kieu · custom-sai-kieu-400 · custom-ngung-400 · custom-khong-lua-chon-400 · quan-tri-403 ·
 #     custom-quan-tri-403 · details-mot-luat-xac-nhan · hop-409-ban-hien-tai
 #   src/modules/listings/ui/http-save-door.test.ts: bay-tra-loi-tu-handler-that
