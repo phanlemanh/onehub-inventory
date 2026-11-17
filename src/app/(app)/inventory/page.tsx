@@ -240,6 +240,14 @@ export default async function Page({ searchParams }: Props) {
         title={label("Listing")}
         headers={headers}
         customColumns={customColumns}
+        detailWords={{
+          furnished: RECORD_LABELS.parts.furnished,
+          legalStatus: RECORD_LABELS.parts.legalStatus,
+          financing: RECORD_LABELS.parts.financing,
+          occupantType: RECORD_LABELS.parts.occupantType,
+          furnishedValues: RECORD_LABELS.furnishedValues,
+          occupantValues: RECORD_LABELS.occupantValues,
+        }}
         feeHeaders={FEE_HEADERS}
         rows={rows}
         listings={listings}

@@ -123,3 +123,34 @@ test("thong-bao-dung-cho-khi-khong-ho-so: with no record open a notice keeps its
   );
   expect(bottom, "thong-bao-dung-cho-khi-khong-ho-so: biến thanh đáy").toBe("");
 });
+
+test("sua-tren-o-chi-tiet: from 768 px a detail cell edits one part, the open record shows it, «Hoàn tác» puts it back", async ({
+  page,
+}, info) => {
+  test.skip(
+    ["360", "414"].includes(info.project.name),
+    "phones do not edit in a cell (row 4); they edit in the record",
+  );
+  await page.goto(`/inventory?vai=ListAgent`);
+  await regionReady(page);
+  await pageReady(page);
+  const cell = page.locator(`[id$="${ID}-Listing_furnished"]`).first();
+  await cell.scrollIntoViewIfNeeded();
+  const before = (await cell.textContent())?.trim() ?? "";
+  await cell.click({ position: { x: 3, y: 3 } });
+  await page.keyboard.press("F2");
+  const list = page.locator('[role="listbox"][data-custom-kind]');
+  await expect(list, "sua-tren-o-chi-tiet: bộ chọn").toBeVisible();
+  const pick = before === "Không nội thất" ? "Đầy đủ nội thất" : "Không nội thất";
+  await list.getByRole("option", { name: pick }).click();
+  await expect(cell, "sua-tren-o-chi-tiet: ô").toContainText(pick);
+  await page.locator("[data-sonner-toast]").getByRole("button", { name: "Hoàn tác" }).click();
+  await expect(cell, "sua-tren-o-chi-tiet: hoàn tác").toContainText(before);
+  // Edit again and open the record: it shows what the cell saved.
+  await cell.click({ position: { x: 3, y: 3 } });
+  await page.keyboard.press("F2");
+  await list.getByRole("option", { name: pick }).click();
+  await expect(cell).toContainText(pick);
+  await page.locator(`tbody tr[data-row-id="${ID}"] button[data-record-open]`).first().click();
+  await expect(field(page, "Listing.furnished"), "sua-tren-o-chi-tiet: hồ sơ").toHaveText(pick);
+});

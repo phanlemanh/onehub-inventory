@@ -51,6 +51,13 @@ export {
   type ListingDetails,
 } from "./listing-details-edit";
 export { ListingCellEdit, type CustomCellField, type CustomEdit } from "./listing-cell-edit";
+export {
+  DETAIL_COLUMN_FIELDS,
+  detailCellFields,
+  detailCells,
+  detailChange,
+  type DetailColumnWords,
+} from "./detail-cells";
 export { CopyLink, recordLink } from "./copy-link";
 export { ENTRY_COPY } from "./entry-copy";
 export { SAVED_VIEW_PARAM, gridView, savedViewHref, storedView } from "./saved-view-api";

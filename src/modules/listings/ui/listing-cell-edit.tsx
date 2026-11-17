@@ -275,20 +275,28 @@ function FeeEditor({
   );
 }
 
-/** One value of a company's own field set on its cell (row 3g); `null` clears it. */
+/** One value set on a typed cell (row 3g): a company's own field, or one detail of the listing; `null` clears it. */
 export type CustomEdit = {
-  field: `custom.${string}`;
+  field: string;
   custom: string;
   value: string | number | boolean | null;
 };
 
-/** A company's own field as its cell edits it (row 3g): its code, kind and choices. */
+/**
+ * A cell edited by its kind (row 3g): a company's own field (`custom.<code>`), or one of the four details of the
+ * listing (`key` names its column; the record's dialog edits the same parts). `limit` is the longest text it takes.
+ */
 export interface CustomCellField {
   code: string;
   header: string;
   kind: CustomKind;
   options: readonly string[];
+  key?: string;
+  limit?: number;
 }
+
+/** The grid column of a typed cell. */
+export const cellKeyOf = (field: CustomCellField): string => field.key ?? `custom.${field.code}`;
 
 /** A typed value of a text, number or date field: an input in the cell and the line under it on a value that does not fit. */
 function CustomTextEditor({
@@ -308,13 +316,13 @@ function CustomTextEditor({
       (stored === null || stored === undefined ? "" : COPY.customShown(field.kind, stored)),
   );
   const [tried, setTried] = useState(false);
-  const read = readCustomValue(field.kind, text, field.options);
+  const read = readCustomValue(field.kind, text, field.options, field.limit);
   const submit = (move?: "next") => {
     setTried(true);
     if (!read.ok) return;
     session.close(move);
     if (!sameCustomValue(read.value, stored))
-      onSave({ field: `custom.${field.code}`, custom: field.code, value: read.value });
+      onSave({ field: cellKeyOf(field), custom: field.code, value: read.value });
   };
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -351,7 +359,7 @@ function CustomTextEditor({
       </div>
       {problem ? (
         <UnderCell alert>
-          <span id="cell-edit-line">{COPY.customProblem(problem)}</span>
+          <span id="cell-edit-line">{COPY.customProblem(problem, field.limit)}</span>
         </UnderCell>
       ) : null}
     </>
@@ -383,7 +391,7 @@ function CustomChoiceEditor({
   const pick = (value: string | boolean | null) => {
     session.close();
     if (!sameCustomValue(value, stored))
-      onSave({ field: `custom.${field.code}`, custom: field.code, value });
+      onSave({ field: cellKeyOf(field), custom: field.code, value });
   };
   return (
     <div

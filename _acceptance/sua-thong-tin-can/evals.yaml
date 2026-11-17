@@ -207,3 +207,32 @@ evals:
     paths: [src/components/candidate/form-dialog.tsx, src/components/candidate/in-dialog.tsx, src/components/candidate/record-panel.tsx, tests/hop-long-nen-mo.test.tsx]
     expected: "exit 0; ca 'hop-long-co-nen-mo' (FormDialog trong một hộp có nền mờ của nó) và đối chứng 'doi-chung' (cùng cách lồng mà không đánh dấu thì 0 lớp nền mờ — đúng lỗi được sửa); hộp không lồng giữ đúng một lớp"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-11
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    layer: backend-effect
+    paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx]
+    expected: "exit 0; ca 'o-chi-tiet-bon-cot' (bốn ô: hai chọn ba giá trị, hai chữ tối đa 200), 'o-chi-tiet-mot-thay-doi' (ô gửi đúng thay đổi details của hộp, chữ đọc lại về giá trị lưu), 'o-chi-tiet-dan' (dán đọc theo kiểu, quá 200 ký tự ở «sai kiểu»)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13b
+    criterion: AC-11
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_e2e
+    paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**, tests/e2e/sua-thong-tin-can.spec.ts]
+    expected: "exit 0 ở 1440 và 1024 (360, 414 bỏ qua có lý do: điện thoại không sửa trên ô); ca 'sua-tren-o-chi-tiet' (ô Nội thất mở bộ chọn, lưu, hoàn tác về cũ; sửa lại rồi mở hồ sơ thì hồ sơ hiện giá trị ô vừa lưu)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13-ui
+    criterion: AC-11
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3487/inventory
+    paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**]
+    steps:
+      - "With the lane H dev server on port 3487 (sample mode), open /inventory?vai=ListAgent at 1440 and at 1024 wide, save _acceptance/sua-thong-tin-can/evidence/E13-luoi-<khổ>.png; scroll the grid right until Nội thất, Pháp lý, Tài chính, Hiện trạng are in view, save E13-bon-cot-<khổ>.png; press F2 on the Nội thất cell of unit 1101, save E13-o-noi-that-1440.png"
+    question: "Lưới có bốn cột Nội thất, Pháp lý, Tài chính, Hiện trạng ngay sau Phòng ngủ ở cả hai khổ, ô của căn đã bán có dấu khoá, và ô Nội thất mở danh sách ba giá trị cộng «Chưa có» cùng khung sửa trên ô của cột Trạng thái không? Nêu khung nào lệch."
+    expected: "Bốn cột đúng chỗ ở hai khổ, khoá đúng, bộ chọn cùng khung"
+    evidence_required: [run_id, screenshot, observed, verdict]

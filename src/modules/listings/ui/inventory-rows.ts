@@ -8,6 +8,8 @@ import type { Listing, ListingUnit, Unit } from "@/generated/ontology";
 
 import type { CustomKind } from "../custom-rules";
 
+import { DETAIL_COLUMN_FIELDS, type DetailColumnWords } from "./detail-cells";
+
 /** Region states a development build may open with `?state=`; anything else is the loaded grid. */
 const STATE_PARAMS = ["loading", "empty", "error", "partial", "forbidden"] as const;
 export type InventoryState = RegionStatus | "empty";
@@ -105,12 +107,27 @@ export function inventoryColumns(
   headers: Readonly<Record<InventoryField, string>>,
   custom: readonly InventoryCustomColumn[] = [],
   fees?: InventoryFeeHeaders,
+  /** Row 3g (Hỏi-3 «lối C»): the four details as columns after the bedrooms, in Quỹ hàng's order. */
+  details?: DetailColumnWords,
 ): TypedColumn[] {
   const standard = INVENTORY_FIELDS.flatMap((field) => {
     const column = typedColumn({ field, header: headers[field] });
-    return fees && field === "Listing.listPrice"
-      ? [column, customColumn({ code: "netToSeller", header: fees.netToSeller, kind: "money" })]
-      : [column];
+    if (fees && field === "Listing.listPrice")
+      return [
+        column,
+        customColumn({ code: "netToSeller", header: fees.netToSeller, kind: "money" }),
+      ];
+    if (details && field === "Unit.bedroomsTotal")
+      return [
+        column,
+        ...DETAIL_COLUMN_FIELDS.map((f) =>
+          typedColumn({
+            field: f,
+            header: details[f.slice("Listing.".length) as keyof DetailColumnWords] as string,
+          }),
+        ),
+      ];
+    return [column];
   });
   return [
     ...standard,

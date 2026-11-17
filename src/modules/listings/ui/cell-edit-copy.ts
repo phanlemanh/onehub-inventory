@@ -115,9 +115,9 @@ export const CELL_EDIT_COPY = {
         : String(value),
   customDatePlaceholder: "dd/mm/yyyy",
   customNone: "Chưa có",
-  customProblem: (problem: CustomProblem): string =>
+  customProblem: (problem: CustomProblem, limit = 500): string =>
     problem === "too-long"
-      ? "Dài quá 500 ký tự."
+      ? `Dài quá ${limit} ký tự.`
       : problem === "not-a-number"
         ? "Gõ một số, như 12 hoặc 1,5."
         : problem === "not-a-date"

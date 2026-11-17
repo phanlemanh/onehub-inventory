@@ -49,12 +49,14 @@ export function readCustomValue(
   kind: CustomKind,
   raw: string,
   options: readonly string[] = [],
+  /** Longest text this field takes: the company layer's 500, or 200 for legal status and financing (row 3g). */
+  textLimit: number = CUSTOM_TEXT_LIMIT,
 ): CustomRead {
   const text = raw.trim();
   if (text === "") return { ok: true, value: null };
   switch (kind) {
     case "text":
-      return text.length > CUSTOM_TEXT_LIMIT
+      return text.length > textLimit
         ? { ok: false, problem: "too-long" }
         : { ok: true, value: text };
     case "number": {

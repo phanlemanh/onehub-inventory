@@ -32,6 +32,13 @@ import {
 import { priceUndoable } from "../edit-rules";
 
 import { CELL_EDIT_COPY as COPY, type CellEditLabels } from "./cell-edit-copy";
+import {
+  detailCellFields,
+  detailCells,
+  detailChange,
+  isDetailColumn,
+  type DetailColumnWords,
+} from "./detail-cells";
 import { FEE_INCLUSION_FIELD, NET_TO_SELLER_FIELD, type InventoryField } from "./inventory-rows";
 import { planPaste, type PastePlan } from "./listing-paste";
 import { pasteWords } from "./listing-paste-copy";
@@ -39,6 +46,7 @@ import { word } from "./cell-edit-copy";
 import {
   ListingCellEdit,
   StatusNeedsDialog,
+  cellKeyOf,
   lockedReasons,
   type CustomCellField,
   type CustomEdit,
@@ -111,6 +119,8 @@ export function useListingCellEdit({
   feeEditable = false,
   onServerWork,
   customFields,
+  detailWords,
+  onSaved,
 }: {
   rows: readonly GridRow[];
   /** Absent: the grid is read-only. */
@@ -129,6 +139,10 @@ export function useListingCellEdit({
   onServerWork?: () => void;
   /** The company's own fields whose cells edit by their kind (row 3g). */
   customFields?: readonly CustomCellField[];
+  /** Words of the four detail columns (row 3g, «lối C»): with them those cells edit one part at a time. */
+  detailWords?: DetailColumnWords;
+  /** Told after every write that saved (the open record shows what the grid saved). */
+  onSaved?: () => void;
 }): {
   rows: readonly GridRow[];
   cellEdit: RegionCellEdit | undefined;
@@ -138,10 +152,12 @@ export function useListingCellEdit({
   /** The listing as the door last saved it, when it did (row 3g: the record shows it). */
   savedListing: (id: string) => Listing | undefined;
 } {
-  const customKeys = useMemo(
-    () => (customFields ?? []).map((f) => `custom.${f.code}`),
-    [customFields],
+  // Typed cells (row 3g): the company's own fields, then the four details when their words are given.
+  const typedFields = useMemo(
+    () => [...(customFields ?? []), ...(detailWords ? detailCellFields(detailWords) : [])],
+    [customFields, detailWords],
   );
+  const customKeys = useMemo(() => typedFields.map(cellKeyOf), [typedFields]);
   const lock = useCallback((row: GridRow) => lockedReasons(row, customKeys), [customKeys]);
   const [door] = useState<ListingSaveDoor & { current?: (id: string) => Listing | undefined }>(
     () =>
@@ -161,11 +177,16 @@ export function useListingCellEdit({
   const [versions] = useState(() => new Map((listings ?? []).map((l) => [l.id, l.version])));
   const [saved] = useState(() => new Map<string, Listing>());
   const customs = useMemo(
-    () =>
-      new Map<FieldKey, CustomCellField>(
-        (customFields ?? []).map((f) => [`custom.${f.code}` as FieldKey, f]),
-      ),
-    [customFields],
+    () => new Map<FieldKey, CustomCellField>(typedFields.map((f) => [cellKeyOf(f) as FieldKey, f])),
+    [typedFields],
+  );
+  /** The change a typed cell sends: one detail of the listing, or one value of the company's own field. */
+  const changeFor = useCallback(
+    (field: CustomCellField, value: CustomEdit["value"]): ListingChange =>
+      field.key && isDetailColumn(field.key) && detailWords
+        ? detailChange(field.key, value === null ? null : String(value), detailWords)
+        : { field: "customField", code: field.code, value },
+    [detailWords],
   );
   const [data, setData] = useState<readonly GridRow[]>(() =>
     rows.map((row) => ({ ...row, locked: lock(row) })),
@@ -207,6 +228,7 @@ export function useListingCellEdit({
       if (outcome.kind === "saved") {
         versions.set(id, outcome.listing.version);
         saved.set(id, outcome.listing);
+        onSaved?.();
         return "saved";
       }
       if (outcome.kind === "conflict" && outcome.current) {
@@ -217,7 +239,11 @@ export function useListingCellEdit({
         setData((all) =>
           all.map((row) => {
             if (row.id !== id) return row;
-            const next = { ...row, ...cellsOf(current, labels, row.transaction) } as GridRow;
+            const next = {
+              ...row,
+              ...cellsOf(current, labels, row.transaction),
+              ...(detailWords ? detailCells(current, detailWords) : {}),
+            } as GridRow;
             return { ...next, locked: lock(next) };
           }),
         );
@@ -226,7 +252,7 @@ export function useListingCellEdit({
       // The cell never sends a change the rules refuse; if one slips through, the door refused it (row 4).
       return outcome.kind === "invalid" ? "refused" : outcome.kind;
     },
-    [door, versions, labels, saved, lock],
+    [door, versions, labels, saved, lock, onSaved, detailWords],
   );
 
   const save = useCallback(
@@ -294,7 +320,7 @@ export function useListingCellEdit({
   /** One value of a company's own field (row 3g): the cell shows it at once, the door saves it, «Hoàn tác» puts it back. */
   const saveCustom = useCallback(
     async (row: GridRow, edit: CustomEdit) => {
-      const field = customs.get(edit.field);
+      const field = customs.get(edit.field as FieldKey);
       if (!field || !labels) return;
       const unit = String(row["Listing.unitNumber"] ?? "");
       const shown = (v: unknown) =>
@@ -307,24 +333,20 @@ export function useListingCellEdit({
             : COPY.customShown(field.kind, v);
       const what = (v: unknown) =>
         `${field.header} ${headers["Listing.unitNumber"].toLocaleLowerCase("vi")} ${unit}: ${shown(v)}`;
-      const was = (row[edit.field] ?? null) as CustomEdit["value"];
+      const key = edit.field as FieldKey;
+      const was = (row[key] ?? null) as CustomEdit["value"];
       const before: Partial<GridRow> = {
-        [edit.field]: row[edit.field],
+        [key]: row[key],
         [CONFIRMED]: row[CONFIRMED],
       };
       const at = new Date().toISOString();
-      patch(row.id, { [edit.field]: edit.value, [CONFIRMED]: at });
+      patch(row.id, { [key]: edit.value, [CONFIRMED]: at });
       const outcome = await runDoorChange({
         done: COPY.done(what(edit.value), true),
         undone: COPY.undone(what(was)),
-        write: () =>
-          write(row.id, { field: "customField", code: field.code, value: edit.value }, at),
+        write: () => write(row.id, changeFor(field, edit.value), at),
         undo: async () => {
-          const result = await write(
-            row.id,
-            { field: "customField", code: field.code, value: was },
-            new Date().toISOString(),
-          );
+          const result = await write(row.id, changeFor(field, was), new Date().toISOString());
           if (result === "saved") patch(row.id, before);
           return result;
         },
@@ -333,7 +355,7 @@ export function useListingCellEdit({
       });
       if (outcome !== "saved" && outcome !== "conflict") patch(row.id, before);
     },
-    [customs, labels, headers, patch, write],
+    [customs, labels, headers, patch, write, changeFor],
   );
 
   // Pasting a region (row 5): the preview first, then every ticked cell through the same door, undone at once.
@@ -349,10 +371,11 @@ export function useListingCellEdit({
         // Row 19's net-to-seller column is worked out from the price and the fees: a paste never writes it.
         PASTE_COMPUTED,
         customs,
+        changeFor,
       );
       setPlan({ ...plan, key: Date.now() });
     },
-    [labels, headerOf, headers, customs],
+    [labels, headerOf, headers, customs, changeFor],
   );
   const applyPaste = useCallback(
     async (ids: readonly string[]) => {
@@ -378,13 +401,13 @@ export function useListingCellEdit({
       // How many pasted cells of each row hold a saved value, to know when the row's confirmed time goes back.
       const holding = new Map<string, number>();
       setApplying(true);
-      for (const { row, change } of picked)
+      for (const { row, field, change, cell } of picked)
         patch(row.id, {
           ...(change.field === "listPrice"
             ? { [PRICE]: change.listPrice }
-            : change.field === "customField"
-              ? { [`custom.${change.code}`]: change.value }
-              : { [STATUS]: change.standardStatus }),
+            : change.field === "standardStatus"
+              ? { [STATUS]: change.standardStatus }
+              : { [field]: cell ?? null }),
           [CONFIRMED]: at,
         });
       const lines = new Map(plan.changes.map((c) => [c.id, c]));
@@ -403,11 +426,10 @@ export function useListingCellEdit({
                           field: "standardStatus",
                           standardStatus: was[STATUS] as ListingStandardStatus,
                         }
-                      : {
-                          field: "customField",
-                          code: field.slice("custom.".length),
-                          value: (was[field] ?? null) as CustomEdit["value"],
-                        };
+                      : changeFor(
+                          customs.get(field as FieldKey)!,
+                          (was[field as FieldKey] ?? null) as CustomEdit["value"],
+                        );
                 const result = await write(row.id, back, new Date().toISOString());
                 if (result === "saved") {
                   // The confirmed time goes back only with the row's last cell that still held a pasted value.
@@ -521,10 +543,16 @@ export function useListingCellEdit({
   const writeListing = useCallback(
     async (id: string, change: ListingChange, at: string) => {
       const outcome = await write(id, change, at);
-      if (outcome === "saved") patch(id, { [CONFIRMED]: saved.get(id)?.lastConfirmedAt ?? at });
+      const now = saved.get(id);
+      if (outcome === "saved")
+        patch(id, {
+          [CONFIRMED]: now?.lastConfirmedAt ?? at,
+          // The record's dialog saved details: their columns show them too (row 3g).
+          ...(now && detailWords ? detailCells(now, detailWords) : {}),
+        });
       return outcome;
     },
-    [write, patch, saved],
+    [write, patch, saved, detailWords],
   );
   return { rows: data, cellEdit, dialogs, writeListing, savedListing };
 }

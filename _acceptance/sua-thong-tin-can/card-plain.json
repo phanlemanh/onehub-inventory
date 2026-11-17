@@ -28,6 +28,10 @@
     {
       "id": "AC-10",
       "p": "Sẽ đặt «Xác nhận lúc» của căn sau mỗi lần sửa đúng như anh chọn ở Hỏi-1, và ô «Xác nhận lúc» trên lưới đổi theo."
+    },
+    {
+      "id": "AC-11",
+      "p": "Sẽ thêm bốn cột Nội thất, Pháp lý, Tài chính, Tình trạng vào Bảng hàng, sửa nhanh từng ô (và dán từ Excel), ẩn được ở «Cột» — lối C anh đã chọn."
     }
   ],
   "wont_do": [
@@ -49,7 +53,7 @@
     },
     {
       "id": "OOS-2",
-      "p": "KHÔNG thêm cột pháp lý, nội thất, tài chính, tình trạng vào Bảng hàng — tám cột đã ký giữ nguyên."
+      "p": "KHÔNG thêm đủ 26 cột như Quỹ hàng ở hàng này — thành hàng riêng ở Cổng Đáng kế."
     },
     {
       "id": "OOS-3",

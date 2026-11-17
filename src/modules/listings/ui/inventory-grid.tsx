@@ -14,6 +14,7 @@ import type { Listing } from "@/generated/ontology";
 
 import type { ListingSaveDoor } from "../save-door";
 import { httpSaveDoor } from "./http-save-door";
+import { detailCells, type DetailColumnWords } from "./detail-cells";
 import { DetailsEditProvider, type DetailsEditApi } from "./listing-details-edit";
 import type { SavedView } from "../saved-view";
 
@@ -66,6 +67,7 @@ export function InventoryGrid({
   readFailed = false,
   noActivate,
   geoTree,
+  detailWords,
 }: {
   title: string;
   headers: Readonly<Record<InventoryField, string>>;
@@ -106,6 +108,8 @@ export function InventoryGrid({
   noActivate?: readonly string[];
   /** 2d: the places of the grid's rows; the second column's place entries then filter the grid in place. */
   geoTree?: readonly GeoNode[];
+  /** Row 3g (Hỏi-3 «lối C»): the four details as columns, edited on their cells; their words from the label table. */
+  detailWords?: DetailColumnWords;
 }) {
   const router = useRouter();
   const [current, setCurrent] = useState<InventoryState>(state);
@@ -143,8 +147,8 @@ export function InventoryGrid({
   // The same columns on every render: this grid renders again on each change of arrangement (the «changed» mark), and
   // new columns would draw the header cells, with the filter box being typed in, again.
   const columns = useMemo(
-    () => inventoryColumns(headers, customColumns, feeHeaders),
-    [headers, customColumns, feeHeaders],
+    () => inventoryColumns(headers, customColumns, feeHeaders, detailWords),
+    [headers, customColumns, feeHeaders, detailWords],
   );
   const headerOf = useCallback(
     (field: FieldKey) => columns.find((c) => c.field === field)?.header ?? field,
@@ -189,8 +193,18 @@ export function InventoryGrid({
       ),
     [customColumns],
   );
+  // The four detail cells of each row, from the listing the row shows (row 3g).
+  const shownRows = useMemo(() => {
+    if (!detailWords || !listings) return rows;
+    const byId = new Map(listings.map((l) => [l.id, l]));
+    return rows.map((row) => {
+      const l = byId.get(row.id);
+      return l ? ({ ...row, ...detailCells(l, detailWords) } as GridRow) : row;
+    });
+  }, [rows, listings, detailWords]);
+  const [detailsTick, setDetailsTick] = useState(0);
   const edit = useListingCellEdit({
-    rows,
+    rows: shownRows,
     listings,
     headers,
     labels: editLabels,
@@ -200,9 +214,11 @@ export function InventoryGrid({
     feeEditable: feeHeaders !== undefined && live,
     onServerWork: live ? () => router.refresh() : undefined,
     customFields,
+    detailWords,
+    // Any saved write re-renders an open record, so a detail saved on a cell shows there too (row 3g).
+    onSaved: () => setDetailsTick((n) => n + 1),
   });
   // The record edits the open listing's details through the same door (row 3g); a save re-renders the record.
-  const [detailsTick, setDetailsTick] = useState(0);
   const { writeListing, savedListing } = edit;
   const detailsApi = useMemo<DetailsEditApi | null>(
     () =>

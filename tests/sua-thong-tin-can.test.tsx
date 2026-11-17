@@ -24,6 +24,9 @@ import {
   ListingRecordFull,
   RECORD_COPY,
   cellEditLabels,
+  detailCellFields,
+  detailCells,
+  detailChange,
   listingView,
   type CustomCellField,
   type DetailsEditApi,
@@ -492,5 +495,89 @@ describe("sua-thong-tin-can · dán vào cột riêng", () => {
       code: "so_cho_xe",
       value: 2,
     });
+  });
+});
+
+describe("sua-thong-tin-can · bốn cột trên lưới (lối C)", () => {
+  const WORDS = {
+    furnished: LABELS.parts.furnished,
+    legalStatus: LABELS.parts.legalStatus,
+    financing: LABELS.parts.financing,
+    occupantType: LABELS.parts.occupantType,
+    furnishedValues: LABELS.furnishedValues,
+    occupantValues: LABELS.occupantValues,
+  };
+
+  it("o-chi-tiet-bon-cot: four cells, two choices of fixed values and two words of at most 200", () => {
+    const fields = detailCellFields(WORDS);
+    const got = fields.map((f) => `${f.key}:${f.kind}:${f.options.length}:${f.limit ?? "-"}`);
+    expect(got, "o-chi-tiet-bon-cot").toEqual([
+      "Listing.furnished:single_select:3:-",
+      "Listing.legalStatus:text:0:200",
+      "Listing.financing:text:0:200",
+      "Listing.occupantType:single_select:3:-",
+    ]);
+  });
+
+  it("o-chi-tiet-mot-thay-doi: a cell sends the record's one change, its word read back to the stored value", () => {
+    expect(detailChange("Listing.furnished", LABELS.furnishedValues.Partially, WORDS)).toEqual({
+      field: "details",
+      furnished: "Partially",
+    });
+    expect(detailChange("Listing.occupantType", null, WORDS)).toEqual({
+      field: "details",
+      occupantType: null,
+    });
+    expect(detailChange("Listing.legalStatus", "Sổ hồng", WORDS)).toEqual({
+      field: "details",
+      legalStatus: "Sổ hồng",
+    });
+    expect(
+      detailCells(
+        { furnished: "Furnished", occupantType: "Vacant", legalStatus: "Sổ hồng" },
+        WORDS,
+      ),
+    ).toMatchObject({
+      "Listing.furnished": LABELS.furnishedValues.Furnished,
+      "Listing.occupantType": LABELS.occupantValues.Vacant,
+      "Listing.legalStatus": "Sổ hồng",
+      "Listing.financing": null,
+    });
+  });
+
+  it("o-chi-tiet-dan: a paste onto Nội thất and Pháp lý reads by kind and writes details", () => {
+    const fields = detailCellFields(WORDS);
+    const customs = new Map(fields.map((f) => [f.key!, f] as const));
+    const row = { ...rows[0]!, "Listing.furnished": null, "Listing.legalStatus": null } as GridRow;
+    const paste: RegionPaste = {
+      cells: [
+        {
+          row,
+          field: "Listing.furnished" as never,
+          raw: LABELS.furnishedValues.Unfurnished.toUpperCase(),
+          open: true,
+        },
+        { row, field: "Listing.legalStatus" as never, raw: "x".repeat(201), open: true },
+        { row, field: "Listing.financing" as never, raw: "Vay 50%", open: true },
+      ],
+      beyond: { rows: 0, columns: 0 },
+    };
+    const plan = planPaste(
+      paste,
+      EDIT_LABELS,
+      (f) => String(f),
+      [],
+      customs as never,
+      (f, v) => detailChange(f.key as never, v === null ? null : String(v), WORDS),
+    );
+    const changes = [...plan.writes.values()].map((w) => w.change);
+    expect(changes, "o-chi-tiet-dan: sẽ đổi").toEqual([
+      { field: "details", furnished: "Unfurnished" },
+      { field: "details", financing: "Vay 50%" },
+    ]);
+    expect(
+      plan.wrong.map((w) => w.why),
+      "o-chi-tiet-dan: sai kiểu",
+    ).toEqual(["Dài quá 200 ký tự."]);
   });
 });

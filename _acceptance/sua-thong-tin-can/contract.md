@@ -60,6 +60,12 @@ Source input: ô cơ hội `_acceptance/sua-thong-tin-can/opportunity.md` (build
   hộp đóng; hộp mở từ hồ sơ có đúng một lớp nền mờ ở mọi khổ (cả hồ sơ toàn màn ở điện thoại, nơi hộp lồng trước đây
   không có nền mờ); thông báo sau khi lưu không đè lên nút chính ở đáy hồ sơ, và khi không mở hồ sơ thì thông báo ở chỗ cũ.
   Hai sửa này ở khối dùng chung nên chữa luôn hộp «Báo sai thông tin» (3e) và thông báo của sửa trên ô (4) khi hồ sơ mở.
+- AC-11: Given Bảng hàng ở khổ từ 768 px (Hỏi-3, chủ kho chọn lối C), When mở trang, Then lưới có thêm bốn cột Nội
+  thất, Pháp lý, Tài chính, Tình trạng sử dụng ngay sau Phòng ngủ, hiện sẵn và ẩn được bằng «Cột» (lưu trong Góc nhìn);
+  mỗi ô sửa được một phần — Nội thất, Tình trạng chọn trong giá trị cố định cộng «Chưa có», Pháp lý, Tài chính gõ chữ tối
+  đa 200 ký tự — qua cùng cửa ghi và cùng thay đổi `details` của hộp trong hồ sơ, có «Hoàn tác»; dán từ Excel vào bốn
+  cột theo kiểu của cột; lưu ở ô thì hồ sơ đang mở hiện giá trị mới, lưu ở hộp thì ô hiện giá trị mới; căn đã bán hay
+  ngừng thì ô khoá. Lối C lật dòng tám cột đã ký ở Hỏi-2 hàng 2. (cross-layer)
 - AC-10: Given một lần sửa bốn trường hay một giá trị trường riêng được lưu, When máy chủ ghi căn, Then «Xác nhận lúc» của
   căn theo đúng câu chủ kho chọn ở Hỏi-1 (khuyến nghị: mọi lần sửa đặt «Xác nhận lúc» là lúc lưu, một luật với hàng 4) và
   ô «Xác nhận lúc» trên lưới đổi theo. (cross-layer)
@@ -92,7 +98,8 @@ sai luật) × vai (ba vai sửa · Quản trị sàn) × khổ (360 · 1440). T
 ## Out of scope
 
 - Sửa trường riêng trên điện thoại — để hàng 3d (ai quyết: chủ kho, lộ trình; luật hàng 4 «điện thoại không sửa trên ô»).
-- Thêm cột Pháp lý, Nội thất, Tài chính, Tình trạng vào Bảng hàng — không làm (ai quyết: chủ kho, tám cột ký ở hàng 2).
+- Thêm đủ 26 cột như Quỹ hàng (tầng, hướng, loại hình, loại căn, giá chốt, ngày bán, đầu chủ, mức đủ, ai thấy…) —
+  hàng riêng «Bảng hàng đủ cột như Quỹ hàng» ở Cổng Đáng kế (ai quyết: chủ kho, 2026-11-17; giám sát ghi).
 - Danh sách giá trị cố định cho Pháp lý, Tài chính — chờ dữ liệu nhập Sheet hàng 11 (ai quyết: chủ kho, Hỏi-1 hàng 3b).
 - Sửa thông tin của căn (tầng, hướng, diện tích) — thuộc danh mục dùng chung, hàng «Báo sai thông tin» 3e (ai quyết: chủ kho).
 - Điều kiện «Sẵn sàng bán» — hàng 15 (ai quyết: chủ kho, lộ trình).
@@ -100,10 +107,10 @@ sai luật) × vai (ba vai sửa · Quản trị sàn) × khổ (360 · 1440). T
 
 ## Câu hỏi cho chủ kho
 
-- Hỏi-3 · Chỗ sửa bốn trường (ô cơ hội để anh chốt): khuyên **A — trong hồ sơ căn**, nút «Sửa» ở đầu mục «Lần chào đang
-  mở», hộp bốn trường; Bảng hàng giữ tám cột đã ký ở hàng 2. Lối khác: B — thêm bốn cột Pháp lý, Nội thất, Tài chính, Tình
-  trạng vào Bảng hàng và sửa trên ô như giá; giá: lưới thành mười hai cột (ẩn bớt bằng «Cột»), ký lại phần cột của hàng 2,
-  điện thoại vẫn phải sửa ở hồ sơ.
+- Hỏi-3 · Chỗ sửa bốn trường — **ĐÃ CHỐT lối C** (chủ kho tại phiên H, 2026-11-17, nguyên văn «Lấy lối C», sau luật
+  chỗ sửa «Sửa nhanh -> Sửa trên bảng/lưới · Sửa nhiều trường trên căn -> Sửa trên chi tiết căn»): bốn cột hiện sẵn trên
+  Bảng hàng, sửa trên ô từng phần; hộp «Sửa» trong hồ sơ cho nhiều trường và điện thoại (AC-11, AC-1, AC-2). Lật dòng tám
+  cột của Hỏi-2 hàng 2: hồ sơ có ảnh lưới ghi sửa sau ký và ghim lại trong vòng này.
 
 - Hỏi-1 · Sửa bốn trường hay trường riêng có tính là «vừa xác nhận với chủ nhà» không: khuyên **có, mọi lần sửa** — một
   luật của hàng 4. Lối khác: trường riêng không tính; giá: hai luật để nhớ.

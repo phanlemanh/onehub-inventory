@@ -11,10 +11,10 @@ import { formatMoney, statusLabel } from "@/lib/format";
 
 import { readCustomValue, sameCustomValue } from "../custom-rules";
 import { readPastePrice, readPasteStatus, readStatusText } from "../paste-rules";
-import type { CustomFieldChange, PriceOrStatusChange } from "../save-door";
+import type { ListingChange, PriceOrStatusChange } from "../save-door";
 
 import { CELL_EDIT_COPY, type CellEditLabels } from "./cell-edit-copy";
-import type { CustomCellField } from "./listing-cell-edit";
+import { cellKeyOf, type CustomCellField } from "./listing-cell-edit";
 import { pasteWords } from "./listing-paste-copy";
 
 const PRICE = "Listing.listPrice";
@@ -32,9 +32,11 @@ const UNIT_FACTS: readonly FieldKey[] = [
 /** One write the preview may apply, keyed by its line's id. */
 export interface PasteWrite {
   row: GridRow;
-  field: typeof PRICE | typeof STATUS | `custom.${string}`;
-  change: PriceOrStatusChange | CustomFieldChange;
+  field: FieldKey;
+  change: PriceOrStatusChange | ListingChange;
   undoable: boolean;
+  /** What a typed cell shows once the write goes (row 3g). */
+  cell?: unknown;
 }
 
 export interface PastePlan {
@@ -65,6 +67,15 @@ export function planPaste(
   computed: readonly FieldKey[] = [],
   /** The company's own fields the cells edit (row 3g): a paste takes them by their kind. */
   customs: ReadonlyMap<string, CustomCellField> = new Map(),
+  /** The change a typed cell sends (a detail of the listing, or a custom value); a custom value when absent. */
+  changeFor: (field: CustomCellField, value: string | number | boolean | null) => ListingChange = (
+    f,
+    value,
+  ) => ({
+    field: "customField",
+    code: f.code,
+    value,
+  }),
 ): PastePlan {
   const say = pasteWords(labels);
   const changes: PasteChangeLine[] = [];
@@ -89,9 +100,9 @@ export function planPaste(
     const custom = customs.get(field);
     if (custom) {
       // A company's own field takes a pasted word by its kind (row 3g), with the cell's one rule.
-      const read = readCustomValue(custom.kind, raw, custom.options);
+      const read = readCustomValue(custom.kind, raw, custom.options, custom.limit);
       if (!read.ok) {
-        wrong.push({ ...line, why: CELL_EDIT_COPY.customProblem(read.problem) });
+        wrong.push({ ...line, why: CELL_EDIT_COPY.customProblem(read.problem, custom.limit) });
         continue;
       }
       if (sameCustomValue(read.value, row[field])) {
@@ -119,9 +130,10 @@ export function planPaste(
       });
       writes.set(id, {
         row,
-        field: `custom.${custom.code}`,
-        change: { field: "customField", code: custom.code, value: read.value },
+        field: cellKeyOf(custom) as FieldKey,
+        change: changeFor(custom, read.value),
         undoable: true,
+        cell: read.value,
       });
       rows.add(row.id);
       continue;
