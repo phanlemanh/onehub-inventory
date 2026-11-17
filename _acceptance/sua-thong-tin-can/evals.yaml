@@ -204,7 +204,7 @@ evals:
     criterion: AC-9
     executor: test
     cmd: config:executors.test.sua_thong_tin_unit
-    paths: [src/components/candidate/form-dialog.tsx, src/components/candidate/in-dialog.tsx, src/components/candidate/record-panel.tsx, tests/hop-long-nen-mo.test.tsx]
+    paths: [src/components/candidate/form-dialog.tsx, src/components/candidate/record-panel.tsx, tests/hop-long-nen-mo.test.tsx]
     expected: "exit 0; ca 'hop-long-co-nen-mo' (FormDialog trong một hộp có nền mờ của nó) và đối chứng 'doi-chung' (cùng cách lồng mà không đánh dấu thì 0 lớp nền mờ — đúng lỗi được sửa); hộp không lồng giữ đúng một lớp"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 

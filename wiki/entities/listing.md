@@ -29,12 +29,19 @@ Người giữ căn (`listAgentKey`, RESO `ListAgentKey`, hàng 10): một thàn
 gọi người ấy chép kèm (`listAgentFullName`). Đưa lên Đang bán cần `activateListing`: Đầu chủ với căn mình giữ hoặc chưa ai
 giữ, Trưởng nhóm toàn sàn (`keeper-activates`).
 
+Sửa thông tin của lần chào đang mở (hàng 3g): pháp lý, nội thất, tài chính, tình trạng sử dụng sửa từng phần trên ô của
+Bảng hàng (bốn cột, chủ kho chọn lối C) hoặc nhiều phần một lần ở hộp «Sửa» của hồ sơ căn — cùng một thay đổi `details`,
+cùng ô `updateListing`, mỗi lần sửa tính là vừa xác nhận với chủ nhà. Pháp lý, tài chính tối đa 200 ký tự (chỉ kiểm phần
+vừa đổi); lần chào đã bán hay ngừng giữ nguyên. Giá trị trường riêng của sàn sửa trên ô theo kiểu, máy chủ kiểm bằng
+`checkCustomValue` của lớp riêng.
+
 ## Where in the code
 
 `src/modules/listings/`: luật sửa giá và trạng thái ở `edit-rules.ts`, cổng lưu ở `save-door.ts`, sửa trên ô của Bảng hàng ở
 `ui/use-listing-cell-edit.tsx`. Bảng `listings`, `listing_units` ở `db/migrations/013_bang_can_chao.sql`; đọc ở
 `inventory-read.ts`, ghi ở `listings-http.ts` (`PATCH /api/v1/listings/[id]`), cổng lưu của trình duyệt ở
-`ui/http-save-door.ts`.
+`ui/http-save-door.ts`. Hàng 3g: hộp «Sửa» ở `ui/listing-details-edit.tsx`, bốn cột ở `ui/detail-cells.ts`, đọc giá trị
+gõ hay dán của trường riêng ở `custom-rules.ts`; một luật đọc kết cục ghi ở `src/lib/write-failure.ts`.
 
 ## History
 
@@ -70,3 +77,6 @@ Hàng 10, 16/11/2026: Bảng hàng trên dữ liệu thật — hai bảng của
 địa lý từ một lần đọc), ghi qua `/api/v1` theo bảng quyền, xung đột trả bản hiện tại, hoàn tác chỉ trường đã đổi; sửa Điều
 kiện phí trên ô; người giữ căn thật trên hồ sơ. Quyết định [0039](../decisions/0039-bang-hang-tren-du-lieu-that.md); hồ sơ
 `_acceptance/bang-hang-du-lieu-that/`.
+
+Hàng 3g, 17/11/2026: sửa bốn phần của lần chào trên ô và trong hồ sơ căn; sửa giá trị trường riêng trên ô và dán; kết cục ghi
+«phiên hết hạn» và «máy chủ lỗi» thay vì «không đủ quyền» ([sua-thong-tin-can](../../_acceptance/sua-thong-tin-can/contract.md)).

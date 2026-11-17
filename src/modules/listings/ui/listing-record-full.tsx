@@ -70,7 +70,7 @@ export interface RecordLabels {
   viewedListing: string;
   listingsOfUnit: string;
   parts: Readonly<Record<CompletenessPart, string>>;
-  /** «Sửa» (row 3g): with it, the open listing's details are edited in the record by roles that may. */
+  /** The edit button's word (row 3g): with it, the open listing's details are edited in the record by roles that may. */
   edit?: string;
   furnishedValues: Readonly<Record<ListingFurnished, string>>;
   occupantValues: Readonly<Record<ListingOccupantType, string>>;

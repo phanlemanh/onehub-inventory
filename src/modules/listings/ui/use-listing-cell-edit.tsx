@@ -466,7 +466,7 @@ export function useListingCellEdit({
       setApplying(false);
       setPlan(null);
     },
-    [plan, labels, patch, write],
+    [plan, labels, patch, write, changeFor, customs],
   );
 
   const blocked = useMemo(() => new Set(noActivate ?? []), [noActivate]);

@@ -23,7 +23,7 @@ export const RECORD_COPY = {
     `${unit.toLocaleLowerCase("vi")} ${unitNumber}`,
   detailsTitle: (edit: string, what: string) => `${edit} thông tin ${what}`,
   detailsDescription:
-    "Đổi pháp lý, nội thất, tài chính, tình trạng sử dụng. Để trống là chưa có. Tính là vừa xác nhận với chủ nhà.",
+    "Đổi pháp lý, nội thất, tài chính, tình trạng sử dụng. Xoá chữ trong ô là chưa có. Tính là vừa xác nhận với chủ nhà.",
   detailsSubmit: "Lưu",
   detailsBusy: "Đang lưu",
   detailsNone: "Chưa có",
@@ -37,7 +37,7 @@ export const RECORD_COPY = {
       : why === "conflict"
         ? "Chưa lưu: căn vừa đổi từ chỗ khác. Đóng hộp để thấy bản mới, rồi sửa lại."
         : why === "expired"
-          ? "Chưa lưu được — phiên đăng nhập đã hết. Đăng nhập lại rồi bấm «Thử lại»."
+          ? "Chưa lưu được — phiên đăng nhập đã hết; bạn đăng nhập lại rồi bấm «Thử lại»."
           : why === "refused"
             ? "Không đủ quyền làm việc này."
             : "Chưa lưu được — máy chủ báo lỗi. Thử lại sau ít phút.",

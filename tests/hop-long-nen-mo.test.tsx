@@ -7,8 +7,7 @@ import { Dialog } from "@base-ui/react/dialog";
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 
-import { FormDialog } from "../src/components/candidate/form-dialog";
-import { InDialog } from "../src/components/candidate/in-dialog";
+import { FormDialog, InDialog } from "../src/components/candidate/form-dialog";
 
 beforeAll(() => {
   Element.prototype.getAnimations ??= () => [];

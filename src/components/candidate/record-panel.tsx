@@ -18,7 +18,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog } from "@base-ui/react/dialog";
 
 import { GRID_COPY } from "./grid-copy";
-import { InDialog } from "./in-dialog";
+import { InDialog } from "./form-dialog";
 import { RECORD_FOOTER_VAR } from "./record-footer";
 import {
   PIN_DEFAULT_SHARE,

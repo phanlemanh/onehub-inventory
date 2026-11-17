@@ -1,6 +1,13 @@
 "use client";
 
-import { useRef, type FormEvent, type ReactElement, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useRef,
+  type FormEvent,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 
 import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { Button } from "@/components/ui/button";
@@ -17,7 +24,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { useInDialog } from "./in-dialog";
+// Whether a part of the screen sits inside an open dialog (row 3g). A FormDialog opened from there is nested, and a
+// nested Base UI dialog draws no backdrop of its own, so what is behind stays bright and seems clickable (the
+// full-screen record on a phone). The record panel marks its body; FormDialog then asks its backdrop to render anyway.
+const InDialogContext = createContext(false);
+
+/** Marks its children as inside an open dialog (the record panel's body). */
+export function InDialog({ value, children }: { value: boolean; children: ReactNode }) {
+  return <InDialogContext.Provider value={value}>{children}</InDialogContext.Provider>;
+}
 
 /**
  * A short form in a dialog (row 9, the one way a screen asks for a few fields): title, one sentence of what happens,
@@ -73,7 +88,7 @@ export function FormDialog({
   const submitRef = useRef<HTMLButtonElement>(null);
   // Opened from inside another dialog (the full-screen record on a phone), this dialog is nested and would draw no
   // backdrop: draw it, so what is behind dims and takes no click, as everywhere else (row 3g).
-  const nested = useInDialog();
+  const nested = useContext(InDialogContext);
   function submit(e: FormEvent) {
     e.preventDefault();
     if (!busy && !refused && canSubmit) onSubmit();

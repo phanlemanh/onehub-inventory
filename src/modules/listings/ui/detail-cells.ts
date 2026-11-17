@@ -1,6 +1,6 @@
-// The four details of a listing as columns of the inventory grid (row 3g, Hỏi-3 «lối C», owner 2026-11-17): Nội thất,
-// Pháp lý, Tài chính, Tình trạng sử dụng, shown from the start like Quỹ hàng shows them, hidden with «Cột», and edited on
-// their cell one part at a time — the record's «Sửa» edits several at once. A cell holds the word the grid shows; a write
+// The four details of a listing as columns of the inventory grid (row 3g, Hỏi-3 option C, owner 2026-11-17): furnished,
+// legal status, financing, occupant type, shown from the start like Quỹ hàng shows them, hidden with the columns menu,
+// and edited on their cell one part at a time — the record's edit dialog edits several at once. A cell holds the word the grid shows; a write
 // sends the part's stored value through the one change of the record (`details`).
 import type { GridRow } from "@/components/candidate/data-region";
 import type { Listing, ListingFurnished, ListingOccupantType } from "@/generated/ontology";

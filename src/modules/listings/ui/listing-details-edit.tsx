@@ -1,9 +1,9 @@
 "use client";
 
 // Editing the four details of the open listing in its record (row 3g): legal status, furnished, financing and occupant
-// type. «Sửa» sits at the head of the record's listing section, right side (design/behaviors.md, «Việc trên một mục
+// type. The edit button sits at the head of the record's listing section, right side (design/behaviors.md, «Việc trên một mục
 // của hồ sơ»), inside PermittedAction for updateListing (row 9e); it opens the store's FormDialog (row 9). One save is
-// one change through the grid's save door, with «Hoàn tác» (row 4's rule). A save that does not go through keeps what
+// one change through the grid's save door, with undo (row 4's rule). A save that does not go through keeps what
 // was typed and says why in the dialog.
 import { PencilIcon } from "lucide-react";
 import { createContext, useContext, useState, type ReactNode } from "react";
@@ -126,7 +126,7 @@ function undoOf(from: ListingDetails, change: DetailsChange): DetailsChange {
   return back;
 }
 
-/** «Sửa» of the record's listing section and its dialog; nothing without the grid's write or for an earlier listing. */
+/** The edit button of the record's listing section and its dialog; nothing without the grid's write or for an earlier listing. */
 export function ListingDetailsEdit({
   id,
   unitNumber,
@@ -177,7 +177,7 @@ export function ListingDetailsEdit({
     setOpen(false);
     api.changed();
     const back = undoOf(details, change);
-    // The save already went through: the shared door says it and offers «Hoàn tác» by row 4's one rule.
+    // The save already went through: the shared door says it and offers undo by row 4's one rule.
     await runDoorChange({
       done: RECORD_COPY.detailsDone(what),
       undone: RECORD_COPY.detailsUndone(what),
