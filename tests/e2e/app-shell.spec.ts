@@ -98,6 +98,58 @@ function assertCentred(bar: Box, search: Box): void {
   if (off > 2) throw new Error("search not in the middle of the top bar");
 }
 
+type Geometry = {
+  edge: { x: number; y: number; width: number; height: number };
+  fold: { x: number; y: number; width: number; height: number };
+  content: { x: number };
+};
+
+async function shellGeometry(page: Page): Promise<Geometry> {
+  const edge = (await page.locator('[data-slot="app-shell-second-column-edge"]').boundingBox())!;
+  const fold = (await page.locator('[data-slot="second-column-rail"]').boundingBox())!;
+  const content = (await page.locator('[data-slot="app-shell-content"]').boundingBox())!;
+  return { edge, fold, content: { x: content.x } };
+}
+
+/** The edge runs the window's height, the fold sits on it mid-window, and the screen starts right after it. */
+function assertOnEdge(g: Geometry, windowHeight: number): void {
+  if (g.edge.height < windowHeight - 80) throw new Error("second column edge stops short");
+  const right = g.edge.x + g.edge.width;
+  if (
+    Math.abs(g.fold.x - right) > 2 ||
+    Math.abs(g.fold.y + g.fold.height / 2 - windowHeight / 2) > 2
+  )
+    throw new Error("fold not on the column edge mid-window");
+  if (g.content.x - right > 2) throw new Error("a gutter stands between the column and the screen");
+}
+
+/** The rotation of each of the fold's two strokes, as "none" or "<n>deg" (Tailwind 4 turns with the `rotate` property). */
+async function strokeTurns(strokes: import("@playwright/test").Locator): Promise<string[]> {
+  return strokes.evaluateAll((els) =>
+    els.map((e) => {
+      const r = getComputedStyle(e).rotate;
+      const deg = r && r !== "none" ? Math.round(parseFloat(r)) : 0;
+      return deg === 0 ? "none" : `${deg}deg`;
+    }),
+  );
+}
+
+type Head = { fontPx: number; headHeight: number; gap: number };
+
+async function headGeometry(page: Page): Promise<Head> {
+  const bar = (await page.locator('[data-slot="app-shell-top-bar"]').first().boundingBox())!;
+  const head = (await page.locator('[data-slot="page-header"]').boundingBox())!;
+  const frame = (await page.locator('[data-slot="frame"]').first().boundingBox())!;
+  const fontPx = await page.locator("h1").evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+  return { fontPx, headHeight: head.height, gap: frame.y - (bar.y + bar.height) };
+}
+
+/** No large title: the h1 is body size in a row no taller than 40px, at most 64px from the top bar to the first frame. */
+function assertThinHead(h: Head): void {
+  if (h.fontPx > 14 || h.headHeight > 40 || h.gap > 64)
+    throw new Error("page head is not one thin row");
+}
+
 async function noSideways(page: Page) {
   return page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -204,6 +256,9 @@ test.describe("App Shell on a computer", () => {
     const search = await page.locator('[data-slot="app-shell-search"]').boundingBox();
     assertCentred(bar, search);
     expect(search!.width).toBeGreaterThanOrEqual(300);
+    // The whole hint shows: nothing of it is cut.
+    const hint = page.locator('[data-slot="unit-jump"] button span').first();
+    expect(await hint.evaluate((e) => e.scrollWidth - e.clientWidth)).toBeLessThanOrEqual(0);
   });
 
   test("the middle check fails on a box at the end of the bar", async () => {
@@ -230,16 +285,113 @@ test.describe("App Shell on a computer", () => {
     await expect(page.locator("html")).toHaveClass(/\bdark\b/);
   });
 
-  test("the second column's edge runs the whole height, its fold on that edge mid-window", async ({
+  test("the second column's edge runs the whole height on every screen, its fold on that edge mid-window", async ({
+    page,
+  }) => {
+    const height = page.viewportSize()!.height;
+    for (const s of SCREENS) {
+      await page.goto(s.href);
+      await expect(page.locator("h1")).toHaveText(s.title);
+      assertOnEdge(await shellGeometry(page), height);
+    }
+  });
+
+  test("the edge check fails on a short edge, a fold off the edge and a gutter before the screen", async () => {
+    const good: Geometry = {
+      edge: { x: 72, y: 56, width: 225, height: 835 },
+      fold: { x: 296, y: 435, width: 28, height: 28 },
+      content: { x: 297 },
+    };
+    expect(() => assertOnEdge(good, 899)).not.toThrow();
+    expect(() => assertOnEdge({ ...good, edge: { ...good.edge, height: 240 } }, 899)).toThrow(
+      "second column edge stops short",
+    );
+    expect(() => assertOnEdge({ ...good, fold: { ...good.fold, y: 150 } }, 899)).toThrow(
+      "fold not on the column edge mid-window",
+    );
+    expect(() => assertOnEdge({ ...good, content: { x: 321 } }, 899)).toThrow(
+      "a gutter stands between the column and the screen",
+    );
+  });
+
+  test("the fold's two strokes bend into an arrow when focused, the other way when folded", async ({
+    page,
+  }) => {
+    await page.context().clearCookies();
+    await page.goto("/inventory");
+    const fold = page.getByRole("button", { name: "Gập cột thứ hai" });
+    const strokes = fold.locator("span span");
+    expect(await strokeTurns(strokes)).toEqual(["none", "none"]);
+    await fold.focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+    await expect.poll(() => strokeTurns(strokes)).toEqual(["40deg", "-40deg"]);
+    await page.keyboard.press("Enter");
+    const open = page.getByRole("button", { name: "Mở cột thứ hai" });
+    await expect(open).toBeFocused();
+    await expect.poll(() => strokeTurns(open.locator("span span"))).toEqual(["-40deg", "40deg"]);
+    // Folded, the fold stands on the screen's left edge, mid-window.
+    const height = page.viewportSize()!.height;
+    const at = (await open.boundingBox())!;
+    const content = (await page.locator('[data-slot="app-shell-content"]').boundingBox())!;
+    expect(Math.abs(at.x - content.x)).toBeLessThanOrEqual(2);
+    expect(Math.abs(at.y + at.height / 2 - height / 2)).toBeLessThanOrEqual(2);
+  });
+
+  test("the fold's strokes bend when the mouse rests on it", async ({ page }) => {
+    await page.context().clearCookies();
+    await page.goto("/inventory");
+    const fold = page.getByRole("button", { name: "Gập cột thứ hai" });
+    expect(await strokeTurns(fold.locator("span span"))).toEqual(["none", "none"]);
+    await fold.hover();
+    await expect.poll(() => strokeTurns(fold.locator("span span"))).toEqual(["40deg", "-40deg"]);
+  });
+
+  test("the head is one thin row: a small h1, at most 64px from the top bar to the first frame", async ({
+    page,
+  }) => {
+    for (const href of ["/inventory", "/sent"]) {
+      await page.goto(href);
+      await expect(page.locator('[data-slot="frame"]').first()).toBeVisible();
+      assertThinHead(await headGeometry(page));
+    }
+  });
+
+  test("the thin-head check fails on the old large title", async () => {
+    expect(() => assertThinHead({ fontPx: 24, headHeight: 32, gap: 88 })).toThrow(
+      "page head is not one thin row",
+    );
+    expect(() => assertThinHead({ fontPx: 14, headHeight: 32, gap: 88 })).toThrow(
+      "page head is not one thin row",
+    );
+    expect(() => assertThinHead({ fontPx: 14, headHeight: 32, gap: 64 })).not.toThrow();
+  });
+
+  test("the account menu is wide enough for one-line name and email, and the arrow keys reach the looks", async ({
     page,
   }) => {
     await page.goto("/inventory");
-    const height = page.viewportSize()!.height;
-    const edge = (await page.locator('[data-slot="app-shell-second-column-edge"]').boundingBox())!;
-    expect(edge.height).toBeGreaterThan(height - 80);
-    const fold = (await page.getByRole("button", { name: "Gập cột thứ hai" }).boundingBox())!;
-    expect(Math.abs(fold.x - (edge.x + edge.width))).toBeLessThanOrEqual(2);
-    expect(Math.abs(fold.y + fold.height / 2 - height / 2)).toBeLessThanOrEqual(2);
+    await page.getByRole("button", { name: "Tài khoản" }).click();
+    const menu = page.getByRole("menu");
+    await expect(menu).toBeVisible();
+    expect((await menu.boundingBox())!.width).toBeGreaterThanOrEqual(256);
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("menuitemradio", { name: "Sáng" })).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("menuitemradio", { name: "Tối" })).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page.locator("html")).toHaveClass(/\bdark\b/);
+    // Choosing a look keeps the menu open.
+    await expect(menu).toBeVisible();
+  });
+
+  test("⌘B does not unfold the rail into names on a computer", async ({ page }) => {
+    await page.goto("/inventory");
+    const rail = page.locator('[data-slot="sidebar"]:not([data-mobile])').first();
+    await expect(rail).toHaveAttribute("data-state", "collapsed");
+    await page.locator("body").press("Meta+b");
+    await page.locator("body").press("Control+b");
+    await expect(rail).toHaveAttribute("data-state", "collapsed");
   });
 
   test("the head of a screen names the place open in the second column", async ({ page }) => {
@@ -268,6 +420,13 @@ test.describe("App Shell on a phone", () => {
           await expect(page.locator("h1")).toHaveText(s.title);
           await expect(column(page)).toBeHidden();
           await expect(rail(page)).toHaveCount(0);
+          // The search is an icon button at the end of the top bar.
+          const bar = (await page
+            .locator('[data-slot="app-shell-top-bar"]')
+            .first()
+            .boundingBox())!;
+          const search = (await page.locator('[data-slot="unit-jump"] button').boundingBox())!;
+          expect(bar.x + bar.width - (search.x + search.width)).toBeLessThanOrEqual(12);
           expect(await noSideways(page)).toBeLessThanOrEqual(0);
           if (s.href === "/inventory" && page.viewportSize()?.width === 360)
             await shot(page, `inventory-360-${colorScheme}`);
@@ -284,6 +443,8 @@ test.describe("App Shell on a phone", () => {
       await openSheet(page);
       const sheet = page.locator('[data-mobile="true"]');
       await expect(sheet.getByRole("link", { name: LABELS.Sent.pref, exact: true })).toBeVisible();
+      // The account menu rides at the foot of the sheet's rail.
+      await expect(sheet.getByRole("button", { name: "Tài khoản" })).toBeVisible();
       for (const name of SECOND_COLUMN["/inventory"]!) {
         await expect(sheet.getByRole("link", { name, exact: true }).first()).toBeVisible();
       }

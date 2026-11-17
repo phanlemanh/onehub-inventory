@@ -1,0 +1,134 @@
+schema_version: 1
+feature_slug: app-shell-khuon-dau-trang
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.app_shell_verve_e2e
+    paths: [src/components/templates/app-shell/second-column.tsx, tests/e2e/app-shell.spec.ts]
+    expected: "exit 0; ở 1024 và 1440, tests/e2e/app-shell.spec.ts: trên Hôm nay, Bảng hàng, Đã gửi dải gập lệch mép phải cột ≤ 2 px, tâm dải lệch giữa cửa sổ ≤ 2 px, vùng màn bắt đầu ≤ 2 px sau mép (hàm assertOnEdge); hai nét của dải không xoay khi chưa chạm, Tab tới hay rê chuột thì xoay 40deg và -40deg, gập rồi thì xoay ngược -40deg và 40deg và dải đứng trên mép trái vùng màn (≤ 2 px) giữa cửa sổ (≤ 2 px); gập, tải lại vẫn gập, mở lại được. Chiều đỏ trên cùng hàm: dải lệch dọc cho 'fold not on the column edge mid-window', vùng màn cách mép 24 px cho 'a gutter stands between the column and the screen', kỳ vọng mở sau tải lại cho 'second column state lost after reload'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.app_shell_verve_e2e
+    paths: [src/components/templates/app-shell/second-column.tsx, tests/e2e/app-shell.spec.ts]
+    expected: "exit 0; ở 1024 và 1440 trên Hôm nay (màn không có nơi con), Bảng hàng, Đã gửi: khung viền cột thứ hai cao ≥ chiều cao cửa sổ trừ 80 px; chiều đỏ: viền cao 240 px trên cùng hàm assertOnEdge cho 'second column edge stops short'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.app_shell_verve_e2e
+    paths: [src/components/templates/app-shell.tsx, src/modules/listings/ui/unit-jump.tsx, tests/e2e/app-shell.spec.ts]
+    expected: "exit 0; ở 1024 và 1440: tâm ô tìm lệch tâm thanh trên ≤ 2 px, ô rộng ≥ 300 px, chữ gợi ý scrollWidth - clientWidth ≤ 0; thanh trên không có nút 'Đổi giao diện' và nút 'Tài khoản'; ở 360 và 414 trang không cuộn ngang và nút tìm cách mép phải thanh trên ≤ 12 px. Chiều đỏ: ô ở x=800 rộng 160 trên thanh 1000 cho 'search not in the middle of the top bar'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.app_shell_verve_e2e
+    paths: [src/app/(app)/account-menu.tsx, src/components/templates/theme.tsx, src/components/templates/app-shell.tsx, tests/e2e/app-shell.spec.ts, tests/e2e/frame.spec.ts]
+    expected: "exit 0; chưa đăng nhập, ở 1024 và 1440: nút 'Tài khoản' trong chân dải biểu tượng, đáy nút cách đáy cửa sổ < 80 px; menu rộng ≥ 256 px; có ba menuitemradio Sáng, Tối, Theo thiết bị và menuitem 'Đăng nhập'; ArrowDown tới Sáng rồi Tối, Enter thì html có lớp dark và menu vẫn mở; ở 360 và 414 tấm menu có nút 'Tài khoản'; account.spec 'khung-chua-dang-nhap' mở menu ở bốn khổ và thấy menuitem 'Đăng nhập' trỏ /login?next=%2F; frame.spec 'chosen theme survives a reload' chọn Tối qua menu ở bốn khổ và tải lại vẫn tối"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-4
+    executor: script
+    layer: backend-effect
+    cmd: config:executors.script.app_shell_verve_db
+    paths: [src/app/(app)/account-menu.tsx, src/app/(app)/company-switch.tsx, src/components/templates/**, tests/e2e-db/**]
+    expected: "exit 0; mọi bài trình duyệt có đăng nhập trên Postgres của dãy R (playwright.db.config.ts, bốn khổ) xanh — gồm mở menu 'Tài khoản' rồi đăng xuất (login.spec, va-dang-nhap.spec), đổi sàn (app-shell-doi-san.spec), màn Thành viên và Tuỳ chỉnh của sàn với nút chính ở đầu trang (members, bo-nut-members, lop-rieng, thue-phi), cột thứ hai theo địa lý và góc nhìn (dia-ly, goc-nhin), vai × màn (vai-man)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.app_shell_verve_e2e
+    paths: [src/components/templates/page-header.tsx, src/components/templates/app-shell/place-crumb.tsx, src/components/templates/shell-focus.tsx, tests/e2e/app-shell.spec.ts]
+    expected: "exit 0; ở 1024 và 1440 trên Bảng hàng và Đã gửi: cỡ chữ h1 ≤ 14 px, hàng đầu trang cao ≤ 40 px, từ đáy thanh trên tới khung đầu tiên ≤ 64 px (assertThinHead); Bảng hàng: h1 'Bảng hàng', sau «›» là 'Tất cả hàng', bấm trạng thái ở cột thứ hai thì phần ấy đổi sang tên trạng thái; Hôm nay không có phần sau «›». Chiều đỏ: số đo tiêu đề lớn cũ (24 px, khoảng 88 px) và (14 px, khoảng 88 px) cho 'page head is not one thin row'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.app_shell_verve_unit
+    paths: [src/components/templates/page-header.tsx, src/components/templates/app-shell/place-crumb.tsx, tests/app-shell.test.tsx, tests/frame.test.tsx]
+    expected: "exit 0; tests/app-shell.test.tsx: PageHeader trong App Shell ở /inventory có h1 'Mục chung hai' và page-header-place 'Tất cả mục hai'; ở / không có page-header-place; tiêu đề trùng nơi đang mở thì không có page-header-place; tests/frame.test.tsx: PageHeader ngoài App Shell vẫn một h1 và tối đa một nút chính"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.app_shell_verve_e2e
+    paths: [src/components/templates/app-shell.tsx, src/components/templates/app-shell/rail-provider.tsx, tests/e2e/app-shell.spec.ts]
+    expected: "exit 0; ở 1024 và 1440: nút 'Mở hoặc đóng thanh bên' ẩn; nhấn Meta+b và Control+b thì dải vẫn data-state=collapsed; ở 360 và 414 các bài tấm menu (openSheet) xanh"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.app_shell_verve_unit
+    paths: [src/components/templates/app-shell.tsx, src/components/templates/app-shell/rail-provider.tsx, tests/app-shell.test.tsx]
+    expected: "exit 0; tests/app-shell.test.tsx: nút 'Mở hoặc đóng thanh bên' nằm trong khối md:hidden; dải desktop data-state=collapsed trước và sau một keydown Meta+b trên window; tài khoản nằm trong app-shell-account bên trong sidebar, không trong thanh trên; thanh trên không có nút 'Đổi giao diện'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.check
+    paths: [src/**, tests/**, tools/e2e_templates/**, eslint.config.js, design/component-registry.json]
+    expected: "exit 0; make check (lint gồm shadcn/no-restyle và onehub-ui, typecheck, mọi bài vitest gồm e2e-templates CHO_TESTS và proof gate, ontology) xanh; eslint.config.js có đúng một hợp đồng { pattern: '^DropdownMenuContent$', allow: ['w-*', 'min-w-*'] }; không tệp nào trong src có eslint-disable cho shadcn/no-restyle"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/**, tests/e2e/**, tools/e2e_templates/**]
+    expected: "exit 0; make e2e — bộ bài trình duyệt chung (sổ màn, khung, App Shell, lưới, tấm menu) ở bốn khổ 360, 414, 1024, 1440, sáng và tối, axe không lỗi serious hay critical"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-8
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/components/templates/**, src/app/(app)/account-menu.tsx, src/modules/listings/ui/unit-jump.tsx]
+    steps:
+      - "Open _acceptance/app-shell-khuon-dau-trang/evidence/truoc/ (frames taken on main before this round) and _acceptance/app-shell-khuon-dau-trang/evidence/sau/ (same screens, same sizes, after this round)."
+      - "For each of 360, 414, 1024, 1440 compare the before and after frame of Bảng hàng, Hôm nay and the open account menu (signed out, so the frames hold sample data only), light and dark."
+      - "Open evidence/sau/menu-dang-nhap-*.png (signed in on lane R Postgres, a long sample email) and check name and email each on one line, the company line, the three looks and sign-out."
+    expected: "A1 dải gập trên mép cột giữa cửa sổ; A2 viền cột hai chạy tới đáy; A3 ô tìm giữa thanh trên, không còn nút giao diện và nút T ở góc phải; A4 nút tài khoản ở đáy dải, menu đủ rộng cho email một dòng, có hàng Giao diện ba lựa chọn; A5 không còn tiêu đề lớn, một hàng «Tên màn › Nơi» với nút chính cuối hàng; A6 không còn nút thanh bên ở góc trái thanh trên khi máy tính; điện thoại vẫn có nút mở tấm menu; tối đọc được; ngoài sáu chỗ ấy màn không đổi dáng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
+
+  - id: E13
+    criterion: AC-8
+    executor: judgment
+    inputs: [_acceptance/app-shell-khuon-dau-trang/design.md, _acceptance/app-shell-khuon-dau-trang/contract.md]
+    question: "Bảng «Sáu chỗ (A1–A6) và cách làm» của design.md có khớp từng câu nguyên văn của chủ kho ở mục «Nguồn» không — mỗi chỗ chủ kho khoanh có đúng một dòng, cột «Sau» làm điều chủ kho nói chứ không thêm việc chủ kho không bảo, và các việc chủ kho bảo «chỉ ghi lại» (P1–P3) nằm ở Out of scope của contract.md chứ không lọt vào sáu chỗ?"
+    evidence_required: [verdict, rationale, judges]
+
+  - id: E14
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/components/templates/**, src/app/(app)/account-menu.tsx, src/modules/listings/ui/unit-jump.tsx]
+    expected: "exit 0; sàn thiết kế M2 không thấy màu hex thô trên các tệp giao diện vòng này chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.app_shell_verve_db
+    paths: [src/app/(app)/account-menu.tsx, src/components/templates/theme.tsx, tests/e2e-db/app-shell-verve.spec.ts]
+    expected: "exit 0; tests/e2e-db/app-shell-verve.spec.ts ở bốn khổ, đăng nhập thật trên Postgres dãy R: quản trị một sàn với email mẫu dài mở menu (điện thoại qua tấm menu) — menu ≥ 256 px, tên và email trọn một dòng (assertWholeLine), 'Đang làm ở <sàn>', ba menuitemradio, không 'Đổi sàn', ArrowDown lần lượt Sáng, Tối, Theo thiết bị, Đăng xuất; người hai sàn thì ArrowDown đầu tiên tới 'Đổi sàn' rồi Sáng. Chiều đỏ trên cùng hàm: email bị cắt (scrollWidth 300 > clientWidth 200) và email bẻ dòng (cao 32 với line-height 16) cho 'text does not show whole on one line'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E16
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.app_shell_verve_db
+    paths: [src/components/templates/page-header.tsx, src/components/templates/app-shell/second-column.tsx, tests/e2e-db/app-shell-verve.spec.ts]
+    expected: "exit 0; ở 1024 và 1440, đăng nhập thật: Thành viên và Tuỳ chỉnh của sàn › Thuế phí có h1 ≤ 14 px, nút chính kết hàng đầu trang (mép phải lệch ≤ 2 px, hàng cao ≤ 40 px — assertActionAtEnd), viền cột thứ hai ≥ chiều cao cửa sổ trừ 80 px. Chiều đỏ: nút rớt xuống hàng hai (hàng cao 80) hay lệch phải 300 px cho 'primary action is not at the end of the thin head'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

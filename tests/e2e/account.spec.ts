@@ -2,14 +2,18 @@
 // the full flow on Postgres is tests/e2e-db/login.spec.ts.
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "../../tools/e2e_templates/fixture";
-import { shown } from "../../tools/e2e_templates/settle";
+import { openSheet, shown } from "../../tools/e2e_templates/settle";
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 test.describe("tai khoan khong co co so du lieu", () => {
-  test("khung-chua-dang-nhap", async ({ page }) => {
+  test("khung-chua-dang-nhap", { tag: "@cho" }, async ({ page }) => {
     await page.goto("/");
-    const link = page.getByRole("link", { name: "Đăng nhập" });
+    // Signing in sits in the account menu at the foot of the rail (app-shell-khuon-dau-trang, AC-4); on a phone the
+    // rail rides in the sheet.
+    if ((page.viewportSize()?.width ?? 0) < 768) await openSheet(page);
+    await page.getByRole("button", { name: "Tài khoản" }).click();
+    const link = page.getByRole("menuitem", { name: "Đăng nhập" });
     await expect(link).toBeVisible();
     await expect(link).toHaveAttribute("href", "/login?next=%2F");
   });

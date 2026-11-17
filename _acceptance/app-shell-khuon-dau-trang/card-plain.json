@@ -1,0 +1,108 @@
+{
+  "feature_plain": "Nhân viên sàn làm việc trong App Shell gọn hơn, xếp theo mẫu Verve của ReUI: nút gập cột thứ hai nằm trên mép cột, ô tìm ở giữa thanh trên, menu tài khoản kèm chọn giao diện ở đáy dải biểu tượng, đầu trang chỉ còn một hàng mảnh.",
+  "will_do": [
+    {
+      "id": "AC-1",
+      "p": "Sẽ đặt nút gập cột thứ hai lên ngay mép cột, ở giữa chiều cao cửa sổ, không chiếm chỗ riêng; rê chuột hay Tab tới thì nút hiện mũi tên chỉ hướng cột sẽ đi."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ cho viền cột thứ hai chạy từ thanh trên xuống tận đáy màn hình, kể cả màn ít mục."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ đặt ô tìm mã căn ở giữa thanh trên, rộng khoảng 320 px, chữ gợi ý hiện trọn; trên điện thoại ô tìm là nút biểu tượng cuối thanh."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ đưa nút tài khoản xuống đáy dải biểu tượng: menu đủ rộng cho tên và email dài trên một dòng, có sàn đang mở, đổi sàn, ba lựa chọn giao diện chọn được bằng phím mũi tên, và đăng xuất."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ giữ mọi màn đang có chạy đúng ở bốn khổ, sáng và tối, cả khi chưa và đã đăng nhập; luật kiểm mã chỉ nới đúng một chỗ: menu được đặt bề rộng."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ có ảnh trước và sau ở bốn khổ để anh thấy từng chỗ trong sáu chỗ đổi đúng lời anh, ngoài ra màn không đổi dáng."
+    }
+  ],
+  "wont_do": [
+    {
+      "id": "AC-5",
+      "p": "Sẽ KHÔNG còn tiêu đề lớn: đầu trang là một hàng mảnh «Tên màn › nơi đang mở ở cột thứ hai», nút chính cuối hàng, dữ liệu lên cao hơn khoảng 24 px."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ KHÔNG còn nút bật thanh bên ở góc trái thanh trên khi dùng máy tính, và dải biểu tượng không mở thành cột có chữ; trên điện thoại nút vẫn mở tấm menu."
+    },
+    {
+      "id": "OOS-1",
+      "p": "KHÔNG làm phần hồ sơ sàn, tìm/lọc/sắp ở màn Thành viên, chia nhóm cột mục con — anh đã bảo chỉ ghi lại, chờ Cổng Đáng."
+    },
+    {
+      "id": "OOS-2",
+      "p": "KHÔNG thêm Hồ sơ, Tuỳ chọn, Thông báo vào menu tài khoản như Verve, vì Inventory chưa có các màn ấy."
+    },
+    {
+      "id": "OOS-3",
+      "p": "KHÔNG thêm ô chọn phạm vi «All» cạnh ô tìm, vì Inventory chỉ tìm mã căn."
+    },
+    {
+      "id": "OOS-4",
+      "p": "KHÔNG đổi tên khung bên dưới đầu trang (ví dụ khung «Thành viên»)."
+    },
+    {
+      "id": "OOS-5",
+      "p": "KHÔNG đổi câu gợi ý của ô tìm."
+    }
+  ],
+  "scope_plain": "Những việc dưới đây cố ý để ngoài vòng này:",
+  "coverage_plain": [
+    {
+      "i": 0,
+      "p": "Mỗi chỗ trong sáu chỗ anh khoanh có đúng một tiêu chí (AC-1 nút gập … AC-6 nút thanh bên)."
+    },
+    {
+      "i": 1,
+      "p": "Bốn khổ màn hình: điện thoại 360, 414 và máy tính 1024, 1440 đều có phép đo."
+    },
+    {
+      "i": 2,
+      "p": "Sáng và tối đều đo: chọn giao diện trong menu và quét lỗi trợ năng hai giao diện (AC-4, AC-7, AC-8)."
+    },
+    {
+      "i": 3,
+      "p": "Đo cả khi chưa đăng nhập (dữ liệu mẫu) và khi đã đăng nhập thật trên Postgres của dãy (menu với email dài, Thành viên, Tuỳ chỉnh của sàn)."
+    },
+    {
+      "i": 4,
+      "p": "Không làm hỏng màn khác: kiểm cả kho, bộ bài trình duyệt chung và bộ có đăng nhập (AC-7)."
+    },
+    {
+      "i": 5,
+      "p": "Ba việc anh bảo chỉ ghi lại để sau, chờ Cổng Đáng."
+    }
+  ],
+  "gap_probe_plain": [
+    {
+      "i": 0,
+      "p": "Chưa có bài nào đo menu tài khoản khi đã đăng nhập — đúng chỗ email từng bị bẻ dòng. Đã thêm bài đăng nhập thật ở bốn khổ: email dài phải hiện trọn một dòng, người một sàn không thấy «Đổi sàn», người hai sàn thấy."
+    },
+    {
+      "i": 1,
+      "p": "Đầu trang mảnh chưa đo ở Thành viên và Tuỳ chỉnh của sàn (hai màn có nút chính, cần đăng nhập). Đã thêm bài đo: nút chính nằm cuối hàng, hàng không cao quá 40 px, viền cột chạy hết chiều cao."
+    },
+    {
+      "i": 2,
+      "p": "Chưa ghi việc menu tài khoản xếp theo trang Verve thay vì lấy khối ReUI Pro (công cụ ReUI trong phiên chưa đăng nhập). Đẩy lên thẻ thành câu Hỏi-3 để anh quyết."
+    },
+    {
+      "i": 3,
+      "p": "Chưa đo mũi tên khi rê chuột, vị trí nút gập khi cột đã gập, và vị trí nút tìm trên điện thoại. Đã thêm cả ba phép đo."
+    },
+    {
+      "i": 4,
+      "p": "Chưa ghi anh đã xem bản dựng ở những khổ nào. Đã ghi: máy tính bấm thử trực tiếp, điện thoại xem ảnh 375 px (gửi kèm thẻ); ảnh 360 và 414 có ở Cổng Bằng chứng."
+    }
+  ]
+}

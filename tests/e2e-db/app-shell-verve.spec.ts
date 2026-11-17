@@ -1,0 +1,219 @@
+// The App Shell laid out as the ReUI Verve template, signed in (_acceptance/app-shell-khuon-dau-trang, AC-2, AC-4, AC-5):
+// the account menu at the foot of the rail is wide enough for a long email on one line, holds the company, the three
+// looks and sign-out, and the arrow keys walk it; switching company shows only to a person in two companies; the page
+// head of the members and company layer screens is one thin row with the primary action at its end, beside a second
+// column edge that runs the whole height. Each check has a twin fed a wrong measure that must fail with its message.
+import { existsSync, readFileSync } from "node:fs";
+
+import { expect, test, type Page, type TestInfo } from "@playwright/test";
+import pg from "pg";
+
+import { openSheet } from "../../tools/e2e_templates/settle";
+import { DB_URL, OUTBOX } from "../../playwright.db.config";
+
+let owner: pg.Client;
+test.beforeAll(async () => {
+  owner = new pg.Client({ connectionString: DB_URL });
+  await owner.connect();
+});
+test.afterAll(async () => {
+  await owner.end();
+});
+
+const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 768;
+
+/** One company admin with a long sample email, in one or two new companies (sample data, MAU). */
+async function admin(info: TestInfo, companies: 1 | 2) {
+  const stamp = `${info.project.name}-${Date.now()}`;
+  const email = `quan-tri-san-mau-dia-chi-dai-${stamp}@example.test`;
+  const user = (
+    await owner.query<{ id: string }>(
+      "insert into identity.users (email, name) values ($1, '[Tên] Quản trị MAU') returning id",
+      [email],
+    )
+  ).rows[0]!.id;
+  const names: string[] = [];
+  for (let i = 0; i < companies; i++) {
+    const name = `[Sàn ${i + 1} ${stamp}]`;
+    const company = (
+      await owner.query<{ id: string }>("insert into companies (name) values ($1) returning id", [
+        name,
+      ])
+    ).rows[0]!.id;
+    await owner.query(
+      "insert into company_members (company_id, user_id, name, roles) values ($1, $2, '[Tên] Quản trị MAU', '{CompanyAdmin}')",
+      [company, user],
+    );
+    names.push(name);
+  }
+  return { email, names };
+}
+
+function codes(email: string): string[] {
+  if (!existsSync(OUTBOX)) return [];
+  return readFileSync(OUTBOX, "utf8")
+    .split("\n")
+    .filter(Boolean)
+    .map((l) => JSON.parse(l) as { email: string; text: string; kind?: string })
+    .filter((m) => m.email === email && m.kind !== "invite")
+    .map((m) => (m.text.match(/\b\d{6}\b/g) ?? [])[0] ?? "");
+}
+
+async function signIn(page: Page, email: string, company: string) {
+  await page.goto("/login");
+  await expect(page.locator('[data-state="email"][data-ready]')).toBeVisible();
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email").press("Enter");
+  await expect(page.locator('[data-state="code"]')).toBeVisible();
+  await expect.poll(() => codes(email).length, { timeout: 10_000 }).toBeGreaterThanOrEqual(1);
+  const code = page.getByLabel("Mã đăng nhập");
+  await code.fill(codes(email).at(-1)!);
+  await code.press("Enter");
+  const choose = page
+    .locator('[data-state="choose-company"]')
+    .getByRole("button", { name: company });
+  await expect(choose.or(page.locator('[data-slot="account-menu"][data-ready]'))).toBeVisible();
+  if (await choose.isVisible()) await choose.click();
+  await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
+}
+
+async function openAccountMenu(page: Page) {
+  if (phone(page)) await openSheet(page);
+  await page.locator('[data-slot="account-menu"][data-ready]').click();
+  await expect(page.getByRole("menu")).toBeVisible();
+}
+
+type Line = { scrollWidth: number; clientWidth: number; height: number; lineHeight: number };
+
+async function lineOf(page: Page, text: string): Promise<Line> {
+  return page
+    .getByRole("menu")
+    .getByText(text, { exact: true })
+    .evaluate((e) => {
+      const s = getComputedStyle(e);
+      return {
+        scrollWidth: e.scrollWidth,
+        clientWidth: e.clientWidth,
+        height: e.getBoundingClientRect().height,
+        lineHeight: parseFloat(s.lineHeight),
+      };
+    });
+}
+
+/** The text shows whole, on one line: nothing cut, no second line. */
+function assertWholeLine(l: Line): void {
+  if (l.scrollWidth > l.clientWidth || l.height > l.lineHeight * 1.5)
+    throw new Error("text does not show whole on one line");
+}
+
+type Head = {
+  headRight: number;
+  headTop: number;
+  headHeight: number;
+  actionRight: number;
+  actionTop: number;
+};
+
+/** The primary action ends the one thin row of the page head. */
+function assertActionAtEnd(h: Head): void {
+  if (
+    h.headHeight > 40 ||
+    Math.abs(h.actionRight - h.headRight) > 2 ||
+    h.actionTop < h.headTop ||
+    h.actionTop > h.headTop + 40
+  )
+    throw new Error("primary action is not at the end of the thin head");
+}
+
+test(
+  "signed in, the account menu shows name and a long email whole, the company, the looks and sign-out",
+  { tag: "@cho" },
+  async ({ page }, info) => {
+    const { email, names } = await admin(info, 1);
+    await signIn(page, email, names[0]!);
+    await openAccountMenu(page);
+    const menu = page.getByRole("menu");
+    expect((await menu.boundingBox())!.width).toBeGreaterThanOrEqual(256);
+    assertWholeLine(await lineOf(page, "[Tên] Quản trị MAU"));
+    assertWholeLine(await lineOf(page, email));
+    await expect(menu).toContainText(`Đang làm ở ${names[0]}`);
+    for (const look of ["Sáng", "Tối", "Theo thiết bị"]) {
+      await expect(page.getByRole("menuitemradio", { name: look })).toBeVisible();
+    }
+    // One company: no switching; the arrow keys walk the three looks, then sign-out.
+    await expect(page.getByRole("menuitem", { name: "Đổi sàn" })).toHaveCount(0);
+    for (const name of ["Sáng", "Tối", "Theo thiết bị"]) {
+      await page.keyboard.press("ArrowDown");
+      await expect(page.getByRole("menuitemradio", { name })).toBeFocused();
+    }
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("menuitem", { name: "Đăng xuất" })).toBeFocused();
+  },
+);
+
+test(
+  "a person in two companies finds switching first in the account menu",
+  { tag: "@cho" },
+  async ({ page }, info) => {
+    const { email, names } = await admin(info, 2);
+    await signIn(page, email, names[0]!);
+    await openAccountMenu(page);
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("menuitem", { name: "Đổi sàn" })).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("menuitemradio", { name: "Sáng" })).toBeFocused();
+  },
+);
+
+test("the whole-line check fails on a cut email and on a wrapped one", async () => {
+  expect(() =>
+    assertWholeLine({ scrollWidth: 300, clientWidth: 200, height: 16, lineHeight: 16 }),
+  ).toThrow("text does not show whole on one line");
+  expect(() =>
+    assertWholeLine({ scrollWidth: 200, clientWidth: 200, height: 32, lineHeight: 16 }),
+  ).toThrow("text does not show whole on one line");
+  expect(() =>
+    assertWholeLine({ scrollWidth: 200, clientWidth: 200, height: 16, lineHeight: 16 }),
+  ).not.toThrow();
+});
+
+test("members and company layer: one thin head with the primary action at its end, a full-height column edge", async ({
+  page,
+}, info) => {
+  test.skip(phone(page), "computer sizes only");
+  const { email, names } = await admin(info, 1);
+  await signIn(page, email, names[0]!);
+  const height = page.viewportSize()!.height;
+  for (const href of ["/members", "/tuy-chinh-san?phan=thue-phi"]) {
+    await page.goto(href);
+    const head = page.locator('[data-slot="page-header"]');
+    const action = page.locator('[data-slot="page-header-action"]');
+    await expect(action).toBeVisible();
+    const fontPx = await head
+      .locator("h1")
+      .evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+    expect(fontPx).toBeLessThanOrEqual(14);
+    const h = (await head.boundingBox())!;
+    const a = (await action.boundingBox())!;
+    assertActionAtEnd({
+      headRight: h.x + h.width,
+      headTop: h.y,
+      headHeight: h.height,
+      actionRight: a.x + a.width,
+      actionTop: a.y,
+    });
+    const edge = (await page.locator('[data-slot="app-shell-second-column-edge"]').boundingBox())!;
+    expect(edge.height).toBeGreaterThan(height - 80);
+  }
+});
+
+test("the action-at-end check fails on an action dropped below the row", async () => {
+  const row = { headRight: 1200, headTop: 72, headHeight: 32, actionRight: 1200, actionTop: 72 };
+  expect(() => assertActionAtEnd(row)).not.toThrow();
+  expect(() => assertActionAtEnd({ ...row, headHeight: 80, actionTop: 120 })).toThrow(
+    "primary action is not at the end of the thin head",
+  );
+  expect(() => assertActionAtEnd({ ...row, actionRight: 900 })).toThrow(
+    "primary action is not at the end of the thin head",
+  );
+});
