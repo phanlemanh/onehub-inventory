@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "app-shell-khuon-dau-trang",
-  "ghi_luc": "2026-11-17T04:01:04Z",
-  "vong_cham": 3,
+  "ghi_luc": "2026-11-17T07:58:36Z",
+  "vong_cham": 4,
   "luot": [
     {
       "vong": 1,
@@ -20,16 +20,27 @@
       "vong": 3,
       "verdict": "PENDING-JUDGMENT",
       "tang": []
+    },
+    {
+      "vong": 4,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
     }
   ],
   "lam_lai": [
     {
       "nguon": "r1",
       "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "r4",
+      "tang": "bai-kiem-ha-tang"
     }
   ],
   "theo_tang": {
-    "bai-kiem-ha-tang": 1,
+    "bai-kiem-ha-tang": 2,
     "trang-thai-hanh-vi": 0,
     "du-lieu-api": 0,
     "nghiep-vu": 0,
