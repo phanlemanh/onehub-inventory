@@ -21,7 +21,7 @@ Lưới, màn mẫu của họ — hàng này chỉ thêm nút «Nạp tệp» v
 
 | Cho | Ứng viên | Ảnh | Chọn |
 | --- | --- | --- | --- |
-| màn | solution-crm-6 | evidence/reui-solution-crm-6.png | |
+| màn | solution-crm-6 | evidence/reui-solution-crm-6.png | x |
 | màn | onboarding-2 | evidence/reui-onboarding-2.png | |
 | màn | wizard-1 | evidence/reui-wizard-1.png | |
 
