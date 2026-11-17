@@ -16,8 +16,14 @@ duyệt kế hoạch tại phiên dãy K ngày 17/11/2026, nguyên văn «Kế h
 Bằng chứng cuối cho SP-1 là `make cach-ly-dich` xanh trên bản thử thật sau khi VP6 gộp. Hồ sơ được ghim lại trên bản có
 thay đổi này.
 
-## Việc phụ VP9, 17/11/2026 — đang dựng (ghi chú bàn giao)
+## Việc phụ VP9, 17/11/2026
 
-- Đang ở đâu: nhánh `claude/vp9-phien-vercel`. Xong: lệnh đưa bản dùng phiên Vercel CLI khi vắng `VERCEL_TOKEN` (kiểm phiên, kiểm đúng dự án, bản thật cần `XAC_NHAN_BAN_THAT=co`); `db/scripts/migrate.sh` chạy được bằng vai chủ không phải siêu vai kiểu Supabase (SET + INHERIT trên vai nội bộ, cấp tạm CREATE trong giao dịch rồi thu). Đang làm: ba điều kiện G-1711-35 cho quyền tạm (tự kiểm sau mỗi commit, bài chứng không phiên nào thấy, cấp hẹp nhất). Chủ kho đã duyệt kế hoạch VP9 và hai lần bổ sung.
-- Việc kế: xanh toàn bộ `tests/db` → commit → ghim lại hồ sơ 22 dưới khoá s4 khi máy rảnh → mở PR, gửi giám sát mã lượt CI → gộp → chủ kho chạy lại `bash ~/onehub-inventory-van-hanh/dua-ban-thu.sh` (bản sao sạch ở `~/onehub-inventory-van-hanh/kho` phải kéo main mới: `git -C ~/onehub-inventory-van-hanh/kho fetch && git -C ~/onehub-inventory-van-hanh/kho checkout --detach origin/main && npm ci` trong thư mục ấy).
-- Bản thử hiện ở: 001 đã áp, 002 dừng; sáu biến chạy và khoá vượt bảo vệ đã đặt; tên miền thu.inventory.onehub.center đã gắn. Khoá Vercel tạo trên web không dùng được — dùng phiên CLI.
+Chủ kho duyệt kế hoạch VP9 và hai lần bổ sung (sổ quyết định). Giám sát G-1711-30, G-1711-31, G-1711-35.
+
+| Chỗ | Người dùng thấy khác gì | Bài kiểm | Phép |
+| --- | --- | --- | --- |
+| `tools/deploy/*`: vắng `VERCEL_TOKEN` thì dùng phiên Vercel CLI đã đăng nhập; kiểm phiên, kiểm đúng dự án đang nối; bản thật cần `XAC_NHAN_BAN_THAT=co`; in lối đang dùng | Người vận hành đưa bản từ máy mình không cần khoá Vercel | `tools/deploy/deploy.test.ts` (hai lối, ca phá: chưa đăng nhập, nối sai dự án, thiếu cờ) | G-1711-30 |
+| `db/scripts/migrate.sh`: chạy được bằng vai chủ không phải siêu vai (Supabase): tự cấp SET + INHERIT trên vai nội bộ, cho mượn CREATE hẹp nhất trong giao dịch rồi thu, lưới sau mỗi commit | Lần áp thay đổi cơ sở dữ liệu đầu trên Supabase không còn dừng ở 002 | `tests/db/migrate-vai-khong-sieu.db.test.ts` (bản cũ đỏ ở 002; cơ sở trống và cơ sở đã áp 001 đều xanh tới 014; kết nối thứ hai không thấy quyền mượn; migration hỏng giữa chừng không để lại quyền) | G-1711-31, G-1711-35 |
+| Sổ tay: lối phiên CLI, cờ bản thật, giả thuyết «User not found» | Không | `tests/van-hanh.test.ts` | G-1711-30 |
+
+Hồ sơ được ghim lại trên bản có thay đổi này.
