@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 4dbbabc1b165d2f61b7b286fb8d8a63dd491de00
+verified_commit: 196e5f71f1a94988073e4183914ffd89b231946b
 human_signoff: Manh Phan 2026-11-17
 ---
 
@@ -179,3 +179,7 @@ none — every multi-run eval is uniform
 ## Iterations
 
 Round 11: mọi eval máy đạt, E10 (judgment, panel giữ từ round 10) chờ người chốt ở Cổng 2; sáu finding ngoài hợp đồng nằm trong review-findings.md. Lịch sử các round trước nằm trong run-log.jsonl.
+
+### Re-pin lần 1 — 2026-11-17, do VP6 sau chu ky: migration 014, vercel.json framework (chay lai sau qua tai)
+run_id: repin-20261117T005705Z-38995
+sha: 196e5f71f1a94988073e4183914ffd89b231946b · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E10 (E10 không khai paths)
