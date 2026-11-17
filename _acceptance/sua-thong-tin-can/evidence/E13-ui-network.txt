@@ -1,0 +1,1 @@
+(no fetch/xhr, no failures)
