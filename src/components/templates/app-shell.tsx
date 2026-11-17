@@ -111,12 +111,14 @@ export function AppShell({
                 {company}
               </div>
               {search ? (
-                <div
-                  data-slot="app-shell-search"
-                  className="flex shrink-0 items-center md:absolute md:left-1/2 md:-translate-x-1/2"
-                >
-                  {search}
-                </div>
+                <>
+                  <div data-slot="app-shell-search" className="flex shrink-0 items-center">
+                    {search}
+                  </div>
+                  {/* On the desktop an empty side as wide as the company's keeps the search in the middle of the bar,
+                      and the company name is cut with «…» before it reaches the search, however long it is. */}
+                  <div aria-hidden className="hidden min-w-0 flex-1 md:block" />
+                </>
               ) : null}
             </header>
           </HiddenInFocus>

@@ -10,7 +10,7 @@ import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import pg from "pg";
 
 import { openSheet } from "../../tools/e2e_templates/settle";
-import { chupAnh } from "../e2e/sua-trang";
+import { chupAnh, themKieu } from "../e2e/sua-trang";
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
 import { shellReady } from "./dang-nhap-vai";
 
@@ -26,7 +26,7 @@ test.afterAll(async () => {
 const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 768;
 
 /** One company admin with a long sample email, in one or two new companies (sample data, MAU). */
-async function admin(info: TestInfo, companies: 1 | 2) {
+async function admin(info: TestInfo, companies: 1 | 2, longName = false) {
   const stamp = `${info.project.name}-${Date.now()}`;
   // A long work email (about 38 characters), as long as the longest addresses a company is likely to use.
   const email = `quan-tri-san-${info.project.name}-${Date.now().toString(36)}@example.test`;
@@ -38,7 +38,9 @@ async function admin(info: TestInfo, companies: 1 | 2) {
   ).rows[0]!.id;
   const names: string[] = [];
   for (let i = 0; i < companies; i++) {
-    const name = `[Sàn ${i + 1} ${stamp}]`;
+    const name = longName
+      ? `[Sàn có tên rất dài để thử thanh trên của App Shell ${i + 1} ${stamp}]`
+      : `[Sàn ${i + 1} ${stamp}]`;
     const company = (
       await owner.query<{ id: string }>("insert into companies (name) values ($1) returning id", [
         name,
@@ -149,6 +151,8 @@ test(
     const shots = process.env["SHOTS_DIR"];
     if (shots) {
       mkdirSync(shots, { recursive: true });
+      // The Next.js dev indicator is not part of the product: keep it out of the evidence frame.
+      await themKieu(page, { content: "nextjs-portal { display: none !important; }" });
       await chupAnh(page, { path: join(shots, `menu-dang-nhap-${info.project.name}.png`) });
     }
     for (const look of ["Sáng", "Tối", "Theo thiết bị"]) {
@@ -241,4 +245,37 @@ test("the shared shell wait holds on a signed-in shell and fails where there is 
   await expect(shellReady(page, { timeout: 2_000 })).rejects.toThrow();
   await signIn(page, email, names[0]!);
   await shellReady(page);
+});
+
+type Rect = { left: number; right: number };
+
+/** The company name ends before the search box begins: a long name is cut, it never runs under the search. */
+function assertApart(company: Rect, search: Rect): void {
+  if (company.right > search.left) throw new Error("company name runs into the search box");
+}
+
+test("a long company name is cut before the search box at 768, 1024 and 1440", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "1440", "one run walks the three computer widths");
+  const { email, names } = await admin(info, 1, true);
+  await signIn(page, email, names[0]!);
+  for (const width of [768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/inventory");
+    await shellReady(page);
+    const name = page.locator('[data-slot="app-shell-top-bar"] [data-slot="company-name"]');
+    const company = await name.evaluate((e) => e.getBoundingClientRect().toJSON() as DOMRect);
+    const search = (await page.locator('[data-slot="app-shell-search"]').boundingBox())!;
+    assertApart(company, { left: search.x, right: search.x + search.width });
+    // The name is long enough to need cutting at these widths, so the cut is what keeps it apart.
+    expect(await name.evaluate((e) => e.scrollWidth > e.clientWidth), `cut at ${width}`).toBe(true);
+  }
+});
+
+test("the apart check fails on a name that runs under the search box", async () => {
+  expect(() => assertApart({ left: 72, right: 720 }, { left: 600, right: 920 })).toThrow(
+    "company name runs into the search box",
+  );
+  expect(() => assertApart({ left: 72, right: 590 }, { left: 600, right: 920 })).not.toThrow();
 });

@@ -11,7 +11,7 @@ import { expect, test } from "../../tools/e2e_templates/fixture";
 import { openSheet } from "../../tools/e2e_templates/settle";
 
 import { LABELS } from "../../src/generated/labels";
-import { chupAnh } from "./sua-trang";
+import { chupAnh, themKieu } from "./sua-trang";
 
 const SCREENS = [
   { href: "/", title: LABELS.Today.pref },
@@ -150,6 +150,41 @@ function assertThinHead(h: Head): void {
     throw new Error("page head is not one thin row");
 }
 
+type HintGeometry = {
+  boxRight: number;
+  buttonRight: number;
+  hintRight: number;
+  keysLeft: number;
+  keysRight: number;
+};
+
+/** Where the search box, its button, its hint and its ⌘ K keys end, as drawn. */
+async function hintGeometry(page: Page): Promise<HintGeometry> {
+  return page.locator('[data-slot="unit-jump"]').evaluate((root) => {
+    const box = root.querySelector(":scope > span")!.getBoundingClientRect();
+    const button = root.querySelector("button")!.getBoundingClientRect();
+    const hint = root.querySelector("button > span")!.getBoundingClientRect();
+    const keys = root.querySelector("button > span:last-child")!.getBoundingClientRect();
+    return {
+      boxRight: box.right,
+      buttonRight: button.right,
+      hintRight: hint.right,
+      keysLeft: keys.left,
+      keysRight: keys.right,
+    };
+  });
+}
+
+/** The hint is whole: the button stays inside its box, the hint ends before the ⌘ K keys, the keys end inside the button. */
+function assertHintWhole(g: HintGeometry): void {
+  if (
+    g.buttonRight > g.boxRight + 1 ||
+    g.hintRight > g.keysLeft + 1 ||
+    g.keysRight > g.buttonRight + 1
+  )
+    throw new Error("search hint is cut");
+}
+
 async function noSideways(page: Page) {
   return page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -257,8 +292,18 @@ test.describe("App Shell on a computer", () => {
     assertCentred(bar, search);
     expect(search!.width).toBeGreaterThanOrEqual(300);
     // The whole hint shows: nothing of it is cut.
-    const hint = page.locator('[data-slot="unit-jump"] button span').first();
-    expect(await hint.evaluate((e) => e.scrollWidth - e.clientWidth)).toBeLessThanOrEqual(0);
+    assertHintWhole(await hintGeometry(page));
+  });
+
+  test("the whole-hint check fails on a search box too narrow for its hint", async ({ page }) => {
+    await page.goto("/inventory");
+    assertHintWhole(await hintGeometry(page));
+    // Break the real page: a box 120 px wide cannot hold «Gõ mã căn…» and the ⌘ K keys.
+    await themKieu(page, {
+      content: '[data-slot="unit-jump"] > span { width: 120px !important; }',
+    });
+    const narrow = await hintGeometry(page);
+    expect(() => assertHintWhole(narrow)).toThrow("search hint is cut");
   });
 
   test("the middle check fails on a box at the end of the bar", async () => {
