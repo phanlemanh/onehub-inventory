@@ -55,6 +55,14 @@
       ]
     },
     {
+      "name": "InDialog",
+      "category": "component",
+      "file": "src/components/candidate/form-dialog.tsx",
+      "level": "organism",
+      "source": "own",
+      "props": ["value"]
+    },
+    {
       "name": "FormDialog",
       "category": "component",
       "file": "src/components/candidate/form-dialog.tsx",
@@ -152,7 +160,7 @@
       "name": "RecordPanel",
       "category": "component",
       "file": "src/components/candidate/record-panel.tsx",
-      "level": "molecule",
+      "level": "organism",
       "source": "own",
       "props": ["ids", "openId", "onNavigate", "render", "returnFocus"]
     },
