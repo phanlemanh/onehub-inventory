@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: []
-status: verified
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-17T01:03:13Z
 design_doc: _acceptance/app-shell-khuon-dau-trang/design.md
