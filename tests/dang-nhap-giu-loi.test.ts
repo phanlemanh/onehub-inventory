@@ -20,7 +20,7 @@ const ROOT = join(__dirname, "..");
 const SIGN_IN_TESTS: Record<string, string> = {
   "tests/e2e-db/login.spec.ts": "a875ed1ef66ece88b9ee230c8928f9065d98faf689bb735a70ddd3d5877c5d7d",
   "tests/e2e-db/va-dang-nhap.spec.ts":
-    "d31454db69357c84a1a802e10c09d5e0c73249ac88a87a9c1dff28f87c8b6cc9",
+    "906240cf41d33759b16237256c6ee498a1dc4d85ae4d15754a9771d0a44427c8",
   "tests/e2e-db/dang-nhap-vai.ts":
     "0f42d8890178da1f80e74d685b2965eee51a249d39016605da56d8a9f056bd2d",
   "tests/e2e/account.spec.ts": "1e0eebd64160d2f4b13c51b5054cbcd29fb7e2714095343fe12b3a82ab040782",
