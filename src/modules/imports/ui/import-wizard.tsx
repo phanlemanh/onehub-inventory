@@ -1,7 +1,7 @@
 "use client";
 // The import screen (row 11, nhap-excel): five steps across the top as ReUI solution-crm-6 lays them out (owner's
 // answer to Hỏi-3). The file is read in the browser; every count shown is the count the server answered.
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Badge } from "@/components/reui/badge";
 import {
@@ -91,6 +91,7 @@ export function ImportWizard() {
   const [result, setResult] = useState<{ id: string; created: number; learned: string[] } | null>(
     null,
   );
+  const fileInput = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(async (t: Table, c: Choices) => {
     setBusy(true);
@@ -213,6 +214,7 @@ export function ImportWizard() {
                     <span className="text-sm font-medium">{busy ? C.reading : C.drop}</span>
                     <span className="text-muted-foreground text-sm">{C.limits}</span>
                     <Input
+                      ref={fileInput}
                       type="file"
                       accept=".xlsx,.csv"
                       aria-label={C.drop}
@@ -223,10 +225,18 @@ export function ImportWizard() {
                     />
                   </label>
                   {problem ? (
-                    <p role="alert" data-state="tep-loi">
-                      {problem}
-                    </p>
+                    <div role="alert" data-state="tep-loi" className="flex items-center gap-3">
+                      <p>{problem}</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInput.current?.click()}
+                      >
+                        {C.chooseAgain}
+                      </Button>
+                    </div>
                   ) : null}
+                  <RecentImports />
                   {table?.otherSheets.length ? (
                     <p className="text-muted-foreground text-sm">{`${C.otherSheets} ${table.otherSheets.join(", ")}`}</p>
                   ) : null}
@@ -420,8 +430,20 @@ export function ImportWizard() {
               {step === 5 && result ? (
                 <div className="flex flex-col gap-2" data-state="xong">
                   <p className="font-medium">{C.done(result.created)}</p>
+                  {marked && marked.keptCount > 0 ? (
+                    <p className="text-muted-foreground text-sm" data-state="giu-chu-goc">
+                      {C.keptCells(marked.keptCount)}
+                    </p>
+                  ) : null}
                   {result.learned.length ? (
-                    <p className="text-muted-foreground text-sm">{`${C.learned}: ${result.learned.length}`}</p>
+                    <div className="flex flex-col gap-1 text-sm">
+                      <p className="text-muted-foreground">{C.learned}</p>
+                      <ul className="list-disc pl-5" data-state="vua-hoc">
+                        {result.learned.map((w) => (
+                          <li key={w}>{w}</li>
+                        ))}
+                      </ul>
+                    </div>
                   ) : null}
                 </div>
               ) : null}
@@ -563,5 +585,36 @@ function UndoImport(props: { id: string; onBanner: (b: Banner) => void; onDone: 
     <Button variant="outline" onClick={() => void run()}>
       {C.undo}
     </Button>
+  );
+}
+
+/** The company's last imports (viewImports); nothing is shown while there is none or the list cannot be read. */
+function RecentImports() {
+  const [rows, setRows] = useState<
+    { id: string; fileName: string; status: string; createdCount: number; createdAt: string }[]
+  >([]);
+  useEffect(() => {
+    let live = true;
+    void answer<typeof rows>(fetch("/api/v1/imports")).then(
+      (r) => live && r.status === 200 && r.body && setRows(r.body),
+    );
+    return () => {
+      live = false;
+    };
+  }, []);
+  if (rows.length === 0) return null;
+  return (
+    <div className="flex flex-col gap-1 text-sm" data-state="gan-day">
+      <p className="font-medium">{C.recent}</p>
+      <ul className="flex flex-col gap-1">
+        {rows.map((r) => (
+          <li key={r.id} className="text-muted-foreground flex gap-3">
+            <span className="text-foreground">{r.fileName}</span>
+            <span>{C.rows(r.createdCount)}</span>
+            <span>{r.status === "undone" ? C.undoneShort : r.createdAt.slice(0, 10)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
