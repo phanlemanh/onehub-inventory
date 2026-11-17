@@ -81,6 +81,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0041 Bản thật ở địa chỉ riêng, Quỹ hàng chỉ để đối chiếu](decisions/0041-ban-that-o-dia-chi-rieng.md)
 - [0042 Cổng chứng minh màn bắt tệp khối tự làm chưa kê, so với nhánh chính bằng danh sách cố định](decisions/0042-cong-bat-khoi-khong-ke.md)
 - [0043 Proxy chỉ chặn trang bản mẫu trên bản dựng thật](decisions/0043-proxy-chi-chan-trang-ban-mau.md)
+- [0044 Thu quyền của các vai khoá công khai Supabase trên mọi đối tượng của kho](decisions/0044-thu-quyen-vai-khoa-cong-khai.md)
 
 ## Incidents
 
