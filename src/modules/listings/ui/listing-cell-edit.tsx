@@ -7,6 +7,7 @@
 import { useState, type KeyboardEvent } from "react";
 
 import type { CellEditSession, GridRow } from "@/components/candidate/data-region";
+import { GRID_COPY } from "@/components/candidate/grid-copy";
 import { FormDialog } from "@/components/candidate/form-dialog";
 import { Badge } from "@/components/reui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,9 @@ import type {
 } from "@/generated/ontology";
 import { statusLabel, statusTone } from "@/lib/format";
 
+import { readCustomValue, sameCustomValue, type CustomKind } from "../custom-rules";
 import {
+  detailsLocked,
   nextStatuses,
   priceAsksAgain,
   priceLocked,
@@ -272,13 +275,153 @@ function FeeEditor({
   );
 }
 
-/** The editor of one inventory cell: price, status or fee inclusion. */
+/** One value of a company's own field set on its cell (row 3g); `null` clears it. */
+export type CustomEdit = {
+  field: `custom.${string}`;
+  custom: string;
+  value: string | number | boolean | null;
+};
+
+/** A company's own field as its cell edits it (row 3g): its code, kind and choices. */
+export interface CustomCellField {
+  code: string;
+  header: string;
+  kind: CustomKind;
+  options: readonly string[];
+}
+
+/** A typed value of a text, number or date field: an input in the cell and the line under it on a value that does not fit. */
+function CustomTextEditor({
+  session,
+  field,
+  labels,
+  onSave,
+}: {
+  session: CellEditSession;
+  field: CustomCellField;
+  labels: CellEditLabels;
+  onSave: (edit: CustomEdit) => void;
+}) {
+  const stored = session.row[session.field];
+  const [text, setText] = useState(
+    session.initialText ??
+      (stored === null || stored === undefined ? "" : COPY.customShown(field.kind, stored)),
+  );
+  const [tried, setTried] = useState(false);
+  const read = readCustomValue(field.kind, text, field.options);
+  const submit = (move?: "next") => {
+    setTried(true);
+    if (!read.ok) return;
+    session.close(move);
+    if (!sameCustomValue(read.value, stored))
+      onSave({ field: `custom.${field.code}`, custom: field.code, value: read.value });
+  };
+  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      submit();
+    } else if (event.key === "Tab" && !event.shiftKey) {
+      event.preventDefault();
+      submit("next");
+    }
+  };
+  const problem = tried && !read.ok ? read.problem : null;
+  return (
+    <>
+      <div className="w-(--anchor-width) rounded-md bg-background ring-2 ring-primary">
+        <Input
+          autoFocus
+          value={text}
+          inputMode={field.kind === "number" ? "decimal" : undefined}
+          placeholder={field.kind === "date" ? COPY.customDatePlaceholder : undefined}
+          data-custom-kind={field.kind}
+          aria-label={COPY.editLabel(
+            labels,
+            field.header,
+            String(session.row["Listing.unitNumber"] ?? ""),
+          )}
+          aria-invalid={problem ? true : undefined}
+          aria-describedby="cell-edit-line"
+          onChange={(event) => {
+            setText(event.target.value);
+            setTried(false);
+          }}
+          onKeyDown={onKeyDown}
+        />
+      </div>
+      {problem ? (
+        <UnderCell alert>
+          <span id="cell-edit-line">{COPY.customProblem(problem)}</span>
+        </UnderCell>
+      ) : null}
+    </>
+  );
+}
+
+/** A choice of a single choice or yes/no field: the list of values, then «Chưa có» to clear it (row 3g). */
+function CustomChoiceEditor({
+  session,
+  field,
+  labels,
+  onSave,
+}: {
+  session: CellEditSession;
+  field: CustomCellField;
+  labels: CellEditLabels;
+  onSave: (edit: CustomEdit) => void;
+}) {
+  const stored = session.row[session.field] ?? null;
+  const values: { value: string | boolean | null; text: string }[] = [
+    ...(field.kind === "boolean"
+      ? [
+          { value: true, text: GRID_COPY.yes },
+          { value: false, text: GRID_COPY.no },
+        ]
+      : field.options.map((o) => ({ value: o, text: o }))),
+    { value: null, text: COPY.customNone },
+  ];
+  const pick = (value: string | boolean | null) => {
+    session.close();
+    if (!sameCustomValue(value, stored))
+      onSave({ field: `custom.${field.code}`, custom: field.code, value });
+  };
+  return (
+    <div
+      role="listbox"
+      data-custom-kind={field.kind}
+      aria-label={COPY.editLabel(
+        labels,
+        field.header,
+        String(session.row["Listing.unitNumber"] ?? ""),
+      )}
+      className="absolute top-0 flex max-h-72 w-max min-w-(--anchor-width) flex-col items-start gap-0.5 overflow-y-auto rounded-md border bg-popover p-1 shadow-md ring-2 ring-primary group-data-[edge=end]/cell-editor:right-0 group-data-[edge=start]/cell-editor:left-0"
+    >
+      {values.map((o, index) => (
+        <Button
+          key={String(o.value)}
+          type="button"
+          variant="ghost"
+          size="sm"
+          role="option"
+          aria-selected={sameCustomValue(o.value, stored)}
+          autoFocus={index === 0}
+          onClick={() => pick(o.value)}
+        >
+          {o.text}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
+/** The editor of one inventory cell: price, status, fee inclusion, or a company's own field (row 3g). */
 export function ListingCellEdit({
   session,
   labels,
   onSave,
   onAsk,
   canActivate = true,
+  custom,
 }: {
   session: CellEditSession;
   labels: CellEditLabels;
@@ -286,7 +429,25 @@ export function ListingCellEdit({
   onAsk: (ask: StatusAsk) => void;
   /** Whether Active is offered for this row (row 10, AC-5); the server checks it again. */
   canActivate?: boolean;
+  /** The company's own field of this cell, when it is one, and where its value goes (row 3g). */
+  custom?: { field: CustomCellField; onSave: (edit: CustomEdit) => void } | undefined;
 }) {
+  if (custom)
+    return custom.field.kind === "single_select" || custom.field.kind === "boolean" ? (
+      <CustomChoiceEditor
+        session={session}
+        field={custom.field}
+        labels={labels}
+        onSave={custom.onSave}
+      />
+    ) : (
+      <CustomTextEditor
+        session={session}
+        field={custom.field}
+        labels={labels}
+        onSave={custom.onSave}
+      />
+    );
   if (session.field === "Listing.listPrice")
     return <PriceEditor session={session} labels={labels} onSave={onSave} />;
   if (session.field === "Listing.feeInclusion")
@@ -446,10 +607,18 @@ function NeedsDialog({
 }
 
 /** Why a row's price and status are locked, shown on the cell; undefined when the row is open to edits. */
-export function lockedReasons(row: GridRow): GridRow["locked"] {
+export function lockedReasons(
+  row: GridRow,
+  /** The company's own columns of the grid (row 3g): a closed or withdrawn listing keeps their values too. */
+  customFields: readonly string[] = [],
+): GridRow["locked"] {
   const status = row["Listing.standardStatus"] as ListingStandardStatus;
   const name = statusLabel(status, row.transaction);
   const locked: NonNullable<GridRow["locked"]> = {};
+  if (detailsLocked(status))
+    for (const field of customFields)
+      locked[field as `custom.${string}`] =
+        status === "Closed" ? COPY.lockedClosed(name) : COPY.lockedFinal(name);
   if (priceLocked(status)) {
     locked["Listing.listPrice"] = COPY.lockedClosed(name);
     locked["Listing.feeInclusion"] = COPY.lockedClosed(name);

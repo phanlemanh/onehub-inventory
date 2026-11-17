@@ -18,6 +18,7 @@ import type {
 import { completeness, unitKind, type CompletenessPart } from "../record";
 import { OPEN_STATUSES } from "../sample";
 
+import { ListingDetailsEdit, useListingDetails } from "./listing-details-edit";
 import { ListingCard, type ListingView } from "./listing-record";
 import { RECORD_COPY, confirmationSentence } from "./record-copy";
 
@@ -69,6 +70,8 @@ export interface RecordLabels {
   viewedListing: string;
   listingsOfUnit: string;
   parts: Readonly<Record<CompletenessPart, string>>;
+  /** «Sửa» (row 3g): with it, the open listing's details are edited in the record by roles that may. */
+  edit?: string;
   furnishedValues: Readonly<Record<ListingFurnished, string>>;
   occupantValues: Readonly<Record<ListingOccupantType, string>>;
   propertyTypeValues: Readonly<Record<string, string>>;
@@ -144,8 +147,16 @@ export function ListingRecordFull({
     const body = top.current?.closest<HTMLElement>('[data-slot="record-panel-body"]');
     if (body) body.scrollTop = 0;
   };
-  const picked = data.listings.find((l) => l.id === pickedId) ?? data.listings[0];
-  if (!picked) return null;
+  const read = data.listings.find((l) => l.id === pickedId) ?? data.listings[0];
+  // The details as the grid last saved them (row 3g), else as the page read them.
+  const details = useListingDetails(read?.id ?? "", {
+    legalStatus: read?.legalStatus,
+    furnished: read?.furnished,
+    financing: read?.financing,
+    occupantType: read?.occupantType,
+  });
+  if (!read) return null;
+  const picked: RecordListing = { ...read, ...details };
   const isNewest = picked.id === newestId;
   const unit = data.unit;
   const done = completeness(picked);
@@ -262,7 +273,30 @@ export function ListingRecordFull({
           ]}
         />
       </Section>
-      <Section slot="listing-offer" title={open ? labels.currentListing : labels.viewedListing}>
+      <Section
+        slot="listing-offer"
+        title={open ? labels.currentListing : labels.viewedListing}
+        action={
+          open && isNewest && labels.edit ? (
+            <ListingDetailsEdit
+              key={picked.id}
+              id={picked.id}
+              unitNumber={unit.unitNumber}
+              details={details}
+              words={{
+                edit: labels.edit,
+                unit: labels.unit,
+                legalStatus: labels.parts.legalStatus,
+                furnished: labels.parts.furnished,
+                financing: labels.parts.financing,
+                occupantType: labels.parts.occupantType,
+                furnishedValues: labels.furnishedValues,
+                occupantValues: labels.occupantValues,
+              }}
+            />
+          ) : undefined
+        }
+      >
         <Rows
           rows={[
             {

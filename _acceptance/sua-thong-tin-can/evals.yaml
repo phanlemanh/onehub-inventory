@@ -1,0 +1,170 @@
+schema_version: 1
+feature_slug: sua-thong-tin-can
+# Ma trận viết trước:
+#   AC-1: 4 vai × 3 lần chào (đang mở mới nhất, lần trước, đã đóng) = 12 ô «có nút / không nút», hằng 12 ghim; 4 vai × PATCH
+#         details = 4 mã (200 ba vai, 403 Quản trị sàn), hằng 4 ghim.
+#   AC-4: 5 kết cục (offline, 409, 401, 500, 403) × hộp = 5 câu ghim, hằng 5.
+#   AC-6: 5 kiểu trường riêng × (bộ sửa đúng kiểu, giá trị đúng lưu, giá trị sai kiểu bị máy chủ từ chối) = 15 ô, hằng 15;
+#         thêm trường đã ngừng và lựa chọn không có = 2 ca từ chối.
+#   AC-7: 7 trả lời (401, 403, 409, 404, 400, 500, thân hỏng) = 7 kết cục ghim, hằng 7; quét src/ tìm bảng mã thứ hai.
+#   AC-9: 2 vật (hộp, ô riêng) × 2 nền = 4 lượt quét; 4 khổ.
+# Bài và ca (tên ca là thông điệp ghim):
+#   src/modules/listings/listings-http.test.ts: details-bon-truong · details-ngoai-tap-400 · details-qua-dai-400 ·
+#     custom-nam-kieu · custom-sai-kieu-400 · custom-ngung-400 · custom-khong-lua-chon-400 · quan-tri-403
+#   src/modules/listings/save-door.test.ts: details-mot-luat-xac-nhan · custom-xoa-khi-trong
+#   src/modules/listings/ui/http-save-door.test.ts: bay-tra-loi-tu-handler-that
+#   src/lib/write-failure.test.ts: mot-bang-ma · nem-va-tra-cung-luat
+#   tests/mot-luat-ghi.test.ts: khong-bang-ma-thu-hai
+#   tests/sua-thong-tin-can.test.tsx: nut-sua-12-o · hop-luu-dem-lai · hop-khong-doi-khong-gui · hop-qua-dai · hop-nam-ket-cuc ·
+#     o-rieng-nam-kieu · o-rieng-sai-kieu · dan-cot-rieng · du-thong-tin-cho-hang-15
+#   tests/bang-hang-khong-du-quyen.test.tsx: khong-du-quyen-tren-man · doi-chung-co-vung-hang · doi-chung-co-ma-can
+#   tests/e2e/sua-thong-tin-can.spec.ts (bốn khổ): sua-bon-truong · hoan-tac-bon-truong · o-rieng-theo-kieu · axe-sang-toi
+#   tests/e2e-db/sua-thong-tin-can.spec.ts: tai-lai-con · quan-tri-khong-nut
+# Cặp phá thử (bản sao; ca tương ứng phải đỏ với thông điệp ghim):
+#   pha-thu-nut-khong-quyen (nút Sửa bỏ PermittedAction)          → «nut-sua-12-o: Quản trị sàn·đang mở»
+#   pha-thu-bo-kiem-rieng (handler bỏ checkCustomValue)            → «custom-sai-kieu-400»
+#   pha-thu-401-thanh-403 (luật đọc 401 như 403)                   → «mot-bang-ma: 401»
+#   pha-thu-bang-ma-thu-hai (http-save-door so status riêng)        → «khong-bang-ma-thu-hai: http-save-door.ts»
+#   pha-thu-dem-rieng (hồ sơ đếm thiếu bằng mảng riêng)             → «du-thong-tin-cho-hang-15»
+#   pha-thu-bo-vung-hang (màn không đủ quyền vẫn vẽ vùng hàng)       → «doi-chung-co-vung-hang»
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx]
+    expected: "exit 0; ca 'nut-sua-12-o' ghim 12 ô (ba vai sửa thấy nút ở lần chào đang mở; Quản trị sàn, lần trước, đã đóng không thấy). Chiều đỏ: pha-thu-nut-khong-quyen → «nut-sua-12-o: Quản trị sàn·đang mở»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E1b
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    layer: backend-effect
+    paths: [src/modules/listings/**, src/app/api/v1/listings/**]
+    expected: "exit 0; ca 'quan-tri-403' (PATCH details của vai không có ô updateListing trả 403, dòng không đổi) và 'details-bon-truong' (ba vai trả 200)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_e2e
+    paths: [src/modules/listings/**, src/app/(app)/inventory/**, tests/e2e/sua-thong-tin-can.spec.ts]
+    expected: "exit 0 ở bốn khổ; ca 'sua-bon-truong' (bốn dòng của mục và số «n/5» đổi sau Lưu) và 'hoan-tac-bon-truong' (Hoàn tác đưa bốn dòng về cũ)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2b
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_e2e_db
+    layer: backend-effect
+    paths: [src/modules/listings/**, src/app/**, tests/e2e-db/sua-thong-tin-can.spec.ts]
+    expected: "exit 0; ca 'tai-lai-con' (đăng nhập [MAU], sửa bốn trường, tải lại trang: hồ sơ vẫn hiện giá trị đã lưu)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2-ui
+    criterion: AC-2
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3487/inventory
+    paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**]
+    steps:
+      - "With the lane H dev server on port 3487 (sample mode), open /inventory?vai=ListAgent at 1440 wide, open the record of the first row, save _acceptance/sua-thong-tin-can/evidence/E2-ho-so-1440.png"
+      - "Press «Sửa» in the «Lần chào đang mở» section, save _acceptance/sua-thong-tin-can/evidence/E2-hop-1440.png; fill the four fields, press «Lưu», save _acceptance/sua-thong-tin-can/evidence/E2-da-luu-1440.png"
+      - "Repeat the three frames at 360 wide as E2-ho-so-360.png, E2-hop-360.png, E2-da-luu-360.png"
+    question: "Nút «Sửa» có nằm ở đầu mục «Lần chào đang mở», bên phải, cùng dáng nút phụ với «Báo sai thông tin» của mục Căn không; hộp có đủ bốn trường; sau Lưu bốn dòng và số «n/5» có đổi theo không, ở cả hai khổ? Nêu khung nào lệch."
+    expected: "Đúng chỗ, đủ bốn trường, giá trị và số đếm đổi ở cả hai khổ"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx]
+    expected: "exit 0; ca 'hop-khong-doi-khong-gui' (0 lần gọi cửa), 'hop-qua-dai' (201 ký tự: câu tại trường, 0 lần gọi), 'details-ngoai-tap-400', 'details-qua-dai-400'. Chiều đỏ: bỏ kiểm độ dài ở hộp → «hop-qua-dai: đã gửi»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/**, src/lib/write-failure.ts, src/components/candidate/use-change.tsx, tests/sua-thong-tin-can.test.tsx]
+    expected: "exit 0; ca 'hop-nam-ket-cuc' ghim năm câu (mất mạng, căn vừa đổi, phiên hết hạn, máy chủ lỗi kèm «Thử lại»; 403 chỉ còn «Thôi») và chữ đã gõ còn nguyên, hằng 5"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx]
+    expected: "exit 0; ca 'du-thong-tin-cho-hang-15' (sau khi lưu Pháp lý và Tình trạng sử dụng, câu «Còn thiếu» không nhắc hai phần ấy và completeness() trên listing đã lưu đồng ý với số trên màn). Chiều đỏ: pha-thu-dem-rieng → «du-thong-tin-cho-hang-15»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    layer: backend-effect
+    paths: [src/modules/listings/**, src/modules/company-config/rules.ts, src/app/api/v1/listings/**]
+    expected: "exit 0; ca 'custom-nam-kieu' (15 ô: năm kiểu × bộ sửa, lưu đúng, từ chối sai kiểu), 'custom-ngung-400', 'custom-khong-lua-chon-400', 'o-rieng-nam-kieu', 'o-rieng-sai-kieu'. Chiều đỏ: pha-thu-bo-kiem-rieng → «custom-sai-kieu-400»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6-ui
+    criterion: AC-6
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3487/inventory
+    paths: [src/modules/listings/ui/**]
+    steps:
+      - "With the lane H dev server on port 3487 (sample mode, whose sample company has custom fields of the five kinds), open /inventory?vai=ListAgent at 1440 wide; for each custom column open the first row's cell and save _acceptance/sua-thong-tin-can/evidence/E6-<kiểu>-1440.png (text, number, date, single_select, boolean)"
+    question: "Mỗi ô có bộ sửa đúng kiểu (ô chữ, ô số, ô ngày, danh sách lựa chọn, Có/Không/Chưa có) cùng khung sửa trên ô của cột Giá không? Nêu kiểu nào sai."
+    expected: "Năm bộ sửa đúng kiểu, cùng khung"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/ui/http-save-door.ts, src/lib/write-failure.ts, src/components/candidate/use-change.tsx, src/modules/listings/listings-http.ts]
+    expected: "exit 0; ca 'bay-tra-loi-tu-handler-that' (bảy trả lời lấy từ createListingsHandlers, bảy kết cục ghim), 'mot-bang-ma', 'nem-va-tra-cung-luat'. Chiều đỏ: pha-thu-401-thanh-403 → «mot-bang-ma: 401»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7b
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/**, tests/mot-luat-ghi.test.ts]
+    expected: "exit 0; ca 'khong-bang-ma-thu-hai' (quét src/: chỉ write-failure.ts so mã trả lời của cửa ghi). Chiều đỏ: pha-thu-bang-ma-thu-hai → «khong-bang-ma-thu-hai: http-save-door.ts»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx, tests/bang-hang-khong-du-quyen.test.tsx]
+    expected: "exit 0; ca 'dan-cot-rieng' (đúng kiểu ở «sẽ đổi», sai kiểu và không có lựa chọn ở «sai kiểu» kèm lý do, chữ rơi vào Về tay theo Hỏi-2), 'doi-chung-co-vung-hang', 'doi-chung-co-ma-can'. Chiều đỏ: pha-thu-bo-vung-hang → «doi-chung-co-vung-hang»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_e2e
+    paths: [src/modules/listings/ui/**, tests/e2e/sua-thong-tin-can.spec.ts]
+    expected: "exit 0 ở bốn khổ; ca 'axe-sang-toi' (hộp và ô riêng, nền sáng và tối, 0 lỗi nghiêm trọng) và tiêu điểm về «Sửa» khi đóng hộp"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/modules/listings/ui/**]
+    expected: "exit 0; không mã màu thô trên tệp giao diện mà vòng chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

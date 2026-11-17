@@ -4,14 +4,17 @@
 import type { PasteChangeLine, PasteOutLine } from "@/components/candidate/paste-preview";
 import type { FieldKey } from "@/components/candidate/column-kind";
 import type { GridRow, RegionPaste } from "@/components/candidate/data-region";
+import { GRID_COPY } from "@/components/candidate/grid-copy";
 import { PASTE_COPY } from "@/components/candidate/paste-copy";
 import type { ListingStandardStatus } from "@/generated/ontology";
 import { formatMoney, statusLabel } from "@/lib/format";
 
+import { readCustomValue, sameCustomValue } from "../custom-rules";
 import { readPastePrice, readPasteStatus, readStatusText } from "../paste-rules";
-import type { PriceOrStatusChange } from "../save-door";
+import type { CustomFieldChange, PriceOrStatusChange } from "../save-door";
 
-import type { CellEditLabels } from "./cell-edit-copy";
+import { CELL_EDIT_COPY, type CellEditLabels } from "./cell-edit-copy";
+import type { CustomCellField } from "./listing-cell-edit";
 import { pasteWords } from "./listing-paste-copy";
 
 const PRICE = "Listing.listPrice";
@@ -29,8 +32,8 @@ const UNIT_FACTS: readonly FieldKey[] = [
 /** One write the preview may apply, keyed by its line's id. */
 export interface PasteWrite {
   row: GridRow;
-  field: typeof PRICE | typeof STATUS;
-  change: PriceOrStatusChange;
+  field: typeof PRICE | typeof STATUS | `custom.${string}`;
+  change: PriceOrStatusChange | CustomFieldChange;
   undoable: boolean;
 }
 
@@ -60,6 +63,8 @@ export function planPaste(
   labels: CellEditLabels,
   headerOf: (field: FieldKey) => string,
   computed: readonly FieldKey[] = [],
+  /** The company's own fields the cells edit (row 3g): a paste takes them by their kind. */
+  customs: ReadonlyMap<string, CustomCellField> = new Map(),
 ): PastePlan {
   const say = pasteWords(labels);
   const changes: PasteChangeLine[] = [];
@@ -79,6 +84,46 @@ export function planPaste(
     }
     if (cell.group !== undefined) {
       skipped.push({ id, where: PASTE_COPY.groupRow(cell.group), raw, why: say.other });
+      continue;
+    }
+    const custom = customs.get(field);
+    if (custom) {
+      // A company's own field takes a pasted word by its kind (row 3g), with the cell's one rule.
+      const read = readCustomValue(custom.kind, raw, custom.options);
+      if (!read.ok) {
+        wrong.push({ ...line, why: CELL_EDIT_COPY.customProblem(read.problem) });
+        continue;
+      }
+      if (sameCustomValue(read.value, row[field])) {
+        same += 1;
+        continue;
+      }
+      if (!cell.open) {
+        skipped.push({ ...line, why: row.locked?.[field] ?? say.notAllowed });
+        continue;
+      }
+      const shown = (v: unknown) =>
+        v === null || v === undefined
+          ? "—"
+          : typeof v === "boolean"
+            ? v
+              ? GRID_COPY.yes
+              : GRID_COPY.no
+            : CELL_EDIT_COPY.customShown(custom.kind, v);
+      changes.push({
+        id,
+        where: line.where,
+        field: line.field,
+        from: shown(row[field]),
+        to: shown(read.value),
+      });
+      writes.set(id, {
+        row,
+        field: `custom.${custom.code}`,
+        change: { field: "customField", code: custom.code, value: read.value },
+        undoable: true,
+      });
+      rows.add(row.id);
       continue;
     }
     if (field !== PRICE && field !== STATUS) {

@@ -3,6 +3,7 @@
 import type { ListingStandardStatus, ListingWithdrawnReason } from "@/generated/ontology";
 import { formatMoney, statusLabel } from "@/lib/format";
 import { WITHDRAWN_REASONS } from "../edit-rules";
+import type { CustomKind, CustomProblem } from "../custom-rules";
 import type { GridRow } from "@/components/candidate/data-region";
 
 type TransactionKind = NonNullable<GridRow["transaction"]>;
@@ -46,7 +47,7 @@ export function word(
 }
 
 /** Why a write did not go through (the write door's outcomes other than saved). */
-type Failure = "offline" | "conflict" | "refused" | "fault";
+type Failure = "offline" | "conflict" | "refused" | "expired" | "fault";
 
 const exact = new Intl.NumberFormat("vi-VN");
 
@@ -92,15 +93,38 @@ export const CELL_EDIT_COPY = {
   saveFailed: (what: string, why: Failure) =>
     why === "fault"
       ? `Chưa lưu được ${what} — máy chủ báo lỗi. Ô đã về giá trị cũ; thử lại sau ít phút.`
-      : why === "conflict"
-        ? `Chưa lưu ${what}: căn vừa đổi từ chỗ khác. Ô đã về giá trị cũ; tải lại trang để thấy bản mới.`
-        : `Chưa lưu được ${what} — mất kết nối mạng. Ô đã về giá trị cũ; có mạng lại thì sửa lại.`,
+      : why === "expired"
+        ? `Chưa lưu được ${what} — phiên đăng nhập đã hết. Ô đã về giá trị cũ; đăng nhập lại rồi sửa lại.`
+        : why === "conflict"
+          ? `Chưa lưu ${what}: căn vừa đổi từ chỗ khác. Ô đã về giá trị cũ; tải lại trang để thấy bản mới.`
+          : `Chưa lưu được ${what} — mất kết nối mạng. Ô đã về giá trị cũ; có mạng lại thì sửa lại.`,
   undoFailed: (labels: CellEditLabels, unit: string, now: string, why: Failure) =>
     why === "offline"
       ? `Chưa hoàn tác được vì mất kết nối mạng. ${word(labels, "Unit")} ${unit} vẫn là ${now}; có mạng lại thì bấm «Thử lại».`
       : why === "conflict"
         ? `Chưa hoàn tác được: căn vừa đổi từ chỗ khác. ${word(labels, "Unit")} ${unit} vẫn là ${now}.`
-        : `Chưa hoàn tác được. ${word(labels, "Unit")} ${unit} vẫn là ${now}.`,
+        : why === "expired"
+          ? `Chưa hoàn tác được vì phiên đăng nhập đã hết. ${word(labels, "Unit")} ${unit} vẫn là ${now}; đăng nhập lại rồi bấm «Thử lại».`
+          : `Chưa hoàn tác được. ${word(labels, "Unit")} ${unit} vẫn là ${now}.`,
+  /** A stored value of a company's own field as its cell editor starts from it (row 3g). */
+  customShown: (kind: CustomKind, value: unknown): string =>
+    kind === "date" && typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)
+      ? `${value.slice(8, 10)}/${value.slice(5, 7)}/${value.slice(0, 4)}`
+      : kind === "number" && typeof value === "number"
+        ? exact.format(value)
+        : String(value),
+  customDatePlaceholder: "dd/mm/yyyy",
+  customNone: "Chưa có",
+  customProblem: (problem: CustomProblem): string =>
+    problem === "too-long"
+      ? "Dài quá 500 ký tự."
+      : problem === "not-a-number"
+        ? "Gõ một số, như 12 hoặc 1,5."
+        : problem === "not-a-date"
+          ? "Gõ ngày như 25/12/2026."
+          : problem === "not-an-option"
+            ? "Không có lựa chọn này."
+            : "Gõ Có hoặc Không.",
   lockedClosed: (status: string) => `${status} — giữ nguyên như lúc bán`,
   lockedFinal: (status: string) => `${status} là nấc cuối`,
 } as const;

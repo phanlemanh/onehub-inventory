@@ -42,6 +42,7 @@ export const PASTE_COPY = {
     conflict: "dòng vừa đổi từ chỗ khác, tải lại trang để thấy bản mới",
     refused: "không đủ quyền",
     fault: "máy chủ báo lỗi",
+    expired: "phiên đăng nhập đã hết, đăng nhập lại",
   },
   undoFailed: (still: string, why: string) =>
     `Chưa hoàn tác được — ${why}. Vẫn mang giá trị mới: ${still}.`,

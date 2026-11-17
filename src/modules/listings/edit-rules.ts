@@ -4,6 +4,8 @@
 // (onehub-quy-hang commit 1729b11f, packages/core/src/listing/status.ts), approved at row 4's scope gate (Hỏi-3).
 import type {
   Listing,
+  ListingFurnished,
+  ListingOccupantType,
   ListingStandardStatus,
   ListingWithdrawnReason,
 } from "../../generated/ontology";
@@ -147,3 +149,29 @@ export const WITHDRAWN_REASONS: readonly ListingWithdrawnReason[] = [
   "owner_changed_mind",
   "unreachable",
 ];
+
+/** Longest legal status or financing a listing takes (row 3g): one line of words. */
+export const DETAILS_TEXT_LIMIT = 200;
+
+/** The four parts of a listing edited together in its record (row 3g), the order the record shows them. */
+export const DETAIL_FIELDS = ["legalStatus", "furnished", "financing", "occupantType"] as const;
+export type DetailField = (typeof DETAIL_FIELDS)[number];
+
+/** The fixed values of furnished and occupant type (RESO 2.1; Hỏi-1 of row 3b). */
+export const FURNISHED_VALUES: readonly ListingFurnished[] = [
+  "Furnished",
+  "Partially",
+  "Unfurnished",
+];
+export const OCCUPANT_VALUES: readonly ListingOccupantType[] = ["Owner", "Tenant", "Vacant"];
+
+/** Only an open listing has its details edited (row 3g): a closed or withdrawn one keeps them as they were. */
+export const detailsLocked = (status: ListingStandardStatus): boolean =>
+  status === "Closed" || status === "Withdrawn";
+
+/** A typed legal status or financing as it is kept: ends trimmed, empty is none. */
+export function detailText(raw: string): { ok: true; value: string | null } | { ok: false } {
+  const value = raw.trim();
+  if (value.length > DETAILS_TEXT_LIMIT) return { ok: false };
+  return { ok: true, value: value === "" ? null : value };
+}

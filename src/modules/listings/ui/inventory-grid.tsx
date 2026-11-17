@@ -14,6 +14,7 @@ import type { Listing } from "@/generated/ontology";
 
 import type { ListingSaveDoor } from "../save-door";
 import { httpSaveDoor } from "./http-save-door";
+import { DetailsEditProvider, type DetailsEditApi } from "./listing-details-edit";
 import type { SavedView } from "../saved-view";
 
 import {
@@ -178,6 +179,16 @@ export function InventoryGrid({
     }),
     [headers, feeHeaders, inclusionOf],
   );
+  // The company's own fields whose cells edit by kind (row 3g): those the page gave a field kind.
+  const customFields = useMemo(
+    () =>
+      (customColumns ?? []).flatMap((c) =>
+        c.fieldKind
+          ? [{ code: c.code, header: c.header, kind: c.fieldKind, options: c.options ?? [] }]
+          : [],
+      ),
+    [customColumns],
+  );
   const edit = useListingCellEdit({
     rows,
     listings,
@@ -188,12 +199,28 @@ export function InventoryGrid({
     noActivate,
     feeEditable: feeHeaders !== undefined && live,
     onServerWork: live ? () => router.refresh() : undefined,
+    customFields,
   });
+  // The record edits the open listing's details through the same door (row 3g); a save re-renders the record.
+  const [detailsTick, setDetailsTick] = useState(0);
+  const { writeListing, savedListing } = edit;
+  const detailsApi = useMemo<DetailsEditApi | null>(
+    () =>
+      listings && editLabels
+        ? {
+            write: writeListing,
+            saved: savedListing,
+            changed: () => setDetailsTick((n) => n + 1),
+            tick: detailsTick,
+          }
+        : null,
+    [listings, editLabels, writeListing, savedListing, detailsTick],
+  );
   const status: RegionStatus = current === "empty" ? "ready" : current;
   const shown =
     current === "empty" ? [] : current === "partial" ? edit.rows.slice(0, PARTIAL_ROWS) : edit.rows;
   return (
-    <>
+    <DetailsEditProvider api={detailsApi}>
       {edit.dialogs}
       <DataRegion
         // Pressing the open entry of the second column again opens it afresh, its unsaved changes dropped.
@@ -234,6 +261,6 @@ export function InventoryGrid({
         cellEdit={edit.cellEdit}
         phoneList={phoneList}
       />
-    </>
+    </DetailsEditProvider>
   );
 }

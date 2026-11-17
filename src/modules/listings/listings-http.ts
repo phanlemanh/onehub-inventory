@@ -1,5 +1,5 @@
 // Listings over HTTP (row 10): PATCH /api/v1/listings/[id] changes one listing by one change — its price, its status
-// with what the status needs, or its fee inclusion. Plain Request in, Response out, so the route file stays one line and
+// with what the status needs, its fee inclusion, its four details or one custom value (row 3g). Plain Request in, Response out, so the route file stays one line and
 // tests call this directly. The door opens with the action of the change (activateListing for a move to Active,
 // updateListing otherwise) before any data is touched; the rules of the move are the ones of edit-rules, run through
 // applyChange; the write names the version the person edited, so a change made in between is a conflict, never
@@ -12,9 +12,14 @@ import type { DbClient, DbPool, DoorError, OpenedDoor } from "@/modules/identity
 import type { Listing } from "../../generated/ontology";
 
 import { LISTING_COLUMNS, toListing, type ListingRow } from "./inventory-read";
-import { applyChange, type ListingChange } from "./save-door";
+import { applyChange, type CustomCheck, type ListingChange } from "./save-door";
 import { STANDARD_STATUSES } from "./sample";
-import { WITHDRAWN_REASONS } from "./edit-rules";
+import {
+  DETAILS_TEXT_LIMIT,
+  FURNISHED_VALUES,
+  OCCUPANT_VALUES,
+  WITHDRAWN_REASONS,
+} from "./edit-rules";
 
 export type ListingsErrorCode = DoorError | "not-found" | "bad-request" | "invalid" | "conflict";
 
@@ -51,6 +56,32 @@ const Change = z.discriminatedUnion("field", [
         .transform((v) => v as Listing["withdrawnReason"]),
     })
     .strict(),
+  // Row 3g: the four details of the record, each optional, null clears; words already trimmed, at most 200.
+  z
+    .object({
+      field: z.literal("details"),
+      legalStatus: z.string().trim().min(1).max(DETAILS_TEXT_LIMIT).nullable().optional(),
+      furnished: z
+        .enum(FURNISHED_VALUES as [string, ...string[]])
+        .nullable()
+        .optional()
+        .transform((v) => v as Listing["furnished"] | null | undefined),
+      financing: z.string().trim().min(1).max(DETAILS_TEXT_LIMIT).nullable().optional(),
+      occupantType: z
+        .enum(OCCUPANT_VALUES as [string, ...string[]])
+        .nullable()
+        .optional()
+        .transform((v) => v as Listing["occupantType"] | null | undefined),
+    })
+    .strict(),
+  // Row 3g: one value of one of the company's own fields; its kind is checked by the company layer's rule.
+  z
+    .object({
+      field: z.literal("customField"),
+      code: z.string().min(1).max(64),
+      value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
+    })
+    .strict(),
 ]);
 const Body = z.object({ version: z.number().int().min(1), change: Change }).strict();
 
@@ -66,9 +97,21 @@ export interface ListingsDeps {
   now?: () => Date;
 }
 
-export interface ListingsHandlers {
-  change(req: Request, id: string): Promise<Response>;
+/** What one request brings besides the body (row 3g): how the company's own fields take a value. */
+export interface ChangeOptions {
+  /**
+   * The company layer's value rule (checkCustomValue of company-config) for the signed-in company, handed in by the
+   * route: listings does not depend on company-config (architecture/modules.yaml). Absent: no custom value is taken.
+   */
+  customCheck?: () => Promise<CustomCheck>;
 }
+
+export interface ListingsHandlers {
+  change(req: Request, id: string, options?: ChangeOptions): Promise<Response>;
+}
+
+/** Without the company layer's rule no custom value goes in: the field reads as unknown. */
+const NO_CUSTOM: CustomCheck = () => ({ ok: false, reason: "field-retired" });
 
 const INSUFFICIENT_PRIVILEGE = "42501";
 
@@ -87,7 +130,7 @@ export const actionOf = (change: ListingChange): ActionName =>
 
 export function createListingsHandlers(deps: ListingsDeps): ListingsHandlers {
   return {
-    async change(req, id) {
+    async change(req, id, options = {}) {
       try {
         if (!z.uuid().safeParse(id).success) return error("not-found");
         let input: z.infer<typeof Body>;
@@ -102,6 +145,10 @@ export function createListingsHandlers(deps: ListingsDeps): ListingsHandlers {
         const door = await deps.door(req, actionOf(change));
         if (typeof door === "string") return error(door);
         const at = (deps.now?.() ?? new Date()).toISOString();
+        const custom =
+          change.field === "customField"
+            ? ((await options.customCheck?.()) ?? NO_CUSTOM)
+            : undefined;
         const outcome = await deps.withCompany<Outcome>(door.pool, door.ctx, async (c) => {
           const { rows } = await c.query(
             `select ${LISTING_COLUMNS} from listings l join listing_units u on u.listing_id = l.id
@@ -120,13 +167,15 @@ export function createListingsHandlers(deps: ListingsDeps): ListingsHandlers {
             listing.listAgentKey !== door.ctx.userId
           )
             return { kind: "forbidden" };
-          const next = applyChange(listing, change, at);
+          const next = applyChange(listing, change, at, custom);
           if (!next.ok) return { kind: "invalid", why: next.why };
           const l = next.listing;
           const r = await c.query(
             `update listings
                 set list_price = $3, standard_status = $4, close_price = $5, close_date = $6, withdrawn_reason = $7,
-                    fee_inclusion = $8, last_confirmed_at = $9, version = version + 1, updated_at = now()
+                    fee_inclusion = $8, last_confirmed_at = $9, legal_status = $10, furnished = $11,
+                    financing = $12, occupant_type = $13, custom_fields = $14::jsonb,
+                    version = version + 1, updated_at = now()
               where id = $1 and version = $2
             returning id`,
             [
@@ -139,6 +188,11 @@ export function createListingsHandlers(deps: ListingsDeps): ListingsHandlers {
               l.withdrawnReason ?? null,
               l.feeInclusion ?? null,
               at,
+              l.legalStatus ?? null,
+              l.furnished ?? null,
+              l.financing ?? null,
+              l.occupantType ?? null,
+              JSON.stringify(l.customFields ?? {}),
             ],
           );
           // A role whose cell does not let it change listings sees no row to change.

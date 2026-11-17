@@ -1,9 +1,12 @@
 // Pure parts of the inventory grid (roadmap row 2): rows, columns and the state a URL asks for. Safe on the server.
 import { customColumn, typedColumn, type TypedColumn } from "@/components/candidate/column-kind";
+
 import { STATUS_ORDER, foldText, type ColumnFilters } from "@/components/candidate/grid-view";
 import type { GridRow, RegionStatus } from "@/components/candidate/data-region";
 import type { DisplayKind } from "@/generated/display";
 import type { Listing, ListingUnit, Unit } from "@/generated/ontology";
+
+import type { CustomKind } from "../custom-rules";
 
 /** Region states a development build may open with `?state=`; anything else is the loaded grid. */
 const STATE_PARAMS = ["loading", "empty", "error", "partial", "forbidden"] as const;
@@ -77,6 +80,9 @@ export interface InventoryCustomColumn {
   code: string;
   header: string;
   kind: DisplayKind;
+  /** The field's own kind and choices (row 3g): with them the cell edits and takes a paste by that kind. */
+  fieldKind?: CustomKind;
+  options?: readonly string[];
 }
 
 /** The worked-out net-to-seller value of a row (row 19): not a field of the model, so it is keyed like a computed column. */
@@ -109,7 +115,7 @@ export function inventoryColumns(
   return [
     ...standard,
     ...(fees ? [typedColumn({ field: FEE_INCLUSION_FIELD, header: fees.feeInclusion })] : []),
-    ...custom.map((c) => customColumn(c)),
+    ...custom.map((c) => customColumn({ code: c.code, header: c.header, kind: c.kind })),
   ];
 }
 
