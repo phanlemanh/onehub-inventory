@@ -320,7 +320,7 @@ actions:
     scope: { ListAgent: own, TeamLead: company }
     doors:
       api: ["POST /api/v1/imports/preview", "POST /api/v1/imports"]
-      db: ["table import_runs insert"]
+      db: ["table import_runs insert", "function app.import_list_agents()"]
 
   - name: viewImports
     description: See the company's recent imports and what each one added, taught and kept as written.

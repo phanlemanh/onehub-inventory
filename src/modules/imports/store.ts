@@ -45,6 +45,26 @@ export interface StoredLearned extends LearnedIds {
   unitCodeIds: string[];
 }
 
+/**
+ * A RunAs on the caller's transaction where every store call sits in its own savepoint: the company-layer store turns a
+ * refused write (an item the company already has) into a result instead of an error, which would otherwise leave the
+ * whole import's transaction aborted.
+ */
+export function savepointRun(c: Queryable): RunAs {
+  let n = 0;
+  return async (fn) => {
+    const name = `nhap_${(n += 1)}`;
+    await c.query(`savepoint ${name}`);
+    const result = await fn(c as never);
+    try {
+      await c.query(`release savepoint ${name}`);
+    } catch {
+      await c.query(`rollback to savepoint ${name}`);
+    }
+    return result;
+  };
+}
+
 const today = () => new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
 
 /** The listing id of one row of one import: the same row sent again gets the same id, so a resend never doubles it. */
@@ -95,6 +115,30 @@ async function context(c: Queryable, table: ImportTable, choices: Choices) {
   return { layer, units, listed };
 }
 
+/**
+ * The name of the list agent who keeps the imported units: a list agent of the company through
+ * app.import_list_agents() — the owner's choice of 2026-11-17 for team leads (migration 016): names only, list agents
+ * only, the current company only — or one's own name (one's own member row is readable). Null otherwise.
+ */
+export async function agentName(
+  c: Queryable,
+  self: string | null,
+  agent: string,
+): Promise<string | null> {
+  const listed = (
+    await c.query(`select name from app.import_list_agents() where user_id = $1`, [agent])
+  ).rows[0] as { name: string } | undefined;
+  if (listed) return listed.name;
+  const own = (
+    await c.query(
+      `select name from company_members where user_id = $1 and 'ListAgent' = any (roles)
+         and ($2::uuid is null or user_id = $2::uuid)`,
+      [agent, self],
+    )
+  ).rows[0] as { name: string } | undefined;
+  return own?.name ?? null;
+}
+
 export async function previewImport(
   c: Queryable,
   table: ImportTable,
@@ -126,11 +170,8 @@ export async function openImport(
   const got: Counts = { ...marked.counts, createCount: marked.createCount };
   if ((Object.keys(got) as (keyof Counts)[]).some((k) => got[k] !== input.expected[k]))
     return { ok: false, problem: "counts-changed" };
-  const agent = await c.query(
-    `select 1 from company_members where user_id = $1 and 'ListAgent' = any (roles)`,
-    [people.listAgentUserId],
-  );
-  if (agent.rows.length === 0) return { ok: false, problem: "bad-agent" };
+  if (!(await agentName(c, people.importedBy, people.listAgentUserId)))
+    return { ok: false, problem: "bad-agent" };
   const id = createHash("sha256").update(`${Date.now()}:${Math.random()}`).digest("hex");
   const runId = `${id.slice(0, 8)}-${id.slice(8, 12)}-4${id.slice(13, 16)}-8${id.slice(17, 20)}-${id.slice(20, 32)}`;
   await c.query(
@@ -213,12 +254,11 @@ export async function writeBatch(
   if (!run) return { ok: false, problem: "not-found" };
   if (run.status !== "open") return { ok: false, problem: "closed" };
   if (run.batches_done.includes(input.batchNo)) return { ok: true, created: 0, done: false };
-  const runAs: RunAs = (fn) => fn(c as never);
+  const runAs = savepointRun(c);
   const marked = await previewImport(c, input, input.choices);
   if (marked.counts.block > 0) return { ok: false, problem: "blocked-cells" };
-  const agent = (
-    await c.query(`select name from company_members where user_id = $1`, [run.list_agent_user_id])
-  ).rows[0] as { name: string };
+  const agentFullName = await agentName(c, null, run.list_agent_user_id);
+  if (!agentFullName) return { ok: false, problem: "not-found" };
   const learned = run.learned;
   const kept: Kept[] = [];
   const items: NewListing[] = [];
@@ -285,7 +325,7 @@ export async function writeBatch(
       id: listingIdOf(runId, input.rowOffset + r),
       unit,
       listAgentUserId: run.list_agent_user_id,
-      listAgentFullName: agent.name,
+      listAgentFullName: agentFullName,
       standardStatus: "Incomplete",
       listPrice: null,
       feeInclusion: null,
@@ -499,7 +539,7 @@ export async function undoImport(c: Queryable, runId: string, by: string): Promi
   const run = await lockRun(c, runId);
   if (!run) return { ok: false, problem: "not-found" };
   if (run.status === "undone") return { ok: false, problem: "already-undone" };
-  const runAs: RunAs = (fn) => fn(c as never);
+  const runAs = savepointRun(c);
   const { removed, kept } = await removeImportListings(c, runId);
   const l = run.learned;
   await retireLearned(runAs, l);

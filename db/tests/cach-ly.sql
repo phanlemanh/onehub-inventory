@@ -603,8 +603,9 @@ end $$;
 -- 19. Privileged functions are a written list (Ngoài-4, 14, 19): a SECURITY DEFINER function runs as its owner, so one
 --     the API role can call — directly or through PUBLIC, which every new function gets by default — or that a trigger
 --     on a table the role can write calls, must be listed here with its owner and a pinned search_path. The list is the
---     identity exception the owner approved: row 8 (dang-nhap-ma-email#d-20261111T052230Z-14) and row 9
---     (moi-nguoi-gan-vai#d-20261111T084753Z-14). An 11th function needs the owner's word first.
+--     identity exception the owner approved: row 8 (dang-nhap-ma-email#d-20261111T052230Z-14), row 9
+--     (moi-nguoi-gan-vai#d-20261111T084753Z-14) and row 11 (nhap-excel#d-20261117T064233Z-63). A 12th function needs the
+--     owner's word first.
 create temp table ham_cho_phep (lich text not null, chu name not null, duyet text not null);
 insert into ham_cho_phep values
   ('app.login_request_code', 'quy_hang_identity', 'dang-nhap-ma-email#d-20261111T052230Z-14'),
@@ -616,7 +617,9 @@ insert into ham_cho_phep values
   ('app.member_roles', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14'),
   ('app.member_list', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14'),
   ('app.member_invite', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14'),
-  ('app.member_set_roles', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14');
+  ('app.member_set_roles', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14'),
+  -- 016_nhap_excel_dau_chu.sql (hàng 11): the owner's word «Cho thấy (lối A)», 2026-11-17.
+  ('app.import_list_agents', 'quy_hang_identity', 'nhap-excel#d-20261117T064233Z-63');
 do $$
 declare r record; k int := 0;
 begin
@@ -928,11 +931,15 @@ insert into catalog_units (unit_key, upi, subdivision_key, building_key, buildin
 insert into identity.users (id, email, name) values
   ('00000000-0000-4000-8000-0000000000a2', 'nhap-a@example.test', '[Tên]'),
   ('00000000-0000-4000-8000-0000000000a3', 'nhap-a2@example.test', '[Tên]'),
-  ('00000000-0000-4000-8000-0000000000b2', 'nhap-b@example.test', '[Tên]');
+  ('00000000-0000-4000-8000-0000000000b2', 'nhap-b@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000a4', 'nhap-tl-a@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000b4', 'nhap-tl-b@example.test', '[Tên]');
 insert into company_members (company_id, user_id, name, roles) values
   ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a2', '[Tên]', '{ListAgent}'),
   ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a3', '[Tên] 02', '{ListAgent}'),
-  ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-0000000000b2', '[Tên]', '{ListAgent}');
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a4', '[Tên] TL', '{TeamLead}'),
+  ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-0000000000b2', '[Tên]', '{ListAgent}'),
+  ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-0000000000b4', '[Tên] TL B', '{TeamLead}');
 insert into import_runs (id, company_id, imported_by, list_agent_user_id, file_name, signature, row_count) values
   ('00000000-0000-4000-8000-0000000c0001', '00000000-0000-4000-8000-00000000000a',
    '00000000-0000-4000-8000-0000000000a2', '00000000-0000-4000-8000-0000000000a2', 'a.xlsx', '{ma can}', 2),
@@ -988,6 +995,21 @@ begin
   delete from listings where id = '00000000-0000-4000-8000-0000000c0011';
   get diagnostics n = row_count;
   if n <> 1 then raise exception 'HỎNG nhap-excel-theo-san: đối chứng — người nhập xoá được % lần chào của lần nhập', n; end if;
+  -- The list agents a team lead may pick (016): A's team lead sees A's two list agents, names only; a list agent (own
+  -- scope) sees nothing; B's team lead sees only B's.
+  select count(*) into n from app.import_list_agents();
+  if n <> 0 then raise exception 'HỎNG nhap-excel-theo-san: đầu chủ (của tôi) thấy % đầu chủ qua hàm', n; end if;
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a4', true);
+  select count(*) into n from app.import_list_agents()
+   where user_id in ('00000000-0000-4000-8000-0000000000a2', '00000000-0000-4000-8000-0000000000a3');
+  if n <> 2 then raise exception 'HỎNG nhap-excel-theo-san: đối chứng — trưởng nhóm sàn A thấy % đầu chủ của A', n; end if;
+  select count(*) into n from app.import_list_agents();
+  if n <> 2 then raise exception 'HỎNG nhap-excel-theo-san: trưởng nhóm sàn A thấy % người qua hàm, phải đúng 2', n; end if;
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000b4', true);
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000b', true);
+  select count(*) into n from app.import_list_agents() where user_id = '00000000-0000-4000-8000-0000000000a2';
+  if n <> 0 then raise exception 'HỎNG nhap-excel-theo-san: trưởng nhóm sàn B thấy % đầu chủ của A', n; end if;
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000a', true);
   -- B sees none of A's imports.
   perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000b2', true);
   perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000b', true);

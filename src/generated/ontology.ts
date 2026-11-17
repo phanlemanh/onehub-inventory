@@ -1278,7 +1278,7 @@ export const ACTIONS: readonly ActionSpec[] = [
     states: [],
     doors: {
       api: ["POST /api/v1/imports/preview", "POST /api/v1/imports"],
-      db: ["table import_runs insert"],
+      db: ["table import_runs insert", "function app.import_list_agents()"],
     },
   },
   {

@@ -12,6 +12,8 @@ const recorder = (rows: unknown[][]) => {
   return {
     texts,
     query: async (text: string) => {
+      if (/^(savepoint|release savepoint|rollback to savepoint)/.test(text))
+        return { rows: [], rowCount: 0 };
       texts.push(text.replace(/\s+/g, " ").trim().slice(0, 40));
       const r = rows[i++] ?? [];
       return { rows: r, rowCount: r.length };
