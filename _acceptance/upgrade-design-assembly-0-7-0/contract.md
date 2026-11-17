@@ -5,7 +5,7 @@ slug: upgrade-design-assembly-0-7-0
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci]
-status: verified
+status: signed-off
 approved_by: Phan Le Manh
 approved_at: 2026-11-17
 design_doc: docs/superpowers/specs/2026-11-17-upgrade-design-assembly-0-7-0-design.md
@@ -130,3 +130,14 @@ coverage-scan».
 - Nền hạ tầng lúc mở vòng: `make check` xanh, còn `npm run build` và `make e2e` đỏ vì `node_modules` ở đây là bản sao của
   checkout chính với Next 16.4.2, trong khi lockfile ở `69253032` đòi 16.4.6 (`duong-nen.md`). Đây không phải lỗi của
   commit; sửa bằng `make setup`, việc cần chủ kho cho phép cài gói.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-17:
+  - Ngoài-2: Sau khi sửa sổ mà chưa vẽ lại, cổng chứng minh màn có thể chấm theo bản sao cũ thay vì thư mục mảnh.
+  - Ngoài-3: Chạy riêng cổng chứng minh màn trên bản tải mới chưa vẽ sổ linh kiện thì một linh kiện chưa kê vẫn báo xanh.
+  - Ngoài-4: Bài so bảng vai × màn × nút không còn đỏ được vì bảng luôn được vẽ lại trước bài kiểm, mà lời chú vẫn hứa điều ấy.
+  - Ngoài-5: Kho chưa có trang quyết định nói vì sao sổ ra khỏi git, và trang 0034 còn mô tả một phép kiểm không còn đúng.
+  - Ngoài-6: Liên kết đầu trang wiki và vài lệnh make đọc tệp dẫn xuất mà bản tải mới chưa có, nên chạy lẻ thì đỏ.
+  - Ngoài-7: Công cụ quét bí mật báo hai cảnh báo giả trong tệp hồ sơ, chưa có ngoại lệ.
+  - Ngoài-8: Tệp hồ sơ có đường dẫn tuyệt đối mang tên người dùng của máy.
+  - Ngoài-11: Chạy riêng `make ontology` hay `make coverage-matrix` trên bản tải mới báo đỏ với lời chỉ sai nguyên nhân.
+  - Ngoài-13: Đổi quyền làm khác nút hiển thị có thể không bị bắt sớm, vì bảng không còn được so trong pull request.
+  - Ngoài-16: `make design` và `make coverage-matrix` đọc tệp dẫn xuất mà không tự vẽ; `make check` xanh chỉ nhờ thứ tự đích.
