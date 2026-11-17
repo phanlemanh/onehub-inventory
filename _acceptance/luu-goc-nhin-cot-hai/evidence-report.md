@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 360a005d0fa127ac09108547e7df3f7d5492f98c
+verified_commit: 8b5e18f36d0e6f31f937a53467c20560fe51a0ef
 human_signoff: Manh Phan 2026-11-13
 ---
 
@@ -246,3 +246,7 @@ Round 2: E2, E3, E5, E6, E7, E8, E9, E15, E16, E19 chay lai tren commit 8f04f8e,
 ### Re-pin lần 1 — 2026-11-13, do sửa cảnh báo CodeQL ở bài trình duyệt và ghi số đo vòng sau khi verified
 run_id: repin-20261113T034533Z-23967
 sha: 360a005d0fa127ac09108547e7df3f7d5492f98c · suites: 3 lệnh exit 0 · evals: 18/18 eval máy đạt kỳ vọng · ngoài làn máy: E15
+
+### Re-pin lần 2 — 2026-11-17, do hang 3g: luoi 13 cot (loi C), sua-sau-ky bai dem cot
+run_id: repin-20261117T045134Z-16554
+sha: 8b5e18f36d0e6f31f937a53467c20560fe51a0ef · suites: 3 lệnh exit 0 · evals: 18/18 eval máy đạt kỳ vọng · ngoài làn máy: E15 · diff chạm vật đo ngoài làn máy: E15 — chưa chứng lại, đi vòng S4 delta
