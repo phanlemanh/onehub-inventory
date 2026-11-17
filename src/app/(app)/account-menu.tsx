@@ -101,6 +101,7 @@ export function AccountMenu({
               size="icon-sm"
               aria-label={COPY.account}
               data-slot="account-sign-in"
+              data-ready={ready || undefined}
             />
           }
         >

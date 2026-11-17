@@ -10,6 +10,7 @@ import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import pg from "pg";
 
 import { openSheet } from "../../tools/e2e_templates/settle";
+import { chupAnh } from "../e2e/sua-trang";
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
 
 let owner: pg.Client;
@@ -147,7 +148,7 @@ test(
     const shots = process.env["SHOTS_DIR"];
     if (shots) {
       mkdirSync(shots, { recursive: true });
-      await page.screenshot({ path: join(shots, `menu-dang-nhap-${info.project.name}.png`) });
+      await chupAnh(page, { path: join(shots, `menu-dang-nhap-${info.project.name}.png`) });
     }
     for (const look of ["Sáng", "Tối", "Theo thiết bị"]) {
       await expect(page.getByRole("menuitemradio", { name: look })).toBeVisible();

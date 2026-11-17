@@ -12,14 +12,18 @@ import { LOGIN_COPY } from "../src/app/login/copy";
 
 const ROOT = join(__dirname, "..");
 
-/** sha256 of each sign-in test file at 42a231f. */
+/**
+ * sha256 of each sign-in test file at 42a231f, updated by app-shell-khuon-dau-trang (owner, 2026-11-17): the account
+ * menu moved to the foot of the App Shell's rail, so the four files open it through the shared door (on a phone the
+ * sheet first) and find signing in as a menu item. No sentence of the sign-in screen changed (the table below).
+ */
 const SIGN_IN_TESTS: Record<string, string> = {
-  "tests/e2e-db/login.spec.ts": "b5fe8c6aebe792f8ea30aba238876f44bd1f1424b38634e2aa2fde4b539724f4",
+  "tests/e2e-db/login.spec.ts": "a875ed1ef66ece88b9ee230c8928f9065d98faf689bb735a70ddd3d5877c5d7d",
   "tests/e2e-db/va-dang-nhap.spec.ts":
-    "46e75fbd081837f04f8af582e8a37d240f73051952cb9740d5169b62b21b77a9",
+    "d31454db69357c84a1a802e10c09d5e0c73249ac88a87a9c1dff28f87c8b6cc9",
   "tests/e2e-db/dang-nhap-vai.ts":
-    "bf8769be3baee62bdcc3131af198b97f6009cfc7dd242d5062d1e34b6f043849",
-  "tests/e2e/account.spec.ts": "219cd58cd0a1399bb3c844860d6f0dd085aee6dbe2a002b1d69a14558178b8a8",
+    "0f42d8890178da1f80e74d685b2965eee51a249d39016605da56d8a9f056bd2d",
+  "tests/e2e/account.spec.ts": "1e0eebd64160d2f4b13c51b5054cbcd29fb7e2714095343fe12b3a82ab040782",
 };
 const SIGN_IN_TEST_COUNT = 4;
 

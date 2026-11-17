@@ -370,6 +370,7 @@ test.describe("frame", () => {
     await pageShown(page);
     // The look is chosen in the account menu at the foot of the rail, which rides in the sheet on a phone.
     if ((page.viewportSize()?.width ?? 0) < 768) await openSheet(page);
+    await expect(page.locator('[data-slot="account-sign-in"][data-ready]')).toBeVisible();
     await page.getByRole("button", { name: "Tài khoản" }).click();
     await page.getByRole("menuitemradio", { name: "Tối" }).click();
     await expect(page.locator("html")).toHaveClass(/\bdark\b/);

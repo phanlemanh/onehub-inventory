@@ -12,6 +12,7 @@ test.describe("tai khoan khong co co so du lieu", () => {
     // Signing in sits in the account menu at the foot of the rail (app-shell-khuon-dau-trang, AC-4); on a phone the
     // rail rides in the sheet.
     if ((page.viewportSize()?.width ?? 0) < 768) await openSheet(page);
+    await expect(page.locator('[data-slot="account-sign-in"][data-ready]')).toBeVisible();
     await page.getByRole("button", { name: "Tài khoản" }).click();
     const link = page.getByRole("menuitem", { name: "Đăng nhập" });
     await expect(link).toBeVisible();

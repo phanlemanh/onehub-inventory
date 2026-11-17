@@ -272,6 +272,7 @@ test.describe("App Shell on a computer", () => {
   }) => {
     await page.goto("/inventory");
     const foot = page.locator('[data-slot="sidebar"] [data-slot="app-shell-account"]');
+    await expect(page.locator('[data-slot="account-sign-in"][data-ready]')).toBeVisible();
     const button = foot.getByRole("button", { name: "Tài khoản" });
     await expect(button).toBeVisible();
     const box = (await button.boundingBox())!;
@@ -371,6 +372,7 @@ test.describe("App Shell on a computer", () => {
     page,
   }) => {
     await page.goto("/inventory");
+    await expect(page.locator('[data-slot="account-sign-in"][data-ready]')).toBeVisible();
     await page.getByRole("button", { name: "Tài khoản" }).click();
     const menu = page.getByRole("menu");
     await expect(menu).toBeVisible();

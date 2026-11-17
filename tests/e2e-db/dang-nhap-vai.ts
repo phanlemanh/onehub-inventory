@@ -11,6 +11,7 @@ import { expect, type Page } from "@playwright/test";
 import pg from "pg";
 
 import type { Role } from "../../src/generated/ontology";
+import { openSheet } from "../../tools/e2e_templates/settle";
 
 /** The run id the database config sets once in its main process; workers inherit it. */
 const RUN = process.env["E2E_DB_RUN"] ?? `${process.pid}`;
@@ -102,5 +103,33 @@ export async function signInWithCode(page: Page, email: string): Promise<void> {
   await code.fill(found[0]!);
   await code.press("Enter");
   await page.waitForURL((u) => u.pathname === "/" && u.search === "");
-  await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
+  await shellReady(page);
+}
+
+const onPhone = (page: Page) => (page.viewportSize()?.width ?? 1280) < 768;
+
+/**
+ * The App Shell of a signed-in person is ready. The account menu sits at the foot of the rail since
+ * app-shell-khuon-dau-trang (owner, 2026-11-17); on a phone the rail rides in the closed sheet, so there the company
+ * name in the top bar marks the signed-in shell instead.
+ */
+export async function shellReady(page: Page): Promise<void> {
+  if (onPhone(page)) {
+    await expect(
+      page.locator('[data-slot="app-shell-top-bar"] [data-slot="company-name"]'),
+    ).toBeVisible();
+  } else {
+    await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
+  }
+}
+
+/** Opens the account menu at the foot of the rail, signed in or not; on a phone the sheet opens first. */
+export async function openAccountMenu(page: Page): Promise<void> {
+  if (onPhone(page)) await openSheet(page);
+  const button = page.locator(
+    '[data-slot="account-menu"][data-ready], [data-slot="account-sign-in"][data-ready]',
+  );
+  await expect(button.first()).toBeVisible();
+  await button.first().click();
+  await expect(page.getByRole("menu")).toBeVisible();
 }

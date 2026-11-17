@@ -16,6 +16,7 @@ import { expect, test, type APIResponse, type Page, type TestInfo } from "@playw
 import pg from "pg";
 
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
+import { openAccountMenu } from "./dang-nhap-vai";
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const SIGN_OUT_FAILED =
@@ -125,8 +126,8 @@ async function signIn(page: Page, email: string) {
 }
 
 async function clickSignOutInMenu(page: Page) {
-  await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
-  await page.getByRole("button", { name: "Tài khoản" }).click();
+  // The account menu sits at the foot of the rail since app-shell-khuon-dau-trang; the shared door opens it.
+  await openAccountMenu(page);
   await page.getByRole("menu").getByRole("menuitem", { name: "Đăng xuất" }).click();
 }
 
