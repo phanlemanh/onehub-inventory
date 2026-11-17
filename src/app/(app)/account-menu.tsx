@@ -106,7 +106,7 @@ export function AccountMenu({
         >
           <UserIcon aria-hidden />
         </DropdownMenuTrigger>
-        <DropdownMenuContent side="right" align="end" className="w-72">
+        <DropdownMenuContent side="right" align="end" className="w-80">
           {theme}
           <DropdownMenuSeparator />
           <DropdownMenuItem render={<Link href={loginHref(pathname || "/")} />}>
@@ -151,11 +151,11 @@ export function AccountMenu({
           <AvatarFallback>{initial(account)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="right" align="end" className="w-72">
+      <DropdownMenuContent side="right" align="end" className="w-80">
         <DropdownMenuGroup>
           <DropdownMenuLabel>
             <span className="flex items-center gap-2.5">
-              <Avatar>
+              <Avatar size="sm">
                 <AvatarFallback>{initial(account)}</AvatarFallback>
               </Avatar>
               <span className="flex min-w-0 flex-col gap-0.5">

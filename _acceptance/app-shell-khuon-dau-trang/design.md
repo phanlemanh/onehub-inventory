@@ -26,7 +26,7 @@ Ghi chép đầy đủ (số đo hai bên): sổ ghi chú của đợt, tệp `d
 | A1 | Nút gập cột thứ hai | nút vuông 24×24, vạch đứng tĩnh, giữa chiều cao CỘT, chiếm rãnh 24 px riêng | dải bấm trên mép cột, giữa chiều cao CỬA SỔ, không chiếm chỗ; hai nét bẻ thành ‹ (cột đang mở) hay › (đang gập) khi rê chuột hay khi Tab tới; viền cột sáng lên khi rê |
 | A2 | Viền cột thứ hai | cao bằng các mục (240 px ở Tuỳ chỉnh của sàn) | chạy hết chiều cao màn hình |
 | A3 | Ô tìm | 145 px sát góc phải | giữa thanh trên, 320 px; phím ⌘ và K tách hai ô; không thêm ô chọn phạm vi (Inventory chỉ tìm mã căn) |
-| A4 | Menu tài khoản | nút «T» và nút sáng/tối riêng ở góc phải thanh trên; menu hẹp bằng nút (128 px), email bẻ dòng | ảnh đại diện ở đáy dải biểu tượng; menu rộng 288 px: tên + email một dòng, sàn đang mở, đổi sàn, hàng ba lựa chọn giao diện, đăng xuất; chưa đăng nhập: giao diện + đăng nhập |
+| A4 | Menu tài khoản | nút «T» và nút sáng/tối riêng ở góc phải thanh trên; menu hẹp bằng nút (128 px), email bẻ dòng | ảnh đại diện ở đáy dải biểu tượng; menu rộng 320 px (ảnh đại diện nhỏ): tên + email tới khoảng 40 ký tự một dòng, dài hơn thì cắt «…» và hiện đủ khi rê, sàn đang mở, đổi sàn, hàng ba lựa chọn giao diện, đăng xuất; chưa đăng nhập: giao diện + đăng nhập |
 | A5 | Đầu trang | tiêu đề lớn 24 px, 88 px từ thanh trên tới khung, trùng tên khung | một hàng mảnh: tên màn (vẫn `h1`) › nơi đang mở ở cột thứ hai, nút chính cuối hàng |
 | A6 | Nút bật thanh bên | ở mọi khổ; trên máy tính mở dải biểu tượng thành cột có chữ | chỉ ở điện thoại (mở tấm menu); trên máy tính dải luôn là biểu tượng, ⌘B không mở |
 

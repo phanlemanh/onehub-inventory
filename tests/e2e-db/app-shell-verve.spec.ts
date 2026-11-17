@@ -26,7 +26,8 @@ const phone = (page: Page) => (page.viewportSize()?.width ?? 0) < 768;
 /** One company admin with a long sample email, in one or two new companies (sample data, MAU). */
 async function admin(info: TestInfo, companies: 1 | 2) {
   const stamp = `${info.project.name}-${Date.now()}`;
-  const email = `quan-tri-san-mau-dia-chi-dai-${stamp}@example.test`;
+  // A long work email (about 38 characters), as long as the longest addresses a company is likely to use.
+  const email = `quan-tri-san-${info.project.name}-${Date.now().toString(36)}@example.test`;
   const user = (
     await owner.query<{ id: string }>(
       "insert into identity.users (email, name) values ($1, '[Tên] Quản trị MAU') returning id",
@@ -73,14 +74,18 @@ async function signIn(page: Page, email: string, company: string) {
   const choose = page
     .locator('[data-state="choose-company"]')
     .getByRole("button", { name: company });
-  await expect(choose.or(page.locator('[data-slot="account-menu"][data-ready]'))).toBeVisible();
+  // On a phone the account menu rides in the closed sheet, so the top bar marks the App Shell.
+  const shell = page.locator('[data-slot="app-shell-top-bar"]');
+  await expect(choose.or(shell)).toBeVisible();
   if (await choose.isVisible()) await choose.click();
-  await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
+  await expect(shell).toBeVisible();
 }
 
 async function openAccountMenu(page: Page) {
   if (phone(page)) await openSheet(page);
-  await page.locator('[data-slot="account-menu"][data-ready]').click();
+  const button = page.locator('[data-slot="account-menu"][data-ready]');
+  await expect(button).toBeVisible();
+  await button.click();
   await expect(page.getByRole("menu")).toBeVisible();
 }
 
