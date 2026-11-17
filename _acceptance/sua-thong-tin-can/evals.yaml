@@ -138,7 +138,7 @@ evals:
     target: http://127.0.0.1:3487/inventory
     paths: [src/modules/listings/ui/**]
     steps:
-      - "With the lane H dev server on port 3487 (sample mode, whose sample company has custom fields of the five kinds), open /inventory?vai=ListAgent at 1440 wide; for each custom column open the first row's cell and save _acceptance/sua-thong-tin-can/evidence/E6-<kiểu>-1440.png (text, number, date, single_select, boolean)"
+      - "Sample mode has no company layer, so the frames come from the signed-in browser case on the lane H Postgres: run `DB_LANE=h DB_PORT=5567 npx playwright test -c playwright.db.config.ts tests/e2e-db/sua-thong-tin-can.spec.ts -g o-rieng-that --project=1440`; it opens one cell of each of the five custom field kinds on a real company and saves _acceptance/sua-thong-tin-can/evidence/E6-<kind>-1440.png (text, number, date, single_select, boolean). Open the five frames."
     question: "Mỗi ô có bộ sửa đúng kiểu (ô chữ, ô số, ô ngày, danh sách lựa chọn, Có/Không/Chưa có) cùng khung sửa trên ô của cột Giá không? Nêu kiểu nào sai."
     expected: "Năm bộ sửa đúng kiểu, cùng khung"
     evidence_required: [run_id, screenshot, observed, verdict]

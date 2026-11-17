@@ -187,6 +187,9 @@ test("o-rieng-that: on a real company each own column opens its kind's editor, a
       page.locator(`[data-custom-kind="${kind}"]`),
       `o-rieng-that: ${kind}`,
     ).toBeVisible();
+    // The frames the record's look check (E6-ui) reads: one editor of each kind at 1440.
+    if (info.project.name === "1440")
+      await page.screenshot({ path: `_acceptance/sua-thong-tin-can/evidence/E6-${kind}-1440.png` });
     await page.keyboard.press("Escape");
   }
   const cell = page.locator(`[id$="${w.listing}-custom_so_cho_xe"]`).first();
