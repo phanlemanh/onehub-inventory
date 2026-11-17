@@ -11,9 +11,13 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogOverlay,
+  DialogPortal,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
+import { useInDialog } from "./in-dialog";
 
 /**
  * A short form in a dialog (row 9, the one way a screen asks for a few fields): title, one sentence of what happens,
@@ -67,6 +71,9 @@ export function FormDialog({
   children: ReactNode;
 }) {
   const submitRef = useRef<HTMLButtonElement>(null);
+  // Opened from inside another dialog (the full-screen record on a phone), this dialog is nested and would draw no
+  // backdrop: draw it, so what is behind dims and takes no click, as everywhere else (row 3g).
+  const nested = useInDialog();
   function submit(e: FormEvent) {
     e.preventDefault();
     if (!busy && !refused && canSubmit) onSubmit();
@@ -74,6 +81,11 @@ export function FormDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger ? <DialogTrigger render={trigger.render}>{trigger.label}</DialogTrigger> : null}
+      {nested ? (
+        <DialogPortal>
+          <DialogOverlay forceRender data-slot="form-dialog-backdrop" />
+        </DialogPortal>
+      ) : null}
       <DialogContent
         data-slot={slot ?? "form-dialog"}
         {...(focusSubmit ? { initialFocus: submitRef } : {})}

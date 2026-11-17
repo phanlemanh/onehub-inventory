@@ -24,6 +24,7 @@ import {
 import type { Listing, ListingFurnished, ListingOccupantType } from "@/generated/ontology";
 import { PermittedAction } from "@/modules/identity/ui";
 
+import { confirmationAge } from "../record";
 import { DETAILS_TEXT_LIMIT, FURNISHED_VALUES, OCCUPANT_VALUES, detailText } from "../edit-rules";
 import type { DetailsChange, ListingChange } from "../save-door";
 
@@ -31,6 +32,8 @@ import { RECORD_COPY } from "./record-copy";
 
 /** The four details as the record holds them. */
 export interface ListingDetails {
+  /** Days since the last confirmation with the owner, when a save moved it (the record's confirmation line). */
+  confirmedDays?: number | null | undefined;
   legalStatus?: string | undefined;
   furnished?: ListingFurnished | undefined;
   financing?: string | undefined;
@@ -66,6 +69,7 @@ export function useListingDetails(id: string, read: ListingDetails): ListingDeta
   const saved = api?.saved(id);
   return saved
     ? {
+        confirmedDays: confirmationAge(saved.lastConfirmedAt, new Date()),
         legalStatus: saved.legalStatus,
         furnished: saved.furnished,
         financing: saved.financing,

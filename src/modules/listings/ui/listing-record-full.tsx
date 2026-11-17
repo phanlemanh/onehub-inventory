@@ -156,7 +156,12 @@ export function ListingRecordFull({
     occupantType: read?.occupantType,
   });
   if (!read) return null;
-  const picked: RecordListing = { ...read, ...details };
+  const { confirmedDays, ...parts } = details;
+  const picked: RecordListing = {
+    ...read,
+    ...parts,
+    ...(confirmedDays === undefined ? {} : { confirmedDays }),
+  };
   const isNewest = picked.id === newestId;
   const unit = data.unit;
   const done = completeness(picked);

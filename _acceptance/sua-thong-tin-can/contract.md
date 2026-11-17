@@ -57,7 +57,9 @@ Source input: ô cơ hội `_acceptance/sua-thong-tin-can/opportunity.md` (build
   hai kiểm tra phụ «không vùng hàng», «không mã căn».
 - AC-9: Given hộp «Sửa» và ô cột riêng đang mở, When bộ quét trợ năng chạy ở nền sáng và tối, và bài trình duyệt chạy ở bốn
   khổ 360, 414, 1024, 1440, Then không có lỗi trợ năng mức nghiêm trọng, nút «Sửa» có tên đọc được, tiêu điểm về «Sửa» khi
-  hộp đóng.
+  hộp đóng; hộp mở từ hồ sơ có đúng một lớp nền mờ ở mọi khổ (cả hồ sơ toàn màn ở điện thoại, nơi hộp lồng trước đây
+  không có nền mờ); thông báo sau khi lưu không đè lên nút chính ở đáy hồ sơ, và khi không mở hồ sơ thì thông báo ở chỗ cũ.
+  Hai sửa này ở khối dùng chung nên chữa luôn hộp «Báo sai thông tin» (3e) và thông báo của sửa trên ô (4) khi hồ sơ mở.
 - AC-10: Given một lần sửa bốn trường hay một giá trị trường riêng được lưu, When máy chủ ghi căn, Then «Xác nhận lúc» của
   căn theo đúng câu chủ kho chọn ở Hỏi-1 (khuyến nghị: mọi lần sửa đặt «Xác nhận lúc» là lúc lưu, một luật với hàng 4) và
   ô «Xác nhận lúc» trên lưới đổi theo. (cross-layer)

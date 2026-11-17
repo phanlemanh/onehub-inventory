@@ -18,6 +18,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog } from "@base-ui/react/dialog";
 
 import { GRID_COPY } from "./grid-copy";
+import { InDialog } from "./in-dialog";
+import { RECORD_FOOTER_VAR } from "./record-footer";
 import {
   PIN_DEFAULT_SHARE,
   PIN_MAX_SHARE,
@@ -30,6 +32,30 @@ import {
 } from "./record-pin";
 
 /** The address parameter that names the open record (design/behaviors.md: the record panel has its own address). */
+
+/** The record's footer, measured into RECORD_FOOTER_VAR (./record-footer.ts) while it is shown (row 3g). */
+function RecordFooter({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const set = () => root.style.setProperty(RECORD_FOOTER_VAR, `${el.offsetHeight}px`);
+    set();
+    const watch = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(set);
+    watch?.observe(el);
+    return () => {
+      watch?.disconnect();
+      root.style.removeProperty(RECORD_FOOTER_VAR);
+    };
+  }, []);
+  return (
+    <div ref={ref} data-slot="record-panel-footer">
+      {children}
+    </div>
+  );
+}
+
 export const RECORD_PARAM = "ho-so";
 
 /** What a screen says about one record: its name and its content. The frame around it is not the screen's. */
@@ -251,9 +277,10 @@ export function RecordPanel({
             }
           />
           <div data-slot="record-panel-body" className="min-h-0 flex-1 overflow-y-auto p-4">
-            {view?.body}
+            {/* A dialog opened from here is nested in this one (row 3g): it draws its own backdrop. */}
+            <InDialog value>{view?.body}</InDialog>
           </div>
-          {view?.footer}
+          {view?.footer ? <RecordFooter>{view.footer}</RecordFooter> : null}
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
@@ -523,7 +550,7 @@ function RecordColumn({
                 >
                   {view.body}
                 </div>
-                {view.footer}
+                {view.footer ? <RecordFooter>{view.footer}</RecordFooter> : null}
               </FramePanel>
             </Frame>
           </aside>

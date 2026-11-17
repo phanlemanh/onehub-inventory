@@ -172,7 +172,7 @@ evals:
     executor: test
     cmd: config:executors.test.sua_thong_tin_e2e
     paths: [src/modules/listings/ui/**, tests/e2e/sua-thong-tin-can.spec.ts]
-    expected: "exit 0 ở bốn khổ; ca 'axe-sang-toi' (hộp và ô riêng, nền sáng và tối, 0 lỗi nghiêm trọng) và tiêu điểm về «Sửa» khi đóng hộp"
+    expected: "exit 0 ở bốn khổ; ca 'axe-sang-toi' (hồ sơ và hộp, nền sáng và tối, 0 lỗi), tiêu điểm về «Sửa» khi đóng hộp (trong 'sua-bon-truong'), 'hop-long-co-nen-mo' (đúng một lớp nền mờ thấy được), 'thong-bao-khong-de-nut-chinh' (hình chữ nhật của thông báo và nút chính không chồng nhau), 'thong-bao-dung-cho-khi-khong-ho-so'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E10
@@ -198,4 +198,12 @@ evals:
     layer: backend-effect
     paths: [src/modules/listings/**]
     expected: "exit 0; ca 'details-mot-luat-xac-nhan' (2 ô, hằng 2: lần sửa bốn trường và lần sửa trường riêng đặt lastConfirmedAt theo câu Hỏi-1 đã chốt). Chiều đỏ: bỏ lastConfirmedAt ở nhánh details của applyChange → «details-mot-luat-xac-nhan: bốn trường»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9b
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/components/candidate/form-dialog.tsx, src/components/candidate/in-dialog.tsx, src/components/candidate/record-panel.tsx, tests/hop-long-nen-mo.test.tsx]
+    expected: "exit 0; ca 'hop-long-co-nen-mo' (FormDialog trong một hộp có nền mờ của nó) và đối chứng 'doi-chung' (cùng cách lồng mà không đánh dấu thì 0 lớp nền mờ — đúng lỗi được sửa); hộp không lồng giữ đúng một lớp"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
