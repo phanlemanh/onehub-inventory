@@ -10,7 +10,8 @@ import { describe, expect, it } from "vitest";
 const ROOT = join(import.meta.dirname, "..");
 const ONE = "src/lib/write-failure.ts";
 /** A status compared to a number on an answer: `response.status === 409`, `res.status >= 500`, `case 403:` after a status switch. */
-const COMPARE = /\b(?:response|res|answer)\.status\s*(?:===|!==|==|>=|<=|>|<)\s*\d{3}/;
+const COMPARE =
+  /\b(?:response|res|answer)\.status\s*(?:===|!==|==|>=|<=|>|<)\s*\d{3}|switch\s*\(\s*(?:response|res|answer)\.status\s*\)/;
 
 function files(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {

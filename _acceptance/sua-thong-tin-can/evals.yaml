@@ -26,19 +26,20 @@ feature_slug: sua-thong-tin-can
 #   tests/e2e/sua-thong-tin-can.spec.ts (bốn khổ): sua-bon-truong · hoan-tac-bon-truong · o-rieng-theo-kieu · axe-sang-toi
 #   tests/e2e-db/sua-thong-tin-can.spec.ts: tai-lai-con · quan-tri-khong-nut
 # Cặp phá thử (bản sao; ca tương ứng phải đỏ với thông điệp ghim):
-#   pha-thu-nut-khong-quyen (nút Sửa bỏ PermittedAction)          → «nut-sua-12-o: Quản trị sàn·đang mở»
+#   pha-thu-nut-khong-quyen (nút Sửa bỏ PermittedAction)          → «nut-sua-12-o: CompanyAdmin·đang mở»
 #   pha-thu-bo-kiem-rieng (handler bỏ checkCustomValue)            → «custom-sai-kieu-400»
 #   pha-thu-401-thanh-403 (luật đọc 401 như 403)                   → «mot-bang-ma: 401»
 #   pha-thu-bang-ma-thu-hai (http-save-door so status riêng)        → «khong-bang-ma-thu-hai: http-save-door.ts»
 #   pha-thu-dem-rieng (hồ sơ đếm thiếu bằng mảng riêng)             → «du-thong-tin-cho-hang-15»
-#   pha-thu-bo-vung-hang (màn không đủ quyền vẫn vẽ vùng hàng)       → «doi-chung-co-vung-hang»
+#   pha-thu-bo-vung-hang (màn không đủ quyền vẫn vẽ vùng hàng)       → «khong-du-quyen-tren-man: vẫn có vùng hàng»
+#   pha-thu-luoi-khong-cao (bỏ tallGridViewport ở bài đối chứng)     → «doi-chung-co-ma-can»
 evals:
   - id: E1
     criterion: AC-1
     executor: test
     cmd: config:executors.test.sua_thong_tin_unit
     paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx]
-    expected: "exit 0; ca 'nut-sua-12-o' ghim 12 ô (ba vai sửa thấy nút ở lần chào đang mở; Quản trị sàn, lần trước, đã đóng không thấy). Chiều đỏ: pha-thu-nut-khong-quyen → «nut-sua-12-o: Quản trị sàn·đang mở»"
+    expected: "exit 0; ca 'nut-sua-12-o' ghim 12 ô (ba vai sửa thấy nút ở lần chào đang mở; Quản trị sàn, lần trước, đã đóng không thấy). Chiều đỏ: pha-thu-nut-khong-quyen → «nut-sua-12-o: CompanyAdmin·đang mở»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E1b
@@ -164,7 +165,7 @@ evals:
     executor: test
     cmd: config:executors.test.sua_thong_tin_unit
     paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx, tests/bang-hang-khong-du-quyen-doi-chung.test.tsx]
-    expected: "exit 0; ca 'dan-cot-rieng' (đúng kiểu ở «sẽ đổi», sai kiểu và không có lựa chọn ở «sai kiểu» kèm lý do, chữ rơi vào Về tay theo Hỏi-2), 'doi-chung-co-vung-hang', 'doi-chung-co-ma-can'. Chiều đỏ: pha-thu-bo-vung-hang → «doi-chung-co-vung-hang»"
+    expected: "exit 0; ca 'dan-cot-rieng' (đúng kiểu ở «sẽ đổi», sai kiểu và không có lựa chọn ở «sai kiểu» kèm lý do, chữ rơi vào Về tay theo Hỏi-2), 'doi-chung-co-vung-hang', 'doi-chung-co-ma-can'. Chiều đỏ: pha-thu-bo-vung-hang → «khong-du-quyen-tren-man: vẫn có vùng hàng»; pha-thu-luoi-khong-cao → «doi-chung-co-ma-can»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E9

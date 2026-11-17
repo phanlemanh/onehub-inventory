@@ -467,6 +467,12 @@ describe("sua-thong-tin-can · dán vào cột riêng", () => {
         { row, field: "custom.so_cho_xe" as never, raw: "2", open: true },
         { row, field: "custom.huong_view" as never, raw: "Biển", open: true },
         { row, field: "custom.netToSeller" as never, raw: "3 tỷ", open: true },
+        {
+          row: { ...row, id: "r2" } as GridRow,
+          field: "custom.so_cho_xe" as never,
+          raw: "hai",
+          open: true,
+        },
       ],
       beyond: { rows: 0, columns: 0 },
     };
@@ -485,7 +491,7 @@ describe("sua-thong-tin-can · dán vào cột riêng", () => {
     expect(
       plan.wrong.map((w) => w.why),
       "dan-cot-rieng: sai kiểu",
-    ).toEqual(["Không có lựa chọn này."]);
+    ).toEqual(["Không có lựa chọn này.", "Gõ một số, như 12 hoặc 1,5."]);
     expect(
       plan.skipped.map((s) => s.id),
       "dan-cot-rieng: Về tay",
@@ -579,5 +585,19 @@ describe("sua-thong-tin-can · bốn cột trên lưới (lối C)", () => {
       plan.wrong.map((w) => w.why),
       "o-chi-tiet-dan: sai kiểu",
     ).toEqual(["Dài quá 200 ký tự."]);
+  });
+});
+
+describe("sua-thong-tin-can · ô riêng theo vai", () => {
+  it("o-rieng-quan-tri-khong-mo: the own columns open under updateListing; a company admin has no cell, a list agent has", async () => {
+    const { actionVisibility } = await import("../src/modules/identity");
+    expect(
+      actionVisibility(["CompanyAdmin"], "updateListing", true),
+      "o-rieng-quan-tri-khong-mo: Quản trị sàn",
+    ).not.toBe("show");
+    expect(
+      actionVisibility(["ListAgent"], "updateListing", true),
+      "o-rieng-quan-tri-khong-mo: đối chứng Đầu chủ",
+    ).toBe("show");
   });
 });
