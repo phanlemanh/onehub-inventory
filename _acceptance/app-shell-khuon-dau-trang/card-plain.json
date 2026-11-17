@@ -1,6 +1,10 @@
 {
   "feature_plain": "Nhân viên sàn làm việc trong App Shell gọn hơn, xếp theo mẫu Verve của ReUI: nút gập cột thứ hai nằm trên mép cột, ô tìm ở giữa thanh trên, menu tài khoản kèm chọn giao diện ở đáy dải biểu tượng, đầu trang chỉ còn một hàng mảnh.",
   "decisions": [
-    {"id": "E13", "q": "Sáu chỗ đã dựng có đúng sáu chỗ anh khoanh, không thêm việc?", "why": "Hội đồng chấm thấy sáu dòng khớp lời anh, P1–P3 nằm ngoài phạm vi; họ chưa chắc vì vài con số (320 px, menu 320 px, email 40 ký tự, dời dấu bản dev) là máy chọn khi dựng, không có trong lời anh."}
-  ]
+    {
+      "id": "E13",
+      "q": "Sáu chỗ đúng lời anh; anh nhận các chi tiết máy tự chọn dưới đây?"
+    }
+  ],
+  "analyst_plain": "Cho E13 — Chi tiết máy tự chọn, không có trong lời anh: (1) ô tìm rộng 320 px; (2) hai phím ⌘ và K tách hai ô; (3) mũi tên ‹ › hiện khi rê chuột hay Tab tới nút gập, viền cột sáng lên khi rê; (4) ⌘B không còn mở dải thành cột có chữ; (5) menu tài khoản rộng 320 px, email tới khoảng 40 ký tự hiện trọn, dài hơn thì cắt «…»; (6) dấu bản dev Next.js dời sang góc phải dưới (người dùng thật không thấy). Sửa chi tiết nào thì ghi số ấy vào câu trả lời. Ngoài ra: Ba phép đo đơn vị E7, E9, E10 cũng xanh trên bản cũ: đó là bài giữ nền có chủ ý (không làm hỏng màn khác), không phải bài chứng minh chỗ đổi; chỗ đổi được chứng minh bằng các bài trình duyệt E1–E6, E8, E15–E17 và ảnh E12."
 }

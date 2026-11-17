@@ -1,1 +1,1 @@
-driver: playwright test + static PNG compare; network not read (n-a driver)
+driver=playwright CLI, no network reader
