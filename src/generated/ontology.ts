@@ -1201,7 +1201,7 @@ export const ACTIONS: readonly ActionSpec[] = [
     status: "live",
     states: [],
     doors: {
-      api: ["POST /api/v1/imports/[id]/batches"],
+      api: [],
       db: ["table listings insert", "table listing_units insert", "table listing_pending_units insert"],
     },
   },

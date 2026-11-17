@@ -6,3 +6,9 @@
 - 2026-11-17 — hàng 11 (cùng lượt): `createListing` chuyển `live` (chủ kho duyệt Hỏi-1), nên ca phá «màn built trỏ thao
   tác planned» của `tests/vai-man-so-man.test.ts` dùng `removeListing` (vẫn planned, hàng 18b) thay `createListing`; màn
   `nhap-tep` (planned) vào danh sách màn ngoài cặp của ca tap-cap-bang-tich. Luật đo không đổi.
+- 2026-11-17 — hàng 11 (màn dựng xong): `nhap-tep` thành màn built nên ca tap-cap-bang-tich có 28 cặp (thêm 4 cặp
+  nhap-tep), hai cặp chặn mới `nhap-tep×BuyerAgent`, `nhap-tep×CompanyAdmin` (Vai × Màn đã duyệt), và nhap-tep rời
+  danh sách màn ngoài cặp.
+- 2026-11-17 — hàng 11 (màn dựng xong): `nhap-tep` thành màn built nên ca tap-cap-bang-tich có 28 cặp (thêm 4 cặp
+  nhap-tep), hai cặp chặn mới `nhap-tep×BuyerAgent`, `nhap-tep×CompanyAdmin` (Vai × Màn đã duyệt), và nhap-tep rời
+  danh sách màn ngoài cặp.

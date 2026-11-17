@@ -283,7 +283,6 @@ actions:
     status: live
     scope: { ListAgent: own, TeamLead: company }
     doors:
-      api: ["POST /api/v1/imports/[id]/batches"]
       db:
         [
           "table listings insert",

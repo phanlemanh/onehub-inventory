@@ -1,5 +1,5 @@
 "use client";
-// The «Nạp tệp» screen (row 11, nhap-excel): five steps across the top as ReUI solution-crm-6 lays them out (owner's
+// The import screen (row 11, nhap-excel): five steps across the top as ReUI solution-crm-6 lays them out (owner's
 // answer to Hỏi-3). The file is read in the browser; every count shown is the count the server answered.
 import { useCallback, useState } from "react";
 
@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { label } from "@/modules/company-config";
+import { PermittedAction } from "@/modules/identity/ui";
 
 import { NO_CHOICES, type Choices, type Mark } from "../mark";
 import { readTable } from "../read-file";
@@ -69,13 +70,10 @@ const targetWord = (t: Target | null) =>
           ? t.custom
           : t.newField.name;
 
-async function post<T>(url: string, body: unknown): Promise<{ status: number; body: T | null }> {
+const JSON_HEADERS = { "content-type": "application/json" };
+async function answer<T>(request: Promise<Response>): Promise<{ status: number; body: T | null }> {
   try {
-    const r = await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    const r = await request;
     return { status: r.status, body: (await r.json().catch(() => null)) as T | null };
   } catch {
     return { status: 0, body: null };
@@ -96,11 +94,17 @@ export function ImportWizard() {
 
   const refresh = useCallback(async (t: Table, c: Choices) => {
     setBusy(true);
-    const r = await post<MarkedTable>("/api/v1/imports/preview", {
-      headers: t.headers,
-      rows: t.rows,
-      choices: c,
-    });
+    const r = await answer<MarkedTable>(
+      fetch("/api/v1/imports/preview", {
+        method: "POST",
+        headers: JSON_HEADERS,
+        body: JSON.stringify({
+          headers: t.headers,
+          rows: t.rows,
+          choices: c,
+        }),
+      }),
+    );
     setBusy(false);
     if (r.status === 0) return setBanner("offline");
     if (r.status !== 200 || !r.body) return setBanner("failed");
@@ -131,65 +135,28 @@ export function ImportWizard() {
     await refresh(tab, NO_CHOICES);
   }
 
-  async function apply() {
-    if (!table || !marked) return;
-    setBusy(true);
+  /** Open the import (importListings); the batches are written by ApplyBatches under continueImport. */
+  async function openImport(): Promise<string | null> {
+    if (!table || !marked) return null;
     const expected = { ...marked.counts, createCount: marked.createCount };
-    const open = await post<{ id: string; error?: string }>("/api/v1/imports", {
-      headers: table.headers,
-      rows: table.rows,
-      choices,
-      fileName: table.fileName,
-      sheetName: table.sheet,
-      expected,
-    });
-    if (open.status === 0) return (setBusy(false), setBanner("offline"));
-    if (open.status === 409)
-      return (setBusy(false), setBanner("changed"), void refresh(table, choices));
-    if (open.status !== 201 || !open.body) return (setBusy(false), setBanner("failed"));
-    const id = open.body.id;
-    const newFieldCols = marked.columns
-      .filter((c) => c.target && "newField" in c.target)
-      .map((c) => c.index);
-    let created = 0;
-    let learned: string[] = [];
-    for (let b = 0; b * BATCH < table.rows.length; b += 1) {
-      const rows = table.rows.slice(b * BATCH, (b + 1) * BATCH);
-      const last = (b + 1) * BATCH >= table.rows.length;
-      const allNewFieldCells: Record<string, string> = {};
-      if (last)
-        table.rows.forEach((r, i) =>
-          newFieldCols.forEach((j) => (allNewFieldCells[`${i}:${j}`] = r[j] ?? "")),
-        );
-      const res = await post<{ created: number; learned?: string[] }>(
-        `/api/v1/imports/${id}/batches`,
-        {
+    const open = await answer<{ id: string }>(
+      fetch("/api/v1/imports", {
+        method: "POST",
+        headers: JSON_HEADERS,
+        body: JSON.stringify({
           headers: table.headers,
-          rows,
+          rows: table.rows,
           choices,
-          batchNo: b,
-          rowOffset: b * BATCH,
-          last,
-          ...(last ? { allNewFieldCells } : {}),
-        },
-      );
-      if (res.status !== 200 || !res.body)
-        return (setBusy(false), setBanner(res.status === 0 ? "offline" : "failed"));
-      created += res.body.created;
-      if (res.body.learned) learned = res.body.learned;
-    }
-    setBusy(false);
-    setBanner(null);
-    setResult({ id, created, learned });
-    setStep(5);
-  }
-
-  async function undo() {
-    if (!result) return;
-    const r = await post<{ removed: string[] }>(`/api/v1/imports/${result.id}/undo`, {});
-    setBanner(r.status === 200 ? null : r.status === 0 ? "offline" : "failed");
-    if (r.status === 200)
-      (setResult(null), setTable(null), setMarked(null), setStep(1), setProblem(C.undone));
+          fileName: table.fileName,
+          sheetName: table.sheet,
+          expected,
+        }),
+      }),
+    );
+    if (open.status === 0) return (setBanner("offline"), null);
+    if (open.status === 409) return (setBanner("changed"), void refresh(table, choices), null);
+    if (open.status !== 201 || !open.body) return (setBanner("failed"), null);
+    return open.body.id;
   }
 
   const asks = marked?.questions.length ?? 0;
@@ -295,7 +262,7 @@ export function ImportWizard() {
                             value: JSON.stringify({
                               newField: { name: c.header.slice(0, 40), kind: "text", options: [] },
                             }),
-                            label: `${C.newField}: ${c.header}`,
+                            label: `${label("CustomField")}: ${c.header}`,
                           },
                           { value: JSON.stringify({ skip: true }), label: C.skipColumn },
                         ]}
@@ -314,7 +281,7 @@ export function ImportWizard() {
                               newField: { name: c.header.slice(0, 40), kind: "text", options: [] },
                             })}
                           >
-                            {`${C.newField}: ${c.header}`}
+                            {`${label("CustomField")}: ${c.header}`}
                           </SelectItem>
                           <SelectItem value={JSON.stringify({ skip: true })}>
                             {C.skipColumn}
@@ -478,20 +445,123 @@ export function ImportWizard() {
                       {C.blocked(blocks)}
                     </Button>
                   ) : null}
-                  <Button disabled={!marked.canApply || busy} onClick={() => void apply()}>
-                    {C.apply(marked.createCount, marked.keptCount)}
-                  </Button>
+                  <PermittedAction action="continueImport">
+                    <ApplyBatches
+                      disabled={!marked.canApply || busy || !table}
+                      words={C.apply(marked.createCount, marked.keptCount)}
+                      table={table!}
+                      choices={choices}
+                      newFieldColumns={marked.columns
+                        .filter((c) => c.target && "newField" in c.target)
+                        .map((c) => c.index)}
+                      open={openImport}
+                      onBusy={setBusy}
+                      onBanner={setBanner}
+                      onDone={(r) => (setResult(r), setStep(5))}
+                    />
+                  </PermittedAction>
                 </>
               ) : null}
               {step === 5 ? (
-                <Button variant="outline" onClick={() => void undo()}>
-                  {C.undo}
-                </Button>
+                result ? (
+                  <PermittedAction action="undoImport">
+                    <UndoImport
+                      id={result.id}
+                      onBanner={setBanner}
+                      onDone={() => (
+                        setResult(null),
+                        setTable(null),
+                        setMarked(null),
+                        setStep(1),
+                        setProblem(C.undone)
+                      )}
+                    />
+                  </PermittedAction>
+                ) : null
               ) : null}
             </FrameFooter>
           </Frame>
         </Stepper>
       </div>
     </>
+  );
+}
+
+/** Writes the batches of an open import, 200 rows each; a batch that fails stops with the rows written so far kept. */
+function ApplyBatches(props: {
+  disabled: boolean;
+  words: string;
+  table: Table;
+  choices: Choices;
+  newFieldColumns: number[];
+  open: () => Promise<string | null>;
+  onBusy: (b: boolean) => void;
+  onBanner: (b: Banner) => void;
+  onDone: (r: { id: string; created: number; learned: string[] }) => void;
+}) {
+  async function run() {
+    props.onBusy(true);
+    const id = await props.open();
+    if (!id) return props.onBusy(false);
+    const { table, choices } = props;
+    let created = 0;
+    let learned: string[] = [];
+    for (let b = 0; b * BATCH < table.rows.length; b += 1) {
+      const last = (b + 1) * BATCH >= table.rows.length;
+      const allNewFieldCells: Record<string, string> = {};
+      if (last)
+        table.rows.forEach((r, i) =>
+          props.newFieldColumns.forEach((j) => (allNewFieldCells[`${i}:${j}`] = r[j] ?? "")),
+        );
+      const res = await answer<{ created: number; learned?: string[] }>(
+        fetch(`/api/v1/imports/${id}/batches`, {
+          method: "POST",
+          headers: JSON_HEADERS,
+          body: JSON.stringify({
+            headers: table.headers,
+            rows: table.rows.slice(b * BATCH, (b + 1) * BATCH),
+            choices,
+            batchNo: b,
+            rowOffset: b * BATCH,
+            last,
+            ...(last ? { allNewFieldCells } : {}),
+          }),
+        }),
+      );
+      if (res.status !== 200 || !res.body) {
+        props.onBusy(false);
+        return props.onBanner(res.status === 0 ? "offline" : "failed");
+      }
+      created += res.body.created;
+      if (res.body.learned) learned = res.body.learned;
+    }
+    props.onBusy(false);
+    props.onBanner(null);
+    props.onDone({ id, created, learned });
+  }
+  return (
+    <Button disabled={props.disabled} onClick={() => void run()}>
+      {props.words}
+    </Button>
+  );
+}
+
+/** Undo a whole import. */
+function UndoImport(props: { id: string; onBanner: (b: Banner) => void; onDone: () => void }) {
+  async function run() {
+    const r = await answer<{ removed: string[] }>(
+      fetch(`/api/v1/imports/${props.id}/undo`, {
+        method: "POST",
+        headers: JSON_HEADERS,
+        body: "{}",
+      }),
+    );
+    props.onBanner(r.status === 200 ? null : r.status === 0 ? "offline" : "failed");
+    if (r.status === 200) props.onDone();
+  }
+  return (
+    <Button variant="outline" onClick={() => void run()}>
+      {C.undo}
+    </Button>
   );
 }

@@ -77,22 +77,27 @@ describe("so-man-du-cua-vao", () => {
 
 describe("tap-cap-bang-tich", () => {
   // Written before the code: the built staff screens and the four roles.
-  const SCREENS = ["today", "inventory", "sent", "sign-in", "members", "tuy-chinh-san"];
+  const SCREENS = ["today", "inventory", "sent", "sign-in", "members", "tuy-chinh-san", "nhap-tep"];
   const ROLES = ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"];
 
-  it("24 pairs, and every other screen of the register with its reason", () => {
+  it("28 pairs, and every other screen of the register with its reason", () => {
     const { pairs: all, outside } = pairs(ROOT);
     const got = all.map((p) => `${p.screen}×${p.role}`).sort();
     const want = SCREENS.flatMap((s) => ROLES.map((r) => `${s}×${r}`)).sort();
     expect(got).toEqual(want);
     expect(outside).toEqual({
       contacts: "planned",
-      "nhap-tep": "planned",
       proto: "dev",
       "proto-bo-nut": "dev",
     });
     const blocked = all.filter((p) => p.expect === "chan").map((p) => `${p.screen}×${p.role}`);
-    expect(blocked.sort()).toEqual(["members×BuyerAgent", "members×ListAgent", "members×TeamLead"]);
+    expect(blocked.sort()).toEqual([
+      "members×BuyerAgent",
+      "members×ListAgent",
+      "members×TeamLead",
+      "nhap-tep×BuyerAgent",
+      "nhap-tep×CompanyAdmin",
+    ]);
     expect(all.filter((p) => p.expect === "day-ve-hom-nay").map((p) => p.screen)).toEqual(
       Array(4).fill("sign-in"),
     );
@@ -111,10 +116,10 @@ describe("tap-cap-bang-tich", () => {
       "export default function Page() {\n  return null;\n}\n",
     );
     const { pairs: all } = pairs(dir);
-    expect(all).toHaveLength(28);
+    expect(all).toHaveLength(32);
     expect(all.filter((p) => p.screen === "thu-them").map((p) => p.role)).toEqual(ROLES);
     // Đối chứng: the same reader on the real register gives 24.
-    expect(pairs(ROOT).pairs).toHaveLength(24);
+    expect(pairs(ROOT).pairs).toHaveLength(28);
   });
 });
 

@@ -22,7 +22,6 @@ export const IMPORT_COPY = {
   remember: "Nhớ cho lần sau",
   keepAsWritten: "Giữ chữ gốc",
   skipColumn: "Bỏ cột",
-  newField: "Trường riêng mới",
   skipRow: "Bỏ dòng",
   pendingDefault: "Giữ nguyên mã, chờ khớp danh mục",
   columnHead: "Cột của tệp",
@@ -40,8 +39,7 @@ export const IMPORT_COPY = {
   retry: "Thử lại",
   changed: "Dữ liệu của sàn vừa đổi — xem lại trước khi áp.",
   failed: "Chưa ghi được — lỗi máy chủ.",
-  phone: "Nạp tệp dùng trên máy tính.",
-  agent: "Người giữ các dòng",
+  phone: "Màn này dùng trên máy tính.",
 };
 
 export const MARK_WORDS: Record<Mark, string> = {
@@ -70,6 +68,6 @@ export const WHY_WORDS: Record<string, string> = {
   "same-target": "Hai cột cùng đi vào một chỗ",
   "no-unit-column": "Tệp chưa có cột mã",
   "owner-column": "Số và tên chủ nhà chưa nhập ở đây — bỏ cột",
-  "target-retired": "Trường riêng đã ngừng — chọn lại",
+  "target-retired": "Trường đã ngừng — chọn lại",
   chosen: "Người chọn",
 };
