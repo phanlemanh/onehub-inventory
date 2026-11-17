@@ -3,12 +3,10 @@
 Cập nhật sau mỗi bước có nghĩa (G-1711-39: hạn mức tuần ≥ 95%, tới 98% đợt bàn giao).
 
 - Trạng thái: Cổng Phạm vi DUYỆT (606ddb1), kế hoạch T3 DUYỆT (chủ kho 17/11). Vùng thi công G duyệt D-11.
-- Xong: việc 0 (thư viện, stepper ReUI, lệnh chấm), 1 (ontology: ImportRun, ListingPendingUnit, bốn thao tác import,
-  createListing live), 2 (migration 015, bộ cách ly xanh 38 ca trên dãy D), 3 (đọc tệp, bộ tệp thử), 4 (luật dấu: `src/modules/imports/{targets,mark,table}.ts`, 23 ca xanh) — đầu nhánh 2822af6.
-- make check hiện đỏ đúng ba bài cửa `/api/v1/imports` của `src/modules/identity/permissions.test.ts` (cửa khai trước,
-  route ở việc 7) — dự kiến, không phải lỗi.
+- Xong: việc 0–6 và phần máy chủ của việc 7: ontology, migration 015, đọc tệp, luật dấu (`src/modules/imports/{targets,mark,table}.ts`), cửa tạo `src/modules/listings/create.ts`, phần học `company-config/import-learn.ts`, mã riêng `catalog/company-alias.ts`, lưu và cửa `src/modules/imports/{store,imports-http,server}.ts` + năm route `/api/v1/imports…`. make check XANH ở 1e0f95d.
 - G-1711-40/41: THÊM ca có tên chèn/xoá chéo sàn vào bộ cách ly (`db/tests/cach-ly.sql` + tên ca vào CA_SQL của `db/scripts/cach-ly.sh`, G duyệt D-12), kèm đối chứng dương; trang Cổng Bằng chứng nêu ca 23 trước → sau.
-- Việc kế: 5 (`src/modules/listings/create.ts`), 6
+- Việc kế ngay: (a) ca có tên «nhap-excel-theo-san» trong `db/tests/cach-ly.sql` + tên vào CA_SQL của `db/scripts/cach-ly.sh` (G D-12); (b) `tests/db/nhap-excel.db.test.ts` theo E4, E6, E8, E9, E12, E13, E14 (route handler thật trên Postgres dãy D) và chạy tệp phá `db/tests/pha-thu/nhap-excel-xoa-mo.sql`; (c) việc 8 màn `/nhap-tep` (khung solution-crm-6, `@/components/reui/stepper` đã cài; gỡ dòng «bo qua: nhap-tep — planned» của e2e-templates.test và đổi screens.yaml sang built); (d) việc 9 Bảng hàng sau khi 3g gộp; (e) việc 10, S4.
+- Ghi chú việc 5–7 cũ: 5 (`src/modules/listings/create.ts`), 6
   (`company-config/import-learn.ts`, `catalog/company-alias.ts`), 7 (cửa `/api/v1/imports` + `tests/db/nhap-excel.db.test.ts`,
   chạy cả tệp phá `db/tests/pha-thu/nhap-excel-xoa-mo.sql`), 8 (màn), 9 (Bảng hàng — sau khi 3g gộp), 10, rồi S4.
 - Năm hồ sơ đã ký có mục sua-sau-ky (ghim lại cùng lượt ghim của hàng 11): kiem-vai-theo-man, kiem-vong-doi-thao-tac,
