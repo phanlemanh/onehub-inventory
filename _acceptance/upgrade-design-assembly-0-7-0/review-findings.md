@@ -1,68 +1,112 @@
+# Review findings: upgrade-design-assembly-0-7-0 (round 3)
+
 ## Trong hợp đồng
 
-Không có.
+(không có finding nào)
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Design / Records: skill and proof-gate template tell agents to write ledger lines into a derived, gitignored copy**
+- **Evidence: CI at the PR head is red and HEAD has no CI result**
+  Người dùng thấy gì: The latest changes are not yet pushed or checked by the automatic pipeline, so the last visible run is red. Nothing is broken for end users; the branch just cannot be merged until the checks are re-run and go green.
+  Căn cứ: No user-facing harm: the red run is on an older version and re-running the checks at the current version settles it with no separate work item.
+  file: `_acceptance/upgrade-design-assembly-0-7-0/evidence-report.md`
+  severity: medium
+  Đề xuất: wont-fix
+
+- **Records: decision 0030 lists the same link twice**
+  Người dùng thấy gì: One internal note page lists the same reference twice. Users of the product never see it and nothing behaves differently.
+  Căn cứ: Purely cosmetic in internal notes, harmless to users, and fixing it later costs almost nothing.
+  file: `wiki/decisions/0030-so-man-khai-cua-vao-va-nut.md`
+  severity: low
+  Đề xuất: wont-fix
+
+- **Tests: comments still promise a drift check that the committed table no longer gives**
+  Người dùng thấy gì: A comment in the tests still says a permission change would show up as a mismatch, but the table is now regenerated each time. A reader could be misled; the product itself is unaffected.
+  Căn cứ: Only misleads developers reading the comment, never users, and the owner already accepted it as a known limit.
+  file: `tests/e2e-db/vai-man.spec.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Records: no decision page for moving the ledgers out of git (AGENTS.md: significant technical choice)**
+  Người dùng thấy gì: The team has no written explanation of why the design ledgers were moved out of version control. End users see no effect; future maintainers may have to guess the reason.
+  Căn cứ: No effect on users and no data at risk; the owner already accepted it and the page can be written later at low cost.
+  file: `wiki/log.md`
+  severity: low
+  Đề xuất: known-limits
+
+- **Personal data: record files contain absolute paths with the machine's username**
+  Người dùng thấy gì: Some internal record files include the developer's computer username in file paths. Customers are not affected, but it is a small amount of personal information kept in the repository.
+  Căn cứ: Low exposure limited to a machine username in internal records, already accepted by the owner, and removable later by editing the files.
+  file: `_acceptance/upgrade-design-assembly-0-7-0/s4-args-r2.json`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): bài đỏ phía nhánh của change-list nạp danh sách tay qua --branch-changes nên đường đọc merge-base mới sửa không bao giờ chạy**
+  Người dùng thấy gì: The check that decides which files the branch changed is not proven to catch a wrongly added file through its real path. This affects only the review process, so a stray change could in theory go unnoticed, not harm customers.
+  Căn cứ: No customer impact; it only weakens one internal safety check, and a fresh review can still catch stray changes.
+  file: `_acceptance/upgrade-design-assembly-0-7-0/rang/measures-two-way.mjs`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Design / Records: skill and proof-gate template tell agents to write ledger lines into a derived, gitignored copy (r2)**
   Người dùng thấy gì: Người làm theo hướng dẫn trong kỹ năng sẽ ghi dòng mới vào một bản sao tạm thời. Dòng đó không vào git và bị ghi đè ở lần chạy sau, nên việc của họ lặng lẽ mất.
   Căn cứ: Mất công việc mà không báo lỗi nên dễ gặp lại, nhưng chỉ ảnh hưởng người làm theo hướng dẫn và sửa rẻ bằng một thay đổi riêng về lời dặn.
   file: `.claude/skills/inventory-ui/SKILL.md`
   severity: high
   Đề xuất: new-contract
 
-- **Design: Python readers prefer the stale out-of-git copy over the fragment folder (the real ledger)**
+- **Design: Python readers prefer the stale out-of-git copy over the fragment folder (the real ledger) (r2)**
   Người dùng thấy gì: Sau khi sửa sổ mà chưa vẽ lại, cổng chứng minh có thể chấm theo dữ liệu cũ nên cho kết quả xanh hoặc đỏ sai.
   Căn cứ: Chỉ sai trong khoảng giữa lúc sửa và lúc vẽ lại, tự hết khi chạy make check, không mất dữ liệu nào.
   file: `tools/proof_gate/model.py`
   severity: medium
   Đề xuất: known-limits
 
-- **Proof gate: row 1q and registry lookups turn off silently when design/component-registry.json is absent**
+- **Proof gate: row 1q and registry lookups turn off silently when design/component-registry.json is absent (r2)**
   Người dùng thấy gì: Khi chạy cổng chứng minh riêng trên bản tải mới, một linh kiện thêm mà chưa kê có thể vẫn báo xanh.
   Căn cứ: Chỉ xảy ra khi bỏ qua make check, còn make check vẫn bắt được, nên hậu quả nhẹ và người dùng cuối không thấy.
   file: `tools/proof_gate/model.py`
   severity: medium
   Đề xuất: known-limits
 
-- **Criteria and tests: role × screen × button drift guard is now vacuous, test descriptions still promise it**
+- **Criteria and tests: role × screen × button drift guard is now vacuous, test descriptions still promise it (r2)**
   Người dùng thấy gì: Bài kiểm về bảng quyền theo vai, màn, nút không còn bắt được lệch nữa dù lời mô tả vẫn hứa vậy, nên một thay đổi quyền sai có thể lọt.
   Căn cứ: Là hàng rào bị yếu đi chứ không phải lỗi đang hiện ra, và việc lệch quyền vẫn còn bài kiểm khác giữ một phần.
   file: `tests/bo-nut-vai-man.test.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Records: no wiki decision for taking ledgers out of git; decision 0034 now states a check that no longer holds**
+- **Records: no wiki decision for taking ledgers out of git; decision 0034 now states a check that no longer holds (r2)**
   Người dùng thấy gì: Nhóm không có trang ghi lại vì sao sổ ra khỏi git, và một trang cũ còn nói điều đã không còn đúng, nên người đọc sau có thể hiểu sai.
   Căn cứ: Chỉ là tài liệu, không ảnh hưởng người dùng cuối, bổ sung sau rất rẻ.
   file: `wiki/decisions/0034-component-register-written-by-design-assembly.md`
   severity: medium
   Đề xuất: known-limits
 
-- **CI and tooling: wiki front-matter links and make targets depend on derived files that a clean checkout lacks**
+- **CI and tooling: wiki front-matter links and make targets depend on derived files that a clean checkout lacks (r2)**
   Người dùng thấy gì: Chạy riêng một số lệnh kiểm trên bản tải mới có thể báo đỏ với lời báo sai nguyên nhân.
   Căn cứ: Chạy make check đầy đủ vẫn đúng, chỉ gây nhầm cho người chạy lẻ và họ tự gỡ được bằng cách chạy lại đủ.
   file: `mk/derived.mk`
   severity: medium
   Đề xuất: known-limits
 
-- **Secrets: gitleaks detect reports 2 leaks introduced by the branch (false positives, not allowlisted)**
+- **Secrets: gitleaks detect reports 2 leaks introduced by the branch (false positives, not allowlisted) (r2)**
   Người dùng thấy gì: Công cụ quét bí mật báo hai cảnh báo giả trong tệp hồ sơ, có thể làm đỏ lần quét toàn lịch sử và gây hoang mang.
   Căn cứ: Không có bí mật thật bị lộ, chỉ gây báo động giả, và có thể xử lý bằng cách thêm ngoại lệ sau.
   file: `_acceptance/upgrade-design-assembly-0-7-0/s4-args.json`
   severity: low
   Đề xuất: known-limits
 
-- **Personal data: committed record carries absolute local paths with the machine username**
+- **Personal data: committed record carries absolute local paths with the machine username (r2)**
   Người dùng thấy gì: Tệp hồ sơ lộ tên người dùng máy và cách tổ chức thư mục cá nhân của chủ kho.
   Căn cứ: Thông tin lộ ở mức thấp, không phải mật khẩu hay dữ liệu khách, nhưng đã vào lịch sử git nên khó gỡ hẳn.
   file: `_acceptance/upgrade-design-assembly-0-7-0/s4-args.json`
   severity: low
   Đề xuất: known-limits
 
-- **Records: duplicate front-matter link in decision 0030**
+- **Records: duplicate front-matter link in decision 0030 (r2)**
   Người dùng thấy gì: Một trang quyết định có hai liên kết giống nhau, người đọc không bị ảnh hưởng gì.
   Căn cứ: Chỉ là lỗi thẩm mỹ trong tài liệu, không ảnh hưởng ai, nên không đáng mở việc riêng.
   file: `wiki/decisions/0030-so-man-khai-cua-vao-va-nut.md`
