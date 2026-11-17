@@ -33,11 +33,13 @@ Source input: ô cơ hội `_acceptance/sua-thong-tin-can/opportunity.md` (build
   «Đã đổi …» kèm «Hoàn tác»; «Hoàn tác» đưa cả bốn về như cũ; tải lại trang (có cơ sở dữ liệu) vẫn thấy giá trị đã lưu. Làm
   được ở khổ 1440 và 360. (cross-layer)
 - AC-3: Given hộp «Sửa» đang mở, When người không đổi gì, gõ Pháp lý quá 200 ký tự, hay để trống một trường, Then không
-  đổi gì thì «Lưu» không gửi gì; quá dài thì hộp nói tại trường và không gửi; để trống là xoá phần ấy, mức đủ thông tin
-  đếm thiếu lại. Máy chủ từ chối bản ghi có giá trị ngoài tập cố định hay chữ quá dài (400).
+  đổi gì thì «Lưu» không gửi gì; quá dài thì hộp nói tại trường và không gửi; để trống là xoá phần ấy (lưu thành không có,
+  mức đủ thông tin đếm thiếu lại); một trường đã dài quá 200 ký tự từ lần nhập tệp mà người không đổi thì vẫn lưu được các
+  trường khác. Máy chủ từ chối bản ghi có giá trị ngoài tập cố định hay chữ quá dài (400). (cross-layer)
 - AC-4: Given một lần lưu trong hộp không qua, When cửa ghi trả mất mạng, căn vừa đổi (409), phiên hết hạn (401), máy chủ
   lỗi (500) hay không đủ quyền (403), Then hộp giữ nguyên chữ đã gõ và nói đúng một câu theo kết cục — bốn câu đầu kèm «Thử
-  lại», câu 403 chỉ còn «Thôi»; căn vừa đổi thì mục hiện bản mới nhất sau khi đóng hộp. (cross-layer)
+  lại», câu 403 chỉ còn «Thôi»; căn vừa đổi (409 kèm bản hiện tại từ máy chủ) thì mục hiện bản mới nhất sau khi đóng
+  hộp. (cross-layer)
 - AC-5: Given căn điền đủ Pháp lý và Tình trạng sử dụng qua hộp, When hồ sơ đếm mức đủ thông tin, Then hai phần ấy không còn
   trong câu «Còn thiếu …» — đếm bằng đúng một luật `completeness` của hàng 3b (không bản thứ hai), là điều kiện hàng 15 đọc.
 - AC-6: Given sàn có trường riêng đủ năm kiểu (chữ, số, ngày, chọn một, có/không) và Đầu chủ ở khổ từ 768 px, When mở ô
@@ -47,8 +49,8 @@ Source input: ô cơ hội `_acceptance/sua-thong-tin-can/opportunity.md` (build
   `updateListing` thì ô không mở. (cross-layer)
 - AC-7: Given cửa lưu của Bảng hàng, When máy chủ trả 401, 403, 409, 404, 400, 500 hay thân trả lời không đọc được, Then
   kết cục lần lượt là phiên hết hạn, không đủ quyền, căn vừa đổi, căn vừa đổi, máy chủ không nhận, máy chủ lỗi, máy chủ lỗi
-  — đọc bằng MỘT luật ở `src/lib/write-failure.ts` mà cả cửa lưu và cửa ghi chung `useChange` dùng (không còn bảng mã thứ
-  hai trong `src/`); bài của cửa lưu lấy thân trả lời từ handler thật `createListingsHandlers`, không viết tay.
+  — đọc bằng MỘT luật ở `src/lib/write-failure.ts` mà cả cửa lưu và cửa ghi chung `useChange` dùng (không tệp nào trên
+  đường ghi của căn còn bảng mã thứ hai); bài của cửa lưu lấy thân trả lời từ handler thật `createListingsHandlers`, không viết tay.
 - AC-8: Given Đầu chủ dán một khối từ Sheet phủ cột riêng của sàn, When hộp xem trước mở, Then giá trị đúng kiểu nằm ở
   «sẽ đổi» và áp được bằng một lần, một «Hoàn tác»; giá trị sai kiểu, lựa chọn không có nằm ở «sai kiểu» kèm lý do; chữ rơi
   vào cột tính (Về tay) theo Hỏi-2. Bài màn không đủ quyền `tests/bang-hang-khong-du-quyen.test.tsx` có đối chứng dương cho
@@ -56,6 +58,9 @@ Source input: ô cơ hội `_acceptance/sua-thong-tin-can/opportunity.md` (build
 - AC-9: Given hộp «Sửa» và ô cột riêng đang mở, When bộ quét trợ năng chạy ở nền sáng và tối, và bài trình duyệt chạy ở bốn
   khổ 360, 414, 1024, 1440, Then không có lỗi trợ năng mức nghiêm trọng, nút «Sửa» có tên đọc được, tiêu điểm về «Sửa» khi
   hộp đóng.
+- AC-10: Given một lần sửa bốn trường hay một giá trị trường riêng được lưu, When máy chủ ghi căn, Then «Xác nhận lúc» của
+  căn theo đúng câu chủ kho chọn ở Hỏi-1 (khuyến nghị: mọi lần sửa đặt «Xác nhận lúc» là lúc lưu, một luật với hàng 4) và
+  ô «Xác nhận lúc» trên lưới đổi theo. (cross-layer)
 
 ## Vai × Màn
 
@@ -67,8 +72,9 @@ Source input: ô cơ hội `_acceptance/sua-thong-tin-can/opportunity.md` (build
 
 ## Đường đo
 
-- Ô cơ hội chưa khai ngưỡng. Đường đo của hàng: số căn đủ năm phần trên tổng căn đang chào của mỗi sàn, đếm từ bảng
-  `listings` bằng luật `completeness` — AC-2, AC-5 bảo đảm có vật để đếm. Không thêm bảng đếm.
+- Ô cơ hội khai ngưỡng đề xuất bằng chính câu «bật khi» của hàng (sửa được ở máy tính và điện thoại, lưu xong hồ sơ và
+  mức đủ thông tin hiện giá trị mới). Đường đo: AC-2 đo ở khổ 1440 và 360; số căn đủ năm phần trên tổng căn đang chào của
+  mỗi sàn đếm từ bảng `listings` bằng luật `completeness` (AC-5). Không thêm bảng đếm.
 
 ## Coverage
 
@@ -77,7 +83,8 @@ trong hồ sơ · ô · dán) × kết cục ghi (lưu · hoàn tác · mất m�
 sai luật) × vai (ba vai sửa · Quản trị sàn) × khổ (360 · 1440). Thước CE: mỗi ô của trục kết cục có một ca trong bài cửa lưu
 (AC-7) hoặc bài hộp (AC-4).
 
-- [GIẢ ĐỊNH] Trần 200 ký tự cho Pháp lý và Tài chính là máy chọn (một dòng chữ); chưa đo trên dữ liệu thật của sàn.
+- [GIẢ ĐỊNH] Trần 200 ký tự cho Pháp lý và Tài chính là máy chọn (một dòng chữ); chưa đo trên dữ liệu thật của sàn. Chỉ
+  kiểm trường người vừa đổi: giá trị dài sẵn từ lần nhập tệp không chặn lần lưu (AC-3).
 - [GIẢ ĐỊNH] Sửa trường riêng trên điện thoại để hàng 3d (sửa nhanh trên điện thoại) — điện thoại không sửa trên ô.
 
 ## Out of scope
@@ -90,6 +97,11 @@ sai luật) × vai (ba vai sửa · Quản trị sàn) × khổ (360 · 1440). T
 - Lịch sử ai sửa gì — hàng 3c «Lịch sử của căn» (ai quyết: chủ kho, lộ trình).
 
 ## Câu hỏi cho chủ kho
+
+- Hỏi-3 · Chỗ sửa bốn trường (ô cơ hội để anh chốt): khuyên **A — trong hồ sơ căn**, nút «Sửa» ở đầu mục «Lần chào đang
+  mở», hộp bốn trường; Bảng hàng giữ tám cột đã ký ở hàng 2. Lối khác: B — thêm bốn cột Pháp lý, Nội thất, Tài chính, Tình
+  trạng vào Bảng hàng và sửa trên ô như giá; giá: lưới thành mười hai cột (ẩn bớt bằng «Cột»), ký lại phần cột của hàng 2,
+  điện thoại vẫn phải sửa ở hồ sơ.
 
 - Hỏi-1 · Sửa bốn trường hay trường riêng có tính là «vừa xác nhận với chủ nhà» không: khuyên **có, mọi lần sửa** — một
   luật của hàng 4. Lối khác: trường riêng không tính; giá: hai luật để nhớ.

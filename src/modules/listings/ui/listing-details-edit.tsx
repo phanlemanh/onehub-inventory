@@ -141,7 +141,9 @@ export function ListingDetailsEdit({
   const [failed, setFailed] = useState<Exclude<WriteOutcome, "saved"> | null>(null);
   const [tried, setTried] = useState(false);
   if (!api) return null;
-  const tooLong = (text: string) => !detailText(text).ok;
+  // Only a part the person changed is checked: words already longer from an imported sheet do not block the save.
+  const tooLong = (text: string, key: "legalStatus" | "financing") =>
+    text.trim() !== (details[key] ?? "") && !detailText(text).ok;
   const openChange = (next: boolean) => {
     if (next) {
       setDraft(draftOf(details));
@@ -153,7 +155,7 @@ export function ListingDetailsEdit({
   const what = RECORD_COPY.detailsWhat(words.unit, unitNumber);
   const submit = async () => {
     setTried(true);
-    if (tooLong(draft.legalStatus) || tooLong(draft.financing)) return;
+    if (tooLong(draft.legalStatus, "legalStatus") || tooLong(draft.financing, "financing")) return;
     const change = changeOf(details, draft);
     if (!change) {
       setOpen(false);
@@ -193,7 +195,7 @@ export function ListingDetailsEdit({
         ? FRAME_COPY.refusedAction
         : RECORD_COPY.detailsFailed(failed);
   const text = (key: "legalStatus" | "financing", label: string) => {
-    const long = tried && tooLong(draft[key]);
+    const long = tried && tooLong(draft[key], key);
     return (
       <Field data-invalid={long || undefined}>
         <FieldLabel htmlFor={`details-${key}`}>{label}</FieldLabel>
