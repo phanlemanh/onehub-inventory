@@ -22,7 +22,7 @@ evals:
     executor: script
     cmd: config:executors.script.app_shell_verve_e2e
     paths: [src/components/templates/app-shell.tsx, src/modules/listings/ui/unit-jump.tsx, tests/e2e/app-shell.spec.ts]
-    expected: "exit 0; ở 1024 và 1440: tâm ô tìm lệch tâm thanh trên ≤ 2 px, ô rộng ≥ 300 px, chữ gợi ý scrollWidth - clientWidth ≤ 0; thanh trên không có nút 'Đổi giao diện' và nút 'Tài khoản'; ở 360 và 414 trang không cuộn ngang và nút tìm cách mép phải thanh trên ≤ 12 px. Chiều đỏ: ô ở x=800 rộng 160 trên thanh 1000 cho 'search not in the middle of the top bar'"
+    expected: "exit 0; ở 1024 và 1440: tâm ô tìm lệch tâm thanh trên ≤ 2 px, ô rộng ≥ 300 px, chữ gợi ý hiện trọn theo vị trí đã vẽ — nút nằm trong ô, chữ gợi ý kết thúc trước hai phím ⌘ K, hai phím kết thúc trong nút (assertHintWhole); thanh trên không có nút 'Đổi giao diện' và nút 'Tài khoản'; ở 360 và 414 trang không cuộn ngang và nút tìm cách mép phải thanh trên ≤ 12 px. Chiều đỏ: ô ở x=800 rộng 160 trên thanh 1000 cho 'search not in the middle of the top bar'; trên chính trang thật, ô tìm bị ép còn 120 px (themKieu) cho 'search hint is cut'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E4
@@ -131,4 +131,12 @@ evals:
     cmd: config:executors.script.app_shell_verve_db
     paths: [src/components/templates/page-header.tsx, src/components/templates/app-shell/second-column.tsx, tests/e2e-db/app-shell-verve.spec.ts]
     expected: "exit 0; ở 1024 và 1440, đăng nhập thật: Thành viên và Tuỳ chỉnh của sàn › Thuế phí có h1 ≤ 14 px, nút chính kết hàng đầu trang (mép phải lệch ≤ 2 px, hàng cao ≤ 40 px — assertActionAtEnd), viền cột thứ hai ≥ chiều cao cửa sổ trừ 80 px. Chiều đỏ: nút rớt xuống hàng hai (hàng cao 80) hay lệch phải 300 px cho 'primary action is not at the end of the thin head'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E17
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.app_shell_verve_db
+    paths: [src/components/templates/app-shell.tsx, src/app/(app)/company-switch.tsx, tests/e2e-db/app-shell-verve.spec.ts]
+    expected: "exit 0; tests/e2e-db/app-shell-verve.spec.ts, đăng nhập thật với một sàn tên rất dài, ở 768, 1024 và 1440: mép phải tên sàn không vượt mép trái ô tìm (assertApart) và tên sàn bị cắt bằng dấu ba chấm (scrollWidth > clientWidth). Chiều đỏ trên cùng hàm: tên sàn kéo tới 720 khi ô tìm bắt đầu ở 600 cho 'company name runs into the search box'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
