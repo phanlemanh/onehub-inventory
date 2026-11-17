@@ -49,3 +49,9 @@ Còn lại trước lượt 2:
 - Trần 500: trang gửi `TEXT_VALUE_LIMIT` của lớp riêng cho cột chữ; bỏ hằng sao chép trong `custom-rules.ts`.
 - Câu mô tả hộp và câu «căn vừa đổi» lấy chữ từ nhãn (DetailsWords, Unit).
 - Rồi: `make check`, bài trình duyệt và DB của hàng, xin s4, s4-args `--carry-anchor 2e4292f`, chấm lượt 2.
+
+## Trạng thái tại 450d92e
+
+Mọi mục G-1711-37 cho sửa đã làm; `make check` xanh. Việc kế: xin `s4`, sinh tham số với `--carry-anchor 2e4292f`, chấm lượt 2
+(trần 3 lượt). Lượt 2 xanh → thẻ Cổng Bằng chứng (nêu: đổi ontology cần người xem; năm hồ sơ sửa sau ký; ảnh trước/sau
+của nền mờ và thông báo), PR sẵn sàng, trình tại phiên H.
