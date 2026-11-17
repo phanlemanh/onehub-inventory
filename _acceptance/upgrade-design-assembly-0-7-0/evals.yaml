@@ -1,0 +1,203 @@
+schema_version: 1
+feature_slug: upgrade-design-assembly-0-7-0
+# Ma trận viết trước (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
+#   Chỗ rời main: 692530329a09e368caea58f335ed648122a9dfba. Commit lên đời: ec2c4597, cha là commit trên.
+#   Plugin: design-assembly 0.7.0; tool f3d66a61fdcfbdfca103d48c7077bd1c9b95bb73, 34 tệp; mk/design-assembly.mk
+#     d67aeb30023e8ce4e0583979387c8078653ff3a3; nguồn: kho design-assembly ở 93daea48bf27b4b3cc629859eb5b74b805642a94.
+#   Bốn tệp dẫn xuất: design/component-registry.json, design/screens.yaml, design/role-screen-buttons.md,
+#     design/intake.yaml. Hai tên cũ: design/so-khoi.yaml, design/vai-man-nut.md. Mảnh: 9 màn, 23 khối.
+#   affected trên 30 lần gộp: 26 mọi màn, 0 một phần, 4 không màn nào, 0 thiếu màn đã khai.
+#   Cổng chứng minh màn chỉ với thư mục mảnh: nhap_kho 23; ngày luật 2026-11-12 (1edac3b0).
+#   Audit: một dòng khác, «contract: 7 of 7 …» → «contract: 8 of 8 …». Commit lên đời: 81 tệp.
+#   Cặp hai chiều: measures-two-way.mjs (mười bài, mỗi phép đo nhanh một bài) và shallow-two-way.mjs (một bài,
+#     make check trên bản sao nông của 69253032). Mỗi ca phá một thông điệp ghim, kê ở `expected` của từng eval.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    layer: backend-effect
+    paths: ["tools/**", "design/**", "tests/**", "mk/**", "src/components/**"]
+    expected: "exit 0; đầu ra có dòng 'design-assembly: 17 decisions held by 25 checks, each seen failing on a changed copy', dòng 'component manifest: design/component-registry.json is up to date (294 components)' và dòng 'Tests  2460 passed | 2 skipped (2462)'. Chiều đỏ: E20 (cổng chứng minh màn đỏ khi thư mục mảnh mất _shared.yaml) và E3 (cùng lệnh trên 69253032 không in dòng 25 lệnh kiểm)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.da070_shallow_check
+    long_running: 15
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng 'shallow: make check green on a depth-1 clone of <sha> with origin; 2460 tests passed; it drew 4 derived files absent before, none tracked'. Chiều đỏ: E3"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.da070_shallow_two_way
+    long_running: 10
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-0/rang/**", "mk/**", "tools/design-assembly/**", ".gitignore"]
+    expected: "exit 0; một bài đạt: cùng cách dựng bản sao trên 69253032 cho phép đo đỏ với 'shallow: make check did not say: derived files: wrote design/screens.yaml from design/screens', 'shallow: make check did not say: design-assembly: 17 decisions held by 25 checks, each seen failing on a changed copy' và 'shallow: tracked in the clone: design/component-registry.json design/screens.yaml'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.da070_tool_tree
+    layer: backend-effect
+    paths: ["tools/design-assembly/**", "design/tool-stamp.json", "mk/design-assembly.mk", "_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; dòng 'tool: tools/design-assembly is the plugin's version 0.7.0, 34 files, tree f3d66a61fdcf; the stamp says the same; mk/design-assembly.mk is the template's'. Chiều đỏ: E15"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.da070_release_ledger
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; dòng 'release ledger: version 0.7.0 at 93daea4 names tool tree f3d66a61fdcf, the one pinned here; its templates have that tree and the gate step', đọc từ kho design-assembly ở commit ghim. Chiều đỏ: E15"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.da070_out_of_git
+    layer: backend-effect
+    paths: [".gitignore", "design/**", "tools/**", "tests/**", "mk/**", "src/**", ".claude/**", "_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; dòng 'out of git: 4 derived files untracked and ignored, old names gone, 9 screen and 23 block files tracked, no reader names an old path'. Chiều đỏ: E16"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.da070_fragments_equal
+    layer: backend-effect
+    paths: ["design/screens/**", "design/intake/**", "_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; dòng 'fragments: 9 screens entries and 23 intake entries hold exactly the data of the old ledgers at 69253032'. Chiều đỏ: E17"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.da070_two_branch_merge
+    layer: backend-effect
+    paths: ["design/screens/**", "design/intake/**", "_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; dòng 'merge: two branches each adding a screen and a block merge clean at <sha>; on the one-file ledgers at 69253032 they conflict in design/screens.yaml and design/so-khoi.yaml'. Chiều đỏ: E18"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.da070_affected_merges
+    long_running: 5
+    layer: backend-effect
+    paths: ["design/theme.json", "tools/design-assembly/**", "_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; dòng 'affected: 30 merges: 26 all screens, 0 some screens, 4 no screen; with a declared screen missing: 0'. Chiều đỏ: E19"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.da070_proof_gate_fragments
+    layer: backend-effect
+    paths: ["tools/proof_gate/**", "design/intake/**", "design/screens/**", "_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; dòng 'proof gate: with design/intake.yaml and design/screens.yaml absent, the gate passes and decision 0023 reads 23 blocks from design/intake'. Chiều đỏ: E20"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E11
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.da070_law_day
+    layer: backend-effect
+    paths: ["tools/proof_gate/legacy.py", "_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; dòng 'law day: 2026-11-12, from the commit 1edac3b0 adding design/so-khoi.yaml, the oldest path of the block ledger'. Chiều đỏ: E20"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E12
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.proof_gate
+    layer: backend-effect
+    paths: ["tools/proof_gate/**", "design/intake/**"]
+    expected: "exit 0; mọi bài của tools/proof_gate đạt, gồm bài 'sổ khối theo mảnh mà chưa có bản sao một tệp thì cổng đọc thẳng thư mục, quyết định 0023 vẫn bật' và đối chứng không _shared.yaml thì 0023 tắt"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E13
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.da070_audit_diff
+    long_running: 5
+    layer: backend-effect
+    paths: ["design/**", "tools/design-assembly/**", "_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; dòng 'audit: at 69253032 and at HEAD the plugin's audit differs in one line: «contract: 7 of 7 ledger file(s) have the one shape every reader relies on» → «contract: 8 of 8 ledger file(s) have the one shape every reader relies on»'. Chiều đỏ: E21"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E14
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.da070_change_list
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; trước khi gộp, dòng 'changes: the upgrade commit changes exactly its 81 files, each in one of 13 groups; the branch changes <n> files, all of them the upgrade's or this record's' với n từ 81 trở lên; sau khi nhánh vào origin/main, dòng 'changes: the upgrade commit changes exactly its 81 files, each in one of 13 groups; the branch is in origin/main already, so only the commit was compared'. Chiều đỏ: E22"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E15
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.da070_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-0/rang/**", "tools/design-assembly/**", "design/tool-stamp.json", "mk/design-assembly.mk"]
+    expected: "exit 0; mười bài đạt. Bài 'tool-tree' đỏ ở sáu ca: thêm một byte vào check.mjs → '…: 34 files'; thêm một tệp → '…: 35 files'; 'the stamp says version 0.6.0, not 0.7.0'; 'the stamp's tree 7806e10b6bd6 is not the tree of version 0.7.0'; 'no stamp at design/tool-stamp.json'; 'mk/design-assembly.mk is not the plugin's gate step'. Bài 'release-ledger' đỏ ở ba ca: 'cannot read … at 93daea4'; 'names tool tree ffffffffffff, not f3d66a61fdcf'; 'no version 0.7.0 at 93daea4'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E16
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.da070_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; bài 'out-of-git' đỏ ở năm ca: 'derived files tracked by git: design/screens.yaml'; 'derived files not ignored: design/intake.yaml'; 'old names still in git: design/so-khoi.yaml'; 'intake: design/intake has 22 entry files, not 23'; 'readers still naming an old path: tools/coverage_matrix/buttons.py'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E17
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.da070_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-0/rang/**", "design/screens/**", "design/intake/**"]
+    expected: "exit 0; bài 'fragments-equal' đỏ ở bốn ca: bản sao mất design/intake/sua-tren-o.yaml → 'intake: entries lost: sua-tren-o'; sổ cũ có thêm màn → 'screens: entries lost: thu'; sổ cũ đổi một trường → 'intake: sua-tren-o differs (mo_ta)'; sổ cũ đổi khoá khác → 'screens: _shared.yaml differs from the old ledger's other keys (statuses)'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E18
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.da070_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; bài 'two-branch-merge' đỏ ở hai ca: hai nhánh thêm cùng một mã → 'merge: fragments: the two branches conflict'; đối chứng đặt ở commit không có sổ một tệp → 'merge: control: design/screens.yaml is not in git at ec2c4597'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E19
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.da070_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-0/rang/**", "design/theme.json"]
+    expected: "exit 0; bài 'affected-merges' đỏ ở hai ca: bản đồ rỗng → '30 all screens, 0 some screens, 0 no screen, not 26 all screens, 0 some screens, 4 no screen'; bản đồ bỏ mọi màn → 'with a declared screen missing: 1, not 0'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E20
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.da070_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-0/rang/**", "tools/proof_gate/**"]
+    expected: "exit 0; bài 'proof-gate-fragments' đỏ ở hai ca: bỏ design/intake/_shared.yaml, và model.py của 69253032 chỉ đổi tên sổ, đều → 'decision 0023 reads 0 blocks without the copies, not 23'; bài 'law-day' đỏ khi legacy.py chỉ đọc đường mới → 'law day: the gate reads 2026-11-17, not 2026-11-12'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E21
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.da070_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; bài 'audit-diff' đỏ ở ba ca: thêm một dòng khác → 'the audits differ beyond the ledger files line'; hai đầu ra như nhau → '… gone [], new []'; không có kho plugin → 'cannot take the plugin out of'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E22
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.da070_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-0/rang/**"]
+    expected: "exit 0; bài 'change-list' đỏ ở sáu ca: 'upgrade commit changed outside the list: design/tokens.json'; 'upgrade commit did not change: mk/derived.mk'; 'branch changed beyond the upgrade and this record: Makefile'; nhóm thiếu behaviors.md → 'upgrade commit files not in exactly one group: design/behaviors.md (0 groups)'; nhóm wiki ghi 5 → 'groups off their count: wiki front-matter links 6/5'; và khi đã gộp, tệp ngoài danh sách vẫn đỏ; xanh khi đã gộp với dòng 'the branch is in origin/main already, so only the commit was compared'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

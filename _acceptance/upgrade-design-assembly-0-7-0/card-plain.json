@@ -1,0 +1,160 @@
+{
+ "feature_plain": "Hai người cùng thêm một màn hay một khối thiết kế sẽ không còn đụng nhau ở pull request, và tệp máy sinh thôi làm dài mỗi lần đổi mã — vì công cụ thiết kế của kho đã lên bản 0.7.0.",
+ "will_do": [
+  {
+   "id": "AC-1",
+   "p": "Sẽ giữ cổng kiểm của kho xanh: 17 quyết định thiết kế vẫn được giữ, nay bằng 25 lệnh kiểm, và 2460 bài kiểm đều đạt."
+  },
+  {
+   "id": "AC-2",
+   "p": "Sẽ chạy được trên một bản tải về sạch như máy CI: cổng tự vẽ lại bốn tệp máy sinh và không đưa tệp nào vào git."
+  },
+  {
+   "id": "AC-3",
+   "p": "Sẽ chạy đúng bản công cụ 0.7.0 mà plugin phát hành, kể cả bước cổng chép từ mẫu của plugin, không sửa tay byte nào."
+  },
+  {
+   "id": "AC-4",
+   "p": "Sẽ để bốn tệp máy sinh ngoài git, bỏ hai tên tệp tiếng Việt cũ, và mỗi màn, mỗi khối nằm ở tệp riêng của nó."
+  },
+  {
+   "id": "AC-5",
+   "p": "Sẽ giữ nguyên mọi dữ liệu của sổ màn và sổ khối khi tách thành từng tệp — không mất mục nào, không đổi trường nào."
+  },
+  {
+   "id": "AC-6",
+   "p": "Sẽ cho hai nhánh cùng thêm một màn và một khối gộp được mà không xung đột (trước đây hai nhánh như thế luôn xung đột)."
+  },
+  {
+   "id": "AC-7",
+   "p": "Sẽ nói được một thay đổi chạm màn nào: trên 30 lần gộp gần nhất, 26 lần chạm mọi màn, 4 lần chỉ đổi ghi chép nên không màn nào, và không lần nào bỏ sót màn đã khai."
+  },
+  {
+   "id": "AC-9",
+   "p": "Sẽ được bản kiểm toán của plugin nhận ra đúng một khác biệt so với trước: thêm một sổ có hình dạng chuẩn (8 thay vì 7)."
+  },
+  {
+   "id": "AC-10",
+   "p": "Sẽ chỉ đổi đúng 81 tệp của commit lên đời, mỗi tệp thuộc một nhóm việc đã khai, cộng tệp của chính hồ sơ này."
+  }
+ ],
+ "wont_do": [
+  {
+   "id": "AC-8",
+   "p": "Chặn việc cổng chứng minh màn lặng lẽ tắt luật «chọn trước, tạo sau» khi chỉ có các tệp mảnh, và giữ ngày luật là ngày sổ khối ra đời (12/11), không phải ngày đổi tên."
+  },
+  {
+   "id": "OOS-1",
+   "p": "KHÔNG thêm hai phép kiểm của bước 8.3 (sổ quyết định đứng thay trưởng thiết kế): chúng đỏ trên bản tải nông, chờ plugin 0.7.1."
+  },
+  {
+   "id": "OOS-2",
+   "p": "KHÔNG đo 30 pull request kế tiếp — đó là phép đo sau khi gộp, ở kho plugin."
+  },
+  {
+   "id": "OOS-3",
+   "p": "KHÔNG xử lý việc bộ kiểm nghiệm thu thấy kho ở bậc thấp hơn trên một bản làm việc mới chưa vẽ tệp máy sinh — việc của bộ kiểm, và chở tệp sang bản mới là anh quyết."
+  },
+  {
+   "id": "OOS-4",
+   "p": "KHÔNG sửa giới hạn đã biết: chạy riêng một bài kiểm (không qua make) thì chưa có các tệp máy sinh."
+  },
+  {
+   "id": "OOS-5",
+   "p": "KHÔNG chấm cách lệnh lên đời, trạng thái hay kiểm toán của plugin làm việc — chúng có bài kiểm ở kho plugin."
+  },
+  {
+   "id": "OOS-6",
+   "p": "KHÔNG ghim lại hay sửa các hồ sơ đã ký trước của công cụ này."
+  },
+  {
+   "id": "OOS-7",
+   "p": "KHÔNG đổi giao diện, mã sản phẩm, dữ liệu hay luật sản phẩm nào."
+  }
+ ],
+ "scope_plain": "Bảy việc cố ý để ngoài vòng này:",
+ "coverage_plain": [
+  {
+   "i": 4,
+   "p": "Công cụ và dấu phiên bản (17 tệp): đủ khi mã của cả thư mục bằng mã plugin ghi cho bản 0.7.0 — AC-3 (đúng bản phát hành)."
+  },
+  {
+   "i": 5,
+   "p": "Bước cổng chép tay (1 tệp): đủ khi giống từng byte mẫu của plugin — AC-3."
+  },
+  {
+   "i": 6,
+   "p": "Nguồn của mã ghim: đủ khi sổ phát hành và mẫu của plugin ở commit ghim nói cùng một mã — AC-3."
+  },
+  {
+   "i": 7,
+   "p": "Sổ linh kiện ra khỏi git (2 tệp): đủ khi git không theo dõi nó, nó bị bỏ qua, và cổng vẫn viết lại nó mỗi lần chạy — AC-4, AC-1, AC-2."
+  },
+  {
+   "i": 8,
+   "p": "Sổ màn tách từng tệp (11 tệp): đủ khi không mất dữ liệu và hai nhánh gộp sạch — AC-4, AC-5, AC-6."
+  },
+  {
+   "i": 9,
+   "p": "Bảng vai × màn × nút đổi tên, ra khỏi git (7 tệp): đủ khi bản tải sạch có bảng sau khi chạy cổng — AC-4, AC-2, AC-1."
+  },
+  {
+   "i": 10,
+   "p": "Sổ khối đổi tên, tách từng tệp (25 tệp): đủ khi không mất dữ liệu và hai nhánh gộp sạch — AC-4, AC-5, AC-6."
+  },
+  {
+   "i": 11,
+   "p": "Cổng chứng minh màn (7 tệp): đủ khi nó đọc được thư mục mảnh và giữ đúng ngày luật — AC-8, AC-1, AC-4."
+  },
+  {
+   "i": 12,
+   "p": "Kỹ năng thiết kế của kho (1 tệp): đủ khi không còn nhắc đường cũ — AC-4, AC-1."
+  },
+  {
+   "i": 13,
+   "p": "Bản đồ «chạm màn nào» (1 tệp): đủ khi đo trên 30 lần gộp ra đúng số đã ghim — AC-7, AC-9."
+  },
+  {
+   "i": 14,
+   "p": "Bảng luật hành vi thành danh sách (1 tệp): đủ khi nằm trong danh sách tệp và cổng đọc được — AC-10, AC-1."
+  },
+  {
+   "i": 15,
+   "p": "Liên kết wiki, hai bài kiểm thứ tự, bài kiểm bản tải nông (8 tệp): đủ khi nằm trong danh sách tệp và bài kiểm đạt — AC-10, AC-1."
+  },
+  {
+   "i": 16,
+   "p": "Hai phép kiểm của bước 8.3: ngoài phạm vi, anh đã hoãn."
+  },
+  {
+   "i": 17,
+   "p": "Chữ lịch sử trong wiki và hồ sơ cũ còn tên cũ: ngoài phạm vi, đó là ghi chép, không phải nơi đọc sổ."
+  },
+  {
+   "i": 18,
+   "p": "Cách lệnh lên đời chạy: ngoài phạm vi, có bài kiểm ở kho plugin."
+  }
+ ],
+ "gap_probe_plain": [
+  {
+   "i": 0,
+   "p": "Luật «lỗi trong công cụ thì máy tự ra bản plugin mới» hứa một việc ngoài kho mà không ai cho phép. Đã sửa: gặp lỗi trong công cụ, vòng dừng và hỏi anh."
+  },
+  {
+   "i": 1,
+   "p": "Các lựa chọn anh cho phép hôm nay chỉ nằm trong lời văn, không có dòng sổ để truy. Đẩy lên anh: Hỏi-2 xin anh xác nhận sáu lựa chọn; lý do hoãn 8.3 nay dựa trên luật bản tải nông của kho."
+  },
+  {
+   "i": 2,
+   "p": "Lý do bỏ quét độ phủ chưa ràng buộc được từng tệp: một tệp lạc vẫn có thể lọt. Đã sửa: 81 tệp nối vào 13 nhóm việc, phép đo đỏ khi một tệp không có nhóm."
+  },
+  {
+   "i": 3,
+   "p": "Dòng «sổ linh kiện khớp mã» không bao giờ đỏ vì cổng tự viết lại sổ trước khi kiểm. Đã sửa: hợp đồng nói rõ dòng ấy chỉ chứng cổng đã chạy bước viết lại; việc sổ ra khỏi git đo riêng."
+  },
+  {
+   "i": 4,
+   "p": "Sau khi gộp, phép đo danh sách tệp in một dòng chưa được ghim. Đã sửa: ghim dòng sau khi gộp và thêm ca kiểm cho trạng thái đã gộp."
+  }
+ ]
+}
