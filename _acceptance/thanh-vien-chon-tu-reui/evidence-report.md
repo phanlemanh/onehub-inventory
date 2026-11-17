@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 5b4f22fba3b279de7eaf1dbcb3dd1b7430611e5d
+verified_commit: a3cb064583e45f083ebc002db147db46a2995449
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -244,3 +244,7 @@ sha: 0d6acd84861efd4fff906d9766bb7bb7d7ffe305 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 2 — 2026-11-17, do chu kho doi khuon 2026-11-17 (VP7, R-1711-5)
 run_id: repin-20261117T024436Z-78231
 sha: 5b4f22fba3b279de7eaf1dbcb3dd1b7430611e5d · suites: 3 lệnh exit 0 · evals: 14/14 eval máy đạt kỳ vọng · ngoài làn máy: E7, E12 · diff chạm vật đo ngoài làn máy: E7, E12 — chưa chứng lại, đi vòng S4 delta · AC không có chốt máy: AC-9
+
+### Re-pin lần 3 — 2026-11-17, do chủ kho đổi khuôn App Shell 2026-11-17 (VP7, lượt 4: đầu menu tài khoản bỏ ảnh đại diện)
+run_id: repin-20261117T065306Z-64786
+sha: a3cb064583e45f083ebc002db147db46a2995449 · suites: 3 lệnh exit 0 · evals: 14/14 eval máy đạt kỳ vọng · ngoài làn máy: E7, E12 · AC không có chốt máy: AC-9
