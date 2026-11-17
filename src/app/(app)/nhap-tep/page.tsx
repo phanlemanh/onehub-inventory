@@ -6,6 +6,7 @@ import { loginHref, PageState } from "@/components/templates/page-state";
 import { label } from "@/modules/company-config";
 import { allowedScope } from "@/modules/identity";
 import { currentSession } from "@/modules/identity/server";
+import { PermittedAction } from "@/modules/identity/ui";
 import { ImportWizard } from "@/modules/imports/ui";
 
 export const metadata: Metadata = { title: label("ImportScreen") };
@@ -19,7 +20,9 @@ export default async function Page() {
   return (
     <>
       <PageHeader title={label("ImportScreen")} />
-      <ImportWizard />
+      <PermittedAction action="importListings">
+        <ImportWizard />
+      </PermittedAction>
     </>
   );
 }
