@@ -74,9 +74,9 @@ evals:
     target: http://127.0.0.1:3487/inventory
     paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**]
     steps:
-      - "With the lane H dev server on port 3487 (sample mode), open /inventory?vai=ListAgent at 1440 wide, open the record of the first row, save _acceptance/sua-thong-tin-can/evidence/E2-ho-so-1440.png"
-      - "Press «Sửa» in the «Lần chào đang mở» section, save _acceptance/sua-thong-tin-can/evidence/E2-hop-1440.png; fill the four fields, press «Lưu», save _acceptance/sua-thong-tin-can/evidence/E2-da-luu-1440.png"
-      - "Repeat the three frames at 360 wide as E2-ho-so-360.png, E2-hop-360.png, E2-da-luu-360.png"
+      - "With the lane H dev server on port 3487 (sample mode), open /inventory?vai=ListAgent&ho-so=4d415500-0001-4000-8000-000000000002 at 1440 wide (unit 1101, whose listing lacks Tài chính, so the count reads 4/5 before), save _acceptance/sua-thong-tin-can/evidence/E2-ho-so-1440.png"
+      - "Press «Sửa» in the «Lần chào đang mở» section, save _acceptance/sua-thong-tin-can/evidence/E2-hop-1440.png; change Pháp lý and type a Tài chính, press «Lưu», save _acceptance/sua-thong-tin-can/evidence/E2-da-luu-1440.png"
+      - "Reload, then repeat the three frames at 360 wide on the same unit (the sample resets on reload) as E2-ho-so-360.png, E2-hop-360.png, E2-da-luu-360.png"
     question: "Nút «Sửa» có nằm ở đầu mục «Lần chào đang mở», bên phải, cùng dáng nút phụ với «Báo sai thông tin» của mục Căn không; hộp có đủ bốn trường; sau Lưu bốn dòng và số «n/5» có đổi theo không, ở cả hai khổ? Nêu khung nào lệch."
     expected: "Đúng chỗ, đủ bốn trường, giá trị và số đếm đổi ở cả hai khổ"
     evidence_required: [run_id, screenshot, observed, verdict]

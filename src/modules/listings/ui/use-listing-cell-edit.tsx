@@ -396,8 +396,8 @@ export function useListingCellEdit({
           [CONFIRMED]: row[CONFIRMED],
         });
       for (const { row, field } of picked)
-        if (field.startsWith("custom."))
-          before.set(row.id, { ...before.get(row.id), [field]: row[field] });
+        // Every typed cell (a custom value or one of the four details, row 3g) keeps its value for undo and failure.
+        if (customs.has(field)) before.set(row.id, { ...before.get(row.id), [field]: row[field] });
       // How many pasted cells of each row hold a saved value, to know when the row's confirmed time goes back.
       const holding = new Map<string, number>();
       setApplying(true);

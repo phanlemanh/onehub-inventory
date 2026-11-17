@@ -1,0 +1,35 @@
+# Bàn giao — hàng 3g (sua-thong-tin-can), sau lượt chấm 1
+
+Nhánh `feat/sua-thong-tin-can`, worktree `agitated-einstein-ff1c68`, dãy H. Cổng Phạm vi đã duyệt (lối C). Lượt 1 REJECT
+(`evidence-report.md`, `review-findings.md`). Giám sát G-1711-37 cho sửa hết ở lượt 2. Lượt 2 chạy khi s4 trống (R đi trước).
+
+## Đã sửa sau lượt 1 (chưa commit lúc ghi trang này thì commit cùng)
+
+- Dán vào cột chi tiết rồi hoàn tác/hỏng làm mất giá trị cũ: `use-listing-cell-edit.tsx` giữ giá trị cũ cho mọi ô có kiểu.
+- Bài DB chụp ảnh qua cửa chung (`chupAnh`): `tests/e2e-db/sua-thong-tin-can.spec.ts`.
+- Bước E2-ui chỉ định căn 1101 (thiếu Tài chính).
+
+## Còn phải làm trước lượt 2 (mục ở `review-findings.md`)
+
+1. Bài «đạt giả được» (luật đợt 1, sửa trong hàng): ma trận 4 vai × PATCH details (`tests/sua-thong-tin-may-chu.test.ts`
+   dùng cửa trả theo vai thật); ca `o-rieng-quan-tri-khong-mo` + đối chứng Đầu chủ; thông điệp ghim khớp ca phá; `khong-bang-ma-thu-hai`
+   quét cả `case 403:` sau switch status; `dan-cot-rieng` thêm «không có lựa chọn»; `thong-bao-dung-cho-khi-khong-ho-so` đo vị
+   trí thông báo thật; `quan-tri-khong-nut: ô` có đối chứng Đầu chủ mở được; đối chứng `doi-chung` gắn đúng ca phá.
+2. Lỗi mã: 409 ở ô cột riêng hiện bản mới nhất (cellsOf/conflict cho ô có kiểu); hoàn tác sau sửa pháp lý dài từ tệp không báo
+   sai (undoOf chỉ gửi phần đã đổi, và trường cũ dài không gửi lại); kết cục `invalid` có câu riêng («máy chủ không nhận»,
+   không phải «Không đủ quyền»); route trả lỗi máy chủ khi không đọc được lớp riêng (không `field-retired`) + bài cho nhánh ấy.
+3. Trần 500 và kiểm ngày: trang gửi trần của trường; ngày dùng một luật.
+4. Câu mô tả hộp lấy chữ khái niệm từ nhãn (Hiện trạng) và chữ «căn» từ nhãn Unit.
+5. Ontology (G mở): yêu cầu `cham-tep` cho `ontology/entities/listing.yaml` — CHỈ THÊM: luật `details-locked-when-closed`,
+   trần 200 cho legalStatus/financing, ô vòng đời `sua_ngoai_gia` → `co: updateListing`; `make gen`; nêu ở PR và Cổng
+   Bằng chứng «có đổi ontology, cần người xem». Dãy D gộp sau.
+
+## Lệnh
+
+- Bài đơn vị: lệnh `executors.test.sua_thong_tin_unit`; trình duyệt: `sua_thong_tin_e2e`; DB: `sua_thong_tin_e2e_db`
+  (DB_LANE=h DB_PORT=5567, container `onehub-inventory-db-h` đang chạy). `make check` phải xanh.
+- Lượt chấm: xin `s4` → `s4-args.mjs --slug sua-thong-tin-can --root . --out _acceptance/sua-thong-tin-can/s4-args.json
+  --carry-anchor <sha lượt 1: 2e4292f>` → Workflow `acceptance-verify.js` (bản có nhúng tham số ở scratchpad là cách phiên
+  này dùng để lời gọi nhỏ). Máy dev 3487 chế độ mẫu cho bài nhìn.
+- Hồ sơ đã ghim lại ở lượt này: bang-hang-ban-doc, luu-goc-nhin-cot-hai, ho-so-du-thong-tin, da-gui-tren-luoi;
+  bo-o-tim-cua-vung để nguyên (E18 gắn PR cũ).
