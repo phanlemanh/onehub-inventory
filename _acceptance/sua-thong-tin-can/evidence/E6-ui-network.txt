@@ -1,1 +1,1 @@
-E6-ui: driver = Playwright test (no network reader). Test passed; gac-hydration 0 warnings. Server log only: idle DB connection closed (administrator command) x5, not app HTTP.
+driver=playwright test runner; no network reader. Playwright passed 1/1; gac-hydration 0 warnings. WebServer log: idle db connection closed (admin command) x5, not an HTTP failure.

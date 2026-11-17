@@ -1,1 +1,1 @@
-app-origin 4xx/5xx/failed requests and console errors (empty below = none)
+playwright listeners (status>=400, requestfailed, console error) on 3487 at 1440 and 360: none recorded
