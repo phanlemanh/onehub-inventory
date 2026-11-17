@@ -161,6 +161,7 @@ export function ImportWizard() {
   }
 
   const asks = marked?.questions.length ?? 0;
+  const skipped = choices.skipRows ?? [];
   const blocks = marked?.counts.block ?? 0;
   return (
     <>
@@ -398,6 +399,7 @@ export function ImportWizard() {
                   </div>
                   <div role="list" className="overflow-x-auto rounded-xl border text-sm">
                     <div className="text-muted-foreground flex w-max min-w-full border-b">
+                      <span className="w-28 shrink-0 px-3 py-2" />
                       {marked.columns.map((c) => (
                         <span key={c.index} className="w-40 shrink-0 truncate px-3 py-2">
                           {c.header}
@@ -408,8 +410,27 @@ export function ImportWizard() {
                       <div
                         role="listitem"
                         key={i}
-                        className="flex w-max min-w-full border-b last:border-0"
+                        data-skipped={skipped.includes(i) || undefined}
+                        className="flex w-max min-w-full border-b last:border-0 data-[skipped]:opacity-50"
                       >
+                        <span className="w-28 shrink-0 px-2 py-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            aria-pressed={skipped.includes(i)}
+                            aria-label={`${C.skipRow} ${i + 1}`}
+                            onClick={() =>
+                              choose({
+                                ...choices,
+                                skipRows: skipped.includes(i)
+                                  ? skipped.filter((r) => r !== i)
+                                  : [...skipped, i],
+                              })
+                            }
+                          >
+                            {skipped.includes(i) ? C.keepRow : C.skipRow}
+                          </Button>
+                        </span>
                         {marked.columns.map((c) => {
                           const cell = marked.cells[i]?.[c.index];
                           return (

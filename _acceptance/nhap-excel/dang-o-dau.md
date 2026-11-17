@@ -20,8 +20,8 @@ Cập nhật sau mỗi bước có nghĩa (G-1711-39: hạn mức tuần ≥ 95%
   make check XANH). Bài `tests/e2e-db/nhap-excel.spec.ts` ĐÃ VIẾT, CHƯA CHẠY: ca tep-khong-len-may-chu (E2), trang-thai
   (11 trạng thái ở 1024/1440 + điện thoại ở 360/414, axe sáng tối), ban-phim. Chờ lượt nặng: dãy R giữ khoá s4 lúc 14:22.
   Chạy: `DB_LANE=d DB_PORT=5571 npx playwright test -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts`.
-  Còn hở so với evals: (1) màn chưa có nút bỏ dòng, nên ban.xlsx (dòng lặp căn, `skipRows`) không áp được bằng tay →
-  E20/E21 cần thêm điều khiển «Bỏ dòng» ở bước Xem trước; (2) ô ST-inventory-trong-nap và E15 sau khi 3g gộp;
+  Còn hở so với evals: (1) nút «Bỏ dòng» ĐÃ CÓ ở bước Xem trước (bài đơn vị xanh) — còn viết ca E20/E21 bằng ban.xlsx
+  theo tests/fixtures/nhap-excel/lua-chon.json; (2) ô ST-inventory-trong-nap và E15 sau khi 3g gộp;
   (3) hoan-tac-loi hiện băng lỗi chung, chưa nêu căn nào chưa gỡ; (4) dang-doc hiện chữ «Đang đọc tệp…», chưa có khung chờ.
 - Việc kế sau màn: (c) việc 8 màn `/nhap-tep` (khung solution-crm-6, `@/components/reui/stepper` đã cài; gỡ dòng «bo qua: nhap-tep — planned» của e2e-templates.test và đổi screens.yaml sang built); (d) việc 9 Bảng hàng sau khi 3g gộp; (e) việc 10, S4.
 - Ghi chú việc 5–7 cũ: 5 (`src/modules/listings/create.ts`), 6

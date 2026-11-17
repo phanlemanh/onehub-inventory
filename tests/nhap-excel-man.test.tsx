@@ -95,6 +95,28 @@ describe("man-nap-tep", () => {
     expect(calls.at(-1)).toBe("/api/v1/imports/run-1/undo");
   });
 
+  it("a row skipped on the preview goes to the server as skipRows, and comes back", async () => {
+    const calls = server();
+    mount();
+    await choose("a.csv", "Mã căn\nS1.01-0905\n");
+    await waitFor(() => expect(calls).toContain("/api/v1/imports/preview"));
+    for (let i = 0; i < 3; i += 1)
+      fireEvent.click(screen.getByRole("button", { name: new RegExp(`^${C.next}`) }));
+    const lastPreview = () =>
+      JSON.parse(
+        String(
+          (fetch as unknown as { mock: { calls: [string, RequestInit?][] } }).mock.calls
+            .filter(([u]) => u.endsWith("/preview"))
+            .at(-1)![1]!.body,
+        ),
+      ) as { choices: { skipRows?: number[] } };
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: `${C.skipRow} 1` })));
+    expect(lastPreview().choices.skipRows).toEqual([0]);
+    expect(screen.getByRole("button", { name: `${C.skipRow} 1` }).textContent).toBe(C.keepRow);
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: `${C.skipRow} 1` })));
+    expect(lastPreview().choices.skipRows).toEqual([]);
+  });
+
   it("a wrong file says why and calls nothing", async () => {
     const calls = server();
     mount();

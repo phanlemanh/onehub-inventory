@@ -25,7 +25,7 @@ import { signInWithCode } from "./dang-nhap-vai";
 const RUN = process.env["E2E_DB_RUN"] ?? `${process.pid}`;
 const DB_PORT = process.env["DB_PORT"] ?? "5563";
 const OWNER_URL = `postgres://postgres:local-only@127.0.0.1:${DB_PORT}/dang_nhap_e2e_${RUN}`;
-const FIX = join(__dirname, "..", "fixtures", "nhap-excel");
+const FIX = join(process.cwd(), "tests", "fixtures", "nhap-excel");
 const COMPANY = "[Sàn thử nạp tệp]";
 const personOf = (role: Role) => ({
   name: `[Tên] Nạp tệp ${role}`,
