@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui, api]
 screens: [inventory]
-status: approved
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-17T03:37:45Z
 design_doc: docs/superpowers/specs/2026-11-17-sua-thong-tin-can-design.md
