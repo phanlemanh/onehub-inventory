@@ -122,13 +122,33 @@ insert into luat_thu_hep values
   ('company_fee_items', 'company_fee_items_insert_by_permission', '(app.allowed(''setFeeSchedule''::text) = ''company''::text)'),
   ('company_fee_items', 'company_fee_items_update_by_permission', '(app.allowed(''setFeeSchedule''::text) = ''company''::text)'),
   -- 013_bang_can_chao.sql (hàng 10): listings and their unit links are read with viewListings, changed with
-  -- updateListing; no action adds one yet (createListing, row 12).
+  -- updateListing; 015 (hàng 11) replaces the two insert rules below: createListing went live.
   ('listings', 'listings_read_by_permission', '(app.allowed(''viewListings''::text) = ''company''::text)'),
-  ('listings', 'listings_insert_by_permission', '(app.allowed(''createListing''::text) = ''company''::text)'),
+  ('listings', 'listings_insert_by_permission',
+   '((app.allowed(''createListing''::text) = ''company''::text) OR ((app.allowed(''createListing''::text) = ''own''::text) AND ((list_agent_user_id)::text = current_setting(''app.user_id''::text, true))))'),
   ('listings', 'listings_update_by_permission', '(app.allowed(''updateListing''::text) = ''company''::text)'),
   ('listing_units', 'listing_units_read_by_permission', '(app.allowed(''viewListings''::text) = ''company''::text)'),
-  ('listing_units', 'listing_units_insert_by_permission', '(app.allowed(''createListing''::text) = ''company''::text)'),
-  ('listing_units', 'listing_units_update_by_permission', '(app.allowed(''updateListing''::text) = ''company''::text)');
+  ('listing_units', 'listing_units_insert_by_permission', '(app.allowed(''createListing''::text) IS NOT NULL)'),
+  ('listing_units', 'listing_units_update_by_permission', '(app.allowed(''updateListing''::text) = ''company''::text)'),
+  -- 015_nhap_excel.sql (hàng 11): createListing adds a listing (own scope: one the person keeps); a listing is deleted only
+  -- when undoImport allows it, it belongs to an import not undone and nobody changed it since (version 1); imports are
+  -- read with viewImports, opened with importListings, written further or undone with continueImport or undoImport.
+  ('listings', 'listings_delete_by_permission',
+   '((import_run_id IS NOT NULL) AND (version = 1) AND (EXISTS ( SELECT
+   FROM import_runs r
+  WHERE ((r.id = listings.import_run_id) AND (r.status <> ''undone''::text) AND ((app.allowed(''undoImport''::text) = ''company''::text) OR ((app.allowed(''undoImport''::text) = ''own''::text) AND ((r.imported_by)::text = current_setting(''app.user_id''::text, true))))))))'),
+  ('listing_pending_units', 'listing_pending_units_read_by_permission',
+   '(app.allowed(''viewListings''::text) = ''company''::text)'),
+  ('listing_pending_units', 'listing_pending_units_insert_by_permission',
+   '(app.allowed(''createListing''::text) IS NOT NULL)'),
+  ('listing_pending_units', 'listing_pending_units_update_by_permission',
+   '(app.allowed(''updateListing''::text) = ''company''::text)'),
+  ('import_runs', 'import_runs_read_by_permission',
+   '(app.allowed(''viewImports''::text) = ''company''::text)'),
+  ('import_runs', 'import_runs_insert_by_permission',
+   '(((imported_by)::text = current_setting(''app.user_id''::text, true)) AND ((app.allowed(''importListings''::text) = ''company''::text) OR ((app.allowed(''importListings''::text) = ''own''::text) AND ((list_agent_user_id)::text = current_setting(''app.user_id''::text, true)))))'),
+  ('import_runs', 'import_runs_update_by_permission',
+   '((app.allowed(''continueImport''::text) = ''company''::text) OR (app.allowed(''undoImport''::text) = ''company''::text) OR (((imported_by)::text = current_setting(''app.user_id''::text, true)) AND ((app.allowed(''continueImport''::text) = ''own''::text) OR (app.allowed(''undoImport''::text) = ''own''::text))))');
 
 create function pg_temp.dung_dang(bang name, luat name, lenh text, bieu_thuc text, cot text,
                                   kieu text default 'PERMISSIVE') returns boolean
@@ -864,10 +884,14 @@ begin
   perform pg_temp.phai_loi('can-chao-theo-san',
     'update listings set standard_status = ''Active'' where id = ''00000000-0000-4000-8000-0000000a0002''',
     'listings_activate');
+  -- Row 11 (015): a listing agent adds only a listing it keeps itself; a listing that came from no import is never
+  -- deleted (the delete rule lets through only listings of an import not undone, version 1).
   perform pg_temp.phai_loi('can-chao-theo-san',
     'insert into listings (id, company_id, standard_status) values (''00000000-0000-4000-8000-0000000a0004'', '
-    '''00000000-0000-4000-8000-00000000000a'', ''Incomplete'')', 'permission denied');
-  perform pg_temp.phai_loi('can-chao-theo-san', 'delete from listings', 'permission denied');
+    '''00000000-0000-4000-8000-00000000000a'', ''Incomplete'')', 'listings_insert_by_permission');
+  delete from listings;
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'HỎNG can-chao-theo-san: vai API xoá được % lần chào không đến từ lần nhập', n; end if;
   perform pg_temp.phai_loi('can-chao-theo-san',
     'update listing_units set upi = ''upi-mau-2'' where listing_id = ''00000000-0000-4000-8000-0000000a0001''',
     'permission denied');
