@@ -8,7 +8,7 @@ links:
     src/components/candidate/paste-preview.tsx,
     src/components/candidate/data-region.tsx,
     src/components/candidate/use-change.tsx,
-    design/so-khoi.yaml,
+    design/intake/_shared.yaml,
     _acceptance/dan-tu-excel/contract.md,
   ]
 sources: [_acceptance/dan-tu-excel/decisions.jsonl, _acceptance/dan-tu-excel/design-pass.md]

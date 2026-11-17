@@ -7,7 +7,7 @@ links:
     src/modules/listings/ui/unit-jump.tsx,
     src/components/templates/app-shell.tsx,
     "src/app/(app)/layout.tsx",
-    design/so-khoi.yaml,
+    design/intake/_shared.yaml,
     _acceptance/loi-vao-ho-so/contract.md,
   ]
 sources:

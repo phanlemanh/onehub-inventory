@@ -1,6 +1,7 @@
 // Checks the decisions this tool holds, shows every check failing on a changed copy, and validates
 // the ledger that points at them.
 // Usage: node tools/design-assembly/check.mjs [--rate] [--target DIR]
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { argv, cwd, exit, stderr, stdout } from "node:process";
@@ -8,7 +9,7 @@ import { fileURLToPath } from "node:url";
 
 import { contrast } from "./color.mjs";
 import { cellProblems, columnsProblem, readDisplays, typesProblem } from "./columns.mjs";
-import { componentsProblem, readFolder, targetProblem } from "./components.mjs";
+import { componentsProblem, readFolder, targetProblem, UNTRACKED } from "./components.mjs";
 import { LEDGERS, shapeProblems } from "./contract.mjs";
 import {
   LAYER_ALIASES,
@@ -47,12 +48,35 @@ import {
   screenActionsDebts,
   screenActionsProblem,
 } from "./screen-actions.mjs";
-import { readScreenLedger } from "./screen-ledger.mjs";
+import { drawDerived, keptOutOfGit } from "./derived.mjs";
+import {
+  FRAGMENT_LEDGERS,
+  FRAGMENTS,
+  joinFound,
+  ledgerOf,
+  ledgerText,
+  readFragments,
+} from "./screen-fragments.mjs";
+import {
+  FRAGMENTS_SHARED,
+  joinLedger,
+  listLine,
+  readScreenLedger,
+  twinNames,
+} from "./screen-ledger.mjs";
 import { DEFAULT_STYLESHEET, findStylesheet, loadStyles, resolve } from "./styles.mjs";
 import { lintProbes } from "./lint.mjs";
 import { probesFor, ruleOf } from "./probes.mjs";
 import { buildTheme, readBlock, renderBlock, withoutBlock } from "./theme.mjs";
 import { tokensProblem } from "./tokens.mjs";
+import {
+  branchFacts,
+  branchNotes,
+  sheetProblem,
+  taggedTests,
+  wallProblem,
+} from "./owner-calls.mjs";
+import { readWaiting } from "./waiting.mjs";
 
 export const FILES = {
   // What this tool needs to check its decisions: the stylesheet it reads, the inputs the decisions
@@ -348,6 +372,28 @@ const KINDS = {
       return { ...state, folders: { ...state.folders, [check.folder]: files } };
     },
   },
+  // A derived file the repository keeps out of git is not in git, so no pull request carries it.
+  // Where there is no git repository nothing can track the file, and the check has nothing to say.
+  [UNTRACKED]: {
+    run(state, check) {
+      if (!state.git) return null;
+      if (state.git.problem) {
+        return `${check.file} is kept out of git, but git could not be asked whether it tracks the file (${state.git.problem}): the check proves nothing until git answers`;
+      }
+      if (state.git.tracked.includes(check.file)) {
+        return `${check.file} is written from the source and this repository keeps it out of git, but git tracks it: run git rm --cached ${check.file}`;
+      }
+      if (!state.git.ignored.includes(check.file)) {
+        return `${check.file} is kept out of git, but git does not ignore it, so it may be added back by mistake: add it to .gitignore`;
+      }
+      return null;
+    },
+    // Git tracks the file.
+    change(state, check) {
+      const git = state.git ?? { tracked: [], ignored: [] };
+      return { ...state, git: { ignored: git.ignored, tracked: [...git.tracked, check.file] } };
+    },
+  },
   // Every screen of the registry declares the states every view of data has.
   states: {
     run(state, check) {
@@ -377,22 +423,59 @@ const KINDS = {
   "screen-ledger": {
     run(state, check) {
       const text = state.files?.[check.file];
+      // Kept as one file per screen, the ledger is named by its folder.
+      const named = state.fragments?.[check.file]?.folder ?? check.file;
       const shape =
-        text === null || text === undefined ? [] : shapeProblems("screens", text, check.file);
+        text === null || text === undefined ? [] : shapeProblems("screens", text, named);
       if (shape.length > 0) return shape.slice(0, 3).join("; ");
       return screenLedgerProblem(
         text,
         state.files?.[check.registry],
         check.pages ? (state.pages?.[check.pages] ?? {}) : {},
-        check.file,
+        named,
       );
     },
-    // The last screen leaves the ledger and stays in the code.
+    // The code lists one more screen, which the ledger does not have. The copy changes the code
+    // and not the ledger: whichever entry of the ledger comes last may be a screen that is only
+    // planned, and taking that one away would change nothing.
     change(state, check) {
-      const text = state.files?.[check.file] ?? "";
-      const last = text.lastIndexOf("\n  - id:");
-      const cut = last === -1 ? "screens:\n" : `${text.slice(0, last)}\n`;
-      return { ...state, files: { ...state.files, [check.file]: cut } };
+      const added =
+        '\nexport const CHANGED = [{ path: "/changed-copy", states: [{ name: "ready" }] }];\n';
+      const registry = `${state.files?.[check.registry] ?? ""}${added}`;
+      return { ...state, files: { ...state.files, [check.registry]: registry } };
+    },
+  },
+  // A ledger the repository keeps as one file per entry, the screens or the intake: each file is
+  // named after the key it holds, so two entries with one key cannot both be there, each has the
+  // shape of an entry, and the one file is not kept beside the folder as a second source.
+  [FRAGMENTS]: {
+    run(state, check) {
+      const found = state.fragments?.[check.file] ?? null;
+      const copy =
+        found && keptOutOfGit(state.theme).includes(check.file)
+          ? joinFound({ ...found, ledger: ledgerOf(check) })
+          : null;
+      return fragmentsProblem(found, check, copy);
+    },
+    // A fragment under another name than its key; where there is none, one is added so.
+    change(state, check) {
+      const found = state.fragments?.[check.file] ?? {
+        folder: check.fragments,
+        shared: "version: 1\n",
+        fragments: [],
+        beside: false,
+        ledger: ledgerOf(check),
+      };
+      const [first, ...rest] = found.fragments;
+      const moved = {
+        name: "changed-copy.yaml",
+        file: `${found.folder}/changed-copy.yaml`,
+        text: first?.text ?? FRAGMENT_LEDGERS[ledgerOf(check)].sample,
+      };
+      return {
+        ...state,
+        fragments: { ...state.fragments, [check.file]: { ...found, fragments: [moved, ...rest] } },
+      };
     },
   },
   // The ledger of screens agrees with the domain model: every action is offered to every role that
@@ -610,6 +693,60 @@ const KINDS = {
       return { ...state, files: { ...state.files, [check.file]: text } };
     },
   },
+  // Every choice points at a row, and every judgment nobody confirmed waits on the decision sheet:
+  // a judgment this branch writes that no person answered and no question asks, source that goes
+  // around a decided scale, and a test that proves a decision the ledger has no row for, fail.
+  "decision-sheet": {
+    run(state, check) {
+      let blueprint;
+      try {
+        blueprint = JSON.parse(state.files?.[check.blueprint] ?? "null");
+      } catch {
+        return `${check.blueprint} is not valid JSON`;
+      }
+      return sheetProblem({
+        ledger: state.ledger,
+        branch: state.branch ?? null,
+        waiting: state.waiting,
+        blueprint,
+        sources: state.sources?.[check.sources] ?? {},
+        tagged: state.tagged ?? [],
+      });
+    },
+    notes: (state) => branchNotes(state.branch ?? null),
+    // The branch writes a judgment of its own, and nobody is asked.
+    change(state) {
+      const row = {
+        id: "changed-copy",
+        layer: "context",
+        kind: "judgment",
+        source: "a changed copy",
+      };
+      const branch = state.branch && !state.branch.problem ? state.branch : emptyBranch();
+      return {
+        ...state,
+        ledger: [...(state.ledger ?? []), row],
+        branch: { ...branch, judgments: [...branch.judgments, row.id] },
+      };
+    },
+  },
+  // The wall: a new kind of screen and the brand colour are the owner's calls. A branch that adds a
+  // page of a kind of screen, or changes the root colour line, fails until the waiting list holds
+  // the owner's answer that keeps that very item.
+  "owner-calls": {
+    run(state) {
+      return wallProblem({ branch: state.branch ?? null, waiting: state.waiting });
+    },
+    notes: (state) => branchNotes(state.branch ?? null),
+    // The branch adds a page of a kind of screen that nobody asked the owner about.
+    change(state) {
+      const branch = state.branch && !state.branch.problem ? state.branch : emptyBranch();
+      return {
+        ...state,
+        branch: { ...branch, pages_added: [...branch.pages_added, "changed-copy"] },
+      };
+    },
+  },
   gate: {
     run(state) {
       if (state.gate === null) return `${FILES.gate} is missing, so make check does not run this`;
@@ -632,6 +769,33 @@ const KINDS = {
 };
 
 const lintKey = (id, check) => `${id}:${check.rule}`;
+
+// A branch that adds nothing, for a changed copy to add to.
+const emptyBranch = () => ({
+  base: "changed-copy",
+  main: "changed-copy",
+  pages_added: [],
+  colour: { base: null, now: null },
+  judgments: [],
+});
+
+// The checks that read what a branch adds, and the waiting list.
+const BRANCH_KINDS = ["decision-sheet", "owner-calls"];
+
+// The waiting list as the gate reads it: its rows, or why it cannot be read.
+function waitingOf(root, rows) {
+  try {
+    return {
+      rows:
+        readWaiting(
+          root,
+          (rows ?? []).map((row) => String(row.id)),
+        )?.rows ?? [],
+    };
+  } catch (error) {
+    return { problem: error.message };
+  }
+}
 
 // The lint rules the ledger points at, for the probe about exceptions.
 const pointedRules = (rows) =>
@@ -689,6 +853,96 @@ export function checkFolders(checks) {
   return [...new Set(checks.flatMap((check) => [check.folder, check.own]).filter(Boolean))];
 }
 
+// The checks whose `file` is a ledger of screens.
+const SCREEN_KINDS = ["screen-ledger", "screen-actions", FRAGMENTS];
+
+// Why the fragments a repository keeps a ledger in are not what they must be, or null. `found` is
+// what the disk holds for the ledger the check names. `copy` is what the one file beside the
+// folder must hold when the repository keeps it as a copy out of git, else null: the one file is
+// then a second source. Each problem is said in the words of the ledger the check holds.
+export function fragmentsProblem(found, check, copy = null) {
+  const folder = check.fragments;
+  const kind = ledgerOf(check);
+  const L = FRAGMENT_LEDGERS[kind];
+  if (!found) {
+    const asked = kind === "screens" ? "" : ` --ledger ${kind}`;
+    return `${check.file} is kept as one file per ${L.one} under ${folder}, and ${folder}/${FRAGMENTS_SHARED} is not there: bring the folder back, or run the tool's screen-fragments.mjs${asked} --join on what is left`;
+  }
+  const problems = [];
+  if (found.beside && copy === null) {
+    problems.push(
+      `${check.file} is there beside ${folder}, so the ledger has two sources: the folder is what is read, remove the file`,
+    );
+  } else if (found.beside && found.besideText !== copy) {
+    problems.push(
+      `${check.file} is the copy the gate writes, and it differs from ${folder}: the folder is the ledger, so a change goes there, and the copy is written again from it`,
+    );
+  }
+  const { list } = L.cut(found.shared);
+  if (listLine(list, "m").test(found.shared)) {
+    problems.push(
+      `${folder}/${FRAGMENTS_SHARED} lists ${L.many} of its own: each ${L.one} has its own file`,
+    );
+  }
+  const twins = twinNames(found.fragments.map((fragment) => fragment.name));
+  if (twins.length > 0) {
+    problems.push(
+      `${twins.map((name) => `${folder}/${name}`).join(" and ")} differ only by capitals, so a system that does not tell them apart keeps one`,
+    );
+  }
+  // One fragment read as a ledger of one entry, so only this entry is judged: with the
+  // repository's spelling of the keys, and nothing else of the shared part.
+  const stub = L.stub(found.shared);
+  const cut = L.cut(stub);
+  const at = new RegExp(`^\\.${L.canonical}( \\([^)]*\\))?\\[0\\]\\.`);
+  for (const fragment of found.fragments) {
+    const one = joinLedger(stub, [fragment], cut);
+    const id = L.entries(one)[0]?.[L.by];
+    if (typeof id !== "string" || id === "") {
+      problems.push(`${fragment.file} names no ${cut.name}, so no ${L.one} is read from it`);
+      continue;
+    }
+    if (fragment.name !== `${id}.yaml`) {
+      problems.push(
+        `${fragment.file} holds ${L.holds(id)}: the file's name is ${L.named(cut.name)}, so it is ${folder}/${id}.yaml`,
+      );
+    }
+    for (const line of shapeProblems(kind, one, fragment.file)) {
+      const rest = line.startsWith(fragment.file) ? line.slice(fragment.file.length) : null;
+      problems.push(rest !== null && at.test(rest) ? rest.replace(at, `${fragment.file}: `) : line);
+    }
+  }
+  if (problems.length === 0) return null;
+  const more = problems.length > 3 ? `; and ${problems.length - 3} more` : "";
+  return `${problems.slice(0, 3).join("; ")}${more}`;
+}
+
+// What git says of the files a repository keeps out of it: which it tracks, and which it ignores.
+// Null when no check asks, or when the folder is not in a git repository.
+// A git that is there and will not answer, for a checkout owned by another user for instance, is
+// neither: the facts then carry `problem`, and the check fails instead of passing unasked.
+export function gitFacts(root, files) {
+  if (files.length === 0) return null;
+  const git = (args, input) =>
+    spawnSync("git", ["-C", root, ...args], { encoding: "utf8", ...(input ? { input } : {}) });
+  const inside = git(["rev-parse", "--is-inside-work-tree"]);
+  // No git on this machine: nothing can track the file.
+  if (inside.error) return null;
+  if (inside.status !== 0) {
+    const said = (inside.stderr ?? "").trim();
+    if (/not a git repository/i.test(said)) return null;
+    return { tracked: [], ignored: [], problem: said.split("\n")[0] || "git gave no reason" };
+  }
+  // Names are read whole, ended by a zero byte: git otherwise quotes a name with a space or a
+  // letter outside ASCII, and no file would match it.
+  const names = (run) => (run.stdout ?? "").split("\0").filter(Boolean);
+  // The ignore question takes names ended by a zero byte only on its input.
+  return {
+    tracked: names(git(["ls-files", "-z", "--", ...files])),
+    ignored: names(git(["check-ignore", "-z", "--stdin"], files.join("\0"))),
+  };
+}
+
 export function readState(root) {
   const read = (file) => {
     const full = path.join(root, file);
@@ -704,6 +958,19 @@ export function readState(root) {
   const usual = Object.values(LEDGERS)
     .map((ledger) => ledger.file)
     .filter(Boolean);
+  // A ledger that may be kept as fragments, the screens or the intake, is read in whichever shape
+  // the repository keeps it: one file, or one file per entry. Every check then reads one text,
+  // under the path the tool data names. Each path is known with the ledger it is.
+  const splittable = new Map(
+    Object.keys(FRAGMENT_LEDGERS).map((kind) => [LEDGERS[kind].file, kind]),
+  );
+  for (const check of checks) {
+    if (check.ledger) splittable.set(check.ledger, "screens");
+    for (const kind of Object.keys(FRAGMENT_LEDGERS)) {
+      if (check.ledgers?.[kind]) splittable.set(check.ledgers[kind], kind);
+    }
+    if (SCREEN_KINDS.includes(check.kind)) splittable.set(check.file, ledgerOf(check));
+  }
   const named = [...checks, { ledgers: usual }]
     .flatMap((check) => [
       check.file,
@@ -715,7 +982,10 @@ export function readState(root) {
       ...Object.values(check.ledgers ?? {}),
     ])
     .filter(Boolean)
-    .map((file) => [file, read(file)]);
+    .map((file) => [
+      file,
+      splittable.has(file) ? ledgerText(root, file, splittable.get(file)) : read(file),
+    ]);
   // Source folders a check names, file by file.
   const folders = checkFolders(checks).map((folder) => [folder, readFolder(root, folder)]);
   // Folders whose every source file a check reads, plain modules included.
@@ -732,6 +1002,19 @@ export function readState(root) {
     readModel(root, folder),
   ]);
   const rows = ledger === null ? null : parseLedger(ledger);
+  // What this branch adds, read once, for the checks that ask.
+  const asking = checks.filter((check) => BRANCH_KINDS.includes(check.kind));
+  const pagesOf = asking.find((check) => check.pages)?.pages ?? "design/patterns";
+  const branch =
+    asking.length === 0
+      ? null
+      : branchFacts(root, {
+          pages: pagesOf,
+          stylesheet,
+          ledger: FILES.ledger,
+          main: asking.find((check) => check.main)?.main ?? null,
+        });
+  const testsOf = asking.find((check) => check.tests)?.tests;
   return {
     root,
     theme: data,
@@ -743,6 +1026,10 @@ export function readState(root) {
     // framework's theme, read only when a value points into it.
     ...loadStyles(root, stylesheet),
     files: Object.fromEntries(named),
+    // The fragments of each such ledger kept as a folder, or null where it is one file.
+    fragments: Object.fromEntries(
+      [...splittable].map(([file, kind]) => [file, readFragments(root, file, kind)]),
+    ),
     folders: Object.fromEntries(folders),
     pages: Object.fromEntries(pages),
     sources: Object.fromEntries(sources),
@@ -751,6 +1038,13 @@ export function readState(root) {
     displays: readDisplays(root),
     gate: read(FILES.gate),
     makefile: read("Makefile"),
+    git: gitFacts(
+      root,
+      checks.filter((check) => check.kind === UNTRACKED).map((check) => check.file),
+    ),
+    waiting: asking.length === 0 ? null : waitingOf(root, rows),
+    branch,
+    tagged: testsOf ? taggedTests(root, testsOf) : [],
   };
 }
 
@@ -838,6 +1132,18 @@ function main() {
   const args = argv.slice(2);
   const at = args.indexOf("--target");
   const root = at === -1 ? cwd() : path.resolve(args[at + 1] ?? "");
+  let drawn;
+  try {
+    drawn = drawDerived(root);
+  } catch (error) {
+    stderr.write(`design-assembly: ${error.message}. Nothing was checked.\n`);
+    exit(1);
+  }
+  for (const item of drawn.written) {
+    stdout.write(
+      `design-assembly: wrote ${item.file} again from ${item.from}; it is kept out of git\n`,
+    );
+  }
   const state = readState(root);
   if (state.theme === null || state.ledger === null) {
     stderr.write(

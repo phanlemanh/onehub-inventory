@@ -5,7 +5,7 @@ links:
   [
     design/patterns/danh-sach-khung.md,
     design/screens.yaml,
-    design/so-khoi.yaml,
+    design/intake/_shared.yaml,
     src/modules/identity/ui/members-list.tsx,
     src/components/candidate/form-dialog.tsx,
     _acceptance/thanh-vien-chon-tu-reui/contract.md,

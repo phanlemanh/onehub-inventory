@@ -63,7 +63,7 @@ export interface Pair {
 
 export const FRAME_SECTION = "khung";
 
-/** The role × screen × button table, read by the one tool that writes design/vai-man-nut.md. */
+/** The role × screen × button table, read by the one tool that writes design/role-screen-buttons.md. */
 export function buttonTable(root: string = REPO_ROOT): ButtonTable {
   const out = execFileSync(
     "python3",

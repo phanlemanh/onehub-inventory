@@ -1,0 +1,7 @@
+ten: RecordActions
+tep: src/components/candidate/row-actions.tsx
+nguon: tao-tay
+nhu_cau: viec-trong-ho-so
+mo_ta: Đầu hồ sơ có một nút chính (thường là Sửa) và «…» của các việc còn lại, theo bảng quyền
+ho_so: bo-nut-theo-quyen
+duyet: 2026-11-12

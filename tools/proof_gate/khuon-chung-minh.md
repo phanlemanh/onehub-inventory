@@ -19,7 +19,7 @@ Lưới đòi `### Hướng` từ khi hợp đồng `approved` (hướng đượ
 
 ## Quyết định 0023: bốn mục thêm
 
-Kho có `design/so-khoi.yaml` thì quyết định 0023 bật cho mọi hồ sơ còn mở không có tên trong
+Kho có `design/intake.yaml` thì quyết định 0023 bật cho mọi hồ sơ còn mở không có tên trong
 `tools/proof_gate/chuyen-tiep.yaml` (ba hồ sơ đã qua Cổng Phạm vi lúc hàng 1n gộp — chúng giữ luật cũ).
 
 | Mục                                                | Đòi từ        | Mã khi thiếu                              |
@@ -32,7 +32,7 @@ Kho có `design/so-khoi.yaml` thì quyết định 0023 bật cho mọi hồ sơ
 | dòng sổ khối `ho_so: <slug>` cho mỗi khối nhập kho | `implemented` | `nhap-kho-thieu-so`                       |
 
 Bậc `trong-kho` khi ấy là thành phần nhà cung cấp (`src/components/ui/`, `src/components/reui/`) hay một dòng của
-`design/so-khoi.yaml` do hồ sơ khác nhập. Khối vòng này vừa tạo hay vừa lấy về ghi `reui` hay `ve-tay`, không ghi `trong-kho`.
+`design/intake.yaml` do hồ sơ khác nhập. Khối vòng này vừa tạo hay vừa lấy về ghi `reui` hay `ve-tay`, không ghi `trong-kho`.
 
 Hàng 1q: mọi tệp mới trong `src/components` ngoài thư mục nhà cung cấp phải có dòng trong bảng Khối (nêu một thành phần
 của tệp), từ lúc tệp xuất hiện trong `design/component-registry.json`; không thì lưới đỏ `khoi-khong-ke`. Khối mới là tệp
@@ -275,7 +275,7 @@ khuôn ấy do hồ sơ khác nhập), cùng mọi luật khối.
 
 Đi từ trên xuống, chỉ xuống bậc khi bậc trên không đáp ứng việc của người dùng hay luật sản phẩm («trông chưa đẹp», «ghép tay
 nhanh hơn» không phải lý do): (1) lắp ghép từ kho — `trong-kho`; (2) kho kết hợp ReUI Pro — phần thiếu ghi `reui`;
-(3) tạo tay — `ve-tay`. Thứ vào bằng bậc 2 hay 3 nhập kho bằng một dòng `design/so-khoi.yaml` sau khi chủ kho duyệt Cổng
+(3) tạo tay — `ve-tay`. Thứ vào bằng bậc 2 hay 3 nhập kho bằng một dòng `design/intake.yaml` sau khi chủ kho duyệt Cổng
 Phạm vi; lần sau gặp cùng nhu cầu là bậc 1.
 
 Bậc là một trong `trong-kho` · `reui` · `ve-tay`. `trong-kho`: tên có trong `design/component-registry.json` (luật 1c), hay
