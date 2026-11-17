@@ -161,6 +161,18 @@ test("quan-tri-khong-nut: a company admin sees the details but no «Sửa», and
     expect(await page.locator('[data-slot="cell-editor"]').count(), "quan-tri-khong-nut: ô").toBe(
       0,
     );
+    // Positive control: the same cell opens for a list agent of the same kind of company.
+    const w2 = await world(info, "qt-dc", ["ListAgent"]);
+    await signIn(page, w2.email, w2.mau);
+    await openInventory(page, "/inventory");
+    const own = page.locator(`[id$="${w2.listing}-Listing_furnished"]`).first();
+    await own.scrollIntoViewIfNeeded();
+    await own.click({ position: { x: 3, y: 3 } });
+    await page.keyboard.press("F2");
+    await expect(
+      page.locator('[data-slot="cell-editor"]'),
+      "quan-tri-khong-nut: đối chứng Đầu chủ",
+    ).toHaveCount(1);
   }
 });
 

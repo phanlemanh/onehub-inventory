@@ -112,16 +112,34 @@ test.describe("sua-thong-tin-can", () => {
   });
 });
 
-test("thong-bao-dung-cho-khi-khong-ho-so: with no record open a notice keeps its usual place", async ({
+test("thong-bao-dung-cho-khi-khong-ho-so: with no record open a notice keeps its usual place at the bottom", async ({
   page,
-}) => {
+}, info) => {
+  test.skip(
+    ["360", "414"].includes(info.project.name),
+    "a price edit on a cell needs 768 px (row 4)",
+  );
   await page.goto("/inventory?vai=ListAgent");
   await regionReady(page);
   await pageReady(page);
-  const bottom = await page.evaluate(() =>
-    getComputedStyle(document.documentElement).getPropertyValue("--record-footer-h").trim(),
-  );
-  expect(bottom, "thong-bao-dung-cho-khi-khong-ho-so: biến thanh đáy").toBe("");
+  expect(
+    await page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue("--record-footer-h").trim(),
+    ),
+    "thong-bao-dung-cho-khi-khong-ho-so: biến thanh đáy",
+  ).toBe("");
+  const cell = page.locator(`[id$="${ID}-Listing_listPrice"]`).first();
+  await cell.click({ position: { x: 3, y: 3 } });
+  await page.keyboard.press("F2");
+  await page.keyboard.press("ControlOrMeta+a");
+  await page.keyboard.type("2,75 tỷ");
+  await page.keyboard.press("Enter");
+  const toast = page.locator("[data-sonner-toast]").first();
+  await expect(toast).toBeVisible();
+  await page.waitForTimeout(500);
+  const box = (await toast.boundingBox())!;
+  const gap = page.viewportSize()!.height - (box.y + box.height);
+  expect(gap, `thong-bao-dung-cho-khi-khong-ho-so: cách đáy ${gap}px`).toBeLessThanOrEqual(40);
 });
 
 test("sua-tren-o-chi-tiet: from 768 px a detail cell edits one part, the open record shows it, «Hoàn tác» puts it back", async ({
