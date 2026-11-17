@@ -22,7 +22,7 @@ const SIGN_IN_TESTS: Record<string, string> = {
   "tests/e2e-db/va-dang-nhap.spec.ts":
     "906240cf41d33759b16237256c6ee498a1dc4d85ae4d15754a9771d0a44427c8",
   "tests/e2e-db/dang-nhap-vai.ts":
-    "0f42d8890178da1f80e74d685b2965eee51a249d39016605da56d8a9f056bd2d",
+    "988a476ec31f8fde5cb928edfcff093ffc1ffdc8dae1e31ff9f308842e142139",
   "tests/e2e/account.spec.ts": "1e0eebd64160d2f4b13c51b5054cbcd29fb7e2714095343fe12b3a82ab040782",
 };
 const SIGN_IN_TEST_COUNT = 4;

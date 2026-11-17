@@ -109,17 +109,21 @@ export async function signInWithCode(page: Page, email: string): Promise<void> {
 const onPhone = (page: Page) => (page.viewportSize()?.width ?? 1280) < 768;
 
 /**
- * The App Shell of a signed-in person is ready. The account menu sits at the foot of the rail since
- * app-shell-khuon-dau-trang (owner, 2026-11-17); on a phone the rail rides in the closed sheet, so there the company
- * name in the top bar marks the signed-in shell instead.
+ * The App Shell of a signed-in person is ready, no weaker than the wait it replaces (supervisor ruling R-1711-5). On a
+ * computer: the account menu at the foot of the rail, hydrated (`data-ready`), as before. On a phone the rail rides in
+ * the closed sheet since app-shell-khuon-dau-trang (owner, 2026-11-17), so the same two facts are read from the top
+ * bar: the signed-in company name shows, and the top bar's search box is hydrated (`data-ready`).
  */
-export async function shellReady(page: Page): Promise<void> {
+export async function shellReady(page: Page, opts: { timeout?: number } = {}): Promise<void> {
   if (onPhone(page)) {
     await expect(
       page.locator('[data-slot="app-shell-top-bar"] [data-slot="company-name"]'),
-    ).toBeVisible();
+    ).toBeVisible(opts);
+    await expect(
+      page.locator('[data-slot="app-shell-top-bar"] [data-slot="unit-jump"][data-ready]'),
+    ).toBeAttached(opts);
   } else {
-    await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
+    await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible(opts);
   }
 }
 

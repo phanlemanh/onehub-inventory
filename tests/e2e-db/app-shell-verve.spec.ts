@@ -12,6 +12,7 @@ import pg from "pg";
 import { openSheet } from "../../tools/e2e_templates/settle";
 import { chupAnh } from "../e2e/sua-trang";
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
+import { shellReady } from "./dang-nhap-vai";
 
 let owner: pg.Client;
 test.beforeAll(async () => {
@@ -229,4 +230,15 @@ test("the action-at-end check fails on an action dropped below the row", async (
   expect(() => assertActionAtEnd({ ...row, actionRight: 900 })).toThrow(
     "primary action is not at the end of the thin head",
   );
+});
+
+test("the shared shell wait holds on a signed-in shell and fails where there is none", async ({
+  page,
+}, info) => {
+  const { email, names } = await admin(info, 1);
+  await page.goto("/login");
+  // No App Shell on the sign-in screen: the wait must fail, on a phone and on a computer alike.
+  await expect(shellReady(page, { timeout: 2_000 })).rejects.toThrow();
+  await signIn(page, email, names[0]!);
+  await shellReady(page);
 });
