@@ -79,6 +79,7 @@ export const CHO_TESTS: Readonly<Record<string, readonly string[]>> = {
     "losing the network shows a banner that leaves when it is back",
     "no serious accessibility violations on every frame screen",
     "a save that fails offline keeps the input and offers retry",
+    "chosen theme survives a reload",
   ],
   "tests/e2e/account.spec.ts": ["login-loi-may-chu"],
   "tests/e2e/app-shell.spec.ts": [

@@ -185,7 +185,8 @@ test.describe("grid", () => {
     await expect(region(page).locator('[data-part="next"]')).toBeVisible();
     await page.getByRole("button", { name: "Thử lại" }).click();
     await expect(bodyRows(page).first()).toBeVisible();
-    await expect(page.getByRole("button", { name: "Mở hoặc đóng thanh bên" })).toBeVisible();
+    // The frame stays: its top bar shows (the sheet button shows only on a phone since the Verve layout).
+    await expect(page.locator('[data-slot="app-shell-top-bar"]')).toBeVisible();
   });
 
   test("empty says why and offers the next step", async ({ page }) => {

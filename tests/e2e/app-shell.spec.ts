@@ -91,6 +91,13 @@ async function shot(page: Page, name: string) {
   await chupAnh(page, { path: join(dir, `E10-${name}.png`) });
 }
 
+/** The search box's middle sits on the top bar's middle. */
+function assertCentred(bar: Box, search: Box): void {
+  if (!bar || !search) throw new Error("search not in the middle of the top bar");
+  const off = Math.abs(search.x + search.width / 2 - (bar.x + bar.width / 2));
+  if (off > 2) throw new Error("search not in the middle of the top bar");
+}
+
 async function noSideways(page: Page) {
   return page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -173,19 +180,77 @@ test.describe("App Shell on a computer", () => {
     expect(() => assertColumnState(state, "open")).toThrow("second column state lost after reload");
   });
 
-  test("the top bar has the theme switch and the account corner, nothing from the block's demo", async ({
+  test("the top bar has the company and the one search box, nothing from the block's demo", async ({
     page,
   }) => {
     await page.goto("/inventory");
     const bar = page.locator('[data-slot="app-shell-top-bar"]').first();
-    await expect(bar.getByRole("button", { name: "Đổi giao diện" })).toBeVisible();
-    await expect(bar.getByRole("link", { name: LABELS.SignIn.pref })).toBeVisible();
+    // The look and the account moved to the foot of the rail (owner's review, Verve layout).
+    await expect(bar.getByRole("button", { name: "Đổi giao diện" })).toHaveCount(0);
+    await expect(bar.getByRole("button", { name: "Tài khoản" })).toHaveCount(0);
+    // On a computer the rail never unfolds: the sheet button is a phone's.
+    await expect(page.getByRole("button", { name: "Mở hoặc đóng thanh bên" })).toBeHidden();
     for (const absent of [/^Create$/, /^Tạo$/, /Thông báo/]) {
       await expect(page.getByRole("button", { name: absent })).toHaveCount(0);
     }
     // The one search box is the product's own (row 3f, the owner's word at its scope gate), not the block's demo.
     await expect(page.getByRole("button", { name: /Gõ mã căn/ })).toHaveCount(1);
     await expect(bar.locator('[data-slot="unit-jump"]').getByRole("button")).toHaveCount(1);
+  });
+
+  test("the search box stands in the middle of the top bar", async ({ page }) => {
+    await page.goto("/inventory");
+    const bar = await page.locator('[data-slot="app-shell-top-bar"]').first().boundingBox();
+    const search = await page.locator('[data-slot="app-shell-search"]').boundingBox();
+    assertCentred(bar, search);
+    expect(search!.width).toBeGreaterThanOrEqual(300);
+  });
+
+  test("the middle check fails on a box at the end of the bar", async () => {
+    expect(() => assertCentred({ x: 0, width: 1000 }, { x: 800, width: 160 })).toThrow(
+      "search not in the middle of the top bar",
+    );
+  });
+
+  test("the account menu at the foot of the rail holds the three looks and sign-in", async ({
+    page,
+  }) => {
+    await page.goto("/inventory");
+    const foot = page.locator('[data-slot="sidebar"] [data-slot="app-shell-account"]');
+    const button = foot.getByRole("button", { name: "Tài khoản" });
+    await expect(button).toBeVisible();
+    const box = (await button.boundingBox())!;
+    expect(box.y + box.height).toBeGreaterThan(page.viewportSize()!.height - 80);
+    await button.click();
+    for (const look of ["Sáng", "Tối", "Theo thiết bị"]) {
+      await expect(page.getByRole("menuitemradio", { name: look })).toBeVisible();
+    }
+    await expect(page.getByRole("menuitem", { name: LABELS.SignIn.pref })).toBeVisible();
+    await page.getByRole("menuitemradio", { name: "Tối" }).click();
+    await expect(page.locator("html")).toHaveClass(/\bdark\b/);
+  });
+
+  test("the second column's edge runs the whole height, its fold on that edge mid-window", async ({
+    page,
+  }) => {
+    await page.goto("/inventory");
+    const height = page.viewportSize()!.height;
+    const edge = (await page.locator('[data-slot="app-shell-second-column-edge"]').boundingBox())!;
+    expect(edge.height).toBeGreaterThan(height - 80);
+    const fold = (await page.getByRole("button", { name: "Gập cột thứ hai" }).boundingBox())!;
+    expect(Math.abs(fold.x - (edge.x + edge.width))).toBeLessThanOrEqual(2);
+    expect(Math.abs(fold.y + fold.height / 2 - height / 2)).toBeLessThanOrEqual(2);
+  });
+
+  test("the head of a screen names the place open in the second column", async ({ page }) => {
+    await page.goto("/inventory");
+    await expect(page.locator("h1")).toHaveText(LABELS.Inventory.pref);
+    await expect(page.locator('[data-slot="page-header-place"]')).toHaveText(ALL_LISTINGS);
+    await column(page).getByRole("link", { name: STATUS_NAMES[1]! }).click();
+    await expect(page.locator('[data-slot="page-header-place"]')).toHaveText(STATUS_NAMES[1]!);
+    await page.goto("/");
+    await expect(page.locator("h1")).toHaveText(LABELS.Today.pref);
+    await expect(page.locator('[data-slot="page-header-place"]')).toHaveCount(0);
   });
 });
 

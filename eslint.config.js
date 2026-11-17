@@ -54,6 +54,9 @@ export default defineConfig([
         {
           contracts: [
             { pattern: "^Button$", allow: ["w-full", "mt-*", "mb-*", "ml-*", "mr-*", "self-*"] },
+            // A menu as wide as its content, not as its trigger: the account menu at the foot of the rail
+            // (owner, 2026-11-17).
+            { pattern: "^DropdownMenuContent$", allow: ["w-*", "min-w-*"] },
           ],
         },
       ],
