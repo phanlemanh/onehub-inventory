@@ -5,7 +5,9 @@
 // production deployments (id, url, commit, created, and which one the domain points to now, read from the domain with
 // `vercel inspect`) and stops. BAN must be the exact id of one of them and must not be the one the domain points to.
 //
-//   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, APP_URL — checked for presence only, never printed.
+//   VERCEL_ORG_ID, VERCEL_PROJECT_ID, APP_URL — checked for presence only, never printed.
+//   VERCEL_TOKEN — CI. Without it the vercel CLI's signed-in session is used, after the checks of len-ban.mjs's
+//   cau-hinh (signed in, the right project linked, XAC_NHAN_BAN_THAT=co for production). The first line says which.
 //   BAN — the id of the deployment to go back to (make rollback ENV=… BAN=dpl_…).
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,25 +15,42 @@ import { fileURLToPath } from "node:url";
 import {
   deploymentAt,
   deploymentLines,
+  envFor,
   ENVS,
   kiemNhanh,
   nameTheTarget,
   productionDeployments,
+  sessionProblem,
   short,
   vercel,
+  vercelMode,
+  modeText,
 } from "./kiem-nhanh.mjs";
 
 export const REQUIRED = ["VERCEL_TOKEN", "VERCEL_ORG_ID", "VERCEL_PROJECT_ID", "APP_URL"];
 
 export async function luiBan(
   appEnv,
-  { cwd = process.cwd(), env = process.env, out = console.log } = {},
+  { cwd = process.cwd(), env: given = process.env, out = console.log } = {},
 ) {
   const say = (text) => out(`rollback ${appEnv}: ${text}`);
-  const missing = REQUIRED.filter((n) => !env[n]?.trim());
+  const mode = vercelMode(given);
+  const env = envFor(mode, given);
+  say(modeText(mode));
+  const missing = REQUIRED.filter((n) => mode === "khoa" || n !== "VERCEL_TOKEN").filter(
+    (n) => !env[n]?.trim(),
+  );
   if (missing.length) {
     say(`ĐỎ — thiếu biến ${missing.join(", ")}`);
     return 1;
+  }
+  if (mode === "phien") {
+    const retry = `make rollback ENV=${appEnv} BAN=${env["BAN"]?.trim() || "<id>"} XAC_NHAN_BAN_THAT=co`;
+    const session = sessionProblem(appEnv, { cwd, env, retry });
+    if (session) {
+      say(`ĐỎ — ${session}`);
+      return 1;
+    }
   }
   const list = productionDeployments({ cwd, env });
   if (!list) {

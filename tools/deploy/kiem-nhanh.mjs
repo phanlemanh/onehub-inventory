@@ -7,6 +7,8 @@
 //   APP_URL — the public address of ENV; production falls back to https://inventory.onehub.center.
 //   VERCEL_AUTOMATION_BYPASS_SECRET — optional, sent as x-vercel-protection-bypass when the deploy is protected.
 import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
 export const ENVS = ["staging", "production"];
@@ -105,6 +107,70 @@ export async function kiemNhanh(base, { env: appEnv, commit }, env = process.env
 
 export function short(commit) {
   return String(commit ?? "").slice(0, 7);
+}
+
+/** The confirmation an operator adds to deploy or roll back production with the CLI's own session. */
+export const XAC_NHAN = "XAC_NHAN_BAN_THAT";
+
+/**
+ * How len-ban.mjs and lui-ban.mjs reach Vercel: "khoa" when VERCEL_TOKEN is set (CI, unchanged), "phien" otherwise —
+ * the vercel CLI's signed-in session on the operator's machine (`vercel login`).
+ */
+export function vercelMode(env = process.env) {
+  return env["VERCEL_TOKEN"]?.trim() ? "khoa" : "phien";
+}
+
+/** The one line that says which way the run reaches Vercel; never the token. */
+export function modeText(mode) {
+  return mode === "khoa" ? "dùng khoá VERCEL_TOKEN" : "dùng phiên Vercel CLI đã đăng nhập";
+}
+
+/** `env` for the children of a run: in session mode a blank VERCEL_TOKEN is dropped, so the CLI uses its session. */
+export function envFor(mode, env) {
+  if (mode === "khoa") return env;
+  const out = { ...env };
+  delete out["VERCEL_TOKEN"];
+  return out;
+}
+
+/**
+ * Session mode only, before anything is touched. Returns the reason or null.
+ *   - production needs XAC_NHAN_BAN_THAT=co: a signed-in session reaches every project of the account, a token only
+ *     its team;
+ *   - `vercel whoami` must succeed (the session is signed in);
+ *   - the right project: `cwd` must be linked (`.vercel/project.json`, written by `vercel link`) to VERCEL_PROJECT_ID
+ *     in VERCEL_ORG_ID. Checked here, before `vercel pull`: with both ids in the environment the CLI deploys to them and
+ *     pull rewrites project.json from them, so after pull the comparison would always hold. Before pull it compares two
+ *     sources the operator chose separately — the project picked by name in `vercel link` and the env file — and a
+ *     wrong env file stops the run before the migration. Ids are never printed.
+ * `retry` is the command line that adds the confirmation.
+ */
+export function sessionProblem(appEnv, { cwd, env, retry }) {
+  if (appEnv === "production" && env[XAC_NHAN]?.trim() !== "co") {
+    return `bản thật bằng phiên Vercel CLI cần xác nhận ${XAC_NHAN}=co — gõ lại: ${retry}`;
+  }
+  if (vercel(["whoami"], { cwd, env }).status !== 0) {
+    return "chưa đăng nhập Vercel CLI và không có VERCEL_TOKEN — gõ vercel login, hay nạp VERCEL_TOKEN";
+  }
+  const file = join(cwd, ".vercel", "project.json");
+  const relink = `gõ vercel link, chọn dự án của ${appEnv}`;
+  if (!existsSync(file)) return `thư mục chưa nối dự án Vercel (.vercel/project.json) — ${relink}`;
+  let link;
+  try {
+    link = JSON.parse(readFileSync(file, "utf8"));
+  } catch {
+    return `.vercel/project.json không đọc được — ${relink}`;
+  }
+  const differs = [
+    ["projectId", "VERCEL_PROJECT_ID"],
+    ["orgId", "VERCEL_ORG_ID"],
+  ].filter(([key, name]) => link?.[key] !== env[name]?.trim());
+  if (differs.length) {
+    const keys = differs.map(([key]) => key).join(" và ");
+    const names = differs.map(([, name]) => name).join(", ");
+    return `${keys} ở .vercel/project.json khác ${names} — sai dự án; ${relink}, hay nạp đúng tệp biến`;
+  }
+  return null;
 }
 
 /** Runs the vercel CLI. The token travels in the environment (VERCEL_TOKEN), never on the command line. */

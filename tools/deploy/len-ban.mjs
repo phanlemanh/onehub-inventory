@@ -7,8 +7,13 @@
 //   staging:    cau-hinh, migration, cach-ly, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien
 //   production: cau-hinh, ban-thu-truoc, migration, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien
 //
+// cau-hinh first prints one line saying how the run reaches Vercel (`cau-hinh — dùng khoá VERCEL_TOKEN` or `cau-hinh —
+// dùng phiên Vercel CLI đã đăng nhập`). Without VERCEL_TOKEN the operator's signed-in CLI session is used, and cau-hinh
+// also checks the session, the project link and, for production, XAC_NHAN_BAN_THAT=co (sessionProblem, kiem-nhanh.mjs).
+//
 // Runs in the repository root (cwd). Variables are only checked for presence, never printed:
-//   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID — read by the vercel CLI from the environment
+//   VERCEL_TOKEN — CI; absent on the operator's machine, where the CLI's session is used
+//   VERCEL_ORG_ID, VERCEL_PROJECT_ID — read by the vercel CLI from the environment
 //   MIGRATE_DATABASE_URL — owner connection, migrations (and the isolation suite's catalog reads) only
 //   LOGIN_DATABASE_URL   — staging: the app's login role, for the isolation suite
 //   APP_URL              — the public address of ENV (the domain)
@@ -23,6 +28,7 @@ import { fileURLToPath } from "node:url";
 import {
   deploymentAt,
   deploymentLines,
+  envFor,
   ENVS,
   git,
   kiemNhanh,
@@ -30,8 +36,11 @@ import {
   productionDeployments,
   readHealth,
   redact,
+  sessionProblem,
   short,
   vercel,
+  vercelMode,
+  modeText,
 } from "./kiem-nhanh.mjs";
 
 const SCRIPTS = resolve(dirname(fileURLToPath(import.meta.url)), "../../db/scripts");
@@ -75,6 +84,11 @@ export const REQUIRED = {
     "STAGING_APP_URL",
   ],
 };
+
+/** The variables a run needs: session mode ("phien") needs all but VERCEL_TOKEN. */
+export function required(appEnv, mode) {
+  return mode === "khoa" ? REQUIRED[appEnv] : REQUIRED[appEnv].filter((n) => n !== "VERCEL_TOKEN");
+}
 
 class Red extends Error {}
 
@@ -256,9 +270,11 @@ async function rollBack(appEnv, { root, env, say, before, newId }) {
 
 export async function lenBan(
   appEnv,
-  { cwd = process.cwd(), env = process.env, out = console.log } = {},
+  { cwd = process.cwd(), env: given = process.env, out = console.log } = {},
 ) {
   const say = (text) => out(`deploy ${appEnv}: ${text}`);
+  const mode = vercelMode(given);
+  const env = envFor(mode, given);
   let root;
   let head;
   let newUrl;
@@ -269,7 +285,8 @@ export async function lenBan(
 
   const steps = {
     "cau-hinh": async () => {
-      const missing = REQUIRED[appEnv].filter((n) => !env[n]?.trim());
+      say(`cau-hinh — ${modeText(mode)}`);
+      const missing = required(appEnv, mode).filter((n) => !env[n]?.trim());
       if (missing.length) throw new Red(`thiếu biến ${missing.join(", ")}`);
       try {
         root = git(["rev-parse", "--show-toplevel"], cwd);
@@ -281,6 +298,11 @@ export async function lenBan(
         throw new Red("cây chưa sạch — commit hay bỏ thay đổi trước");
       const problem = vercelJsonProblem(root);
       if (problem) throw new Red(problem);
+      if (mode === "phien") {
+        const retry = `make deploy ENV=${appEnv} XAC_NHAN_BAN_THAT=co`;
+        const session = sessionProblem(appEnv, { cwd: root, env, retry });
+        if (session) throw new Red(session);
+      }
     },
     "ban-thu-truoc": async () => {
       const h = await readHealth(env["STAGING_APP_URL"], env);

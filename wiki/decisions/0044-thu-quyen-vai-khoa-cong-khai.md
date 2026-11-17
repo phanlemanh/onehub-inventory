@@ -7,6 +7,8 @@ links:
     db/migrations/014_thu_quyen_vai_cong_khai.sql,
     tests/db/thu-quyen-vai-cong-khai.db.test.ts,
     db/scripts/cach-ly-dich.sh,
+    db/scripts/migrate.sh,
+    tests/db/migrate-vai-khong-sieu.db.test.ts,
   ]
 sources: [_acceptance/moi-truong-thu-va-ban-that/contract.md]
 ---
@@ -68,5 +70,55 @@ public` thẳng.
   bằng các vai ấy.
 - Một schema mới của kho phải được thêm vào danh sách schema của bài kiểm và của lần thu quyền kế tiếp.
 - Trên Supabase, `postgres` không phải siêu vai: migration thu quyền trên hàm của `quy_hang_identity` bằng cách đổi sang
-  vai ấy khi chỉ đổi được mà không kế thừa. Chưa chạy được trên Supabase thật trong kho; nếu `postgres` không với tới
-  chủ của một đối tượng, bước tự kiểm sẽ huỷ migration và gọi tên đối tượng.
+  vai ấy khi chỉ đổi được mà không kế thừa. Nay `migrate.sh` cho vai chạy migration kế thừa luôn (mục dưới), nên nhánh
+  đổi vai ấy chỉ còn là lưới. Nếu `postgres` không với tới chủ của một đối tượng, bước tự kiểm sẽ huỷ migration và gọi
+  tên đối tượng.
+
+## Vì sao Supabase khác CI
+
+Ngày 2026-11-17, lần đầu chạy migration trên bản thử Supabase: 001 áp xong, 002 huỷ ở câu đổi chủ hàm sang
+`quy_hang_identity` với lỗi «must be able to SET ROLE». Các dãy và CI chạy migration bằng siêu vai nên chưa từng gặp.
+
+- Supabase chạy Postgres 17, và vai `postgres` ở đó không phải siêu vai: chỉ có quyền tạo vai (CREATEROLE) và vượt luật
+  theo dòng (BYPASSRLS). Từ Postgres 16, vai tạo vai chỉ được quyền quản (ADMIN) trên vai mình tạo, không được đổi sang
+  (SET) hay kế thừa (INHERIT), trừ khi đặt `createrole_self_grant`.
+- Khi trao một hàm cho vai khác, Postgres đòi hai điều mà siêu vai được miễn: vai chạy migration đổi sang được chủ mới,
+  và chủ mới có quyền tạo (CREATE) trong schema của hàm. Lỗi thứ hai lộ ngay sau khi sửa lỗi thứ nhất.
+- Chỉ đổi sang được mà không kế thừa thì chưa đủ: câu cấp và thu quyền ngay sau mỗi lần đổi chủ
+  (`grant execute ... to quy_hang_app`) chạy nhân danh vai chạy migration, vai ấy cần quyền của chủ; thiếu thì Postgres
+  chỉ cảnh báo rồi bỏ qua, và ứng dụng không gọi được hàm đăng nhập. Bài kiểm có ca đối chứng cho đúng điều này.
+
+Nên `db/scripts/migrate.sh`, chỉ khi vai chạy migration không phải siêu vai và Postgres từ 16 trở lên (siêu vai, các
+dãy và CI không đổi gì):
+
+1. Trước khi áp, vá trạng thái cũ: các vai của kho (các câu `create role` trong migration) đã có mà vai chạy migration
+   có quyền quản nhưng chưa đổi sang hay chưa kế thừa được — do `migrate.sh` cũ tạo, như `quy_hang_app` trên bản thử —
+   được cấp lại cho vai chạy migration, có SET và INHERIT. Cấp lại khi đã có thì không đổi gì.
+2. Mỗi phiên migration đặt `createrole_self_grant = 'set, inherit'`, nên vai mới tạo cũng như thế.
+3. Trong chính giao dịch của mỗi migration, mỗi vai mà tệp ấy trao đối tượng cho (`owner to <vai>`) được mượn quyền
+   tạo trong các schema của kho (các câu `create schema`) mà nó chưa có, rồi bị thu đúng phần ấy trước khi giao dịch
+   xong. Vai đã có thì được mượn thẳng. Chỉ khi vai được tạo ngay trong chính tệp ấy (002 tạo `quy_hang_identity` rồi
+   trao hàm cho nó), lúc giao dịch bắt đầu vai chưa có để cấp, nên PUBLIC mượn thay.
+4. Sau mỗi migration, `migrate.sh` đọc lại quyền tạo trên các schema của kho: có vai nào mới có mà trước migration chưa
+   có, hay PUBLIC có ở bất kỳ schema nào, thì dừng với mã 3 và một dòng gọi tên vai và schema. Lưới này chạy cả với
+   siêu vai.
+
+Phiên khác không bao giờ thấy quyền cho mượn, vì nó không bao giờ được ghi hẳn: migration hỏng thì cả giao dịch huỷ,
+quyền mượn huỷ theo. Sau migration, quyền trên schema y như khi siêu vai chạy.
+
+Quyền tối thiểu: vai chạy migration không được thêm gì nó chưa tự cấp được (nó đã có quyền quản các vai ấy), và
+`quy_hang_identity` vốn vượt luật theo dòng như chính `postgres` của Supabase. Quyền tạo chỉ cho mượn tới đúng vai sắp
+nhận đối tượng; PUBLIC chỉ mượn khi vai ấy chưa có để cấp.
+
+Bài kiểm `tests/db/migrate-vai-khong-sieu.db.test.ts` chạy trên cụm riêng (Postgres 16, đã có luật của Postgres 16)
+với một vai dựng như `postgres` của Supabase:
+
+- bản `migrate.sh` cũ đỏ ở 002 «must be able to SET ROLE»;
+- trên cơ sở đã áp 001 bằng bản cũ, và trên cơ sở trống, bản nay áp hết tới 014, mọi quyền trên bảng, hàm, schema y như
+  khi siêu vai chạy, `cach-ly-dich.sh` xanh;
+- trong lúc áp, một phiên thứ hai hỏi liên tục ai có quyền tạo trên `app` và `identity`, PUBLIC và cả ba vai của kho:
+  không lần nào thấy;
+- migration hỏng giữa chừng: trong giao dịch thấy đúng PUBLIC (vai tạo trong tệp) và `quy_hang_identity` (vai đã có)
+  mượn quyền, sau khi huỷ không ai còn quyền tạo;
+- migration để lại quyền tạo cho một vai hay cho PUBLIC thì `migrate.sh` dừng, gọi tên schema;
+- chỉ SET mà không INHERIT thì đỏ.

@@ -90,7 +90,9 @@ Bảng biến ở mục sau nói mỗi biến dùng cho gì.
    - **Đạt khi:** danh sách Tokens có khoá mới, phạm vi là nhóm ấy, ngày hết hạn sau một năm; giá trị đã nằm trong trình
      giữ mật khẩu và lịch có ngày nhắc.
    - **Đỏ thì:** đóng hộp thoại trước khi chép giá trị — Vercel không cho xem lại: xoá khoá ấy (Delete) và tạo khoá mới;
-     phạm vi chỉ có tài khoản cá nhân — chủ kho chưa là thành viên nhóm, nhờ người quản trị nhóm mời.
+     phạm vi chỉ có tài khoản cá nhân — chủ kho chưa là thành viên nhóm, nhờ người quản trị nhóm mời; khoá tạo trên web mà
+     Vercel trả «User not found» — giả thuyết: khoá thuộc phạm vi nhóm nhưng được dùng không kèm nhóm; tạo lại khoá chọn
+     đúng nhóm ở ô phạm vi, rồi thử một lần mà khoá không vào lịch sử dòng lệnh: `read -rs K; vercel whoami --token "$K" --scope <nhóm>; unset K` (dán khoá khi được chờ; in tên tài khoản là đạt).
 7. **Vercel — bảo vệ bản mới.** Ở mỗi dự án: Settings › Deployment Protection. Nếu «Vercel Authentication» đang bật, tạo
    «Protection Bypass for Automation» để lệnh kiểm nhanh đọc được địa chỉ riêng của bản mới. Tắt thì bỏ qua việc này.
    Máy nhận lại: `VERCEL_AUTOMATION_BYPASS_SECRET` (chỉ khi bật).

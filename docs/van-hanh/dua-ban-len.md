@@ -131,3 +131,5 @@ Chỉ khi GitHub Actions không dùng được. Cần một máy có Node 24 (`n
 kho sạch, đứng ở commit cần đưa lên; nạp các biến của môi trường ấy (bảng biến) từ tệp ngoài kho. Gõ
 `make deploy ENV=staging`, đọc các dòng như bước 2; đạt thì `make deploy ENV=production`, đọc như bước 5. Cách đọc dòng đỏ
 giống hệt mục trên.
+
+Không có `VERCEL_TOKEN` thì lệnh dùng phiên `vercel login` của máy (dòng đầu `cau-hinh — dùng phiên Vercel CLI đã đăng nhập`): trước đó gõ `vercel link` trong bản sao kho và chọn đúng dự án của môi trường ấy — `cau-hinh` đỏ nếu chưa đăng nhập hay dự án đã nối khác `VERCEL_PROJECT_ID`/`VERCEL_ORG_ID` của tệp biến — và bản thật phải gõ thêm cờ xác nhận: `make deploy ENV=production XAC_NHAN_BAN_THAT=co`.

@@ -23,6 +23,7 @@ dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật m
   `VERCEL_PROJECT_ID` (dự án của môi trường cần lùi) và `APP_URL` (địa chỉ của môi trường ấy); thêm
   `VERCEL_AUTOMATION_BYPASS_SECRET` nếu dự án bật bảo vệ bản mới. Giá trị lấy từ trình giữ mật khẩu, giống giá trị đã đặt
   ở môi trường GitHub cùng tên.
+- Không có `VERCEL_TOKEN`: lệnh dùng phiên `vercel login` của máy (dòng đầu `rollback <ENV>: dùng phiên Vercel CLI đã đăng nhập`), bản sao kho phải nối đúng dự án bằng `vercel link`, và bản thật gõ thêm cờ: `make rollback ENV=production BAN=<id> XAC_NHAN_BAN_THAT=co`.
 
 ## Các bước
 
