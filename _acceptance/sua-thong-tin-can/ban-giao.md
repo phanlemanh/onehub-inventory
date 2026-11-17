@@ -33,3 +33,19 @@ Nhánh `feat/sua-thong-tin-can`, worktree `agitated-einstein-ff1c68`, dãy H. C�
   này dùng để lời gọi nhỏ). Máy dev 3487 chế độ mẫu cho bài nhìn.
 - Hồ sơ đã ghim lại ở lượt này: bang-hang-ban-doc, luu-goc-nhin-cot-hai, ho-so-du-thong-tin, da-gui-tren-luoi;
   bo-o-tim-cua-vung để nguyên (E18 gắn PR cũ).
+
+## Cập nhật sau các commit sửa lượt 1 (tới d97869c)
+
+Đã xong: route trả 500 khi không đọc được lớp riêng (+ `tests/sua-thong-tin-route.test.ts`); hai luật trong
+`ontology/entities/listing.yaml` (G-1711-38 duyệt H-12, make gen); 409 ở ô cột riêng hiện giá trị máy chủ; hộp nói «máy chủ
+báo lỗi» thay vì «Không đủ quyền» khi 400; không có «Hoàn tác» khi chữ dài từ tệp không ghi lại được; thông điệp ghim khớp ca
+phá; quét bắt `switch (response.status)`; dán sai kiểu số; ca vai của ô riêng.
+
+Còn lại trước lượt 2:
+- Ma trận 4 vai × PATCH details ở `tests/sua-thong-tin-may-chu.test.ts` (cửa trả theo `allowedScope(roles, "updateListing")`).
+- `thong-bao-dung-cho-khi-khong-ho-so` đo vị trí thông báo thật (sửa giá trên ô ở khổ rộng, đáy thông báo cách đáy cửa sổ ≤ 40px).
+- `quan-tri-khong-nut: ô` thêm đối chứng Đầu chủ mở được ô (cùng bài DB).
+- Một ca nối thật cửa lưu → móc sửa → hộp (thay đáp viết tay): `httpSaveDoor` qua handler thật trả 401 → hộp nói phiên hết hạn.
+- Trần 500: trang gửi `TEXT_VALUE_LIMIT` của lớp riêng cho cột chữ; bỏ hằng sao chép trong `custom-rules.ts`.
+- Câu mô tả hộp và câu «căn vừa đổi» lấy chữ từ nhãn (DetailsWords, Unit).
+- Rồi: `make check`, bài trình duyệt và DB của hàng, xin s4, s4-args `--carry-anchor 2e4292f`, chấm lượt 2.
