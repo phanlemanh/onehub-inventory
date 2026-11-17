@@ -5,7 +5,7 @@ slug: upgrade-design-assembly-0-7-0
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci]
-status: verified
+status: signed-off
 approved_by: Phan Le Manh
 approved_at: 2026-11-17
 design_doc: docs/superpowers/specs/2026-11-17-upgrade-design-assembly-0-7-0-design.md
@@ -146,3 +146,9 @@ coverage-scan».
   - Ngoài-11: Chạy riêng `make ontology` hay `make coverage-matrix` trên bản tải mới báo đỏ với lời chỉ sai nguyên nhân.
   - Ngoài-13: Đổi quyền làm khác nút hiển thị có thể không bị bắt sớm, vì bảng không còn được so trong pull request.
   - Ngoài-16: `make design` và `make coverage-matrix` đọc tệp dẫn xuất mà không tự vẽ; `make check` xanh chỉ nhờ thứ tự đích.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-17 (ký lại sau bản sửa sau ký; số mục theo lượt chấm 3, các mục đã
+  ghi ở khối trên không lặp lại):
+  - Ngoài-3: Lời chú trong bài kiểm vẫn nói đổi quyền sẽ hiện thành lệch bảng, trong khi bảng nay được vẽ lại mỗi lần.
+  - Ngoài-4: Kho chưa có trang quyết định nói vì sao các sổ thiết kế ra khỏi git.
+  - Ngoài-5: Tệp hồ sơ có đường dẫn tuyệt đối mang tên người dùng của máy.
+  - Ngoài-6: Ca đỏ của phép đo cả nhánh nạp danh sách tay, nên đường đọc từ chỗ nhánh rời `origin/main` chưa được thấy đỏ thật.
