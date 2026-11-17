@@ -36,8 +36,8 @@ modules:
     depends_on: []
   - name: imports
     description: Data import, including the AI-assisted planning call
-    owns: []
-    depends_on: []
+    owns: [ImportRun]
+    depends_on: [identity, catalog, company-config, listings]
   - name: workspace
     description: Today queues, navigation and team views
     owns: []

@@ -40,3 +40,26 @@ Lưới, màn mẫu của họ — hàng này chỉ thêm nút «Nạp tệp» v
 | Badge | trong-kho | | | | |
 | DataRegion (lưới xem trước) | trong-kho | | | | |
 | Khung năm bước (thanh bước + thân + chân bước) | reui | `node tools/reui_catalog/tra.mjs import wizard csv --loai block` | solution-crm-6 | — (được chọn theo Hỏi-3) | chọn khối |
+
+## Màn inventory
+
+### Từ Quỹ hàng
+
+| Trang | Khối Quỹ hàng đã chọn | Giữ | Bỏ | Vì sao |
+| --- | --- | --- | --- | --- |
+| docs/tri-thuc/wiki/chu-de/nhap-excel.md | nút viền «Nhập Excel» ở đầu Bảng hàng, ẩn theo vai (`qh:docs/design/vo-va-ia.md` §2) | nút viền ở đầu màn theo vai; căn nhập vào hiện ngay trên bảng | trang trống có nút | luật design-assembly: trạng thái trống chỉ có nút khi điền được ngay trên màn, nên ở đây là liên kết trong câu |
+
+### Họ
+
+| Họ đề xuất | Lối | Vì sao |
+| --- | --- | --- |
+| grid | màn mẫu mới | Bảng hàng là màn mẫu của họ Lưới; hàng này thêm một nút, một liên kết ở trạng thái trống và dòng của căn chờ khớp, không đổi khuôn |
+
+### Ứng viên ReUI
+
+Không chọn khối nào: nút đi qua `PermittedAction` của kho (hàng 9e), trạng thái trống là `RegionEmpty` của kho.
+
+| Cho | Ứng viên | Ảnh | Chọn |
+| --- | --- | --- | --- |
+| màn | empty-state-13 | evidence/reui-empty-state-13.png | |
+| màn | empty-state-14 | evidence/reui-empty-state-14.png | |

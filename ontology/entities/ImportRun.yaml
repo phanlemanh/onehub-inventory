@@ -1,0 +1,53 @@
+name: ImportRun
+description: >-
+  One time a person brought a sheet file into the company's inventory: who imported it, for which list agent, the shape
+  of the file, how many listings it added, what the company learned from the person's choices, which cells were kept as
+  written, and whether it was undone. Not the file itself — the file never reaches the server.
+reso: none (our own)
+
+properties:
+  id: { type: uuid, required: true, unique: true, display: none }
+  companyId: { type: ref, target: Company, required: true, display: none }
+  importedBy: { type: ref, target: Member, required: true, display: person }
+  listAgentUserId: { type: ref, target: Member, required: true, display: person }
+  fileName: { type: string, required: true, max: 200, display: text }
+  sheetName: { type: string, max: 200, display: text }
+  signature: { type: json, required: true, display: none }
+  rowCount: { type: integer, required: true, min: 0, display: count }
+  createdCount: { type: integer, required: true, min: 0, display: count }
+  learned: { type: json, required: true, display: none }
+  kept: { type: json, required: true, display: none }
+  batchesDone: { type: json, required: true, display: none }
+  status: { type: enum, values: [open, done, undone], required: true, display: status }
+  createdAt: { type: datetime, required: true, display: datetime }
+  undoneAt: { type: datetime, display: datetime }
+
+rules:
+  - id: no-cell-lost
+    description: >-
+      Every cell of the file gets exactly one of four marks (keep, fixed, ask, block) and one target: a standard field,
+      a custom field, or kept as written in this import; nothing applies while a cell is blocked.
+    implemented_in: src/modules/imports/mark.ts
+  - id: learn-on-success
+    description: The person's choices go into the company layer once, after the last batch is written.
+    implemented_in: src/modules/imports/store.ts
+  - id: undo-whole-import
+    description: >-
+      Undo removes the import's listings nobody changed since (version 1), retires what this import taught, and lists the
+      listings it kept.
+    implemented_in: src/modules/imports/store.ts
+
+code:
+  model: src/modules/imports/
+  tests: tests/db/nhap-excel.db.test.ts
+wiki: wiki/entities/import-run.md
+
+vong_doi:
+  them: { co: importListings }
+  xem: { co: importListings }
+  sua:
+    {
+      khong: true,
+      duyet: "Cổng Phạm vi hàng 11 (2026-11-17): một lần nhập không sửa, chỉ hoàn tác.",
+    }
+  go: { co: importListings }

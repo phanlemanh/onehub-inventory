@@ -12,7 +12,7 @@ export const PROTO_COPY = {
     "Mỗi cột của tệp đi vào một trường của Bảng hàng.",
     "Máy hỏi mỗi cách viết một lần, không hỏi từng ô.",
     "Còn chỗ chặn thì chưa áp được: bấm «Còn 2 chỗ chặn» để về đúng cột hay câu cần gỡ ở bước 2, 3.",
-    "Sàn đã nhớ cách ghép này cho lần sau.",
+    "Đã nhớ cách ghép này cho lần sau.",
   ],
   drop: "Kéo tệp vào đây hoặc bấm để chọn",
   dropLimits: ".xlsx hoặc .csv · tối đa 10 MB, 5.000 dòng",
@@ -36,7 +36,7 @@ export const PROTO_COPY = {
     string
   >,
   doneTitle: "Đã thêm 212 căn vào Bảng hàng",
-  learned: "Sàn vừa học",
+  learned: "Vừa học",
   kept: "6 ô giữ chữ gốc ở lần nhập",
   layoutA: "Lối A — bước ngang (solution-crm-6)",
   layoutB: "Lối B — bước dọc bên trái (onboarding-2)",

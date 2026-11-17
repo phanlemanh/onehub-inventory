@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { label } from "@/modules/company-config";
 import { PageHeader } from "@/components/templates/page-header";
 import { PageState } from "@/components/templates/page-state";
 
@@ -33,7 +34,7 @@ export default async function ProtoPage({ params, searchParams }: Props) {
     // Row 11 scope gate: the two layouts of the «Nạp tệp» screen, same blocks, same sample data.
     return (
       <>
-        <PageHeader title="Nạp tệp" />
+        <PageHeader title={label("ImportScreen")} />
         <ImportWizardProto
           key={`${String(loi)}-${String(buoc)}`}
           layout={loi === "b" ? "b" : "a"}

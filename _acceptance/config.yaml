@@ -33,6 +33,7 @@ executors:
     cau_hinh_ban_that: "npx vitest run src/modules/identity/config.test.ts src/modules/identity/config-ban-that.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): start-up configuration matrix of a real build
     van_hanh: "npx vitest run tests/van-hanh.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): runbook procedures, make targets and variables it names exist
     khoa_bi_mat: "npx vitest run tests/khong-khoa-bi-mat.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): no secret pattern in a tracked file, .env.example lists the new variables
+    nhap_excel_unit: "npx vitest run src/modules/imports tests/nhap-excel --coverage.enabled=false --reporter=verbose"   # nhap-excel (row 11): file reader, column/value/unit marks, no cell lost on the dirty set, ontology
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
@@ -123,6 +124,9 @@ executors:
     release_ledger_matches: "node _acceptance/upgrade-design-assembly-tool/rang/release-ledger.mjs --plugin-repo \"${DESIGN_ASSEMBLY_REPO:-$HOME/dev/design-assembly}\""   # upgrade-design-assembly-tool: the plugin's own release ledger names the tool tree this record pins
     branch_changes_only_upgrade: "node _acceptance/upgrade-design-assembly-tool/rang/branch-changes.mjs --root ."   # upgrade-design-assembly-tool: the branch changes the upgrade's eight files and this record's files only
     upgrade_measures_two_way: "node --test _acceptance/upgrade-design-assembly-tool/rang/measures-two-way.mjs"   # upgrade-design-assembly-tool: each measure green as it is, red with its pinned message on a broken copy
+    nhap_excel_db: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} npx vitest run -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts --reporter=verbose"   # nhap-excel (row 11): preview, batched apply, learn, second import, undo on lane D Postgres
+    nhap_excel_e2e: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} npx playwright test -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts"   # nhap-excel (row 11): Nạp tệp screen and inventory entry in the browser, lane D
+    cach_ly_d: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} bash db/scripts/cach-ly.sh"   # nhap-excel (row 11): isolation suite with import_runs and the import delete rule, lane D
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files

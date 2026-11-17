@@ -1382,6 +1382,80 @@
       "source": "library"
     },
     {
+      "name": "Stepper",
+      "category": "component",
+      "file": "src/components/reui/stepper.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["defaultValue", "value", "onValueChange", "orientation", "indicators"]
+    },
+    {
+      "name": "StepperItem",
+      "category": "component",
+      "file": "src/components/reui/stepper.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["step", "completed", "disabled", "loading"]
+    },
+    {
+      "name": "StepperTrigger",
+      "category": "component",
+      "file": "src/components/reui/stepper.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["tabIndex", "render"]
+    },
+    {
+      "name": "StepperIndicator",
+      "category": "component",
+      "file": "src/components/reui/stepper.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "StepperSeparator",
+      "category": "component",
+      "file": "src/components/reui/stepper.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "StepperTitle",
+      "category": "component",
+      "file": "src/components/reui/stepper.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "StepperDescription",
+      "category": "component",
+      "file": "src/components/reui/stepper.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "StepperPanel",
+      "category": "component",
+      "file": "src/components/reui/stepper.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
+      "name": "StepperContent",
+      "category": "component",
+      "file": "src/components/reui/stepper.tsx",
+      "level": "atom",
+      "source": "library",
+      "props": ["value", "forceMount"]
+    },
+    {
+      "name": "StepperNav",
+      "category": "component",
+      "file": "src/components/reui/stepper.tsx",
+      "level": "atom",
+      "source": "library"
+    },
+    {
       "name": "AppShell",
       "category": "component",
       "file": "src/components/templates/app-shell.tsx",

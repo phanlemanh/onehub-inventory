@@ -29,8 +29,8 @@ Mỗi màn của sổ màn có một mục, cộng mục `khung` cho App Shell. 
 
 | Vai          | Nút theo quyền                                                                                                                                                                                                                                                                     | Nút không theo quyền                                            |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Đầu chủ      | `updateListing` (toàn sàn), `editView` (của tôi), `saveView` (của tôi), `readCatalog` (toàn sàn), `viewListings` (toàn sàn), `createListing` (toàn sàn, dự kiến), `activateListing` (của tôi, dự kiến), `removeListing` (của tôi, dự kiến), `viewOwnerPhone` (của tôi, dự kiến)    | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng |
-| Đầu khách    | `updateListing` (toàn sàn), `editView` (của tôi), `saveView` (của tôi), `readCatalog` (toàn sàn), `viewListings` (toàn sàn), `createListing` (toàn sàn, dự kiến)                                                                                                                   | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng |
+| Đầu chủ      | `updateListing` (toàn sàn), `editView` (của tôi), `saveView` (của tôi), `readCatalog` (toàn sàn), `viewListings` (toàn sàn), `createListing` (của tôi, dự kiến), `activateListing` (của tôi, dự kiến), `removeListing` (của tôi, dự kiến), `viewOwnerPhone` (của tôi, dự kiến)     | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng |
+| Đầu khách    | `updateListing` (toàn sàn), `editView` (của tôi), `saveView` (của tôi), `readCatalog` (toàn sàn), `viewListings` (toàn sàn)                                                                                                                                                        | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng |
 | Trưởng nhóm  | `updateListing` (toàn sàn), `editView` (của tôi), `saveView` (của tôi), `readCatalog` (toàn sàn), `viewListings` (toàn sàn), `createListing` (toàn sàn, dự kiến), `activateListing` (toàn sàn, dự kiến), `removeListing` (toàn sàn, dự kiến), `viewOwnerPhone` (toàn sàn, dự kiến) | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng |
 | Quản trị sàn | `readCatalog` (toàn sàn), `viewListings` (toàn sàn)                                                                                                                                                                                                                                | Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng |
 
@@ -74,8 +74,8 @@ Mỗi màn của sổ màn có một mục, cộng mục `khung` cho App Shell. 
 
 | Vai          | Nút theo quyền                                                                                                                                                                                                                                                                                  | Nút không theo quyền |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| Đầu chủ      | `createListing` (toàn sàn), `createContact` (toàn sàn), `updateListing` (toàn sàn), `removeListing` (của tôi), `updateContact` (của tôi), `removeContact` (của tôi), `viewListings` (toàn sàn), `viewContacts` (toàn sàn)                                                                       | —                    |
-| Đầu khách    | `createListing` (toàn sàn), `createContact` (toàn sàn), `updateListing` (toàn sàn), `updateContact` (của tôi), `removeContact` (của tôi), `viewListings` (toàn sàn), `viewContacts` (toàn sàn)                                                                                                  | —                    |
+| Đầu chủ      | `createListing` (của tôi), `createContact` (toàn sàn), `updateListing` (toàn sàn), `removeListing` (của tôi), `updateContact` (của tôi), `removeContact` (của tôi), `viewListings` (toàn sàn), `viewContacts` (toàn sàn)                                                                        | —                    |
+| Đầu khách    | `createContact` (toàn sàn), `updateListing` (toàn sàn), `updateContact` (của tôi), `removeContact` (của tôi), `viewListings` (toàn sàn), `viewContacts` (toàn sàn)                                                                                                                              | —                    |
 | Trưởng nhóm  | `createListing` (toàn sàn), `createContact` (toàn sàn), `updateListing` (toàn sàn), `removeListing` (toàn sàn), `updateContact` (toàn sàn), `mergeContacts` (toàn sàn), `removeContact` (toàn sàn), `eraseContactPersonalData` (toàn sàn), `viewListings` (toàn sàn), `viewContacts` (toàn sàn) | —                    |
 | Quản trị sàn | `viewListings` (toàn sàn)                                                                                                                                                                                                                                                                       | —                    |
 
@@ -96,3 +96,12 @@ Mỗi màn của sổ màn có một mục, cộng mục `khung` cho App Shell. 
 | Đầu khách    | chặn                                                                                | —                    |
 | Trưởng nhóm  | chặn                                                                                | —                    |
 | Quản trị sàn | `listMembers` (toàn sàn), `inviteMember` (toàn sàn), `changeMemberRoles` (toàn sàn) | —                    |
+
+## nhap-tep — `/nhap-tep`
+
+| Vai          | Nút theo quyền                       | Nút không theo quyền |
+| ------------ | ------------------------------------ | -------------------- |
+| Đầu chủ      | `importListings` (của tôi, dự kiến)  | Quay lại, Tiếp       |
+| Đầu khách    | chặn                                 | Quay lại, Tiếp       |
+| Trưởng nhóm  | `importListings` (toàn sàn, dự kiến) | Quay lại, Tiếp       |
+| Quản trị sàn | chặn                                 | Quay lại, Tiếp       |

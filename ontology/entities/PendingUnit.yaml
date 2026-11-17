@@ -31,9 +31,7 @@ wiki: wiki/entities/pending-unit.md
 # co = an action of ontology/actions.yaml (a planned one names the row that opens it), hang = a roadmap row will do it,
 # khong = deliberately absent, with the owner's gate line in duyet. Cells as approved at the 1t scope gate.
 vong_doi:
-  them:
-    hang: "12"
-    ly_do: "Pending units come from adding units (owner's answer to question 7 of row 7e)."
+  them: { co: importListings }
   xem: { co: readCompanyLayer }
   sua: { co: editCompanyLayer }
   go: { co: retireCompanyLayer }

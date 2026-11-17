@@ -66,8 +66,8 @@ thì hỏi lại cột ấy (hàng 7e AC-6).
 - `listings`: thêm `import_run_id` (trỏ lần nhập đã tạo nó). Vai ứng dụng được INSERT, luật thu hẹp đòi `createListing`,
   `WITH CHECK` theo sàn. DELETE chỉ cho căn của một lần nhập chưa hoàn tác, `version = 1` (chưa ai sửa), đòi quyền hoàn
   tác lần nhập (G-1711-6 (2)).
-- `listing_units`: trỏ được căn danh mục (`upi`) hoặc căn chờ khớp của sàn — đúng một trong hai; mỗi căn chờ khớp một lần
-  chào mở. Đổi mô hình miền: Lần chào trỏ căn chờ khớp (Hỏi-2, theo `/ontology-add`).
+- Bảng mới `listing_pending_units` (thực thể ListingPendingUnit): lần chào trỏ căn chờ khớp của sàn; `listing_units` (căn
+  danh mục) không đổi. Mỗi lần chào đúng một liên kết căn; mỗi căn chờ khớp một lần chào mở. Đổi mô hình miền: Lần chào trỏ căn chờ khớp (Hỏi-2, theo `/ontology-add`).
 - Không cột mới ở danh mục chung; danh mục chung không đổi dòng nào khi nhập.
 
 ## Cửa ghi (`/api/v1`)

@@ -117,7 +117,7 @@ Hỏi-7 (khuyên): Đầu chủ và Trưởng nhóm có cả hai; Đầu khách,
 
 | Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
 |---|---|---|---|---|
-| nhap-tep | được — nạp, ghép, áp; căn mang đầu chủ là mình; Hoàn tác lần nhập của sàn | không — «không đủ quyền» | được — như Đầu chủ, chọn đầu chủ cho cả lần nhập | không — «không đủ quyền» |
+| nhap-tep | được — nạp, ghép, áp; căn mang đầu chủ là mình; Hoàn tác lần nhập của sàn | chặn — «không đủ quyền» | được — như Đầu chủ, chọn đầu chủ cho cả lần nhập | chặn — «không đủ quyền» |
 | inventory | được — nút Nạp tệp ở đầu màn và ở trạng thái trống | được — không nút Nạp tệp | được — như Đầu chủ | được — không nút Nạp tệp |
 
 ## Đường đo

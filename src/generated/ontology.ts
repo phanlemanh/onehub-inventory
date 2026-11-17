@@ -162,6 +162,32 @@ export interface FeeItem {
   retiredAt?: string;
 }
 
+export type ImportRunStatus = "open" | "done" | "undone";
+
+/** One time a person brought a sheet file into the company's inventory: who imported it, for which list agent, the shape of the file, how many listings it added, what the company learned from the person's choices, which cells were kept as written, and whether it was undone. Not the file itself — the file never reaches the server. */
+export interface ImportRun {
+  id: string;
+  /** id of Company */
+  companyId: string;
+  /** id of Member */
+  importedBy: string;
+  /** id of Member */
+  listAgentUserId: string;
+  fileName: string;
+  sheetName?: string;
+  signature: Record<string, unknown> | unknown[];
+  rowCount: number;
+  createdCount: number;
+  learned: Record<string, unknown> | unknown[];
+  kept: Record<string, unknown> | unknown[];
+  batchesDone: Record<string, unknown> | unknown[];
+  status: ImportRunStatus;
+  /** ISO datetime */
+  createdAt: string;
+  /** ISO datetime */
+  undoneAt?: string;
+}
+
 /** The shape of a sheet a company imported — its column names in order — and where each column goes: a standard field, a custom field, or left out on purpose. The next sheet of the same shape needs no matching again. */
 export interface ImportTemplate {
   id: string;
@@ -227,6 +253,17 @@ export interface ListingOwner {
   /** id of Listing */
   listingId: string;
   contactType: ListingOwnerContactType;
+}
+
+/** The link between one listing and the company's pending unit it offers, when the shared catalog does not have the unit yet. A listing has exactly one unit link: a ListingUnit (catalog) or a ListingPendingUnit, never both. */
+export interface ListingPendingUnit {
+  id: string;
+  /** id of Company */
+  companyId: string;
+  /** id of Listing */
+  listingId: string;
+  /** id of PendingUnit */
+  pendingUnitId: string;
 }
 
 /** The link between one listing and the shared-catalog unit it offers, inside one company. */
@@ -434,6 +471,9 @@ export interface UpdateListingInput {
 export interface ActivateListingInput {
 }
 
+export interface ImportListingsInput {
+}
+
 export interface ViewOwnerPhoneInput {
 }
 
@@ -510,6 +550,8 @@ export interface ActionHandlers {
   updateListing(input: UpdateListingInput, ctx: ActionContext): Promise<void>;
   /** Put a listing on sale (own scope is the unit one keeps, or a unit nobody keeps yet). */
   activateListing(input: ActivateListingInput, ctx: ActionContext): Promise<void>;
+  /** Import a sheet file into the inventory — preview, apply in batches, undo a whole import (own scope imports for oneself; company scope picks a list agent of the company). */
+  importListings(input: ImportListingsInput, ctx: ActionContext): Promise<void>;
   /** See the phone number of a listing's owner (own scope is the unit one keeps). */
   viewOwnerPhone(input: ViewOwnerPhoneInput, ctx: ActionContext): Promise<void>;
   /** Remove a listing from the list; who removed it and when is kept (own scope is the unit one keeps). */
@@ -1128,7 +1170,7 @@ export const ACTIONS: readonly ActionSpec[] = [
     description: "Add a listing.",
     entity: "Listing",
     kind: "create",
-    roles: ["ListAgent", "BuyerAgent", "TeamLead"],
+    roles: ["ListAgent", "TeamLead"],
     agent: "forbidden",
     idempotent: false,
     output: null,
@@ -1138,15 +1180,14 @@ export const ACTIONS: readonly ActionSpec[] = [
       additionalProperties: false,
     },
     scope: {
-      ListAgent: "company",
-      BuyerAgent: "company",
+      ListAgent: "own",
       TeamLead: "company",
     },
-    status: "planned",
+    status: "live",
     states: [],
     doors: {
-      api: [],
-      db: [],
+      api: ["POST /api/v1/imports/[id]/batches"],
+      db: ["table listings insert", "table listing_units insert", "table listing_pending_units insert"],
     },
   },
   {
@@ -1198,6 +1239,31 @@ export const ACTIONS: readonly ActionSpec[] = [
     doors: {
       api: ["PATCH /api/v1/listings/[id]"],
       db: [],
+    },
+  },
+  {
+    name: "importListings",
+    description: "Import a sheet file into the inventory — preview, apply in batches, undo a whole import (own scope imports for oneself; company scope picks a list agent of the company).",
+    entity: "ImportRun",
+    kind: "command",
+    roles: ["ListAgent", "TeamLead"],
+    agent: "forbidden",
+    idempotent: false,
+    output: null,
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+    scope: {
+      ListAgent: "own",
+      TeamLead: "company",
+    },
+    status: "live",
+    states: [],
+    doors: {
+      api: ["POST /api/v1/imports", "POST /api/v1/imports/preview", "POST /api/v1/imports/[id]/batches", "POST /api/v1/imports/[id]/undo", "GET /api/v1/imports"],
+      db: ["table import_runs insert", "table import_runs update", "table listings delete"],
     },
   },
   {

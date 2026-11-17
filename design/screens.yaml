@@ -28,6 +28,7 @@ families:
   grid: Lưới
   list-frame: Danh sách khung
   dang-nhap: Đăng nhập
+  luong-nhieu-buoc: Luồng nhiều bước
 audiences: [staff, public, dev]
 statuses: [built, planned]
 khung:
@@ -140,3 +141,13 @@ screens:
     mo_san: [inviteMember, changeMemberRoles]
     nut_chung: []
     hien: [Member]
+  - id: nhap-tep
+    route: /nhap-tep
+    title: ImportScreen
+    family: luong-nhieu-buoc
+    audience: staff
+    status: planned
+    vao: importListings
+    nut: [importListings]
+    nut_chung: [Quay lại, Tiếp]
+    hien: [ImportRun]

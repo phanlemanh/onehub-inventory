@@ -280,8 +280,16 @@ actions:
     description: Add a listing.
     entity: Listing
     kind: create
-    status: planned
-    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company }
+    status: live
+    scope: { ListAgent: own, TeamLead: company }
+    doors:
+      api: ["POST /api/v1/imports/[id]/batches"]
+      db:
+        [
+          "table listings insert",
+          "table listing_units insert",
+          "table listing_pending_units insert",
+        ]
 
   - name: updateListing
     description: Change a listing's price, fees or details.
@@ -301,6 +309,25 @@ actions:
     scope: { ListAgent: own, TeamLead: company }
     doors:
       api: ["PATCH /api/v1/listings/[id]"]
+
+  - name: importListings
+    description: >-
+      Import a sheet file into the inventory — preview, apply in batches, undo a whole import (own scope imports for
+      oneself; company scope picks a list agent of the company).
+    entity: ImportRun
+    kind: command
+    status: live
+    scope: { ListAgent: own, TeamLead: company }
+    doors:
+      api:
+        [
+          "POST /api/v1/imports",
+          "POST /api/v1/imports/preview",
+          "POST /api/v1/imports/[id]/batches",
+          "POST /api/v1/imports/[id]/undo",
+          "GET /api/v1/imports",
+        ]
+      db: ["table import_runs insert", "table import_runs update", "table listings delete"]
 
   - name: viewOwnerPhone
     description: See the phone number of a listing's owner (own scope is the unit one keeps).
