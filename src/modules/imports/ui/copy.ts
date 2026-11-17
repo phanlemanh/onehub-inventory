@@ -34,6 +34,8 @@ export const IMPORT_COPY = {
   learned: "Vừa học cho lần sau",
   undo: "Hoàn tác lần nhập",
   undone: "Đã hoàn tác lần nhập.",
+  undoneShort: "đã hoàn tác",
+  keptCells: (n: number) => `${n} ô giữ chữ gốc của tệp`,
   recent: "Lần nhập gần đây",
   offline: "Chưa ghi gì — mất kết nối mạng.",
   retry: "Thử lại",

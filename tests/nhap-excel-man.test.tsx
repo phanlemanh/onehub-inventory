@@ -39,7 +39,9 @@ function server(fail?: "offline") {
   const calls: string[] = [];
   vi.stubGlobal(
     "fetch",
-    vi.fn(async (url: string) => {
+    vi.fn(async (url: string, init?: RequestInit) => {
+      // The recent imports list reads at mount; only what the screen sends is counted.
+      if (!init?.method || init.method === "GET") return Response.json([]);
       calls.push(url);
       if (fail === "offline") throw new TypeError("network");
       if (url.endsWith("/preview")) return Response.json(MARKED);
@@ -80,6 +82,9 @@ describe("man-nap-tep", () => {
     expect(document.querySelector('[data-mark="keep"]')?.textContent).toBe("7");
     await act(async () => fireEvent.click(screen.getByRole("button", { name: C.apply(1, 0) })));
     await waitFor(() => expect(screen.getByText(C.done(1))).toBeTruthy());
+    expect(
+      [...document.querySelectorAll('[data-state="vua-hoc"] li')].map((l) => l.textContent),
+    ).toEqual(["template"]);
     expect(calls).toEqual([
       "/api/v1/imports/preview",
       "/api/v1/imports",
@@ -95,8 +100,9 @@ describe("man-nap-tep", () => {
     mount();
     await choose("a.pdf", "x");
     await waitFor(() =>
-      expect(screen.getByRole("alert").textContent).toBe(PROBLEM_WORDS["wrong-type"]),
+      expect(screen.getByRole("alert").textContent).toContain(PROBLEM_WORDS["wrong-type"]),
     );
+    expect(screen.getByRole("button", { name: C.chooseAgain })).toBeTruthy();
     expect(calls).toEqual([]);
   });
 
