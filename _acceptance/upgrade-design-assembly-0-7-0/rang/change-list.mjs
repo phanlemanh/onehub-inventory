@@ -1,5 +1,5 @@
 // AC-10: the upgrade commit changes exactly the files the matrix lists, and the branch from where it
-// left main to HEAD changes nothing beyond them and this record's own files. Once the branch is in
+// leaves origin/main to HEAD changes nothing beyond them and this record's own files. Once the branch is in
 // main there is nothing between main and HEAD; the commit is still compared, and the line says so.
 // Usage: node change-list.mjs [--root <repository>] [--commit-changes <file>] [--branch-changes <file>]
 //   [--groups <JSON file>] [--merged]   (the overrides stand in for git diff, the matrix's groups and
@@ -16,7 +16,11 @@ const fromFile = (name) => (option(name) ? lines(readFileSync(option(name), "utf
 const commit = fromFile("--commit-changes") ?? lines(git(root, "diff", "--name-only", "--no-renames", BASE, UPGRADE));
 const groups = option("--groups") ? JSON.parse(readFileSync(option("--groups"), "utf8")) : FILE_GROUPS;
 const merged = process.argv.includes("--merged") || spawnSync("git", ["-C", root, "merge-base", "--is-ancestor", UPGRADE, "origin/main"]).status === 0;
-const branch = fromFile("--branch-changes") ?? (merged ? [] : lines(git(root, "diff", "--name-only", "--no-renames", BASE, "HEAD")));
+// The branch's own changes: from where it now leaves origin/main (moves when main is merged into the
+// branch), or from BASE when there is no origin/main to read.
+const leaves = spawnSync("git", ["-C", root, "merge-base", "HEAD", "origin/main"], { encoding: "utf8" });
+const from = leaves.status === 0 ? leaves.stdout.trim() : BASE;
+const branch = fromFile("--branch-changes") ?? (merged ? [] : lines(git(root, "diff", "--name-only", "--no-renames", from, "HEAD")));
 
 const found = [];
 const outside = commit.filter((file) => !UPGRADE_CHANGES.includes(file));
