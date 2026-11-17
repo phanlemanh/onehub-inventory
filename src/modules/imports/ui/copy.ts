@@ -23,6 +23,7 @@ export const IMPORT_COPY = {
   keepAsWritten: "Giữ chữ gốc",
   skipColumn: "Bỏ cột",
   skipRow: "Bỏ dòng",
+  keepRow: "Lấy lại dòng",
   pendingDefault: "Giữ nguyên mã, chờ khớp danh mục",
   columnHead: "Cột của tệp",
   targetHead: "Đi vào",
