@@ -1,13 +1,13 @@
 ---
 schema_version: 2
 feature_slug: app-shell-khuon-dau-trang
-verdict: REJECT
-failed_evals: ["E5","E15","E16","E10","E11"]
+verdict: PENDING-JUDGMENT
+failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 2b76a3331d7846c7cabcce9fa616baafe78e2102
+verified_commit: 45a3cb0839776f4d770edba5dff98845c2a7d604
 human_signoff:
 ---
 
@@ -19,197 +19,193 @@ human_signoff:
 | E2 | AC-2 | script | PASS |
 | E3 | AC-3 | script | PASS |
 | E4 | AC-4 | script | PASS |
-| E5 | AC-4 | script | FAIL |
+| E5 | AC-4 | script | PASS |
 | E6 | AC-5 | script | PASS |
 | E7 | AC-5 | test | PASS |
 | E8 | AC-6 | script | PASS |
 | E9 | AC-6 | test | PASS |
-| E10 | AC-7 | script | FAIL |
-| E11 | AC-7 | script | FAIL |
+| E10 | AC-7 | script | PASS |
+| E11 | AC-7 | script | PASS |
 | E12 | AC-8 | ui-check | PASS |
 | E13 | AC-8 | judgment | UNCERTAIN |
 | E14 | AC-7 | script | PASS |
-| E15 | AC-4 | script | FAIL |
-| E16 | AC-5 | script | FAIL |
+| E15 | AC-4 | script | PASS |
+| E16 | AC-5 | script | PASS |
 
 ## Evidence
 
 - eval: E1
-  run_id: minted-app-shell-khuon-dau-trang-E1-r1
+  run_id: minted-app-shell-khuon-dau-trang-E1-r2
   exit_code: 0
   baseline: red
   verifier: config:executors.script.app_shell_verve_e2e
-  verified_at: 2026-11-17T01:22:55Z
+  verified_at: 2026-11-17T02:58:24Z
   output: |
-    npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts
+    Lệnh: npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts
     gac-hydration: 0 canh bao
 
 - eval: E2
-  run_id: minted-app-shell-khuon-dau-trang-E2-r1
+  run_id: minted-app-shell-khuon-dau-trang-E2-r2
   exit_code: 0
   baseline: red
   verifier: config:executors.script.app_shell_verve_e2e
-  verified_at: 2026-11-17T01:22:55Z
+  verified_at: 2026-11-17T02:58:24Z
   output: |
-    npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts
+    Lệnh: npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts
     gac-hydration: 0 canh bao
 
 - eval: E3
-  run_id: minted-app-shell-khuon-dau-trang-E3-r1
+  run_id: minted-app-shell-khuon-dau-trang-E3-r2
   exit_code: 0
   baseline: red
   verifier: config:executors.script.app_shell_verve_e2e
-  verified_at: 2026-11-17T01:22:55Z
+  verified_at: 2026-11-17T02:58:24Z
   output: |
-    npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts
+    Lệnh: npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts
     gac-hydration: 0 canh bao
 
 - eval: E4
-  run_id: minted-app-shell-khuon-dau-trang-E4-r1
+  run_id: minted-app-shell-khuon-dau-trang-E4-r2
   exit_code: 0
   baseline: red
   verifier: config:executors.script.app_shell_verve_e2e
-  verified_at: 2026-11-17T01:22:55Z
+  verified_at: 2026-11-17T02:58:24Z
   output: |
-    npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts
+    Lệnh: npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts
     gac-hydration: 0 canh bao
 
 - eval: E5
-  run_id: minted-app-shell-khuon-dau-trang-E5-r1
-  exit_code: 1
+  run_id: minted-app-shell-khuon-dau-trang-E5-r2
+  exit_code: 0
   baseline: red
   verifier: config:executors.script.app_shell_verve_db
-  verified_at: 2026-11-17T01:22:55Z
+  verified_at: 2026-11-17T02:58:24Z
   output: |
-    playwright.db.config.ts, dãy R: 32 failed, 157 skipped, 40 did not run, 661 passed (31.9m)
-    Đỏ ở 360 và 414: bo-nut-members, login, members, thue-phi, va-dang-nhap (dang-xuat, dang-xuat-mang-dut, dang-xuat-may-chu-loi, dang-xuat-duoc, axe-sang-toi, moi-nguoi-va-dang-nhap, doi-vai-thanh-ben, khong-du-quyen, tu-choi-403-cau-rieng, dat-muc-roi-bang-hang-doi)
-    Đỏ ở 1024 và 1440: login.spec dang-xuat, thue-phi.spec dat-muc-roi-bang-hang-doi
-    Đỏ ở vai-360: vai-man.spec thanh ben theo vai
-    gac-hydration: 0 canh bao
+    Lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    Lệnh kết thúc thành công.
 
 - eval: E6
-  run_id: minted-app-shell-khuon-dau-trang-E6-r1
+  run_id: minted-app-shell-khuon-dau-trang-E6-r2
   exit_code: 0
   baseline: red
   verifier: config:executors.script.app_shell_verve_e2e
-  verified_at: 2026-11-17T01:22:55Z
+  verified_at: 2026-11-17T02:58:24Z
   output: |
-    npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts
+    Lệnh: npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts
     gac-hydration: 0 canh bao
 
 - eval: E7
-  run_id: minted-app-shell-khuon-dau-trang-E7-r1
+  run_id: minted-app-shell-khuon-dau-trang-E7-r2
   exit_code: 0
   baseline: green
   verifier: config:executors.test.app_shell_verve_unit
-  verified_at: 2026-11-17T01:22:55Z
+  verified_at: 2026-11-17T02:58:24Z
   output: |
-    npx vitest run tests/app-shell.test.tsx tests/frame.test.tsx tools/e2e_templates/e2e-templates.test.ts
+    Lệnh: npx vitest run tests/app-shell.test.tsx tests/frame.test.tsx tools/e2e_templates/e2e-templates.test.ts
+    Lệnh kết thúc thành công.
 
 - eval: E8
-  run_id: minted-app-shell-khuon-dau-trang-E8-r1
+  run_id: minted-app-shell-khuon-dau-trang-E8-r2
   exit_code: 0
   baseline: red
   verifier: config:executors.script.app_shell_verve_e2e
-  verified_at: 2026-11-17T01:22:55Z
+  verified_at: 2026-11-17T02:58:24Z
   output: |
-    npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts
+    Lệnh: npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts
     gac-hydration: 0 canh bao
 
 - eval: E9
-  run_id: minted-app-shell-khuon-dau-trang-E9-r1
+  run_id: minted-app-shell-khuon-dau-trang-E9-r2
   exit_code: 0
   baseline: green
   verifier: config:executors.test.app_shell_verve_unit
-  verified_at: 2026-11-17T01:22:55Z
+  verified_at: 2026-11-17T02:58:24Z
   output: |
-    npx vitest run tests/app-shell.test.tsx tests/frame.test.tsx tools/e2e_templates/e2e-templates.test.ts
+    Lệnh: npx vitest run tests/app-shell.test.tsx tests/frame.test.tsx tools/e2e_templates/e2e-templates.test.ts
+    Lệnh kết thúc thành công.
 
 - eval: E10
-  run_id: minted-app-shell-khuon-dau-trang-E10-r1
-  exit_code: 2
-  baseline: n-a
+  run_id: minted-app-shell-khuon-dau-trang-E10-r2
+  exit_code: 0
+  baseline: green
   verifier: config:executors.script.check
-  verified_at: 2026-11-17T01:22:55Z
+  verified_at: 2026-11-17T02:58:24Z
   output: |
-    make check: Test Files 2 failed | 145 passed (147); Tests 2 failed | 2463 passed | 2 skipped
-    Đỏ 1: tests/dang-nhap-giu-loi.test.ts:75 giu-loi-bai-dang-nhap, mã băm tệp lệch với mã đã giữ (nhận 9a1630cf48f58ca9ba4a607da478bbbb6b0d6562f5073970623d2648764495c3)
-    Đỏ 2: tests/sua-trang.test.ts:35 "sua-trang: tests/e2e-db/app-shell-verve.spec.ts:150 screenshot khong qua cua chung"
+    Lệnh: make check
+    CODEOWNERS matches governance/autonomy.yaml
 
 - eval: E11
-  run_id: minted-app-shell-khuon-dau-trang-E11-r1
-  exit_code: 2
+  run_id: minted-app-shell-khuon-dau-trang-E11-r2
+  exit_code: 0
   baseline: n-a
   verifier: config:executors.script.e2e
-  verified_at: 2026-11-17T01:22:55Z
+  verified_at: 2026-11-17T02:58:24Z
   output: |
-    make e2e: 2 failed, 1151 skipped, 1267 passed (18.6m); cả hai ở khổ 1440
-    Đỏ 1: tools/e2e_templates/suite.ts:116 cham / man sent / khung tieu-de, "page not hydrated" (trang chua gan xong)
-    Đỏ 2: tools/e2e_templates/suite.ts:272 pha vung cho-tai "khung cho khong bao gio hien" phai do trong 15000ms, đo 52801ms
+    Lệnh: make e2e
+    gac-hydration: 0 canh bao
 
 - eval: E12
-  run_id: minted-app-shell-khuon-dau-trang-E12-r1
+  run_id: minted-app-shell-khuon-dau-trang-E12-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.ui-check
-  verified_at: 2026-11-17T01:22:55Z
+  verified_at: 2026-11-17T02:58:24Z
   screenshot: evidence/E12-step1.png
   observed: |
-    1440 sáng/tối, 1024 sáng: trước có nút thanh bên ở góc trái, ô tìm kèm nút giao diện và "Đăng nhập" ở góc phải, tiêu đề lớn "Bảng hàng"/"Hôm nay" và menu giao diện (Sáng/Tối/Theo thiết bị). Sau: ô tìm giữa thanh trên, không còn nút giao diện và đăng nhập ở góc phải, một hàng nhỏ "Bảng hàng › Tất cả hàng", không còn nút thanh bên, biểu tượng tài khoản nhỏ ở đáy dải; menu mở có hàng "Giao diện" ba lựa chọn và "Đăng nhập". Dải gập nằm giữa chiều cao trên mép cột, mép cột chạy tới đáy, bảng không đổi.
-    414/360 sáng/tối: sau giữ nút mở tấm menu ở góc trái và biểu tượng tìm, bỏ giao diện và đăng nhập khỏi thanh trên, thay tiêu đề lớn bằng hàng đường dẫn; tấm menu mở có nút tài khoản ở đáy với hàng Giao diện ba lựa chọn. Đăng nhập thật ở bốn khổ: tên, email dài và dòng "Đang làm ở" mỗi thứ một dòng, ba kiểu giao diện, "Đăng xuất". Tối đọc được. Ghi chú: Hôm nay sau chỉ có tiêu đề cột nhỏ, không có hàng đường dẫn (màn không có nút chính).
+    1440 truoc: big "Bảng hàng"/"Hôm nay" title, sidebar-toggle button at top-left of bar, search box at right with a sun/moon theme button and "Đăng nhập" at the far right, fold strip near the top of the column edge (y~215), column border ending at about y 375 (Bảng hàng) / 135 (Hôm nay), no account button at the bottom. 1440 sau: no big title; one row "Bảng hàng › Tất cả hàng" (Hôm nay shows "Hôm nay"); no sidebar toggle at top-left; search box centered in the top bar; no theme button and no sign-in at right; fold strip now at mid-height (y~451) on the column edge; column-2 border runs to the bottom of the window; account person icon at the bottom of the rail. Table content otherwise identical (same columns, rows, filters), just shifted left by about 23px because the title is gone. Open account menu signed out (sau 1440 light): panel above the bottom account button, row "Giao diện" with three icon choices (light/dark/system) and a "Đăng nhập" row; truoc menu was the theme dropdown (Sáng/Tối/Theo thiết bị) from the top-right button. 1024 and 360 follow the same pattern: 1024 sau keeps the centered search and bottom account button, column border full height; 360/414 sau keep the sidebar-open button at top-left and a search icon at right, breadcrumb row, and the menu sheet opens with the account menu at the bottom (Giao diện three choices + Đăng nhập). Dark 1440 and 1024 and 414: text, borders, badges, table all legible on dark background, same shape as light. Signed-in frames (menu-dang-nhap 360/414/1024/1440): avatar "T", name "[Tên] Quản trị MAU" on one line, long email "quan-tri-san-<size>-...@example.test" whole on one line (not cut, not wrapped, fits panel width), line "Đang làm ở [Sàn 1 <size>-...]" on one line, "Giao diện" row with three choices, "Đăng xuất" row; company name also shown top-left of bar at 1024/1440. The "N" round badge is the Next dev overlay, not app UI. No contradiction with Expected A1-A6 found. Ghi chú: các khung trước/sau còn lại (414 sáng, các biến thể tối khác của Hôm nay và menu 360/414) chưa được mở từng khung.
   network_observed: n-a (driver)
 
 - eval: E13
-  judged_by: judge panel (3 lens, fresh context) — đề xuất
+  judged_by: judge panel đề xuất (domain-correctness, operational-feasibility, spec-alignment), fresh context
   verdict: UNCERTAIN
-  rationale: Cả ba lens không phân biệt được việc làm đúng lời chủ kho với việc thêm ngoài lời, vì nhiều chi tiết cột «Sau» và việc dời dấu dev Next.js không có trong «Nguồn».
-  panel_votes:
-    - domain-correctness: UNCERTAIN — Mỗi chỗ A1–A6 có đúng một dòng, P1–P3 nằm ở Out of scope, nhưng nhiều chi tiết A1, A3, A4 (nét bẻ ‹ ›, ô tìm 320 px, menu 320 px, email 40 ký tự) và việc dời dấu dev Next.js không thấy trong lời chủ kho ở mục «Nguồn»; design.md không nói P1–P3 ứng với lời nào.
-    - operational-feasibility: UNCERTAIN — Phần lớn khớp lời chủ kho, nhưng P1–P3 chỉ được nêu tên ở contract.md, và việc dời dấu dev nằm ngoài sáu chỗ nên có thể trái AC-8.
-    - spec-alignment: UNCERTAIN — Có đúng sáu hàng A1–A6; chi tiết cột «Sau» vượt lời nguyên văn trong «Nguồn», và «Ngoài sáu chỗ» nêu việc dời dấu dev mà không có câu chủ kho nào đòi.
+  rationale: Cả ba góc nhìn đều thấy sáu dòng A1–A6 khớp lời chủ kho ở mức chủ đề và P1–P3 nằm ở Out of scope của contract.md, nhưng nhiều chi tiết cột «Sau» (320 px, ⌘ và K tách hai ô, ‹ › khi rê, ⌘B không mở, email 40 ký tự, dời dấu dev Next.js) không truy được về lời chủ kho hay số đo Verve trong hai tệp được phép đọc; design.md cũng không nêu P1–P3 là những việc nào.
+  votes:
+    - domain-correctness: UNCERTAIN — mục «Nguồn» của design.md không có câu nào nêu P1–P3, chỉ có «Chỉ ghi lại» chung chung ở mục 9; A3 (ô tìm 320 px), A1 (mũi tên ‹ › khi rê), A4 (menu 320 px) không có trong lời nguyên văn; chủ kho ở mục 2 chỉ nói «so sánh phần này».
+    - operational-feasibility: UNCERTAIN — các câu 1, 2 và 9 chỉ nói «so sánh» hoặc «dựng lại» nên chưa biết chi tiết nào đến từ chủ kho và chi tiết nào do người dựng thêm; việc dời dấu Next.js chưa có căn cứ là lời chủ kho hay hệ quả bắt buộc của A4, nếu không có thì là việc thêm ngoài lời chủ kho và bị coi là không đạt.
+    - spec-alignment: UNCERTAIN — mỗi chỗ A1–A6 có một dòng và P1–P3 nằm ở Out of scope, nhưng dấu ‹ › khi rê, ô tìm 320 px, menu 40 ký tự và việc dời dấu dev Next.js chỉ sổ ghi chú đợt (ngoài input) mới cho biết là số đo Verve hay lời chủ kho; nếu không có lời chủ kho đồng ý dời dấu dev thì đó là việc thêm ngoài lời chủ kho.
+  panel_note: Panel là đề xuất của máy; người quyết ở Cổng 2.
   required_evidence:
-    - Sổ ghi chú của đợt `dieu-chinh-hang-muc-verve-settings.md`: cho thấy các chi tiết cột «Sau» của A1, A3, A4 (nét bẻ ‹ › khi rê, ô tìm 320 px, menu 320 px, cắt email sau 40 ký tự) là điều chủ kho bảo hoặc số đo Verve chủ kho đã bảo theo.
-    - Lời nguyên văn của chủ kho cho P1 (phần hồ sơ sàn), P2 (tìm/lọc/sắp ở màn Thành viên), P3 (chia nhóm cột mục con) với dấu «chỉ ghi lại», để xác nhận contract.md Out of scope không thiếu việc nào.
-    - Lời hay dòng quyết định của chủ kho cho phép dời dấu bản dev Next.js sang góc phải dưới; ảnh trước/sau bốn khổ của góc dưới trái và dấu dev để xác nhận không trái AC-8.
+    - Sổ ghi chú đợt dieu-chinh-hang-muc-verve-settings.md: lời nguyên văn của chủ kho cho «chỉ ghi lại» và đối chiếu P1 (hồ sơ sàn), P2 (tìm/lọc/sắp ở Thành viên), P3 (chia nhóm cột mục con), để xác nhận P1–P3 là việc chủ kho bảo «chỉ ghi lại».
+    - Cũng trong sổ đó: lời chủ kho hoặc số đo Verve cho các chi tiết A3 (ô tìm giữa thanh trên, 320 px, ⌘ và K tách hai ô), A1 (mũi tên ‹ › khi rê, viền sáng khi rê), A4 (menu rộng 320 px, tên và email tới 40 ký tự một dòng), A6 (⌘B không mở), để xác nhận cột «Sau» không thêm việc chủ kho không bảo.
+    - Dòng trong sổ ghi chú có lời chủ kho đồng ý dời dấu dev Next.js sang góc phải dưới, hoặc chứng minh đó là hệ quả bắt buộc của A4.
   human_override:  # chi nguoi ghi
+
+- eval: E14
+  run_id: minted-app-shell-khuon-dau-trang-E14-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.design.floor
+  verified_at: 2026-11-17T02:58:24Z
+  output: |
+    Lệnh: node "$R/scripts/design-floor-s4.mjs" --root .
+    Lệnh kết thúc thành công.
+
+- eval: E15
+  run_id: minted-app-shell-khuon-dau-trang-E15-r2
+  exit_code: 0
+  baseline: red
+  verifier: config:executors.script.app_shell_verve_db
+  verified_at: 2026-11-17T02:58:24Z
+  output: |
+    Lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    Lệnh kết thúc thành công.
+
+- eval: E16
+  run_id: minted-app-shell-khuon-dau-trang-E16-r2
+  exit_code: 0
+  baseline: red
+  verifier: config:executors.script.app_shell_verve_db
+  verified_at: 2026-11-17T02:58:24Z
+  output: |
+    Lệnh: DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts
+    Lệnh kết thúc thành công.
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-app-shell-khuon-dau-trang-SUITE-build-r1
+  run_id: minted-app-shell-khuon-dau-trang-SUITE-build-r2
   exit_code: 0
-  verified_at: 2026-11-17T01:22:55Z
-
-- eval: E14
-  run_id: minted-app-shell-khuon-dau-trang-E14-r1
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.design.floor
-  verified_at: 2026-11-17T01:22:55Z
-  output: |
-    design-floor-s4.mjs --root . xong, không thấy màu hex thô trên các tệp giao diện vòng này chạm
-
-- eval: E15
-  run_id: minted-app-shell-khuon-dau-trang-E15-r1
-  exit_code: 1
-  baseline: red
-  verifier: config:executors.script.app_shell_verve_db
-  verified_at: 2026-11-17T01:22:55Z
-  output: |
-    Cùng lần chạy playwright.db.config.ts với E5: 32 failed, 661 passed. Chưa có dòng đỏ riêng của app-shell-verve.spec.ts trong phần đuôi đã lưu; đồng thời bài sua-trang chỉ ra app-shell-verve.spec.ts:150 có screenshot không qua cửa chung.
-    gac-hydration: 0 canh bao
-
-- eval: E16
-  run_id: minted-app-shell-khuon-dau-trang-E16-r1
-  exit_code: 1
-  baseline: red
-  verifier: config:executors.script.app_shell_verve_db
-  verified_at: 2026-11-17T01:22:55Z
-  output: |
-    Cùng lần chạy playwright.db.config.ts với E5: 32 failed, 661 passed. Đỏ gồm thue-phi.spec.ts:315 dat-muc-roi-bang-hang-doi ở 360, 414, 1024, 1440 (Tuỳ chỉnh của sàn › Thuế phí).
-    gac-hydration: 0 canh bao
-
-Lệnh fail không gắn eval: không có. Ba lệnh fail đều đã gắn eval (dãy db gắn E5, E15, E16; make check gắn E10; make e2e gắn E11).
+  verified_at: 2026-11-17T02:58:24Z
 
 ## Known limits
 
@@ -217,17 +213,21 @@ Lệnh fail không gắn eval: không có. Ba lệnh fail đều đã gắn eval
 
 ## Analyst
 
-Eval không phân biệt (xanh cả trên HEAD lẫn baseline, chứng minh harness chứ không phải feature; nên viết lại để assert hành vi mới hoặc xác nhận là regression-guard có chủ ý): E7, E9 (lệnh npx vitest run tests/app-shell.test.tsx tests/frame.test.tsx tools/e2e_templates/e2e-templates.test.ts --coverage.enabled=false --reporter=verbose).
+Eval không phân biệt (xanh trên cả bản mới lẫn baseline; chứng minh harness chứ không phải tính năng — nên viết lại để assert hành vi mới, hoặc xác nhận là regression-guard có chủ ý):
 
-Baseline không đo:
-- make check: baseline vuột trần 178 giây/lệnh — đã dừng cả cây tiến trình; BLOCKED hạ tầng, không phải kết quả của code cũ
-- make e2e: hết trần tổng 480 giây của lane baseline trước khi tới lệnh này — không chạy
-- R="${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}" && node "$R/scripts/design-floor-s4.mjs" --root .: hết trần tổng 480 giây của lane baseline trước khi tới lệnh này — không chạy
+- npx vitest run tests/app-shell.test.tsx tests/frame.test.tsx tools/e2e_templates/e2e-templates.test.ts --coverage.enabled=false --reporter=verbose: E7, E9
+- make check: E10
+
+Baseline khong do:
+
+- make e2e: baseline vuot tran 55 giay/lenh — da dung ca cay tien trinh; BLOCKED ha tang, khong phai ket qua cua code cu
+- R="${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}" && node "$R/scripts/design-floor-s4.mjs" --root .: het tran tong 480 giay cua lane baseline truoc khi toi lenh nay — khong chay
 
 ## Variance
 
-none — mọi eval nhiều lần chạy đều đồng nhất (mọi eval chạy một lần, không có phương sai)
+none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: E5, E15, E16, E10, E11 failed — bài đăng nhập thật trên Postgres dãy R đỏ ở đăng xuất, thành viên, thuế phí và vai × màn; make check đỏ vì mã băm bài giữ lời đăng nhập lệch và vì app-shell-verve.spec.ts:150 có screenshot không qua cửa chung; make e2e đỏ ở khổ 1440 (trang chưa gắn xong ở khung tiêu đề, pha chờ-tải quá 15000 ms). Returned to implementation.
+Round 1: lịch sử nằm trong run-log.jsonl và các bản ghi round trước; round này thay thế nội dung cũ.
+Round 2: mọi eval máy xanh, E12 xanh theo ảnh đã mở; E13 còn UNCERTAIN chờ người chốt ở Cổng 2 nên verdict là PENDING-JUDGMENT.
