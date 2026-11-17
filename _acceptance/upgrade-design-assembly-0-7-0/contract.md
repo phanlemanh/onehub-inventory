@@ -5,7 +5,7 @@ slug: upgrade-design-assembly-0-7-0
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci]
-status: implemented
+status: verified
 approved_by: Phan Le Manh
 approved_at: 2026-11-17
 design_doc: docs/superpowers/specs/2026-11-17-upgrade-design-assembly-0-7-0-design.md

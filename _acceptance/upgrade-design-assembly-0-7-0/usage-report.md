@@ -45,3 +45,36 @@ wall: 912s
 - **claude-sonnet-5-5**: 4 agent · 9 calls · out 26,581 · in 18 · cache_read 200,793 · cache_create 184,502
 - **claude-haiku-5-5**: 17 agent · 44 calls · out 29,399 · in 88 · cache_read 834,084 · cache_create 573,547
 
+### S4 round 2 — wf_3d616f83-72b (12 agent, 51,784 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| review:invariants | claude-opus-5-5 | 38 | 20,214 | 78 | 3,442,508 | 457 |
+| synthesize:report | claude-sonnet-5-5 | 2 | 7,344 | 4 | 45,473 | 42 |
+| review:bugs | claude-opus-5-5 | 15 | 6,151 | 30 | 806,424 | 125 |
+| machine:make check | claude-haiku-5-5 | 4 | 4,052 | 8 | 102,471 | 126 |
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 3,936 | 6 | 70,148 | 151 |
+| triage | claude-sonnet-5-5 | 2 | 3,168 | 4 | 30,072 | 24 |
+| machine:node _acceptance/upgrade-design-assembly | claude-haiku-5-5 | 4 | 3,064 | 8 | 102,756 | 148 |
+| review:measurement | claude-opus-5-5 | 4 | 1,119 | 8 | 106,246 | 23 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 1,090 | 4 | 28,980 | 11 |
+| machine:make e2e | claude-haiku-5-5 | 2 | 623 | 4 | 3,300 | 576 |
+| machine:node _acceptance/upgrade-design-assembly | claude-haiku-5-5 | 2 | 613 | 4 | 29,023 | 7 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 410 | 4 | 24,479 | 9 |
+
+
+wall: 789s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| review | 3 | 27,484 | 4,355,178 | 457 | 04:48:27 | 04:56:04 |
+| machine | 5 | 9,442 | 266,530 | 713 | 04:48:27 | 05:00:21 |
+| baseline | 1 | 3,936 | 70,148 | 151 | 04:48:27 | 04:50:58 |
+| triage | 1 | 3,168 | 30,072 | 24 | 05:00:21 | 05:00:45 |
+| capture | 1 | 410 | 24,479 | 9 | 05:00:45 | 05:00:54 |
+| synthesize | 1 | 7,344 | 45,473 | 42 | 05:00:54 | 05:01:36 |
+
+- **claude-opus-5-5**: 3 agent · 57 calls · out 27,484 · in 116 · cache_read 4,355,178 · cache_create 248,525
+- **claude-sonnet-5-5**: 4 agent · 9 calls · out 14,858 · in 18 · cache_read 170,172 · cache_create 176,173
+- **claude-haiku-5-5**: 5 agent · 14 calls · out 9,442 · in 28 · cache_read 266,530 · cache_create 187,683
+
