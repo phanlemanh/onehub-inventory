@@ -98,7 +98,7 @@ evals:
     steps:
       - "Open _acceptance/app-shell-khuon-dau-trang/evidence/truoc/ (frames taken on main before this round) and _acceptance/app-shell-khuon-dau-trang/evidence/sau/ (same screens, same sizes, after this round)."
       - "For each of 360, 414, 1024, 1440 compare the before and after frame of Bảng hàng, Hôm nay and the open account menu (signed out, so the frames hold sample data only), light and dark."
-      - "Open evidence/sau/menu-dang-nhap-*.png (signed in on lane R Postgres, a long sample email) and check name and email each on one line, the company line, the three looks and sign-out."
+      - "Run SHOTS_DIR=_acceptance/app-shell-khuon-dau-trang/evidence/sau DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts tests/e2e-db/app-shell-verve.spec.ts; it saves evidence/sau/menu-dang-nhap-<360|414|1024|1440>.png (signed in on lane R Postgres, a long sample email). Check name and email each on one line, the company line, the three looks and sign-out."
     expected: "A1 dải gập trên mép cột giữa cửa sổ; A2 viền cột hai chạy tới đáy; A3 ô tìm giữa thanh trên, không còn nút giao diện và nút T ở góc phải; A4 nút tài khoản ở đáy dải, menu đủ rộng cho email một dòng, có hàng Giao diện ba lựa chọn; A5 không còn tiêu đề lớn, một hàng «Tên màn › Nơi» với nút chính cuối hàng; A6 không còn nút thanh bên ở góc trái thanh trên khi máy tính; điện thoại vẫn có nút mở tấm menu; tối đọc được; ngoài sáu chỗ ấy màn không đổi dáng"
     evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
 

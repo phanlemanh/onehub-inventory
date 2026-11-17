@@ -3,7 +3,8 @@
 // looks and sign-out, and the arrow keys walk it; switching company shows only to a person in two companies; the page
 // head of the members and company layer screens is one thin row with the primary action at its end, beside a second
 // column edge that runs the whole height. Each check has a twin fed a wrong measure that must fail with its message.
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import pg from "pg";
@@ -137,6 +138,12 @@ test(
     assertWholeLine(await lineOf(page, "[Tên] Quản trị MAU"));
     assertWholeLine(await lineOf(page, email));
     await expect(menu).toContainText(`Đang làm ở ${names[0]}`);
+    // SHOTS_DIR=<dir> keeps the open menu for the ui-check (E12): one frame per width.
+    const shots = process.env["SHOTS_DIR"];
+    if (shots) {
+      mkdirSync(shots, { recursive: true });
+      await page.screenshot({ path: join(shots, `menu-dang-nhap-${info.project.name}.png`) });
+    }
     for (const look of ["Sáng", "Tối", "Theo thiết bị"]) {
       await expect(page.getByRole("menuitemradio", { name: look })).toBeVisible();
     }
