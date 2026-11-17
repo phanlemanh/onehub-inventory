@@ -146,7 +146,7 @@ screens:
     title: ImportScreen
     family: luong-nhieu-buoc
     audience: staff
-    status: planned
+    status: built
     vao: importListings
     nut: [importListings, continueImport, undoImport]
     nut_chung: [Quay lại, Tiếp]

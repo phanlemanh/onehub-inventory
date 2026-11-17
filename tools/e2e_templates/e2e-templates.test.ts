@@ -447,7 +447,6 @@ describe("màn cần đăng nhập không còn danh sách bỏ qua", () => {
         "bo qua: contacts — planned",
         "bo qua: proto — dev",
         "bo qua: proto-bo-nut — dev",
-        "bo qua: nhap-tep — planned",
       ]);
     },
     SLOW,
