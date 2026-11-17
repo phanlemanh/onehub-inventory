@@ -264,3 +264,25 @@ describe("sua-thong-tin-can · server", () => {
     expect(outcome.kind === "conflict" ? outcome.current?.legalStatus : null).toBe("Sổ hồng");
   });
 });
+
+describe("sua-thong-tin-can · bốn vai", () => {
+  it("vai-4-o: four roles × PATCH details, the door answering by the permission table (3 × 200, CompanyAdmin 403)", async () => {
+    const { allowedScope } = await import("../src/modules/identity");
+    const want: Record<string, number> = {
+      ListAgent: 200,
+      BuyerAgent: 200,
+      TeamLead: 200,
+      CompanyAdmin: 403,
+    };
+    let cells = 0;
+    for (const [role, status] of Object.entries(want)) {
+      const scope = allowedScope([role as "ListAgent"], "updateListing");
+      const t = handlers(scope ? {} : { door: "forbidden" });
+      const res = await t.patch({ field: "details", legalStatus: "Sổ hồng" });
+      expect(res.status, `vai-4-o: ${role}`).toBe(status);
+      expect(t.writes.length, `vai-4-o: ${role} ghi`).toBe(status === 200 ? 1 : 0);
+      cells += 1;
+    }
+    expect(cells).toBe(4);
+  });
+});

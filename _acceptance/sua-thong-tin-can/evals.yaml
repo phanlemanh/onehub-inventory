@@ -48,7 +48,7 @@ evals:
     cmd: config:executors.test.sua_thong_tin_unit
     layer: backend-effect
     paths: [src/modules/listings/**, src/app/api/v1/listings/**]
-    expected: "exit 0; ca 'quan-tri-403' (PATCH details của vai không có ô updateListing trả 403, dòng không đổi) và 'details-bon-truong' (ba vai trả 200)"
+    expected: "exit 0; ca 'vai-4-o' (4 vai × PATCH details theo bảng quyền: ba vai 200 và ghi một dòng, Quản trị sàn 403 không ghi, hằng 4), 'quan-tri-403', 'details-bon-truong'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E2
