@@ -27,3 +27,10 @@ Chủ kho duyệt kế hoạch VP9 và hai lần bổ sung (sổ quyết định
 | Sổ tay: lối phiên CLI, cờ bản thật, giả thuyết «User not found» | Không | `tests/van-hanh.test.ts` | G-1711-30 |
 
 Hồ sơ được ghim lại trên bản có thay đổi này.
+
+### Bàn giao bg-20261117T080658Z — đang ở đâu
+
+- VP9 đã commit và đẩy lên nhánh `claude/vp9-phien-vercel` (chưa mở PR, chưa ghim lại hồ sơ 22).
+- Việc kế: xin s4 khi tải máy dưới 8 → `repin-lane.mjs --root . --slug moi-truong-thu-va-ban-that --write` → pre-merge-check `--base origin/main` → mở PR VP9, gửi giám sát mã lượt CI → `gop`.
+- Sau khi gộp: kéo main vào bản sao đưa bản `~/onehub-inventory-van-hanh/kho` (fetch, checkout `--detach origin/main`, `npm ci`), rồi chủ kho chạy `bash ~/onehub-inventory-van-hanh/dua-ban-thu.sh` — bước 6 hiện in «CHỜ», phải sửa lại thành `make deploy ENV=staging`.
+- Bản thử: 001 đã áp, 002 dừng; sáu biến, khoá vượt bảo vệ, tên miền thu.inventory.onehub.center đã đặt. Khoá Vercel trên web không dùng được — dùng phiên Vercel CLI.
