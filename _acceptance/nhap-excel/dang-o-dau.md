@@ -9,9 +9,7 @@ Cập nhật sau mỗi bước có nghĩa (G-1711-39: hạn mức tuần ≥ 95%
 - ĐANG DỞ việc 8 (màn): trang `src/app/(app)/nhap-tep/page.tsx` (trong PermittedAction importListings), khung
   `src/modules/imports/ui/import-wizard.tsx` (ApplyBatches trong PermittedAction continueImport, UndoImport trong
   undoImport), screens.yaml nhap-tep = built; các bài đã ký đi theo màn mới (sua-sau-ky: kiem-vai-theo-man,
-  bo-kiem-chung-khi-dang-nhap, khai-vai-va-man). make check chỉ còn ĐỎ ngưỡng phủ mã (statements 78.47%, functions
-  78.41% < 80%): viết `tests/nhap-excel-man.test.tsx` dựng ImportWizard với fetch giả (chọn tệp csv nhỏ → preview → bước
-  2–4 → Áp gọi /api/v1/imports rồi /batches → Xong → Hoàn tác), đủ đưa phủ mã qua 80%.
+  bo-kiem-chung-khi-dang-nhap, khai-vai-va-man). make check XANH (bài đơn vị của màn `tests/nhap-excel-man.test.tsx`, phủ mã 80,16%).
   Sau đó: thanh bên (src/app/(app)/nav.ts) mục Nạp tệp theo importListings; design/patterns/luong-nhieu-buoc.md;
   design/so-khoi.yaml dòng khối khung năm bước (ho_so: nhap-excel); chung-minh-man.md đủ mục khi implemented;
   tests/e2e-db/nhap-excel.spec.ts (E2, E15, E16, E20, E21) + axe. Lưu ý: commit c2414e82 dùng --no-verify (pre-commit chỉ
