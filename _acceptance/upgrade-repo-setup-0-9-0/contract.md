@@ -66,8 +66,9 @@ làm theo ngả máy khuyên. Mỗi điểm trả lời khác thì nhánh đổi
   chạy `tools/ci_verdict.py`; job `gate` giống từng byte job ấy ở `bd32d73e`; và When đưa `tools/ci_verdict.py` đủ 64 tổ hợp
   của ba job, mỗi job một trong `success`, `skipped`, `failure`, `cancelled`, Then đúng một tổ hợp (cả ba `success`) thoát 0
   và 63 tổ hợp còn lại thoát 1, mỗi job không `success` được gọi tên trên một dòng của nó, dòng của job `failure` có
-  `failed`, dòng của job bị bỏ qua khi mọi job nó chờ đã `success` có `the pull request is a draft`, và dòng của job bị bỏ
-  qua khi một job nó chờ không `success` có `a tier it waits for did not pass`.
+  `failed`, dòng của job `cancelled` có `cancelled`, dòng của job bị bỏ qua khi mọi job khác đã `success` có
+  `the pull request is a draft`, và dòng của job bị bỏ qua khi có job khác không `success` có
+  `a tier it waits for did not pass` (luật `ci_verdict.py` tự ghi; lời này sửa ở Cổng Phạm vi, xem sổ quyết định).
 - AC-5: Given lượt CI của PR #88 trên commit `fd53ac96`, When đọc các job, Then `quick`, `e2e`, `e2e-db` và `check` kết thúc
   `success`; và Given lượt CI mới nhất của PR #88 trên một commit sau `fd53ac96` mà mọi tệp nó khác `fd53ac96` đều khớp
   `HEAVY_NOT_INPUTS` (`docs/** wiki/** *.md _acceptance/**`), When đọc lượt ấy, Then phép đo in sha của commit ấy, và `e2e`,

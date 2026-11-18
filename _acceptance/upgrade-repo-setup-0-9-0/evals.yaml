@@ -56,7 +56,7 @@ evals:
     long_running: 2
     layer: backend-effect
     paths: [".github/workflows/ci.yml", "tools/ci_verdict.py", "tools/ci_inputs.py"]
-    expected: "exit 0; dòng 'ci-shape: five jobs quick, e2e, e2e-db, check, gate; e2e and e2e-db behind quick, skipped on a draft, one reuse key each; check waits for quick, e2e, e2e-db and runs ci_verdict.py; gate as at bd32d73e; ci_verdict.py: 64 of 64 combinations as written beforehand, 1 exits 0 and 63 exit 1, each job that is not success named on its own line with failed, the pull request is a draft, or a tier it waits for did not pass'; không tổ hợp nào có một job không success mà thoát 0 (should-NOT-fire)"
+    expected: "exit 0; dòng 'ci-shape: five jobs quick, e2e, e2e-db, check, gate; e2e and e2e-db behind quick, skipped on a draft, one reuse key each; check waits for quick, e2e, e2e-db and runs ci_verdict.py; gate as at bd32d73e; ci_verdict.py: 64 of 64 combinations as written beforehand, 1 exits 0 and 63 exit 1, each job that is not success named on its own line with failed, cancelled, the pull request is a draft (every other job success) or a tier it waits for did not pass (another job not success)'; không tổ hợp nào có một job không success mà thoát 0 (should-NOT-fire)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E6
     criterion: AC-5
