@@ -1,41 +1,132 @@
 {
   "feature_plain": "Kho chuyển sang kit nghiệm thu 3.0 của kho mới delivery-loop: cổng tự động trên GitHub, phiên Claude Code trên máy và công cụ tìm kit cùng chạy một bản kit, không còn trỏ về kho kit cũ.",
   "will_do": [
-    {"id": "AC-1", "p": "Sẽ làm cổng tự động trên GitHub kéo kit 3.0 theo thẻ từ kho mới, đúng chỗ đặt lõi của bố cục mới."},
-    {"id": "AC-2", "p": "Sẽ để cổng trước-gộp của kit 3.0 cho nhánh này qua — trước chữ ký chỉ còn đúng một lời chặn «chưa có chữ ký người» của chính việc này, sau chữ ký không còn lời chặn nào."},
-    {"id": "AC-3", "p": "Sẽ chứng đổi bản kit không đổi phán quyết nào trên hồ sơ cũ: kit cũ và kit 3.0 chấm lại mọi hồ sơ của kho, cùng một kết quả, ở cả mốc diễn tập lẫn mốc lúc chấm."},
-    {"id": "AC-4", "p": "Sẽ để bản đồ sản phẩm qua bước kiểm của kit 3.0, và bốn lệnh kiểm của kho tìm thấy đủ tệp của chúng trong kit 3.0."},
-    {"id": "AC-5", "p": "Sẽ làm công cụ tìm kit chỉ nhận bản cài từ kho mới; máy chỉ có bản cài cũ thì nó trả rỗng thay vì lặng lẽ dùng kit cũ."},
-    {"id": "AC-6", "p": "Sẽ làm phiên Claude Code bật đúng sáu plugin của kho mới, ghim cùng thẻ v3.0.0 với cổng GitHub, không đổi quyền hay móc nào."},
-    {"id": "AC-7", "p": "Sẽ sửa trang gốc tri thức và gói đợt cho mọi lệnh và đường dẫn nhắc tới đều có thật trong kit 3.0."},
-    {"id": "AC-8", "p": "Sẽ không còn chỗ nào ngoài sử liệu gọi tên kho kit cũ hay lệnh cũ (trên mốc diễn tập có 15 chỗ ở 6 tệp)."},
-    {"id": "AC-9", "p": "Sẽ giữ bộ kiểm của kho xanh như trước."},
-    {"id": "AC-10", "p": "Sẽ chứng mỗi phép đo của việc này từng đỏ trên một bản phá cố ý, để màu xanh có nghĩa."}
+    {
+      "id": "AC-1",
+      "p": "Sẽ làm cổng tự động trên GitHub kéo kit 3.0 theo thẻ từ kho mới, đúng chỗ đặt lõi của bố cục mới."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ để cổng trước-gộp của kit 3.0 cho nhánh này qua — trước chữ ký chỉ còn đúng một lời chặn «chưa có chữ ký người» của chính việc này, sau chữ ký không còn lời chặn nào."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ chứng đổi bản kit không đổi phán quyết nào trên hồ sơ cũ: kit cũ và kit 3.0 chấm lại mọi hồ sơ của kho, cùng một kết quả, ở cả mốc diễn tập lẫn mốc lúc chấm."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ để bản đồ sản phẩm qua bước kiểm của kit 3.0, và bốn lệnh kiểm của kho tìm thấy đủ tệp của chúng trong kit 3.0."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ làm công cụ tìm kit chỉ nhận bản cài từ kho mới; máy chỉ có bản cài cũ thì nó trả rỗng thay vì lặng lẽ dùng kit cũ."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ làm phiên Claude Code bật đúng sáu plugin của kho mới, ghim cùng thẻ v3.0.0 với cổng GitHub, không đổi quyền hay móc nào."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ sửa trang gốc tri thức và gói đợt cho mọi lệnh và đường dẫn nhắc tới đều có thật trong kit 3.0."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ không còn chỗ nào ngoài sử liệu gọi tên kho kit cũ hay lệnh cũ (trên mốc diễn tập có 15 chỗ ở 6 tệp)."
+    },
+    {
+      "id": "AC-9",
+      "p": "Sẽ giữ bộ kiểm của kho xanh như trước."
+    },
+    {
+      "id": "AC-10",
+      "p": "Sẽ chứng mỗi phép đo của việc này từng đỏ trên một bản phá cố ý, để màu xanh có nghĩa."
+    }
   ],
   "wont_do": [
-    {"id": "OOS-1", "p": "KHÔNG cài, gỡ hay bật plugin trên máy — việc của anh (bước 2.4)."},
-    {"id": "OOS-2", "p": "KHÔNG mở PR, không đẩy lên main, không gộp; không sửa kho khác."},
-    {"id": "OOS-3", "p": "KHÔNG đổi tên khoá cấu hình và KHÔNG sửa sử liệu cũ còn tên cũ (kit 3.0 vẫn đọc khoá cũ)."},
-    {"id": "OOS-4", "p": "KHÔNG ghim lại các hồ sơ đã ký bằng kit 3.0."}
+    {
+      "id": "OOS-1",
+      "p": "KHÔNG cài, gỡ hay bật plugin trên máy — việc của anh (bước 2.4)."
+    },
+    {
+      "id": "OOS-2",
+      "p": "KHÔNG mở PR, không đẩy lên main, không gộp; không sửa kho khác."
+    },
+    {
+      "id": "OOS-3",
+      "p": "KHÔNG đổi tên khoá cấu hình và KHÔNG sửa sử liệu cũ còn tên cũ (kit 3.0 vẫn đọc khoá cũ)."
+    },
+    {
+      "id": "OOS-4",
+      "p": "KHÔNG ghim lại các hồ sơ đã ký bằng kit 3.0."
+    }
   ],
   "coverage_plain": [
-    {"i": 2, "p": "Cổng tự động trên GitHub: AC-1 (kéo đúng kit) và AC-2 (cổng cho qua)."},
-    {"i": 3, "p": "Đổi bản kit trên hồ sơ cũ, kể cả hồ sơ vào nhánh chính sau mốc diễn tập: AC-3 (chấm lại cùng kết quả) và AC-4 (bản đồ sản phẩm)."},
-    {"i": 4, "p": "Bốn lệnh kiểm của kho dựa vào chỗ đặt kit: AC-4 (tệp có thật trong kit 3.0)."},
-    {"i": 5, "p": "Công cụ tìm kit và ca kiểm của nó: AC-5 (chỉ nhận bản cài kho mới)."},
-    {"i": 6, "p": "Plugin của phiên Claude Code: AC-6 (đúng sáu plugin, đúng thẻ); phiên mở thật trên máy là giới hạn đã khai."},
-    {"i": 7, "p": "Trang tri thức, gói đợt và chú thích cấu hình: AC-7 (lệnh có thật) và AC-8 (không còn tên cũ)."},
-    {"i": 8, "p": "Tên cũ còn sót ở tệp đang dùng: AC-8."},
-    {"i": 9, "p": "Luật tin commit «tri-thuc:» giữ nguyên vì kit 3.0 vẫn tự commit bằng nó; AC-8 khai loại trừ."},
-    {"i": 10, "p": "Bộ kiểm của kho: AC-9."},
-    {"i": 11, "p": "Phép đo của chính việc này: AC-10 (mỗi phép từng đỏ)."},
-    {"i": 12, "p": "Ba tài liệu cũ nhắc tên đợt «dieu-phoi-nen» và tên khoá cấu hình: ngoài phạm vi — tên đợt là dữ liệu, kit 3.0 vẫn đọc hai khoá."}
+    {
+      "i": 2,
+      "p": "Cổng tự động trên GitHub: AC-1 (kéo đúng kit) và AC-2 (cổng cho qua)."
+    },
+    {
+      "i": 3,
+      "p": "Đổi bản kit trên hồ sơ cũ, kể cả hồ sơ vào nhánh chính sau mốc diễn tập: AC-3 (chấm lại cùng kết quả) và AC-4 (bản đồ sản phẩm)."
+    },
+    {
+      "i": 4,
+      "p": "Bốn lệnh kiểm của kho dựa vào chỗ đặt kit: AC-4 (tệp có thật trong kit 3.0)."
+    },
+    {
+      "i": 5,
+      "p": "Công cụ tìm kit và ca kiểm của nó: AC-5 (chỉ nhận bản cài kho mới)."
+    },
+    {
+      "i": 6,
+      "p": "Plugin của phiên Claude Code: AC-6 (đúng sáu plugin, đúng thẻ); phiên mở thật trên máy là giới hạn đã khai."
+    },
+    {
+      "i": 7,
+      "p": "Trang tri thức, gói đợt và chú thích cấu hình: AC-7 (lệnh có thật) và AC-8 (không còn tên cũ)."
+    },
+    {
+      "i": 8,
+      "p": "Tên cũ còn sót ở tệp đang dùng: AC-8."
+    },
+    {
+      "i": 9,
+      "p": "Luật tin commit «tri-thuc:» giữ nguyên vì kit 3.0 vẫn tự commit bằng nó; AC-8 khai loại trừ."
+    },
+    {
+      "i": 10,
+      "p": "Bộ kiểm của kho: AC-9."
+    },
+    {
+      "i": 11,
+      "p": "Phép đo của chính việc này: AC-10 (mỗi phép từng đỏ)."
+    },
+    {
+      "i": 12,
+      "p": "Ba tài liệu cũ nhắc tên đợt «dieu-phoi-nen» và tên khoá cấu hình: ngoài phạm vi — tên đợt là dữ liệu, kit 3.0 vẫn đọc hai khoá."
+    }
   ],
   "gap_probe_plain": [
-    {"i": 0, "p": "Bản nháp đầu chỉ cho máy và GitHub cùng tên kho kit, chưa cùng phiên bản — máy cài từ nhánh chính có thể chạy bản mới hơn cổng GitHub. Đã thành câu hỏi Hỏi-3; nháp theo khuyến nghị ghim thẻ v3.0.0 và có phép đo đỏ khi bỏ ghim."},
-    {"i": 1, "p": "«Không dùng lùi bản cài cũ» không phải lối duy nhất: dùng lùi kèm cảnh báo to vẫn khả thi. Đây là lựa chọn của anh, đã gộp với câu thứ tự cài và gộp thành Hỏi-2."},
-    {"i": 2, "p": "Bốn lệnh kiểm của kho dựa vào chỗ đặt kit chưa có phép đo. Đã thêm vào AC-4: mọi tệp chúng gọi phải có thật trong kit 3.0, có bản phá trỏ tệp không có."},
-    {"i": 3, "p": "Phép đo cổng mới chỉ kiểm lời chặn «có gọi tên việc này», chưa kiểm đúng loại lời chặn. Đã ghim đúng lời «chưa có chữ ký người», mọi lời chặn khác là đỏ; lần đo sau chữ ký làm trước khi trình PR."},
-    {"i": 4, "p": "Mốc so sánh gõ cứng sẽ lệch khi gộp nhánh chính vào. Đã chấm lại hồ sơ cũ ở cả mốc diễn tập lẫn mốc lúc chấm, giữ số đếm tên cũ ở mốc cố định, và kê rõ danh sách tệp loại trừ."}
-  ]
+    {
+      "i": 0,
+      "p": "Bản nháp đầu chỉ cho máy và GitHub cùng tên kho kit, chưa cùng phiên bản — máy cài từ nhánh chính có thể chạy bản mới hơn cổng GitHub. Đã thành câu hỏi Hỏi-3; nháp theo khuyến nghị ghim thẻ v3.0.0 và có phép đo đỏ khi bỏ ghim."
+    },
+    {
+      "i": 1,
+      "p": "«Không dùng lùi bản cài cũ» không phải lối duy nhất: dùng lùi kèm cảnh báo to vẫn khả thi. Đây là lựa chọn của anh, đã gộp với câu thứ tự cài và gộp thành Hỏi-2."
+    },
+    {
+      "i": 2,
+      "p": "Bốn lệnh kiểm của kho dựa vào chỗ đặt kit chưa có phép đo. Đã thêm vào AC-4: mọi tệp chúng gọi phải có thật trong kit 3.0, có bản phá trỏ tệp không có."
+    },
+    {
+      "i": 3,
+      "p": "Phép đo cổng mới chỉ kiểm lời chặn «có gọi tên việc này», chưa kiểm đúng loại lời chặn. Đã ghim đúng lời «chưa có chữ ký người», mọi lời chặn khác là đỏ; lần đo sau chữ ký làm trước khi trình PR."
+    },
+    {
+      "i": 4,
+      "p": "Mốc so sánh gõ cứng sẽ lệch khi gộp nhánh chính vào. Đã chấm lại hồ sơ cũ ở cả mốc diễn tập lẫn mốc lúc chấm, giữ số đếm tên cũ ở mốc cố định, và kê rõ danh sách tệp loại trừ."
+    }
+  ],
+  "analyst_plain": "Hai phép đo (ca kiểm kit-root và make check) xanh cả trên nhánh lẫn trên bản cũ — đó là lưới chống hồi quy có chủ ý, không phải bằng chứng riêng của việc này; bằng chứng riêng nằm ở chín phép đo mới, mỗi phép đã thấy đỏ trên bản phá."
 }
