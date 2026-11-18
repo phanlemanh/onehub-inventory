@@ -27,18 +27,26 @@ function redWith(lines, script, ...args) {
   return out;
 }
 
-test("shallow-check: red on 8925e8ff, and red when it looks for 295 components", () => {
-  // One make check run: at BASE the gate holds 17 by 25, and the manifest line still says 294, so the
-  // missing 295 line proves the manifest pin bites on its own.
-  const out = redWith(
-    [`shallow: make check did not say: ${gateLine(GATE)}`, `shallow: make check did not say: ${manifestLine(295)}`],
+test("shallow-check: red on 8925e8ff, and red when it looks for 295 components or 2461 tests", () => {
+  // One make check run on BASE. The positive control is what the gate and the manifest said there:
+  // 17 decisions by 25 checks, and 294 components. So the missing 19/27 line is the gate at BASE, not a
+  // make check that died before the gate, and the missing 295 line is the manifest pin biting alone.
+  redWith(
+    [
+      `shallow: make check did not say: ${gateLine(GATE)}`,
+      `shallow: make check did not say: ${manifestLine(295)}`,
+      `shallow, the gate said: ${gateLine(BASE_GATE)}`,
+      `shallow, the manifest said: ${manifestLine(294)}`,
+      "tests and skipped 2, not 2461 and 2",
+    ],
     "shallow-check.mjs",
     "--rev",
     BASE,
     "--components",
     "295",
+    "--tests",
+    "2461",
   );
-  assert.ok(!out.includes(`did not say: ${gateLine(BASE_GATE)}`));
 });
 
 test("shallow-alone: red with the 0.7.0 owner-calls", () => {
@@ -64,5 +72,18 @@ test("shallow-bite: red without the two checks", () => {
     ["bite: a new page under design/patterns did not stop owner-calls", "bite: an untold tag did not stop decision-sheet"],
     "shallow-bite.mjs",
     "--omit-checks",
+  );
+});
+
+test("shallow-bite: red when the gate prints the lines but exits 0", () => {
+  redWith(
+    [
+      "bite: a new page under design/patterns printed its line, but the gate exited 0",
+      "bite: an untold tag printed its line, but the gate exited 0",
+      "bite: the fixtures of 8925e8ff did not stop decision-sheet by name: exit 0",
+    ],
+    "shallow-bite.mjs",
+    "--gate",
+    "make design-assembly; true",
   );
 });

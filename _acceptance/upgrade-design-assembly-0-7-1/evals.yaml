@@ -130,7 +130,7 @@ evals:
     criterion: AC-9
     executor: script
     cmd: config:executors.script.ci_db_thu
-    long_running: 30
+    long_running: 60
     layer: backend-effect
     paths: ["**"]
     expected: "exit 0; dòng cuối 'ci-thu: xanh … · check xanh · pha bo-phien do · pha vai-chu do · pha may-chu-chu do'. Chiều đỏ: ba bản phá của chính ci-thu.sh (bo-phien, vai-chu, may-chu-chu) phải đỏ, và lệnh thoát khác 0 khi một bản phá không đỏ hay make check không xanh"

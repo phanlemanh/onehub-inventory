@@ -55,6 +55,9 @@ test("tool-tree: green as it is; red on a changed tool file, a 0.7.0 stamp, a ch
   redOnCopy("tool: the stamp says version 0.7.0, not 0.7.1", "tool-tree.mjs", {
     replace: { [STAMP]: JSON.stringify({ ...stamp, version: "0.7.0" }) },
   });
+  redOnCopy("tool: the stamp's tree f3d66a61fdcf is not the tree of version 0.7.1", "tool-tree.mjs", {
+    replace: { [STAMP]: JSON.stringify({ ...stamp, tree: "f3d66a61fdcfbdfca103d48c7077bd1c9b95bb73" }) },
+  });
   redOnCopy(`tool: ${GATE_STEP.file} is not the plugin's gate step`, "tool-tree.mjs", {
     replace: { [GATE_STEP.file]: `${real(GATE_STEP.file)}# changed\n` },
   });
@@ -105,6 +108,12 @@ test("rows-mirror: green as it is; red on a changed field, a lost row, a changed
   const shapesNote = ledger.match(/ {4}note: "that each ledger present has its shape[^\n]*/)[0];
   redOnCopy("rows: design/decisions.yaml changed beyond the two rows since 8925e8ff", "rows-mirror.py", {
     replace: { "design/decisions.yaml": ledger.replace(shapesNote, '    note: "changed"') },
+  });
+  const themeData = JSON.parse(theme);
+  const otherCheck = Object.keys(themeData.checks).find((key) => !["decision-sheet", "owner-calls"].includes(key));
+  const changedOther = { ...themeData, checks: { ...themeData.checks, [otherCheck]: [] } };
+  redOnCopy("rows: design/theme.json changed beyond the two checks since 8925e8ff", "rows-mirror.py", {
+    replace: { "design/theme.json": JSON.stringify(changedOther, null, 2) },
   });
   red("rows: cannot read design/decisions.yaml at ba3af6b", "rows-mirror.py", "--plugin-repo", tmp);
 });

@@ -1,9 +1,12 @@
 // AC-4: on fresh depth-1 clones of HEAD, the two new rows stop what they exist to stop. The
 // untouched copy is green; a new page under design/patterns stops owner-calls; a test tagged with a
 // decision the ledger has no row for stops decision-sheet; the fixtures of BASE stop decision-sheet,
-// naming each tag they held. Each change is committed in its clone, so it is what the branch adds.
+// naming each tag they held. "Stops" is both halves: the row's line is printed and the gate does not
+// exit 0. Each change is committed in its clone, so it is what the branch adds.
 // Usage: node shallow-bite.mjs [--root <repository>] [--rev <commit>] [--main-at <commit>]
-//   [--omit-checks]   (a break: the two checks taken out of design/theme.json in every clone)
+//   [--omit-checks] [--gate <shell command>]
+//   (breaks: --omit-checks takes the two checks out of design/theme.json in every clone; --gate runs
+//   another command in place of `make design-assembly`, e.g. one that prints the lines and exits 0)
 import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -15,6 +18,7 @@ const root = path.resolve(option("--root", ROOT));
 const rev = option("--rev", "HEAD");
 const mainAt = option("--main-at", BASE);
 const omitChecks = process.argv.includes("--omit-checks");
+const gate = option("--gate", "make design-assembly");
 const THEME = "design/theme.json";
 
 const write = (kho, file, text) => {
@@ -35,7 +39,7 @@ function gateOn(change) {
     git(clone.kho, "add", "-A");
     const status = git(clone.kho, "status", "--porcelain").trim();
     if (status) git(clone.kho, "-c", "user.name=rang", "-c", "user.email=rang@example.invalid", "commit", "-q", "-m", "bite");
-    const run = spawnSync("make", ["design-assembly"], { cwd: clone.kho, encoding: "utf8", maxBuffer: 1 << 28 });
+    const run = spawnSync("sh", ["-c", gate], { cwd: clone.kho, encoding: "utf8", maxBuffer: 1 << 28 });
     return { code: run.status, out: `${run.stdout}${run.stderr}` };
   } finally {
     clone.remove();
@@ -53,8 +57,10 @@ try {
   }
   const page = gateOn((kho) => write(kho, NEW_PAGE.file, "# Trang mới\n"));
   if (!page.out.includes(NEW_PAGE.line)) found.push("a new page under design/patterns did not stop owner-calls");
+  else if (page.code === 0) found.push("a new page under design/patterns printed its line, but the gate exited 0");
   const tag = gateOn((kho) => write(kho, UNTOLD_TAG.file, UNTOLD_TAG.text));
   if (!tag.out.includes(UNTOLD_TAG.line)) found.push("an untold tag did not stop decision-sheet");
+  else if (tag.code === 0) found.push("an untold tag printed its line, but the gate exited 0");
   const fixtures = gateOn((kho) => write(kho, FIXTURE_FILE, git(root, "show", `${BASE}:${FIXTURE_FILE}`)));
   const sheetLines = fixtures.out.split("\n").filter((line) => line.includes("decision-sheet") || line.includes(FIXTURE_FILE));
   const unnamed = BASE_FIXTURE_TAGS.filter((tag) => !sheetLines.some((line) => line.includes(`${tag}:`)));
