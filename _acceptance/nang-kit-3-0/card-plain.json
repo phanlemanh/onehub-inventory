@@ -127,5 +127,6 @@
       "i": 4,
       "p": "Mốc so sánh gõ cứng sẽ lệch khi gộp nhánh chính vào. Đã chấm lại hồ sơ cũ ở cả mốc diễn tập lẫn mốc lúc chấm, giữ số đếm tên cũ ở mốc cố định, và kê rõ danh sách tệp loại trừ."
     }
-  ]
+  ],
+  "analyst_plain": "make check xanh cả trên nhánh lẫn trên bản cũ — đó là lưới chống hồi quy có chủ ý; bằng chứng riêng của việc nâng kit nằm ở các phép đo mới, mỗi phép đã thấy đỏ trên bản phá."
 }
