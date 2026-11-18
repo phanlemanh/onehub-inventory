@@ -10,6 +10,10 @@ export const UPGRADE = "fd53ac960bf6bc0247caa0f4b015b52541c00f36";
 // After Gate 1, the owner's answer to Hoi-1 (split): e2e-db out of the needs of check. The first CI run
 // of the decided ci.yml is on this commit.
 export const CI_COMMIT = "0deb79befe9931c6d4ea88969496de2ce012107f";
+// main moved (PR 87, delivery-loop v3.0.0) and was merged into the branch: the base the rules are
+// compared with, and the commit of the first full CI run on it.
+export const MAIN = "47d52b06c6dfcfc61bc0225666023c66cf3b514e";
+export const RUN_COMMIT = "2109c27dc1edf47075d174fd3fa06232480c9ad5";
 export const CI_COMMIT_FILES = [".github/workflows/ci.yml", "tests/ci-yml-patch.test.ts"];
 export const PLUGIN_REPO = "phanlemanh/repo-standards";
 export const PLUGIN_TAG = "repo-setup-v0.9.0";
@@ -17,7 +21,7 @@ export const PLUGIN_TAG = "repo-setup-v0.9.0";
 // make check on HEAD.
 export const CHECK_PASSED =
   "make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance";
-export const TESTS_LINE = "Tests  2461 passed | 2 skipped (2463)";
+export const TESTS_LINE = "Tests  2464 passed | 2 skipped (2466)";
 export const DA_LINE = "design-assembly: 19 decisions held by 27 checks, each seen failing on a changed copy";
 
 // apply.py --dry-run --json on BASE: 12 marked, one conflict.
@@ -52,7 +56,7 @@ export const PHRASE = {
 export const HEAVY_NOT_INPUTS = ["docs/**", "wiki/**", "*.md", "_acceptance/**"];
 
 // gitleaks.
-export const LEAKS_BASE = 12;
+export const LEAKS_BASE = 22; // 12 before PR 87, and 10 from its own dossier nang-kit-3-0
 export const LEAK_RULE = "generic-api-key";
 export const LEAK_PATH = /^_acceptance\/[^/]+\/s4-args[^/]*\.json$/;
 

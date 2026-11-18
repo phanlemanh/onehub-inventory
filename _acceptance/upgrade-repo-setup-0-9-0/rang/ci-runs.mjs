@@ -4,7 +4,7 @@
 // Usage: node ci-runs.mjs [--root <dir>]
 
 import { git, gh, isHeavyInput, root, verdict } from "./lib.mjs";
-import { CI_COMMIT as UPGRADE, HEAVY_NOT_INPUTS, REPO, REUSED } from "./matrix.mjs";
+import { RUN_COMMIT as UPGRADE, HEAVY_NOT_INPUTS, REPO, REUSED } from "./matrix.mjs";
 
 const NAME = "ci-runs";
 const dir = root();

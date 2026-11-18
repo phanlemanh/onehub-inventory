@@ -7,7 +7,7 @@
 import { readFileSync } from "node:fs";
 
 import { applyPy, git, root, run, verdict, worktree } from "./lib.mjs";
-import { AFTER_ALLOWED, BASE, CI_COMMIT, CI_COMMIT_FILES, GROUP_COUNTS, HAND, KEPT, TOTAL, UPGRADE } from "./matrix.mjs";
+import { AFTER_ALLOWED, BASE, CI_COMMIT, CI_COMMIT_FILES, GROUP_COUNTS, HAND, KEPT, MAIN, TOTAL, UPGRADE } from "./matrix.mjs";
 
 const NAME = "change-set";
 const argv = process.argv.slice(2);
@@ -61,9 +61,11 @@ try {
     if (JSON.stringify(owner) !== JSON.stringify([...CI_COMMIT_FILES].sort())) {
       problems.push(`commit ${CI_COMMIT.slice(0, 8)} changes [${owner.join(", ")}], not [${CI_COMMIT_FILES.join(", ")}]`);
     }
-    const after = git(dir, "diff", "--name-only", upgrade, "HEAD").split("\n").filter(Boolean);
-    for (const f of after) {
-      if (!AFTER_ALLOWED.some((re) => re.test(f)) && !CI_COMMIT_FILES.includes(f)) problems.push(`${f} changed after ${upgrade.slice(0, 8)}`);
+    // What the pull request changes against main (merged in at MAIN): the 46 files, the two files of
+    // the owner's commit, this dossier and the T1 files, nothing else.
+    const pr = git(dir, "diff", "--name-only", MAIN, "HEAD").split("\n").filter(Boolean);
+    for (const f of pr) {
+      if (!files.includes(f) && !AFTER_ALLOWED.some((re) => re.test(f)) && !CI_COMMIT_FILES.includes(f)) problems.push(`${f} changed after ${upgrade.slice(0, 8)}`);
     }
   }
 } catch (err) {
@@ -74,5 +76,5 @@ const groups = Object.entries(GROUP_COUNTS).map(([g, n]) => `${g === "conflict" 
 verdict(
   NAME,
   problems,
-  `the ${TOTAL} files of ${BASE.slice(0, 8)}..${upgrade.slice(0, 8)} fall each in one group read from the apply.py report and the hand-edit list: ${groups}; four files of the report unchanged; commit ${CI_COMMIT.slice(0, 8)} changes only ${CI_COMMIT_FILES.join(" and ")}; ${upgrade.slice(0, 8)}..HEAD changes besides them only this dossier, _acceptance/config.yaml, PRODUCT-MAP.md and LO-TRINH.html${note}`,
+  `the ${TOTAL} files of ${BASE.slice(0, 8)}..${upgrade.slice(0, 8)} fall each in one group read from the apply.py report and the hand-edit list: ${groups}; four files of the report unchanged; commit ${CI_COMMIT.slice(0, 8)} changes only ${CI_COMMIT_FILES.join(" and ")}; against main (${MAIN.slice(0, 8)}) the pull request changes besides them only this dossier, _acceptance/config.yaml, PRODUCT-MAP.md and LO-TRINH.html${note}`,
 );
