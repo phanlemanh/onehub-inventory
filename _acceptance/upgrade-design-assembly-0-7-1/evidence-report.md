@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 5912e32cb4331dc3df83ca0cca54db9d28c69f5e
+verified_commit: 5d2765aa995235e1b5164de36283ab363402d728
 human_signoff: Phan Le Manh 2026-11-18
 ---
 
@@ -244,3 +244,7 @@ none — every multi-run eval is uniform
 Round 1: ban ghi dau va cac sua cho phat hien cua no (commit de1c7fb3). Returned to implementation.
 Round 2: ban ghi vong 2, E14 chay rieng, moi ca nong co thu muc tam rieng (commit 5912e32c). Returned to implementation.
 Round 3: moi eval may xanh tren 5912e32c; E1 va E11 mang tu round 1 vi delta khong cham paths cua chung.
+
+### Re-pin lần 1 — 2026-11-18, do gộp main (PR #85, make db-sample) vào nhánh để gỡ xung đột ở wiki/log.md
+run_id: repin-20261118T085041Z-30924
+sha: 5d2765aa995235e1b5164de36283ab363402d728 · suites: 3 lệnh exit 0 · evals: 18/18 eval máy đạt kỳ vọng
