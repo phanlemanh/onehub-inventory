@@ -1,0 +1,44 @@
+{
+  "feature_plain": "Công cụ thiết kế của kho lên bản 0.7.1, và hai phép kiểm mới nhắc người khi một nhánh thêm kiểu màn mới hay một lựa chọn chưa ai xác nhận, chạy được cả trên bản sao nông như CI dựng.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ giữ bộ kiểm toàn kho (make check) xanh, cổng thiết kế báo 19 quyết định giữ bởi 27 phép kiểm, 2460 bài đạt."},
+    {"id": "AC-2", "p": "Sẽ giữ bộ kiểm toàn kho xanh trên bản sao nông dựng như CI; bản trước khi lên đời thì phép đo đỏ vì cổng chưa có hai hàng."},
+    {"id": "AC-3", "p": "Sẽ cho hai phép kiểm mới tự lấy nhánh chính về khi chạy riêng trên bản sao nông, và so đúng với chỗ nhánh rời nhánh chính; công cụ bản cũ thì cả hai báo không tìm ra nhánh chính."},
+    {"id": "AC-4", "p": "Sẽ chặn trên bản sao nông: một trang kiểu màn mới chờ chủ kho trả lời, và một bài kiểm gắn thẻ quyết định chưa có trong sổ."},
+    {"id": "AC-5", "p": "Sẽ giữ thư mục công cụ trùng từng byte với bản 0.7.1 mà sổ phát hành của plugin ghi, dấu phiên bản nói đúng 0.7.1."},
+    {"id": "AC-6", "p": "Sẽ giữ hai hàng sổ và hai khai báo phép kiểm chép đúng của plugin, chỉ bỏ phần bản thiết kế mà kho này không có, ngoài ra hai tệp sổ không đổi gì."},
+    {"id": "AC-7", "p": "Sẽ giữ hai bài kiểm bị đụng đều xanh, và dữ liệu mẫu trong bài kiểm sổ quyết định không còn bị cổng đọc nhầm thành thẻ thật."},
+    {"id": "AC-8", "p": "Sẽ giữ nhánh chỉ đổi đúng 6 tệp của lần lên đời cộng các tệp có tên của hồ sơ này."},
+    {"id": "AC-9", "p": "Sẽ giữ lần chạy thử CI có Postgres trên máy (ci-thu.sh) xanh, cùng ba bản phá của nó đều đỏ."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "Không đo cách các lệnh của plugin chạy (upgrade, status, audit, decide)."},
+    {"id": "OOS-2", "p": "Không sửa tay công cụ, không sửa kho plugin: lỗi tìm ra ở đó trả về cho plugin."},
+    {"id": "OOS-3", "p": "Không sửa chữ «debt:» cổng in trước lời báo lấy nhánh chính thành công; đã ghi lại và báo cho phiên giao việc."},
+    {"id": "OOS-4", "p": "Không sửa việc cổng đọc nhầm chuỗi trong dữ liệu mẫu; plugin đã ghi giới hạn ấy, kho này chỉ tránh nó ở một tệp."},
+    {"id": "OOS-5", "p": "Không ghim lại hay sửa các hồ sơ đã ký của những lần lên đời trước."},
+    {"id": "OOS-6", "p": "Không đổi giao diện, mã sản phẩm, mô hình dữ liệu hay luật sản phẩm."}
+  ],
+  "scope_plain": "Những gì vòng này cố ý không làm:",
+  "coverage_plain": [
+    {"i": 0, "p": "Độ phủ đi theo 6 tệp của lần lên đời và từng chỗ đọc chúng; không quét thêm không gian tiêu chí (dòng sổ bỏ quét)."},
+    {"i": 2, "p": "Phần công cụ đổi được đo bằng AC-5 (trùng bản 0.7.1), AC-3 (tự lấy nhánh chính) và AC-4 (chặn được)."},
+    {"i": 3, "p": "Dấu phiên bản được đo bằng AC-5 (ghi đúng 0.7.1)."},
+    {"i": 4, "p": "Bước cổng không đổi: AC-5 đo nó trùng mẫu, AC-8 đo nó không nằm trong tệp bị đổi."},
+    {"i": 5, "p": "Hai hàng sổ được đo bằng AC-6 (chép đúng), AC-1 (19 quyết định) và AC-4 (chặn được)."},
+    {"i": 6, "p": "Hai khai báo phép kiểm được đo bằng AC-6 (chép đúng), AC-1 (27 phép kiểm) và AC-4 (chặn được)."},
+    {"i": 7, "p": "Dữ liệu mẫu của bài kiểm sổ quyết định được đo bằng AC-7 (không còn bị đọc nhầm) và AC-1."},
+    {"i": 8, "p": "Lý do miễn trong bài kiểm bản sao nông được đo bằng AC-7 (bài xanh) và AC-8 (chỉ đổi đúng tệp)."},
+    {"i": 9, "p": "Bộ kiểm toàn kho trên bản sao nông được đo bằng AC-2 và AC-9 (chạy thử CI có Postgres)."},
+    {"i": 10, "p": "Hai phép kiểm chạy riêng trên bản sao nông được đo bằng AC-3 (tự lấy nhánh chính) và AC-4 (chặn được)."},
+    {"i": 11, "p": "Cách lệnh lên đời chạy nằm ngoài phạm vi: nó thuộc plugin và có bài kiểm ở kho plugin."},
+    {"i": 12, "p": "So với nhánh chính trên GitHub nằm ngoài phép đo trên máy: job CI của pull request chứng điều đó."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Ba lựa chọn của máy (bỏ quét độ phủ, chỗ đặt phép đo, chỗ đặt bản chép bộ chấm) dựa vào thói quen của hồ sơ trước chứ không có căn cứ của vòng này. Đã viết lại, mỗi lựa chọn nêu vì sao lối khác không đi được ở vòng này."},
+    {"i": 1, "p": "Việc để phép đo của hồ sơ 0.7.0 đỏ khi ghim lại, và việc chỉ canh cây công cụ ở lượt chấm, là đánh đổi của chủ kho mà máy lại ghi là tự chọn. Đã chuyển thành câu hỏi cho chủ kho (Hỏi-2)."},
+    {"i": 2, "p": "Bản sao nông lấy nhánh chính trên máy, mà nhánh ấy chậm 16 commit so với chỗ nhánh rời, nên hai phép kiểm so với gốc sai. Đã đổi: bản sao lấy nhánh chính ghim đúng chỗ rời, phép đo kiểm chỗ rời và có ca đỏ khi nhánh chính cũ."},
+    {"i": 3, "p": "Hứa báo cho plugin về chữ «debt:» mà không ghi ở đâu. Đã ghi vào tệp ghi chú chung, thêm dòng sổ, và phần ngoài phạm vi trỏ tới đó."},
+    {"i": 4, "p": "Danh sách tệp được đổi thêm không nêu đường dẫn, và một dòng của bộ kiểm trên bản sao nông chưa được ghim. Đã kê từng tệp, thêm ca đỏ cho một tệp wiki lạ, và ghim dòng 294 linh kiện."}
+  ]
+}

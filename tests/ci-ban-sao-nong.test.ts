@@ -49,7 +49,7 @@ const FALLS_BACK: Record<string, string> = {
   "tools/round_metrics/round_metrics.py":
     "kiem_moc: commit khong co ma kho la kho nong thi ghi 'kho nong: bo qua kiem lich su git' va dung",
   "tools/design-assembly/owner-calls.mjs":
-    "chi hai phep kiem decision-sheet va owner-calls goi no; kho chua giu phep nao (buoc 8.4 hoan, cho plugin tu lay lich su o ban sao nong)",
+    "chi hai phep kiem decision-sheet va owner-calls goi no; o ban sao nong no tu lay main tu origin (plugin 0.7.1), ci-thu.sh chay make check o do",
 };
 
 /**

@@ -168,6 +168,19 @@
         "file": "design/component-registry.json"
       }
     ],
+    "decision-sheet": [
+      {
+        "kind": "decision-sheet",
+        "sources": "src",
+        "tests": "tests"
+      }
+    ],
+    "owner-calls": [
+      {
+        "kind": "owner-calls",
+        "pages": "design/patterns"
+      }
+    ],
     "ledger-shapes": [
       {
         "kind": "shapes",
