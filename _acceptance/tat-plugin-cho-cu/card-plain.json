@@ -1,34 +1,4 @@
 {
   "feature_plain": "Phiên Claude Code mở ở kho này chỉ chạy kit nghiệm thu bản 3.0.0, dù máy vẫn bật bản cũ cho mọi kho khác.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ thêm vào cài đặt phiên của kho (.claude/settings.json) sáu dòng tắt, mỗi dòng một plugin của chợ cũ; mọi phần khác của tệp giữ nguyên."},
-    {"id": "AC-2", "p": "Sẽ chứng minh thước không xanh giả: trên bản kho chưa sửa, phép thử phiên thật phải thấy hai bản kit cùng nạp; máy không bật bản cũ thì thước báo «không đối chứng được»."},
-    {"id": "AC-3", "p": "Sẽ cho thấy, bằng một phiên thật mở ở worktree này, mỗi plugin kit chỉ còn một bản 3.0.0 của chợ mới, lệnh cũ «cắt lượt» mất và lệnh mới còn."},
-    {"id": "AC-4", "p": "Sẽ đo đúng va chạm với hồ sơ đã ký: phép quét tên cũ của hồ sơ trước chỉ bắt đúng sáu dòng tắt, không bắt gì ở tệp khác."},
-    {"id": "AC-5", "p": "Sẽ giữ xanh phép kiểm cài đặt chợ của hồ sơ trước (dòng tắt không phải dòng bật)."},
-    {"id": "AC-6", "p": "Sẽ giữ bộ kiểm chính của kho (make check) xanh."},
-    {"id": "AC-7", "p": "Sẽ cho mỗi phép đo mới một ca đỏ có chủ đích, để biết thước thật sự chạy."}
-  ],
-  "wont_do": [
-    {"id": "OOS-1", "p": "Sẽ KHÔNG sửa cài đặt mức người dùng của máy, không gỡ plugin cũ khỏi máy."},
-    {"id": "OOS-2", "p": "Sẽ KHÔNG sửa hồ sơ đã ký của vòng nâng kit trước (theo khuyến nghị Hỏi-1), không sửa CI hay governance."},
-    {"id": "OOS-3", "p": "Sẽ KHÔNG chạy phép thử phiên thật trong CI — nó phụ thuộc máy."}
-  ],
-  "coverage_plain": [
-    {"i": 0, "p": "Phủ theo tệp chạm và theo từng bên đọc tệp ấy; bỏ quét hình thái vì không gian tiêu chí nhỏ, kê trọn trong bảng."},
-    {"i": 2, "p": "Hình của tệp cài đặt: đúng sáu dòng tắt thêm vào, phần còn lại không đổi (AC-1)."},
-    {"i": 3, "p": "Claude Code khi mở phiên — trên bản chưa sửa thấy hai bản (AC-2), trên nhánh chỉ một bản (AC-3)."},
-    {"i": 4, "p": "Máy cài kiểu nào cũng phủ: plugin cũ trùng tên bản mới, plugin cũ khác tên bản mới, hay máy không bật gì (AC-2, AC-3)."},
-    {"i": 5, "p": "Phép quét tên cũ của hồ sơ trước chỉ bắt đúng sáu dòng tắt (AC-4)."},
-    {"i": 6, "p": "Phép kiểm cài đặt chợ của hồ sơ trước vẫn xanh (AC-5)."},
-    {"i": 7, "p": "Bộ kiểm chính của kho xanh (AC-6)."},
-    {"i": 8, "p": "Mỗi phép đo mới đỏ đúng chỗ khi vật bị phá (AC-7)."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Máy từng ghi «ở lại phiên này» như thể không còn lối khác; thật ra anh có thể mở phiên mới sau khi áp dòng tắt. Đã chuyển thành câu hỏi Hỏi-2 cho anh."},
-    {"i": 1, "p": "Căn cứ máy trích cho việc tắt sáu thay vì ba không thật sự quyết việc đó. Đã thay bằng lý do đúng: ba plugin cũ có tên khác bản mới, nên chỉ tắt ba thì máy khác vẫn trộn hai bản."},
-    {"i": 2, "p": "Máy từng nói không gian tiêu chí chỉ một trục; thật ra có thêm trục «máy cài plugin cũ kiểu nào». Đã thêm hàng phủ cho trục ấy."},
-    {"i": 3, "p": "Thước phiên thiếu ca đỏ cho plugin cũ có tên khác bản mới. Đã thêm ca ấy, có thông điệp ghim."},
-    {"i": 4, "p": "Chưa rõ phép quét tên cũ có bắt cả tài liệu của vòng này không. Đã khai phạm vi quét và luật viết: tài liệu và dòng nhật ký wiki không nhắc tên chợ cũ."}
-  ]
+  "scope_plain": "Ba việc đã cắt từ Cổng Phạm vi, không đổi."
 }

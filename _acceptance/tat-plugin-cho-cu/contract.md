@@ -5,7 +5,7 @@ slug: tat-plugin-cho-cu
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config]
-status: verified
+status: signed-off
 approved_by: Phan Le Manh
 approved_at: 2026-11-18
 design_doc: docs/superpowers/specs/2026-11-18-tat-plugin-cho-cu-design.md
@@ -76,3 +76,7 @@ Phủ theo tệp chạm và bên đọc; không quét không gian tiêu chí: d�
   Hỏi-1: chạy lại `nk30_leftover` của hồ sơ `nang-kit-3-0` sẽ đỏ (6 dòng khoá tắt) cho tới vòng sửa thước ấy; AC-4 đo chính
   quan hệ đó.
 - Sau khi gộp: đo lại phép thử phiên thật một lần trên checkout chính ở `main`, ghi kết quả vào mô tả PR.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-19:
+  - Ngoài-1: Nhật ký wiki có một dòng trống thừa sau mục mới, nên mục ấy hiển thị lệch nhẹ so với các mục khác.
+  - Ngoài-2: Nếu tệp cài đặt cá nhân của máy bị hỏng, phép thử phiên báo «máy không bật bản cũ» thay vì nêu lỗi đọc tệp; nó không bao giờ báo đạt nhầm.
+  - Ngoài-3: Bộ kiểm hai chiều chỉ thử một plugin cũ cho mỗi nhóm, nên một bản thước sau hẹp hơn có thể lọt qua mà bộ kiểm không báo.
