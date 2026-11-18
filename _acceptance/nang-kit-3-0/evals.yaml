@@ -1,0 +1,103 @@
+schema_version: 1
+feature_slug: nang-kit-3-0
+# Ma trận viết trước.
+#   Chỗ rời main: 8925e8ff (merge-base HEAD origin/main). Kit mới: phanlemanh/delivery-loop thẻ v3.0.0 = c16d25db.
+#   Kit cũ: phanlemanh/acceptance-gate-kit thẻ v2.38.1. Gốc lõi: <kit>/plugins/acceptance-gate (3.0) · <kit> (2.38.1).
+#   Chợ 3.0: delivery-loop, sáu plugin acceptance-gate · feature-loop · diagram-design · roadmap · knowledge · dispatch.
+#   Lệnh tên mới trong tài liệu sống: /knowledge:ingest · /knowledge:health · /dispatch:open (4 lần nhắc, 3 lệnh khác nhau).
+#   Quét tên cũ trên chỗ rời main: 15 dòng ở 6 tệp; ở HEAD: 0.
+#   Mọi phép đo ở rang/, kéo kit theo thẻ vào thư mục tạm ngoài kho (không dựa vào kit-root: máy chưa có chợ mới).
+#   Cặp hai chiều: rang/two-way.mjs — mỗi phép đo xanh trên vật lành, đỏ với thông điệp ghim dưới đây trên bản phá.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.nk30_ci_kit
+    layer: backend-effect
+    paths: [".github/workflows/ci.yml", "_acceptance/nang-kit-3-0/rang/**"]
+    expected: "exit 0; dòng 'ci-kit: gate fetches phanlemanh/delivery-loop v3.0.0 at c16d25db; CLAUDE_PLUGIN_ROOT=<kit>/plugins/acceptance-gate has scripts/pre-merge-check.sh and scripts/product-map.mjs; the gate job differs from origin/main in 3 lines'. Chiều đỏ (two-way, ci.yml của chỗ rời main): 'ci-kit: KIT_TAG is v2.38.1, want v3.0.0'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.nk30_gate_branch
+    long_running: 5
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng 'gate-branch: kit v3.0.0 ran its rules on HEAD against origin/main; <n> VIOLATION lines, each the T3 signature rule on nang-kit-3-0' với n là 0 hoặc 1, và đầu ra của cổng có dòng 'pre-merge-check: rules ran='. Chiều đỏ (two-way): (a) worktree 8925e8ff + đúng hunk .claude/settings.json, không hồ sơ: 'gate-branch: VIOLATION outside the T3 signature rule on nang-kit-3-0'; (b) worktree HEAD với evals.yaml của hồ sơ này mất trường criterion ở E1: cùng thông điệp. Lượt S5 sau chữ ký: cùng lệnh với cờ --signed đòi n = 0, đỏ là 'gate-branch: --signed wants 0 VIOLATION, got <n>'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.nk30_gate_control
+    long_running: 10
+    layer: backend-effect
+    paths: ["_acceptance/nang-kit-3-0/rang/**"]
+    expected: "exit 0; hai dòng 'gate-control: on <sha> --recheck-all, kit v2.38.1 and v3.0.0 both 0 VIOLATION, <k> OK each, same records', một cho 8925e8ff (diễn tập 18/11: k = 57) và một cho merge-base HEAD origin/main lúc chấm (k không ghim; hai sha trùng thì in một dòng kèm 'merge-base is 8925e8ff'). Chiều đỏ (two-way, đầu ra thật của lượt này bớt một dòng OK ở một bên): 'gate-control: OK records differ'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.nk30_product_map
+    layer: backend-effect
+    paths: ["PRODUCT-MAP.md", "_acceptance/**", "_acceptance/nang-kit-3-0/rang/**"]
+    expected: "exit 0; dòng 'product-map: kit v3.0.0 product-map.mjs --check exit 0 on <root>' và dòng 'executor-scripts: 4 executor commands under the kit root (script.product_map, design.floor, design.khuon, design.ui_check), 4 scripts, all present in kit v3.0.0 plugins/acceptance-gate'. Chiều đỏ (two-way): worktree HEAD với PRODUCT-MAP.md thêm một dòng: 'product-map: kit v3.0.0 product-map.mjs --check exit 1'; config.yaml đổi design.floor sang scripts/khong-co.mjs: 'executor-scripts: design.floor calls scripts/khong-co.mjs, missing in kit v3.0.0'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.nk30_kit_root
+    layer: backend-effect
+    paths: ["tools/kit-root.mjs", "tools/kit-root.d.mts", "tests/kit-root.test.ts"]
+    expected: "exit 0; vitest in đủ ba ca 'reads the acceptance-gate install of the delivery-loop marketplace', 'ignores an install left from the old acceptance-gate-kit marketplace', 'returns nothing for a registry without plugins', và 'Tests  6 passed (6)'. Chiều đỏ: E11 (ba ca trên kit-root.mjs của chỗ rời main: 'kit-root red: installEntries is not exported by the old kit-root')"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.nk30_kit_root_cli
+    layer: backend-effect
+    paths: ["tools/kit-root.mjs", "_acceptance/nang-kit-3-0/rang/**"]
+    expected: "exit 0; dòng 'kit-root cli: old-only -> empty; new-only -> new; both -> new; project beats user'. Chiều đỏ (two-way, kit-root.mjs của chỗ rời main): 'kit-root cli: old-only printed /'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.nk30_settings
+    layer: backend-effect
+    paths: [".claude/settings.json", ".github/workflows/ci.yml", "_acceptance/nang-kit-3-0/rang/**"]
+    expected: "exit 0; dòng 'settings: marketplace delivery-loop (phanlemanh/delivery-loop) at ref v3.0.0 = KIT_TAG of ci.yml; 6 plugins on, equal to the kit marketplace; no @acceptance-gate-kit key; superpowers, permissions and hooks as on origin/main'. Chiều đỏ (two-way, settings.json của chỗ rời main): 'settings: marketplace is acceptance-gate-kit, want delivery-loop'; (bản HEAD bỏ khoá dispatch@delivery-loop): 'settings: plugins on differ from the kit marketplace'; (bản HEAD bỏ ref): 'settings: marketplace not pinned to v3.0.0'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.nk30_doc_commands
+    layer: backend-effect
+    paths: ["docs/tri-thuc/TRI-THUC.md", "docs/plan/dot-nen/README.md", "_acceptance/config.yaml", "_acceptance/nang-kit-3-0/rang/**"]
+    expected: "exit 0; dòng 'doc-commands: 4 command mentions (3 distinct) and 1 kit path in 3 files, all found in kit v3.0.0'. Chiều đỏ (two-way, ba tệp của chỗ rời main): 'doc-commands: /tri-thuc:ghi not in kit v3.0.0'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.nk30_leftover
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng 'leftover: 0 lines at HEAD; 15 lines in 6 files at 8925e8ff' (danh sách loại đúng như AC-8). Chiều đỏ (two-way, cây HEAD thêm một dòng '/dieu-phoi:mo-dot' vào một tệp sống): 'leftover: 1 lines at HEAD'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0 (make check: lint, typecheck, test, ontology và các bước khác của CHECK_TARGETS). Chiều đỏ: E5 (ca kit-root trên vật chỗ rời main) — make check gồm bộ kiểm đơn vị"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E11
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.nk30_two_way
+    long_running: 15
+    layer: backend-effect
+    paths: ["_acceptance/nang-kit-3-0/rang/**", "tools/kit-root.mjs", ".claude/settings.json", ".github/workflows/ci.yml", "docs/**"]
+    expected: "exit 0; node --test in 'pass 13' và 'fail 0': với mỗi chiều đỏ kê ở expected của E1–E4, E6–E9 một bài «xanh trên vật lành, đỏ trên bản phá với đúng thông điệp ghim» (E2 hai bài, E4 hai bài, E7 ba bài), cộng bài 'kit-root red: installEntries is not exported by the old kit-root'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
