@@ -1,10 +1,13 @@
 // AC-5: CI of PR 88 on CI_COMMIT (the decided ci.yml) ran quick, e2e and check green, and e2e-db
 // reported a result (printed; it does not hold check); and on the newest run of a later commit that
 // differs from CI_COMMIT only in files the heavy tier does not read, e2e ended green without running again.
-// Usage: node ci-runs.mjs [--root <dir>]
+// Usage: node ci-runs.mjs [--root <dir>] [--run-commit <sha>]  (two-way.mjs reads an older run with it)
 
 import { git, gh, isHeavyInput, root, verdict } from "./lib.mjs";
-import { RUN_COMMIT as UPGRADE, HEAVY_NOT_INPUTS, REPO, REUSED } from "./matrix.mjs";
+import { RUN_COMMIT, HEAVY_NOT_INPUTS, REPO, REUSED } from "./matrix.mjs";
+
+const argv = process.argv.slice(2);
+const UPGRADE = argv.includes("--run-commit") ? argv[argv.indexOf("--run-commit") + 1] : RUN_COMMIT;
 
 const NAME = "ci-runs";
 const dir = root();
@@ -19,7 +22,7 @@ const jobs = (id) => JSON.parse(gh(["run", "view", String(id), "-R", REPO, "--js
 
 try {
   const all = runs().filter((r) => r.status === "completed");
-  const first = all.find((r) => r.headSha === UPGRADE);
+  const first = all.find((r) => r.headSha === UPGRADE || r.headSha.startsWith(UPGRADE));
   if (!first) problems.push(`no completed CI run on ${UPGRADE.slice(0, 8)}`);
   else {
     const js = jobs(first.databaseId);

@@ -40,7 +40,7 @@ evals:
     long_running: 5
     layer: backend-effect
     paths: [".repo-setup.json", "**"]
-    expected: "exit 0; dòng 'apply-again: repo-setup 0.9.0 has nothing left to do on HEAD (created, updated, merged, marked, conflict all empty; manifest 0.9.0); on bd32d73e it exits 1 with 12 marked files and a conflict on mk/derived.mk'; trên HEAD không tệp nào còn dấu và không tệp nào còn phải ghi (should-NOT-fire)"
+    expected: "exit 0; dòng 'apply-again: repo-setup 0.9.0 has nothing left to do on HEAD (created, updated, merged, marked, conflict all empty; manifest 0.9.0; no marker left); on bd32d73e it exits 1 with 12 marked files and a conflict on mk/derived.mk'; trên HEAD không tệp nào còn dấu và không tệp nào còn phải ghi (should-NOT-fire)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E4
     criterion: AC-3
@@ -115,11 +115,11 @@ evals:
     expected: "exit 0; dòng 'change-set: the 46 files of bd32d73e..fd53ac96 fall each in one group read from the apply.py report and the hand-edit list: manifest 1, created 14, conflict then created 1, updated 10, merged 6, marked 9, hand 5; four files of the report unchanged; commit 0deb79be changes only .github/workflows/ci.yml and tests/ci-yml-patch.test.ts; against main (47d52b06) the pull request changes besides them only this dossier, _acceptance/config.yaml, PRODUCT-MAP.md and LO-TRINH.html'; không tệp nào ngoài nhóm, không nhóm nào lệch số, không tệp giao diện, mã sản phẩm hay hồ sơ đã ký nào đổi (Out of scope)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E12
-    criterion: AC-2, AC-3, AC-4, AC-6, AC-7, AC-9, AC-10
+    criterion: AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-9, AC-10
     executor: script
     cmd: config:executors.script.rs090_two_way
     long_running: 10
     layer: backend-effect
     paths: ["_acceptance/upgrade-repo-setup-0-9-0/rang/**"]
-    expected: "exit 0; node --test đạt mọi ca: mỗi phép đo xanh trên bản lành và đỏ với thông điệp ghim trên bản phá — apply-again đỏ trên một tệp còn dấu ('marked'); rules-kept đỏ khi autonomy.yaml đổi một dòng; ci-shape đỏ khi e2e-db mất needs: quick, khi gate đổi một byte, khi một bản ci_verdict.py bỏ qua kết quả của e2e, và khi check lại chờ e2e-db; secret-scan đỏ khi bỏ mục miễn mới; design-assembly-word đỏ khi dòng check: mất chữ; ledgers đỏ khi wiki/log.md mang dòng dấu vẽ; change-set đỏ khi một tệp ngoài nhóm đổi, và khi số tệp của một nhóm lệch; không phép đo nào xanh trên bản phá (should-NOT-fire)"
+    expected: "exit 0; node --test đạt mọi ca: mỗi phép đo xanh trên bản lành và đỏ với thông điệp ghim trên bản phá — apply-again đỏ trên một tệp còn dấu ('marked'); rules-kept đỏ khi autonomy.yaml đổi một dòng; ci-shape đỏ khi e2e-db mất needs: quick, khi gate đổi một byte, khi một bản ci_verdict.py bỏ qua kết quả của e2e, và khi check lại chờ e2e-db; secret-scan đỏ khi bỏ mục miễn mới; design-assembly-word đỏ khi dòng check: mất chữ; ledgers đỏ khi wiki/log.md mang dòng dấu vẽ; change-set đỏ khi một tệp ngoài nhóm đổi, và khi số tệp của một nhóm lệch; ci-runs đỏ trên lượt của fd53ac96 (check failure); không phép đo nào xanh trên bản phá (should-NOT-fire)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

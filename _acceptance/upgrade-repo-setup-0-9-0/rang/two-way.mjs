@@ -156,3 +156,10 @@ test("change-set: green on a sound copy; red when a file outside the list change
   );
   withCopy(null, (at) => red(measure("change-set.mjs", at, ["--report", REPORT, "--upgrade", RENAME]), "change-set: group created has 0 files, not 14"));
 });
+
+test("ci-runs: green on the decided run, red on the run of fd53ac96 where check failed", () => {
+  // ci-runs reads GitHub, so a broken copy of the tree cannot break it: the red case reads a real
+  // older run of PR 88 instead, the one whose e2e-db reached its ceiling and whose check failed.
+  green(run("node", [join(HERE, "ci-runs.mjs")]), "ci-runs");
+  red(run("node", [join(HERE, "ci-runs.mjs"), "--run-commit", "fd53ac960bf6bc0247caa0f4b015b52541c00f36"]), "ci-runs: on fd53ac96 check is failure, not success");
+});
