@@ -1,0 +1,86 @@
+{
+  "plugins": [
+    {
+      "name": "diagram-design",
+      "source": "diagram-design@acceptance-gate-kit",
+      "version": "2.7.1"
+    },
+    {
+      "name": "acceptance-gate",
+      "source": "acceptance-gate@acceptance-gate-kit",
+      "version": "2.38.1"
+    },
+    {
+      "name": "feature-loop",
+      "source": "feature-loop@acceptance-gate-kit",
+      "version": "2.38.1"
+    },
+    {
+      "name": "acceptance-gate",
+      "source": "acceptance-gate@delivery-loop",
+      "version": "3.0.0"
+    },
+    {
+      "name": "feature-loop",
+      "source": "feature-loop@delivery-loop",
+      "version": "3.0.0"
+    },
+    {
+      "name": "diagram-design",
+      "source": "diagram-design@delivery-loop",
+      "version": "3.0.0"
+    },
+    {
+      "name": "roadmap",
+      "source": "roadmap@delivery-loop",
+      "version": "3.0.0"
+    },
+    {
+      "name": "knowledge",
+      "source": "knowledge@delivery-loop",
+      "version": "3.0.0"
+    },
+    {
+      "name": "dispatch",
+      "source": "dispatch@delivery-loop",
+      "version": "3.0.0"
+    }
+  ],
+  "slash_commands": [
+    "acceptance-gate:acceptance",
+    "acceptance-gate:acceptance-card",
+    "acceptance-gate:acceptance-init",
+    "acceptance-gate:acceptance-report",
+    "acceptance-gate:acceptance-status",
+    "acceptance-gate:approve",
+    "acceptance-gate:cat-luot",
+    "acceptance-gate:design-pass",
+    "acceptance-gate:gom-tin-hieu",
+    "acceptance-gate:morphological-scan",
+    "acceptance-gate:observed",
+    "acceptance-gate:scope-slice",
+    "acceptance-gate:signal-intake",
+    "acceptance-gate:signoff",
+    "acceptance-gate:start",
+    "acceptance-gate:uat-session",
+    "acceptance-gate:ux-ui-craft",
+    "diagram-design:diagram-design",
+    "diagram-design:export-diagram",
+    "diagram-design:import-drawio",
+    "dispatch:close",
+    "dispatch:handoff",
+    "dispatch:open",
+    "dispatch:resume",
+    "dispatch:status",
+    "feature-loop:acceptance-verify",
+    "feature-loop:execute-parallel",
+    "feature-loop:feature-loop",
+    "knowledge:health",
+    "knowledge:ingest",
+    "roadmap:pin",
+    "roadmap:status",
+    "roadmap:suggest",
+    "roadmap:undo",
+    "roadmap:unpin"
+  ]
+}
