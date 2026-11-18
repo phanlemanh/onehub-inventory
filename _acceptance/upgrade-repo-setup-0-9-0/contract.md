@@ -57,7 +57,7 @@ làm theo ngả máy khuyên. Mỗi điểm trả lời khác thì nhánh đổi
 - AC-2: Given HEAD, When chạy `apply.py --dry-run --json` của tag `repo-setup-v0.9.0`, Then lệnh thoát 0, `.repo-setup.json`
   ghi `version` `0.9.0`, và các danh sách `created`, `updated`, `merged`, `marked`, `conflict` đều rỗng; cùng lệnh ấy trên
   `bd32d73e` thoát 1, với 12 tệp `marked` và `conflict` là đúng `mk/derived.mk`.
-- AC-3: Given HEAD và nhánh chính lúc gộp (`47d52b06`), When so các tệp luật, Then `governance/autonomy.yaml`, `tools/ontology_actions.py`,
+- AC-3: Given HEAD và nền của PR (chỗ HEAD rời `origin/main`, dời theo mỗi lần gộp nhánh chính; `47d52b06` sau PR #87, `f6c47332` sau PR #91), When so các tệp luật, Then `governance/autonomy.yaml`, `tools/ontology_actions.py`,
   `tools/boundaries.py` và `ontology/relations.yaml` giống từng byte; `.github/CODEOWNERS` khác đúng một dòng, dòng chú thích
   thứ ba; trong `.claude/settings.json`, `permissions`, `enabledPlugins`, `extraKnownMarketplaces` và hai hook `PreToolUse`,
   `Stop` giống hệt, và `hooks` chỉ thêm `SessionStart` chạy `make -s derived`; và ruleset `main` trên GitHub vẫn bắt buộc
@@ -65,7 +65,7 @@ làm theo ngả máy khuyên. Mỗi điểm trả lời khác thì nhánh đổi
 - AC-4: Given `.github/workflows/ci.yml` ở HEAD, When đọc các job, Then có đúng năm job `quick`, `e2e`, `e2e-db`, `check`,
   `gate`; `quick` chạy `make check-quick` rồi `make build`; `e2e` và `e2e-db` có `needs: quick`, bỏ qua khi PR là bản nháp,
   và mỗi job một khoá dùng lại `heavy-ok-<tên job>-`; `check` có `needs: [quick, e2e]` (Hỏi-1: tách), `if: always()` và
-  chạy `tools/ci_verdict.py`; job `gate` giống từng byte job ấy ở nhánh chính lúc gộp (`47d52b06`); và When đưa `tools/ci_verdict.py` đủ 16 tổ hợp
+  chạy `tools/ci_verdict.py`; job `gate` giống từng byte job ấy ở nền của PR; và When đưa `tools/ci_verdict.py` đủ 16 tổ hợp
   của hai job `check` chờ, mỗi job một trong `success`, `skipped`, `failure`, `cancelled`, Then đúng một tổ hợp (cả hai
   `success`) thoát 0 và 15 tổ hợp còn lại thoát 1, mỗi job không `success` được gọi tên trên một dòng của nó, dòng của job `failure` có
   `failed`, dòng của job `cancelled` có `cancelled`, dòng của job bị bỏ qua khi mọi job khác đã `success` có
@@ -77,8 +77,8 @@ làm theo ngả máy khuyên. Mỗi điểm trả lời khác thì nhánh đổi
   When đọc lượt ấy, Then phép đo in sha của commit ấy, và `e2e` kết thúc `success` mà không chạy lại, tóm tắt của job nói
   `not run again: same inputs as run`; không có lượt nào như thế thì phép đo đỏ với lời riêng.
 - AC-6: Given HEAD, When chạy `gitleaks git` trên mọi commit với `.gitleaks.toml` của HEAD (Hỏi-2), Then không có phát hiện
-  nào; cùng lệnh ấy với `.gitleaks.toml` của `bd32d73e` thì có đúng 22 phát hiện (12 trước PR #87, 10 từ hồ sơ `nang-kit-3-0` của nó), đều
-  `generic-api-key` và đều trong
+  nào; cùng lệnh ấy với `.gitleaks.toml` của `bd32d73e` thì có đúng 12 phát hiện trên lịch sử tới `bd32d73e`, và trên mọi
+  commit chỉ có phát hiện `generic-api-key` trong
   `_acceptance/*/s4-args*.json`; và một tệp ngoài `_acceptance/` chứa một giá trị 64 ký tự hex cạnh tên `keys.test.ts` vẫn bị
   bắt; và job `secret-scan` của PR #88 kết thúc `success`.
 - AC-7: Given HEAD, When đọc các đích tiên quyết của `check` trong `make -pn check`, Then chúng là `check-quick`,
@@ -96,8 +96,8 @@ làm theo ngả máy khuyên. Mỗi điểm trả lời khác thì nhánh đổi
 - AC-10: Given `bd32d73e`, `fd53ac96`, `0deb79be`, HEAD và báo cáo `apply.py --dry-run --json` của tag `repo-setup-v0.9.0` trên
   `bd32d73e`, When kê tệp đổi từ `bd32d73e` tới `fd53ac96`, Then mỗi tệp thuộc đúng một nhóm của bảng Coverage và số tệp của
   từng nhóm bằng số ghi trong bảng (46 tệp); nhóm của một tệp đọc từ báo cáo của `apply.py` hay danh sách sửa tay, không từ
-  chính diff; commit `0deb79be` chỉ đổi `.github/workflows/ci.yml` và `tests/ci-yml-patch.test.ts`; và so với nhánh
-  chính lúc gộp (`47d52b06`), ngoài 46 tệp và hai tệp ấy PR không đổi tệp nào ngoài thư mục `_acceptance/upgrade-repo-setup-0-9-0/`,
+  chính diff; commit `0deb79be` chỉ đổi `.github/workflows/ci.yml` và `tests/ci-yml-patch.test.ts`; và so với nền
+  của PR, ngoài 46 tệp và hai tệp ấy PR không đổi tệp nào ngoài thư mục `_acceptance/upgrade-repo-setup-0-9-0/`,
   `_acceptance/config.yaml`, `PRODUCT-MAP.md` và `LO-TRINH.html`. Khi nhánh đã vào `origin/main`, phép đo chỉ so commit và
   nói đúng điều đó.
 
@@ -136,7 +136,7 @@ chí: lên đời là việc tất định, các nhóm dưới đây là toàn b
 
 ## Notes
 
-- Các con số của tiêu chí (2464 bài, 19 và 27, 46 tệp, 12 tệp đánh dấu, 22 phát hiện) đọc từ kết quả commit đã có: lên đời
+- Các con số của tiêu chí (2464 bài, 19 và 27, 46 tệp, 12 tệp đánh dấu, 12 phát hiện tới `bd32d73e`) đọc từ kết quả commit đã có: lên đời
   là việc tất định, và hồ sơ này chấm sau khi làm, như hồ sơ `upgrade-design-assembly-0-7-1`. Riêng nhóm của 46 tệp đọc từ
   báo cáo của `apply.py`, một nguồn khác diff. Ma trận ở `rang/matrix.mjs`.
 - Các phép đo nằm ở `rang/`, chạy ở lượt chấm và lượt ghim lại, không chạy trong `make check`. Mỗi phép đo có mặt đỏ của nó

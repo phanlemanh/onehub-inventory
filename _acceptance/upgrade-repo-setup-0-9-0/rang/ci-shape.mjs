@@ -6,11 +6,12 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { git, root, run, verdict, yaml } from "./lib.mjs";
-import { MAIN as BASE, CHECK_NEEDS, DRAFT_IF, HEAVY, JOBS, PHRASE, STATES } from "./matrix.mjs";
+import { git, prBase, root, run, verdict, yaml } from "./lib.mjs";
+import { CHECK_NEEDS, DRAFT_IF, HEAVY, JOBS, PHRASE, STATES } from "./matrix.mjs";
 
 const NAME = "ci-shape";
 const dir = root();
+const BASE = prBase(dir);
 const WORKFLOW = ".github/workflows/ci.yml";
 const problems = [];
 

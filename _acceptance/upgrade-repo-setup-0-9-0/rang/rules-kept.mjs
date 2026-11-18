@@ -1,15 +1,16 @@
-// AC-3: the rules of the repository are as on main when it was merged in (MAIN), but for the owner's
-// answers to Hoi-2 and Hoi-3.
+// AC-3: the rules of the repository are as on the base of the pull request (where HEAD left
+// origin/main), but for the owner's answers to Hoi-2 and Hoi-3.
 // Usage: node rules-kept.mjs [--root <dir>] [--no-github]
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { flag, gh, git, root, verdict } from "./lib.mjs";
-import { MAIN as BASE, CODEOWNERS_LINE, KEPT, REPO, RULESET_CHECKS } from "./matrix.mjs";
+import { flag, gh, git, prBase, root, verdict } from "./lib.mjs";
+import { CODEOWNERS_LINE, KEPT, REPO, RULESET_CHECKS } from "./matrix.mjs";
 
 const NAME = "rules-kept";
 const dir = root();
+const BASE = prBase(dir);
 const problems = [];
 const atBase = (path) => git(dir, "show", `${BASE}:${path}`);
 const now = (path) => readFileSync(join(dir, path), "utf8");

@@ -56,7 +56,7 @@ export const PHRASE = {
 export const HEAVY_NOT_INPUTS = ["docs/**", "wiki/**", "*.md", "_acceptance/**"];
 
 // gitleaks.
-export const LEAKS_BASE = 22; // 12 before PR 87, and 10 from its own dossier nang-kit-3-0
+export const LEAKS_BASE = 12; // with the old allowlist, over the history up to BASE (it never changes)
 export const LEAK_RULE = "generic-api-key";
 export const LEAK_PATH = /^_acceptance\/[^/]+\/s4-args[^/]*\.json$/;
 

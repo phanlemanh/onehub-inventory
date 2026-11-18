@@ -70,7 +70,7 @@ test("rules-kept: green on a sound copy, red when autonomy.yaml changes one line
   withCopy(null, (at) => green(measure("rules-kept.mjs", at, ["--no-github"]), "rules-kept"));
   withCopy(
     (at) => writeFileSync(join(at, "governance/autonomy.yaml"), readFileSync(join(at, "governance/autonomy.yaml"), "utf8") + "# one more line\n"),
-    (at) => red(measure("rules-kept.mjs", at, ["--no-github"]), "rules-kept: governance/autonomy.yaml differs from 47d52b06"),
+    (at) => red(measure("rules-kept.mjs", at, ["--no-github"]), "rules-kept: governance/autonomy.yaml differs from "),
   );
 });
 
@@ -90,7 +90,7 @@ test("ci-shape: green on a sound copy; red without needs: quick, with a gate byt
   );
   withCopy(
     (at) => swap(at, ".github/workflows/ci.yml", "KIT_TAG: v3.0.0", "KIT_TAG: v3.0.1"),
-    (at) => red(measure("ci-shape.mjs", at), "ci-shape: the gate job differs from 47d52b06"),
+    (at) => red(measure("ci-shape.mjs", at), "ci-shape: the gate job differs from "),
   );
   withCopy(
     (at) => swap(at, "tools/ci_verdict.py", 'if result != "success":', 'if result != "success" and name != "e2e":'),
@@ -112,7 +112,7 @@ test("secret-scan: green on a sound copy, red without the new allowlist", () => 
       assert.ok(cut > 0);
       writeFileSync(p, text.slice(0, cut));
     },
-    (at) => red(measure("secret-scan.mjs", at, ["--no-github"]), "secret-scan: 22 leaks with the allowlist of HEAD"),
+    (at) => red(measure("secret-scan.mjs", at, ["--no-github"]), " leaks with the allowlist of HEAD"),
   );
 });
 

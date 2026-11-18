@@ -6,14 +6,15 @@
 
 import { readFileSync } from "node:fs";
 
-import { applyPy, git, root, run, verdict, worktree } from "./lib.mjs";
-import { AFTER_ALLOWED, BASE, CI_COMMIT, CI_COMMIT_FILES, GROUP_COUNTS, HAND, KEPT, MAIN, TOTAL, UPGRADE } from "./matrix.mjs";
+import { applyPy, git, prBase, root, run, verdict, worktree } from "./lib.mjs";
+import { AFTER_ALLOWED, BASE, CI_COMMIT, CI_COMMIT_FILES, GROUP_COUNTS, HAND, KEPT, TOTAL, UPGRADE } from "./matrix.mjs";
 
 const NAME = "change-set";
 const argv = process.argv.slice(2);
 const opt = (k) => (argv.includes(k) ? argv[argv.indexOf(k) + 1] : null);
 const dir = root();
 const upgrade = opt("--upgrade") ?? UPGRADE;
+const MAIN = prBase(dir);
 const problems = [];
 let note = "";
 
@@ -61,7 +62,7 @@ try {
     if (JSON.stringify(owner) !== JSON.stringify([...CI_COMMIT_FILES].sort())) {
       problems.push(`commit ${CI_COMMIT.slice(0, 8)} changes [${owner.join(", ")}], not [${CI_COMMIT_FILES.join(", ")}]`);
     }
-    // What the pull request changes against main (merged in at MAIN): the 46 files, the two files of
+    // What the pull request changes against its base (where HEAD left origin/main): the 46 files, the two files of
     // the owner's commit, this dossier and the T1 files, nothing else.
     const pr = git(dir, "diff", "--name-only", MAIN, "HEAD").split("\n").filter(Boolean);
     for (const f of pr) {

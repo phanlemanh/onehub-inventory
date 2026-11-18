@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { PLUGIN_REPO, PLUGIN_TAG } from "./matrix.mjs";
+import { MAIN, PLUGIN_REPO, PLUGIN_TAG } from "./matrix.mjs";
 
 export const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -40,6 +40,15 @@ export function verdict(name, problems, okLine) {
   }
   console.log(`${name}: ${okLine}`);
   process.exit(0);
+}
+
+/**
+ * The base of the pull request: where HEAD left origin/main, which moves forward each time main is
+ * merged in. MAIN (the main of the first such merge) when origin/main cannot be read.
+ */
+export function prBase(dir) {
+  const r = run("git", ["-C", dir, "merge-base", "HEAD", "origin/main"]);
+  return r.code === 0 && r.out.trim() ? r.out.trim() : MAIN;
 }
 
 /** YAML to an object, through PyYAML (the repository has no YAML parser for node). */
