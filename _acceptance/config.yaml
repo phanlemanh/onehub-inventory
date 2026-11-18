@@ -147,6 +147,11 @@ executors:
     nk30_doc_commands: "node _acceptance/nang-kit-3-0/rang/doc-commands.mjs"   # nang-kit-3-0: every command and kit path the living docs name exists in kit 3.0
     nk30_leftover: "node _acceptance/nang-kit-3-0/rang/leftover.mjs"   # nang-kit-3-0: no old kit name in living files; 14 lines in 5 files at 8925e8ff
     nk30_two_way: "node --test _acceptance/nang-kit-3-0/rang/two-way.mjs"   # nang-kit-3-0: each measure green as it is, red with its pinned message on a broken copy
+    tpc_settings: "node _acceptance/tat-plugin-cho-cu/rang/settings.mjs"   # tat-plugin-cho-cu: repo settings = merge-base plus six false keys for the old marketplace's plugins
+    tpc_phien: "node _acceptance/tat-plugin-cho-cu/rang/phien.mjs"   # tat-plugin-cho-cu: a real session here loads one 3.0.0 copy of each kit plugin (runs on a machine, calls the model once)
+    tpc_doi_chung: "node _acceptance/tat-plugin-cho-cu/rang/phien.mjs --doi-chung"   # tat-plugin-cho-cu: positive control — the same measure is red at the merge-base
+    tpc_quet_ten_cu: "node _acceptance/tat-plugin-cho-cu/rang/quet-ten-cu.mjs"   # tat-plugin-cho-cu: the nk30 old-name sweep finds only the six false keys
+    tpc_two_way: "node --test _acceptance/tat-plugin-cho-cu/rang/two-way.mjs"   # tat-plugin-cho-cu: each measure green on the sound object, red with its pinned message on a broken copy
     da071_shallow_check: "node _acceptance/upgrade-design-assembly-0-7-1/rang/shallow-check.mjs"   # upgrade-design-assembly-0-7-1: make check green on a depth-1 clone of HEAD with origin main at 8925e8ff; 19 decisions by 27 checks
     da071_shallow_alone: "node _acceptance/upgrade-design-assembly-0-7-1/rang/shallow-alone.mjs"   # upgrade-design-assembly-0-7-1: make design-assembly alone on a fresh depth-1 clone: both rows fetched main from origin
     da071_shallow_bite: "node _acceptance/upgrade-design-assembly-0-7-1/rang/shallow-bite.mjs"   # upgrade-design-assembly-0-7-1: a new page stops owner-calls, an untold tag and the fixtures of 8925e8ff stop decision-sheet
