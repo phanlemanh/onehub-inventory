@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: fee86ff1f5da431aedd7b56e0d56b26c6cc233eb
+verified_commit: f3f2be4c02520391c830647824f27a3ec4e06824
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -178,3 +178,7 @@ sha: dd333930b60b6b2f20d19006a13e3d8cfa7b4de8 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 3 — 2026-11-15, do VP2 (PR #66, sửa sau chữ ký): per-run temp root, proof gate waits for the shallow history lock, header and grid-probe early reads fixed
 run_id: repin-20261115T193207Z-65976
 sha: fee86ff1f5da431aedd7b56e0d56b26c6cc233eb · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng
+
+### Re-pin lần 4 — 2026-11-18, do PR #90 nâng trần e2e-db lên 60 phút (chủ kho chọn 18/11/2026), bằng chứng ghim ở fee86ff1 đã cũ
+run_id: repin-20261118T215204Z-68913
+sha: f3f2be4c02520391c830647824f27a3ec4e06824 · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng
