@@ -34,12 +34,13 @@ executors:
     van_hanh: "npx vitest run tests/van-hanh.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): runbook procedures, make targets and variables it names exist
     khoa_bi_mat: "npx vitest run tests/khong-khoa-bi-mat.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): no secret pattern in a tracked file, .env.example lists the new variables
     nk30_kit_root: "npx vitest run tests/kit-root.test.ts --coverage.enabled=false --reporter=verbose"   # nang-kit-3-0: kit-root reads only the delivery-loop install
+    da071_two_tests: "npx vitest run tests/ci-ban-sao-nong.test.ts tests/design-check.test.ts --coverage.enabled=false --reporter=verbose"   # upgrade-design-assembly-0-7-1: the shallow-clone test and the ledger test, the fixtures built from TAG
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
     quyen_kho: "bash -c 'out=$(npx vitest run tests/permissions.test.ts --coverage.enabled=false 2>&1); rc=$?; printf \"%s\\n\" \"$out\"; [ $rc -eq 0 ] && printf \"%s\" \"$out\" | grep -qE \"Tests +47 passed \\(47\\)\"'"
     quyen_kho_ban_goc: "node -e \"const a=JSON.parse(require('child_process').execSync('git show 84a2d597:.claude/settings.json')).permissions,b=JSON.parse(require('fs').readFileSync('.claude/settings.json')).permissions;for(const k of ['deny','allow'])if(JSON.stringify(a[k])!==JSON.stringify(b[k])){console.error(k+' list changed');process.exit(1)}console.log('deny and allow identical to 84a2d597')\""
-    e2e: "make e2e"                  # suy từ: mk/design.mk — cần trình duyệt Playwright
+    e2e: "DATABASE_URL= make e2e"    # suy từ: mk/design.mk — cần trình duyệt Playwright; DATABASE_URL trống như CI (Hỏi-3 của upgrade-design-assembly-0-7-1)
     product_map: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/product-map.mjs\" --root . --check"   # suy từ: mẫu của kit, cách viết của Quỹ hàng
     cach_ly: "bash db/scripts/cach-ly.sh"   # hồ sơ cach-ly-moi-san — Postgres của dãy (DB_LANE), duyệt N-2
     vai_man: "npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false"   # row 1d: role × screen register and contract block
@@ -146,6 +147,16 @@ executors:
     nk30_doc_commands: "node _acceptance/nang-kit-3-0/rang/doc-commands.mjs"   # nang-kit-3-0: every command and kit path the living docs name exists in kit 3.0
     nk30_leftover: "node _acceptance/nang-kit-3-0/rang/leftover.mjs"   # nang-kit-3-0: no old kit name in living files; 14 lines in 5 files at 8925e8ff
     nk30_two_way: "node --test _acceptance/nang-kit-3-0/rang/two-way.mjs"   # nang-kit-3-0: each measure green as it is, red with its pinned message on a broken copy
+    da071_shallow_check: "node _acceptance/upgrade-design-assembly-0-7-1/rang/shallow-check.mjs"   # upgrade-design-assembly-0-7-1: make check green on a depth-1 clone of HEAD with origin main at 8925e8ff; 19 decisions by 27 checks
+    da071_shallow_alone: "node _acceptance/upgrade-design-assembly-0-7-1/rang/shallow-alone.mjs"   # upgrade-design-assembly-0-7-1: make design-assembly alone on a fresh depth-1 clone: both rows fetched main from origin
+    da071_shallow_bite: "node _acceptance/upgrade-design-assembly-0-7-1/rang/shallow-bite.mjs"   # upgrade-design-assembly-0-7-1: a new page stops owner-calls, an untold tag and the fixtures of 8925e8ff stop decision-sheet
+    da071_tool_tree: "node _acceptance/upgrade-design-assembly-0-7-1/rang/tool-tree.mjs"   # upgrade-design-assembly-0-7-1: the tool folder is the tree of plugin version 0.7.1, the stamp says so, the gate step is the template's
+    da071_release_ledger: "node _acceptance/upgrade-design-assembly-0-7-1/rang/release-ledger.mjs"   # upgrade-design-assembly-0-7-1: the plugin's release ledger and templates at ba3af6b name the tree pinned here (DESIGN_ASSEMBLY_REPO, default ~/design-assembly)
+    da071_rows_mirror: "python3 _acceptance/upgrade-design-assembly-0-7-1/rang/rows-mirror.py"   # upgrade-design-assembly-0-7-1: the two rows and checks are the plugin's at ba3af6b, but for blueprint; nothing else changed in the two files
+    da071_fixture_tags: "node _acceptance/upgrade-design-assembly-0-7-1/rang/fixture-tags.mjs"   # upgrade-design-assembly-0-7-1: tests/design-check.test.ts holds no tag for the tool's own tagged-test reader
+    da071_change_list: "node _acceptance/upgrade-design-assembly-0-7-1/rang/change-list.mjs"   # upgrade-design-assembly-0-7-1: the upgrade commit changes its 6 files; the branch nothing beyond them and this record
+    da071_two_way: "node --test _acceptance/upgrade-design-assembly-0-7-1/rang/measures-two-way.mjs"   # upgrade-design-assembly-0-7-1: each fast measure green as it is, red with its pinned message on a broken copy
+    da071_shallow_two_way: "node --test _acceptance/upgrade-design-assembly-0-7-1/rang/shallow-two-way.mjs"   # upgrade-design-assembly-0-7-1: the three shallow-clone measures red with their pinned lines on broken clones
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
@@ -209,6 +220,7 @@ feature_loop:
     - executors.script.check
     - executors.script.build
     - executors.script.e2e
+  model_evals: ["upgrade-design-assembly-0-7-1/E14"]
 dev_server:
   start: "npm run dev"
   url: "http://127.0.0.1:3470"

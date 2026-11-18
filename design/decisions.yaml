@@ -313,3 +313,15 @@ decisions:
     source: "the design-assembly contract, one shape per ledger with its version"
     check: "tool:tools/design-assembly/check.mjs"
     note: "that each ledger present has its shape and a version this tool reads; what a ledger says is held by the rows about it"
+  - id: decision-sheet
+    layer: governance
+    kind: closed
+    source: "every choice points at a row, and every judgment nobody confirmed waits on the decision sheet"
+    check: "tool:tools/design-assembly/check.mjs"
+    note: "what this branch writes is read from git against the main branch; a person's answer is read from the note of a row, as the decision sheet writes it; the choices it reads are values, components, kinds of screen, states, words and column types, and free layout inside a screen is not read"
+  - id: owner-calls
+    layer: governance
+    kind: closed
+    source: "a new kind of screen and the brand colour wait for the owner's answer in the waiting list"
+    check: "tool:tools/design-assembly/check.mjs"
+    note: "a new page under design/patterns, and the root colour line of the stylesheet, against the main branch; enforcing it on the hosting service is not this tool's"
