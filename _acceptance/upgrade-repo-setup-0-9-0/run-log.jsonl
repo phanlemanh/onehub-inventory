@@ -1,0 +1,12 @@
+{"ts":"2026-11-18T15:07:22Z","round":1,"evalId":"E1","run_id":"upgrade-repo-setup-0-9-0-E1-20261118T150604Z","exit_code":0,"cmd":"make check"}
+{"ts":"2026-11-18T15:07:45Z","round":1,"evalId":"E2","run_id":"upgrade-repo-setup-0-9-0-E2-20261118T150738Z","exit_code":0,"cmd":"npm run build"}
+{"ts":"2026-11-18T15:07:59Z","round":1,"evalId":"E3","run_id":"upgrade-repo-setup-0-9-0-E3-20261118T150752Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/apply-again.mjs"}
+{"ts":"2026-11-18T15:08:00Z","round":1,"evalId":"E4","run_id":"upgrade-repo-setup-0-9-0-E4-20261118T150759Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/rules-kept.mjs"}
+{"ts":"2026-11-18T15:08:01Z","round":1,"evalId":"E5","run_id":"upgrade-repo-setup-0-9-0-E5-20261118T150800Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/ci-shape.mjs"}
+{"ts":"2026-11-18T15:08:27Z","round":1,"evalId":"E7","run_id":"upgrade-repo-setup-0-9-0-E7-20261118T150812Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/secret-scan.mjs"}
+{"ts":"2026-11-18T15:08:34Z","round":1,"evalId":"E8","run_id":"upgrade-repo-setup-0-9-0-E8-20261118T150827Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/design-assembly-word.mjs"}
+{"ts":"2026-11-18T15:09:09Z","round":1,"evalId":"E9","run_id":"upgrade-repo-setup-0-9-0-E9-20261118T150842Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/pinned-tests.mjs"}
+{"ts":"2026-11-18T15:09:11Z","round":1,"evalId":"E10","run_id":"upgrade-repo-setup-0-9-0-E10-20261118T150909Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/ledgers.mjs"}
+{"ts":"2026-11-18T15:09:14Z","round":1,"evalId":"E11","run_id":"upgrade-repo-setup-0-9-0-E11-20261118T150911Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/change-set.mjs"}
+{"ts":"2026-11-18T15:10:28Z","round":1,"evalId":"E12","run_id":"upgrade-repo-setup-0-9-0-E12-20261118T150922Z","exit_code":0,"cmd":"node --test _acceptance/upgrade-repo-setup-0-9-0/rang/two-way.mjs"}
+{"ts":"2026-11-18T15:10:51Z","round":1,"evalId":"E6","run_id":"upgrade-repo-setup-0-9-0-E6-20261118T151048Z","exit_code":1,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/ci-runs.mjs"}
