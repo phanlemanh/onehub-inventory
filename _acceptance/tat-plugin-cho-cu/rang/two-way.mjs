@@ -88,3 +88,31 @@ test("E2 red: a merge-base init with one version each gives no positive control"
   assert.equal(phien.controlJudge(INIT_BASE, "0000000").ok, true, "E2 not green on the recorded merge-base init");
   red(phien.controlJudge(INIT_HEAD, "0000000"), "doi-chung: the session measure is green at merge-base — no positive control");
 });
+
+// E4 — in a temporary worktree at HEAD, so breaking a file never touches the real tree.
+import { appendFileSync, writeFileSync } from "node:fs";
+import * as quet from "./quet-ten-cu.mjs";
+import { withWorktree } from "./kit.mjs";
+
+async function inHead(breakIt) {
+  return withWorktree("HEAD", async (dir) => {
+    assert.equal((await quet.measure({ root: dir })).ok, true, "E4 not green on the HEAD worktree");
+    breakIt(dir);
+    return quet.measure({ root: dir });
+  });
+}
+
+test("E4 red (a): a line naming the old marketplace in wiki/log.md", async () => {
+  const r = await inHead((dir) => appendFileSync(join(dir, "wiki/log.md"), `\n- ${settings.OLD_MARKET} still named here\n`));
+  red(r, "quet-ten-cu: sweep line outside .claude/settings.json: wiki/log.md");
+});
+
+test("E4 red (b): the road-map false key dropped", async () => {
+  const r = await inHead((dir) => {
+    const p = join(dir, ".claude/settings.json");
+    const s = JSON.parse(readFileSync(p, "utf8"));
+    delete s.enabledPlugins[`road-map@${settings.OLD_MARKET}`];
+    writeFileSync(p, JSON.stringify(s, null, 2) + "\n");
+  });
+  red(r, "quet-ten-cu: sweep finds 5 false-key lines, want 6");
+});
