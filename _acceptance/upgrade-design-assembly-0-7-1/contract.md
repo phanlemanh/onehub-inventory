@@ -5,7 +5,7 @@ slug: upgrade-design-assembly-0-7-1
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci]
-status: verified
+status: signed-off
 approved_by: Phan Le Manh
 approved_at: 2026-11-18
 design_doc: docs/superpowers/specs/2026-11-18-upgrade-design-assembly-0-7-1-design.md
@@ -118,3 +118,20 @@ Phủ theo 6 tệp của commit và từng bên đọc bị đổi. Không quét
   `DATABASE_URL` từ tệp môi trường của máy, trỏ vào Postgres `onehub-inventory-db-main` đang chạy, nên đòi đăng nhập ở
   những bài viết cho chế độ không cơ sở dữ liệu. Cùng bài `tests/e2e/account.spec.ts` với `DATABASE_URL` trống thì 4/4 đạt.
   Đây không phải lỗi của commit; cách gỡ là Hỏi-3 trên thẻ Cổng Phạm vi.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-18:
+  - Ngoài-1: E14 nằm trong `feature_loop.model_evals` để chạy riêng, nên các lượt chấm và ghim lại sau đếm nó là một
+    eval gọi model, dù nó không gọi model nào.
+  - Ngoài-2: quét bí mật toàn lịch sử báo 4 «khoá» trong các tệp `s4-args*.json`; đó là mã băm tệp, không có khoá thật.
+  - Ngoài-3: `owner-calls.mjs` của plugin ghi đè `GIT_SSH_COMMAND`, nên máy lấy mã qua SSH bằng cấu hình riêng có thể
+    làm hai hàng đỏ trên bản sao nông; sửa ở kho plugin.
+  - Ngoài-4: lý do lâu dài của thay đổi (cổng có thể gọi mạng trên bản sao nông) chỉ có ở hồ sơ và một dòng
+    `wiki/log.md`, chưa có trang quyết định trong wiki.
+  - Ngoài-5: bài tự kiểm của câu kiểm «không để lại bản sao» không chạy phép đo con, nên không chứng việc truyền
+    `TMPDIR` riêng cho từng ca.
+  - Ngoài-6: câu kiểm «không để lại bản sao» không có đối chứng dương rằng bản sao thật sự nằm trong thư mục tạm của ca,
+    và bài tự kiểm mới không thể đỏ.
+  - Ngoài-7: lệnh e2e dùng chung đổi thành `DATABASE_URL= make e2e` (Hỏi-3), nên các hồ sơ khác cũng chấm e2e không
+    cơ sở dữ liệu như CI; hồ sơ này không có tiêu chí ghi việc đổi ấy.
+  - Ngoài-8: tài liệu thiết kế ghi `owner-calls.mjs` đổi +160/−26; con số đúng là +136/−24.
+  - Ngoài-9: cùng việc với Ngoài-4 — chưa có trang quyết định trong wiki, và thêm một trang thì phép đo của AC-8 đỏ.
+  - Ngoài-10: cùng việc với Ngoài-3 — `GIT_SSH_COMMAND` bị ghi đè khi lấy `main` trên bản sao nông.
