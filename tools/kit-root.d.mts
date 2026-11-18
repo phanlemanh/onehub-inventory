@@ -5,3 +5,7 @@ export interface PluginInstall {
 }
 
 export function chooseInstall(entries: PluginInstall[], roots: string[]): string;
+
+export const PLUGIN_KEY: string;
+
+export function installEntries(registry: unknown): PluginInstall[];

@@ -69,7 +69,7 @@ jobs:
   gate:
     runs-on: ubuntu-latest
     env:
-      KIT_TAG: v2.38.1
+      KIT_TAG: v3.0.0
     steps:
       - uses: actions/checkout@v7
         with:
@@ -80,9 +80,9 @@ jobs:
       - name: Fetch the kit by tag, outside the repository
         run: |
           git init -q "$RUNNER_TEMP/kit"
-          git -C "$RUNNER_TEMP/kit" fetch -q --depth 1 https://github.com/phanlemanh/acceptance-gate-kit "refs/tags/$KIT_TAG"
+          git -C "$RUNNER_TEMP/kit" fetch -q --depth 1 https://github.com/phanlemanh/delivery-loop "refs/tags/$KIT_TAG"
           git -C "$RUNNER_TEMP/kit" checkout -q FETCH_HEAD
-          echo "CLAUDE_PLUGIN_ROOT=$RUNNER_TEMP/kit" >> "$GITHUB_ENV"
+          echo "CLAUDE_PLUGIN_ROOT=$RUNNER_TEMP/kit/plugins/acceptance-gate" >> "$GITHUB_ENV"
       - name: pre-merge-check
         run: |
           if [ -n "${GITHUB_BASE_REF:-}" ]; then
