@@ -1,5 +1,5 @@
 {
- "feature_plain": "Kho được nâng bộ setup lên 0.9.0: CI chia hai tầng nên PR chưa sẵn sàng không chạy bài nặng, và lần sau nâng tiếp được bằng gộp ba chiều; luật của kho giữ nguyên, trừ ba điểm anh trả lời ở cổng này.",
+ "feature_plain": "Kho được nâng bộ setup lên 0.9.0: CI chia hai tầng nên PR chưa sẵn sàng không chạy bài nặng, và lần sau nâng tiếp được bằng gộp ba chiều; luật của kho giữ nguyên, trừ hai điểm anh đã đồng ý ở Cổng Phạm vi (mục miễn quét bí mật, bài kiểm của hồ sơ ci-co-postgres).",
  "will_do": [
   {
    "id": "AC-1",
