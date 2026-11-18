@@ -14,7 +14,7 @@ import * as gateControl from "./gate-control.mjs";
 import { commitAll, coreRoot, fetchKit, git, repoRoot, worktree } from "./kit.mjs";
 import * as kitRootCli from "./kit-root-cli.mjs";
 import * as leftover from "./leftover.mjs";
-import { BASELINE, DOC_FILES, NEW_KIT } from "./matrix.mjs";
+import { BASELINE, DOC_FILES, LIFECYCLE_REASONS, NEW_KIT } from "./matrix.mjs";
 import * as productMap from "./product-map.mjs";
 import * as settings from "./settings.mjs";
 
@@ -183,4 +183,11 @@ test("kit-root red: installEntries is not exported by the old kit-root", async (
   const newMod = await import(join(ROOT, "tools/kit-root.mjs"));
   assert.equal(typeof newMod.installEntries, "function");
   assert.equal(oldMod.installEntries, undefined, "kit-root red: installEntries is not exported by the old kit-root");
+});
+
+test("E2 gate-branch: every lifecycle reason is written, verbatim, by kit 3.0's gate", () => {
+  const gate = readFileSync(join(coreRoot(NEW_KIT, fetchKit(NEW_KIT)), "scripts/pre-merge-check.sh"), "utf8");
+  for (const { source } of LIFECYCLE_REASONS)
+    assert.ok(gate.includes(source), `gate-branch: lifecycle reason not written by kit 3.0: ${source}`);
+  assert.equal(gate.includes('echo "VIOLATION [$slug]: verdict=$verdict (must be PASS to merge)x"'), false);
 });
