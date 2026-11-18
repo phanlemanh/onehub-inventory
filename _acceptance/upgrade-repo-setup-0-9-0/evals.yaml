@@ -1,0 +1,123 @@
+schema_version: 1
+feature_slug: upgrade-repo-setup-0-9-0
+# Ma trận viết trước (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
+#   Chỗ rời main: bd32d73e. Commit đổi tên: a9acfe77; commit lên đời: fd53ac96; từ bd32d73e tới fd53ac96 đổi 46 tệp.
+#   repo-setup: tag repo-setup-v0.9.0. Dry-run trên HEAD: 0 created/updated/merged/marked/conflict; trên bd32d73e: exit 1,
+#     12 marked, conflict mk/derived.mk.
+#   make check: 2461 bài đạt, 2 bỏ qua; design-assembly 19 quyết định giữ bởi 27 phép kiểm; «no heavy checks».
+#   Tệp luật giữ nguyên: governance/autonomy.yaml, tools/ontology_actions.py, tools/boundaries.py, ontology/relations.yaml; CODEOWNERS khác đúng
+#     dòng 3; settings.json chỉ thêm hook SessionStart. Ruleset main: check, e2e, gate, strict tắt.
+#   gitleaks: 0 phát hiện với .gitleaks.toml của HEAD, 12 với bản của bd32d73e, đều trong _acceptance/*/s4-args*.json.
+#   Nhóm của 46 tệp (từ báo cáo apply.py trên bd32d73e + sửa tay): manifest 1, created 14, conflict rồi created 1,
+#     updated 10, merged 6, marked 9, sửa tay 5. ci_verdict.py: 64 tổ hợp viết trước (4 trạng thái × 3 job).
+#   Tệp được đổi ngoài hai commit: thư mục hồ sơ, _acceptance/config.yaml, PRODUCT-MAP.md, LO-TRINH.html.
+#   Cặp hai chiều: rang/two-way.mjs, mỗi ca phá một thông điệp ghim, kê ở `expected` của E12.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; đầu ra có dòng 'make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance', dòng 'Tests  2461 passed | 2 skipped (2463)', dòng 'design-assembly: 19 decisions held by 27 checks, each seen failing on a changed copy' và dòng 'no heavy checks'; không thêm bài bỏ qua nào ngoài 2 bài như trước, không bước nào của make check bị bỏ (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.build
+    long_running: 10
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; Next.js in bảng các trang đã dựng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.rs090_apply_again
+    long_running: 5
+    layer: backend-effect
+    paths: [".repo-setup.json", "**"]
+    expected: "exit 0; dòng 'apply-again: repo-setup 0.9.0 has nothing left to do on HEAD (created, updated, merged, marked, conflict all empty; manifest 0.9.0); on bd32d73e it exits 1 with 12 marked files and a conflict on mk/derived.mk'; trên HEAD không tệp nào còn dấu và không tệp nào còn phải ghi (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.rs090_rules_kept
+    long_running: 2
+    layer: backend-effect
+    paths: ["governance/**", ".github/CODEOWNERS", ".claude/settings.json", "tools/ontology_actions.py", "ontology/relations.yaml"]
+    expected: "exit 0; dòng 'rules-kept: autonomy.yaml, ontology_actions.py, boundaries.py and relations.yaml as at bd32d73e; CODEOWNERS differs on line 3 only; settings.json adds the SessionStart hook only; the main ruleset requires check, e2e, gate, strict off'; không luật nào của kho đổi ngoài Hỏi-1 đến Hỏi-3 và ruleset không đổi (Out of scope: luật mới, PR 6)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.rs090_ci_shape
+    long_running: 2
+    layer: backend-effect
+    paths: [".github/workflows/ci.yml", "tools/ci_verdict.py", "tools/ci_inputs.py"]
+    expected: "exit 0; dòng 'ci-shape: five jobs quick, e2e, e2e-db, check, gate; e2e and e2e-db behind quick, skipped on a draft, one reuse key each; check waits for quick, e2e, e2e-db and runs ci_verdict.py; gate as at bd32d73e; ci_verdict.py: 64 of 64 combinations as written beforehand, 1 exits 0 and 63 exit 1, each job that is not success named on its own line with failed, the pull request is a draft, or a tier it waits for did not pass'; không tổ hợp nào có một job không success mà thoát 0 (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.rs090_ci_runs
+    long_running: 2
+    layer: backend-effect
+    paths: [".github/workflows/ci.yml"]
+    expected: "exit 0; dòng 'ci-runs: on fd53ac96 quick, e2e, e2e-db and check succeeded; on <sha>, the newest run whose commit differs from fd53ac96 only in HEAVY_NOT_INPUTS, e2e and e2e-db succeeded without running again (same inputs as run <url>)'; không có lượt nào như thế thì đỏ với 'ci-runs: no run of PR 88 after fd53ac96 changes only HEAVY_NOT_INPUTS'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.rs090_secret_scan
+    long_running: 3
+    layer: backend-effect
+    paths: [".gitleaks.toml", ".github/workflows/security.yml", ".pre-commit-config.yaml"]
+    expected: "exit 0; dòng 'secret-scan: no leak over every commit with the allowlist of HEAD; 12 with the one of bd32d73e, all generic-api-key in _acceptance/*/s4-args*.json; a 64-hex value next to keys.test.ts outside _acceptance/ is caught; the secret-scan job of PR 88 succeeded'; mục miễn không che một giá trị ngoài _acceptance/ (negative)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.rs090_design_assembly_word
+    long_running: 3
+    layer: backend-effect
+    paths: ["Makefile", "tools/design-assembly/**", "mk/design-assembly.mk"]
+    expected: "exit 0; dòng 'design-assembly-word: check depends on check-quick, check-heavy, design-assembly; the tool holds 19 decisions by 27 checks; without the word on the check line it says checks-in-gate: the Makefile's check target no longer runs CHECK_TARGETS'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.rs090_pinned_tests
+    long_running: 10
+    layer: backend-effect
+    paths: ["tests/ci-yml-patch.test.ts", "tests/ci-ban-sao-nong.test.ts", "tests/coverage-matrix.test.ts", ".github/workflows/ci.yml", "Makefile"]
+    expected: "exit 0; dòng 'pinned-tests: the three tests pass on HEAD; postgres:15, e2e-db out of check, coverage-matrix out of CHECK_TARGETS and a new git log under tools/ each turn one of them red'; không bản phá nào xanh (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.rs090_ledgers
+    long_running: 3
+    layer: backend-effect
+    paths: ["mk/**", "tools/ledgers*.py", "wiki/log.md", "wiki/index.md", "ontology/glossary.md", "src/generated/ontology.ts"]
+    expected: "exit 0; dòng 'ledgers: log, index, glossary and gen are one-file; make split DRY=1 exits 0 and writes nothing for each; mk/design-role-table.mk is mk/derived.mk of bd32d73e; make -n test runs tools/coverage_matrix/buttons.py'; không sổ nào đã tách (Out of scope: PR 2 đến 5)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E11
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.rs090_change_set
+    long_running: 1
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng 'change-set: the 46 files of bd32d73e..fd53ac96 fall each in one group read from the apply.py report and the hand-edit list: manifest 1, created 14, conflict then created 1, updated 10, merged 6, marked 9, hand 5; four files of the report unchanged; fd53ac96..HEAD changes only this dossier, _acceptance/config.yaml, PRODUCT-MAP.md and LO-TRINH.html'; không tệp nào ngoài nhóm, không nhóm nào lệch số, không tệp giao diện, mã sản phẩm hay hồ sơ đã ký nào đổi (Out of scope)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E12
+    criterion: AC-2, AC-3, AC-4, AC-6, AC-7, AC-9, AC-10
+    executor: script
+    cmd: config:executors.script.rs090_two_way
+    long_running: 10
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-repo-setup-0-9-0/rang/**"]
+    expected: "exit 0; node --test đạt mọi ca: mỗi phép đo xanh trên bản lành và đỏ với thông điệp ghim trên bản phá — apply-again đỏ trên một tệp còn dấu ('marked'); rules-kept đỏ khi autonomy.yaml đổi một dòng; ci-shape đỏ khi e2e-db mất needs: quick, khi gate đổi một byte, và khi một bản ci_verdict.py bỏ qua kết quả của e2e; secret-scan đỏ khi bỏ mục miễn mới; design-assembly-word đỏ khi dòng check: mất chữ; ledgers đỏ khi wiki/log.md mang dòng dấu vẽ; change-set đỏ khi một tệp ngoài nhóm đổi, và khi số tệp của một nhóm lệch; không phép đo nào xanh trên bản phá (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
