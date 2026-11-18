@@ -5,7 +5,7 @@ slug: upgrade-repo-setup-0-9-0
 owner:
 risk_tier: T3
 surfaces: [config, ci]
-status: implemented
+status: verified
 approved_by: Phan Le Manh
 approved_at: 2026-11-18
 ---

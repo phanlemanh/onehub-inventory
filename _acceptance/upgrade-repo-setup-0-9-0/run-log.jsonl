@@ -10,3 +10,15 @@
 {"ts":"2026-11-18T15:09:14Z","round":1,"evalId":"E11","run_id":"upgrade-repo-setup-0-9-0-E11-20261118T150911Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/change-set.mjs"}
 {"ts":"2026-11-18T15:10:28Z","round":1,"evalId":"E12","run_id":"upgrade-repo-setup-0-9-0-E12-20261118T150922Z","exit_code":0,"cmd":"node --test _acceptance/upgrade-repo-setup-0-9-0/rang/two-way.mjs"}
 {"ts":"2026-11-18T15:10:51Z","round":1,"evalId":"E6","run_id":"upgrade-repo-setup-0-9-0-E6-20261118T151048Z","exit_code":1,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/ci-runs.mjs"}
+{"ts":"2026-11-18T15:19:29Z","round":2,"evalId":"E1","run_id":"upgrade-repo-setup-0-9-0-E1-20261118T151809Z","exit_code":0,"cmd":"make check"}
+{"ts":"2026-11-18T15:19:44Z","round":2,"evalId":"E2","run_id":"upgrade-repo-setup-0-9-0-E2-20261118T151940Z","exit_code":0,"cmd":"npm run build"}
+{"ts":"2026-11-18T15:19:52Z","round":2,"evalId":"E3","run_id":"upgrade-repo-setup-0-9-0-E3-20261118T151950Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/apply-again.mjs"}
+{"ts":"2026-11-18T15:19:54Z","round":2,"evalId":"E4","run_id":"upgrade-repo-setup-0-9-0-E4-20261118T151952Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/rules-kept.mjs"}
+{"ts":"2026-11-18T15:19:54Z","round":2,"evalId":"E5","run_id":"upgrade-repo-setup-0-9-0-E5-20261118T151954Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/ci-shape.mjs"}
+{"ts":"2026-11-18T15:20:07Z","round":2,"evalId":"E6","run_id":"upgrade-repo-setup-0-9-0-E6-20261118T152002Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/ci-runs.mjs"}
+{"ts":"2026-11-18T15:20:22Z","round":2,"evalId":"E7","run_id":"upgrade-repo-setup-0-9-0-E7-20261118T152014Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/secret-scan.mjs"}
+{"ts":"2026-11-18T15:20:26Z","round":2,"evalId":"E8","run_id":"upgrade-repo-setup-0-9-0-E8-20261118T152022Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/design-assembly-word.mjs"}
+{"ts":"2026-11-18T15:20:48Z","round":2,"evalId":"E9","run_id":"upgrade-repo-setup-0-9-0-E9-20261118T152033Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/pinned-tests.mjs"}
+{"ts":"2026-11-18T15:20:49Z","round":2,"evalId":"E10","run_id":"upgrade-repo-setup-0-9-0-E10-20261118T152048Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/ledgers.mjs"}
+{"ts":"2026-11-18T15:20:52Z","round":2,"evalId":"E11","run_id":"upgrade-repo-setup-0-9-0-E11-20261118T152049Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-9-0/rang/change-set.mjs"}
+{"ts":"2026-11-18T15:21:56Z","round":2,"evalId":"E12","run_id":"upgrade-repo-setup-0-9-0-E12-20261118T152100Z","exit_code":0,"cmd":"node --test _acceptance/upgrade-repo-setup-0-9-0/rang/two-way.mjs"}
