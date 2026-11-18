@@ -5,7 +5,7 @@ slug: nang-kit-3-0
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci, tooling]
-status: verified
+status: signed-off
 approved_by: Phan Le Manh
 approved_at: 2026-11-18
 design_doc: docs/superpowers/specs/2026-11-18-nang-kit-3-0-design.md
@@ -106,3 +106,32 @@ Phủ theo tệp chạm và bên đọc của từng tệp; không quét không 
 - Phép đo ở `rang/` tự kéo kit theo thẻ vào thư mục tạm ngoài kho; không dựa vào `kit-root` vì máy chưa có chợ mới.
 - Thời điểm gộp đã chốt: sau vòng `upgrade-design-assembly-0-7-1` và PR #83; khi đó `main` đi tiếp thì gộp `main` vào nhánh
   (commit gộp, không rebase) rồi chạy lại cổng.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-18:
+  - Ngoài-3: Công cụ dò bí mật sẽ báo thêm vài cảnh báo giả ở các tệp ghi mã băm, làm nhiễu kết quả quét.
+  - Ngoài-4: Một bài kiểm của hồ sơ chỉ đúng trước khi chủ kho ký, sau đó chạy lại sẽ báo đỏ dù sản phẩm không sai.
+  - Ngoài-5: Nếu ai đó dời thẻ phiên bản của kit sang bản khác, kiểm tra tự động của mọi PR sẽ âm thầm chạy bản kit khác mà không ai được báo.
+  - Ngoài-6: Nếu sau này ai đó sửa nhầm cách chọn bản cài khi sổ có cả bản cũ lẫn mới, bộ kiểm tự động chính sẽ không báo đỏ.
+  - Ngoài-7: Khâu dọn dẹp của bài kiểm có thể bỏ sót một thư mục tạm còn sót lại từ một bước kiểm, và lời ghi trong sổ quyết định nói rộng hơn thực tế.
+  - Ngoài-10: Tệp lộ trình còn bảo người đọc gõ một lệnh kit đã đổi tên ở 3.0; ai làm theo sẽ gặp lỗi lệnh không có.
+  - Ngoài-11: Nếu thẻ phiên bản của kit bị dời, cổng gộp có thể âm thầm chạy mã khác bản đã duyệt.
+  - Ngoài-12: Hồ sơ nghiệm thu còn ghi số đếm tên cũ lỗi thời ở hai chỗ; chỉ gây nhầm cho người đọc.
+  - Ngoài-13: Lượt chấm để lại thư mục tạm trên máy, và bản kit tạm cũ được tin chỉ bằng mã commit đầu.
+  - Ngoài-15: Điều kiện nghiệm thu đã được nới hai lần sau khi chủ kho duyệt mà chưa được xác nhận lại.
+  - Ngoài-16: Cổng gộp có thể cho qua một dòng cảnh báo lạ chỉ vì nó chứa một câu quen thuộc.
+  - Ngoài-17: Công cụ quét bí mật báo nhầm vài chuỗi băm là khoá.
+  - Ngoài-18: Hồ sơ trong kho công khai để lộ tên tài khoản máy và cách sắp xếp thư mục của chủ kho.
+  - Ngoài-19: Nếu ai đó dời thẻ phiên bản của bộ kiểm, cổng gộp có thể đổi hành vi mà CI không báo.
+  - Ngoài-21: Phép kiểm cấu hình có thể báo đạt khi cả hai thông tin phiên bản đều biến mất.
+  - Ngoài-22: Vài tài liệu hướng dẫn vẫn nhắc tên bộ kiểm cũ, nên người đọc có thể bị dẫn tới công cụ cũ.
+  - Ngoài-23: Lịch sử nhánh có hai báo động giả trông như khoá bị lộ; không có gì lộ thật nhưng có thể che một báo động thật.
+  - Ngoài-24: Nếu nhãn phiên bản của kit bị dời sang nội dung khác, cổng gộp có thể chạy bản khác mà không ai thấy.
+  - Ngoài-25: Hồ sơ trong kho công khai lộ tên tài khoản máy và cách xếp thư mục, và vòng 1 chấm bằng khuôn của kit cũ.
+  - Ngoài-26: Vòng 1 bị trả lại chỉ vì bộ kiểm trình duyệt đỏ sẵn trên máy này; việc sửa không có gì thật để sửa.
+  - Ngoài-27: Thẻ quyết định từng báo một eval chưa đạt trong khi mọi eval đều đạt (lỗi đọc của bộ dựng thẻ).
+  - Ngoài-29: Hai phép kiểm được ghi đạt chỉ dựa vào mã thoát, nên hồ sơ không chứng được bài kiểm đã thật sự chạy.
+  - Ngoài-30: Hai tiêu chí được nới sau khi chủ kho đã duyệt, và tấm thẻ chủ kho xem vẫn ghi con số cũ.
+  - Ngoài-31: Phần ghi chú đầu hồ sơ còn con số quét cũ, người đọc có thể thấy hai con số khác nhau.
+  - Ngoài-32: Nếu thẻ phiên bản của kit bị dời, máy chủ kiểm tra và máy cá nhân có thể âm thầm chạy hai bản khác nhau.
+  - Ngoài-33: Phép kiểm tra cấu hình có thể báo xanh nhầm nếu cả thẻ trong CI lẫn phiên bản ghim trong cấu hình cùng bị xoá.
+  - Ngoài-34: Ghi chú trong hồ sơ nói 15 dòng ở 6 tệp trong khi phép đo thật dùng 14 dòng ở 5 tệp, người chấm có thể bị nhầm.
+  - Ngoài-36: Dữ liệu thử cho việc tìm bản cài kit được viết tay giống hệt code đọc, nên nếu kit đổi tên chợ thì bài kiểm tra vẫn xanh trong khi máy thật không tìm thấy kit.
