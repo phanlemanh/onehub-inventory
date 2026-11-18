@@ -27,6 +27,9 @@ do not report tests as passing.
    A test deleted, skipped or loosened without a stated reason is blocking.
 3. **Domain**: names follow `ontology/glossary.md`; new concepts, rules and actions are in `ontology/`;
    generated code is current (`make ontology`); each business rule lives in one place.
+   A new `never` under `lifecycle` or `not_set` in `ontology/` names the person who decided, and the PR
+   shows their decision; an operation dropped by the author alone is blocking. A new
+   `lifecycle: { via: ... }` on a relation claims the link never changes: check that it is true.
 4. **Secrets**: no keys, tokens, passwords or connection strings in code, tests, docs, fixtures or
    logs. Run `gitleaks detect --no-banner` if available.
 5. **Personal data**: properties marked `pii: true` in `ontology/entities/*.yaml` do not reach logs,
@@ -41,8 +44,9 @@ do not report tests as passing.
    (`pull_request_target` with a checkout of PR code).
 9. **Design**: module boundaries hold, errors are handled, and the code follows existing patterns
    and the conventions in `AGENTS.md`.
-10. **Tier**: if `tools/autonomy.py` exists, run `python3 tools/autonomy.py --base origin/<base>`. Auth,
-    data or migrations classified below high is blocking.
+10. **Tier**: if `tools/autonomy.py` exists, run `python3 tools/autonomy.py --base origin/<base>`
+    and report the tier with the file behind it. A removed or switched-off test, or a looser
+    `agent:` setting, that the gate did not raise is blocking.
 11. **Records**: `wiki/` is updated when the change has a lasting why, and the PR's "Human decisions
     needed" is honest.
 
