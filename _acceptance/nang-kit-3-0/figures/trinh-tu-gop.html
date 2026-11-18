@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hỏi-2 · Trình tự gộp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Lora:ital,wght@0,400;1,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap&subset=vietnamese" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-soft:    #636b80;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Lora', 'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1272px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 0.5rem;
+    }
+    .sub { color: var(--color-soft); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .scroll { overflow-x: auto; }
+    svg { width: 100%; min-width: 980px; display: block; }
+  </style>
+</head>
+<body>
+  <main class="frame">
+    <p class="eyebrow">Dòng thời gian có một chỗ rẽ · Hỏi-2 · Cổng Phạm vi</p>
+    <h1>Hỏi-2: thứ tự cài chợ mới và gộp PR</h1>
+    <p class="sub">Liên quan: AC-2 (đo lại sau ký), Known limit (1).</p>
+
+    <div class="scroll">
+    <svg viewBox="0 0 1264 512" xmlns="http://www.w3.org/2000/svg" font-family="'Geist', sans-serif">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/>
+        </marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/>
+        </marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/>
+        </marker>
+      </defs>
+      <rect x="0" y="0" width="1264" height="512" fill="#f5f5f5"/>
+
+      <!-- Connectors first (behind nodes) -->
+      <!-- Shared steps 1 → 2 → 3 -->
+      <path d="M 216 232 L 248 232" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+      <path d="M 376 232 L 408 232" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+      <!-- Fork after step 3: two attach points on its right edge -->
+      <path d="M 584 212 L 600 212 Q 608 212 608 204 L 608 128 Q 608 120 616 120 L 632 120" fill="none" stroke="#eb6c36" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+      <path d="M 584 252 L 600 252 Q 608 252 608 260 L 608 336 Q 608 344 616 344 L 632 344" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+      <!-- Recommended branch -->
+      <path d="M 808 120 L 840 120" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+      <path d="M 1016 120 L 1048 120" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+      <!-- Other branch -->
+      <path d="M 808 344 L 840 344" fill="none" stroke="#4f5d75" stroke-width="1" marker-end="url(#arrow)"/>
+      <path d="M 1016 344 L 1048 344" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+
+      <!-- Step 1 -->
+      <rect x="32" y="168" width="184" height="128" rx="6" fill="#f5f5f5"/>
+      <rect x="32" y="168" width="184" height="128" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="40" y="176" width="56" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="68" y="188" fill="#2d3142" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BƯỚC 1</text>
+      <text x="124" y="216" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Vòng</text>
+      <text x="124" y="236" fill="#2d3142" font-size="10" font-weight="500" font-family="'Geist Mono', monospace" text-anchor="middle">upgrade-design-</text>
+      <text x="124" y="252" fill="#2d3142" font-size="10" font-weight="500" font-family="'Geist Mono', monospace" text-anchor="middle">assembly-0-7-1</text>
+      <text x="124" y="276" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">gộp</text>
+
+      <!-- Step 2 -->
+      <rect x="248" y="168" width="128" height="128" rx="6" fill="#f5f5f5"/>
+      <rect x="248" y="168" width="128" height="128" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="256" y="176" width="56" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="284" y="188" fill="#2d3142" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BƯỚC 2</text>
+      <text x="312" y="236" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">PR #83 gộp</text>
+
+      <!-- Step 3 -->
+      <rect x="408" y="168" width="176" height="128" rx="6" fill="#f5f5f5"/>
+      <rect x="408" y="168" width="176" height="128" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="416" y="176" width="56" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="444" y="188" fill="#2d3142" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BƯỚC 3</text>
+      <text x="496" y="224" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Gộp <tspan font-family="'Geist Mono', monospace" font-weight="500">main</tspan> vào nhánh này,</text>
+      <text x="496" y="244" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">chạy lại cổng</text>
+      <text x="496" y="276" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">AC-2 · đo lại sau ký</text>
+
+      <!-- Step 4a · recommended (focal) -->
+      <rect x="632" y="56" width="176" height="128" rx="6" fill="#f5f5f5"/>
+      <rect x="632" y="56" width="176" height="128" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <rect x="640" y="64" width="112" height="16" rx="2" fill="transparent" stroke="rgba(235,108,54,0.50)" stroke-width="0.8"/>
+      <text x="696" y="76" fill="#ba4513" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BƯỚC 4A · KHUYÊN</text>
+      <text x="720" y="108" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Anh cài chợ</text>
+      <text x="720" y="126" fill="#2d3142" font-size="11" font-weight="500" font-family="'Geist Mono', monospace" text-anchor="middle">delivery-loop</text>
+      <text x="720" y="144" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">trên máy</text>
+      <text x="720" y="168" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">bước 2.4</text>
+
+      <!-- Step 5a -->
+      <rect x="840" y="56" width="176" height="128" rx="6" fill="#f5f5f5"/>
+      <rect x="840" y="56" width="176" height="128" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="848" y="64" width="64" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="880" y="76" fill="#2d3142" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BƯỚC 5A</text>
+      <text x="928" y="124" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Gộp PR này</text>
+
+      <!-- Outcome of recommended branch -->
+      <rect x="1048" y="56" width="184" height="128" rx="6" fill="#f5f5f5"/>
+      <rect x="1048" y="56" width="184" height="128" rx="6" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="0.8"/>
+      <text x="1140" y="112" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Phiên mới nạp</text>
+      <text x="1140" y="132" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">6 plugin 3.0</text>
+      <text x="1140" y="164" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Known limit (1)</text>
+
+      <!-- Step 4b -->
+      <rect x="632" y="280" width="176" height="128" rx="6" fill="#f5f5f5"/>
+      <rect x="632" y="280" width="176" height="128" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="640" y="288" width="64" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="672" y="300" fill="#2d3142" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BƯỚC 4B</text>
+      <text x="720" y="348" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Gộp PR này</text>
+
+      <!-- Gap -->
+      <rect x="840" y="280" width="176" height="128" rx="6" fill="#f5f5f5"/>
+      <rect x="840" y="280" width="176" height="128" rx="6" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.45)" stroke-width="1" stroke-dasharray="4,3"/>
+      <rect x="848" y="288" width="96" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="896" y="300" fill="#2d3142" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">KHOẢNG TRỐNG</text>
+      <text x="928" y="332" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Phiên mới không có</text>
+      <text x="928" y="352" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">plugin kit,</text>
+      <text x="928" y="372" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle"><tspan font-family="'Geist Mono', monospace" font-weight="500">kit-root</tspan> in rỗng</text>
+
+      <!-- Step 5b -->
+      <rect x="1048" y="280" width="184" height="128" rx="6" fill="#f5f5f5"/>
+      <rect x="1048" y="280" width="184" height="128" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="1056" y="288" width="64" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="1088" y="300" fill="#2d3142" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BƯỚC 5B</text>
+      <text x="1140" y="348" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Anh cài chợ</text>
+
+      <!-- Legend strip -->
+      <line x1="32" y1="440" x2="1232" y2="440" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
+      <text x="32" y="460" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.18em">CHÚ GIẢI</text>
+
+      <rect x="32" y="476" width="16" height="12" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.2"/>
+      <text x="56" y="486" fill="#4f5d75" font-size="9">Nhánh khuyên</text>
+
+      <rect x="176" y="476" width="16" height="12" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="200" y="486" fill="#4f5d75" font-size="9">Bước</text>
+
+      <rect x="272" y="476" width="16" height="12" rx="2" fill="rgba(45,49,66,0.05)" stroke="#4f5d75" stroke-width="0.8"/>
+      <text x="296" y="486" fill="#4f5d75" font-size="9">Phiên mới sau khi gộp</text>
+
+      <rect x="464" y="476" width="16" height="12" rx="2" fill="rgba(45,49,66,0.03)" stroke="rgba(45,49,66,0.45)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="488" y="486" fill="#4f5d75" font-size="9">Khoảng trống: phiên không có plugin kit</text>
+    </svg>
+    </div>
+  </main>
+</body>
+</html>
