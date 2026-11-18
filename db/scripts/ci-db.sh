@@ -103,11 +103,8 @@ chay() {
         --outputFile.json="$OUT/bai-db.json"
       ;;
     co-phien)
-      # Two workers here, one in the configuration (the lanes' own runs): one worker took 30 of the job's 40 minutes
-      # (run 44306178853). Safe on one database: each test signs in people of its own (project name and time in the
-      # email), the shared sessions only read, and the two serial files keep their order inside one worker.
       PLAYWRIGHT_JSON_OUTPUT_NAME="$OUT/co-phien.json" npx playwright test -c playwright.db.config.ts \
-        --reporter="list,json,$GAC_HYDRATION" --workers=2
+        --reporter="list,json,$GAC_HYDRATION"
       ;;
     khong-phien)
       # Without the slowed copy (describe «cham», CPU slowed four times): the e2e job already runs it, and the count
