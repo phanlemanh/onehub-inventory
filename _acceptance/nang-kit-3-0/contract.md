@@ -5,7 +5,7 @@ slug: nang-kit-3-0
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci, tooling]
-status: approved
+status: implemented
 approved_by: Phan Le Manh
 approved_at: 2026-11-18
 design_doc: docs/superpowers/specs/2026-11-18-nang-kit-3-0-design.md
