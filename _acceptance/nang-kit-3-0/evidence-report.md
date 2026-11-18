@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 9bbc4180c545dcf6fcd1ec958d7787fc7ff6dc16
+verified_commit: f6a5f27ebedc9179ab818976a9b32d8cc7f06b5d
 human_signoff: Phan Le Manh 2026-11-18
 ---
 
@@ -163,3 +163,7 @@ none — every multi-run eval is uniform
 Round 1: REJECT — make e2e failed, already failing at baseline and accepted by the owner at Gate 1. Returned to implementation.
 Round 4: REJECT — 13/13 two-way cases passed, but the cleanup hook saw a temp worktree of a concurrent run. Hook now checks only its own temp worktrees.
 Round 5: all machine evals passed, E5 carried from round 1; verdict PASS.
+
+### Re-pin lần 1 — 2026-11-18, do gộp main (#85, #86) vào nhánh và sửa ghi_chu lộ trình sang /acceptance-gate:scope-slice
+run_id: repin-20261118T105555Z-84393
+sha: f6a5f27ebedc9179ab818976a9b32d8cc7f06b5d · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng
