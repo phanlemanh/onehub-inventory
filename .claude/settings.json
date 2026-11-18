@@ -77,7 +77,13 @@
     "superpowers@claude-plugins-official": true,
     "roadmap@delivery-loop": true,
     "knowledge@delivery-loop": true,
-    "dispatch@delivery-loop": true
+    "dispatch@delivery-loop": true,
+    "acceptance-gate@acceptance-gate-kit": false,
+    "feature-loop@acceptance-gate-kit": false,
+    "diagram-design@acceptance-gate-kit": false,
+    "dieu-phoi@acceptance-gate-kit": false,
+    "road-map@acceptance-gate-kit": false,
+    "tri-thuc@acceptance-gate-kit": false
   },
   "extraKnownMarketplaces": {
     "delivery-loop": {
