@@ -51,3 +51,45 @@ wall: 1946s
 - **claude-opus-5-5**: 3 agent · 48 calls · out 38,908 · in 96 · cache_read 3,236,593 · cache_create 286,478
 - **claude-sonnet-5-5**: 11 agent · 35 calls · out 33,787 · in 70 · cache_read 751,740 · cache_create 473,717
 
+### S4 round 2 — wf_9e34b33a-db9 (21 agent, 105,302 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| machine:bash db/scripts/ci-thu.sh | claude-haiku-5-5 | 27 | 28,218 | 54 | 1,294,876 | 2640 |
+| review:invariants | claude-opus-5-5 | 23 | 10,513 | 46 | 1,542,156 | 246 |
+| synthesize:report | claude-sonnet-5-5 | 5 | 9,884 | 10 | 213,542 | 72 |
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 9,389 | 6 | 85,269 | 241 |
+| machine:node --test _acceptance/upgrade-design-a | claude-haiku-5-5 | 8 | 8,636 | 16 | 263,295 | 553 |
+| review:bugs | claude-opus-5-5 | 13 | 7,991 | 26 | 798,780 | 342 |
+| review:measurement | claude-opus-5-5 | 7 | 5,493 | 14 | 290,377 | 87 |
+| machine:node _acceptance/upgrade-design-assembly | claude-haiku-5-5 | 5 | 4,755 | 10 | 142,659 | 239 |
+| machine:node _acceptance/upgrade-design-assembly | claude-haiku-5-5 | 5 | 4,693 | 10 | 142,590 | 267 |
+| machine:DATABASE_URL= make e2e | claude-haiku-5-5 | 4 | 3,878 | 8 | 74,560 | 691 |
+| machine:node --test _acceptance/upgrade-design-a | claude-haiku-5-5 | 3 | 2,463 | 6 | 67,074 | 13 |
+| machine:node _acceptance/upgrade-design-assembly | claude-haiku-5-5 | 3 | 2,335 | 6 | 67,047 | 75 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,333 | 4 | 25,891 | 135 |
+| triage | claude-sonnet-5-5 | 3 | 1,234 | 6 | 66,134 | 11 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 1,020 | 4 | 29,195 | 23 |
+| machine:node _acceptance/upgrade-design-assembly | claude-haiku-5-5 | 2 | 703 | 4 | 29,241 | 6 |
+| machine:node _acceptance/upgrade-design-assembly | claude-haiku-5-5 | 2 | 687 | 4 | 29,240 | 6 |
+| machine:python3 _acceptance/upgrade-design-assem | claude-haiku-5-5 | 2 | 667 | 4 | 29,242 | 6 |
+| machine:node _acceptance/upgrade-design-assembly | claude-haiku-5-5 | 2 | 521 | 4 | 29,240 | 6 |
+| machine:node _acceptance/upgrade-design-assembly | claude-haiku-5-5 | 2 | 520 | 4 | 29,238 | 6 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 369 | 4 | 24,716 | 5 |
+
+
+wall: 2730s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| machine | 14 | 60,429 | 2,253,388 | 2641 | 02:25:36 | 03:09:38 |
+| baseline | 1 | 9,389 | 85,269 | 241 | 02:25:36 | 02:29:38 |
+| review | 3 | 23,997 | 2,631,313 | 345 | 02:25:44 | 02:31:29 |
+| triage | 1 | 1,234 | 66,134 | 11 | 03:09:38 | 03:09:49 |
+| capture | 1 | 369 | 24,716 | 5 | 03:09:49 | 03:09:54 |
+| synthesize | 1 | 9,884 | 213,542 | 72 | 03:09:54 | 03:11:06 |
+
+- **claude-haiku-5-5**: 14 agent · 69 calls · out 60,429 · in 138 · cache_read 2,253,388 · cache_create 517,741
+- **claude-opus-5-5**: 3 agent · 43 calls · out 23,997 · in 86 · cache_read 2,631,313 · cache_create 243,609
+- **claude-sonnet-5-5**: 4 agent · 13 calls · out 20,876 · in 26 · cache_read 389,661 · cache_create 187,448
+
