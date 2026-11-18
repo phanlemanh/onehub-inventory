@@ -18,11 +18,11 @@ tên chợ cũ: acceptance-gate, feature-loop, diagram-design, dieu-phoi, road-m
 
 Đo trước khi tin (18/11, cây chưa commit):
 
-| Cây | Plugin kit nạp | `acceptance-gate:cat-luot` |
-| --- | --- | --- |
-| `origin/main` chưa sửa | 9 bản: ba plugin mỗi cái hai bản, cộng roadmap, knowledge, dispatch 3.0.0 | có |
-| thêm ba khoá `false` | 6 bản, đều `@delivery-loop` 3.0.0 | không |
-| thêm sáu khoá `false` | 6 bản, đều `@delivery-loop` 3.0.0, không lỗi nạp | không |
+| Cây                    | Plugin kit nạp                                                            | `acceptance-gate:cat-luot` |
+| ---------------------- | ------------------------------------------------------------------------- | -------------------------- |
+| `origin/main` chưa sửa | 9 bản: ba plugin mỗi cái hai bản, cộng roadmap, knowledge, dispatch 3.0.0 | có                         |
+| thêm ba khoá `false`   | 6 bản, đều `@delivery-loop` 3.0.0                                         | không                      |
+| thêm sáu khoá `false`  | 6 bản, đều `@delivery-loop` 3.0.0, không lỗi nạp                          | không                      |
 
 Dòng `false` ở mức kho thắng dòng `true` ở mức người dùng. Không đụng cài đặt mức người dùng của máy.
 

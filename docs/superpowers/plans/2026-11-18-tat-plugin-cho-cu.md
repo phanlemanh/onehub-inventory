@@ -31,10 +31,12 @@
 ### Task 1: settings keys and their measure (E1)
 
 **Files:**
+
 - Modify: `.claude/settings.json` (`enabledPlugins`: six new `false` keys)
 - Create: `_acceptance/tat-plugin-cho-cu/rang/matrix.mjs`, `rang/kit.mjs`, `rang/settings.mjs`, `rang/two-way.mjs`
 
 **Interfaces:**
+
 - Produces: `matrix.mjs` exports `OLD_MARKET` (string), `OLD_PLUGINS` (the six names, sorted), `NEW_MARKET = "delivery-loop"`, `NEW_PLUGINS` (six names), `NEW_VERSION = "3.0.0"`, `KIT_NAMES` (nine names of AC-3).
 - Produces: `kit.mjs` exports `repoRoot(): string`, `mergeBase(root): string` (`git merge-base HEAD origin/main`), `withWorktree(rev, fn): Promise<any>` (temp detached worktree in `os.tmpdir()`, removed in `finally`), `cli(measure)` (prints `line`, exits 0 if `ok`, else `code ?? 1`).
 - Produces: `settings.mjs` exports `judge(head, base): {ok, line}` and `measure({root}): Promise<{ok,line}>`.
@@ -48,10 +50,12 @@
 ### Task 2: session measure and positive control (E2, E3)
 
 **Files:**
+
 - Create: `rang/phien.mjs`, `rang/init-merge-base.json`, `rang/init-head.json`
 - Modify: `rang/two-way.mjs`
 
 **Interfaces:**
+
 - Consumes: Task 1 `matrix.mjs`, `kit.mjs`.
 - Produces: `phien.mjs` exports `probe(cwd): Promise<Init>` (`Init = {plugins:[{name,source,version}], slash_commands:string[]}`), `judge(init): {ok,line}`, `precondition(): {ok,line,code}` (reads user settings; no old key `true` → `code: 3`, pinned message), `measure()` (HEAD, cwd = repo root), `control()` (merge-base worktree; ok iff `judge` is red with a line starting `phien: two versions of` and `cat-luot` is present). CLI: no flag → `measure`; `--doi-chung` → `control`; `--ghi` → write both fixtures (trimmed `Init`).
 
@@ -64,10 +68,12 @@
 ### Task 3: old-name sweep relation (E4)
 
 **Files:**
+
 - Create: `rang/quet-ten-cu.mjs`
 - Modify: `rang/two-way.mjs`
 
 **Interfaces:**
+
 - Consumes: `sweep(root)` from `_acceptance/nang-kit-3-0/rang/leftover.mjs`; Task 1 `withWorktree`, `OLD_PLUGINS`.
 - Produces: `quet-ten-cu.mjs` exports `judge(lines): {ok,line}`, `measure({root})`.
 
@@ -80,6 +86,7 @@
 ### Task 4: wire executors, log line, full check (E5, E6, E7)
 
 **Files:**
+
 - Modify: `_acceptance/config.yaml` (`executors.script`: `tpc_settings`, `tpc_phien`, `tpc_doi_chung`, `tpc_quet_ten_cu`, `tpc_two_way`), `wiki/log.md` (one line, no old marketplace name)
 
 - [ ] Step 1: add the five executors (`node _acceptance/tat-plugin-cho-cu/rang/<file>`; `tpc_doi_chung` adds `--doi-chung`; `tpc_two_way` is `node --test …/two-way.mjs`).
@@ -89,9 +96,9 @@
 
 All four tasks: `independent: false` (Tasks 2–4 consume Task 1's `matrix.mjs` and `kit.mjs`, and all append to `two-way.mjs`). Executed in order in the main loop.
 
-| Task | Evals served | Verify |
-| --- | --- | --- |
-| 1 | E1, part of E7 | `node rang/settings.mjs`; two-way E1 tests |
-| 2 | E2, E3, part of E7 | `node rang/phien.mjs`; `--doi-chung`; two-way |
-| 3 | E4, part of E7 | `node rang/quet-ten-cu.mjs`; two-way |
-| 4 | E5, E6, E7 | `make check`; `nk30_settings`; two-way `pass 11` |
+| Task | Evals served       | Verify                                           |
+| ---- | ------------------ | ------------------------------------------------ |
+| 1    | E1, part of E7     | `node rang/settings.mjs`; two-way E1 tests       |
+| 2    | E2, E3, part of E7 | `node rang/phien.mjs`; `--doi-chung`; two-way    |
+| 3    | E4, part of E7     | `node rang/quet-ten-cu.mjs`; two-way             |
+| 4    | E5, E6, E7         | `make check`; `nk30_settings`; two-way `pass 11` |

@@ -35,7 +35,9 @@ export function probe(cwd) {
     const stop = () => {
       try {
         process.kill(-child.pid, "SIGTERM");
-      } catch {}
+      } catch {
+        // The session already exited: nothing left to stop.
+      }
     };
     const timer = setTimeout(() => {
       stop();
@@ -106,7 +108,9 @@ export function precondition(home = homedir()) {
   let on = {};
   try {
     on = JSON.parse(readFileSync(join(home, ".claude/settings.json"), "utf8")).enabledPlugins ?? {};
-  } catch {}
+  } catch {
+    // No readable user settings: nothing is on at user level, so the precondition fails below.
+  }
   if (Object.entries(on).some(([k, v]) => k.endsWith(`@${OLD_MARKET}`) && v === true)) return { ok: true };
   return { ok: false, code: 3, line: "phien: cannot run the control — no old-marketplace plugin is on at user level" };
 }
