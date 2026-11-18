@@ -33,6 +33,7 @@ executors:
     cau_hinh_ban_that: "npx vitest run src/modules/identity/config.test.ts src/modules/identity/config-ban-that.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): start-up configuration matrix of a real build
     van_hanh: "npx vitest run tests/van-hanh.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): runbook procedures, make targets and variables it names exist
     khoa_bi_mat: "npx vitest run tests/khong-khoa-bi-mat.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): no secret pattern in a tracked file, .env.example lists the new variables
+    nk30_kit_root: "npx vitest run tests/kit-root.test.ts --coverage.enabled=false --reporter=verbose"   # nang-kit-3-0: kit-root reads only the delivery-loop install
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
@@ -136,6 +137,15 @@ executors:
     da070_shallow_check: "node _acceptance/upgrade-design-assembly-0-7-0/rang/shallow-check.mjs"   # upgrade-design-assembly-0-7-0: make check green on a depth-1 clone of HEAD with origin, every derived file drawn, none tracked
     da070_two_way: "node --test _acceptance/upgrade-design-assembly-0-7-0/rang/measures-two-way.mjs"   # upgrade-design-assembly-0-7-0: each measure green as it is, red with its pinned message on a broken copy
     da070_shallow_two_way: "node --test _acceptance/upgrade-design-assembly-0-7-0/rang/shallow-two-way.mjs"   # upgrade-design-assembly-0-7-0: the shallow-clone measure red with its pinned lines on the old layout
+    nk30_ci_kit: "node _acceptance/nang-kit-3-0/rang/ci-kit.mjs"   # nang-kit-3-0: the CI gate job fetches delivery-loop v3.0.0 with the core at plugins/acceptance-gate
+    nk30_gate_branch: "node _acceptance/nang-kit-3-0/rang/gate-branch.mjs"   # nang-kit-3-0: kit 3.0 gate on the branch stops it only for this record's lifecycle reasons (--signed: none)
+    nk30_gate_control: "node _acceptance/nang-kit-3-0/rang/gate-control.mjs"   # nang-kit-3-0: kit 2.38.1 and 3.0.0 recheck every record alike at 8925e8ff and the merge-base
+    nk30_product_map: "node _acceptance/nang-kit-3-0/rang/product-map.mjs"   # nang-kit-3-0: kit 3.0 product-map --check, and the four kit-root executors find their scripts
+    nk30_kit_root_cli: "node _acceptance/nang-kit-3-0/rang/kit-root-cli.mjs"   # nang-kit-3-0: node tools/kit-root.mjs on real registry files
+    nk30_settings: "node _acceptance/nang-kit-3-0/rang/settings.mjs"   # nang-kit-3-0: the session marketplace is the kit's own, pinned to the CI tag, six plugins on
+    nk30_doc_commands: "node _acceptance/nang-kit-3-0/rang/doc-commands.mjs"   # nang-kit-3-0: every command and kit path the living docs name exists in kit 3.0
+    nk30_leftover: "node _acceptance/nang-kit-3-0/rang/leftover.mjs"   # nang-kit-3-0: no old kit name in living files; 14 lines in 5 files at 8925e8ff
+    nk30_two_way: "node --test _acceptance/nang-kit-3-0/rang/two-way.mjs"   # nang-kit-3-0: each measure green as it is, red with its pinned message on a broken copy
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
@@ -205,7 +215,7 @@ dev_server:
 capture:
   ui: "npx playwright screenshot"   # <url> <out.png>, for the Gate 2 slideshow
 dieu_phoi:
-  goi_dot: docs/plan/dot-{ten}   # batch package; open with /dieu-phoi:mo-dot <name>
+  goi_dot: docs/plan/dot-{ten}   # batch package; open with /dispatch:open <name>
 tri_thuc:
   noi: docs/tri-thuc   # in this repo; public since 2026-11-10 and the owner chose to keep raw sources here
 lo_trinh:

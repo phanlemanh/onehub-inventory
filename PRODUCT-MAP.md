@@ -36,7 +36,7 @@ flowchart TD
 
 ## Đang làm
 
-- Nâng kit nghiệm thu của kho từ v2.38.1 (acceptance-gate-kit) lên v3.0.0 của kho mới delivery-loop — CI kéo kit 3.0 theo thẻ, phiên Claude Code bật chợ mới, kit-root chỉ đọc bản cài của chợ mới (`nang-kit-3-0`)
+- Nâng kit nghiệm thu của kho từ v2.38.1 lên v3.0.0 của kho mới delivery-loop — CI kéo kit 3.0 theo thẻ, phiên Claude Code bật chợ mới, kit-root chỉ đọc bản cài của chợ mới (`nang-kit-3-0`)
 
 ## Đã giao — chờ phiên nghiệm thu
 

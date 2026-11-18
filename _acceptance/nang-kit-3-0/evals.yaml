@@ -24,7 +24,7 @@ evals:
     long_running: 5
     layer: backend-effect
     paths: ["**"]
-    expected: "exit 0; dòng 'gate-branch: kit v3.0.0 ran its rules on HEAD against origin/main; <n> VIOLATION lines, each the T3 signature rule on nang-kit-3-0' với n là 0 hoặc 1, và đầu ra của cổng có dòng 'pre-merge-check: rules ran='. Chiều đỏ (two-way): (a) worktree 8925e8ff + đúng hunk .claude/settings.json, không hồ sơ: 'gate-branch: VIOLATION outside the T3 signature rule on nang-kit-3-0'; (b) worktree HEAD với evals.yaml của hồ sơ này mất trường criterion ở E1: cùng thông điệp. Lượt S5 sau chữ ký: cùng lệnh với cờ --signed đòi n = 0, đỏ là 'gate-branch: --signed wants 0 VIOLATION, got <n>'"
+    expected: "exit 0; dòng 'gate-branch: kit v3.0.0 ran its rules on HEAD against origin/main; <n> VIOLATION lines, each a lifecycle reason of nang-kit-3-0 (no evidence report yet, or T3 not signed yet)' với n là 0 hoặc 1, và đầu ra của cổng có dòng 'pre-merge-check: rules ran='. Chiều đỏ (two-way): (a) worktree 8925e8ff + đúng hunk .claude/settings.json, không hồ sơ: 'gate-branch: VIOLATION outside the lifecycle reasons of nang-kit-3-0'; (b) worktree HEAD với contract của hồ sơ này khai risk_tier: T1 (hạng thấp trên đường T3): cùng thông điệp. Lượt S5 sau chữ ký: cùng lệnh với cờ --signed đòi n = 0, đỏ là 'gate-branch: --signed wants 0 VIOLATION, got <n>'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E3
     criterion: AC-3
@@ -81,7 +81,7 @@ evals:
     cmd: config:executors.script.nk30_leftover
     layer: backend-effect
     paths: ["**"]
-    expected: "exit 0; dòng 'leftover: 0 lines at HEAD; 15 lines in 6 files at 8925e8ff' (danh sách loại đúng như AC-8). Chiều đỏ (two-way, cây HEAD thêm một dòng '/dieu-phoi:mo-dot' vào một tệp sống): 'leftover: 1 lines at HEAD'"
+    expected: "exit 0; dòng 'leftover: 0 lines at HEAD; 14 lines in 5 files at 8925e8ff' (danh sách loại đúng như AC-8). Chiều đỏ (two-way, cây HEAD thêm một dòng '/dieu-phoi:mo-dot' vào một tệp sống): 'leftover: 1 lines at HEAD'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E10
     criterion: AC-9

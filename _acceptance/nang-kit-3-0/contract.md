@@ -1,6 +1,6 @@
 ---
 schema_version: 1
-feature: Nâng kit nghiệm thu của kho từ v2.38.1 (acceptance-gate-kit) lên v3.0.0 của kho mới delivery-loop — CI kéo kit 3.0 theo thẻ, phiên Claude Code bật chợ mới, kit-root chỉ đọc bản cài của chợ mới
+feature: Nâng kit nghiệm thu của kho từ v2.38.1 lên v3.0.0 của kho mới delivery-loop — CI kéo kit 3.0 theo thẻ, phiên Claude Code bật chợ mới, kit-root chỉ đọc bản cài của chợ mới
 slug: nang-kit-3-0
 owner: phanlemanh@gmail.com
 risk_tier: T3
@@ -32,9 +32,10 @@ delivery-loop; CHANGELOG 3.0.0 và `migration/chay-thu-phien/bang-ten.json` củ
   `scripts/product-map.mjs`; ngoài ba dòng ấy việc `gate` không đổi so với `origin/main`.
 - AC-2: Given kit 3.0 kéo theo thẻ (gốc `plugins/acceptance-gate`) và nhánh ở HEAD, When chạy
   `pre-merge-check.sh . --base origin/main` như CI chạy, Then đầu ra có dòng `pre-merge-check: rules ran=`, và dòng
-  `VIOLATION` nếu có thì chỉ đúng một dòng, gọi tên hồ sơ `nang-kit-3-0` với lý do của luật chữ ký T3 (`hạng T3 chưa có chữ
-  ký người — code t3_paths phải có người ký`); mọi dòng `VIOLATION` khác — kể cả dòng gọi tên hồ sơ này với lý do khác — là
-  đỏ. Phần «sau chữ ký, cùng lệnh 0 `VIOLATION`» đo ở S5 trước khi trình PR (Known limit 2).
+  `VIOLATION` nếu có thì chỉ đúng một dòng, gọi tên hồ sơ `nang-kit-3-0` với một trong hai lý do vòng đời của chính hồ sơ
+  này — `status=implemented but no evidence-report.md` (lúc chấm, báo cáo chưa ghi) hoặc `hạng T3 chưa có chữ ký người —
+  code t3_paths phải có người ký` (đã chấm, chưa ký); mọi dòng `VIOLATION` khác — kể cả dòng gọi tên hồ sơ này với lý do
+  khác — là đỏ. Phần «sau chữ ký, cùng lệnh 0 `VIOLATION`» đo ở S5 trước khi trình PR (Known limit 2).
 - AC-3: Given hai worktree tạm — `8925e8ff` (mốc diễn tập) và `git merge-base HEAD origin/main` tính lúc chấm — When chạy
   cổng trước-gộp với `--recheck-all` trên mỗi worktree bằng kit `v2.38.1` (`phanlemanh/acceptance-gate-kit`) và bằng kit
   `v3.0.0`, Then cả bốn lượt 0 dòng `VIOLATION`, và trên mỗi worktree hai bản kit OK cùng một tập hồ sơ (số không ghim; diễn
@@ -61,9 +62,10 @@ delivery-loop; CHANGELOG 3.0.0 và `migration/chay-thu-phien/bang-ten.json` củ
   `@`, hay sau `/` và trước `:` (lệnh); `road-map`/`dieu-phoi` giữa hai dấu `/` (đường); hoặc ba tên ấy đứng riêng trong dấu
   backtick — ở mọi tệp theo dõi trừ đúng danh sách loại: `_acceptance/**` (riêng `_acceptance/config.yaml` có quét),
   `wiki/decisions/**`, `docs/tri-thuc/raw/**`, `docs/superpowers/specs/2026-11-18-nang-kit-3-0-design.md`,
-  `docs/superpowers/plans/2026-11-18-nang-kit-3-0.md`, Then không còn dòng nào; cùng phép quét trên `8925e8ff` (mốc cố
-  định) ra đúng 15 dòng ở 6 tệp (`.claude/settings.json`, `ci.yml`, `docs/plan/dot-nen/README.md`,
-  `docs/tri-thuc/TRI-THUC.md`, `tools/kit-root.mjs`, `_acceptance/config.yaml`). Tiền tố tin commit `tri-thuc: ` của
+  `docs/superpowers/plans/2026-11-18-nang-kit-3-0.md`, và hai tệp gọi tên khoá cũ để chối nó (`tools/kit-root.mjs`,
+  `tests/kit-root.test.ts` — hành vi chối do AC-5 canh), Then không còn dòng nào; cùng phép quét trên `8925e8ff` (mốc cố
+  định) ra đúng 14 dòng ở 5 tệp (`.claude/settings.json`, `ci.yml`, `docs/plan/dot-nen/README.md`,
+  `docs/tri-thuc/TRI-THUC.md`, `_acceptance/config.yaml`). Tiền tố tin commit `tri-thuc: ` của
   `tools/commit_msg.py` không thuộc phép quét: kit 3.0 vẫn tự commit trang tri thức bằng nó.
 - AC-9: Given nhánh ở HEAD, When chạy `make check`, Then lệnh thoát 0 (bộ kiểm đơn vị, `tsc --noEmit`, lint không đỏ thêm
   so với `origin/main`).
