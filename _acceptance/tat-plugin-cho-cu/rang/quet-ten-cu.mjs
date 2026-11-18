@@ -8,7 +8,9 @@ import { OLD_MARKET, OLD_PLUGINS } from "./matrix.mjs";
 
 const SETTINGS = ".claude/settings.json";
 const LINE = /^([^:]+):(\d+):(.*)$/;
-const FALSE_KEY = new RegExp(`^\\s*"([a-z-]+)@${OLD_MARKET.replace(/-/g, "\\-")}": false,?\\s*$`);
+// Escapes every regular-expression metacharacter, backslash included.
+const escapeRegExp = (s) => s.replace(/[\\^$.*+?()[\]{}|-]/g, "\\$&");
+const FALSE_KEY = new RegExp(`^\\s*"([a-z-]+)@${escapeRegExp(OLD_MARKET)}": false,?\\s*$`);
 
 export function judge(lines) {
   const keys = [];
