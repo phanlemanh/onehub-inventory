@@ -52,11 +52,11 @@ sửa design doc cũ nhắc tên đợt `dieu-phoi-nen` (tên đợt, không ph�
 
 ## Các cách làm
 
-| Cách | Làm gì | Được | Mất |
-|---|---|---|---|
-| **A — chọn** | Áp lại bản vá diễn tập lên đầu `origin/main`, dọn thêm hai chỗ gọi lệnh cũ; `kit-root` chỉ đọc khoá mới; chợ ghim `ref` bằng `KIT_TAG` | Một bản kit — cùng thẻ — trên cả máy và CI; bản vá đã đo không làm hồ sơ nào đỏ | Máy chưa cài chợ mới mất kit cho tới khi cài (Hỏi-2) |
-| B | Như A nhưng `kit-root` đọc lùi khoá cũ khi không thấy khoá mới | Máy chưa cài vẫn chạy | Máy chạy lõi 2.38 trong khi CI chạy 3.0, không tiếng báo — đúng kiểu thất bại phải tránh |
-| C | Chỉ đổi `ci.yml`, để settings và `kit-root` tới khi cài chợ | Không đụng đường T3 | Máy và CI chạy hai bản kit; mốc chưa «được nhận» trọn |
+| Cách         | Làm gì                                                                                                                                 | Được                                                                            | Mất                                                                                      |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| **A — chọn** | Áp lại bản vá diễn tập lên đầu `origin/main`, dọn thêm hai chỗ gọi lệnh cũ; `kit-root` chỉ đọc khoá mới; chợ ghim `ref` bằng `KIT_TAG` | Một bản kit — cùng thẻ — trên cả máy và CI; bản vá đã đo không làm hồ sơ nào đỏ | Máy chưa cài chợ mới mất kit cho tới khi cài (Hỏi-2)                                     |
+| B            | Như A nhưng `kit-root` đọc lùi khoá cũ khi không thấy khoá mới                                                                         | Máy chưa cài vẫn chạy                                                           | Máy chạy lõi 2.38 trong khi CI chạy 3.0, không tiếng báo — đúng kiểu thất bại phải tránh |
+| C            | Chỉ đổi `ci.yml`, để settings và `kit-root` tới khi cài chợ                                                                            | Không đụng đường T3                                                             | Máy và CI chạy hai bản kit; mốc chưa «được nhận» trọn                                    |
 
 Chọn A. B và C chết vì cùng một lý do: hai bản kit chấm một kho.
 
