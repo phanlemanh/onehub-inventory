@@ -152,9 +152,11 @@ jobs:
           path: .heavy-ok
           key: ${{ steps.key.outputs.key }}
 
-  # The one check that stands for every tier: green only when each one above is "success".
+  # The one check that stands for the tiers it waits for: green only when each is "success".
+  # e2e-db is not one of them (owner, 2026-11-18): it runs and reports, as before, but a slow
+  # run that reaches its 40-minute ceiling does not hold a merge.
   check:
-    needs: [quick, e2e, e2e-db]
+    needs: [quick, e2e]
     if: always()
     runs-on: ubuntu-latest
     steps:

@@ -1,8 +1,8 @@
 // Row 1s (_acceptance/ci-co-postgres, AC-9, E9): the workflow patch the owner allowed to apply. It only adds lines, its
 // job runs in the workflow with the agreed service, ceiling and steps, and db/scripts/ci-thu.sh reads its values from this
 // very file. Since repo-setup 0.9.0 (tiered CI) the workflow is laid out again, so the patch no longer applies to it as a
-// diff: what the patch agreed is checked on the job itself, and the job sits in the heavy tier, behind `quick`, with
-// `check` waiting for it.
+// diff: what the patch agreed is checked on the job itself, and the job sits in the heavy tier, behind `quick`. `check`
+// does not wait for it (owner, 2026-11-18): a run that reaches its ceiling does not hold a merge.
 import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -103,13 +103,13 @@ describe("ban va workflow (AC-9)", () => {
     expect(body.filter((l) => l.startsWith("+")).length).toBeGreaterThan(10);
   });
 
-  it("job e2e-db o tang nang: sau quick, bo qua o ban nhap, va o tong check cho no", () => {
+  it("job e2e-db o tang nang: sau quick, bo qua o ban nhap; o tong check khong cho no (chu kho quyet)", () => {
     const block = job(workflow, "e2e-db");
     expect(block).toMatch(/^ {4}needs: quick$/m);
     expect(block).toMatch(
       /^ {4}if: github\.event_name != 'pull_request' \|\| !github\.event\.pull_request\.draft$/m,
     );
-    expect(job(workflow, "check")).toMatch(/^ {4}needs: \[quick, e2e, e2e-db\]$/m);
+    expect(job(workflow, "check")).toMatch(/^ {4}needs: \[quick, e2e\]$/m);
   });
 
   it("job e2e-db: cac buoc da chot theo dung thu tu, checkout van nong", () => {
