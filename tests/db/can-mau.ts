@@ -57,3 +57,63 @@ export async function seedSampleInventory(
   for (const s of statements) await owner.query(s.text, s.values);
   return { idOf, count: data.current.length };
 }
+
+const DEV_ROLES = ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"];
+
+interface OwnerClient {
+  query<R = Record<string, unknown>>(text: string, values?: unknown[]): Promise<{ rows: R[] }>;
+}
+
+/**
+ * Fills a developer's own database (one already migrated, e.g. after `make db-up`) with the sample inventory, in one
+ * transaction: the company named `companyName` and the person `email` are made when missing — the person holding all
+ * four roles there — then every sample listing, the person keeping the ones the sample gives «the person viewing».
+ * Refuses when the company already has listings, so running it twice never doubles the rows. Test data only.
+ */
+export async function loadDevSample(
+  owner: OwnerClient,
+  opts: { companyName: string; email: string; personName: string },
+): Promise<{ companyId: string; count: number }> {
+  await owner.query("begin");
+  try {
+    const companyId =
+      (
+        await owner.query<{ id: string }>("select id from companies where name = $1", [
+          opts.companyName,
+        ])
+      ).rows[0]?.id ??
+      (
+        await owner.query<{ id: string }>("insert into companies (name) values ($1) returning id", [
+          opts.companyName,
+        ])
+      ).rows[0]!.id;
+    const existing = Number(
+      (
+        await owner.query<{ n: string }>(
+          "select count(*) as n from listings where company_id = $1",
+          [companyId],
+        )
+      ).rows[0]!.n,
+    );
+    if (existing > 0)
+      throw new Error(
+        `${opts.companyName} already has ${existing} listings — not loading the sample twice`,
+      );
+    const user = (
+      await owner.query<{ id: string; name: string }>(
+        "insert into identity.users (email, name) values ($1, $2) on conflict (email) do update set email = excluded.email returning id, name",
+        [opts.email, opts.personName],
+      )
+    ).rows[0]!;
+    await owner.query(
+      "insert into company_members (company_id, user_id, name, roles) values ($1, $2, $3, $4) on conflict do nothing",
+      [companyId, user.id, user.name, DEV_ROLES],
+    );
+    const { count } = await seedSampleInventory(owner, companyId, user);
+    await owner.query("commit");
+    return { companyId, count };
+  } catch (err) {
+    await owner.query("rollback");
+    throw err;
+  }
+}
