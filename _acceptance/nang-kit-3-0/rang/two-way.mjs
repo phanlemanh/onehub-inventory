@@ -2,7 +2,7 @@
 // broken in exactly what the measure guards. Messages are the ones pinned in evals.yaml.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { after, test } from "node:test";
@@ -38,8 +38,13 @@ function tempRoot(files) {
   return dir;
 }
 
+// Worktrees this run made; the after hook checks only these, never other runs' worktrees on the machine.
+const mine = new Set();
+
 function withWorktree(rev, fn) {
   const wt = worktree(rev);
+  mine.add(wt.dir);
+  mine.add(realpathSync(wt.dir));
   return Promise.resolve()
     .then(() => fn(wt.dir))
     .finally(() => wt.remove());
@@ -54,7 +59,12 @@ function redWith(r, prefix) {
 }
 
 after(() => {
-  const left = git(ROOT, "worktree", "list").split("\n").filter((l) => l.includes("nk30-wt-"));
+  const listed = git(ROOT, "worktree", "list", "--porcelain")
+    .split("\n")
+    .filter((l) => l.startsWith("worktree "))
+    .map((l) => l.slice("worktree ".length));
+  const left = listed.filter((d) => mine.has(d));
+  assert.ok(mine.size > 0, "fixture: this run made no temp worktree");
   assert.deepEqual(left, [], "temp worktrees left behind");
 });
 
