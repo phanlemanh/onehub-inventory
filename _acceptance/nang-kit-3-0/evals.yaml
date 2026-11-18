@@ -24,7 +24,7 @@ evals:
     long_running: 5
     layer: backend-effect
     paths: ["**"]
-    expected: "exit 0; dòng 'gate-branch: kit v3.0.0 ran its rules on HEAD against origin/main; <n> VIOLATION lines, each a lifecycle reason of nang-kit-3-0 (not graded yet, graded but not PASS, or T3 not signed yet)' với n là 0 hoặc 1, và đầu ra của cổng có dòng 'pre-merge-check: rules ran='. Chiều đỏ (two-way): (a) worktree 8925e8ff + đúng hunk .claude/settings.json, không hồ sơ: 'gate-branch: VIOLATION outside the lifecycle reasons of nang-kit-3-0'; (b) worktree HEAD với contract của hồ sơ này khai risk_tier: T1 (hạng thấp trên đường T3): cùng thông điệp. Cả ba lý do có nguyên văn trong pre-merge-check.sh của kit 3.0 (two-way: 'gate-branch: lifecycle reason not written by kit 3.0'). Lượt S5 sau chữ ký: cùng lệnh với cờ --signed đòi n = 0, đỏ là 'gate-branch: --signed wants 0 VIOLATION, got <n>'"
+    expected: "exit 0; dòng 'gate-branch: kit v3.0.0 ran its rules on HEAD against origin/main; <n> VIOLATION lines, all naming nang-kit-3-0', và đầu ra của cổng có dòng 'pre-merge-check: rules ran='. Chiều đỏ (two-way): (a) worktree 8925e8ff + đúng hunk .claude/settings.json, không hồ sơ: 'gate-branch: VIOLATION not naming nang-kit-3-0'; (b) đầu ra thật của cổng trên HEAD (hồ sơ chưa ký) qua --signed: 'gate-branch: --signed wants 0 VIOLATION, got 1'. Lượt S5 sau chữ ký: cùng lệnh với cờ --signed đòi n = 0"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E3
     criterion: AC-3
@@ -99,5 +99,5 @@ evals:
     long_running: 15
     layer: backend-effect
     paths: ["_acceptance/nang-kit-3-0/rang/**", "tools/kit-root.mjs", ".claude/settings.json", ".github/workflows/ci.yml", "docs/**"]
-    expected: "exit 0; node --test in 'pass 14' và 'fail 0': với mỗi chiều đỏ kê ở expected của E1–E4, E6–E9 một bài «xanh trên vật lành, đỏ trên bản phá với đúng thông điệp ghim» (E2 hai bài, E4 hai bài, E7 ba bài), cộng bài 'kit-root red: installEntries is not exported by the old kit-root' và bài ba lý do vòng đời của E2 có nguyên văn trong cổng kit 3.0"
+    expected: "exit 0; node --test in 'pass 13' và 'fail 0': với mỗi chiều đỏ kê ở expected của E1–E4, E6–E9 một bài «xanh trên vật lành, đỏ trên bản phá với đúng thông điệp ghim» (E2 hai bài, E4 hai bài, E7 ba bài), cộng bài 'kit-root red: installEntries is not exported by the old kit-root'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

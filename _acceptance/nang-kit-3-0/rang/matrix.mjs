@@ -34,24 +34,8 @@ export const CI_CHANGED_LINES = 3;
 export const CI_PLUGIN_ROOT_SUFFIX = "/plugins/acceptance-gate";
 export const CI_CORE_FILES = ["scripts/pre-merge-check.sh", "scripts/product-map.mjs"];
 
-// Before the record is signed the gate stops it for one of its own lifecycle reasons, and only those:
-// graded not yet, graded but not PASS (an earlier round's report), PASS but not signed. Each pattern is
-// matched against the reason text; `source` is the line of kit 3.0's pre-merge-check.sh that writes it
-// (two-way.mjs checks every source is there, verbatim).
-export const LIFECYCLE_REASONS = [
-  {
-    re: /^status=implemented but no evidence-report\.md$/,
-    source: 'echo "VIOLATION [$slug]: status=$status but no evidence-report.md"',
-  },
-  {
-    re: /^verdict=(REJECT|BLOCKED|PENDING-JUDGMENT) \(must be PASS to merge\)$/,
-    source: 'echo "VIOLATION [$slug]: verdict=$verdict (must be PASS to merge)"',
-  },
-  {
-    re: /hạng T3 chưa có chữ ký người — code t3_paths phải có người ký/,
-    source: 'ly="hạng $t chưa có chữ ký người — code t3_paths phải có người ký"',
-  },
-];
+// Before the record is signed, every stop of the gate names this record (AC-2 after the scope cut of
+// 2026-11-18: which of the record's own reasons is not measured here; --signed at S5 wants none at all).
 
 // Executor commands of _acceptance/config.yaml that join a script to the kit root.
 export const KIT_EXECUTORS = ["script.product_map", "design.floor", "design.khuon", "design.ui_check"];

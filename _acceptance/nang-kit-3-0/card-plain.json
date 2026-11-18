@@ -7,7 +7,7 @@
     },
     {
       "id": "AC-2",
-      "p": "Sẽ để cổng trước-gộp của kit 3.0 cho nhánh này qua — trước chữ ký chỉ còn đúng một lời chặn «chưa có chữ ký người» của chính việc này, sau chữ ký không còn lời chặn nào."
+      "p": "Sẽ để cổng trước-gộp của kit 3.0 chạy đủ luật trên nhánh và mọi lời chặn trước chữ ký chỉ gọi tên chính việc này; sau chữ ký không còn lời chặn nào (đo ở bước trình PR và bằng CI). Loại lý do của lời chặn trước chữ ký không đo — ghi trong hạn chế đã biết."
     },
     {
       "id": "AC-3",
@@ -31,7 +31,7 @@
     },
     {
       "id": "AC-8",
-      "p": "Sẽ không còn chỗ nào ngoài sử liệu gọi tên kho kit cũ hay lệnh cũ (trên mốc diễn tập có 15 chỗ ở 6 tệp)."
+      "p": "Sẽ không còn chỗ nào ngoài sử liệu gọi tên kho kit cũ hay lệnh cũ (trên mốc diễn tập có 14 chỗ ở 5 tệp; công cụ tìm kit và ca kiểm của nó được gọi tên khoá cũ để chối nó)."
     },
     {
       "id": "AC-9",
@@ -127,6 +127,5 @@
       "i": 4,
       "p": "Mốc so sánh gõ cứng sẽ lệch khi gộp nhánh chính vào. Đã chấm lại hồ sơ cũ ở cả mốc diễn tập lẫn mốc lúc chấm, giữ số đếm tên cũ ở mốc cố định, và kê rõ danh sách tệp loại trừ."
     }
-  ],
-  "analyst_plain": "Hai phép đo (ca kiểm kit-root và make check) xanh cả trên nhánh lẫn trên bản cũ — đó là lưới chống hồi quy có chủ ý, không phải bằng chứng riêng của việc này; bằng chứng riêng nằm ở chín phép đo mới, mỗi phép đã thấy đỏ trên bản phá."
+  ]
 }

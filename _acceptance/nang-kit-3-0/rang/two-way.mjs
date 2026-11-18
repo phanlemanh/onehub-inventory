@@ -11,10 +11,10 @@ import * as ciKit from "./ci-kit.mjs";
 import * as docCommands from "./doc-commands.mjs";
 import * as gateBranch from "./gate-branch.mjs";
 import * as gateControl from "./gate-control.mjs";
-import { commitAll, coreRoot, fetchKit, git, repoRoot, worktree } from "./kit.mjs";
+import { commitAll, coreRoot, fetchKit, git, repoRoot, runGate, worktree } from "./kit.mjs";
 import * as kitRootCli from "./kit-root-cli.mjs";
 import * as leftover from "./leftover.mjs";
-import { BASELINE, DOC_FILES, LIFECYCLE_REASONS, NEW_KIT } from "./matrix.mjs";
+import { BASELINE, DOC_FILES, NEW_KIT } from "./matrix.mjs";
 import * as productMap from "./product-map.mjs";
 import * as settings from "./settings.mjs";
 
@@ -72,25 +72,16 @@ test("E2 gate-branch (a): red on baseline + the settings change without a record
     commitAll(dir, "chore: probe settings without a record");
     redWith(
       await gateBranch.measure({ root: dir, base: BASELINE, save: false }),
-      "gate-branch: VIOLATION outside the lifecycle reasons of nang-kit-3-0",
+      "gate-branch: VIOLATION not naming nang-kit-3-0",
     );
   });
 });
 
-test("E2 gate-branch (b): red on HEAD when this record declares a low tier on T3 paths", async () => {
-  await greenOnce("gate-branch", () => gateBranch.measure({ save: false }));
-  await withWorktree("HEAD", async (dir) => {
-    const p = join(dir, "_acceptance/nang-kit-3-0/contract.md");
-    const text = readFileSync(p, "utf8");
-    const broken = text.replace("risk_tier: T3\n", "risk_tier: T1\n");
-    assert.notEqual(broken, text, "fixture: risk_tier of the contract not found");
-    writeFileSync(p, broken);
-    commitAll(dir, "test: probe a low tier");
-    redWith(
-      await gateBranch.measure({ root: dir, save: false }),
-      "gate-branch: VIOLATION outside the lifecycle reasons of nang-kit-3-0",
-    );
-  });
+test("E2 gate-branch (b): --signed is red on the real gate output while this record is unsigned", async () => {
+  const core = coreRoot(NEW_KIT, fetchKit(NEW_KIT));
+  const { out } = runGate(core, ROOT, ["--base", "origin/main"]);
+  assert.equal(gateBranch.judge(out).ok, true, "fixture: the unsigned gate output is not green without --signed");
+  redWith(gateBranch.judge(out, { signed: true }), "gate-branch: --signed wants 0 VIOLATION, got 1");
 });
 
 test("E3 gate-control: red when one real run loses an OK line", () => {
@@ -183,11 +174,4 @@ test("kit-root red: installEntries is not exported by the old kit-root", async (
   const newMod = await import(join(ROOT, "tools/kit-root.mjs"));
   assert.equal(typeof newMod.installEntries, "function");
   assert.equal(oldMod.installEntries, undefined, "kit-root red: installEntries is not exported by the old kit-root");
-});
-
-test("E2 gate-branch: every lifecycle reason is written, verbatim, by kit 3.0's gate", () => {
-  const gate = readFileSync(join(coreRoot(NEW_KIT, fetchKit(NEW_KIT)), "scripts/pre-merge-check.sh"), "utf8");
-  for (const { source } of LIFECYCLE_REASONS)
-    assert.ok(gate.includes(source), `gate-branch: lifecycle reason not written by kit 3.0: ${source}`);
-  assert.equal(gate.includes('echo "VIOLATION [$slug]: verdict=$verdict (must be PASS to merge)x"'), false);
 });

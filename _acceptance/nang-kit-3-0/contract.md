@@ -5,9 +5,9 @@ slug: nang-kit-3-0
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci, tooling]
-status: implemented
-approved_by: Phan Le Manh
-approved_at: 2026-11-18
+status: draft
+approved_by:
+approved_at:
 design_doc: docs/superpowers/specs/2026-11-18-nang-kit-3-0-design.md
 ---
 
@@ -31,12 +31,10 @@ delivery-loop; CHANGELOG 3.0.0 và `migration/chay-thu-phien/bang-ten.json` củ
   `c16d25db`, và `CLAUDE_PLUGIN_ROOT` trỏ `<kit>/plugins/acceptance-gate` — thư mục có `scripts/pre-merge-check.sh` và
   `scripts/product-map.mjs`; ngoài ba dòng ấy việc `gate` không đổi so với `origin/main`.
 - AC-2: Given kit 3.0 kéo theo thẻ (gốc `plugins/acceptance-gate`) và nhánh ở HEAD, When chạy
-  `pre-merge-check.sh . --base origin/main` như CI chạy, Then đầu ra có dòng `pre-merge-check: rules ran=`, và dòng
-  `VIOLATION` nếu có thì chỉ đúng một dòng, gọi tên hồ sơ `nang-kit-3-0` với một trong ba lý do vòng đời của chính hồ sơ
-  này — `status=implemented but no evidence-report.md` (chưa chấm), `verdict=<REJECT|BLOCKED|PENDING-JUDGMENT> (must be
-  PASS to merge)` (đã chấm, báo cáo vòng trước chưa đạt) hoặc `hạng T3 chưa có chữ ký người — code t3_paths phải có người
-  ký` (đạt, chưa ký) — mỗi câu có nguyên văn trong `pre-merge-check.sh` của kit 3.0; mọi dòng `VIOLATION` khác — kể cả dòng
-  gọi tên hồ sơ này với lý do khác — là đỏ. Phần «sau chữ ký, cùng lệnh 0 `VIOLATION`» đo ở S5 trước khi trình PR (Known limit 2).
+  `pre-merge-check.sh . --base origin/main` như CI chạy, Then đầu ra có dòng `pre-merge-check: rules ran=` và mọi dòng
+  `VIOLATION` (nếu có) đều gọi tên hồ sơ `nang-kit-3-0` — không dòng nào gọi tên tệp hay hồ sơ khác. Lý do của từng dòng
+  không đo ở đây (Known limit 3); phần «sau chữ ký, cùng lệnh 0 `VIOLATION`» đo ở S5 bằng `gate-branch --signed` trước khi
+  trình PR (Known limit 2).
 - AC-3: Given hai worktree tạm — `8925e8ff` (mốc diễn tập) và `git merge-base HEAD origin/main` tính lúc chấm — When chạy
   cổng trước-gộp với `--recheck-all` trên mỗi worktree bằng kit `v2.38.1` (`phanlemanh/acceptance-gate-kit`) và bằng kit
   `v3.0.0`, Then cả bốn lượt 0 dòng `VIOLATION`, và trên mỗi worktree hai bản kit OK cùng một tập hồ sơ (số không ghim; diễn
@@ -102,7 +100,9 @@ Phủ theo tệp chạm và bên đọc của từng tệp; không quét không 
 
 - Known limits (khai trước): (1) phiên nạp đủ 6 plugin của chợ `delivery-loop` chưa đo ở kho này — máy chưa cài chợ mới;
   (2) phần «sau chữ ký, 0 VIOLATION» của AC-2 chỉ đo được sau Cổng Bằng chứng: máy chạy lại `nk30_gate_branch` ở S5,
-  đòi 0 dòng `VIOLATION`, ghi kết quả vào mô tả PR; CI của PR là chốt.
+  đòi 0 dòng `VIOLATION`, ghi kết quả vào mô tả PR; CI của PR là chốt. (3) Thu phạm vi ở trần 3 lượt (chủ kho chọn
+  18/11, dòng sổ «Thu phạm vi AC-2»): trước chữ ký, lượt chấm không đo LÝ DO của các dòng `VIOLATION` gọi tên hồ sơ này —
+  một lỗi thật mà cổng 3.0 bắt trên chính hồ sơ này trước chữ ký chỉ lộ ra ở lượt `--signed` và CI của PR.
 - Phép đo ở `rang/` tự kéo kit theo thẻ vào thư mục tạm ngoài kho; không dựa vào `kit-root` vì máy chưa có chợ mới.
 - Thời điểm gộp đã chốt: sau vòng `upgrade-design-assembly-0-7-1` và PR #83; khi đó `main` đi tiếp thì gộp `main` vào nhánh
   (commit gộp, không rebase) rồi chạy lại cổng.
