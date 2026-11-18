@@ -74,7 +74,7 @@ test("rules-kept: green on a sound copy, red when autonomy.yaml changes one line
   );
 });
 
-test("ci-shape: green on a sound copy; red without needs: quick, with a gate byte changed, and with a verdict that ignores e2e", () => {
+test("ci-shape: green on a sound copy; red without needs: quick, with a gate byte changed, with a verdict that ignores e2e, and when check waits for e2e-db again", () => {
   withCopy(null, (at) => green(measure("ci-shape.mjs", at), "ci-shape"));
   withCopy(
     (at) => {
@@ -94,7 +94,11 @@ test("ci-shape: green on a sound copy; red without needs: quick, with a gate byt
   );
   withCopy(
     (at) => swap(at, "tools/ci_verdict.py", 'if result != "success":', 'if result != "success" and name != "e2e":'),
-    (at) => red(measure("ci-shape.mjs", at), "ci-shape: ci_verdict success/failure/success: exit 0"),
+    (at) => red(measure("ci-shape.mjs", at), "ci-shape: ci_verdict success/failure: exit 0"),
+  );
+  withCopy(
+    (at) => swap(at, ".github/workflows/ci.yml", "needs: [quick, e2e]", "needs: [quick, e2e, e2e-db]"),
+    (at) => red(measure("ci-shape.mjs", at), 'ci-shape: check needs ["quick","e2e","e2e-db"], not ["quick","e2e"]'),
   );
 });
 

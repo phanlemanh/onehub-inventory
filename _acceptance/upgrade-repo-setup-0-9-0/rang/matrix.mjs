@@ -7,6 +7,10 @@ export const PR = 88;
 export const BASE = "bd32d73e7f59ada71ff13185250933783b08334c";
 export const RENAME = "a9acfe7762b42f66b1c36bedf85464332af94e99";
 export const UPGRADE = "fd53ac960bf6bc0247caa0f4b015b52541c00f36";
+// After Gate 1, the owner's answer to Hoi-1 (split): e2e-db out of the needs of check. The first CI run
+// of the decided ci.yml is on this commit.
+export const CI_COMMIT = "0deb79befe9931c6d4ea88969496de2ce012107f";
+export const CI_COMMIT_FILES = [".github/workflows/ci.yml", "tests/ci-yml-patch.test.ts"];
 export const PLUGIN_REPO = "phanlemanh/repo-standards";
 export const PLUGIN_TAG = "repo-setup-v0.9.0";
 
@@ -33,7 +37,8 @@ export const RULESET_CHECKS = ["check", "e2e", "gate"];
 // ci.yml.
 export const JOBS = ["quick", "e2e", "e2e-db", "check", "gate"];
 export const HEAVY = ["e2e", "e2e-db"];
-export const CHECK_NEEDS = ["quick", "e2e", "e2e-db"];
+export const CHECK_NEEDS = ["quick", "e2e"]; // Hoi-1: split, e2e-db does not hold check
+export const REUSED = ["e2e"];
 export const DRAFT_IF = "github.event_name != 'pull_request' || !github.event.pull_request.draft";
 export const STATES = ["success", "skipped", "failure", "cancelled"];
 // What ci_verdict.py prints for a tier that is not success, by its documented rule: a skipped

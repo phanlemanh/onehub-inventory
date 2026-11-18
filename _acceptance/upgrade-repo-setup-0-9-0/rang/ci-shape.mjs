@@ -1,5 +1,5 @@
 // AC-4: the jobs of the tiered ci.yml, the gate job byte for byte, and tools/ci_verdict.py on all
-// 64 combinations of the three tiers it waits for, against the expectation written below from
+// 16 combinations of the two tiers check waits for, against the expectation written below from
 // its documented rule (never from its output).
 // Usage: node ci-shape.mjs [--root <dir>]
 
@@ -66,15 +66,16 @@ try {
   const gateBase = jobText(git(dir, "show", `${BASE}:${WORKFLOW}`), "gate");
   if (!gateNow || gateNow !== gateBase) problems.push(`the gate job differs from ${BASE.slice(0, 8)}`);
 
-  for (const a of STATES) {
-    for (const b of STATES) {
-      for (const c of STATES) {
+  const combinations = CHECK_NEEDS.reduce((acc) => acc.flatMap((c) => STATES.map((s) => [...c, s])), [[]]);
+  for (const states of combinations) {
+    {
+      {
         combos++;
-        const results = { quick: a, e2e: b, "e2e-db": c };
+        const results = Object.fromEntries(CHECK_NEEDS.map((n, i) => [n, states[i]]));
         const needs = Object.fromEntries(Object.entries(results).map(([k, r]) => [k, { result: r }]));
         const got = run("python3", ["tools/ci_verdict.py"], { cwd: dir, env: { ...process.env, NEEDS_JSON: JSON.stringify(needs) } });
         const want = expected(results);
-        const label = `${a}/${b}/${c}`;
+        const label = states.join("/");
         if (got.code !== (want.length === 0 ? 0 : 1)) problems.push(`ci_verdict ${label}: exit ${got.code}`);
         const lines = got.out.trim() ? got.out.trim().split("\n") : [];
         if (lines.length !== want.length) problems.push(`ci_verdict ${label}: ${lines.length} lines, not ${want.length}`);
@@ -93,5 +94,5 @@ try {
 verdict(
   NAME,
   problems,
-  `five jobs ${JOBS.join(", ")}; e2e and e2e-db behind quick, skipped on a draft, one reuse key each; check waits for ${CHECK_NEEDS.join(", ")} and runs ci_verdict.py; gate as at ${BASE.slice(0, 8)}; ci_verdict.py: ${combos} of 64 combinations as written beforehand, 1 exits 0 and 63 exit 1`,
+  `five jobs ${JOBS.join(", ")}; e2e and e2e-db behind quick, skipped on a draft, one reuse key each; check waits for ${CHECK_NEEDS.join(", ")} and runs ci_verdict.py; gate as at ${BASE.slice(0, 8)}; ci_verdict.py: ${combos} of ${STATES.length ** CHECK_NEEDS.length} combinations as written beforehand, 1 exits 0 and ${combos - 1} exit 1`,
 );

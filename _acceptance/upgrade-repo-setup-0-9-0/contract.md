@@ -1,6 +1,6 @@
 ---
 schema_version: 1
-feature: Lên đời bộ setup repo-setup từ 0.4.0 lên 0.9.0, phần máy chạy (CI xếp tầng, sổ ngoài git, đường nâng cấp); luật của kho giữ nguyên, trừ ba điểm chủ kho trả lời ở Gate 1 (Hỏi-1 đến Hỏi-3)
+feature: Lên đời bộ setup repo-setup từ 0.4.0 lên 0.9.0, phần máy chạy (CI xếp tầng, sổ ngoài git, đường nâng cấp); luật của kho giữ nguyên, trừ hai điểm chủ kho đồng ý ở Gate 1 (Hỏi-2, Hỏi-3)
 slug: upgrade-repo-setup-0-9-0
 owner:
 risk_tier: T3
@@ -14,10 +14,11 @@ approved_at: 2026-11-18
 
 ## Context
 
-Thay đổi đã làm sẵn trên nhánh `chore/upgrade-repo-setup-0.9.0`, PR #88, hai commit cắt từ `origin/main` ở `bd32d73e`:
+Thay đổi đã làm sẵn trên nhánh `chore/upgrade-repo-setup-0.9.0`, PR #88, ba commit cắt từ `origin/main` ở `bd32d73e`:
 `a9acfe77` đổi tên `mk/derived.mk` thành `mk/design-role-table.mk` (commit này mang luôn `mk/derived.mk` mới của
 repo-setup, nên đứng riêng không dựng được; cả PR thì dựng được), và `fd53ac96` chạy `apply.py` của tag
-`repo-setup-v0.9.0` (gộp ba chiều từ 0.4.0) rồi gỡ 12 tệp bị đánh dấu. Kho dựng từ 0.4.0 và chưa nâng lần nào; 0.7.0 đến
+`repo-setup-v0.9.0` (gộp ba chiều từ 0.4.0) rồi gỡ 12 tệp bị đánh dấu; `0deb79be`, sau Gate 1, đưa `e2e-db` ra khỏi
+`needs` của `check` theo câu trả lời của chủ kho cho Hỏi-1. Kho dựng từ 0.4.0 và chưa nâng lần nào; 0.7.0 đến
 0.9.0 mang đường nâng cấp, sổ ngoài git và CI xếp tầng. Nhánh đổi `tools/**`, `mk/**`, `Makefile`, `.claude/settings.json`,
 `.gitleaks.toml` và workflow, nên là T3 và cổng trước khi gộp đòi hồ sơ có chữ ký người. Hồ sơ này chấm đúng những gì hai
 commit đã làm.
@@ -31,10 +32,10 @@ một lần chạy thử trên bản sao); CHANGELOG của repo-setup, mục 0.6
 Kế hoạch (mục 8, câu 3 và 4) để ba điểm này cho chủ kho; lời «Làm PR 0 và PR 1» không trả lời riêng từng điểm. Nhánh đã
 làm theo ngả máy khuyên. Mỗi điểm trả lời khác thì nhánh đổi và các tiêu chí ghi bên dưới đổi theo, trước lượt chấm.
 
-- **Hỏi-1 — `e2e-db` chặn gộp.** Hôm nay ruleset không bắt buộc `e2e-db`. Ô `check` mới chờ `quick`, `e2e` và `e2e-db`, nên
-  `e2e-db` đỏ sẽ chặn gộp qua `check`. Đó là siết luật. Máy khuyên **đồng ý**: bài cách ly dữ liệu nằm ở `e2e-db`, và
-  lượt `main` gần nhất xanh cả bốn job. Nếu **tách**: `check` chỉ chờ `quick` và `e2e`; AC-4 và AC-8 bỏ vế `e2e-db` trong
-  `needs` của `check`.
+- **Hỏi-1 — `e2e-db` chặn gộp.** Đã trả lời: **tách** (chủ kho, 2026-11-18, sau lượt đầu của PR #88). Lúc duyệt, máy
+  khuyên đồng ý dựa trên một lượt `main` xanh; lượt đầu của PR thấy `e2e-db` chạm trần 40 phút, và trên `main` 2 trong 4 lượt
+  gần nhất cũng chạm trần. `check` nay chờ `quick` và `e2e`; `e2e-db` chạy và báo như hôm nay, không chặn gộp. Dòng sổ
+  `revisit` ghi lời chủ kho.
 - **Hỏi-2 — mục miễn trong `.gitleaks.toml`** (tệp hạng cao, nó có thể che bí mật thật). Mục miễn hẹp: chỉ giá trị 64 ký tự
   hex, chỉ trong `_acceptance/*/s4-args*.json`. Máy khuyên **đồng ý**: không có nó, `secret-scan` mới đỏ trên mọi PR vì 12
   báo nhầm. Nếu **không**: bỏ mục miễn, `secret-scan` đỏ tới khi có cách khác (vd. `.gitleaksignore` theo vân tay), AC-6
@@ -62,18 +63,18 @@ làm theo ngả máy khuyên. Mỗi điểm trả lời khác thì nhánh đổi
   đúng `check`, `e2e`, `gate` với `strict` tắt.
 - AC-4: Given `.github/workflows/ci.yml` ở HEAD, When đọc các job, Then có đúng năm job `quick`, `e2e`, `e2e-db`, `check`,
   `gate`; `quick` chạy `make check-quick` rồi `make build`; `e2e` và `e2e-db` có `needs: quick`, bỏ qua khi PR là bản nháp,
-  và mỗi job một khoá dùng lại `heavy-ok-<tên job>-`; `check` có `needs: [quick, e2e, e2e-db]` (Hỏi-1), `if: always()` và
-  chạy `tools/ci_verdict.py`; job `gate` giống từng byte job ấy ở `bd32d73e`; và When đưa `tools/ci_verdict.py` đủ 64 tổ hợp
-  của ba job, mỗi job một trong `success`, `skipped`, `failure`, `cancelled`, Then đúng một tổ hợp (cả ba `success`) thoát 0
-  và 63 tổ hợp còn lại thoát 1, mỗi job không `success` được gọi tên trên một dòng của nó, dòng của job `failure` có
+  và mỗi job một khoá dùng lại `heavy-ok-<tên job>-`; `check` có `needs: [quick, e2e]` (Hỏi-1: tách), `if: always()` và
+  chạy `tools/ci_verdict.py`; job `gate` giống từng byte job ấy ở `bd32d73e`; và When đưa `tools/ci_verdict.py` đủ 16 tổ hợp
+  của hai job `check` chờ, mỗi job một trong `success`, `skipped`, `failure`, `cancelled`, Then đúng một tổ hợp (cả hai
+  `success`) thoát 0 và 15 tổ hợp còn lại thoát 1, mỗi job không `success` được gọi tên trên một dòng của nó, dòng của job `failure` có
   `failed`, dòng của job `cancelled` có `cancelled`, dòng của job bị bỏ qua khi mọi job khác đã `success` có
   `the pull request is a draft`, và dòng của job bị bỏ qua khi có job khác không `success` có
   `a tier it waits for did not pass` (luật `ci_verdict.py` tự ghi; lời này sửa ở Cổng Phạm vi, xem sổ quyết định).
-- AC-5: Given lượt CI của PR #88 trên commit `fd53ac96`, When đọc các job, Then `quick`, `e2e`, `e2e-db` và `check` kết thúc
-  `success`; và Given lượt CI mới nhất của PR #88 trên một commit sau `fd53ac96` mà mọi tệp nó khác `fd53ac96` đều khớp
-  `HEAVY_NOT_INPUTS` (`docs/** wiki/** *.md _acceptance/**`), When đọc lượt ấy, Then phép đo in sha của commit ấy, và `e2e`,
-  `e2e-db` kết thúc `success` mà không chạy lại, tóm tắt của mỗi job nói `not run again: same inputs as run`; không có lượt
-  nào như thế thì phép đo đỏ với lời riêng.
+- AC-5: Given lượt CI của PR #88 trên commit `0deb79be`, When đọc các job, Then `quick`, `e2e` và `check` kết thúc
+  `success`, và `e2e-db` có chạy và báo một kết quả, phép đo in kết quả ấy; và Given lượt CI mới nhất của PR #88 trên một
+  commit sau `0deb79be` mà mọi tệp nó khác `0deb79be` đều khớp `HEAVY_NOT_INPUTS` (`docs/** wiki/** *.md _acceptance/**`),
+  When đọc lượt ấy, Then phép đo in sha của commit ấy, và `e2e` kết thúc `success` mà không chạy lại, tóm tắt của job nói
+  `not run again: same inputs as run`; không có lượt nào như thế thì phép đo đỏ với lời riêng.
 - AC-6: Given HEAD, When chạy `gitleaks git` trên mọi commit với `.gitleaks.toml` của HEAD (Hỏi-2), Then không có phát hiện
   nào; cùng lệnh ấy với `.gitleaks.toml` của `bd32d73e` thì có đúng 12 phát hiện, đều `generic-api-key` và đều trong
   `_acceptance/*/s4-args*.json`; và một tệp ngoài `_acceptance/` chứa một giá trị 64 ký tự hex cạnh tên `keys.test.ts` vẫn bị
@@ -84,16 +85,17 @@ làm theo ngả máy khuyên. Mỗi điểm trả lời khác thì nhánh đổi
   `checks-in-gate: the Makefile's check target no longer runs CHECK_TARGETS`.
 - AC-8: Given HEAD, When chạy `tests/ci-yml-patch.test.ts` (Hỏi-3), `tests/ci-ban-sao-nong.test.ts` và
   `tests/coverage-matrix.test.ts`, Then mọi bài đạt; và trên một bản sao, đổi ảnh Postgres của `e2e-db` thành `postgres:15`,
-  hay bỏ `e2e-db` khỏi `needs` của `check`, thì `tests/ci-yml-patch.test.ts` có bài đỏ; bỏ `coverage-matrix` khỏi
+  hay thêm `e2e-db` vào `needs` của `check`, thì `tests/ci-yml-patch.test.ts` có bài đỏ; bỏ `coverage-matrix` khỏi
   `CHECK_TARGETS` thì `tests/coverage-matrix.test.ts` có bài đỏ; và thêm một dòng gọi `git log` vào một tệp mới dưới `tools/`
   thì `tests/ci-ban-sao-nong.test.ts` có bài đỏ gọi tên tệp ấy.
 - AC-9: Given HEAD, When hỏi hình của bốn sổ bằng `tools/ledgers.py shape`, Then `log`, `index`, `glossary` và `gen` đều là
   `one-file`, và `make split L=<sổ> DRY=1` của từng sổ thoát 0 mà không ghi tệp nào; `mk/design-role-table.mk` giống từng
   byte `mk/derived.mk` của `bd32d73e`, và `make -n test` vẫn chạy `tools/coverage_matrix/buttons.py`.
-- AC-10: Given `bd32d73e`, `fd53ac96`, HEAD và báo cáo `apply.py --dry-run --json` của tag `repo-setup-v0.9.0` trên
+- AC-10: Given `bd32d73e`, `fd53ac96`, `0deb79be`, HEAD và báo cáo `apply.py --dry-run --json` của tag `repo-setup-v0.9.0` trên
   `bd32d73e`, When kê tệp đổi từ `bd32d73e` tới `fd53ac96`, Then mỗi tệp thuộc đúng một nhóm của bảng Coverage và số tệp của
   từng nhóm bằng số ghi trong bảng (46 tệp); nhóm của một tệp đọc từ báo cáo của `apply.py` hay danh sách sửa tay, không từ
-  chính diff; và từ `fd53ac96` tới HEAD, nhánh không đổi tệp nào ngoài thư mục `_acceptance/upgrade-repo-setup-0-9-0/`,
+  chính diff; commit `0deb79be` chỉ đổi `.github/workflows/ci.yml` và `tests/ci-yml-patch.test.ts`; và từ `fd53ac96`
+  tới HEAD, ngoài hai tệp ấy nhánh không đổi tệp nào ngoài thư mục `_acceptance/upgrade-repo-setup-0-9-0/`,
   `_acceptance/config.yaml`, `PRODUCT-MAP.md` và `LO-TRINH.html`. Khi nhánh đã vào `origin/main`, phép đo chỉ so commit và
   nói đúng điều đó.
 
@@ -113,6 +115,7 @@ chí: lên đời là việc tất định, các nhóm dưới đây là toàn b
 | `marked` của báo cáo, trừ `tools/ontology_actions.py`, `tools/boundaries.py`, `ontology/relations.yaml` (giữ bản cũ) | 9 | AC-4 (`ci.yml`); AC-3 (`settings.json`); AC-7 (`Makefile`); AC-2; AC-1 |
 | Sửa tay: `.gitleaks.toml`, `mk/design-role-table.mk`, ba bài kiểm | 5 | AC-6; AC-9; AC-8 |
 | Bốn tệp có trong báo cáo mà không đổi | 0 | AC-3 |
+| Sau Gate 1, commit `0deb79be` (Hỏi-1: tách): `ci.yml`, `tests/ci-yml-patch.test.ts`, ngoài 46 tệp | 2 | AC-4; AC-5; AC-8; AC-10 |
 | `pr-title.yml` (`conventional-commits`), `release.yml` (trong `updated`) | — | AC-10; job `conventional-commits` chạy từ workflow của nhánh chính (`pull_request_target`), nên chỉ có hiệu lực sau khi gộp |
 | `e2e`, `e2e-db` trên máy | — | Ngoài phạm vi của phép đo trên máy: cần trình duyệt và Postgres; AC-5 đọc chúng trên CI |
 
@@ -139,7 +142,8 @@ chí: lên đời là việc tất định, các nhóm dưới đây là toàn b
 - AC-2 và AC-10 đọc `apply.py` của tag `repo-setup-v0.9.0`, tải từ kho phanlemanh/repo-standards (hoặc thư mục trong biến
   `REPO_SETUP_PLUGIN`). Máy không đọc được thì phép đo đỏ với lời «cannot read», không xanh suông.
 - AC-3 và AC-5 đọc GitHub bằng `gh`. Máy không đăng nhập `gh` thì hai phép đo đỏ với lời «cannot read».
-- AC-5 chỉ chấm được sau khi một commit chỉ đổi tệp khớp `HEAVY_NOT_INPUTS` được đẩy và CI của nó chạy xong: GitHub chạy
+- AC-5 đọc lượt trên `0deb79be`, commit đầu của `ci.yml` đã quyết; lượt trên `fd53ac96` bị lượt ấy thay thế. Nó chỉ chấm
+  được sau khi một commit chỉ đổi tệp khớp `HEAVY_NOT_INPUTS` được đẩy và CI của nó chạy xong: GitHub chạy
   lượt cho commit cuối của mỗi lần đẩy, nên commit ấy phải là đầu nhánh lúc đẩy. `LO-TRINH.html` không khớp
   `HEAVY_NOT_INPUTS`, nên nếu nó đổi thì đổi ở commit sau commit được đo.
 - Chỉ dòng `check:` của `Makefile` mang chữ `design-assembly`; bản 0.7.2 của công cụ lần theo `check-quick`, và chữ ấy gỡ ở PR

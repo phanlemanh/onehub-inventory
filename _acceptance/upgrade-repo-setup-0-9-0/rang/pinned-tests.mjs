@@ -23,9 +23,9 @@ const CASES = [
     edit: (at) => swap(at, ".github/workflows/ci.yml", "image: postgres:16", "image: postgres:15"),
   },
   {
-    what: "e2e-db out of check",
+    what: "e2e-db added to check",
     test: "tests/ci-yml-patch.test.ts",
-    edit: (at) => swap(at, ".github/workflows/ci.yml", "needs: [quick, e2e, e2e-db]", "needs: [quick, e2e]"),
+    edit: (at) => swap(at, ".github/workflows/ci.yml", "needs: [quick, e2e]", "needs: [quick, e2e, e2e-db]"),
   },
   {
     what: "coverage-matrix out of CHECK_TARGETS",
@@ -69,5 +69,5 @@ try {
 verdict(
   NAME,
   problems,
-  "the three tests pass on HEAD; postgres:15, e2e-db out of check, coverage-matrix out of CHECK_TARGETS and a new git log under tools/ each turn one of them red",
+  "the three tests pass on HEAD; postgres:15, e2e-db added to check, coverage-matrix out of CHECK_TARGETS and a new git log under tools/ each turn one of them red",
 );

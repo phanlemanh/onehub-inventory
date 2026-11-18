@@ -1,16 +1,17 @@
-// AC-5: CI of PR 88 on UPGRADE ran every tier green; and on the newest run of a later commit that
-// differs from UPGRADE only in files the heavy tier does not read, e2e and e2e-db ended green
-// without running again.
+// AC-5: CI of PR 88 on CI_COMMIT (the decided ci.yml) ran quick, e2e and check green, and e2e-db
+// reported a result (printed; it does not hold check); and on the newest run of a later commit that
+// differs from CI_COMMIT only in files the heavy tier does not read, e2e ended green without running again.
 // Usage: node ci-runs.mjs [--root <dir>]
 
 import { git, gh, isHeavyInput, root, verdict } from "./lib.mjs";
-import { HEAVY, HEAVY_NOT_INPUTS, REPO, UPGRADE } from "./matrix.mjs";
+import { CI_COMMIT as UPGRADE, HEAVY_NOT_INPUTS, REPO, REUSED } from "./matrix.mjs";
 
 const NAME = "ci-runs";
 const dir = root();
 const problems = [];
 let measured = "";
 let reused = "";
+let e2eDb = "";
 
 const runs = () =>
   JSON.parse(gh(["run", "list", "-R", REPO, "--workflow", "CI", "--branch", "chore/upgrade-repo-setup-0.9.0", "--limit", "50", "--json", "databaseId,headSha,status,conclusion,createdAt"]));
@@ -22,10 +23,13 @@ try {
   if (!first) problems.push(`no completed CI run on ${UPGRADE.slice(0, 8)}`);
   else {
     const js = jobs(first.databaseId);
-    for (const name of ["quick", ...HEAVY, "check"]) {
+    for (const name of ["quick", "e2e", "check"]) {
       const j = js.find((x) => x.name === name);
       if (!j || j.conclusion !== "success") problems.push(`on ${UPGRADE.slice(0, 8)} ${name} is ${j ? j.conclusion : "missing"}, not success`);
     }
+    const db = js.find((x) => x.name === "e2e-db");
+    if (!db || !db.conclusion) problems.push(`on ${UPGRADE.slice(0, 8)} e2e-db reported no result`);
+    else e2eDb = db.conclusion;
   }
 
   const later = all
@@ -36,7 +40,7 @@ try {
   else {
     measured = later.headSha;
     const js = jobs(later.databaseId);
-    for (const name of HEAVY) {
+    for (const name of REUSED) {
       const j = js.find((x) => x.name === name);
       const step = j?.steps?.find((s) => s.name === "Same inputs as a green run");
       if (!j || j.conclusion !== "success") problems.push(`on ${measured.slice(0, 8)} ${name} is ${j ? j.conclusion : "missing"}, not success`);
@@ -61,5 +65,5 @@ function run0(sha) {
 verdict(
   NAME,
   problems,
-  `on ${UPGRADE.slice(0, 8)} quick, e2e, e2e-db and check succeeded; on ${measured.slice(0, 8)}, the newest run whose commit differs from ${UPGRADE.slice(0, 8)} only in HEAVY_NOT_INPUTS, e2e and e2e-db succeeded without running again (same inputs as run ${reused})`,
+  `on ${UPGRADE.slice(0, 8)} quick, e2e and check succeeded (e2e-db: ${e2eDb}); on ${measured.slice(0, 8)}, the newest run whose commit differs from ${UPGRADE.slice(0, 8)} only in HEAVY_NOT_INPUTS, e2e succeeded without running again (same inputs as run ${reused})`,
 );

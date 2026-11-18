@@ -2,6 +2,7 @@ schema_version: 1
 feature_slug: upgrade-repo-setup-0-9-0
 # Ma trận viết trước (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
 #   Chỗ rời main: bd32d73e. Commit đổi tên: a9acfe77; commit lên đời: fd53ac96; từ bd32d73e tới fd53ac96 đổi 46 tệp.
+#   Sau Gate 1 (Hỏi-1: tách): 0deb79be đổi ci.yml và tests/ci-yml-patch.test.ts; check chờ quick, e2e.
 #   repo-setup: tag repo-setup-v0.9.0. Dry-run trên HEAD: 0 created/updated/merged/marked/conflict; trên bd32d73e: exit 1,
 #     12 marked, conflict mk/derived.mk.
 #   make check: 2461 bài đạt, 2 bỏ qua; design-assembly 19 quyết định giữ bởi 27 phép kiểm; «no heavy checks».
@@ -9,7 +10,7 @@ feature_slug: upgrade-repo-setup-0-9-0
 #     dòng 3; settings.json chỉ thêm hook SessionStart. Ruleset main: check, e2e, gate, strict tắt.
 #   gitleaks: 0 phát hiện với .gitleaks.toml của HEAD, 12 với bản của bd32d73e, đều trong _acceptance/*/s4-args*.json.
 #   Nhóm của 46 tệp (từ báo cáo apply.py trên bd32d73e + sửa tay): manifest 1, created 14, conflict rồi created 1,
-#     updated 10, merged 6, marked 9, sửa tay 5. ci_verdict.py: 64 tổ hợp viết trước (4 trạng thái × 3 job).
+#     updated 10, merged 6, marked 9, sửa tay 5. ci_verdict.py: 16 tổ hợp viết trước (4 trạng thái × 2 job check chờ).
 #   Tệp được đổi ngoài hai commit: thư mục hồ sơ, _acceptance/config.yaml, PRODUCT-MAP.md, LO-TRINH.html.
 #   Cặp hai chiều: rang/two-way.mjs, mỗi ca phá một thông điệp ghim, kê ở `expected` của E12.
 evals:
@@ -56,7 +57,7 @@ evals:
     long_running: 2
     layer: backend-effect
     paths: [".github/workflows/ci.yml", "tools/ci_verdict.py", "tools/ci_inputs.py"]
-    expected: "exit 0; dòng 'ci-shape: five jobs quick, e2e, e2e-db, check, gate; e2e and e2e-db behind quick, skipped on a draft, one reuse key each; check waits for quick, e2e, e2e-db and runs ci_verdict.py; gate as at bd32d73e; ci_verdict.py: 64 of 64 combinations as written beforehand, 1 exits 0 and 63 exit 1, each job that is not success named on its own line with failed, cancelled, the pull request is a draft (every other job success) or a tier it waits for did not pass (another job not success)'; không tổ hợp nào có một job không success mà thoát 0 (should-NOT-fire)"
+    expected: "exit 0; dòng 'ci-shape: five jobs quick, e2e, e2e-db, check, gate; e2e and e2e-db behind quick, skipped on a draft, one reuse key each; check waits for quick, e2e and runs ci_verdict.py; gate as at bd32d73e; ci_verdict.py: 16 of 16 combinations as written beforehand, 1 exits 0 and 15 exit 1'; mỗi job không success có dòng riêng với failed, cancelled, the pull request is a draft (mọi job khác success) hay a tier it waits for did not pass (có job khác không success); không tổ hợp nào có một job không success mà thoát 0, và check không chờ e2e-db (should-NOT-fire, Hỏi-1: tách)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E6
     criterion: AC-5
@@ -65,7 +66,7 @@ evals:
     long_running: 2
     layer: backend-effect
     paths: [".github/workflows/ci.yml"]
-    expected: "exit 0; dòng 'ci-runs: on fd53ac96 quick, e2e, e2e-db and check succeeded; on <sha>, the newest run whose commit differs from fd53ac96 only in HEAVY_NOT_INPUTS, e2e and e2e-db succeeded without running again (same inputs as run <url>)'; không có lượt nào như thế thì đỏ với 'ci-runs: no run of PR 88 after fd53ac96 changes only HEAVY_NOT_INPUTS'"
+    expected: "exit 0; dòng 'ci-runs: on 0deb79be quick, e2e and check succeeded (e2e-db: <kết quả>); on <sha>, the newest run whose commit differs from 0deb79be only in HEAVY_NOT_INPUTS, e2e succeeded without running again (same inputs as run <id>)'; không có lượt nào như thế thì đỏ với 'ci-runs: no run of PR 88 after 0deb79be changes only HEAVY_NOT_INPUTS'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E7
     criterion: AC-6
@@ -92,7 +93,7 @@ evals:
     long_running: 10
     layer: backend-effect
     paths: ["tests/ci-yml-patch.test.ts", "tests/ci-ban-sao-nong.test.ts", "tests/coverage-matrix.test.ts", ".github/workflows/ci.yml", "Makefile"]
-    expected: "exit 0; dòng 'pinned-tests: the three tests pass on HEAD; postgres:15, e2e-db out of check, coverage-matrix out of CHECK_TARGETS and a new git log under tools/ each turn one of them red'; không bản phá nào xanh (should-NOT-fire)"
+    expected: "exit 0; dòng 'pinned-tests: the three tests pass on HEAD; postgres:15, e2e-db added to check, coverage-matrix out of CHECK_TARGETS and a new git log under tools/ each turn one of them red'; không bản phá nào xanh (should-NOT-fire)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E10
     criterion: AC-9
@@ -110,7 +111,7 @@ evals:
     long_running: 1
     layer: backend-effect
     paths: ["**"]
-    expected: "exit 0; dòng 'change-set: the 46 files of bd32d73e..fd53ac96 fall each in one group read from the apply.py report and the hand-edit list: manifest 1, created 14, conflict then created 1, updated 10, merged 6, marked 9, hand 5; four files of the report unchanged; fd53ac96..HEAD changes only this dossier, _acceptance/config.yaml, PRODUCT-MAP.md and LO-TRINH.html'; không tệp nào ngoài nhóm, không nhóm nào lệch số, không tệp giao diện, mã sản phẩm hay hồ sơ đã ký nào đổi (Out of scope)"
+    expected: "exit 0; dòng 'change-set: the 46 files of bd32d73e..fd53ac96 fall each in one group read from the apply.py report and the hand-edit list: manifest 1, created 14, conflict then created 1, updated 10, merged 6, marked 9, hand 5; four files of the report unchanged; commit 0deb79be changes only .github/workflows/ci.yml and tests/ci-yml-patch.test.ts; fd53ac96..HEAD changes besides them only this dossier, _acceptance/config.yaml, PRODUCT-MAP.md and LO-TRINH.html'; không tệp nào ngoài nhóm, không nhóm nào lệch số, không tệp giao diện, mã sản phẩm hay hồ sơ đã ký nào đổi (Out of scope)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E12
     criterion: AC-2, AC-3, AC-4, AC-6, AC-7, AC-9, AC-10
@@ -119,5 +120,5 @@ evals:
     long_running: 10
     layer: backend-effect
     paths: ["_acceptance/upgrade-repo-setup-0-9-0/rang/**"]
-    expected: "exit 0; node --test đạt mọi ca: mỗi phép đo xanh trên bản lành và đỏ với thông điệp ghim trên bản phá — apply-again đỏ trên một tệp còn dấu ('marked'); rules-kept đỏ khi autonomy.yaml đổi một dòng; ci-shape đỏ khi e2e-db mất needs: quick, khi gate đổi một byte, và khi một bản ci_verdict.py bỏ qua kết quả của e2e; secret-scan đỏ khi bỏ mục miễn mới; design-assembly-word đỏ khi dòng check: mất chữ; ledgers đỏ khi wiki/log.md mang dòng dấu vẽ; change-set đỏ khi một tệp ngoài nhóm đổi, và khi số tệp của một nhóm lệch; không phép đo nào xanh trên bản phá (should-NOT-fire)"
+    expected: "exit 0; node --test đạt mọi ca: mỗi phép đo xanh trên bản lành và đỏ với thông điệp ghim trên bản phá — apply-again đỏ trên một tệp còn dấu ('marked'); rules-kept đỏ khi autonomy.yaml đổi một dòng; ci-shape đỏ khi e2e-db mất needs: quick, khi gate đổi một byte, khi một bản ci_verdict.py bỏ qua kết quả của e2e, và khi check lại chờ e2e-db; secret-scan đỏ khi bỏ mục miễn mới; design-assembly-word đỏ khi dòng check: mất chữ; ledgers đỏ khi wiki/log.md mang dòng dấu vẽ; change-set đỏ khi một tệp ngoài nhóm đổi, và khi số tệp của một nhóm lệch; không phép đo nào xanh trên bản phá (should-NOT-fire)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
