@@ -9,3 +9,11 @@ description = "File hashes in the repo-setup manifest"
 condition = "AND"
 paths = ['''^\.repo-setup\.json$''']
 regexes = ['''^[0-9a-f]{64}$''']
+
+# The acceptance kit records the SHA-256 of each file it graded (s4-args*.json). Next to a name
+# like "keys.test.ts" that looks like an API key. Only such hashes in those files are allowed.
+[[allowlists]]
+description = "File hashes in the acceptance kit's S4 arguments"
+condition = "AND"
+paths = ['''^_acceptance/[^/]+/s4-args[^/]*\.json$''']
+regexes = ['''^[0-9a-f]{64}$''']

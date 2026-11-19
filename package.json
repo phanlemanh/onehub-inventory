@@ -13,12 +13,12 @@
     "start": "next start -p 3470",
     "build": "next build",
     "format": "prettier --write .",
-    "lint": "eslint . && prettier --check .",
+    "lint": "eslint . && prettier --check --log-level warn .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "prepare": "git config merge.generated-file.driver true || true"
+    "prepare": "git config merge.generated-file.driver true || true; command -v make >/dev/null 2>&1 && make -s derived || true"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

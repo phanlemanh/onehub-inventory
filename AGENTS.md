@@ -48,7 +48,9 @@ Playwright. This repo replaces onehub-quy-hang for the MVP and takes only select
 
 ## Before you change code
 
-1. Read `wiki/index.md` to orient yourself.
+1. Read `wiki/index.md` to orient yourself. `wiki/log.md`, `wiki/index.md` and `ontology/glossary.md`
+   are drawn by `make derived`; edit the fragments, not the drawn files. If one is missing, run
+   `make derived`.
 2. If the task touches business logic, read `ontology/glossary.md` and the
    relevant `ontology/entities/*.yaml`.
 3. Look for an existing implementation of the rule before writing a new one.
@@ -60,8 +62,8 @@ Playwright. This repo replaces onehub-quy-hang for the MVP and takes only select
   (e.g. `Client` when the glossary says `Customer`).
 - Use the generated domain types; to change them, change `ontology/` and run `make gen`.
 - Do not add a new entity, relation or rule to the code without adding it to
-  `ontology/` in the same change. Changes to `ontology/` need human review —
-  call them out in the PR description.
+  `ontology/` in the same change. Changes to `ontology/` change what the business
+  means: call them out in the PR description.
 - Every behaviour change comes with a test.
 - Never commit secrets or `.env`. Configuration goes in `.env.example`.
 - Keep changes small and focused; one concern per PR.
@@ -71,7 +73,11 @@ Playwright. This repo replaces onehub-quy-hang for the MVP and takes only select
 
 - `make check` is green.
 - Update the wiki:
-  - append one line to `wiki/log.md` (date, what changed, link to PR/issue);
+  - `make log m="what changed — link to PR/issue"` adds one entry to the wiki log: one new file in
+    `wiki/log/`, so two branches never edit the same line;
+  - a new term: `python3 tools/ledgers.py add-term <Term> --definition "..."`;
+  - a new wiki page needs only `type` and `title` in its front matter: the index lists it by itself.
+    If `wiki/index.md` is still in git (this repository has not split it yet), add the link there;
   - significant technical choice → new `wiki/decisions/NNNN-title.md`;
   - production bug or outage → `wiki/incidents/YYYY-MM-DD-title.md`;
   - an entity's behaviour changed → update `wiki/entities/<entity>.md`.
@@ -96,7 +102,7 @@ Playwright. This repo replaces onehub-quy-hang for the MVP and takes only select
 - Instructions for AI (this file, skills, tool descriptions): English.
 - Conversation: vi
 - Documents: vi (tour, wiki content, specs, PR descriptions).
-- Business terms: English code name, with the display name in `ontology/glossary.md`.
+- Business terms: English code name, with the display name in the glossary (`ontology/glossary/<Term>.md`, drawn into `ontology/glossary.md`).
 - Text that end users see follows the product's own language, not this rule.
 
 ## Architecture: modular monolith
@@ -127,10 +133,13 @@ Playwright. This repo replaces onehub-quy-hang for the MVP and takes only select
 
 ## Autonomy tiers
 
-Changes are classified low / medium / high by `governance/autonomy.yaml`.
+`governance/autonomy.yaml` says who decides that a change may merge. `low` merges itself when the
+required checks pass. `medium` is merged by a person. `high` changes the rules of the game and
+needs a code owner.
 
-- Check the tier before you start: `python3 tools/autonomy.py --base origin/main`. High-tier changes
-  need a human: get approval before you start, and the PR needs a code owner.
+- A tier is never a reason to stop and ask before you work: when to stop is decided by the
+  workflow that drives you. Do the work, open the pull request, and say in it what a person has to
+  decide. `python3 tools/autonomy.py --base origin/main` shows the tier and the file behind it.
 - Do not edit `.github/workflows/` or `governance/`: humans own them.
 - Never delete or weaken a test to get green.
 
@@ -143,3 +152,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+- Do not merge a pull request yourself. A `low` one merges itself when the checks pass; any
+  other merge is a person's decision.
+- Never delete or weaken a test to get green, and never loosen an `agent:` setting in `ontology/`
+  on your own. The gate sees both and raises the tier.

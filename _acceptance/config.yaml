@@ -162,6 +162,16 @@ executors:
     da071_change_list: "node _acceptance/upgrade-design-assembly-0-7-1/rang/change-list.mjs"   # upgrade-design-assembly-0-7-1: the upgrade commit changes its 6 files; the branch nothing beyond them and this record
     da071_two_way: "node --test _acceptance/upgrade-design-assembly-0-7-1/rang/measures-two-way.mjs"   # upgrade-design-assembly-0-7-1: each fast measure green as it is, red with its pinned message on a broken copy
     da071_shallow_two_way: "node --test _acceptance/upgrade-design-assembly-0-7-1/rang/shallow-two-way.mjs"   # upgrade-design-assembly-0-7-1: the three shallow-clone measures red with their pinned lines on broken clones
+    rs090_apply_again: "node _acceptance/upgrade-repo-setup-0-9-0/rang/apply-again.mjs"   # upgrade-repo-setup-0-9-0: apply.py of repo-setup 0.9.0 has nothing left to do on HEAD; on bd32d73e it marks 12 files and stops on mk/derived.mk
+    rs090_rules_kept: "node _acceptance/upgrade-repo-setup-0-9-0/rang/rules-kept.mjs"   # upgrade-repo-setup-0-9-0: autonomy.yaml, ontology_actions.py, relations.yaml as at bd32d73e; CODEOWNERS line 3 only; settings.json adds SessionStart only; ruleset main unchanged
+    rs090_ci_shape: "node _acceptance/upgrade-repo-setup-0-9-0/rang/ci-shape.mjs"   # upgrade-repo-setup-0-9-0: five jobs of the tiered ci.yml, gate byte for byte, ci_verdict.py on four cases
+    rs090_ci_runs: "node _acceptance/upgrade-repo-setup-0-9-0/rang/ci-runs.mjs"   # upgrade-repo-setup-0-9-0: CI of PR 88: fd53ac96 green on quick, e2e, e2e-db, check; the dossier commit reuses e2e and e2e-db
+    rs090_secret_scan: "node _acceptance/upgrade-repo-setup-0-9-0/rang/secret-scan.mjs"   # upgrade-repo-setup-0-9-0: gitleaks over every commit: 0 with the allowlist of HEAD, 12 with bd32d73e, a control outside _acceptance/ caught
+    rs090_design_assembly_word: "node _acceptance/upgrade-repo-setup-0-9-0/rang/design-assembly-word.mjs"   # upgrade-repo-setup-0-9-0: check names design-assembly for the 0.7.1 tool; red on a copy without the word
+    rs090_pinned_tests: "node _acceptance/upgrade-repo-setup-0-9-0/rang/pinned-tests.mjs"   # upgrade-repo-setup-0-9-0: the three tests pinned to the old CI pass on HEAD and go red on four broken copies
+    rs090_ledgers: "node _acceptance/upgrade-repo-setup-0-9-0/rang/ledgers.mjs"   # upgrade-repo-setup-0-9-0: four ledgers one-file, make split DRY=1 writes nothing, the renamed design-role-table file
+    rs090_change_set: "node _acceptance/upgrade-repo-setup-0-9-0/rang/change-set.mjs"   # upgrade-repo-setup-0-9-0: 46 files from bd32d73e to fd53ac96; after it only this dossier and the T1 files
+    rs090_two_way: "node --test _acceptance/upgrade-repo-setup-0-9-0/rang/two-way.mjs"   # upgrade-repo-setup-0-9-0: each measure green as it is, red with its pinned message on a broken copy
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
