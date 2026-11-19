@@ -30,8 +30,8 @@ function measure(script, at, args = []) {
 }
 
 /** A fresh copy of HEAD with node_modules linked, broken by `edit` (or left sound). */
-function withCopy(edit, fn, rev = "HEAD") {
-  const wt = worktree(ROOT, rev);
+function withCopy(edit, fn) {
+  const wt = worktree(ROOT, "HEAD");
   try {
     run("ln", ["-s", join(ROOT, "node_modules"), join(wt.dir, "node_modules")]);
     if (edit) edit(wt.dir);
@@ -124,12 +124,8 @@ test("design-assembly-word: green on a sound copy, red when the check line loses
   );
 });
 
-// AC-9 held at this record's commit; split-log-ledger split the log after it, and its AC-3 now stands for E10
-// (sua-sau-ky.md, 19/11). Both copies are made at the verified commit, so the case still proves the measure.
-const LEDGERS_AT = "702e71dd1025b61a5abff7973652e636e7fb41d9";
-
 test("ledgers: green on a sound copy, red when wiki/log.md carries the drawn stamp", () => {
-  withCopy(null, (at) => green(measure("ledgers.mjs", at), "ledgers"), LEDGERS_AT);
+  withCopy(null, (at) => green(measure("ledgers.mjs", at), "ledgers"));
   withCopy(
     (at) => {
       // The stamp comes from the real writer, tools/ledgers.py stamp(), not from a hand-made line.
@@ -139,7 +135,6 @@ test("ledgers: green on a sound copy, red when wiki/log.md carries the drawn sta
       git(at, "add", "wiki/log.md");
     },
     (at) => red(measure("ledgers.mjs", at), "ledgers: ledger log is fragments, not one-file"),
-    LEDGERS_AT,
   );
 });
 

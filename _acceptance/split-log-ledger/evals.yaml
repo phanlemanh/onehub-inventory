@@ -7,7 +7,8 @@ feature_slug: split-log-ledger
 #   Lời dặn ghi tay: 2 tệp (docs/van-hanh/xoay-khoa.md, docs/plan/dot-nen/LUAT-rieng.md); bản ghi lịch sử không quét:
 #     docs/superpowers/, docs/plan/do-he-design/, wiki/log/, _acceptance/.
 #   Phép đo của hồ sơ đã ký bị việc tách làm gãy: 3 (don-no-bo-kiem E6, tat-plugin-cho-cu E7 ca «E4 red (a)»,
-#     upgrade-repo-setup-0-9-0 E10 và ca «ledgers» của E12). Đọc trước/sau ở rang/do-cu-truoc-sau.md.
+#     upgrade-repo-setup-0-9-0 E10 và ca «ledgers» của E12). Đọc trước/sau ở rang/do-cu-truoc-sau.md. Hỏi-2 trả lời
+#     «không» (19/11): để nguyên như lúc ký, ghi ở Known limits của contract.md, không eval nào đo chúng ở đây.
 #   CI: quick, e2e, check phải success; e2e-db và gate chỉ in.
 #   Bên đọc wiki/log.md không phải .md: 24 tệp, mỗi tệp một lý do ở READERS của rang/matrix.mjs.
 #   Cặp hai chiều: rang/two-way.mjs, mỗi ca phá một thông điệp ghim, kê ở `expected` của E7.
@@ -48,15 +49,6 @@ evals:
     paths: ["**/*.md", "_acceptance/split-log-ledger/rang/**"]
     expected: "exit 0; dòng 'docs-log: the 2 instructions name make log m= and lost their old words; <n> live .md files swept, none writes wiki/log.md by hand'. Chiều đỏ ở E7: bản ở c79189dd → 'docs-log: docs/van-hanh/xoay-khoa.md still has its old instruction'; một câu «thêm một dòng vào `wiki/log.md`» trong docs/van-hanh/khoi-phuc.md → '… writes wiki/log.md by hand'; câu «Append a line to `wiki/log.md`» trong .claude/skills/wiki-query/SKILL.md → 'docs-log: .claude/skills/wiki-query/SKILL.md:<dòng> writes wiki/log.md by hand'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
-  - id: E5
-    criterion: AC-5, AC-3
-    executor: script
-    cmd: config:executors.script.sll_do_cu
-    long_running: 5
-    layer: backend-effect
-    paths: ["_acceptance/don-no-bo-kiem/**", "_acceptance/tat-plugin-cho-cu/**", "_acceptance/upgrade-repo-setup-0-9-0/**", "_acceptance/nang-kit-3-0/rang/**", "wiki/**", "_acceptance/split-log-ledger/**"]
-    expected: "exit 0; dòng 'do-cu: so-quyet-dinh exits 0; two-way «E4 red» of tat-plugin-cho-cu and «ledgers» of upgrade-repo-setup-0-9-0 pass; E10 declares not-run, superseded_by split-log-ledger#AC-3; three sua-sau-ky.md sections'. Chiều đỏ ở E7: so-quyet-dinh.mjs lại nhắm vào wiki/log.md → 'do-cu: so-quyet-dinh exited 1: so-quyet-dinh: ban sao con lien ket cu ma khong do'; E10 mất `status: not-run` và `superseded_by` → 'do-cu: E10 status is absent, not not-run'"
-    evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E6
     criterion: AC-6
     executor: script
@@ -67,13 +59,13 @@ evals:
     expected: "exit 0; dòng 'ci-pr: run <id> on <sha 8 ký tự>: quick, e2e, check success; e2e-db <kết luận>, gate <kết luận>' với sha là đầu nhánh của PR. Chiều đỏ ở E7: các job của lượt 44306178853 (check failure) → 'ci-pr: job check ended failure'; một lượt thiếu job e2e → 'job e2e is not in the run'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E7
-    criterion: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7
+    criterion: AC-1, AC-2, AC-3, AC-4, AC-6, AC-7
     executor: script
     cmd: config:executors.script.sll_two_way
     long_running: 10
     layer: backend-effect
     paths: ["_acceptance/split-log-ledger/rang/**"]
-    expected: "exit 0; node --test đạt bảy ca: mỗi phép đo xanh trên bản lành và đỏ với thông điệp ghim trên bản phá, như ghi ở `expected` của E1 đến E6 và E9; không phép đo nào xanh trên bản phá (should-NOT-fire)"
+    expected: "exit 0; node --test đạt sáu ca: mỗi phép đo xanh trên bản lành và đỏ với thông điệp ghim trên bản phá, như ghi ở `expected` của E1 đến E4, E6 và E9; không phép đo nào xanh trên bản phá (should-NOT-fire)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E8
     criterion: AC-1, AC-2

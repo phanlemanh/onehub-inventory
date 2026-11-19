@@ -13,5 +13,6 @@ E10) đọc tệp đã vẽ, cùng nội dung, nên không đo ở đây.
 | upgrade-repo-setup-0-9-0 · E10 | `rs090_ledgers` | 0 | 1 — `ledger log is fragments, not one-file` | AC-9 nói sổ log là one-file ở HEAD |
 | upgrade-repo-setup-0-9-0 · E12 | `rs090_two_way` | 1 — ca «rules-kept» | 1 — «rules-kept», thêm «ledgers» (bản lành ở HEAD) và «change-set» | «change-set» đỏ ở mọi nhánh chưa vào `origin/main` (phép đo chỉ so commit khi nhánh đã vào) |
 
-Sau khi sửa (Hỏi-2): `so_quyet_dinh` thoát 0; ca «E4 red» của `tpc_two_way` và ca «ledgers» của `rs090_two_way` đạt;
-E10 khai không-chạy, thay bởi AC-3 của hồ sơ này. Ba ca đỏ từ trước giữ nguyên (Out of scope).
+Hỏi-2 trả lời «không» (19/11, sau lượt chấm 1): PR này không sửa ba hồ sơ ấy. Sửa chúng nghĩa là các tệp của chúng
+nằm trong diff của PR, và chốt trước-gộp (`gate`) bắt phải ghim lại cả ba hồ sơ, mà hai hồ sơ đã đỏ sẵn từ trước
+khi tách. Cột «Sau» là điều lượt ghim lại kế tiếp của từng hồ sơ sẽ thấy; Known limits của `contract.md` ghi chỗ sửa.

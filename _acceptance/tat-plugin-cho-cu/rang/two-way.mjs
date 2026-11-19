@@ -102,20 +102,9 @@ async function inHead(breakIt) {
   });
 }
 
-// The wiki log as git holds it: since split-log-ledger (sua-sau-ky.md, 19/11) the newest entry of wiki/log/, because
-// wiki/log.md is drawn and out of git, so the sweep never reads it; wiki/log.md again while the log is one file.
-function logInGit(dir) {
-  const entries = git(dir, "ls-files", "wiki/log/").split("\n").filter((f) => /^wiki\/log\/\d{4}-\d{2}-\d{2}-\d{2}-.+\.md$/.test(f));
-  return entries.sort().pop() ?? "wiki/log.md";
-}
-
-test("E4 red (a): a line naming the old marketplace in the wiki log", async () => {
-  let log;
-  const r = await inHead((dir) => {
-    log = logInGit(dir);
-    appendFileSync(join(dir, log), `\n- ${settings.OLD_MARKET} still named here\n`);
-  });
-  red(r, `quet-ten-cu: sweep line outside .claude/settings.json: ${log}`);
+test("E4 red (a): a line naming the old marketplace in wiki/log.md", async () => {
+  const r = await inHead((dir) => appendFileSync(join(dir, "wiki/log.md"), `\n- ${settings.OLD_MARKET} still named here\n`));
+  red(r, "quet-ten-cu: sweep line outside .claude/settings.json: wiki/log.md");
 });
 
 test("E4 red (b): the road-map false key dropped", async () => {

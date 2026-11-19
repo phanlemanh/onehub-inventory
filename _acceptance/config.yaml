@@ -174,9 +174,8 @@ executors:
     rs090_two_way: "node --test _acceptance/upgrade-repo-setup-0-9-0/rang/two-way.mjs"   # upgrade-repo-setup-0-9-0: each measure green as it is, red with its pinned message on a broken copy
     sll_so_log: "node _acceptance/split-log-ledger/rang/so-log.mjs"   # split-log-ledger: log is fragments, wiki/log.md drawn and out of git, the 108 entries of c79189dd each once, newest first
     sll_ve_truoc_test: "node _acceptance/split-log-ledger/rang/ve-truoc-test.mjs"   # split-log-ledger: a fresh checkout draws wiki/log.md before the tests; khong-o-tim passes
-    sll_ke_thua_e10: "node _acceptance/split-log-ledger/rang/ke-thua-e10.mjs"   # split-log-ledger: stands for upgrade-repo-setup-0-9-0/E10 — four ledgers in one shape each, split DRY=1 writes nothing, the renamed mk file, make -n test
+    sll_ke_thua_e10: "node _acceptance/split-log-ledger/rang/ke-thua-e10.mjs"   # split-log-ledger: what of upgrade-repo-setup-0-9-0/E10 stays true — four ledgers in one shape each, split DRY=1 writes nothing, the renamed mk file, make -n test
     sll_docs_log: "node _acceptance/split-log-ledger/rang/docs-log.mjs"   # split-log-ledger: no live document writes wiki/log.md by hand
-    sll_do_cu: "node _acceptance/split-log-ledger/rang/do-cu.mjs"   # split-log-ledger: the three measures of signed records the split broke are whole again
     sll_ci_pr: "node _acceptance/split-log-ledger/rang/ci-pr.mjs"   # split-log-ledger: quick, e2e, check green on the pull request's head; e2e-db and gate printed
     sll_ben_doc: "node _acceptance/split-log-ledger/rang/ben-doc.mjs"   # split-log-ledger: every tracked file that is no .md and names the drawn log is weighed in READERS
     sll_two_way: "node --test _acceptance/split-log-ledger/rang/two-way.mjs"   # split-log-ledger: each measure green on a sound copy, red with its pinned message on a broken one

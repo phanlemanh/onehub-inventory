@@ -23,8 +23,9 @@ Dùng đúng công cụ repo-setup 0.9.0 đã đặt ở PR 88: `make split L=lo
    (`docs/plan/dot-nen/LUAT-rieng.md`). `AGENTS.md` và `.claude/skills/*` đã viết cho lúc sau khi tách. Kế hoạch, đặc tả
    và bản đo cũ là bản ghi của ngày ấy, để nguyên.
 4. Gỡ bản thừa của hai mục trùng (Hỏi-3 của hợp đồng).
-5. Đo các phép đo của hồ sơ đã ký có đọc `wiki/log.md`, trước và sau khi tách, trên cây đã commit. Ba hồ sơ gãy; sửa sau
-   chữ ký theo nếp `sua-sau-ky.md` (Hỏi-2), dùng lối `superseded_by` của kit cho E10 của `upgrade-repo-setup-0-9-0`.
+5. Đo các phép đo của hồ sơ đã ký có đọc `wiki/log.md`, trước và sau khi tách, trên cây đã commit. Ba hồ sơ gãy. Lần duyệt
+   đầu chọn sửa sau chữ ký (Hỏi-2); sau lượt chấm 1 chủ kho đổi thành để nguyên, ghi Known limits của hợp đồng, vì sửa
+   thì chốt trước-gộp đòi ghim lại cả ba hồ sơ, mà hai hồ sơ đã đỏ sẵn trên `main`.
 
 ## Lựa chọn
 

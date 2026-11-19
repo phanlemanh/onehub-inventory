@@ -31,18 +31,6 @@ export const HISTORY = ["docs/superpowers/", "docs/plan/do-he-design/"];
 /** A sentence that tells the reader to put a line into wiki/log.md by hand (Vietnamese or English). */
 export const HAND_WRITE = [/(?:ghi|thêm)[^.\n]{0,40}`wiki\/log\.md`/i, /(?:add|append|write)[^.\n]{0,40}`?wiki\/log\.md/i];
 
-/** The three measures of signed records this split broke, fixed after signature (sua-sau-ky.md). */
-export const FIXED = {
-  soQuyetDinh: ["_acceptance/don-no-bo-kiem/rang/so-quyet-dinh.mjs", "--root", "."],
-  tpcCase: "E4 red",
-  tpcTwoWay: "_acceptance/tat-plugin-cho-cu/rang/two-way.mjs",
-  rs090Case: "^ledgers",
-  rs090TwoWay: "_acceptance/upgrade-repo-setup-0-9-0/rang/two-way.mjs",
-};
-
-/** The eval of upgrade-repo-setup-0-9-0 this record stands for. */
-export const SUPERSEDES = { evals: "_acceptance/upgrade-repo-setup-0-9-0/evals.yaml", id: "E10", pointer: "split-log-ledger#AC-3" };
-
 /** The three jobs that must end in success on the pull request's head; e2e-db and gate are read and printed (gate waits for the owner's signature). */
 export const CI_REQUIRED = ["quick", "e2e", "check"];
 export const CI_REPORTED = ["e2e-db", "gate"];
@@ -64,12 +52,12 @@ export const READERS = {
   "_acceptance/bang-quyen-theo-vai/evals.yaml": "judgment input: the drawn file, same entries",
   "_acceptance/bo-o-tim-cua-vung/evals.yaml": "judgment input and make test: the drawn file, same entries",
   "_acceptance/thue-phi/evals.yaml": "judgment input: the drawn file, same entries",
-  "_acceptance/don-no-bo-kiem/evals.yaml": "words of E6's expected; its measure is mended (AC-5)",
-  "_acceptance/don-no-bo-kiem/rang/so-quyet-dinh.mjs": "mended after signature (AC-5)",
+  "_acceptance/don-no-bo-kiem/evals.yaml": "words of E6's expected; its measure goes red at the next re-pin (Known limits)",
+  "_acceptance/don-no-bo-kiem/rang/so-quyet-dinh.mjs": "left as signed: red at the next re-pin (Known limits)",
   "_acceptance/tat-plugin-cho-cu/evals.yaml": "words of E4's expected; the sweep reads files git holds, now the entries",
-  "_acceptance/tat-plugin-cho-cu/rang/two-way.mjs": "mended after signature (AC-5)",
-  "_acceptance/upgrade-repo-setup-0-9-0/evals.yaml": "E10, now not-run and superseded by AC-3 (AC-5)",
-  "_acceptance/upgrade-repo-setup-0-9-0/rang/two-way.mjs": "mended after signature (AC-5)",
+  "_acceptance/tat-plugin-cho-cu/rang/two-way.mjs": "left as signed: case «E4 red (a)» red at the next re-pin (Known limits)",
+  "_acceptance/upgrade-repo-setup-0-9-0/evals.yaml": "words of E10's expected; E10 red at the next re-pin (Known limits)",
+  "_acceptance/upgrade-repo-setup-0-9-0/rang/two-way.mjs": "left as signed: case «ledgers» red at the next re-pin (Known limits)",
   "_acceptance/upgrade-design-assembly-tool/evals.yaml": "comment: a file the upgrade commit changed",
   "_acceptance/upgrade-design-assembly-tool/rang/matrix.mjs": "the list of files a past commit changed; reads history, not the file",
   "_acceptance/upgrade-design-assembly-0-7-0/rang/matrix.mjs": "the list of files a past commit changed; reads history, not the file",

@@ -1,7 +1,8 @@
-// AC-3, which stands for upgrade-repo-setup-0-9-0/E10 (AC-9 of that record): the log is fragments; each of the
+// AC-3, what stays true of upgrade-repo-setup-0-9-0/E10 (AC-9 of that record): the log is fragments; each of the
 // other three ledgers has one shape, and `make split L=<ledger> DRY=1` exits 0 and writes nothing for all four;
 // mk/design-role-table.mk is still mk/derived.mk of that record's BASE; `make -n test` still runs the table.
-// What E10 said and this does not: index, glossary and gen are one-file. PR 2 of the plan splits them.
+// What E10 said and this does not: the log and index, glossary, gen are one-file. E10 itself is left as signed and
+// goes red at that record's next re-pin (Known limits of contract.md); this does not stand in for it.
 // Usage: node ke-thua-e10.mjs [--root <dir>]
 
 import { createHash } from "node:crypto";

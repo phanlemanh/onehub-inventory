@@ -154,20 +154,6 @@ test("ben-doc: green on a sound copy; red on a new tracked reader of wiki/log.md
   );
 });
 
-test("do-cu: green on a sound copy; red with so-quyet-dinh aimed at wiki/log.md again, and without E10's declaration", () => {
-  withCopy("HEAD", null, (at) => green(measure("do-cu.mjs", at), "do-cu"));
-  withCopy(
-    "HEAD",
-    (at) => swap(at, "_acceptance/don-no-bo-kiem/rang/so-quyet-dinh.mjs", '.sort().pop() ?? "wiki/log.md";', '.sort().pop() && "wiki/log.md";'),
-    (at) => red(measure("do-cu.mjs", at), "do-cu: so-quyet-dinh exited 1: so-quyet-dinh: ban sao con lien ket cu ma khong do"),
-  );
-  withCopy(
-    "HEAD",
-    (at) => swap(at, "_acceptance/upgrade-repo-setup-0-9-0/evals.yaml", "    status: not-run\n    superseded_by: split-log-ledger#AC-3\n", ""),
-    (at) => red(measure("do-cu.mjs", at), "do-cu: E10 status is absent, not not-run"),
-  );
-});
-
 test("ci-pr: green on the jobs of a green run; red on a run where check failed", () => {
   green(measure("ci-pr.mjs", ROOT, ["--jobs", jobsOf(RUN_GREEN)]), "ci-pr");
   red(measure("ci-pr.mjs", ROOT, ["--jobs", jobsOf(RUN_RED)]), "ci-pr: job check ended failure");
