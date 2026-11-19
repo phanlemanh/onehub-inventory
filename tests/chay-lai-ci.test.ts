@@ -34,8 +34,10 @@ async function retriesOf(file: string, ci: string | undefined): Promise<number> 
 export function retryProblems(r: Retries): string[] {
   const out: string[] = [];
   if (r.dbOnCi !== 1) out.push(`chay-lai: cau hinh db tren CI chay lai ${r.dbOnCi} lan, can 1`);
-  if (r.dbOnLane !== 0) out.push(`chay-lai: cau hinh db tren may chay lai ${r.dbOnLane} lan, can 0`);
-  if (r.mainOnCi !== 0) out.push(`chay-lai: cau hinh chinh tren CI chay lai ${r.mainOnCi} lan, can 0`);
+  if (r.dbOnLane !== 0)
+    out.push(`chay-lai: cau hinh db tren may chay lai ${r.dbOnLane} lan, can 0`);
+  if (r.mainOnCi !== 0)
+    out.push(`chay-lai: cau hinh chinh tren CI chay lai ${r.mainOnCi} lan, can 0`);
   return out;
 }
 
