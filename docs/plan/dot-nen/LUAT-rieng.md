@@ -9,7 +9,7 @@
 7. Gộp `main` mà có đổi `package.json` hay `package-lock.json` thì chạy `npm ci` trước khi lên làn đo.
 8. Không bao giờ `gh pr merge --auto`. Gộp chỉ qua lệnh `gop` của đợt, dưới khoá `merge`.
 9. `PRODUCT-MAP.md`, `LO-TRINH.html`, `design/component-registry.json` và `src/generated/` không sửa tay. Xung đột thì sinh lại sau khi gộp `origin/main`.
-10. Tệp dùng chung (`_acceptance/config.yaml`, `design/decisions.yaml`, `.env.example`, `wiki/log.md`) chỉ thêm dòng, không sửa hay xoá dòng của người khác; xung đột thì giữ cả hai bên. Sửa dòng có sẵn thì gửi yêu cầu `cham-tep`.
+10. Tệp dùng chung (`_acceptance/config.yaml`, `design/decisions.yaml`, `.env.example`) chỉ thêm dòng, không sửa hay xoá dòng của người khác; xung đột thì giữ cả hai bên. Sửa dòng có sẵn thì gửi yêu cầu `cham-tep`. Sổ wiki ghi bằng `make log m="..."` (mỗi mục một tệp ở `wiki/log/`), không sửa tay `wiki/log.md`: tệp ấy vẽ ra.
 11. Không sửa tay `src/components/ui` và `src/components/reui`. Lỗi kiểu trong đó không tính ở lượt kiểm chặt; đừng hạ cờ kiểm để qua.
 12. Mỗi màn mới phải vào bài axe ở cả sáng và tối trước khi trình Cổng Bằng chứng, vì kit bản 2.38.0 chưa đo được tương phản màu Tailwind 4.
 13. PR mở ở dạng nháp tới lúc trình Cổng Bằng chứng; chuyển sẵn sàng bằng `gh pr ready`.

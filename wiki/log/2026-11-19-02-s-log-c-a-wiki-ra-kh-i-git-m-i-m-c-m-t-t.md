@@ -1,0 +1,1 @@
+Sổ log của wiki ra khỏi git: mỗi mục một tệp ở `wiki/log/`, `wiki/log.md` vẽ ra bằng `make derived` và nằm trong `.gitignore`; ghi mục mới bằng `make log m="..."` — PR 1 trên 2 của nâng cấp repo-setup 0.9.0, hồ sơ `_acceptance/split-log-ledger/`.

@@ -123,4 +123,5 @@ Khoá riêng: làm ngay sau bước 5 của môi trường ấy. Khoá dùng chu
 - Bản thật không nối được cơ sở dữ liệu sau bước 3 và bước 4 đỏ: đừng lùi bản — bản cũ cũng dùng mật khẩu cũ. Sửa
   `DATABASE_URL` ở Vercel cho đúng mật khẩu mới, rồi chạy lại bước 4.
 - Khoá lộ mà không tạo được khoá mới (mất quyền quản trị): thu hồi khoá lộ trước, chấp nhận gián đoạn, rồi xin lại quyền.
-- Sau khi xong, ghi một dòng vào `wiki/log.md`: ngày, khoá nào, môi trường nào — không ghi giá trị.
+- Sau khi xong, ghi một mục sổ wiki bằng `make log m="<khoá nào, môi trường nào>"` (lệnh tự thêm ngày) — không ghi giá trị.
+  Đừng sửa tay `wiki/log.md`: tệp ấy vẽ ra từ `wiki/log/`.
