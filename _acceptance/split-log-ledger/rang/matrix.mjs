@@ -33,7 +33,7 @@ export const HAND_WRITE = [/(?:ghi|thêm)[^.\n]{0,40}`wiki\/log\.md`/i, /(?:add|
 
 /** The three measures of signed records this split broke, fixed after signature (sua-sau-ky.md). */
 export const FIXED = {
-  soQuyetDinh: "node _acceptance/don-no-bo-kiem/rang/so-quyet-dinh.mjs --root .",
+  soQuyetDinh: ["_acceptance/don-no-bo-kiem/rang/so-quyet-dinh.mjs", "--root", "."],
   tpcCase: "E4 red",
   tpcTwoWay: "_acceptance/tat-plugin-cho-cu/rang/two-way.mjs",
   rs090Case: "^ledgers",

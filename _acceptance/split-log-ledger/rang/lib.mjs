@@ -19,9 +19,9 @@ export function arg(name, argv = process.argv.slice(2)) {
   return i >= 0 ? argv[i + 1] : undefined;
 }
 
-/** Run a command; never throws. */
+/** Run a command without a shell (arguments are never parsed by one); never throws. */
 export function run(cmd, args, opts = {}) {
-  const r = spawnSync(cmd, args, { encoding: "utf8", maxBuffer: 256 * 1024 * 1024, ...opts });
+  const r = spawnSync(cmd, args, { encoding: "utf8", maxBuffer: 256 * 1024 * 1024, ...opts, shell: false });
   return { code: r.status, out: r.stdout ?? "", err: r.stderr ?? "" };
 }
 

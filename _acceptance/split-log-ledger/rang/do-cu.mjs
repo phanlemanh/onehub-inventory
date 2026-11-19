@@ -28,7 +28,9 @@ function twoWayCase(file, pattern, label) {
 }
 
 try {
-  const sq = run("bash", ["-c", FIXED.soQuyetDinh], { cwd: dir, env });
+  // E6 of don-no-bo-kiem is so-quyet-dinh.mjs then make ontology; the split broke only the first half. The second
+  // needs the design files a fresh copy has not drawn, and make check (E8) runs it on the real tree.
+  const sq = run("node", FIXED.soQuyetDinh, { cwd: dir, env });
   if (sq.code !== 0) problems.push(`so-quyet-dinh exited ${sq.code}: ${(sq.out.trim() || sq.err.trim().split("\n").slice(-3).join(" | "))}`);
   twoWayCase(FIXED.tpcTwoWay, FIXED.tpcCase, "tat-plugin-cho-cu two-way «E4 red»");
   twoWayCase(FIXED.rs090TwoWay, FIXED.rs090Case, "upgrade-repo-setup-0-9-0 two-way «ledgers»");
