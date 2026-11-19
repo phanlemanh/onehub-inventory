@@ -1,0 +1,85 @@
+schema_version: 1
+feature_slug: split-log-ledger
+# Ma trận viết trước (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
+#   Chỗ tách: c79189dd (main sau PR 90). wiki/log.md ở đó: 110 dòng mục, 108 mục khác nhau (hai mục mỗi mục hai bản).
+#   Sau khi tách: sổ log fragments, 109 tệp mục ở wiki/log/ (110 − 2 bản trùng + 1 mục mới ngày 2026-11-19).
+#   Mục mới được phép: ngày 2026-11-19 trở về sau. Ba sổ còn lại: một hình mỗi sổ (hôm nay one-file).
+#   Lời dặn ghi tay: 2 tệp (docs/van-hanh/xoay-khoa.md, docs/plan/dot-nen/LUAT-rieng.md); bản ghi lịch sử không quét:
+#     docs/superpowers/, docs/plan/do-he-design/, wiki/log/, _acceptance/.
+#   Phép đo của hồ sơ đã ký bị việc tách làm gãy: 3 (don-no-bo-kiem E6, tat-plugin-cho-cu E7 ca «E4 red (a)»,
+#     upgrade-repo-setup-0-9-0 E10 và ca «ledgers» của E12). Đọc trước/sau ở rang/do-cu-truoc-sau.md.
+#   CI: quick, e2e, check phải success; e2e-db và gate chỉ in.
+#   Cặp hai chiều: rang/two-way.mjs, mỗi ca phá một thông điệp ghim, kê ở `expected` của E7.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.sll_so_log
+    long_running: 2
+    layer: backend-effect
+    paths: ["wiki/**", ".gitignore", "tools/ledgers*.py", "mk/derived.mk", "_acceptance/split-log-ledger/rang/**"]
+    expected: "exit 0; dòng 'so-log: log is fragments, wiki/log.md drawn and out of git; the 108 entries of c79189dd (110 lines) each once, word for word, newest first; <n> written since' với n ≥ 1 (mục của chính việc này); không mục nào của c79189dd thiếu hay lặp, không mục nào ngày trước 2026-11-19 mà c79189dd không có (should-NOT-fire). Chiều đỏ ở E7: thiếu một mục → 'so-log: entry missing: - 2026-11-09 — '; một mục hai lần → 'so-log: entry 2 times: - 2026-11-09 — '; wiki/log.md trong git → 'so-log: wiki/log.md is in git'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.sll_ve_truoc_test
+    long_running: 3
+    layer: backend-effect
+    paths: ["Makefile", "mk/**", "tests/khong-o-tim.test.ts", "wiki/**", "_acceptance/split-log-ledger/rang/**"]
+    expected: "exit 0; dòng 've-truoc-test: a fresh checkout has no wiki/log.md; make check-quick draws it before it runs the tests; tests/khong-o-tim.test.ts passes once it is drawn'. Chiều đỏ ở E7: bản sao mà dòng `$(HEAVY_TARGETS) build dev: | derived` của Makefile mất `| derived` → 've-truoc-test: make check-quick does not draw the wiki log'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.sll_ke_thua_e10
+    long_running: 2
+    layer: backend-effect
+    paths: ["mk/**", "Makefile", "tools/ledgers*.py", "wiki/**", "ontology/glossary/**", "_acceptance/split-log-ledger/rang/**"]
+    expected: "exit 0; dòng 'ke-thua-e10: log fragments, index one-file, glossary one-file, gen one-file; make split DRY=1 exits 0 and writes nothing for each; mk/design-role-table.mk is mk/derived.mk of bd32d73e; make -n test runs tools/coverage_matrix/buttons.py'. Chiều đỏ ở E7: mk/design-role-table.mk thêm một byte → 'ke-thua-e10: mk/design-role-table.mk is not mk/derived.mk of bd32d73e'; bản ở c79189dd (trước khi tách) → 'ke-thua-e10: ledger log is one-file, not fragments'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.sll_docs_log
+    long_running: 1
+    layer: backend-effect
+    paths: ["**/*.md", "_acceptance/split-log-ledger/rang/**"]
+    expected: "exit 0; dòng 'docs-log: the 2 instructions name make log m= and lost their old words; <n> live .md files swept, none writes wiki/log.md by hand'. Chiều đỏ ở E7: bản ở c79189dd → 'docs-log: docs/van-hanh/xoay-khoa.md still has its old instruction'; một câu «thêm một dòng vào `wiki/log.md`» trong docs/van-hanh/khoi-phuc.md → '… writes wiki/log.md by hand'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5, AC-3
+    executor: script
+    cmd: config:executors.script.sll_do_cu
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/don-no-bo-kiem/**", "_acceptance/tat-plugin-cho-cu/**", "_acceptance/upgrade-repo-setup-0-9-0/**", "_acceptance/nang-kit-3-0/rang/**", "wiki/**", "_acceptance/split-log-ledger/**"]
+    expected: "exit 0; dòng 'do-cu: so-quyet-dinh exits 0; two-way «E4 red» of tat-plugin-cho-cu and «ledgers» of upgrade-repo-setup-0-9-0 pass; E10 declares not-run, superseded_by split-log-ledger#AC-3; three sua-sau-ky.md sections'. Chiều đỏ ở E7: so-quyet-dinh.mjs lại nhắm vào wiki/log.md → 'do-cu: so-quyet-dinh exited 1: so-quyet-dinh: ban sao con lien ket cu ma khong do'; E10 mất `status: not-run` và `superseded_by` → 'do-cu: E10 status is absent, not not-run'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.sll_ci_pr
+    long_running: 1
+    layer: backend-effect
+    paths: [".github/workflows/ci.yml", "_acceptance/split-log-ledger/rang/**"]
+    expected: "exit 0; dòng 'ci-pr: run <id> on <sha 8 ký tự>: quick, e2e, check success; e2e-db <kết luận>, gate <kết luận>' với sha là đầu nhánh của PR. Chiều đỏ ở E7: các job của lượt 44306178853 (check failure) → 'ci-pr: job check ended failure'; một lượt thiếu job e2e → 'job e2e is not in the run'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6
+    executor: script
+    cmd: config:executors.script.sll_two_way
+    long_running: 10
+    layer: backend-effect
+    paths: ["_acceptance/split-log-ledger/rang/**"]
+    expected: "exit 0; node --test đạt sáu ca: mỗi phép đo xanh trên bản lành và đỏ với thông điệp ghim trên bản phá, như ghi ở `expected` của E1 đến E6; không phép đo nào xanh trên bản phá (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-1, AC-2
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; đầu ra có dòng bắt đầu 'make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance', có 'drew wiki/log.md', và dòng 'no heavy checks'; không bài nào đỏ hay bị bỏ thêm (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

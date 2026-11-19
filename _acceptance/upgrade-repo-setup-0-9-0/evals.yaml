@@ -101,6 +101,10 @@ evals:
     criterion: AC-9
     executor: script
     cmd: config:executors.script.rs090_ledgers
+    # split-log-ledger split the log on purpose (Out of scope above: PR 2 to 5); AC-9 held at the verified
+    # commit and its two-way case in rang/two-way.mjs still proves the measure there (sua-sau-ky.md, 19/11).
+    status: not-run
+    superseded_by: split-log-ledger#AC-3
     long_running: 3
     layer: backend-effect
     paths: ["mk/**", "tools/ledgers*.py", "wiki/log.md", "wiki/index.md", "ontology/glossary.md", "src/generated/ontology.ts"]

@@ -32,9 +32,12 @@ const files = execFileSync("git", ["ls-files", "--cached", "--others", "--exclud
   .filter((f) => f && existsSync(join(root, f)));
 const read = (f) => readFileSync(join(root, f), "utf8");
 const real = check(files, read);
-const broken = check(files, (f) => (f === "wiki/log.md" ? `${read(f)}\n[0034](decisions/${OLD}.md)\n` : read(f)));
+// The log the copy breaks: since split-log-ledger (sua-sau-ky.md, 19/11) the newest entry of wiki/log/, because
+// wiki/log.md is drawn and out of git; wiki/log.md again while the log is one file.
+const LOG = files.filter((f) => /^wiki\/log\/\d{4}-\d{2}-\d{2}-\d{2}-.+\.md$/.test(f)).sort().pop() ?? "wiki/log.md";
+const broken = check(files, (f) => (f === LOG ? `${read(f)}\n[0034](decisions/${OLD}.md)\n` : read(f)));
 const out = [...real];
-if (!broken.includes("so-quyet-dinh: lien ket cu o wiki/log.md")) out.push("so-quyet-dinh: ban sao con lien ket cu ma khong do");
+if (!broken.includes(`so-quyet-dinh: lien ket cu o ${LOG}`)) out.push("so-quyet-dinh: ban sao con lien ket cu ma khong do");
 if (out.length) {
   console.log(out.join("\n"));
   process.exit(1);
