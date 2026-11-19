@@ -4,7 +4,7 @@ feature: Tách sổ log của wiki ra khỏi git (mỗi mục một tệp ở wi
 slug: split-log-ledger
 owner:
 risk_tier: T2
-surfaces: [wiki, docs, config]
+surfaces: [docs, config]
 status: draft
 design_doc: docs/superpowers/specs/2026-11-19-split-log-ledger-design.md
 ---
