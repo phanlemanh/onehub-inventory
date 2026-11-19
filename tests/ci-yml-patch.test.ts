@@ -79,7 +79,7 @@ describe("ban va workflow (AC-9)", () => {
     const image = agreed(/^ +image: *(\S+) *$/);
     const password = agreed(/^ +POSTGRES_PASSWORD: *(\S+) *$/);
     const ceiling = agreed(/^ +timeout-minutes: *(\d+) *$/);
-    expect([image, password, ceiling]).toEqual(["postgres:16", "local-only", "40"]);
+    expect([image, password, ceiling]).toEqual(["postgres:16", "local-only", "60"]);
     expect(block).toMatch(new RegExp(`^ {8}image: ${image.replace(".", "\\.")}$`, "m"));
     expect(block).toMatch(new RegExp(`^ {10}POSTGRES_PASSWORD: ${password}$`, "m"));
     expect(block).toMatch(/^ {10}- 5432:5432$/m);
@@ -137,7 +137,7 @@ describe("ci-thu doc chinh ban va (AC-9, AC-5)", () => {
         "mat khau: local-only",
         "cong trong container: 5432",
         "lenh: make ci-db",
-        "tran 40 phut",
+        "tran 60 phut",
         "",
       ].join("\n"),
     );
@@ -156,7 +156,7 @@ describe("ci-thu doc chinh ban va (AC-9, AC-5)", () => {
     const copy = join(dir, "ban-va-tran-3.patch");
     writeFileSync(
       copy,
-      readFileSync(PATCH, "utf8").replace("timeout-minutes: 40", "timeout-minutes: 3"),
+      readFileSync(PATCH, "utf8").replace("timeout-minutes: 60", "timeout-minutes: 3"),
     );
     const red = spawnSync("bash", [CI_THU, "--kiem-tran", "2.5", copy], { encoding: "utf8" });
     expect(red.status).toBe(1);

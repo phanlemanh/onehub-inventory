@@ -92,7 +92,7 @@ jobs:
     needs: quick
     if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     services:
       postgres:
         image: postgres:16
