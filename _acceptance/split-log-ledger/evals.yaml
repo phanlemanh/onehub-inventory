@@ -82,7 +82,7 @@ evals:
     long_running: 30
     layer: backend-effect
     paths: ["**"]
-    expected: "exit 0; đầu ra có dòng bắt đầu 'make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance', có 'drew wiki/log.md', và dòng 'no heavy checks'; không bài nào đỏ hay bị bỏ thêm (should-NOT-fire)"
+    expected: "exit 0; đầu ra có dòng bắt đầu 'make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance', dòng 'Tests  2466 passed | 2 skipped (2468)' và dòng 'no heavy checks'; không bài nào đỏ hay bị bỏ thêm (should-NOT-fire)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E9
     criterion: AC-7
