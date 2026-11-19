@@ -1,0 +1,1 @@
+Khung ứng dụng đầy đủ: mục đang chọn, lối nhảy, tiêu đề tab, trạng thái lỗi, không tìm thấy, chờ tải, hết phiên, bộ định dạng Intl vi-VN, màu sáu trạng thái, băng trên màn khi mất mạng, giao diện sáng và tối — hàng 1a, `_acceptance/khung-va-giao-dien/`

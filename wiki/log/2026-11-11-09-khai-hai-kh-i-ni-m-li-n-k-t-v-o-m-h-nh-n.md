@@ -1,0 +1,1 @@
+Khai hai khái niệm liên kết vào mô hình nghiệp vụ: Chủ của hàng (ListingOwner, có sàn và vai bên bán) và Căn của hàng (ListingUnit); mã dữ liệu mẫu dùng kiểu sinh — [khai-lien-ket-chao-can](../_acceptance/khai-lien-ket-chao-can/design.md)

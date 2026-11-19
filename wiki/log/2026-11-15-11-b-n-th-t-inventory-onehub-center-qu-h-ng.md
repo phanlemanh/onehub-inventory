@@ -1,0 +1,1 @@
+Bản thật ở `inventory.onehub.center`, Quỹ hàng giữ địa chỉ cũ chỉ để đối chiếu, không chuyển dữ liệu; thêm hàng 22 và 1u, hàng 21 thành chân trời H13 — [0041](decisions/0041-ban-that-o-dia-chi-rieng.md).

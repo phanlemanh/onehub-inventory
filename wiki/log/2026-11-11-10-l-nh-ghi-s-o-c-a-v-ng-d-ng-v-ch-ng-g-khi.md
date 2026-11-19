@@ -1,0 +1,1 @@
+Lệnh ghi số đo của vòng dừng và chỉ đường gỡ khi bản số đo cũ không đọc được, không phải JSON hay sai hình dạng, thay vì lặng lẽ bỏ tầng đã khai rồi ghi đè — hàng 1l, `_acceptance/so-do-ghi-khong-mat-tang/`

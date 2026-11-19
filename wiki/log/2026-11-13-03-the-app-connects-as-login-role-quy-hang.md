@@ -1,0 +1,1 @@
+The app connects as login role quy_hang_login (migration 008); the query door refuses an owner-reachable role; isolation suite gains login-session cases (row 7c) — [0027](decisions/0027-ung-dung-noi-bang-vai-dang-nhap.md).
