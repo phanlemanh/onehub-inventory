@@ -16,15 +16,20 @@ const dir = root();
 const problems = [];
 const RECORDS = ["don-no-bo-kiem", "tat-plugin-cho-cu", "upgrade-repo-setup-0-9-0"];
 
+// A measure run from inside `node --test` (two-way.mjs) inherits NODE_TEST_CONTEXT, and a nested `node --test`
+// then skips its files; the children here run as from a shell.
+const env = { ...process.env };
+delete env.NODE_TEST_CONTEXT;
+
 function twoWayCase(file, pattern, label) {
-  const r = run("node", ["--test", `--test-name-pattern=${pattern}`, file], { cwd: dir });
+  const r = run("node", ["--test", `--test-name-pattern=${pattern}`, file], { cwd: dir, env });
   const pass = Number((/ℹ pass (\d+)/.exec(r.out) ?? [])[1] ?? 0);
   if (r.code !== 0 || pass === 0) problems.push(`${label}: exit ${r.code}, ${pass} passed: ${r.out.split("\n").filter((l) => l.startsWith("✖")).join(" | ")}`);
 }
 
 try {
-  const sq = run("bash", ["-c", FIXED.soQuyetDinh], { cwd: dir });
-  if (sq.code !== 0) problems.push(`so-quyet-dinh exited ${sq.code}: ${sq.out.trim()}`);
+  const sq = run("bash", ["-c", FIXED.soQuyetDinh], { cwd: dir, env });
+  if (sq.code !== 0) problems.push(`so-quyet-dinh exited ${sq.code}: ${(sq.out.trim() || sq.err.trim().split("\n").slice(-3).join(" | "))}`);
   twoWayCase(FIXED.tpcTwoWay, FIXED.tpcCase, "tat-plugin-cho-cu two-way «E4 red»");
   twoWayCase(FIXED.rs090TwoWay, FIXED.rs090Case, "upgrade-repo-setup-0-9-0 two-way «ledgers»");
   const py = "import json,sys,yaml; d=yaml.safe_load(open(sys.argv[1])); print(json.dumps([e for e in d['evals'] if e.get('id')==sys.argv[2]]))";

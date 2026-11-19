@@ -4,7 +4,8 @@
 // What E10 said and this does not: index, glossary and gen are one-file. PR 2 of the plan splits them.
 // Usage: node ke-thua-e10.mjs [--root <dir>]
 
-import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { git, root, run, verdict } from "./lib.mjs";
@@ -16,7 +17,11 @@ const GEN_OUT = "src/generated/ontology.ts";
 const dir = root();
 const problems = [];
 const shapes = {};
-const status = () => git(dir, "status", "--porcelain", "--untracked-files=all");
+// What `make split DRY=1` could write: anything git sees, and the four drawn or kept ledger files, which
+// .gitignore may hide from git status — so those are compared by content.
+const LEDGER_FILES = ["wiki/log.md", "wiki/index.md", "ontology/glossary.md", GEN_OUT];
+const read = (f) => (existsSync(join(dir, f)) ? createHash("sha256").update(readFileSync(join(dir, f))).digest("hex") : "absent");
+const status = () => [git(dir, "status", "--porcelain", "--untracked-files=all"), ...LEDGER_FILES.map(read)].join("\n");
 
 try {
   for (const l of LEDGERS) {

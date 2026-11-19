@@ -9,6 +9,7 @@ feature_slug: split-log-ledger
 #   Phép đo của hồ sơ đã ký bị việc tách làm gãy: 3 (don-no-bo-kiem E6, tat-plugin-cho-cu E7 ca «E4 red (a)»,
 #     upgrade-repo-setup-0-9-0 E10 và ca «ledgers» của E12). Đọc trước/sau ở rang/do-cu-truoc-sau.md.
 #   CI: quick, e2e, check phải success; e2e-db và gate chỉ in.
+#   Bên đọc wiki/log.md không phải .md: 24 tệp, mỗi tệp một lý do ở READERS của rang/matrix.mjs.
 #   Cặp hai chiều: rang/two-way.mjs, mỗi ca phá một thông điệp ghim, kê ở `expected` của E7.
 evals:
   - id: E1
@@ -18,7 +19,7 @@ evals:
     long_running: 2
     layer: backend-effect
     paths: ["wiki/**", ".gitignore", "tools/ledgers*.py", "mk/derived.mk", "_acceptance/split-log-ledger/rang/**"]
-    expected: "exit 0; dòng 'so-log: log is fragments, wiki/log.md drawn and out of git; the 108 entries of c79189dd (110 lines) each once, word for word, newest first; <n> written since' với n ≥ 1 (mục của chính việc này); không mục nào của c79189dd thiếu hay lặp, không mục nào ngày trước 2026-11-19 mà c79189dd không có (should-NOT-fire). Chiều đỏ ở E7: thiếu một mục → 'so-log: entry missing: - 2026-11-09 — '; một mục hai lần → 'so-log: entry 2 times: - 2026-11-09 — '; wiki/log.md trong git → 'so-log: wiki/log.md is in git'"
+    expected: "exit 0; dòng 'so-log: log is fragments, wiki/log.md drawn and out of git, its head the same and the repository's own; the 108 entries of c79189dd (110 lines) each once, word for word, newest first; <n> written since' với n ≥ 1 (mục của chính việc này); không mục nào của c79189dd thiếu hay lặp, không mục nào ngày trước 2026-11-19 mà c79189dd không có (should-NOT-fire). Chiều đỏ ở E7: thiếu một mục → 'so-log: entry missing: - 2026-11-09 — '; một mục hai lần → 'so-log: entry 2 times: - 2026-11-09 — '; wiki/log.md trong git → 'so-log: wiki/log.md is in git'; tệp mục mới 2026-11-10-99 → 'so-log: entry dated before the split that c79189dd did not have: - 2026-11-10 — Một mục mới'; tools/ledgers.py vẽ cũ trước mới → 'so-log: not newest first at entry 2'; tiêu đề ở wiki/log.head.md mất một chữ → 'so-log: the head of the drawn log differs from c79189dd'; .repo-setup.json thêm lại wiki/log.head.md → 'so-log: .repo-setup.json still keeps wiki/log.head.md'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E2
     criterion: AC-2
@@ -36,7 +37,7 @@ evals:
     long_running: 2
     layer: backend-effect
     paths: ["mk/**", "Makefile", "tools/ledgers*.py", "wiki/**", "ontology/glossary/**", "_acceptance/split-log-ledger/rang/**"]
-    expected: "exit 0; dòng 'ke-thua-e10: log fragments, index one-file, glossary one-file, gen one-file; make split DRY=1 exits 0 and writes nothing for each; mk/design-role-table.mk is mk/derived.mk of bd32d73e; make -n test runs tools/coverage_matrix/buttons.py'. Chiều đỏ ở E7: mk/design-role-table.mk thêm một byte → 'ke-thua-e10: mk/design-role-table.mk is not mk/derived.mk of bd32d73e'; bản ở c79189dd (trước khi tách) → 'ke-thua-e10: ledger log is one-file, not fragments'"
+    expected: "exit 0; dòng 'ke-thua-e10: log fragments, index one-file, glossary one-file, gen one-file; make split DRY=1 exits 0 and writes nothing for each; mk/design-role-table.mk is mk/derived.mk of bd32d73e; make -n test runs tools/coverage_matrix/buttons.py'. Chiều đỏ ở E7: mk/design-role-table.mk thêm một byte → 'ke-thua-e10: mk/design-role-table.mk is not mk/derived.mk of bd32d73e'; bản ở c79189dd (trước khi tách) → 'ke-thua-e10: ledger log is one-file, not fragments'; công thức split của mk/derived.mk ghi thêm vào wiki/log.md (tệp .gitignore che) → 'ke-thua-e10: make split L=log DRY=1 wrote to the tree'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E4
     criterion: AC-4
@@ -45,7 +46,7 @@ evals:
     long_running: 1
     layer: backend-effect
     paths: ["**/*.md", "_acceptance/split-log-ledger/rang/**"]
-    expected: "exit 0; dòng 'docs-log: the 2 instructions name make log m= and lost their old words; <n> live .md files swept, none writes wiki/log.md by hand'. Chiều đỏ ở E7: bản ở c79189dd → 'docs-log: docs/van-hanh/xoay-khoa.md still has its old instruction'; một câu «thêm một dòng vào `wiki/log.md`» trong docs/van-hanh/khoi-phuc.md → '… writes wiki/log.md by hand'"
+    expected: "exit 0; dòng 'docs-log: the 2 instructions name make log m= and lost their old words; <n> live .md files swept, none writes wiki/log.md by hand'. Chiều đỏ ở E7: bản ở c79189dd → 'docs-log: docs/van-hanh/xoay-khoa.md still has its old instruction'; một câu «thêm một dòng vào `wiki/log.md`» trong docs/van-hanh/khoi-phuc.md → '… writes wiki/log.md by hand'; câu «Append a line to `wiki/log.md`» trong .claude/skills/wiki-query/SKILL.md → 'docs-log: .claude/skills/wiki-query/SKILL.md:<dòng> writes wiki/log.md by hand'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E5
     criterion: AC-5, AC-3
@@ -66,13 +67,13 @@ evals:
     expected: "exit 0; dòng 'ci-pr: run <id> on <sha 8 ký tự>: quick, e2e, check success; e2e-db <kết luận>, gate <kết luận>' với sha là đầu nhánh của PR. Chiều đỏ ở E7: các job của lượt 44306178853 (check failure) → 'ci-pr: job check ended failure'; một lượt thiếu job e2e → 'job e2e is not in the run'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E7
-    criterion: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6
+    criterion: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7
     executor: script
     cmd: config:executors.script.sll_two_way
     long_running: 10
     layer: backend-effect
     paths: ["_acceptance/split-log-ledger/rang/**"]
-    expected: "exit 0; node --test đạt sáu ca: mỗi phép đo xanh trên bản lành và đỏ với thông điệp ghim trên bản phá, như ghi ở `expected` của E1 đến E6; không phép đo nào xanh trên bản phá (should-NOT-fire)"
+    expected: "exit 0; node --test đạt bảy ca: mỗi phép đo xanh trên bản lành và đỏ với thông điệp ghim trên bản phá, như ghi ở `expected` của E1 đến E6 và E9; không phép đo nào xanh trên bản phá (should-NOT-fire)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E8
     criterion: AC-1, AC-2
@@ -82,4 +83,13 @@ evals:
     layer: backend-effect
     paths: ["**"]
     expected: "exit 0; đầu ra có dòng bắt đầu 'make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance', có 'drew wiki/log.md', và dòng 'no heavy checks'; không bài nào đỏ hay bị bỏ thêm (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.sll_ben_doc
+    long_running: 1
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng 'ben-doc: 24 files that are no .md name wiki/log.md, each weighed in READERS; none new'. Chiều đỏ ở E7: tệp mới tools/doc-log.mjs đọc wiki/log.md, đã git add → 'ben-doc: reader not weighed: tools/doc-log.mjs'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

@@ -15,7 +15,7 @@ design_doc: docs/superpowers/specs/2026-11-19-split-log-ledger-design.md
 
 PR 88 (`3e4f4fbd`) đưa kho lên repo-setup 0.9.0 phần máy chạy: công cụ sổ `tools/ledgers*.py`, `make derived`,
 `make split`. Bốn sổ (`log`, `index`, `glossary`, `gen`) vẫn nằm trong git, mỗi sổ một tệp. Chủ kho quyết ngày 19/11:
-tách bằng hai PR, sổ `log` trước; `index`, `glossary` và `gen` ở PR sau (Out of scope). Kế hoạch:
+tách bằng hai PR, sổ `log` trước; `index`, `glossary` và `gen` ở PR sau, mỗi sổ một commit (Out of scope). Quyết định này thay mục «mỗi sổ một PR, PR 2 đến 5» của kế hoạch và của hồ sơ `upgrade-repo-setup-0-9-0` (Hỏi-4). Kế hoạch:
 `docs/superpowers/plans/2026-11-18-onehub-upgrade-0.9.0.md` của kho phanlemanh/repo-standards, mục 5 và 6.
 
 Nhánh `chore/split-log-ledger` cắt từ `c79189dd` (main sau PR 90) và đã làm sẵn, như hồ sơ PR 88:
@@ -58,26 +58,36 @@ lượt chấm.
   y hệt, di chứng của các lần gộp. `make split` giữ cả hai bản. Máy khuyên **gỡ bản thừa** (commit `c1272ef7`, hai tệp,
   đảo được bằng `git revert`). Nếu **giữ**: bỏ commit ấy, AC-1 đổi thành «110 dòng, mỗi dòng đúng số lần như trước».
 
+- **Hỏi-4 — xác nhận: hai PR thay cho bốn.** Phiên điều phối chuyển lời chủ kho ngày 19/11: tách bằng hai PR, sổ `log`
+  trước, `index`, `glossary` và `gen` ở PR 2, mỗi sổ một commit. Kế hoạch và Out of scope của `upgrade-repo-setup-0-9-0`
+  còn ghi «mỗi sổ một PR, PR 2 đến 5». Máy khuyên **xác nhận** để sổ quyết định có lời của chủ kho; AC-3 viết để bền qua
+  PR 2 dù PR ấy tách một hay ba sổ. Nếu **không** (quay về bốn PR): hồ sơ này không đổi, chỉ Out of scope đổi chữ.
+
 ## Criteria
 
 - AC-1: Given HEAD, When hỏi hình sổ log, vẽ `wiki/log.md` bằng `make wiki-derived` và so với `wiki/log.md` của `c79189dd`,
   Then sổ log là `fragments`; `wiki/log.md` không nằm trong git và bị `.gitignore` bỏ qua; `make ledgers-check` và
   `make derived-untracked` thoát 0; mỗi mục trong 108 mục khác nhau của `c79189dd` (110 dòng) có mặt đúng một lần, khớp
-  từng chữ; mọi mục khác đều mang ngày 2026-11-19 trở về sau; các mục xếp mới trước cũ theo ngày; và trên bản sao thiếu
-  một mục, có một mục hai lần, hay có `wiki/log.md` trong git, phép đo đỏ gọi đúng lỗi ấy.
+  từng chữ; mọi mục khác đều mang ngày 2026-11-19 trở về sau; các mục xếp mới trước cũ theo ngày; phần đầu sổ (front
+  matter, tiêu đề, lời dặn) vẽ ra giống từng chữ bản ở `c79189dd`, `wiki/log.head.md` nằm trong git và `.repo-setup.json`
+  thôi giữ nó; và trên bản sao thiếu một mục, có một mục hai lần, có `wiki/log.md` trong git, có một mục mới mang ngày
+  trước khi tách, vẽ cũ trước mới, đầu sổ lệch một chữ, hay `.repo-setup.json` còn giữ `wiki/log.head.md`, phép đo đỏ
+  gọi đúng lỗi ấy.
 - AC-2: Given một bản checkout mới của HEAD, When đọc kế hoạch của `make check-quick` (tầng nhẹ CI chạy ở mọi lần đẩy),
   Then bản checkout chưa có `wiki/log.md`; `make check-quick` vẽ sổ log trước khi chạy bài kiểm; và sau `make derived`,
   `tests/khong-o-tim.test.ts` (bài đọc `wiki/log.md`) đạt; trên bản sao mà các bước của `check` thôi chờ `derived`,
   phép đo đỏ `make check-quick does not draw the wiki log`.
 - AC-3: Given HEAD, When hỏi hình bốn sổ và chạy `make split L=<sổ> DRY=1` cho từng sổ, Then sổ log là `fragments`, ba sổ
-  còn lại mỗi sổ một hình (`one-file` hay `fragments`), cả bốn lệnh thoát 0 mà không ghi tệp nào;
+  còn lại mỗi sổ một hình (`one-file` hay `fragments`), cả bốn lệnh thoát 0 mà không ghi tệp nào (so `git status` và
+  nội dung bốn tệp sổ, kể cả tệp `.gitignore` che; bản sao mà `make split` ghi vào `wiki/log.md` thì đỏ);
   `mk/design-role-table.mk` giống từng byte `mk/derived.mk` của `bd32d73e`; `make -n test` vẫn chạy
   `tools/coverage_matrix/buttons.py`. AC này đứng thay `upgrade-repo-setup-0-9-0/E10` (AC-9 của hồ sơ ấy), trừ câu
   «index, glossary, gen là one-file» mà PR 2 sẽ đổi.
 - AC-4: Given HEAD, When đọc `docs/van-hanh/xoay-khoa.md`, `docs/plan/dot-nen/LUAT-rieng.md` và mọi tệp `.md` git giữ
   ngoài `wiki/log/`, `_acceptance/`, `docs/superpowers/` và `docs/plan/do-he-design/` (bản ghi của việc đã qua), Then hai
   tệp đầu không còn lời dặn cũ và có `make log m=`; không tệp nào có câu dặn ghi hay thêm một dòng vào `wiki/log.md`
-  bằng tay; trên `c79189dd` phép đo đỏ ở `docs/van-hanh/xoay-khoa.md`.
+  bằng tay, tiếng Việt hay tiếng Anh (lời dặn cho AI như `.claude/skills/*` viết bằng tiếng Anh); trên `c79189dd` phép đo
+  đỏ ở `docs/van-hanh/xoay-khoa.md`, và một câu «Append a line to `wiki/log.md`» trong một skill làm nó đỏ.
 - AC-5: Given HEAD và câu trả lời «đồng ý» cho Hỏi-2, When chạy `so_quyet_dinh` của `don-no-bo-kiem`, ca «E4 red» của
   `tat-plugin-cho-cu/rang/two-way.mjs` và ca «ledgers» của `upgrade-repo-setup-0-9-0/rang/two-way.mjs`, Then cả ba đạt; E10
   của `upgrade-repo-setup-0-9-0` khai `status: not-run` và `superseded_by: split-log-ledger#AC-3`; mỗi hồ sơ trong ba hồ sơ có
@@ -85,6 +95,11 @@ lượt chấm.
   phép đo đỏ.
 - AC-6: Given lượt CI mới nhất trên đầu nhánh của PR, When đọc các job, Then `quick`, `e2e` và `check` kết thúc `success`;
   phép đo in kết luận của `e2e-db` và `gate` (`gate` chờ chữ ký của hồ sơ này, `e2e-db` không chặn gộp).
+- AC-7: Given HEAD, When tìm mọi tệp git giữ không phải `.md` có nhắc `wiki/log.md` (trừ `wiki/log/`, hồ sơ này, và tệp
+  dữ liệu của các lượt cũ: `s4-args*.json`, `run-log.jsonl`, `decisions.jsonl`, `card.html`, `evidence-page.html`), Then
+  mỗi tệp có trong bảng `READERS` của `rang/matrix.mjs` kèm lý do nó vẫn đúng sau khi tách (24 tệp hôm nay: công cụ sổ,
+  tệp bỏ qua, bài kiểm chờ `derived`, eval phán đoán đọc tệp vẽ, ba phép đo đã sửa ở AC-5, danh sách tệp đổi của commit
+  cũ); một tệp mới đọc `wiki/log.md` mà chưa cân thì phép đo đỏ gọi tên tệp ấy.
 
 ## Coverage
 
@@ -94,11 +109,12 @@ Phủ theo tệp đổi so với `c79189dd`, nhóm theo việc. Không quét kh�
 | Nhóm | Tệp | Tiêu chí |
 | --- | --- | --- |
 | Sổ log: `wiki/log.md` ra khỏi git, mục thành tệp ở `wiki/log/` (110 do `make split`, trừ 2 bản trùng, cộng 1 mục mới) | 1 xoá, 109 thêm | AC-1; AC-2; AC-3 |
-| `.repo-setup.json`: bỏ `wiki/log.head.md` khỏi danh sách repo-setup theo dõi (do `make split`) | 1 | AC-3 (`make split DRY=1`); diff |
+| `.repo-setup.json`: bỏ `wiki/log.head.md` khỏi danh sách repo-setup theo dõi (do `make split`) | 1 | AC-1 |
 | Hai lời dặn ghi tay (`docs/van-hanh/xoay-khoa.md`, `docs/plan/dot-nen/LUAT-rieng.md`) | 2 | AC-4 |
 | Ba phép đo của hồ sơ đã ký, E10 của `upgrade-repo-setup-0-9-0`, ba `sua-sau-ky.md` (Hỏi-2) | 7 | AC-5; AC-3 |
-| Hồ sơ này, các lệnh `sll_*` trong `_acceptance/config.yaml`, design doc | — | AC-1 đến AC-6 qua E7 |
+| Hồ sơ này, các lệnh `sll_*` trong `_acceptance/config.yaml`, design doc | — | AC-1 đến AC-7 qua E7 |
 | CI trên PR | — | AC-6 |
+| Bên đọc `wiki/log.md` không đổi (công cụ, tệp bỏ qua, bài kiểm, eval của hồ sơ cũ) | 0 đổi, 24 cân | AC-7; AC-2; AC-5 |
 | `.gitattributes` (Hỏi-1: giữ) | 0 | Không đổi; diff |
 
 ## Out of scope

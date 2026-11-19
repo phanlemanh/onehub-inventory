@@ -178,6 +178,7 @@ executors:
     sll_docs_log: "node _acceptance/split-log-ledger/rang/docs-log.mjs"   # split-log-ledger: no live document writes wiki/log.md by hand
     sll_do_cu: "node _acceptance/split-log-ledger/rang/do-cu.mjs"   # split-log-ledger: the three measures of signed records the split broke are whole again
     sll_ci_pr: "node _acceptance/split-log-ledger/rang/ci-pr.mjs"   # split-log-ledger: quick, e2e, check green on the pull request's head; e2e-db and gate printed
+    sll_ben_doc: "node _acceptance/split-log-ledger/rang/ben-doc.mjs"   # split-log-ledger: every tracked file that is no .md and names the drawn log is weighed in READERS
     sll_two_way: "node --test _acceptance/split-log-ledger/rang/two-way.mjs"   # split-log-ledger: each measure green on a sound copy, red with its pinned message on a broken one
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:

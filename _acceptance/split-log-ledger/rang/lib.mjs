@@ -2,7 +2,7 @@
 // place (three levels up), or given with --root <dir> (a broken copy in two-way.mjs).
 
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, symlinkSync } from "node:fs";
+import { mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -41,13 +41,20 @@ export function verdict(name, problems, okLine) {
   process.exit(0);
 }
 
-/** A detached worktree of `ref` in a temp dir with node_modules linked; `remove()` takes it away. */
+/**
+ * A detached worktree of `ref` in a temp dir with node_modules linked; `remove()` takes it away. git sees the
+ * link as an untracked file (`.gitignore` names the folder `node_modules/`), so `env` hides it from every git
+ * a measure runs in the copy, through a temporary excludes file.
+ */
 export function worktree(dir, ref) {
   const at = join(mkdtempSync(join(tmpdir(), "sll-wt-")), "w");
   git(dir, "worktree", "add", "-q", "--detach", at, ref);
   symlinkSync(join(dir, "node_modules"), join(at, "node_modules"));
+  const exclude = join(dirname(at), "exclude");
+  writeFileSync(exclude, "node_modules\n");
   return {
     dir: at,
+    env: { ...process.env, GIT_CONFIG_COUNT: "1", GIT_CONFIG_KEY_0: "core.excludesFile", GIT_CONFIG_VALUE_0: exclude },
     remove() {
       run("git", ["-C", dir, "worktree", "remove", "--force", at]);
       rmSync(dirname(at), { recursive: true, force: true });

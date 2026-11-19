@@ -29,16 +29,20 @@ before(() => {
 });
 after(() => rmSync(tmp, { recursive: true, force: true }));
 
+let copyEnv = process.env;
+
 function measure(script, at, args = []) {
-  return run("node", [join(HERE, script), "--root", at, ...args]);
+  return run("node", [join(HERE, script), "--root", at, ...args], { env: copyEnv });
 }
 
 function withCopy(ref, edit, fn) {
   const wt = worktree(ROOT, ref);
   try {
+    copyEnv = wt.env;
     if (edit) edit(wt.dir);
     fn(wt.dir);
   } finally {
+    copyEnv = process.env;
     wt.remove();
   }
 }
@@ -81,6 +85,26 @@ test("so-log: green on a sound copy; red when an entry is gone, when one is ther
     },
     (at) => red(measure("so-log.mjs", at), "so-log: wiki/log.md is in git"),
   );
+  withCopy(
+    "HEAD",
+    (at) => writeFileSync(join(at, "wiki/log/2026-11-10-99-chen-ngay-cu.md"), "Một mục mới mang ngày trước khi tách.\n"),
+    (at) => red(measure("so-log.mjs", at), "so-log: entry dated before the split that c79189dd did not have: - 2026-11-10 — Một mục mới"),
+  );
+  withCopy(
+    "HEAD",
+    (at) => swap(at, "tools/ledgers.py", "for p in reversed(log_entries(root))", "for p in log_entries(root)"),
+    (at) => red(measure("so-log.mjs", at), "so-log: not newest first at entry 2"),
+  );
+  withCopy(
+    "HEAD",
+    (at) => swap(at, "wiki/log.head.md", "title: Change log of the wiki and notable code changes", "title: Change log of the wiki and notable code change"),
+    (at) => red(measure("so-log.mjs", at), "so-log: the head of the drawn log differs from c79189dd"),
+  );
+  withCopy(
+    "HEAD",
+    (at) => swap(at, ".repo-setup.json", '"wiki/index.head.md": "0.9.0",', '"wiki/index.head.md": "0.9.0",\n    "wiki/log.head.md": "0.9.0",'),
+    (at) => red(measure("so-log.mjs", at), "so-log: .repo-setup.json still keeps wiki/log.head.md"),
+  );
 });
 
 test("ve-truoc-test: green on a fresh copy; red when the steps no longer wait for derived", () => {
@@ -96,6 +120,11 @@ test("ke-thua-e10: green on a sound copy; red on the renamed file changed, and b
   withCopy("HEAD", null, (at) => green(measure("ke-thua-e10.mjs", at), "ke-thua-e10"));
   withCopy("HEAD", (at) => appendFileSync(join(at, "mk/design-role-table.mk"), "\n"), (at) => red(measure("ke-thua-e10.mjs", at), "ke-thua-e10: mk/design-role-table.mk is not mk/derived.mk of bd32d73e"));
   withCopy(SPLIT_FROM, null, (at) => red(measure("ke-thua-e10.mjs", at), "ke-thua-e10: ledger log is one-file, not fragments"));
+  withCopy(
+    "HEAD",
+    (at) => swap(at, "mk/derived.mk", "$(if $(DRY),--dry-run)", "$(if $(DRY),--dry-run) && printf x >> wiki/log.md"),
+    (at) => red(measure("ke-thua-e10.mjs", at), "ke-thua-e10: make split L=log DRY=1 wrote to the tree"),
+  );
 });
 
 test("docs-log: green on a sound copy; red before the split, and on a new hand-written instruction", () => {
@@ -105,6 +134,23 @@ test("docs-log: green on a sound copy; red before the split, and on a new hand-w
     "HEAD",
     (at) => appendFileSync(join(at, "docs/van-hanh/khoi-phuc.md"), "\nSau đó thêm một dòng vào `wiki/log.md`.\n"),
     (at) => red(measure("docs-log.mjs", at), "writes wiki/log.md by hand"),
+  );
+  withCopy(
+    "HEAD",
+    (at) => appendFileSync(join(at, ".claude/skills/wiki-query/SKILL.md"), "\nAppend a line to `wiki/log.md` after each answer.\n"),
+    (at) => red(measure("docs-log.mjs", at), "docs-log: .claude/skills/wiki-query/SKILL.md:"),
+  );
+});
+
+test("ben-doc: green on a sound copy; red on a new tracked reader of wiki/log.md", () => {
+  withCopy("HEAD", null, (at) => green(measure("ben-doc.mjs", at), "ben-doc"));
+  withCopy(
+    "HEAD",
+    (at) => {
+      writeFileSync(join(at, "tools/doc-log.mjs"), 'import { readFileSync } from "node:fs";\nconsole.log(readFileSync("wiki/log.md", "utf8").length);\n');
+      git(at, "add", "tools/doc-log.mjs");
+    },
+    (at) => red(measure("ben-doc.mjs", at), "ben-doc: reader not weighed: tools/doc-log.mjs"),
   );
 });
 

@@ -46,3 +46,38 @@ export const SUPERSEDES = { evals: "_acceptance/upgrade-repo-setup-0-9-0/evals.y
 /** The three jobs that must end in success on the pull request's head; e2e-db and gate are read and printed (gate waits for the owner's signature). */
 export const CI_REQUIRED = ["quick", "e2e", "check"];
 export const CI_REPORTED = ["e2e-db", "gate"];
+
+/**
+ * Every tracked file that is no .md and names wiki/log.md, each with why it is sound after the split (AC-7).
+ * Records of past runs (RECORD_DATA) only quote the name and read nothing.
+ */
+export const READERS = {
+  ".gitattributes": "repo-setup's template line merge=union; applies to no tracked file now (Hỏi-1: kept)",
+  ".gitignore": "keeps the drawn file out of git",
+  ".prettierignore": "keeps the drawn file out of the formatter",
+  "mk/derived.mk": "the ledger tool: draws the file",
+  "tools/ledgers.py": "the ledger tool: draws the file",
+  "tools/ledgers_split.py": "the ledger tool: the split itself",
+  "tests/khong-o-tim.test.ts": "reads the drawn file; every check step waits for derived (AC-2)",
+  "_acceptance/config.yaml": "comments of this record's commands",
+  "_acceptance/bang-hang-the-dien-thoai/evals.yaml": "judgment input: the drawn file, same entries",
+  "_acceptance/bang-quyen-theo-vai/evals.yaml": "judgment input: the drawn file, same entries",
+  "_acceptance/bo-o-tim-cua-vung/evals.yaml": "judgment input and make test: the drawn file, same entries",
+  "_acceptance/thue-phi/evals.yaml": "judgment input: the drawn file, same entries",
+  "_acceptance/don-no-bo-kiem/evals.yaml": "words of E6's expected; its measure is mended (AC-5)",
+  "_acceptance/don-no-bo-kiem/rang/so-quyet-dinh.mjs": "mended after signature (AC-5)",
+  "_acceptance/tat-plugin-cho-cu/evals.yaml": "words of E4's expected; the sweep reads files git holds, now the entries",
+  "_acceptance/tat-plugin-cho-cu/rang/two-way.mjs": "mended after signature (AC-5)",
+  "_acceptance/upgrade-repo-setup-0-9-0/evals.yaml": "E10, now not-run and superseded by AC-3 (AC-5)",
+  "_acceptance/upgrade-repo-setup-0-9-0/rang/two-way.mjs": "mended after signature (AC-5)",
+  "_acceptance/upgrade-design-assembly-tool/evals.yaml": "comment: a file the upgrade commit changed",
+  "_acceptance/upgrade-design-assembly-tool/rang/matrix.mjs": "the list of files a past commit changed; reads history, not the file",
+  "_acceptance/upgrade-design-assembly-0-7-0/rang/matrix.mjs": "the list of files a past commit changed; reads history, not the file",
+  "_acceptance/upgrade-design-assembly-0-7-1/evals.yaml": "comment: a file the upgrade commit changed",
+  "_acceptance/upgrade-design-assembly-0-7-1/rang/matrix.mjs": "the list of files a past commit changed; reads history, not the file",
+  "_acceptance/upgrade-design-assembly-0-7-1/rang/measures-two-way.mjs": "a made-up change list in a broken copy; reads nothing",
+};
+
+/** This record's own files, and data files of past runs that only quote the name. */
+export const OWN = "_acceptance/split-log-ledger/";
+export const RECORD_DATA = /(?:^|\/)(?:s4-args[^/]*\.json|run-log\.jsonl|decisions\.jsonl|card\.html|evidence-page\.html)$/;
