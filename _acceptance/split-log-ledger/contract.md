@@ -5,7 +5,7 @@ slug: split-log-ledger
 owner:
 risk_tier: T2
 surfaces: [docs, config]
-status: verified
+status: signed-off
 approved_by: Phan Le Manh
 approved_at: 2026-11-19
 design_doc: docs/superpowers/specs/2026-11-19-split-log-ledger-design.md
@@ -169,3 +169,9 @@ Ba hồ sơ đã ký để nguyên như lúc ký (Hỏi-2: không). Lượt ghim
 - Ngoài-4 (máy định tuyến 2026-11-19, đề xuất S4 known-limits): The check only confirms the quick check is ordered to draw the log before the tests, not that a real run does so. A faulty setup could pass the check yet fail on the first real run, where it would show up immediately. — `_acceptance/split-log-ledger/rang/ve-truoc-test.mjs`
 - Ngoài-5 (máy định tuyến 2026-11-19, đề xuất S4 known-limits): The recorded 'before' conflict count can only be reproduced from the owner's main checkout, not from another copy or machine. Product users are unaffected. — `_acceptance/split-log-ledger/rang/measure.sh`
 - Ngoài-6 (máy định tuyến 2026-11-19, đề xuất S4 known-limits): One test case builds its sample log entry by hand instead of with the real tool, so it could miss a future change in the entry format. Today it matches, and users see no effect. — `_acceptance/split-log-ledger/rang/two-way.mjs`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-19:
+  - Ngoài-1: Mục «Lựa chọn» của tài liệu thiết kế còn tả cách làm cũ của Hỏi-2 mà chủ kho đã bác; sổ log tách đúng như đã duyệt.
+  - Ngoài-3: Phép đo «trước» (`rang/measure.sh`) ghi cứng đường dẫn bản checkout của chủ kho, lộ tên người dùng máy.
+  - Ngoài-4: Phép đo `ve-truoc-test` đọc kế hoạch của `make check-quick`, không đo một lần chạy thật; CI thật vẫn là lưới chặn.
+  - Ngoài-5: Phép đo «trước» chỉ chạy lại được từ bản checkout chính của chủ kho.
+  - Ngoài-6: Một ca thử của `so-log` tự viết tệp mục bằng tay thay vì sinh bằng công cụ thật; hôm nay khớp khuôn.
