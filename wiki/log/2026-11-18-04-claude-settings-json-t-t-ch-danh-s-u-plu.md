@@ -1,0 +1,1 @@
+`.claude/settings.json` tắt đích danh sáu plugin của chợ kit cũ, nên phiên mở ở kho này chỉ nạp kit 3.0.0 của chợ `delivery-loop` dù máy bật bản cũ ở mức người dùng; đo bằng phiên thật, có đối chứng dương ở merge-base — hồ sơ `_acceptance/tat-plugin-cho-cu/`.

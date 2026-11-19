@@ -1,0 +1,1 @@
+Màn đăng nhập chọn lại từ khối ReUI auth-15 (logo trên, một cột hẹp giữa trang, chân trang một dòng); họ màn mới «dang-nhap» với khuôn LoginLayout; luồng mã email và bài kiểm hàng 8, 1m giữ nguyên — `_acceptance/dang-nhap-chon-tu-reui/`.

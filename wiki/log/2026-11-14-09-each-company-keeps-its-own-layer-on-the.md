@@ -1,0 +1,1 @@
+Each company keeps its own layer on the standard core: labels, custom fields, value spellings, pending units and import templates; the inventory reads the company's words and columns, and the screen «Tuỳ chỉnh của sàn» reviews them with the row 9e button set (row 7e) — [0029](decisions/0029-cau-hinh-san-dua-vao-danh-tinh-va-danh-muc.md).

@@ -1,0 +1,1 @@
+Góc nhìn đã lưu, phần máy chủ (hàng 2c): khái niệm `SavedView`, bốn thao tác của bảng quyền (của tôi, ba vai đọc Bảng hàng), bảng `saved_view` (migration 009, chỉ người lưu chạm được), cửa `/api/v1/saved-views`; mô-đun danh tính mở cửa thao tác dùng chung — `_acceptance/luu-goc-nhin-cot-hai/`, [0026](decisions/0026-cua-thao-tac-dung-chung.md).

@@ -1,0 +1,31 @@
+PR 91 (2026-11-18T22:31:58Z): merge-backs=0 conflicted=0 ledger-conflicted=0
+PR 90 (2026-11-19T02:45:55Z): merge-backs=2 conflicted=2 ledger-conflicted=1 [wiki/log.md ]
+PR 88 (2026-11-19T01:26:44Z): merge-backs=2 conflicted=1 ledger-conflicted=0
+PR 87 (2026-11-18T13:59:20Z): merge-backs=1 conflicted=1 ledger-conflicted=1 [wiki/log.md ]
+PR 86 (2026-11-18T10:52:44Z): merge-backs=1 conflicted=1 ledger-conflicted=1 [wiki/log.md ]
+PR 85 (2026-11-18T08:47:27Z): merge-backs=0 conflicted=0 ledger-conflicted=0
+PR 84 (2026-11-17T09:47:10Z): merge-backs=1 conflicted=1 ledger-conflicted=1 [wiki/log.md ]
+PR 82 (2026-11-17T01:45:01Z): merge-backs=0 conflicted=0 ledger-conflicted=0
+PR 81 (2026-11-16T23:21:25Z): merge-backs=2 conflicted=2 ledger-conflicted=2 [wiki/log.md ]
+PR 80 (2026-11-16T12:49:12Z): merge-backs=1 conflicted=0 ledger-conflicted=0
+PR 79 (2026-11-16T13:56:59Z): merge-backs=6 conflicted=6 ledger-conflicted=2 [wiki/log.md ]
+PR 73 (2026-11-16T07:07:13Z): merge-backs=1 conflicted=1 ledger-conflicted=1 [wiki/log.md ]
+PR 72 (2026-11-16T06:35:17Z): merge-backs=1 conflicted=1 ledger-conflicted=1 [wiki/log.md ]
+PR 71 (2026-11-16T10:19:14Z): merge-backs=5 conflicted=4 ledger-conflicted=4 [wiki/index.md wiki/log.md ]
+PR 70 (2026-11-15T22:54:30Z): merge-backs=1 conflicted=1 ledger-conflicted=1 [wiki/log.md ]
+PR 69 (2026-11-16T03:15:38Z): merge-backs=4 conflicted=4 ledger-conflicted=2 [wiki/index.md wiki/log.md ]
+PR 68 (2026-11-15T10:04:10Z): merge-backs=2 conflicted=2 ledger-conflicted=1 [wiki/log.md ]
+PR 67 (2026-11-15T07:03:40Z): merge-backs=0 conflicted=0 ledger-conflicted=0
+PR 66 (2026-11-15T20:09:00Z): merge-backs=4 conflicted=4 ledger-conflicted=4 [wiki/log.md ]
+PR 65 (2026-11-16T01:35:30Z): merge-backs=7 conflicted=6 ledger-conflicted=4 [wiki/log.md ]
+PR 64 (2026-11-16T05:34:13Z): merge-backs=8 conflicted=8 ledger-conflicted=5 [wiki/index.md wiki/log.md ]
+PR 63 (2026-11-15T08:14:27Z): merge-backs=6 conflicted=6 ledger-conflicted=5 [wiki/log.md ]
+PR 62 (2026-11-14T17:25:02Z): merge-backs=1 conflicted=1 ledger-conflicted=1 [wiki/log.md ]
+PR 61 (2026-11-15T02:41:36Z): merge-backs=5 conflicted=4 ledger-conflicted=4 [wiki/log.md ]
+PR 60 (2026-11-14T16:50:52Z): merge-backs=2 conflicted=2 ledger-conflicted=2 [wiki/log.md ]
+PR 59 (2026-11-15T01:44:36Z): merge-backs=4 conflicted=2 ledger-conflicted=2 [wiki/log.md ]
+PR 58 (2026-11-15T00:55:36Z): merge-backs=3 conflicted=3 ledger-conflicted=2 [wiki/index.md wiki/log.md ]
+PR 57 (2026-11-14T12:57:36Z): merge-backs=4 conflicted=3 ledger-conflicted=1 [wiki/log.md ]
+PR 56 (2026-11-14T08:22:06Z): merge-backs=0 conflicted=0 ledger-conflicted=0
+PR 55 (2026-11-14T10:18:03Z): merge-backs=4 conflicted=4 ledger-conflicted=3 [wiki/log.md ]
+TOTAL: PRs=30 merge-backs=78 conflicted=70 ledger-conflicted=51 PRs-with-ledger-conflict=23

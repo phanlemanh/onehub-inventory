@@ -1,0 +1,1 @@
+Góc nhìn đã lưu thôi giữ chữ tìm (chủ kho chốt 2026-11-13, hàng 2c): migration 011 bỏ chữ tìm khỏi dữ liệu góc nhìn cũ; mô tả `SavedView` và trang thực thể sửa theo (hàng 2e, đợt A); công cụ chứng minh màn kiểm từng khối được miễn của sổ khối bằng git — `_acceptance/bo-o-tim-cua-vung/`, `tools/proof_gate/legacy.py`.

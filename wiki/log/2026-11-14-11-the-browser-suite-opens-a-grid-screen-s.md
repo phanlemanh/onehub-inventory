@@ -1,0 +1,1 @@
+The browser suite opens a grid screen's region cases at its declared `vao_vung` (state query joined with «&»), and «chữ dài» measures the reverse where the longest allowed text fits (row 7e, after signature) — [0032](decisions/0032-loi-vao-bo-vung-luoi.md).

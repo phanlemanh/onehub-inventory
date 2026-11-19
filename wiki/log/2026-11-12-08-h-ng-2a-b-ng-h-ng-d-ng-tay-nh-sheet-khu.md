@@ -1,0 +1,1 @@
+hàng 2a «Bảng hàng dùng tay như Sheet»: khuôn Lưới có ô chọn và đi phím, chép vùng, sắp, lọc từng cột, nhóm theo toà, ẩn hiện cột, toàn màn hình; sáu lối tắt trạng thái ở cột thứ hai — hàng 2a, `_acceptance/bang-hang-dung-tay-nhu-sheet/`

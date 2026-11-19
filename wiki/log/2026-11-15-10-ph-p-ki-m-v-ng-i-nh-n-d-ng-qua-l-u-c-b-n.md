@@ -1,0 +1,1 @@
+Phép kiểm vòng đời nhận dạng ô «qua lưu cả bảng» cho ô thêm và gỡ (thao tác là thao tác sửa của cùng thực thể, có lý do, có nút; báo cáo in thành nhóm riêng); khoản Thuế phí khai theo dạng này (hàng 19, G N-1511-3, sau chữ ký 1t) — [sửa sau ký](../_acceptance/kiem-vong-doi-thao-tac/sua-sau-ky.md).

@@ -1,0 +1,1 @@
+Inventory by place (row 2d): the App Shell's second column lists projects, then subdivisions and buildings, with no counts; picking one filters the grid's Building column (whole names, stray spaces folded), «Tất cả hàng» drops it, and the footer shows the count — [PR #65](https://github.com/phanlemanh/onehub-inventory/pull/65).

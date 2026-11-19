@@ -1,0 +1,1 @@
+Cổng chứng minh màn theo quyết định 0023: sổ khối `design/so-khoi.yaml` (mở rỗng), bậc «trong kho» tra sổ, ứng viên ReUI kèm ảnh, vùng lấy bỏ thêm, mục «Từ Quỹ hàng» và «Họ», lối khuôn bọc cho App Shell; ba hồ sơ đã qua Cổng Phạm vi giữ luật cũ; luật giao diện thay câu «chuyển thể chỉ đổi dữ liệu» bằng luật ba tầng — [0023](decisions/0023-chon-truoc-tao-sau.md), hàng 1n.
