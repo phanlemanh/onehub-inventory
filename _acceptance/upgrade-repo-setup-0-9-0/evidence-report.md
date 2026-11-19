@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent (grader, round 2; did not write the code, not the round 1 grader)
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 6695053545508da0188695caa9b260c8d03c2d99
+verified_commit: 702e71dd1025b61a5abff7973652e636e7fb41d9
 human_signoff: Phan Le Manh 2026-11-19
 ---
 
@@ -182,3 +182,7 @@ none — every eval is deterministic and ran once.
 
 Round 1: E6 failed — lượt CI của PR #88 trên commit chỉ đổi HEAVY_NOT_INPUTS (`f4280da0`) chưa xong lúc phép đo chạy (xong 9 giây sau). Returned to implementation.
 Round 2: không đổi mã; hồ sơ thêm ca đỏ cho `ci-runs` trong `rang/two-way.mjs` và dòng ghim E3 nêu «no marker left». Cả 12 eval đạt trên `66950535`, E6 đọc lượt đã xong của `f4280da0`. PASS.
+
+### Re-pin lần 1 — 2026-11-19, do hoá cũ do gộp nhánh chính (PR #87, #91) sau chữ ký
+run_id: repin-20261119T002548Z-67147
+sha: 702e71dd1025b61a5abff7973652e636e7fb41d9 · suites: 3 lệnh exit 0 · evals: 12/12 eval máy đạt kỳ vọng
