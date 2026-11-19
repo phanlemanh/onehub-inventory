@@ -1,8 +1,10 @@
-// Row 1s (_acceptance/ci-co-postgres, AC-9, E9): the workflow patch the owner allowed to apply. It applies cleanly to
-// the workflow at HEAD, only adds lines, adds exactly one job with the agreed service and steps, leaves every other
-// job byte for byte, and db/scripts/ci-thu.sh reads its values from this very file.
+// Row 1s (_acceptance/ci-co-postgres, AC-9, E9): the workflow patch the owner allowed to apply. It only adds lines, its
+// job runs in the workflow with the agreed service, ceiling and steps, and db/scripts/ci-thu.sh reads its values from this
+// very file. Since repo-setup 0.9.0 (tiered CI) the workflow is laid out again, so the patch no longer applies to it as a
+// diff: what the patch agreed is checked on the job itself, and the job sits in the heavy tier, behind `quick`. `check`
+// does not wait for it (owner, 2026-11-18): a run that reaches its ceiling does not hold a merge.
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -15,30 +17,11 @@ const WORKFLOW = ".github/workflows/ci.yml";
 const CI_THU = join(ROOT, "db/scripts/ci-thu.sh");
 
 let dir: string;
-let before: string;
-let after: string;
-
-/** The workflow as it was before the patch: the patch reversed when it is already in, else the file itself. */
-function original(): string {
-  const now = readFileSync(join(ROOT, WORKFLOW), "utf8");
-  const d = tempDir("ci-yml-goc-");
-  try {
-    mkdirSync(join(d, ".github/workflows"), { recursive: true });
-    writeFileSync(join(d, WORKFLOW), now);
-    const r = spawnSync("git", ["apply", "-R", "--check", PATCH], { cwd: d });
-    if (r.status !== 0) return now;
-    execFileSync("git", ["apply", "-R", PATCH], { cwd: d });
-    return readFileSync(join(d, WORKFLOW), "utf8");
-  } finally {
-    rmSync(d, { recursive: true, force: true });
-  }
-}
+let workflow: string;
 
 beforeAll(() => {
   dir = tempDir("ci-yml-");
-  mkdirSync(join(dir, ".github/workflows"), { recursive: true });
-  before = original();
-  writeFileSync(join(dir, WORKFLOW), before);
+  workflow = readFileSync(join(ROOT, WORKFLOW), "utf8");
 });
 afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
@@ -57,13 +40,50 @@ function job(text: string, name: string): string {
   return lines.slice(start, end).join("\n");
 }
 
+/** The `uses:` and `run:` of each step of a job, in order, whether or not the step also has `name:` or `if:`. */
+function steps(block: string): string[] {
+  return block
+    .split("\n")
+    .map((l) => /^ {6}- (uses|run): (.+)$/.exec(l) ?? /^ {8}(uses|run): (.+)$/.exec(l))
+    .filter((m): m is RegExpExecArray => m !== null)
+    .map((m) => `- ${m[1]}: ${m[2]}`);
+}
+
+/** The value of the first added line of the patch that matches, as ci-thu.sh reads it. */
+function agreed(pattern: RegExp): string {
+  const line = readFileSync(PATCH, "utf8")
+    .split("\n")
+    .find((l) => l.startsWith("+") && pattern.test(l.slice(1)));
+  return line ? (pattern.exec(line.slice(1))?.[1] ?? "") : "";
+}
+
+/** Whether `want` appears in `have` in the same order, other items allowed in between. */
+function inOrder(have: string[], want: string[]): boolean {
+  let i = 0;
+  for (const item of have) if (item === want[i]) i++;
+  return i === want.length;
+}
+
+const AGREED_STEPS = [
+  "- uses: actions/checkout@v7",
+  "- uses: actions/setup-node@v7",
+  "- run: npm ci",
+  "- run: npx playwright install --with-deps chromium",
+  "- run: make ci-db",
+];
+
 describe("ban va workflow (AC-9)", () => {
-  it("ap sach len workflow truoc ban va", () => {
-    const r = spawnSync("git", ["apply", "--check", PATCH], { cwd: dir, encoding: "utf8" });
-    expect(r.stderr).toBe("");
-    expect(r.status).toBe(0);
-    execFileSync("git", ["apply", PATCH], { cwd: dir });
-    after = readFileSync(join(dir, WORKFLOW), "utf8");
+  it("job e2e-db cua workflow mang dung anh, mat khau, cong, tran va lenh cua ban va", () => {
+    const block = job(workflow, "e2e-db");
+    expect(block).not.toBe("");
+    const image = agreed(/^ +image: *(\S+) *$/);
+    const password = agreed(/^ +POSTGRES_PASSWORD: *(\S+) *$/);
+    const ceiling = agreed(/^ +timeout-minutes: *(\d+) *$/);
+    expect([image, password, ceiling]).toEqual(["postgres:16", "local-only", "60"]);
+    expect(block).toMatch(new RegExp(`^ {8}image: ${image.replace(".", "\\.")}$`, "m"));
+    expect(block).toMatch(new RegExp(`^ {10}POSTGRES_PASSWORD: ${password}$`, "m"));
+    expect(block).toMatch(/^ {10}- 5432:5432$/m);
+    expect(block).toMatch(new RegExp(`^ {4}timeout-minutes: ${ceiling}$`, "m"));
   });
 
   it("pha: ban sao ban va sua mot dong cu thi phep loc bat dung dong", () => {
@@ -83,44 +103,26 @@ describe("ban va workflow (AC-9)", () => {
     expect(body.filter((l) => l.startsWith("+")).length).toBeGreaterThan(10);
   });
 
-  it("dung mot job moi; cac job cu giong het (bo job moi ra thi bang tep cu)", () => {
-    const jobsOf = (t: string) =>
-      t
-        .split("\n")
-        .filter((l) => /^ {2}[a-z0-9-]+:$/.test(l))
-        .map((l) => l.trim().slice(0, -1));
-    expect(jobsOf(after).filter((j) => !jobsOf(before).includes(j))).toEqual(["e2e-db"]);
-    const block = job(after, "e2e-db");
-    const added = readFileSync(PATCH, "utf8")
-      .split("\n")
-      .filter((l) => l.startsWith("+") && !l.startsWith("+++"))
-      .map((l) => l.slice(1));
-    // The added lines form one block in one hunk: taking that block out gives the old file back.
-    const rebuilt = after.replace(`${added.join("\n")}\n`, "");
-    expect(rebuilt).toBe(before);
-    expect(block).not.toBe("");
+  it("job e2e-db o tang nang: sau quick, bo qua o ban nhap; o tong check khong cho no (chu kho quyet)", () => {
+    const block = job(workflow, "e2e-db");
+    expect(block).toMatch(/^ {4}needs: quick$/m);
+    expect(block).toMatch(
+      /^ {4}if: github\.event_name != 'pull_request' \|\| !github\.event\.pull_request\.draft$/m,
+    );
+    expect(job(workflow, "check")).toMatch(/^ {4}needs: \[quick, e2e\]$/m);
   });
 
-  it("job moi: tran, dich vu postgres:16, mat khau, cong, cac buoc", () => {
-    const block = job(after, "e2e-db");
-    expect(block).toMatch(/^ {4}timeout-minutes: 60$/m);
-    expect(block).toMatch(/^ {8}image: postgres:16$/m);
-    expect(block).toMatch(/^ {10}POSTGRES_PASSWORD: local-only$/m);
-    expect(block).toMatch(/^ {10}- 5432:5432$/m);
-    const steps = block
-      .split("\n")
-      .filter((l) => /^ {6}- (uses|run):/.test(l))
-      .map((l) => l.trim());
-    expect(steps).toEqual([
-      "- uses: actions/checkout@v7",
-      "- uses: actions/setup-node@v7",
-      "- run: npm ci",
-      "- run: npx playwright install --with-deps chromium",
-      "- run: make ci-db",
-    ]);
+  it("job e2e-db: cac buoc da chot theo dung thu tu, checkout van nong", () => {
+    const block = job(workflow, "e2e-db");
+    expect(inOrder(steps(block), AGREED_STEPS)).toBe(true);
     expect(block).toMatch(/^ {10}node-version-file: \.nvmrc$/m);
     // The checkout stays shallow, as in the other jobs (no fetch-depth).
     expect(block).not.toMatch(/fetch-depth/);
+  });
+
+  it("pha: bo buoc make ci-db khoi job thi phep so thu tu bat duoc", () => {
+    const block = job(workflow, "e2e-db").replace("run: make ci-db", "run: make e2e");
+    expect(inOrder(steps(block), AGREED_STEPS)).toBe(false);
   });
 });
 

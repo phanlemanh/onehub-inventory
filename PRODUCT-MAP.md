@@ -12,7 +12,7 @@ flowchart TD
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
   GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
-  GB --> DG["Đã giao<br/>8 việc"]
+  GB --> DG["Đã giao<br/>9 việc"]
   GB --> CN["Chờ phiên nghiệm thu<br/>52 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
@@ -99,3 +99,4 @@ flowchart TD
 - Lên đời công cụ design-assembly từ 0.1.0 lên 0.7.0 bằng lệnh upgrade — sổ linh kiện, sổ màn và sổ khối thôi đi theo pull request, bảng vai × màn × nút ra khỏi git, bản đồ affected (`upgrade-design-assembly-0-7-0`)
 - Lên đời công cụ design-assembly từ 0.7.0 lên 0.7.1 và thêm hai hàng cổng decision-sheet, owner-calls, chạy được trên bản sao nông (`upgrade-design-assembly-0-7-1`)
 - Lên đời công cụ design-assembly bằng lệnh upgrade của plugin bản 0.1.0 — sổ linh kiện ghi lại quan hệ dựng từ, kho ghi dấu phiên bản công cụ (`upgrade-design-assembly-tool`)
+- Lên đời bộ setup repo-setup từ 0.4.0 lên 0.9.0, phần máy chạy (CI xếp tầng, sổ ngoài git, đường nâng cấp); luật của kho giữ nguyên, trừ hai điểm chủ kho đồng ý ở Gate 1 (Hỏi-2, Hỏi-3) (`upgrade-repo-setup-0-9-0`)

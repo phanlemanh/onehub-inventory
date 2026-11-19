@@ -7,6 +7,7 @@ title: Change log of the wiki and notable code changes
 
 Newest first. One line each: `YYYY-MM-DD — what changed — link`.
 
+- 2026-11-19 — Bài trình duyệt có đăng nhập (`playwright.db.config.ts`) chạy lại một lần chỉ trên CI, tới khi hai bài chập chờn (`vung chu-dai`, bài phá `ve-tay-va-dieu-kien-phi-pha` của thue-phi) được sửa; bài đạt ở lần chạy lại hiện tên là «flaky» — hồ sơ `_acceptance/ci-co-postgres/` (decisions.jsonl), bài `tests/chay-lai-ci.test.ts`, PR [#90](https://github.com/phanlemanh/onehub-inventory/pull/90).
 - 2026-11-18 — Trần job `e2e-db` của CI nâng từ 40 lên 60 phút, bước `co-phien` giữ một worker: lượt thử hai worker nhanh hơn nhưng đỏ hai bài dùng trạng thái chung của lượt; dòng `revisit` nêu khi nào xét lại — hồ sơ `_acceptance/ci-co-postgres/` (decisions.jsonl), PR [#90](https://github.com/phanlemanh/onehub-inventory/pull/90).
 - 2026-11-18 — `.claude/settings.json` tắt đích danh sáu plugin của chợ kit cũ, nên phiên mở ở kho này chỉ nạp kit 3.0.0 của chợ `delivery-loop` dù máy bật bản cũ ở mức người dùng; đo bằng phiên thật, có đối chứng dương ở merge-base — hồ sơ `_acceptance/tat-plugin-cho-cu/`.
 - 2026-11-18 — Kit nghiệm thu nâng từ 2.38.1 lên 3.0.0, lấy từ kho delivery-loop: CI kéo thẻ v3.0.0 với lõi ở `plugins/acceptance-gate`, phiên bật sáu plugin của chợ `delivery-loop` ghim cùng thẻ, `kit-root` chỉ đọc bản cài của chợ mới — [0045](decisions/0045-kit-nghiem-thu-delivery-loop-3-0.md), hồ sơ `_acceptance/nang-kit-3-0/`.
