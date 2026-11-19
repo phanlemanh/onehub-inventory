@@ -36,3 +36,41 @@ wall: 751s
 - **claude-opus-5-5**: 3 agent · 45 calls · out 28,263 · in 90 · cache_read 2,978,147 · cache_create 270,253
 - **claude-sonnet-5-5**: 4 agent · 9 calls · out 15,572 · in 18 · cache_read 174,539 · cache_create 177,843
 - **claude-haiku-5-5**: 11 agent · 31 calls · out 23,271 · in 62 · cache_read 641,491 · cache_create 404,540
+### S4 round 2 — wf_75df04e5-1e7 (17 agent, 54,256 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| review:conventions | claude-opus-5-5 | 16 | 9,084 | 32 | 1,064,878 | 137 |
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 6,983 | 6 | 79,723 | 146 |
+| review:bugs | claude-opus-5-5 | 16 | 5,365 | 32 | 965,442 | 139 |
+| review:measurement | claude-opus-5-5 | 11 | 4,899 | 22 | 585,104 | 78 |
+| synthesize:report | claude-sonnet-5-5 | 2 | 4,620 | 4 | 35,769 | 29 |
+| machine:make check | claude-haiku-5-5 | 3 | 3,195 | 6 | 64,124 | 108 |
+| machine:node --test _acceptance/split-log-ledger | claude-haiku-5-5 | 3 | 2,346 | 6 | 67,485 | 60 |
+| machine:node _acceptance/split-log-ledger/rang/v | claude-haiku-5-5 | 3 | 2,276 | 6 | 67,566 | 13 |
+| machine:node _acceptance/split-log-ledger/rang/b | claude-haiku-5-5 | 3 | 2,251 | 6 | 67,898 | 13 |
+| machine:node _acceptance/split-log-ledger/rang/s | claude-haiku-5-5 | 3 | 2,250 | 6 | 68,007 | 13 |
+| machine:node _acceptance/split-log-ledger/rang/d | claude-haiku-5-5 | 3 | 2,217 | 6 | 67,910 | 13 |
+| machine:node _acceptance/split-log-ledger/rang/c | claude-haiku-5-5 | 3 | 2,131 | 6 | 67,477 | 13 |
+| machine:node _acceptance/split-log-ledger/rang/k | claude-haiku-5-5 | 3 | 2,119 | 6 | 67,500 | 12 |
+| machine:DATABASE_URL= make e2e | claude-haiku-5-5 | 2 | 1,832 | 4 | 3,300 | 566 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 1,206 | 4 | 29,452 | 13 |
+| triage | claude-sonnet-5-5 | 2 | 1,032 | 4 | 27,633 | 10 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 450 | 4 | 24,973 | 8 |
+
+
+wall: 734s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| review | 3 | 19,348 | 2,615,424 | 142 | 07:51:08 | 07:53:29 |
+| baseline | 1 | 6,983 | 79,723 | 146 | 07:51:08 | 07:53:34 |
+| machine | 10 | 21,823 | 570,719 | 686 | 07:51:08 | 08:02:34 |
+| triage | 1 | 1,032 | 27,633 | 10 | 08:02:34 | 08:02:44 |
+| capture | 1 | 450 | 24,973 | 8 | 08:02:44 | 08:02:52 |
+| synthesize | 1 | 4,620 | 35,769 | 29 | 08:02:53 | 08:03:22 |
+
+- **claude-opus-5-5**: 3 agent · 43 calls · out 19,348 · in 86 · cache_read 2,615,424 · cache_create 258,454
+- **claude-sonnet-5-5**: 4 agent · 9 calls · out 13,085 · in 18 · cache_read 168,098 · cache_create 173,074
+- **claude-haiku-5-5**: 10 agent · 28 calls · out 21,823 · in 56 · cache_read 570,719 · cache_create 368,994
+

@@ -5,7 +5,7 @@ slug: split-log-ledger
 owner:
 risk_tier: T2
 surfaces: [docs, config]
-status: implemented
+status: verified
 approved_by: Phan Le Manh
 approved_at: 2026-11-19
 design_doc: docs/superpowers/specs/2026-11-19-split-log-ledger-design.md
@@ -164,3 +164,8 @@ Ba hồ sơ đã ký để nguyên như lúc ký (Hỏi-2: không). Lượt ghim
   bằng `git merge-tree --write-tree` với `GIT_ATTR_SOURCE` đặt về nhánh lúc đó, vì `merge=union` chỉ có từ PR 88.
 - Phép đo «sau» đếm lại cùng cách khi đủ PR gộp sau PR 2.
 - Đo các phép đo của hồ sơ đã ký trước và sau khi tách (`rang/do-cu-truoc-sau.md`).
+- Ngoài-1 (máy định tuyến 2026-11-19, đề xuất S4 known-limits): The design note still describes an approach the owner turned down, so a reviewer may read two conflicting accounts of what was decided. The wiki log split itself works as the owner approved; only the written explanation is out of date. — `docs/superpowers/specs/2026-11-19-split-log-ledger-design.md`
+- Ngoài-3 (máy định tuyến 2026-11-19, đề xuất S4 known-limits): Only the repo owner's machine can re-run the 'before' count of merge conflicts, and the file shows a local username in a public repo. Nothing changes for people using the product. — `_acceptance/split-log-ledger/rang/measure.sh`
+- Ngoài-4 (máy định tuyến 2026-11-19, đề xuất S4 known-limits): The check only confirms the quick check is ordered to draw the log before the tests, not that a real run does so. A faulty setup could pass the check yet fail on the first real run, where it would show up immediately. — `_acceptance/split-log-ledger/rang/ve-truoc-test.mjs`
+- Ngoài-5 (máy định tuyến 2026-11-19, đề xuất S4 known-limits): The recorded 'before' conflict count can only be reproduced from the owner's main checkout, not from another copy or machine. Product users are unaffected. — `_acceptance/split-log-ledger/rang/measure.sh`
+- Ngoài-6 (máy định tuyến 2026-11-19, đề xuất S4 known-limits): One test case builds its sample log entry by hand instead of with the real tool, so it could miss a future change in the entry format. Today it matches, and users see no effect. — `_acceptance/split-log-ledger/rang/two-way.mjs`
