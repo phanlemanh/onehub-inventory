@@ -1,1 +1,0 @@
-Recorded the reuse ladder set by the owner (choose before making; repo, then repo with ReUI Pro, then hand-made; three layers of "keep as is") and added roadmap rows 1n, 1o, 1p, 9c — [0023](decisions/0023-chon-truoc-tao-sau.md).
