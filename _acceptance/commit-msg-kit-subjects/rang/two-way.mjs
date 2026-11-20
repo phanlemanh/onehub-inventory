@@ -11,6 +11,8 @@ import { HERE, kitInstall, root, run, show, prBase, worktree } from "./lib.mjs";
 import { KIT_COMMITTING_SCRIPTS, KIT_SUBJECTS } from "./matrix.mjs";
 
 const dir = root([]);
+/** Every character a regular expression treats as special, the backslash among them, escaped. */
+const escapeRegExp = (s) => s.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&");
 const RULE = "tools/commit_msg.py";
 const scratch = mkdtempSync(join(tmpdir(), "cmks-2w-"));
 const trees = [];
@@ -116,7 +118,7 @@ test("commits-judged is red when tools/commit_msg.py accepts every message", () 
 test("change-set is red on a file outside the change, and on the hook's wiring", () => {
   for (const f of ["src/app/page.tsx", ".pre-commit-config.yaml"]) {
     const r = measure("change-set", dir, {}, ["--files", `tools/commit_msg.py,tests/commit-msg.test.ts,${f}`]);
-    assert.match(r.out, new RegExp(`${f.replace(/\./g, "\\.")} changes`));
+    assert.match(r.out, new RegExp(`${escapeRegExp(f)} changes`));
   }
 });
 
