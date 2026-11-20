@@ -187,6 +187,13 @@ executors:
     rs0101_change_set: "node _acceptance/upgrade-repo-setup-0-10-1/rang/change-set.mjs"   # upgrade-repo-setup-0-10-1: the two commits' files; besides them only this round; no T3 path
     rs0101_ruleset: "node _acceptance/upgrade-repo-setup-0-10-1/rang/ruleset.mjs"   # upgrade-repo-setup-0-10-1: main requires check, e2e, gate only; merge commits or rebase allowed
     rs0101_two_way: "node --test _acceptance/upgrade-repo-setup-0-10-1/rang/two-way.mjs"   # upgrade-repo-setup-0-10-1: each measure green as it is, red with its message on a broken copy
+    cmks_kit_subjects: "node _acceptance/commit-msg-kit-subjects/rang/kit-subjects.mjs"   # commit-msg-kit-subjects: every subject the kit v3.0.0 writes, read from its files, passes tools/commit_msg.py
+    cmks_near_miss: "node _acceptance/commit-msg-kit-subjects/rang/near-miss.mjs"   # commit-msg-kit-subjects: messages that only look like kit subjects stay refused, the job's two probes among them
+    cmks_history: "node _acceptance/commit-msg-kit-subjects/rang/history.mjs"   # commit-msg-kit-subjects: over every commit of the base, only the kit's 12 more accepted, none less
+    cmks_commits_judged: "node _acceptance/commit-msg-kit-subjects/rang/commits-judged.mjs"   # commit-msg-kit-subjects: the job's probe and judge block, run in a clean checkout of HEAD
+    cmks_change_set: "node _acceptance/commit-msg-kit-subjects/rang/change-set.mjs"   # commit-msg-kit-subjects: the rule, its test, a log entry and this round; not the hook's wiring
+    cmks_test_cases: "node _acceptance/commit-msg-kit-subjects/rang/test-cases.mjs"   # commit-msg-kit-subjects: the test file keeps every old case and adds exactly the ten new ones
+    cmks_two_way: "node --test _acceptance/commit-msg-kit-subjects/rang/two-way.mjs"   # commit-msg-kit-subjects: each measure green as it is, red on a copy with one thing broken
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
