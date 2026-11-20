@@ -1,0 +1,17 @@
+{"ts": "2026-11-20T07:16:59Z", "round": 1, "evalId": "E1", "run_id": "commit-msg-kit-subjects-E1-20261120T071659Z", "exit_code": 0, "cmd": "node _acceptance/commit-msg-kit-subjects/rang/kit-subjects.mjs"}
+{"ts": "2026-11-20T07:17:07Z", "round": 1, "evalId": "E2", "run_id": "commit-msg-kit-subjects-E2-20261120T071707Z", "exit_code": 0, "cmd": "node _acceptance/commit-msg-kit-subjects/rang/near-miss.mjs"}
+{"ts": "2026-11-20T07:17:24Z", "round": 1, "evalId": "E3", "run_id": "commit-msg-kit-subjects-E3-20261120T071724Z", "exit_code": 0, "cmd": "node _acceptance/commit-msg-kit-subjects/rang/history.mjs"}
+{"ts": "2026-11-20T07:17:32Z", "round": 1, "evalId": "E4", "run_id": "commit-msg-kit-subjects-E4-20261120T071732Z", "exit_code": 0, "cmd": "node _acceptance/commit-msg-kit-subjects/rang/commits-judged.mjs"}
+{"ts": "2026-11-20T07:19:00Z", "round": 1, "evalId": "E5", "run_id": "commit-msg-kit-subjects-E5-20261120T071900Z", "exit_code": 0, "cmd": "make check"}
+{"ts": "2026-11-20T07:19:10Z", "round": 1, "evalId": "E6", "run_id": "commit-msg-kit-subjects-E6-20261120T071910Z", "exit_code": 0, "cmd": "node _acceptance/commit-msg-kit-subjects/rang/change-set.mjs"}
+{"ts": "2026-11-20T07:20:18Z", "round": 1, "evalId": "E7", "run_id": "commit-msg-kit-subjects-E7-20261120T072018Z", "exit_code": 0, "cmd": "node --test _acceptance/commit-msg-kit-subjects/rang/two-way.mjs"}
+{"ts": "2026-11-20T07:20:24Z", "round": 1, "evalId": "E8", "run_id": "commit-msg-kit-subjects-E8-20261120T072024Z", "exit_code": 0, "cmd": "node _acceptance/commit-msg-kit-subjects/rang/test-cases.mjs"}
+{"ts":"2026-11-20T07:23:24Z","round":2,"evalId":"E1","run_id":"commit-msg-kit-subjects-E1-20261120T072324Z","exit_code":0,"cmd":"node _acceptance/commit-msg-kit-subjects/rang/kit-subjects.mjs"}
+{"ts":"2026-11-20T07:23:40Z","round":2,"evalId":"E2","run_id":"commit-msg-kit-subjects-E2-20261120T072340Z","exit_code":127,"cmd":"node _acceptance/commit-msg-kit-subjects/rang/near-miss.mjs"}
+{"ts":"2026-11-20T07:24:02Z","round":2,"evalId":"E2","run_id":"commit-msg-kit-subjects-E2-20261120T072402Z","exit_code":0,"cmd":"node _acceptance/commit-msg-kit-subjects/rang/near-miss.mjs"}
+{"ts":"2026-11-20T07:24:09Z","round":2,"evalId":"E3","run_id":"commit-msg-kit-subjects-E3-20261120T072409Z","exit_code":0,"cmd":"node _acceptance/commit-msg-kit-subjects/rang/history.mjs"}
+{"ts":"2026-11-20T07:24:29Z","round":2,"evalId":"E4","run_id":"commit-msg-kit-subjects-E4-20261120T072429Z","exit_code":0,"cmd":"node _acceptance/commit-msg-kit-subjects/rang/commits-judged.mjs"}
+{"ts":"2026-11-20T07:24:40Z","round":2,"evalId":"E5","run_id":"commit-msg-kit-subjects-E5-20261120T072440Z","exit_code":0,"cmd":"make check"}
+{"ts":"2026-11-20T07:26:05Z","round":2,"evalId":"E6","run_id":"commit-msg-kit-subjects-E6-20261120T072605Z","exit_code":0,"cmd":"node _acceptance/commit-msg-kit-subjects/rang/change-set.mjs"}
+{"ts":"2026-11-20T07:26:12Z","round":2,"evalId":"E7","run_id":"commit-msg-kit-subjects-E7-20261120T072612Z","exit_code":0,"cmd":"node --test _acceptance/commit-msg-kit-subjects/rang/two-way.mjs"}
+{"ts":"2026-11-20T07:27:21Z","round":2,"evalId":"E8","run_id":"commit-msg-kit-subjects-E8-20261120T072721Z","exit_code":0,"cmd":"node _acceptance/commit-msg-kit-subjects/rang/test-cases.mjs"}
