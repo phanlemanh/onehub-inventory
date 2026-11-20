@@ -5,9 +5,9 @@ slug: commit-msg-kit-subjects
 owner:
 risk_tier: T3
 surfaces: [config, ci]
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Phan Le Manh
+approved_at: 2026-11-20
 ---
 
 # Acceptance Contract: commit-msg-kit-subjects
