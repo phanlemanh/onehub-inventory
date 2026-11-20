@@ -1,47 +1,4 @@
 {
-  "feature_plain": "Sau khi gộp, một tin commit do người viết PR soạn không còn ra lệnh được cho máy chạy CI, bản sao kho mà bước kiểm tiêu đề commit dùng không còn giữ khoá truy cập, và chính sách gộp được gọi tên ô kiểm «gate» của bộ nghiệm thu.",
-  "will_do": [
-    { "id": "AC-1", "p": "Sẽ qua trọn bộ kiểm của kho, với đúng số bài như trên nhánh chính hôm nay." },
-    { "id": "AC-2", "p": "Sẽ cho thấy công cụ lên đời chạy lại không còn gì để làm, và chạy trên bản sao của nhánh chính thì ra đúng bốn tệp của PR." },
-    { "id": "AC-3", "p": "Sẽ cho thấy ba tệp đổi giống hệt bản mẫu của bản phát hành, và trong bước kiểm tiêu đề commit chỉ hai chỗ đổi." },
-    { "id": "AC-4", "p": "Sẽ cho thấy dòng lệnh cài vào tin commit chỉ hiện ra như chữ, không thành lệnh, kể cả ở nhánh báo «không chạy được»; không có mã ngẫu nhiên thì bước dừng đỏ mà không in gì." },
-    { "id": "AC-5", "p": "Sẽ cho thấy bước kiểm vẫn nhận và từ chối đúng như trước trên sáu tin mẫu." },
-    { "id": "AC-6", "p": "Sẽ cho thấy bản sao kho của bước kiểm không giữ khoá truy cập, và không việc gì của bước cần khoá ấy." },
-    { "id": "AC-7", "p": "Sẽ cho thấy trên PR này máy CI vẫn chạy bản cũ của bước kiểm, nên bản mới chạy lần đầu sau khi gộp." },
-    { "id": "AC-9", "p": "Sẽ cho thấy PR chỉ đổi bốn tệp lên đời và hồ sơ này, giữ nguyên commit lên đời, và mọi commit qua luật tiêu đề của nhánh chính." },
-    { "id": "AC-10", "p": "Sẽ cho thấy mỗi phép đo xanh trên cây và đỏ đúng lời trên một bản bị phá đúng chỗ nó canh." }
-  ],
-  "wont_do": [
-    { "id": "AC-8", "p": "Chặn tên «gate» lại khi kho có quy trình tác tử riêng; còn không thì chính sách được gọi tên nó — đo trên bản sao, chính sách thật giữ nguyên." },
-    { "id": "OOS-1", "p": "KHÔNG ghi tên «gate» vào chính sách của kho: đó là quyết định riêng của anh." },
-    { "id": "OOS-2", "p": "KHÔNG thêm bài kiểm riêng cho phần chính sách: bài kiểm của nó nằm ở kho bộ setup." },
-    { "id": "OOS-3", "p": "KHÔNG vá hai chỗ hở đã biết của bản phát hành (đọc tối đa 250 commit, công cụ không ghim phiên bản)." },
-    { "id": "OOS-4", "p": "KHÔNG sửa tệp của lần lên đời hay viết lại lịch sử nhánh." },
-    { "id": "OOS-5", "p": "KHÔNG đổi cấu hình nghiệm thu ngoài các lệnh đo của hồ sơ này, không đổi quy trình CI hay chính sách." },
-    { "id": "OOS-6", "p": "KHÔNG rời bản nháp, gộp, hay chạy kiểm giao diện trên máy: việc của anh và của CI." }
-  ],
-  "scope_plain": "Lên đời là việc máy làm theo bản phát hành; hồ sơ chỉ đo, không sửa gì của nó.",
-  "coverage_plain": [
-    { "i": 0, "p": "Phủ theo từng tệp mà lần lên đời đổi; đó là toàn bộ không gian của việc này." },
-    { "i": 3, "p": "Bước kiểm tiêu đề commit: đúng bản mẫu (AC-3), rào chữ (AC-4), kết quả không đổi (AC-5), khoá truy cập (AC-6)." },
-    { "i": 4, "p": "Phần chính sách gộp: đúng bản mẫu (AC-3), gọi tên được «gate» (AC-8)." },
-    { "i": 5, "p": "Bản ghi phiên bản của bộ setup: AC-2 và AC-3." },
-    { "i": 6, "p": "Cả cây: bộ kiểm của kho (AC-1), không tệp lạ (AC-9), mỗi phép đo có ca đỏ (AC-10)." },
-    { "i": 7, "p": "Máy CI trước khi gộp: chạy bản cũ (AC-7)." },
-    { "i": 8, "p": "Máy CI sau khi gộp: hồ sơ không đo được, anh quyết ở Hỏi-1." },
-    { "i": 9, "p": "Kiểm giao diện: không đo ở đây vì PR không đổi giao diện hay dữ liệu." }
-  ],
-  "gap_probe_plain": [
-    { "i": 0, "p": "Nhánh «không chạy được» của bước kiểm chưa được thử với chữ do người viết PR soạn. Đã thêm ca thử và bản phá." },
-    { "i": 1, "p": "Phép đo chính sách gọi thẳng phần lập kế hoạch nên bỏ sót cách lệnh chính nối nó, và thiếu ca gọi tên «gate» ở cả hai chỗ. Đã đo qua lệnh chính và thêm ca." },
-    { "i": 2, "p": "Khoá truy cập vẫn tới mọi hook qua biến môi trường của bước. Có từ trước, không đổi ở đây: đã ghi giới hạn và gửi về bộ setup." },
-    { "i": 3, "p": "Phép đo chỉ kiểm tên tệp cấu hình, không kiểm nội dung đổi. Đã kiểm từng dòng thêm và đọc hạng rủi ro từ nhánh chính." },
-    { "i": 4, "p": "Bản mẫu để so không được ghim, cache cũ hay nhãn bị trỏ lại sẽ làm hai phép đo cùng sai. Đã ghim theo mã commit của bản phát hành." },
-    { "i": 5, "p": "Cách đọc dòng của máy CI chưa mô phỏng đủ, và thiếu bản phá cho mã cố định và dòng đóng lệch. Đã sửa và thêm hai bản phá." },
-    { "i": 6, "p": "Một bản phá đỏ vì lý do khác, và một ca mẫu không đo điều nó mang tên. Đã thêm bản phá đúng chỗ và sửa tên ca." },
-    { "i": 7, "p": "PR thử sau gộp như mô tả không phân biệt được bản cũ với bản mới. Đã ghi ba điều phải thấy." },
-    { "i": 8, "p": "Hai câu về khoá truy cập nói quá. Đã sửa câu và bỏ một phép kiểm không phân biệt gì." },
-    { "i": 9, "p": "Vài câu trong ghi chú không có phép đo đỡ. Đã đo lượt chạy đầu tiên và ghi nguồn cho các câu còn lại." }
-  ],
-  "decisions_plain": []
+  "feature_plain": "Sau khi gộp, một tin commit do người viết PR soạn không còn ra lệnh được cho máy chạy CI, bản sao kho của bước kiểm tiêu đề commit không giữ khoá truy cập, và chính sách gộp được gọi tên ô kiểm «gate» — cả mười phép đo đã qua.",
+  "scope_plain": "Phạm vi giữ đúng như đã duyệt ở Cổng 1: chỉ đo bản lên đời, không sửa gì của nó."
 }
