@@ -5,7 +5,7 @@ slug: upgrade-repo-setup-0-10-1
 owner:
 risk_tier: T2
 surfaces: [config, ci, docs]
-status: verified
+status: signed-off
 approved_by: Phan Le Manh
 approved_at: 2026-11-20
 ---
