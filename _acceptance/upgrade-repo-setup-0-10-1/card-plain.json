@@ -143,5 +143,7 @@
       "i": 9,
       "p": "Ô kiểm in nguyên đầu ra hook trong workflow có quyền của kho. Đã thêm ca thử tin giả lỗi; phần rủi ro còn lại ghi ở Notes để gửi repo-setup."
     }
-  ]
+  ],
+  "decisions": [],
+  "analyst_plain": ""
 }
