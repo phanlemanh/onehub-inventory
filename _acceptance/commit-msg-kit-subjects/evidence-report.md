@@ -8,7 +8,7 @@ verified_by: fresh-context grader, round 2 (Phase 3 VERIFY); did not write the c
 enforcement_mode: strict
 bypass_used: false
 verified_commit: c910cdeb176f61e369e9ca89c632434f92aa8a6b
-human_signoff:
+human_signoff: Phan Le Manh 2026-11-20
 ---
 
 # Evidence Report: commit-msg-kit-subjects
