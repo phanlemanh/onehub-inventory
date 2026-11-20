@@ -26,7 +26,7 @@ evals:
     cmd: config:executors.script.rs0101_apply_again
     long_running: 10
     paths: [".repo-setup.json", ".github/workflows/pr-title.yml", "AGENTS.md"]
-    expected: "exit 0; dòng 'apply-again: apply.py of repo-setup-v0.10.1 has nothing left to do on HEAD (manifest 0.10.1, no marker); on the base it updates pr-title.yml, merges AGENTS.md and does nothing else, and applied to a copy of the base it writes HEAD's three files byte for byte'; trên HEAD không danh sách hành động nào có tệp, trên nền không tệp nào bị tạo, sửa tay, đánh dấu hay xung đột (should-NOT-fire)"
+    expected: "exit 0; dòng 'apply-again: apply.py of repo-setup-v0.10.1 has nothing left to do on HEAD (manifest 0.10.1, no marker); on the base it updates pr-title.yml, merges AGENTS.md and does nothing else; removed is the 8 samples on both, edited grows by AGENTS.md only; applied to a copy of the base it writes HEAD's three files byte for byte'; trên HEAD không danh sách hành động nào có tệp, trên nền không tệp nào bị tạo, đánh dấu, bỏ hay xung đột (should-NOT-fire)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E3
     criterion: AC-3

@@ -1,6 +1,9 @@
 // AC-2: apply.py of the tag repo-setup-v0.10.1, no option.
 //   - On HEAD, --dry-run --json: exit 0, every action list empty, no file still marked.
-//   - On the base, --dry-run --json: pr-title.yml updated, AGENTS.md merged, nothing else.
+//   - On the base, --dry-run --json: pr-title.yml updated, AGENTS.md merged, no other action.
+//   - The two groups where the tool does nothing agree across the two runs: `removed` (deleted by
+//     the repository, not created again) is the 8 samples of KEPT_OLD on both; `edited` (edited by
+//     the repository, left as it is) on HEAD is `edited` on the base plus AGENTS.md.
 //   - On a throwaway worktree of the base, a real run: the three files it writes are HEAD's byte
 //     for byte. This is where the text of AGENTS.md and pr-title.yml gets a source outside the tree.
 // apply.py is the owner's tool; it writes only into the temp worktree.
@@ -10,12 +13,13 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { pluginTree, prBase, root, run, verdict, worktree } from "./lib.mjs";
-import { NEW_VERSION, PLUGIN_TAG, UPGRADE_FILES } from "./matrix.mjs";
+import { KEPT_OLD, NEW_VERSION, PLUGIN_TAG, UPGRADE_FILES } from "./matrix.mjs";
 
 const NAME = "apply-again";
 const dir = root();
 const problems = [];
-const ACTIONS = ["created", "updated", "merged", "edited", "marked", "base_unread", "removed", "dropped", "conflict"];
+const ACTIONS = ["created", "updated", "merged", "marked", "base_unread", "dropped", "conflict"];
+const sorted = (l) => JSON.stringify([...(l ?? [])].sort());
 const AT_BASE = { updated: [".github/workflows/pr-title.yml"], merged: ["AGENTS.md"] };
 
 function apply(at, ...opts) {
@@ -49,6 +53,14 @@ try {
     const dry = apply(wt.dir, "--dry-run");
     if (dry.code !== 0) problems.push(`on ${base.slice(0, 8)} apply.py --dry-run exited ${dry.code}, not 0`);
     lists(dry.report, AT_BASE, `on ${base.slice(0, 8)}`);
+    for (const [where, r] of [["HEAD", head.report], [base.slice(0, 8), dry.report]]) {
+      if (sorted(r.removed) !== sorted(Object.keys(KEPT_OLD))) {
+        problems.push(`on ${where} removed is ${sorted(r.removed)}, not the ${Object.keys(KEPT_OLD).length} samples of AC-6`);
+      }
+    }
+    if (sorted(head.report.edited) !== sorted([...(dry.report.edited ?? []), "AGENTS.md"])) {
+      problems.push("edited on HEAD is not edited on the base plus AGENTS.md");
+    }
     const real = apply(wt.dir);
     if (real.code !== 0) problems.push(`on a copy of ${base.slice(0, 8)} apply.py exited ${real.code}, not 0`);
     for (const f of UPGRADE_FILES) {
@@ -66,5 +78,5 @@ try {
 verdict(
   NAME,
   problems,
-  `apply.py of ${PLUGIN_TAG} has nothing left to do on HEAD (manifest ${NEW_VERSION}, no marker); on the base it updates pr-title.yml, merges AGENTS.md and does nothing else, and applied to a copy of the base it writes HEAD's three files byte for byte`,
+  `apply.py of ${PLUGIN_TAG} has nothing left to do on HEAD (manifest ${NEW_VERSION}, no marker); on the base it updates pr-title.yml, merges AGENTS.md and does nothing else; removed is the ${Object.keys(KEPT_OLD).length} samples on both, edited grows by AGENTS.md only; applied to a copy of the base it writes HEAD's three files byte for byte`,
 );

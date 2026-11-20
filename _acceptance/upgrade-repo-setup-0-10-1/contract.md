@@ -5,7 +5,7 @@ slug: upgrade-repo-setup-0-10-1
 owner:
 risk_tier: T2
 surfaces: [config, ci, docs]
-status: approved
+status: implemented
 approved_by: Phan Le Manh
 approved_at: 2026-11-20
 ---
@@ -50,11 +50,14 @@ CHANGELOG của repo-setup, mục 0.10.0 và 0.10.1; phản biện context sạc
   `Tests  2466 passed | 2 skipped (2468)`, dòng `design-assembly: 19 decisions held by 27 checks, each seen failing on a changed copy`, dòng `no heavy checks` và dòng
   `make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance`; không thêm bài bỏ qua nào ngoài 2 bài.
 - AC-2: Given HEAD và nền của PR (`git merge-base HEAD origin/main`, hôm nay `1ad8469f`), When chạy `apply.py --json` của
-  tag `repo-setup-v0.10.1`, không tuỳ chọn khác, Then với `--dry-run` trên HEAD lệnh thoát 0 và các danh sách `created`,
-  `updated`, `merged`, `edited`, `marked`, `base_unread`, `removed`, `dropped`, `conflict` đều rỗng, không tệp nào còn dấu
+  tag `repo-setup-v0.10.1`, không tuỳ chọn khác, Then với `--dry-run` trên HEAD lệnh thoát 0 và các danh sách hành động
+  `created`, `updated`, `merged`, `marked`, `base_unread`, `dropped`, `conflict` đều rỗng, không tệp nào còn dấu
   (`tools/upgrade_markers.py` thoát 0); với `--dry-run` trên nền, `updated` đúng là `.github/workflows/pr-title.yml`,
-  `merged` đúng là `AGENTS.md`, các danh sách còn lại rỗng; và chạy thật trên một bản sao tạm của nền, lệnh thoát 0 và ba
-  tệp `pr-title.yml`, `AGENTS.md`, `.repo-setup.json` nó ghi giống từng byte ba tệp ở HEAD (Hỏi-1).
+  `merged` đúng là `AGENTS.md`, các danh sách hành động còn lại rỗng; hai nhóm không-làm-gì khớp chéo: `removed` (tệp kho đã
+  xoá, công cụ không tạo lại) trên HEAD và trên nền đúng là 8 tệp mẫu của AC-6, `edited` (tệp kho đã sửa tay, công cụ để
+  nguyên) trên HEAD bằng `edited` trên nền cộng `AGENTS.md`; và chạy thật trên một bản sao tạm của nền, lệnh thoát 0 và ba
+  tệp `pr-title.yml`, `AGENTS.md`, `.repo-setup.json` nó ghi giống từng byte ba tệp ở HEAD (Hỏi-1; lời sửa sau Cổng 1,
+  xem sổ quyết định).
 - AC-3: Given HEAD, When so `.github/workflows/pr-title.yml` với bản mẫu
   `plugins/repo-setup/presets/_core/team/dot.github/workflows/pr-title.yml` của tag, Then hai tệp giống từng byte, sha256
   của tệp bằng mã `.repo-setup.json` ghi cho nó; và so với nền của PR, `name`, `on`, `permissions`, danh sách job, job
