@@ -103,7 +103,7 @@ try {
     ]) {
       withPolicy(extra);
       r = check(c.dir);
-      if (r.code === 0 || !r.out.includes(says)) problems.push(`with ${AGENT_WORKFLOW}, "${extra.replace("\n", " ")}" is not refused`);
+      if (r.code === 0 || !r.out.includes(says)) problems.push(`with ${AGENT_WORKFLOW}, "${extra.replaceAll("\n", " ")}" is not refused`);
     }
     rmSync(join(c.dir, AGENT_WORKFLOW));
 
