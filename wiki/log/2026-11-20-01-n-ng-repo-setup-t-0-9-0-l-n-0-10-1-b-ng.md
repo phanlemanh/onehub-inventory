@@ -1,0 +1,1 @@
+Nâng repo-setup từ 0.9.0 lên 0.10.1 bằng `apply.py` của tag: ô `conventional-commits` chạy hook commit-msg của chính kho (không còn gọi hook theo tên `conventional-pre-commit`), `AGENTS.md` tách hai luật và thêm mục «What holds these rules»; không luật nào của kho đổi.
