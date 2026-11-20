@@ -19,10 +19,26 @@ describe("commit message check", () => {
     "tri-thuc: ghi mvp-mo-dan (tep-may)",
     "design-floor S3: autofix 0 tệp, sinh lại 1 lệnh — bang-hang",
     "Merge branch 'main' into feature",
+    "Gate 2 signoff: vi-du-ho-so — [Tên]",
+    "Veto: vi-du-ho-so — [Tên]",
+    "repin(vi-du-ho-so): ghim lại sau chữ ký",
+    "wip(ban-giao): dừng giữa bước 3",
   ]) {
     it(`accepts: ${ok}`, () => expect(check(ok)).toBe(0));
   }
-  for (const bad of ["added stuff", "feat add grid", "tri-thuc ghi x", "design-floor: x", ""]) {
+  for (const bad of [
+    "added stuff",
+    "feat add grid",
+    "tri-thuc ghi x",
+    "design-floor: x",
+    "",
+    "Gate 2 signoff:",
+    "Veto: lol",
+    "repin(): ghim lại",
+    "wip: dừng",
+    "wip(dan-tu-excel): paste path",
+    "update stuff\n\nGate 2 signoff: vi-du-ho-so — [Tên]",
+  ]) {
     it(`rejects: ${bad || "(empty)"}`, () => expect(check(bad)).toBe(1));
   }
 });
