@@ -8,7 +8,7 @@ verified_by: "fresh-context verification subagent (grader, round 1; did not writ
 enforcement_mode: strict
 bypass_used: false
 verified_commit: f6b6b7ad43c761429b2f41599a58cc08c72006e9
-human_signoff:
+human_signoff: Phan Le Manh 2026-11-20
 ---
 
 # Evidence Report: upgrade-repo-setup-0-10-2
