@@ -32,6 +32,10 @@ function broken(file, edit) {
   const text = edit(before);
   assert.notEqual(text, before, `the break did not apply to ${file}`);
   writeFileSync(join(t.dir, file), text);
+  // Staged, not committed: pre-commit sets unstaged changes aside before it runs a hook, so an unstaged break would
+  // never reach the hook of commits-judged.
+  const add = run("git", ["-C", t.dir, "add", "--", file]);
+  assert.equal(add.code, 0, add.err);
   return t.dir;
 }
 const brokenRule = (edit) => broken(RULE, edit);
@@ -123,6 +127,6 @@ test("change-set is red on a commit of the pull request that only the new rule a
 });
 
 test("test-cases is red when an old case of the test file is dropped", () => {
-  const at = broken("tests/commit-msg.test.ts", (t) => t.replace('"design-floor: x", ', ""));
+  const at = broken("tests/commit-msg.test.ts", (t) => t.replace('    "design-floor: x",\n', ""));
   assert.match(measure("test-cases", at).out, /not all kept/);
 });
