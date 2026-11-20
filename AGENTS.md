@@ -65,7 +65,8 @@ Playwright. This repo replaces onehub-quy-hang for the MVP and takes only select
   `ontology/` in the same change. Changes to `ontology/` change what the business
   means: call them out in the PR description.
 - Every behaviour change comes with a test.
-- Never commit secrets or `.env`. Configuration goes in `.env.example`.
+- Never commit secrets.
+- Never commit `.env`. Configuration goes in `.env.example`.
 - Keep changes small and focused; one concern per PR.
 - Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`).
 
@@ -81,8 +82,8 @@ Playwright. This repo replaces onehub-quy-hang for the MVP and takes only select
   - significant technical choice → new `wiki/decisions/NNNN-title.md`;
   - production bug or outage → `wiki/incidents/YYYY-MM-DD-title.md`;
   - an entity's behaviour changed → update `wiki/entities/<entity>.md`.
-- Follow the page formats in `ontology/page-types.yaml`. Link to code paths,
-  do not paste code into the wiki.
+- Follow the page formats in `ontology/page-types.yaml`.
+- Link to code paths, do not paste code into the wiki.
 
 ## Project map
 
@@ -157,3 +158,15 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   other merge is a person's decision.
 - Never delete or weaken a test to get green, and never loosen an `agent:` setting in `ontology/`
   on your own. The gate sees both and raises the tier.
+
+## What holds these rules
+
+A machine catches a miss of these:
+
+- a secret in a commit: `secret-scan` goes red (GitHub)
+- commit format: `conventional-title` or `conventional-commits` goes red (GitHub)
+- a wiki page that breaks its page format: `make check` goes red
+- a module reaching past another module's public API: `make check` goes red
+
+Nothing listed here covers the other rules in this file. Do not count on a machine to catch a
+miss: keeping them is on you.

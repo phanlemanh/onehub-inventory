@@ -179,6 +179,14 @@ executors:
     sll_ci_pr: "node _acceptance/split-log-ledger/rang/ci-pr.mjs"   # split-log-ledger: quick, e2e, check green on the pull request's head; e2e-db and gate printed
     sll_ben_doc: "node _acceptance/split-log-ledger/rang/ben-doc.mjs"   # split-log-ledger: every tracked file that is no .md and names the drawn log is weighed in READERS
     sll_two_way: "node --test _acceptance/split-log-ledger/rang/two-way.mjs"   # split-log-ledger: each measure green on a sound copy, red with its pinned message on a broken one
+    rs0101_apply_again: "node _acceptance/upgrade-repo-setup-0-10-1/rang/apply-again.mjs"   # upgrade-repo-setup-0-10-1: apply.py of repo-setup 0.10.1: nothing left on HEAD; on a copy of the base it writes HEAD's three files
+    rs0101_template_same: "node _acceptance/upgrade-repo-setup-0-10-1/rang/template-same.mjs"   # upgrade-repo-setup-0-10-1: pr-title.yml is the tag's template; only step 2 of conventional-commits changed
+    rs0101_commits_judged: "node _acceptance/upgrade-repo-setup-0-10-1/rang/commits-judged.mjs"   # upgrade-repo-setup-0-10-1: the job's commit check run here with tools/commit_msg.py
+    rs0101_agents_tail: "node _acceptance/upgrade-repo-setup-0-10-1/rang/agents-tail.mjs"   # upgrade-repo-setup-0-10-1: AGENTS.md: two rules split, closing section, the checks it names exist
+    rs0101_manifest: "node _acceptance/upgrade-repo-setup-0-10-1/rang/manifest.mjs"   # upgrade-repo-setup-0-10-1: .repo-setup.json from 0.9.0 to 0.10.1, nothing else
+    rs0101_change_set: "node _acceptance/upgrade-repo-setup-0-10-1/rang/change-set.mjs"   # upgrade-repo-setup-0-10-1: the two commits' files; besides them only this round; no T3 path
+    rs0101_ruleset: "node _acceptance/upgrade-repo-setup-0-10-1/rang/ruleset.mjs"   # upgrade-repo-setup-0-10-1: main requires check, e2e, gate only; merge commits or rebase allowed
+    rs0101_two_way: "node --test _acceptance/upgrade-repo-setup-0-10-1/rang/two-way.mjs"   # upgrade-repo-setup-0-10-1: each measure green as it is, red with its message on a broken copy
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files
