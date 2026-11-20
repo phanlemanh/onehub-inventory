@@ -1,0 +1,40 @@
+{
+  "feature_plain": "Sau khi gộp, PR có commit chữ ký hay ghim lại của kit nghiệm thu không còn bị kiểm tiêu đề commit trên GitHub đánh đỏ, còn tin commit viết sai vẫn bị chặn như cũ.",
+  "will_do": [
+    { "id": "AC-1", "p": "Sẽ cho qua cả bảy kiểu tiêu đề commit mà kit tự viết, đọc thẳng từ bản cài của kit; kit có kiểu tiêu đề mới mà hồ sơ chưa biết thì phép đo báo đỏ." },
+    { "id": "AC-2", "p": "Sẽ vẫn chặn 32 tin chỉ na ná tiêu đề kit: thiếu chữ, sai hoa thường, khoảng trắng lạ, tên hồ sơ sai khuôn, hay tiêu đề kit giấu ở dòng sau." },
+    { "id": "AC-4", "p": "Sẽ chạy đúng đoạn kiểm commit của GitHub trên bản sạch của nhánh này: tiêu đề kit qua, tin sai vẫn bị chặn, và phép dò vẫn thấy có hook đang chấm." },
+    { "id": "AC-5", "p": "Sẽ giữ toàn bộ bộ kiểm của kho xanh, thêm đúng mười bài mới, không bài nào bị bỏ qua thêm." },
+    { "id": "AC-6", "p": "Sẽ chỉ đổi luật kiểm, tệp bài kiểm của nó và một dòng sổ wiki; mọi commit của chính PR này, kể cả commit chữ ký, vẫn qua luật cũ đang chạy trên GitHub." },
+    { "id": "AC-7", "p": "Sẽ chứng minh từng phép đo biết đỏ: 13 bản cố tình phá, mỗi bản phải bị đúng phép đo canh nó bắt được." },
+    { "id": "AC-8", "p": "Sẽ giữ nguyên mọi ca kiểm cũ của luật, chỉ thêm 4 ca phải qua và 6 ca phải bị chặn." }
+  ],
+  "wont_do": [
+    { "id": "AC-3", "p": "Sẽ KHÔNG chặn thêm commit nào trong 1393 commit đã có mà trước nay vẫn qua; chỉ nhận thêm đúng 12 commit của kit, và vẫn chặn đúng một commit «wip(dan-tu-excel)»." },
+    { "id": "OOS-1", "p": "KHÔNG đổi cách nối hook hay đoạn kiểm trên GitHub, chỉ đổi luật kiểm." },
+    { "id": "OOS-2", "p": "KHÔNG sửa lại 12 commit cũ trên nhánh chính; GitHub chỉ kiểm commit của PR." },
+    { "id": "OOS-3", "p": "KHÔNG đổi cách kit đặt tiêu đề commit; việc đó thuộc kho của kit." },
+    { "id": "OOS-4", "p": "KHÔNG nhận «wip» với phạm vi khác «ban-giao», chữ hoa thường khác, hay tên hồ sơ ngoài chữ thường, số và gạch nối." },
+    { "id": "OOS-5", "p": "KHÔNG xét các commit kit để tác tử tự đặt tin (đã viết đúng chuẩn) hay commit trong kho tạm của kit." },
+    { "id": "OOS-6", "p": "KHÔNG tự làm xanh PR đang mở đã bị đỏ: PR ấy cần một lần đẩy, sửa tiêu đề hoặc mở lại thì GitHub mới kiểm lại." }
+  ],
+  "scope_plain": "Phạm vi cố ý hẹp: chỉ mở đúng những kiểu tiêu đề kit cần, mọi thứ khác giữ nguyên.",
+  "coverage_plain": [
+    { "i": 0, "p": "Mọi nơi có thể viết tiêu đề đều được soi: lệnh ký của kit, các script của kit, plugin bàn giao, và commit do người viết (AC-1 đúng khuôn, AC-3 lịch sử, AC-8 ca cũ)." },
+    { "i": 1, "p": "Mọi dạng tin đều có ca: đúng khuôn, có thân tin, na ná, khoảng trắng lạ, nhiều dòng, tin rỗng và tin dò (AC-1, AC-2)." },
+    { "i": 2, "p": "Cả ba chỗ chấm đều đo: lúc commit trên máy, trên GitHub sau khi gộp, và trên GitHub cho chính PR này bằng luật cũ (AC-1, AC-4, AC-6)." },
+    { "i": 3, "p": "Không gì cũ bị hỏng: cả lịch sử commit, các ca kiểm cũ và toàn bộ bộ kiểm đều được chạy lại (AC-3, AC-8, AC-5)." },
+    { "i": 4, "p": "Chính các phép đo cũng được kiểm: mỗi phép đo phải đỏ khi bị phá, và phạm vi tệp đổi được khoanh (AC-7, AC-6)." }
+  ],
+  "gap_probe_plain": [
+    { "i": 0, "p": "Thiếu kiểm commit của chính PR này theo luật cũ trên GitHub; nay mỗi commit của PR đều được chấm bằng luật cũ, kèm một bản phá." },
+    { "i": 1, "p": "Phép dò script của kit bỏ sót vài cách viết lệnh commit; nay bắt mọi cách, và kho tạm của kit được ghi tên riêng kèm lý do." },
+    { "i": 2, "p": "Chưa soi các tệp hướng dẫn của kit, nơi có ba kiểu tiêu đề; nay soi hết và báo đỏ nếu có kiểu lạ." },
+    { "i": 3, "p": "Chưa có ca tin nhiều dòng; nay có ba ca và một bản phá luật đọc mọi dòng." },
+    { "i": 4, "p": "Chạy bộ kiểm chung không chứng minh được «thêm đúng mười ca, ca cũ còn nguyên»; nay có phép đo riêng so từng ca và ghim số bài." },
+    { "i": 5, "p": "Luật dự kiến rộng hơn khuôn của kit; nay siết đúng khuôn (tên hồ sơ, dấu gạch dài rồi tên người) và thêm 9 ca khoảng trắng hay tên lạ." },
+    { "i": 6, "p": "Chữ hợp đồng đếm sai số ca; đã sửa thành 32." },
+    { "i": 7, "p": "Con số lịch sử phụ thuộc nhánh chính đang tiến; nay đếm trên một mốc cố định, và ghi bản công cụ chạy hook." },
+    { "i": 8, "p": "Chưa nói PR đang mở không tự xanh, và câu về công cụ phát hành chưa đo; nay ghi rõ cả hai." }
+  ]
+}
