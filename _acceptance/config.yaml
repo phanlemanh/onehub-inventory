@@ -194,6 +194,15 @@ executors:
     cmks_change_set: "node _acceptance/commit-msg-kit-subjects/rang/change-set.mjs"   # commit-msg-kit-subjects: the rule, its test, a log entry and this round; not the hook's wiring
     cmks_test_cases: "node _acceptance/commit-msg-kit-subjects/rang/test-cases.mjs"   # commit-msg-kit-subjects: the test file keeps every old case and adds exactly the ten new ones
     cmks_two_way: "node --test _acceptance/commit-msg-kit-subjects/rang/two-way.mjs"   # commit-msg-kit-subjects: each measure green as it is, red on a copy with one thing broken
+    rs0102_apply_again: "node _acceptance/upgrade-repo-setup-0-10-2/rang/apply-again.mjs"   # upgrade-repo-setup-0-10-2: apply.py of repo-setup 0.10.2: nothing left on HEAD; on a copy of the base it writes HEAD's four files
+    rs0102_template_same: "node _acceptance/upgrade-repo-setup-0-10-2/rang/template-same.mjs"   # upgrade-repo-setup-0-10-2: the three files are the tag's templates; manifest 0.10.2; only the checkout and the judging step changed
+    rs0102_fence: "node _acceptance/upgrade-repo-setup-0-10-2/rang/fence.mjs"   # upgrade-repo-setup-0-10-2: the judging step fences what the hooks print; no token, no output
+    rs0102_judged: "node _acceptance/upgrade-repo-setup-0-10-2/rang/judged.mjs"   # upgrade-repo-setup-0-10-2: the judging step of HEAD answers as the base's on the same messages
+    rs0102_credentials: "node _acceptance/upgrade-repo-setup-0-10-2/rang/credentials.mjs"   # upgrade-repo-setup-0-10-2: the checkout keeps no token and nothing of the job needs one
+    rs0102_runner: "node _acceptance/upgrade-repo-setup-0-10-2/rang/runner.mjs"   # upgrade-repo-setup-0-10-2: PR 95's conventional-commits run was the base's job (pull_request_target)
+    rs0102_policy: "node _acceptance/upgrade-repo-setup-0-10-2/rang/policy.mjs"   # upgrade-repo-setup-0-10-2: on a copy, the policy may name gate without the agent pipeline
+    rs0102_change_set: "node _acceptance/upgrade-repo-setup-0-10-2/rang/change-set.mjs"   # upgrade-repo-setup-0-10-2: the upgrade commit unchanged; besides it only this round; base rule on every commit
+    rs0102_two_way: "node --test _acceptance/upgrade-repo-setup-0-10-2/rang/two-way.mjs"   # upgrade-repo-setup-0-10-2: each measure green as it is, red on a copy with one thing broken
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files

@@ -1,0 +1,4 @@
+{
+  "feature_plain": "Sau khi gộp, một tin commit do người viết PR soạn không còn ra lệnh được cho máy chạy CI, bản sao kho của bước kiểm tiêu đề commit không giữ khoá truy cập, và chính sách gộp được gọi tên ô kiểm «gate» — cả mười phép đo đã qua.",
+  "scope_plain": "Phạm vi giữ đúng như đã duyệt ở Cổng 1: chỉ đo bản lên đời, không sửa gì của nó."
+}
