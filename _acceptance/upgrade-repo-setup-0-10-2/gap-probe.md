@@ -1,6 +1,6 @@
 ---
 slug: upgrade-repo-setup-0-10-2
-at: 2026-11-20T10:05:00Z
+at: 2026-11-20T09:50:00Z
 verdict: findings
 p0: 0
 p1: 5
