@@ -33,6 +33,10 @@ export default defineConfig([
     "playwright-report/",
     "test-results/",
     "src/components/reui/",
+    // Not part of the repository: run folders of the acceptance kit and the batch, and worktrees of lanes and
+    // sessions. Both sit inside the working tree, so `eslint .` would read them.
+    ".acceptance-runs/",
+    ".claude/worktrees/",
   ]),
   js.configs.recommended,
   ...nextVitals,
