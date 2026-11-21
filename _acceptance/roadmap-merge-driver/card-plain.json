@@ -1,0 +1,41 @@
+{
+  "feature_plain": "Người làm trên một nhánh gộp nhánh chính về mà không còn vấp trang lộ trình do máy vẽ; bộ quét bảo mật thôi báo lỗi ở các kịch bản đo của hồ sơ; và kho ghi lại quyết định nâng bộ công cụ dựng kho theo mốc.",
+  "will_do": [
+    { "id": "AC-1", "p": "Sẽ đánh dấu trang lộ trình là tệp máy sinh, ngay cạnh bản đồ sản phẩm; các dấu cũ giữ nguyên." },
+    { "id": "AC-2", "p": "Sẽ gộp sạch khi hai nhánh cùng vẽ lại trang lộ trình, giữ trang của nhánh đang làm; đo bằng chín ca gộp thật, có cả ca máy chưa dựng và ca nhánh mở từ trước." },
+    { "id": "AC-3", "p": "Sẽ bắt được trang lộ trình cũ sau khi gộp: bước kiểm bản đồ báo đỏ cho tới khi vẽ lại." },
+    { "id": "AC-4", "p": "Sẽ có một đoạn dạy dựng máy: lệnh nào đặt cách gộp này, kiểm thế nào, sau khi gộp phải vẽ lại và ghi lại, và hai giới hạn đã biết." },
+    { "id": "AC-5", "p": "Sẽ có trang quyết định số 0046: nâng bộ công cụ dựng kho gom theo mốc, trừ bản vá chữa lỗi kho đang vấp; kèm bốn vòng nâng vừa qua và hạng của từng vòng." },
+    { "id": "AC-6", "p": "Sẽ đưa các kịch bản đo của hồ sơ ra khỏi phạm vi quét bảo mật, đúng thư mục ấy và không rộng hơn; kiểm rằng không quy trình tự động nào của kho gọi các kịch bản này." },
+    { "id": "AC-7", "p": "Sẽ chỉ đổi đúng các tệp của vòng; bảng xếp hạng rủi ro của kho giữ nguyên." },
+    { "id": "AC-8", "p": "Sẽ chứng mỗi phép đo biết báo đỏ: phá thử từng điều một thì phép đo canh điều ấy phải đỏ." },
+    { "id": "AC-9", "p": "Sẽ giữ trọn bộ kiểm của kho xanh như trước, không thêm bài bỏ qua." }
+  ],
+  "wont_do": [
+    { "id": "OOS-1", "p": "Sẽ KHÔNG chữa xung đột ở tệp cấu hình nghiệm thu dùng chung (30 lần trong số đo): để vòng sửa kit sau mốc 3.1." },
+    { "id": "OOS-2", "p": "Sẽ KHÔNG đổi bảng xếp hạng rủi ro hay luật tự chủ; đề xuất đổi hạng cho tệp do công cụ ghi chỉ nêu trong báo cáo cuối." },
+    { "id": "OOS-3", "p": "Sẽ KHÔNG sửa kit, không nâng bản kit, không đưa trang lộ trình ra khỏi kho mã." },
+    { "id": "OOS-4", "p": "Sẽ KHÔNG đóng tay cảnh báo bảo mật nào và không sửa kịch bản đo của các hồ sơ đã ký." },
+    { "id": "OOS-5", "p": "Sẽ KHÔNG đổi cài đặt nào trên GitHub." },
+    { "id": "OOS-6", "p": "Sẽ KHÔNG thêm đoạn vào hai trang do công cụ dựng kho ghi (hướng dẫn đóng góp, trang giới thiệu), trừ khi anh chọn lối khác ở Hỏi-3." }
+  ],
+  "scope_plain": "Vòng chỉ làm ba nhát rẻ ở phía kho; phần gốc của xung đột tệp sinh thuộc vòng sửa kit sau.",
+  "coverage_plain": [
+    { "i": 0, "p": "Hai tệp máy sinh đều được đo: trang lộ trình (AC-1 đánh dấu, AC-2 gộp, AC-3 vẽ lại) và bản đồ sản phẩm (AC-1, AC-2 làm đối chứng)." },
+    { "i": 1, "p": "Máy đã dựng và máy chưa dựng đều có ca đo (AC-2 gộp), và lời dạy nói rõ khác biệt (AC-4 tài liệu)." },
+    { "i": 2, "p": "Nhánh mở sau vòng này gộp sạch; nhánh mở trước còn vấp một lần, có ca đo và có câu báo trước (AC-2, AC-4)." },
+    { "i": 3, "p": "Cả ca hai bên cùng đổi lẫn ca chỉ nhánh chính đổi đều được đo (AC-2 gộp)." },
+    { "i": 4, "p": "Việc sau khi gộp: trang cũ bị bắt và vẽ lại thì hết (AC-3), lời dạy nêu đúng lệnh (AC-4)." },
+    { "i": 5, "p": "Các dấu cũ của kho không bị ảnh hưởng: tệp thường vẫn báo xung đột, nhật ký vẫn ghép dòng (AC-1, AC-2)." },
+    { "i": 6, "p": "Phạm vi quét bảo mật: đúng thư mục kịch bản đo bị loại, mọi tệp khác vẫn được quét, và không ai ngoài lượt chấm gọi các kịch bản ấy (AC-6)." },
+    { "i": 7, "p": "Trang quyết định được đo cả nội dung lẫn khuôn trang (AC-5, AC-9 trọn bộ kiểm)." },
+    { "i": 8, "p": "Chính các phép đo của vòng cũng được thử hai chiều (AC-8), kèm kiểm tập tệp (AC-7) và trọn bộ kiểm (AC-9)." }
+  ],
+  "gap_probe_plain": [
+    { "i": 0, "p": "Lý do máy tự chọn chỗ đặt đoạn dạy dựng máy không đứng được: không luật nào của kho quyết việc này. Đã chuyển thành Hỏi-3 để anh chọn." },
+    { "i": 1, "p": "Thiếu ca nhánh mở từ trước vòng này: những nhánh đó vẫn vấp trang lộ trình một lần ở lần gộp đầu. Đã thử thật, thêm ca đo thứ chín và một câu báo trước trong lời dạy." },
+    { "i": 2, "p": "Câu hỏi về bộ quét bảo mật chưa nói máy sẽ sửa tệp quy trình bằng cách nào, trong khi kho cấm máy sửa thư mục ấy. Đã viết rõ ở Hỏi-2: máy chỉ áp đúng bản vá bốn dòng, và chỉ khi anh duyệt." },
+    { "i": 3, "p": "Chưa ai kiểm tiền đề «kịch bản đo chỉ chạy lúc chấm». Đã thêm phép đo: không quy trình tự động, lệnh dựng hay mã nào của kho gọi các kịch bản ấy." },
+    { "i": 4, "p": "Lời hứa «dựng máy là đủ» mới được đo bằng chữ. Đã đổi: phép đo chạy đúng lệnh dựng máy của kho rồi mới thử gộp." }
+  ]
+}

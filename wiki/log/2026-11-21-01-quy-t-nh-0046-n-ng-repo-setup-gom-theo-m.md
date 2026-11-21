@@ -1,0 +1,1 @@
+Quyết định 0046: nâng repo-setup gom theo mốc của kit nghiệm thu, trừ bản vá chữa lỗi kho đang vấp. Cùng hồ sơ roadmap-merge-driver: `LO-TRINH.html` mang `merge=generated-file` và thước của hồ sơ ra khỏi phạm vi quét CodeQL.
