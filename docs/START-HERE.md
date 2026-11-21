@@ -34,6 +34,33 @@ Sau thay đổi nhìn thấy được, chạy thêm `make e2e`.
 | `_acceptance/`          | Cấu hình và hồ sơ cổng nghiệm thu                                                 |
 | `wiki/`                 | Quyết định, khái niệm, nhật ký                                                    |
 
+## Gộp nhánh chính và tệp máy sinh
+
+`PRODUCT-MAP.md` và `LO-TRINH.html` do máy vẽ lại cả tệp. `.gitattributes` gắn cho hai tệp này `merge=generated-file`: khi gộp, Git giữ bản của nhánh đang đứng thay vì báo xung đột.
+
+Cách gộp ấy là cấu hình của từng bản kéo, không nằm trong kho. `make setup` (hoặc `npm install`) đặt nó. Kiểm:
+
+```bash
+git config --get merge.generated-file.driver
+```
+
+Kết quả phải là `true`. Chưa có thì đặt tay:
+
+```bash
+git config merge.generated-file.driver true
+```
+
+Sau mỗi lần gộp nhánh chính vào nhánh, vẽ lại hai tệp rồi commit. Không vẽ lại thì bước `product-map --check` của CI đỏ.
+
+```bash
+R="${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}" && node "$R/scripts/product-map.mjs" --root .
+```
+
+Hai giới hạn:
+
+- GitHub không chạy driver của máy: trang PR trên web vẫn báo xung đột ở hai tệp này. Gộp nhánh chính ở máy rồi đẩy lên.
+- Nhánh mở trước khi dòng của `LO-TRINH.html` lên nhánh chính (21/11/2026) còn xung đột ở tệp ấy một lần, ở lần gộp nhánh chính đầu tiên. Từ lần kế thì hết.
+
 ## Điều gì tự chạy
 
 CI chạy `make check` khi có kho GitHub. Trong Claude Code, hook chặn sửa migration đã commit và tệp bí mật, và kiểm kiểu cùng lint tệp vừa đổi khi kết thúc lượt. Hook kit chặn báo cáo PASS giả.
