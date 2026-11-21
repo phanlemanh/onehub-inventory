@@ -5,7 +5,7 @@ slug: roadmap-merge-driver
 owner:
 risk_tier: T2
 surfaces: [config, ci, docs]
-status: approved
+status: implemented
 approved_by: Phan Le Manh
 approved_at: 2026-11-21
 design_doc: docs/superpowers/specs/2026-11-21-roadmap-merge-driver-design.md
