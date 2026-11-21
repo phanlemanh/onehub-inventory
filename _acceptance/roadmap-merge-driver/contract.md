@@ -5,7 +5,7 @@ slug: roadmap-merge-driver
 owner:
 risk_tier: T2
 surfaces: [config, ci, docs]
-status: implemented
+status: machine-cleared
 approved_by: Phan Le Manh
 approved_at: 2026-11-21
 design_doc: docs/superpowers/specs/2026-11-21-roadmap-merge-driver-design.md
@@ -182,3 +182,12 @@ Giới hạn đã biết:
 - Con số 134 → 63 lần xung đột là số phát lại của phiên giữ đợt, hồ sơ này không đo lại. Thước sau gộp của kế hoạch: số
   lần xung đột ở tệp này trong 7 ngày kế.
 - `.gitattributes` và `security.yml` do repo-setup ghi: vòng nâng repo-setup kế sẽ thấy hai tệp này lệch với mẫu.
+- Ngoài-1 (máy định tuyến 2026-11-21, đề xuất S4 known-limits): Máy đã sửa tệp cấu hình quét bảo mật mà quy định thường chỉ cho người sửa. Chủ kho đã đồng ý trước, nhưng người gộp nên tự xác nhận lại. — `.github/workflows/security.yml`
+- Ngoài-2 (máy định tuyến 2026-11-21, đề xuất S4 known-limits): Phần mô tả kết quả mong đợi của ba phép kiểm ghi hơi khác chữ so với kết quả thật. Người dùng không thấy gì; chỉ người đối chiếu từng chữ mới thấy lệch. — `_acceptance/roadmap-merge-driver/evals.yaml`
+- Ngoài-3 (máy định tuyến 2026-11-21, đề xuất S4 known-limits): Ba phép kiểm mô tả kết quả mong đợi khác chữ với kết quả thật. Người dùng không bị ảnh hưởng. — `_acceptance/roadmap-merge-driver/evals.yaml`
+- Ngoài-4 (máy định tuyến 2026-11-21, đề xuất S4 known-limits): Phép kiểm có thể báo đạt nhầm hoặc đỏ nhầm trong tương lai khi nhật ký có thêm tệp chứa cùng số. Hiện tại kết quả vẫn đúng. — `_acceptance/roadmap-merge-driver/rang/decision.mjs`
+- Ngoài-5 (máy định tuyến 2026-11-21, đề xuất S4 known-limits): Phép kiểm phạm vi thay đổi có thể không thấy một tệp bị dời vào thư mục hồ sơ. Nhánh hiện tại không có trường hợp này. — `_acceptance/roadmap-merge-driver/rang/two-way.mjs`
+- Ngoài-6 (máy định tuyến 2026-11-21, đề xuất S4 known-limits): Việc số bài kiểm không đổi so với trước chỉ được xác nhận qua việc bộ kiểm chạy xanh, không có con số đối chiếu. Không thấy dấu hiệu bài bị bỏ. — `_acceptance/roadmap-merge-driver/evals.yaml`
+- Ngoài-7 (máy định tuyến 2026-11-21, đề xuất S4 known-limits): Nếu sau này lệnh cài đặt đổi cách chạy, trang hướng dẫn có thể sai mà phép kiểm vẫn xanh. Hiện tại hướng dẫn đúng. — `_acceptance/roadmap-merge-driver/rang/docs.mjs`
+- Ngoài-8 (máy định tuyến 2026-11-21, đề xuất S4 known-limits): Phép kiểm đếm nhật ký theo một dãy số trần nên có thể nhầm ở vòng sau. Kết quả hôm nay đúng. — `_acceptance/roadmap-merge-driver/rang/decision.mjs`
+- Ngoài-9 (máy định tuyến 2026-11-21, đề xuất S4 known-limits): Hai phép kiểm cấm vẫn hoạt động đúng khi thử tay, nhưng chưa có bài tự động chứng minh chúng báo đúng lý do. Người dùng không bị ảnh hưởng. — `_acceptance/roadmap-merge-driver/rang/two-way.mjs`
