@@ -3,6 +3,7 @@ type: entity
 title: Complex (Phân khu)
 links: [ontology/entities/Complex.yaml]
 sources: ["_acceptance/danh-muc-can-nhu-onehub-invest/contract.md", "https://dd.reso.org/DD2.1/"]
+summary: phân khu của một dự án
 ---
 
 # Complex (Phân khu)

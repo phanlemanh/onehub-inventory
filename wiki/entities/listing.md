@@ -3,6 +3,7 @@ type: entity
 title: Listing (Hàng)
 links: [ontology/entities/Listing.yaml, db/migrations/013_bang_can_chao.sql]
 sources: [onehub-quy-hang/CONTEXT.md, "https://dd.reso.org/DD2.1/Property/StandardStatus/"]
+summary: một lần chào trên một căn
 ---
 
 # Listing (Hàng)

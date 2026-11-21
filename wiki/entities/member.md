@@ -15,6 +15,7 @@ sources:
     _acceptance/bang-quyen-theo-vai/contract.md,
     wiki/decisions/0016-permission-model.md,
   ]
+summary: người làm việc trong một sàn, với vai sàn giao
 ---
 
 # Member (Thành viên)

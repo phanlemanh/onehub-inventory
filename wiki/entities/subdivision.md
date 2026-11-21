@@ -3,6 +3,7 @@ type: entity
 title: Subdivision (Dự án)
 links: [ontology/entities/Subdivision.yaml]
 sources: ["_acceptance/danh-muc-can-nhu-onehub-invest/contract.md", "https://dd.reso.org/DD2.1/"]
+summary: dự án, gốc của danh mục dùng chung
 ---
 
 # Subdivision (Dự án)
