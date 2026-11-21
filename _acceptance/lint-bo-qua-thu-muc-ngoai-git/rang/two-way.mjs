@@ -5,7 +5,7 @@
 
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 
@@ -19,10 +19,13 @@ function run(script, ...args) {
   return { code: r.status, out };
 }
 
-const noPlanted = () => {
+// The planted folders of THIS run are gone. Only the run's own tag is checked: in a grading round other measures plant
+// their own folders at the same time.
+const noPlanted = (out) => {
+  const tag = /: plants (lnt-[0-9]+-[0-9]+)/.exec(out)?.[1];
+  assert.ok(tag, `no plants line in: ${out}`);
   for (const d of [".acceptance-runs", ".claude/worktrees"]) {
-    const full = join(REPO, d);
-    if (existsSync(full)) assert.equal(readdirSync(full).filter((n) => n.startsWith("lnt-")).length, 0, `${d} keeps a planted folder`);
+    assert.equal(existsSync(join(REPO, d, tag)), false, `${d}/${tag} was not removed`);
   }
 };
 
@@ -83,7 +86,7 @@ test("E4 green: npm run lint stays green with broken files planted, and the plan
   const r = run("chay-that.mjs");
   assert.equal(r.code, 0, r.out);
   assert.match(r.out, /chay-that: npm run lint exit 0 with a broken \.mjs planted in 3 out-of-git places; none named in the output; planted folders removed/);
-  noPlanted();
+  noPlanted(r.out);
 });
 
 test("E4 red (b): Prettier without the .prettierignore lines names the planted worktree file, and the plants are removed", () => {
@@ -91,23 +94,23 @@ test("E4 red (b): Prettier without the .prettierignore lines names the planted w
   assert.equal(r.code, 1, r.out);
   assert.match(r.out, /chay-that: prettier named a planted file: \.claude\/worktrees\/lnt-[0-9-]+\/x\.mjs/);
   assert.match(r.out, /planted folders removed/);
-  noPlanted();
+  noPlanted(r.out);
 });
 
 test("E7 green: the test runner collects no test file from either out-of-git folder", { timeout: 300_000 }, () => {
   const r = run("kiem-tron.mjs", "--liet-ke");
   assert.equal(r.code, 0, r.out);
   assert.match(r.out, /kiem-tron: test runner collects no planted file; planted folders removed/);
-  noPlanted();
+  noPlanted(r.out);
 });
 
-test("E7 red: without the two new excludes the test runner collects the planted tests of both folders", { timeout: 300_000 }, () => {
+test("E7 red (a): without the two new excludes the test runner collects the planted tests of both folders", { timeout: 300_000 }, () => {
   const r = run("kiem-tron.mjs", "--liet-ke", "--pha");
   assert.equal(r.code, 1, r.out);
   assert.match(r.out, /kiem-tron: test runner collects a planted file: .*\.acceptance-runs\/lnt-[0-9-]+\/tests\/planted\.test\.ts/);
   assert.match(r.out, /\.claude\/worktrees\/lnt-[0-9-]+\/tests\/planted\.test\.ts/);
   assert.match(r.out, /planted folders removed/);
-  noPlanted();
+  noPlanted(r.out);
 });
 
 test("E4 red (a): without the two new patterns lint names a planted file, and the plants are still removed", { timeout: 600_000 }, () => {
@@ -115,5 +118,30 @@ test("E4 red (a): without the two new patterns lint names a planted file, and th
   assert.equal(r.code, 1, r.out);
   assert.match(r.out, /chay-that: lint named a planted file: /);
   assert.match(r.out, /planted folders removed/);
-  noPlanted();
+  noPlanted(r.out);
+});
+
+test("E7 green: the type checker reads no planted file", { timeout: 300_000 }, () => {
+  const r = run("kiem-tron.mjs", "--tsc");
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /kiem-tron: type checker reads no planted file; planted folders removed/);
+  noPlanted(r.out);
+});
+
+test("E7 red (b): a type checker config that names the folders lists the planted files", { timeout: 300_000 }, () => {
+  const r = run("kiem-tron.mjs", "--tsc", "--pha");
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /kiem-tron: type checker reads a planted file: .*\.claude\/worktrees\/lnt-[0-9-]+\/src\/planted\.ts/);
+  assert.match(r.out, /planted folders removed/);
+  noPlanted(r.out);
+});
+
+test("E7 red (c): plants that break nothing stop the measure before it runs", { timeout: 300_000 }, () => {
+  const r = run("kiem-tron.mjs", "--cay-lanh", "--tsc");
+  assert.equal(r.code, 2, r.out);
+  assert.match(
+    r.out,
+    /kiem-tron: a planted file breaks nothing: src\/planted\.ts is not a type error; tests\/planted\.test\.ts does not fail; tools\/planted\.mjs is not an ESLint error; tools\/planted\.mjs is formatted for Prettier/,
+  );
+  noPlanted(r.out);
 });

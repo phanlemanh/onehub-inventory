@@ -42,9 +42,10 @@ Source input: prompt (chủ kho duyệt 21/11 «Làm cả ba», mục «bộ ki�
 - AC-6: Given mỗi phép đo `lnt_*` của hồ sơ, When chạy nó trên vật lành rồi trên bản phá (cấu hình của kho bỏ đi hai mục
   mới), Then vật lành xanh và bản phá đỏ với thông điệp ghim trong `evals.yaml`; mọi phép đo in gốc cây nó đo, và gốc ấy là
   cây đang chấm.
-- AC-7: Given ở mỗi thư mục ngoài git một bộ tệp mà mỗi bước của `make check` sẽ đỏ nếu đọc phải (bài kiểm hỏng, lỗi kiểu,
-  trang wiki sai khuôn, màn phạm luật giao diện, tệp `.mjs` sai luật), When chạy `make check` từ gốc cây, Then thoát 0 và
-  không dòng nào nêu các tệp ấy; thư mục tạm được gỡ sau khi đo, kể cả khi đỏ.
+- AC-7: Given ở mỗi thư mục ngoài git một bài kiểm hỏng, một tệp `.ts` lỗi kiểu và một tệp `.mjs` sai luật — mỗi tệp đã
+  chứng làm đỏ đúng công cụ của nó khi công cụ ấy được trỏ thẳng vào tệp —, When chạy `make check` từ gốc cây, Then thoát
+  0, không dòng nào nêu các tệp ấy, và danh sách tệp của bộ kiểm kiểu (`tsconfig.json`, `tsconfig.strict.json`) không có
+  tệp nào trong số đó; thư mục tạm được gỡ sau khi đo, kể cả khi đỏ.
 
 ## Coverage
 
@@ -52,7 +53,7 @@ Không quét không gian tiêu chí: dòng sổ `descope` «bỏ coverage-scan»
 
 | Trục                                                                            | Tiêu chí   |
 | ------------------------------------------------------------------------------- | ---------- |
-| Công cụ: ESLint · Prettier · Vitest · các bước còn lại của `make check`          | AC-1, AC-2 · AC-7 · AC-7 |
+| Công cụ: ESLint · Prettier · Vitest · bộ kiểm kiểu · các bước còn lại của `make check` | AC-1, AC-2 · AC-7 · AC-7 · AC-7 (chỉ đòi thoát 0) |
 | Thư mục ngoài git: `.acceptance-runs/` · `.claude/worktrees/` · bản dựng lồng trong worktree | AC-1, AC-2, AC-4 |
 | Chiều: phải bỏ qua · không được bỏ quá tay                                      | AC-1, AC-2 · AC-3 |
 | Cách đo: hỏi công cụ · chạy lệnh thật của kho                                   | AC-1–AC-3 · AC-4, AC-5, AC-7 |
@@ -70,5 +71,6 @@ Không quét không gian tiêu chí: dòng sổ `descope` «bỏ coverage-scan»
 
 - Known limits (khai trước): (1) phép đo chạy trong worktree của nhánh, nơi không có thư mục đợt thật; ca kho chính được
   dựng lại bằng tệp sai luật đặt tạm. Sau khi gộp: chạy `make check` một lần ở kho chính trên `main` và ghi kết quả vào mô
-  tả PR. (2) Mẫu bỏ qua neo ở gốc cây; một thư mục cùng tên nằm sâu hơn trong cây (không có hôm nay) vẫn bị quét.
+  tả PR. (2) Mẫu bỏ qua neo ở gốc cây; một thư mục cùng tên nằm sâu hơn trong cây (không có hôm nay) vẫn bị quét. (3) Các bước của `make check` đọc thư mục cố định trong cây (trang wiki đọc `wiki/`, sổ đọc `wiki/`, ranh giới module
+  đọc `src/modules/` và `src/app/`) không có tệp cấy: chúng không với tới hai thư mục, AC-7 chỉ đòi `make check` thoát 0.
 - `eslint.config.js`, `.prettierignore` và `vitest.config.ts` do repo-setup quản; cả ba đã lệch bản mẫu từ trước vòng này.

@@ -21,6 +21,8 @@ feature_slug: lint-bo-qua-thu-muc-ngoai-git
 #   nên E2 hỏi thêm với .prettierignore một mình, một đường mỗi thư mục, để dòng .acceptance-runs/ cũng có bằng chứng.
 #   Vitest (thêm sau phản biện): bản phá là tệp cấu hình tạm đặt trong thư mục cấy, nhập vitest.config.ts của kho và bỏ hai
 #   mục exclude mới. Đo 21/11 trước khi sửa: make check với tệp cấy đỏ ở bước test, nêu planted.test.ts của cả hai thư mục.
+#   Lượt chấm 1 (REJECT): ba tệp cấy (lỗi kiểu, trang wiki, màn) nằm ở chỗ bước của chúng không bao giờ đọc nên xanh
+#   không chứng gì; nay cấy ba tệp, mỗi tệp chứng đỏ khi trỏ thẳng, và bộ kiểm kiểu đo bằng danh sách tệp của nó.
 #   Mọi phép đo suy gốc cây từ vị trí của chính nó (lên ba cấp từ rang/) và in dòng '<tên>: root <gốc>'.
 evals:
   - id: E1
@@ -69,7 +71,7 @@ evals:
     cmd: config:executors.script.lnt_two_way
     layer: backend-effect
     paths: ["eslint.config.js", ".prettierignore", ".gitignore", "_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/**"]
-    expected: "exit 0; node --test báo 'tests 13', 'pass 13', 'fail 0': năm ca xanh (E1, E2, E3, E4, E7), bảy ca đỏ (E1 một, E2 một, E3 hai, E4 hai, E7 một — mỗi ca đỏ của E4 và E7 còn đòi thư mục tạm không còn) và một ca 'bản sao trong bộ nhớ không bỏ gì thì khớp cách tra thật'. Mọi ca đòi dòng '<tên>: root <gốc>' trùng gốc cây đang chấm. Chiều đỏ của chính E6: đổi thông điệp ghim trong một phép đo → ca tương ứng fail vì không khớp chuỗi."
+    expected: "exit 0; node --test báo 'tests 16', 'pass 16', 'fail 0': sáu ca xanh (E1, E2, E3, E4, E7 bộ chạy bài kiểm, E7 bộ kiểm kiểu), chín ca đỏ (E1 một, E2 một, E3 hai, E4 hai, E7 ba: (a) Vitest bỏ hai mục exclude gom bài kiểm cấy, (b) cấu hình kiểu nêu hai thư mục thì danh sách có tệp cấy, (c) tệp cấy lành thì phép đo dừng exit 2 trước khi chạy) và một ca 'bản sao trong bộ nhớ không bỏ gì thì khớp cách tra thật'. Mọi ca đòi dòng '<tên>: root <gốc>' trùng gốc cây đang chấm; ca có cấy đòi thư mục tạm của CHÍNH lượt ấy (dòng '<tên>: plants <tag>') không còn. Chiều đỏ của chính E6: đổi thông điệp ghim trong một phép đo → ca tương ứng fail vì không khớp chuỗi."
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E7
     criterion: AC-7
@@ -78,5 +80,5 @@ evals:
     long_running: 2
     layer: backend-effect
     paths: ["**"]
-    expected: "exit 0; dòng 'kiem-tron: make check exit 0 with 5 planted files in each of 2 out-of-git folders; none named in the output; planted folders removed'. Chiều đỏ (two-way, E6): Vitest với bản cấu hình bỏ hai mục exclude mới → exit 1 với 'kiem-tron: test runner collects a planted file:' kèm planted.test.ts của cả hai thư mục; thư mục tạm không còn sau lần đỏ."
+    expected: "exit 0; dòng 'kiem-tron: make check exit 0 with 3 planted files in each of 2 out-of-git folders; none named in the output; the type checker lists none (tsconfig.json, tsconfig.strict.json); planted folders removed'. Trước khi cấy, phép đo chứng từng tệp làm đỏ công cụ của nó khi trỏ thẳng (bài kiểm '1 failed', tsc lỗi kiểu, ESLint lỗi, Prettier chưa định dạng); không thì exit 2 'kiem-tron: a planted file breaks nothing: …'. Chiều đỏ: ba ca E7 của E6."
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

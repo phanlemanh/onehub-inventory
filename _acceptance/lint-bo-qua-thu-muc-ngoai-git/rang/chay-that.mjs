@@ -21,6 +21,7 @@ console.log(ROOT_LINE("chay-that"));
 const broken = process.argv.includes("--pha");
 const brokenPrettier = process.argv.includes("--pha-pr");
 const tag = `lnt-${process.pid}-${Date.now()}`;
+console.log(`chay-that: plants ${tag}`);
 const BAD = 'const a=1\nvar b = require("x")\nconsole.log(c)\n';
 
 // Planted folders, and whether each parent existed before (so an empty parent we made is removed too).
