@@ -1,11 +1,14 @@
 # Deploy, smoke check and rollback on Vercel (row moi-truong-thu-va-ban-that; runbook docs/van-hanh/).
 # Used by .github/workflows/deploy.yml. ENV=staging|production; variables are read from the environment, never printed.
-.PHONY: deploy smoke rollback
+.PHONY: deploy smoke rollback dat-khoa
 ENV ?= staging
 DEPLOY_TOOLS := $(dir $(lastword $(MAKEFILE_LIST)))../tools/deploy
 
 deploy: ## Deploy to ENV (staging|production): config, migrations, build, check, then the domain
 	node $(DEPLOY_TOOLS)/len-ban.mjs $(ENV)
+
+dat-khoa: ## Set the GitHub environment secrets from the keys you paste (ENV=staging|production, default both; XOAY=1 rotates the generated two)
+	node $(DEPLOY_TOOLS)/dat-khoa.mjs $(if $(filter command line environment,$(origin ENV)),$(ENV),all) $(if $(XOAY),--xoay)
 
 smoke: ## Read-only check of ENV's public address (APP_URL)
 	node $(DEPLOY_TOOLS)/kiem-nhanh.mjs $(ENV)
