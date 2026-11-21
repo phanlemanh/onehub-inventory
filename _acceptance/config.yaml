@@ -212,6 +212,14 @@ executors:
     rs0103_flow: "node _acceptance/upgrade-repo-setup-0-10-3/rang/flow.mjs"   # upgrade-repo-setup-0-10-3: the flow measure reads no dossier and a threshold changes no exit code
     rs0103_change_set: "node _acceptance/upgrade-repo-setup-0-10-3/rang/change-set.mjs"   # upgrade-repo-setup-0-10-3: the upgrade commit unchanged; besides it only this round; base rule on every commit
     rs0103_two_way: "node --test _acceptance/upgrade-repo-setup-0-10-3/rang/two-way.mjs"   # upgrade-repo-setup-0-10-3: each measure green as it is, red on a copy with one thing broken
+    rmd_attr: "node _acceptance/roadmap-merge-driver/rang/attr.mjs"   # roadmap-merge-driver: LO-TRINH.html carries merge=generated-file next to PRODUCT-MAP.md; every older line kept
+    rmd_merge: "node _acceptance/roadmap-merge-driver/rang/merge.mjs"   # roadmap-merge-driver: nine merges on scratch repositories, by file, driver and .gitattributes; the driver set by the prepare script
+    rmd_redraw: "node _acceptance/roadmap-merge-driver/rang/redraw.mjs"   # roadmap-merge-driver: a stale page fails product-map --check on a copy of HEAD; the redraw makes it pass
+    rmd_docs: "node _acceptance/roadmap-merge-driver/rang/docs.mjs"   # roadmap-merge-driver: the setup section names the commands the repository really uses
+    rmd_decision: "node _acceptance/roadmap-merge-driver/rang/decision.mjs"   # roadmap-merge-driver: decision page 0046, its four tiers equal the contracts of the upgrade rounds
+    rmd_codeql: "node _acceptance/roadmap-merge-driver/rang/codeql.mjs"   # roadmap-merge-driver: CodeQL ignores the measures of the records and nothing else
+    rmd_change_set: "node _acceptance/roadmap-merge-driver/rang/change-set.mjs"   # roadmap-merge-driver: the files of the round only; risk_tiers as the base
+    rmd_two_way: "node --test _acceptance/roadmap-merge-driver/rang/two-way.mjs"   # roadmap-merge-driver: each measure green as it is, red with its message on a broken copy
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files

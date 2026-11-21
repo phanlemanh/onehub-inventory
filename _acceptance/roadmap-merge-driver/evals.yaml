@@ -1,0 +1,80 @@
+schema_version: 1
+feature_slug: roadmap-merge-driver
+# Kế hoạch đo, viết trước mã. Dữ liệu chung ở rang/matrix.mjs, mọi phép đo đọc nó.
+#   Nền của PR: git merge-base HEAD origin/main, lúc mở hồ sơ 8e0a91c9.
+#   Thước gọi lệnh bằng mảng đối số (execFileSync), không ghép chuỗi lệnh.
+#   Cặp hai chiều: rang/two-way.mjs — mỗi phép đo xanh trên cây, đỏ với thông điệp ghim trên bản phá.
+#   Mỗi phép đo nhận --root <thư mục> để two-way chạy nó trên bản phá; mặc định là gốc kho suy từ vị trí script.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.rmd_attr
+    long_running: 1
+    paths: [".gitattributes"]
+    expected: "exit 0; dòng 'attr: LO-TRINH.html merge=generated-file follows PRODUCT-MAP.md; check-attr gives generated-file for both, union for wiki/log.md, unspecified for README.md and package.json; every line of the base is kept in order, 1 comment line reworded, 1 line added'. Chiều đỏ (two-way): mất dòng mới → 'attr: no line LO-TRINH.html merge=generated-file'; dòng đứng sai chỗ → 'attr: the new line does not follow PRODUCT-MAP.md'; bỏ một dòng cũ → 'attr: a line of the base is gone'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.rmd_merge
+    long_running: 2
+    paths: [".gitattributes", "package.json"]
+    expected: "exit 0; dòng 'merge: the prepare script of package.json sets merge.generated-file.driver to true on a scratch repository', chín dòng 'merge case <n>: … as expected', rồi dòng 'merge: 9 of 9 cases as expected (5 clean, 4 conflict)'. Số assert bằng số ca của GOP trong rang/matrix.mjs. Kho tạm dựng bằng git thật, .gitattributes đọc từ cây; ca 5, 6 và nhánh của ca 9 dùng bản bỏ dòng mới. Ở ca có driver, driver do chính script prepare rút từ package.json của cây đặt (bên viết thật), thước không tự gõ git config. Should-NOT-fire: ca 3 (tệp thường), ca 4 (không driver) và ca 9 (nhánh mở trước vòng) phải xung đột. Chiều đỏ: .gitattributes mất dòng mới → 'merge case 1: expected a clean merge keeping the branch, got a conflict in LO-TRINH.html'; prepare mất lệnh → 'merge: the prepare script did not set merge.generated-file.driver'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.rmd_redraw
+    long_running: 3
+    paths: ["LO-TRINH.html", "PRODUCT-MAP.md", "docs/plan/**", "_acceptance/**"]
+    expected: "exit 0; dòng 'redraw: on a copy of HEAD product-map --check passes; with the page of the base it fails naming LO-TRINH.html; after product-map --root it passes and the page equals HEAD'. Đo ĐẦU RA thật của lệnh vẽ của kit trên một cây làm việc tạm, không đo lời dạy. Chiều đỏ: bản phá coi trang lệch là khớp → 'redraw: the stale page was not caught'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.rmd_docs
+    long_running: 1
+    paths: ["docs/START-HERE.md", "package.json", ".gitattributes", "_acceptance/config.yaml"]
+    expected: "exit 0; dòng 'docs: the section names the setup command, the driver command of package.json, the check command, the redraw command of the repository, the 2 files .gitattributes marks, and the GitHub limit'. Quan hệ, không chỉ chuỗi: lệnh đặt driver trong trang phải có trong script prepare của package.json; lệnh vẽ phải bằng executors.script.product_map bỏ --check; danh sách tệp trong trang phải bằng tập tệp mang merge=generated-file trong .gitattributes. Trang còn phải có câu giới hạn nhánh mở trước vòng (ca 9 của E2 đo hành vi ấy trên git thật). Chiều đỏ: mất lệnh đặt driver → 'docs: the driver command is missing'; lệnh vẽ khác → 'docs: the redraw command is not the repository's'; thiếu giới hạn GitHub → 'docs: the GitHub limit is missing'; thiếu giới hạn nhánh mở trước → 'docs: the limit for branches opened before the line is missing'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.rmd_decision
+    long_running: 1
+    paths: ["wiki/decisions/**", "wiki/log/**", "_acceptance/upgrade-repo-setup-*/contract.md"]
+    expected: "exit 0; dòng 'decision: page 0046 has the four sections, Accepted 2026-11-21, the owner's sentence and the milestone definition; tiers 0.9.0 T3, 0.10.1 T2, 0.10.2 T3, 0.10.3 T3 equal risk_tier of <k> contracts in the tree (<danh sách hợp đồng chưa có trong cây>); risk_tiers said unchanged; 1 new log entry names it'. Chiều đỏ: sai một hạng → 'decision: tier of 0.10.1 is T3 in the page, T2 in its contract'; mất một mục → 'decision: section Consequences is missing'; mất câu của chủ kho → 'decision: the owner's sentence is missing'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.rmd_codeql
+    long_running: 1
+    paths: [".github/workflows/security.yml", "_acceptance/**"]
+    expected: "exit 0; dòng 'codeql: the init step ignores exactly _acceptance/**/rang/**; against the base the workflow adds the 4 lines of the patch and removes none; the pattern covers <n> tracked files under _acceptance/<record>/rang/, the 4 alert files among them, and 0 of the <m> other tracked files; none of the <k> caller files (workflows, Makefile, mk, package.json, pre-commit, src, tests, tools, db) names a path under _acceptance/<record>/rang/'. Mẫu được khớp theo luật của tài liệu CodeQL (** là không hoặc nhiều đoạn đường dẫn). Danh sách bên gọi BEN_GOI viết trước trong rang/matrix.mjs; thước in số tệp đã soát, và từ chối (exit khác 0) nếu một mục của danh sách không khớp tệp nào trừ mục được đánh dấu có thể vắng. Should-NOT-fire: không tệp nào ngoài rang/ bị loại. Chiều đỏ: mẫu rộng hơn → 'codeql: the pattern is not exactly _acceptance/**/rang/**'; bớt dòng cũ → 'codeql: the workflow lost a line of the base'; một workflow gọi thước → 'codeql: a caller names a measure of a record'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.rmd_change_set
+    long_running: 1
+    paths: ["**"]
+    expected: "exit 0; dòng 'change-set: the branch changes only the files of the round; _acceptance/config.yaml only adds rmd_ commands and risk_tiers equals the base; nothing under governance/, .claude/, tools/, mk/, no Makefile, no package.json, and of .github/ only workflows/security.yml'. Chiều đỏ: tệp ngoài danh sách → 'change-set: outside the round: <tệp>'; risk_tiers đổi → 'change-set: risk_tiers differs from the base'; config bớt dòng → 'change-set: _acceptance/config.yaml lost a line'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.rmd_two_way
+    long_running: 5
+    paths: ["_acceptance/roadmap-merge-driver/rang/**", ".gitattributes", "docs/START-HERE.md", "wiki/decisions/**", ".github/workflows/security.yml"]
+    expected: "exit 0; node --test in 'fail 0' và số bài đạt bằng số bài; mỗi phép đo xanh trên cây và đỏ đúng thông điệp ghim trên từng bản phá liệt ở AC-8"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    paths: ["**"]
+    expected: "exit 0; dòng 'make check passed: …'; dòng 'Test Files' và 'Tests' bằng đường nền của vòng (duong-nen.md), không thêm bài bỏ qua (should-NOT-fire: vòng không thêm bài kiểm của kho)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
