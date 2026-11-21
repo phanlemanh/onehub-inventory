@@ -1,17 +1,19 @@
 ---
 schema_version: 2
 feature_slug: lint-bo-qua-thu-muc-ngoai-git
-verdict: REJECT
-failed_evals: [E6]
-reason:
+verdict: BLOCKED
+failed_evals: []
+reason: [{"cmd":"node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/kiem-tron.mjs","reason":"vuot thoi luong khai (long_running) — lenh cho tra __QUA_HAN, chua co dong __EXIT="}]
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: f78a97bbbc7a2b3139dfd5791cb369651a9cee8c
+verified_commit: 08d6dcb9c60a81ddc6c0ef130822b164054cb63a
 human_signoff:
 ---
 
 # Evidence Report: lint-bo-qua-thu-muc-ngoai-git
+
+Vòng 2. Lệnh của E7 (`kiem-tron.mjs`) vượt thời lượng đã khai nên báo cáo ở trạng thái BLOCKED, không phải lỗi mã. Cách xử lý là chạy lại với thời hạn của công cụ dài hơn. Không eval nào fail.
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
@@ -20,89 +22,88 @@ human_signoff:
 | E3 | AC-3 | script | PASS |
 | E4 | AC-4 | script | PASS |
 | E5 | AC-5 | script | PASS |
-| E6 | AC-6 | script | FAIL |
-| E7 | AC-7 | script | PASS |
+| E6 | AC-6 | script | PASS |
+| E7 | AC-7 | script | BLOCKED |
 
 ## Evidence
 
 - eval: E1
-  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-E1-r1
+  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-E1-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.lnt_eslint
-  verified_at: 2026-11-21T13:28:50Z
+  verified_at: 2026-11-21T13:50:02Z
   output: |
     eslint: 3 of 3 out-of-git paths ignored (.acceptance-runs/x/a.mjs, .claude/worktrees/w/src/app/page.tsx, .claude/worktrees/w/.next/chunk.js)
 
 - eval: E2
-  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-E2-r1
+  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-E2-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.lnt_prettier
-  verified_at: 2026-11-21T13:28:50Z
+  verified_at: 2026-11-21T13:50:02Z
   output: |
     prettier: 3 of 3 out-of-git paths ignored; .prettierignore alone ignores both folders
 
 - eval: E3
-  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-E3-r1
+  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-E3-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.lnt_doi_chung
-  verified_at: 2026-11-21T13:28:50Z
+  verified_at: 2026-11-21T13:50:02Z
   output: |
     doi-chung: 18 of 18 in-tree paths keep their state (eslint 14 linted, 4 ignored; prettier 12 checked, 6 ignored)
 
 - eval: E4
-  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-E4-r1
+  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-E4-r2
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.lnt_chay_that
-  verified_at: 2026-11-21T13:28:50Z
+  verified_at: 2026-11-21T13:50:02Z
   output: |
-    chay-that: npm run lint passed with a broken .mjs planted in 3 out-of-git places; none named in the output; planted folders removed
+    chay-that: npm run lint exit 0 with a broken .mjs planted in 3 out-of-git places; none named in the output; planted folders removed
 
 - eval: E5
-  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-E5-r1
+  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-E5-r2
   exit_code: 0
   baseline: green
   verifier: config:executors.script.check
-  verified_at: 2026-11-21T13:28:50Z
+  verified_at: 2026-11-21T13:50:02Z
   output: |
     make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance
 
 - eval: E6
-  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-E6-r1
-  exit_code: 1
-  baseline: n-a
-  verifier: config:executors.script.lnt_two_way
-  verified_at: 2026-11-21T13:28:50Z
-  output: |
-    not ok: "E4 red (a): without the two new patterns lint names a planted file, and the plants are still removed" (25.7 s)
-    AssertionError: .acceptance-runs keeps a planted folder
-    actual 1, expected 0 (strictEqual), at noPlanted (two-way.mjs:25), called from two-way.mjs:110 and again from two-way.mjs:118
-
-- eval: E7
-  run_id: r1-l7-1-20261121132850
+  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-E6-r2
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.script.lnt_kiem_tron
-  verified_at: 2026-11-21T13:28:50Z
+  verifier: config:executors.script.lnt_two_way
+  verified_at: 2026-11-21T13:50:02Z
   output: |
-    kiem-tron: make check passed with 5 planted files in each of 2 out-of-git folders; none named in the output; planted folders removed
+    node --test hoàn tất, không ca nào fail
+    duration_ms 78699.240584
+
+- eval: E7
+  run_id: bm4r6h69e
+  baseline: n-a
+  verifier: config:executors.script.lnt_kiem_tron
+  verified_at: 2026-11-21T13:50:02Z
+  ket_qua: BLOCKED, lệnh vượt thời lượng khai (long_running), chờ trả __QUA_HAN và chưa có dòng kết thúc __EXIT
+  output: |
+    kiem-tron: root /Users/manhphan/dev/onehub-inventory-cham-102
+    kiem-tron: plants lnt-82015-1795269076983
+    __QUA_HAN
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-SUITE-build-r1
+  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-SUITE-build-r2
   exit_code: 0
-  verified_at: 2026-11-21T13:28:50Z
+  verified_at: 2026-11-21T13:50:02Z
 
 - cmd: DATABASE_URL= make e2e
-  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-SUITE-DATABASE_URL_make_e2e-r1
+  run_id: minted-lint-bo-qua-thu-muc-ngoai-git-SUITE-DATABASE_URL_make_e2e-r2
   exit_code: 0
-  verified_at: 2026-11-21T13:28:50Z
-
-Lệnh fail không gắn eval nào: không có. Lệnh duy nhất fail là `node --test _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/two-way.mjs`, gắn với E6.
+  verified_at: 2026-11-21T13:50:02Z
 
 ## Known limits
 
@@ -110,7 +111,7 @@ Lệnh fail không gắn eval nào: không có. Lệnh duy nhất fail là `node
 
 ## Analyst
 
-Eval không-phân-biệt (xanh trên cả HEAD lẫn baseline): E5 (`make check`). Đây là regression-guard có chủ ý, không chứng minh tính năng mới.
+Eval không phân biệt (xanh cả trên HEAD lẫn baseline): E5 (`make check`). Đây là regression-guard có chủ ý, nó chứng minh bộ máy chứ không chứng minh tính năng.
 
 Baseline không đo:
 - node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/bo-qua.mjs --eslint: bo qua baseline: tep _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/bo-qua.mjs co o cay dang kiem nhung chua co o merge-base 799ae9dc7f60f542e466f0656ddcde60bfffa2c8 — eval moi, chay tren code cu khong phan biet gi
@@ -120,10 +121,13 @@ Baseline không đo:
 - node --test _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/two-way.mjs: bo qua baseline: tep _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/two-way.mjs co o cay dang kiem nhung chua co o merge-base 799ae9dc7f60f542e466f0656ddcde60bfffa2c8 — eval moi, chay tren code cu khong phan biet gi
 - node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/kiem-tron.mjs: bo qua baseline: tep _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/kiem-tron.mjs co o cay dang kiem nhung chua co o merge-base 799ae9dc7f60f542e466f0656ddcde60bfffa2c8 — eval moi, chay tren code cu khong phan biet gi
 
+Panel giám khảo: không có panel nào được đề xuất cho vòng này, nên không có mục judgment chờ người.
+
 ## Variance
 
-none — mọi eval chạy một lần (deterministic), không eval nào có pass_rate lẫn lộn.
+none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 1: E6 failed — ca đỏ "E4 red (a)" trong two-way.mjs đòi thư mục tạm `.acceptance-runs` không còn sau lần chạy đỏ, nhưng sau lần chạy vẫn còn một thư mục cấy (xác nhận ở hai lệnh gọi, dòng 110 và dòng 118). Returned to implementation.
+Round 1: E6 failed, E7 bị một finding mức cao về thiếu đối chứng dương cho từng tệp cấy. Returned to implementation.
+Round 2: E1 đến E6 và hai lệnh suite xanh; E7 BLOCKED vì `kiem-tron.mjs` vượt thời lượng khai, cần chạy lại với thời hạn công cụ dài hơn.

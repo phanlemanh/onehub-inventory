@@ -1,20 +1,22 @@
 ## Trong hợp đồng
 
-- **Hình dạng 4 (assertion âm tính một mình): E7 kiểm make check xanh mà không có đối chứng dương cho từng tệp cấy, ba trong năm tệp không bao giờ bị đọc**
-  file: `_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/kiem-tron.mjs:81`
-  severity: high
-  AC: AC-7
+- **Hình dạng 6 (gốc cây): phép thử «gốc in ra là cây đang chấm» tự quy chiếu, nên không bắt được một gốc cây bị gắn cứng**
+  file: `_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/two-way.mjs:18`
+  severity: medium
+  AC: AC-6
   source: measurement
-  detail: AC-7 hứa rằng ở mỗi thư mục ngoài git có một bộ tệp mà mỗi bước của make check sẽ đỏ nếu đọc phải. Nhánh make check (dòng 81-103) chỉ đòi hai điều: exit 0, và không dòng nào nêu tag. Nó không chứng trước rằng mỗi tệp trong PLANT (dòng 23-29) làm bước của nó đỏ khi bước ấy đọc tới. chay-that.mjs có làm việc này (dòng 45-55), kiem-tron thì không. Ở cây này, ba tệp cấy không thể làm đỏ gì vì không bước nào đọc tới chỗ đặt chúng:
-  - `src/planted.ts`: tsc chỉ đọc `src` và `tests` ở gốc (tsconfig.json `include`), nên `.claude/worktrees/<tag>/src/planted.ts` và `.acceptance-runs/<tag>/src/planted.ts` không vào typecheck dù có bỏ qua hay không.
-  - `wiki/entities/planted.md`: tools/wiki_lint.py chỉ quét `root/wiki` (dòng 179 và 208).
-  - `tests/planted.test.ts`: chỉ phần này có chiều đỏ, qua `--liet-ke --pha` trong two-way.mjs dòng 104-111, và chiều đỏ ấy hỏi `vitest list` chứ không chạy make check.
-  Vì vậy dòng xanh "make check exit 0 with 5 planted files in each of 2 out-of-git folders; none named" đúng theo cách dựng ở các bước typecheck và ontology/wiki. Nó không chứng được rằng cấu hình bỏ qua có tác dụng. Thêm vào đó, two-way.mjs không có ca nào chạy kiem-tron ở chế độ make check (ca E7 xanh dòng 97-102 cũng chỉ dùng `--liet-ke`), nên khẳng định "mỗi bước" không có ca đỏ nào ghim thông điệp, ngoài bước Vitest.
-  rationale: AC-7 đòi một bộ tệp mà mỗi bước của make check sẽ đỏ nếu đọc phải; finding chỉ ra ba tệp cấy không bước nào đọc tới nên điều kiện Given của AC-7 không được chứng và phép đo xanh không chứng được gì.
+  detail: Hàm run() ở dòng 18 kiểm `out.includes(`: root ${REPO}\n`)`, với REPO nhập từ ./lib.mjs (dòng 12). Ba phép đo bo-qua.mjs, chay-that.mjs và kiem-tron.mjs đều in dòng gốc qua ROOT_LINE của cùng lib.mjs (lib.mjs dòng 11), và ROOT_LINE in đúng biến REPO đó (lib.mjs dòng 14, `resolve(HERE, "../../..")`). Vế đo và vế so lấy từ một nguồn, nên phép so luôn đúng. Ví dụ: sửa lib.mjs thành `REPO = "/Users/.../onehub-inventory"` (đo bản checkout của tác giả) thì cả phép đo lẫn two-way cùng nhận gốc mới, và assert vẫn xanh. Như vậy điều E6/AC-6 hứa («gốc ấy là cây đang chấm») không có phép đo nào giữ. Muốn có đối chứng thì two-way phải tự suy gốc cây theo đường độc lập, ví dụ `git rev-parse --show-toplevel` từ cwd của lượt chấm, hoặc `process.cwd()` của executor, rồi mới so với dòng gốc mà phép đo in ra.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
+
+- **Hình dạng 4 (chỉ kiểm phía âm): hai lệnh thật `npm run lint` và `make check` của E4 và E7 chưa lần nào được chạy đỏ**
+  Người dùng thấy gì: Hai lệnh kiểm thật của kho chưa từng được thử cho ra kết quả đỏ, nên nếu chúng hỏng âm thầm thì bộ nghiệm thu có thể vẫn báo xanh. Phần thiết lập chính của tính năng vẫn được các phép đo khác kiểm đỏ và xanh.
+  Căn cứ: Hậu quả nhẹ vì chỉ làm bộ kiểm kém nhạy ở hai nhánh, không mất dữ liệu và người dùng cuối không thấy; sửa được sau này mà không ảnh hưởng bản đã giao.
+  file: `_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/two-way.mjs`
+  severity: low
+  Đề xuất: known-limits
 
 ## Chưa adversarial-verify (refuter chết)
 
