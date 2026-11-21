@@ -257,7 +257,7 @@ function stepCachLy(root, env) {
  * Sets the login role's password as a SCRAM verifier, through psql's standard input on the owner connection: neither
  * the command line nor the statement Postgres receives holds the password.
  */
-function stepLoginRole(env) {
+export function setLoginRolePassword(env) {
   const { cmd, args } = psqlCmd(env);
   const sql = `alter role ${LOGIN_ROLE} password '${scramVerifier(env["LOGIN_DB_PASSWORD"])}';\n`;
   const r = spawnSync(
@@ -431,7 +431,7 @@ export async function lenBan(
       if (h.error || h.body?.commit !== head) throw new Red(`bản thử chưa chạy ${short(head)}`);
     },
     migration: async () => stepMigration(root, env),
-    "vai-dang-nhap": async () => stepLoginRole(env),
+    "vai-dang-nhap": async () => setLoginRolePassword(env),
     "cach-ly": async () => stepCachLy(root, env),
     bien: async () => stepVercelVars(appEnv, env),
     dung: async () => {
