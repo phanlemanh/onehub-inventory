@@ -224,6 +224,7 @@ executors:
     lnt_prettier: "node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/bo-qua.mjs --prettier"   # lint-bo-qua-thu-muc-ngoai-git: Prettier ignores the three out-of-git paths
     lnt_doi_chung: "node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/bo-qua.mjs --doi-chung"   # lint-bo-qua-thu-muc-ngoai-git: 18 in-tree paths keep the ignore state they had before the change
     lnt_chay_that: "node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/chay-that.mjs"   # lint-bo-qua-thu-muc-ngoai-git: npm run lint stays green with a broken file planted in the out-of-git folders
+    lnt_kiem_tron: "node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/kiem-tron.mjs"   # lint-bo-qua-thu-muc-ngoai-git: make check stays green with a file each step would fail on planted in both out-of-git folders
     lnt_two_way: "node --test _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/two-way.mjs"   # lint-bo-qua-thu-muc-ngoai-git: each measure green on the sound object, red with its pinned message on a broken copy
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:

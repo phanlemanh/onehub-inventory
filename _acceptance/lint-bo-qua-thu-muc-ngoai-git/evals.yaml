@@ -17,7 +17,11 @@ feature_slug: lint-bo-qua-thu-muc-ngoai-git
 #
 #   Mọi phép đo ở rang/. Bản phá của cặp hai chiều: cấu hình ESLint của kho bỏ đi hai mục mới của globalIgnores, và
 #   .prettierignore bỏ đi hai dòng mới — dựng trong bộ nhớ hoặc trong thư mục tạm của hệ thống, không sửa tệp nào của kho.
-#   Riêng Prettier, bản phá chỉ lật MỘT ô (.claude/worktrees/w/src/app/page.tsx): hai ô còn lại đã bỏ qua nhờ .gitignore.
+#   Riêng Prettier, bản phá chỉ lật MỘT ô (.claude/worktrees/w/src/app/page.tsx): hai ô còn lại đã bỏ qua nhờ .gitignore;
+#   nên E2 hỏi thêm với .prettierignore một mình, một đường mỗi thư mục, để dòng .acceptance-runs/ cũng có bằng chứng.
+#   Vitest (thêm sau phản biện): bản phá là tệp cấu hình tạm đặt trong thư mục cấy, nhập vitest.config.ts của kho và bỏ hai
+#   mục exclude mới. Đo 21/11 trước khi sửa: make check với tệp cấy đỏ ở bước test, nêu planted.test.ts của cả hai thư mục.
+#   Mọi phép đo suy gốc cây từ vị trí của chính nó (lên ba cấp từ rang/) và in dòng '<tên>: root <gốc>'.
 evals:
   - id: E1
     criterion: AC-1
@@ -33,7 +37,7 @@ evals:
     cmd: config:executors.script.lnt_prettier
     layer: backend-effect
     paths: [".prettierignore", ".gitignore", "_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/**"]
-    expected: "exit 0; dòng 'prettier: 3 of 3 out-of-git paths ignored'. Chiều đỏ (two-way): .prettierignore bỏ hai dòng mới → exit 1 với thông điệp ghim 'prettier: still checked: .claude/worktrees/w/src/app/page.tsx'."
+    expected: "exit 0; dòng 'prettier: 3 of 3 out-of-git paths ignored; .prettierignore alone ignores both folders'. Chiều đỏ (two-way): .prettierignore bỏ hai dòng mới → exit 1 với hai thông điệp ghim 'prettier: still checked: .claude/worktrees/w/src/app/page.tsx' và 'prettier: .prettierignore alone does not ignore: .acceptance-runs/x/a.mjs, .claude/worktrees/w/src/app/page.tsx'."
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E3
     criterion: AC-3
@@ -49,7 +53,7 @@ evals:
     cmd: config:executors.script.lnt_chay_that
     layer: backend-effect
     paths: ["eslint.config.js", ".prettierignore", ".gitignore", "package.json", "_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/**"]
-    expected: "exit 0; dòng 'chay-that: npm run lint exit 0 with a broken .mjs planted in 3 out-of-git places; none named in the output; planted folders removed'. Chiều đỏ (two-way): cùng ba tệp, ESLint chạy với cấu hình bỏ hai mục mới → exit 1 với thông điệp ghim 'chay-that: lint named a planted file:' kèm đường tệp; và sau mọi lần chạy, kể cả lần đỏ, ba thư mục tạm không còn (ghim 'planted folders removed')."
+    expected: "exit 0; dòng 'chay-that: npm run lint exit 0 with a broken .mjs planted in 3 out-of-git places; none named in the output; planted folders removed'. Trước khi đo, phép đo chứng tệp cấy là lỗi ESLint và chưa đúng định dạng Prettier khi không gì bỏ qua nó (không thì exit 2). Chiều đỏ (two-way): (a) cùng ba tệp, ESLint chạy cả cây với cấu hình bỏ hai mục mới → exit 1 với 'chay-that: lint named a planted file:' kèm đường tệp; (b) Prettier chạy trên tệp cấy ở .claude/worktrees/ chỉ với .gitignore (không có dòng của .prettierignore) → exit 1 với 'chay-that: prettier named a planted file: .claude/worktrees/<tạm>/x.mjs'; sau mọi lần chạy, kể cả lần đỏ, thư mục tạm không còn (ghim 'planted folders removed')."
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E5
     criterion: AC-5
@@ -65,5 +69,14 @@ evals:
     cmd: config:executors.script.lnt_two_way
     layer: backend-effect
     paths: ["eslint.config.js", ".prettierignore", ".gitignore", "_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/**"]
-    expected: "exit 0; node --test báo đủ bốn cặp (E1, E2, E3, E4), mỗi cặp một ca xanh trên vật lành và ít nhất một ca đỏ trên bản phá khớp thông điệp ghim ở trên. Chiều đỏ của chính E6: đổi thông điệp ghim trong một phép đo → ca tương ứng fail vì không khớp chuỗi."
+    expected: "exit 0; node --test báo 'tests 13', 'pass 13', 'fail 0': năm ca xanh (E1, E2, E3, E4, E7), bảy ca đỏ (E1 một, E2 một, E3 hai, E4 hai, E7 một — mỗi ca đỏ của E4 và E7 còn đòi thư mục tạm không còn) và một ca 'bản sao trong bộ nhớ không bỏ gì thì khớp cách tra thật'. Mọi ca đòi dòng '<tên>: root <gốc>' trùng gốc cây đang chấm. Chiều đỏ của chính E6: đổi thông điệp ghim trong một phép đo → ca tương ứng fail vì không khớp chuỗi."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.lnt_kiem_tron
+    long_running: 2
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng 'kiem-tron: make check exit 0 with 5 planted files in each of 2 out-of-git folders; none named in the output; planted folders removed'. Chiều đỏ (two-way, E6): Vitest với bản cấu hình bỏ hai mục exclude mới → exit 1 với 'kiem-tron: test runner collects a planted file:' kèm planted.test.ts của cả hai thư mục; thư mục tạm không còn sau lần đỏ."
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

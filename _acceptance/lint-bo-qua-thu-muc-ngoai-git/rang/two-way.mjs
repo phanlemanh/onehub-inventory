@@ -1,0 +1,119 @@
+// AC-6: each measure is green on the tree as it is, and red with its pinned message on a copy where exactly one
+// thing is broken. A measure that has never been red proves nothing. The broken copies are built in memory or in the
+// system temp folder; no file of the repository changes.
+// Usage: node --test two-way.mjs
+
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { existsSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+import { test } from "node:test";
+
+import { HERE, REPO } from "./lib.mjs";
+
+function run(script, ...args) {
+  const r = spawnSync(process.execPath, [join(HERE, script), ...args], { cwd: REPO, encoding: "utf8" });
+  const out = `${r.stdout}${r.stderr}`;
+  // Every measure names the root it measured; it must be the tree under grading, not the checkout around it.
+  assert.ok(out.includes(`: root ${REPO}\n`), `${script} did not print root ${REPO}: ${out}`);
+  return { code: r.status, out };
+}
+
+const noPlanted = () => {
+  for (const d of [".acceptance-runs", ".claude/worktrees"]) {
+    const full = join(REPO, d);
+    if (existsSync(full)) assert.equal(readdirSync(full).filter((n) => n.startsWith("lnt-")).length, 0, `${d} keeps a planted folder`);
+  }
+};
+
+test("E1 green: ESLint ignores the three out-of-git paths", () => {
+  const r = run("bo-qua.mjs", "--eslint");
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /eslint: 3 of 3 out-of-git paths ignored/);
+});
+
+test("E1 red: without the two new patterns ESLint still lints all three", () => {
+  const r = run("bo-qua.mjs", "--eslint", "--pha");
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /eslint: still linted: /);
+  for (const p of [".acceptance-runs/x/a.mjs", ".claude/worktrees/w/src/app/page.tsx", ".claude/worktrees/w/.next/chunk.js"]) {
+    assert.ok(r.out.includes(p), `missing ${p} in: ${r.out}`);
+  }
+});
+
+test("E2 green: Prettier ignores the three out-of-git paths", () => {
+  const r = run("bo-qua.mjs", "--prettier");
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /prettier: 3 of 3 out-of-git paths ignored/);
+});
+
+test("E2 red: without the two new lines Prettier checks the worktree source file", () => {
+  const r = run("bo-qua.mjs", "--prettier", "--pha");
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /prettier: still checked: \.claude\/worktrees\/w\/src\/app\/page\.tsx/);
+  assert.match(r.out, /prettier: \.prettierignore alone does not ignore: \.acceptance-runs\/x\/a\.mjs, \.claude\/worktrees\/w\/src\/app\/page\.tsx/);
+});
+
+test("E3 green: the 18 in-tree paths keep the state measured at 799ae9dc", () => {
+  const r = run("bo-qua.mjs", "--doi-chung");
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /doi-chung: 18 of 18 in-tree paths keep their state \(eslint 14 linted, 4 ignored; prettier 12 checked, 6 ignored\)/);
+});
+
+test("E3 red (a): an ESLint pattern that ignores too much changes an in-tree path", () => {
+  const r = run("bo-qua.mjs", "--doi-chung", "--them", ".claude/");
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /doi-chung: eslint state changed: .*\.claude\/hooks\/x\.mjs/);
+});
+
+test("E3 red (b): a .prettierignore line that ignores too much changes an in-tree path", () => {
+  const r = run("bo-qua.mjs", "--doi-chung", "--them-pr", "tools/");
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /doi-chung: prettier state changed: tools\/x\.mjs/);
+});
+
+test("the in-memory copies with nothing removed agree with the real lookup", () => {
+  for (const mode of ["--eslint", "--prettier", "--doi-chung"]) {
+    const r = run("bo-qua.mjs", mode, "--pha-rong");
+    assert.equal(r.code, 0, `${mode}: ${r.out}`);
+  }
+});
+
+test("E4 green: npm run lint stays green with broken files planted, and the plants are removed", { timeout: 600_000 }, () => {
+  const r = run("chay-that.mjs");
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /chay-that: npm run lint exit 0 with a broken \.mjs planted in 3 out-of-git places; none named in the output; planted folders removed/);
+  noPlanted();
+});
+
+test("E4 red (b): Prettier without the .prettierignore lines names the planted worktree file, and the plants are removed", () => {
+  const r = run("chay-that.mjs", "--pha-pr");
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /chay-that: prettier named a planted file: \.claude\/worktrees\/lnt-[0-9-]+\/x\.mjs/);
+  assert.match(r.out, /planted folders removed/);
+  noPlanted();
+});
+
+test("E7 green: the test runner collects no test file from either out-of-git folder", { timeout: 300_000 }, () => {
+  const r = run("kiem-tron.mjs", "--liet-ke");
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /kiem-tron: test runner collects no planted file; planted folders removed/);
+  noPlanted();
+});
+
+test("E7 red: without the two new excludes the test runner collects the planted tests of both folders", { timeout: 300_000 }, () => {
+  const r = run("kiem-tron.mjs", "--liet-ke", "--pha");
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /kiem-tron: test runner collects a planted file: .*\.acceptance-runs\/lnt-[0-9-]+\/tests\/planted\.test\.ts/);
+  assert.match(r.out, /\.claude\/worktrees\/lnt-[0-9-]+\/tests\/planted\.test\.ts/);
+  assert.match(r.out, /planted folders removed/);
+  noPlanted();
+});
+
+test("E4 red (a): without the two new patterns lint names a planted file, and the plants are still removed", { timeout: 600_000 }, () => {
+  const r = run("chay-that.mjs", "--pha");
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /chay-that: lint named a planted file: /);
+  assert.match(r.out, /planted folders removed/);
+  noPlanted();
+});

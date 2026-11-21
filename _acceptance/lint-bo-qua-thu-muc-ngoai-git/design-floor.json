@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "bac": "M1",
-  "ly_do": "có giao diện (140 tệp khớp design.surface_globs), chưa khai nguồn — design_floor.registry trỏ tệp không có: design/component-registry.json",
+  "bac": "M2",
+  "ly_do": "nguồn design/tokens.json · design/component-registry.json",
   "tri_thuc": {
     "trang_thai": "doc-duoc",
     "ly_do": "",
@@ -31,7 +31,7 @@
   "reuse_plan": null,
   "flow": null,
   "dong": [
-    "Bậc kho: M1 — có giao diện (140 tệp khớp design.surface_globs), chưa khai nguồn — design_floor.registry trỏ tệp không có: design/component-registry.json",
+    "Bậc kho: M2 — nguồn design/tokens.json · design/component-registry.json",
     "Tri thức thiết kế: chỉ mục (5310 token) + knowledge/design-agents.md (1679 token), knowledge/designmd-format.md (2695 token)"
   ]
 }

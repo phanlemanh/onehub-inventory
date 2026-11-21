@@ -26,6 +26,12 @@ sát không commit được.
 
 `.next/`, `test-results/` trong `globalIgnores` chỉ khớp ở gốc, nên bản dựng của một worktree lồng bên trong vẫn bị quét.
 
+Bộ chạy bài kiểm cũng vậy (phát hiện ở bước phản biện): `vitest.config.ts` thay danh sách loại trừ mặc định bằng danh sách
+riêng, nên Vitest gom mọi `*.test.*` dưới gốc. Ở kho chính, `vitest list` gom 476 tệp bài kiểm của các worktree lồng.
+Đo với tệp cấy ở cả hai thư mục: `make check` qua lint rồi đỏ ở bước test, nêu bài kiểm cấy của cả hai. Các bước còn lại
+không đọc hai thư mục: bộ kiểm kiểu chỉ đọc thư mục kê trong `tsconfig.json`, công cụ ranh giới và trang wiki đi từ `src/`
+và `wiki/`.
+
 ## Approaches
 
 1. **Thêm hai thư mục vào danh sách bỏ qua của hai công cụ (chọn).** `globalIgnores` của `eslint.config.js` thêm
@@ -45,7 +51,8 @@ Prettier: thêm vào `.prettierignore` thay vì `.gitignore`, vì `.gitignore` �
 
 - `eslint.config.js`: hai mục mới trong `globalIgnores`.
 - `.prettierignore`: hai dòng mới, kèm một dòng chú thích.
-- Không đổi luật lint nào, không đổi lệnh nào, không đổi `Makefile`, `package.json`, `.pre-commit-config.yaml`.
+- `vitest.config.ts`: hai mục mới trong `test.exclude`.
+- Không đổi luật nào, không đổi lệnh nào, không đổi `Makefile`, `package.json`, `tsconfig.json`, `.pre-commit-config.yaml`.
 
 ## Đo
 
@@ -59,12 +66,14 @@ Mọi phép đo ở `_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/`, gọi qua
   lượt chấm canh, nên phép đo không làm đổi cây.
 - **Hai chiều**: mỗi phép đo chạy lại trên bản phá — cấu hình của kho bỏ đi hai mục mới, dựng trong bộ nhớ — và phải đỏ
   với thông điệp ghim.
+- **Bộ kiểm trọn**: ở mỗi thư mục ngoài git cấy một bộ tệp mà mỗi bước của `make check` sẽ đỏ nếu đọc phải, chạy
+  `make check`, đòi thoát 0 và không nêu tệp cấy. Chiều đỏ: Vitest với bản cấu hình bỏ hai mục mới gom bài kiểm cấy.
 - `make check` xanh.
 
 ## Rủi ro
 
 - Bỏ quá tay: một mẫu sai có thể làm lint thôi quét thư mục thật. Ma trận đối chứng trong cây canh điều này.
-- Hai tệp do repo-setup quản (`.repo-setup.json` ghi băm bản mẫu). Cả hai đã lệch bản mẫu từ trước; lần nâng repo-setup
+- Ba tệp do repo-setup quản (`.repo-setup.json` ghi băm bản mẫu). Cả ba đã lệch bản mẫu từ trước; lần nâng repo-setup
   sau gộp ba chiều như mọi lần.
 
 ## Sau khi gộp
