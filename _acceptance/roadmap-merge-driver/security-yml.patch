@@ -1,0 +1,12 @@
+--- a/.github/workflows/security.yml
++++ b/.github/workflows/security.yml
+@@ -63,5 +63,9 @@
+         if: steps.scanning.outputs.on != 'false'
+         with:
+           languages: javascript-typescript
++          # The measures of an acceptance record run only when a round is graded; they are not shipped.
++          config: |
++            paths-ignore:
++              - "_acceptance/**/rang/**"
+       - uses: github/codeql-action/analyze@v4
+         if: steps.scanning.outputs.on != 'false'
