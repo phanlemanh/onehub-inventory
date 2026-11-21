@@ -1,0 +1,69 @@
+schema_version: 1
+feature_slug: lint-bo-qua-thu-muc-ngoai-git
+# Ma trận viết trước. Đo ngày 21/11 ở 799ae9dc (origin/main lúc mở vòng), bằng ESLint#isPathIgnored và
+# prettier.getFileInfo (ignorePath: .gitignore + .prettierignore). Cột «trước» là giá trị đo; cột «sau» là lời hứa.
+#
+#   Ba đường phải bỏ qua (AC-1, AC-2)            ESLint trước → sau     Prettier trước → sau
+#   .acceptance-runs/x/a.mjs                     quét → bỏ qua          bỏ qua → bỏ qua (.gitignore đã có)
+#   .claude/worktrees/w/src/app/page.tsx         quét → bỏ qua          quét → bỏ qua
+#   .claude/worktrees/w/.next/chunk.js           quét → bỏ qua          bỏ qua → bỏ qua (.gitignore: .next)
+#
+#   Mười tám đường đối chứng (AC-3): sau = trước, từng ô.
+#   ESLint QUÉT, Prettier QUÉT (12): src/app/x.tsx · src/modules/listings/x.ts · src/components/candidate/x.tsx ·
+#     tests/x.test.ts · tests/e2e/x.spec.ts · tools/x.mjs · tools/eslint-ui/x.mjs · db/scripts/x.mjs ·
+#     .claude/hooks/x.mjs · .claude/skills/x/y.mjs · eslint.config.js · playwright.config.ts
+#   ESLint QUÉT, Prettier BỎ QUA (2): _acceptance/x/rang/y.mjs · src/components/ui/x.tsx
+#   ESLint BỎ QUA, Prettier BỎ QUA (4): src/generated/x.ts · src/components/reui/x.tsx · .next/x.js · node_modules/x/y.js
+#
+#   Mọi phép đo ở rang/. Bản phá của cặp hai chiều: cấu hình ESLint của kho bỏ đi hai mục mới của globalIgnores, và
+#   .prettierignore bỏ đi hai dòng mới — dựng trong bộ nhớ hoặc trong thư mục tạm của hệ thống, không sửa tệp nào của kho.
+#   Riêng Prettier, bản phá chỉ lật MỘT ô (.claude/worktrees/w/src/app/page.tsx): hai ô còn lại đã bỏ qua nhờ .gitignore.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.lnt_eslint
+    layer: backend-effect
+    paths: ["eslint.config.js", "_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/**"]
+    expected: "exit 0; dòng 'eslint: 3 of 3 out-of-git paths ignored (.acceptance-runs/x/a.mjs, .claude/worktrees/w/src/app/page.tsx, .claude/worktrees/w/.next/chunk.js)'. Chiều đỏ (two-way): cấu hình bỏ hai mục mới → exit 1 với thông điệp ghim 'eslint: still linted:' kèm đủ ba đường."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.lnt_prettier
+    layer: backend-effect
+    paths: [".prettierignore", ".gitignore", "_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/**"]
+    expected: "exit 0; dòng 'prettier: 3 of 3 out-of-git paths ignored'. Chiều đỏ (two-way): .prettierignore bỏ hai dòng mới → exit 1 với thông điệp ghim 'prettier: still checked: .claude/worktrees/w/src/app/page.tsx'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.lnt_doi_chung
+    layer: backend-effect
+    paths: ["eslint.config.js", ".prettierignore", ".gitignore", "_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/**"]
+    expected: "exit 0; dòng 'doi-chung: 18 of 18 in-tree paths keep their state (eslint 14 linted, 4 ignored; prettier 12 checked, 6 ignored)'. Chiều đỏ (two-way): (a) thêm mẫu '.claude/' vào bản cấu hình ESLint trong bộ nhớ → exit 1 với thông điệp ghim 'doi-chung: eslint state changed: .claude/hooks/x.mjs'; (b) thêm dòng 'tools/' vào bản .prettierignore tạm → exit 1 với 'doi-chung: prettier state changed: tools/x.mjs'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.lnt_chay_that
+    layer: backend-effect
+    paths: ["eslint.config.js", ".prettierignore", ".gitignore", "package.json", "_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/**"]
+    expected: "exit 0; dòng 'chay-that: npm run lint exit 0 with a broken .mjs planted in 3 out-of-git places; none named in the output; planted folders removed'. Chiều đỏ (two-way): cùng ba tệp, ESLint chạy với cấu hình bỏ hai mục mới → exit 1 với thông điệp ghim 'chay-that: lint named a planted file:' kèm đường tệp; và sau mọi lần chạy, kể cả lần đỏ, ba thư mục tạm không còn (ghim 'planted folders removed')."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.check
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0 (make check: lint, typecheck, test, ontology, ranh giới module, định dạng trang wiki)."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.lnt_two_way
+    layer: backend-effect
+    paths: ["eslint.config.js", ".prettierignore", ".gitignore", "_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/**"]
+    expected: "exit 0; node --test báo đủ bốn cặp (E1, E2, E3, E4), mỗi cặp một ca xanh trên vật lành và ít nhất một ca đỏ trên bản phá khớp thông điệp ghim ở trên. Chiều đỏ của chính E6: đổi thông điệp ghim trong một phép đo → ca tương ứng fail vì không khớp chuỗi."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
