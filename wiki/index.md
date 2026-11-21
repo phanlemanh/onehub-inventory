@@ -83,6 +83,7 @@ first; keep it under ~60 lines. Page formats: `ontology/page-types.yaml`.
 - [0043 Proxy chỉ chặn trang bản mẫu trên bản dựng thật](decisions/0043-proxy-chi-chan-trang-ban-mau.md)
 - [0044 Thu quyền của các vai khoá công khai Supabase trên mọi đối tượng của kho](decisions/0044-thu-quyen-vai-khoa-cong-khai.md)
 - [0045 Kit nghiệm thu lấy từ kho delivery-loop, thẻ v3.0.0, một bản cho cả máy lẫn CI](decisions/0045-kit-nghiem-thu-delivery-loop-3-0.md)
+- [0046 Nâng repo-setup gom theo mốc, trừ bản vá chữa lỗi kho đang vấp](decisions/0046-repo-setup-upgrades-per-milestone.md)
 
 ## Incidents
 

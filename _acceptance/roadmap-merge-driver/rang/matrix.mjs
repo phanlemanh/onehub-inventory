@@ -93,6 +93,7 @@ export const ROUND_FILES = [
   ATTR_FILE,
   TOUR,
   DECISION,
+  "wiki/index.md", // the hand-kept index links every decision page (AGENTS.md); ledger line of S3
   "wiki/log/**",
   WORKFLOW,
   `docs/superpowers/specs/2026-11-21-${SLUG}-design.md`,
