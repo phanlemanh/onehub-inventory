@@ -10,7 +10,7 @@ flowchart TD
   GD --> B["Sắp mở vòng<br/>9 việc"]
   GD --> XL["Xếp lại sau<br/>chưa có"]
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
-  B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
+  B --> CD["Chờ duyệt phạm vi<br/>1 việc"] --> GP{"Cổng Phạm vi"}
   GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
   GB --> DG["Đã giao<br/>13 việc"]
   GB --> CN["Chờ phiên nghiệm thu<br/>52 việc"] --> GG{"Cổng Giá trị"}
@@ -33,6 +33,10 @@ flowchart TD
 - Đầu chủ đổi giá và đổi trạng thái ngay trong hồ sơ căn trên điện thoại, theo cùng luật với sửa trên ô của Bảng hàng (`sua-nhanh-tren-dien-thoai`)
 - Đầu chủ sửa được thông tin của căn ngoài giá và trạng thái — pháp lý, nội thất, tài chính, tình trạng sử dụng — ngay trong sản phẩm, không phải nhập lại tệp (`sua-thong-tin-can`)
 - Đầu chủ gõ mã căn để thêm căn, hoặc tạo căn tay khi danh mục chưa có (`them-can`)
+
+## Chờ duyệt phạm vi
+
+- Lên đời bộ setup repo-setup từ 0.10.2 lên 0.10.3 — chính sách gộp lưu cách gộp PR (merge_method, kho này chọn merge), thước đo luồng in ngưỡng mà không đổi mã thoát, AGENTS.md bỏ câu nói về gate; tệp chính sách gộp tay (`upgrade-repo-setup-0-10-3`)
 
 ## Đã giao — chờ phiên nghiệm thu
 
