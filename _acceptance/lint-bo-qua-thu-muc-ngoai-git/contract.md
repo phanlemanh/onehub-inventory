@@ -5,7 +5,7 @@ slug: lint-bo-qua-thu-muc-ngoai-git
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [config]
-status: implemented
+status: machine-cleared
 approved_by:
 approved_at:
 veto_state: mo
@@ -74,3 +74,5 @@ Không quét không gian tiêu chí: dòng sổ `descope` «bỏ coverage-scan»
   tả PR. (2) Mẫu bỏ qua neo ở gốc cây; một thư mục cùng tên nằm sâu hơn trong cây (không có hôm nay) vẫn bị quét. (3) Các bước của `make check` đọc thư mục cố định trong cây (trang wiki đọc `wiki/`, sổ đọc `wiki/`, ranh giới module
   đọc `src/modules/` và `src/app/`) không có tệp cấy: chúng không với tới hai thư mục, AC-7 chỉ đòi `make check` thoát 0.
 - `eslint.config.js`, `.prettierignore` và `vitest.config.ts` do repo-setup quản; cả ba đã lệch bản mẫu từ trước vòng này.
+- Ngoài-2 (máy định tuyến 2026-11-21, đề xuất S4 known-limits): Nếu người chạy bị dừng giữa chừng ở một số bước, vài thư mục tạm dùng để đo có thể nằm lại trên máy. Chúng không làm bộ kiểm đỏ và sẽ được dọn ở lượt chạy sau. — `_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/kiem-tron.mjs`
+- Ngoài-3 (máy định tuyến 2026-11-21, đề xuất S4 known-limits): Phép đo bằng chứng rằng lỗi được nhận ra hơi lỏng: nó xác nhận có báo lỗi nhưng chưa chỉ rõ tệp nào bị nêu. Việc bỏ qua thư mục vẫn hoạt động đúng. — `_acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/two-way.mjs`
