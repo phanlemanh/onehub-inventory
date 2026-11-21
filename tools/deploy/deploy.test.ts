@@ -1413,3 +1413,18 @@ describe("E6 · bước bien đỏ thì không ghi gì và không dựng", () =>
     expect(r.code).toBe(0);
   });
 });
+
+describe("make cach-ly-dich dựng chuỗi vai đăng nhập như lệnh đưa bản lên", () => {
+  it("--login-url in chuỗi vai đăng nhập; thiếu mật khẩu thì thoát 1 và không in gì ra đầu ra chuẩn", async () => {
+    const ctx = await fresh("staging");
+    const ok = await run(ctx, "node", [LEN_BAN, "--login-url"]);
+    expect(ok.code).toBe(0);
+    const u = new URL(ok.stdout);
+    expect(decodeURIComponent(u.username)).toBe("quy_hang_login.abcdefghijklmnopqrst");
+    expect(decodeURIComponent(u.password)).toBe(LOGIN_PW);
+    ctx.env["LOGIN_DB_PASSWORD"] = "";
+    const red = await run(ctx, "node", [LEN_BAN, "--login-url"]);
+    expect(red.code).toBe(1);
+    expect(red.stdout).toBe("");
+  });
+});

@@ -498,6 +498,20 @@ export async function lenBan(
 }
 
 async function main() {
+  // `--login-url`: the login role's connection string built the same way, for make cach-ly-dich on the operator's
+  // machine. It goes to a shell variable, never to the screen.
+  if (process.argv[2] === "--login-url") {
+    const password = process.env["LOGIN_DB_PASSWORD"] ?? "";
+    const url = loginUrl(process.env["MIGRATE_DATABASE_URL"] ?? "", password);
+    if (!url || !LOGIN_PASSWORD.test(password)) {
+      console.error(
+        "deploy: cần MIGRATE_DATABASE_URL đọc được và LOGIN_DB_PASSWORD chữ và số từ 24 ký tự",
+      );
+      process.exit(1);
+    }
+    process.stdout.write(url);
+    process.exit(0);
+  }
   const appEnv = process.argv[2];
   if (!ENVS.includes(appEnv)) {
     console.log("deploy: ENV phải là staging hay production");

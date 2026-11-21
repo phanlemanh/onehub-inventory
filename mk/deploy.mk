@@ -17,8 +17,8 @@ rollback: ## List ENV's deployments; with BAN=<id>, point the domain at that dep
 	node $(DEPLOY_TOOLS)/lui-ban.mjs $(ENV)
 
 .PHONY: cach-ly-dich sao-luu khoi-phuc-thu
-cach-ly-dich: ## Read-only isolation suite on a target (MIGRATE_DATABASE_URL, LOGIN_DATABASE_URL; PSQL_DICH optional)
-	bash db/scripts/cach-ly-dich.sh
+cach-ly-dich: ## Read-only isolation suite on a target (MIGRATE_DATABASE_URL and LOGIN_DB_PASSWORD, or LOGIN_DATABASE_URL; PSQL_DICH optional)
+	@LOGIN_DATABASE_URL="$${LOGIN_DATABASE_URL:-$$(node $(DEPLOY_TOOLS)/len-ban.mjs --login-url)}" bash db/scripts/cach-ly-dich.sh
 
 sao-luu: ## Back up MIGRATE_DATABASE_URL to TEP, outside the repo, with TEP.dem row counts
 	bash db/scripts/sao-luu.sh $(TEP)
