@@ -1,0 +1,39 @@
+{
+  "feature_plain": "Bạn tạo khoá ở trang từng dịch vụ rồi dán mỗi khoá đúng một lần vào một lệnh; lần đưa bản lên đầu không còn dừng giữa chừng, và không còn biến nào phải đặt tay trên Vercel.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ đặt đúng năm khoá vào môi trường GitHub từ những gì bạn dán; giá trị không bao giờ hiện trên dòng lệnh hay trên màn hình, và khoá Vercel chỉ hỏi một lần cho cả hai môi trường."},
+    {"id": "AC-4", "p": "Sẽ đặt mật khẩu cho vai đăng nhập của ứng dụng ngay sau migration, dưới dạng băm, nên nhật ký cơ sở dữ liệu không bao giờ thấy mật khẩu; ứng dụng đăng nhập được, mật khẩu sai bị từ chối."},
+    {"id": "AC-5", "p": "Sẽ đẩy sáu biến sang dự án Vercel trước mỗi lần dựng, đúng môi trường, với chuỗi nối của vai đăng nhập chứ không phải vai chủ."},
+    {"id": "AC-6", "p": "Sẽ dừng trước khi dựng nếu dự án Vercel đang giữ một biến cấm hay Vercel từ chối; tên miền không đổi."},
+    {"id": "AC-7", "p": "Sẽ chạy chín bước theo đúng thứ tự, mỗi bước đỏ được riêng, dòng lỗi đã che mọi giá trị, và chưa tới bước gắn tên miền thì không đụng tên miền."},
+    {"id": "AC-8", "p": "Sẽ giữ bản tệp CI trong sổ tay khớp đúng tên biến lệnh đòi, và xoá khỏi sổ tay ba việc tay cũ: đặt biến trên Vercel, dựng chuỗi vai đăng nhập, đặt mật khẩu trong SQL Editor."},
+    {"id": "AC-10", "p": "Sẽ để bộ kiểm của kho xanh."}
+  ],
+  "wont_do": [
+    {"id": "AC-2", "p": "Sẽ KHÔNG đổi khoá đang chạy khi bạn chạy lại lệnh; chỉ khi bạn gõ thêm --xoay mới sinh lại hai khoá tự sinh."},
+    {"id": "AC-3", "p": "Chặn mọi đầu vào sai trước khi đặt bất kỳ khoá nào — chuỗi nối nhầm cổng, khoá Resend sai, môi trường chưa có, GitHub chưa đăng nhập; đứt giữa chừng thì nói rõ khoá nào đã đặt, chạy lại chỉ làm phần còn lại."},
+    {"id": "OOS-1", "p": "Không sửa tệp CI hay phần governance: bạn dán tệp CI theo bản trong sổ tay."},
+    {"id": "OOS-2", "p": "Không tạo khoá thay bạn ở các dịch vụ, không đọc khoá từ trình giữ mật khẩu."},
+    {"id": "OOS-3", "p": "Không tự duyệt bản thật, không bỏ người duyệt của bản thật."},
+    {"id": "OOS-4", "p": "Chưa có lịch tự thử khôi phục mỗi quý — để một hàng sau."},
+    {"id": "OOS-5", "p": "Việc dựng hạ tầng thật (môi trường GitHub, cài đặt Vercel, tắt Data API) máy làm sau khi gộp, theo quyền đứng, không đo trong vòng này."}
+  ],
+  "coverage_plain": [
+    {"i": 0, "p": "Đối chiếu với cách GitHub giữ khoá theo môi trường: muốn đặt khoá phải có quyền quản trị kho, nên lệnh kiểm quyền ấy trước (AC-3)."},
+    {"i": 1, "p": "Đối chiếu với cách Postgres nhận mật khẩu đã băm sẵn: phép đo chấm dạng băm đúng như máy chủ chấm, trên vector thử chuẩn (AC-4)."},
+    {"i": 2, "p": "Đối chiếu với hướng dẫn giữ khoá của OWASP: không để khoá trên dòng lệnh hay trong nhật ký, xoay được (AC-1, AC-2, AC-4)."},
+    {"i": 3, "p": "Để sau: Vercel giới hạn số lần gọi."},
+    {"i": 4, "p": "Để sau: GitHub đổi khoá mã hoá của môi trường giữa lúc đang đặt."},
+    {"i": 5, "p": "Để sau: hai lượt đưa bản lên chạy cùng lúc — tệp CI đã xếp hàng chúng."},
+    {"i": 6, "p": "Không làm: đọc khoá từ trình giữ mật khẩu, vì thêm một dịch vụ bạn phải giữ."},
+    {"i": 7, "p": "Không làm: người chạy lệnh không phải chủ kho, vì kho chỉ có một chủ."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Lý do ghi cho lựa chọn «khoá ở GitHub, lệnh đưa bản lên đẩy sang Vercel» sai: còn lối để lệnh đặt khoá đẩy thẳng sang Vercel. Đã sửa: lối ấy bị loại vì mỗi lần đổi địa chỉ hay địa chỉ gửi thư lại phải gọi bạn, và xoay mật khẩu sẽ tách khỏi lượt đặt nó vào cơ sở dữ liệu."},
+    {"i": 1, "p": "Quyền đứng cho máy «đặt người duyệt» cả ở bản thật — máy có thể thay người duyệt bản thật mà không phạm câu chữ nào. Đã sửa: người duyệt bản thật chỉ là bạn, máy đặt một lần, không bao giờ đổi; giám khảo phải hỏi thêm chỗ mâu thuẫn."},
+    {"i": 2, "p": "Hai câu hỏi cho bạn chưa có trong hợp đồng, nên máy có thể tự viết quyền cho chính mình. Đã sửa: hai câu nằm trong hợp đồng; quyền đứng phải khớp câu trả lời của bạn."},
+    {"i": 3, "p": "Danh sách bước đỏ chưa viết trước, nên một lỗi in mật khẩu ra nhật ký CI có thể lọt. Đã sửa: danh sách viết trước, có ô vai chưa có và ô lỗi in giá trị ra, mọi ô đỏ trước bước gắn tên miền không được đụng tên miền."},
+    {"i": 4, "p": "Cổng nối của ứng dụng chưa có lý do. Đã sửa: giữ đúng cổng sổ tay hàng 22 đã chốt; đổi sang cổng khác là một hàng sau."}
+  ],
+  "scope_plain": "Năm thứ vòng này cố ý không làm:"
+}
