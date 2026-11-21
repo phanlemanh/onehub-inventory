@@ -157,7 +157,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Do not merge a pull request yourself. A `low` one merges itself when the checks pass; any
   other merge is a person's decision.
 - Never delete or weaken a test to get green, and never loosen an `agent:` setting in `ontology/`
-  on your own. The gate sees both and raises the tier.
+  on your own.
 
 ## What holds these rules
 

@@ -203,6 +203,15 @@ executors:
     rs0102_policy: "node _acceptance/upgrade-repo-setup-0-10-2/rang/policy.mjs"   # upgrade-repo-setup-0-10-2: on a copy, the policy may name gate without the agent pipeline
     rs0102_change_set: "node _acceptance/upgrade-repo-setup-0-10-2/rang/change-set.mjs"   # upgrade-repo-setup-0-10-2: the upgrade commit unchanged; besides it only this round; base rule on every commit
     rs0102_two_way: "node --test _acceptance/upgrade-repo-setup-0-10-2/rang/two-way.mjs"   # upgrade-repo-setup-0-10-2: each measure green as it is, red on a copy with one thing broken
+    rs0103_apply_again: "node _acceptance/upgrade-repo-setup-0-10-3/rang/apply-again.mjs"   # upgrade-repo-setup-0-10-3: apply.py of repo-setup 0.10.3: nothing left on HEAD; on a copy of the base it writes HEAD's files and marks the policy
+    rs0103_template_same: "node _acceptance/upgrade-repo-setup-0-10-3/rang/template-same.mjs"   # upgrade-repo-setup-0-10-3: the eight tools are the tag's templates; manifest 0.10.3; AGENTS.md loses one sentence
+    rs0103_resolution: "node _acceptance/upgrade-repo-setup-0-10-3/rang/resolution.mjs"   # upgrade-repo-setup-0-10-3: the policy file is the 0.10.3 side of the marked block with merge_method: merge
+    rs0103_policy_same: "node _acceptance/upgrade-repo-setup-0-10-3/rang/policy-same.mjs"   # upgrade-repo-setup-0-10-3: tiers, CODEOWNERS and required checks unchanged; merge commits instead of squash
+    rs0103_merge_method: "node _acceptance/upgrade-repo-setup-0-10-3/rang/merge-method.mjs"   # upgrade-repo-setup-0-10-3: github_setup.py reads merge_method; a differing option exits 2
+    rs0103_real_run: "node _acceptance/upgrade-repo-setup-0-10-3/rang/real-run.mjs"   # upgrade-repo-setup-0-10-3: the dry run of github_setup.py on the real repository
+    rs0103_flow: "node _acceptance/upgrade-repo-setup-0-10-3/rang/flow.mjs"   # upgrade-repo-setup-0-10-3: the flow measure reads no dossier and a threshold changes no exit code
+    rs0103_change_set: "node _acceptance/upgrade-repo-setup-0-10-3/rang/change-set.mjs"   # upgrade-repo-setup-0-10-3: the upgrade commit unchanged; besides it only this round; base rule on every commit
+    rs0103_two_way: "node --test _acceptance/upgrade-repo-setup-0-10-3/rang/two-way.mjs"   # upgrade-repo-setup-0-10-3: each measure green as it is, red on a copy with one thing broken
     rmd_attr: "node _acceptance/roadmap-merge-driver/rang/attr.mjs"   # roadmap-merge-driver: LO-TRINH.html carries merge=generated-file next to PRODUCT-MAP.md; every older line kept
     rmd_merge: "node _acceptance/roadmap-merge-driver/rang/merge.mjs"   # roadmap-merge-driver: nine merges on scratch repositories, by file, driver and .gitattributes; the driver set by the prepare script
     rmd_redraw: "node _acceptance/roadmap-merge-driver/rang/redraw.mjs"   # roadmap-merge-driver: a stale page fails product-map --check on a copy of HEAD; the redraw makes it pass

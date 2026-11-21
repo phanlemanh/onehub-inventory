@@ -1,0 +1,85 @@
+schema_version: 1
+feature_slug: upgrade-repo-setup-0-10-3
+# Ma trận viết trước (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
+#   Nền của PR: git merge-base HEAD origin/main, hôm nay 8e0a91c9 (merge của PR 97). Commit lên đời 871afebb.
+#   repo-setup: cây ở commit c5581ff1, bóc từ tag repo-setup-v0.10.3, tải theo sha.
+#   apply.py trên nền: created năm tệp sdlc_*, updated ba tệp công cụ, merged AGENTS.md, marked governance/autonomy.yaml.
+#   Gộp tay: phía 0.10.3 của khối bị đánh dấu, merge_method: squash thành merge; thêm proof rỗng, required_checks rỗng.
+#   Chính sách trước và sau: cùng hạng, CODEOWNERS, check bắt buộc; không tuỳ chọn thì nền đặt squash, HEAD đặt merge.
+#   github_setup.py: --merge-method squash bị từ chối (2); merge_method: rebase dừng (1); dry run trên kho thật.
+#   Thước đo luồng: không đọc _acceptance, vượt ngưỡng không đổi mã thoát.
+#   make check trên HEAD: 148 tệp bài, 2476 đạt, 2 bỏ qua.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    paths: ["**"]
+    expected: "exit 0; đầu ra có dòng 'Test Files  148 passed (148)', dòng 'Tests  2476 passed | 2 skipped (2478)' và dòng 'make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance'; không thêm bài bỏ qua nào ngoài 2 bài (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.rs0103_apply_again
+    long_running: 10
+    paths: [".repo-setup.json", "AGENTS.md", "governance/autonomy.yaml", "tools/**"]
+    expected: "exit 0; dòng 'apply-again: apply.py of repo-setup-v0.10.3 has nothing left to do on HEAD (…); on the base it creates the five sdlc tools, updates autonomy.py, github_setup.py and sdlc_metrics.py, merges AGENTS.md and marks the policy file, nothing else; applied to a copy of the base it writes HEAD's other ten files byte for byte and leaves markers in the policy file only'; trên HEAD không danh sách hành động nào có tệp (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.rs0103_template_same
+    paths: ["tools/**", ".repo-setup.json", "AGENTS.md"]
+    expected: "exit 0; dòng 'template-same: the eight tool files are the tag's templates byte for byte with the hashes .repo-setup.json records; the manifest goes from 0.10.2 to 0.10.3 for 90 files, the 8 deleted samples keep 0.4.0, and it gains the five new tools; AGENTS.md loses only \"The gate sees both and raises the tier.\"'; không mục manifest nào bị bỏ, AGENTS.md không đổi dòng nào khác (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.rs0103_resolution
+    paths: ["governance/autonomy.yaml"]
+    expected: "exit 0; dòng 'resolution: governance/autonomy.yaml is the marked file of apply.py with the block on the side of repo-setup 0.10.3 and one line changed, merge_method: squash to merge; as YAML it is the base's policy plus proof with an empty check, an empty required_checks and merge_method: merge, nothing else'; không khoá nào khác của chính sách đổi (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.rs0103_policy_same
+    paths: ["governance/autonomy.yaml", "tools/autonomy.py", "tools/github_setup.py", ".github/CODEOWNERS"]
+    expected: "exit 0; dòng 'policy-same: in the base, HEAD and the minimal resolution the tier of every tracked file, of a deleted test and of a bot update, the proof (none), the CODEOWNERS block (the committed one) and every step but the merge step (environments, ruleset, required checks) are the same and the policy has no problem; with no option the base would set squash-only merges, HEAD and the minimal resolution merge commits only'; không tệp nào đổi hạng (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.rs0103_merge_method
+    paths: ["governance/autonomy.yaml", "tools/autonomy.py", "tools/github_setup.py"]
+    expected: "exit 0; dòng 'merge-method: github_setup.py reads merge_method: merge (no option or --merge-method merge: merge commits only); --merge-method squash is refused with exit 2, saying where the choice is made; merge_method: rebase turns the codeowners check red and stops github_setup.py, no tier changes; without the key the merge settings are left as they are, and the option sets them for one run'; tuỳ chọn khác bị từ chối, giá trị lạ dừng khi mới hỏi gh tên kho (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.rs0103_real_run
+    paths: ["governance/autonomy.yaml", "tools/github_setup.py"]
+    expected: "exit 0; dòng 'real-run: the dry run of github_setup.py on phanlemanh/onehub-inventory exits 0 and would set merge commits only and require check, secret-scan, conventional-title, conventional-commits; --merge-method squash exits 2; main requires check, e2e, gate today from its one ruleset \"main\" (not \"repo-setup: protect default branch\", so --apply would add a second ruleset) with no code owner review required: left to the owner'; không lần chạy nào là --apply (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.rs0103_flow
+    paths: ["tools/sdlc_*.py", ".github/workflows/**", "Makefile", "mk/**"]
+    expected: "exit 0; dòng 'flow: the flow measure names no _acceptance file and opens none; in four forms it exits 0 with a number over its threshold as without one and shows that line only when it is over; it writes nothing without --write, and with it only the week's page and the wiki index; nothing runs it by itself'; vượt ngưỡng không đổi mã thoát, không tệp hồ sơ nào bị mở (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.rs0103_change_set
+    paths: ["**"]
+    expected: "exit 0; dòng 'change-set: 871afebb is unchanged on the base and changes the eleven files of the upgrade; besides them the pull request changes only this dossier and the files of its round, not CI, the hook or its wiring, and of governance/ only the policy file; the config only gains the commands rs0103_*; tools/** and governance/** make it T3 by the base's tiers and autonomy.py ranks it high; it merges into origin/main without a conflict; every commit of the pull request passes the base's rule'; không tệp ngoài danh sách (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.rs0103_two_way
+    long_running: 10
+    paths: ["_acceptance/upgrade-repo-setup-0-10-3/rang/**"]
+    expected: "exit 0; node --test báo 'tests 19', 'pass 19', 'fail 0': sáu phép đo xanh trên cây và mười ba bài phá đỏ đúng lời (template-same, apply-again, resolution, hai bài policy-same, bốn bài merge-method, ba bài flow, change-set)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
