@@ -3,6 +3,7 @@ type: entity
 title: Company (Sàn)
 links: [ontology/entities/Company.yaml]
 sources: [onehub-quy-hang/CONTEXT.md, onehub-quy-hang/docs/adr/0001-khoi-diem.md]
+summary: sàn, đơn vị cách ly dữ liệu
 ---
 
 # Company (Sàn)

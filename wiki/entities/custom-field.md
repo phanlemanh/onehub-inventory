@@ -11,6 +11,7 @@ sources:
     "_acceptance/lop-rieng-cua-san/contract.md",
     "_acceptance/danh-muc-can-nhu-onehub-invest/de-xuat-nhap-la-luc-anh-xa.md",
   ]
+summary: trường riêng của sàn
 ---
 
 # CustomField (Trường riêng)

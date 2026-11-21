@@ -3,6 +3,7 @@ type: entity
 title: Contact (Liên hệ)
 links: [ontology/entities/Contact.yaml]
 sources: [onehub-quy-hang/CONTEXT.md, "https://dd.reso.org/DD2.1/Contacts/"]
+summary: một người làm việc với sàn
 ---
 
 # Contact (Liên hệ)

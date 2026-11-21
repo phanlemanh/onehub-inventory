@@ -3,6 +3,7 @@ type: entity
 title: CatalogAlias (Mã gốc)
 links: [ontology/entities/CatalogAlias.yaml]
 sources: ["_acceptance/danh-muc-can-nhu-onehub-invest/contract.md", "https://dd.reso.org/DD2.1/"]
+summary: mã gốc giữ làm bí danh
 ---
 
 # CatalogAlias (Mã gốc)

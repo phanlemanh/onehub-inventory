@@ -3,6 +3,7 @@ type: entity
 title: SavedView (Góc nhìn)
 links: [ontology/entities/SavedView.yaml]
 sources: ["_acceptance/luu-goc-nhin-cot-hai/contract.md", "https://dd.reso.org/DD2.1/"]
+summary: góc nhìn một người lưu cho một màn Lưới
 ---
 
 # SavedView (Góc nhìn)

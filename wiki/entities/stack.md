@@ -3,6 +3,7 @@ type: entity
 title: Stack (Trục)
 links: [ontology/entities/Stack.yaml]
 sources: ["_acceptance/danh-muc-can-nhu-onehub-invest/contract.md", "https://dd.reso.org/DD2.1/"]
+summary: trục của một toà
 ---
 
 # Stack (Trục)

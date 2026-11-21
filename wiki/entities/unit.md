@@ -3,6 +3,7 @@ type: entity
 title: Unit (Căn)
 links: [ontology/entities/Unit.yaml]
 sources: [onehub-quy-hang/CONTEXT.md, "https://dd.reso.org/DD2.1/Property/"]
+summary: căn trong danh mục dùng chung
 ---
 
 # Unit (Căn)
