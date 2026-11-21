@@ -3,7 +3,8 @@
 // The broken copies used by two-way.mjs live here too, built in memory or in the system temp folder, never in the
 // repository: a measure must not change the tree it measures.
 
-import { copyFileSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { copyFileSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -111,4 +112,49 @@ export function dropPrettierLines(text) {
   const lines = text.split("\n");
   const kept = lines.filter((l) => !NEW_IGNORES.includes(l.trim()));
   return { text: kept.join("\n"), removed: lines.length - kept.length };
+}
+
+// Run a command without blocking, so a stop signal still reaches the cleanup below, which also stops the command.
+const children = new Set();
+export function runAsync(cmd, args, opts = {}) {
+  return new Promise((done) => {
+    const child = spawn(cmd, args, { cwd: REPO, detached: true, ...opts });
+    children.add(child);
+    child.on("exit", () => children.delete(child));
+    let out = "";
+    child.stdout?.on("data", (b) => (out += b));
+    child.stderr?.on("data", (b) => (out += b));
+    child.on("error", (e) => done({ status: null, output: `${out}${e.message}` }));
+    child.on("close", (status, signal) => done({ status, signal, output: out }));
+  });
+}
+
+// Planted folders left by a measure that was stopped from outside (a grader's time limit kills it): remove those of
+// a dead run older than an hour, then make sure this run's own folders go even when it is stopped.
+export function guardPlants(roots) {
+  const hour = 60 * 60 * 1000;
+  for (const d of [join(REPO, ".acceptance-runs"), join(REPO, ".claude/worktrees")]) {
+    if (!existsSync(d)) continue;
+    for (const n of readdirSync(d)) {
+      if (!/^lnt-\d+-\d+$/.test(n)) continue;
+      const full = join(d, n);
+      if (Date.now() - statSync(full).mtimeMs > hour) rmSync(full, { recursive: true, force: true });
+    }
+  }
+  const stop = (sig) => {
+    for (const c of children) {
+      try {
+        process.kill(-c.pid, "SIGTERM");
+      } catch {
+        // already gone
+      }
+    }
+    for (const r of roots) rmSync(r, { recursive: true, force: true });
+    for (const d of [join(REPO, ".acceptance-runs"), join(REPO, ".claude/worktrees")]) {
+      if (existsSync(d) && readdirSync(d).length === 0) rmSync(d, { recursive: true, force: true });
+    }
+    process.exit(sig === "SIGINT" ? 130 : 143);
+  };
+  process.once("SIGTERM", stop);
+  process.once("SIGINT", stop);
 }

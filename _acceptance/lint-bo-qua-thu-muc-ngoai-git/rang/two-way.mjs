@@ -5,19 +5,36 @@
 
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, realpathSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 
 import { HERE, REPO } from "./lib.mjs";
 
+// The tree under grading, found without lib.mjs: the git work tree of the folder this test runs from (the grader runs
+// it from the repository root). A measure that measured another tree prints another root and fails here.
+const TREE = realpathSync(
+  spawnSync("git", ["rev-parse", "--show-toplevel"], { cwd: process.cwd(), encoding: "utf8" }).stdout.trim(),
+);
+
+export function assertRoot(script, out, tree = TREE) {
+  const printed = /: root (.+)\n/.exec(out)?.[1];
+  assert.ok(printed, `${script} printed no root line: ${out}`);
+  assert.equal(realpathSync(printed), tree, `${script} measured ${printed}, not the tree under grading ${tree}`);
+}
+
 function run(script, ...args) {
   const r = spawnSync(process.execPath, [join(HERE, script), ...args], { cwd: REPO, encoding: "utf8" });
   const out = `${r.stdout}${r.stderr}`;
-  // Every measure names the root it measured; it must be the tree under grading, not the checkout around it.
-  assert.ok(out.includes(`: root ${REPO}\n`), `${script} did not print root ${REPO}: ${out}`);
+  assertRoot(script, out);
   return { code: r.status, out };
 }
+
+test("root check red: a measure that prints another root is caught", () => {
+  assert.throws(() => assertRoot("x.mjs", `x: root ${tmpdir()}\n`), /measured .*, not the tree under grading/);
+  assert.throws(() => assertRoot("x.mjs", "no root here\n"), /printed no root line/);
+});
 
 // The planted folders of THIS run are gone. Only the run's own tag is checked: in a grading round other measures plant
 // their own folders at the same time.

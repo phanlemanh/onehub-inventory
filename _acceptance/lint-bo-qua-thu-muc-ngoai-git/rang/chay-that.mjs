@@ -14,7 +14,7 @@ import { join } from "node:path";
 
 import prettier from "prettier";
 
-import { editConfig, eslintAt, NEW_IGNORES, REPO, repoConfig, ROOT_LINE } from "./lib.mjs";
+import { editConfig, eslintAt, guardPlants, NEW_IGNORES, REPO, repoConfig, ROOT_LINE, runAsync } from "./lib.mjs";
 
 console.log(ROOT_LINE("chay-that"));
 
@@ -29,6 +29,7 @@ const runsDir = join(REPO, ".acceptance-runs");
 const worktreesDir = join(REPO, ".claude/worktrees");
 const parents = [runsDir, worktreesDir].map((d) => [d, existsSync(d)]);
 const plantedRoots = [join(runsDir, tag), join(worktreesDir, tag)];
+guardPlants(plantedRoots);
 const plantedFiles = [
   join(runsDir, tag, "x.mjs"),
   join(worktreesDir, tag, "x.mjs"),
@@ -93,14 +94,14 @@ try {
       }
     }
   } else {
-    const run = spawnSync("npm", ["run", "lint"], { cwd: REPO, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
-    const output = `${run.stdout ?? ""}${run.stderr ?? ""}`;
+    const run = await runAsync("npm", ["run", "lint"]);
+    const output = run.output;
     const named = output
       .split("\n")
       .filter((l) => l.includes(tag))
       .map((l) => l.trim());
     if (run.status === null) {
-      line = `chay-that: npm run lint did not finish (${run.error?.message ?? run.signal})`;
+      line = `chay-that: npm run lint did not finish (${run.signal ?? output.slice(-500)})`;
     } else if (named.length) {
       code = 1;
       line = `chay-that: lint named a planted file: ${named.join(" | ")}`;

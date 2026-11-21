@@ -29,7 +29,7 @@ import { dirname, join } from "node:path";
 
 import prettier from "prettier";
 
-import { eslintAt, REPO, ROOT_LINE } from "./lib.mjs";
+import { eslintAt, guardPlants, REPO, ROOT_LINE, runAsync } from "./lib.mjs";
 
 const args = process.argv.slice(2);
 const mode = args.includes("--liet-ke") ? "list" : args.includes("--tsc") ? "tsc" : "check";
@@ -55,6 +55,7 @@ export const PLANT = sound ? SOUND_PLANT : BROKEN_PLANT;
 const parentsOf = [join(REPO, ".acceptance-runs"), join(REPO, ".claude/worktrees")];
 const parents = parentsOf.map((d) => [d, existsSync(d)]);
 const roots = parentsOf.map((d) => join(d, tag));
+guardPlants(roots);
 
 function cleanUp() {
   for (const d of roots) rmSync(d, { recursive: true, force: true });
@@ -174,19 +175,14 @@ try {
       const lists = ["tsconfig.json", "tsconfig.strict.json"].map((p) => [p, tscFiles(p)]);
       const listed = lists.flatMap(([p, { files }]) => files.filter((f) => f.includes(tag)).map((f) => `${p}: ${f}`));
       const listFailed = lists.filter(([, { status }]) => status !== 0).map(([p]) => p);
-      const run = spawnSync("make", ["--no-print-directory", "check"], {
-        cwd: REPO,
-        encoding: "utf8",
-        maxBuffer: 256 * 1024 * 1024,
-        env: { ...process.env, CI: "" },
-      });
-      const output = `${run.stdout ?? ""}${run.stderr ?? ""}`;
+      const run = await runAsync("make", ["--no-print-directory", "check"], { env: { ...process.env, CI: "" } });
+      const output = run.output;
       const named = output
         .split("\n")
         .filter((l) => l.includes(tag))
         .map((l) => l.trim());
       if (run.status === null) {
-        line = `kiem-tron: make check did not finish (${run.error?.message ?? run.signal})`;
+        line = `kiem-tron: make check did not finish (${run.signal ?? run.output.slice(-500)})`;
       } else if (listFailed.length) {
         line = `kiem-tron: tsc --listFilesOnly failed for ${listFailed.join(", ")}`;
       } else if (named.length || listed.length) {
