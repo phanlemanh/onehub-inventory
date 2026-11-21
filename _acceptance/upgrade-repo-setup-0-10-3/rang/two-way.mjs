@@ -121,10 +121,10 @@ test("merge-method is red when the codeowners check no longer reads merge_method
 });
 
 test("policy-same is red when the committed CODEOWNERS is not what the policy renders", () => {
-  const at = committedCopy(".github/CODEOWNERS", (t) => `${t}/src/ @someone\n`);
+  const at = committedCopy(".github/CODEOWNERS", (t) => t.replace("@phanlemanh", "@someone-else"));
   const r = measure("policy-same", "--root", at);
   assert.equal(r.code, 1);
-  assert.match(r.out, /the CODEOWNERS block is not the committed \.github\/CODEOWNERS|differs from the base/);
+  assert.match(r.out, /HEAD: the CODEOWNERS block is not the committed \.github\/CODEOWNERS/);
 });
 
 test("flow is red when a split report over its threshold changes the exit code", () => {

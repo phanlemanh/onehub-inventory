@@ -190,6 +190,7 @@ print(json.dumps({
     "tier": res["tier"],
     "proof": res["proof"],
     "codeowners": a.render_codeowners(policy, own),
+    "committed_block": a.codeowners_block((root / ".github" / "CODEOWNERS").read_text(encoding="utf-8")),
     "problems": problems,
     "exit": code,
     "stderr": err.getvalue().strip(),

@@ -47,10 +47,9 @@ try {
   writeFileSync(join(minimal, POLICY), m.before + mergeBlock + m.ours + m.after);
 
   const views = { base: policyView(copy(base), files), HEAD: policyView(head, files), minimal: policyView(minimal, files) };
-  const codeowners = readFileSync(join(dir, ".github/CODEOWNERS"), "utf8");
   for (const [where, v] of Object.entries(views)) {
     if (v.problems.length > 0) problems.push(`${where}: the policy has problems: ${v.problems.join("; ")}`);
-    if (!codeowners.includes(v.codeowners)) problems.push(`${where}: the CODEOWNERS block is not the committed .github/CODEOWNERS`);
+    if (v.codeowners !== v.committed_block) problems.push(`${where}: the CODEOWNERS block is not the committed .github/CODEOWNERS`);
   }
   for (const where of ["HEAD", "minimal"]) {
     const v = views[where];

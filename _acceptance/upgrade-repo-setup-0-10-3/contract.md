@@ -162,7 +162,7 @@ của tag `repo-setup-v0.10.3`. Phản biện context sạch ở `gap-probe.md`.
 
 ## Coverage
 
-Phủ theo mười hai tệp của commit lên đời, mỗi tệp nối vào nhóm mà công cụ báo, cộng bốn điều brief đòi đo. Không quét không
+Phủ theo mười một tệp của commit lên đời, mỗi tệp nối vào nhóm mà công cụ báo, cộng bốn điều brief đòi đo. Không quét không
 gian tiêu chí: lên đời là việc tất định.
 
 | Nhóm | Tệp hay nơi | Tiêu chí |
