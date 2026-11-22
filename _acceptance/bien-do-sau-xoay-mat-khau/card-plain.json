@@ -1,0 +1,28 @@
+{
+  "feature_plain": "Lệnh đưa bản lên đẩy biến sang Vercel trước rồi mới đổi mật khẩu cơ sở dữ liệu, nên Vercel lỗi lúc đang xoay khoá không còn làm bản thật mất kết nối; sổ vận hành nói rõ lúc nào bản đang chạy đã mất kết nối và cần chạy lại ngay.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ chạy bước đẩy biến sang Vercel ngay sau migration, trước bước đặt mật khẩu cơ sở dữ liệu, ở cả bản thử lẫn bản thật."},
+    {"id": "AC-2", "p": "Sẽ không đổi mật khẩu cơ sở dữ liệu khi bước đẩy biến đỏ vì bất kỳ lý do nào của Vercel — bản đang chạy không bị đụng."},
+    {"id": "AC-3", "p": "Sẽ giữ nguyên độ chặt của các ca bước đỏ cũ, xếp lại theo thứ tự mới, và thêm ca đặt mật khẩu đỏ sau khi đã đẩy biến."},
+    {"id": "AC-4", "p": "Sẽ giữ sổ vận hành kể đúng thứ tự bước: một ca kiểm đọc thứ tự từ chính lệnh và đỏ khi sổ tay lệch."},
+    {"id": "AC-5", "p": "Sẽ nói rõ cho người vận hành vừa xoay mật khẩu: đỏ ở đâu thì bản đang chạy yên, đỏ ở đâu thì đã mất kết nối và phải chạy lại ngay; dặn không bấm dựng lại trên Vercel khi lệnh còn đỏ."},
+    {"id": "AC-6", "p": "Sẽ ghi quyết định mới vào wiki và sửa mọi chỗ kể thứ tự bước theo thứ tự mới, có lệnh kiểm đỏ khi lệch."},
+    {"id": "AC-7", "p": "Sẽ giữ toàn bộ bộ kiểm của kho xanh."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "Không dời bước đặt mật khẩu xuống sau bước dựng bản, không giữ hai mật khẩu song song lúc xoay."},
+    {"id": "OOS-2", "p": "Không đổi cách xoay khoá, không đổi sáu biến đẩy sang Vercel."},
+    {"id": "OOS-3", "p": "Không thử trên Vercel và Supabase thật trong vòng này: lần đưa bản thử đầu sau khi gộp là lần chứng thật."}
+  ],
+  "scope_plain": "Những việc dưới đây cố ý để ngoài vòng này:",
+  "coverage_plain": [
+    {"i": 0, "p": "Để sau: dời bước đặt mật khẩu xuống sau bước dựng bản để thu hẹp cả khoảng hở lúc xoay."},
+    {"i": 1, "p": "Để sau: chặn bằng máy việc bấm dựng lại trên Vercel khi Vercel đã giữ mật khẩu mới mà cơ sở dữ liệu chưa — vòng này chỉ dặn trong sổ tay."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Thứ tự mới có một cái giá chưa được nêu: bước đẩy biến đỏ giữa chừng có thể để Vercel giữ mật khẩu mới trong khi cơ sở dữ liệu còn mật khẩu cũ — một lần bấm dựng lại trên Vercel lúc ấy làm hỏng bản thật. Đã sửa: Hỏi-1 nêu cái giá, sổ tay dặn không bấm dựng lại ở mọi hàng liên quan."},
+    {"i": 1, "p": "Thiết kế tự mâu thuẫn khi bước đặt mật khẩu đỏ. Đã sửa: sổ tay chia ba vùng, trong đó đặt mật khẩu đỏ nghĩa là mật khẩu chưa đổi; ca kiểm ghim đúng một lần gửi câu đặt mật khẩu."},
+    {"i": 2, "p": "Lệnh kiểm ghi chép chỉ tìm chữ thay vì so cả thứ tự. Đã sửa: so cả danh sách bước ở ba chỗ, có ba bản phá với ba thông điệp ghim; nội dung trang quyết định do người chấm đọc."},
+    {"i": 3, "p": "Chưa hỏi các hàng sổ tay của những bước sau có ngụ ý bản đang chạy yên lúc vừa xoay không. Đã sửa: tiêu chí đòi và người chấm hỏi, kèm câu trích làm bằng."}
+  ]
+}
