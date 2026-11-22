@@ -123,3 +123,8 @@ Không quét bằng `morphological-scan` (dòng `descope` trong sổ quyết đ�
 - Ngoài-2 (máy định tuyến 2026-11-22, đề xuất S4 known-limits): Nếu ai đó sửa lý do ghi trong một hàng của sổ tay thành lý do sai, bài kiểm vẫn xanh. Người vận hành có thể đọc một lý do lệch với điều lệnh thật in ra. — `tests/so-tay-lui-ban.test.ts`
 - Ngoài-3 (máy định tuyến 2026-11-22, đề xuất S4 known-limits): Bài kiểm lý do kiểm nhanh dựa vào cách mã được viết, nên mã đổi cách viết mà kết quả không đổi có thể làm bài kiểm báo sai, hoặc mã thêm điều kiện mà bài kiểm vẫn xanh. — `tests/so-tay-lui-ban.test.ts`
 - Ngoài-4 (máy định tuyến 2026-11-22, đề xuất S4 known-limits): Một đoạn trong sổ lùi bản bảo người vận hành tự chọn bản khác trên Vercel không có câu trỏ về mục sau xoay mật khẩu, và bài kiểm không bắt được. Người vừa xoay mật khẩu có thể chọn nhầm bản cũ không nối được. — `tests/so-tay-lui-ban.test.ts`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-22:
+  - Ngoài-1: Ca kiểm đọc lý do kiểm nhanh từ chữ trong mã, không chạy lệnh kiểm; đổi thứ tự các bước kiểm của lệnh thì sổ tay có thể ghi lý do cũ mà ca kiểm vẫn xanh.
+  - Ngoài-2: Mục từ lượt 2 (lý do không gắn với hàng); lượt 3 đã gắn lý do vào hai hàng dẫn về bản cũ.
+  - Ngoài-3: Cùng gốc với Ngoài-1: tiền đề «sức khoẻ chỉ ok khi vai đạt» cũng đọc từ chữ trong mã.
+  - Ngoài-4: Mục từ lượt 2 (đoạn chọn bản trên trang Vercel không có câu trỏ); dòng chặn đầu sổ lùi bản nay phủ đoạn ấy.
