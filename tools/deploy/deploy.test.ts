@@ -1,8 +1,18 @@
 // make deploy / make rollback with a fake `vercel` and a fake `psql` first on PATH, a stub isolation command and a fake
 // health server (row moi-truong-thu-va-ban-that, E1–E4). The matrix of red steps is the header of
 // _acceptance/moi-truong-thu-va-ban-that/evals.yaml: each ENV × each red step on its own.
+// Row dat-khoa-mot-lenh (E4–E7) added two steps — vai-dang-nhap and bien — a fake Vercel API on the same server, and
+// the cells of the header of _acceptance/dat-khoa-mot-lenh/evals.yaml.
 import { spawn, spawnSync } from "node:child_process";
-import { chmodSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  appendFileSync,
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { join, resolve } from "node:path";
@@ -10,6 +20,7 @@ import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { tempDir } from "../../tests/support/temp-dir";
+import { parseVerifier, scramKeys, scramVerifier, serverCheck } from "./scram.mjs";
 
 const HERE = resolve(__dirname);
 const LEN_BAN = join(HERE, "len-ban.mjs");
@@ -22,7 +33,9 @@ const STEPS: Record<Env, string[]> = {
   staging: [
     "cau-hinh",
     "migration",
+    "vai-dang-nhap",
     "cach-ly",
+    "bien",
     "dung",
     "kiem-nhanh",
     "gan-ten-mien",
@@ -32,37 +45,43 @@ const STEPS: Record<Env, string[]> = {
     "cau-hinh",
     "ban-thu-truoc",
     "migration",
+    "vai-dang-nhap",
+    "bien",
     "dung",
     "kiem-nhanh",
     "gan-ten-mien",
     "kiem-nhanh-ten-mien",
   ],
 };
+const COMMON = [
+  "VERCEL_TOKEN",
+  "VERCEL_ORG_ID",
+  "VERCEL_PROJECT_ID",
+  "MIGRATE_DATABASE_URL",
+  "LOGIN_DB_PASSWORD",
+  "AUTH_SECRET",
+  "RESEND_API_KEY",
+  "MAIL_FROM",
+  "APP_URL",
+];
 const REQUIRED: Record<Env, string[]> = {
-  staging: [
-    "VERCEL_TOKEN",
-    "VERCEL_ORG_ID",
-    "VERCEL_PROJECT_ID",
-    "MIGRATE_DATABASE_URL",
-    "LOGIN_DATABASE_URL",
-    "APP_URL",
-  ],
-  production: [
-    "VERCEL_TOKEN",
-    "VERCEL_ORG_ID",
-    "VERCEL_PROJECT_ID",
-    "MIGRATE_DATABASE_URL",
-    "APP_URL",
-    "STAGING_APP_URL",
-  ],
+  staging: COMMON,
+  production: [...COMMON, "STAGING_APP_URL"],
 };
 const SECRETS = [
   "VERCEL_TOKEN",
   "VERCEL_ORG_ID",
   "VERCEL_PROJECT_ID",
   "MIGRATE_DATABASE_URL",
-  "LOGIN_DATABASE_URL",
+  "AUTH_SECRET",
+  "RESEND_API_KEY",
 ];
+/** The owner's Session pooler string of the fake target; its password is a marker. */
+const MIGRATE_URL =
+  "postgresql://postgres.abcdefghijklmnopqrst:moc-bi-mat-MIGRATE_DATABASE_URL@pooler.example.test:5432/postgres";
+/** The login role's password: letters and digits, so it cannot carry the moc-bi-mat- marker; checked on its own. */
+const LOGIN_PW = "MocBiMatLoginPassword0123456789";
+const FORBIDDEN = ["MIGRATE_DATABASE_URL", "LOGIN_CODE_OUTBOX", "NEXT_PUBLIC_E2E_BUTTON_RECORD"];
 const OLD = "0123456789abcdef0123456789abcdef01234567";
 
 // The domain (APP_URL, path /ten-mien) is an alias: the file ten-mien holds the id of the deployment it points to, or is
@@ -111,6 +130,17 @@ if (c >= 0) {
   process.exit(0);
 }
 const sql = fs.readFileSync(0, "utf8");
+if (/^alter role quy_hang_login password /.test(sql)) {
+  fs.writeFileSync(path.join(dir, "vai.sql"), sql);
+  fs.writeFileSync(path.join(dir, "vai.argv"), a.join(" "));
+  fs.appendFileSync(path.join(dir, "calls.log"), Date.now() + " psql vai\\n");
+  if (fs.existsSync(path.join(dir, "vai-chua-co"))) { console.error('psql:<stdin>:1: ERROR:  role "quy_hang_login" does not exist'); process.exit(3); }
+  if (fs.existsSync(path.join(dir, "vai-in-gia-tri"))) {
+    console.error("psql: error: connection to " + a[a.indexOf("-d") + 1] + " failed for password " + (process.env.LOGIN_DB_PASSWORD || ""));
+    process.exit(2);
+  }
+  process.exit(0);
+}
 if (/fake-loi/.test(sql)) { console.error('ERROR:  syntax error at or near "fake-loi"'); process.exit(3); }
 const m = sql.match(/insert into public.schema_migrations \\(name\\) values \\('([^']+)'\\)/);
 fs.appendFileSync(st, m[1] + "\\n");
@@ -147,6 +177,11 @@ interface Ctx {
   /** Answers for the domain's next health reads, one each, before the usual ones: "drop" closes, "text" is not JSON. */
   domainSeq?: (Health | "drop" | "text")[];
   requests: { t: number; path: string }[];
+  /** Calls to the fake Vercel API, in order, with the parsed body of each write. */
+  api: { t: number; method: string; path: string; auth: string; body: unknown }[];
+  /** Variable names the fake Vercel project already holds, and the status its API answers with. */
+  vercelEnvs: string[];
+  apiStatus: number;
 }
 
 interface Listed {
@@ -281,10 +316,41 @@ async function fresh(appEnv: Env, setup: Setup = {}): Promise<Ctx> {
     health: {},
     proto: {},
     requests: [],
+    api: [],
+    vercelEnvs: [],
+    apiStatus: 200,
   };
   const server = createServer((req, res) => {
     const path = req.url ?? "/";
     ctx.requests.push({ t: Date.now(), path });
+    if (path.startsWith("/vercel-api/")) {
+      let text = "";
+      req.on("data", (b) => (text += b));
+      req.on("end", () => {
+        const t = Date.now();
+        const method = req.method ?? "GET";
+        const bare = path.slice("/vercel-api".length);
+        ctx.api.push({
+          t,
+          method,
+          path: bare,
+          auth: String(req.headers["authorization"] ?? ""),
+          body: text ? JSON.parse(text) : undefined,
+        });
+        // The log names no id: ids are redacted like secrets, and calls.log is checked for markers.
+        appendFileSync(
+          join(fake, "calls.log"),
+          `${t} api ${method} ${bare.split("?")[0].replace(/projects\/[^/]+/, "projects/<id>")}\n`,
+        );
+        res.setHeader("content-type", "application/json");
+        res.statusCode = ctx.apiStatus;
+        if (ctx.apiStatus !== 200) return res.end('{"error":{"code":"forbidden"}}');
+        if (method === "GET")
+          return res.end(JSON.stringify({ envs: ctx.vercelEnvs.map((key) => ({ key })) }));
+        res.end('{"created":[]}');
+      });
+      return;
+    }
     let prefix = "/" + (path.split("/")[1] ?? "");
     const rest = path.slice(prefix.length);
     if (prefix === "/ten-mien") {
@@ -353,11 +419,15 @@ async function fresh(appEnv: Env, setup: Setup = {}): Promise<Ctx> {
     VERCEL_TOKEN: "moc-bi-mat-VERCEL_TOKEN",
     VERCEL_ORG_ID: "moc-bi-mat-VERCEL_ORG_ID",
     VERCEL_PROJECT_ID: "moc-bi-mat-VERCEL_PROJECT_ID",
-    MIGRATE_DATABASE_URL: "moc-bi-mat-MIGRATE_DATABASE_URL",
+    VERCEL_API_URL: `${ctx.base}/vercel-api`,
+    MIGRATE_DATABASE_URL: MIGRATE_URL,
+    LOGIN_DB_PASSWORD: LOGIN_PW,
+    AUTH_SECRET: "moc-bi-mat-AUTH_SECRET",
+    RESEND_API_KEY: "moc-bi-mat-RESEND_API_KEY",
+    MAIL_FROM: "OneHub Inventory <no-reply@onehub.center>",
     APP_URL: `${ctx.base}/ten-mien`,
   };
-  if (appEnv === "staging") ctx.env["LOGIN_DATABASE_URL"] = "moc-bi-mat-LOGIN_DATABASE_URL";
-  else ctx.env["STAGING_APP_URL"] = `${ctx.base}/ban-thu`;
+  if (appEnv === "production") ctx.env["STAGING_APP_URL"] = `${ctx.base}/ban-thu`;
   return ctx;
 }
 
@@ -410,6 +480,7 @@ function expectNoMarker(ctx: Ctx, r: Run): void {
     expect(text.includes(`moc-bi-mat-${name}`), `giá trị của ${name} lộ ra`).toBe(false);
   }
   expect(text).not.toContain("moc-bi-mat-");
+  expect(text.includes(LOGIN_PW), "giá trị của LOGIN_DB_PASSWORD lộ ra").toBe(false);
 }
 
 function expectGreen(ctx: Ctx, appEnv: Env, r: Run): void {
@@ -435,12 +506,22 @@ function expectGreen(ctx: Ctx, appEnv: Env, r: Run): void {
   expect(apply).toBeGreaterThanOrEqual(0);
   expect(apply).toBeLessThan(firstVercel);
   expect(applied(ctx)).toEqual(["001_a.sql", "002_b.sql"]);
+  // Row dat-khoa-mot-lenh: the login role's password after the migrations, the variables before the first vercel call.
+  const vai = r.calls.indexOf("psql vai");
+  expect(vai).toBeGreaterThan(apply);
+  expect(vai).toBeLessThan(firstVercel);
+  expect(ctx.api.map((c) => `${c.method} ${c.path}`)).toEqual([
+    `GET /v9/projects/moc-bi-mat-VERCEL_PROJECT_ID/env?teamId=moc-bi-mat-VERCEL_ORG_ID`,
+    `POST /v10/projects/moc-bi-mat-VERCEL_PROJECT_ID/env?upsert=true&teamId=moc-bi-mat-VERCEL_ORG_ID`,
+  ]);
+  expect(r.calls.indexOf("api POST /v10/projects/<id>/env")).toBeGreaterThan(vai);
+  expect(r.calls.indexOf("api POST /v10/projects/<id>/env")).toBeLessThan(firstVercel);
   expectNoMarker(ctx, r);
 }
 
 describe("make deploy — green", () => {
   for (const appEnv of ["staging", "production"] as const) {
-    it(`${appEnv} xanh qua make: bảy bước đạt, vercel đúng thứ tự, migration trước vercel`, async () => {
+    it(`${appEnv} xanh qua make: chín bước đạt, vercel đúng thứ tự, migration trước vercel`, async () => {
       const ctx = await fresh(appEnv);
       const r = await run(ctx, "make", ["-s", "-f", DEPLOY_MK, "deploy", `ENV=${appEnv}`]);
       expectGreen(ctx, appEnv, r);
@@ -581,6 +662,60 @@ const RED: RedCase[] = [
     },
     reason: () => "002_b.sql",
   },
+  // Row dat-khoa-mot-lenh: the cells of the header of _acceptance/dat-khoa-mot-lenh/evals.yaml.
+  {
+    name: "LOGIN_DB_PASSWORD ngắn",
+    step: "cau-hinh",
+    arrange: (ctx) => {
+      ctx.env["LOGIN_DB_PASSWORD"] = "abc";
+    },
+    reason: () => "LOGIN_DB_PASSWORD phải là chữ và số, từ 24 ký tự",
+  },
+  {
+    name: "LOGIN_DB_PASSWORD có ký tự đặc biệt",
+    step: "cau-hinh",
+    arrange: (ctx) => {
+      ctx.env["LOGIN_DB_PASSWORD"] = "MocBiMatLoginPassword01234@";
+    },
+    reason: () => "LOGIN_DB_PASSWORD phải là chữ và số, từ 24 ký tự",
+  },
+  {
+    name: "MIGRATE_DATABASE_URL không đọc được",
+    step: "cau-hinh",
+    arrange: (ctx) => {
+      ctx.env["MIGRATE_DATABASE_URL"] = "moc-bi-mat-MIGRATE_DATABASE_URL";
+    },
+    reason: () => "MIGRATE_DATABASE_URL không đọc được",
+  },
+  {
+    name: "vai đăng nhập chưa có",
+    step: "vai-dang-nhap",
+    arrange: (ctx) => writeFileSync(join(ctx.fake, "vai-chua-co"), ""),
+    reason: () => 'không đặt được mật khẩu vai đăng nhập: role "quy_hang_login" does not exist',
+  },
+  {
+    name: "psql in chuỗi nối và mật khẩu ra rồi lỗi",
+    step: "vai-dang-nhap",
+    arrange: (ctx) => writeFileSync(join(ctx.fake, "vai-in-gia-tri"), ""),
+    reason: () =>
+      "không đặt được mật khẩu vai đăng nhập: psql: error: connection to *** failed for password ***",
+  },
+  ...FORBIDDEN.map((name): RedCase => ({
+    name: `dự án Vercel có biến cấm ${name}`,
+    step: "bien",
+    arrange: (ctx) => {
+      ctx.vercelEnvs = ["APP_URL", name];
+    },
+    reason: () => `dự án Vercel đang có biến cấm ${name}`,
+  })),
+  {
+    name: "Vercel trả 403",
+    step: "bien",
+    arrange: (ctx) => {
+      ctx.apiStatus = 403;
+    },
+    reason: () => "Vercel trả 403",
+  },
   {
     name: "bộ kiểm cách ly đỏ",
     step: "cach-ly",
@@ -679,11 +814,20 @@ describe("make deploy — ma trận bước đỏ", () => {
           expect(r.vercel).toEqual([]);
           expect(r.calls.some((x) => x.startsWith("psql"))).toBe(false);
         }
+        // Row dat-khoa-mot-lenh: a step red before the build calls no vercel command at all, and writes nothing to
+        // the Vercel project.
+        if (at < steps.indexOf("dung")) {
+          expect(r.vercel).toEqual([]);
+          expect(ctx.api.some((c) => c.method === "POST")).toBe(false);
+        }
         expectNoMarker(ctx, r);
       });
     }
   }
 });
+
+// Lines before the domain check: every step but the last, the same count in both environments.
+const AT_DOMAIN_CHECK = STEPS.staging.indexOf("kiem-nhanh-ten-mien");
 
 describe("make deploy — lùi sau gắn tên miền về đúng bản tên miền trỏ tới trước khi gắn", () => {
   for (const appEnv of ["staging", "production"] as const) {
@@ -700,7 +844,9 @@ describe("make deploy — lùi sau gắn tên miền về đúng bản tên mi�
 
     function expectFirstSixGreen(r: Run): void {
       expect(r.code).not.toBe(0);
-      expect(r.lines.slice(0, 6)).toEqual(STEPS[appEnv].slice(0, 6).map((s) => `${P}: ${s} đạt`));
+      expect(r.lines.slice(0, AT_DOMAIN_CHECK)).toEqual(
+        STEPS[appEnv].slice(0, AT_DOMAIN_CHECK).map((s) => `${P}: ${s} đạt`),
+      );
       expect(r.vercel.filter((v) => v.startsWith("vercel promote"))).toHaveLength(1);
     }
 
@@ -709,7 +855,7 @@ describe("make deploy — lùi sau gắn tên miền về đúng bản tên mi�
       ctx.domainSeq = [redAfter(ctx)];
       const r = await deploy(ctx, appEnv);
       expectFirstSixGreen(r);
-      expect(r.lines.slice(6)).toEqual([redLine, `${P}: đã lùi về bản trước`]);
+      expect(r.lines.slice(AT_DOMAIN_CHECK)).toEqual([redLine, `${P}: đã lùi về bản trước`]);
       expect(rollbacks(r)).toEqual(["vercel rollback dpl_cu --yes"]);
       // The alias was read again after the rollback, and points at the recorded id.
       const at = r.vercel.indexOf("vercel rollback dpl_cu --yes");
@@ -737,7 +883,7 @@ describe("make deploy — lùi sau gắn tên miền về đúng bản tên mi�
         "vercel rollback dpl_truoc --yes",
       ]);
       expect(domainId(ctx)).toBe("dpl_truoc");
-      expect(r.lines.slice(6)).toEqual([redLine, `${P}: đã lùi về bản trước`]);
+      expect(r.lines.slice(AT_DOMAIN_CHECK)).toEqual([redLine, `${P}: đã lùi về bản trước`]);
     });
 
     it(`${appEnv}: lần gắn đầu (tên miền chưa trỏ bản nào) → DỪNG, in danh sách, hỏi BAN`, async () => {
@@ -746,7 +892,7 @@ describe("make deploy — lùi sau gắn tên miền về đúng bản tên mi�
       ctx.domainSeq = [redAfter(ctx)];
       const r = await deploy(ctx, appEnv);
       expectFirstSixGreen(r);
-      expect(r.lines.slice(6)).toEqual([
+      expect(r.lines.slice(AT_DOMAIN_CHECK)).toEqual([
         redLine,
         `${P}: lùi bản DỪNG — không đọc được bản tên miền trỏ tới trước khi gắn (lần gắn đầu, hay Vercel không trả lời), ${stays}`,
         ...listLines(P, ctx, "dpl_moi"),
@@ -762,7 +908,7 @@ describe("make deploy — lùi sau gắn tên miền về đúng bản tên mi�
       ctx.domainSeq = [redAfter(ctx)];
       const r = await deploy(ctx, appEnv);
       expectFirstSixGreen(r);
-      expect(r.lines.slice(6)).toEqual([
+      expect(r.lines.slice(AT_DOMAIN_CHECK)).toEqual([
         redLine,
         `${P}: lùi bản DỪNG — không đọc được bản tên miền trỏ tới trước khi gắn (lần gắn đầu, hay Vercel không trả lời), ${stays}`,
         ...listLines(P, ctx, null),
@@ -777,7 +923,7 @@ describe("make deploy — lùi sau gắn tên miền về đúng bản tên mi�
       ctx.domainSeq = [redAfter(ctx)];
       const r = await deploy(ctx, appEnv);
       expectFirstSixGreen(r);
-      expect(r.lines.slice(6)).toEqual([
+      expect(r.lines.slice(AT_DOMAIN_CHECK)).toEqual([
         redLine,
         `${P}: lùi bản DỪNG — không đọc được mã bản mới, ${stays}`,
         ...listLines(P, ctx, "dpl_moi"),
@@ -792,7 +938,7 @@ describe("make deploy — lùi sau gắn tên miền về đúng bản tên mi�
       ctx.domainSeq = [redAfter(ctx)];
       const r = await deploy(ctx, appEnv);
       expectFirstSixGreen(r);
-      expect(r.lines.slice(6)).toEqual([
+      expect(r.lines.slice(AT_DOMAIN_CHECK)).toEqual([
         redLine,
         `${P}: lùi bản DỪNG — trước khi gắn, tên miền đã trỏ vào chính bản mới dpl_moi, ${stays}`,
         ...listLines(P, ctx, "dpl_moi"),
@@ -818,7 +964,7 @@ describe("make deploy — lùi sau gắn tên miền về đúng bản tên mi�
     ctx.domainSeq = [redAfter(ctx)];
     const r = await deploy(ctx, "staging");
     expect(r.code).not.toBe(0);
-    expect(r.lines.slice(6)).toEqual([
+    expect(r.lines.slice(AT_DOMAIN_CHECK)).toEqual([
       redLine,
       `${P}: lùi bản DỪNG — không đọc được bản tên miền trỏ tới trước khi gắn (lần gắn đầu, hay Vercel không trả lời), không tự lùi; tên miền vẫn ở bản mới`,
       `${P}: lùi bản ĐỎ — không đọc được danh sách bản của Vercel`,
@@ -833,7 +979,7 @@ describe("make deploy — lùi sau gắn tên miền về đúng bản tên mi�
     ctx.domainSeq = [redAfter(ctx)];
     const r = await deploy(ctx, "staging");
     expect(r.code).not.toBe(0);
-    expect(r.lines.slice(6)).toEqual([
+    expect(r.lines.slice(AT_DOMAIN_CHECK)).toEqual([
       redLine,
       `${P}: lùi bản ĐỎ — vercel rollback lỗi (mã 1)`,
       ...listLines(P, ctx, "dpl_moi"),
@@ -847,7 +993,7 @@ describe("make deploy — lùi sau gắn tên miền về đúng bản tên mi�
     ctx.domainSeq = [redAfter(ctx)];
     const r = await deploy(ctx, "staging");
     expect(r.code).not.toBe(0);
-    expect(r.lines.slice(6)).toEqual([
+    expect(r.lines.slice(AT_DOMAIN_CHECK)).toEqual([
       redLine,
       `${P}: lùi bản ĐỎ — tên miền chưa về bản dpl_cu (đang ở dpl_moi)`,
       ...listLines(P, ctx, "dpl_moi"),
@@ -863,7 +1009,7 @@ describe("make deploy — lùi sau gắn tên miền về đúng bản tên mi�
     const r = await deploy(ctx, "staging");
     expect(r.code).not.toBe(0);
     expect(domainId(ctx)).toBe("dpl_cu");
-    expect(r.lines.slice(6)).toEqual([
+    expect(r.lines.slice(AT_DOMAIN_CHECK)).toEqual([
       redLine,
       `${P}: lùi bản ĐỎ — tên miền đã về bản dpl_cu nhưng kiểm nhanh đỏ: /proto/x trả 200, cần 404`,
       ...listLines(P, ctx, "dpl_cu"),
@@ -1092,5 +1238,193 @@ describe.runIf(PG)("make deploy — migration trên Postgres thật", () => {
     );
     expect(ledger).toBe("");
     expect(tableA).toBe(false);
+  });
+});
+
+// ── Row dat-khoa-mot-lenh: E4 (the login role's password), E5 (the variables pushed to Vercel), E6 (bien red) ──────
+
+/** A finding when the statement sent to Postgres holds the password itself; null when it does not. */
+function sqlLeak(sql: string, password: string): string | null {
+  return sql.includes(password) ? "câu SQL chứa mật khẩu trần" : null;
+}
+
+/** The six variables the bien step must write, with their Vercel type. */
+const VERCEL_EXPECTED: Record<string, string> = {
+  DATABASE_URL: "encrypted",
+  AUTH_SECRET: "encrypted",
+  RESEND_API_KEY: "encrypted",
+  MAIL_FROM: "plain",
+  APP_URL: "plain",
+  APP_ENV: "plain",
+};
+
+interface VercelVar {
+  key: string;
+  value: string;
+  type: string;
+  target: string[];
+}
+
+/** Findings of a POST body against the six variables: missing, extra, wrong type or target. */
+function vercelBodyFindings(body: VercelVar[]): string[] {
+  const out: string[] = [];
+  const keys = body.map((v) => v.key);
+  for (const k of Object.keys(VERCEL_EXPECTED))
+    if (!keys.includes(k)) out.push(`thiếu biến Vercel: ${k}`);
+  for (const v of body) {
+    if (!(v.key in VERCEL_EXPECTED)) out.push(`thừa biến Vercel: ${v.key}`);
+    else if (v.type !== VERCEL_EXPECTED[v.key]) out.push(`sai kiểu ${v.key}: ${v.type}`);
+    if (JSON.stringify(v.target) !== '["production"]') out.push(`sai môi trường ${v.key}`);
+  }
+  return out;
+}
+
+const RFC7677 = {
+  salt: "W22ZaJ0SNY7soEsUEjb6gQ==",
+  authMessage:
+    "n=user,r=rOprNGfwEbeRWgbNEkqO," +
+    "r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0,s=W22ZaJ0SNY7soEsUEjb6gQ==,i=4096," +
+    "c=biws,r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0",
+  clientProof: "dHzbZapWIk4jUhN+Ute9ytag9zjfMHgsqmmiz7AndVQ=",
+  serverSignature: "6rriTRBi23WpRR/wtup+mMhUZUn/dB5nLTJRsjl95G4=",
+};
+
+describe("E4 · mật khẩu vai đăng nhập đặt bằng dạng băm SCRAM", () => {
+  it("E4 · dạng băm chấm như máy chủ Postgres trên vector thử RFC 7677", () => {
+    const v = scramVerifier("pencil", { salt: Buffer.from(RFC7677.salt, "base64") });
+    const r = serverCheck(v, RFC7677.authMessage, RFC7677.clientProof);
+    expect(r.ok).toBe(true);
+    expect(r.serverSignature).toBe(RFC7677.serverSignature);
+    // Control: the same proof against another password's verifier is refused.
+    const other = scramVerifier("pencil2", { salt: Buffer.from(RFC7677.salt, "base64") });
+    expect(serverCheck(other, RFC7677.authMessage, RFC7677.clientProof).ok).toBe(false);
+  });
+
+  for (const appEnv of ["staging", "production"] as const) {
+    it(`E4 · ${appEnv}: câu gửi psql là dạng băm của LOGIN_DB_PASSWORD, không có mật khẩu trần`, async () => {
+      const ctx = await fresh(appEnv);
+      const r = await deploy(ctx, appEnv);
+      expect(r.code, r.stdout + r.stderr).toBe(0);
+      const sql = readFileSync(join(ctx.fake, "vai.sql"), "utf8");
+      expect(sql).toMatch(/^alter role quy_hang_login password 'SCRAM-SHA-256\$4096:[^']+';\n$/);
+      expect(sqlLeak(sql, LOGIN_PW)).toBeNull();
+      expect(readFileSync(join(ctx.fake, "vai.argv"), "utf8")).not.toContain(LOGIN_PW);
+      // The verifier is the one of LOGIN_DB_PASSWORD: recomputed from its own salt, both keys match.
+      const v = parseVerifier(sql.match(/'([^']+)'/)![1]!)!;
+      const keys = scramKeys(LOGIN_PW, v.salt, v.iterations);
+      expect(keys.storedKey.equals(v.storedKey)).toBe(true);
+      expect(keys.serverKey.equals(v.serverKey)).toBe(true);
+    });
+  }
+
+  it("E4 · chiều đỏ: câu SQL có mật khẩu trần thì hàm đo bắt", () => {
+    const sound = `alter role quy_hang_login password '${scramVerifier(LOGIN_PW)}';\n`;
+    expect(sqlLeak(sound, LOGIN_PW)).toBeNull();
+    expect(sqlLeak(`${sound}-- ${LOGIN_PW}\n`, LOGIN_PW)).toBe("câu SQL chứa mật khẩu trần");
+  });
+});
+
+describe("E5 · sáu biến đẩy sang dự án Vercel trước khi dựng", () => {
+  for (const appEnv of ["staging", "production"] as const) {
+    it(`E5 · ${appEnv}: một lần đọc, một lần ghi đè, đúng sáu biến, chuỗi nối của vai đăng nhập`, async () => {
+      const ctx = await fresh(appEnv);
+      const r = await deploy(ctx, appEnv);
+      expect(r.code, r.stdout + r.stderr).toBe(0);
+      expect(ctx.api.map((c) => c.method)).toEqual(["GET", "POST"]);
+      expect(ctx.api.every((c) => c.auth === "Bearer moc-bi-mat-VERCEL_TOKEN")).toBe(true);
+      const body = ctx.api[1]!.body as VercelVar[];
+      expect(body).toHaveLength(6);
+      expect(vercelBodyFindings(body)).toEqual([]);
+      const value = Object.fromEntries(body.map((v) => [v.key, v.value]));
+      const db = new URL(value["DATABASE_URL"]!);
+      const owner = new URL(MIGRATE_URL);
+      expect(decodeURIComponent(db.username)).toBe("quy_hang_login.abcdefghijklmnopqrst");
+      expect(decodeURIComponent(db.password)).toBe(LOGIN_PW);
+      expect([db.protocol, db.hostname, db.port, db.pathname]).toEqual([
+        owner.protocol,
+        owner.hostname,
+        owner.port,
+        owner.pathname,
+      ]);
+      expect(value).toMatchObject({
+        AUTH_SECRET: "moc-bi-mat-AUTH_SECRET",
+        RESEND_API_KEY: "moc-bi-mat-RESEND_API_KEY",
+        MAIL_FROM: "OneHub Inventory <no-reply@onehub.center>",
+        APP_URL: `${ctx.base}/ten-mien`,
+        APP_ENV: appEnv,
+      });
+      // Written before the first vercel call (the build pulls them).
+      const firstVercel = r.calls.findIndex((c) => c.startsWith("vercel "));
+      expect(r.calls.indexOf("api POST /v10/projects/<id>/env")).toBeLessThan(firstVercel);
+      expectNoMarker(ctx, r);
+    });
+  }
+
+  it("E5 · chiều đỏ: thân ghi đè thiếu một biến thì hàm so bắt", async () => {
+    const ctx = await fresh("staging");
+    await deploy(ctx, "staging");
+    const body = ctx.api[1]!.body as VercelVar[];
+    expect(vercelBodyFindings(body)).toEqual([]);
+    expect(vercelBodyFindings(body.filter((v) => v.key !== "AUTH_SECRET"))).toEqual([
+      "thiếu biến Vercel: AUTH_SECRET",
+    ]);
+  });
+});
+
+describe("E6 · bước bien đỏ thì không ghi gì và không dựng", () => {
+  const cases: { name: string; arrange: (ctx: Ctx) => void; line: string; get: number }[] = [
+    ...FORBIDDEN.map((name) => ({
+      name: `biến cấm ${name}`,
+      arrange: (ctx: Ctx) => {
+        ctx.vercelEnvs = [name];
+      },
+      line: `bien ĐỎ — dự án Vercel đang có biến cấm ${name}`,
+      get: 1,
+    })),
+    {
+      name: "Vercel trả 403",
+      arrange: (ctx: Ctx) => {
+        ctx.apiStatus = 403;
+      },
+      line: "bien ĐỎ — Vercel trả 403",
+      get: 1,
+    },
+  ];
+  for (const c of cases) {
+    it(`E6 · ${c.name}: dòng đỏ ghim, 0 lần ghi, 0 lần gọi vercel, tên miền không đổi`, async () => {
+      const ctx = await fresh("staging");
+      c.arrange(ctx);
+      const r = await deploy(ctx, "staging");
+      expect(r.code).not.toBe(0);
+      expect(r.lines).toContain(`deploy staging: ${c.line}`);
+      expect(r.lines.at(-1)).toBe("deploy staging: DỪNG ở bien — tên miền không đổi");
+      expect(ctx.api.filter((x) => x.method === "GET")).toHaveLength(c.get);
+      expect(ctx.api.filter((x) => x.method === "POST")).toHaveLength(0);
+      expect(r.vercel).toEqual([]);
+      expect(domainId(ctx)).toBe("dpl_cu");
+    });
+  }
+
+  it("E6 · đối chứng dương: cùng máy giả, không biến cấm, trả 200 → bien đạt", async () => {
+    const ctx = await fresh("staging");
+    ctx.vercelEnvs = ["APP_URL", "DATABASE_URL"];
+    const r = await deploy(ctx, "staging");
+    expect(r.lines).toContain("deploy staging: bien đạt");
+    expect(r.code).toBe(0);
+  });
+});
+
+describe("make cach-ly-dich dựng chuỗi vai đăng nhập như lệnh đưa bản lên", () => {
+  it("--login-url in chuỗi vai đăng nhập; thiếu mật khẩu thì thoát 1 và không in gì ra đầu ra chuẩn", async () => {
+    const ctx = await fresh("staging");
+    const ok = await run(ctx, "node", [LEN_BAN, "--login-url"]);
+    expect(ok.code).toBe(0);
+    const u = new URL(ok.stdout);
+    expect(decodeURIComponent(u.username)).toBe("quy_hang_login.abcdefghijklmnopqrst");
+    expect(decodeURIComponent(u.password)).toBe(LOGIN_PW);
+    ctx.env["LOGIN_DB_PASSWORD"] = "";
+    const red = await run(ctx, "node", [LEN_BAN, "--login-url"]);
+    expect(red.code).toBe(1);
+    expect(red.stdout).toBe("");
   });
 });
