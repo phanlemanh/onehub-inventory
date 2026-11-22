@@ -1,1 +1,0 @@
-Runbooks about rolling back now open with one banner to the rotation section of xoay-khoa.md instead of a pointer in every sentence (owner changed the shape after grading round 2) — row lui-ban-luc-xoay-mat-khau
