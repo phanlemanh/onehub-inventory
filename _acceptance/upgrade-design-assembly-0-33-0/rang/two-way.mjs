@@ -130,6 +130,16 @@ cases["change-list"] = () => {
       writeFileSync(map, readFileSync(map, "utf8").replace("Đầu chủ gõ mã căn", "Đầu chủ nhập mã căn"));
     });
     red("change-list with another record's map line", "changes: PRODUCT-MAP.md changed a line that is not this record's", "change-list.mjs", root);
+    branch(() => {
+      const map = path.join(clone.dir, "PRODUCT-MAP.md");
+      writeFileSync(map, readFileSync(map, "utf8").replace("(hàng 3f)", "(hàng 3g)").replace("ở hàng 7 trước", "ở hàng 8 trước"));
+    });
+    red("change-list with a digit changed on another record's map line", "changes: PRODUCT-MAP.md changed a line that is not this record's", "change-list.mjs", root);
+    branch(() => {
+      const page = path.join(clone.dir, "LO-TRINH.html");
+      writeFileSync(page, readFileSync(page, "utf8").replace("<b>1h</b>", "<b>1i</b>").replace("<b>2</b> — kế hoạch", "<b>4</b> — kế hoạch"));
+    });
+    red("change-list with a digit changed on another row of the roadmap page", "changes: LO-TRINH.html changed a line that is not this record's", "change-list.mjs", root);
     at("checkout", "-q", head);
     at("update-ref", "refs/remotes/origin/main", head);
     green("change-list once merged", "the branch is in origin/main already, so only the commits were compared", "change-list.mjs", root);

@@ -8,6 +8,8 @@ import path from "node:path";
 import { branchBase, git, head, lines, option, ROOT, run } from "./lib.mjs";
 import {
   BRANCH_MAY_CHANGE,
+  DRAWN_COUNTS,
+  DRAWN_HEADINGS,
   DRAWN_PAGES,
   RERUN,
   RERUN_CHANGES,
@@ -34,7 +36,8 @@ const may = (file) => BRANCH_MAY_CHANGE.some((p) => (p.endsWith("/") ? file.star
 // or by a count.
 function drawnPageProblems(base, file) {
   const diff = git(root, "diff", "--word-diff=porcelain", "--word-diff-regex=[^<>,{}]+", base, "HEAD", "--", file);
-  const norm = (s) => s.replace(/chưa có/g, "0 việc").replace(/\d+/g, "#");
+  const isCount = (s) => DRAWN_COUNTS.some((re) => re.test(s));
+  const norm = (s) => (isCount(s) ? s.replace(/chưa có/g, "0 việc").replace(/\d+/g, "#") : s);
   const removed = [];
   const added = [];
   for (const line of diff.split("\n")) {
@@ -44,7 +47,7 @@ function drawnPageProblems(base, file) {
   }
   // A section heading the page opens for this record's stage goes with the record's own line.
   const ours = added.some((s) => s.includes(SLUG));
-  const rest = added.filter((s) => !s.includes(SLUG) && !(ours && /^#+ /.test(s))).map(norm);
+  const rest = added.filter((s) => !s.includes(SLUG) && !(ours && DRAWN_HEADINGS.test(s))).map(norm);
   const gone = removed.map(norm);
   const left = [...rest];
   const stray = [];

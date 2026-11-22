@@ -10,10 +10,10 @@ import { BASE, NO_MAIN, ROWS } from "./matrix.mjs";
 
 let failed = 0;
 
-function red(label, wants, args) {
+function red(label, wants, args, also = () => []) {
   const own = scratch("case");
   const r = run("node", [path.join(HERE, "shallow-alone.mjs"), ...args], ROOT, { TMPDIR: own });
-  const missing = wants.filter((want) => !r.out.includes(want));
+  const missing = [...wants.filter((want) => !r.out.includes(want)), ...also(r.out)];
   const made = readdirSync(own).filter((name) => name.startsWith("upgrade-0-36-1-shallow-"));
   rmSync(own, { recursive: true, force: true });
   // The clone was made in this case's folder (positive), and removed from it (none left).
@@ -27,13 +27,13 @@ function red(label, wants, args) {
 
 red(
   "shallow-alone: red when origin has no main",
-  [
-    "alone: make design-assembly exit 2",
-    "alone: decision-sheet did not say main was fetched from origin",
-    ...ROWS.map((row) => `${row}: what this branch`),
-    NO_MAIN,
-  ],
+  ["alone: make design-assembly exit 2", "alone: decision-sheet did not say main was fetched from origin"],
   ["--no-main"],
+  // Each row on its own line says it has no main to compare with: the row and the reason together.
+  (out) =>
+    ROWS.filter((row) => !out.split("\n").some((line) => line.includes(`${row}: what this branch`) && line.includes(NO_MAIN))).map(
+      (row) => `${row}: what this branch … ${NO_MAIN}`,
+    ),
 );
 red("shallow-alone: red when origin main is older", [`alone: the clone left main at ${BASE.slice(0, 8)}`], ["--main-at", BASE]);
 process.exitCode = failed ? 1 : 0;
