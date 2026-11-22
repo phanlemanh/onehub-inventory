@@ -5,9 +5,9 @@ slug: bien-vercel-tu-choi
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-22
 design_doc: docs/superpowers/specs/2026-11-22-bien-vercel-tu-choi-design.md
 ---
 
