@@ -348,13 +348,16 @@ export function confirmedKeys(reply) {
 
 /**
  * Writes the app's six variables to the Production environment of ENV's Vercel project, before the build pulls them.
- * Red, before anything is written, when the project holds a variable a production build refuses to start with. Red
+ * Red, before anything is written, when the listing has no `envs` array or the project holds a variable a production
+ * build refuses to start with. Red
  * after the write, still before the build, when Vercel's reply refuses a variable or does not confirm all six.
  */
 async function stepVercelVars(appEnv, env) {
   const project = encodeURIComponent(env["VERCEL_PROJECT_ID"]);
   const listing = await vercelApi(env, "GET", `/v9/projects/${project}/env`);
-  const keys = new Set((listing?.envs ?? []).map((e) => e?.key));
+  // Vercel documents a reply shape without `envs`; reading it as an empty list would skip the forbidden check unseen.
+  if (!Array.isArray(listing?.envs)) throw new Red("Vercel trả danh sách biến không đúng khuôn");
+  const keys = new Set(listing.envs.map((e) => e?.key));
   const forbidden = FORBIDDEN_ON_VERCEL.find((k) => keys.has(k));
   if (forbidden) throw new Red(`dự án Vercel đang có biến cấm ${forbidden}`);
   const value = {

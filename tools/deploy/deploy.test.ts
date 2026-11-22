@@ -1651,3 +1651,33 @@ describe("E3 · Vercel trả 201 mà không xác nhận đủ sáu biến thì b
     expect(refusedItems({ failed: ["x", null, { error: {} }] })).toEqual(["không rõ tên"]);
   });
 });
+
+describe("E4 · lần đọc biến trả thành công mà không có danh sách thì bước bien đỏ, chưa ghi gì", () => {
+  const cells: { name: string; body: unknown }[] = [
+    { name: "đối tượng biến đơn", body: { key: "APP_URL", type: "plain", value: "x" } },
+    { name: "envs không phải mảng", body: { envs: {} } },
+    { name: "thân không phải JSON", body: "not json" },
+  ];
+  for (const appEnv of ["staging", "production"] as const) {
+    for (const c of cells) {
+      it(`E4 · ${appEnv} · ${c.name}: dòng đỏ ghim, 0 lần ghi, không dựng`, async () => {
+        await expectBienRed(
+          appEnv,
+          (ctx) => {
+            ctx.vercelReply.get = { status: 200, body: c.body };
+          },
+          "Vercel trả danh sách biến không đúng khuôn",
+          ["GET"],
+        );
+      });
+    }
+  }
+
+  it("E4 · đối chứng dương: danh sách rỗng đúng khuôn → bien đạt", async () => {
+    const ctx = await fresh("staging");
+    ctx.vercelReply.get = { status: 200, body: { envs: [] } };
+    const r = await deploy(ctx, "staging");
+    expect(r.lines).toContain("deploy staging: bien đạt");
+    expect(r.code).toBe(0);
+  });
+});
