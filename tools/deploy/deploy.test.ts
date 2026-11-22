@@ -1751,3 +1751,58 @@ describe("E3 · vai-dang-nhap đỏ sau khi đã ghi biến", () => {
     });
   }
 });
+
+describe("E2 · bước bien đỏ thì không đặt mật khẩu vai đăng nhập", () => {
+  const cells: { name: string; arrange: (ctx: Ctx) => void; reason: string }[] = [
+    {
+      name: "biến cấm MIGRATE_DATABASE_URL",
+      arrange: (ctx) => {
+        ctx.vercelEnvs = ["MIGRATE_DATABASE_URL"];
+      },
+      reason: "dự án Vercel đang có biến cấm MIGRATE_DATABASE_URL",
+    },
+    {
+      name: "Vercel trả 403",
+      arrange: (ctx) => {
+        ctx.apiStatus = 403;
+      },
+      reason: "Vercel trả 403",
+    },
+    {
+      name: "từ chối AUTH_SECRET",
+      arrange: refusal([{ error: { key: "AUTH_SECRET", message: "x" } }]),
+      reason: "Vercel từ chối ghi biến AUTH_SECRET",
+    },
+    {
+      name: "created rỗng",
+      arrange: (ctx) => {
+        ctx.vercelReply.post = { status: 201, body: { created: [], failed: [] } };
+      },
+      reason: `Vercel không xác nhận đã ghi biến ${SIX.join(", ")}`,
+    },
+    {
+      name: "danh sách không có envs",
+      arrange: (ctx) => {
+        ctx.vercelReply.get = { status: 200, body: { key: "APP_URL", type: "plain", value: "x" } };
+      },
+      reason: "Vercel trả danh sách biến không đúng khuôn",
+    },
+  ];
+  for (const appEnv of ["staging", "production"] as const) {
+    for (const c of cells) {
+      it(`E2 · ${appEnv} · ${c.name}: dừng ở bien, mật khẩu không đặt`, async () => {
+        const ctx = await fresh(appEnv);
+        c.arrange(ctx);
+        const r = await deploy(ctx, appEnv);
+        expect(r.code).not.toBe(0);
+        expect(r.lines).toContain(`deploy ${appEnv}: bien ĐỎ — ${c.reason}`);
+        expect(r.lines.at(-1)).toBe(`deploy ${appEnv}: DỪNG ở bien — tên miền không đổi`);
+        expect(vaiCalls(r)).toBe(0);
+        expect(existsSync(join(ctx.fake, "vai.sql"))).toBe(false);
+        expect(r.vercel).toEqual([]);
+        expect(domainId(ctx)).toBe("dpl_cu");
+        expectNoMarker(ctx, r);
+      });
+    }
+  }
+});
