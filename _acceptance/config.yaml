@@ -305,3 +305,6 @@ tri_thuc:
   noi: docs/tri-thuc   # in this repo; public since 2026-11-10 and the owner chose to keep raw sources here
 lo_trinh:
   tep: docs/plan/lo-trinh.json
+tro_ly_quyet_dinh:
+  mac_ky: true             # mặc-ký có phủ quyết cho hàng backend — chủ kho ký 2026-11-22 (LUAT đợt nen)
+  nguoi_quyet: "Manh Phan"
