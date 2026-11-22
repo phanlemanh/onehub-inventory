@@ -1,0 +1,39 @@
+{
+  "feature_plain": "Bộ kiểm thiết kế mà mọi PR của kho chạy được nâng từ bản 0.7.1 lên bản 0.36.1 của plugin, chỉ phần máy: không quyết định thiết kế nào của kho đổi, cổng vẫn giữ đúng 19 quyết định như hôm nay.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ giữ toàn bộ bộ kiểm của kho xanh, với cùng 19 quyết định, 294 linh kiện, độ tất định 47/67 và đủ số bài kiểm."},
+    {"id": "AC-2", "p": "Sẽ để riêng cổng thiết kế in đúng 19 quyết định và 47/67, và đỏ ngay khi sổ thiết kế mất một phép kiểm."},
+    {"id": "AC-3", "p": "Sẽ chứng bộ kiểm trong kho đúng từng byte là bản 0.36.1 mà plugin đã cài phát hành, cả bước cổng chạy nó."},
+    {"id": "AC-4", "p": "Sẽ chứng mỗi quyết định trong 67 quyết định thiết kế giữ nguyên trạng thái như với bản 0.7.1 cũ."},
+    {"id": "AC-5", "p": "Sẽ chứng cổng vẫn tự so với nhánh chính trên bản sao nông như CI dựng, và đỏ khi không có nhánh chính để so."},
+    {"id": "AC-6", "p": "Sẽ chứng PR chỉ đổi bộ kiểm, dấu phiên bản, bước cổng, một dòng nhật ký và tệp của hồ sơ này."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "Không chấm cách các lệnh của plugin tự chạy — việc đó có bài kiểm ở kho plugin."},
+    {"id": "OOS-2", "p": "Không sửa tay bộ kiểm, không sửa kho plugin, không tắt cảnh báo CodeQL."},
+    {"id": "OOS-3", "p": "Không sửa dòng chú thích cũ về bản 0.7.2 trong tệp lệnh của kho."},
+    {"id": "OOS-4", "p": "Không nhận quyết định thiết kế mới nào mà bản mới mở ra, kể cả 14 quyết định có bằng chứng chưa có con trỏ."},
+    {"id": "OOS-5", "p": "Không ghim lại hay sửa các hồ sơ lên đời đã ký trước đây."},
+    {"id": "OOS-6", "p": "Không chạy lượt thử CI có cơ sở dữ liệu trên máy; không đổi giao diện, dữ liệu hay luật sản phẩm nào."}
+  ],
+  "coverage_plain": [
+    {"i": 3, "p": "Bộ kiểm mới (bản 0.33.0 rồi 0.36.1): đủ khi cây đúng bản phát hành (AC-3), cổng xanh cùng số (AC-1, AC-2) và không tệp lạ (AC-6)."},
+    {"i": 4, "p": "Dấu phiên bản của kho: đủ khi nó ghi 0.36.1 cùng mã cây thật (AC-3)."},
+    {"i": 5, "p": "Bước cổng mà bản mới có thể viết lại: đủ khi bằng mẫu 0.36.1 từng byte (AC-3) và nằm trong danh sách tệp (AC-6)."},
+    {"i": 6, "p": "Dòng nhật ký wiki: đủ khi là tệp duy nhất ngoài bộ kiểm mà commit lên đời thêm (AC-6)."},
+    {"i": 7, "p": "Sổ thiết kế của kho không đổi: đủ khi 67 quyết định giữ trạng thái (AC-4) và không tệp sổ nào bị đổi (AC-6)."},
+    {"i": 8, "p": "Toàn bộ bộ kiểm trên cây đã gộp nhánh chính: đủ khi xanh với đúng các con số (AC-1)."},
+    {"i": 9, "p": "So với nhánh chính trên bản sao nông: đủ khi cổng tự lấy nhánh chính rồi xanh, và đỏ khi không có (AC-5)."},
+    {"i": 10, "p": "Bản sao nông có cơ sở dữ liệu: không đo trên máy, các job CI của PR chứng nó."},
+    {"i": 11, "p": "Cảnh báo CodeQL: chưa có phép đo trên máy; job CodeQL của PR phải xanh sau lần chạy lại 0.36.1, trước Cổng Bằng chứng."},
+    {"i": 12, "p": "Việc bản mới thôi ghi đè cách nối SSH của máy: ngoài phạm vi, là lợi ích của plugin, hồ sơ này không chứng."},
+    {"i": 13, "p": "Cách lệnh lên đời của plugin tự chạy: ngoài phạm vi, có bài kiểm ở kho plugin."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Lý do bỏ lượt quét độ phủ ban đầu sai và việc bản mới thôi ghi đè cách nối SSH không ai đo — đã sửa lý do, và ghi rõ điều SSH là của plugin, ngoài phạm vi."},
+    {"i": 1, "p": "Phép đo cây bộ kiểm ghim cứng số bản cũ — đã sửa: đích cố định là 0.36.1."},
+    {"i": 2, "p": "Bảng độ phủ nói CodeQL đã có chứng trong khi job đang đỏ — đã sửa: ghi đang đỏ, và Cổng Bằng chứng chỉ trình khi job ấy xanh."},
+    {"i": 3, "p": "PR được phép đổi bản đồ sản phẩm và lộ trình mà không nêu lý do — đã sửa: bỏ hai tệp ấy khỏi danh sách được đổi."},
+    {"i": 4, "p": "Chấm từ bản chép ngoài kho có thể đo nhầm cây — đã sửa: phép đo suy gốc từ chỗ nó nằm và in mã cây đã đo; ca phá thêm bị từ chối vì không đo hành vi bộ kiểm."}
+  ]
+}
