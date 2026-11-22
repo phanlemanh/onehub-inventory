@@ -109,14 +109,12 @@ export const BRANCH_MAY_CHANGE = [
   `docs/superpowers/specs/2026-11-22-${SLUG}-design.md`,
   `docs/superpowers/plans/2026-11-22-${SLUG}.md`,
 ];
-// The two pages the gate commands draw again: they may change only on segments that name this record
-// (with the heading of the stage section it opens), or on the per-stage counts these patterns name.
-// Only inside a count segment are digits read as a count; anywhere else a changed digit is a change.
+// The two pages the gate commands draw again. Each must be exactly what the kit's drawer makes from
+// the records at HEAD (its own `product-map.mjs --check`); the file list above keeps every record
+// but this one as it is on main, so the pages can differ from main only because of this record. The
+// drawer's check leaves out one part of LO-TRINH.html, each row's summary in the page's data block;
+// this record is in no row of the plan, so every summary must stay as it was where the branch left
+// main.
 export const DRAWN_PAGES = ["PRODUCT-MAP.md", "LO-TRINH.html"];
-export const DRAWN_COUNTS = [
-  /\d+ việc|chưa có/,
-  /\d+ chỗ cần sửa/,
-  /Cần sửa trong kế hoạch \(\d+\)/,
-  /\d+ hồ sơ không thuộc kế hoạch nào/,
-];
-export const DRAWN_HEADINGS = /^## (Đang làm|Đã giao|Chờ duyệt phạm vi|Chờ phiên nghiệm thu)/;
+export const DRAWER = "scripts/product-map.mjs";
+export const DATA_BLOCK = /<script type="application\/json" id="lo-trinh-du-lieu">([\s\S]*?)<\/script>/;

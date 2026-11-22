@@ -2,6 +2,7 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
+  appendFileSync,
   mkdirSync,
   mkdtempSync,
   readdirSync,
@@ -182,6 +183,9 @@ export function workClone(root, rev = "HEAD") {
   git(clone.dir, "checkout", "-q", git(root, "rev-parse", rev).trim());
   const modules = path.join(clone.dir, "node_modules");
   symlinkSync(path.join(root, "node_modules"), modules);
+  // The repository ignores the node_modules folder, not a link of that name: keep the link out of
+  // every commit a break case makes, so a case is red for its own break only.
+  appendFileSync(path.join(clone.dir, ".git/info/exclude"), "\nnode_modules\n");
   return {
     dir: clone.dir,
     remove() {

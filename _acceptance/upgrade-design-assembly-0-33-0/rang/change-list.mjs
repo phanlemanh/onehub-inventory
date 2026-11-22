@@ -1,6 +1,6 @@
 // AC-6: each upgrade commit changes exactly its files, and the branch, from where it leaves
 // origin/main to HEAD, changes nothing beyond them, this record's own files, and the two pages the
-// gate commands draw again (there only words that name this record, or counts).
+// gate commands draw again (each exactly what the records at HEAD draw, see DRAWN_PAGES).
 // Usage: node change-list.mjs [--root <repository>] [--upgrade <rev>] [--rerun <rev>]
 //   (--upgrade and --rerun stand in for the pinned commits, for the break copies)
 import path from "node:path";
@@ -8,12 +8,11 @@ import path from "node:path";
 import { branchBase, git, head, lines, option, ROOT, run } from "./lib.mjs";
 import {
   BRANCH_MAY_CHANGE,
-  DRAWN_COUNTS,
-  DRAWN_HEADINGS,
+  DATA_BLOCK,
+  DRAWER,
   DRAWN_PAGES,
   RERUN,
   RERUN_CHANGES,
-  SLUG,
   UPGRADE,
   UPGRADE_CHANGES,
 } from "./matrix.mjs";
@@ -32,38 +31,46 @@ const upgradeCount = commitList("upgrade", option("--upgrade", UPGRADE), UPGRADE
 const rerunCount = commitList("rerun", option("--rerun", RERUN), RERUN_CHANGES);
 
 const may = (file) => BRANCH_MAY_CHANGE.some((p) => (p.endsWith("/") ? file.startsWith(p) : file === p));
-// A drawn page may change only by segments that name this record (with the heading of its section),
-// or by a count.
-function drawnPageProblems(base, file) {
-  const diff = git(root, "diff", "--word-diff=porcelain", "--word-diff-regex=[^<>,{}]+", base, "HEAD", "--", file);
-  const isCount = (s) => DRAWN_COUNTS.some((re) => re.test(s));
-  const norm = (s) => (isCount(s) ? s.replace(/chưa có/g, "0 việc").replace(/\d+/g, "#") : s);
-  const removed = [];
-  const added = [];
-  for (const line of diff.split("\n")) {
-    if (line.startsWith("---") || line.startsWith("+++")) continue;
-    if (line.startsWith("-")) removed.push(line.slice(1));
-    else if (line.startsWith("+")) added.push(line.slice(1));
+// The kit's drawer, found as the repository's own product_map executor finds it.
+function drawer() {
+  const kit = process.env.CLAUDE_PLUGIN_ROOT || run("node", ["tools/kit-root.mjs"], root).out.trim();
+  return kit ? path.join(kit, DRAWER) : null;
+}
+// What the drawer's check says of each page: true when the page is the drawing of the records.
+function redrawn() {
+  const script = drawer();
+  if (!script) return null;
+  const out = run("node", [script, "--root", root, "--check"], root).out;
+  return Object.fromEntries(DRAWN_PAGES.map((page) => [page, out.includes(`${page} khớp`)]));
+}
+// Each plan row's summary in the roadmap page's data block, by row code.
+function summaries(html) {
+  const block = html.match(DATA_BLOCK);
+  if (!block) return {};
+  const data = JSON.parse(block[1]);
+  const rows = (data.lo_trinh ?? []).flatMap((plan) => plan.hang ?? []);
+  return Object.fromEntries(rows.map((row) => [row.ma, JSON.stringify(row.tom_tat ?? null)]));
+}
+function drawnPageProblems(base, file, checked) {
+  if (!checked) return [`cannot find the kit's drawer (${DRAWER}): set CLAUDE_PLUGIN_ROOT or install acceptance-gate`];
+  const problems = checked[file] ? [] : [`${file} is not what the records at HEAD draw`];
+  if (file === "LO-TRINH.html") {
+    const before = summaries(git(root, "show", `${base}:${file}`));
+    const after = summaries(git(root, "show", `HEAD:${file}`));
+    for (const ma of new Set([...Object.keys(before), ...Object.keys(after)])) {
+      if (before[ma] !== after[ma]) problems.push(`${file} changed the summary of row ${ma}, the one part the redraw does not compare`);
+    }
   }
-  // A section heading the page opens for this record's stage goes with the record's own line.
-  const ours = added.some((s) => s.includes(SLUG));
-  const rest = added.filter((s) => !s.includes(SLUG) && !(ours && DRAWN_HEADINGS.test(s))).map(norm);
-  const gone = removed.map(norm);
-  const left = [...rest];
-  const stray = [];
-  for (const s of gone) {
-    const at = left.indexOf(s);
-    if (at === -1) stray.push(s);
-    else left.splice(at, 1);
-  }
-  return [...stray, ...left];
+  return problems;
 }
 const base = branchBase(root);
 const merged = base === head(root) || run("git", ["merge-base", "--is-ancestor", "HEAD", "origin/main"], root).status === 0;
 if (!merged) {
-  for (const file of changed(base, "HEAD")) {
+  const files = changed(base, "HEAD");
+  const checked = files.some((file) => DRAWN_PAGES.includes(file)) ? redrawn() : {};
+  for (const file of files) {
     if (DRAWN_PAGES.includes(file)) {
-      if (drawnPageProblems(base, file).length) found.push(`${file} changed a line that is not this record's`);
+      found.push(...drawnPageProblems(base, file, checked));
     } else if (!may(file)) {
       found.push(`branch changed beyond the upgrade and this record: ${file}`);
     }

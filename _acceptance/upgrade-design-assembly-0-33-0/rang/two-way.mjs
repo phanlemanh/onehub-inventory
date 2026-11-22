@@ -125,21 +125,41 @@ cases["change-list"] = () => {
     red("change-list with Makefile on the branch", "changes: branch changed beyond the upgrade and this record: Makefile", "change-list.mjs", root);
     branch(() => edit("design/decisions.yaml", "\n"));
     red("change-list with the ledger on the branch", "changes: branch changed beyond the upgrade and this record: design/decisions.yaml", "change-list.mjs", root);
-    branch(() => {
-      const map = path.join(clone.dir, "PRODUCT-MAP.md");
-      writeFileSync(map, readFileSync(map, "utf8").replace("Đầu chủ gõ mã căn", "Đầu chủ nhập mã căn"));
-    });
-    red("change-list with another record's map line", "changes: PRODUCT-MAP.md changed a line that is not this record's", "change-list.mjs", root);
-    branch(() => {
-      const map = path.join(clone.dir, "PRODUCT-MAP.md");
-      writeFileSync(map, readFileSync(map, "utf8").replace("(hàng 3f)", "(hàng 3g)").replace("ở hàng 7 trước", "ở hàng 8 trước"));
-    });
-    red("change-list with a digit changed on another record's map line", "changes: PRODUCT-MAP.md changed a line that is not this record's", "change-list.mjs", root);
-    branch(() => {
-      const page = path.join(clone.dir, "LO-TRINH.html");
-      writeFileSync(page, readFileSync(page, "utf8").replace("<b>1h</b>", "<b>1i</b>").replace("<b>2</b> — kế hoạch", "<b>4</b> — kế hoạch"));
-    });
-    red("change-list with a digit changed on another row of the roadmap page", "changes: LO-TRINH.html changed a line that is not this record's", "change-list.mjs", root);
+    // The two drawn pages, each changed by hand in one place; a digit-only case changes one digit and
+    // nothing else.
+    const page = (rel, from, to) =>
+      branch(() => {
+        const file = path.join(clone.dir, rel);
+        const text = readFileSync(file, "utf8");
+        if (!text.includes(from)) throw new Error(`${rel} has no «${from}» to change`);
+        writeFileSync(file, text.replace(from, to));
+      });
+    const notDrawn = (rel) => `changes: ${rel} is not what the records at HEAD draw`;
+    page("PRODUCT-MAP.md", "Đầu chủ gõ mã căn", "Đầu chủ nhập mã căn");
+    red("change-list with a word changed on another record's map line", notDrawn("PRODUCT-MAP.md"), "change-list.mjs", root);
+    page("PRODUCT-MAP.md", "(hàng 3f)", "(hàng 4f)");
+    red("change-list with one digit changed on another record's map line", notDrawn("PRODUCT-MAP.md"), "change-list.mjs", root);
+    page("PRODUCT-MAP.md", "20 việc", "21 việc");
+    red("change-list with one digit changed on a stage count the records do not give", notDrawn("PRODUCT-MAP.md"), "change-list.mjs", root);
+    page("LO-TRINH.html", "<b>2</b> — kế hoạch", "<b>4</b> — kế hoạch");
+    red("change-list with one digit changed on another row of the roadmap page", notDrawn("LO-TRINH.html"), "change-list.mjs", root);
+    page("LO-TRINH.html", "(hàng 7e) khi danh mục chưa có", "(hàng 8e) khi danh mục chưa có");
+    red("change-list with one digit changed beside «chưa có» on another row of the roadmap page", notDrawn("LO-TRINH.html"), "change-list.mjs", root);
+    page("LO-TRINH.html", '"ngay":"2026-11-11"', '"ngay":"2026-11-12"');
+    red(
+      "change-list with one digit changed in another row's summary, which the redraw does not compare",
+      "changes: LO-TRINH.html changed the summary of row 1, the one part the redraw does not compare",
+      "change-list.mjs",
+      root,
+    );
+    // Another record changed: the drawing would follow it, so the file list must stop it.
+    branch(() => edit("_acceptance/du-lieu-mau/contract.md", "\n"));
+    red(
+      "change-list with another record changed",
+      "changes: branch changed beyond the upgrade and this record: _acceptance/du-lieu-mau/contract.md",
+      "change-list.mjs",
+      root,
+    );
     at("checkout", "-q", head);
     at("update-ref", "refs/remotes/origin/main", head);
     green("change-list once merged", "the branch is in origin/main already, so only the commits were compared", "change-list.mjs", root);
