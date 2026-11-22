@@ -1,5 +1,9 @@
 # Xoay khoá bí mật
 
+> **Đã xoay mật khẩu vai đăng nhập?** Mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» ở dưới thắng mọi câu khác của
+> sổ này về lùi bản và về việc bản đang chạy có yên không. Đọc nó trước khi lùi bản, và khi một lượt đưa bản lên đỏ lúc
+> vừa xoay.
+
 Thay một khoá hay mật khẩu bằng cái mới ở mọi chỗ nó nằm, đưa lại bản để bản đang chạy dùng cái mới, rồi thu hồi cái cũ.
 Luôn xoay ở bản thử trước, kiểm, rồi mới tới bản thật. Mục lục và bảng biến: [README.md](README.md).
 
@@ -75,12 +79,10 @@ chung (`VERCEL_TOKEN`): bước 1–2 một lần cho cả hai, bước 4–5 �
 - **Đạt khi:** Supabase báo đã lưu; bước 2 in `đặt MIGRATE_DATABASE_URL`. Đổi mật khẩu vai chủ không làm bản đang chạy
   mất kết nối: ứng dụng nối bằng vai đăng nhập.
 - **Đỏ thì:** xoay mật khẩu vai đăng nhập có một khoảng hở. Từ lúc bước `vai-dang-nhap` đạt tới khi lần đưa bản kế chạy
-  xanh trọn (vài phút), bản đang chạy còn giữ mật khẩu cũ nên không nối được cơ sở dữ liệu. Lần đưa bản ấy mà đỏ ở bất kỳ
-  bước nào sau `vai-dang-nhap` thì bản đang chạy hỏng tới khi một lần đưa bản xanh; lùi về bản cũ không cứu được vì bản cũ
-  cũng giữ mật khẩu cũ. Bước `bien` chạy trước `vai-dang-nhap`, nên lỗi của
-  Vercel ở bước ấy không mở khoảng hở; bước `vai-dang-nhap` đỏ thì mật khẩu chưa đổi. Bảng «Đỏ thì làm gì» của
-  [dua-ban-len.md](dua-ban-len.md) nói từng vùng. Nên xoay mật khẩu vai đăng nhập lúc vắng người dùng, hoặc ngay nếu khoá
-  lộ, và sửa nguyên nhân đỏ trước khi lùi bản.
+  xanh trọn (vài phút), bản đang chạy chưa có mật khẩu mới nên không nối được cơ sở dữ liệu. Bước `bien` chạy trước
+  `vai-dang-nhap`, nên lỗi của Vercel ở bước ấy không mở khoảng hở; bước `vai-dang-nhap` đỏ thì mật khẩu chưa đổi. Nên
+  xoay mật khẩu vai đăng nhập lúc vắng người dùng, hoặc ngay nếu khoá lộ. Lần đưa bản ấy đỏ, hay về sau cần lùi bản: đọc
+  mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» ở dưới trước khi lùi.
 
 ### 4. Đưa lại bản
 
@@ -94,7 +96,8 @@ chung (`VERCEL_TOKEN`): bước 1–2 một lần cho cả hai, bước 4–5 �
   `vai-dang-nhap`, rồi `cach-ly`, `kiem-nhanh`), `AUTH_SECRET` và `RESEND_API_KEY` (bước `bien` đẩy sang Vercel, bản dựng
   mới khởi động với chúng).
 - **Đỏ thì:** đọc dòng đỏ theo bảng của [dua-ban-len.md](dua-ban-len.md). Đỏ do khoá mới sai: làm lại bước 2 rồi chạy
-  lại. Khoá cũ chưa bị thu hồi nên, trừ mật khẩu vai đăng nhập (bước 3), bản đang chạy không bị ảnh hưởng.
+  lại. Khoá cũ chưa bị thu hồi nên, trừ mật khẩu vai đăng nhập (bước 3), bản đang chạy không bị ảnh hưởng; lùi bản sau
+  khi xoay mật khẩu vai đăng nhập thì theo mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» ở dưới.
 
 ### 5. Kiểm bằng mắt
 
@@ -116,12 +119,53 @@ Khoá riêng: làm ngay sau bước 5 của môi trường ấy. Khoá dùng chu
 - **Đỏ thì:** xoá nhầm khoá mới — tạo lại từ bước 1. Sau khi thu hồi mà lệnh nào đó đỏ, đó là chỗ còn giữ khoá cũ: thêm
   chỗ ấy vào bảng trên trong PR kế tiếp.
 
+## Lùi bản sau khi xoay mật khẩu vai đăng nhập
+
+Đây là chỗ duy nhất nói về lùi bản sau khi xoay mật khẩu vai đăng nhập; đầu mỗi sổ vận hành có một dòng chặn trỏ về đây.
+
+**Luật.** Mỗi bản trên Vercel giữ mật khẩu vai đăng nhập của lúc nó được dựng (bước `dung`). Từ khi một lượt đưa bản lên
+in `vai-dang-nhap đạt` với mật khẩu mới, cơ sở dữ liệu chỉ nhận mật khẩu mới. Mọi bản dựng trước lượt ấy giữ mật khẩu cũ
+nên không nối được cơ sở dữ liệu nữa — mãi, không riêng mấy phút của lượt ấy, kể cả nhiều ngày sau một lượt xanh. Lùi về
+một bản như thế, bằng đường nào cũng vậy (lệnh tự lùi, `make rollback`, Instant Rollback trên trang Vercel), không khôi
+phục kết nối. Chỉ bản dựng ở bước `dung` của lượt xoay hay của một lượt sau nó mới nối được.
+
+**Thước.** Sức khoẻ `<APP_URL>/api/v1/health` trả `"vai":"dat"` là bản đang giữ tên miền nối được cơ sở dữ liệu. Kiểm
+nhanh của `make deploy` và `make rollback` đọc đúng trường ấy.
+
+**Buộc phải lùi thì chọn bản nào.**
+
+1. Tìm giờ lượt xoay: GitHub › Actions › Deploy, lượt đầu tiên chạy sau `make dat-khoa ENV=<env> XOAY=1` (hay sau khi
+   chủ kho đặt mật khẩu tự giữ, mục «Mật khẩu vai đăng nhập ở máy chủ kho» của [README.md](README.md)) mà nhật ký có
+   `vai-dang-nhap đạt`. Mục sổ wiki ghi lúc xoay (mục «Đỏ thì làm gì» dưới) cũng có ngày.
+2. `make rollback ENV=<ENV>`, không kèm `BAN`, in mỗi bản một dòng `bản <id> · <url> · commit … · tạo <giờ UTC>`. Chỉ
+   chọn bản tạo sau giờ lượt xoay.
+3. Không có bản nào như thế ngoài bản hỏng: đừng lùi. Sửa nguyên nhân rồi đưa bản sửa lên; một lượt `make deploy` xanh
+   trọn là đường ra.
+
+**Dòng của lệnh lúc vừa xoay.** Mật khẩu chỉ đổi ở lượt đầu tiên in `vai-dang-nhap đạt` với mật khẩu mới (lượt xoay).
+Bảng gọi lượt ấy và mọi lượt trước nó, kể từ khi mật khẩu mới được đặt ở GitHub, là «trước khi đổi mật khẩu»; mọi lượt sau
+nó, tới lượt đầu tiên in `xong <commit>`, là «lượt chạy lại». Một lượt đỏ ở `bien` hay trước đó, hay ở `vai-dang-nhap`,
+chưa đổi mật khẩu, nên nó là «trước khi đổi mật khẩu» nếu chưa lượt nào in `vai-dang-nhap đạt`.
+
+| Dòng                                                                                                                                                                                                                    | Bản đang giữ tên miền                                                                                                                                                                                                                                                                           | Làm gì                                                                                                                                                |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cau-hinh`, `ban-thu-truoc`, `migration` hay `bien` ĐỎ, rồi `DỪNG ở <bước> — tên miền không đổi`                                                                                                                        | Trước khi đổi mật khẩu: mật khẩu chưa đổi, bản đang chạy yên. Lượt chạy lại: mật khẩu đã đổi từ lượt trước, bản đang chạy đã mất kết nối, trừ khi sức khoẻ còn `"vai":"dat"`.                                                                                                                   | Sửa theo dòng của bước ấy trong bảng «Đỏ thì làm gì» của [dua-ban-len.md](dua-ban-len.md), chạy lại. Đừng lùi.                                        |
+| `vai-dang-nhap` ĐỎ, rồi `DỪNG ở vai-dang-nhap — tên miền không đổi`                                                                                                                                                     | Lượt này không đổi mật khẩu: như dòng trên. Bước `bien` đã ghi mật khẩu mới vào biến của Vercel.                                                                                                                                                                                                | Đừng bấm dựng lại trên Vercel trước khi lệnh chạy xanh. Sửa, chạy lại.                                                                                |
+| `cach-ly`, `dung`, `kiem-nhanh` hay `gan-ten-mien` ĐỎ sau `vai-dang-nhap đạt`, rồi `DỪNG ở <bước> — tên miền không đổi`                                                                                                 | Tên miền vẫn ở bản dựng trước lượt xoay: đã mất kết nối từ lúc `vai-dang-nhap đạt`.                                                                                                                                                                                                             | Coi như sự cố: đừng lùi; sửa nguyên nhân và chạy lại `make deploy` ngay.                                                                              |
+| `kiem-nhanh-ten-mien ĐỎ`, rồi `đã lùi về bản trước`                                                                                                                                                                     | Lệnh chỉ in dòng này khi bản trước vừa qua kiểm nhanh, kể cả `"vai":"dat"`: lúc kiểm, nó nối được. Sau khi xoay, điều ấy chỉ xảy ra khi bản trước cũng dựng từ lượt xoay trở đi (một lượt chạy lại đã gắn tên miền).                                                                            | Mở sức khoẻ để chắc; `vai` chưa đạt thì làm như dòng `lùi bản ĐỎ — tên miền đã về bản` dưới. Rồi tìm nguyên nhân đỏ như dòng `kiem-nhanh` cùng lý do. |
+| `kiem-nhanh-ten-mien ĐỎ`, rồi `lùi bản DỪNG — không đọc được bản tên miền trỏ tới trước khi gắn`, `lùi bản DỪNG — không đọc được mã bản mới` hay `lùi bản DỪNG — trước khi gắn, tên miền đã trỏ vào chính bản mới <id>` | Lệnh không lùi: tên miền vẫn ở bản mới của lượt này, dựng sau bước `bien` nên mang mật khẩu mới — không mất kết nối vì mật khẩu. Lý do đỏ nằm ở dòng `kiem-nhanh-ten-mien ĐỎ` ngay trên.                                                                                                        | Đừng chọn bản trong danh sách in kèm, trừ bản tạo sau giờ lượt xoay. Sửa nguyên nhân, chạy lại.                                                       |
+| `kiem-nhanh-ten-mien ĐỎ`, rồi `lùi bản ĐỎ — vercel rollback lỗi` hay `lùi bản ĐỎ — tên miền chưa về bản <id>`                                                                                                           | Không chắc tên miền đang ở bản nào.                                                                                                                                                                                                                                                             | Mở sức khoẻ: `"vai":"dat"` là đang nối được. Đừng lùi tay về bản dựng trước lượt xoay; sửa nguyên nhân, chạy lại.                                     |
+| `lùi bản ĐỎ — không đọc được danh sách bản của Vercel` (dòng phụ)                                                                                                                                                       | Lệnh in dòng này ngay sau một dòng `lùi bản …` khác, khi không đọc được danh sách bản để in kèm. Tên miền ở đâu là theo dòng đứng trước nó: sau một dòng `lùi bản DỪNG` thì ở bản mới; sau `lùi bản ĐỎ — tên miền đã về bản` thì ở bản trước; sau hai dòng `lùi bản ĐỎ` còn lại thì không chắc. | Làm theo hàng của dòng đứng trước nó.                                                                                                                 |
+| `kiem-nhanh-ten-mien ĐỎ`, rồi `lùi bản ĐỎ — tên miền đã về bản <id> nhưng kiểm nhanh đỏ: <lý do>`                                                                                                                       | Lệnh tự lùi đã chuyển tên miền khỏi bản mới còn nối được, về bản dựng trước lượt xoay: mất kết nối, lý do là `sức khoẻ ok khác true (vai: …)`. Đây là dòng hay gặp nhất khi lượt xoay đỏ ở bước cuối.                                                                                           | Coi như sự cố: đừng lùi tiếp; sửa nguyên nhân của dòng `kiem-nhanh-ten-mien ĐỎ` đầu tiên và chạy lại `make deploy` ngay.                              |
+| `rollback <ENV>: kiem-nhanh-ten-mien ĐỎ — sức khoẻ ok khác true (vai: …)` (của `make rollback`)                                                                                                                         | Bản vừa chọn dựng trước lượt xoay; tên miền đang ở nó, mất kết nối.                                                                                                                                                                                                                             | Đừng thử bản cũ hơn: bản nào cũng vậy. Chọn bản tạo sau giờ lượt xoay; không có thì đưa bản sửa lên.                                                  |
+| Instant Rollback trên trang Vercel                                                                                                                                                                                      | Không kiểm gì: bản dựng trước lượt xoay không nối được.                                                                                                                                                                                                                                         | Chỉ chọn bản tạo sau giờ lượt xoay.                                                                                                                   |
+
 ## Đỏ thì làm gì
 
 - Một bước đỏ mà chưa thu hồi khoá cũ: chạy lại bước 2 với giá trị cũ là bản trở lại như trước (trừ mật khẩu vai đăng
   nhập đã đặt vào cơ sở dữ liệu: đưa lại bản cho xanh để Vercel nhận mật khẩu mới).
-- Bản không nối được cơ sở dữ liệu sau khi xoay mật khẩu vai đăng nhập và lần đưa bản đỏ: đừng lùi bản — bản cũ cũng
-  dùng mật khẩu cũ. Sửa nguyên nhân đỏ rồi chạy lại bước 4.
+- Lần đưa bản đỏ sau khi xoay mật khẩu vai đăng nhập: đừng lùi bản trước khi đọc mục «Lùi bản sau khi xoay mật khẩu vai
+  đăng nhập» ở trên; thường là sửa nguyên nhân đỏ rồi chạy lại bước 4.
 - Khoá lộ mà không tạo được khoá mới (mất quyền quản trị): thu hồi khoá lộ trước, chấp nhận gián đoạn, rồi xin lại quyền.
 - Sau khi xong, ghi một mục sổ wiki bằng `make log m="<khoá nào, môi trường nào>"` (lệnh tự thêm ngày) — không ghi giá trị.
   Đừng sửa tay `wiki/log.md`: tệp ấy vẽ ra từ `wiki/log/`.

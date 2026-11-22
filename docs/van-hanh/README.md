@@ -1,5 +1,9 @@
 # Sổ tay vận hành
 
+> **Đã xoay mật khẩu vai đăng nhập?** Mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» của [xoay-khoa.md](xoay-khoa.md)
+> thắng mọi câu của sổ này về lùi bản và về việc bản đang chạy có yên không. Đọc nó trước khi lùi bản, và khi một lượt
+> đưa bản lên đỏ lúc vừa xoay.
+
 Sổ tay cho người đưa Inventory lên mạng và giữ nó chạy: bản thử (staging) và bản thật (production) ở
 `https://inventory.onehub.center`. Mỗi môi trường là một dự án Vercel riêng và một cơ sở dữ liệu Supabase riêng, cùng ở
 Singapore. Mọi việc trong kho đi qua một lệnh `make`; việc ngoài kho (tài khoản, khoá, tên miền) do chủ kho làm theo danh
@@ -13,29 +17,29 @@ Hai vai sổ tay gọi tên:
 
 ## Các quy trình
 
-| Quy trình         | Khi nào                                                         | Tệp                                          |
-| ----------------- | --------------------------------------------------------------- | -------------------------------------------- |
-| Đưa bản lên       | Có bản phát hành mới, hoặc vừa đổi biến trên Vercel             | [dua-ban-len.md](dua-ban-len.md)             |
-| Lùi bản           | Bản đang chạy hỏng sau khi lên                                  | [lui-ban.md](lui-ban.md)                     |
-| Xoay khoá bí mật  | Khoá lộ, người giữ khoá rời đi, hay tới hạn đổi                 | [xoay-khoa.md](xoay-khoa.md)                 |
-| Khôi phục dữ liệu | Thử khôi phục lúc ra mắt rồi mỗi quý; mất hay hỏng dữ liệu thật | [khoi-phuc.md](khoi-phuc.md)                 |
-| Nhật ký khôi phục | Ghi mỗi lần thử khôi phục                                       | [nhat-ky-khoi-phuc.md](nhat-ky-khoi-phuc.md) |
+| Quy trình         | Khi nào                                                                                                                                                          | Tệp                                          |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| Đưa bản lên       | Có bản phát hành mới, hoặc vừa đổi biến trên Vercel                                                                                                              | [dua-ban-len.md](dua-ban-len.md)             |
+| Lùi bản           | Bản đang chạy hỏng sau khi lên; vừa xoay mật khẩu vai đăng nhập thì đọc trước mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» của [xoay-khoa.md](xoay-khoa.md) | [lui-ban.md](lui-ban.md)                     |
+| Xoay khoá bí mật  | Khoá lộ, người giữ khoá rời đi, hay tới hạn đổi                                                                                                                  | [xoay-khoa.md](xoay-khoa.md)                 |
+| Khôi phục dữ liệu | Thử khôi phục lúc ra mắt rồi mỗi quý; mất hay hỏng dữ liệu thật                                                                                                  | [khoi-phuc.md](khoi-phuc.md)                 |
+| Nhật ký khôi phục | Ghi mỗi lần thử khôi phục                                                                                                                                        | [nhat-ky-khoi-phuc.md](nhat-ky-khoi-phuc.md) |
 
 Mỗi bước trong bốn quy trình ghi bốn điều: làm ở đâu, gõ hay bấm gì, thấy gì là đạt, đỏ thì làm gì. Mỗi việc ngoài kho
 (mục cuối) cũng ghi «Đạt khi» và «Đỏ thì».
 
 ## Lệnh của kho
 
-| Lệnh                           | Làm gì                                                                                                                                                  |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `make dat-khoa`                | Hỏi ẩn các khoá do dịch vụ cấp, tự sinh hai khoá, đặt tất cả vào hai môi trường GitHub                                                                  |
-| `make deploy ENV=staging`      | Đưa commit đang đứng lên bản thử: kiểm cấu hình, áp migration, đặt mật khẩu vai đăng nhập, kiểm cách ly, đẩy biến sang Vercel, dựng, kiểm, gắn tên miền |
-| `make deploy ENV=production`   | Như trên cho bản thật; trước hết đòi bản thử đã chạy đúng commit này                                                                                    |
-| `make smoke ENV=staging`       | Kiểm nhanh chỉ đọc địa chỉ `APP_URL` của môi trường                                                                                                     |
-| `make rollback ENV=production` | Trỏ tên miền về bản trước, rồi kiểm nhanh                                                                                                               |
-| `make cach-ly-dich`            | Bộ kiểm cách ly chỉ đọc trên một cơ sở dữ liệu đích                                                                                                     |
-| `make sao-luu TEP=<tệp>`       | Sao lưu cơ sở dữ liệu đích ra một tệp ngoài kho, kèm tệp đếm dòng                                                                                       |
-| `make khoi-phuc-thu TEP=<tệp>` | Thử khôi phục tệp sao lưu vào một cơ sở nháp, đếm dòng, kiểm cách ly, in dòng cho nhật ký                                                               |
+| Lệnh                           | Làm gì                                                                                                                                                                      |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `make dat-khoa`                | Hỏi ẩn các khoá do dịch vụ cấp, tự sinh hai khoá, đặt tất cả vào hai môi trường GitHub                                                                                      |
+| `make deploy ENV=staging`      | Đưa commit đang đứng lên bản thử: kiểm cấu hình, áp migration, đặt mật khẩu vai đăng nhập, kiểm cách ly, đẩy biến sang Vercel, dựng, kiểm, gắn tên miền                     |
+| `make deploy ENV=production`   | Như trên cho bản thật; trước hết đòi bản thử đã chạy đúng commit này                                                                                                        |
+| `make smoke ENV=staging`       | Kiểm nhanh chỉ đọc địa chỉ `APP_URL` của môi trường                                                                                                                         |
+| `make rollback ENV=production` | Trỏ tên miền về bản trước, rồi kiểm nhanh; vừa xoay mật khẩu vai đăng nhập thì đọc trước mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» của [xoay-khoa.md](xoay-khoa.md) |
+| `make cach-ly-dich`            | Bộ kiểm cách ly chỉ đọc trên một cơ sở dữ liệu đích                                                                                                                         |
+| `make sao-luu TEP=<tệp>`       | Sao lưu cơ sở dữ liệu đích ra một tệp ngoài kho, kèm tệp đếm dòng                                                                                                           |
+| `make khoi-phuc-thu TEP=<tệp>` | Thử khôi phục tệp sao lưu vào một cơ sở nháp, đếm dòng, kiểm cách ly, in dòng cho nhật ký                                                                                   |
 
 `ENV` nhận `staging` hoặc `production`. Lệnh chỉ kiểm biến có mặt, không bao giờ in giá trị.
 
@@ -243,7 +247,8 @@ violates unique constraint "users_email_key"` — địa chỉ ấy đã có tà
     dòng. Lần thử khôi phục đầu theo [khoi-phuc.md](khoi-phuc.md) cần chuỗi vai đăng nhập trên máy chủ kho: xem «Mật khẩu
     vai đăng nhập ở máy chủ kho» dưới. Máy nhận lại: không biến mới.
     - **Đạt khi:** `smoke staging: đạt <commit>` và `smoke production: đạt <commit>`.
-    - **Đỏ thì:** lùi bản theo [lui-ban.md](lui-ban.md), rồi tìm nguyên nhân.
+    - **Đỏ thì:** lùi bản theo [lui-ban.md](lui-ban.md), rồi tìm nguyên nhân; vừa xoay mật khẩu vai đăng nhập thì đọc
+      trước mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» của [xoay-khoa.md](xoay-khoa.md).
 
 ### Mật khẩu vai đăng nhập ở máy chủ kho
 
@@ -252,7 +257,8 @@ violates unique constraint "users_email_key"` — địa chỉ ấy đã có tà
 khôi phục, đưa bản lên từ máy chủ kho). Muốn làm những việc ấy, chủ kho tự giữ mật khẩu vai: sinh trong trình giữ mật
 khẩu một chuỗi chữ và số từ 24 ký tự, đặt bằng `gh secret set LOGIN_DB_PASSWORD --env <env>` (lệnh hỏi giá trị), rồi
 chạy một lượt Deploy để bước `vai-dang-nhap` đặt nó vào cơ sở dữ liệu. Từ đó `make dat-khoa` giữ nguyên khoá ấy; chỉ
-`make dat-khoa XOAY=1` sinh lại nó.
+`make dat-khoa XOAY=1` sinh lại nó. Lượt Deploy đặt mật khẩu tự giữ ấy cũng là một lần xoay mật khẩu vai đăng nhập: sau
+lượt ấy, đọc mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» của [xoay-khoa.md](xoay-khoa.md) trước khi lùi bản.
 
 ## Bảng biến
 
