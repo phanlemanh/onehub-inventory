@@ -12,7 +12,7 @@ flowchart TD
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
   GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
-  GB --> DG["Đã giao<br/>18 việc"]
+  GB --> DG["Đã giao<br/>19 việc"]
   GB --> CN["Chờ phiên nghiệm thu<br/>52 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
@@ -92,6 +92,7 @@ flowchart TD
 ## Đã giao
 
 - Nhận plugin design-assembly — lệnh kiểm chạy lại lint của kho, sổ linh kiện do công cụ của plugin ghi thay công cụ viết tay (`adopt-design-assembly`)
+- Bước bien chạy trước bước vai-dang-nhap — Vercel lỗi lúc đang xoay mật khẩu vai đăng nhập thì bản thật không bị đụng; sổ tay nói thẳng khi nào bản đang chạy đã mất kết nối (`bien-do-sau-xoay-mat-khau`)
 - Bước bien đọc câu trả lời của Vercel — Vercel trả thành công mà từ chối hay không xác nhận ghi một biến, hoặc trả danh sách biến lạ khuôn, thì lệnh đưa bản lên dừng ở bien, gọi tên biến, không in giá trị, tên miền không đổi (`bien-vercel-tu-choi`)
 - Hook commit-msg của kho (tools/commit_msg.py) nhận đúng các tiêu đề commit kit nghiệm thu v3.0.0 tự viết — Gate 2 signoff, Veto, repin, wip(ban-giao) — để job conventional-commits không đỏ trên PR qua Cổng 2 (`commit-msg-kit-subjects`)
 - Một lệnh đặt khoá — chủ kho dán mỗi khoá do dịch vụ cấp một lần vào make dat-khoa; lệnh đưa bản lên tự đặt mật khẩu vai đăng nhập và tự đẩy biến sang Vercel; sổ tay chỉ còn phần của chủ kho; quyền đứng cho hạ tầng Inventory (`dat-khoa-mot-lenh`)

@@ -1,0 +1,6 @@
+{
+  "feature_plain": "Lệnh đưa bản lên đẩy biến sang Vercel trước rồi mới đổi mật khẩu cơ sở dữ liệu, nên Vercel lỗi lúc đang xoay khoá không còn làm bản thật mất kết nối; mục «Đỏ thì làm gì» của sổ vận hành nói rõ lúc nào bản đang chạy đã mất kết nối.",
+  "decisions": [
+    {"id": "E5", "q": "Mục «Đỏ thì làm gì» có đủ rõ cho người vừa xoay mật khẩu?", "why": "Ba người chấm độc lập cùng đề xuất ĐẠT ở lượt 3: ba vùng đúng, có lời dặn không dựng lại trên Vercel và không lùi về bản cũ."}
+  ]
+}

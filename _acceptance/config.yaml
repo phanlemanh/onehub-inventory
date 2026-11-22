@@ -229,6 +229,7 @@ executors:
     lnt_chay_that: "node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/chay-that.mjs"   # lint-bo-qua-thu-muc-ngoai-git: npm run lint stays green with a broken file planted in the out-of-git folders
     lnt_kiem_tron: "node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/kiem-tron.mjs"   # lint-bo-qua-thu-muc-ngoai-git: make check stays green with a file each step would fail on planted in both out-of-git folders
     lnt_two_way: "node --test _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/two-way.mjs"   # lint-bo-qua-thu-muc-ngoai-git: each measure green on the sound object, red with its pinned message on a broken copy
+    bdx_ghi_chep: "node _acceptance/bien-do-sau-xoay-mat-khau/rang/ghi-chep.mjs && node _acceptance/bien-do-sau-xoay-mat-khau/rang/ghi-chep.mjs --tu-kiem"   # bien-do-sau-xoay-mat-khau: decision 0048, README step order and the len-ban.mjs header follow STEPS
   ui-check: "npx playwright screenshot"   # ui-check graders of a grading round (row 9c): the screen opened or captured in a browser and looked at; same command as capture.ui
   design:
     floor: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/design-floor-s4.mjs\" --root ."   # design-floor at S4: raw hex on touched UI files

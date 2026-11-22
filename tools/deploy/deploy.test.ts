@@ -20,7 +20,7 @@ import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { tempDir } from "../../tests/support/temp-dir";
-import { confirmedKeys, refusedItems } from "./len-ban.mjs";
+import { confirmedKeys, refusedItems, STEPS as STEPS_CODE } from "./len-ban.mjs";
 import { parseVerifier, scramKeys, scramVerifier, serverCheck } from "./scram.mjs";
 
 const HERE = resolve(__dirname);
@@ -30,30 +30,8 @@ const KIEM_NHANH = join(HERE, "kiem-nhanh.mjs");
 const DEPLOY_MK = resolve(HERE, "../../mk/deploy.mk");
 
 type Env = "staging" | "production";
-const STEPS: Record<Env, string[]> = {
-  staging: [
-    "cau-hinh",
-    "migration",
-    "vai-dang-nhap",
-    "cach-ly",
-    "bien",
-    "dung",
-    "kiem-nhanh",
-    "gan-ten-mien",
-    "kiem-nhanh-ten-mien",
-  ],
-  production: [
-    "cau-hinh",
-    "ban-thu-truoc",
-    "migration",
-    "vai-dang-nhap",
-    "bien",
-    "dung",
-    "kiem-nhanh",
-    "gan-ten-mien",
-    "kiem-nhanh-ten-mien",
-  ],
-};
+/** The step order of make deploy, read from the code itself (row bien-do-sau-xoay-mat-khau): no copy to drift. */
+const STEPS = STEPS_CODE as Record<Env, string[]>;
 const COMMON = [
   "VERCEL_TOKEN",
   "VERCEL_ORG_ID",
@@ -516,6 +494,11 @@ function expectNoMarker(_ctx: Ctx, r: Run): void {
   expect(markerLeak(runText(r))).toBeNull();
 }
 
+/** How many times the fake psql received the statement that sets the login role's password. */
+function vaiCalls(r: Run): number {
+  return r.calls.filter((c) => c === "psql vai").length;
+}
+
 function expectGreen(ctx: Ctx, appEnv: Env, r: Run): void {
   expect(r.code, r.stdout + r.stderr).toBe(0);
   expect(r.lines).toEqual([
@@ -539,16 +522,18 @@ function expectGreen(ctx: Ctx, appEnv: Env, r: Run): void {
   expect(apply).toBeGreaterThanOrEqual(0);
   expect(apply).toBeLessThan(firstVercel);
   expect(applied(ctx)).toEqual(["001_a.sql", "002_b.sql"]);
-  // Row dat-khoa-mot-lenh: the login role's password after the migrations, the variables before the first vercel call.
+  // Row bien-do-sau-xoay-mat-khau: migrations, then the variables to Vercel, then the login role's password (exactly
+  // once), then the first vercel call — so a Vercel failure never changes the password.
+  const post = r.calls.indexOf("api POST /v10/projects/<id>/env");
   const vai = r.calls.indexOf("psql vai");
-  expect(vai).toBeGreaterThan(apply);
+  expect(post).toBeGreaterThan(apply);
+  expect(vai).toBeGreaterThan(post);
   expect(vai).toBeLessThan(firstVercel);
+  expect(vaiCalls(r)).toBe(1);
   expect(ctx.api.map((c) => `${c.method} ${c.path}`)).toEqual([
     `GET /v9/projects/moc-bi-mat-VERCEL_PROJECT_ID/env?teamId=moc-bi-mat-VERCEL_ORG_ID`,
     `POST /v10/projects/moc-bi-mat-VERCEL_PROJECT_ID/env?upsert=true&teamId=moc-bi-mat-VERCEL_ORG_ID`,
   ]);
-  expect(r.calls.indexOf("api POST /v10/projects/<id>/env")).toBeGreaterThan(vai);
-  expect(r.calls.indexOf("api POST /v10/projects/<id>/env")).toBeLessThan(firstVercel);
   expectNoMarker(ctx, r);
 }
 
@@ -847,12 +832,13 @@ describe("make deploy — ma trận bước đỏ", () => {
           expect(r.vercel).toEqual([]);
           expect(r.calls.some((x) => x.startsWith("psql"))).toBe(false);
         }
-        // Row dat-khoa-mot-lenh: a step red before the build calls no vercel command at all, and writes nothing to
-        // the Vercel project.
-        if (at < steps.indexOf("dung")) {
-          expect(r.vercel).toEqual([]);
+        // Rows dat-khoa-mot-lenh and bien-do-sau-xoay-mat-khau, by position in the order: a step red before bien
+        // writes nothing to the Vercel project; before the build, no vercel command at all; before vai-dang-nhap, no
+        // password is set.
+        if (at < steps.indexOf("bien"))
           expect(ctx.api.some((c) => c.method === "POST")).toBe(false);
-        }
+        if (at < steps.indexOf("dung")) expect(r.vercel).toEqual([]);
+        if (at < steps.indexOf("vai-dang-nhap")) expect(vaiCalls(r)).toBe(0);
         expectNoMarker(ctx, r);
       });
     }
@@ -1711,5 +1697,162 @@ describe("E6 · sổ tay có hàng cho mỗi lý do đỏ mới của bien", () 
     expect(soTayFindings(broken)).toEqual([
       "sổ tay thiếu hàng bien: Vercel từ chối ghi biến <tên>",
     ]);
+  });
+});
+
+// ── Row bien-do-sau-xoay-mat-khau: bien before vai-dang-nhap (E1–E4 of _acceptance/bien-do-sau-xoay-mat-khau) ──────
+
+describe("E1 · thứ tự bước khai trong mã", () => {
+  it("E1 · thứ tự khai: bien trước vai-dang-nhap ở cả hai môi trường", () => {
+    expect(STEPS.staging).toEqual([
+      "cau-hinh",
+      "migration",
+      "bien",
+      "vai-dang-nhap",
+      "cach-ly",
+      "dung",
+      "kiem-nhanh",
+      "gan-ten-mien",
+      "kiem-nhanh-ten-mien",
+    ]);
+    expect(STEPS.production).toEqual([
+      "cau-hinh",
+      "ban-thu-truoc",
+      "migration",
+      "bien",
+      "vai-dang-nhap",
+      "dung",
+      "kiem-nhanh",
+      "gan-ten-mien",
+      "kiem-nhanh-ten-mien",
+    ]);
+  });
+});
+
+describe("E3 · vai-dang-nhap đỏ sau khi đã ghi biến", () => {
+  for (const appEnv of ["staging", "production"] as const) {
+    it(`E3 · ${appEnv} · vai-dang-nhap đỏ sau khi ghi biến: một lần ghi, một lần gửi câu đặt mật khẩu, không dựng`, async () => {
+      const ctx = await fresh(appEnv);
+      writeFileSync(join(ctx.fake, "vai-chua-co"), "");
+      const r = await deploy(ctx, appEnv);
+      expect(r.code).not.toBe(0);
+      expect(r.lines).toContain(
+        `deploy ${appEnv}: vai-dang-nhap ĐỎ — không đặt được mật khẩu vai đăng nhập: role "quy_hang_login" does not exist`,
+      );
+      expect(r.lines.at(-1)).toBe(`deploy ${appEnv}: DỪNG ở vai-dang-nhap — tên miền không đổi`);
+      expect(ctx.api.filter((c) => c.method === "POST")).toHaveLength(1);
+      expect(vaiCalls(r)).toBe(1);
+      expect(r.calls.indexOf("api POST /v10/projects/<id>/env")).toBeLessThan(
+        r.calls.indexOf("psql vai"),
+      );
+      expect(r.vercel).toEqual([]);
+      expect(domainId(ctx)).toBe("dpl_cu");
+      expectNoMarker(ctx, r);
+    });
+  }
+});
+
+describe("E2 · bước bien đỏ thì không đặt mật khẩu vai đăng nhập", () => {
+  const cells: { name: string; arrange: (ctx: Ctx) => void; reason: string }[] = [
+    {
+      name: "biến cấm MIGRATE_DATABASE_URL",
+      arrange: (ctx) => {
+        ctx.vercelEnvs = ["MIGRATE_DATABASE_URL"];
+      },
+      reason: "dự án Vercel đang có biến cấm MIGRATE_DATABASE_URL",
+    },
+    {
+      name: "Vercel trả 403",
+      arrange: (ctx) => {
+        ctx.apiStatus = 403;
+      },
+      reason: "Vercel trả 403",
+    },
+    {
+      name: "từ chối AUTH_SECRET",
+      arrange: refusal([{ error: { key: "AUTH_SECRET", message: "x" } }]),
+      reason: "Vercel từ chối ghi biến AUTH_SECRET",
+    },
+    {
+      name: "created rỗng",
+      arrange: (ctx) => {
+        ctx.vercelReply.post = { status: 201, body: { created: [], failed: [] } };
+      },
+      reason: `Vercel không xác nhận đã ghi biến ${SIX.join(", ")}`,
+    },
+    {
+      name: "danh sách không có envs",
+      arrange: (ctx) => {
+        ctx.vercelReply.get = { status: 200, body: { key: "APP_URL", type: "plain", value: "x" } };
+      },
+      reason: "Vercel trả danh sách biến không đúng khuôn",
+    },
+  ];
+  for (const appEnv of ["staging", "production"] as const) {
+    for (const c of cells) {
+      it(`E2 · ${appEnv} · ${c.name}: dừng ở bien, mật khẩu không đặt`, async () => {
+        const ctx = await fresh(appEnv);
+        c.arrange(ctx);
+        const r = await deploy(ctx, appEnv);
+        expect(r.code).not.toBe(0);
+        expect(r.lines).toContain(`deploy ${appEnv}: bien ĐỎ — ${c.reason}`);
+        expect(r.lines.at(-1)).toBe(`deploy ${appEnv}: DỪNG ở bien — tên miền không đổi`);
+        expect(vaiCalls(r)).toBe(0);
+        expect(existsSync(join(ctx.fake, "vai.sql"))).toBe(false);
+        expect(r.vercel).toEqual([]);
+        expect(domainId(ctx)).toBe("dpl_cu");
+        expectNoMarker(ctx, r);
+      });
+    }
+  }
+});
+
+/** The «Đạt khi» bullet of a numbered step section of the deploy runbook, up to the next bullet. */
+function datKhi(md: string, buoc: number): string {
+  const start = md.search(new RegExp(`^### ${buoc}\\. `, "m"));
+  if (start < 0) return "";
+  const section = md.slice(start).split(/\n### /)[0]!;
+  const m = /- \*\*Đạt khi:\*\*([\s\S]*?)(?=\n- \*\*|$)/.exec(section);
+  return m ? m[1]! : "";
+}
+
+/** Findings when the runbook's «Đạt khi» lines of bước 2 (staging) and bước 5 (production) list the steps out of order. */
+function thuTuSoTay(md: string): string[] {
+  const out: string[] = [];
+  for (const [buoc, appEnv] of [
+    [2, "staging"],
+    [5, "production"],
+  ] as const) {
+    const text = datKhi(md, buoc);
+    const found = STEPS[appEnv]
+      .map((s) => ({ s, at: text.search(new RegExp(`(?<![\\w-])${s} đạt`)) }))
+      .filter((x) => x.at >= 0)
+      .sort((a, b) => a.at - b.at)
+      .map((x) => x.s);
+    if (JSON.stringify(found) !== JSON.stringify(STEPS[appEnv])) {
+      out.push(`sổ tay bước ${buoc}: thứ tự lệch STEPS.${appEnv}`);
+    }
+  }
+  return out;
+}
+
+describe("E4 · sổ tay kể đúng thứ tự bước của lệnh", () => {
+  const md = readFileSync(resolve(HERE, "../../docs/van-hanh/dua-ban-len.md"), "utf8");
+
+  it("E4 · sổ tay kể đúng thứ tự bước", () => {
+    expect(thuTuSoTay(md)).toEqual([]);
+  });
+
+  it("E4 · chiều đỏ: hoán vai-dang-nhap với bien ở bước 2 → hàm so gọi tên bước 2", () => {
+    const start = md.search(/^### 2\. /m);
+    const end = md.search(/^### 3\. /m);
+    const swapped = md
+      .slice(start, end)
+      .replace("`vai-dang-nhap đạt`", "@@")
+      .replace("`bien đạt`", "`vai-dang-nhap đạt`")
+      .replace("@@", "`bien đạt`");
+    const broken = md.slice(0, start) + swapped + md.slice(end);
+    expect(broken).not.toBe(md);
+    expect(thuTuSoTay(broken)).toEqual(["sổ tay bước 2: thứ tự lệch STEPS.staging"]);
   });
 });
