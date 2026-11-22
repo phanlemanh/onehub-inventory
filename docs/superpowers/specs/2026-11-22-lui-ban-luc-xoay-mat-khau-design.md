@@ -117,8 +117,8 @@ tiêu đề. Bốn luật, mỗi luật một hàm trả danh sách lỗi:
   chúng phân biệt. Chỉ hàng bảng được tính, không phần Luật. Mã thêm một dòng lùi bản mới thì thước đỏ tới khi bảng kể nó.
 - **Trỏ tới.** Ngoài mục ấy, mọi đoạn khớp mẫu lùi bản (`lùi`, `rollback`, `lui-ban.md`, không phân hoa thường) mang câu
   trỏ: tên mục trong «», kèm liên kết `xoay-khoa.md` khi đoạn ở tệp khác. Riêng `lui-ban.md`: luật này áp cho đoạn mở đầu,
-  «Khi nào dùng» (ít nhất một mục), và mọi đoạn khớp mẫu lối thử bản khác (`bản cũ hơn`, `trang Vercel`, `Instant
-  Rollback`, `kiem-nhanh-ten-mien ĐỎ`). Thêm: ngoài `xoay-khoa.md`, mọi đoạn nhắc xoay mật khẩu vai đăng nhập (mẫu
+  «Khi nào dùng» (ít nhất một mục), và mọi đoạn khớp mẫu lối thử bản khác (`một bản cũ hơn`, `trang Vercel`, `Instant
+Rollback`, `kiem-nhanh-ten-mien ĐỎ`). Thêm: ngoài `xoay-khoa.md`, mọi đoạn nhắc xoay mật khẩu vai đăng nhập (mẫu
   `xoay` và `mật khẩu vai đăng nhập` trong cùng đoạn) mang câu trỏ.
 - **Không kể lại.** Ngoài mục ấy, không đoạn nào chứa `mật khẩu cũ` — lý do lùi bản không cứu được chỉ nằm một chỗ.
 
