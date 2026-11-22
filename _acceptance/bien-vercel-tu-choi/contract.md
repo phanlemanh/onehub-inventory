@@ -5,7 +5,7 @@ slug: bien-vercel-tu-choi
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-22
 design_doc: docs/superpowers/specs/2026-11-22-bien-vercel-tu-choi-design.md
@@ -133,3 +133,12 @@ a project], đọc 22/11.
 
 - Hạng T3: vòng sửa `tools/**`.
 - Không có màn nào: không có nghi thức thiết kế giao diện, không có đặc tả UX (dòng `descope` trong sổ).
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-22:
+  - Ngoài-2: Bảng kế hoạch chấm ghi hai dòng báo lỗi mẫu (E1-b, E1-c) thiếu phần mã lỗi, khác với dòng lệnh thật in ra;
+    người chấm đọc bảng có thể tưởng hai ca là sai dù lệnh chạy đúng.
+  - Ngoài-3: Cùng chỗ lệch ấy, ghi lại lần hai từ một lượt soi khác.
+  - Ngoài-4: Phép kiểm sổ tay so với ba lý do gõ tay, không với dòng đỏ mã thật in; đổi lời một dòng đỏ hay thêm lý do
+    mới mà quên sửa sổ tay thì phép kiểm vẫn xanh.
+- Ngoài hợp đồng: Ngoài-1 (vừa xoay mật khẩu vai đăng nhập mà bước `bien` đỏ thì hàng sổ tay mới nói bản thật không bị
+  ảnh hưởng, trong khi nó có thể đã mất kết nối cơ sở dữ liệu) — chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng
+  2026-11-22.

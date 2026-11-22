@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: bien-vercel-tu-choi
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 8139ed3d4968821c43711d0db8f717b3cdd10d25
-human_signoff:
+human_signoff: Manh Phan 2026-11-22
 ---
 
 # Evidence Report: bien-vercel-tu-choi
@@ -119,7 +119,7 @@ human_signoff:
     - domain-correctness: PASS — Ba hàng `bien` mới (dòng 102–104 của dua-ban-len.md) đều nói «Bản chưa dựng, tên miền không đổi» và cho việc kế tiếp: gửi nguyên dòng đỏ cho người giữ kho mã, hoặc chạy lại một lần rồi mới gửi. Không hàng nào bảo in, dán hay gửi giá trị khoá, vì chỉ gửi dòng đỏ có tên biến và mã lỗi. Không hàng nào bảo xoá hay sửa biến trên Vercel, vì cả ba nói «Không xoá hay sửa». Cột «Làm gì» không có tên hàm hay tên trường JSON. Hàng thứ ba có mặt vì hợp đồng vẫn còn AC-4.
     - operational-feasibility: PASS — Ba hàng `bien` mới (dòng 102–104) đều nói «Bản chưa dựng, tên miền không đổi» và có việc kế tiếp (gửi nguyên dòng đỏ cho người giữ kho mã, hoặc chạy lại một lần rồi mới báo). Không hàng nào bảo in, dán hay gửi giá trị của khoá, vì chỉ gửi dòng đỏ có tên biến. Hai hàng đầu chỉ nhắc xoá hay sửa biến để cấm («Không xoá hay sửa biến…»). Lời dùng tiếng người vận hành, không có tên hàm hay tên trường JSON như `failed`, `created` hay `envs`. Hàng thứ ba có mặt đúng vì hợp đồng còn AC-4.
     - spec-alignment: PASS — Cả ba hàng `bien` mới (dòng 102–104 của dua-ban-len.md) đều nói «Bản chưa dựng, tên miền không đổi» và nêu việc tiếp theo. Hàng từ chối ghi bảo gửi nguyên dòng đỏ cho người giữ kho mã, hai hàng còn lại bảo chạy lại một lần rồi mới gửi. Không hàng nào bảo in, dán hay gửi giá trị của khoá. Hai hàng đầu cấm rõ việc xoá hay sửa biến trên Vercel, hàng thứ ba không đụng tới biến. Lời viết theo tiếng người vận hành, không có tên hàm hay tên trường JSON ngoài chính dòng đỏ. Hợp đồng còn AC-4 nên hàng thứ ba là bắt buộc và có mặt.
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-22 — Đạt
 
 ## Known limits
 
