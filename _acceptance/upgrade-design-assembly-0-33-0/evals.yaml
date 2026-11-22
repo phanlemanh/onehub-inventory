@@ -2,15 +2,18 @@ schema_version: 1
 feature_slug: upgrade-design-assembly-0-33-0
 # Ma trận viết trước (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
 #   Commit lên đời thứ nhất: 26ab13af, cha 6ce94d9f; 28 tệp (26 tệp công cụ, dấu phiên bản, một dòng wiki/log/).
-#   Bản đích: 0.36.1. Mã cây, số tệp, mã bước cổng, danh sách tệp của commit chạy lại và lời hai hàng trên bản sao nông
-#     ghim từ bản xem trước và sổ phát hành của thư mục bản 0.36.1 trong bộ nhớ đệm plugin, sau khi bản ấy cài (dòng sổ fix).
+#   Bản đích: 0.36.1 — cây f53b64535e01adcf1421d594d23413facdb455d5, 44 tệp; mk/design-assembly.mk
+#     15c4208b99e238f16a5d7b1826e66629ebf5d510 (sổ phát hành và mẫu của thư mục bản 0.36.1 trong bộ nhớ đệm plugin).
+#   Commit chạy lại: 9 tệp bản xem trước kê (adapters/vite.mjs, check.mjs, contract.mjs, derived.mjs, host-make.mjs,
+#     ledger.mjs, screen-facts.mjs, mk/design-assembly.mk, design/tool-stamp.json) và một tệp wiki/log/; mã commit và lời
+#     hai hàng trên bản sao nông ghim ở ma trận khi commit có (dòng sổ fix).
 #   Không phụ thuộc phiên bản: 19 quyết định giữ bởi 27 phép kiểm; độ tất định 47/67 (19 held, 28 claimed); 67 quyết định,
 #     trạng thái giống hệt với công cụ 0.7.1 (thư mục tools/design-assembly của 6ce94d9f). make check: 2607 đạt, 2 bỏ qua
 #     trên cây hiện tại; 294 linh kiện.
 #   Bản sao nông dựng như db/scripts/ci-thu.sh; origin là kho trung gian chia đối tượng với kho này, main ở
 #     merge-base(HEAD, origin/main) (hiện dda3487e).
 #   Nhánh được đổi: tools/design-assembly/, design/tool-stamp.json, mk/design-assembly.mk, wiki/log/, thư mục hồ sơ,
-#     design doc và kế hoạch 2026-11-22.
+#     design doc và kế hoạch 2026-11-22; PRODUCT-MAP.md và LO-TRINH.html chỉ ở dòng của hồ sơ này hay số đếm việc theo nấc.
 #   Cặp hai chiều: two-way.mjs (phép đo nhanh) và shallow-two-way.mjs (bản sao nông). Mỗi ca phá ghim một thông điệp,
 #     kê ở `expected` của từng eval.
 evals:
@@ -47,7 +50,7 @@ evals:
     cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/tool-tree.mjs
     layer: backend-effect
     paths: ["tools/design-assembly/**", "design/tool-stamp.json", "mk/design-assembly.mk", "_acceptance/upgrade-design-assembly-0-33-0/rang/**"]
-    expected: "exit 0; dòng 'tool: tools/design-assembly is the plugin's version <bản>, <n> files, tree <12 hex>; the stamp says the same; mk/design-assembly.mk is the template's; the installed plugin <bản> names that tree in its release ledger and its templates hold it' với <bản> là 0.36.1 và số tệp, mã cây ghim ở ma trận. Chiều đỏ: E5"
+    expected: "exit 0; dòng 'tool: tools/design-assembly is the plugin's version <bản>, <n> files, tree <12 hex>; the stamp says the same; mk/design-assembly.mk is the template's; the installed plugin <bản> names that tree in its release ledger and its templates hold it' với <bản> 0.36.1, <n> 44, mã cây f53b64535e01. Chiều đỏ: E5"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E5
     criterion: AC-3
@@ -100,7 +103,7 @@ evals:
     cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/change-list.mjs
     layer: backend-effect
     paths: ["**"]
-    expected: "exit 0; dòng 'changes: the upgrade commit changes its 28 files; the branch changes nothing beyond the upgrade and this record' (hoặc, khi đã gộp, 'the branch is in origin/main already, so only the commit was compared'). Chiều đỏ: E11"
+    expected: "exit 0; dòng 'changes: the upgrade commit changes its 28 files; the 0.36.1 rerun changes its 10 files; the branch changes nothing beyond the upgrades and this record' (hoặc, khi đã gộp, 'the branch is in origin/main already, so only the commit was compared'). Chiều đỏ: E11"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E11
     criterion: AC-6
@@ -109,5 +112,5 @@ evals:
     long_running: 5
     layer: backend-effect
     paths: ["_acceptance/upgrade-design-assembly-0-33-0/rang/**"]
-    expected: "exit 0; bài 'change-list' đỏ ở năm ca: commit đổi thêm một tệp → 'upgrade commit changed outside the list: design/theme.json'; commit thiếu một tệp → 'upgrade commit did not change: design/tool-stamp.json'; commit chạy lại đổi một tệp ngoài thư mục công cụ, dấu, bước cổng và wiki/log/ → 'rerun commit changed outside the tool: design/theme.json'; nhánh đổi thêm một tệp → 'branch changed beyond the upgrade and this record: Makefile'; nhánh đổi một tệp sổ → 'branch changed beyond the upgrade and this record: design/decisions.yaml'"
+    expected: "exit 0; bài 'change-list' đỏ ở sáu ca: commit đổi thêm một tệp → 'upgrade commit changed outside the list: design/theme.json'; commit thiếu một tệp → 'upgrade commit did not change: design/tool-stamp.json'; commit chạy lại đổi một tệp ngoài thư mục công cụ, dấu, bước cổng và wiki/log/ → 'rerun commit changed outside the tool: design/theme.json'; nhánh đổi thêm một tệp → 'branch changed beyond the upgrade and this record: Makefile'; nhánh đổi một tệp sổ → 'branch changed beyond the upgrade and this record: design/decisions.yaml'; bản đồ sản phẩm đổi một dòng của việc khác → 'PRODUCT-MAP.md changed a line that is not this record's'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

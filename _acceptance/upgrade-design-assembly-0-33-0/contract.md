@@ -5,9 +5,9 @@ slug: upgrade-design-assembly-0-33-0
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci]
-status: approved
-approved_by: Manh Phan
-approved_at: 2026-11-22
+status: draft
+approved_by:
+approved_at:
 design_doc: docs/superpowers/specs/2026-11-22-upgrade-design-assembly-0-33-0-design.md
 ---
 
@@ -37,9 +37,9 @@ chỉ phần máy, PR #107; đích đổi thành 0.36.1 cùng ngày); design doc
   trong AC-1 và lệnh tính in `determinism rate: 47/67 (70%)` cùng `19 held and re-run here, 28 claimed by another check and not
   re-run`; khi `design/theme.json` của một bản chép mất một phép kiểm thì phép đo đỏ vì cổng không in dòng 19/27.
 - AC-3: Given thư mục `tools/design-assembly/`, `design/tool-stamp.json` và `mk/design-assembly.mk` ở HEAD, When tính mã
-  git từ tên và nội dung tệp, Then dấu phiên bản ghi `0.36.1`, thư mục có đúng mã cây và số tệp mà sổ phát hành của
-  plugin 0.36.1 ghi (ghim ở ma trận sau khi bản ấy cài) và dấu ghi cùng mã, `mk/design-assembly.mk` bằng từng byte mẫu
-  bước cổng của 0.36.1; và trong thư mục bản 0.36.1 của plugin đã cài trên máy, sổ phát hành ghi đúng mã cây ấy, thư mục
+  git từ tên và nội dung tệp, Then dấu phiên bản ghi `0.36.1`, thư mục có 44 tệp và mã cây
+  `f53b64535e01adcf1421d594d23413facdb455d5` mà sổ phát hành của plugin 0.36.1 ghi, dấu ghi cùng mã, và
+  `mk/design-assembly.mk` có mã `15c4208b99e238f16a5d7b1826e66629ebf5d510` của mẫu bước cổng 0.36.1; và trong thư mục bản 0.36.1 của plugin đã cài trên máy, sổ phát hành ghi đúng mã cây ấy, thư mục
   mẫu công cụ có mã cây ấy và mẫu bước cổng có mã của `mk/design-assembly.mk`.
 - AC-4: Given sổ thiết kế của kho ở HEAD, When chạy lệnh tính độ tất định một lần với công cụ ở HEAD và một lần với
   công cụ 0.7.1 (thư mục `tools/design-assembly/` của `6ce94d9f`) trên cùng cây, Then cả hai thoát 0 và cho mỗi quyết
@@ -53,9 +53,10 @@ chỉ phần máy, PR #107; đích đổi thành 0.36.1 cùng ngày); design doc
   `main` thì lệnh không thoát 0 và cả hai hàng báo không có nhánh chính để so (ở 0.33.0: `origin has neither main nor
   master`).
 - AC-6: Given commit `26ab13af` và cha `6ce94d9f`, When kê tệp commit đổi, Then đúng 28 tệp của ma trận; commit chạy lại
-  `upgrade` với 0.36.1 đổi đúng danh sách mà bản xem trước kê (ghim ở ma trận), và danh sách ấy chỉ gồm tệp trong
-  `tools/design-assembly/`, `design/tool-stamp.json`, `mk/design-assembly.mk` và một tệp trong `wiki/log/`; và từ chỗ
-  nhánh rời `origin/main` tới HEAD, nhánh không đổi tệp nào ngoài các tệp ấy và thư mục
+  `upgrade` với 0.36.1 đổi đúng 9 tệp mà bản xem trước kê (7 tệp trong `tools/design-assembly/`, `mk/design-assembly.mk`,
+  `design/tool-stamp.json`) cùng một tệp trong `wiki/log/`; và từ chỗ nhánh rời `origin/main` tới HEAD, nhánh không đổi
+  tệp nào ngoài các tệp của hai commit ấy, `PRODUCT-MAP.md` và `LO-TRINH.html` ở đúng dòng nói hồ sơ này hay số đếm
+  việc theo nấc, và thư mục
   `_acceptance/upgrade-design-assembly-0-33-0/`, `docs/superpowers/specs/2026-11-22-upgrade-design-assembly-0-33-0-design.md`
   và `docs/superpowers/plans/2026-11-22-upgrade-design-assembly-0-33-0.md`. Khi nhánh đã vào `origin/main`, phép đo chỉ
   so commit và nói đúng điều đó.
@@ -94,8 +95,13 @@ coverage-scan».
 
 - Số không phụ thuộc phiên bản công cụ (19 và 27, 47/67, 67 quyết định, 294 linh kiện) đọc từ cây hiện tại. Lên đời chỉ
   phần máy không được đổi chúng: bản xem trước 0.36.1 hay lượt chấm thấy chúng đổi thì vòng dừng và trình chủ kho.
-- Số thuộc phiên bản 0.36.1 (mã cây, số tệp, mã bước cổng, danh sách tệp của commit chạy lại, lời hai hàng in trên bản
-  sao nông) ghim vào `rang/matrix.mjs` từ bản xem trước và sổ phát hành của plugin đã cài, kèm một dòng sổ `fix`. Gộp
+- Số thuộc phiên bản 0.36.1 (mã cây, số tệp, mã bước cổng, danh sách tệp) đọc từ bản xem trước và sổ phát hành của
+  plugin đã cài ngày 2026-11-22; mã commit chạy lại và lời hai hàng in trên bản sao nông ghim vào `rang/matrix.mjs` khi
+  commit có, kèm một dòng sổ `fix`.
+- Bước cổng 0.36.1 nối các bước dựng tệp suy ra vào danh sách chung khi bộ lệnh của kho có danh sách ấy; kho này chưa
+  có, nên bước cổng giữ đường cũ. Nó thêm một lệnh in trạng thái và vai của từng màn (`design-screen-facts`).
+- `PRODUCT-MAP.md` và `LO-TRINH.html` do bộ kiểm vẽ lại mỗi lần ký cổng; AC-6 cho chúng đổi chỉ ở dòng của hồ sơ này
+  và số đếm việc theo nấc. Gộp
   `main` thêm lần nữa thì số bài có thể đổi: cũng một dòng `fix`, tiêu chí giữ nguyên nghĩa.
 - Không chạy lại `upgrade` trước khi phiên design-assembly báo 0.36.1 đã cài trên máy. Tới lúc ấy cảnh báo CodeQL «làm
   sạch nhiều ký tự chưa trọn» ở `tools/design-assembly/adapters/vite.mjs` dòng 83 (bỏ chú thích HTML khỏi `index.html`
