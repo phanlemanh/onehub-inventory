@@ -1,0 +1,31 @@
+{
+  "feature_plain": "Khi Vercel báo thành công mà thật ra từ chối hay không xác nhận ghi một khoá, lệnh đưa bản lên dừng trước khi dựng bản, gọi tên khoá đó và không đổi tên miền — thay vì báo đạt rồi chạy bản mới bằng khoá cũ.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ dừng ở bước đẩy biến khi Vercel từ chối ghi một biến, gọi tên từng biến bị từ chối kèm mã lỗi của Vercel; bản chưa dựng, tên miền không đổi."},
+    {"id": "AC-2", "p": "Sẽ không bao giờ in giá trị của khoá, kể cả khi lời báo lỗi của Vercel chép nguyên giá trị ấy."},
+    {"id": "AC-3", "p": "Sẽ dừng khi Vercel không xác nhận đã ghi đủ sáu biến, gọi tên biến thiếu (mức đòi tuỳ Hỏi-2)."},
+    {"id": "AC-5", "p": "Sẽ vẫn chạy xanh trọn chín bước khi Vercel trả đúng khuôn tài liệu — ca đối chứng trên cùng máy giả."},
+    {"id": "AC-6", "p": "Sẽ có trong sổ vận hành một hàng cho mỗi dòng đỏ mới, nói người vận hành làm gì tiếp, không bảo xoá khoá trên Vercel."},
+    {"id": "AC-7", "p": "Sẽ giữ toàn bộ bộ kiểm của kho xanh."}
+  ],
+  "wont_do": [
+    {"id": "AC-4", "p": "Chặn ngay từ lần đọc: Vercel trả danh sách biến lạ khuôn thì dừng trước khi ghi gì, để phép kiểm biến cấm không lặng lẽ bị bỏ qua (chỉ khi Hỏi-1 trả «gộp»)."},
+    {"id": "OOS-1", "p": "Không đọc trang thứ hai trở đi của danh sách biến trên Vercel — tài liệu không ghi cách chuyển trang, dự án có dưới 20 biến."},
+    {"id": "OOS-2", "p": "Không hoàn lại các khoá đã ghi được khi một khoá khác bị từ chối — làm vậy phải đọc giá trị cũ của khoá; một lần bấm dựng lại ngay trên Vercel trước lần đưa bản xanh kế sẽ chạy bộ khoá lẫn cũ mới."},
+    {"id": "OOS-3", "p": "Không xoá hay sửa biến trên Vercel thay người giữ kho mã."},
+    {"id": "OOS-4", "p": "Không đổi cách lệnh đưa bản lên gọi Vercel, không đổi sáu biến."},
+    {"id": "OOS-5", "p": "Không đụng các giới hạn đã biết khác của việc đặt khoá một lệnh."}
+  ],
+  "scope_plain": "Những việc dưới đây cố ý để ngoài vòng này:",
+  "coverage_plain": [
+    {"i": 0, "p": "Để sau: danh sách biến trên Vercel có nhiều trang thì chỉ trang đầu được kiểm biến cấm."},
+    {"i": 1, "p": "Để sau: Vercel trả một mã thành công khác 201 cho lần ghi thì vẫn được đọc như 201."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Sổ vận hành từng bảo xoá khoá trên Vercel theo nguyên nhân đoán, và việc không hoàn lại khoá đã ghi chưa được ghi thành quyết định. Đã sửa: dòng đỏ in mã lỗi của Vercel, sổ tay không bảo xoá hay sửa gì, quyết định không hoàn lại có dòng riêng kèm giới hạn."},
+    {"i": 1, "p": "Kế hoạch đo chỉ viết cho câu trả lời máy khuyên ở Hỏi-1 và Hỏi-2. Đã sửa: mỗi phép đo ghi rõ nhánh của từng câu trả lời, và thiết kế với hợp đồng dùng chung một câu cho nhánh «câu đề»."},
+    {"i": 2, "p": "Phép đo «không lộ khoá» chưa chứng rằng câu trả lời giả thật sự mang khoá. Đã sửa: ca đo kiểm thân trả lời giả có chứa khoá trước, rồi mới kiểm đầu ra không có; dòng đỏ ghim ba tên theo thứ tự."},
+    {"i": 3, "p": "Chưa có câu trả lời thật nào của Vercel cho lần ghi đè, nên ca xanh không chứng được luật «đủ sáu» không đỏ nhầm. Máy không có khoá Vercel nên không lấy mẫu được — để anh quyết ở Hỏi-2, giới hạn đã ghi rõ."},
+    {"i": 4, "p": "Chưa có ô đo cho biến không rõ tên đứng giữa và tên bị lặp. Đã sửa: thêm ba ô (không rõ tên ở giữa, tên lặp, mã lỗi lạ khuôn)."}
+  ]
+}

@@ -20,6 +20,7 @@ import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { tempDir } from "../../tests/support/temp-dir";
+import { confirmedKeys, refusedItems } from "./len-ban.mjs";
 import { parseVerifier, scramKeys, scramVerifier, serverCheck } from "./scram.mjs";
 
 const HERE = resolve(__dirname);
@@ -182,6 +183,18 @@ interface Ctx {
   /** Variable names the fake Vercel project already holds, and the status its API answers with. */
   vercelEnvs: string[];
   apiStatus: number;
+  /**
+   * Row bien-vercel-tu-choi: the reply to one call, when a case sets it — a string body is sent raw (not JSON). Unset,
+   * the fake answers in the documented shape: GET 200 `{ envs }`, POST 201 `{ created: <the six posted>, failed: [] }`.
+   */
+  vercelReply: { get?: Reply; post?: Reply };
+  /** Every body the fake Vercel API sent, in order. */
+  served: { method: string; text: string }[];
+}
+
+interface Reply {
+  status: number;
+  body: unknown;
 }
 
 interface Listed {
@@ -319,6 +332,8 @@ async function fresh(appEnv: Env, setup: Setup = {}): Promise<Ctx> {
     api: [],
     vercelEnvs: [],
     apiStatus: 200,
+    vercelReply: {},
+    served: [],
   };
   const server = createServer((req, res) => {
     const path = req.url ?? "/";
@@ -343,11 +358,21 @@ async function fresh(appEnv: Env, setup: Setup = {}): Promise<Ctx> {
           `${t} api ${method} ${bare.split("?")[0].replace(/projects\/[^/]+/, "projects/<id>")}\n`,
         );
         res.setHeader("content-type", "application/json");
-        res.statusCode = ctx.apiStatus;
-        if (ctx.apiStatus !== 200) return res.end('{"error":{"code":"forbidden"}}');
-        if (method === "GET")
-          return res.end(JSON.stringify({ envs: ctx.vercelEnvs.map((key) => ({ key })) }));
-        res.end('{"created":[]}');
+        const send = (status: number, payload: unknown) => {
+          const out = typeof payload === "string" ? payload : JSON.stringify(payload);
+          ctx.served.push({ method, text: out });
+          res.statusCode = status;
+          res.end(out);
+        };
+        if (ctx.apiStatus !== 200) return send(ctx.apiStatus, { error: { code: "forbidden" } });
+        const set = method === "GET" ? ctx.vercelReply.get : ctx.vercelReply.post;
+        if (set) return send(set.status, set.body);
+        if (method === "GET") return send(200, { envs: ctx.vercelEnvs.map((key) => ({ key })) });
+        const posted = (text ? JSON.parse(text) : []) as VercelVar[];
+        send(201, {
+          created: posted.map(({ key, type, value, target }) => ({ key, type, value, target })),
+          failed: [],
+        });
       });
       return;
     }
@@ -474,13 +499,21 @@ function applied(ctx: Ctx): string[] {
   return readFileSync(join(ctx.fake, "schema_migrations"), "utf8").split("\n").filter(Boolean);
 }
 
-function expectNoMarker(ctx: Ctx, r: Run): void {
-  const text = `${r.stdout}\n${r.stderr}\n${r.calls.join("\n")}`;
-  for (const name of SECRETS) {
-    expect(text.includes(`moc-bi-mat-${name}`), `giá trị của ${name} lộ ra`).toBe(false);
-  }
-  expect(text).not.toContain("moc-bi-mat-");
-  expect(text.includes(LOGIN_PW), "giá trị của LOGIN_DB_PASSWORD lộ ra").toBe(false);
+/** The first secret value found in `text`, named; null when none. Every secret of the fixture is `moc-bi-mat-<NAME>`. */
+function markerLeak(text: string): string | null {
+  for (const name of SECRETS)
+    if (text.includes(`moc-bi-mat-${name}`)) return `giá trị của ${name} lộ ra`;
+  if (text.includes("moc-bi-mat-")) return "giá trị bí mật lộ ra";
+  if (text.includes(LOGIN_PW)) return "giá trị của LOGIN_DB_PASSWORD lộ ra";
+  return null;
+}
+
+function runText(r: Run): string {
+  return `${r.stdout}\n${r.stderr}\n${r.calls.join("\n")}`;
+}
+
+function expectNoMarker(_ctx: Ctx, r: Run): void {
+  expect(markerLeak(runText(r))).toBeNull();
 }
 
 function expectGreen(ctx: Ctx, appEnv: Env, r: Run): void {
@@ -1405,7 +1438,7 @@ describe("E6 · bước bien đỏ thì không ghi gì và không dựng", () =>
     });
   }
 
-  it("E6 · đối chứng dương: cùng máy giả, không biến cấm, trả 200 → bien đạt", async () => {
+  it("E6 · đối chứng dương: cùng máy giả, không biến cấm, lần ghi trả 201 đủ sáu → bien đạt", async () => {
     const ctx = await fresh("staging");
     ctx.vercelEnvs = ["APP_URL", "DATABASE_URL"];
     const r = await deploy(ctx, "staging");
@@ -1426,5 +1459,257 @@ describe("make cach-ly-dich dựng chuỗi vai đăng nhập như lệnh đưa b
     const red = await run(ctx, "node", [LEN_BAN, "--login-url"]);
     expect(red.code).toBe(1);
     expect(red.stdout).toBe("");
+  });
+});
+
+// ── Row bien-vercel-tu-choi: the bien step reads Vercel's replies (E1–E6 of _acceptance/bien-vercel-tu-choi) ─────────
+
+/** The six variable names in the order the bien step writes them. */
+const SIX = Object.keys(VERCEL_EXPECTED);
+
+/** The body the fake Vercel API last sent for `method`, parsed; undefined when it sent none. */
+function lastServed(ctx: Ctx, method: string): unknown {
+  const s = ctx.served.filter((x) => x.method === method).at(-1);
+  return s ? JSON.parse(s.text) : undefined;
+}
+
+describe("E5 · Vercel trả đúng khuôn tài liệu thì bước bien đạt", () => {
+  for (const appEnv of ["staging", "production"] as const) {
+    it(`E5 · ${appEnv}: lần ghi trả 201, created đủ sáu, failed rỗng → bien đạt, chín bước xanh`, async () => {
+      const ctx = await fresh(appEnv);
+      const r = await deploy(ctx, appEnv);
+      expectGreen(ctx, appEnv, r);
+      const reply = lastServed(ctx, "POST") as { created: VercelVar[]; failed: unknown[] };
+      expect(reply.failed).toEqual([]);
+      expect(reply.created.map((v) => v.key)).toEqual(SIX);
+      expectNoMarker(ctx, r);
+    });
+  }
+});
+
+/** The six variables as the fake confirms them, keyed like the POST body. */
+function createdSix(keys: string[] = SIX): { key: string; type: string; target: string[] }[] {
+  return keys.map((key) => ({ key, type: VERCEL_EXPECTED[key]!, target: ["production"] }));
+}
+
+/** A red bien case: the line, the stop, no build, the domain unchanged, no value printed. */
+async function expectBienRed(
+  appEnv: Env,
+  arrange: (ctx: Ctx) => void,
+  reason: string,
+  methods: string[],
+) {
+  const ctx = await fresh(appEnv);
+  arrange(ctx);
+  const r = await deploy(ctx, appEnv);
+  expect(r.code).not.toBe(0);
+  expect(r.lines).toContain(`deploy ${appEnv}: bien ĐỎ — ${reason}`);
+  expect(r.lines.at(-1)).toBe(`deploy ${appEnv}: DỪNG ở bien — tên miền không đổi`);
+  expect(ctx.api.map((c) => c.method)).toEqual(methods);
+  expect(r.vercel).toEqual([]);
+  expect(domainId(ctx)).toBe("dpl_cu");
+  expectNoMarker(ctx, r);
+  return { ctx, r };
+}
+
+const refusal = (failed: unknown[]) => (ctx: Ctx) => {
+  ctx.vercelReply.post = { status: 201, body: { created: createdSix(), failed } };
+};
+
+describe("E1 · Vercel trả 201 mà từ chối ghi biến thì bước bien đỏ", () => {
+  const cells: { name: string; failed: unknown[]; reason: string }[] = [
+    {
+      name: "E1-a hai biến, một có mã lỗi",
+      failed: [
+        { error: { code: "ENV_CONFLICT", message: "conflict", key: "AUTH_SECRET" } },
+        { error: { message: "refused", key: "RESEND_API_KEY" } },
+      ],
+      reason: "Vercel từ chối ghi biến AUTH_SECRET (ENV_CONFLICT), RESEND_API_KEY",
+    },
+    {
+      name: "E1-b tên chỉ ở envVarKey",
+      failed: [{ error: { code: "bad_value", message: "x", envVarKey: "RESEND_API_KEY" } }],
+      reason: "Vercel từ chối ghi biến RESEND_API_KEY (bad_value)",
+    },
+    {
+      name: "E1-c không rõ tên đứng giữa",
+      failed: [
+        { error: { message: "a", key: "AUTH_SECRET" } },
+        { error: { code: "x", message: "b", key: "not a name" } },
+        { error: { message: "c", key: "RESEND_API_KEY" } },
+      ],
+      reason: "Vercel từ chối ghi biến AUTH_SECRET, không rõ tên (x), RESEND_API_KEY",
+    },
+    {
+      name: "E1-d tên lặp",
+      failed: [
+        { error: { message: "a", key: "AUTH_SECRET" } },
+        { error: { message: "b", key: "AUTH_SECRET" } },
+      ],
+      reason: "Vercel từ chối ghi biến AUTH_SECRET",
+    },
+    {
+      name: "E1-e mã lạ khuôn không in",
+      failed: [{ error: { code: "bad code; x", message: "a", key: "AUTH_SECRET" } }],
+      reason: "Vercel từ chối ghi biến AUTH_SECRET",
+    },
+  ];
+  for (const appEnv of ["staging", "production"] as const) {
+    for (const c of cells) {
+      it(`E1 · ${appEnv} · ${c.name}: dòng đỏ ghim, không dựng, tên miền không đổi`, async () => {
+        await expectBienRed(appEnv, refusal(c.failed), c.reason, ["GET", "POST"]);
+      });
+    }
+  }
+});
+
+describe("E2 · lời báo lỗi của Vercel chép giá trị thì dòng in vẫn không có giá trị", () => {
+  for (const appEnv of ["staging", "production"] as const) {
+    it(`E2 · ${appEnv}: failed mang error.value và error.message có giá trị → dòng chỉ có tên`, async () => {
+      const ctx = await fresh(appEnv);
+      const values: Record<string, string> = {
+        AUTH_SECRET: ctx.env["AUTH_SECRET"]!,
+        RESEND_API_KEY: ctx.env["RESEND_API_KEY"]!,
+      };
+      const failed = ["AUTH_SECRET", "RESEND_API_KEY", "DATABASE_URL"].map((key) => ({
+        error: {
+          key,
+          value: values[key] ?? `postgresql://quy_hang_login:${LOGIN_PW}@db.example/postgres`,
+          message: `value ${values[key] ?? LOGIN_PW} is invalid`,
+        },
+      }));
+      ctx.vercelReply.post = { status: 201, body: { created: createdSix(), failed } };
+      const r = await deploy(ctx, appEnv);
+      // Source control: the fake did send the values back, in both fields.
+      const served = ctx.served
+        .filter((s) => s.method === "POST")
+        .map((s) => s.text)
+        .join("\n");
+      expect(served.split("moc-bi-mat-AUTH_SECRET")).toHaveLength(3);
+      expect(served).toContain(LOGIN_PW);
+      expect(r.lines).toContain(
+        `deploy ${appEnv}: bien ĐỎ — Vercel từ chối ghi biến AUTH_SECRET, RESEND_API_KEY, DATABASE_URL`,
+      );
+      expect(r.vercel).toEqual([]);
+      expect(markerLeak(runText(r))).toBeNull();
+    });
+  }
+  it("E2 · chiều đỏ: cùng đầu ra, nối một giá trị → hàm đo gọi tên biến lộ", async () => {
+    const ctx = await fresh("staging");
+    ctx.vercelReply.post = {
+      status: 201,
+      body: { created: createdSix(), failed: [{ error: { key: "AUTH_SECRET", message: "x" } }] },
+    };
+    const r = await deploy(ctx, "staging");
+    expect(markerLeak(runText(r))).toBeNull();
+    expect(markerLeak(`${runText(r)}\nmoc-bi-mat-AUTH_SECRET`)).toBe(
+      "giá trị của AUTH_SECRET lộ ra",
+    );
+    expect(markerLeak(`${runText(r)}\n${LOGIN_PW}`)).toBe("giá trị của LOGIN_DB_PASSWORD lộ ra");
+  });
+});
+
+describe("E3 · Vercel trả 201 mà không xác nhận đủ sáu biến thì bước bien đỏ", () => {
+  const all = `Vercel không xác nhận đã ghi biến ${SIX.join(", ")}`;
+  const cells: { name: string; body: unknown; reason: string }[] = [
+    {
+      name: "thiếu DATABASE_URL và APP_ENV",
+      body: {
+        created: createdSix(SIX.filter((k) => k !== "DATABASE_URL" && k !== "APP_ENV")),
+        failed: [],
+      },
+      reason: "Vercel không xác nhận đã ghi biến DATABASE_URL, APP_ENV",
+    },
+    { name: "created rỗng", body: { created: [], failed: [] }, reason: all },
+    { name: "không có created", body: { failed: [] }, reason: all },
+    { name: "created là đối tượng không key", body: { created: {}, failed: [] }, reason: all },
+    { name: "thân không phải JSON", body: "not json", reason: all },
+  ];
+  for (const appEnv of ["staging", "production"] as const) {
+    for (const c of cells) {
+      it(`E3 · ${appEnv} · ${c.name}: dòng đỏ gọi tên biến thiếu, không dựng`, async () => {
+        await expectBienRed(
+          appEnv,
+          (ctx) => {
+            ctx.vercelReply.post = { status: 201, body: c.body };
+          },
+          c.reason,
+          ["GET", "POST"],
+        );
+      });
+    }
+  }
+
+  it("E3 · khuôn câu trả lời ghi: đối tượng đơn, failed lạ, mục failed không phải đối tượng", () => {
+    expect([...confirmedKeys({ created: { key: "APP_URL" } })]).toEqual(["APP_URL"]);
+    expect([...confirmedKeys({ created: [{ key: "A_B" }, null, "x", { key: 3 }] })]).toEqual([
+      "A_B",
+    ]);
+    expect([...confirmedKeys(null)]).toEqual([]);
+    expect(refusedItems({ failed: {} })).toEqual([]);
+    expect(refusedItems(null)).toEqual([]);
+    expect(refusedItems({ failed: ["x", null, { error: {} }] })).toEqual(["không rõ tên"]);
+  });
+});
+
+describe("E4 · lần đọc biến trả thành công mà không có danh sách thì bước bien đỏ, chưa ghi gì", () => {
+  const cells: { name: string; body: unknown }[] = [
+    { name: "đối tượng biến đơn", body: { key: "APP_URL", type: "plain", value: "x" } },
+    { name: "envs không phải mảng", body: { envs: {} } },
+    { name: "thân không phải JSON", body: "not json" },
+  ];
+  for (const appEnv of ["staging", "production"] as const) {
+    for (const c of cells) {
+      it(`E4 · ${appEnv} · ${c.name}: dòng đỏ ghim, 0 lần ghi, không dựng`, async () => {
+        await expectBienRed(
+          appEnv,
+          (ctx) => {
+            ctx.vercelReply.get = { status: 200, body: c.body };
+          },
+          "Vercel trả danh sách biến không đúng khuôn",
+          ["GET"],
+        );
+      });
+    }
+  }
+
+  it("E4 · đối chứng dương: danh sách rỗng đúng khuôn → bien đạt", async () => {
+    const ctx = await fresh("staging");
+    ctx.vercelReply.get = { status: 200, body: { envs: [] } };
+    const r = await deploy(ctx, "staging");
+    expect(r.lines).toContain("deploy staging: bien đạt");
+    expect(r.code).toBe(0);
+  });
+});
+
+const BIEN_REASONS = [
+  "Vercel từ chối ghi biến <tên>",
+  "Vercel không xác nhận đã ghi biến <tên>",
+  "Vercel trả danh sách biến không đúng khuôn",
+];
+
+/** One finding per red reason of the bien step that no `bien` row of the runbook's table carries. */
+function soTayFindings(md: string): string[] {
+  const rows = md.split("\n").filter((l) => l.startsWith("| `bien`"));
+  return BIEN_REASONS.filter((reason) => !rows.some((row) => row.includes(reason))).map(
+    (reason) => `sổ tay thiếu hàng bien: ${reason}`,
+  );
+}
+
+describe("E6 · sổ tay có hàng cho mỗi lý do đỏ mới của bien", () => {
+  const md = readFileSync(resolve(HERE, "../../docs/van-hanh/dua-ban-len.md"), "utf8");
+
+  it("E6 · mục «Đỏ thì làm gì» có hàng bien cho từng lý do", () => {
+    expect(soTayFindings(md)).toEqual([]);
+  });
+
+  it("E6 · chiều đỏ: bỏ hàng «Vercel từ chối ghi biến» → hàm so gọi tên hàng thiếu", () => {
+    const broken = md
+      .split("\n")
+      .filter((l) => !(l.startsWith("| `bien`") && l.includes("Vercel từ chối ghi biến")))
+      .join("\n");
+    expect(soTayFindings(broken)).toEqual([
+      "sổ tay thiếu hàng bien: Vercel từ chối ghi biến <tên>",
+    ]);
   });
 });
