@@ -5,7 +5,7 @@ slug: dat-khoa-mot-lenh
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-22
 design_doc: docs/superpowers/specs/2026-11-22-dat-khoa-mot-lenh-design.md
@@ -160,5 +160,14 @@ lệnh này.
 - Không sửa hồ sơ hàng 22. Hồ sơ ấy đo bảy bước; vòng này đo chín bước bằng bài kiểm của chính nó.
 - Đường nền không chạy được: phiên này nằm trong thư mục kho có đợt điều phối đang nghỉ, và móc chặn của đợt chặn lệnh đo
   nền khi không có lượt. Thẻ ghi «chưa có số liệu nền».
-- Known limits: (trống)
-- Ngoài hợp đồng: (trống)
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-22:
+  - Ngoài-1: Danh sách biến bị cấm ở bản dựng thật và tên vai đăng nhập nằm ở hai chỗ, không bài kiểm nào giữ hai chỗ khớp
+    nhau; thêm một biến cấm ở một chỗ mà quên chỗ kia thì bản đưa lên vẫn chạy xong rồi ứng dụng mới từ chối khởi động.
+  - Ngoài-2: Vercel trả thành công mà câu trả lời lạ khuôn thì bước kiểm biến cấm bỏ qua mà không báo.
+  - Ngoài-3: Dán khoá qua đường ống thay vì gõ tay thì khoảng trắng thừa ở cuối có thể bị lưu vào khoá Resend hay chuỗi bỏ
+    bảo vệ của Vercel.
+  - Ngoài-5: Chưa bài kiểm nào đưa khoá do lệnh đặt khoá sinh ra qua đúng phép kiểm của lệnh đưa bản lên.
+  - Ngoài-6: Bài kiểm sổ tay chỉ chứng hôm nay không còn việc tay cũ, chưa có đối chứng rằng nó bắt được khi việc cũ quay
+    lại.
+- Ngoài hợp đồng: Ngoài-4 (Vercel trả thành công nhưng từ chối ghi một biến, bước `bien` vẫn báo đạt) — chủ kho chọn mở
+  hợp đồng mới ở Cổng Bằng chứng 2026-11-22.

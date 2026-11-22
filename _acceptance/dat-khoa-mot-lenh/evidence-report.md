@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: dat-khoa-mot-lenh
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: ece85f767ec13b160d83fc1ced33812c8f77445b
-human_signoff:
+human_signoff: Manh Phan 2026-11-22
 ---
 
 # Evidence Report: dat-khoa-mot-lenh
@@ -164,7 +164,7 @@ human_signoff:
   judged_by: judge panel ba lens (fresh context)
   proposal: PASS
   rationale: Ba lens cùng đề xuất PASS, không có ý kiến trái. Các lệch nhỏ đã nêu ở lens domain-correctness (dẫn «Hỏi-1», cờ `--xoay` so với `XOAY=1`, AGENTS.md cấm rộng hơn spec, thiếu giá trị `APP_URL` và `MAIL_FROM` cho bản thử) không làm sai quyền hạn nhưng người nên xem.
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-22 — Đạt
 
 ## Known limits
 
