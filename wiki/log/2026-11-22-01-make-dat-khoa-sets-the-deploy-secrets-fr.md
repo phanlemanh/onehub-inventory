@@ -1,0 +1,1 @@
+make dat-khoa sets the deploy secrets from the keys the owner pastes; make deploy sets the login role password as a SCRAM verifier and pushes the app variables to Vercel; runbook keeps only the owner's part; AGENTS.md standing permission for Inventory infrastructure — decision 0047
