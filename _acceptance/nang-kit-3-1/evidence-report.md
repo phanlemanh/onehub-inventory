@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 153243b126f03468c38d9a534c8fe6fa854c2307
-human_signoff:
+human_signoff: Manh Phan 2026-11-23
 ---
 
 # Evidence Report: nang-kit-3-1

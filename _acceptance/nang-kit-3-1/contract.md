@@ -5,7 +5,7 @@ slug: nang-kit-3-1
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-22
 design_doc: docs/superpowers/specs/2026-11-22-nang-kit-3-1-design.md
@@ -94,3 +94,10 @@ Phủ theo tệp chạm và bên đọc của từng tệp; không quét không 
   kiểm chỉ 3.1 có (căn cứ bước thiết kế, trợ lý quyết định) chạy trong phiên, không ở CI.
 - Phép đo ở `rang/` tự kéo kit theo thẻ vào thư mục tạm ngoài kho và đối chiếu commit với ma trận; không dựa vào bản cài
   trên máy.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-23:
+  - Ngoài-1: Bộ công cụ 3.1 có đường để máy tự gộp PR khi câu ký của chủ kho kèm lời cho phép; ở kho này đường ấy đang tắt vì cờ gộp-theo-lời-ký chưa bật, và quy tắc «không tự gộp» chưa được đối chiếu với nó.
+  - Ngoài-4: Khi chấm từ bản kéo ngoài, phép đo đợt (AC-9) đọc thư mục đợt của bản làm việc chính theo tên đoán trước; sai tên thì phép đo báo đỏ, không cho xanh giả.
+  - Ngoài-6: Bảng phủ không liệt các tệp kit đổi ở 3.1, trong đó có đường phiên tự gộp PR khi người ký kèm «gộp khi CI xanh» — đang tắt vì cờ chưa bật.
+  - Ngoài-8: Phép đo đợt đọc thư mục của bản làm việc chính chứ không phải bản đang chấm; nó chỉ đọc, không đổi dữ liệu.
+  - Ngoài-9: Bộ kit tải về thư mục tạm chỉ được tin theo commit đầu; ai sửa tay thư mục ấy thì phép đo có thể xanh sai — xoá thư mục tạm rồi chạy lại là khắc phục.
+  - Ngoài-11: Phép đo cài đặt đọc tệp của chính nó từ bản đang chấm nhưng đọc nhánh gốc và tệp CI từ bản giữ phép đo; chấm trên một bản sao khác thì có thể so lệch nhánh.
