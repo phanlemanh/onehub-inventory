@@ -2,7 +2,7 @@
 // broken in exactly what the measure guards. Messages are the ones pinned in evals.yaml.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { appendFileSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { appendFileSync, copyFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { after, test } from "node:test";
@@ -208,4 +208,23 @@ test("E10 dot (c): red on a copy of the batch where a lane holds the s4 lock", a
   mkdirSync(join(copy, "khoa", "s4"), { recursive: true });
   writeFileSync(join(copy, "khoa", "s4", "chu.json"), JSON.stringify({ day: "K" }));
   redWith(await dot.judge({ oldDir: fetchKit(OLD_KIT), newDir: fetchKit(NEW_KIT), dir: copy }), "dot: lock s4 is held");
+});
+
+test("E10 dot (d): red when the 3.1 reader of plan groups returns one group fewer", async () => {
+  await greenOnce("dot", () => dot.measure());
+  const real = fetchKit(NEW_KIT);
+  const copy = mkdtempSync(join(tmpdir(), "nk31-kit-pha-"));
+  cpSync(join(real, "plugins/dispatch"), join(copy, "plugins/dispatch"), { recursive: true });
+  const f = join(copy, "plugins/dispatch/scripts/nguon-hang.mjs");
+  const text = readFileSync(f, "utf8");
+  assert.ok(text.includes("export function docNhomKeHoach("), "nguon-hang.mjs of v3.1.0 has no docNhomKeHoach");
+  writeFileSync(
+    f,
+    text.replace("export function docNhomKeHoach(", "function docNhomKeHoachThat(") +
+      "\nexport function docNhomKeHoach(g) {\n  const m = docNhomKeHoachThat(g);\n  m.delete([...m.keys()][0]);\n  return m;\n}\n",
+  );
+  redWith(
+    await dot.judge({ oldDir: fetchKit(OLD_KIT), newDir: copy, dir: dot.batchDir() }),
+    "dot: nguon-hang.mjs docNhomKeHoach reads differently in v3.0.0 and v3.1.0",
+  );
 });

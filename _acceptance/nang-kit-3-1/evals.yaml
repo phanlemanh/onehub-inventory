@@ -79,7 +79,7 @@ evals:
     long_running: 10
     layer: backend-effect
     paths: ["_acceptance/**", ".claude/settings.json", ".github/workflows/ci.yml", "docs/**", "PRODUCT-MAP.md", "LO-TRINH.html"]
-    expected: "exit 0; node --test in 'pass 18' và 'fail 0': với mỗi chiều đỏ kê ở expected của E1–E7 và E10 một bài «xanh trên vật lành, đỏ trên bản phá với đúng thông điệp ghim» (E1 hai, E2 hai, E3 hai, E4 hai, E5 một, E6 ba, E7 ba, E10 ba)"
+    expected: "exit 0; node --test in 'pass 19' và 'fail 0': với mỗi chiều đỏ kê ở expected của E1–E7 và E10 một bài «xanh trên vật lành, đỏ trên bản phá với đúng thông điệp ghim» (E1 hai, E2 hai, E3 hai, E4 hai, E5 một, E6 ba, E7 ba, E10 bốn)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E10
     criterion: AC-9
@@ -87,5 +87,5 @@ evals:
     cmd: node _acceptance/nang-kit-3-1/rang/dot.mjs
     layer: backend-effect
     paths: ["_acceptance/nang-kit-3-1/rang/**", "docs/plan/**"]
-    expected: "exit 0; dòng 'dot: <n> hook files of dispatch, 2 changed in v3.1.0 (hinh-dang.mjs,nguon-hang.mjs), reading batch dieu-phoi-nen alike in both; no s4 lock held (<l> lock folders)'. Chiều đỏ (two-way): hai bản kit như nhau: 'dot: hook files changed in v3.1.0 are none'; không có thư mục đợt: 'dot: batch folder dieu-phoi-nen not found'; bản chép thư mục đợt (tệp thật) có khoa/s4/chu.json: 'dot: lock s4 is held'"
+    expected: "exit 0; dòng 'dot: <n> hook files of dispatch, 2 changed in v3.1.0 (hinh-dang.mjs,nguon-hang.mjs), reading batch dieu-phoi-nen alike in both; no s4 lock held (<l> lock folders)'. Chiều đỏ (two-way): hai bản kit như nhau: 'dot: hook files changed in v3.1.0 are none'; không có thư mục đợt: 'dot: batch folder dieu-phoi-nen not found'; bản chép thư mục đợt (tệp thật) có khoa/s4/chu.json: 'dot: lock s4 is held'; bản chép gói dispatch 3.1 mà docNhomKeHoach trả thiếu một nhóm: 'dot: nguon-hang.mjs docNhomKeHoach reads differently in v3.0.0 and v3.1.0'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

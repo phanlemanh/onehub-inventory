@@ -34,6 +34,16 @@ export function batchDir(root = repoRoot()) {
   return candidates.find((d) => existsSync(join(d, "dieu-phoi.config.json"))) ?? null;
 }
 
+// JSON.stringify turns a Map or a Set into "{}", so two readers returning different Maps would compare equal.
+// Spell their entries out before comparing.
+export function jsonSafe(v) {
+  if (v instanceof Map) return { Map: [...v].map(([k, x]) => [jsonSafe(k), jsonSafe(x)]) };
+  if (v instanceof Set) return { Set: [...v].map(jsonSafe) };
+  if (Array.isArray(v)) return v.map(jsonSafe);
+  if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, jsonSafe(x)]));
+  return v;
+}
+
 // {reader: JSON of its return value, or "throws <message>"} for one version of one file.
 async function readWith(kitDir, file, args) {
   const mod = await import(pathToFileURL(join(kitDir, "plugins/dispatch/scripts", file)).href);
@@ -44,7 +54,7 @@ async function readWith(kitDir, file, args) {
       continue;
     }
     try {
-      r[fn] = JSON.stringify(mod[fn](args[which]) ?? null);
+      r[fn] = JSON.stringify(jsonSafe(mod[fn](args[which]) ?? null));
     } catch (e) {
       r[fn] = `throws ${e.message}`;
     }
