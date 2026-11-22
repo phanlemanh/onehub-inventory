@@ -10,6 +10,8 @@ dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật m
 - Lệnh đưa bản lên báo `lùi bản DỪNG` hay `lùi bản ĐỎ` sau khi đã gắn tên miền: lệnh không tự lùi được, tên miền còn ở
   bản hỏng, và lệnh đã in sẵn danh sách bản để chọn (bước 3).
 - Không dùng khi lệnh đưa bản lên đã tự báo `đã lùi về bản trước`: việc ấy đã xong; chỉ cần kiểm như bước 5.
+- Không dùng khi lượt đưa bản hỏng vừa xoay mật khẩu vai đăng nhập: mọi bản cũ giữ mật khẩu cũ nên lùi về đâu cũng không
+  nối được cơ sở dữ liệu. Sửa nguyên nhân và chạy lại `make deploy` ngay ([xoay-khoa.md](xoay-khoa.md), bước 3).
 
 ## Cần có trước
 
