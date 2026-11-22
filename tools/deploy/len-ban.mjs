@@ -310,9 +310,46 @@ async function vercelApi(env, method, path, body) {
   }
 }
 
+const VAR_NAME = /^[A-Z][A-Z0-9_]*$/;
+const ERROR_CODE = /^[A-Za-z0-9_-]+$/;
+
+/**
+ * Row bien-vercel-tu-choi: what the red line says for each item of `failed` in Vercel's reply to the variable write —
+ * the variable's name (from `error.key`, else `error.envVarKey`) or `không rõ tên`, followed by ` (<error.code>)` when
+ * the code is a plain token. In `failed` order, each item once. Never reads `error.message` or `error.value`: Vercel may
+ * copy the variable's value there. Empty when `failed` is absent or not an array.
+ */
+export function refusedItems(reply) {
+  const failed = reply?.failed;
+  if (!Array.isArray(failed)) return [];
+  const items = new Map();
+  for (const entry of failed) {
+    const error = entry?.error;
+    const name =
+      [error?.key, error?.envVarKey].find((k) => typeof k === "string" && VAR_NAME.test(k)) ??
+      "không rõ tên";
+    const code =
+      typeof error?.code === "string" && ERROR_CODE.test(error.code) ? ` (${error.code})` : "";
+    if (!items.has(name)) items.set(name, `${name}${code}`);
+  }
+  return [...items.values()];
+}
+
+/** The variable names Vercel's reply to the write lists in `created` — an array of variables or a single one. */
+export function confirmedKeys(reply) {
+  const created = reply?.created;
+  const list = Array.isArray(created)
+    ? created
+    : created && typeof created === "object"
+      ? [created]
+      : [];
+  return new Set(list.map((v) => v?.key).filter((k) => typeof k === "string"));
+}
+
 /**
  * Writes the app's six variables to the Production environment of ENV's Vercel project, before the build pulls them.
- * Red, before anything is written, when the project holds a variable a production build refuses to start with.
+ * Red, before anything is written, when the project holds a variable a production build refuses to start with. Red
+ * after the write, still before the build, when Vercel's reply refuses a variable or does not confirm all six.
  */
 async function stepVercelVars(appEnv, env) {
   const project = encodeURIComponent(env["VERCEL_PROJECT_ID"]);
@@ -334,7 +371,12 @@ async function stepVercelVars(appEnv, env) {
     type,
     target: ["production"],
   }));
-  await vercelApi(env, "POST", `/v10/projects/${project}/env?upsert=true`, body);
+  const reply = await vercelApi(env, "POST", `/v10/projects/${project}/env?upsert=true`, body);
+  const refused = refusedItems(reply);
+  if (refused.length) throw new Red(`Vercel từ chối ghi biến ${refused.join(", ")}`);
+  const confirmed = confirmedKeys(reply);
+  const missing = VERCEL_VARS.map(([key]) => key).filter((key) => !confirmed.has(key));
+  if (missing.length) throw new Red(`Vercel không xác nhận đã ghi biến ${missing.join(", ")}`);
 }
 
 /**
