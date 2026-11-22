@@ -42,7 +42,7 @@ evals:
     long_running: 5
     layer: backend-effect
     paths: ["_acceptance/upgrade-design-assembly-0-33-0/rang/**", "design/theme.json"]
-    expected: "exit 0; bài 'gate-lines' xanh trên bản chép không đổi và đỏ khi design/theme.json của bản chép mất một phép kiểm, với 'gate: the gate did not say: design-assembly: 19 decisions held by 27 checks, each seen failing on a changed copy'"
+    expected: "exit 0; bài 'gate-lines' xanh trên bản sao không đổi và đỏ khi design/theme.json của bản chép mất một phép kiểm, với 'gate: the gate did not say: design-assembly: 19 decisions held by 27 checks, each seen failing on a changed copy'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E4
     criterion: AC-3
@@ -103,7 +103,7 @@ evals:
     cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/change-list.mjs
     layer: backend-effect
     paths: ["**"]
-    expected: "exit 0; dòng 'changes: the upgrade commit changes its 28 files; the 0.36.1 rerun changes its 10 files; the branch changes nothing beyond the upgrades and this record' (hoặc, khi đã gộp, 'the branch is in origin/main already, so only the commit was compared'). Chiều đỏ: E11"
+    expected: "exit 0; dòng 'changes: the upgrade commit changes its 28 files; the 0.36.1 rerun changes its 10 files; the branch changes nothing beyond the upgrades and this record' (hoặc, khi đã gộp, 'the branch is in origin/main already, so only the commits were compared'). Chiều đỏ: E11"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E11
     criterion: AC-6
@@ -112,5 +112,5 @@ evals:
     long_running: 5
     layer: backend-effect
     paths: ["_acceptance/upgrade-design-assembly-0-33-0/rang/**"]
-    expected: "exit 0; bài 'change-list' đỏ ở sáu ca: commit đổi thêm một tệp → 'upgrade commit changed outside the list: design/theme.json'; commit thiếu một tệp → 'upgrade commit did not change: design/tool-stamp.json'; commit chạy lại đổi một tệp ngoài thư mục công cụ, dấu, bước cổng và wiki/log/ → 'rerun commit changed outside the tool: design/theme.json'; nhánh đổi thêm một tệp → 'branch changed beyond the upgrade and this record: Makefile'; nhánh đổi một tệp sổ → 'branch changed beyond the upgrade and this record: design/decisions.yaml'; bản đồ sản phẩm đổi một dòng của việc khác → 'PRODUCT-MAP.md changed a line that is not this record's'"
+    expected: "exit 0; bài 'change-list' đỏ ở sáu ca: commit đổi thêm một tệp → 'upgrade commit changed outside the list: design/theme.json'; commit thiếu một tệp → 'upgrade commit did not change: design/tool-stamp.json'; commit chạy lại đổi một tệp ngoài thư mục công cụ, dấu, bước cổng và wiki/log/ → 'rerun commit changed outside the list: design/theme.json'; nhánh đổi thêm một tệp → 'branch changed beyond the upgrade and this record: Makefile'; nhánh đổi một tệp sổ → 'branch changed beyond the upgrade and this record: design/decisions.yaml'; bản đồ sản phẩm đổi một dòng của việc khác → 'PRODUCT-MAP.md changed a line that is not this record's'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
