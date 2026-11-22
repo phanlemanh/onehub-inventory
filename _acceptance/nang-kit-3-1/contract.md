@@ -4,7 +4,7 @@ feature: Nâng kit nghiệm thu của phiên từ delivery-loop v3.0.0 lên v3.1
 slug: nang-kit-3-1
 owner: phanlemanh@gmail.com
 risk_tier: T3
-surfaces: [config, tooling]
+surfaces: [config]
 status: draft
 design_doc: docs/superpowers/specs/2026-11-22-nang-kit-3-1-design.md
 ---

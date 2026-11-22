@@ -1,0 +1,21 @@
+{
+  "feature_plain": "Phiên làm việc của kho chuyển sang bộ kit nghiệm thu bản 3.1 — bản có trợ lý quyết định (máy tự đi theo khuyến nghị ở hàng backend, anh phủ quyết trước khi gộp) và chuyến gộp nhiều PR một lần.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ chỉ đổi đúng một dòng cấu hình: chợ kit của phiên ghim bản 3.1 thay cho 3.0; sáu plugin bật đúng như chợ khai."},
+    {"id": "AC-2", "p": "Sẽ chứng thẻ 3.1 trên kho kit trỏ đúng bản đã phát hành, năm plugin mang số 3.1."},
+    {"id": "AC-3", "p": "Sẽ chạy trợ lý quyết định của bản 3.1 trên chính kho này và nó đếm đúng mọi hồ sơ."},
+    {"id": "AC-4", "p": "Sẽ chứng bản đồ sản phẩm, bốn lệnh kiểm dùng kit và mọi lệnh kit tài liệu nhắc tới vẫn chạy được ở bản 3.1."},
+    {"id": "AC-5", "p": "Sẽ chứng cổng kiểm gộp bản 3.0 và 3.1 cho cùng kết quả trên toàn bộ 72 hồ sơ cũ và trên hồ sơ này."},
+    {"id": "AC-6", "p": "Sẽ chứng cổng kiểm của PR chỉ chặn vì hồ sơ này chờ chữ ký, và hết chặn sau khi anh ký."},
+    {"id": "AC-7", "p": "Sẽ chạy trọn bộ kiểm của kho và đòi xanh."},
+    {"id": "AC-9", "p": "Sẽ chứng phần điều phối đợt của bản 3.1 đọc sổ đợt của kho y như 3.0, và không dãy nào đang dở lượt chấm lúc nâng."},
+    {"id": "AC-8", "p": "Sẽ chứng mỗi phép đo biết đỏ: chạy trên bản phá thử thì báo đúng lỗi đã ghim."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "Sẽ KHÔNG bật mặc-ký ở đây (PR #108 lo) và không đụng tệp quyền tự gộp của anh."},
+    {"id": "OOS-2", "p": "Sẽ KHÔNG sửa tệp CI — kể cả dòng bản kit của cổng kiểm (Hỏi-1)."},
+    {"id": "OOS-3", "p": "Sẽ KHÔNG cài hay cập nhật plugin trên máy, không ghim lại hồ sơ cũ, không sửa kho kit."},
+    {"id": "OOS-4", "p": "Sẽ KHÔNG mở PR mới hay tự gộp — PR #109 là của hàng này, nút gộp của anh."}
+  ],
+  "scope_plain": "Phần cắt ra để giữ vòng chỉ là một dòng cấu hình cùng bằng chứng cho nó:"
+}
