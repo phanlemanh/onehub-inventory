@@ -28,7 +28,9 @@ const NAMED = `«${ROTATION_SECTION}»`;
 
 const ABOUT_ROLLBACK = /lùi|rollback|lui-ban\.md/i;
 const ROTATES_LOGIN = (text: string) => /xoay/i.test(text) && /mật khẩu vai đăng nhập/i.test(text);
-const OTHER_DEPLOYMENT = /một bản cũ hơn|trang Vercel|Instant Rollback|kiem-nhanh-ten-mien ĐỎ/;
+const OTHER_DEPLOYMENT =
+  /một bản cũ hơn|trang Vercel|Instant Rollback|kiem-nhanh-ten-mien ĐỎ|chọn (một )?bản/;
+const RUNNING_FINE = /bản đang chạy (không bị|yên)/i;
 const REASON = /mật khẩu cũ/i;
 
 type Files = Record<string, string>;
@@ -149,25 +151,40 @@ export function everyLine(files: Files, steps: string[], lines: string[]): strin
   return out;
 }
 
-/** The paragraphs pointsThere holds to the pointer rule, each with the rule that applies. */
-export function checkedUnits(
-  files: Files,
-): { unit: Unit; why: "lùi bản" | "xoay" | "mở đầu" | "khi nào dùng" }[] {
-  const out: { unit: Unit; why: "lùi bản" | "xoay" | "mở đầu" | "khi nào dùng" }[] = [];
+type Why = "lùi bản" | "xoay" | "yên" | "mở đầu" | "khi nào dùng" | "bước";
+
+/**
+ * The paragraphs pointsThere holds to the pointer rule, each with the rule that applies. lui-ban.md is a page about
+ * rolling back: its opening, «Khi nào dùng» and every step of «Các bước» that mentions rolling back must each carry
+ * the pointer somewhere (a group), and every other paragraph of it that sends the operator to another deployment
+ * carries it itself. In every file, a paragraph that says the running deployment is fine carries it too.
+ */
+export function checkedUnits(files: Files): { unit: Unit; why: Why }[] {
+  const out: { unit: Unit; why: Why }[] = [];
   for (const u of allUnits(files)) {
     if (inSection(u)) continue;
     if (u.file === ROLLBACK_PAGE) {
       if (!u.h2) out.push({ unit: u, why: "mở đầu" });
       else if (u.h2 === "Khi nào dùng") out.push({ unit: u, why: "khi nào dùng" });
+      else if (u.h2 === "Các bước" && ABOUT_ROLLBACK.test(u.text))
+        out.push({ unit: u, why: "bước" });
       else if (OTHER_DEPLOYMENT.test(u.text)) out.push({ unit: u, why: "lùi bản" });
+      else if (RUNNING_FINE.test(u.text)) out.push({ unit: u, why: "yên" });
       else if (ROTATES_LOGIN(u.text)) out.push({ unit: u, why: "xoay" });
       continue;
     }
     if (ABOUT_ROLLBACK.test(u.text)) out.push({ unit: u, why: "lùi bản" });
+    else if (RUNNING_FINE.test(u.text)) out.push({ unit: u, why: "yên" });
     else if (u.file !== HOME && ROTATES_LOGIN(u.text)) out.push({ unit: u, why: "xoay" });
   }
   return out;
 }
+
+const KIND: Record<"lùi bản" | "xoay" | "yên", string> = {
+  "lùi bản": "nói về lùi bản",
+  xoay: "nhắc xoay mật khẩu vai đăng nhập",
+  yên: "nói bản đang chạy yên",
+};
 
 export function pointsThere(files: Files): string[] {
   const out: string[] = [];
@@ -180,11 +197,45 @@ export function pointsThere(files: Files): string[] {
       );
     }
   }
-  for (const { unit, why } of checked) {
-    if (why === "mở đầu" || why === "khi nào dùng" || hasPointer(unit)) continue;
-    const kind = why === "lùi bản" ? "nói về lùi bản" : "nhắc xoay mật khẩu vai đăng nhập";
-    out.push(`${unit.file}: đoạn ${kind} không trỏ mục ${NAMED}: "${head(unit)}"`);
+  const steps = [...new Set(checked.filter((c) => c.why === "bước").map((c) => c.unit.h3))];
+  for (const h3 of steps) {
+    const group = checked.filter((c) => c.why === "bước" && c.unit.h3 === h3).map((c) => c.unit);
+    if (!group.some(hasPointer))
+      out.push(`${ROLLBACK_PAGE}: bước «${h3}» nói về lùi bản mà không trỏ mục ${NAMED}`);
   }
+  for (const { unit, why } of checked) {
+    if (why === "mở đầu" || why === "khi nào dùng" || why === "bước" || hasPointer(unit)) continue;
+    out.push(`${unit.file}: đoạn ${KIND[why]} không trỏ mục ${NAMED}: "${head(unit)}"`);
+  }
+  return out;
+}
+
+/** The fixed head of the reason the quick check gives when health answers `ok` other than true. */
+export function notOkReason(kiemNhanh: string): string {
+  const m = /body\.ok !== true\)[^`]*`([^`]*)`/.exec(kiemNhanh);
+  return m ? m[1]!.split(/\$\{|\(/)[0]!.trim() : "";
+}
+
+/**
+ * The reason the section names for a deployment that cannot connect is the one the quick check really prints.
+ * health.ts sets `ok` to `vai === "dat"`, so a deployment that cannot connect answers `ok: false` and the check
+ * stops at its `ok` line; its later `vai nối chưa đạt` line is never reached against the real server.
+ */
+export function rotationReason(files: Files, kiemNhanh: string): string[] {
+  const section = allUnits(files)
+    .filter(inSection)
+    .map((u) => u.text)
+    .join("\n");
+  const out: string[] = [];
+  if (section.includes("vai nối chưa đạt"))
+    out.push(
+      `mục ${NAMED} nêu lý do kiểm nhanh mà máy không in khi bản không nối được: vai nối chưa đạt`,
+    );
+  const reason = notOkReason(kiemNhanh);
+  if (!reason || !section.includes(reason))
+    out.push(
+      `mục ${NAMED} thiếu lý do kiểm nhanh khi bản không nối được: ${reason || "(không rút được từ mã)"}`,
+    );
   return out;
 }
 
@@ -210,6 +261,8 @@ function broken(files: Files, file: string, from: string, to: string): Files {
 
 const files = readRunbooks();
 const lenBan = readFileSync(LEN_BAN, "utf8");
+const kiemNhanh = readFileSync(join(ROOT, "tools", "deploy", "kiem-nhanh.mjs"), "utf8");
+const health = readFileSync(join(ROOT, "src", "modules", "identity", "health.ts"), "utf8");
 const luiBan = readFileSync(LUI_BAN, "utf8");
 let steps: string[] = [];
 
@@ -231,13 +284,14 @@ function rest(raw: string): string {
   return end < 0 ? "" : raw.slice(end);
 }
 
-/** `files` with the section's name taken out of the stretch of `file` from `from` to the next `## ` heading. */
+/** `files` with the section's name taken out of the stretch of `file` from `from` to the next `##` or `###` heading. */
 function unpointed(files: Files, file: string, from: string): Files {
   const raw = files[file]!;
   const at = raw.indexOf(from);
   expect(at, `${file} có đoạn ${from}`).toBeGreaterThanOrEqual(0);
-  const end = raw.indexOf("\n## ", at + 1);
-  const block = raw.slice(at, end < 0 ? undefined : end);
+  // The stretch ends at the next heading of level two or three, so one step is broken, not the steps after it.
+  const ends = ["\n## ", "\n### "].map((h) => raw.indexOf(h, at + 1)).filter((i) => i >= 0);
+  const block = raw.slice(at, ends.length ? Math.min(...ends) : undefined);
   const name = new RegExp(NAMED.replace(/ /g, "\\s+"), "g");
   const cut = block.replace(name, "«mục khác»");
   expect(cut, `đoạn ${from} của ${file} có câu trỏ để bỏ`).not.toEqual(block);
@@ -333,6 +387,27 @@ describe("E2 · đủ dòng", () => {
   });
 });
 
+describe("E2 · lý do kiểm nhanh", () => {
+  it("tiền đề: sức khoẻ chỉ ok khi vai đạt, nên bản không nối được trả ok khác true", () => {
+    expect(health).toMatch(/ok:\s*vai === "dat"/);
+    expect(notOkReason(kiemNhanh)).toBe("sức khoẻ ok khác true");
+  });
+  it("nội dung thật: mục nêu đúng lý do máy in", () => {
+    expect(rotationReason(files, kiemNhanh)).toEqual([]);
+  });
+  it("mục nêu «vai nối chưa đạt» thay cho lý do thật → đỏ", () => {
+    const copy = {
+      ...files,
+      [HOME]: files[HOME]!.replaceAll("sức khoẻ ok khác true", "vai nối chưa đạt"),
+    };
+    expect(copy[HOME]).not.toEqual(files[HOME]);
+    expect(rotationReason(copy, kiemNhanh)).toEqual([
+      `mục ${NAMED} nêu lý do kiểm nhanh mà máy không in khi bản không nối được: vai nối chưa đạt`,
+      `mục ${NAMED} thiếu lý do kiểm nhanh khi bản không nối được: sức khoẻ ok khác true`,
+    ]);
+  });
+});
+
 describe("E4 · nội dung thật", () => {
   it("mọi đoạn về lùi bản ngoài mục trỏ tới mục", () => {
     expect(pointsThere(files)).toEqual([]);
@@ -340,7 +415,7 @@ describe("E4 · nội dung thật", () => {
 });
 
 describe("E4 · phủ đủ chỗ", () => {
-  it("thước xét mười lăm chỗ mà hàng trước để sót hay vừa sửa", () => {
+  it("thước xét hai mươi ba chỗ mà hàng trước để sót hay vừa sửa", () => {
     const checked = checkedUnits(files).map((c) => c.unit);
     const places: [string, string, (u: Unit) => boolean][] = [
       [
@@ -394,6 +469,42 @@ describe("E4 · phủ đủ chỗ", () => {
         "việc 13 Đỏ thì",
         (u) => /lui-ban\.md/.test(u.text) && u.text.startsWith("- **Đỏ thì:**"),
       ],
+      [
+        ROLLBACK_PAGE,
+        "bước 1 Đỏ thì",
+        (u) => u.h3.startsWith("1.") && u.text.startsWith("- **Đỏ thì:**"),
+      ],
+      [
+        ROLLBACK_PAGE,
+        "bước 3 Đạt khi",
+        (u) => u.h3.startsWith("3.") && u.text.startsWith("- **Đạt khi:**"),
+      ],
+      [
+        ROLLBACK_PAGE,
+        "bước 6 Đỏ thì",
+        (u) => u.h3.startsWith("6.") && u.text.startsWith("- **Đỏ thì:**"),
+      ],
+      [
+        ROLLBACK_PAGE,
+        "hàng DỪNG chưa nêu bản",
+        (u) => u.text.startsWith("| `rollback <ENV>: DỪNG — chưa nêu bản"),
+      ],
+      [
+        ROLLBACK_PAGE,
+        "hàng DỪNG tên miền đã ở bản",
+        (u) => u.text.startsWith("| `rollback <ENV>: DỪNG — tên miền đã ở bản"),
+      ],
+      [
+        "dua-ban-len.md",
+        "hàng vai-dang-nhap thứ nhất",
+        (u) => u.text.startsWith("| `vai-dang-nhap`") && u.text.includes("does not exist"),
+      ],
+      [
+        "dua-ban-len.md",
+        "hàng vai-dang-nhap thứ hai",
+        (u) => u.text.startsWith("| `vai-dang-nhap`") && u.text.includes("(dòng khác)"),
+      ],
+      [HOME, "bước 4 Đỏ thì", (u) => u.h3.startsWith("4.") && u.text.startsWith("- **Đỏ thì:**")],
     ];
     const missing = places
       .filter(([f, , h]) => !checked.some((u) => u.file === f && h(u)))
@@ -423,6 +534,29 @@ describe("E4 · chiều đỏ", () => {
     )!;
     expect(pointsThere(copy)).toEqual([
       `${ROLLBACK_PAGE}: đoạn nói về lùi bản không trỏ mục ${NAMED}: "${row.text.slice(0, 60)}"`,
+    ]);
+  });
+  it("bỏ câu trỏ ở bước 3 của sổ lùi bản → đỏ ở mức bước", () => {
+    const copy = unpointed(files, ROLLBACK_PAGE, "### 3.");
+    const h3 = units(ROLLBACK_PAGE, copy[ROLLBACK_PAGE]!).find((u) => u.h3.startsWith("3."))!.h3;
+    expect(pointsThere(copy)).toEqual([
+      `${ROLLBACK_PAGE}: bước «${h3}» nói về lùi bản mà không trỏ mục ${NAMED}`,
+    ]);
+  });
+  it("bỏ câu trỏ ở hàng vai-dang-nhap của sổ đưa bản lên → đỏ vì nói bản đang chạy yên", () => {
+    const raw = files["dua-ban-len.md"]!;
+    const line = raw
+      .split("\n")
+      .find((l) => l.startsWith("| `vai-dang-nhap`") && l.includes("does not exist"))!;
+    const name = new RegExp(NAMED.replace(/ /g, "\\s+"), "g");
+    const cut = line.replace(name, "«mục khác»");
+    expect(cut).not.toEqual(line);
+    const copy = { ...files, "dua-ban-len.md": raw.replace(line, cut) };
+    const row = units("dua-ban-len.md", copy["dua-ban-len.md"]!).find((u) =>
+      u.text.includes("does not exist"),
+    )!;
+    expect(pointsThere(copy)).toEqual([
+      `dua-ban-len.md: đoạn nói bản đang chạy yên không trỏ mục ${NAMED}: "${row.text.slice(0, 60)}"`,
     ]);
   });
   it("một tệp sổ tay mới có câu lùi bản không trỏ → đỏ", () => {

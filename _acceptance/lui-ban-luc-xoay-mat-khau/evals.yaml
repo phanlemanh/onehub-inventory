@@ -67,7 +67,11 @@ evals:
       vào bản sao rollBack → duDong trả đúng «… thiếu dòng của lệnh: lùi bản ĐỎ — dòng thử»; thay mọi «`kiem-nhanh`»
       (nguyên tên) trong bảng của mục bằng «kiểm nhanh», giữ «`kiem-nhanh-ten-mien`» → duDong trả đúng «mục «…» thiếu
       bước: kiem-nhanh»; dòng ấy chỉ còn ở phần Luật (chuyển «đã lùi về bản trước» ra khỏi bảng, sang một đoạn văn của mục)
-      → duDong trả đúng «… thiếu dòng của lệnh: đã lùi về bản trước».
+      → duDong trả đúng «… thiếu dòng của lệnh: đã lùi về bản trước». Thêm từ lượt sửa 1 (ca «E2 · lý do kiểm nhanh»):
+      tiền đề health.ts có «ok: vai === "dat"» và notOkReason(kiem-nhanh.mjs) = «sức khoẻ ok khác true»; rotationReason
+      trên nội dung thật → []; thay «sức khoẻ ok khác true» bằng «vai nối chưa đạt» trong sổ xoay khoá → đúng hai thông
+      điệp «mục «…» nêu lý do kiểm nhanh mà máy không in khi bản không nối được: vai nối chưa đạt» và «mục «…» thiếu lý do
+      kiểm nhanh khi bản không nối được: sức khoẻ ok khác true».
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E3
     criterion: AC-2
@@ -98,7 +102,9 @@ evals:
     paths: ["docs/van-hanh/*.md", "tests/so-tay-lui-ban.test.ts"]
     expected: >-
       exit 0. Ca «E4 · nội dung thật» pass: troToi trên mọi docs/van-hanh/*.md → []; và ca «E4 · phủ đủ chỗ» pass: tập đoạn
-      troToi xét chứa đủ mười lăm chỗ — dua-ban-len.md: «Đỏ thì» bước 3, 5, 6, đoạn mở đầu «Đỏ thì làm gì», hàng
+      troToi xét chứa đủ hai mươi ba chỗ (từ lượt sửa 1 thêm: lui-ban.md bước 1 «Đỏ thì», bước 3 «Đạt khi», bước 6 «Đỏ thì»,
+      hàng «DỪNG — chưa nêu bản», hàng «DỪNG — tên miền đã ở bản»; dua-ban-len.md hai hàng vai-dang-nhap; xoay-khoa.md bước 4
+      «Đỏ thì») — mười lăm chỗ đầu là — dua-ban-len.md: «Đỏ thì» bước 3, 5, 6, đoạn mở đầu «Đỏ thì làm gì», hàng
       gan-ten-mien; lui-ban.md: đoạn mở đầu, «Khi nào dùng», «Đỏ thì» bước 4 và 5, hàng «kiem-nhanh-ten-mien ĐỎ», hàng
       «Lệnh không chạy được ở máy nào» (Instant Rollback); xoay-khoa.md: «Đỏ thì» bước 3, «Đỏ thì làm gì» dòng hai;
       README.md: hàng make rollback và «Đỏ thì» việc 13 (thước không xanh vì bỏ sót chỗ). Chiều đỏ, cùng nội dung: bỏ câu trỏ ở
@@ -107,7 +113,9 @@ evals:
       đoạn mở đầu không trỏ mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập»»; thêm moi.md với «Lỗi thì lùi bản ngay.» →
       đúng một thông điệp bắt đầu «moi.md: đoạn nói về lùi bản không trỏ mục»; bỏ câu trỏ ở hàng Instant Rollback của
       lui-ban.md → đúng một thông điệp «lui-ban.md: đoạn nói về lùi bản không trỏ mục «…»: "| Lệnh không chạy được ở máy
-      nào …"» (60 ký tự đầu của hàng).
+      nào …"» (60 ký tự đầu của hàng); từ lượt sửa 1: bỏ câu trỏ ở bước 3 lui-ban.md → đúng «lui-ban.md: bước «3. …» nói
+      về lùi bản mà không trỏ mục «…»» (sổ lùi bản xét theo bước); bỏ câu trỏ ở hàng vai-dang-nhap thứ nhất của
+      dua-ban-len.md → đúng một thông điệp «dua-ban-len.md: đoạn nói bản đang chạy yên không trỏ mục «…»: …».
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E5
     criterion: AC-4

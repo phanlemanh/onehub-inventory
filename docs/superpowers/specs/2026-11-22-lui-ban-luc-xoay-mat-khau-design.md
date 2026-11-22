@@ -120,6 +120,9 @@ tiêu đề. Bốn luật, mỗi luật một hàm trả danh sách lỗi:
   «Khi nào dùng» (ít nhất một mục), và mọi đoạn khớp mẫu lối thử bản khác (`một bản cũ hơn`, `trang Vercel`, `Instant
 Rollback`, `kiem-nhanh-ten-mien ĐỎ`). Thêm: ngoài `xoay-khoa.md`, mọi đoạn nhắc xoay mật khẩu vai đăng nhập (mẫu
   `xoay` và `mật khẩu vai đăng nhập` trong cùng đoạn) mang câu trỏ.
+- **Lý do kiểm nhanh** (thêm ở lượt sửa 1). Sức khoẻ chỉ `ok` khi `vai` đạt (`health.ts`), nên bản không nối được
+  trả `ok` khác true và kiểm nhanh dừng ở lý do `sức khoẻ ok khác true (vai: …)`; dòng `vai nối chưa đạt` không bao giờ
+  tới được với máy chủ thật. Mục phải nêu lý do rút từ `kiem-nhanh.mjs` và không được nêu `vai nối chưa đạt`.
 - **Không kể lại.** Ngoài mục ấy, không đoạn nào chứa `mật khẩu cũ` — lý do lùi bản không cứu được chỉ nằm một chỗ.
 
 Văn bản chuẩn về NFC trước khi so. Mỗi lỗi in tệp, luật và đầu đoạn (60 ký tự). Chiều đỏ chạy trên bản sao nội dung thật trong bộ nhớ: bỏ câu trỏ ở bước 6 của
