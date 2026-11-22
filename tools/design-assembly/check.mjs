@@ -2,14 +2,21 @@
 // the ledger that points at them.
 // Usage: node tools/design-assembly/check.mjs [--rate] [--target DIR]
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 import { argv, cwd, exit, stderr, stdout } from "node:process";
 import { fileURLToPath } from "node:url";
 
 import { contrast } from "./color.mjs";
 import { cellProblems, columnsProblem, readDisplays, typesProblem } from "./columns.mjs";
-import { componentsProblem, readFolder, targetProblem, UNTRACKED } from "./components.mjs";
+import {
+  componentsProblem,
+  keepsSettings,
+  libraryParts,
+  readFolder,
+  targetProblem,
+  UNTRACKED,
+} from "./components.mjs";
 import { LEDGERS, shapeProblems } from "./contract.mjs";
 import {
   LAYER_ALIASES,
@@ -48,6 +55,7 @@ import {
   screenActionsDebts,
   screenActionsProblem,
 } from "./screen-actions.mjs";
+import { seenFilesProblem } from "./screen-actions-seen.mjs";
 import { drawDerived, keptOutOfGit } from "./derived.mjs";
 import {
   FRAGMENT_LEDGERS,
@@ -67,10 +75,22 @@ import {
 import { DEFAULT_STYLESHEET, findStylesheet, loadStyles, resolve } from "./styles.mjs";
 import { lintProbes } from "./lint.mjs";
 import { probesFor, ruleOf } from "./probes.mjs";
-import { buildTheme, readBlock, renderBlock, withoutBlock } from "./theme.mjs";
+import {
+  buildTheme,
+  END,
+  readBlock,
+  readVariable,
+  renderBlock,
+  sourcedFont,
+  withoutBlock,
+} from "./theme.mjs";
 import { tokensProblem } from "./tokens.mjs";
+import { buildOf } from "./adapters/index.mjs";
+import { fontProblems, readLoads, unloadedCopy } from "./fonts.mjs";
+import { readFontSources } from "./sources-ledger.mjs";
 import {
   branchFacts,
+  branchDone,
   branchNotes,
   sheetProblem,
   taggedTests,
@@ -89,6 +109,36 @@ export const FILES = {
   css: DEFAULT_STYLESHEET,
   gate: "mk/design-assembly.mk",
 };
+
+// What a font of the sources ledger is read from when the block is written again: the fonts of
+// the ledger as the repository holds them now, the stylesheet the block sits in, and the build's
+// own way to write what loads a font, where it has one.
+export const fontContext = (state) => ({
+  sources: state.fontSources ?? [],
+  stylesheet: state.stylesheet,
+  faces: state.fontFaces ?? null,
+});
+
+// The mode a scope stands for: the light one is :root, any other is a dark one.
+const modeOf = (scope) => ([scope].flat()[0] === ":root" ? "light" : "dark");
+// A pair of colour roles as a sentence names it: the two roles, the mode and its selectors.
+const pairName = (check) =>
+  `${check.foreground} on ${check.background} in ${modeOf(check.scope)} mode (${[check.scope].flat().join(", ")})`;
+// The contrast ratio of a pair as the stylesheet stands, or why it cannot be read.
+function measuredPair(state, check) {
+  const foreground = resolve(state, check.scope, check.foreground);
+  const background = resolve(state, check.scope, check.background);
+  if (!foreground?.color || !background?.color) {
+    return {
+      problem: `cannot read ${check.foreground} and ${check.background} in ${[check.scope].flat().join(", ")}`,
+    };
+  }
+  return { ratio: contrast(foreground.color, background.color) };
+}
+// Whether the typeface row checks the fonts of the sources ledger it chose: a repository the guide
+// wrote before it did keeps hearing a font's fault from the generated block.
+const fontRowHeld = (state) =>
+  (state.theme?.checks?.typeface ?? []).some((check) => check.kind === "font-row");
 
 // One entry per kind of check. `run` returns null when the check passes, else what is wrong.
 // `change` returns the same state altered so that the check must fail.
@@ -112,13 +162,64 @@ const KINDS = {
         typeScale: foundations.type_scale ?? "standard",
         typeRatio: foundations.type_ratio,
         cornerRadius: foundations.corner_radius ?? "floor",
+        textFont: foundations.text_font,
+        headingFont: foundations.heading_font,
       };
       const applied = state.theme?.inputs ?? {};
-      const differs = Object.keys(applied).filter(
-        (key) => String(answers[key]) !== String(applied[key]),
-      );
+      // The owner's word for each question of the table of colour roles, as the guide applies it.
+      const words = decided.layers?.foundations?.roles;
+      if (words) {
+        answers.colorRoles = Object.fromEntries(
+          Object.entries(words).map(([question, word]) => [question, word?.source]),
+        );
+      }
+      // The neutral family and the status tones are answers once the owner's word is that the
+      // formula writes their roles; a brand's own colour for a tone is an answer of its own.
+      const formula = (question) => words?.[question]?.source === "formula";
+      if (formula("color-roles-neutral")) answers.neutralFamily = foundations.neutral_family;
+      // The tones are a set: in any order, each once.
+      const toneSet = (list) => [...new Set(list)].sort();
+      if (formula("color-roles-status")) {
+        answers.statusTones = toneSet([foundations.status_tones ?? []].flat());
+      }
+      const own = decided.layers?.foundations?.brand_exceptions;
+      if (own) {
+        answers.exceptions = Object.fromEntries(
+          Object.entries(own).map(([role, item]) => [
+            role,
+            { light: item?.light, dark: item?.dark },
+          ]),
+        );
+      }
+      // What is applied, the status tones by their names: the guide copies each tone's entry of
+      // the plugin's closed list, which the blueprint does not hold.
+      const appliedSaid = {
+        ...applied,
+        ...(applied.statusTones
+          ? { statusTones: toneSet(applied.statusTones.map((tone) => tone.tone)) }
+          : {}),
+      };
+      // The typeface and the colour roles came later: an answer the blueprint gives and nothing
+      // applied is not in force. `follows` is what the guide derives from the words, not an answer.
+      const later = [
+        "textFont",
+        "headingFont",
+        "colorRoles",
+        "neutralFamily",
+        "statusTones",
+        "exceptions",
+      ].filter((key) => answers[key] !== undefined);
+      const said = (value) =>
+        value !== null && typeof value === "object"
+          ? JSON.stringify(Object.entries(value).sort())
+          : String(value);
+      const differs = [...new Set([...Object.keys(applied), ...later])]
+        .filter((key) => key !== "follows")
+        .filter((key) => said(answers[key]) !== said(appliedSaid[key]));
       if (differs.length === 0) return null;
-      return `${check.file} decides ${differs.map((key) => `${key}: ${answers[key]}`).join(", ")}, and what is applied is ${differs.map((key) => applied[key]).join(", ")}: run the guide again, or put the answer back`;
+      const shown = (value) =>
+        value !== null && typeof value === "object" ? JSON.stringify(value) : value;
+      return `${check.file} decides ${differs.map((key) => `${key}: ${shown(answers[key])}`).join(", ")}, and what is applied is ${differs.map((key) => shown(appliedSaid[key])).join(", ")}: run the guide again, or put the answer back`;
     },
     change(state, check) {
       const decided = JSON.parse(state.files?.[check.file] ?? "{}");
@@ -172,7 +273,27 @@ const KINDS = {
     run(state) {
       const block = readBlock(state.css);
       if (block === null) return `the generated block is missing from ${state.stylesheet}`;
-      const expected = renderBlock(buildTheme(state.theme.inputs, state.css));
+      let expected;
+      try {
+        expected = renderBlock(buildTheme(state.theme.inputs, state.css, fontContext(state)));
+      } catch (error) {
+        // A chosen font whose row is gone, waits on its licence or no longer pins what the
+        // repository holds is the typeface's fault, said under its row where the row checks it:
+        // the rest of the block is still held here, up to the typefaces.
+        if (error.font && fontRowHeld(state)) {
+          const rest = Object.fromEntries(
+            Object.entries(state.theme.inputs).filter(
+              ([key]) => !["textFont", "headingFont"].includes(key),
+            ),
+          );
+          const prefix = renderBlock(buildTheme(rest, state.css)).slice(0, -END.length);
+          if (block.startsWith(prefix)) return null;
+          return "the generated block is not what the source color gives: run the guide again instead of editing it";
+        }
+        // The repository no longer gives what the decided inputs need, such as the floor's font,
+        // or the row of a chosen font with its licence and a pin that still holds.
+        return `the generated block cannot be written again from what was decided: ${error.message}`;
+      }
       if (block === expected) return null;
       return "the generated block is not what the source color gives: run the guide again instead of editing it";
     },
@@ -184,22 +305,106 @@ const KINDS = {
       return { ...state, css: state.css.replace(block, edited) };
     },
   },
+  // A pair of colour roles reaches the contrast ratio of its threshold. A pair the guide measured
+  // below it while a role of it waits on the owner says `waits`: it is named with its ratio on every
+  // run and does not fail, until the owner answers and the guide runs again. It still fails when a
+  // role of it can no longer be read, since then nothing is measured.
   contrast: {
+    // A pair that waits is still held to the ratio it was measured at when it began to wait
+    // (`measured`): it may not get worse while the owner has not answered. A pair written before
+    // that ratio was kept is named on every run, as before, and held once the guide runs again.
     run(state, check) {
-      const foreground = resolve(state, check.scope, check.foreground);
-      const background = resolve(state, check.scope, check.background);
-      if (!foreground?.color || !background?.color) {
-        return `cannot read ${check.foreground} and ${check.background} in ${[check.scope].flat().join(", ")}`;
+      const measured = measuredPair(state, check);
+      if (measured.problem) return measured.problem;
+      if (measured.ratio >= check.min) return null;
+      if (check.waits) {
+        const now = Number(measured.ratio.toFixed(2));
+        if (typeof check.measured !== "number" || now >= check.measured) return null;
+        return `${pairName(check)} measured ${check.measured.toFixed(2)}:1 when it began to wait on ${check.waits}, and is now ${measured.ratio.toFixed(2)}:1: a pair that waits on the owner may not get worse`;
       }
-      const ratio = contrast(foreground.color, background.color);
-      if (ratio >= check.min) return null;
-      return `${check.foreground} on ${check.background} in ${[check.scope].flat().join(", ")} has a contrast ratio of ${ratio.toFixed(2)}:1, below ${check.min}:1`;
+      return `${pairName(check)} has a contrast ratio of ${measured.ratio.toFixed(2)}:1, below ${check.min}:1`;
+    },
+    notes(state, check) {
+      if (!check.waits) return [];
+      const measured = measuredPair(state, check);
+      if (measured.problem || measured.ratio >= check.min) return [];
+      const unheld =
+        typeof check.measured === "number"
+          ? `, and held at ${check.measured.toFixed(2)}:1, the ratio it began to wait at`
+          : "; the ratio it began at is not kept: run the guide again to hold it there";
+      return [
+        `${pairName(check)} measures ${measured.ratio.toFixed(2)}:1, below ${check.min}:1: not checked until the owner answers ${check.waits}${unheld}`,
+      ];
     },
     change(state, check) {
-      const background = resolve(state, check.scope, check.background);
       const where = [check.scope].flat()[0];
+      // A pair held at the ratio it began to wait at: its text on its own ground, 1:1, below it.
+      if (check.waits && typeof check.measured === "number") {
+        const ground = resolve(state, check.scope, check.background);
+        const same = `${where} {\n  ${check.foreground}: ${ground?.value ?? "oklch(1 0 0)"};\n}\n`;
+        return { ...state, css: `${state.css}\n${same}` };
+      }
+      if (check.waits) {
+        const unread = `${where} {\n  ${check.foreground}: unreadable;\n}\n`;
+        return { ...state, css: `${state.css}\n${unread}` };
+      }
+      const background = resolve(state, check.scope, check.background);
       const same = `${where} {\n  ${check.foreground}: ${background?.value ?? "oklch(1 0 0)"};\n}\n`;
       return { ...state, css: `${state.css}\n${same}` };
+    },
+  },
+  // The status tones the owner chose are written in every mode, and no tone left out is declared:
+  // a role of a tone nobody chose would be a colour no answer speaks for.
+  tones: {
+    run(state, check) {
+      const found = [];
+      for (const scope of check.scopes) {
+        for (const role of check.chosen) {
+          if (!resolve(state, scope, role)?.color)
+            found.push(`${role} is not a colour in ${scope}`);
+        }
+      }
+      for (const { role, tone } of check.absent) {
+        const where = check.scopes.filter((scope) => readVariable(state.css, scope, role) !== null);
+        if (where.length > 0) {
+          found.push(
+            `${role} is declared in ${where.join(", ")}, and the owner did not choose the ${tone} tone: choose it in the guide, or take the declaration out`,
+          );
+        }
+      }
+      return found.length > 0 ? found.join("; ") : null;
+    },
+    change(state, check) {
+      const absent = check.absent[0];
+      const role = absent?.role ?? check.chosen[0];
+      const value = absent ? "oklch(0.6 0.15 150)" : "unreadable";
+      return { ...state, css: `${state.css}\n:root {\n  ${role}: ${value};\n}\n` };
+    },
+  },
+  // A font of the sources ledger that a typeface choice names can still be chosen: its row is
+  // there, whole, with its licence, and its pin still holds what the repository has.
+  "font-row": {
+    run(state, check) {
+      try {
+        sourcedFont(check.value, state.fontSources);
+        return null;
+      } catch (error) {
+        return error.message;
+      }
+    },
+    change(state) {
+      return { ...state, fontSources: [] };
+    },
+  },
+  // Every typeface the stylesheet names is loaded, as the repository's build loads one, or is a
+  // family every device has.
+  "font-loaded": {
+    run(state, check) {
+      const found = fontProblems(state, check.variables, state.stylesheet, state.fonts);
+      return found.length > 0 ? found.join("; ") : null;
+    },
+    change(state, check) {
+      return { ...state, css: unloadedCopy(state.css, check.variables[0]) };
     },
   },
   // The variable resolves to the decided value: nothing later in the stylesheet overrides it.
@@ -272,7 +477,8 @@ const KINDS = {
       const read = check.own ?? check.folder;
       const files = state.folders?.[read] ?? {};
       return componentsProblem(state.files?.[check.file], files, check.file, read, {
-        library: [check.folder, ...(check.libraries ?? [])],
+        // Where the library shares its folder, the guide listed its parts one by one.
+        library: check.library ?? [check.folder, ...(check.libraries ?? [])],
         pages: check.pages ? (state.pages?.[check.pages] ?? {}) : {},
       });
     },
@@ -302,6 +508,13 @@ const KINDS = {
       if (check.pages) {
         for (const [file, text] of Object.entries(state.pages?.[check.pages] ?? {})) {
           problems.push(...shapeProblems("screen-kinds", text, file));
+        }
+      }
+      // A ledger kept as one file per entry and no single file, the sources, entry by entry.
+      for (const [kind, ledger] of Object.entries(LEDGERS)) {
+        if (!ledger.ending) continue;
+        for (const [file, text] of Object.entries(state.ledgerFolders?.[ledger.folder] ?? {})) {
+          problems.push(...shapeProblems(kind, text, file));
         }
       }
       if (problems.length === 0) return null;
@@ -362,7 +575,7 @@ const KINDS = {
   // No screen sets on a table what the column type decides.
   cells: {
     run(state, check) {
-      return cellProblems(state.folders?.[check.folder] ?? {}, check.rule, check.skip);
+      return cellProblems(state.folders?.[check.folder] ?? {}, check.rule, liveSkip(state, check));
     },
     change(state, check) {
       const added = `${check.folder}/changed-copy.tsx`;
@@ -511,10 +724,29 @@ const KINDS = {
       return { ...state, files: { ...state.files, [check.file]: text } };
     },
   },
+  // Each role sees in a browser the buttons the ledger of screens and the model give it: the
+  // browser test that walks the screens as each role is there, reads the gate's own plan and
+  // enters by the repository's file of ways in, and that file is there. The test itself runs with
+  // the repository's browser checks.
+  "screen-actions-seen": {
+    run(state, check) {
+      if (!state.models?.[check.model]?.present) {
+        return `${check.model}/actions.yaml is missing, so no role is walked`;
+      }
+      return seenFilesProblem(
+        { door: state.files?.[check.door] ?? null, test: state.files?.[check.test] ?? null },
+        { doorFile: check.door, testFile: check.test },
+      );
+    },
+    // The file of ways in is gone.
+    change(state, check) {
+      return { ...state, files: { ...state.files, [check.door]: null } };
+    },
+  },
   // No screen writes its own words.
   words: {
     run(state, check) {
-      return wordsProblem(state.folders?.[check.folder] ?? {}, check.skip);
+      return wordsProblem(state.folders?.[check.folder] ?? {}, liveSkip(state, check));
     },
     change(state, check) {
       const added = `${check.folder}/changed-copy.tsx`;
@@ -528,7 +760,7 @@ const KINDS = {
     run(state, check) {
       // Every source file where the check names them; the screens alone in an older setting.
       const files = state.sources?.[check.sources] ?? state.folders?.[check.folder] ?? {};
-      return channelsProblem(files, check.skip);
+      return channelsProblem(files, liveSkip(state, check));
     },
     change(state, check) {
       const added = `${check.folder}/changed-copy.tsx`;
@@ -547,7 +779,7 @@ const KINDS = {
   // No empty state dresses a link as a button.
   "empty-state": {
     run(state, check) {
-      return emptyStateProblem(state.sources?.[check.sources] ?? {}, check.skip);
+      return emptyStateProblem(state.sources?.[check.sources] ?? {}, liveSkip(state, check));
     },
     change(state, check) {
       const added = `${check.sources}/changed-copy.tsx`;
@@ -561,7 +793,11 @@ const KINDS = {
   "screen-links": {
     run(state, check) {
       const paths = screenPaths(state.files?.[check.registry], state.files?.[check.ledger] ?? null);
-      return screenLinksProblem(state.sources?.[check.sources] ?? {}, paths, check.skip);
+      return screenLinksProblem(
+        state.sources?.[check.sources] ?? {},
+        paths,
+        liveSkip(state, check),
+      );
     },
     change(state, check) {
       const to =
@@ -575,7 +811,7 @@ const KINDS = {
   // Every error message a screen shows says what happened and what to do next.
   "error-copy": {
     run(state, check) {
-      return errorCopyProblem(state.folders?.[check.folder] ?? {}, check.skip);
+      return errorCopyProblem(state.folders?.[check.folder] ?? {}, liveSkip(state, check));
     },
     change(state, check) {
       const added = `${check.folder}/changed-copy.tsx`;
@@ -711,9 +947,13 @@ const KINDS = {
         blueprint,
         sources: state.sources?.[check.sources] ?? {},
         tagged: state.tagged ?? [],
+        // The component library's files, read from its settings now: a component added to a
+        // folder the library shares is told apart without running the guide again.
+        library: state.library ?? undefined,
       });
     },
     notes: (state) => branchNotes(state.branch ?? null),
+    done: (state) => branchDone(state.branch ?? null),
     // The branch writes a judgment of its own, and nobody is asked.
     change(state) {
       const row = {
@@ -738,6 +978,7 @@ const KINDS = {
       return wallProblem({ branch: state.branch ?? null, waiting: state.waiting });
     },
     notes: (state) => branchNotes(state.branch ?? null),
+    done: (state) => branchDone(state.branch ?? null),
     // The branch adds a page of a kind of screen that nobody asked the owner about.
     change(state) {
       const branch = state.branch && !state.branch.problem ? state.branch : emptyBranch();
@@ -757,7 +998,7 @@ const KINDS = {
         return `${FILES.gate} does not run the check, or runs it in a way that cannot fail`;
       }
       // The gate itself must still run what the included files add to it.
-      if (!/^check:.*(\$\(CHECK_TARGETS\)|\bdesign-assembly\b)/m.test(state.makefile ?? "")) {
+      if (!checkReachesTargets(state.makefile ?? "")) {
         return "the Makefile's check target no longer runs CHECK_TARGETS, so make check does not run this";
       }
       return null;
@@ -767,8 +1008,38 @@ const KINDS = {
     },
   },
 };
+// The kinds of check, for the plugin's own tests of a single check.
+export const KINDS_FOR_TEST = KINDS;
 
 const lintKey = (id, check) => `${id}:${check.rule}`;
+
+// Whether `make check` runs CHECK_TARGETS (or design-assembly itself), directly or through the
+// targets it depends on: repo-setup 0.9.0 writes `check: check-quick check-heavy` and
+// `check-quick: $(CHECK_TARGETS)`. Only prerequisites count, not a comment after `##` or `#`.
+function checkReachesTargets(makefile) {
+  const prerequisites = new Map();
+  for (const line of makefile.split("\n")) {
+    const rule = /^([A-Za-z0-9_.-]+)\s*::?(?!=)(.*)$/.exec(line);
+    if (!rule) continue;
+    const words = rule[2]
+      .split("#")[0]
+      .split(/\s+/)
+      .filter((word) => word && word !== "|");
+    prerequisites.set(rule[1], [...(prerequisites.get(rule[1]) ?? []), ...words]);
+  }
+  const seen = new Set();
+  const queue = ["check"];
+  while (queue.length > 0) {
+    const target = queue.shift();
+    if (seen.has(target)) continue;
+    seen.add(target);
+    for (const word of prerequisites.get(target) ?? []) {
+      if (word === "$(CHECK_TARGETS)" || word === "design-assembly") return true;
+      queue.push(word);
+    }
+  }
+  return false;
+}
 
 // A branch that adds nothing, for a changed copy to add to.
 const emptyBranch = () => ({
@@ -943,6 +1214,18 @@ export function gitFacts(root, files) {
   };
 }
 
+// Every file of a folder that ends as its ledger's files do, by its path, as it is on disk.
+function readLedgerFolder(root, folder, ending) {
+  const full = path.join(root, folder);
+  if (!existsSync(full) || !statSync(full).isDirectory()) return {};
+  return Object.fromEntries(
+    readdirSync(full)
+      .filter((name) => name.endsWith(ending) && statSync(path.join(full, name)).isFile())
+      .sort()
+      .map((name) => [`${folder}/${name}`, readFileSync(path.join(full, name), "utf8")]),
+  );
+}
+
 export function readState(root) {
   const read = (file) => {
     const full = path.join(root, file);
@@ -977,6 +1260,7 @@ export function readState(root) {
       check.types,
       check.registry,
       check.test,
+      check.door,
       check.blueprint,
       check.ledger,
       ...Object.values(check.ledgers ?? {}),
@@ -1015,8 +1299,11 @@ export function readState(root) {
           main: asking.find((check) => check.main)?.main ?? null,
         });
   const testsOf = asking.find((check) => check.tests)?.tests;
+  const styles = loadStyles(root, stylesheet);
   return {
     root,
+    // The component library's parts, read from its settings now, where it keeps them.
+    library: keepsSettings(root) ? libraryParts(root) : null,
     theme: data,
     ledger: rows,
     // What the repository's own lint rejects, for the decisions it holds.
@@ -1024,7 +1311,15 @@ export function readState(root) {
     stylesheet,
     // `css` is the repository's own text with its relative imports put in place; `base` is the
     // framework's theme, read only when a value points into it.
-    ...loadStyles(root, stylesheet),
+    ...styles,
+    // What loads a typeface, as the adapter of the repository's build reads it.
+    fonts: checks.some((check) => check.kind === "font-loaded")
+      ? readLoads(root, styles.css, stylesheet)
+      : null,
+    // The fonts of the sources ledger, each with how its pin differs from the repository today,
+    // and how the repository's build writes what loads one.
+    fontSources: readFontSources(root),
+    fontFaces: buildOf(root).fontFaces ?? null,
     files: Object.fromEntries(named),
     // The fragments of each such ledger kept as a folder, or null where it is one file.
     fragments: Object.fromEntries(
@@ -1032,6 +1327,12 @@ export function readState(root) {
     ),
     folders: Object.fromEntries(folders),
     pages: Object.fromEntries(pages),
+    // The ledgers kept only as a folder of files, the sources, file by file.
+    ledgerFolders: Object.fromEntries(
+      Object.values(LEDGERS)
+        .filter((ledger) => ledger.ending)
+        .map((ledger) => [ledger.folder, readLedgerFolder(root, ledger.folder, ledger.ending)]),
+    ),
     sources: Object.fromEntries(sources),
     models: Object.fromEntries(models),
     // The column type each field of the data model names.
@@ -1050,11 +1351,20 @@ export function readState(root) {
 
 // For every decision this tool holds: what is wrong, or null, and whether each of its checks was
 // seen failing on a changed copy.
+// The files a check leaves out: the list the guide wrote into the tool data, and the component
+// library's parts read from its settings now, so a library file installed after the guide ran is
+// left out too.
+export function liveSkip(state, check) {
+  return [...new Set([...(check.skip ?? []), ...(state.library ?? [])])];
+}
+
 export function runChecks(state) {
   return Object.entries(state.theme?.checks ?? {}).map(([id, checks]) => {
     const problems = [];
     // What a check lists on every run without failing, such as work planned for later.
     const notes = [];
+    // What a check did to reach its answer, such as history it fetched: work done, not a debt.
+    const done = [];
     let seenFailing = true;
     for (const check of checks) {
       const kind = KINDS[check.kind];
@@ -1065,6 +1375,7 @@ export function runChecks(state) {
       const problem = kind.run(state, check, id);
       if (problem) problems.push(problem);
       if (kind.notes) notes.push(...kind.notes(state, check, id));
+      if (kind.done) done.push(...kind.done(state, check, id));
       if (kind.run(kind.change(state, check, id), check, id) === null) seenFailing = false;
     }
     return {
@@ -1073,8 +1384,17 @@ export function runChecks(state) {
       seenFailing,
       held: problems.length === 0 && seenFailing,
       notes,
+      done,
     };
   });
+}
+
+// The lines a passing gate prints for its results: what a check did, then what it leaves as a debt.
+export function noteLines(results) {
+  return results.flatMap((r) => [
+    ...(r.done ?? []).map((line) => `  ${r.id}: ${line}`),
+    ...r.notes.map((note) => `  ${r.id}, debt: ${note}`),
+  ]);
 }
 
 // The ledger and this tool must agree in both directions.
@@ -1174,7 +1494,7 @@ function main() {
     for (const line of problems) stderr.write(`  ${line}\n`);
     exit(1);
   }
-  for (const r of results) for (const note of r.notes) stdout.write(`  ${r.id}, debt: ${note}\n`);
+  for (const line of noteLines(results)) stdout.write(`${line}\n`);
   const count = results.reduce((sum, r) => sum + state.theme.checks[r.id].length, 0);
   stdout.write(
     `design-assembly: ${results.length} decisions held by ${count} checks, each seen failing on a changed copy\n`,

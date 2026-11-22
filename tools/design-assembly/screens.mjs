@@ -11,7 +11,8 @@ import { readYaml } from "./yaml.mjs";
 // One page per kind of screen. The folder and the front matter are the ones the acceptance kit
 // reads, so a repository keeps one page for both tools; the keys are in the kit's own language.
 export const KINDS_FOLDER = "design/patterns";
-const KEY = {
+// This is the one table of those keys: whatever reads a page of a kind takes them from here.
+export const KEY = {
   kind: "nhom", // the kind's name, equal to the file name
   task: "nhan_viec", // the main task of a person on a screen of this kind
   files: "nhan_dien", // globs of the source files that draw a screen of this kind
@@ -20,6 +21,11 @@ const KEY = {
   exceptions: "ngoai_le", // [{ tep, khoi?, ly_do }]: without `khoi`, the file leaves the kind
   part: "khoi",
   why: "ly_do",
+  frame: "khuon", // { ten, nhap }: the frame a screen of this kind is built in
+  frameName: "ten",
+  frameImport: "nhap",
+  required: "khe_bat_buoc", // what the frame must be given
+  forbidden: "cam_ngoai_khuon", // what may not be used outside the frame
 };
 // Files in the folder that are not a kind of screen.
 export const NOT_A_KIND = ["README.md", "lech-lot.md"];

@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 import { adapter as library } from "./adapters/shadcn.mjs";
 import { newerProblem } from "./contract.mjs";
 import { lineWidth, renderJson } from "./json.mjs";
-import { frontMatter, readPages } from "./screens.mjs";
+import { frontMatter, KEY, readPages } from "./screens.mjs";
 
 // The file a repository gets when nothing names another one, and the folder read by default.
 export const REGISTRY = "design/component-registry.json";
@@ -28,20 +28,65 @@ export const COMPONENTS_DECISION = "component-manifest";
 // The shape of the file: the acceptance kit reads the version as a string.
 const VERSION = "2";
 
-// The folders of every component library the repository installed: the library's own, then the
-// folder of each other registry its settings name, when that folder is there.
-export function libraryFolders(root) {
-  const file = path.join(root, library.settingsFile);
-  let settings;
+// Code the repository did not write, where it keeps no component settings: a vendor's components,
+// by the usual names of their folders, at any depth. The adapter names the folders.
+export const VENDOR = new RegExp(`(^|\\/)components\\/(${library.vendorFolders.join("|")})\\/`);
+
+// A JSON file of the repository, or null when it is not there or cannot be read.
+function jsonAt(root, file) {
   try {
-    settings = existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : null;
+    const full = path.join(root, file);
+    return existsSync(full) ? JSON.parse(readFileSync(full, "utf8")) : null;
   } catch {
-    settings = null;
+    return null;
   }
+}
+
+// The folders of every component library the repository installed: the library's own, then the
+// folder of each other registry its settings name, when that folder is there. An alias of the
+// package's own is read through the package's exports.
+export function libraryFolders(root) {
+  const settings = jsonAt(root, library.settingsFile);
+  const pkg = jsonAt(root, "package.json");
   const others = library
-    .registryFoldersIn(settings)
+    .registryFoldersIn(settings, pkg)
     .filter((folder) => existsSync(path.join(root, folder)));
-  return [library.folderIn(settings) ?? library.folder, ...others];
+  return [library.folderIn(settings, pkg) ?? library.folder, ...others];
+}
+
+// The parts of the repository that are a component library's: a folder a library keeps to itself,
+// written `folder/`, and, where the library shares its folder with the repository's own
+// components, each file of that folder named for one of the library's items. A folder the library
+// keeps to itself is one named for it, `ui`, or another registry's.
+export function libraryParts(root) {
+  const [main, ...others] = libraryFolders(root);
+  const shared = ownFolder(main) === null;
+  const items = new Set(library.items);
+  const files = shared
+    ? Object.keys(readFolder(root, main))
+        .filter((file) => path.posix.dirname(file) === main)
+        .filter((file) => items.has(path.posix.basename(file).replace(/\.[jt]sx$/, "")))
+    : [];
+  return [...(shared ? files : [`${main}/`]), ...others.map((folder) => `${folder}/`)];
+}
+
+// Whether a file is one of the parts of a library: under a folder, or that very file. A part
+// written without the closing slash names a folder unless it names a source file.
+export function inLibrary(file, parts) {
+  return parts.some((part) => {
+    const folder = part.endsWith("/") || !/\.[jt]sx?$/.test(part);
+    return folder ? file.startsWith(part.endsWith("/") ? part : `${part}/`) : file === part;
+  });
+}
+
+// Whether the repository keeps the component settings its library's parts are read from.
+export const keepsSettings = (root) => jsonAt(root, library.settingsFile) !== null;
+
+// Which files of the repository are a library's: the parts its settings give, and always the
+// usual names of the folders, so a repository that keeps settings loses none it had.
+export function libraryTest(root) {
+  const parts = keepsSettings(root) ? libraryParts(root) : [];
+  return (file) => VENDOR.test(file) || inLibrary(file, parts);
 }
 
 // A folder of templates: the frames screens are built in, whatever they import.
@@ -391,7 +436,7 @@ function levels(files) {
 export function templateNames(pages) {
   return new Set(
     Object.values(pages ?? {})
-      .map((text) => frontMatter(text)?.khuon?.ten)
+      .map((text) => frontMatter(text)?.[KEY.frame]?.[KEY.frameName])
       .filter((name) => typeof name === "string"),
   );
 }
@@ -426,6 +471,9 @@ function propsOf(signature) {
 const COMMON_PROPS = new Set(["className", "children"]);
 
 function survey(given, { library, pages } = {}) {
+  // No list at all means no library is known, and every component is listed as the library's,
+  // as before there was a list; a list, even an empty one, says which files are.
+  const known = library !== undefined && library !== null;
   const libraries = [library].flat().filter(Boolean);
   const files = Object.fromEntries(
     Object.entries(given).map(([file, text]) => [file, withoutComments(text)]),
@@ -510,10 +558,7 @@ function survey(given, { library, pages } = {}) {
         category: "component",
         file,
         level: templates.has(name) ? "template" : level(file),
-        source:
-          libraries.length === 0 || libraries.some((folder) => file.startsWith(`${folder}/`))
-            ? "library"
-            : "own",
+        source: !known || inLibrary(file, libraries) ? "library" : "own",
         ...(drawnWith.length > 0 ? { parts: drawnWith } : {}),
         ...(props.length > 0 ? { props } : {}),
         ...(control ? { control: true } : {}),
@@ -610,7 +655,8 @@ export function regenerated(root) {
   const read = check.own ?? check.folder;
   const files = readFolder(root, read);
   const options = {
-    library: [check.folder, ...(check.libraries ?? [])],
+    // Where the library shares its folder, the check lists the library's parts one by one.
+    library: check.library ?? [check.folder, ...(check.libraries ?? [])],
     pages: check.pages ? readPages(root, check.pages) : {},
   };
   const manifest = readComponents(files, options);

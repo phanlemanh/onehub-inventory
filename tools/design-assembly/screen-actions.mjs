@@ -8,7 +8,7 @@
 // Usage: node tools/design-assembly/screen-actions.mjs [--target DIR] [--keys entry=…,actions=…]
 //          [--overlay FILE.json] [--table] [--json]
 // Read-only: it never writes, in this repository or the one it reads.
-import { existsSync, readdirSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
 import { argv, cwd, exit, stdout } from "node:process";
 import { fileURLToPath } from "node:url";
@@ -35,32 +35,51 @@ const named = (value) =>
   value === null || value === undefined || value === "" || value === "null" ? null : String(value);
 const join = (names) => names.join(", ");
 
-// The model as the files of the repository have it: actions, roles, and each entity by the name of
-// its file. A file that is not there reads as nothing.
-export function readModel(root, folder = MODEL) {
-  const read = (file) => {
-    const full = path.join(root, folder, file);
-    return existsSync(full) ? readYaml(readFileSync(full, "utf8")) : null;
-  };
-  const entitiesFolder = path.join(root, folder, "entities");
-  const entities = existsSync(entitiesFolder)
-    ? Object.fromEntries(
-        readdirSync(entitiesFolder)
-          .filter((file) => file.endsWith(".yaml") && !file.startsWith("_"))
-          .sort()
-          .map((file) => [
-            file.replace(/\.yaml$/, ""),
-            readYaml(readFileSync(path.join(entitiesFolder, file), "utf8")),
-          ]),
-      )
-    : {};
+// The model as its files have it, from the text of each by its path under the model's folder:
+// actions, roles, and each entity by the name of its file. A file that is not there reads as
+// nothing. One reader for the files of a disk and for the files of a commit.
+export function modelOfFiles(files) {
+  const read = (file) => (typeof files[file] === "string" ? readYaml(files[file]) : null);
+  const entities = Object.fromEntries(
+    Object.keys(files)
+      .filter((file) => /^entities\/[^/]+\.yaml$/.test(file) && !/^entities\/_/.test(file))
+      .sort()
+      .map((file) => [file.replace(/^entities\/|\.yaml$/g, ""), read(file)]),
+  );
   const actions = read("actions.yaml");
+  const roles = read("roles.yaml");
   return {
     present: actions !== null,
     actions: Array.isArray(actions?.actions) ? actions.actions : [],
-    roles: Array.isArray(read("roles.yaml")?.roles) ? read("roles.yaml").roles : [],
+    roles: Array.isArray(roles?.roles) ? roles.roles : [],
     entities,
   };
+}
+
+// The model as the files of the repository have it.
+export function readModel(root, folder = MODEL) {
+  const text = (file) => {
+    const full = path.join(root, folder, file);
+    return existsSync(full) ? readFileSync(full, "utf8") : null;
+  };
+  const entitiesFolder = path.join(root, folder, "entities");
+  // Only a file named as an entity's file is read: a folder kept beside the entities, or a file
+  // of another kind, is passed over, never opened.
+  const isEntityFile = (file) =>
+    file.endsWith(".yaml") &&
+    statSync(path.join(entitiesFolder, file), { throwIfNoEntry: false })?.isFile() === true;
+  const names = existsSync(entitiesFolder)
+    ? readdirSync(entitiesFolder)
+        .filter(isEntityFile)
+        .map((file) => `entities/${file}`)
+    : [];
+  return modelOfFiles(
+    Object.fromEntries(
+      ["actions.yaml", "roles.yaml", ...names]
+        .map((file) => [file, text(file)])
+        .filter(([, found]) => found !== null),
+    ),
+  );
 }
 
 // The model as data: each action with the roles that hold it, and each entity with its lifecycle

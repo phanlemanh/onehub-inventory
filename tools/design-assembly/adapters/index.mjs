@@ -3,6 +3,7 @@
 // how to reach it. A test fails when a name an adapter declares appears in the core.
 import { adapter as eslint } from "./eslint.mjs";
 import { adapter as nextjs } from "./nextjs.mjs";
+import { adapter as nextjsBuild } from "./nextjs-build.mjs";
 import { adapter as playwright } from "./playwright.mjs";
 import { adapter as react } from "./react.mjs";
 import { adapter as shadcn } from "./shadcn.mjs";
@@ -21,10 +22,24 @@ export const ADAPTER_KINDS = {
   routes: "knows which files draw the screen at a route, where the folders of the source say it",
 };
 
-export const ADAPTERS = [vite, playwright, tailwind, shadcn, react, eslint, nextjs];
+// The first build is the one a repository whose packages name none is drawn with.
+export const ADAPTERS = [vite, playwright, tailwind, shadcn, react, eslint, nextjs, nextjsBuild];
 
 // The adapter of a kind.
 export const adapterOf = (kind) => ADAPTERS.find((adapter) => adapter.kind === kind);
+
+// The build a repository is drawn with and loads its fonts by: the one it shows most surely it
+// builds with, by its settings file or its own development command, then by its packages; on a
+// tie, the first in the list; and the first build when it names none.
+export function buildOf(root) {
+  let found = null;
+  let best = 0;
+  for (const adapter of ADAPTERS.filter((item) => item.kind === "build")) {
+    const sure = Number(adapter.detect(root)) || 0;
+    if (sure > best) [found, best] = [adapter, sure];
+  }
+  return found ?? adapterOf("build");
+}
 
 // Every name an adapter declares that appears in a text: a library or build tool named where only
 // an adapter may name it. A name is matched whole, in any case, so `reactive` is not `react`.

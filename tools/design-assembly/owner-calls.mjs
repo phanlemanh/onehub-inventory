@@ -17,6 +17,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { env } from "node:process";
 
+import { inLibrary, VENDOR } from "./components.mjs";
 import { parseLedger } from "./ledger.mjs";
 import { NOT_A_KIND } from "./screens.mjs";
 import { colourItem, STAMP, UNCONFIRMED } from "./waiting.mjs";
@@ -30,15 +31,17 @@ export const BYPASS = {
   radius: /\brounded(?:-[a-z]{1,2})?-\[[^\]]+\]/g,
 };
 // Code the repository did not write: a vendor's components are not the repository's decisions.
-export const VENDOR = /(^|\/)components\/(ui|reui)\//;
+export { VENDOR };
 const MARKUP = /\.[jt]sx$/;
+const vendor = (file) => VENDOR.test(file);
 
 // For each decision of BYPASS, how many places in source go around it and in which files.
-// `sources` maps a file to its text.
-export function bypasses(sources) {
+// `sources` maps a file to its text; `isLibrary` says which files are a component library's, by
+// the usual folders when not given.
+export function bypasses(sources, isLibrary = vendor) {
   const result = Object.fromEntries(Object.keys(BYPASS).map((id) => [id, { count: 0, files: [] }]));
   for (const [file, text] of Object.entries(sources ?? {})) {
-    if (!MARKUP.test(file) || VENDOR.test(file)) continue;
+    if (!MARKUP.test(file) || isLibrary(file)) continue;
     for (const [id, pattern] of Object.entries(BYPASS)) {
       const hits = (text ?? "").match(pattern)?.length ?? 0;
       if (hits > 0) {
@@ -92,27 +95,22 @@ const NO_MAIN = `name the main branch with "main" on the check in design/theme.j
 const pageName = (file) => path.posix.basename(file, ".md");
 const isPage = (name) => name.endsWith(".md") && !NOT_A_KIND.includes(name);
 
-// What this branch adds, read from git: its base, the pages of kinds of screen that were not there,
-// the root colour line there and now, and the judgments of the ledger it writes or changes.
-// Null outside git. With `problem` when git is there and cannot say. With `born` when the base has
-// no decision ledger, and nothing else. `main` names the main branch where it has another name.
-// `history` is how a shallow checkout's history is fetched, as for HISTORY.
-export function branchFacts(
-  root,
-  { pages, stylesheet, ledger, main: named = null, history = HISTORY },
-) {
+// Where this branch left the main one, read from git: the commit they share (`base`), the name
+// of the main branch, and git itself for what is read next. Null outside git. With `problem` when
+// git is there and cannot say. With `unborn` when the repository has no commit yet. `main` names
+// the main branch where it has another name. `history` is how a shallow checkout's history is
+// fetched, as for HISTORY; with `fetch` false nothing is fetched, and a shallow checkout that
+// lacks the main branch is a problem, said as such.
+export function branchBase(root, { main: named = null, history = HISTORY, fetch = true } = {}) {
   // Never waits on a prompt for a password or a passphrase: a fetch that needs one fails, and
   // says so. `timed` also gives up after a while, for a call that goes to the remote.
+  const quiet = { ...env, GIT_TERMINAL_PROMPT: "0", ...sshOverride(root) };
   const run = (timeout, args) =>
     spawnSync("git", ["-C", root, ...args], {
       encoding: "utf8",
       maxBuffer: 1 << 30,
       timeout,
-      env: {
-        ...env,
-        GIT_TERMINAL_PROMPT: "0",
-        GIT_SSH_COMMAND: env.GIT_SSH_COMMAND ?? "ssh -o BatchMode=yes",
-      },
+      env: quiet,
     });
   const git = Object.assign((...args) => run(undefined, args), {
     timed: (timeout, ...args) => run(timeout, args),
@@ -124,9 +122,7 @@ export function branchFacts(
     if (/not a git repository/i.test(said)) return null;
     return { problem: said.split("\n")[0] || "git gave no reason" };
   }
-  // No commit yet: the repository starts here, with the person who answers, and there is nothing
-  // before it to compare with.
-  if (git("rev-parse", "--verify", "--quiet", "HEAD").status !== 0) return unborn(null, null);
+  if (git("rev-parse", "--verify", "--quiet", "HEAD").status !== 0) return { unborn: true };
   const known = (name) => git("rev-parse", "--verify", "--quiet", `${name}^{commit}`).status === 0;
   // Each main branch git knows, with where this branch left it. The newest of those is the base: a
   // fork point every other one is an ancestor of.
@@ -140,6 +136,12 @@ export function branchFacts(
   // the main branch is then the one fetched.
   let fetched;
   if (forksOf(names).length === 0 && isShallow(git)) {
+    if (!fetch) {
+      return {
+        problem:
+          "a shallow checkout that lacks the main branch, and nothing is fetched to read this",
+      };
+    }
     const got = fetchMain(git, named, history);
     if (got.problem) return { problem: got.problem };
     fetched = got.fetched;
@@ -163,6 +165,21 @@ export function branchFacts(
   const isAncestor = (a, b) => git("merge-base", "--is-ancestor", a, b).status === 0;
   const { name: main, base } =
     forks.find((fork) => forks.every((other) => isAncestor(other.base, fork.base))) ?? forks[0];
+  return { git, base, main, ...(fetched ? { fetched } : {}) };
+}
+
+// What this branch adds, read from git: its base, the pages of kinds of screen that were not there,
+// the root colour line there and now, and the judgments of the ledger it writes or changes.
+// Null outside git. With `problem` when git is there and cannot say. With `born` when the base has
+// no decision ledger, and nothing else. `main` names the main branch where it has another name.
+// `history` is how a shallow checkout's history is fetched, as for HISTORY.
+export function branchFacts(root, { pages, stylesheet, ledger, main: named = null, history }) {
+  const found = branchBase(root, { main: named, ...(history ? { history } : {}) });
+  if (found === null || found.problem) return found;
+  // No commit yet: the repository starts here, with the person who answers, and there is nothing
+  // before it to compare with.
+  if (found.unborn) return unborn(null, null);
+  const { git, base, main, fetched } = found;
   // A file at the base, named from the target: its text, or null where the base has no such file.
   // Anything else git says is not an absence, and is thrown, never read as "nothing there".
   const atBase = (file) => {
@@ -184,6 +201,20 @@ export function branchFacts(
   } catch (error) {
     return { problem: error.message };
   }
+}
+
+// The ssh command git runs for the remote, told never to ask for a password, only where the machine
+// names none of its own. An environment variable wins over git's settings, so setting one over a
+// command the machine configured (`GIT_SSH_COMMAND`, `GIT_SSH`, or `core.sshCommand`, such as a
+// key a continuous integration checkout names) would drop that command and its key. A configured
+// command is left alone: a call to the remote still gives up after NETWORK_MS.
+function sshOverride(root) {
+  if (env.GIT_SSH_COMMAND || env.GIT_SSH) return {};
+  const configured = spawnSync("git", ["-C", root, "config", "--get", "core.sshCommand"], {
+    encoding: "utf8",
+  });
+  if (configured.status === 0 && configured.stdout.trim() !== "") return {};
+  return { GIT_SSH_COMMAND: "ssh -o BatchMode=yes" };
 }
 
 // How a shallow checkout's history is fetched: `step` commits first, a step doubled each later
@@ -333,6 +364,14 @@ function unanswered(row, { waiting, blueprint }) {
   if (String(row.source ?? "").includes("blueprint") && layer?.status === "decided") {
     if (layer.source === "user" || (layer.confirmed ?? []).includes(key)) return null;
   }
+  // A design principle the guide writes is the owner's when the blueprint lists it as theirs.
+  const context = blueprint?.layers?.context;
+  const principle = (Array.isArray(context?.principles) ? context.principles : []).find(
+    (item) => `principle-${item?.id}` === id,
+  );
+  if (String(row.source ?? "").includes("blueprint") && context?.status === "decided") {
+    if (principle?.source === "user") return null;
+  }
   return `${id}: a judgment this branch writes, which no person answered and no question asks; ask the owner with decide --ask --item decision:${id}, or say in its note that a person has not confirmed it`;
 }
 
@@ -343,7 +382,9 @@ const waitingProblem = (waiting) =>
 // what this branch adds (null outside git), `waiting` the waiting list as { rows } or { problem },
 // `blueprint` the blueprint as data, `sources` the repository's source by file, `tagged` its
 // tests that name a decision.
-export function sheetProblem({ ledger, branch, waiting, blueprint, sources, tagged }) {
+// `library` is the parts of the repository that are a component library's, as libraryParts gives
+// them; without it, the usual folders.
+export function sheetProblem({ ledger, branch, waiting, blueprint, sources, tagged, library }) {
   const rows = ledger ?? [];
   const problems = [];
   const unread = waitingProblem(waiting);
@@ -356,7 +397,9 @@ export function sheetProblem({ ledger, branch, waiting, blueprint, sources, tagg
     if (why) problems.push(why);
   }
   const decided = new Set(rows.map((row) => String(row.id)));
-  for (const [id, around] of Object.entries(bypasses(sources))) {
+  // The usual folders always, and the parts the settings give where they are known.
+  const isLibrary = (file) => vendor(file) || inLibrary(file, library ?? []);
+  for (const [id, around] of Object.entries(bypasses(sources, isLibrary))) {
     if (decided.has(id) && around.count > 0) {
       problems.push(
         `${id}: ${around.count} place(s) in source go around it: ${around.files.slice(0, 5).join(", ")}`,
@@ -428,7 +471,8 @@ export function wallProblem({ branch, waiting }) {
   return problems.length === 0 ? null : problems.join("; ");
 }
 
-// What the checks say on a pass that did not compare, and where history was fetched to compare.
+// What the checks say on a pass that did not compare. History fetched to compare is work done, not
+// a debt: `branchDone` says it.
 export function branchNotes(branch) {
   if (branch === null) {
     return ["not in a git repository: what a branch adds is not compared with the main branch"];
@@ -440,5 +484,10 @@ export function branchNotes(branch) {
           ? "no commit yet: the repository starts here, so what it adds is not compared"
           : "the main branch has no decision ledger: this branch is where the repository meets the plugin, so what it adds is not compared",
       ];
-  return branch.fetched ? [...born, branch.fetched] : born;
+  return born;
+}
+
+// What the checks did to compare: in a shallow checkout, the history they fetched.
+export function branchDone(branch) {
+  return branch?.fetched ? [branch.fetched] : [];
 }
