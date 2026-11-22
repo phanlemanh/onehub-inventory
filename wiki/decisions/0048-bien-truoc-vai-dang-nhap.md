@@ -56,7 +56,7 @@ Không hàm bước nào đổi. `migration` vẫn đứng đầu, nên migratio
   sở dữ liệu còn mật khẩu cũ. Bản đang chạy không bị đụng, vì biến chỉ vào bản qua một lần dựng. Nhưng một lần bấm dựng lại
   ngay trên Vercel lúc ấy sẽ không nối được. Sổ tay ([dua-ban-len.md](../../docs/van-hanh/dua-ban-len.md)) dặn không làm.
   Thứ tự cũ thì hỏng ngay mà không cần ai bấm gì.
-- Khoảng hở còn lại: từ lúc `vai-dang-nhap` đạt tới `gan-ten-mien`. Lúc đang xoay, `cach-ly`, `dung` hay `kiem-nhanh` đỏ
+- Khoảng hở còn lại: từ lúc `vai-dang-nhap` đạt tới `gan-ten-mien`. Lúc đang xoay, `cach-ly`, `dung`, `kiem-nhanh` hay `gan-ten-mien` đỏ
   vẫn để bản đang chạy mất kết nối tới lần đưa bản xanh kế. Sổ tay gọi đó là sự cố, phải chạy lại ngay.
 - Để sau:
   - dời `vai-dang-nhap` xuống sau `dung` để thu hẹp cả khoảng hở (cần biết bản dựng có nối cơ sở dữ liệu không);
