@@ -128,7 +128,7 @@ evals:
       mục ấy: người vừa xoay có đủ để không lùi về bản dựng trước lượt xoay, kể cả khi một câu khác trong sổ (ví dụ «lùi
       bản ngay», «chọn bản đã chạy tốt gần nhất», «gấp thì dùng dòng cuối», «một bước đỏ không đổi gì ở bản đang phục
       vụ») bảo khác? Có câu nào trong sổ nói ngược dòng chặn — ví dụ nói mục không áp ở đây? (3) Các dòng «Đạt khi» của
-      bước 2 và bước 5 sổ đưa bản lên có kể đủ các bước theo đúng thứ tự STEPS trong len- ban.mjs không; mọi hàng bien
+      bước 2 và bước 5 sổ đưa bản lên có kể đủ các bước theo đúng thứ tự STEPS trong len-ban.mjs không; mọi hàng bien
       và vai-dang-nhap còn dặn không bấm dựng lại trên Vercel trước khi lệnh chạy xanh không? (4) Có câu nào bảo in, dán
       hay gửi giá trị của khoá không?
     evidence_required: [run_id, verifier, verified_at, verdict, rationale]
