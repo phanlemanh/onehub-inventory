@@ -4,12 +4,14 @@
 // the domain pointed to just before the promote (read from the domain with `vercel inspect`); when that is not certain
 // it stops, prints the READY production deployments and asks the operator for `make rollback ENV=<ENV> BAN=<id>`.
 //
-//   staging:    cau-hinh, migration, vai-dang-nhap, cach-ly, bien, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien
-//   production: cau-hinh, ban-thu-truoc, migration, vai-dang-nhap, bien, dung, kiem-nhanh, gan-ten-mien,
+//   staging:    cau-hinh, migration, bien, vai-dang-nhap, cach-ly, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien
+//   production: cau-hinh, ban-thu-truoc, migration, bien, vai-dang-nhap, dung, kiem-nhanh, gan-ten-mien,
 //               kiem-nhanh-ten-mien
-// Row dat-khoa-mot-lenh added vai-dang-nhap (the login role's password, set as a SCRAM verifier right after the
-// migrations) and bien (the app's six variables pushed to the Vercel project before the build), so the first deploy
-// no longer stops for a password typed by hand and nobody sets variables on Vercel.
+// Row dat-khoa-mot-lenh added vai-dang-nhap (the login role's password, set as a SCRAM verifier) and bien (the app's
+// six variables pushed to the Vercel project before the build), so the first deploy no longer stops for a password
+// typed by hand and nobody sets variables on Vercel. Row bien-do-sau-xoay-mat-khau (decision 0048) runs bien before
+// vai-dang-nhap: a Vercel failure while the login password is being rotated never changes the database password, so
+// the running deployment keeps its connection.
 //
 // Runs in the repository root (cwd). Variables are only checked for presence, never printed:
 //   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID — read by the vercel CLI and the Vercel API calls
@@ -48,9 +50,9 @@ export const STEPS = {
   staging: [
     "cau-hinh",
     "migration",
+    "bien",
     "vai-dang-nhap",
     "cach-ly",
-    "bien",
     "dung",
     "kiem-nhanh",
     "gan-ten-mien",
@@ -60,8 +62,8 @@ export const STEPS = {
     "cau-hinh",
     "ban-thu-truoc",
     "migration",
-    "vai-dang-nhap",
     "bien",
+    "vai-dang-nhap",
     "dung",
     "kiem-nhanh",
     "gan-ten-mien",
