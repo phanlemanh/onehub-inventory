@@ -1,5 +1,9 @@
 # Lùi bản
 
+> **Đã xoay mật khẩu vai đăng nhập?** Mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» của [xoay-khoa.md](xoay-khoa.md)
+> thắng mọi câu của sổ này về lùi bản và về việc bản đang chạy có yên không. Đọc nó trước khi lùi bản, và khi một lượt
+> đưa bản lên đỏ lúc vừa xoay.
+
 Trỏ tên miền của một môi trường về một bản đã chạy tốt, do người vận hành nêu đích danh, rồi kiểm lại. Lùi bản chỉ đổi mã đang phục vụ; cơ sở
 dữ liệu giữ nguyên, nên mọi migration đã áp vẫn còn — luật migration (mục «Cần có trước» của [dua-ban-len.md](dua-ban-len.md)) bảo
 đảm bản trước chạy được trên cơ sở dữ liệu ấy. Ngoại lệ là mật khẩu vai đăng nhập: vừa xoay nó thì đọc mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» của [xoay-khoa.md](xoay-khoa.md) trước

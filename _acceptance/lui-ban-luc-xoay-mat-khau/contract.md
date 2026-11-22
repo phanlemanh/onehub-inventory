@@ -5,9 +5,9 @@ slug: lui-ban-luc-xoay-mat-khau
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [docs]
-status: implemented
-approved_by: Manh Phan
-approved_at: 2026-11-22
+status: draft
+approved_by:
+approved_at:
 design_doc: docs/superpowers/specs/2026-11-22-lui-ban-luc-xoay-mat-khau-design.md
 ---
 
@@ -45,34 +45,33 @@ Source input: prompt — Ngoài-1 của `_acceptance/bien-do-sau-xoay-mat-khau/`
 
   Điều mục nói khớp `tools/deploy/len-ban.mjs`, `tools/deploy/lui-ban.mjs`, `tools/deploy/kiem-nhanh.mjs` và
   `src/modules/identity/health.ts`. (judgment)
-- AC-2: Given mục ấy; When đọc bảng dòng của lệnh lúc vừa xoay; Then bảng kể mọi tên bước của hai môi trường, mọi dòng lùi
-  bản mà lệnh đưa bản lên có thể in, và dòng `kiem-nhanh-ten-mien ĐỎ` của `make rollback`, mỗi thứ trong một hàng của bảng.
-  Một ca kiểm rút các dòng ấy từ chính mã, không từ bản chép tay, và đỏ khi bảng thiếu một dòng hay một bước. Với mỗi dòng, bảng nói bản đang chạy ra sao và làm gì,
-  đúng với mã:
+- AC-2: Given mục ấy; When đọc bảng dòng của lệnh lúc vừa xoay; Then mọi tên bước của hai môi trường, mọi dòng lùi bản mà
+  lệnh đưa bản lên có thể in, và dòng `kiem-nhanh-ten-mien ĐỎ` của `make rollback` đều nằm trong ô «Dòng» của một hàng
+  bảng. Một ca kiểm rút các dòng ấy từ chính mã, không từ bản chép tay, và đỏ khi ô «Dòng» của bảng thiếu một dòng hay một
+  bước — nhắc ở cột khác hay ở đoạn văn không tính. Bảng định nghĩa rõ «trước khi đổi mật khẩu» (mọi lượt tới và gồm lượt
+  đầu in `vai-dang-nhap đạt` với mật khẩu mới) và «lượt chạy lại» (mọi lượt sau đó, tới lượt đầu in `xong`). Với mỗi dòng,
+  bảng nói bản đang giữ tên miền ra sao và làm gì, đúng với mã:
   - `đã lùi về bản trước`: bản trước vừa qua kiểm sức khoẻ, kể cả `vai`, nên lúc kiểm nó nối được;
   - ba dòng `lùi bản DỪNG`: tên miền vẫn ở bản mới của lượt này, không mất kết nối vì mật khẩu;
-  - `lùi bản ĐỎ — tên miền đã về bản … nhưng kiểm nhanh đỏ`: tên miền đã về bản dựng trước lượt xoay, mất kết nối;
+  - `lùi bản ĐỎ — tên miền đã về bản … nhưng kiểm nhanh đỏ`: tên miền đã về bản dựng trước lượt xoay, mất kết nối, với lý
+    do đúng là lý do máy thật in cho bản không nối được; hàng `make rollback` cũng vậy — một ca kiểm rút lý do ấy từ mã kiểm
+    nhanh và đỏ khi hai hàng ấy nêu lý do khác;
+  - `lùi bản ĐỎ — không đọc được danh sách bản của Vercel`: dòng phụ, luôn in sau một dòng lùi bản khác; tên miền ở đâu là
+    theo dòng đứng trước nó;
   - bước đỏ sau `vai-dang-nhap` mà tên miền không đổi: tên miền vẫn ở bản dựng trước lượt xoay, mất kết nối;
-  - đỏ ở `bien` hay trước, hay ở `vai-dang-nhap`, ở lượt xoay đầu: mật khẩu chưa đổi; ở một lượt chạy lại sau một lượt đã
-    in `vai-dang-nhap đạt`: bản đang chạy đã mất kết nối từ lượt trước.
+  - đỏ ở `bien` hay trước, hay ở `vai-dang-nhap`: trước khi đổi mật khẩu thì bản đang chạy yên; ở lượt chạy lại thì bản đang
+    chạy đã mất kết nối từ lượt trước.
 - AC-3: Given mọi tệp `docs/van-hanh/*.md`; When một ca kiểm chia chúng thành đoạn (đoạn văn, mục danh sách, hàng bảng) và
-  tìm theo mẫu chữ; Then ngoài mục ấy:
-  - mọi đoạn nói về lùi bản (`lùi`, `rollback`, `lui-ban.md`) mang câu trỏ: tên mục trong «», kèm liên kết `xoay-khoa.md` khi
-    đoạn ở tệp khác;
-  - riêng sổ lùi bản, luật ấy áp cho đoạn mở đầu, «Khi nào dùng» và mọi lối thử bản khác (`bản cũ hơn`, `trang Vercel`,
-    `Instant Rollback`, `kiem-nhanh-ten-mien ĐỎ`);
-  - trong đó có bước 3, 5, 6 và đoạn mở đầu «Đỏ thì làm gì» của sổ đưa bản lên; bước 4, bước 5, hàng Instant Rollback và
-    hàng `kiem-nhanh-ten-mien ĐỎ` của sổ lùi bản; bước 3 và «Đỏ thì làm gì» của sổ xoay khoá; hàng `make rollback` và việc
-    13 của README.
-
-  Ca kiểm đỏ, ghim tên tệp và đầu đoạn, khi một đoạn thiếu câu trỏ, kể cả ở một tệp sổ tay mới.
-- AC-4: Given cùng các tệp ấy; When ca kiểm tìm câu kể lại; Then ngoài mục ấy không đoạn nào chứa `mật khẩu cũ`, và ngoài sổ
-  xoay khoá mọi đoạn nhắc xoay mật khẩu vai đăng nhập mang câu trỏ. Ca kiểm đỏ, ghim tên tệp và đầu đoạn, khi một đoạn kể
-  lại.
+  tìm theo mẫu chữ; Then mọi sổ có đoạn nói về lùi bản (`lùi`, `rollback`, `lui-ban.md`), về việc bản đang chạy yên, hay về
+  xoay mật khẩu vai đăng nhập, có một dòng chặn là đoạn đầu tiên ngay dưới tiêu đề: một dòng trích dẫn nêu tên mục trong «»
+  (kèm liên kết `xoay-khoa.md` khi sổ không phải sổ xoay khoá) và nói mục ấy thắng mọi câu của sổ về lùi bản và về bản đang
+  chạy. Câu trỏ ở từng câu không bắt buộc. Ca kiểm đỏ, ghim tên tệp, khi sổ thiếu dòng chặn hay dòng chặn không đứng đầu,
+  kể cả ở một sổ mới.
+- AC-4: Given cùng các tệp ấy; When ca kiểm tìm câu kể lại; Then ngoài mục ấy không đoạn nào chứa `mật khẩu cũ`. Ca kiểm đỏ,
+  ghim tên tệp và đầu đoạn, khi một đoạn kể lại.
 - AC-5: Given các sổ đã sửa; When đọc như người vận hành; Then:
-  - mỗi câu trỏ là một vế ngắn nói khi nào phải đọc mục (vừa xoay mật khẩu vai đăng nhập), không lặp lý do, và câu quanh nó
-    vẫn đọc trôi;
-  - không câu nào ngoài mục còn ngụ ý bản đang chạy yên hay khuyên lùi về bản cũ lúc vừa xoay mà không trỏ;
+  - dòng chặn đầu mỗi sổ đọc được ngay: khi nào nó áp, và rằng mục thắng mọi câu của sổ về lùi bản và về bản đang chạy;
+  - mục, đọc cùng dòng chặn, đủ để người vừa xoay không lùi về bản dựng trước lượt xoay dù một câu khác của sổ bảo lùi;
   - các luật đã ký của hàng trước còn nguyên: các dòng «Đạt khi» kể đúng thứ tự bước; hàng `bien` và `vai-dang-nhap` dặn
     không bấm dựng lại trên Vercel trước khi lệnh chạy xanh;
   - không câu nào bảo in, dán hay gửi giá trị khoá. (judgment)
@@ -100,8 +99,8 @@ Không quét bằng `morphological-scan` (dòng `descope` trong sổ quyết đ�
 | Dòng của lệnh | tên bước của hai môi trường · tám dòng lùi bản của `rollBack` · dòng kiểm của `make rollback` · Instant Rollback | AC-2, AC-1 |
 | Lượt | lượt xoay đầu · lượt chạy lại sau lượt đã qua `vai-dang-nhap` · lùi nhiều ngày sau một lượt xanh | AC-2, AC-1 |
 | Tệp sổ tay | sổ đưa bản lên · sổ lùi bản · sổ xoay khoá · README · tệp mới trong thư mục | AC-3, AC-4 |
-| Kiểu câu | câu có chữ lùi bản · câu kể lý do «mật khẩu cũ» · câu nhắc xoay mật khẩu vai đăng nhập | AC-3, AC-4 |
-| Câu chữ | câu trỏ đọc trôi · luật đã ký giữ nguyên · không lộ khoá | AC-5 |
+| Kiểu câu | sổ có câu về lùi bản, bản đang chạy yên hay xoay mật khẩu (cần dòng chặn) · câu kể lý do «mật khẩu cũ» | AC-3, AC-4 |
+| Câu chữ | dòng chặn đọc được ngay · mục thắng câu khác của sổ · luật đã ký giữ nguyên · không lộ khoá | AC-5 |
 
 ## Out of scope
 
@@ -115,5 +114,8 @@ Không quét bằng `morphological-scan` (dòng `descope` trong sổ quyết đ�
 
 - Hạng T2: vòng sửa `docs/van-hanh/**` và thêm `tests/so-tay-lui-ban.test.ts`; không chạm `tools/**`.
 - Không có màn nào: không có nghi thức thiết kế giao diện, không có đặc tả UX (dòng `descope` trong sổ).
+- Đổi khuôn ở dừng-vá sau lượt chấm 2 (chủ kho chọn «đổi khuôn», 2026-11-22): câu trỏ ở từng câu không đóng được lớp câu
+  ngụ ý trong văn xuôi — mỗi lượt sửa mở rộng mẫu chữ thì lượt chấm kế tìm thêm một câu viết khác chữ. Khuôn mới đặt một
+  dòng chặn ở đầu mỗi sổ (AC-3); các câu trỏ đã thêm ở lượt trước được giữ, không bắt buộc. Lượt 3 là lượt cuối trước trần.
 - Vòng này thay một phần AC-5 của hồ sơ `bien-do-sau-xoay-mat-khau`: ba vùng của đoạn mở đầu «Đỏ thì làm gì» sổ đưa bản lên
   chuyển vào bảng của mục mới; đoạn ấy chỉ còn câu trỏ.

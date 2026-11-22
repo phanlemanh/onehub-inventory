@@ -1,5 +1,9 @@
 # Sổ tay vận hành
 
+> **Đã xoay mật khẩu vai đăng nhập?** Mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» của [xoay-khoa.md](xoay-khoa.md)
+> thắng mọi câu của sổ này về lùi bản và về việc bản đang chạy có yên không. Đọc nó trước khi lùi bản, và khi một lượt
+> đưa bản lên đỏ lúc vừa xoay.
+
 Sổ tay cho người đưa Inventory lên mạng và giữ nó chạy: bản thử (staging) và bản thật (production) ở
 `https://inventory.onehub.center`. Mỗi môi trường là một dự án Vercel riêng và một cơ sở dữ liệu Supabase riêng, cùng ở
 Singapore. Mọi việc trong kho đi qua một lệnh `make`; việc ngoài kho (tài khoản, khoá, tên miền) do chủ kho làm theo danh

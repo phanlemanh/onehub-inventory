@@ -1,34 +1,100 @@
 {
-  "feature_plain": "Người vận hành vừa xoay mật khẩu đăng nhập cơ sở dữ liệu sẽ tìm thấy đúng một chỗ nói có nên lùi bản hay không, và mọi câu về lùi bản ở các sổ khác dẫn về chỗ ấy.",
+  "feature_plain": "Người vận hành vừa xoay mật khẩu đăng nhập cơ sở dữ liệu thấy ngay ở đầu mỗi sổ vận hành rằng có một chỗ duy nhất nói có nên lùi bản hay không, và chỗ ấy thắng mọi câu khác của sổ.",
   "will_do": [
-    {"id": "AC-1", "p": "Sẽ có một mục duy nhất trong sổ xoay khoá nói: sau khi xoay, mọi bản dựng trước đó không bao giờ nối lại được cơ sở dữ liệu, nên lùi về chúng không cứu được; phải lùi thì chỉ chọn bản tạo sau lượt xoay, và xem sức khoẻ để biết bản nào đang nối được."},
-    {"id": "AC-2", "p": "Sẽ có một bảng trong mục ấy kể từng dòng lệnh đưa bản lên có thể in lúc vừa xoay — bản thật đang ra sao và làm gì — và một ca kiểm tự đọc các dòng ấy từ chính lệnh, đỏ khi bảng sót dòng."},
-    {"id": "AC-3", "p": "Sẽ có câu trỏ về mục ấy ở mọi câu nói về lùi bản trong các sổ vận hành, kể cả bước 3, 5, 6 của sổ đưa bản lên; một ca kiểm thường trực đỏ khi câu nào thiếu, kể cả ở sổ tay viết sau này."},
-    {"id": "AC-5", "p": "Sẽ giữ câu chữ đọc trôi: mỗi câu trỏ là một vế ngắn, các lời dặn đã ký của hàng trước còn nguyên, không câu nào bảo dán khoá."},
-    {"id": "AC-6", "p": "Sẽ giữ toàn bộ kiểm tra của kho xanh."}
+    {
+      "id": "AC-1",
+      "p": "Sẽ có một mục duy nhất trong sổ xoay khoá nói: sau khi xoay, mọi bản dựng trước đó không bao giờ nối lại được cơ sở dữ liệu, nên lùi về chúng không cứu được; phải lùi thì chỉ chọn bản tạo sau lượt xoay, và xem sức khoẻ để biết bản nào đang nối được."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ có một bảng trong mục ấy, mỗi dòng lệnh có thể in lúc vừa xoay nằm ở ô «Dòng» của một hàng riêng, nói bản đang giữ tên miền ra sao và làm gì — đúng với lệnh thật, kể cả lý do kiểm nhanh thật và dòng phụ «không đọc được danh sách bản»; một ca kiểm đọc các dòng ấy từ chính lệnh và đỏ khi bảng sót."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ có một dòng chặn ngay dưới tiêu đề của mọi sổ vận hành nói về lùi bản: vừa xoay mật khẩu đăng nhập thì mục ấy thắng mọi câu của sổ về lùi bản và về việc bản đang chạy có yên không; một ca kiểm thường trực đỏ khi sổ nào thiếu, kể cả sổ viết sau này. Không còn đòi câu trỏ ở từng câu."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ giữ câu chữ đọc được: dòng chặn hiểu ngay, mục đủ để người vừa xoay không lùi về bản cũ dù câu khác của sổ bảo lùi, các lời dặn đã ký của hàng trước còn nguyên, không câu nào bảo dán khoá."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ giữ toàn bộ kiểm tra của kho xanh."
+    }
   ],
   "wont_do": [
-    {"id": "AC-4", "p": "Sẽ KHÔNG kể lại lý do ở chỗ khác: ngoài mục ấy không câu nào giải thích chuyện mật khẩu cũ, và câu nào nhắc xoay mật khẩu đăng nhập đều trỏ về mục."},
-    {"id": "OOS-1", "p": "Không đổi lệnh đưa bản lên: lúc vừa xoay, nếu bước kiểm cuối đỏ vì lý do khác, lệnh vẫn tự lùi về bản cũ và làm bản thật mất kết nối — đây chính là Hỏi-1."},
-    {"id": "OOS-2", "p": "Không khuyên cách «lùi tới» bản mới của lượt xoay để nối lại nhanh."},
-    {"id": "OOS-3", "p": "Không sửa hai câu ghi chép nói quá «lỗi Vercel nào cũng an toàn» — anh đã ghi chúng là giới hạn đã biết."},
-    {"id": "OOS-4", "p": "Không sửa trang quyết định 0048 hay các trang wiki khác."}
+    {
+      "id": "AC-4",
+      "p": "Sẽ KHÔNG kể lại lý do ở chỗ khác: ngoài mục ấy không câu nào giải thích chuyện mật khẩu cũ."
+    },
+    {
+      "id": "OOS-1",
+      "p": "Không đổi lệnh đưa bản lên: lúc vừa xoay, nếu bước kiểm cuối đỏ vì lý do khác, lệnh vẫn tự lùi về bản cũ và làm bản thật mất kết nối — đây chính là Hỏi-1."
+    },
+    {
+      "id": "OOS-2",
+      "p": "Không khuyên cách «lùi tới» bản mới của lượt xoay để nối lại nhanh."
+    },
+    {
+      "id": "OOS-3",
+      "p": "Không sửa hai câu ghi chép nói quá «lỗi Vercel nào cũng an toàn» — anh đã ghi chúng là giới hạn đã biết."
+    },
+    {
+      "id": "OOS-4",
+      "p": "Không sửa trang quyết định 0048 hay các trang wiki khác."
+    }
   ],
-  "scope_plain": "Việc này chỉ sửa sổ tay vận hành và thêm một ca kiểm; lệnh đưa bản lên giữ nguyên.",
+  "scope_plain": "Việc này chỉ sửa sổ tay vận hành và một ca kiểm; lệnh đưa bản lên giữ nguyên. Khuôn đã đổi sau lượt chấm 2: dòng chặn đầu sổ thay cho câu trỏ ở từng câu.",
   "coverage_plain": [
-    {"i": 0, "p": "Không chạy bước quét hình thái: mọi trục dưới đây đọc thẳng từ lệnh và thư mục sổ tay."},
-    {"i": 2, "p": "Mục mới: luật theo bản dựng, lùi không cứu, cách chọn bản, xem sức khoẻ — AC-1 (mục duy nhất)."},
-    {"i": 3, "p": "Dòng của lệnh: mọi bước, chín dòng lùi bản đọc từ mã, dòng kiểm của lệnh lùi tay, lùi trên trang Vercel — AC-2 (bảng đủ dòng), AC-1."},
-    {"i": 4, "p": "Lượt: lượt xoay đầu, lượt chạy lại sau khi mật khẩu đã đổi, lùi nhiều ngày sau một lượt xanh — AC-2, AC-1."},
-    {"i": 5, "p": "Sổ tay: đưa bản lên, lùi bản, xoay khoá, mục lục, và mọi sổ thêm sau này — AC-3 (câu trỏ), AC-4 (không kể lại)."},
-    {"i": 6, "p": "Kiểu câu: câu có chữ lùi bản, câu kể lý do mật khẩu cũ, câu nhắc xoay mật khẩu đăng nhập — AC-3, AC-4."},
-    {"i": 7, "p": "Câu chữ: câu trỏ đọc trôi, lời dặn đã ký giữ nguyên, không lộ khoá — AC-5 (người chấm đọc)."}
+    {
+      "i": 0,
+      "p": "Không chạy bước quét hình thái: mọi trục dưới đây đọc thẳng từ lệnh và thư mục sổ tay."
+    },
+    {
+      "i": 2,
+      "p": "Mục mới: luật theo bản dựng, lùi không cứu, cách chọn bản, xem sức khoẻ — AC-1 (mục duy nhất)."
+    },
+    {
+      "i": 3,
+      "p": "Dòng của lệnh: mọi bước, chín dòng lùi bản đọc từ mã, dòng kiểm của lệnh lùi tay, lùi trên trang Vercel — AC-2 (bảng đủ dòng), AC-1."
+    },
+    {
+      "i": 4,
+      "p": "Lượt: trước khi đổi mật khẩu, lượt chạy lại sau khi đã đổi, lùi nhiều ngày sau một lượt xanh — AC-2 (bảng định nghĩa rõ hai loại lượt), AC-1."
+    },
+    {
+      "i": 5,
+      "p": "Sổ: đưa bản lên, lùi bản, xoay khoá, mục lục, và mọi sổ thêm sau này — AC-3 (dòng chặn), AC-4 (không kể lại)."
+    },
+    {
+      "i": 6,
+      "p": "Kiểu sổ: sổ có câu về lùi bản, về bản đang chạy yên hay về xoay mật khẩu thì cần dòng chặn; câu kể lý do mật khẩu cũ chỉ được nằm trong mục — AC-3, AC-4."
+    },
+    {
+      "i": 7,
+      "p": "Câu chữ: dòng chặn hiểu ngay, mục thắng câu khác của sổ, lời dặn đã ký giữ nguyên, không lộ khoá — AC-5 (người chấm đọc)."
+    }
   ],
   "gap_probe_plain": [
-    {"i": 0, "p": "Việc giữ nguyên lệnh — để lệnh tự lùi làm bản thật mất kết nối lúc vừa xoay — là chuyện khẩu vị rủi ro, máy không được tự quyết. Đã chuyển thành Hỏi-1 cho anh, kèm khuyến nghị."},
-    {"i": 1, "p": "Hai lựa chọn máy ghi «có căn cứ» nhưng câu trích chỉ liên quan, không quyết. Đã sửa: một cái đổi sang lý do «lối khác chết», một cái trích đúng dòng anh chọn ở cổng trước."},
-    {"i": 2, "p": "Ca kiểm «đủ dòng» có thể xanh nhầm (tên bước ăn theo tên dài hơn, dòng chỉ nhắc ngoài bảng). Đã sửa: ghim đủ chín dòng, chỉ tính hàng bảng, thêm hai ca đỏ."},
-    {"i": 3, "p": "Ca kiểm «câu trỏ» chưa chứng là nó xét các lối thử bản khác của sổ lùi bản và vài chỗ khác. Đã sửa: liệt mười lăm chỗ phải xét, thêm ca đỏ cho hàng lùi trên trang Vercel."},
-    {"i": 4, "p": "Ba câu hỏi cho người chấm hỏi điều không có trong tệp họ được đọc. Đã sửa: thêm đúng các tệp cần, hay rút câu hỏi."}
+    {
+      "i": 0,
+      "p": "Việc giữ nguyên lệnh — để lệnh tự lùi làm bản thật mất kết nối lúc vừa xoay — là chuyện khẩu vị rủi ro, máy không được tự quyết. Đã chuyển thành Hỏi-1 cho anh, kèm khuyến nghị."
+    },
+    {
+      "i": 1,
+      "p": "Hai lựa chọn máy ghi «có căn cứ» nhưng câu trích chỉ liên quan, không quyết. Đã sửa: một cái đổi sang lý do «lối khác chết», một cái trích đúng dòng anh chọn ở cổng trước."
+    },
+    {
+      "i": 2,
+      "p": "Ca kiểm «đủ dòng» có thể xanh nhầm (tên bước ăn theo tên dài hơn, dòng chỉ nhắc ngoài bảng). Đã sửa: ghim đủ chín dòng, chỉ tính hàng bảng, thêm hai ca đỏ."
+    },
+    {
+      "i": 3,
+      "p": "Ca kiểm «câu trỏ» chưa chứng là nó xét các lối thử bản khác của sổ lùi bản và vài chỗ khác. Đã sửa: liệt mười lăm chỗ phải xét, thêm ca đỏ cho hàng lùi trên trang Vercel."
+    },
+    {
+      "i": 4,
+      "p": "Ba câu hỏi cho người chấm hỏi điều không có trong tệp họ được đọc. Đã sửa: thêm đúng các tệp cần, hay rút câu hỏi."
+    }
   ]
 }

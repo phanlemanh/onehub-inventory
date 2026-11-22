@@ -136,3 +136,22 @@ mã lệnh, không đổi công cụ.
 ### Ghi chép
 
 Một dòng nhật ký wiki bằng `make log`. Không trang quyết định mới: đây là cách viết sổ tay, không phải lựa chọn kỹ thuật.
+
+## Đổi khuôn sau lượt chấm 2
+
+Chủ kho chọn «đổi khuôn» ở dừng-vá (22/11). Lượt 1 và lượt 2 lặp cùng hai lớp lỗi: câu ngụ ý bản đang chạy yên hay bảo lùi
+bản mà thước theo mẫu chữ không bắt, và hàng bảng tả lệch điều mã in. Câu trỏ ở từng câu không đóng được lớp thứ nhất: mỗi
+lần mở rộng mẫu chữ, lượt chấm kế tìm thêm một câu viết khác chữ.
+
+Khuôn mới:
+
+- **Dòng chặn đầu sổ.** Mọi sổ có đoạn về lùi bản, về bản đang chạy yên, hay về xoay mật khẩu vai đăng nhập mở đầu bằng
+  một dòng trích dẫn ngay dưới tiêu đề: mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» thắng mọi câu của sổ về lùi bản và
+  về việc bản đang chạy có yên không. Hiện là bốn sổ: README, đưa bản lên, lùi bản, xoay khoá. Câu trỏ đã thêm ở các lượt
+  trước được giữ, nhưng không bắt buộc.
+- **Thước theo cấu trúc.** `banners` kiểm dòng chặn là đoạn đầu, dạng trích dẫn, nêu tên mục, có chữ «thắng», có liên kết
+  ngoài sổ xoay khoá; sổ nào cần dòng chặn thì do mẫu chữ chọn, nên sổ mới cũng bị xét.
+- **Bảng đo theo hàng.** `everyLine` chỉ đọc ô «Dòng» (cột đầu) của các hàng; `rotationReason` đòi hai hàng «tên miền đã về
+  bản» và `make rollback` nêu lý do rút từ mã kiểm nhanh. Dòng phụ «không đọc được danh sách bản» có hàng riêng. Bảng định
+  nghĩa «trước khi đổi mật khẩu» và «lượt chạy lại» theo lượt đầu in `vai-dang-nhap đạt`.
+- Luật «không kể lại» giữ nguyên.

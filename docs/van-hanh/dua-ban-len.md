@@ -1,5 +1,9 @@
 # Đưa bản lên
 
+> **Đã xoay mật khẩu vai đăng nhập?** Mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» của [xoay-khoa.md](xoay-khoa.md)
+> thắng mọi câu của sổ này về lùi bản và về việc bản đang chạy có yên không. Đọc nó trước khi lùi bản, và khi một lượt
+> đưa bản lên đỏ lúc vừa xoay.
+
 Đưa một commit của nhánh `main` lên bản thử, rồi lên bản thật. Lệnh đi từng bước và dừng ở bước đỏ đầu tiên; trước khi
 gắn tên miền, một bước đỏ không đổi gì ở bản đang phục vụ người dùng. Mục lục và bảng biến: [README.md](README.md).
 
