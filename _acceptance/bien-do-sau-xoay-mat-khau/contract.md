@@ -5,9 +5,9 @@ slug: bien-do-sau-xoay-mat-khau
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
-status: implemented
-approved_by: Manh Phan
-approved_at: 2026-11-22
+status: draft
+approved_by:
+approved_at:
 design_doc: docs/superpowers/specs/2026-11-22-bien-do-sau-xoay-mat-khau-design.md
 ---
 
@@ -73,7 +73,7 @@ Source input: prompt — Ngoài-1 của `_acceptance/bien-vercel-tu-choi/`; ch�
   Then các dòng đạt kể đúng thứ tự bước mà lệnh đưa bản lên dùng. Một ca kiểm đọc thứ tự từ chính lệnh, không từ một bản
   chép tay, và đỏ khi sổ tay lệch.
 - AC-5: Given sổ tay `docs/van-hanh/dua-ban-len.md` và `docs/van-hanh/xoay-khoa.md`; When người vận hành vừa xoay mật khẩu
-  vai đăng nhập và thấy một bước đỏ; Then mục «Đỏ thì làm gì» chia ba vùng:
+  vai đăng nhập và thấy một bước đỏ của lệnh; Then mục «Đỏ thì làm gì» (đoạn mở đầu và bảng) chia ba vùng:
   - đỏ ở `bien` hay trước đó: bản đang chạy không bị đụng;
   - đỏ ở `vai-dang-nhap`: mật khẩu chưa đổi, bản đang chạy không bị đụng, nhưng Vercel có thể đã giữ mật khẩu mới;
   - đỏ sau khi `vai-dang-nhap` đạt: bản đang chạy đã mất kết nối cơ sở dữ liệu, sửa nguyên nhân và chạy lại ngay.
@@ -83,10 +83,11 @@ Source input: prompt — Ngoài-1 của `_acceptance/bien-vercel-tu-choi/`; ch�
 
   Thêm nữa:
   - mọi hàng `bien` và hàng `vai-dang-nhap` dặn không bấm dựng lại trên Vercel trước khi lệnh chạy xanh;
-  - không hàng nào của một bước chạy sau `vai-dang-nhap` (`cach-ly`, `dung`, `kiem-nhanh`, `gan-ten-mien`,
-    `kiem-nhanh-ten-mien`, kể cả các dòng lùi bản) nói hay ngụ ý bản đang chạy yên mà không trừ ca vừa xoay mật khẩu;
-  - các dòng lùi bản dặn: vừa xoay mật khẩu vai đăng nhập thì đừng lùi về bản cũ (`make rollback`, Instant Rollback) — sửa
-    nguyên nhân và chạy lại;
+  - trong bảng «Đỏ thì làm gì», không hàng nào của một bước chạy sau `vai-dang-nhap` (`cach-ly`, `dung`, `kiem-nhanh`,
+    `gan-ten-mien`, `kiem-nhanh-ten-mien`, kể cả các dòng lùi bản) nói hay ngụ ý bản đang chạy yên mà không trừ ca vừa xoay
+    mật khẩu;
+  - các dòng lùi bản của bảng ấy dặn: vừa xoay mật khẩu vai đăng nhập thì đừng lùi về bản cũ (`make rollback`, Instant
+    Rollback) — sửa nguyên nhân và chạy lại;
   - bước 3 của sổ xoay khoá nói khoảng hở bắt đầu khi `vai-dang-nhap` đạt, sau bước `bien`;
   - trang quyết định 0048 nói thứ tự mới, vì sao, cái giá (trạng thái lẫn trên Vercel) và khoảng hở còn lại.
 
@@ -134,8 +135,14 @@ môi trường.
 - Dời `vai-dang-nhap` xuống sau `dung`, hay giữ hai mật khẩu song song lúc xoay.
 - Đổi cách xoay khoá (`make dat-khoa`), hay đổi sáu biến của bước `bien`.
 - Thử trên dự án Vercel và Supabase thật: lần đưa bản thử đầu sau khi gộp là lần chứng thật.
+- Các câu nói về lùi bản lúc vừa xoay mật khẩu nằm ngoài mục «Đỏ thì làm gì»: bước 3, 5, 6 của sổ đưa bản lên và sổ lùi
+  bản (thu phạm vi sau trần ba lượt chấm, dòng `descope` stage S4-r3 trong sổ).
 
 ## Notes
 
 - Hạng T3: vòng sửa `tools/**`.
 - Không có màn nào: không có nghi thức thiết kế giao diện, không có đặc tả UX (dòng `descope` trong sổ).
+- Known limits — chọn ở Cổng Phạm vi 2026-11-22 (thu phạm vi sau trần ba lượt chấm):
+  - Ngoài mục «Đỏ thì làm gì», sổ đưa bản lên chưa trừ ca vừa xoay mật khẩu vai đăng nhập ở các câu về lùi bản: bước 5 coi
+    «đã lùi về bản trước» là bản thật đã yên; bước 3 và bước 6 bảo lùi bản ngay khi kiểm bằng mắt thấy lỗi. Ca ấy đề xuất
+    thành một việc riêng: viết thành một mục duy nhất trong sổ xoay khoá, các sổ khác chỉ trỏ tới.

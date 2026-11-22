@@ -19,7 +19,7 @@
     },
     {
       "id": "AC-5",
-      "p": "Sẽ nói rõ cho người vận hành vừa xoay mật khẩu, bằng một luật thay cho danh sách bước: đỏ ở bước đẩy biến hay trước đó thì bản đang chạy yên; đỏ ở bất kỳ đâu sau khi đặt mật khẩu xong — kể cả lúc lệnh tự lùi bản — thì bản đang chạy đã mất kết nối, đừng lùi về bản cũ, sửa và chạy lại ngay."
+      "p": "Sẽ nói rõ trong mục «Đỏ thì làm gì» của sổ đưa bản lên cho người vận hành vừa xoay mật khẩu: đỏ ở bước đẩy biến hay trước đó thì bản đang chạy yên; đỏ sau khi đặt mật khẩu xong — kể cả lúc lệnh tự lùi bản — thì bản đang chạy đã mất kết nối, đừng lùi về bản cũ, sửa và chạy lại ngay."
     },
     {
       "id": "AC-6",
@@ -42,6 +42,10 @@
     {
       "id": "OOS-3",
       "p": "Không thử trên Vercel và Supabase thật trong vòng này: lần đưa bản thử đầu sau khi gộp là lần chứng thật."
+    },
+    {
+      "id": "OOS-4",
+      "p": "Không sửa vòng này các câu về lùi bản nằm ngoài mục «Đỏ thì làm gì» (bước 3, 5, 6 của sổ đưa bản lên, sổ lùi bản): ghi giới hạn đã biết, đề xuất một việc riêng gom ca này về một mục trong sổ xoay khoá."
     }
   ],
   "scope_plain": "Những việc dưới đây cố ý để ngoài vòng này:",

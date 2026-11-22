@@ -2,17 +2,19 @@
 
 ## Trong hợp đồng
 
-- **Section 5 of the deploy runbook treats 'đã lùi về bản trước' as safe with no rotation exception**
-  file: `docs/van-hanh/dua-ban-len.md:69`
-  severity: medium
-  AC: AC-5
-  source: conventions
-  detail: The new outage rule (line 92 onward) says that after the login password is rotated it also covers the case where the command rolled itself back ('đã lùi về bản trước'), and that the operator must run make deploy again right away. Step 5 ('Theo dõi bản thật') still says, with no exception: 'Thấy `đã lùi về bản trước` là bản thật đã tự quay về bản cũ — vẫn phải tìm nguyên nhân trước khi đưa lại.' This tells the operator the live app is back on a good version and there is time to investigate, which is exactly what the new rule exists to prevent. The contract and eval (3) of this round require that nothing implies the running app is fine without excepting the rotation case. This line is outside the red-step table, so the table check misses it. An operator watching the production run reads it first.
-  rationale: AC-5 cấm mọi dòng của bước chạy sau vai-dang-nhap, kể cả dòng lùi bản, nói hay ngụ ý bản đang chạy yên mà không trừ ca vừa xoay mật khẩu; dòng ở bước 5 này làm đúng điều đó.
+Không còn mục nào: mục duy nhất của lượt 3 (bước 5 của sổ đưa bản lên) chuyển ra ngoài hợp đồng khi chủ kho thu phạm vi AC-5
+về mục «Đỏ thì làm gì» ở trần ba lượt (dòng `descope` stage S4-r3 trong sổ quyết định).
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
+
+- **Section 5 of the deploy runbook treats 'đã lùi về bản trước' as safe with no rotation exception**
+  Người dùng thấy gì: Người vận hành theo dõi bản thật vừa xoay mật khẩu, thấy «đã lùi về bản trước» và đọc ở bước 5 rằng bản thật đã quay về bản cũ, nên tưởng còn thời gian tìm nguyên nhân trong khi bản cũ có thể không nối được cơ sở dữ liệu.
+  Căn cứ: Câu nằm ngoài mục «Đỏ thì làm gì» mà phạm vi đã thu về; cùng nhóm với bước 3 và bước 6, nên đáng làm chung trong một việc riêng viết ca lùi bản lúc xoay mật khẩu thành một mục duy nhất.
+  file: `docs/van-hanh/dua-ban-len.md`
+  severity: medium
+  Đề xuất: new-contract
 
 - **The 'đã lùi về bản trước' row passes the health check and says the old version cannot connect, in the same row**
   Người dùng thấy gì: Người vận hành đọc một hàng vừa nói bản cũ đã qua kiểm sức khoẻ, vừa nói bản cũ không nối được cơ sở dữ liệu, nên có thể hoang mang. Lời dặn cuối vẫn đúng: không lùi, sửa nguyên nhân và chạy lại.
