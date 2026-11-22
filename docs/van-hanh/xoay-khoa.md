@@ -74,10 +74,12 @@ chung (`VERCEL_TOKEN`): bước 1–2 một lần cho cả hai, bước 4–5 �
 - **Gõ hay bấm:** vai chủ — đặt lại mật khẩu, rồi bước 2 với chuỗi Session pooler còn `[YOUR-PASSWORD]` và mật khẩu mới.
 - **Đạt khi:** Supabase báo đã lưu; bước 2 in `đặt MIGRATE_DATABASE_URL`. Đổi mật khẩu vai chủ không làm bản đang chạy
   mất kết nối: ứng dụng nối bằng vai đăng nhập.
-- **Đỏ thì:** xoay mật khẩu vai đăng nhập có một khoảng hở. Từ bước `vai-dang-nhap` tới bước `gan-ten-mien` của lần đưa
-  bản kế (vài phút), bản đang chạy còn giữ mật khẩu cũ nên không nối được cơ sở dữ liệu. Lần đưa bản ấy mà đỏ giữa hai
-  bước thì bản đang chạy hỏng tới khi một lần đưa bản xanh. Nên xoay mật khẩu vai đăng nhập lúc vắng người dùng, hoặc
-  ngay nếu khoá lộ, và sửa nguyên nhân đỏ trước khi lùi bản.
+- **Đỏ thì:** xoay mật khẩu vai đăng nhập có một khoảng hở. Từ lúc bước `vai-dang-nhap` đạt tới bước `gan-ten-mien` của
+  lần đưa bản kế (vài phút), bản đang chạy còn giữ mật khẩu cũ nên không nối được cơ sở dữ liệu. Lần đưa bản ấy mà đỏ
+  giữa hai bước thì bản đang chạy hỏng tới khi một lần đưa bản xanh. Bước `bien` chạy trước `vai-dang-nhap`, nên lỗi của
+  Vercel ở bước ấy không mở khoảng hở; bước `vai-dang-nhap` đỏ thì mật khẩu chưa đổi. Bảng «Đỏ thì làm gì» của
+  [dua-ban-len.md](dua-ban-len.md) nói từng vùng. Nên xoay mật khẩu vai đăng nhập lúc vắng người dùng, hoặc ngay nếu khoá
+  lộ, và sửa nguyên nhân đỏ trước khi lùi bản.
 
 ### 4. Đưa lại bản
 

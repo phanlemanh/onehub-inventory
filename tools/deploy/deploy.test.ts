@@ -1806,3 +1806,53 @@ describe("E2 · bước bien đỏ thì không đặt mật khẩu vai đăng nh
     }
   }
 });
+
+/** The «Đạt khi» bullet of a numbered step section of the deploy runbook, up to the next bullet. */
+function datKhi(md: string, buoc: number): string {
+  const start = md.search(new RegExp(`^### ${buoc}\\. `, "m"));
+  if (start < 0) return "";
+  const section = md.slice(start).split(/\n### /)[0]!;
+  const m = /- \*\*Đạt khi:\*\*([\s\S]*?)(?=\n- \*\*|$)/.exec(section);
+  return m ? m[1]! : "";
+}
+
+/** Findings when the runbook's «Đạt khi» lines of bước 2 (staging) and bước 5 (production) list the steps out of order. */
+function thuTuSoTay(md: string): string[] {
+  const out: string[] = [];
+  for (const [buoc, appEnv] of [
+    [2, "staging"],
+    [5, "production"],
+  ] as const) {
+    const text = datKhi(md, buoc);
+    const found = STEPS[appEnv]
+      .map((s) => ({ s, at: text.search(new RegExp(`(?<![\\w-])${s} đạt`)) }))
+      .filter((x) => x.at >= 0)
+      .sort((a, b) => a.at - b.at)
+      .map((x) => x.s);
+    if (JSON.stringify(found) !== JSON.stringify(STEPS[appEnv])) {
+      out.push(`sổ tay bước ${buoc}: thứ tự lệch STEPS.${appEnv}`);
+    }
+  }
+  return out;
+}
+
+describe("E4 · sổ tay kể đúng thứ tự bước của lệnh", () => {
+  const md = readFileSync(resolve(HERE, "../../docs/van-hanh/dua-ban-len.md"), "utf8");
+
+  it("E4 · sổ tay kể đúng thứ tự bước", () => {
+    expect(thuTuSoTay(md)).toEqual([]);
+  });
+
+  it("E4 · chiều đỏ: hoán vai-dang-nhap với bien ở bước 2 → hàm so gọi tên bước 2", () => {
+    const start = md.search(/^### 2\. /m);
+    const end = md.search(/^### 3\. /m);
+    const swapped = md
+      .slice(start, end)
+      .replace("`vai-dang-nhap đạt`", "@@")
+      .replace("`bien đạt`", "`vai-dang-nhap đạt`")
+      .replace("@@", "`bien đạt`");
+    const broken = md.slice(0, start) + swapped + md.slice(end);
+    expect(broken).not.toBe(md);
+    expect(thuTuSoTay(broken)).toEqual(["sổ tay bước 2: thứ tự lệch STEPS.staging"]);
+  });
+});
