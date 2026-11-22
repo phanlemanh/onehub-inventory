@@ -182,6 +182,18 @@ interface Ctx {
   /** Variable names the fake Vercel project already holds, and the status its API answers with. */
   vercelEnvs: string[];
   apiStatus: number;
+  /**
+   * Row bien-vercel-tu-choi: the reply to one call, when a case sets it — a string body is sent raw (not JSON). Unset,
+   * the fake answers in the documented shape: GET 200 `{ envs }`, POST 201 `{ created: <the six posted>, failed: [] }`.
+   */
+  vercelReply: { get?: Reply; post?: Reply };
+  /** Every body the fake Vercel API sent, in order. */
+  served: { method: string; text: string }[];
+}
+
+interface Reply {
+  status: number;
+  body: unknown;
 }
 
 interface Listed {
@@ -319,6 +331,8 @@ async function fresh(appEnv: Env, setup: Setup = {}): Promise<Ctx> {
     api: [],
     vercelEnvs: [],
     apiStatus: 200,
+    vercelReply: {},
+    served: [],
   };
   const server = createServer((req, res) => {
     const path = req.url ?? "/";
@@ -343,11 +357,21 @@ async function fresh(appEnv: Env, setup: Setup = {}): Promise<Ctx> {
           `${t} api ${method} ${bare.split("?")[0].replace(/projects\/[^/]+/, "projects/<id>")}\n`,
         );
         res.setHeader("content-type", "application/json");
-        res.statusCode = ctx.apiStatus;
-        if (ctx.apiStatus !== 200) return res.end('{"error":{"code":"forbidden"}}');
-        if (method === "GET")
-          return res.end(JSON.stringify({ envs: ctx.vercelEnvs.map((key) => ({ key })) }));
-        res.end('{"created":[]}');
+        const send = (status: number, payload: unknown) => {
+          const out = typeof payload === "string" ? payload : JSON.stringify(payload);
+          ctx.served.push({ method, text: out });
+          res.statusCode = status;
+          res.end(out);
+        };
+        if (ctx.apiStatus !== 200) return send(ctx.apiStatus, { error: { code: "forbidden" } });
+        const set = method === "GET" ? ctx.vercelReply.get : ctx.vercelReply.post;
+        if (set) return send(set.status, set.body);
+        if (method === "GET") return send(200, { envs: ctx.vercelEnvs.map((key) => ({ key })) });
+        const posted = (text ? JSON.parse(text) : []) as VercelVar[];
+        send(201, {
+          created: posted.map(({ key, type, value, target }) => ({ key, type, value, target })),
+          failed: [],
+        });
       });
       return;
     }
@@ -1405,7 +1429,7 @@ describe("E6 · bước bien đỏ thì không ghi gì và không dựng", () =>
     });
   }
 
-  it("E6 · đối chứng dương: cùng máy giả, không biến cấm, trả 200 → bien đạt", async () => {
+  it("E6 · đối chứng dương: cùng máy giả, không biến cấm, lần ghi trả 201 đủ sáu → bien đạt", async () => {
     const ctx = await fresh("staging");
     ctx.vercelEnvs = ["APP_URL", "DATABASE_URL"];
     const r = await deploy(ctx, "staging");
@@ -1427,4 +1451,29 @@ describe("make cach-ly-dich dựng chuỗi vai đăng nhập như lệnh đưa b
     expect(red.code).toBe(1);
     expect(red.stdout).toBe("");
   });
+});
+
+// ── Row bien-vercel-tu-choi: the bien step reads Vercel's replies (E1–E6 of _acceptance/bien-vercel-tu-choi) ─────────
+
+/** The six variable names in the order the bien step writes them. */
+const SIX = Object.keys(VERCEL_EXPECTED);
+
+/** The body the fake Vercel API last sent for `method`, parsed; undefined when it sent none. */
+function lastServed(ctx: Ctx, method: string): unknown {
+  const s = ctx.served.filter((x) => x.method === method).at(-1);
+  return s ? JSON.parse(s.text) : undefined;
+}
+
+describe("E5 · Vercel trả đúng khuôn tài liệu thì bước bien đạt", () => {
+  for (const appEnv of ["staging", "production"] as const) {
+    it(`E5 · ${appEnv}: lần ghi trả 201, created đủ sáu, failed rỗng → bien đạt, chín bước xanh`, async () => {
+      const ctx = await fresh(appEnv);
+      const r = await deploy(ctx, appEnv);
+      expectGreen(ctx, appEnv, r);
+      const reply = lastServed(ctx, "POST") as { created: VercelVar[]; failed: unknown[] };
+      expect(reply.failed).toEqual([]);
+      expect(reply.created.map((v) => v.key)).toEqual(SIX);
+      expectNoMarker(ctx, r);
+    });
+  }
 });
