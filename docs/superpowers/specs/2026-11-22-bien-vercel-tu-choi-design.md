@@ -56,6 +56,7 @@ Sau `POST /v10/projects/<id>/env?upsert=true`:
 
    Không bao giờ đọc `error.message` hay `error.value` ra dòng in: tài liệu cho thấy `error.value` có thể mang giá trị. Mã
    lỗi là tên loại lỗi, không mang giá trị. Nó cho người giữ kho mã biết vì sao Vercel từ chối mà không phải đoán.
+
 2. Ngược lại, gom tên trong `created`:
    - mảng thì lấy `key` của từng phần tử;
    - đối tượng thì lấy `key` của nó;
