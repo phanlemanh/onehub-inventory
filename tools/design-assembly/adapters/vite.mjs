@@ -73,6 +73,27 @@ function detect(root) {
   return settings || /^vite\b/.test(String(data.scripts?.dev ?? "")) ? 2 : 1;
 }
 
+// The page with its comments taken out, read left to right as a browser reads them: a comment opens
+// at `<!--` and closes at the first `-->` after it, or at once on `<!-->` or `<!--->`; one never
+// closed runs to the end of the page. What is left is only read, never shown.
+function withoutComments(page) {
+  let kept = "";
+  let at = 0;
+  for (;;) {
+    const open = page.indexOf("<!--", at);
+    if (open < 0) return kept + page.slice(at);
+    kept += page.slice(at, open);
+    const body = open + 4;
+    if (page.startsWith(">", body)) at = body + 1;
+    else if (page.startsWith("->", body)) at = body + 2;
+    else {
+      const close = page.indexOf("-->", body);
+      if (close < 0) return kept;
+      at = close + 3;
+    }
+  }
+}
+
 // The files the application starts from: each module its page loads, as index.html names it, by
 // path from the repository root. None when there is no such page, or it loads none of the
 // repository's own.
@@ -80,7 +101,7 @@ function entries(root) {
   const file = path.join(root, "index.html");
   if (!existsSync(file)) return [];
   // A script inside a comment is not loaded.
-  const page = readFileSync(file, "utf8").replace(/<!--[\s\S]*?-->/g, "");
+  const page = withoutComments(readFileSync(file, "utf8"));
   const found = [];
   for (const [, attributes] of page.matchAll(/<script\b([^>]*)>/gi)) {
     if (!/\btype\s*=\s*["']module["']/i.test(attributes)) continue;

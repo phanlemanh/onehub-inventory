@@ -84,6 +84,7 @@ import {
   sourcedFont,
   withoutBlock,
 } from "./theme.mjs";
+import { GATE_STEP, gateStepProblem, gateStepThatCannotFail, readMakefile } from "./host-make.mjs";
 import { tokensProblem } from "./tokens.mjs";
 import { buildOf } from "./adapters/index.mjs";
 import { fontProblems, readLoads, unloadedCopy } from "./fonts.mjs";
@@ -107,7 +108,7 @@ export const FILES = {
   // Where the guide writes its generated block. The checks read the stylesheet the tool data
   // names, which may be another file.
   css: DEFAULT_STYLESHEET,
-  gate: "mk/design-assembly.mk",
+  gate: GATE_STEP,
 };
 
 // What a font of the sources ledger is read from when the block is written again: the fonts of
@@ -989,57 +990,14 @@ const KINDS = {
     },
   },
   gate: {
-    run(state) {
-      if (state.gate === null) return `${FILES.gate} is missing, so make check does not run this`;
-      if (!/^CHECK_TARGETS \+= .*\bdesign-assembly\b/m.test(state.gate)) {
-        return `${FILES.gate} does not add design-assembly to CHECK_TARGETS`;
-      }
-      if (!/^\t@?node tools\/design-assembly\/check\.mjs$/m.test(state.gate)) {
-        return `${FILES.gate} does not run the check, or runs it in a way that cannot fail`;
-      }
-      // The gate itself must still run what the included files add to it.
-      if (!checkReachesTargets(state.makefile ?? "")) {
-        return "the Makefile's check target no longer runs CHECK_TARGETS, so make check does not run this";
-      }
-      return null;
-    },
-    change(state) {
-      return { ...state, gate: (state.gate ?? "").replace(/^\t@?node /m, "\t-@node ") };
-    },
+    run: (state) => gateStepProblem(state.gate, state.makefile),
+    change: (state) => ({ ...state, gate: gateStepThatCannotFail(state.gate) }),
   },
 };
 // The kinds of check, for the plugin's own tests of a single check.
 export const KINDS_FOR_TEST = KINDS;
 
 const lintKey = (id, check) => `${id}:${check.rule}`;
-
-// Whether `make check` runs CHECK_TARGETS (or design-assembly itself), directly or through the
-// targets it depends on: repo-setup 0.9.0 writes `check: check-quick check-heavy` and
-// `check-quick: $(CHECK_TARGETS)`. Only prerequisites count, not a comment after `##` or `#`.
-function checkReachesTargets(makefile) {
-  const prerequisites = new Map();
-  for (const line of makefile.split("\n")) {
-    const rule = /^([A-Za-z0-9_.-]+)\s*::?(?!=)(.*)$/.exec(line);
-    if (!rule) continue;
-    const words = rule[2]
-      .split("#")[0]
-      .split(/\s+/)
-      .filter((word) => word && word !== "|");
-    prerequisites.set(rule[1], [...(prerequisites.get(rule[1]) ?? []), ...words]);
-  }
-  const seen = new Set();
-  const queue = ["check"];
-  while (queue.length > 0) {
-    const target = queue.shift();
-    if (seen.has(target)) continue;
-    seen.add(target);
-    for (const word of prerequisites.get(target) ?? []) {
-      if (word === "$(CHECK_TARGETS)" || word === "design-assembly") return true;
-      queue.push(word);
-    }
-  }
-  return false;
-}
 
 // A branch that adds nothing, for a changed copy to add to.
 const emptyBranch = () => ({
@@ -1338,7 +1296,7 @@ export function readState(root) {
     // The column type each field of the data model names.
     displays: readDisplays(root),
     gate: read(FILES.gate),
-    makefile: read("Makefile"),
+    makefile: readMakefile(root),
     git: gitFacts(
       root,
       checks.filter((check) => check.kind === UNTRACKED).map((check) => check.file),
@@ -1428,7 +1386,7 @@ export function ledgerView(state) {
       const by = row.check === TOOL ? undefined : `${row.check}, re-run here`;
       return { id, kind: row.kind, state: mine?.held ? "held" : "FAILING", ...(by ? { by } : {}) };
     }
-    const broken = pointerProblem(state.root, id, row.check);
+    const broken = pointerProblem(state.root, id, row.check, state.gate);
     return { id, kind: row.kind, state: broken ? "FAILING" : "claimed", by: row.check };
   });
 }
@@ -1443,7 +1401,12 @@ export function gateProblems(state) {
       return r.seenFailing ? [] : [`${r.id}: the check cannot fail, so it proves nothing`];
     }),
     ...crossProblems(state, results),
-    ...ledgerProblems(state.root, state.ledger, [...LAYERS, ...Object.keys(LAYER_ALIASES)]),
+    ...ledgerProblems(
+      state.root,
+      state.ledger,
+      [...LAYERS, ...Object.keys(LAYER_ALIASES)],
+      state.gate,
+    ),
   ];
   return { results, problems };
 }

@@ -51,10 +51,17 @@ export const TOKEN_TYPES = [
 ];
 const ATOMIC_LEVELS = ["atom", "molecule", "organism", "template"];
 
+// When a repository has a ledger: from birth, once the floor is laid and the ledgers are laid on
+// it without asking anyone (`adopt --starter`), or with its first entry, which only a person or a
+// later round brings. A ledger of the first kind that is missing is something to say; one of the
+// second kind is not.
+export const BORN = { floor: "with-the-floor", firstEntry: "with-its-first-entry" };
+
 export const LEDGERS = {
   decisions: {
     file: "design/decisions.yaml",
     question: "what the repository decided, and what holds each decision",
+    born: BORN.floor,
     writer: "people, and the guide for the rows it holds",
     version: 1,
     format: "yaml-ledger",
@@ -78,6 +85,7 @@ export const LEDGERS = {
   blueprint: {
     file: "design/blueprint.json",
     question: "what the person answered, layer by layer",
+    born: BORN.firstEntry,
     writer: "the person, through the guide",
     version: 1,
     root: {
@@ -91,6 +99,7 @@ export const LEDGERS = {
   tokens: {
     file: "design/tokens.json",
     question: "which values exist",
+    born: BORN.floor,
     writer: "make design-tokens, from the stylesheet",
     // The Design Tokens Community Group format carries no version of its own.
     version: null,
@@ -99,6 +108,7 @@ export const LEDGERS = {
   components: {
     file: "design/component-registry.json",
     question: "which components exist, where, and of what",
+    born: BORN.floor,
     writer: "make design-components, from the source",
     version: 2,
     // The acceptance kit reads the version as a string and refuses any key beside these two.
@@ -127,6 +137,7 @@ export const LEDGERS = {
   "column-types": {
     file: "design/column-types.json",
     question: "which column types the repository has",
+    born: BORN.floor,
     writer: "a person",
     version: 1,
     root: {
@@ -138,6 +149,7 @@ export const LEDGERS = {
   columns: {
     file: "design/columns.json",
     question: "how each column type is aligned and how wide it starts, and each field's type",
+    born: BORN.firstEntry,
     writer: "make design-columns, from the data model",
     version: 1,
     root: {
@@ -150,6 +162,7 @@ export const LEDGERS = {
   states: {
     file: "design/states.json",
     question: "which states every screen declares, and which screens are excused",
+    born: BORN.floor,
     writer: "a person",
     version: 1,
     root: {
@@ -161,6 +174,7 @@ export const LEDGERS = {
   "screen-sizes": {
     file: "design/screen-sizes.json",
     question: "the widths every page is checked at",
+    born: BORN.floor,
     writer: "a person",
     version: 1,
     root: { version: required(number), widths: required(list(number)) },
@@ -168,6 +182,7 @@ export const LEDGERS = {
   parts: {
     file: "design/parts.json",
     question: "the parts of the code from the top down, and which may import which",
+    born: BORN.firstEntry,
     writer: "a person",
     version: 1,
     root: {
@@ -178,6 +193,7 @@ export const LEDGERS = {
   screens: {
     file: "design/screens.yaml",
     question: "which screens exist, of which kind, with which states",
+    born: BORN.floor,
     writer: "a person or an agent, with each new screen",
     version: 1,
     format: "yaml-screens",
@@ -233,6 +249,7 @@ export const LEDGERS = {
   intake: {
     file: INTAKE_LEDGER,
     question: "which need got which block, from where, and who approved it on which day",
+    born: BORN.firstEntry,
     writer: "the round that takes the block in, once, with its approval",
     version: 1,
     format: "yaml-intake",
@@ -300,6 +317,7 @@ export const LEDGERS = {
     ending: ".json",
     question:
       "which outside libraries blocks are picked from, in what order, at which pin; and which fonts the product uses, from where, at which pin, under which licence",
+    born: BORN.firstEntry,
     writer:
       "a person, or the repository's own tool that pins a source; a font's row, the guide or adopt from what the repository holds, and its licence a person; one file per source",
     version: 1,
@@ -382,6 +400,7 @@ export const LEDGERS = {
   "screen-kinds": {
     folder: "design/patterns",
     question: "how a screen of each kind is built",
+    born: BORN.firstEntry,
     writer: "a person",
     // The acceptance kit defines the page and has no version for it.
     version: null,
@@ -486,6 +505,25 @@ export function newerLedgers(root) {
       }
     })
     .filter(Boolean);
+}
+
+// Whether a ledger is there: its file, or, for a ledger that may be kept one file per entry, a
+// folder that holds at least one file.
+function ledgerHere(root, ledger) {
+  if (ledger.file && existsSync(path.join(root, ledger.file))) return true;
+  const folder = ledger.folder ?? ledger.fragments?.folder;
+  if (!folder) return false;
+  const full = path.join(root, folder);
+  return existsSync(full) && statSync(full).isDirectory() && readdirSync(full).length > 0;
+}
+
+// The ledgers a repository has from birth that this one has not, by file, in the contract's order.
+// Read at the contract's own paths: a file moved elsewhere by the acceptance kit's settings counts
+// as missing here.
+export function missingAtBirth(root) {
+  return Object.values(LEDGERS)
+    .filter((ledger) => ledger.born === BORN.floor && !ledgerHere(root, ledger))
+    .map((ledger) => ledger.file ?? ledger.folder);
 }
 
 // The token file: groups of tokens, nested as deep as a group needs, each token with a known type

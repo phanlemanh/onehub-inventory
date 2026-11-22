@@ -3,8 +3,10 @@
 // from the folder that is the ledger.
 // A clean checkout has none of them, so whatever reads one runs this first: the gate does, and the
 // plugin's make step does before the tests. A repository that keeps none out of git gets nothing.
-// Usage: node tools/design-assembly/derived.mjs [--quiet] [--target DIR]
+// Usage: node tools/design-assembly/derived.mjs [--quiet | --list] [--target DIR]
 // --quiet says only what it wrote, for a step that runs it every time.
+// --list writes nothing and prints the files kept out of git, one per line, for the gate's shared
+// list of derived files.
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { argv, cwd, exit, stderr, stdout } from "node:process";
@@ -98,7 +100,21 @@ export function drawDerived(root) {
   return { kept: files.length, written };
 }
 
-const USAGE = "derived.mjs [--quiet] [--target DIR]";
+// Prints the files the tool data keeps out of git, one per line, and writes nothing. Tool data that
+// is not JSON is named, and ends with 1.
+function listKept(root) {
+  const theme = read(root, THEME);
+  if (theme === null) return 0;
+  try {
+    for (const file of keptOutOfGit(JSON.parse(theme))) stdout.write(`${file}\n`);
+  } catch (error) {
+    stderr.write(`derived files: ${THEME} is not JSON (${String(error.message).split("\n")[0]})\n`);
+    return 1;
+  }
+  return 0;
+}
+
+const USAGE = "derived.mjs [--quiet | --list] [--target DIR]";
 
 function main(args) {
   const at = args.indexOf("--target");
@@ -107,15 +123,17 @@ function main(args) {
     stderr.write(`derived files: --target takes a folder. Usage: ${USAGE}\n`);
     return 1;
   }
-  // Everything but --quiet, --target and its folder.
+  // Everything but --quiet, --list, --target and its folder.
   const unknown = args.filter(
-    (arg, index) => arg !== "--quiet" && (at === -1 || (index !== at && index !== at + 1)),
+    (arg, index) =>
+      !["--quiet", "--list"].includes(arg) && (at === -1 || (index !== at && index !== at + 1)),
   );
   if (unknown.length > 0) {
     stderr.write(`derived files: ${unknown.join(", ")} is not understood. Usage: ${USAGE}\n`);
     return 1;
   }
   const root = folder === null ? cwd() : path.resolve(folder);
+  if (args.includes("--list")) return listKept(root);
   const quiet = args.includes("--quiet");
   let drawn;
   try {
