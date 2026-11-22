@@ -1,0 +1,142 @@
+schema_version: 1
+feature_slug: lui-ban-luc-xoay-mat-khau
+# Kế hoạch đo, viết trước khi viết mã. Viết lại sau dừng-vá lượt 2 (đổi khuôn: dòng chặn đầu sổ thay câu trỏ từng câu).
+#
+# Tệp kiểm: tests/so-tay-lui-ban.test.ts. Mỗi describe mang tiền tố mã eval («E2 · …»); rang/chay.sh <mã> chạy đúng các
+# ca của mã ấy. Hàm thuần, mỗi hàm nhận { tệp → nội dung } (và mã nguồn khi cần) và trả danh sách lỗi:
+#   oneSection(files)                — đúng một tiêu đề «## Lùi bản sau khi xoay mật khẩu vai đăng nhập», ở xoay-khoa.md
+#   everyLine(files, steps, lines)   — ô «Dòng» (cột đầu) của các hàng bảng trong mục kể mọi tên bước của STEPS và mọi dòng
+#                                      lùi bản của rollBack cùng dòng kiem-nhanh-ten-mien ĐỎ của lui-ban.mjs
+#   rotationReason(files, kiemNhanh) — hai hàng «tên miền đã về bản» và «rollback <ENV>: kiem-nhanh-ten-mien ĐỎ» nêu lý do
+#                                      kiểm nhanh rút từ mã cho bản không nối được; mục không nêu «vai nối chưa đạt»
+#   banners(files)                   — mọi sổ có đoạn về lùi bản / bản đang chạy yên / xoay mật khẩu vai đăng nhập có dòng
+#                                      chặn là đoạn đầu ngay dưới tiêu đề, dạng trích dẫn, nêu tên mục (+ liên kết ngoài
+#                                      xoay-khoa.md) và chữ «thắng»
+#   noRestating(files)               — ngoài mục không đoạn nào chứa «mật khẩu cũ»
+# Đối chứng dương: nội dung thật của docs/van-hanh/*.md và mã thật → mỗi hàm trả [].
+# Chiều đỏ trên bản sao trong bộ nhớ của CHÍNH nội dung thật, mỗi ca ghim nguyên thông điệp (xem expected từng eval).
+# Ma trận dòng lùi bản rút từ rollBack (cắt ở «${», «(» hay «,» đầu tiên), viết trước, đúng thứ tự trong mã:
+#   lùi bản ĐỎ — không đọc được danh sách bản của Vercel
+#   lùi bản DỪNG — không đọc được bản tên miền trỏ tới trước khi gắn
+#   lùi bản DỪNG — không đọc được mã bản mới
+#   lùi bản DỪNG — trước khi gắn
+#   lùi bản ĐỎ — vercel rollback lỗi
+#   lùi bản ĐỎ — tên miền chưa về bản
+#   lùi bản ĐỎ — tên miền đã về bản
+#   đã lùi về bản trước
+#   kiem-nhanh-ten-mien ĐỎ                       (lui-ban.mjs)
+# Văn bản chuẩn NFC trước khi so.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: judgment
+    inputs: ["docs/van-hanh/xoay-khoa.md", "tools/deploy/len-ban.mjs", "tools/deploy/lui-ban.mjs", "tools/deploy/kiem-nhanh.mjs", "src/modules/identity/health.ts", "mk/deploy.mk", ".github/workflows/deploy.yml", "_acceptance/lui-ban-luc-xoay-mat-khau/contract.md"]
+    question: >-
+      Đọc mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» của xoay-khoa.md như người vận hành vừa xoay mật khẩu vai
+      đăng nhập, với contract.md (AC-1) làm ý định và bốn tệp mã làm sự thật. (1) Mục có nói luật theo bản dựng — mỗi
+      bản giữ mật khẩu của lúc dựng; từ khi một lượt in «vai-dang-nhap đạt» với mật khẩu mới, mọi bản dựng trước lượt ấy
+      không nối được nữa, mãi chứ không riêng mấy phút của lượt — và điều ấy có khớp mã không (bước bien ghi
+      DATABASE_URL trước bước dung; vai-dang-nhap đặt mật khẩu vào cơ sở dữ liệu)? (2) Có nói lùi về bản như thế bằng cả
+      ba đường (lệnh tự lùi, make rollback, Instant Rollback) không khôi phục kết nối, và chỉ bản dựng ở bước dung của
+      lượt xoay hay lượt sau nối được? (3) Có nói phải lùi thì chọn bản nào (bản tạo sau lượt xoay, đọc giờ tạo trong
+      danh sách make rollback in ra), và không có bản như thế thì không lùi, sửa và đưa bản sửa lên? Danh sách make
+      rollback trong mã có thật in giờ tạo không? (4) Có nêu sức khoẻ «"vai":"dat"» là thước, và mã kiểm nhanh có thật
+      đòi vai đạt qua vai đăng nhập không? (5) Mục chỉ người vận hành tới chỗ tìm giờ lượt xoay (tab Actions › Deploy,
+      lệnh make dat-khoa … XOAY=1): các chỗ ấy có thật trong mk/deploy.mk và .github/workflows/deploy.yml không? (6) Có
+      câu nào trong mục nói sai điều mã làm? Trích câu làm bằng.
+    evidence_required: [run_id, verifier, verified_at, verdict, rationale]
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: bash _acceptance/lui-ban-luc-xoay-mat-khau/rang/chay.sh E2
+    layer: backend-effect
+    paths: ["docs/van-hanh/*.md", "tests/so-tay-lui-ban.test.ts", "tools/deploy/len-ban.mjs", "tools/deploy/lui-ban.mjs", "tools/deploy/kiem-nhanh.mjs", "src/modules/identity/health.ts"]
+    expected: >-
+      exit 0. Ca «E2 · đọc được mã» pass: rollbackLines bằng đúng chín chuỗi của ma trận, phân biệt, theo thứ tự ấy;
+      STEPS.staging ∪ STEPS.production có mười tên bước. «E2 · một chỗ» và «E2 · đủ dòng» pass trên nội dung thật:
+      oneSection → [], everyLine → []. «E2 · lý do kiểm nhanh» pass: tiền đề health.ts có «ok: vai === "dat"»,
+      notOkReason(kiem-nhanh.mjs) = «sức khoẻ ok khác true», rotationReason → []. Chiều đỏ, cùng nội dung: chép tiêu đề
+      sang dua-ban-len.md → oneSection trả đúng «mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» phải có đúng một chỗ,
+      ở xoay-khoa.md: thấy 2 (xoay-khoa.md, dua-ban-len.md)»; xoá hẳn hàng «lùi bản ĐỎ — tên miền đã về bản …» khỏi bảng
+      → everyLine trả đúng «… thiếu dòng của lệnh: lùi bản ĐỎ — tên miền đã về bản» (dù chuỗi ấy còn ở cột «Làm gì» của
+      hàng khác); bỏ «`kiem-nhanh`» khỏi ô «Dòng» của hàng cach-ly/dung/kiem-nhanh/gan-ten-mien → everyLine trả đúng
+      «mục «…» thiếu bước: kiem-nhanh»; thêm say("lùi bản ĐỎ — dòng thử") vào bản sao rollBack → «… thiếu dòng của lệnh:
+      lùi bản ĐỎ — dòng thử»; thay lý do trong hàng «tên miền đã về bản» bằng «vai: chưa rõ» → rotationReason trả đúng
+      «hàng «lùi bản ĐỎ — tên miền đã về bản» không nêu lý do kiểm nhanh máy in cho bản không nối được: sức khoẻ ok khác
+      true»; thay mọi «sức khoẻ ok khác true» của mục bằng «vai nối chưa đạt» → rotationReason trả đúng ba thông điệp:
+      «mục «…» nêu lý do kiểm nhanh mà máy không in khi bản không nối được: vai nối chưa đạt» và hai thông điệp «hàng …
+      không nêu lý do …» cho hai hàng.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-2
+    executor: judgment
+    inputs: ["docs/van-hanh/xoay-khoa.md", "tools/deploy/len-ban.mjs", "tools/deploy/lui-ban.mjs", "tools/deploy/kiem-nhanh.mjs", "src/modules/identity/health.ts", "_acceptance/lui-ban-luc-xoay-mat-khau/contract.md"]
+    question: >-
+      Đọc bảng dòng của lệnh trong mục «Lùi bản sau khi xoay mật khẩu vai đăng nhập» của xoay-khoa.md, với contract.md
+      (AC-2) làm ý định và mã làm sự thật (rollBack và vòng bước của lenBan trong len-ban.mjs; lui-ban.mjs; kiemNhanh).
+      Với mỗi hàng, «Bản đang chạy» và «Làm gì» có đúng với mã không: (1) «đã lùi về bản trước» — mã chỉ in sau khi tên
+      miền về đúng bản trước và kiemNhanh bản ấy đạt (đòi vai «dat»); bảng có nói bản ấy nối được lúc kiểm, và không nói
+      nó «không nối được»? (2) ba dòng «lùi bản DỪNG» — mã không lùi, tên miền ở bản mới dựng ở lượt này; bảng có nói
+      không mất kết nối vì mật khẩu và không khuyên chọn bản trong danh sách in kèm? (3) bốn dòng «lùi bản ĐỎ» — hàng
+      «tên miền đã về bản … nhưng kiểm nhanh đỏ» có nói mất kết nối; ba hàng còn lại có nói đúng là không chắc tên miền
+      ở đâu? (4) bước đỏ sau vai-dang-nhap mà «DỪNG ở <bước> — tên miền không đổi»: có nói tên miền vẫn ở bản dựng trước
+      lượt xoay, đã mất kết nối? Các bước được kể có đúng là các bước đứng sau vai-dang-nhap trong STEPS của từng môi
+      trường? (5) đỏ ở bien hay trước, hay ở vai-dang-nhap: có tách lượt xoay đầu (mật khẩu chưa đổi) với lượt chạy lại
+      sau một lượt đã in «vai-dang-nhap đạt» (bản đang chạy đã mất kết nối từ lượt trước)? (6) dòng «rollback <ENV>:
+      kiem-nhanh-ten-mien ĐỎ» của make rollback: có nói bản cũ hơn cũng vậy? (7) bảng có định nghĩa «trước khi đổi mật
+      khẩu» và «lượt chạy lại» sao cho mọi lượt đỏ ở bien hay trước, hay ở vai-dang-nhap, đều xếp được vào một trong
+      hai, khớp thứ tự STEPS (bien trước vai-dang-nhap)? (8) dòng «lùi bản ĐỎ — không đọc được danh sách bản của
+      Vercel»: theo hàm stop của rollBack, nó luôn in sau một dòng lùi bản khác; bảng có nói thế và có nói tên miền ở
+      đâu là theo dòng đứng trước, thay vì gán «không chắc»? Trích hàng làm bằng cho mỗi ý sai.
+    evidence_required: [run_id, verifier, verified_at, verdict, rationale]
+  - id: E4
+    criterion: AC-3
+    executor: test
+    cmd: bash _acceptance/lui-ban-luc-xoay-mat-khau/rang/chay.sh E4
+    layer: backend-effect
+    paths: ["docs/van-hanh/*.md", "tests/so-tay-lui-ban.test.ts"]
+    expected: >-
+      exit 0. Ca «E4 · nội dung thật» pass: banners trên mọi docs/van-hanh/*.md → []; ca «E4 · sổ phải có dòng chặn»
+      pass: tập sổ banners đòi gồm đúng README.md, dua-ban-len.md, lui-ban.md, xoay-khoa.md (khoi-phuc.md và
+      nhat-ky-khoi-phuc.md không có đoạn nào về lùi bản nên không đòi) — thước không xanh vì xét thiếu sổ. Chiều đỏ,
+      cùng nội dung: bỏ dòng chặn của dua-ban-len.md → đúng «dua-ban-len.md: thiếu dòng chặn ngay dưới tiêu đề trỏ mục
+      «Lùi bản sau khi xoay mật khẩu vai đăng nhập»»; dời dòng chặn của lui-ban.md xuống sau đoạn mở đầu → đúng
+      «lui-ban.md: thiếu dòng chặn ngay dưới tiêu đề trỏ mục «…»»; dòng chặn của README.md mất liên kết xoay-khoa.md →
+      đúng «README.md: thiếu dòng chặn …»; dòng chặn của dua-ban-len.md mất chữ «thắng» → đúng «dua-ban-len.md: thiếu
+      dòng chặn …»; thêm moi.md («# Mới» rồi «Lỗi thì lùi bản ngay.») → đúng «moi.md: thiếu dòng chặn …».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-4
+    executor: test
+    cmd: bash _acceptance/lui-ban-luc-xoay-mat-khau/rang/chay.sh E5
+    layer: backend-effect
+    paths: ["docs/van-hanh/*.md", "tests/so-tay-lui-ban.test.ts"]
+    expected: >-
+      exit 0. Ca «E5 · nội dung thật» pass: noRestating → [] trên mọi docs/van-hanh/*.md; đối chứng dương: mục có chứa
+      «mật khẩu cũ». Chiều đỏ, cùng nội dung: thêm «- Lùi không cứu được: bản cũ giữ mật khẩu cũ.» đầu «Khi nào dùng»
+      của lui-ban.md → đúng một thông điệp «lui-ban.md: đoạn kể lại lý do ngoài mục: "- Lùi không cứu được: bản cũ giữ
+      mật khẩu cũ."».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-5
+    executor: judgment
+    inputs: ["docs/van-hanh/dua-ban-len.md", "docs/van-hanh/lui-ban.md", "docs/van-hanh/xoay-khoa.md", "docs/van-hanh/README.md", "tools/deploy/len-ban.mjs", "_acceptance/lui-ban-luc-xoay-mat-khau/contract.md"]
+    question: >-
+      Đọc bốn sổ như người vận hành vừa xoay mật khẩu vai đăng nhập, với contract.md (AC-5) làm ý định. (1) Dòng chặn
+      ngay dưới tiêu đề mỗi sổ có đọc được ngay không: nói khi nào nó áp, và nói mục «Lùi bản sau khi xoay mật khẩu vai
+      đăng nhập» thắng mọi câu của sổ về lùi bản và về bản đang chạy? Trích dòng vụng nếu có. (2) Đọc dòng chặn rồi đọc
+      mục ấy: người vừa xoay có đủ để không lùi về bản dựng trước lượt xoay, kể cả khi một câu khác trong sổ (ví dụ «lùi
+      bản ngay», «chọn bản đã chạy tốt gần nhất», «gấp thì dùng dòng cuối», «một bước đỏ không đổi gì ở bản đang phục
+      vụ») bảo khác? Có câu nào trong sổ nói ngược dòng chặn — ví dụ nói mục không áp ở đây? (3) Các dòng «Đạt khi» của
+      bước 2 và bước 5 sổ đưa bản lên có kể đủ các bước theo đúng thứ tự STEPS trong len-ban.mjs không; mọi hàng bien
+      và vai-dang-nhap còn dặn không bấm dựng lại trên Vercel trước khi lệnh chạy xanh không? (4) Có câu nào bảo in, dán
+      hay gửi giá trị của khoá không?
+    evidence_required: [run_id, verifier, verified_at, verdict, rationale]
+  - id: E7
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.check
+    layer: backend-effect
+    expected: >-
+      exit 0.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
