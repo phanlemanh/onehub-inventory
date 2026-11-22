@@ -94,3 +94,49 @@ wall: 1004s
 - **claude-sonnet-5-5**: 15 agent · 36 calls · out 82,849 · in 74 · cache_read 481,277 · cache_create 648,098
 - **claude-haiku-5-5**: 6 agent · 16 calls · out 10,165 · in 32 · cache_read 152,864 · cache_create 92,771
 
+### S4 round 3 — wf_39f86f42-50e (23 agent, 117,380 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| review:bugs | claude-opus-5-5 | 23 | 16,909 | 48 | 1,061,023 | 183 |
+| judge:E3:operational-feasibility | claude-sonnet-5-5 | 3 | 11,185 | 6 | 67,787 | 78 |
+| review:measurement | claude-opus-5-5 | 10 | 9,583 | 22 | 351,768 | 94 |
+| review:conventions | claude-opus-5-5 | 16 | 8,121 | 34 | 537,440 | 88 |
+| synthesize:report | claude-sonnet-5-5 | 2 | 7,604 | 4 | 26,205 | 43 |
+| judge:E1:spec-alignment | claude-sonnet-5-5 | 2 | 7,474 | 4 | 16,813 | 55 |
+| judge:E1:domain-correctness | claude-sonnet-5-5 | 2 | 7,105 | 4 | 13,197 | 51 |
+| judge:E1:operational-feasibility | claude-sonnet-5-5 | 3 | 6,889 | 8 | 70,474 | 51 |
+| judge:E6:domain-correctness | claude-sonnet-5-5 | 2 | 6,029 | 4 | 16,524 | 44 |
+| judge:E3:domain-correctness | claude-sonnet-5-5 | 3 | 4,806 | 6 | 67,783 | 37 |
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 4,736 | 6 | 42,005 | 192 |
+| judge:E6:operational-feasibility | claude-sonnet-5-5 | 2 | 4,450 | 4 | 16,526 | 31 |
+| judge:E3:spec-alignment | claude-sonnet-5-5 | 4 | 4,115 | 10 | 84,153 | 34 |
+| judge:E6:spec-alignment | claude-sonnet-5-5 | 2 | 4,074 | 4 | 16,524 | 32 |
+| machine:DATABASE_URL= make e2e | claude-haiku-5-5 | 2 | 2,983 | 4 | 6,762 | 609 |
+| machine:bash _acceptance/lui-ban-luc-xoay-mat-kh | claude-haiku-5-5 | 2 | 2,242 | 4 | 16,130 | 12 |
+| machine:bash _acceptance/lui-ban-luc-xoay-mat-kh | claude-haiku-5-5 | 2 | 2,211 | 4 | 16,130 | 11 |
+| machine:bash _acceptance/lui-ban-luc-xoay-mat-kh | claude-haiku-5-5 | 2 | 2,183 | 4 | 16,130 | 11 |
+| triage | claude-sonnet-5-5 | 2 | 1,557 | 4 | 15,027 | 12 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,087 | 4 | 12,690 | 148 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 937 | 4 | 16,075 | 11 |
+| refute:xoay-khoa.md | claude-sonnet-5-5 | 2 | 758 | 4 | 12,006 | 8 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 342 | 4 | 11,485 | 5 |
+
+
+wall: 836s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| judge | 9 | 56,127 | 369,781 | 80 | 09:05:18 | 09:06:38 |
+| baseline | 1 | 4,736 | 42,005 | 192 | 09:05:18 | 09:08:30 |
+| machine | 6 | 11,643 | 83,917 | 768 | 09:05:18 | 09:18:06 |
+| review | 3 | 34,613 | 1,950,231 | 204 | 09:05:33 | 09:08:56 |
+| triage | 1 | 1,557 | 15,027 | 12 | 09:18:06 | 09:18:18 |
+| refute | 1 | 758 | 12,006 | 8 | 09:18:18 | 09:18:26 |
+| capture | 1 | 342 | 11,485 | 5 | 09:18:26 | 09:18:31 |
+| synthesize | 1 | 7,604 | 26,205 | 43 | 09:18:31 | 09:19:14 |
+
+- **claude-opus-5-5**: 3 agent · 49 calls · out 34,613 · in 104 · cache_read 1,950,231 · cache_create 189,936
+- **claude-sonnet-5-5**: 14 agent · 34 calls · out 71,124 · in 72 · cache_read 476,509 · cache_create 636,456
+- **claude-haiku-5-5**: 6 agent · 12 calls · out 11,643 · in 24 · cache_read 83,917 · cache_create 94,439
+

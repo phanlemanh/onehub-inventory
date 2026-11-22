@@ -5,7 +5,7 @@ slug: lui-ban-luc-xoay-mat-khau
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [docs]
-status: implemented
+status: verified
 approved_by: Manh Phan
 approved_at: 2026-11-22
 design_doc: docs/superpowers/specs/2026-11-22-lui-ban-luc-xoay-mat-khau-design.md
@@ -119,3 +119,7 @@ Không quét bằng `morphological-scan` (dòng `descope` trong sổ quyết đ�
   dòng chặn ở đầu mỗi sổ (AC-3); các câu trỏ đã thêm ở lượt trước được giữ, không bắt buộc. Lượt 3 là lượt cuối trước trần.
 - Vòng này thay một phần AC-5 của hồ sơ `bien-do-sau-xoay-mat-khau`: ba vùng của đoạn mở đầu «Đỏ thì làm gì» sổ đưa bản lên
   chuyển vào bảng của mục mới; đoạn ấy chỉ còn câu trỏ.
+- Ngoài-1 (máy định tuyến 2026-11-22, đề xuất S4 known-limits): Nếu sau này ai đó đổi thứ tự các bước kiểm của lệnh, sổ tay có thể vẫn ghi lý do cũ trong khi lệnh in lý do khác, và bài kiểm vẫn báo xanh. Người vận hành khi đó đọc sai nguyên nhân mất kết nối, nhưng không có dữ liệu nào bị mất. — `tests/so-tay-lui-ban.test.ts`
+- Ngoài-2 (máy định tuyến 2026-11-22, đề xuất S4 known-limits): Nếu ai đó sửa lý do ghi trong một hàng của sổ tay thành lý do sai, bài kiểm vẫn xanh. Người vận hành có thể đọc một lý do lệch với điều lệnh thật in ra. — `tests/so-tay-lui-ban.test.ts`
+- Ngoài-3 (máy định tuyến 2026-11-22, đề xuất S4 known-limits): Bài kiểm lý do kiểm nhanh dựa vào cách mã được viết, nên mã đổi cách viết mà kết quả không đổi có thể làm bài kiểm báo sai, hoặc mã thêm điều kiện mà bài kiểm vẫn xanh. — `tests/so-tay-lui-ban.test.ts`
+- Ngoài-4 (máy định tuyến 2026-11-22, đề xuất S4 known-limits): Một đoạn trong sổ lùi bản bảo người vận hành tự chọn bản khác trên Vercel không có câu trỏ về mục sau xoay mật khẩu, và bài kiểm không bắt được. Người vừa xoay mật khẩu có thể chọn nhầm bản cũ không nối được. — `tests/so-tay-lui-ban.test.ts`
