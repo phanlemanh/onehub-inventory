@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: bien-do-sau-xoay-mat-khau
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: d79d189195ebe384af1ab742afac4fea26604d16
-human_signoff:
+human_signoff: Manh Phan 2026-11-22
 ---
 
 # Evidence Report: bien-do-sau-xoay-mat-khau
@@ -66,7 +66,7 @@ human_signoff:
   judged_by: judge panel (fresh context, 3 lens) — đề xuất PASS
   verdict: PASS
   rationale: Ba lens đều thấy mục «Đỏ thì làm gì» chia đúng ba vùng, luật vùng ba phủ cả ca tự lùi bản, mọi hàng bien và vai-dang-nhap dặn không dựng lại trên Vercel, và không câu nào bảo in hay gửi giá trị khoá.
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-22 — Đạt
   panel:
     - domain-correctness: PASS — Mục «Đỏ thì làm gì» của dua-ban-len.md chia đúng ba vùng. Vùng ba là luật theo vị trí («bất kỳ bước nào chạy sau khi `vai-dang-nhap` đạt») và phủ cả `đã lùi về bản trước`, `lùi bản DỪNG`, `lùi bản ĐỎ`. Ca `vai-dang-nhap` đỏ nằm ở vùng hai, không nằm ở vùng «mất kết nối». Cả 5 hàng `bien` và 2 hàng `vai-dang-nhap` đều dặn «Đừng bấm dựng lại trên Vercel trước khi lệnh này chạy xanh». Các hàng `gan-ten-mien` và `kiem-nhanh-ten-mien` đều trừ ca vừa xoay mật khẩu và dặn «đừng lùi về bản cũ… sửa nguyên nhân và chạy lại `make deploy` ngay». Không hàng nào của `cach-ly`, `dung`, `kiem-nhanh` nói bản đang chạy yên. Bước 3 của xoay-khoa.md nói khoảng hở bắt đầu «từ lúc bước `vai-dang-nhap` đạt» và `bien` chạy trước. Trang 0048 có thứ tự mới, lý do, cái giá và khoảng hở còn lại. Không câu nào bảo in, dán hay gửi giá trị khoá ra ngoài lệnh `make dat-khoa`. Còn một điểm phụ, ngoài phạm vi các hàng của bảng. Bước 3 và bước 6 của dua-ban-len.md dặn «lùi bản» theo lui-ban.md mà không nhắc ca xoay mật khẩu. Hai bước đó nằm ngoài mục «Đỏ thì làm gì» và ngoài câu hỏi này.
     - operational-feasibility: PASS — Mục «Đỏ thì làm gì» chia đúng ba vùng. Vùng thứ ba là luật theo vị trí («bất kỳ bước nào chạy sau khi `vai-dang-nhap` đạt») và phủ cả `đã lùi về bản trước`, `lùi bản DỪNG`, `lùi bản ĐỎ`. Ca `vai-dang-nhap` đỏ nằm ở vùng hai («mật khẩu chưa đổi, bản đang chạy không bị đụng»), không bị xếp vào vùng mất kết nối. Năm hàng `bien` và hai hàng `vai-dang-nhap` đều dặn «Đừng bấm dựng lại trên Vercel trước khi lệnh này chạy xanh». Các hàng `cach-ly`, `dung` và `kiem-nhanh` không nói bản đang chạy yên. Hàng `gan-ten-mien` và ba hàng `kiem-nhanh-ten-mien` có câu «Vừa xoay mật khẩu vai đăng nhập: đừng lùi về bản cũ… sửa nguyên nhân và chạy lại `make deploy` ngay». Bước 3 của `xoay-khoa.md` nói khoảng hở bắt đầu «từ lúc bước `vai-dang-nhap` đạt» và «Bước `bien` chạy trước `vai-dang-nhap`, nên lỗi của Vercel ở bước ấy không mở khoảng hở». Trang 0048 có thứ tự mới, lý do, cái giá («Vercel giữ mật khẩu mới trong khi cơ sở dữ liệu còn mật khẩu cũ») và khoảng hở còn lại. Không câu nào bảo in, dán hay gửi giá trị khoá. Mọi chỗ dán chỉ dán vào `make dat-khoa` khi lệnh hỏi.

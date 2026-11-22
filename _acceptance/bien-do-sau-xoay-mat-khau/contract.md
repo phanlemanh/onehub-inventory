@@ -5,7 +5,7 @@ slug: bien-do-sau-xoay-mat-khau
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-22
 design_doc: docs/superpowers/specs/2026-11-22-bien-do-sau-xoay-mat-khau-design.md
@@ -146,3 +146,14 @@ môi trường.
   - Ngoài mục «Đỏ thì làm gì», sổ đưa bản lên chưa trừ ca vừa xoay mật khẩu vai đăng nhập ở các câu về lùi bản: bước 5 coi
     «đã lùi về bản trước» là bản thật đã yên; bước 3 và bước 6 bảo lùi bản ngay khi kiểm bằng mắt thấy lỗi. Ca ấy đề xuất
     thành một việc riêng: viết thành một mục duy nhất trong sổ xoay khoá, các sổ khác chỉ trỏ tới.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-22:
+  - Ngoài-2: Hàng «đã lùi về bản trước» của bảng vừa nói bản cũ đã qua kiểm sức khoẻ vừa nói bản cũ không nối được cơ sở
+    dữ liệu lúc vừa xoay mật khẩu; lời dặn cuối (không lùi, chạy lại) vẫn đúng.
+  - Ngoài-3: Luật vùng ba xếp cả «lùi bản DỪNG» vào ca mất kết nối, dù lúc ấy tên miền vẫn ở bản mới mang mật khẩu mới;
+    người vận hành có thể tìm sai nguyên nhân, lời dặn cuối vẫn đúng.
+  - Ngoài-4: Bước 3 và bước 6 của sổ đưa bản lên vẫn bảo lùi bản ngay khi kiểm bằng mắt thấy lỗi, không trừ lượt vừa xoay
+    mật khẩu (sổ lùi bản đã chặn ca này).
+  - Ngoài-5: Chú thích đầu lệnh đưa bản lên và dòng nhật ký wiki nói «lỗi Vercel» thay vì «lỗi ở bước đẩy biến»: lỗi Vercel
+    ở bước dựng hay gắn tên miền lúc đang xoay vẫn làm bản thật mất kết nối.
+- Ngoài hợp đồng: Ngoài-1 (bước 5 của sổ đưa bản lên coi «đã lùi về bản trước» là an toàn ngay cả khi vừa xoay mật khẩu)
+  — chủ kho chọn mở hợp đồng mới ở Cổng Bằng chứng 2026-11-22.
