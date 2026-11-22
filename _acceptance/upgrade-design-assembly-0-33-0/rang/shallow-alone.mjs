@@ -13,6 +13,7 @@ const sha = head(root);
 const base = branchBase(root);
 const mainAt = option("--main-at", base);
 const clone = shallowClone(root, sha, { mainAt });
+process.stdout.write(`alone: clone made in ${path.dirname(clone.dir)}\n`);
 const found = [];
 let make;
 let left;
