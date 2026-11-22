@@ -5,7 +5,7 @@ slug: bien-do-sau-xoay-mat-khau
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
-status: approved
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-22
 design_doc: docs/superpowers/specs/2026-11-22-bien-do-sau-xoay-mat-khau-design.md
