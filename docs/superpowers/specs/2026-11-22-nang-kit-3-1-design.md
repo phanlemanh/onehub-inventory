@@ -33,16 +33,19 @@ Theo khuôn `nang-kit-3-0`: răng ở `_acceptance/nang-kit-3-1/rang/`, kéo kit
 commit với ma trận `matrix.mjs`; mỗi răng có cặp hai chiều trong `two-way.mjs`. Lệnh riêng của hồ sơ khai thẳng trong
 `evals.yaml` (không thêm khoá vào `_acceptance/config.yaml`).
 
-| Răng                                  | Tiêu chí | Đo gì                                                        |
-| ------------------------------------- | -------- | ------------------------------------------------------------ |
-| `settings.mjs`                        | AC-1     | đúng một dòng đổi so với main; plugin bật = chợ ở thẻ        |
-| `tag.mjs`                             | AC-2     | thẻ trên GitHub bóc ra `0a93a5b9`; bản của sáu plugin        |
-| `tro-ly.mjs`                          | AC-3     | `--dem` thoát 0, đếm = số hồ sơ có hợp đồng, đủ bảy loại câu |
-| `product-map.mjs`, `doc-commands.mjs` | AC-4     | bản đồ sản phẩm, bốn executor, lệnh trong tài liệu sống      |
-| `gate-control.mjs`                    | AC-5     | 3.0 và 3.1 cho cùng kết quả trên mọi hồ sơ ở merge-base      |
-| `gate-branch.mjs`                     | AC-6     | cổng theo `KIT_TAG` của CI trên nhánh: chỉ dừng vì hồ sơ này |
+| Răng                                  | Tiêu chí | Đo gì                                                                |
+| ------------------------------------- | -------- | -------------------------------------------------------------------- |
+| `settings.mjs`                        | AC-1     | đúng một dòng đổi so với main; plugin bật = chợ ở thẻ                |
+| `tag.mjs`                             | AC-2     | thẻ trên GitHub bóc ra `0a93a5b9`; bản của sáu plugin                |
+| `tro-ly.mjs`                          | AC-3     | `--dem` thoát 0, đếm = số hồ sơ có hợp đồng, đủ bảy loại câu         |
+| `product-map.mjs`, `doc-commands.mjs` | AC-4     | bản đồ sản phẩm, bốn executor, lệnh trong tài liệu sống              |
+| `gate-control.mjs`                    | AC-5     | 3.0 và 3.1 cho cùng kết quả trên mọi hồ sơ ở merge-base và trên HEAD |
+| `dot.mjs`                             | AC-9     | móc điều phối 3.1 đọc thư mục đợt như 3.0; không dãy nào đang S4     |
+| `gate-branch.mjs`                     | AC-6     | cổng theo `KIT_TAG` của CI trên nhánh: chỉ dừng vì hồ sơ này         |
 
 ## Câu hỏi cho chủ kho
 
 - Hỏi-1: CI giữ `v3.0.0` trong PR này (khuyên) hay chủ kho đổi `KIT_TAG` trên nhánh trước lượt chấm.
 - Hỏi-2: chấm từ bản chép kho bên ngoài vì đợt đang nghỉ (khuyên) hay chờ đợt chạy lại.
+- Hỏi-3: nhận giới hạn «phiên nạp 3.1 sau gộp chưa đo» (khuyên), kiểm bộ nhớ đệm ở phiên mới đầu tiên sau gộp.
+- Hỏi-3: nhận giới hạn «phiên nạp 3.1 sau gộp chưa đo» (khuyên), kiểm bộ nhớ đệm ở phiên mới đầu tiên sau gộp.

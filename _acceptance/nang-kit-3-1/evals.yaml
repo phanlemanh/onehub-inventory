@@ -51,8 +51,8 @@ evals:
     cmd: node _acceptance/nang-kit-3-1/rang/gate-control.mjs
     long_running: 5
     layer: backend-effect
-    paths: ["_acceptance/nang-kit-3-1/rang/**"]
-    expected: "exit 0; dòng 'gate-control: on <sha> (merge-base) --recheck-all, kit v3.0.0 and v3.1.0 both 0 VIOLATION, <k> OK each, same records' (lúc thiết kế trên 1410a0f0: k = 72). Chiều đỏ (two-way, đầu ra thật của kit v3.1.0 bớt một dòng OK ở một bên): 'gate-control: OK records differ'"
+    paths: ["_acceptance/**", ".claude/settings.json"]
+    expected: "exit 0; dòng 'gate-control: on <sha> (merge-base) --recheck-all, kit v3.0.0 and v3.1.0 both 0 VIOLATION, <k> OK each (= records with a contract), same records' với k = số _acceptance/*/contract.md ở <sha> đếm bằng git ls-tree (lúc thiết kế trên 1410a0f0: 72), và dòng 'gate-control: on HEAD against origin/main both kits print the same <m> verdict lines'. Chiều đỏ (two-way, từ đầu ra thật của kit v3.1.0): bớt một dòng OK ở một bên: 'gate-control: OK records differ'; bỏ mọi dòng OK ở cả hai bên: 'gate-control: OK 0 records, want <k>'; thêm một dòng VIOLATION vào một bên trên HEAD: 'gate-control: verdict lines on HEAD differ between kits'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E7
     criterion: AC-6
@@ -78,6 +78,14 @@ evals:
     cmd: node --test _acceptance/nang-kit-3-1/rang/two-way.mjs
     long_running: 10
     layer: backend-effect
-    paths: ["_acceptance/nang-kit-3-1/rang/**", ".claude/settings.json", ".github/workflows/ci.yml", "docs/**", "_acceptance/config.yaml"]
-    expected: "exit 0; node --test in 'pass 13' và 'fail 0': với mỗi chiều đỏ kê ở expected của E1–E7 một bài «xanh trên vật lành, đỏ trên bản phá với đúng thông điệp ghim» (E1 hai, E2 hai, E3 hai, E4 hai, E5 một, E6 một, E7 ba)"
+    paths: ["_acceptance/**", ".claude/settings.json", ".github/workflows/ci.yml", "docs/**", "PRODUCT-MAP.md", "LO-TRINH.html"]
+    expected: "exit 0; node --test in 'pass 18' và 'fail 0': với mỗi chiều đỏ kê ở expected của E1–E7 và E10 một bài «xanh trên vật lành, đỏ trên bản phá với đúng thông điệp ghim» (E1 hai, E2 hai, E3 hai, E4 hai, E5 một, E6 ba, E7 ba, E10 ba)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: node _acceptance/nang-kit-3-1/rang/dot.mjs
+    layer: backend-effect
+    paths: ["_acceptance/nang-kit-3-1/rang/**", "docs/plan/**"]
+    expected: "exit 0; dòng 'dot: <n> hook files of dispatch, 2 changed in v3.1.0 (hinh-dang.mjs,nguon-hang.mjs), reading batch dieu-phoi-nen alike in both; no s4 lock held (<l> lock folders)'. Chiều đỏ (two-way): hai bản kit như nhau: 'dot: hook files changed in v3.1.0 are none'; không có thư mục đợt: 'dot: batch folder dieu-phoi-nen not found'; bản chép thư mục đợt (tệp thật) có khoa/s4/chu.json: 'dot: lock s4 is held'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]

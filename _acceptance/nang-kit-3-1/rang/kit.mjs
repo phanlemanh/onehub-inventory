@@ -64,7 +64,7 @@ export function worktree(rev, root = repoRoot()) {
 
 export function commitAll(dir, message) {
   git(dir, "add", "-A");
-  git(dir, "-c", "user.name=nk31 measure", "-c", "user.email=nk31@example.invalid", "commit", "-q", "-m", message);
+  git(dir, "-c", "core.hooksPath=/dev/null", "-c", "user.name=nk31 measure", "-c", "user.email=nk31@example.invalid", "commit", "-q", "-m", message);
 }
 
 export function runGate(core, cwd, args) {

@@ -51,3 +51,17 @@ export const KIT_EXECUTORS = ["script.product_map", "design.floor", "design.khuo
 // Commands and kit paths named in the living docs.
 export const DOC_FILES = ["docs/tri-thuc/TRI-THUC.md", "docs/plan/dot-nen/README.md", "_acceptance/config.yaml"];
 export const DOC_COUNTS = { mentions: 4, distinct: 3, paths: 1 };
+
+// AC-9: dispatch hook scripts read the batch folder. Between v3.0.0 and v3.1.0 exactly these files of their local
+// import closure change; each reader listed here must read this repo's real state the same way in both versions
+// (argument "batch" = the batch folder, "repo" = the repository root).
+export const HOOK_CLOSURE_CHANGED = {
+  "hinh-dang.mjs": [
+    ["docCauHinh", "batch"],
+    ["docHangViec", "batch"],
+  ],
+  "nguon-hang.mjs": [["docNhomKeHoach", "repo"]],
+};
+export const BATCH = "dieu-phoi-nen";
+// Rule 15 of docs/plan/dot-nen/LUAT-rieng.md: no kit upgrade during an S4 round — no lane holds these locks.
+export const S4_LOCKS = ["s4"];
