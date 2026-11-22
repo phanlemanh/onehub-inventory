@@ -204,8 +204,8 @@ khi đặt <tên>; đã đặt: …` — chạy lại, Enter để giữ các kh
 
 10. **Máy — bật tự động triển khai và đưa bản thử lên lần đầu.** Settings › Secrets and variables › Actions › tab Variables,
     biến kho `DEPLOY_ENABLED` = `true`; rồi Actions › Deploy › Run workflow, nhánh `main` (lần đầu chưa có thẻ phát hành).
-    Lần đưa bản đầu không còn dừng giữa chừng: bước `vai-dang-nhap` tự đặt mật khẩu vai đăng nhập ngay sau migration, bước
-    `bien` tự đặt biến của dự án Vercel. Việc `production` dừng chờ chủ kho duyệt (việc 12). Máy nhận lại: không biến mới.
+    Lần đưa bản đầu không còn dừng giữa chừng: ngay sau `migration`, bước `bien` tự đặt biến của dự án Vercel, rồi bước
+    `vai-dang-nhap` tự đặt mật khẩu vai đăng nhập. Việc `production` dừng chờ chủ kho duyệt (việc 12). Máy nhận lại: không biến mới.
     - **Đạt khi:** nhật ký lượt Deploy có `deploy staging: xong <commit>`; `<địa chỉ bản thử>/api/v1/health` trả
       `"ok":true`, `"env":"staging"`, `"vai":"dat"`.
     - **Đỏ thì:** đọc dòng đỏ trong nhật ký và làm theo bảng «Đỏ thì làm gì» của [dua-ban-len.md](dua-ban-len.md); lượt
