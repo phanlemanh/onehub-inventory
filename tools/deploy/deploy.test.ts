@@ -1681,3 +1681,35 @@ describe("E4 · lần đọc biến trả thành công mà không có danh sách
     expect(r.code).toBe(0);
   });
 });
+
+const BIEN_REASONS = [
+  "Vercel từ chối ghi biến <tên>",
+  "Vercel không xác nhận đã ghi biến <tên>",
+  "Vercel trả danh sách biến không đúng khuôn",
+];
+
+/** One finding per red reason of the bien step that no `bien` row of the runbook's table carries. */
+function soTayFindings(md: string): string[] {
+  const rows = md.split("\n").filter((l) => l.startsWith("| `bien`"));
+  return BIEN_REASONS.filter((reason) => !rows.some((row) => row.includes(reason))).map(
+    (reason) => `sổ tay thiếu hàng bien: ${reason}`,
+  );
+}
+
+describe("E6 · sổ tay có hàng cho mỗi lý do đỏ mới của bien", () => {
+  const md = readFileSync(resolve(HERE, "../../docs/van-hanh/dua-ban-len.md"), "utf8");
+
+  it("E6 · mục «Đỏ thì làm gì» có hàng bien cho từng lý do", () => {
+    expect(soTayFindings(md)).toEqual([]);
+  });
+
+  it("E6 · chiều đỏ: bỏ hàng «Vercel từ chối ghi biến» → hàm so gọi tên hàng thiếu", () => {
+    const broken = md
+      .split("\n")
+      .filter((l) => !(l.startsWith("| `bien`") && l.includes("Vercel từ chối ghi biến")))
+      .join("\n");
+    expect(soTayFindings(broken)).toEqual([
+      "sổ tay thiếu hàng bien: Vercel từ chối ghi biến <tên>",
+    ]);
+  });
+});
