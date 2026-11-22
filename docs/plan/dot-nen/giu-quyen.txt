@@ -1,0 +1,2 @@
+# giữ-quyền — mỗi dòng: <slug> [ghi chú]. Hàng ghi ở đây: mọi câu chờ chủ kho, máy không mặc-ký.
+# Nút «tôi quyết» trên Bảng đợt ghi và xoá dòng trong chính tệp này.
