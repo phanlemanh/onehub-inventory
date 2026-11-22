@@ -5,9 +5,9 @@ slug: bien-do-sau-xoay-mat-khau
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [cli, docs]
-status: implemented
-approved_by: Manh Phan
-approved_at: 2026-11-22
+status: draft
+approved_by:
+approved_at:
 design_doc: docs/superpowers/specs/2026-11-22-bien-do-sau-xoay-mat-khau-design.md
 ---
 
@@ -78,9 +78,15 @@ Source input: prompt — Ngoài-1 của `_acceptance/bien-vercel-tu-choi/`; ch�
   - đỏ ở `vai-dang-nhap`: mật khẩu chưa đổi, bản đang chạy không bị đụng, nhưng Vercel có thể đã giữ mật khẩu mới;
   - đỏ sau khi `vai-dang-nhap` đạt: bản đang chạy đã mất kết nối cơ sở dữ liệu, sửa nguyên nhân và chạy lại ngay.
 
+  Vùng thứ ba viết thành một luật theo vị trí so với `vai-dang-nhap`, không phải danh sách tên bước. Nó phủ cả lúc lệnh tự
+  lùi tên miền về bản trước (sau `kiem-nhanh-ten-mien` đỏ): bản ấy cũng giữ mật khẩu cũ.
+
   Thêm nữa:
   - mọi hàng `bien` và hàng `vai-dang-nhap` dặn không bấm dựng lại trên Vercel trước khi lệnh chạy xanh;
-  - hàng của `cach-ly`, `dung`, `kiem-nhanh` không nói hay ngụ ý bản đang chạy yên mà không trừ ca vừa xoay mật khẩu;
+  - không hàng nào của một bước chạy sau `vai-dang-nhap` (`cach-ly`, `dung`, `kiem-nhanh`, `gan-ten-mien`,
+    `kiem-nhanh-ten-mien`, kể cả các dòng lùi bản) nói hay ngụ ý bản đang chạy yên mà không trừ ca vừa xoay mật khẩu;
+  - các dòng lùi bản dặn: vừa xoay mật khẩu vai đăng nhập thì đừng lùi về bản cũ (`make rollback`, Instant Rollback) — sửa
+    nguyên nhân và chạy lại;
   - bước 3 của sổ xoay khoá nói khoảng hở bắt đầu khi `vai-dang-nhap` đạt, sau bước `bien`;
   - trang quyết định 0048 nói thứ tự mới, vì sao, cái giá (trạng thái lẫn trên Vercel) và khoảng hở còn lại.
 
