@@ -5,9 +5,9 @@ slug: lui-ban-luc-xoay-mat-khau
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [docs]
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-22
 design_doc: docs/superpowers/specs/2026-11-22-lui-ban-luc-xoay-mat-khau-design.md
 ---
 
