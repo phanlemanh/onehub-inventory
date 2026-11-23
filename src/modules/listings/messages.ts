@@ -1,10 +1,11 @@
 // The two internal messages about a listing (row 3e, _acceptance/hoi-dau-chu-bao-sai): asking the listing agent, and
 // reporting a wrong catalog detail. Pure: built only from what the record shows and what the person typed — nothing of
 // the owner, no network. The person sends them through the device's share sheet (SP-3).
+import { QUERY_WORD } from "./ui/query-words";
 
 /** The link of one listing: the inventory address that opens its record (row 3), absolute so it can be pasted. */
 export function recordLink(id: string, origin: string): string {
-  return new URL(`/inventory?ho-so=${encodeURIComponent(id)}`, origin).toString();
+  return new URL(`/inventory?${QUERY_WORD.record}=${encodeURIComponent(id)}`, origin).toString();
 }
 
 const lower = (noun: string) => noun.toLocaleLowerCase("vi");

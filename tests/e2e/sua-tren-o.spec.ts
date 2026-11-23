@@ -1,5 +1,5 @@
 // Price and status edited in the inventory cell (roadmap row 4, _acceptance/sua-tren-o), in a real browser at the four
-// widths. The page has no signed-in session here: ?vai=<role> stands in for the session's role outside production.
+// widths. The page has no signed-in session here: ?role=<role> stands in for the session's role outside production.
 // E2, E3, E4-e2e, E5-e2e, E6, E8-e2e, E9, E11 of the contract; case names are the pinned messages.
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
@@ -39,7 +39,7 @@ const saves = (page: Page) =>
   );
 
 async function openInventory(page: Page, role = "ListAgent"): Promise<void> {
-  await page.goto(`/inventory?vai=${role}`);
+  await page.goto(`/inventory?role=${role}`);
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
   await expect(
     page.locator('[data-slot="data-region-body"] table[data-slot="data-grid-table"]'),
@@ -236,7 +236,7 @@ test.describe("sua-tren-o", () => {
     test.skip(WIDE.has(width()), "phones only");
     // Row 2b: on a phone the region is a list of listing cards with no cell at all; nothing on a card edits, and
     // tapping the card of 1101 opens its record, never an editor.
-    await page.goto(`/inventory?vai=ListAgent`);
+    await page.goto(`/inventory?role=ListAgent`);
     await rowsShown(page);
     await assertCardsNotTable(page, "dien-thoai-khong-sua");
     const controls = await page

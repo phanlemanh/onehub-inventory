@@ -26,14 +26,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProtoPage({ params, searchParams }: Props) {
   if (process.env.NODE_ENV === "production") notFound();
   const { slug } = await params;
-  const { state, columns, quyen } = await searchParams;
+  const { state, columns, permission } = await searchParams;
   if (slug === BEHAVIOR_SLUG) {
     return (
       <>
         <PageHeader title="Bản mẫu hành vi" />
         <BehaviorShowcase
           state={typeof state === "string" ? state : undefined}
-          denied={quyen === "khong"}
+          denied={permission === "denied"}
         />
       </>
     );

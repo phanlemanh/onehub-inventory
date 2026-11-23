@@ -1,0 +1,4 @@
+# tệp	chữ trên dòng	lý do — chỉ đúng các dòng PINNED trong query-words.mjs
+tests/e2e-db/bang-hang-that.spec.ts	?ho-so=${t.id}	ca lien-ket-cu và ảnh cho bàn chấm mở liên kết cũ (AC-4)
+tests/e2e/the-dien-thoai.spec.ts	?mau=bien	ca cong-tac-cu chứng công tắc cũ không còn tác dụng (AC-5)
+tests/e2e/behavior.spec.ts	?quyen=khong	ca quyen-cu chứng công tắc cũ không còn tác dụng (AC-5)

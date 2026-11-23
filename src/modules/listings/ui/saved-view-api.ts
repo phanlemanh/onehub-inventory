@@ -4,8 +4,10 @@ import { sameView, type GridView } from "@/components/candidate/grid-view";
 
 import type { SavedView, SavedViewNameError, SavedViewState } from "../saved-view";
 
+import { QUERY_WORD } from "./query-words";
+
 /** Where a saved view of the inventory opens: its own address, so a reload or another session opens it too. */
-export const SAVED_VIEW_PARAM = "goc-nhin";
+export const SAVED_VIEW_PARAM = QUERY_WORD.view;
 
 export function savedViewHref(id: string): string {
   return `/inventory?${SAVED_VIEW_PARAM}=${encodeURIComponent(id)}`;

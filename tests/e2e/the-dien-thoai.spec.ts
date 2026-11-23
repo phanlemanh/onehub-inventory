@@ -27,7 +27,7 @@ const cards = (page: Page) => page.locator('[data-slot="phone-card"]');
 
 async function openAt(page: Page, width: number, query = "", height = 800): Promise<void> {
   await page.setViewportSize({ width, height });
-  await page.goto(`/inventory?vai=ListAgent${query}`);
+  await page.goto(`/inventory?role=ListAgent${query}`);
   // One region shown, holding one layout (G-1511-47): read early, the page can hold the region twice, both hidden.
   await regionReady(page);
   await page.waitForLoadState("networkidle");
@@ -119,12 +119,12 @@ test("mo-va-lui (E3): open a card far down, next, then back and close keep the p
   });
   for (const close of ["back", "button"] as const) {
     await page.locator(`[data-slot="phone-card"][data-row-id="${target}"]`).click();
-    await expect(page).toHaveURL(new RegExp(`ho-so=${target}`));
+    await expect(page).toHaveURL(new RegExp(`record=${target}`));
     await expect(page.getByRole("dialog")).toBeVisible();
     if (close === "back") {
       await page.getByRole("button", { name: "Sau" }).click();
       const next = ids[ids.indexOf(target) + 1];
-      await expect(page).toHaveURL(new RegExp(`ho-so=${next}`));
+      await expect(page).toHaveURL(new RegExp(`record=${next}`));
       await page.goBack();
       await page.goBack();
     } else {
@@ -143,7 +143,7 @@ test("mo-va-lui (E3): open a card far down, next, then back and close keep the p
 test("du-lieu-bien (E8): long codes, big prices, rent and no price fit at 360", async ({
   page,
 }) => {
-  await openAt(page, 360, "&mau=bien");
+  await openAt(page, 360, "&sample=edge");
   const edge = page.locator('[data-slot="phone-card"][data-row-id^="bien-"]');
   await expect(edge).toHaveCount(9);
   const problems = await edge.evaluateAll((els) =>
@@ -171,13 +171,28 @@ test("du-lieu-bien (E8): long codes, big prices, rent and no price fit at 360", 
   }
 });
 
+// Row 1v (english-query-words, E8): the old switches ?mau=bien and ?vai= no longer do anything; the page reads as with
+// no switch at all (control: ?sample=edge above adds the nine edge cards).
+test("cong-tac-cu: ?mau=bien and ?vai= change nothing", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto("/inventory");
+  await page.waitForLoadState("networkidle");
+  const plain = await page.locator("main").innerText();
+  await page.goto("/inventory?mau=bien&vai=BuyerAgent");
+  await page.waitForLoadState("networkidle");
+  await expect(page.locator('[data-row-id^="bien-"]'), "cong-tac-cu: mau con tac dung").toHaveCount(
+    0,
+  );
+  expect(await page.locator("main").innerText(), "cong-tac-cu: trang khac trang tron").toBe(plain);
+});
+
 test.describe("vai (E9)", () => {
   // Every role the register lets into the inventory (`vao: null`, row 9b's signed table) reads the cards. Counted
   // only once the region has settled and shows cards: a count taken before the cards draw passes on nothing.
   for (const role of ["TeamLead", "ListAgent", "BuyerAgent", "CompanyAdmin"] as const) {
     test(`${role} reads cards and edits nothing on them`, async ({ page }) => {
       await page.setViewportSize({ width: 360, height: 800 });
-      await page.goto(`/inventory?vai=${role}`);
+      await page.goto(`/inventory?role=${role}`);
       await cards(page).first().waitFor();
       await page.waitForLoadState("networkidle");
       if ((await cards(page).count()) === 0) throw new Error(`no card for ${role}`);
@@ -199,7 +214,7 @@ test.describe("vai (E9)", () => {
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(`/inventory?vai=CompanyAdmin`);
+    await page.goto(`/inventory?role=CompanyAdmin`);
     await page.locator('[data-slot="data-region"] table tbody tr').first().waitFor();
     await page.waitForLoadState("networkidle");
     await expect(page.locator('[data-slot="page-state"][data-kind="forbidden"]')).toHaveCount(0);
@@ -333,7 +348,7 @@ test.describe("bo-bai-chung (G-1411-12 f)", () => {
         const seen = await counts(page);
         if (phone) {
           if (seen.table > 0) throw new Error(`${id} at ${width}: a table in the region`);
-          if (id === "chu-dai") await expect(page).toHaveURL(/ho-so=/);
+          if (id === "chu-dai") await expect(page).toHaveURL(/record=/);
           else if (seen.sheet === 0)
             throw new Error(`${id} at ${width}: the filter sheet never opened`);
         } else if (seen.sheet > 0 || seen.table === 0) {

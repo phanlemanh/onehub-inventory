@@ -85,7 +85,7 @@ const STATUS_OF: Record<string, RegionStatus> = {
 /**
  * The prototype of row 1e: one record panel for listings and people, loading by delay, error with and without a
  * reload, permission on the region's button, and the shared save door with undo or confirmation. `?state=` picks a
- * region state; `?quyen=khong` takes the «Thêm dòng» permission away.
+ * region state; `?permission=denied` takes the «Thêm dòng» permission away.
  */
 export function BehaviorShowcase({ state, denied }: { state?: string; denied: boolean }) {
   const [view, setView] = useState<"listings" | "people">("listings");

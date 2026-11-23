@@ -152,10 +152,10 @@ function checkPlaceAddress(link: NavLink, search: string, kept: Record<string, s
   if (url.pathname !== "/inventory") throw new Error("noi lech");
   for (const [k, v] of Object.entries(kept))
     if (url.searchParams.get(k) !== v) throw new Error("mat loc khac");
-  const own = new URL(link.href, "http://x").searchParams.getAll("vung");
-  if (JSON.stringify(url.searchParams.getAll("vung")) !== JSON.stringify(own))
+  const own = new URL(link.href, "http://x").searchParams.getAll("place");
+  if (JSON.stringify(url.searchParams.getAll("place")) !== JSON.stringify(own))
     throw new Error("noi lech");
-  for (const gone of ["toa", "du-an", "goc-nhin"])
+  for (const gone of ["building", "subdivision", "view"])
     if (url.searchParams.has(gone)) throw new Error("noi lech");
 }
 
@@ -166,8 +166,9 @@ describe("a place's address (VP5)", () => {
   );
   // Everything the inventory address can hold: a status shortcut, a unit code, an open record (kept); a place, the
   // top-bar search's building and project, a saved view (dropped).
-  const open = "status=Active&ma=S1.0301&ho-so=r1&vung=old&toa=S1.01&du-an=P&goc-nhin=v1";
-  const kept = { status: "Active", ma: "S1.0301", "ho-so": "r1" };
+  const open =
+    "status=Active&unit=S1.0301&record=r1&place=old&building=S1.01&subdivision=P&view=v1";
+  const kept = { status: "Active", unit: "S1.0301", record: "r1" };
 
   it("every place keeps the open address's other filters, so a press before the page comes alive keeps them", () => {
     expect(links).toHaveLength(10);

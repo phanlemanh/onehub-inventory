@@ -68,20 +68,23 @@ describe("khong-con-mau-trong-trang (E2b)", () => {
   });
 });
 
-/** Reads of the ?vai= parameter in src/app outside the stand-in rule (prototype pages are not read). */
+/** Reads of the ?role= parameter in src/app outside the stand-in rule (prototype pages are not read). */
 function standInLeaks(sources: Map<string, string>): string[] {
   const out: string[] = [];
   for (const [path, text] of sources) {
     if (path.includes("/proto/")) continue;
     for (const line of text.split("\n"))
-      if (/\bquery\.vai\b|query\["vai"\]/.test(line) && !/standInRole\(/.test(line))
+      if (
+        /\bquery\.role\b|query\["role"\]|query\[QUERY_WORD\.role\]/.test(line) &&
+        !/standInRole\(/.test(line)
+      )
         out.push(`khong-con-vai-thay-phien: ${path.split("/").pop()}`);
   }
   return out;
 }
 
 describe("khong-con-vai-thay-phien (E9)", () => {
-  it("?vai= is read only through standInRole, which gives a role only on the sample company outside production", async () => {
+  it("?role= is read only through standInRole, which gives a role only on the sample company outside production", async () => {
     expect(standInLeaks(appSources())).toEqual([]);
     const { standInRole } = await import("../src/app/(app)/inventory-source");
     const data = { current: [], earlier: [], listingUnits: [], units: [], keepers: {} };
@@ -96,10 +99,10 @@ describe("khong-con-vai-thay-phien (E9)", () => {
     expect(got).toEqual([null, null, null, "TeamLead", null, null]);
   });
 
-  it("pha-thu-vai-thay-phien: a page that reads ?vai= by itself is named", () => {
+  it("pha-thu-vai-thay-phien: a page that reads ?role= by itself is named", () => {
     const sources = appSources();
     const page = "src/app/(app)/inventory/page.tsx";
-    sources.set(page, `${sources.get(page)}\nconst role = first(query.vai);\n`);
+    sources.set(page, `${sources.get(page)}\nconst role = first(query[QUERY_WORD.role]);\n`);
     expect(standInLeaks(sources)).toEqual(["khong-con-vai-thay-phien: page.tsx"]);
   });
 });
