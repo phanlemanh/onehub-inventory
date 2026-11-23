@@ -1,0 +1,35 @@
+{
+  "feature_plain": "Tám quyết định thiết kế đã ghi giờ được giữ bằng kiểm tra máy có sẵn của kho, thêm hai quyết định về phông chữ; không màn nào đổi.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ cho cổng kiểm tra của kho xanh, và công cụ thiết kế báo giữ 22 quyết định (trước là 19), mỗi kiểm tra đã thấy đỏ trên bản đổi."},
+    {"id": "AC-2", "p": "Sẽ cho mỗi quyết định trong mười dòng trỏ đúng kiểm tra đã định, và kiểm tra ấy có thật: bài kiểm thử mang nhãn của chính quyết định, hoặc mục trong dữ liệu kiểm tra."},
+    {"id": "AC-3", "p": "Sẽ cho các bài kiểm thử được trỏ tới chạy xanh: định dạng số-tiền-ngày, lưới, App Shell và bảng ở mọi cỡ màn."},
+    {"id": "AC-4", "p": "Sẽ chỉ thêm tám dòng kiểm tra và hai dòng mới vào bản ghi quyết định, không đổi quyết định nào khác, không đụng màn, thành phần hay bảng kiểu."},
+    {"id": "AC-5", "p": "Sẽ cho trang luật dặn tác tử dựng màn nói đúng cỡ chạm 24px và phông tiêu đề như kiểm tra giữ, với đúng một dòng sai đã biết (Hỏi-1)."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "Không sửa dòng sai về phông thân bài trên trang luật: lỗi của công cụ design-assembly, đang sửa ở kho ấy."},
+    {"id": "OOS-2", "p": "Không đo cỡ chạm của 16 loại phần tử trong menu, hộp thoại, thanh bên: công cụ chưa đo được."},
+    {"id": "OOS-3", "p": "Không ghi nguồn và giấy phép của phông Inter: việc ấy cần lời anh."},
+    {"id": "OOS-4", "p": "Không sửa ba luật lint bắt hẹp hơn mẫu thử (tên class ghép, ngoại lệ không lý do, khoảng cách ngoài thang)."},
+    {"id": "OOS-5", "p": "Không đổi giao diện, mã sản phẩm, mô hình dữ liệu hay luật sản phẩm."}
+  ],
+  "scope_plain": "Hồ sơ chấm đúng thay đổi đã có trên PR 111; năm phần dưới đây cố ý để ngoài vòng.",
+  "coverage_plain": [
+    {"i": 0, "p": "Phủ theo từng thứ nhánh đổi và ai đọc nó, không quét rộng hơn."},
+    {"i": 2, "p": "Tám quyết định được nối: trỏ đúng (AC-2), kiểm tra chạy xanh (AC-3), chỉ thêm dòng kiểm tra (AC-4)."},
+    {"i": 3, "p": "Hai quyết định phông chữ mới: có mục kiểm tra (AC-2), công cụ giữ và đã thấy đỏ (AC-1)."},
+    {"i": 4, "p": "Dữ liệu kiểm tra của công cụ thiết kế: AC-1 và AC-2."},
+    {"i": 5, "p": "Trang luật dặn tác tử dựng màn: khớp dữ liệu kiểm tra, đúng một dòng sai đã biết (AC-5)."},
+    {"i": 6, "p": "Ba phần cắt khỏi vòng đều có dòng sổ nói giá nếu sai."},
+    {"i": 7, "p": "Không gì khác đổi: AC-4."},
+    {"i": 8, "p": "Dòng nhật ký wiki: chỉ là ghi chép, cổng kiểm tra giữ định dạng."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Ba phần cắt khỏi vòng chưa có dòng sổ nói giá — đã thêm ba dòng; phông Inter không thành câu hỏi vì giấy phép là lời anh và thay đổi này không đổi gì về nó."},
+    {"i": 1, "p": "Phép đo «không gì khác đổi» quên tài liệu thiết kế của chính hồ sơ — đã tính đúng tệp ấy và thêm ca đỏ cho tệp lạ khác."},
+    {"i": 2, "p": "Trang luật dặn tác tử chưa có tiêu chí nào đo — đã thêm AC-5 so trang với dữ liệu kiểm tra, bốn ca đỏ."},
+    {"i": 3, "p": "Lo bài kiểm thử mang nhãn bị bỏ qua mà phép đo vẫn xanh — không làm: các bài bỏ qua hiện có là bỏ theo cỡ màn có chủ ý, và bộ thử trình duyệt chạy đủ bốn cỡ."},
+    {"i": 4, "p": "Gộp main vào nhánh sẽ làm phép đo «không gì khác đổi» đỏ oan — đã cho nó tính lại chỗ nhánh rời main mỗi lần chạy."}
+  ]
+}

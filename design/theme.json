@@ -212,6 +212,27 @@
         "of": "intake",
         "file": "design/intake.yaml"
       }
+    ],
+    "target-size": [
+      {
+        "kind": "target-size",
+        "folder": "src/components/ui",
+        "min": 24
+      }
+    ],
+    "font-loaded": [
+      {
+        "kind": "font-loaded",
+        "variables": ["--font-heading"]
+      }
+    ],
+    "typeface": [
+      {
+        "kind": "value",
+        "scope": ":root",
+        "variable": "--font-heading",
+        "expected": "var(--font-sans)"
+      }
     ]
   },
   "affected": {
