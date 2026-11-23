@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 2a4be2c49592b96046cdbd3ff78625739f42b197
-human_signoff:
+human_signoff: Manh Phan 2026-11-23
 ---
 
 # Evidence Report: english-route-names

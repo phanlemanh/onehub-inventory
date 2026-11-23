@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: []
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-23T01:53:33Z
 design_doc: docs/superpowers/specs/2026-11-23-english-route-names-design.md
@@ -104,12 +104,14 @@ bằng lệnh quét chữ cũ E1 (mỗi dòng của bảng một mẫu) và cặ
   - `tests/screen-old-ids.test.ts` : `tuy-chinh-san` : ca `old-ids` dựng hồ sơ khai mã cũ (AC-7)
   Mẫu mã màn cũ bắt cả mã trần `tuy-chinh-san` (khoá, mục danh sách), không chỉ địa chỉ `/tuy-chinh-san`.
 - Known limits — chọn ở Cổng Bằng chứng 2026-11-23:
-  - Ngoài-1: Thay đổi này chạm vào các công cụ kiểm tra được bảo vệ nên phải có chủ mã duyệt mới được gộp, không tự gộp được.
-  - Ngoài-2: Công cụ kiểm tra chữ cũ có thể bỏ sót nếu sau này ai đó đưa địa chỉ cũ trở lại trong sổ màn của màn Tuỳ chỉnh của sàn.
-  - Ngoài-3: Bộ quét chữ cũ miễn cho cả hai tệp thay vì chỉ một dòng, nên nếu địa chỉ cũ quay lại ở đó thì có thể không bị báo.
-  - Ngoài-4: Quy tắc đọc mã màn cũ nằm ở hai nơi nên sau này có thể lệch nhau.
-  - Ngoài-5: Nếu cổng kiểm hồ sơ đang mở lặng lẽ ngừng chặn mã màn cũ, việc này có thể chưa bị phát hiện ngay.
-  - Ngoài-7: Phép thử thử-phá có thể báo đỏ vì công cụ hỏng chứ không vì đúng lý do.
-  - Ngoài-8: Phép quét chữ cũ có thể bỏ qua một dòng chữ cũ thêm vào sau này nếu nó nằm cùng tệp với dòng được giữ.
-  - Ngoài-9: Phép quét có thể bỏ sót vài cách viết tên phần cũ.
-  - Ngoài-10: Nếu hai nhãn trong cột bên bị đổi chỗ nhầm, bài kiểm hiện tại có thể không báo.
+  - Ngoài-1: Nếu tệp lệnh chạy bốn bài kiểm của hồ sơ bị sửa, một lượt chấm sau có thể dùng lại kết quả cũ mà không chạy lại.
+  - Ngoài-2: Nếu lệnh quét chữ cũ bị sửa, một lượt chấm sau có thể không chạy lại nó, nên một địa chỉ cũ quay lại có thể không bị báo ngay.
+  - Ngoài-3: Thay đổi này chạm vào các công cụ kiểm tra được bảo vệ nên phải có chủ mã duyệt mới được gộp, không tự gộp được.
+  - Ngoài-4: Công cụ kiểm tra chữ cũ có thể bỏ sót nếu sau này ai đó đưa địa chỉ cũ trở lại trong sổ màn của màn Tuỳ chỉnh của sàn.
+  - Ngoài-5: Bộ quét chữ cũ miễn cho cả hai tệp thay vì chỉ một dòng, nên nếu địa chỉ cũ quay lại ở đó thì có thể không bị báo.
+  - Ngoài-6: Quy tắc đọc mã màn cũ nằm ở hai nơi nên sau này có thể lệch nhau.
+  - Ngoài-7: Nếu cổng kiểm hồ sơ đang mở lặng lẽ ngừng chặn mã màn cũ, việc này có thể chưa bị phát hiện ngay.
+  - Ngoài-9: Phép thử thử-phá có thể báo đỏ vì công cụ hỏng chứ không vì đúng lý do.
+  - Ngoài-10: Phép quét chữ cũ có thể bỏ qua một dòng chữ cũ thêm vào sau này nếu nó nằm cùng tệp với dòng được giữ.
+  - Ngoài-11: Phép quét có thể bỏ sót vài cách viết tên phần cũ.
+  - Ngoài-12: Nếu hai nhãn trong cột bên bị đổi chỗ nhầm, bài kiểm hiện tại có thể không báo.
