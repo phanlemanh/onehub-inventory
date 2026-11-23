@@ -21,7 +21,7 @@ Chỉ người lưu thấy, mở, đổi tên, lưu thay đổi hay xoá góc nh
 khoảng trắng hai đầu, 1–40 ký tự, không trùng (không phân biệt hoa thường) trong góc nhìn của cùng người trên cùng màn.
 Không gồm chữ tìm, toàn màn hình, ô đang chọn, nhóm đang mở, vị trí cuộn.
 
-Địa chỉ của một góc nhìn là `/inventory?goc-nhin=<id>`: tải lại hay mở ở phiên khác ra đúng cách xem; góc nhìn đã xoá hay
+Địa chỉ của một góc nhìn là `/inventory?view=<id>`: tải lại hay mở ở phiên khác ra đúng cách xem; góc nhìn đã xoá hay
 của người khác mở Bảng hàng trống lọc kèm câu «… không còn». Đổi cách xem của góc nhìn đang mở thì mục mang dấu «đã đổi»
 và nút lưu thành «Lưu thay đổi» và «Lưu thành mới»; không gì tự lưu. Bấm lại mục đang mở là bỏ thay đổi chưa lưu.
 
