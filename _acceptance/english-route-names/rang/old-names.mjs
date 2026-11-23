@@ -19,7 +19,8 @@ const ROOT = rootArg >= 0 ? args[rootArg + 1] : join(HERE, "../../..");
 export const REGIONS = ["src", "design/screens", "tools/e2e_templates", "tests"];
 // One pattern per line of the contract's old → new table. `proto` patterns count only on a line that names /proto/.
 export const PATTERNS = [
-  { name: "/tuy-chinh-san", re: /\/tuy-chinh-san/ },
+  // The old screen id, bare or inside the old address (/tuy-chinh-san): a screen id key or list entry counts too.
+  { name: "tuy-chinh-san", re: /\btuy-chinh-san\b/ },
   { name: "?phan=", re: /[?&]phan=/ },
   { name: "proto/bo-nut-theo-quyen", re: /proto\/bo-nut-theo-quyen/ },
   { name: "proto-bo-nut", re: /\bproto-bo-nut\b/ },
@@ -35,12 +36,15 @@ export const PATTERNS = [
 ];
 // The pinned keep list: exactly these lines may stay in rang/giu.txt (file, literal on the line, reason).
 export const PINNED = [
-  "tests/e2e-db/lop-rieng.spec.ts\t${OUT}/tuy-chinh-san-\tảnh bằng chứng mà _acceptance/lop-rieng-cua-san/chung-minh-man.md trích",
+  "tests/e2e-db/lop-rieng.spec.ts\ttuy-chinh-san-\tảnh bằng chứng mà _acceptance/lop-rieng-cua-san/chung-minh-man.md trích",
   "tests/e2e/bo-nut.spec.ts\t/tuy-chinh-san\tca dia-chi-cu-khong-con mở địa chỉ cũ để chứng nó không còn",
   "tests/e2e/bo-nut.spec.ts\t/proto/bo-nut-theo-quyen\tca dia-chi-cu-khong-con mở địa chỉ cũ để chứng nó không còn",
   "tests/company-layer-route.test.ts\t?phan=\tca doc-phan chứng ?phan= không còn được đọc",
   "tests/e2e-db/lop-rieng.spec.ts\t?phan=\tca phan-cu-khong-doc chứng ?phan= không còn được đọc",
   "design/screens/proto-permitted-actions.yaml\tproto-bo-nut\tkhoá old_ids của sổ màn: hồ sơ đã ký còn khai mã cũ",
+  "design/screens/company-layer.yaml\ttuy-chinh-san\tkhoá old_ids của sổ màn: hồ sơ đã ký còn khai mã cũ",
+  "tests/e2e-db/thue-phi.spec.ts\t\"tuy-chinh-san\"\ttên khung ảnh mà _acceptance/thue-phi/chung-minh-man.md trích",
+  "tests/screen-old-ids.test.ts\ttuy-chinh-san\tca old-ids dựng hồ sơ khai mã cũ để chứng khoá old_ids (AC-7)",
 ];
 
 function files(root, rel) {
@@ -127,7 +131,7 @@ function copyTree(root) {
 
 // Where each pattern is planted: the ten plants spread over the four regions.
 const PLANTS = [
-  ["src/app/(app)/nav.ts", 'const plant = "/tuy-chinh-san";'],
+  ["src/app/(app)/nav.ts", 'const plant = { "tuy-chinh-san": 1 };'],
   ["tests/vong-doi-thao-tac.test.ts", 'const plant = "/company-layer?phan=labels";'],
   ["tools/e2e_templates/recipes.ts", 'const plant = "/proto/bo-nut-theo-quyen";'],
   ["design/screens/company-layer.yaml", "# plant: proto-bo-nut"],

@@ -15,25 +15,28 @@ const REPO = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const COVERAGE = process.env["OLD_IDS_COVERAGE"] ?? join(REPO, "tools/coverage_matrix/check.py");
 const PROOF = join(REPO, "tools/proof_gate/check.py");
 const SIGNED = readFileSync(join(REPO, "_acceptance/thue-phi/contract.md"), "utf8");
+const SIGNED_PROOF = readFileSync(join(REPO, "_acceptance/thue-phi/chung-minh-man.md"), "utf8");
 const OLD = "screen 'tuy-chinh-san' is an old id of 'company-layer'";
 const SLOW = { timeout: 120_000 };
 
 const made: string[] = [];
 afterAll(() => made.forEach((d) => rmSync(d, { recursive: true, force: true })));
 
-/** A copy with the registers, the pages and one contract under `_acceptance/fixture/`. */
-function copyWith(contract: string): string {
+/** A copy with the registers, the pages and one contract (and its screen proof) under `_acceptance/fixture/`. */
+function copyWith(contract: string, proof?: string): string {
   const root = tempDir("screen-old-ids-");
   made.push(root);
   for (const rel of ["design", "ontology", "src/app"])
     cpSync(join(REPO, rel), join(root, rel), { recursive: true });
   mkdirSync(join(root, "_acceptance/fixture"), { recursive: true });
   writeFileSync(join(root, "_acceptance/fixture/contract.md"), contract);
+  if (proof !== undefined)
+    writeFileSync(join(root, "_acceptance/fixture/chung-minh-man.md"), proof);
   return root;
 }
 
-const run = (tool: string, root: string) =>
-  spawnSync("python3", [tool, "--root", root], { encoding: "utf8" });
+const run = (tool: string, root: string, ...extra: string[]) =>
+  spawnSync("python3", [tool, "--root", root, ...extra], { encoding: "utf8" });
 const out = (r: ReturnType<typeof run>) => `${r.stdout}${r.stderr}`;
 const opened = SIGNED.replace(/^status: signed-off$/m, "status: approved");
 
@@ -59,6 +62,22 @@ describe("old-ids", () => {
   it("old-ids: closed contract passes — proof gate", SLOW, () => {
     const r = run(PROOF, copyWith(SIGNED));
     expect(out(r), "old-ids: closed contract passes").not.toMatch(/^fixture · tuy-chinh-san/m);
+    // The gate still counts a closed contract's proven screens by the path the register gives them (path_of →
+    // family_of): with the real signed proof, the old id must count exactly as the new id does.
+    const asOld = run(PROOF, copyWith(SIGNED, SIGNED_PROOF), "--report", "--json");
+    const asNew = run(
+      PROOF,
+      copyWith(
+        SIGNED.replace("[tuy-chinh-san, inventory]", "[company-layer, inventory]"),
+        SIGNED_PROOF.replace(/^## Màn tuy-chinh-san$/m, "## Màn company-layer"),
+      ),
+      "--report",
+      "--json",
+    );
+    expect(asNew.status, "old-ids: closed contract passes — report ran").toBe(0);
+    expect(out(asOld), "old-ids: closed contract passes — old id counts as the new id").toBe(
+      out(asNew),
+    );
   });
 
   it("old-ids: open contract uses tuy-chinh-san — proof gate", SLOW, () => {

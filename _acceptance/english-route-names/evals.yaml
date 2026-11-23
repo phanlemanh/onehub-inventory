@@ -9,7 +9,7 @@ feature_slug: english-route-names
 #   AC-3 (E2): 6 mục cột thứ hai, mỗi mục so href và nhãn viết trước.
 #   AC-7 (E4): 2 bộ đọc sổ màn × (hồ sơ đóng khai mã cũ → qua · hồ sơ mở khai mã cũ → đỏ) = 4 ca.
 # Cặp phá thử (bản sao; ca tương ứng phải đỏ với thông điệp ghim):
-#   pha-thu-chu-cu (cấy «/tuy-chinh-san» vào một tệp src/ ở bản sao)          → «chu-cu: /tuy-chinh-san»
+#   pha-thu-chu-cu (cấy mã màn trần «tuy-chinh-san» vào một tệp src/ ở bản sao) → «chu-cu: tuy-chinh-san»
 #   pha-thu-doc-phan (hàm đọc phần đọc lại query.phan ở bản sao)               → «doc-phan: ?phan=can-cho»
 #   pha-thu-mo-dung-ma-cu (bộ đọc nhận old_ids cho hồ sơ đang mở ở bản sao)    → «old-ids: open contract uses tuy-chinh-san»
 evals:
@@ -34,7 +34,7 @@ evals:
     executor: test
     cmd: npx vitest run tests/company-layer-route.test.ts src/modules/company-config/ui --coverage.enabled=false --reporter=verbose
     paths: [src/modules/company-config/ui/**, src/app/(app)/nav.ts, src/app/(app)/company-layer/**, tests/company-layer-route.test.ts]
-    expected: "exit 0; ca 'doc-phan' đủ 9 ca viết trước (labels, fields, aliases, pending-units, templates, fee-schedule, vắng → labels, 'xyz' → labels, chỉ ?phan=can-cho → labels); ca 'cot-hai' so đủ 6 mục: /company-layer, /company-layer?part=fields, ?part=aliases, ?part=pending-units, ?part=templates, ?part=fee-schedule, nhãn từ label(); layer-screen.test.tsx xanh với data-part tên API. Chiều đỏ: pha-thu-doc-phan (đọc lại query.phan) đỏ với «doc-phan: ?phan=can-cho»"
+    expected: "exit 0; ca 'doc-phan' đủ 9 ca viết trước (labels, fields, aliases, pending-units, templates, fee-schedule, vắng → labels, 'xyz' → labels, chỉ ?phan=can-cho → labels); ca 'cot-hai' so đủ 6 mục: /company-layer, /company-layer?part=fields, ?part=aliases, ?part=pending-units, ?part=templates, ?part=fee-schedule, nhãn từ label(); ca 'vai-khong-quyen' (AC-1) vẽ trang như máy chủ với cửa quyền trả «không có phạm vi» và thấy khối «Không đủ quyền» chung, không phần nào (đối chứng: có quyền thì vẽ phần labels; chiều đỏ: bỏ chốt quyền ở page.tsx → đỏ «vai-khong-quyen: khoi»); layer-screen.test.tsx xanh với data-part tên API. Chiều đỏ: pha-thu-doc-phan (đọc lại query.phan) đỏ với «doc-phan: ?phan=can-cho»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3
@@ -89,7 +89,7 @@ evals:
     executor: script
     cmd: config:executors.script.lop_rieng_e2e
     paths: [src/app/(app)/company-layer/**, src/modules/company-config/**, tests/e2e-db/lop-rieng.spec.ts]
-    expected: "exit 0 — các ca màn Tuỳ chỉnh của sàn mở /company-layer và ?part=<tên API>, Postgres dãy R; vai chỉ đọc không thấy nút ghi; ca 'phan-cu-khong-doc' mở /company-layer?phan=can-cho và thấy khung data-part=\"labels\" (đối chứng: ?part=pending-units thấy data-part=\"pending-units\"); ca 'vai-khong-quyen' với vai không có readCompanyLayer thấy chữ «không được phép» của trang chung; ca 'chua-dang-nhap' về /login?next=%2Fcompany-layer"
+    expected: "exit 0 — các ca màn Tuỳ chỉnh của sàn mở /company-layer và ?part=<tên API>, Postgres dãy R; vai chỉ đọc không thấy nút ghi; ca 'phan-cu-khong-doc' mở /company-layer?phan=can-cho và thấy khung data-part=\"labels\" (đối chứng: ?part=pending-units thấy data-part=\"pending-units\"); ca 'chua-dang-nhap' về /login?next=%2Fcompany-layer"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E10
