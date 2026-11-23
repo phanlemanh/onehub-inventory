@@ -1,0 +1,36 @@
+{
+  "feature_plain": "Công cụ giữ thiết kế của kho lên bản mới, và trang luật mà tác tử đọc trước khi dựng màn thôi ghi phông chữ thân bài là «undefined».",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ giữ toàn bộ bộ kiểm của kho xanh, với đúng các con số cũ: 22 quyết định thiết kế được giữ, 294 linh kiện, 2607 bài kiểm đạt."},
+    {"id": "AC-2", "p": "Sẽ đưa công cụ trong kho về đúng bản 0.36.2 mà plugin phát hành, kèm dấu phiên bản khớp."},
+    {"id": "AC-3", "p": "Sẽ cho công cụ biết phông thân bài được nạp bằng bộ nạp phông nào, ở tệp nào."},
+    {"id": "AC-4", "p": "Sẽ cho trang luật cho tác tử nói đúng phông thân bài và dẫn tới bảng kiểu thật; và nói rõ rằng phép đo dòng sai của hồ sơ đã ký trước giờ sẽ đỏ."},
+    {"id": "AC-5", "p": "Sẽ chạy lại bước tiếp nhận mà không thêm quyết định, không viết tệp và không hỏi người câu nào mới."},
+    {"id": "AC-6", "p": "Sẽ giữ trạng thái của cả 69 quyết định thiết kế y như với công cụ bản trước."},
+    {"id": "AC-7", "p": "Sẽ chỉ đổi đúng các tệp của bản lên đời và trang luật, không chạm màn hay mã sản phẩm."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "KHÔNG sửa plugin design-assembly, cũng không sửa tay công cụ trong kho."},
+    {"id": "OOS-2", "p": "KHÔNG sửa hồ sơ nghiệm thu đã ký của lần tiếp nhận trước (PR #111)."},
+    {"id": "OOS-3", "p": "KHÔNG làm ba việc PR #111 đã gạt: dòng nguồn phông Inter kèm giấy phép, đo cỡ chạm của 16 loại phần tử, ba luật lint bắt hẹp."},
+    {"id": "OOS-4", "p": "KHÔNG đổi giao diện, mã sản phẩm, mô hình dữ liệu hay luật sản phẩm."}
+  ],
+  "coverage_plain": [
+    {"i": 0, "p": "Phủ theo từng thứ nhánh đổi và ai đọc nó; không quét thêm không gian tiêu chí (đã ghi sổ lý do)."},
+    {"i": 2, "p": "Công cụ và dấu phiên bản: bằng đúng bản phát hành (AC-2), có trường mới của bộ đọc phông (AC-3), không đổi tệp nào khác (AC-7)."},
+    {"i": 3, "p": "Bộ kiểm của kho xanh với số cũ (AC-1)."},
+    {"i": 4, "p": "Mọi quyết định thiết kế giữ trạng thái (AC-6)."},
+    {"i": 5, "p": "Dòng phông chữ của trang luật cho tác tử đúng như plugin viết (AC-4)."},
+    {"i": 6, "p": "Hồ sơ đã ký trước: phép đo dòng sai của nó đỏ đúng một dòng, hồ sơ này nói thay (AC-4)."},
+    {"i": 7, "p": "Chạy lại tiếp nhận không hỏi gì mới (AC-5)."},
+    {"i": 8, "p": "Dòng nhật ký wiki nằm trong danh sách tệp được đổi (AC-7)."},
+    {"i": 9, "p": "Ngoài phạm vi: tiếp nhận chỉ viết lại trang luật khi thêm được quyết định — sửa ở plugin, không ở đây."},
+    {"i": 10, "p": "Ngoài phạm vi: ba việc PR #111 đã gạt giữ nguyên."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Lý do «không sửa hồ sơ đã ký» dựa vào tiền lệ của hồ sơ khác, không phải lời anh — đã sửa: thành Hỏi-3 trên thẻ này."},
+    {"i": 1, "p": "Lý do «đo plugin từ mã nguồn» bỏ qua lối cài bản mới lên máy, và ba tiêu chí chỉ chấm được trên máy có mã nguồn plugin — đã sửa lý do, giới hạn ghi ở phần ghi chú."},
+    {"i": 2, "p": "Một dòng sổ gộp hai lựa chọn mà căn cứ chỉ quyết một — đã tách thành hai dòng, mỗi dòng căn cứ riêng."},
+    {"i": 3, "p": "Phép đo «chạy lại tiếp nhận» chỉ chứng được một trong ba vế — đã thêm hai ca phá: thêm một câu hỏi, có tệp để viết; cả hai đỏ đúng thông điệp."}
+  ]
+}
