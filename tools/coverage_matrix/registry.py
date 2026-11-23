@@ -25,6 +25,8 @@ class Registry:
     role_names: list[str] = field(default_factory=list)
     role_labels: dict[str, str] = field(default_factory=dict)
     screens: dict[str, dict[str, Any]] = field(default_factory=dict)
+    # Former ids of renamed screens (`old_ids` on a screen file) → the current id. Only closed contracts may name them.
+    old_ids: dict[str, str] = field(default_factory=dict)
     pages: dict[str, str] = field(default_factory=dict)
     errors: list[str] = field(default_factory=list)
 
@@ -162,3 +164,18 @@ def _check_screens(doc: dict[str, Any], concepts: dict[str, Any], reg: Registry)
     for route, page in reg.pages.items():
         if route not in routes:
             reg.errors.append(f"page '{route}' is not in {SCREENS_FILE} ({page})")
+    for item in doc.get("screens") or []:
+        if not isinstance(item, dict) or not item.get("id"):
+            continue
+        sid = str(item["id"])
+        old = item.get("old_ids") or []
+        if not isinstance(old, list):
+            reg.errors.append(f"{SCREENS_FILE}: screen '{sid}': old_ids must be a list of ids")
+            continue
+        for o in (str(x) for x in old):
+            if o in reg.screens:
+                reg.errors.append(f"{SCREENS_FILE}: screen '{sid}': old id '{o}' is a current screen id")
+            elif o in reg.old_ids:
+                reg.errors.append(f"{SCREENS_FILE}: old id '{o}' is listed twice")
+            else:
+                reg.old_ids[o] = sid

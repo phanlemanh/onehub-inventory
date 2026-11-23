@@ -8,7 +8,7 @@ afterEach(() => vi.unstubAllEnvs());
 
 describe("proxy for prototype pages (decision 0043)", () => {
   it("runs on /proto and every path under it", () => {
-    for (const url of ["/proto", "/proto/bo-nut-theo-quyen", "/proto/a/b"])
+    for (const url of ["/proto", "/proto/permitted-actions", "/proto/a/b"])
       expect(unstable_doesMiddlewareMatch({ config, url }), url).toBe(true);
   });
 

@@ -86,19 +86,19 @@ function show(part: GridPart, role: Role) {
 }
 
 const HEAD: Record<GridPart, string | null> = {
-  nhan: label("AddCompanyLabel"),
-  truong: label("AddCustomField"),
-  "tu-dien": label("AddValueAlias"),
-  "can-cho": label("MatchPendingUnits"),
-  mau: null,
+  labels: label("AddCompanyLabel"),
+  fields: label("AddCustomField"),
+  aliases: label("AddValueAlias"),
+  "pending-units": label("MatchPendingUnits"),
+  templates: null,
 };
 
 const ROW_TEXT: Record<GridPart, string> = {
-  nhan: "Block",
-  truong: "View",
-  "tu-dien": "ĐN",
-  "can-cho": "S1.01-0501",
-  mau: "Sheet tuần",
+  labels: "Block",
+  fields: "View",
+  aliases: "ĐN",
+  "pending-units": "S1.01-0501",
+  templates: "Sheet tuần",
 };
 
 describe("phan-theo-vai", () => {
@@ -129,13 +129,13 @@ describe("phan-theo-vai", () => {
       "fetch",
       vi.fn(async () => new Response("{}", { status: 500 })),
     );
-    const { container } = show("nhan", "CompanyAdmin");
+    const { container } = show("labels", "CompanyAdmin");
     await waitFor(() => expect(container.querySelector('[data-state="error"]')).not.toBeNull());
   });
 
   it("matching says how many matched and how many still wait", async () => {
     serve({ status: 200, body: { matched: 1, waiting: 0 } });
-    show("can-cho", "CompanyAdmin");
+    show("pending-units", "CompanyAdmin");
     const button = await screen.findByRole("button", { name: label("MatchPendingUnits") });
     await act(async () => fireEvent.click(button));
     await waitFor(() =>
