@@ -5,6 +5,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { adapterOf } from "./adapters/index.mjs";
+import { libraryFolders, libraryTest } from "./components.mjs";
 
 const values = adapterOf("values");
 const source = adapterOf("source");
@@ -38,7 +39,7 @@ export function probeComponent(root) {
   } catch {
     settings = null;
   }
-  const folder = components.folderIn(settings) ?? components.folder;
+  const [folder] = libraryFolders(root);
   const { name, file } = components.probeComponent;
   const found = [".tsx", ".jsx"].some((extension) =>
     existsSync(path.join(root, folder, `${file}${extension}`)),
@@ -92,16 +93,21 @@ export function probesFor(id, { component = null, rules = [] } = {}) {
 // Screen files a probe may be linted as, in a stable order: source files outside the component
 // library and the tests, so that the rules for screens apply.
 export function probeCandidates(root, limit = 60) {
-  const library = components.folder;
+  // The library's files, by its settings: a folder it shares with screens is walked, its own
+  // files are left out.
+  const library = libraryTest(root);
   const found = [];
   const walk = (dir) => {
     const full = path.join(root, dir);
     if (!existsSync(full) || found.length >= limit) return;
     for (const name of readdirSync(full).sort()) {
       const file = path.posix.join(dir, name);
-      if (file === library || name === "node_modules" || name.startsWith(".")) continue;
-      if (statSync(path.join(root, file)).isDirectory()) walk(file);
-      else if (/\.[jt]sx$/.test(name) && !/\.(test|spec)\./.test(name)) found.push(file);
+      if (name === "node_modules" || name.startsWith(".")) continue;
+      if (statSync(path.join(root, file)).isDirectory()) {
+        if (!library(`${file}/`)) walk(file);
+      } else if (/\.[jt]sx$/.test(name) && !/\.(test|spec)\./.test(name) && !library(file)) {
+        found.push(file);
+      }
       if (found.length >= limit) return;
     }
   };

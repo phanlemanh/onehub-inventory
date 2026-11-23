@@ -28,6 +28,12 @@ export const ROW_KEYS = [
   "item",
   // The day an agent asked it.
   "asked_on",
+  // What the owner picks from, when the question is a choice among named things, the one the
+  // recommendation names first. See CHOICES.
+  "candidates",
+  // The questions that waited and that this one takes the place of, by their ids: a question that
+  // asks the same thing about more than they did. A question another replaces waits no longer.
+  "replaces",
   "answer",
   "said",
   "by",
@@ -43,14 +49,119 @@ export const UNCONFIRMED = /has not (confirmed|reviewed)/;
 export const STAMP =
   /(?:^|; )(confirmed|refused|answered) by (.+?) on (\d{4}-\d{2}-\d{2})(?:: (.*))?$/;
 
+// The slots of a screen brief a question can be about, by their ids. The plugin's catalogue of
+// slots is where each is described; a repository's gate reads the waiting list with no plugin
+// beside it, so the ids stand here too, and a test of the plugin holds the two lists equal.
+export const SCREEN_SLOTS = [
+  "kind",
+  "shows",
+  "actions",
+  "states",
+  "components",
+  "words",
+  "rules",
+  "principles",
+  "widths-and-checks",
+  "model-changes",
+  "navigation",
+  "touched-screens",
+];
+
+// The slots whose question is one for every screen it concerns, by their ids, and whether the
+// item names what the question is about: principles and direction are the repository's, the same
+// on every sheet; a change to the data model is named by the names it is about, sorted and joined
+// with +, and is one question for every screen whose row or branch has those names.
+export const SHARED_SLOTS = { principles: false, "model-changes": true };
+const NAMES = "[A-Za-z0-9_.-]+(?:\\+[A-Za-z0-9_.-]+)*";
+const SHARED = new RegExp(
+  `^(?:${Object.entries(SHARED_SLOTS)
+    .map(([slot, keyed]) => (keyed ? `${slot}:${NAMES}` : slot))
+    .join("|")})$`,
+);
+
 // The items a question can name, each written `kind:which`. A row of the decision ledger, a page of
-// a kind of screen (its file name, without .md), or the root colour line (its value, as written).
-// The last two are the owner's calls: an agent that asks one does not go on.
+// a kind of screen (its file name, without .md), the root colour line (its value, as written), a
+// need a block is taken in for (its key), what a ledger lists as made before it (the ledger's
+// name), the block of a need that is retired or merged (the need's key), or one slot of the brief
+// of one screen (the screen's id in the ledger of screens, a colon, the slot's id). Pattern and
+// colour are the owner's calls: an agent that asks one does not go on. One slot asked for every
+// screen it concerns is written `screens:principles`, or `screens:model-changes:NAMES`. A slot of a
+// screen is not:
+// nothing a branch changes tells the gate that a screen was built on an open slot, so the gate
+// could not hold the stop; the agent goes on with its recommendation, as for any question.
 export const ITEMS = {
   decision: { which: /^[a-z0-9][a-z0-9-]*$/, owners: false },
   pattern: { which: /^[a-z0-9][a-z0-9._-]*$/i, owners: true },
   "source-color": { which: /^\S(?:.*\S)?$/, owners: true },
+  need: { which: /^[a-z0-9]+(-[a-z0-9]+)*$/, owners: false },
+  before: { which: /^[a-z0-9]+(-[a-z0-9]+)*$/, owners: false },
+  block: { which: /^[a-z0-9]+(-[a-z0-9]+)*$/, owners: false },
+  screen: { which: new RegExp(`^[^\\s:,/\\\\]+:(${SCREEN_SLOTS.join("|")})$`), owners: false },
+  screens: { which: SHARED, owners: false },
 };
+
+// The item for one slot of the brief of one screen.
+export const screenItem = (screen, slot) => `screen:${screen}:${slot}`;
+// The item for one slot asked once for every screen it concerns, with the names it is about where
+// the slot takes them.
+export const sharedItem = (slot, names = []) =>
+  SHARED_SLOTS[slot] ? `screens:${slot}:${names.join("+")}` : `screens:${slot}`;
+// The names a shared item is about, or null where it is not one of that slot.
+export function sharedNames(item, slot) {
+  const head = `screens:${slot}:`;
+  return typeof item === "string" && item.startsWith(head) && SHARED.test(item.slice(8))
+    ? item.slice(head.length).split("+")
+    : null;
+}
+// Whether a name can stand in a shared item.
+export const sharedName = (name) => /^[A-Za-z0-9_.-]+$/.test(String(name));
+
+// How a value answers a question with candidates, by the kind of its item: the name of one
+// candidate for a need, the made-by-hand choice included; for what came before a ledger, the names
+// of some of them, a comma between each.
+const MANY = ["before"];
+const kindOf = (item) => (typeof item === "string" ? item.split(":")[0] : null);
+
+// Whether a value may pick several of the candidates of a question.
+export const takesMany = (row) => MANY.includes(kindOf(row?.item));
+
+// The names a value picks, for a question with candidates: one, or several split at commas.
+export function picked(row, said) {
+  const words = String(said ?? "").trim();
+  if (!takesMany(row)) return words === "" ? [] : [words];
+  return words
+    .split(",")
+    .map((name) => name.trim())
+    .filter(Boolean);
+}
+
+// Why a value does not answer a question with candidates, or null: it picks at least one, and each
+// name it picks is one of them.
+export function answerProblem(row, said) {
+  if (!Array.isArray(row?.candidates)) return null;
+  const names = row.candidates.map((candidate) => candidate?.name);
+  const chosen = picked(row, said);
+  if (chosen.length === 0) return "the answer names no candidate";
+  const strangers = chosen.filter((name) => !names.includes(name));
+  if (strangers.length === 0) return null;
+  return `${strangers.join(", ")} ${strangers.length === 1 ? "is" : "are"} not among its candidates: ${names.join(", ")}`;
+}
+
+// Why the candidates of a question cannot be read, or null: a list of things, each with a name of
+// its own.
+function candidatesProblem(candidates) {
+  if (!Array.isArray(candidates) || candidates.length === 0) {
+    return "candidates is a list of the things to pick from, at least one";
+  }
+  const names = candidates.map((candidate) =>
+    candidate && typeof candidate === "object" && !Array.isArray(candidate) ? candidate.name : null,
+  );
+  if (names.some((name) => typeof name !== "string" || name.trim() === "")) {
+    return "each of the candidates is a thing with a name";
+  }
+  const twice = names.filter((name, index) => names.indexOf(name) !== index);
+  return twice.length > 0 ? `candidates names ${twice[0]} twice` : null;
+}
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 export const isDay = (value) =>
@@ -61,7 +172,8 @@ export function itemProblem(item) {
   if (typeof item !== "string") return "an item is written kind:which";
   const at = item.indexOf(":");
   const kind = at === -1 ? item : item.slice(0, at);
-  const rule = ITEMS[kind];
+  // Only a kind of its own: a word every object has, such as constructor, is no kind.
+  const rule = Object.hasOwn(ITEMS, kind) ? ITEMS[kind] : undefined;
   if (at === -1 || !rule) {
     return `an item is one of ${Object.keys(ITEMS)
       .map((name) => `${name}:…`)
@@ -98,6 +210,18 @@ export function rowProblems(row, at) {
   if (row.item !== undefined && itemProblem(row.item)) {
     found.push(`${at}: item: ${itemProblem(row.item)}`);
   }
+  if (
+    row.replaces !== undefined &&
+    !(
+      Array.isArray(row.replaces) &&
+      row.replaces.length > 0 &&
+      row.replaces.every((id) => typeof id === "string" && ID.test(id) && id !== row.id)
+    )
+  ) {
+    found.push(`${at}: replaces is a list of the ids of other questions`);
+  }
+  const candidates = row.candidates === undefined ? null : candidatesProblem(row.candidates);
+  if (candidates) found.push(`${at}: ${candidates}`);
   if (row.asked_on !== undefined && !isDay(row.asked_on)) {
     found.push(`${at}: asked_on is a day written YYYY-MM-DD`);
   }
@@ -118,6 +242,10 @@ export function rowProblems(row, at) {
     }
     if (row.answer === "value" && row.said === undefined) {
       found.push(`${at}: a value with no words`);
+    }
+    if (row.answer === "value" && row.said !== undefined && row.candidates && !candidates) {
+      const problem = answerProblem(row, row.said);
+      if (problem) found.push(`${at}: ${problem}`);
     }
   }
   return found;
@@ -255,6 +383,17 @@ export function readWaiting(root, ledgerIds = []) {
 export function folderRows(root) {
   const { rows, problems } = readFolder(root);
   return { rows, problems };
+}
+
+// The questions another one replaces, each by its id with the id of the one that replaces it: a
+// question waits no longer once a newer one takes its place.
+export function replacedBy(rows = []) {
+  const found = new Map();
+  for (const row of rows) {
+    if (row?.kind === "permission" || !Array.isArray(row?.replaces)) continue;
+    for (const id of row.replaces) if (!found.has(id)) found.set(id, row.id);
+  }
+  return found;
 }
 
 // The file one question is written to when the list is a folder.

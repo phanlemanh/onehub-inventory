@@ -8,6 +8,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { adapterOf } from "./adapters/index.mjs";
+import { toolInGate } from "./host-make.mjs";
 
 const lint = adapterOf("lint");
 
@@ -134,22 +135,17 @@ function filesNamed(root, names, dir = "") {
 const read = (root, file) =>
   existsSync(path.join(root, file)) ? readFileSync(path.join(root, file), "utf8") : null;
 
-// Whether the gate runs a tool: a Makefile, an included mk file or a package script names it.
-function inGate(root, tool) {
-  const mk = existsSync(path.join(root, "mk")) ? readdirSync(path.join(root, "mk")).sort() : [];
-  const texts = ["Makefile", "package.json", ...mk.map((name) => `mk/${name}`)];
-  return texts.some((file) => (read(root, file) ?? "").includes(tool));
-}
-
 // Why a check pointer does not resolve, or null. Structural: it shows the proof exists and is wired
-// in, not that it was seen failing.
-export function pointerProblem(root, id, check) {
+// in, not that it was seen failing. `gate` is the gate step as it is to be read, when it is not the
+// one on disk: an upgrade asks of the step it would write.
+export function pointerProblem(root, id, check, gate = undefined) {
   const [prefix, ...rest] = check.split(":");
   const value = rest.join(":");
   if (["test", "e2e", "tool"].includes(prefix)) {
     const text = read(root, value);
     if (text === null) return `${check}: no such file`;
-    if (prefix === "tool") return inGate(root, value) ? null : `${check}: not run by the gate`;
+    if (prefix === "tool")
+      return toolInGate(root, value, gate) ? null : `${check}: not run by the gate`;
     const tagged = new RegExp(`decision:${literally(id)}(?![\\w-])`);
     return tagged.test(text) ? null : `${check}: the file does not name decision:${id}`;
   }
@@ -171,7 +167,7 @@ export function oldLayerNames(rows) {
 
 // One line per problem in the ledger. `layers` is the list of layer names a row may use; pass null
 // to accept any.
-export function ledgerProblems(root, rows, layers) {
+export function ledgerProblems(root, rows, layers, gate = undefined) {
   const found = [];
   const seen = new Set();
   for (const row of rows) {
@@ -192,7 +188,7 @@ export function ledgerProblems(root, rows, layers) {
       found.push(`${id}: a judgment cannot have an automatic check`);
     }
     if (row.check) {
-      const problem = pointerProblem(root, id, row.check);
+      const problem = pointerProblem(root, id, row.check, gate);
       if (problem) found.push(`${id}: ${problem}`);
     }
   }

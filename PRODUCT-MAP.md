@@ -12,7 +12,7 @@ flowchart TD
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
   GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
-  GB --> DG["Đã giao<br/>21 việc"]
+  GB --> DG["Đã giao<br/>22 việc"]
   GB --> CN["Chờ phiên nghiệm thu<br/>52 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
@@ -105,6 +105,7 @@ flowchart TD
 - Gộp nhánh chính vào nhánh PR không vấp trang máy sinh LO-TRINH.html (một dòng .gitattributes + đoạn dạy dựng máy), thước của hồ sơ ra khỏi phạm vi quét CodeQL, và ghi quyết định nhịp nâng repo-setup (`roadmap-merge-driver`) — đã giao — máy thông, bằng chứng xanh-sạch
 - Tách sổ log của wiki ra khỏi git (mỗi mục một tệp ở wiki/log/, wiki/log.md vẽ ra); PR 1 trên 2 của bước tách sổ trong nâng cấp repo-setup 0.9.0 (`split-log-ledger`)
 - Tắt đích danh sáu plugin của chợ cũ ở mức kho, để phiên Claude Code mở ở kho này chỉ nạp bản 3.0.0 của chợ delivery-loop dù máy bật bản cũ ở mức người dùng (`tat-plugin-cho-cu`)
+- Lên đời công cụ design-assembly từ 0.7.1 lên 0.36.1 bằng lệnh upgrade, chỉ phần máy — không quyết định thiết kế nào đổi trạng thái (`upgrade-design-assembly-0-33-0`)
 - Lên đời công cụ design-assembly từ 0.1.0 lên 0.7.0 bằng lệnh upgrade — sổ linh kiện, sổ màn và sổ khối thôi đi theo pull request, bảng vai × màn × nút ra khỏi git, bản đồ affected (`upgrade-design-assembly-0-7-0`)
 - Lên đời công cụ design-assembly từ 0.7.0 lên 0.7.1 và thêm hai hàng cổng decision-sheet, owner-calls, chạy được trên bản sao nông (`upgrade-design-assembly-0-7-1`)
 - Lên đời công cụ design-assembly bằng lệnh upgrade của plugin bản 0.1.0 — sổ linh kiện ghi lại quan hệ dựng từ, kho ghi dấu phiên bản công cụ (`upgrade-design-assembly-tool`)
