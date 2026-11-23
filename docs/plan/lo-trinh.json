@@ -255,6 +255,27 @@
       "dot": "mvp-dot-1"
     },
     {
+      "ma": "1v",
+      "cau_giao": "Địa chỉ và từ truy vấn của Bảng hàng viết bằng tiếng Anh như luật kho: ?vai, ?mau, ?ma, ?toa, ?du-an, ?ho-so, ?vung, ?goc-nhin của /inventory và ?quyen của /proto/[slug] đổi sang từ tiếng Anh, liên kết đã dán và góc nhìn đã lưu vẫn mở đúng chỗ",
+      "vai": "nen",
+      "tieu_chi": 8,
+      "vi_sao": "AGENTS.md đòi mã, định danh và tên tệp bằng tiếng Anh. Hồ sơ english-route-names (PR #114) đổi /tuy-chinh-san và /proto/bo-nut-theo-quyen, và ở Cổng Phạm vi (Hỏi-2) chủ kho chọn tách tám từ truy vấn của Bảng hàng sang hàng riêng vì chúng chạm khoảng hai mươi tệp bài kiểm và tools/deploy/thu-ban-dung.sh. Chủ kho 2026-11-23: «mở hàng riêng cho từ truy vấn Bảng hàng».",
+      "hang": "T3",
+      "slug": "english-query-words",
+      "bat_khi": "Không còn từ truy vấn tiếng Việt nào được đọc trong src/ (lệnh quét có cặp phá thử); make check, make e2e và bài trình duyệt có Postgres của Bảng hàng xanh với từ mới; góc nhìn đã lưu và liên kết có ?vung= cũ được xử lý theo lựa chọn của chủ kho ở Cổng Phạm vi",
+      "nhom": "nen",
+      "vung": [
+        "src/app/(app)/inventory/**",
+        "src/app/(app)/proto/**",
+        "src/modules/listings/ui/**",
+        "src/components/candidate/**",
+        "tests/**",
+        "tools/deploy/**",
+        "tools/e2e_templates/**"
+      ],
+      "dot": "mvp-dot-1"
+    },
+    {
       "ma": "1g",
       "cau_giao": "Agent tra được danh mục ReUI Pro ngay trong kho theo phiên bản đã ghim, không phụ thuộc kết nối ngoài",
       "tieu_chi": 6,
