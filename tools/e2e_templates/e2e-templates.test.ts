@@ -374,7 +374,7 @@ describe("sổ giả thêm màn thì có bộ", () => {
        * too — it needs a session, so the signed-out run hands it over by name at run time (64 became 80). Row 7e adds
        * the company layer screen (80 became 96).
        */
-      const SCREENS = ["today", "inventory", "sent", "sign-in", "members", "tuy-chinh-san"];
+      const SCREENS = ["today", "inventory", "sent", "sign-in", "members", "company-layer"];
       const expected = SCREENS.flatMap((s) =>
         SIZES.flatMap((z) => FRAME_TESTS.map((t) => `${z} ${s} ${t}`)),
       );
@@ -446,7 +446,7 @@ describe("màn cần đăng nhập không còn danh sách bỏ qua", () => {
       expect(r.lines.filter((l) => l.startsWith("bo qua: "))).toEqual([
         "bo qua: contacts — planned",
         "bo qua: proto — dev",
-        "bo qua: proto-bo-nut — dev",
+        "bo qua: proto-permitted-actions — dev",
       ]);
     },
     SLOW,
@@ -606,20 +606,20 @@ function casesOf(root: string, id: string): { name: string; vao: string | null }
   return out;
 }
 
-const ENTRY = "    vao_vung: /tuy-chinh-san?phan=can-cho\n";
+const ENTRY = "    vao_vung: /company-layer?part=pending-units\n";
 
 describe("lối vào của bộ vùng (vao_vung, hàng 7e)", () => {
   it(
     "a screen without vao_vung keeps the same region cases, opened at its route (control)",
     () => {
       const root = copyRegister();
-      const declared = casesOf(root, "tuy-chinh-san");
+      const declared = casesOf(root, "company-layer");
       edit(root, "design/screens.yaml", (t) => t.replace(ENTRY, ""));
-      const plain = casesOf(root, "tuy-chinh-san");
+      const plain = casesOf(root, "company-layer");
       expect(plain.map((c) => c.name).sort()).toEqual(declared.map((c) => c.name).sort());
       const region = plain.filter((c) => c.name.includes(" vung › "));
       expect(region.length).toBeGreaterThan(0);
-      for (const c of region) expect(c.vao, c.name).toBe("/tuy-chinh-san");
+      for (const c of region) expect(c.vao, c.name).toBe("/company-layer");
       for (const c of casesOf(root, "inventory").filter((x) => x.name.includes(" vung › ")))
         expect(c.vao, c.name).toBe("/inventory");
     },
@@ -629,10 +629,10 @@ describe("lối vào của bộ vùng (vao_vung, hàng 7e)", () => {
   it(
     "a declared vao_vung under the route is where every region case opens; frame cases carry no entry",
     () => {
-      const cases = casesOf(copyRegister(), "tuy-chinh-san");
+      const cases = casesOf(copyRegister(), "company-layer");
       const region = cases.filter((c) => c.name.includes(" vung › "));
       expect(region.length).toBeGreaterThan(0);
-      for (const c of region) expect(c.vao, c.name).toBe("/tuy-chinh-san?phan=can-cho");
+      for (const c of region) expect(c.vao, c.name).toBe("/company-layer?part=pending-units");
       const frame = cases.filter((c) => /^\d+ (pha )?khung /.test(c.name));
       expect(frame.length).toBeGreaterThan(0);
       for (const c of frame) expect(c.vao, c.name).toBeNull();
@@ -642,12 +642,12 @@ describe("lối vào của bộ vùng (vao_vung, hàng 7e)", () => {
 
   it("the reverse «chữ dài» case passes only when a text of the declared length shows whole", () => {
     const long = "x".repeat(80);
-    expect(longestProblem("tuy-chinh-san", 1440, 80, [{ text: long, cut: false }])).toBeNull();
-    expect(longestProblem("tuy-chinh-san", 1440, 80, [{ text: long, cut: true }])).toBe(
-      "chu-dai: tuy-chinh-san @1440 chu 80 ky tu bi cat — go dong LONGEST_FITS",
+    expect(longestProblem("company-layer", 1440, 80, [{ text: long, cut: false }])).toBeNull();
+    expect(longestProblem("company-layer", 1440, 80, [{ text: long, cut: true }])).toBe(
+      "chu-dai: company-layer @1440 chu 80 ky tu bi cat — go dong LONGEST_FITS",
     );
-    expect(longestProblem("tuy-chinh-san", 1440, 80, [{ text: "A-101", cut: false }])).toBe(
-      "chu-dai: tuy-chinh-san @1440 khong co chu 80 ky tu de do",
+    expect(longestProblem("company-layer", 1440, 80, [{ text: "A-101", cut: false }])).toBe(
+      "chu-dai: company-layer @1440 khong co chu 80 ky tu de do",
     );
     const grid = new Set(
       bridge(REPO_ROOT)
@@ -664,18 +664,20 @@ describe("lối vào của bộ vùng (vao_vung, hàng 7e)", () => {
   it("a case's state query joins a declared entry with & and leaves a plain route as before", () => {
     for (const r of REGION.filter((x) => x.query)) {
       expect(withQuery("/inventory", r.query)).toBe(`/inventory${r.query}`);
-      expect(withQuery("/tuy-chinh-san?phan=can-cho", r.query)).toBe(
-        `/tuy-chinh-san?phan=can-cho&${r.query!.slice(1)}`,
+      expect(withQuery("/company-layer?part=pending-units", r.query)).toBe(
+        `/company-layer?part=pending-units&${r.query!.slice(1)}`,
       );
     }
-    expect(withQuery("/tuy-chinh-san?phan=can-cho", undefined)).toBe("/tuy-chinh-san?phan=can-cho");
+    expect(withQuery("/company-layer?part=pending-units", undefined)).toBe(
+      "/company-layer?part=pending-units",
+    );
   });
 
   for (const [name, change, message] of [
     [
       "a vao_vung outside the screen's route",
-      (t: string) => t.replace(ENTRY, "    vao_vung: /inventory?phan=can-cho\n"),
-      "tuy-chinh-san: vao_vung ngoai man",
+      (t: string) => t.replace(ENTRY, "    vao_vung: /inventory?part=pending-units\n"),
+      "company-layer: vao_vung ngoai man",
     ],
     [
       "a vao_vung on a screen outside family grid",

@@ -5,7 +5,7 @@ slug: english-route-names
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
-screens: [company-layer]
+screens: []
 status: approved
 approved_by: Manh Phan
 approved_at: 2026-11-23T01:53:33Z
@@ -66,11 +66,12 @@ Luật sản phẩm: không luật nào bị chạm — vòng không đổi truy
 
 ## Vai × Màn
 
-| Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
-| --- | --- | --- | --- | --- |
-| company-layer | được — như trước ở `/tuy-chinh-san`: xem sáu phần; Thêm, Sửa, Ngừng dùng; Khớp; Đổi tên mẫu nhập | được — như trước: chỉ xem, không nút ghi | được — như Đầu chủ | được — như Đầu chủ; đặt mức ở phần Thuế phí |
-
-Quyền không đổi: vòng chỉ đổi địa chỉ. Bản mẫu `proto-permitted-actions` là trang dev, không thuộc bảng này.
+Hợp đồng không khai màn sản phẩm (sửa ở S3, dòng `fix` trong sổ — chờ chủ kho phê ở Cổng Bằng chứng): vòng chỉ đổi địa
+chỉ, mã và từ truy vấn, không đổi dáng hay quyền của màn nào; chứng minh màn `company-layer` là của hàng 7e và 19, và khai
+màn ở `screens:` sẽ bắt vòng này dựng lại tệp chứng minh màn (ảnh cạnh màn mẫu, khối, Quỹ hàng) cho một màn trông y như cũ.
+Trạng thái đích của màn `company-layer` viết thành câu thay cho bảng: Đầu chủ được — xem sáu phần; Thêm, Sửa, Ngừng dùng;
+Khớp; Đổi tên mẫu nhập; Đầu khách được — chỉ xem, không nút ghi; Trưởng nhóm và Quản trị sàn được — như Đầu chủ, Quản trị
+sàn đặt mức ở phần Thuế phí. Quyền không đổi so với `/tuy-chinh-san`. Bản mẫu `proto-permitted-actions` là trang dev.
 
 ## Coverage
 

@@ -68,7 +68,7 @@ describe("khong-con-mau-trong-trang (E2b)", () => {
   });
 });
 
-/** Reads of the ?vai= parameter in src/app outside the stand-in rule (the prototype page of row 9e has its own). */
+/** Reads of the ?vai= parameter in src/app outside the stand-in rule (prototype pages are not read). */
 function standInLeaks(sources: Map<string, string>): string[] {
   const out: string[] = [];
   for (const [path, text] of sources) {

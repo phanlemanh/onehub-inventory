@@ -1050,7 +1050,7 @@ export const REGION: Recipe[] = [
  * longer limit or a narrower column cuts it, the case goes red and the line must go: the normal case applies again.
  */
 export const LONGEST_FITS: Record<string, { sizes: number[]; max: number; why: string }> = {
-  "tuy-chinh-san": {
+  "company-layer": {
     sizes: [1440],
     max: 80,
     why: "«Căn chờ khớp»: mã sàn gõ tối đa 80 ký tự (db/migrations/010_lop_rieng_cua_san.sql)",

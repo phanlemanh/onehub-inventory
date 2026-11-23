@@ -19,6 +19,8 @@
 #             block in its ontology file (row 1t)
 #   vao_vung  (optional, family grid only) the path the browser suite's region cases open, under the screen's own
 #             route; absent, they open `route`. The frame cases always open `route` (row 7e)
+#   old_ids   (optional) former ids of a renamed screen; a closed contract may still name one, an open contract naming
+#             one is red with the current id (english-route-names)
 #
 # `khung` declares the same for the App Shell around every staff screen: the top bar and the second column (row 9b).
 #

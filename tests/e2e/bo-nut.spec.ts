@@ -1,4 +1,4 @@
-// Row 9e (bo-nut-theo-quyen), evals E11: the template sample /proto/bo-nut-theo-quyen under the four roles.
+// Row 9e (bo-nut-theo-quyen), evals E11: the template sample /proto/permitted-actions under the four roles.
 //   bon-vai-hai-kho — at 360 and 1440, for both sample screens, each role sees the buttons the generated role × screen
 //     table (design/role-screen-buttons.md) gives it: the add button in the page head, the region or «not allowed», and on a
 //     row of its own and a row of someone else's the «…» menu with exactly the permitted actions, ordinary ones first.
@@ -18,11 +18,12 @@ const ROLES: Role[] = ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"];
 const SCREENS = ["listings", "contacts"] as const;
 const lower = (s: string) => s.toLocaleLowerCase("vi");
 
-/** The proto-bo-nut section of the generated table: role display name → actions in its cell. */
+/** The proto-permitted-actions section of the generated table: role display name → actions in its cell. */
 function generatedCells(): Map<string, Set<string>> {
   const text = readFileSync("design/role-screen-buttons.md", "utf8");
-  const section = text.split(/^## /m).find((s) => s.startsWith("proto-bo-nut"));
-  if (!section) throw new Error("design/role-screen-buttons.md không có mục proto-bo-nut");
+  const section = text.split(/^## /m).find((s) => s.startsWith("proto-permitted-actions"));
+  if (!section)
+    throw new Error("design/role-screen-buttons.md không có mục proto-permitted-actions");
   const cells = new Map<string, Set<string>>();
   for (const line of section.split("\n")) {
     const m = /^\| (.+?) +\| (.+?) +\|$/.exec(line);
@@ -48,7 +49,7 @@ function menuOf(screen: (typeof SCREENS)[number]): [string, string, boolean][] {
 }
 
 async function open(page: Page, screen: string, role: Role) {
-  await page.goto(`/proto/bo-nut-theo-quyen?bang=an&man=${screen}&vai=${role}`);
+  await page.goto(`/proto/permitted-actions?board=hidden&screen=${screen}&role=${role}`);
   await expect(page.getByRole("heading", { level: 1 })).toContainText(LABELS[role].pref);
 }
 
@@ -174,4 +175,33 @@ test("nut-them-toan-man-hinh", async ({ page }, info) => {
       .getByRole("button", { name: LABELS.CreateListing.pref }),
   ).toBeVisible();
   await chupAnh(page, { path: `${shots}/toan-man-1440.png` });
+});
+
+// english-route-names, AC-5: the two old Vietnamese addresses are gone, with no redirect. /tuy-chinh-san answers 404
+// with the shared not-found screen. /proto/bo-nut-theo-quyen now falls to /proto/[slug], which in a development build
+// draws an empty design-pass page titled by the slug for any slug it does not know — no button set; the production
+// build answers 404 for every prototype (tools/deploy/thu-ban-dung.sh, eval E15).
+test("dia-chi-cu-khong-con", async ({ page }, info) => {
+  test.skip(info.project.name !== "1440", "an address answers the same at every width");
+  const notFound = page.locator('[data-slot="page-state"][data-kind="not-found"]');
+  for (const old of ["/tuy-chinh-san", "/tuy-chinh-san?phan=can-cho"]) {
+    const res = await page.goto(old);
+    expect(res?.status(), `dia-chi-cu-khong-con: ${old}`).toBe(404);
+    await expect(notFound, `dia-chi-cu-khong-con: ${old}`).toBeVisible();
+    expect(new URL(page.url()).pathname, `dia-chi-cu-khong-con: ${old} khong chuyen huong`).toBe(
+      "/tuy-chinh-san",
+    );
+  }
+  await page.goto("/proto/bo-nut-theo-quyen?board=hidden&screen=listings&role=ListAgent");
+  expect(new URL(page.url()).pathname, "dia-chi-cu-khong-con: ban mau cu khong chuyen huong").toBe(
+    "/proto/bo-nut-theo-quyen",
+  );
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("bo-nut-theo-quyen");
+  await expect(
+    page.locator('[data-slot="data-region"]'),
+    "dia-chi-cu-khong-con: ban mau cu khong con bo nut",
+  ).toHaveCount(0);
+  // Control: the new address shows the button set on the same server.
+  await open(page, "listings", "ListAgent");
+  await expect(page.locator('[data-slot="data-region"]').first()).toBeVisible();
 });

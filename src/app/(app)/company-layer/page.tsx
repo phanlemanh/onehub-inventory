@@ -8,8 +8,8 @@ import {
   CompanyLayerScreen,
   FeePart,
   forcedStateFrom,
-  LAYER_PARTS_SHOWN,
-  type ShownPart,
+  LAYER_ROUTE,
+  layerPartFrom,
 } from "@/modules/company-config/ui";
 import { allowedScope } from "@/modules/identity";
 import { currentSession } from "@/modules/identity/server";
@@ -20,22 +20,19 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 
 /**
  * the company layer screen (row 7e): whoever the permission table gives readCompanyLayer sees the company's own layer, one
- * part at a time as the second column of the App Shell chooses it (`?phan=`); anyone else sees «not allowed».
+ * part at a time as the second column of the App Shell chooses it (`?part=`); anyone else sees «not allowed».
  */
 export default async function Page({ searchParams }: Props) {
   const session = await currentSession();
-  if (!session?.company) redirect(loginHref("/tuy-chinh-san"));
+  if (!session?.company) redirect(loginHref(LAYER_ROUTE));
   if (allowedScope(session.roles, "readCompanyLayer") === null) {
     return <PageState kind="forbidden" homeHref="/" />;
   }
   const query = await searchParams;
-  const asked = query.phan;
-  const part: ShownPart = (LAYER_PARTS_SHOWN as readonly unknown[]).includes(asked)
-    ? (asked as ShownPart)
-    : "nhan";
+  const part = layerPartFrom(query);
   // The fee part (row 19) is a framed list, not a grid; its API answers by readFeeSchedule, which every role that
   // opens this screen holds.
-  if (part === "thue-phi") return <FeePart screenTitle={label("CompanyLayer")} />;
+  if (part === "fee-schedule") return <FeePart screenTitle={label("CompanyLayer")} />;
   return (
     <CompanyLayerScreen
       key={part}
