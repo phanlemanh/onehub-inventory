@@ -139,9 +139,9 @@ describe("searchSuggestions", () => {
 
 describe("searchHref", () => {
   it("puts the text in the parameter of its kind, trimmed", () => {
-    expect(searchHref("unit", " 0601 ")).toBe("/inventory?ma=0601");
-    expect(searchHref("building", "S1.02")).toBe("/inventory?toa=S1.02");
-    expect(searchHref("subdivision", "Khu 1")).toBe("/inventory?du-an=Khu+1");
+    expect(searchHref("unit", " 0601 ")).toBe("/inventory?unit=0601");
+    expect(searchHref("building", "S1.02")).toBe("/inventory?building=S1.02");
+    expect(searchHref("subdivision", "Khu 1")).toBe("/inventory?subdivision=Khu+1");
   });
 });
 

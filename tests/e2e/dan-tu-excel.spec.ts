@@ -1,5 +1,5 @@
 // A region pasted from Excel into the inventory grid (roadmap row 5, _acceptance/dan-tu-excel), in a real browser at
-// the four widths. ?vai=<role> stands in for the session's role outside production. The sample data is drawn by a
+// the four widths. ?role=<role> stands in for the session's role outside production. The sample data is drawn by a
 // seeded generator, so each case reads the rows it pastes onto from the grid and works out what it must see.
 // E1, E4-e2e, E5, E6-e2e, E7-e2e, E8, E9-axe, E12 of the contract; case names are the pinned messages.
 import AxeBuilder from "@axe-core/playwright";
@@ -48,7 +48,7 @@ async function hideNetToSeller(page: Page): Promise<void> {
 }
 
 async function openInventory(page: Page, role = "ListAgent"): Promise<void> {
-  await page.goto(`/inventory?vai=${role}`);
+  await page.goto(`/inventory?role=${role}`);
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
   // VP4: until the browser takes over, the region holds both the table and the cards; read either only after that.
   await regionReady(page);

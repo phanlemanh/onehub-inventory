@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The production build on a lane's Postgres (row moi-truong-thu-va-ban-that, AC-6, eval E6). A real `next build` runs
 # with `next start` as staging, connected as the app's login role, and every switch of a development machine must be
-# shut: /proto/<every slug of the prototype register> answers 404; ?vai=, ?mau=, ?state= change nothing, signed out
+# shut: /proto/<every slug of the prototype register> answers 404; ?role=, ?sample=, ?state= change nothing, signed out
 # (sign-in, like the address without them) and with a session this run signs itself with its own AUTH_SECRET (same
 # role, same rows, same state as without them). A dev server on the same tree shows the switches do work there
 # (positive control), and the same build connected as a table owner says so: it refuses to start naming DATABASE_URL,
@@ -139,8 +139,8 @@ while IFS= read -r s; do [ -n "$s" ] && MAUS+=("$s"); done < <(
     grep -o 'param !== "[a-z-]*"' | sed -E 's/.*"(.*)"/\1/')
 [ "${#MAUS[@]}" -gt 0 ] || red "khong thay gia tri mau"
 PARAMS=()
-for v in "${ROLES[@]}"; do PARAMS+=("vai=$v"); done
-for v in "${MAUS[@]}"; do PARAMS+=("mau=$v"); done
+for v in "${ROLES[@]}"; do PARAMS+=("role=$v"); done
+for v in "${MAUS[@]}"; do PARAMS+=("sample=$v"); done
 for v in "${STATES[@]}"; do PARAMS+=("state=$v"); done
 echo "so ban mau: ${PROTO_SLUGS[*]}"
 echo "bang quyen: ${ROLES[*]} · mau: ${MAUS[*]} · trang thai ep: ${STATES[*]}"
@@ -223,6 +223,10 @@ for slug in "${PROTO_SLUGS[@]}"; do
     red "proto/$slug: trả $code, cần 404"
   fi
   do_ "proto/$slug-404"
+  # The behaviour prototype's switch (row 1v): with ?permission=denied the page is still not there.
+  code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$BASE/proto/$slug?permission=denied")"
+  [ "$code" = 404 ] || red "proto/$slug?permission=denied: trả $code, cần 404"
+  do_ "proto/$slug?permission=denied-404"
 done
 
 # ---------------------------------------------------------------- 5. signed out: every switch goes to sign-in
@@ -353,7 +357,7 @@ stop "$OWN2_PID"
 do_ "vai-chu-bang-suc-khoe-ok-false-ly-do-cua"
 
 # ---------------------------------------------------------------- 7. positive control on a dev server
-# Same tree, `next dev`, no database: the sample company, where the switches exist. At least one ?vai= and one
+# Same tree, `next dev`, no database: the sample company, where the switches exist. At least one ?role= and one
 # /proto/<slug> must have an effect, else the checks above prove nothing.
 DPORT="$(free_port)"
 DBASE="http://127.0.0.1:$DPORT"
@@ -374,14 +378,14 @@ curl -s -o "$TMP/dev-plain.html" --max-time 120 "$DBASE/inventory"
 dev_plain="$(signal_of "$TMP/dev-plain.html" "")"
 vai_hit=""
 for v in "${ROLES[@]}"; do
-  curl -s -o "$TMP/dev-vai.html" --max-time 120 "$DBASE/inventory?vai=$v"
-  sig="$(signal_of "$TMP/dev-vai.html" "vai=$v")"
+  curl -s -o "$TMP/dev-vai.html" --max-time 120 "$DBASE/inventory?role=$v"
+  sig="$(signal_of "$TMP/dev-vai.html" "role=$v")"
   if [ "$sig" != "$dev_plain" ] && grep -q "$v" <<<"$sig"; then vai_hit="$v"; break; fi
 done
-[ -n "$vai_hit" ] || red "doi-chung: không ?vai= nào đổi được trang trên máy dev ('$dev_plain')"
+[ -n "$vai_hit" ] || red "doi-chung: không ?role= nào đổi được trang trên máy dev ('$dev_plain')"
 echo "doi-chung /inventory: $dev_plain"
-echo "doi-chung ?vai=$vai_hit: $sig"
-do_ "doi-chung-dev-?vai=$vai_hit-co-tac-dung"
+echo "doi-chung ?role=$vai_hit: $sig"
+do_ "doi-chung-dev-?role=$vai_hit-co-tac-dung"
 stop "$DEV_PID"
 
 echo "ban-dung-that: $N phép kiểm đạt"

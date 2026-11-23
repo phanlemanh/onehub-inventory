@@ -203,3 +203,29 @@ describe("khu-hoi", () => {
     expect(gridView(stored), "khu-hoi: mo lai").toEqual(grid);
   });
 });
+
+// E4: an old search word reaches no filter by itself — it is translated first, and the English word fills the filter.
+describe("tu-cu", () => {
+  it("tu-cu-khong-loc", async () => {
+    const { sampleInventoryData } = await import("../src/app/(app)/inventory-sample-data");
+    source = { kind: "ready", data: sampleInventoryData(), live: false };
+    expect(await redirectOf({ toa: "S1.01" }), "tu-cu-khong-loc: khong dich").toBe(
+      "/inventory?building=S1.01",
+    );
+    const { default: Page } = (await import("../src/app/(app)/inventory/page")) as {
+      default: PageFn;
+    };
+    const filtersOf = async (query: Record<string, string>) => {
+      const tree = await Page({ searchParams: Promise.resolve(query) });
+      const children = (tree.props as { children: ReactElement[] }).children;
+      const grid = children.find(
+        (child) => (child.props as { filters?: unknown })?.filters !== undefined,
+      );
+      return (grid?.props as { filters?: Record<string, unknown> } | undefined)?.filters ?? {};
+    };
+    expect(
+      await filtersOf({ building: "S1.01" }),
+      "tu-cu-khong-loc: tu moi khong loc",
+    ).toHaveProperty("Listing.buildingName");
+  });
+});

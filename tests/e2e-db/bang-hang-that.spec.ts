@@ -1,7 +1,7 @@
 // Row 10 (bang-hang-du-lieu-that) in the browser on this lane's Postgres: the inventory of the signed-in company, read and
 // changed for real. Each test makes its own companies from the sample ([MAU], a small [MAU-2], an empty [MAU-TRONG]) with
 // «[Tên]» people. Evals E3, E4b, E5b, E6b, E7, E8, E9b, E10b.
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
 
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Browser, type Page, type TestInfo } from "@playwright/test";
@@ -165,7 +165,7 @@ async function rowCount(page: Page): Promise<number> {
  * closed so the one row is on screen whatever its place in the grid's order.
  */
 async function openOn(page: Page, unit: string) {
-  await openInventory(page, `/inventory?ma=${encodeURIComponent(unit)}`);
+  await openInventory(page, `/inventory?unit=${encodeURIComponent(unit)}`);
   // A code shared by two buildings finds both and opens no record; the rows are on screen either way.
   const record = page.locator('[data-slot="record-panel"]');
   if (
@@ -313,7 +313,7 @@ test("chuot-giua-the-moi: a middle click on a tree entry opens a new tab and lea
   // The new tab opens the entry's own address: the grid filtered to that building; this tab stays where it was.
   const opens = new URL(tab.url());
   expect(opens.pathname).toBe("/inventory");
-  expect(opens.searchParams.get("vung") ?? "").toContain(building);
+  expect(opens.searchParams.get("place") ?? "").toContain(building);
   expect(page.url()).toBe(before);
 });
 
@@ -357,12 +357,12 @@ test("dang-ban-chi-nguoi-giu: Active is offered on one's own unit and on an unke
   expect(await statusOptions(page, sampleRow("none").unit)).toContain("Active");
   // The record names the keeper of someone else's unit, and says nobody keeps an unkept one.
   const other = sampleRow("other");
-  await page.goto(`/inventory?ho-so=${companyListingId(w.mau.id, other.id)}`);
+  await page.goto(`/inventory?record=${companyListingId(w.mau.id, other.id)}`);
   await expect(page.locator('[data-slot="ask-list-agent"]')).toContainText(
     other.keeper?.kind === "other" ? other.keeper.name : "",
   );
   const none = sampleRow("none");
-  await page.goto(`/inventory?ho-so=${companyListingId(w.mau.id, none.id)}`);
+  await page.goto(`/inventory?record=${companyListingId(w.mau.id, none.id)}`);
   await expect(page.locator('[data-slot="ask-list-agent"]')).toBeDisabled();
 });
 
@@ -588,7 +588,7 @@ test("nam-trang-thai + axe-sang-toi: loading, empty, a real read error with Tả
   // No match: [MAU] filtered by a code it does not have.
   await page.locator('[data-slot="app-shell-top-bar"] [data-slot="company-name"]').click();
   await page.getByRole("menuitemradio", { name: w.mau.name }).click();
-  await openInventory(page, "/inventory?ma=KHONG-CO-CAN-NAY");
+  await openInventory(page, "/inventory?unit=KHONG-CO-CAN-NAY");
   await expect(
     page
       .locator('[data-slot="region-state"][data-kind="no-match"]')
@@ -599,11 +599,11 @@ test("nam-trang-thai + axe-sang-toi: loading, empty, a real read error with Tả
 
 // ---- E9b · no session goes to sign-in --------------------------------------------------------------------------------
 
-test("chua-dang-nhap-ve-dang-nhap: without a session /inventory, with or without ?vai=, goes to sign-in", async ({
+test("chua-dang-nhap-ve-dang-nhap: without a session /inventory, with or without ?role=, goes to sign-in", async ({
   page,
 }, info) => {
   await page.context().clearCookies();
-  for (const path of ["/inventory", "/inventory?vai=TeamLead"]) {
+  for (const path of ["/inventory", "/inventory?role=TeamLead"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/login\?next=/);
   }
@@ -612,6 +612,102 @@ test("chua-dang-nhap-ve-dang-nhap: without a session /inventory, with or without
   await signIn(page, w.email, w.mau);
   await openInventory(page);
   expect(await rowCount(page)).toBe(60);
+});
+
+// ---- row 1v (english-query-words) · an old link, E18 and E17-ui -------------------------------------------------------
+
+const OLD_WORDS = ["ma", "toa", "du-an", "ho-so", "vung", "goc-nhin"];
+const hasOldWord = (url: string) => OLD_WORDS.some((w) => new URL(url).searchParams.has(w));
+
+/** Signs in on the sign-in page already open (keeping its ?next=), as signIn does from a fresh one. */
+async function signInHere(page: Page, email: string, into: Company) {
+  const before = codes(email).length;
+  await expect(page.locator('[data-state="email"][data-ready]')).toBeVisible();
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Email").press("Enter");
+  await expect(page.locator('[data-state="code"]')).toBeVisible();
+  await expect.poll(() => codes(email).length, { timeout: 10_000 }).toBe(before + 1);
+  const code = page.getByLabel("Mã đăng nhập");
+  await code.fill(codes(email).at(-1)!);
+  await code.press("Enter");
+  const choose = page.locator('[data-state="choose-company"]');
+  await expect(choose.or(page.locator('[data-slot="account-menu"][data-ready]'))).toBeVisible();
+  if (await choose.isVisible()) await choose.getByRole("button", { name: into.name }).click();
+}
+
+/** One listing of [MAU] with its unit code and its project, the place an old link names. */
+function oldLinkTarget(companyId: string) {
+  const sample = DATA.current[0]!;
+  const unit = UNIT_OF.get(sample.id)!;
+  return {
+    id: companyListingId(companyId, sample.id),
+    code: unit.unitNumber,
+    place: unit.subdivisionName!,
+  };
+}
+
+test("lien-ket-cu: an old link goes through sign-in once translated and opens the unit", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "1440", "do o 1440");
+  const w = await world(info, "lkc");
+  const t = oldLinkTarget(w.mau.id);
+  const view = "00000000-0000-4000-8000-000000000001";
+  const oldLink = `/inventory?ho-so=${t.id}&vung=${encodeURIComponent(t.place)}&goc-nhin=${view}`;
+  const translations: string[] = [];
+  page.on("response", (r) => {
+    if (r.status() >= 300 && r.status() < 400 && hasOldWord(r.url())) translations.push(r.url());
+  });
+  await page.context().clearCookies();
+  await page.goto(oldLink);
+  await expect(page, "lien-ket-cu: khong ve dang nhap").toHaveURL(/\/login\?next=/);
+  const next = decodeURIComponent(new URL(page.url()).searchParams.get("next") ?? "");
+  expect(next, "lien-ket-cu: next mang tu cu").not.toMatch(/ho-so|vung|goc-nhin/);
+  expect(next, "lien-ket-cu: next thieu tu moi").toContain(`record=${t.id}`);
+  expect(next, "lien-ket-cu: next thieu place").toContain("place=");
+  expect(next, "lien-ket-cu: next thieu view").toContain(`view=${view}`);
+  await signInHere(page, w.email, w.mau);
+  await page.waitForURL((u) => u.pathname === "/inventory");
+  expect(hasOldWord(page.url()), "lien-ket-cu: dia chi cuoi mang tu cu").toBe(false);
+  expect(new URL(page.url()).searchParams.get("record"), "lien-ket-cu: dia chi cuoi").toBe(t.id);
+  await expect(page.locator('[data-slot="record-panel"]'), "lien-ket-cu: ngan ho so").toContainText(
+    t.code,
+  );
+  expect(translations, "lien-ket-cu: so buoc dich").toHaveLength(1);
+});
+
+test("lien-ket-cu: đối chứng — the same link in English takes no translation step", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "1440", "do o 1440");
+  const w = await world(info, "lkm");
+  const t = oldLinkTarget(w.mau.id);
+  const translations: string[] = [];
+  page.on("response", (r) => {
+    if (r.status() >= 300 && r.status() < 400 && hasOldWord(r.url())) translations.push(r.url());
+  });
+  await signIn(page, w.email, w.mau);
+  await openInventory(page, `/inventory?record=${t.id}&place=${encodeURIComponent(t.place)}`);
+  await expect(page.locator('[data-slot="record-panel"]'), "doi-chung: ngan ho so").toContainText(
+    t.code,
+  );
+  expect(translations, "doi-chung: co buoc dich").toHaveLength(0);
+});
+
+test("old link images: an old link at 1440, for the judge (URL_ANH=1)", async ({ page }, info) => {
+  test.skip(info.project.name !== "1440" || !process.env.URL_ANH, "anh cho ban cham");
+  const w = await world(info, "lka");
+  const t = oldLinkTarget(w.mau.id);
+  await signIn(page, w.email, w.mau);
+  const oldLink = `/inventory?ho-so=${t.id}&vung=${encodeURIComponent(t.place)}`;
+  await openInventory(page, oldLink);
+  await expect(page.locator('[data-slot="record-panel"]')).toContainText(t.code);
+  const dir = ".acceptance-runs/english-query-words";
+  mkdirSync(dir, { recursive: true });
+  await page.screenshot({ path: `${dir}/old-link-1440.png` });
+  console.log(`lien ket cu: ${oldLink}`);
+  console.log(`can va noi mong doi: ${t.code} · ${t.place}`);
+  console.log(`dia chi cuoi: ${new URL(page.url()).pathname}${new URL(page.url()).search}`);
 });
 
 // ---- E10b · 5,000 listings scroll to the end -------------------------------------------------------------------------
