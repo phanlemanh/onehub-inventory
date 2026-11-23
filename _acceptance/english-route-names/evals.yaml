@@ -49,7 +49,7 @@ evals:
     criterion: AC-7
     executor: test
     cmd: bash _acceptance/english-route-names/rang/old-ids.sh
-    paths: [tools/coverage_matrix/**, tools/proof_gate/**, design/screens/**]
+    paths: [tools/coverage_matrix/**, tools/proof_gate/**, design/screens/**, tests/screen-old-ids.test.ts, _acceptance/english-route-names/rang/old-ids.sh]
     expected: "exit 0; 4 ca: coverage_matrix và proof_gate đều cho hồ sơ đóng khai tuy-chinh-san qua, hồ sơ mở khai tuy-chinh-san đỏ với «screen 'tuy-chinh-san' is an old id of 'company-layer'»; in «old-ids: 4/4». Chiều đỏ: pha-thu-mo-dung-ma-cu đỏ với «old-ids: open contract uses tuy-chinh-san»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
