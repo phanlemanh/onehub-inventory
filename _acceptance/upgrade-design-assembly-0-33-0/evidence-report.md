@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 5df01192cd67b8096f8018303b1501e66a2ba39f
-human_signoff:
+human_signoff: Manh Phan 2026-11-23
 ---
 
 # Evidence Report: upgrade-design-assembly-0-33-0

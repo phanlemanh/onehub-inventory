@@ -5,7 +5,7 @@ slug: upgrade-design-assembly-0-33-0
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-22
 design_doc: docs/superpowers/specs/2026-11-22-upgrade-design-assembly-0-33-0-design.md
@@ -116,3 +116,10 @@ coverage-scan».
   (hiện là `dda3487e`). Trong `make check` hai hàng không in lời «fetched» vì cổng chứng minh màn đã lấy cả lịch sử trước.
 - Lỗi lượt chấm tìm ra trong `tools/design-assembly/` không sửa tay trên nhánh và không sửa ở kho plugin: vòng dừng và
   trình chủ kho.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-23:
+  - Ngoài-1: khi chấm trên chính kho, phép kiểm hai trang vẽ đọc bản đang nằm trên máy chứ không đọc bản đã commit,
+    nên một sửa tay đã commit lọt qua nếu trên máy đã vẽ lại mà chưa commit; CI chấm trên bản sạch nên không bị.
+  - Ngoài-2: phép kiểm hai trang vẽ không dừng khi cây làm việc còn tệp chưa commit, nên tệp lạ trong thư mục hồ sơ có
+    thể đổi kết quả.
+  - Ngoài-3: hai vế của phép đo danh sách tệp đọc hai bản khác nhau — danh sách tệp theo commit, trang vẽ theo tệp trên
+    máy.
