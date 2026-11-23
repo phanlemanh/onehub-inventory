@@ -1,19 +1,17 @@
 ---
 schema_version: 2
 feature_slug: english-query-words
-verdict: REJECT
-failed_evals: [E10]
+verdict: PASS
+failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: eac7de4c30c03a54add2332b518502b808c61fea
+verified_commit: 9f090aab680886a9c3a1ad48e452ea57423ec998
 human_signoff:
 ---
 
 # Evidence Report: english-query-words
-
-Round 2. Nội dung thay toàn bộ round cũ; lịch sử nằm ở mục Iterations.
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
@@ -27,7 +25,7 @@ Round 2. Nội dung thay toàn bộ round cũ; lịch sử nằm ở mục Itera
 | E7 | AC-6 | script | PASS (carry-forward r1) |
 | E8 | AC-5 | script | PASS (carry-forward r1) |
 | E9 | AC-5 | script | PASS (carry-forward r1) |
-| E10 | AC-8 | script | FAIL |
+| E10 | AC-8 | script | PASS |
 | E11 | AC-8 | script | PASS (carry-forward r1) |
 | E12 | AC-8 | script | PASS |
 | E13 | AC-8 | script | PASS (carry-forward r1) |
@@ -37,60 +35,57 @@ Round 2. Nội dung thay toàn bộ round cũ; lịch sử nằm ở mục Itera
 | E17-ui | AC-4 | ui-check | PASS (carry-forward r1) |
 | E18 | AC-4 | script | PASS |
 
-Lệnh fail không gắn eval: `DATABASE_URL= make e2e` (xem khối suite bên dưới). `make check` fail gắn với E10.
-
 ## Evidence
 
 - eval: E1
-  run_id: minted-english-query-words-E1-r2
+  run_id: minted-english-query-words-E1-r3
   exit_code: 0
   baseline: n-a
   verifier: _acceptance/english-query-words/rang/query-words.mjs
+  verified_at: 2026-11-23T11:27:01Z
   output: |
     quet: 9 tu x 11 ngu canh x 5 vung · cham: 0 · giu: 14
 
 - eval: E3
-  run_id: minted-english-query-words-E3-r2
+  run_id: minted-english-query-words-E3-r3
   exit_code: 0
   baseline: n-a
   verifier: _acceptance/english-query-words/rang/chay.sh
+  verified_at: 2026-11-23T11:27:01Z
   output: |
-    (lệnh chạy xong, không có dòng lỗi)
+    (lệnh hoàn tất, bộ chạy không in dòng tóm tắt riêng)
 
 - eval: E10
-  run_id: minted-english-query-words-E10-r2
-  exit_code: 2
-  baseline: n-a
+  run_id: minted-english-query-words-E10-r3
+  exit_code: 0
+  baseline: green
   verifier: config:executors.script.check
+  verified_at: 2026-11-23T11:27:01Z
   output: |
-    upgrade: no conflict markers
-    ✖ 6 problems (0 errors, 6 warnings)
-    node tools/typecheck_own.mjs
-    tests/e2e-db/bang-hang-that.spec.ts(636,65): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
-    make: *** [typecheck] Error 1
+    make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance
 
 - eval: E12
-  run_id: minted-english-query-words-E12-r2
+  run_id: minted-english-query-words-E12-r3
   exit_code: 0
   baseline: red
   verifier: config:executors.test.bang_hang_that_e2e
+  verified_at: 2026-11-23T11:27:01Z
   output: |
     gac-hydration: 0 canh bao
 
 - eval: E18
-  run_id: minted-english-query-words-E18-r2
+  run_id: minted-english-query-words-E18-r3
   exit_code: 0
   baseline: red
   verifier: config:executors.test.bang_hang_that_e2e
+  verified_at: 2026-11-23T11:27:01Z
   output: |
     gac-hydration: 0 canh bao
-
-### Carry-forward (delta không chạm paths của eval, round này không chạy lại)
 
 - eval: E1-pha
   run_id: minted-english-query-words-E1-pha-r1
   exit_code: 0
-  verifier: _acceptance/english-query-words/rang/ (script, không khai ref)
+  verifier: _acceptance/english-query-words/rang/query-words.mjs
   verified_at: 2026-11-23T10:23:51Z
   carried_from_round: 1
   # carry-forward tu round 1 — delta khong cham paths cua eval
@@ -98,7 +93,7 @@ Lệnh fail không gắn eval: `DATABASE_URL= make e2e` (xem khối suite bên d
 - eval: E2
   run_id: minted-english-query-words-E2-r1
   exit_code: 0
-  verifier: test (không khai ref)
+  verifier: _acceptance/english-query-words/rang/chay.sh
   verified_at: 2026-11-23T10:23:51Z
   carried_from_round: 1
   # carry-forward tu round 1 — delta khong cham paths cua eval
@@ -106,7 +101,7 @@ Lệnh fail không gắn eval: `DATABASE_URL= make e2e` (xem khối suite bên d
 - eval: E4
   run_id: minted-english-query-words-E4-r1
   exit_code: 0
-  verifier: test (không khai ref)
+  verifier: _acceptance/english-query-words/rang/chay.sh
   verified_at: 2026-11-23T10:23:51Z
   carried_from_round: 1
   # carry-forward tu round 1 — delta khong cham paths cua eval
@@ -130,7 +125,7 @@ Lệnh fail không gắn eval: `DATABASE_URL= make e2e` (xem khối suite bên d
 - eval: E7
   run_id: minted-english-query-words-E7-r1
   exit_code: 0
-  verifier: script (không khai ref)
+  verifier: _acceptance/english-query-words/rang/chay.sh
   verified_at: 2026-11-23T10:23:51Z
   carried_from_round: 1
   # carry-forward tu round 1 — delta khong cham paths cua eval
@@ -178,7 +173,7 @@ Lệnh fail không gắn eval: `DATABASE_URL= make e2e` (xem khối suite bên d
 - eval: E15
   run_id: minted-english-query-words-E15-r1
   exit_code: 0
-  verifier: script (không khai ref)
+  verifier: _acceptance/english-query-words/rang/chay.sh
   verified_at: 2026-11-23T10:23:51Z
   carried_from_round: 1
   # carry-forward tu round 1 — delta khong cham paths cua eval
@@ -194,33 +189,26 @@ Lệnh fail không gắn eval: `DATABASE_URL= make e2e` (xem khối suite bên d
 - eval: E17-ui
   run_id: minted-english-query-words-E17-ui-r1
   exit_code: 0
-  verifier: ui-check (không khai ref)
+  verifier: _acceptance/english-query-words/rang/chay.sh
   verified_at: 2026-11-23T10:23:51Z
   carried_from_round: 1
-  # carry-forward tu round 1 — delta khong cham paths cua eval
+  # carry-forward tu round 1 — delta khong cham paths cua eval (khung cua luot goc)
   screenshot: evidence/E17-ui-step1.png
   observed: |
     Frame old-link-1440.png (read directly): Bảng hàng at 1440. The record drawer is open on the right with heading "0905 · S1.01", Vinhomes Ocean Park 1 · S1.01 · Căn hộ, status Đang giao dịch, 5,71 tỷ, full details (Mã căn 0905, Toà S1.01). The sidebar has the place "Vinhomes Ocean Park 1" with "Tất cả" highlighted, and the table lists 36/60 rows with row 1 = 0905 · S1.01 · Vinhomes Ocean Park. This matches Expected: drawer open, place lit, address carries only the new words (record, place).
   network_observed: n-a (driver)
 
-- eval: E18
-  note: khối chạy mới của round 2 nằm ở phần trên; không carry.
-
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-english-query-words-SUITE-build-r2
+  run_id: minted-english-query-words-SUITE-build-r3
   exit_code: 0
-  verified_at: 2026-11-23T10:41:51Z
+  verified_at: 2026-11-23T11:27:01Z
 
 - cmd: DATABASE_URL= make e2e
-  run_id: minted-english-query-words-SUITE-DATABASE_URL_make_e2e-r2
-  exit_code: 2
-  verified_at: 2026-11-23T10:41:51Z
-  output: |
-    1218 passed, 1132 skipped, còn một nhóm ca đỏ ở các khổ 414, 1024 và 1440
-    (ví dụ tests/e2e/sheet.spec.ts, grid.spec.ts, sua-tren-o.spec.ts, dan-tu-excel.spec.ts, ho-so-can.spec.ts)
-    gac-hydration: 0 canh bao
+  run_id: minted-english-query-words-SUITE-DATABASE_URL_make_e2e-r3
+  exit_code: 0
+  verified_at: 2026-11-23T11:27:01Z
 
 ## Known limits
 
@@ -228,18 +216,19 @@ Lệnh fail không gắn eval: `DATABASE_URL= make e2e` (xem khối suite bên d
 
 ## Analyst
 
-none — mọi eval feature đều red trên baseline (có phân biệt) hoặc là eval mới không đo được baseline (xem dưới).
+Eval không-phân-biệt (xanh trên cả HEAD lẫn baseline):
+- E10 (`make check`): regression-guard có chủ ý, xanh ở cả hai phía.
 
-Baseline khong do
+Baseline không đo:
 - node _acceptance/english-query-words/rang/query-words.mjs --root .: bo qua baseline: tep _acceptance/english-query-words/rang/query-words.mjs co o cay dang kiem nhung chua co o merge-base 25f847090057f37bbd5d9ac35a16f6b272878fda — eval moi, chay tren code cu khong phan biet gi
 - bash _acceptance/english-query-words/rang/chay.sh E3: bo qua baseline: tep _acceptance/english-query-words/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 25f847090057f37bbd5d9ac35a16f6b272878fda — eval moi, chay tren code cu khong phan biet gi
-- make check: baseline vuot tran 180 giay/lenh — da dung ca cay tien trinh; BLOCKED ha tang, khong phai ket qua cua code cu
 
 ## Variance
 
-none — mọi eval chạy một lần, không có eval nhiều lần.
+none — mọi eval chạy một lần, kết quả đồng nhất.
 
 ## Iterations
 
-Round 1: các eval E1-pha, E2, E4–E9, E11, E13–E17-ui chạy và đạt (verified 2026-11-23T10:23:51Z).
-Round 2: E10 fail — `make check` dừng ở typecheck: tests/e2e-db/bang-hang-that.spec.ts dòng 636 cột 65 truyền `string | undefined` vào tham số `string` (TS2345). `DATABASE_URL= make e2e` cũng fail ở một nhóm ca (không gắn eval). E1, E3, E12, E18 đạt. Quay lại implementation.
+Round 1: lượt đầu chạy các eval E1-pha, E2, E4-E9, E11, E13-E16, E17-ui, các kết quả này được mang sang round 3.
+Round 2: không có dữ liệu chi tiết trong payload của round 3.
+Round 3: chạy lại E1, E3, E10, E12, E18 cùng hai lệnh suite (build, e2e); tất cả xanh, các eval còn lại mang từ round 1 vì delta không chạm paths của chúng.

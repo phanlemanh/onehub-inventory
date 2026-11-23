@@ -1,21 +1,35 @@
-# Review findings: english-query-words (round 2)
+# Review findings: english-query-words (round 3)
 
 ## Trong hợp đồng
 
-(không có finding nào map được vào AC)
+Không có.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Ảnh bằng chứng E17-ui bước 2 là bản sao y hệt bước 1, và không có dữ liệu nào chứng minh kết luận về địa chỉ**
+- **The English-link control can never fail: by definition it cannot count a translation step**
+  Người dùng thấy gì: Bài kiểm chứng rằng liên kết mới không bị chuyển hướng thừa chưa thực sự bắt được lỗi: nếu sau này liên kết mới bị tải lại hay chuyển vòng một cách vô ích, bài kiểm vẫn báo xanh. Người dùng hiện không gặp lỗi gì.
+  Căn cứ: Hậu quả nhẹ: chỉ làm lưới an toàn của kiểm thử yếu đi, không mất dữ liệu hay hỏng màn hình hôm nay; nếu có lỗi chuyển hướng thừa người dùng chỉ thấy trang tải chậm hơn và có thể tải lại, và củng cố bài kiểm sau này rẻ.
+  file: `tests/e2e-db/bang-hang-that.spec.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Shape 4 (a negative assertion with no real positive control): the English-link control test cannot fail by construction**
+  Người dùng thấy gì: Bài kiểm nói rằng liên kết tiếng Anh không bị dịch thêm bước nào, nhưng thực tế nó không thể báo đỏ trong tình huống này. Người dùng hiện không thấy ảnh hưởng nào.
+  Căn cứ: Hậu quả nhẹ và không ảnh hưởng người dùng trực tiếp: chỉ là một khẳng định kiểm thử chưa chứng minh được điều nó nói, không có dữ liệu mất hay lộ, và ghi lại thành hạn chế đã biết là đủ.
+  file: `tests/e2e-db/bang-hang-that.spec.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Ảnh bằng chứng E17-ui bước 2 là bản sao y hệt bước 1, và không có dữ liệu nào chứng minh kết luận về địa chỉ (r2)**
   Người dùng thấy gì: Hồ sơ nghiệm thu thiếu một ảnh chứng minh rằng liên kết cũ mở ra địa chỉ mới. Người dùng không bị ảnh hưởng gì, chỉ là bằng chứng lưu lại cho bước này chưa đủ thuyết phục.
   Căn cứ: Không ảnh hưởng người dùng cuối và không mất dữ liệu; chỉ làm hồ sơ kiểm tra kém chắc chắn, chụp lại bằng chứng sau là xong và rẻ.
   file: `_acceptance/english-query-words/evidence/E17-ui-step2.png`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 3 (presence instead of relation): a 'translation step' is counted as any page load without an old word that follows one with an old word, with no check that it is the translation**
+- **Shape 3 (presence instead of relation): a 'translation step' is counted as any page load without an old word that follows one with an old word, with no check that it is the translation (r2 · tệp đã đổi)**
   Người dùng thấy gì: Bài kiểm tra việc liên kết cũ chỉ chuyển hướng một lần có thể báo xanh dù chuyển hướng thật không đúng như mong đợi. Người dùng chưa gặp lỗi nào, nhưng một lỗi chuyển hướng sau này có thể lọt qua.
   Căn cứ: Không có hậu quả trực tiếp cho người dùng hôm nay và không mất dữ liệu; rủi ro là bỏ sót lỗi sau này, sửa bài kiểm sau khá rẻ nên ghi lại là đủ.
   file: `tests/e2e-db/bang-hang-that.spec.ts`
@@ -86,5 +100,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   Đề xuất: wont-fix
 
 ## Chưa adversarial-verify (refuter chết)
+
+Không có.
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
