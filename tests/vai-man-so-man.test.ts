@@ -76,7 +76,7 @@ describe("so-man-du-cua-vao", () => {
 
 describe("tap-cap-bang-tich", () => {
   // Written before the code: the built staff screens and the four roles.
-  const SCREENS = ["today", "inventory", "sent", "sign-in", "members", "tuy-chinh-san"];
+  const SCREENS = ["today", "inventory", "sent", "sign-in", "members", "company-layer"];
   const ROLES = ["ListAgent", "BuyerAgent", "TeamLead", "CompanyAdmin"];
 
   it("24 pairs, and every other screen of the register with its reason", () => {
@@ -87,7 +87,7 @@ describe("tap-cap-bang-tich", () => {
     expect(outside).toEqual({
       contacts: "planned",
       proto: "dev",
-      "proto-bo-nut": "dev",
+      "proto-permitted-actions": "dev",
     });
     const blocked = all.filter((p) => p.expect === "chan").map((p) => `${p.screen}×${p.role}`);
     expect(blocked.sort()).toEqual(["members×BuyerAgent", "members×ListAgent", "members×TeamLead"]);
@@ -167,7 +167,7 @@ describe("thanh-ben-khop-so-man", () => {
   it("every sidebar entry gates its screen with the register's action", () => {
     const t = buttonTable(ROOT);
     const linked = NAV.filter((i) => t.screens.some((s) => s.route === i.href)).map((i) => i.href);
-    expect(linked.sort()).toEqual(["/", "/inventory", "/members", "/sent", "/tuy-chinh-san"]);
+    expect(linked.sort()).toEqual(["/", "/company-layer", "/inventory", "/members", "/sent"]);
     expect(navProblems(NAV, t.screens)).toEqual([]);
   });
 

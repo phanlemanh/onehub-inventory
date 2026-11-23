@@ -109,7 +109,7 @@ describe("man-khai-hien", () => {
         "sent",
         "sign-in",
         "today",
-        "tuy-chinh-san",
+        "company-layer",
       ].sort(),
     );
   });
@@ -142,7 +142,7 @@ describe("may-thay-man-hien", () => {
       inventory: ["Listing", "ListingOwner", "SavedView", "Unit"],
       sent: ["ShareLink"],
       contacts: ["Contact"],
-      "tuy-chinh-san": [
+      "company-layer": [
         "CompanyLabel",
         "CompanyValueAlias",
         "CustomField",
@@ -616,7 +616,7 @@ describe("xem-theo-vai", () => {
       khung: all,
       inventory: all,
       sent: all,
-      "tuy-chinh-san": all,
+      "company-layer": all,
       members: ["CompanyAdmin"],
       contacts: ["ListAgent", "BuyerAgent", "TeamLead"],
     };

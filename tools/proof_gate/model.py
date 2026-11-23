@@ -133,6 +133,8 @@ class Family:
 class Repo:
     root: Path
     screens: dict[str, dict[str, Any]] = field(default_factory=dict)
+    # Former ids of renamed screens (`old_ids` on a screen file) → the current id; closed contracts keep naming them.
+    old_ids: dict[str, str] = field(default_factory=dict)
     families: dict[str, Family] = field(default_factory=dict)
     states: list[str] = field(default_factory=list)
     registry_names: set[str] = field(default_factory=set)
@@ -160,8 +162,12 @@ class Repo:
         """Files of the register outside the supplier folders, each with its component names (row 1q)."""
         return {f: names for f, names in self.registry_by_file.items() if f and not f.startswith(VENDOR_DIRS)}
 
+    def screen(self, screen_id: str) -> dict[str, Any]:
+        """A screen's register entry by its id, or by a former id of a renamed screen."""
+        return self.screens.get(screen_id) or self.screens.get(self.old_ids.get(screen_id, "")) or {}
+
     def family_of(self, screen_id: str) -> Family | None:
-        screen = self.screens.get(screen_id) or {}
+        screen = self.screen(screen_id)
         key = screen.get("family")
         return self.families.get(str(key)) if key is not None else None
 
@@ -237,6 +243,8 @@ def load_repo(root: Path) -> Repo:
     for item in doc.get("screens") or []:
         if isinstance(item, dict) and item.get("id"):
             repo.screens[str(item["id"])] = item
+            for old in item.get("old_ids") or []:
+                repo.old_ids[str(old)] = str(item["id"])
 
     pdir = root / PATTERNS_DIR
     files = sorted(p for p in pdir.glob("*.md") if p.name not in RESERVED_PATTERN_FILES) if pdir.is_dir() else []

@@ -94,8 +94,8 @@ async function as(browser: Browser, who: string, info: TestInfo): Promise<Page> 
 }
 
 async function openPart(page: Page) {
-  await page.goto("/tuy-chinh-san?phan=thue-phi");
-  await expect(page.locator('[data-part="thue-phi"][data-state="ready"]')).toBeVisible();
+  await page.goto("/company-layer?part=fee-schedule");
+  await expect(page.locator('[data-part="fee-schedule"][data-state="ready"]')).toBeVisible();
 }
 const row = (page: Page, code: string) => page.locator(`[data-fee="${code}"]`);
 

@@ -181,10 +181,10 @@ describe("screens", () => {
         "/inventory",
         "/sent",
         "/proto/[slug]",
-        "/proto/bo-nut-theo-quyen",
+        "/proto/permitted-actions",
         "/login",
         "/members",
-        "/tuy-chinh-san",
+        "/company-layer",
       ]),
     );
   });
