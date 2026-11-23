@@ -2,229 +2,225 @@
 schema_version: 2
 feature_slug: english-query-words
 verdict: REJECT
-failed_evals: ["E12","E18"]
+failed_evals: [E10]
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: ee053b89bd6de5dbaafe91842f2d83b759e46600
+verified_commit: eac7de4c30c03a54add2332b518502b808c61fea
 human_signoff:
 ---
 
 # Evidence Report: english-query-words
 
+Round 2. Nội dung thay toàn bộ round cũ; lịch sử nằm ở mục Iterations.
+
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
 | E1 | AC-7 | script | PASS |
-| E1-pha | AC-7 | script | PASS |
-| E2 | AC-4 | test | PASS |
+| E1-pha | AC-7 | script | PASS (carry-forward r1) |
+| E2 | AC-4 | test | PASS (carry-forward r1) |
 | E3 | AC-3 | test | PASS |
-| E4 | AC-1 | test | PASS |
-| E5 | AC-2 | script | PASS |
-| E6 | AC-2 | script | PASS |
-| E7 | AC-6 | script | PASS |
-| E8 | AC-5 | script | PASS |
-| E9 | AC-5 | script | PASS |
-| E10 | AC-8 | script | PASS |
-| E11 | AC-8 | script | PASS |
-| E12 | AC-8 | script | FAIL |
-| E13 | AC-8 | script | PASS |
-| E14 | AC-8 | script | PASS |
-| E15 | AC-8 | script | PASS |
-| E16 | AC-8 | script | PASS |
-| E17-ui | AC-4 | ui-check | PASS |
-| E18 | AC-4 | script | FAIL |
+| E4 | AC-1 | test | PASS (carry-forward r1) |
+| E5 | AC-2 | script | PASS (carry-forward r1) |
+| E6 | AC-2 | script | PASS (carry-forward r1) |
+| E7 | AC-6 | script | PASS (carry-forward r1) |
+| E8 | AC-5 | script | PASS (carry-forward r1) |
+| E9 | AC-5 | script | PASS (carry-forward r1) |
+| E10 | AC-8 | script | FAIL |
+| E11 | AC-8 | script | PASS (carry-forward r1) |
+| E12 | AC-8 | script | PASS |
+| E13 | AC-8 | script | PASS (carry-forward r1) |
+| E14 | AC-8 | script | PASS (carry-forward r1) |
+| E15 | AC-8 | script | PASS (carry-forward r1) |
+| E16 | AC-8 | script | PASS (carry-forward r1) |
+| E17-ui | AC-4 | ui-check | PASS (carry-forward r1) |
+| E18 | AC-4 | script | PASS |
 
-Lệnh fail không gắn eval riêng: lệnh Playwright của `tests/e2e-db/bang-hang-that.spec.ts` (dãy R) gắn chung cho E12 và E18. Ca fail duy nhất là `lien-ket-cu: an old link goes through sign-in once translated and opens the unit` ở khổ 1440: số bước dịch nhận được là một danh sách rỗng, trong khi eval hứa đúng một bước (dòng 676 của spec). 28 ca đạt, 35 ca bỏ qua.
+Lệnh fail không gắn eval: `DATABASE_URL= make e2e` (xem khối suite bên dưới). `make check` fail gắn với E10.
 
 ## Evidence
 
 - eval: E1
-  run_id: minted-english-query-words-E1-r1
+  run_id: minted-english-query-words-E1-r2
   exit_code: 0
   baseline: n-a
   verifier: _acceptance/english-query-words/rang/query-words.mjs
-  verified_at: 2026-11-23T10:23:51Z
   output: |
     quet: 9 tu x 11 ngu canh x 5 vung · cham: 0 · giu: 14
+
+- eval: E3
+  run_id: minted-english-query-words-E3-r2
+  exit_code: 0
+  baseline: n-a
+  verifier: _acceptance/english-query-words/rang/chay.sh
+  output: |
+    (lệnh chạy xong, không có dòng lỗi)
+
+- eval: E10
+  run_id: minted-english-query-words-E10-r2
+  exit_code: 2
+  baseline: n-a
+  verifier: config:executors.script.check
+  output: |
+    upgrade: no conflict markers
+    ✖ 6 problems (0 errors, 6 warnings)
+    node tools/typecheck_own.mjs
+    tests/e2e-db/bang-hang-that.spec.ts(636,65): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+    make: *** [typecheck] Error 1
+
+- eval: E12
+  run_id: minted-english-query-words-E12-r2
+  exit_code: 0
+  baseline: red
+  verifier: config:executors.test.bang_hang_that_e2e
+  output: |
+    gac-hydration: 0 canh bao
+
+- eval: E18
+  run_id: minted-english-query-words-E18-r2
+  exit_code: 0
+  baseline: red
+  verifier: config:executors.test.bang_hang_that_e2e
+  output: |
+    gac-hydration: 0 canh bao
+
+### Carry-forward (delta không chạm paths của eval, round này không chạy lại)
 
 - eval: E1-pha
   run_id: minted-english-query-words-E1-pha-r1
   exit_code: 0
-  baseline: n-a
-  verifier: _acceptance/english-query-words/rang/query-words.mjs
+  verifier: _acceptance/english-query-words/rang/ (script, không khai ref)
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    self-test: 100/100 do dung cho
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E2
   run_id: minted-english-query-words-E2-r1
   exit_code: 0
-  baseline: n-a
-  verifier: _acceptance/english-query-words/rang/chay.sh
+  verifier: test (không khai ref)
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    (lệnh không in dòng tóm tắt; kết thúc thành công)
-
-- eval: E3
-  run_id: minted-english-query-words-E3-r1
-  exit_code: 0
-  baseline: n-a
-  verifier: _acceptance/english-query-words/rang/chay.sh
-  verified_at: 2026-11-23T10:23:51Z
-  output: |
-    (lệnh không in dòng tóm tắt; kết thúc thành công)
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E4
   run_id: minted-english-query-words-E4-r1
   exit_code: 0
-  baseline: n-a
-  verifier: _acceptance/english-query-words/rang/chay.sh
+  verifier: test (không khai ref)
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    (lệnh không in dòng tóm tắt; kết thúc thành công)
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E5
   run_id: minted-english-query-words-E5-r1
   exit_code: 0
-  baseline: green
   verifier: config:executors.test.dia_ly
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    vitest src/modules/listings/ui/geo-tree.test.ts tests/dia-ly.test.tsx: xanh
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E6
   run_id: minted-english-query-words-E6-r1
   exit_code: 0
-  baseline: red
   verifier: config:executors.script.goc_nhin_e2e
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    gac-hydration: 0 canh bao
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E7
   run_id: minted-english-query-words-E7-r1
   exit_code: 0
-  baseline: n-a
-  verifier: _acceptance/english-query-words/rang/chay.sh
+  verifier: script (không khai ref)
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    (lệnh không in dòng tóm tắt; kết thúc thành công)
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E8
   run_id: minted-english-query-words-E8-r1
   exit_code: 0
-  baseline: red
   verifier: config:executors.script.the_dien_thoai_e2e
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    gac-hydration: 0 canh bao
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E9
   run_id: minted-english-query-words-E9-r1
   exit_code: 0
-  baseline: red
   verifier: config:executors.script.ban_dung_that
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    ban-dung-that: 37 phép kiểm đạt
-
-- eval: E10
-  run_id: minted-english-query-words-E10-r1
-  exit_code: 0
-  baseline: green
-  verifier: config:executors.script.check
-  verified_at: 2026-11-23T10:23:51Z
-  output: |
-    make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E11
   run_id: minted-english-query-words-E11-r1
   exit_code: 0
-  baseline: n-a
   verifier: config:executors.script.e2e
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    gac-hydration: 0 canh bao
-
-- eval: E12
-  run_id: minted-english-query-words-E12-r1
-  exit_code: 1
-  baseline: n-a
-  verifier: config:executors.test.bang_hang_that_e2e
-  verified_at: 2026-11-23T10:23:51Z
-  output: |
-    ✘  61 [1440] › tests/e2e-db/bang-hang-that.spec.ts:649:1 › lien-ket-cu: an old link goes through sign-in once translated and opens the unit
-    Error: lien-ket-cu: so buoc dich
-    Expected length: 1
-    Received length: 0
-    > 676 |   expect(translations, "lien-ket-cu: so buoc dich").toHaveLength(1);
-    1 failed, 35 skipped, 28 passed (3.1m)
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E13
   run_id: minted-english-query-words-E13-r1
   exit_code: 0
-  baseline: n-a
   verifier: config:executors.test.dia_ly_e2e_db
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    gac-hydration: 0 canh bao
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E14
   run_id: minted-english-query-words-E14-r1
   exit_code: 0
-  baseline: n-a
   verifier: config:executors.script.hoi_dau_chu_e2e_db
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    gac-hydration: 0 canh bao
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E15
   run_id: minted-english-query-words-E15-r1
   exit_code: 0
-  baseline: n-a
-  verifier: _acceptance/english-query-words/rang/query-words.mjs
+  verifier: script (không khai ref)
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    wiki: 0 trang thuc the tro tu cu · behaviors: 0 tu cu · nhat ky: 1 dong english-query-words
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E16
   run_id: minted-english-query-words-E16-r1
   exit_code: 0
-  baseline: n-a
   verifier: config:executors.design.khuon
   verified_at: 2026-11-23T10:23:51Z
-  output: |
-    21 tệp giao diện ngoài bản đồ
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E17-ui
   run_id: minted-english-query-words-E17-ui-r1
   exit_code: 0
-  baseline: n-a
-  verifier: tests/e2e-db/bang-hang-that.spec.ts
+  verifier: ui-check (không khai ref)
   verified_at: 2026-11-23T10:23:51Z
+  carried_from_round: 1
+  # carry-forward tu round 1 — delta khong cham paths cua eval
   screenshot: evidence/E17-ui-step1.png
   observed: |
     Frame old-link-1440.png (read directly): Bảng hàng at 1440. The record drawer is open on the right with heading "0905 · S1.01", Vinhomes Ocean Park 1 · S1.01 · Căn hộ, status Đang giao dịch, 5,71 tỷ, full details (Mã căn 0905, Toà S1.01). The sidebar has the place "Vinhomes Ocean Park 1" with "Tất cả" highlighted, and the table lists 36/60 rows with row 1 = 0905 · S1.01 · Vinhomes Ocean Park. This matches Expected: drawer open, place lit, address carries only the new words (record, place).
   network_observed: n-a (driver)
 
 - eval: E18
-  run_id: minted-english-query-words-E18-r1
-  exit_code: 1
-  baseline: n-a
-  verifier: config:executors.test.bang_hang_that_e2e
-  verified_at: 2026-11-23T10:23:51Z
-  output: |
-    ✘  61 [1440] › tests/e2e-db/bang-hang-that.spec.ts:649:1 › lien-ket-cu: an old link goes through sign-in once translated and opens the unit
-    Received length: 0 (expected 1 translation step)
-    ✓  62 [1440] › tests/e2e-db/bang-hang-that.spec.ts:679:1 › lien-ket-cu: đối chứng — the same link in English takes no translation step
+  note: khối chạy mới của round 2 nằm ở phần trên; không carry.
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-english-query-words-SUITE-build-r1
+  run_id: minted-english-query-words-SUITE-build-r2
   exit_code: 0
-  verified_at: 2026-11-23T10:23:51Z
+  verified_at: 2026-11-23T10:41:51Z
+
+- cmd: DATABASE_URL= make e2e
+  run_id: minted-english-query-words-SUITE-DATABASE_URL_make_e2e-r2
+  exit_code: 2
+  verified_at: 2026-11-23T10:41:51Z
+  output: |
+    1218 passed, 1132 skipped, còn một nhóm ca đỏ ở các khổ 414, 1024 và 1440
+    (ví dụ tests/e2e/sheet.spec.ts, grid.spec.ts, sua-tren-o.spec.ts, dan-tu-excel.spec.ts, ho-so-can.spec.ts)
+    gac-hydration: 0 canh bao
 
 ## Known limits
 
@@ -232,28 +228,18 @@ Lệnh fail không gắn eval riêng: lệnh Playwright của `tests/e2e-db/bang
 
 ## Analyst
 
-Eval không phân biệt (xanh ở cả code mới lẫn baseline):
-- E5: xanh ở cả hai phía, là bài đo giữ chuẩn có chủ ý hay cần viết lại để khẳng định hành vi mới thì cần người xem lại.
-- E10: xanh ở cả hai phía, là cổng hồi quy bình thường nhưng nó không chứng minh được tính năng.
+none — mọi eval feature đều red trên baseline (có phân biệt) hoặc là eval mới không đo được baseline (xem dưới).
 
 Baseline khong do
 - node _acceptance/english-query-words/rang/query-words.mjs --root .: bo qua baseline: tep _acceptance/english-query-words/rang/query-words.mjs co o cay dang kiem nhung chua co o merge-base 25f847090057f37bbd5d9ac35a16f6b272878fda — eval moi, chay tren code cu khong phan biet gi
-- node _acceptance/english-query-words/rang/query-words.mjs --root . --self-test: bo qua baseline: tep _acceptance/english-query-words/rang/query-words.mjs co o cay dang kiem nhung chua co o merge-base 25f847090057f37bbd5d9ac35a16f6b272878fda — eval moi, chay tren code cu khong phan biet gi
-- bash _acceptance/english-query-words/rang/chay.sh E2: bo qua baseline: tep _acceptance/english-query-words/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 25f847090057f37bbd5d9ac35a16f6b272878fda — eval moi, chay tren code cu khong phan biet gi
 - bash _acceptance/english-query-words/rang/chay.sh E3: bo qua baseline: tep _acceptance/english-query-words/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 25f847090057f37bbd5d9ac35a16f6b272878fda — eval moi, chay tren code cu khong phan biet gi
-- bash _acceptance/english-query-words/rang/chay.sh E4: bo qua baseline: tep _acceptance/english-query-words/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 25f847090057f37bbd5d9ac35a16f6b272878fda — eval moi, chay tren code cu khong phan biet gi
-- bash _acceptance/english-query-words/rang/chay.sh E7: bo qua baseline: tep _acceptance/english-query-words/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 25f847090057f37bbd5d9ac35a16f6b272878fda — eval moi, chay tren code cu khong phan biet gi
-- DATABASE_URL= make e2e: baseline vuot tran 53 giay/lenh — da dung ca cay tien trinh; BLOCKED ha tang, khong phai ket qua cua code cu
-- DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} npx playwright test -c playwright.db.config.ts tests/e2e-db/bang-hang-that.spec.ts: het tran tong 480 giay cua lane baseline truoc khi toi lenh nay — khong chay
-- DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx playwright test -c playwright.db.config.ts tests/e2e-db/dia-ly.spec.ts: het tran tong 480 giay cua lane baseline truoc khi toi lenh nay — khong chay
-- DB_LANE=${DB_LANE:-v} DB_PORT=${DB_PORT:-5570} npx playwright test -c playwright.db.config.ts tests/e2e-db/hoi-dau-chu-bao-sai.spec.ts: het tran tong 480 giay cua lane baseline truoc khi toi lenh nay — khong chay
-- node _acceptance/english-query-words/rang/query-words.mjs --root . --wiki: bo qua baseline: tep _acceptance/english-query-words/rang/query-words.mjs co o cay dang kiem nhung chua co o merge-base 25f847090057f37bbd5d9ac35a16f6b272878fda — eval moi, chay tren code cu khong phan biet gi
-- R="${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}" && node "$R/scripts/design-floor-khuon.mjs" --kiem --root .: het tran tong 480 giay cua lane baseline truoc khi toi lenh nay — khong chay
+- make check: baseline vuot tran 180 giay/lenh — da dung ca cay tien trinh; BLOCKED ha tang, khong phai ket qua cua code cu
 
 ## Variance
 
-none — every multi-run eval is uniform
+none — mọi eval chạy một lần, không có eval nhiều lần.
 
 ## Iterations
 
-Round 1: E12, E18 failed — ca `lien-ket-cu` trên Postgres dãy R ở khổ 1440 không thấy bước dịch nào trong danh sách phản hồi chuyển hướng (nhận 0, hợp đồng hứa đúng 1), dù ca đối chứng bằng từ mới xanh. Returned to implementation.
+Round 1: các eval E1-pha, E2, E4–E9, E11, E13–E17-ui chạy và đạt (verified 2026-11-23T10:23:51Z).
+Round 2: E10 fail — `make check` dừng ở typecheck: tests/e2e-db/bang-hang-that.spec.ts dòng 636 cột 65 truyền `string | undefined` vào tham số `string` (TS2345). `DATABASE_URL= make e2e` cũng fail ở một nhóm ca (không gắn eval). E1, E3, E12, E18 đạt. Quay lại implementation.

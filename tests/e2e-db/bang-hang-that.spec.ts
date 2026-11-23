@@ -633,7 +633,11 @@ function watchTranslations(page: Page) {
   });
   return {
     documents,
-    steps: () => documents.slice(1).filter((u, i) => hasOldWord(documents[i]) && !hasOldWord(u)),
+    steps: () =>
+      documents.slice(1).filter((u, i) => {
+        const before = documents[i];
+        return before !== undefined && hasOldWord(before) && !hasOldWord(u);
+      }),
   };
 }
 
