@@ -619,6 +619,24 @@ test("chua-dang-nhap-ve-dang-nhap: without a session /inventory, with or without
 const OLD_WORDS = ["ma", "toa", "du-an", "ho-so", "vung", "goc-nhin"];
 const hasOldWord = (url: string) => OLD_WORDS.some((w) => new URL(url).searchParams.has(w));
 
+/**
+ * Translation steps of a page: the (app) group streams (it has a loading.tsx), so the page's redirect reaches the
+ * browser inside a 200 document, not as a 3xx. A step is a document load that carries an old word followed by the next
+ * document load, which carries none. Returns the document URLs seen and the steps among them.
+ */
+function watchTranslations(page: Page) {
+  const documents: string[] = [];
+  page.on("response", (r) => {
+    if (r.request().resourceType() === "document" && r.request().frame() === page.mainFrame()) {
+      documents.push(r.url());
+    }
+  });
+  return {
+    documents,
+    steps: () => documents.slice(1).filter((u, i) => hasOldWord(documents[i]) && !hasOldWord(u)),
+  };
+}
+
 /** Signs in on the sign-in page already open (keeping its ?next=), as signIn does from a fresh one. */
 async function signInHere(page: Page, email: string, into: Company) {
   const before = codes(email).length;
@@ -654,10 +672,7 @@ test("lien-ket-cu: an old link goes through sign-in once translated and opens th
   const t = oldLinkTarget(w.mau.id);
   const view = "00000000-0000-4000-8000-000000000001";
   const oldLink = `/inventory?ho-so=${t.id}&vung=${encodeURIComponent(t.place)}&goc-nhin=${view}`;
-  const translations: string[] = [];
-  page.on("response", (r) => {
-    if (r.status() >= 300 && r.status() < 400 && hasOldWord(r.url())) translations.push(r.url());
-  });
+  const seen = watchTranslations(page);
   await page.context().clearCookies();
   await page.goto(oldLink);
   await expect(page, "lien-ket-cu: khong ve dang nhap").toHaveURL(/\/login\?next=/);
@@ -673,7 +688,8 @@ test("lien-ket-cu: an old link goes through sign-in once translated and opens th
   await expect(page.locator('[data-slot="record-panel"]'), "lien-ket-cu: ngan ho so").toContainText(
     t.code,
   );
-  expect(translations, "lien-ket-cu: so buoc dich").toHaveLength(1);
+  expect(seen.steps(), "lien-ket-cu: so buoc dich").toHaveLength(1);
+  expect(seen.documents.filter(hasOldWord), "lien-ket-cu: vong lap dich").toHaveLength(1);
 });
 
 test("lien-ket-cu: đối chứng — the same link in English takes no translation step", async ({
@@ -682,16 +698,14 @@ test("lien-ket-cu: đối chứng — the same link in English takes no translat
   test.skip(info.project.name !== "1440", "do o 1440");
   const w = await world(info, "lkm");
   const t = oldLinkTarget(w.mau.id);
-  const translations: string[] = [];
-  page.on("response", (r) => {
-    if (r.status() >= 300 && r.status() < 400 && hasOldWord(r.url())) translations.push(r.url());
-  });
   await signIn(page, w.email, w.mau);
+  const seen = watchTranslations(page);
   await openInventory(page, `/inventory?record=${t.id}&place=${encodeURIComponent(t.place)}`);
   await expect(page.locator('[data-slot="record-panel"]'), "doi-chung: ngan ho so").toContainText(
     t.code,
   );
-  expect(translations, "doi-chung: co buoc dich").toHaveLength(0);
+  expect(seen.documents.length, "doi-chung: khong thay trang nao").toBeGreaterThan(0);
+  expect(seen.steps(), "doi-chung: co buoc dich").toHaveLength(0);
 });
 
 test("old link images: an old link at 1440, for the judge (URL_ANH=1)", async ({ page }, info) => {
