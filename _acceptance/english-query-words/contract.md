@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: []
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-23T09:20:13Z
 design_doc: docs/superpowers/specs/2026-11-23-english-query-words-design.md
@@ -95,3 +95,15 @@ chín từ trên năm vùng, kèm cặp phá thử.
   - bài đơn vị của bảng dịch : ca chứng từ cũ được dịch, công tắc dev cũ không được dịch
   - bài trình duyệt mở liên kết cũ : ca AC-4
   - bài trình duyệt hay bài đơn vị chứng `?vai=`, `?mau=bien`, `?quyen=khong` không còn tác dụng : ca AC-5
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-23:
+  - Ngoài-1: ca đối chứng liên kết tiếng Anh không thể đỏ; một lần tải lại thừa trên liên kết mới sẽ không bị bắt.
+  - Ngoài-2: cùng ca đối chứng ấy là một khẳng định phủ định chưa có đối chứng dương thật.
+  - Ngoài-3: ảnh bước 2 của bàn chấm liên kết cũ trùng ảnh bước 1, nên hồ sơ thiếu ảnh chứng địa chỉ mới.
+  - Ngoài-4: bộ đếm bước dịch tính mọi lần tải trang không còn từ cũ đứng sau một trang có từ cũ, không kiểm đó đúng là bước dịch.
+  - Ngoài-5: thay đổi chạm công cụ kiểm tra được bảo vệ của kho, nên gộp cần chủ mã duyệt.
+  - Ngoài-6: luật giữ mã màn cũ khi đổi tên màn chưa có trang quyết định riêng.
+  - Ngoài-7: từ công tắc quyền của bản mẫu hành vi được viết ở hai chỗ, đổi một chỗ có thể quên chỗ kia.
+  - Ngoài-8: ca ghi của ngăn hồ sơ chỉ so hai hằng, chưa thử địa chỉ thật được ghi ra.
+  - Ngoài-9: chưa có ca chứng từ tìm cũ đứng một mình không còn lọc Bảng hàng.
+  - Ngoài-10: ca đi qua trang đăng nhập chưa nối hai bước với nhau; ca trình duyệt phủ phần còn lại.
+  - Ngoài-12: ca liên kết cũ qua trang đăng nhập chỉ kiểm có từ nơi, không so giá trị nơi.

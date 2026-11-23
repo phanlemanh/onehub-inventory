@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 9f090aab680886a9c3a1ad48e452ea57423ec998
-human_signoff:
+human_signoff: Manh Phan 2026-11-23
 ---
 
 # Evidence Report: english-query-words
