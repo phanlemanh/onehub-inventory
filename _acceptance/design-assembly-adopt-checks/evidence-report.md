@@ -1,13 +1,13 @@
 ---
 schema_version: 2
 feature_slug: design-assembly-adopt-checks
-verdict: REJECT
-failed_evals: [E4, E6]
+verdict: PASS
+failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: b31b78dd8ab8936f1593177a52e78d6b132562d6
+verified_commit: 91c68290cfd77d563b8fe21864f9876ce52195be
 human_signoff:
 ---
 
@@ -18,9 +18,9 @@ human_signoff:
 | E1 | AC-1 | script | PASS |
 | E2 | AC-2 | script | PASS |
 | E3 | AC-3 | test | PASS |
-| E4 | AC-2 | script | FAIL |
+| E4 | AC-2 | script | PASS |
 | E5 | AC-3 | script | PASS |
-| E6 | AC-4 | script | FAIL |
+| E6 | AC-4 | script | PASS |
 | E7 | AC-5 | script | PASS |
 
 ## Evidence
@@ -28,11 +28,12 @@ human_signoff:
 - eval: E1
   run_id: minted-design-assembly-adopt-checks-E1-r1
   exit_code: 0
-  baseline: green
+  baseline: n-a
   verifier: config:executors.script.check
   verified_at: 2026-11-23T01:59:35Z
+  carried_from_round: 1
   output: |
-    make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance
+    carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E2
   run_id: minted-design-assembly-adopt-checks-E2-r1
@@ -40,8 +41,9 @@ human_signoff:
   baseline: n-a
   verifier: _acceptance/design-assembly-adopt-checks/rang/chay.sh
   verified_at: 2026-11-23T01:59:35Z
+  carried_from_round: 1
   output: |
-    pointers: 10 rows point at their check
+    carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E3
   run_id: minted-design-assembly-adopt-checks-E3-r1
@@ -49,38 +51,37 @@ human_signoff:
   baseline: n-a
   verifier: _acceptance/design-assembly-adopt-checks/rang/chay.sh
   verified_at: 2026-11-23T01:59:35Z
+  carried_from_round: 1
   output: |
-    unit tests of tests/format.test.ts and tests/grid.test.tsx passed, no output line beyond the runner summary
+    carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E4
-  run_id: minted-design-assembly-adopt-checks-E4-r1
-  exit_code: 1
+  run_id: minted-design-assembly-adopt-checks-E4-r2
+  exit_code: 0
   baseline: n-a
   verifier: _acceptance/design-assembly-adopt-checks/rang/chay.sh
-  verified_at: 2026-11-23T01:59:35Z
+  verified_at: 2026-11-23T06:12:12Z
   output: |
-    tests 17, pass 16, fail 1
-    failing: shape: green on the repository (hai-chieu.mjs:96)
-    shape: file changed outside the matrix: docs/superpowers/plans/2026-11-23-design-assembly-adopt-checks.md
-    expected 0 from the shape run on the repository, got 1
+    ℹ duration_ms 664.928541
 
 - eval: E5
   run_id: minted-design-assembly-adopt-checks-E5-r1
   exit_code: 0
-  baseline: red
+  baseline: n-a
   verifier: config:executors.script.e2e
   verified_at: 2026-11-23T01:59:35Z
+  carried_from_round: 1
   output: |
-    gac-hydration: 0 canh bao
+    carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E6
-  run_id: minted-design-assembly-adopt-checks-E6-r1
-  exit_code: 1
+  run_id: minted-design-assembly-adopt-checks-E6-r2
+  exit_code: 0
   baseline: n-a
   verifier: _acceptance/design-assembly-adopt-checks/rang/chay.sh
-  verified_at: 2026-11-23T01:59:35Z
+  verified_at: 2026-11-23T06:12:12Z
   output: |
-    shape: file changed outside the matrix: docs/superpowers/plans/2026-11-23-design-assembly-adopt-checks.md
+    shape: 8 rows gained a check, 2 rows added, no other row changed; files changed: 5
 
 - eval: E7
   run_id: minted-design-assembly-adopt-checks-E7-r1
@@ -88,17 +89,26 @@ human_signoff:
   baseline: n-a
   verifier: _acceptance/design-assembly-adopt-checks/rang/chay.sh
   verified_at: 2026-11-23T01:59:35Z
+  carried_from_round: 1
   output: |
-    rules: Controls says 24px as design/theme.json holds; Type says headings in var(--font-sans) as design/theme.json holds; one known wrong line
+    carry-forward tu round 1 — delta khong cham paths cua eval
 
 ### Lệnh suite (hồi quy)
 
-- cmd: npm run build
-  run_id: minted-design-assembly-adopt-checks-SUITE-build-r1
+- cmd: make check
+  run_id: minted-design-assembly-adopt-checks-SUITE-make_check-r2
   exit_code: 0
-  verified_at: 2026-11-23T01:59:35Z
+  verified_at: 2026-11-23T06:12:12Z
 
-Lệnh fail không gắn eval: không có. Hai lệnh fail đều gắn eval: lệnh two-way gắn E4, lệnh shape gắn E6.
+- cmd: npm run build
+  run_id: minted-design-assembly-adopt-checks-SUITE-build-r2
+  exit_code: 0
+  verified_at: 2026-11-23T06:12:12Z
+
+- cmd: DATABASE_URL= make e2e
+  run_id: minted-design-assembly-adopt-checks-SUITE-DATABASE_URL_make_e2e-r2
+  exit_code: 0
+  verified_at: 2026-11-23T06:12:12Z
 
 ## Known limits
 
@@ -106,20 +116,20 @@ Lệnh fail không gắn eval: không có. Hai lệnh fail đều gắn eval: l�
 
 ## Analyst
 
-Non-discriminating (xanh cả trên HEAD lẫn baseline):
+carried tu round 1 — baseline khong do lai round nay.
+
+Eval khong-phan-biet (xanh ca tren HEAD lan baseline, chung minh harness chu khong phai feature):
 - make check (E1)
 
-Baseline không đo:
-- bash _acceptance/design-assembly-adopt-checks/rang/chay.sh pointers: bo qua baseline: tep _acceptance/design-assembly-adopt-checks/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 9bf4054f6cb2bd2509277830b6c35d3c6297295d — eval moi, chay tren code cu khong phan biet gi
-- bash _acceptance/design-assembly-adopt-checks/rang/chay.sh unit: bo qua baseline: tep _acceptance/design-assembly-adopt-checks/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 9bf4054f6cb2bd2509277830b6c35d3c6297295d — eval moi, chay tren code cu khong phan biet gi
-- bash _acceptance/design-assembly-adopt-checks/rang/chay.sh two-way: bo qua baseline: tep _acceptance/design-assembly-adopt-checks/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 9bf4054f6cb2bd2509277830b6c35d3c6297295d — eval moi, chay tren code cu khong phan biet gi
-- bash _acceptance/design-assembly-adopt-checks/rang/chay.sh shape: bo qua baseline: tep _acceptance/design-assembly-adopt-checks/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 9bf4054f6cb2bd2509277830b6c35d3c6297295d — eval moi, chay tren code cu khong phan biet gi
-- bash _acceptance/design-assembly-adopt-checks/rang/chay.sh rules: bo qua baseline: tep _acceptance/design-assembly-adopt-checks/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 9bf4054f6cb2bd2509277830b6c35d3c6297295d — eval moi, chay tren code cu khong phan biet gi
+Baseline khong do: round nay khong do lai (evals.yaml khong doi tu lan baseline cuoi); moi eval ghi n-a.
+
+Khong co eval judgment nen khong co panel judge.
 
 ## Variance
 
-none — mọi eval chạy một lần và đều xác định, không có eval nhiều lần chạy.
+none — every multi-run eval is uniform (moi eval chay 1 lan, deterministic)
 
 ## Iterations
 
-Round 1: E4, E6 failed — kế hoạch docs/superpowers/plans/2026-11-23-design-assembly-adopt-checks.md (thêm ở b31b78dd) nằm ngoài danh sách tệp được phép của phép đo shape, nên shape đỏ trên kho và E4 mất một bài (16/17). Returned to implementation.
+Round 1: E4, E6 failed — kế hoạch của hồ sơ nằm ngoài danh sách tệp được phép của ma trận (AC-4). Returned to implementation.
+Round 2: E4, E6 chạy lại sau bản sửa, đạt; E1, E2, E3, E5, E7 carry-forward từ round 1 vì delta không chạm paths của chúng. Verdict PASS.

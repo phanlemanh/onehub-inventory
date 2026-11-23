@@ -5,7 +5,7 @@ slug: design-assembly-adopt-checks
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [config, tooling]
-status: implemented
+status: machine-cleared
 approved_by: Manh Phan
 approved_at: 2026-11-23
 design_doc: docs/superpowers/specs/2026-11-23-design-assembly-adopt-checks-design.md
@@ -75,3 +75,5 @@ Phủ theo từng thứ nhánh đổi và bên đọc của nó; không quét kh
 - Trang luật cho tác tử ghi «Running text is set in `undefined`» và dẫn tới `design/blueprint.json` không có trong kho
   (Hỏi-1). AC-5 giữ rằng đó là dòng sai duy nhất và hai luật có số của trang khớp dữ liệu kiểm tra; cổng vẫn giữ phông bằng
   hai dòng `font-loaded`, `typeface`.
+- Ngoài-1 (máy định tuyến 2026-11-23, đề xuất S4 known-limits): Một quyết định thiết kế có thể được tính là đã có kiểm tra chỉ vì tệp kiểm thử còn dòng ghi chú mang tên nó, dù chưa chắc có bài kiểm thử nào thật sự giữ quyết định đó. Người dùng cuối không thấy gì khác ngay, nhưng sau này một quyết định có thể mất kiểm tra mà bộ kiểm không báo. — `_acceptance/design-assembly-adopt-checks/rang/kiem.mjs`
+- Ngoài-2 (máy định tuyến 2026-11-23, đề xuất S4 known-limits): Phép đo có thể báo đúng tám dòng được thêm kiểm tra trong khi một dòng thật ra chỉ bị đổi kiểm tra cũ. Với nhánh này điều đó không xảy ra, nên người dùng không bị ảnh hưởng. — `_acceptance/design-assembly-adopt-checks/rang/kiem.mjs`
