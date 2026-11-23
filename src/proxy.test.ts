@@ -16,7 +16,7 @@ describe("proxy for prototype pages (decision 0043)", () => {
     for (const url of [
       "/",
       "/inventory",
-      "/inventory?vai=ListAgent",
+      "/inventory?role=ListAgent",
       "/api/v1/health",
       "/login",
       "/prototype",
