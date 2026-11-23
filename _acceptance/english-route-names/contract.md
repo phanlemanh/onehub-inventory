@@ -92,8 +92,11 @@ bằng lệnh quét chữ cũ E1 (mỗi dòng của bảng một mẫu) và cặ
 
 - Không bảng nào lưu địa chỉ màn hay tên phần: `saved_view.screen` chỉ nhận `inventory` (`db/migrations/009_goc_nhin.sql`),
   `view.query` là chữ tìm. Dữ liệu đã lưu không cần đổi.
-- Danh sách giữ ghim (`rang/giu.txt`, tệp : mẫu : lý do) — chỉ hai dòng, đều là tên ảnh bằng chứng mà tệp chứng minh màn của
-  hồ sơ đã ký trích (`evidence/tuy-chinh-san-<khổ>.png`), ghi khi chạy với cờ chụp ảnh:
-  - `tests/e2e-db/lop-rieng.spec.ts` : `tuy-chinh-san-` : ảnh của `_acceptance/lop-rieng-cua-san/chung-minh-man.md`
-  - `tests/e2e-db/thue-phi.spec.ts` : `tuy-chinh-san` (tên khung `proof`) : ảnh của `_acceptance/thue-phi/chung-minh-man.md`
-  Mã hàng trong lời chú và đường `.acceptance-runs/<hồ sơ>/` không khớp mẫu nào nên không cần dòng giữ.
+- Danh sách giữ ghim (`rang/giu.txt`, cùng sáu dòng với `PINNED` trong `rang/old-names.mjs`; tệp : chữ trên dòng : lý do):
+  - `tests/e2e-db/lop-rieng.spec.ts` : `${OUT}/tuy-chinh-san-` : ảnh bằng chứng mà `_acceptance/lop-rieng-cua-san/chung-minh-man.md` trích
+  - `tests/e2e/bo-nut.spec.ts` : `/tuy-chinh-san` : ca `dia-chi-cu-khong-con` mở địa chỉ cũ để chứng nó không còn
+  - `tests/e2e/bo-nut.spec.ts` : `/proto/bo-nut-theo-quyen` : cùng ca ấy
+  - `tests/company-layer-route.test.ts` : `?phan=` : ca `doc-phan` chứng `?phan=` không còn được đọc
+  - `tests/e2e-db/lop-rieng.spec.ts` : `?phan=` : ca `phan-cu-khong-doc`, cùng lý do
+  - `design/screens/proto-permitted-actions.yaml` : `proto-bo-nut` : khoá `old_ids` của sổ màn
+  Tên ảnh `tuy-chinh-san` của `tests/e2e-db/thue-phi.spec.ts` (tên khung `proof`) không khớp mẫu nào nên không cần dòng giữ.

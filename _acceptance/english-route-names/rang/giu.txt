@@ -1,0 +1,7 @@
+# file<TAB>literal on the line<TAB>reason — pinned in rang/old-names.mjs (PINNED)
+tests/e2e-db/lop-rieng.spec.ts	${OUT}/tuy-chinh-san-	ảnh bằng chứng mà _acceptance/lop-rieng-cua-san/chung-minh-man.md trích
+tests/e2e/bo-nut.spec.ts	/tuy-chinh-san	ca dia-chi-cu-khong-con mở địa chỉ cũ để chứng nó không còn
+tests/e2e/bo-nut.spec.ts	/proto/bo-nut-theo-quyen	ca dia-chi-cu-khong-con mở địa chỉ cũ để chứng nó không còn
+tests/company-layer-route.test.ts	?phan=	ca doc-phan chứng ?phan= không còn được đọc
+tests/e2e-db/lop-rieng.spec.ts	?phan=	ca phan-cu-khong-doc chứng ?phan= không còn được đọc
+design/screens/proto-permitted-actions.yaml	proto-bo-nut	khoá old_ids của sổ màn: hồ sơ đã ký còn khai mã cũ
