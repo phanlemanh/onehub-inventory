@@ -132,7 +132,7 @@ def path_of(repo: Repo, screen: str) -> str:
 
 
 def product_screens(repo: Repo, c: Contract) -> list[str]:
-    return [s for s in c.screens if (repo.screens.get(s) or {}).get("audience") != "dev"]
+    return [s for s in c.screens if repo.screen(s).get("audience") != "dev"]
 
 
 # ---------------------------------------------------------------- grounds
@@ -407,7 +407,7 @@ def check_family(repo: Repo, screen: str, p: ScreenProof, emit) -> None:
         return
     r = rows[0]
     proposed = bare(r.get("họ đề xuất", ""))
-    actual = (repo.screens.get(screen) or {}).get("family")
+    actual = repo.screen(screen).get("family")
     if fold(proposed) == NO_FAMILY:
         if actual is not None:
             emit("ho-lech-so-man", f"ghi họ rỗng mà design/screens.yaml ghi '{actual}'")
@@ -671,6 +671,10 @@ def run(root: Path) -> tuple[list[Finding], Tally, dict[str, int]]:
         findings.extend(undeclared)
 
     for c in contracts:
+        if c.status in OPEN:
+            for s in c.screens:
+                if s in repo.old_ids:
+                    findings.append(Finding(c.slug, s, "ma-man-cu", f"screen '{s}' is an old id of '{repo.old_ids[s]}'"))
         new = repo.ledger_present and c.slug not in repo.transition
         wrapped = False
         if c.wrapper is not None and c.status in OPEN:

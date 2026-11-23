@@ -1,0 +1,24 @@
+id: company-layer
+route: /company-layer
+title: CompanyLayer
+family: grid
+audience: staff
+status: built
+# Renamed from tuy-chinh-san (english-route-names): signed contracts keep the old id, open ones must use the new one.
+old_ids: [tuy-chinh-san]
+vao_vung: /company-layer?part=pending-units
+vao: readCompanyLayer
+# Parts (?part=): the grid parts labels, fields, aliases, pending-units, templates hold the CompanyLayer buttons; the
+# Thuế phí part (?part=fee-schedule, row 19) has one button, setFeeSchedule.
+nut: [addCompanyLayer, editCompanyLayer, retireCompanyLayer, matchPendingUnits, setFeeSchedule]
+mo_san: [addCompanyLayer]
+nut_chung: [Lọc, Cột, Toàn màn hình]
+hien:
+  - CompanyLabel
+  - CustomField
+  - CompanyValueAlias
+  - ImportTemplate
+  - PendingUnit
+  - FeeItem
+  - Listing
+  - Unit

@@ -129,15 +129,15 @@ describe("giu-moi-man", () => {
     // The frame first, then the screens in the order of their ids: the register is one file per screen (design/screens).
     expect(sections(ROOT).map((s) => s.id)).toEqual([
       "khung",
+      "company-layer",
       "contacts",
       "inventory",
       "members",
       "proto",
-      "proto-bo-nut",
+      "proto-permitted-actions",
       "sent",
       "sign-in",
       "today",
-      "tuy-chinh-san",
     ]);
   });
 });

@@ -1,0 +1,1 @@
+english-route-names: /tuy-chinh-san → /company-layer, ?phan= → ?part= (labels, fields, aliases, pending-units, templates, fee-schedule), /proto/bo-nut-theo-quyen → /proto/permitted-actions (board, screen, role, open); screen ids company-layer, proto-permitted-actions with old_ids

@@ -3,14 +3,39 @@
 import type { ConceptCode } from "@/generated/labels";
 
 import type { FieldKind } from "../rules";
-import type { LayerProblem } from "../store";
+import type { LayerPart, LayerProblem } from "../store";
 
-/** The five parts shown as a grid (row 7e). */
-export const GRID_PARTS = ["nhan", "truong", "tu-dien", "can-cho", "mau"] as const;
+/** The five parts shown as a grid (row 7e), named as the API names them (`/api/v1/company-layer/<part>`). */
+export const GRID_PARTS = [
+  "labels",
+  "fields",
+  "aliases",
+  "pending-units",
+  "templates",
+] as const satisfies readonly LayerPart[];
 export type GridPart = (typeof GRID_PARTS)[number];
-/** Every part of the screen, in the order of the second column: the grid parts, then the fee part (row 19). */
-export const LAYER_PARTS_SHOWN = [...GRID_PARTS, "thue-phi"] as const;
+/** Every part of the screen, in the order of the second column: the grid parts, then the fee part (row 19), named as
+ * its API is (`/api/v1/company/fee-schedule`). */
+export const LAYER_PARTS_SHOWN = [...GRID_PARTS, "fee-schedule"] as const;
 export type ShownPart = (typeof LAYER_PARTS_SHOWN)[number];
+
+/** The company layer screen's address. */
+export const LAYER_ROUTE = "/company-layer";
+
+/** The part a request opens: `?part=` when it names a part, else the first one. A repeated `?part=` keeps its first
+ * value. */
+export function layerPartFrom(query: Record<string, string | string[] | undefined>): ShownPart {
+  const raw = query["part"];
+  const asked = Array.isArray(raw) ? raw[0] : raw;
+  return (LAYER_PARTS_SHOWN as readonly unknown[]).includes(asked)
+    ? (asked as ShownPart)
+    : "labels";
+}
+
+/** The address of one part: the first part at the screen's own address, every other with `?part=`. */
+export function layerPartHref(part: ShownPart): string {
+  return part === "labels" ? LAYER_ROUTE : `${LAYER_ROUTE}?part=${part}`;
+}
 
 /** Region states a development build may open with `?state=`, like the inventory's. */
 export const FORCED_STATES = ["loading", "empty", "error", "partial", "forbidden"] as const;
@@ -24,29 +49,29 @@ export function forcedStateFrom(param: unknown, env: string | undefined): Forced
 
 /** The concept each part is named by in the label table. */
 export const PART_TITLE: Record<ShownPart, ConceptCode> = {
-  nhan: "CompanyLabel",
-  truong: "CustomField",
-  "tu-dien": "ValueDictionary",
-  "can-cho": "PendingUnit",
-  mau: "ImportTemplate",
-  "thue-phi": "FeeSchedule",
+  labels: "CompanyLabel",
+  fields: "CustomField",
+  aliases: "ValueDictionary",
+  "pending-units": "PendingUnit",
+  templates: "ImportTemplate",
+  "fee-schedule": "FeeSchedule",
 };
 
 export const LAYER_COPY = {
   screenWhy: "Những gì sàn đã gọi riêng, thêm riêng và nhớ riêng so với chuẩn chung.",
   partWhy: {
-    nhan: "Chữ sàn dùng thay tên cột chuẩn.",
-    truong: "Cột sàn có mà chuẩn chung không có, hiện sau các cột chuẩn.",
-    "tu-dien": "Chữ sàn quen viết ứng với giá trị chuẩn nào.",
-    "can-cho": "Những căn sàn có mà danh mục chung chưa có.",
-    mau: "Dạng tệp Sheet đã nhập và cột nào đi vào đâu.",
+    labels: "Chữ sàn dùng thay tên cột chuẩn.",
+    fields: "Cột sàn có mà chuẩn chung không có, hiện sau các cột chuẩn.",
+    aliases: "Chữ sàn quen viết ứng với giá trị chuẩn nào.",
+    "pending-units": "Những căn sàn có mà danh mục chung chưa có.",
+    templates: "Dạng tệp Sheet đã nhập và cột nào đi vào đâu.",
   } satisfies Record<GridPart, string>,
   empty: {
-    nhan: "Chưa đặt chữ riêng nào. Chữ riêng cũng sinh ra khi nhập bảng hàng.",
-    truong: "Chưa có cột riêng nào. Cột riêng cũng sinh ra khi nhập bảng hàng.",
-    "tu-dien": "Chưa có cặp chữ nào. Các cặp chữ cũng sinh ra khi nhập bảng hàng.",
-    "can-cho": "Không có căn nào chờ khớp với danh mục.",
-    mau: "Chưa có mẫu nào. Mẫu sinh ra sau lần nhập bảng hàng đầu tiên.",
+    labels: "Chưa đặt chữ riêng nào. Chữ riêng cũng sinh ra khi nhập bảng hàng.",
+    fields: "Chưa có cột riêng nào. Cột riêng cũng sinh ra khi nhập bảng hàng.",
+    aliases: "Chưa có cặp chữ nào. Các cặp chữ cũng sinh ra khi nhập bảng hàng.",
+    "pending-units": "Không có căn nào chờ khớp với danh mục.",
+    templates: "Chưa có mẫu nào. Mẫu sinh ra sau lần nhập bảng hàng đầu tiên.",
   } satisfies Record<GridPart, string>,
   col: {
     concept: "Khái niệm chuẩn",
