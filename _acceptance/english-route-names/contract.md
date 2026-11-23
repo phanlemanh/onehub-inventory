@@ -103,3 +103,13 @@ bằng lệnh quét chữ cũ E1 (mỗi dòng của bảng một mẫu) và cặ
   - `tests/e2e-db/thue-phi.spec.ts` : `"tuy-chinh-san"` : tên khung ảnh mà `_acceptance/thue-phi/chung-minh-man.md` trích
   - `tests/screen-old-ids.test.ts` : `tuy-chinh-san` : ca `old-ids` dựng hồ sơ khai mã cũ (AC-7)
   Mẫu mã màn cũ bắt cả mã trần `tuy-chinh-san` (khoá, mục danh sách), không chỉ địa chỉ `/tuy-chinh-san`.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-23:
+  - Ngoài-1: Thay đổi này chạm vào các công cụ kiểm tra được bảo vệ nên phải có chủ mã duyệt mới được gộp, không tự gộp được.
+  - Ngoài-2: Công cụ kiểm tra chữ cũ có thể bỏ sót nếu sau này ai đó đưa địa chỉ cũ trở lại trong sổ màn của màn Tuỳ chỉnh của sàn.
+  - Ngoài-3: Bộ quét chữ cũ miễn cho cả hai tệp thay vì chỉ một dòng, nên nếu địa chỉ cũ quay lại ở đó thì có thể không bị báo.
+  - Ngoài-4: Quy tắc đọc mã màn cũ nằm ở hai nơi nên sau này có thể lệch nhau.
+  - Ngoài-5: Nếu cổng kiểm hồ sơ đang mở lặng lẽ ngừng chặn mã màn cũ, việc này có thể chưa bị phát hiện ngay.
+  - Ngoài-7: Phép thử thử-phá có thể báo đỏ vì công cụ hỏng chứ không vì đúng lý do.
+  - Ngoài-8: Phép quét chữ cũ có thể bỏ qua một dòng chữ cũ thêm vào sau này nếu nó nằm cùng tệp với dòng được giữ.
+  - Ngoài-9: Phép quét có thể bỏ sót vài cách viết tên phần cũ.
+  - Ngoài-10: Nếu hai nhãn trong cột bên bị đổi chỗ nhầm, bài kiểm hiện tại có thể không báo.

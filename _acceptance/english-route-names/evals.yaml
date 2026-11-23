@@ -32,7 +32,7 @@ evals:
   - id: E2
     criterion: AC-2
     executor: test
-    cmd: npx vitest run tests/company-layer-route.test.ts src/modules/company-config/ui --coverage.enabled=false --reporter=verbose
+    cmd: bash _acceptance/english-route-names/rang/chay.sh E2
     paths: [src/modules/company-config/ui/**, src/app/(app)/nav.ts, src/app/(app)/company-layer/**, tests/company-layer-route.test.ts]
     expected: "exit 0; ca 'doc-phan' đủ 9 ca viết trước (labels, fields, aliases, pending-units, templates, fee-schedule, vắng → labels, 'xyz' → labels, chỉ ?phan=can-cho → labels); ca 'cot-hai' so đủ 6 mục: /company-layer, /company-layer?part=fields, ?part=aliases, ?part=pending-units, ?part=templates, ?part=fee-schedule, nhãn từ label(); ca 'vai-khong-quyen' (AC-1) vẽ trang như máy chủ với cửa quyền trả «không có phạm vi» và thấy khối «Không đủ quyền» chung, không phần nào (đối chứng: có quyền thì vẽ phần labels; chiều đỏ: bỏ chốt quyền ở page.tsx → đỏ «vai-khong-quyen: khoi»); layer-screen.test.tsx xanh với data-part tên API. Chiều đỏ: pha-thu-doc-phan (đọc lại query.phan) đỏ với «doc-phan: ?phan=can-cho»"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
@@ -40,7 +40,7 @@ evals:
   - id: E3
     criterion: AC-3
     executor: test
-    cmd: npx vitest run tests/company-layer-route.test.ts --coverage.enabled=false --reporter=verbose
+    cmd: bash _acceptance/english-route-names/rang/chay.sh E3
     paths: [src/app/(app)/nav.ts, tests/company-layer-route.test.ts]
     expected: "exit 0; ca 'cot-hai' xanh: sáu href và sáu nhãn đúng thứ tự viết trước; thêm hay bớt một mục thì hằng 6 đỏ"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
@@ -56,7 +56,7 @@ evals:
   - id: E5
     criterion: AC-6
     executor: test
-    cmd: npx vitest run tests/vai-man-so-man.test.ts tests/vai-man-nut-sinh.test.ts tests/bo-nut-vai-man.test.ts tests/vong-doi-thao-tac.test.ts tests/coverage-matrix.test.ts tools/e2e_templates --coverage.enabled=false --reporter=verbose
+    cmd: bash _acceptance/english-route-names/rang/chay.sh E5
     paths: [design/screens/**, tests/vai-man-*.ts, tests/bo-nut-vai-man.test.ts, tests/vong-doi-thao-tac.test.ts, tests/coverage-matrix.test.ts, tools/e2e_templates/**]
     expected: "exit 0; sổ màn có company-layer và proto-permitted-actions, không có tuy-chinh-san hay proto-bo-nut; bảng vai × màn × nút sinh mục company-layer và proto-permitted-actions; bộ bài theo sổ màn dựng ca vùng ở /company-layer?part=pending-units"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
@@ -79,7 +79,7 @@ evals:
   - id: E8
     criterion: AC-5
     executor: test
-    cmd: npx playwright test tests/e2e/bo-nut.spec.ts --project=1440
+    cmd: bash _acceptance/english-route-names/rang/chay.sh E8
     paths: [src/app/(app)/**, tests/e2e/bo-nut.spec.ts]
     expected: "exit 0; ca 'dia-chi-cu-khong-con' xanh: hai địa chỉ cũ trả 404 và trang không có, không chuyển hướng"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
