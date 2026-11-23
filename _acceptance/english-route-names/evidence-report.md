@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 2a4be2c49592b96046cdbd3ff78625739f42b197
+verified_commit: fe25c1bd0271c39109b24f8bad2aa7b65cc8a94b
 human_signoff: Manh Phan 2026-11-23
 ---
 
@@ -209,3 +209,7 @@ none — every multi-run eval is uniform
 Round 1: E7, E10, E11, E12, E13, E14-ui, E15 verified (run-log r1); chuyen sang round 2 de chay lai cac eval bi delta cham.
 Round 2: E1, E4, E9 verified lai (run-log r2); phan con lai carry-forward tu round 1.
 Round 3: E1-pha, E2, E3, E5, E6, E8 va hai lenh suite chay lai tren commit 2a4be2c4 (lenh eval chuyen sang rang/chay.sh); E1, E4, E7, E9-E15 carry-forward, PASS.
+
+### Re-pin lần 1 — 2026-11-23, do main merged into the branch (PR #111): design/decisions.yaml, design/theme.json, .claude/rules/design-assembly.md
+run_id: repin-20261123T090056Z-70218
+sha: fe25c1bd0271c39109b24f8bad2aa7b65cc8a94b · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng · ngoài làn máy: E14-ui
