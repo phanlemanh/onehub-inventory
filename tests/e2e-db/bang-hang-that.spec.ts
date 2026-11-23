@@ -14,7 +14,7 @@ import { statusLabel } from "../../src/lib/format";
 import { label } from "../../src/modules/company-config";
 import { companyListingId, seedSampleInventory } from "../db/can-mau";
 import { cardCodes, isPhone, phoneCards, regionReady } from "../e2e/phone-list";
-import { pageReady, suaTrang } from "../e2e/sua-trang";
+import { chupAnh, pageReady, suaTrang } from "../e2e/sua-trang";
 
 let owner: pg.Client;
 test.beforeAll(async () => {
@@ -704,7 +704,7 @@ test("old link images: an old link at 1440, for the judge (URL_ANH=1)", async ({
   await expect(page.locator('[data-slot="record-panel"]')).toContainText(t.code);
   const dir = ".acceptance-runs/english-query-words";
   mkdirSync(dir, { recursive: true });
-  await page.screenshot({ path: `${dir}/old-link-1440.png` });
+  await chupAnh(page, { path: `${dir}/old-link-1440.png` });
   console.log(`lien ket cu: ${oldLink}`);
   console.log(`can va noi mong doi: ${t.code} · ${t.place}`);
   console.log(`dia chi cuoi: ${new URL(page.url()).pathname}${new URL(page.url()).search}`);
