@@ -139,7 +139,10 @@ cases["change-list"] = () => {
     red("change-list with a word changed on another record's map line", notDrawn("PRODUCT-MAP.md"), "change-list.mjs", root);
     page("PRODUCT-MAP.md", "(hàng 3f)", "(hàng 4f)");
     red("change-list with one digit changed on another record's map line", notDrawn("PRODUCT-MAP.md"), "change-list.mjs", root);
-    page("PRODUCT-MAP.md", "20 việc", "21 việc");
+    // The count of «Đã giao» as the page has it now, plus one: main moves this count.
+    const shipped = readFileSync(path.join(ROOT, "PRODUCT-MAP.md"), "utf8").match(/Đã giao<br\/>(\d+) việc/);
+    if (!shipped) throw new Error("PRODUCT-MAP.md has no count for «Đã giao»");
+    page("PRODUCT-MAP.md", `Đã giao<br/>${shipped[1]} việc`, `Đã giao<br/>${Number(shipped[1]) + 1} việc`);
     red("change-list with one digit changed on a stage count the records do not give", notDrawn("PRODUCT-MAP.md"), "change-list.mjs", root);
     page("LO-TRINH.html", "<b>2</b> — kế hoạch", "<b>4</b> — kế hoạch");
     red("change-list with one digit changed on another row of the roadmap page", notDrawn("LO-TRINH.html"), "change-list.mjs", root);
