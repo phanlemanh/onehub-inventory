@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 615e807840635ec3ed1fe264c180ee664e29f712
+verified_commit: 5df01192cd67b8096f8018303b1501e66a2ba39f
 human_signoff:
 ---
 
@@ -174,3 +174,7 @@ none — every multi-run eval is uniform
 Round 1: three in-contract findings fixed (commit c3b0313e); evidence recorded, E1 run here.
 Round 2: PASS (commit 1986145f), stop-patching on the drawn-page rule.
 Round 3: E2-E11 re-run on 615e80784063 and all pass, plus the three suite commands; E1 carried forward from round 1.
+
+### Re-pin lần 1 — 2026-11-23, do gộp nhánh chính (PR 109, kit 3.1.0) vào nhánh
+run_id: repin-20261123T002315Z-61827
+sha: 5df01192cd67b8096f8018303b1501e66a2ba39f · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng
