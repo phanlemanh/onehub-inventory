@@ -50,7 +50,7 @@ jobs:
       - name: Look for a green run with the same inputs
         id: earlier
         if: github.event_name == 'pull_request'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: .heavy-ok
           key: ${{ steps.key.outputs.key }}
@@ -81,7 +81,7 @@ jobs:
       # A key that is already saved (a run with the same inputs saved it first) is no failure.
       - if: steps.earlier.outputs.cache-hit != 'true'
         continue-on-error: true
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: .heavy-ok
           key: ${{ steps.key.outputs.key }}
@@ -116,7 +116,7 @@ jobs:
       - name: Look for a green run with the same inputs
         id: earlier
         if: github.event_name == 'pull_request'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: .heavy-ok
           key: ${{ steps.key.outputs.key }}
@@ -147,7 +147,7 @@ jobs:
       # A key that is already saved (a run with the same inputs saved it first) is no failure.
       - if: steps.earlier.outputs.cache-hit != 'true'
         continue-on-error: true
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: .heavy-ok
           key: ${{ steps.key.outputs.key }}
