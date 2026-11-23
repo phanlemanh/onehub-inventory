@@ -19,7 +19,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { ADDED, BASE, FILES, GAINED, KNOWN_DEFECT, LOG_FOLDER, RULES_PAGE, RULES_SECTIONS, TOOL } from "./matrix.mjs";
+import { ADDED, BASE, FILES, GAINED, GATE_VIEWS, KNOWN_DEFECT, LOG_FOLDER, RULES_PAGE, RULES_SECTIONS, TOOL } from "./matrix.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const [mode, ...rest] = process.argv.slice(2);
@@ -97,7 +97,7 @@ if (mode === "pointers") {
   const files = flag("--files")
     ? flag("--files").split(",").filter(Boolean)
     : git("diff", "--name-only", base, "HEAD").split("\n").filter(Boolean);
-  const changed = files.filter((file) => !file.startsWith("_acceptance/"));
+  const changed = files.filter((file) => !file.startsWith("_acceptance/") && !GATE_VIEWS.includes(file));
   for (const file of changed)
     if (!FILES.includes(file) && !(file.startsWith(LOG_FOLDER) && file.endsWith(".md")))
       faults.push(`shape: file changed outside the matrix: ${file}`);

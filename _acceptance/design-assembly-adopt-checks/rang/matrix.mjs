@@ -35,6 +35,11 @@ export const FILES = [
 ];
 export const LOG_FOLDER = "wiki/log/";
 
+// Views the gate ritual itself redraws from the acceptance records when a person approves or signs
+// (the approve and signoff commands stage them). They count with _acceptance/, not as a change of
+// the branch.
+export const GATE_VIEWS = ["PRODUCT-MAP.md", "LO-TRINH.html"];
+
 // The sections the regenerated rules page must have (AC-5), and the one known wrong line.
 export const RULES_PAGE = ".claude/rules/design-assembly.md";
 export const RULES_SECTIONS = ["Type", "A screen", "Questions only the owner answers", "No check holds these: a person reviews them", "Controls", "After a change"];
