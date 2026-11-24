@@ -1,0 +1,41 @@
+{
+  "feature_plain": "Mọi phiên làm việc và cổng kiểm của mọi PR ở kho này dùng bản kit nghiệm thu 3.1.1 — bản vá để lời «gộp» kèm chữ ký giữ chỗ không lọt qua nữa.",
+  "will_do": [
+    { "id": "AC-1", "p": "Sẽ ghim chợ plugin của phiên vào bản 3.1.1, chỉ đổi đúng một dòng; sáu plugin bật giữ nguyên." },
+    { "id": "AC-2", "p": "Sẽ xác nhận thẻ 3.1.1 trên kho kit trỏ đúng bản đã phát hành, năm gói lên 3.1.1, gói vẽ hình giữ 3.0.0." },
+    { "id": "AC-3", "p": "Sẽ ghim cổng kiểm của CI vào bản 3.1.1 bằng một dòng, áp từ bản vá giữ trong hồ sơ — chỉ khi anh cho (Hỏi-1)." },
+    { "id": "AC-4", "p": "Sẽ chạy bước kiểm bản cài mà ghi chú phát hành dặn, đòi kết quả «ĐẠT 8/8»." },
+    { "id": "AC-5", "p": "Sẽ chứng phần bản vá đổi không chạm thứ kho này chạy: lõi kiểm và bốn lệnh chấm giữ nguyên, khoá gộp theo lời không bật." },
+    { "id": "AC-6", "p": "Sẽ chạy cổng kiểm của cả hai bản trên mọi hồ sơ cũ và hồ sơ này, đòi cùng kết quả." },
+    { "id": "AC-7", "p": "Sẽ chạy cổng kiểm của CI trên nhánh này: có chạy luật, chỉ chặn đúng hồ sơ này trước chữ ký, sau chữ ký không chặn gì." },
+    { "id": "AC-8", "p": "Sẽ giữ bộ kiểm của kho xanh." },
+    { "id": "AC-9", "p": "Sẽ chứng mỗi phép đo biết đỏ: xanh trên vật lành, đỏ đúng câu ghim trên bản bị phá." }
+  ],
+  "wont_do": [
+    { "id": "OOS-1", "p": "Sẽ KHÔNG cài hay cập nhật plugin trên máy, không sửa cấu hình cá nhân — đó là việc của anh." },
+    { "id": "OOS-2", "p": "Sẽ KHÔNG bật khoá «gộp theo lời ký» hay khoá mới nào của kit, không sửa tệp luật chơi." },
+    { "id": "OOS-3", "p": "Sẽ KHÔNG ghim lại hồ sơ cũ, không sửa kho kit, không nhận các thay đổi kit gộp sau thẻ 3.1.1." },
+    { "id": "OOS-4", "p": "Sẽ KHÔNG tự gộp PR — chỉ gộp khi anh bảo trong phiên này." }
+  ],
+  "scope_plain": "Vòng chỉ đổi hai dòng ghim bản kit; mọi thứ khác giữ nguyên.",
+  "coverage_plain": [
+    { "i": 2, "p": "Phiên mở ở kho nạp chợ kit nào — AC-1 (một dòng ghim); máy đã cài đúng hay chưa là Hỏi-2." },
+    { "i": 3, "p": "Thẻ phát hành trỏ đúng bản và đúng số gói — AC-2 (thẻ và số bản)." },
+    { "i": 4, "p": "CI của mọi PR kéo kit bản nào — AC-3 (một dòng của CI) và AC-7 (cổng chạy thật)." },
+    { "i": 5, "p": "Bản cài sạch của thẻ đủ tám mục kiểm — AC-4 (kiểm bản cài)." },
+    { "i": 6, "p": "Bốn lệnh chấm của kho chạy tệp lõi không đổi — AC-5 (so hai bản)." },
+    { "i": 7, "p": "Cổng kiểm cho cùng phán quyết trên mọi hồ sơ khi đổi bản — AC-6 (cổng hai bản)." },
+    { "i": 8, "p": "Phần duy nhất bản vá đổi hành vi (gộp theo lời) không chạy ở kho này — AC-5 (khoá không bật)." },
+    { "i": 9, "p": "Cổng kiểm trên chính nhánh này — AC-7." },
+    { "i": 10, "p": "Bộ kiểm của kho còn xanh — AC-8." },
+    { "i": 11, "p": "Mỗi phép đo của hồ sơ biết đỏ — AC-9." },
+    { "i": 12, "p": "Bản cài plugin trên máy anh — ngoài phạm vi, của anh (Hỏi-2)." }
+  ],
+  "gap_probe_plain": [
+    { "i": 0, "p": "Máy định bỏ phép chạy cổng hai bản trên mọi hồ sơ cho nhanh — đó là đánh đổi của anh. Đã sửa: giữ cả hai phép đo (thêm AC-6), không còn gì phải hỏi." },
+    { "i": 1, "p": "Máy định gộp bước duyệt kế hoạch vào thẻ này dựa trên tiền lệ vòng trước — tiền lệ ấy không quyết cho vòng này. Đã sửa: thành Hỏi-3 cho anh." },
+    { "i": 2, "p": "Hợp đồng mặc định anh sẽ cho máy sửa dòng CI. Đã sửa: khai sẵn nhánh «không» — tiêu chí CI thu về hạn chế đã biết, máy sửa hợp đồng và trình lại." },
+    { "i": 3, "p": "Phép so bản chưa đo bốn lệnh chấm thật sự chạy tệp lõi. Đã sửa: AC-5 đọc bốn lệnh từ cấu hình kho, có chiều đỏ." },
+    { "i": 4, "p": "Phép đo cổng trên nhánh có thể xanh khi cổng không chạy luật nào. Đã sửa: đòi có luật chạy và, trước chữ ký, ít nhất một dòng chặn đúng hồ sơ này." }
+  ]
+}
