@@ -11,8 +11,8 @@ flowchart TD
   GD --> XL["Xếp lại sau<br/>chưa có"]
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
-  GP --> DL["Đang làm<br/>1 việc"] --> GB{"Cổng Bằng chứng"}
-  GB --> DG["Đã giao<br/>24 việc"]
+  GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
+  GB --> DG["Đã giao<br/>25 việc"]
   GB --> CN["Chờ phiên nghiệm thu<br/>53 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
@@ -33,10 +33,6 @@ flowchart TD
 - Đầu chủ đổi giá và đổi trạng thái ngay trong hồ sơ căn trên điện thoại, theo cùng luật với sửa trên ô của Bảng hàng (`sua-nhanh-tren-dien-thoai`)
 - Đầu chủ sửa được thông tin của căn ngoài giá và trạng thái — pháp lý, nội thất, tài chính, tình trạng sử dụng — ngay trong sản phẩm, không phải nhập lại tệp (`sua-thong-tin-can`)
 - Đầu chủ gõ mã căn để thêm căn, hoặc tạo căn tay khi danh mục chưa có (`them-can`)
-
-## Đang làm
-
-- Nâng kit nghiệm thu từ delivery-loop v3.1.0 lên v3.1.1 — bản vá chữ ký giữ chỗ của lệnh gộp theo lời, ở chợ của phiên và ở việc gate của CI (`nang-kit-3-1-1`)
 
 ## Đã giao — chờ phiên nghiệm thu
 
@@ -108,6 +104,7 @@ flowchart TD
 - Ca lùi bản sau khi xoay mật khẩu vai đăng nhập viết một lần trong sổ xoay khoá; mọi câu lùi bản khác của sổ vận hành trỏ tới đó, và một ca kiểm giữ luật ấy (`lui-ban-luc-xoay-mat-khau`)
 - Nâng kit nghiệm thu của kho từ v2.38.1 lên v3.0.0 của kho mới delivery-loop — CI kéo kit 3.0 theo thẻ, phiên Claude Code bật chợ mới, kit-root chỉ đọc bản cài của chợ mới (`nang-kit-3-0`)
 - Nâng kit nghiệm thu của phiên từ delivery-loop v3.0.0 lên v3.1.0 — bản mang trợ lý quyết định (mặc-ký có phủ quyết, giữ-quyền, kiểm mẫu) và chuyến gộp (`nang-kit-3-1`)
+- Nâng kit nghiệm thu từ delivery-loop v3.1.0 lên v3.1.1 — bản vá chữ ký giữ chỗ của lệnh gộp theo lời, ở chợ của phiên và ở việc gate của CI (`nang-kit-3-1-1`)
 - Chép lại công cụ design-assembly từ plugin — sổ linh kiện hết ghi trùng linh kiện xuất lại qua tệp gom (`refresh-design-assembly-tool`)
 - Gộp nhánh chính vào nhánh PR không vấp trang máy sinh LO-TRINH.html (một dòng .gitattributes + đoạn dạy dựng máy), thước của hồ sơ ra khỏi phạm vi quét CodeQL, và ghi quyết định nhịp nâng repo-setup (`roadmap-merge-driver`) — đã giao — máy thông, bằng chứng xanh-sạch
 - Tách sổ log của wiki ra khỏi git (mỗi mục một tệp ở wiki/log/, wiki/log.md vẽ ra); PR 1 trên 2 của bước tách sổ trong nâng cấp repo-setup 0.9.0 (`split-log-ledger`)

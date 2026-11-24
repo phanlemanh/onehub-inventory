@@ -5,7 +5,7 @@ slug: nang-kit-3-1-1
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config]
-status: verified
+status: signed-off
 approved_by: Phan Le Manh
 approved_at: 2026-11-24
 design_doc: docs/superpowers/specs/2026-11-24-nang-kit-3-1-1-design.md
@@ -88,3 +88,6 @@ Phủ theo tệp chạm và bên đọc của từng tệp kit đổi; không qu
   làm vòng này và mọi phiên trên máy tới khi chủ kho cài lại chạy kit 3.0.0 — hồ sơ đo kit theo thẻ, không đo bản cài (Hỏi-2).
   (2) Phần «sau chữ ký, 0 VIOLATION» của AC-7 chỉ đo được sau Cổng Bằng chứng.
 - Phép đo ở `rang/` tự kéo kit theo thẻ vào thư mục tạm ngoài kho và đối chiếu commit với ma trận.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-24:
+  - Ngoài-1: Phép kiểm các lệnh chấm của kho không đối chiếu đúng bốn tên đã ghim, nên một lệnh viết theo kiểu lạ có thể bị bỏ sót mà vẫn báo đạt.
+  - Ngoài-2: Phía «xanh» của bài hai chiều cho phép so cổng hai bản so một lượt chạy với chính nó, nên bằng chứng phía ấy yếu; phép đo cổng hai bản thật vẫn chạy cả hai bản.
