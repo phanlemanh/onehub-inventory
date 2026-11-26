@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "app-shell-khuon-dau-trang",
-  "ghi_luc": "2026-11-17T07:58:36Z",
-  "vong_cham": 4,
+  "ghi_luc": "2026-11-26T09:06:22Z",
+  "vong_cham": 7,
   "luot": [
     {
       "vong": 1,
@@ -27,6 +27,25 @@
       "tang": [
         "bai-kiem-ha-tang"
       ]
+    },
+    {
+      "vong": 5,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 6,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 7,
+      "verdict": "PENDING-JUDGMENT",
+      "tang": []
     }
   ],
   "lam_lai": [
@@ -37,10 +56,18 @@
     {
       "nguon": "r4",
       "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "r5",
+      "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "r6",
+      "tang": "bai-kiem-ha-tang"
     }
   ],
   "theo_tang": {
-    "bai-kiem-ha-tang": 2,
+    "bai-kiem-ha-tang": 4,
     "trang-thai-hanh-vi": 0,
     "du-lieu-api": 0,
     "nghiep-vu": 0,
@@ -55,14 +82,18 @@
   "chua_phan": [],
   "thuoc_vat": {
     "vat": [
-      249,
-      38
+      276,
+      49
     ],
     "thuoc": [
-      10,
-      2
+      11,
+      3
     ],
-    "nhat": 1
+    "nhat": 2
   },
-  "gio_may": null
+  "gio_may": {
+    "gio_may": 13.57,
+    "gio_cho": 210.43,
+    "phan_tram_tuan": null
+  }
 }
