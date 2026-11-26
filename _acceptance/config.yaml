@@ -298,6 +298,8 @@ design_pass:
 feature_loop:
   ui_standards_skill: inventory-ui
   ngoai_n_tu_dinh_tuyen: true   # same as onehub-quy-hang: the machine routes out-of-contract items on clean T2 records
+  gop_theo_loi_ky: true    # the evidence gate card carries «gộp: khi CI xanh»; the owner's signature line is the merge word (owner, 2026-11-26: «Bật»)
+  do_san_tren_nen: true    # a repin that meets the same red already recorded on main is labelled, not blocked (owner, 2026-11-26)
   suite_keys:
     - executors.script.check
     - executors.script.build
