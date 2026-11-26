@@ -57,6 +57,7 @@ describe("luu-lan-nhap", () => {
         { id: "l2", version: 2 },
       ],
       [{ id: "l1" }],
+      [{ code: "S1 01-0905" }],
       [],
       [],
       [],
@@ -64,7 +65,13 @@ describe("luu-lan-nhap", () => {
       [],
     ]);
     const r = await undoImport(c, "run-1", "me");
-    expect(r).toEqual({ ok: true, removed: ["l1"], kept: ["l2"], retired: 4 });
+    expect(r).toEqual({
+      ok: true,
+      removed: ["l1"],
+      kept: ["l2"],
+      keptCodes: ["S1 01-0905"],
+      retired: 4,
+    });
     expect(c.texts.at(-1)).toContain("update import_runs set status = 'undone'");
   });
 

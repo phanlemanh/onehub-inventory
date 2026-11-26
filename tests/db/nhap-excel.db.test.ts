@@ -366,8 +366,22 @@ describe("hoan tac (E14)", () => {
       req(`${URL_}/${r.id}/undo`, "POST", {}, await e.cookie("LA")),
       r.id!,
     );
-    const body = (await undo.json()) as { removed: string[]; kept: string[] };
+    const body = (await undo.json()) as { removed: string[]; kept: string[]; keptCodes: string[] };
     expect([undo.status, body.removed.length, body.kept]).toEqual([200, 2, [edited]]);
+    // The kept listing is named by the code a person knows it by, read from its unit — never empty.
+    const known = (
+      await e.w.db.owner.query<{ code: string }>(
+        `select coalesce(cu.building_name || ' ' || cu.unit_number, cpu.raw_code) as code
+           from listings l
+           left join listing_units lu on lu.listing_id = l.id
+           left join catalog_units cu on cu.upi = lu.upi
+           left join listing_pending_units lp on lp.listing_id = l.id
+           left join company_pending_units cpu on cpu.id = lp.pending_unit_id
+          where l.id = $1`,
+        [edited],
+      )
+    ).rows[0]!.code;
+    expect([known.length > 0, body.keptCodes]).toEqual([true, [known]]);
     expect(
       await count(e, "select count(*) as n from company_labels where retired_at is null"),
     ).toBe(0);

@@ -159,8 +159,15 @@ describe("cua-tao-can", () => {
         { id: "l2", version: 2 },
       ],
       [{ id: "l1" }],
+      [{ code: "S1 01-0905" }],
     ]);
-    expect(await removeImportListings(c, "run-1")).toEqual({ removed: ["l1"], kept: ["l2"] });
+    expect(await removeImportListings(c, "run-1")).toEqual({
+      removed: ["l1"],
+      kept: ["l2"],
+      keptCodes: ["S1 01-0905"],
+    });
+    // The codes are read for the kept listings only.
+    expect(c.calls[2]!.params![0]).toEqual(["l2"]);
   });
 });
 
