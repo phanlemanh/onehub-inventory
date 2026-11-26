@@ -124,7 +124,8 @@ async function floatGeometry(page: Page): Promise<{
         document.querySelector('[data-slot="data-region"] [data-slot="column-filter"] input'),
       ),
       accountHit: hits(
-        document.querySelector('[data-slot="app-shell-top-bar"] [data-slot^="account"]'),
+        // The account menu sits at the foot of the rail since app-shell-khuon-dau-trang (owner, 2026-11-17).
+        document.querySelector('[data-slot="app-shell-account"] [data-slot^="account"]'),
       ),
       overflow: Math.max(
         aside.scrollWidth - aside.clientWidth,
