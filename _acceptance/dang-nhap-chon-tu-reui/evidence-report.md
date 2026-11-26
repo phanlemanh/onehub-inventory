@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: a3cb064583e45f083ebc002db147db46a2995449
+verified_commit: 0445d8c1f9f77b34c2aa3a3d0db28da47363c60d
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -181,3 +181,7 @@ sha: 8f483c908e395d82f5341db4b91b7c56e404dfa4 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 4 — 2026-11-17, do chủ kho đổi khuôn App Shell 2026-11-17 (VP7, lượt 4: đầu menu tài khoản bỏ ảnh đại diện)
 run_id: repin-20261117T065306Z-64786
 sha: a3cb064583e45f083ebc002db147db46a2995449 · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng · ngoài làn máy: E1, E4
+
+### Re-pin lần 5 — 2026-11-26, do nhánh PR #83 đã gộp main — ghim lại trên đầu nhánh, Postgres dãy R (G-2611-7)
+run_id: repin-20261126T093843Z-29282
+sha: 0445d8c1f9f77b34c2aa3a3d0db28da47363c60d · suites: 3 lệnh exit 0 · evals: 9/9 eval máy đạt kỳ vọng · ngoài làn máy: E1, E4
