@@ -170,9 +170,9 @@ describe("one entry lit", () => {
   const MATRIX: [string, string, string][] = [
     ["", "", ALL_TITLE],
     ["status=Active", "", "Đang bán"],
-    [`goc-nhin=${G1!.id}`, "", G1!.name],
-    [`goc-nhin=${G2!.id}`, "", G2!.name],
-    ["goc-nhin=khong-co", "", ALL_TITLE],
+    [`view=${G1!.id}`, "", G1!.name],
+    [`view=${G2!.id}`, "", G2!.name],
+    ["view=khong-co", "", ALL_TITLE],
   ];
 
   it.each(MATRIX)("/inventory?%s", (search, _, want) => {
@@ -194,7 +194,7 @@ describe("one entry lit", () => {
   });
 
   it("the check fails when entries light by address prefix", () => {
-    where.search = `goc-nhin=${G1!.id}`;
+    where.search = `view=${G1!.id}`;
     shell(VIEWS, G1!);
     const here = `/inventory?${where.search}`;
     const byPrefix = [...column().querySelectorAll<HTMLAnchorElement>("a[href]")].filter((a) =>
@@ -206,7 +206,7 @@ describe("one entry lit", () => {
 
 describe("changed mark and save buttons", () => {
   it("marks the open view while the grid differs from what was saved, and only then offers both saves", () => {
-    where.search = `goc-nhin=${G1!.id}`;
+    where.search = `view=${G1!.id}`;
     shell(VIEWS, G1!);
     const mark = () => column().querySelectorAll('[data-slot="place-changed"]');
     expect(mark()).toHaveLength(0);
@@ -313,9 +313,7 @@ describe("naming dialog", () => {
     await openSave();
     fireEvent.change(nameBox(), { target: { value: "  [MAU] Mới  " } });
     await submit();
-    await waitFor(() =>
-      expect(router.push).toHaveBeenCalledWith(`/inventory?goc-nhin=${saved.id}`),
-    );
+    await waitFor(() => expect(router.push).toHaveBeenCalledWith(`/inventory?view=${saved.id}`));
     const body = JSON.parse(
       ((fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0]![1] as RequestInit)
         .body as string,

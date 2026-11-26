@@ -9,6 +9,15 @@ import { homedir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+// The kit ships from the delivery-loop marketplace since 3.0.0. An install from the old
+// acceptance-gate-kit marketplace is not read: running its scripts here would mix two kit versions.
+export const PLUGIN_KEY = "acceptance-gate@delivery-loop";
+
+export function installEntries(registry) {
+  const entries = registry?.plugins?.[PLUGIN_KEY];
+  return Array.isArray(entries) ? entries : [];
+}
+
 export function chooseInstall(entries, roots) {
   const usable = (e) => e?.installPath && existsSync(e.installPath);
   for (const root of roots) {
@@ -40,9 +49,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === realpathSync(process.a
     process.env.PLUGIN_REGISTRY ?? `${homedir()}/.claude/plugins/installed_plugins.json`;
   let entries;
   try {
-    entries =
-      JSON.parse(readFileSync(registry, "utf8")).plugins?.["acceptance-gate@acceptance-gate-kit"] ??
-      [];
+    entries = installEntries(JSON.parse(readFileSync(registry, "utf8")));
   } catch {
     entries = [];
   }

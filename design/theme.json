@@ -162,6 +162,23 @@
         "libraries": ["src/components/reui"],
         "own": "src/components",
         "pages": "design/patterns"
+      },
+      {
+        "kind": "untracked",
+        "file": "design/component-registry.json"
+      }
+    ],
+    "decision-sheet": [
+      {
+        "kind": "decision-sheet",
+        "sources": "src",
+        "tests": "tests"
+      }
+    ],
+    "owner-calls": [
+      {
+        "kind": "owner-calls",
+        "pages": "design/patterns"
       }
     ],
     "ledger-shapes": [
@@ -174,7 +191,100 @@
           "screens": "design/screens.yaml"
         },
         "pages": "design/patterns"
+      },
+      {
+        "kind": "screen-fragments",
+        "file": "design/screens.yaml",
+        "fragments": "design/screens"
+      },
+      {
+        "kind": "untracked",
+        "file": "design/screens.yaml"
+      },
+      {
+        "kind": "screen-fragments",
+        "of": "intake",
+        "file": "design/intake.yaml",
+        "fragments": "design/intake"
+      },
+      {
+        "kind": "untracked",
+        "of": "intake",
+        "file": "design/intake.yaml"
+      },
+      {
+        "kind": "taken-down",
+        "sources": "src"
+      },
+      {
+        "kind": "choose-first"
+      },
+      {
+        "kind": "floating-parts",
+        "test": "tests/e2e/floating-parts.spec.ts"
       }
+    ],
+    "target-size": [
+      {
+        "kind": "target-size",
+        "folder": "src/components/ui",
+        "min": 24
+      }
+    ],
+    "font-loaded": [
+      {
+        "kind": "font-loaded",
+        "variables": ["--font-heading"]
+      }
+    ],
+    "typeface": [
+      {
+        "kind": "value",
+        "scope": ":root",
+        "variable": "--font-heading",
+        "expected": "var(--font-sans)"
+      }
+    ],
+    "spacing": [
+      {
+        "kind": "lint",
+        "rule": "onehub-ui/no-off-scale-spacing",
+        "at": "src/app/(app)/account-menu.tsx"
+      }
+    ],
+    "lint-exceptions": [
+      {
+        "kind": "lint",
+        "rule": "onehub-ui/require-disable-reason",
+        "at": "src/app/(app)/account-menu.tsx"
+      }
+    ],
+    "whole-class-names": [
+      {
+        "kind": "lint",
+        "rule": "onehub-ui/no-partial-class",
+        "at": "src/app/(app)/account-menu.tsx",
+        "component": {
+          "name": "Button",
+          "from": "@/components/ui/button"
+        }
+      }
+    ]
+  },
+  "affected": {
+    "global": [],
+    "none": [
+      "_acceptance/**",
+      "docs/**",
+      "wiki/**",
+      "architecture/**",
+      "governance/**",
+      "evals/**",
+      "tools/**",
+      ".claude/**",
+      "*.md",
+      "LO-TRINH.html",
+      "design/decisions.yaml"
     ]
   }
 }

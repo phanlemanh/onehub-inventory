@@ -643,7 +643,7 @@ test.describe("E8 · accessibility and Esc", () => {
   }, info) => {
     test.skip(browserName !== "chromium" || info.project.name !== "1440", "do o 1440");
     // A role that may edit price (row 4).
-    await openScreen(page, "/inventory?vai=ListAgent");
+    await openScreen(page, "/inventory?role=ListAgent");
     await openRow(page, 0);
     await pin(page);
     const cell = priceCell(page, 1);

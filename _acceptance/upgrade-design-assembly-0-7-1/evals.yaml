@@ -1,0 +1,173 @@
+schema_version: 1
+feature_slug: upgrade-design-assembly-0-7-1
+# Ma trận viết trước (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
+#   Chỗ rời main: 8925e8fffc776534c5388ced3fea36ac2a1345f6. Commit lên đời: 8d64f79c, cha là commit trên; 6 tệp.
+#   Plugin: design-assembly 0.7.1; tool 2da4cc56de55b9805b50baf46731151f12428f63, 34 tệp; mk/design-assembly.mk
+#     d67aeb30023e8ce4e0583979387c8078653ff3a3; nguồn: kho design-assembly ở ba3af6b090bb4a0922ff16f708220e9ff0bc57e6.
+#   Cổng: 19 quyết định giữ bởi 27 phép kiểm; ở 8925e8ff là 17 và 25. make check: 2460 bài đạt, 2 bỏ qua; 294 linh kiện.
+#   Bản sao nông dựng như db/scripts/ci-thu.sh, mỗi ca một bản sao mới; origin là kho trung gian chia đối tượng với
+#     kho này, main ghim ở 8925e8ff (main trên máy ở ea774a0f, chậm 16 commit, không dùng làm gốc so).
+#   Tệp được đổi ngoài commit: thư mục hồ sơ, _acceptance/config.yaml, design doc 2026-11-18, kế hoạch 2026-11-18,
+#     wiki/log.md, PRODUCT-MAP.md, LO-TRINH.html.
+#   Hai lời «fetched» khi cổng chạy riêng; «no main branch to compare with» với owner-calls.mjs của 8925e8ff.
+#   Hai ca cắn: trang design/patterns/trang-moi.md (owner-calls), thẻ decision:khong-co-hang (decision-sheet);
+#     tests/design-check.test.ts của 8925e8ff (decision-sheet gọi tên decision:a, decision:other, decision:a-b).
+#   Cặp hai chiều: measures-two-way.mjs (các phép đo nhanh) và shallow-two-way.mjs (các phép đo trên bản sao nông).
+#     Mỗi ca phá một thông điệp ghim, kê ở `expected` của từng eval.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    layer: backend-effect
+    paths: ["tools/**", "design/**", "tests/**", "mk/**", "src/components/**"]
+    expected: "exit 0; đầu ra có dòng 'design-assembly: 19 decisions held by 27 checks, each seen failing on a changed copy' và dòng 'Tests  2460 passed | 2 skipped (2462)'. Chiều đỏ: E3 (cùng cổng trên 8925e8ff in 17 và 25) và E7 (bỏ khai báo owner-calls thì trang mẫu mới lọt qua)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.da071_shallow_check
+    long_running: 15
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng 'shallow: make check green on a depth-1 clone of <sha> with origin main at 8925e8ff; 2460 tests passed; the gate held 19 decisions by 27 checks; the component manifest is up to date (294 components); the clone left main at 8925e8ff'. Chiều đỏ: E3"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.da071_shallow_two_way
+    long_running: 20
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-1/rang/**", "tools/design-assembly/**", "design/decisions.yaml", "design/theme.json"]
+    expected: "exit 0; bài 'shallow-check: red on 8925e8ff' đạt: phép đo đỏ với 'shallow: make check did not say: design-assembly: 19 decisions held by 27 checks, each seen failing on a changed copy'; và khi phép đo dò dòng manifest với số 295 thay vì 294 (ca phá của MUST_SAY) thì đỏ với 'shallow: make check did not say: component manifest: design/component-registry.json is up to date (295 components)'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.da071_shallow_alone
+    long_running: 5
+    layer: backend-effect
+    paths: ["tools/design-assembly/**", "design/decisions.yaml", "design/theme.json", "mk/design-assembly.mk", "_acceptance/upgrade-design-assembly-0-7-1/rang/**"]
+    expected: "exit 0; dòng 'alone: make design-assembly green on a fresh depth-1 clone of <sha> with origin main at 8925e8ff; decision-sheet and owner-calls each said main was fetched from origin; the clone left main at 8925e8ff'. Chiều đỏ: E5"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.da071_shallow_two_way
+    long_running: 20
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-1/rang/**", "tools/design-assembly/**"]
+    expected: "exit 0; bài 'shallow-alone: red with the 0.7.0 owner-calls' đạt: phép đo đỏ với 'alone: decision-sheet did not say main was fetched from origin' và 'alone: make design-assembly exit 2', và đầu ra có 'decision-sheet: what this branch writes cannot be compared: no main branch to compare with' cùng 'owner-calls: what this branch adds cannot be read, so a new kind of screen or a new brand colour would pass unseen: no main branch to compare with'; và bài 'shallow-alone: red when origin main is older' đạt: main của kho trung gian ghim ở ea774a0f thì phép đo đỏ với 'alone: the clone left main at ea774a0f, not 8925e8ff'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.da071_shallow_bite
+    long_running: 10
+    layer: backend-effect
+    paths: ["tools/design-assembly/**", "design/decisions.yaml", "design/theme.json", "tests/design-check.test.ts", "_acceptance/upgrade-design-assembly-0-7-1/rang/**"]
+    expected: "exit 0; dòng 'bite: on fresh depth-1 clones of <sha>, the untouched copy is green; a new page stops owner-calls, an untold tag stops decision-sheet, and the fixtures of 8925e8ff stop decision-sheet by name'. Chiều đỏ: E7"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.da071_shallow_two_way
+    long_running: 20
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-1/rang/**", "design/theme.json"]
+    expected: "exit 0; bài 'shallow-bite: red without the two checks' đạt: bỏ hai khai báo khỏi design/theme.json của bản sao thì phép đo đỏ với 'bite: a new page under design/patterns did not stop owner-calls' và 'bite: an untold tag did not stop decision-sheet'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.da071_tool_tree
+    layer: backend-effect
+    paths: ["tools/design-assembly/**", "design/tool-stamp.json", "mk/design-assembly.mk", "_acceptance/upgrade-design-assembly-0-7-1/rang/**"]
+    expected: "exit 0; dòng 'tool: tools/design-assembly is the plugin's version 0.7.1, 34 files, tree 2da4cc56de55; the stamp says the same; mk/design-assembly.mk is the template's'. Chiều đỏ: E15"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.da071_release_ledger
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-1/rang/**"]
+    expected: "exit 0; dòng 'release ledger: version 0.7.1 at ba3af6b names tool tree 2da4cc56de55, the one pinned here; its templates have that tree and the gate step', đọc từ kho design-assembly ở commit ghim. Chiều đỏ: E15"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.da071_rows_mirror
+    layer: backend-effect
+    paths: ["design/decisions.yaml", "design/theme.json", "_acceptance/upgrade-design-assembly-0-7-1/rang/**"]
+    expected: "exit 0; dòng 'rows: decision-sheet and owner-calls are the plugin's rows at ba3af6b field for field; their checks are the plugin's but for blueprint, which this repository has no file for; nothing else changed in the two files since 8925e8ff'. Chiều đỏ: E16"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E11
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.da071_two_tests
+    layer: backend-effect
+    paths: ["tests/ci-ban-sao-nong.test.ts", "tests/design-check.test.ts", "tools/design_check.py", "tools/design-assembly/**"]
+    expected: "exit 0; mọi bài của tests/ci-ban-sao-nong.test.ts và tests/design-check.test.ts đạt, không bài nào bỏ qua"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E12
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.da071_fixture_tags
+    layer: backend-effect
+    paths: ["tests/design-check.test.ts", "tools/design-assembly/**", "_acceptance/upgrade-design-assembly-0-7-1/rang/**"]
+    expected: "exit 0; dòng 'fixtures: tests/design-check.test.ts holds no string the tagged-test reader takes for a tag; at 8925e8ff it held decision:a, decision:other, decision:a-b'. Phép đo đọc biểu thức thẻ từ tools/design-assembly/owner-calls.mjs, không chép tay. Chiều đỏ: E17 và ca bản của 8925e8ff trong E6"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E13
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.da071_change_list
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng 'changes: the upgrade commit changes its 6 files; the branch changes nothing beyond them and this record' (hoặc, khi đã gộp, 'the branch is in origin/main already, so only the commit was compared'). Chiều đỏ: E18"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E14
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.ci_db_thu
+    long_running: 60
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng cuối 'ci-thu: xanh … · check xanh · pha bo-phien do · pha vai-chu do · pha may-chu-chu do'. Chiều đỏ: ba bản phá của chính ci-thu.sh (bo-phien, vai-chu, may-chu-chu) phải đỏ, và lệnh thoát khác 0 khi một bản phá không đỏ hay make check không xanh"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E15
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.da071_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-1/rang/**", "tools/design-assembly/**", "design/tool-stamp.json", "mk/design-assembly.mk"]
+    expected: "exit 0; bài 'tool-tree' đỏ ở ba ca: một tệp công cụ đổi → 'differs from the plugin's version 0.7.1'; dấu ghi 0.7.0 → 'the stamp says version 0.7.0, not 0.7.1'; bước cổng khác mẫu → 'is not the plugin's gate step'; bài 'release-ledger' đỏ ở hai ca: sổ không có 0.7.1 → 'no version 0.7.1 at ba3af6b'; không có kho plugin → 'cannot read'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E16
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.da071_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-1/rang/**", "design/decisions.yaml", "design/theme.json"]
+    expected: "exit 0; bài 'rows-mirror' đỏ ở bốn ca: một trường của hàng owner-calls đổi → 'row owner-calls differs from the plugin's in note'; thiếu hàng decision-sheet → 'no row decision-sheet'; khai báo owner-calls đổi thư mục trang → 'check owner-calls differs from the plugin's'; một hàng khác của sổ đổi → 'design/decisions.yaml changed beyond the two rows since 8925e8ff'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E17
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.da071_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-1/rang/**", "tests/design-check.test.ts"]
+    expected: "exit 0; bài 'fixture-tags' đỏ khi tệp bài kiểm là bản của 8925e8ff → 'fixtures: tests/design-check.test.ts still holds tags: decision:a decision:other decision:a-b'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E18
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.da071_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-7-1/rang/**"]
+    expected: "exit 0; bài 'change-list' đỏ ở bốn ca: commit đổi thêm một tệp → 'upgrade commit changed outside the list: design/tokens.json'; commit thiếu một tệp → 'upgrade commit did not change: design/theme.json'; nhánh đổi thêm một tệp → 'branch changed beyond the upgrade and this record: Makefile'; và nhánh đổi một tệp wiki ngoài danh sách → 'branch changed beyond the upgrade and this record: wiki/decisions/0099-x.md'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

@@ -2,7 +2,7 @@
 
 // One filter state for the grid and the second column (row 2d, AC-2..AC-6): a place picked in the column changes only
 // the project and building filters, the grid's other filters kept; whatever the two filters amount to — picked or
-// typed — is written to the address as `?vung=`, so the column lights that place and a reload or copied link opens it.
+// typed — is written to the address as `?place=`, so the column lights that place and a reload or copied link opens it.
 import { useEffect, useRef, useState } from "react";
 
 import type { TypedColumn } from "@/components/candidate/column-kind";

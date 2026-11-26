@@ -322,7 +322,7 @@ describe("E1 / E13 — the second column", () => {
 
   it("exactly one entry lit, counted across nested entries", () => {
     const s103 = TREE[0]!.children[0]!.children.find((n) => n.name === "S1.03")!;
-    where.search = new URLSearchParams({ status: "Active", vung: s103.key }).toString();
+    where.search = new URLSearchParams({ status: "Active", place: s103.key }).toString();
     shell(ROWS);
     const lit = [...column().querySelectorAll('a[aria-current="true"]')];
     expect(lit.map((a) => a.textContent)).toEqual(["S1.03"]);
@@ -404,7 +404,7 @@ describe("one filter state", () => {
     expect(box("Dự án").value).toBe(P1);
     expect(box("Toà").value).toBe("S1.03");
     await waitFor(() =>
-      expect(new URL(window.location.href).searchParams.get("vung")).toContain("S1.03"),
+      expect(new URL(window.location.href).searchParams.get("place")).toContain("S1.03"),
     );
   });
 
@@ -423,7 +423,7 @@ describe("one filter state", () => {
 
   it("a modified click opens elsewhere: this tab keeps its place, and a later pick still writes the address", async () => {
     shell(ROWS);
-    const vung = () => new URL(window.location.href).searchParams.get("vung") ?? "";
+    const vung = () => new URL(window.location.href).searchParams.get("place") ?? "";
     fireEvent.click(within(groupOf(P1)).getByRole("link", { name: "S1.03" }));
     await waitFor(() => expect(vung()).toContain("S1.03"));
     expect(footer()).toBe("10");

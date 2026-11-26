@@ -18,13 +18,13 @@ Read only what the task needs, in this order:
 block — goes down this scale, one rung at a time, and only drops a rung when the rung above cannot do the user's job or
 breaks a product rule ("looks nicer" or "faster by hand" is not a reason):
 
-1. **Compose from the store.** A supplier component, or a template in `design/so-khoi.yaml`. The machine does this alone.
+1. **Compose from the store.** A supplier component, or a template in `design/intake.yaml`. The machine does this alone.
 2. **The store plus ReUI Pro.** What the store has comes from the store; what it lacks is chosen from ReUI Pro
    (`design/reui-catalog.json`, searched offline with `tools/reui_catalog`).
 3. **Make it by hand.**
 
 The store grows: whatever is used for the first time, chosen from ReUI or made by hand, is taken into the store with one
-line of `design/so-khoi.yaml` (what it is, which ReUI block or by hand, for which need, the day the owner approved it), and
+line of `design/intake.yaml` (what it is, which ReUI block or by hand, for which need, the day the owner approved it), and
 the next time the same need comes it is rung 1. One need, one solution: if the store's answer is not enough, extend it —
 never put a second one beside it. Something made in this round is not "in the store" for this round. Rung 2 the first
 time and rung 3 always are shown at the scope gate with two or three ReUI candidates and their images, for the owner to
@@ -83,13 +83,13 @@ Every path lists its blocks in `### Khối` with the rung `trong-kho`, `reui` or
 you searched, the nearest candidate (a real name in the registry or in `design/reui-catalog.json`, searched offline with
 `tools/reui_catalog`) and why it does not fit. The whole proof is needed once the contract is `implemented`.
 
-With decision 0023 on (the repo has `design/so-khoi.yaml`), the proof also carries, per screen:
+With decision 0023 on (the repo has `design/intake.yaml`), the proof also carries, per screen:
 
 - from `approved`: `### Từ Quỹ hàng` (the context page, or `chưa có trang — <reason>`), `### Họ` (the family you propose
   and the path it gives — the family is the owner's call at the scope gate), and for a new family or new reference the
   `màn` group of `### Ứng viên ReUI` (two or three candidates, one PNG each);
 - from `implemented`: a candidate group for every `reui` or `ve-tay` block, `### Vùng` and the `Cách` column for every
-  ReUI block, and its line in `design/so-khoi.yaml` with `ho_so` = your round. `trong-kho` means a supplier component or a
+  ReUI block, and its line in `design/intake.yaml` with `ho_so` = your round. `trong-kho` means a supplier component or a
   ledger line taken in by another round.
 
 A round that builds a wrapping template such as the App Shell declares `khuon_boc: <id>` in its contract (the id must be

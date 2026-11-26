@@ -1,0 +1,116 @@
+schema_version: 1
+feature_slug: upgrade-design-assembly-0-33-0
+# Ma trận viết trước (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
+#   Commit lên đời thứ nhất: 26ab13af, cha 6ce94d9f; 28 tệp (26 tệp công cụ, dấu phiên bản, một dòng wiki/log/).
+#   Bản đích: 0.36.1 — cây f53b64535e01adcf1421d594d23413facdb455d5, 44 tệp; mk/design-assembly.mk
+#     15c4208b99e238f16a5d7b1826e66629ebf5d510 (sổ phát hành và mẫu của thư mục bản 0.36.1 trong bộ nhớ đệm plugin).
+#   Commit chạy lại: 9 tệp bản xem trước kê (adapters/vite.mjs, check.mjs, contract.mjs, derived.mjs, host-make.mjs,
+#     ledger.mjs, screen-facts.mjs, mk/design-assembly.mk, design/tool-stamp.json) và một tệp wiki/log/; mã commit và lời
+#     hai hàng trên bản sao nông ghim ở ma trận khi commit có (dòng sổ fix).
+#   Không phụ thuộc phiên bản: 19 quyết định giữ bởi 27 phép kiểm; độ tất định 47/67 (19 held, 28 claimed); 67 quyết định,
+#     trạng thái giống hệt với công cụ 0.7.1 (thư mục tools/design-assembly của 6ce94d9f). make check: 2607 đạt, 2 bỏ qua
+#     trên cây hiện tại; 294 linh kiện.
+#   Bản sao nông dựng như db/scripts/ci-thu.sh; origin là kho trung gian chia đối tượng với kho này, main ở
+#     merge-base(HEAD, origin/main) (hiện dda3487e).
+#   Nhánh được đổi: tools/design-assembly/, design/tool-stamp.json, mk/design-assembly.mk, wiki/log/, thư mục hồ sơ,
+#     design doc và kế hoạch 2026-11-22; PRODUCT-MAP.md và LO-TRINH.html chỉ ở dòng của hồ sơ này hay số đếm việc theo nấc.
+#   Cặp hai chiều: two-way.mjs (phép đo nhanh) và shallow-two-way.mjs (bản sao nông). Mỗi ca phá ghim một thông điệp,
+#     kê ở `expected` của từng eval.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    layer: backend-effect
+    paths: ["tools/**", "design/**", "tests/**", "mk/**", "src/**"]
+    expected: "exit 0; đầu ra có các dòng 'design-assembly: 19 decisions held by 27 checks, each seen failing on a changed copy', 'component manifest: design/component-registry.json is up to date (294 components)', 'determinism: 47/67 = 70%' và dòng số bài ghim ở ma trận (cây hiện tại 'Tests  2607 passed | 2 skipped (2609)'). Chiều đỏ của dòng cổng: E3"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/gate-lines.mjs
+    long_running: 5
+    layer: backend-effect
+    paths: ["tools/design-assembly/**", "design/**", "_acceptance/upgrade-design-assembly-0-33-0/rang/**"]
+    expected: "exit 0; dòng 'gate: the gate holds 19 decisions by 27 checks; determinism rate 47/67, 19 held and 28 claimed'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-2
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/two-way.mjs --only gate-lines
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-33-0/rang/**", "design/theme.json"]
+    expected: "exit 0; bài 'gate-lines' xanh trên bản sao không đổi và đỏ khi design/theme.json của bản chép mất một phép kiểm, với 'gate: the gate did not say: design-assembly: 19 decisions held by 27 checks, each seen failing on a changed copy'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/tool-tree.mjs
+    layer: backend-effect
+    paths: ["tools/design-assembly/**", "design/tool-stamp.json", "mk/design-assembly.mk", "_acceptance/upgrade-design-assembly-0-33-0/rang/**"]
+    expected: "exit 0; dòng 'tool: tools/design-assembly is the plugin's version <bản>, <n> files, tree <12 hex>; the stamp says the same; mk/design-assembly.mk is the template's; the installed plugin <bản> names that tree in its release ledger and its templates hold it' với <bản> 0.36.1, <n> 44, mã cây f53b64535e01. Chiều đỏ: E5"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-3
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/two-way.mjs --only tool-tree
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-33-0/rang/**", "tools/design-assembly/**", "design/tool-stamp.json", "mk/design-assembly.mk"]
+    expected: "exit 0; bài 'tool-tree' đỏ ở năm ca: một tệp công cụ đổi → 'differs from the plugin's version 0.36.1'; dấu ghi 0.33.0 → 'the stamp says version 0.33.0, not 0.36.1'; bước cổng khác mẫu → 'is not the plugin's gate step'; sổ phát hành của plugin không có bản → 'the installed plugin's release ledger has no version 0.36.1'; không có thư mục plugin → 'cannot read'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-4
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/decision-states.mjs
+    long_running: 5
+    layer: backend-effect
+    paths: ["tools/design-assembly/**", "design/**", "_acceptance/upgrade-design-assembly-0-33-0/rang/**"]
+    expected: "exit 0; dòng 'states: on this ledger the tool at HEAD and the 0.7.1 tool give each of the 67 decisions the same state; both say 47/67'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-4
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/two-way.mjs --only decision-states
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-33-0/rang/**"]
+    expected: "exit 0; bài 'decision-states' đỏ khi phía 0.7.1 đọc design/theme.json không có phép kiểm của raw-table, với 'states: raw-table is held with the tool at HEAD, not with the 0.7.1 tool'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-5
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/shallow-alone.mjs
+    long_running: 5
+    layer: backend-effect
+    paths: ["tools/design-assembly/**", "design/**", "mk/design-assembly.mk", "_acceptance/upgrade-design-assembly-0-33-0/rang/**"]
+    expected: "exit 0; dòng 'alone: make design-assembly green on a fresh depth-1 clone of <sha> with origin main at <base>; decision-sheet and owner-calls each said main was fetched from origin; the clone left main at <base>'. Chiều đỏ: E9"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-5
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/shallow-two-way.mjs
+    long_running: 10
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-33-0/rang/**", "tools/design-assembly/**"]
+    expected: "exit 0; bài 'shallow-alone: red when origin has no main' đạt: phép đo đỏ với 'alone: make design-assembly exit 2' và 'alone: decision-sheet did not say main was fetched from origin', mỗi hàng decision-sheet và owner-calls có MỘT dòng mang cả tên hàng lẫn lời không-có-nhánh-chính ghim ở ma trận; và bài 'shallow-alone: red when origin main is older' đạt: main của kho trung gian ở 6ce94d9f thì phép đo đỏ với 'alone: the clone left main at 6ce94d9f'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-6
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/change-list.mjs
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng 'changes: the upgrade commit changes its 28 files; the 0.36.1 rerun changes its 10 files; the branch changes nothing beyond the upgrades and this record' (hoặc, khi đã gộp, 'the branch is in origin/main already, so only the commits were compared'). Chiều đỏ: E11"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E11
+    criterion: AC-6
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-33-0/rang/two-way.mjs --only change-list
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-33-0/rang/**"]
+    expected: "exit 0; bài 'change-list' xanh trên nhánh như nó là và khi đã gộp, đỏ ở mười hai ca: commit đổi thêm một tệp → 'upgrade commit changed outside the list: design/theme.json'; commit thiếu một tệp → 'upgrade commit did not change: design/tool-stamp.json'; commit chạy lại đổi một tệp ngoài thư mục công cụ, dấu, bước cổng và wiki/log/ → 'rerun commit changed outside the list: design/theme.json'; nhánh đổi thêm một tệp → 'branch changed beyond the upgrade and this record: Makefile'; nhánh đổi một tệp sổ → 'branch changed beyond the upgrade and this record: design/decisions.yaml'; nhánh đổi hồ sơ của việc khác → 'branch changed beyond the upgrade and this record: _acceptance/du-lieu-mau/contract.md'; bản đồ sản phẩm đổi một chữ trên dòng của việc khác, đổi đúng một chữ số trên dòng của việc khác (3f→4f), hay đổi số đếm của nấc «Đã giao» thành số đang có cộng một → 'PRODUCT-MAP.md is not what the records at HEAD draw'; trang lộ trình đổi đúng một chữ số trên hàng khác (<b>2</b>→<b>4</b>), hay cạnh chữ «chưa có» (7e→8e) → 'LO-TRINH.html is not what the records at HEAD draw'; trang lộ trình đổi đúng một chữ số trong tóm tắt của hàng 1 ở khối dữ liệu → 'LO-TRINH.html changed the summary of row 1, the one part the redraw does not compare'. Hai trang vẽ đo bằng quan hệ, không dò chữ: trang phải đúng bằng bản bộ vẽ của kit vẽ lại từ hồ sơ ở HEAD (product-map.mjs --check, tìm như executor product_map của kho), và danh sách tệp giữ mọi hồ sơ khác như ở main"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

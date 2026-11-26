@@ -42,7 +42,7 @@ afterAll(() => {
 function copy(): string {
   const dir = tempDir("vai-man-nut-sinh-");
   copies.push(dir);
-  for (const part of ["ontology", "design/screens.yaml", "design/vai-man-nut.md", "src"])
+  for (const part of ["ontology", "design/screens.yaml", "design/role-screen-buttons.md", "src"])
     cpSync(join(ROOT, part), join(dir, part), { recursive: true });
   return dir;
 }
@@ -126,24 +126,25 @@ describe("khong-gan-ca-mo-dun", () => {
 
 describe("giu-moi-man", () => {
   it("every screen of the register has a section, plus the frame", () => {
+    // The frame first, then the screens in the order of their ids: the register is one file per screen (design/screens).
     expect(sections(ROOT).map((s) => s.id)).toEqual([
       "khung",
-      "today",
-      "inventory",
-      "sent",
+      "company-layer",
       "contacts",
-      "tuy-chinh-san",
-      "proto",
-      "proto-bo-nut",
-      "sign-in",
+      "inventory",
       "members",
+      "proto",
+      "proto-permitted-actions",
+      "sent",
+      "sign-in",
+      "today",
     ]);
   });
 });
 
 describe("bang-du-muc", () => {
   it("the generated file: 10 sections, 3 columns, 4 role rows each", () => {
-    const text = readFileSync(join(ROOT, "design/vai-man-nut.md"), "utf8");
+    const text = readFileSync(join(ROOT, "design/role-screen-buttons.md"), "utf8");
     const heads = text.split("\n").filter((l) => l.startsWith("## "));
     expect(heads).toHaveLength(10);
     for (const block of text.split("\n## ").slice(1)) {
@@ -159,7 +160,9 @@ describe("bang-du-muc", () => {
 
   it("pha: a hand-edited cell fails --check naming the screen", () => {
     const dir = copy();
-    edit(dir, "design/vai-man-nut.md", (t) => t.replace("(toàn sàn, dự kiến)", "(toàn sàn)"));
+    edit(dir, "design/role-screen-buttons.md", (t) =>
+      t.replace(/(## inventory [\s\S]*?)\(toàn sàn, dự kiến\)/, "$1(toàn sàn)"),
+    );
     const r = run(dir, "--check");
     expect(r.status).not.toBe(0);
     expect(r.out).toContain("lệch bảng quyền: inventory");

@@ -1,0 +1,9 @@
+{"ts":"2026-11-20T03:29:21Z","round":1,"evalId":"E1","run_id":"upgrade-repo-setup-0-10-1-E1-20261120T032732Z","exit_code":0,"cmd":"make check"}
+{"ts":"2026-11-20T03:29:47Z","round":1,"evalId":"E2","run_id":"upgrade-repo-setup-0-10-1-E2-20261120T032945Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-10-1/rang/apply-again.mjs"}
+{"ts":"2026-11-20T03:30:08Z","round":1,"evalId":"E3","run_id":"upgrade-repo-setup-0-10-1-E3-20261120T033007Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-10-1/rang/template-same.mjs"}
+{"ts":"2026-11-20T03:30:38Z","round":1,"evalId":"E4","run_id":"upgrade-repo-setup-0-10-1-E4-20261120T033014Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-10-1/rang/commits-judged.mjs"}
+{"ts":"2026-11-20T03:31:14Z","round":1,"evalId":"E5","run_id":"upgrade-repo-setup-0-10-1-E5-20261120T033114Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-10-1/rang/agents-tail.mjs"}
+{"ts":"2026-11-20T03:31:23Z","round":1,"evalId":"E6","run_id":"upgrade-repo-setup-0-10-1-E6-20261120T033123Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-10-1/rang/manifest.mjs"}
+{"ts":"2026-11-20T03:31:25Z","round":1,"evalId":"E7","run_id":"upgrade-repo-setup-0-10-1-E7-20261120T033125Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-10-1/rang/change-set.mjs"}
+{"ts":"2026-11-20T03:32:53Z","round":1,"evalId":"E8","run_id":"upgrade-repo-setup-0-10-1-E8-20261120T033133Z","exit_code":0,"cmd":"node --test _acceptance/upgrade-repo-setup-0-10-1/rang/two-way.mjs"}
+{"ts":"2026-11-20T03:33:08Z","round":1,"evalId":"E9","run_id":"upgrade-repo-setup-0-10-1-E9-20261120T033306Z","exit_code":0,"cmd":"node _acceptance/upgrade-repo-setup-0-10-1/rang/ruleset.mjs"}

@@ -1,0 +1,1 @@
+Bảng hàng có cửa vào theo luật vào của sổ màn, cùng cửa với màn Thành viên (hàng 2b, sửa sau chữ ký, chờ chủ kho xác nhận): hôm nay mọi vai vào được, Quản trị sàn thấy thẻ chỉ đọc theo sổ vai × màn của 9b; ca kiểm Quản trị sàn cũ qua giả nên được viết lại — [hồ sơ](../_acceptance/bang-hang-the-dien-thoai/contract.md).

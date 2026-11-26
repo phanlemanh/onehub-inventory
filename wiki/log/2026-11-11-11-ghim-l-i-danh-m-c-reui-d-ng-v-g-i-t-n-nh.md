@@ -1,0 +1,1 @@
+Ghim lại danh mục ReUI dừng và gọi tên nhóm khi nguồn đổi cách ghi tiêu đề nhóm, thay vì lặng lẽ bỏ cả nhóm; lưới chặn mã, khoá thử đủ 10 dạng × 27 chỗ và nay quét cả số đếm, bắt được câu import có nháy kép trong phần ghim — [tools/reui_catalog](../tools/reui_catalog/README.md), hàng 1k

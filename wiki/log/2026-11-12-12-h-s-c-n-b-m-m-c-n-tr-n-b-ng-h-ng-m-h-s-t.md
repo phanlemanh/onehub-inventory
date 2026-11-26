@@ -1,0 +1,1 @@
+Hồ sơ căn: bấm mã căn trên Bảng hàng mở hồ sơ trong ngăn nổi bên phải (từ dưới thanh trên tới đáy màn hình, không khoá bảng, có địa chỉ `?ho-so=`), điện thoại mở toàn màn với thẻ căn ở đầu; thẻ và hồ sơ đọc một mô hình; Tab từ hồ sơ đi vào bảng — hàng 3, `_acceptance/ho-so-can/`, [0024](decisions/0024-ngan-noi-xem-chi-tiet.md).

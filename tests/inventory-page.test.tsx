@@ -33,7 +33,7 @@ vi.mock("../src/app/(app)/inventory-source", async () => {
     standInRole: () => null,
   };
 });
-// The role stand-in of row 4 asks for the session only when ?vai= is given; there is none here.
+// The role stand-in of row 4 asks for the session only when ?role= is given; there is none here.
 vi.mock("../src/modules/identity/server", () => ({ currentSession: async () => null }));
 
 afterEach(() => {
@@ -171,5 +171,32 @@ describe("status shortcuts open the page filtered (row 2a, E10)", () => {
       });
     };
     await expect(checkStatusPage(dropping)).rejects.toThrow("page drops status: Active");
+  });
+});
+
+// Row 1v (english-query-words, E4): the record opens by ?record=<id>; a listing no longer on the inventory gets the
+// stale-link sentence, a live one does not.
+describe("record-moi (row 1v, E4)", () => {
+  type StaleProps = { rows: GridRow[]; staleLinkNote?: string };
+  async function staleOf(query: Record<string, string>): Promise<StaleProps> {
+    vi.stubEnv("NODE_ENV", "development");
+    const tree = await (Page as unknown as PageFn)({ searchParams: Promise.resolve(query) });
+    const children = (tree.props as { children: ReactElement[] }).children;
+    const grid = children.find((child) => child.type === InventoryGrid);
+    if (!grid) throw new Error("page has no inventory grid");
+    return grid.props as StaleProps;
+  }
+
+  it("record-moi: a live id opens without the stale sentence, a removed id gets it", async () => {
+    const { rows } = await staleOf({});
+    const live = String(rows[0]!.id);
+    expect(
+      (await staleOf({ record: live })).staleLinkNote,
+      "record-moi: id song bi bao cu",
+    ).toBeUndefined();
+    expect(
+      (await staleOf({ record: "khong-con" })).staleLinkNote,
+      "record-moi: id da xoa khong bao",
+    ).toMatch(/\S/);
   });
 });

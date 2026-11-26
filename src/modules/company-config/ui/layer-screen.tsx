@@ -27,15 +27,6 @@ import {
   type SpellingField,
 } from "./layer-dialogs";
 
-/** The part of the URL (`?phan=`) for each part of the layer, and the API's name for it. */
-const API_PART: Record<GridPart, LayerPart> = {
-  nhan: "labels",
-  truong: "fields",
-  "tu-dien": "aliases",
-  "can-cho": "pending-units",
-  mau: "templates",
-};
-
 /** Names of the standard fields a spelling can stand for, from the label table. */
 const STANDARD_FIELD_NAME: Record<string, ConceptCode> = {
   "Listing.standardStatus": "StandardStatus",
@@ -85,7 +76,7 @@ function partGrid(
   layer: CompanyLayer,
 ): { columns: TypedColumn[]; rows: GridRow[] } {
   switch (part) {
-    case "nhan":
+    case "labels":
       return {
         columns: [
           typedColumn({ field: "CompanyLabel.concept", header: C.col.concept }),
@@ -97,7 +88,7 @@ function partGrid(
           "CompanyLabel.label": l.label,
         })),
       };
-    case "truong":
+    case "fields":
       return {
         columns: [
           typedColumn({ field: "CustomField.name", header: C.col.name }),
@@ -111,7 +102,7 @@ function partGrid(
           "custom.options": f.options.join(", ") || null,
         })),
       };
-    case "tu-dien":
+    case "aliases":
       return {
         columns: [
           typedColumn({ field: "CompanyValueAlias.field", header: C.col.field }),
@@ -125,7 +116,7 @@ function partGrid(
           "CompanyValueAlias.value": valueText(a.field, a.value),
         })),
       };
-    case "can-cho":
+    case "pending-units":
       return {
         columns: [
           typedColumn({ field: "PendingUnit.rawCode", header: C.col.code }),
@@ -137,7 +128,7 @@ function partGrid(
           "custom.state": p.matchedAt ? C.matchedState : C.waiting,
         })),
       };
-    case "mau":
+    case "templates":
       return {
         columns: [
           typedColumn({ field: "ImportTemplate.name", header: C.col.template }),
@@ -226,12 +217,12 @@ export function CompanyLayerScreen({
   const rowActions = (row: GridRow): RecordAction[] => {
     const name = rowName(part, row);
     const edit: RecordAction[] =
-      part === "can-cho"
+      part === "pending-units"
         ? []
         : [
             {
               action: "editCompanyLayer",
-              label: part === "mau" ? label("RenameTemplate") : label("Edit"),
+              label: part === "templates" ? label("RenameTemplate") : label("Edit"),
               onSelect: () => setEditing({ part, id: row.id }),
             },
           ];
@@ -245,7 +236,7 @@ export function CompanyLayerScreen({
           what: C.retireWhat,
           done: C.retired(name),
           apply: async () => {
-            const r = await send(`${API_PART[part]}/${encodeURIComponent(row.id)}/retire`, "POST");
+            const r = await send(`${part}/${encodeURIComponent(row.id)}/retire`, "POST");
             reload();
             if (!r.ok) throw new Error(r.errors["form"] ?? C.failed);
           },
@@ -298,11 +289,11 @@ const EMPTY: CompanyLayer = {
 
 function rowName(part: GridPart, row: GridRow): string {
   const key = {
-    nhan: "CompanyLabel.label",
-    truong: "CustomField.name",
-    "tu-dien": "CompanyValueAlias.raw",
-    "can-cho": "PendingUnit.rawCode",
-    mau: "ImportTemplate.name",
+    labels: "CompanyLabel.label",
+    fields: "CustomField.name",
+    aliases: "CompanyValueAlias.raw",
+    "pending-units": "PendingUnit.rawCode",
+    templates: "ImportTemplate.name",
   }[part] as keyof GridRow;
   return String(row[key] ?? "");
 }
@@ -315,31 +306,31 @@ function headButton(
   done: (message: string) => void,
 ): ReactNode {
   switch (part) {
-    case "nhan":
+    case "labels":
       return (
         <PermittedAction action="addCompanyLayer">
           <LabelDialog concepts={concepts} onDone={done} />
         </PermittedAction>
       );
-    case "truong":
+    case "fields":
       return (
         <PermittedAction action="addCompanyLayer">
           <FieldDialog onDone={done} />
         </PermittedAction>
       );
-    case "tu-dien":
+    case "aliases":
       return (
         <PermittedAction action="addCompanyLayer">
           <AliasDialog fields={layer ? spellingFields(layer) : []} onDone={done} />
         </PermittedAction>
       );
-    case "can-cho":
+    case "pending-units":
       return (
         <PermittedAction action="matchPendingUnits">
           <MatchButton done={done} />
         </PermittedAction>
       );
-    case "mau":
+    case "templates":
       return null;
   }
 }
@@ -386,13 +377,13 @@ function editDialog(
   };
   const key = `${editing.part}:${editing.id}`;
   switch (editing.part) {
-    case "nhan": {
+    case "labels": {
       const l = layer.labels.find((x) => x.id === editing.id);
       return l ? (
         <LabelDialog key={key} concepts={concepts} editing={l} open setOpen={close} onDone={done} />
       ) : null;
     }
-    case "truong": {
+    case "fields": {
       const f = layer.fields.find((x) => x.code === editing.id);
       return f ? (
         <FieldDialog
@@ -404,7 +395,7 @@ function editDialog(
         />
       ) : null;
     }
-    case "tu-dien": {
+    case "aliases": {
       const a = layer.aliases.find((x) => x.id === editing.id);
       return a ? (
         <AliasDialog
@@ -417,11 +408,11 @@ function editDialog(
         />
       ) : null;
     }
-    case "mau": {
+    case "templates": {
       const t = layer.templates.find((x) => x.id === editing.id);
       return t ? <RenameDialog key={key} editing={t} open setOpen={close} onDone={done} /> : null;
     }
-    case "can-cho":
+    case "pending-units":
       return null;
   }
 }

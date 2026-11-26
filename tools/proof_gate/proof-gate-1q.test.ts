@@ -85,7 +85,7 @@ function sample(opts: { ledger?: boolean; before?: boolean; comps?: Comp[] } = {
   registry(root, opts.comps ?? BASE);
   write(root, "design/reui-catalog.json", JSON.stringify({ groups: [] }));
   write(root, NEW_FILE, "export {};\n");
-  if (opts.ledger !== false) write(root, "design/so-khoi.yaml", "version: 1\nkhoi: []\n");
+  if (opts.ledger !== false) write(root, "design/intake.yaml", "version: 1\nkhoi: []\n");
   if (opts.before !== false) {
     write(root, "tools/proof_gate/thanh-phan-co-truoc.yaml", "version: 1\ntep: []\n");
   }
@@ -111,7 +111,7 @@ function ledgerLine(root: string, over: Record<string, string>) {
   };
   write(
     root,
-    "design/so-khoi.yaml",
+    "design/intake.yaml",
     [
       "version: 1",
       "khoi:",
@@ -373,7 +373,7 @@ describe("kho thật và danh sách có trước", () => {
     for (const r of rows) expect(/ly_do: \S/.test(r), r).toBe(true);
     const reg = JSON.parse(readFileSync(join(ROOT, "design/component-registry.json"), "utf8"));
     const files = new Set(reg.components.map((c: Comp) => c.file));
-    const ledgerText = readFileSync(join(ROOT, "design/so-khoi.yaml"), "utf8");
+    const ledgerText = readFileSync(join(ROOT, "design/intake.yaml"), "utf8");
     for (const t of teps) {
       expect(files.has(t), t).toBe(true);
       expect(t.startsWith("src/components/ui/") || t.startsWith("src/components/reui/"), t).toBe(

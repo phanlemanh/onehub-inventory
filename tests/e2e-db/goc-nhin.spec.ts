@@ -223,7 +223,7 @@ async function saveAs(page: Page, name: string, button = SAVE) {
   await dialog.getByLabel("Tên").fill(name);
   await dialog.getByLabel("Tên").press("Enter");
   await expect(dialog).toBeHidden();
-  await page.waitForURL((u) => u.searchParams.has("goc-nhin"));
+  await page.waitForURL((u) => u.searchParams.has("view"));
   // On a phone the second column rides in the closed sheet; the entry is checked where it shows.
   if (await secondColumn(page).isVisible())
     await expect(entry(page, name)).toHaveAttribute("aria-current", "true");
@@ -301,9 +301,9 @@ test("saved view round trip", async ({ page, browser }, info) => {
 
   // (a) another entry, then the view's entry
   await secondColumn(page).getByRole("link", { name: ALL, exact: true }).click();
-  await page.waitForURL((u) => !u.searchParams.has("goc-nhin"));
+  await page.waitForURL((u) => !u.searchParams.has("view"));
   await entry(page, NAME).click();
-  await page.waitForURL((u) => u.searchParams.has("goc-nhin"));
+  await page.waitForURL((u) => u.searchParams.has("view"));
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(NAME);
   checkReopened(await snapshot(page), before);
   // (b) a reload
@@ -386,7 +386,7 @@ test("save changes · save as new · reselect discards changes", async ({ page }
   await saveAs(page, "[MAU] Hai phòng ngủ", SAVE_AS_NEW);
   await expect(secondColumn(page).locator('[data-slot="second-column-trailing"]')).toHaveCount(2);
   await entry(page, NAME).click();
-  await page.waitForURL((u) => u.searchParams.get("goc-nhin") === row!.id);
+  await page.waitForURL((u) => u.searchParams.get("view") === row!.id);
   checkReopened(await snapshot(page), two);
   const rows = await storedViews(me.id);
   expect(rows).toHaveLength(2);
@@ -500,7 +500,7 @@ test("remove", async ({ page }, info) => {
   await more.click();
   await page.getByRole("menuitem", { name: REMOVE }).click();
   await confirm.getByRole("button", { name: REMOVE }).click();
-  await page.waitForURL((u) => u.pathname === "/inventory" && !u.searchParams.has("goc-nhin"));
+  await page.waitForURL((u) => u.pathname === "/inventory" && !u.searchParams.has("view"));
   await expect(entry(page, NAME)).toHaveCount(0);
   await expect(secondColumn(page).getByRole("link", { name: ALL, exact: true })).toHaveAttribute(
     "aria-current",
@@ -548,7 +548,7 @@ test("phone sheet", { tag: "@cho" }, async ({ page }, info) => {
   await expect(link).toBeVisible();
   await link.click();
   await expect(page.getByRole("dialog")).toBeHidden();
-  await page.waitForURL((u) => u.searchParams.has("goc-nhin"));
+  await page.waitForURL((u) => u.searchParams.has("view"));
   expect((await snapshot(page)).units).toEqual(wide.units);
 });
 
@@ -638,7 +638,7 @@ test("E15 frames", { tag: "@cho" }, async ({ page }, info) => {
   // On a phone the view opens by its address, so the sheet is closed and settled before the frames open it.
   if (phone) {
     const first = (await storedViews(me.id)).find((v) => v.name === NAME)!;
-    await page.goto(`/inventory?goc-nhin=${first.id}`);
+    await page.goto(`/inventory?view=${first.id}`);
   } else await entry(page, NAME).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(NAME);
   await fillStays(page, region(page).getByLabel("Lọc cột Phòng ngủ"), "2");

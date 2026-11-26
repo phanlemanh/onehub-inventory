@@ -7,8 +7,11 @@ const SCALE = new Set(
     " ",
   ),
 );
-const UTILITY =
-  /^(?:p[xytrblse]?|m[xytrblse]?|gap(?:-[xy])?|space-[xy]|w|h|size|(?:min|max)-[wh]|inset(?:-[xy])?|top|right|bottom|left|start|end|basis|scroll-[mp][xytrblse]?)-(\d+(?:\.\d+)?)$/;
+const NAMES =
+  "(?:p[xytrblse]?|m[xytrblse]?|gap(?:-[xy])?|space-[xy]|w|h|size|(?:min|max)-[wh]|inset(?:-[xy])?|top|right|bottom|left|start|end|basis|scroll-[mp][xytrblse]?)";
+const UTILITY = new RegExp(`^${NAMES}-(\\d+(?:\\.\\d+)?)$`);
+// A value in brackets (p-[13px], w-[calc(100%-1rem)]) is off every step, whatever it says.
+const ARBITRARY = new RegExp(`^${NAMES}-\\[.+\\]$`);
 
 export default {
   meta: {
@@ -17,12 +20,18 @@ export default {
     messages: {
       offScale:
         "'{{token}}' is off the spacing scale: use a default Tailwind step such as 9 or 10.",
+      arbitrary:
+        "'{{token}}' writes its own value, off the spacing scale: use a default Tailwind step such as 3 or 4.",
     },
     schema: [],
   },
   create(context) {
     return classStringVisitor(context, (value, node) => {
       for (const { raw, base } of tokenize(value)) {
+        if (ARBITRARY.test(base)) {
+          context.report({ node, messageId: "arbitrary", data: { token: raw } });
+          continue;
+        }
         const match = UTILITY.exec(base);
         if (match && !SCALE.has(match[1])) {
           context.report({ node, messageId: "offScale", data: { token: raw } });

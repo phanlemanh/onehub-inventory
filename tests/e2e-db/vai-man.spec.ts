@@ -35,12 +35,12 @@ import { chupAnh } from "../e2e/sua-trang";
 const ALL = pairs().pairs;
 const TABLE = buttonTable();
 /**
- * The committed role × screen × button table (design/vai-man-nut.md), as the owner reads it: the buttons each role's
+ * The committed role × screen × button table (design/role-screen-buttons.md), as the owner reads it: the buttons each role's
  * cell lists, by section. Read from the file, not recomputed, so a permission changed without regenerating the table
  * shows here (make check catches the same drift without a browser).
  */
 const COMMITTED = committedTable(
-  readFileSync(join(import.meta.dirname, "../../design/vai-man-nut.md"), "utf8"),
+  readFileSync(join(import.meta.dirname, "../../design/role-screen-buttons.md"), "utf8"),
 );
 const FORBIDDEN = FRAME_COPY.forbidden.title;
 /**

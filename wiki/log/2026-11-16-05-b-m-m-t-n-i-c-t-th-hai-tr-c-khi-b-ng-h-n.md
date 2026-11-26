@@ -1,0 +1,1 @@
+Bấm một nơi ở cột thứ hai trước khi Bảng hàng nhận trang không còn mất các lọc khác (việc phụ VP5, AC-5 của hàng 2d): địa chỉ của mục nơi mang sẵn các lọc của địa chỉ đang mở; bài E8 hết chập chờn — [sửa sau ký](../_acceptance/bang-hang-theo-dia-ly/sua-sau-ky.md).

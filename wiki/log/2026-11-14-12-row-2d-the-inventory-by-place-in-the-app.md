@@ -1,0 +1,1 @@
+Row 2d: the inventory by place in the App Shell's second column (one group per project, no counts) as one filter state with the Dự án and Toà boxes — [0036](decisions/0036-mot-trang-thai-loc-theo-dia-ly.md).

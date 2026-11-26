@@ -141,7 +141,7 @@ test.describe("E2, E3 · the copied link", () => {
     await copyButton(page).click();
     await expect(page.getByText(COPIED)).toBeVisible();
     const copied = await page.evaluate(() => navigator.clipboard.readText());
-    const expected = new URL(`/inventory?ho-so=${encodeURIComponent(id)}`, page.url()).toString();
+    const expected = new URL(`/inventory?record=${encodeURIComponent(id)}`, page.url()).toString();
     expect(copied, "copied link lost the listing").toBe(expected);
 
     const other = await browser.newContext({ viewport: { width: 1440, height: 900 } });
@@ -177,14 +177,14 @@ test.describe("E4 · a link to a listing that left the inventory", () => {
     page,
   }, info) => {
     test.skip(info.project.name !== "1440", "one width is enough");
-    await openInventory(page, "?ho-so=khong-co");
+    await openInventory(page, "?record=khong-co");
     await expect(page.getByText(STALE), "stale link opened silently").toBeVisible();
     await expect(panel(page)).toHaveCount(0);
     await expect(openers(page).first()).toBeVisible();
 
     await openInventory(page);
     const { id } = await openFifth(page);
-    await openInventory(page, `?ho-so=${encodeURIComponent(id)}`);
+    await openInventory(page, `?record=${encodeURIComponent(id)}`);
     await expect(panel(page)).toHaveAttribute("data-record-id", id);
     await expect(page.getByText(STALE)).toHaveCount(0);
   });
@@ -196,7 +196,7 @@ test.describe("E5, E6 · the inventory opened from a unit code", () => {
   }) => {
     await openInventory(page);
     const { id, unit } = await openFifth(page, true);
-    await openInventory(page, `?ma=${encodeURIComponent(`  ${unit.toLowerCase()} `)}`);
+    await openInventory(page, `?unit=${encodeURIComponent(`  ${unit.toLowerCase()} `)}`);
     await expect(panel(page)).toHaveAttribute("data-record-id", id);
     // On the phone the record covers the list; the filter is read after it closes, in the filter sheet (row 2b).
     await unitFilterHolds(page, unit.toLowerCase().trim(), "code not in the unit column filter");
@@ -205,7 +205,7 @@ test.describe("E5, E6 · the inventory opened from a unit code", () => {
   test("a code in three buildings: three rows, three buildings, no record opens", async ({
     page,
   }) => {
-    await openInventory(page, "?ma=0601");
+    await openInventory(page, "?unit=0601");
     await expect(openers(page)).toHaveCount(3);
     // The building of each row: the table's third cell, or on a phone the card's place «Toà · Dự án» (row 2b).
     const buildings = isPhone(page)
@@ -222,7 +222,7 @@ test.describe("E5, E6 · the inventory opened from a unit code", () => {
   });
 
   test("an unknown code opens no record", async ({ page }) => {
-    await openInventory(page, "?ma=Z-99.99");
+    await openInventory(page, "?unit=Z-99.99");
     await expect(panel(page), "unknown code opened a record").toHaveCount(0);
     await expect(page.getByText("Không có dòng nào khớp")).toBeVisible();
   });
@@ -461,7 +461,10 @@ test.describe("E5 · the top-bar ⌘K box", () => {
     test.skip(info.project.name !== "1440", "one width is enough");
     const { id, unit } = await uniqueRow(page);
     // The code in the building column instead of the unit column, with the record open.
-    await openInventory(page, `?toa=${encodeURIComponent(unit)}&ho-so=${encodeURIComponent(id)}`);
+    await openInventory(
+      page,
+      `?building=${encodeURIComponent(unit)}&record=${encodeURIComponent(id)}`,
+    );
     await expect(checkJumped(page, id, unit)).rejects.toThrow("code not in the unit column filter");
   });
 });
@@ -483,7 +486,7 @@ test.describe("E7 · an unknown code typed in the box", () => {
     await openSearch(page);
     await paletteInput(page).fill(UNKNOWN);
     await paletteInput(page).press("Enter");
-    await expect(page).toHaveURL(/\/inventory\?ma=/);
+    await expect(page).toHaveURL(/\/inventory\?unit=/);
     await checkUnknown(page);
     // On a phone «Xoá lọc» is both on the chip row and in the empty list: either clears every filter (row 2b). From
     // 768 px the region has exactly one, so the locator stays strict there.
@@ -498,7 +501,7 @@ test.describe("E7 · an unknown code typed in the box", () => {
 
   test("the check fails when a record opens anyway", async ({ page }, info) => {
     test.skip(info.project.name !== "1440", "one width is enough");
-    await openInventory(page, `?ma=${UNKNOWN}`);
+    await openInventory(page, `?unit=${UNKNOWN}`);
     // A record panel standing beside the empty grid, as if the first row had been opened anyway.
     await suaTrang(page, () => {
       const fake = document.createElement("section");
@@ -532,7 +535,7 @@ test.describe("E8 · the grid after an unknown code, and the open box", () => {
   for (const scheme of ["light", "dark"] as const) {
     test(`no serious or critical issue, ${scheme}`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: scheme });
-      await openInventory(page, `?ma=${UNKNOWN}`);
+      await openInventory(page, `?unit=${UNKNOWN}`);
       await checkReadable(page, '[data-slot="data-region"]');
       await openSearch(page);
       await paletteInput(page).fill("0");

@@ -11,8 +11,32 @@
 version: 1
 default: medium
 
-# Reviewers requested by tier (rendered into .github/CODEOWNERS by `make codeowners`).
-# Low-tier paths get no owner, so agents can merge them without a human.
+# The machine proof that takes the person's place. Name the required status check that proves a
+# change does what it should, for example the evidence re-check of the feature loop you use. It
+# must run and report on every pull request: one that never reports blocks the pull request, and
+# on GitHub a skipped job counts as passed. Then:
+#   - `python3 tools/github_setup.py --apply` requires that check on the default branch;
+#   - `default` above may become `low`, and only the rules of the game keep an owner
+#     (`make codeowners`);
+#   - the PR pipeline stops running its own reviewer agent: one verdict, paid for once.
+# `default: low` without a proof is refused: a person leaves only when a machine takes the place.
+proof:
+  check: ""
+
+# Status checks of this repository's own that the default branch must require, besides the setup's
+# (`check`, `secret-scan`, and `gate` with agent workflows) and the proof above: for example a
+# browser suite. `python3 tools/github_setup.py --apply` requires them. A required check must run
+# and report on every pull request; on GitHub a skipped job counts as passed.
+required_checks: []
+
+# How pull requests merge: the one method `python3 tools/github_setup.py --apply` sets. `squash`
+# puts one commit per pull request on the default branch; `merge` keeps the branch's commits and
+# adds a merge commit, for a feature loop that needs them. It is stored here so that a later run
+# does not set the repository back to squash.
+merge_method: merge
+
+# Deciders by tier (rendered into .github/CODEOWNERS by `make codeowners`).
+# A path with no owner needs no person.
 owners:
   medium: ["@phanlemanh"]
   high: ["@phanlemanh"]

@@ -1,0 +1,146 @@
+schema_version: 1
+feature_slug: english-route-names
+# Ma trận viết trước:
+#   AC-8 (E1): 10 mẫu chữ cũ (thứ 10: đọc khoá phan từ tham số truy vấn) = các dòng của bảng cũ → mới — /tuy-chinh-san · ?phan= · bo-nut-theo-quyen trong một địa chỉ
+#     /proto/ · proto-bo-nut · ?bang= · ?man= · ?mo= của bản mẫu · data-part và khoá phần nhan|truong|tu-dien|can-cho|mau|thue-phi
+#     · tệp design/screens/tuy-chinh-san.yaml hay proto-bo-nut.yaml — trên 4 vùng (src/, design/screens/, tools/e2e_templates/,
+#     tests/); lệnh in «quet: 9 mau x 4 vung» và số chỗ chạm. Chỗ được giữ có tên và lý do trong tệp rang/giu.txt.
+#   AC-2 (E2): 6 tên phần + vắng + lạ + ?phan=can-cho (không còn được đọc) = 9 ca của hàm đọc phần, mỗi ca một assert.
+#   AC-3 (E2): 6 mục cột thứ hai, mỗi mục so href và nhãn viết trước.
+#   AC-7 (E4): 2 bộ đọc sổ màn × (hồ sơ đóng khai mã cũ → qua · hồ sơ mở khai mã cũ → đỏ) = 4 ca.
+# Cặp phá thử (bản sao; ca tương ứng phải đỏ với thông điệp ghim):
+#   pha-thu-chu-cu (cấy mã màn trần «tuy-chinh-san» vào một tệp src/ ở bản sao) → «chu-cu: tuy-chinh-san»
+#   pha-thu-doc-phan (hàm đọc phần đọc lại query.phan ở bản sao)               → «doc-phan: ?phan=can-cho»
+#   pha-thu-mo-dung-ma-cu (bộ đọc nhận old_ids cho hồ sơ đang mở ở bản sao)    → «old-ids: open contract uses tuy-chinh-san»
+evals:
+  - id: E1
+    criterion: AC-8
+    executor: script
+    cmd: node _acceptance/english-route-names/rang/old-names.mjs --root .
+    paths: [src/**, design/screens/**, tools/e2e_templates/**, tests/**, db/migrations/**]
+    expected: "exit 0; in «quet: 10 mau x 4 vung · cham: 0 · giu: <n>» với n bằng số dòng giữ đã ghim trong lệnh (giu.txt khác danh sách ghim → đỏ «giu: lech danh sach ghim»), và «luu-tru: 0 bang luu dia chi». Mẫu thứ 10 là cách đọc khoá phan từ tham số truy vấn (.phan, [\"phan\"]). Chiều đỏ: E1-pha"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E1-pha
+    criterion: AC-8
+    executor: script
+    cmd: node _acceptance/english-route-names/rang/old-names.mjs --root . --self-test
+    paths: [_acceptance/english-route-names/rang/**]
+    expected: "exit 0; lệnh dựng một bản sao cho mỗi mẫu, cấy mẫu ấy vào một tệp, mười bản sao trải đủ bốn vùng (src/, design/screens/, tools/e2e_templates/, tests/); mỗi bản sao phải đỏ với «chu-cu: <mẫu>» đúng mẫu đã cấy; thêm một bản sao có thêm một dòng vào giu.txt phải đỏ «giu: lech danh sach ghim»; in «self-test: 11/11 do dung cho». Đối chứng dương: cây thật xanh trong cùng lượt"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: bash _acceptance/english-route-names/rang/chay.sh E2
+    paths: [src/modules/company-config/ui/**, src/app/(app)/nav.ts, src/app/(app)/company-layer/**, tests/company-layer-route.test.ts]
+    expected: "exit 0; ca 'doc-phan' đủ 9 ca viết trước (labels, fields, aliases, pending-units, templates, fee-schedule, vắng → labels, 'xyz' → labels, chỉ ?phan=can-cho → labels); ca 'cot-hai' so đủ 6 mục: /company-layer, /company-layer?part=fields, ?part=aliases, ?part=pending-units, ?part=templates, ?part=fee-schedule, nhãn từ label(); ca 'vai-khong-quyen' (AC-1) vẽ trang như máy chủ với cửa quyền trả «không có phạm vi» và thấy khối «Không đủ quyền» chung, không phần nào (đối chứng: có quyền thì vẽ phần labels; chiều đỏ: bỏ chốt quyền ở page.tsx → đỏ «vai-khong-quyen: khoi»); layer-screen.test.tsx xanh với data-part tên API. Chiều đỏ: pha-thu-doc-phan (đọc lại query.phan) đỏ với «doc-phan: ?phan=can-cho»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: bash _acceptance/english-route-names/rang/chay.sh E3
+    paths: [src/app/(app)/nav.ts, tests/company-layer-route.test.ts]
+    expected: "exit 0; ca 'cot-hai' xanh: sáu href và sáu nhãn đúng thứ tự viết trước; thêm hay bớt một mục thì hằng 6 đỏ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-7
+    executor: test
+    cmd: bash _acceptance/english-route-names/rang/old-ids.sh
+    paths: [tools/coverage_matrix/**, tools/proof_gate/**, design/screens/**, tests/screen-old-ids.test.ts, _acceptance/english-route-names/rang/old-ids.sh]
+    expected: "exit 0; 4 ca: coverage_matrix và proof_gate đều cho hồ sơ đóng khai tuy-chinh-san qua, hồ sơ mở khai tuy-chinh-san đỏ với «screen 'tuy-chinh-san' is an old id of 'company-layer'»; in «old-ids: 4/4». Chiều đỏ: pha-thu-mo-dung-ma-cu đỏ với «old-ids: open contract uses tuy-chinh-san»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-6
+    executor: test
+    cmd: bash _acceptance/english-route-names/rang/chay.sh E5
+    paths: [design/screens/**, tests/vai-man-*.ts, tests/bo-nut-vai-man.test.ts, tests/vong-doi-thao-tac.test.ts, tests/coverage-matrix.test.ts, tools/e2e_templates/**]
+    expected: "exit 0; sổ màn có company-layer và proto-permitted-actions, không có tuy-chinh-san hay proto-bo-nut; bảng vai × màn × nút sinh mục company-layer và proto-permitted-actions; bộ bài theo sổ màn dựng ca vùng ở /company-layer?part=pending-units"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.check
+    expected: "exit 0 — make check xanh, kể cả coverage-matrix với ba hồ sơ đã ký khai mã cũ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: [src/app/(app)/proto/**, tests/e2e/**, src/proxy.ts]
+    expected: "exit 0 — make e2e xanh ở bốn khổ; tests/e2e/bo-nut.spec.ts mở /proto/permitted-actions?board=hidden&screen=…&role=… dưới bốn vai; ca 'dia-chi-cu-khong-con' thấy /tuy-chinh-san và /proto/bo-nut-theo-quyen trả trang không có"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-5
+    executor: test
+    cmd: bash _acceptance/english-route-names/rang/chay.sh E8
+    paths: [src/app/(app)/**, tests/e2e/bo-nut.spec.ts]
+    expected: "exit 0; ca 'dia-chi-cu-khong-con' xanh: hai địa chỉ cũ trả 404 và trang không có, không chuyển hướng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.lop_rieng_e2e
+    paths: [src/app/(app)/company-layer/**, src/modules/company-config/**, tests/e2e-db/lop-rieng.spec.ts]
+    expected: "exit 0 — các ca màn Tuỳ chỉnh của sàn mở /company-layer và ?part=<tên API>, Postgres dãy R; vai chỉ đọc không thấy nút ghi; ca 'phan-cu-khong-doc' mở /company-layer?phan=can-cho và thấy khung data-part=\"labels\" (đối chứng: ?part=pending-units thấy data-part=\"pending-units\"); ca 'chua-dang-nhap' về /login?next=%2Fcompany-layer"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.thue_phi_e2e
+    paths: [src/modules/company-config/ui/fee-part.tsx, tests/e2e-db/thue-phi.spec.ts]
+    expected: "exit 0 — phần Thuế phí mở ở /company-layer?part=fee-schedule, khung mang data-part=\"fee-schedule\", Postgres dãy N"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.kiem_chung_phien
+    paths: [tests/e2e-db/screens.spec.ts, tools/e2e_templates/**, design/screens/**]
+    expected: "exit 0 — bộ bài theo sổ màn chạy màn company-layer khi đã đăng nhập, Postgres dãy H"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.bo_nut_e2e_db
+    paths: [tests/e2e-db/bo-nut-members.spec.ts]
+    expected: "exit 0 — thanh bên, màn Thành viên và thông báo 403 như trước, Postgres dãy V"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-9
+    executor: script
+    cmd: node _acceptance/english-route-names/rang/old-names.mjs --root . --wiki
+    paths: [wiki/entities/**, wiki/log/**]
+    expected: "exit 0; in «wiki: 0 trang thuc the tro dia chi cu · nhat ky: 1 dong english-route-names»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14-ui
+    criterion: AC-3
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3485/company-layer?part=fields
+    paths: [src/app/(app)/nav.ts, src/app/(app)/company-layer/**, src/modules/company-config/ui/**]
+    steps:
+      - "From the repo root, with lane R Postgres up (DB_PORT 5565), run: URL_ANH=1 DB_LANE=r DB_PORT=5565 npx playwright test -c playwright.db.config.ts tests/e2e-db/lop-rieng.spec.ts --project 1440 -g 'english route images' — it signs the company admin in through the shared door and saves the frames below in .acceptance-runs/english-route-names/"
+      - "Open company-layer-fields-1440.png and company-layer-templates-1440.png; read the address line printed under each frame in the test output"
+    question: "Ở cả hai khung, cột thứ hai của App Shell có đủ sáu mục của màn Tuỳ chỉnh của sàn theo thứ tự Nhãn riêng, Trường riêng, Từ điển, Căn chờ khớp, Mẫu nhập, Thuế phí, mục đang mở được đánh dấu (Trường riêng ở khung một, Mẫu nhập ở khung hai), và địa chỉ in ra là /company-layer?part=fields và /company-layer?part=templates? Nêu khung nào lệch."
+    expected: "Hai khung khớp; màn trông như trước khi đổi địa chỉ"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E15
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.ban_dung_that
+    paths: [src/app/(app)/proto/**, tools/deploy/thu-ban-dung.sh]
+    expected: "exit 0 — bản build thật trên Postgres dãy K; dòng «proto/permitted-actions-404» có mặt (bộ đọc lấy tên bản mẫu từ thư mục src/app/(app)/proto/), và không còn dòng proto/bo-nut-theo-quyen. Đối chứng dương: E7 mở cùng địa chỉ trên bản dev và thấy bản mẫu"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

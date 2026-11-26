@@ -1,0 +1,42 @@
+# Block ledger (the intake ledger of design-assembly) — decision 0023 «Chọn trước, tạo sau — kho lớn dần»
+# (wiki/decisions/0023-chon-truoc-tao-sau.md). One file per thing taken into the store, named after its need, beside
+# this one; chosen from ReUI or made by hand, after the owner saw it at the scope gate. Until 2026-11-17 it was the one
+# file design/so-khoi.yaml. design/intake.yaml is a copy of this folder, out of git, written again before the tests.
+# tools/proof_gate/check.py reads the ledger: the rung `trong-kho` looks a block up here, and every block a round
+# takes in (rung `reui` or `ve-tay`) needs its file here. While this ledger exists, decision 0023 is on for the gate.
+#
+#   ten       name of the store template (as written in the «Khối» table)
+#   tep       its code file
+#   nguon     the ReUI block it started from (a name in design/reui-catalog.json), or tao-tay
+#   nhu_cau   need key, lowercase with dashes — one need, one solution: two lines with the same key fail
+#   mo_ta     the need in one plain sentence
+#   ho_so     the round that took it in (_acceptance/<ho_so>/)
+#   duyet     the day the owner approved that round's scope gate (YYYY-MM-DD, equal to its approved_at)
+#
+# Empty on purpose: per decision 0023 nothing is in the store yet in the full sense. App Shell, sign-in, Members and
+# the form dialog are chosen again in rows 1o, 1p and 9c; the grid template is arranged in row 2.
+version: 1
+# The design-assembly contract's names for the keys this ledger spells its own way (its intake ledger).
+keys:
+  blocks: khoi
+  name: ten
+  file: tep
+  source: nguon
+  need: nhu_cau
+  description: mo_ta
+  record: ho_so
+  approved: duyet
+# khoi: one file per entry beside this one, each named after its nhu_cau
+# Blocks made before this ledger existed, each named with the round that made it, the commit that created it and the
+# day. Their line above needs no «ve-tay» row in that round's signed proof; any other block pointing at the same round
+# still does. Added pair by pair, never a whole round, and only for a closed round (supervisor ruling K-1311-4, row 2c).
+# Adding a pair here needs a ruling of the batch supervisor, and the owner signs it at the evidence gate of that row.
+# The proof gate checks each pair in git (row 2e, tools/proof_gate/legacy.py): the commit exists, adds the block's
+# file, carries the written day, and that day is before the commit that added this ledger. A shallow copy fetches the
+# missing history first; if it cannot, the pair is red.
+khoi_co_truoc:
+  - ten: FormDialog
+    ho_so: moi-nguoi-gan-vai
+    commit: fd5ebee
+    ngay: 2026-11-11
+    vi_sao: Hộp biểu mẫu dùng chung do hàng 9 tạo trước luật sổ khối; hàng 2c bù dòng sổ, hồ sơ đã ký của hàng 9 giữ nguyên.

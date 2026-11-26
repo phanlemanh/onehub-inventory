@@ -1,0 +1,202 @@
+schema_version: 1
+feature_slug: dat-khoa-mot-lenh
+# Kế hoạch đo, viết trước khi viết mã.
+#
+# Tên ca: mỗi ca của bài kiểm mang tiền tố đúng mã eval của nó (vd «E3 · cổng 6543»), để đầu ra của vitest gọi tên được
+# từng ô.
+#
+# Chiều đỏ của các phép đo, theo hai cách:
+#   - Hàm đo: mỗi hàm đo của bài kiểm (bắt giá trị trên dòng lệnh, bắt giá trị trong đầu ra, bắt mật khẩu trần trong câu
+#     SQL, so tập tên của khối deploy.yml) có một ca chạy trên đúng nhật ký hay văn bản của ca xanh, đã phá một chỗ. Ca ấy
+#     đòi hàm đo trả lỗi với thông điệp ghim.
+#   - Ca đỏ của lệnh: dùng chung máy giả với ca xanh, chỉ đổi một ô.
+#
+# Ma trận AC-3 (thông điệp ghim; mọi ô: thoát khác 0, 0 lần `gh secret set`):
+#   cổng 6543                      → «MIGRATE_DATABASE_URL: cổng 6543 là Transaction pooler, cần Session pooler cổng 5432»
+#   không phải postgresql://       → «MIGRATE_DATABASE_URL: không phải chuỗi postgresql://»
+#   không mật khẩu                 → «MIGRATE_DATABASE_URL: thiếu mật khẩu»
+#   người dùng khác postgres       → «MIGRATE_DATABASE_URL: người dùng phải là postgres của dự án»
+#   Resend không bắt đầu re_       → «RESEND_API_KEY: không bắt đầu bằng re_»
+#   khoá Vercel có khoảng trắng    → «VERCEL_TOKEN: có khoảng trắng»
+#   khoá chưa có mà bỏ trống       → «<tên>: chưa có trên GitHub, không được bỏ trống»
+#   môi trường chưa có             → «môi trường <env> chưa có trên GitHub»
+#   gh chưa đăng nhập              → «gh chưa đăng nhập»
+#   gh không đọc được khoá công khai → «không đọc được khoá công khai của môi trường <env> — cần quyền quản trị kho»
+#
+# Ma trận bước đỏ AC-7 (mỗi môi trường × mỗi ô). Bảng RED của tools/deploy/deploy.test.ts chạy nó.
+#   Ô của hàng 22 giữ nguyên, ma trận gốc ở đầu _acceptance/moi-truong-thu-va-ban-that/evals.yaml.
+#   Ô mới của vòng này, kèm dòng ghim:
+#   cau-hinh       thiếu LOGIN_DB_PASSWORD, AUTH_SECRET, RESEND_API_KEY hay MAIL_FROM (mỗi tên một ô)
+#                    → «cau-hinh ĐỎ — thiếu biến <tên>»
+#   cau-hinh       LOGIN_DB_PASSWORD «abc» · có «@»
+#                    → «cau-hinh ĐỎ — LOGIN_DB_PASSWORD phải là chữ và số, từ 24 ký tự»
+#   vai-dang-nhap  vai chưa có (psql giả trả «role "quy_hang_login" does not exist»)
+#                    → «vai-dang-nhap ĐỎ — không đặt được mật khẩu vai đăng nhập: role "quy_hang_login" does not exist»
+#   vai-dang-nhap  psql giả in chuỗi MIGRATE_DATABASE_URL và LOGIN_DB_PASSWORD ra stderr rồi lỗi
+#                    → dòng đỏ và mọi dòng in có «***» thay cho cả hai giá trị
+#   bien           ba biến cấm (mỗi tên một ô) · Vercel trả 403 → dòng ghim của E6
+# Mọi ô: đúng một dòng ĐỎ, rồi «DỪNG ở <bước> — tên miền không đổi».
+# Mọi ô trước gan-ten-mien: 0 lần «vercel promote» trong calls.log.
+# Không ô nào để giá trị của biến bí mật ở dòng in (expectNoMarker).
+# Đối chứng dương: ca xanh cùng máy giả.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.dat_khoa
+    layer: backend-effect
+    paths: ["tools/deploy/dat-khoa.mjs", "tools/deploy/dat-khoa.test.ts", "Makefile", "mk/deploy.mk"]
+    expected: >-
+      exit 0. Các ca «E1 ·» đều pass. gh giả ghi đúng năm lần `secret set` cho staging (VERCEL_TOKEN, MIGRATE_DATABASE_URL,
+      RESEND_API_KEY, AUTH_SECRET, LOGIN_DB_PASSWORD) và không tên nào khác. Ca `all`: VERCEL_TOKEN được hỏi đúng một lần.
+      MIGRATE_DATABASE_URL không còn «[YOUR-PASSWORD]» và mang mật khẩu đã mã hoá theo URL; giải mã ra lại đúng mật khẩu.
+      Chiều đỏ:
+      (a) nhật ký của ca xanh, chép một giá trị lên dòng lệnh → hàm đo trả «giá trị nằm trên dòng lệnh: <tên>»;
+      (b) đầu ra của ca xanh, nối một giá trị → hàm đo trả «giá trị có trong đầu ra: <tên>».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.dat_khoa
+    layer: backend-effect
+    paths: ["tools/deploy/dat-khoa.mjs", "tools/deploy/dat-khoa.test.ts"]
+    expected: >-
+      exit 0. Các ca «E2 ·» đều pass.
+      Chạy lại với mọi câu bỏ trống: 0 lần `secret set`, đủ dòng «giữ <tên>» cho mỗi khoá.
+      `--xoay`: đúng hai lần `secret set` (AUTH_SECRET, LOGIN_DB_PASSWORD), giá trị mới khác giá trị cũ.
+      Khuôn: AUTH_SECRET khớp /^[A-Za-z0-9_-]{64}$/, LOGIN_DB_PASSWORD khớp /^[A-Za-z0-9]{40}$/, qua 50 lần sinh.
+      Chiều đỏ: một giá trị sai khuôn → hàm kiểm khuôn trả «AUTH_SECRET sai khuôn» hay «LOGIN_DB_PASSWORD sai khuôn».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.dat_khoa
+    layer: backend-effect
+    paths: ["tools/deploy/dat-khoa.mjs", "tools/deploy/dat-khoa.test.ts"]
+    expected: >-
+      exit 0. Có mười ca «E3 ·» theo ma trận ở đầu tệp này; mỗi ca đòi thoát khác 0, đúng thông điệp ghim, 0 lần
+      `secret set`.
+      Ca đứt giữa chừng: gh giả lỗi ở lần `secret set` thứ ba → thoát khác 0; in hai tên đã đặt và tên khoá lỗi, không
+      in giá trị. Chạy lại với các câu đã đặt bỏ trống thì chỉ đặt phần còn lại.
+      Đối chứng dương: cùng ca với đầu vào đúng thì thoát 0.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.deploy_kiem
+    layer: backend-effect
+    paths: ["tools/deploy/len-ban.mjs", "tools/deploy/scram.mjs", "tools/deploy/deploy.test.ts"]
+    expected: >-
+      exit 0. Các ca «E4 ·» đều pass. psql giả ghi đầu vào chuẩn của bước vai-dang-nhap. Câu chứa
+      «alter role quy_hang_login password 'SCRAM-SHA-256$4096:» và không chứa LOGIN_DB_PASSWORD. Dòng lệnh của psql không
+      chứa LOGIN_DB_PASSWORD.
+      Dạng băm, chấm như máy chủ Postgres chấm, trên vector thử của RFC 7677: mật khẩu «pencil», muối
+      «W22ZaJ0SNY7soEsUEjb6gQ==», 4096 vòng. Hai phép chấm phải qua:
+      - ClientProof của RFC qua phép kiểm bằng khoá lưu: H(ClientProof XOR HMAC(khoá lưu, AuthMessage)) = khoá lưu;
+      - ServerSignature của RFC = HMAC(khoá máy chủ, AuthMessage).
+      Chiều đỏ: câu SQL của ca xanh, thêm mật khẩu trần → hàm đo trả «câu SQL chứa mật khẩu trần».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4b
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.dk_vai_db
+    layer: backend-effect
+    paths: ["tools/deploy/scram.mjs", "tools/deploy/len-ban.mjs", "tests/db/mat-khau-vai-dang-nhap.db.test.ts", "db/migrations/**"]
+    expected: >-
+      exit 0, trên Postgres của dãy. Cơ sở nháp đã áp mọi migration, rồi bước vai-dang-nhap đặt dạng băm qua psql thật.
+      Kết quả: pg nối bằng quy_hang_login với đúng mật khẩu → `select current_user` trả quy_hang_login; mật khẩu khác →
+      lỗi «password authentication failed»; chạy bước lần hai → vẫn nối được bằng đúng mật khẩu.
+      Đối chứng: trước bước, cùng mật khẩu bị từ chối.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.deploy_kiem
+    layer: backend-effect
+    paths: ["tools/deploy/len-ban.mjs", "tools/deploy/kiem-nhanh.mjs", "tools/deploy/deploy.test.ts"]
+    expected: >-
+      exit 0. Các ca «E5 ·» đều pass. Máy API giả ghi đúng một GET /v9/projects/<id>/env, rồi đúng một
+      POST /v10/projects/<id>/env?upsert=true.
+      Thân POST là mảng đúng sáu phần tử, mỗi phần tử target ["production"]: DATABASE_URL, AUTH_SECRET, RESEND_API_KEY
+      (type encrypted); MAIL_FROM, APP_URL, APP_ENV (type plain).
+      DATABASE_URL giải ra: người dùng «quy_hang_login.<mã dự án>», cùng máy chủ, cổng, tên cơ sở với MIGRATE_DATABASE_URL,
+      mật khẩu = LOGIN_DB_PASSWORD. APP_ENV bằng môi trường của lượt, ở cả staging lẫn production.
+      Mốc thời gian của POST trước lần `vercel pull` đầu trong calls.log. Đầu ra không chứa giá trị nào của sáu biến.
+      Chiều đỏ: thân POST của ca xanh, bỏ một biến → hàm so trả «thiếu biến Vercel: <tên>».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.deploy_kiem
+    layer: backend-effect
+    paths: ["tools/deploy/len-ban.mjs", "tools/deploy/deploy.test.ts"]
+    expected: >-
+      exit 0. Các ca «E6 ·» đều pass. Có ba ca biến cấm, mỗi biến một ca: dòng «bien ĐỎ — dự án Vercel đang có biến cấm
+      <tên>», 0 POST.
+      Một ca API trả 403: dòng «bien ĐỎ — Vercel trả 403».
+      Cả bốn ca: 0 lần gọi vercel trong calls.log, có dòng «DỪNG ở bien — tên miền không đổi».
+      Đối chứng dương: cùng máy giả, không biến cấm, trả 200 → bien đạt.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.deploy_kiem
+    layer: backend-effect
+    paths: ["tools/deploy/len-ban.mjs", "tools/deploy/deploy.test.ts"]
+    expected: >-
+      exit 0. Toàn bộ tools/deploy pass, gồm các ca sẵn có của hàng 22 (không ca nào bị xoá hay nới).
+      Ca xanh in đúng chín dòng bước theo thứ tự rồi «xong <commit>».
+      Bản thử: cau-hinh, migration, vai-dang-nhap, cach-ly, bien, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien.
+      Bản thật: cau-hinh, ban-thu-truoc, migration, vai-dang-nhap, bien, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien.
+      Ma trận bước đỏ ở đầu tệp này chạy đủ mọi ô ở cả hai môi trường, mỗi ô đúng dòng ghim. Chín bước, bước nào cũng
+      có ít nhất một ô. Các ô trước gan-ten-mien có 0 lần «vercel promote». Ô psql in giá trị ra stderr: không dòng in nào
+      chứa MIGRATE_DATABASE_URL hay LOGIN_DB_PASSWORD.
+      Đối chứng dương: ca xanh cùng máy giả.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.dk_so_tay
+    layer: backend-effect
+    paths: ["docs/van-hanh/**", "tools/deploy/len-ban.mjs", "tools/deploy/so-tay-khop.test.ts"]
+    expected: >-
+      exit 0. Các ca «E8 ·» đều pass. Bài đọc khối ```yaml của README. Ở mỗi việc, tập tên trong env của bước
+      `make deploy` (secrets.* hay vars.*) bằng REQUIRED[env] của len-ban.mjs ∪ {VERCEL_AUTOMATION_BYPASS_SECRET}.
+      docs/van-hanh không còn chuỗi «LOGIN_DATABASE_URL», «Environment Variables» hay «alter role quy_hang_login password».
+      Chiều đỏ: (a) khối của ca xanh, bỏ một tên → «khối deploy.yml thiếu <tên> ở <việc>»;
+      (b) thêm LOGIN_DATABASE_URL → «khối deploy.yml thừa LOGIN_DATABASE_URL ở <việc>».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8b
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.van_hanh
+    layer: backend-effect
+    paths: ["docs/van-hanh/**", "tests/van-hanh.test.ts", "Makefile", "mk/**"]
+    expected: "exit 0: bài kiểm sổ tay sẵn có của hàng 22 vẫn xanh trên sổ tay đã sửa (mọi lệnh make và tên biến sổ tay nêu có thật)."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-9
+    executor: judgment
+    inputs: ["docs/van-hanh/README.md", "AGENTS.md", "docs/superpowers/specs/2026-11-22-dat-khoa-mot-lenh-design.md"]
+    question: >-
+      Đọc như một người vận hành chưa biết kho.
+      (1) Trong docs/van-hanh/README.md, phần việc của chủ kho có chỉ gồm việc cần tài khoản của chủ kho không: tạo khoá ở
+      dịch vụ, chạy make dat-khoa, dán deploy.yml, tạo Quản trị sàn đầu, duyệt bản thật? Mỗi việc có «Đạt khi» và «Đỏ thì»
+      không?
+      (2) Phần máy làm có tách khỏi phần chủ kho không?
+      (3) Mục «Infrastructure standing permission» trong AGENTS.md có nói rõ máy được làm gì không hỏi không? Có đủ năm điều
+      máy không bao giờ làm không: cầm hay in giá trị khoá; duyệt bản thật hay đổi người duyệt của production; xoá dữ
+      liệu, dự án hay khoá; sửa .github/workflows/ hay governance/; nới quyền của chính mình?
+      (4) Danh sách được làm có câu nào cho phép đổi, bỏ hay thêm người duyệt production, hay mâu thuẫn với năm điều cấm
+      không?
+      (5) Ba tệp có khớp nhau không?
+      Nêu từng chỗ thiếu hay lệch, kèm tệp và mục.
+    evidence_required: [run_id, verdicts, verifier, verified_at]
+  - id: E10
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.check
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0 (make check: lint, kiểm kiểu, bài kiểm, ontology, ranh giới module, định dạng trang wiki)."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

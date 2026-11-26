@@ -1,0 +1,1 @@
+Danh mục ReUI (678 khối Pro, 27 thành phần gốc, 1.264 ví dụ) ghim theo bản chụp có băm, tra được tại máy không cần mạng; kiểm trong `make check` đỏ khi có mục tra không ra hoặc lọt mã, khoá — [tools/reui_catalog](../tools/reui_catalog/README.md), hàng 1g

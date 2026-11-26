@@ -1,0 +1,1 @@
+Thuế phí của sàn (hàng 19, viết từ 14/11, vào nhánh chính 15/11): khoản phí, Điều kiện phí, cột Về tay, phần Thuế phí trên khung danh sách, Về tay trên thẻ căn ở điện thoại — [0037](decisions/0037-thue-phi-la-du-lieu-cua-san.md).

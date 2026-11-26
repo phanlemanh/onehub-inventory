@@ -1,0 +1,1 @@
+Ba luật lint giao diện giờ chặn được mọi mẫu thử của design-assembly: khoảng cách viết giá trị trong ngoặc vuông, tên lớp ghép bằng dấu +, ngoại lệ lint không lý do cho mọi luật (kể cả tắt cả tệp). Ba quyết định spacing, whole-class-names, lint-exceptions chuyển từ khai sang giữ; tầng nền tảng đạt.

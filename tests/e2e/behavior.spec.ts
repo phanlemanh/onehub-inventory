@@ -90,7 +90,7 @@ test.describe("behavior", () => {
   test("record panel opens beside the grid and closes with Escape", async ({ page }, info) => {
     await openProto(page);
     await openRow(page, 1);
-    await expect(page).toHaveURL(/ho-so=can-2/);
+    await expect(page).toHaveURL(/record=can-2/);
     const box = await recordPanel(page).boundingBox();
     const width = page.viewportSize()!.width;
     expect(box).not.toBeNull();
@@ -108,10 +108,10 @@ test.describe("behavior", () => {
       expect(Math.abs(edges.record - edges.area)).toBeLessThanOrEqual(1);
     }
     await page.getByRole("button", { name: "Sau" }).click();
-    await expect(page).toHaveURL(/ho-so=can-3/);
+    await expect(page).toHaveURL(/record=can-3/);
     await page.keyboard.press("Escape");
     await expect(recordPanel(page)).toHaveCount(0);
-    await expect(page).not.toHaveURL(/ho-so=/);
+    await expect(page).not.toHaveURL(/record=/);
     await expect(async () => assertFocusReturned(page, "can-3")).toPass({ timeout: 5000 });
   });
 
@@ -125,9 +125,31 @@ test.describe("behavior", () => {
   });
 
   test("opening the address opens the record", async ({ page }) => {
-    await openProto(page, "?ho-so=can-4");
+    await openProto(page, "?record=can-4");
     await expect(recordPanel(page)).toBeVisible();
     await expect(recordPanel(page)).toHaveAttribute("data-record-id", "can-4");
+  });
+
+  // Row 1v (english-query-words, E11): the prototype's switch is ?permission=denied; the old ?quyen=khong does nothing.
+  test("quyen-moi: ?permission=denied takes «Thêm dòng» away", async ({ page }) => {
+    await openProto(page);
+    await expect(
+      region(page).getByRole("button", { name: "Thêm dòng" }),
+      "quyen-moi: doi chung",
+    ).toHaveCount(1);
+    await openProto(page, "?permission=denied");
+    await expect(
+      region(page).getByRole("button", { name: "Thêm dòng" }),
+      "quyen-moi: con nut",
+    ).toHaveCount(0);
+  });
+
+  test("quyen-cu: the old ?quyen=khong keeps «Thêm dòng»", async ({ page }) => {
+    await openProto(page, "?quyen=khong");
+    await expect(
+      region(page).getByRole("button", { name: "Thêm dòng" }),
+      "quyen-cu: tu cu con tac dung",
+    ).toHaveCount(1);
   });
 
   test("next and previous keep the frame", async ({ page }) => {

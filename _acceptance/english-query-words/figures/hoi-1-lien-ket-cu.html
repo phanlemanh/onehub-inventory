@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liên kết cũ đã gửi</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Lora:ital,wght@0,400;1,400&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:3rem 2rem;background:#f5f5f5;color:#2d3142;font-family:'Geist',system-ui,sans-serif}
+.frame{width:100%;max-width:1040px}
+.eyebrow{margin-bottom:.5rem;color:#4f5d75;font:500 .66rem 'Geist Mono',monospace;letter-spacing:.18em;text-transform:uppercase}
+h1{margin-bottom:1.5rem;font:400 2rem/1.15 'Instrument Serif','Lora',serif;letter-spacing:-.02em}
+svg{display:block;width:100%;min-width:880px}
+</style>
+</head>
+<body>
+<main class="frame">
+<p class="eyebrow">Hỏi-1 · english-query-words · liên kết cũ</p>
+<h1>Liên kết cũ đã gửi: dịch hay không dịch</h1>
+<svg viewBox="0 0 988 468" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t d">
+<title id="t">Liên kết cũ đã gửi: dịch hay không dịch</title>
+<desc id="d">Sơ đồ luồng trái sang phải. Nút đầu: liên kết cũ đã gửi /inventory?ho-so=&lt;căn&gt;&amp;vung=&lt;nơi&gt;. Nhánh trên, Dịch (khuyên): Bảng Hàng dịch một lần sang /inventory?record=&lt;căn&gt;&amp;place=&lt;nơi&gt;, rồi ngăn hồ sơ căn mở, nơi sáng. Nhánh dưới, Không dịch: trang không hiểu ho-so, vung, rồi bảng hàng trơn, không mở căn. Ba công tắc dev ?vai= ?mau= ?quyen= bỏ hẳn ở cả hai nhánh.</desc>
+<defs>
+<marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+<marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+<marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+</defs>
+<rect width="100%" height="100%" fill="#f5f5f5"/>
+
+<!-- connectors first -->
+<path d="M268 184 H312 Q320 184 320 176 V108 Q320 100 328 100 H440" stroke="#eb6c36" stroke-width="1.4" fill="none" marker-end="url(#arrow-accent)"/>
+<path d="M680 100 H720" stroke="#eb6c36" stroke-width="1.4" fill="none" marker-end="url(#arrow-accent)"/>
+<path d="M268 216 H312 Q320 216 320 224 V292 Q320 300 328 300 H440" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" fill="none" marker-end="url(#arrow)"/>
+<path d="M680 300 H720" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" fill="none" marker-end="url(#arrow)"/>
+
+<!-- branch labels, 8px above their segments -->
+<rect x="336" y="72" width="96" height="16" rx="2" fill="#f5f5f5"/>
+<text x="384" y="84" fill="#ba4513" font-size="11" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Dịch (khuyên)</text>
+<rect x="344" y="272" width="80" height="16" rx="2" fill="#f5f5f5"/>
+<text x="384" y="284" fill="#4f5d75" font-size="11" font-weight="500" font-family="'Geist', sans-serif" text-anchor="middle">Không dịch</text>
+
+<!-- start -->
+<rect x="28" y="152" width="240" height="96" rx="20" fill="#f5f5f5"/>
+<rect x="28" y="152" width="240" height="96" rx="20" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<text x="148" y="192" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Liên kết cũ đã gửi:</text>
+<text x="148" y="212" fill="#4f5d75" font-size="10" font-family="'Geist Mono', monospace" text-anchor="middle">/inventory?ho-so=&lt;căn&gt;&amp;vung=&lt;nơi&gt;</text>
+
+<!-- upper branch (recommended) -->
+<rect x="440" y="52" width="240" height="96" rx="6" fill="#f5f5f5"/>
+<rect x="440" y="52" width="240" height="96" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+<text x="560" y="94" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Bảng Hàng dịch một lần →</text>
+<text x="560" y="114" fill="#4f5d75" font-size="10" font-family="'Geist Mono', monospace" text-anchor="middle">/inventory?record=&lt;căn&gt;&amp;place=&lt;nơi&gt;</text>
+
+<rect x="720" y="52" width="240" height="96" rx="6" fill="#f5f5f5"/>
+<rect x="720" y="52" width="240" height="96" rx="6" fill="rgba(235,108,54,0.10)" stroke="#eb6c36" stroke-width="1.4"/>
+<text x="840" y="104" fill="#ba4513" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Ngăn hồ sơ căn mở, nơi sáng</text>
+
+<!-- lower branch (muted) -->
+<rect x="440" y="252" width="240" height="96" rx="6" fill="#f5f5f5"/>
+<rect x="440" y="252" width="240" height="96" rx="6" fill="#f5f5f5" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="560" y="304" fill="#4f5d75" font-size="12" font-weight="500" font-family="'Geist', sans-serif" text-anchor="middle">Trang không hiểu ho-so, vung</text>
+
+<rect x="720" y="252" width="240" height="96" rx="6" fill="#f5f5f5"/>
+<rect x="720" y="252" width="240" height="96" rx="6" fill="#f5f5f5" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,3"/>
+<text x="840" y="304" fill="#4f5d75" font-size="12" font-weight="500" font-family="'Geist', sans-serif" text-anchor="middle">Bảng hàng trơn, không mở căn</text>
+
+<!-- note under the figure -->
+<text x="28" y="388" fill="#2d3142" font-size="16" font-style="italic" font-family="'Instrument Serif', 'Lora', serif">Ba công tắc dev <tspan font-style="normal" font-size="12" font-family="'Geist Mono', monospace" fill="#4f5d75">?vai= ?mau= ?quyen=</tspan> bỏ hẳn ở cả hai nhánh</text>
+
+<!-- legend -->
+<line x1="28" y1="412" x2="960" y2="412" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
+<text x="28" y="432" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.14em">CHÚ GIẢI</text>
+<line x1="28" y1="452" x2="56" y2="452" stroke="#eb6c36" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
+<text x="64" y="456" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Nhánh khuyên</text>
+<line x1="160" y1="452" x2="188" y2="452" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+<text x="196" y="456" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Nhánh còn lại</text>
+<text x="960" y="456" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end" letter-spacing="0.08em">AC-4 · AC-5 · Hỏi-1</text>
+</svg>
+</main>
+</body>
+</html>

@@ -23,7 +23,7 @@ khi mở hồ sơ (commit bfcb647, giám sát đợt G-1611-91 giao mở hồ s�
 làm. Người dùng là mọi nhân viên sàn, trên máy tính và điện thoại.
 
 Source input: lời chủ kho trong phiên «điều chỉnh hạng mục» · sổ ghi chú của đợt `dieu-chinh-hang-muc-verve-settings.md`
-· hồ sơ đã ký `app-shell-chon-tu-reui` (hàng 1o) · `wiki/decisions/0045-app-shell-theo-verve.md`.
+· hồ sơ đã ký `app-shell-chon-tu-reui` (hàng 1o) · `wiki/decisions/0050-app-shell-theo-verve.md`.
 
 ## Criteria
 

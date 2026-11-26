@@ -6,13 +6,16 @@ import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 import { tempDir } from "./support/temp-dir";
 
+// The tag is built here so the gate's tagged-test reader does not take these fixtures for proofs.
+const TAG = "decision:";
+
 function run(decisions: string, setup: (root: string) => void = () => {}) {
   const root = tempDir("design-check-");
   mkdirSync(join(root, "design"));
   mkdirSync(join(root, "tests"));
   mkdirSync(join(root, "tools"));
   mkdirSync(join(root, "_acceptance"));
-  writeFileSync(join(root, "tests/a.test.ts"), "// decision:a\n");
+  writeFileSync(join(root, "tests/a.test.ts"), `// ${TAG}a\n`);
   writeFileSync(join(root, "README.md"), "");
   writeFileSync(join(root, "tools/t.py"), "");
   writeFileSync(join(root, "Makefile"), "x:\n\tpython3 tools/t.py\n");
@@ -77,11 +80,11 @@ describe("determinism ledger", () => {
   it("does not count a test that does not name its decision", () => {
     const result = run(row("test:tests/a.test.ts", "other"));
     expect(result.status).toBe(1);
-    expect(result.stdout).toContain("decision:other");
+    expect(result.stdout).toContain(`${TAG}other`);
   });
 
   it("does not take a longer decision id for this one", () => {
-    const setup = (root: string) => writeFileSync(join(root, "tests/a.test.ts"), "decision:a-b\n");
+    const setup = (root: string) => writeFileSync(join(root, "tests/a.test.ts"), `${TAG}a-b\n`);
     expect(run(row("test:tests/a.test.ts"), setup).status).toBe(1);
   });
 
