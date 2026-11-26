@@ -1,0 +1,41 @@
+{
+  "feature_plain": "Kho dùng bản 0.76.0 của bộ công cụ hệ thiết kế, như máy của chủ kho, và sổ thiết kế có chữ tiếng Việt cho trang logo và bộ biểu tượng.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ giữ toàn bộ kiểm tra của kho xanh, với cùng số quyết định được giữ, cùng số linh kiện và cùng số bài như trước khi lên đời."},
+    {"id": "AC-2", "p": "Sẽ giữ bước kiểm hệ thiết kế nói 25 quyết định được giữ bởi 36 phép kiểm, và tỉ lệ tất định 62/73; bỏ một phép kiểm thì phép đo đỏ."},
+    {"id": "AC-3", "p": "Sẽ chứng bản công cụ trong kho đúng từng byte bản 0.76.0 của bộ công cụ, và bộ công cụ trên máy đúng là 0.76.0."},
+    {"id": "AC-4", "p": "Sẽ chứng không quyết định thiết kế nào đổi trạng thái giữa công cụ cũ và công cụ mới, trên cùng sổ quyết định."},
+    {"id": "AC-5", "p": "Sẽ giữ phép kiểm tra hệ thiết kế nói 40 trên 40 quyết định lõi đã có câu trả lời."},
+    {"id": "AC-6", "p": "Sẽ chứng 13 chữ mới của sổ thiết kế là tiếng Việt, đủ khoá, và theo luật viết của sản phẩm (không chấm than, không chữ «sàn», dấu thanh kiểu mới)."},
+    {"id": "AC-7", "p": "Sẽ chứng sổ thiết kế vẽ được, và khi kho có logo hay bộ biểu tượng thì trang ấy hiện đủ 13 chữ tiếng Việt, không còn chữ tiếng Anh của khuôn."},
+    {"id": "AC-8", "p": "Sẽ chứng nhánh không đổi gì ngoài bản công cụ, dấu phiên bản, chữ của sổ, một dòng nhật ký và hồ sơ này."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "KHÔNG xét cách các lệnh của bộ công cụ chạy — đó là việc của kho bộ công cụ."},
+    {"id": "OOS-2", "p": "KHÔNG sửa tay bản công cụ trong kho; lỗi tìm ra ở công cụ trả về bộ công cụ."},
+    {"id": "OOS-3", "p": "KHÔNG dịch vài cụm tiếng Anh bộ công cụ tự viết trên trang logo (nguồn của bộ biểu tượng, câu báo lỗi dòng nguồn): khuôn chữ chưa có chỗ cho chúng."},
+    {"id": "OOS-4", "p": "KHÔNG tự ghi logo hay bộ biểu tượng của sản phẩm vào sổ nguồn — chủ kho quyết, kèm giấy phép."},
+    {"id": "OOS-5", "p": "KHÔNG sửa hai hồ sơ đã ký trước đó (40/40 quyết định lõi và lên đời 0.69.0)."},
+    {"id": "OOS-6", "p": "KHÔNG đổi màn hình, mã sản phẩm, dữ liệu hay luật sản phẩm nào."}
+  ],
+  "scope_plain": "Việc này chỉ đổi phần máy của hệ thiết kế và chữ của sổ; người dùng sản phẩm không thấy gì khác.",
+  "coverage_plain": [
+    {"i": 3, "p": "Bản công cụ mới: AC-3 (đúng bản phát hành), AC-1 và AC-2 (kiểm vẫn xanh, cùng số), AC-4 (không quyết định nào đổi), AC-8 (không đổi gì thêm)."},
+    {"i": 4, "p": "Dấu phiên bản 0.76.0: AC-3 (dấu khớp bản công cụ), AC-8."},
+    {"i": 5, "p": "Bước kiểm hệ thiết kế trong lệnh kiểm của kho, giữ nguyên: AC-3 (bằng mẫu 0.76.0), AC-1."},
+    {"i": 6, "p": "Chữ của sổ thiết kế: AC-6 (khoá và luật viết), AC-7 (sổ vẽ đúng chữ ấy), AC-9 (hội đồng đọc nghĩa và giọng), AC-8."},
+    {"i": 7, "p": "Phép kiểm tra 40/40 quyết định lõi: AC-5."},
+    {"i": 8, "p": "Dòng nhật ký wiki: AC-8."},
+    {"i": 9, "p": "Ba phép kiểm mới về logo và bộ biểu tượng: ngoài phạm vi, chỉ bật khi kho có logo hay bộ biểu tượng; AC-4 chứng chưa quyết định nào đổi."},
+    {"i": 10, "p": "Bài kiểm trình duyệt của CI: phải xanh trên đúng bản đã chấm trước Cổng Bằng chứng; lệnh gộp theo lời ký chỉ gộp khi CI xanh."},
+    {"i": 11, "p": "Kiểm trên bản sao nông và cơ sở dữ liệu: CI chứng, cùng chốt gộp ở dòng trên."},
+    {"i": 12, "p": "Cách lệnh lên đời chạy: ngoài phạm vi, có bài kiểm ở kho bộ công cụ."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Lý do bỏ ba phép đo của lần trước dựa vào một câu không quyết được việc ấy. Đã thay bằng lý do riêng: ba phép đo ấy đo những tệp lần này không chạm, và nếu chạm thì phép đo danh sách tệp đỏ."},
+    {"i": 1, "p": "Hai lời hứa chưa từng được thấy đỏ: chữ có biểu tượng cảm xúc, và trang lộ trình bị sửa tay. Đã thêm một ca phá cho mỗi lời, cả hai đỏ đúng câu ghim."},
+    {"i": 2, "p": "Phép vẽ sổ nhận mã lỗi chung và chưa đo chỗ đứng của chữ. Đã chỉ nhận mã ấy khi sổ tự nói là thiếu hình, và đo mỗi chữ trong đúng khung quanh nó; chữ đúng nghĩa khoá nào để hội đồng AC-9 đọc."},
+    {"i": 3, "p": "Hội đồng bị hỏi điều chỉ chủ kho quyết (chọn chữ «Logo»). Đã bỏ câu ấy khỏi hội đồng; chọn chữ là câu Hỏi-3 của chủ kho."},
+    {"i": 4, "p": "Hai dòng phủ dựa vào CI không có chốt. Đã ghi chốt: lệnh gộp theo lời ký chỉ gộp khi CI xanh trên đúng bản ấy."}
+  ]
+}
