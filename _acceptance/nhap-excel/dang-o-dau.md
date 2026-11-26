@@ -2,6 +2,16 @@
 
 Cập nhật sau mỗi bước có nghĩa (G-1711-39: hạn mức tuần ≥ 95%, tới 98% đợt bàn giao).
 
+- **26/11 (đợt chạy lại, G-2611-3):** gộp main (bd11426c): sổ màn → `design/screens/nhap-tep.yaml`, dòng nhật ký →
+  mảnh `wiki/log/`, các tệp vẽ lại theo main; migration 015, 016 không trùng main. Việc 8 (màn) XONG phần máy:
+  bài trình duyệt `tests/e2e-db/nhap-excel.spec.ts` chạy lần đầu, 7 ca xanh ở dãy D (trạng thái 30 ô + axe sáng tối, bàn
+  phím, tệp không lên máy chủ, chữ dài, E20 số trên màn bằng số máy chủ); bốn lỗi thật đã sửa (addf15ad). Hồ sơ họ
+  `design/patterns/luong-nhieu-buoc.md`, dòng sổ khối `design/intake/nap-tep-nhieu-buoc.yaml`, chứng minh màn đủ ma trận
+  — lưới chứng minh màn xanh. `make check` đỏ ĐÚNG MỘT chỗ: owner-calls `pattern:luong-nhieu-buoc` chờ chủ kho giữ
+  (`design/waiting/pattern-luong-nhieu-buoc.json`, yêu cầu D-13). Kế: chờ lời chủ kho; việc 9 (Bảng hàng, E15, E19,
+  E21) sau khi 3g gộp và kéo main; rồi việc 10 và S4.
+- Hở còn lại so với evals: E21 và ô ST-inventory-trong-nap (cần việc 9).
+
 - Trạng thái: Cổng Phạm vi DUYỆT (606ddb1), kế hoạch T3 DUYỆT (chủ kho 17/11). Vùng thi công G duyệt D-11.
 - Xong: việc 0–6 và phần máy chủ của việc 7: ontology, migration 015, đọc tệp, luật dấu (`src/modules/imports/{targets,mark,table}.ts`), cửa tạo `src/modules/listings/create.ts`, phần học `company-config/import-learn.ts`, mã riêng `catalog/company-alias.ts`, lưu và cửa `src/modules/imports/{store,imports-http,server}.ts` + năm route `/api/v1/imports…`. make check XANH ở 1e0f95d.
 - G-1711-40/41: THÊM ca có tên chèn/xoá chéo sàn vào bộ cách ly (`db/tests/cach-ly.sql` + tên ca vào CA_SQL của `db/scripts/cach-ly.sh`, G duyệt D-12), kèm đối chứng dương; trang Cổng Bằng chứng nêu ca 23 trước → sau.
