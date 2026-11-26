@@ -1,0 +1,94 @@
+schema_version: 1
+feature_slug: sua-ba-luat-lint-giao-dien
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: node _acceptance/sua-ba-luat-lint-giao-dien/rang/probe.mjs E1
+    paths: ["tools/eslint-ui/**", "eslint.config.js"]
+    expected: >
+      Thoát 0; dòng đầu «probe: root <gốc kho>»; tám dòng «E1 chặn: …» (p-[13px], gap-[7px], md:-mt-[3px], w-[200px],
+      h-[37px], size-[18px], min-w-[10rem], lg:max-h-[50vh]) và «E1 đối chứng đúng: on-scale steps p-3 gap-2».
+      Chiều đỏ (AC-7): luật về bản của điểm gộp với main → thoát 1 với «E1 LỌT: <div className="p-[13px]" />».
+
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: node _acceptance/sua-ba-luat-lint-giao-dien/rang/probe.mjs E2
+    paths: ["tools/eslint-ui/**", "eslint.config.js"]
+    expected: >
+      Thoát 0; chín dòng «E2 chặn: …» (div, Button, cn, ? :, &&, ||, className chuỗi phải, clsx, cva) và hai dòng
+      «E2 đối chứng đúng: …».
+      Chiều đỏ (AC-7): luật về bản của điểm gộp → thoát 1 với «E2 LỌT: <div className={"text-" + tone} />».
+
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: node _acceptance/sua-ba-luat-lint-giao-dien/rang/probe.mjs E3
+    paths: ["tools/eslint-ui/**", "eslint.config.js"]
+    expected: >
+      Thoát 0; năm dòng «E3 chặn: …» và «E3 đối chứng đúng: the same exception with -- and a reason».
+      Chiều đỏ (AC-7): luật về bản của điểm gộp → thoát 1 với «E3 LỌT: // eslint-disable-next-line shadcn/no-arbitrary-values».
+
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: node _acceptance/sua-ba-luat-lint-giao-dien/rang/probe.mjs E4
+    paths: ["tools/eslint-ui/**", "eslint.config.js"]
+    expected: >
+      Thoát 0; bốn dòng «E4 chặn: …» (mỗi đoạn đúng một báo lỗi), ba dòng «E4 đối chứng đúng: …» gồm «other rules stay
+      suppressed», và «E4 chặn: autofix still runs on screen files».
+      Chiều đỏ thêm (AC-7): bộ hậu xử lý gỡ nhãn của mọi luật → «E4 SAI ĐỐI CHỨNG: other rules stay suppressed»; bộ hậu xử lý
+      tắt sửa tự động → «E4 LỌT: autofix stops on screen files».
+      Chiều đỏ (AC-7): plugin và cấu hình về bản của điểm gộp (không có bộ hậu xử lý) → thoát 1 với «E4 LỌT: /* eslint-disable */».
+
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: node _acceptance/sua-ba-luat-lint-giao-dien/rang/held.mjs
+    paths: ["design/**", "tools/eslint-ui/**", "tools/design-assembly/**", "eslint.config.js"]
+    expected: >
+      Thoát 0; dòng đầu «held: root <gốc kho>»; ba dòng «E5 giữ: <quyết định> bởi <luật>», đọc từ dòng «held … (eslint:<luật>,
+      re-run here)» mà check.mjs --rate in khi tự chạy lại mẫu thử.
+      Chiều đỏ (AC-7): worktree của HEAD mang luật của điểm gộp → thoát 1 với «E5 KHÔNG GIỮ: spacing».
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.check
+    expected: >
+      Thoát 0; dòng cuối «make check passed: …» gồm lint và design-assembly.
+
+  - id: E7
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.build
+    expected: Thoát 0.
+
+  - id: E8
+    criterion: AC-7
+    executor: script
+    cmd: node _acceptance/sua-ba-luat-lint-giao-dien/rang/two-way.mjs
+    paths: ["tools/eslint-ui/**", "eslint.config.js", "design/**", "tools/design-assembly/**", "wiki/decisions/**", "_acceptance/sua-ba-luat-lint-giao-dien/rang/**"]
+    expected: >
+      Thoát 0; dòng đầu «two-way: root <gốc kho> · base <sha>»; mười dòng «đúng: …» — bản lành xanh; bốn bản phá E1–E4 thoát
+      1 với đúng dòng «LỌT» ghim ở trên; hai bản phá bộ hậu xử lý thoát 1 với dòng ghim của E4; E5 cây thật xanh và E5 bản
+      phá thoát 1 với «E5 KHÔNG GIỮ: spacing»; E10 bản phá thoát 1 với «E10 THIẾU: không trang quyết định nào trỏ
+      d-20261126T061152Z-5». Thư mục tạm và worktree tạm dưới .acceptance-runs/ được gỡ cả khi đỏ.
+
+  - id: E9
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.design.floor
+    expected: >
+      Thoát 0: tệp giao diện duy nhất vòng này chạm (`src/components/candidate/data-region.tsx`, chỉ thêm lý do vào hai
+      chú thích) không có mã màu thô.
+
+  - id: E10
+    criterion: AC-6
+    executor: script
+    cmd: node _acceptance/sua-ba-luat-lint-giao-dien/rang/wiki.mjs
+    paths: ["wiki/decisions/**"]
+    expected: >
+      Thoát 0; dòng đầu «wiki: dir <gốc kho>/wiki/decisions»; «E10 có: <trang> trỏ d-20261126T061152Z-5».
+      Chiều đỏ (AC-7): thư mục quyết định trống → thoát 1 với «E10 THIẾU: không trang quyết định nào trỏ d-20261126T061152Z-5».

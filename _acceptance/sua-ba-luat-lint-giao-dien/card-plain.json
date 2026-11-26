@@ -1,0 +1,36 @@
+{
+  "feature_plain": "Máy tự chặn ba kiểu viết giao diện lệch hệ thiết kế mà hôm nay vẫn lọt — khoảng cách tự đặt số, tên màu ghép từng mảnh, và chỗ tắt kiểm tra không ghi lý do — để công cụ thiết kế tính ba quyết định này là «máy giữ» thay vì «chỉ khai».",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ chặn mọi khoảng cách và kích thước tự đặt số trong ngoặc vuông (tám kiểu, có và không có tiền tố màn hình), còn bước có sẵn của thang vẫn qua."},
+    {"id": "AC-2", "p": "Sẽ chặn tên lớp ghép từng mảnh bằng dấu cộng ở chín chỗ viết thường gặp, còn ghép hai lớp cách nhau khoảng trắng vẫn qua."},
+    {"id": "AC-3", "p": "Sẽ bắt mọi chỗ tắt kiểm tra phải ghi lý do, kể cả khi tắt luật của shadcn hay React, chứ không chỉ luật riêng của kho."},
+    {"id": "AC-4", "p": "Sẽ bắt cả kiểu tắt kiểm tra cho nguyên tệp hay nguyên dòng mà không lý do — kiểu trước đây không gì chặn — mà không làm hỏng chỗ tắt có lý do hay việc tự sửa lỗi."},
+    {"id": "AC-5", "p": "Sẽ để chính công cụ thiết kế, khi tự chạy lại mẫu thử của nó, thấy ba quyết định này là «máy giữ»."},
+    {"id": "AC-7", "p": "Sẽ có mỗi phép đo đã chứng là biết đỏ: đặt lại luật cũ thì đúng phép đo ấy báo lọt."}
+  ],
+  "wont_do": [
+    {"id": "AC-6", "p": "Sẽ KHÔNG làm vỡ gì khác: toàn bộ kiểm tra và bản dựng của kho vẫn xanh, và có một trang quyết định trong wiki ghi quy ước mới."},
+    {"id": "OOS-1", "p": "Không đổi luật kiểm tra nào khác, không dọn các cảnh báo có sẵn."},
+    {"id": "OOS-2", "p": "Không áp luật lý do cho mã ngoài màn (công cụ, bài kiểm) hay mã của nhà cung cấp — giữ đúng phạm vi màn như trước."},
+    {"id": "OOS-3", "p": "Không đụng ba việc đang chờ khác: chọn công cụ ngoài, dòng nguồn phông chữ, xuất hệ thiết kế ra Claude Design."}
+  ],
+  "coverage_plain": [
+    {"i": 0, "p": "Không quét rộng không gian tiêu chí: phạm vi là đúng các mẫu công cụ thiết kế báo lọt hôm nay, liệt kê trọn trong bảng dưới."},
+    {"i": 1, "p": "(tiếp câu trên)"},
+    {"i": 3, "p": "Ba quyết định đều có tiêu chí: khoảng cách (AC-1), tên lớp viết liền (AC-2), chỗ tắt kiểm tra có lý do (AC-3, AC-4)."},
+    {"i": 4, "p": "Đủ nghĩa là mọi mẫu công cụ in «lọt» ngày 26/11 đều nằm trong phép đo, chép nguyên văn."},
+    {"i": 5, "p": "Khoảng cách và kích thước, có và không tiền tố màn hình (AC-1)."},
+    {"i": 6, "p": "Năm dạng ghép nhân bốn chỗ đọc tên lớp (AC-2)."},
+    {"i": 7, "p": "Hai tác dụng phụ của bước chặn mới đều được đo: luật khác vẫn tắt được, tự sửa vẫn chạy (AC-4)."},
+    {"i": 8, "p": "Cả hai chiều: phải chặn mẫu xấu và không chặn mẫu đúng (AC-1 đến AC-4)."},
+    {"i": 9, "p": "Kết luận thật của công cụ thiết kế (AC-5) và trang quyết định trong wiki (AC-6)."},
+    {"i": 10, "p": "Không vỡ gì khác trong kho (AC-6)."},
+    {"i": 11, "p": "Mỗi phép đo đã chứng là biết đỏ (AC-7)."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Thiếu: chưa phép đo nào đọc kết luận thật của công cụ thiết kế. Đã sửa: phép đo nay chạy công cụ và đọc ba dòng «máy giữ»; đặt lại luật cũ thì nó báo «không giữ»."},
+    {"i": 1, "p": "Thiếu: chưa đo hai tác dụng phụ của bước chặn mới. Đã sửa: thêm hai ca (luật khác vẫn tắt được, tự sửa vẫn chạy), mỗi ca có bản phá đỏ."},
+    {"i": 2, "p": "Thiếu: bảng mẫu chưa đủ (chưa có lớp kích thước, thiếu vài dạng ghép). Đã sửa: tám mẫu khoảng cách và kích thước, chín mẫu ghép."},
+    {"i": 3, "p": "Thiếu: quy ước mới chưa có trang quyết định trong wiki. Đã sửa: thêm tiêu chí đòi trang ấy, viết sau khi anh trả lời Hỏi-1."}
+  ]
+}
