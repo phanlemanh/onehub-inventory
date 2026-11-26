@@ -37,7 +37,7 @@ const words = (change) => (dir) => {
 
 // case: measure, the break, the words the red line must hold.
 const CASES = [
-  ["muc-untag", "muc", edit("tests/language.test.ts", "// decision:terms\n", ""), "21 claimed"],
+  ["muc-untag", "muc", edit("tests/language.test.ts", "// decision:terms\n", ""), "18 claimed"],
   ["sau-dong-untag", "sau-dong", edit("tests/language.test.ts", "// decision:terms\n", ""), "terms is failing"],
   ["sau-dong-repoint", "sau-dong", edit("design/decisions.yaml", 'check: "test:tests/bo-nut-vai-man.test.ts"', 'check: "test:tests/vai-man-so-man.test.ts"'), "screen-actions is"],
   ["loi-chu-unconfirmed", "loi-chu", edit("design/decisions.yaml", "is missing from the register or an entry is wrong; confirmed by Manh Phan on 2026-11-26: Đồng ý, ghi cả 6 câu", "is missing from the register or an entry is wrong; a person has not confirmed it"), "in the note of screen-ledger"],
@@ -46,6 +46,7 @@ const CASES = [
   ["dong-gan-extra", "dong-gan", edit("tests/bo-nut-vai-man.test.ts", "// decision:screen-actions\n", "// decision:screen-actions\n// another line\n"), "tests/bo-nut-vai-man.test.ts is not its"],
   ["dong-gan-locked", "dong-gan", edit("tools/proof_gate/proof-gate.test.ts", "// Tests for", "// decision:reference-implementation\n// Tests for"), "tools/proof_gate/proof-gate.test.ts changed since"],
   ["tep-nhanh-extra", "tep-nhanh", add("src/lib/probe.ts", "export const probe = 1;\n"), "changed outside the list: src/lib/probe.ts"],
+  ["tep-nhanh-map", "tep-nhanh", edit("PRODUCT-MAP.md", "\n", "\nhand edit\n"), "differ from the kit's drawing"],
   ["bo-chu-key", "bo-chu", words((w) => (w.extra = "x")), "extra extra"],
   ["bo-chu-colour", "bo-chu", words((w) => (w.title = "Hệ thiết kế #ff0000")), "a value of the repository"],
   ["bo-chu-question", "bo-chu", words((w) => delete w.questions.terms), "not the six"],

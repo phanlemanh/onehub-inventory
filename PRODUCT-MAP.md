@@ -11,7 +11,7 @@ flowchart TD
   GD --> XL["Xếp lại sau<br/>chưa có"]
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
-  GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
+  GP --> DL["Đang làm<br/>1 việc"] --> GB{"Cổng Bằng chứng"}
   GB --> DG["Đã giao<br/>27 việc"]
   GB --> CN["Chờ phiên nghiệm thu<br/>53 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
@@ -33,6 +33,10 @@ flowchart TD
 - Đầu chủ đổi giá và đổi trạng thái ngay trong hồ sơ căn trên điện thoại, theo cùng luật với sửa trên ô của Bảng hàng (`sua-nhanh-tren-dien-thoai`)
 - Đầu chủ sửa được thông tin của căn ngoài giá và trạng thái — pháp lý, nội thất, tài chính, tình trạng sử dụng — ngay trong sản phẩm, không phải nhập lại tệp (`sua-thong-tin-can`)
 - Đầu chủ gõ mã căn để thêm căn, hoặc tạo căn tay khi danh mục chưa có (`them-can`)
+
+## Đang làm
+
+- Ghi sáu quyết định lõi còn mở của hệ thiết kế theo lời chủ kho, và bộ chữ tiếng Việt của sổ hệ thiết kế (`design-decisions-40-of-40`)
 
 ## Đã giao — chờ phiên nghiệm thu
 
@@ -98,7 +102,6 @@ flowchart TD
 - Hook commit-msg của kho (tools/commit_msg.py) nhận đúng các tiêu đề commit kit nghiệm thu v3.0.0 tự viết — Gate 2 signoff, Veto, repin, wip(ban-giao) — để job conventional-commits không đỏ trên PR qua Cổng 2 (`commit-msg-kit-subjects`)
 - Một lệnh đặt khoá — chủ kho dán mỗi khoá do dịch vụ cấp một lần vào make dat-khoa; lệnh đưa bản lên tự đặt mật khẩu vai đăng nhập và tự đẩy biến sang Vercel; sổ tay chỉ còn phần của chủ kho; quyền đứng cho hạ tầng Inventory (`dat-khoa-mot-lenh`)
 - Tiếp nhận design-assembly — tám quyết định thiết kế đã ghi được nối vào kiểm tra sẵn có, thêm hai dòng phông chữ (`design-assembly-adopt-checks`) — đã giao — máy thông, bằng chứng xanh-sạch
-- Ghi sáu quyết định lõi còn mở của hệ thiết kế theo lời chủ kho, và bộ chữ tiếng Việt của sổ hệ thiết kế (`design-decisions-40-of-40`)
 - Địa chỉ màn Tuỳ chỉnh của sàn và bản mẫu bộ nút, từ chọn phần và mã màn của chúng viết bằng tiếng Anh như luật kho (`english-route-names`)
 - `go-hoi-khi-gop`
 - Lint và bộ chạy bài kiểm của kho bỏ qua hai thư mục ngoài git (.acceptance-runs/ và .claude/worktrees/) để bộ kiểm và hook trước commit không đỏ vì tệp không thuộc kho (`lint-bo-qua-thu-muc-ngoai-git`) — đã giao — máy thông, cửa veto còn mở
@@ -109,6 +112,7 @@ flowchart TD
 - Chép lại công cụ design-assembly từ plugin — sổ linh kiện hết ghi trùng linh kiện xuất lại qua tệp gom (`refresh-design-assembly-tool`)
 - Gộp nhánh chính vào nhánh PR không vấp trang máy sinh LO-TRINH.html (một dòng .gitattributes + đoạn dạy dựng máy), thước của hồ sơ ra khỏi phạm vi quét CodeQL, và ghi quyết định nhịp nâng repo-setup (`roadmap-merge-driver`) — đã giao — máy thông, bằng chứng xanh-sạch
 - Tách sổ log của wiki ra khỏi git (mỗi mục một tệp ở wiki/log/, wiki/log.md vẽ ra); PR 1 trên 2 của bước tách sổ trong nâng cấp repo-setup 0.9.0 (`split-log-ledger`)
+- Ba luật lint giao diện của kho chặn được mọi mẫu thử mà công cụ thiết kế dùng để xác nhận luật giữ quyết định — khoảng cách tự viết giá trị, tên lớp ghép bằng dấu cộng, và ngoại lệ lint không lý do cho mọi luật kể cả tắt cả tệp (`sua-ba-luat-lint-giao-dien`)
 - Tắt đích danh sáu plugin của chợ cũ ở mức kho, để phiên Claude Code mở ở kho này chỉ nạp bản 3.0.0 của chợ delivery-loop dù máy bật bản cũ ở mức người dùng (`tat-plugin-cho-cu`)
 - Lên đời công cụ design-assembly từ 0.7.1 lên 0.36.1 bằng lệnh upgrade, chỉ phần máy — không quyết định thiết kế nào đổi trạng thái (`upgrade-design-assembly-0-33-0`)
 - Lên đời công cụ design-assembly từ 0.36.1 lên 0.69.0 bằng lệnh upgrade, chỉ phần máy — không quyết định thiết kế nào đổi trạng thái (`upgrade-design-assembly-0-69-0`)

@@ -10,7 +10,7 @@ evals:
     long_running: 30
     layer: backend-effect
     paths: ["design/**", "tests/**", "tools/**", "wiki/log/**"]
-    expected: "exit 0; đầu ra có 'design-assembly: 22 decisions held by 33 checks, each seen failing on a changed copy', 'component manifest: design/component-registry.json is up to date (294 components)', 'determinism: 62/73 = 85%' và 'Tests  2663 passed | 2 skipped (2665)'"
+    expected: "exit 0; đầu ra có 'design-assembly: 25 decisions held by 36 checks, each seen failing on a changed copy', 'component manifest: design/component-registry.json is up to date (294 components)', 'determinism: 62/73 = 85%' và 'Tests  2688 passed | 2 skipped (2690)'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E2
     criterion: AC-2
@@ -18,7 +18,7 @@ evals:
     cmd: node _acceptance/design-decisions-40-of-40/rang/do.mjs muc
     layer: backend-effect
     paths: ["design/**", "tests/**", "playwright.config.ts", "_acceptance/design-decisions-40-of-40/rang/**"]
-    expected: "exit 0; dòng 'muc: 40 of 40 core decisions answered, 11 held, 22 claimed, 7 recorded'"
+    expected: "exit 0; dòng 'muc: 40 of 40 core decisions answered, 14 held, 19 claimed, 7 recorded'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E3
     criterion: AC-2
@@ -27,7 +27,7 @@ evals:
     long_running: 5
     layer: backend-effect
     paths: ["_acceptance/design-decisions-40-of-40/rang/**", "design/**", "tests/**"]
-    expected: "exit 0; mỗi ca xanh trên bản sao không đổi và đỏ sau khi phá — muc-untag: đỏ 'the audit says 39 of 40, 11 held, 21 claimed, 7 recorded'"
+    expected: "exit 0; mỗi ca xanh trên bản sao không đổi và đỏ sau khi phá — muc-untag: đỏ 'the audit says 39 of 40, 14 held, 18 claimed, 7 recorded'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E4
     criterion: AC-3
@@ -112,7 +112,7 @@ evals:
     long_running: 5
     layer: backend-effect
     paths: ["_acceptance/design-decisions-40-of-40/rang/**", "design/**", "tests/**"]
-    expected: "exit 0; mỗi ca xanh trên bản sao không đổi và đỏ sau khi phá — tep-nhanh-extra: đỏ 'changed outside the list: src/lib/probe.ts'"
+    expected: "exit 0; mỗi ca xanh trên bản sao không đổi và đỏ sau khi phá — tep-nhanh-extra: đỏ 'changed outside the list: src/lib/probe.ts'; tep-nhanh-map: đỏ 'differ from the kit' khi PRODUCT-MAP.md bị sửa tay"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E14
     criterion: AC-8

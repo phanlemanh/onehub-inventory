@@ -5,7 +5,7 @@ slug: design-decisions-40-of-40
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [config, docs]
-status: signed-off
+status: implemented
 veto_state: mo
 veto_opened_at: 2026-11-26T06:30:00Z
 approved_by:
@@ -32,11 +32,11 @@ Source input: lời chủ kho ngày 2026-11-26: «Phân tích và đề xuất c
 ## Criteria
 
 - AC-1: Given nhánh ở HEAD, When chạy `make check`, Then lệnh thoát 0, và đầu ra có các dòng
-  `design-assembly: 22 decisions held by 33 checks, each seen failing on a changed copy`,
+  `design-assembly: 25 decisions held by 36 checks, each seen failing on a changed copy`,
   `component manifest: design/component-registry.json is up to date (294 components)`, `determinism: 62/73 = 85%` và
-  `Tests  2663 passed | 2 skipped (2665)`.
+  `Tests  2688 passed | 2 skipped (2690)`.
 - AC-2: Given HEAD, When chạy lệnh kiểm tra (audit) của plugin design-assembly, Then nó nói 40 trong 40 quyết định lõi có
-  câu trả lời, chia 11 có phép kiểm đã chạy lại, 22 có phép kiểm chưa chạy lại, 7 là lời người đã ghi, và mọi tầng ở
+  câu trả lời, chia 14 có phép kiểm đã chạy lại, 19 có phép kiểm chưa chạy lại, 7 là lời người đã ghi, và mọi tầng ở
   trạng thái «đã đạt» hoặc «đủ, dựa trên phép kiểm chưa chạy lại»; khi một bài kiểm mất dòng gắn tên quyết định thì phép đo
   đỏ và nói 39 trên 40.
 - AC-3: Given HEAD, When đọc trạng thái từng quyết định trong sáu quyết định, Then `error-copy` là lời người đã ghi, và mỗi
@@ -55,7 +55,8 @@ Source input: lời chủ kho ngày 2026-11-26: «Phân tích và đề xuất c
   đúng một dòng đầu `// decision:<id>` của quyết định nó giữ, và `tools/proof_gate/proof-gate.test.ts` (tệp khoá theo dấu
   vân tay) không đổi; khi một tệp có thêm dòng khác, hay tệp khoá bị gắn tên, thì phép đo đỏ và gọi tên tệp.
 - AC-7: Given chỗ nhánh rời `main` và HEAD, When kê tệp nhánh đổi, Then nhánh chỉ đổi `design/decisions.yaml`,
-  `design/book-words.json`, bốn bài kiểm, đúng một tệp `wiki/log/` và thư mục `_acceptance/design-decisions-40-of-40/`;
+  `design/book-words.json`, bốn bài kiểm, đúng một tệp `wiki/log/`, thư mục `_acceptance/design-decisions-40-of-40/`, cùng
+  `PRODUCT-MAP.md` và `LO-TRINH.html` khi mỗi trang đúng bằng bản bộ vẽ của kit vẽ lại;
   khi nhánh có thêm một tệp mã thì phép đo đỏ và gọi tên tệp.
 - AC-8: Given `design/book-words.json` ở HEAD, When so với khuôn chữ của sổ (`book.mjs --words-template` của plugin), Then
   tệp là JSON, có đúng các khoá của khuôn, mục câu hỏi có đúng sáu mã quyết định, và không chứa giá trị màu hay tên kho;
@@ -109,3 +110,5 @@ Phủ theo tệp nhánh đổi và theo từng bên đọc chúng. Không quét 
   - Phản biện-4: hợp đồng không nói «sổ màn» được giữ bằng công cụ chạy trong kiểm toàn kho thay vì dòng gắn tên, và chưa
     có ca phá cắt mối nối ấy.
   - Phản biện-5: phép dò bộ chữ chỉ bắt mã màu hex, rgb, hsl, oklch và một cách viết tên kho.
+- Vòng 2 (2026-11-26): gộp `main` có PR #123 (`7e08ffd1`) vào nhánh; số ghim của AC-1, AC-2 cập nhật và AC-7 nhận hai trang
+  bộ vẽ của kit, theo dòng sổ `fix` cùng ngày. Chữ ký vòng 1 không áp cho bằng chứng vòng 2.

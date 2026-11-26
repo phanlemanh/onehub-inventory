@@ -8,7 +8,7 @@
 // Measures: muc, sau-dong, loi-chu, kho-man, dong-gan, tep-nhanh, bo-chu, dong-khac.
 // --base is the commit the branch left main at; without it, `git merge-base origin/main HEAD`.
 // The design-assembly plugin is read from $DA_PLUGIN, default the owner's checkout.
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -33,6 +33,8 @@ const TAGGED = {
 const LOCKED = "tools/proof_gate/proof-gate.test.ts";
 const COLOURS = ["color-roles-sidebar", "color-roles-neutral", "color-roles-status", "color-roles-chart"];
 const SIZES = ["360", "414", "1024", "1440"];
+const KIT = process.env.AG_PLUGIN ?? "/Users/manhphan/dev/delivery-loop/plugins/acceptance-gate";
+const KIT_PAGES = ["PRODUCT-MAP.md", "LO-TRINH.html"];
 const CONFIRMED = /confirmed by Manh Phan on 2026-11-26: Đồng ý, ghi cả 6 câu$/;
 
 const args = process.argv.slice(2);
@@ -98,10 +100,10 @@ const measures = {
     const a = JSON.parse(node("audit.mjs", "--json"));
     const c = a.coverage;
     const got = `${c.answered} of ${c.core}, ${c.held} held, ${c.claimed} claimed, ${c.recorded} recorded`;
-    if (got !== "40 of 40, 11 held, 22 claimed, 7 recorded") red(`the audit says ${got}, not 40 of 40, 11 held, 22 claimed, 7 recorded`);
+    if (got !== "40 of 40, 14 held, 19 claimed, 7 recorded") red(`the audit says ${got}, not 40 of 40, 14 held, 19 claimed, 7 recorded`);
     const short = a.tiers.filter((t) => !["reached", "claimed"].includes(t.state)).map((t) => `${t.id} ${t.state}`);
     if (short.length) red(`tiers not complete: ${short.join(", ")}`);
-    green(`40 of 40 core decisions answered, 11 held, 22 claimed, 7 recorded; ${a.tiers.length} tiers reached or claimed`);
+    green(`40 of 40 core decisions answered, 14 held, 19 claimed, 7 recorded; ${a.tiers.length} tiers reached or claimed`);
   },
 
   // AC-3: error-copy is recorded; each of the five others is claimed by its own check.
@@ -170,7 +172,15 @@ const measures = {
     const changed = git("diff", "--name-only", b, "HEAD").split("\n").filter(Boolean);
     const allowed = new Set(["design/decisions.yaml", "design/book-words.json", ...Object.keys(TAGGED)]);
     const logs = changed.filter((f) => f.startsWith("wiki/log/"));
-    const extra = changed.filter((f) => !allowed.has(f) && !f.startsWith(`_acceptance/${SLUG}/`) && !f.startsWith("wiki/log/"));
+    // The kit's two pages, redrawn at signing, are allowed only when they are exactly the kit's drawing.
+    const pages = changed.filter((f) => KIT_PAGES.includes(f));
+    if (pages.length) {
+      const map = spawnSync("node", [join(KIT, "scripts", "product-map.mjs"), "--root", ROOT, "--check"], { cwd: ROOT, encoding: "utf8" });
+      if (map.status !== 0) red(`${pages.join(", ")} differ from the kit's drawing: ${(map.stdout + map.stderr).trim().split("\n")[0]}`);
+    }
+    const extra = changed.filter(
+      (f) => !allowed.has(f) && !KIT_PAGES.includes(f) && !f.startsWith(`_acceptance/${SLUG}/`) && !f.startsWith("wiki/log/"),
+    );
     if (extra.length) red(`changed outside the list: ${extra.join(", ")}`);
     if (logs.length !== 1) red(`${logs.length} wiki log files changed, not 1`);
     const missing = [...allowed].filter((f) => !changed.includes(f));
