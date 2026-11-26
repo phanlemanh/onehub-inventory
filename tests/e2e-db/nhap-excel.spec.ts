@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Cookie, type Page, type Request } from "@playwright/test";
+import { expect, test, type Cookie, type Page, type Request, type Route } from "@playwright/test";
 import pg from "pg";
 
 import { FRAME_COPY } from "../../src/components/templates/frame-copy";
@@ -356,4 +356,88 @@ test("chu dai: a long value keeps the page in its width and is read in full", as
     long,
   );
   expect(whole, "long value cut away").toBe(true);
+});
+
+/** Every number the preview step shows equals the server's answer, or the first that differs is named. */
+async function screenCountsFault(
+  page: Page,
+  body: Record<string, unknown>,
+): Promise<string | null> {
+  const counts = body["counts"] as Record<string, number>;
+  for (const m of ["keep", "fixed", "ask", "block"]) {
+    const shown = Number(
+      await page.locator(`[data-state="dem-dau"] [data-mark="${m}"]`).textContent(),
+    );
+    if (shown !== counts[m])
+      return `screen counts differ from server: ${m} ${shown} != ${counts[m]}`;
+  }
+  return null;
+}
+
+test("so tren man bang so may chu: the preview and Xong show the server's numbers", async ({
+  page,
+}) => {
+  test.skip(test.info().project.name !== "1440", "one width: the numbers do not depend on it");
+  await openScreen(page);
+  // The person's answers for ban.xlsx, as the database case gives them, with the new field left out (its cells are
+  // sent by the screen's own choice); the test hands them to the server in place of clicks on every question.
+  const answers = JSON.parse(readFileSync(join(FIX, "lua-chon.json"), "utf8")) as {
+    columns: Record<string, unknown>;
+  };
+  answers.columns["7"] = { target: { skip: true } };
+  let preview: Record<string, unknown> | null = null;
+  let learned: string[] = [];
+  const withAnswers = (r: Route) => {
+    const sent = JSON.parse(r.request().postData() ?? "{}") as Record<string, unknown>;
+    return JSON.stringify({ ...sent, choices: answers });
+  };
+  await page.route("**/api/v1/imports/preview", async (r) => {
+    const res = await r.fetch({ postData: withAnswers(r) });
+    preview = (await res.json()) as Record<string, unknown>;
+    await r.fulfill({ response: res, json: preview });
+  });
+  await page.route("**/api/v1/imports", (r) =>
+    r.request().method() === "POST" ? r.continue({ postData: withAnswers(r) }) : r.continue(),
+  );
+  await page.route("**/api/v1/imports/*/batches", async (r) => {
+    const res = await r.fetch({ postData: withAnswers(r) });
+    const json = (await res.json()) as { learned?: string[] };
+    if (json.learned) learned = json.learned;
+    await r.fulfill({ response: res, json });
+  });
+
+  await choose(page, "ban.xlsx");
+  await expect(next(page)).toBeEnabled({ timeout: 10_000 });
+  await toPreview(page);
+  const last = preview as unknown as Record<string, unknown>;
+  expect(await screenCountsFault(page, last)).toBeNull();
+  const createCount = last["createCount"] as number;
+  const keptCount = last["keptCount"] as number;
+  expect(createCount, "ban.xlsx with the answers creates listings").toBeGreaterThan(0);
+  await expect(page.getByRole("button", { name: C.apply(createCount, keptCount) })).toBeEnabled();
+
+  await page.getByRole("button", { name: C.apply(createCount, keptCount) }).click();
+  await expect(page.locator('[data-state="xong"]')).toContainText(C.done(createCount));
+  if (keptCount > 0)
+    await expect(page.locator('[data-state="giu-chu-goc"]')).toHaveText(C.keptCells(keptCount));
+  const shownLearned = await page.locator('[data-state="vua-hoc"] li').allTextContents();
+  expect(learned.length, "the answers teach the company something").toBeGreaterThan(0);
+  expect(shownLearned).toEqual(learned);
+
+  // Break: an answer whose «ask» count is one more than its cells — a screen counting its own cells would show the
+  // cells' number; this one must show the server's.
+  await page.unroute("**/api/v1/imports/preview");
+  await page.route("**/api/v1/imports/preview", async (r) => {
+    const res = await r.fetch({ postData: withAnswers(r) });
+    const json = (await res.json()) as Record<string, unknown>;
+    const counts = json["counts"] as Record<string, number>;
+    preview = { ...json, counts: { ...counts, ask: counts["ask"]! + 1 } };
+    await r.fulfill({ response: res, json: preview });
+  });
+  await page.goto("/nhap-tep");
+  await waitReady(page);
+  await choose(page, "ban.xlsx");
+  await expect(next(page)).toBeEnabled({ timeout: 10_000 });
+  await toPreview(page);
+  expect(await screenCountsFault(page, preview as unknown as Record<string, unknown>)).toBeNull();
 });
