@@ -1,0 +1,44 @@
+{
+  "feature_plain": "Bộ công cụ giữ chuẩn thiết kế của kho lên bản mới nhất (0.69.0) mà không đổi quyết định thiết kế nào, và từ nay máy tự chặn một nhánh thêm thành phần giao diện mới mà chưa ghi vào sổ nhận khối.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ giữ toàn bộ bài kiểm của kho xanh, với đúng số đã ghim: 22 quyết định thiết kế, 33 phép kiểm, độ xác định 57/69, 294 linh kiện."},
+    {"id": "AC-2", "p": "Sẽ cho cổng thiết kế tự nói đủ 22 quyết định và 33 phép kiểm, và đỏ ngay khi một phép kiểm bị gỡ khỏi sổ."},
+    {"id": "AC-3", "p": "Sẽ chứng bộ công cụ trong kho trùng từng byte với bản 0.69.0 của plugin đã cài, cả dấu phiên bản lẫn bước cổng."},
+    {"id": "AC-4", "p": "Sẽ chứng không quyết định thiết kế nào trong 69 quyết định đổi trạng thái so với trước khi nâng."},
+    {"id": "AC-5", "p": "Sẽ chứng cổng thiết kế, kể cả chốt «chọn trước khi vẽ», chạy đúng trên bản tải nông như CI tải."},
+    {"id": "AC-6", "p": "Sẽ chứng nhánh không đổi gì ngoài những tệp của lần nâng, nhật ký và hồ sơ này."},
+    {"id": "AC-7", "p": "Sẽ chứng luật kiểm React chỉ được tắt cho riêng thư mục công cụ, còn mọi chỗ khác vẫn bắt lỗi như cũ."},
+    {"id": "AC-8", "p": "Sẽ chứng chốt «chọn trước khi vẽ» làm đúng cả hai chiều: thành phần mới chưa vào sổ thì chặn, đã vào sổ thì cho qua."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "Không kiểm cách các lệnh của plugin chạy, không sửa kho của plugin."},
+    {"id": "OOS-2", "p": "Không sửa tay bộ công cụ: lỗi tìm ra trong đó là việc của plugin, vòng dừng và trình anh."},
+    {"id": "OOS-3", "p": "Không trả lời bốn câu màu đang chờ anh, không bổ sung ba sổ còn thiếu và sáu quyết định chưa có bài kiểm."},
+    {"id": "OOS-4", "p": "Không ghim ReUI hay nguồn nào làm nguồn ngoài: hai chốt về khối nguồn ngoài chưa giữ gì cho tới lúc ấy."},
+    {"id": "OOS-5", "p": "Không ghim lại hay sửa hồ sơ đã ký của các lần nâng trước."},
+    {"id": "OOS-6", "p": "Không đổi màn hình, mã sản phẩm, dữ liệu hay luật sản phẩm nào."}
+  ],
+  "scope_plain": "Lần này chỉ thay bộ máy kiểm thiết kế; mọi việc dùng tính năng mới của nó để làm sau.",
+  "coverage_plain": [
+    {"i": 0, "p": "Độ phủ kê theo từng tệp lần nâng đụng tới và từng chỗ đọc các tệp ấy, gồm hai chỗ đọc mới: chốt «chọn trước khi vẽ» soi mọi nhánh sau này, và bài trình duyệt mới chạy trong CI."},
+    {"i": 4, "p": "Bộ công cụ: trùng bản phát hành (AC-3 so cây công cụ), cổng xanh với đúng số (AC-1, AC-2), không đổi gì thêm (AC-6 danh sách tệp)."},
+    {"i": 5, "p": "Dấu phiên bản ghi 0.69.0 (AC-3 so cây công cụ)."},
+    {"i": 6, "p": "Bước cổng viết lại bằng mẫu mới mà mọi lệnh cũ vẫn chạy (AC-3 so mẫu, AC-1 bài kiểm của kho)."},
+    {"i": 7, "p": "Ba phép kiểm mới trong sổ thiết kế: đủ 33 và phá thì đỏ (AC-2), không quyết định nào đổi trạng thái (AC-4), chốt «chọn trước khi vẽ» chạy thật (AC-8)."},
+    {"i": 8, "p": "Chốt «chọn trước khi vẽ» với các nhánh sau này: thiếu dòng sổ thì chặn, có dòng thì cho qua, dòng trỏ nhầm tệp thì vẫn chặn (AC-8 hai chiều)."},
+    {"i": 9, "p": "Bài trình duyệt mới có trong lần nâng (AC-6); nó chỉ chạy trên CI, nên CI của PR phải xanh trên đúng bản đã chấm trước khi trình anh ký."},
+    {"i": 10, "p": "Chỗ tắt luật kiểm React có tầm đúng một thư mục (AC-7) và lint của kho vẫn xanh (AC-1)."},
+    {"i": 11, "p": "Ngoại lệ «được đọc lịch sử git» của chốt mới là thật trên bản tải nông (AC-5), và bài kiểm luật ấy vẫn xanh (AC-1)."},
+    {"i": 12, "p": "Dòng nhật ký wiki có trong danh sách tệp được phép (AC-6)."},
+    {"i": 13, "p": "Hai chốt về khối nguồn ngoài: ngoài phạm vi, vì kho chưa ghim nguồn ngoài nên chúng chưa giữ gì."},
+    {"i": 14, "p": "Bài kiểm chạy trên bản tải nông và cơ sở dữ liệu: CI chứng, máy này không đo."},
+    {"i": 15, "p": "Cách lệnh nâng của plugin chạy: ngoài phạm vi, kho của plugin có bài kiểm riêng."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Hai lựa chọn máy ghi là «có căn cứ trong tài liệu» thật ra chỉ dựa vào hồ sơ lần nâng trước, không quyết được cho lần này. Đã sửa: ghi lại hai lựa chọn ấy với lý do riêng của lần này, và bảng độ phủ kê thêm hai chỗ đọc mới."},
+    {"i": 1, "p": "Phép đo chốt «chọn trước khi vẽ» chỉ thử chiều chặn, chưa thử chiều cho qua, nên một chốt chặn oan mọi thành phần mới vẫn qua. Đã sửa: thêm ca có dòng sổ thì cổng xanh lại, và ca dòng sổ trỏ nhầm tệp thì vẫn đỏ."},
+    {"i": 2, "p": "Việc nặng nhất (hạng T3) đòi một cổng duyệt kế hoạch riêng, mà mã đã có trước hồ sơ. Đưa lên anh quyết ở câu Hỏi-2."},
+    {"i": 3, "p": "Phép đo chỗ tắt luật React chưa thử một tệp cùng loại ngay cạnh thư mục công cụ, nên tắt rộng hơn lời hứa vẫn lọt. Đã sửa: thêm tệp thử cạnh thư mục và ca tắt rộng ra cả thư mục cha thì đỏ."},
+    {"i": 4, "p": "Không phép đo nào trên máy chạy bài trình duyệt mới. Để lại cho CI: hồ sơ ghi rõ CI của PR phải xanh trên đúng bản đã chấm trước khi trình anh ký."}
+  ]
+}

@@ -22,6 +22,8 @@ import {
   SAVED_VIEW_PARAM,
   savedViewCopy,
   GEO_PARAM,
+  QUERY_WORD,
+  englishQuery,
   geoFiltersFor,
   geoTree,
   inventoryFiltersFrom,
@@ -122,18 +124,22 @@ function hereOf(query: Record<string, string | string[] | undefined>): string {
 /** Inventory: the signed-in company's listings (row 10), or the sample company where no database is configured. */
 export default async function Page({ searchParams }: Props) {
   const query = await searchParams;
+  // An older link carries the Vietnamese words (row 1v, Hỏi-1): one redirect to the same address in English, before
+  // the sign-in step, so the sign-in page brings the person back to the English address.
+  const english = englishQuery(query);
+  if (english) redirect(`/inventory?${english}`);
   const state = first(query.state);
   const source = await inventorySource();
-  // With a database there is no stand-in: no session goes to sign-in, whatever ?vai= says (row 10, AC-9).
+  // With a database there is no stand-in: no session goes to sign-in, whatever ?role= says (row 10, AC-9).
   if (source.kind === "signed-out") redirect(loginHref(hereOf(query)));
   const live = source.kind !== "ready" || source.live;
-  const vai = standInRole(source, first(query.vai), process.env.NODE_ENV);
+  const role = standInRole(source, first(query[QUERY_WORD.role]), process.env.NODE_ENV);
   // The screen's entry rule, before any listing is shown (row 2b, AC-9): a role the register keeps out sees «not
   // allowed» at every width, the same block as the members page (row 9b); so does a role without viewListings.
   if (source.kind === "forbidden") return <PageState kind="forbidden" homeHref="/" />;
   if (entryAction(NAV, "/inventory") !== undefined) {
     const session = await currentSession();
-    const roles = session ? session.roles : vai ? [vai] : [];
+    const roles = session ? session.roles : role ? [role] : [];
     if (entryRefused(NAV, "/inventory", roles)) return <PageState kind="forbidden" homeHref="/" />;
   }
   const data = source.kind === "ready" ? source.data : null;
@@ -156,12 +162,12 @@ export default async function Page({ searchParams }: Props) {
   const viewLabels = savedViewLabels();
   const viewCopy = savedViewCopy(viewLabels);
   const listings = data?.current ?? [];
-  // Development only, on the sample company: `?mau=bien` adds edge rows (row 2b) so the phone cards can be measured with
+  // Development only, on the sample company: `?sample=edge` adds edge rows (row 2b) so the phone cards can be measured with
   // long codes and prices. Net to seller under the company's fee schedule (row 19); no readable schedule leaves it empty.
   const rows = withFees(
     [
       ...(data ? rowsOf(data) : []),
-      ...(live ? [] : inventoryEdgeRowsFrom(first(query.mau), process.env.NODE_ENV)),
+      ...(live ? [] : inventoryEdgeRowsFrom(first(query[QUERY_WORD.sample]), process.env.NODE_ENV)),
     ],
     listings,
     fees?.items ?? null,
@@ -169,17 +175,17 @@ export default async function Page({ searchParams }: Props) {
   // The top-bar search (row 3f) opens the grid with its text in a column filter; one unit found opens its record
   // through the record's own address (row 3), so the back button and «Chép đường dẫn» work as usual.
   const opening = inventoryOpeningFor(rows, {
-    code: first(query.ma),
-    building: first(query.toa),
-    subdivision: first(query["du-an"]),
+    code: first(query[QUERY_WORD.unit]),
+    building: first(query[QUERY_WORD.building]),
+    subdivision: first(query[QUERY_WORD.subdivision]),
   });
-  if (opening.recordId !== null && first(query["ho-so"]) === undefined) {
+  if (opening.recordId !== null && first(query[QUERY_WORD.record]) === undefined) {
     const next = new URLSearchParams();
     for (const [key, value] of Object.entries(query)) {
       const v = first(value);
       if (v !== undefined) next.set(key, v);
     }
-    next.set("ho-so", opening.recordId);
+    next.set(QUERY_WORD.record, opening.recordId);
     redirect(`/inventory?${next}`);
   }
   // One way to open the grid arranged (row 2c's initial view): a saved view's own arrangement wins; otherwise the
@@ -193,11 +199,11 @@ export default async function Page({ searchParams }: Props) {
       ? undefined
       : { ...inventoryFiltersFrom(status), ...opening.filters, ...geo };
   // A shared link (row 3f) to a listing no longer on the inventory: the grid opens as usual and says why.
-  const asked = first(query["ho-so"]);
+  const asked = first(query[QUERY_WORD.record]);
   const stale = asked !== undefined && !rows.some((row) => row.id === asked);
-  // On the sample company only (no database, outside production), ?vai=<role> stands in for the session's role, so the
+  // On the sample company only (no database, outside production), ?role=<role> stands in for the session's role, so the
   // browser tests and the screenshots of row 4 can open the cells the permission table gives that role.
-  const standIn = vai ? [vai] : null;
+  const standIn = role ? [role] : null;
   // Moving a status cell to Active needs activateListing: own scope offers it on one's own unit or one nobody keeps.
   const activate = live
     ? allowedScope((await currentSession())?.roles ?? [], "activateListing")

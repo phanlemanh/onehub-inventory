@@ -128,18 +128,22 @@ decisions:
     layer: content
     kind: standard
     source: "Intl vi-VN"
+    check: "test:tests/format.test.ts"
   - id: column-align
     layer: core
     kind: formula
     source: "display kind"
+    check: "test:tests/grid.test.tsx"
   - id: column-width
     layer: core
     kind: formula
     source: "label and sample length"
+    check: "test:tests/grid.test.tsx"
   - id: table-density
     layer: core
     kind: formula
     source: "total minimum width"
+    check: "e2e:tests/e2e/grid.spec.ts"
   - id: edit-in-cell
     layer: patterns
     kind: formula
@@ -159,6 +163,7 @@ decisions:
     layer: conformance
     kind: standard
     source: "WCAG 2.5.8"
+    check: "tool:tools/design-assembly/check.mjs"
   - id: focus-not-obscured
     layer: conformance
     kind: standard
@@ -215,6 +220,7 @@ decisions:
     layer: foundations
     kind: closed
     source: "Chủ kho, sáng và tối"
+    check: "e2e:tests/e2e/frame.spec.ts"
   - id: notification-channel
     layer: patterns
     kind: closed
@@ -224,6 +230,7 @@ decisions:
     layer: foundations
     kind: closed
     source: "sáu trạng thái StandardStatus"
+    check: "e2e:tests/e2e/frame.spec.ts"
   - id: read-only-cell
     layer: patterns
     kind: closed
@@ -233,6 +240,7 @@ decisions:
     layer: templates
     kind: closed
     source: "design/behaviors.md"
+    check: "e2e:tests/e2e/frame.spec.ts"
   - id: record-panel
     layer: patterns
     kind: closed
@@ -313,3 +321,26 @@ decisions:
     source: "the design-assembly contract, one shape per ledger with its version"
     check: "tool:tools/design-assembly/check.mjs"
     note: "that each ledger present has its shape and a version this tool reads; what a ledger says is held by the rows about it"
+  - id: decision-sheet
+    layer: governance
+    kind: closed
+    source: "every choice points at a row, and every judgment nobody confirmed waits on the decision sheet"
+    check: "tool:tools/design-assembly/check.mjs"
+    note: "what this branch writes is read from git against the main branch; a person's answer is read from the note of a row, as the decision sheet writes it; the choices it reads are values, components, kinds of screen, states, words and column types, and free layout inside a screen is not read"
+  - id: owner-calls
+    layer: governance
+    kind: closed
+    source: "a new kind of screen and the brand colour wait for the owner's answer in the waiting list"
+    check: "tool:tools/design-assembly/check.mjs"
+    note: "a new page under design/patterns, and the root colour line of the stylesheet, against the main branch; enforcing it on the hosting service is not this tool's"
+  - id: font-loaded
+    layer: foundations
+    kind: closed
+    source: "src/app/globals.css, the typeface each of --font-heading names first"
+    check: "tool:tools/design-assembly/check.mjs"
+    note: "the first typeface of each list, against what the adapter of the build can see load it: an @font-face rule or a font package of the stylesheet, or the build's own font loader in a layout file; that the file holds the weights a screen uses is not checked"
+  - id: typeface
+    layer: foundations
+    kind: closed
+    source: "the stylesheet's typefaces, as found"
+    check: "tool:tools/design-assembly/check.mjs"

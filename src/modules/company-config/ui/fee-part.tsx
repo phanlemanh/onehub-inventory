@@ -195,14 +195,14 @@ export function FeePart({ screenTitle }: { screenTitle: string }) {
 
   if (load.kind === "loading")
     return (
-      <div className="flex flex-col gap-6" data-part="thue-phi" data-state="loading">
+      <div className="flex flex-col gap-6" data-part="fee-schedule" data-state="loading">
         {header}
         <PageSkeleton />
       </div>
     );
   if (load.kind === "error")
     return (
-      <div className="flex flex-col gap-6" data-part="thue-phi" data-state="error">
+      <div className="flex flex-col gap-6" data-part="fee-schedule" data-state="error">
         {header}
         <PageState
           kind="error"
@@ -322,7 +322,7 @@ export function FeePart({ screenTitle }: { screenTitle: string }) {
 
   const includedCount = draft.filter((d) => d.included).length;
   return (
-    <div className="flex flex-col gap-6" data-part="thue-phi" data-state="ready">
+    <div className="flex flex-col gap-6" data-part="fee-schedule" data-state="ready">
       {header}
       <p className="text-sm text-muted-foreground">{C.why}</p>
       <FramedList

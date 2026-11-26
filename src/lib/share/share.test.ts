@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { openShare, sharedText, type ShareDevice, type ShareOutcome } from ".";
 
-const MESSAGE = { text: "Hỏi về căn 1101 · S1.01", url: "https://x.test/inventory?ho-so=a" };
+const MESSAGE = { text: "Hỏi về căn 1101 · S1.01", url: "https://x.test/inventory?record=a" };
 const abort = () => Object.assign(new Error("cancelled"), { name: "AbortError" });
 
 type Cell = {

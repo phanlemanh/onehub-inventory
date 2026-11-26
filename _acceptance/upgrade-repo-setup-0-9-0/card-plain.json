@@ -1,0 +1,148 @@
+{
+ "feature_plain": "Kho được nâng bộ setup lên 0.9.0: CI chia hai tầng nên PR chưa sẵn sàng không chạy bài nặng, và lần sau nâng tiếp được bằng gộp ba chiều; luật của kho giữ nguyên, trừ hai điểm anh đã đồng ý ở Cổng Phạm vi (mục miễn quét bí mật, bài kiểm của hồ sơ ci-co-postgres).",
+ "will_do": [
+  {
+   "id": "AC-1",
+   "p": "Sẽ giữ toàn bộ bài kiểm của kho xanh (2.461 bài) và bản dựng vẫn ra được."
+  },
+  {
+   "id": "AC-2",
+   "p": "Sẽ để bộ setup không còn việc gì dang dở: chạy lại công cụ nâng cấp thì không còn tệp nào phải ghi hay gỡ dấu."
+  },
+  {
+   "id": "AC-3",
+   "p": "Sẽ giữ nguyên luật của kho: chính sách hạng, quyền của tác tử, bộ kiểm ontology, ranh giới mô-đun và ruleset trên GitHub."
+  },
+  {
+   "id": "AC-4",
+   "p": "Sẽ chia CI thành tầng nhẹ chạy mọi lần đẩy và tầng nặng (bài trình duyệt, bài cơ sở dữ liệu) chạy sau, và ô tổng chỉ xanh khi cả ba tầng xanh, thử đủ 64 tổ hợp."
+  },
+  {
+   "id": "AC-5",
+   "p": "Sẽ chứng trên CI thật: lượt đầu chạy đủ và xanh; lượt chỉ đổi tài liệu và hồ sơ thì dùng lại kết quả bài nặng thay vì chạy lại."
+  },
+  {
+   "id": "AC-7",
+   "p": "Sẽ giữ bộ kiểm thiết kế (design-assembly) xanh bằng một chữ tạm, gỡ khi công cụ lên bản 0.7.2."
+  },
+  {
+   "id": "AC-8",
+   "p": "Sẽ sửa năm bài kiểm từng đóng đinh CI cũ mà vẫn giữ răng: phá ảnh cơ sở dữ liệu hay rút tầng cơ sở dữ liệu khỏi ô tổng thì bài đỏ."
+  },
+  {
+   "id": "AC-9",
+   "p": "Sẽ để bốn sổ (nhật ký, chỉ mục, thuật ngữ, mã sinh) nguyên một tệp như hôm nay, sẵn sàng tách ở các PR sau."
+  },
+  {
+   "id": "AC-10",
+   "p": "Sẽ chỉ đổi đúng 46 tệp đã kê theo báo cáo của công cụ nâng cấp, và sau đó chỉ thêm tệp của hồ sơ này."
+  }
+ ],
+ "wont_do": [
+  {
+   "id": "AC-6",
+   "p": "Chặn bí mật trên mọi commit của nhánh (trước nay ô quét bí mật không quét gì trong CI); chỉ miễn đúng 12 mã băm của bộ kit, cùng giá trị ở chỗ khác vẫn bị bắt."
+  },
+  {
+   "id": "OOS-1",
+   "p": "KHÔNG tách sổ ở PR này: mỗi sổ một PR riêng sau."
+  },
+  {
+   "id": "OOS-2",
+   "p": "KHÔNG đổi ruleset trên GitHub: việc của anh, PR 6."
+  },
+  {
+   "id": "OOS-3",
+   "p": "KHÔNG đổi thói quen mở PR ở dạng bản nháp, dù đó là nơi phần lớn phút máy được tiết kiệm: PR 7."
+  },
+  {
+   "id": "OOS-4",
+   "p": "KHÔNG nhận luật mới của bộ setup (ba luật ontology, chính sách hạng mới, bỏ luật dừng của tác tử): mỗi luật một quyết định."
+  },
+  {
+   "id": "OOS-5",
+   "p": "KHÔNG lên công cụ thiết kế 0.7.2 ở đây."
+  },
+  {
+   "id": "OOS-6",
+   "p": "KHÔNG gỡ xung đột với PR 87 ở đây: PR nào gộp sau thì gộp ngược một lần."
+  },
+  {
+   "id": "OOS-7",
+   "p": "KHÔNG đổi giao diện, mã sản phẩm, dữ liệu hay luật sản phẩm."
+  },
+  {
+   "id": "OOS-8",
+   "p": "KHÔNG sửa tệp của hồ sơ đã ký; riêng bài kiểm mà một hồ sơ đã ký chạy thì đổi, xem Hỏi-3."
+  }
+ ],
+ "scope_plain": "Những việc dưới đây cố ý để ngoài PR này, mỗi việc có PR hay quyết định riêng.",
+ "coverage_plain": [
+  {
+   "i": 0,
+   "p": "Mọi tệp đổi được nối vào nhóm theo báo cáo của chính công cụ nâng cấp, không theo diff, nên một tệp lạ lọt vào sẽ bị bắt."
+  },
+  {
+   "i": 4,
+   "p": "Bản ghi của lần nâng (1 tệp): AC-2 (không còn việc dở)."
+  },
+  {
+   "i": 5,
+   "p": "14 tệp mới của bộ setup, gồm công cụ CI và công cụ sổ: AC-2, AC-4, AC-9."
+  },
+  {
+   "i": 6,
+   "p": "Tệp trùng tên được ghi sau khi đổi tên tệp cũ (1 tệp): AC-9."
+  },
+  {
+   "i": 7,
+   "p": "10 tệp cập nhật thẳng, chính sách hạng giữ bản cũ: AC-3 (luật giữ nguyên)."
+  },
+  {
+   "i": 8,
+   "p": "6 tệp gộp sạch, gồm quét bí mật: AC-6."
+  },
+  {
+   "i": 9,
+   "p": "9 tệp gỡ dấu bằng tay (CI, quyền tác tử, Makefile); ba tệp luật giữ bản cũ: AC-3, AC-4, AC-7."
+  },
+  {
+   "i": 10,
+   "p": "5 tệp sửa tay (mục miễn bí mật, tệp đổi tên, ba bài kiểm): AC-6, AC-8, AC-9."
+  },
+  {
+   "i": 11,
+   "p": "Bốn tệp luật công cụ muốn đổi mà giữ nguyên: AC-3."
+  },
+  {
+   "i": 12,
+   "p": "Ô kiểm định dạng commit chỉ có hiệu lực sau khi gộp, vì nó chạy từ nhánh chính."
+  },
+  {
+   "i": 13,
+   "p": "Bài trình duyệt và bài cơ sở dữ liệu không chạy trên máy; đọc kết quả trên CI ở AC-5."
+  }
+ ],
+ "gap_probe_plain": [
+  {
+   "i": 0,
+   "p": "Tầng cơ sở dữ liệu nay chặn gộp qua ô tổng, một lần siết luật mà hợp đồng cũ coi như máy đã quyết. Đã chuyển thành Hỏi-1 cho anh."
+  },
+  {
+   "i": 1,
+   "p": "Mục miễn trong tệp quét bí mật và việc viết lại bài kiểm của một hồ sơ đã ký là hai thay đổi tường chưa ai quyết. Đã chuyển thành Hỏi-2 và Hỏi-3, ghi rõ hệ quả khi ghim lại hồ sơ cũ."
+  },
+  {
+   "i": 2,
+   "p": "Ô tổng chỉ được thử bốn ca, nên một ô tổng bỏ qua tầng trình duyệt vẫn qua. Đã sửa: thử đủ 64 tổ hợp viết trước, và thêm ca phá phải đỏ."
+  },
+  {
+   "i": 3,
+   "p": "Chưa nói chấm lượt CI nào cho phần dùng lại kết quả. Đã sửa: đo lượt mới nhất chỉ đổi tài liệu và hồ sơ, in mã commit, đỏ nếu không có."
+  },
+  {
+   "i": 4,
+   "p": "Danh sách 46 tệp chép từ chính commit nên tự so với mình. Đã sửa: nhóm đọc từ báo cáo của công cụ nâng cấp, đếm từng nhóm, lệch là đỏ."
+  }
+ ]
+}

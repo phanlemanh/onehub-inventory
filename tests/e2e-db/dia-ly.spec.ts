@@ -287,7 +287,7 @@ test("E8 a press before the page comes alive keeps the other filters", async ({ 
   expect(await page.locator("html[data-hydrated]").count()).toBe(0);
   const s103 = place(column(page), P1, "S1.03");
   await s103.click();
-  await page.waitForURL((u) => u.searchParams.has("vung"));
+  await page.waitForURL((u) => u.searchParams.has("place"));
   checkAddressKept(page.url());
   // The address the press reached opens, alive, on the place with the status filter still on.
   await page.unroute(scripts);
@@ -301,7 +301,7 @@ test("E8 a press before the page comes alive keeps the other filters", async ({ 
   checkKept(await statusBox(page).textContent());
   await expect(s103).toHaveAttribute("aria-current", "true");
   // Break: the place's bare address, as the column drew it before VP5, drops the status filter.
-  const bare = `/inventory?vung=${encodeURIComponent(nodeOf("S1.03").key)}`;
+  const bare = `/inventory?place=${encodeURIComponent(nodeOf("S1.03").key)}`;
   expect(() => checkAddressKept(new URL(bare, page.url()).href)).toThrow("mat loc khac");
 });
 
@@ -337,14 +337,14 @@ test("«Tất cả hàng» after a pick drops the place; a status entry keeps it
   await place(column(page), P1, "S1.03").click();
   await expect.poll(() => footerCount(page)).toBe(10);
   // The pick is really on before the press: the address names the place and the building box holds it.
-  await expect.poll(() => new URL(page.url()).searchParams.get("vung") ?? "").toContain("S1.03");
+  await expect.poll(() => new URL(page.url()).searchParams.get("place") ?? "").toContain("S1.03");
   expect(await region(page).getByLabel("Lọc cột Toà").inputValue()).toBe("S1.03");
   await column(page).getByRole("link", { name: ALL, exact: true }).click();
   await expect.poll(() => footerCount(page)).toBe(60);
   // The rows come back at once; the lit entry follows when the address lands.
   await expect.poll(() => litNames(column(page)), { timeout: 10_000 }).toEqual([ALL]);
   checkAllRows(await footerCount(page), await litNames(column(page)));
-  expect(new URL(page.url()).searchParams.has("vung")).toBe(false);
+  expect(new URL(page.url()).searchParams.has("place")).toBe(false);
   expect(await region(page).getByLabel("Lọc cột Toà").inputValue()).toBe("");
 
   await page.goto("/inventory?status=Active", { waitUntil: "networkidle" });
@@ -355,7 +355,7 @@ test("«Tất cả hàng» after a pick drops the place; a status entry keeps it
   await column(page).getByRole("link", { name: ACTIVE, exact: true }).click();
   await expect.poll(() => footerCount(page)).toBe(active);
   await expect.poll(() => litNames(column(page))).toEqual([ACTIVE]);
-  expect(new URL(page.url()).searchParams.has("vung")).toBe(false);
+  expect(new URL(page.url()).searchParams.has("place")).toBe(false);
   checkKept(await statusBox(page).textContent());
   // Break: the grid still on the place after the press.
   expect(() => checkAllRows(10, ["S1.03"])).toThrow("tat ca hang con loc noi");
@@ -376,8 +376,8 @@ test("a modified click opens a new tab; this tab keeps its place and a later pic
   await page.goto("/inventory", { waitUntil: "networkidle" });
   await settled(page);
   await place(column(page), P1, "S1.03").click();
-  await expect.poll(() => new URL(page.url()).searchParams.get("vung") ?? "").toContain("S1.03");
-  const vung = () => new URL(page.url()).searchParams.get("vung") ?? "";
+  await expect.poll(() => new URL(page.url()).searchParams.get("place") ?? "").toContain("S1.03");
+  const vung = () => new URL(page.url()).searchParams.get("place") ?? "";
   for (const target of [
     column(page).getByRole("link", { name: ALL, exact: true }),
     place(column(page), P1, "S1.02"),
@@ -408,7 +408,7 @@ test("E9 reload, a copied link, a saved view, an unknown place", async ({
   await signIn(page, email);
   await place(column(page), P1, "The Sapphire 1").click();
   await expect
-    .poll(() => new URL(page.url()).searchParams.get("vung"))
+    .poll(() => new URL(page.url()).searchParams.get("place"))
     .toBe(nodeOf("The Sapphire 1").key);
   const link = page.url();
   await page.reload();
@@ -429,7 +429,7 @@ test("E9 reload, a copied link, a saved view, an unknown place", async ({
   const dialog = page.locator('[data-slot="view-name-dialog"]');
   await dialog.getByLabel("Tên").fill("Sapphire");
   await dialog.getByLabel("Tên").press("Enter");
-  await page.waitForURL((u) => u.searchParams.has("goc-nhin"));
+  await page.waitForURL((u) => u.searchParams.has("view"));
   await column(page).getByRole("link", { name: ALL }).click();
   await expect.poll(() => footerCount(page)).toBe(60);
   await column(page)
@@ -447,7 +447,7 @@ test("E9 reload, a copied link, a saved view, an unknown place", async ({
   await expect(region(page).getByLabel("Lọc cột Dự án")).toHaveAttribute("title", P1);
   checkLit(await litNames(column(page)), "Sapphire");
 
-  await page.goto("/inventory?vung=khong-co");
+  await page.goto("/inventory?place=khong-co");
   await settled(page);
   expect(await footerCount(page)).toBe(60);
   checkLit(await litNames(column(page)), ALL);

@@ -50,7 +50,7 @@ const panel = (page: Page) => page.locator('[data-slot="record-panel"]');
 const record = (page: Page) => page.locator('[data-slot="listing-record"]');
 
 async function openRecord(page: Page, id: string): Promise<void> {
-  await page.goto(`${URL}?ho-so=${id}`);
+  await page.goto(`${URL}?record=${id}`);
   // Table rows from 768 px, listing cards below it (row 2b).
   await rowsShown(page);
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);

@@ -1,0 +1,7 @@
+ten: FormDialog nhãn
+tep: src/components/candidate/form-dialog.tsx
+nguon: dialog-2
+nhu_cau: hop-co-nhan-tieu-de
+mo_ta: Hộp biểu mẫu có nhãn nhỏ cạnh tiêu đề (tên sàn khi mời người), trường xếp dọc, dải chân hai nút — dáng của dialog-2
+ho_so: thanh-vien-chon-tu-reui
+duyet: 2026-11-14

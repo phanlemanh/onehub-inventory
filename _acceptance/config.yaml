@@ -30,16 +30,21 @@ executors:
     dia_ly_e2e_db: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx playwright test -c playwright.db.config.ts tests/e2e-db/dia-ly.spec.ts"   # bang-hang-theo-dia-ly (row 2d): tree in the signed-in App Shell at four widths, saved view, axe light and dark, lane K Postgres
     vong_doi: "npx vitest run tests/vong-doi-thao-tac.test.ts --coverage.enabled=false --reporter=verbose"   # kiem-vong-doi-thao-tac (row 1t): every entity a screen shows has add, view, edit, remove or an approved reason
     deploy_kiem: "npx vitest run tools/deploy --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): make deploy and rollback with a fake vercel and a fake health server, every step red on its own
+    dat_khoa: "npx vitest run tools/deploy/dat-khoa.test.ts --coverage.enabled=false --reporter=verbose"   # dat-khoa-mot-lenh: make dat-khoa with a fake gh — the set of secrets, values on stdin only, keep and rotate, every wrong input red before any set
+    dk_so_tay: "npx vitest run tools/deploy/so-tay-khop.test.ts --coverage.enabled=false --reporter=verbose"   # dat-khoa-mot-lenh: the runbook's deploy.yml block passes exactly the names make deploy requires
+    dk_vai_db: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx vitest run -c vitest.db.config.ts tests/db/mat-khau-vai-dang-nhap.db.test.ts --reporter=verbose"   # dat-khoa-mot-lenh: the login role signs in with the password the deploy step sets as a SCRAM verifier, on lane Postgres
     cau_hinh_ban_that: "npx vitest run src/modules/identity/config.test.ts src/modules/identity/config-ban-that.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): start-up configuration matrix of a real build
     van_hanh: "npx vitest run tests/van-hanh.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): runbook procedures, make targets and variables it names exist
     khoa_bi_mat: "npx vitest run tests/khong-khoa-bi-mat.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): no secret pattern in a tracked file, .env.example lists the new variables
+    nk30_kit_root: "npx vitest run tests/kit-root.test.ts --coverage.enabled=false --reporter=verbose"   # nang-kit-3-0: kit-root reads only the delivery-loop install
+    da071_two_tests: "npx vitest run tests/ci-ban-sao-nong.test.ts tests/design-check.test.ts --coverage.enabled=false --reporter=verbose"   # upgrade-design-assembly-0-7-1: the shallow-clone test and the ledger test, the fixtures built from TAG
     nhap_excel_unit: "npx vitest run src/modules/imports tests/nhap-excel --coverage.enabled=false --reporter=verbose"   # nhap-excel (row 11): file reader, column/value/unit marks, no cell lost on the dirty set, ontology
   script:
     check: "make check"              # suy từ: Makefile, .github/workflows/ci.yml
     build: "npm run build"           # suy từ: package.json, ci.yml
     quyen_kho: "bash -c 'out=$(npx vitest run tests/permissions.test.ts --coverage.enabled=false 2>&1); rc=$?; printf \"%s\\n\" \"$out\"; [ $rc -eq 0 ] && printf \"%s\" \"$out\" | grep -qE \"Tests +47 passed \\(47\\)\"'"
     quyen_kho_ban_goc: "node -e \"const a=JSON.parse(require('child_process').execSync('git show 84a2d597:.claude/settings.json')).permissions,b=JSON.parse(require('fs').readFileSync('.claude/settings.json')).permissions;for(const k of ['deny','allow'])if(JSON.stringify(a[k])!==JSON.stringify(b[k])){console.error(k+' list changed');process.exit(1)}console.log('deny and allow identical to 84a2d597')\""
-    e2e: "make e2e"                  # suy từ: mk/design.mk — cần trình duyệt Playwright
+    e2e: "DATABASE_URL= make e2e"    # suy từ: mk/design.mk — cần trình duyệt Playwright; DATABASE_URL trống như CI (Hỏi-3 của upgrade-design-assembly-0-7-1)
     product_map: "R=\"${CLAUDE_PLUGIN_ROOT:-$(node tools/kit-root.mjs)}\" && node \"$R/scripts/product-map.mjs\" --root . --check"   # suy từ: mẫu của kit, cách viết của Quỹ hàng
     cach_ly: "bash db/scripts/cach-ly.sh"   # hồ sơ cach-ly-moi-san — Postgres của dãy (DB_LANE), duyệt N-2
     vai_man: "npx vitest run tests/coverage-matrix.test.ts --coverage.enabled=false"   # row 1d: role × screen register and contract block
@@ -124,6 +129,108 @@ executors:
     release_ledger_matches: "node _acceptance/upgrade-design-assembly-tool/rang/release-ledger.mjs --plugin-repo \"${DESIGN_ASSEMBLY_REPO:-$HOME/dev/design-assembly}\""   # upgrade-design-assembly-tool: the plugin's own release ledger names the tool tree this record pins
     branch_changes_only_upgrade: "node _acceptance/upgrade-design-assembly-tool/rang/branch-changes.mjs --root ."   # upgrade-design-assembly-tool: the branch changes the upgrade's eight files and this record's files only
     upgrade_measures_two_way: "node --test _acceptance/upgrade-design-assembly-tool/rang/measures-two-way.mjs"   # upgrade-design-assembly-tool: each measure green as it is, red with its pinned message on a broken copy
+    da070_tool_tree: "node _acceptance/upgrade-design-assembly-0-7-0/rang/tool-tree.mjs"   # upgrade-design-assembly-0-7-0: the tool folder is the tree of plugin version 0.7.0, the stamp says so, the gate step is the template's
+    da070_release_ledger: "node _acceptance/upgrade-design-assembly-0-7-0/rang/release-ledger.mjs"   # upgrade-design-assembly-0-7-0: the plugin's release ledger and templates at 93daea4 name the tree pinned here (DESIGN_ASSEMBLY_REPO, default ~/design-assembly)
+    da070_out_of_git: "node _acceptance/upgrade-design-assembly-0-7-0/rang/out-of-git.mjs"   # upgrade-design-assembly-0-7-0: four derived files untracked and ignored, old names gone, fragment folders tracked, no reader names an old path
+    da070_fragments_equal: "python3 _acceptance/upgrade-design-assembly-0-7-0/rang/fragments-equal.py"   # upgrade-design-assembly-0-7-0: the fragment folders hold exactly the data of the old one-file ledgers at 69253032
+    da070_two_branch_merge: "node _acceptance/upgrade-design-assembly-0-7-0/rang/two-branch-merge.mjs"   # upgrade-design-assembly-0-7-0: two branches adding a screen and a block merge clean; the control on the old ledgers conflicts
+    da070_affected_merges: "node _acceptance/upgrade-design-assembly-0-7-0/rang/affected-merges.mjs"   # upgrade-design-assembly-0-7-0: affected with the map of HEAD over the last 30 merges of main: 26 all, 0 some, 4 none, 0 missing
+    da070_proof_gate_fragments: "node _acceptance/upgrade-design-assembly-0-7-0/rang/proof-gate-fragments.mjs"   # upgrade-design-assembly-0-7-0: the proof gate passes and reads 23 blocks with the fragment folders alone
+    da070_law_day: "python3 _acceptance/upgrade-design-assembly-0-7-0/rang/law-day.py"   # upgrade-design-assembly-0-7-0: the proof gate reads the law day from the commit adding design/so-khoi.yaml
+    da070_audit_diff: "node _acceptance/upgrade-design-assembly-0-7-0/rang/audit-diff.mjs"   # upgrade-design-assembly-0-7-0: the plugin audit at 69253032 and at HEAD differ in the ledger files line only
+    da070_change_list: "node _acceptance/upgrade-design-assembly-0-7-0/rang/change-list.mjs"   # upgrade-design-assembly-0-7-0: the upgrade commit changes its 81 files; the branch nothing beyond them and this record
+    da070_shallow_check: "node _acceptance/upgrade-design-assembly-0-7-0/rang/shallow-check.mjs"   # upgrade-design-assembly-0-7-0: make check green on a depth-1 clone of HEAD with origin, every derived file drawn, none tracked
+    da070_two_way: "node --test _acceptance/upgrade-design-assembly-0-7-0/rang/measures-two-way.mjs"   # upgrade-design-assembly-0-7-0: each measure green as it is, red with its pinned message on a broken copy
+    da070_shallow_two_way: "node --test _acceptance/upgrade-design-assembly-0-7-0/rang/shallow-two-way.mjs"   # upgrade-design-assembly-0-7-0: the shallow-clone measure red with its pinned lines on the old layout
+    nk30_ci_kit: "node _acceptance/nang-kit-3-0/rang/ci-kit.mjs"   # nang-kit-3-0: the CI gate job fetches delivery-loop v3.0.0 with the core at plugins/acceptance-gate
+    nk30_gate_branch: "node _acceptance/nang-kit-3-0/rang/gate-branch.mjs"   # nang-kit-3-0: kit 3.0 gate on the branch stops it only for this record's lifecycle reasons (--signed: none)
+    nk30_gate_control: "node _acceptance/nang-kit-3-0/rang/gate-control.mjs"   # nang-kit-3-0: kit 2.38.1 and 3.0.0 recheck every record alike at 8925e8ff and the merge-base
+    nk30_product_map: "node _acceptance/nang-kit-3-0/rang/product-map.mjs"   # nang-kit-3-0: kit 3.0 product-map --check, and the four kit-root executors find their scripts
+    nk30_kit_root_cli: "node _acceptance/nang-kit-3-0/rang/kit-root-cli.mjs"   # nang-kit-3-0: node tools/kit-root.mjs on real registry files
+    nk30_settings: "node _acceptance/nang-kit-3-0/rang/settings.mjs"   # nang-kit-3-0: the session marketplace is the kit's own, pinned to the CI tag, six plugins on
+    nk30_doc_commands: "node _acceptance/nang-kit-3-0/rang/doc-commands.mjs"   # nang-kit-3-0: every command and kit path the living docs name exists in kit 3.0
+    nk30_leftover: "node _acceptance/nang-kit-3-0/rang/leftover.mjs"   # nang-kit-3-0: no old kit name in living files; 14 lines in 5 files at 8925e8ff
+    nk30_two_way: "node --test _acceptance/nang-kit-3-0/rang/two-way.mjs"   # nang-kit-3-0: each measure green as it is, red with its pinned message on a broken copy
+    tpc_settings: "node _acceptance/tat-plugin-cho-cu/rang/settings.mjs"   # tat-plugin-cho-cu: repo settings = merge-base plus six false keys for the old marketplace's plugins
+    tpc_phien: "node _acceptance/tat-plugin-cho-cu/rang/phien.mjs"   # tat-plugin-cho-cu: a real session here loads one 3.0.0 copy of each kit plugin (runs on a machine, calls the model once)
+    tpc_doi_chung: "node _acceptance/tat-plugin-cho-cu/rang/phien.mjs --doi-chung"   # tat-plugin-cho-cu: positive control — the same measure is red at the merge-base
+    tpc_quet_ten_cu: "node _acceptance/tat-plugin-cho-cu/rang/quet-ten-cu.mjs"   # tat-plugin-cho-cu: the nk30 old-name sweep finds only the six false keys
+    tpc_two_way: "node --test _acceptance/tat-plugin-cho-cu/rang/two-way.mjs"   # tat-plugin-cho-cu: each measure green on the sound object, red with its pinned message on a broken copy
+    da071_shallow_check: "node _acceptance/upgrade-design-assembly-0-7-1/rang/shallow-check.mjs"   # upgrade-design-assembly-0-7-1: make check green on a depth-1 clone of HEAD with origin main at 8925e8ff; 19 decisions by 27 checks
+    da071_shallow_alone: "node _acceptance/upgrade-design-assembly-0-7-1/rang/shallow-alone.mjs"   # upgrade-design-assembly-0-7-1: make design-assembly alone on a fresh depth-1 clone: both rows fetched main from origin
+    da071_shallow_bite: "node _acceptance/upgrade-design-assembly-0-7-1/rang/shallow-bite.mjs"   # upgrade-design-assembly-0-7-1: a new page stops owner-calls, an untold tag and the fixtures of 8925e8ff stop decision-sheet
+    da071_tool_tree: "node _acceptance/upgrade-design-assembly-0-7-1/rang/tool-tree.mjs"   # upgrade-design-assembly-0-7-1: the tool folder is the tree of plugin version 0.7.1, the stamp says so, the gate step is the template's
+    da071_release_ledger: "node _acceptance/upgrade-design-assembly-0-7-1/rang/release-ledger.mjs"   # upgrade-design-assembly-0-7-1: the plugin's release ledger and templates at ba3af6b name the tree pinned here (DESIGN_ASSEMBLY_REPO, default ~/design-assembly)
+    da071_rows_mirror: "python3 _acceptance/upgrade-design-assembly-0-7-1/rang/rows-mirror.py"   # upgrade-design-assembly-0-7-1: the two rows and checks are the plugin's at ba3af6b, but for blueprint; nothing else changed in the two files
+    da071_fixture_tags: "node _acceptance/upgrade-design-assembly-0-7-1/rang/fixture-tags.mjs"   # upgrade-design-assembly-0-7-1: tests/design-check.test.ts holds no tag for the tool's own tagged-test reader
+    da071_change_list: "node _acceptance/upgrade-design-assembly-0-7-1/rang/change-list.mjs"   # upgrade-design-assembly-0-7-1: the upgrade commit changes its 6 files; the branch nothing beyond them and this record
+    da071_two_way: "node --test _acceptance/upgrade-design-assembly-0-7-1/rang/measures-two-way.mjs"   # upgrade-design-assembly-0-7-1: each fast measure green as it is, red with its pinned message on a broken copy
+    da071_shallow_two_way: "node --test _acceptance/upgrade-design-assembly-0-7-1/rang/shallow-two-way.mjs"   # upgrade-design-assembly-0-7-1: the three shallow-clone measures red with their pinned lines on broken clones
+    rs090_apply_again: "node _acceptance/upgrade-repo-setup-0-9-0/rang/apply-again.mjs"   # upgrade-repo-setup-0-9-0: apply.py of repo-setup 0.9.0 has nothing left to do on HEAD; on bd32d73e it marks 12 files and stops on mk/derived.mk
+    rs090_rules_kept: "node _acceptance/upgrade-repo-setup-0-9-0/rang/rules-kept.mjs"   # upgrade-repo-setup-0-9-0: autonomy.yaml, ontology_actions.py, relations.yaml as at bd32d73e; CODEOWNERS line 3 only; settings.json adds SessionStart only; ruleset main unchanged
+    rs090_ci_shape: "node _acceptance/upgrade-repo-setup-0-9-0/rang/ci-shape.mjs"   # upgrade-repo-setup-0-9-0: five jobs of the tiered ci.yml, gate byte for byte, ci_verdict.py on four cases
+    rs090_ci_runs: "node _acceptance/upgrade-repo-setup-0-9-0/rang/ci-runs.mjs"   # upgrade-repo-setup-0-9-0: CI of PR 88: fd53ac96 green on quick, e2e, e2e-db, check; the dossier commit reuses e2e and e2e-db
+    rs090_secret_scan: "node _acceptance/upgrade-repo-setup-0-9-0/rang/secret-scan.mjs"   # upgrade-repo-setup-0-9-0: gitleaks over every commit: 0 with the allowlist of HEAD, 12 with bd32d73e, a control outside _acceptance/ caught
+    rs090_design_assembly_word: "node _acceptance/upgrade-repo-setup-0-9-0/rang/design-assembly-word.mjs"   # upgrade-repo-setup-0-9-0: check names design-assembly for the 0.7.1 tool; red on a copy without the word
+    rs090_pinned_tests: "node _acceptance/upgrade-repo-setup-0-9-0/rang/pinned-tests.mjs"   # upgrade-repo-setup-0-9-0: the three tests pinned to the old CI pass on HEAD and go red on four broken copies
+    rs090_ledgers: "node _acceptance/upgrade-repo-setup-0-9-0/rang/ledgers.mjs"   # upgrade-repo-setup-0-9-0: four ledgers one-file, make split DRY=1 writes nothing, the renamed design-role-table file
+    rs090_change_set: "node _acceptance/upgrade-repo-setup-0-9-0/rang/change-set.mjs"   # upgrade-repo-setup-0-9-0: 46 files from bd32d73e to fd53ac96; after it only this dossier and the T1 files
+    rs090_two_way: "node --test _acceptance/upgrade-repo-setup-0-9-0/rang/two-way.mjs"   # upgrade-repo-setup-0-9-0: each measure green as it is, red with its pinned message on a broken copy
+    sll_so_log: "node _acceptance/split-log-ledger/rang/so-log.mjs"   # split-log-ledger: log is fragments, wiki/log.md drawn and out of git, the 108 entries of c79189dd each once, newest first
+    sll_ve_truoc_test: "node _acceptance/split-log-ledger/rang/ve-truoc-test.mjs"   # split-log-ledger: a fresh checkout draws wiki/log.md before the tests; khong-o-tim passes
+    sll_ke_thua_e10: "node _acceptance/split-log-ledger/rang/ke-thua-e10.mjs"   # split-log-ledger: what of upgrade-repo-setup-0-9-0/E10 stays true — four ledgers in one shape each, split DRY=1 writes nothing, the renamed mk file, make -n test
+    sll_docs_log: "node _acceptance/split-log-ledger/rang/docs-log.mjs"   # split-log-ledger: no live document writes wiki/log.md by hand
+    sll_ci_pr: "node _acceptance/split-log-ledger/rang/ci-pr.mjs"   # split-log-ledger: quick, e2e, check green on the pull request's head; e2e-db and gate printed
+    sll_ben_doc: "node _acceptance/split-log-ledger/rang/ben-doc.mjs"   # split-log-ledger: every tracked file that is no .md and names the drawn log is weighed in READERS
+    sll_two_way: "node --test _acceptance/split-log-ledger/rang/two-way.mjs"   # split-log-ledger: each measure green on a sound copy, red with its pinned message on a broken one
+    rs0101_apply_again: "node _acceptance/upgrade-repo-setup-0-10-1/rang/apply-again.mjs"   # upgrade-repo-setup-0-10-1: apply.py of repo-setup 0.10.1: nothing left on HEAD; on a copy of the base it writes HEAD's three files
+    rs0101_template_same: "node _acceptance/upgrade-repo-setup-0-10-1/rang/template-same.mjs"   # upgrade-repo-setup-0-10-1: pr-title.yml is the tag's template; only step 2 of conventional-commits changed
+    rs0101_commits_judged: "node _acceptance/upgrade-repo-setup-0-10-1/rang/commits-judged.mjs"   # upgrade-repo-setup-0-10-1: the job's commit check run here with tools/commit_msg.py
+    rs0101_agents_tail: "node _acceptance/upgrade-repo-setup-0-10-1/rang/agents-tail.mjs"   # upgrade-repo-setup-0-10-1: AGENTS.md: two rules split, closing section, the checks it names exist
+    rs0101_manifest: "node _acceptance/upgrade-repo-setup-0-10-1/rang/manifest.mjs"   # upgrade-repo-setup-0-10-1: .repo-setup.json from 0.9.0 to 0.10.1, nothing else
+    rs0101_change_set: "node _acceptance/upgrade-repo-setup-0-10-1/rang/change-set.mjs"   # upgrade-repo-setup-0-10-1: the two commits' files; besides them only this round; no T3 path
+    rs0101_ruleset: "node _acceptance/upgrade-repo-setup-0-10-1/rang/ruleset.mjs"   # upgrade-repo-setup-0-10-1: main requires check, e2e, gate only; merge commits or rebase allowed
+    rs0101_two_way: "node --test _acceptance/upgrade-repo-setup-0-10-1/rang/two-way.mjs"   # upgrade-repo-setup-0-10-1: each measure green as it is, red with its message on a broken copy
+    cmks_kit_subjects: "node _acceptance/commit-msg-kit-subjects/rang/kit-subjects.mjs"   # commit-msg-kit-subjects: every subject the kit v3.0.0 writes, read from its files, passes tools/commit_msg.py
+    cmks_near_miss: "node _acceptance/commit-msg-kit-subjects/rang/near-miss.mjs"   # commit-msg-kit-subjects: messages that only look like kit subjects stay refused, the job's two probes among them
+    cmks_history: "node _acceptance/commit-msg-kit-subjects/rang/history.mjs"   # commit-msg-kit-subjects: over every commit of the base, only the kit's 12 more accepted, none less
+    cmks_commits_judged: "node _acceptance/commit-msg-kit-subjects/rang/commits-judged.mjs"   # commit-msg-kit-subjects: the job's probe and judge block, run in a clean checkout of HEAD
+    cmks_change_set: "node _acceptance/commit-msg-kit-subjects/rang/change-set.mjs"   # commit-msg-kit-subjects: the rule, its test, a log entry and this round; not the hook's wiring
+    cmks_test_cases: "node _acceptance/commit-msg-kit-subjects/rang/test-cases.mjs"   # commit-msg-kit-subjects: the test file keeps every old case and adds exactly the ten new ones
+    cmks_two_way: "node --test _acceptance/commit-msg-kit-subjects/rang/two-way.mjs"   # commit-msg-kit-subjects: each measure green as it is, red on a copy with one thing broken
+    rs0102_apply_again: "node _acceptance/upgrade-repo-setup-0-10-2/rang/apply-again.mjs"   # upgrade-repo-setup-0-10-2: apply.py of repo-setup 0.10.2: nothing left on HEAD; on a copy of the base it writes HEAD's four files
+    rs0102_template_same: "node _acceptance/upgrade-repo-setup-0-10-2/rang/template-same.mjs"   # upgrade-repo-setup-0-10-2: the three files are the tag's templates; manifest 0.10.2; only the checkout and the judging step changed
+    rs0102_fence: "node _acceptance/upgrade-repo-setup-0-10-2/rang/fence.mjs"   # upgrade-repo-setup-0-10-2: the judging step fences what the hooks print; no token, no output
+    rs0102_judged: "node _acceptance/upgrade-repo-setup-0-10-2/rang/judged.mjs"   # upgrade-repo-setup-0-10-2: the judging step of HEAD answers as the base's on the same messages
+    rs0102_credentials: "node _acceptance/upgrade-repo-setup-0-10-2/rang/credentials.mjs"   # upgrade-repo-setup-0-10-2: the checkout keeps no token and nothing of the job needs one
+    rs0102_runner: "node _acceptance/upgrade-repo-setup-0-10-2/rang/runner.mjs"   # upgrade-repo-setup-0-10-2: PR 95's conventional-commits run was the base's job (pull_request_target)
+    rs0102_policy: "node _acceptance/upgrade-repo-setup-0-10-2/rang/policy.mjs"   # upgrade-repo-setup-0-10-2: on a copy, the policy may name gate without the agent pipeline
+    rs0102_change_set: "node _acceptance/upgrade-repo-setup-0-10-2/rang/change-set.mjs"   # upgrade-repo-setup-0-10-2: the upgrade commit unchanged; besides it only this round; base rule on every commit
+    rs0102_two_way: "node --test _acceptance/upgrade-repo-setup-0-10-2/rang/two-way.mjs"   # upgrade-repo-setup-0-10-2: each measure green as it is, red on a copy with one thing broken
+    rs0103_apply_again: "node _acceptance/upgrade-repo-setup-0-10-3/rang/apply-again.mjs"   # upgrade-repo-setup-0-10-3: apply.py of repo-setup 0.10.3: nothing left on HEAD; on a copy of the base it writes HEAD's files and marks the policy
+    rs0103_template_same: "node _acceptance/upgrade-repo-setup-0-10-3/rang/template-same.mjs"   # upgrade-repo-setup-0-10-3: the eight tools are the tag's templates; manifest 0.10.3; AGENTS.md loses one sentence
+    rs0103_resolution: "node _acceptance/upgrade-repo-setup-0-10-3/rang/resolution.mjs"   # upgrade-repo-setup-0-10-3: the policy file is the 0.10.3 side of the marked block with merge_method: merge
+    rs0103_policy_same: "node _acceptance/upgrade-repo-setup-0-10-3/rang/policy-same.mjs"   # upgrade-repo-setup-0-10-3: tiers, CODEOWNERS and required checks unchanged; merge commits instead of squash
+    rs0103_merge_method: "node _acceptance/upgrade-repo-setup-0-10-3/rang/merge-method.mjs"   # upgrade-repo-setup-0-10-3: github_setup.py reads merge_method; a differing option exits 2
+    rs0103_real_run: "node _acceptance/upgrade-repo-setup-0-10-3/rang/real-run.mjs"   # upgrade-repo-setup-0-10-3: the dry run of github_setup.py on the real repository
+    rs0103_flow: "node _acceptance/upgrade-repo-setup-0-10-3/rang/flow.mjs"   # upgrade-repo-setup-0-10-3: the flow measure reads no dossier and a threshold changes no exit code
+    rs0103_change_set: "node _acceptance/upgrade-repo-setup-0-10-3/rang/change-set.mjs"   # upgrade-repo-setup-0-10-3: the upgrade commit unchanged; besides it only this round; base rule on every commit
+    rs0103_two_way: "node --test _acceptance/upgrade-repo-setup-0-10-3/rang/two-way.mjs"   # upgrade-repo-setup-0-10-3: each measure green as it is, red on a copy with one thing broken
+    rmd_attr: "node _acceptance/roadmap-merge-driver/rang/attr.mjs"   # roadmap-merge-driver: LO-TRINH.html carries merge=generated-file next to PRODUCT-MAP.md; every older line kept
+    rmd_merge: "node _acceptance/roadmap-merge-driver/rang/merge.mjs"   # roadmap-merge-driver: nine merges on scratch repositories, by file, driver and .gitattributes; the driver set by the prepare script
+    rmd_redraw: "node _acceptance/roadmap-merge-driver/rang/redraw.mjs"   # roadmap-merge-driver: a stale page fails product-map --check on a copy of HEAD; the redraw makes it pass
+    rmd_docs: "node _acceptance/roadmap-merge-driver/rang/docs.mjs"   # roadmap-merge-driver: the setup section names the commands the repository really uses
+    rmd_decision: "node _acceptance/roadmap-merge-driver/rang/decision.mjs"   # roadmap-merge-driver: decision page 0046, its four tiers equal the contracts of the upgrade rounds
+    rmd_codeql: "node _acceptance/roadmap-merge-driver/rang/codeql.mjs"   # roadmap-merge-driver: CodeQL ignores the measures of the records and nothing else
+    rmd_change_set: "node _acceptance/roadmap-merge-driver/rang/change-set.mjs"   # roadmap-merge-driver: the files of the round only; risk_tiers as the base
+    rmd_two_way: "node --test _acceptance/roadmap-merge-driver/rang/two-way.mjs"   # roadmap-merge-driver: each measure green as it is, red with its message on a broken copy
+    lnt_eslint: "node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/bo-qua.mjs --eslint"   # lint-bo-qua-thu-muc-ngoai-git: ESLint ignores the three out-of-git paths
+    lnt_prettier: "node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/bo-qua.mjs --prettier"   # lint-bo-qua-thu-muc-ngoai-git: Prettier ignores the three out-of-git paths
+    lnt_doi_chung: "node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/bo-qua.mjs --doi-chung"   # lint-bo-qua-thu-muc-ngoai-git: 18 in-tree paths keep the ignore state they had before the change
+    lnt_chay_that: "node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/chay-that.mjs"   # lint-bo-qua-thu-muc-ngoai-git: npm run lint stays green with a broken file planted in the out-of-git folders
+    lnt_kiem_tron: "node _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/kiem-tron.mjs"   # lint-bo-qua-thu-muc-ngoai-git: make check stays green with a file each step would fail on planted in both out-of-git folders
+    lnt_two_way: "node --test _acceptance/lint-bo-qua-thu-muc-ngoai-git/rang/two-way.mjs"   # lint-bo-qua-thu-muc-ngoai-git: each measure green on the sound object, red with its pinned message on a broken copy
+    bdx_ghi_chep: "node _acceptance/bien-do-sau-xoay-mat-khau/rang/ghi-chep.mjs && node _acceptance/bien-do-sau-xoay-mat-khau/rang/ghi-chep.mjs --tu-kiem"   # bien-do-sau-xoay-mat-khau: decision 0048, README step order and the len-ban.mjs header follow STEPS
     nhap_excel_db: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} npx vitest run -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts --reporter=verbose"   # nhap-excel (row 11): preview, batched apply, learn, second import, undo on lane D Postgres
     nhap_excel_e2e: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} npx playwright test -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts"   # nhap-excel (row 11): Nạp tệp screen and inventory entry in the browser, lane D
     cach_ly_d: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} bash db/scripts/cach-ly.sh"   # nhap-excel (row 11): isolation suite with import_runs and the import delete rule, lane D
@@ -146,6 +253,9 @@ risk_tiers:
     - "PRODUCT-MAP.md"               # suy từ: mẫu của kit — máy sinh, commit cùng chữ ký
     - "LO-TRINH.html"
     - "docs/tri-thuc/**"
+    - "version.txt"                  # suy từ: chủ kho 26/11 — release-please chỉ ghi số phiên bản
+    - ".release-please-manifest.json" # suy từ: chủ kho 26/11 — số phiên bản của release-please
+    - "release-please-config.json"   # suy từ: chủ kho 26/11 — cách đánh số và viết CHANGELOG, không mã chạy
   t3_paths:
     - "PRODUCT-INVARIANTS.md"        # product invariants; only the owner edits this file
     - "db/**"                        # suy từ: bất biến 1 — chỗ đặt migration khi chuyển mã
@@ -190,14 +300,18 @@ feature_loop:
     - executors.script.check
     - executors.script.build
     - executors.script.e2e
+  model_evals: ["upgrade-design-assembly-0-7-1/E14"]
 dev_server:
   start: "npm run dev"
   url: "http://127.0.0.1:3470"
 capture:
   ui: "npx playwright screenshot"   # <url> <out.png>, for the Gate 2 slideshow
 dieu_phoi:
-  goi_dot: docs/plan/dot-{ten}   # batch package; open with /dieu-phoi:mo-dot <name>
+  goi_dot: docs/plan/dot-{ten}   # batch package; open with /dispatch:open <name>
 tri_thuc:
   noi: docs/tri-thuc   # in this repo; public since 2026-11-10 and the owner chose to keep raw sources here
 lo_trinh:
   tep: docs/plan/lo-trinh.json
+tro_ly_quyet_dinh:
+  mac_ky: true             # mặc-ký có phủ quyết cho hàng backend — chủ kho ký 2026-11-22 (LUAT đợt nen)
+  nguoi_quyet: "Manh Phan"

@@ -1,0 +1,149 @@
+{
+  "feature_plain": "Kho lên bộ setup repo-setup 0.10.1 để ô kiểm tiêu đề commit trên GitHub thôi đỏ oan trên mọi PR: nó chấm commit bằng đúng hook của kho thay vì gọi một hook kho không có; luật của kho không đổi.",
+  "will_do": [
+    {
+      "id": "AC-1",
+      "p": "Sẽ chứng toàn bộ phép kiểm của kho vẫn xanh trên nhánh (AC-1, make check đủ), cùng số bài như trước."
+    },
+    {
+      "id": "AC-2",
+      "p": "Sẽ chứng công cụ của tag không còn gì phải làm trên nhánh, và áp lên bản sao của main thì ra đúng ba tệp của PR (AC-2, cần anh cho chạy — Hỏi-1)."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ chứng tệp workflow kiểm tiêu đề giống từng byte bản mẫu của tag, và chỉ đúng bước chấm commit đổi (AC-3)."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ chứng ô chấm commit mới, chạy trên máy trong bản checkout sạch, nhận commit đúng khuôn, từ chối commit sai khuôn, và lỗi cũ của main có thật (AC-4)."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ chứng hướng dẫn cho tác tử chỉ đổi đúng hai luật tách dòng và thêm mục «máy nào canh luật nào», và mọi ô kiểm mục ấy gọi tên đều có thật (AC-5)."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ chứng bản ghi của lần lên đời chỉ đổi số phiên bản và mã của hai tệp, thêm đúng một tệp (AC-6)."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ chứng PR không đổi tệp nào ngoài bốn tệp của lần lên đời và hồ sơ này, không chạm vùng hạng cao (AC-7)."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ chứng mỗi phép đo biết đỏ: phá đúng thứ nó canh trên một bản sao thì nó đỏ với lời riêng (AC-8)."
+    },
+    {
+      "id": "AC-9",
+      "p": "Sẽ chứng ô kiểm commit không phải ô bắt buộc để gộp, nên nó đỏ cũng không chặn gộp (AC-9)."
+    }
+  ],
+  "wont_do": [
+    {
+      "id": "OOS-1",
+      "p": "Không sửa hook kiểm commit của kho để nhận tiêu đề chữ ký và ghim lại của kit — việc riêng (Hỏi-2)."
+    },
+    {
+      "id": "OOS-2",
+      "p": "Không đổi hạng hay danh sách miễn của cổng nghiệm thu; chỉ thêm lệnh của hồ sơ này."
+    },
+    {
+      "id": "OOS-3",
+      "p": "Không đổi luật quản trị, luật bảo vệ main hay workflow nào khác."
+    },
+    {
+      "id": "OOS-4",
+      "p": "Không rời bản nháp, không gộp, không chạy kiểm trình duyệt trên máy — việc của anh và của CI."
+    },
+    {
+      "id": "OOS-5",
+      "p": "Không sửa tệp của lần lên đời; thấy sai thì báo."
+    },
+    {
+      "id": "OOS-6",
+      "p": "Không nhận thêm luật mới nào của repo-setup mà kho chưa nhận."
+    }
+  ],
+  "coverage_plain": [
+    {
+      "i": 0,
+      "p": "Độ phủ đi theo bốn tệp của PR, mỗi tệp nối với tiêu chí chứng nó; lên đời là việc tất định nên các nhóm dưới là toàn bộ."
+    },
+    {
+      "i": 2,
+      "p": "Tệp workflow kiểm tiêu đề: đúng bản mẫu (AC-3), logic mới chạy được và lỗi cũ có thật (AC-4), công cụ tái tạo được (AC-2)."
+    },
+    {
+      "i": 3,
+      "p": "Hướng dẫn cho tác tử: đúng các dòng đổi (AC-5), công cụ tái tạo được (AC-2)."
+    },
+    {
+      "i": 4,
+      "p": "Bản ghi lên đời: đúng phiên bản và mã (AC-6), công cụ tái tạo được (AC-2)."
+    },
+    {
+      "i": 5,
+      "p": "Dòng sổ wiki: đúng một tệp (AC-7), sổ vẫn hợp lệ trong make check (AC-1)."
+    },
+    {
+      "i": 6,
+      "p": "Cả cây: phép kiểm xanh (AC-1), không tệp lạ (AC-7), mỗi phép đo có ca đỏ (AC-8)."
+    },
+    {
+      "i": 7,
+      "p": "Cài đặt của kho trên GitHub: ô kiểm commit không bắt buộc, kho cho gộp giữ commit (AC-9)."
+    },
+    {
+      "i": 8,
+      "p": "Ô kiểm commit trên GitHub chỉ chạy bản mới sau khi gộp; máy đo logic của nó ở đây, lượt thật đầu tiên phải nhìn ở PR kế."
+    },
+    {
+      "i": 9,
+      "p": "Kiểm trình duyệt và CSDL không đo ở đây: PR không đổi mã; CI chạy chúng khi PR rời bản nháp."
+    }
+  ],
+  "gap_probe_plain": [
+    {
+      "i": 0,
+      "p": "Phép đo ô chấm commit chạy trên máy đã cài sẵn mọi thứ và không biết hook nào thật sự chấm. Đã sửa: chạy trong bản checkout sạch, ghim tám hook chạy và chỉ hook kiểm tiêu đề từ chối; lượt đầu trên GitHub ghi là rủi ro chưa đo."
+    },
+    {
+      "i": 1,
+      "p": "Hệ quả «sau gộp ô kiểm sẽ đỏ trên commit chữ ký của kit» chưa ai đo. Đã sửa: đo hai tiêu đề mẫu và đếm 13 commit trên main."
+    },
+    {
+      "i": 2,
+      "p": "Câu «ô kiểm không bắt buộc» chưa được đo. Đã sửa: thêm AC-9 đọc luật bảo vệ main."
+    },
+    {
+      "i": 3,
+      "p": "Phép đo không có ca nào phá chính kịch bản của ô kiểm. Đã sửa: thêm hai ca phá kịch bản, phép đo đỏ cả hai."
+    },
+    {
+      "i": 4,
+      "p": "Chữ thêm vào hướng dẫn tác tử chỉ được so với diff của chính PR. Đã sửa: AC-2 áp tag thật lên bản sao của main rồi so ba tệp từng byte (chờ Hỏi-1)."
+    },
+    {
+      "i": 5,
+      "p": "Số bài kiểm đọc từ chính nhánh và dùng bộ kiểm nhẹ. Đã sửa một phần: nay chạy make check đủ; không so riêng với main vì PR không đổi mã."
+    },
+    {
+      "i": 6,
+      "p": "Không ai nói ô kiểm sẽ đi nhánh nào theo cách kho cho gộp. Đã sửa: AC-9 đo kho cho gộp giữ commit."
+    },
+    {
+      "i": 7,
+      "p": "Một tệp sổ wiki nay thành tệp của công cụ; hệ quả cho lần lên đời sau ghi ở Notes."
+    },
+    {
+      "i": 8,
+      "p": "Mục mới trong hướng dẫn tác tử có câu hơi trái với một luật có máy canh, và đứng sau khối Next.js tự viết lại. Ghi ở Notes để gửi repo-setup."
+    },
+    {
+      "i": 9,
+      "p": "Ô kiểm in nguyên đầu ra hook trong workflow có quyền của kho. Đã thêm ca thử tin giả lỗi; phần rủi ro còn lại ghi ở Notes để gửi repo-setup."
+    }
+  ],
+  "decisions": [],
+  "analyst_plain": ""
+}

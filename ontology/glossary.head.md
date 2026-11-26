@@ -1,0 +1,4 @@
+# Glossary — onehub-inventory
+
+One line per business term. If two people could understand a word differently,
+it belongs here. Code, docs and agents must use these exact names.

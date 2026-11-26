@@ -1,0 +1,89 @@
+schema_version: 1
+feature_slug: upgrade-repo-setup-0-10-2
+# Ma trận viết trước (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
+#   Nền của PR: git merge-base HEAD origin/main, hôm nay f2a49b49 (merge của PR 94). Commit lên đời dbe08dca.
+#   repo-setup: tag repo-setup-v0.10.2 (commit 2f8f1415); bản mẫu dưới plugins/repo-setup/presets/_core/team/.
+#   Dry-run trên HEAD: mọi danh sách hành động rỗng, 32 tệp edited, 8 tệp removed; trên nền: updated = pr-title.yml,
+#     tools/autonomy.py, tools/github_setup.py; chạy thật trên bản sao tạm của nền: bốn tệp giống HEAD từng byte.
+#   make check trên HEAD: 148 tệp bài, 2476 đạt, 2 bỏ qua (bằng main sau PR 94).
+#   Bước chấm của conventional-commits: chạy nguyên văn bằng bash -eo pipefail, gh giả, uvx pre-commit; ba dòng cài
+#     trong tin; rào ::stop-commands::<32 hex>; không mã thì đỏ. Kết quả chấm giống nền trên sáu tin của ANSWERS.
+#   Lượt chạy 44709236514 của PR 95: job của nền (pull_request_target, persist-credentials: true, không rào).
+#   Chính sách trên bản sao: gate nhận được khi không có pr-pipeline.yml; check, secret-scan vẫn bị từ chối.
+#   Cặp hai chiều: rang/two-way.mjs, mỗi bản phá đúng một điều một phép đo canh.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    paths: ["**"]
+    expected: "exit 0; đầu ra có dòng 'Test Files  148 passed (148)', dòng 'Tests  2476 passed | 2 skipped (2478)' và dòng 'make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance'; không thêm bài bỏ qua nào ngoài 2 bài (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.rs0102_apply_again
+    long_running: 10
+    paths: [".repo-setup.json", ".github/workflows/pr-title.yml", "tools/autonomy.py", "tools/github_setup.py"]
+    expected: "exit 0; dòng 'apply-again: apply.py of repo-setup-v0.10.2 has nothing left to do on HEAD (no marker, 32 edited files left alone, the 8 deleted samples not made again); on the base it updates pr-title.yml, autonomy.py and github_setup.py and does nothing else; applied to a copy of the base it writes HEAD's four files byte for byte, and a second run has nothing to do'; trên HEAD không danh sách hành động nào có tệp, trên nền không tệp nào bị tạo, gộp, đánh dấu, bỏ hay xung đột (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.rs0102_template_same
+    paths: [".github/workflows/pr-title.yml", "tools/autonomy.py", "tools/github_setup.py", ".repo-setup.json"]
+    expected: "exit 0; dòng 'template-same: pr-title.yml, tools/autonomy.py and tools/github_setup.py are the tag's templates byte for byte with the hashes .repo-setup.json records; the manifest goes from 0.10.1 to 0.10.2 for every file but the 8 deleted samples (0.4.0), and only those three hashes change; in pr-title.yml only the checkout of conventional-commits (persist-credentials: false) and the run of its judging step changed'; trigger, quyền, conventional-title không đổi, không mục manifest nào thêm hay bỏ (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.rs0102_fence
+    long_running: 5
+    paths: [".github/workflows/pr-title.yml", ".pre-commit-config.yaml"]
+    expected: "exit 0; dòng 'fence: the hook output of each refused commit is fenced by a new 32-hex token and the planted commands stay inside; outside, the runner reads only one ::error:: line per commit, its subject without control characters and with % escaped; on the could-not-run path the author's text is fenced and quoted too; with no random token the step prints nothing of the output and is red'; không dòng cài nào tới runner, kể cả phần sau một dấu xuống dòng và ở nhánh could not run; không có mã thì không in đầu ra hook (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.rs0102_judged
+    long_running: 5
+    paths: [".github/workflows/pr-title.yml", ".pre-commit-config.yaml", "tools/commit_msg.py"]
+    expected: "exit 0; dòng 'judged: with pre-commit <phiên bản> the step of HEAD and the step of the base give the same answer on each of the 6 messages (…); both pass where the repository squashes, and both stop with their own message on no commit-msg hook and on a config they cannot read, HEAD's output fenced'; update stuff, wip(dan-tu-excel) và tin giống lỗi pre-commit bị từ chối, cấu hình hỏng không đổ lỗi cho commit (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.rs0102_credentials
+    paths: [".github/workflows/pr-title.yml"]
+    expected: "exit 0; dòng 'credentials: the checkout of conventional-commits keeps no token in .git/config (persist-credentials: false, the action's default at the base); the script of the judging step writes no git command and gets the token for gh from its env; no other job of pr-title.yml checks out'; script bước chấm không có lệnh git, không job nào khác checkout (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.rs0102_runner
+    paths: [".github/workflows/pr-title.yml"]
+    expected: "exit 0; dòng 'runner: run 44709236514 of PR 95 (pull_request_target, the upgrade commit) checked out main with the token kept and ran the base's unfenced script: the job of 0.10.2 has not run on a runner yet, and runs first on a pull request event after the merge'; log không có show_hook_output hay stop-commands (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.rs0102_policy
+    paths: ["tools/autonomy.py", "tools/github_setup.py", "governance/autonomy.yaml"]
+    expected: "exit 0; dòng 'policy: on a copy, the policy may name gate under required_checks or as proof.check: the codeowners check passes, the classification reports the proof, and the ruleset github_setup.py main would write requires gate once, also when named in both places; with .github/workflows/pr-pipeline.yml both are refused again, check and secret-scan stay refused, and the tools of the base refuse gate; the real policy is unchanged'; có pr-pipeline.yml thì gate bị từ chối, check và secret-scan luôn bị từ chối (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.rs0102_change_set
+    paths: ["**"]
+    expected: "exit 0; dòng 'change-set: dbe08dca is unchanged on the base and changes the four files of the upgrade; besides them the pull request changes only this dossier and the files of its round, not the policy, the hook or its wiring; the config only gains the commands rs0102_*; tools/** makes it T3 by the base's tiers; every commit of the pull request passes the base's rule'; không tệp ngoài danh sách, không chạm governance/, config không đổi gì ngoài lệnh rs0102_* (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.rs0102_two_way
+    long_running: 10
+    paths: ["_acceptance/upgrade-repo-setup-0-10-2/rang/**"]
+    expected: "exit 0; node --test báo 'tests 24', 'pass 24', 'fail 0': bảy phép đo xanh trên cây và mười bảy bài phá đỏ đúng lời (template-same, apply-again, bảy bài fence, hai bài judged, credentials, runner, hai bài policy, hai bài change-set)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

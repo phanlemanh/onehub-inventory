@@ -1,0 +1,1 @@
+Thu quyền của các vai khoá công khai Supabase (việc phụ VP6, hàng 22): migration 014 thu mọi quyền của `anon`, `authenticated`, `service_role` và PUBLIC trên bảng, chuỗi số, hàm, schema của kho, thu cả quyền mặc định; `vercel.json` khai `framework: nextjs` — [0044](decisions/0044-thu-quyen-vai-khoa-cong-khai.md).

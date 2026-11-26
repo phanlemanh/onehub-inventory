@@ -1,6 +1,6 @@
 # Gói đợt nen
 
-Đợt Điều phối – Thợ đầu tiên của onehub-inventory. Chủ kho duyệt hàng, Cổng Đáng của từng hàng và quyền tự merge ở thẻ khởi tạo của `/dieu-phoi:mo-dot nen`, không phải ở đây.
+Đợt Điều phối – Thợ đầu tiên của onehub-inventory. Chủ kho duyệt hàng, Cổng Đáng của từng hàng và quyền tự merge ở thẻ khởi tạo của `/dispatch:open nen`, không phải ở đây.
 
 ## Điều kiện trước khi mở
 
@@ -8,7 +8,7 @@
 2. Bản vá T1-escape của kit đã phát hành và kho đã nâng bản.
 3. Lộ trình đã chốt.
 4. Docker đang chạy.
-5. Mở từ một phiên mới ở checkout chính, để nạp gói `dieu-phoi`.
+5. Mở từ một phiên mới ở checkout chính, để nạp gói `dispatch`.
 
 ## Dãy
 

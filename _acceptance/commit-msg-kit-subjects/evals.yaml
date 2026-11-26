@@ -1,0 +1,75 @@
+schema_version: 1
+feature_slug: commit-msg-kit-subjects
+# Ma trận viết trước, sửa sau phản biện (gap-probe.md) (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
+#   Nền của PR: git merge-base HEAD origin/main, lúc mở hồ sơ 499ee2cf (gộp PR 93).
+#   Kit: delivery-loop v3.0.0, đọc từ bản cài (tools/kit-root.mjs); 7 tiêu đề kit tự viết, 4 script commit.
+#   Lịch sử nền: 1393 commit không phải merge; luật mới nhận thêm 7 «Gate 2 signoff» + 5 «repin», không bớt commit nào,
+#     còn từ chối đúng 1: «wip(dan-tu-excel): …» (theo ngả máy khuyên ở Hỏi-1).
+#   Job conventional-commits: khối dò và chấm trích từ pr-title.yml, chạy trong checkout sạch của HEAD; 8 hook ở stage
+#     commit-msg, chỉ commit-message chấm.
+#   Cặp hai chiều: rang/two-way.mjs, mỗi ca phá đúng một điều một phép đo canh.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.cmks_kit_subjects
+    long_running: 2
+    paths: ["tools/commit_msg.py"]
+    expected: "exit 0; dòng 'kit-subjects: the 7 subjects the kit v3.0.0 writes (found word for word in its files; 4 scripts commit into the repository, 1 into a scratch repository, no other; its markdown tells to commit no other subject) pass tools/commit_msg.py, alone and with a body'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.cmks_near_miss
+    long_running: 2
+    paths: ["tools/commit_msg.py"]
+    expected: "exit 0; dòng 'near-miss: the 32 near misses are refused, the two probes of the job among them' (should-NOT-fire: tin chỉ giống tiêu đề kit, kể cả tin nhiều dòng, vẫn bị từ chối)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.cmks_history
+    long_running: 2
+    paths: ["tools/commit_msg.py"]
+    expected: "exit 0; dòng 'history: over the 1393 non-merge commits of 499ee2cf the tree accepts 12 more (7 Gate 2 signoff, 5 repin), refuses none the base accepts, and still refuses 1: wip(dan-tu-excel): paste path from the clickable preview' (should-NOT-fire: không commit nào nền nhận lại bị từ chối)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.cmks_commits_judged
+    long_running: 5
+    paths: ["tools/commit_msg.py", ".pre-commit-config.yaml", ".github/workflows/pr-title.yml"]
+    expected: "exit 0; dòng bắt đầu 'commits-judged: block ' và có 'from uvx in a clean checkout of HEAD: 8 hooks run at commit-msg and only commit-message refuses the probe; the 7 kit subjects pass, \"update stuff\" and \"wip(dan-tu-excel)\" are refused'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    paths: ["**"]
+    expected: "exit 0; dòng 'Test Files  148 passed (148)', dòng 'Tests  2476 passed | 2 skipped (2478)' (nền 2466 + 10 ca của AC-8; không thêm bài bỏ qua nào, should-NOT-fire), dòng 'no heavy checks' và dòng 'make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.cmks_change_set
+    long_running: 1
+    paths: ["**"]
+    expected: "exit 0; dòng 'change-set: the pull request changes tools/commit_msg.py and tests/commit-msg.test.ts, wiki/log/**, this dossier and the files of its round; none of .pre-commit-config.yaml, .github/**, governance/**; every commit of the pull request passes the base's rule'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.cmks_two_way
+    long_running: 10
+    paths: ["_acceptance/commit-msg-kit-subjects/rang/**", "tools/commit_msg.py"]
+    expected: "exit 0; node --test in 'tests 18 / pass 18 / fail 0'; mỗi phép đo đỏ trên bản phá đúng điều nó canh"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.cmks_test_cases
+    long_running: 1
+    paths: ["tests/commit-msg.test.ts"]
+    expected: "exit 0; dòng 'test-cases: tests/commit-msg.test.ts keeps every case of the base and adds 4 accepted and 6 refused cases, no other' (should-NOT-fire: không ca cũ nào mất hay đổi)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Luồng khoá · Luồng hai làn</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Lora:ital,wght@0,400;1,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap&subset=vietnamese" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-soft:    #636b80;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Lora', 'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1200px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 0.5rem;
+    }
+    .sub { color: var(--color-soft); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    svg { width: 100%; min-width: 900px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Luồng hai làn · AC-1 · AC-4 · AC-5 · AC-7</p>
+    <h1>Khoá đi một đường từ chủ kho tới Vercel</h1>
+    <p class="sub">Lệnh đưa bản lên lệch hàng 22 ở hai bước mới, tô nổi bên dưới.</p>
+
+    <svg viewBox="0 0 1200 520" xmlns="http://www.w3.org/2000/svg" font-family="'Geist', sans-serif">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- Lane dividers -->
+      <line x1="40" y1="80" x2="1168" y2="80" stroke="rgba(45,49,66,0.22)" stroke-width="1"/>
+      <line x1="40" y1="256" x2="1168" y2="256" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+      <line x1="40" y1="440" x2="1168" y2="440" stroke="rgba(45,49,66,0.22)" stroke-width="1"/>
+      <line x1="160" y1="80" x2="160" y2="440" stroke="rgba(45,49,66,0.22)" stroke-width="1"/>
+
+      <!-- Column heads -->
+      <text x="40" y="60" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.18em">LÀN</text>
+      <text x="176" y="60" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.18em">CÁC BƯỚC</text>
+
+      <!-- Lane labels -->
+      <text x="40" y="164" fill="#2d3142" font-size="12" font-weight="600">Chủ kho</text>
+
+      <text x="40" y="332" fill="#2d3142" font-size="12" font-weight="600">Lượt Deploy</text>
+      <text x="40" y="348" fill="#2d3142" font-size="12" font-weight="600">trên CI</text>
+      <text x="40" y="368" fill="#636b80" font-size="9">bản thử</text>
+
+      <!-- ===== Arrows (drawn before boxes) ===== -->
+      <!-- Top lane -->
+      <line x1="384" y1="132" x2="432" y2="132" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="656" y1="132" x2="720" y2="132" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- make dat-khoa → hai khoá tự sinh -->
+      <line x1="544" y1="160" x2="544" y2="180" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+      <!-- hai khoá tự sinh → môi trường GitHub -->
+      <path d="M656 208 H760 Q768 208 768 200 V160" fill="none" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+      <!-- môi trường GitHub → lượt Deploy (bước 01) -->
+      <path d="M880 160 V260 Q880 268 872 268 H232 Q224 268 224 276 V288" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+
+      <!-- Bottom lane chain: nine steps -->
+      <line x1="272" y1="332" x2="288" y2="332" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="384" y1="332" x2="400" y2="332" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="496" y1="332" x2="512" y2="332" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="608" y1="332" x2="624" y2="332" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="720" y1="332" x2="736" y2="332" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="832" y1="332" x2="848" y2="332" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="944" y1="332" x2="960" y2="332" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="1056" y1="332" x2="1072" y2="332" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+      <!-- ===== Top lane boxes ===== -->
+      <rect x="176" y="104" width="208" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="176" y="104" width="208" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="280" y="128" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Tạo khoá ở dịch vụ</text>
+      <text x="280" y="146" fill="#636b80" font-size="9" text-anchor="middle">Vercel · Resend · Supabase</text>
+
+      <rect x="432" y="104" width="224" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="432" y="104" width="224" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="544" y="128" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Chạy <tspan font-family="'Geist Mono', monospace" font-weight="500">make dat-khoa</tspan></text>
+      <text x="544" y="146" fill="#636b80" font-size="9" text-anchor="middle">dán từng khoá</text>
+
+      <rect x="720" y="104" width="208" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="720" y="104" width="208" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="824" y="128" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Khoá vào môi trường</text>
+      <text x="824" y="144" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">GitHub</text>
+
+      <!-- Hai khoá tự sinh (beside make dat-khoa) -->
+      <rect x="432" y="180" width="224" height="56" rx="6" fill="#f5f5f5"/>
+      <rect x="432" y="180" width="224" height="56" rx="6" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.30)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="544" y="200" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Hai khoá tự sinh</text>
+      <text x="544" y="216" fill="#4f5d75" font-size="9" text-anchor="middle">khoá đăng nhập của ứng dụng</text>
+      <text x="544" y="228" fill="#4f5d75" font-size="9" text-anchor="middle">mật khẩu vai đăng nhập</text>
+
+      <!-- Callout: máy không thấy giá trị khoá -->
+      <line x1="952" y1="112" x2="952" y2="152" stroke="rgba(45,49,66,0.30)" stroke-width="1"/>
+      <text x="964" y="128" fill="#4f5d75" font-size="14" font-style="italic" font-family="'Lora', 'Instrument Serif', serif">máy không thấy</text>
+      <text x="964" y="148" fill="#4f5d75" font-size="14" font-style="italic" font-family="'Lora', 'Instrument Serif', serif">giá trị khoá</text>
+
+      <!-- ===== Bottom lane: nine steps (x = 176 + 112k, w = 96) ===== -->
+      <!-- 01 kiểm cấu hình -->
+      <rect x="176" y="288" width="96" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="176" y="288" width="96" height="88" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="184" y="296" width="24" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="196" y="308" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">01</text>
+      <text x="224" y="336" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Kiểm</text>
+      <text x="224" y="352" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">cấu hình</text>
+
+      <!-- 02 migration -->
+      <rect x="288" y="288" width="96" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="288" y="288" width="96" height="88" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="296" y="296" width="24" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="308" y="308" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">02</text>
+      <text x="336" y="344" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Migration</text>
+
+      <!-- 03 đặt mật khẩu vai (dạng băm) — MỚI -->
+      <rect x="400" y="288" width="96" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="400" y="288" width="96" height="88" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <rect x="408" y="296" width="24" height="16" rx="2" fill="transparent" stroke="rgba(235,108,54,0.60)" stroke-width="0.8"/>
+      <text x="420" y="308" fill="#ba4513" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">03</text>
+      <rect x="440" y="296" width="32" height="16" rx="2" fill="#eb6c36"/>
+      <text x="456" y="308" fill="#ffffff" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">MỚI</text>
+      <text x="448" y="336" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Đặt mật khẩu</text>
+      <text x="448" y="352" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">vai</text>
+      <text x="448" y="368" fill="#636b80" font-size="9" text-anchor="middle">dạng băm</text>
+
+      <!-- 04 kiểm cách ly -->
+      <rect x="512" y="288" width="96" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="512" y="288" width="96" height="88" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="520" y="296" width="24" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="532" y="308" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">04</text>
+      <text x="560" y="336" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Kiểm</text>
+      <text x="560" y="352" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">cách ly</text>
+
+      <!-- 05 đẩy sáu biến sang Vercel — MỚI -->
+      <rect x="624" y="288" width="96" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="624" y="288" width="96" height="88" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <rect x="632" y="296" width="24" height="16" rx="2" fill="transparent" stroke="rgba(235,108,54,0.60)" stroke-width="0.8"/>
+      <text x="644" y="308" fill="#ba4513" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">05</text>
+      <rect x="664" y="296" width="32" height="16" rx="2" fill="#eb6c36"/>
+      <text x="680" y="308" fill="#ffffff" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">MỚI</text>
+      <text x="672" y="336" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Đẩy sáu biến</text>
+      <text x="672" y="352" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">sang Vercel</text>
+
+      <!-- 06 dựng -->
+      <rect x="736" y="288" width="96" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="736" y="288" width="96" height="88" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="744" y="296" width="24" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="756" y="308" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">06</text>
+      <text x="784" y="344" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Dựng</text>
+
+      <!-- 07 kiểm nhanh -->
+      <rect x="848" y="288" width="96" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="848" y="288" width="96" height="88" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="856" y="296" width="24" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="868" y="308" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">07</text>
+      <text x="896" y="336" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Kiểm</text>
+      <text x="896" y="352" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">nhanh</text>
+
+      <!-- 08 gắn tên miền -->
+      <rect x="960" y="288" width="96" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="960" y="288" width="96" height="88" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="968" y="296" width="24" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="980" y="308" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">08</text>
+      <text x="1008" y="336" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Gắn</text>
+      <text x="1008" y="352" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">tên miền</text>
+
+      <!-- 09 kiểm tên miền -->
+      <rect x="1072" y="288" width="96" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="1072" y="288" width="96" height="88" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="1080" y="296" width="24" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="1092" y="308" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">09</text>
+      <text x="1120" y="336" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">Kiểm</text>
+      <text x="1120" y="352" fill="#2d3142" font-size="12" font-weight="600" text-anchor="middle">tên miền</text>
+
+      <!-- Bracket under steps 01–07 + note -->
+      <path d="M176 388 V396 H944 V388" fill="none" stroke="rgba(45,49,66,0.40)" stroke-width="1"/>
+      <text x="560" y="420" fill="#4f5d75" font-size="14" font-style="italic" font-family="'Lora', 'Instrument Serif', serif" text-anchor="middle">đỏ trước gắn tên miền thì tên miền không đổi</text>
+
+      <!-- ===== Legend ===== -->
+      <line x1="40" y1="456" x2="1168" y2="456" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
+      <text x="40" y="476" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.14em">CHÚ GIẢI</text>
+
+      <rect x="40" y="488" width="16" height="12" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="64" y="498" fill="#4f5d75" font-size="9">Bước</text>
+
+      <rect x="124" y="488" width="16" height="12" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <text x="148" y="498" fill="#4f5d75" font-size="9">Bước mới</text>
+
+      <rect x="232" y="488" width="16" height="12" rx="2" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.30)" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="256" y="498" fill="#4f5d75" font-size="9">Lệnh tự sinh</text>
+
+      <line x1="352" y1="494" x2="380" y2="494" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <text x="388" y="498" fill="#4f5d75" font-size="9">Đi tiếp trong làn</text>
+
+      <line x1="496" y1="494" x2="524" y2="494" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+      <text x="532" y="498" fill="#4f5d75" font-size="9">Khoá sang lượt Deploy</text>
+    </svg>
+  </div>
+</body>
+</html>

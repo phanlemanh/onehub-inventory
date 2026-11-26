@@ -1,0 +1,1 @@
+Cổng chứng minh màn bắt tệp khối tự làm chưa kê ở sổ khối, danh sách có trước hay bảng Khối của hồ sơ đang mở (hàng 1q); so với nhánh chính bằng danh sách cố định, không đọc git — [0042](decisions/0042-cong-bat-khoi-khong-ke.md), `_acceptance/cong-bat-khoi-khong-ke/`.

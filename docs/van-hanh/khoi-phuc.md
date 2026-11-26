@@ -33,7 +33,10 @@ sở nháp, đếm dòng từng bảng và chạy bộ kiểm cách ly trên b�
   - `MIGRATE_DATABASE_URL` — chuỗi Session pooler vai chủ của dự án bản thử;
   - `SAO_LUU_LUOC_DO` — `public identity app` (chỉ các lược đồ của ta, không lấy lược đồ riêng của Supabase);
   - `KHOI_PHUC_ADMIN_URL` — cùng chuỗi như `MIGRATE_DATABASE_URL` (lệnh tự thay tên cơ sở dữ liệu bằng một cơ sở nháp);
-  - `KHOI_PHUC_LOGIN_URL` — cùng chuỗi như `LOGIN_DATABASE_URL` của bản thử (vai `quy_hang_login`).
+  - `LOGIN_DB_PASSWORD` — mật khẩu vai đăng nhập của bản thử, chủ kho tự giữ (README, mục «Mật khẩu vai đăng nhập ở máy
+    chủ kho»);
+  - `KHOI_PHUC_LOGIN_URL` — chuỗi vai `quy_hang_login` của bản thử: chuỗi `MIGRATE_DATABASE_URL`, đổi người dùng
+    `postgres` (phần trước dấu chấm) thành `quy_hang_login` và mật khẩu thành `LOGIN_DB_PASSWORD`.
 
 ## Các bước
 
@@ -47,7 +50,8 @@ sở nháp, đếm dòng từng bảng và chạy bộ kiểm cách ly trên b�
 ### 2. Kiểm cách ly trên bản thử
 
 - **Ở đâu:** cùng cửa sổ dòng lệnh.
-- **Gõ hay bấm:** `LOGIN_DATABASE_URL="$KHOI_PHUC_LOGIN_URL" make cach-ly-dich`.
+- **Gõ hay bấm:** `make cach-ly-dich` (lệnh tự dựng chuỗi vai đăng nhập từ `MIGRATE_DATABASE_URL` và
+  `LOGIN_DB_PASSWORD`).
 - **Đạt khi:** mỗi ca in một dòng `ok <ca>`, dòng cuối `cach-ly-dich: 4 ca đạt`. Bộ kiểm chỉ đọc, không ghi gì.
 - **Đỏ thì:** `thiếu biến <tên>` — bổ sung tệp biến. Dòng gọi tên bảng hay vai (`vai anon co quyen tren: …`,
   `bang khong ep luat dong: …`) — làm theo bảng «Đỏ thì làm gì» của [dua-ban-len.md](dua-ban-len.md), dòng `cach-ly`,
@@ -129,9 +133,9 @@ khôi phục, và mọi thứ ghi sau thời điểm sao lưu mất.
    Đỏ thì: bảng «Đỏ thì làm gì» của [dua-ban-len.md](dua-ban-len.md).
 4. **Kiểm cách ly bản thật.** Ở đâu: máy chủ kho, cửa sổ dòng lệnh, trong thư mục bản sao của kho. Trước hết dựng tệp
    biến ngoài kho của bản thật (một lần; quyền chỉ chủ đọc: `chmod 600 <tệp>`), mỗi dòng dạng `TÊN=giá trị` lấy từ trình
-   giữ mật khẩu: `MIGRATE_DATABASE_URL` (chuỗi Session pooler vai chủ của dự án bản thật, việc 3 của README),
-   `LOGIN_DATABASE_URL` (chuỗi vai `quy_hang_login` của bản thật — cùng chuỗi `DATABASE_URL` đặt ở Vercel, việc 4 của
-   README), `APP_URL` (`https://inventory.onehub.center`), thêm `VERCEL_AUTOMATION_BYPASS_SECRET` nếu dự án bật bảo vệ.
+   giữ mật khẩu: `MIGRATE_DATABASE_URL` (chuỗi Session pooler vai chủ của dự án bản thật, việc 4 của README),
+   `LOGIN_DB_PASSWORD` (mật khẩu vai đăng nhập của bản thật, chủ kho tự giữ — README, mục «Mật khẩu vai đăng nhập ở máy
+   chủ kho»), `APP_URL` (`https://inventory.onehub.center`), thêm `VERCEL_AUTOMATION_BYPASS_SECRET` nếu dự án bật bảo vệ.
    Gõ hay bấm: `set -a; source <tệp biến của bản thật>; set +a`, rồi `make cach-ly-dich`, rồi
    `make smoke ENV=production`. Đạt khi: `cach-ly-dich: 4 ca đạt` và
    `smoke production: đạt <commit>`. Đỏ thì: dòng gọi tên bảng hay vai — báo người giữ kho mã ngay, cân nhắc tạm ngừng bản thật.

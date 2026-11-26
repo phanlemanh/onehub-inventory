@@ -3,7 +3,9 @@
 
   python3 tools/commit_msg.py <message-file>
 
-The kit commits regenerated files and knowledge pages itself with messages it does not let a repo change.
+The acceptance kit (delivery-loop v3.0.0) writes some commits itself, with subjects a repo cannot change: its
+knowledge pages, the design floor of S3, the Gate 2 signature, a veto, a re-pin after the signature, and the
+work-in-progress commit of a hand-over. Those subjects pass in their exact form, nothing looser.
 """
 
 from __future__ import annotations
@@ -13,7 +15,7 @@ import sys
 from pathlib import Path
 
 CONVENTIONAL = r"(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([^)]+\))?!?: \S"
-KIT = r"(tri-thuc: |design-floor S3: )"
+KIT = r"(tri-thuc: |design-floor S3: |Gate 2 signoff: [a-z0-9-]+ — \S|Veto: [a-z0-9-]+ — \S|repin\([a-z0-9-]+\): \S|wip\(ban-giao\): \S)"
 GIT = r"(Merge |Revert \")"
 ALLOWED = re.compile(rf"^({CONVENTIONAL}|{KIT}|{GIT})")
 

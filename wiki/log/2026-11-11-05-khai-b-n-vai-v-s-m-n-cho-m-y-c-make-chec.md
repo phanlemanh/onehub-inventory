@@ -1,0 +1,1 @@
+Khai bốn vai và sổ màn cho máy đọc; `make check` đỏ khi có trang chưa khai hay hợp đồng của vòng giao diện thiếu khối Vai × Màn, `make coverage-report` in số đo của đợt thử — hàng 1d, [0017](decisions/0017-actor-surface-coverage-pilot.md), `_acceptance/khai-vai-va-man/`

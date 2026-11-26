@@ -1,8 +1,22 @@
 // The source adapter for React: the libraries a React screen could show a toast with, and the page
 // that draws a component of the repository once per option.
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+
+// Whether the repository draws its screens with React: its packages name it.
+function present(root) {
+  try {
+    const data = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8"));
+    return "react" in { ...data.dependencies, ...data.devDependencies };
+  } catch {
+    return existsSync(path.join(root, "node_modules/react/package.json"));
+  }
+}
+
 export const adapter = {
   id: "react",
   kind: "source",
+  present,
   names: ["react", "react-dom", "sonner", "react-hot-toast", "react-toastify"],
   toastModules: ["sonner", "react-hot-toast", "react-toastify"],
   harness,

@@ -71,7 +71,7 @@ test.describe("E7 · a sent link opens beside the grid", () => {
     await openSent(page);
     await page.locator(`[data-record-open="${LINK_5}"]`).click();
     await expect(panel(page)).toHaveAttribute("data-record-id", LINK_5);
-    await expect(page).toHaveURL(new RegExp(`ho-so=${LINK_5}`));
+    await expect(page).toHaveURL(new RegExp(`record=${LINK_5}`));
     await checkRecord(page, LINK_5);
     expect((await rowCells(page, LINK_5))["Số căn"]).toBe("30");
     await panel(page).getByRole("button", { name: "Đóng" }).click();

@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "den": "80fc4e2b13c01493397b07ce3c528211b31fe7c3",
+  "base": "d47869acd2a52c7f97eef0af75d23b66220301dc",
+  "ghim": null,
+  "theo_khuon": [],
+  "lech_moi": [],
+  "no_cu": [],
+  "khong_do": [],
+  "ngoai_ban_do": 0,
+  "nhom": [
+    "dang-nhap",
+    "danh-sach-khung",
+    "luoi"
+  ]
+}

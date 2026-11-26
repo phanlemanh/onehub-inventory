@@ -321,11 +321,11 @@ describe("trang-thai (E7)", () => {
 
 describe("cua-phat-trien (E13)", () => {
   it.each([
-    ["bien", "production", 0],
-    ["bien", "development", 9],
+    ["edge", "production", 0],
+    ["edge", "development", 9],
     [undefined, "development", 0],
     ["khac", "development", 0],
-  ] as const)("?mau=%s in %s gives %i edge rows", (param, env, n) => {
+  ] as const)("?sample=%s in %s gives %i edge rows", (param, env, n) => {
     const got = inventoryEdgeRowsFrom(param, env).length;
     if (env === "production" && got > 0) throw new Error("dev seam active in production: mau");
     expect(got).toBe(n);

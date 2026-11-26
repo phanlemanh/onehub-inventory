@@ -1,0 +1,1 @@
+Đăng nhập bằng mã email: mã 6 số qua thư, phiên 30 ngày trượt, chọn và đổi sàn, menu tài khoản, đăng xuất; schema danh tính chỉ chủ đọc, bảng thành viên lọc theo sàn, sáu hàm hẹp của vai riêng; thêm gói `pg` — hàng 8, [0021](decisions/0021-dang-nhap-ma-email.md), `_acceptance/dang-nhap-ma-email/`

@@ -14,7 +14,12 @@ import { STATUS_ORDER } from "@/components/candidate/grid-view";
 import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { label } from "@/modules/company-config";
 import { allowedScope } from "@/modules/identity";
-import { LAYER_PARTS_SHOWN, PART_TITLE } from "@/modules/company-config/ui";
+import {
+  LAYER_PARTS_SHOWN,
+  LAYER_ROUTE,
+  layerPartHref,
+  PART_TITLE,
+} from "@/modules/company-config/ui";
 import { inventoryStatusHref } from "@/modules/listings/ui";
 
 import type { Role } from "@/generated/ontology";
@@ -104,14 +109,14 @@ export const NAV: NavItem[] = [
   { href: "/members", title: label("Member"), icon: icon(UsersIcon), action: "listMembers" },
   // The company's own layer (row 7e): one entry per part in the second column.
   {
-    href: "/tuy-chinh-san",
+    href: LAYER_ROUTE,
     title: label("CompanyLayer"),
     icon: icon(SlidersHorizontalIcon),
     action: "readCompanyLayer",
     sections: [
       {
         items: LAYER_PARTS_SHOWN.map((p) => ({
-          href: p === "nhan" ? "/tuy-chinh-san" : `/tuy-chinh-san?phan=${p}`,
+          href: layerPartHref(p),
           title: label(PART_TITLE[p]),
         })),
       },

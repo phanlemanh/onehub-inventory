@@ -5,7 +5,7 @@ links:
   [
     src/components/ui/resizable.tsx,
     src/components/candidate/record-panel.tsx,
-    design/so-khoi.yaml,
+    design/intake/_shared.yaml,
     _acceptance/ngan-chi-tiet-ghim-thanh-cot/contract.md,
   ]
 sources:

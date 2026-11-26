@@ -1,0 +1,4 @@
+{
+  "feature_plain": "Sau khi gộp, PR có commit chữ ký hay ghim lại của kit nghiệm thu không còn bị kiểm tiêu đề commit trên GitHub đánh đỏ, còn tin commit viết sai vẫn bị chặn như cũ.",
+  "scope_plain": "Phạm vi giữ đúng như đã duyệt ở Cổng 1: chỉ mở đúng những kiểu tiêu đề kit cần, mọi thứ khác giữ nguyên."
+}

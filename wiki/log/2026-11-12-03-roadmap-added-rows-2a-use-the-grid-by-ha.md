@@ -1,0 +1,1 @@
+Roadmap: added rows 2a (use the grid by hand like a sheet), 2b (phone cards), 1q, 1r, 9d, 7a from the owner's sheet-habit decision and the items signed as "new contract"; row 10 now waits for 1r, 9d, 7a; opened the worth-gate cell of row 9a — [lo-trinh](../docs/plan/lo-trinh.json).

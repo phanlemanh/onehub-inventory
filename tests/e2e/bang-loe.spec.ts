@@ -98,7 +98,7 @@ async function record(
     };
     requestAnimationFrame(tick);
   }, brk);
-  await page.goto("/inventory?vai=ListAgent");
+  await page.goto("/inventory?role=ListAgent");
   // Recording runs until the region is hydrated (one layout only); with the CPU slowed six times on CI that can take
   // most of a minute, so these tests get three times the timeout and the wait its own 60 s cap.
   await regionReady(page, 60_000);
@@ -199,7 +199,7 @@ async function assertOneBranch(page: Page, width: number, phone: boolean): Promi
 
 async function openReady(page: Page, width: number, height: number): Promise<void> {
   await page.setViewportSize({ width, height });
-  await page.goto("/inventory?vai=ListAgent");
+  await page.goto("/inventory?role=ListAgent");
   await regionReady(page);
 }
 

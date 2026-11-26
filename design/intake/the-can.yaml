@@ -1,0 +1,7 @@
+ten: ListingCard
+tep: src/modules/listings/ui/listing-record.tsx
+nguon: product-grid-4
+nhu_cau: the-can
+mo_ta: Thẻ một căn với mã căn, giá, nơi, trạng thái và ba thông số
+ho_so: ho-so-can
+duyet: 2026-11-12

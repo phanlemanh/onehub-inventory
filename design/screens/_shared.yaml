@@ -1,0 +1,40 @@
+# Screen register: every page under src/app is declared here (roadmap row 1d, decision 0017).
+# tools/coverage_matrix/check.py fails `make check` when a page is missing or an entry is wrong.
+#
+#   id        stable key; contracts list it under `screens:` and in their Vai × Màn block
+#   route     the page's path under src/app, without route groups "(x)" and slots "@x"
+#   title     label key in ontology/labels.yaml (null only for audience dev)
+#   family    a key of `families`, or null when not assigned yet (row 1c assigns)
+#   audience  staff (signed-in staff) | public (customer page) | dev (development build only)
+#   status    built (the page exists) | planned (declared ahead, no page yet)
+#   vao       (staff/public) the action a role must hold to open the screen, a name in ontology/actions.yaml, or null when
+#             every member of the company may open it; a built screen never names a planned action (row 9b)
+#   nut       (staff/public) the actions the screen has buttons for, names in ontology/actions.yaml; a declared action not
+#             found in the code yet shows as «dự kiến» in design/role-screen-buttons.md (row 9b)
+#   mo_san    (optional) the actions of `nut` whose buttons show as soon as the screen opens; the role × screen browser
+#             suite expects exactly these for every role that holds them (row 9b)
+#   nut_chung (staff/public) buttons that do not depend on a permission, as people read them
+#   hien      (staff/public, and khung) the entities of ontology/entities/ the screen shows; tools/coverage_matrix/
+#             lifecycle.py also reads them from the code and fails on one not listed, and each needs a `vong_doi`
+#             block in its ontology file (row 1t)
+#   vao_vung  (optional, family grid only) the path the browser suite's region cases open, under the screen's own
+#             route; absent, they open `route`. The frame cases always open `route` (row 7e)
+#   old_ids   (optional) former ids of a renamed screen; a closed contract may still name one, an open contract naming
+#             one is red with the current id (english-route-names)
+#
+# `khung` declares the same for the App Shell around every staff screen: the top bar and the second column (row 9b).
+#
+# `version` is the shape of this file, read by the design-assembly tool's ledger contract.
+version: 1
+families:
+  grid: Lưới
+  list-frame: Danh sách khung
+  dang-nhap: Đăng nhập
+  luong-nhieu-buoc: Luồng nhiều bước
+audiences: [staff, public, dev]
+statuses: [built, planned]
+khung:
+  nut: [editView, removeView]
+  nut_chung: [Tìm (⌘K), Đổi sàn, Đăng xuất]
+  hien: [SavedView, Listing, Unit]
+# screens: one file per screen beside this one, each named after the screen's id

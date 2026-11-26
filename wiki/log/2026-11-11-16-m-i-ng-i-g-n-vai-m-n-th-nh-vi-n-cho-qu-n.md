@@ -1,0 +1,1 @@
+Mời người, gán vai: màn Thành viên cho Quản trị sàn (mời bằng email kèm một thư mời, đổi vai, sàn luôn còn một quản trị), thực thể `Member` với tập vai và tên theo sàn, bốn hàm hẹp của vai danh tính; khuôn dùng chung hộp thoại có biểu mẫu và trạng thái trang «Không đủ quyền» — hàng 9, [0022](decisions/0022-moi-nguoi-gan-vai.md), `_acceptance/moi-nguoi-gan-vai/`

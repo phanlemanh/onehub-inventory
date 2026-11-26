@@ -1,0 +1,1 @@
+Vá phần đăng nhập: đường trở về sau đăng nhập kiểm bằng danh sách cho phép và bộ đọc địa chỉ của trình duyệt (14 dạng lách, mỗi dạng một ca); đăng xuất lỗi mạng hay máy chủ báo rõ «chưa thoát» và giữ người ở trang; người hết sàn mà còn phiên có nút Đăng xuất thay cho danh sách sàn trống — hàng 1m, `_acceptance/va-dang-nhap/`

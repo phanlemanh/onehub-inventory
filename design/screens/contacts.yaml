@@ -1,0 +1,10 @@
+id: contacts
+route: /contacts
+title: Contact
+family: grid
+audience: staff
+status: planned
+vao: viewContacts
+nut: [createContact, updateContact, removeContact, mergeContacts, eraseContactPersonalData]
+nut_chung: []
+hien: [Contact]
