@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: app-shell-khuon-dau-trang
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 957bb3c12c1f63adb237b58c40c28ace2112c22b
-human_signoff:
+human_signoff: Manh Phan 2026-11-26
 ---
 
 # Evidence Report: app-shell-khuon-dau-trang
@@ -215,7 +215,7 @@ Round 7. Năm eval chạy lại (E5, E15, E16, E17 trên Postgres dãy R; E10 l�
     - spec-alignment: UNCERTAIN (r5)
   required_evidence:
     - (judge không nêu bằng-chứng-thiếu)
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-26 — Đạt
 
 ### Lệnh suite (hồi quy)
 

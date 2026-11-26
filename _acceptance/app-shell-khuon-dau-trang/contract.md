@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui]
 screens: []
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-17T01:03:13Z
 design_doc: _acceptance/app-shell-khuon-dau-trang/design.md
@@ -100,3 +100,6 @@ tài khoản và cùng đầu trang trên các màn mình vào được; bảng 
   `supersedes` của vòng này nêu lời chủ kho.
 - Tệp và bài thử bị hồ sơ đã ký ghim mà vòng này sửa (App Shell hàng 1o, các màn có tiêu đề lớn) được ghi «sửa sau ký»
   và ghim lại trong cùng lượt, lý do «chủ kho đổi khuôn 2026-11-17».
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-26:
+  - Ngoài-1: Bản mô tả menu tài khoản trên trang ký từng ghi theo menu cũ (còn ảnh đại diện nhỏ, email khoảng 40 ký tự); thẻ và trang bằng chứng đã dựng lại ngày 26/11.
+  - Ngoài-2: Phím tắt đóng mở thanh bên trên máy tính chỉ được kiểm ở chiều «không mở dải», chưa có phép thử chứng chiều ngược lại.
