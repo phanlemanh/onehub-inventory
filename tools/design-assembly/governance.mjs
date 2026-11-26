@@ -238,6 +238,39 @@ export function againstDirection(partsText, sources, pages) {
   return { ...sources, [bottom]: `${sources[bottom]}\nimport "${written}";\n` };
 }
 
+// The package of a list a module name is: the package itself, or a module under it.
+export const packageOf = (name, packages) =>
+  (packages ?? []).find((entry) => name === entry || String(name).startsWith(`${entry}/`)) ?? null;
+
+const DRAWS = /\.[jt]sx$/;
+const SVG_ELEMENT = /<svg[\s>/]/;
+
+// Where the code does not take its icons from the icon sets the sources ledger records, one
+// sentence per place (spec 0017, criterion 8): a file that imports an icon package no row records,
+// and a file that draws a screen and writes an svg element by hand. A file under the folder a row
+// records is the set itself and is not read; a part of the component library may draw. `sets` are
+// the icon sets of the ledger, `packages` the icon packages the check knows, `library` the parts
+// left to the component library.
+export function iconUseProblems(sources, { sets, packages, library = () => false }) {
+  const recorded = sets.map((set) => set.module ?? set.pin?.package).filter(Boolean);
+  const folders = sets.map((set) => set.folder).filter(Boolean);
+  const found = [];
+  for (const [file, text] of Object.entries(sources)) {
+    if (folders.some((folder) => file.startsWith(`${folder}/`))) continue;
+    for (const name of importsOf(text)) {
+      if (packageOf(name, packages) && !packageOf(name, recorded)) {
+        found.push(
+          `${file} imports ${name}, an icon package no icon set row of the sources ledger records`,
+        );
+      }
+    }
+    if (DRAWS.test(file) && !library(file) && SVG_ELEMENT.test(withoutComments(text))) {
+      found.push(`${file} writes an svg element by hand`);
+    }
+  }
+  return found;
+}
+
 // The lines of the record: every row of its table after the heading row.
 export function readSlips(text) {
   const rows = (text ?? "").split(/\r?\n/).filter((line) => /^\s*\|/.test(line));

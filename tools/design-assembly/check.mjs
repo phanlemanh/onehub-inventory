@@ -11,6 +11,7 @@ import { contrast } from "./color.mjs";
 import { cellProblems, columnsProblem, readDisplays, typesProblem } from "./columns.mjs";
 import {
   componentsProblem,
+  inLibrary,
   keepsSettings,
   libraryParts,
   readFolder,
@@ -50,6 +51,7 @@ import {
 } from "./patterns.mjs";
 import {
   againstDirection,
+  iconUseProblems,
   importsOf,
   importsProblem,
   readSources,
@@ -118,14 +120,25 @@ import {
   scriptThatCannotFail,
 } from "./host-make.mjs";
 import { tokensProblem } from "./tokens.mjs";
-import { exportProblem, inputsOf, unlistedProblems, withManifest } from "./exports.mjs";
+import { exportProblem, inputsOf, typeOf, unlistedProblems, withManifest } from "./exports.mjs";
 import { buildOf } from "./adapters/index.mjs";
 import { fontProblems, readLoads, unloadedCopy } from "./fonts.mjs";
-import { readFontSources } from "./sources-ledger.mjs";
+import {
+  ICON_SET_CHECK,
+  ICON_USE_CHECK,
+  LOGO_USE_CHECK,
+  isIconSet,
+  markUseProblems,
+  readFontSources,
+  readIconSets,
+  readLogoSources,
+  sourcedLogo,
+} from "./sources-ledger.mjs";
 import {
   branchFacts,
   branchDone,
   branchNotes,
+  choiceLines,
   sheetProblem,
   taggedTests,
   wallProblem,
@@ -198,6 +211,7 @@ const KINDS = {
         cornerRadius: foundations.corner_radius ?? "floor",
         textFont: foundations.text_font,
         headingFont: foundations.heading_font,
+        mark: foundations.mark,
       };
       const applied = state.theme?.inputs ?? {};
       // The owner's word for each question of the table of colour roles, as the guide applies it.
@@ -238,6 +252,7 @@ const KINDS = {
       const later = [
         "textFont",
         "headingFont",
+        "mark",
         "colorRoles",
         "neutralFamily",
         "statusTones",
@@ -428,6 +443,122 @@ const KINDS = {
     },
     change(state) {
       return { ...state, fontSources: [] };
+    },
+  },
+  // Every icon set of the sources ledger still pins what the repository holds: the version the
+  // lockfile pins its package at, or the hash of each of its files (spec 0017, criterion 7). Laid
+  // only once the repository has a row of the kind.
+  [ICON_SET_CHECK.kind]: {
+    run(state) {
+      const drift = (state.iconSets ?? []).flatMap((set) => set.drift);
+      if (drift.length === 0) return null;
+      const more = drift.length > 3 ? `; and ${drift.length - 3} more` : "";
+      return `${drift.slice(0, 3).join("; ")}${more}`;
+    },
+    // An icon set whose package the lockfile pins at another version.
+    change(state) {
+      const file = "design/sources/changed-copy.json";
+      return {
+        ...state,
+        iconSets: [
+          ...(state.iconSets ?? []),
+          { file, drift: [`${file} pins changed-copy at 1.0.0, and the lockfile pins 2.0.0`] },
+        ],
+      };
+    },
+  },
+  // The code takes its icons from the icon sets of the sources ledger (spec 0017, criterion 8): no
+  // file imports an icon package of the list the check carries that no row records, and no
+  // file that draws a screen writes an svg element by hand. The row the decision points at is an
+  // icon set row. Laid only once the repository has a row of the kind.
+  [ICON_USE_CHECK.kind]: {
+    run(state, check) {
+      const sets = state.iconSets ?? [];
+      if (!sets.some((set) => set.file === check.source)) {
+        return `${check.source} is no icon set row of the sources ledger: the icons decision points at the row of the set the code uses`;
+      }
+      const skip = liveSkip(state, check);
+      const found = iconUseProblems(state.sources?.[check.sources] ?? {}, {
+        sets,
+        packages: check.packages,
+        library: (file) => inLibrary(file, skip),
+      });
+      if (found.length === 0) return null;
+      const more = found.length > 5 ? `; and ${found.length - 5} more` : "";
+      const named = sets
+        .map((set) => set.module ?? set.pin?.package ?? (set.folder && `the folder ${set.folder}`))
+        .filter(Boolean);
+      return `${found.slice(0, 5).join("; ")}${more}: an icon comes from the icon set the sources ledger records (${named.join(", ")}); a second set the code uses needs a row of its own: write its row with icon-source; an icon the set lacks goes in a folder an icon set row records`;
+    },
+    // A file of the folder the check reads draws an svg element by hand.
+    change(state, check) {
+      const file = `${check.sources}/changed-copy.tsx`;
+      const sources = {
+        ...state.sources?.[check.sources],
+        [file]: "export const C = () => <svg />;\n",
+      };
+      return { ...state, sources: { ...state.sources, [check.sources]: sources } };
+    },
+  },
+  // Every logo row of the sources ledger still pins the files of the mark the repository holds:
+  // a file changed by one byte, gone, or led out of the repository is red, and the sentence names
+  // the row (spec 0017). A repository with no logo row has nothing here to hold.
+  "logo-pins": {
+    run(state) {
+      const problems = (state.logoSources ?? []).flatMap((mark) => mark.drift);
+      if (problems.length === 0) return null;
+      const more = problems.length > 3 ? `; and ${problems.length - 3} more` : "";
+      return `${problems.slice(0, 3).join("; ")}${more}`;
+    },
+    // A logo row whose one file is no longer the file it was pinned with.
+    change(state) {
+      const file = "design/sources/changed-copy.json";
+      return {
+        ...state,
+        logoSources: [
+          ...(state.logoSources ?? []),
+          {
+            file,
+            drift: [`${file}: changed.svg is not the file it was pinned with`],
+          },
+        ],
+      };
+    },
+  },
+  // Once the repository has a logo row, the mark it shows comes from a row: the page icons its build
+  // declares and the images its app frame shows are files a logo row pins (spec 0017, criterion 9).
+  // Laid beside the check of the pins, only where the repository has a logo row.
+  [LOGO_USE_CHECK.kind]: {
+    run(state) {
+      const problems = state.markUse ?? [];
+      if (problems.length === 0) return null;
+      const more = problems.length > 3 ? `; and ${problems.length - 3} more` : "";
+      return `${problems.slice(0, 3).join("; ")}${more}`;
+    },
+    // A page icon no logo row pins.
+    change(state) {
+      return {
+        ...state,
+        markUse: [
+          ...(state.markUse ?? []),
+          "public/changed-copy.svg, a page icon the build declares (index.html), is no file of a logo row",
+        ],
+      };
+    },
+  },
+  // The mark the foundations layer chose from the sources ledger can still be chosen: its row is
+  // there, whole, with its licence, and its pin still holds what the repository has.
+  "logo-row": {
+    run(state, check) {
+      try {
+        sourcedLogo(check.value, state.logoSources);
+        return null;
+      } catch (error) {
+        return error.message;
+      }
+    },
+    change(state) {
+      return { ...state, logoSources: [] };
     },
   },
   // Every typeface the stylesheet names is loaded, as the repository's build loads one, or is a
@@ -1208,7 +1339,11 @@ const KINDS = {
       return wallProblem({ branch: state.branch ?? null, waiting: state.waiting });
     },
     notes: (state) => branchNotes(state.branch ?? null),
-    done: (state) => branchDone(state.branch ?? null),
+    // What the wall read, beside the history fetched: the mark the owner chose among candidates.
+    done: (state) => [
+      ...branchDone(state.branch ?? null),
+      ...choiceLines({ branch: state.branch ?? null, waiting: state.waiting }),
+    ],
     // The branch adds a page of a kind of screen that nobody asked the owner about.
     change(state) {
       const branch = state.branch && !state.branch.problem ? state.branch : emptyBranch();
@@ -1241,16 +1376,21 @@ export const TAKEN_DOWN_CHECK = { kind: "taken-down", sources: "src" };
 // The folder each pinned source declares for its items' files, without its last slash. A source
 // written before the key, or one that cannot be read, declares none.
 function declaredFolders(state) {
-  return Object.values(state.ledgerFolders?.[SOURCES_FOLDER] ?? {})
-    .map((text) => {
-      try {
-        return JSON.parse(text);
-      } catch {
-        return null;
-      }
-    })
-    .filter((source) => typeof source?.folder === "string" && source.folder.trim() !== "")
-    .map((source) => ({ source: source.id, folder: source.folder.replace(/\/+$/, "") }));
+  return (
+    Object.values(state.ledgerFolders?.[SOURCES_FOLDER] ?? {})
+      .map((text) => {
+        try {
+          return JSON.parse(text);
+        } catch {
+          return null;
+        }
+      })
+      .filter((source) => typeof source?.folder === "string" && source.folder.trim() !== "")
+      // The folder of an icon set is the set itself, which the code uses freely: no item of an
+      // outside source is taken in from it.
+      .filter((source) => !isIconSet(source))
+      .map((source) => ({ source: source.id, folder: source.folder.replace(/\/+$/, "") }))
+  );
 }
 
 // The files of every item taken down and not taken in, each with its conform record: a record
@@ -1303,6 +1443,11 @@ const exportInputs = (state) =>
     files: withManifest(state.root, state.files ?? {}),
     theme: state.theme,
     sources: state.ledgerFolders?.[LEDGERS.sources.folder] ?? {},
+    // The type the stylesheet gives, as the exports were written from it: what loads a typeface is
+    // read here where the font-loaded check has not read it already.
+    type: state.css
+      ? typeOf(state, (state.fonts ?? readLoads(state.root, state.css, state.stylesheet)).loads)
+      : null,
   });
 
 const lintKey = (id, check) => `${id}:${check.rule}`;
@@ -1596,7 +1741,16 @@ export function readState(root) {
     // The fonts of the sources ledger, each with how its pin differs from the repository today,
     // and how the repository's build writes what loads one.
     fontSources: readFontSources(root),
+    // The icon sets of the sources ledger, each with how its pin differs from the repository today.
+    iconSets: readIconSets(root),
     fontFaces: buildOf(root).fontFaces ?? null,
+    // The logo rows of the sources ledger, each with how its pin differs from the repository today.
+    logoSources: readLogoSources(root),
+    // The page icons and the images of the app frame that no logo row pins: read only where the
+    // check of the mark's use is laid.
+    markUse: checks.some((check) => check.kind === LOGO_USE_CHECK.kind)
+      ? markUseProblems(root, buildOf(root), readLogoSources(root))
+      : null,
     files: Object.fromEntries(named),
     // The fragments of each such ledger kept as a folder, or null where it is one file.
     fragments: Object.fromEntries(
