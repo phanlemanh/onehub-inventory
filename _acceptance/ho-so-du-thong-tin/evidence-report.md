@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 8b5e18f36d0e6f31f937a53467c20560fe51a0ef
+verified_commit: dec74df04c273d49fc81c17b1f7fde95e915a584
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -184,3 +184,7 @@ sha: fd194149a38a03f3c31b9ee80e95e01f8c1d3858 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 2 — 2026-11-17, do hang 3g: luoi 13 cot (loi C), sua-sau-ky bai dem cot
 run_id: repin-20261117T045134Z-16554
 sha: 8b5e18f36d0e6f31f937a53467c20560fe51a0ef · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E10 · diff chạm vật đo ngoài làn máy: E10 — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 3 — 2026-11-26, do gộp main (App Shell #83, #127) và hàng 3g đổi mã các hồ sơ này đo
+run_id: repin-20261126T153348Z-96242
+sha: dec74df04c273d49fc81c17b1f7fde95e915a584 · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E10 · diff chạm vật đo ngoài làn máy: E10 — chưa chứng lại, đi vòng S4 delta
