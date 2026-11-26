@@ -1,0 +1,1 @@
+CHANGELOG gets a 0.1.0 baseline heading so release-please adds the first release above it instead of demoting the file's own title; the hand-written Unreleased notes move under «0.2.0 — in plain words», right below where the generated 0.2.0 entry will land
