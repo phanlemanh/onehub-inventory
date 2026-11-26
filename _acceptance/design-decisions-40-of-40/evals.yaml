@@ -1,0 +1,150 @@
+schema_version: 1
+feature_slug: design-decisions-40-of-40
+# Mỗi tiêu chí: một phép đo xanh trên cây (rang/do.mjs) và một phép đo hai chiều trên bản sao mới (rang/hai-chieu.mjs).
+# Phép đo đọc plugin design-assembly 0.69.0 ở $DA_PLUGIN (mặc định thư mục chủ kho cài).
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    layer: backend-effect
+    paths: ["design/**", "tests/**", "tools/**", "wiki/log/**"]
+    expected: "exit 0; đầu ra có 'design-assembly: 25 decisions held by 36 checks, each seen failing on a changed copy', 'component manifest: design/component-registry.json is up to date (297 components)', 'determinism: 62/73 = 85%' và 'Tests  2698 passed | 2 skipped (2700)'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/do.mjs muc
+    layer: backend-effect
+    paths: ["design/**", "tests/**", "playwright.config.ts", "_acceptance/design-decisions-40-of-40/rang/**"]
+    expected: "exit 0; dòng 'muc: 40 of 40 core decisions answered, 14 held, 19 claimed, 7 recorded'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-2
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only muc
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/design-decisions-40-of-40/rang/**", "design/**", "tests/**"]
+    expected: "exit 0; mỗi ca xanh trên bản sao không đổi và đỏ sau khi phá — muc-untag: đỏ 'the audit says 39 of 40, 14 held, 18 claimed, 7 recorded'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/do.mjs sau-dong
+    layer: backend-effect
+    paths: ["design/**", "tests/**", "playwright.config.ts", "_acceptance/design-decisions-40-of-40/rang/**"]
+    expected: "exit 0; dòng 'sau-dong: error-copy recorded; terms, test-screen-sizes, reference-implementation, screen-ledger, screen-actions claimed by their checks'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-3
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only sau-dong
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/design-decisions-40-of-40/rang/**", "design/**", "tests/**"]
+    expected: "exit 0; mỗi ca xanh trên bản sao không đổi và đỏ sau khi phá — sau-dong-untag: đỏ 'terms is failing'; sau-dong-repoint: đỏ 'screen-actions is failing by test:tests/vai-man-so-man.test.ts'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-4
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/do.mjs loi-chu
+    layer: backend-effect
+    paths: ["design/**", "tests/**", "playwright.config.ts", "_acceptance/design-decisions-40-of-40/rang/**"]
+    expected: "exit 0; dòng 'loi-chu: the six rows are confirmed by Manh Phan on 2026-11-26; the four colour questions still wait'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-4
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only loi-chu
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/design-decisions-40-of-40/rang/**", "design/**", "tests/**"]
+    expected: "exit 0; mỗi ca xanh trên bản sao không đổi và đỏ sau khi phá — loi-chu-unconfirmed: đỏ 'no confirmation by Manh Phan on 2026-11-26 in the note of screen-ledger'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-5
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/do.mjs kho-man
+    layer: backend-effect
+    paths: ["design/**", "tests/**", "playwright.config.ts", "_acceptance/design-decisions-40-of-40/rang/**"]
+    expected: "exit 0; dòng 'kho-man: the ledger row, the browser projects and design/states.md all say 360,414,1024,1440'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-5
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only kho-man
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/design-decisions-40-of-40/rang/**", "design/**", "tests/**"]
+    expected: "exit 0; mỗi ca xanh trên bản sao không đổi và đỏ sau khi phá — kho-man-project: đỏ 'the browser projects are 375,414,1024,1440'; kho-man-row: đỏ 'the ledger row says 390,414,1024,1440'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-6
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/do.mjs dong-gan
+    layer: backend-effect
+    paths: ["design/**", "tests/**", "playwright.config.ts", "_acceptance/design-decisions-40-of-40/rang/**"]
+    expected: "exit 0; dòng 'dong-gan: four tests gained one first line each, tools/proof_gate/proof-gate.test.ts untouched since'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E11
+    criterion: AC-6
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only dong-gan
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/design-decisions-40-of-40/rang/**", "design/**", "tests/**"]
+    expected: "exit 0; mỗi ca xanh trên bản sao không đổi và đỏ sau khi phá — dong-gan-extra: đỏ 'tests/bo-nut-vai-man.test.ts is not its'; dong-gan-locked: đỏ 'tools/proof_gate/proof-gate.test.ts changed since'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E12
+    criterion: AC-7
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/do.mjs tep-nhanh
+    layer: backend-effect
+    paths: ["design/**", "tests/**", "playwright.config.ts", "_acceptance/design-decisions-40-of-40/rang/**"]
+    expected: "exit 0; dòng 'tep-nhanh: files changed since <chỗ rời>, all on the list'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E13
+    criterion: AC-7
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only tep-nhanh
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/design-decisions-40-of-40/rang/**", "design/**", "tests/**"]
+    expected: "exit 0; mỗi ca xanh trên bản sao không đổi và đỏ sau khi phá — tep-nhanh-extra: đỏ 'changed outside the list: src/lib/probe.ts'; tep-nhanh-map: đỏ 'differ from the kit' khi PRODUCT-MAP.md bị sửa tay"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E14
+    criterion: AC-8
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/do.mjs bo-chu
+    layer: backend-effect
+    paths: ["design/**", "tests/**", "playwright.config.ts", "_acceptance/design-decisions-40-of-40/rang/**"]
+    expected: "exit 0; dòng 'bo-chu: design/book-words.json has the template's 132 keys and the six questions, and no colour or name'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E15
+    criterion: AC-8
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only bo-chu
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/design-decisions-40-of-40/rang/**", "design/**", "tests/**"]
+    expected: "exit 0; mỗi ca xanh trên bản sao không đổi và đỏ sau khi phá — bo-chu-key: đỏ 'extra extra'; bo-chu-colour: đỏ 'a value of the repository'; bo-chu-question: đỏ 'not the six'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E16
+    criterion: AC-9
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/do.mjs dong-khac
+    layer: backend-effect
+    paths: ["design/**", "tests/**", "playwright.config.ts", "_acceptance/design-decisions-40-of-40/rang/**"]
+    expected: "exit 0; dòng 'dong-khac: 67 other rows as at <chỗ rời>; the six rows present'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E17
+    criterion: AC-9
+    executor: script
+    cmd: node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only dong-khac
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/design-decisions-40-of-40/rang/**", "design/**", "tests/**"]
+    expected: "exit 0; mỗi ca xanh trên bản sao không đổi và đỏ sau khi phá — dong-khac-row: đỏ 'rows other than the six changed: color-role'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
