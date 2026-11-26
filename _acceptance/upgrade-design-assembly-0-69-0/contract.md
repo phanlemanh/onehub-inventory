@@ -5,7 +5,7 @@ slug: upgrade-design-assembly-0-69-0
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-26
 design_doc: docs/superpowers/specs/2026-11-26-upgrade-design-assembly-0-69-0-design.md
@@ -115,3 +115,10 @@ chí: dòng sổ `descope` «bỏ coverage-scan».
   `floating-parts.spec.ts` (0 ca, vì kho chưa có hồ sơ conform).
 - Mã đã có trên nhánh trước khi có hồ sơ (`7174ab43`, `78124335`). Kế hoạch của vòng là kế hoạch đo: viết bộ phép đo và
   ghim số, không viết thêm mã sản phẩm. Gộp Gate 1.5 vào Cổng Phạm vi hay duyệt riêng là câu Hỏi-2 của thẻ.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-26:
+  - Ngoài-1: nếu một lần đổi cấu hình lint sau này làm lint bỏ qua cả tệp công cụ lẫn hai tệp thử, phép đo tầm của chỗ
+    tắt luật (E12) vẫn báo xanh.
+  - Ngoài-2: bốn kiểu lệch giữa dấu phiên bản, sổ phát hành và mẫu của plugin chưa có ca phá riêng, nên nếu chúng lệch
+    sau này thì phép đo cây công cụ (E4, E5) chưa được chứng là bắt được.
+  - Ngoài-3: ca phá của phép đo «quyết định giữ trạng thái» (E7) có thể đạt nhầm lý do nếu công cụ cũ bị lỗi, vì nó chỉ
+    kiểm có dòng nói về `raw-table` chứ không kiểm đó là dòng khác biệt duy nhất.
