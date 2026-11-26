@@ -34,15 +34,31 @@ function base(): string | null {
   return null;
 }
 
+/**
+ * The one other change allowed, word for word (app-shell-khuon-dau-trang, owner 2026-11-17, supervisor ruling
+ * R-1711-5): the account menu moved to the foot of the App Shell's rail, which on a phone rides in the closed sheet, so
+ * the wait for the signed-in shell goes through the shared door — this line for that line, plus its one import.
+ */
+const SHELL_WAIT_OLD = `  await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();`;
+const SHELL_WAIT_NEW = "  await shellReady(page);";
+const SHELL_WAIT_IMPORT = 'import { shellReady } from "./dang-nhap-vai";';
+
 /** Lines of a unified diff that change something beyond the row locator. */
 export function beyondLocator(diff: string): string[] {
   const lines = diff.split("\n").filter((l) => /^[+-]/.test(l) && !/^(\+\+\+|---)/.test(l));
   const removed = lines.filter((l) => l.startsWith("-")).map((l) => l.slice(1));
   const added = lines.filter((l) => l.startsWith("+")).map((l) => l.slice(1));
+  // The shared door's import is allowed once, and only alongside the one line it serves.
+  const importAt = added.indexOf(SHELL_WAIT_IMPORT);
+  if (importAt >= 0 && removed.includes(SHELL_WAIT_OLD)) added.splice(importAt, 1);
   const bad: string[] = [];
   removed.forEach((r, i) => {
     const a = added[i];
-    if (a === undefined || r.replaceAll("li[data-member", "[data-member") !== a) bad.push(r);
+    const allowed =
+      a !== undefined &&
+      (r.replaceAll("li[data-member", "[data-member") === a ||
+        (r === SHELL_WAIT_OLD && a === SHELL_WAIT_NEW));
+    if (!allowed) bad.push(r);
   });
   added.slice(removed.length).forEach((a) => bad.push(a));
   return bad;
@@ -73,6 +89,37 @@ describe("row 9 tests keep their words (row 9c)", () => {
       '-  await expect(page.getByText("Đã mời")).toBeVisible();',
       '+  await expect(page.getByText("Đã thêm")).toBeVisible();',
     ].join("\n");
+    expect(() => assertLocatorOnly(diff)).toThrow("row 9 test changed beyond the row locator");
+  });
+
+  const shellWait = [
+    "--- a/x",
+    "+++ b/x",
+    `+${SHELL_WAIT_IMPORT}`,
+    `-${SHELL_WAIT_OLD}`,
+    `+${SHELL_WAIT_NEW}`,
+  ];
+
+  it("the shell wait through the shared door, with its one import, is the one other change allowed", () => {
+    expect(() => assertLocatorOnly(shellWait.join("\n"))).not.toThrow();
+  });
+
+  it("pha thu: the shell wait swapped for another call is caught", () => {
+    const diff = [...shellWait.slice(0, 4), "+  await page.waitForTimeout(1000);"].join("\n");
+    expect(() => assertLocatorOnly(diff)).toThrow("row 9 test changed beyond the row locator");
+  });
+
+  it("pha thu: the shell wait plus a changed expected sentence is caught", () => {
+    const diff = [
+      ...shellWait,
+      '-  await expect(page.getByText("Đã mời")).toBeVisible();',
+      '+  await expect(page.getByText("Đã thêm")).toBeVisible();',
+    ].join("\n");
+    expect(() => assertLocatorOnly(diff)).toThrow("row 9 test changed beyond the row locator");
+  });
+
+  it("pha thu: the import alone, without the line it serves, is caught", () => {
+    const diff = ["--- a/x", "+++ b/x", `+${SHELL_WAIT_IMPORT}`].join("\n");
     expect(() => assertLocatorOnly(diff)).toThrow("row 9 test changed beyond the row locator");
   });
 });

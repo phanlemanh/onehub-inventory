@@ -218,7 +218,8 @@ test.describe("frame", () => {
     await page.goto(`${PROTO}?state=error`);
     await expect(page.locator("h1")).toHaveText("Màn này chưa hiện được");
     await assertErrorState(page);
-    await expect(page.getByRole("button", { name: "Mở hoặc đóng thanh bên" })).toBeVisible();
+    // The frame stays: its top bar shows (the sheet button shows only on a phone since the Verve layout).
+    await expect(page.locator('[data-slot="app-shell-top-bar"]')).toBeVisible();
     await page.evaluate((flag) => window.sessionStorage.setItem(flag, "1"), MENDED_FLAG);
     await page.getByRole("button", { name: "Thử lại" }).click();
     await expect(page.locator("h1")).toHaveText("Bản mẫu khung");
@@ -254,7 +255,8 @@ test.describe("frame", () => {
     await page.waitForTimeout(500);
     await expect(page.locator('[data-slot="page-skeleton"]')).toBeHidden();
     await assertSkeletonAfterOneSecond(page);
-    await expect(page.getByRole("button", { name: "Mở hoặc đóng thanh bên" })).toBeVisible();
+    // The frame stays: its top bar shows (the sheet button shows only on a phone since the Verve layout).
+    await expect(page.locator('[data-slot="app-shell-top-bar"]')).toBeVisible();
     await expect(page.locator("h1")).toHaveText("Bản mẫu khung", { timeout: 10_000 });
   });
 
@@ -362,11 +364,14 @@ test.describe("frame", () => {
     await expect(page.locator("html")).not.toHaveClass(/\bdark\b/);
   });
 
-  test("chosen theme survives a reload", async ({ page }) => {
+  test("chosen theme survives a reload", { tag: "@cho" }, async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
     await pageShown(page);
-    await page.getByRole("button", { name: "Đổi giao diện" }).click();
+    // The look is chosen in the account menu at the foot of the rail, which rides in the sheet on a phone.
+    if ((page.viewportSize()?.width ?? 0) < 768) await openSheet(page);
+    await expect(page.locator('[data-slot="account-sign-in"][data-ready]')).toBeVisible();
+    await page.getByRole("button", { name: "Tài khoản" }).click();
     await page.getByRole("menuitemradio", { name: "Tối" }).click();
     await expect(page.locator("html")).toHaveClass(/\bdark\b/);
     await page.reload();

@@ -87,23 +87,25 @@ export function UnitJump({
   return (
     <>
       <span data-slot="unit-jump" data-ready={keysReady || undefined} className="contents">
-        <Button
-          variant="outline"
-          size="sm"
-          aria-keyshortcuts="Meta+K Control+K /"
-          onClick={() => setOpen(true)}
-        >
-          <SearchIcon aria-hidden="true" />
-          <span className="text-muted-foreground max-sm:sr-only">
-            {ENTRY_COPY.searchHint(words.unit)}
-          </span>
-          <kbd
-            aria-hidden="true"
-            className="rounded border px-1 text-xs text-muted-foreground max-sm:hidden"
+        {/* In the middle of the top bar on the desktop, wide enough for its whole hint (ReUI Verve template). */}
+        <span className="md:w-80">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            aria-keyshortcuts="Meta+K Control+K /"
+            onClick={() => setOpen(true)}
           >
-            ⌘K
-          </kbd>
-        </Button>
+            <SearchIcon aria-hidden="true" />
+            <span className="text-muted-foreground max-sm:sr-only md:flex-1 md:text-left">
+              {ENTRY_COPY.searchHint(words.unit)}
+            </span>
+            <span aria-hidden="true" className="inline-flex items-center gap-1 max-sm:hidden">
+              <kbd className="rounded border px-1 text-xs text-muted-foreground">⌘</kbd>
+              <kbd className="rounded border px-1 text-xs text-muted-foreground">K</kbd>
+            </span>
+          </Button>
+        </span>
       </span>
       {/* Mounted only while open: the palette puts its hidden title outside the box, and a closed box must add no
           heading to the page. */}

@@ -16,6 +16,7 @@ import { expect, test, type APIResponse, type Page, type TestInfo } from "@playw
 import pg from "pg";
 
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
+import { openAccountMenu } from "./dang-nhap-vai";
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const SIGN_OUT_FAILED =
@@ -124,9 +125,19 @@ async function signIn(page: Page, email: string) {
   await expect(page).toHaveURL(/\/$/);
 }
 
+/**
+ * Waits until the failed sign-out's toast has left. On a phone the toast stands over the account menu at the foot of
+ * the sheet (app-shell-khuon-dau-trang, a known limit), and a pointer resting on it holds it open; a person waits
+ * about four seconds, the check moves the pointer away and waits the same.
+ */
+async function toastGone(page: Page) {
+  await page.mouse.move(0, 0);
+  await expect(page.locator("[data-sonner-toast]")).toHaveCount(0, { timeout: 15_000 });
+}
+
 async function clickSignOutInMenu(page: Page) {
-  await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
-  await page.getByRole("button", { name: "Tài khoản" }).click();
+  // The account menu sits at the foot of the rail since app-shell-khuon-dau-trang; the shared door opens it.
+  await openAccountMenu(page);
   await page.getByRole("menu").getByRole("menuitem", { name: "Đăng xuất" }).click();
 }
 
@@ -278,6 +289,7 @@ test("dang-xuat-mang-dut", async ({ page }, info) => {
   expect(await sessionStatus(page)).toBe(200);
 
   await page.unroute(`**${SESSION_PATH}`);
+  await toastGone(page);
   await clickSignOutInMenu(page);
   await expect(page).toHaveURL(/\/login$/);
   expect(await sessions(email)).toBe(0);
@@ -304,6 +316,7 @@ test("dang-xuat-may-chu-loi", async ({ page }, info) => {
   } finally {
     await mendSignOut();
   }
+  await toastGone(page);
   await clickSignOutInMenu(page);
   await expect(page).toHaveURL(/\/login$/);
   expect(await sessions(email)).toBe(0);
