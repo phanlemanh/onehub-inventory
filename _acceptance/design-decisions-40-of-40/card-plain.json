@@ -1,5 +1,5 @@
 {
-  "feature_plain": "Hệ thiết kế ghi đủ 40/40 quyết định lõi theo lời chủ kho, và sổ hệ thiết kế đọc bằng tiếng Việt — chấm lại sau khi gộp main có ba luật lint mới.",
+  "feature_plain": "Hệ thiết kế ghi đủ 40/40 quyết định lõi theo lời chủ kho, và sổ hệ thiết kế đọc bằng tiếng Việt — chấm lại vòng 3 sau khi gộp main có App Shell mới (thêm 10 bài kiểm, 3 thành phần).",
   "scope_plain": "Những việc vòng này cố ý không làm:",
-  "analyst_plain": "Giữ nguyên năm giới hạn anh đã chọn và ba giới hạn của vòng 1. Vòng 2 thêm hai: phép đo đọc hai plugin đã cài mà không kiểm số bản; và hai trang bản đồ chỉ được nhận khi đúng bản bộ vẽ theo trạng thái hồ sơ, nên lúc ký phải vẽ lại (bước ký tự làm)."
+  "analyst_plain": "Giữ nguyên năm giới hạn anh đã chọn, ba giới hạn của vòng 1 và hai của vòng 2. Vòng 3 thêm một điều: máy anh đã lên plugin hệ thiết kế 0.76.0 nhưng kho vẫn ở 0.69.0, nên vòng này đo bằng bản 0.69.0; đo bằng bản mới thì phép đo bộ chữ đỏ vì khuôn chữ có thêm phần logo."
 }
