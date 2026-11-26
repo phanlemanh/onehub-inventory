@@ -5,7 +5,7 @@ slug: sua-ba-luat-lint-giao-dien
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-26
 design_doc: docs/superpowers/specs/2026-11-26-sua-ba-luat-lint-giao-dien-design.md
@@ -91,3 +91,10 @@ mà công cụ thiết kế báo «lọt».
   thể; công cụ thiết kế chạy lại bộ mẫu của nó ở mỗi lần `make check`. (2) Luật tên lớp chỉ đọc thuộc tính `className` và
   lời gọi `cn`/`clsx`/`cva`; một tên lớp ghép rồi gán qua biến trung gian không bị bắt. (3) Bộ hậu xử lý gỡ nhãn «đã tắt»
   chỉ cho báo cáo của luật lý do, nên không ngoại lệ nào tự miễn được việc ghi lý do.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-26:
+  - Ngoài-1: Một màn cộng một tên lớp với một lựa chọn trong ngoặc có thể bị báo lỗi oan; người viết viết khác hoặc ghi
+    ngoại lệ có lý do.
+  - Ngoài-2: Tên lớp ghép bằng dấu cộng mà phần chữ viết bằng dấu huyền vẫn lọt qua kiểm tra.
+  - Ngoài-4: Một số cách ghép khác (dấu huyền bên trong chuỗi cộng, bọc khai báo kiểu) vẫn lọt qua kiểm tra.
+  - Ngoài-5: Phép thử hai chiều của E5 báo đỏ cả khi công cụ thiết kế không chạy được, không phân biệt với ca luật hỏng.
+  - Ngoài-6: Phép thử E10 chỉ kiểm có trang quyết định nhắc mã dòng sổ, không kiểm nội dung trang.
