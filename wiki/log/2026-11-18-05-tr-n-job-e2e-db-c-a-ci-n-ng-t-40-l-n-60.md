@@ -1,0 +1,1 @@
+Trần job `e2e-db` của CI nâng từ 40 lên 60 phút, bước `co-phien` giữ một worker: lượt thử hai worker nhanh hơn nhưng đỏ hai bài dùng trạng thái chung của lượt; dòng `revisit` nêu khi nào xét lại — hồ sơ `_acceptance/ci-co-postgres/` (decisions.jsonl), PR [#90](https://github.com/phanlemanh/onehub-inventory/pull/90).

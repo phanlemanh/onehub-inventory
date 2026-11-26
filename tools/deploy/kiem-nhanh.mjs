@@ -21,6 +21,10 @@ export const SECRET_NAMES = [
   "MIGRATE_DATABASE_URL",
   "LOGIN_DATABASE_URL",
   "VERCEL_AUTOMATION_BYPASS_SECRET",
+  // Row dat-khoa-mot-lenh: the login role's password and the two keys pushed to Vercel.
+  "LOGIN_DB_PASSWORD",
+  "AUTH_SECRET",
+  "RESEND_API_KEY",
 ];
 
 /** Replaces every secret value found in `text` with ***. */

@@ -249,7 +249,7 @@ describe("record panel opens from the grid", () => {
   });
 
   it("reads and writes the page address when the screen does not hold it", async () => {
-    window.history.replaceState(null, "", "/proto/hanh-vi-trong-luoi-khung?ho-so=b");
+    window.history.replaceState(null, "", "/proto/hanh-vi-trong-luoi-khung?record=b");
     const push = vi.spyOn(window.history, "pushState");
     render(
       <DataRegion
@@ -261,13 +261,13 @@ describe("record panel opens from the grid", () => {
     );
     await waitFor(() => expect(panel()?.getAttribute("data-record-id")).toBe("b"));
     fireEvent.click(screen.getByRole("button", { name: "Sau" }));
-    expect(String(push.mock.calls.at(-1)?.[2])).toContain("ho-so=c");
+    expect(String(push.mock.calls.at(-1)?.[2])).toContain("record=c");
     fireEvent.click(document.querySelector<HTMLElement>(recordOpenSelector("e"))!, {});
-    expect(String(push.mock.calls.at(-1)?.[2])).toContain("ho-so=e");
+    expect(String(push.mock.calls.at(-1)?.[2])).toContain("record=e");
     fireEvent.click(screen.getByRole("button", { name: "Đóng" }));
-    expect(String(push.mock.calls.at(-1)?.[2])).not.toContain("ho-so");
+    expect(String(push.mock.calls.at(-1)?.[2])).not.toContain("record");
     // Back in the browser reopens the record the address names.
-    window.history.replaceState(null, "", "/proto/hanh-vi-trong-luoi-khung?ho-so=d");
+    window.history.replaceState(null, "", "/proto/hanh-vi-trong-luoi-khung?record=d");
     act(() => {
       window.dispatchEvent(new PopStateEvent("popstate"));
     });

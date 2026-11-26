@@ -161,7 +161,11 @@ def check_contract(path: Path, root: Path, reg: Registry) -> Record:
 
     ids = [str(s) for s in screens]
     for sid in ids:
-        if sid not in reg.screens:
+        if sid in reg.old_ids:
+            # A renamed screen: signed records keep the id they were signed with; an open contract uses the new one.
+            if status not in CLOSED:
+                err(f"screen '{sid}' is an old id of '{reg.old_ids[sid]}'")
+        elif sid not in reg.screens:
             err(f"screen '{sid}' is not in {SCREENS_FILE}")
     if len(table) < 2 or not _is_separator(_cells(table[1])):
         err(f"no Vai × Màn table under '{SECTION}'")

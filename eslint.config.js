@@ -33,17 +33,31 @@ export default defineConfig([
     "playwright-report/",
     "test-results/",
     "src/components/reui/",
+    // Not part of the repository: run folders of the acceptance kit and the batch, and worktrees of lanes and
+    // sessions. Both sit inside the working tree, so `eslint .` would read them.
+    ".acceptance-runs/",
+    ".claude/worktrees/",
   ]),
   js.configs.recommended,
   ...nextVitals,
   ...nextTs,
   { files: ["src/hooks/use-mobile.ts"], rules: { "react-hooks/set-state-in-effect": "off" } },
+  // The design-assembly tool is plain Node code the plugin writes; it has no React, so a function
+  // whose name starts with "use" (contract.mjs `useClashes`) is not a hook.
+  { files: ["tools/design-assembly/**"], rules: { "react-hooks/rules-of-hooks": "off" } },
   {
     files: ["**/*.mjs", "tools/**/*.js"],
     languageOptions: { globals: globals.node },
     rules: { "import/no-anonymous-default-export": "off" },
   },
-  { files: UI_FILES, ignores: VENDOR, plugins: { "onehub-ui": onehubUi }, rules: UI_RULES },
+  {
+    files: UI_FILES,
+    ignores: VENDOR,
+    plugins: { "onehub-ui": onehubUi },
+    // Keeps the report of an exception with no reason on the line that switches the lint off.
+    processor: "onehub-ui/reasons",
+    rules: UI_RULES,
+  },
   {
     files: UI_FILES,
     ignores: VENDOR,

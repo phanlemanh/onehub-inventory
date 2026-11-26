@@ -1,0 +1,1 @@
+Kit nghiệm thu nâng từ 2.38.1 lên 3.0.0, lấy từ kho delivery-loop: CI kéo thẻ v3.0.0 với lõi ở `plugins/acceptance-gate`, phiên bật sáu plugin của chợ `delivery-loop` ghim cùng thẻ, `kit-root` chỉ đọc bản cài của chợ mới — [0045](decisions/0045-kit-nghiem-thu-delivery-loop-3-0.md), hồ sơ `_acceptance/nang-kit-3-0/`.

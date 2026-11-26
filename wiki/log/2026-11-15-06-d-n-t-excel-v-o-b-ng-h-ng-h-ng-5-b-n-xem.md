@@ -1,0 +1,1 @@
+Dán từ Excel vào Bảng hàng (hàng 5): bản xem trước ô sẽ đổi, bị bỏ, sai kiểu; áp một lần, hoàn tác một lần, đọc bằng luật sửa trên ô của hàng 4 — `src/components/candidate/paste-preview.tsx`, `src/modules/listings/paste-rules.ts`, [0040](decisions/0040-dan-qua-ban-xem-truoc.md).

@@ -9,7 +9,16 @@ export default defineConfig({
     testTimeout: 20_000,
     // Every run gets its own temporary folder, removed when the run ends (tests/support/temp-root.ts).
     globalSetup: ["tests/support/temp-root.ts"],
-    exclude: ["tests/e2e/**", "tests/e2e-db/**", "tests/db/**", "node_modules/**", ".next/**"],
+    // .acceptance-runs/ and .claude/worktrees/ are not part of the repository (run folders and nested worktrees).
+    exclude: [
+      "tests/e2e/**",
+      "tests/e2e-db/**",
+      "tests/db/**",
+      "node_modules/**",
+      ".next/**",
+      ".acceptance-runs/**",
+      ".claude/worktrees/**",
+    ],
     coverage: {
       enabled: true,
       provider: "v8",

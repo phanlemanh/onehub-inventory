@@ -1,0 +1,73 @@
+schema_version: 1
+feature_slug: tat-plugin-cho-cu
+# Ma trận viết trước.
+#   Chỗ rời main: 47d52b06 (merge-base HEAD origin/main lúc mở vòng).
+#   Sáu plugin chợ cũ (marketplace.json của acceptance-gate-kit): acceptance-gate · feature-loop · diagram-design ·
+#   dieu-phoi · road-map · tri-thuc. Sáu plugin chợ mới: acceptance-gate · feature-loop · diagram-design · roadmap ·
+#   knowledge · dispatch, đều 3.0.0.
+#   Đo 18/11 trước khi viết: merge-base → 9 bản kit (3 tên hai bản), cat-luot có; sáu khoá false → 6 bản @delivery-loop
+#   3.0.0, cat-luot không, scope-slice có. nk30_leftover với ba khoá false: thoát 1 «3 lines at HEAD».
+#   Mọi phép đo ở rang/. Thước phiên (E2, E3) đọc ~/.claude/settings.json CHỈ ĐỌC để kiểm tiền đề; không ghi gì ngoài
+#   worktree tạm trong thư mục tạm của hệ thống (gỡ khi xong).
+#   Cặp hai chiều: rang/two-way.mjs — mỗi phép đo xanh trên vật lành, đỏ với thông điệp ghim dưới đây trên bản phá.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.tpc_settings
+    layer: backend-effect
+    paths: [".claude/settings.json", "_acceptance/tat-plugin-cho-cu/rang/**"]
+    expected: "exit 0; dòng 'settings: enabledPlugins = merge-base + 6 false keys (acceptance-gate, feature-loop, diagram-design, dieu-phoi, road-map, tri-thuc @acceptance-gate-kit); every other key as at merge-base'. Chiều đỏ (two-way): (a) bản HEAD bỏ khoá tri-thuc@acceptance-gate-kit: 'settings: false keys differ from the six old-marketplace plugins'; (b) bản HEAD đổi một khoá tắt thành true: 'settings: false keys differ from the six old-marketplace plugins'; (c) bản HEAD đổi permissions: 'settings: permissions changed from merge-base'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.tpc_doi_chung
+    long_running: 3
+    layer: backend-effect
+    paths: [".claude/settings.json", "_acceptance/tat-plugin-cho-cu/rang/**"]
+    expected: "exit 0; dòng 'doi-chung: at merge-base <sha> the session measure is red as pinned (phien: two versions of <tên>…), cat-luot present'. Máy không bật plugin chợ cũ ở mức người dùng: exit 3 'phien: cannot run the control — no old-marketplace plugin is on at user level'. Chiều đỏ (two-way): bản init giả có mỗi plugin một bản: 'doi-chung: the session measure is green at merge-base — no positive control'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.tpc_phien
+    long_running: 3
+    layer: backend-effect
+    paths: [".claude/settings.json", "_acceptance/tat-plugin-cho-cu/rang/**"]
+    expected: "exit 0; dòng 'phien: 6 kit plugins, one version each, all @delivery-loop 3.0.0; cat-luot absent; scope-slice and feature-loop:feature-loop present'. Tiền đề vắng: exit 3 như E2. Chiều đỏ (two-way, trên bản init đã ghi lại của merge-base và các bản giả): (a) hai bản acceptance-gate: 'phien: two versions of acceptance-gate'; (b) thiếu dispatch@delivery-loop: 'phien: delivery-loop plugins differ from the six'; (c) có acceptance-gate:cat-luot: 'phien: acceptance-gate:cat-luot still loaded'; (d) một plugin @delivery-loop version 2.38.1: 'phien: feature-loop@delivery-loop is 2.38.1, want 3.0.0'; (e) thêm plugin road-map source road-map@acceptance-gate-kit (tên khác bản mới, phép đếm tên không bắt): 'phien: old-marketplace source still loaded: road-map@acceptance-gate-kit'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.tpc_quet_ten_cu
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0 trên commit đã có đủ hồ sơ, design doc, plan và dòng wiki/log.md của vòng (sweep chừa _acceptance/** theo SWEEP_EXCLUDE của nang-kit-3-0; design doc, plan, wiki/log.md nằm trong phạm vi quét và không được nhắc tên chợ cũ); dòng 'quet-ten-cu: nk30 sweep at HEAD finds 6 lines, all false keys in .claude/settings.json for the six old-marketplace plugins'. Chiều đỏ (two-way, worktree tạm ở HEAD): (a) thêm một dòng nhắc tên chợ cũ vào wiki/log.md: 'quet-ten-cu: sweep line outside .claude/settings.json: wiki/log.md'; (b) bỏ khoá tắt road-map: 'quet-ten-cu: sweep finds 5 false-key lines, want 6'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.nk30_settings
+    layer: backend-effect
+    paths: [".claude/settings.json", ".github/workflows/ci.yml"]
+    expected: "exit 0; dòng 'settings: marketplace delivery-loop (phanlemanh/delivery-loop) at ref v3.0.0 = KIT_TAG of ci.yml; 6 plugins on, equal to the kit marketplace; no @acceptance-gate-kit key; …'. Chiều đỏ: thước của hồ sơ nang-kit-3-0, cặp hai chiều đã có ở rang/two-way.mjs của hồ sơ ấy (E11 của nó) — vòng này không dựng lại"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0 (make check). Chiều đỏ: không dựng riêng — make check là bộ kiểm của kho, vòng không thêm ca vào nó"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.tpc_two_way
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/tat-plugin-cho-cu/rang/**", ".claude/settings.json"]
+    expected: "exit 0; node --test in 'pass 11' và 'fail 0': mỗi chiều đỏ kê ở expected của E1 (3), E2 (1), E3 (5), E4 (2) một bài «xanh trên vật lành, đỏ trên bản phá với đúng thông điệp ghim». Bài của E2, E3 không gọi model: chạy trên rang/init-merge-base.json và rang/init-head.json — bản init THẬT do phép thử phiên ghi ở S3 (chỉ giữ name, source, version của plugin và danh sách slash_commands; bỏ đường tuyệt đối), các bản phá dựng bằng cách sửa bản sao của chúng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

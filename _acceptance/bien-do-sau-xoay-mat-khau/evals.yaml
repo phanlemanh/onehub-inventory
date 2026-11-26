@@ -1,0 +1,124 @@
+schema_version: 1
+feature_slug: bien-do-sau-xoay-mat-khau
+# Kế hoạch đo, viết trước khi viết mã.
+#
+# Tên ca: mỗi ca mới của tools/deploy/deploy.test.ts mang tiền tố mã eval («E2 · staging · …»). Ca cũ của ma trận bước đỏ
+# và đường xanh giữ tên cũ; E1 và E3 đọc chúng qua tên describe «make deploy — green» và «make deploy — ma trận bước đỏ».
+#
+# Nguồn thứ tự: STEPS xuất từ tools/deploy/len-ban.mjs. Tệp kiểm dùng chính STEPS ấy (import), không giữ bản chép tay; ca
+# «E1 · thứ tự khai» ghim STEPS bằng hai danh sách viết ở AC-1 — đó là chỗ duy nhất thứ tự được viết tay, và nó là lời hứa.
+#
+# Dấu đặt mật khẩu: psql giả ghi «psql vai» vào calls.log và tệp vai.sql khi nhận câu đặt mật khẩu (đã có từ hàng
+# dat-khoa-mot-lenh). «Không đặt mật khẩu» = không dòng «psql vai» và không tệp vai.sql.
+#
+# Ma trận E2 (mỗi ô × staging, production; mọi ô: dòng đỏ ở bien như ghim, dòng cuối «DỪNG ở bien — tên miền không đổi»,
+# 0 dòng «psql vai», không tệp vai.sql, 0 lệnh vercel, tên miền vẫn dpl_cu, không giá trị bí mật ở dòng in):
+#   biến cấm MIGRATE_DATABASE_URL     → «bien ĐỎ — dự án Vercel đang có biến cấm MIGRATE_DATABASE_URL»
+#   Vercel trả 403                     → «bien ĐỎ — Vercel trả 403»
+#   từ chối AUTH_SECRET                → «bien ĐỎ — Vercel từ chối ghi biến AUTH_SECRET»
+#   created rỗng                       → «bien ĐỎ — Vercel không xác nhận đã ghi biến DATABASE_URL, AUTH_SECRET,
+#                                         RESEND_API_KEY, MAIL_FROM, APP_URL, APP_ENV»
+#   danh sách không có envs            → «bien ĐỎ — Vercel trả danh sách biến không đúng khuôn»
+# Đối chứng dương cùng máy giả: đường xanh có đúng một dòng «psql vai», sau lần ghi biến (E1).
+#
+# Chiều đỏ của mã: hoán lại thứ tự cũ trong bản sao STEPS (vai-dang-nhap trước bien) thì E1 và năm ô E2 đỏ (lượt phá-thử
+# của task, ghi trong plan và thân commit).
+#
+# Chiều đỏ của E4: hàm so lấy hai dòng «Đạt khi» của sổ tay; chạy trên nội dung thật đã hoán «bien đạt» với
+# «vai-dang-nhap đạt» ở bước 2 → trả đúng «sổ tay bước 2: thứ tự lệch STEPS.staging».
+#
+# Theo Hỏi-1: «đổi thứ tự» (khuyến nghị) — mọi eval dưới đây. «chỉ sửa sổ tay» — bỏ E1, E2, E3 (AC-1..AC-3) và phần thứ tự
+# của E6; E4 vẫn chạy trên thứ tự cũ.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.deploy_kiem
+    layer: backend-effect
+    paths: ["tools/deploy/len-ban.mjs", "tools/deploy/deploy.test.ts"]
+    expected: >-
+      exit 0. Ca «E1 · thứ tự khai» pass: STEPS.staging và STEPS.production bằng đúng hai danh sách của AC-1. Bốn ca
+      đường xanh của describe «make deploy — green» pass ở hai môi trường: chín dòng đạt theo STEPS, và trong calls.log
+      «psql ap 002_b.sql» < «api POST /v10/projects/<id>/env» < «psql vai» < lệnh vercel đầu tiên; đúng một «psql vai».
+      Chiều đỏ: bản sao STEPS với vai-dang-nhap trước bien → ca thứ tự khai và ca đường xanh đỏ.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.deploy_kiem
+    layer: backend-effect
+    paths: ["tools/deploy/len-ban.mjs", "tools/deploy/deploy.test.ts"]
+    expected: >-
+      exit 0. Có mười ca «E2 ·» (năm ô × hai môi trường) theo ma trận ở đầu tệp; mỗi ca so đúng cả dòng đỏ ghim, dòng
+      cuối DỪNG ở bien, 0 dòng «psql vai», không tệp vai.sql, r.vercel rỗng, tên miền dpl_cu, markerLeak null.
+      Chiều đỏ: cùng máy giả không làm bien đỏ → có đúng một «psql vai» (E1); bản sao thứ tự cũ → mười ca E2 đỏ vì có
+      «psql vai».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.deploy_kiem
+    layer: backend-effect
+    paths: ["tools/deploy/len-ban.mjs", "tools/deploy/deploy.test.ts"]
+    expected: >-
+      exit 0. Mọi ca của describe «make deploy — ma trận bước đỏ» pass ở hai môi trường, với ba luật đặt theo STEPS mới:
+      bước đỏ đứng trước bien → 0 POST tới Vercel; bước đỏ đứng trước dung → r.vercel rỗng; bước đỏ đứng trước
+      vai-dang-nhap → 0 dòng «psql vai». Có hai ca «E3 · <env> · vai-dang-nhap đỏ sau khi ghi biến» (psql giả lỗi ở câu
+      đặt mật khẩu): đúng một POST, đúng một «psql vai», POST đứng trước «psql vai», dòng đỏ ở vai-dang-nhap, dòng cuối
+      DỪNG ở vai-dang-nhap, r.vercel rỗng, tên miền dpl_cu.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.deploy_kiem
+    layer: backend-effect
+    paths: ["docs/van-hanh/dua-ban-len.md", "tools/deploy/deploy.test.ts", "tools/deploy/len-ban.mjs"]
+    expected: >-
+      exit 0. Ca «E4 · sổ tay kể đúng thứ tự bước» pass: hàm so rút các tên bước theo thứ tự xuất hiện trong dòng «Đạt
+      khi» của bước 2 (bản thử) và bước 5 (bản thật) của docs/van-hanh/dua-ban-len.md, so bằng STEPS.staging và
+      STEPS.production import từ len-ban.mjs → []. Chiều đỏ: cùng nội dung, hoán «vai-dang-nhap đạt» với «bien đạt» ở
+      bước 2 → hàm so trả đúng [«sổ tay bước 2: thứ tự lệch STEPS.staging»].
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: judgment
+    inputs: ["docs/van-hanh/dua-ban-len.md", "docs/van-hanh/xoay-khoa.md", "wiki/decisions/0048-bien-truoc-vai-dang-nhap.md", "_acceptance/bien-do-sau-xoay-mat-khau/contract.md"]
+    question: >-
+      Đọc hai sổ tay và trang quyết định 0048 như người vận hành vừa xoay mật khẩu vai đăng nhập, với contract.md (AC-5)
+      làm ý định.
+      (1) Mục «Đỏ thì làm gì» của dua-ban-len.md có chia đúng ba vùng không: đỏ ở bien hay trước — bản đang chạy yên; đỏ ở
+      vai-dang-nhap — mật khẩu chưa đổi, bản đang chạy yên, Vercel có thể đã giữ mật khẩu mới; đỏ sau khi vai-dang-nhap đạt
+      — bản đang chạy đã mất kết nối, sửa và chạy lại ngay? Có câu nào xếp ca vai-dang-nhap đỏ vào vùng «mất kết nối» không?
+      (2) Mọi hàng bien và hàng vai-dang-nhap có dặn không bấm dựng lại trên Vercel trước khi lệnh chạy xanh không?
+      (3) Vùng thứ ba có viết thành một luật theo vị trí so với vai-dang-nhap (không phải danh sách tên bước), và có phủ cả
+      lúc lệnh tự lùi tên miền về bản trước không? Có hàng nào của một bước chạy sau vai-dang-nhap (cach-ly, dung,
+      kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien, kể cả các dòng lùi bản) nói hay ngụ ý bản đang chạy yên, hay khuyên
+      lùi về bản cũ, mà không trừ ca vừa xoay mật khẩu? Trích câu làm bằng.
+      (4) Bước 3 của xoay-khoa.md có nói khoảng hở bắt đầu khi vai-dang-nhap đạt, sau bước bien?
+      (5) Trang 0048 có nói thứ tự mới, vì sao, cái giá (Vercel giữ mật khẩu mới khi cơ sở dữ liệu chưa) và khoảng hở còn
+      lại không?
+      (6) Có câu nào bảo in, dán hay gửi giá trị của khoá không?
+    evidence_required: [run_id, verifier, verified_at, verdict, rationale]
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.bdx_ghi_chep
+    layer: backend-effect
+    paths: ["wiki/decisions/0048-*.md", "docs/van-hanh/README.md", "tools/deploy/len-ban.mjs"]
+    expected: >-
+      exit 0, in «ghi-chep: 3 chỗ đạt». Lệnh kiểm import STEPS từ tools/deploy/len-ban.mjs và rút tên bước (mọi tên trong
+      STEPS) theo thứ tự xuất hiện ở ba chỗ: (a) có đúng một tệp wiki/decisions/0048-*.md, frontmatter type: decision, và
+      đoạn nêu thứ tự trong nó kể STEPS.staging; (b) câu thứ tự bước ở việc 10 của docs/van-hanh/README.md kể các bước nó
+      nhắc theo đúng thứ tự STEPS.staging (không đảo cặp nào); (c) hai dòng chú thích «staging:» và «production:» ở đầu
+      len-ban.mjs bằng đúng STEPS.staging và STEPS.production. Chiều đỏ, mỗi chỗ một bản sao dưới thư mục tạm, chạy với
+      --root trỏ bản sao: chú thích về thứ tự cũ → thoát 1, in «ghi-chep: chú thích len-ban.mjs lệch STEPS»; README hoán
+      dung với cach-ly → thoát 1, in «ghi-chep: README việc 10 lệch STEPS»; 0048 vắng → thoát 1, in «ghi-chep: thiếu
+      wiki/decisions/0048-*.md». Ba chiều đỏ chạy bằng cờ --tu-kiem của chính lệnh.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.check
+    layer: backend-effect
+    expected: exit 0.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

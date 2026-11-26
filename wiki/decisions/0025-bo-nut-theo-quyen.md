@@ -7,7 +7,7 @@ links:
     wiki/decisions/0023-chon-truoc-tao-sau.md,
     wiki/decisions/0024-ngan-noi-xem-chi-tiet.md,
     design/behaviors.md,
-    design/vai-man-nut.md,
+    tools/coverage_matrix/buttons.py,
     ontology/actions.yaml,
     src/modules/identity/ui/,
     src/components/candidate/row-actions.tsx,

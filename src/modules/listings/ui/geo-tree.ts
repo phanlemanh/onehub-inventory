@@ -13,6 +13,7 @@ import type { GridRow } from "@/components/candidate/data-region";
 import type { NavLink, NavSection } from "@/components/templates/app-shell";
 
 import { SEARCH_PARAM } from "./inventory-rows";
+import { QUERY_WORD } from "./query-words";
 import { SAVED_VIEW_PARAM } from "./saved-view-api";
 
 /** Where one building stands: its project and, when public, its complex (row 7d). */
@@ -35,7 +36,7 @@ export interface GeoNode {
 }
 
 /** The inventory address parameter of a place (one or several, for picking several buildings). */
-export const GEO_PARAM = "vung";
+export const GEO_PARAM = QUERY_WORD.place;
 const SEP = "›";
 
 const keyOf = (...parts: (string | undefined)[]): string =>

@@ -1,0 +1,13 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index b169642..f0286e7 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -169,7 +169,7 @@ jobs:
+   gate:
+     runs-on: ubuntu-latest
+     env:
+-      KIT_TAG: v3.1.0
++      KIT_TAG: v3.1.1
+     steps:
+       - uses: actions/checkout@v7
+         with:

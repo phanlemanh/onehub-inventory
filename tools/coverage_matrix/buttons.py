@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Role × screen × button table, generated from the permission table (roadmap rows 9e, 9b). Standard library only.
 
-  python3 tools/coverage_matrix/buttons.py [--root DIR]           # writes design/vai-man-nut.md
+  python3 tools/coverage_matrix/buttons.py [--root DIR]           # writes design/role-screen-buttons.md
   python3 tools/coverage_matrix/buttons.py [--root DIR] --check   # fails with «lệch bảng quyền: <màn>» on drift
   python3 tools/coverage_matrix/buttons.py [--root DIR] --json    # the table as JSON, for tests
 
@@ -31,7 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from registry import PAGE_FILE, load_registry  # noqa: E402
 from repo_ontology import load_yaml_file  # noqa: E402
 
-OUT = "design/vai-man-nut.md"
+OUT = "design/role-screen-buttons.md"
 ACTIONS_FILE = "ontology/actions.yaml"
 SCREENS_FILE = "design/screens.yaml"
 FRAME_FILES = {"layout.tsx", "nav.ts"}
@@ -250,8 +250,8 @@ def render(table: dict[str, Any]) -> str:
         "# Vai × Màn tới cấp nút",
         "",
         "<!-- Tệp sinh bởi tools/coverage_matrix/buttons.py từ ontology/actions.yaml, design/screens.yaml và các nút tìm thấy",
-        "     trong mã của từng màn. Không sửa tay: đổi bảng quyền, sổ màn hay nút của màn rồi chạy lại lệnh; make check đỏ",
-        "     khi tệp lệch. -->",
+        "     trong mã của từng màn. Không sửa tay, không commit: tệp nằm ngoài git, make sinh lại nó trước bài kiểm",
+        "     (mk/derived.mk); đổi bảng quyền, sổ màn hay nút của màn rồi chạy lại lệnh. -->",
         "",
         "Mỗi màn của sổ màn có một mục, cộng mục `khung` cho App Shell. Cột «Nút theo quyền» liệt các thao tác vai ấy làm",
         "được trên màn, kèm phạm vi; «dự kiến» là nút sổ màn đã khai mà mã chưa có. «chặn» là vai không có ô nào.",
@@ -293,7 +293,7 @@ def blocks(text: str) -> dict[str, str]:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--root", default=str(Path(__file__).resolve().parents[2]))
-    ap.add_argument("--check", action="store_true", help="compare design/vai-man-nut.md with the table; never writes")
+    ap.add_argument("--check", action="store_true", help="compare design/role-screen-buttons.md with the table; never writes")
     ap.add_argument("--json", action="store_true", help="print the table as JSON; never writes")
     args = ap.parse_args(argv)
     root = Path(args.root).resolve()

@@ -1,0 +1,1 @@
+App Shell chọn từ ReUI app-shell-8: cột biểu tượng lọc theo mọi vai, cột thứ hai theo màn (Bảng hàng có lối tắt trạng thái), gập và nhớ qua tải lại, tên sàn ở đầu thanh trên đổi sàn cùng lối với menu tài khoản; điện thoại dùng thanh bên thu gọn — hàng 1o, [0023](decisions/0023-chon-truoc-tao-sau.md), `_acceptance/app-shell-chon-tu-reui/`

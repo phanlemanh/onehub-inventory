@@ -11,6 +11,7 @@ sources:
     "_acceptance/lop-rieng-cua-san/contract.md",
     "_acceptance/danh-muc-can-nhu-onehub-invest/de-xuat-nhap-la-luc-anh-xa.md",
   ]
+summary: nhãn riêng của sàn
 ---
 
 # CompanyLabel (Nhãn riêng)
@@ -25,7 +26,7 @@ Một nhãn đang dùng cho mỗi khái niệm; khái niệm là trường hay t
 
 ## Where in the code
 
-`src/modules/company-config/`, bảng trong `db/migrations/010_lop_rieng_cua_san.sql`, ghi qua `/api/v1/company-layer`. Màn xem lại và sửa: `/tuy-chinh-san` (`src/modules/company-config/ui/`), nút theo bảng quyền như hàng 9e. Bảng hàng đọc nhãn riêng của sàn đang đăng nhập (`myCompanyLayer`, `labelOverrides`); trang gửi khách không đọc (bài `tests/lop-rieng-cot.test.ts`).
+`src/modules/company-config/`, bảng trong `db/migrations/010_lop_rieng_cua_san.sql`, ghi qua `/api/v1/company-layer`. Màn xem lại và sửa: `/company-layer` (`src/modules/company-config/ui/`), nút theo bảng quyền như hàng 9e. Bảng hàng đọc nhãn riêng của sàn đang đăng nhập (`myCompanyLayer`, `labelOverrides`); trang gửi khách không đọc (bài `tests/lop-rieng-cot.test.ts`).
 
 ## History
 

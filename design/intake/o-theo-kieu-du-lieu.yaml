@@ -1,0 +1,7 @@
+ten: TypedCell
+tep: src/components/candidate/typed-cell.tsx
+nguon: tao-tay
+nhu_cau: o-theo-kieu-du-lieu
+mo_ta: Một ô của lưới hiện giá trị theo kiểu dữ liệu (số, tiền, ngày, chữ)
+ho_so: bang-hang-ban-doc
+duyet: 2026-11-12

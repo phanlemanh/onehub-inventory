@@ -1,0 +1,1 @@
+Thanh bên nhận danh sách vai một người giữ và hiện mục của mọi vai ấy (người kiêm nhiều vai được cộng, theo 0016); kiểu vai của mục lấy từ bản khai vai — hàng 1i, [0016](decisions/0016-permission-model.md), `_acceptance/thanh-ben-nhieu-vai/`

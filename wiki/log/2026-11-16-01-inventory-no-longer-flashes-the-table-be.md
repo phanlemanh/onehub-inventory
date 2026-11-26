@@ -1,0 +1,1 @@
+Inventory no longer flashes the table before the cards on a phone (VP4, debt of row 2b): the region draws both layouts until the browser takes over, then marks itself hydrated — [PR #70](https://github.com/phanlemanh/onehub-inventory/pull/70).

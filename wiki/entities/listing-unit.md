@@ -3,6 +3,7 @@ type: entity
 title: ListingUnit (Căn của hàng)
 links: [ontology/entities/ListingUnit.yaml]
 sources: ["_acceptance/khai-lien-ket-chao-can/design.md"]
+summary: lần chào trỏ tới căn của danh mục
 ---
 
 # ListingUnit (Căn của hàng)

@@ -736,14 +736,14 @@ test.describe("E4 · the record lives in the address", () => {
     page.on("pageerror", (error) => errors.push(error.message));
     await openInventory(page);
     const { id, unit } = await openFifth(page);
-    await expect(page).toHaveURL(new RegExp(`[?&]ho-so=${id}`));
+    await expect(page).toHaveURL(new RegExp(`[?&]record=${id}`));
     await page.goBack();
     await expect(panel(page)).toHaveCount(0);
     await expect(page).toHaveURL(/\/inventory(\?|$)/);
-    await openInventory(page, `?ho-so=${encodeURIComponent(id)}`);
+    await openInventory(page, `?record=${encodeURIComponent(id)}`);
     await expect(panel(page)).toHaveAttribute("data-record-id", id);
     await assertOpened(page, unit);
-    await openInventory(page, "?ho-so=khong-co");
+    await openInventory(page, "?record=khong-co");
     await page.waitForTimeout(300);
     await expect(panel(page)).toHaveCount(0);
     await expect(page.locator('[data-slot="region-count"]')).toContainText("60");
@@ -753,7 +753,7 @@ test.describe("E4 · the record lives in the address", () => {
   test("break: reading the record by row index opens the wrong one", async ({ page }) => {
     await openInventory(page);
     const { id } = await openFifth(page);
-    await openInventory(page, `?ho-so=${encodeURIComponent(id)}`);
+    await openInventory(page, `?record=${encodeURIComponent(id)}`);
     // The unit at the next index stands for a reader that counts rows instead of matching ids.
     const wrong = ((await openers(page).nth(5).textContent()) ?? "").trim();
     await expect(assertOpened(page, wrong)).rejects.toThrow("address opened the wrong record");

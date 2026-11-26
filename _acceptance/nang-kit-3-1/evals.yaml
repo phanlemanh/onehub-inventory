@@ -1,0 +1,91 @@
+schema_version: 1
+feature_slug: nang-kit-3-1
+# Ma trận viết trước: _acceptance/nang-kit-3-1/rang/matrix.mjs.
+#   Kit mới: phanlemanh/delivery-loop thẻ v3.1.0 = 0a93a5b9 (đối tượng thẻ b623358b). Kit cũ: thẻ v3.0.0 = c16d25db.
+#   Gốc lõi: <kit>/plugins/acceptance-gate. Chợ: delivery-loop, sáu plugin; năm ở 3.1.0, diagram-design ở 3.0.0.
+#   Mọi phép đo kéo kit theo thẻ vào os.tmpdir(), ngoài kho. Cặp hai chiều: rang/two-way.mjs.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: node _acceptance/nang-kit-3-1/rang/settings.mjs
+    layer: backend-effect
+    paths: [".claude/settings.json", "_acceptance/nang-kit-3-1/rang/**"]
+    expected: "exit 0; dòng 'settings: marketplace delivery-loop (phanlemanh/delivery-loop) at ref v3.1.0; the only line changed from origin/main; 6 plugins on, equal to the kit v3.1.0 marketplace; KIT_TAG of ci.yml is <tag>'. Chiều đỏ (two-way): settings của main: 'settings: marketplace not pinned to v3.1.0'; HEAD thêm một dòng đổi: 'settings: differs from origin/main in 2 lines'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: node _acceptance/nang-kit-3-1/rang/tag.mjs
+    layer: backend-effect
+    paths: ["_acceptance/nang-kit-3-1/rang/**"]
+    expected: "exit 0; dòng 'tag: v3.1.0 on phanlemanh/delivery-loop peels to 0a93a5b9; 6 plugin versions as in the matrix (5 at 3.1.0)'. Chiều đỏ (two-way): thẻ bóc ra c16d25db: 'tag: v3.1.0 on phanlemanh/delivery-loop is c16d25db, want 0a93a5b9'; plugin.json của v3.0.0: 'tag: acceptance-gate is 3.0.0, want 3.1.0'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: node _acceptance/nang-kit-3-1/rang/tro-ly.mjs
+    layer: backend-effect
+    paths: ["_acceptance/**"]
+    expected: "exit 0; dòng 'tro-ly: kit v3.1.0 scripts/tro-ly-quyet-dinh.cjs --dem exit 0 on this repo; <n> records counted (= records with a contract), mặc-ký <tắt|bật>, 7 kind lines'. Chiều đỏ (two-way): kit v3.0.0: 'tro-ly: scripts/tro-ly-quyet-dinh.cjs missing in kit v3.0.0'; gốc tạm có một hồ sơ: 'tro-ly: counts <n> records, want 1'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: node _acceptance/nang-kit-3-1/rang/product-map.mjs
+    layer: backend-effect
+    paths: ["PRODUCT-MAP.md", "LO-TRINH.html", "_acceptance/**"]
+    expected: "exit 0; dòng 'product-map: kit v3.1.0 product-map.mjs --check exit 0 on HEAD' và dòng 'executor-scripts: 4 executor commands under the kit root (script.product_map, design.floor, design.khuon, design.ui_check), 4 scripts, all present in kit v3.1.0 plugins/acceptance-gate'. Chiều đỏ (two-way): PRODUCT-MAP.md thêm một dòng: 'product-map: kit v3.1.0 product-map.mjs --check exit 1'; design.floor gọi scripts/khong-co.mjs: 'executor-scripts: design.floor calls scripts/khong-co.mjs, missing in kit v3.1.0'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-4
+    executor: script
+    cmd: node _acceptance/nang-kit-3-1/rang/doc-commands.mjs
+    layer: backend-effect
+    paths: ["docs/tri-thuc/TRI-THUC.md", "docs/plan/dot-nen/README.md", "_acceptance/config.yaml", "_acceptance/nang-kit-3-1/rang/**"]
+    expected: "exit 0; dòng 'doc-commands: 4 command mentions (3 distinct) and 1 kit path in 3 files, all found in kit v3.1.0'. Chiều đỏ (two-way, TRI-THUC.md đổi /knowledge:ingest thành /knowledge:ghi): 'doc-commands: /knowledge:ghi not in kit v3.1.0'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: node _acceptance/nang-kit-3-1/rang/gate-control.mjs
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/**", ".claude/settings.json"]
+    expected: "exit 0; dòng 'gate-control: on <sha> (merge-base) --recheck-all, kit v3.0.0 and v3.1.0 both 0 VIOLATION, <k> OK each (= records with a contract), same records' với k = số _acceptance/*/contract.md ở <sha> đếm bằng git ls-tree (lúc thiết kế trên 1410a0f0: 72), và dòng 'gate-control: on HEAD against origin/main both kits print the same <m> verdict lines'. Chiều đỏ (two-way, từ đầu ra thật của kit v3.1.0): bớt một dòng OK ở một bên: 'gate-control: OK records differ'; bỏ mọi dòng OK ở cả hai bên: 'gate-control: OK 0 records, want <k>'; thêm một dòng VIOLATION vào một bên trên HEAD: 'gate-control: verdict lines on HEAD differ between kits'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-6
+    executor: script
+    cmd: node _acceptance/nang-kit-3-1/rang/gate-branch.mjs
+    long_running: 5
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng 'gate-branch: kit <KIT_TAG> (KIT_TAG of ci.yml) ran its rules on HEAD against origin/main; <n> VIOLATION lines, all naming nang-kit-3-1'. Chiều đỏ (two-way): merge-base + đúng hunk .claude/settings.json, không hồ sơ: 'gate-branch: VIOLATION not naming nang-kit-3-1'; đầu ra thật trên HEAD (chưa ký) qua --signed: 'gate-branch: --signed wants 0 VIOLATION'; ci.yml KIT_TAG v9.9.9: 'ci-tag: KIT_TAG of the gate job is v9.9.9, want v3.0.0 or v3.1.0'. Lượt S5 sau chữ ký: cùng lệnh với --signed đòi n = 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0 (make check: lint, typecheck, test, ontology và các bước khác của CHECK_TARGETS). Chiều đỏ: E4 (product-map lệch là một bước của make check)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-8
+    executor: script
+    cmd: node --test _acceptance/nang-kit-3-1/rang/two-way.mjs
+    long_running: 10
+    layer: backend-effect
+    paths: ["_acceptance/**", ".claude/settings.json", ".github/workflows/ci.yml", "docs/**", "PRODUCT-MAP.md", "LO-TRINH.html"]
+    expected: "exit 0; node --test in 'pass 19' và 'fail 0': với mỗi chiều đỏ kê ở expected của E1–E7 và E10 một bài «xanh trên vật lành, đỏ trên bản phá với đúng thông điệp ghim» (E1 hai, E2 hai, E3 hai, E4 hai, E5 một, E6 ba, E7 ba, E10 bốn)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: node _acceptance/nang-kit-3-1/rang/dot.mjs
+    layer: backend-effect
+    paths: ["_acceptance/nang-kit-3-1/rang/**", "docs/plan/**"]
+    expected: "exit 0; dòng 'dot: <n> hook files of dispatch, 2 changed in v3.1.0 (hinh-dang.mjs,nguon-hang.mjs), reading batch dieu-phoi-nen alike in both; no s4 lock held (<l> lock folders)'. Chiều đỏ (two-way): hai bản kit như nhau: 'dot: hook files changed in v3.1.0 are none'; không có thư mục đợt: 'dot: batch folder dieu-phoi-nen not found'; bản chép thư mục đợt (tệp thật) có khoa/s4/chu.json: 'dot: lock s4 is held'; bản chép gói dispatch 3.1 mà docNhomKeHoach trả thiếu một nhóm: 'dot: nguon-hang.mjs docNhomKeHoach reads differently in v3.0.0 and v3.1.0'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

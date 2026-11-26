@@ -123,7 +123,7 @@ test("tai-lai-con: four details saved in the record are there after a reload, an
 }, info) => {
   const w = await world(info, "luu", ["ListAgent"]);
   await signIn(page, w.email, w.mau);
-  await openInventory(page, `/inventory?ho-so=${w.listing}`);
+  await openInventory(page, `/inventory?record=${w.listing}`);
   await editOpen(page).first().scrollIntoViewIfNeeded();
   await editOpen(page).first().click();
   const dialog = page.locator('[data-slot="listing-details-edit"]');
@@ -132,7 +132,7 @@ test("tai-lai-con: four details saved in the record are there after a reload, an
   await dialog.locator('input[data-detail="legalStatus"]').fill("Sổ hồng [MAU]");
   await dialog.getByRole("button", { name: "Lưu" }).click();
   await expect(dialog).toBeHidden();
-  await openInventory(page, `/inventory?ho-so=${w.listing}`);
+  await openInventory(page, `/inventory?record=${w.listing}`);
   await expect(offerValue(page, "Listing.financing"), "tai-lai-con: hồ sơ").toHaveText(value);
   const row = (
     await owner.query<{ financing: string; legal_status: string }>(
@@ -148,7 +148,7 @@ test("quan-tri-khong-nut: a company admin sees the details but no «Sửa», and
 }, info) => {
   const w = await world(info, "qt", ["CompanyAdmin"]);
   await signIn(page, w.email, w.mau);
-  await openInventory(page, `/inventory?ho-so=${w.listing}`);
+  await openInventory(page, `/inventory?record=${w.listing}`);
   await expect(page.locator('[data-slot="listing-offer"]').first()).toBeVisible();
   expect(await editOpen(page).count(), "quan-tri-khong-nut: nút").toBe(0);
   if (["1024", "1440"].includes(info.project.name)) {

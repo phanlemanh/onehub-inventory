@@ -1,0 +1,8 @@
+id: proto-permitted-actions
+route: /proto/permitted-actions
+title: null
+family: null
+audience: dev
+status: built
+# Renamed from proto-bo-nut (english-route-names): signed contracts keep the old id, open ones must use the new one.
+old_ids: [proto-bo-nut]

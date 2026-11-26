@@ -3,6 +3,7 @@ type: entity
 title: Building (Toà)
 links: [ontology/entities/Building.yaml]
 sources: ["_acceptance/danh-muc-can-nhu-onehub-invest/contract.md", "https://dd.reso.org/DD2.1/"]
+summary: toà, khoá `bld_`
 ---
 
 # Building (Toà)

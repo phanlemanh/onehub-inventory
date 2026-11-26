@@ -18,7 +18,10 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-LEDGER_PATH = "design/so-khoi.yaml"
+LEDGER_PATH = "design/intake.yaml"
+# Every path the ledger has had in git: added as design/so-khoi.yaml, renamed in design-assembly step 8.4, now the
+# folder design/intake (its copy at LEDGER_PATH is out of git). The law's day is the oldest commit adding any of them.
+LEDGER_PATHS = ("design/so-khoi.yaml", LEDGER_PATH, "design/intake/_shared.yaml")
 TOOL_REPO = Path(__file__).resolve().parents[2]
 # Tries at fetching the missing history while another run holds git's lock on it, one second apart. The variable is
 # for the tool's own tests (a break sets 1: no waiting).
@@ -103,7 +106,7 @@ class History:
             self.fetch_error = self.fetch_error or "bản sao vẫn thiếu lịch sử sau khi lấy"
 
     def _read_law(self) -> None:
-        rc, out, err = _git(self.root, "log", "--diff-filter=A", "--format=%H %as", "--", self.prefix + LEDGER_PATH)
+        rc, out, err = _git(self.root, "log", "--diff-filter=A", "--format=%H %as", "--", *(self.prefix + p for p in LEDGER_PATHS))
         lines = [ln.split() for ln in out.splitlines() if ln.strip()]
         if rc != 0 or not lines:
             self.law_why = f"không tìm thấy commit thêm {LEDGER_PATH}" + (f" ({_first_line(err)})" if err else "")

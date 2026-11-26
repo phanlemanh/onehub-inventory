@@ -1,0 +1,146 @@
+
+- design-floor S1 2026-11-23T01:47:29.328Z: chỉ mục 5310 token · verification-honesty 1876 token · content-design 1314 token (tổng 8500 token)
+### S4 round 1 — wf_24ab87cf-9a2 (29 agent, 100,071 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| review:bugs | claude-opus-5-5 | 28 | 14,035 | 56 | 1,906,832 | 161 |
+| review:measurement | claude-opus-5-5 | 14 | 13,852 | 30 | 647,372 | 142 |
+| review:invariants | claude-opus-5-5 | 22 | 13,720 | 44 | 1,410,742 | 156 |
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 10,694 | 6 | 22,675 | 536 |
+| synthesize:report | claude-sonnet-5-5 | 2 | 10,658 | 4 | 32,868 | 58 |
+| triage | claude-sonnet-5-5 | 2 | 4,352 | 4 | 17,998 | 30 |
+| machine:DATABASE_URL= make e2e | claude-haiku-5-5 | 2 | 2,961 | 4 | 6,762 | 580 |
+| machine:DB_LANE=${DB_LANE:-n} DB_PORT=${DB_PORT: | claude-haiku-5-5 | 2 | 2,637 | 4 | 15,429 | 95 |
+| machine:DB_LANE=h DB_PORT=5567 npx playwright te | claude-haiku-5-5 | 2 | 2,602 | 4 | 6,762 | 467 |
+| machine:npx vitest run tests/company-layer-route | claude-haiku-5-5 | 2 | 2,517 | 4 | 15,385 | 16 |
+| machine:DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT: | claude-haiku-5-5 | 2 | 2,213 | 4 | 15,430 | 69 |
+| machine:npx playwright test tests/e2e/bo-nut.spe | claude-haiku-5-5 | 2 | 1,941 | 4 | 15,371 | 33 |
+| machine:DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT: | claude-haiku-5-5 | 2 | 1,827 | 4 | 15,411 | 42 |
+| machine:npx vitest run tests/vai-man-so-man.test | claude-haiku-5-5 | 2 | 1,819 | 4 | 15,460 | 43 |
+| ui:E14-ui | claude-sonnet-5-5 | 3 | 1,673 | 6 | 146,728 | 45 |
+| machine:DB_LANE=${DB_LANE:-v} DB_PORT=${DB_PORT: | claude-haiku-5-5 | 2 | 1,615 | 4 | 15,431 | 57 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,504 | 4 | 11,944 | 163 |
+| refute:old-names.mjs | claude-sonnet-5-5 | 5 | 1,340 | 10 | 68,840 | 17 |
+| refute:evals.yaml | claude-sonnet-5-5 | 4 | 1,331 | 8 | 48,968 | 15 |
+| machine:npx vitest run tests/company-layer-route | claude-haiku-5-5 | 2 | 1,208 | 4 | 15,374 | 11 |
+| machine:node _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 1,030 | 4 | 15,366 | 10 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 915 | 4 | 15,348 | 14 |
+| refute:bo-nut.spec.ts | claude-sonnet-5-5 | 2 | 707 | 4 | 11,034 | 7 |
+| machine:node _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 653 | 4 | 15,362 | 5 |
+| refute:screen-old-ids.test.ts | claude-sonnet-5-5 | 3 | 548 | 6 | 29,143 | 10 |
+| refute:evals.yaml | claude-sonnet-5-5 | 3 | 510 | 6 | 28,698 | 9 |
+| machine:node _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 462 | 4 | 15,366 | 5 |
+| machine:bash _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 452 | 4 | 15,361 | 9 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 295 | 4 | 10,734 | 6 |
+
+
+wall: 869s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| baseline | 1 | 10,694 | 22,675 | 536 | 06:51:34 | 07:00:30 |
+| machine | 16 | 26,356 | 225,562 | 758 | 06:51:34 | 07:04:12 |
+| ui | 1 | 1,673 | 146,728 | 45 | 06:51:34 | 06:52:19 |
+| review | 3 | 41,607 | 3,964,946 | 163 | 06:51:51 | 06:54:34 |
+| triage | 1 | 4,352 | 17,998 | 30 | 07:04:12 | 07:04:42 |
+| refute | 5 | 4,436 | 186,683 | 18 | 07:04:42 | 07:05:00 |
+| capture | 1 | 295 | 10,734 | 6 | 07:05:00 | 07:05:06 |
+| synthesize | 1 | 10,658 | 32,868 | 58 | 07:05:06 | 07:06:04 |
+
+- **claude-opus-5-5**: 3 agent · 64 calls · out 41,607 · in 130 · cache_read 3,964,946 · cache_create 275,190
+- **claude-sonnet-5-5**: 10 agent · 29 calls · out 32,108 · in 58 · cache_read 417,686 · cache_create 306,502
+- **claude-haiku-5-5**: 16 agent · 32 calls · out 26,356 · in 64 · cache_read 225,562 · cache_create 221,127
+
+### S4 round 2 — wf_80a06340-df2 (19 agent, 56,946 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| review:invariants | claude-opus-5-5 | 19 | 8,725 | 38 | 1,010,880 | 101 |
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 7,260 | 6 | 19,429 | 445 |
+| synthesize:report | claude-sonnet-5-5 | 4 | 7,095 | 8 | 101,176 | 43 |
+| review:measurement | claude-opus-5-5 | 10 | 6,273 | 22 | 307,994 | 65 |
+| review:bugs | claude-opus-5-5 | 9 | 5,901 | 18 | 283,671 | 66 |
+| machine:DATABASE_URL= make e2e | claude-haiku-5-5 | 2 | 2,932 | 4 | 3,381 | 568 |
+| machine:npx vitest run tests/vai-man-so-man.test | claude-haiku-5-5 | 2 | 2,772 | 4 | 15,479 | 35 |
+| machine:npx vitest run tests/company-layer-route | claude-haiku-5-5 | 2 | 2,345 | 4 | 15,404 | 13 |
+| machine:DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT: | claude-haiku-5-5 | 2 | 2,217 | 4 | 15,449 | 52 |
+| triage | claude-sonnet-5-5 | 2 | 1,920 | 4 | 14,977 | 15 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,634 | 4 | 11,963 | 141 |
+| machine:npx vitest run tests/company-layer-route | claude-haiku-5-5 | 2 | 1,394 | 4 | 15,393 | 10 |
+| refute:bo-nut.spec.ts | claude-sonnet-5-5 | 5 | 1,391 | 10 | 59,521 | 15 |
+| machine:npx playwright test tests/e2e/bo-nut.spe | claude-haiku-5-5 | 2 | 1,231 | 4 | 15,390 | 26 |
+| machine:node _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 1,018 | 4 | 15,385 | 10 |
+| machine:bash _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 985 | 4 | 15,380 | 9 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 935 | 4 | 15,348 | 9 |
+| machine:node _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 621 | 4 | 15,381 | 5 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 297 | 4 | 10,734 | 5 |
+
+
+wall: 795s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| baseline | 1 | 7,260 | 19,429 | 445 | 07:19:33 | 07:26:58 |
+| review | 3 | 20,899 | 1,602,545 | 101 | 07:19:33 | 07:21:13 |
+| machine | 11 | 18,084 | 153,953 | 717 | 07:19:33 | 07:31:30 |
+| triage | 1 | 1,920 | 14,977 | 15 | 07:31:30 | 07:31:45 |
+| refute | 1 | 1,391 | 59,521 | 15 | 07:31:45 | 07:32:00 |
+| capture | 1 | 297 | 10,734 | 5 | 07:32:00 | 07:32:05 |
+| synthesize | 1 | 7,095 | 101,176 | 43 | 07:32:05 | 07:32:47 |
+
+- **claude-opus-5-5**: 3 agent · 38 calls · out 20,899 · in 78 · cache_read 1,602,545 · cache_create 167,678
+- **claude-sonnet-5-5**: 5 agent · 16 calls · out 17,963 · in 32 · cache_read 205,837 · cache_create 150,524
+- **claude-haiku-5-5**: 11 agent · 22 calls · out 18,084 · in 44 · cache_read 153,953 · cache_create 153,012
+
+### S4 round 3 — wf_199c1f52-d03 (29 agent, 85,607 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| review:invariants | claude-opus-5-5 | 23 | 13,277 | 46 | 1,589,468 | 146 |
+| synthesize:report | claude-sonnet-5-5 | 7 | 9,240 | 14 | 234,321 | 61 |
+| review:bugs | claude-opus-5-5 | 20 | 9,084 | 40 | 577,043 | 97 |
+| review:bugs | claude-opus-5-5 | 17 | 7,307 | 34 | 539,994 | 82 |
+| synthesize:report | claude-sonnet-5-5 | 2 | 6,474 | 4 | 25,243 | 38 |
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 5,364 | 6 | 42,514 | 212 |
+| review:invariants | claude-opus-5-5 | 12 | 4,504 | 24 | 574,736 | 59 |
+| machine:bash _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 2,776 | 4 | 15,407 | 41 |
+| machine:bash _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 2,733 | 4 | 15,407 | 37 |
+| triage | claude-sonnet-5-5 | 2 | 2,551 | 4 | 16,212 | 17 |
+| machine:DATABASE_URL= make e2e | claude-haiku-5-5 | 6 | 2,303 | 12 | 70,523 | 702 |
+| review:measurement | claude-opus-5-5 | 6 | 2,197 | 12 | 100,207 | 24 |
+| machine:node _acceptance/english-route-names/ran | claude-haiku-5-5 | 3 | 1,665 | 6 | 30,682 | 11 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,628 | 4 | 11,990 | 185 |
+| review:measurement | claude-opus-5-5 | 4 | 1,518 | 8 | 55,317 | 17 |
+| machine:bash _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 1,390 | 4 | 15,407 | 10 |
+| triage | claude-sonnet-5-5 | 2 | 1,320 | 4 | 13,450 | 12 |
+| machine:bash _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 1,293 | 4 | 15,407 | 10 |
+| refute:bo-nut.spec.ts | claude-sonnet-5-5 | 5 | 1,292 | 10 | 65,043 | 14 |
+| machine:bash _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 1,234 | 4 | 15,407 | 25 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 1,132 | 4 | 15,375 | 12 |
+| machine:bash _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 1,109 | 4 | 15,407 | 26 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 1,050 | 4 | 15,375 | 14 |
+| machine:node _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 830 | 4 | 15,412 | 8 |
+| machine:bash _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 662 | 4 | 15,407 | 8 |
+| machine:bash _acceptance/english-route-names/ran | claude-haiku-5-5 | 2 | 522 | 4 | 15,407 | 8 |
+| machine:DATABASE_URL= make e2e | claude-haiku-5-5 | 2 | 464 | 4 | 3,381 | 562 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 380 | 4 | 10,761 | 5 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 308 | 4 | 10,761 | 5 |
+
+
+wall: 1800s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| baseline | 1 | 5,364 | 42,514 | 212 | 07:40:55 | 07:44:27 |
+| machine | 15 | 20,791 | 285,994 | 1744 | 07:40:55 | 08:09:59 |
+| review | 6 | 37,887 | 3,436,765 | 1253 | 07:40:55 | 08:01:48 |
+| triage | 2 | 3,871 | 29,662 | 855 | 07:55:57 | 08:10:11 |
+| refute | 1 | 1,292 | 65,043 | 14 | 07:56:14 | 07:56:28 |
+| capture | 2 | 688 | 21,522 | 829 | 07:56:28 | 08:10:17 |
+| synthesize | 2 | 15,714 | 259,564 | 862 | 07:56:33 | 08:10:55 |
+
+- **claude-opus-5-5**: 6 agent · 82 calls · out 37,887 · in 164 · cache_read 3,436,765 · cache_create 324,049
+- **claude-sonnet-5-5**: 8 agent · 25 calls · out 26,929 · in 50 · cache_read 418,305 · cache_create 198,305
+- **claude-haiku-5-5**: 15 agent · 35 calls · out 20,791 · in 70 · cache_read 285,994 · cache_create 221,374
+

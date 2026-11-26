@@ -1,8 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "commit-search-depth": 5000,
   "packages": {
     ".": {
-      "release-type": "node",
+      "release-type": "simple",
+      "package-name": "onehub-inventory",
       "changelog-path": "CHANGELOG.md"
     }
   }

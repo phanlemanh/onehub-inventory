@@ -12,7 +12,7 @@ const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const ID = "4d415500-0001-4000-8000-000000000002";
 
 async function openRecord(page: Page): Promise<void> {
-  await page.goto(`/inventory?vai=ListAgent&ho-so=${ID}`);
+  await page.goto(`/inventory?role=ListAgent&record=${ID}`);
   await regionReady(page);
   await pageReady(page, { el: page.locator('[data-slot="listing-details-edit-open"]') });
   await page.locator('[data-slot="listing-offer"]').first().scrollIntoViewIfNeeded();
@@ -119,7 +119,7 @@ test("thong-bao-dung-cho-khi-khong-ho-so: with no record open a notice keeps its
     ["360", "414"].includes(info.project.name),
     "a price edit on a cell needs 768 px (row 4)",
   );
-  await page.goto("/inventory?vai=ListAgent");
+  await page.goto("/inventory?role=ListAgent");
   await regionReady(page);
   await pageReady(page);
   expect(
@@ -149,7 +149,7 @@ test("sua-tren-o-chi-tiet: from 768 px a detail cell edits one part, the open re
     ["360", "414"].includes(info.project.name),
     "phones do not edit in a cell (row 4); they edit in the record",
   );
-  await page.goto(`/inventory?vai=ListAgent`);
+  await page.goto(`/inventory?role=ListAgent`);
   await regionReady(page);
   await pageReady(page);
   const cell = page.locator(`[id$="${ID}-Listing_furnished"]`).first();

@@ -145,7 +145,7 @@ function assertAskOf(row: GridRow, message: { text: string; url: string }, origi
     .join(" · ");
   if (message.text !== `Hỏi về ${WORDS.unit.toLocaleLowerCase("vi")} ${where}`)
     throw new Error(`question names the wrong unit: ${message.text}`);
-  if (message.url !== new URL(`/inventory?ho-so=${encodeURIComponent(row.id)}`, origin).toString())
+  if (message.url !== new URL(`/inventory?record=${encodeURIComponent(row.id)}`, origin).toString())
     throw new Error(`question links to the wrong record: ${message.url}`);
 }
 

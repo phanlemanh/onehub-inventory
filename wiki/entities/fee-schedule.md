@@ -4,6 +4,7 @@ title: FeeItem (Khoản phí) và FeeSchedule (Thuế phí)
 links: [ontology/entities/FeeItem.yaml, ontology/entities/Listing.yaml]
 sources:
   ["_acceptance/thue-phi/contract.md", "docs/superpowers/specs/2026-11-14-thue-phi-design.md"]
+summary: khoản của thuế phí của sàn, và Về tay
 ---
 
 # FeeItem (Khoản phí) và FeeSchedule (Thuế phí)

@@ -1,0 +1,1 @@
+tools/commit_msg.py accepts the commit subjects the acceptance kit v3.0.0 writes (Gate 2 signoff, Veto, repin, wip(ban-giao)) so conventional-commits stops failing on pull requests through Gate 2 — PR #94

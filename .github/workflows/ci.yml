@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+    # ready_for_review: a draft skips the heavy tier, so leaving draft needs a run of its own.
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
@@ -12,8 +14,15 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Files the heavy tier does not read. A pull request that changes only these reuses an earlier
+  # green heavy run with the same inputs. A path not listed is an input: when unsure, it runs.
+  # Changing this list changes the rules of the game.
+  HEAVY_NOT_INPUTS: "docs/** wiki/** *.md _acceptance/** LO-TRINH.html"
+
 jobs:
-  check:
+  # The light tier, on every push.
+  quick:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -22,26 +31,68 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: make check
-      - run: npm run build
+      - run: make check-quick
+      - run: make build
 
+  # The heavy tier, part 1: browser tests, once quick is green and the pull request is not a draft.
   e2e:
+    needs: quick
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - name: Key of what this job reads
+        id: key
+        # The assignment fails the step when the tool fails: an empty key must never match.
+        run: |
+          key=$(python3 tools/ci_inputs.py key)
+          echo "key=heavy-ok-e2e-$key" >> "$GITHUB_OUTPUT"
+      - name: Look for a green run with the same inputs
+        id: earlier
+        if: github.event_name == 'pull_request'
+        uses: actions/cache/restore@v4
+        with:
+          path: .heavy-ok
+          key: ${{ steps.key.outputs.key }}
+      - name: Same inputs as a green run
+        if: steps.earlier.outputs.cache-hit == 'true'
+        run: |
+          echo "e2e not run again: same inputs as run $(sed -n 1p .heavy-ok) at commit $(sed -n 2p .heavy-ok)." \
+            | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/setup-node@v7
+        if: steps.earlier.outputs.cache-hit != 'true'
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: make e2e
+      - if: steps.earlier.outputs.cache-hit != 'true'
+        run: npm ci
+      - if: steps.earlier.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.earlier.outputs.cache-hit != 'true'
+        run: make e2e
+      - name: Record the green run
+        if: steps.earlier.outputs.cache-hit != 'true'
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          printf '%s\n%s\n' "$RUN_URL" "$COMMIT" > .heavy-ok
+          echo "e2e ran: make e2e is green at commit $COMMIT." | tee -a "$GITHUB_STEP_SUMMARY"
+      # A key that is already saved (a run with the same inputs saved it first) is no failure.
+      - if: steps.earlier.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: .heavy-ok
+          key: ${{ steps.key.outputs.key }}
 
-  # Row 1s: browser tests with a session, the isolation suite and the database tests, on a Postgres of this run only.
-  # Everything after the service is one command of the repository (db/scripts/ci-db.sh), connected as quy_hang_login.
+  # The heavy tier, part 2 (row 1s): browser tests with a session, the isolation suite and the database
+  # tests, on a Postgres of this run only (db/scripts/ci-db.sh, connected as quy_hang_login).
   e2e-db:
+    needs: quick
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     services:
       postgres:
         image: postgres:16
@@ -56,20 +107,69 @@ jobs:
           --health-retries 20
     steps:
       - uses: actions/checkout@v7
+      - name: Key of what this job reads
+        id: key
+        # The assignment fails the step when the tool fails: an empty key must never match.
+        run: |
+          key=$(python3 tools/ci_inputs.py key)
+          echo "key=heavy-ok-e2e-db-$key" >> "$GITHUB_OUTPUT"
+      - name: Look for a green run with the same inputs
+        id: earlier
+        if: github.event_name == 'pull_request'
+        uses: actions/cache/restore@v4
+        with:
+          path: .heavy-ok
+          key: ${{ steps.key.outputs.key }}
+      - name: Same inputs as a green run
+        if: steps.earlier.outputs.cache-hit == 'true'
+        run: |
+          echo "e2e-db not run again: same inputs as run $(sed -n 1p .heavy-ok) at commit $(sed -n 2p .heavy-ok)." \
+            | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/setup-node@v7
+        if: steps.earlier.outputs.cache-hit != 'true'
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: make ci-db
+      - if: steps.earlier.outputs.cache-hit != 'true'
+        run: npm ci
+      - if: steps.earlier.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.earlier.outputs.cache-hit != 'true'
+        run: make ci-db
+      - name: Record the green run
+        if: steps.earlier.outputs.cache-hit != 'true'
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          printf '%s\n%s\n' "$RUN_URL" "$COMMIT" > .heavy-ok
+          echo "e2e-db ran: make ci-db is green at commit $COMMIT." | tee -a "$GITHUB_STEP_SUMMARY"
+      # A key that is already saved (a run with the same inputs saved it first) is no failure.
+      - if: steps.earlier.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: .heavy-ok
+          key: ${{ steps.key.outputs.key }}
 
-  # Acceptance gate of the kit, run from a pinned tag so no kit file is copied here.
-  # Raising the kit version is a deliberate change of KIT_TAG; this file is in t1_skip_globs.
+  # The one check that stands for the tiers it waits for: green only when each is "success".
+  # e2e-db is not one of them (owner, 2026-11-18): it runs and reports, as before, but a slow
+  # run that reaches its 40-minute ceiling does not hold a merge.
+  check:
+    needs: [quick, e2e]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Every tier is green
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: python3 tools/ci_verdict.py
+
   gate:
     runs-on: ubuntu-latest
     env:
-      KIT_TAG: v2.38.1
+      KIT_TAG: v3.1.1
     steps:
       - uses: actions/checkout@v7
         with:
@@ -80,9 +180,9 @@ jobs:
       - name: Fetch the kit by tag, outside the repository
         run: |
           git init -q "$RUNNER_TEMP/kit"
-          git -C "$RUNNER_TEMP/kit" fetch -q --depth 1 https://github.com/phanlemanh/acceptance-gate-kit "refs/tags/$KIT_TAG"
+          git -C "$RUNNER_TEMP/kit" fetch -q --depth 1 https://github.com/phanlemanh/delivery-loop "refs/tags/$KIT_TAG"
           git -C "$RUNNER_TEMP/kit" checkout -q FETCH_HEAD
-          echo "CLAUDE_PLUGIN_ROOT=$RUNNER_TEMP/kit" >> "$GITHUB_ENV"
+          echo "CLAUDE_PLUGIN_ROOT=$RUNNER_TEMP/kit/plugins/acceptance-gate" >> "$GITHUB_ENV"
       - name: pre-merge-check
         run: |
           if [ -n "${GITHUB_BASE_REF:-}" ]; then

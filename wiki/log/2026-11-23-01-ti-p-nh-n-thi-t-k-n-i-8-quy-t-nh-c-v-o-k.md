@@ -1,0 +1,1 @@
+Tiếp nhận thiết kế: nối 8 quyết định đã có vào kiểm tra sẵn có (cỡ chạm, sáng/tối, điều hướng di động, màu trạng thái, độ dày bảng, định dạng số-ngày, căn lề và độ rộng cột), thêm hai dòng phông chữ; tầng thành phần lõi đủ 10/10

@@ -1,0 +1,30 @@
+{
+  "feature_plain": "Đường dẫn của Bảng hàng dùng từ tiếng Anh thay từ tiếng Việt; liên kết cũ người đã chép hay đã gửi vẫn mở đúng căn, đúng nơi, đúng góc nhìn.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ mở Bảng hàng đã lọc khi đường dẫn mang mã căn, toà hay dự án bằng từ mới; tìm ra đúng một căn thì mở luôn hồ sơ căn ấy."},
+    {"id": "AC-2", "p": "Sẽ mở hồ sơ căn, một nơi trên cây địa lý và một góc nhìn đã lưu bằng từ mới, như từ cũ từng mở; căn hay góc nhìn không còn thì vẫn có câu báo."},
+    {"id": "AC-3", "p": "Sẽ chỉ ghi từ mới vào mọi đường dẫn sản phẩm tạo ra: thanh địa chỉ, liên kết cột thứ hai, đường dẫn trong tin hỏi đầu chủ."},
+    {"id": "AC-4", "p": "Sẽ đưa một liên kết cũ sang đúng chỗ bằng một lần chuyển, giữ mọi lọc khác; người chưa đăng nhập, đăng nhập xong cũng về thẳng chỗ ấy (chờ Hỏi-1)."},
+    {"id": "AC-5", "p": "Sẽ giữ ba công tắc chỉ dùng khi phát triển (đóng vai, thêm dòng mẫu dài, tắt quyền trên bản mẫu) bằng từ mới; từ cũ của chúng thôi tác dụng, bản thật vẫn tắt cả ba."},
+    {"id": "AC-7", "p": "Sẽ có một lệnh quét chứng không còn từ truy vấn tiếng Việt nào trong mã, bài kiểm và công cụ, trừ danh sách giữ có tên; lệnh tự thử phá trên từng ô."},
+    {"id": "AC-8", "p": "Sẽ giữ xanh mọi bộ kiểm của kho, các bài trình duyệt có cơ sở dữ liệu của Bảng hàng và bài thử bản thật, cùng trang wiki nói từ mới."}
+  ],
+  "wont_do": [
+    {"id": "AC-6", "p": "Sẽ KHÔNG đổi dữ liệu góc nhìn đã lưu: dữ liệu ấy không mang từ truy vấn nào, góc nhìn cũ mở bằng từ mới như cũ."},
+    {"id": "OOS-1", "p": "Không đổi tên tệp bài kiểm tiếng Việt: hồ sơ đã ký chạy lại chúng bằng đúng tên ấy."},
+    {"id": "OOS-2", "p": "Không đổi những tên tiếng Việt không phải từ đường dẫn (tên nhóm bài «vùng của màn», cột vai của bước kiểm nối, mã dòng mẫu)."},
+    {"id": "OOS-3", "p": "Không đụng địa chỉ màn Tuỳ chỉnh của sàn và bản mẫu bộ nút: đã đổi ở PR #114."},
+    {"id": "OOS-4", "p": "Không sửa hồ sơ nghiệm thu, trang quyết định và kế hoạch cũ: là sử liệu, giữ chữ lúc viết."}
+  ],
+  "scope_plain": "Bốn thứ cố ý để ngoài vòng này:",
+  "coverage_plain": [
+    {"i": 0, "p": "Không quét hình thái: việc đổi tên một chiều, mỗi từ cũ đúng một từ mới. Mỗi dòng của bảng cũ → mới có tiêu chí đọc (AC-1 ô tìm, AC-2 hồ sơ và cây, AC-5 công tắc), mọi chỗ ghi có AC-3, liên kết cũ có AC-4, và lệnh quét chín từ trên năm vùng (AC-7) là bằng chứng đủ."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Tên mới của sáu từ không có trong từ điển được ghi như luật kho đã quyết, trong khi thật ra là một lựa chọn; giá đổi sau khi gộp bị ghi thấp. Đã tách thành câu hỏi Hỏi-3 cho anh, ba từ của ô tìm vẫn theo từ điển."},
+    {"i": 1, "p": "Phép đo góc nhìn đã lưu chỉ xem tên khoá, không xem dữ liệu bên trong. Đã đổi thành phép đo đi qua chính bộ ghi và bộ đọc thật, đòi dữ liệu không mang từ đường dẫn nào."},
+    {"i": 2, "p": "Lệnh quét thiếu ba cách mã có thể đọc từ cũ và tự thử quá mỏng. Đã thêm ba cách ấy và tự thử trên đủ 99 ô từ × cách đọc."},
+    {"i": 3, "p": "Liên kết cũ đi qua trang đăng nhập mà chỉ có ảnh và bài dựng tay làm bằng chứng. Đã thêm một bài trình duyệt trên cơ sở dữ liệu thật đi qua đăng nhập, đếm đúng một lần chuyển; ảnh in kèm căn và nơi mong đợi."},
+    {"i": 4, "p": "Vài lời hứa chưa có phép đo (mở hồ sơ bằng từ mới, câu báo căn đã xoá, công tắc tắt quyền trên bản thật và từ cũ của nó). Đã ghim từng lời hứa vào một phép đo."}
+  ]
+}

@@ -3,6 +3,7 @@ type: entity
 title: ListingOwner (Chủ của hàng)
 links: [ontology/entities/ListingOwner.yaml]
 sources: ["_acceptance/khai-lien-ket-chao-can/design.md", "https://dd.reso.org/DD2.1/"]
+summary: chủ của một lần chào, theo vai
 ---
 
 # ListingOwner (Chủ của hàng)

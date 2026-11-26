@@ -11,6 +11,7 @@ sources:
     "_acceptance/lop-rieng-cua-san/contract.md",
     "_acceptance/danh-muc-can-nhu-onehub-invest/de-xuat-nhap-la-luc-anh-xa.md",
   ]
+summary: trường riêng của sàn
 ---
 
 # CustomField (Trường riêng)
@@ -25,7 +26,7 @@ Tối đa 20 trường đang dùng, giữ ở cả cửa và cơ sở dữ liệ
 
 ## Where in the code
 
-`src/modules/company-config/`, bảng trong `db/migrations/010_lop_rieng_cua_san.sql`, ghi qua `/api/v1/company-layer`. Màn xem lại và sửa: `/tuy-chinh-san` (`src/modules/company-config/ui/`), nút theo bảng quyền như hàng 9e. Cột riêng hiện trên Bảng hàng sau tám cột chuẩn, theo vị trí (`src/modules/listings/ui/inventory-rows.ts`, `customColumnsOf` trong `rules.ts`). Luật thuần ở `src/modules/company-config/rules.ts`.
+`src/modules/company-config/`, bảng trong `db/migrations/010_lop_rieng_cua_san.sql`, ghi qua `/api/v1/company-layer`. Màn xem lại và sửa: `/company-layer?part=fields` (`src/modules/company-config/ui/`), nút theo bảng quyền như hàng 9e. Cột riêng hiện trên Bảng hàng sau tám cột chuẩn, theo vị trí (`src/modules/listings/ui/inventory-rows.ts`, `customColumnsOf` trong `rules.ts`). Luật thuần ở `src/modules/company-config/rules.ts`.
 
 ## History
 

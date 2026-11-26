@@ -83,7 +83,7 @@ function ledgerYaml(entries: Entry[]): string {
 }
 
 function ledger(root: string, entries: Entry[]) {
-  write(root, "design/so-khoi.yaml", ledgerYaml(entries));
+  write(root, "design/intake.yaml", ledgerYaml(entries));
 }
 
 /** The ledger line that takes the grid template in for `slug`. */
@@ -429,8 +429,31 @@ describe("hai lớp luật: chuyển tiếp × trạng thái", () => {
 
   it("kho không có sổ khối thì cả mười ô theo luật 1c", () => {
     const { root } = build(false);
-    expect(existsSync(join(root, "design/so-khoi.yaml"))).toBe(false);
+    expect(existsSync(join(root, "design/intake.yaml"))).toBe(false);
     expect(run(root).status).toBe(0);
+  });
+
+  it("sổ khối theo mảnh mà chưa có bản sao một tệp thì cổng đọc thẳng thư mục, quyết định 0023 vẫn bật", () => {
+    const { root } = build(false);
+    write(
+      root,
+      "design/intake/_shared.yaml",
+      "version: 1\nkeys:\n  blocks: khoi\n# khoi: one file per entry\n",
+    );
+    write(
+      root,
+      "design/intake/bang-nhieu-dong.yaml",
+      Object.entries(gridLine("moi-implemented"))
+        .map(([k, v]) => `${k}: ${v}`)
+        .join("\n") + "\n",
+    );
+    expect(existsSync(join(root, "design/intake.yaml"))).toBe(false);
+    const data = JSON.parse(run(root, "--report", "--json").stdout);
+    expect(data.nhap_kho).toBe(1);
+    // Control: without _shared.yaml the folder is not a ledger, and decision 0023 stays off.
+    const { root: bare } = build(false);
+    write(bare, "design/intake/bang-nhieu-dong.yaml", "ten: LuoiRegion\n");
+    expect(JSON.parse(run(bare, "--report", "--json").stdout).nhap_kho).toBe(0);
   });
 
   it("--report --json đếm dòng sổ khối và hồ sơ chuyển tiếp còn mở", () => {
@@ -903,10 +926,10 @@ describe("sổ khối", () => {
     expect(run(root).stdout).toMatch(/LuoiHai.*LuoiRegion/);
   });
   it("sổ của kho thật đọc được", () => {
-    const text = readFileSync(join(ROOT, "design/so-khoi.yaml"), "utf8");
+    const text = readFileSync(join(ROOT, "design/intake.yaml"), "utf8");
     expect(text).toMatch(/^khoi:/m);
     const r = run(ROOT);
-    expect(r.stdout).not.toContain("so-khoi.yaml · -");
+    expect(r.stdout).not.toContain("intake.yaml · -");
   });
 });
 
@@ -1168,7 +1191,7 @@ describe("khuôn bọc", () => {
 
 describe("kho thật và khuôn tệp chứng minh", () => {
   it("kho thật có sổ khối, lưới xanh", () => {
-    expect(existsSync(join(ROOT, "design/so-khoi.yaml"))).toBe(true);
+    expect(existsSync(join(ROOT, "design/intake.yaml"))).toBe(true);
     const r = run(ROOT);
     expect(r.stderr).toBe("");
     expect(r.status).toBe(0);
@@ -1339,7 +1362,7 @@ function skillProblems(text: string): string[] {
   const out: string[] = [];
   if (text.includes(OLD_RULE)) out.push(`còn câu cũ: ${OLD_RULE}`);
   for (const s of [
-    "design/so-khoi.yaml",
+    "design/intake.yaml",
     "docs/tri-thuc/wiki/chu-de/",
     "onehub-quy-hang",
     "Component",
@@ -1417,7 +1440,7 @@ describe("khối có trước luật sổ khối: miễn theo từng cặp gọi
   function writeLedger(root: string, lines: Entry[], pairs: Pair[], sha: string) {
     write(
       root,
-      "design/so-khoi.yaml",
+      "design/intake.yaml",
       [
         ledgerYaml(lines).trimEnd(),
         ...(pairs.length ? ["khoi_co_truoc:"] : []),
@@ -1486,11 +1509,11 @@ describe("khối có trước luật sổ khối: miễn theo từng cặp gọi
 
   it("một dòng của mục thiếu commit thì không đọc được", () => {
     const root = withOldRound([gridLine(), legacyLine()], PAIR);
-    const text = readFileSync(join(root, "design/so-khoi.yaml"), "utf8").replace(
+    const text = readFileSync(join(root, "design/intake.yaml"), "utf8").replace(
       / {4}commit: [0-9a-f]+\n/,
       "",
     );
-    write(root, "design/so-khoi.yaml", text);
+    write(root, "design/intake.yaml", text);
     expect(codesOf(root)).toEqual(expect.arrayContaining(["doc-loi", "so-khong-chung-tu"]));
   });
 
@@ -1544,8 +1567,8 @@ describe("khối có trước luật sổ khối: miễn theo từng cặp gọi
     commitAll(root, "ledger", LAW_DAY);
     write(
       root,
-      "design/so-khoi.yaml",
-      `${readFileSync(join(root, "design/so-khoi.yaml"), "utf8")}# sửa\n`,
+      "design/intake.yaml",
+      `${readFileSync(join(root, "design/intake.yaml"), "utf8")}# sửa\n`,
     );
     commitAll(root, "edit", "2026-11-13");
     return root;

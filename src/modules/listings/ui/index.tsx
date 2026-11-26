@@ -60,6 +60,7 @@ export {
 } from "./detail-cells";
 export { CopyLink, recordLink } from "./copy-link";
 export { ENTRY_COPY } from "./entry-copy";
+export { QUERY_WORD, OLD_LINK_WORD, englishQuery } from "./query-words";
 export { SAVED_VIEW_PARAM, gridView, savedViewHref, storedView } from "./saved-view-api";
 export { savedViewCopy, type SavedViewCopy, type SavedViewLabels } from "./saved-view-copy";
 export { savedViewsSection } from "./saved-views-section";

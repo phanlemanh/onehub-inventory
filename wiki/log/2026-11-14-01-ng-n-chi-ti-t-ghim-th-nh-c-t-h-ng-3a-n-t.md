@@ -1,0 +1,1 @@
+Ngăn chi tiết ghim thành cột (hàng 3a): nút Ghim ở đầu hồ sơ biến ngăn nổi thành cột cạnh bảng, vạch chia kéo được (Resizable, quyết định 0031), nhớ bằng cookie; ngăn nổi nay đứng dưới thanh công cụ của vùng — [ngan-chi-tiet-ghim-thanh-cot](../_acceptance/ngan-chi-tiet-ghim-thanh-cot/contract.md)

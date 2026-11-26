@@ -1,0 +1,81 @@
+schema_version: 1
+feature_slug: upgrade-repo-setup-0-10-1
+# Ma trận viết trước (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
+#   Nền của PR: git merge-base HEAD origin/main, hôm nay 1ad8469f. Commit lên đời 238099bb; commit ghi sổ 10f4e6fb.
+#   repo-setup: tag repo-setup-v0.10.1; bản mẫu plugins/repo-setup/presets/_core/team/dot.github/workflows/pr-title.yml.
+#   Dry-run trên HEAD: mọi danh sách hành động rỗng; trên nền: updated = pr-title.yml, merged = AGENTS.md (mô tả PR);
+#     chạy thật trên bản sao tạm của nền: ba tệp giống HEAD từng byte.
+#   make check trên HEAD: 148 tệp bài, 2466 đạt, 2 bỏ qua, «no heavy checks».
+#   .repo-setup.json: 0.9.0 → 0.10.1; 8 tệp mẫu đã xoá giữ 0.4.0; mã đổi cho pr-title.yml, AGENTS.md; thêm wiki/log.head.md.
+#   Job conventional-commits: khối dò và chấm trích từ pr-title.yml, chạy trong checkout sạch; 8 hook ở stage commit-msg, chỉ
+#     commit-message chấm; trên nền từ 2026-11-01: 7 Gate 2 signoff, 5 repin, 1 wip bị từ chối. Lệnh cũ: không có hook id
+#     conventional-pre-commit. Ruleset main: check, e2e, gate.
+#   Cặp hai chiều: rang/two-way.mjs, mỗi ca phá đúng một điều một phép đo canh.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    paths: ["**"]
+    expected: "exit 0; đầu ra có dòng 'Test Files  148 passed (148)', dòng 'Tests  2466 passed | 2 skipped (2468)', dòng 'design-assembly: 19 decisions held by 27 checks, each seen failing on a changed copy', dòng 'no heavy checks' và dòng 'make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance'; không thêm bài bỏ qua nào ngoài 2 bài (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: config:executors.script.rs0101_apply_again
+    long_running: 10
+    paths: [".repo-setup.json", ".github/workflows/pr-title.yml", "AGENTS.md"]
+    expected: "exit 0; dòng 'apply-again: apply.py of repo-setup-v0.10.1 has nothing left to do on HEAD (manifest 0.10.1, no marker); on the base it updates pr-title.yml, merges AGENTS.md and does nothing else; removed is the 8 samples on both, edited grows by AGENTS.md only; applied to a copy of the base it writes HEAD's three files byte for byte'; trên HEAD không danh sách hành động nào có tệp, trên nền không tệp nào bị tạo, đánh dấu, bỏ hay xung đột (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.rs0101_template_same
+    paths: [".github/workflows/pr-title.yml", ".repo-setup.json"]
+    expected: "exit 0; dòng 'template-same: pr-title.yml is the tag's template byte for byte and has the hash .repo-setup.json records; only the run of step 2 of conventional-commits changed, and it no longer names conventional-pre-commit'; conventional-title, trigger và quyền không đổi (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: config:executors.script.rs0101_commits_judged
+    long_running: 5
+    paths: [".github/workflows/pr-title.yml", ".pre-commit-config.yaml", "tools/commit_msg.py"]
+    expected: "exit 0; dòng 'commits-judged: block <sha> of pr-title.yml, in a clean checkout: 8 hooks run at commit-msg and only commit-message refuses the probe; 238099bb and 10f4e6fb pass, \"update stuff\" and the kit's signoff and repin subjects are refused; 13 commits of the base since 2026-11-01 would be refused; the base's command finds no hook conventional-pre-commit; no commit-msg hook and an unreadable config each stop with their own message'; tin sai khuôn, tin có dòng giống lỗi pre-commit và hai tiêu đề của kit đều bị từ chối, bản sao không hook và bản sao cấu hình hỏng không được qua (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.rs0101_agents_tail
+    paths: ["AGENTS.md", ".github/workflows/security.yml", ".github/workflows/pr-title.yml", "Makefile", "mk/**"]
+    expected: "exit 0; dòng 'agents-tail: AGENTS.md changes only the two split rules and the closing section \"What holds these rules\"; secret-scan, conventional-title, conventional-commits, the wiki lint and the module boundaries all exist'; không dòng nào khác của AGENTS.md đổi (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.rs0101_manifest
+    paths: [".repo-setup.json", "wiki/log.head.md"]
+    expected: "exit 0; dòng 'manifest: .repo-setup.json goes from 0.9.0 to 0.10.1; every file it records is at 0.10.1 except the 8 deleted samples, which keep 0.4.0; the hash changes for pr-title.yml and AGENTS.md only and wiki/log.head.md is added with the hash of the file'; không khoá đầu nào khác đổi, không mục nào bị bỏ (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.rs0101_change_set
+    paths: ["**"]
+    expected: "exit 0; dòng 'change-set: 238099bb changes pr-title.yml, .repo-setup.json and AGENTS.md; 10f4e6fb one wiki/log file; besides them the pull request changes only this dossier and the files of its round, none a T3 path'; không tệp ngoài danh sách, không đường T3 (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.rs0101_two_way
+    long_running: 10
+    paths: ["_acceptance/upgrade-repo-setup-0-10-1/rang/**"]
+    expected: "exit 0; node --test báo 'tests 12', 'pass 12', 'fail 0': năm ca xanh trên cây và bảy ca đỏ đúng lời trên bản sao hỏng (pr-title.yml thêm một dòng; pr-title.yml của nền; judge luôn trả 0; phép dò không còn dừng; một dòng sau mục kết của AGENTS.md; version 0.10.0; commit thêm src/modules/identity/extra.ts)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.rs0101_ruleset
+    paths: [".github/workflows/pr-title.yml"]
+    expected: "exit 0; dòng 'ruleset: main requires check, e2e, gate only, no classic protection adds a check, and merge commits or rebase are allowed, so conventional-commits judges the commits without blocking a merge'; conventional-title và conventional-commits không phải check bắt buộc (should-NOT-fire)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

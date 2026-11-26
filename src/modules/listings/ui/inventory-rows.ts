@@ -9,6 +9,7 @@ import type { Listing, ListingUnit, Unit } from "@/generated/ontology";
 import type { CustomKind } from "../custom-rules";
 
 import { DETAIL_COLUMN_FIELDS, type DetailColumnWords } from "./detail-cells";
+import { QUERY_WORD } from "./query-words";
 
 /** Region states a development build may open with `?state=`; anything else is the loaded grid. */
 const STATE_PARAMS = ["loading", "empty", "error", "partial", "forbidden"] as const;
@@ -169,7 +170,7 @@ export function inventoryFiltersFrom(param: string | undefined): ColumnFilters {
 }
 
 /**
- * Development only (row 2b, AC-8): `?mau=bien` adds nine rows the sample company does not have — a 14-character unit
+ * Development only (row 2b, AC-8): `?sample=edge` adds nine rows the sample company does not have — a 14-character unit
  * code, a price in the hundreds of billions, a monthly rent, a unit without a price, and the six statuses — so the phone
  * cards can be measured at 360 px. Honoured only outside production, like `?state=`; anything else adds nothing.
  */
@@ -177,7 +178,7 @@ export function inventoryEdgeRowsFrom(
   param: string | undefined,
   env: string | undefined,
 ): GridRow[] {
-  if (env === "production" || param !== "bien") return [];
+  if (env === "production" || param !== "edge") return [];
   const base = {
     "Listing.buildingName": "[MAU] Biên",
     "Listing.subdivisionName": "[MAU] Một cái tên rất dài để thử cắt chữ ở thẻ",
@@ -283,9 +284,9 @@ export interface SearchSuggestion {
 
 /** The search parameter of the inventory address for each kind (read by `inventoryOpeningFor` through the page). */
 export const SEARCH_PARAM: Readonly<Record<SearchKind, string>> = {
-  unit: "ma",
-  building: "toa",
-  subdivision: "du-an",
+  unit: QUERY_WORD.unit,
+  building: QUERY_WORD.building,
+  subdivision: QUERY_WORD.subdivision,
 };
 
 /** At most this many suggestions show under the box. */

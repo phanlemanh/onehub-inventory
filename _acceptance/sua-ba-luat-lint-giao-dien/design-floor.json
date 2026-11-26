@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "bac": "M2",
+  "ly_do": "nguồn design/tokens.json · design/component-registry.json",
+  "tri_thuc": {
+    "trang_thai": "doc-duoc",
+    "ly_do": "",
+    "goc": "/var/folders/6x/1dlzszm51wzbt20dn5y1lgzh0000gn/T/design-floor-tri-thuc/a7ad5f1e650321ac325734e9199f266c9b990212",
+    "chi_muc": {
+      "path": "knowledge/index.json",
+      "byte": 21239,
+      "token": 5310
+    },
+    "tep": [
+      {
+        "id": "component-catalog",
+        "path": "knowledge/component-catalog.md",
+        "diem": 1,
+        "byte": 9231,
+        "token": 2308
+      },
+      {
+        "id": "content-design",
+        "path": "knowledge/content-design.md",
+        "diem": 1,
+        "byte": 5254,
+        "token": 1314
+      }
+    ]
+  },
+  "reuse_plan": null,
+  "flow": null,
+  "dong": [
+    "Bậc kho: M2 — nguồn design/tokens.json · design/component-registry.json",
+    "Tri thức thiết kế: chỉ mục (5310 token) + knowledge/component-catalog.md (2308 token), knowledge/content-design.md (1314 token)"
+  ]
+}

@@ -1,7 +1,7 @@
 // The component manifest: the components the source exports and the variants each one declares,
 // in the registry format the acceptance kit reads. It is derived: a component is changed in its
 // source file, and this file is written again from the source.
-// Usage: node tools/design-assembly/components.mjs [--write] [--target DIR]
+// Usage: node tools/design-assembly/components.mjs [--write | --out-of-git | --in-git] [--target DIR]
 import {
   existsSync,
   mkdirSync,
@@ -18,7 +18,8 @@ import { fileURLToPath } from "node:url";
 import { adapter as library } from "./adapters/shadcn.mjs";
 import { newerProblem } from "./contract.mjs";
 import { lineWidth, renderJson } from "./json.mjs";
-import { frontMatter, readPages } from "./screens.mjs";
+import { frontMatter, KEY, readPages } from "./screens.mjs";
+import { DEFAULT_FOLDER, leftOut, sourceFolder } from "./source-folders.mjs";
 
 // The file a repository gets when nothing names another one, and the folder read by default.
 export const REGISTRY = "design/component-registry.json";
@@ -28,20 +29,67 @@ export const COMPONENTS_DECISION = "component-manifest";
 // The shape of the file: the acceptance kit reads the version as a string.
 const VERSION = "2";
 
-// The folders of every component library the repository installed: the library's own, then the
-// folder of each other registry its settings name, when that folder is there.
-export function libraryFolders(root) {
-  const file = path.join(root, library.settingsFile);
-  let settings;
+// Code the repository did not write, where it keeps no component settings: a vendor's components,
+// by the usual names of their folders, at any depth. The adapter names the folders.
+export const VENDOR = new RegExp(`(^|\\/)components\\/(${library.vendorFolders.join("|")})\\/`);
+
+// A JSON file of the repository, or null when it is not there or cannot be read.
+function jsonAt(root, file) {
   try {
-    settings = existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : null;
+    const full = path.join(root, file);
+    return existsSync(full) ? JSON.parse(readFileSync(full, "utf8")) : null;
   } catch {
-    settings = null;
+    return null;
   }
+}
+
+// The folders of every component library the repository installed: the library's own, then the
+// folder of each other registry its settings name, when that folder is there. An alias of the
+// package's own is read through the package's exports.
+export function libraryFolders(root) {
+  const settings = jsonAt(root, library.settingsFile);
+  const pkg = jsonAt(root, "package.json");
+  // The folder `@/` stands for: the package's source folder.
+  const source = sourceFolder(root).folder;
   const others = library
-    .registryFoldersIn(settings)
+    .registryFoldersIn(settings, pkg, source)
     .filter((folder) => existsSync(path.join(root, folder)));
-  return [library.folderIn(settings) ?? library.folder, ...others];
+  return [library.folderIn(settings, pkg, source) ?? library.folderUnder(source), ...others];
+}
+
+// The parts of the repository that are a component library's: a folder a library keeps to itself,
+// written `folder/`, and, where the library shares its folder with the repository's own
+// components, each file of that folder named for one of the library's items. A folder the library
+// keeps to itself is one named for it, `ui`, or another registry's.
+export function libraryParts(root) {
+  const [main, ...others] = libraryFolders(root);
+  const shared = ownFolder(main) === null;
+  const items = new Set(library.items);
+  const files = shared
+    ? Object.keys(readFolder(root, main))
+        .filter((file) => path.posix.dirname(file) === main)
+        .filter((file) => items.has(path.posix.basename(file).replace(/\.[jt]sx$/, "")))
+    : [];
+  return [...(shared ? files : [`${main}/`]), ...others.map((folder) => `${folder}/`)];
+}
+
+// Whether a file is one of the parts of a library: under a folder, or that very file. A part
+// written without the closing slash names a folder unless it names a source file.
+export function inLibrary(file, parts) {
+  return parts.some((part) => {
+    const folder = part.endsWith("/") || !/\.[jt]sx?$/.test(part);
+    return folder ? file.startsWith(part.endsWith("/") ? part : `${part}/`) : file === part;
+  });
+}
+
+// Whether the repository keeps the component settings its library's parts are read from.
+export const keepsSettings = (root) => jsonAt(root, library.settingsFile) !== null;
+
+// Which files of the repository are a library's: the parts its settings give, and always the
+// usual names of the folders, so a repository that keeps settings loses none it had.
+export function libraryTest(root) {
+  const parts = keepsSettings(root) ? libraryParts(root) : [];
+  return (file) => VENDOR.test(file) || inLibrary(file, parts);
 }
 
 // A folder of templates: the frames screens are built in, whatever they import.
@@ -61,6 +109,7 @@ export function readFolder(root, folder) {
     if (!existsSync(full)) return;
     for (const name of readdirSync(full).sort()) {
       const relative = path.posix.join(dir, name);
+      if (leftOut(folder, relative)) continue;
       if (statSync(path.join(root, relative)).isDirectory()) walk(relative);
       else if (/\.[jt]sx$/.test(name))
         found[relative] = readFileSync(path.join(root, relative), "utf8");
@@ -349,14 +398,14 @@ function declaration(text, name) {
 }
 
 // Reads every source file once: the manifest, and the heights the controls declare.
-// The files a file imports among the given ones: `@/` is the source folder, and a relative path
-// is read from the file's own folder.
-function importsAmong(file, text, files) {
+// The files a file imports among the given ones: `@/` is the source folder, `source`, and a
+// relative path is read from the file's own folder.
+function importsAmong(file, text, files, source = DEFAULT_FOLDER) {
   const found = new Set();
   for (const match of text.matchAll(/(?:from|import)\s*\(?\s*["']([^"']+)["']/g)) {
     const spec = match[1];
     let base;
-    if (spec.startsWith("@/")) base = `src/${spec.slice(2)}`;
+    if (spec.startsWith("@/")) base = path.posix.join(source, spec.slice(2));
     else if (spec.startsWith(".")) base = path.posix.join(path.posix.dirname(file), spec);
     else continue;
     const hit = ["", ".tsx", ".ts", ".jsx", ".js", "/index.tsx", "/index.ts"]
@@ -370,13 +419,13 @@ function importsAmong(file, text, files) {
 // A file's atomic level, computed and never declared: how deep it imports other components. None
 // is an atom, one step a molecule, two or more an organism. A file in a folder of templates is a
 // template, and so is a component a page of a screen kind names as the frame of its screens.
-function levels(files) {
+function levels(files, source) {
   const depth = new Map();
   const visit = (file, seen) => {
     if (depth.has(file)) return depth.get(file);
     if (seen.has(file)) return 0;
     const next = new Set(seen).add(file);
-    const below = importsAmong(file, files[file], files).map((other) => visit(other, next));
+    const below = importsAmong(file, files[file], files, source).map((other) => visit(other, next));
     const value = below.length === 0 ? 0 : 1 + Math.max(...below);
     depth.set(file, value);
     return value;
@@ -391,7 +440,7 @@ function levels(files) {
 export function templateNames(pages) {
   return new Set(
     Object.values(pages ?? {})
-      .map((text) => frontMatter(text)?.khuon?.ten)
+      .map((text) => frontMatter(text)?.[KEY.frame]?.[KEY.frameName])
       .filter((name) => typeof name === "string"),
   );
 }
@@ -425,12 +474,15 @@ function propsOf(signature) {
 // Props every component takes, which say nothing about this one.
 const COMMON_PROPS = new Set(["className", "children"]);
 
-function survey(given, { library, pages } = {}) {
+function survey(given, { library, pages, source } = {}) {
+  // No list at all means no library is known, and every component is listed as the library's,
+  // as before there was a list; a list, even an empty one, says which files are.
+  const known = library !== undefined && library !== null;
   const libraries = [library].flat().filter(Boolean);
   const files = Object.fromEntries(
     Object.entries(given).map(([file, text]) => [file, withoutComments(text)]),
   );
-  const level = levels(files);
+  const level = levels(files, source);
   const templates = templateNames(pages);
   // Variant sets by file: a component reads a set of its own file before one of the same name
   // declared elsewhere.
@@ -510,10 +562,7 @@ function survey(given, { library, pages } = {}) {
         category: "component",
         file,
         level: templates.has(name) ? "template" : level(file),
-        source:
-          libraries.length === 0 || libraries.some((folder) => file.startsWith(`${folder}/`))
-            ? "library"
-            : "own",
+        source: !known || inLibrary(file, libraries) ? "library" : "own",
         ...(drawnWith.length > 0 ? { parts: drawnWith } : {}),
         ...(props.length > 0 ? { props } : {}),
         ...(control ? { control: true } : {}),
@@ -610,8 +659,10 @@ export function regenerated(root) {
   const read = check.own ?? check.folder;
   const files = readFolder(root, read);
   const options = {
-    library: [check.folder, ...(check.libraries ?? [])],
+    // Where the library shares its folder, the check lists the library's parts one by one.
+    library: check.library ?? [check.folder, ...(check.libraries ?? [])],
     pages: check.pages ? readPages(root, check.pages) : {},
+    ...(check.source ? { source: check.source } : {}),
   };
   const manifest = readComponents(files, options);
   return {
@@ -623,6 +674,85 @@ export function regenerated(root) {
     files,
     options,
   };
+}
+
+// The components of the repository, as the tool's manifest would list them now; where the tool
+// data names no manifest, read through the components adapter from the library's folder and the
+// repository's own beside it.
+export function componentsOf(root) {
+  let made;
+  try {
+    made = regenerated(root);
+  } catch (error) {
+    return {
+      read: null,
+      problem: `the component-manifest check of design/theme.json cannot be read: ${error.message}`,
+      components: [],
+    };
+  }
+  if (made) return { read: made.read, components: made.data.components };
+  const folders = libraryFolders(root);
+  const read = ownFolder(folders[0]) ?? folders[0];
+  if (!existsSync(path.join(root, read))) return { read: null, missing: read, components: [] };
+  const answer = sourceFolder(root);
+  const { folder: source } = answer;
+  try {
+    return {
+      read,
+      // How the folder was learnt, where it is not the usual one.
+      ...(source === DEFAULT_FOLDER ? {} : { said: answer.said }),
+      components: readComponents(readFolder(root, read), { library: folders, source }).components,
+    };
+  } catch (error) {
+    return { read: null, problem: `${read} cannot be read: ${error.message}`, components: [] };
+  }
+}
+
+// The check that says a derived file is kept out of git, as the tool data lists it.
+export const UNTRACKED = "untracked";
+
+// The check to carry over when the list of the manifest's checks is built again: one for `file`
+// when the repository keeps its manifest out of git, whatever file it named for it before. So the
+// choice follows the manifest to a new path, and is never dropped without a word.
+export function outOfGitChecks(theme, file) {
+  const asked = (theme?.checks?.[COMPONENTS_DECISION] ?? []).some(
+    (check) => check.kind === UNTRACKED,
+  );
+  return asked ? [{ kind: UNTRACKED, file }] : [];
+}
+
+// The tool data with the manifest kept out of git, or back in it. Only the manifest's own list of
+// checks changes; a repository whose data already says so gets the very same data back.
+export function withManifestOutOfGit(theme, file, out) {
+  const checks = theme.checks?.[COMPONENTS_DECISION] ?? [];
+  const has = checks.some((check) => check.kind === UNTRACKED && check.file === file);
+  if (out === has) return theme;
+  const others = checks.filter((check) => check.kind !== UNTRACKED);
+  const next = out ? [...others, { kind: UNTRACKED, file }] : others;
+  return { ...theme, checks: { ...theme.checks, [COMPONENTS_DECISION]: next } };
+}
+
+// Keeps the manifest out of git from now on, or takes that back. It writes the choice to the tool
+// data and says what is left for a person to do in git; it never touches the index or .gitignore.
+function choose(root, made, out) {
+  const themeFile = path.join(root, "design/theme.json");
+  const theme = JSON.parse(readFileSync(themeFile, "utf8"));
+  const file = made.check.file;
+  const next = withManifestOutOfGit(theme, file, out);
+  if (next !== theme) writeFileSync(themeFile, renderJson(next, lineWidth(root)));
+  if (out) {
+    stdout.write(
+      `component manifest: ${file} is kept out of git from now on. The gate writes it again from ${made.read} before it checks, and is red while git tracks the file or does not ignore it.
+  to finish: add ${file} to .gitignore, then run git rm --cached ${file}
+`,
+    );
+  } else {
+    stdout.write(
+      `component manifest: ${file} is kept in git again, and is held to ${made.read} as before.
+  to finish: take ${file} out of .gitignore, then run git add ${file}
+`,
+    );
+  }
 }
 
 function main() {
@@ -638,6 +768,13 @@ function main() {
     );
     exit(0);
   }
+  const out = args.includes("--out-of-git");
+  const back = args.includes("--in-git");
+  if (out && back) {
+    stderr.write("component manifest: give one of --out-of-git and --in-git, not both\n");
+    exit(1);
+  }
+  if (out || back) return choose(root, made, out);
   const { check, read, files, options, data: manifest } = made;
   const full = path.join(root, check.file);
   const before = existsSync(full) ? readFileSync(full, "utf8") : null;
