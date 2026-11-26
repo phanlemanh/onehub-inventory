@@ -5,7 +5,7 @@ slug: sua-ba-luat-lint-giao-dien
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config]
-status: implemented
+status: verified
 approved_by: Manh Phan
 approved_at: 2026-11-26
 design_doc: docs/superpowers/specs/2026-11-26-sua-ba-luat-lint-giao-dien-design.md
