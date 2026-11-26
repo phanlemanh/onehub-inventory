@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "den": "2e4292f1541b36ea29c1b8f37d8e16da4327f4a1",
-  "base": "ea774a0f55a5cda763e63f3f61051fd5a98805ba",
+  "den": "96f2b5834f3d43dbc9c2b3345b66eff9537aac04",
+  "base": "c68aeac2facc4fe725dcad61583fa6953cbec9c2",
   "ghim": {
     "dang-nhap": "f38f955e60cb5db33bb5a3ed743f88d5565546d4",
     "danh-sach-khung": "718fde285963e50e4e31eeac95aa5c02b003671b",
@@ -19,7 +19,7 @@
     }
   ],
   "khong_do": [],
-  "ngoai_ban_do": 20,
+  "ngoai_ban_do": 21,
   "nhom": [
     "dang-nhap",
     "danh-sach-khung",

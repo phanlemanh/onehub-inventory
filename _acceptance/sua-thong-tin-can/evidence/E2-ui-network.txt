@@ -1,5 +1,4 @@
-NETWORK (document/fetch/xhr)
-1440 200 GET http://127.0.0.1:3487/inventory?role=ListAgent&record=4d415500-0001-4000-8000-000000000002
-360 200 GET http://127.0.0.1:3487/inventory?role=ListAgent&record=4d415500-0001-4000-8000-000000000002
-
-CONSOLE error/warning
+Playwright MCP, port 3487: static requests only, no fetch/XHR failures; console errors at load: see below
+[     267ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://127.0.0.1:3487/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:761
+[     308ms] [LOG] [HMR] connected @ http://127.0.0.1:3487/_next/static/chunks/node_modules_next_dist_05y3oi5z9mc_3._.js:761
+[     417ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:3487/favicon.ico:1

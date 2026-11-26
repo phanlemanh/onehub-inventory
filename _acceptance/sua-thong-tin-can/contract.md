@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui, api]
 screens: [inventory]
-status: implemented
+status: machine-cleared
 approved_by: Manh Phan
 approved_at: 2026-11-17T03:37:45Z
 design_doc: docs/superpowers/specs/2026-11-17-sua-thong-tin-can-design.md
@@ -124,3 +124,10 @@ sai luật) × vai (ba vai sửa · Quản trị sàn) × khổ (360 · 1440). T
   nên không ghim lại được ở nhánh khác (phán quyết (e) của giám sát, nợ cho hàng «siết bộ kiểm lần hai»). Hàng 3g đổi hai
   tệp bài nó dùng chung (`tests/e2e/sheet.spec.ts`, `tests/e2e/screens/inventory-width.spec.ts`) — cùng sửa ấy đã ghi sửa
   sau ký và ghim lại ở `bang-hang-ban-doc` và `luu-goc-nhin-cot-hai`.
+- Ngoài-1 (máy định tuyến 2026-11-26, đề xuất S4 known-limits): Người dùng thật không bị ảnh hưởng: máy chủ thật vẫn từ chối giá trị sai của cột riêng. Chỉ có bản mẫu dùng cho thử nghiệm nhận cả giá trị mà máy chủ sẽ từ chối, nên một bài thử có thể báo xanh dù máy chủ thật trả lỗi. — `src/modules/listings/save-door.ts`
+- Ngoài-2 (máy định tuyến 2026-11-26, đề xuất S4 known-limits): Khi căn vừa bị xoá hoặc không còn thuộc sàn, ô vẫn hiện giá trị người dùng vừa gõ dù chưa lưu, trong khi thông báo nói ô đã về giá trị cũ. Tải lại trang là thấy đúng. — `src/modules/listings/ui/use-listing-cell-edit.tsx`
+- Ngoài-3 (máy định tuyến 2026-11-26, đề xuất S4 known-limits): Bài kiểm tra chưa chứng minh được rằng Quản trị sàn không mở được ô cột riêng. Nếu sau này có người sửa lưới làm hở quyền, bài vẫn xanh. — `tests/sua-thong-tin-can.test.tsx`
+- Ngoài-4 (máy định tuyến 2026-11-26, đề xuất S4 known-limits): Một số bài kiểm tra về giá trị cột riêng đo bản chép trong bài, không đo đường máy chủ thật. Nếu đường thật lệch đi, các bài này không báo. — `tests/sua-thong-tin-may-chu.test.ts`
+- Ngoài-5 (máy định tuyến 2026-11-26, đề xuất S4 known-limits): Một bài kiểm tra màn dùng thân trả lời lỗi viết tay. Nếu máy chủ đổi dạng trả lời, bài này không phát hiện. — `tests/sua-thong-tin-can.test.tsx`
+- Ngoài-6 (máy định tuyến 2026-11-26, đề xuất S4 known-limits): Bộ canh giữ để không ai thêm bảng mã lỗi thứ hai còn hở: vài cách viết so mã vẫn lọt. Người dùng có thể gặp thông báo lỗi lệch nhau nếu sau này có người viết như vậy. — `tests/mot-luat-ghi.test.ts`
+- Ngoài-7 (máy định tuyến 2026-11-26, đề xuất S4 known-limits): Bài kiểm tra việc bấm ⌘B không mở rộng thanh bên chưa chứng minh phím có tới nơi. Nếu phím hỏng, bài vẫn xanh. — `tests/e2e/app-shell.spec.ts`
