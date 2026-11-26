@@ -10,10 +10,12 @@ import type { ListingStandardStatus } from "@/generated/ontology";
 import { formatMoney, statusLabel } from "@/lib/format";
 
 import { readCustomValue, sameCustomValue } from "../custom-rules";
+import { detailUndoable } from "../edit-rules";
 import { readPastePrice, readPasteStatus, readStatusText } from "../paste-rules";
 import type { ListingChange, PriceOrStatusChange } from "../save-door";
 
 import { CELL_EDIT_COPY, type CellEditLabels } from "./cell-edit-copy";
+import { isDetailColumn } from "./detail-cells";
 import { cellKeyOf, type CustomCellField } from "./listing-cell-edit";
 import { pasteWords } from "./listing-paste-copy";
 
@@ -132,7 +134,8 @@ export function planPaste(
         row,
         field: cellKeyOf(custom) as FieldKey,
         change: changeFor(custom, read.value),
-        undoable: true,
+        // A detail's words longer than the limit, kept from an imported sheet, cannot be pasted back (row 3g).
+        undoable: !isDetailColumn(field) || detailUndoable(row[field]),
         cell: read.value,
       });
       rows.add(row.id);

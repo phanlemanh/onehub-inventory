@@ -29,7 +29,7 @@ import {
   type SaveRequest,
 } from "../save-door";
 
-import { priceUndoable } from "../edit-rules";
+import { detailUndoable, priceUndoable } from "../edit-rules";
 
 import { CELL_EDIT_COPY as COPY, type CellEditLabels } from "./cell-edit-copy";
 import {
@@ -353,16 +353,20 @@ export function useListingCellEdit({
         [CONFIRMED]: row[CONFIRMED],
       };
       const at = new Date().toISOString();
+      // Words longer than the limit, kept from an imported sheet, cannot be written back: no undo then.
+      const undoable = !isDetailColumn(key) || detailUndoable(was);
       patch(row.id, { [key]: edit.value, [CONFIRMED]: at });
       const outcome = await runDoorChange({
-        done: COPY.done(what(edit.value), true),
+        done: COPY.done(what(edit.value), undoable),
         undone: COPY.undone(what(was)),
         write: () => write(row.id, changeFor(field, edit.value), at),
-        undo: async () => {
-          const result = await write(row.id, changeFor(field, was), new Date().toISOString());
-          if (result === "saved") patch(row.id, before);
-          return result;
-        },
+        undo: undoable
+          ? async () => {
+              const result = await write(row.id, changeFor(field, was), new Date().toISOString());
+              if (result === "saved") patch(row.id, before);
+              return result;
+            }
+          : undefined,
         failed: (why) => COPY.saveFailed(what(edit.value).toLocaleLowerCase("vi"), why),
         undoFailed: (why) => COPY.undoFailed(labels, unit, shown(edit.value), why),
       });

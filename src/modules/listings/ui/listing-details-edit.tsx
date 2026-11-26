@@ -25,7 +25,13 @@ import type { Listing, ListingFurnished, ListingOccupantType } from "@/generated
 import { PermittedAction } from "@/modules/identity/ui";
 
 import { confirmationAge } from "../record";
-import { DETAILS_TEXT_LIMIT, FURNISHED_VALUES, OCCUPANT_VALUES, detailText } from "../edit-rules";
+import {
+  DETAILS_TEXT_LIMIT,
+  FURNISHED_VALUES,
+  OCCUPANT_VALUES,
+  detailText,
+  detailUndoable,
+} from "../edit-rules";
 import type { DetailsChange, ListingChange } from "../save-door";
 
 import { RECORD_COPY } from "./record-copy";
@@ -178,9 +184,7 @@ export function ListingDetailsEdit({
     api.changed();
     const back = undoOf(details, change);
     // Words longer than the limit, kept from an imported sheet, cannot be written back: no undo then (row 3g).
-    const undoable = ![back.legalStatus, back.financing].some(
-      (v) => typeof v === "string" && !detailText(v).ok,
-    );
+    const undoable = detailUndoable(back.legalStatus) && detailUndoable(back.financing);
     // The save already went through: the shared door says it and offers undo by row 4's one rule.
     await runDoorChange({
       done: RECORD_COPY.detailsDone(what),

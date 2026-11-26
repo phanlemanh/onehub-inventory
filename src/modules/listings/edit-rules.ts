@@ -175,3 +175,11 @@ export function detailText(raw: string): { ok: true; value: string | null } | { 
   if (value.length > DETAILS_TEXT_LIMIT) return { ok: false };
   return { ok: true, value: value === "" ? null : value };
 }
+
+/**
+ * Whether a detail's value from before an edit can be written back by «Hoàn tác» (row 3g): a choice or none always;
+ * words only as the save door takes them, so words longer than DETAILS_TEXT_LIMIT, kept from an imported sheet, cannot.
+ */
+export const detailUndoable = (previous: unknown): boolean =>
+  typeof previous !== "string" ||
+  (detailText(previous).ok && previous.trim() === previous && previous !== "");

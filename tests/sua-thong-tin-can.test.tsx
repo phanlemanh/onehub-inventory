@@ -17,7 +17,12 @@ import { FRAME_COPY } from "../src/components/templates/frame-copy";
 import type { Listing } from "../src/generated/ontology";
 import { label } from "../src/modules/company-config";
 import { SessionRoles } from "../src/modules/identity/ui";
-import { applyChange, completeness, type ListingChange } from "../src/modules/listings";
+import {
+  applyChange,
+  completeness,
+  detailUndoable,
+  type ListingChange,
+} from "../src/modules/listings";
 import {
   DetailsEditProvider,
   ListingCellEdit,
@@ -585,6 +590,41 @@ describe("sua-thong-tin-can · bốn cột trên lưới (lối C)", () => {
       plan.wrong.map((w) => w.why),
       "o-chi-tiet-dan: sai kiểu",
     ).toEqual(["Dài quá 200 ký tự."]);
+  });
+
+  it("hoan-tac-chu-cu-dai: words already longer than 200 from a sheet are not offered back, on a cell or a paste", () => {
+    const long = "x".repeat(201);
+    expect(
+      [null, undefined, "Furnished", "Sổ hồng", "x".repeat(200), long, " Sổ hồng", ""].map(
+        detailUndoable,
+      ),
+      "hoan-tac-chu-cu-dai: luật",
+    ).toEqual([true, true, true, true, true, false, false, false]);
+    const fields = detailCellFields(WORDS);
+    const customs = new Map(fields.map((f) => [f.key!, f] as const));
+    const row = {
+      ...rows[0]!,
+      "Listing.legalStatus": long,
+      "Listing.financing": "Vay 50%",
+    } as GridRow;
+    const plan = planPaste(
+      {
+        cells: [
+          { row, field: "Listing.legalStatus" as never, raw: "Sổ hồng", open: true },
+          { row, field: "Listing.financing" as never, raw: "Vay 70%", open: true },
+        ],
+        beyond: { rows: 0, columns: 0 },
+      },
+      EDIT_LABELS,
+      (f) => String(f),
+      [],
+      customs as never,
+      (f, v) => detailChange(f.key as never, v === null ? null : String(v), WORDS),
+    );
+    expect(
+      [...plan.writes.values()].map((w) => w.undoable),
+      "hoan-tac-chu-cu-dai: dán",
+    ).toEqual([false, true]);
   });
 });
 
