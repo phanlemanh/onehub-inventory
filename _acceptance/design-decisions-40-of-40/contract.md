@@ -5,7 +5,7 @@ slug: design-decisions-40-of-40
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [config, docs]
-status: signed-off
+status: implemented
 veto_state: mo
 veto_opened_at: 2026-11-26T06:30:00Z
 approved_by:
@@ -33,8 +33,8 @@ Source input: lời chủ kho ngày 2026-11-26: «Phân tích và đề xuất c
 
 - AC-1: Given nhánh ở HEAD, When chạy `make check`, Then lệnh thoát 0, và đầu ra có các dòng
   `design-assembly: 25 decisions held by 36 checks, each seen failing on a changed copy`,
-  `component manifest: design/component-registry.json is up to date (294 components)`, `determinism: 62/73 = 85%` và
-  `Tests  2688 passed | 2 skipped (2690)`.
+  `component manifest: design/component-registry.json is up to date (297 components)`, `determinism: 62/73 = 85%` và
+  `Tests  2698 passed | 2 skipped (2700)`.
 - AC-2: Given HEAD, When chạy lệnh kiểm tra (audit) của plugin design-assembly, Then nó nói 40 trong 40 quyết định lõi có
   câu trả lời, chia 14 có phép kiểm đã chạy lại, 19 có phép kiểm chưa chạy lại, 7 là lời người đã ghi, và mọi tầng ở
   trạng thái «đã đạt» hoặc «đủ, dựa trên phép kiểm chưa chạy lại»; khi một bài kiểm mất dòng gắn tên quyết định thì phép đo
@@ -112,3 +112,6 @@ Phủ theo tệp nhánh đổi và theo từng bên đọc chúng. Không quét 
   - Phản biện-5: phép dò bộ chữ chỉ bắt mã màu hex, rgb, hsl, oklch và một cách viết tên kho.
 - Vòng 2 (2026-11-26): gộp `main` có PR #123 (`7e08ffd1`) vào nhánh; số ghim của AC-1, AC-2 cập nhật và AC-7 nhận hai trang
   bộ vẽ của kit, theo dòng sổ `fix` cùng ngày. Chữ ký vòng 1 không áp cho bằng chứng vòng 2.
+- Vòng 3 (2026-11-26): gộp `main` có PR #83 (`c68aeac2`) vào nhánh; số ghim của AC-1 cập nhật (297 thành phần, 2698 bài)
+  theo dòng sổ `fix` cùng ngày. Máy chủ kho đã lên plugin design-assembly 0.76.0 nhưng kho vẫn ghi 0.69.0: phép đo chạy với
+  `$DA_PLUGIN` trỏ vào bản 0.69.0 (commit `d52453d` của kho plugin). Chữ ký vòng 2 không áp cho bằng chứng vòng 3.

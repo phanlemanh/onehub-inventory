@@ -10,7 +10,7 @@ evals:
     long_running: 30
     layer: backend-effect
     paths: ["design/**", "tests/**", "tools/**", "wiki/log/**"]
-    expected: "exit 0; đầu ra có 'design-assembly: 25 decisions held by 36 checks, each seen failing on a changed copy', 'component manifest: design/component-registry.json is up to date (294 components)', 'determinism: 62/73 = 85%' và 'Tests  2688 passed | 2 skipped (2690)'"
+    expected: "exit 0; đầu ra có 'design-assembly: 25 decisions held by 36 checks, each seen failing on a changed copy', 'component manifest: design/component-registry.json is up to date (297 components)', 'determinism: 62/73 = 85%' và 'Tests  2698 passed | 2 skipped (2700)'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E2
     criterion: AC-2
