@@ -8,7 +8,7 @@ verified_by: fresh-context verification subagent (fresh grader, verify round 2)
 enforcement_mode: strict
 bypass_used: false
 verified_commit: 69173dd427d333f2a5b7bbedbfb039bfa0776e2d
-human_signoff:
+human_signoff: Manh Phan 2026-11-26
 ---
 
 # Evidence Report: design-decisions-40-of-40
