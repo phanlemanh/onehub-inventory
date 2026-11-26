@@ -1,14 +1,12 @@
-# Review findings: app-shell-khuon-dau-trang (round 5)
+# Review findings: app-shell-khuon-dau-trang (round 6)
 
 ## Trong hợp đồng
 
-Không có finding.
+(không có finding nào)
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
-
-Không có finding mới ở round này.
 
 - **The gate card and evidence page still describe the round-3 account menu (40 characters, small avatar kept), while card-plain.json describes the round-4 menu (r4)**
   Người dùng thấy gì: The sign-off page the owner reads still describes the old account menu: it says long emails fit up to about 40 characters and that the small avatar is kept, while the real menu now drops the avatar and fits slightly longer emails. The owner could approve on a description that does not match the product, and the stated email length differs between 43 and 44 in different places.

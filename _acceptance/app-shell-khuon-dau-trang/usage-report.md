@@ -157,3 +157,32 @@ wall: 905s
 - **claude-sonnet-5-5**: 6 agent · 14 calls · out 17,584 · in 28 · cache_read 156,279 · cache_create 187,346
 - **claude-opus-5-5**: 3 agent · 20 calls · out 5,776 · in 40 · cache_read 454,430 · cache_create 86,779
 - **claude-haiku-5-5**: 4 agent · 11 calls · out 4,997 · in 22 · cache_read 110,686 · cache_create 82,998
+### S4 round 6 — wf_f49596a3-50b (10 agent, 23,651 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| synthesize:report | claude-sonnet-5-5 | 2 | 6,792 | 4 | 30,316 | 39 |
+| machine:make -s design-role-table && DB_LANE=${D | claude-haiku-5-5 | 11 | 5,526 | 22 | 190,530 | 1160 |
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 2,968 | 6 | 41,452 | 141 |
+| review:conventions | claude-opus-5-5 | 6 | 1,824 | 12 | 125,918 | 20 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,669 | 4 | 17,863 | 136 |
+| machine:DATABASE_URL= make e2e | claude-haiku-5-5 | 4 | 1,246 | 8 | 44,298 | 670 |
+| review:bugs | claude-opus-5-5 | 5 | 1,127 | 10 | 93,028 | 13 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 1,111 | 4 | 17,867 | 11 |
+| review:measurement | claude-opus-5-5 | 5 | 1,045 | 10 | 90,192 | 13 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 343 | 4 | 13,272 | 5 |
+
+
+wall: 1209s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| machine | 4 | 9,552 | 270,558 | 1162 | 08:16:55 | 08:36:17 |
+| baseline | 1 | 2,968 | 41,452 | 141 | 08:16:55 | 08:19:17 |
+| review | 3 | 3,996 | 309,138 | 20 | 08:16:55 | 08:17:15 |
+| capture | 1 | 343 | 13,272 | 5 | 08:36:20 | 08:36:24 |
+| synthesize | 1 | 6,792 | 30,316 | 39 | 08:36:25 | 08:37:05 |
+
+- **claude-sonnet-5-5**: 3 agent · 7 calls · out 10,103 · in 14 · cache_read 85,040 · cache_create 81,987
+- **claude-haiku-5-5**: 4 agent · 19 calls · out 9,552 · in 38 · cache_read 270,558 · cache_create 96,277
+- **claude-opus-5-5**: 3 agent · 16 calls · out 3,996 · in 32 · cache_read 309,138 · cache_create 74,117

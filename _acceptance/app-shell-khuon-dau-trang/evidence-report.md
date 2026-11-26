@@ -2,70 +2,89 @@
 schema_version: 2
 feature_slug: app-shell-khuon-dau-trang
 verdict: REJECT
-failed_evals: ["E5"]
+failed_evals: ["E5","E15","E16","E17"]
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 685372e0e82f65deb7edeae548facb805003bf13
+verified_commit: 8c47d39ac4704d84ed821034cde6d5136514ed92
 human_signoff:
 ---
 
 # Evidence Report: app-shell-khuon-dau-trang
 
-Round 5. Lệnh Playwright trên Postgres dãy R (E5) đỏ: bài vai-man.spec.ts không đọc được design/role-screen-buttons.md. Lệnh này không gắn eval nào ngoài E5, nên không có lệnh fail nằm ngoài eval.
+Round 6. Bốn eval chạy lại trên Postgres dãy R (E5, E15, E16, E17) đỏ. Các eval còn lại giữ nguyên từ các round trước vì delta không chạm paths của chúng.
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
-| E1 | AC-1 | script | PASS (carry-forward từ round 3) |
-| E2 | AC-2 | script | PASS (carry-forward từ round 3) |
-| E3 | AC-3 | script | PASS (carry-forward từ round 3) |
-| E4 | AC-4 | script | PASS (carry-forward từ round 4) |
+| E1 | AC-1 | script | PASS (carried r3) |
+| E2 | AC-2 | script | PASS (carried r3) |
+| E3 | AC-3 | script | PASS (carried r3) |
+| E4 | AC-4 | script | PASS (carried r4) |
 | E5 | AC-4 | script | FAIL |
-| E6 | AC-5 | script | PASS (carry-forward từ round 3) |
-| E7 | AC-5 | test | PASS (carry-forward từ round 3) |
-| E8 | AC-6 | script | PASS (carry-forward từ round 3) |
-| E9 | AC-6 | test | PASS (carry-forward từ round 3) |
-| E10 | AC-7 | script | PASS |
-| E11 | AC-7 | script | PASS |
-| E12 | AC-8 | ui-check | PASS (carry-forward từ round 4) |
-| E13 | AC-8 | judgment | UNCERTAIN |
-| E14 | AC-7 | script | PASS (carry-forward từ round 4) |
-| E15 | AC-4 | script | PASS (carry-forward từ round 4) |
-| E16 | AC-5 | script | PASS (carry-forward từ round 4) |
-| E17 | AC-3 | script | PASS (carry-forward từ round 4) |
+| E6 | AC-5 | script | PASS (carried r3) |
+| E7 | AC-5 | test | PASS (carried r3) |
+| E8 | AC-6 | script | PASS (carried r3) |
+| E9 | AC-6 | test | PASS (carried r3) |
+| E10 | AC-7 | script | PASS (carried r5) |
+| E11 | AC-7 | script | PASS (carried r5) |
+| E12 | AC-8 | ui-check | PASS (carried r4) |
+| E13 | AC-8 | judgment | UNCERTAIN (panel giữ nguyên từ round 5) |
+| E14 | AC-7 | script | PASS (carried r4) |
+| E15 | AC-4 | script | FAIL |
+| E16 | AC-5 | script | FAIL |
+| E17 | AC-3 | script | FAIL |
 
 ## Evidence
 
+### Eval chạy lại ở round 6 (đỏ)
+
+Bốn eval dưới đây dùng chung một lệnh: `make -s design-role-table && DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} npx playwright test -c playwright.db.config.ts`. Kết quả của lệnh: 717 bài xanh, 203 bài bỏ qua, 2 bài đỏ, chạy 19.1 phút. Cả hai bài đỏ đều là cùng một bài ở hai khổ (1024 và 1440): `tests/e2e-db/app-shell-verve.spec.ts:201`, "members and company layer: one thin head with the primary action at its end, a full-height column edge". Tại dòng 212 của tệp đó, `expect(locator('[data-slot="page-header-action"]')).toBeVisible()` chờ 20000 ms mà không thấy phần tử nào. Đây là bài của E16 (nút chính cuối hàng đầu trang ở màn Thành viên). Lệnh gộp bốn eval nên máy ghi cả bốn đỏ. Báo cáo này không tách riêng bài nào của E5, E15 hay E17 đỏ. Cần chạy lại từng eval nếu muốn tách.
+
+Lệnh đỏ không gắn riêng eval nào: không có. Lệnh duy nhất đỏ đã được gắn cho E5, E15, E16, E17.
+
 - eval: E5
-  run_id: minted-app-shell-khuon-dau-trang-E5-r5
+  run_id: minted-app-shell-khuon-dau-trang-E5-r6
   exit_code: 1
   baseline: red
   verifier: config:executors.script.app_shell_verve_db
-  verified_at: 2026-11-26T07:51:02Z
   output: |
-    man do co phien: company-layer, inventory, members, sent, today
-    Error: ENOENT: no such file or directory, open '.../design/role-screen-buttons.md'
-    at vai-man.spec.ts:43 (readFileSync của bảng đã chốt, COMMITTED)
+    717 passed, 203 skipped, 2 failed (cả bộ playwright.db.config.ts, 19.1m)
     gac-hydration: 0 canh bao
+    Hai bài đỏ: app-shell-verve.spec.ts:201 ở 1024 và 1440 (chi tiết ở E16)
 
-- eval: E10
-  run_id: minted-app-shell-khuon-dau-trang-E10-r5
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.check
-  verified_at: 2026-11-26T07:51:02Z
-  output: |
-    make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance
-
-- eval: E11
-  run_id: minted-app-shell-khuon-dau-trang-E11-r5
-  exit_code: 0
+- eval: E15
+  run_id: minted-app-shell-khuon-dau-trang-E15-r6
+  exit_code: 1
   baseline: red
-  verifier: config:executors.script.e2e
-  verified_at: 2026-11-26T07:51:02Z
+  verifier: config:executors.script.app_shell_verve_db
   output: |
-    gac-hydration: 0 canh bao
+    Lệnh chung với E5 đỏ vì 2 bài của app-shell-verve.spec.ts:201.
+    Bài menu tài khoản của E15 không nằm trong hai bài đỏ nêu trong đuôi kết quả.
+
+- eval: E16
+  run_id: minted-app-shell-khuon-dau-trang-E16-r6
+  exit_code: 1
+  baseline: red
+  verifier: config:executors.script.app_shell_verve_db
+  output: |
+    2) [1440] › tests/e2e-db/app-shell-verve.spec.ts:201:1 › members and company layer: one thin head with the primary action at its end, a full-height column edge
+    Error: expect(locator).toBeVisible() failed
+    Locator: locator('[data-slot="page-header-action"]')
+    Expected: visible; Timeout: 20000ms; Error: element(s) not found
+    > 212 |     await expect(action).toBeVisible();
+    Bài đỏ tương tự ở khổ 1024.
+
+- eval: E17
+  run_id: minted-app-shell-khuon-dau-trang-E17-r6
+  exit_code: 1
+  baseline: red
+  verifier: config:executors.script.app_shell_verve_db
+  output: |
+    Lệnh chung với E5 đỏ vì 2 bài của app-shell-verve.spec.ts:201.
+    Bài tên sàn dài của E17 không nằm trong hai bài đỏ nêu trong đuôi kết quả.
+
+### Eval giữ nguyên từ round trước
 
 - eval: E1
   run_id: minted-app-shell-khuon-dau-trang-E1-r3
@@ -73,7 +92,8 @@ Round 5. Lệnh Playwright trên Postgres dãy R (E5) đỏ: bài vai-man.spec.t
   verifier: config:executors.script.app_shell_verve_e2e
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
-  # carry-forward tu round 3 — delta khong cham paths cua eval
+  output: |
+    carry-forward tu round 3 — delta khong cham paths cua eval
 
 - eval: E2
   run_id: minted-app-shell-khuon-dau-trang-E2-r3
@@ -81,7 +101,8 @@ Round 5. Lệnh Playwright trên Postgres dãy R (E5) đỏ: bài vai-man.spec.t
   verifier: config:executors.script.app_shell_verve_e2e
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
-  # carry-forward tu round 3 — delta khong cham paths cua eval
+  output: |
+    carry-forward tu round 3 — delta khong cham paths cua eval
 
 - eval: E3
   run_id: minted-app-shell-khuon-dau-trang-E3-r3
@@ -89,7 +110,8 @@ Round 5. Lệnh Playwright trên Postgres dãy R (E5) đỏ: bài vai-man.spec.t
   verifier: config:executors.script.app_shell_verve_e2e
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
-  # carry-forward tu round 3 — delta khong cham paths cua eval
+  output: |
+    carry-forward tu round 3 — delta khong cham paths cua eval
 
 - eval: E4
   run_id: minted-app-shell-khuon-dau-trang-E4-r4
@@ -97,7 +119,8 @@ Round 5. Lệnh Playwright trên Postgres dãy R (E5) đỏ: bài vai-man.spec.t
   verifier: config:executors.script.app_shell_verve_e2e
   verified_at: 2026-11-17T07:26:40Z
   carried_from_round: 4
-  # carry-forward tu round 4 — delta khong cham paths cua eval
+  output: |
+    carry-forward tu round 4 — delta khong cham paths cua eval
 
 - eval: E6
   run_id: minted-app-shell-khuon-dau-trang-E6-r3
@@ -105,7 +128,8 @@ Round 5. Lệnh Playwright trên Postgres dãy R (E5) đỏ: bài vai-man.spec.t
   verifier: config:executors.script.app_shell_verve_e2e
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
-  # carry-forward tu round 3 — delta khong cham paths cua eval
+  output: |
+    carry-forward tu round 3 — delta khong cham paths cua eval
 
 - eval: E7
   run_id: minted-app-shell-khuon-dau-trang-E7-r3
@@ -113,7 +137,8 @@ Round 5. Lệnh Playwright trên Postgres dãy R (E5) đỏ: bài vai-man.spec.t
   verifier: config:executors.test.app_shell_verve_unit
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
-  # carry-forward tu round 3 — delta khong cham paths cua eval
+  output: |
+    carry-forward tu round 3 — delta khong cham paths cua eval
 
 - eval: E8
   run_id: minted-app-shell-khuon-dau-trang-E8-r3
@@ -121,7 +146,8 @@ Round 5. Lệnh Playwright trên Postgres dãy R (E5) đỏ: bài vai-man.spec.t
   verifier: config:executors.script.app_shell_verve_e2e
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
-  # carry-forward tu round 3 — delta khong cham paths cua eval
+  output: |
+    carry-forward tu round 3 — delta khong cham paths cua eval
 
 - eval: E9
   run_id: minted-app-shell-khuon-dau-trang-E9-r3
@@ -129,15 +155,33 @@ Round 5. Lệnh Playwright trên Postgres dãy R (E5) đỏ: bài vai-man.spec.t
   verifier: config:executors.test.app_shell_verve_unit
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
-  # carry-forward tu round 3 — delta khong cham paths cua eval
+  output: |
+    carry-forward tu round 3 — delta khong cham paths cua eval
+
+- eval: E10
+  run_id: minted-app-shell-khuon-dau-trang-E10-r5
+  exit_code: 0
+  verifier: config:executors.script.check
+  verified_at: 2026-11-26T07:51:02Z
+  carried_from_round: 5
+  output: |
+    carry-forward tu round 5 — delta khong cham paths cua eval
+
+- eval: E11
+  run_id: minted-app-shell-khuon-dau-trang-E11-r5
+  exit_code: 0
+  verifier: config:executors.script.e2e
+  verified_at: 2026-11-26T07:51:02Z
+  carried_from_round: 5
+  output: |
+    carry-forward tu round 5 — delta khong cham paths cua eval
 
 - eval: E12
   run_id: minted-app-shell-khuon-dau-trang-E12-r4
   exit_code: 0
-  verifier: ui-check
+  verifier: config:executors.ui-check
   verified_at: 2026-11-17T07:26:40Z
   carried_from_round: 4
-  # carry-forward tu round 4 — delta khong cham paths cua eval
   screenshot: evidence/E12-step1.png
   observed: |
     Frames I opened and read:
@@ -151,6 +195,19 @@ Round 5. Lệnh Playwright trên Postgres dãy R (E5) đỏ: bài vai-man.spec.t
     - sau/menu-dang-nhap-1024: same, the menu is fully visible.
     Outside the six listed spots, the table, status chips and rows look the same before and after. No contradiction with Expected found in the frames I read.
   network_observed: n-a (driver)
+  note: carry-forward tu round 4 — delta khong cham paths cua eval; khung cua luot goc, cung run_id
+
+- eval: E13
+  judged_by: panel giữ nguyên từ round 5 — inputs không đổi, không chấm lại; rationale xem round 5
+  verdict: UNCERTAIN
+  rationale: Panel đề xuất UNCERTAIN, giữ nguyên từ round 5. Ba lens đều UNCERTAIN (r5).
+  votes:
+    - domain-correctness: UNCERTAIN (r5)
+    - operational-feasibility: UNCERTAIN (r5)
+    - spec-alignment: UNCERTAIN (r5)
+  required_evidence:
+    - (xem round 5)
+  human_override:  # chi nguoi ghi
 
 - eval: E14
   run_id: minted-app-shell-khuon-dau-trang-E14-r4
@@ -158,55 +215,25 @@ Round 5. Lệnh Playwright trên Postgres dãy R (E5) đỏ: bài vai-man.spec.t
   verifier: config:executors.design.floor
   verified_at: 2026-11-17T07:26:40Z
   carried_from_round: 4
-  # carry-forward tu round 4 — delta khong cham paths cua eval
-
-- eval: E15
-  run_id: minted-app-shell-khuon-dau-trang-E15-r4
-  exit_code: 0
-  verifier: config:executors.script.app_shell_verve_db
-  verified_at: 2026-11-17T07:26:40Z
-  carried_from_round: 4
-  # carry-forward tu round 4 — delta khong cham paths cua eval
-
-- eval: E16
-  run_id: minted-app-shell-khuon-dau-trang-E16-r4
-  exit_code: 0
-  verifier: config:executors.script.app_shell_verve_db
-  verified_at: 2026-11-17T07:26:40Z
-  carried_from_round: 4
-  # carry-forward tu round 4 — delta khong cham paths cua eval
-
-- eval: E17
-  run_id: minted-app-shell-khuon-dau-trang-E17-r4
-  exit_code: 0
-  verifier: config:executors.script.app_shell_verve_db
-  verified_at: 2026-11-17T07:26:40Z
-  carried_from_round: 4
-  # carry-forward tu round 4 — delta khong cham paths cua eval
-
-### Judgment
-
-Panel đề xuất cho E13: ba lăng kính (domain-correctness, operational-feasibility, spec-alignment). Cả ba cho UNCERTAIN; human_override để trống cho người quyết ở Cổng 2.
-
-- eval: E13
-  judged_by: judge panel (fresh context)
-  verdict: UNCERTAIN
-  votes:
-    - domain-correctness: UNCERTAIN — Mỗi chỗ A1–A6 có đúng một dòng, P1–P3 nằm ở Out of scope và Later của contract.md. Nhưng mục «Nguồn» của design.md không nêu P1–P3, nên không đối chiếu được việc nào chủ kho «chỉ ghi lại». Nhiều chi tiết cột «Sau» (menu 320 px, khoảng 40 ký tự, dấu ‹ ›, viền sáng khi rê, ⌘ và K tách hai ô, dấu dev Next.js sang góc phải dưới) không có trong lời nguyên văn; có vẻ lấy từ số đo Verve nằm ngoài hai tệp được giao.
-    - operational-feasibility: UNCERTAIN — A1–A6 và P1–P3 khớp contract.md. Nhưng 320 px và ⌘ K tách hai ô (A3), 40 ký tự và «…» (A4), ‹ › (A1), ⌘B không mở (A6) không rõ do chủ kho nói hay suy từ Verve. Việc dời dấu Next.js sang góc phải dưới nằm ngoài sáu chỗ và không có câu nguyên văn. Câu 9 chỉ nói «Chỉ ghi lại», không nêu tên P1–P3.
-    - spec-alignment: UNCERTAIN — Sáu dòng A1–A6 khớp các câu 2–7 của chủ kho; P1–P3 ở Out of scope. Nhiều chi tiết cột «Sau» không có trong lời nguyên văn (ô tìm 320 px, menu 320 px, 40 ký tự, ‹ ›, viền sáng khi rê, ⌘B không mở, dấu dev Next.js). Câu 9 «Chỉ ghi lại» không nêu tên P1–P3.
-  required_evidence:
-    - Sổ ghi chú `dieu-chinh-hang-muc-verve-settings.md`: số đo Verve và lời chủ kho cho từng chi tiết cột «Sau» (320 px ô tìm và menu, khoảng 40 ký tự, ‹ ›, viền sáng khi rê, ⌘ và K tách hai ô, ⌘B không mở). Có và khớp thì đổi sang PASS.
-    - Câu nguyên văn hoặc dòng `descope` trong `decisions.jsonl` gắn «Chỉ ghi lại» với P1 (hồ sơ sàn), P2 (tìm/lọc/sắp ở màn Thành viên), P3 (chia nhóm cột mục con).
-    - Dòng sổ cho thấy chủ kho bảo hoặc duyệt việc chuyển dấu dev Next.js sang góc phải dưới. Không có thì đó là việc thêm ngoài lời chủ kho.
-  human_override:  # chi nguoi ghi
+  output: |
+    carry-forward tu round 4 — delta khong cham paths cua eval
 
 ### Lệnh suite (hồi quy)
 
-- cmd: npm run build
-  run_id: minted-app-shell-khuon-dau-trang-SUITE-build-r5
+- cmd: make check
+  run_id: minted-app-shell-khuon-dau-trang-SUITE-make_check-r6
   exit_code: 0
-  verified_at: 2026-11-26T07:51:02Z
+  verified_at: 2026-11-26T08:16:16Z
+
+- cmd: npm run build
+  run_id: minted-app-shell-khuon-dau-trang-SUITE-build-r6
+  exit_code: 0
+  verified_at: 2026-11-26T08:16:16Z
+
+- cmd: DATABASE_URL= make e2e
+  run_id: minted-app-shell-khuon-dau-trang-SUITE-DATABASE_URL_make_e2e-r6
+  exit_code: 0
+  verified_at: 2026-11-26T08:16:16Z
 
 ## Known limits
 
@@ -216,15 +243,13 @@ Panel đề xuất cho E13: ba lăng kính (domain-correctness, operational-feas
 
 none — mọi eval feature đều red trên baseline (có phân biệt)
 
-Baseline không đo:
-- make check: baseline vuot tran 180 giay/lenh — da dung ca cay tien trinh; BLOCKED ha tang, khong phai ket qua cua code cu
-
 ## Variance
 
 none — mọi eval nhiều lần chạy đều đồng nhất
 
 ## Iterations
 
-Round 3: E1, E2, E3, E6, E7, E8, E9 chạy và xanh; kết quả được mang sang các round sau.
-Round 4: E4, E12, E14, E15, E16, E17 chạy và xanh; kết quả được mang sang round 5.
-Round 5: E5 failed — vai-man.spec.ts:43 không mở được design/role-screen-buttons.md (ENOENT) nên cả bài dừng. E10 và E11 xanh. Returned to implementation.
+Round 3: E1, E2, E3, E6, E7, E8, E9 xanh, giữ lại cho các round sau.
+Round 4: E4, E12, E14 xanh, giữ lại.
+Round 5: E10, E11 xanh, giữ lại; panel E13 chấm UNCERTAIN.
+Round 6: E5, E15, E16, E17 đỏ — bài `app-shell-verve.spec.ts:201` (màn Thành viên, 1024 và 1440) không thấy `page-header-action`. Trả về cho khâu cài đặt.
