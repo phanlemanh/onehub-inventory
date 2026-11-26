@@ -205,7 +205,7 @@ test("members and company layer: one thin head with the primary action at its en
   const { email, names } = await admin(info, 1);
   await signIn(page, email, names[0]!);
   const height = page.viewportSize()!.height;
-  for (const href of ["/members", "/tuy-chinh-san?phan=thue-phi"]) {
+  for (const href of ["/members", "/company-layer?part=fee-schedule"]) {
     await page.goto(href);
     const head = page.locator('[data-slot="page-header"]');
     const action = page.locator('[data-slot="page-header-action"]');
