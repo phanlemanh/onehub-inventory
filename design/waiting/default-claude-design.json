@@ -1,0 +1,22 @@
+{
+  "id": "default-claude-design",
+  "kind": "question",
+  "group": "sending out",
+  "question": "Make the design system just sent the default in Claude Design?",
+  "recommendation": "yes: the account has no default system yet",
+  "basis": "with no default, nothing made there follows this repository's system",
+  "hard_to_undo": false,
+  "where": "claude-design, the account's default system",
+  "if_refused": "the system stays there, not the default",
+  "asked_on": "2026-11-26",
+  "candidates": [
+    {
+      "name": "yes",
+      "about": "Make it the default there, so every design made there follows it."
+    },
+    {
+      "name": "no",
+      "about": "Leave the default there as it is."
+    }
+  ]
+}

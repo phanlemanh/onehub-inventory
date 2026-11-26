@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "pushes": [
+    {
+      "plug": "claude-design",
+      "stamp": "101fb07cae9d",
+      "on": "2026-11-26"
+    }
+  ]
+}
