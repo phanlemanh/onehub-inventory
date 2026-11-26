@@ -148,7 +148,7 @@ evals:
     criterion: AC-12
     executor: script
     cmd: config:executors.script.check
-    paths: ["src/app/(app)/nhap-tep/**", src/modules/imports/**, design/screens.yaml, design/so-khoi.yaml, ontology/labels.yaml, _acceptance/nhap-excel/chung-minh-man.md]
+    paths: ["src/app/(app)/nhap-tep/**", src/modules/imports/**, design/screens/nhap-tep.yaml, design/patterns/luong-nhieu-buoc.md, design/intake/nap-tep-nhieu-buoc.yaml, ontology/labels.yaml, _acceptance/nhap-excel/chung-minh-man.md]
     expected: "exit 0; make check xanh trên cây của lượt: sổ màn có nhap-tep (bộ kiểm sổ màn), chứng minh màn qua tools/proof_gate/check.py, không chữ cứng trong src (bộ kiểm nhãn), ranh giới mô-đun (tools/boundaries.py), vai × màn; ca phá được các bộ kiểm ấy tự mang (mỗi bộ có ca đỏ của nó)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
