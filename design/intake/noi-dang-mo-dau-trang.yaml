@@ -1,0 +1,9 @@
+ten: PlaceCrumb
+tep: src/components/templates/app-shell/place-crumb.tsx
+nguon: tao-tay
+nhu_cau: noi-dang-mo-dau-trang
+mo_ta: Đầu trang một hàng mảnh nêu nơi đang mở trong App Shell (mục của thanh bên theo vai, rồi tên màn), như đầu trang của mẫu Verve
+ho_so: app-shell-khuon-dau-trang
+duyet: 2026-11-17
+searched: breadcrumb page head current place
+nearest: none

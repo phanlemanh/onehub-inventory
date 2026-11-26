@@ -1,0 +1,1 @@
+App Shell xếp theo mẫu Verve của ReUI (chủ kho duyệt bản xem trước 17/11): viền cột thứ hai hết chiều cao với dải gập giữa màn hình, ô tìm giữa thanh trên, menu tài khoản có chọn giao diện ở đáy dải biểu tượng, dải không mở rộng trên máy tính, đầu trang một hàng mảnh nêu nơi đang mở — [0050](decisions/0050-app-shell-theo-verve.md), PR #83
