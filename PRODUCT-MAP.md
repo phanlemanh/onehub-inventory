@@ -12,7 +12,7 @@ flowchart TD
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
   GP --> DL["Đang làm<br/>1 việc"] --> GB{"Cổng Bằng chứng"}
-  GB --> DG["Đã giao<br/>28 việc"]
+  GB --> DG["Đã giao<br/>29 việc"]
   GB --> CN["Chờ phiên nghiệm thu<br/>53 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
@@ -102,6 +102,7 @@ flowchart TD
 - Hook commit-msg của kho (tools/commit_msg.py) nhận đúng các tiêu đề commit kit nghiệm thu v3.0.0 tự viết — Gate 2 signoff, Veto, repin, wip(ban-giao) — để job conventional-commits không đỏ trên PR qua Cổng 2 (`commit-msg-kit-subjects`)
 - Một lệnh đặt khoá — chủ kho dán mỗi khoá do dịch vụ cấp một lần vào make dat-khoa; lệnh đưa bản lên tự đặt mật khẩu vai đăng nhập và tự đẩy biến sang Vercel; sổ tay chỉ còn phần của chủ kho; quyền đứng cho hạ tầng Inventory (`dat-khoa-mot-lenh`)
 - Tiếp nhận design-assembly — tám quyết định thiết kế đã ghi được nối vào kiểm tra sẵn có, thêm hai dòng phông chữ (`design-assembly-adopt-checks`) — đã giao — máy thông, bằng chứng xanh-sạch
+- Ghi sáu quyết định lõi còn mở của hệ thiết kế theo lời chủ kho, và bộ chữ tiếng Việt của sổ hệ thiết kế (`design-decisions-40-of-40`)
 - Địa chỉ màn Tuỳ chỉnh của sàn và bản mẫu bộ nút, từ chọn phần và mã màn của chúng viết bằng tiếng Anh như luật kho (`english-route-names`)
 - `go-hoi-khi-gop`
 - Lint và bộ chạy bài kiểm của kho bỏ qua hai thư mục ngoài git (.acceptance-runs/ và .claude/worktrees/) để bộ kiểm và hook trước commit không đỏ vì tệp không thuộc kho (`lint-bo-qua-thu-muc-ngoai-git`) — đã giao — máy thông, cửa veto còn mở
