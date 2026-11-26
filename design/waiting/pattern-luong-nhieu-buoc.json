@@ -1,0 +1,9 @@
+{
+  "id": "pattern-luong-nhieu-buoc",
+  "question": "Giữ họ màn mới «Luồng nhiều bước» (màn Nạp tệp là màn mẫu) như đã duyệt ở Cổng Phạm vi hàng 11?",
+  "recommendation": "Giữ",
+  "basis": "Chủ kho đã duyệt họ mới này ở Cổng Phạm vi hàng 11 ngày 2026-11-17 (Hỏi-10); ba họ đang có không nhận một luồng nhiều bước",
+  "hard_to_undo": false,
+  "item": "pattern:luong-nhieu-buoc",
+  "asked_on": "2026-11-26"
+}
