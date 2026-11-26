@@ -317,6 +317,9 @@ test.describe("E9 · the full record passes the accessibility scan", () => {
   );
 
   test("1440 and 360, light and dark, newest and Lần 1: eight scans", async ({ page }) => {
+    // Eight axe scans in one case: about 4.4 s a scan on a laptop, past 30 s on CI once the grid carries row 3g's four
+    // detail columns. More time only; the eight scans and the rules stay as they were (G-2611-14).
+    test.setTimeout(90_000);
     let scans = 0;
     for (const size of [
       { width: 1440, height: 900 },
