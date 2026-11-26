@@ -45,9 +45,9 @@ run({
     {
       code: "// eslint-disable-next-line onehub-ui/no-raw-table -- bảng in hoá đơn, data-grid không in được\nconst a = 1;",
     },
-    // Không phải luật onehub-ui/* nên không xét.
-    { code: "// eslint-disable-next-line react-hooks/purity\nconst a = 1;" },
-    { code: "/* eslint-disable react-hooks/purity, no-console */\nconst a = 1;" },
+    {
+      code: "// eslint-disable-next-line react-hooks/purity -- the value is read once\nconst a = 1;",
+    },
     {
       code: "const a = 1; // eslint-disable-line onehub-ui/no-emoji-icons -- emoji là nội dung người dùng nhập",
     },
@@ -62,8 +62,8 @@ run({
     { code: "// onehub-ui/no-raw-table là luật cấm bảng thô\nconst a = 1;" },
   ],
   invalid: [
-    // Các ca eslint-disable trần / tự nêu require-disable-reason chỉ đúng khi noInlineConfig bật: trong lint thật
-    // ESLint nuốt báo cáo của chúng, nên check-bare-disables.mjs (chạy sau eslint trong `npm run lint`) mới là chỗ bắt.
+    // With inline config on, ESLint swallows the report of a directive that disables its own line or the whole
+    // file; the plugin's processor puts it back (see the cases with inline config on, below).
     {
       code: "// eslint-disable-next-line onehub-ui/no-raw-table\nconst a = 1;",
       errors: [{ messageId: "missingReason", line: 1 }],
@@ -81,7 +81,20 @@ run({
       code: "const a = 1; // eslint-disable-line\n",
       errors: [{ messageId: "missingReason" }],
     },
-    // Danh sách có lẫn luật ngoài plugin vẫn bị xét vì chứa onehub-ui/*.
+    // Every rule needs a reason, not only the rules of onehub-ui.
+    {
+      code: "// eslint-disable-next-line react-hooks/purity\nconst a = 1;",
+      errors: [{ messageId: "missingReason", line: 1 }],
+    },
+    {
+      code: "/* eslint-disable react-hooks/purity, no-console */\nconst a = 1;",
+      errors: [{ messageId: "missingReason" }],
+    },
+    {
+      code: "// eslint-disable-next-line shadcn/no-arbitrary-values\nconst a = 1;",
+      errors: [{ messageId: "missingReason" }],
+    },
+    // Danh sách có lẫn luật ngoài plugin vẫn bị xét.
     {
       code: "// eslint-disable-next-line react-hooks/purity, onehub-ui/no-raw-table\nconst a = 1;",
       errors: [{ messageId: "missingReason" }],
@@ -106,3 +119,36 @@ run({
   ],
 });
 assertMessages(rule, { missingReason: "-- <lý do>" });
+
+// With inline config on, as in the real lint: the directive would swallow the rule's own report on its line. The
+// plugin's processor puts back what the rule found, once.
+const plugin = (await import("../../tools/eslint-ui/index.mjs")).default;
+const real = [
+  {
+    plugins: { "onehub-ui": plugin },
+    processor: "onehub-ui/reasons",
+    rules: { [RULE_ID]: "error" },
+    languageOptions: { ecmaVersion: "latest", sourceType: "module" },
+  },
+];
+const lintReal = (code) =>
+  new Linter().verify(code, real, "screen.js").filter((m) => m.ruleId === RULE_ID);
+
+describe("require-disable-reason with inline config on", () => {
+  for (const code of [
+    "/* eslint-disable */\nconst a = 1;",
+    "const a = 1; // eslint-disable-line\n",
+    "const a = 1; // eslint-disable-line no-console\n",
+    "/* eslint-disable onehub-ui/require-disable-reason */\nconst a = 1;",
+  ]) {
+    it(code, () => assert.equal(lintReal(code).length, 1, JSON.stringify(lintReal(code))));
+  }
+  for (const code of [
+    "/* eslint-disable -- generated file */\nconst a = 1;",
+    "const a = 1; // eslint-disable-line no-console -- a script's own output\n",
+  ]) {
+    it(code, () => assert.deepEqual(lintReal(code), []));
+  }
+  it("a report the directive does not swallow is not doubled", () =>
+    assert.equal(lintReal("// eslint-disable-next-line no-console\nconst a = 1;").length, 1));
+});

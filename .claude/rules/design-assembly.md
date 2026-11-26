@@ -11,7 +11,7 @@ it.
 
 ## Type
 
-- Running text is set in `undefined` and headings in `var(--font-sans)`, as `design/blueprint.json` decides: the generated block of the stylesheet names them as `--font-sans` and `--font-heading`, and the gate holds both.
+- Running text is set in the typeface the font loader in src/app/layout.tsx sets as `--font-sans` and headings in `var(--font-sans)`, as `src/app/globals.css` sets them today, adopted as found: the gate holds `--font-heading` to it.
 - Never name a typeface in a screen or a component: text takes `--font-sans` from the page, and a heading takes `--font-heading`. Another typeface is the owner's answer in the guide, never a class.
 - Every typeface the stylesheet names is loaded, or is one every device has: a new one comes with what loads it (an @font-face rule, a font package the stylesheet imports, or the build's own font loader), or the gate fails.
 

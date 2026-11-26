@@ -8,12 +8,10 @@ export default {
   meta: {
     type: "problem",
     docs: {
-      description:
-        "Ngoại lệ lint cho luật onehub-ui (hoặc tắt mọi luật) phải kèm lý do sau ` -- `.",
+      description: "Mọi ngoại lệ lint, cho bất kỳ luật nào, phải kèm lý do sau ` -- `.",
     },
     messages: {
-      missingReason:
-        "Ngoại lệ lint phải kèm lý do: `eslint-disable-next-line onehub-ui/<luật> -- <lý do>`.",
+      missingReason: "Ngoại lệ lint phải kèm lý do: `eslint-disable-next-line <luật> -- <lý do>`.",
     },
     schema: [],
   },
@@ -26,15 +24,8 @@ export default {
 
           const rest = comment.value.slice(directive[0].length);
           const sep = SEPARATOR.exec(rest);
-          const list = sep ? rest.slice(0, sep.index) : rest;
           const reason = sep ? rest.slice(sep.index + sep[0].length) : "";
-
-          const rules = list
-            .split(",")
-            .map((r) => r.trim())
-            .filter(Boolean);
-          const coversOnehub = rules.length === 0 || rules.some((r) => r.startsWith("onehub-ui/"));
-          if (coversOnehub && !reason.trim()) {
+          if (!reason.trim()) {
             context.report({ loc: comment.loc, messageId: "missingReason" });
           }
         }

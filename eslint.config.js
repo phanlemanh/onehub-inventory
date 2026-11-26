@@ -50,7 +50,14 @@ export default defineConfig([
     languageOptions: { globals: globals.node },
     rules: { "import/no-anonymous-default-export": "off" },
   },
-  { files: UI_FILES, ignores: VENDOR, plugins: { "onehub-ui": onehubUi }, rules: UI_RULES },
+  {
+    files: UI_FILES,
+    ignores: VENDOR,
+    plugins: { "onehub-ui": onehubUi },
+    // Keeps the report of an exception with no reason on the line that switches the lint off.
+    processor: "onehub-ui/reasons",
+    rules: UI_RULES,
+  },
   {
     files: UI_FILES,
     ignores: VENDOR,
