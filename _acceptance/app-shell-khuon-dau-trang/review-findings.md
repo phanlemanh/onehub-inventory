@@ -1,8 +1,6 @@
-# Review findings: app-shell-khuon-dau-trang (round 6)
+# Review findings: app-shell-khuon-dau-trang (round 7)
 
 ## Trong hợp đồng
-
-(không có finding nào)
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 

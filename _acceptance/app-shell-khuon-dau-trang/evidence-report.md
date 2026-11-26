@@ -1,19 +1,19 @@
 ---
 schema_version: 2
 feature_slug: app-shell-khuon-dau-trang
-verdict: REJECT
-failed_evals: ["E5","E15","E16","E17"]
+verdict: PENDING-JUDGMENT
+failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 8c47d39ac4704d84ed821034cde6d5136514ed92
+verified_commit: 957bb3c12c1f63adb237b58c40c28ace2112c22b
 human_signoff:
 ---
 
 # Evidence Report: app-shell-khuon-dau-trang
 
-Round 6. Bốn eval chạy lại trên Postgres dãy R (E5, E15, E16, E17) đỏ. Các eval còn lại giữ nguyên từ các round trước vì delta không chạm paths của chúng.
+Round 7. Năm eval chạy lại (E5, E15, E16, E17 trên Postgres dãy R; E10 là make check) đều xanh, cùng hai lệnh suite (build, make e2e). Các eval còn lại giữ nguyên từ các round trước vì delta không chạm paths của chúng. Mục E13 vẫn chờ người chốt ở Cổng 2.
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
@@ -21,74 +21,26 @@ Round 6. Bốn eval chạy lại trên Postgres dãy R (E5, E15, E16, E17) đỏ
 | E2 | AC-2 | script | PASS (carried r3) |
 | E3 | AC-3 | script | PASS (carried r3) |
 | E4 | AC-4 | script | PASS (carried r4) |
-| E5 | AC-4 | script | FAIL |
+| E5 | AC-4 | script | PASS |
 | E6 | AC-5 | script | PASS (carried r3) |
 | E7 | AC-5 | test | PASS (carried r3) |
 | E8 | AC-6 | script | PASS (carried r3) |
 | E9 | AC-6 | test | PASS (carried r3) |
-| E10 | AC-7 | script | PASS (carried r5) |
+| E10 | AC-7 | script | PASS |
 | E11 | AC-7 | script | PASS (carried r5) |
 | E12 | AC-8 | ui-check | PASS (carried r4) |
-| E13 | AC-8 | judgment | UNCERTAIN (panel giữ nguyên từ round 5) |
+| E13 | AC-8 | judgment | UNCERTAIN (carried r5) |
 | E14 | AC-7 | script | PASS (carried r4) |
-| E15 | AC-4 | script | FAIL |
-| E16 | AC-5 | script | FAIL |
-| E17 | AC-3 | script | FAIL |
+| E15 | AC-4 | script | PASS |
+| E16 | AC-5 | script | PASS |
+| E17 | AC-3 | script | PASS |
 
 ## Evidence
-
-### Eval chạy lại ở round 6 (đỏ)
-
-Bốn eval dưới đây dùng chung một lệnh: `make -s design-role-table && DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} npx playwright test -c playwright.db.config.ts`. Kết quả của lệnh: 717 bài xanh, 203 bài bỏ qua, 2 bài đỏ, chạy 19.1 phút. Cả hai bài đỏ đều là cùng một bài ở hai khổ (1024 và 1440): `tests/e2e-db/app-shell-verve.spec.ts:201`, "members and company layer: one thin head with the primary action at its end, a full-height column edge". Tại dòng 212 của tệp đó, `expect(locator('[data-slot="page-header-action"]')).toBeVisible()` chờ 20000 ms mà không thấy phần tử nào. Đây là bài của E16 (nút chính cuối hàng đầu trang ở màn Thành viên). Lệnh gộp bốn eval nên máy ghi cả bốn đỏ. Báo cáo này không tách riêng bài nào của E5, E15 hay E17 đỏ. Cần chạy lại từng eval nếu muốn tách.
-
-Lệnh đỏ không gắn riêng eval nào: không có. Lệnh duy nhất đỏ đã được gắn cho E5, E15, E16, E17.
-
-- eval: E5
-  run_id: minted-app-shell-khuon-dau-trang-E5-r6
-  exit_code: 1
-  baseline: red
-  verifier: config:executors.script.app_shell_verve_db
-  output: |
-    717 passed, 203 skipped, 2 failed (cả bộ playwright.db.config.ts, 19.1m)
-    gac-hydration: 0 canh bao
-    Hai bài đỏ: app-shell-verve.spec.ts:201 ở 1024 và 1440 (chi tiết ở E16)
-
-- eval: E15
-  run_id: minted-app-shell-khuon-dau-trang-E15-r6
-  exit_code: 1
-  baseline: red
-  verifier: config:executors.script.app_shell_verve_db
-  output: |
-    Lệnh chung với E5 đỏ vì 2 bài của app-shell-verve.spec.ts:201.
-    Bài menu tài khoản của E15 không nằm trong hai bài đỏ nêu trong đuôi kết quả.
-
-- eval: E16
-  run_id: minted-app-shell-khuon-dau-trang-E16-r6
-  exit_code: 1
-  baseline: red
-  verifier: config:executors.script.app_shell_verve_db
-  output: |
-    2) [1440] › tests/e2e-db/app-shell-verve.spec.ts:201:1 › members and company layer: one thin head with the primary action at its end, a full-height column edge
-    Error: expect(locator).toBeVisible() failed
-    Locator: locator('[data-slot="page-header-action"]')
-    Expected: visible; Timeout: 20000ms; Error: element(s) not found
-    > 212 |     await expect(action).toBeVisible();
-    Bài đỏ tương tự ở khổ 1024.
-
-- eval: E17
-  run_id: minted-app-shell-khuon-dau-trang-E17-r6
-  exit_code: 1
-  baseline: red
-  verifier: config:executors.script.app_shell_verve_db
-  output: |
-    Lệnh chung với E5 đỏ vì 2 bài của app-shell-verve.spec.ts:201.
-    Bài tên sàn dài của E17 không nằm trong hai bài đỏ nêu trong đuôi kết quả.
-
-### Eval giữ nguyên từ round trước
 
 - eval: E1
   run_id: minted-app-shell-khuon-dau-trang-E1-r3
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.app_shell_verve_e2e
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
@@ -98,6 +50,7 @@ Lệnh đỏ không gắn riêng eval nào: không có. Lệnh duy nhất đỏ 
 - eval: E2
   run_id: minted-app-shell-khuon-dau-trang-E2-r3
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.app_shell_verve_e2e
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
@@ -107,6 +60,7 @@ Lệnh đỏ không gắn riêng eval nào: không có. Lệnh duy nhất đỏ 
 - eval: E3
   run_id: minted-app-shell-khuon-dau-trang-E3-r3
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.app_shell_verve_e2e
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
@@ -116,15 +70,26 @@ Lệnh đỏ không gắn riêng eval nào: không có. Lệnh duy nhất đỏ 
 - eval: E4
   run_id: minted-app-shell-khuon-dau-trang-E4-r4
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.app_shell_verve_e2e
   verified_at: 2026-11-17T07:26:40Z
   carried_from_round: 4
   output: |
     carry-forward tu round 4 — delta khong cham paths cua eval
 
+- eval: E5
+  run_id: minted-app-shell-khuon-dau-trang-E5-r7
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.app_shell_verve_db
+  verified_at: 2026-11-26T08:39:53Z
+  output: |
+    make -s design-role-table && npx playwright test -c playwright.db.config.ts trên Postgres dãy R: toàn bộ bài xanh.
+
 - eval: E6
   run_id: minted-app-shell-khuon-dau-trang-E6-r3
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.app_shell_verve_e2e
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
@@ -134,6 +99,7 @@ Lệnh đỏ không gắn riêng eval nào: không có. Lệnh duy nhất đỏ 
 - eval: E7
   run_id: minted-app-shell-khuon-dau-trang-E7-r3
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.test.app_shell_verve_unit
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
@@ -143,6 +109,7 @@ Lệnh đỏ không gắn riêng eval nào: không có. Lệnh duy nhất đỏ 
 - eval: E8
   run_id: minted-app-shell-khuon-dau-trang-E8-r3
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.app_shell_verve_e2e
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
@@ -152,6 +119,7 @@ Lệnh đỏ không gắn riêng eval nào: không có. Lệnh duy nhất đỏ 
 - eval: E9
   run_id: minted-app-shell-khuon-dau-trang-E9-r3
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.test.app_shell_verve_unit
   verified_at: 2026-11-17T03:36:00Z
   carried_from_round: 3
@@ -159,17 +127,18 @@ Lệnh đỏ không gắn riêng eval nào: không có. Lệnh duy nhất đỏ 
     carry-forward tu round 3 — delta khong cham paths cua eval
 
 - eval: E10
-  run_id: minted-app-shell-khuon-dau-trang-E10-r5
+  run_id: minted-app-shell-khuon-dau-trang-E10-r7
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.check
-  verified_at: 2026-11-26T07:51:02Z
-  carried_from_round: 5
+  verified_at: 2026-11-26T08:39:53Z
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance
 
 - eval: E11
   run_id: minted-app-shell-khuon-dau-trang-E11-r5
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.script.e2e
   verified_at: 2026-11-26T07:51:02Z
   carried_from_round: 5
@@ -179,6 +148,7 @@ Lệnh đỏ không gắn riêng eval nào: không có. Lệnh duy nhất đỏ 
 - eval: E12
   run_id: minted-app-shell-khuon-dau-trang-E12-r4
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.ui-check
   verified_at: 2026-11-17T07:26:40Z
   carried_from_round: 4
@@ -195,45 +165,69 @@ Lệnh đỏ không gắn riêng eval nào: không có. Lệnh duy nhất đỏ 
     - sau/menu-dang-nhap-1024: same, the menu is fully visible.
     Outside the six listed spots, the table, status chips and rows look the same before and after. No contradiction with Expected found in the frames I read.
   network_observed: n-a (driver)
-  note: carry-forward tu round 4 — delta khong cham paths cua eval; khung cua luot goc, cung run_id
-
-- eval: E13
-  judged_by: panel giữ nguyên từ round 5 — inputs không đổi, không chấm lại; rationale xem round 5
-  verdict: UNCERTAIN
-  rationale: Panel đề xuất UNCERTAIN, giữ nguyên từ round 5. Ba lens đều UNCERTAIN (r5).
-  votes:
-    - domain-correctness: UNCERTAIN (r5)
-    - operational-feasibility: UNCERTAIN (r5)
-    - spec-alignment: UNCERTAIN (r5)
-  required_evidence:
-    - (xem round 5)
-  human_override:  # chi nguoi ghi
 
 - eval: E14
   run_id: minted-app-shell-khuon-dau-trang-E14-r4
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.design.floor
   verified_at: 2026-11-17T07:26:40Z
   carried_from_round: 4
   output: |
     carry-forward tu round 4 — delta khong cham paths cua eval
 
+- eval: E15
+  run_id: minted-app-shell-khuon-dau-trang-E15-r7
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.app_shell_verve_db
+  verified_at: 2026-11-26T08:39:53Z
+  output: |
+    Cùng lệnh với E5 (Postgres dãy R, bốn khổ): bài tests/e2e-db/app-shell-verve.spec.ts xanh.
+
+- eval: E16
+  run_id: minted-app-shell-khuon-dau-trang-E16-r7
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.app_shell_verve_db
+  verified_at: 2026-11-26T08:39:53Z
+  output: |
+    Cùng lệnh với E5: bài đầu trang mỏng và nút chính cuối hàng xanh ở 1024 và 1440.
+
+- eval: E17
+  run_id: minted-app-shell-khuon-dau-trang-E17-r7
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.app_shell_verve_db
+  verified_at: 2026-11-26T08:39:53Z
+  output: |
+    Cùng lệnh với E5: bài tên sàn dài cắt bằng dấu ba chấm, không đè ô tìm, xanh ở 768, 1024, 1440.
+
+### Judgment
+
+- eval: E13
+  judged_by: judge panel (carried from round 5)
+  verdict: UNCERTAIN
+  rationale: panel giu nguyen tu round 5 — inputs khong doi, khong cham lai; rationale xem round do.
+  votes:
+    - domain-correctness: UNCERTAIN (r5)
+    - operational-feasibility: UNCERTAIN (r5)
+    - spec-alignment: UNCERTAIN (r5)
+  required_evidence:
+    - (judge không nêu bằng-chứng-thiếu)
+  human_override:  # chi nguoi ghi
+
 ### Lệnh suite (hồi quy)
 
-- cmd: make check
-  run_id: minted-app-shell-khuon-dau-trang-SUITE-make_check-r6
-  exit_code: 0
-  verified_at: 2026-11-26T08:16:16Z
-
 - cmd: npm run build
-  run_id: minted-app-shell-khuon-dau-trang-SUITE-build-r6
+  run_id: minted-app-shell-khuon-dau-trang-SUITE-build-r7
   exit_code: 0
-  verified_at: 2026-11-26T08:16:16Z
+  verified_at: 2026-11-26T08:39:53Z
 
 - cmd: DATABASE_URL= make e2e
-  run_id: minted-app-shell-khuon-dau-trang-SUITE-DATABASE_URL_make_e2e-r6
+  run_id: minted-app-shell-khuon-dau-trang-SUITE-DATABASE_URL_make_e2e-r7
   exit_code: 0
-  verified_at: 2026-11-26T08:16:16Z
+  verified_at: 2026-11-26T08:39:53Z
 
 ## Known limits
 
@@ -241,15 +235,20 @@ Lệnh đỏ không gắn riêng eval nào: không có. Lệnh duy nhất đỏ 
 
 ## Analyst
 
-none — mọi eval feature đều red trên baseline (có phân biệt)
+carried tu round 6 — baseline khong do lai round nay.
+
+Baseline khong do: mọi eval ghi baseline n-a vì evals.yaml không đổi từ lần đo cuối (round 6); round này không đo lại.
+
+Eval không-phân-biệt: none được liệt kê. Hai lệnh suite xanh-cả-hai-phía là regression-guard bình thường.
 
 ## Variance
 
-none — mọi eval nhiều lần chạy đều đồng nhất
+none — every multi-run eval is uniform
 
 ## Iterations
 
 Round 3: E1, E2, E3, E6, E7, E8, E9 xanh, giữ lại cho các round sau.
 Round 4: E4, E12, E14 xanh, giữ lại.
 Round 5: E10, E11 xanh, giữ lại; panel E13 chấm UNCERTAIN.
-Round 6: E5, E15, E16, E17 đỏ — bài `app-shell-verve.spec.ts:201` (màn Thành viên, 1024 và 1440) không thấy `page-header-action`. Trả về cho khâu cài đặt.
+Round 6: E5, E15, E16, E17 đỏ — bài app-shell-verve.spec.ts:201 (màn Thành viên, 1024 và 1440) không thấy page-header-action. Trả về cho khâu cài đặt.
+Round 7: E5, E15, E16, E17 và E10 xanh, cùng build và make e2e; E13 còn chờ người chốt ở Cổng 2.
