@@ -11,6 +11,7 @@ import { DB_URL, OUTBOX } from "../../playwright.db.config";
 import { sampleInventoryData } from "../../src/app/(app)/inventory-sample-data";
 import { companyListingId, seedSampleInventory } from "../db/can-mau";
 import { regionReady } from "../e2e/phone-list";
+import { shellReady } from "./dang-nhap-vai";
 import { chupAnh, pageReady } from "../e2e/sua-trang";
 
 let owner: pg.Client;
@@ -102,9 +103,16 @@ async function signIn(page: Page, email: string, into: Company) {
   await code.fill(codes(email).at(-1)!);
   await code.press("Enter");
   const choose = page.locator('[data-state="choose-company"]');
-  await expect(choose.or(page.locator('[data-slot="account-menu"][data-ready]'))).toBeVisible();
+  // On a phone the account menu rides in the closed sheet (App Shell, row VP7): the top bar's company name stands in.
+  const shell = page.locator(
+    '[data-slot="account-menu"][data-ready], [data-slot="app-shell-top-bar"] [data-slot="company-name"]',
+  );
+  await expect(choose.or(shell.filter({ visible: true }).first())).toBeVisible();
   if (await choose.isVisible()) await choose.getByRole("button", { name: into.name }).click();
-  await expect(page.locator('[data-slot="company-name"]')).toContainText(into.name);
+  await shellReady(page);
+  await expect(
+    page.locator('[data-slot="company-name"]').filter({ visible: true }).first(),
+  ).toContainText(into.name);
 }
 
 async function openInventory(page: Page, path: string) {
