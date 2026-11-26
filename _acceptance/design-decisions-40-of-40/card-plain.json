@@ -1,0 +1,5 @@
+{
+  "feature_plain": "Hệ thiết kế ghi đủ 40/40 quyết định lõi theo lời chủ kho, và sổ hệ thiết kế đọc bằng tiếng Việt.",
+  "scope_plain": "Những việc vòng này cố ý không làm:",
+  "analyst_plain": "Bên chấm ghi năm giới hạn của phép đo: bài kiểm cỡ màn trên trình duyệt không được chạy trong vòng này; phép đo cỡ màn chỉ đọc tên dự án, không đọc bề rộng; phép dò bộ chữ chỉ bắt một tên kho và vài kiểu mã màu; phần đầu tệp sổ quyết định không được so; phép đo không tự kiểm số bản plugin."
+}
