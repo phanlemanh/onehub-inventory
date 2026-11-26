@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 1c0db7a53ead8ac3ca23c20991b2746df50d1e98
+verified_commit: 9e5cf640628157d835c23a4cf7060c1bd4299f82
 human_signoff: Manh Phan 2026-11-13
 ---
 
@@ -258,3 +258,7 @@ sha: dec74df04c273d49fc81c17b1f7fde95e915a584 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 4 — 2026-11-26, do gộp main #124 và sửa hai bài thử sau CI nặng (G-2611-13)
 run_id: repin-20261126T165751Z-54219
 sha: 1c0db7a53ead8ac3ca23c20991b2746df50d1e98 · suites: 3 lệnh exit 0 · evals: 18/18 eval máy đạt kỳ vọng · ngoài làn máy: E15
+
+### Re-pin lần 5 — 2026-11-26, do giờ chờ ca quét trợ năng tám lần (G-2611-14)
+run_id: repin-20261126T180905Z-49173
+sha: 9e5cf640628157d835c23a4cf7060c1bd4299f82 · suites: 3 lệnh exit 0 · evals: 18/18 eval máy đạt kỳ vọng · ngoài làn máy: E15
