@@ -11,6 +11,7 @@ import { expect, type Page } from "@playwright/test";
 import pg from "pg";
 
 import type { Role } from "../../src/generated/ontology";
+import { openSheet } from "../../tools/e2e_templates/settle";
 
 /** The run id the database config sets once in its main process; workers inherit it. */
 const RUN = process.env["E2E_DB_RUN"] ?? `${process.pid}`;
@@ -102,5 +103,37 @@ export async function signInWithCode(page: Page, email: string): Promise<void> {
   await code.fill(found[0]!);
   await code.press("Enter");
   await page.waitForURL((u) => u.pathname === "/" && u.search === "");
-  await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
+  await shellReady(page);
+}
+
+const onPhone = (page: Page) => (page.viewportSize()?.width ?? 1280) < 768;
+
+/**
+ * The App Shell of a signed-in person is ready, no weaker than the wait it replaces (supervisor ruling R-1711-5). On a
+ * computer: the account menu at the foot of the rail, hydrated (`data-ready`), as before. On a phone the rail rides in
+ * the closed sheet since app-shell-khuon-dau-trang (owner, 2026-11-17), so the same two facts are read from the top
+ * bar: the signed-in company name shows, and the top bar's search box is hydrated (`data-ready`).
+ */
+export async function shellReady(page: Page, opts: { timeout?: number } = {}): Promise<void> {
+  if (onPhone(page)) {
+    await expect(
+      page.locator('[data-slot="app-shell-top-bar"] [data-slot="company-name"]'),
+    ).toBeVisible(opts);
+    await expect(
+      page.locator('[data-slot="app-shell-top-bar"] [data-slot="unit-jump"][data-ready]'),
+    ).toBeAttached(opts);
+  } else {
+    await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible(opts);
+  }
+}
+
+/** Opens the account menu at the foot of the rail, signed in or not; on a phone the sheet opens first. */
+export async function openAccountMenu(page: Page): Promise<void> {
+  if (onPhone(page)) await openSheet(page);
+  const button = page.locator(
+    '[data-slot="account-menu"][data-ready], [data-slot="account-sign-in"][data-ready]',
+  );
+  await expect(button.first()).toBeVisible();
+  await button.first().click();
+  await expect(page.getByRole("menu")).toBeVisible();
 }

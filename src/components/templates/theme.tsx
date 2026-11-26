@@ -3,15 +3,13 @@
 import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 import { ThemeProvider as NextThemes, useTheme } from "next-themes";
 import type { ReactNode } from "react";
+import { useSyncExternalStore } from "react";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Menu as MenuPrimitive } from "@base-ui/react/menu";
+
+import { buttonVariants } from "@/components/ui/button";
+
+import { cn } from "@/lib/utils";
 
 import { FRAME_COPY } from "./frame-copy";
 
@@ -25,34 +23,48 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 }
 
 const CHOICES = [
-  { value: "light", label: FRAME_COPY.theme.light },
-  { value: "dark", label: FRAME_COPY.theme.dark },
-  { value: "system", label: FRAME_COPY.theme.system },
+  { value: "light", label: FRAME_COPY.theme.light, Icon: SunIcon },
+  { value: "dark", label: FRAME_COPY.theme.dark, Icon: MoonIcon },
+  { value: "system", label: FRAME_COPY.theme.system, Icon: MonitorIcon },
 ] as const;
 
-export function ThemeSwitch() {
+const noSubscribe = () => () => {};
+
+/**
+ * The three looks as one row of icon choices inside the account menu (ReUI Verve template): light, dark, or following
+ * the device. They are the menu's own radio items, so the arrow keys reach them and choosing keeps the menu open. The
+ * chosen one is known only in the browser, so the server paints none chosen.
+ */
+export function ThemeMenuChoice() {
   const { theme, setTheme } = useTheme();
+  const inBrowser = useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false,
+  );
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={<Button variant="ghost" size="icon-sm" aria-label={FRAME_COPY.theme.button} />}
-      >
-        <SunIcon className="dark:hidden" />
-        <MoonIcon className="hidden dark:block" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuRadioGroup
-          value={theme ?? "system"}
-          onValueChange={(value) => setTheme(value)}
+    <MenuPrimitive.RadioGroup
+      aria-label={FRAME_COPY.theme.button}
+      value={inBrowser ? (theme ?? "system") : null}
+      onValueChange={(value: string) => setTheme(value)}
+      data-slot="theme-choice"
+      className="inline-flex items-center gap-0.5 rounded-full bg-muted/60 p-0.5"
+    >
+      {CHOICES.map(({ value, label, Icon }) => (
+        <MenuPrimitive.RadioItem
+          key={value}
+          value={value}
+          closeOnClick={false}
+          aria-label={label}
+          title={label}
+          className={cn(
+            buttonVariants({ variant: "ghost", size: "icon-xs" }),
+            "rounded-full outline-hidden data-checked:bg-background data-checked:text-foreground data-highlighted:bg-accent data-highlighted:text-accent-foreground",
+          )}
         >
-          {CHOICES.map((choice) => (
-            <DropdownMenuRadioItem key={choice.value} value={choice.value}>
-              {choice.value === "system" ? <MonitorIcon /> : null}
-              {choice.label}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <Icon aria-hidden />
+        </MenuPrimitive.RadioItem>
+      ))}
+    </MenuPrimitive.RadioGroup>
   );
 }

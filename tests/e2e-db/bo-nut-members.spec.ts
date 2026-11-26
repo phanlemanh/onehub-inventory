@@ -24,6 +24,7 @@ import {
 } from "../../src/modules/identity/permissions";
 import { expect, test } from "../../tools/e2e_templates/fixture";
 import { openSheet } from "../../tools/e2e_templates/settle";
+import { shellReady } from "./dang-nhap-vai";
 
 const MEMBER = "Thành viên";
 const INVITE = "Mời người";
@@ -105,7 +106,7 @@ const mobile = (info: TestInfo) => Number(info.project.name) < 768;
 
 /** The «Thành viên» entries of the sidebar; on a phone the sidebar sheet is opened first. */
 async function navMembers(page: Page, info: TestInfo) {
-  await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
+  await shellReady(page);
   if (mobile(info)) await openSheet(page);
   return page.getByRole("link", { name: MEMBER, exact: true });
 }

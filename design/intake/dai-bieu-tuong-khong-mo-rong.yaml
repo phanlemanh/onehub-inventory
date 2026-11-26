@@ -1,0 +1,9 @@
+ten: RailProvider
+tep: src/components/templates/app-shell/rail-provider.tsx
+nguon: tao-tay
+nhu_cau: dai-bieu-tuong-khong-mo-rong
+mo_ta: Dải biểu tượng của App Shell luôn thu gọn trên máy tính, không mở rộng — bọc trạng thái thanh bên cho mẫu Verve
+ho_so: app-shell-khuon-dau-trang
+duyet: 2026-11-17
+searched: sidebar provider collapsed rail icon
+nearest: SidebarProvider
