@@ -12,6 +12,8 @@ import requireDisableReason from "./rules/require-disable-reason.mjs";
 import noOffScaleSpacing from "./rules/no-off-scale-spacing.mjs";
 import noPartialClass from "./rules/no-partial-class.mjs";
 
+const REASON_RULE = "onehub-ui/require-disable-reason";
+
 export default {
   meta: { name: "onehub-ui" },
   rules: {
@@ -27,5 +29,23 @@ export default {
     "require-disable-reason": requireDisableReason,
     "no-off-scale-spacing": noOffScaleSpacing,
     "no-partial-class": noPartialClass,
+  },
+  processors: {
+    // `/* eslint-disable */` and `// eslint-disable-line` switch off the lint on the very line that
+    // carries them, so the report of require-disable-reason on that line would be dropped. The text
+    // goes through unchanged; that rule's reports lose the suppression, since no directive may
+    // excuse itself from giving a reason.
+    reasons: {
+      meta: { name: "onehub-ui/reasons" },
+      supportsAutofix: true,
+      preprocess: (text) => [text],
+      postprocess: (lists) =>
+        lists.flat().map((message) => {
+          if (message.ruleId !== REASON_RULE || !message.suppressions) return message;
+          const kept = { ...message };
+          delete kept.suppressions;
+          return kept;
+        }),
+    },
   },
 };

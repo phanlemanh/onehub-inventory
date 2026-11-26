@@ -245,6 +245,31 @@
         "expected": "var(--font-sans)"
       }
     ],
+    "spacing": [
+      {
+        "kind": "lint",
+        "rule": "onehub-ui/no-off-scale-spacing",
+        "at": "src/app/(app)/account-menu.tsx"
+      }
+    ],
+    "lint-exceptions": [
+      {
+        "kind": "lint",
+        "rule": "onehub-ui/require-disable-reason",
+        "at": "src/app/(app)/account-menu.tsx"
+      }
+    ],
+    "whole-class-names": [
+      {
+        "kind": "lint",
+        "rule": "onehub-ui/no-partial-class",
+        "at": "src/app/(app)/account-menu.tsx",
+        "component": {
+          "name": "Button",
+          "from": "@/components/ui/button"
+        }
+      }
+    ],
     "design-exports": [
       {
         "kind": "export",
