@@ -10,7 +10,14 @@ import { fileURLToPath } from "node:url";
 import { tokenHex } from "./color.mjs";
 import { families } from "./fonts.mjs";
 import { TYPE_STEPS } from "./scale.mjs";
-import { darkScopes, expand, loadStyles, themeDeclarations } from "./styles.mjs";
+import {
+  darkScopes,
+  DEFAULT_STYLESHEET,
+  expand,
+  findStylesheet,
+  loadStyles,
+  themeDeclarations,
+} from "./styles.mjs";
 
 // The file a repository gets when nothing names another one.
 export const TOKENS = "design/tokens.json";
@@ -125,7 +132,8 @@ export function regenerated(root) {
   const theme = existsSync(themeFile) ? JSON.parse(readFileSync(themeFile, "utf8")) : null;
   const check = theme?.checks?.[TOKENS_DECISION]?.[0];
   if (!check) return null;
-  const stylesheet = theme.stylesheet ?? "src/index.css";
+  // The stylesheet the tool data names, else the one every reader finds.
+  const stylesheet = theme.stylesheet ?? findStylesheet(root) ?? DEFAULT_STYLESHEET;
   const { tokens, unresolved } = readTokens(loadStyles(root, stylesheet));
   return { file: check.file, content: renderTokens(tokens), data: tokens, stylesheet, unresolved };
 }

@@ -42,6 +42,9 @@ export default defineConfig([
   ...nextVitals,
   ...nextTs,
   { files: ["src/hooks/use-mobile.ts"], rules: { "react-hooks/set-state-in-effect": "off" } },
+  // The design-assembly tool is plain Node code the plugin writes; it has no React, so a function
+  // whose name starts with "use" (contract.mjs `useClashes`) is not a hook.
+  { files: ["tools/design-assembly/**"], rules: { "react-hooks/rules-of-hooks": "off" } },
   {
     files: ["**/*.mjs", "tools/**/*.js"],
     languageOptions: { globals: globals.node },

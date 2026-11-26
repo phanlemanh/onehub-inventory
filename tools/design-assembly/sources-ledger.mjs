@@ -21,6 +21,22 @@ const isMap = (value) => value !== null && typeof value === "object" && !Array.i
 const text = (value) => (typeof value === "string" ? value : undefined);
 const filled = (value) => typeof value === "string" && value.trim() !== "";
 export const isFont = (source) => isMap(source) && source.kind === FONT_KIND;
+// The kind of source that is the core of the family the repository declared it is of (spec 0016,
+// answer 4): a copy of the core kept in the repository, compared by hash. It offers no block of a
+// library; a repository is of one family, so the row is `design/sources/core.json`, id `core`.
+export const CORE_KIND = "core";
+export const CORE_ID = "core";
+export const isCoreSource = (source) => isMap(source) && source.kind === CORE_KIND;
+// Where a source stands on the ladder find and intake walk: before the starter kit and the family's
+// store, or after them, which is where a source that declares nothing stands (spec 0015).
+export const LADDER_PLACES = ["before-starter", "after-family"];
+export const DEFAULT_LADDER_PLACE = "after-family";
+// The pin a file keeps: the file itself, or, for a catalog that keeps its own pin, its `pin`.
+export const pinWithin = (data) => (isMap(data) && isMap(data.pin) ? data.pin : data);
+// The source a plug is pinned as: the one that names it, else the one of its id.
+export const sourceOfPlug = (sources, plug) =>
+  sources.find((source) => source.plug === plug) ??
+  sources.find((source) => source.id === plug && !source.plug);
 // How each field of a font row a stylesheet takes is written: the contract holds a row's shape
 // with these, and the reader refuses a row that breaks one before any of it reaches a stylesheet.
 export const FONT_FIELDS = {
@@ -79,6 +95,38 @@ const outside = (root, file, what) =>
 const isFile = (full) => existsSync(full) && statSync(full).isFile();
 const readJson = (root, file) => JSON.parse(readFileSync(inside(root, file), "utf8"));
 
+// JSON with its keys in order, so that the same pin, written another way, hashes the same.
+const stable = (value) =>
+  Array.isArray(value)
+    ? `[${value.map(stable).join(",")}]`
+    : isMap(value)
+      ? `{${Object.keys(value)
+          .sort()
+          .map((key) => `${JSON.stringify(key)}:${stable(value[key])}`)
+          .join(",")}}`
+      : JSON.stringify(value);
+
+// The hash of a source's pin as the repository holds it now, kept in its file or in the one its
+// pin_file names, or null when it cannot be read. A conform record keeps it, so that a newer item
+// is told from a hand edit, and an item behind its source's pin is told at all (spec 0015).
+export function pinSha256(root, sourceId) {
+  const json = (file) => {
+    try {
+      return inside(root, file) === null ? null : readJson(root, file);
+    } catch {
+      return null;
+    }
+  };
+  const source = json(`${SOURCES_FOLDER}/${sourceId}.json`);
+  if (!isMap(source)) return null;
+  const pin = isMap(source.pin)
+    ? source.pin
+    : typeof source.pin_file === "string"
+      ? pinWithin(json(source.pin_file))
+      : null;
+  return isMap(pin) ? createHash("sha256").update(stable(pin)).digest("hex") : null;
+}
+
 // Why the snapshot a pin names differs from it, or null when every file matches. What could not
 // be compared is said in `blind`.
 function snapshotProblem(root, source, pin, blind) {
@@ -134,6 +182,10 @@ function readSource(root, name) {
     catalog: text(source.catalog) ?? null,
     install: text(source.install) ?? null,
     licence: text(source.licence) ?? null,
+    plug: text(source.plug) ?? null,
+    ladder_place: LADDER_PLACES.includes(source.ladder_place)
+      ? source.ladder_place
+      : DEFAULT_LADDER_PLACE,
   };
   for (const [key, what] of [
     ["pin_file", "the file its pin is kept in"],
@@ -146,7 +198,7 @@ function readSource(root, name) {
   let pin = isMap(source.pin) ? source.pin : null;
   if (!pin && source.pin_file) {
     try {
-      pin = readJson(root, source.pin_file);
+      pin = pinWithin(readJson(root, source.pin_file));
     } catch {
       return {
         ...said,
@@ -187,10 +239,14 @@ function parsed(root, name) {
 
 // Every pinned source blocks are picked from, in the order they are looked through: by `order`,
 // the smallest first and a source without one last, then by id. Empty when the repository keeps
-// none. A font is a source of another kind: it offers no block, and is read by `readFontSources`.
+// none. A font is a source of another kind: it offers no block, and is read by `readFontSources`;
+// so is the family core, which the contract reads as the repository's family.
 export function readPinnedSources(root) {
   return sourceFiles(root)
-    .filter((name) => !isFont(parsed(root, name)))
+    .filter((name) => {
+      const source = parsed(root, name);
+      return !isFont(source) && !isCoreSource(source);
+    })
     .map((name) => readSource(root, name))
     .sort(
       (a, b) =>

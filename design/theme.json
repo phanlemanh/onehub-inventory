@@ -211,6 +211,17 @@
         "kind": "untracked",
         "of": "intake",
         "file": "design/intake.yaml"
+      },
+      {
+        "kind": "taken-down",
+        "sources": "src"
+      },
+      {
+        "kind": "choose-first"
+      },
+      {
+        "kind": "floating-parts",
+        "test": "tests/e2e/floating-parts.spec.ts"
       }
     ],
     "target-size": [

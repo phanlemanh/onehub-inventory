@@ -8,6 +8,13 @@ import path from "node:path";
 
 export const MAKEFILE = "Makefile";
 export const MK_FOLDER = "mk";
+// Where a repository with no Makefile keeps its commands: the scripts of its package file.
+export const PACKAGE_FILE = "package.json";
+// The command of the gate, as a package script runs it: the check, in a way that can fail.
+export const CHECK_COMMAND = "node tools/design-assembly/check.mjs";
+// The names the gate's script is given, the first one free: a script the repository already has
+// under a name is never written over.
+export const CHECK_SCRIPTS = ["design:check", "design-assembly:check"];
 // The gate step this tool installs beside it: the plugin writes it, and reads it whole.
 export const GATE_STEP = `${MK_FOLDER}/design-assembly.mk`;
 
@@ -100,6 +107,20 @@ export const HOST_READS = {
     [`${MK_FOLDER}/*.mk`],
     "The gate step adds the files this tool keeps out of git to the shared list of derived files.",
   ),
+  "check-script": read(
+    CHECK_SCRIPTS.join(" "),
+    "",
+    "word",
+    [PACKAGE_FILE],
+    "Where the repository keeps no Makefile, the gate is a script of its package under the first of these names it does not already use; a ledger row's check-in-gate check names the script it holds.",
+  ),
+  "script-runs-check": read(
+    "^node tools/design-assembly/check\\.mjs$",
+    "",
+    "pattern",
+    [PACKAGE_FILE],
+    "The gate's script runs the check and nothing else, so it fails when the check fails.",
+  ),
 };
 // ---- end of reads ----
 
@@ -164,6 +185,107 @@ export function gateStepProblem(gate, makefile) {
     return "the Makefile's check target no longer runs CHECK_TARGETS, so make check does not run this";
   }
   return null;
+}
+
+// The package file, or null.
+export const readPackage = (root) => readText(root, PACKAGE_FILE);
+
+const scriptsOf = (text) => {
+  try {
+    const scripts = JSON.parse(text ?? "null")?.scripts;
+    return scripts !== null && typeof scripts === "object" && !Array.isArray(scripts)
+      ? scripts
+      : {};
+  } catch {
+    return null;
+  }
+};
+
+// Why the gate's script does not run this tool's check, or null: `pkg` is the text of the
+// package file, `name` the script the check-in-gate check names.
+export function scriptGateProblem(pkg, name) {
+  const scripts = scriptsOf(pkg);
+  if (pkg === null || pkg === undefined)
+    return `${PACKAGE_FILE} is missing, so no script runs this`;
+  if (scripts === null) return `${PACKAGE_FILE} cannot be read, so no script runs this`;
+  if (typeof scripts[name] !== "string")
+    return `${PACKAGE_FILE} has no script ${name}, so nothing runs this`;
+  if (!pattern("script-runs-check").test(scripts[name].trim())) {
+    return `the script ${name} of ${PACKAGE_FILE} does not run the check alone, or runs it in a way that cannot fail`;
+  }
+  return null;
+}
+
+// The package file with the gate's script changed so that it cannot fail.
+export function scriptThatCannotFail(pkg, name) {
+  const data = JSON.parse(pkg);
+  return JSON.stringify({
+    ...data,
+    scripts: { ...data.scripts, [name]: `${CHECK_COMMAND} || true` },
+  });
+}
+
+// Where the gate is, for a repository: `{ kind: "make" }` when the Makefile reads every mk file;
+// `{ kind: "script", name, have }` when the repository keeps no Makefile and has a package file,
+// `name` being the script the gate is or will be, and `have` whether it is already there as the
+// gate needs it; or `{ problem }`. A repository that has a Makefile is read as it always was.
+export function gateHost(root) {
+  const makefile = readMakefile(root);
+  if (joinsMkFiles(makefile)) return { kind: "make" };
+  const problem = "the Makefile does not include mk/*.mk, so the checks could not join make check";
+  if (makefile !== null) return { problem };
+  const pkg = readPackage(root);
+  if (pkg === null) return { problem };
+  const scripts = scriptsOf(pkg);
+  if (scripts === null)
+    return { problem: `${PACKAGE_FILE} cannot be read, so no script can hold the gate` };
+  const mine = CHECK_SCRIPTS.find(
+    (name) => typeof scripts[name] === "string" && scripts[name].trim() === CHECK_COMMAND,
+  );
+  if (mine) return { kind: "script", name: mine, have: true };
+  const free = CHECK_SCRIPTS.find((name) => scripts[name] === undefined);
+  const taken = CHECK_SCRIPTS.filter((name) => scripts[name] !== undefined);
+  if (!free) {
+    return {
+      problem: `the repository keeps no Makefile, and its ${PACKAGE_FILE} already has scripts named ${CHECK_SCRIPTS.join(" and ")} that run something else, so the gate has no name to take: rename one, then adopt again`,
+    };
+  }
+  return { kind: "script", name: free, have: false, taken };
+}
+
+// The package file with the gate's script added, keeping the file as it is written: its indent,
+// the order of its keys and its last line. Null when it cannot be read.
+export function withCheckScript(pkg, name) {
+  const scripts = scriptsOf(pkg);
+  if (scripts === null) return null;
+  const line = `"${name}": "${CHECK_COMMAND}"`;
+  // Written in place where the scripts are a block of one entry per line: the line goes first.
+  const open = /("scripts"\s*:\s*\{)(\r?\n)([ \t]+)(?=")/.exec(pkg);
+  if (open) {
+    const at = open.index + open[1].length;
+    const text = `${pkg.slice(0, at)}${open[2]}${open[3]}${line},${pkg.slice(at)}`;
+    if (scriptsOf(text)?.[name] === CHECK_COMMAND) return text;
+  }
+  // Elsewhere the scripts are written in as text too, with the file's own line ending and indent:
+  // in place of empty scripts, or as the last key of the file. Only a file that none of this
+  // reaches is written again whole.
+  const eol = pkg.includes("\r\n") ? "\r\n" : "\n";
+  const indent = /\n([ \t]+)"/.exec(pkg)?.[1] ?? "  ";
+  const block = (at) => `{${eol}${at}${indent}${line}${eol}${at}}`;
+  const tries = [
+    pkg.replace(/("scripts"\s*:\s*)\{\s*\}/, (_, key) => `${key}${block(indent)}`),
+    pkg.replace(
+      /(\S)(\s*)\}(\s*)$/,
+      (_, last, space, after) =>
+        `${last},${eol}${indent}"scripts": ${block(indent)}${space}}${after}`,
+    ),
+  ];
+  for (const text of tries) {
+    if (text !== pkg && scriptsOf(text)?.[name] === CHECK_COMMAND) return text;
+  }
+  const data = JSON.parse(pkg);
+  const end = pkg.endsWith("\n") ? eol : "";
+  return `${JSON.stringify({ ...data, scripts: { ...data.scripts, [name]: CHECK_COMMAND } }, null, indent)}${end}`;
 }
 
 // The gate step changed so that its check cannot fail: what the check of the gate is seen failing on.
