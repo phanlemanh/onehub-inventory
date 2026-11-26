@@ -1,0 +1,17 @@
+{"ts":"2026-11-26T06:27:38Z","round":1,"evalId":"E1","run_id":"design-decisions-40-of-40-E1-20261126T062542Z","exit_code":0,"cmd":"make check"}
+{"ts":"2026-11-26T06:27:49Z","round":1,"evalId":"E2","run_id":"design-decisions-40-of-40-E2-20261126T062747Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs muc"}
+{"ts":"2026-11-26T06:27:56Z","round":1,"evalId":"E3","run_id":"design-decisions-40-of-40-E3-20261126T062749Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only muc"}
+{"ts":"2026-11-26T06:27:58Z","round":1,"evalId":"E4","run_id":"design-decisions-40-of-40-E4-20261126T062756Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs sau-dong"}
+{"ts":"2026-11-26T06:28:11Z","round":1,"evalId":"E5","run_id":"design-decisions-40-of-40-E5-20261126T062758Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only sau-dong"}
+{"ts":"2026-11-26T06:28:19Z","round":1,"evalId":"E6","run_id":"design-decisions-40-of-40-E6-20261126T062816Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs loi-chu"}
+{"ts":"2026-11-26T06:28:23Z","round":1,"evalId":"E7","run_id":"design-decisions-40-of-40-E7-20261126T062819Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only loi-chu"}
+{"ts":"2026-11-26T06:28:23Z","round":1,"evalId":"E8","run_id":"design-decisions-40-of-40-E8-20261126T062823Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs kho-man"}
+{"ts":"2026-11-26T06:28:27Z","round":1,"evalId":"E9","run_id":"design-decisions-40-of-40-E9-20261126T062823Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only kho-man"}
+{"ts":"2026-11-26T06:28:27Z","round":1,"evalId":"E10","run_id":"design-decisions-40-of-40-E10-20261126T062827Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs dong-gan"}
+{"ts":"2026-11-26T06:28:31Z","round":1,"evalId":"E11","run_id":"design-decisions-40-of-40-E11-20261126T062827Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only dong-gan"}
+{"ts":"2026-11-26T06:28:36Z","round":1,"evalId":"E12","run_id":"design-decisions-40-of-40-E12-20261126T062836Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs tep-nhanh"}
+{"ts":"2026-11-26T06:28:37Z","round":1,"evalId":"E13","run_id":"design-decisions-40-of-40-E13-20261126T062836Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only tep-nhanh"}
+{"ts":"2026-11-26T06:28:40Z","round":1,"evalId":"E14","run_id":"design-decisions-40-of-40-E14-20261126T062837Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs bo-chu"}
+{"ts":"2026-11-26T06:28:59Z","round":1,"evalId":"E15","run_id":"design-decisions-40-of-40-E15-20261126T062840Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only bo-chu"}
+{"ts":"2026-11-26T06:28:59Z","round":1,"evalId":"E16","run_id":"design-decisions-40-of-40-E16-20261126T062859Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs dong-khac"}
+{"ts":"2026-11-26T06:29:00Z","round":1,"evalId":"E17","run_id":"design-decisions-40-of-40-E17-20261126T062859Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only dong-khac"}
