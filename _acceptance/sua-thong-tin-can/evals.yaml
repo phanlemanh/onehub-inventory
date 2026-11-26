@@ -75,7 +75,7 @@ evals:
     target: http://127.0.0.1:3487/inventory
     paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**]
     steps:
-      - "With the lane H dev server on port 3487 (sample mode), open /inventory?vai=ListAgent&ho-so=4d415500-0001-4000-8000-000000000002 at 1440 wide (unit 1101, whose listing lacks Tài chính, so the count reads 4/5 before), save _acceptance/sua-thong-tin-can/evidence/E2-ho-so-1440.png"
+      - "With the lane H dev server on port 3487 (sample mode), open /inventory?role=ListAgent&record=4d415500-0001-4000-8000-000000000002 at 1440 wide (unit 1101, whose listing lacks Tài chính, so the count reads 4/5 before), save _acceptance/sua-thong-tin-can/evidence/E2-ho-so-1440.png"
       - "Press «Sửa» in the «Lần chào đang mở» section, save _acceptance/sua-thong-tin-can/evidence/E2-hop-1440.png; change Pháp lý and type a Tài chính, press «Lưu», save _acceptance/sua-thong-tin-can/evidence/E2-da-luu-1440.png"
       - "Reload, then repeat the three frames at 360 wide on the same unit (the sample resets on reload) as E2-ho-so-360.png, E2-hop-360.png, E2-da-luu-360.png"
     question: "Nút «Sửa» có nằm ở đầu mục «Lần chào đang mở», bên phải, cùng dáng nút phụ với «Báo sai thông tin» của mục Căn không; hộp có đủ bốn trường; sau Lưu bốn dòng và số «n/5» có đổi theo không, ở cả hai khổ? Nêu khung nào lệch."
@@ -233,7 +233,7 @@ evals:
     target: http://127.0.0.1:3487/inventory
     paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**]
     steps:
-      - "With the lane H dev server on port 3487 (sample mode), open /inventory?vai=ListAgent at 1440 and at 1024 wide, save _acceptance/sua-thong-tin-can/evidence/E13-luoi-<khổ>.png; scroll the grid right until Nội thất, Pháp lý, Tài chính, Hiện trạng are in view, save E13-bon-cot-<khổ>.png; press F2 on the Nội thất cell of unit 1101, save E13-o-noi-that-1440.png"
+      - "With the lane H dev server on port 3487 (sample mode), open /inventory?role=ListAgent at 1440 and at 1024 wide, save _acceptance/sua-thong-tin-can/evidence/E13-luoi-<khổ>.png; at 1440 scroll the grid right until Nội thất, Pháp lý, Tài chính, Hiện trạng are in view together, save E13-bon-cot-1440.png; at 1024 scroll the grid right to each of the four columns in turn, with Phòng ngủ or the column before it beside it, save E13-cot-<noi-that|phap-ly|tai-chinh|hien-trang>-1024.png (G-2611-4: 1024 leaves ~367px after the two pinned columns, the four need ~618px); press F2 on the Nội thất cell of unit 1101, save E13-o-noi-that-1440.png"
     question: "Lưới có bốn cột Nội thất, Pháp lý, Tài chính, Hiện trạng ngay sau Phòng ngủ ở cả hai khổ, ô của căn đã bán có dấu khoá, và ô Nội thất mở danh sách ba giá trị cộng «Chưa có» cùng khung sửa trên ô của cột Trạng thái không? Nêu khung nào lệch."
     expected: "Bốn cột đúng chỗ ở hai khổ, khoá đúng, bộ chọn cùng khung"
     evidence_required: [run_id, screenshot, observed, verdict]
