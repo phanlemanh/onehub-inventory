@@ -1,0 +1,1 @@
+Rollback after rotating the login role's password is written once, in xoay-khoa.md; every other runbook rollback paragraph points to it, held by tests/so-tay-lui-ban.test.ts — row lui-ban-luc-xoay-mat-khau

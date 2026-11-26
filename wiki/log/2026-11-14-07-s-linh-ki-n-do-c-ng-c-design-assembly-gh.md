@@ -1,0 +1,1 @@
+Sổ linh kiện do công cụ design-assembly ghi, theo hình dạng của hợp đồng (mỗi linh kiện một mục, có thuộc tính, ReUI là thư viện); công cụ cũ `tools/design_registry.mjs` bị bỏ; khai sổ với kit để PR sau — [0032](decisions/0034-component-register-written-by-design-assembly.md).

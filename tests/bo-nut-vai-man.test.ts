@@ -1,5 +1,5 @@
 // Row 9e (bo-nut-theo-quyen), AC-9: the role × screen × button table is generated from the permission table
-// (tools/coverage_matrix/buttons.py → design/vai-man-nut.md), and drift turns `make check` red.
+// (tools/coverage_matrix/buttons.py → design/role-screen-buttons.md), and drift turns `make check` red.
 //   bang-sinh-khop-quyen — every screen × role lists exactly the actions allowedScope gives, with their scope.
 //   doi-o-doi-bang — on a copy of the table giving TeamLead listMembers, members × TeamLead changes.
 //   tep-sinh-lech-do — a hand-edited generated file makes `--check` fail with «lệch bảng quyền: <màn>».
@@ -41,7 +41,12 @@ afterAll(() => {
 function copy(): string {
   const dir = tempDir("vai-man-nut-");
   copies.push(dir);
-  for (const part of ["ontology", "design/screens.yaml", "design/vai-man-nut.md", "src/app"])
+  for (const part of [
+    "ontology",
+    "design/screens.yaml",
+    "design/role-screen-buttons.md",
+    "src/app",
+  ])
     cpSync(join(ROOT, part), join(dir, part), { recursive: true });
   return dir;
 }
@@ -101,7 +106,7 @@ describe("doi-o-doi-bang", () => {
 describe("tep-sinh-lech-do", () => {
   it("a hand-edited generated file fails the check, naming the screen", () => {
     const dir = copy();
-    const file = join(dir, "design/vai-man-nut.md");
+    const file = join(dir, "design/role-screen-buttons.md");
     const before = readFileSync(file, "utf8");
     const after = before.replace("`inviteMember` (toàn sàn), ", "");
     expect(after, "bản phá không đổi được tệp").not.toBe(before);

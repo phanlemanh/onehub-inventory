@@ -3,6 +3,7 @@ type: entity
 title: Agreement (Thoả thuận)
 links: [ontology/entities/Agreement.yaml]
 sources: [onehub-quy-hang/CONTEXT.md, onehub-quy-hang/docs/adr/0001-khoi-diem.md]
+summary: cho phép một kết nối chảy
 ---
 
 # Agreement (Thoả thuận)

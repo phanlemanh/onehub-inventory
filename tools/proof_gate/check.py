@@ -14,13 +14,13 @@ of each screen from design/screens.yaml and the family files in design/patterns/
 Every path also carries the «Khối» table: the ladder Trong kho → ReUI → Vẽ tay, with grounds when a block leaves
 «trong kho». Open contracts are checked: the «Hướng» table from `approved`, the whole proof from `implemented`.
 
-Decision 0023 (row 1n) is on while design/so-khoi.yaml exists, for every open contract not named in
+Decision 0023 (row 1n) is on while design/intake.yaml exists, for every open contract not named in
 tools/proof_gate/chuyen-tiep.yaml. It adds, from `approved`: «Từ Quỹ hàng», «Họ», and ReUI candidates with images for
 the whole screen (new family, new reference) or the wrapping template; from `implemented`: candidates for every block
 taken into the store, «Vùng» and «Cách» for every ReUI block, its line in the block ledger, and «trong kho» looked up
 in the ledger instead of the generated registry. A contract with `khuon_boc: <id>` (an id of
 tools/proof_gate/khuon-boc.yaml) proves the template in `## Khuôn <id>`, not the screens it wraps.
-Row 1q, while both design/so-khoi.yaml and tools/proof_gate/thanh-phan-co-truoc.yaml exist: every file of the generated component register outside the supplier
+Row 1q, while both design/intake.yaml and tools/proof_gate/thanh-phan-co-truoc.yaml exist: every file of the generated component register outside the supplier
 folders must be declared somewhere — a ledger line (its `tep`, or its `ten` naming a component of the file), the list
 of files made before row 1q (tools/proof_gate/thanh-phan-co-truoc.yaml, frozen), or the «Khối» table of an open
 contract naming a component of the file. No git: the frozen list stands for "already on the main branch".
@@ -132,7 +132,7 @@ def path_of(repo: Repo, screen: str) -> str:
 
 
 def product_screens(repo: Repo, c: Contract) -> list[str]:
-    return [s for s in c.screens if (repo.screens.get(s) or {}).get("audience") != "dev"]
+    return [s for s in c.screens if repo.screen(s).get("audience") != "dev"]
 
 
 # ---------------------------------------------------------------- grounds
@@ -407,7 +407,7 @@ def check_family(repo: Repo, screen: str, p: ScreenProof, emit) -> None:
         return
     r = rows[0]
     proposed = bare(r.get("họ đề xuất", ""))
-    actual = (repo.screens.get(screen) or {}).get("family")
+    actual = repo.screen(screen).get("family")
     if fold(proposed) == NO_FAMILY:
         if actual is not None:
             emit("ho-lech-so-man", f"ghi họ rỗng mà design/screens.yaml ghi '{actual}'")
@@ -560,7 +560,7 @@ def check_ledger(repo: Repo, by_slug: dict[str, Contract]) -> list[Finding]:
         want_name, want_rung = (source, "reui") if source != HAND_MADE else (name, "ve-tay")
         legacy = repo.legacy_blocks.get((name, slug))
         if legacy is not None and owner.status not in OPEN:
-            # Made before the ledger by a closed round, named pair by pair (so-khoi.yaml, khoi_co_truoc); git must
+            # Made before the ledger by a closed round, named pair by pair (design/intake, khoi_co_truoc); git must
             # prove the commit, its file and its day (row 2e, AC-10).
             if history is None:
                 history = History.read(repo.root)
@@ -671,6 +671,10 @@ def run(root: Path) -> tuple[list[Finding], Tally, dict[str, int]]:
         findings.extend(undeclared)
 
     for c in contracts:
+        if c.status in OPEN:
+            for s in c.screens:
+                if s in repo.old_ids:
+                    findings.append(Finding(c.slug, s, "ma-man-cu", f"screen '{s}' is an old id of '{repo.old_ids[s]}'"))
         new = repo.ledger_present and c.slug not in repo.transition
         wrapped = False
         if c.wrapper is not None and c.status in OPEN:

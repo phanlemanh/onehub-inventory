@@ -20,3 +20,16 @@ LO-TRINH.html
 docs/plan/lo-trinh.json
 docs/tri-thuc/
 .playwright-mcp/
+.repo-setup.json
+
+# Drawn by `make derived`
+wiki/log.md
+wiki/index.md
+ontology/glossary.md
+# Written by tools/ledgers.py, one entry each; never formatted
+wiki/log/
+ontology/glossary/
+
+# Not part of the repository: run folders of the acceptance kit and the batch, and worktrees of lanes and sessions
+.acceptance-runs/
+.claude/worktrees/

@@ -1,0 +1,1 @@
+The design-assembly tool upgraded to plugin version 0.1.0 through the plugin's own upgrade command: six tool files, the component register gains back three "built from" parts of the filters, and `design/tool-stamp.json` records the version taken; record `_acceptance/upgrade-design-assembly-tool/`.

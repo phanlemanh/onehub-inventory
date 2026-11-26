@@ -1,0 +1,1 @@
+Bảng hàng trên điện thoại thành danh sách thẻ căn dưới 768 px (hàng 2b): hàng công cụ dính, ngăn Lọc có Sắp theo và chip, chạm thẻ mở hồ sơ toàn màn; bài trình duyệt cũ ở 360/414 viết lại theo thẻ — [hồ sơ](../_acceptance/bang-hang-the-dien-thoai/contract.md).

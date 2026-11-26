@@ -30,7 +30,7 @@ import {
 } from "./record-pin";
 
 /** The address parameter that names the open record (design/behaviors.md: the record panel has its own address). */
-export const RECORD_PARAM = "ho-so";
+export const RECORD_PARAM = "record";
 
 /** What a screen says about one record: its name and its content. The frame around it is not the screen's. */
 export interface RecordView {
@@ -57,7 +57,7 @@ export function recordIdIn(search: string, param: string = RECORD_PARAM): string
 
 /**
  * The open record kept in the page address. The panel holds the open id itself and writes it to the address
- * (`?ho-so=<id>`, a new history entry, so the browser's back closes it and the address can be shared); it reads the
+ * (`?record=<id>`, a new history entry, so the browser's back closes it and the address can be shared); it reads the
  * address once after mounting and again on back and forward. It does not wait for the router to read the address
  * back, so walking from row to row never closes the panel for a frame.
  */

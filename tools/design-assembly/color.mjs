@@ -25,6 +25,11 @@ export function hexToOklch(hex) {
   const match = /^#([0-9a-f]{6})$/i.exec(hex);
   if (!match) throw new Error(`"${hex}" is not a #rrggbb colour`);
   const [r, g, b] = [0, 2, 4].map((at) => toLinear(parseInt(match[1].slice(at, at + 2), 16) / 255));
+  return linearToOklch([r, g, b]);
+}
+
+// Linear sRGB to OKLCH.
+function linearToOklch([r, g, b]) {
   const L = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
   const M = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
   const S = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
@@ -118,11 +123,76 @@ function mixed(value) {
   };
 }
 
-// Reads `oklch(L C H)`, `#rrggbb`, `#rgb`, `white`, `black`, and a mix of two such colours in
-// oklch. A hue written `none` is read as 0: it only appears with zero chroma. Returns null for
-// anything else, such as a value with alpha or a mix in another colour space.
+const D50_TO_D65 = [
+  [0.9554734527042182, -0.023098536874261423, 0.0632593086610217],
+  [-0.028369706963208136, 1.0099954580058226, 0.021041398966943008],
+  [0.012314001688319899, -0.020507696433477912, 1.3303659366080753],
+];
+const XYZ_TO_LINEAR = [
+  [3.2409699419045226, -1.537383177570094, -0.4986107602930034],
+  [-0.9692436362808796, 1.8759675015077202, 0.04155505740717559],
+  [0.05563007969699366, -0.20397695888897652, 1.0569715142428786],
+];
+const times = (matrix, vector) =>
+  matrix.map((row) => row.reduce((sum, cell, at) => sum + cell * vector[at], 0));
+
+// An alpha written after the channels, `/ 1`, `/ 100%`, or a fourth number: true when the colour is
+// opaque. A colour with any transparency is not read: what shows through is not known here.
+const opaque = (alpha) => alpha === undefined || /^(1(\.0*)?|100(\.0*)?%)$/.test(alpha.trim());
+
+// `lab(L a b)`, CIE Lab with the D50 white as CSS defines it, to OKLCH.
+function fromLab(l, a, b) {
+  const kappa = 24389 / 27;
+  const epsilon = 216 / 24389;
+  const fy = (l + 16) / 116;
+  const [fx, fz] = [fy + a / 500, fy - b / 200];
+  const back = (t) => (t ** 3 > epsilon ? t ** 3 : (116 * t - 16) / kappa);
+  const xyz = [back(fx) * 0.96422, l > kappa * epsilon ? fy ** 3 : l / kappa, back(fz) * 0.82521];
+  return linearToOklch(times(XYZ_TO_LINEAR, times(D50_TO_D65, xyz)));
+}
+
+// `hsl(H S L)`, in degrees and percentages, to OKLCH.
+function fromHsl(h, saturation, lightness) {
+  const [sat, light] = [saturation / 100, lightness / 100];
+  const k = (n) => (n + h / 30) % 12;
+  const a = sat * Math.min(light, 1 - light);
+  const channel = (n) => light - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+  return linearToOklch([0, 8, 4].map((n) => toLinear(channel(n))));
+}
+
+// The channels of a colour function, written with spaces or commas, and its alpha if any.
+function channelsOf(name, value) {
+  const call = new RegExp(`^${name}a?\\(\\s*([^)]*)\\)$`, "i").exec(value);
+  if (!call) return null;
+  const [body, slash] = call[1].split("/");
+  const parts = body.split(/[\s,]+/).filter(Boolean);
+  const alpha = slash ?? (parts.length === 4 ? parts.pop() : undefined);
+  if (parts.length !== 3 || !opaque(alpha)) return null;
+  const numbers = parts.map((part) => Number(part.replace(/(%|deg)$/, "")));
+  return numbers.some((number) => !Number.isFinite(number)) ? null : numbers;
+}
+
+// Reads `oklch(L C H)`, `#rrggbb`, `#rgb`, `white`, `black`, `lab(L a b)`, `hsl(H S L)` with an
+// alpha of one at most, and a mix of two such colours in oklch. A hue written `none` is read as 0:
+// it only appears with zero chroma. Returns null for anything else, such as a value with
+// transparency or a mix in another colour space.
 export function parseColor(text) {
   const value = text.trim();
+  const lab = channelsOf("lab", value);
+  // In lab(), a percentage of a or b is of 125, as CSS reads it; of lightness, of 100.
+  if (lab) {
+    const [, a, b] = value
+      .replace(/^lab\(|\)$/gi, "")
+      .split("/")[0]
+      .trim()
+      .split(/[\s,]+/);
+    const scaled = [a, b].map((part, at) =>
+      part.endsWith("%") ? lab[at + 1] * 1.25 : lab[at + 1],
+    );
+    return fromLab(lab[0], ...scaled);
+  }
+  const hsl = channelsOf("hsl", value);
+  if (hsl) return fromHsl(...hsl);
   if (/^white$/i.test(value)) return { l: 1, c: 0, h: 0 };
   if (/^black$/i.test(value)) return { l: 0, c: 0, h: 0 };
   if (/^color-mix\(/i.test(value)) return mixed(value);

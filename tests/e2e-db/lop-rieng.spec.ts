@@ -17,7 +17,12 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 import pg from "pg";
 
 import { label } from "../../src/modules/company-config";
-import { PROBLEM_COPY } from "../../src/modules/company-config/ui/copy";
+import {
+  layerPartHref,
+  PROBLEM_COPY,
+  type GridPart,
+  type ShownPart,
+} from "../../src/modules/company-config/ui/copy";
 import type { Role } from "../../src/generated/ontology";
 import { sampleCatalog } from "../../src/modules/catalog";
 import { catalogLoadStatements } from "../../src/modules/catalog/load-sql";
@@ -153,8 +158,8 @@ async function post(api: Api, part: string, data: unknown): Promise<string> {
 }
 
 /** Opens one part of the company layer screen and waits for its rows. */
-async function openPart(page: Page, part: string) {
-  await page.goto(part === "nhan" ? "/tuy-chinh-san" : `/tuy-chinh-san?phan=${part}`);
+async function openPart(page: Page, part: ShownPart) {
+  await page.goto(layerPartHref(part));
   await expect(page.locator(`[data-part="${part}"][data-state="ready"]`)).toBeVisible();
 }
 
@@ -206,7 +211,7 @@ test.describe("lop rieng tren bang hang", () => {
       )[0]!.n;
 
     // Add a single choice field, a text field, a label and a spelling through the screen's forms.
-    await openPart(page, "truong");
+    await openPart(page, "fields");
     const field = dialogOf(page, "field-dialog");
     const addField = async (name: string, kind: string, options?: string) => {
       await page
@@ -229,7 +234,7 @@ test.describe("lop rieng tren bang hang", () => {
     );
     expect(made).toEqual([{ code: "huong_view", kind: "single_select" }]);
 
-    await openPart(page, "nhan");
+    await openPart(page, "labels");
     const labelForm = dialogOf(page, "label-dialog");
     await page
       .getByRole("button", { name: label("AddCompanyLabel") })
@@ -240,7 +245,7 @@ test.describe("lop rieng tren bang hang", () => {
     await labelForm.getByRole("button", { name: "Thêm", exact: true }).click();
     await expect(labelForm).toBeHidden();
 
-    await openPart(page, "tu-dien");
+    await openPart(page, "aliases");
     const alias = dialogOf(page, "alias-dialog");
     await page
       .getByRole("button", { name: label("AddValueAlias") })
@@ -262,7 +267,7 @@ test.describe("lop rieng tren bang hang", () => {
     const REFUSALS = ["name-taken", "options-count", "field-limit", "value-not-in-set"] as const;
     expect(REFUSALS).toHaveLength(4);
     const fieldsBefore = await liveFields();
-    await openPart(page, "truong");
+    await openPart(page, "fields");
     await addField("ghi chu", "Chữ");
     await expect(errorUnder(field, "name")).toHaveText(PROBLEM_COPY["name-taken"]!.text);
     await expect(field.getByLabel("Tên trường")).toHaveValue("ghi chu");
@@ -278,7 +283,7 @@ test.describe("lop rieng tren bang hang", () => {
     const filler: string[] = [];
     for (let i = 1; i <= 20 - fieldsBefore; i += 1)
       filler.push(await post(api, "fields", { name: `Tạm ${i}`, kind: "text" }));
-    await openPart(page, "truong");
+    await openPart(page, "fields");
     await addField("Thứ hai mốt", "Chữ");
     await expect(field.locator('[data-slot="form-error"]')).toHaveText(
       PROBLEM_COPY["field-limit"]!.text,
@@ -288,7 +293,7 @@ test.describe("lop rieng tren bang hang", () => {
     for (const code of filler)
       expect((await api.post(`/api/v1/company-layer/fields/${code}/retire`)).status()).toBe(200);
     expect(await liveFields()).toBe(fieldsBefore);
-    await openPart(page, "tu-dien");
+    await openPart(page, "aliases");
     await page
       .getByRole("button", { name: label("AddValueAlias") })
       .first()
@@ -312,7 +317,7 @@ test.describe("lop rieng tren bang hang", () => {
     expect(await liveFields()).toBe(fieldsBefore);
 
     // Edit: the kind is locked; the name and the options save.
-    await openPart(page, "truong");
+    await openPart(page, "fields");
     const edit = async () => {
       await page.locator('[data-row-actions-for="huong_view"] [data-slot="row-actions"]').click();
       await page.getByRole("menuitem", { name: label("Edit") }).click();
@@ -342,7 +347,7 @@ test.describe("lop rieng tren bang hang", () => {
 
     // Retire keeps the row: gone from the screen, still in the table with the time it stopped.
     const temp = await post(api, "fields", { name: "Cột thử", kind: "boolean" });
-    await openPart(page, "truong");
+    await openPart(page, "fields");
     await page.locator(`[data-row-actions-for="${temp}"] [data-slot="row-actions"]`).click();
     await page.getByRole("menuitem", { name: label("RetireItem") }).click();
     await page
@@ -441,9 +446,9 @@ test.describe("lop rieng tren bang hang", () => {
         const tail = scheme === "dark" ? "-toi" : "";
         await snap(
           page,
-          "/tuy-chinh-san?phan=truong",
+          "/company-layer?part=fields",
           `tuy-chinh-san-${width}${tail}`,
-          '[data-part="truong"][data-state="ready"] tbody tr',
+          '[data-part="fields"][data-state="ready"] tbody tr',
         );
         if (width < 1024) {
           // On a phone the five parts ride in the App Shell's sheet: open it the shared way and show them.
@@ -469,11 +474,11 @@ test.describe("lop rieng tren bang hang", () => {
           await chupAnh(page, { path: `${OUT}/inventory-1440-cuoi${tail}.png` });
           await snap(
             page,
-            "/tuy-chinh-san?phan=mau",
+            "/company-layer?part=templates",
             `tuy-chinh-san-mau-1440${tail}`,
-            '[data-part="mau"][data-state="ready"]',
+            '[data-part="templates"][data-state="ready"]',
           );
-          await openPart(page, "truong");
+          await openPart(page, "fields");
           await page
             .locator('[data-row-actions-for="huong_view"] [data-slot="row-actions"]')
             .click();
@@ -499,9 +504,9 @@ test.describe("lop rieng tren bang hang", () => {
     const rp = await reader.newPage();
     await snap(
       rp,
-      "/tuy-chinh-san?phan=truong",
+      "/company-layer?part=fields",
       "tuy-chinh-san-chi-doc-1440",
-      '[data-part="truong"][data-state="ready"] tbody tr',
+      '[data-part="fields"][data-state="ready"] tbody tr',
     );
     await reader.close();
   });
@@ -526,12 +531,12 @@ test.describe("lop rieng tren bang hang", () => {
     });
 
     // The button table of the row (thao-tac-nhap.yaml), written before the code: 5 parts.
-    const TABLE: Record<string, { head: string[]; row: string[] }> = {
-      nhan: { head: [label("AddCompanyLabel")], row: [label("Edit"), label("RetireItem")] },
-      truong: { head: [label("AddCustomField")], row: [label("Edit"), label("RetireItem")] },
-      "tu-dien": { head: [label("AddValueAlias")], row: [label("Edit"), label("RetireItem")] },
-      "can-cho": { head: [label("MatchPendingUnits")], row: [label("RetireItem")] },
-      mau: { head: [], row: [label("RenameTemplate"), label("RetireItem")] },
+    const TABLE: Record<GridPart, { head: string[]; row: string[] }> = {
+      labels: { head: [label("AddCompanyLabel")], row: [label("Edit"), label("RetireItem")] },
+      fields: { head: [label("AddCustomField")], row: [label("Edit"), label("RetireItem")] },
+      aliases: { head: [label("AddValueAlias")], row: [label("Edit"), label("RetireItem")] },
+      "pending-units": { head: [label("MatchPendingUnits")], row: [label("RetireItem")] },
+      templates: { head: [], row: [label("RenameTemplate"), label("RetireItem")] },
     };
     expect(Object.keys(TABLE)).toHaveLength(5);
     const WRITERS: readonly Role[] = ["ListAgent", "TeamLead", "CompanyAdmin"];
@@ -539,7 +544,10 @@ test.describe("lop rieng tren bang hang", () => {
     for (const role of ROLES) {
       const ctx = await browser.newContext({ storageState: stateOf(role) });
       const p = await ctx.newPage();
-      for (const [part, want] of Object.entries(TABLE)) {
+      for (const [part, want] of Object.entries(TABLE) as [
+        GridPart,
+        { head: string[]; row: string[] },
+      ][]) {
         await openPart(p, part);
         const writer = WRITERS.includes(role);
         const head = await p.locator('[data-slot="page-header-action"] button').allInnerTexts();
@@ -569,7 +577,7 @@ test.describe("lop rieng tren bang hang", () => {
     expect(cells).toBe(20);
 
     // Edit the label «Block» into «Lô»: it stays after a reload and the inventory reads it.
-    await openPart(page, "nhan");
+    await openPart(page, "labels");
     const block = (await layerOf(api)).labels.find((l) => l.concept === "Building")!;
     await page.locator(`[data-row-actions-for="${block.id}"] [data-slot="row-actions"]`).click();
     await page.getByRole("menuitem", { name: label("Edit") }).click();
@@ -583,7 +591,7 @@ test.describe("lop rieng tren bang hang", () => {
     expect((await headers(page))[1]).toBe("Lô");
 
     // Retire the field «Ghi chú»: gone from the part and from the inventory.
-    await openPart(page, "truong");
+    await openPart(page, "fields");
     await page.locator('[data-row-actions-for="ghi_chu"] [data-slot="row-actions"]').click();
     await page.getByRole("menuitem", { name: label("RetireItem") }).click();
     await page
@@ -595,7 +603,7 @@ test.describe("lop rieng tren bang hang", () => {
     expect(await headers(page)).not.toContain("Ghi chú");
 
     // Match the pending unit with the catalog.
-    await openPart(page, "can-cho");
+    await openPart(page, "pending-units");
     const [answer] = await Promise.all([
       page.waitForResponse((r) => r.url().endsWith("/pending-units/match")),
       page
@@ -611,7 +619,7 @@ test.describe("lop rieng tren bang hang", () => {
     // The role is taken away while the form is open: the form says so and offers nothing to send again.
     const lead = await browser.newContext({ storageState: stateOf("TeamLead") });
     const lp = await lead.newPage();
-    await openPart(lp, "nhan");
+    await openPart(lp, "labels");
     await lp
       .getByRole("button", { name: label("AddCompanyLabel") })
       .first()
@@ -636,5 +644,45 @@ test.describe("lop rieng tren bang hang", () => {
       await setRoles(["TeamLead"]);
     }
     await lead.close();
+  });
+  // english-route-names, AC-1 and AC-2 (E9): the screen at its English address, the old ?phan= not read.
+  test("english route names", async ({ browser }) => {
+    const admin = await browser.newContext({ storageState: stateOf("CompanyAdmin") });
+    const page = await admin.newPage();
+    await page.goto("/company-layer?phan=can-cho");
+    await expect(
+      page.locator('[data-part="labels"][data-state="ready"]'),
+      "phan-cu-khong-doc: ?phan=can-cho",
+    ).toBeVisible();
+    await expect(page.locator('[data-part="pending-units"]')).toHaveCount(0);
+    // Control: the same part by its new word opens.
+    await openPart(page, "pending-units");
+    await admin.close();
+
+    const anon = await browser.newContext();
+    const signedOut = await anon.newPage();
+    await signedOut.goto("/company-layer");
+    await expect(signedOut, "chua-dang-nhap: ve dang nhap").toHaveURL(/\/login\?next=/);
+    expect(new URL(signedOut.url()).searchParams.get("next"), "chua-dang-nhap: next").toBe(
+      "/company-layer",
+    );
+    await anon.close();
+  });
+
+  // english-route-names, E14-ui: two frames of the screen at its new address, for the reviewer to look at.
+  test("english route images", { tag: "@cho" }, async ({ browser }) => {
+    test.skip(process.env["URL_ANH"] !== "1", "pictures only when asked: URL_ANH=1");
+    const ctx = await browser.newContext({
+      storageState: stateOf("CompanyAdmin"),
+      viewport: { width: 1440, height: 900 },
+    });
+    const page = await ctx.newPage();
+    for (const part of ["fields", "templates"] as const) {
+      await openPart(page, part);
+      const file = `.acceptance-runs/english-route-names/company-layer-${part}-1440.png`;
+      await chupAnh(page, { path: file });
+      console.log(`${file}: ${new URL(page.url()).pathname}${new URL(page.url()).search}`);
+    }
+    await ctx.close();
   });
 });

@@ -1,0 +1,1 @@
+Invitation sign-in link built from `APP_URL` (the product's own address), never from the request's host; production refuses to start without it or with a malformed one (https only); the login-code mail carries no link — [0021](decisions/0021-dang-nhap-ma-email.md), row 9d.

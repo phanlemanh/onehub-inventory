@@ -3,6 +3,7 @@ type: entity
 title: CompanyCatalogAlias (Mã riêng)
 links: [ontology/entities/CompanyCatalogAlias.yaml]
 sources: ["_acceptance/danh-muc-can-nhu-onehub-invest/contract.md", "https://dd.reso.org/DD2.1/"]
+summary: mã, tên riêng một sàn gọi toà, căn
 ---
 
 # CompanyCatalogAlias (Mã riêng)

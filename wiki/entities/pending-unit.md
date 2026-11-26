@@ -11,6 +11,7 @@ sources:
     "_acceptance/lop-rieng-cua-san/contract.md",
     "_acceptance/danh-muc-can-nhu-onehub-invest/de-xuat-nhap-la-luc-anh-xa.md",
   ]
+summary: căn chờ khớp với danh mục
 ---
 
 # PendingUnit (Căn chờ khớp)
@@ -25,7 +26,7 @@ Tra mã trong sàn đi bốn nguồn: mã riêng → mã gốc → bộ đọc 8
 
 ## Where in the code
 
-`src/modules/company-config/`, bảng trong `db/migrations/010_lop_rieng_cua_san.sql`, ghi qua `/api/v1/company-layer`. Màn xem lại và sửa: `/tuy-chinh-san` (`src/modules/company-config/ui/`), nút theo bảng quyền như hàng 9e.
+`src/modules/company-config/`, bảng trong `db/migrations/010_lop_rieng_cua_san.sql`, ghi qua `/api/v1/company-layer`. Màn xem lại và sửa: `/company-layer?part=pending-units` (`src/modules/company-config/ui/`), nút theo bảng quyền như hàng 9e.
 
 ## History
 

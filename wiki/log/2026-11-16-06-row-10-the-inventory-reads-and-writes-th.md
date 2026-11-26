@@ -1,0 +1,1 @@
+Row 10: the inventory reads and writes the company's real listings (migration 013, PATCH /api/v1/listings/[id], one read per render, keeper on the record, fee inclusion on its cell) — [0039](decisions/0039-bang-hang-tren-du-lieu-that.md).

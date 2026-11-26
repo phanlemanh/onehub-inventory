@@ -1,0 +1,10 @@
+id: sent
+route: /sent
+title: Sent
+family: grid
+audience: staff
+status: built
+vao: null
+nut: []
+nut_chung: [Lọc, Cột, Toàn màn hình, Ghim]
+hien: [ShareLink]

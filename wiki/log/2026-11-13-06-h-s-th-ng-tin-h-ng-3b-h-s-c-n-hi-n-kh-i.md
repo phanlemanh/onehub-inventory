@@ -1,0 +1,1 @@
+Hồ sơ đủ thông tin (hàng 3b): hồ sơ căn hiện khối Căn (loại căn, tầng, hướng, loại hình), khối lần chào (pháp lý, nội thất, tài chính, hiện trạng), mức đủ thông tin, câu xác nhận đếm ngày theo giờ Việt Nam và các lần chào của căn; lần chào thêm năm trường và luật một lần chào mở trên một căn; chưa có migration (bảng lần chào ở hàng 10) — `_acceptance/ho-so-du-thong-tin/`.

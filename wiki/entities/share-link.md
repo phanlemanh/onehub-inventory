@@ -4,6 +4,7 @@ title: ShareLink (Link đã gửi)
 links: [ontology/entities/ShareLink.yaml]
 sources:
   [docs/tri-thuc/wiki/chu-de/da-gui-va-trang-khach.md, "https://dd.reso.org/DD2.1/ContactListings/"]
+summary: link đã gửi cho một người nhận, gói nhiều lần chào
 ---
 
 # ShareLink (Link đã gửi)

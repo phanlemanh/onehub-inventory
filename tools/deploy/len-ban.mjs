@@ -4,22 +4,32 @@
 // the domain pointed to just before the promote (read from the domain with `vercel inspect`); when that is not certain
 // it stops, prints the READY production deployments and asks the operator for `make rollback ENV=<ENV> BAN=<id>`.
 //
-//   staging:    cau-hinh, migration, cach-ly, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien
-//   production: cau-hinh, ban-thu-truoc, migration, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien
+//   staging:    cau-hinh, migration, bien, vai-dang-nhap, cach-ly, dung, kiem-nhanh, gan-ten-mien, kiem-nhanh-ten-mien
+//   production: cau-hinh, ban-thu-truoc, migration, bien, vai-dang-nhap, dung, kiem-nhanh, gan-ten-mien,
+//               kiem-nhanh-ten-mien
+// Row dat-khoa-mot-lenh added vai-dang-nhap (the login role's password, set as a SCRAM verifier) and bien (the app's
+// six variables pushed to the Vercel project before the build), so the first deploy no longer stops for a password
+// typed by hand and nobody sets variables on Vercel. Row bien-do-sau-xoay-mat-khau (decision 0048) runs bien before
+// vai-dang-nhap: a Vercel failure while the login password is being rotated never changes the database password, so
+// the running deployment keeps its connection.
 //
 // Runs in the repository root (cwd). Variables are only checked for presence, never printed:
-//   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID — read by the vercel CLI from the environment
-//   MIGRATE_DATABASE_URL — owner connection, migrations (and the isolation suite's catalog reads) only
-//   LOGIN_DATABASE_URL   — staging: the app's login role, for the isolation suite
+//   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID — read by the vercel CLI and the Vercel API calls
+//   MIGRATE_DATABASE_URL — owner connection (Session pooler): migrations, the login role's password, catalog reads
+//   LOGIN_DB_PASSWORD    — the login role's password, letters and digits, 24 or more; the login connection string is
+//                          built from MIGRATE_DATABASE_URL with it (user quy_hang_login, same host, port and database)
+//   AUTH_SECRET, RESEND_API_KEY, MAIL_FROM — pushed to the Vercel project as they are
 //   APP_URL              — the public address of ENV (the domain)
 //   STAGING_APP_URL      — production: the staging address, whose health must already run this commit
 // Optional: PSQL_DICH (psql command line, default `psql`), CACH_LY_CMD (isolation command, default
-// `bash db/scripts/cach-ly-dich.sh`), VERCEL_AUTOMATION_BYPASS_SECRET (protected deployment urls).
+// `bash db/scripts/cach-ly-dich.sh`), VERCEL_AUTOMATION_BYPASS_SECRET (protected deployment urls), VERCEL_API_URL
+// (default https://api.vercel.com).
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { scramVerifier } from "./scram.mjs";
 import {
   deploymentAt,
   deploymentLines,
@@ -40,6 +50,8 @@ export const STEPS = {
   staging: [
     "cau-hinh",
     "migration",
+    "bien",
+    "vai-dang-nhap",
     "cach-ly",
     "dung",
     "kiem-nhanh",
@@ -50,6 +62,8 @@ export const STEPS = {
     "cau-hinh",
     "ban-thu-truoc",
     "migration",
+    "bien",
+    "vai-dang-nhap",
     "dung",
     "kiem-nhanh",
     "gan-ten-mien",
@@ -57,24 +71,61 @@ export const STEPS = {
   ],
 };
 
+const COMMON = [
+  "VERCEL_TOKEN",
+  "VERCEL_ORG_ID",
+  "VERCEL_PROJECT_ID",
+  "MIGRATE_DATABASE_URL",
+  "LOGIN_DB_PASSWORD",
+  "AUTH_SECRET",
+  "RESEND_API_KEY",
+  "MAIL_FROM",
+  "APP_URL",
+];
 export const REQUIRED = {
-  staging: [
-    "VERCEL_TOKEN",
-    "VERCEL_ORG_ID",
-    "VERCEL_PROJECT_ID",
-    "MIGRATE_DATABASE_URL",
-    "LOGIN_DATABASE_URL",
-    "APP_URL",
-  ],
-  production: [
-    "VERCEL_TOKEN",
-    "VERCEL_ORG_ID",
-    "VERCEL_PROJECT_ID",
-    "MIGRATE_DATABASE_URL",
-    "APP_URL",
-    "STAGING_APP_URL",
-  ],
+  staging: COMMON,
+  production: [...COMMON, "STAGING_APP_URL"],
 };
+
+/** The variables the bien step writes to the Vercel project, and their type there. */
+export const VERCEL_VARS = [
+  ["DATABASE_URL", "encrypted"],
+  ["AUTH_SECRET", "encrypted"],
+  ["RESEND_API_KEY", "encrypted"],
+  ["MAIL_FROM", "plain"],
+  ["APP_URL", "plain"],
+  ["APP_ENV", "plain"],
+];
+
+/** Variables a production build refuses to start with (src/modules/identity/config.ts FORBIDDEN_IN_PRODUCTION). */
+export const FORBIDDEN_ON_VERCEL = [
+  "MIGRATE_DATABASE_URL",
+  "LOGIN_CODE_OUTBOX",
+  "NEXT_PUBLIC_E2E_BUTTON_RECORD",
+];
+
+export const LOGIN_ROLE = "quy_hang_login";
+const LOGIN_PASSWORD = /^[A-Za-z0-9]{24,}$/;
+
+/**
+ * The app's connection string: the owner's Session pooler string with the user switched to the login role — the
+ * `.<project ref>` part Supabase's pooler needs is kept — and the login role's password. Null when unreadable.
+ */
+export function loginUrl(migrateUrl, password) {
+  let u;
+  try {
+    u = new URL(String(migrateUrl).trim());
+  } catch {
+    return null;
+  }
+  if (!/^postgres(ql)?:$/.test(u.protocol) || !u.hostname) return null;
+  const user = decodeURIComponent(u.username);
+  const ref = /^postgres(\.[a-z0-9]+)?$/.exec(user);
+  if (!ref) return null;
+  u.username = `${LOGIN_ROLE}${ref[1] ?? ""}`;
+  u.password = encodeURIComponent(password);
+  return u.toString();
+}
 
 class Red extends Error {}
 
@@ -205,6 +256,135 @@ function stepCachLy(root, env) {
 }
 
 /**
+ * Sets the login role's password as a SCRAM verifier, through psql's standard input on the owner connection: neither
+ * the command line nor the statement Postgres receives holds the password.
+ */
+export function setLoginRolePassword(env) {
+  const { cmd, args } = psqlCmd(env);
+  const sql = `alter role ${LOGIN_ROLE} password '${scramVerifier(env["LOGIN_DB_PASSWORD"])}';\n`;
+  const r = spawnSync(
+    cmd,
+    [...args, "-d", env["MIGRATE_DATABASE_URL"], "-v", "ON_ERROR_STOP=1", "-X", "-q"],
+    {
+      env,
+      input: sql,
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "pipe"],
+    },
+  );
+  if (r.status !== 0) {
+    const out = redact(`${r.stdout ?? ""}${r.stderr ?? ""}`, env).trim();
+    if (out) process.stderr.write(`${out}\n`);
+    const last =
+      out
+        .split("\n")
+        .map((l) => l.replace(/^(psql:[^E]*)?ERROR:\s*/, "").trim())
+        .filter(Boolean)
+        .pop() || `mã ${r.status}`;
+    throw new Red(`không đặt được mật khẩu vai đăng nhập: ${last}`);
+  }
+}
+
+/** One call to the Vercel API; the body is parsed JSON or null. Never prints anything. */
+async function vercelApi(env, method, path, body) {
+  const base = (env["VERCEL_API_URL"] || "https://api.vercel.com").replace(/\/+$/, "");
+  const sep = path.includes("?") ? "&" : "?";
+  const url = `${base}${path}${sep}teamId=${encodeURIComponent(env["VERCEL_ORG_ID"])}`;
+  let res;
+  try {
+    res = await fetch(url, {
+      method,
+      headers: {
+        authorization: `Bearer ${env["VERCEL_TOKEN"]}`,
+        "content-type": "application/json",
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch {
+    throw new Red("Vercel không trả lời");
+  }
+  if (res.status < 200 || res.status > 299) throw new Red(`Vercel trả ${res.status}`);
+  try {
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+const VAR_NAME = /^[A-Z][A-Z0-9_]*$/;
+const ERROR_CODE = /^[A-Za-z0-9_-]+$/;
+
+/**
+ * Row bien-vercel-tu-choi: what the red line says for each item of `failed` in Vercel's reply to the variable write —
+ * the variable's name (from `error.key`, else `error.envVarKey`) or `không rõ tên`, followed by ` (<error.code>)` when
+ * the code is a plain token. In `failed` order, each item once. Never reads `error.message` or `error.value`: Vercel may
+ * copy the variable's value there. Empty when `failed` is absent or not an array.
+ */
+export function refusedItems(reply) {
+  const failed = reply?.failed;
+  if (!Array.isArray(failed)) return [];
+  const items = new Map();
+  for (const entry of failed) {
+    const error = entry?.error;
+    const name =
+      [error?.key, error?.envVarKey].find((k) => typeof k === "string" && VAR_NAME.test(k)) ??
+      "không rõ tên";
+    const code =
+      typeof error?.code === "string" && ERROR_CODE.test(error.code) ? ` (${error.code})` : "";
+    if (!items.has(name)) items.set(name, `${name}${code}`);
+  }
+  return [...items.values()];
+}
+
+/** The variable names Vercel's reply to the write lists in `created` — an array of variables or a single one. */
+export function confirmedKeys(reply) {
+  const created = reply?.created;
+  const list = Array.isArray(created)
+    ? created
+    : created && typeof created === "object"
+      ? [created]
+      : [];
+  return new Set(list.map((v) => v?.key).filter((k) => typeof k === "string"));
+}
+
+/**
+ * Writes the app's six variables to the Production environment of ENV's Vercel project, before the build pulls them.
+ * Red, before anything is written, when the listing has no `envs` array or the project holds a variable a production
+ * build refuses to start with. Red
+ * after the write, still before the build, when Vercel's reply refuses a variable or does not confirm all six.
+ */
+async function stepVercelVars(appEnv, env) {
+  const project = encodeURIComponent(env["VERCEL_PROJECT_ID"]);
+  const listing = await vercelApi(env, "GET", `/v9/projects/${project}/env`);
+  // Vercel documents a reply shape without `envs`; reading it as an empty list would skip the forbidden check unseen.
+  if (!Array.isArray(listing?.envs)) throw new Red("Vercel trả danh sách biến không đúng khuôn");
+  const keys = new Set(listing.envs.map((e) => e?.key));
+  const forbidden = FORBIDDEN_ON_VERCEL.find((k) => keys.has(k));
+  if (forbidden) throw new Red(`dự án Vercel đang có biến cấm ${forbidden}`);
+  const value = {
+    DATABASE_URL: env["LOGIN_DATABASE_URL"],
+    AUTH_SECRET: env["AUTH_SECRET"],
+    RESEND_API_KEY: env["RESEND_API_KEY"],
+    MAIL_FROM: env["MAIL_FROM"],
+    APP_URL: env["APP_URL"],
+    APP_ENV: appEnv,
+  };
+  const body = VERCEL_VARS.map(([key, type]) => ({
+    key,
+    value: value[key],
+    type,
+    target: ["production"],
+  }));
+  const reply = await vercelApi(env, "POST", `/v10/projects/${project}/env?upsert=true`, body);
+  const refused = refusedItems(reply);
+  if (refused.length) throw new Red(`Vercel từ chối ghi biến ${refused.join(", ")}`);
+  const confirmed = confirmedKeys(reply);
+  const missing = VERCEL_VARS.map(([key]) => key).filter((key) => !confirmed.has(key));
+  if (missing.length) throw new Red(`Vercel không xác nhận đã ghi biến ${missing.join(", ")}`);
+}
+
+/**
  * After a red check on the domain: point it back at the deployment that held it before the promote — the id read from
  * the domain itself, never one chosen from the list — then confirm the domain points there and check it. Without a
  * certain id nothing is rolled back: the list is printed and the operator names the target. Always returns 1.
@@ -271,6 +451,17 @@ export async function lenBan(
     "cau-hinh": async () => {
       const missing = REQUIRED[appEnv].filter((n) => !env[n]?.trim());
       if (missing.length) throw new Red(`thiếu biến ${missing.join(", ")}`);
+      if (!LOGIN_PASSWORD.test(env["LOGIN_DB_PASSWORD"])) {
+        throw new Red("LOGIN_DB_PASSWORD phải là chữ và số, từ 24 ký tự");
+      }
+      const login = loginUrl(env["MIGRATE_DATABASE_URL"], env["LOGIN_DB_PASSWORD"]);
+      if (!login) {
+        throw new Red(
+          "MIGRATE_DATABASE_URL không đọc được: cần postgresql://postgres[.<mã dự án>]:…@<máy chủ>:<cổng>/<cơ sở>",
+        );
+      }
+      // Every child sees the derived string under its usual name, and redact() hides it like any secret.
+      env = { ...env, LOGIN_DATABASE_URL: login };
       try {
         root = git(["rev-parse", "--show-toplevel"], cwd);
         head = git(["rev-parse", "HEAD"], root);
@@ -287,7 +478,9 @@ export async function lenBan(
       if (h.error || h.body?.commit !== head) throw new Red(`bản thử chưa chạy ${short(head)}`);
     },
     migration: async () => stepMigration(root, env),
+    "vai-dang-nhap": async () => setLoginRolePassword(env),
     "cach-ly": async () => stepCachLy(root, env),
+    bien: async () => stepVercelVars(appEnv, env),
     dung: async () => {
       const venv = { ...env, COMMIT_SHA: head };
       const pull = vercel(["pull", "--yes", "--environment=production"], { cwd: root, env: venv });
@@ -352,6 +545,20 @@ export async function lenBan(
 }
 
 async function main() {
+  // `--login-url`: the login role's connection string built the same way, for make cach-ly-dich on the operator's
+  // machine. It goes to a shell variable, never to the screen.
+  if (process.argv[2] === "--login-url") {
+    const password = process.env["LOGIN_DB_PASSWORD"] ?? "";
+    const url = loginUrl(process.env["MIGRATE_DATABASE_URL"] ?? "", password);
+    if (!url || !LOGIN_PASSWORD.test(password)) {
+      console.error(
+        "deploy: cần MIGRATE_DATABASE_URL đọc được và LOGIN_DB_PASSWORD chữ và số từ 24 ký tự",
+      );
+      process.exit(1);
+    }
+    process.stdout.write(url);
+    process.exit(0);
+  }
   const appEnv = process.argv[2];
   if (!ENVS.includes(appEnv)) {
     console.log("deploy: ENV phải là staging hay production");

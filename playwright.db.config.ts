@@ -74,6 +74,10 @@ export default defineConfig({
   // The hydration guard turns the run red when React reports a server/page mismatch (row 1u).
   reporter: [["list"], ["./tests/e2e/gac-hydration.ts"]],
   workers: 1,
+  // One retry on CI only, until the two flaky tests are fixed (owner, 2026-11-19, _acceptance/ci-co-postgres
+  // decisions.jsonl): `vung chu-dai` and the thue-phi break case `ve-tay-va-dieu-kien-phi-pha`. A test that passes on its
+  // retry is reported as flaky by name in the list reporter; lanes and the main configuration never retry.
+  retries: process.env["CI"] ? 1 : 0,
   // A dev server compiles each route on first use; with other servers building at the same time that takes longer
   // than the 5-second default.
   timeout: 90_000,

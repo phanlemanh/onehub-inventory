@@ -129,7 +129,7 @@ const shared = (page: Page) =>
 
 async function openRecord(page: Page, sampleId: string) {
   const id = real(sampleId);
-  await page.goto(`/inventory?ho-so=${encodeURIComponent(id)}`);
+  await page.goto(`/inventory?record=${encodeURIComponent(id)}`);
   await expect(page.locator(`[data-slot="record-panel"][data-record-id="${id}"]`)).toBeVisible();
 }
 
@@ -265,7 +265,7 @@ test("company admin: reads the record and asks its keeper (row 10, Hỏi-1 A)", 
 }, info) => {
   test.skip(info.project.name !== "1440", "do o 1440");
   await signIn(page, await person(info, "ad", ["CompanyAdmin"]), "/");
-  await page.goto(`/inventory?ho-so=${encodeURIComponent(real(rowKept("other").id))}`);
+  await page.goto(`/inventory?record=${encodeURIComponent(real(rowKept("other").id))}`);
   // Since row 10 the admin reads the inventory: the record opens with its keeper's name.
   await expect(page.locator('[data-slot="ask-list-agent"]')).toHaveText(
     `${ASK} · ${keeperName(rowKept("other").id)}`,

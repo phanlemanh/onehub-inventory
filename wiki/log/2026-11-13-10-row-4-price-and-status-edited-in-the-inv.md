@@ -1,0 +1,1 @@
+Row 4: price and status edited in the inventory cell (ReUI data-grid-editing-2 shape, Hỏi-4), one save door with four outcomes, undo failures reported; behaviour guard reads .ts as TypeScript — [sua-tren-o](../_acceptance/sua-tren-o/contract.md).

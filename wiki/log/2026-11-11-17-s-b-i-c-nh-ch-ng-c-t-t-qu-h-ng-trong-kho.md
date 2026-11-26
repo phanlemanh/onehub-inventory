@@ -1,0 +1,1 @@
+Sổ bối cảnh chưng cất từ Quỹ hàng trong kho tri thức: trang nền Sản phẩm, mục lục theo hàng lộ trình và 12 trang màn, mỗi ý trỏ nguồn Quỹ hàng ở commit `1729b11f` — [docs/tri-thuc/wiki/nen/muc-luc.md](../docs/tri-thuc/wiki/nen/muc-luc.md).

@@ -181,10 +181,10 @@ describe("screens", () => {
         "/inventory",
         "/sent",
         "/proto/[slug]",
-        "/proto/bo-nut-theo-quyen",
+        "/proto/permitted-actions",
         "/login",
         "/members",
-        "/tuy-chinh-san",
+        "/company-layer",
         // Row 11 (nhap-excel): the import screen.
         "/nhap-tep",
       ]),
@@ -539,8 +539,14 @@ describe("report", () => {
 describe("make", () => {
   it("check depends on the matrix and keeps its exit code", SLOW, () => {
     const db = spawnSync("make", ["-pn", "check"], { cwd: REPO, encoding: "utf8" }).stdout;
-    const checkLine = db.split("\n").find((l) => l.startsWith("check:"));
-    expect(checkLine?.split(/\s+/)).toContain("coverage-matrix");
+    // repo-setup 0.9.0: `check: check-quick check-heavy`, and `check-quick` runs CHECK_TARGETS.
+    const prerequisites = (target: string) =>
+      db
+        .split("\n")
+        .find((l) => l.startsWith(`${target}:`))
+        ?.split(/\s+/) ?? [];
+    expect(prerequisites("check")).toContain("check-quick");
+    expect(prerequisites("check-quick")).toContain("coverage-matrix");
     const start = db.split("\n").findIndex((l) => l.startsWith("coverage-matrix:"));
     expect(start).toBeGreaterThanOrEqual(0);
     const recipe: string[] = [];

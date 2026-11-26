@@ -1,0 +1,11 @@
+id: members
+route: /members
+title: Member
+family: list-frame
+audience: staff
+status: built
+vao: listMembers
+nut: [inviteMember, changeMemberRoles]
+mo_san: [inviteMember, changeMemberRoles]
+nut_chung: []
+hien: [Member]

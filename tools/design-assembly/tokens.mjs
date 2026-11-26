@@ -8,8 +8,16 @@ import { argv, cwd, exit, stderr, stdout } from "node:process";
 import { fileURLToPath } from "node:url";
 
 import { tokenHex } from "./color.mjs";
+import { families } from "./fonts.mjs";
 import { TYPE_STEPS } from "./scale.mjs";
-import { darkScopes, expand, loadStyles, themeDeclarations } from "./styles.mjs";
+import {
+  darkScopes,
+  DEFAULT_STYLESHEET,
+  expand,
+  findStylesheet,
+  loadStyles,
+  themeDeclarations,
+} from "./styles.mjs";
 
 // The file a repository gets when nothing names another one.
 export const TOKENS = "design/tokens.json";
@@ -20,7 +28,8 @@ const OWNER = "design-assembly";
 // The theme namespaces that become tokens, and the token type of each. A token `group.name` is the
 // variable `--group-name` of the stylesheet, so a reader that turns a token path into a variable
 // name finds a variable that exists.
-const GROUPS = { color: "color", radius: "dimension", text: "dimension" };
+// A typeface is a family name: the first of the list the stylesheet writes.
+const GROUPS = { color: "color", radius: "dimension", text: "dimension", font: "fontFamily" };
 
 // `calc(<length> * <number>)` as the length it is. Anything else is kept as written.
 function fold(value) {
@@ -37,19 +46,27 @@ export function readTokens(styles) {
   const tokens = {};
   const unresolved = [];
   for (const variable of names) {
-    const match = /^--(color|radius|text)-([a-z0-9]+(?:-[a-z0-9]+)*)$/.exec(variable);
+    const match = /^--(color|radius|text|font)-([a-z0-9]+(?:-[a-z0-9]+)*)$/.exec(variable);
     if (!match) continue;
     const [, group, name] = match;
+    // The framework names its weights under the same start: a weight is no typeface.
+    if (group === "font" && name.startsWith("weight-")) continue;
     const value = fold(expand(styles, ":root", `var(${variable})`));
     if (value.includes("var(")) {
+      // A typeface that points at a variable the build's font loader sets while the page runs has
+      // no value in the stylesheet, and nothing is wrong: the font-loaded check holds it.
+      if (group === "font") continue;
       unresolved.push(variable);
       continue;
     }
     // A colour is written in hexadecimal, the one form every reader of the file takes; the CSS
     // text stays under this tool's own extension, so a reader of the stylesheet's words has them.
     const color = group === "color" ? tokenHex(value) : null;
-    const token = { $type: GROUPS[group], $value: color ?? value };
-    const own = color && color !== value ? { css: value } : {};
+    // A typeface is written as the family it means, its first: a list would be an array, which a
+    // formatter lays out its own way. The whole list, as the stylesheet writes it, stays beside it.
+    const font = group === "font" ? (families(value)[0] ?? null) : null;
+    const token = { $type: GROUPS[group], $value: color ?? font ?? value };
+    const own = (color && color !== value) || font ? { css: value } : {};
     const other = dark.length === 0 ? value : fold(expand(styles, dark, `var(${variable})`));
     if (other !== value && !other.includes("var(")) own.dark = other;
     if (Object.keys(own).length > 0) token.$extensions = { [OWNER]: own };
@@ -115,7 +132,8 @@ export function regenerated(root) {
   const theme = existsSync(themeFile) ? JSON.parse(readFileSync(themeFile, "utf8")) : null;
   const check = theme?.checks?.[TOKENS_DECISION]?.[0];
   if (!check) return null;
-  const stylesheet = theme.stylesheet ?? "src/index.css";
+  // The stylesheet the tool data names, else the one every reader finds.
+  const stylesheet = theme.stylesheet ?? findStylesheet(root) ?? DEFAULT_STYLESHEET;
   const { tokens, unresolved } = readTokens(loadStyles(root, stylesheet));
   return { file: check.file, content: renderTokens(tokens), data: tokens, stylesheet, unresolved };
 }

@@ -47,7 +47,7 @@ describe("UnitJump", () => {
     fireEvent.click(setup());
     fireEvent.change(input(), { target: { value: "0905" } });
     fireEvent.click(screen.getByRole("option", { name: /0905/ }));
-    expect(push, "jump did not navigate").toHaveBeenCalledWith("/inventory?ma=0905");
+    expect(push, "jump did not navigate").toHaveBeenCalledWith("/inventory?unit=0905");
   });
 
   it("Enter with no suggestion searches the typed text; Enter on an empty box goes nowhere", () => {
@@ -57,7 +57,7 @@ describe("UnitJump", () => {
     fireEvent.change(input(), { target: { value: " Z-99 " } });
     expect(screen.getByText(/Không có căn nào khớp/)).toBeTruthy();
     fireEvent.keyDown(input(), { key: "Enter" });
-    expect(push).toHaveBeenCalledWith("/inventory?ma=Z-99");
+    expect(push).toHaveBeenCalledWith("/inventory?unit=Z-99");
   });
 
   it("⌘K, Ctrl+K and / open it; / typed in a field does not", () => {

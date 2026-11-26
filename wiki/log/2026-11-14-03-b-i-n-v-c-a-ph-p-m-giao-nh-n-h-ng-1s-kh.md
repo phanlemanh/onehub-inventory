@@ -1,0 +1,1 @@
+Bài đơn vị của phép đếm giao–nhận (hàng 1s) không còn gắn với danh sách tệp bài hiện có của kho: chạy trên báo cáo mẫu với danh sách tệp của chính bản mẫu (`--tep-bai`), nên thêm tệp `tests/e2e-db/*.spec.ts` không còn buộc sinh lại bản mẫu; phép đếm trên CI vẫn xét mọi tệp trong kho (việc phụ VP1) — [ci-co-postgres](../_acceptance/ci-co-postgres/contract.md).

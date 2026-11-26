@@ -1,0 +1,7 @@
+ten: RowActions
+tep: src/components/candidate/row-actions.tsx
+nguon: tao-tay
+nhu_cau: viec-tren-dong
+mo_ta: Một nút «…» cuối dòng giữ các việc trên một bản ghi theo bảng quyền, việc xoá sau cùng và qua hộp xác nhận
+ho_so: bo-nut-theo-quyen
+duyet: 2026-11-12

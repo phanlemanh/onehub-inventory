@@ -12,6 +12,29 @@ export const adapter = {
   // A ledger row that a lint rule holds points at it as `eslint:<rule>`.
   prefix: "eslint",
   configFiles: ["eslint.config.js", "eslint.config.mjs", "eslint.config.ts"],
+  // What shows a repository uses this lint at all, in its folder or one above it: a configuration
+  // file of any shape the lint has read, the key of a package file that holds one, or the lint
+  // among its packages. A repository with none of these has no lint this adapter can run.
+  signs: {
+    files: [
+      "eslint.config.js",
+      "eslint.config.mjs",
+      "eslint.config.cjs",
+      "eslint.config.ts",
+      "eslint.config.mts",
+      "eslint.config.cts",
+      ".eslintrc",
+      ".eslintrc.js",
+      ".eslintrc.cjs",
+      ".eslintrc.json",
+      ".eslintrc.yml",
+      ".eslintrc.yaml",
+    ],
+    packageKey: "eslintConfig",
+    packageName: "eslint",
+  },
+  // Files that set paths apart from every rule, beside the configuration.
+  ignoreFiles: [".eslintignore"],
   // An exception written in the source, from its first word to the end of its line.
   exception: /eslint-disable[^\n]*/g,
   // Ways to make an exception without a reason: to every rule on the next line, to one rule on the
@@ -21,8 +44,31 @@ export const adapter = {
     ...rules.map((rule) => `// eslint-disable-next-line ${rule}`),
     "/* eslint-disable */",
   ],
+  // The rules a file sets below an error, as the lint reads its own comments: a block comment
+  // `/* eslint rule: severity, ... */`, the severity a word or a number, alone or first in a list.
+  // Off and warn both: a warning does not fail the lint. Read from eslint 10's parser of comments;
+  // `eslint-enable`, `global`, `globals` and `exported` set no rule, and `eslint-env` is refused.
+  rulesLowered,
   run,
 };
+
+// What each severity is called, as a word or a number.
+const LEVELS = { off: "off", 0: "off", warn: "warn", 1: "warn", error: "error", 2: "error" };
+
+function rulesLowered(code) {
+  const lowered = [];
+  for (const [, body] of String(code ?? "").matchAll(/\/\*([\s\S]*?)\*\//g)) {
+    // A reason follows two dashes and a space, and is not part of the directive.
+    const directive = body.split(/\s-{2,}\s/)[0].trim();
+    const head = /^eslint\s+([\s\S]*)$/.exec(directive);
+    if (!head) continue;
+    const setting = /["']?([@\w./-]+)["']?\s*:\s*\[?\s*["']?(off|warn|error|[012])["']?/g;
+    for (const [, rule, level] of head[1].matchAll(setting)) {
+      if (LEVELS[level] !== "error") lowered.push(rule);
+    }
+  }
+  return lowered;
+}
 
 const ERROR = 2;
 const severity = (setting) => {

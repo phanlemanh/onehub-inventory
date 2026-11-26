@@ -1,0 +1,6 @@
+{
+  "feature_plain": "Khi Vercel báo thành công mà thật ra từ chối hay không xác nhận ghi một khoá, hoặc trả danh sách biến lạ khuôn, lệnh đưa bản lên dừng trước khi dựng bản, gọi tên khoá và không đổi tên miền.",
+  "decisions": [
+    {"id": "E6b", "q": "Ba hàng mới của sổ vận hành có đủ rõ để người vận hành làm theo?", "why": "Ba người chấm độc lập cùng đề xuất ĐẠT: mỗi hàng nói bản chưa dựng, tên miền không đổi, việc làm tiếp, không bảo in khoá hay xoá biến."}
+  ]
+}

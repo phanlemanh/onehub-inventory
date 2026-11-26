@@ -1,0 +1,1 @@
+Three early reads fixed (row 7e, 2e after signature): the inventory header check reads each column title from the header's structure once the grid hydrates, the grid probe waits for sign-in or a grid before its verdict, and the proof gate waits for another run's git history lock in a shallow copy — [#66](https://github.com/phanlemanh/onehub-inventory/pull/66).

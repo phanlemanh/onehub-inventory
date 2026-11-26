@@ -3,6 +3,7 @@ type: entity
 title: Listing (Hàng)
 links: [ontology/entities/Listing.yaml, db/migrations/013_bang_can_chao.sql]
 sources: [onehub-quy-hang/CONTEXT.md, "https://dd.reso.org/DD2.1/Property/StandardStatus/"]
+summary: một lần chào trên một căn
 ---
 
 # Listing (Hàng)
@@ -63,7 +64,7 @@ Không sửa trên thẻ (hàng 3d). Hồ sơ: `_acceptance/bang-hang-the-dien-t
 
 Hàng 2d, 14/11/2026: Bảng hàng đi theo địa lý — cột thứ hai có mỗi dự án một nhóm (phân khu lồng toà), đọc từ chính
 các dòng của bảng và chỗ đứng của toà trong danh mục; chọn một nơi chỉ thay lọc Dự án, Toà (danh sách tên khớp trọn),
-giữ lọc khác; địa chỉ mang `?vung=<nơi>`. Không thêm trường hay luật của lần chào. Quyết định
+giữ lọc khác; địa chỉ mang `?place=<nơi>`. Không thêm trường hay luật của lần chào. Quyết định
 [0036](../decisions/0036-mot-trang-thai-loc-theo-dia-ly.md); hồ sơ `_acceptance/bang-hang-theo-dia-ly/`.
 
 Hàng 10, 16/11/2026: Bảng hàng trên dữ liệu thật — hai bảng của sàn, đọc theo sàn đang đăng nhập (lưới, hồ sơ, ô ⌘K, cây
