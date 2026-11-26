@@ -178,8 +178,15 @@ decisions:
     source: "Core Web Vitals"
   - id: error-copy
     layer: content
+    kind: judgment
+    source: "design/language.md: what happened, why, what to do next"
+    note: "a person reviews it, by design: no check can tell whether a sentence gives the reason; confirmed by Manh Phan on 2026-11-26: Đồng ý, ghi cả 6 câu"
+  - id: terms
+    layer: content
     kind: closed
-    source: "three-part sentence"
+    source: "ontology/labels.yaml and design/language.md: one preferred label per concept, side, agent and party kept apart"
+    check: "test:tests/language.test.ts"
+    note: "one unique preferred label per concept, no preferred label as another concept's alternative, no hard-coded label or old spelling; confirmed by Manh Phan on 2026-11-26: Đồng ý, ghi cả 6 câu"
   - id: state-matrix
     layer: patterns
     kind: closed
@@ -188,7 +195,27 @@ decisions:
   - id: test-screen-sizes
     layer: conformance
     kind: formula
-    source: "StatCounter top six"
+    source: "360, 414, 1024, 1440: the browser projects of playwright.config.ts, as design/states.md says"
+    check: "e2e:tests/e2e/frame.spec.ts"
+    note: "the spec runs once per browser project, so at each of the four widths; confirmed by Manh Phan on 2026-11-26: Đồng ý, ghi cả 6 câu"
+  - id: reference-implementation
+    layer: templates
+    kind: closed
+    source: "the reference screen named in each page of design/patterns/"
+    check: "test:tests/proof-matrix-self.test.ts"
+    note: "proves the proof gate's state matrix really runs on the grid kind's reference screen, Bảng hàng; the other two kinds' reference screens are named on their pages and not tested here; confirmed by Manh Phan on 2026-11-26: Đồng ý, ghi cả 6 câu"
+  - id: screen-ledger
+    layer: templates
+    kind: closed
+    source: "design/screens.yaml"
+    check: "tool:tools/coverage_matrix/check.py"
+    note: "make check fails when a page under src/app is missing from the register or an entry is wrong; confirmed by Manh Phan on 2026-11-26: Đồng ý, ghi cả 6 câu"
+  - id: screen-actions
+    layer: templates
+    kind: closed
+    source: "ontology/actions.yaml through design/role-screen-buttons.md"
+    check: "test:tests/bo-nut-vai-man.test.ts"
+    note: "every screen and role lists exactly the actions the permission table gives; the browser suite tests/e2e-db/vai-man.spec.ts runs each role on each screen; confirmed by Manh Phan on 2026-11-26: Đồng ý, ghi cả 6 câu"
   - id: primary-task
     layer: product
     kind: judgment
