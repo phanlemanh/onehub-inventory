@@ -101,3 +101,11 @@ Phủ theo tệp nhánh đổi và theo từng bên đọc chúng. Không quét 
 - Lần chạy đầu, `reference-implementation` trỏ vào `tools/proof_gate/proof-gate.test.ts`; bài khoá
   `proof-gate-0023.test.ts` đỏ vì tệp đã ký đổi. Dòng được trỏ sang `tests/proof-matrix-self.test.ts` trước commit
   `902fc742`, và AC-6 giữ tệp khoá không đổi.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-26:
+  - Phản biện-1: phép đo chỉ thấy lời xác nhận của chủ kho trong ghi chú, không so nội dung sáu câu trả lời với đề xuất chủ
+    kho đã đồng ý.
+  - Phản biện-2: chưa có ca phá chứng rằng phép đo đỏ khi máy tự trả lời một câu về màu.
+  - Phản biện-3: phép đo đỏ khi một tầng tụt, nhưng chưa có ca phá chứng điều đó.
+  - Phản biện-4: hợp đồng không nói «sổ màn» được giữ bằng công cụ chạy trong kiểm toàn kho thay vì dòng gắn tên, và chưa
+    có ca phá cắt mối nối ấy.
+  - Phản biện-5: phép dò bộ chữ chỉ bắt mã màu hex, rgb, hsl, oklch và một cách viết tên kho.
