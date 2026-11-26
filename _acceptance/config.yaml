@@ -249,6 +249,9 @@ risk_tiers:
     - "PRODUCT-MAP.md"               # suy từ: mẫu của kit — máy sinh, commit cùng chữ ký
     - "LO-TRINH.html"
     - "docs/tri-thuc/**"
+    - "version.txt"                  # suy từ: chủ kho 26/11 — release-please chỉ ghi số phiên bản
+    - ".release-please-manifest.json" # suy từ: chủ kho 26/11 — số phiên bản của release-please
+    - "release-please-config.json"   # suy từ: chủ kho 26/11 — cách đánh số và viết CHANGELOG, không mã chạy
   t3_paths:
     - "PRODUCT-INVARIANTS.md"        # product invariants; only the owner edits this file
     - "db/**"                        # suy từ: bất biến 1 — chỗ đặt migration khi chuyển mã

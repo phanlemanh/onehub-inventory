@@ -1,1 +1,1 @@
-release-please reads up to 5000 commits (default 500), so the first release's CHANGELOG reaches back to the repository's start
+release-please reads up to 5000 commits (default 500), so the first release's CHANGELOG reaches back to the repository's start; it writes the version to version.txt instead of package.json (release type simple), and version.txt, the manifest and the release config are T1 for the acceptance gate (owner 2026-11-26), so a release PR needs no dossier while package.json stays gated
