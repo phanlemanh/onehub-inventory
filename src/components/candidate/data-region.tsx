@@ -555,7 +555,7 @@ export function DataRegion({
       grouped: isGrouped,
       hidden: hiddenKey === "" ? [] : (hiddenKey.split("|") as FieldKey[]),
     }),
-    [filters, sortBy?.field, sortBy?.direction, isGrouped, hiddenKey], // eslint-disable-line react-hooks/exhaustive-deps
+    [filters, sortBy?.field, sortBy?.direction, isGrouped, hiddenKey], // eslint-disable-line react-hooks/exhaustive-deps -- sortBy is a new object each render: keyed on its field and direction so the memo holds
   );
   const viewListener = useRef(onViewChange);
   useEffect(() => {
@@ -568,7 +568,7 @@ export function DataRegion({
   // Filter, then sort, then group: a sort orders rows inside each group, numbers run on through the groups.
   const shown = useMemo(
     () => sortRows(filterRows(rows, columns, filters), columns, sortBy),
-    [rows, columns, filters, sortBy?.field, sortBy?.direction], // eslint-disable-line react-hooks/exhaustive-deps
+    [rows, columns, filters, sortBy?.field, sortBy?.direction], // eslint-disable-line react-hooks/exhaustive-deps -- sortBy is a new object each render: keyed on its field and direction so the memo holds
   );
   const data = useMemo((): TableRow[] => {
     if (!isGrouped || !groupColumn) {
