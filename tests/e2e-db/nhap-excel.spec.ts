@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page, type Request } from "@playwright/test";
+import { expect, test, type Cookie, type Page, type Request } from "@playwright/test";
 import pg from "pg";
 
 import { FRAME_COPY } from "../../src/components/templates/frame-copy";
@@ -72,9 +72,18 @@ function makeWorld(): Promise<void> {
 
 const desktop = (page: Page) => (page.viewportSize()?.width ?? 0) >= 768;
 
+// One sign-in per role per worker: the code request is limited to five per email in fifteen minutes (identity
+// constants), and every case of this file opens the screen. Later cases reuse the session's cookies.
+const signedIn = new Map<Role, Cookie[]>();
+
 async function openScreen(page: Page, role: Role = "ListAgent") {
   await makeWorld();
-  await signInWithCode(page, personOf(role).email);
+  const kept = signedIn.get(role);
+  if (kept) await page.context().addCookies(kept);
+  else {
+    await signInWithCode(page, personOf(role).email);
+    signedIn.set(role, await page.context().cookies());
+  }
   await page.goto("/nhap-tep");
   await waitReady(page);
 }
@@ -95,6 +104,12 @@ async function toPreview(page: Page) {
 }
 
 async function seriousAxe(page: Page): Promise<string[]> {
+  // Measure the settled screen: a colour transition caught half way (the step bar's active step) reads as low contrast.
+  await page.waitForFunction(() =>
+    document
+      .getAnimations()
+      .every((a) => a.playState !== "running" || a.effect?.getTiming().iterations === Infinity),
+  );
   const { violations } = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     .exclude("nextjs-portal")
@@ -193,6 +208,8 @@ test("trang thai: every state of the screen at its widths, light and dark, axe c
   });
   await choose(page, "gon.xlsx");
   await expect(page.getByText(C.reading)).toBeVisible();
+  // From one second on, a placeholder laid out like the column table (design/states.md, Chờ tải).
+  await expect(page.locator('[data-slot="region-skeleton"][data-shown="true"]')).toBeVisible();
   cells.push("ST-nhap-tep-dang-doc");
   await expect(next(page)).toBeEnabled({ timeout: 10_000 });
   await page.unroute("**/api/v1/imports/preview");
@@ -227,9 +244,10 @@ test("trang thai: every state of the screen at its widths, light and dark, axe c
     r.fulfill({ status: 500, json: { error: "internal" } }),
   );
   await page.getByRole("button", { name: C.undo }).click();
-  await cell("ST-nhap-tep-hoan-tac-loi", page.getByText(C.failed));
+  await cell("ST-nhap-tep-hoan-tac-loi", page.getByText(C.undoFailed));
   await page.unroute("**/api/v1/imports/*/undo");
-  await page.getByRole("button", { name: C.undo }).click();
+  // «Thử lại» beside the sentence runs the undo again (not the preview).
+  await page.locator('[data-state="hoan-tac-loi"]').getByRole("button", { name: C.retry }).click();
   await expect(page.getByText(C.undone)).toBeVisible();
 
   // ST-nhap-tep-cho-nguoi: a sheet with questions shows how many are left on the step bar.
@@ -296,4 +314,46 @@ test("ban phim: Tab, arrows, Space and Enter take gon.xlsx to Xong", async ({ pa
   // Leave the company as it was for the other widths.
   await page.getByRole("button", { name: C.undo }).click();
   await expect(page.getByText(C.undone)).toBeVisible();
+});
+
+test("chu dai: a long value keeps the page in its width and is read in full", async ({ page }) => {
+  test.skip(test.info().project.name !== "1024", "one width: the narrowest the screen is used at");
+  await openScreen(page);
+  const long = `S1.01-0905 ${"[Tên] ghi chú rất dài của chủ nhà ".repeat(6)}`.trim();
+  await choose(page, "dai.csv", `Mã căn,Toà\n"${long}",S1\n`);
+  await expect(next(page)).toBeEnabled({ timeout: 10_000 });
+  // The page fits (true), or the first leaf sticking out is named.
+  const fits = () =>
+    page.evaluate(() => {
+      const w = document.documentElement.clientWidth;
+      if (document.documentElement.scrollWidth <= w) return true;
+      // The deepest box that sticks out while none of its children do: the one that pushes the page wider.
+      const out = [...document.querySelectorAll("main *")].find(
+        (e) =>
+          e.getBoundingClientRect().right > w + 1 &&
+          !e.closest("header") &&
+          [...e.children].every((k) => k.getBoundingClientRect().right <= w + 1),
+      );
+      if (!out) return false;
+      const chain: string[] = [];
+      for (let e: Element | null = out; e && chain.length < 8; e = e.parentElement)
+        chain.push(
+          `${e.tagName.toLowerCase()}[${Math.round(e.getBoundingClientRect().right)}] ${String(e.getAttribute("class") ?? "").slice(0, 60)}`,
+        );
+      return chain.join(" < ");
+    });
+  for (let i = 0; i < 3; i += 1) {
+    expect(await fits(), `page wider than the screen on step ${i + 2}`).toBe(true);
+    if (!(await next(page).isEnabled())) break;
+    await next(page).click();
+  }
+  expect(await fits(), "page wider than the screen").toBe(true);
+  // Read in full: the whole value is on the page as text or as the cell's title, never cut away.
+  const whole = await page.evaluate(
+    (v) =>
+      document.body.innerText.includes(v) ||
+      [...document.querySelectorAll("[title]")].some((e) => e.getAttribute("title") === v),
+    long,
+  );
+  expect(whole, "long value cut away").toBe(true);
 });

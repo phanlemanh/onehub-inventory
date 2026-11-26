@@ -85,7 +85,7 @@ export async function createListings(
 export async function removeImportListings(
   c: Queryable,
   importRunId: string,
-): Promise<{ removed: string[]; kept: string[] }> {
+): Promise<{ removed: string[]; kept: string[]; keptCodes: string[] }> {
   const { rows } = await c.query(
     `select id, version from listings where import_run_id = $1 order by original_entry_timestamp, id`,
     [importRunId],
@@ -96,5 +96,20 @@ export async function removeImportListings(
     [importRunId],
   );
   const removed = (del.rows as { id: string }[]).map((r) => r.id);
-  return { removed, kept: all.filter((r) => !removed.includes(r.id)).map((r) => r.id) };
+  const kept = all.filter((r) => !removed.includes(r.id)).map((r) => r.id);
+  // The code a person knows each kept listing by: the catalog unit's building and number, or the pending unit's code
+  // as the file wrote it.
+  const codes = await c.query(
+    `select coalesce(cu.building_name || ' ' || cu.unit_number, cpu.raw_code, '') as code
+       from listings l
+       left join listing_units lu on lu.listing_id = l.id
+       left join catalog_units cu on cu.upi = lu.upi
+       left join listing_pending_units lp on lp.listing_id = l.id
+       left join company_pending_units cpu on cpu.id = lp.pending_unit_id
+      where l.id = any($1::uuid[])
+      order by l.original_entry_timestamp, l.id`,
+    [kept],
+  );
+  const keptCodes = (codes.rows as { code: string }[]).map((r) => r.code);
+  return { removed, kept, keptCodes };
 }

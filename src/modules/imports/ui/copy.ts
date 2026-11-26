@@ -36,8 +36,13 @@ export const IMPORT_COPY = {
   undo: "Hoàn tác lần nhập",
   undone: "Đã hoàn tác lần nhập.",
   undoneShort: "đã hoàn tác",
+  undoneKept: (codes: string[]) =>
+    `Đã hoàn tác lần nhập. Còn ${codes.length} căn chưa gỡ vì đã có người sửa sau lần nhập: ${codes.join(", ")}.`,
+  undoFailed: "Chưa gỡ căn nào — máy chủ chưa hoàn tác được. Lần nhập vẫn còn nguyên.",
+  undoOffline: "Chưa gỡ căn nào — mất kết nối mạng. Lần nhập vẫn còn nguyên.",
   keptCells: (n: number) => `${n} ô giữ chữ gốc của tệp`,
   recent: "Lần nhập gần đây",
+  recentFailed: "Chưa đọc được lần nhập gần đây — vẫn nạp tệp được.",
   offline: "Chưa ghi gì — mất kết nối mạng.",
   retry: "Thử lại",
   changed: "Dữ liệu của sàn vừa đổi — xem lại trước khi áp.",

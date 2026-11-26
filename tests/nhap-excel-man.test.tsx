@@ -3,12 +3,32 @@
 // counts are the server's, the five steps run, apply writes the open call then the batch, undo goes through its door,
 // the buttons show only for roles the permission table allows, and a dropped connection says nothing was written.
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import type { Role } from "@/generated/ontology";
 import { SessionRoles } from "@/modules/identity/ui";
 import { ImportWizard } from "@/modules/imports/ui";
 import { IMPORT_COPY as C, MARK_WORDS, PROBLEM_WORDS, STEP_WORDS } from "@/modules/imports/ui/copy";
+
+beforeAll(() => {
+  // The wait of step 1 is a DataRegion, which measures itself and asks for the screen width.
+  globalThis.ResizeObserver ??= class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+  Element.prototype.getAnimations ??= () => [];
+  window.matchMedia ??= ((query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    onchange: null,
+    dispatchEvent: () => false,
+  })) as unknown as typeof window.matchMedia;
+});
 
 afterEach(() => {
   cleanup();
@@ -35,20 +55,35 @@ const MARKED = {
   questions: [],
 };
 
-function server(fail?: "offline") {
+function server(fail?: "offline" | "recent", undo: Array<Response | "kept"> = []) {
   const calls: string[] = [];
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string, init?: RequestInit) => {
       // The recent imports list reads at mount; only what the screen sends is counted.
-      if (!init?.method || init.method === "GET") return Response.json([]);
+      if (!init?.method || init.method === "GET")
+        return fail === "recent"
+          ? Response.json({ error: "server-error" }, { status: 500 })
+          : Response.json([]);
       calls.push(url);
       if (fail === "offline") throw new TypeError("network");
       if (url.endsWith("/preview")) return Response.json(MARKED);
       if (url === "/api/v1/imports") return Response.json({ id: "run-1" }, { status: 201 });
       if (url.endsWith("/batches"))
         return Response.json({ created: 1, done: true, learned: ["template"] });
-      if (url.endsWith("/undo")) return Response.json({ removed: ["l1"], kept: [], retired: 1 });
+      if (url.endsWith("/undo")) {
+        // Queued answers first (a failure, or a kept listing), then the plain success.
+        const next = undo.shift();
+        if (next === "kept")
+          return Response.json({
+            removed: [],
+            kept: ["l1"],
+            keptCodes: ["S1 01-0905"],
+            retired: 1,
+          });
+        if (next) return next;
+        return Response.json({ removed: ["l1"], kept: [], keptCodes: [], retired: 1 });
+      }
       return Response.json({}, { status: 404 });
     }),
   );
@@ -93,6 +128,43 @@ describe("man-nap-tep", () => {
     await act(async () => fireEvent.click(screen.getByRole("button", { name: C.undo })));
     await waitFor(() => expect(screen.getByText(C.undone)).toBeTruthy());
     expect(calls.at(-1)).toBe("/api/v1/imports/run-1/undo");
+  });
+
+  async function toDone(calls: string[]) {
+    await choose("a.csv", "Mã căn\nS1.01-0905\n");
+    await waitFor(() => expect(calls).toContain("/api/v1/imports/preview"));
+    for (let i = 0; i < 3; i += 1)
+      fireEvent.click(screen.getByRole("button", { name: new RegExp(`^${C.next}`) }));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: C.apply(1, 0) })));
+    await waitFor(() => expect(screen.getByText(C.done(1))).toBeTruthy());
+  }
+
+  it("an undo that fails says nothing was removed, and «Thử lại» runs the undo again", async () => {
+    const calls = server(undefined, [Response.json({ error: "server-error" }, { status: 500 })]);
+    mount();
+    await toDone(calls);
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: C.undo })));
+    await waitFor(() => expect(screen.getByText(C.undoFailed)).toBeTruthy());
+    const before = calls.length;
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: C.retry })));
+    await waitFor(() => expect(screen.getByText(C.undone)).toBeTruthy());
+    expect(calls.slice(before)).toEqual(["/api/v1/imports/run-1/undo"]);
+  });
+
+  it("an undo that keeps an edited listing names its unit and says why", async () => {
+    const calls = server(undefined, ["kept"]);
+    mount();
+    await toDone(calls);
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: C.undo })));
+    await waitFor(() => expect(screen.getByText(C.undoneKept(["S1 01-0905"]))).toBeTruthy());
+  });
+
+  it("recent imports that cannot be read say so, and the file is still read", async () => {
+    const calls = server("recent");
+    mount();
+    await waitFor(() => expect(screen.getByText(C.recentFailed)).toBeTruthy());
+    await choose("a.csv", "Mã căn\nS1.01-0905\n");
+    await waitFor(() => expect(calls).toContain("/api/v1/imports/preview"));
   });
 
   it("a row skipped on the preview goes to the server as skipRows, and comes back", async () => {

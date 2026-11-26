@@ -531,7 +531,7 @@ function conceptOf(target: StandardTarget): string {
 }
 
 export type UndoResult =
-  | { ok: true; removed: string[]; kept: string[]; retired: number }
+  | { ok: true; removed: string[]; kept: string[]; keptCodes: string[]; retired: number }
   | { ok: false; problem: "not-found" | "already-undone" };
 
 /** Undo a whole import: its untouched listings, what it taught, the pending units no listing sits on any more. */
@@ -540,7 +540,7 @@ export async function undoImport(c: Queryable, runId: string, by: string): Promi
   if (!run) return { ok: false, problem: "not-found" };
   if (run.status === "undone") return { ok: false, problem: "already-undone" };
   const runAs = savepointRun(c);
-  const { removed, kept } = await removeImportListings(c, runId);
+  const { removed, kept, keptCodes } = await removeImportListings(c, runId);
   const l = run.learned;
   await retireLearned(runAs, l);
   for (const id of l.unitCodeIds ?? []) await retireCompanyUnitCode(c, id);
@@ -563,7 +563,7 @@ export async function undoImport(c: Queryable, runId: string, by: string): Promi
     `update import_runs set status = 'undone', undone_at = now(), undone_by = $2 where id::text = $1`,
     [runId, by],
   );
-  return { ok: true, removed, kept, retired };
+  return { ok: true, removed, kept, keptCodes, retired };
 }
 
 export interface RecentImport {
