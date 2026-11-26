@@ -141,6 +141,8 @@ function fontLoads(root, css, stylesheet) {
       loads.push({
         variable: match[1],
         by,
+        via: "loader",
+        file,
         loader: names.get(call?.name) ?? null,
         files: call ? namedFiles(root, file, call.text) : [],
       });

@@ -5,6 +5,7 @@ import path from "node:path";
 
 import { LAYERS } from "./ledger.mjs";
 import { globPattern, KINDS_FOLDER, ofAKind } from "./screens.mjs";
+import { leftOut, sourceFolder } from "./source-folders.mjs";
 
 // The file a person owns: the parts of the code, listed from the top down. A file is of the first
 // part that names it, and imports only its own part and the parts listed after it.
@@ -15,14 +16,16 @@ export const SOURCE_FOLDER = "src";
 
 const SOURCE = /\.(?:[cm]?[jt]sx?)$/;
 
-// Every source file of a folder, by path: screens, components and plain modules alike.
-export function readSources(root, folder = SOURCE_FOLDER) {
+// Every source file of a folder, by path: screens, components and plain modules alike. With no
+// folder given, the folder the package keeps its source in (source-folders.mjs).
+export function readSources(root, folder = sourceFolder(root).folder) {
   const found = {};
   const walk = (dir) => {
     const full = path.join(root, dir);
     if (!existsSync(full)) return;
     for (const name of readdirSync(full).sort()) {
       const relative = path.posix.join(dir, name);
+      if (leftOut(folder, relative)) continue;
       if (statSync(path.join(root, relative)).isDirectory()) walk(relative);
       else if (SOURCE.test(name) && !name.endsWith(".d.ts")) {
         found[relative] = readFileSync(path.join(root, relative), "utf8");

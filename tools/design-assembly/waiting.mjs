@@ -34,6 +34,9 @@ export const ROW_KEYS = [
   // The questions that waited and that this one takes the place of, by their ids: a question that
   // asks the same thing about more than they did. A question another replaces waits no longer.
   "replaces",
+  // What an item of an outside source is let off, each with its rule, file and reason, when the
+  // question asks the owner to keep that list before the item is taken in (spec 0015).
+  "exemptions",
   "answer",
   "said",
   "by",
@@ -96,6 +99,7 @@ export const ITEMS = {
   need: { which: /^[a-z0-9]+(-[a-z0-9]+)*$/, owners: false },
   before: { which: /^[a-z0-9]+(-[a-z0-9]+)*$/, owners: false },
   block: { which: /^[a-z0-9]+(-[a-z0-9]+)*$/, owners: false },
+  exemptions: { which: /^[a-z0-9]+(-[a-z0-9]+)*$/, owners: false },
   screen: { which: new RegExp(`^[^\\s:,/\\\\]+:(${SCREEN_SLOTS.join("|")})$`), owners: false },
   screens: { which: SHARED, owners: false },
 };
@@ -163,9 +167,27 @@ function candidatesProblem(candidates) {
   return twice.length > 0 ? `candidates names ${twice[0]} twice` : null;
 }
 
+// Why the exemptions of a question cannot be read, or null: a list, each with a rule, a file and a
+// reason written out.
+function exemptionsProblem(exemptions) {
+  const written = (value) => typeof value === "string" && value.trim() !== "";
+  if (!Array.isArray(exemptions) || exemptions.length === 0) {
+    return "exemptions is a list of what an item is let off, at least one";
+  }
+  return exemptions.every(
+    (entry) => written(entry?.rule) && written(entry?.file) && written(entry?.reason),
+  )
+    ? null
+    : "each of the exemptions has a rule, a file and a reason";
+}
+
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
-export const isDay = (value) =>
-  DAY.test(String(value)) && new Date(`${value}T00:00:00Z`).toISOString().startsWith(value);
+// A day that is one: written YYYY-MM-DD, and a date of the calendar (no thirteenth month).
+export const isDay = (value) => {
+  if (!DAY.test(String(value))) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value);
+};
 
 // Why a written item is not one the gate can name, or null.
 export function itemProblem(item) {
@@ -222,6 +244,9 @@ export function rowProblems(row, at) {
   }
   const candidates = row.candidates === undefined ? null : candidatesProblem(row.candidates);
   if (candidates) found.push(`${at}: ${candidates}`);
+  if (row.exemptions !== undefined && exemptionsProblem(row.exemptions)) {
+    found.push(`${at}: ${exemptionsProblem(row.exemptions)}`);
+  }
   if (row.asked_on !== undefined && !isDay(row.asked_on)) {
     found.push(`${at}: asked_on is a day written YYYY-MM-DD`);
   }

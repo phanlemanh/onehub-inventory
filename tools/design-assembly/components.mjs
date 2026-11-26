@@ -19,6 +19,7 @@ import { adapter as library } from "./adapters/shadcn.mjs";
 import { newerProblem } from "./contract.mjs";
 import { lineWidth, renderJson } from "./json.mjs";
 import { frontMatter, KEY, readPages } from "./screens.mjs";
+import { DEFAULT_FOLDER, leftOut, sourceFolder } from "./source-folders.mjs";
 
 // The file a repository gets when nothing names another one, and the folder read by default.
 export const REGISTRY = "design/component-registry.json";
@@ -48,10 +49,12 @@ function jsonAt(root, file) {
 export function libraryFolders(root) {
   const settings = jsonAt(root, library.settingsFile);
   const pkg = jsonAt(root, "package.json");
+  // The folder `@/` stands for: the package's source folder.
+  const source = sourceFolder(root).folder;
   const others = library
-    .registryFoldersIn(settings, pkg)
+    .registryFoldersIn(settings, pkg, source)
     .filter((folder) => existsSync(path.join(root, folder)));
-  return [library.folderIn(settings, pkg) ?? library.folder, ...others];
+  return [library.folderIn(settings, pkg, source) ?? library.folderUnder(source), ...others];
 }
 
 // The parts of the repository that are a component library's: a folder a library keeps to itself,
@@ -106,6 +109,7 @@ export function readFolder(root, folder) {
     if (!existsSync(full)) return;
     for (const name of readdirSync(full).sort()) {
       const relative = path.posix.join(dir, name);
+      if (leftOut(folder, relative)) continue;
       if (statSync(path.join(root, relative)).isDirectory()) walk(relative);
       else if (/\.[jt]sx$/.test(name))
         found[relative] = readFileSync(path.join(root, relative), "utf8");
@@ -394,14 +398,14 @@ function declaration(text, name) {
 }
 
 // Reads every source file once: the manifest, and the heights the controls declare.
-// The files a file imports among the given ones: `@/` is the source folder, and a relative path
-// is read from the file's own folder.
-function importsAmong(file, text, files) {
+// The files a file imports among the given ones: `@/` is the source folder, `source`, and a
+// relative path is read from the file's own folder.
+function importsAmong(file, text, files, source = DEFAULT_FOLDER) {
   const found = new Set();
   for (const match of text.matchAll(/(?:from|import)\s*\(?\s*["']([^"']+)["']/g)) {
     const spec = match[1];
     let base;
-    if (spec.startsWith("@/")) base = `src/${spec.slice(2)}`;
+    if (spec.startsWith("@/")) base = path.posix.join(source, spec.slice(2));
     else if (spec.startsWith(".")) base = path.posix.join(path.posix.dirname(file), spec);
     else continue;
     const hit = ["", ".tsx", ".ts", ".jsx", ".js", "/index.tsx", "/index.ts"]
@@ -415,13 +419,13 @@ function importsAmong(file, text, files) {
 // A file's atomic level, computed and never declared: how deep it imports other components. None
 // is an atom, one step a molecule, two or more an organism. A file in a folder of templates is a
 // template, and so is a component a page of a screen kind names as the frame of its screens.
-function levels(files) {
+function levels(files, source) {
   const depth = new Map();
   const visit = (file, seen) => {
     if (depth.has(file)) return depth.get(file);
     if (seen.has(file)) return 0;
     const next = new Set(seen).add(file);
-    const below = importsAmong(file, files[file], files).map((other) => visit(other, next));
+    const below = importsAmong(file, files[file], files, source).map((other) => visit(other, next));
     const value = below.length === 0 ? 0 : 1 + Math.max(...below);
     depth.set(file, value);
     return value;
@@ -470,7 +474,7 @@ function propsOf(signature) {
 // Props every component takes, which say nothing about this one.
 const COMMON_PROPS = new Set(["className", "children"]);
 
-function survey(given, { library, pages } = {}) {
+function survey(given, { library, pages, source } = {}) {
   // No list at all means no library is known, and every component is listed as the library's,
   // as before there was a list; a list, even an empty one, says which files are.
   const known = library !== undefined && library !== null;
@@ -478,7 +482,7 @@ function survey(given, { library, pages } = {}) {
   const files = Object.fromEntries(
     Object.entries(given).map(([file, text]) => [file, withoutComments(text)]),
   );
-  const level = levels(files);
+  const level = levels(files, source);
   const templates = templateNames(pages);
   // Variant sets by file: a component reads a set of its own file before one of the same name
   // declared elsewhere.
@@ -658,6 +662,7 @@ export function regenerated(root) {
     // Where the library shares its folder, the check lists the library's parts one by one.
     library: check.library ?? [check.folder, ...(check.libraries ?? [])],
     pages: check.pages ? readPages(root, check.pages) : {},
+    ...(check.source ? { source: check.source } : {}),
   };
   const manifest = readComponents(files, options);
   return {
@@ -669,6 +674,38 @@ export function regenerated(root) {
     files,
     options,
   };
+}
+
+// The components of the repository, as the tool's manifest would list them now; where the tool
+// data names no manifest, read through the components adapter from the library's folder and the
+// repository's own beside it.
+export function componentsOf(root) {
+  let made;
+  try {
+    made = regenerated(root);
+  } catch (error) {
+    return {
+      read: null,
+      problem: `the component-manifest check of design/theme.json cannot be read: ${error.message}`,
+      components: [],
+    };
+  }
+  if (made) return { read: made.read, components: made.data.components };
+  const folders = libraryFolders(root);
+  const read = ownFolder(folders[0]) ?? folders[0];
+  if (!existsSync(path.join(root, read))) return { read: null, missing: read, components: [] };
+  const answer = sourceFolder(root);
+  const { folder: source } = answer;
+  try {
+    return {
+      read,
+      // How the folder was learnt, where it is not the usual one.
+      ...(source === DEFAULT_FOLDER ? {} : { said: answer.said }),
+      components: readComponents(readFolder(root, read), { library: folders, source }).components,
+    };
+  } catch (error) {
+    return { read: null, problem: `${read} cannot be read: ${error.message}`, components: [] };
+  }
 }
 
 // The check that says a derived file is kept out of git, as the tool data lists it.

@@ -7,12 +7,13 @@ import path from "node:path";
 const SETTINGS = "components.json";
 const FOLDER = "src/components/ui";
 
-// An alias of the settings as a folder of the repository: `@/x` is `src/x`; an alias that starts
-// with the package's own name is followed through the package's exports, `./x/*` to the folder its
-// files are in. Null when neither reaches a folder.
-function folderOf(alias, pkg) {
+// An alias of the settings as a folder of the repository: `@/x` is `x` under the folder the package
+// keeps its source in, `src` unless the caller knows another (`.` for the package's root); an alias
+// that starts with the package's own name is followed through the package's exports, `./x/*` to the
+// folder its files are in. Null when neither reaches a folder.
+function folderOf(alias, pkg, source = "src") {
   if (typeof alias !== "string") return null;
-  if (alias.startsWith("@/")) return `src/${alias.slice(2)}`;
+  if (alias.startsWith("@/")) return path.posix.join(source, alias.slice(2));
   const name = pkg?.name;
   if (typeof name !== "string" || !alias.startsWith(`${name}/`)) return null;
   const rest = alias.slice(name.length + 1);
@@ -111,15 +112,17 @@ export const adapter = {
   stylesheetIn: (settings) => settings?.tailwind?.css ?? null,
   // The folder of the library the settings name, or null. `pkg` is the repository's package file,
   // whose own name and exports an alias may go through.
-  folderIn: (settings, pkg = null) => folderOf(settings?.aliases?.ui, pkg),
+  folderIn: (settings, pkg = null, source = "src") => folderOf(settings?.aliases?.ui, pkg, source),
+  // The library's usual folder, under the folder the package keeps its source in.
+  folderUnder: (source = "src") => path.posix.join(source, "components/ui"),
   // `const name = cva(base, { variants })`: the name of a variant set, at the open of its call.
   variantSet: /\bconst\s+(\w+)\s*=\s*cva\(/g,
   // The toast component the library installs, from the package it wraps.
   toast: { package: "sonner", template: "sonner.tsx.template", file: "sonner.tsx" },
   // The folders other registries install into: each registry the settings name, by its name, in
   // the folder of the components alias.
-  registryFoldersIn: (settings, pkg = null) => {
-    const folder = folderOf(settings?.aliases?.components, pkg);
+  registryFoldersIn: (settings, pkg = null, source = "src") => {
+    const folder = folderOf(settings?.aliases?.components, pkg, source);
     if (!folder) return [];
     return Object.keys(settings?.registries ?? {})
       .map((name) => name.replace(/^@/, ""))
@@ -130,4 +133,7 @@ export const adapter = {
   importPathIn: (settings) => settings?.aliases?.ui ?? "@/components/ui",
   // The component a probe restyles, when the library has it.
   probeComponent: { name: "Button", file: "button" },
+  // Rules of the library's linter that read the classes given to its components only, so a text
+  // that breaks them is written on a component, never on a plain element they do not look at.
+  componentClassRules: ["shadcn/require-static-classes"],
 };

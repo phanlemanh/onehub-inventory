@@ -50,6 +50,8 @@ const FALLS_BACK: Record<string, string> = {
     "kiem_moc: commit khong co ma kho la kho nong thi ghi 'kho nong: bo qua kiem lich su git' va dung",
   "tools/design-assembly/owner-calls.mjs":
     "chi hai phep kiem decision-sheet va owner-calls goi no; o ban sao nong no tu lay main tu origin (plugin 0.7.1), ci-thu.sh chay make check o do",
+  "tools/design-assembly/choose-first.mjs":
+    "phep kiem choose-first (plugin 0.69.0) lay goc nhanh qua branchBase cua owner-calls.mjs: o ban sao nong no tu lay main tu origin roi moi doc tep o goc, ci-thu.sh chay make check o do",
   "tools/autonomy.py":
     "cua repo-setup 0.9.0; chi nhanh so diff (--base) doc lich su; make check chi goi --check-codeowners, khong doc lich su",
   "tools/ledgers_split.py":

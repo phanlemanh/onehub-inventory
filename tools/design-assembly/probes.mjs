@@ -1,6 +1,7 @@
 // Probes: for a decision a lint rule may hold, source texts that break it. A repository's lint holds
 // the decision when it rejects every probe, and the gate shows that again on each run. The texts
 // come from the adapters; this file only says which decision each set breaks.
+import { leftOut, sourceFolder } from "./source-folders.mjs";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 
@@ -48,9 +49,10 @@ export function probeComponent(root) {
 }
 
 // The texts that break `id`, each with the line that names it, and the control: the same file
-// with nothing that breaks a decision. `rules` are the lint rules the ledger points at, for the
-// decision about exceptions. Null when this tool cannot probe the decision here.
-export function probesFor(id, { component = null, rules = [] } = {}) {
+// with nothing that breaks a decision. `rule` is the lint rule the probes are run against: one that
+// reads a component's classes only is probed on a component. `rules` are the lint rules the ledger
+// points at, for the decision about exceptions. Null when this tool cannot probe the decision here.
+export function probesFor(id, { component = null, rule = null, rules = [] } = {}) {
   const { probe } = source;
   const control = probe.file(probe.control);
   const plain = (bodies) => bodies.map((body) => ({ label: body, text: probe.file(body) }));
@@ -70,10 +72,12 @@ export function probesFor(id, { component = null, rules = [] } = {}) {
   }
   if (id === "whole-class-names") {
     const pieces = probe.pieces(values.classStart);
+    const onComponentsOnly = (components.componentClassRules ?? []).includes(rule);
+    if (onComponentsOnly && !component) return null;
     return {
       control,
       probes: [
-        ...plain(pieces.map((attribute) => probe.element(attribute))),
+        ...(onComponentsOnly ? [] : plain(pieces.map((attribute) => probe.element(attribute)))),
         ...(component ? pieces.map(onComponent) : []),
       ],
     };
@@ -90,19 +94,32 @@ export function probesFor(id, { component = null, rules = [] } = {}) {
   return null;
 }
 
+// Why `probesFor` gave nothing for `id`, in words for the gate and for adopting.
+export function noProbeFor(id, { component = null, rule = null } = {}) {
+  if (
+    id === "whole-class-names" &&
+    !component &&
+    (components.componentClassRules ?? []).includes(rule)
+  ) {
+    return `${rule} reads only the classes given to a component, and the repository has no component of the library to probe it on`;
+  }
+  return `this tool has no probe that breaks ${id}`;
+}
+
 // Screen files a probe may be linted as, in a stable order: source files outside the component
 // library and the tests, so that the rules for screens apply.
 export function probeCandidates(root, limit = 60) {
   // The library's files, by its settings: a folder it shares with screens is walked, its own
   // files are left out.
   const library = libraryTest(root);
+  const { folder } = sourceFolder(root);
   const found = [];
   const walk = (dir) => {
     const full = path.join(root, dir);
     if (!existsSync(full) || found.length >= limit) return;
     for (const name of readdirSync(full).sort()) {
       const file = path.posix.join(dir, name);
-      if (name === "node_modules" || name.startsWith(".")) continue;
+      if (name === "node_modules" || name.startsWith(".") || leftOut(folder, file)) continue;
       if (statSync(path.join(root, file)).isDirectory()) {
         if (!library(`${file}/`)) walk(file);
       } else if (/\.[jt]sx$/.test(name) && !/\.(test|spec)\./.test(name) && !library(file)) {
@@ -111,6 +128,6 @@ export function probeCandidates(root, limit = 60) {
       if (found.length >= limit) return;
     }
   };
-  walk("src");
+  walk(folder);
   return found;
 }

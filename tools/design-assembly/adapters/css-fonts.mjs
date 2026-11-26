@@ -80,6 +80,8 @@ export function stylesheetLoads(root, css, stylesheet) {
   const loads = faces(css).map(({ family, urls }) => ({
     family,
     by: `an @font-face rule of ${stylesheet}`,
+    via: "font-face",
+    file: stylesheet,
     urls,
   }));
   for (const specifier of importedPackages(css)) {
@@ -94,6 +96,9 @@ export function stylesheetLoads(root, css, stylesheet) {
       loads.push({
         family,
         by: `the package ${specifier}, which ${stylesheet} imports`,
+        via: "package",
+        specifier,
+        file: stylesheet,
         package: name,
       });
     }

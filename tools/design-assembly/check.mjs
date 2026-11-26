@@ -17,7 +17,14 @@ import {
   targetProblem,
   UNTRACKED,
 } from "./components.mjs";
-import { LEDGERS, shapeProblems } from "./contract.mjs";
+import {
+  CONFORM_FOLDER,
+  FAMILY_CORE_CHECK,
+  LEDGERS,
+  lockedCoreProblems,
+  readFamilyCore,
+  shapeProblems,
+} from "./contract.mjs";
 import {
   LAYER_ALIASES,
   LAYERS,
@@ -41,7 +48,23 @@ import {
   withRecordLayout,
   wordsProblem,
 } from "./patterns.mjs";
-import { againstDirection, importsProblem, readSources, slipsProblem } from "./governance.mjs";
+import {
+  againstDirection,
+  importsOf,
+  importsProblem,
+  readSources,
+  resolveImport,
+  slipsProblem,
+} from "./governance.mjs";
+import {
+  byHandProblems,
+  readChoice,
+  unreadLine,
+  unrecordedFiles,
+  unrecordedLine,
+} from "./choose-first.mjs";
+import { readIntakeLedger } from "./intake-ledger.mjs";
+import { SOURCES_FOLDER } from "./sources-ledger.mjs";
 import {
   kindsProblem,
   readPages,
@@ -56,6 +79,7 @@ import {
   screenActionsProblem,
 } from "./screen-actions.mjs";
 import { seenFilesProblem } from "./screen-actions-seen.mjs";
+import { floatingFilesProblem } from "./floating-parts.mjs";
 import { drawDerived, keptOutOfGit } from "./derived.mjs";
 import {
   FRAGMENT_LEDGERS,
@@ -74,7 +98,7 @@ import {
 } from "./screen-ledger.mjs";
 import { DEFAULT_STYLESHEET, findStylesheet, loadStyles, resolve } from "./styles.mjs";
 import { lintProbes } from "./lint.mjs";
-import { probesFor, ruleOf } from "./probes.mjs";
+import { noProbeFor, probesFor, ruleOf } from "./probes.mjs";
 import {
   buildTheme,
   END,
@@ -84,8 +108,17 @@ import {
   sourcedFont,
   withoutBlock,
 } from "./theme.mjs";
-import { GATE_STEP, gateStepProblem, gateStepThatCannotFail, readMakefile } from "./host-make.mjs";
+import {
+  GATE_STEP,
+  gateStepProblem,
+  gateStepThatCannotFail,
+  readMakefile,
+  readPackage,
+  scriptGateProblem,
+  scriptThatCannotFail,
+} from "./host-make.mjs";
 import { tokensProblem } from "./tokens.mjs";
+import { exportProblem, inputsOf, unlistedProblems, withManifest } from "./exports.mjs";
 import { buildOf } from "./adapters/index.mjs";
 import { fontProblems, readLoads, unloadedCopy } from "./fonts.mjs";
 import { readFontSources } from "./sources-ledger.mjs";
@@ -472,6 +505,31 @@ const KINDS = {
       return { ...state, css: `${state.css}\n@theme inline {\n  --color-changed-copy: #000;\n}\n` };
     },
   },
+  // An export of the design ledgers says what they say now: written from them, stamped with their
+  // state, never changed by hand.
+  export: {
+    run(state, check, id) {
+      const own = exportProblem(
+        exportInputs(state),
+        check.name,
+        check.file,
+        state.files?.[check.file],
+      );
+      // The first export also says which exports the tool data has stopped holding.
+      const listed = (state.theme?.checks?.[id] ?? []).filter((item) => item.kind === "export");
+      const missing = listed[0] === check ? unlistedProblems(listed.map((item) => item.file)) : [];
+      return [own, ...missing].filter(Boolean).join("; ") || null;
+    },
+    // A new colour in the tokens is a new state of the ledgers: the export on disk is behind it.
+    change(state) {
+      const tokens = parsedOr(state.files?.["design/tokens.json"], {});
+      const changed = {
+        ...tokens,
+        color: { ...tokens.color, "changed-copy": { $type: "color", $value: "#000000" } },
+      };
+      return { ...state, files: { ...state.files, "design/tokens.json": JSON.stringify(changed) } };
+    },
+  },
   // The component manifest says what the source says: the components exported, and their variants.
   components: {
     run(state, check) {
@@ -481,12 +539,14 @@ const KINDS = {
         // Where the library shares its folder, the guide listed its parts one by one.
         library: check.library ?? [check.folder, ...(check.libraries ?? [])],
         pages: check.pages ? (state.pages?.[check.pages] ?? {}) : {},
+        // The folder `@/` stands for, where it is not the usual one.
+        ...(check.source ? { source: check.source } : {}),
       });
     },
     // A new source file is a new component: the file on disk no longer matches.
     change(state, check) {
       const read = check.own ?? check.folder;
-      const added = `${check.folder}/changed-copy.tsx`;
+      const added = path.posix.join(check.folder, "changed-copy.tsx");
       const files = {
         ...state.folders?.[read],
         [added]: "export function ChangedCopy() {}\n",
@@ -538,6 +598,175 @@ const KINDS = {
       return { ...state, files: { ...state.files, [versioned]: JSON.stringify(changed) } };
     },
   },
+  // No file of the repository's own code uses a file of an item of an outside source that was taken
+  // down and is not taken in: its conform record holds the item's files, and no row of the intake
+  // ledger answers its need yet (spec 0015).
+  "taken-down": {
+    run(state, check) {
+      const { items, covered } = takenDownFiles(state, check);
+      const folders = declaredFolders(state);
+      if (items.size === 0 && folders.length === 0) return null;
+      const sources = state.sources?.[check.sources] ?? {};
+      const folderOf = (file) => folders.find((each) => file.startsWith(`${each.folder}/`));
+      const problems = [];
+      for (const [file, code] of Object.entries(sources)) {
+        // An item's own files, and the code of a source's folder, use one another freely.
+        if (items.has(file) || folderOf(file)) continue;
+        for (const name of importsOf(code)) {
+          const target = resolveImport(file, name, sources);
+          if (!target) continue;
+          const item = items.get(target);
+          if (item) {
+            problems.push(
+              `${file} uses ${target}, a file of ${item.item} from the source ${item.source}, which was taken down for the need ${item.need} and is not taken in: conform it and take it in with intake --need ${item.need}, or stop using it`,
+            );
+            continue;
+          }
+          const declared = folderOf(target);
+          if (declared && !covered.has(target)) {
+            problems.push(
+              `${file} uses ${target}, in the folder ${declared.folder} of the source ${declared.source}, which no conform record of an item taken in lists: write the conform record of the item it belongs to and take it in with intake, or stop using it`,
+            );
+          }
+        }
+      }
+      if (problems.length === 0) return null;
+      const more = problems.length > 3 ? `; and ${problems.length - 3} more` : "";
+      return `${problems.slice(0, 3).join("; ")}${more}`;
+    },
+    // An item taken down for a need nobody took in, and a page of the repository that imports it.
+    change(state, check) {
+      const folder = check.sources ?? "src";
+      // Joined as paths are, so a source folder that is the package's root, `.`, adds nothing.
+      const item = path.posix.join(folder, "components/taken-down/broken-item.tsx");
+      const record = {
+        version: 1,
+        need: "broken-need",
+        source: "broken-source",
+        item: "broken-item",
+        taken: [{ file: item, sha256: "0".repeat(64) }],
+        conformed: [{ file: item, sha256: "0".repeat(64) }],
+        patches: [],
+        exemptions: [],
+      };
+      return {
+        ...state,
+        files: {
+          ...state.files,
+          [check.intake ?? LEDGERS.intake.file]: "version: 1\nblocks: []\n",
+        },
+        ledgerFolders: {
+          ...state.ledgerFolders,
+          [CONFORM_FOLDER]: { [`${CONFORM_FOLDER}/broken-need.json`]: JSON.stringify(record) },
+        },
+        sources: {
+          ...state.sources,
+          [folder]: {
+            ...state.sources?.[folder],
+            [item]: "export function BrokenItem() {}\n",
+            [path.posix.join(folder, "broken-page.tsx")]:
+              'import { BrokenItem } from "./components/taken-down/broken-item";\nexport const Page = BrokenItem;\n',
+          },
+        },
+      };
+    },
+  },
+  // The floating parts of every item of an outside source are opened on the screens that use it
+  // (spec 0015, item 11.7): with a conform record, the browser test that opens them is there and
+  // calls the check. The test itself runs with the repository's browser checks.
+  "floating-parts": {
+    run(state, check) {
+      const records = Object.keys(state.ledgerFolders?.[CONFORM_FOLDER] ?? {}).length;
+      return floatingFilesProblem({ records, test: state.files?.[check.test] ?? null }, check.test);
+    },
+    // A conform record, and the browser test gone.
+    change(state, check) {
+      const records = state.ledgerFolders?.[CONFORM_FOLDER] ?? {};
+      return {
+        ...state,
+        files: { ...state.files, [check.test]: null },
+        ledgerFolders: {
+          ...state.ledgerFolders,
+          [CONFORM_FOLDER]: { ...records, [`${CONFORM_FOLDER}/changed-copy.json`]: "{}" },
+        },
+      };
+    },
+  },
+  // The gate holds the choice (spec 0015): a component file this branch adds with no row of the
+  // intake ledger, and a row made by hand it writes without the words searched and the nearest
+  // candidate, are red. What the main branch has is not held to it.
+  "choose-first": {
+    run(state, check) {
+      const choice = state.choice;
+      if (choice?.problem) return unreadLine(choice.problem);
+      if (!choice?.base) return null;
+      const ledger = readIntakeLedger(state.files?.[check.intake ?? LEDGERS.intake.file] ?? "");
+      const baseLedger = readIntakeLedger(choice.base.intake ?? "");
+      const { items, covered } = takenDownFiles(state, check);
+      const problems = [
+        ...unrecordedFiles({
+          components: choice.components,
+          baseFiles: choice.base.files,
+          ledger,
+          baseLedger,
+          covered: [...items.keys(), ...covered],
+          folders: declaredFolders(state).map((each) => each.folder),
+        }).map(unrecordedLine),
+        ...byHandProblems({
+          ledger,
+          baseLedger,
+          held: choice.held ?? [],
+          components: choice.components,
+        }),
+      ];
+      if (problems.length === 0) return null;
+      const more = problems.length > 3 ? `; and ${problems.length - 3} more` : "";
+      return `${problems.slice(0, 3).join("; ")}${more}`;
+    },
+    notes: (state) => (state.choice?.note ? [state.choice.note] : []),
+    // A component this branch adds that no row records, compared with a base that had nothing.
+    change(state) {
+      const choice = state.choice ?? {};
+      const added = { name: "ChangedCopy", file: "changed-copy/changed-copy.tsx" };
+      return {
+        ...state,
+        choice: {
+          ...choice,
+          components: [...(choice.components ?? []), added],
+          base: choice.base ?? { files: [], intake: null },
+          problem: null,
+        },
+      };
+    },
+  },
+  // The locked answers of the family core the repository pinned (spec 0016, criterion 8): a value
+  // the repository holds otherwise, with no exception recorded against the pin, is red, and so is a
+  // copy of the core that differs from its hashes. A default never is. Laid only on a repository
+  // that declares a family; one that declares none has nothing here.
+  [FAMILY_CORE_CHECK.kind]: {
+    run(state) {
+      const problems = lockedCoreProblems(state.familyCore, state.ledger ?? []);
+      if (problems.length === 0) return null;
+      const more = problems.length > 3 ? `; and ${problems.length - 3} more` : "";
+      return `${problems.slice(0, 3).join("; ")}${more}`;
+    },
+    // A core that locks a value the repository holds otherwise.
+    change(state) {
+      const label = "000000000000";
+      return {
+        ...state,
+        familyCore: {
+          pinned: {
+            label,
+            unreadable: null,
+            answers: [{ id: "source-color", kind: "value", hold: "locked", value: "#000000" }],
+          },
+          values: { "source-color": { value: "#ffffff", from: "a changed copy" } },
+        },
+        ledger: (state.ledger ?? []).filter((row) => String(row.id) !== "source-color"),
+      };
+    },
+  },
   // Every control declares a height that reaches the target size of the conformance level.
   "target-size": {
     run(state, check) {
@@ -545,7 +774,7 @@ const KINDS = {
     },
     // A control far below any target size: the check must name it.
     change(state, check) {
-      const added = `${check.folder}/changed-copy.tsx`;
+      const added = path.posix.join(check.folder, "changed-copy.tsx");
       const source = 'export function ChangedCopy() {\n  return <button className="h-1" />;\n}\n';
       const files = { ...state.folders?.[check.folder], [added]: source };
       return { ...state, folders: { ...state.folders, [check.folder]: files } };
@@ -579,7 +808,7 @@ const KINDS = {
       return cellProblems(state.folders?.[check.folder] ?? {}, check.rule, liveSkip(state, check));
     },
     change(state, check) {
-      const added = `${check.folder}/changed-copy.tsx`;
+      const added = path.posix.join(check.folder, "changed-copy.tsx");
       const source =
         'export const ChangedCopy = () => (\n  <tr className="h-9">\n    <td className="w-40 text-right" />\n  </tr>\n);\n';
       const files = { ...state.folders?.[check.folder], [added]: source };
@@ -750,7 +979,7 @@ const KINDS = {
       return wordsProblem(state.folders?.[check.folder] ?? {}, liveSkip(state, check));
     },
     change(state, check) {
-      const added = `${check.folder}/changed-copy.tsx`;
+      const added = path.posix.join(check.folder, "changed-copy.tsx");
       const source = 'export const ChangedCopy = () => <p title="Changed copy">Changed copy</p>;\n';
       const files = { ...state.folders?.[check.folder], [added]: source };
       return { ...state, folders: { ...state.folders, [check.folder]: files } };
@@ -764,7 +993,7 @@ const KINDS = {
       return channelsProblem(files, liveSkip(state, check));
     },
     change(state, check) {
-      const added = `${check.folder}/changed-copy.tsx`;
+      const added = path.posix.join(check.folder, "changed-copy.tsx");
       const source =
         "export const ChangedCopy = () => <button onClick={() => window.alert(text)} />;\n";
       const files = { ...state.folders?.[check.folder], [added]: source };
@@ -783,7 +1012,7 @@ const KINDS = {
       return emptyStateProblem(state.sources?.[check.sources] ?? {}, liveSkip(state, check));
     },
     change(state, check) {
-      const added = `${check.sources}/changed-copy.tsx`;
+      const added = path.posix.join(check.sources, "changed-copy.tsx");
       const source =
         'export const ChangedCopy = () => <Empty><a href="/" className={buttonVariants()}>{word}</a></Empty>;\n';
       const files = { ...state.sources?.[check.sources], [added]: source };
@@ -803,7 +1032,7 @@ const KINDS = {
     change(state, check) {
       const to =
         screenPaths(state.files?.[check.registry], state.files?.[check.ledger] ?? null)[0] ?? "/";
-      const added = `${check.sources}/example/changed-copy.tsx`;
+      const added = path.posix.join(check.sources, "example/changed-copy.tsx");
       const source = `export const ChangedCopy = () => <a href="${to}">{word}</a>;\n`;
       const files = { ...state.sources?.[check.sources], [added]: source };
       return { ...state, sources: { ...state.sources, [check.sources]: files } };
@@ -815,7 +1044,7 @@ const KINDS = {
       return errorCopyProblem(state.folders?.[check.folder] ?? {}, liveSkip(state, check));
     },
     change(state, check) {
-      const added = `${check.folder}/changed-copy.tsx`;
+      const added = path.posix.join(check.folder, "changed-copy.tsx");
       const source =
         'export const ChangedCopy = () => (\n  <Alert variant="destructive">\n    <AlertTitle>{title}</AlertTitle>\n  </Alert>\n);\n';
       const files = { ...state.folders?.[check.folder], [added]: source };
@@ -989,13 +1218,92 @@ const KINDS = {
       };
     },
   },
+  // The gate: the step of the Makefile, or, where the repository keeps no Makefile, the script of
+  // its package the check names.
   gate: {
-    run: (state) => gateStepProblem(state.gate, state.makefile),
-    change: (state) => ({ ...state, gate: gateStepThatCannotFail(state.gate) }),
+    run: (state, check) =>
+      check?.script
+        ? scriptGateProblem(state.package, check.script)
+        : gateStepProblem(state.gate, state.makefile),
+    change: (state, check) =>
+      check?.script
+        ? { ...state, package: scriptThatCannotFail(state.package, check.script) }
+        : { ...state, gate: gateStepThatCannotFail(state.gate) },
   },
 };
 // The kinds of check, for the plugin's own tests of a single check.
 export const KINDS_FOR_TEST = KINDS;
+
+// The check of items taken down and not taken in, as the ledger-shapes row holds it wherever the
+// row is written: by the guide, by adopting, and by upgrading a repository that lacks it.
+export const TAKEN_DOWN_CHECK = { kind: "taken-down", sources: "src" };
+
+// The folder each pinned source declares for its items' files, without its last slash. A source
+// written before the key, or one that cannot be read, declares none.
+function declaredFolders(state) {
+  return Object.values(state.ledgerFolders?.[SOURCES_FOLDER] ?? {})
+    .map((text) => {
+      try {
+        return JSON.parse(text);
+      } catch {
+        return null;
+      }
+    })
+    .filter((source) => typeof source?.folder === "string" && source.folder.trim() !== "")
+    .map((source) => ({ source: source.id, folder: source.folder.replace(/\/+$/, "") }));
+}
+
+// The files of every item taken down and not taken in, each with its conform record: a record
+// whose need no row of the intake ledger answers. And the files taken in: those of a record whose
+// need a row answers, and the file every row names, a row written before records among them. A
+// record that cannot be read is the shape check's to name, not this one's.
+function takenDownFiles(state, check) {
+  const blocks =
+    readIntakeLedger(state.files?.[check.intake ?? LEDGERS.intake.file] ?? "").blocks ?? [];
+  const answered = new Set(
+    blocks.map((block) => block?.need).filter((need) => typeof need === "string"),
+  );
+  const covered = new Set(
+    blocks.map((block) => block?.file).filter((file) => typeof file === "string"),
+  );
+  const files = new Map();
+  for (const text of Object.values(state.ledgerFolders?.[CONFORM_FOLDER] ?? {})) {
+    let record;
+    try {
+      record = JSON.parse(text);
+    } catch {
+      continue;
+    }
+    if (typeof record?.need !== "string") continue;
+    const listed = [
+      ...(Array.isArray(record.taken) ? record.taken : []),
+      ...(Array.isArray(record.conformed) ? record.conformed : []),
+    ];
+    for (const entry of listed) {
+      if (typeof entry?.file !== "string") continue;
+      if (answered.has(record.need)) covered.add(entry.file);
+      else files.set(entry.file, record);
+    }
+  }
+  return { items: files, covered };
+}
+
+// A JSON text as data, or the value given when it cannot be read.
+const parsedOr = (text, otherwise) => {
+  try {
+    return JSON.parse(text ?? "null") ?? otherwise;
+  } catch {
+    return otherwise;
+  }
+};
+
+// What the exports are written from, as the state of the gate holds it.
+const exportInputs = (state) =>
+  inputsOf({
+    files: withManifest(state.root, state.files ?? {}),
+    theme: state.theme,
+    sources: state.ledgerFolders?.[LEDGERS.sources.folder] ?? {},
+  });
 
 const lintKey = (id, check) => `${id}:${check.rule}`;
 
@@ -1010,6 +1318,14 @@ const emptyBranch = () => ({
 
 // The checks that read what a branch adds, and the waiting list.
 const BRANCH_KINDS = ["decision-sheet", "owner-calls"];
+
+// The family core the repository pinned and how it holds each answer, with the questions that wait
+// on the owner, so that a locked answer held otherwise names the question about it. A waiting list
+// that cannot be read names none. Null when the repository declares no family.
+function familyCoreOf(root, rows) {
+  const family = readFamilyCore(root);
+  return family === null ? null : { ...family, waiting: waitingOf(root, rows).rows ?? [] };
+}
 
 // The waiting list as the gate reads it: its rows, or why it cannot be read.
 function waitingOf(root, rows) {
@@ -1040,9 +1356,11 @@ export function lintResults(root, checks, rows) {
     for (const check of list.filter((item) => item.kind === "lint")) {
       const key = lintKey(id, check);
       const rules = pointedRules(rows).filter((rule) => rule !== check.rule);
-      const probes = probesFor(id, { component: check.component ?? null, rules });
+      const probes = probesFor(id, { component: check.component ?? null, rule: check.rule, rules });
       if (!probes) {
-        missing[key] = { error: `this tool has no probe that breaks ${id}` };
+        missing[key] = {
+          error: noProbeFor(id, { component: check.component ?? null, rule: check.rule }),
+        };
         continue;
       }
       labels[key] = probes.probes.map((probe) => probe.label);
@@ -1257,6 +1575,7 @@ export function readState(root) {
           main: asking.find((check) => check.main)?.main ?? null,
         });
   const testsOf = asking.find((check) => check.tests)?.tests;
+  const choosing = checks.find((check) => check.kind === "choose-first") ?? null;
   const styles = loadStyles(root, stylesheet);
   return {
     root,
@@ -1297,12 +1616,20 @@ export function readState(root) {
     displays: readDisplays(root),
     gate: read(FILES.gate),
     makefile: readMakefile(root),
+    package: readPackage(root),
     git: gitFacts(
       root,
       checks.filter((check) => check.kind === UNTRACKED).map((check) => check.file),
     ),
     waiting: asking.length === 0 ? null : waitingOf(root, rows),
     branch,
+    // What the check that holds the choice compares: read only where a check asks.
+    choice: choosing ? readChoice(root, choosing) : null,
+    // The family core the repository pinned, and how it holds each answer: read only where the
+    // check of its locked answers is laid.
+    familyCore: checks.some((check) => check.kind === FAMILY_CORE_CHECK.kind)
+      ? familyCoreOf(root, rows)
+      : null,
     tagged: testsOf ? taggedTests(root, testsOf) : [],
   };
 }

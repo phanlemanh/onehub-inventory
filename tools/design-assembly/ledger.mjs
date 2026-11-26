@@ -138,7 +138,37 @@ const read = (root, file) =>
 // Why a check pointer does not resolve, or null. Structural: it shows the proof exists and is wired
 // in, not that it was seen failing. `gate` is the gate step as it is to be read, when it is not the
 // one on disk: an upgrade asks of the step it would write.
+// Why a row's check waits on a tool the repository lacks, or null: a lint rule, where the
+// repository keeps no configuration of the lint tool the rule is run by. Such a row is never held.
+export function lacksTool(root, check) {
+  const [prefix] = String(check ?? "").split(":");
+  if (prefix !== lint.prefix || usesLint(root)) return null;
+  return `${check}: the repository shows no sign of the lint tool this check is run by (no ${lint.signs.files.join(", ")}, and no ${lint.signs.packageName} in its package file, here or in a folder above it), so nothing runs it here`;
+}
+
+// Whether the repository uses the lint the adapter runs: a sign of it in its folder or a folder
+// above, up to the top of its git checkout, as the lint itself looks upward for its settings.
+function usesLint(root) {
+  const { files, packageKey, packageName } = lint.signs;
+  let dir = path.resolve(root);
+  for (;;) {
+    if (files.some((file) => existsSync(path.join(dir, file)))) return true;
+    try {
+      const data = JSON.parse(readFileSync(path.join(dir, "package.json"), "utf8"));
+      const named = { ...data.dependencies, ...data.devDependencies };
+      if (data[packageKey] || named[packageName]) return true;
+    } catch {
+      // No package file here, or one that cannot be read: no sign in it.
+    }
+    const up = path.dirname(dir);
+    if (existsSync(path.join(dir, ".git")) || up === dir) return false;
+    dir = up;
+  }
+}
+
 export function pointerProblem(root, id, check, gate = undefined) {
+  const lacking = lacksTool(root, check);
+  if (lacking) return lacking;
   const [prefix, ...rest] = check.split(":");
   const value = rest.join(":");
   if (["test", "e2e", "tool"].includes(prefix)) {
@@ -200,7 +230,9 @@ export function ledgerRate(root, rows) {
   const automatic = rows.filter(
     (row) => row.check && !pointerProblem(root, String(row.id), row.check),
   );
-  return { automatic: automatic.length, total: rows.length };
+  // Rows that wait on a tool the repository lacks, counted only where there are some.
+  const lacking = rows.filter((row) => lacksTool(root, row.check)).length;
+  return { automatic: automatic.length, total: rows.length, ...(lacking > 0 ? { lacking } : {}) };
 }
 
 export function readLedger(root) {

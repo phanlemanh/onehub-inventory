@@ -74,14 +74,56 @@ export function themeDeclarations(styles) {
   return found;
 }
 
-// What a variable is declared as for a selector: its own block, the root, the repository's theme,
-// then the framework's. `scope` may be several selectors that apply together, strongest first.
+// The text inside each `@layer name { ... }` block of a stylesheet, in the order written.
+function layerBodies(css) {
+  const bodies = [];
+  for (const open of css.matchAll(/(?:^|\n)[ \t]*@layer[^{;]*\{/g)) {
+    let depth = 1;
+    let at = open.index + open[0].length;
+    const from = at;
+    while (at < css.length && depth > 0) {
+      if (css[at] === "{") depth += 1;
+      else if (css[at] === "}") depth -= 1;
+      at += 1;
+    }
+    bodies.push(css.slice(from, at - 1));
+  }
+  return bodies;
+}
+
+// A variable a cascade layer declares for a selector, or null. A selector inside a layer is
+// indented, and a later layer wins over an earlier one.
+const literal = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+function layeredValue(css, selector, name) {
+  const blocks = new RegExp(`(?:^|\\n)[ \\t]*${literal(selector)}\\s*\\{([^}]*)\\}`, "g");
+  let value = null;
+  for (const body of layerBodies(css)) {
+    for (const block of body.matchAll(blocks)) {
+      const found = [
+        ...block[1].matchAll(new RegExp(`${literal(name)}\\s*:\\s*([^;]+);`, "g")),
+      ].pop();
+      if (found) value = found[1].trim();
+    }
+  }
+  return value;
+}
+
+// What a variable is declared as for a selector: its own block, the root, the same in a cascade
+// layer (which every unlayered declaration outranks), the repository's theme, then the framework's.
+// `scope` may be several selectors that apply together, strongest first.
 function declared(styles, scope, name) {
-  const own = [scope, ":root"]
-    .flat()
+  const selectors = [scope, ":root"].flat();
+  const own = selectors
     .map((selector) => readVariable(styles.css, selector, name))
     .find((value) => value !== null);
   if (own !== undefined) return own;
+  const layered = styles.css.includes("@layer")
+    ? selectors
+        .map((selector) => layeredValue(styles.css, selector, name))
+        .find((value) => value !== null)
+    : undefined;
+  if (layered !== undefined) return layered;
   const themed = themeDeclarations(styles).findLast((item) => item.name === name);
   if (themed) return themed.value;
   const pattern = new RegExp(`(?:^|[\\s;{])${name}\\s*:\\s*([^;]+);`, "g");
