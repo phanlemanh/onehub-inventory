@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 96f2b5834f3d43dbc9c2b3345b66eff9537aac04
+verified_commit: 1c0db7a53ead8ac3ca23c20991b2746df50d1e98
 human_signoff:
 ---
 
@@ -338,3 +338,7 @@ Round 1: make check failed — returned to implementation (chi tiết trong run-
 Round 2: xem run-log.jsonl.
 Round 3: E2b rejected — sign-in wait at phone widths after the App Shell merge; round cap reached.
 Round 4: test chờ App Shell theo cách dùng chung; E2, E2b, E2-ui và ba lệnh suite xanh; các eval khác carry-forward từ round 3 — PASS.
+
+### Re-pin lần 1 — 2026-11-26, do gộp main #124 và sửa hai bài thử sau CI nặng (G-2611-13)
+run_id: repin-20261126T165751Z-54219
+sha: 1c0db7a53ead8ac3ca23c20991b2746df50d1e98 · suites: 3 lệnh exit 0 · evals: 20/20 eval máy đạt kỳ vọng · ngoài làn máy: E2-ui, E6-ui, E13-ui
