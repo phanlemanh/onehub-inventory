@@ -26,6 +26,8 @@ export const FRAME_COPY = {
   goHome: "Về trang đầu",
   theme: {
     button: "Đổi giao diện",
+    /** The row of the account menu that holds the three looks. */
+    row: "Giao diện",
     light: "Sáng",
     dark: "Tối",
     system: "Theo thiết bị",

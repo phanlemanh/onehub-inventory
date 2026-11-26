@@ -11,6 +11,7 @@ import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import pg from "pg";
 
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
+import { openAccountMenu } from "./dang-nhap-vai";
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
@@ -84,11 +85,6 @@ async function askCode(page: Page, email: string) {
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Email").press("Enter");
   await expect(page.locator('[data-state="code"]')).toBeVisible();
-}
-
-async function openAccountMenu(page: Page) {
-  await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
-  await page.getByRole("button", { name: "Tài khoản" }).click();
 }
 
 async function typeCode(page: Page, code: string) {
@@ -263,7 +259,9 @@ test("dang-xuat", async ({ page }, info) => {
   await menu.getByRole("menuitem", { name: "Đăng xuất" }).click();
   await expect(page).toHaveURL(/\/login$/);
   await page.goto("/");
-  await expect(page.getByRole("link", { name: "Đăng nhập" })).toBeVisible();
+  // Signed out, signing in sits in the account menu at the foot of the rail (app-shell-khuon-dau-trang).
+  await openAccountMenu(page);
+  await expect(page.getByRole("menuitem", { name: "Đăng nhập" })).toBeVisible();
   await shot(page, info, 8, "360");
 });
 

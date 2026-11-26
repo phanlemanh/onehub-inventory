@@ -192,7 +192,12 @@ export function SecondColumnNav({
   );
 }
 
-/** Desktop second column beside the screen, with its fold handle. Hidden on the phone (it rides in the sheet). */
+/**
+ * Desktop second column beside the screen. Its edge runs the whole height of the screen, and its fold handle is a rail
+ * on that edge, in the middle of the window, that takes no room of its own: two strokes that bend into an arrow
+ * pointing the way the column will go when hovered or focused (the arrangement of the ReUI Verve template). Hidden on
+ * the phone (the column rides in the sheet).
+ */
 export function SecondColumn({
   items,
   roles,
@@ -205,26 +210,57 @@ export function SecondColumn({
 }) {
   const [open, setOpen] = useColumnOpen(initialOpen);
   return (
-    <div className="sticky top-12 hidden max-h-svh shrink-0 self-start md:flex">
+    <div
+      data-slot="app-shell-second-column-edge"
+      className={cn(
+        "hidden shrink-0 self-stretch transition-colors md:flex",
+        open && "border-r has-[[data-slot=second-column-rail]:hover]:border-ring/50",
+      )}
+    >
       <aside
         data-slot="app-shell-second-column"
         data-state={open ? "open" : "closed"}
-        className={cn("overflow-hidden border-r", open ? "w-56" : "w-0 border-r-0")}
+        className={cn(
+          "sticky top-12 max-h-svh self-start overflow-x-hidden overflow-y-auto pb-12",
+          open ? "w-56" : "w-0",
+        )}
       >
         <div className="w-56">
           <SecondColumnNav items={items} roles={roles} />
         </div>
       </aside>
-      <div className="flex items-center">
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          aria-label={open ? COPY.collapse : COPY.expand}
-          aria-expanded={open}
-          onClick={() => setOpen(!open)}
-        >
-          <span aria-hidden className="h-6 w-1 rounded-full bg-border" />
-        </Button>
+      {/* Fixed with no horizontal offset inside a zero-width block after the column: it stays on the column's edge, at
+          the middle of the window (a fixed child of the flex row itself would sit at the row's start). */}
+      <div className="w-0">
+        <div className="fixed top-1/2 z-30 -translate-y-1/2">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            data-slot="second-column-rail"
+            aria-label={open ? COPY.collapse : COPY.expand}
+            aria-expanded={open}
+            onClick={() => setOpen(!open)}
+          >
+            <span aria-hidden className="flex flex-col items-center">
+              <span
+                className={cn(
+                  "block h-2 w-0.5 origin-bottom rounded-t-full bg-foreground/40 transition-transform duration-100 ease-linear group-hover/button:bg-foreground/60 group-focus-visible/button:bg-foreground/60",
+                  open
+                    ? "group-hover/button:rotate-40 group-focus-visible/button:rotate-40"
+                    : "group-hover/button:-rotate-40 group-focus-visible/button:-rotate-40",
+                )}
+              />
+              <span
+                className={cn(
+                  "block h-2 w-0.5 origin-top rounded-b-full bg-foreground/40 transition-transform duration-100 ease-linear group-hover/button:bg-foreground/60 group-focus-visible/button:bg-foreground/60",
+                  open
+                    ? "group-hover/button:-rotate-40 group-focus-visible/button:-rotate-40"
+                    : "group-hover/button:rotate-40 group-focus-visible/button:rotate-40",
+                )}
+              />
+            </span>
+          </Button>
+        </div>
       </div>
     </div>
   );

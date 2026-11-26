@@ -19,7 +19,7 @@ import type { ButtonDecision } from "../../src/modules/identity/ui";
 import { expect, test } from "../../tools/e2e_templates/fixture";
 import { openSheet } from "../../tools/e2e_templates/settle";
 
-import { roleSession, ROLES, WITNESS } from "./dang-nhap-vai";
+import { roleSession, ROLES, shellReady, WITNESS } from "./dang-nhap-vai";
 import {
   buttonTable,
   FRAME_SECTION,
@@ -208,7 +208,7 @@ async function witnessStep(page: Page, p: Pair, size: Size): Promise<void> {
 
 async function navStep(page: Page, role: Role, size: Size): Promise<void> {
   await page.goto("/");
-  await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
+  await shellReady(page);
   if (Number(size) < 768) await openSheet(page);
   for (const p of ALL.filter((x) => x.role === role && NAV_SCREENS.has(x.screen))) {
     await expect(
