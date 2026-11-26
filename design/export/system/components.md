@@ -1,6 +1,6 @@
 # Components
 
-Written from the design ledgers at 101fb07cae9d. Do not change it here: change a ledger, then write it again with make design-exports.
+Written from the design ledgers at eb3e4b366ba0. Do not change it here: change a ledger, then write it again with make design-exports.
 
 - **ActionPermissionProvider** (atom), `src/components/candidate/action-permission.tsx`: permitted
 - **CellEditor** (atom), `src/components/candidate/cell-editor.tsx`: anchor, find, label, onClose

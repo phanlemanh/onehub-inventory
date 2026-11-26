@@ -1,4 +1,27 @@
 {
-  "$description": "Written from the design ledgers at 101fb07cae9d. Do not change it here: change a ledger, then write it again with make design-exports.",
+  "$description": "Written from the design ledgers at eb3e4b366ba0. Do not change it here: change a ledger, then write it again with make design-exports.",
+  "typefaces": [
+    {
+      "key": "sans",
+      "variable": "--font-sans",
+      "family": "Inter",
+      "loaded_by": "the font loader in src/app/layout.tsx",
+      "hosted": "google"
+    },
+    {
+      "key": "heading",
+      "variable": "--font-heading",
+      "family": "Inter",
+      "loaded_by": "the font loader in src/app/layout.tsx",
+      "hosted": "google"
+    },
+    {
+      "key": "mono",
+      "variable": "--font-mono",
+      "family": "ui-monospace",
+      "loaded_by": null,
+      "hosted": null
+    }
+  ],
   "fonts": []
 }

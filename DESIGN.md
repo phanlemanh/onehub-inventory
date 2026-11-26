@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: "onehub-inventory"
-description: "The design system of onehub-inventory, written from the design ledgers at 101fb07cae9d. Do not change it here: change a ledger, then write it again with make design-exports."
+description: "The design system of onehub-inventory, written from the design ledgers at eb3e4b366ba0. Do not change it here: change a ledger, then write it again with make design-exports."
 colors:
   accent: "#ebf2ff"
   accent-foreground: "#171717"
@@ -86,22 +86,31 @@ colors:
     warning-foreground: "#d08700"
 typography:
   xs:
+    fontFamily: "Inter"
     fontSize: 12px
   sm:
+    fontFamily: "Inter"
     fontSize: 14px
   base:
+    fontFamily: "Inter"
     fontSize: 16px
   lg:
+    fontFamily: "Inter"
     fontSize: 18px
   xl:
+    fontFamily: "Inter"
     fontSize: 20px
   2xl:
+    fontFamily: "Inter"
     fontSize: 24px
   3xl:
+    fontFamily: "Inter"
     fontSize: 30px
   4xl:
+    fontFamily: "Inter"
     fontSize: 36px
   5xl:
+    fontFamily: "Inter"
     fontSize: 48px
 rounded:
   base: 10px
@@ -118,7 +127,7 @@ spacing:
 
 ## Overview
 
-The design system of onehub-inventory, as its design ledgers hold it at 101fb07cae9d. Product type: not decided; conformance level: not decided.
+The design system of onehub-inventory, as its design ledgers hold it at eb3e4b366ba0. Product type: not decided; conformance level: not decided.
 
 ## Colors
 
@@ -126,7 +135,7 @@ Each role is written light at the top and dark under `dark`. A role that follows
 
 ## Typography
 
-Running text is set in the floor's font, headings in the same. The scale is standard.
+Running text is set in Inter, headings in Inter. The scale is standard.
 
 ## Layout
 

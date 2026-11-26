@@ -86,8 +86,9 @@ const SHARED = new RegExp(
 // a kind of screen (its file name, without .md), the root colour line (its value, as written), a
 // need a block is taken in for (its key), what a ledger lists as made before it (the ledger's
 // name), the block of a need that is retired or merged (the need's key), or one slot of the brief
-// of one screen (the screen's id in the ledger of screens, a colon, the slot's id). Pattern and
-// colour are the owner's calls: an agent that asks one does not go on. One slot asked for every
+// of one screen (the screen's id in the ledger of screens, a colon, the slot's id), or the mark of
+// the product (the id of its logo row in the sources ledger). Pattern, colour and mark are the
+// owner's calls: an agent that asks one does not go on. One slot asked for every
 // screen it concerns is written `screens:principles`, or `screens:model-changes:NAMES`. A slot of a
 // screen is not:
 // nothing a branch changes tells the gate that a screen was built on an open slot, so the gate
@@ -96,6 +97,8 @@ export const ITEMS = {
   decision: { which: /^[a-z0-9][a-z0-9-]*$/, owners: false },
   pattern: { which: /^[a-z0-9][a-z0-9._-]*$/i, owners: true },
   "source-color": { which: /^\S(?:.*\S)?$/, owners: true },
+  // A new logo row, or a changed file of one (spec 0017): the owner chooses the mark.
+  logo: { which: /^[a-z0-9]+(-[a-z0-9]+)*$/, owners: true },
   need: { which: /^[a-z0-9]+(-[a-z0-9]+)*$/, owners: false },
   before: { which: /^[a-z0-9]+(-[a-z0-9]+)*$/, owners: false },
   block: { which: /^[a-z0-9]+(-[a-z0-9]+)*$/, owners: false },
@@ -150,6 +153,36 @@ export function answerProblem(row, said) {
   if (strangers.length === 0) return null;
   return `${strangers.join(", ")} ${strangers.length === 1 ? "is" : "are"} not among its candidates: ${names.join(", ")}`;
 }
+
+// The candidate the owner chose, for a question about the mark that offers candidates: the first,
+// the recommended one, for an answer that keeps it; the one named, for an answer that names one of
+// them. Null for a question of any other item, one with no candidates, and any other answer: no
+// other question reads its answer this way.
+export function chosenCandidate(row) {
+  if (kindOf(row?.item) !== "logo" || !Array.isArray(row?.candidates)) return null;
+  const names = row.candidates.map((candidate) => candidate?.name);
+  if (row.answer === "keep") return typeof names[0] === "string" ? names[0] : null;
+  if (row.answer !== "value") return null;
+  const said = String(row.said ?? "").trim();
+  return names.includes(said) ? said : null;
+}
+
+// Each choice of a mark the waiting list holds: the item, the candidate, the question, who chose
+// it and on which day.
+export const markChoices = (rows = []) =>
+  rows
+    .filter((row) => row?.kind !== "permission" && chosenCandidate(row) !== null)
+    .map((row) => ({
+      item: row.item,
+      candidate: chosenCandidate(row),
+      question: row.id,
+      by: row.by,
+      on: row.on,
+    }));
+
+// A choice of a mark, as every reader says it.
+export const choiceSaid = (choice) =>
+  `the owner chose ${choice.candidate} in ${choice.question}, by ${choice.by} on ${choice.on}`;
 
 // Why the candidates of a question cannot be read, or null: a list of things, each with a name of
 // its own.
@@ -207,6 +240,9 @@ export function itemProblem(item) {
 // Whether a question about this item is the owner's to answer before the work goes on.
 export const mustAsk = (item) =>
   typeof item === "string" && itemProblem(item) === null && ITEMS[item.split(":")[0]].owners;
+
+// The item for the mark of the product, from the id of its logo row in the sources ledger.
+export const logoItem = (id) => `logo:${id}`;
 
 // The item for the root colour line of a stylesheet, from the value it holds.
 export const colourItem = (value) => `source-color:${String(value).replace(/\s+/g, " ").trim()}`;
