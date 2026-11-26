@@ -1,1 +1,5 @@
-playwright listeners (status>=400, requestfailed, console error) on 3487 at 1440 and 360: none recorded
+NETWORK (document/fetch/xhr)
+1440 200 GET http://127.0.0.1:3487/inventory?role=ListAgent&record=4d415500-0001-4000-8000-000000000002
+360 200 GET http://127.0.0.1:3487/inventory?role=ListAgent&record=4d415500-0001-4000-8000-000000000002
+
+CONSOLE error/warning
