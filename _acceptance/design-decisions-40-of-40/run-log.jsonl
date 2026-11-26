@@ -15,3 +15,20 @@
 {"ts":"2026-11-26T06:28:59Z","round":1,"evalId":"E15","run_id":"design-decisions-40-of-40-E15-20261126T062840Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only bo-chu"}
 {"ts":"2026-11-26T06:28:59Z","round":1,"evalId":"E16","run_id":"design-decisions-40-of-40-E16-20261126T062859Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs dong-khac"}
 {"ts":"2026-11-26T06:29:00Z","round":1,"evalId":"E17","run_id":"design-decisions-40-of-40-E17-20261126T062859Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only dong-khac"}
+{"ts":"2026-11-26T07:28:25Z","round":2,"evalId":"E1","run_id":"design-decisions-40-of-40-E1-r2-20261126T072617Z","exit_code":0,"cmd":"make check"}
+{"ts":"2026-11-26T07:28:38Z","round":2,"evalId":"E2","run_id":"design-decisions-40-of-40-E2-r2-20261126T072835Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs muc"}
+{"ts":"2026-11-26T07:28:44Z","round":2,"evalId":"E3","run_id":"design-decisions-40-of-40-E3-r2-20261126T072838Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only muc"}
+{"ts":"2026-11-26T07:28:46Z","round":2,"evalId":"E4","run_id":"design-decisions-40-of-40-E4-r2-20261126T072844Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs sau-dong"}
+{"ts":"2026-11-26T07:28:59Z","round":2,"evalId":"E5","run_id":"design-decisions-40-of-40-E5-r2-20261126T072846Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only sau-dong"}
+{"ts":"2026-11-26T07:29:02Z","round":2,"evalId":"E6","run_id":"design-decisions-40-of-40-E6-r2-20261126T072859Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs loi-chu"}
+{"ts":"2026-11-26T07:29:06Z","round":2,"evalId":"E7","run_id":"design-decisions-40-of-40-E7-r2-20261126T072902Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only loi-chu"}
+{"ts":"2026-11-26T07:29:06Z","round":2,"evalId":"E8","run_id":"design-decisions-40-of-40-E8-r2-20261126T072906Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs kho-man"}
+{"ts":"2026-11-26T07:29:09Z","round":2,"evalId":"E9","run_id":"design-decisions-40-of-40-E9-r2-20261126T072906Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only kho-man"}
+{"ts":"2026-11-26T07:29:15Z","round":2,"evalId":"E10","run_id":"design-decisions-40-of-40-E10-r2-20261126T072915Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs dong-gan"}
+{"ts":"2026-11-26T07:29:19Z","round":2,"evalId":"E11","run_id":"design-decisions-40-of-40-E11-r2-20261126T072915Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only dong-gan"}
+{"ts":"2026-11-26T07:29:20Z","round":2,"evalId":"E12","run_id":"design-decisions-40-of-40-E12-r2-20261126T072919Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs tep-nhanh"}
+{"ts":"2026-11-26T07:29:24Z","round":2,"evalId":"E13","run_id":"design-decisions-40-of-40-E13-r2-20261126T072920Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only tep-nhanh"}
+{"ts":"2026-11-26T07:29:27Z","round":2,"evalId":"E14","run_id":"design-decisions-40-of-40-E14-r2-20261126T072924Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs bo-chu"}
+{"ts":"2026-11-26T07:29:46Z","round":2,"evalId":"E15","run_id":"design-decisions-40-of-40-E15-r2-20261126T072927Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only bo-chu"}
+{"ts":"2026-11-26T07:29:46Z","round":2,"evalId":"E16","run_id":"design-decisions-40-of-40-E16-r2-20261126T072946Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/do.mjs dong-khac"}
+{"ts":"2026-11-26T07:29:48Z","round":2,"evalId":"E17","run_id":"design-decisions-40-of-40-E17-r2-20261126T072946Z","exit_code":0,"cmd":"node _acceptance/design-decisions-40-of-40/rang/hai-chieu.mjs --only dong-khac"}

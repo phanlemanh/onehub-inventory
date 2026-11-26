@@ -5,7 +5,7 @@ slug: design-decisions-40-of-40
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [config, docs]
-status: implemented
+status: verified
 veto_state: mo
 veto_opened_at: 2026-11-26T06:30:00Z
 approved_by:
