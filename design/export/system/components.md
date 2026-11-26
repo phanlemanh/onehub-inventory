@@ -1,0 +1,298 @@
+# Components
+
+Written from the design ledgers at 101fb07cae9d. Do not change it here: change a ledger, then write it again with make design-exports.
+
+- **ActionPermissionProvider** (atom), `src/components/candidate/action-permission.tsx`: permitted
+- **CellEditor** (atom), `src/components/candidate/cell-editor.tsx`: anchor, find, label, onClose
+- **ColumnFilterCell** (organism), `src/components/candidate/column-filter-cell.tsx`: spec, column, options
+- **DataRegion** (template), `src/components/candidate/data-region.tsx`: title, columns, rows, status, onRetry, onCancel, emptyWhy, emptyAction, action, headAction, rowActions, record, editable, cellEdit, initialFilters, groupBy, initialView, onViewChange, hiddenAtFirst, phoneList
+- **FormDialog** (organism), `src/components/candidate/form-dialog.tsx`: trigger, title, description, submitLabel, busyLabel, busy, open, onOpenChange, onSubmit, formError, refused, slot, badge, canSubmit, focusSubmit
+- **ListFace** (organism), `src/components/candidate/framed-list.tsx`: name, sub, avatar
+- **FramedList** (template), `src/components/candidate/framed-list.tsx`: title, count, headAction, rows, footer, slot, controlWidth
+- **PastePreviewBody** (organism), `src/components/candidate/paste-preview.tsx`: changes, skipped, wrong, picked, setPicked, busy
+- **PastePreview** (organism), `src/components/candidate/paste-preview.tsx`: open, title, changes, skipped, wrong, same, busy, onApply, onClose
+- **PhoneList** (organism), `src/components/candidate/phone-list.tsx`: list, data, columns, column, options, activeFields, count, group, more, rowAction, sort, onOpen, onClear, noMatch
+- **RecordPanel** (molecule), `src/components/candidate/record-panel.tsx`: ids, openId, onNavigate, render, returnFocus
+- **RegionTitle** (atom), `src/components/candidate/region-header.tsx`: title
+- **RegionToolbar** (atom), `src/components/candidate/region-header.tsx`: total, shown, action, tools, showCount
+- **RegionHeader** (atom), `src/components/candidate/region-header.tsx`
+- **RegionLoading** (molecule), `src/components/candidate/region-state.tsx`: columns, rows, onCancel
+- **RegionEmpty** (molecule), `src/components/candidate/region-state.tsx`: why, action
+- **RegionNoMatch** (molecule), `src/components/candidate/region-state.tsx`: onClear
+- **RegionError** (molecule), `src/components/candidate/region-state.tsx`: onRetry
+- **RegionPartialEmpty** (molecule), `src/components/candidate/region-state.tsx`: onRetry
+- **RegionForbidden** (molecule), `src/components/candidate/region-state.tsx`
+- **RegionPartial** (molecule), `src/components/candidate/region-state.tsx`: onRetry
+- **RowActions** (organism), `src/components/candidate/row-actions.tsx`: actions, mine, title, run, inGrid
+- **RecordActions** (organism), `src/components/candidate/row-actions.tsx`: main, actions, mine, title
+- **TouchTarget** (atom), `src/components/candidate/touch-target.tsx`
+- **TruncatedText** (atom), `src/components/candidate/truncated-text.tsx`: text
+- **TypedCell** (molecule), `src/components/candidate/typed-cell.tsx`: kind, value, transaction, lockedReason, editMode
+- **Badge** (atom), `src/components/reui/badge.tsx`: render
+- **CascaderColumnPanel** (organism), `src/components/reui/cascader/cascader-columns.tsx`: column, virtualized
+- **CascaderColumns** (organism), `src/components/reui/cascader/cascader-columns.tsx`: columnWidth, maxHeight
+- **CascaderActionsContext** (molecule), `src/components/reui/cascader/cascader-context.tsx`
+- **CascaderHighlightContext** (molecule), `src/components/reui/cascader/cascader-context.tsx`
+- **CascaderRenderContext** (molecule), `src/components/reui/cascader/cascader-context.tsx`
+- **CascaderStateContext** (molecule), `src/components/reui/cascader/cascader-context.tsx`
+- **CascaderAction** (organism), `src/components/reui/cascader/cascader-footer.tsx`: icon, onSelect, onClick, onKeyDown, disabled
+- **CascaderFooter** (organism), `src/components/reui/cascader/cascader-footer.tsx`: onKeyDown
+- **CascaderSubmenu** (organism), `src/components/reui/cascader/cascader-footer.tsx`: open, defaultOpen, onOpenChange
+- **CascaderSubmenuContent** (organism), `src/components/reui/cascader/cascader-footer.tsx`: onKeyDown, side, align, sideOffset, alignOffset
+- **CascaderSubmenuTrigger** (organism), `src/components/reui/cascader/cascader-footer.tsx`: icon, onKeyDown, onClick, disabled
+- **CascaderGroup** (organism), `src/components/reui/cascader/cascader-item.tsx`
+- **CascaderItem** (organism), `src/components/reui/cascader/cascader-item.tsx`: node, index, depth, showPath, as, expanded, indent, branch, selectable, selected, indeterminate, selectedCount, loading, error, childrenLoading, childrenError, onClick, onMouseUp, style
+- **CascaderItems** (organism), `src/components/reui/cascader/cascader-item.tsx`
+- **CascaderLabel** (organism), `src/components/reui/cascader/cascader-item.tsx`
+- **CascaderSeparator** (organism), `src/components/reui/cascader/cascader-item.tsx`
+- **CascaderNav** (organism), `src/components/reui/cascader/cascader-nav.tsx`
+- **CascaderBack** (organism), `src/components/reui/cascader/cascader-nav.tsx`
+- **CascaderBreadcrumb** (organism), `src/components/reui/cascader/cascader-nav.tsx`: maxSegments, collapse, interactive
+- **CascaderInput** (organism), `src/components/reui/cascader/cascader-nav.tsx`: showBack, placeholder, onKeyDown, aria-describedby
+- **CascaderValue** (organism), `src/components/reui/cascader/cascader-nav.tsx`: display, maxSegments, collapse, separator, showIcon, placeholder
+- **CascaderVirtualColumn** (organism), `src/components/reui/cascader/cascader-virtual.tsx`: column, estimateSize, overscan
+- **CascaderVirtualItems** (organism), `src/components/reui/cascader/cascader-virtual.tsx`
+- **Cascader** (organism), `src/components/reui/cascader/cascader.tsx`: items, getParent, getChildren, onSearch, searchDebounce, resolveValue, loadKey, prefetch, onLoadError, value, defaultValue, onValueChange, multiple, selectable, indicator, actions, cascade, max, mode, expandTrigger, path, defaultPath, onPathChange, expanded, defaultExpanded, onExpandedChange, open, defaultOpen, onOpenChange, closeOnSelect, inputValue, defaultInputValue, onInputValueChange, searchScope, filter, revealSelected, maxHeight, virtualize, virtualizeThreshold, estimateRowSize, overscan, labels, renderItem, renderLabel, disabled, name, form, id, required, readOnly, invalid, inputRef, inline
+- **CascaderTrigger** (organism), `src/components/reui/cascader/cascader.tsx`: showIcon, ref
+- **CascaderChip** (organism), `src/components/reui/cascader/cascader.tsx`: node, showPath, maxSegments, showRemove, onRemove
+- **CascaderChips** (organism), `src/components/reui/cascader/cascader.tsx`: placeholder, strategy
+- **CascaderContent** (organism), `src/components/reui/cascader/cascader.tsx`: side, sideOffset, align, alignOffset, anchor, collisionBoundary, collisionPadding, sticky, positionMethod, container, ref
+- **CascaderPanel** (organism), `src/components/reui/cascader/cascader.tsx`
+- **CascaderList** (organism), `src/components/reui/cascader/cascader.tsx`: style, maxHeight
+- **CascaderEmpty** (organism), `src/components/reui/cascader/cascader.tsx`: skeletonRows
+- **CascaderStatus** (organism), `src/components/reui/cascader/cascader.tsx`
+- **DataGridCellSelection** (organism), `src/components/reui/data-grid/data-grid-cell-selection.tsx`: apiRef, clipboard, keyboard
+- **DataGridSelectionBar** (organism), `src/components/reui/data-grid/data-grid-cell-selection.tsx`: label, clearLabel, onClear
+- **DataGridColumnFilter** (organism), `src/components/reui/data-grid/data-grid-column-filter.tsx`: column, title, options
+- **DataGridColumnHeader** (organism), `src/components/reui/data-grid/data-grid-column-header.tsx`
+- **DataGridColumnVisibility** (organism), `src/components/reui/data-grid/data-grid-column-visibility.tsx`: table, trigger
+- **DataGridPagination** (organism), `src/components/reui/data-grid/data-grid-pagination.tsx`
+- **DataGridScrollArea** (organism), `src/components/reui/data-grid/data-grid-scroll-area.tsx`: orientation
+- **DataGridTableDndRowHandle** (organism), `src/components/reui/data-grid/data-grid-table-dnd-rows.tsx`: disabled, disabledLabel
+- **DataGridTableDndRows** (organism), `src/components/reui/data-grid/data-grid-table-dnd-rows.tsx`: handleDragEnd, dataIds, footerContent, collisionDetection, modifiers, sortingStrategy, renderRowDecoration, dropIndicator, onDragStart, onDragMove, onDragOver, onDragCancel, accessibility
+- **DataGridTableDnd** (organism), `src/components/reui/data-grid/data-grid-table-dnd.tsx`: handleDragEnd, footerContent, accessibility
+- **DataGridTableVirtual** (organism), `src/components/reui/data-grid/data-grid-table-virtual.tsx`: height, estimateSize, overscan, scrollBehavior, scrollToRowAlign, scrollToRowIndex, columnVirtualizerOptions, scrollToColumnAlign, scrollToColumnIndex, footerContent, renderHeader, onFetchMore, isFetchingMore, hasMore, fetchMoreOffset, virtualizerOptions
+- **DataGridTable** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: footerContent, renderHeader
+- **DataGridTableAddRow** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableBase** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableBody** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableBodyRow** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: row, pinnedBoundary, rowRef, dndRef, dndStyle, dndDragging, dataIndex
+- **DataGridTableBodyRowCell** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: cell, dndRef, dndStyle, columnIndex
+- **DataGridTableBodyRowExpandded** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: row
+- **DataGridTableRenderedRow** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: row, pinnedBoundary, rowRef, rowIndex, centerWindow
+- **DataGridTableBodyRowSkeleton** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableBodyRowSkeletonCell** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: column
+- **DataGridTableEmpty** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableFillBodyCell** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableFillHeadCell** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: rowSpan
+- **DataGridTableFoot** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableFootRow** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableFootRowCell** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: colSpan
+- **DataGridTableHeader** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableHead** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableHeadRow** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: rowId
+- **DataGridTableHeadRowCell** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: header, coveredHeaders, dndRef, dndStyle
+- **DataGridTableHeadRowCellResize** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: header
+- **DataGridTableLoader** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableRowExpand** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: row, indent
+- **DataGridTableRowPin** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: row
+- **DataGridTableRowSelect** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: row
+- **DataGridTableRowSelectAll** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableRowSpacer** (organism), `src/components/reui/data-grid/data-grid-table.tsx`
+- **DataGridTableViewport** (organism), `src/components/reui/data-grid/data-grid-table.tsx`: viewportRef, style
+- **DataGridProvider** (molecule), `src/components/reui/data-grid/data-grid.tsx`: table
+- **DataGrid** (molecule), `src/components/reui/data-grid/data-grid.tsx`: table
+- **DataGridContainer** (molecule), `src/components/reui/data-grid/data-grid.tsx`
+- **FilterAdvancedRow** (organism), `src/components/reui/filters/filters-advanced.tsx`
+- **FiltersAdvancedPanel** (organism), `src/components/reui/filters/filters-advanced.tsx`: mode, renderEmpty, reorderable
+- **FiltersAdvanced** (organism), `src/components/reui/filters/filters-advanced.tsx`: mode, trigger, reorderable, align
+- **FilterFieldPicker** (organism), `src/components/reui/filters/filters-builder.tsx`: path, onPathChange, query, onQueryChange, onSelect, maxHeight, labels, actions
+- **FiltersBuilder** (organism), `src/components/reui/filters/filters-builder.tsx`: trigger
+- **FilterValuePopover** (organism), `src/components/reui/filters/filters-chip.tsx`: rule, field, operator, trigger
+- **FilterOperatorPopover** (organism), `src/components/reui/filters/filters-chip.tsx`: rule, field, trigger
+- **FilterMoveToMenuItems** (organism), `src/components/reui/filters/filters-chip.tsx`: nodeId
+- **FilterRuleMenuItems** (organism), `src/components/reui/filters/filters-chip.tsx`: ruleId, allowGrouping
+- **FilterChip** (organism), `src/components/reui/filters/filters-chip.tsx`
+- **FilterActionsContext** (organism), `src/components/reui/filters/filters-context.tsx`
+- **FilterFocusContext** (organism), `src/components/reui/filters/filters-context.tsx`
+- **FilterRenderContext** (organism), `src/components/reui/filters/filters-context.tsx`
+- **FilterStateContext** (organism), `src/components/reui/filters/filters-context.tsx`
+- **FilterReorderProvider** (organism), `src/components/reui/filters/filters-context.tsx`
+- **FilterRowStateProvider** (organism), `src/components/reui/filters/filters-context.tsx`
+- **FilterTextEditor** (organism), `src/components/reui/filters/filters-editors.tsx`: value, onValueChange, commit, cancel, autoFocusProps, labels, host, field
+- **FilterNumberEditor** (organism), `src/components/reui/filters/filters-editors.tsx`: value, onValueChange, commit, cancel, autoFocusProps, labels, host, field
+- **FilterRangeEditor** (organism), `src/components/reui/filters/filters-editors.tsx`: value, onValueChange, commit, cancel, autoFocusProps, labels, host, field
+- **FilterMenu** (organism), `src/components/reui/filters/filters-editors.tsx`: items, selected, multiple, onSelectionChange, labels, ariaLabel, searchPlaceholder, searchable, maxHeight, pinSelected, sortSelected, preFiltered, autoFocusProps, query, onQueryChange, state
+- **FilterSelectEditor** (organism), `src/components/reui/filters/filters-editors.tsx`
+- **FilterMultiSelectEditor** (organism), `src/components/reui/filters/filters-editors.tsx`
+- **FilterBooleanEditor** (organism), `src/components/reui/filters/filters-editors.tsx`: value, onValueChange, commit, labels, autoFocusProps, field
+- **Filters** (organism), `src/components/reui/filters/filters.tsx`: fields, query, defaultQuery, onQueryChange, labels, operatorLabels, editors, variant, advancedMode, advancedAlign, reorderable, size, disabled, readOnly, onBeforeQueryChange, onConvertToAdvanced, menuClassName, fieldPickerClassName, pathCollapse, maxPathSegments, trigger, showClear, renderValue, renderChip, renderEmpty
+- **FiltersRow** (organism), `src/components/reui/filters/filters.tsx`: trigger, showClear
+- **Frame** (atom), `src/components/reui/frame.tsx`
+- **FramePanel** (atom), `src/components/reui/frame.tsx`: fit
+- **FrameHeader** (atom), `src/components/reui/frame.tsx`
+- **FrameTitle** (atom), `src/components/reui/frame.tsx`
+- **FrameDescription** (atom), `src/components/reui/frame.tsx`
+- **FrameFooter** (atom), `src/components/reui/frame.tsx`
+- **AppShell** (template), `src/components/templates/app-shell.tsx`: nav, roles, company, account, search, columnOpen
+- **PlaceChangeProvider** (template), `src/components/templates/app-shell/place-change.tsx`
+- **SecondColumnNav** (template), `src/components/templates/app-shell/second-column.tsx`: items, roles
+- **SecondColumn** (template), `src/components/templates/app-shell/second-column.tsx`: items, roles, initialOpen
+- **LoginLayout** (template), `src/components/templates/login-layout.tsx`: heading, lead, footer
+- **NavMenu** (template), `src/components/templates/nav-menu.tsx`: items, roles
+- **PageHeader** (template), `src/components/templates/page-header.tsx`: title, action
+- **PageSkeleton** (template), `src/components/templates/page-skeleton.tsx`
+- **PageState** (template), `src/components/templates/page-state.tsx`: kind, onRetry, returnTo, homeHref
+- **ConnectionWatcher** (template), `src/components/templates/screen-banner.tsx`
+- **ScreenBanner** (template), `src/components/templates/screen-banner.tsx`
+- **ShellFocusProvider** (template), `src/components/templates/shell-focus.tsx`
+- **HiddenInFocus** (template), `src/components/templates/shell-focus.tsx`
+- **ShellContent** (template), `src/components/templates/shell-focus.tsx`
+- **ThemeProvider** (template), `src/components/templates/theme.tsx`
+- **ThemeSwitch** (template), `src/components/templates/theme.tsx`
+- **Avatar** (atom), `src/components/ui/avatar.tsx`: size
+- **AvatarImage** (atom), `src/components/ui/avatar.tsx`
+- **AvatarFallback** (atom), `src/components/ui/avatar.tsx`
+- **AvatarGroup** (atom), `src/components/ui/avatar.tsx`
+- **AvatarGroupCount** (atom), `src/components/ui/avatar.tsx`
+- **AvatarBadge** (atom), `src/components/ui/avatar.tsx`
+- **ButtonGroup** (molecule), `src/components/ui/button-group.tsx`
+- **ButtonGroupSeparator** (molecule), `src/components/ui/button-group.tsx`: orientation
+- **ButtonGroupText** (molecule), `src/components/ui/button-group.tsx`: render
+- **Button** (atom), `src/components/ui/button.tsx`
+- **Checkbox** (atom), `src/components/ui/checkbox.tsx`
+- **Command** (organism), `src/components/ui/command.tsx`
+- **CommandDialog** (organism), `src/components/ui/command.tsx`: title, description, showCloseButton
+- **CommandInput** (organism), `src/components/ui/command.tsx`
+- **CommandList** (organism), `src/components/ui/command.tsx`
+- **CommandEmpty** (organism), `src/components/ui/command.tsx`
+- **CommandGroup** (organism), `src/components/ui/command.tsx`
+- **CommandItem** (organism), `src/components/ui/command.tsx`
+- **CommandShortcut** (organism), `src/components/ui/command.tsx`
+- **CommandSeparator** (organism), `src/components/ui/command.tsx`
+- **Dialog** (molecule), `src/components/ui/dialog.tsx`
+- **DialogClose** (molecule), `src/components/ui/dialog.tsx`
+- **DialogContent** (molecule), `src/components/ui/dialog.tsx`: showCloseButton
+- **DialogDescription** (molecule), `src/components/ui/dialog.tsx`
+- **DialogFooter** (molecule), `src/components/ui/dialog.tsx`: showCloseButton
+- **DialogHeader** (molecule), `src/components/ui/dialog.tsx`
+- **DialogOverlay** (molecule), `src/components/ui/dialog.tsx`
+- **DialogPortal** (molecule), `src/components/ui/dialog.tsx`
+- **DialogTitle** (molecule), `src/components/ui/dialog.tsx`
+- **DialogTrigger** (molecule), `src/components/ui/dialog.tsx`
+- **DropdownMenu** (atom), `src/components/ui/dropdown-menu.tsx`
+- **DropdownMenuPortal** (atom), `src/components/ui/dropdown-menu.tsx`
+- **DropdownMenuTrigger** (atom), `src/components/ui/dropdown-menu.tsx`
+- **DropdownMenuContent** (atom), `src/components/ui/dropdown-menu.tsx`: align, alignOffset, side, sideOffset
+- **DropdownMenuGroup** (atom), `src/components/ui/dropdown-menu.tsx`
+- **DropdownMenuLabel** (atom), `src/components/ui/dropdown-menu.tsx`: inset
+- **DropdownMenuItem** (atom), `src/components/ui/dropdown-menu.tsx`: inset, variant
+- **DropdownMenuCheckboxItem** (atom), `src/components/ui/dropdown-menu.tsx`: checked, inset
+- **DropdownMenuRadioGroup** (atom), `src/components/ui/dropdown-menu.tsx`
+- **DropdownMenuRadioItem** (atom), `src/components/ui/dropdown-menu.tsx`: inset
+- **DropdownMenuSeparator** (atom), `src/components/ui/dropdown-menu.tsx`
+- **DropdownMenuShortcut** (atom), `src/components/ui/dropdown-menu.tsx`
+- **DropdownMenuSub** (atom), `src/components/ui/dropdown-menu.tsx`
+- **DropdownMenuSubTrigger** (atom), `src/components/ui/dropdown-menu.tsx`: inset
+- **DropdownMenuSubContent** (atom), `src/components/ui/dropdown-menu.tsx`: align, alignOffset, side, sideOffset
+- **Empty** (atom), `src/components/ui/empty.tsx`
+- **EmptyHeader** (atom), `src/components/ui/empty.tsx`
+- **EmptyTitle** (atom), `src/components/ui/empty.tsx`
+- **EmptyDescription** (atom), `src/components/ui/empty.tsx`
+- **EmptyContent** (atom), `src/components/ui/empty.tsx`
+- **EmptyMedia** (atom), `src/components/ui/empty.tsx`
+- **Field** (molecule), `src/components/ui/field.tsx`
+- **FieldLabel** (molecule), `src/components/ui/field.tsx`
+- **FieldDescription** (molecule), `src/components/ui/field.tsx`
+- **FieldError** (molecule), `src/components/ui/field.tsx`: errors
+- **FieldGroup** (molecule), `src/components/ui/field.tsx`
+- **FieldLegend** (molecule), `src/components/ui/field.tsx`: variant
+- **FieldSeparator** (molecule), `src/components/ui/field.tsx`
+- **FieldSet** (molecule), `src/components/ui/field.tsx`
+- **FieldContent** (molecule), `src/components/ui/field.tsx`
+- **FieldTitle** (molecule), `src/components/ui/field.tsx`
+- **InputGroup** (molecule), `src/components/ui/input-group.tsx`
+- **InputGroupAddon** (molecule), `src/components/ui/input-group.tsx`
+- **InputGroupButton** (molecule), `src/components/ui/input-group.tsx`: type, variant
+- **InputGroupText** (molecule), `src/components/ui/input-group.tsx`
+- **InputGroupInput** (molecule), `src/components/ui/input-group.tsx`
+- **InputGroupTextarea** (molecule), `src/components/ui/input-group.tsx`
+- **Input** (atom), `src/components/ui/input.tsx`: type
+- **Item** (molecule), `src/components/ui/item.tsx`: render
+- **ItemMedia** (molecule), `src/components/ui/item.tsx`
+- **ItemContent** (molecule), `src/components/ui/item.tsx`
+- **ItemActions** (molecule), `src/components/ui/item.tsx`
+- **ItemGroup** (molecule), `src/components/ui/item.tsx`
+- **ItemSeparator** (molecule), `src/components/ui/item.tsx`
+- **ItemTitle** (molecule), `src/components/ui/item.tsx`
+- **ItemDescription** (molecule), `src/components/ui/item.tsx`
+- **ItemHeader** (molecule), `src/components/ui/item.tsx`
+- **ItemFooter** (molecule), `src/components/ui/item.tsx`
+- **Label** (atom), `src/components/ui/label.tsx`
+- **Popover** (atom), `src/components/ui/popover.tsx`
+- **PopoverContent** (atom), `src/components/ui/popover.tsx`: align, alignOffset, side, sideOffset
+- **PopoverDescription** (atom), `src/components/ui/popover.tsx`
+- **PopoverHeader** (atom), `src/components/ui/popover.tsx`
+- **PopoverTitle** (atom), `src/components/ui/popover.tsx`
+- **PopoverTrigger** (atom), `src/components/ui/popover.tsx`
+- **Progress** (atom), `src/components/ui/progress.tsx`: value
+- **ProgressTrack** (atom), `src/components/ui/progress.tsx`
+- **ProgressIndicator** (atom), `src/components/ui/progress.tsx`
+- **ProgressLabel** (atom), `src/components/ui/progress.tsx`
+- **ProgressValue** (atom), `src/components/ui/progress.tsx`
+- **ResizableHandle** (atom), `src/components/ui/resizable.tsx`: withHandle
+- **ResizablePanel** (atom), `src/components/ui/resizable.tsx`
+- **ResizablePanelGroup** (atom), `src/components/ui/resizable.tsx`
+- **ScrollArea** (atom), `src/components/ui/scroll-area.tsx`
+- **ScrollBar** (atom), `src/components/ui/scroll-area.tsx`: orientation
+- **Select** (atom), `src/components/ui/select.tsx`
+- **SelectContent** (atom), `src/components/ui/select.tsx`: side, sideOffset, align, alignOffset, alignItemWithTrigger
+- **SelectGroup** (atom), `src/components/ui/select.tsx`
+- **SelectItem** (atom), `src/components/ui/select.tsx`
+- **SelectLabel** (atom), `src/components/ui/select.tsx`
+- **SelectScrollDownButton** (atom), `src/components/ui/select.tsx`
+- **SelectScrollUpButton** (atom), `src/components/ui/select.tsx`
+- **SelectSeparator** (atom), `src/components/ui/select.tsx`
+- **SelectTrigger** (atom), `src/components/ui/select.tsx`: size
+- **SelectValue** (atom), `src/components/ui/select.tsx`
+- **Separator** (atom), `src/components/ui/separator.tsx`: orientation
+- **Sheet** (molecule), `src/components/ui/sheet.tsx`
+- **SheetTrigger** (molecule), `src/components/ui/sheet.tsx`
+- **SheetClose** (molecule), `src/components/ui/sheet.tsx`
+- **SheetContent** (molecule), `src/components/ui/sheet.tsx`: side, showCloseButton
+- **SheetHeader** (molecule), `src/components/ui/sheet.tsx`
+- **SheetFooter** (molecule), `src/components/ui/sheet.tsx`
+- **SheetTitle** (molecule), `src/components/ui/sheet.tsx`
+- **SheetDescription** (molecule), `src/components/ui/sheet.tsx`
+- **Sidebar** (organism), `src/components/ui/sidebar.tsx`: side, variant, collapsible, dir
+- **SidebarContent** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarFooter** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarGroup** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarGroupAction** (organism), `src/components/ui/sidebar.tsx`: render
+- **SidebarGroupContent** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarGroupLabel** (organism), `src/components/ui/sidebar.tsx`: render
+- **SidebarHeader** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarInput** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarInset** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarMenu** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarMenuAction** (organism), `src/components/ui/sidebar.tsx`: render, showOnHover
+- **SidebarMenuBadge** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarMenuButton** (organism), `src/components/ui/sidebar.tsx`: render, isActive, tooltip
+- **SidebarMenuItem** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarMenuSkeleton** (organism), `src/components/ui/sidebar.tsx`: showIcon
+- **SidebarMenuSub** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarMenuSubButton** (organism), `src/components/ui/sidebar.tsx`: render, size, isActive
+- **SidebarMenuSubItem** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarProvider** (organism), `src/components/ui/sidebar.tsx`: defaultOpen, open, onOpenChange, style
+- **SidebarRail** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarSeparator** (organism), `src/components/ui/sidebar.tsx`
+- **SidebarTrigger** (organism), `src/components/ui/sidebar.tsx`: onClick
+- **Skeleton** (atom), `src/components/ui/skeleton.tsx`
+- **Toaster** (atom), `src/components/ui/sonner.tsx`
+- **Spinner** (atom), `src/components/ui/spinner.tsx`
+- **Switch** (atom), `src/components/ui/switch.tsx`: size
+- **Textarea** (atom), `src/components/ui/textarea.tsx`
+- **Tooltip** (atom), `src/components/ui/tooltip.tsx`
+- **TooltipTrigger** (atom), `src/components/ui/tooltip.tsx`
+- **TooltipContent** (atom), `src/components/ui/tooltip.tsx`: side, sideOffset, align, alignOffset
+- **TooltipProvider** (atom), `src/components/ui/tooltip.tsx`: delay

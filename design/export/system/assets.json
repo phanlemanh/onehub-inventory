@@ -1,0 +1,4 @@
+{
+  "$description": "Written from the design ledgers at 101fb07cae9d. Do not change it here: change a ledger, then write it again with make design-exports.",
+  "fonts": []
+}

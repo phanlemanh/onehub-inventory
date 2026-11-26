@@ -344,3 +344,8 @@ decisions:
     kind: closed
     source: "the stylesheet's typefaces, as found"
     check: "tool:tools/design-assembly/check.mjs"
+  - id: design-exports
+    layer: governance
+    kind: formula
+    source: "the design ledgers, written out by make design-exports"
+    check: "tool:tools/design-assembly/check.mjs"

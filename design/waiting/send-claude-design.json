@@ -1,0 +1,23 @@
+{
+  "id": "send-claude-design",
+  "kind": "question",
+  "group": "sending out",
+  "question": "May the design system bundle of this repository be sent to claude-design, for this repository and this plug only?",
+  "recommendation": "allow: the owner named this plug at the handoff socket, for this very place",
+  "basis": "decision d0088, and the owner's word \"Keep at handoff and brand\" on 2026-11-23, said of: The design values and files of the repository it is given, to a private artifact of the person's Claude account.; what goes: the files of design/export/system",
+  "hard_to_undo": true,
+  "where": "design/export/system, sent to claude-design",
+  "if_refused": "nothing is sent, and the bundle stays in the repository",
+  "item": "decision:send-claude-design",
+  "asked_on": "2026-11-26",
+  "candidates": [
+    {
+      "name": "allow",
+      "about": "Send it, for this repository and this plug only, until the leave is taken back."
+    },
+    {
+      "name": "not-now",
+      "about": "Keep it in the repository: nothing is sent."
+    }
+  ]
+}
