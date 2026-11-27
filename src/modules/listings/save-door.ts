@@ -84,7 +84,14 @@ export type ListingChange =
   | { field: "feeInclusion"; feeInclusion: ListingFeeInclusion }
   | DetailsChange
   | CustomFieldChange
-  | UnitAttributesChange;
+  | UnitAttributesChange
+  | UnitMoveChange;
+
+/**
+ * «Gắn sang căn khác» (row 3h, AC-10): the listing points at another unit of the shared catalog. Its own values stay; the
+ * catalog's values follow the new unit. The server moves the unit link; one open listing per unit stays the database's.
+ */
+export type UnitMoveChange = { field: "unit"; upi: string };
 
 /** Why a change breaks a rule; the editors never send one, so this answer means an editor let it through. */
 export type Invalid =
@@ -97,7 +104,11 @@ export type Invalid =
   /** A custom value the company's field does not take (the reason of checkCustomValue, row 7e). */
   | { rule: "custom"; reason: string }
   /** A unit attribute the readers of unit-attributes.ts do not take (row 3h). */
-  | { rule: "attributes" };
+  | { rule: "attributes" }
+  /** The unit to move to already has an open listing of the company, named by its unit number (row 3h). */
+  | { rule: "unit-open"; unitNumber: string }
+  /** The unit to move to is not in the shared catalog, or is the unit the listing already points at (row 3h). */
+  | { rule: "unit" };
 
 export type SaveOutcome =
   | { kind: "saved"; listing: Listing }
@@ -172,6 +183,11 @@ export function applyChange(
     next = withPart(next, "financing", change.financing);
     next = withPart(next, "occupantType", change.occupantType);
     return { ok: true, listing: next };
+  }
+  if (change.field === "unit") {
+    // The link moves with the listing's details: a sold or withdrawn listing stays on the unit it was sold on.
+    if (detailsLocked(listing.standardStatus)) return { ok: false, why: { rule: "locked" } };
+    return { ok: true, listing: confirmed };
   }
   if (change.field === "unitAttributes") {
     if (detailsLocked(listing.standardStatus)) return { ok: false, why: { rule: "locked" } };

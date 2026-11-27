@@ -3,6 +3,7 @@
 // security of migration 013 keeps it to the company's rows and to roles that may view listings; the statements add no
 // company filter of their own, so nothing here can widen what the database allows.
 import type { Listing } from "../../generated/ontology";
+import { SOURCE_OF, UNIT_ATTRIBUTE_FIELDS, type AttributeSource } from "./unit-attributes";
 import { readCatalogUnits } from "../catalog/server";
 import type { DbClient } from "../identity/server";
 
@@ -27,6 +28,17 @@ interface Row {
   original_entry_timestamp: Date;
   last_confirmed_at: Date | null;
   version: number;
+  // Row 3h: the listing's own unit values and their sources (migration 017); null = the catalog's value shows.
+  living_area: string | null;
+  living_area_source: AttributeSource | null;
+  floor: string | null;
+  floor_source: AttributeSource | null;
+  bedrooms_total: number | null;
+  bedrooms_total_source: AttributeSource | null;
+  direction_faces: string | null;
+  direction_faces_source: AttributeSource | null;
+  property_sub_type: Listing["propertySubType"] | null;
+  property_sub_type_source: AttributeSource | null;
   upi: string;
 }
 
@@ -34,7 +46,9 @@ interface Row {
 export const LISTING_COLUMNS = `
   l.id, l.company_id, l.standard_status, l.list_price, l.close_price, to_char(l.close_date, 'YYYY-MM-DD') as close_date,
   l.withdrawn_reason, l.fee_inclusion, l.furnished, l.occupant_type, l.legal_status, l.financing, l.custom_fields,
-  l.list_agent_user_id, l.list_agent_full_name, l.original_entry_timestamp, l.last_confirmed_at, l.version, u.upi`;
+  l.list_agent_user_id, l.list_agent_full_name, l.original_entry_timestamp, l.last_confirmed_at, l.version,
+  l.living_area, l.living_area_source, l.floor, l.floor_source, l.bedrooms_total, l.bedrooms_total_source,
+  l.direction_faces, l.direction_faces_source, l.property_sub_type, l.property_sub_type_source, u.upi`;
 
 const READ_LISTINGS = `
   select ${LISTING_COLUMNS}
@@ -69,7 +83,30 @@ export function toListing(
   if (r.list_agent_user_id) out.listAgentKey = r.list_agent_user_id;
   if (r.list_agent_full_name) out.listAgentFullName = r.list_agent_full_name;
   if (r.last_confirmed_at) out.lastConfirmedAt = r.last_confirmed_at.toISOString();
+  const own = ownColumnsOf(r);
+  for (const f of UNIT_ATTRIBUTE_FIELDS) {
+    const value = own[f];
+    const source = own[SOURCE_OF[f]];
+    if (value !== null && source !== null)
+      Object.assign(out, { [f]: value, [SOURCE_OF[f]]: source });
+  }
   return out;
+}
+
+/** The five own values of a row by their model names (numeric arrives as text and is read as a number). */
+function ownColumnsOf(r: Row): Record<string, unknown> {
+  return {
+    livingArea: r.living_area === null ? null : Number(r.living_area),
+    livingAreaSource: r.living_area_source,
+    floor: r.floor,
+    floorSource: r.floor_source,
+    bedroomsTotal: r.bedrooms_total,
+    bedroomsTotalSource: r.bedrooms_total_source,
+    directionFaces: r.direction_faces,
+    directionFacesSource: r.direction_faces_source,
+    propertySubType: r.property_sub_type,
+    propertySubTypeSource: r.property_sub_type_source,
+  };
 }
 
 export type ListingRow = Row;

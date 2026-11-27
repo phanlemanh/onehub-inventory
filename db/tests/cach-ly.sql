@@ -868,9 +868,11 @@ begin
     'insert into listings (id, company_id, standard_status) values (''00000000-0000-4000-8000-0000000a0004'', '
     '''00000000-0000-4000-8000-00000000000a'', ''Incomplete'')', 'permission denied');
   perform pg_temp.phai_loi('can-chao-theo-san', 'delete from listings', 'permission denied');
+  -- Row 3h («Gắn sang căn khác», AC-10): the unit of a listing may change, never onto a unit that already has an open
+  -- listing of the company.
   perform pg_temp.phai_loi('can-chao-theo-san',
     'update listing_units set upi = ''upi-mau-2'' where listing_id = ''00000000-0000-4000-8000-0000000a0001''',
-    'permission denied');
+    'listing_units_one_open');
   -- Company B, by id: nothing seen, nothing changed.
   perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000b2', true);
   perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000b', true);
@@ -885,5 +887,76 @@ begin
   select count(*) into n from listings;
   if n <> 0 then raise exception 'HỎNG can-chao-theo-san: phiên chưa chọn sàn thấy % lần chào', n; end if;
   raise notice 'ok can-chao-theo-san — đọc, sửa, luật dữ liệu, người giữ căn, sàn khác';
+end $$;
+rollback;
+
+-- 24. A listing's own unit values (row 3h, hồ sơ tin-rao-giu-gia-tri-rieng): the five values and their sources live on
+--     the company's listing; B cannot read or change them by id; a value never stands without its source; the values
+--     keep the catalog's rules (eight directions, floor without a leading zero); the shared catalog stays read-only for
+--     the API role. Positive control: A's listing agent writes a typed area and takes it back.
+begin;
+select pg_temp.dung_hai_san();
+insert into catalog_nodes (slug, node_type, name) values ('mau-du-an', 'project', '[MAU] Dự án');
+insert into catalog_buildings (building_key, subdivision_key, building_name, upi)
+  values ('bld_00000000000000000000000001', 'mau-du-an', '[MAU] Toà', 'upi-mau-toa');
+insert into catalog_units (unit_key, upi, subdivision_key, building_key, building_name, unit_number, property_type,
+                           property_sub_type, living_area) values
+  ('unt_00000000000000000000000001', 'upi-mau-1', 'mau-du-an', 'bld_00000000000000000000000001', '[MAU] Toà', 'A-01',
+   'Residential', 'Condominium', 70);
+insert into identity.users (id, email, name) values
+  ('00000000-0000-4000-8000-0000000000a2', 'dau-chu-a@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000b2', 'dau-chu-b@example.test', '[Tên]');
+insert into company_members (company_id, user_id, name, roles) values
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a2', '[Tên]', '{ListAgent}'),
+  ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-0000000000b2', '[Tên]', '{ListAgent,TeamLead}');
+insert into listings (id, company_id, standard_status, list_agent_user_id, list_agent_full_name, bedrooms_total,
+                      bedrooms_total_source) values
+  ('00000000-0000-4000-8000-0000000a0001', '00000000-0000-4000-8000-00000000000a', 'Incomplete',
+   '00000000-0000-4000-8000-0000000000a2', '[Tên]', 2, 'File');
+insert into listing_units (listing_id, company_id, upi, open) values
+  ('00000000-0000-4000-8000-0000000a0001', '00000000-0000-4000-8000-00000000000a', 'upi-mau-1', true);
+do $$
+begin
+  perform pg_temp.phai_loi('gia-tri-rieng-theo-san',
+    'update listings set living_area = 72 where id = ''00000000-0000-4000-8000-0000000a0001''',
+    'listings_living_area_sourced');
+  perform pg_temp.phai_loi('gia-tri-rieng-theo-san',
+    'update listings set floor_source = ''Typed'' where id = ''00000000-0000-4000-8000-0000000a0001''',
+    'listings_floor_sourced');
+  perform pg_temp.phai_loi('gia-tri-rieng-theo-san',
+    'update listings set direction_faces = ''Đông-Nam'', direction_faces_source = ''Typed'' '
+    'where id = ''00000000-0000-4000-8000-0000000a0001''', 'listings_direction_faces_check');
+  perform pg_temp.phai_loi('gia-tri-rieng-theo-san',
+    'update listings set floor = ''07'', floor_source = ''Typed'' where id = ''00000000-0000-4000-8000-0000000a0001''',
+    'listings_floor_check');
+  perform pg_temp.phai_loi('gia-tri-rieng-theo-san',
+    'update listings set living_area = 72, living_area_source = ''Catalog'' '
+    'where id = ''00000000-0000-4000-8000-0000000a0001''', 'listings_living_area_source_check');
+end $$;
+set local role quy_hang_app;
+do $$
+declare n int;
+begin
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a2', true);
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000a', true);
+  update listings set living_area = 72.5, living_area_source = 'Typed', version = version + 1
+   where id = '00000000-0000-4000-8000-0000000a0001';
+  get diagnostics n = row_count;
+  if n <> 1 then raise exception 'HỎNG gia-tri-rieng-theo-san: đối chứng — đầu chủ sàn A ghi được % giá trị riêng', n; end if;
+  select count(*) into n from listings where living_area = 72.5 and bedrooms_total = 2;
+  if n <> 1 then raise exception 'HỎNG gia-tri-rieng-theo-san: đối chứng — đầu chủ sàn A đọc lại % dòng', n; end if;
+  update listings set living_area = null, living_area_source = null where id = '00000000-0000-4000-8000-0000000a0001';
+  perform pg_temp.phai_loi('gia-tri-rieng-theo-san',
+    'update catalog_units set living_area = 72 where upi = ''upi-mau-1''', 'permission denied');
+  -- Company B, by id: the own values are neither seen nor changed.
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000b2', true);
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000b', true);
+  select count(*) into n from listings where bedrooms_total is not null;
+  if n <> 0 then raise exception 'HỎNG gia-tri-rieng-theo-san: sàn B thấy % giá trị riêng của A', n; end if;
+  update listings set bedrooms_total = 9, bedrooms_total_source = 'Typed'
+   where id = '00000000-0000-4000-8000-0000000a0001';
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'HỎNG gia-tri-rieng-theo-san: sàn B sửa được % giá trị riêng của A', n; end if;
+  raise notice 'ok gia-tri-rieng-theo-san — ghi, đọc, nguồn đi cùng giá trị, luật của danh mục, sàn khác';
 end $$;
 rollback;
