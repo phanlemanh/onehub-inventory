@@ -1,1 +1,1 @@
-no browser driver; frames compared from files
+n-a (driver): frames compared from saved PNGs; dev server 127.0.0.1:3470 not running (curl 000), none started
