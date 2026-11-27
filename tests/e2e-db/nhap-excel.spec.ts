@@ -23,6 +23,7 @@ import { waitReady } from "../../tools/e2e_templates/runner";
 
 import { label } from "../../src/modules/company-config";
 import { regionReady } from "../e2e/phone-list";
+import { suaTrang } from "../e2e/sua-trang";
 
 import { signInWithCode } from "./dang-nhap-vai";
 
@@ -504,7 +505,7 @@ test("bang hang trong: one Nạp tệp link in the empty sentence and an outline
   await expect(empty).toBeVisible();
   expect(await importEntryFault(page, "BuyerAgent")).toBeNull();
   // Break, in the test: an entry hidden by CSS instead of not drawn is caught.
-  await page.evaluate(() => {
+  await suaTrang(page, () => {
     const a = document.createElement("a");
     a.href = "/nhap-tep";
     a.style.display = "none";

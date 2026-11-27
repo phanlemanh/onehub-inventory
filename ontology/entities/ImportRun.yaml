@@ -44,6 +44,14 @@ wiki: wiki/entities/import-run.md
 
 vong_doi:
   them: { co: importListings }
-  xem: { co: viewImports }
+  xem:
+    co: viewImports
+    chan:
+      BuyerAgent:
+        khong: "Only the roles that import see imports (AC-7)."
+        duyet: "nhap-excel#d-20261127T090211Z-68"
+      CompanyAdmin:
+        khong: "Only the roles that import see imports (AC-7)."
+        duyet: "nhap-excel#d-20261127T090211Z-68"
   sua: { co: continueImport }
   go: { co: undoImport }
