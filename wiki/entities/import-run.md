@@ -29,6 +29,8 @@ nhiêu căn, sàn học được gì từ lựa chọn của người, ô nào g
   một đích; còn ô chặn thì không áp được.
 - Áp theo gói 200 dòng; gửi lại một gói không ghi trùng; sàn học một lần sau gói cuối.
 - Hoàn tác gỡ các căn của lần nhập chưa ai sửa, ngừng dùng những gì chính lần nhập dạy, và liệt kê căn được giữ.
+- Cột thuộc tính căn (diện tích, phòng ngủ, hướng, tầng, loại hình) được nhận nhưng không ghi vào căn hay danh mục
+  chung: chữ gốc giữ nguyên văn trong bản ghi lần nhập (`kept`, lý do `unit-attribute`) cho hàng 3h đọc lại (G-2711-4).
 - Không AI.
 
 ## Where in the code
@@ -39,3 +41,5 @@ qua cửa server của `src/modules/listings/`; phần học qua `src/modules/co
 ## History
 
 - 2026-11-17 — Thêm ở hàng 11 «Nhập Excel» (`_acceptance/nhap-excel/`), chủ kho duyệt Cổng Phạm vi.
+- 2026-11-27 — Thêm hai chỗ ghép Tầng và Loại hình, giữ chữ gốc trong bản ghi lần nhập (G-2711-4, lời chủ kho «Tin rao
+  giữ giá trị riêng»); Bảng hàng có nút «Nạp tệp» cho vai được nhập và liên kết trong câu trạng thái trống.

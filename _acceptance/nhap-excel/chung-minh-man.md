@@ -1,7 +1,7 @@
 # Chứng minh màn — nhap-excel
 
 Hàng 11 có hai màn trong `screens:`: màn mới `nhap-tep` (họ mới «Luồng nhiều bước», Hỏi-10) và `inventory` (Bảng hàng, họ
-Lưới, màn mẫu của họ — hàng này chỉ thêm nút «Nạp tệp» và căn chờ khớp). Mục `inventory` viết đủ khi hợp đồng `implemented`.
+Lưới, màn mẫu của họ — hàng này chỉ thêm nút «Nạp tệp» và căn chờ khớp). Mục `inventory` đo bằng E15 và E21 (`tests/e2e-db/nhap-excel.spec.ts`).
 
 ## Màn nhap-tep
 
