@@ -5,3 +5,4 @@ export * from "./read-file";
 export * from "./targets";
 export * from "./mark";
 export * from "./table";
+export * from "./learned";

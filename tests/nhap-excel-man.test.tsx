@@ -6,6 +6,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import type { Role } from "@/generated/ontology";
+import { label } from "@/modules/company-config";
 import { SessionRoles } from "@/modules/identity/ui";
 import { ImportWizard } from "@/modules/imports/ui";
 import { IMPORT_COPY as C, MARK_WORDS, PROBLEM_WORDS, STEP_WORDS } from "@/modules/imports/ui/copy";
@@ -70,7 +71,15 @@ function server(fail?: "offline" | "recent", undo: Array<Response | "kept"> = []
       if (url.endsWith("/preview")) return Response.json(MARKED);
       if (url === "/api/v1/imports") return Response.json({ id: "run-1" }, { status: 201 });
       if (url.endsWith("/batches"))
-        return Response.json({ created: 1, done: true, learned: ["template"] });
+        return Response.json({
+          created: 1,
+          done: true,
+          learned: [
+            { concept: "ImportTemplate", name: "a.csv" },
+            { concept: "CompanyLabel", name: "«Block»" },
+            { concept: "CompanyLabel", name: "«DT»" },
+          ],
+        });
       if (url.endsWith("/undo")) {
         // Queued answers first (a failure, or a kept listing), then the plain success.
         const next = undo.shift();
@@ -119,7 +128,11 @@ describe("man-nap-tep", () => {
     await waitFor(() => expect(screen.getByText(C.done(1))).toBeTruthy());
     expect(
       [...document.querySelectorAll('[data-state="vua-hoc"] li')].map((l) => l.textContent),
-    ).toEqual(["template"]);
+    ).toEqual([
+      `${label("ImportTemplate")}: a.csv`,
+      `${label("CompanyLabel")}: «Block»`,
+      `${label("CompanyLabel")}: «DT»`,
+    ]);
     expect(calls).toEqual([
       "/api/v1/imports/preview",
       "/api/v1/imports",
