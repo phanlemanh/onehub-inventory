@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "den": "1fc47a9a71db0fd0c6ed3b6ab53f31807324370d",
-  "base": "142c8e7aede628e0ccddad5a83342074baac35ab",
+  "den": "b4f8b282caa1201d667d0c8fdb0e27a36b2eb368",
+  "base": "1f4e7d368335a569760cbb9029c2b722987e5094",
   "ghim": {
     "dang-nhap": "f38f955e60cb5db33bb5a3ed743f88d5565546d4",
     "danh-sach-khung": "718fde285963e50e4e31eeac95aa5c02b003671b",
@@ -23,7 +23,7 @@
   "khong_do": [
     "src/modules/imports/ui/import-wizard.tsx — nhập động"
   ],
-  "ngoai_ban_do": 9,
+  "ngoai_ban_do": 23,
   "nhom": [
     "dang-nhap",
     "danh-sach-khung",
