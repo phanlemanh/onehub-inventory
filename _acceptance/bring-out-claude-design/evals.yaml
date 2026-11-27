@@ -1,0 +1,126 @@
+schema_version: 1
+feature_slug: bring-out-claude-design
+# Ma trận viết trước (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
+#   Nhánh rời main ở fe9afc7f. Sổ thiết kế ở f1f0bbbc4e26 sau khi gộp main và viết lại bản xuất.
+#   Cổng: 26 quyết định giữ bởi 41 phép kiểm. make check: 2743 đạt, 2 bỏ qua.
+#   Gói: 40 vai màu (sáng, tối), sans và heading Inter, 7 bậc bo góc, đơn vị khoảng cách 4px, 298 linh kiện.
+#   Phép gửi send-claude-design (judgment, Manh Phan 2026-11-26), bốn tệp gói; lần gửi cuối f1f0bbbc4e26, 2026-11-27.
+#   Câu chờ default-claude-design: có/không, chưa trả lời.
+#   Giá trị tối: so với chữ CSS của nguồn qua rang/colour.mjs (bộ đổi OKLab riêng của hồ sơ), lệch tối đa 2/255 mỗi kênh.
+#   Dữ liệu riêng tư: thư; số điện thoại liền, có cách, 0 hay +84; khoá; đường /Users/, /home/, /private/tmp/, /var/folders/.
+#   Cặp hai chiều: two-way.mjs, 39 ca. Mỗi ca phá ghim một thông điệp, kê ở `expected` của từng eval.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; đầu ra có 'design-assembly: 26 decisions held by 41 checks, each seen failing on a changed copy' và dòng số bài ghim ở ma trận (cây hiện tại 'Tests  2743 passed | 2 skipped (2745)'). Chiều đỏ của cổng giữ bản xuất: E3"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: node _acceptance/bring-out-claude-design/rang/exports.mjs
+    long_running: 5
+    layer: backend-effect
+    paths: ["DESIGN.md", "design/**", "tools/design-assembly/**", "src/**", "_acceptance/bring-out-claude-design/rang/**"]
+    expected: "exit 0; dòng 'exports: the five exports are what the ledgers write at f1f0bbbc4e26; the gate holds them (design-assembly: 26 decisions held by 41 checks, each seen failing on a changed copy)'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-2
+    executor: script
+    cmd: node _acceptance/bring-out-claude-design/rang/two-way.mjs --only exports
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/bring-out-claude-design/rang/**", "DESIGN.md", "design/**"]
+    expected: "exit 0; 'two-way: every case held'; bốn ca: xanh trên bản sao như nó là; DESIGN.md sửa tay → 'exports: DESIGN.md is not what the ledgers write at HEAD'; một màu của design/tokens.json đổi, bản xuất không viết lại → 'exports: the gate did not hold the exports: design-exports: DESIGN.md was written from the design ledgers at f1f0bbbc4e26; they are now at'; design/theme.json giữ bốn bản xuất → 'exports: design-exports in design/theme.json lists'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: node _acceptance/bring-out-claude-design/rang/bundle.mjs
+    long_running: 3
+    layer: backend-effect
+    paths: ["DESIGN.md", "design/**", "src/**", "_acceptance/bring-out-claude-design/rang/**"]
+    expected: "exit 0; dòng 'bundle: the bundle gives 40 colours in both themes, the typefaces, 7 radius steps, the spacing unit and 298 components, as their sources do'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-3
+    executor: script
+    cmd: node _acceptance/bring-out-claude-design/rang/two-way.mjs --only bundle
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/bring-out-claude-design/rang/**", "DESIGN.md", "design/export/system/**"]
+    expected: "exit 0; 'two-way: every case held'; mười ca: xanh như nó là; accent không có giá trị tối → 'bundle: colour accent has no dark value'; giá trị sáng của accent đổi → 'bundle: colour accent is #000000 in the light theme, not #ebf2ff'; giá trị tối của accent đổi → 'bundle: colour accent is #fafafa in the dark theme, not oklch(26.9% 0 none)'; giá trị tối của primary bằng giá trị sáng → 'bundle: colour primary is #0246ff in the dark theme, not color-mix(in oklch, #0246ff 60%, white)'; màu ở khuôn cũ → 'bundle: the colours are not a list of tokens'; radius-md 9px → 'bundle: radius-md is 9px, not 8px (0.5rem)'; họ chữ sans rỗng → 'bundle: the sans family is «», not Inter'; bỏ một linh kiện → 'bundle: components.md does not list InDialog src/components/candidate/form-dialog.tsx'; màu của DESIGN.md đổi → 'bundle: DESIGN.md gives accent as #ebf2fe, not #ebf2ff'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-4
+    executor: script
+    cmd: node _acceptance/bring-out-claude-design/rang/leave.mjs
+    long_running: 2
+    layer: backend-effect
+    paths: ["design/decisions.yaml", "design/export/**", "_acceptance/bring-out-claude-design/rang/**"]
+    expected: "exit 0; dòng 'leave: send-claude-design gives leave for the four bundle files to claude-design, confirmed by Manh Phan on 2026-11-26; the send step agrees; the last push is at f1f0bbbc4e26, as the bundle'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-4
+    executor: script
+    cmd: node _acceptance/bring-out-claude-design/rang/two-way.mjs --only leave
+    long_running: 3
+    layer: backend-effect
+    paths: ["_acceptance/bring-out-claude-design/rang/**", "design/decisions.yaml", "design/export/pushed.json"]
+    expected: "exit 0; 'two-way: every case held'; bảy ca: xanh như nó là; lần gửi ở trạng thái cũ → 'leave: the last push to claude-design is at eb3e4b366ba0, the bundle is at f1f0bbbc4e26'; phép mất chữ xác nhận → 'leave: send-claude-design is not confirmed by Manh Phan on 2026-11-26'; phép cho ba tệp → 'leave: send-claude-design gives leave for «leave: design/export/system/README.md, design/export/system/tokens.json, design/export/system/components.md; to:'; phép trỏ artifact dùng chung → 'leave: send-claude-design sends to «The design values and files of the repository it is given, to a shared artifact of the person's Claude account.», which is not a private artifact'; một lần gửi tới chỗ không có phép → 'leave: a push went to claude-design-team, a place no leave names'; không có lần gửi → 'leave: design/export/pushed.json records no push to claude-design'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-5
+    executor: script
+    cmd: node _acceptance/bring-out-claude-design/rang/default.mjs
+    layer: backend-effect
+    paths: ["design/waiting/**", "design/decisions.yaml", "_acceptance/bring-out-claude-design/rang/**"]
+    expected: "exit 0; dòng 'default: default-claude-design waits on the owner with no answer written, and the ledger has no row for it'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-5
+    executor: script
+    cmd: node _acceptance/bring-out-claude-design/rang/two-way.mjs --only default
+    long_running: 3
+    layer: backend-effect
+    paths: ["_acceptance/bring-out-claude-design/rang/**", "design/waiting/**", "design/decisions.yaml"]
+    expected: "exit 0; 'two-way: every case held'; bốn ca: xanh như nó là; ghi câu trả lời → 'default: default-claude-design has an answer written: answer: \"yes\"'; câu chờ mất → 'default: design/waiting/default-claude-design.json is gone'; sổ có dòng cho nó → 'default: design/decisions.yaml has a row default-claude-design'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-6
+    executor: script
+    cmd: node _acceptance/bring-out-claude-design/rang/clean.mjs
+    layer: backend-effect
+    paths: ["DESIGN.md", "design/export/system/**", "_acceptance/bring-out-claude-design/rang/**"]
+    expected: "exit 0; dòng 'clean: the five exports carry no email address, phone number, key or path on this machine'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E11
+    criterion: AC-6
+    executor: script
+    cmd: node _acceptance/bring-out-claude-design/rang/two-way.mjs --only clean
+    long_running: 3
+    layer: backend-effect
+    paths: ["_acceptance/bring-out-claude-design/rang/**", "DESIGN.md", "design/export/system/**"]
+    expected: "exit 0; 'two-way: every case held'; mười ca: xanh như nó là; thư trong README → 'clean: design/export/system/README.md carries an email address: «ten@example.com»'; số điện thoại trong components.md → 'clean: design/export/system/components.md carries a phone number: «0900000012»'; số có cách → 'clean: design/export/system/components.md carries a phone number: «0900 000 012»'; số +84 → 'clean: design/export/system/README.md carries a phone number: «+84 900 000 012»'; đường /home → 'clean: DESIGN.md carries a path on this machine: «/home/t»'; đường /private/tmp → 'clean: design/export/system/tokens.json carries a path on this machine: «/private/tmp/»'; đường /var/folders → 'clean: design/export/system/assets.json carries a path on this machine: «/var/folders/»'; khoá trong DESIGN.md → 'clean: DESIGN.md carries a key or token'; đường dẫn máy trong assets.json → 'clean: design/export/system/assets.json carries a path on this machine: «/Users/»'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E12
+    criterion: AC-7
+    executor: script
+    cmd: node _acceptance/bring-out-claude-design/rang/change-list.mjs
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng 'changes: the branch changes the exports, the push record, the two ledgers by adding lines, the waiting question, wiki log lines and this record, nothing else' (hoặc, khi đã gộp, 'the branch is in origin/main already; nothing to compare'). Chiều đỏ: E13"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E13
+    criterion: AC-7
+    executor: script
+    cmd: node _acceptance/bring-out-claude-design/rang/two-way.mjs --only change-list
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/bring-out-claude-design/rang/**"]
+    expected: "exit 0; 'two-way: every case held'; bốn ca: xanh như nó là; nhánh đổi Makefile → 'changes: branch changed beyond the export and this record: Makefile'; nhánh bỏ một dòng sổ của main → 'changes: branch removed lines from design/decisions.yaml: «# Determinism ledger: one line per design decision.'; nhánh sửa một dòng nhật ký của main → 'changes: branch changed an existing wiki log line: wiki/log/'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
