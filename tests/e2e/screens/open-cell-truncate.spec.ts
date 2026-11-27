@@ -97,10 +97,23 @@ test.describe("E13 · the open cell is cut inside its cell", () => {
       return;
     }
     await openGrid(page, "/inventory");
-    const id = (await page.locator("[data-record-open]").first().getAttribute("data-record-open"))!;
-    const col = await page
-      .locator(`[data-record-open="${id}"]`)
-      .evaluate((el) => el.closest("td")?.getAttribute("data-col-id") ?? "");
+    // The opener of a table cell, its record id and its column read in one go: right after the region is ready a cell
+    // can still be redrawn, and a second read could land on the node it just left behind, outside the table (Linux, 1 in
+    // 6 on main 1f4e7d36; VP10, supervisor ruling G-2811-6). Waits for a cell that carries its column, not for a time.
+    let id = "";
+    let col = "";
+    await expect
+      .poll(async () => {
+        ({ id, col } = await page
+          .locator("td [data-record-open]")
+          .first()
+          .evaluate((el) => ({
+            id: el.getAttribute("data-record-open") ?? "",
+            col: el.closest("td")?.getAttribute("data-col-id") ?? "",
+          })));
+        return id !== "" && col !== "";
+      }, "an opener in a table cell that names its column")
+      .toBe(true);
     // Row 2e: the grid's fixed table layout takes each column's width from its <col>, so a width on the cells alone
     // never narrowed the column; this case passed only while unit codes were cut anyway. Narrow the <col> as well.
     const nth = await page
