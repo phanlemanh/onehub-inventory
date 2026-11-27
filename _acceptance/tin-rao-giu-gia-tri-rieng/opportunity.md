@@ -90,3 +90,12 @@ ngăn chi tiết: sửa trong trang chi tiết của 3h, tôi liệt kê lỗi �
 - Quyết: làm (lát A).
 - (a) «Bảng hàng đủ cột như Quỹ hàng» là hàng riêng, đứng sau 3h.
 - (b) Lỗi ngăn chi tiết căn sửa trong trang chi tiết của 3h; chủ kho liệt kê ở Cổng Phạm vi.
+
+## Dữ kiện cho bước thiết kế (giám sát chuyển từ dãy H, 2026-11-27)
+
+- **Căn tạo tay (hàng 12):** hồ sơ them-can ghi «sửa thông tin khác ở hàng 3g», nhưng 3g không sửa thuộc tính căn — căn
+  tạo tay gõ sai diện tích hay hướng hôm nay không có chỗ sửa. Thuộc lát A của 3h; hợp đồng ở S1 ghi thành tiêu chí.
+- **Sửa trường riêng trên điện thoại:** 3g để việc này cho 3d, mà ô cơ hội 3d chỉ có giá và trạng thái. Nêu ở Cổng
+  Phạm vi 3h dưới điều «trang chi tiết sửa được mọi thứ ở mọi cỡ màn», để chủ kho chọn làm ở 3h hay giữ cho 3d.
+- **Không đổi ô vòng đời Unit.sua «khong»** (d-20261115T042837Z-14): sàn sửa bản của mình trên tin rao, Danh bạ không
+  đổi — ô ấy vẫn đúng.
