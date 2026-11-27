@@ -21,9 +21,17 @@ hộp sửa và dòng khoá. Kế hoạch này nối chúng vào dữ liệu th�
 | VP10 `khung-luoi-va-ngan-chi-tiet` vào main | ngăn chi tiết nổi, đầu ngăn một dòng; ảnh bằng chứng của 3h chụp trên khung này                             | dãy H |
 | VP11 `chuan-hoa-he-design` vào main         | cách bấm và sửa ô mới (Enter là sửa, bấm ra ngoài là lưu); hai ô sửa được của 3h dựng một lần trên cách này | dãy H |
 
-Thứ tự: G-2711-16 (11 và VP10 → VP11 → 3h). Máy đề nghị G một điều chỉnh: các việc 1–3 và 6–7 không đụng giao diện, nên
-có thể bắt đầu ngay khi 11 vào main, không phải chờ VP10, VP11. Các việc 4, 5, 8 chờ cả hai. G không đồng ý thì mọi việc
-chờ cả ba.
+Thứ tự của giám sát (G-2711-17), ba nhịp:
+
+1. Việc 1–3 (cột cơ sở dữ liệu, cửa ghi, gắn sang căn khác) dựng ngay sau khi kế hoạch được duyệt, không chờ ai.
+   Migration của 3h lấy số sau số lớn nhất của nhánh hàng 11 (`origin/claude/agitated-dewdney-3cdf78`, hôm nay là 016)
+   và của main, tức `017`, vì 11 gộp trước. Đổi ontology Listing đúng phạm vi đã duyệt, chạy `make gen`, không nới ô
+   `agent:` nào.
+2. Việc 6–7 (nhập tệp, căn chờ khớp) dựng khi 11 đã vào main, sau khi gộp main vào nhánh.
+3. Việc 4, 5, 8 (lưới, ngăn, hồ sơ đã ký) chờ VP10 và VP11 vào main. Trong lúc chờ, không sửa năm tệp khung dùng chung.
+
+Một hồ sơ, một PR: không mở PR riêng cho phần nền. Lượt chấm S4 chỉ xin khi cả tám việc xong, trên main đã có 11, VP10
+và VP11.
 
 Mỗi lần bắt đầu dựng: gộp `origin/main` vào nhánh, chạy `make check`, rồi chạy đường nền lại (`duong-nen` của đợt).
 
@@ -54,7 +62,7 @@ Mỗi lần bắt đầu dựng: gộp `origin/main` vào nhánh, chạy `make c
 
 ### Việc 1: Cột trong cơ sở dữ liệu và đường đọc thật
 
-**Tệp:** `db/migrations/0NN_tin_rao_gia_tri_rieng.sql` (số chốt sau migration cuối trên main; dùng skill
+**Tệp:** `db/migrations/017_tin_rao_gia_tri_rieng.sql` (sau 016 của hàng 11, G-2711-17; số lại tăng nếu main có số lớn hơn lúc dựng; dùng skill
 `/new-migration`), `src/modules/listings/inventory-read.ts`, `src/modules/listings/load-sql.ts`, `db/scripts/cach-ly.sh`,
 `tests/db/tin-rao-gia-tri-rieng.db.test.ts`.
 
