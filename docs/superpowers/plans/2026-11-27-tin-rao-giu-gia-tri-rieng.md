@@ -162,6 +162,20 @@ trong hồ sơ), ô tìm mã căn của hàng 12 (dùng lại, không viết m�
 - Lệnh Sửa, Lấy lại, Gắn sang căn khác hiện theo bộ nút theo quyền (`updateListing`). «Báo sai thông tin căn» còn cho mọi vai.
 - Bài: E3, E3b, E4, E5, E11b (bốn vai), E14 (ma trận ba trạng thái × hai vai), E14b (khung VP10, 360 và 1440, sáng và tối, đo vùng bấm).
 - Phục vụ: E3, E3b, E4, E5, E11b, E14, E14b.
+- **Đã dựng (G-2811-8, chồng lên VP10 lát 1 @86a4c667, trước VP11):**
+  - Dòng khoá ở chỗ «Sửa» và ở chỗ «Hỏi đầu chủ» theo một mẫu: `RECORD_COPY.blocked(căn, trạng thái, việc)`, ví dụ
+    «Căn đã bán, không sửa». Chữ của từng mảnh lấy từ bảng nhãn.
+  - Tin chưa ai giữ có dòng «Căn chưa có đầu chủ giữ» thay nút mờ. `design/behaviors.md` đã sửa câu này, bài E4 và E5 của
+    hàng 3e đổi theo; phải ghi sửa-sau-ký ở việc 8.
+  - `load-sql.ts` nạp năm giá trị riêng của dữ liệu mẫu (sót từ việc 1).
+  - Bài: `tests/tin-rao-giu-gia-tri-rieng.test.tsx` (E14, E11b, E3b) và `tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts`
+    (E3 ở 4 khổ, E4, E5, E14b).
+- **Để sau VP11:** phép kiểm màu dấu không trùng màu trạng thái. Dấu tạm dùng token `--info` đang có, không viết mã màu
+  tay.
+- **Chờ khung VP10:** vùng bấm 44px của «Sửa» trên điện thoại. Lớp
+  `[&_[data-slot=${RECORD_SECTION_HEADER}]_button]:min-h-11` trong `record-panel.tsx` viết bằng chuỗi nội suy nên Tailwind
+  không sinh ra; nút đầu mục ra `min-height: auto` (28px), nút đáy vẫn 44px. Bài E14b ở 360 đỏ đúng chỗ này. Tệp khung
+  thuộc VP10, 3h không sửa.
 
 ### Việc 5b: Thân hồ sơ căn theo bốn nhóm A–D (chờ VP10, VP11)
 
