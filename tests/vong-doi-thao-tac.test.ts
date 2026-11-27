@@ -646,9 +646,10 @@ describe("xem-theo-vai", () => {
     // Row 10 lets the admin view listings (Hỏi-1 A); a copy that takes the admin's cell away while the screen stays open
     // to every role is red.
     breakFile(dir, "ontology/actions.yaml", (t) =>
+      // Anchored on viewListings' own description, not on how its doors are laid out (row 11 added a third door).
       t.replace(
-        '    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }\n    doors:\n      db: ["table listings select"',
-        '    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company }\n    doors:\n      db: ["table listings select"',
+        "    description: See the listings of the company.\n    entity: Listing\n    kind: query\n    status: live\n    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }",
+        "    description: See the listings of the company.\n    entity: Listing\n    kind: query\n    status: live\n    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company }",
       ),
     );
     expectRed(dir, "Listing.xem: CompanyAdmin mo duoc inventory ma khong xem duoc");
