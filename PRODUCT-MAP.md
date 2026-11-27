@@ -12,7 +12,7 @@ flowchart TD
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
   GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
-  GB --> DG["Đã giao<br/>30 việc"]
+  GB --> DG["Đã giao<br/>31 việc"]
   GB --> CN["Chờ phiên nghiệm thu<br/>54 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
@@ -96,6 +96,7 @@ flowchart TD
 - Nhân viên sàn làm việc trong App Shell và đầu trang xếp theo mẫu Verve của ReUI — dải gập trên mép cột thứ hai, ô tìm giữa thanh trên, menu tài khoản có chọn giao diện ở đáy dải biểu tượng, đầu trang một hàng mảnh (`app-shell-khuon-dau-trang`)
 - Bước bien chạy trước bước vai-dang-nhap — Vercel lỗi lúc đang xoay mật khẩu vai đăng nhập thì bản thật không bị đụng; sổ tay nói thẳng khi nào bản đang chạy đã mất kết nối (`bien-do-sau-xoay-mat-khau`)
 - Bước bien đọc câu trả lời của Vercel — Vercel trả thành công mà từ chối hay không xác nhận ghi một biến, hoặc trả danh sách biến lạ khuôn, thì lệnh đưa bản lên dừng ở bien, gọi tên biến, không in giá trị, tên miền không đổi (`bien-vercel-tu-choi`)
+- Xuất hệ thiết kế của kho ra DESIGN.md và gói hệ thiết kế cho Claude Design, cổng giữ bản xuất, gửi gói theo phép của chủ kho và ghi lần gửi (`bring-out-claude-design`) — đã giao — máy thông, bằng chứng xanh-sạch
 - Hook commit-msg của kho (tools/commit_msg.py) nhận đúng các tiêu đề commit kit nghiệm thu v3.0.0 tự viết — Gate 2 signoff, Veto, repin, wip(ban-giao) — để job conventional-commits không đỏ trên PR qua Cổng 2 (`commit-msg-kit-subjects`)
 - Một lệnh đặt khoá — chủ kho dán mỗi khoá do dịch vụ cấp một lần vào make dat-khoa; lệnh đưa bản lên tự đặt mật khẩu vai đăng nhập và tự đẩy biến sang Vercel; sổ tay chỉ còn phần của chủ kho; quyền đứng cho hạ tầng Inventory (`dat-khoa-mot-lenh`)
 - Tiếp nhận design-assembly — tám quyết định thiết kế đã ghi được nối vào kiểm tra sẵn có, thêm hai dòng phông chữ (`design-assembly-adopt-checks`) — đã giao — máy thông, bằng chứng xanh-sạch
