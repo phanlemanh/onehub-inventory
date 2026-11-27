@@ -41,11 +41,14 @@ interface Row {
 /** Prefix of the unit key of a listing on a pending unit (row 11): it has no UPI until the catalog matches it. */
 export const PENDING_UNIT = "pending:";
 
-/** The columns of a listing, with its unit link; also what the write path returns. */
-export const LISTING_COLUMNS = `
+/** The listing's own columns, without its unit link. */
+const OWN_COLUMNS = `
   l.id, l.company_id, l.standard_status, l.list_price, l.close_price, to_char(l.close_date, 'YYYY-MM-DD') as close_date,
   l.withdrawn_reason, l.fee_inclusion, l.furnished, l.occupant_type, l.legal_status, l.financing, l.custom_fields,
-  l.list_agent_user_id, l.list_agent_full_name, l.original_entry_timestamp, l.last_confirmed_at, l.version,
+  l.list_agent_user_id, l.list_agent_full_name, l.original_entry_timestamp, l.last_confirmed_at, l.version`;
+
+/** The columns of a listing, with its unit link; also what the write path returns. */
+export const LISTING_COLUMNS = `${OWN_COLUMNS},
   coalesce(u.upi, '${PENDING_UNIT}' || lp.pending_unit_id) as upi, cpu.raw_code as pending_code,
   cpu.building_text as pending_building`;
 
@@ -56,11 +59,23 @@ export const LISTING_FROM = `
   left join listing_pending_units lp on lp.listing_id = l.id
   left join company_pending_units cpu on cpu.id = lp.pending_unit_id`;
 
+/**
+ * Every listing of the company: those on a catalog unit, then those on a pending unit (row 11), each read with an inner
+ * join. Not one query over LISTING_FROM with «on a catalog unit or on a pending unit»: under outer joins the planner
+ * keeps the row rules' app.allowed() on every row instead of checking it once, and 5,000 listings took 0.7 s against
+ * 6 ms on the inner join of row 10 (tests/db/bang-hang-that.db.test.ts, nam-nghin-can). The company's pending unit is
+ * still an outer join, so a role that does not read the company layer keeps the listing, without its code.
+ */
 const READ_LISTINGS = `
-  select ${LISTING_COLUMNS}
-    from ${LISTING_FROM}
-   where u.listing_id is not null or lp.listing_id is not null
-   order by l.original_entry_timestamp desc, l.id`;
+  select r.* from (
+    select ${OWN_COLUMNS}, u.upi, null::text as pending_code, null::text as pending_building
+      from listings l join listing_units u on u.listing_id = l.id
+    union all
+    select ${OWN_COLUMNS}, '${PENDING_UNIT}' || lp.pending_unit_id, cpu.raw_code, cpu.building_text
+      from listings l join listing_pending_units lp on lp.listing_id = l.id
+      left join company_pending_units cpu on cpu.id = lp.pending_unit_id
+  ) r
+   order by r.original_entry_timestamp desc, r.id`;
 
 /** A database row as a Listing of the generated model; names of the unit come from the catalog unit. */
 export function toListing(
