@@ -18,7 +18,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog } from "@base-ui/react/dialog";
 
 import { GRID_COPY } from "./grid-copy";
-import { RECORD_SECTION_HEADER } from "./record-section";
 import { InDialog } from "./form-dialog";
 import { RECORD_FOOTER_VAR } from "./record-footer";
 import {
@@ -174,10 +173,12 @@ function PanelHeader({
  * press (owner, BH session 2026-11-27, «Duyệt cả ba câu», point 3); the desktop keeps its 28 px. The head stays one
  * line: its padding shrinks so the taller buttons fit the same 61 px.
  */
+// Each class written out in full: Tailwind reads class names from the source text, so a name built from a constant is
+// never generated (VP10: the section head's buttons stayed 28 px on a phone; lane R found it, ruling G-2811-11).
 const PHONE_HIT_AREA = [
   "[&_[data-slot=record-panel-header]]:py-2",
   "[&_[data-slot=record-panel-header]_button]:size-11",
-  `[&_[data-slot=${RECORD_SECTION_HEADER}]_button]:min-h-11`,
+  "[&_[data-slot=record-section-header]_button]:min-h-11",
   "[&_[data-slot=record-panel-footer]_button]:min-h-11",
 ].join(" ");
 
