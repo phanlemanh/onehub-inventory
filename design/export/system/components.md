@@ -1,6 +1,6 @@
 # Components
 
-Written from the design ledgers at 3767c9471997. Do not change it here: change a ledger, then write it again with make design-exports.
+Written from the design ledgers at 55a0e97bf74b. Do not change it here: change a ledger, then write it again with make design-exports.
 
 - **ActionPermissionProvider** (atom), `src/components/candidate/action-permission.tsx`: permitted
 - **CellEditor** (atom), `src/components/candidate/cell-editor.tsx`: anchor, find, label, onClose
@@ -135,6 +135,16 @@ Written from the design ledgers at 3767c9471997. Do not change it here: change a
 - **FrameTitle** (atom), `src/components/reui/frame.tsx`
 - **FrameDescription** (atom), `src/components/reui/frame.tsx`
 - **FrameFooter** (atom), `src/components/reui/frame.tsx`
+- **Stepper** (atom), `src/components/reui/stepper.tsx`: defaultValue, value, onValueChange, orientation, indicators
+- **StepperItem** (atom), `src/components/reui/stepper.tsx`: step, completed, disabled, loading
+- **StepperTrigger** (atom), `src/components/reui/stepper.tsx`: tabIndex, render
+- **StepperIndicator** (atom), `src/components/reui/stepper.tsx`
+- **StepperSeparator** (atom), `src/components/reui/stepper.tsx`
+- **StepperTitle** (atom), `src/components/reui/stepper.tsx`
+- **StepperDescription** (atom), `src/components/reui/stepper.tsx`
+- **StepperPanel** (atom), `src/components/reui/stepper.tsx`
+- **StepperContent** (atom), `src/components/reui/stepper.tsx`: value, forceMount
+- **StepperNav** (atom), `src/components/reui/stepper.tsx`
 - **AppShell** (template), `src/components/templates/app-shell.tsx`: nav, roles, company, account, search, columnOpen
 - **PlaceChangeProvider** (template), `src/components/templates/app-shell/place-change.tsx`
 - **ShellNavProvider** (template), `src/components/templates/app-shell/place-crumb.tsx`: items, roles

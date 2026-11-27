@@ -280,8 +280,15 @@ actions:
     description: Add a listing.
     entity: Listing
     kind: create
-    status: planned
-    scope: { ListAgent: company, BuyerAgent: company, TeamLead: company }
+    status: live
+    scope: { ListAgent: own, TeamLead: company }
+    doors:
+      db:
+        [
+          "table listings insert",
+          "table listing_units insert",
+          "table listing_pending_units insert",
+        ]
 
   - name: updateListing
     description: Change a listing's price, fees or details.
@@ -301,6 +308,51 @@ actions:
     scope: { ListAgent: own, TeamLead: company }
     doors:
       api: ["PATCH /api/v1/listings/[id]"]
+
+  - name: importListings
+    description: >-
+      Start importing a sheet file into the inventory — preview the marks and open an import (own scope imports for
+      oneself; company scope picks a list agent of the company).
+    entity: ImportRun
+    kind: create
+    status: live
+    scope: { ListAgent: own, TeamLead: company }
+    doors:
+      api:
+        ["POST /api/v1/imports/preview", "POST /api/v1/imports", "GET /api/v1/imports/list-agents"]
+      db: ["table import_runs insert", "function app.import_list_agents()"]
+
+  - name: viewImports
+    description: See the company's recent imports and what each one added, taught and kept as written.
+    entity: ImportRun
+    kind: query
+    status: live
+    scope: { ListAgent: company, TeamLead: company }
+    doors:
+      api: ["GET /api/v1/imports"]
+      db: ["table import_runs select"]
+
+  - name: continueImport
+    description: Write the next batches of an open import, or send a failed batch again.
+    entity: ImportRun
+    kind: update
+    status: live
+    scope: { ListAgent: own, TeamLead: company }
+    doors:
+      api: ["POST /api/v1/imports/[id]/batches"]
+      db: ["table import_runs update"]
+
+  - name: undoImport
+    description: >-
+      Undo a whole import: remove its listings nobody changed since and retire what it taught (own scope is an import
+      one made).
+    entity: ImportRun
+    kind: delete
+    status: live
+    scope: { ListAgent: own, TeamLead: company }
+    doors:
+      api: ["POST /api/v1/imports/[id]/undo"]
+      db: ["table import_runs update", "table listings delete"]
 
   - name: viewOwnerPhone
     description: See the phone number of a listing's owner (own scope is the unit one keeps).

@@ -119,6 +119,22 @@ concepts:
     own: true
     pref: Mẫu nhập
     en: Import template
+  ListingPendingUnit:
+    kind: entity
+    own: true
+    pref: Hàng căn chờ
+    en: Listing on a pending unit
+  ImportRun:
+    kind: entity
+    own: true
+    pref: Lần nạp tệp
+    en: Import
+  ImportScreen:
+    kind: surface
+    own: true
+    pref: Nạp tệp
+    en: Import a file
+    avoid: [Import, Upload]
   FeeSchedule:
     kind: entity
     own: true

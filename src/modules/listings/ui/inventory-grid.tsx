@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -17,6 +18,7 @@ import { usePlaceChange } from "@/components/templates/app-shell/place-change";
 import { notifyResult } from "@/components/templates/notify";
 import { Button } from "@/components/ui/button";
 import type { Listing } from "@/generated/ontology";
+import { PermittedAction, usePermitted } from "@/modules/identity/ui";
 
 import type { ListingSaveDoor } from "../save-door";
 import { effectiveAttributes, type CatalogAttributes } from "../unit-attributes";
@@ -30,7 +32,6 @@ import {
 import { AttributeDiffersMark, MARK_ROOM_CH, MarkLookProvider } from "./attribute-differs-mark";
 import { EditOneProvider } from "./unit-attributes-edit";
 import { attributeText, type MarkLook, type UnitAttributeWords } from "./unit-attribute-copy";
-import { useActionPermission } from "@/components/candidate/action-permission";
 import { httpSaveDoor } from "./http-save-door";
 import { detailCells, type DetailColumnWords } from "./detail-cells";
 import { DetailsEditProvider, type DetailsEditApi } from "./listing-details-edit";
@@ -90,6 +91,7 @@ export function InventoryGrid({
   state,
   emptyWhy,
   reloadLabel,
+  emptyLink,
   filters,
   staleLinkNote,
   savedViews,
@@ -118,6 +120,11 @@ export function InventoryGrid({
   emptyWhy: string;
   /** The empty state's next step: load the list again (someone may have added units meanwhile). */
   reloadLabel: string;
+  /**
+   * A way to fill the list from elsewhere (row 11: the import screen): the empty state then says it in one sentence with one
+   * link, shown only to a session the permission table gives importListings, and has no button (design-assembly empty-state).
+   */
+  emptyLink?: { lead: string; word: string; href: string };
   /** Column filters the grid opens with (a status shortcut, or the top-bar search of row 3f). */
   filters?: ColumnFilters;
   /** Said once when the page opens: the address named a listing that is not among the rows (a stale link, row 3f). */
@@ -162,6 +169,7 @@ export function InventoryGrid({
   };
 }) {
   const router = useRouter();
+  const permitted = usePermitted();
   const [current, setCurrent] = useState<InventoryState>(state);
   // A new read of the page (Tải lại, or after a change the server works out) brings its own state.
   const [givenState, setGivenState] = useState(state);
@@ -304,7 +312,6 @@ export function InventoryGrid({
   // The record edits the open listing's details through the same door (row 3g); a save re-renders the record.
   const { writeListing, savedListing, revertAttribute } = edit;
   // Row 3h: the mark on a cell whose own value differs from the catalog's, with «Lấy lại» for a person who may edit.
-  const permitted = useActionPermission();
   const listingOf = useMemo(() => new Map((listings ?? []).map((l) => [l.id, l])), [listings]);
   /** What a differing attribute cell's mark says (row 3h), or null when the row's value does not differ. */
   const differsOf = useCallback(
@@ -427,9 +434,25 @@ export function InventoryGrid({
             }
             groupBy={INVENTORY_GROUP_BY}
             emptyAction={
-              <Button variant="outline" onClick={() => router.refresh()}>
-                {reloadLabel}
-              </Button>
+              // A role that imports is sent to the import screen from the sentence; any other keeps the reload button.
+              emptyLink && permitted("importListings") ? (
+                <PermittedAction action="importListings">
+                  <p data-slot="empty-link" className="text-sm text-muted-foreground">
+                    {emptyLink.lead}{" "}
+                    <Link
+                      href={emptyLink.href}
+                      className="font-medium text-foreground underline underline-offset-4"
+                    >
+                      {emptyLink.word}
+                    </Link>
+                    .
+                  </p>
+                </PermittedAction>
+              ) : (
+                <Button variant="outline" onClick={() => router.refresh()}>
+                  {reloadLabel}
+                </Button>
+              )
             }
             cellEdit={edit.cellEdit}
             phoneList={phoneList}

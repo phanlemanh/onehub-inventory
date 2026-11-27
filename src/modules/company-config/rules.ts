@@ -17,6 +17,8 @@ export const OPTION_LIMIT = 30;
 export const TEXT_VALUE_LIMIT = 500;
 /** Longest name of a field and longest words of a label. */
 export const NAME_LIMIT = 40;
+/** Longest code of a pending unit, as the file wrote it. */
+export const PENDING_CODE_LIMIT = 80;
 
 export type FieldKind = CustomField["kind"];
 export const FIELD_KINDS: readonly FieldKind[] = [

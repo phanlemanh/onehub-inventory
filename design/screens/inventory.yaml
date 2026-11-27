@@ -15,6 +15,7 @@ nut:
   - viewOwnerPhone
   - readCatalog
   - viewListings
+  - importListings
 mo_san: [saveView]
 nut_chung: [Chép đường dẫn, Lọc, Cột, Toàn màn hình, Ghim, Trước, Sau, Đóng]
-hien: [Listing, Unit, ListingOwner, SavedView]
+hien: [Listing, Unit, ListingOwner, SavedView, ImportRun]

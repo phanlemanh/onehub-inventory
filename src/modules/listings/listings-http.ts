@@ -13,7 +13,7 @@ import type { Listing } from "../../generated/ontology";
 
 import { readCatalogUnits } from "../catalog/server";
 
-import { LISTING_COLUMNS, toListing, type ListingRow } from "./inventory-read";
+import { LISTING_COLUMNS, LISTING_FROM, toListing, type ListingRow } from "./inventory-read";
 import { applyChange, type CustomCheck, type Invalid, type ListingChange } from "./save-door";
 import { STANDARD_STATUSES } from "./sample";
 import { UNIT_ATTRIBUTE_FIELDS } from "./unit-attributes";
@@ -192,7 +192,7 @@ export function createListingsHandlers(deps: ListingsDeps): ListingsHandlers {
             : undefined;
         const outcome = await deps.withCompany<Outcome>(door.pool, door.ctx, async (c) => {
           const { rows } = await c.query(
-            `select ${LISTING_COLUMNS} from listings l join listing_units u on u.listing_id = l.id
+            `select ${LISTING_COLUMNS} from ${LISTING_FROM}
               where l.id = $1 for update of l`,
             [id],
           );

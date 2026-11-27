@@ -1,5 +1,5 @@
 {
-  "$description": "Written from the design ledgers at 3767c9471997. Do not change it here: change a ledger, then write it again with make design-exports.",
+  "$description": "Written from the design ledgers at 55a0e97bf74b. Do not change it here: change a ledger, then write it again with make design-exports.",
   "typefaces": [
     {
       "key": "sans",

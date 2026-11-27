@@ -14,3 +14,12 @@ Giám sát phán N-1511-3 (theo Quyền, lần năm): thêm một dạng ô mớ
 | Bài kiểm (`tests/vong-doi-thao-tac.test.ts`, mục `qua-luu-ca-bang`): ca xanh của `FeeItem` và nhóm riêng trong báo cáo; bốn ca phá đều đỏ — thao tác loại sửa nhưng khác ô sửa, thiếu lý do, không có nút trên màn, dùng `qua_luu` ở ô xem hay ô sửa; một ca đối chứng: bỏ `qua_luu` thì luật loại của ô `co` thường áp lại. Bảng ô đã duyệt thêm bốn ô của `FeeItem` (55 → 59), màn «Tuỳ chỉnh của sàn» đọc thêm `FeeItem`. | Không | XONG N-1511-3 |
 
 Trang quyết định 0038 đã duyệt không đổi. Chủ kho soi bốn ô của `FeeItem` ở Cổng Bằng chứng của hàng 19.
+
+- 2026-11-17 — hàng 11 «Nhập Excel» (`_acceptance/nhap-excel/`, dãy D): màn mới `nhap-tep` hiện thực thể mới ImportRun
+  (thêm `importListings`, xem `viewImports`, sửa `continueImport`, gỡ `undoImport`), nên ca may-thay-man-hien của
+  `tests/vong-doi-thao-tac.test.ts` thêm dòng `nhap-tep: [ImportRun]` vào bảng viết trước và đếm 9 màn thay 8. Luật đo
+  không đổi. Hồ sơ này ghim lại cùng lượt ghim của hàng 11.
+- 2026-11-17 — hàng 11 (cùng lượt): `createListing` chuyển `live` (chủ kho duyệt Hỏi-1 ở Cổng Phạm vi hàng 11), nên ô
+  `Listing.them` của bảng đã duyệt là `createListing` (không còn hàng 12), và ca đối chứng / ca phá «thao tác dự kiến
+  thiếu hàng» dùng ô `Listing.go` (`removeListing`, hàng 18b) thay cho `Listing.them`. Bảng đã duyệt thêm dòng ImportRun
+  (bốn ô, chủ kho thấy ở Cổng Bằng chứng hàng 11). Màn `nhap-tep` vào danh sách màn của ca man-khai-hien. Luật đo không đổi.
