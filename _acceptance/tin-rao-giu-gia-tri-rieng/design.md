@@ -110,6 +110,12 @@ mở» (013) chặn khi căn mới đã có tin mở, câu lỗi nói căn nào.
 
 Mỗi hồ sơ một dòng `sua-sau-ky.md` khi 3h gộp; không sửa chữ ký cũ.
 
+Làn ghim lại (giám sát báo 27/11): hồ sơ `sua-tren-o` (hàng 4) và `lop-rieng-cua-san` (7e) đang cũ bằng chứng trên main
+(ghim 13/11 ở b3b6702, fee86ff); chạm `_acceptance/` của chúng là cổng báo «evidence is stale». Kế hoạch (S2) của 3h có
+sẵn một bước ghim lại các hồ sơ 3h ghi sửa sau ký (4, 5, 3e, cùng 7e đang cũ) bằng lượt `ghim-lai` của đợt qua lệnh bọc
+giữ nhịp; eval của 7e cần Postgres dãy R. Ghi chú lưới 12 cột của hàng 4 và 7e đang nằm tạm ở hồ sơ 3g (PR #129): chép về
+đúng hồ sơ trong cùng bước ghim lại.
+
 ## 7. Ngoài lát A
 
 Khoá một giá trị (lát B, sau khi dùng lát A). Gửi chỗ lệch về Invest (kết nối «xác nhận danh mục», sau MVP). Bảng hàng
