@@ -172,6 +172,3 @@ thấy màn nhưng không có nút ghi nào; `/api/v1` trả 403.
      mà chưa có kết cục nào thì đọc trang như cũ. Bài trình duyệt `tests/e2e/landing.spec.ts` trên trang dựng sẵn: chuyển
      sang đăng nhập sau 1,5 giây thì đọc là đăng nhập; lưới hiện sau 1,5 giây thì đọc là có lưới; trang đăng nhập mở thẳng
      thì là chính nó; phá: cách đọc cũ trên cùng trang gọi màn là không có lưới («chua co vung du lieu»).
-- Ghi sau ký 2026-11-27: Bảng hàng nay có mười hai cột chuẩn — tám cột cũ và bốn cột Nội thất, Pháp lý, Tài chính, Hiện trạng của hàng 3g
-  (lối C, chủ kho chọn 17/11). Câu «trường riêng hiện sau tám cột chuẩn» đọc là: trường riêng hiện sau mười hai cột chuẩn, vẫn theo vị trí
-  đã khai. Bài `tests/e2e-db/lop-rieng.spec.ts` đã đếm theo số cột mới (G-2611-13).

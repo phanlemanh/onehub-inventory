@@ -125,7 +125,3 @@ Quét không gian AC theo trục (morphological, preset entity-feature, rút g�
   - Ngoài-10: Bài kiểm lời báo khi hoàn tác hỏng không đỏ được dù lời báo nêu sai căn hay sai giá.
   - Ngoài-12: Bài kiểm các cột chỉ-đọc chỉ thử một lối vào cho hai cột sửa được.
   - Ngoài-14: Bài kiểm «không có lần ghi nào» chỉ nhìn một lần ngay sau thao tác, nên một lần ghi sai đến trễ vẫn lọt.
-- Ghi sau ký 2026-11-27: Bảng hàng nay có mười hai cột chuẩn — tám cột của hàng này và bốn cột Nội thất, Pháp lý, Tài chính, Hiện trạng
-  của hàng 3g (lối C, chủ kho chọn 17/11). Câu «đúng hai trên tám cột mở» của AC-8 đọc là: Giá chào, Trạng thái và bốn cột của 3g mở sửa;
-  sáu cột Căn, Toà, Khu, Diện tích, Phòng ngủ, Xác nhận lúc vẫn không mở. Dòng Never «sửa thuộc tính căn trên ô» sẽ do hàng 3h
-  `tin-rao-giu-gia-tri-rieng` lật theo hướng chủ kho chốt 27/11; tới khi 3h gộp thì hành vi của hàng này không đổi.
