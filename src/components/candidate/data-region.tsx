@@ -1199,6 +1199,7 @@ export function DataRegion({
             size="sm"
             aria-pressed={isGrouped}
             data-slot="group-toggle"
+            title={GRID_COPY.sheet.groupBy(groupColumn.header)}
             onClick={() => {
               setGrouped((on) => !on);
               setExpanded(true);
@@ -1211,7 +1212,12 @@ export function DataRegion({
         <DataGridColumnVisibility
           table={table}
           trigger={
-            <Button variant="outline" size="sm" data-slot="columns-toggle">
+            <Button
+              variant="outline"
+              size="sm"
+              data-slot="columns-toggle"
+              title={GRID_COPY.sheet.columns}
+            >
               <Columns3Icon aria-hidden="true" />
               <span className={FLOAT_LABEL}>{GRID_COPY.sheet.columns}</span>
             </Button>
@@ -1226,6 +1232,7 @@ export function DataRegion({
               aria-pressed={fullScreen}
               ref={fullScreenButtonRef}
               data-slot="full-screen-toggle"
+              title={fullScreen ? GRID_COPY.sheet.leaveFullScreen : GRID_COPY.sheet.fullScreen}
               onClick={toggleFullScreen}
             >
               {fullScreen ? (

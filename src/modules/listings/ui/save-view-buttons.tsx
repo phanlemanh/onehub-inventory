@@ -40,6 +40,7 @@ function SaveViewDialog({
             variant="outline"
             size="sm"
             data-slot={asNew ? "save-view-as-new" : "save-view"}
+            title={asNew ? undefined : copy.labels.save}
           />
         ),
         label: asNew ? (
