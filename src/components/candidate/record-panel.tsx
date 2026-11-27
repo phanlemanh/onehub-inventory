@@ -495,7 +495,7 @@ function RecordColumn({
             role="dialog"
             aria-modal="false"
             aria-labelledby={titleId}
-            className={`flex h-full flex-col bg-background ${pinned ? "" : "border-l shadow-2xl"}`}
+            className={`flex h-full flex-col ${pinned ? "bg-background" : "border-l bg-popover text-popover-foreground shadow-xl"}`}
             onKeyDown={(event) => {
               if (event.key !== "Escape") return;
               event.stopPropagation();
@@ -506,9 +506,9 @@ function RecordColumn({
               data-slot="record-panel"
               data-record-layout={pinned ? "pinned" : "float"}
               data-record-id={openId}
-              className="min-h-0 flex-1 rounded-none border-0 p-0 text-sm shadow-none"
+              className="min-h-0 flex-1 rounded-none border-0 bg-transparent p-0 text-sm shadow-none"
             >
-              <FramePanel className="flex min-h-0 flex-1 flex-col rounded-none border-0 p-0 shadow-none">
+              <FramePanel className="flex min-h-0 flex-1 flex-col rounded-none border-0 bg-transparent p-0 shadow-none">
                 <PanelHeader
                   title={
                     <h2
