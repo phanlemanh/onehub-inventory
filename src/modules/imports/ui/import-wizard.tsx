@@ -640,7 +640,21 @@ function ApplyBatches(props: {
     learned: LearnedItem[];
   } | null>(null);
   const [failed, setFailed] = useState<"offline" | "server" | null>(null);
+  // One write loop at a time: a second press while one runs does nothing (S4-r3 t9).
+  const running = useRef(false);
+  const [writing, setWriting] = useState(false);
   async function run() {
+    if (running.current) return;
+    running.current = true;
+    setWriting(true);
+    try {
+      await write();
+    } finally {
+      running.current = false;
+      setWriting(false);
+    }
+  }
+  async function write() {
     props.onBusy(true);
     let at = progress;
     if (!at) {
@@ -701,13 +715,13 @@ function ApplyBatches(props: {
             failed === "offline",
           )}
         </p>
-        <Button variant="outline" onClick={() => void run()}>
+        <Button variant="outline" disabled={writing} onClick={() => void run()}>
           {C.retry}
         </Button>
       </div>
     );
   return (
-    <Button disabled={props.disabled} onClick={() => void run()}>
+    <Button disabled={props.disabled || writing} onClick={() => void run()}>
       {props.words}
     </Button>
   );

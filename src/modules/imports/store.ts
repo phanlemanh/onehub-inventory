@@ -49,6 +49,8 @@ export interface Kept {
 
 export interface StoredLearned extends LearnedIds {
   unitCodeIds: string[];
+  /** What the last batch said was learned, kept so a retry of that batch answers the same (S4-r3 t8). */
+  items?: LearnedItem[];
 }
 
 /**
@@ -282,7 +284,7 @@ export async function writeBatch(
 ): Promise<BatchResult> {
   const run = await lockRun(c, runId);
   if (!run) return { ok: false, problem: "not-found" };
-  if (run.status !== "open") return { ok: false, problem: "closed" };
+  if (run.status === "undone") return { ok: false, problem: "closed" };
   // The batch is the slice of the table the person opened, at its own place, with the same headers and choices.
   const hashes = run.batch_hashes ?? [];
   if (
@@ -293,7 +295,23 @@ export async function writeBatch(
     input.last !== (input.batchNo === hashes.length - 1)
   )
     return { ok: false, problem: "table-changed" };
-  if (run.batches_done.includes(input.batchNo)) return { ok: true, created: 0, done: false };
+  // A batch already written (its answer lost on the way back) answers again what it wrote, never writes twice: the
+  // screen's «Thử lại» then reaches Xong with the right count, even on the last batch (AC-7; S4-r3 t8).
+  if (run.batches_done.includes(input.batchNo)) {
+    const ids = input.rows.map((_, r) => listingIdOf(runId, input.rowOffset + r));
+    const { rows } = await c.query(
+      `select count(*)::int as n from listings where import_run_id::text = $1 and id::text = any($2)`,
+      [runId, ids],
+    );
+    const created = (rows[0] as { n: number }).n;
+    return {
+      ok: true,
+      created,
+      done: input.last,
+      ...(input.last ? { learned: run.learned.items ?? [] } : {}),
+    };
+  }
+  if (run.status !== "open") return { ok: false, problem: "closed" };
   const runAs = savepointRun(c);
   // Rows the person left out are counted in the whole file; this batch reads them at its own place (S4-r1 t8).
   const skipRows = (input.choices.skipRows ?? [])
@@ -400,7 +418,10 @@ export async function writeBatch(
   ).id;
   const done = await createListings(c, company, runId, items);
   let learnedWords: LearnedItem[] | undefined;
-  if (input.last) learnedWords = await learnAtEnd(c, runAs, runId, input, marked, learned);
+  if (input.last) {
+    learnedWords = await learnAtEnd(c, runAs, runId, input, marked, learned);
+    learned.items = learnedWords;
+  }
   await c.query(
     `update import_runs set batches_done = array_append(batches_done, $2), created_count = created_count + $3,
        kept = kept || $4::jsonb, learned = $5::jsonb, status = case when $6 then 'done' else status end

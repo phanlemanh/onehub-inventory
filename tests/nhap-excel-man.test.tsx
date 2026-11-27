@@ -158,6 +158,86 @@ describe("man-nap-tep", () => {
     expect([opens, sent]).toEqual([1, ["run-1:0", "run-1:1", "run-1:1"]]);
   });
 
+  it("an answer lost after the server wrote a batch: Thử lại reaches Xong with the right count, and a double press runs one loop (S4-r3 t8, t9)", async () => {
+    // The server's side: a batch written once answers its own count again when sent again (store writeBatch).
+    const written = new Set<number>();
+    const lost = new Set<number>();
+    const sent: number[] = [];
+    let opens = 0;
+    const counts = (rows: number) => (b: number) => Math.min(200, rows - b * 200);
+    const stub = (rows: number, loseOnce: number[]) => {
+      loseOnce.forEach((b) => lost.add(b));
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(async (url: string, init?: RequestInit) => {
+          if (!init?.method || init.method === "GET") return Response.json([]);
+          if (url.endsWith("/preview")) return Response.json(MARKED);
+          if (url === "/api/v1/imports")
+            return Response.json({ id: `run-${(opens += 1)}` }, { status: 201 });
+          const { batchNo, last } = JSON.parse(String(init.body)) as {
+            batchNo: number;
+            last: boolean;
+          };
+          sent.push(batchNo);
+          written.add(batchNo);
+          if (lost.delete(batchNo)) throw new TypeError("network");
+          return Response.json({
+            created: counts(rows)(batchNo),
+            done: last,
+            ...(last ? { learned: [{ concept: "ImportTemplate", name: "lon.csv" }] } : {}),
+          });
+        }),
+      );
+    };
+    const toApply = async (rows: number) => {
+      mount();
+      await choose(
+        "lon.csv",
+        `Mã căn\n${Array.from({ length: rows }, (_, i) => `A-${i}`).join("\n")}\n`,
+      );
+      await waitFor(() =>
+        expect(screen.getByRole("button", { name: new RegExp(`^${C.next}`) })).toBeTruthy(),
+      );
+      for (let i = 0; i < 3; i += 1)
+        fireEvent.click(screen.getByRole("button", { name: new RegExp(`^${C.next}`) }));
+      await act(async () => fireEvent.click(screen.getByRole("button", { name: C.apply(1, 0) })));
+    };
+    const retry = () =>
+      within(document.querySelector('[data-state="ghi-do-dang"]') as HTMLElement).getByRole(
+        "button",
+        {
+          name: C.retry,
+        },
+      );
+
+    // The last batch's answer is lost: the screen says what it knows, Thử lại then reaches Xong with all 250 rows.
+    stub(250, [1]);
+    await toApply(250);
+    await waitFor(() => expect(screen.getByText(C.batchStopped(200, 250, true))).toBeTruthy());
+    // A double press: the second click while the first runs starts nothing.
+    await act(async () => {
+      fireEvent.click(retry());
+      fireEvent.click(retry());
+    });
+    await waitFor(() => expect(screen.getByText(C.done(250))).toBeTruthy());
+    expect(
+      screen.getByText(C.learnedItem({ concept: "ImportTemplate", name: "lon.csv" })),
+    ).toBeTruthy();
+    expect([opens, sent]).toEqual([1, [0, 1, 1]]);
+    cleanup();
+
+    // A middle batch's answer is lost: its retry counts its 200 rows, so Xong says 450, not 250.
+    written.clear();
+    sent.length = 0;
+    opens = 0;
+    stub(450, [1]);
+    await toApply(450);
+    await waitFor(() => expect(screen.getByText(C.batchStopped(200, 450, true))).toBeTruthy());
+    await act(async () => fireEvent.click(retry()));
+    await waitFor(() => expect(screen.getByText(C.done(450))).toBeTruthy());
+    expect([opens, sent]).toEqual([1, [0, 1, 1, 2]]);
+  });
+
   it("reads the file in the page, shows the server's counts, applies in two calls and undoes", async () => {
     const calls = server();
     mount();
