@@ -452,7 +452,9 @@ function RecordColumn({
           // Floating, the record stands below the region's toolbar so the toolbar stays usable (AC-4 of row 3a, after
           // the supervisor's ruling D-1411-1: the owner's newer word wins over row 3's «Trừ thanh trên»); pinned, the
           // region gives up its width, so the column runs from just under the top bar.
-          "--record-top": `${pinned ? bounds.top : Math.max(bounds.top, bounds.tools)}px`,
+          // Owner 2026-11-27 (BH session): the floating record, too, runs from just under the App Shell's top bar
+          // to the bottom, over the content below, like decision 0024's «Trừ thanh trên».
+          "--record-top": `${bounds.top}px`,
           "--record-right": `${bounds.right}px`,
           "--record-bottom": `${bounds.bottom}px`,
           "--record-left": `${bounds.left}px`,
@@ -493,7 +495,7 @@ function RecordColumn({
             role="dialog"
             aria-modal="false"
             aria-labelledby={titleId}
-            className={`flex h-full flex-col bg-background ${pinned ? "" : "border-l p-2"}`}
+            className={`flex h-full flex-col bg-background ${pinned ? "" : "border-l shadow-2xl"}`}
             onKeyDown={(event) => {
               if (event.key !== "Escape") return;
               event.stopPropagation();
@@ -504,11 +506,9 @@ function RecordColumn({
               data-slot="record-panel"
               data-record-layout={pinned ? "pinned" : "float"}
               data-record-id={openId}
-              className={`min-h-0 flex-1 text-sm ${pinned ? "rounded-none border-0 p-0 shadow-none" : "shadow-lg"}`}
+              className="min-h-0 flex-1 rounded-none border-0 p-0 text-sm shadow-none"
             >
-              <FramePanel
-                className={`flex min-h-0 flex-1 flex-col p-0 ${pinned ? "rounded-none border-0 shadow-none" : ""}`}
-              >
+              <FramePanel className="flex min-h-0 flex-1 flex-col rounded-none border-0 p-0 shadow-none">
                 <PanelHeader
                   title={
                     <h2
