@@ -191,7 +191,7 @@ AttributeSource): boolean`, đúng khi giá trị mới được ghi);
 ### Việc 8: Hồ sơ đã ký, ghim lại, wiki
 
 - Mỗi hồ sơ một dòng `sua-sau-ky.md`: hàng 4 (`sua-tren-o`), hàng 5 (`dan-tu-excel`), 3g (`sua-thong-tin-can`), 3e
-  (`hoi-dau-chu-bao-sai`), 12 (`them-can`).
+  (`hoi-dau-chu-bao-sai`), 12 (`them-can`), 10 (`bang-hang-du-lieu-that`: ca cách ly 23 nay chứng gắn sang căn đã có tin mở bị chặn, thay cho «không đổi được căn»).
 - Chép ghi chú lưới mười hai cột của hàng 4 và 7e từ hồ sơ 3g (PR #129) về đúng hồ sơ.
 - Ghim lại 4, 5, 3e, 7e bằng một lượt `ghim-lai` của đợt (xin khoá, chạy `repin-lane.mjs`, nhả). Eval của 7e cần Postgres
   dãy R.
