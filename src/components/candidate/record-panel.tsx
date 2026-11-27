@@ -110,8 +110,10 @@ export function useRecordAddress(param: string = RECORD_PARAM) {
 }
 
 /**
- * The panel's header, two lines on every width (owner, 2026-11-13, «Có, mọi khổ»): the record's name on its own line,
- * then the record's actions, «Trước» and «Sau» in the grid's order, and «Đóng» on the line below, at the right.
+ * The panel's header, one line on every width (owner, BH session 2026-11-27: «đóng, tiếp, lùi… thường nằm ở góc phải
+ * trên cùng», after the two lines of 2026-11-13): the record's name on the left, then at the top right the record's
+ * actions, the pin, «Trước» and «Sau» in the grid's order and «Đóng». The walking and closing buttons show their icons
+ * only, each with its name for assistive tech and as a hint on hover, so the line fits from 320 px.
  */
 function PanelHeader({
   title,
@@ -132,27 +134,32 @@ function PanelHeader({
   close: ReactNode;
 }) {
   return (
-    <div data-slot="record-panel-header" className="flex flex-col gap-2 border-b p-4">
+    <div
+      data-slot="record-panel-header"
+      className="flex items-center justify-between gap-2 border-b p-4"
+    >
       {title}
-      <div data-slot="record-panel-actions" className="flex items-center justify-end gap-1">
+      <div data-slot="record-panel-actions" className="flex shrink-0 items-center gap-1">
         {actions}
         {pin}
         <Button
-          variant="outline"
-          size="sm"
+          variant="ghost"
+          size="icon-sm"
+          aria-label={GRID_COPY.record.previous}
+          title={GRID_COPY.record.previous}
           disabled={previous === undefined}
           onClick={() => previous !== undefined && onNavigate(previous)}
         >
           <ChevronLeftIcon aria-hidden="true" />
-          {GRID_COPY.record.previous}
         </Button>
         <Button
-          variant="outline"
-          size="sm"
+          variant="ghost"
+          size="icon-sm"
+          aria-label={GRID_COPY.record.next}
+          title={GRID_COPY.record.next}
           disabled={next === undefined}
           onClick={() => next !== undefined && onNavigate(next)}
         >
-          {GRID_COPY.record.next}
           <ChevronRightIcon aria-hidden="true" />
         </Button>
         {close}
@@ -161,7 +168,7 @@ function PanelHeader({
   );
 }
 
-const TITLE_CLASS = "min-w-0 text-lg font-semibold break-words";
+const TITLE_CLASS = "min-w-0 flex-1 truncate text-lg font-semibold";
 
 /**
  * The one record panel of the app (design/behaviors.md, open the record panel; owner's choice at row 3's scope gate:
@@ -269,9 +276,17 @@ export function RecordPanel({
             onNavigate={onNavigate}
             actions={view?.actions}
             close={
-              <Dialog.Close render={<Button variant="ghost" size="sm" />}>
+              <Dialog.Close
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={GRID_COPY.record.close}
+                    title={GRID_COPY.record.close}
+                  />
+                }
+              >
                 <XIcon aria-hidden="true" />
-                {GRID_COPY.record.close}
               </Dialog.Close>
             }
           />
@@ -554,9 +569,14 @@ function RecordColumn({
                     ) : null
                   }
                   close={
-                    <Button variant="ghost" size="sm" onClick={() => onNavigate(null)}>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={GRID_COPY.record.close}
+                      title={GRID_COPY.record.close}
+                      onClick={() => onNavigate(null)}
+                    >
                       <XIcon aria-hidden="true" />
-                      {GRID_COPY.record.close}
                     </Button>
                   }
                 />
