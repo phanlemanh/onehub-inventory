@@ -71,7 +71,8 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
   không ghi được giá trị riêng của sàn A (ca mới trong bộ kiểm cách ly); tin Đã bán, Ngừng khoá năm thuộc tính như 3g.
 - AC-12: Given hồ sơ căn ở 360 và 1440, When mở một tin Đã bán và một tin Ngừng hẳn với vai có `updateListing` và với vai
   không giữ căn, Then chỗ nút «Sửa» của khối thông tin căn là một dòng chữ nhạt có ổ khoá nói lý do (C1), chỗ nút «Hỏi đầu
-  chủ» ở đáy hồ sơ là một dòng chữ nhạt nói lý do (C2) — không nút mờ, không biến mất im lặng, chữ đọc từ bảng nhãn; tin
+  chủ» ở đáy hồ sơ là một dòng chữ nhạt nói lý do (C2; cùng cách ấy cho tin chưa ai giữ, thay nút mờ «Căn chưa có đầu
+  chủ giữ») — không nút mờ, không biến mất im lặng, chữ đọc từ bảng nhãn; tin
   đang mở thì hai nút như cũ; trên điện thoại nút «Sửa» ở đầu mục có vùng bấm ít nhất 44px, máy tính 28px (C10); ngăn hiện
   thuộc tính căn chỉ để đọc khi không bấm «Sửa» (C16). Và thân hồ sơ theo bốn nhóm A–D chủ kho duyệt sau Cổng Phạm vi
   (mục «Sửa sau Cổng Phạm vi»): (A) thân mở bằng một dòng trạng thái bên trái, giá bên phải ở mọi khổ, rồi «dự án · loại
@@ -122,6 +123,10 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
   điểm còn lại của chi tiết căn»). Xếp vào 3h theo G-2711-20: nội dung ngăn chi tiết có một chủ là 3h. Không thêm tiêu
   chí mới để hợp đồng giữ 12 tiêu chí (một lượt chấm); đo bằng E15, E15b. Tên người xác nhận ở nhóm C chờ lịch sử của
   hàng 3c — tới lúc ấy chỉ hiện số ngày.
+- 2026-11-27 · C2 phủ thêm tin chưa ai giữ: đáy hồ sơ hôm nay hiện nút chính mờ «Căn chưa có đầu chủ giữ», nay thành dòng
+  chữ nhạt nói lý do như căn đã bán và ngừng hẳn. Giám sát thấy khi soi ảnh VP10 và xếp vào 3h; đây là chính luật chủ kho
+  đã duyệt (câu 2 «Chuẩn nút dùng chung», «Duyệt cả ba câu» ở phiên BH; C2 «Theo luật mới» tại phiên R), không hỏi lại. Đo
+  bằng E14, E14b.
 
 ## Out of scope
 

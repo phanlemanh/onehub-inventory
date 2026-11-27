@@ -164,7 +164,7 @@ evals:
     executor: test
     cmd: config:executors.test.unit
     paths: [src/modules/listings/ui/**, tests/tin-rao-gia-tri-rieng.test.tsx]
-    expected: "exit 0; ma trận viết trước ba trạng thái (đang mở, Closed, Withdrawn) × hai vai (có updateListing, không giữ căn) dựng hồ sơ căn: tin đang mở có nút «Sửa» ở đầu khối thông tin căn và nút «Hỏi đầu chủ» ở đáy khi người xem không giữ căn; tin Closed, Withdrawn không có hai nút ấy (không có button nào mang tên ấy, kể cả disabled) mà có hai dòng data-slot section-locked-reason và ask-locked-reason, chữ rút từ ontology/labels.yaml (không viết tay); thuộc tính căn hiện chỉ để đọc khi chưa bấm «Sửa» (không input nào trong khối); ca đối chứng ẩn nút không để dòng cho 'blocked action disappears silently' và ca dùng nút disabled cho 'dimmed button instead of reason'"
+    expected: "exit 0; ma trận viết trước ba trạng thái (đang mở, Closed, Withdrawn) × hai vai (có updateListing, không giữ căn) dựng hồ sơ căn, cộng tin đang mở chưa ai giữ: tin đang mở có nút «Sửa» ở đầu khối thông tin căn và nút «Hỏi đầu chủ» ở đáy khi người xem không giữ căn; tin Closed, Withdrawn không có hai nút ấy (không có button nào mang tên ấy, kể cả disabled) mà có hai dòng data-slot section-locked-reason và ask-locked-reason, chữ rút từ ontology/labels.yaml (không viết tay); tin chưa ai giữ không có button «Hỏi đầu chủ» nào (kể cả disabled) mà có dòng ask-locked-reason nói chưa ai giữ; thuộc tính căn hiện chỉ để đọc khi chưa bấm «Sửa» (không input nào trong khối); ca đối chứng ẩn nút không để dòng cho 'blocked action disappears silently' và ca dùng nút disabled cho 'dimmed button instead of reason'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E14b
@@ -173,7 +173,7 @@ evals:
     layer: ui-observed
     cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E14b
     paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
-    expected: "exit 0; trên khung ngăn của VP10 (main đã gộp VP10 và VP11), ở 360 và 1440, sáng và tối: hồ sơ căn 0606 (Đã bán) và 1201 (Ngừng hẳn) có dòng chữ nhạt có ổ khoá ở chỗ «Sửa» và dòng nhạt nói lý do ở chỗ «Hỏi đầu chủ»; tin đang mở có hai nút; ở 360 hộp bao của nút «Sửa» đầu mục cao ít nhất 44px, ở 1440 cao 28px (getBoundingClientRect); axe không có lỗi; ảnh evidence/E14b-<khổ>-<nền>.png"
+    expected: "exit 0; trên khung ngăn của VP10 (main đã gộp VP10 và VP11), ở 360 và 1440, sáng và tối: hồ sơ căn 0606 (Đã bán) và 1201 (Ngừng hẳn) có dòng chữ nhạt có ổ khoá ở chỗ «Sửa» và dòng nhạt nói lý do ở chỗ «Hỏi đầu chủ»; tin đang mở chưa ai giữ có dòng nhạt nói lý do ở đáy, không nút mờ; tin đang mở có hai nút; ở 360 hộp bao của nút «Sửa» đầu mục cao ít nhất 44px, ở 1440 cao 28px (getBoundingClientRect); axe không có lỗi; ảnh evidence/E14b-<khổ>-<nền>.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
 
   - id: E15

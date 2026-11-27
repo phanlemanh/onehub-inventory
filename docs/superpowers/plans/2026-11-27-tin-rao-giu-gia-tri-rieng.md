@@ -151,6 +151,8 @@ trong hồ sơ), ô tìm mã căn của hàng 12 (dùng lại, không viết m�
 - Tin Đã bán hoặc Ngừng hẳn:
   - chỗ «Sửa» là dòng chữ nhạt có ổ khoá (C1);
   - chỗ «Hỏi đầu chủ» ở đáy hồ sơ là dòng chữ nhạt nói lý do (C2).
+  - Tin chưa ai giữ cũng vậy: nút chính mờ «Căn chưa có đầu chủ giữ» ở đáy thành dòng chữ nhạt nói lý do (G, khi soi ảnh
+    VP10). Ba trạng thái (đã bán, ngừng hẳn, chưa ai giữ) dùng chung một cách xử lý.
 - Chữ dòng khoá theo mẫu chủ kho duyệt ở chuẩn nút: «Căn đã bán, không sửa». Lời ngừng hẳn và lời cho «Hỏi đầu chủ» viết
   cùng một mẫu, đặt trong `labels.yaml`, và thay chữ của bản mẫu («Đã bán — giữ nguyên như lúc bán»).
 - Điện thoại: nút «Sửa» ở đầu mục có vùng bấm ít nhất 44px (C10). Máy tính giữ 28px.
