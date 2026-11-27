@@ -22,13 +22,19 @@ import { pasteWords } from "./listing-paste-copy";
 const PRICE = "Listing.listPrice";
 const STATUS = "Listing.standardStatus";
 const CONFIRMED = "Listing.lastConfirmedAt";
-/** The unit's own facts: fixed on the grid (row 4, a Never the owner signed). */
+/**
+ * The unit's own facts: a paste never writes them (row 4, a Never the owner signed). Row 3h edits the unit attributes
+ * on their cells; taking them by paste is row 5's change after the sign-off (design §6 of row 3h), not yet made.
+ */
 const UNIT_FACTS: readonly FieldKey[] = [
   "Listing.unitNumber",
   "Listing.buildingName",
   "Listing.subdivisionName",
   "Unit.livingArea",
   "Unit.bedroomsTotal",
+  "Unit.floor",
+  "Unit.directionFaces",
+  "Unit.propertySubType",
 ];
 
 /** One write the preview may apply, keyed by its line's id. */

@@ -12,7 +12,7 @@ import { mySavedView, mySavedViews } from "@/modules/listings/server";
 
 import { feeHeaders, withFees } from "../inventory-fees";
 import { inventorySource, standInRole } from "../inventory-source";
-import { placesOf, recordsOf, rowsOf } from "../inventory-view";
+import { catalogAttributesOf, placesOf, recordsOf, rowsOf } from "../inventory-view";
 import { entryAction, entryRefused, NAV } from "../nav";
 import { savedViewLabels } from "../saved-view-labels";
 import {
@@ -30,8 +30,10 @@ import {
   inventoryOpeningFor,
   inventoryStateFrom,
   inventoryEdgeRowsFrom,
+  markLookFrom,
   type InventoryField,
   type RecordLabels,
+  type UnitAttributeWords,
 } from "@/modules/listings/ui";
 
 export const metadata: Metadata = { title: label("Inventory") };
@@ -60,6 +62,33 @@ function headersFor(overrides: Parameters<typeof label>[1]): Record<InventoryFie
     "Listing.lastConfirmedAt": label("LastConfirmedAt", overrides),
   };
 }
+
+/** Words of the listing's own unit attributes (row 3h), from the label table. */
+const ATTRIBUTE_WORDS: UnitAttributeWords = {
+  names: {
+    livingArea: label("LivingArea"),
+    floor: label("UnitFloorLocation"),
+    bedroomsTotal: label("BedroomsTotal"),
+    directionFaces: label("DirectionFaces"),
+    propertySubType: label("PropertySubType"),
+  },
+  subTypes: {
+    Condominium: label("SubTypeCondominium"),
+    Townhouse: label("SubTypeTownhouse"),
+    "Single Family Residence": label("SubTypeSingleFamily"),
+    "Unimproved Land": label("SubTypeLand"),
+  },
+  sources: {
+    Typed: label("SourceTyped"),
+    File: label("SourceFile"),
+    Catalog: label("SourceCatalog"),
+  },
+  catalog: label("Catalog"),
+  differs: label("DiffersFromCatalog"),
+  revert: label("RevertToCatalog"),
+  edit: label("Edit"),
+  unit: label("Unit"),
+};
 
 /** Labels of the full unit record (row 3b), from the label table. */
 const RECORD_LABELS: RecordLabels = {
@@ -101,6 +130,7 @@ const RECORD_LABELS: RecordLabels = {
     "Single Family Residence": label("SubTypeSingleFamily"),
     "Unimproved Land": label("SubTypeLand"),
   },
+  attributes: ATTRIBUTE_WORDS,
 };
 
 const FEE_HEADERS = feeHeaders();
@@ -270,6 +300,14 @@ export default async function Page({ searchParams }: Props) {
         filters={filters}
         geoTree={tree}
         staleLinkNote={stale ? ENTRY_COPY.staleLink(label("Unit"), label("Inventory")) : undefined}
+        unitAttributes={{
+          words: ATTRIBUTE_WORDS,
+          catalog: data ? catalogAttributesOf(data) : {},
+          look: markLookFrom(first(query[QUERY_WORD.mark]), process.env.NODE_ENV),
+          // Variant B of row 3h, for comparison at the scope gate: outside production only, like `?state=`.
+          more:
+            process.env.NODE_ENV !== "production" && first(query[QUERY_WORD.columns]) === "five",
+        }}
         fullRecord={{
           records: data ? recordsOf(data, new Date()) : {},
           labels: RECORD_LABELS,

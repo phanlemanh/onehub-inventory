@@ -13,6 +13,17 @@ import { Button } from "@/components/ui/button";
 import type { Listing } from "@/generated/ontology";
 
 import type { ListingSaveDoor } from "../save-door";
+import { effectiveAttributes, type CatalogAttributes } from "../unit-attributes";
+import {
+  GRID_ATTRIBUTES,
+  MORE_ATTRIBUTES,
+  attributeCellFields,
+  attributeCells,
+  attributeOfColumn,
+} from "./attribute-cells";
+import { AttributeDiffersMark, MarkLookProvider } from "./attribute-differs-mark";
+import { attributeText, type MarkLook, type UnitAttributeWords } from "./unit-attribute-copy";
+import { useActionPermission } from "@/components/candidate/action-permission";
 import { httpSaveDoor } from "./http-save-door";
 import { detailCells, type DetailColumnWords } from "./detail-cells";
 import { DetailsEditProvider, type DetailsEditApi } from "./listing-details-edit";
@@ -68,6 +79,7 @@ export function InventoryGrid({
   noActivate,
   geoTree,
   detailWords,
+  unitAttributes,
 }: {
   title: string;
   headers: Readonly<Record<InventoryField, string>>;
@@ -110,6 +122,16 @@ export function InventoryGrid({
   geoTree?: readonly GeoNode[];
   /** Row 3g (Hỏi-3 «lối C»): the four details as columns, edited on their cells; their words from the label table. */
   detailWords?: DetailColumnWords;
+  /**
+   * Row 3h: the listing's own unit attributes — their words, what the catalog says for each listing, the mark's look
+   * (`?mark=`) and whether floor, direction and sub type show as columns too (`?columns=five`, variant B).
+   */
+  unitAttributes?: {
+    words: UnitAttributeWords;
+    catalog: Readonly<Record<string, CatalogAttributes>>;
+    look?: MarkLook;
+    more?: boolean;
+  };
 }) {
   const router = useRouter();
   const [current, setCurrent] = useState<InventoryState>(state);
@@ -146,9 +168,24 @@ export function InventoryGrid({
   }, [staleLinkNote]);
   // The same columns on every render: this grid renders again on each change of arrangement (the «changed» mark), and
   // new columns would draw the header cells, with the filter box being typed in, again.
+  const attrWords = unitAttributes?.words;
+  const more = unitAttributes?.more === true;
   const columns = useMemo(
-    () => inventoryColumns(headers, customColumns, feeHeaders, detailWords),
-    [headers, customColumns, feeHeaders, detailWords],
+    () =>
+      inventoryColumns(
+        headers,
+        customColumns,
+        feeHeaders,
+        detailWords,
+        more && attrWords
+          ? {
+              floor: attrWords.names.floor,
+              directionFaces: attrWords.names.directionFaces,
+              propertySubType: attrWords.names.propertySubType,
+            }
+          : undefined,
+      ),
+    [headers, customColumns, feeHeaders, detailWords, more, attrWords],
   );
   const headerOf = useCallback(
     (field: FieldKey) => columns.find((c) => c.field === field)?.header ?? field,
@@ -201,15 +238,38 @@ export function InventoryGrid({
       ),
     [customColumns],
   );
-  // The four detail cells of each row, from the listing the row shows (row 3g).
+  // The four detail cells of each row, from the listing the row shows (row 3g), and its unit attributes (row 3h).
   const shownRows = useMemo(() => {
-    if (!detailWords || !listings) return rows;
+    if ((!detailWords && !unitAttributes) || !listings) return rows;
     const byId = new Map(listings.map((l) => [l.id, l]));
     return rows.map((row) => {
       const l = byId.get(row.id);
-      return l ? ({ ...row, ...detailCells(l, detailWords) } as GridRow) : row;
+      return l
+        ? ({
+            ...row,
+            ...(detailWords ? detailCells(l, detailWords) : {}),
+            ...(unitAttributes
+              ? attributeCells(l, unitAttributes.catalog[l.id], unitAttributes.words)
+              : {}),
+          } as GridRow)
+        : row;
     });
-  }, [rows, listings, detailWords]);
+  }, [rows, listings, detailWords, unitAttributes]);
+  // Row 3h: the attribute cells edited on the grid (area and bedrooms; with variant B the three more).
+  const attributeEdit = useMemo(
+    () =>
+      unitAttributes && listings
+        ? {
+            fields: attributeCellFields(
+              more ? [...GRID_ATTRIBUTES, ...MORE_ATTRIBUTES] : GRID_ATTRIBUTES,
+              unitAttributes.words,
+            ),
+            words: unitAttributes.words,
+            catalogOf: (id: string) => unitAttributes.catalog[id],
+          }
+        : undefined,
+    [unitAttributes, listings, more],
+  );
   const [detailsTick, setDetailsTick] = useState(0);
   const edit = useListingCellEdit({
     rows: shownRows,
@@ -225,9 +285,37 @@ export function InventoryGrid({
     detailWords,
     // Any saved write re-renders an open record, so a detail saved on a cell shows there too (row 3g).
     onSaved: () => setDetailsTick((n) => n + 1),
+    attributes: attributeEdit,
   });
   // The record edits the open listing's details through the same door (row 3g); a save re-renders the record.
-  const { writeListing, savedListing } = edit;
+  const { writeListing, savedListing, revertAttribute } = edit;
+  // Row 3h: the mark on a cell whose own value differs from the catalog's, with «Lấy lại» for a person who may edit.
+  const permitted = useActionPermission();
+  const listingOf = useMemo(() => new Map((listings ?? []).map((l) => [l.id, l])), [listings]);
+  const cellMark = useCallback(
+    (row: GridRow, field: FieldKey) => {
+      const attribute = attributeOfColumn(field);
+      if (!attribute || !unitAttributes) return null;
+      const l = savedListing(row.id) ?? listingOf.get(row.id);
+      if (!l) return null;
+      const e = effectiveAttributes(l, unitAttributes.catalog[row.id])[attribute];
+      if (!e.differs || (e.source !== "Typed" && e.source !== "File")) return null;
+      const catalogShown = attributeText(unitAttributes.words, attribute, e.catalogValue);
+      const may =
+        listings !== undefined && !row.locked?.[field] && permitted("updateListing", true);
+      return (
+        <AttributeDiffersMark
+          inGrid
+          words={unitAttributes.words}
+          catalogShown={catalogShown}
+          sourceWord={unitAttributes.words.sources[e.source]}
+          onRevert={may ? () => revertAttribute(row.id, field) : undefined}
+        />
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the tick moves on with every saved write, so the marks read the listing as last saved
+    [unitAttributes, savedListing, listingOf, listings, permitted, revertAttribute, detailsTick],
+  );
   const detailsApi = useMemo<DetailsEditApi | null>(
     () =>
       listings && editLabels
@@ -244,47 +332,50 @@ export function InventoryGrid({
   const shown =
     current === "empty" ? [] : current === "partial" ? edit.rows.slice(0, PARTIAL_ROWS) : edit.rows;
   return (
-    <DetailsEditProvider api={detailsApi}>
-      {edit.dialogs}
-      <DataRegion
-        // Pressing the open entry of the second column again opens it afresh, its unsaved changes dropped.
-        key={`${openView?.id ?? ""}:${place.reopened}:${geo.picked}`}
-        title={title}
-        columns={columns}
-        rows={shown}
-        status={status}
-        onRetry={() => (readFailed ? router.refresh() : setCurrent("ready"))}
-        record={record}
-        emptyWhy={emptyWhy}
-        initialFilters={filters}
-        initialView={geo.view ?? saved}
-        hiddenAtFirst={feeHeaders ? HIDDEN_AT_FIRST : undefined}
-        onViewChange={setView}
-        action={
-          savedViews && copy
-            ? {
-                allowed: true,
-                node: (
-                  <SaveViewButtons
-                    current={view}
-                    open={openView ?? null}
-                    changed={changed}
-                    taken={savedViews.map((v) => v.name)}
-                    copy={copy}
-                  />
-                ),
-              }
-            : undefined
-        }
-        groupBy={INVENTORY_GROUP_BY}
-        emptyAction={
-          <Button variant="outline" onClick={() => router.refresh()}>
-            {reloadLabel}
-          </Button>
-        }
-        cellEdit={edit.cellEdit}
-        phoneList={phoneList}
-      />
-    </DetailsEditProvider>
+    <MarkLookProvider value={unitAttributes?.look ?? "dot"}>
+      <DetailsEditProvider api={detailsApi}>
+        {edit.dialogs}
+        <DataRegion
+          // Pressing the open entry of the second column again opens it afresh, its unsaved changes dropped.
+          key={`${openView?.id ?? ""}:${place.reopened}:${geo.picked}`}
+          title={title}
+          columns={columns}
+          rows={shown}
+          status={status}
+          onRetry={() => (readFailed ? router.refresh() : setCurrent("ready"))}
+          record={record}
+          emptyWhy={emptyWhy}
+          initialFilters={filters}
+          initialView={geo.view ?? saved}
+          hiddenAtFirst={feeHeaders ? HIDDEN_AT_FIRST : undefined}
+          onViewChange={setView}
+          action={
+            savedViews && copy
+              ? {
+                  allowed: true,
+                  node: (
+                    <SaveViewButtons
+                      current={view}
+                      open={openView ?? null}
+                      changed={changed}
+                      taken={savedViews.map((v) => v.name)}
+                      copy={copy}
+                    />
+                  ),
+                }
+              : undefined
+          }
+          groupBy={INVENTORY_GROUP_BY}
+          emptyAction={
+            <Button variant="outline" onClick={() => router.refresh()}>
+              {reloadLabel}
+            </Button>
+          }
+          cellEdit={edit.cellEdit}
+          phoneList={phoneList}
+          cellMark={unitAttributes ? cellMark : undefined}
+        />
+      </DetailsEditProvider>
+    </MarkLookProvider>
   );
 }

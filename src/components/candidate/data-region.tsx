@@ -406,6 +406,7 @@ export function DataRegion({
   onViewChange,
   hiddenAtFirst,
   phoneList,
+  cellMark,
 }: {
   title: string;
   columns: readonly TypedColumn[];
@@ -451,6 +452,11 @@ export function DataRegion({
   hiddenAtFirst?: readonly FieldKey[];
   /** Row 2b: below 768 px the rows show as the screen's cards instead of the table. */
   phoneList?: RegionPhoneList<GridRow>;
+  /**
+   * A small mark the screen draws after a cell's value (row 3h: a value that differs from the shared catalog); null
+   * for none. It never changes the cell's words or colour; a control inside it carries `data-cell-interactive`.
+   */
+  cellMark?: (row: GridRow, field: FieldKey) => ReactNode;
 }) {
   // VP4: undefined until the browser knows the width; meanwhile both layouts are drawn and CSS shows one.
   const phoneLayout = usePhoneLayout();
@@ -847,7 +853,7 @@ export function DataRegion({
               }
               return column.field === groupCountField ? count : null;
             }
-            const cell = (
+            const typed = (
               <TypedCell
                 kind={column.kind}
                 value={info.getValue()}
@@ -856,6 +862,30 @@ export function DataRegion({
                 editMode={editable ? editModeFor(column.kind) : undefined}
               />
             );
+            const mark = cellMark?.(row as GridRow, column.field) ?? null;
+            const cell =
+              mark === null ? (
+                typed
+              ) : (
+                // The mark sits at the cell's free edge, away from the value, so the value keeps its width and line.
+                <span
+                  data-slot="cell-with-mark"
+                  className={cn(
+                    "relative flex w-full min-w-0 items-center",
+                    column.align === "right" ? "justify-end" : "justify-start",
+                  )}
+                >
+                  {typed}
+                  <span
+                    className={cn(
+                      "absolute inset-y-0 flex items-center",
+                      column.align === "right" ? "left-0" : "right-0",
+                    )}
+                  >
+                    {mark}
+                  </span>
+                </span>
+              );
             if (index !== 0 || !opensRecord) return cell;
             const id = row.id;
             return (
@@ -954,6 +984,7 @@ export function DataRegion({
       groupLabelField,
       groupCountField,
       canEdit,
+      cellMark,
     ],
   );
 

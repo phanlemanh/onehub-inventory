@@ -56,7 +56,8 @@ export interface DetailsEditApi {
   tick: number;
 }
 
-const DetailsEditContext = createContext<DetailsEditApi | null>(null);
+/** The grid's write lent to its records (row 3g); row 3h's unit attributes edit through it too. */
+export const DetailsEditContext = createContext<DetailsEditApi | null>(null);
 
 /** Lends the grid's write to every record it opens; without it a record is read-only. */
 export function DetailsEditProvider({

@@ -15,12 +15,23 @@ import type {
   ListingStandardStatus,
 } from "@/generated/ontology";
 
+import { detailsLocked } from "../edit-rules";
 import { completeness, unitKind, type CompletenessPart } from "../record";
 import { OPEN_STATUSES } from "../sample";
+import {
+  effectiveAttributes,
+  type EffectiveAttribute,
+  type OwnAttributes,
+  type UnitAttributeField,
+  type UnitAttributeValues,
+} from "../unit-attributes";
 
 import { ListingDetailsEdit, useListingDetails } from "./listing-details-edit";
 import { ListingCard, type ListingView } from "./listing-record";
 import { RECORD_COPY, confirmationSentence } from "./record-copy";
+import { AttributeDiffersMark } from "./attribute-differs-mark";
+import { attributeText, type UnitAttributeWords } from "./unit-attribute-copy";
+import { UnitAttributesEdit, useAttributeRevert, useOwnAttributes } from "./unit-attributes-edit";
 
 /** One listing of the unit as the record reads it; `confirmedDays` is counted on the server for the request. */
 export interface RecordListing {
@@ -36,6 +47,8 @@ export interface RecordListing {
   occupantType?: ListingOccupantType | undefined;
   legalStatus?: string | undefined;
   financing?: string | undefined;
+  /** The listing's own values of the unit attributes and their sources (row 3h); absent when it follows the catalog. */
+  own?: OwnAttributes | undefined;
 }
 
 /** What the record reads of one grid row: the unit from the shared catalog and its listings, newest first. */
@@ -75,6 +88,8 @@ export interface RecordLabels {
   furnishedValues: Readonly<Record<ListingFurnished, string>>;
   occupantValues: Readonly<Record<ListingOccupantType, string>>;
   propertyTypeValues: Readonly<Record<string, string>>;
+  /** Row 3h: the words of the own unit attributes; with them the unit section edits them and marks a difference. */
+  attributes?: UnitAttributeWords;
 }
 
 const shown = (value: string | number | null | undefined): string =>
@@ -106,7 +121,17 @@ function Section({
 }
 
 /** Label and value rows; a row whose value is missing says so in a quieter colour (`data-empty`). */
-function Rows({ rows }: { rows: readonly { key: string; label: string; value: string | null }[] }) {
+function Rows({
+  rows,
+}: {
+  rows: readonly {
+    key: string;
+    label: string;
+    value: string | null;
+    /** Row 3h: where an own value came from and its mark, after the value. */
+    after?: ReactNode;
+  }[];
+}) {
   return (
     <dl className="grid grid-cols-5 gap-x-4 gap-y-2 text-sm">
       {rows.map((row) => (
@@ -115,6 +140,11 @@ function Rows({ rows }: { rows: readonly { key: string; label: string; value: st
           {row.value === null ? (
             <dd data-empty="" className="col-span-3 min-w-0 text-muted-foreground italic">
               {RECORD_COPY.missing}
+            </dd>
+          ) : row.after ? (
+            <dd className="col-span-3 flex min-w-0 flex-wrap items-center gap-x-1.5 break-words">
+              <span>{row.value}</span>
+              {row.after}
             </dd>
           ) : (
             <dd className="col-span-3 min-w-0 break-words">{row.value}</dd>
@@ -155,6 +185,10 @@ export function ListingRecordFull({
     financing: read?.financing,
     occupantType: read?.occupantType,
   });
+  // The unit attributes as the grid last saved them (row 3h), over the catalog's.
+  const own = useOwnAttributes(read?.id ?? "", read?.own);
+  const words = labels.attributes;
+  const revert = useAttributeRevert(read?.id ?? "", data.unit.unitNumber, own, words!);
   if (!read) return null;
   const { confirmedDays, ...parts } = details;
   const picked: RecordListing = {
@@ -163,7 +197,42 @@ export function ListingRecordFull({
     ...(confirmedDays === undefined ? {} : { confirmedDays }),
   };
   const isNewest = picked.id === newestId;
-  const unit = data.unit;
+  const catalogUnit = data.unit;
+  const attrs = effectiveAttributes(own, catalogUnit);
+  // What the record shows of the unit: its effective attributes (row 3h), the rest from the catalog.
+  const unit = {
+    ...catalogUnit,
+    livingArea: attrs.livingArea.value,
+    floor: attrs.floor.value,
+    bedroomsTotal: attrs.bedroomsTotal.value,
+    directionFaces: attrs.directionFaces.value,
+    propertySubType: attrs.propertySubType.value,
+  };
+  // Only the open, newest listing has its attributes edited, like its details (row 3g's lock).
+  const editable = isNewest && !detailsLocked(picked.standardStatus);
+  /** The source and the mark after an attribute's value. */
+  const after = <K extends UnitAttributeField>(
+    field: K,
+    e: EffectiveAttribute<UnitAttributeValues[K]>,
+  ): ReactNode => {
+    if (!words || (e.source !== "Typed" && e.source !== "File")) return undefined;
+    const catalogShown = attributeText(words, field, e.catalogValue);
+    return (
+      <>
+        <span data-slot="attribute-source" className="text-xs text-muted-foreground">
+          {words.sources[e.source]}
+        </span>
+        {e.differs ? (
+          <AttributeDiffersMark
+            words={words}
+            catalogShown={catalogShown}
+            sourceWord={words.sources[e.source]}
+            onRevert={editable && revert ? () => revert(field, catalogShown) : undefined}
+          />
+        ) : null}
+      </>
+    );
+  };
   const done = completeness(picked);
   const open = OPEN_STATUSES.includes(picked.standardStatus);
   // The card shows the listing in view: its price and status; place and the three facts come from the unit.
@@ -236,7 +305,27 @@ export function ListingRecordFull({
             : RECORD_COPY.lacking(done.missing.map((part) => labels.parts[part]))}
         </p>
       </div>
-      <Section slot="listing-unit" title={labels.unit} action={report}>
+      <Section
+        slot="listing-unit"
+        title={labels.unit}
+        action={
+          words && editable ? (
+            <span className="flex items-center gap-1">
+              <UnitAttributesEdit
+                key={`attributes:${picked.id}`}
+                id={picked.id}
+                unitNumber={unit.unitNumber}
+                own={own}
+                catalog={catalogUnit}
+                words={words}
+              />
+              {report}
+            </span>
+          ) : (
+            report
+          )
+        }
+      >
         <Rows
           rows={[
             {
@@ -249,16 +338,33 @@ export function ListingRecordFull({
               label: labels.unitKind,
               value: shown(unitKind(unit.bedroomsTotal)),
             },
+            ...(words
+              ? [
+                  {
+                    key: "Unit.bedroomsTotal",
+                    label: labels.bedrooms,
+                    value: shown(unit.bedroomsTotal),
+                    after: after("bedroomsTotal", attrs.bedroomsTotal),
+                  },
+                ]
+              : []),
             {
               key: "Unit.livingArea",
               label: labels.livingArea,
               value: unit.livingArea === null ? EMPTY : formatArea(unit.livingArea),
+              after: after("livingArea", attrs.livingArea),
             },
-            { key: "Unit.floor", label: labels.floor, value: shown(unit.floor) },
+            {
+              key: "Unit.floor",
+              label: labels.floor,
+              value: shown(unit.floor),
+              after: after("floor", attrs.floor),
+            },
             {
               key: "Unit.directionFaces",
               label: labels.direction,
               value: shown(unit.directionFaces),
+              after: after("directionFaces", attrs.directionFaces),
             },
             {
               key: "Listing.buildingName",
@@ -274,6 +380,7 @@ export function ListingRecordFull({
               key: "Unit.propertySubType",
               label: labels.propertyType,
               value: shown(unit.propertySubType && labels.propertyTypeValues[unit.propertySubType]),
+              after: after("propertySubType", attrs.propertySubType),
             },
           ]}
         />

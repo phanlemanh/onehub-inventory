@@ -30,6 +30,11 @@ import {
 } from "../save-door";
 
 import { detailUndoable, priceUndoable } from "../edit-rules";
+import {
+  effectiveAttributes,
+  type CatalogAttributes,
+  type OwnAttributes,
+} from "../unit-attributes";
 
 import { CELL_EDIT_COPY as COPY, type CellEditLabels } from "./cell-edit-copy";
 import {
@@ -43,11 +48,14 @@ import { FEE_INCLUSION_FIELD, NET_TO_SELLER_FIELD, type InventoryField } from ".
 import { planPaste, type PastePlan } from "./listing-paste";
 import { pasteWords } from "./listing-paste-copy";
 import { word } from "./cell-edit-copy";
+import { attributeCells, attributeChange, attributeUndo, subTypeOf } from "./attribute-cells";
+import { UNIT_ATTRIBUTE_COPY, attributeText, type UnitAttributeWords } from "./unit-attribute-copy";
 import {
   ListingCellEdit,
   StatusNeedsDialog,
   cellKeyOf,
   lockedReasons,
+  type AttributeCellNote,
   type CustomCellField,
   type CustomEdit,
   type ListingEdit,
@@ -104,6 +112,13 @@ const cellsOf = (
   [FEE]: feeWord(labels, l.feeInclusion, tx),
 });
 
+/** The unit attribute cells of the grid (row 3h): which are edited, their words, and each row's catalog values. */
+export interface AttributeCellEdit {
+  fields: readonly CustomCellField[];
+  words: UnitAttributeWords;
+  catalogOf: (id: string) => CatalogAttributes | undefined;
+}
+
 /**
  * The cell edit of the inventory grid over `rows`. `listings` are the listings the rows show (the sample door holds
  * them); `door` replaces the sample door (tests, and row 10's real write path).
@@ -121,6 +136,7 @@ export function useListingCellEdit({
   customFields,
   detailWords,
   onSaved,
+  attributes,
 }: {
   rows: readonly GridRow[];
   /** Absent: the grid is read-only. */
@@ -143,6 +159,8 @@ export function useListingCellEdit({
   detailWords?: DetailColumnWords;
   /** Told after every write that saved (the open record shows what the grid saved). */
   onSaved?: () => void;
+  /** Row 3h: the unit attribute cells, edited by their own readers; their saves send one unitAttributes change. */
+  attributes?: AttributeCellEdit;
 }): {
   rows: readonly GridRow[];
   cellEdit: RegionCellEdit | undefined;
@@ -151,6 +169,8 @@ export function useListingCellEdit({
   writeListing: (id: string, change: ListingChange, at: string) => Promise<WriteOutcome>;
   /** The listing as the door last saved it, when it did (row 3g: the record shows it). */
   savedListing: (id: string) => Listing | undefined;
+  /** Row 3h: takes the catalog's value again for one attribute cell of a row, with «Hoàn tác» (the mark's command). */
+  revertAttribute: (id: string, key: FieldKey) => void;
 } {
   // Typed cells (row 3g): the company's own fields, then the four details when their words are given.
   const typedFields = useMemo(
@@ -158,7 +178,16 @@ export function useListingCellEdit({
     [customFields, detailWords],
   );
   const customKeys = useMemo(() => typedFields.map(cellKeyOf), [typedFields]);
-  const lock = useCallback((row: GridRow) => lockedReasons(row, customKeys), [customKeys]);
+  // Row 3h: the unit attribute cells, kept apart from the typed cells so a paste still leaves them (row 5).
+  const attrFields = useMemo(
+    () =>
+      new Map<FieldKey, CustomCellField>(
+        (attributes?.fields ?? []).map((f) => [cellKeyOf(f) as FieldKey, f]),
+      ),
+    [attributes],
+  );
+  const lockKeys = useMemo(() => [...customKeys, ...attrFields.keys()], [customKeys, attrFields]);
+  const lock = useCallback((row: GridRow) => lockedReasons(row, lockKeys), [lockKeys]);
   const [door] = useState<ListingSaveDoor & { current?: (id: string) => Listing | undefined }>(
     () =>
       given ??
@@ -176,6 +205,18 @@ export function useListingCellEdit({
   );
   const [versions] = useState(() => new Map((listings ?? []).map((l) => [l.id, l.version])));
   const [saved] = useState(() => new Map<string, Listing>());
+  const [read] = useState(() => new Map((listings ?? []).map((l) => [l.id, l])));
+  /** The listing as the door last saved it, else as the page read it: its own attribute values (row 3h). */
+  const currentOf = useCallback(
+    (id: string): OwnAttributes => saved.get(id) ?? read.get(id) ?? {},
+    [saved, read],
+  );
+  /** What the attribute cells of a listing show (row 3h). */
+  const attributeCellsOf = useCallback(
+    (l: Listing): Partial<GridRow> =>
+      attributes ? attributeCells(l, attributes.catalogOf(l.id), attributes.words) : {},
+    [attributes],
+  );
   /** The door's last answer: the record's dialog tells «the server would not take it» from «not allowed» (row 3g). */
   const lastKind = useRef<string>("");
   const customs = useMemo(
@@ -246,6 +287,7 @@ export function useListingCellEdit({
               ...row,
               ...cellsOf(current, labels, row.transaction),
               ...(detailWords ? detailCells(current, detailWords) : {}),
+              ...attributeCellsOf(current),
               // The company's own values as the server keeps them now (row 3g, finding of round 1).
               ...Object.fromEntries(
                 customKeys
@@ -265,7 +307,7 @@ export function useListingCellEdit({
       // The cell never sends a change the rules refuse; if one slips through, the door refused it (row 4).
       return outcome.kind === "invalid" ? "refused" : outcome.kind;
     },
-    [door, versions, labels, saved, lock, onSaved, detailWords, customKeys],
+    [door, versions, labels, saved, lock, onSaved, detailWords, customKeys, attributeCellsOf],
   );
 
   const save = useCallback(
@@ -373,6 +415,92 @@ export function useListingCellEdit({
       if (outcome !== "saved" && outcome !== "conflict") patch(row.id, before);
     },
     [customs, labels, headers, patch, write, changeFor],
+  );
+
+  /**
+   * One unit attribute of a listing (row 3h): the cell shows it at once, the door saves it as typed by the company;
+   * null takes the catalog's value again. «Hoàn tác» writes back the own value and source the listing held before.
+   */
+  const saveAttribute = useCallback(
+    async (row: GridRow, edit: CustomEdit) => {
+      const key = edit.field as FieldKey;
+      const attribute = attrFields.get(key)?.attribute;
+      if (!attribute || !attributes || !labels) return;
+      const words = attributes.words;
+      const catalogValue = effectiveAttributes({}, attributes.catalogOf(row.id))[attribute].value;
+      const text = (shown: unknown) =>
+        attributeText(
+          words,
+          attribute,
+          (attribute === "propertySubType" ? (subTypeOf(shown, words) ?? null) : shown) as never,
+        );
+      const unit = String(row["Listing.unitNumber"] ?? "");
+      const now =
+        edit.value === null
+          ? UNIT_ATTRIBUTE_COPY.backToCatalog(words, attributeText(words, attribute, catalogValue))
+          : text(edit.value);
+      const what = UNIT_ATTRIBUTE_COPY.what(words, attribute, unit, now);
+      const change = attributeChange(attribute, edit.value, words);
+      const back = attributeUndo(currentOf(row.id), [attribute]);
+      const before: Partial<GridRow> = { [key]: row[key], [CONFIRMED]: row[CONFIRMED] };
+      const shownNow =
+        edit.value ??
+        (attribute === "propertySubType" && catalogValue !== null
+          ? words.subTypes[catalogValue as keyof typeof words.subTypes]
+          : catalogValue);
+      const at = new Date().toISOString();
+      patch(row.id, { [key]: shownNow, [CONFIRMED]: at });
+      const outcome = await runDoorChange({
+        done: COPY.done(what, true),
+        undone: COPY.undone(UNIT_ATTRIBUTE_COPY.what(words, attribute, unit, text(row[key]))),
+        write: () => write(row.id, change, at),
+        undo: async () => {
+          const result = await write(row.id, back, new Date().toISOString());
+          if (result === "saved") patch(row.id, before);
+          return result;
+        },
+        failed: (why) => COPY.saveFailed(what.toLocaleLowerCase("vi"), why),
+        undoFailed: (why) => COPY.undoFailed(labels, unit, now, why),
+      });
+      if (outcome !== "saved" && outcome !== "conflict") patch(row.id, before);
+    },
+    [attrFields, attributes, labels, currentOf, patch, write],
+  );
+  /** What an attribute cell's editor says of the catalog for this row (row 3h). */
+  const noteOf = useCallback(
+    (row: GridRow, field: CustomCellField): AttributeCellNote | undefined => {
+      if (!field.attribute || !attributes) return undefined;
+      const words = attributes.words;
+      const e = effectiveAttributes(currentOf(row.id), attributes.catalogOf(row.id))[
+        field.attribute
+      ];
+      const hasOwn = e.source === "Typed" || e.source === "File";
+      return {
+        hasOwn,
+        // Only an own value has a way back to the catalog; a cell that follows it says nothing more.
+        note:
+          !hasOwn || e.catalogValue === null
+            ? null
+            : UNIT_ATTRIBUTE_COPY.cellNote(
+                words,
+                attributeText(words, field.attribute, e.catalogValue),
+              ),
+        revert: e.differs ? words.revert : undefined,
+        noneText: words.sources.Catalog,
+      };
+    },
+    [attributes, currentOf],
+  );
+  const dataRef = useRef(data);
+  useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
+  const revertAttribute = useCallback(
+    (id: string, key: FieldKey) => {
+      const row = dataRef.current.find((r) => r.id === id);
+      if (row) void saveAttribute(row, { field: key, custom: key, value: null });
+    },
+    [saveAttribute],
   );
 
   // Pasting a region (row 5): the preview first, then every ticked cell through the same door, undone at once.
@@ -494,6 +622,7 @@ export function useListingCellEdit({
       fields: [
         ...((feeEditable ? [PRICE, STATUS, FEE] : [PRICE, STATUS]) as FieldKey[]),
         ...customs.keys(),
+        ...attrFields.keys(),
       ],
       label: (row, field) =>
         COPY.editLabel(
@@ -509,6 +638,13 @@ export function useListingCellEdit({
           onAsk={setAsk}
           canActivate={!blocked.has(session.row.id)}
           custom={(() => {
+            const own = attrFields.get(session.field);
+            if (own)
+              return {
+                field: own,
+                onSave: (edit: CustomEdit) => void saveAttribute(session.row, edit),
+                attribute: noteOf(session.row, own),
+              };
             const field = customs.get(session.field);
             return field
               ? { field, onSave: (edit: CustomEdit) => void saveCustom(session.row, edit) }
@@ -531,6 +667,9 @@ export function useListingCellEdit({
     onPaste,
     feeEditable,
     blocked,
+    attrFields,
+    saveAttribute,
+    noteOf,
   ]);
 
   const dialogs = labels ? (
@@ -568,10 +707,12 @@ export function useListingCellEdit({
           [CONFIRMED]: now?.lastConfirmedAt ?? at,
           // The record's dialog saved details: their columns show them too (row 3g).
           ...(now && detailWords ? detailCells(now, detailWords) : {}),
+          // And its unit attributes (row 3h).
+          ...(now ? attributeCellsOf(now) : {}),
         });
       return outcome;
     },
-    [write, patch, saved, detailWords],
+    [write, patch, saved, detailWords, attributeCellsOf],
   );
-  return { rows: data, cellEdit, dialogs, writeListing, savedListing };
+  return { rows: data, cellEdit, dialogs, writeListing, savedListing, revertAttribute };
 }
