@@ -70,12 +70,9 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
 
 ## Vai × Màn
 
-| Vai | inventory: xem năm thuộc tính | sửa, lấy lại, gắn sang căn khác | Báo sai |
-|---|---|---|---|
-| Đầu chủ (ListAgent) | có | có | có |
-| Đầu khách (BuyerAgent) | có | có | có |
-| Trưởng nhóm (TeamLead) | có | có | có |
-| Quản trị sàn (CompanyAdmin) | theo `viewListings` | không | theo 3e |
+| Màn | Đầu chủ | Đầu khách | Trưởng nhóm | Quản trị sàn |
+| --- | --- | --- | --- | --- |
+| inventory | được — xem năm thuộc tính; sửa, lấy lại, gắn sang căn khác; Báo sai | được — như Đầu chủ | được — như Đầu chủ | được — xem theo `viewListings`; không sửa, không lấy lại, không gắn sang căn khác; Báo sai theo 3e |
 
 ## Coverage
 
