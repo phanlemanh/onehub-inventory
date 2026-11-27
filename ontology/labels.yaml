@@ -404,6 +404,43 @@ concepts:
     reso: PropertySubType.UnimprovedLand
     pref: Đất
     en: Unimproved land
+  # Row 3h (tin-rao-giu-gia-tri-rieng): a listing's own value of a unit attribute, where it came from, and the way back
+  # to the shared catalog. «danh mục», not «Danh bạ» (Contact avoids it).
+  Catalog:
+    kind: entity
+    own: true
+    pref: Danh mục
+    en: Catalog
+  AttributeSource:
+    kind: field
+    own: true
+    pref: Nguồn giá trị
+    en: Value source
+  SourceTyped:
+    kind: value
+    own: true
+    pref: Sàn gõ
+    en: Typed by the brokerage
+  SourceFile:
+    kind: value
+    own: true
+    pref: Nhập từ tệp
+    en: From an imported file
+  SourceCatalog:
+    kind: value
+    own: true
+    pref: Theo danh mục
+    en: From the catalog
+  DiffersFromCatalog:
+    kind: status
+    own: true
+    pref: Khác danh mục
+    en: Differs from the catalog
+  RevertToCatalog:
+    kind: action
+    own: true
+    pref: Lấy lại danh mục
+    en: Use the catalog value
   UnitKind:
     kind: field
     own: true

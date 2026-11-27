@@ -477,6 +477,8 @@ describe("bang-da-duyet", () => {
       dua_len_ban: "activateListing",
       nhan: "hang 18a",
       doi_nguoi_giu: "hang 18a",
+      // Row 3h (tin-rao-giu-gia-tri-rieng, design §2): the company edits its own values of the unit attributes.
+      sua_thuoc_tinh_can: "updateListing",
     },
     ListingOwner: { them: "hang 13", xem: "viewOwnerPhone·13", sua: "hang 18b", go: "hang 13" },
     Unit: { them: "hang 12", xem: "readCatalog", sua: "khong", go: "khong" },
@@ -563,7 +565,7 @@ describe("bang-da-duyet", () => {
       expect(have, name).toEqual(want);
       cells += Object.keys(want).length;
     }
-    expect(cells).toBe(59);
+    expect(cells).toBe(60);
   });
 
   it("the seven real gaps of the 14/11 review each point to the row approved for it", () => {

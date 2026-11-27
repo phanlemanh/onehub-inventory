@@ -6,3 +6,4 @@ export * from "./lookup";
 export * from "./sample";
 export * from "./unit-code";
 export * from "./resolve";
+export * from "./directions";

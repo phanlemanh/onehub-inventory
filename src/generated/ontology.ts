@@ -186,6 +186,18 @@ export type ListingOccupantType = "Owner" | "Tenant" | "Vacant";
 
 export type ListingFeeInclusion = "Included" | "Excluded";
 
+export type ListingLivingAreaSource = "Typed" | "File";
+
+export type ListingFloorSource = "Typed" | "File";
+
+export type ListingBedroomsTotalSource = "Typed" | "File";
+
+export type ListingDirectionFacesSource = "Typed" | "File";
+
+export type ListingPropertySubType = "Condominium" | "Townhouse" | "Single Family Residence" | "Unimproved Land";
+
+export type ListingPropertySubTypeSource = "Typed" | "File";
+
 /** One offer by a company to sell or lease one unit. */
 export interface Listing {
   id: string;
@@ -212,6 +224,16 @@ export interface Listing {
   listAgentKey?: string;
   listAgentFullName?: string;
   version: number;
+  livingArea?: number;
+  livingAreaSource?: ListingLivingAreaSource;
+  floor?: string;
+  floorSource?: ListingFloorSource;
+  bedroomsTotal?: number;
+  bedroomsTotalSource?: ListingBedroomsTotalSource;
+  directionFaces?: string;
+  directionFacesSource?: ListingDirectionFacesSource;
+  propertySubType?: ListingPropertySubType;
+  propertySubTypeSource?: ListingPropertySubTypeSource;
   customFields?: Record<string, unknown> | unknown[];
 }
 

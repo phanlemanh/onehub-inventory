@@ -36,13 +36,21 @@ cùng ô `updateListing`, mỗi lần sửa tính là vừa xác nhận với ch
 vừa đổi); lần chào đã bán hay ngừng giữ nguyên. Giá trị trường riêng của sàn sửa trên ô theo kiểu, máy chủ kiểm bằng
 `checkCustomValue` của lớp riêng.
 
+Giá trị riêng của thuộc tính căn (hàng 3h, `own-value-beats-catalog`): diện tích, tầng, phòng ngủ, hướng, loại hình có
+thể là giá trị riêng của lần chào, cùng tên RESO với căn của danh mục; mỗi giá trị nhớ nguồn (`AttributeSource`: sàn gõ
+hay nhập từ tệp). Không có giá trị riêng thì theo danh mục; sàn gõ thắng tệp, tệp thắng danh mục; danh mục không bao
+giờ đè giá trị riêng và sàn không sửa danh mục. Loại căn vẫn suy từ phòng ngủ hiệu lực. Bản bấm được chỉ ghi vào dữ liệu
+mẫu; cửa `/api/v1` từ chối thay đổi `unitAttributes` (400) tới khi migration của hàng 3h thêm cột.
+
 ## Where in the code
 
 `src/modules/listings/`: luật sửa giá và trạng thái ở `edit-rules.ts`, cổng lưu ở `save-door.ts`, sửa trên ô của Bảng hàng ở
 `ui/use-listing-cell-edit.tsx`. Bảng `listings`, `listing_units` ở `db/migrations/013_bang_can_chao.sql`; đọc ở
 `inventory-read.ts`, ghi ở `listings-http.ts` (`PATCH /api/v1/listings/[id]`), cổng lưu của trình duyệt ở
 `ui/http-save-door.ts`. Hàng 3g: hộp «Sửa» ở `ui/listing-details-edit.tsx`, bốn cột ở `ui/detail-cells.ts`, đọc giá trị
-gõ hay dán của trường riêng ở `custom-rules.ts`; một luật đọc kết cục ghi ở `src/lib/write-failure.ts`.
+gõ hay dán của trường riêng ở `custom-rules.ts`; một luật đọc kết cục ghi ở `src/lib/write-failure.ts`. Hàng 3h: giá
+trị hiệu lực và luật đọc ở `unit-attributes.ts`, ô thuộc tính ở `ui/attribute-cells.ts`, dấu khác danh mục ở
+`ui/attribute-differs-mark.tsx`, hộp «Sửa» của khối căn ở `ui/unit-attributes-edit.tsx`.
 
 ## History
 
@@ -81,3 +89,6 @@ kiện phí trên ô; người giữ căn thật trên hồ sơ. Quyết định
 
 Hàng 3g, 17/11/2026: sửa bốn phần của lần chào trên ô và trong hồ sơ căn; sửa giá trị trường riêng trên ô và dán; kết cục ghi
 «phiên hết hạn» và «máy chủ lỗi» thay vì «không đủ quyền» ([sua-thong-tin-can](../../_acceptance/sua-thong-tin-can/contract.md)).
+
+Hàng 3h, 27/11/2026 (bản bấm được): năm giá trị riêng của thuộc tính căn kèm nguồn, luật `own-value-beats-catalog`, ô
+`vong_doi.rieng.sua_thuoc_tinh_can`. Hồ sơ: `_acceptance/tin-rao-giu-gia-tri-rieng/`.
