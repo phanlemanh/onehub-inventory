@@ -1,18 +1,19 @@
 // Each measure of this record, seen green on the thing as it is and red, with its pinned message, on a
 // clone broken on purpose. Usage: node two-way.mjs [--only <name>] — names: exports, bundle, leave,
 // default, clean, change-list. Prints one line per case; exit 0 only when every case held.
-import { readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
 
 import { HERE, option, ROOT, run, workClone } from "./lib.mjs";
-import { LEDGER, PUSHED, THEME, WAITING } from "./matrix.mjs";
+import { LAYOUT, LEDGER, PLUG, PLUGIN_DIR, PUSHED, STYLESHEET, THEME, WAITING } from "./matrix.mjs";
 
 const only = option("--only");
 let failed = 0;
 
 // Runs a measure of this folder on `dir`; `want` is a line it must print, `exit` the code it must end with.
-function expect(label, want, exit, script, dir) {
-  const r = run("node", [path.join(HERE, script), "--root", dir], ROOT);
+function expect(label, want, exit, script, dir, env = {}) {
+  const r = run("node", [path.join(HERE, script), "--root", dir], ROOT, env);
   const ok = r.status === exit && r.out.includes(want);
   if (!ok) failed += 1;
   process.stdout.write(`${ok ? "held" : "FAILED"}: ${script.replace(".mjs", "")}: ${label}\n`);
@@ -20,20 +21,41 @@ function expect(label, want, exit, script, dir) {
 }
 // A clone at HEAD with `edit(dir)` applied, committed when `commit` is set; the measure runs on it,
 // then the clone goes.
-function onClone(label, want, exit, script, edit = null, commit = false) {
+function onClone(label, want, exit, script, edit = null, commit = false, env = {}) {
   const clone = workClone(ROOT);
   try {
     if (edit) {
       edit(clone.dir);
       if (commit) clone.commit(`break: ${label}`);
     }
-    expect(label, want, exit, script, clone.dir);
+    expect(label, want, exit, script, clone.dir, env);
   } finally {
     clone.remove();
   }
 }
 const green = (script, want) => onClone("as it is (green)", want, 0, script);
-const red = (script, label, want, edit, commit = false) => onClone(`${label} (red)`, want, 1, script, edit, commit);
+const red = (script, label, want, edit, commit = false, env = {}) => onClone(`${label} (red)`, want, 1, script, edit, commit, env);
+// Several breaks applied one after the other.
+const all = (...edits) => (dir) => { for (const edit of edits) edit(dir); };
+// A stand-in for the installed plugin whose send step prints what the real one prints, with `change`
+// applied to its lines: the real dry run's output, taken on ROOT, is the fixture, not a hand copy.
+function fakePlugin(change) {
+  const real = run("node", [path.join(PLUGIN_DIR(), "scripts/bring-out.mjs"), "--send", PLUG, "--dry-run"], ROOT);
+  if (real.status !== 0) throw new Error(`the installed send step did not run (exit ${real.status}): ${real.out}`);
+  const dir = mkdtempSync(path.join(tmpdir(), "bring-out-claude-design-plugin-"));
+  mkdirSync(path.join(dir, "scripts"));
+  const out = change(real.out.split("\n")).join("\n");
+  writeFileSync(path.join(dir, "scripts/bring-out.mjs"), `process.stdout.write(${JSON.stringify(out)});\n`);
+  return { env: { DA_PLUGIN: dir }, remove: () => rmSync(dir, { recursive: true, force: true }) };
+}
+function redWithPlugin(label, want, change) {
+  const plugin = fakePlugin(change);
+  try {
+    red("leave.mjs", label, want, null, false, plugin.env);
+  } finally {
+    plugin.remove();
+  }
+}
 const text = (dir, rel) => readFileSync(path.join(dir, rel), "utf8");
 const put = (dir, rel, body) => writeFileSync(path.join(dir, rel), body);
 const swap = (rel, from, to) => (dir) => {
@@ -72,6 +94,8 @@ const cases = {
     red("bundle.mjs", "radius-md 9px", "bundle: radius-md is 9px, not 8px (0.5rem)", jsonEdit(TOKENS, (d) => { d.radius.tokens.find((t) => t.name === "radius-md").value = "9px"; }));
     red("bundle.mjs", "sans family empty", "bundle: the sans family is «», not Inter", jsonEdit(TOKENS, (d) => { d.type.families.sans = ""; }));
     red("bundle.mjs", "a component dropped", "bundle: components.md does not list InDialog src/components/candidate/form-dialog.tsx", swap("design/export/system/components.md", "- **InDialog** (organism), `src/components/candidate/form-dialog.tsx`: value\n", ""));
+    red("bundle.mjs", "layout.tsx loads another font", `bundle: ${LAYOUT} loads Roboto for the sans family, not Inter`, all(swap(LAYOUT, "import { Inter } from", "import { Roboto } from"), swap(LAYOUT, "= Inter({", "= Roboto({")));
+    red("bundle.mjs", "the stylesheet sets its own spacing", "bundle: the spacing unit is 4px, its source gives 4.8px (0.3rem)", swap(STYLESHEET, "  --font-heading: var(--font-sans);\n", "  --font-heading: var(--font-sans);\n  --spacing: 0.3rem;\n"));
     red("bundle.mjs", "DESIGN.md colour changed", "bundle: DESIGN.md gives accent as #ebf2fe, not #ebf2ff", swap("DESIGN.md", 'accent: "#ebf2ff"', 'accent: "#ebf2fe"'));
   },
   leave() {
@@ -81,6 +105,8 @@ const cases = {
     red("leave.mjs", "leave for three files", "leave: send-claude-design gives leave for «leave: design/export/system/README.md, design/export/system/tokens.json, design/export/system/components.md; to:", swap(LEDGER, "design/export/system/components.md, design/export/system/assets.json; to:", "design/export/system/components.md; to:"));
     red("leave.mjs", "leave sends to a shared artifact", "leave: send-claude-design sends to «The design values and files of the repository it is given, to a shared artifact of the person's Claude account.», which is not a private artifact", swap(LEDGER, "to a private artifact of the person's Claude account.", "to a shared artifact of the person's Claude account."));
     red("leave.mjs", "a push to a place no leave names", "leave: a push went to claude-design-team, a place no leave names", jsonEdit(PUSHED, (d) => { d.pushes.unshift({ plug: "claude-design-team", stamp: "f1f0bbbc4e26", on: "2026-11-27" }); }));
+    redWithPlugin("the send step sends a fifth file", "leave: the send step sends DESIGN.md, which the leave does not name", (ls) => ls.map((l) => (l.startsWith("sends: ") ? `${l}, DESIGN.md` : l)));
+    redWithPlugin("the send step drops a file", "leave: the send step does not send design/export/system/assets.json", (ls) => ls.map((l) => (l.startsWith("sends: ") ? l.replace(", design/export/system/assets.json", "") : l)));
     red("leave.mjs", "no push recorded", "leave: design/export/pushed.json records no push to claude-design", jsonEdit(PUSHED, (d) => { d.pushes = []; }));
   },
   default() {

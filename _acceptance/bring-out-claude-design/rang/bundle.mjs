@@ -11,11 +11,13 @@ import {
   COLOURS,
   COMPONENTS,
   FAMILIES,
+  LAYOUT,
   LOADED_BY,
   REGISTRY,
   REM,
   SOURCE_TOKENS,
   SPACING_UNIT,
+  STYLESHEET,
   THEMES,
 } from "./matrix.mjs";
 
@@ -56,6 +58,34 @@ for (const role of roles) {
   if (at !== source.color[role].$value) found.push(`DESIGN.md gives ${role} as ${at ?? "nothing"}, not ${source.color[role].$value}`);
 }
 
+// Typefaces, from their source: the next/font/google loaders of src/app/layout.tsx give a family to a
+// CSS variable; the stylesheet maps --font-<key> to one of those variables. «Roboto_Mono» is «Roboto Mono».
+const layout = read(LAYOUT);
+const stylesheet = read(STYLESHEET);
+const loaded = {};
+for (const imp of layout.matchAll(/import\s*\{([^}]*)\}\s*from\s*["']next\/font\/google["']/g)) {
+  for (const name of imp[1].split(",").map((n) => n.trim().split(/\s+as\s+/).at(-1)).filter(Boolean)) {
+    for (const call of layout.matchAll(new RegExp(`\\b${name}\\(\\s*\\{[^}]*variable:\\s*["'](--[\\w-]+)["']`, "g"))) {
+      loaded[call[1]] = name.replaceAll("_", " ");
+    }
+  }
+}
+const sourceFamily = (key) => {
+  let variable = `--font-${key}`;
+  for (let hops = 0; hops < 4; hops += 1) {
+    if (loaded[variable]) return loaded[variable];
+    const next = stylesheet.match(new RegExp(`${variable}:\\s*var\\((--[\\w-]+)\\)`))?.[1];
+    if (!next || next === variable) break;
+    variable = next;
+  }
+  return loaded[variable] ?? null;
+};
+for (const key of Object.keys(FAMILIES)) {
+  const fromSource = sourceFamily(key);
+  if (fromSource !== FAMILIES[key]) found.push(`${LAYOUT} loads ${fromSource ?? "no family"} for the ${key} family, not ${FAMILIES[key]}`);
+  const inBundle = String(tokens.type?.families?.[key] ?? "").replaceAll('"', "").split(",")[0].trim();
+  if (fromSource && inBundle !== fromSource) found.push(`the bundle gives the ${key} family as «${inBundle}», its source loads ${fromSource}`);
+}
 // Typefaces: the families, and what loads them.
 for (const [key, family] of Object.entries(FAMILIES)) {
   if (!String(tokens.type?.families?.[key] ?? "").includes(family)) found.push(`the ${key} family is «${tokens.type?.families?.[key] ?? ""}», not ${family}`);
@@ -71,6 +101,13 @@ for (const [step, { $value }] of Object.entries(source.radius ?? {})) {
 }
 const unit = (tokens.spacing?.tokens ?? []).find((t) => t.name === "spacing-unit")?.value;
 if (unit !== SPACING_UNIT) found.push(`the spacing unit is ${unit ?? "missing"}, not ${SPACING_UNIT}`);
+// The spacing unit's source: the stylesheet's own --spacing when it sets one, else Tailwind's theme.
+const spacingOf = (css) => css.match(/--spacing:\s*([\d.]+)rem\s*;/)?.[1];
+const ownSpacing = spacingOf(stylesheet);
+const twTheme = path.join(root, "node_modules/tailwindcss/theme.css");
+const spacingRem = ownSpacing ?? (existsSync(twTheme) ? spacingOf(readFileSync(twTheme, "utf8")) : undefined);
+if (!spacingRem) found.push(`no source gives the spacing unit (${STYLESHEET} sets no --spacing and Tailwind's theme.css is not there)`);
+else if (unit !== px(`${spacingRem}rem`)) found.push(`the spacing unit is ${unit ?? "missing"}, its source gives ${px(`${spacingRem}rem`)} (${spacingRem}rem)`);
 
 // Components: the manifest's, each once. The manifest is kept out of git: write it when absent.
 let registryRoot = root;

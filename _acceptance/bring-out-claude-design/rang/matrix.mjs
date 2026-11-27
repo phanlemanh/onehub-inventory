@@ -28,6 +28,9 @@ export const COMPONENTS = 298;
 export const FAMILIES = { sans: "Inter", heading: "Inter" };
 export const LOADED_BY = "the font loader in src/app/layout.tsx";
 export const SPACING_UNIT = "4px";
+// Where the typefaces and the spacing unit come from: bundle.mjs reads them there, not from the bundle.
+export const LAYOUT = "src/app/layout.tsx";
+export const STYLESHEET = "src/app/globals.css";
 export const REM = 16;
 
 // The owner's leave to send, and the push.

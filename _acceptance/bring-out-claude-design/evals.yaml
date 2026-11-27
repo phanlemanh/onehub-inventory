@@ -8,7 +8,7 @@ feature_slug: bring-out-claude-design
 #   Câu chờ default-claude-design: có/không, chưa trả lời.
 #   Giá trị tối: so với chữ CSS của nguồn qua rang/colour.mjs (bộ đổi OKLab riêng của hồ sơ), lệch tối đa 2/255 mỗi kênh.
 #   Dữ liệu riêng tư: thư; số điện thoại liền, có cách, 0 hay +84; khoá; đường /Users/, /home/, /private/tmp/, /var/folders/.
-#   Cặp hai chiều: two-way.mjs, 39 ca. Mỗi ca phá ghim một thông điệp, kê ở `expected` của từng eval.
+#   Cặp hai chiều: two-way.mjs, 43 ca (39 trước cổng, 4 thêm ở S4 vòng 1). Mỗi ca phá ghim một thông điệp, kê ở `expected` của từng eval.
 evals:
   - id: E1
     criterion: AC-1
@@ -53,7 +53,7 @@ evals:
     long_running: 5
     layer: backend-effect
     paths: ["_acceptance/bring-out-claude-design/rang/**", "DESIGN.md", "design/export/system/**"]
-    expected: "exit 0; 'two-way: every case held'; mười ca: xanh như nó là; accent không có giá trị tối → 'bundle: colour accent has no dark value'; giá trị sáng của accent đổi → 'bundle: colour accent is #000000 in the light theme, not #ebf2ff'; giá trị tối của accent đổi → 'bundle: colour accent is #fafafa in the dark theme, not oklch(26.9% 0 none)'; giá trị tối của primary bằng giá trị sáng → 'bundle: colour primary is #0246ff in the dark theme, not color-mix(in oklch, #0246ff 60%, white)'; màu ở khuôn cũ → 'bundle: the colours are not a list of tokens'; radius-md 9px → 'bundle: radius-md is 9px, not 8px (0.5rem)'; họ chữ sans rỗng → 'bundle: the sans family is «», not Inter'; bỏ một linh kiện → 'bundle: components.md does not list InDialog src/components/candidate/form-dialog.tsx'; màu của DESIGN.md đổi → 'bundle: DESIGN.md gives accent as #ebf2fe, not #ebf2ff'"
+    expected: "exit 0; 'two-way: every case held'; mười hai ca: xanh như nó là; accent không có giá trị tối → 'bundle: colour accent has no dark value'; giá trị sáng của accent đổi → 'bundle: colour accent is #000000 in the light theme, not #ebf2ff'; giá trị tối của accent đổi → 'bundle: colour accent is #fafafa in the dark theme, not oklch(26.9% 0 none)'; giá trị tối của primary bằng giá trị sáng → 'bundle: colour primary is #0246ff in the dark theme, not color-mix(in oklch, #0246ff 60%, white)'; màu ở khuôn cũ → 'bundle: the colours are not a list of tokens'; radius-md 9px → 'bundle: radius-md is 9px, not 8px (0.5rem)'; họ chữ sans rỗng → 'bundle: the sans family is «», not Inter'; bỏ một linh kiện → 'bundle: components.md does not list InDialog src/components/candidate/form-dialog.tsx'; layout.tsx nạp phông khác → 'bundle: src/app/layout.tsx loads Roboto for the sans family, not Inter'; stylesheet tự đặt --spacing → 'bundle: the spacing unit is 4px, its source gives 4.8px (0.3rem)'; màu của DESIGN.md đổi → 'bundle: DESIGN.md gives accent as #ebf2fe, not #ebf2ff'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E6
     criterion: AC-4
@@ -71,7 +71,7 @@ evals:
     long_running: 3
     layer: backend-effect
     paths: ["_acceptance/bring-out-claude-design/rang/**", "design/decisions.yaml", "design/export/pushed.json"]
-    expected: "exit 0; 'two-way: every case held'; bảy ca: xanh như nó là; lần gửi ở trạng thái cũ → 'leave: the last push to claude-design is at eb3e4b366ba0, the bundle is at f1f0bbbc4e26'; phép mất chữ xác nhận → 'leave: send-claude-design is not confirmed by Manh Phan on 2026-11-26'; phép cho ba tệp → 'leave: send-claude-design gives leave for «leave: design/export/system/README.md, design/export/system/tokens.json, design/export/system/components.md; to:'; phép trỏ artifact dùng chung → 'leave: send-claude-design sends to «The design values and files of the repository it is given, to a shared artifact of the person's Claude account.», which is not a private artifact'; một lần gửi tới chỗ không có phép → 'leave: a push went to claude-design-team, a place no leave names'; không có lần gửi → 'leave: design/export/pushed.json records no push to claude-design'"
+    expected: "exit 0; 'two-way: every case held'; chín ca: xanh như nó là; lần gửi ở trạng thái cũ → 'leave: the last push to claude-design is at eb3e4b366ba0, the bundle is at f1f0bbbc4e26'; phép mất chữ xác nhận → 'leave: send-claude-design is not confirmed by Manh Phan on 2026-11-26'; phép cho ba tệp → 'leave: send-claude-design gives leave for «leave: design/export/system/README.md, design/export/system/tokens.json, design/export/system/components.md; to:'; phép trỏ artifact dùng chung → 'leave: send-claude-design sends to «The design values and files of the repository it is given, to a shared artifact of the person's Claude account.», which is not a private artifact'; một lần gửi tới chỗ không có phép → 'leave: a push went to claude-design-team, a place no leave names'; bước gửi gửi thêm tệp thứ năm → 'leave: the send step sends DESIGN.md, which the leave does not name'; bước gửi bỏ một tệp → 'leave: the send step does not send design/export/system/assets.json'; không có lần gửi → 'leave: design/export/pushed.json records no push to claude-design'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
   - id: E8
     criterion: AC-5
