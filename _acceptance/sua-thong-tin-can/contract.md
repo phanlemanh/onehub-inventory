@@ -139,3 +139,11 @@ sai luật) × vai (ba vai sửa · Quản trị sàn) × khổ (360 · 1440). T
   - Ngoài-5: một bài kiểm tra màn dùng thân trả lời lỗi viết tay, nên không thấy khi máy chủ đổi dạng trả lời.
   - Ngoài-6: bộ canh «chỉ một bảng mã lỗi» còn hở vài cách viết so mã.
   - Ngoài-7: bài kiểm tra phím ⌘B không mở rộng thanh bên chưa chứng minh phím có tới nơi.
+- Ghi sau ký 2026-11-27: dòng ngoài phạm vi «Sửa thông tin của căn (tầng, hướng, diện tích) — … hàng «Báo sai thông tin» 3e» nay trỏ sang
+  hàng 3h `tin-rao-giu-gia-tri-rieng`. Chủ kho chốt hướng «Tin rao giữ giá trị riêng, Danh bạ chỉ làm giàu» ngày 27/11 (G-2711-1): sàn sửa
+  các thuộc tính ấy trên tin rao của mình; «Báo sai thông tin» còn cho người không có quyền sửa. Hàng 3g không đổi mã vì ghi chú này.
+- Ghi sau ký 2026-11-27: Bảng hàng nay có mười hai cột chuẩn — tám cột cũ và bốn cột Nội thất, Pháp lý, Tài chính, Hiện trạng của hàng
+  này (lối C). Hai hồ sơ đã ký còn viết theo lưới tám cột và đọc như sau: hàng 4 `sua-tren-o`, AC-8 «đúng hai trên tám cột mở» — sáu cột
+  mở sửa (Giá chào, Trạng thái và bốn cột của hàng này), sáu cột Căn, Toà, Khu, Diện tích, Phòng ngủ, Xác nhận lúc vẫn không mở; hàng 7e
+  `lop-rieng-cua-san` «trường riêng hiện sau tám cột chuẩn» — sau mười hai cột chuẩn. Ghi chú nằm ở hồ sơ này vì chạm hai hồ sơ kia thì
+  cổng CI đòi ghim lại bằng chứng của chúng (ghim từ 13/11), là một việc riêng.

@@ -1,0 +1,154 @@
+schema_version: 1
+feature_slug: upgrade-design-assembly-0-76-0
+# Ma trận viết trước (dữ liệu ở rang/matrix.mjs, mọi phép đo đọc nó).
+#   Nhánh rời main ở f1fd7038. Commit lên đời afcb1ca2: 14 tệp (11 tệp công cụ, dấu phiên bản, design/book-words.json,
+#     một tệp wiki/log/).
+#   Bản đích 0.76.0: cây 80ed15e5d52b6cd1682e5a299772586e0854ee35, 51 tệp; mk/design-assembly.mk
+#     a9af3d808fc7f156d659ada3f6528cfe3482264c (giữ nguyên). Plugin đã cài: /Users/manhphan/dev/design-assembly/plugins/
+#     design-assembly (DA_PLUGIN thay khi chấm ở máy khác), plugin.json ghi 0.76.0.
+#   Cổng: 25 quyết định giữ bởi 36 phép kiểm; độ tất định 62/73 (25 held, 37 claimed); 73 quyết định cùng trạng thái với
+#     công cụ 0.69.0 của f1fd7038. make check: 2698 đạt, 2 bỏ qua; 297 linh kiện. Kiểm tra của plugin: 40/40 lõi (14 held,
+#     19 claimed, 7 recorded).
+#   Chữ của sổ: 145 khoá của khuôn, sáu câu hỏi, 13 khoá brand… tiếng Việt. Sổ vẽ trên ba bản sao có dòng mẫu: bộ biểu
+#     tượng có cỡ và nét, bộ không có, dòng logo trỏ tệp vắng.
+#   Cặp hai chiều: two-way.mjs, 39 ca. Mỗi ca phá ghim một thông điệp, kê ở `expected` của từng eval.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    long_running: 30
+    layer: backend-effect
+    paths: ["tools/**", "design/**", "tests/**", "mk/**", "src/**"]
+    expected: "exit 0; đầu ra có các dòng 'design-assembly: 25 decisions held by 36 checks, each seen failing on a changed copy', 'component manifest: design/component-registry.json is up to date (297 components)', 'determinism: 62/73 = 85%' và dòng số bài ghim ở ma trận (cây hiện tại 'Tests  2698 passed | 2 skipped (2700)'). Chiều đỏ của dòng cổng: E3"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/gate-lines.mjs
+    long_running: 5
+    layer: backend-effect
+    paths: ["tools/design-assembly/**", "design/**", "_acceptance/upgrade-design-assembly-0-76-0/rang/**"]
+    expected: "exit 0; dòng 'gate: the gate holds 25 decisions by 36 checks; determinism rate 62/73, 25 held and 37 claimed'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-2
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/two-way.mjs --only gate-lines
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-76-0/rang/**", "design/theme.json"]
+    expected: "exit 0; bài 'gate-lines' xanh trên bản sao không đổi và đỏ khi design/theme.json của bản chép mất một phép kiểm, với 'gate: the gate did not say: design-assembly: 25 decisions held by 36 checks, each seen failing on a changed copy'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/tool-tree.mjs
+    layer: backend-effect
+    paths: ["tools/design-assembly/**", "design/tool-stamp.json", "mk/design-assembly.mk", "_acceptance/upgrade-design-assembly-0-76-0/rang/**"]
+    expected: "exit 0; dòng 'tool: tools/design-assembly is the plugin's version 0.76.0, 51 files, tree 80ed15e5d52b; the stamp says the same; mk/design-assembly.mk is the template's; the installed plugin is 0.76.0, names that tree in its release ledger and its templates hold it'. Chiều đỏ: E5"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-3
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/two-way.mjs --only tool-tree
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-76-0/rang/**", "tools/design-assembly/**", "design/tool-stamp.json", "mk/design-assembly.mk"]
+    expected: "exit 0; bài 'tool-tree' đỏ ở sáu ca: một tệp công cụ đổi → 'differs from the plugin's version 0.76.0'; dấu ghi 0.69.0 → 'the stamp says version 0.69.0, not 0.76.0'; bước cổng khác mẫu → 'is not the plugin's gate step'; plugin đã cài ghi 0.69.0 → 'the installed plugin is version 0.69.0, not 0.76.0'; sổ phát hành của plugin không có bản → 'the installed plugin's release ledger has no version 0.76.0'; không có thư mục plugin → 'cannot read the installed plugin'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-4
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/decision-states.mjs
+    long_running: 5
+    layer: backend-effect
+    paths: ["tools/design-assembly/**", "design/**", "_acceptance/upgrade-design-assembly-0-76-0/rang/**"]
+    expected: "exit 0; dòng 'states: the 0.76.0 tool and the 0.69.0 tool, on the ledger at HEAD, give each of the 73 decisions the same state; both say 62/73'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-4
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/two-way.mjs --only decision-states
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-76-0/rang/**"]
+    expected: "exit 0; bài 'decision-states' xanh như nó là và đỏ khi phía 0.69.0 đọc design/theme.json không có phép kiểm của raw-table, với 'states: raw-table is held with the 0.76.0 tool, not with the 0.69.0 tool'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-5
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/audit.mjs
+    long_running: 5
+    layer: backend-effect
+    paths: ["tools/design-assembly/**", "design/**", "_acceptance/upgrade-design-assembly-0-76-0/rang/**"]
+    expected: "exit 0; dòng 'audit: coverage: 40 of 40 core decisions answered (14 held and re-run here, 19 claimed and not re-run, 7 recorded)'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E9
+    criterion: AC-5
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/two-way.mjs --only audit
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-76-0/rang/**", "design/decisions.yaml"]
+    expected: "exit 0; bài 'audit' xanh như nó là và đỏ khi sổ quyết định của bản sao mất dòng error-copy, với 'audit: the audit said «coverage: 39 of 40 core decisions answered'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E10
+    criterion: AC-6
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/words.mjs
+    layer: backend-effect
+    paths: ["design/book-words.json", "_acceptance/upgrade-design-assembly-0-76-0/rang/**"]
+    expected: "exit 0; dòng 'words: design/book-words.json has the template's 145 keys and the six questions; the 13 brand keys are Vietnamese, NFC, and hold nothing design/language.md rules out; the table matches'. Chiều đỏ: E11"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E11
+    criterion: AC-6
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/two-way.mjs --only words
+    long_running: 3
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-76-0/rang/**", "design/book-words.json"]
+    expected: "exit 0; bài 'words' xanh như nó là, đỏ ở mười ba ca, mỗi ca gọi tên khoá: thiếu brandStroke → 'words: missing brandStroke, a key of the words template'; khoá lạ → 'words: brandExtra is not a key of the words template'; chữ tiếng Anh → 'words: brandTitle is the template's English: «Brand assets»'; chữ rỗng → 'words: brandRow is empty'; dấu chấm than → 'words: brandNoIcons holds an exclamation mark'; mã màu → 'words: brandLede holds a colour value'; tên kho → 'words: brandFloorText holds the repository's name'; dấu thanh kiểu cũ → 'words: brandUnread holds a tone mark in the old place'; «sàn» → 'words: brandQuestion holds «sàn»'; emoji → 'words: brandMark holds an emoji'; không NFC → 'words: brandIcons is not in Unicode NFC'; năm câu hỏi → 'words: the questions are'; bảng cũ → 'is not what the words template and design/book-words.json say'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E12
+    criterion: AC-7
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/book.mjs
+    long_running: 5
+    layer: backend-effect
+    paths: ["design/**", "tools/design-assembly/**", "_acceptance/upgrade-design-assembly-0-76-0/rang/**"]
+    expected: "exit 0; dòng 'book: the book draws from the tree as it is (40 of 40, no brand page); on clones with an icon set, a bare icon set and a logo row it shows all 13 brand words in Vietnamese and none in the template's English'. Chiều đỏ: E13"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E13
+    criterion: AC-7
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/two-way.mjs --only book
+    long_running: 10
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-76-0/rang/**", "design/book-words.json"]
+    expected: "exit 0; bài 'book' xanh như nó là; đỏ khi chữ của sổ thiếu brandSizes, với 'book: brandSizes: the brand page shows the template's English «sizes»'; đỏ khi brandFloorText là chữ tiếng Anh, với 'book: brandFloorText: the brand page shows the template's English'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E14
+    criterion: AC-8
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/change-list.mjs
+    layer: backend-effect
+    paths: ["**"]
+    expected: "exit 0; dòng 'changes: the upgrade commit changes its 14 files; the branch changes nothing beyond the upgrade and this record' (hoặc, khi đã gộp, 'the branch is in origin/main already, so only the commit was compared'). Chiều đỏ: E15"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E15
+    criterion: AC-8
+    executor: script
+    cmd: node _acceptance/upgrade-design-assembly-0-76-0/rang/two-way.mjs --only change-list
+    long_running: 5
+    layer: backend-effect
+    paths: ["_acceptance/upgrade-design-assembly-0-76-0/rang/**"]
+    expected: "exit 0; bài 'change-list' xanh trên nhánh như nó là và khi đã gộp, đỏ ở bảy ca: commit lên đời đổi thêm một tệp → 'upgrade commit changed outside the list: design/decisions.yaml'; commit lên đời thiếu một tệp → 'upgrade commit did not change: design/book-words.json'; nhánh đổi Makefile → 'branch changed beyond the upgrade and this record: Makefile'; nhánh đổi design/theme.json → 'branch changed beyond the upgrade and this record: design/theme.json'; nhánh đổi hồ sơ 0.69.0 → 'branch changed beyond the upgrade and this record: _acceptance/upgrade-design-assembly-0-69-0/contract.md'; bản đồ sản phẩm đổi một chữ số → 'PRODUCT-MAP.md is not what the records at HEAD draw'; trang lộ trình đổi một chữ số → 'LO-TRINH.html is not what the records at HEAD draw'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E16
+    criterion: AC-9
+    executor: judgment
+    inputs: [_acceptance/upgrade-design-assembly-0-76-0/rang/brand-words.md, design/language.md]
+    question: "Trong bảng brand-words.md, với mỗi dòng trong 13 dòng: câu ở cột «Sổ (tiếng Việt)» có nói cùng điều câu ở cột «Khuôn (tiếng Anh)» CỦA CÙNG DÒNG nói không (không thêm, không bớt ý, không mang ý của dòng khác)? Câu có viết hoa chữ đầu đúng như câu tiếng Anh (câu đứng riêng viết hoa, mảnh ghép giữa dòng như «dòng», «ghim», «cỡ», «nét» viết thường) không? Theo design/language.md (mục 2, 3 và 5), câu có dùng chữ bị tránh, chữ trùng nghĩa pháp lý như «sàn», dấu chấm than, emoji, hay dấu thanh kiểu cũ không? Không chấm việc chọn «Logo» hay chữ khác cho «the mark»: đó là câu của chủ kho."
+    expected: "PASS khi cả 13 câu nói đúng ý, viết hoa đúng chỗ và không phạm design/language.md; FAIL khi một câu lệch ý, sai chỗ viết hoa, hoặc phạm luật chữ — nêu khoá và chữ nên thay"
+    evidence_required: [verdict, rationale]

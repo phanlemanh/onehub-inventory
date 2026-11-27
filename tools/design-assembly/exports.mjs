@@ -17,9 +17,12 @@ import path from "node:path";
 import { argv, cwd, exit, stderr, stdout } from "node:process";
 import { fileURLToPath } from "node:url";
 
+import { adapterOf } from "./adapters/index.mjs";
 import { tokenHex } from "./color.mjs";
 import { regenerated } from "./components.mjs";
-import { BASE_PX, CORNER_RADII } from "./scale.mjs";
+import { firstFamily, readLoads } from "./fonts.mjs";
+import { BASE_PX, CORNER_RADII, toRatio, TYPE_STEPS } from "./scale.mjs";
+import { DEFAULT_STYLESHEET, expand, findStylesheet, loadStyles, resolve } from "./styles.mjs";
 
 export const DESIGN_MD = "DESIGN.md";
 export const SYSTEM_FOLDER = "design/export/system";
@@ -37,6 +40,15 @@ const STAMP = /written from the design ledgers at ([0-9a-f]{12})/i;
 const OWNER = "design-assembly";
 // The steps of the type scale from which a size is a heading's.
 const HEADING_STEPS = ["xl", "2xl", "3xl", "4xl", "5xl"];
+// The families of type the stylesheet names, by the key the bundle gives each, and their variable.
+const values = adapterOf("values");
+const TYPE_FAMILIES = [
+  ["sans", values.fonts.text],
+  ["heading", values.fonts.heading],
+  ["mono", values.fonts.mono],
+].filter(([, variable]) => variable);
+// What a name of the bundle's tokens may be, as the tools that read it take one.
+const TOKEN_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$/;
 const SECTIONS = ["Overview", "Colors", "Typography", "Layout", "Shapes", "Do's and Don'ts"];
 
 const parse = (text) => {
@@ -65,11 +77,97 @@ const codeSpan = (text) => {
   return `${ticks}${ticks.length > 1 ? " " : ""}${text}${ticks.length > 1 ? " " : ""}${ticks}`;
 };
 
+// ---- the use of each colour role ----------------------------------------------------------------
+
+// What each colour role of the floor is for, as the plugin's table of colour roles measures it: the
+// grounds it is text on, the grounds it is a part against, or why it is measured in no pair. The
+// gate cannot read the plugin's references on the disk of a repository, so the pairs are kept here;
+// a test of the plugin holds them to its references/color-roles.json. An export writes a role's use
+// from these pairs and nothing else.
+export const ROLE_PAIRS = {
+  background: {},
+  foreground: { on: ["background"] },
+  card: {},
+  "card-foreground": { on: ["card"] },
+  popover: {},
+  "popover-foreground": { on: ["popover"] },
+  primary: { on: ["background"] },
+  "primary-foreground": { on: ["primary"] },
+  secondary: {},
+  "secondary-foreground": { on: ["secondary"] },
+  muted: {},
+  "muted-foreground": { on: ["muted", "background"] },
+  accent: {},
+  "accent-foreground": { on: ["accent"] },
+  destructive: { on: ["background"] },
+  success: { on: ["background"] },
+  warning: { on: ["background"] },
+  info: { on: ["background"] },
+  border: {
+    unmeasured:
+      "a border sets parts apart; it is not what a person reads, and the floor's own is lighter than 3:1 by design",
+  },
+  input: {
+    unmeasured:
+      "the edge of a field, drawn by the component with its own ground: the review measures it on the screen",
+  },
+  ring: { against: ["background"] },
+  "chart-1": {
+    unmeasured:
+      "a chart's colours are read beside each other on its plot, which the table does not know",
+  },
+  "chart-2": { unmeasured: "as --chart-1" },
+  "chart-3": { unmeasured: "as --chart-1" },
+  "chart-4": { unmeasured: "as --chart-1" },
+  "chart-5": { unmeasured: "as --chart-1" },
+  sidebar: {},
+  "sidebar-foreground": { on: ["sidebar"] },
+  "sidebar-primary": {},
+  "sidebar-primary-foreground": { on: ["sidebar-primary"] },
+  "sidebar-accent": {},
+  "sidebar-accent-foreground": { on: ["sidebar-accent"] },
+  "sidebar-border": { unmeasured: "as --border" },
+  "sidebar-ring": { against: ["sidebar"] },
+};
+
+const NOT_IN_TABLE =
+  "A colour role of this repository's own: the plugin's table of colour roles does not describe it.";
+
+// Why a role is measured in no pair, a reason that says `as --other` read as that role's.
+function unmeasured(role, seen = []) {
+  const reason = ROLE_PAIRS[role]?.unmeasured;
+  const other = /^as --([\w-]+)$/.exec(reason ?? "")?.[1];
+  if (other && !seen.includes(other)) return unmeasured(other, [...seen, role]);
+  return reason ?? null;
+}
+
+// The use of one colour role, in a sentence or a few, from the table's pairs among the roles the
+// repository has, and from the role it follows when it follows one.
+export function roleUse(role, roles, follows = null) {
+  const parts = [];
+  if (follows) parts.push(`Follows ${follows}: it takes that role's value.`);
+  const pairs = ROLE_PAIRS[role];
+  if (!pairs) return [...parts, NOT_IN_TABLE].join(" ");
+  const list = (items) => items.join(", ");
+  if (pairs.on?.length) parts.push(`Text on ${list(pairs.on)}.`);
+  if (pairs.against?.length) parts.push(`A part that is not text, against ${list(pairs.against)}.`);
+  const present = roles.filter((other) => other !== role);
+  const text = present.filter((other) => ROLE_PAIRS[other]?.on?.includes(role));
+  const against = present.filter((other) => ROLE_PAIRS[other]?.against?.includes(role));
+  if (text.length > 0) parts.push(`Ground of the text ${list(text)}.`);
+  if (against.length > 0) parts.push(`Ground of the parts ${list(against)}.`);
+  const why = unmeasured(role);
+  if (why) parts.push(`Measured in no pair: ${why}.`);
+  if (parts.length === (follows ? 1 : 0))
+    parts.push("A colour role of the floor, measured in no pair.");
+  return parts.join(" ");
+}
+
 // ---- what an export is made from ----------------------------------------------------------------
 
 // The inputs of every export, as data: the tokens file, the blueprint, the inputs of the tool data,
 // the component manifest and the sources, each read as the data it holds.
-export function inputsOf({ files, theme, sources }) {
+export function inputsOf({ files, theme, sources, type = null }) {
   return {
     tokens: parse(files[SOURCES.tokens]),
     blueprint: parse(files[SOURCES.blueprint]),
@@ -79,8 +177,52 @@ export function inputsOf({ files, theme, sources }) {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([, text]) => parse(text))
       .filter(Boolean),
+    type,
   };
 }
+
+// The type the stylesheet gives: each family it names (running text, headings, fixed width), as it
+// writes it and as the page gets it, with what loads it; and the line height of each step of the
+// scale. A family whose first item is a variable the build's font loader sets is the loader's
+// family where the loader names it; where it names none (local files), the family is null and the
+// bundle names no stack for it. Null with no stylesheet, or an empty one.
+export function typeOf(styles, loads = []) {
+  if (!styles?.css) return null;
+  const families = [];
+  for (const [key, variable] of TYPE_FAMILIES) {
+    // A variable the stylesheet does not declare names no family; one that points at itself, as a
+    // stylesheet does for a variable the build's font loader sets, is that variable.
+    if (resolve(styles, ":root", variable) === null) continue;
+    const css = expand(styles, ":root", `var(${variable})`).replace(/\s+/g, " ").trim();
+    const first = firstFamily(css);
+    const load = first.variable
+      ? loads.find((item) => item.variable === first.variable)
+      : loads.find(
+          (item) => item.family && item.family.toLowerCase() === first.name?.toLowerCase(),
+        );
+    const family = first.variable ? (load?.face ?? null) : (first.name ?? first.generic ?? null);
+    const stack = first.variable ? family && css.replace(/^var\([^)]*\)/, quoted(family)) : css;
+    families.push({
+      key,
+      variable,
+      css,
+      family,
+      stack: stack || null,
+      loaded_by: load?.by ?? null,
+      hosted: load?.via === "loader" && load?.loader === "google" ? "google" : null,
+    });
+  }
+  const leading = TYPE_STEPS.map(([step]) => [
+    step,
+    toRatio(expand(styles, ":root", `var(--text-${step}--line-height)`)),
+  ]).filter(([, ratio]) => ratio !== null);
+  return {
+    families,
+    line_heights: Object.fromEntries(leading.map(([step, ratio]) => [step, round(ratio)])),
+  };
+}
+
+const round = (value) => Number(value.toFixed(4));
 
 // The state of the ledgers the exports are written from: a hash of their data, so a file laid out
 // again by a formatter is the same state.
@@ -103,8 +245,11 @@ function coloursOf({ tokens, inputs }) {
   };
 }
 
+// The typeface of one family of the stylesheet, by its key, or null.
+const familyOf = (type, key) => type?.families?.find((item) => item.key === key)?.family ?? null;
+
 // The sizes of the type scale in pixels, the families, the corner radii and the spacing unit.
-function shapeOf({ tokens, inputs, blueprint }) {
+function shapeOf({ tokens, inputs, blueprint, type }) {
   const sizes = Object.entries(tokens?.text ?? {}).map(([step, token]) => [step, px(token.$value)]);
   const radii = Object.entries(tokens?.radius ?? {}).map(([step, token]) => [
     step,
@@ -116,8 +261,12 @@ function shapeOf({ tokens, inputs, blueprint }) {
     sizes: sizes.filter(([, size]) => size !== null),
     // The base corner first, unless the tokens name a step base of their own.
     radii: kept.some(([step]) => step === "base") ? kept : [["base", base], ...kept],
-    text: tokens?.font?.sans?.$value ?? null,
-    heading: tokens?.font?.heading?.$value ?? tokens?.font?.sans?.$value ?? null,
+    text: tokens?.font?.sans?.$value ?? familyOf(type, "sans"),
+    heading:
+      tokens?.font?.heading?.$value ??
+      tokens?.font?.sans?.$value ??
+      familyOf(type, "heading") ??
+      familyOf(type, "sans"),
     unit: blueprint?.layers?.foundations?.choice?.spacing_unit ?? "4px",
   };
 }
@@ -245,40 +394,91 @@ export function designMdProblems(text, file = DESIGN_MD) {
 
 // ---- the system bundle ---------------------------------------------------------------------------
 
-const token = (type, value) => ({ $type: type, $value: value });
-const colourTokens = (rows, prefix) =>
-  Object.fromEntries(
-    rows.map(([role, follows, value]) => [
-      role,
-      token("color", follows ? `{${prefix}${follows}}` : value),
-    ]),
-  );
-
-// The tokens of the bundle: colours of both themes, the dark ones under `color.dark`, the type scale
-// and its families, the corners and the spacing unit.
-function systemTokens(inputs, stamp) {
+// The tokens of the bundle, as the design system tools of an assistant read one: each family a
+// list of tokens with a name, a value and its use; colours with a value per theme, light first so
+// a reader that misses a theme takes the light one; a role that follows another as a reference to
+// it; type as its families and the steps of its scale. A name such a tool would not take is left
+// out of the lists and named under `$left_out`.
+function systemTokens(inputs, name, stamp) {
   const colours = coloursOf(inputs);
   const shape = shapeOf(inputs);
-  return {
+  const roles = colours.light.map(([role]) => role);
+  const dark = new Map(colours.dark.map(([role, , value]) => [role, value]));
+  const leftOut = [];
+  const named = (items) =>
+    items.filter((item) => {
+      if (TOKEN_NAME.test(item.name)) return true;
+      leftOut.push(item.name);
+      return false;
+    });
+  const colourTokens = colours.light.map(([role, follows, value]) => {
+    const alias = follows && roles.includes(follows) ? `{${follows}}` : null;
+    return {
+      name: role,
+      value: { light: alias ?? value, dark: alias ?? dark.get(role) },
+      usage: roleUse(role, roles, follows),
+    };
+  });
+  const families = Object.fromEntries(
+    (inputs.type?.families ?? [])
+      .filter((item) => item.stack)
+      .map((item) => [item.key, item.stack]),
+  );
+  const leading = inputs.type?.line_heights ?? {};
+  const style = (step, size, kind) => ({
+    name: `text-${step}`,
+    fontSize: `${size}px`,
+    ...(leading[step] ? { lineHeight: `${Math.round(size * leading[step] * 100) / 100}px` } : {}),
+    usage: `${kind}: step ${step} of the type scale.`,
+  });
+  const text = shape.sizes.filter(([step]) => !HEADING_STEPS.includes(step));
+  const headings = shape.sizes.filter(([step]) => HEADING_STEPS.includes(step));
+  const headingFamily = families.heading ? "heading" : families.sans ? "sans" : null;
+  const groups = [
+    ["Text", families.sans ? "sans" : null, text, "Running text"],
+    ["Headings", headingFamily, headings, "Headings"],
+  ]
+    .filter(([, , steps]) => steps.length > 0)
+    .map(([group, family, steps, kind]) => ({
+      name: group,
+      ...(family ? { family } : {}),
+      styles: named(steps.map(([step, size]) => style(step, size, kind))),
+    }));
+  const tokens = {
     $description: `Written from the design ledgers at ${stamp}. Do not change it here: change a ledger, then ${AGAIN}.`,
+    name,
+    version: 1,
     color: {
-      ...colourTokens(colours.light, "color."),
-      dark: colourTokens(colours.dark, "color.dark."),
+      themes: [
+        { id: "light", name: "Light" },
+        { id: "dark", name: "Dark" },
+      ],
+      tokens: named(colourTokens),
     },
-    font: {
-      family: {
-        ...(shape.text ? { body: token("fontFamily", shape.text) } : {}),
-        ...(shape.heading ? { heading: token("fontFamily", shape.heading) } : {}),
-      },
-      size: Object.fromEntries(
-        shape.sizes.map(([step, size]) => [step, token("dimension", `${size}px`)]),
+    type: { fonts: [], families, groups },
+    spacing: {
+      tokens: named([
+        {
+          name: "spacing-unit",
+          value: shape.unit,
+          usage: "The spacing unit: every distance is a multiple of it.",
+        },
+      ]),
+    },
+    radius: {
+      tokens: named(
+        shape.radii.map(([step, size]) => ({
+          name: `radius-${step}`,
+          value: `${size}px`,
+          usage:
+            step === "base"
+              ? "The base corner radius; the other steps derive from it."
+              : `Corner radius, step ${step}.`,
+        })),
       ),
     },
-    radius: Object.fromEntries(
-      shape.radii.map(([step, size]) => [step, token("dimension", `${size}px`)]),
-    ),
-    spacing: { unit: token("dimension", shape.unit) },
   };
+  return leftOut.length > 0 ? { ...tokens, $left_out: leftOut } : tokens;
 }
 
 // The files of the bundle, by their name in its folder.
@@ -292,12 +492,12 @@ export function systemBundle(inputs, name) {
       "",
       line,
       "",
-      "- `tokens.json`: colours of both themes (dark under `color.dark`), type, corners and spacing.",
+      "- `tokens.json`: colours with a value for the light theme and the dark, the families and the steps of the type scale, spacing and corner radius; each token with its use.",
       "- `components.md`: the components of the product, from its component manifest, listed and not drawn.",
-      "- `assets.json`: the fonts of its sources ledger, each with its pin and licence.",
+      "- `assets.json`: the families the stylesheet names, with what loads each, and the fonts of its sources ledger, each with its pin, licence and files.",
       "",
     ].join("\n"),
-    "tokens.json": `${JSON.stringify(systemTokens(inputs, stamp), null, 2)}\n`,
+    "tokens.json": `${JSON.stringify(systemTokens(inputs, name, stamp), null, 2)}\n`,
     "components.md": [
       "# Components",
       "",
@@ -312,6 +512,15 @@ export function systemBundle(inputs, name) {
     "assets.json": `${JSON.stringify(
       {
         $description: line,
+        typefaces: (inputs.type?.families ?? []).map(
+          ({ key, variable, family, loaded_by, hosted }) => ({
+            key,
+            variable,
+            family,
+            loaded_by,
+            hosted,
+          }),
+        ),
         fonts: inputs.sources
           .filter((source) => source.kind === "font")
           .map(({ id, family, pin, licence }) => ({
@@ -319,6 +528,13 @@ export function systemBundle(inputs, name) {
             family,
             pin: pin ?? null,
             licence: licence ?? null,
+            files: Array.isArray(pin?.files)
+              ? pin.files.map(({ file, weight, style }) => ({
+                  file,
+                  weight: weight ?? null,
+                  style: style ?? null,
+                }))
+              : [],
           })),
       },
       null,
@@ -373,7 +589,14 @@ export function unlistedProblems(listed) {
         `${file} is an export the tool data does not hold: write the exports again with the plugin's bring-out`,
     );
 }
-const EMPTY_INPUTS = { tokens: null, blueprint: null, inputs: {}, registry: null, sources: [] };
+const EMPTY_INPUTS = {
+  tokens: null,
+  blueprint: null,
+  inputs: {},
+  registry: null,
+  sources: [],
+  type: null,
+};
 
 // ---- on disk ------------------------------------------------------------------------------------
 
@@ -413,6 +636,7 @@ export function readInputs(root, files = {}) {
   const sources = Object.fromEntries(
     [...new Set(names)].filter((file) => file.endsWith(".json")).map((file) => [file, read(file)]),
   );
+  const theme = parse(read(SOURCES.theme));
   return inputsOf({
     files: withManifest(
       root,
@@ -420,9 +644,18 @@ export function readInputs(root, files = {}) {
         [SOURCES.tokens, SOURCES.blueprint, SOURCES.registry].map((file) => [file, read(file)]),
       ),
     ),
-    theme: parse(read(SOURCES.theme)),
+    theme,
     sources,
+    type: typeIn(root, theme, files),
   });
+}
+
+// The type of a repository's stylesheet, read from disk, or null where it has none.
+export function typeIn(root, theme, files = {}) {
+  const stylesheet = theme?.stylesheet ?? findStylesheet(root) ?? DEFAULT_STYLESHEET;
+  const styles = loadStyles(root, stylesheet, files);
+  if (styles.css === "") return null;
+  return typeOf(styles, readLoads(root, styles.css, stylesheet).loads);
 }
 
 // The name the tool data gives the exports, or null when it holds none.
