@@ -165,7 +165,11 @@ const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-(--region-height)";
 const FULL_SCREEN_HEIGHT_CLASS =
   "group-data-full-screen/region:h-(--region-full-height) lg:group-data-full-screen/region:h-(--region-full-height)";
 const REGION_HEIGHTS = {
-  "--region-height": "calc(100dvh - 23rem)",
+  // The screen less everything around the rows, top to bottom (owner, BH session 2026-11-27: the grid ends 16 px above
+  // the work area's bottom, like every other edge of the content): the inset's 8 px margin, the top bar 48, the content's
+  // 16 padding, the page header 32 and the 16 gap, the region's head down to the column headers 96, the footer and the
+  // frame's bottom 42, the content's 16 padding and the inset's 8 margin = 282 px.
+  "--region-height": "calc(100dvh - 17.625rem)",
   "--region-full-height": "calc(100dvh - 10rem)",
 } as CSSProperties;
 

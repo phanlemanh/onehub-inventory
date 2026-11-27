@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useSyncExternalStore } from "react";
@@ -30,6 +31,12 @@ import {
   type NavLink,
 } from "../nav-menu";
 import { usePlaceChange } from "./place-change";
+
+/**
+ * The column's longest run: the screen less the top bar (3rem) and the inset's 8 px margin above and below, so the
+ * column never makes the page taller than the screen (owner, BH session 2026-11-27: Bảng hàng at the right height).
+ */
+const COLUMN_HEIGHT = { "--second-column-height": "calc(100svh - 4rem)" } as CSSProperties;
 
 const COPY = FRAME_COPY.secondColumn;
 
@@ -219,9 +226,12 @@ export function SecondColumn({
     >
       <aside
         data-slot="app-shell-second-column"
+        style={COLUMN_HEIGHT}
         data-state={open ? "open" : "closed"}
         className={cn(
-          "sticky top-12 max-h-svh self-start overflow-x-hidden overflow-y-auto pb-12",
+          // Ends at the work area's bottom (screen less the top bar and the inset's two 8 px margins), so the column never makes
+          // the page taller than the screen (owner, BH session 2026-11-27: Bảng hàng at the right height).
+          "sticky top-12 max-h-(--second-column-height) self-start overflow-x-hidden overflow-y-auto pb-4",
           open ? "w-56" : "w-0",
         )}
       >
