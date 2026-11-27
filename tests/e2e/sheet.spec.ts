@@ -533,6 +533,7 @@ test.describe("sheet tab stops", () => {
         // gone (owner, BH session 2026-11-27, L1).
         const stops = await phoneTabStops(page);
         expect(stops).not.toContain("Thêm");
+        expect(stops).not.toContain("Lưu góc nhìn");
         const cards = await page.locator('[data-slot="phone-card"]').count();
         checkPhoneStops(
           stops,
@@ -1113,11 +1114,46 @@ test.describe("header buttons in view", () => {
     }
   });
 
+  /**
+   * L4: no header shows a «Bỏ ghim» button; the last column pinned at the start casts the pinned-edge shadow on its
+   * header and on its body cells, and no other pinned column does.
+   */
+  async function assertPinnedEdge(page: Page): Promise<void> {
+    const g = await page.evaluate(() => {
+      const shadowed = (el: Element) => /6px 0px 6px -6px/.test(getComputedStyle(el).boxShadow);
+      const pinned = [
+        ...document.querySelectorAll(
+          '[data-slot="data-region-body"] :is(th, td)[data-pinned="start"]',
+        ),
+      ];
+      const last = pinned.filter((el) => el.getAttribute("data-last-col") === "start");
+      const unpinButtons = [
+        ...document.querySelectorAll('[data-slot="data-region-body"] thead button'),
+      ].filter(
+        (b) =>
+          (b as HTMLElement).offsetParent !== null &&
+          /^Bỏ ghim /.test(b.getAttribute("aria-label") ?? ""),
+      ).length;
+      return {
+        unpinButtons,
+        lastHead: last.filter((el) => el.tagName === "TH").length,
+        lastBody: last.filter((el) => el.tagName === "TD").length,
+        lastShadowed: last.every(shadowed),
+        otherShadowed: pinned.filter((el) => !last.includes(el)).some(shadowed),
+      };
+    });
+    if (g.unpinButtons > 0) throw new Error(`header shows «Bỏ ghim» buttons: ${g.unpinButtons}`);
+    if (g.lastHead === 0 || g.lastBody === 0 || !g.lastShadowed)
+      throw new Error("no pinned edge shadow");
+    if (g.otherShadowed) throw new Error("shadow on a pinned column that is not the last");
+  }
+
   test("a column pins from its menu and casts a shadow over the columns scrolling under it", async ({
     page,
   }) => {
     if (isPhone(page)) return phoneStandIn(page, "header buttons");
     await openInventory(page);
+    await assertPinnedEdge(page);
     const price = page
       .locator('[data-slot="data-region-body"] thead th[data-col-id="Listing.listPrice"]')
       .first();
@@ -1125,11 +1161,26 @@ test.describe("header buttons in view", () => {
     await page.getByRole("menuitem", { name: "Ghim bên trái" }).click();
     await page.keyboard.press("Escape");
     await expect(price).toHaveAttribute("data-pinned", "start");
-    const edge = page.locator(
-      '[data-slot="data-region-body"] thead th[data-pinned="start"][data-last-col="start"]',
-    );
-    await expect(edge).toHaveCount(1);
-    expect(await edge.evaluate((el) => getComputedStyle(el).boxShadow)).toMatch(/6px 0px 6px -6px/);
+    await assertPinnedEdge(page);
+  });
+
+  test("break: a «Bỏ ghim» button back on a header is caught", async ({ page }) => {
+    if (isPhone(page)) return phoneStandInBreak(page, "header buttons");
+    await openInventory(page);
+    await themKieu(page, {
+      content: "thead span:has(>button>svg.lucide-pin-off) { display: flex !important; }",
+    });
+    await expect(assertPinnedEdge(page)).rejects.toThrow("header shows «Bỏ ghim» buttons");
+  });
+
+  test("break: a pinned edge without its shadow is caught", async ({ page }) => {
+    if (isPhone(page)) return phoneStandInBreak(page, "header buttons");
+    await openInventory(page);
+    await themKieu(page, {
+      content:
+        '[data-slot="data-region-body"] :is(th, td)[data-pinned] { box-shadow: none !important; }',
+    });
+    await expect(assertPinnedEdge(page)).rejects.toThrow("no pinned edge shadow");
   });
 
   test("the check fails when the next header covers the first column's buttons", async ({

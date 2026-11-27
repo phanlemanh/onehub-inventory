@@ -278,6 +278,8 @@ async function checkTouchTargets(page: Page): Promise<void> {
       throw new Error(`touch target under 44px: ${slot} ${box.w}×${box.h}`);
     boxes.push({ slot, ...box });
   }
+  const bar = (await page.locator('[data-slot="phone-toolbar"]').boundingBox())!;
+  if (bar.height > 60) throw new Error(`toolbar wraps: ${bar.height}px`);
   const filter = page.locator('[data-slot="phone-filter-button"]');
   if (!/^Lọc/.test((await filter.innerText()).trim())) throw new Error("«Lọc» shows no word");
   if ((await page.locator('[data-slot="phone-toolbar"] [data-slot="phone-more"]').count()) > 0)
@@ -298,6 +300,15 @@ test.describe("vung-cham (BH 2026-11-27, L1 and L5)", () => {
       await page.locator('[data-slot="phone-filter-button"]').click({ position: { x: 2, y: 2 } });
       await expect(page.getByRole("dialog", { name: "Lọc" })).toBeVisible();
     });
+
+  test("break: a toolbar that runs to two lines is caught", async ({ page }) => {
+    await openAt(page, 360);
+    await themKieu(page, {
+      content:
+        '[data-slot="phone-toolbar"], [data-slot="phone-toolbar"] > div { flex-wrap: wrap !important; } [data-slot="phone-toolbar"] > div { width: 100% !important; } [data-slot="phone-actions"] { flex-basis: 100% !important; }',
+    });
+    await expect(checkTouchTargets(page)).rejects.toThrow("toolbar wraps");
+  });
 
   test("break: a toolbar button back at 36 px is caught", async ({ page }) => {
     await openAt(page, 360);

@@ -125,6 +125,11 @@ async function handleOnEdge(page: Page): Promise<{ framed: boolean; hint: string
   return { framed, hint };
 }
 
+function assertHandleShown(shown: { framed: boolean; hint: string | null }): void {
+  if (!shown.framed) throw new Error("fold handle not shown on the edge");
+  if (shown.hint !== "Gập cột thứ hai") throw new Error(`fold handle hint ${shown.hint}`);
+}
+
 test.describe("L6 · the second column's fold handle shows on its edge", () => {
   test.beforeEach(({ page }) => test.skip(isPhone(page), "cột thứ hai từ 768"));
 
@@ -136,9 +141,7 @@ test.describe("L6 · the second column's fold handle shows on its edge", () => {
         .locator('[data-slot="second-column-rail-frame"]')
         .evaluate((el) => getComputedStyle(el).boxShadow),
     ).toBe("none");
-    const shown = await handleOnEdge(page);
-    expect(shown.framed, "handle framed on the edge").toBe(true);
-    expect(shown.hint).toBe("Gập cột thứ hai");
+    assertHandleShown(await handleOnEdge(page));
   });
 
   test("break: an edge that does not answer the pointer is caught", async ({ page }) => {
@@ -146,6 +149,161 @@ test.describe("L6 · the second column's fold handle shows on its edge", () => {
     await themKieu(page, {
       content: '[data-slot="second-column-edge-hover"] { pointer-events: none !important; }',
     });
-    expect((await handleOnEdge(page)).framed).toBe(false);
+    const shown = await handleOnEdge(page);
+    expect(() => assertHandleShown(shown)).toThrow("fold handle not shown on the edge");
+  });
+});
+
+// ---- Q2 · the grid fits the screen (owner, BH session 2026-11-27, «Chốt cả bốn») ---------------------------------------
+
+/** The page does not scroll down, and the grid's frame ends 16 px above the work area's bottom. */
+async function gridFit(page: Page): Promise<{ extra: number; gap: number }> {
+  return page.evaluate(() => {
+    const area = document.querySelector('[data-slot="sidebar-inset"]')!.getBoundingClientRect();
+    const region = document.querySelector('[data-slot="data-region"]')!.getBoundingClientRect();
+    const scroller = document.scrollingElement!;
+    return {
+      extra: scroller.scrollHeight - scroller.clientHeight,
+      gap: Math.min(area.bottom, window.innerHeight) - region.bottom,
+    };
+  });
+}
+
+function assertGridFits(g: { extra: number; gap: number }): void {
+  if (g.extra > 1) throw new Error(`page scrolls ${g.extra}px below the grid`);
+  if (Math.abs(g.gap - 16) > 4)
+    throw new Error(`grid ends ${g.gap}px above the work area's bottom`);
+}
+
+test.describe("Q2 · the grid fits the screen", () => {
+  test.beforeEach(({ page }) => test.skip(isPhone(page), "bảng từ 768"));
+
+  test("no page scroll below the grid; the grid ends 16 px above the bottom", async ({ page }) => {
+    await openInventory(page);
+    await expect(async () => assertGridFits(await gridFit(page))).toPass({ timeout: 3000 });
+  });
+
+  test("break: a second column taller than the screen makes the page scroll", async ({ page }) => {
+    await openInventory(page);
+    await themKieu(page, {
+      content:
+        '[data-slot="app-shell-second-column"] { max-height: none !important; min-height: 200vh !important; }',
+    });
+    await page.waitForTimeout(300);
+    expect(() => assertGridFits({ extra: 0, gap: 40 })).toThrow("grid ends");
+    const g = await gridFit(page);
+    expect(() => assertGridFits(g)).toThrow("page scrolls");
+  });
+});
+
+// ---- Q3 · the floating record lies on its own surface ----------------------------------------------------------------
+
+/** The floating record's surface: the popover colour, a line on its left, a shadow over the grid. */
+async function recordSurface(
+  page: Page,
+): Promise<{ bg: string; popover: string; left: string; shadow: string }> {
+  // A probe element reads the popover colour, so this goes through the shared door for page changes.
+  return suaTrang(page, () => {
+    const aside = document.querySelector('[data-slot="record-panel"]')!.closest('[role="dialog"]')!;
+    const style = getComputedStyle(aside);
+    const probe = document.createElement("div");
+    probe.className = "bg-popover";
+    document.body.append(probe);
+    const popover = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return {
+      bg: style.backgroundColor,
+      popover,
+      left: style.borderLeftWidth,
+      shadow: style.boxShadow,
+    };
+  });
+}
+
+function assertSurface(s: { bg: string; popover: string; left: string; shadow: string }): void {
+  if (s.bg !== s.popover) throw new Error(`record surface ${s.bg}, not the popover ${s.popover}`);
+  if (parseFloat(s.left) < 1) throw new Error("record has no line on its left");
+  if (s.shadow === "none") throw new Error("record casts no shadow");
+}
+
+test.describe("Q3 · the floating record lies on its own surface", () => {
+  test.beforeEach(({ page }) => test.skip(isPhone(page), "ngăn nổi từ 768"));
+
+  for (const colorScheme of ["light", "dark"] as const)
+    test(`popover colour, left line, shadow (${colorScheme})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme });
+      await openInventory(page);
+      await page.locator("[data-record-open]:visible").nth(4).click();
+      await expect(page.locator('[data-slot="record-panel"]')).toHaveAttribute(
+        "data-record-layout",
+        "float",
+      );
+      assertSurface(await recordSurface(page));
+    });
+
+  test("break: a record on the page's own colour without a shadow is caught", async ({ page }) => {
+    await openInventory(page);
+    await themKieu(page, {
+      content:
+        '[role="dialog"]:has([data-slot="record-panel"]) { background: var(--background) !important; box-shadow: none !important; }',
+    });
+    await page.locator("[data-record-open]:visible").nth(4).click();
+    await expect(page.locator('[data-slot="record-panel"]')).toBeVisible();
+    const s = await recordSurface(page);
+    expect(() => assertSurface(s)).toThrow(/not the popover|no shadow/);
+  });
+});
+
+// ---- Q1, Q3, Q4 on Đã gửi: the same frame on the second grid screen ------------------------------------------------
+
+/** On Đã gửi with a record floating: under the top bar, on its own surface, the toolbar 16 px short of it. */
+async function sentFrame(page: Page): Promise<void> {
+  const g = await page.evaluate(() => {
+    const aside = document.querySelector('[data-slot="record-panel"]')!.closest('[role="dialog"]')!;
+    const a = aside.getBoundingClientRect();
+    const bar = document.querySelector('[data-slot="app-shell-top-bar"]')!.getBoundingClientRect();
+    const controls = [
+      ...document.querySelectorAll(
+        '[data-slot="region-toolbar"] button, [data-slot="region-toolbar"] a',
+      ),
+    ].filter((el) => (el as HTMLElement).offsetParent !== null);
+    const right = controls.length
+      ? Math.max(...controls.map((el) => el.getBoundingClientRect().right))
+      : null;
+    const style = getComputedStyle(aside);
+    return { top: a.top, left: a.left, bar: bar.bottom, right, shadow: style.boxShadow };
+  });
+  if (Math.abs(g.top - g.bar) > 2)
+    throw new Error(`record top ${g.top} not under the top bar ${g.bar}`);
+  if (g.shadow === "none") throw new Error("record casts no shadow");
+  if (g.right !== null && g.right > g.left - 16 + 1)
+    throw new Error(`toolbar runs under the record: ends ${g.right}, record at ${g.left}`);
+}
+
+test.describe("Đã gửi · the same frame as Bảng hàng", () => {
+  test.beforeEach(({ page }) => test.skip(isPhone(page), "ngăn nổi từ 768"));
+
+  async function openSent(page: Page): Promise<void> {
+    await page.goto("/sent?role=ListAgent");
+    await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
+    await expect(table(page)).toHaveAttribute("tabindex", "0");
+    await page.locator("[data-record-open]:visible").first().click();
+    await expect(page.locator('[data-slot="record-panel"]')).toHaveAttribute(
+      "data-record-layout",
+      "float",
+    );
+    await page.waitForTimeout(300);
+  }
+
+  test("record under the top bar, on its own surface, toolbar clear of it", async ({ page }) => {
+    await openSent(page);
+    await expect(async () => sentFrame(page)).toPass({ timeout: 3000 });
+  });
+
+  test("break: a record from the top of the screen is caught", async ({ page }) => {
+    await openSent(page);
+    await themKieu(page, { content: '[data-slot="record-panel-layer"] { top: 0 !important; }' });
+    await page.waitForTimeout(300);
+    await expect(sentFrame(page)).rejects.toThrow("not under the top bar");
   });
 });
