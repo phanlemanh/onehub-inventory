@@ -139,3 +139,6 @@ sai luật) × vai (ba vai sửa · Quản trị sàn) × khổ (360 · 1440). T
   - Ngoài-5: một bài kiểm tra màn dùng thân trả lời lỗi viết tay, nên không thấy khi máy chủ đổi dạng trả lời.
   - Ngoài-6: bộ canh «chỉ một bảng mã lỗi» còn hở vài cách viết so mã.
   - Ngoài-7: bài kiểm tra phím ⌘B không mở rộng thanh bên chưa chứng minh phím có tới nơi.
+- Ghi sau ký 2026-11-27: dòng ngoài phạm vi «Sửa thông tin của căn (tầng, hướng, diện tích) — … hàng «Báo sai thông tin» 3e» nay trỏ sang
+  hàng 3h `tin-rao-giu-gia-tri-rieng`. Chủ kho chốt hướng «Tin rao giữ giá trị riêng, Danh bạ chỉ làm giàu» ngày 27/11 (G-2711-1): sàn sửa
+  các thuộc tính ấy trên tin rao của mình; «Báo sai thông tin» còn cho người không có quyền sửa. Hàng 3g không đổi mã vì ghi chú này.
