@@ -413,7 +413,16 @@ describe("ap (E9)", () => {
       ),
       first.id!,
     );
-    expect(again.status).toBe(409);
+    // The last batch sent again after the import is done (its answer lost on the way back): the same count and the
+    // same learned items as the first answer, nothing written twice (S4-r3 t8).
+    expect(again.status).toBe(200);
+    const body = (await again.json()) as {
+      created: number;
+      done: boolean;
+      learned?: LearnedItem[];
+    };
+    expect([body.created, body.done, body.learned]).toEqual([3, true, first.body?.learned]);
+    expect(await count(e, "select count(*) as n from listings")).toBe(3);
     const second = await applyAll(e, "LA", rowsOf(e.codes), { ...CHOICES, units: {} });
     expect(second.body?.created ?? 0).toBe(0);
     expect(await count(e, "select count(*) as n from listings")).toBe(3);
@@ -629,6 +638,17 @@ describe("hoan tac (E14)", () => {
     expect(
       (await e.h.undo(req(`${URL_}/${r.id}/undo`, "POST", {}, await e.cookie("LA")), r.id!)).status,
     ).toBe(409);
+    // An undone import takes no batch, not even one it had written: 409 closed, nothing comes back.
+    const late = await sendBatch(e, "LA", r.id!, {
+      headers: HEADERS,
+      rows: rowsOf(e.codes),
+      choices: CHOICES,
+      batchNo: 0,
+      rowOffset: 0,
+      last: true,
+    });
+    expect([late.status, late.error]).toEqual([409, "closed"]);
+    expect(await count(e, "select count(*) as n from listings")).toBe(1);
   });
 });
 
@@ -717,8 +737,9 @@ const statusTableFault = (written: readonly (string | null)[]) => {
   );
   return s ? `import skipped the status table: Incomplete -> ${s}` : null;
 };
-const resendFault = (before: number, after: number, created: number) =>
-  after !== before || created > 0 ? "batch resend created duplicates" : null;
+// A batch sent again answers what it wrote the first time (S4-r3 t8) and writes nothing: the listings stay as they were.
+const resendFault = (before: number, after: number) =>
+  after !== before ? "batch resend created duplicates" : null;
 const insertFault = (outcome: "allowed" | "refused") =>
   outcome === "allowed" ? "insert allowed without createListing" : null;
 const undoFault = (removed: readonly string[], edited: string, stillThere: boolean) =>
@@ -1087,18 +1108,21 @@ describe("ap (E9) — audit", () => {
     // Batch 1 again while the import is still open: the import knows it is written.
     const before = await listings();
     const resent = await batch(0);
-    expect([resent.status, resent.created]).toEqual([200, 0]);
-    expect(resendFault(before, await listings(), resent.created ?? 0)).toBeNull();
+    expect([resent.status, resent.created]).toEqual([200, 200]);
+    expect(resendFault(before, await listings())).toBeNull();
     expect((await batch(1)).created).toBe(200);
     expect(await learnedRows()).toBe(0);
     expect((await batch(2)).created).toBe(50);
     expect(await listings()).toBe(450);
     expect(await learnedRows()).toBeGreaterThan(0);
-    // After the last batch the import is closed: batch 1 once more is 409 and writes nothing.
+    // After the last batch, a batch sent again — its answer lost on the way back — answers its own count again and
+    // writes nothing: batch 1 says 200, the last one says 50 (S4-r3 t8).
     const late = await batch(0);
-    expect([late.status, late.error]).toEqual([409, "closed"]);
-    expect(resendFault(450, await listings(), 0)).toBeNull();
-    expect(resendFault(450, 650, 200)).toBe("batch resend created duplicates");
+    expect([late.status, late.created]).toEqual([200, 200]);
+    const lastAgain = await batch(2);
+    expect([lastAgain.status, lastAgain.created]).toEqual([200, 50]);
+    expect(resendFault(450, await listings())).toBeNull();
+    expect(resendFault(450, 650)).toBe("batch resend created duplicates");
   });
 
   it("list agents: a team lead of B gets none of A's, ids and names only; a team lead of A naming B's person is refused (break pinned)", async () => {
