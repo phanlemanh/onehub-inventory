@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui, api]
 screens: [inventory]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-17T03:37:45Z
 design_doc: docs/superpowers/specs/2026-11-17-sua-thong-tin-can-design.md
@@ -131,3 +131,11 @@ sai luật) × vai (ba vai sửa · Quản trị sàn) × khổ (360 · 1440). T
 - Ngoài-5 (máy định tuyến 2026-11-26, đề xuất S4 known-limits): Một bài kiểm tra màn dùng thân trả lời lỗi viết tay. Nếu máy chủ đổi dạng trả lời, bài này không phát hiện. — `tests/sua-thong-tin-can.test.tsx`
 - Ngoài-6 (máy định tuyến 2026-11-26, đề xuất S4 known-limits): Bộ canh giữ để không ai thêm bảng mã lỗi thứ hai còn hở: vài cách viết so mã vẫn lọt. Người dùng có thể gặp thông báo lỗi lệch nhau nếu sau này có người viết như vậy. — `tests/mot-luat-ghi.test.ts`
 - Ngoài-7 (máy định tuyến 2026-11-26, đề xuất S4 known-limits): Bài kiểm tra việc bấm ⌘B không mở rộng thanh bên chưa chứng minh phím có tới nơi. Nếu phím hỏng, bài vẫn xanh. — `tests/e2e/app-shell.spec.ts`
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-27:
+  - Ngoài-1: bản mẫu dùng cho thử nghiệm nhận cả giá trị cột riêng mà máy chủ thật sẽ từ chối, nên một bài thử có thể báo xanh nhầm.
+  - Ngoài-2: khi căn biến mất giữa lúc sửa, ô vẫn hiện giá trị vừa gõ dù thông báo nói ô đã về giá trị cũ; tải lại trang là đúng.
+  - Ngoài-3: bài kiểm tra chưa chứng minh Quản trị sàn không mở được ô cột riêng.
+  - Ngoài-4: một số bài kiểm tra về giá trị cột riêng đo bản chép trong bài, không đo đường máy chủ thật.
+  - Ngoài-5: một bài kiểm tra màn dùng thân trả lời lỗi viết tay, nên không thấy khi máy chủ đổi dạng trả lời.
+  - Ngoài-6: bộ canh «chỉ một bảng mã lỗi» còn hở vài cách viết so mã.
+  - Ngoài-7: bài kiểm tra phím ⌘B không mở rộng thanh bên chưa chứng minh phím có tới nơi.
