@@ -1,18 +1,19 @@
 # Components
 
-Written from the design ledgers at eb3e4b366ba0. Do not change it here: change a ledger, then write it again with make design-exports.
+Written from the design ledgers at f1f0bbbc4e26. Do not change it here: change a ledger, then write it again with make design-exports.
 
 - **ActionPermissionProvider** (atom), `src/components/candidate/action-permission.tsx`: permitted
 - **CellEditor** (atom), `src/components/candidate/cell-editor.tsx`: anchor, find, label, onClose
 - **ColumnFilterCell** (organism), `src/components/candidate/column-filter-cell.tsx`: spec, column, options
 - **DataRegion** (template), `src/components/candidate/data-region.tsx`: title, columns, rows, status, onRetry, onCancel, emptyWhy, emptyAction, action, headAction, rowActions, record, editable, cellEdit, initialFilters, groupBy, initialView, onViewChange, hiddenAtFirst, phoneList
+- **InDialog** (organism), `src/components/candidate/form-dialog.tsx`: value
 - **FormDialog** (organism), `src/components/candidate/form-dialog.tsx`: trigger, title, description, submitLabel, busyLabel, busy, open, onOpenChange, onSubmit, formError, refused, slot, badge, canSubmit, focusSubmit
 - **ListFace** (organism), `src/components/candidate/framed-list.tsx`: name, sub, avatar
 - **FramedList** (template), `src/components/candidate/framed-list.tsx`: title, count, headAction, rows, footer, slot, controlWidth
 - **PastePreviewBody** (organism), `src/components/candidate/paste-preview.tsx`: changes, skipped, wrong, picked, setPicked, busy
 - **PastePreview** (organism), `src/components/candidate/paste-preview.tsx`: open, title, changes, skipped, wrong, same, busy, onApply, onClose
 - **PhoneList** (organism), `src/components/candidate/phone-list.tsx`: list, data, columns, column, options, activeFields, count, group, more, rowAction, sort, onOpen, onClear, noMatch
-- **RecordPanel** (molecule), `src/components/candidate/record-panel.tsx`: ids, openId, onNavigate, render, returnFocus
+- **RecordPanel** (organism), `src/components/candidate/record-panel.tsx`: ids, openId, onNavigate, render, returnFocus
 - **RegionTitle** (atom), `src/components/candidate/region-header.tsx`: title
 - **RegionToolbar** (atom), `src/components/candidate/region-header.tsx`: total, shown, action, tools, showCount
 - **RegionHeader** (atom), `src/components/candidate/region-header.tsx`
@@ -136,6 +137,9 @@ Written from the design ledgers at eb3e4b366ba0. Do not change it here: change a
 - **FrameFooter** (atom), `src/components/reui/frame.tsx`
 - **AppShell** (template), `src/components/templates/app-shell.tsx`: nav, roles, company, account, search, columnOpen
 - **PlaceChangeProvider** (template), `src/components/templates/app-shell/place-change.tsx`
+- **ShellNavProvider** (template), `src/components/templates/app-shell/place-crumb.tsx`: items, roles
+- **PlaceCrumb** (template), `src/components/templates/app-shell/place-crumb.tsx`: title
+- **RailProvider** (template), `src/components/templates/app-shell/rail-provider.tsx`
 - **SecondColumnNav** (template), `src/components/templates/app-shell/second-column.tsx`: items, roles
 - **SecondColumn** (template), `src/components/templates/app-shell/second-column.tsx`: items, roles, initialOpen
 - **LoginLayout** (template), `src/components/templates/login-layout.tsx`: heading, lead, footer
@@ -149,7 +153,7 @@ Written from the design ledgers at eb3e4b366ba0. Do not change it here: change a
 - **HiddenInFocus** (template), `src/components/templates/shell-focus.tsx`
 - **ShellContent** (template), `src/components/templates/shell-focus.tsx`
 - **ThemeProvider** (template), `src/components/templates/theme.tsx`
-- **ThemeSwitch** (template), `src/components/templates/theme.tsx`
+- **ThemeMenuChoice** (template), `src/components/templates/theme.tsx`
 - **Avatar** (atom), `src/components/ui/avatar.tsx`: size
 - **AvatarImage** (atom), `src/components/ui/avatar.tsx`
 - **AvatarFallback** (atom), `src/components/ui/avatar.tsx`
