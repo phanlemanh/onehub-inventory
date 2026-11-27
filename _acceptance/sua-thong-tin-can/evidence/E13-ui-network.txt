@@ -1,0 +1,6 @@
+E13-ui network (driver: playwright script, origin http://127.0.0.1:3487, lane H sample mode)
+200 1440 GET document http://127.0.0.1:3487/inventory?role=ListAgent
+200 1024 GET document http://127.0.0.1:3487/inventory?role=ListAgent
+requestfailed events: none
+fetch/xhr to app origin: none observed (SSR page)
+console errors/warnings: none

@@ -1,0 +1,1 @@
+Row 3g: the four details of a listing edited on grid cells and in the unit record, custom values edited on cells by kind, one rule for write failures (session ended, server fault) — [sua-thong-tin-can](../_acceptance/sua-thong-tin-can/contract.md)

@@ -5,12 +5,18 @@
 import type {
   Listing,
   ListingFeeInclusion,
+  ListingFurnished,
+  ListingOccupantType,
   ListingStandardStatus,
   ListingWithdrawnReason,
 } from "../../generated/ontology";
 
 import {
+  DETAILS_TEXT_LIMIT,
+  FURNISHED_VALUES,
+  OCCUPANT_VALUES,
   canMove,
+  detailsLocked,
   priceLocked,
   readPrice,
   statusLocked,
@@ -29,16 +35,42 @@ export type PriceOrStatusChange =
       withdrawnReason?: ListingWithdrawnReason;
     };
 
-/** One edit of a listing: a price or status change, or the fee inclusion chosen on its cell (row 10, AC-7). */
-export type ListingChange =
-  PriceOrStatusChange | { field: "feeInclusion"; feeInclusion: ListingFeeInclusion };
+/**
+ * The four details edited together in the record (row 3g): only the parts named change; `null` clears a part. Legal
+ * status and financing are free words (Hỏi-1 of row 3b), already trimmed; furnished and occupant type are fixed values.
+ */
+export type DetailsChange = {
+  field: "details";
+  legalStatus?: string | null;
+  furnished?: ListingFurnished | null;
+  financing?: string | null;
+  occupantType?: ListingOccupantType | null;
+};
 
-/** Why a change breaks a rule; the cell never sends one, so this answer means a cell let it through. */
+/** One value of one of the company's own fields (row 7e), set on its cell (row 3g); `null` clears it. */
+export type CustomFieldChange = {
+  field: "customField";
+  code: string;
+  value: string | number | boolean | null;
+};
+
+/** One edit of a listing: a price or status change, the fee inclusion (row 10), its details or a custom value (3g). */
+export type ListingChange =
+  | PriceOrStatusChange
+  | { field: "feeInclusion"; feeInclusion: ListingFeeInclusion }
+  | DetailsChange
+  | CustomFieldChange;
+
+/** Why a change breaks a rule; the editors never send one, so this answer means an editor let it through. */
 export type Invalid =
   | { rule: "locked" }
   | { rule: "move"; from: ListingStandardStatus; to: ListingStandardStatus }
   | { rule: "price" }
-  | { rule: "needs"; needs: StatusNeed[] };
+  | { rule: "needs"; needs: StatusNeed[] }
+  /** A detail outside its fixed values, or words longer than DETAILS_TEXT_LIMIT. */
+  | { rule: "details" }
+  /** A custom value the company's field does not take (the reason of checkCustomValue, row 7e). */
+  | { rule: "custom"; reason: string };
 
 export type SaveOutcome =
   | { kind: "saved"; listing: Listing }
@@ -46,7 +78,37 @@ export type SaveOutcome =
   | { kind: "offline" }
   /** The listing changed (or was removed: no `current`) since the person read it. */
   | { kind: "conflict"; current?: Listing }
-  | { kind: "invalid"; why: Invalid };
+  | { kind: "invalid"; why: Invalid }
+  /** The session ended (401): the person signs in again (row 3g, debt of row 10). */
+  | { kind: "expired" }
+  /** The server failed or its answer could not be read (row 3g, debt of row 10). */
+  | { kind: "fault" };
+
+/** Whether one of the company's fields takes a value: checkCustomValue of the company layer, handed in by the caller. */
+export type CustomCheck = (
+  code: string,
+  value: string | number | boolean,
+) => { ok: true } | { ok: false; reason: string };
+
+const isText = (v: unknown): v is string | null | undefined =>
+  v === undefined ||
+  v === null ||
+  (typeof v === "string" && v.trim() === v && v !== "" && v.length <= DETAILS_TEXT_LIMIT);
+const isOneOf = <T>(set: readonly T[], v: unknown): boolean =>
+  v === undefined || v === null || set.includes(v as T);
+
+/** A listing with one part set, or taken off when the value is null. */
+function withPart<K extends keyof Listing>(
+  listing: Listing,
+  key: K,
+  value: Listing[K] | null | undefined,
+): Listing {
+  if (value === undefined) return listing;
+  const next = { ...listing };
+  if (value === null) delete next[key];
+  else next[key] = value;
+  return next;
+}
 
 export interface SaveRequest {
   id: string;
@@ -66,8 +128,35 @@ export function applyChange(
   listing: Listing,
   change: ListingChange,
   at: string,
+  custom?: CustomCheck,
 ): { ok: true; listing: Listing } | { ok: false; why: Invalid } {
   const confirmed = { ...listing, version: listing.version + 1, lastConfirmedAt: at };
+  if (change.field === "details") {
+    if (detailsLocked(listing.standardStatus)) return { ok: false, why: { rule: "locked" } };
+    const fine =
+      isText(change.legalStatus) &&
+      isText(change.financing) &&
+      isOneOf(FURNISHED_VALUES, change.furnished) &&
+      isOneOf(OCCUPANT_VALUES, change.occupantType);
+    if (!fine) return { ok: false, why: { rule: "details" } };
+    let next: Listing = confirmed;
+    next = withPart(next, "legalStatus", change.legalStatus);
+    next = withPart(next, "furnished", change.furnished);
+    next = withPart(next, "financing", change.financing);
+    next = withPart(next, "occupantType", change.occupantType);
+    return { ok: true, listing: next };
+  }
+  if (change.field === "customField") {
+    if (detailsLocked(listing.standardStatus)) return { ok: false, why: { rule: "locked" } };
+    const values = { ...((listing.customFields as Record<string, unknown> | undefined) ?? {}) };
+    if (change.value === null) delete values[change.code];
+    else {
+      const check = custom?.(change.code, change.value) ?? { ok: true };
+      if (!check.ok) return { ok: false, why: { rule: "custom", reason: check.reason } };
+      values[change.code] = change.value;
+    }
+    return { ok: true, listing: { ...confirmed, customFields: values } };
+  }
   if (change.field === "listPrice") {
     if (priceLocked(listing.standardStatus)) return { ok: false, why: { rule: "locked" } };
     if (!Number.isInteger(change.listPrice) || !readPrice(String(change.listPrice)).ok)
