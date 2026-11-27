@@ -314,6 +314,10 @@ export function RecordPanel({
   );
 }
 
+/** The record column's inner box: no clipping, so the floating record's shadow shows on the grid. */
+// eslint-disable-next-line shadcn/no-inline-styles -- reason: react-resizable-panels sets overflow:auto inline on the panel's inner box; only its style prop, merged after, overrides it without !important
+const RECORD_COLUMN_BOX: CSSProperties = { overflow: "visible" };
+
 /** The App Shell's top bar and work area, by their slots; a page without the App Shell uses the whole window. */
 const TOP_BAR = '[data-slot="app-shell-top-bar"]';
 const WORK_AREA = '[data-slot="sidebar-inset"]';
@@ -517,9 +521,8 @@ function RecordColumn({
         } as CSSProperties
       }
       // The layer lets clicks through to the grid; only the record and, when pinned, the divider take them. The vendor
-      // parts take no classes, so the layer styles them by their slots. The panel's inner box lets the floating record's
-      // shadow fall onto the grid instead of clipping it (owner 2026-11-27, Q3).
-      className={`pointer-events-none fixed top-(--record-top) right-(--record-right) bottom-(--record-bottom) left-(--record-left) [&_[data-slot=resizable-panel]:has(aside)]:pointer-events-auto [&_[data-slot=resizable-panel]>div:has(>aside)]:overflow-visible ${pinned ? "z-40 [&_[data-slot=resizable-handle]]:pointer-events-auto" : "z-50 [&_[data-slot=resizable-handle]]:hidden"}`}
+      // parts take no classes, so the layer styles them by their slots.
+      className={`pointer-events-none fixed top-(--record-top) right-(--record-right) bottom-(--record-bottom) left-(--record-left) [&_[data-slot=resizable-panel]:has(aside)]:pointer-events-auto ${pinned ? "z-40 [&_[data-slot=resizable-handle]]:pointer-events-auto" : "z-50 [&_[data-slot=resizable-handle]]:hidden"}`}
     >
       <ResizablePanelGroup
         orientation="horizontal"
@@ -538,6 +541,9 @@ function RecordColumn({
         <ResizablePanel
           id="record-column"
           panelRef={panelRef}
+          // The panel's inner box scrolls by default (an inline style of the library), which clips the floating record's
+          // shadow; the record scrolls its own body, so the box lets the shadow fall onto the grid (owner 2026-11-27, Q3).
+          style={RECORD_COLUMN_BOX}
           defaultSize={width}
           minSize={PIN_MIN_WIDTH}
           // The grid's 480 px floor binds the pinned column only; the floating record keeps row 3's width.

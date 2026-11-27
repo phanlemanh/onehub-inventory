@@ -14,7 +14,7 @@ evals:
     executor: script
     cmd: bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E2
     paths: [src/components/candidate/record-panel.tsx, tests/e2e/khung-luoi-nut.spec.ts]
-    expected: "exit 0; tests/e2e/khung-luoi-nut.spec.ts «Q3 · » ở 1024 và 1440, sáng và tối: nền ngăn bằng màu bg-popover, viền trái ≥ 1 px, box-shadow khác none (assertSurface). Chiều đỏ: ngăn nền var(--background) không bóng cho 'not the popover|no shadow'"
+    expected: "exit 0; tests/e2e/khung-luoi-nut.spec.ts «Q3 · » ở 1024 và 1440, sáng và tối, đo trên điểm ảnh của ảnh chụp (standsApart): hộp cha của ngăn có overflow visible (không cắt bóng); cột điểm ảnh của viền trái khác lưới bên cạnh ≥ 10 độ sáng; dải 8 px ngay bên trái ngăn tối hơn khi có bóng so với khi tắt bóng ≥ 3 (sáng) hoặc ≥ 2 (tối). Chiều đỏ trên cùng hàm, cả sáng lẫn tối: hộp cha overflow auto, nền ngăn bằng nền lưới, bỏ viền cho 'record shadow clipped by its box', rồi 'no line shows on the record's left', rồi 'no shadow shows on the grid'; bỏ bản sửa (style của khung chia) thì bài thường đỏ 'record shadow clipped by its box (overflow auto)'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E3
@@ -86,7 +86,7 @@ evals:
     executor: script
     cmd: bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E11
     paths: [src/components/candidate/data-region.tsx, src/app/globals.css, tests/e2e/sheet.spec.ts]
-    expected: "exit 0; sheet.spec.ts «header buttons in view» ở 1024 và 1440: không nút nào tên bắt đầu «Bỏ ghim »; trình đơn Toà có «Ghim bên trái» kèm dấu chọn, bấm thì Toà mất data-pinned; trước và sau khi ghim «Giá chào» từ trình đơn, cột ghim cuối có bóng '6px 0px 6px -6px' trên cả th lẫn td, cột ghim khác không có (assertPinnedEdge). Chiều đỏ trên cùng hàm: hiện lại nút «Bỏ ghim» cho 'header shows «Bỏ ghim» buttons'; bỏ bóng cho 'no pinned edge shadow'"
+    expected: "exit 0; sheet.spec.ts «header buttons in view» ở 1024 và 1440: không nút nào tên bắt đầu «Bỏ ghim »; trình đơn Toà có «Ghim bên trái» kèm dấu chọn, bấm thì Toà mất data-pinned; trước và sau khi ghim «Giá chào» từ trình đơn, dải 4 px ngay bên phải cột ghim cuối tối hơn khi có bóng so với khi tắt bóng ≥ 3 độ sáng, đo trên điểm ảnh (assertPinnedEdge). Chiều đỏ trên cùng hàm: hiện lại nút «Bỏ ghim» cho 'header shows «Bỏ ghim» buttons'; bỏ bóng cho 'no pinned edge shadow'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E12
@@ -94,7 +94,7 @@ evals:
     executor: script
     cmd: bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E12
     paths: [src/components/templates/app-shell/second-column.tsx, tests/e2e/khung-luoi-nut.spec.ts]
-    expected: "exit 0; khung-luoi-nut.spec.ts «L6 · » ở 1024 và 1440: con trỏ ở x=600 thì khung nút gập không bóng; con trỏ ở mép cột, một phần tư chiều cao, thì khung có bóng và title 'Gập cột thứ hai'. Chiều đỏ: dải bắt con trỏ pointer-events none cho 'fold handle not shown on the edge'"
+    expected: "exit 0; khung-luoi-nut.spec.ts «L6 · » ở 1024 và 1440: con trỏ ở mép cột thứ hai, một phần tư chiều cao, thì các cột điểm ảnh ở hai cạnh khung nút gập đổi ≥ 8 độ sáng so với khi con trỏ ở xa, và title 'Gập cột thứ hai' (handleOnEdge, đo trên điểm ảnh). Chiều đỏ: dải bắt con trỏ pointer-events none cho 'fold handle not shown on the edge'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E13

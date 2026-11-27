@@ -6,6 +6,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 import { isPhone, regionHydrated, rowsShown } from "./phone-list";
+import { columnLuminance, luminance } from "./do-diem-anh";
 import { suaTrang, themKieu } from "./sua-trang";
 
 const table = (page: Page) =>
@@ -113,16 +114,32 @@ test.describe("L3 · the filter row stands level", () => {
 // ---- L6 · the fold handle shows on the column's edge --------------------------------------------------------------
 
 /** With the pointer on the second column's edge, away from the handle, the handle stands out and names itself. */
+/**
+ * With the pointer on the second column's edge, away from the handle, the handle's frame shows on screen: the pixel
+ * columns at the frame's left and right sides change against the same columns with the pointer away (measured on
+ * pixels, not on the declared shadow — VP10 round 2). The strokes in the middle turn on hover too, so only the sides
+ * count.
+ */
 async function handleOnEdge(page: Page): Promise<{ framed: boolean; hint: string | null }> {
+  const frame = (await page.locator('[data-slot="second-column-rail-frame"]').boundingBox())!;
+  const sides = {
+    x: Math.floor(frame.x) - 2,
+    y: Math.round(frame.y),
+    width: Math.ceil(frame.width) + 4,
+    height: Math.round(frame.height),
+  };
+  await page.mouse.move(600, 300);
+  await page.waitForTimeout(250);
+  const away = await columnLuminance(page, sides);
   const edge = (await page.locator('[data-slot="app-shell-second-column-edge"]').boundingBox())!;
   const height = page.viewportSize()!.height;
   await page.mouse.move(edge.x + edge.width - 1, Math.round(height / 4));
   await page.waitForTimeout(250);
-  const framed = await page
-    .locator('[data-slot="second-column-rail-frame"]')
-    .evaluate((el) => getComputedStyle(el).boxShadow !== "none");
+  const on = await columnLuminance(page, sides);
+  const side = [0, 1, 2, 3, on.length - 4, on.length - 3, on.length - 2, on.length - 1];
+  const change = Math.max(...side.map((c) => Math.abs((on[c] ?? 0) - (away[c] ?? 0))));
   const hint = await page.locator('[data-slot="second-column-rail"]').getAttribute("title");
-  return { framed, hint };
+  return { framed: change >= 8, hint };
 }
 
 function assertHandleShown(shown: { framed: boolean; hint: string | null }): void {
@@ -135,12 +152,6 @@ test.describe("L6 · the second column's fold handle shows on its edge", () => {
 
   test("the pointer on the edge frames the handle; it says what a press does", async ({ page }) => {
     await openInventory(page);
-    await page.mouse.move(600, 300);
-    expect(
-      await page
-        .locator('[data-slot="second-column-rail-frame"]')
-        .evaluate((el) => getComputedStyle(el).boxShadow),
-    ).toBe("none");
     assertHandleShown(await handleOnEdge(page));
   });
 
@@ -196,78 +207,118 @@ test.describe("Q2 · the grid fits the screen", () => {
   });
 });
 
-// ---- Q3 · the floating record lies on its own surface ----------------------------------------------------------------
+// ---- Q3 · the floating record stands apart from the grid, by what shows on screen --------------------------------------
+// Measured on pixels, not on the declared style (round 2 of the grading: a shadow clipped by the record's box still read
+// as declared). Light: the record's surface is the page's own white, so a shadow must darken the grid just left of the
+// record. Dark: the record's surface is lighter than the page. Either way the record's box must not clip the shadow.
 
-/** The floating record's surface: the popover colour, a line on its left, a shadow over the grid. */
-async function recordSurface(
-  page: Page,
-): Promise<{ bg: string; popover: string; left: string; shadow: string }> {
-  // A probe element reads the popover colour, so this goes through the shared door for page changes.
-  return suaTrang(page, () => {
-    const aside = document.querySelector('[data-slot="record-panel"]')!.closest('[role="dialog"]')!;
-    const style = getComputedStyle(aside);
-    const probe = document.createElement("div");
-    probe.className = "bg-popover";
-    document.body.append(probe);
-    const popover = getComputedStyle(probe).backgroundColor;
-    probe.remove();
-    return {
-      bg: style.backgroundColor,
-      popover,
-      left: style.borderLeftWidth,
-      shadow: style.boxShadow,
-    };
+type Apart = {
+  clipped: string;
+  shade: number;
+  step: number;
+  edge: number;
+  left: number;
+  border: string;
+};
+
+/**
+ * How the floating record stands apart: what its box does with overflow, how much darker the grid is just left of the
+ * record with the shadow than without it (shade), and how far the record's surface differs from the grid beside it
+ * (step) — both in luminance.
+ */
+async function standsApart(page: Page): Promise<Apart> {
+  const aside = page.locator('[role="dialog"]:has([data-slot="record-panel"])');
+  const g = await aside.evaluate((el) => ({
+    clipped: getComputedStyle(el.parentElement!).overflow,
+    border: getComputedStyle(el).borderLeftWidth,
+    ...(({ left, top, height }) => ({ left, top, height }))(el.getBoundingClientRect()),
+  }));
+  const y = Math.round(g.top + g.height * 0.45);
+  const strip = { x: Math.round(g.left) - 10, y, width: 8, height: 160 };
+  const inside = { x: Math.round(g.left) + 4, y, width: 8, height: 160 };
+  const withShadow = await luminance(page, strip);
+  // The same strip without the shadow, then the shadow back (a style of this check, removed by id).
+  await suaTrang(page, () => {
+    const style = document.createElement("style");
+    style.id = "khong-bong-tam";
+    style.textContent =
+      '[role="dialog"]:has([data-slot="record-panel"]) { box-shadow: none !important; }';
+    document.head.append(style);
   });
+  await page.waitForTimeout(100);
+  const without = await luminance(page, strip);
+  await suaTrang(page, () => document.getElementById("khong-bong-tam")?.remove());
+  await page.waitForTimeout(100);
+  const surface = await luminance(page, inside);
+  // The record's left line against the grid just beside it.
+  const line = await columnLuminance(page, { x: Math.floor(g.left) - 1, y, width: 4, height: 160 });
+  return {
+    edge: Math.max(...line.map((c) => Math.abs(c - without))),
+    clipped: g.clipped,
+    shade: without - withShadow,
+    step: Math.abs(surface - without),
+    left: g.left,
+    border: g.border,
+  };
 }
 
-function assertSurface(s: { bg: string; popover: string; left: string; shadow: string }): void {
-  if (s.bg !== s.popover) throw new Error(`record surface ${s.bg}, not the popover ${s.popover}`);
-  if (parseFloat(s.left) < 1) throw new Error("record has no line on its left");
-  if (s.shadow === "none") throw new Error("record casts no shadow");
-  // A shadow cast to the left, onto the grid: some layer with a negative x offset (Q3: the record reads as a layer).
-  if (!/-\d+(\.\d+)?px 0px/.test(s.shadow)) throw new Error("record casts no shadow onto the grid");
+/**
+ * The record stands apart by what shows: its box does not clip its shadow, its left line shows against the grid
+ * (luminance step ≥ 10) and its shadow darkens the grid beside it (≥ 3 in light, where the surface is the page's own
+ * white; ≥ 2 in dark, where a black shadow falls on a near-black page).
+ */
+function assertStandsApart(a: Apart, minShade: number): void {
+  if (a.clipped !== "visible")
+    throw new Error(`record shadow clipped by its box (overflow ${a.clipped})`);
+  if (parseFloat(a.border) < 1 || a.edge < 10)
+    throw new Error(`no line shows on the record's left (step ${a.edge.toFixed(1)})`);
+  if (a.shade < minShade)
+    throw new Error(`no shadow shows on the grid (darker by ${a.shade.toFixed(1)})`);
 }
 
-test.describe("Q3 · the floating record lies on its own surface", () => {
+test.describe("Q3 · the floating record stands apart from the grid", () => {
   test.beforeEach(({ page }) => test.skip(isPhone(page), "ngăn nổi từ 768"));
 
+  async function openRecord(page: Page): Promise<void> {
+    await openInventory(page);
+    await page.locator("[data-record-open]:visible").nth(4).click();
+    await expect(page.locator('[data-slot="record-panel"]')).toHaveAttribute(
+      "data-record-layout",
+      "float",
+    );
+    await page.waitForTimeout(500);
+  }
+
   for (const colorScheme of ["light", "dark"] as const)
-    test(`popover colour, left line, shadow (${colorScheme})`, async ({ page }) => {
+    test(`a line on its left, and a shadow or a lighter surface that shows (${colorScheme})`, async ({
+      page,
+    }) => {
       await page.emulateMedia({ colorScheme });
-      await openInventory(page);
-      await page.locator("[data-record-open]:visible").nth(4).click();
-      await expect(page.locator('[data-slot="record-panel"]')).toHaveAttribute(
-        "data-record-layout",
-        "float",
+      await openRecord(page);
+      assertStandsApart(await standsApart(page), colorScheme === "light" ? 3 : 2);
+    });
+
+  for (const colorScheme of ["light", "dark"] as const)
+    test(`break: a record whose box clips its shadow, with no surface or line of its own, is caught (${colorScheme})`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme });
+      await openRecord(page);
+      await themKieu(page, {
+        content:
+          '[data-slot="resizable-panel"] > div:has(> [role="dialog"]) { overflow: auto !important; } [role="dialog"]:has([data-slot="record-panel"]) { background: var(--card) !important; border-left-width: 0 !important; }',
+      });
+      await page.waitForTimeout(300);
+      const a = await standsApart(page);
+      const min = colorScheme === "light" ? 3 : 2;
+      expect(() => assertStandsApart(a, min)).toThrow("record shadow clipped by its box");
+      expect(() => assertStandsApart({ ...a, clipped: "visible" }, min)).toThrow(
+        "no line shows on the record's left",
       );
-      assertSurface(await recordSurface(page));
+      expect(() =>
+        assertStandsApart({ ...a, clipped: "visible", border: "1px", edge: 20 }, min),
+      ).toThrow("no shadow shows on the grid");
     });
-
-  test("break: a record with only a drop shadow, none onto the grid, is caught", async ({
-    page,
-  }) => {
-    await openInventory(page);
-    await themKieu(page, {
-      content:
-        '[role="dialog"]:has([data-slot="record-panel"]) { box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1) !important; }',
-    });
-    await page.locator("[data-record-open]:visible").nth(4).click();
-    await expect(page.locator('[data-slot="record-panel"]')).toBeVisible();
-    const s = await recordSurface(page);
-    expect(() => assertSurface(s)).toThrow("record casts no shadow onto the grid");
-  });
-
-  test("break: a record on the page's own colour without a shadow is caught", async ({ page }) => {
-    await openInventory(page);
-    await themKieu(page, {
-      content:
-        '[role="dialog"]:has([data-slot="record-panel"]) { background: var(--background) !important; box-shadow: none !important; }',
-    });
-    await page.locator("[data-record-open]:visible").nth(4).click();
-    await expect(page.locator('[data-slot="record-panel"]')).toBeVisible();
-    const s = await recordSurface(page);
-    expect(() => assertSurface(s)).toThrow(/not the popover|no shadow/);
-  });
 });
 
 // ---- Q1, Q3, Q4 on Đã gửi: the same frame on the second grid screen ------------------------------------------------
