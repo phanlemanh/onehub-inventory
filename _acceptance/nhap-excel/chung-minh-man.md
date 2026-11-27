@@ -60,8 +60,8 @@ màn dùng ở 1024 và 1440; ở 360 và 414 nó nói «Màn này dùng trên m
 | --- | --- | --- | --- | --- | --- |
 | Frame | trong-kho | | | | |
 | Badge | trong-kho | | | | |
-| DataRegion (lưới xem trước) | trong-kho | | | | |
-| RegionLoading (khung chờ khi đọc tệp) | trong-kho | | | | |
+| DataRegion | trong-kho | | | | |
+| Stepper | trong-kho | | | | |
 | solution-crm-6 | reui | `node tools/reui_catalog/tra.mjs import wizard csv --loai block` | solution-crm-6 | — (được chọn theo Hỏi-3) | chọn khối |
 
 ### Vùng
@@ -101,3 +101,29 @@ Không chọn khối nào: nút đi qua `PermittedAction` của kho (hàng 9e), 
 | --- | --- | --- | --- |
 | màn | empty-state-13 | evidence/reui-empty-state-13.png | |
 | màn | empty-state-14 | evidence/reui-empty-state-14.png | |
+
+### Ma trận trạng thái
+
+Bảng hàng vẫn là màn mẫu của họ Lưới; hàng này thêm nút «Nạp tệp» ở đầu màn, một liên kết trong câu trạng thái trống và dòng
+của căn chờ khớp. Các trạng thái khác giữ bài của các hàng trước.
+
+| Trạng thái | Kết quả | Căn cứ |
+| --- | --- | --- |
+| Chờ tải | đạt | tests/e2e/screens/screens.spec.ts (công thức cho-tai) |
+| Trống | đạt | tests/e2e-db/nhap-excel.spec.ts (bang hang trong: đúng một liên kết «Nạp tệp» trong câu, không nút trong vùng) |
+| Không có dòng nào khớp | đạt | tests/e2e/screens/screens.spec.ts (công thức khong-khop) |
+| Lỗi | đạt | tests/e2e/screens/screens.spec.ts (công thức loi) |
+| Một phần hỏng | đạt | tests/e2e/screens/screens.spec.ts (công thức mot-phan-hong) |
+| Chữ dài | đạt | tests/e2e/screens/screens.spec.ts (công thức chu-dai); mã và toà của căn chờ khớp đi qua cùng ô chữ của lưới |
+| Không đủ quyền | đạt | tests/e2e-db/nhap-excel.spec.ts (bang hang trong: Đầu khách không có nút hay liên kết nạp, kể cả ẩn) |
+| Xung đột khi lưu | đạt | src/modules/listings/save-door.test.ts (cong-luu: conflict); dòng căn chờ khớp sửa qua cùng cửa (src/modules/listings/listings-http.ts) |
+| Phiên hết hạn | không áp | Của khung (App Shell), không của vùng |
+| Mất mạng khi lưu | đạt | src/components/candidate/use-change.test.tsx (luu-hong-ve-cu) |
+| Link hết hạn | không áp | Trạng thái của trang khách; Bảng hàng là màn nội bộ |
+
+### Khối
+
+| Khối | Bậc | Đã tra | Ứng viên gần nhất | Vì sao không dùng | Cách |
+| --- | --- | --- | --- | --- | --- |
+| DataRegion | trong-kho | | | | |
+| PageHeader | trong-kho | | | | |
