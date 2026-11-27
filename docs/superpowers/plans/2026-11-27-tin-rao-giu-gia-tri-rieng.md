@@ -208,6 +208,17 @@ AttributeSource): boolean`, đúng khi giá trị mới được ghi);
 - Bước xem trước: ô khác danh mục mang cùng dấu của lưới, kèm giá trị danh mục.
 - Bài: E7, E8.
 - Phục vụ: E7, E8.
+- **Đã dựng (nhịp 2, G-2811-3, chồng lên nhánh hàng 11):**
+  - Không thêm `mergeSource`. Luật «chỉ đặt khi chưa có giá trị riêng» nằm một chỗ, ở `setFileValues`
+    (`src/modules/listings/create.ts`), nên khỏi có hàm thứ hai trùng luật với `sourceWins`.
+  - Tin mới nhận giá trị tệp ngay trong câu chèn của `createListings`.
+  - Lệnh đọc lại là `make tin-rao-doc-lai` (`db/scripts/doc-lai-tep.ts` → `rereadImportValues` của
+    `src/modules/imports/reread.ts`). Nó nối bằng tài khoản chủ cơ sở dữ liệu. Lớp cấu hình của sàn đọc qua `readLayer` dưới
+    vai ứng dụng với đúng sàn của lần nhập; kept sai hình thì dừng với «kept shape unread». Giới hạn: d-…-30. Không tăng
+    phiên bản, bỏ qua tin đã khoá: d-…-31.
+  - Bước xem trước: ô khác danh mục mang `catalog` (`withCatalogDiffers` trong `store.ts`) và hiện `AttributeDiffersMark`
+    của lưới. Chữ của năm thuộc tính chuyển sang `src/app/(app)/unit-attribute-words.ts`, dùng chung cho Bảng hàng và
+    màn nhập.
 
 ### Việc 7: Căn chờ khớp
 
@@ -217,6 +228,12 @@ AttributeSource): boolean`, đúng khi giá trị mới được ghi);
   - trước khi khớp, năm giá trị hiện không dấu;
   - sau khi khớp, giá trị riêng giữ nguyên và ô nào khác danh mục mới có dấu.
 - Phục vụ: E9.
+- **Đã dựng (nhịp 2):**
+  - `matchPendingUnits` của hàng 11 (`src/modules/company-config/store.ts`) chỉ ghi khoá căn danh mục lên căn chờ.
+  - Bước đọc Bảng hàng lấy `cpu.unit_key` và đọc căn ấy bằng `readCatalogUnitsByKey` (cửa mới của catalog). Căn chờ đã
+    khớp mượn năm thuộc tính để so, còn tên vẫn là mã của sàn.
+  - «Gắn sang căn khác» từ chối tin trên căn chờ, vì căn chờ chưa có liên kết danh mục để chuyển (d-…-32).
+  - Không đụng đường khớp của hàng 11.
 
 ### Việc 8: Hồ sơ đã ký, ghim lại, wiki
 
