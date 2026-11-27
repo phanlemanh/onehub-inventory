@@ -1,39 +1,4 @@
 {
-  "feature_plain": "Hệ thiết kế của kho (màu, chữ, bo góc, linh kiện) được viết ra thành tệp mà Claude Design đọc được, cổng kiểm tra giữ cho bản viết ra không cũ đi so với kho, và gói được gửi sang tài khoản Claude Design riêng tư của anh theo phép anh đã cho.",
-  "will_do": [
-    {"id": "AC-1", "p": "Sẽ giữ cả kho xanh sau khi lấy main vào: kiểm toàn bộ thoát sạch, cổng thiết kế giữ 26 quyết định."},
-    {"id": "AC-2", "p": "Sẽ chứng bản viết ra đúng bằng thứ sổ thiết kế viết ra hôm nay, và cổng kiểm tra đỏ khi sổ đổi mà bản viết ra chưa viết lại."},
-    {"id": "AC-3", "p": "Sẽ chứng gói gửi đi nói đúng điều kho nói: 40 màu ở cả giao diện sáng và tối, kiểu chữ Inter, các bậc bo góc, khoảng cách 4px và đủ 298 linh kiện."},
-    {"id": "AC-4", "p": "Sẽ chứng thứ đã gửi đúng bốn tệp anh cho phép, tới đúng chỗ riêng tư anh cho phép, và lần gửi cuối ghi đúng bản đang có trong kho."},
-    {"id": "AC-5", "p": "Sẽ để câu «đặt hệ này làm mặc định ở Claude Design» chờ anh; không câu trả lời nào được ghi thay anh."},
-    {"id": "AC-7", "p": "Sẽ chứng nhánh này chỉ đổi phần thiết kế viết ra, sổ lần gửi, câu chờ, nhật ký và hồ sơ này — không đổi gì khác của kho."}
-  ],
-  "wont_do": [
-    {"id": "AC-6", "p": "Chặn mọi địa chỉ thư, số điện thoại, khoá truy cập hay đường dẫn trên máy lọt vào thứ gửi ra ngoài kho."},
-    {"id": "OOS-1", "p": "Không chứng bằng máy trang Claude Design hiện gói ra sao — anh mở đường dẫn và nhìn trước khi ký Cổng Bằng chứng."},
-    {"id": "OOS-2", "p": "Không trả lời câu đặt mặc định ở Claude Design — câu đó của anh."},
-    {"id": "OOS-3", "p": "Không sửa công cụ thiết kế hay cách nó viết và gửi — việc của bộ công cụ."},
-    {"id": "OOS-4", "p": "Không đổi giao diện, mã sản phẩm, dữ liệu hay luật sản phẩm nào."}
-  ],
-  "scope_plain": "Việc này chỉ viết sổ thiết kế ra ngoài và gửi đi; mọi thứ ở Claude Design sau đó nằm ngoài vòng.",
-  "coverage_plain": [
-    {"i": 0, "p": "Phủ theo từng tệp nhánh đổi và ai đọc tệp ấy; không quét thêm không gian tiêu chí vì việc chỉ có một chiều."},
-    {"i": 2, "p": "Tệp mô tả hệ thiết kế: đúng bằng sổ viết ra (AC-2), đúng 40 màu (AC-3), không dữ liệu riêng tư (AC-6)."},
-    {"i": 3, "p": "Bốn tệp của gói gửi Claude Design: đúng bằng sổ (AC-2), đúng màu, chữ, bo góc, khoảng cách, linh kiện (AC-3), sạch (AC-6)."},
-    {"i": 4, "p": "Sổ quyết định: cổng giữ bản viết ra (AC-2), phép gửi của anh (AC-4), chỉ thêm dòng (AC-7)."},
-    {"i": 5, "p": "Năm phép kiểm bản viết ra của cổng (AC-2), chỉ thêm dòng (AC-7)."},
-    {"i": 6, "p": "Sổ lần gửi: lần gửi cuối đúng bản trong kho, tới chỗ có phép (AC-4)."},
-    {"i": 7, "p": "Câu đặt mặc định còn chờ anh (AC-5)."},
-    {"i": 8, "p": "Nhật ký: chỉ thêm dòng mới (AC-7)."},
-    {"i": 9, "p": "Cả kho sau khi lấy main vào: kiểm toàn bộ xanh (AC-1)."},
-    {"i": 10, "p": "Trang Claude Design: ngoài vòng, vì cần đăng nhập tài khoản của anh; anh xem trước khi ký."},
-    {"i": 11, "p": "Cách công cụ thiết kế làm việc: ngoài vòng, công cụ có bài kiểm riêng và cổng tự chứng mỗi phép kiểm đỏ được."}
-  ],
-  "gap_probe_plain": [
-    {"i": 0, "p": "Dòng sổ chọn bộ đo trích một hồ sơ cũ như thể đã quyết sẵn, trong khi bộ đo này do máy tự đặt. Đã sửa: dòng mới kê từng chỗ đọc tệp và phép đo giữ nó."},
-    {"i": 1, "p": "Màu ở giao diện tối chỉ được kiểm là có, chưa kiểm là đúng. Đã sửa: so từng màu tối với kho bằng một bộ đổi màu riêng, cả 40 màu khớp."},
-    {"i": 2, "p": "Chưa kiểm gói đi đúng chỗ riêng tư anh cho phép. Đã sửa: kiểm chỗ nhận phải riêng tư và mọi lần gửi phải tới chỗ có phép."},
-    {"i": 3, "p": "Trang Claude Design hiện đúng hay không chưa ai chứng, trong khi lần đầu trang trống. Đã sửa: ghi rõ chưa chứng, và anh xem trang trước khi ký."},
-    {"i": 4, "p": "Quét dữ liệu riêng tư mỗi loại chỉ thử một dạng. Đã sửa: thêm số có cách, số +84 và các dạng đường dẫn khác."}
-  ]
+  "feature_plain": "Hệ thiết kế của kho được viết ra cho Claude Design đọc, cổng giữ bản viết ra khớp sổ, và gói đã gửi sang tài khoản Claude Design riêng tư của anh theo phép anh cho; máy đã chứng đủ 13 phép đo, còn trang Claude Design hiện ra sao chỉ anh xem được.",
+  "analyst_plain": "Phép kiểm toàn bộ kho xanh cả trước lẫn sau việc này, nên nó chỉ chứng kho không hỏng; các phép đo riêng của việc này mới đỏ được khi bản viết ra hay lần gửi sai."
 }
