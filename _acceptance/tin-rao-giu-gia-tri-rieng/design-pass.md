@@ -1,19 +1,19 @@
 ---
 slug: tin-rao-giu-gia-tri-rieng
-at: 2026-11-27T02:52:12Z
+at: 2026-11-27T03:12:34Z
 route: http://127.0.0.1:3489/inventory?role=ListAgent
 material: real-components
 context: host-embedded
 context_scenes: []
 reaction: nac-1 (anh-gui-kem-trang)
-options: _acceptance/tin-rao-giu-gia-tri-rieng/cong-pham-vi-ban-dau.html
+options: _acceptance/tin-rao-giu-gia-tri-rieng/cong-pham-vi.html
 divergence: opened
 ds_skill: inventory-ui
-states: [dau-mo, ho-so-da-ban, ho-so-khac, ho-so-quan-tri, ho-so-tep, hop-sua, luoi-dau-bieu-tuong, luoi-dau-cham, luoi-dau-nhan, luoi-nam-cot, luoi-the, o-sua-loi, o-sua-mo]
+states: [c-0606, c-0905, c-0905-cuon, c-1202, dau-badge, dau-dot, dau-icon, dau-mo, dau-mo-da-ban, dau-mo-danh-ba, hai-sua-a, ho-so-da-ban, ho-so-khac, ho-so-quan-tri, ho-so-tep, hop-sua, loai-can-sau, loai-can-truoc, loi-a, loi-b, luoi-toi, mot-sua-b, mot-sua-b-hop, o-sua-loi, the]
 breakpoints: [mobile-360, mobile-414, desktop-1024, desktop-1440]
 themes: [light, dark]
-patched: 0
-deferred: 2
+patched: 6
+deferred: 0
 ---
 # design-pass — tin-rao-giu-gia-tri-rieng
 
@@ -27,30 +27,49 @@ kho «Bảng hàng đủ cột là hàng riêng») và lối B năm cột.
 
 ## Ma trận capture
 
+Lượt hai (sau soi G-2711-8); ảnh lượt một giữ ở `evidence/design-pass/` làm vết.
+
 | state | breakpoint | theme | file |
 |---|---|---|---|
-| dau-mo | 1440 | light | evidence/design-pass/dau-mo--1440--sang.png |
-| ho-so-da-ban | 1440 | light | evidence/design-pass/ho-so-da-ban--1440--sang.png |
-| ho-so-khac | 1024 | light | evidence/design-pass/ho-so-khac--1024--sang.png |
-| ho-so-khac | 1440 | light | evidence/design-pass/ho-so-khac--1440--sang.png |
-| ho-so-khac | 1440 | dark | evidence/design-pass/ho-so-khac--1440--toi.png |
-| ho-so-khac | 360 | light | evidence/design-pass/ho-so-khac--360--sang.png |
-| ho-so-khac | 414 | light | evidence/design-pass/ho-so-khac--414--sang.png |
-| ho-so-quan-tri | 1440 | light | evidence/design-pass/ho-so-quan-tri--1440--sang.png |
-| ho-so-tep | 1440 | light | evidence/design-pass/ho-so-tep--1440--sang.png |
-| hop-sua | 1440 | light | evidence/design-pass/hop-sua--1440--sang.png |
-| hop-sua | 1440 | dark | evidence/design-pass/hop-sua--1440--toi.png |
-| hop-sua | 360 | light | evidence/design-pass/hop-sua--360--sang.png |
-| luoi-dau-bieu-tuong | 1440 | light | evidence/design-pass/luoi-dau-bieu-tuong--1440--sang.png |
-| luoi-dau-cham | 1024 | light | evidence/design-pass/luoi-dau-cham--1024--sang.png |
-| luoi-dau-cham | 1440 | light | evidence/design-pass/luoi-dau-cham--1440--sang.png |
-| luoi-dau-cham | 1440 | dark | evidence/design-pass/luoi-dau-cham--1440--toi.png |
-| luoi-dau-nhan | 1440 | light | evidence/design-pass/luoi-dau-nhan--1440--sang.png |
-| luoi-nam-cot | 1440 | light | evidence/design-pass/luoi-nam-cot--1440--sang.png |
-| luoi-the | 360 | light | evidence/design-pass/luoi-the--360--sang.png |
-| luoi-the | 414 | light | evidence/design-pass/luoi-the--414--sang.png |
-| o-sua-loi | 1440 | light | evidence/design-pass/o-sua-loi--1440--sang.png |
-| o-sua-mo | 1440 | light | evidence/design-pass/o-sua-mo--1440--sang.png |
+| c-0606 | 1440 | light | evidence/design-pass/vong-2/c-0606--1440--sang.png |
+| c-0905 | 1440 | light | evidence/design-pass/vong-2/c-0905--1440--sang.png |
+| c-0905 | 360 | light | evidence/design-pass/vong-2/c-0905--360--sang.png |
+| c-0905-cuon | 1440 | light | evidence/design-pass/vong-2/c-0905-cuon--1440--sang.png |
+| c-1202 | 1440 | light | evidence/design-pass/vong-2/c-1202--1440--sang.png |
+| dau-badge | 1024 | light | evidence/design-pass/vong-2/dau-badge--1024--sang.png |
+| dau-badge | 1440 | light | evidence/design-pass/vong-2/dau-badge--1440--sang.png |
+| dau-dot | 1024 | light | evidence/design-pass/vong-2/dau-dot--1024--sang.png |
+| dau-dot | 1440 | light | evidence/design-pass/vong-2/dau-dot--1440--sang.png |
+| dau-icon | 1024 | light | evidence/design-pass/vong-2/dau-icon--1024--sang.png |
+| dau-icon | 1440 | light | evidence/design-pass/vong-2/dau-icon--1440--sang.png |
+| dau-mo | 1440 | light | evidence/design-pass/vong-2/dau-mo--1440--sang.png |
+| dau-mo-da-ban | 1440 | light | evidence/design-pass/vong-2/dau-mo-da-ban--1440--sang.png |
+| dau-mo-danh-ba | 1440 | light | evidence/design-pass/vong-2/dau-mo-danh-ba--1440--sang.png |
+| hai-sua-a | 1440 | light | evidence/design-pass/vong-2/hai-sua-a--1440--sang.png |
+| hai-sua-a | 360 | light | evidence/design-pass/vong-2/hai-sua-a--360--sang.png |
+| ho-so-da-ban | 1440 | light | evidence/design-pass/vong-2/ho-so-da-ban--1440--sang.png |
+| ho-so-khac | 1024 | light | evidence/design-pass/vong-2/ho-so-khac--1024--sang.png |
+| ho-so-khac | 1440 | light | evidence/design-pass/vong-2/ho-so-khac--1440--sang.png |
+| ho-so-khac | 1440 | dark | evidence/design-pass/vong-2/ho-so-khac--1440--toi.png |
+| ho-so-khac | 360 | light | evidence/design-pass/vong-2/ho-so-khac--360--sang.png |
+| ho-so-khac | 414 | light | evidence/design-pass/vong-2/ho-so-khac--414--sang.png |
+| ho-so-quan-tri | 1440 | light | evidence/design-pass/vong-2/ho-so-quan-tri--1440--sang.png |
+| ho-so-tep | 1440 | light | evidence/design-pass/vong-2/ho-so-tep--1440--sang.png |
+| hop-sua | 1440 | light | evidence/design-pass/vong-2/hop-sua--1440--sang.png |
+| hop-sua | 1440 | dark | evidence/design-pass/vong-2/hop-sua--1440--toi.png |
+| hop-sua | 360 | light | evidence/design-pass/vong-2/hop-sua--360--sang.png |
+| loai-can-sau | 1440 | light | evidence/design-pass/vong-2/loai-can-sau--1440--sang.png |
+| loai-can-truoc | 1440 | light | evidence/design-pass/vong-2/loai-can-truoc--1440--sang.png |
+| loi-a | 1024 | light | evidence/design-pass/vong-2/loi-a--1024--sang.png |
+| loi-a | 1440 | light | evidence/design-pass/vong-2/loi-a--1440--sang.png |
+| loi-b | 1024 | light | evidence/design-pass/vong-2/loi-b--1024--sang.png |
+| loi-b | 1440 | light | evidence/design-pass/vong-2/loi-b--1440--sang.png |
+| luoi-toi | 1440 | dark | evidence/design-pass/vong-2/luoi-toi--1440--toi.png |
+| mot-sua-b | 1440 | light | evidence/design-pass/vong-2/mot-sua-b--1440--sang.png |
+| mot-sua-b-hop | 1440 | light | evidence/design-pass/vong-2/mot-sua-b-hop--1440--sang.png |
+| o-sua-loi | 1440 | light | evidence/design-pass/vong-2/o-sua-loi--1440--sang.png |
+| the | 360 | light | evidence/design-pass/vong-2/the--360--sang.png |
+| the | 414 | light | evidence/design-pass/vong-2/the--414--sang.png |
 
 ## Cảnh ngữ-cảnh
 
@@ -60,10 +79,13 @@ kho «Bảng hàng đủ cột là hàng riêng») và lối B năm cột.
 
 ### Nhóm 1 — vá-được-trong-từ-vựng-token (đã vá tại chỗ)
 
-- (không có)
+- Dấu đặt sát giá trị, cùng vị trí ở mọi cột và trong ngăn (G-2711-8 điểm 1).
+- Nhãn «khác» không còn đè số hay ổ khoá: cột thuộc tính rộng thêm theo kiểu dấu (điểm 2).
+- Căn đã bán: ổ khoá cạnh «CĂN», dòng lý do, «Lấy lại» tắt kèm lý do (điểm 6).
+- Thẻ điện thoại có dấu cạnh giá trị khác (điểm 7).
+- Màu dấu là token «info» của hệ thiết kế ở cả hai nền (điểm 8).
+- Ẩn dấu «N» của máy dev khi chụp (điểm 3).
 
 ### Nhóm 2 — đòi-đổi-DS/component (chờ Gate 1)
 
-- Dấu chấm nằm góc trái trên của ô số canh phải, xa con số ở cột rộng (ảnh luoi-dau-cham--1440); đề xuất đặt sát trái
-  con số — cần khe `cellMark` của khung lưới nhận chỗ đặt.
-- Kiểu nhãn «khác» đè lên con số ở cột Diện tích hẹp (ảnh luoi-dau-nhan--1440); kiểu này chỉ dùng được nếu cột rộng thêm.
+- (không còn; hai điểm lượt một đã vá ở Nhóm 1)

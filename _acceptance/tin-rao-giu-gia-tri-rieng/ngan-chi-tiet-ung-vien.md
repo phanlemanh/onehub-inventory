@@ -29,5 +29,8 @@ trình bằng bảng chữ dài.
 | C15 | nhẹ | 0905, 1440 | «Xác nhận 26 ngày trước» không nói ai, không báo khi quá cũ |
 | C16 | nhẹ | 0905, 1440 | Thuộc tính căn chỉ đọc — đã thuộc 3h (AC-3, AC-4, AC-5) |
 
+Thuộc việc khung (G-2711-9: khung ngăn và lưới là việc riêng, gộp trước 3h; không bày như lựa chọn của 3h): C5 (đầu
+ngăn), C7 (tiêu điểm khi mở ngăn), C12 (nút ghim của đầu ngăn), C13 (đường phân cách đầu ngăn khi cuộn).
+
 C16 nằm sẵn trong 3h. C1 chạm đúng khối 3h sửa (khoá năm thuộc tính ở căn đã bán, AC-11) — máy khuyên nhận vào 3h.
 C10 chạm nút «Sửa» 3h thêm vào khối thông tin căn — máy khuyên nhận phần nút của 3h. Các điểm khác chờ chủ kho chọn.
