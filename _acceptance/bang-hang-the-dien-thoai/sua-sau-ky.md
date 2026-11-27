@@ -52,3 +52,10 @@ thời hạn bài gấp ba.
 
 Lớp «vẽ chân vùng và trạng thái rỗng một lần» không làm (G cho bỏ, XONG D-1511-14): hai chỗ ấy nằm ở hai vị trí khác
 nhau trên màn (thanh trên của thẻ, chân bảng), gộp lại là đổi điều người dùng thấy.
+
+## VP10 lát 1, 2026-11-27
+
+| Chỗ | Người dùng thấy khác gì | Phép |
+| --- | --- | --- |
+| `tests/e2e/the-dien-thoai.spec.ts` «vung-cham»: nút hàng công cụ tự cao 44 px (nút chỉ hình rộng 44), «Lọc» có chữ, «Lưu góc nhìn» đứng thẳng trên hàng, không còn «…» tên «Thêm», hàng không xuống dòng (≤ 60 px); thay phân xử G-1411-130 (nút 36 px trong vùng chạm 44); ca phá đổi theo | Có: nút to hơn, «Lọc» có chữ, «Lưu góc nhìn» hiện thẳng | «Duyệt cả sáu điểm» (L1, L5), luật «…» |
+| `tests/e2e/sheet.spec.ts` «sheet tab stops» trên điện thoại: bỏ điểm dừng «Thêm» | Có: bớt một điểm dừng Tab | L1 |
