@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "slug": "khung-luoi-va-ngan-chi-tiet",
-  "ghi_luc": "2026-11-27T22:24:27Z",
-  "vong_cham": 7,
+  "ghi_luc": "2026-11-27T23:26:51Z",
+  "vong_cham": 8,
   "luot": [
     {
       "vong": 1,
@@ -47,6 +47,11 @@
     },
     {
       "vong": 7,
+      "verdict": "PASS",
+      "tang": []
+    },
+    {
+      "vong": 8,
       "verdict": "PASS",
       "tang": []
     }
