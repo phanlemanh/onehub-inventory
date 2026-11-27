@@ -9,9 +9,7 @@
   /* The last column pinned at the start casts this over the columns scrolling under it (owner 2026-11-27, L4). */
   /* The floating record lies over the grid: a shadow cast to its left, onto the grid, besides the usual drop shadow, so
      it reads as a layer even where its surface is the page's own white (owner 2026-11-27, Q3). */
-  --shadow-record-float:
-    0 20px 25px -5px rgb(0 0 0 / 0.1),
-    -12px 0 24px -10px color-mix(in oklab, var(--foreground) 28%, transparent);
+  --shadow-record-float: 0 20px 25px -5px rgb(0 0 0 / 0.1), -12px 0 24px -10px rgb(0 0 0 / 0.22);
   --shadow-pinned-edge:
     inset -1px 0 0 0 var(--border),
     6px 0 6px -6px color-mix(in oklab, var(--foreground) 30%, transparent);
