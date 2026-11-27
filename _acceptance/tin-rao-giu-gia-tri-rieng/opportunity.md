@@ -33,8 +33,9 @@ Vì sao: Chủ kho 2026-11-27 tại phiên dãy H: «Tin rao giữ giá trị ri
 - **Danh mục vẫn sạch, lệch hiện thành tín hiệu.** Sàn không sửa danh mục (luật cũ giữ). Ô khác danh mục có dấu nhỏ;
   bấm «lấy lại theo Danh bạ» là về. Danh mục đổi về sau không đè giá trị sàn đã có — giống cách onehub-invest để kế
   thừa từ danh bạ luôn ở lớp thấp nhất.
-- **Gỡ nút thắt cho nhập Sheet.** Hàng 11 gặp Sheet khác danh mục thì có chỗ giữ giá trị Sheet (nguồn «nhập từ tệp»),
-  thay vì bỏ hay đè.
+- **Gỡ nút thắt cho nhập Sheet.** Hàng 11 nay giữ nguyên văn diện tích, phòng ngủ, hướng, tầng, loại căn trong bản ghi
+  lần nhập, chưa ghi vào căn và chưa so với Danh bạ. Lát A đọc lại chúng làm nguồn «nhập từ tệp», và hiện chênh lệch so
+  với Danh bạ ngay ở bước xem trước của lần nhập.
 
 ## Hai lát
 
@@ -50,7 +51,7 @@ Vì sao: Chủ kho 2026-11-27 tại phiên dãy H: «Tin rao giữ giá trị ri
 - **Bốn hồ sơ đã ký ghi «sửa sau ký»:** hàng 4 (dòng «không bao giờ sửa diện tích, phòng ngủ, toà trên ô»), hàng 5
   (dán vào thuộc tính căn ngoài phạm vi), 3g (dòng ngoài phạm vi «thông tin của căn thuộc danh mục»), 3e («Báo sai»
   nay cho người không có quyền sửa).
-- **Đứng sau 3g** (đang chờ chữ ký) — 3h dùng đường sửa và chi tiết căn của 3g; cùng 4, 5, 3e, 12.
+- **Đứng sau 3g** (đang chờ chữ ký) — 3h dùng đường sửa và chi tiết căn của 3g; cùng 4, 5, 3e, 12 và 11 (giá trị nhập giữ sẵn trong bản ghi lần nhập).
 - Ước máy: 0,9–8,6 giờ máy, khoảng 5,6% hạn mức tuần (dự báo của kit).
 
 ## Đã chốt (không hỏi lại)
