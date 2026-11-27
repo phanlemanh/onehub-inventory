@@ -97,6 +97,10 @@ export function terminalAsk({ input = process.stdin, output = process.stderr } =
   }
   return (question) =>
     new Promise((done) => {
+      // The question goes on a line of its own: readline clears and redraws the current line (when the question
+      // starts, and again when the terminal panel redraws), so a question on the input line was erased and the person
+      // saw an empty terminal (2026-11-28).
+      output.write(`${question}\n`);
       const rl = createInterface({ input, output, terminal: true });
       rl._writeToOutput = () => {};
       rl.question("", (answer) => {
@@ -104,9 +108,6 @@ export function terminalAsk({ input = process.stdin, output = process.stderr } =
         output.write("\n");
         done(answer.trim());
       });
-      // After rl.question: readline clears the current line when it starts a question, so a question written before
-      // it was erased and the person saw an empty line.
-      output.write(question);
     });
 }
 

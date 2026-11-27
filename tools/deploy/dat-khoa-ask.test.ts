@@ -16,19 +16,18 @@ function fakeTerminal() {
   return { input, output, written: () => written };
 }
 
-/** What the person still sees on the last line: the text after the last "clear to end of screen". */
-function visibleAfterLastClear(screen: string): string {
-  const parts = screen.split("\x1b[0J");
-  return parts[parts.length - 1] ?? "";
+/** Lines readline can no longer erase: everything before the last line break (it only clears the input line). */
+function settledLines(screen: string): string {
+  return screen.slice(0, screen.lastIndexOf("\n") + 1);
 }
 
 describe("make dat-khoa — câu hỏi khoá còn hiện trên màn", () => {
-  it("in câu hỏi sau khi readline xoá dòng, nhận câu trả lời, không hiện chữ đã dán", async () => {
+  it("in câu hỏi trên dòng riêng mà readline không xoá, nhận câu trả lời, không hiện chữ đã dán", async () => {
     const term = fakeTerminal();
     const ask = terminalAsk({ input: term.input, output: term.output });
     const answer = ask("VERCEL_TOKEN (dán rồi Enter): ");
     await new Promise((r) => setImmediate(r));
-    expect(visibleAfterLastClear(term.written())).toContain("VERCEL_TOKEN (dán rồi Enter): ");
+    expect(settledLines(term.written())).toContain("VERCEL_TOKEN (dán rồi Enter): \n");
     term.input.write("khoa-thu-0000\r");
     expect(await answer).toBe("khoa-thu-0000");
     expect(term.written()).not.toContain("khoa-thu-0000");
