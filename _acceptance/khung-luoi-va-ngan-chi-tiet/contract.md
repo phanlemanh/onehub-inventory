@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: []
-status: approved
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-27T09:04:51Z
 design_doc: _acceptance/khung-luoi-va-ngan-chi-tiet/design.md
