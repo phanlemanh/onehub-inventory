@@ -1,14 +1,14 @@
 ---
 schema_version: 1
-feature: "Đầu chủ sửa được diện tích, tầng, phòng ngủ, hướng và loại hình của căn mình chào — ngay trên ô ở máy tính và trong chi tiết căn ở mọi cỡ màn — và giá trị ấy là của sàn: danh mục dùng chung chỉ điền chỗ sàn chưa có, ô khác danh mục có dấu nhỏ và lệnh «lấy lại theo Danh bạ»"
+feature: "Đầu chủ sửa được diện tích, tầng, phòng ngủ, hướng và loại hình của căn mình chào — ngay trên ô ở máy tính và trong chi tiết căn ở mọi cỡ màn — và giá trị ấy là của sàn: danh mục dùng chung chỉ điền chỗ sàn chưa có, ô khác danh mục có dấu nhỏ và lệnh «lấy lại theo danh mục»"
 slug: tin-rao-giu-gia-tri-rieng
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api, db]
 screens: [inventory]
-status: draft
-approved_by:
-approved_at:
+status: approved
+approved_by: Manh Phan
+approved_at: 2026-11-27
 design_doc: _acceptance/tin-rao-giu-gia-tri-rieng/design.md
 ---
 
@@ -35,18 +35,20 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
   điện thoại hiện năm thuộc tính, Then tin thứ nhất hiện giá trị riêng, tin thứ hai hiện giá trị danh mục; Loại căn
   («Studio», «2PN») suy từ Phòng ngủ hiệu lực của tin; lọc (cả phần chạy ở máy chủ), ⌘K và cây địa lý đọc cùng giá trị ấy (một hàm đọc hiệu lực).
 - AC-2: Given Bảng hàng ở 1024 hoặc 1440 và vai có quyền sửa hàng, When sửa ô Diện tích hoặc Phòng ngủ của một tin đang mở
-  (gõ, Enter), Then giá trị lưu qua cửa `/api/v1` với nguồn «sàn gõ», ô hiện giá trị mới, thông báo đã lưu có Hoàn tác
+  theo luật sửa trên ô hiện hành của kho, Then giá trị lưu qua cửa `/api/v1` với nguồn «sàn gõ», ô hiện giá trị mới, thông báo đã lưu có Hoàn tác
   trả đúng giá trị trước; gửi với phiên bản cũ (người khác vừa sửa) bị từ chối, câu báo theo luật của hàng 4, giá trị đã lưu không đổi; chữ không đọc được (vd «bảy mươi», Phòng ngủ «2,5») hiện câu lỗi dưới ô, không gửi gì, chữ đã
-  gõ còn nguyên — cùng luật đọc, câu lỗi, phiên bản và hoàn tác của hàng 4.
+  gõ còn nguyên — cùng luật đọc, câu lỗi, phiên bản và hoàn tác của hàng 4; cách mở và xác nhận sửa theo luật sửa trên ô hiện hành của
+  kho (VP11 sẽ đổi nó: Enter là sửa, bấm ra ngoài là lưu), không chép phím của hàng 4.
 - AC-3: Given hồ sơ căn của một tin đang mở ở 360, 414, 1024 và 1440, When bấm «Sửa» ở khối thông tin căn, đổi năm trường
   rồi Lưu, Then cả năm giá trị lưu một lần với nguồn «sàn gõ» và khối hiện giá trị mới; Tầng theo luật tầng của danh mục
-  (7, 15A; «07» bị từ chối), Hướng và Loại hình chọn từ danh sách; Hoàn tác trả cả năm về trước.
+  (7, 15A; «07» bị từ chối), Hướng chọn từ tám hướng cố định (Hỏi-5), Loại hình chọn từ danh sách; Loại căn không có ô gõ — luôn suy từ Phòng ngủ
+  (Hỏi-2); Hoàn tác trả cả năm về trước.
 - AC-4: Given một ô có giá trị riêng khác giá trị danh mục, When nhìn ô trên lưới và dòng trong hồ sơ căn, Then có một dấu
-  nhỏ có tên cho trình đọc màn hình «khác <nhãn danh mục theo Hỏi-4>: <giá trị danh mục>» (chữ đọc từ bảng nhãn); ô bằng danh mục, ô danh mục trống và căn chờ khớp
+  nhỏ có tên cho trình đọc màn hình «khác danh mục: <giá trị danh mục>» (chữ đọc từ bảng nhãn); ô bằng danh mục, ô danh mục trống và căn chờ khớp
   KHÔNG có dấu; dấu không đổi màu chữ ô, không chặn lưu, đạt axe ở sáng và tối.
-- AC-5: Given một ô có dấu khác Danh bạ, When chọn lệnh lấy lại (chữ theo Hỏi-4, đọc từ bảng nhãn; trên ô hoặc trong hồ sơ căn), Then giá trị riêng
+- AC-5: Given một ô có dấu khác Danh bạ, When chọn lệnh lấy lại (chữ «danh mục», đọc từ bảng nhãn; trên ô hoặc trong hồ sơ căn), Then giá trị riêng
   và nguồn bị xoá, ô hiện giá trị danh mục, dấu tắt; Hoàn tác trả lại giá trị riêng và nguồn cũ. Tin từng có giá trị tệp
-  rồi bị sàn gõ đè: lấy lại về đâu theo câu trả lời Hỏi-7 (khuyên: về danh mục).
+  rồi bị sàn gõ đè: lấy lại về thẳng danh mục (Hỏi-7), không về giá trị tệp trước.
 - AC-6 (cross-layer): Given tin của sàn có giá trị riêng nguồn «sàn gõ» và «nhập từ tệp» cho căn X, và một tin khác không
   có giá trị riêng, When danh mục đổi giá trị của căn X, Then giá trị riêng của tin không đổi một byte; tin không có giá trị
   riêng hiện giá trị danh mục mới; không lệnh nào của sàn đổi được một dòng `catalog_units` (đếm dòng và băm trước/sau).
@@ -67,6 +69,11 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
   diện, `/api/v1` và cơ sở dữ liệu, Then chỉ vai có `updateListing` thấy lệnh sửa, lấy lại, gắn sang căn khác (qua bộ nút
   theo quyền); vai khác vẫn thấy «Báo sai thông tin căn»; máy chủ trả 403 cho vai không quyền; người sàn B không đọc,
   không ghi được giá trị riêng của sàn A (ca mới trong bộ kiểm cách ly); tin Đã bán, Ngừng khoá năm thuộc tính như 3g.
+- AC-12: Given hồ sơ căn ở 360 và 1440, When mở một tin Đã bán và một tin Ngừng hẳn với vai có `updateListing` và với vai
+  không giữ căn, Then chỗ nút «Sửa» của khối thông tin căn là một dòng chữ nhạt có ổ khoá nói lý do (C1), chỗ nút «Hỏi đầu
+  chủ» ở đáy hồ sơ là một dòng chữ nhạt nói lý do (C2) — không nút mờ, không biến mất im lặng, chữ đọc từ bảng nhãn; tin
+  đang mở thì hai nút như cũ; trên điện thoại nút «Sửa» ở đầu mục có vùng bấm ít nhất 44px, máy tính 28px (C10); ngăn hiện
+  thuộc tính căn chỉ để đọc khi không bấm «Sửa» (C16).
 
 ## Vai × Màn
 
@@ -84,7 +91,8 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
 - Trục thuộc tính (Diện tích · Tầng · Phòng ngủ · Hướng · Loại hình; Loại căn suy ra): AC-1, AC-3; trên ô chỉ Diện tích,
   Phòng ngủ (AC-2) vì ba cột kia chưa có trên Bảng hàng.
 - Trục người (có `updateListing` · không · sàn khác): AC-11. Thước: bảng quyền 013, SP-1.
-- [GIẢ ĐỊNH] Danh sách hướng là tám hướng (Hỏi-5) — người gạch ở Cổng Phạm vi.
+- Danh sách hướng là tám hướng (Hỏi-5, chủ kho duyệt ở Cổng Phạm vi).
+- Trục trạng thái của nút trong hồ sơ căn (đang mở · Đã bán · Ngừng hẳn) × vai (có quyền sửa · không giữ căn): AC-12.
 
 ## Đường đo
 
@@ -93,7 +101,7 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
   (danh mục không đổi, không đè), AC-4/5 (dấu, lấy lại), AC-9 (căn chờ khớp), AC-11 (sàn khác). Số đếm dùng thật sau giao
   (số ô sửa, số lần lấy lại) đọc từ bảng `listings` nguồn «sàn gõ» ở phiên nghiệm thu — không cần mã mới.
 - Vế «mức đủ thông tin hiện giá trị của sàn» của ngưỡng: năm phần của mức đủ (hàng 3b) không gồm thuộc tính căn, nên vế
-  này không đo được như đang viết — máy đề nghị gạch (Hỏi-8, chủ kho quyết ở Cổng Phạm vi).
+  này gạch khỏi ngưỡng (Hỏi-8, chủ kho duyệt ở Cổng Phạm vi: mức đủ giữ như cũ).
 - Vế «giá và trạng thái giữ luật đã ký, ô máy tính ra không sửa»: E13 (bộ bài của hàng 4 chạy lại, cộng ca ô thuộc tính
   không mở sửa dưới 768 px).
 
@@ -107,22 +115,26 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
 - Lịch sử ai sửa gì — hàng 3c. Mức đủ thông tin không đổi (năm phần của 3b không gồm thuộc tính căn).
 - Trang khách — hàng 17; khi dựng thì đọc giá trị hiệu lực qua luật ẩn (SP-4).
 
-## Câu hỏi cho chủ kho (Cổng Phạm vi)
+## Đã chốt ở Cổng Phạm vi
 
-- Hỏi-1 · Lỗi ngăn chi tiết căn ông thấy 27/11 — ông liệt kê; lỗi nào nằm ở trang chi tiết thì sửa trong 3h (lời ông ở Cổng
-  Đáng).
-- Hỏi-2 · Loại căn (Studio, 2PN) — khuyên: không cho gõ đè, luôn suy từ Phòng ngủ của tin; muốn «2PN» khác thì sửa Phòng ngủ.
-- Hỏi-3 · Sửa trường riêng của sàn trên điện thoại — khuyên: làm ở 3h trong trang chi tiết (ô cơ hội 3d chỉ có giá và trạng
-  thái; trang chi tiết sửa được mọi thứ ở mọi cỡ).
-- Hỏi-4 · Chữ trên màn «Tin rao» / «Danh bạ» so với «Hàng» / «danh mục» hôm nay.
-- Hỏi-5 · Hướng chọn từ tám hướng cố định hay gõ chữ tự do.
-- Hỏi-9 · Sửa trên lưới: hai cột (Diện tích, Phòng ngủ; khuyên) hay năm cột (thêm Tầng, Hướng, Loại hình ngay sau Phòng ngủ).
-- Hỏi-10 · Chi tiết căn: mỗi khối một «Sửa» (khối căn của 3h, khối lần chào của 3g; khuyên) hay một «Sửa» mở một hộp chung.
-- Hỏi-7 · Tin có giá trị tệp rồi bị sàn gõ đè: «lấy lại» về danh mục (khuyên) hay về giá trị tệp trước rồi mới về danh mục.
-- Hỏi-8 · Mức đủ thông tin giữ năm phần của 3b, không gồm thuộc tính căn (khuyên: giữ) — gạch vế ấy khỏi ngưỡng của ô cơ hội.
-- Hỏi-6 · Dấu khác Danh bạ — chọn một trong 2–3 ứng viên ReUI có ảnh (khối mới).
+Chủ kho duyệt 2026-11-27 tại phiên dãy R, nguyên văn dòng trả lời:
+
+> Hỏi-1: C1, C2 (căn đã bán, ngừng hẳn: thay «Hỏi đầu chủ» bằng dòng nhạt nói lý do), C10, C16 vào 3h · Hỏi-2: không gõ
+> đè Loại căn · Hỏi-3: làm ở 3h · Hỏi-4: «danh mục» · Hỏi-5: tám hướng · Hỏi-6: chấm · Hỏi-7: lấy lại về danh mục · Hỏi-8:
+> mức đủ giữ như cũ · Hỏi-9: hai cột · Hỏi-10: mỗi khối một «Sửa» · duyệt hay sửa: duyệt
+
+- Hỏi-1 → AC-12. C1, C10 và Hỏi-10 cùng là ba câu «Chuẩn nút dùng chung» chủ kho đã duyệt ở phiên BH 2026-11-27, nguyên
+  văn «Duyệt cả ba câu» (sổ đợt `dieu-phoi-nen`, mục «Chuẩn nút dùng chung»). C2 theo câu 2 của chuẩn ấy (lời chủ kho tại
+  phiên R: «Theo luật mới»). Các điểm C khác không chọn; C5, C7, C12, C13 thuộc việc khung VP10.
+- Hỏi-2 → AC-3. Hỏi-3 → AC-3 (làm ở 3h, trong hồ sơ căn ở mọi cỡ). Hỏi-4 → AC-4, AC-5 (chữ «danh mục»). Hỏi-5 → AC-3.
+  Hỏi-6 → AC-4 (dấu chấm). Hỏi-7 → AC-5. Hỏi-8 → Đường đo. Hỏi-9 → AC-2. Hỏi-10 → AC-3, AC-12.
+- Luật đã duyệt ở phiên BH mà 3h áp, không hỏi lại: luật nút «…» («Duyệt luật đã sửa» — đầu mục căn có «Sửa» và «Báo
+  sai thông tin», hai việc thường, hiện thẳng); khung ngăn và đầu ngăn một dòng («Chốt cả bốn», «Chốt một dòng» — việc
+  VP10, 3h dựng trên đó); cách bấm và sửa ô («Duyệt cả ba lối A» — việc VP11, 3h dựng trên đó).
 
 ## Notes
 
 - Bản bấm được, ảnh và ứng viên ReUI dựng sau khi 3g vào main (G-2711-6); Cổng Phạm vi trình sau khi giám sát soi.
+- Thi công đứng sau VP10 `khung-luoi-va-ngan-chi-tiet` và VP11 `chuan-hoa-he-design` (G-2711-12, G-2711-16): gộp main có
+  cả hai rồi mới dựng; ảnh bằng chứng chụp trên khung mới.
 - Sửa sau ký khi 3h gộp: hàng 4, hàng 5, 3g, 3e, 12 (design §6).

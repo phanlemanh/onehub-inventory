@@ -34,7 +34,7 @@ evals:
     layer: ui-observed
     cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E2b
     paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
-    expected: "exit 0; trên Bảng hàng đăng nhập (Postgres dãy R) ở 1024 và 1440: chọn ô Diện tích của một tin đang mở, gõ '72,5', Enter → ô hiện '72,5 m²', thông báo đã lưu có Hoàn tác; tải lại trang thì ô vẫn '72,5 m²'; Hoàn tác trả ô về giá trị trước; gõ 'bảy mươi' hiện câu lỗi dưới ô và không có lời gọi PATCH nào (đếm mạng); ảnh evidence/E2b-1024.png, E2b-1440.png"
+    expected: "exit 0; trên Bảng hàng đăng nhập (Postgres dãy R) ở 1024 và 1440: chọn ô Diện tích của một tin đang mở, mở sửa và xác nhận theo luật sửa trên ô hiện hành của kho (rút từ helper e2e dùng chung của sửa trên ô, không viết tay phím), gõ '72,5' → ô hiện '72,5 m²', thông báo đã lưu có Hoàn tác; tải lại trang thì ô vẫn '72,5 m²'; Hoàn tác trả ô về giá trị trước; gõ 'bảy mươi' hiện câu lỗi dưới ô và không có lời gọi PATCH nào (đếm mạng); ảnh evidence/E2b-1024.png, E2b-1440.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
 
   - id: E3
@@ -69,7 +69,7 @@ evals:
     layer: ui-observed
     cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E5
     paths: [src/modules/listings/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
-    expected: "exit 0; ở 1440 trên ô có dấu và ở 360 trong hồ sơ căn: chọn lệnh lấy lại (tìm theo chữ đọc từ ontology/labels.yaml, không viết tay) → PATCH mang giá trị null cho đúng thuộc tính ấy; ô hiện giá trị danh mục, dấu tắt; đọc lại từ cơ sở dữ liệu: cột giá trị và cột nguồn đều null; Hoàn tác trả giá trị riêng và nguồn cũ (đọc lại cơ sở dữ liệu); ca tin nguồn File bị gõ đè rồi lấy lại: kỳ vọng theo câu trả lời Hỏi-7 (khuyên: về danh mục, cột nguồn null); ca đối chứng dùng chữ cứng khác bảng nhãn cho 'label not from labels.yaml'"
+    expected: "exit 0; ở 1440 trên ô có dấu và ở 360 trong hồ sơ căn: chọn lệnh lấy lại (tìm theo chữ đọc từ ontology/labels.yaml, không viết tay) → PATCH mang giá trị null cho đúng thuộc tính ấy; ô hiện giá trị danh mục, dấu tắt; đọc lại từ cơ sở dữ liệu: cột giá trị và cột nguồn đều null; Hoàn tác trả giá trị riêng và nguồn cũ (đọc lại cơ sở dữ liệu); ca tin nguồn File bị gõ đè rồi lấy lại: về thẳng danh mục theo Hỏi-7 (cột giá trị và cột nguồn null); ca đối chứng dùng chữ cứng khác bảng nhãn cho 'label not from labels.yaml'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
 
   - id: E6
@@ -156,5 +156,22 @@ evals:
     executor: test
     cmd: config:executors.test.sua_tren_o
     paths: [src/modules/listings/edit-rules.ts, src/modules/listings/save-door.ts, src/components/candidate/**]
-    expected: "exit 0; bộ bài của hàng 4 chạy lại không đổi một ca (giá, trạng thái, ô máy tính ra không sửa); cộng ca mới trong src/components/candidate/data-region-cell-edit.test.tsx: dưới 768 px ô Diện tích, Phòng ngủ không mở sửa (gõ, Enter, F2 không mở khung), từ 768 px mở; ca đối chứng mở sửa ở 360 cho 'phone cell opened for edit'"
+    expected: "exit 0; bộ bài của hàng 4 chạy lại không đổi một ca (giá, trạng thái, ô máy tính ra không sửa); cộng ca mới trong src/components/candidate/data-region-cell-edit.test.tsx: dưới 768 px ô Diện tích, Phòng ngủ không mở sửa (mọi lối mở sửa của luật sửa trên ô hiện hành đều không mở khung), từ 768 px mở; ca đối chứng mở sửa ở 360 cho 'phone cell opened for edit'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-12
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/ui/**, tests/tin-rao-gia-tri-rieng.test.tsx]
+    expected: "exit 0; ma trận viết trước ba trạng thái (đang mở, Closed, Withdrawn) × hai vai (có updateListing, không giữ căn) dựng hồ sơ căn: tin đang mở có nút «Sửa» ở đầu khối thông tin căn và nút «Hỏi đầu chủ» ở đáy khi người xem không giữ căn; tin Closed, Withdrawn không có hai nút ấy (không có button nào mang tên ấy, kể cả disabled) mà có hai dòng data-slot section-locked-reason và ask-locked-reason, chữ rút từ ontology/labels.yaml (không viết tay); thuộc tính căn hiện chỉ để đọc khi chưa bấm «Sửa» (không input nào trong khối); ca đối chứng ẩn nút không để dòng cho 'blocked action disappears silently' và ca dùng nút disabled cho 'dimmed button instead of reason'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14b
+    criterion: AC-12
+    executor: ui-check
+    layer: ui-observed
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E14b
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    expected: "exit 0; trên khung ngăn của VP10 (main đã gộp VP10 và VP11), ở 360 và 1440, sáng và tối: hồ sơ căn 0606 (Đã bán) và 1201 (Ngừng hẳn) có dòng chữ nhạt có ổ khoá ở chỗ «Sửa» và dòng nhạt nói lý do ở chỗ «Hỏi đầu chủ»; tin đang mở có hai nút; ở 360 hộp bao của nút «Sửa» đầu mục cao ít nhất 44px, ở 1440 cao 28px (getBoundingClientRect); axe không có lỗi; ảnh evidence/E14b-<khổ>-<nền>.png"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
