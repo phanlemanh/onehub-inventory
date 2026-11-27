@@ -1,0 +1,239 @@
+schema_version: 1
+feature_slug: sua-thong-tin-can
+# Ma trận viết trước:
+#   AC-1: 4 vai × 3 lần chào (đang mở mới nhất, lần trước, đã đóng) = 12 ô «có nút / không nút», hằng 12 ghim; 4 vai × PATCH
+#         details = 4 mã (200 ba vai, 403 Quản trị sàn), hằng 4 ghim.
+#   AC-4: 5 kết cục (offline, 409, 401, 500, 403) × hộp = 5 câu ghim, hằng 5.
+#   AC-6: lớp màn: 5 kiểu × bộ sửa đúng kiểu = 5 ô, hằng 5 (o-rieng-nam-kieu); lớp máy chủ: 5 kiểu × (giá trị đúng lưu,
+#         giá trị sai kiểu bị từ chối) = 10 ô, hằng 10 (custom-nam-kieu); thêm trường đã ngừng, lựa chọn không có = 2 ca từ
+#         chối; vai: Quản trị sàn ô không mở kèm đối chứng dương Đầu chủ mở được (o-rieng-quan-tri-khong-mo), PATCH
+#         customField của Quản trị sàn 403 (custom-quan-tri-403).
+#   AC-10: 2 loại sửa (bốn trường, trường riêng) × «Xác nhận lúc» theo Hỏi-1 = 2 ô, hằng 2 (details-mot-luat-xac-nhan).
+#   AC-7: 7 trả lời (401, 403, 409, 404, 400, 500, thân hỏng) = 7 kết cục ghim, hằng 7; quét src/ tìm bảng mã thứ hai.
+#   AC-9: 2 vật (hộp, ô riêng) × 2 nền = 4 lượt quét; 4 khổ.
+# Bài và ca (tên ca là thông điệp ghim):
+#   tests/sua-thong-tin-may-chu.test.ts: details-bon-truong · details-ngoai-tap-400 · details-qua-dai-400 ·
+#     custom-nam-kieu · custom-sai-kieu-400 · custom-ngung-400 · custom-khong-lua-chon-400 · quan-tri-403 ·
+#     custom-quan-tri-403 · details-mot-luat-xac-nhan · hop-409-ban-hien-tai
+#   src/modules/listings/ui/http-save-door.test.ts: bay-tra-loi-tu-handler-that
+#   src/lib/write-failure.test.ts: mot-bang-ma · nem-va-tra-cung-luat
+#   tests/mot-luat-ghi.test.ts: khong-bang-ma-thu-hai
+#   tests/sua-thong-tin-can.test.tsx: nut-sua-12-o · hop-luu-dem-lai · hop-khong-doi-khong-gui · hop-qua-dai · hop-nam-ket-cuc ·
+#     hop-truong-cu-dai · hop-de-trong-la-xoa · hop-409-tai-ban-moi · o-rieng-nam-kieu · o-rieng-sai-kieu ·
+#     o-rieng-quan-tri-khong-mo · dan-cot-rieng · du-thong-tin-cho-hang-15
+#   tests/bang-hang-khong-du-quyen-doi-chung.test.tsx: doi-chung-co-vung-hang · doi-chung-co-ma-can (tệp mới: bài đã ký của hàng
+#     10 giữ nguyên; cùng ba kiểm, lưới được cho chiều cao để vẽ dòng)
+#   tests/e2e/sua-thong-tin-can.spec.ts (bốn khổ): sua-bon-truong · hoan-tac-bon-truong · o-rieng-theo-kieu · axe-sang-toi
+#   tests/e2e-db/sua-thong-tin-can.spec.ts: tai-lai-con · quan-tri-khong-nut
+# Cặp phá thử (bản sao; ca tương ứng phải đỏ với thông điệp ghim):
+#   pha-thu-nut-khong-quyen (nút Sửa bỏ PermittedAction)          → «nut-sua-12-o: CompanyAdmin·đang mở»
+#   pha-thu-bo-kiem-rieng (handler bỏ checkCustomValue)            → «custom-sai-kieu-400»
+#   pha-thu-401-thanh-403 (luật đọc 401 như 403)                   → «mot-bang-ma: 401»
+#   pha-thu-bang-ma-thu-hai (http-save-door so status riêng)        → «khong-bang-ma-thu-hai: http-save-door.ts»
+#   pha-thu-dem-rieng (hồ sơ đếm thiếu bằng mảng riêng)             → «du-thong-tin-cho-hang-15»
+#   pha-thu-bo-vung-hang (màn không đủ quyền vẫn vẽ vùng hàng)       → «khong-du-quyen-tren-man: vẫn có vùng hàng»
+#   pha-thu-luoi-khong-cao (bỏ tallGridViewport ở bài đối chứng)     → «doi-chung-co-ma-can»
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx]
+    expected: "exit 0; ca 'nut-sua-12-o' ghim 12 ô (ba vai sửa thấy nút ở lần chào đang mở; Quản trị sàn, lần trước, đã đóng không thấy). Chiều đỏ: pha-thu-nut-khong-quyen → «nut-sua-12-o: CompanyAdmin·đang mở»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E1b
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    layer: backend-effect
+    paths: [src/modules/listings/**, src/app/api/v1/listings/**]
+    expected: "exit 0; ca 'vai-4-o' (4 vai × PATCH details theo bảng quyền: ba vai 200 và ghi một dòng, Quản trị sàn 403 không ghi, hằng 4), 'quan-tri-403', 'details-bon-truong'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_e2e
+    paths: [src/modules/listings/**, src/app/(app)/inventory/**, tests/e2e/sua-thong-tin-can.spec.ts]
+    expected: "exit 0 ở bốn khổ; ca 'sua-bon-truong' (bốn dòng của mục và số «n/5» đổi sau Lưu) và 'hoan-tac-bon-truong' (Hoàn tác đưa bốn dòng về cũ)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2b
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_e2e_db
+    layer: backend-effect
+    paths: [src/modules/listings/**, src/app/**, tests/e2e-db/sua-thong-tin-can.spec.ts]
+    expected: "exit 0; ca 'tai-lai-con' (đăng nhập [MAU], sửa bốn trường, tải lại trang: hồ sơ vẫn hiện giá trị đã lưu)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2-ui
+    criterion: AC-2
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3487/inventory
+    paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**]
+    steps:
+      - "With the lane H dev server on port 3487 (sample mode), open /inventory?role=ListAgent&record=4d415500-0001-4000-8000-000000000002 at 1440 wide (unit 1101, whose listing lacks Tài chính, so the count reads 4/5 before), save _acceptance/sua-thong-tin-can/evidence/E2-ho-so-1440.png"
+      - "Press «Sửa» in the «Lần chào đang mở» section, save _acceptance/sua-thong-tin-can/evidence/E2-hop-1440.png; change Pháp lý and type a Tài chính, press «Lưu», save _acceptance/sua-thong-tin-can/evidence/E2-da-luu-1440.png"
+      - "Reload, then repeat the three frames at 360 wide on the same unit (the sample resets on reload) as E2-ho-so-360.png, E2-hop-360.png, E2-da-luu-360.png"
+    question: "Nút «Sửa» có nằm ở đầu mục «Lần chào đang mở», bên phải, cùng dáng nút phụ với «Báo sai thông tin» của mục Căn không; hộp có đủ bốn trường; sau Lưu bốn dòng và số «n/5» có đổi theo không, ở cả hai khổ? Nêu khung nào lệch."
+    expected: "Đúng chỗ, đủ bốn trường, giá trị và số đếm đổi ở cả hai khổ"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E3
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx]
+    expected: "exit 0; ca 'hop-khong-doi-khong-gui' (0 lần gọi cửa), 'hop-qua-dai' (201 ký tự: câu tại trường, 0 lần gọi), 'hop-truong-cu-dai' (Pháp lý 350 ký tự sẵn, chỉ đổi Nội thất: lưu được, thay đổi gửi đi không mang Pháp lý), 'hop-de-trong-la-xoa' (để trống Tài chính: thay đổi mang financing null, câu «Còn thiếu» có lại Tài chính), 'custom-xoa-khi-trong', 'details-ngoai-tap-400', 'details-qua-dai-400'. Chiều đỏ: bỏ kiểm độ dài ở hộp → «hop-qua-dai: đã gửi»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/**, src/lib/write-failure.ts, src/components/candidate/use-change.tsx, tests/sua-thong-tin-can.test.tsx]
+    expected: "exit 0; ca 'hop-nam-ket-cuc' ghim năm câu (mất mạng, căn vừa đổi, phiên hết hạn, máy chủ lỗi kèm «Thử lại»; 403 chỉ còn «Thôi») và chữ đã gõ còn nguyên, hằng 5; 'noi-that-cua-luu' (cửa lưu thật qua móc sửa: 401 là phiên hết hạn, 400 là lỗi máy chủ, không phải «không đủ quyền»)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4b
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    layer: backend-effect
+    paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx]
+    expected: "exit 0; ca 'hop-409-ban-hien-tai' (PATCH details với phiên bản cũ: 409 kèm bản hiện tại, dòng không đổi) và 'hop-409-tai-ban-moi' (trả lời 409 lấy từ createListingsHandlers thật qua cửa lưu: đóng hộp thì mục hiện bản mới nhất)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-5
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx]
+    expected: "exit 0; ca 'du-thong-tin-cho-hang-15' (sau khi lưu Pháp lý và Tình trạng sử dụng, câu «Còn thiếu» không nhắc hai phần ấy và completeness() trên listing đã lưu đồng ý với số trên màn). Chiều đỏ: pha-thu-dem-rieng → «du-thong-tin-cho-hang-15»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    layer: backend-effect
+    paths: [src/modules/listings/**, src/modules/company-config/rules.ts, src/app/api/v1/listings/**]
+    expected: "exit 0; lớp máy chủ: 'custom-nam-kieu' (10 ô, hằng 10), 'custom-ngung-400', 'custom-khong-lua-chon-400', 'custom-quan-tri-403'. Chiều đỏ: pha-thu-bo-kiem-rieng → «custom-sai-kieu-400»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6b
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/ui/**, tests/sua-thong-tin-can.test.tsx]
+    expected: "exit 0; lớp màn: 'o-rieng-nam-kieu' (5 ô, hằng 5: ô chữ, ô số, ô ngày, danh sách lựa chọn, Có/Không/Chưa có), 'o-rieng-sai-kieu' (dòng dưới ô nói kiểu, 0 lần gọi cửa), 'o-rieng-quan-tri-khong-mo' (Quản trị sàn: ô không mở; đối chứng dương Đầu chủ: ô mở)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6-ui
+    criterion: AC-6
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3487/inventory
+    paths: [src/modules/listings/ui/**]
+    steps:
+      - "Sample mode has no company layer, so the frames come from the signed-in browser case on the lane H Postgres: run `DB_LANE=h DB_PORT=5567 npx playwright test -c playwright.db.config.ts tests/e2e-db/sua-thong-tin-can.spec.ts -g o-rieng-that --project=1440`; it opens one cell of each of the five custom field kinds on a real company and saves _acceptance/sua-thong-tin-can/evidence/E6-<kind>-1440.png (text, number, date, single_select, boolean). Open the five frames."
+    question: "Mỗi ô có bộ sửa đúng kiểu (ô chữ, ô số, ô ngày, danh sách lựa chọn, Có/Không/Chưa có) cùng khung sửa trên ô của cột Giá không? Nêu kiểu nào sai."
+    expected: "Năm bộ sửa đúng kiểu, cùng khung"
+    evidence_required: [run_id, screenshot, observed, verdict]
+
+  - id: E7
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/ui/http-save-door.ts, src/lib/write-failure.ts, src/components/candidate/use-change.tsx, src/modules/listings/listings-http.ts]
+    expected: "exit 0; ca 'bay-tra-loi-tu-handler-that' (bảy trả lời lấy từ createListingsHandlers, bảy kết cục ghim), 'mot-bang-ma', 'nem-va-tra-cung-luat'. Chiều đỏ: pha-thu-401-thanh-403 → «mot-bang-ma: 401»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7b
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/**, tests/mot-luat-ghi.test.ts]
+    expected: "exit 0; ca 'khong-bang-ma-thu-hai' (quét src/: chỉ write-failure.ts so mã trả lời của cửa ghi). Chiều đỏ: pha-thu-bang-ma-thu-hai → «khong-bang-ma-thu-hai: http-save-door.ts»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx, tests/bang-hang-khong-du-quyen-doi-chung.test.tsx]
+    expected: "exit 0; ca 'dan-cot-rieng' (đúng kiểu ở «sẽ đổi», sai kiểu và không có lựa chọn ở «sai kiểu» kèm lý do, chữ rơi vào Về tay theo Hỏi-2), 'doi-chung-co-vung-hang', 'doi-chung-co-ma-can'. Chiều đỏ: pha-thu-bo-vung-hang → «khong-du-quyen-tren-man: vẫn có vùng hàng»; pha-thu-luoi-khong-cao → «doi-chung-co-ma-can»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_e2e
+    paths: [src/modules/listings/ui/**, tests/e2e/sua-thong-tin-can.spec.ts]
+    expected: "exit 0 ở bốn khổ; ca 'axe-sang-toi' (hồ sơ và hộp, nền sáng và tối, 0 lỗi), tiêu điểm về «Sửa» khi đóng hộp (trong 'sua-bon-truong'), 'hop-long-co-nen-mo' (đúng một lớp nền mờ thấy được), 'thong-bao-khong-de-nut-chinh' (hình chữ nhật của thông báo và nút chính không chồng nhau), 'thong-bao-dung-cho-khi-khong-ho-so'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/modules/listings/ui/**]
+    expected: "exit 0; không mã màu thô trên tệp giao diện mà vòng chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-10
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    layer: backend-effect
+    paths: [src/modules/listings/**]
+    expected: "exit 0; ca 'details-mot-luat-xac-nhan' (2 ô, hằng 2: lần sửa bốn trường và lần sửa trường riêng đặt lastConfirmedAt theo câu Hỏi-1 đã chốt). Chiều đỏ: bỏ lastConfirmedAt ở nhánh details của applyChange → «details-mot-luat-xac-nhan: bốn trường»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9b
+    criterion: AC-9
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    paths: [src/components/candidate/form-dialog.tsx, src/components/candidate/record-panel.tsx, tests/hop-long-nen-mo.test.tsx]
+    expected: "exit 0; ca 'hop-long-co-nen-mo' (FormDialog trong một hộp có nền mờ của nó) và đối chứng 'doi-chung' (cùng cách lồng mà không đánh dấu thì 0 lớp nền mờ — đúng lỗi được sửa); hộp không lồng giữ đúng một lớp"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-11
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_unit
+    layer: backend-effect
+    paths: [src/modules/listings/**, tests/sua-thong-tin-can.test.tsx]
+    expected: "exit 0; ca 'o-chi-tiet-bon-cot' (bốn ô: hai chọn ba giá trị, hai chữ tối đa 200), 'o-chi-tiet-mot-thay-doi' (ô gửi đúng thay đổi details của hộp, chữ đọc lại về giá trị lưu), 'o-chi-tiet-dan' (dán đọc theo kiểu, quá 200 ký tự ở «sai kiểu»)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13b
+    criterion: AC-11
+    executor: test
+    cmd: config:executors.test.sua_thong_tin_e2e
+    paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**, tests/e2e/sua-thong-tin-can.spec.ts]
+    expected: "exit 0 ở 1440 và 1024 (360, 414 bỏ qua có lý do: điện thoại không sửa trên ô); ca 'sua-tren-o-chi-tiet' (ô Nội thất mở bộ chọn, lưu, hoàn tác về cũ; sửa lại rồi mở hồ sơ thì hồ sơ hiện giá trị ô vừa lưu)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13-ui
+    criterion: AC-11
+    executor: ui-check
+    layer: ui-observed
+    target: http://127.0.0.1:3487/inventory
+    paths: [src/modules/listings/ui/**, src/app/(app)/inventory/**]
+    steps:
+      - "With the lane H dev server on port 3487 (sample mode), open /inventory?role=ListAgent at 1440 and at 1024 wide, save _acceptance/sua-thong-tin-can/evidence/E13-luoi-<khổ>.png; at 1440 scroll the grid right until Nội thất, Pháp lý, Tài chính, Hiện trạng are in view together, save E13-bon-cot-1440.png; at 1024 scroll the grid right to each of the four columns in turn, with Phòng ngủ or the column before it beside it, save E13-cot-<noi-that|phap-ly|tai-chinh|hien-trang>-1024.png (G-2611-4: 1024 leaves ~367px after the two pinned columns, the four need ~618px); press F2 on the Nội thất cell of unit 1101, save E13-o-noi-that-1440.png"
+    question: "Lưới có bốn cột Nội thất, Pháp lý, Tài chính, Hiện trạng ngay sau Phòng ngủ ở cả hai khổ, ô của căn đã bán có dấu khoá, và ô Nội thất mở danh sách ba giá trị cộng «Chưa có» cùng khung sửa trên ô của cột Trạng thái không? Nêu khung nào lệch."
+    expected: "Bốn cột đúng chỗ ở hai khổ, khoá đúng, bộ chọn cùng khung"
+    evidence_required: [run_id, screenshot, observed, verdict]

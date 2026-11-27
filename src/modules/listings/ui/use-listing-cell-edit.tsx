@@ -14,6 +14,7 @@ import {
 
 import type { FieldKey } from "@/components/candidate/column-kind";
 import type { GridRow, RegionCellEdit, RegionPaste } from "@/components/candidate/data-region";
+import { GRID_COPY } from "@/components/candidate/grid-copy";
 import { PASTE_COPY } from "@/components/candidate/paste-copy";
 import { PastePreview } from "@/components/candidate/paste-preview";
 import { notifyResult } from "@/components/templates/notify";
@@ -28,9 +29,16 @@ import {
   type SaveRequest,
 } from "../save-door";
 
-import { priceUndoable } from "../edit-rules";
+import { detailUndoable, priceUndoable } from "../edit-rules";
 
 import { CELL_EDIT_COPY as COPY, type CellEditLabels } from "./cell-edit-copy";
+import {
+  detailCellFields,
+  detailCells,
+  detailChange,
+  isDetailColumn,
+  type DetailColumnWords,
+} from "./detail-cells";
 import { FEE_INCLUSION_FIELD, NET_TO_SELLER_FIELD, type InventoryField } from "./inventory-rows";
 import { planPaste, type PastePlan } from "./listing-paste";
 import { pasteWords } from "./listing-paste-copy";
@@ -38,7 +46,10 @@ import { word } from "./cell-edit-copy";
 import {
   ListingCellEdit,
   StatusNeedsDialog,
+  cellKeyOf,
   lockedReasons,
+  type CustomCellField,
+  type CustomEdit,
   type ListingEdit,
   type StatusAsk,
 } from "./listing-cell-edit";
@@ -107,6 +118,9 @@ export function useListingCellEdit({
   noActivate,
   feeEditable = false,
   onServerWork,
+  customFields,
+  detailWords,
+  onSaved,
 }: {
   rows: readonly GridRow[];
   /** Absent: the grid is read-only. */
@@ -123,7 +137,28 @@ export function useListingCellEdit({
   feeEditable?: boolean;
   /** Called after a saved change whose other cells the server works out (the net to seller): the page reads again. */
   onServerWork?: () => void;
-}): { rows: readonly GridRow[]; cellEdit: RegionCellEdit | undefined; dialogs: ReactNode } {
+  /** The company's own fields whose cells edit by their kind (row 3g). */
+  customFields?: readonly CustomCellField[];
+  /** Words of the four detail columns (row 3g, «lối C»): with them those cells edit one part at a time. */
+  detailWords?: DetailColumnWords;
+  /** Told after every write that saved (the open record shows what the grid saved). */
+  onSaved?: () => void;
+}): {
+  rows: readonly GridRow[];
+  cellEdit: RegionCellEdit | undefined;
+  dialogs: ReactNode;
+  /** One write of a listing through the same door and versions (row 3g: the record's details). */
+  writeListing: (id: string, change: ListingChange, at: string) => Promise<WriteOutcome>;
+  /** The listing as the door last saved it, when it did (row 3g: the record shows it). */
+  savedListing: (id: string) => Listing | undefined;
+} {
+  // Typed cells (row 3g): the company's own fields, then the four details when their words are given.
+  const typedFields = useMemo(
+    () => [...(customFields ?? []), ...(detailWords ? detailCellFields(detailWords) : [])],
+    [customFields, detailWords],
+  );
+  const customKeys = useMemo(() => typedFields.map(cellKeyOf), [typedFields]);
+  const lock = useCallback((row: GridRow) => lockedReasons(row, customKeys), [customKeys]);
   const [door] = useState<ListingSaveDoor & { current?: (id: string) => Listing | undefined }>(
     () =>
       given ??
@@ -140,8 +175,23 @@ export function useListingCellEdit({
       }),
   );
   const [versions] = useState(() => new Map((listings ?? []).map((l) => [l.id, l.version])));
+  const [saved] = useState(() => new Map<string, Listing>());
+  /** The door's last answer: the record's dialog tells «the server would not take it» from «not allowed» (row 3g). */
+  const lastKind = useRef<string>("");
+  const customs = useMemo(
+    () => new Map<FieldKey, CustomCellField>(typedFields.map((f) => [cellKeyOf(f) as FieldKey, f])),
+    [typedFields],
+  );
+  /** The change a typed cell sends: one detail of the listing, or one value of the company's own field. */
+  const changeFor = useCallback(
+    (field: CustomCellField, value: CustomEdit["value"]): ListingChange =>
+      field.key && isDetailColumn(field.key) && detailWords
+        ? detailChange(field.key, value === null ? null : String(value), detailWords)
+        : { field: "customField", code: field.code, value },
+    [detailWords],
+  );
   const [data, setData] = useState<readonly GridRow[]>(() =>
-    rows.map((row) => ({ ...row, locked: lockedReasons(row) })),
+    rows.map((row) => ({ ...row, locked: lock(row) })),
   );
   // The page reads the rows again after a change the server works out (the net to seller of a fee change, row 10): the
   // new rows and versions replace the ones held here. Only for rows the server hands in (stable between renders).
@@ -149,10 +199,10 @@ export function useListingCellEdit({
   useEffect(() => {
     if (!onServerWork || (seen.current.rows === rows && seen.current.listings === listings)) return;
     seen.current = { rows, listings };
-    setData(rows.map((row) => ({ ...row, locked: lockedReasons(row) })));
+    setData(rows.map((row) => ({ ...row, locked: lock(row) })));
     for (const l of listings ?? [])
       versions.set(l.id, Math.max(versions.get(l.id) ?? 0, l.version));
-  }, [onServerWork, rows, listings, versions]);
+  }, [onServerWork, rows, listings, versions, lock]);
   const [ask, setAsk] = useState<StatusAsk | null>(null);
   const wide = useSyncExternalStore(
     subscribeWide,
@@ -160,41 +210,62 @@ export function useListingCellEdit({
     () => false,
   );
 
-  const patch = useCallback((id: string, fields: Partial<GridRow>) => {
-    setData((all) =>
-      all.map((row) => {
-        if (row.id !== id) return row;
-        const next = { ...row, ...fields } as GridRow;
-        return { ...next, locked: lockedReasons(next) };
-      }),
-    );
-  }, []);
+  const patch = useCallback(
+    (id: string, fields: Partial<GridRow>) => {
+      setData((all) =>
+        all.map((row) => {
+          if (row.id !== id) return row;
+          const next = { ...row, ...fields } as GridRow;
+          return { ...next, locked: lock(next) };
+        }),
+      );
+    },
+    [lock],
+  );
 
   /** One write through the door; the row's version moves on when it saves. */
   const write = useCallback(
     async (id: string, change: ListingChange, at: string): Promise<WriteOutcome> => {
       const outcome = await door.save({ id, version: versions.get(id) ?? 1, change, at });
+      lastKind.current = outcome.kind;
       if (outcome.kind === "saved") {
         versions.set(id, outcome.listing.version);
+        saved.set(id, outcome.listing);
+        onSaved?.();
         return "saved";
       }
       if (outcome.kind === "conflict" && outcome.current) {
         // Someone changed the listing since: the row shows it as the server keeps it now, never the edit over it.
         const current = outcome.current;
         versions.set(id, current.version);
+        saved.set(id, current);
         setData((all) =>
           all.map((row) => {
             if (row.id !== id) return row;
-            const next = { ...row, ...cellsOf(current, labels, row.transaction) } as GridRow;
-            return { ...next, locked: lockedReasons(next) };
+            const next = {
+              ...row,
+              ...cellsOf(current, labels, row.transaction),
+              ...(detailWords ? detailCells(current, detailWords) : {}),
+              // The company's own values as the server keeps them now (row 3g, finding of round 1).
+              ...Object.fromEntries(
+                customKeys
+                  .filter((k) => k.startsWith("custom."))
+                  .map((k) => [
+                    k,
+                    (current.customFields as Record<string, unknown> | undefined)?.[k.slice(7)] ??
+                      null,
+                  ]),
+              ),
+            } as GridRow;
+            return { ...next, locked: lock(next) };
           }),
         );
         return "conflict";
       }
-      // The cell never sends a change the rules refuse; if one slips through, the door refused it.
+      // The cell never sends a change the rules refuse; if one slips through, the door refused it (row 4).
       return outcome.kind === "invalid" ? "refused" : outcome.kind;
     },
-    [door, versions, labels],
+    [door, versions, labels, saved, lock, onSaved, detailWords, customKeys],
   );
 
   const save = useCallback(
@@ -259,6 +330,51 @@ export function useListingCellEdit({
     [headers, labels, listings, patch, write, onServerWork],
   );
 
+  /** One value of a company's own field (row 3g): the cell shows it at once, the door saves it, «Hoàn tác» puts it back. */
+  const saveCustom = useCallback(
+    async (row: GridRow, edit: CustomEdit) => {
+      const field = customs.get(edit.field as FieldKey);
+      if (!field || !labels) return;
+      const unit = String(row["Listing.unitNumber"] ?? "");
+      const shown = (v: unknown) =>
+        v === null || v === undefined
+          ? COPY.customNone
+          : typeof v === "boolean"
+            ? v
+              ? GRID_COPY.yes
+              : GRID_COPY.no
+            : COPY.customShown(field.kind, v);
+      const what = (v: unknown) =>
+        `${field.header} ${headers["Listing.unitNumber"].toLocaleLowerCase("vi")} ${unit}: ${shown(v)}`;
+      const key = edit.field as FieldKey;
+      const was = (row[key] ?? null) as CustomEdit["value"];
+      const before: Partial<GridRow> = {
+        [key]: row[key],
+        [CONFIRMED]: row[CONFIRMED],
+      };
+      const at = new Date().toISOString();
+      // Words longer than the limit, kept from an imported sheet, cannot be written back: no undo then.
+      const undoable = !isDetailColumn(key) || detailUndoable(was);
+      patch(row.id, { [key]: edit.value, [CONFIRMED]: at });
+      const outcome = await runDoorChange({
+        done: COPY.done(what(edit.value), undoable),
+        undone: COPY.undone(what(was)),
+        write: () => write(row.id, changeFor(field, edit.value), at),
+        undo: undoable
+          ? async () => {
+              const result = await write(row.id, changeFor(field, was), new Date().toISOString());
+              if (result === "saved") patch(row.id, before);
+              return result;
+            }
+          : undefined,
+        failed: (why) => COPY.saveFailed(what(edit.value).toLocaleLowerCase("vi"), why),
+        undoFailed: (why) => COPY.undoFailed(labels, unit, shown(edit.value), why),
+      });
+      if (outcome !== "saved" && outcome !== "conflict") patch(row.id, before);
+    },
+    [customs, labels, headers, patch, write, changeFor],
+  );
+
   // Pasting a region (row 5): the preview first, then every ticked cell through the same door, undone at once.
   const [plan, setPlan] = useState<PastePlan | null>(null);
   const [applying, setApplying] = useState(false);
@@ -271,10 +387,12 @@ export function useListingCellEdit({
         (field) => headerOf?.(field) ?? headers[field as InventoryField] ?? field,
         // Row 19's net-to-seller column is worked out from the price and the fees: a paste never writes it.
         PASTE_COMPUTED,
+        customs,
+        changeFor,
       );
       setPlan({ ...plan, key: Date.now() });
     },
-    [labels, headerOf, headers],
+    [labels, headerOf, headers, customs, changeFor],
   );
   const applyPaste = useCallback(
     async (ids: readonly string[]) => {
@@ -289,18 +407,24 @@ export function useListingCellEdit({
       const before = new Map<string, Partial<GridRow>>();
       for (const { row } of picked)
         before.set(row.id, {
+          ...before.get(row.id),
           [PRICE]: row[PRICE],
           [STATUS]: row[STATUS],
           [CONFIRMED]: row[CONFIRMED],
         });
+      for (const { row, field } of picked)
+        // Every typed cell (a custom value or one of the four details, row 3g) keeps its value for undo and failure.
+        if (customs.has(field)) before.set(row.id, { ...before.get(row.id), [field]: row[field] });
       // How many pasted cells of each row hold a saved value, to know when the row's confirmed time goes back.
       const holding = new Map<string, number>();
       setApplying(true);
-      for (const { row, change } of picked)
+      for (const { row, field, change, cell } of picked)
         patch(row.id, {
           ...(change.field === "listPrice"
             ? { [PRICE]: change.listPrice }
-            : { [STATUS]: change.standardStatus }),
+            : change.field === "standardStatus"
+              ? { [STATUS]: change.standardStatus }
+              : { [field]: cell ?? null }),
           [CONFIRMED]: at,
         });
       const lines = new Map(plan.changes.map((c) => [c.id, c]));
@@ -314,10 +438,15 @@ export function useListingCellEdit({
                 const back: ListingChange =
                   field === PRICE
                     ? { field: "listPrice", listPrice: was[PRICE] as number }
-                    : {
-                        field: "standardStatus",
-                        standardStatus: was[STATUS] as ListingStandardStatus,
-                      };
+                    : field === STATUS
+                      ? {
+                          field: "standardStatus",
+                          standardStatus: was[STATUS] as ListingStandardStatus,
+                        }
+                      : changeFor(
+                          customs.get(field as FieldKey)!,
+                          (was[field as FieldKey] ?? null) as CustomEdit["value"],
+                        );
                 const result = await write(row.id, back, new Date().toISOString());
                 if (result === "saved") {
                   // The confirmed time goes back only with the row's last cell that still held a pasted value.
@@ -354,7 +483,7 @@ export function useListingCellEdit({
       setApplying(false);
       setPlan(null);
     },
-    [plan, labels, patch, write],
+    [plan, labels, patch, write, changeFor, customs],
   );
 
   const blocked = useMemo(() => new Set(noActivate ?? []), [noActivate]);
@@ -362,7 +491,10 @@ export function useListingCellEdit({
     if (!wide || !listings || !labels) return undefined;
     return {
       action: "updateListing",
-      fields: feeEditable ? [PRICE, STATUS, FEE] : [PRICE, STATUS],
+      fields: [
+        ...((feeEditable ? [PRICE, STATUS, FEE] : [PRICE, STATUS]) as FieldKey[]),
+        ...customs.keys(),
+      ],
       label: (row, field) =>
         COPY.editLabel(
           labels,
@@ -376,12 +508,30 @@ export function useListingCellEdit({
           onSave={(edit) => void save(session.row, edit)}
           onAsk={setAsk}
           canActivate={!blocked.has(session.row.id)}
+          custom={(() => {
+            const field = customs.get(session.field);
+            return field
+              ? { field, onSave: (edit: CustomEdit) => void saveCustom(session.row, edit) }
+              : undefined;
+          })()}
         />
       ),
       paste: onPaste,
       pasteRefused: () => notifyResult({ message: pasteWords(labels).refused }),
     };
-  }, [wide, listings, labels, headers, headerOf, save, onPaste, feeEditable, blocked]);
+  }, [
+    wide,
+    listings,
+    labels,
+    headers,
+    headerOf,
+    save,
+    saveCustom,
+    customs,
+    onPaste,
+    feeEditable,
+    blocked,
+  ]);
 
   const dialogs = labels ? (
     <>
@@ -405,5 +555,23 @@ export function useListingCellEdit({
       />
     </>
   ) : null;
-  return { rows: data, cellEdit, dialogs };
+  const savedListing = useCallback((id: string) => saved.get(id), [saved]);
+  // The record's details (row 3g) are no column of the grid; their save moves the row's confirmed time like any edit.
+  const writeListing = useCallback(
+    async (id: string, change: ListingChange, at: string) => {
+      const written = await write(id, change, at);
+      // The cell keeps row 4's reading of a 400; the record's dialog says the server would not take it, not «not allowed».
+      const outcome = written === "refused" && lastKind.current === "invalid" ? "fault" : written;
+      const now = saved.get(id);
+      if (outcome === "saved")
+        patch(id, {
+          [CONFIRMED]: now?.lastConfirmedAt ?? at,
+          // The record's dialog saved details: their columns show them too (row 3g).
+          ...(now && detailWords ? detailCells(now, detailWords) : {}),
+        });
+      return outcome;
+    },
+    [write, patch, saved, detailWords],
+  );
+  return { rows: data, cellEdit, dialogs, writeListing, savedListing };
 }

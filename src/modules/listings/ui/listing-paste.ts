@@ -4,14 +4,19 @@
 import type { PasteChangeLine, PasteOutLine } from "@/components/candidate/paste-preview";
 import type { FieldKey } from "@/components/candidate/column-kind";
 import type { GridRow, RegionPaste } from "@/components/candidate/data-region";
+import { GRID_COPY } from "@/components/candidate/grid-copy";
 import { PASTE_COPY } from "@/components/candidate/paste-copy";
 import type { ListingStandardStatus } from "@/generated/ontology";
 import { formatMoney, statusLabel } from "@/lib/format";
 
+import { readCustomValue, sameCustomValue } from "../custom-rules";
+import { detailUndoable } from "../edit-rules";
 import { readPastePrice, readPasteStatus, readStatusText } from "../paste-rules";
-import type { PriceOrStatusChange } from "../save-door";
+import type { ListingChange, PriceOrStatusChange } from "../save-door";
 
-import type { CellEditLabels } from "./cell-edit-copy";
+import { CELL_EDIT_COPY, type CellEditLabels } from "./cell-edit-copy";
+import { isDetailColumn } from "./detail-cells";
+import { cellKeyOf, type CustomCellField } from "./listing-cell-edit";
 import { pasteWords } from "./listing-paste-copy";
 
 const PRICE = "Listing.listPrice";
@@ -29,9 +34,11 @@ const UNIT_FACTS: readonly FieldKey[] = [
 /** One write the preview may apply, keyed by its line's id. */
 export interface PasteWrite {
   row: GridRow;
-  field: typeof PRICE | typeof STATUS;
-  change: PriceOrStatusChange;
+  field: FieldKey;
+  change: PriceOrStatusChange | ListingChange;
   undoable: boolean;
+  /** What a typed cell shows once the write goes (row 3g). */
+  cell?: unknown;
 }
 
 export interface PastePlan {
@@ -60,6 +67,17 @@ export function planPaste(
   labels: CellEditLabels,
   headerOf: (field: FieldKey) => string,
   computed: readonly FieldKey[] = [],
+  /** The company's own fields the cells edit (row 3g): a paste takes them by their kind. */
+  customs: ReadonlyMap<string, CustomCellField> = new Map(),
+  /** The change a typed cell sends (a detail of the listing, or a custom value); a custom value when absent. */
+  changeFor: (field: CustomCellField, value: string | number | boolean | null) => ListingChange = (
+    f,
+    value,
+  ) => ({
+    field: "customField",
+    code: f.code,
+    value,
+  }),
 ): PastePlan {
   const say = pasteWords(labels);
   const changes: PasteChangeLine[] = [];
@@ -79,6 +97,48 @@ export function planPaste(
     }
     if (cell.group !== undefined) {
       skipped.push({ id, where: PASTE_COPY.groupRow(cell.group), raw, why: say.other });
+      continue;
+    }
+    const custom = customs.get(field);
+    if (custom) {
+      // A company's own field takes a pasted word by its kind (row 3g), with the cell's one rule.
+      const read = readCustomValue(custom.kind, raw, custom.options, custom.limit);
+      if (!read.ok) {
+        wrong.push({ ...line, why: CELL_EDIT_COPY.customProblem(read.problem, custom.limit) });
+        continue;
+      }
+      if (sameCustomValue(read.value, row[field])) {
+        same += 1;
+        continue;
+      }
+      if (!cell.open) {
+        skipped.push({ ...line, why: row.locked?.[field] ?? say.notAllowed });
+        continue;
+      }
+      const shown = (v: unknown) =>
+        v === null || v === undefined
+          ? "—"
+          : typeof v === "boolean"
+            ? v
+              ? GRID_COPY.yes
+              : GRID_COPY.no
+            : CELL_EDIT_COPY.customShown(custom.kind, v);
+      changes.push({
+        id,
+        where: line.where,
+        field: line.field,
+        from: shown(row[field]),
+        to: shown(read.value),
+      });
+      writes.set(id, {
+        row,
+        field: cellKeyOf(custom) as FieldKey,
+        change: changeFor(custom, read.value),
+        // A detail's words longer than the limit, kept from an imported sheet, cannot be pasted back (row 3g).
+        undoable: !isDetailColumn(field) || detailUndoable(row[field]),
+        cell: read.value,
+      });
+      rows.add(row.id);
       continue;
     }
     if (field !== PRICE && field !== STATUS) {
