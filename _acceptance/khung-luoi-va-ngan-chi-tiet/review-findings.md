@@ -4,42 +4,49 @@
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Gate card counts three carried-over PASS evals as failing**
+- **E14 is carried as PASS from round 5 while the same command, run fresh this round, exits 2**
+  Người dùng thấy gì: Bảng kết quả của vòng có thể ghi một bài kiểm tra là đạt dù lần chạy mới nhất của cùng lệnh đã lỗi. Người dùng không thấy gì ở màn hình; chỉ người đọc báo cáo có thể bị hiểu nhầm về mức xanh của vòng.
+  Căn cứ: Không ảnh hưởng người dùng cuối và không mất dữ liệu; vòng vẫn bị từ chối đúng vì lần chạy lỗi được tính, nên chỉ cần ghi lại hạn chế này và sửa khi chỉnh công cụ chấm.
+  file: `_acceptance/khung-luoi-va-ngan-chi-tiet/s4-args-r6.json`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Gate card counts three carried-over PASS evals as failing (r6)**
   Người dùng thấy gì: Thẻ trình chủ kho ghi bảy tiêu chí chưa đạt trong khi thực tế chỉ bốn tiêu chí hỏng. Chủ kho có thể hiểu nhầm và bỏ cả ba tiêu chí đang đạt khi chọn lối thu phạm vi.
   Căn cứ: Chỉ là chữ trên thẻ, không đụng người dùng cuối hay dữ liệu; chủ kho đọc lại bằng chứng là thấy, và sửa thẻ rất rẻ nhưng nằm ngoài hợp đồng giao diện.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/card.html`
   severity: low
   Đề xuất: known-limits
 
-- **Evidence page header still shows 2 grading rounds after round 5**
+- **Evidence page header still shows 2 grading rounds after round 5 (r6)**
   Người dùng thấy gì: Trang bằng chứng báo hai lượt chấm trong khi thẻ nói năm lượt. Chủ kho có thể không thấy là đã vượt trần ba lượt.
   Căn cứ: Chỉ lệch một con số trên trang bằng chứng, không ảnh hưởng người dùng sản phẩm; chủ kho tự đối chiếu được với dòng thời gian cùng trang.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/evidence-page.html`
   severity: low
   Đề xuất: known-limits
 
-- **Gate card lists three carried-forward PASS evals (E8, E11, E16) as failed**
+- **Gate card lists three carried-forward PASS evals (E8, E11, E16) as failed (r6)**
   Người dùng thấy gì: Thẻ trình chủ kho tính ba tiêu chí đã đạt là hỏng, nên bảy thay vì bốn tiêu chí bị nêu chưa đạt. Quyết định lối ra của chủ kho có thể dựa trên danh sách sai.
   Căn cứ: Hậu quả nằm ở quyết định của một người đọc thẻ, không mất dữ liệu; sửa thẻ rẻ nhưng không thuộc tiêu chí giao diện nào.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/card.html`
   severity: medium
   Đề xuất: known-limits
 
-- **Dark 'not apart' control frame still has a 13-level surface step at the record's left edge in the strip above the grid card, above the suite's own 10-level visibility threshold**
+- **Dark 'not apart' control frame still has a 13-level surface step at the record's left edge in the strip above the grid card, above the suite's own 10-level visibility threshold (r6)**
   Người dùng thấy gì: Phép đối chiếu cho giao diện tối có thể không phân biệt được ngăn có viền trái với ngăn thiếu viền. Bài chấm có thể cho kết quả không đáng tin dù màn hình thật không đổi.
   Căn cứ: Không ảnh hưởng người dùng cuối, chỉ làm bài chấm kém chắc; ghi lại hạn chế là đủ cho đến khi dựng lại khung đối chiếu.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/evals.yaml`
   severity: medium
   Đề xuất: known-limits
 
-- **Evidence page header still says 2 grading rounds after round 5**
+- **Evidence page header still says 2 grading rounds after round 5 (r6)**
   Người dùng thấy gì: Trang bằng chứng vẫn ghi hai lượt chấm dù đã chấm năm lượt, nên che việc đã vượt trần ba lượt.
   Căn cứ: Chỉ là một con số cũ trên trang tài liệu, không ảnh hưởng người dùng sản phẩm và chủ kho tự kiểm được ở dòng thời gian.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/evidence-page.html`
   severity: low
   Đề xuất: known-limits
 
-- **Shape 2 (hand-made fixture shaped to the reader): E18's dark not-apart control frame was rebuilt by hand to get the verdict the eval wants, and nothing in the tree can regenerate it**
+- **Shape 2 (hand-made fixture shaped to the reader): E18's dark not-apart control frame was rebuilt by hand to get the verdict the eval wants, and nothing in the tree can regenerate it (r6)**
   Người dùng thấy gì: Ảnh đối chiếu của giao diện tối được vẽ tay và không ai dựng lại được khi màn hình đổi. Kết quả chấm có thể chỉ phản ánh lời mô tả chứ không phải khả năng phân biệt bằng mắt.
   Căn cứ: Không ảnh hưởng người dùng cuối, chỉ giảm độ tin của một bài chấm; sửa đúng cách cần dựng công cụ tạo ảnh nên đắt hơn hậu quả.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/evals.yaml`
@@ -74,7 +81,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: known-limits
 
-- **Hình dạng 2 (mẫu đối chứng làm tay, không rút được từ bên tạo): hai khung đỏ khong-tach của E18 không có lệnh nào sinh lại (r3 · tệp đã đổi)**
+- **Hình dạng 2 (mẫu đối chứng làm tay, không rút được từ bên tạo): hai khung đỏ khong-tach của E18 không có lệnh nào sinh lại (r3)**
   Người dùng thấy gì: Hai ảnh dùng làm mẫu «ngăn không tách khỏi lưới» được làm tay, nên khó chụp lại đúng cùng điều kiện về sau. Người dùng không bị ảnh hưởng, chỉ việc kiểm lại bằng mắt có thể kém chắc.
   Căn cứ: Chỉ liên quan tới bằng chứng nghiệm thu, không tới màn hình người dùng; nếu ảnh cũ lệch thì chụp lại là xong, không mất gì.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/evals.yaml`
@@ -109,4 +116,6 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: wont-fix
 
-⚠ Cụm ngoài vùng phủ: 6/6 lỗi rơi vào file không bộ đo nào phủ (_acceptance/khung-luoi-va-ngan-chi-tiet/card.html, _acceptance/khung-luoi-va-ngan-chi-tiet/evidence-page.html, _acceptance/khung-luoi-va-ngan-chi-tiet/evals.yaml) — dừng và quyết: mở rộng hợp đồng hay rút phạm vi.
+## Chưa adversarial-verify (refuter chết)
+
+Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
