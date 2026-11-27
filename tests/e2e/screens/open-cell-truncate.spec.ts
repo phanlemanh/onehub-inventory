@@ -6,7 +6,7 @@
 // lifts the width limit with a style tag on the real page.
 import { expect, test, type Page } from "@playwright/test";
 
-import { assertCardsNotTable, isPhone, rowsShown } from "../phone-list";
+import { assertCardsNotTable, isPhone, regionReady, rowsShown } from "../phone-list";
 import { themKieu } from "../sua-trang";
 
 const SIZES = new Set(["1440", "360"]);
@@ -14,6 +14,9 @@ const LONG_NAME_ROW = "4d415500-0010-4000-8000-000000000003";
 
 async function openGrid(page: Page, route: string): Promise<void> {
   await page.goto(route);
+  // VP4's rule: measure only once the region has taken over the server's HTML and draws one layout (row 3g, sửa sau ký:
+  // the wider inventory of row 3g made the race visible — the first opener was the phone card's).
+  await regionReady(page);
   await page.locator('[data-slot="data-region"] tbody tr').first().waitFor();
   await expect(page.locator('[hidden][id^="S:"]')).toHaveCount(0);
 }

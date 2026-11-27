@@ -141,10 +141,11 @@ export function useChange(): { run: (change: Change) => Promise<boolean>; dialog
 }
 
 /**
- * What a write door answers (row 4): the four outcomes of the real write path, plus `fault` for anything else that
- * went wrong (a 500, a bug) — never a thrown error, so the screen always puts the old value back.
+ * What a write door answers (row 4): the outcomes of the real write path — `expired` when the session ended (401, row
+ * 3g) — plus `fault` for anything else that went wrong (a 500, a bug) — never a thrown error, so the screen always puts
+ * the old value back. A thrown failure is read by the one rule of src/lib/write-failure.ts.
  */
-export type WriteOutcome = "saved" | "refused" | "offline" | "conflict" | "fault";
+export type WriteOutcome = "saved" | "refused" | "offline" | "conflict" | "expired" | "fault";
 type Failure = Exclude<WriteOutcome, "saved">;
 
 /**
@@ -166,7 +167,7 @@ export interface DoorChange {
 
 /**
  * Runs one write; a thrown failure of the real write path becomes its outcome (fetch's TypeError or a device that
- * reports itself offline → offline, 403 → refused, 409 → conflict). Anything else is a fault: logged, and answered
+ * reports itself offline → offline, 401 → expired, 403 → refused, 409 → conflict). Anything else is a fault: logged, and answered
  * as `fault` so the screen still puts the old value back and says so.
  */
 async function attempt(write: () => Promise<WriteOutcome>): Promise<WriteOutcome> {

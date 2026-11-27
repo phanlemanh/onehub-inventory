@@ -1,0 +1,1 @@
+driver=playwright test runner; no network reader. Playwright passed 1/1; gac-hydration 0 warnings. WebServer log: idle db connection closed (admin command) x5, not an HTTP failure.
