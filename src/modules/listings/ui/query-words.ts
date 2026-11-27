@@ -25,6 +25,8 @@ export const QUERY_WORD = {
   columns: "columns",
   /** Development only, row 3h's prototype: `?mark=dot|badge|icon`, the look of the catalog mark (Hỏi-6). */
   mark: "mark",
+  /** Development only, row 3h's prototype: `?edit=one`, one edit button for the whole record (variant b). */
+  edit: "edit",
 } as const;
 
 /**

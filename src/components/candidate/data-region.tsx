@@ -867,23 +867,16 @@ export function DataRegion({
               mark === null ? (
                 typed
               ) : (
-                // The mark sits at the cell's free edge, away from the value, so the value keeps its width and line.
+                // The mark sits right after the value, on its line; a text value too long gives way with an ellipsis.
                 <span
                   data-slot="cell-with-mark"
                   className={cn(
-                    "relative flex w-full min-w-0 items-center",
+                    "flex w-full min-w-0 items-center gap-1 whitespace-nowrap",
                     column.align === "right" ? "justify-end" : "justify-start",
                   )}
                 >
                   {typed}
-                  <span
-                    className={cn(
-                      "absolute inset-y-0 flex items-center",
-                      column.align === "right" ? "left-0" : "right-0",
-                    )}
-                  >
-                    {mark}
-                  </span>
+                  {mark}
                 </span>
               );
             if (index !== 0 || !opensRecord) return cell;

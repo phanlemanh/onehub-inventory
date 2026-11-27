@@ -307,6 +307,8 @@ export default async function Page({ searchParams }: Props) {
           // Variant B of row 3h, for comparison at the scope gate: outside production only, like `?state=`.
           more:
             process.env.NODE_ENV !== "production" && first(query[QUERY_WORD.columns]) === "five",
+          // Variant (b) of the record's edit button, for the same comparison: one edit button for the whole record.
+          editOne: process.env.NODE_ENV !== "production" && first(query[QUERY_WORD.edit]) === "one",
         }}
         fullRecord={{
           records: data ? recordsOf(data, new Date()) : {},

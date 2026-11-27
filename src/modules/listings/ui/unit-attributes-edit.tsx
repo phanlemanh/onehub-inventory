@@ -6,13 +6,22 @@
 // dialog as row 3g's details, not a second one. One save is one unitAttributes change through the grid's save door,
 // with «Hoàn tác» that puts back all five as they were. An empty field follows the catalog again.
 import { PencilIcon } from "lucide-react";
-import { useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 import { FormDialog } from "@/components/candidate/form-dialog";
 import { runDoorChange, type WriteOutcome } from "@/components/candidate/use-change";
 import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { Button } from "@/components/ui/button";
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSeparator,
+  FieldSet,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -25,7 +34,7 @@ import type { Listing } from "@/generated/ontology";
 import { PermittedAction, usePermitted } from "@/modules/identity/ui";
 
 import { DIRECTION_VALUES } from "../../catalog";
-import type { UnitAttributesChange } from "../save-door";
+import type { DetailsChange, ListingChange, UnitAttributesChange } from "../save-door";
 import {
   PROPERTY_SUB_TYPES,
   UNIT_ATTRIBUTE_FIELDS,
@@ -43,7 +52,12 @@ import {
 
 import { attributeUndo } from "./attribute-cells";
 import { CELL_EDIT_COPY } from "./cell-edit-copy";
-import { DetailsEditContext } from "./listing-details-edit";
+import {
+  DetailsEditContext,
+  useDetailsForm,
+  type DetailsWords,
+  type ListingDetails,
+} from "./listing-details-edit";
 import { RECORD_COPY } from "./record-copy";
 import {
   UNIT_ATTRIBUTE_COPY as COPY,
@@ -99,84 +113,20 @@ function changeOf(own: OwnAttributes, draft: Draft): UnitAttributesChange | null
   return Object.keys(change).length > 1 ? (change as UnitAttributesChange) : null;
 }
 
-/** The edit button of the record's unit section and its dialog; nothing without the grid's write or the right to edit. */
-export function UnitAttributesEdit({
-  id,
-  unitNumber,
-  own,
-  catalog,
-  words,
-}: {
-  id: string;
-  unitNumber: string;
-  own: OwnAttributes;
-  catalog: CatalogAttributes | null;
-  words: UnitAttributeWords;
-}) {
-  const api = useContext(DetailsEditContext);
-  const [open, setOpen] = useState(false);
+/** The five fields of a dialog, their draft and what a save sends (the unit section's edit button, and `?edit=one`). */
+export function useAttributesForm(
+  own: OwnAttributes,
+  catalog: CatalogAttributes | null,
+  words: UnitAttributeWords,
+) {
   const [draft, setDraft] = useState<Draft>(() => draftOf(own));
-  const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState<Exclude<WriteOutcome, "saved"> | null>(null);
   const [tried, setTried] = useState(false);
-  if (!api) return null;
   const effective = effectiveAttributes(own, catalog);
-  const openChange = (next: boolean) => {
-    if (next) {
-      setDraft(draftOf(own));
-      setFailed(null);
-      setTried(false);
-    }
-    setOpen(next);
-  };
-  const what = RECORD_COPY.detailsWhat(words.unit, unitNumber);
   const problems = UNIT_ATTRIBUTE_FIELDS.flatMap((f) => {
     const read = readDraft(f, draft);
     return read.ok ? [] : [[f, read.problem] as const];
   });
   const problemOf = new Map(problems);
-  const submit = async () => {
-    setTried(true);
-    if (problems.length > 0) return;
-    const change = changeOf(own, draft);
-    if (!change) {
-      setOpen(false);
-      return;
-    }
-    setBusy(true);
-    const outcome = await api.write(id, change, new Date().toISOString());
-    setBusy(false);
-    if (outcome !== "saved") {
-      setFailed(outcome);
-      api.changed();
-      return;
-    }
-    setOpen(false);
-    api.changed();
-    const back = attributeUndo(
-      own,
-      UNIT_ATTRIBUTE_FIELDS.filter((f) => change[f] !== undefined),
-    );
-    await runDoorChange({
-      done: RECORD_COPY.detailsDone(what),
-      undone: RECORD_COPY.detailsUndone(what),
-      write: () => Promise.resolve("saved"),
-      undo: async () => {
-        const result = await api.write(id, back, new Date().toISOString());
-        if (result === "saved") api.changed();
-        return result;
-      },
-      failed: (why) => RECORD_COPY.detailsFailed(why),
-      undoFailed: (why) => RECORD_COPY.detailsUndoFailed(what, why),
-    });
-  };
-  const refused = failed === "refused";
-  const formError =
-    failed === null
-      ? undefined
-      : refused
-        ? FRAME_COPY.refusedAction
-        : RECORD_COPY.detailsFailed(failed);
   /** The catalog's value under a field («…: 68,5 m²») while the field would differ from it. */
   const catalogLine = (f: UnitAttributeField) => {
     const c = effective[f].catalogValue;
@@ -243,25 +193,124 @@ export function UnitAttributesEdit({
       </Field>
     );
   };
+  return {
+    /** Starts the draft afresh from the listing's own values. */
+    reset: () => {
+      setDraft(draftOf(own));
+      setTried(false);
+    },
+    /** Marks the fields tried; true when a field must be fixed before anything is sent. */
+    blocked: (): boolean => {
+      setTried(true);
+      return problems.length > 0;
+    },
+    change: (): UnitAttributesChange | null => changeOf(own, draft),
+    /** The change that puts back the own values and sources `change` replaced. */
+    undo: (change: UnitAttributesChange): UnitAttributesChange =>
+      attributeUndo(
+        own,
+        UNIT_ATTRIBUTE_FIELDS.filter((f) => change[f] !== undefined),
+      ),
+    fields: (
+      <FieldGroup>
+        {typed("livingArea")}
+        {typed("floor")}
+        {typed("bedroomsTotal")}
+        {choice("directionFaces", DIRECTION_VALUES)}
+        {choice("propertySubType", PROPERTY_SUB_TYPES)}
+      </FieldGroup>
+    ),
+  };
+}
+
+/** A dialog's outcome line: what a save that did not go through says, and whether it was refused. */
+function failureLine(failed: Exclude<WriteOutcome, "saved"> | null) {
+  return {
+    refused: failed === "refused",
+    formError:
+      failed === null
+        ? undefined
+        : failed === "refused"
+          ? FRAME_COPY.refusedAction
+          : RECORD_COPY.detailsFailed(failed),
+  };
+}
+
+/** The record's edit button (a ghost edit button with its pencil). */
+const editTrigger = (words: { edit: string }, slot: string) => ({
+  render: <Button variant="ghost" size="sm" data-action="updateListing" data-slot={slot} />,
+  label: (
+    <>
+      <PencilIcon aria-hidden="true" />
+      {words.edit}
+    </>
+  ),
+});
+
+/** The edit button of the record's unit section and its dialog; nothing without the grid's write or the right to edit. */
+export function UnitAttributesEdit({
+  id,
+  unitNumber,
+  own,
+  catalog,
+  words,
+}: {
+  id: string;
+  unitNumber: string;
+  own: OwnAttributes;
+  catalog: CatalogAttributes | null;
+  words: UnitAttributeWords;
+}) {
+  const api = useContext(DetailsEditContext);
+  const [open, setOpen] = useState(false);
+  const form = useAttributesForm(own, catalog, words);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState<Exclude<WriteOutcome, "saved"> | null>(null);
+  if (!api) return null;
+  const openChange = (next: boolean) => {
+    if (next) {
+      form.reset();
+      setFailed(null);
+    }
+    setOpen(next);
+  };
+  const what = RECORD_COPY.detailsWhat(words.unit, unitNumber);
+  const submit = async () => {
+    if (form.blocked()) return;
+    const change = form.change();
+    if (!change) {
+      setOpen(false);
+      return;
+    }
+    setBusy(true);
+    const outcome = await api.write(id, change, new Date().toISOString());
+    setBusy(false);
+    if (outcome !== "saved") {
+      setFailed(outcome);
+      api.changed();
+      return;
+    }
+    setOpen(false);
+    api.changed();
+    const back = form.undo(change);
+    await runDoorChange({
+      done: RECORD_COPY.detailsDone(what),
+      undone: RECORD_COPY.detailsUndone(what),
+      write: () => Promise.resolve("saved"),
+      undo: async () => {
+        const result = await api.write(id, back, new Date().toISOString());
+        if (result === "saved") api.changed();
+        return result;
+      },
+      failed: (why) => RECORD_COPY.detailsFailed(why),
+      undoFailed: (why) => RECORD_COPY.detailsUndoFailed(what, why),
+    });
+  };
+  const { refused, formError } = failureLine(failed);
   return (
     <PermittedAction action="updateListing">
       <FormDialog
-        trigger={{
-          render: (
-            <Button
-              variant="ghost"
-              size="sm"
-              data-action="updateListing"
-              data-slot="unit-attributes-edit-open"
-            />
-          ),
-          label: (
-            <>
-              <PencilIcon aria-hidden="true" />
-              {words.edit}
-            </>
-          ),
-        }}
+        trigger={editTrigger(words, "unit-attributes-edit-open")}
         title={RECORD_COPY.detailsTitle(words.edit, what)}
         description={COPY.dialogDescription(words)}
         submitLabel={RECORD_COPY.detailsSubmit}
@@ -274,13 +323,131 @@ export function UnitAttributesEdit({
         refused={refused}
         slot="unit-attributes-edit"
       >
-        <FieldGroup>
-          {typed("livingArea")}
-          {typed("floor")}
-          {typed("bedroomsTotal")}
-          {choice("directionFaces", DIRECTION_VALUES)}
-          {choice("propertySubType", PROPERTY_SUB_TYPES)}
-        </FieldGroup>
+        {form.fields}
+      </FormDialog>
+    </PermittedAction>
+  );
+}
+
+const EditOneContext = createContext(false);
+/**
+ * Variant (b) of the record's edit buttons, for the scope gate only (`?edit=one`, outside production): one edit button at
+ * the top of the record body instead of one per section. Without it, variant (a): edit button on the unit section (row 3h)
+ * and on the listing section (row 3g).
+ */
+export const EditOneProvider = EditOneContext.Provider;
+export const useEditOne = (): boolean => useContext(EditOneContext);
+
+/**
+ * Variant (b): one edit button that opens one dialog with the unit's five fields, then the listing's four details. Each group
+ * saves through its own change (two writes for the prototype); «Hoàn tác» puts both back.
+ */
+export function RecordEditOne({
+  id,
+  unitNumber,
+  own,
+  catalog,
+  attributeWords,
+  details,
+  detailsWords,
+  titles,
+}: {
+  id: string;
+  unitNumber: string;
+  own: OwnAttributes;
+  catalog: CatalogAttributes | null;
+  attributeWords: UnitAttributeWords;
+  details: ListingDetails;
+  detailsWords: DetailsWords;
+  /** The two sections' titles, from the label table: the unit, and the open listing. */
+  titles: { unit: string; offer: string };
+}) {
+  const api = useContext(DetailsEditContext);
+  const [open, setOpen] = useState(false);
+  const unit = useAttributesForm(own, catalog, attributeWords);
+  const offer = useDetailsForm(details, detailsWords);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState<Exclude<WriteOutcome, "saved"> | null>(null);
+  if (!api) return null;
+  const openChange = (next: boolean) => {
+    if (next) {
+      unit.reset();
+      offer.reset();
+      setFailed(null);
+    }
+    setOpen(next);
+  };
+  const what = RECORD_COPY.detailsWhat(attributeWords.unit, unitNumber);
+  const submit = async () => {
+    const unitBlocked = unit.blocked();
+    const offerBlocked = offer.blocked();
+    if (unitBlocked || offerBlocked) return;
+    const changes: ListingChange[] = [unit.change(), offer.change()].filter(
+      (c): c is NonNullable<typeof c> => c !== null,
+    );
+    if (changes.length === 0) {
+      setOpen(false);
+      return;
+    }
+    const backs: ListingChange[] = [];
+    setBusy(true);
+    for (const change of changes) {
+      const outcome = await api.write(id, change, new Date().toISOString());
+      if (outcome !== "saved") {
+        setBusy(false);
+        setFailed(outcome);
+        api.changed();
+        return;
+      }
+      backs.unshift(
+        change.field === "unitAttributes" ? unit.undo(change) : offer.undo(change as DetailsChange),
+      );
+    }
+    setBusy(false);
+    setOpen(false);
+    api.changed();
+    await runDoorChange({
+      done: RECORD_COPY.detailsDone(what),
+      undone: RECORD_COPY.detailsUndone(what),
+      write: () => Promise.resolve("saved"),
+      undo: async () => {
+        for (const back of backs) {
+          const result = await api.write(id, back, new Date().toISOString());
+          if (result !== "saved") return result;
+        }
+        api.changed();
+        return "saved";
+      },
+      failed: (why) => RECORD_COPY.detailsFailed(why),
+      undoFailed: (why) => RECORD_COPY.detailsUndoFailed(what, why),
+    });
+  };
+  const { refused, formError } = failureLine(failed);
+  return (
+    <PermittedAction action="updateListing">
+      <FormDialog
+        trigger={editTrigger(attributeWords, "record-edit-one-open")}
+        title={RECORD_COPY.detailsTitle(attributeWords.edit, what)}
+        description={COPY.dialogDescription(attributeWords)}
+        submitLabel={RECORD_COPY.detailsSubmit}
+        busyLabel={RECORD_COPY.detailsBusy}
+        busy={busy}
+        open={open}
+        onOpenChange={openChange}
+        onSubmit={() => void submit()}
+        formError={formError}
+        refused={refused}
+        slot="record-edit-one"
+      >
+        <FieldSet>
+          <FieldLegend variant="label">{titles.unit}</FieldLegend>
+          {unit.fields}
+        </FieldSet>
+        <FieldSeparator />
+        <FieldSet>
+          <FieldLegend variant="label">{titles.offer}</FieldLegend>
+          {offer.fields}
+        </FieldSet>
       </FormDialog>
     </PermittedAction>
   );

@@ -3,12 +3,13 @@
 // listing was confirmed, how complete it is, the unit, the listing, and every listing of the unit. Read-only. Blocks
 // follow solution-crm-4 (Hỏi-4 at the scope gate), assembled from what the repo has. Touching an earlier listing turns
 // the whole record to it, the address stays (Hỏi-3).
+import { LockIcon } from "lucide-react";
 import { useRef, useState, type ReactNode } from "react";
 
 import { TypedCell } from "@/components/candidate/typed-cell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { EMPTY, formatArea, formatMoney } from "@/lib/format";
+import { EMPTY, formatArea, formatMoney, statusLabel } from "@/lib/format";
 import type {
   ListingFurnished,
   ListingOccupantType,
@@ -31,7 +32,14 @@ import { ListingCard, type ListingView } from "./listing-record";
 import { RECORD_COPY, confirmationSentence } from "./record-copy";
 import { AttributeDiffersMark } from "./attribute-differs-mark";
 import { attributeText, type UnitAttributeWords } from "./unit-attribute-copy";
-import { UnitAttributesEdit, useAttributeRevert, useOwnAttributes } from "./unit-attributes-edit";
+import {
+  RecordEditOne,
+  UnitAttributesEdit,
+  useAttributeRevert,
+  useEditOne,
+  useOwnAttributes,
+} from "./unit-attributes-edit";
+import { CELL_EDIT_COPY } from "./cell-edit-copy";
 
 /** One listing of the unit as the record reads it; `confirmedDays` is counted on the server for the request. */
 export interface RecordListing {
@@ -99,22 +107,34 @@ function Section({
   slot,
   title,
   action,
+  locked,
   children,
 }: {
   slot: string;
   title: string;
   /** A control on the section's head row, after the title (row 3e: ReportUnitError on the unit section). */
   action?: ReactNode;
+  /**
+   * Why the section cannot be edited now (row 3h: a sold or withdrawn listing), in row 3g's words: the grid's lock beside
+   * the title and one quiet line under the head.
+   */
+  locked?: string | undefined;
   children: ReactNode;
 }) {
   return (
     <section data-slot={slot} aria-label={title} className="flex flex-col gap-2 border-t pt-4">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+        <h3 className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
           {title}
+          {locked ? <LockIcon aria-hidden="true" className="size-3" /> : null}
         </h3>
         {action}
       </div>
+      {locked ? (
+        <p data-slot="section-locked-reason" className="text-xs text-muted-foreground">
+          {locked}
+        </p>
+      ) : null}
       {children}
     </section>
   );
@@ -189,6 +209,7 @@ export function ListingRecordFull({
   const own = useOwnAttributes(read?.id ?? "", read?.own);
   const words = labels.attributes;
   const revert = useAttributeRevert(read?.id ?? "", data.unit.unitNumber, own, words!);
+  const editOne = useEditOne();
   if (!read) return null;
   const { confirmedDays, ...parts } = details;
   const picked: RecordListing = {
@@ -210,6 +231,16 @@ export function ListingRecordFull({
   };
   // Only the open, newest listing has its attributes edited, like its details (row 3g's lock).
   const editable = isNewest && !detailsLocked(picked.standardStatus);
+  // A sold or withdrawn listing keeps its attributes, said in row 3g's words to a person who may edit (row 3h).
+  const statusName = statusLabel(picked.standardStatus, picked.transaction);
+  const lockedWhy =
+    words && revert && detailsLocked(picked.standardStatus)
+      ? picked.standardStatus === "Closed"
+        ? CELL_EDIT_COPY.lockedClosed(statusName)
+        : CELL_EDIT_COPY.lockedFinal(statusName)
+      : undefined;
+  // Variant (b) of the scope gate (`?edit=one`): one edit button on top for both sections, none on the sections.
+  const oneEdit = editOne && Boolean(words) && Boolean(labels.edit) && editable;
   /** The source and the mark after an attribute's value. */
   const after = <K extends UnitAttributeField>(
     field: K,
@@ -217,19 +248,21 @@ export function ListingRecordFull({
   ): ReactNode => {
     if (!words || (e.source !== "Typed" && e.source !== "File")) return undefined;
     const catalogShown = attributeText(words, field, e.catalogValue);
+    // The mark sits right after the value, as on the grid; the source word follows it.
     return (
       <>
-        <span data-slot="attribute-source" className="text-xs text-muted-foreground">
-          {words.sources[e.source]}
-        </span>
         {e.differs ? (
           <AttributeDiffersMark
             words={words}
             catalogShown={catalogShown}
             sourceWord={words.sources[e.source]}
             onRevert={editable && revert ? () => revert(field, catalogShown) : undefined}
+            lockedReason={lockedWhy}
           />
         ) : null}
+        <span data-slot="attribute-source" className="text-xs text-muted-foreground">
+          {words.sources[e.source]}
+        </span>
       </>
     );
   };
@@ -270,6 +303,30 @@ export function ListingRecordFull({
       data-listing-in-view={picked.id}
       className="flex flex-col gap-4"
     >
+      {oneEdit && words && labels.edit ? (
+        <div data-slot="record-edit-one" className="flex justify-end">
+          <RecordEditOne
+            key={`one:${picked.id}`}
+            id={picked.id}
+            unitNumber={unit.unitNumber}
+            own={own}
+            catalog={catalogUnit}
+            attributeWords={words}
+            details={details}
+            detailsWords={{
+              edit: labels.edit,
+              unit: labels.unit,
+              legalStatus: labels.parts.legalStatus,
+              furnished: labels.parts.furnished,
+              financing: labels.parts.financing,
+              occupantType: labels.parts.occupantType,
+              furnishedValues: labels.furnishedValues,
+              occupantValues: labels.occupantValues,
+            }}
+            titles={{ unit: labels.unit, offer: labels.currentListing }}
+          />
+        </div>
+      ) : null}
       <ListingCard view={cardView} priceLabel={labels.listPrice} />
       <p data-slot="listing-confirmation" className="text-xs text-muted-foreground">
         {confirmationSentence(picked.confirmedDays)}
@@ -308,8 +365,9 @@ export function ListingRecordFull({
       <Section
         slot="listing-unit"
         title={labels.unit}
+        locked={lockedWhy}
         action={
-          words && editable ? (
+          words && editable && !oneEdit ? (
             <span className="flex items-center gap-1">
               <UnitAttributesEdit
                 key={`attributes:${picked.id}`}
@@ -389,7 +447,7 @@ export function ListingRecordFull({
         slot="listing-offer"
         title={open ? labels.currentListing : labels.viewedListing}
         action={
-          open && isNewest && labels.edit ? (
+          open && isNewest && labels.edit && !oneEdit ? (
             <ListingDetailsEdit
               key={picked.id}
               id={picked.id}
