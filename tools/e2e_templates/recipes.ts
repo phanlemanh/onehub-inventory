@@ -856,13 +856,19 @@ export const REGION: Recipe[] = [
       if ((await cut.getAttribute("tabindex")) !== "0")
         fail("chu-dai: khong toi duoc bang ban phim");
       await page.keyboard.press("Tab");
-      await cut.focus();
-      const shown = await cut.evaluate((el) => ({
-        wraps: getComputedStyle(el).whiteSpace !== "nowrap",
-        fits: el.scrollWidth <= el.clientWidth,
-        full: el.textContent,
-        title: el.getAttribute("title"),
-      }));
+      // Focus and the reading in one call, on one node: right after the region is ready the grid can still redraw, and
+      // a focused cell that fits is no longer marked cut, so a second call through the locator landed on another,
+      // unfocused cell (Linux, GitHub run of row 11; same root as 2fcd4039, supervisor ruling G-2811-25). The wrap on
+      // focus is CSS (focus-visible), so it holds inside the call; nothing measured changed.
+      const shown = await cut.evaluate((el: HTMLElement) => {
+        el.focus();
+        return {
+          wraps: getComputedStyle(el).whiteSpace !== "nowrap",
+          fits: el.scrollWidth <= el.clientWidth,
+          full: el.textContent,
+          title: el.getAttribute("title"),
+        };
+      });
       if (!shown.wraps || !shown.fits || shown.full !== shown.title) {
         fail("chu-dai: khong doc du khi focus");
       }
