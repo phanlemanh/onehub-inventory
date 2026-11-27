@@ -15,6 +15,7 @@ import pg from "pg";
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
 import { expect, test } from "../../tools/e2e_templates/fixture";
 import { openSheet } from "../../tools/e2e_templates/settle";
+import { shellReady } from "./dang-nhap-vai";
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const MEMBER = "Thành viên";
@@ -110,7 +111,7 @@ const mobile = (info: TestInfo) => Number(info.project.name) < 768;
 
 /** The «Thành viên» entries of the sidebar; on a phone the sidebar sheet is opened first. */
 async function navMembers(page: Page, info: TestInfo) {
-  await expect(page.locator('[data-slot="account-menu"][data-ready]')).toBeVisible();
+  await shellReady(page);
   if (mobile(info)) await openSheet(page);
   return page.getByRole("link", { name: MEMBER, exact: true });
 }

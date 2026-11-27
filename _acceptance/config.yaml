@@ -26,6 +26,9 @@ executors:
     bang_hang_that_unit: "npx vitest run src/modules/listings tests/bang-hang-that.test.ts tests/mot-lan-doc.test.tsx tests/bang-hang-khong-du-quyen.test.tsx --coverage.enabled=false --reporter=verbose"   # bang-hang-du-lieu-that (row 10): HTTP handlers, read door, no sample data or stand-in role left in src
     bang_hang_that_db: "DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} npx vitest run -c vitest.db.config.ts tests/db/bang-hang-that.db.test.ts --reporter=verbose"   # bang-hang-du-lieu-that (row 10): listings tables, read and write at API and database, lane R Postgres
     bang_hang_that_e2e: "DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} npx playwright test -c playwright.db.config.ts tests/e2e-db/bang-hang-that.spec.ts"   # bang-hang-du-lieu-that (row 10): real inventory signed in, four sizes, lane R Postgres
+    sua_thong_tin_unit: "npx vitest run src/modules/listings src/lib/write-failure.test.ts src/components/candidate/use-change.test.tsx tests/sua-thong-tin-can.test.tsx tests/sua-thong-tin-may-chu.test.ts tests/sua-thong-tin-route.test.ts tests/mot-luat-ghi.test.ts tests/bang-hang-khong-du-quyen.test.tsx tests/bang-hang-khong-du-quyen-doi-chung.test.tsx tests/hop-long-nen-mo.test.tsx --coverage.enabled=false --reporter=verbose"   # sua-thong-tin-can (row 3g): record edit of four fields, custom field cells and paste, one write-failure rule
+    sua_thong_tin_e2e: "npx playwright test tests/e2e/sua-thong-tin-can.spec.ts"   # sua-thong-tin-can (row 3g): record edit and custom cells at four sizes, axe light and dark
+    sua_thong_tin_e2e_db: "DB_LANE=${DB_LANE:-h} DB_PORT=${DB_PORT:-5567} npx playwright test -c playwright.db.config.ts tests/e2e-db/sua-thong-tin-can.spec.ts"   # sua-thong-tin-can (row 3g): saved four fields survive a reload, lane H Postgres
     dia_ly: "npx vitest run src/modules/listings/ui/geo-tree.test.ts tests/dia-ly.test.tsx --coverage.enabled=false --reporter=verbose"   # bang-hang-theo-dia-ly (row 2d): geography tree, whole-name filter, one filter state
     dia_ly_e2e_db: "DB_LANE=${DB_LANE:-k} DB_PORT=${DB_PORT:-5564} npx playwright test -c playwright.db.config.ts tests/e2e-db/dia-ly.spec.ts"   # bang-hang-theo-dia-ly (row 2d): tree in the signed-in App Shell at four widths, saved view, axe light and dark, lane K Postgres
     vong_doi: "npx vitest run tests/vong-doi-thao-tac.test.ts --coverage.enabled=false --reporter=verbose"   # kiem-vong-doi-thao-tac (row 1t): every entity a screen shows has add, view, edit, remove or an approved reason
@@ -36,6 +39,7 @@ executors:
     cau_hinh_ban_that: "npx vitest run src/modules/identity/config.test.ts src/modules/identity/config-ban-that.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): start-up configuration matrix of a real build
     van_hanh: "npx vitest run tests/van-hanh.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): runbook procedures, make targets and variables it names exist
     khoa_bi_mat: "npx vitest run tests/khong-khoa-bi-mat.test.ts --coverage.enabled=false --reporter=verbose"   # moi-truong-thu-va-ban-that (row 22): no secret pattern in a tracked file, .env.example lists the new variables
+    app_shell_verve_unit: "npx vitest run tests/app-shell.test.tsx tests/frame.test.tsx tools/e2e_templates/e2e-templates.test.ts --coverage.enabled=false --reporter=verbose"   # app-shell-khuon-dau-trang: shell laid out as the ReUI Verve template, unit level
     nk30_kit_root: "npx vitest run tests/kit-root.test.ts --coverage.enabled=false --reporter=verbose"   # nang-kit-3-0: kit-root reads only the delivery-loop install
     da071_two_tests: "npx vitest run tests/ci-ban-sao-nong.test.ts tests/design-check.test.ts --coverage.enabled=false --reporter=verbose"   # upgrade-design-assembly-0-7-1: the shallow-clone test and the ledger test, the fixtures built from TAG
     nhap_excel_unit: "npx vitest run src/modules/imports tests/nhap-excel --coverage.enabled=false --reporter=verbose"   # nhap-excel (row 11): file reader, column/value/unit marks, no cell lost on the dirty set, ontology
@@ -92,6 +96,8 @@ executors:
     ci_db_that: "node db/scripts/ci-that.mjs --cho 60"   # ci-co-postgres (row 1s): latest CI run on the branch head — job e2e-db green, its log lines, duration against timeout-minutes
     vai_man_e2e: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} bash -c 'J=$(mktemp -t vai-man).json; PLAYWRIGHT_JSON_OUTPUT_NAME=$J npx playwright test -c playwright.db.config.ts tests/e2e-db/vai.setup.ts tests/e2e-db/vai-man.spec.ts --reporter=list,json && node tests/e2e-db/vai-man-doi-chieu.mjs $J'"   # kiem-vai-theo-man (row 9b): every role × screen pair through the shared role sign-in door, lane D Postgres
     the_dien_thoai_e2e: "npx playwright test tests/e2e/the-dien-thoai.spec.ts"   # bang-hang-the-dien-thoai (row 2b): cards below 768, table from 768, open and back, edge data, roles, axe
+    app_shell_verve_e2e: "npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/frame.spec.ts tests/e2e/grid.spec.ts"   # app-shell-khuon-dau-trang: fold rail, edge, search, account menu, page head, sheet button at four sizes
+    app_shell_verve_db: "make -s design-role-table && DB_LANE=${DB_LANE:-r} DB_PORT=${DB_PORT:-5565} npx playwright test -c playwright.db.config.ts"   # app-shell-khuon-dau-trang: every signed-in browser test after the shell and page head changed, lane R Postgres
     thanh_vien_e2e_c: "DB_LANE=${DB_LANE:-c} DB_PORT=${DB_PORT:-5569} npx playwright test -c playwright.db.config.ts tests/e2e-db/thanh-vien.spec.ts tests/e2e-db/members.spec.ts tests/e2e-db/bo-nut-members.spec.ts"   # thanh-vien-chon-tu-reui (row 9c): members list and invite dialog, row 9 and 9e browser tests, lane C Postgres
     moi_nguoi_db_c: "DB_LANE=${DB_LANE:-c} DB_PORT=${DB_PORT:-5569} npx vitest run -c vitest.db.config.ts tests/db/moi-nguoi.db.test.ts --reporter=verbose"   # thanh-vien-chon-tu-reui (row 9c): row 9 database tests unchanged, lane C Postgres
     vai_man_pha_thu: "DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} node tests/e2e-db/pha-thu-vai-man.mjs"   # kiem-vai-theo-man (row 9b): three breaks on a copy of the tree, each must turn its pair red with the pinned message
@@ -296,6 +302,8 @@ design_pass:
 feature_loop:
   ui_standards_skill: inventory-ui
   ngoai_n_tu_dinh_tuyen: true   # same as onehub-quy-hang: the machine routes out-of-contract items on clean T2 records
+  gop_theo_loi_ky: true    # the evidence gate card carries «gộp: khi CI xanh»; the owner's signature line is the merge word (owner, 2026-11-26: «Bật»)
+  do_san_tren_nen: true    # a repin that meets the same red already recorded on main is labelled, not blocked (owner, 2026-11-26)
   suite_keys:
     - executors.script.check
     - executors.script.build

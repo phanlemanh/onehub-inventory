@@ -1,0 +1,1 @@
+Kho bật hai tuỳ chọn của kit 3.1.1: gộp trong câu ký (thẻ Cổng Bằng chứng in sẵn «gộp: khi CI xanh», chữ ký của chủ kho là lời gộp) và nhãn «đỏ sẵn trên nền» cho lượt ghim lại gặp đúng cái đỏ đã có trên main — chủ kho «Bật» 26/11

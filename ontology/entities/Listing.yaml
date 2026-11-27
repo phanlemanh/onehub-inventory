@@ -56,6 +56,12 @@ rules:
     implemented_in: db/migrations/013_bang_can_chao.sql
   - id: no-seventh-status
     description: Companies add labels anchored to the six standard values; they never add a seventh value.
+  - id: details-locked-when-closed
+    description: A Closed or Withdrawn listing keeps its four details (legal status, furnished, financing, occupant type) and its custom values as they were; only an open listing has them edited (row 3g).
+    implemented_in: src/modules/listings/edit-rules.ts
+  - id: details-text-limit
+    description: Legal status and financing are free words of at most 200 characters each; only a part being changed is checked, so longer words from an imported sheet stay until changed (row 3g).
+    implemented_in: src/modules/listings/edit-rules.ts
 
 code:
   model: src/modules/listings/

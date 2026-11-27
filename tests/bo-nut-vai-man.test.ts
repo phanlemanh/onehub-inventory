@@ -1,3 +1,4 @@
+// decision:screen-actions
 // Row 9e (bo-nut-theo-quyen), AC-9: the role × screen × button table is generated from the permission table
 // (tools/coverage_matrix/buttons.py → design/role-screen-buttons.md), and drift turns `make check` red.
 //   bang-sinh-khop-quyen — every screen × role lists exactly the actions allowedScope gives, with their scope.

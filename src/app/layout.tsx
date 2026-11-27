@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
+import { noticeBottom } from "@/components/candidate/record-footer";
 import { ThemeProvider } from "@/components/templates/theme";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,7 +20,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider>
           <TooltipProvider>{children}</TooltipProvider>
-          <Toaster />
+          {/* Notices sit above an open record's footer (row 3g); sonner's own gaps are 24px, 16px on phones. */}
+          <Toaster
+            offset={{ bottom: noticeBottom("24px") }}
+            mobileOffset={{ bottom: noticeBottom("16px") }}
+          />
           <HydrationMark />
         </ThemeProvider>
       </body>

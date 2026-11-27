@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: fd194149a38a03f3c31b9ee80e95e01f8c1d3858
+verified_commit: 9e5cf640628157d835c23a4cf7060c1bd4299f82
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -180,3 +180,19 @@ Round 3: make test, make check, npm run build và make e2e (988 test) đều xan
 ### Re-pin lần 1 — 2026-11-14, do gộp nhánh chính sau 1s (PR #48) trước khi gộp PR #47
 run_id: repin-20261114T020730Z-96169
 sha: fd194149a38a03f3c31b9ee80e95e01f8c1d3858 · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E10 · diff chạm vật đo ngoài làn máy: E10 — đã chứng lại sau gộp (G-1411-24): chụp lại 14 ảnh E10 trên 1f33c05 bằng một tệp bài tạm (ẩn chỉ báo chế độ chạy thử), bộ chấm giao diện xem riêng E10: PASS — thứ tự đọc đúng ở bốn khổ, ảnh tối đọc được, khổ hẹp có thẻ căn và ba thông số, ảnh Lần 1 có dải lần cũ và «Chưa có» nhạt hơn giá trị thật
+
+### Re-pin lần 2 — 2026-11-17, do hang 3g: luoi 13 cot (loi C), sua-sau-ky bai dem cot
+run_id: repin-20261117T045134Z-16554
+sha: 8b5e18f36d0e6f31f937a53467c20560fe51a0ef · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E10 · diff chạm vật đo ngoài làn máy: E10 — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 3 — 2026-11-26, do gộp main (App Shell #83, #127) và hàng 3g đổi mã các hồ sơ này đo
+run_id: repin-20261126T153348Z-96242
+sha: dec74df04c273d49fc81c17b1f7fde95e915a584 · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E10 · diff chạm vật đo ngoài làn máy: E10 — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 4 — 2026-11-26, do gộp main #124 và sửa hai bài thử sau CI nặng (G-2611-13)
+run_id: repin-20261126T165751Z-54219
+sha: 1c0db7a53ead8ac3ca23c20991b2746df50d1e98 · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E10
+
+### Re-pin lần 5 — 2026-11-26, do giờ chờ ca quét trợ năng tám lần (G-2611-14)
+run_id: repin-20261126T180905Z-49173
+sha: 9e5cf640628157d835c23a4cf7060c1bd4299f82 · suites: 3 lệnh exit 0 · evals: 11/11 eval máy đạt kỳ vọng · ngoài làn máy: E10
