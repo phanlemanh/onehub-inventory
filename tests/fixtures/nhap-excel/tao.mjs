@@ -8,7 +8,14 @@ import { fileURLToPath } from "node:url";
 import { zipSync, strToU8 } from "fflate";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+// Escapes text for an XML text node or attribute value: the sheet name goes inside name="…".
+const esc = (s) =>
+  s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 const col = (i) =>
   i < 26 ? String.fromCharCode(65 + i) : col(Math.floor(i / 26) - 1) + col(i % 26);
 
