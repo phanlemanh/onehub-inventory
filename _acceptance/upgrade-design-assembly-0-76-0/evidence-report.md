@@ -1,14 +1,14 @@
 ---
 schema_version: 2
 feature_slug: upgrade-design-assembly-0-76-0
-verdict: PENDING-JUDGMENT
+verdict: PASS
 failed_evals: []
 reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
 verified_commit: a5c46ae4d08982bd119c3f133a3efa22343d74a6
-human_signoff:
+human_signoff: Manh Phan 2026-11-27
 ---
 
 # Evidence Report: upgrade-design-assembly-0-76-0
@@ -212,7 +212,7 @@ Panel đề xuất cho E16: PASS. Ô human_override để trống cho người c
     - domain-correctness: PASS — Trong 13 dòng, câu tiếng Việt nói cùng điều với câu tiếng Anh của cùng dòng. Chỗ dịch tự nhiên như "Brand assets" thành "Logo và bộ biểu tượng", "tự vẽ" và "đúng tệp" không thêm ý của dòng khác. Chữ đầu viết hoa đúng. Không có chữ "sàn", dấu chấm than, emoji hay dấu thanh kiểu cũ, và dấu thanh theo kiểu mới như mục 5 của language.md. Lens này không đối chiếu được danh sách avoid trong labels.yaml vì file đó ngoài phạm vi.
     - operational-feasibility: PASS — Mỗi câu Sổ nói cùng điều với câu Khuôn của dòng đó. Chữ hoa đúng. Không có chữ bị tránh, «sàn», dấu chấm than, emoji hay dấu thanh kiểu cũ. Hai chỗ diễn đạt rộng hơn một chút («Logo và bộ biểu tượng» cho «Brand assets», «Sổ này không tự vẽ gì» cho «drawn by the book») vẫn cùng ý, không coi là lỗi.
     - spec-alignment: PASS — Cả 13 dòng nói cùng ý với câu tiếng Anh cùng dòng, không thêm bớt hay lẫn ý dòng khác. Chữ hoa đúng. Bảng không có chữ «sàn», dấu chấm than, emoji hay dấu thanh kiểu cũ (mục 2, 3, 5 của language.md). Việc chọn «Logo» cho «the mark» không bị chấm.
-  human_override:  # chi nguoi ghi
+  human_override: Manh Phan 2026-11-27 — Đạt
 
 ## Known limits
 

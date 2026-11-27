@@ -5,7 +5,7 @@ slug: upgrade-design-assembly-0-76-0
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config, ci, docs]
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-27
 design_doc: docs/superpowers/specs/2026-11-26-upgrade-design-assembly-0-76-0-design.md
@@ -113,3 +113,19 @@ coverage-scan».
 - Cổng Bằng chứng chỉ trình khi job `e2e` của PR đã xanh trên đúng commit đã chấm.
 - Mã đã có trên nhánh trước khi có hồ sơ (`afcb1ca2`). Kế hoạch của vòng là kế hoạch đo: viết bộ phép đo và ghim số, không
   viết thêm mã sản phẩm. Gộp Gate 1.5 vào Cổng Phạm vi hay duyệt riêng là câu Hỏi-2 của thẻ.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-27:
+  - Ngoài-1: mô tả PR không nói rằng bản lên đời này ở hạng cần chủ mã duyệt; cổng vẫn chặn gộp sai.
+  - Ngoài-2: mô tả PR không kể vòng chấm đầu bị từ chối vì một bài kiểm trình duyệt đỏ, cũng không kể nhánh còn chở hồ
+    sơ và bản đồ sản phẩm.
+  - Ngoài-3: mục nhật ký wiki của việc này không dẫn tới PR hay hợp đồng.
+  - Ngoài-4: phép đo cây công cụ đọc bộ công cụ ở đường dẫn trên máy chủ kho; máy khác phải đặt biến trỏ tới bộ công cụ,
+    không thì báo đỏ giả.
+  - Ngoài-5: sổ ghi nguyên nhân bài kiểm trình duyệt đỏ ở vòng đầu là tải chậm, trong khi nhật ký gợi ý một lỗi hiếm về
+    thời điểm tải trang; bài kiểm ấy có thể thỉnh thoảng đỏ giả.
+  - Ngoài-6: khi chủ kho chọn ứng viên logo đầu tiên bằng cách gõ tên nó, bộ công cụ có thể báo chưa hợp lệ; kho chưa có
+    dòng logo nên chưa ai gặp, sửa thuộc bản sau của bộ công cụ.
+  - Ngoài-8: phép đo luật viết chưa có ca phá cho mọi luật, nhất là cách viết màu oklch, rgb, hsl.
+  - Ngoài-9: với sáu trong 13 chữ của trang logo, phép đo chỉ thấy chữ có trên trang, chưa thấy nó hiện đúng chỗ và đúng
+    lúc.
+  - Ngoài-10: trang logo chỉ được thử trên dòng mẫu viết tay, chưa thử trên dòng do bộ công cụ tự ghi.
+  - Ngoài-11: «bộ công cụ trên máy» trong phép đo trỏ vào bản của chủ kho, nên kết quả gắn với máy đó.
