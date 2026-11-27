@@ -71,7 +71,8 @@ trùng và để qua mọi cặp của bảng mới — trừ sắc tím trên �
 | --- | --- | --- | --- | --- | --- | --- |
 | «Chưa đủ để rao» – «Tạm ngừng» | 0,0 | 0,0 | 35,3 | 31,9 | 35,3 | 31,9 |
 | «Đang giao dịch» – «Đã bán» | 9,4 | 16,0 | **10,4** | 16,0 | 20,4 | 30,1 |
-| «Tạm ngừng» – «Ngừng hẳn» | 13,0 | > 40 | 13,0 | > 40 | 13,0 | > 40 |
+| «Tạm ngừng» – «Ngừng hẳn» | 13,0 | 41,2 | 13,0 | 41,2 | 13,0 | 41,2 |
+| «Đang giao dịch» – «Ngừng hẳn» | 42,3 | 35,9 | 42,6 | 35,9 | 36,1 | 31,0 |
 | cặp thấp nhất còn lại | 11,1 | 18,1 | 34,0 | 31,9 | 34,0 | 31,0 |
 
 Xanh thương hiệu (`#0246ff`) ngả tím, nên sắc tím trên ảnh chỉ cách nó 10,4 ở nền sáng — gần mức chủ kho gọi là trùng.

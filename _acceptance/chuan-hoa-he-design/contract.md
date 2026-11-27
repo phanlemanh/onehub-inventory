@@ -59,8 +59,8 @@ G-2811-15) · bàn giao phiên BH `bh-ban-giao-2026-11-27.md` · trang `chuan-ho
   `src/components/reui` đổi.
 - AC-10: Given `design.md`, `design/behaviors.md` và `wiki/decisions/0052-chuan-hoa-he-design.md`, When đặt cạnh lời chủ kho
   ở mục «Nguồn» và câu trả lời ở Cổng Phạm vi, Then mỗi điều của lát 1 có đúng một chỗ làm và một dòng sổ hành vi mang lời
-  và ngày của ông (dòng «Sửa dữ liệu», «Phím trong lưới», «Chữ mở trong ô», «Ô không sửa được»); điều của lát 2, lát 3 và
-  các câu ông chưa quyết không lọt vào phần đã làm. (judgment)
+  và ngày của chủ kho (dòng «Sửa dữ liệu», «Phím trong lưới», «Chữ mở trong ô», «Ô không sửa được»); điều của lát 2, lát 3
+  và các câu chủ kho chưa quyết không lọt vào phần đã làm. (judgment)
 
 - AC-11 (chờ Hỏi-4): Given Bảng hàng ở 1440 nền tối với ngăn chi tiết của một căn đang mở, When đo độ sáng của trang, lưới
   và thân ngăn, rồi mở trình đơn tiêu đề một cột và rê lên một mục, Then thân ngăn sáng hơn lưới ít nhất 5 nấc xám (khuyên
