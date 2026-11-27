@@ -631,46 +631,81 @@ function ApplyBatches(props: {
   onBanner: (b: Banner) => void;
   onDone: (r: { id: string; created: number; learned: LearnedItem[] }) => void;
 }) {
+  // The import opened and how far it got: a batch that fails keeps both, so «Thử lại» sends that very batch again on
+  // the same import instead of opening a new one (AC-7; S4-r2 t1). The server writes a batch whole or not at all.
+  const [progress, setProgress] = useState<{
+    id: string;
+    next: number;
+    created: number;
+    learned: LearnedItem[];
+  } | null>(null);
+  const [failed, setFailed] = useState<"offline" | "server" | null>(null);
   async function run() {
     props.onBusy(true);
-    const id = await props.open();
-    if (!id) return props.onBusy(false);
+    let at = progress;
+    if (!at) {
+      const id = await props.open();
+      if (!id) return props.onBusy(false);
+      at = { id, next: 0, created: 0, learned: [] };
+    }
     const { table, choices } = props;
-    let created = 0;
-    let learned: LearnedItem[] = [];
-    for (let b = 0; b * BATCH < table.rows.length; b += 1) {
+    for (let b = at.next; b * BATCH < table.rows.length; b += 1) {
       const last = (b + 1) * BATCH >= table.rows.length;
       const allNewFieldCells: Record<string, string> = {};
       if (last)
         table.rows.forEach((r, i) =>
           props.newFieldColumns.forEach((j) => (allNewFieldCells[`${i}:${j}`] = r[j] ?? "")),
         );
-      const res = await answer<{ created: number; learned?: LearnedItem[] }>(
-        fetch(`/api/v1/imports/${id}/batches`, {
-          method: "POST",
-          headers: JSON_HEADERS,
-          body: JSON.stringify({
-            headers: table.headers,
-            rows: table.rows.slice(b * BATCH, (b + 1) * BATCH),
-            choices,
-            batchNo: b,
-            rowOffset: b * BATCH,
-            last,
-            ...(last ? { allNewFieldCells } : {}),
+      const id: string = at.id;
+      const res: { status: number; body: { created: number; learned?: LearnedItem[] } | null } =
+        await answer<{ created: number; learned?: LearnedItem[] }>(
+          fetch(`/api/v1/imports/${id}/batches`, {
+            method: "POST",
+            headers: JSON_HEADERS,
+            body: JSON.stringify({
+              headers: table.headers,
+              rows: table.rows.slice(b * BATCH, (b + 1) * BATCH),
+              choices,
+              batchNo: b,
+              rowOffset: b * BATCH,
+              last,
+              ...(last ? { allNewFieldCells } : {}),
+            }),
           }),
-        }),
-      );
+        );
       if (res.status !== 200 || !res.body) {
-        props.onBusy(false);
-        return props.onBanner(res.status === 0 ? "offline" : "failed");
+        setProgress({ ...at, next: b });
+        setFailed(res.status === 0 ? "offline" : "server");
+        return props.onBusy(false);
       }
-      created += res.body.created;
-      if (res.body.learned) learned = res.body.learned;
+      at = {
+        ...at,
+        next: b + 1,
+        created: at.created + res.body.created,
+        learned: res.body.learned ?? at.learned,
+      };
     }
+    setProgress(null);
+    setFailed(null);
     props.onBusy(false);
     props.onBanner(null);
-    props.onDone({ id, created, learned });
+    props.onDone({ id: at.id, created: at.created, learned: at.learned });
   }
+  if (failed && progress)
+    return (
+      <div role="alert" data-state="ghi-do-dang" className="flex items-center gap-3">
+        <p>
+          {C.batchStopped(
+            Math.min(progress.next * BATCH, props.table.rows.length),
+            props.table.rows.length,
+            failed === "offline",
+          )}
+        </p>
+        <Button variant="outline" onClick={() => void run()}>
+          {C.retry}
+        </Button>
+      </div>
+    );
   return (
     <Button disabled={props.disabled} onClick={() => void run()}>
       {props.words}

@@ -2,7 +2,7 @@
 // Row 11 (nhap-excel): the Nạp tệp screen in the browser test environment — a CSV is read in the page, the preview
 // counts are the server's, the five steps run, apply writes the open call then the batch, undo goes through its door,
 // the buttons show only for roles the permission table allows, and a dropped connection says nothing was written.
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import type { Role } from "@/generated/ontology";
@@ -114,6 +114,50 @@ async function choose(name: string, text: string) {
 }
 
 describe("man-nap-tep", () => {
+  it("a batch that fails part way: the screen says how many rows are written, and Thử lại sends that batch again on the same import (S4-r2 t1)", async () => {
+    const sent: string[] = [];
+    let opens = 0;
+    let failOnce = true;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string, init?: RequestInit) => {
+        if (!init?.method || init.method === "GET") return Response.json([]);
+        if (url.endsWith("/preview")) return Response.json(MARKED);
+        if (url === "/api/v1/imports")
+          return Response.json({ id: `run-${(opens += 1)}` }, { status: 201 });
+        if (url.endsWith("/batches")) {
+          const { batchNo } = JSON.parse(String(init.body)) as { batchNo: number };
+          sent.push(`${url.split("/")[4]}:${batchNo}`);
+          if (batchNo === 1 && failOnce) {
+            failOnce = false;
+            return Response.json({ error: "server-error" }, { status: 500 });
+          }
+          return Response.json({ created: batchNo === 0 ? 200 : 50, done: batchNo === 1 });
+        }
+        return Response.json({}, { status: 404 });
+      }),
+    );
+    mount();
+    await choose(
+      "lon.csv",
+      `Mã căn\n${Array.from({ length: 250 }, (_, i) => `A-${i}`).join("\n")}\n`,
+    );
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: new RegExp(`^${C.next}`) })).toBeTruthy(),
+    );
+    for (let i = 0; i < 3; i += 1)
+      fireEvent.click(screen.getByRole("button", { name: new RegExp(`^${C.next}`) }));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: C.apply(1, 0) })));
+    // The first batch is written; the second failed: the screen says 200 of 250, not «nothing written».
+    await waitFor(() => expect(screen.getByText(C.batchStopped(200, 250, false))).toBeTruthy());
+    expect(screen.queryByText(C.failed)).toBeNull();
+    const alert = document.querySelector('[data-state="ghi-do-dang"]') as HTMLElement;
+    await act(async () => fireEvent.click(within(alert).getByRole("button", { name: C.retry })));
+    await waitFor(() => expect(screen.getByText(C.done(250))).toBeTruthy());
+    // One import opened; Thử lại sent batch 1 again on it, never batch 0 nor a new import.
+    expect([opens, sent]).toEqual([1, ["run-1:0", "run-1:1", "run-1:1"]]);
+  });
+
   it("reads the file in the page, shows the server's counts, applies in two calls and undoes", async () => {
     const calls = server();
     mount();

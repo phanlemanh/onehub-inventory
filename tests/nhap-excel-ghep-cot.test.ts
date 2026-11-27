@@ -59,6 +59,31 @@ const TABLE: [string, string | null, string, string][] = [
   ["SĐT chủ", null, "block", "owner-column"],
 ];
 
+// S4-r2 t3: owner headers as sheets write them, matched by their words — and headers that must stay open.
+const OWNER_WRITTEN = [
+  "SĐT chủ nhà",
+  "Tên chủ nhà",
+  "Điện thoại chủ nhà",
+  "Số ĐT",
+  "SĐT CN",
+  "Liên hệ chủ nhà",
+  "Phone",
+  "Tel.",
+  "Zalo chủ",
+  "Chủ sở hữu",
+  "Số liên lạc",
+];
+const NOT_OWNER = [
+  "DT",
+  "Ghi chú",
+  "Tình trạng",
+  "Giá chào",
+  "Toà",
+  "Hướng",
+  "Diện tích",
+  "Telecom",
+];
+
 describe("ghep-cot", () => {
   it("24 single headers as written before", () => {
     expect(TABLE).toHaveLength(24);
@@ -66,6 +91,12 @@ describe("ghep-cot", () => {
       const c = one(h);
       expect([target(c), c.mark, c.why], h).toEqual([t, m, w]);
     }
+  });
+
+  it("owner and phone headers as sheets write them are blocked by their words; area, notes and others stay open (S4-r2 t3)", () => {
+    for (const h of OWNER_WRITTEN)
+      expect([one(h).mark, one(h).why], h).toEqual(["block", "owner-column"]);
+    for (const h of NOT_OWNER) expect(one(h).why, h).not.toBe("owner-column");
   });
 
   it("two columns into the asking price block both; no unit column blocks every column", () => {

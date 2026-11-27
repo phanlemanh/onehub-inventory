@@ -114,8 +114,13 @@ async function context(c: Queryable, table: ImportTable, choices: Choices) {
     }
   const listed = new Set<string>();
   const { rows } = await c.query(
+    // A pending unit matched to the catalog since keeps its open listings on the pending link: they count for its
+    // catalog unit too, so the unit never gets a second open listing (Listing rule one-open-listing; S4-r2 t4).
     `select u.unit_key as id from listing_units l join catalog_units u on u.upi = l.upi where l.open
-     union all select p.pending_unit_id::text from listing_pending_units p where p.open`,
+     union all select p.pending_unit_id::text from listing_pending_units p where p.open
+     union all select cpu.unit_key from listing_pending_units p
+       join company_pending_units cpu on cpu.id = p.pending_unit_id
+      where p.open and cpu.unit_key is not null`,
   );
   for (const r of rows as { id: string }[]) listed.add(r.id);
   return { layer, units, listed };

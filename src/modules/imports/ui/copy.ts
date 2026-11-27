@@ -54,6 +54,9 @@ export const IMPORT_COPY = {
   retry: "Thử lại",
   changed: "Dữ liệu của sàn vừa đổi — xem lại trước khi áp.",
   failed: "Chưa ghi được — lỗi máy chủ.",
+  /** A batch stopped the writing part way: what is written stays, «Thử lại» writes the rest on the same import. */
+  batchStopped: (written: number, total: number, offline: boolean) =>
+    `Đã ghi ${written}/${total} dòng; phần còn lại chưa ghi — ${offline ? "mất kết nối mạng" : "lỗi máy chủ"}. Bấm Thử lại để ghi tiếp.`,
   phone: "Màn này dùng trên máy tính.",
 };
 
