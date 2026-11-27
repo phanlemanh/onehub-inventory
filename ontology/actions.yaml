@@ -274,7 +274,12 @@ actions:
     status: live
     scope: { ListAgent: company, BuyerAgent: company, TeamLead: company, CompanyAdmin: company }
     doors:
-      db: ["table listings select", "table listing_units select"]
+      db:
+        [
+          "table listings select",
+          "table listing_units select",
+          "table listing_pending_units select",
+        ]
 
   - name: createListing
     description: Add a listing.

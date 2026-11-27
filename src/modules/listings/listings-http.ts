@@ -91,7 +91,7 @@ const Change = z.discriminatedUnion("field", [
       value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
     })
     .strict(),
-  // Row 3h: the listing's own unit values (migration 019). `null` takes the catalog's value again; a value's kind is
+  // Row 3h: the listing's own unit values (migration 020). `null` takes the catalog's value again; a value's kind is
   // checked by the rule of edit (attributeFits in save-door), so the shapes here only keep out what is no value at all.
   z
     .object({

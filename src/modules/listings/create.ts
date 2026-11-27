@@ -100,7 +100,7 @@ export async function createListings(
         l.lastConfirmedAt,
         importRunId,
         l.withdrawnReason,
-        // Row 3h: each own value from the file with its source «File»; none, no source (migration 019).
+        // Row 3h: each own value from the file with its source «File»; none, no source (migration 020).
         ...fileParams(l.fileValues),
       ],
     );

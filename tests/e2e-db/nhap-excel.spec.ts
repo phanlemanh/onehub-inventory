@@ -221,6 +221,8 @@ test("trang thai: every state of the screen at its widths, light and dark, axe c
   // ST-nhap-tep-mac-dinh.
   await openScreen(page);
   await cell("ST-nhap-tep-mac-dinh", page.getByText(C.drop, { exact: true }));
+  // The control of the buyer agent's «no file area» above: the same locator finds the file area here.
+  await expect(page.getByLabel(C.drop)).toHaveCount(1);
 
   // ST-nhap-tep-tep-loi and ST-nhap-tep-tep-rong.
   await choose(page, "a.pdf", "%PDF-1.4");

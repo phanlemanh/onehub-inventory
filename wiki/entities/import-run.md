@@ -32,7 +32,8 @@ nhiêu căn, sàn học được gì từ lựa chọn của người, ô nào g
   dấu, sai chỗ hay vượt số dòng thì 409 và không ghi gì. Dòng người đã bỏ tính theo vị trí trong cả tệp.
 - Cột số hay tên chủ nhà chỉ có một lối là bỏ cột, kể cả khi mẫu nhập cũ trỏ nó đi đâu (Hỏi-12).
 - Trưởng nhóm chọn Đầu chủ trên màn trước khi áp; danh sách chỉ có mã và tên (`GET /api/v1/imports/list-agents`,
-  hàm `app.import_list_agents()` của migration 016).
+  hàm `app.import_list_agents()` của migration 016). Từ migration 019, vai «của mình» gọi hàm thì chỉ thấy chính mình, và
+  chỉ gắn được căn vào lần chào mình giữ (`db/migrations/019_nhap_excel_moi_noi_cua_minh.sql`).
 - Mã căn dài quá 80 ký tự và trường riêng sàn không thêm được bị chặn ở bước xem trước; máy chủ không bao giờ bỏ lặng lẽ
   một dòng hay một cột đã hứa.
 - Hoàn tác gỡ các căn của lần nhập chưa ai sửa, ngừng dùng những gì chính lần nhập dạy, và liệt kê căn được giữ.

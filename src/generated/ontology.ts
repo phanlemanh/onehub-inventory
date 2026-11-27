@@ -1205,7 +1205,7 @@ export const ACTIONS: readonly ActionSpec[] = [
     states: [],
     doors: {
       api: [],
-      db: ["table listings select", "table listing_units select"],
+      db: ["table listings select", "table listing_units select", "table listing_pending_units select"],
     },
   },
   {

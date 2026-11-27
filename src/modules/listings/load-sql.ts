@@ -64,7 +64,7 @@ export function listingLoadStatements(
         l.originalEntryTimestamp ?? null,
         l.lastConfirmedAt ?? null,
         l.version,
-        // Row 3h: the listing's own unit values and their sources (migration 019), as the sample holds them.
+        // Row 3h: the listing's own unit values and their sources (migration 020), as the sample holds them.
         l.livingArea ?? null,
         l.livingAreaSource ?? null,
         l.floor ?? null,

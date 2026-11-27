@@ -24,8 +24,8 @@ hộp sửa và dòng khoá. Kế hoạch này nối chúng vào dữ liệu th�
 Thứ tự của giám sát (G-2711-17), ba nhịp:
 
 1. Việc 1–3 (cột cơ sở dữ liệu, cửa ghi, gắn sang căn khác) dựng ngay sau khi kế hoạch được duyệt, không chờ ai.
-   Migration của 3h lấy số sau số lớn nhất của nhánh hàng 11 (`origin/claude/agitated-dewdney-3cdf78`, nay là 018)
-   và của main, tức `019`, vì 11 gộp trước (G-2711-33). Đổi ontology Listing đúng phạm vi đã duyệt, chạy `make gen`, không nới ô
+   Migration của 3h lấy số sau số lớn nhất của nhánh hàng 11 (`origin/claude/agitated-dewdney-3cdf78`, nay là 019)
+   và của main, tức `020`, vì 11 gộp trước (G-2711-33, G-2811-20). Đổi ontology Listing đúng phạm vi đã duyệt, chạy `make gen`, không nới ô
    `agent:` nào.
 2. Việc 6–7 (nhập tệp, căn chờ khớp) dựng chồng lên nhánh hàng 11 trước khi 11 vào main (G-2811-3); khi 11 vào main thì
    gộp main vào nhánh.
@@ -63,7 +63,7 @@ Mỗi lần bắt đầu dựng: gộp `origin/main` vào nhánh, chạy `make c
 
 ### Việc 1: Cột trong cơ sở dữ liệu và đường đọc thật
 
-**Tệp:** `db/migrations/019_tin_rao_gia_tri_rieng.sql` (sau 018 của hàng 11, G-2711-33; số lại tăng nếu main có số lớn hơn lúc dựng; dùng skill
+**Tệp:** `db/migrations/020_tin_rao_gia_tri_rieng.sql` (sau 019 của hàng 11, G-2811-20; số lại tăng nếu main có số lớn hơn lúc dựng; dùng skill
 `/new-migration`), `src/modules/listings/inventory-read.ts`, `src/modules/listings/load-sql.ts`, `db/scripts/cach-ly.sh`,
 `tests/db/tin-rao-gia-tri-rieng.db.test.ts`.
 

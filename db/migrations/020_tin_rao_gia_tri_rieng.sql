@@ -1,4 +1,4 @@
--- 019_tin_rao_gia_tri_rieng.sql · Tin rao giữ giá trị riêng (hàng 3h, hồ sơ tin-rao-giu-gia-tri-rieng): lần chào của sàn
+-- 020_tin_rao_gia_tri_rieng.sql · Tin rao giữ giá trị riêng (hàng 3h, hồ sơ tin-rao-giu-gia-tri-rieng): lần chào của sàn
 -- giữ bản riêng của năm thuộc tính căn — Diện tích, Tầng, Phòng ngủ, Hướng, Loại hình (tên RESO như của Unit) — mỗi giá
 -- trị nhớ nguồn: 'Typed' (sàn gõ) hay 'File' (nhập từ tệp). Không có giá trị riêng thì màn hiện giá trị danh mục chung; thứ
 -- tự thắng Typed › File › danh mục, đọc ở một hàm thuần (src/modules/listings/unit-attributes.ts). Danh mục chung

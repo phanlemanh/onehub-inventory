@@ -1,7 +1,7 @@
 // Row 3h (tin-rao-giu-gia-tri-rieng), evals E1b, E6, E10, E11 in the database: a listing's own unit values read through
 // the real inventory read, written and taken back through PATCH /api/v1/listings/[id], the unit link moved («Gắn sang
 // căn khác»), and the shared catalog untouched — through the identity module's door, withCompany, under the API role,
-// on this lane's Postgres (migration 019). Company A holds the people of the permission-table world (LA, BA, TL, CA).
+// on this lane's Postgres (migration 020). Company A holds the people of the permission-table world (LA, BA, TL, CA).
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { sampleCatalog } from "@/modules/catalog";
@@ -639,5 +639,53 @@ describe("can-cho-khop (E9)", () => {
     const differing = UNIT_ATTRIBUTE_FIELDS.filter((f) => after.a[f].differs);
     expect(differing).toEqual(["livingArea"]);
     expect(after.a.livingArea.catalogValue).toBe(Number(target.living_area));
+  });
+});
+
+describe("cung-san-khac-nguoi-giu (E11, G-2811-24)", () => {
+  it("cung-san-khac-nguoi-giu: one company, another keeper — the two doors follow the signed table; the admin changes nothing", async () => {
+    const e = await apiWorld("cung_san");
+    const [from, to] = UNITS.slice(-2);
+    const id = crypto.randomUUID();
+    // The listing is kept by A's team lead; the listing agent LA does not keep it.
+    await e.w.db.owner.query(
+      `insert into listings (id, company_id, standard_status, list_price, list_agent_user_id, list_agent_full_name)
+       values ($1, $2, 'Incomplete', 3000000000, $3, '[Tên] TL')`,
+      [id, e.w.A, e.w.id.TL],
+    );
+    await e.w.db.owner.query(
+      "insert into listing_units (listing_id, company_id, upi, open) values ($1, $2, $3, true)",
+      [id, e.w.A, from!.upi],
+    );
+    const state = async () =>
+      (
+        await e.w.db.owner.query<{ area: number | null; upi: string; version: number }>(
+          `select l.living_area::float8 as area, u.upi, l.version from listings l
+             join listing_units u on u.listing_id = l.id where l.id = $1`,
+          [id],
+        )
+      ).rows[0]!;
+    // A's company admin has no updateListing: refused at both doors, nothing changes.
+    const before = await state();
+    const values = { field: "unitAttributes", livingArea: 99 };
+    const move = { field: "unit", upi: to!.upi };
+    for (const change of [values, move]) {
+      const res = await e.patch("CA", id, { version: before.version, change });
+      expect(res.status, JSON.stringify(change)).toBe(403);
+    }
+    expect(await state()).toEqual(before);
+    // The listing agent who does not keep it: updateListing is company-wide in the signed table (owner 2026-11-15).
+    expect(
+      (
+        await e.patch("LA", id, {
+          version: before.version,
+          change: { ...values, livingArea: 72.5 },
+        })
+      ).status,
+    ).toBe(200);
+    expect((await e.patch("LA", id, { version: before.version + 1, change: move })).status).toBe(
+      200,
+    );
+    expect(await state()).toMatchObject({ area: 72.5, upi: to!.upi });
   });
 });
