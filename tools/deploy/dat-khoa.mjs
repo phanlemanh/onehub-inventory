@@ -86,8 +86,8 @@ function realGh(args, input) {
  * Asks on the terminal without echo. When standard input is not a terminal (a pipe, a test), answers are read from it
  * one line each, in the order the questions come.
  */
-export function terminalAsk() {
-  if (!process.stdin.isTTY) {
+export function terminalAsk({ input = process.stdin, output = process.stderr } = {}) {
+  if (!input.isTTY) {
     const lines = readFileSync(0, "utf8").split("\n");
     return async (question) => {
       process.stderr.write(question);
@@ -97,14 +97,16 @@ export function terminalAsk() {
   }
   return (question) =>
     new Promise((done) => {
-      const rl = createInterface({ input: process.stdin, output: process.stderr, terminal: true });
-      process.stderr.write(question);
+      const rl = createInterface({ input, output, terminal: true });
       rl._writeToOutput = () => {};
       rl.question("", (answer) => {
         rl.close();
-        process.stderr.write("\n");
+        output.write("\n");
         done(answer.trim());
       });
+      // After rl.question: readline clears the current line when it starts a question, so a question written before
+      // it was erased and the person saw an empty line.
+      output.write(question);
     });
 }
 
