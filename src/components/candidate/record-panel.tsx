@@ -468,8 +468,19 @@ function RecordColumn({
       root.style.removeProperty("--record-pinned");
     };
   }, [pinned, pinnedWidth]);
+  // While the record is open beside the grid, floating or pinned, the region's toolbar buttons drop their words and
+  // keep their icon, name and hover hint (owner, BH session 2026-11-27, and scope gate of khung-luoi-va-ngan-chi-tiet,
+  // Hỏi-7: pinned too, so the toolbar stays on one line).
+  useEffect(() => {
+    if (!shown) return;
+    const root = document.documentElement;
+    root.dataset["recordBeside"] = "";
+    return () => {
+      delete root.dataset["recordBeside"];
+    };
+  }, [shown]);
   // Floating, the record lies over the right of the region: the region's toolbar ends before the record's edge, with
-  // 16 px to spare, and its buttons drop their words (owner, BH session 2026-11-27), so no button is cut in half.
+  // 16 px to spare (owner, BH session 2026-11-27), so no button is cut in half.
   const floating = shown && !pinned;
   useEffect(() => {
     const root = document.documentElement;

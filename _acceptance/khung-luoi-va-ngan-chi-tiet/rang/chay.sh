@@ -19,6 +19,7 @@ case "${1:-}" in
   E10) pw tests/e2e/khung-luoi-nut.spec.ts -g "L3 · " ;;
   E11) pw tests/e2e/sheet.spec.ts -g "header buttons in view" ;;
   E12) pw tests/e2e/khung-luoi-nut.spec.ts -g "L6 · " ;;
+  E22) pw tests/e2e/khung-luoi-nut.spec.ts -g "Hỏi-7 · " ;;
   E20) pw tests/e2e/khung-luoi-nut.spec.ts -g "Đã gửi · " ;;
   E15) make -s design-role-table && DB_LANE="${DB_LANE:-h}" DB_PORT="${DB_PORT:-5567}" npx playwright test -c playwright.db.config.ts --reporter=list ;;
   E16) git diff --exit-code --stat "$(git merge-base HEAD origin/main)" HEAD -- src/components/ui src/components/reui && echo "vendor folders untouched" ;;

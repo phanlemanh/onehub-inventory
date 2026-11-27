@@ -158,10 +158,11 @@ const ROW_HEIGHT_PX = { dense: 33, normal: 49 } as const;
 const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-(--region-height)";
 
 /**
- * A toolbar button's words while the floating record lies over the right of the region (owner, BH session 2026-11-27):
- * the button keeps its icon and its name for assistive tech, so no button is cut in half by the record's edge.
+ * A toolbar button's words while the record is open beside the grid, floating or pinned (owner, BH session 2026-11-27;
+ * scope gate Hỏi-7): the button keeps its icon and its name for assistive tech, so the toolbar stays on one line and no
+ * button is cut in half by the record's edge.
  */
-const FLOAT_LABEL = "in-data-record-float:sr-only";
+const FLOAT_LABEL = "in-data-record-beside:sr-only";
 
 /**
  * In full screen the grid ends at the screen's bottom edge: the screen less the name strip, toolbar and footer, a

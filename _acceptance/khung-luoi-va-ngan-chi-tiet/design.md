@@ -115,7 +115,7 @@ Bộ kit được dùng như giao: kích cỡ và khung nằm ở phần tử b�
 |---|---|---|---|
 | ST-luoi-ngan-dong | Bảng hàng, Đã gửi | thanh công cụ có chữ, lưới khít màn | bấm mã căn |
 | ST-luoi-ngan-noi | Bảng hàng, Đã gửi | ngăn nổi từ dưới thanh trên; thanh công cụ dừng cách ngăn 16 px, nút chỉ hình | đọc, Trước/Sau, Ghim, Đóng |
-| ST-luoi-ngan-ghim | Bảng hàng, Đã gửi | ngăn là cột, vùng nhường chỗ, nút thanh công cụ giữ chữ (chờ câu hỏi ở Cổng Phạm vi) | kéo vạch chia, Bỏ ghim |
+| ST-luoi-ngan-ghim | Bảng hàng, Đã gửi | ngăn là cột, vùng nhường chỗ, nút thanh công cụ chỉ hình (Cổng Phạm vi, Hỏi-7) | kéo vạch chia, Bỏ ghim |
 | ST-luoi-toan-man | Bảng hàng | không thanh trên; ngăn từ mép trên cửa sổ | Esc thoát |
 | ST-luoi-dien-thoai | Bảng hàng | thẻ; hàng công cụ «Lọc» có chữ, nút 44 px, «Lưu góc nhìn» hiện thẳng; ngăn toàn màn | chạm thẻ, Lọc |
 <!-- UX-STATE-TABLE>>> -->

@@ -43,8 +43,9 @@ các nút đặt mỗi chỗ một kiểu.
 
 - **Ngăn nổi trở lại 0024:** cao từ ngay dưới thanh trên App Shell tới đáy, sát mép phải, nổi trên nội dung (nền lớp nổi,
   viền trái, bóng). Thay chỗ đặt của hàng 3a (AC-4). Ghim (quyết định 0031) giữ nguyên.
-- **Thanh công cụ nhường ngăn:** khi ngăn nổi, thanh công cụ của vùng dừng cách ngăn 16 px, nút của nó chỉ còn hình, có
-  tên đọc và chữ gợi ý; không nút nào bị cắt đôi.
+- **Thanh công cụ nhường ngăn:** khi ngăn nổi, thanh công cụ của vùng dừng cách ngăn 16 px; khi ngăn mở cạnh lưới, nổi
+  hay ghim (Cổng Phạm vi, Hỏi-7), nút của nó chỉ còn hình, có tên đọc và chữ gợi ý; không nút nào bị cắt đôi, thanh một
+  dòng.
 - **Lưới khít màn:** đáy lưới cách vùng làm việc 16 px; cột thứ hai không làm trang cuộn thừa.
 - **Đầu ngăn một dòng ở mọi khổ:** tên bên trái; góc phải trên Chép đường dẫn, Ghim (từ 800 px), Trước, Sau, Đóng, chỉ
   hình, có tên đọc và chữ gợi ý. Thay «đầu hai dòng» của hàng 3e (AC-10).

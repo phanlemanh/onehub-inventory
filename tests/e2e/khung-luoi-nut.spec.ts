@@ -307,3 +307,62 @@ test.describe("Đã gửi · the same frame as Bảng hàng", () => {
     await expect(sentFrame(page)).rejects.toThrow("not under the top bar");
   });
 });
+
+// ---- Hỏi-7 of the scope gate: pinned, the toolbar's buttons keep only their icon and the toolbar stays one line -------
+
+/** The region's toolbar while the record is pinned: one line, every word-button down to its icon with a name and hint. */
+async function pinnedToolbar(page: Page): Promise<void> {
+  const g = await page.evaluate(() => {
+    const bar = document.querySelector('[data-slot="region-toolbar"]')!;
+    const buttons = [...bar.querySelectorAll<HTMLElement>("button")].filter(
+      (b) => b.offsetParent !== null,
+    );
+    const tops = buttons.map((b) => Math.round(b.getBoundingClientRect().top));
+    return {
+      lines: new Set(tops).size,
+      wide: buttons
+        .filter((b) => b.getBoundingClientRect().width > 40)
+        .map((b) => b.getAttribute("title") ?? b.innerText),
+      unnamed: buttons.filter((b) => !b.getAttribute("title")).length,
+    };
+  });
+  if (g.lines > 1) throw new Error(`toolbar runs to ${g.lines} lines while pinned`);
+  if (g.wide.length > 0)
+    throw new Error(`toolbar buttons keep their words while pinned: ${g.wide.join(", ")}`);
+  if (g.unnamed > 0) throw new Error(`toolbar buttons without a hover hint: ${g.unnamed}`);
+}
+
+test.describe("Hỏi-7 · pinned, the toolbar buttons keep only their icon", () => {
+  test.beforeEach(({ page }, info) =>
+    test.skip(
+      isPhone(page) || info.project.name !== "1440",
+      "ghim từ 800 px vùng làm việc — đo ở 1440",
+    ),
+  );
+
+  async function openPinned(page: Page): Promise<void> {
+    await openInventory(page);
+    await page.locator("[data-record-open]:visible").nth(4).click();
+    await page.locator('[data-slot="record-pin"]').click();
+    await expect(page.locator('[data-slot="record-panel"]')).toHaveAttribute(
+      "data-record-layout",
+      "pinned",
+    );
+    await page.waitForTimeout(300);
+  }
+
+  test("one line, icon buttons with a hint", async ({ page }) => {
+    await openPinned(page);
+    await expect(async () => pinnedToolbar(page)).toPass({ timeout: 3000 });
+  });
+
+  test("break: buttons that keep their words while pinned are caught", async ({ page }) => {
+    await openPinned(page);
+    await themKieu(page, {
+      content:
+        '[data-slot="region-toolbar"] [class*="sr-only"] { position: static !important; width: auto !important; height: auto !important; clip: auto !important; margin: 0 !important; overflow: visible !important; white-space: nowrap !important; }',
+    });
+    await page.waitForTimeout(300);
+    await expect(pinnedToolbar(page)).rejects.toThrow(/keep their words|lines while pinned/);
+  });
+});

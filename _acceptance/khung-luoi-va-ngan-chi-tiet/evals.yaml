@@ -171,3 +171,11 @@ evals:
     paths: [src/components/candidate/data-region.tsx, src/components/candidate/region-header.tsx, src/app/(app)/sent/**, tests/e2e/khung-luoi-nut.spec.ts]
     expected: "exit 0; cùng bài «Đã gửi · the same frame as Bảng hàng»: phần thanh công cụ của sentFrame không đỏ 'toolbar runs under the record' ở 1024 và 1440"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E22
+    criterion: AC-3
+    executor: script
+    cmd: bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E22
+    paths: [src/components/candidate/record-panel.tsx, src/components/candidate/data-region.tsx, src/modules/listings/ui/save-view-buttons.tsx, tests/e2e/khung-luoi-nut.spec.ts]
+    expected: "exit 0; khung-luoi-nut.spec.ts «Hỏi-7 · » ở 1440 với ngăn ghim: mọi nút thanh công cụ cùng một dòng, rộng ≤ 40 px, có title (pinnedToolbar). Chiều đỏ trên cùng hàm: hiện lại chữ của nút cho 'keep their words|lines while pinned'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
