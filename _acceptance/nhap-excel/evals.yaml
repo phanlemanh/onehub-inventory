@@ -204,3 +204,19 @@ evals:
     paths: [src/modules/imports/**, src/modules/catalog/**, "src/app/api/v1/imports/**", tests/db/nhap-excel.db.test.ts]
     expected: "exit 0; ca 'G-2711-4': preview qua route handler thật với cột «Tầng», «Loại căn», «Diện tích» — «Tầng 07» và «15a» là máy sửa 'floor-read', «Căn hộ» giữ nguyên 'standard', «2PN» cần người 'unknown-value', không ô nào chặn; áp tạo 3 lần chào; import_runs.kept có đúng năm mục 'unit-attribute' theo thứ tự (Tầng, Tầng 07) (Loại căn, Căn hộ) (Diện tích, 72) (Tầng, 15a) (Loại căn, 2PN); băm md5 của catalog_units trước và sau lần nhập bằng nhau; ca phá đã chạy tay: bỏ Unit.floor khỏi đường unit-attribute → khẳng định lệch mảng kept"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E23
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E24
+    criterion: AC-12
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luong-nhieu-buoc.md", "src/app/(app)/nhap-tep/**/*.tsx", "src/modules/imports/ui/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luong-nhieu-buoc"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
