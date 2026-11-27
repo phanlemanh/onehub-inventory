@@ -116,20 +116,37 @@ export const HEADER_DICTIONARY: Record<
   "ngay xac nhan": { target: "Listing.lastConfirmedAt" },
 };
 
-/** Headers of the owner's name or phone: those go on the unit's record (row 11b), never into this import. */
-export const OWNER_HEADERS = new Set(
-  [
-    "chu nha",
-    "ten chu",
-    "sdt",
-    "sdt chu",
-    "so chu",
-    "dien thoai",
-    "so dien thoai",
-    "dt chu",
-    "lien he",
-  ].map(fold),
-);
+/**
+ * Headers of the owner's name or a phone: those go on the unit's record (row 11b), never into this import (Hỏi-12). A
+ * header is read by its folded words: any phrase below as whole words anywhere in it, so «SĐT chủ nhà», «Tên chủ nhà»,
+ * «Số ĐT», «Phone» are caught while «DT» (living area) and «Ghi chú» are not.
+ */
+export const OWNER_PHRASES = [
+  // phones and other ways to reach a person
+  "sdt",
+  "so dt",
+  "dt chu",
+  "dt cn",
+  "dien thoai",
+  "phone",
+  "tel",
+  "mobile",
+  "zalo",
+  "lien he",
+  "lien lac",
+  // the owner by name
+  "chu nha",
+  "ten chu",
+  "so chu",
+  "chu can",
+  "chu so huu",
+].map(fold);
+
+/** Whether a folded header names the owner or a phone (see OWNER_PHRASES). */
+export function isOwnerFolded(folded: string): boolean {
+  const padded = ` ${folded.replace(/[^a-z0-9]+/g, " ").trim()} `;
+  return OWNER_PHRASES.some((p) => padded.includes(` ${p} `));
+}
 
 /** Closed sets of standard values: the stored value and the concept whose label is its word. */
 export const VALUE_CONCEPTS: Partial<Record<StandardTarget, Record<string, ConceptCode>>> = {

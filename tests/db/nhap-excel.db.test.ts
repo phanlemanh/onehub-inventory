@@ -363,6 +363,37 @@ describe("ap (E9)", () => {
     expect((await e.w.db.owner.query<{ n: string }>(catalog)).rows[0]!.n).toBe(before);
   });
 
+  it("a pending unit matched to the catalog since keeps its one open listing: the same code again is already listed (S4-r2 t4)", async () => {
+    const e = await importWorld("cho_da_khop");
+    expect((await applyAll(e, "LA", rowsOf(e.codes))).status).toBe(200);
+    // The catalog now has the pending unit: it is matched to a catalog unit nobody lists yet.
+    const free = (
+      await e.w.db.owner.query<{ unit_key: string }>(
+        `select unit_key from catalog_units where unit_key not in (
+           select u.unit_key from listing_units l join catalog_units u on u.upi = l.upi) limit 1`,
+      )
+    ).rows[0]!.unit_key;
+    await e.w.db.owner.query(
+      `update company_pending_units set unit_key = $1, matched_at = now() where raw_code = 'SA5-99.99'`,
+      [free],
+    );
+    const again = await preview(e, "LA", [rowsOf(e.codes)[2]!], { ...CHOICES, units: {} });
+    expect(again.body.cells[0]![0]).toMatchObject({ mark: "ask", why: "already-listed" });
+    expect(again.body.createCount).toBe(0);
+    const open = async () =>
+      count(
+        e,
+        `select count(*) as n from listings l
+           left join listing_units lu on lu.listing_id = l.id
+           left join catalog_units cu on cu.upi = lu.upi
+           left join listing_pending_units lp on lp.listing_id = l.id
+           left join company_pending_units cpu on cpu.id = lp.pending_unit_id
+          where coalesce(cu.unit_key, cpu.unit_key) = $1`,
+        [free],
+      );
+    expect(await open()).toBe(1);
+  });
+
   it("a batch sent again writes nothing; the same file again adds no second open listing for the same units", async () => {
     const e = await importWorld("lai");
     const first = await applyAll(e, "LA", rowsOf(e.codes));

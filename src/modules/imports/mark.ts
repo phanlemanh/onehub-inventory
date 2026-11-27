@@ -18,7 +18,7 @@ import type { ListingStandardStatus } from "@/generated/ontology";
 
 import {
   HEADER_DICTIONARY,
-  OWNER_HEADERS,
+  isOwnerFolded,
   STANDARD_HEADER_CONCEPTS,
   STANDARD_TARGETS,
   TARGET_CONCEPT,
@@ -159,7 +159,7 @@ export function matchColumns(
         : null;
     // An owner's name or phone never goes in (Hỏi-12): the column stays blocked until the person drops it, whatever
     // else the request or a template says; this check is the server's, the screen only offers the same choice.
-    if (OWNER_HEADERS.has(f)) {
+    if (isOwnerFolded(f)) {
       if (chosen && "skip" in chosen.target)
         return {
           index,
@@ -469,5 +469,5 @@ export function readFloor(raw: string): string | null {
 
 /** Whether a header names the owner's name or phone (Hỏi-12): such a column can only be dropped. */
 export function isOwnerHeader(header: string): boolean {
-  return OWNER_HEADERS.has(fold(header));
+  return isOwnerFolded(fold(header));
 }
