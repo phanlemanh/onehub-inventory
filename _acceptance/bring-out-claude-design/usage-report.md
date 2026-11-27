@@ -46,3 +46,48 @@ wall: 962s
 - **claude-sonnet-5-5**: 6 agent · 15 calls · out 16,559 · in 30 · cache_read 163,267 · cache_create 135,790
 - **claude-haiku-5-5**: 15 agent · 43 calls · out 24,689 · in 86 · cache_read 453,092 · cache_create 229,801
 
+### S4 round 2 — wf_ec9157a1-b78 (23 agent, 59,032 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 9,546 | 6 | 54,153 | 212 |
+| synthesize:report | claude-sonnet-5-5 | 2 | 7,010 | 4 | 25,363 | 38 |
+| review:measurement | claude-opus-5-5 | 7 | 5,773 | 14 | 200,695 | 148 |
+| review:invariants | claude-opus-5-5 | 9 | 4,016 | 18 | 172,847 | 54 |
+| machine:DATABASE_URL= make e2e | claude-haiku-5-5 | 4 | 3,309 | 8 | 34,576 | 616 |
+| review:bugs | claude-opus-5-5 | 6 | 2,860 | 12 | 111,779 | 138 |
+| machine:make check | claude-haiku-5-5 | 4 | 2,829 | 8 | 48,968 | 157 |
+| triage | claude-sonnet-5-5 | 2 | 2,387 | 4 | 14,435 | 19 |
+| machine:node _acceptance/bring-out-claude-design | claude-haiku-5-5 | 3 | 2,153 | 6 | 34,301 | 81 |
+| machine:node _acceptance/bring-out-claude-design | claude-haiku-5-5 | 3 | 2,051 | 6 | 34,309 | 22 |
+| machine:node _acceptance/bring-out-claude-design | claude-haiku-5-5 | 3 | 1,958 | 6 | 34,317 | 34 |
+| machine:node _acceptance/bring-out-claude-design | claude-haiku-5-5 | 3 | 1,952 | 6 | 34,305 | 32 |
+| machine:node _acceptance/bring-out-claude-design | claude-haiku-5-5 | 3 | 1,950 | 6 | 34,293 | 10 |
+| machine:node _acceptance/bring-out-claude-design | claude-haiku-5-5 | 3 | 1,914 | 6 | 34,288 | 14 |
+| machine:node _acceptance/bring-out-claude-design | claude-haiku-5-5 | 3 | 1,878 | 6 | 34,302 | 19 |
+| machine:node _acceptance/bring-out-claude-design | claude-haiku-5-5 | 3 | 1,820 | 6 | 34,233 | 10 |
+| machine:node _acceptance/bring-out-claude-design | claude-haiku-5-5 | 3 | 1,779 | 6 | 34,219 | 49 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 1,049 | 4 | 15,377 | 10 |
+| refute:bundle.mjs | claude-sonnet-5-5 | 3 | 689 | 6 | 25,950 | 7 |
+| machine:node _acceptance/bring-out-claude-design | claude-haiku-5-5 | 2 | 668 | 4 | 15,410 | 5 |
+| machine:node _acceptance/bring-out-claude-design | claude-haiku-5-5 | 2 | 605 | 4 | 15,412 | 6 |
+| machine:node _acceptance/bring-out-claude-design | claude-haiku-5-5 | 2 | 535 | 4 | 15,411 | 5 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 301 | 4 | 10,764 | 4 |
+
+
+wall: 852s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| baseline | 1 | 9,546 | 54,153 | 212 | 05:10:53 | 05:14:25 |
+| machine | 15 | 26,450 | 453,721 | 783 | 05:10:53 | 05:23:56 |
+| review | 3 | 12,649 | 485,321 | 150 | 05:11:04 | 05:13:34 |
+| triage | 1 | 2,387 | 14,435 | 19 | 05:23:56 | 05:24:15 |
+| refute | 1 | 689 | 25,950 | 7 | 05:24:15 | 05:24:23 |
+| capture | 1 | 301 | 10,764 | 4 | 05:24:23 | 05:24:27 |
+| synthesize | 1 | 7,010 | 25,363 | 38 | 05:24:27 | 05:25:05 |
+
+- **claude-sonnet-5-5**: 5 agent · 12 calls · out 19,933 · in 24 · cache_read 130,665 · cache_create 119,516
+- **claude-opus-5-5**: 3 agent · 22 calls · out 12,649 · in 44 · cache_read 485,321 · cache_create 102,212
+- **claude-haiku-5-5**: 15 agent · 43 calls · out 26,450 · in 86 · cache_read 453,721 · cache_create 232,780
+

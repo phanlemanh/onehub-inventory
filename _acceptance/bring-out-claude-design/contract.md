@@ -5,7 +5,7 @@ slug: bring-out-claude-design
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [config, docs]
-status: implemented
+status: machine-cleared
 approved_by: Manh Phan
 approved_at: 2026-11-27
 design_doc: docs/superpowers/specs/2026-11-27-bring-out-claude-design-design.md
@@ -97,3 +97,13 @@ Phủ theo tệp nhánh đổi và từng bên đọc chúng. Không quét khôn
   đường dẫn artifact và nhìn màu, chữ và linh kiện; thẻ ghi việc này chưa ai chứng cho tới khi chủ kho nói đã xem (dòng sổ
   `descope` «bỏ chứng trang Claude Design bằng máy»).
 - Cổng Bằng chứng chỉ trình khi job `e2e` của PR đã xanh trên đúng commit đã chấm.
+- Ngoài-1 (máy định tuyến 2026-11-27, đề xuất S4 known-limits): Các tệp nghiệm thu lưu sẵn đường dẫn trên máy của chủ kho, nên phép đo mặc định chỉ chạy trên máy ấy và tên tài khoản của chủ kho nằm trong kho. Gói gửi cho Claude Design vẫn sạch. — `_acceptance/bring-out-claude-design/rang/matrix.mjs`
+- Ngoài-2 (máy định tuyến 2026-11-27, đề xuất S4 known-limits): Nếu phép so kiểu chữ của gói với nguồn bị hỏng, vẫn có một phép kiểm khác bắt được trường hợp đổi phông sang khác Inter. Chỉ thiếu một ca thử riêng chứng minh phép so ấy tự đỏ. — `_acceptance/bring-out-claude-design/rang/two-way.mjs`
+- Ngoài-3 (máy định tuyến 2026-11-27, đề xuất S4 known-limits): Phép kiểm bước gửi đã chặt hơn nhưng chưa có ca thử nào chứng minh nó đỏ khi chỗ nhận bị đổi hoặc dòng nói phép đã có biến mất. Chưa rõ phép ấy có thật sự bắt được hai lỗi này. — `_acceptance/bring-out-claude-design/rang/leave.mjs`
+- Ngoài-4 (máy định tuyến 2026-11-27, đề xuất S4 known-limits): Địa chỉ thư thật của chủ kho nằm trong hồ sơ nghiệm thu, giống 78 hồ sơ khác. Người dùng cuối không thấy nó, nhưng nó nằm trong kho mã. — `_acceptance/bring-out-claude-design/contract.md`
+- Ngoài-5 (máy định tuyến 2026-11-27, đề xuất S4 known-limits): Phép đo gửi chỉ chạy được trên máy của chủ kho trừ khi đặt biến chỉ chỗ khác. Tên thư mục của chủ kho cũng nằm trong kho mã. — `_acceptance/bring-out-claude-design/rang/matrix.mjs`
+- Ngoài-6 (máy định tuyến 2026-11-27, đề xuất S4 known-limits): Sổ lần gửi chỉ còn lần gửi gần nhất, dù đã gửi ba lần ra dịch vụ ngoài. Người xem lại sau này không thấy đủ lịch sử các lần gửi. — `design/export/pushed.json`
+- Ngoài-7 (máy định tuyến 2026-11-27, đề xuất S4 known-limits): Chú thích của phép đo hứa kiểm một điều mà thực tế nó không kiểm. Nếu sau này có lần gửi ghi nhầm là tài khoản đã có mặc định, phép đo vẫn xanh. — `_acceptance/bring-out-claude-design/rang/default.mjs`
+- Ngoài-8 (máy định tuyến 2026-11-27, đề xuất S4 known-limits): Khi bước chuẩn bị sổ linh kiện hỏng, phép đo báo đỏ nhưng không nói vì sao, nên người chấm phải tự tìm nguyên nhân. — `_acceptance/bring-out-claude-design/rang/bundle.mjs`
+- Ngoài-9 (máy định tuyến 2026-11-27, đề xuất S4 known-limits): Phép quét dữ liệu riêng tư mới được thử đỏ với một phần các dạng khoá và số điện thoại. Một lỗi gõ ở dạng chưa thử có thể làm quét bỏ sót mà không ai biết. — `_acceptance/bring-out-claude-design/rang/two-way.mjs`
+- Ngoài-10 (máy định tuyến 2026-11-27, đề xuất S4 known-limits): Phép đo gửi chạy bản plugin có sẵn trên máy chủ kho, nên kết quả phụ thuộc bản đó và không chạy được trên máy khác nếu không đặt biến. — `_acceptance/bring-out-claude-design/rang/matrix.mjs`
