@@ -11,7 +11,11 @@ vi.mock("@/modules/imports/store", () => ({
     p.listAgentUserId === "bad" ? { ok: false, problem: "bad-agent" } : { ok: true, id: "run-1" },
   ),
   writeBatch: vi.fn(async (_c: unknown, id: string) =>
-    id === "closed" ? { ok: false, problem: "closed" } : { ok: true, created: 2, done: false },
+    id === "closed"
+      ? { ok: false, problem: "closed" }
+      : id === "other-table"
+        ? { ok: false, problem: "table-changed" }
+        : { ok: true, created: 2, done: false },
   ),
   undoImport: vi.fn(async (_c: unknown, id: string) =>
     id === "twice"
@@ -19,6 +23,7 @@ vi.mock("@/modules/imports/store", () => ({
       : { ok: true, removed: ["a"], kept: [], retired: 1 },
   ),
   recentImports: vi.fn(async () => []),
+  listAgents: vi.fn(async () => [{ userId: "u1", name: "[Tên]" }]),
 }));
 
 import { createImportsHandlers } from "@/modules/imports/imports-http";
@@ -81,12 +86,23 @@ describe("cua-http", () => {
     };
     expect((await handlers().batch(post(b), "run-1")).status).toBe(200);
     expect((await handlers().batch(post(b), "closed")).status).toBe(409);
+    expect((await handlers().batch(post(b), "other-table")).status).toBe(409);
     expect(
       (await handlers().batch(post({ ...b, rows: Array(201).fill(["x"]) }), "run-1")).status,
     ).toBe(400);
     expect((await handlers().undo(post({}), "run-1")).status).toBe(200);
     expect((await handlers().undo(post({}), "twice")).status).toBe(409);
     expect((await handlers().recent(new Request("http://x"))).status).toBe(200);
+  });
+  it("list agents: a team lead (company scope) reads them, a list agent (own) reads none, a closed door its code", async () => {
+    const get = () => new Request("http://x/api/v1/imports/list-agents");
+    const read = async (scope: Scope | "forbidden") => {
+      const r = await handlers(scope).agents(get());
+      return [r.status, await r.json()];
+    };
+    expect(await read("company")).toEqual([200, [{ userId: "u1", name: "[Tên]" }]]);
+    expect(await read("own")).toEqual([200, []]);
+    expect((await read("forbidden"))[0]).toBe(403);
   });
   it("an error inside answers 500 without the error's text", async () => {
     const h = createImportsHandlers({

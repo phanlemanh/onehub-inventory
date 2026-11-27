@@ -12,7 +12,7 @@ import { usePlaceChange } from "@/components/templates/app-shell/place-change";
 import { notifyResult } from "@/components/templates/notify";
 import { Button } from "@/components/ui/button";
 import type { Listing } from "@/generated/ontology";
-import { PermittedAction } from "@/modules/identity/ui";
+import { PermittedAction, usePermitted } from "@/modules/identity/ui";
 
 import type { ListingSaveDoor } from "../save-door";
 import { httpSaveDoor } from "./http-save-door";
@@ -120,6 +120,7 @@ export function InventoryGrid({
   detailWords?: DetailColumnWords;
 }) {
   const router = useRouter();
+  const permitted = usePermitted();
   const [current, setCurrent] = useState<InventoryState>(state);
   // A new read of the page (Tải lại, or after a change the server works out) brings its own state.
   const [givenState, setGivenState] = useState(state);
@@ -286,7 +287,8 @@ export function InventoryGrid({
         }
         groupBy={INVENTORY_GROUP_BY}
         emptyAction={
-          emptyLink ? (
+          // A role that imports is sent to the import screen from the sentence; any other keeps the reload button.
+          emptyLink && permitted("importListings") ? (
             <PermittedAction action="importListings">
               <p data-slot="empty-link" className="text-sm text-muted-foreground">
                 {emptyLink.lead}{" "}

@@ -25,6 +25,8 @@ export const IMPORT_COPY = {
   remember: "Nhớ cho lần sau",
   keepAsWritten: "Giữ chữ gốc",
   skipColumn: "Bỏ cột",
+  /** A team lead imports for one list agent of the company (Hỏi-7). */
+  pickAgent: `Nhập cho ${label("ListAgent")} nào?`,
   skipRow: "Bỏ dòng",
   keepRow: "Lấy lại dòng",
   pendingDefault: "Giữ nguyên mã, chờ khớp danh mục",
@@ -81,6 +83,9 @@ export const WHY_WORDS: Record<string, string> = {
   "same-target": "Hai cột cùng đi vào một chỗ",
   "no-unit-column": "Tệp chưa có cột mã",
   "owner-column": "Số và tên chủ nhà chưa nhập ở đây — bỏ cột",
+  "field-refused":
+    "Không thêm được trường này: tên trống, trùng tên hay đã đủ 20 trường — chọn chỗ khác hoặc bỏ cột",
+  "code-too-long": "Mã dài quá 80 ký tự — sửa trong tệp rồi nạp lại",
   "target-retired": "Trường đã ngừng — chọn lại",
   chosen: "Người chọn",
 };

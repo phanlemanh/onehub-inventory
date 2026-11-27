@@ -37,7 +37,7 @@ const personOf = (role: Role) => ({
   name: `[Tên] Nạp tệp ${role}`,
   email: `nhap-excel-${role.toLowerCase()}-${RUN}@example.test`,
 });
-const PEOPLE: Role[] = ["ListAgent", "BuyerAgent"];
+const PEOPLE: Role[] = ["ListAgent", "BuyerAgent", "TeamLead"];
 
 let made: Promise<void> | null = null;
 /** The company of this file with one importer and one buyer agent, and the shared catalog; made once per run. */
@@ -448,6 +448,41 @@ test("so tren man bang so may chu: the preview and Xong show the server's number
   await expect(next(page)).toBeEnabled({ timeout: 10_000 });
   await toPreview(page);
   expect(await screenCountsFault(page, preview as unknown as Record<string, unknown>)).toBeNull();
+});
+
+// ---- S4-r1 t9 · a team lead imports for a list agent chosen on the screen (Hỏi-7) -------------------------------------
+
+test("truong nhom nap ho: Áp waits for the list agent, and the listings are kept by the one chosen", async ({
+  page,
+}) => {
+  test.skip(test.info().project.name !== "1440", "one width: the choice does not depend on it");
+  await makeWorld();
+  await emptyInventory();
+  await page.context().clearCookies();
+  await openScreen(page, "TeamLead");
+  await choose(page, "gon.xlsx");
+  await expect(next(page)).toBeEnabled({ timeout: 10_000 });
+  await toPreview(page);
+  const apply = page.getByRole("button", { name: /^Áp/ });
+  await expect(apply).toBeDisabled();
+  await page.getByRole("combobox", { name: C.pickAgent }).click();
+  await page.getByRole("option", { name: personOf("ListAgent").name }).click();
+  await expect(apply).toBeEnabled();
+  await apply.click();
+  await expect(page.locator('[data-state="xong"]')).toBeVisible();
+  const db = new pg.Client({ connectionString: OWNER_URL });
+  await db.connect();
+  try {
+    const { rows } = await db.query<{ email: string }>(
+      `select distinct u.email from listings l join identity.users u on u.id = l.list_agent_user_id
+        where l.company_id = (select id from companies where name = $1)`,
+      [COMPANY],
+    );
+    expect(rows.map((r) => r.email)).toEqual([personOf("ListAgent").email]);
+  } finally {
+    await db.end();
+  }
+  await emptyInventory();
 });
 
 // ---- E15 · the inventory's way in, and the imported listings on it (AC-11) -------------------------------------------

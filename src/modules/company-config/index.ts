@@ -32,6 +32,7 @@ export {
   NAME_LIMIT,
   OPTION_LIMIT,
   STANDARD_VALUE_SETS,
+  PENDING_CODE_LIMIT,
   TEXT_VALUE_LIMIT,
   checkCustomValue,
   checkFieldDraft,

@@ -4,7 +4,16 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { listingIdOf, recentImports, undoImport } from "@/modules/imports/store";
+import {
+  BATCH_ROWS,
+  batchHash,
+  listAgents,
+  listingIdOf,
+  recentImports,
+  tableHash,
+  undoImport,
+  writeBatch,
+} from "@/modules/imports/store";
 
 const recorder = (rows: unknown[][]) => {
   const texts: string[] = [];
@@ -28,6 +37,66 @@ const LEARNED = {
   pendingUnits: [{ rawCode: "X", id: "p1" }],
   unitCodeIds: ["7"],
 };
+
+describe("gan-goi-voi-lan-mo (S4-r1 t2)", () => {
+  const CH = { columns: {}, values: {}, units: {} };
+  const rows = [["A-1"], ["A-2"]];
+  const run = (over: Record<string, unknown> = {}) => ({
+    id: "run-1",
+    status: "open",
+    list_agent_user_id: "me",
+    file_name: "a.xlsx",
+    batches_done: [],
+    learned: {},
+    kept: [],
+    created_count: 0,
+    table_hash: tableHash(["Mã căn"], CH),
+    batch_hashes: [batchHash(rows)],
+    ...over,
+  });
+  const batch = { headers: ["Mã căn"], rows, choices: CH, batchNo: 0, rowOffset: 0, last: true };
+  it("the fingerprints change with the headers, the choices and the rows", () => {
+    expect(tableHash(["Mã căn"], CH)).toMatch(/^[0-9a-f]{64}$/);
+    expect(tableHash(["Mã"], CH)).not.toBe(tableHash(["Mã căn"], CH));
+    expect(tableHash(["Mã căn"], { ...CH, skipRows: [0] })).not.toBe(tableHash(["Mã căn"], CH));
+    expect(batchHash([["A-1"]])).not.toBe(batchHash(rows));
+    expect(BATCH_ROWS).toBe(200);
+  });
+  it("a batch off the opened table is refused before anything is read or written", async () => {
+    for (const over of [
+      { headers: ["Mã"] },
+      { rows: [["A-1"]] },
+      { choices: { ...CH, skipRows: [1] } },
+      { batchNo: 1, rowOffset: 200 },
+      { rowOffset: 1 },
+      { last: false },
+    ]) {
+      const c = recorder([[run()]]);
+      expect(
+        await writeBatch(c as never, "run-1", { ...batch, ...over } as never),
+        JSON.stringify(over),
+      ).toEqual({
+        ok: false,
+        problem: "table-changed",
+      });
+      expect(c.texts).toHaveLength(1);
+    }
+    // An import opened before the fingerprints existed is refused the same way.
+    const old = recorder([[run({ table_hash: null, batch_hashes: null })]]);
+    expect((await writeBatch(old as never, "run-1", batch as never)).ok).toBe(false);
+  });
+  it("list agents are read through the privileged function, ids and names only", async () => {
+    const sent: string[] = [];
+    const c = {
+      query: async (text: string) => (
+        sent.push(text),
+        { rows: [{ userId: "u1", name: "[Tên]" }], rowCount: 1 }
+      ),
+    };
+    expect(await listAgents(c as never)).toEqual([{ userId: "u1", name: "[Tên]" }]);
+    expect(sent[0]).toContain("from app.import_list_agents()");
+  });
+});
 
 describe("luu-lan-nhap", () => {
   it("a listing id is fixed by the import and the row, and shaped as a uuid", () => {

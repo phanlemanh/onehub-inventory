@@ -180,3 +180,15 @@ export const VALUE_DICTIONARY: Partial<Record<StandardTarget, Record<string, str
     "bao phi": "Included",
   },
 };
+
+/** The concepts whose standard words a new custom field may not take as its name (the company layer's rule). */
+export const STANDARD_HEADER_CONCEPTS = [
+  "Unit",
+  "Building",
+  "Subdivision",
+  "StandardStatus",
+  "ListPrice",
+  "LivingArea",
+  "BedroomsTotal",
+  "LastConfirmedAt",
+] as const;
