@@ -5,9 +5,11 @@
 //                   decision sheet: red for a judgment this branch writes that no person answered
 //                   and no question asks, for source that goes around a decided scale, and for a
 //                   test that proves a decision the ledger has no row for
-//   owner-calls     the wall: a branch that adds a page of a kind of screen, or changes the root
-//                   colour line, is red until the waiting list holds the owner's answer that keeps
-//                   that very item
+//   owner-calls     the wall: a branch that adds a page of a kind of screen, changes the root
+//                   colour line, or adds a logo row or changes a file of one, is red until the
+//                   waiting list holds the owner's answer that keeps that very item; for a mark
+//                   asked with candidates, the answer that chooses one of them, and a row that
+//                   says it is that candidate's, or names none for the first
 //
 // What a branch adds is read from git, against where the branch left the main one, with what is
 // not committed yet. A shallow checkout fetches the history it needs from the remote named origin.
@@ -20,7 +22,16 @@ import { env } from "node:process";
 import { inLibrary, VENDOR } from "./components.mjs";
 import { parseLedger } from "./ledger.mjs";
 import { NOT_A_KIND } from "./screens.mjs";
-import { colourItem, STAMP, UNCONFIRMED } from "./waiting.mjs";
+import { LOGO_KIND, SOURCES_FOLDER } from "./sources-ledger.mjs";
+import {
+  choiceSaid,
+  chosenCandidate,
+  colourItem,
+  logoItem,
+  markChoices,
+  STAMP,
+  UNCONFIRMED,
+} from "./waiting.mjs";
 
 // How source goes around a decision about using a scale: a raw value where a role or a step of
 // the scale is decided. One detector, read by the audit and by the gate.
@@ -328,13 +339,73 @@ function compare({ root, git, base, main, pages, stylesheet, ledger, atBase }) {
     .filter((row) => !was.has(String(row.id)) || shape(was.get(String(row.id))) !== shape(row))
     .map((row) => String(row.id));
 
+  // The files each logo row pins, at the base and now, by the row's id.
+  const listedSources = git("ls-tree", "-r", "--name-only", "-z", base, "--", `${SOURCES_FOLDER}/`);
+  if (listedSources.status !== 0)
+    return { problem: `git could not list ${SOURCES_FOLDER} at ${base}` };
+  const sourcesAtBase = listedSources.stdout
+    .split("\0")
+    .filter((file) => file.endsWith(".json") && path.posix.dirname(file) === SOURCES_FOLDER);
+  const folderNow = path.join(root, SOURCES_FOLDER);
+  const sourcesNow = existsSync(folderNow)
+    ? readdirSync(folderNow)
+        .filter((name) => name.endsWith(".json"))
+        .map((name) => `${SOURCES_FOLDER}/${name}`)
+    : [];
+
   return {
     base,
     main,
     pages_added: pagesAdded,
     colour: { base: rootColour(atBase(stylesheet)), now: rootColour(read(stylesheet)) },
     judgments,
+    marks: {
+      base: markPins(sourcesAtBase.map((file) => [file, atBase(file)])),
+      now: markPins(sourcesNow.map((file) => [file, read(file)])),
+      // The candidate each logo row says its package holds, by the row's id.
+      held: markCandidates(sourcesNow.map((file) => [file, read(file)])),
+    },
   };
+}
+
+// The files each logo row pins, as one line per file of its hash and path, by the row's id: what a
+// branch changes when it changes the mark. A file that is not JSON, or not a logo, is no row here.
+function markPins(files) {
+  const pins = {};
+  for (const [file, text] of files) {
+    let row;
+    try {
+      row = JSON.parse(text ?? "null");
+    } catch {
+      continue;
+    }
+    if (row?.kind !== LOGO_KIND) continue;
+    const entries = Array.isArray(row.pin?.files) ? row.pin.files : [];
+    pins[path.posix.basename(file, ".json")] = entries
+      .map((entry) => `${entry?.sha256 ?? ""} ${entry?.file ?? ""}`)
+      .sort()
+      .join("\n");
+  }
+  return pins;
+}
+
+// The candidate each logo row says its package holds (its made.candidate), or null where it names
+// none, by the row's id.
+function markCandidates(files) {
+  const held = {};
+  for (const [file, text] of files) {
+    let row;
+    try {
+      row = JSON.parse(text ?? "null");
+    } catch {
+      continue;
+    }
+    if (row?.kind !== LOGO_KIND) continue;
+    const candidate = row.made?.candidate;
+    held[path.posix.basename(file, ".json")] =
+      typeof candidate === "string" && candidate.trim() !== "" ? candidate : null;
+  }
+  return held;
 }
 
 // A branch that is where the repository meets the plugin, or a repository with no commit yet:
@@ -422,6 +493,7 @@ export function sheetProblem({ ledger, branch, waiting, blueprint, sources, tagg
 
 const WHAT = {
   pattern: (which) => `a new kind of screen (${which})`,
+  logo: (which) => `a new mark, or a changed file of one (${SOURCES_FOLDER}/${which}.json),`,
   "source-color": (which) =>
     which === "none" ? "taking the root colour line away" : `a new root colour (${which})`,
 };
@@ -434,6 +506,11 @@ export function ownersItems(branch) {
   if (colour.base !== colour.now && (colour.base !== null || colour.now !== null)) {
     items.push(colour.now === null ? "source-color:none" : colourItem(colour.now));
   }
+  // A logo row this branch adds, or one whose files it changes: the owner chooses the mark.
+  const marks = branch.marks ?? { base: {}, now: {} };
+  for (const id of Object.keys(marks.now ?? {}).sort()) {
+    if (marks.base?.[id] !== marks.now[id]) items.push(logoItem(id));
+  }
   return items;
 }
 
@@ -444,19 +521,27 @@ export function wallProblem({ branch, waiting }) {
   if (unread) problems.push(unread);
   if (branch?.problem) {
     problems.push(
-      `what this branch adds cannot be read, so a new kind of screen or a new brand colour would pass unseen: ${branch.problem}`,
+      `what this branch adds cannot be read, so a new kind of screen, a new brand colour or a new mark would pass unseen: ${branch.problem}`,
     );
   }
   for (const item of ownersItems(branch)) {
     const [kind, ...rest] = item.split(":");
     const what = WHAT[kind](rest.join(":"));
     const asked = (waiting?.rows ?? []).filter((row) => row.item === item);
+    // A mark asked with candidates: the answer that chooses one, and the row of that candidate.
+    const choice = kind === "logo" ? asked.find((row) => chosenCandidate(row) !== null) : null;
+    if (choice) {
+      const why = markChoiceProblem(rest.join(":"), choice, branch);
+      if (why) problems.push(`${item}: ${why}`);
+      continue;
+    }
     if (asked.some((row) => row.answer === "keep")) continue;
     const answered = asked.find((row) => row.answer);
     if (answered) {
       const said = answered.said ? `: ${answered.said}` : "";
+      const none = kind === "logo" && answered.answer === "value" ? noChoice(answered) : "";
       problems.push(
-        `${item}: ${what} is the owner's call, and the owner ${answered.answer === "refuse" ? "refused" : "answered otherwise"} in ${answered.id}${said}`,
+        `${item}: ${what} is the owner's call, and the owner ${answered.answer === "refuse" ? "refused" : "answered otherwise"} in ${answered.id}${said}${none}`,
       );
     } else if (asked.length > 0) {
       problems.push(
@@ -469,6 +554,41 @@ export function wallProblem({ branch, waiting }) {
     }
   }
   return problems.length === 0 ? null : problems.join("; ");
+}
+
+// Why a mark the owner chose among candidates is not the one the branch's row holds, or null. A row
+// that names no candidate is the first one's, as before candidates were read: it cannot be told to
+// be another's.
+function markChoiceProblem(id, row, branch) {
+  const chosen = chosenCandidate(row);
+  const held = branch.marks?.held?.[id] ?? null;
+  const file = `${SOURCES_FOLDER}/${id}.json`;
+  const said = choiceSaid({ candidate: chosen, question: row.id, by: row.by, on: row.on });
+  const step = `write the row from the package of ${chosen} with logo-source --package`;
+  if (held === chosen) return null;
+  if (held !== null) return `${said}, and ${file} holds the mark of ${held}: ${step}`;
+  if (row.answer === "keep") return null;
+  return `${said}, and ${file} names no candidate, so it cannot be told to be the mark of ${chosen}: ${step}`;
+}
+
+// Why the owner's own words about a mark choose no mark: the question offered no candidates, or
+// the words name none of them.
+const noChoice = (row) =>
+  Array.isArray(row.candidates)
+    ? `; that names none of its candidates (${row.candidates.map((item) => item?.name).join(", ")}), so no mark is chosen`
+    : `; ${row.id} offered no candidates, so no mark is chosen from them`;
+
+// What the wall says on a pass about a mark the owner chose among candidates: which, by whom, when.
+export function choiceLines({ branch, waiting }) {
+  if (!branch || branch.problem || waiting?.problem) return [];
+  const items = ownersItems(branch).filter((item) => item.startsWith("logo:"));
+  return markChoices(waiting?.rows ?? [])
+    .filter((choice) => items.includes(choice.item))
+    .filter((choice) => {
+      const row = waiting.rows.find((item) => item.id === choice.question);
+      return markChoiceProblem(choice.item.slice("logo:".length), row, branch) === null;
+    })
+    .map((choice) => `${choice.item}: ${choiceSaid(choice)}`);
 }
 
 // What the checks say on a pass that did not compare. History fetched to compare is work done, not

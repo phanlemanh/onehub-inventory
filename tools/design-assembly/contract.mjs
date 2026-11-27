@@ -23,9 +23,15 @@ import {
   FONT_FIELDS,
   FONT_STYLES,
   fontRowProblems,
+  iconSetRowProblems,
   isCoreSource,
   isFont,
+  isIconSet,
+  isLogo,
   LADDER_PLACES,
+  LOGO_ROLES,
+  LOGO_VARIANTS,
+  logoRowProblems,
   SOURCES_FOLDER,
 } from "./sources-ledger.mjs";
 import { parseLedger } from "./ledger.mjs";
@@ -362,10 +368,10 @@ export const LEDGERS = {
     folder: SOURCES_FOLDER,
     ending: ".json",
     question:
-      "which outside libraries blocks are picked from, in what order, at which pin; and which fonts the product uses, from where, at which pin, under which licence",
+      "which outside libraries blocks are picked from, in what order, at which pin; which fonts the product uses, and which icon set, from where, at which pin, under which licence",
     born: BORN.firstEntry,
     writer:
-      "a person, or the repository's own tool that pins a source; a font's row, the guide or adopt from what the repository holds, and its licence a person; one file per source",
+      "a person, or the repository's own tool that pins a source; a font's row, the guide or adopt from what the repository holds; an icon set's row, icon-source or adopt from what the repository holds; the licence a person; one file per source",
     version: 1,
     format: "json-sources",
     root: {
@@ -449,6 +455,45 @@ export const LEDGERS = {
         open: true,
       },
     },
+    // A source of the kind `logo` (spec 0017): the mark of the product. No catalog: it offers no
+    // block. Its pin, each file of the mark already in the repository with its hash, its role and
+    // its variant; the licence, who holds the right to use the mark and where, which a person
+    // writes. `own` says the repository kept the files before the row was written, `proposed`
+    // which command wrote the row and when, and `made` who made the mark, when it says so.
+    logo: {
+      catalog: text,
+      pin: required({
+        type: "object",
+        fields: {
+          files: required(
+            list({
+              type: "object",
+              fields: {
+                file: required({ ...text, pattern: '^[^"\\\\\\n]+$' }),
+                sha256: required({ ...text, pattern: "^[0-9a-f]{64}$" }),
+                role: required({ ...text, values: LOGO_ROLES }),
+                variant: required({ ...text, values: LOGO_VARIANTS }),
+              },
+              open: true,
+            }),
+          ),
+        },
+        open: true,
+      }),
+      own: { type: "boolean" },
+      proposed: {
+        type: "object",
+        fields: { by: required(text), on: required(day) },
+        open: true,
+      },
+      made: {
+        type: "object",
+        // `candidate`: which of the candidates the owner was offered the mark is, as its package
+        // says; the wall holds it against the owner's choice.
+        fields: { by: required(text), on: day, candidate: text },
+        open: true,
+      },
+    },
     // A source of the kind `core` (spec 0016, answer 4): the family core the repository declared it
     // is of. No catalog: it offers no block of a library. The family's name as the core says it;
     // the folder of the repository its copy of the core is kept in; the pin, each file of that copy
@@ -481,6 +526,54 @@ export const LEDGERS = {
           core: required({ ...text, pattern: "^[0-9a-f]{12}$" }),
           left: required(list(dashed)),
         },
+        open: true,
+      },
+    },
+    // A source of the kind `icon-set` (spec 0017): the icon set the product uses. No catalog: it
+    // offers no block of a library. The module the code imports icons from, which is the package
+    // where the set is one; or the folder the repository keeps its own icon files in. A pin the row
+    // itself holds, the package at the version the lockfile pins it at or each file with its hash;
+    // the sizes the product uses and the stroke width of a set drawn in strokes, as a person
+    // answers them; and the licence, which a person writes. `own` and `proposed` as for a font.
+    "icon-set": {
+      catalog: text,
+      module: text,
+      folder: text,
+      pin: {
+        type: "object",
+        fields: {
+          package: text,
+          version: text,
+          files: list({
+            type: "object",
+            fields: {
+              file: required(text),
+              sha256: required({ ...text, pattern: "^[0-9a-f]{64}$" }),
+            },
+            open: true,
+          }),
+        },
+        open: true,
+      },
+      sizes: list(number),
+      stroke: number,
+      // The icons drawn because the pinned set lacked them (spec 0017, criterion 18): each file of
+      // the pin that was drawn, the icon a screen needed, why the pinned set did not answer, and
+      // the day it was recorded. Only a row of the repository's own files has them.
+      drawn: list({
+        type: "object",
+        fields: {
+          file: required(text),
+          need: required({ ...text, pattern: "\\S" }),
+          why: required({ ...text, pattern: "\\S" }),
+          on: day,
+        },
+        open: true,
+      }),
+      own: { type: "boolean" },
+      proposed: {
+        type: "object",
+        fields: { by: required(text), on: required(day) },
         open: true,
       },
     },
@@ -563,6 +656,68 @@ export const LEDGERS = {
 
 // Ledgers the contract names whose one shape is not settled yet, and why.
 export const UNSETTLED = {};
+
+// The manifest of a package of mark files (spec 0017, «the plug that builds a mark»): not a ledger,
+// but the input of logo-source --package, kept as `manifest.json` in the package's folder by the
+// outside plug that made the mark. It says which plug made it and on which day, the name the mark
+// stands for, which candidate of the question it holds, the sentence of its idea, its palette, the
+// root numbers of its construction, and
+// each file of the package by its path from the folder, with its hash, its role and its variant.
+// It names no person: who chose the mark is for the decision sheet to say, never the plug.
+const PACKAGE_FILE = '^(?!/)(?!(?:.*/)?\\.\\.(?:/|$))[^"\\\\\\n]+$';
+const written = { ...text, pattern: "\\S" };
+const PACKAGE_FIELDS = {
+  version: required(number),
+  kind: required({ ...text, values: ["logo-package"] }),
+  made: required({ type: "object", fields: { by: required(dashed), on: required(day) } }),
+  title: written,
+  // Which of the candidates the owner was offered the package holds, by the name the question on
+  // the waiting list gives it. A package made without a question of candidates names none.
+  candidate: written,
+  idea: required(written),
+  palette: required(
+    list({ type: "object", fields: { name: required(written), value: required(written) } }),
+  ),
+  build: required({ type: "object" }),
+  files: required(
+    list({
+      type: "object",
+      fields: {
+        file: required({ ...text, pattern: PACKAGE_FILE }),
+        sha256: required({ ...text, pattern: "^[0-9a-f]{64}$" }),
+        role: required({ ...text, values: LOGO_ROLES }),
+        variant: required({ ...text, values: LOGO_VARIANTS }),
+      },
+    }),
+  ),
+};
+export const LOGO_PACKAGE = {
+  file: "manifest.json",
+  kind: "logo-package",
+  version: 1,
+  fields: PACKAGE_FIELDS,
+  // What is wrong with a manifest read as data, each line naming where; empty when it is whole.
+  problems(data, file) {
+    if (typeOf(data) !== "object") return [`${file} is ${typeOf(data)}, the contract says object`];
+    const version = versionOf(data);
+    if (version !== null && version > LOGO_PACKAGE.version) {
+      return [
+        `${file} has shape ${version} and this tool knows shape ${LOGO_PACKAGE.version}: update the design-assembly plugin`,
+      ];
+    }
+    const problems = objectProblems(data, PACKAGE_FIELDS, false, file);
+    const files = Array.isArray(data.files) ? data.files : [];
+    if (Array.isArray(data.files) && files.length === 0)
+      problems.push(`${file}.files names no file`);
+    const named = files.map((entry) => String(entry?.file ?? ""));
+    for (const twice of new Set(named.filter((name, index) => named.indexOf(name) !== index))) {
+      problems.push(
+        `${file} names ${twice} twice: each file of the mark has one role and one variant`,
+      );
+    }
+    return problems;
+  },
+};
 
 // The core of a family of products (spec 0016): not a ledger of a repository, but a folder of its
 // own, on this machine, that the repositories of one family share. It has a fixed shape, versioned
@@ -1981,7 +2136,19 @@ function sourceProblems(textOfFile, file) {
   // more what a font says of itself. So is the family core the repository pinned.
   const font = isFont(data);
   const core = isCoreSource(data);
-  const variant = font ? LEDGERS.sources.font : core ? LEDGERS.sources.core : {};
+  // An icon set is a source of its own kind too (spec 0017).
+  const iconSet = isIconSet(data);
+  // And so is the mark (spec 0017).
+  const logo = isLogo(data);
+  const variant = font
+    ? LEDGERS.sources.font
+    : core
+      ? LEDGERS.sources.core
+      : iconSet
+        ? LEDGERS.sources["icon-set"]
+        : logo
+          ? LEDGERS.sources.logo
+          : {};
   const root = { ...LEDGERS.sources.root, ...variant };
   const problems = objectProblems(data, root, LEDGERS.sources.open, file);
   const name = path.basename(file);
@@ -1991,6 +2158,9 @@ function sourceProblems(textOfFile, file) {
     );
   }
   if (font) return [...problems, ...fontRowProblems(data, file)];
+  if (iconSet) return [...problems, ...iconSetRowProblems(data, file)];
+  // The mark: its pin and its licence, past its shape.
+  if (logo) return [...problems, ...logoRowProblems(data, file)];
   if (core) {
     if (data.id !== CORE_ID) {
       problems.push(
