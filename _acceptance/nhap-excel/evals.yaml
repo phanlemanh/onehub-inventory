@@ -158,6 +158,10 @@ evals:
     cmd: config:executors.ui-check
     layer: ui-observed
     paths: ["src/app/(app)/nhap-tep/**", src/modules/imports/**]
+    steps:
+      - "mkdir -p _acceptance/nhap-excel/evidence/ui, then from the repository root, with the lane D Postgres up (make db-up DB_LANE=d DB_PORT=5571 if it is not): NHAP_EXCEL_CHUP=_acceptance/nhap-excel/evidence/ui DB_LANE=d DB_PORT=5571 npx playwright test -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts -g 'chup nhap-tep' --project=1440 --project=1024 — it signs in as the Đầu chủ of a test company on its own dev server and saves nhap-tep-tai, -da-chon, -ghep-cot, -gia-tri-va-ma, -xem-truoc-ban (ban.xlsx as it comes), -xem-truoc and -xong (gon.xlsx) at -1440 and -1024"
+      - "Open every saved nhap-tep-*.png and look at it"
+    question: "Thanh năm bước có hiện và đúng bước ở mỗi ảnh không; bước Ghép cột của ban.xlsx có cột «View» mang dấu Cần người và cột «SĐT chủ» mang dấu Chặn kèm lý do không; Xem trước của ban.xlsx có đếm bốn dấu và nút Áp tắt khi còn chặn không; màn Xong có nói số dòng đã thêm, liệt kê phần vừa học bằng chữ người đọc (không phải chữ máy) và có Hoàn tác không? Nêu ảnh nào lệch."
     expected: "Mở /nhap-tep trên bản đang chạy (dữ liệu thử dãy D, Đầu chủ) ở 1440 và 1024, nạp ban.xlsx: thấy thanh năm bước, bước Ghép cột có cột 'View' mang dấu cần người và cột 'SĐT' mang dấu chặn với lý do; bước Xem trước có đếm bốn dấu và nút Áp tắt khi còn chặn; màn Xong nói số căn đã thêm và phần vừa học, có Hoàn tác. Ảnh lưu evidence/ui/nhap-tep-<buoc>-<kho>.png"
     evidence_required: [run_id, screenshot, observed, verifier, verified_at]
 
@@ -167,7 +171,11 @@ evals:
     cmd: config:executors.ui-check
     layer: ui-observed
     paths: ["src/app/(app)/inventory/**", src/modules/listings/**]
-    expected: "Mở /inventory ở 1440 với sàn thử 0 căn: thấy câu trạng thái trống có liên kết «Nạp tệp» và nút viền «Nạp tệp» ở đầu màn; sau khi nạp gon.xlsx: thấy các căn vừa thêm, căn chờ khớp có mã gốc ở cột Căn. Ảnh evidence/ui/inventory-trong-1440.png, evidence/ui/inventory-sau-nhap-1440.png"
+    steps:
+      - "mkdir -p _acceptance/nhap-excel/evidence/ui, then from the repository root, with the lane D Postgres up: NHAP_EXCEL_CHUP=_acceptance/nhap-excel/evidence/ui DB_LANE=d DB_PORT=5571 npx playwright test -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts -g 'chup bang hang' --project=1440 — it saves inventory-trong-1440 (Đầu chủ, company with no listing), inventory-sau-nhap-1440 (after the three-row file of E15, one code the catalog lacks) and inventory-dau-khach-1440 (Đầu khách, same company)"
+      - "Open the three saved inventory-*.png and look at them"
+    question: "Ảnh trống có câu trạng thái trống với đúng một liên kết «Nạp tệp» trong câu và nút viền «Nạp tệp» ở đầu màn không; ảnh sau khi nạp có ba căn, căn chờ khớp hiện mã gốc ZZ-99.01 và toà «Toà của tệp» không; ảnh Đầu khách có vắng cả liên kết lẫn nút không? Nêu ảnh nào lệch."
+    expected: "Mở /inventory ở 1440 với sàn thử 0 căn: thấy câu trạng thái trống có liên kết «Nạp tệp» và nút viền «Nạp tệp» ở đầu màn; sau khi nạp tệp ba dòng của E15: thấy các căn vừa thêm, căn chờ khớp có mã gốc ở cột Căn; Đầu khách không thấy lối nạp. Ảnh evidence/ui/inventory-trong-1440.png, evidence/ui/inventory-sau-nhap-1440.png, evidence/ui/inventory-dau-khach-1440.png"
     evidence_required: [run_id, screenshot, observed, verifier, verified_at]
 
   - id: E20
