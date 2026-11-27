@@ -307,6 +307,12 @@ test.describe("vung-cham (BH 2026-11-27, L1 and L5)", () => {
       content:
         '[data-slot="phone-toolbar"], [data-slot="phone-toolbar"] > div { flex-wrap: wrap !important; } [data-slot="phone-toolbar"] > div { width: 100% !important; } [data-slot="phone-actions"] { flex-basis: 100% !important; }',
     });
+    // The break is in place before the check runs (a busy machine can measure the frame before the style lands).
+    await expect
+      .poll(
+        async () => (await page.locator('[data-slot="phone-toolbar"]').boundingBox())?.height ?? 0,
+      )
+      .toBeGreaterThan(60);
     await expect(checkTouchTargets(page)).rejects.toThrow("toolbar wraps");
   });
 
@@ -315,6 +321,13 @@ test.describe("vung-cham (BH 2026-11-27, L1 and L5)", () => {
     await themKieu(page, {
       content: '[data-slot="phone-filter-button"] { height: 36px !important; }',
     });
+    // The break is in place before the check runs (a busy machine can measure the frame before the style lands).
+    await expect
+      .poll(
+        async () =>
+          (await page.locator('[data-slot="phone-filter-button"]').boundingBox())?.height ?? 99,
+      )
+      .toBeLessThan(40);
     await expect(checkTouchTargets(page)).rejects.toThrow(
       "touch target under 44px: phone-filter-button",
     );

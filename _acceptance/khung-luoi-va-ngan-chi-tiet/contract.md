@@ -72,8 +72,8 @@ ngăn (đóng, nổi, ghim, toàn màn hình, điện thoại).
 - Trục trạng thái ngăn: nổi (AC-1, AC-3) | ghim (AC-3) | toàn màn hình (AC-1) | điện thoại (AC-4, AC-5) | đóng (AC-2).
 - Trục màn: Bảng hàng (mọi AC) | Đã gửi (AC-1, AC-3, AC-11).
 - Trục không hồi quy: kiểm cả kho, bộ chung, bộ có đăng nhập (AC-11).
-- Later: các câu (a)–(f) và ba đề xuất «máy giữ» — chủ kho trả lời ở Cổng Phạm vi; phần dựng vượt cỡ thì giám sát cắt
-  thành việc riêng. VP11 «Chuẩn hoá hệ design» (màu trạng thái, bấm ô, lọc) là việc riêng sau vòng này.
+- Later: các câu (a)–(f) — chủ kho trả lời ở Cổng Phạm vi, phần dựng ở lát 2; ba đề xuất «máy giữ» chủ kho đã duyệt, thành
+  việc công cụ VP12. VP11 «Chuẩn hoá hệ design» (màu trạng thái, bấm ô, lọc) là việc riêng sau vòng này.
 
 ## Vai × Màn
 

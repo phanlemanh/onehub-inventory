@@ -155,7 +155,7 @@ Căn cứ: quyết định 0024 và lời chủ kho 12/11, 27/11 trên bản b�
 ## Chỗ các bản xem trước chưa phủ (hỏi ở Cổng Phạm vi)
 
 - Ngăn ghim thành cột: nút thanh công cụ hiện giữ chữ; lời duyệt nói «khi ngăn nổi» ở sổ đợt và «khi ngăn mở» ở sổ phiên
-  — hỏi chủ kho (khuyên giữ chữ). Bản dựng theo khuyến nghị; đổi một dòng nếu ông chọn khác.
+  — hỏi chủ kho. Ảnh 1440: giữ chữ thì «Lưu góc nhìn» rớt dòng hai — khuyên chỉ hình cả khi ghim, dựng ngay sau cổng.
 - Đã gửi: cùng khung, đo bằng bài «Đã gửi · the same frame as Bảng hàng»; ảnh ở trang cổng.
 - Cột Căn: trình đơn tiêu đề của nó (từ trước vòng này) vẫn có «Ghim bên trái» nên bấm được để bỏ ghim — trái luật hàng
   2a «cột đầu luôn ghim». Vòng này không đổi; hỏi chủ kho (khuyên chặn, dựng ở lát 2).
