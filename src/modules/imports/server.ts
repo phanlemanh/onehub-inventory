@@ -8,6 +8,14 @@ import { createImportsHandlers, type ImportsHandlers } from "./imports-http";
 
 export { createImportsHandlers, type ImportsDeps, type ImportsHandlers } from "./imports-http";
 export { listingIdOf, BATCH_ROWS } from "./store";
+// Row 3h: read the unit attributes older imports kept as written once more (make tin-rao-doc-lai).
+export {
+  KeptShapeUnread,
+  layerThroughDoor,
+  rereadImportValues,
+  type LayerOf,
+  type RereadSummary,
+} from "./reread";
 
 let handlers: ImportsHandlers | undefined;
 

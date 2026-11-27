@@ -12,9 +12,18 @@ import type { LoginDeps } from "@/modules/identity/login";
 import type { ActionName } from "@/modules/identity/permissions";
 import { captureSender } from "@/modules/identity/sender";
 import { withCompany } from "@/modules/identity/with-company";
+import { matchPendingUnits } from "@/modules/company-config/server";
+import { createImportsHandlers } from "@/modules/imports/imports-http";
+import { NO_CHOICES, valueKey } from "@/modules/imports";
+import { layerThroughDoor, listingIdOf, rereadImportValues } from "@/modules/imports/server";
 import { readInventory } from "@/modules/listings/inventory-read";
 import { createListingsHandlers } from "@/modules/listings/listings-http";
-import { effectiveAttributes } from "@/modules/listings/unit-attributes";
+import {
+  effectiveAttributes,
+  ownAttributesOf,
+  sameAttribute,
+  UNIT_ATTRIBUTE_FIELDS,
+} from "@/modules/listings/unit-attributes";
 
 import { asPerson, dropWorld, world, type Person, type World } from "./bang-quyen-world";
 
@@ -125,8 +134,82 @@ async function apiWorld(suffix: string) {
         "select count(*)::text as n, md5(string_agg(t::text, '|' order by upi)) as h from catalog_units t",
       )
     ).rows[0]!;
-  return { w, patch, listing, version, catalogHash };
+  // Row 3h, tasks 6–7: the import's real handlers (row 11), with the same sign-in.
+  const imports = createImportsHandlers({ door, withCompany });
+  const importAs = (who: Person) => async (path: string, body: unknown, id?: string) => {
+    const r = send(`${ORIGIN}/api/v1/imports${path}`, "POST", body, await cookie(who));
+    const res =
+      path === "/preview"
+        ? await imports.preview(r)
+        : path === ""
+          ? await imports.open(r)
+          : await imports.batch(r, id!);
+    return { status: res.status, body: (await res.json()) as Record<string, unknown> };
+  };
+  return { w, patch, listing, version, catalogHash, importAs };
 }
+
+type ApiWorld = Awaited<ReturnType<typeof apiWorld>>;
+
+/** Three catalog units by their original code, with what the catalog says of their area. */
+async function codedUnits(w: World) {
+  return (
+    await w.db.owner.query<{ code: string; upi: string; unit_key: string; living_area: string }>(
+      `select a.value as code, u.upi, u.unit_key, u.living_area::text
+         from catalog_aliases a join catalog_units u on u.unit_key = a.object_key
+        where a.kind = 'ma_goc' and u.living_area is not null
+        order by a.value limit 2`,
+    )
+  ).rows;
+}
+
+const IMPORT_HEADERS = ["Mã căn", "Block", "DT", "Tầng", "PN", "Hướng", "Loại hình"];
+
+/**
+ * One import through the real door of row 11, as the list agent: row 0 on a catalog unit with an area other than the
+ * catalog's, row 1 on a catalog unit with the catalog's own area and «2PN» in Loại hình (kept as written), row 2 on a
+ * pending unit. Returns the import's id and the listing id of each row.
+ */
+async function importThree(e: ApiWorld, units: Awaited<ReturnType<typeof codedUnits>>) {
+  const run = e.importAs("LA");
+  const rows = [
+    [units[0]!.code, "[MAU] Toà", "72.5", "15a", "2", "Đông Nam", "Chung cư"],
+    [units[1]!.code, "[MAU] Toà", units[1]!.living_area, "7", "3", "Tây Bắc", "2PN"],
+    ["SA5-99.99", "Sapphire 9", "80", "", "1", "", ""],
+  ];
+  const choices = {
+    ...NO_CHOICES,
+    columns: { 1: { target: { standard: "Unit.buildingName" } } },
+    values: { [valueKey(6, "2PN")]: { value: null, remember: false } },
+    units: { "sa5-99.99": { pending: true } },
+  };
+  const preview = await run("/preview", { headers: IMPORT_HEADERS, rows, choices });
+  expect(preview.status).toBe(200);
+  const p = preview.body as { counts: Record<string, number>; createCount: number };
+  const open = await run("", {
+    headers: IMPORT_HEADERS,
+    rows,
+    choices,
+    fileName: "bang-hang.xlsx",
+    sheetName: "Sheet1",
+    expected: { ...p.counts, createCount: p.createCount },
+  });
+  expect(open.status).toBe(201);
+  const id = (open.body as { id: string }).id;
+  const batch = await run(
+    `/${id}/batches`,
+    { headers: IMPORT_HEADERS, rows, choices, batchNo: 0, rowOffset: 0, last: true },
+    id,
+  );
+  expect(batch.status).toBe(200);
+  expect(batch.body["created"]).toBe(3);
+  return { id, preview: preview.body, ids: [0, 1, 2].map((r) => listingIdOf(id, r)) };
+}
+
+const OWN_COLUMNS = `living_area::float8 as living_area, living_area_source, floor, floor_source, bedrooms_total,
+  bedrooms_total_source, direction_faces, direction_faces_source, property_sub_type, property_sub_type_source`;
+const ownOf = async (w: World, id: string) =>
+  (await w.db.owner.query(`select ${OWN_COLUMNS} from listings where id = $1`, [id])).rows[0];
 
 describe("doc-gia-tri-rieng (E1b)", () => {
   it("doc-gia-tri-rieng: the real read carries own values and sources; a listing without one follows the catalog", async () => {
@@ -367,5 +450,194 @@ describe("san-khac-khong-cham (E11, SP-1)", () => {
       )
     ).rows[0];
     expect(after).toEqual(before);
+  });
+});
+
+describe("nhap-tep-gia-tri-tep (E7, E8)", () => {
+  it("nhap-tep-gia-tri-tep: a new import writes each read cell as an own value from a file; «2PN» stays kept; the preview marks the one differing area", async () => {
+    const e = await apiWorld("nhap_tep");
+    const units = await codedUnits(e.w);
+    const { id, preview, ids } = await importThree(e, units);
+    expect(await ownOf(e.w, ids[0]!)).toEqual({
+      living_area: 72.5,
+      living_area_source: "File",
+      floor: "15A",
+      floor_source: "File",
+      bedrooms_total: 2,
+      bedrooms_total_source: "File",
+      direction_faces: "Đông Nam",
+      direction_faces_source: "File",
+      property_sub_type: "Condominium",
+      property_sub_type_source: "File",
+    });
+    // «2PN» is not a property sub type: no value, the cell stays kept as written.
+    expect(await ownOf(e.w, ids[1]!)).toMatchObject({
+      bedrooms_total: 3,
+      bedrooms_total_source: "File",
+      property_sub_type: null,
+      property_sub_type_source: null,
+    });
+    const kept = (
+      await e.w.db.owner.query<{ kept: { row: number; header: string; raw: string }[] }>(
+        "select kept from import_runs where id = $1",
+        [id],
+      )
+    ).rows[0]!.kept;
+    expect(kept).toContainEqual(
+      expect.objectContaining({ row: 1, header: "Loại hình", raw: "2PN" }),
+    );
+    // A pending unit takes its file values too.
+    expect(await ownOf(e.w, ids[2]!)).toMatchObject({ living_area: 80, bedrooms_total: 1 });
+    // The preview: only row 0's area differs from its catalog unit, and the file's value is still the one written.
+    const cells = (preview as { cells: { value: unknown; catalog?: unknown }[][] }).cells;
+    const marked = cells.flatMap((row, r) =>
+      row.flatMap((c, j) => (c.catalog === undefined ? [] : [{ r, j, c }])),
+    );
+    // Row 0's area differs and carries the catalog's; row 1's area is the catalog's own, so no mark. Every marked cell
+    // really differs (the other columns of these rows follow what the catalog says of each unit).
+    expect(marked).toContainEqual({
+      r: 0,
+      j: 2,
+      c: expect.objectContaining({ value: 72.5, catalog: Number(units[0]!.living_area) }),
+    });
+    expect(marked.some((m) => m.r === 1 && m.j === 2)).toBe(false);
+    expect(marked.some((m) => m.r === 2)).toBe(false);
+    for (const m of marked)
+      expect(sameAttribute(m.c.value, m.c.catalog), `${m.r}:${m.j}`).toBe(false);
+  });
+});
+
+describe("doc-lai-lan-nhap-cu (E7)", () => {
+  it("doc-lai-lan-nhap-cu: an import made before the row is read again — values from the file where none, a typed listing kept, twice the same; a broken kept is named", async () => {
+    const e = await apiWorld("doc_lai");
+    const units = await codedUnits(e.w);
+    const { id, ids } = await importThree(e, units);
+    // Before row 3h the import kept these cells only as written: take the own values off, as the old write path left it.
+    await e.w.db.owner.query(
+      `update listings set living_area = null, living_area_source = null, floor = null, floor_source = null,
+         bedrooms_total = null, bedrooms_total_source = null, direction_faces = null, direction_faces_source = null,
+         property_sub_type = null, property_sub_type_source = null where import_run_id = $1`,
+      [id],
+    );
+    // The company types a bedroom count on row 1's listing.
+    const typed = await e.patch("LA", ids[1]!, {
+      version: await e.version(ids[1]!),
+      change: { field: "unitAttributes", bedroomsTotal: 4 },
+    });
+    expect(typed.status).toBe(200);
+    // Row 2's listing was withdrawn since: its details are locked, so the file gives it nothing (Review Focus 4).
+    await e.w.db.owner.query(
+      "update listings set standard_status = 'Withdrawn', withdrawn_reason = 'unreachable' where id = $1",
+      [ids[2]],
+    );
+    const first = await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    expect(first).toMatchObject({ imports: 1, listingsSet: 1, typedKept: 1, lockedKept: 1 });
+    expect(await ownOf(e.w, ids[2]!)).toMatchObject({ living_area: null, bedrooms_total: null });
+    expect(await ownOf(e.w, ids[0]!)).toMatchObject({
+      living_area: 72.5,
+      living_area_source: "File",
+      floor: "15A",
+      property_sub_type: "Condominium",
+    });
+    expect(await ownOf(e.w, ids[1]!)).toMatchObject({
+      bedrooms_total: 4,
+      bedrooms_total_source: "Typed",
+      living_area: null,
+      direction_faces: null,
+    });
+    // Not a person's change: the import still counts the listing as untouched.
+    expect(await e.version(ids[0]!)).toBe(1);
+    const before = await e.w.db.owner.query(`select ${OWN_COLUMNS} from listings order by id`);
+    const second = await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    expect(second).toMatchObject({ listingsSet: 0, typedKept: 1, lockedKept: 1 });
+    expect(
+      (await e.w.db.owner.query(`select ${OWN_COLUMNS} from listings order by id`)).rows,
+    ).toEqual(before.rows);
+    // A kept list of another shape stops the run with the import's name, never reads as nothing to do.
+    await e.w.db.owner.query(
+      `update import_runs set kept = jsonb_build_array(jsonb_build_object('rij', 0, 'header', 'DT', 'raw', '70',
+         'why', 'unit-attribute')) where id = $1`,
+      [id],
+    );
+    await expect(rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool))).rejects.toThrow(
+      `kept shape unread: import ${id}`,
+    );
+  });
+});
+
+describe("can-cho-khop (E9)", () => {
+  it("can-cho-khop: a listing on a pending unit keeps its typed values without a mark; matched, its values stay and only the differing one is marked", async () => {
+    const e = await apiWorld("can_cho");
+    const units = await codedUnits(e.w);
+    const { ids } = await importThree(e, units);
+    const pending = ids[2]!;
+    const target = (
+      await e.w.db.owner.query<{
+        unit_key: string;
+        living_area: string;
+        bedrooms_total: number;
+        floor: string;
+        direction_faces: string;
+        property_sub_type: string;
+      }>(
+        `select unit_key, living_area::text, bedrooms_total, floor, direction_faces, property_sub_type
+           from catalog_units
+          where living_area is not null and bedrooms_total is not null and floor is not null
+            and direction_faces is not null and property_sub_type is not null and upi <> all($1)
+          order by unit_key limit 1`,
+        [units.map((u) => u.upi)],
+      )
+    ).rows[0]!;
+    const typed = await e.patch("LA", pending, {
+      version: await e.version(pending),
+      change: {
+        field: "unitAttributes",
+        livingArea: Number(target.living_area) + 5,
+        // Every value but the area is the one the catalog will lend: only the area may differ after the match.
+        floor: target.floor,
+        bedroomsTotal: target.bedrooms_total,
+        directionFaces: target.direction_faces,
+        propertySubType: target.property_sub_type,
+      },
+    });
+    expect(typed.status).toBe(200);
+    const shown = async () => {
+      const read = await asPerson(e.w, "LA", e.w.A, (c) => readInventory(c, e.w.id.LA));
+      const l = read.current.find((x) => x.id === pending)!;
+      const upi = read.listingUnits.find((x) => x.listingId === pending)!.upi;
+      return {
+        l,
+        a: effectiveAttributes(
+          l,
+          read.units.find((u) => u.upi === upi),
+        ),
+      };
+    };
+    const waiting = await shown();
+    for (const f of UNIT_ATTRIBUTE_FIELDS) {
+      expect(waiting.a[f].source, f).toBe("Typed");
+      expect(waiting.a[f].differs, f).toBe(false);
+    }
+    // «Gắn sang căn khác» has no catalog link to move on a pending unit: refused, nothing changes.
+    const moved = await e.patch("LA", pending, {
+      version: await e.version(pending),
+      change: { field: "unit", upi: units[0]!.upi },
+    });
+    expect(moved.status).toBe(400);
+    // The catalog now knows the code: the company matches its pending units.
+    await e.w.db.owner.query(
+      "insert into catalog_aliases (object_key, kind, value, source) values ($1, 'ma_goc', 'SA5-99.99', 'test')",
+      [target.unit_key],
+    );
+    // Committed, as the company layer's own route does it (asPerson rolls back).
+    const m = await withCompany(e.w.pool, { userId: e.w.id.LA, companyId: e.w.A }, (c) =>
+      matchPendingUnits((fn) => fn(c)),
+    );
+    expect(m.matched).toBe(1);
+    const after = await shown();
+    expect(ownAttributesOf(after.l)).toEqual(ownAttributesOf(waiting.l));
+    const differing = UNIT_ATTRIBUTE_FIELDS.filter((f) => after.a[f].differs);
+    expect(differing).toEqual(["livingArea"]);
+    expect(after.a.livingArea.catalogValue).toBe(Number(target.living_area));
   });
 });

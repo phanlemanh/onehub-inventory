@@ -4,6 +4,9 @@
 // nobody changed since). Nothing here reads a session.
 import type { ListingStandardStatus } from "../../generated/ontology";
 
+import { detailsLocked } from "./edit-rules";
+import { attributeFits, UNIT_ATTRIBUTE_FIELDS, type UnitAttributeValues } from "./unit-attributes";
+
 /** A query client of the caller's transaction (the identity module's DbClient). */
 export interface Queryable {
   query(text: string, params?: unknown[]): Promise<{ rows: unknown[]; rowCount: number | null }>;
@@ -26,9 +29,40 @@ export interface NewListing {
   customFields: Record<string, unknown>;
   /** The owner confirmation date the file gave (YYYY-MM-DD), else null: an import is not a fresh confirmation. */
   lastConfirmedAt: string | null;
+  /**
+   * Row 3h: what the file said of the unit's five attributes, read; each becomes an own value from a file (source
+   * «File»). A value outside the attribute's rule is left out, never written: the import keeps its cell as written.
+   */
+  fileValues?: Partial<UnitAttributeValues>;
 }
 
 const OPEN = ["Incomplete", "Active", "Pending", "Hold"];
+
+/** The five values of a file in the column order of the statements below; null where the file gave none that fits. */
+function fileParams(values: Partial<UnitAttributeValues> | undefined): unknown[] {
+  return UNIT_ATTRIBUTE_FIELDS.map((f) =>
+    values?.[f] !== undefined && attributeFits(f, values[f]) ? values[f] : null,
+  );
+}
+
+// Reading an older import again: an attribute that has no own value takes the file's; one that has keeps its own.
+const FILL_FILE_VALUES = `
+  update listings
+     set living_area = coalesce(living_area, $2),
+         living_area_source = case when living_area is null and $2::numeric is not null then 'File'
+                                   else living_area_source end,
+         floor = coalesce(floor, $3),
+         floor_source = case when floor is null and $3::text is not null then 'File' else floor_source end,
+         bedrooms_total = coalesce(bedrooms_total, $4),
+         bedrooms_total_source = case when bedrooms_total is null and $4::integer is not null then 'File'
+                                      else bedrooms_total_source end,
+         direction_faces = coalesce(direction_faces, $5),
+         direction_faces_source = case when direction_faces is null and $5::text is not null then 'File'
+                                       else direction_faces_source end,
+         property_sub_type = coalesce(property_sub_type, $6),
+         property_sub_type_source = case when property_sub_type is null and $6::text is not null then 'File'
+                                         else property_sub_type_source end
+   where id = $1`;
 
 /** Add listings of one import, each with its one unit link, in the caller's transaction. */
 export async function createListings(
@@ -42,8 +76,14 @@ export async function createListings(
     await c.query(
       `insert into listings (id, company_id, standard_status, list_price, fee_inclusion, furnished, occupant_type,
          legal_status, financing, custom_fields, list_agent_user_id, list_agent_full_name, last_confirmed_at,
-         import_run_id, withdrawn_reason)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, $12, $13::date, $14, $15)`,
+         import_run_id, withdrawn_reason, living_area, living_area_source, floor, floor_source, bedrooms_total,
+         bedrooms_total_source, direction_faces, direction_faces_source, property_sub_type, property_sub_type_source)
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, $12, $13::date, $14, $15,
+         $16, case when $16::numeric is null then null else 'File' end,
+         $17, case when $17::text is null then null else 'File' end,
+         $18, case when $18::integer is null then null else 'File' end,
+         $19, case when $19::text is null then null else 'File' end,
+         $20, case when $20::text is null then null else 'File' end)`,
       [
         l.id,
         companyId,
@@ -60,6 +100,8 @@ export async function createListings(
         l.lastConfirmedAt,
         importRunId,
         l.withdrawnReason,
+        // Row 3h: each own value from the file with its source «File»; none, no source (migration 019).
+        ...fileParams(l.fileValues),
       ],
     );
     const open = OPEN.includes(l.standardStatus);
@@ -76,6 +118,40 @@ export async function createListings(
     created.push(l.id);
   }
   return { created };
+}
+
+/** What setFileValues did to one listing. */
+export type FileValuesOutcome = "set" | "typed-kept" | "locked" | "nothing-new" | "not-found";
+
+/**
+ * Row 3h, reading an import made before the row again (AC-7): the file's values become own values from a file where
+ * the listing has no own value yet. A listing the company typed a value on is not touched at all, nor one whose
+ * details are locked (sold or withdrawn), and an attribute that already has an own value keeps it. Not a person's
+ * change: the version stays, so undoing the import still treats the listing as untouched. Run twice, the second run
+ * sets nothing.
+ */
+export async function setFileValues(
+  c: Queryable,
+  listingId: string,
+  values: Partial<UnitAttributeValues>,
+): Promise<FileValuesOutcome> {
+  const { rows } = await c.query(
+    `select standard_status, living_area_source, floor_source, bedrooms_total_source, direction_faces_source,
+            property_sub_type_source
+       from listings where id = $1 for update`,
+    [listingId],
+  );
+  const row = rows[0] as
+    ({ standard_status: ListingStandardStatus } & Record<string, string | null>) | undefined;
+  if (!row) return "not-found";
+  const { standard_status: status, ...rest } = row;
+  const sources = Object.values(rest);
+  if (sources.includes("Typed")) return "typed-kept";
+  if (detailsLocked(status)) return "locked";
+  const file = fileParams(values);
+  if (!file.some((v, i) => v !== null && sources[i] === null)) return "nothing-new";
+  await c.query(FILL_FILE_VALUES, [listingId, ...file]);
+  return "set";
 }
 
 /**

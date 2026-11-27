@@ -13,7 +13,13 @@ import type { Listing } from "../../generated/ontology";
 
 import { readCatalogUnits } from "../catalog/server";
 
-import { LISTING_COLUMNS, LISTING_FROM, toListing, type ListingRow } from "./inventory-read";
+import {
+  LISTING_COLUMNS,
+  LISTING_FROM,
+  PENDING_UNIT,
+  toListing,
+  type ListingRow,
+} from "./inventory-read";
 import { applyChange, type CustomCheck, type Invalid, type ListingChange } from "./save-door";
 import { STANDARD_STATUSES } from "./sample";
 import { UNIT_ATTRIBUTE_FIELDS } from "./unit-attributes";
@@ -157,7 +163,8 @@ async function moveUnit(
   from: string,
   to: string,
 ): Promise<Invalid | null> {
-  if (to === from) return { rule: "unit" };
+  // A listing on a pending unit (row 11) has no catalog link to move: the pending unit is matched instead.
+  if (to === from || from.startsWith(PENDING_UNIT)) return { rule: "unit" };
   const [unit] = await readCatalogUnits(c, [to]);
   if (!unit) return { rule: "unit" };
   const taken = await c.query(

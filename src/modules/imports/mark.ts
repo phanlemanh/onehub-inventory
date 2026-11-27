@@ -282,6 +282,11 @@ export interface CellMark {
   mark: Mark;
   value: string | number | boolean | null;
   why: string;
+  /**
+   * Row 3h: the catalog's value of a unit attribute when the row's catalog unit says otherwise than the file (set by the
+   * server's preview); the file's value is still the one written.
+   */
+  catalog?: string | number;
 }
 
 export interface ValueContext {

@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 # Company isolation suite (SP-1, hồ sơ cach-ly-moi-san). Runs on this lane's Postgres container, never on real data:
 #   1. a fresh scratch database, migrations applied twice (the second run applies nothing);
-#   2. db/tests/cach-ly.sql — 24 cases under the API role, using the door's own statements;
-#   3. eleven break cases (twenty-seven break files), each file on its own scratch database: the suite must go red with the
+#   2. db/tests/cach-ly.sql — 26 cases under the API role, using the door's own statements;
+#   3. eleven break cases (twenty-nine break files), each file on its own scratch database: the suite must go red with the
 #      pinned messages;
 #   4. the app's login role (row 7c): db/tests/vai-dang-nhap.sql on the clean database in a rolled-back transaction;
 #      db/tests/vai-dang-nhap-phien.sql on a connection logged in AS quy_hang_login; seven break files, each in one
 #      rolled-back transaction with the catalog case (roles belong to the whole cluster, so a break is never committed),
 #      then the catalog case once more — a trace left on the cluster fails it.
 # Every case prints `ok <case>` exactly once; the last line is
-# `cach-ly: 40 ca đạt, vai quy_hang_app, nối bằng quy_hang_login`.
+# `cach-ly: 42 ca đạt, vai quy_hang_app, nối bằng quy_hang_login`.
 # Missing, repeated or failing cases are named and the exit code is not 0.
 #
 #   DB_LANE=n bash db/scripts/cach-ly.sh       (see db/scripts/psql.sh for DB_LANE and PSQL)

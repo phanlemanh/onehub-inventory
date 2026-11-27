@@ -35,8 +35,9 @@ import {
   markLookFrom,
   type InventoryField,
   type RecordLabels,
-  type UnitAttributeWords,
 } from "@/modules/listings/ui";
+
+import { ATTRIBUTE_WORDS } from "../unit-attribute-words";
 
 export const metadata: Metadata = { title: label("Inventory") };
 
@@ -67,33 +68,6 @@ function headersFor(overrides: Parameters<typeof label>[1]): Record<InventoryFie
     "Listing.lastConfirmedAt": label("LastConfirmedAt", overrides),
   };
 }
-
-/** Words of the listing's own unit attributes (row 3h), from the label table. */
-const ATTRIBUTE_WORDS: UnitAttributeWords = {
-  names: {
-    livingArea: label("LivingArea"),
-    floor: label("UnitFloorLocation"),
-    bedroomsTotal: label("BedroomsTotal"),
-    directionFaces: label("DirectionFaces"),
-    propertySubType: label("PropertySubType"),
-  },
-  subTypes: {
-    Condominium: label("SubTypeCondominium"),
-    Townhouse: label("SubTypeTownhouse"),
-    "Single Family Residence": label("SubTypeSingleFamily"),
-    "Unimproved Land": label("SubTypeLand"),
-  },
-  sources: {
-    Typed: label("SourceTyped"),
-    File: label("SourceFile"),
-    Catalog: label("SourceCatalog"),
-  },
-  catalog: label("Catalog"),
-  differs: label("DiffersFromCatalog"),
-  revert: label("RevertToCatalog"),
-  edit: label("Edit"),
-  unit: label("Unit"),
-};
 
 /** Labels of the full unit record (row 3b), from the label table. */
 const RECORD_LABELS: RecordLabels = {

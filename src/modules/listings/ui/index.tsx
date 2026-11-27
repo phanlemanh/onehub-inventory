@@ -81,6 +81,7 @@ export {
   type UnitAttributeWords,
 } from "./unit-attribute-copy";
 export { AttributeDiffersMark } from "./attribute-differs-mark";
+export { AttributeDiffersSign } from "./attribute-differs-sign";
 export { UnitAttributesEdit } from "./unit-attributes-edit";
 export { ASK_COPY, type AskWords } from "./ask-copy";
 export {

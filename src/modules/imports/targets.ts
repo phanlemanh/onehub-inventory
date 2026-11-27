@@ -3,6 +3,7 @@
 // ontology/labels.yaml through label(); the header dictionary holds the short spellings sheets use, folded.
 import { fold, type FieldKind } from "@/modules/company-config";
 import type { ConceptCode } from "@/generated/labels";
+import type { UnitAttributeField } from "@/modules/listings";
 
 export const STANDARD_TARGETS = [
   "unitCode",
@@ -31,6 +32,15 @@ export type Target =
   | { custom: string }
   | { newField: { name: string; kind: FieldKind; options: string[] } }
   | { skip: true };
+
+/** Row 3h: the import's unit attribute targets and the listing's own value each one fills (source «File»). */
+export const FILE_VALUE_OF: Partial<Record<StandardTarget, UnitAttributeField>> = {
+  "Unit.livingArea": "livingArea",
+  "Unit.floor": "floor",
+  "Unit.bedroomsTotal": "bedroomsTotal",
+  "Unit.directionFaces": "directionFaces",
+  "Unit.propertySubType": "propertySubType",
+};
 
 /** The concept whose label names each standard target (its column header on the inventory or the record). */
 export const TARGET_CONCEPT: Record<StandardTarget, ConceptCode> = {

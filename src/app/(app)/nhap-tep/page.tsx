@@ -9,6 +9,8 @@ import { currentSession } from "@/modules/identity/server";
 import { PermittedAction } from "@/modules/identity/ui";
 import { ImportWizard } from "@/modules/imports/ui";
 
+import { ATTRIBUTE_WORDS } from "../unit-attribute-words";
+
 export const metadata: Metadata = { title: label("ImportScreen") };
 
 /** The import screen (row 11): whoever the permission table gives importListings imports a file; anyone else sees «not allowed». */
@@ -21,7 +23,7 @@ export default async function Page() {
     <>
       <PageHeader title={label("ImportScreen")} />
       <PermittedAction action="importListings">
-        <ImportWizard />
+        <ImportWizard attributeWords={ATTRIBUTE_WORDS} />
       </PermittedAction>
     </>
   );

@@ -35,12 +35,23 @@ import {
 import { label } from "@/modules/company-config";
 import { allowedScope } from "@/modules/identity";
 import { PermittedAction, useSessionRoles } from "@/modules/identity/ui";
+import type { UnitAttributeValues } from "@/modules/listings";
+import {
+  AttributeDiffersSign,
+  attributeText,
+  type UnitAttributeWords,
+} from "@/modules/listings/ui";
 
 import type { LearnedItem } from "../learned";
 import { isOwnerHeader, NO_CHOICES, type Choices, type Mark } from "../mark";
 import { readTable } from "../read-file";
 import type { MarkedTable } from "../table";
-import { STANDARD_TARGETS, TARGET_CONCEPT, type Target } from "../targets";
+import {
+  FILE_VALUE_OF as ATTRIBUTE_OF,
+  STANDARD_TARGETS,
+  TARGET_CONCEPT,
+  type Target,
+} from "../targets";
 import { IMPORT_COPY as C, MARK_WORDS, PROBLEM_WORDS, STEP_WORDS, WHY_WORDS } from "./copy";
 
 const MARK_VARIANT: Record<
@@ -97,7 +108,12 @@ const WAIT_COLUMNS: readonly TypedColumn[] = [C.columnHead, C.targetHead, C.mark
 /** The one panel every step tab controls: the body shows the active step. */
 const STEP_PANEL = "nhap-tep-buoc";
 
-export function ImportWizard() {
+export function ImportWizard({
+  attributeWords,
+}: {
+  /** Row 3h: the words of the unit attributes, for the mark on a cell that differs from the catalog. */
+  attributeWords?: UnitAttributeWords;
+} = {}) {
   const [step, setStep] = useState(1);
   const [table, setTable] = useState<Table | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
@@ -504,13 +520,30 @@ export function ImportWizard() {
                       </span>
                       {marked.columns.map((c) => {
                         const cell = marked.cells[i]?.[c.index];
+                        // Row 3h (AC-8): the file's value stays shown, the grid's mark after it holds the catalog's.
+                        const field =
+                          c.target && "standard" in c.target
+                            ? ATTRIBUTE_OF[c.target.standard]
+                            : undefined;
+                        const differs =
+                          attributeWords && field && cell?.catalog !== undefined ? (
+                            <AttributeDiffersSign
+                              words={attributeWords}
+                              catalogShown={attributeText(
+                                attributeWords,
+                                field,
+                                cell.catalog as UnitAttributeValues[typeof field],
+                              )}
+                            />
+                          ) : null;
                         return (
                           <span
                             key={c.index}
                             title={cell ? MARK_WORDS[cell.mark] : ""}
-                            className={`w-40 shrink-0 truncate px-3 py-2 ${cell?.mark === "ask" ? "bg-warning/10" : cell?.mark === "block" ? "bg-destructive/10" : ""}`}
+                            className={`w-40 shrink-0 truncate px-3 py-2 ${differs ? "flex items-center gap-1" : ""} ${cell?.mark === "ask" ? "bg-warning/10" : cell?.mark === "block" ? "bg-destructive/10" : ""}`}
                           >
-                            {r[c.index]}
+                            {differs ? <span className="truncate">{r[c.index]}</span> : r[c.index]}
+                            {differs}
                           </span>
                         );
                       })}

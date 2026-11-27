@@ -42,6 +42,8 @@ function handlers(opts: {
   door?: string | { scope: "company" | "own"; userId?: string };
   found?: ReturnType<typeof row> | null;
   updated?: number;
+  /** Row 3h: an answer of its own for a statement (the catalog unit, an open listing on it); else the cases below. */
+  answer?: (text: string) => { rows: unknown[]; rowCount: number } | undefined;
 }) {
   const seen: string[] = [];
   const queries: string[] = [];
@@ -50,6 +52,8 @@ function handlers(opts: {
     query: async (text, values) => {
       queries.push(text);
       params.push((values as unknown[] | undefined) ?? []);
+      const own = opts.answer?.(text);
+      if (own) return own;
       if (/^\s*select/.test(text))
         return { rows: opts.found === null ? [] : [opts.found ?? row()], rowCount: 1 };
       return { rows: [], rowCount: opts.updated ?? 1 };
@@ -118,6 +122,56 @@ describe("listings-http", () => {
   };
   const written = (t: { params: unknown[][]; queries: string[] }) =>
     t.params[t.queries.findIndex((q) => /^\s*update listings/.test(q))]!.slice(14);
+
+  // Row 3h (E10): «Gắn sang căn khác» moves the unit link to a catalog unit, never onto one with an open listing, and
+  // never from a pending unit, which has no catalog link to move.
+  const UNIT = {
+    upi: "u2",
+    unit_number: "B-02",
+    building_name: "[MAU] B1",
+    floor: null,
+    living_area: null,
+    bedrooms_total: null,
+    direction_faces: null,
+    property_sub_type: null,
+    subdivision_name: "[MAU] P1",
+    complex_name: null,
+  };
+  const moving = (opts: { taken?: boolean; known?: boolean; from?: string } = {}) =>
+    handlers({
+      found: row({ ...OWN_COLUMNS, upi: opts.from ?? "u" }),
+      answer: (text) =>
+        text.includes("from catalog_units")
+          ? { rows: opts.known === false ? [] : [UNIT], rowCount: opts.known === false ? 0 : 1 }
+          : text.includes("from listing_units where upi")
+            ? { rows: opts.taken ? [{}] : [], rowCount: opts.taken ? 1 : 0 }
+            : undefined,
+    });
+  const move = { version: 1, change: { field: "unit", upi: "u2" } };
+  const moved = (t: { queries: string[]; params: unknown[][] }) =>
+    t.params[t.queries.findIndex((q) => q.startsWith("update listing_units"))];
+
+  it("moves the unit link to a catalog unit with no open listing", async () => {
+    const t = moving();
+    expect((await t.patch(move)).status).toBe(200);
+    expect(moved(t)).toEqual([ID, "u2"]);
+  });
+
+  it("refuses a unit with an open listing (named), an unknown unit, the same unit and a pending unit", async () => {
+    const taken = moving({ taken: true });
+    const res = await taken.patch(move);
+    expect(res.status).toBe(400);
+    expect(JSON.stringify(await res.json())).toContain("B-02");
+    expect(moved(taken)).toBeUndefined();
+    for (const t of [
+      moving({ known: false }),
+      moving({ from: "u2" }),
+      moving({ from: "pending:p-1" }),
+    ]) {
+      expect((await t.patch(move)).status).toBe(400);
+      expect(moved(t)).toBeUndefined();
+    }
+  });
 
   it("writes the own unit values with the source Typed and keeps the others as they were", async () => {
     const t = handlers({

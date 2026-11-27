@@ -4,7 +4,7 @@
 // company filter of their own, so nothing here can widen what the database allows.
 import type { Listing } from "../../generated/ontology";
 import { SOURCE_OF, UNIT_ATTRIBUTE_FIELDS, type AttributeSource } from "./unit-attributes";
-import { readCatalogUnits } from "../catalog/server";
+import { readCatalogUnits, readCatalogUnitsByKey } from "../catalog/server";
 import type { DbClient } from "../identity/server";
 
 import {
@@ -48,6 +48,8 @@ interface Row {
   upi: string;
   pending_code: string | null;
   pending_building: string | null;
+  /** Row 3h: the catalog unit a pending unit was matched to (matchPendingUnits), by its key; null while it waits. */
+  pending_unit_key: string | null;
 }
 
 /** Prefix of the unit key of a listing on a pending unit (row 11): it has no UPI until the catalog matches it. */
@@ -61,7 +63,7 @@ export const LISTING_COLUMNS = `
   l.living_area, l.living_area_source, l.floor, l.floor_source, l.bedrooms_total, l.bedrooms_total_source,
   l.direction_faces, l.direction_faces_source, l.property_sub_type, l.property_sub_type_source,
   coalesce(u.upi, '${PENDING_UNIT}' || lp.pending_unit_id) as upi, cpu.raw_code as pending_code,
-  cpu.building_text as pending_building`;
+  cpu.building_text as pending_building, cpu.unit_key as pending_unit_key`;
 
 /** A listing with its unit link: a catalog unit, or a pending unit of the company (row 11), never neither. */
 export const LISTING_FROM = `
@@ -140,18 +142,35 @@ export async function readInventory(client: DbClient, viewerId: string): Promise
     client,
     listingRows.map((r) => r.upi).filter((upi) => !upi.startsWith(PENDING_UNIT)),
   );
-  // A pending unit is shown by the company's own code and the tower text of its file; its attributes stay empty.
+  // Row 3h (AC-9): a pending unit the catalog matched lends that unit's five attributes; the listing's own values
+  // still win, and only then can a value differ from the catalog's. One that waits has no catalog values at all.
+  const matched = new Map(
+    (
+      await readCatalogUnitsByKey(
+        client,
+        listingRows.flatMap((r) => (r.pending_unit_key ? [r.pending_unit_key] : [])),
+      )
+    ).map((u) => [u.unitKey, u]),
+  );
+  // A pending unit is shown by the company's own code and the tower text of its file.
   for (const r of listingRows)
     if (
       r.upi.startsWith(PENDING_UNIT) &&
       r.pending_code !== null &&
       !units.some((u) => u.upi === r.upi)
-    )
+    ) {
+      const m = r.pending_unit_key ? matched.get(r.pending_unit_key) : undefined;
       units.push({
         upi: r.upi,
         unitNumber: r.pending_code,
         buildingName: r.pending_building ?? "",
+        ...(m?.livingArea !== undefined ? { livingArea: m.livingArea } : {}),
+        ...(m?.floor !== undefined ? { floor: m.floor } : {}),
+        ...(m?.bedroomsTotal !== undefined ? { bedroomsTotal: m.bedroomsTotal } : {}),
+        ...(m?.directionFaces !== undefined ? { directionFaces: m.directionFaces } : {}),
+        ...(m?.propertySubType ? { propertySubType: m.propertySubType } : {}),
       });
+    }
   const unitByUpi = new Map(units.map((u) => [u.upi, u]));
   // The grid's first order: by project, then by unit (as the sample company is ordered).
   listingRows.sort(

@@ -53,7 +53,33 @@ export async function readCatalogUnits(
 ): Promise<CatalogUnitRead[]> {
   if (upis.length === 0) return [];
   const { rows } = await client.query(READ_UNITS, [[...new Set(upis)]]);
-  return (rows as Row[]).map((r) => ({
+  return (rows as Row[]).map(toRead);
+}
+
+/**
+ * The units with these unit keys, each with its key (row 3h): a company's pending unit, once matched, names the catalog
+ * unit by its key, and its listing shows that unit's attributes where it has no own value.
+ */
+export async function readCatalogUnitsByKey(
+  client: QueryClient,
+  unitKeys: readonly string[],
+): Promise<(CatalogUnitRead & { unitKey: string })[]> {
+  if (unitKeys.length === 0) return [];
+  const { rows } = await client.query(
+    READ_UNITS.replace(
+      "where u.upi = any($1::text[])",
+      "where u.unit_key = any($1::text[])",
+    ).replace("select u.upi,", "select u.unit_key, u.upi,"),
+    [[...new Set(unitKeys)]],
+  );
+  return (rows as (Row & { unit_key: string })[]).map((r) => ({
+    ...toRead(r),
+    unitKey: r.unit_key,
+  }));
+}
+
+function toRead(r: Row): CatalogUnitRead {
+  return {
     upi: r.upi,
     unitNumber: r.unit_number,
     buildingName: r.building_name,
@@ -64,5 +90,5 @@ export async function readCatalogUnits(
     ...(r.bedrooms_total !== null ? { bedroomsTotal: r.bedrooms_total } : {}),
     ...(r.direction_faces !== null ? { directionFaces: r.direction_faces } : {}),
     propertySubType: r.property_sub_type,
-  }));
+  };
 }

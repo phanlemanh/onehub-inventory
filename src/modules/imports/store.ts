@@ -5,7 +5,11 @@ import "server-only";
 // again here so the numbers written are the numbers shown. A batch carries 200 rows at most and is written once.
 import { createHash } from "node:crypto";
 
-import { addCompanyUnitCode, retireCompanyUnitCode } from "@/modules/catalog/server";
+import {
+  addCompanyUnitCode,
+  readCatalogUnitsByKey,
+  retireCompanyUnitCode,
+} from "@/modules/catalog/server";
 import { fold, label, templateSignature, type FieldDraft } from "@/modules/company-config";
 import {
   learnFromImport,
@@ -23,10 +27,12 @@ import {
   type Queryable,
 } from "@/modules/listings/server";
 
+import { markCatalogDiffers } from "./catalog-differs";
 import type { LearnedConcept, LearnedItem } from "./learned";
 import { markValue, type CellMark, type Choices, type UnitFound } from "./mark";
 import { markTable, type MarkedTable } from "./table";
 import {
+  FILE_VALUE_OF,
   STANDARD_HEADER_CONCEPTS,
   TEMPLATE_FIELD,
   type StandardTarget,
@@ -158,7 +164,15 @@ export async function previewImport(
   choices: Choices,
 ): Promise<MarkedTable> {
   const ctx = await context(c, table, choices);
-  return markTable(table, { ...ctx, today: today() }, choices);
+  const marked = markTable(table, { ...ctx, today: today() }, choices);
+  return withCatalogDiffers(c, marked);
+}
+
+/** Row 3h (AC-8): the catalog units the preview's rows matched, read once, then the pure marking of table.ts. */
+async function withCatalogDiffers(c: Queryable, marked: MarkedTable): Promise<MarkedTable> {
+  const keys = marked.rows.flatMap((r) => (r.unit && "unitKey" in r.unit ? [r.unit.unitKey] : []));
+  const units = await readCatalogUnitsByKey(c, keys);
+  return markCatalogDiffers(marked, new Map(units.map((u) => [u.unitKey, u])));
 }
 
 /** Fingerprints that tie every batch to the table opened (migration 017): headers and choices, and each 200-row slice. */
@@ -406,6 +420,10 @@ export async function writeBatch(
       if (!col.target || cell.value === null || cell.mark === "ask") return;
       if ("custom" in col.target) l.customFields[col.target.custom] = cell.value;
       else if ("standard" in col.target) {
+        // Row 3h (AC-7): a unit attribute read from the file is the listing's own value from a file; the cell is also
+        // kept as written above, as before. A cell that asked (an unread «2PN») is not a value.
+        const own = FILE_VALUE_OF[col.target.standard];
+        if (own) l.fileValues = { ...l.fileValues, [own]: cell.value };
         const key = STANDARD_COLUMN[col.target.standard];
         if (key) (l as unknown as Record<string, unknown>)[key] = cell.value;
         if (col.implies && l.feeInclusion === null) l.feeInclusion = col.implies.feeInclusion;
