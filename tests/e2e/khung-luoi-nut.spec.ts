@@ -246,15 +246,28 @@ async function standsApart(page: Page): Promise<Apart> {
   });
   await page.waitForTimeout(100);
   const without = await luminance(page, strip);
-  // The record's left line, taken while the shadow is off: with it on, the shadow alone darkens these columns in light.
-  const line = await columnLuminance(page, { x: Math.floor(g.left) - 1, y, width: 4, height: 160 });
+  // The record's left line, taken while the shadow is off (with it on, the shadow alone darkens these columns in light),
+  // in the band between the top bar and the grid's card: there the page's own plain ground stands left of the record.
+  // Beside the grid instead, a cell's text can reach the record's edge — on Linux at 1024 the «V» of a Dự án cell sits
+  // in the column next to the line (GitHub run 46055904623; VP10, G-2811-5).
+  const regionTop = await page
+    .locator('[data-slot="data-region"]')
+    .evaluate((el) => el.getBoundingClientRect().top);
+  const bandY = Math.round(g.top) + 4;
+  const bandH = Math.floor(regionTop) - 4 - bandY;
+  if (bandH < 8) throw new Error(`no plain ground beside the record's left edge (band ${bandH}px)`);
+  const line = await columnLuminance(page, {
+    x: Math.floor(g.left) - 1,
+    y: bandY,
+    width: 4,
+    height: bandH,
+  });
   await suaTrang(page, () => document.getElementById("khong-bong-tam")?.remove());
   await page.waitForTimeout(100);
   const surface = await luminance(page, inside);
   return {
-    // A line is one pixel column at the record's left that differs from the column on each side of it: the grid's
-    // nearest column and the record's own surface. A step alone is no line; the grid's mean is no neighbour (cells
-    // hold text there at 1024).
+    // A line is one pixel column at the record's left that differs from the column on each side of it: the page's
+    // ground on its left and the record's own surface on its right. A step alone is no line.
     edge: Math.max(
       ...[1, 2].map((i) =>
         Math.min(Math.abs(line[i]! - line[i - 1]!), Math.abs(line[i]! - line[i + 1]!)),
@@ -271,9 +284,9 @@ async function standsApart(page: Page): Promise<Apart> {
 /**
  * The record stands apart by what shows, measured per theme on what the eye uses there:
  * - light: the record's surface is the page's own white, so the shadow must darken the grid beside it (≥ 3; measured
- *   24.5 at 1440) and its left line must stand out from the pixel column on each side, shadow off (≥ 10; measured 22.6 at 1024);
+ *   24.5 at 1440) and its left line must stand out from the pixel column on each side, shadow off, beside the page's plain ground (≥ 10);
  * - dark: the record's surface is about the grid's own (step 1.5 at 1440) and a black shadow on a near-black grid barely
- *   shows (2.5), so the left line is what sets it apart (≥ 10; measured 18 at 1024). Shadow and surface step are recorded,
+ *   shows (2.5), so the left line is what sets it apart (≥ 10). Shadow and surface step are recorded,
  *   not asserted, in dark: a threshold that close to the measured value would flicker on another machine.
  * In both, the record's box must not clip the shadow.
  */
