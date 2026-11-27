@@ -5,7 +5,7 @@ slug: bring-out-claude-design
 owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [config, docs]
-status: approved
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-27
 design_doc: docs/superpowers/specs/2026-11-27-bring-out-claude-design-design.md
