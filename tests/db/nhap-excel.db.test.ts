@@ -17,7 +17,9 @@ import type { ActionName } from "@/modules/identity/permissions";
 import { captureSender } from "@/modules/identity/sender";
 import { withCompany } from "@/modules/identity/with-company";
 
-import { dropWorld, world, type Person, type World } from "./bang-quyen-world";
+import { readInventory } from "@/modules/listings/inventory-read";
+
+import { asPerson, dropWorld, world, type Person, type World } from "./bang-quyen-world";
 
 const worlds: World[] = [];
 afterEach(async () => {
@@ -250,6 +252,29 @@ describe("ap (E9)", () => {
       ["Hold", null, true],
     ]);
     expect(new Set(rows.map((x) => x.list_agent_user_id))).toEqual(new Set([e.w.id.LA]));
+  });
+
+  it("E15: the inventory shows the imported listings, a pending unit by the file's code and tower text", async () => {
+    const e = await importWorld("bang-hang");
+    const r = await applyAll(e, "LA", rowsOf(e.codes));
+    expect(r.status).toBe(200);
+    const inv = await asPerson(e.w, "LA", e.w.A, (c) => readInventory(c, e.w.id.LA));
+    expect(inv.current).toHaveLength(3);
+    const pending = inv.current.find((l) => l.unitNumber === "SA5-99.99");
+    expect([pending?.buildingName, pending?.standardStatus]).toEqual(["Sapphire 9", "Hold"]);
+    const unit = inv.units.find(
+      (u) => u.upi === inv.listingUnits.find((x) => x.listingId === pending?.id)?.upi,
+    );
+    expect([unit?.unitNumber, unit?.livingArea, unit?.bedroomsTotal]).toEqual([
+      "SA5-99.99",
+      undefined,
+      undefined,
+    ]);
+    // Without the pending join the listing would be missing: the break the case guards against.
+    const catalogOnly = inv.current.filter((l) =>
+      inv.listingUnits.some((x) => x.listingId === l.id && !x.upi.startsWith("pending:")),
+    );
+    expect(catalogOnly).toHaveLength(2);
   });
 
   it("G-2711-4: floor and property type columns are taken, their words kept as written on the import; the unit and the catalog do not change", async () => {

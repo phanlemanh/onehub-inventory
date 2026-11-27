@@ -338,7 +338,8 @@ export function ImportWizard() {
                     {c.learnLabel !== null ? (
                       <label className="flex items-center gap-2">
                         <Checkbox
-                          checked={c.learnLabel}
+                          // The person's own choice shows at once; the preview it starts confirms it.
+                          checked={choices.columns[c.index]?.learnLabel ?? c.learnLabel}
                           onCheckedChange={(v) =>
                             c.target &&
                             choose({

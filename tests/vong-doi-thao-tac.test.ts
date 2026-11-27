@@ -140,7 +140,7 @@ describe("may-thay-man-hien", () => {
     const want: Record<string, string[]> = {
       khung: ["Listing", "SavedView", "Unit"],
       today: [],
-      inventory: ["Listing", "ListingOwner", "SavedView", "Unit"],
+      inventory: ["ImportRun", "Listing", "ListingOwner", "SavedView", "Unit"],
       sent: ["ShareLink"],
       contacts: ["Contact"],
       "company-layer": [

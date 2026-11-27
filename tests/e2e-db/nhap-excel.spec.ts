@@ -3,8 +3,9 @@
 // People sign in through the shared sign-in function of row 9b (dang-nhap-vai.ts); this file never signs in by itself.
 //   tep khong len may chu — E2: the file is read in the page; only JSON {headers, rows} reaches /api/v1/imports/preview.
 //   trang thai            — E16: every state of the screen at the width it belongs to, a text assertion each, axe light
-//                           and dark on every cell. The inventory's empty-state cell (ST-inventory-trong-nap) is added
-//                           with the inventory entry, after row 3g merges (dang-o-dau.md).
+//                           and dark on every cell.
+//   bang hang trong       — E15: the inventory's Nạp tệp link and button for importers only, imported listings on it.
+//   nhan rieng tren bang hang — E21: the header «Block» an import learns is the inventory's tower header.
 //   ban phim              — E16: Tab, arrows, Space and Enter take gon.xlsx through the five steps to Xong.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -19,6 +20,9 @@ import { sampleCatalog } from "../../src/modules/catalog";
 import { catalogLoadStatements } from "../../src/modules/catalog/load-sql";
 import { IMPORT_COPY as C, PROBLEM_WORDS, STEP_WORDS } from "../../src/modules/imports/ui/copy";
 import { waitReady } from "../../tools/e2e_templates/runner";
+
+import { label } from "../../src/modules/company-config";
+import { regionReady } from "../e2e/phone-list";
 
 import { signInWithCode } from "./dang-nhap-vai";
 
@@ -440,4 +444,188 @@ test("so tren man bang so may chu: the preview and Xong show the server's number
   await expect(next(page)).toBeEnabled({ timeout: 10_000 });
   await toPreview(page);
   expect(await screenCountsFault(page, preview as unknown as Record<string, unknown>)).toBeNull();
+});
+
+// ---- E15 · the inventory's way in, and the imported listings on it (AC-11) -------------------------------------------
+
+/** Clears this file's company of listings (the cases before it leave some), so the inventory opens empty. */
+async function emptyInventory(): Promise<void> {
+  const db = new pg.Client({ connectionString: OWNER_URL });
+  await db.connect();
+  try {
+    const company = "(select id from companies where name = $1)";
+    await db.query(`delete from listing_units where company_id = ${company}`, [COMPANY]);
+    await db.query(`delete from listing_pending_units where company_id = ${company}`, [COMPANY]);
+    await db.query(`delete from listings where company_id = ${company}`, [COMPANY]);
+    await db.query(
+      `update company_pending_units set retired_at = now() where company_id = ${company} and retired_at is null`,
+      [COMPANY],
+    );
+  } finally {
+    await db.end();
+  }
+}
+
+/** The import entries of the inventory a role must not have: rendered at all (hidden or not) counts. */
+async function importEntryFault(page: Page, role: Role): Promise<string | null> {
+  const n = await page.locator('main a[href="/nhap-tep"]').count();
+  return n > 0 ? `import button rendered for ${role}` : null;
+}
+
+async function openInventoryAs(page: Page, role: Role) {
+  await page.context().clearCookies();
+  await openScreen(page, role);
+  await page.goto("/inventory");
+  await waitReady(page);
+  await regionReady(page);
+}
+
+// A file with one code the catalog does not have: it becomes a pending unit, shown by the file's code and tower.
+const FRAME_COPY_IMPORT = label("ImportScreen");
+const PENDING_CODE = "ZZ-99.01";
+const PENDING_TOWER = "Toà của tệp";
+const E15_FILE = [
+  "Mã căn,Toà,Giá chào,Trạng thái",
+  "S1.01-0905,Sapphire 1,4650000000,Đang bán",
+  "S1.01-0906,Sapphire 1,3900000000,Đang bán",
+  `${PENDING_CODE},${PENDING_TOWER},2100000000,Đang bán`,
+].join("\n");
+
+test("bang hang trong: one Nạp tệp link in the empty sentence and an outline button, for importers only; the imported listings on the inventory", async ({
+  page,
+}) => {
+  test.skip(test.info().project.name !== "1440", "one width: the entry does not depend on it");
+  await makeWorld();
+  await emptyInventory();
+  const empty = page.locator('[data-slot="region-state"][data-kind="empty"]').first();
+
+  // Đầu khách: the empty inventory, with neither the link nor the button — not drawn, not merely hidden.
+  await openInventoryAs(page, "BuyerAgent");
+  await expect(empty).toBeVisible();
+  expect(await importEntryFault(page, "BuyerAgent")).toBeNull();
+  // Break, in the test: an entry hidden by CSS instead of not drawn is caught.
+  await page.evaluate(() => {
+    const a = document.createElement("a");
+    a.href = "/nhap-tep";
+    a.style.display = "none";
+    document.querySelector('[data-slot="page-header"]')?.append(a);
+  });
+  expect(await importEntryFault(page, "BuyerAgent")).toBe("import button rendered for BuyerAgent");
+
+  // Đầu chủ (the positive control): exactly one link in the empty sentence, no button there; the outline button above.
+  await openInventoryAs(page, "ListAgent");
+  await expect(empty).toBeVisible();
+  const links = empty.getByRole("link");
+  await expect(links).toHaveCount(1);
+  await expect(links.first()).toHaveText(FRAME_COPY_IMPORT);
+  await expect(links.first()).toHaveAttribute("href", "/nhap-tep");
+  await expect(empty.getByRole("button")).toHaveCount(0);
+  const head = page.locator('[data-slot="page-header-action"] a[href="/nhap-tep"]');
+  await expect(head).toHaveText(FRAME_COPY_IMPORT);
+  expect(await seriousAxe(page), "axe inventory empty").toEqual([]);
+
+  // Through the button, the five steps, then back on the inventory: three listings, the pending one by its code.
+  await head.click();
+  await page.waitForURL("**/nhap-tep");
+  await waitReady(page);
+  await choose(page, "bang-hang.csv", E15_FILE);
+  await expect(next(page)).toBeEnabled({ timeout: 10_000 });
+  await toPreview(page);
+  await page.getByRole("button", { name: /^Áp 3 dòng/ }).click();
+  await expect(page.locator('[data-state="xong"]')).toContainText(C.done(3));
+  await page.goto("/inventory");
+  await waitReady(page);
+  await regionReady(page);
+  const rows = page.locator('[data-slot="data-region-body"] tbody tr[data-row-id]');
+  await expect(rows).toHaveCount(3);
+  const pending = rows.filter({
+    has: page.locator("button[data-record-open]", { hasText: new RegExp(`^${PENDING_CODE}$`) }),
+  });
+  await expect(pending).toHaveCount(1);
+  await expect(pending.locator('td[data-col-id="Listing.buildingName"]')).toHaveText(PENDING_TOWER);
+  await emptyInventory();
+});
+
+// ---- E21 · a header learned by an import is the inventory's header (AC-3) --------------------------------------------
+
+/**
+ * Retires this file's company's own labels, so the inventory starts from the standard headers; with `templates`, its
+ * import templates too, so the same file shape asks its column questions again.
+ */
+async function retireLabels(templates = false): Promise<void> {
+  const db = new pg.Client({ connectionString: OWNER_URL });
+  await db.connect();
+  try {
+    for (const t of templates ? ["company_labels", "company_import_templates"] : ["company_labels"])
+      await db.query(
+        `update ${t} set retired_at = now()
+          where company_id = (select id from companies where name = $1) and retired_at is null`,
+        [COMPANY],
+      );
+  } finally {
+    await db.end();
+  }
+}
+
+const towerHeader = (page: Page) =>
+  page
+    .locator(
+      'thead th[data-col-id="Listing.buildingName"] [data-slot="sheet-header"] > :first-child',
+    )
+    .first();
+
+/** The inventory's tower header against the one the import should have taught; null when they agree. */
+async function learnedHeaderFault(page: Page, want: string): Promise<string | null> {
+  const got = ((await towerHeader(page).textContent()) ?? "").trim();
+  return got === want ? null : `inventory header is not the learned label: ${got} != ${want}`;
+}
+
+const BLOCK_FILE = E15_FILE.replace("Mã căn,Toà,", "Mã căn,Block,");
+
+async function importBlockFile(page: Page, learn: boolean) {
+  await page.goto("/nhap-tep");
+  await waitReady(page);
+  await choose(page, "block.csv", BLOCK_FILE);
+  await expect(next(page)).toBeEnabled({ timeout: 10_000 });
+  await next(page).click();
+  const box = page.getByRole("checkbox", { name: C.learnLabel("Block") });
+  await expect(box).toBeChecked();
+  if (!learn) await box.uncheck();
+  await next(page).click();
+  await next(page).click();
+  await expect(page.locator('[data-state="dem-dau"]')).toBeVisible();
+  await page.getByRole("button", { name: /^Áp 3 dòng/ }).click();
+  await expect(page.locator('[data-state="xong"]')).toContainText(C.done(3));
+  await page.goto("/inventory");
+  await waitReady(page);
+  await regionReady(page);
+}
+
+test("nhan rieng tren bang hang: the header «Block» an import learns is the inventory's tower header", async ({
+  page,
+}) => {
+  test.skip(test.info().project.name !== "1440", "one width: the header does not depend on it");
+  await makeWorld();
+  const standard = label("Building");
+  // Unticked: nothing is learned, the inventory keeps the standard word (the control).
+  await emptyInventory();
+  await retireLabels(true);
+  await page.context().clearCookies();
+  await openScreen(page);
+  await importBlockFile(page, false);
+  expect(await learnedHeaderFault(page, standard)).toBeNull();
+  // Ticked by default: the company learns «Block», and the inventory's tower column says it.
+  await emptyInventory();
+  await retireLabels(true);
+  await importBlockFile(page, true);
+  expect(await learnedHeaderFault(page, "Block")).toBeNull();
+  // Break, in the test: the learned label taken back in the database mid-way is caught on the next read.
+  await retireLabels();
+  await page.reload();
+  await waitReady(page);
+  await regionReady(page);
+  expect(await learnedHeaderFault(page, "Block")).toBe(
+    `inventory header is not the learned label: ${standard} != Block`,
+  );
+  await emptyInventory();
 });

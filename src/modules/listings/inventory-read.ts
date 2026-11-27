@@ -6,7 +6,12 @@ import type { Listing } from "../../generated/ontology";
 import { readCatalogUnits } from "../catalog/server";
 import type { DbClient } from "../identity/server";
 
-import { keeperOf, splitCurrent, type InventoryData } from "./inventory-data";
+import {
+  keeperOf,
+  splitCurrent,
+  type InventoryData,
+  type InventoryUnitRead,
+} from "./inventory-data";
 
 interface Row {
   id: string;
@@ -27,18 +32,34 @@ interface Row {
   original_entry_timestamp: Date;
   last_confirmed_at: Date | null;
   version: number;
+  /** The catalog unit's UPI, or `pending:<id>` for a listing on a pending unit (row 11). */
   upi: string;
+  pending_code: string | null;
+  pending_building: string | null;
 }
+
+/** Prefix of the unit key of a listing on a pending unit (row 11): it has no UPI until the catalog matches it. */
+export const PENDING_UNIT = "pending:";
 
 /** The columns of a listing, with its unit link; also what the write path returns. */
 export const LISTING_COLUMNS = `
   l.id, l.company_id, l.standard_status, l.list_price, l.close_price, to_char(l.close_date, 'YYYY-MM-DD') as close_date,
   l.withdrawn_reason, l.fee_inclusion, l.furnished, l.occupant_type, l.legal_status, l.financing, l.custom_fields,
-  l.list_agent_user_id, l.list_agent_full_name, l.original_entry_timestamp, l.last_confirmed_at, l.version, u.upi`;
+  l.list_agent_user_id, l.list_agent_full_name, l.original_entry_timestamp, l.last_confirmed_at, l.version,
+  coalesce(u.upi, '${PENDING_UNIT}' || lp.pending_unit_id) as upi, cpu.raw_code as pending_code,
+  cpu.building_text as pending_building`;
+
+/** A listing with its unit link: a catalog unit, or a pending unit of the company (row 11), never neither. */
+export const LISTING_FROM = `
+  listings l
+  left join listing_units u on u.listing_id = l.id
+  left join listing_pending_units lp on lp.listing_id = l.id
+  left join company_pending_units cpu on cpu.id = lp.pending_unit_id`;
 
 const READ_LISTINGS = `
   select ${LISTING_COLUMNS}
-    from listings l join listing_units u on u.listing_id = l.id
+    from ${LISTING_FROM}
+   where u.listing_id is not null or lp.listing_id is not null
    order by l.original_entry_timestamp desc, l.id`;
 
 /** A database row as a Listing of the generated model; names of the unit come from the catalog unit. */
@@ -78,10 +99,22 @@ export type ListingRow = Row;
 export async function readInventory(client: DbClient, viewerId: string): Promise<InventoryData> {
   const { rows } = await client.query(READ_LISTINGS);
   const listingRows = rows as Row[];
-  const units = await readCatalogUnits(
+  const units: InventoryUnitRead[] = await readCatalogUnits(
     client,
-    listingRows.map((r) => r.upi),
+    listingRows.map((r) => r.upi).filter((upi) => !upi.startsWith(PENDING_UNIT)),
   );
+  // A pending unit is shown by the company's own code and the tower text of its file; its attributes stay empty.
+  for (const r of listingRows)
+    if (
+      r.upi.startsWith(PENDING_UNIT) &&
+      r.pending_code !== null &&
+      !units.some((u) => u.upi === r.upi)
+    )
+      units.push({
+        upi: r.upi,
+        unitNumber: r.pending_code,
+        buildingName: r.pending_building ?? "",
+      });
   const unitByUpi = new Map(units.map((u) => [u.upi, u]));
   // The grid's first order: by project, then by unit (as the sample company is ordered).
   listingRows.sort(
