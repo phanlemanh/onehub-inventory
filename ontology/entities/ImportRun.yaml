@@ -13,7 +13,7 @@ properties:
   fileName: { type: string, required: true, max: 200, display: text }
   sheetName: { type: string, max: 200, display: text }
   signature: { type: json, required: true, display: none }
-  rowCount: { type: integer, required: true, min: 0, display: count }
+  rowCount: { type: integer, required: true, min: 1, max: 5000, display: count }
   createdCount: { type: integer, required: true, min: 0, display: count }
   learned: { type: json, required: true, display: none }
   kept: { type: json, required: true, display: none }
@@ -21,6 +21,7 @@ properties:
   status: { type: enum, values: [open, done, undone], required: true, display: status }
   createdAt: { type: datetime, required: true, display: datetime }
   undoneAt: { type: datetime, display: datetime }
+  undoneBy: { type: ref, target: Member, display: person }
   tableHash:
     type: string
     max: 64

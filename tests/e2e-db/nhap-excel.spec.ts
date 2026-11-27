@@ -173,6 +173,26 @@ test("tep khong len may chu: the file is read in the page, only JSON rows reach 
   }
 });
 
+/** The offline state of a dropped request: the banner is on the screen, or the state is named as missing. */
+async function offlineFault(page: Page): Promise<string | null> {
+  return (await page.locator('[data-state="banner-offline"]').count()) > 0
+    ? null
+    : "offline state missing: ST-nhap-tep-mat-mang";
+}
+
+/** ST-inventory-trong-nap: the empty inventory of a role that imports leads to Nạp tệp, in light and dark, axe clean. */
+async function inventoryEmptyCell(page: Page): Promise<string> {
+  await emptyInventory();
+  await openInventoryAs(page, "ListAgent");
+  const empty = page.locator('[data-slot="region-state"][data-kind="empty"]').first();
+  await lightAndDark(
+    page,
+    "ST-inventory-trong-nap",
+    empty.getByRole("link", { name: FRAME_COPY_IMPORT }),
+  );
+  return "ST-inventory-trong-nap";
+}
+
 test("trang thai: every state of the screen at its widths, light and dark, axe clean", async ({
   page,
 }) => {
@@ -183,6 +203,7 @@ test("trang thai: every state of the screen at its widths, light and dark, axe c
     await lightAndDark(page, "ST-nhap-tep-dien-thoai", page.locator('[data-state="dien-thoai"]'));
     await expect(page.locator('[data-state="dien-thoai"]')).toHaveText(C.phone);
     await expect(page.getByLabel(C.drop)).toBeHidden();
+    await inventoryEmptyCell(page);
     return;
   }
   const cells: string[] = [];
@@ -207,16 +228,15 @@ test("trang thai: every state of the screen at its widths, light and dark, axe c
   await choose(page, "rong.csv", "Mã căn,Toà\n");
   await cell("ST-nhap-tep-tep-rong", page.getByText(PROBLEM_WORDS["header-only"]));
 
-  // ST-nhap-tep-dang-doc: the server's answer is held back two seconds.
+  // ST-nhap-tep-dang-doc: the server's answer is held back long enough to read the state in both schemes.
   await page.route("**/api/v1/imports/preview", async (r) => {
-    await new Promise((ok) => setTimeout(ok, 2_000));
+    await new Promise((ok) => setTimeout(ok, 8_000));
     await r.continue();
   });
   await choose(page, "gon.xlsx");
-  await expect(page.getByText(C.reading)).toBeVisible();
   // From one second on, a placeholder laid out like the column table (design/states.md, Chờ tải).
   await expect(page.locator('[data-slot="region-skeleton"][data-shown="true"]')).toBeVisible();
-  cells.push("ST-nhap-tep-dang-doc");
+  await cell("ST-nhap-tep-dang-doc", page.getByText(C.reading));
   await expect(next(page)).toBeEnabled({ timeout: 10_000 });
   await page.unroute("**/api/v1/imports/preview");
 
@@ -225,9 +245,13 @@ test("trang thai: every state of the screen at its widths, light and dark, axe c
   await page.getByLabel(C.drop).setInputFiles(join(FIX, "gon.xlsx"));
   await cell("ST-nhap-tep-mat-mang", page.locator('[data-state="banner-offline"]'));
   await expect(page.locator('[data-state="banner-offline"]')).toContainText(C.offline);
+  expect(await offlineFault(page)).toBeNull();
   await page.unroute("**/api/v1/imports/preview");
   await page.getByRole("button", { name: C.retry }).click();
   await expect(page.locator('[data-state="banner-offline"]')).toHaveCount(0);
+  // Break, in the test: with no banner on the screen — what a screen that swallows the dropped request shows — the
+  // check names the state.
+  expect(await offlineFault(page)).toBe("offline state missing: ST-nhap-tep-mat-mang");
 
   // ST-nhap-tep-xung-dot: the company layer changed since the preview.
   await toPreview(page);
@@ -278,8 +302,12 @@ test("trang thai: every state of the screen at its widths, light and dark, axe c
   await waitReady(page);
   await expect(page.locator('[data-state="gan-day"]')).toContainText("gon.xlsx");
 
+  cells.push(await inventoryEmptyCell(page));
+
+  // 11 states of the screen at this width plus the inventory's way in: 12 cells, each in light and dark (24 axe scans).
   expect(cells.sort()).toEqual(
     [
+      "ST-inventory-trong-nap",
       "ST-nhap-tep-con-chan",
       "ST-nhap-tep-cho-nguoi",
       "ST-nhap-tep-dang-doc",
@@ -710,6 +738,24 @@ test("chup nhap-tep: every step of ban.xlsx and gon.xlsx to Xong, for the grader
   await expect(page.locator('[data-state="xong"]')).toBeVisible();
   await shot(page, `nhap-tep-xong-${width}`);
   await emptyInventory();
+});
+
+test("chup dau chu: a team lead's preview with the list agent picker, closed and open, for the grader", async ({
+  page,
+}) => {
+  const width = test.info().project.name;
+  test.skip(!SHOTS || !["1440", "1024"].includes(width), "pictures for a grading round only");
+  await makeWorld();
+  await emptyInventory();
+  await page.context().clearCookies();
+  await openScreen(page, "TeamLead");
+  await choose(page, "gon.xlsx");
+  await expect(next(page)).toBeEnabled({ timeout: 10_000 });
+  await toPreview(page);
+  await shot(page, `nhap-tep-dau-chu-${width}`);
+  await page.getByRole("combobox", { name: C.pickAgent }).click();
+  await expect(page.getByRole("option").first()).toBeVisible();
+  await shot(page, `nhap-tep-dau-chu-mo-${width}`);
 });
 
 test("chup bang hang: the empty inventory, then the E15 file on it, for the grader", async ({
