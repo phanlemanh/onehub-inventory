@@ -1,0 +1,158 @@
+schema_version: 1
+feature_slug: chuan-hoa-he-design
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E1
+    paths: [src/lib/format/index.ts, src/app/globals.css, src/styles/dark.css, tests/e2e/chuan-hoa-mau.spec.ts]
+    expected: "exit 0; tests/e2e/chuan-hoa-mau.spec.ts «AC-1 · six statuses, six colours» ở 1440 sáng và tối, trên Bảng hàng có đủ sáu trạng thái: chụp nhãn đầu tiên của mỗi trạng thái, lấy màu chữ (điểm ảnh xa màu nền nhất) đổi sang Lab; ma trận viết sẵn 15 cặp × 2 nền = 30 ô, mỗi ô ΔE2000 ≥ 12 (ngưỡng theo câu trả lời Hỏi-2), bài đòi đúng 30 ô; «Chưa đủ để rao» độ bão hoà chữ ≤ 8 ở cả hai nền; «Đang giao dịch» sắc theo Hỏi-2; trạng thái có độ bão hoà > 8 lệch sắc giữa sáng và tối ≤ 30°. Chiều đỏ trên cùng hàm: tập nhãn rỗng cho 'no status badge found'; ép «Chưa đủ để rao» về biến thể của «Tạm ngừng» cho 'two statuses share a colour: Incomplete and Hold'; trả --info nền sáng về --onehub-blue cho 'two statuses share a colour: Pending and Closed'; sắc tím ảnh 27/11 (violet) ở nền sáng cho 'Pending and Closed 10.4 under 12' khi ngưỡng là 12. Đã chạy trong ảnh Linux của Playwright."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-1
+    executor: test
+    cmd: npx vitest run tests/mau-trang-thai.test.ts --coverage.enabled=false --reporter=verbose
+    paths: [src/lib/format/index.ts, src/app/globals.css, tests/mau-trang-thai.test.ts]
+    expected: "exit 0; STATUS_TONE có sáu biến thể khác nhau từng đôi; Incomplete là 'invert-light', Pending là 'info-light'; khối :root của src/app/globals.css khai --info khác --primary và không trỏ --onehub-blue; quét mọi tệp .ts, .tsx dưới src (trừ src/components/ui, src/components/reui): biến thể và lớp info ('info-light', variant=\"info\", text-info, bg-info, border-info) chỉ xuất hiện ở src/lib/format/index.ts. Chiều đỏ trong cùng tệp: bảng giả có hai trạng thái chung biến thể cho 'STATUS_TONE gives Incomplete and Hold the same variant'; chuỗi CSS giả '--info: var(--onehub-blue)' cho 'light --info equals the brand blue'; tệp giả dùng variant=\"info\" cho 'info used outside the status table: <tệp>'; thư mục quét rỗng cho 'no source file scanned'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-2
+    executor: script
+    cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E3
+    paths: [src/lib/format/index.ts, src/modules/listings/ui/listing-record.tsx, src/modules/listings/ui/listing-record-full.tsx, tests/e2e/chuan-hoa-mau.spec.ts]
+    expected: "exit 0; chuan-hoa-mau.spec.ts «AC-2 · one colour per status everywhere», sáng và tối, ma trận viết sẵn 22 ô mỗi nền = 44 ô: lưới 1440 (6 trạng thái), thẻ điện thoại 360 (6), đầu ngăn chi tiết của một căn mỗi trạng thái (6), lịch sử lần chào (4: Đang giao dịch, Ngừng hẳn, Đã bán của căn 0905; Chưa đủ để rao của căn 1202); mỗi ô so màu chữ với ô lưới cùng trạng thái cùng nền, ΔE2000 ≤ 3; bài in số ô đã đo và đòi đúng 44. Chiều đỏ: ép nhãn trong ngăn sang biến thể khác cho 'status Active differs between grid and record head, light'; thiếu một ô cho tên ô, ví dụ 'no Pending badge in offer history, dark'; số ô khác 44 cho 'measured 43 of 44 cells'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E4
+    paths: [src/components/candidate/typed-cell.tsx, src/modules/listings/ui/listing-cell-edit.tsx, tests/e2e/chuan-hoa-mau.spec.ts]
+    expected: "exit 0; chuan-hoa-mau.spec.ts «AC-3 · no padlock where the status says it» ở 1024 và 1440 trên dòng căn đã bán và căn ngừng hẳn: các ô trạng thái, giá chào, phí, cột riêng không chứa svg ổ khoá; mỗi ô ấy có title và aria-description bắt đầu bằng chữ khoá của lưới và nêu tên trạng thái; Enter, F2, gõ chữ, bấm đúp không mở khung sửa. Chiều đỏ: vẽ lại ổ khoá cho 'padlock where the status explains the lock'; bỏ aria-description cho 'locked cell gives no reason'; không tìm thấy dòng khoá nào cho 'no locked row found'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-4
+    executor: script
+    cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E5
+    paths: [src/components/candidate/data-region.tsx, tests/e2e/chuan-hoa-sua-o.spec.ts]
+    expected: "exit 0; tests/e2e/chuan-hoa-sua-o.spec.ts «AC-4 · Enter edits» ở 1024 và 1440: vai Đầu chủ chọn ô Giá chào của căn đang bán, Enter → khung sửa mở trên ô, ngăn chi tiết không mở; Enter trên ô Căn, ô giá căn đã bán, ô Diện tích → ngăn chi tiết của đúng dòng; vai chỉ xem Enter trên ô Giá chào → ngăn chi tiết; /sent Enter → chi tiết; /company-layer Enter → ô dưới được chọn. Chiều đỏ trên cùng hàm: trả cửa Enter về luật cũ cho 'Enter opened the record on an editable cell'; ép Enter mở sửa ở ô khoá cho 'Enter opened an editor on a locked cell'. Cùng tệp đơn vị src/components/candidate/data-region-keys.test.tsx xanh."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E6
+    paths: [src/components/candidate/data-region.tsx, tests/e2e/chuan-hoa-sua-o.spec.ts]
+    expected: "exit 0; chuan-hoa-sua-o.spec.ts «AC-5 · Space opens the record» ở 1024 và 1440 trên /inventory và /sent: chọn ô Giá chào (sửa được) rồi phím cách → ngăn chi tiết của đúng dòng mở, không khung sửa, scrollTop của trang và của lưới không đổi; khung sửa đang mở thì phím cách thêm một dấu cách vào giá trị. Chiều đỏ: bỏ cửa phím cách cho 'Space did not open the record'; để trình duyệt cuộn mặc định cho 'Space scrolled the grid'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-6
+    executor: script
+    cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E7
+    paths: [src/components/candidate/data-region.tsx, tests/e2e/chuan-hoa-sua-o.spec.ts]
+    expected: "exit 0; chuan-hoa-sua-o.spec.ts «AC-6 · a pencil on editable cells» ở 1024 và 1440: vai Đầu chủ rê ô Giá chào căn đang bán → một bút chì thấy được ở nửa phải ô, có title; rê ô giá căn đã bán, ô Diện tích, ô Căn → không bút; vai chỉ xem rê ô Giá chào → không bút; ngữ cảnh chạm (hasTouch, không rê) 1024 chọn ô Giá chào → bút thấy được. Chiều đỏ: hiện bút ở mọi ô cho 'pencil on a cell that does not edit'; ẩn bút khi không rê cho 'no pencil on the selected cell without hover'; không có ô sửa được nào cho 'no editable cell found'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-7
+    executor: script
+    cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E8
+    paths: [src/components/candidate/cell-editor.tsx, src/components/candidate/data-region.tsx, src/modules/listings/ui/use-listing-cell-edit.tsx, tests/e2e/chuan-hoa-sua-o.spec.ts]
+    expected: "exit 0; chuan-hoa-sua-o.spec.ts «AC-7 · clicking away saves» ở 1024 và 1440: mở sửa ô Giá chào, gõ giá đổi ≤ 20 %, bấm ô Diện tích dòng khác → ô Giá chào hiện giá mới, thông báo có «Hoàn tác», ô Diện tích là ô đang chọn; gõ giá đổi > 20 % rồi bấm ra ngoài → hỏi lại như Enter; gõ chữ không đọc được rồi bấm ra ngoài → khung còn mở, dòng báo chưa hiểu, giá cũ không đổi; Esc → không ghi; Tab → ghi và ô kế được chọn. Chiều đỏ trên cùng hàm: trả bấm ra ngoài về huỷ cho 'clicking away dropped the typed value'; ghi cả giá trị chưa hiểu cho 'an unread value was saved'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E18
+    criterion: AC-7
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E18
+    paths: [src/components/candidate/cell-editor.tsx, src/components/candidate/data-region.tsx, src/modules/listings/ui/use-listing-cell-edit.tsx, tests/e2e-db/chuan-hoa-ghi-mot-lan.spec.ts]
+    expected: "exit 0; tests/e2e-db/chuan-hoa-ghi-mot-lan.spec.ts trên Postgres có đăng nhập, 1440: đếm yêu cầu ghi tới /api/v1 khi sửa ô Giá chào: bấm ra ngoài đúng 1 lần ghi; Enter đúng 1 lần, không thêm lần nào khi khung đóng hay khi bấm sang ô khác sau đó; Esc 0 lần; giá trị chưa hiểu rồi bấm ra ngoài 0 lần; tải lại trang thì ô hiện giá mới (đọc từ máy chủ). Chiều đỏ trên cùng hàm: để đường bấm-ra-ngoài ghi thêm sau Enter cho 'two writes for one edit'; huỷ lần ghi khi lưới vẽ lại cho 'value lost after reload'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E19
+    criterion: AC-11
+    executor: script
+    cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E19
+    paths: [src/styles/dark.css, src/app/globals.css, tests/e2e/chuan-hoa-mau.spec.ts]
+    expected: "exit 0; chuan-hoa-mau.spec.ts «AC-11 · floating surface stands off the grid in dark» ở 1440: nền tối, ngăn chi tiết của 0905 mở, đọc giá trị xám của điểm ảnh ở dải đường dẫn (trang), một ô lưới trống chữ và thân ngăn trống chữ: ngăn − lưới ≥ 5; mở trình đơn tiêu đề «Giá chào», rê mục thứ hai: mục rê − nền trình đơn ≥ 5; nền sáng ba giá trị như trước vòng. Chiều đỏ trên cùng hàm: --popover = --card cho 'record surface equals the grid in dark'; --popover = neutral-800 cho 'menu hover equals the menu'; không thấy ngăn cho 'no record open'. Đã chạy trong ảnh Linux của Playwright."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-8
+    executor: script
+    cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E9
+    paths: [tests/e2e/support/mo-sua-o.ts, tests/e2e/chuan-hoa-tro-giup.spec.ts]
+    expected: "exit 0; tests/e2e/chuan-hoa-tro-giup.spec.ts ở 1440: moSuaO(page, { dong: '0905', cot: 'Giá chào' }) trả khung sửa đang mở trên đúng ô; gọi trên ô khoá ném lỗi chứa 'did not open for editing' và tên ô; gọi với dòng không có ném 'no cell matches'. Chiều đỏ: bộ trợ giúp trả về khi khung chưa mở cho 'helper returned without an open editor'."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["**"]
+    expected: "exit 0; make check xanh trên cây của vòng"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.e2e
+    paths: ["**"]
+    expected: "exit 0; bộ bài trình duyệt chung ở bốn khổ, sáng và tối, gồm axe không lỗi serious hay critical"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-9
+    executor: script
+    cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E12
+    paths: ["**"]
+    expected: "exit 0; bộ có đăng nhập trên Postgres (playwright.db.config.ts) xanh"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-9
+    executor: script
+    cmd: bash _acceptance/chuan-hoa-he-design/rang/chay.sh E13
+    paths: [src/components/ui/**, src/components/reui/**]
+    expected: "exit 0; git diff so với merge-base với origin/main không có tệp nào dưới src/components/ui hay src/components/reui; in 'vendor folders untouched'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.design.floor
+    paths: [src/**]
+    expected: "exit 0; sàn thiết kế M2 không thấy mã màu thô mới trên các tệp giao diện vòng chạm"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E17
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-1
+    executor: ui-check
+    layer: ui-observed
+    paths: [src/lib/format/index.ts, src/app/globals.css, src/components/candidate/**, src/modules/listings/ui/**]
+    steps:
+      - "Open _acceptance/chuan-hoa-he-design/evidence/truoc/ (frames on the VP10 slice 1 branch before this round) and _acceptance/chuan-hoa-he-design/evidence/sau/ (same screens, sizes and data after this round)."
+      - "For 1440 light and dark, compare Bảng hàng with all six statuses, one sold row and the record of 0905 open; for 360 light and dark compare the phone cards; for 1024 compare the hover pencil on Giá chào and the open editor."
+      - "Open evidence/pha/mau-1440-light-trung.png (the same screen with «Chưa đủ để rao» forced to the «Tạm ngừng» colour) beside sau/mau-1440-light.png."
+    expected: "Sau: sáu nhãn đọc được sáu màu khác nhau ở cả sáng lẫn tối, «Chưa đủ để rao» xám, «Đang giao dịch» tím, bốn màu kia như trước; dòng căn đã bán không còn ổ khoá; ngăn chi tiết và thẻ điện thoại cùng màu với lưới; bút chì chỉ ở ô sửa được; khung sửa nằm trên ô. Chiều đỏ: khung pha/mau-1440-light-trung.png phải bị chấm là CÓ hai nhãn trùng màu — chấm nó là sáu màu khác nhau thì phép nhìn không phân biệt được."
+    evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
+
+  - id: E16
+    criterion: AC-10
+    executor: judgment
+    inputs: [_acceptance/chuan-hoa-he-design/design.md, _acceptance/chuan-hoa-he-design/contract.md, _acceptance/chuan-hoa-he-design/decisions.jsonl, design/behaviors.md, wiki/decisions/0052-chuan-hoa-he-design.md]
+    question: "Đặt cạnh mục «Nguồn — lời chủ kho, nguyên văn» và bảng «Cắt lát» của design.md, cùng dòng trả lời Cổng Phạm vi trong decisions.jsonl: (1) mỗi điều của lát 1 có đúng một dòng ở bảng «Từng chỗ và cách làm — lát 1» và cột «Sau» làm đúng điều ấy, không thêm việc ông không bảo; (2) design/behaviors.md các dòng «Sửa dữ liệu», «Phím trong lưới», «Chữ mở trong ô», «Ô không sửa được» nói đúng luật mới (Enter là sửa ở ô sửa được, mở hồ sơ ở ô khác; phím cách mở hồ sơ; bấm ra ngoài là ghi; khoá do trạng thái không vẽ ổ khoá) kèm lời duyệt và ngày 2026-11-27, và không còn câu «Enter mở dòng khi màn có hồ sơ»; (3) các điều của lát 2, lát 3 và các câu chi-nguoi chưa trả lời không nằm trong phần đã làm của design.md, behaviors.md hay trang quyết định 0052?"
+    evidence_required: [verdict, rationale, judges]
