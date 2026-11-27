@@ -168,6 +168,21 @@ function PanelHeader({
   );
 }
 
+/** A section head inside a record: its buttons get the phone's hit area (owner, BH session 2026-11-27). */
+export const RECORD_SECTION_HEADER = "record-section-header";
+
+/**
+ * On a phone, every button at the record's head, at a section's head and at the record's foot is at least 44 px to
+ * press (owner, BH session 2026-11-27, «Duyệt cả ba câu», point 3); the desktop keeps its 28 px. The head stays one
+ * line: its padding shrinks so the taller buttons fit the same 61 px.
+ */
+const PHONE_HIT_AREA = [
+  "[&_[data-slot=record-panel-header]]:py-2",
+  "[&_[data-slot=record-panel-header]_button]:size-11",
+  `[&_[data-slot=${RECORD_SECTION_HEADER}]_button]:min-h-11`,
+  "[&_[data-slot=record-panel-footer]_button]:min-h-11",
+].join(" ");
+
 const TITLE_CLASS = "min-w-0 flex-1 truncate text-lg font-semibold";
 
 /**
@@ -267,7 +282,7 @@ export function RecordPanel({
           data-record-id={openId ?? undefined}
           // Focus goes back once the panel has closed (onOpenChangeComplete), to the row last shown.
           finalFocus={false}
-          className="fixed inset-y-0 right-0 z-50 flex h-full w-full flex-col bg-popover text-sm text-popover-foreground outline-none"
+          className={`fixed inset-y-0 right-0 z-50 flex h-full w-full flex-col bg-popover text-sm text-popover-foreground outline-none ${PHONE_HIT_AREA}`}
         >
           <PanelHeader
             title={<Dialog.Title className={TITLE_CLASS}>{view?.title}</Dialog.Title>}
@@ -304,7 +319,7 @@ export function RecordPanel({
 /** The App Shell's top bar and work area, by their slots; a page without the App Shell uses the whole window. */
 const TOP_BAR = '[data-slot="app-shell-top-bar"]';
 const WORK_AREA = '[data-slot="sidebar-inset"]';
-/** The data region's toolbar: the floating record stands below it (AC-4 of row 3a). */
+/** The data region's toolbar: it ends 16 px short of the floating record (owner, BH session 2026-11-27). */
 const REGION_TOOLS = '[data-slot="region-toolbar"]';
 
 /**
@@ -327,7 +342,6 @@ function regionRoom(): number {
 function useWorkAreaBounds(open: boolean) {
   const [bounds, setBounds] = useState({
     top: 0,
-    tools: 0,
     room: 0,
     right: 0,
     bottom: 0,
@@ -344,7 +358,6 @@ function useWorkAreaBounds(open: boolean) {
       setBounds({
         // No top bar (full screen): the panel runs the whole height, from the top of the window.
         top: Math.max(0, barRect ? barRect.bottom : 0),
-        tools: document.querySelector(REGION_TOOLS)?.getBoundingClientRect().bottom ?? 0,
         room: regionRoom(),
         right: area ? Math.max(0, window.innerWidth - area.right) : 0,
         bottom: area ? Math.max(0, window.innerHeight - area.bottom) : 0,
@@ -485,11 +498,9 @@ function RecordColumn({
       data-slot="record-panel-layer"
       style={
         {
-          // Floating, the record stands below the region's toolbar so the toolbar stays usable (AC-4 of row 3a, after
-          // the supervisor's ruling D-1411-1: the owner's newer word wins over row 3's «Trừ thanh trên»); pinned, the
-          // region gives up its width, so the column runs from just under the top bar.
-          // Owner 2026-11-27 (BH session): the floating record, too, runs from just under the App Shell's top bar
-          // to the bottom, over the content below, like decision 0024's «Trừ thanh trên».
+          // Floating or pinned, the record runs from just under the App Shell's top bar to the bottom (owner, BH
+          // session 2026-11-27, «Chốt cả bốn»: back to decision 0024's «Trừ thanh trên», no longer under the region's
+          // toolbar as row 3a's AC-4 had it); floating, it lies over the content below and the toolbar clears it.
           "--record-top": `${bounds.top}px`,
           "--record-right": `${bounds.right}px`,
           "--record-bottom": `${bounds.bottom}px`,
