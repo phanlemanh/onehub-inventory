@@ -13,6 +13,7 @@ import { tempDir } from "./support/temp-dir";
 const ROOT = join(import.meta.dirname, "..");
 const TOOL = join(ROOT, "tools/coverage_matrix/lifecycle.py");
 const GATE = "kiem-vong-doi-thao-tac#d-20261115T042837Z-14";
+const IMPORT_GATE = "nhap-excel#d-20261127T090211Z-68";
 
 function run(root: string, ...args: string[]) {
   const r = spawnSync("python3", [TOOL, "--root", root, ...args], { encoding: "utf8" });
@@ -63,6 +64,7 @@ const PARTS = [
   "src/components",
   "docs/plan/lo-trinh.json",
   "_acceptance/kiem-vong-doi-thao-tac/decisions.jsonl",
+  "_acceptance/nhap-excel/decisions.jsonl",
 ];
 
 /** A copy of what the tool reads, without .git. */
@@ -592,17 +594,15 @@ describe("bang-da-duyet", () => {
     expect(life("ListingOwner").go.hang).toBe("13");
   });
 
-  it("every khong cell names the scope gate line of this record, which carries the owner's name", () => {
-    const ledger = readFileSync(
-      join(ROOT, "_acceptance/kiem-vong-doi-thao-tac/decisions.jsonl"),
-      "utf8",
-    )
-      .split("\n")
-      .filter(Boolean)
-      .map((l) => JSON.parse(l) as { id: string; stage?: string; decided_by?: string });
-    const gate = ledger.find((l) => l.id === GATE.split("#")[1])!;
-    expect(gate.stage).toBe("gate1");
-    expect(gate.decided_by).toBeTruthy();
+  it("every khong cell names a scope gate line of its record, which carries the owner's name", () => {
+    const gateLine = (ref: string) => {
+      const [record, id] = ref.split("#");
+      return readFileSync(join(ROOT, `_acceptance/${record}/decisions.jsonl`), "utf8")
+        .split("\n")
+        .filter(Boolean)
+        .map((l) => JSON.parse(l) as { id: string; stage?: string; decided_by?: string })
+        .find((l) => l.id === id);
+    };
     const refs: string[] = [];
     const walk = (c: Cell) => {
       if (c.khong) refs.push(c.duyet ?? "");
@@ -613,8 +613,15 @@ describe("bang-da-duyet", () => {
       for (const c of ["them", "xem", "sua", "go"]) walk(life[c]!);
       for (const v of Object.values(life.rieng ?? {})) walk(v);
     }
-    expect(refs.length).toBe(5);
-    expect(new Set(refs)).toEqual(new Set([GATE]));
+    for (const ref of new Set(refs)) {
+      const line = gateLine(ref);
+      expect(line?.stage, ref).toBe("gate1");
+      expect(line?.decided_by, ref).toBeTruthy();
+    }
+    // The 1t scope gate holds five cells; row 11's line of 27/11 holds the two who do not see imports.
+    expect(refs.filter((r) => r === GATE)).toHaveLength(5);
+    expect(refs.filter((r) => r === IMPORT_GATE)).toHaveLength(2);
+    expect(refs).toHaveLength(7);
   });
 });
 
