@@ -38,7 +38,7 @@ evals:
     executor: script
     cmd: bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E5
     paths: [src/components/candidate/data-region.tsx, src/components/candidate/region-header.tsx, src/components/candidate/record-panel.tsx, src/modules/listings/ui/save-view-buttons.tsx, tests/e2e/ho-so-can.spec.ts]
-    expected: "exit 0; ho-so-can.spec.ts ở 1024 và 1440: nút cuối của thanh công cụ (kể cả khi sheet-tools dồn sang phải bằng margin-left:auto) dừng ≤ mép trái ngăn − 16 px (assertFloat, 'toolbar runs under the record'); «Cột», «Toàn màn hình» có title và rộng ≤ 40 px. Chiều đỏ: thanh công cụ margin-right 0 cộng sheet-tools dồn phải cho 'toolbar runs under the record'"
+    expected: "exit 0; ho-so-can.spec.ts ở 1024 và 1440: nút cuối của thanh công cụ (kể cả khi sheet-tools dồn sang phải bằng margin-left:auto) dừng ≤ mép trái ngăn − 16 px (assertFloat, 'toolbar runs under the record'; không thấy nút nào trên thanh công cụ thì đỏ 'no toolbar button beside the record'); «Cột», «Toàn màn hình» phải có mặt, có title và rộng ≤ 40 px. Chiều đỏ: thanh công cụ margin-right 0 cộng sheet-tools dồn phải cho 'toolbar runs under the record'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E6
@@ -54,7 +54,7 @@ evals:
     executor: script
     cmd: bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E7
     paths: [src/components/candidate/record-panel.tsx, src/components/candidate/record-section.ts, src/modules/listings/ui/listing-record-full.tsx, tests/e2e/ho-so-can.spec.ts]
-    expected: "exit 0; ho-so-can.spec.ts «44 px to press on a phone» ở bốn khổ: 360 và 414 mọi nút ở record-panel-header, record-section-header, record-panel-footer cao ≥ 44 px, nút đầu rộng ≥ 44 px, đầu vẫn một dòng; 1024 và 1440 nút đầu cao 28 px. Chiều đỏ: nút đầu ép 28 px ở điện thoại cho 'under 44'; danh sách rỗng cho 'no button at the record head'"
+    expected: "exit 0; ho-so-can.spec.ts «44 px to press on a phone» ở bốn khổ, hồ sơ mở với vai Đầu chủ (đầu mục có «Báo sai thông tin», «Sửa»): 360 và 414 mỗi chỗ — đầu hồ sơ, đầu mục, đáy hồ sơ khi có đáy — phải có ít nhất một nút ('no button at the record head', 'no button at a section head', 'no button at the record foot'), mọi nút ấy cao ≥ 44 px, nút đầu rộng ≥ 44 px, đầu vẫn một dòng; 1024 và 1440 nút đầu cao 28 px và đầu mục có nút. Chiều đỏ trên trang thật: nút đầu ép 28 px cho 'under 44'; nút đầu mục ép 28 px cho 'section button 28px high, under 44'; ẩn nút đầu mục cho 'no button at a section head'; và trên lớp nội suy cũ của record-panel bài đỏ 'section button 28px high, under 44' (G-2811-11)"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E8
