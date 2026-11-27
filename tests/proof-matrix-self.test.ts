@@ -1,3 +1,4 @@
+// decision:reference-implementation
 // Self-check of the proof gate on Bảng hàng (roadmap row 2, AC-8, E8). Row 1c's gate passes in silence in three places
 // (states table unreadable, an unknown contract status); this file proves the matrix check REALLY runs on the inventory
 // proof before the screen becomes the grid family's reference.

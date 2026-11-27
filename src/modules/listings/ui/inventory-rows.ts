@@ -1,10 +1,14 @@
 // Pure parts of the inventory grid (roadmap row 2): rows, columns and the state a URL asks for. Safe on the server.
 import { customColumn, typedColumn, type TypedColumn } from "@/components/candidate/column-kind";
+
 import { STATUS_ORDER, foldText, type ColumnFilters } from "@/components/candidate/grid-view";
 import type { GridRow, RegionStatus } from "@/components/candidate/data-region";
 import type { DisplayKind } from "@/generated/display";
 import type { Listing, ListingUnit, Unit } from "@/generated/ontology";
 
+import type { CustomKind } from "../custom-rules";
+
+import { DETAIL_COLUMN_FIELDS, type DetailColumnWords } from "./detail-cells";
 import { QUERY_WORD } from "./query-words";
 
 /** Region states a development build may open with `?state=`; anything else is the loaded grid. */
@@ -79,6 +83,11 @@ export interface InventoryCustomColumn {
   code: string;
   header: string;
   kind: DisplayKind;
+  /** The field's own kind and choices (row 3g): with them the cell edits and takes a paste by that kind. */
+  fieldKind?: CustomKind;
+  options?: readonly string[];
+  /** Longest text a text field takes, from the company layer (row 3g: one rule, one owner). */
+  limit?: number;
 }
 
 /** The worked-out net-to-seller value of a row (row 19): not a field of the model, so it is keyed like a computed column. */
@@ -101,17 +110,32 @@ export function inventoryColumns(
   headers: Readonly<Record<InventoryField, string>>,
   custom: readonly InventoryCustomColumn[] = [],
   fees?: InventoryFeeHeaders,
+  /** Row 3g (Hỏi-3 «lối C»): the four details as columns after the bedrooms, in Quỹ hàng's order. */
+  details?: DetailColumnWords,
 ): TypedColumn[] {
   const standard = INVENTORY_FIELDS.flatMap((field) => {
     const column = typedColumn({ field, header: headers[field] });
-    return fees && field === "Listing.listPrice"
-      ? [column, customColumn({ code: "netToSeller", header: fees.netToSeller, kind: "money" })]
-      : [column];
+    if (fees && field === "Listing.listPrice")
+      return [
+        column,
+        customColumn({ code: "netToSeller", header: fees.netToSeller, kind: "money" }),
+      ];
+    if (details && field === "Unit.bedroomsTotal")
+      return [
+        column,
+        ...DETAIL_COLUMN_FIELDS.map((f) =>
+          typedColumn({
+            field: f,
+            header: details[f.slice("Listing.".length) as keyof DetailColumnWords] as string,
+          }),
+        ),
+      ];
+    return [column];
   });
   return [
     ...standard,
     ...(fees ? [typedColumn({ field: FEE_INCLUSION_FIELD, header: fees.feeInclusion })] : []),
-    ...custom.map((c) => customColumn(c)),
+    ...custom.map((c) => customColumn({ code: c.code, header: c.header, kind: c.kind })),
   ];
 }
 

@@ -1,11 +1,14 @@
 "use client";
 
-import { LogInIcon, LogOutIcon } from "lucide-react";
+import { ArrowLeftRightIcon, LogInIcon, LogOutIcon, PaletteIcon, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 
+import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { loginHref } from "@/components/templates/page-state";
+import { ThemeMenuChoice } from "@/components/templates/theme";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -50,8 +53,9 @@ function initial(account: AccountView): string {
 }
 
 /**
- * The account corner of the frame (row 8, N6): «sign in» when nobody is signed in; otherwise who you are, the
- * company you work in, switching company when you belong to several, and signing out.
+ * The account menu at the foot of the App Shell's rail (row 8, N6), arranged as the ReUI Verve template: the look
+ * (light, dark, following the device) and «sign in» when nobody is signed in; otherwise who you are, the company you
+ * work in, switching company when you belong to several, the look, and signing out.
  */
 export function AccountMenu({
   account,
@@ -72,18 +76,46 @@ export function AccountMenu({
     () => false,
   );
 
+  // The three looks, for the signed-in and the signed-out alike: each look is a menu item of its own, so the arrow keys
+  // reach it.
+  const theme = (
+    <div
+      data-slot="account-theme"
+      className="flex items-center gap-1.5 px-1.5 py-1 text-sm [&>svg]:size-4 [&>svg]:shrink-0"
+    >
+      <PaletteIcon aria-hidden />
+      <span>{FRAME_COPY.theme.row}</span>
+      <span className="ml-auto">
+        <ThemeMenuChoice />
+      </span>
+    </div>
+  );
+
   if (!account) {
     return (
-      <Link
-        href={loginHref(pathname || "/")}
-        className="text-sm font-medium"
-        data-slot="account-sign-in"
-      >
-        <span className="inline-flex items-center gap-1">
-          <LogInIcon className="size-4" aria-hidden />
-          {labels.signIn}
-        </span>
-      </Link>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={COPY.account}
+              data-slot="account-sign-in"
+              data-ready={ready || undefined}
+            />
+          }
+        >
+          <UserIcon aria-hidden />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="right" align="end" className="w-80">
+          {theme}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem render={<Link href={loginHref(pathname || "/")} />}>
+            <LogInIcon />
+            {labels.signIn}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     );
   }
 
@@ -108,7 +140,7 @@ export function AccountMenu({
       <DropdownMenuTrigger
         render={
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon-sm"
             aria-label={COPY.account}
             data-slot="account-menu"
@@ -116,14 +148,20 @@ export function AccountMenu({
           />
         }
       >
-        {initial(account)}
+        <Avatar size="sm">
+          <AvatarFallback>{initial(account)}</AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent side="right" align="end" className="w-80">
         <DropdownMenuGroup>
+          {/* No avatar beside the name: the button that opens the menu already shows it, and the room it took cut a
+              39-character email on Linux, where Inter sets about 4.5% wider than on macOS. */}
           <DropdownMenuLabel>
-            <span className="flex flex-col gap-0.5">
-              <span className="text-sm font-medium text-foreground">{account.name}</span>
-              <span className="break-all">{account.email}</span>
+            <span className="flex min-w-0 flex-col gap-0.5">
+              <span className="truncate text-sm font-semibold text-foreground">{account.name}</span>
+              <span className="truncate" title={account.email}>
+                {account.email}
+              </span>
             </span>
           </DropdownMenuLabel>
           <DropdownMenuLabel>
@@ -137,6 +175,7 @@ export function AccountMenu({
             <DropdownMenuSeparator />
             <DropdownMenuSub>
               <DropdownMenuSubTrigger disabled={busy || switching}>
+                <ArrowLeftRightIcon />
                 {COPY.switchCompany}
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
@@ -154,6 +193,8 @@ export function AccountMenu({
             </DropdownMenuSub>
           </>
         ) : null}
+        <DropdownMenuSeparator />
+        {theme}
         <DropdownMenuSeparator />
         <DropdownMenuItem disabled={busy} onClick={() => void signOutHere()}>
           <LogOutIcon />

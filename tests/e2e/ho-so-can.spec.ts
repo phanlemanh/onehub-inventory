@@ -124,7 +124,8 @@ async function floatGeometry(page: Page): Promise<{
         document.querySelector('[data-slot="data-region"] [data-slot="column-filter"] input'),
       ),
       accountHit: hits(
-        document.querySelector('[data-slot="app-shell-top-bar"] [data-slot^="account"]'),
+        // The account menu sits at the foot of the rail since app-shell-khuon-dau-trang (owner, 2026-11-17).
+        document.querySelector('[data-slot="app-shell-account"] [data-slot^="account"]'),
       ),
       overflow: Math.max(
         aside.scrollWidth - aside.clientWidth,
@@ -658,8 +659,19 @@ test.describe("E2 · the unit code opens in one click, the cell selects like a s
   test("break: a unit code that keeps the grid's two-step press is caught", async ({ page }) => {
     await openInventory(page);
     await suaTrang(page, () => {
-      for (const el of document.querySelectorAll("[data-record-open]"))
-        el.removeAttribute("data-cell-interactive");
+      // A later render of the grid would put the mark back (row 3g renders the rows once more when the details
+      // arrive), so the break holds the mark off for the rest of the case.
+      const strip = () => {
+        for (const el of document.querySelectorAll("[data-record-open][data-cell-interactive]"))
+          el.removeAttribute("data-cell-interactive");
+      };
+      strip();
+      new MutationObserver(strip).observe(document.body, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ["data-cell-interactive"],
+      });
     });
     await expect(assertOneClickOpens(page, 5)).rejects.toThrow(
       "unit code needs two clicks to open",

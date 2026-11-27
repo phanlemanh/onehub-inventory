@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { PageHeader } from "@/components/templates/page-header";
 import { PageState, loginHref } from "@/components/templates/page-state";
-import { customColumnsOf, label, labelOverrides } from "@/modules/company-config";
+import { TEXT_VALUE_LIMIT, customColumnsOf, label, labelOverrides } from "@/modules/company-config";
 import { myCompanyLayer, myFeeSchedule } from "@/modules/company-config/server";
 import { allowedScope } from "@/modules/identity";
 import { currentSession } from "@/modules/identity/server";
@@ -77,6 +77,7 @@ const RECORD_LABELS: RecordLabels = {
   currentListing: label("CurrentListing"),
   viewedListing: label("ViewedListing"),
   listingsOfUnit: label("ListingsOfUnit"),
+  edit: label("Edit"),
   parts: {
     listPrice: label("ListPrice"),
     furnished: label("Furnished"),
@@ -155,7 +156,14 @@ export default async function Page({ searchParams }: Props) {
   ]);
   // The company's own words and columns (row 7e); without a readable layer, the standard ones.
   const headers = headersFor({ overrides: labelOverrides(layer?.labels ?? []) });
-  const customColumns = customColumnsOf(layer?.fields ?? []);
+  // Each own column carries its field's kind and choices, so its cell edits and takes a paste by kind (row 3g).
+  const fieldOf = new Map((layer?.fields ?? []).map((f) => [f.code, f]));
+  const customColumns = customColumnsOf(layer?.fields ?? []).map((c) => ({
+    ...c,
+    fieldKind: fieldOf.get(c.code)?.kind,
+    options: fieldOf.get(c.code)?.options ?? [],
+    ...(fieldOf.get(c.code)?.kind === "text" ? { limit: TEXT_VALUE_LIMIT } : {}),
+  }));
   const missing = viewId !== undefined && openView === null;
   // Views that could not be read still leave saving open; the server checks names again.
   const savedViews = listed === "unreadable" ? [] : listed;
@@ -239,6 +247,14 @@ export default async function Page({ searchParams }: Props) {
         title={label("Listing")}
         headers={headers}
         customColumns={customColumns}
+        detailWords={{
+          furnished: RECORD_LABELS.parts.furnished,
+          legalStatus: RECORD_LABELS.parts.legalStatus,
+          financing: RECORD_LABELS.parts.financing,
+          occupantType: RECORD_LABELS.parts.occupantType,
+          furnishedValues: RECORD_LABELS.furnishedValues,
+          occupantValues: RECORD_LABELS.occupantValues,
+        }}
         feeHeaders={FEE_HEADERS}
         rows={rows}
         listings={listings}

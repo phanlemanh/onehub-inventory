@@ -123,6 +123,11 @@ const STANDARD = [
   "NetToSeller",
   "LivingArea",
   "BedroomsTotal",
+  // Row 3g: the four details of a listing stand right after Phòng ngủ, in the order Quỹ hàng shows them.
+  "Furnished",
+  "LegalStatus",
+  "Financing",
+  "OccupantType",
   "LastConfirmedAt",
 ] as const;
 
@@ -389,7 +394,7 @@ test.describe("lop rieng tren bang hang", () => {
       "Hướng view",
       "Ghi chú",
     ];
-    expect(wantA).toHaveLength(11);
+    expect(wantA).toHaveLength(15);
     const gotA = await headers(pageA);
     const shownRetired = gotA.find((h) => h === "Hoa hồng tạm");
     if (shownRetired) throw new Error(`retired field shown: ${shownRetired}`);
