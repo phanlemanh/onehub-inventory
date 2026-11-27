@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: edcf17a89857a424371ae515f2d68f8af06fcf96
+verified_commit: e9d9acd8a540391c31e93bb5fd9fc0a2880e709a
 human_signoff: Manh Phan 2026-11-12
 ---
 
@@ -183,3 +183,11 @@ Round 4: mọi eval máy xanh, E10 có tám ảnh đã đối chiếu, E11 ba le
 ### Re-pin lần 1 — 2026-11-12, do gộp nhánh chính có hàng 1r sau chữ ký
 run_id: repin-20261112T153042Z-38517
 sha: edcf17a89857a424371ae515f2d68f8af06fcf96 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E10, E11 (E11 không khai paths) · AC không có chốt máy: AC-10
+
+### Re-pin lần 2 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi kỳ vọng bài của các hồ sơ đã ký; thước 2e sửa ở ec70d782 (G-2711-36); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T185306Z-85596
+sha: 8f4041b5a07324f15e575fa0d8b5827f54618c32 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E10, E11 (E11 không khai paths) · diff chạm vật đo ngoài làn máy: E10 — chưa chứng lại, đi vòng S4 delta · AC không có chốt máy: AC-10
+
+### Re-pin lần 3 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi bài của các hồ sơ đã ký: thước viền Q3, open-cell-truncate (G-2811-6), bài 44 px và các bài xanh rỗng (G-2811-11); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T222637Z-53064
+sha: e9d9acd8a540391c31e93bb5fd9fc0a2880e709a · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E10, E11 (E11 không khai paths) · diff chạm vật đo ngoài làn máy: E10 — chưa chứng lại, đi vòng S4 delta · AC không có chốt máy: AC-10

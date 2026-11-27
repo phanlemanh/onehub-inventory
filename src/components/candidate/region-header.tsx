@@ -40,7 +40,10 @@ export function RegionToolbar({
   const count = showCount ? countText(total, shown) : null;
   if (count === null && total === undefined && !action) return null;
   return (
-    <div data-slot="region-toolbar" className="flex flex-wrap items-center gap-x-3 gap-y-2">
+    <div
+      data-slot="region-toolbar"
+      className="flex flex-wrap items-center gap-x-3 gap-y-2 in-data-record-float:mr-(--record-float-clear)"
+    >
       {count ? (
         <span data-slot="region-count" className="text-sm text-muted-foreground">
           {count}

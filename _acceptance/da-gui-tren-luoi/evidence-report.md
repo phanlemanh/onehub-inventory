@@ -6,7 +6,7 @@ failed_evals: []
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 9e5cf640628157d835c23a4cf7060c1bd4299f82
+verified_commit: e9d9acd8a540391c31e93bb5fd9fc0a2880e709a
 human_signoff: Manh Phan 2026-11-13
 ---
 
@@ -237,3 +237,7 @@ sha: 1c0db7a53ead8ac3ca23c20991b2746df50d1e98 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 6 — 2026-11-26, do giờ chờ ca quét trợ năng tám lần (G-2611-14)
 run_id: repin-20261126T180905Z-49173
 sha: 9e5cf640628157d835c23a4cf7060c1bd4299f82 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E14, E15 (E15 không khai paths) · AC không có chốt máy: AC-10
+
+### Re-pin lần 7 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi bài của các hồ sơ đã ký: thước viền Q3, open-cell-truncate (G-2811-6), bài 44 px và các bài xanh rỗng (G-2811-11); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T222637Z-53064
+sha: e9d9acd8a540391c31e93bb5fd9fc0a2880e709a · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E14, E15 (E15 không khai paths) · diff chạm vật đo ngoài làn máy: E14 — chưa chứng lại, đi vòng S4 delta · AC không có chốt máy: AC-10
