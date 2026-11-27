@@ -1117,14 +1117,24 @@ test.describe("header buttons in view", () => {
 
   /**
    * L4: no header shows a «Bỏ ghim» button; the last column pinned at the start casts the pinned-edge shadow on its
-   * header and on its body cells, and no other pinned column does.
+   * header and on its body cells — measured on pixels (VP10 rounds 2 and 3): the strip just right of the cell, with the
+   * shadows on against the shadows off. A shadow on an inner pinned column cannot show: the next pinned cell covers it
+   * (a forced one measured 0 at 1024 and 1440), so no check is made for it.
    */
   async function assertPinnedEdge(page: Page): Promise<void> {
     const g = await page.evaluate(() => {
-      const pinned = [
-        ...document.querySelectorAll('[data-slot="data-region-body"] td[data-pinned="start"]'),
-      ];
+      const box = (el: Element) => {
+        const r = el.getBoundingClientRect();
+        return { right: r.right, top: r.top, height: r.height };
+      };
+      const row = document.querySelector(
+        '[data-slot="data-region-body"] tbody tr:has(td[data-pinned="start"])',
+      );
+      const pinned = row ? [...row.querySelectorAll('td[data-pinned="start"]')] : [];
       const last = pinned.find((el) => el.getAttribute("data-last-col") === "start");
+      const head = document.querySelector(
+        '[data-slot="data-region-body"] thead th[data-pinned="start"][data-last-col="start"]',
+      );
       const unpinButtons = [
         ...document.querySelectorAll('[data-slot="data-region-body"] thead button'),
       ].filter(
@@ -1132,19 +1142,26 @@ test.describe("header buttons in view", () => {
           (b as HTMLElement).offsetParent !== null &&
           /^Bỏ ghim /.test(b.getAttribute("aria-label") ?? ""),
       ).length;
-      const r = last?.getBoundingClientRect();
-      return { unpinButtons, edge: r ? { right: r.right, top: r.top } : null };
+      return {
+        unpinButtons,
+        last: last ? box(last) : null,
+        head: head ? box(head) : null,
+      };
     });
     if (g.unpinButtons > 0) throw new Error(`header shows «Bỏ ghim» buttons: ${g.unpinButtons}`);
-    if (!g.edge) throw new Error("no pinned edge shadow");
-    // On pixels (VP10 round 2): the strip just right of the last pinned column is darker with its shadow than without.
-    const strip = {
-      x: Math.round(g.edge.right) + 1,
-      y: Math.round(g.edge.top),
+    if (!g.last || !g.head) throw new Error("no pinned edge shadow");
+    const stripOf = (b: { right: number; top: number; height: number }, height: number) => ({
+      x: Math.round(b.right) + 1,
+      y: Math.round(b.top),
       width: 4,
-      height: 160,
-    };
-    const withShadow = await columnLuminance(page, strip);
+      height: Math.max(8, Math.round(height)),
+    });
+    const strips = [
+      { name: "body", clip: stripOf(g.last, 160) },
+      { name: "header", clip: stripOf(g.head, g.head.height) },
+    ];
+    const withShadow = [];
+    for (const s of strips) withShadow.push(await columnLuminance(page, s.clip));
     await suaTrang(page, () => {
       const style = document.createElement("style");
       style.id = "khong-bong-ghim";
@@ -1153,10 +1170,17 @@ test.describe("header buttons in view", () => {
       document.head.append(style);
     });
     await page.waitForTimeout(100);
-    const without = await columnLuminance(page, strip);
+    const shade: Record<string, number> = {};
+    for (const [n, s] of strips.entries()) {
+      const without = await columnLuminance(page, s.clip);
+      shade[s.name] = Math.max(...withShadow[n]!.map((c, k) => (without[k] ?? c) - c));
+    }
     await suaTrang(page, () => document.getElementById("khong-bong-ghim")?.remove());
-    const shade = Math.max(...withShadow.map((c, n) => (without[n] ?? c) - c));
-    if (shade < 3) throw new Error(`no pinned edge shadow (darker by ${shade.toFixed(1)})`);
+    for (const name of ["body", "header"])
+      if (shade[name]! < 3)
+        throw new Error(
+          `no pinned edge shadow on the ${name} (darker by ${shade[name]!.toFixed(1)})`,
+        );
   }
 
   test("a column pins from its menu and casts a shadow over the columns scrolling under it", async ({
@@ -1192,6 +1216,15 @@ test.describe("header buttons in view", () => {
         '[data-slot="data-region-body"] :is(th, td)[data-pinned] { box-shadow: none !important; }',
     });
     await expect(assertPinnedEdge(page)).rejects.toThrow("no pinned edge shadow");
+  });
+
+  test("break: a pinned header without its shadow is caught", async ({ page }) => {
+    if (isPhone(page)) return phoneStandInBreak(page, "header buttons");
+    await openInventory(page);
+    await themKieu(page, {
+      content: '[data-slot="data-region-body"] th[data-pinned] { box-shadow: none !important; }',
+    });
+    await expect(assertPinnedEdge(page)).rejects.toThrow("no pinned edge shadow on the header");
   });
 
   test("the check fails when the next header covers the first column's buttons", async ({

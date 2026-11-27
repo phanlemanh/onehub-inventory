@@ -246,13 +246,20 @@ async function standsApart(page: Page): Promise<Apart> {
   });
   await page.waitForTimeout(100);
   const without = await luminance(page, strip);
+  // The record's left line, taken while the shadow is off: with it on, the shadow alone darkens these columns in light.
+  const line = await columnLuminance(page, { x: Math.floor(g.left) - 1, y, width: 4, height: 160 });
   await suaTrang(page, () => document.getElementById("khong-bong-tam")?.remove());
   await page.waitForTimeout(100);
   const surface = await luminance(page, inside);
-  // The record's left line against the grid just beside it.
-  const line = await columnLuminance(page, { x: Math.floor(g.left) - 1, y, width: 4, height: 160 });
   return {
-    edge: Math.max(...line.map((c) => Math.abs(c - without))),
+    // A line is one pixel column at the record's left that differs from the column on each side of it: the grid's
+    // nearest column and the record's own surface. A step alone is no line; the grid's mean is no neighbour (cells
+    // hold text there at 1024).
+    edge: Math.max(
+      ...[1, 2].map((i) =>
+        Math.min(Math.abs(line[i]! - line[i - 1]!), Math.abs(line[i]! - line[i + 1]!)),
+      ),
+    ),
     clipped: g.clipped,
     shade: without - withShadow,
     step: Math.abs(surface - without),
@@ -264,9 +271,9 @@ async function standsApart(page: Page): Promise<Apart> {
 /**
  * The record stands apart by what shows, measured per theme on what the eye uses there:
  * - light: the record's surface is the page's own white, so the shadow must darken the grid beside it (≥ 3; measured
- *   24.5 at 1440) and its left line must show (≥ 10; measured 24.7);
+ *   24.5 at 1440) and its left line must stand out from the pixel column on each side, shadow off (≥ 10; measured 22.6 at 1024);
  * - dark: the record's surface is about the grid's own (step 1.5 at 1440) and a black shadow on a near-black grid barely
- *   shows (2.5), so the left line is what sets it apart (≥ 10; measured 21.5). Shadow and surface step are recorded,
+ *   shows (2.5), so the left line is what sets it apart (≥ 10; measured 18 at 1024). Shadow and surface step are recorded,
  *   not asserted, in dark: a threshold that close to the measured value would flicker on another machine.
  * In both, the record's box must not clip the shadow.
  */
@@ -325,6 +332,23 @@ test.describe("Q3 · the floating record stands apart from the grid", () => {
       expect(() =>
         assertStandsApart({ ...a, clipped: "visible", border: "1px", edge: 20 }, "light"),
       ).toThrow("no shadow shows on the grid");
+    });
+
+  for (const colorScheme of ["light", "dark"] as const)
+    test(`break: a shadow with no line that shows on the record's left is caught (${colorScheme})`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme });
+      await openRecord(page);
+      // The line keeps its width but takes the record's own surface; the shadow stays (review of round 3).
+      await themKieu(page, {
+        content:
+          '[role="dialog"]:has([data-slot="record-panel"]) { border-left-color: transparent !important; }',
+      });
+      await page.waitForTimeout(300);
+      const a = await standsApart(page);
+      expect(a.clipped).toBe("visible");
+      expect(() => assertStandsApart(a, colorScheme)).toThrow("no line shows on the record's left");
     });
 });
 
