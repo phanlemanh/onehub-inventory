@@ -9,7 +9,7 @@ import { catalogLoadStatements } from "@/modules/catalog/load-sql";
 import { sampleCatalog } from "@/modules/catalog";
 import { label } from "@/modules/company-config";
 import { createImportsHandlers } from "@/modules/imports/imports-http";
-import { NO_CHOICES, type Choices } from "@/modules/imports";
+import { NO_CHOICES, type Choices, type LearnedItem } from "@/modules/imports";
 import { openDoor } from "@/modules/identity/action-door";
 import { createAuthHandlers, tokenFrom } from "@/modules/identity/http";
 import type { LoginDeps } from "@/modules/identity/login";
@@ -155,7 +155,7 @@ async function applyAll(
   return {
     status: res.status,
     id,
-    body: (await res.json()) as { created: number; learned?: string[] },
+    body: (await res.json()) as { created: number; learned?: LearnedItem[] },
   };
 }
 
@@ -367,7 +367,14 @@ describe("hoc va lan hai (E4, E12, E13)", () => {
   it("the label, the pending unit and the template are learned once, and the same shape asks nothing already answered", async () => {
     const e = await importWorld("hoc");
     const r = await applyAll(e, "LA", rowsOf(e.codes));
-    expect(r.body?.learned).toEqual(expect.arrayContaining(["template", "label", "pending-unit"]));
+    // Each item by its concept and the name the person gave it, never a machine word (the Xong screen lists them).
+    expect(r.body?.learned).toEqual([
+      { concept: "ImportTemplate", name: "bang-hang.xlsx" },
+      { concept: "CompanyLabel", name: "«Mã căn»" },
+      { concept: "CompanyLabel", name: "«Block»" },
+      { concept: "CompanyLabel", name: "«Ngày check»" },
+      { concept: "PendingUnit", name: "SA5-99.99" },
+    ]);
     expect(
       await count(
         e,

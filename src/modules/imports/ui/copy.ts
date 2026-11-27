@@ -1,6 +1,9 @@
 // Words of the import screen (row 11, nhap-excel) that are not concepts of ontology/labels.yaml; concept words come from
 // label(). Plain Vietnamese, each at most one sentence.
 import type { ReadProblem } from "../read-file";
+import { label } from "@/modules/company-config";
+
+import type { LearnedItem } from "../learned";
 import type { Mark } from "../mark";
 
 export const STEP_WORDS = ["Chọn tệp", "Ghép cột", "Giá trị và mã", "Xem trước", "Xong"] as const;
@@ -33,6 +36,8 @@ export const IMPORT_COPY = {
   noQuestion: "Không còn câu nào phải trả lời.",
   done: (n: number) => `Đã thêm ${n} dòng`,
   learned: "Vừa học cho lần sau",
+  /** One item learned: the word of its concept (label()), a colon, then the name the person gave it. */
+  learnedItem: (item: LearnedItem) => `${label(item.concept)}: ${item.name}`,
   undo: "Hoàn tác lần nhập",
   undone: "Đã hoàn tác lần nhập.",
   undoneShort: "đã hoàn tác",

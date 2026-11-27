@@ -17,13 +17,14 @@ import pg from "pg";
 import { FRAME_COPY } from "../../src/components/templates/frame-copy";
 import type { Role } from "../../src/generated/ontology";
 import { sampleCatalog } from "../../src/modules/catalog";
+import type { LearnedItem } from "../../src/modules/imports";
 import { catalogLoadStatements } from "../../src/modules/catalog/load-sql";
 import { IMPORT_COPY as C, PROBLEM_WORDS, STEP_WORDS } from "../../src/modules/imports/ui/copy";
 import { waitReady } from "../../tools/e2e_templates/runner";
 
 import { label } from "../../src/modules/company-config";
 import { regionReady } from "../e2e/phone-list";
-import { suaTrang } from "../e2e/sua-trang";
+import { chupAnh, suaTrang } from "../e2e/sua-trang";
 
 import { signInWithCode } from "./dang-nhap-vai";
 
@@ -391,7 +392,7 @@ test("so tren man bang so may chu: the preview and Xong show the server's number
   };
   answers.columns["7"] = { target: { skip: true } };
   let preview: Record<string, unknown> | null = null;
-  let learned: string[] = [];
+  let learned: LearnedItem[] = [];
   const withAnswers = (r: Route) => {
     const sent = JSON.parse(r.request().postData() ?? "{}") as Record<string, unknown>;
     return JSON.stringify({ ...sent, choices: answers });
@@ -406,7 +407,7 @@ test("so tren man bang so may chu: the preview and Xong show the server's number
   );
   await page.route("**/api/v1/imports/*/batches", async (r) => {
     const res = await r.fetch({ postData: withAnswers(r) });
-    const json = (await res.json()) as { learned?: string[] };
+    const json = (await res.json()) as { learned?: LearnedItem[] };
     if (json.learned) learned = json.learned;
     await r.fulfill({ response: res, json });
   });
@@ -427,7 +428,9 @@ test("so tren man bang so may chu: the preview and Xong show the server's number
     await expect(page.locator('[data-state="giu-chu-goc"]')).toHaveText(C.keptCells(keptCount));
   const shownLearned = await page.locator('[data-state="vua-hoc"] li').allTextContents();
   expect(learned.length, "the answers teach the company something").toBeGreaterThan(0);
-  expect(shownLearned).toEqual(learned);
+  // Each item said in words: the concept's label and the name the person gave it, never the server's machine word.
+  expect(shownLearned).toEqual(learned.map(C.learnedItem));
+  expect(shownLearned.every((w) => w.includes(": "))).toBe(true);
 
   // Break: an answer whose «ask» count is one more than its cells — a screen counting its own cells would show the
   // cells' number; this one must show the server's.
@@ -628,5 +631,72 @@ test("nhan rieng tren bang hang: the header «Block» an import learns is the in
   expect(await learnedHeaderFault(page, "Block")).toBe(
     `inventory header is not the learned label: ${standard} != Block`,
   );
+  await emptyInventory();
+});
+
+// ---- E18, E19 · pictures for the graders who look at the screens (AC-12, AC-11) ---------------------------------------
+
+// Only when a folder is named: a grading round's look at the screens (evals E18, E19) runs these, CI does not.
+const SHOTS = process.env["NHAP_EXCEL_CHUP"];
+
+async function shot(page: Page, name: string) {
+  await page.waitForFunction(() =>
+    document.getAnimations().every((a) => a.playState !== "running"),
+  );
+  await chupAnh(page, { path: join(SHOTS!, `${name}.png`), fullPage: true });
+}
+
+test("chup nhap-tep: every step of ban.xlsx and gon.xlsx to Xong, for the grader", async ({
+  page,
+}) => {
+  const width = test.info().project.name;
+  test.skip(!SHOTS || !["1440", "1024"].includes(width), "pictures for a grading round only");
+  test.setTimeout(180_000);
+  await emptyInventory();
+  await openScreen(page);
+  await shot(page, `nhap-tep-tai-${width}`);
+  // ban.xlsx as it comes: the column step with its questions and its blocked column, then each step the screen opens.
+  await choose(page, "ban.xlsx");
+  await expect(next(page)).toBeEnabled({ timeout: 10_000 });
+  await shot(page, `nhap-tep-da-chon-${width}`);
+  for (const step of ["ghep-cot", "gia-tri-va-ma", "xem-truoc-ban"]) {
+    if (!(await next(page).isEnabled())) break;
+    await next(page).click();
+    await shot(page, `nhap-tep-${step}-${width}`);
+  }
+  // gon.xlsx to Xong: the preview with its four counts, then what was added and learned, with Hoàn tác.
+  await page.goto("/nhap-tep");
+  await waitReady(page);
+  await choose(page, "gon.xlsx");
+  await expect(next(page)).toBeEnabled({ timeout: 10_000 });
+  await toPreview(page);
+  await shot(page, `nhap-tep-xem-truoc-${width}`);
+  await page.getByRole("button", { name: /^Áp/ }).click();
+  await expect(page.locator('[data-state="xong"]')).toBeVisible();
+  await shot(page, `nhap-tep-xong-${width}`);
+  await emptyInventory();
+});
+
+test("chup bang hang: the empty inventory, then the E15 file on it, for the grader", async ({
+  page,
+}) => {
+  test.skip(!SHOTS || test.info().project.name !== "1440", "pictures for a grading round only");
+  await makeWorld();
+  await emptyInventory();
+  await openInventoryAs(page, "ListAgent");
+  await shot(page, "inventory-trong-1440");
+  await page.goto("/nhap-tep");
+  await waitReady(page);
+  await choose(page, "bang-hang.csv", E15_FILE);
+  await expect(next(page)).toBeEnabled({ timeout: 10_000 });
+  await toPreview(page);
+  await page.getByRole("button", { name: /^Áp 3 dòng/ }).click();
+  await expect(page.locator('[data-state="xong"]')).toContainText(C.done(3));
+  await page.goto("/inventory");
+  await waitReady(page);
+  await regionReady(page);
+  await shot(page, "inventory-sau-nhap-1440");
+  await openInventoryAs(page, "BuyerAgent");
+  await shot(page, "inventory-dau-khach-1440");
   await emptyInventory();
 });

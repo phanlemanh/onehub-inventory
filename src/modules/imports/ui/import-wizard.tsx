@@ -35,6 +35,7 @@ import {
 import { label } from "@/modules/company-config";
 import { PermittedAction } from "@/modules/identity/ui";
 
+import type { LearnedItem } from "../learned";
 import { NO_CHOICES, type Choices, type Mark } from "../mark";
 import { readTable } from "../read-file";
 import type { MarkedTable } from "../table";
@@ -103,9 +104,11 @@ export function ImportWizard() {
   const [choices, setChoices] = useState<Choices>(NO_CHOICES);
   const [banner, setBanner] = useState<Banner>(null);
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<{ id: string; created: number; learned: string[] } | null>(
-    null,
-  );
+  const [result, setResult] = useState<{
+    id: string;
+    created: number;
+    learned: LearnedItem[];
+  } | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
   // `keep` is the banner that stays once the preview is read again: after a conflict the person must still see why
@@ -499,8 +502,8 @@ export function ImportWizard() {
                   <div className="flex flex-col gap-1 text-sm">
                     <p className="text-muted-foreground">{C.learned}</p>
                     <ul className="list-disc pl-5" data-state="vua-hoc">
-                      {result.learned.map((w) => (
-                        <li key={w}>{w}</li>
+                      {result.learned.map((item, i) => (
+                        <li key={`${item.concept}-${i}`}>{C.learnedItem(item)}</li>
                       ))}
                     </ul>
                   </div>
@@ -577,7 +580,7 @@ function ApplyBatches(props: {
   open: () => Promise<string | null>;
   onBusy: (b: boolean) => void;
   onBanner: (b: Banner) => void;
-  onDone: (r: { id: string; created: number; learned: string[] }) => void;
+  onDone: (r: { id: string; created: number; learned: LearnedItem[] }) => void;
 }) {
   async function run() {
     props.onBusy(true);
@@ -585,7 +588,7 @@ function ApplyBatches(props: {
     if (!id) return props.onBusy(false);
     const { table, choices } = props;
     let created = 0;
-    let learned: string[] = [];
+    let learned: LearnedItem[] = [];
     for (let b = 0; b * BATCH < table.rows.length; b += 1) {
       const last = (b + 1) * BATCH >= table.rows.length;
       const allNewFieldCells: Record<string, string> = {};
@@ -593,7 +596,7 @@ function ApplyBatches(props: {
         table.rows.forEach((r, i) =>
           props.newFieldColumns.forEach((j) => (allNewFieldCells[`${i}:${j}`] = r[j] ?? "")),
         );
-      const res = await answer<{ created: number; learned?: string[] }>(
+      const res = await answer<{ created: number; learned?: LearnedItem[] }>(
         fetch(`/api/v1/imports/${id}/batches`, {
           method: "POST",
           headers: JSON_HEADERS,

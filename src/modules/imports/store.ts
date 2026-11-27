@@ -23,6 +23,7 @@ import {
   type Queryable,
 } from "@/modules/listings/server";
 
+import type { LearnedConcept, LearnedItem } from "./learned";
 import { markValue, type CellMark, type Choices, type UnitFound } from "./mark";
 import { markTable, type MarkedTable } from "./table";
 import { TEMPLATE_FIELD, type StandardTarget, type Target } from "./targets";
@@ -232,7 +233,7 @@ const STANDARD_COLUMN: Partial<Record<StandardTarget, keyof NewListing>> = {
 };
 
 export type BatchResult =
-  | { ok: true; created: number; done: boolean; learned?: string[] }
+  | { ok: true; created: number; done: boolean; learned?: LearnedItem[] }
   | { ok: false; problem: "not-found" | "closed" | "blocked-cells" };
 
 /**
@@ -353,7 +354,7 @@ export async function writeBatch(
     (await c.query(`select app.current_company_id()::text as id`)).rows[0] as { id: string }
   ).id;
   const done = await createListings(c, company, runId, items);
-  let learnedWords: string[] | undefined;
+  let learnedWords: LearnedItem[] | undefined;
   if (input.last) learnedWords = await learnAtEnd(c, runAs, runId, input, marked, learned);
   await c.query(
     `update import_runs set batches_done = array_append(batches_done, $2), created_count = created_count + $3,
@@ -384,8 +385,15 @@ async function learnAtEnd(
   input: ImportTable & { choices: Choices; allNewFieldCells?: Record<string, string> },
   marked: MarkedTable,
   learned: StoredLearned,
-): Promise<string[]> {
-  const words: string[] = [];
+): Promise<LearnedItem[]> {
+  const items: Record<LearnedConcept, string[]> = {
+    ImportTemplate: [],
+    CompanyLabel: [],
+    CustomField: [],
+    CompanyValueAlias: [],
+    CompanyCatalogAlias: [],
+    PendingUnit: [],
+  };
   const fields: FieldDraft[] = [];
   for (const col of marked.columns)
     if (col.target && "newField" in col.target) fields.push({ ...col.target.newField });
@@ -420,41 +428,41 @@ async function learnAtEnd(
       rest.join("|");
     if (field) aliases.push({ field, raw: raw.trim().slice(0, 40), value: v.value });
   }
-  const ids = await learnFromImport(
-    run,
-    {
-      template: null,
-      labels,
-      fields,
-      aliases: aliases.filter(
-        (a) => !a.field.startsWith("Unit.") || a.field === "Unit.directionFaces",
-      ),
-      pendingUnits: [],
-    },
-    standardHeaders,
-    (draft, code) => newCodes.set(fold(draft.name), code),
-  );
-  learned.fieldCodes.push(...ids.fieldCodes);
-  learned.labelIds.push(...ids.labelIds);
-  learned.aliasIds.push(...ids.aliasIds);
+  // One item a call, in the order fields, labels, spellings: an item the company already has is not learned, and the
+  // name of each one learned is the one the person gave it.
+  const none = { template: null, labels: [], fields: [], aliases: [], pendingUnits: [] };
+  const fieldOf = (draft: FieldDraft, code: string) => newCodes.set(fold(draft.name), code);
+  for (const f of fields) {
+    const ids = await learnFromImport(run, { ...none, fields: [f] }, standardHeaders, fieldOf);
+    learned.fieldCodes.push(...ids.fieldCodes);
+    if (ids.fieldCodes.length) items.CustomField.push(f.name);
+  }
+  for (const l of labels) {
+    const ids = await learnFromImport(run, { ...none, labels: [l] }, standardHeaders);
+    learned.labelIds.push(...ids.labelIds);
+    if (ids.labelIds.length) items.CompanyLabel.push(`«${l.label}»`);
+  }
+  for (const a of aliases.filter(
+    (a) => !a.field.startsWith("Unit.") || a.field === "Unit.directionFaces",
+  )) {
+    const ids = await learnFromImport(run, { ...none, aliases: [a] }, standardHeaders);
+    learned.aliasIds.push(...ids.aliasIds);
+    if (ids.aliasIds.length) items.CompanyValueAlias.push(`«${a.raw}»`);
+  }
   // Aliases of single choice fields this import created, now that their codes exist.
   for (const [key, v] of Object.entries(input.choices.values)) {
     const t = marked.columns[Number(key.split("|")[0])]?.target;
     if (!v.remember || v.value === null || !t || !("newField" in t)) continue;
     const code = newCodes.get(fold(t.newField.name));
     if (!code) continue;
+    const raw = key.split("|").slice(1).join("|");
     const more = await learnFromImport(
       run,
-      {
-        template: null,
-        labels: [],
-        fields: [],
-        aliases: [{ field: code, raw: key.split("|").slice(1).join("|"), value: v.value }],
-        pendingUnits: [],
-      },
+      { ...none, aliases: [{ field: code, raw, value: v.value }] },
       [],
     );
     learned.aliasIds.push(...more.aliasIds);
+    if (more.aliasIds.length) items.CompanyValueAlias.push(`«${raw}»`);
   }
   // Values of the custom fields created here, written onto this import's listings without a new version.
   for (const [cellKey, raw] of Object.entries(input.allNewFieldCells ?? {})) {
@@ -479,7 +487,10 @@ async function learnAtEnd(
       const raw =
         input.rows.map((r) => r[unitAt(marked)] ?? "").find((x) => fold(x) === code) ?? code;
       const id = await addCompanyUnitCode(c, raw, choice.unitKey);
-      if (id) learned.unitCodeIds.push(id);
+      if (id) {
+        learned.unitCodeIds.push(id);
+        items.CompanyCatalogAlias.push(raw);
+      }
     }
   if (marked.columns.every((col) => col.target)) {
     const columns: TemplateTarget[] = marked.columns.map((col) => {
@@ -503,18 +514,16 @@ async function learnAtEnd(
         },
         [],
       );
-      if (t.templateId) learned.templateId = t.templateId;
+      if (t.templateId) {
+        learned.templateId = t.templateId;
+        items.ImportTemplate.push(run0.file_name);
+      }
     }
   }
-  if (learned.templateId) words.push("template");
-  return [
-    ...words,
-    ...learned.labelIds.map(() => "label"),
-    ...learned.fieldCodes.map(() => "field"),
-    ...learned.aliasIds.map(() => "alias"),
-    ...learned.unitCodeIds.map(() => "unit-code"),
-    ...learned.pendingUnits.map(() => "pending-unit"),
-  ];
+  items.PendingUnit.push(...learned.pendingUnits.map((p) => p.rawCode));
+  return (Object.keys(items) as LearnedConcept[]).flatMap((concept) =>
+    items[concept].map((name) => ({ concept, name })),
+  );
 }
 
 function conceptOf(target: StandardTarget): string {
