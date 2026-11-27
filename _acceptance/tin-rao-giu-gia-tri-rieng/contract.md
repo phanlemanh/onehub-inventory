@@ -116,6 +116,8 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
   thái; trang chi tiết sửa được mọi thứ ở mọi cỡ).
 - Hỏi-4 · Chữ trên màn «Tin rao» / «Danh bạ» so với «Hàng» / «danh mục» hôm nay.
 - Hỏi-5 · Hướng chọn từ tám hướng cố định hay gõ chữ tự do.
+- Hỏi-9 · Sửa trên lưới: hai cột (Diện tích, Phòng ngủ; khuyên) hay năm cột (thêm Tầng, Hướng, Loại hình ngay sau Phòng ngủ).
+- Hỏi-10 · Chi tiết căn: mỗi khối một «Sửa» (khối căn của 3h, khối lần chào của 3g; khuyên) hay một «Sửa» mở một hộp chung.
 - Hỏi-7 · Tin có giá trị tệp rồi bị sàn gõ đè: «lấy lại» về danh mục (khuyên) hay về giá trị tệp trước rồi mới về danh mục.
 - Hỏi-8 · Mức đủ thông tin giữ năm phần của 3b, không gồm thuộc tính căn (khuyên: giữ) — gạch vế ấy khỏi ngưỡng của ô cơ hội.
 - Hỏi-6 · Dấu khác Danh bạ — chọn một trong 2–3 ứng viên ReUI có ảnh (khối mới).

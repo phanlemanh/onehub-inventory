@@ -115,8 +115,8 @@ function Section({
   /** A control on the section's head row, after the title (row 3e: ReportUnitError on the unit section). */
   action?: ReactNode;
   /**
-   * Why the section cannot be edited now (row 3h: a sold or withdrawn listing), in row 3g's words: the grid's lock beside
-   * the title and one quiet line under the head.
+   * Why the section cannot be edited now (row 3h: a sold or withdrawn listing), in row 3g's words: in the edit button's
+   * place on the head row, the grid's lock and one quiet line.
    */
   locked?: string | undefined;
   children: ReactNode;
@@ -124,17 +124,23 @@ function Section({
   return (
     <section data-slot={slot} aria-label={title} className="flex flex-col gap-2 border-t pt-4">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+        <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
           {title}
-          {locked ? <LockIcon aria-hidden="true" className="size-3" /> : null}
         </h3>
-        {action}
+        <div className="flex items-center gap-3">
+          {/* A blocked edit keeps its place: a quiet line with the lock and the reason, never a dimmed button. */}
+          {locked ? (
+            <p
+              data-slot="section-locked-reason"
+              className="flex items-center gap-1 text-xs text-muted-foreground"
+            >
+              <LockIcon aria-hidden="true" className="size-3" />
+              {locked}
+            </p>
+          ) : null}
+          {action}
+        </div>
       </div>
-      {locked ? (
-        <p data-slot="section-locked-reason" className="text-xs text-muted-foreground">
-          {locked}
-        </p>
-      ) : null}
       {children}
     </section>
   );

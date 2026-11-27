@@ -6,7 +6,7 @@
 // person who may edit, the way back to it. Three looks are offered for the owner to choose at the scope gate (Hỏi-6),
 // switched with `?mark=` outside production: a dot with a tooltip (the default), a light badge (after ReUI c-badge-16)
 // or an icon with a tooltip (c-tooltip-3). Its colour is the design system's info token (`--info`), in both themes.
-import { InfoIcon } from "lucide-react";
+import { InfoIcon, LockIcon } from "lucide-react";
 import { createContext, useContext, useState } from "react";
 
 import { Badge } from "@/components/reui/badge";
@@ -123,21 +123,14 @@ export function AttributeDiffersMark({
     </PopoverTrigger>
   );
   const command = lockedReason ? (
-    <>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        disabled
-        data-action="updateListing"
-        data-slot="attribute-revert"
-      >
-        {words.revert}
-      </Button>
-      <p data-slot="attribute-locked-reason" className="text-xs text-muted-foreground">
-        {lockedReason}
-      </p>
-    </>
+    // Blocked by the listing's status: the reason with the lock in the command's place, never a dimmed button.
+    <p
+      data-slot="attribute-locked-reason"
+      className="flex items-center gap-1 text-xs text-muted-foreground"
+    >
+      <LockIcon aria-hidden="true" className="size-3" />
+      {lockedReason}
+    </p>
   ) : onRevert ? (
     <Button
       type="button"

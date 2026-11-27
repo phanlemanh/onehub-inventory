@@ -33,4 +33,4 @@ Thuộc việc khung (G-2711-9: khung ngăn và lưới là việc riêng, gộp
 ngăn), C7 (tiêu điểm khi mở ngăn), C12 (nút ghim của đầu ngăn), C13 (đường phân cách đầu ngăn khi cuộn).
 
 C16 nằm sẵn trong 3h. C1 chạm đúng khối 3h sửa (khoá năm thuộc tính ở căn đã bán, AC-11) — máy khuyên nhận vào 3h.
-C10 chạm nút «Sửa» 3h thêm vào khối thông tin căn — máy khuyên nhận phần nút của 3h. Các điểm khác chờ chủ kho chọn.
+C10 chạm nút «Sửa» 3h thêm vào khối thông tin căn — máy khuyên nhận phần nút của 3h. C2 (giám sát chuyển từ BH, G-2711-11): máy khuyên ẩn «Hỏi đầu chủ» ở căn đã bán và ngừng hẳn, nhận vào 3h. C1, C2, C10 và Hỏi-10 cùng câu với «Chuẩn nút dùng chung» của phiên BH — chủ kho trả lời một nơi. Các điểm khác chờ chủ kho chọn.
