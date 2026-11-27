@@ -40,7 +40,6 @@ import {
   useEditOne,
   useOwnAttributes,
 } from "./unit-attributes-edit";
-import { CELL_EDIT_COPY } from "./cell-edit-copy";
 
 /** One listing of the unit as the record reads it; `confirmedDays` is counted on the server for the request. */
 export interface RecordListing {
@@ -243,9 +242,7 @@ export function ListingRecordFull({
   const statusName = statusLabel(picked.standardStatus, picked.transaction);
   const lockedWhy =
     words && revert && detailsLocked(picked.standardStatus)
-      ? picked.standardStatus === "Closed"
-        ? CELL_EDIT_COPY.lockedClosed(statusName)
-        : CELL_EDIT_COPY.lockedFinal(statusName)
+      ? RECORD_COPY.blocked(labels.unit, statusName, words.edit)
       : undefined;
   // Variant (b) of the scope gate (`?edit=one`): one edit button on top for both sections, none on the sections.
   const oneEdit = editOne && Boolean(words) && Boolean(labels.edit) && editable;

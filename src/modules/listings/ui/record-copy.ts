@@ -13,6 +13,13 @@ export const RECORD_COPY = {
   listingNumber: (n: number) => `Lần ${n}`,
   viewingEarlier: (n: number) => `Đang xem lần chào cũ · Lần ${n}`,
   backToNewest: "Về lần mới nhất",
+  /**
+   * Row 3h (C1, C2; the shared button rule, sentence 2): a task the listing's status blocks gives its place to one quiet
+   * line saying why: «<unit> <status>, không <task>», the three words from the label table (the owner's example is in
+   * design/behaviors.md, «Chuẩn nút dùng chung»).
+   */
+  blocked: (unit: string, status: string, task: string) =>
+    `${unit} ${status.toLocaleLowerCase("vi")}, không ${task.toLocaleLowerCase("vi")}`,
   /** «Mã căn»: the code of the unit, from the unit's label. */
   unitCode: (unit: string) => `Mã ${unit.toLocaleLowerCase("vi")}`,
   /** The heading of the unit's listings with their count, after the label passed in. */

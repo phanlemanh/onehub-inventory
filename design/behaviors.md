@@ -67,8 +67,9 @@ khi vai của phiên có ô cho thao tác của nút (`actionVisibility` cạnh 
      Hệ quả: «Đổi vai» của Thành viên hiện thẳng; hàng công cụ điện thoại của Bảng hàng hiện thẳng «Lưu góc nhìn» thay «…».
 - Thanh dính đáy hồ sơ (D, hàng 3e, giám sát G-1311-38): chỗ đặt thứ năm, ngoài vùng cuộn của thân, chứa đúng MỘT nút — bước
   kế với một con người («Hỏi đầu chủ» cho người không giữ căn; «Ghi cuộc gọi» của người giữ căn là hàng 14). Không phải thanh
-  công cụ. Không có nút thì không có thanh. Căn chưa ai giữ thì nút tắt và chữ nút nói vì sao — trạng thái của căn, không phải
-  quyền, nên không trái luật «không có nút mờ».
+  công cụ. Không có nút thì không có thanh. Căn chưa ai giữ, đã bán hay ngừng hẳn thì chỗ nút là một dòng chữ nhạt nói vì sao
+  («Căn chưa có đầu chủ giữ», «Căn đã bán, không hỏi đầu chủ»), không nút mờ (hàng 3h, C2 «Theo luật mới»; câu 2 của chuẩn nút
+  dùng chung).
 - Nút gửi tin cho người khác chỉ soạn tin rồi mở bảng chia sẻ của máy (`src/lib/share`); máy không có thì chép và báo; không
   lời gọi mạng nào (SP-3).
 - Trong mọi «…»: việc thường trước, việc xoá sau cùng, tách bằng một vạch, chữ đỏ. Vai đang xem không có việc nào ở chỗ ấy

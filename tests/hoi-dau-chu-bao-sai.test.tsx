@@ -261,25 +261,29 @@ describe("E3 · when the device has no share sheet", () => {
 // ---- E4 · a unit nobody keeps -------------------------------------------------------------------------------------
 
 describe("E4 · a unit nobody keeps", () => {
-  it("shows the button off, saying why, and asks nobody", () => {
+  // Row 3h (C2 «Theo luật mới», sửa sau ký of row 3e): the dimmed button became one quiet line saying why.
+  it("shows no button, one quiet line saying why, and asks nobody", () => {
     const { calls, copied } = fakeShare("ok", "ok");
     openRecord(rowKept("none"));
-    const button = askButton()!;
-    expect(button.disabled).toBe(true);
-    expect(button.textContent).toBe(ASK_COPY.unheld(WORDS.unit, WORDS.listAgent));
-    fireEvent.click(button);
+    expect(askButton()).toBeNull();
+    expect(
+      screen.queryAllByRole("button", { name: ASK_COPY.unheld(WORDS.unit, WORDS.listAgent) }),
+    ).toEqual([]);
+    const line = document.querySelector('[data-slot="ask-locked-reason"]')!;
+    expect(line.textContent).toBe(ASK_COPY.unheld(WORDS.unit, WORDS.listAgent));
     expect(calls).toEqual([]);
     expect(copied).toEqual([]);
   });
 
-  it("control: a unit someone else keeps has the button on", () => {
+  it("control: a unit someone else keeps has the button on and no reason line", () => {
     openRecord(rowKept("other"));
     expect(askButton()!.disabled).toBe(false);
+    expect(document.querySelector('[data-slot="ask-locked-reason"]')).toBeNull();
   });
 
-  it("break: a button left on for an unkept unit says «unheld unit asks nobody»", () => {
+  it("break: a button left for an unkept unit says «unheld unit asks nobody»", () => {
     openRecord(rowKept("other"));
-    expect(() => expect(askButton()!.disabled, "unheld unit asks nobody").toBe(true)).toThrow(
+    expect(() => expect(askButton(), "unheld unit asks nobody").toBeNull()).toThrow(
       /unheld unit asks nobody/,
     );
   });
@@ -289,8 +293,9 @@ describe("E4 · a unit nobody keeps", () => {
 
 describe("E5 · the ask button follows the permission table and the keeper", () => {
   const KINDS = ["other", "viewer", "none"] as const;
+  // A unit nobody keeps has no button since row 3h: its place holds the reason line (E4 above).
   const expected = (role: Role, kind: (typeof KINDS)[number]) =>
-    actionVisibility([role], "viewListings", false) === "show" && kind !== "viewer";
+    actionVisibility([role], "viewListings", false) === "show" && kind === "other";
 
   const cells = ROLES.flatMap((role) => KINDS.map((kind) => ({ role, kind })));
   it("covers twelve cells", () => expect(cells).toHaveLength(12));

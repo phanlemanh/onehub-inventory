@@ -4,6 +4,7 @@ import type { GridRow, RegionRecord } from "@/components/candidate/data-region";
 import { TypedCell } from "@/components/candidate/typed-cell";
 import { EMPTY, formatByKind } from "@/lib/format";
 import type { FieldKey, TypedColumn } from "@/components/candidate/column-kind";
+import type { ListingStandardStatus } from "@/generated/ontology";
 
 import Image from "next/image";
 import { Fragment, type ReactNode } from "react";
@@ -366,7 +367,13 @@ export function listingRecord(
         footer: words ? (
           <AskListAgent
             key={view.id}
-            listing={{ id: view.id, unitNumber: view.unitNumber, buildingName: building }}
+            listing={{
+              id: view.id,
+              unitNumber: view.unitNumber,
+              buildingName: building,
+              status: view.status as ListingStandardStatus,
+              ...(view.transaction ? { transaction: view.transaction } : {}),
+            }}
             keeper={full?.keepers ? (full.keepers[view.id] ?? null) : sampleKeeperOf(view.id)}
             words={words}
           />
