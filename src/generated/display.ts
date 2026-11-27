@@ -30,6 +30,7 @@ export const FIELD_DISPLAY = {
   "ImportRun.sheetName": "text",
   "ImportRun.status": "status",
   "ImportRun.undoneAt": "datetime",
+  "ImportRun.undoneBy": "person",
   "ImportTemplate.name": "text",
   "Listing.buildingName": "text",
   "Listing.closeDate": "date",

@@ -186,6 +186,8 @@ export interface ImportRun {
   createdAt: string;
   /** ISO datetime */
   undoneAt?: string;
+  /** id of Member */
+  undoneBy?: string;
   /** Fingerprint of the headers and choices the person saw when the import was opened; every batch must carry the same (migration 017). */
   tableHash?: string;
   /** Fingerprint of each slice of 200 rows opened; a batch is written only at its own place with its own rows (migration 017). */
