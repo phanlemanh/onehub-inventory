@@ -1,0 +1,160 @@
+schema_version: 1
+feature_slug: tin-rao-giu-gia-tri-rieng
+# Lệnh riêng của hồ sơ chạy qua _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh <E> (dựng ở S3; lane R Postgres
+# DB_LANE=r DB_PORT=5565). Lệnh dùng chung của kho đi qua config:.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/**, tests/tin-rao-gia-tri-rieng.test.ts]
+    expected: "exit 0; tests/tin-rao-gia-tri-rieng.test.ts: ma trận viết trước 5 thuộc tính × 4 nguồn (Typed, File, không có riêng + danh mục có, không có riêng + danh mục trống) cho effectiveAttributes — số assert bằng 20; mỗi ô so value, source, catalogValue, differs; differs so số theo số (72 và 72,0 bằng nhau) và chữ theo foldWords ('Đông Nam' và 'dong nam' bằng nhau); unitKind đọc Phòng ngủ hiệu lực (riêng 2, danh mục 3 → '2PN'); hàng lưới, hồ sơ căn, thẻ điện thoại, chữ ⌘K và lá cây địa lý dựng từ cùng một tin có giá trị riêng đều mang giá trị riêng (rút từ hàm thật của từng nơi, không viết tay chữ mong đợi); ca đối chứng cho một nơi đọc thẳng danh mục cho 'surface reads catalog instead of listing'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E1b
+    criterion: AC-1
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E1b
+    paths: [src/modules/listings/**, src/app/api/v1/listings/**, tests/db/tin-rao-gia-tri-rieng.db.test.ts]
+    expected: "exit 0; trên Postgres dãy R qua đường đọc thật của Bảng hàng (readInventory và mọi lọc chạy ở máy chủ): tin có Phòng ngủ riêng 2 (danh mục 3) và Diện tích riêng 72 (danh mục 70) — lọc Phòng ngủ = 2 trả tin ấy, lọc = 3 không trả; lọc Diện tích trong khoảng 71–73 trả tin ấy; tin không riêng lọc theo danh mục; ca đối chứng cho lọc đọc cột danh mục cho 'filter reads catalog value'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/edit-rules.ts, src/modules/listings/save-door.ts, src/modules/listings/ui/**, tests/tin-rao-gia-tri-rieng.test.ts]
+    expected: "exit 0; ma trận viết trước luật đọc ô: Diện tích nhận '72,5', '72.5', '72,5 m2', '72,5m²' → 72.5, từ chối '', 'bảy mươi', '0', '-3', '72,5,1' với câu lỗi ghim; Phòng ngủ nhận '0', '3', từ chối '2,5', 'Studio' (câu lỗi gợi 'gõ 0'); ô sửa gửi qua cửa giả đúng một thay đổi {field:'unitAttributes', livingArea:72.5} kèm version, không gửi khi chữ không đọc được; Hoàn tác gửi lại giá trị trước (kể cả null khi trước là theo Danh bạ); cửa giả trả 409 (phiên bản cũ) thì ô hiện đúng câu xung đột của write-failure.ts và trở về giá trị máy chủ trả; ca đối chứng gửi khi đọc hỏng cho 'unreadable value sent'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2b
+    criterion: AC-2
+    executor: ui-check
+    layer: ui-observed
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E2b
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    expected: "exit 0; trên Bảng hàng đăng nhập (Postgres dãy R) ở 1024 và 1440: chọn ô Diện tích của một tin đang mở, gõ '72,5', Enter → ô hiện '72,5 m²', thông báo đã lưu có Hoàn tác; tải lại trang thì ô vẫn '72,5 m²'; Hoàn tác trả ô về giá trị trước; gõ 'bảy mươi' hiện câu lỗi dưới ô và không có lời gọi PATCH nào (đếm mạng); ảnh evidence/E2b-1024.png, E2b-1440.png"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E3
+    criterion: AC-3
+    executor: ui-check
+    layer: ui-observed
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E3
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    expected: "exit 0; ở 360, 414, 1024, 1440 mở hồ sơ căn của một tin đang mở, bấm 'Sửa' ở khối thông tin căn, đổi năm trường (Diện tích, Tầng '15A', Phòng ngủ, Hướng chọn, Loại hình chọn), Lưu → đúng một PATCH mang năm giá trị; khối hiện năm giá trị mới; tầng '07' bị từ chối với câu lỗi ghim và không có PATCH; Hoàn tác trả cả năm; ảnh evidence/E3-<khổ>.png cho mỗi khổ"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E3b
+    criterion: AC-3
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/**, src/modules/catalog/unit-code.ts, tests/tin-rao-gia-tri-rieng.test.ts]
+    expected: "exit 0; luật tầng của 3h gọi đúng hàm của danh mục (unit-code.ts): ma trận '7','15A','0' nhận, '07','A15','',' 7 ' (sau trim nhận '7') — kết quả bằng kết quả hàm danh mục trên cùng chữ (rút từ hàm thật, không chép bảng); Loại hình chỉ nhận bốn giá trị của Unit.propertySubType trong ontology sinh ra; ca đối chứng viết luật tầng thứ hai cho 'second floor rule'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-4
+    executor: ui-check
+    layer: ui-observed
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E4
+    paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    expected: "exit 0; dữ liệu mẫu có bốn tin: riêng khác danh mục, riêng bằng danh mục, danh mục trống, căn chờ khớp; ở 1440 và 360 chỉ tin thứ nhất có dấu (đếm phần tử data-slot attribute-differs bằng 1 trên lưới và 1 trong hồ sơ căn), tên truy cập là chữ của khái niệm dấu khác danh mục trong ontology/labels.yaml (đọc từ bảng nhãn, không viết tay) nối giá trị danh mục; màu chữ của ô có dấu bằng ô không dấu (getComputedStyle color); axe không có lỗi ở sáng và tối; ca đối chứng gắn dấu cho ô bằng danh mục cho 'mark on equal value'; ảnh evidence/E4-1440.png, E4-360.png"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E5
+    criterion: AC-5
+    executor: ui-check
+    layer: ui-observed
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E5
+    paths: [src/modules/listings/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    expected: "exit 0; ở 1440 trên ô có dấu và ở 360 trong hồ sơ căn: chọn lệnh lấy lại (tìm theo chữ đọc từ ontology/labels.yaml, không viết tay) → PATCH mang giá trị null cho đúng thuộc tính ấy; ô hiện giá trị danh mục, dấu tắt; đọc lại từ cơ sở dữ liệu: cột giá trị và cột nguồn đều null; Hoàn tác trả giá trị riêng và nguồn cũ (đọc lại cơ sở dữ liệu); ca tin nguồn File bị gõ đè rồi lấy lại: kỳ vọng theo câu trả lời Hỏi-7 (khuyên: về danh mục, cột nguồn null); ca đối chứng dùng chữ cứng khác bảng nhãn cho 'label not from labels.yaml'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E6
+    criterion: AC-6
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E6
+    paths: [db/migrations/**, src/modules/listings/**, src/modules/catalog/**, tests/db/tin-rao-gia-tri-rieng.db.test.ts]
+    expected: "exit 0; tests/db/tin-rao-gia-tri-rieng.db.test.ts trên Postgres dãy R: ba tin trỏ căn X (riêng Typed, riêng File, không riêng); vai chủ danh mục đổi living_area của X → hai tin riêng giữ nguyên giá trị và nguồn (so từng cột), tin không riêng đọc qua readInventory hiện giá trị mới; trước và sau mọi lệnh sửa, lấy lại, gắn sang căn khác của vai ứng dụng: số dòng và md5 toàn bảng catalog_units không đổi; vai ứng dụng update catalog_units bị từ chối (42501); ràng buộc cột nguồn null ⇔ cột giá trị null: chèn nguồn không giá trị bị từ chối; ca đối chứng cho trigger đè giá trị riêng khi danh mục đổi cho 'catalog overwrote listing value'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-7
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E7
+    paths: [db/migrations/**, src/modules/imports/**, src/modules/listings/**, tests/db/tin-rao-gia-tri-rieng.db.test.ts]
+    expected: "exit 0; tệp mẫu năm cột (rút khuôn từ bộ đọc tiêu đề thật của hàng 11, không viết tay tiêu đề) nhập ba dòng: mỗi tin mới có năm giá trị nguồn File đúng dòng (so qua listingIdOf); ô 'Loại căn' = '2PN' không thành giá trị Loại hình, còn trong kept với dấu cần người; lần nhập cũ dựng bằng chính đường ghi của hàng 11 khi bước đặt giá trị của 3h tắt (bộ ghi thật sinh kept, không chèn tay; hai tin, rồi một tin được PATCH giá trị Typed) → sau bước đọc lại: tin chưa riêng nhận giá trị File, tin Typed giữ nguyên; số tin nhận giá trị File bằng số dòng có ô đọc được; chạy bước đọc lại hai lần ra cùng kết quả; ca đối chứng cho bước đọc lại đè Typed cho 'file overwrote typed'; ca đối chứng kept sai hình (đổi khoá row) cho 'kept shape unread' — đỏ có tên, không im lặng ra 0"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-8
+    executor: ui-check
+    layer: ui-observed
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E8
+    paths: [src/modules/imports/**, src/modules/listings/ui/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    expected: "exit 0; ở 1440 và 360 bước xem trước của lần nhập với tệp có một dòng Diện tích khác danh mục của căn khớp và một dòng bằng: đúng một ô có dấu khác Danh bạ (cùng data-slot attribute-differs của lưới) kèm giá trị danh mục; ô ấy vẫn hiện giá trị tệp là giá trị sẽ ghi; ảnh evidence/E8-1440.png, E8-360.png"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E9
+    criterion: AC-9
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E9
+    paths: [src/modules/listings/**, src/modules/company-config/**, tests/db/tin-rao-gia-tri-rieng.db.test.ts]
+    expected: "exit 0; tin trỏ căn chờ khớp: PATCH năm giá trị → đọc lại có năm giá trị nguồn Typed, effectiveAttributes differs false cho cả năm; chạy matchPendingUnits khi danh mục có căn cùng mã (Diện tích khác, Phòng ngủ bằng) → giá trị riêng giữ nguyên từng cột, chỉ Diện tích differs true; ca đối chứng xoá giá trị riêng khi khớp cho 'match dropped listing values'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-10
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E10
+    paths: [src/modules/listings/**, src/app/api/v1/listings/**, tests/db/tin-rao-gia-tri-rieng.db.test.ts]
+    expected: "exit 0; qua /api/v1: gắn tin T (riêng Diện tích Typed) từ căn X sang căn Y → listing_units.upi = Y, Diện tích riêng giữ, Phòng ngủ (không riêng) đọc theo Y; gắn sang căn Z đã có tin mở → 409 với câu nêu mã căn Z, liên kết và giá trị không đổi; lưới không có lệnh gắn (tìm theo tên trong menu ô bằng 0); ca đối chứng cho phép hai tin mở trên Z cho 'two open listings on one unit'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10b
+    criterion: AC-10
+    executor: ui-check
+    layer: ui-observed
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E10b
+    paths: [src/modules/listings/ui/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    expected: "exit 0; ở 1440 và 360 trong hồ sơ căn: 'Gắn sang căn khác' mở ô tìm mã căn của hàng 12, chọn căn Y → hồ sơ hiện mã căn Y, Diện tích riêng còn, dấu tính theo Y; chọn căn đã có tin mở → câu lỗi nêu mã căn, hồ sơ không đổi; ảnh evidence/E10b-1440.png, E10b-360.png"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E11
+    criterion: AC-11
+    executor: script
+    layer: backend-effect
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E11
+    paths: [db/migrations/**, db/scripts/cach-ly.sh, src/modules/listings/**, src/app/api/v1/listings/**, tests/db/tin-rao-gia-tri-rieng.db.test.ts]
+    expected: "exit 0; bộ kiểm cách ly (db/scripts/cach-ly.sh) xanh với ca mới: người sàn B select năm cột riêng của tin sàn A ra 0 dòng, update ra 0 dòng; ma trận viết trước bốn vai × ba lệnh (sửa, lấy lại, gắn sang căn khác) qua /api/v1: 200 khi vai có updateListing, 403 khi không (số assert bằng 12, vai rút từ bảng quyền thật); tin Closed và Withdrawn: PATCH unitAttributes → 400 với lý do khoá; ca đối chứng mở chính sách đọc cho sàn khác cho 'other company reads listing values'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11b
+    criterion: AC-11
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/ui/**, src/modules/identity/**, tests/tin-rao-gia-tri-rieng.test.ts]
+    expected: "exit 0; ma trận bốn vai qua ActionPermissionProvider dựng từ actionVisibility thật: lệnh Sửa thuộc tính, Lấy lại, Gắn sang căn khác hiện khi và chỉ khi vai có updateListing; nút Báo sai thông tin căn hiện cho mọi vai có viewListings; ca đối chứng so tên vai thay bảng quyền cho 'role name instead of permission table'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.check
+    paths: [ontology/**, src/generated/**, wiki/**]
+    expected: "exit 0; make check xanh: Listing.yaml có năm thuộc tính mang đúng tên reso của Unit (LivingArea, UnitFloorLocation, BedroomsTotal, DirectionFaces, PropertySubType) và khái niệm riêng AttributeSource có trong bảng thuật ngữ; ô vòng đời Unit.sua vẫn 'khong'; nhãn mới đến từ ontology/labels.yaml"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.sua_tren_o
+    paths: [src/modules/listings/edit-rules.ts, src/modules/listings/save-door.ts, src/components/candidate/**]
+    expected: "exit 0; bộ bài của hàng 4 chạy lại không đổi một ca (giá, trạng thái, ô máy tính ra không sửa); cộng ca mới trong src/components/candidate/data-region-cell-edit.test.tsx: dưới 768 px ô Diện tích, Phòng ngủ không mở sửa (gõ, Enter, F2 không mở khung), từ 768 px mở; ca đối chứng mở sửa ở 360 cho 'phone cell opened for edit'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
