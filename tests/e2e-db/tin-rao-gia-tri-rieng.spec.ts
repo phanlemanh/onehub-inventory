@@ -232,7 +232,8 @@ test("lay-lai: the mark's command takes the catalog value back — value and sou
 test("khoa-ba-trang-thai: sold and withdrawn keep «Sửa» and «Hỏi đầu chủ» as quiet lines; an unkept unit has its line; «Sửa» is 44 px on a phone (E14b)", async ({
   page,
 }, info) => {
-  test.skip(!["360", "1440"].includes(info.project.name), "E14b measures 360 and 1440");
+  test.skip(!["360", "414", "1440"].includes(info.project.name), "E14b measures 360, 414 and 1440");
+  const phone = ["360", "414"].includes(info.project.name);
   const w = await world(info, "khoa", ["TeamLead"]);
   await signIn(page, w.email, w.mau);
   for (const theme of ["light", "dark"] as const) {
@@ -261,7 +262,7 @@ test("khoa-ba-trang-thai: sold and withdrawn keep «Sửa» and «Hỏi đầu c
       page.locator('[data-slot="ask-list-agent"]').filter({ visible: true }),
     ).toHaveCount(1);
     const height = (await editOpen(page).boundingBox())!.height;
-    if (info.project.name === "360") expect(height, "vùng bấm Sửa 360").toBeGreaterThanOrEqual(44);
+    if (phone) expect(height, `vùng bấm Sửa ${info.project.name}`).toBeGreaterThanOrEqual(44);
     else expect(height, "nút Sửa 1440").toBe(28);
   }
 });
