@@ -3,10 +3,10 @@ schema_version: 1
 slug: tin-rao-giu-gia-tri-rieng
 feature: "Đầu chủ sửa được diện tích, tầng, phòng ngủ, hướng và loại hình của căn mình chào — ngay trên ô ở máy tính và trong chi tiết căn ở mọi cỡ màn — và giá trị ấy là của sàn: danh mục dùng chung chỉ điền chỗ sàn chưa có, ô khác danh mục có dấu nhỏ và lệnh «lấy lại theo Danh bạ»"
 owner: phanlemanh@gmail.com
-stage: discovery              # discovery | decided | archived
-decision:         # build | iterate | park | kill — người ký Cổng 0 điền
-decided_by:
-decided_at:     # ISO UTC
+stage: decided              # discovery | decided | archived
+decision: build   # build | iterate | park | kill — người ký Cổng 0 điền
+decided_by: Manh Phan
+decided_at: 2026-11-27T01:52:16Z   # ISO UTC
 prototype:
   base_commit:     # điểm cắt nhánh proto khỏi nhánh chính — guard diffBase khi keep
   disposition:     # keep | archive
@@ -81,3 +81,12 @@ là dữ liệu riêng của sàn.
 - Kết quả nào là SỐNG: [đề xuất] Đầu chủ sửa một trong năm thuộc tính trên ô hoặc trong chi tiết căn thì Bảng hàng, hồ sơ căn và mức đủ thông tin hiện giá trị của sàn; danh mục dùng chung không đổi một dòng; ô khác danh mục có dấu nhỏ, bấm «lấy lại theo Danh bạ» thì ô về giá trị danh mục và nguồn về «theo Danh bạ»; danh mục đổi về sau không đè giá trị sàn gõ hay nhập từ tệp; căn chờ khớp giữ được năm thuộc tính trước khi khớp; sàn khác không thấy giá trị của sàn này (SP-1); kiểm tra, câu lỗi, hoàn tác dùng luật của hàng 4; giá và trạng thái giữ luật đã ký, ô máy tính ra không sửa
 - Kết quả nào là CHẾT: [đề xuất] chưa đạt «Đầu chủ sửa một trong năm thuộc tính trên ô hoặc trong chi tiết căn thì Bảng hàng, hồ sơ căn và mức đủ thông tin hiện giá trị của sàn; danh mục dùng chung không đổi một dòng; ô khác danh mục có dấu nhỏ, bấm «lấy lại theo Danh bạ» thì ô về giá trị danh mục và nguồn về «theo Danh bạ»; danh mục đổi về sau không đè giá trị sàn gõ hay nhập từ tệp; căn chờ khớp giữ được năm thuộc tính trước khi khớp; sàn khác không thấy giá trị của sàn này (SP-1); kiểm tra, câu lỗi, hoàn tác dùng luật của hàng 4; giá và trạng thái giữ luật đã ký, ô máy tính ra không sửa» khi hết timebox
 - Timebox: một vòng lát A (Cổng Phạm vi → Cổng Bằng chứng) trong đợt dieu-phoi-nen, sau khi 3g gộp.
+
+## Lời chủ kho ở Cổng Đáng
+
+2026-11-27, tại phiên dãy R, nguyên văn: «Cổng Đáng 3h: đáng, làm · (a) Bảng hàng đủ cột: hàng riêng sau 3h · (b) lỗi
+ngăn chi tiết: sửa trong trang chi tiết của 3h, tôi liệt kê lỗi ở Cổng Phạm vi».
+
+- Quyết: làm (lát A).
+- (a) «Bảng hàng đủ cột như Quỹ hàng» là hàng riêng, đứng sau 3h.
+- (b) Lỗi ngăn chi tiết căn sửa trong trang chi tiết của 3h; chủ kho liệt kê ở Cổng Phạm vi.
