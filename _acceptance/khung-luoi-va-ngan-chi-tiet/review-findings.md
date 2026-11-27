@@ -1,12 +1,68 @@
-# Review findings: khung-luoi-va-ngan-chi-tiet (round 2)
+# Review findings: khung-luoi-va-ngan-chi-tiet (round 3)
 
 ## Trong hợp đồng
 
-Không có finding nào được map vào AC (phân loại phạm vi không chạy được, xem mục dưới).
+Không có.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
+
+- **Pinned-edge test silently drops the 'shadow only on the last pinned column' and header-cell checks, and its doc still claims them**
+  Người dùng thấy gì: Khi ghim hai cột, nếu cột ghim bên trong cũng đổ bóng hoặc tiêu đề thiếu bóng thì bài kiểm tự động sẽ không báo. Người dùng có thể thấy bóng ở sai chỗ mà không ai phát hiện sớm.
+  Căn cứ: Màn hình vẫn đúng điều chủ kho đã duyệt, chỉ là lưới an toàn tự động lỏng hơn trước; lỗi nếu có chỉ là thẩm mỹ, người dùng không mất dữ liệu và việc dặn lại bài kiểm có thể làm sau.
+  file: `tests/e2e/sheet.spec.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **E2 expectation for dark theme changed by a supervisor ruling (G-2711-28) that is not in the decision ledger and contradicts E18**
+  Người dùng thấy gì: Hồ sơ nghiệm thu nói hai điều khác nhau về nền ngăn ở giao diện tối, và phán quyết của giám sát chưa được ghi vào sổ. Người dùng không thấy khác biệt gì, nhưng người đọc hồ sơ sau này sẽ khó biết điều nào là đúng.
+  Căn cứ: Không ảnh hưởng gì đến người dùng cuối, chỉ làm hồ sơ khó đọc; bổ sung dòng sổ sau là rẻ và không làm hỏng gì khi chưa làm.
+  file: `_acceptance/khung-luoi-va-ngan-chi-tiet/evals.yaml`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Orphaned or duplicated JSDoc blocks left behind by the rewrite**
+  Người dùng thấy gì: Một vài chú thích trong mã kiểm thử bị dư hoặc đặt nhầm chỗ. Người dùng không bị ảnh hưởng gì.
+  Căn cứ: Chỉ là chuyện gọn mã của bài thử, không tác động tới sản phẩm, nên chấp nhận và không mở việc.
+  file: `tests/e2e/do-diem-anh.ts`
+  severity: low
+  Đề xuất: wont-fix
+
+- **In light theme, the record's left-line check passes on the shadow alone, so a missing or invisible line goes unnoticed**
+  Người dùng thấy gì: Ở giao diện sáng, nếu viền bên trái của ngăn chi tiết vô tình biến mất hoặc trùng màu nền thì bài kiểm tự động vẫn cho qua vì bóng đã làm mép trông tối. Người dùng khi đó sẽ thấy ngăn kém tách khỏi lưới.
+  Căn cứ: Hậu quả chỉ là mép ngăn kém rõ, không mất dữ liệu và dễ thấy khi xem tay; chi phí siết bài đo không lớn nhưng ngoài điều đã ký.
+  file: `tests/e2e/khung-luoi-nut.spec.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Hình dạng 1 (đo chỉ dẫn thay vì đầu ra) + 4: «viền trái thấy được» của Q3 chỉ đỏ được qua borderLeftWidth khai báo; phần đo điểm ảnh ở nền sáng thật ra đo bóng**
+  Người dùng thấy gì: Bài kiểm tự động cho «viền trái thấy được» thực ra chỉ chắc chắn bắt được lỗi khi viền bị khai báo bằng 0, còn viền có mà không nhìn thấy thì có thể lọt. Người dùng có thể gặp ngăn không có đường viền rõ ở giao diện sáng.
+  Căn cứ: Lỗi nếu xảy ra chỉ là thẩm mỹ, tự khỏi khi sửa kiểu và không mất dữ liệu; giữ như hiện tại và ghi lại hạn chế này là hợp lý.
+  file: `tests/e2e/khung-luoi-nut.spec.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Hình dạng 4 (khẳng định âm tính đứng một mình, không có đối chứng dương): lần kiểm «no shadow shows on the grid» trong vòng tối vẫn ném lỗi dù ngăn đã sửa đúng**
+  Người dùng thấy gì: Ở giao diện tối, bài kiểm tự động nói bóng của ngăn bị cắt thì không chứng minh được gì, vì bóng ở nền tối vốn đã quá nhạt. Người dùng có thể thấy bóng ngăn bị cắt ở giao diện tối mà bài kiểm không báo.
+  Căn cứ: Bóng ở nền tối vốn rất nhẹ nên hậu quả thị giác nhỏ, không mất dữ liệu; chỉ là bài kiểm bớt chắc ở một nhánh.
+  file: `tests/e2e/khung-luoi-nut.spec.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 5 (tuyên quét cả lớp nhưng chỉ đo một điểm): JSDoc của assertPinnedEdge vẫn hứa phần tiêu đề và «không cột ghim nào khác», nhưng mã đã bỏ cả hai**
+  Người dùng thấy gì: Phần ghi chú của bài kiểm nói nó bảo vệ cả tiêu đề và các cột ghim khác, nhưng thực tế không. Người dùng có thể gặp bóng sai ở những chỗ ấy mà không ai biết là chưa được kiểm.
+  Căn cứ: Chỉ làm người đọc hiểu sai phạm vi bảo vệ, không đổi gì cho người dùng; sửa chú thích rẻ nhưng không cần gấp.
+  file: `tests/e2e/sheet.spec.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 2 (mẫu đối chứng làm tay, không rút được từ bên tạo): hai khung đỏ khong-tach của E18 không có lệnh nào sinh lại**
+  Người dùng thấy gì: Hai ảnh dùng làm mẫu «ngăn không tách khỏi lưới» được làm tay, nên khó chụp lại đúng cùng điều kiện về sau. Người dùng không bị ảnh hưởng, chỉ việc kiểm lại bằng mắt có thể kém chắc.
+  Căn cứ: Chỉ liên quan tới bằng chứng nghiệm thu, không tới màn hình người dùng; nếu ảnh cũ lệch thì chụp lại là xong, không mất gì.
+  file: `_acceptance/khung-luoi-va-ngan-chi-tiet/evals.yaml`
+  severity: low
+  Đề xuất: known-limits
 
 - **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): chiều đỏ 'grid ends' của Q2 đưa số tự đặt vào assertGridFits (r1 · tệp đã đổi)**
   Người dùng thấy gì: Bài kiểm tra việc lưới khít màn có thể vẫn xanh nếu sau này lưới dừng sai chỗ, nên một lỗi về chỗ dừng của lưới có thể lọt qua mà không ai biết. Hiện màn vẫn chạy đúng.
@@ -50,46 +106,4 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: wont-fix
 
-## Chưa phân loại (triage-failed)
-
-phân loại phạm vi không chạy được — không lỗi nào bị máy tự sửa, người xem lại toàn bộ
-
-- **L4 comment now sits above the new record shadow, not the pinned-edge shadow it describes**
-  file: `src/app/globals.css:9`
-  severity: low
-  source: conventions
-  detail: The new comment and `--shadow-record-float` (lines 10-12) were inserted between the existing comment on line 9 and `--shadow-pinned-edge` (line 13). That comment explains `--shadow-pinned-edge` ("The last column pinned at the start casts this over the columns scrolling under it ... L4"). It now sits directly above a second comment and the floating-record token. Anyone reading the file will take the L4 note as describing the record shadow, and `--shadow-pinned-edge` is left with no explanation. Fix: put the new block (comment plus `--shadow-record-float`) after the `--shadow-pinned-edge` declaration, or move the L4 comment back down next to the token it explains. Only the comment is out of place; the token values and the CSS still work.
-
-- **Bóng đổ sang lưới vẫn bị cắt: lớp overflow-visible thua style inline overflow:auto của react-resizable-panels**
-  file: `src/components/candidate/record-panel.tsx:522`
-  severity: high
-  source: bugs
-  detail: Bản sửa Q3 trông vào biến thể `[&_[data-slot=resizable-panel]>div:has(>aside)]:overflow-visible` để bóng của ngăn nổi không bị cắt. Nhưng react-resizable-panels 4.22.1 (node_modules/react-resizable-panels/dist/react-resizable-panels.js, khoảng dòng 4003-4011) dựng ô bên trong của Panel với style inline `overflow: "auto"`. Lớp Tailwind này không có `!important`, nên style inline thắng và ô ấy vẫn cắt mọi thứ vượt mép trái của `aside`. Lớp bóng mới `-12px 0 24px -10px` trong `--shadow-record-float` (globals.css) vì thế không bao giờ đổ sang lưới. Tôi đã đọc điểm ảnh trong khung bằng chứng `evidence/sau/ngan-1440-light.png`, chụp lại ở commit 603a2961 sau khi sửa: các cột x=880..919 (bên trái viền ngăn ở x=920) đều là (255,255,255) tuyệt đối, không có dải tối dần nào. Như vậy ở nền sáng ngăn vẫn không tách khỏi lưới, tức kỳ vọng mới của E18 («dải bóng tối dần đổ sang lưới ngay bên trái ngăn (nền ngăn trắng như trang)») chưa đạt. Cách sửa: dùng `!overflow-visible`, hoặc truyền `style={{ overflow: "visible" }}` cho ResizablePanel (prop style được gộp đè lên sau overflow:auto).
-
-- **Bài kiểm Q3 chỉ đọc chuỗi box-shadow tính được nên không bắt được bóng bị cắt**
-  file: `tests/e2e/khung-luoi-nut.spec.ts:228`
-  severity: medium
-  source: bugs
-  detail: `assertSurface` chỉ dò chuỗi `getComputedStyle(aside).boxShadow` có khớp `/-\d+(\.\d+)?px 0px/` hay không. Chuỗi ấy khớp dù bóng có hiện ra thật hay bị ô bọc `overflow:auto` của Panel cắt mất, nên bài kiểm xanh trong lúc bóng đổ sang lưới vô hình (xem finding ở record-panel.tsx:522). Bài «break» mới cũng chỉ đối chứng chuỗi CSS, không đối chứng chuyện bị cắt. Bài kiểm vì thế báo đạt cho đúng cái lỗi mà nó được viết ra để chặn. Muốn bắt được thì phải đo cái thật sự hiển thị: kiểm `getComputedStyle(aside.parentElement).overflow === 'visible'` (và với mọi tổ tiên tới mép trái ngăn), hoặc lấy mẫu điểm ảnh ngay bên trái viền ngăn trong ảnh chụp.
-
-- **Hình dạng 1 (đo chỉ dẫn thay vì đầu ra): kiểm tra bóng đổ sang lưới chỉ đọc chuỗi box-shadow đã tính, không bắt được việc bóng bị cắt**
-  file: `tests/e2e/khung-luoi-nut.spec.ts:228`
-  severity: high
-  source: measurement
-  detail: Commit 603a2961 nói lỗi ở vòng 1 là ô bên trong của ResizablePanel đã cắt mất bóng. Bản sửa là lớp `[&_[data-slot=resizable-panel]>div:has(>aside)]:overflow-visible` trong record-panel.tsx, cộng thêm token `--shadow-record-float`. Thế nhưng phép đo mới chỉ đọc `getComputedStyle(aside).boxShadow` (dòng 213 trong recordSurface) rồi cho qua regex `/-\d+(\.\d+)?px 0px/` ở dòng 228. Giá trị box-shadow tính được trên aside không đổi dù phần tử cha có overflow:hidden hay không. Vì vậy nếu bỏ lớp overflow-visible, tức là quay lại đúng lỗi vòng 1, cả hai test `popover colour, left line, shadow (light|dark)` vẫn xanh. Phép đo xác nhận khai báo CSS (chỉ dẫn) chứ không xác nhận bóng thật sự hiện trên lưới (đầu ra). Phép phá ở dòng 246-258 cũng chỉ thay khai báo box-shadow, không thử trường hợp bóng bị cắt, nên không lấp được chỗ hở này.
-
-- **Hình dạng 3 (kiểm chuỗi có mặt trong khi lời hứa là quan hệ giữa các giá trị): regex 'độ lệch x âm' không bảo đảm có bóng tràn sang trái**
-  file: `tests/e2e/khung-luoi-nut.spec.ts:228`
-  severity: medium
-  source: measurement
-  detail: Lời hứa của Q3/E18 là bóng tràn ra ngoài mép trái của ngăn và đổ lên lưới. Đây là quan hệ giữa độ lệch x, độ nhoè, độ loang (spread) và việc có `inset` hay không. Assert ở dòng 228 chỉ kiểm có chuỗi con dạng `-Npx 0px` trong box-shadow đã tính. Các trường hợp sau vẫn qua: (a) bóng có loang âm triệt tiêu độ lệch, ví dụ `-12px 0px 0px -12px`, không tràn ra pixel nào; (b) bóng `inset`, ví dụ Chrome xuất `rgb(...) -1px 0px 0px 0px inset`, nằm bên trong ngăn; (c) bóng hắt lên trên, ví dụ `0px -4px 0px ...` chứa `-4px 0px`, vì regex không neo vào vị trí của độ lệch x. Assert này không so các giá trị với nhau để chứng minh có phần bóng nằm bên trái mép ngăn.
-
-- **Hình dạng 6 (đo bản chụp không thuộc cây đang kiểm): E18 chấm các khung sau/ chụp trước bản sửa bóng**
-  file: `_acceptance/khung-luoi-va-ngan-chi-tiet/evals.yaml:149`
-  severity: high
-  source: measurement
-  detail: Bước mới ở dòng 149 và kỳ vọng mới ở dòng 150 yêu cầu chấm sau/ngan-1440-light.png và sau/ngan-1440-dark.png theo tiêu chí 'dải bóng tối dần đổ sang lưới ngay bên trái ngăn'. `git log` cho thấy hai tệp này chỉ được commit một lần, ở 3e3a4208 (15:26). Mốc này trước cả hai commit sửa bóng: 603a2961 (thêm overflow-visible và --shadow-record-float) và 2bef2d59 (bóng đen ở cả hai nền). Từ 3e3a4208 đến HEAD, src/ có đổi ở globals.css, record-panel.tsx, data-region.tsx và save-view-buttons.tsx, nhưng thư mục sau/ không được chụp lại. Hơn nữa không script nào trong repo sinh lại các khung này: không có tệp .ts, .sh hay .py nào tham chiếu tới ngan-1440. Hệ quả là người chấm E18 nhìn ảnh của mã trước bản sửa, không phải cây đang kiểm. Phép đối chứng đỏ (pha/*-khong-tach.png) cũng đem so với những khung cũ đó.
-
-## Chưa adversarial-verify (refuter chết)
-
-Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
+⚠ Cụm ngoài vùng phủ: 2/8 lỗi rơi vào file không bộ đo nào phủ (_acceptance/khung-luoi-va-ngan-chi-tiet/evals.yaml) — dừng và quyết: mở rộng hợp đồng hay rút phạm vi.

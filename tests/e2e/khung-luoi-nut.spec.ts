@@ -113,7 +113,6 @@ test.describe("L3 · the filter row stands level", () => {
 
 // ---- L6 · the fold handle shows on the column's edge --------------------------------------------------------------
 
-/** With the pointer on the second column's edge, away from the handle, the handle stands out and names itself. */
 /**
  * With the pointer on the second column's edge, away from the handle, the handle's frame shows on screen: the pixel
  * columns at the frame's left and right sides change against the same columns with the pointer away (measured on

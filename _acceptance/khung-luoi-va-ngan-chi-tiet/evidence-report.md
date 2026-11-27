@@ -1,24 +1,21 @@
 ---
 schema_version: 2
 feature_slug: khung-luoi-va-ngan-chi-tiet
-verdict: BLOCKED
-triage_failed: true
-failed_evals: [E18]
-reason: |
-  E6 không chạy được: webServer của config Playwright không khởi động được vì cổng 3613 đã bị tiến trình khác chiếm (listen EADDRINUSE :::3613). Lệnh `bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E6` chạy đúng một lần, không sửa code, không đổi branch, không chạy lại. Cần giải phóng cổng 3613 (hoặc dừng server đang chạy trên đó) rồi chạy lại E6.
-  E15 không có kết quả: lệnh `bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E15` — agent bị skip/chết, không được tính là pass.
+verdict: REJECT
+failed_evals: ["E13","E14","E15"]
+reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: f29510740345d6150c1e988322be231279653309
+verified_commit: 3ab4277edd1f3b741ff1293efdb6204ae2b3d80b
 human_signoff:
 ---
 
 # Evidence Report: khung-luoi-va-ngan-chi-tiet
 
-⚠ phân loại phạm vi KHÔNG chạy được — không lỗi nào được máy tự sửa; danh sách đầy đủ nằm trong review-findings.md và người xem lại toàn bộ trước khi ký.
+Round 3. Ba eval đỏ: E13 (make check), E14 (make e2e), E15 (bài trình duyệt có đăng nhập trên Postgres). Các eval tính năng E1–E12, E17, E18, E20–E22 xanh. E16 mang từ round 1.
 
-Round 2. Lệnh fail không gắn eval: `ui-check:E18` (gắn E18, đã tính trong bảng).
+Lệnh fail không gắn eval ngoài ba eval trên: không có. Ba lệnh fail đều đã gắn eval: `make check` gắn E13, `DATABASE_URL= make e2e` gắn E14, `bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E15` gắn E15.
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
@@ -27,226 +24,240 @@ Round 2. Lệnh fail không gắn eval: `ui-check:E18` (gắn E18, đã tính tr
 | E3 | AC-3 | script | PASS |
 | E4 | AC-2 | script | PASS |
 | E5 | AC-3 | script | PASS |
-| E6 | AC-4 | script | BLOCKED (cổng 3613 bị chiếm, không chạy được) |
+| E6 | AC-4 | script | PASS |
 | E7 | AC-5 | script | PASS |
-| E8 | AC-6 | script | PASS (carry-forward từ round 1) |
+| E8 | AC-6 | script | PASS |
 | E9 | AC-7 | script | PASS |
 | E10 | AC-8 | script | PASS |
 | E11 | AC-9 | script | PASS |
 | E12 | AC-10 | script | PASS |
-| E13 | AC-11 | script | PASS |
-| E14 | AC-11 | script | PASS |
-| E15 | AC-11 | script | BLOCKED (agent bị skip/chết, không có kết quả) |
+| E13 | AC-11 | script | FAIL |
+| E14 | AC-11 | script | FAIL |
+| E15 | AC-11 | script | FAIL |
 | E16 | AC-11 | script | PASS (carry-forward từ round 1) |
 | E17 | AC-11 | script | PASS |
-| E18 | AC-1 | ui-check | FAIL |
-| E19 | AC-12 | judgment | chờ người (hội đồng đề xuất PASS, human_override còn trống) |
+| E18 | AC-1 | ui-check | PASS |
+| E19 | AC-12 | judgment | PASS (đề xuất, chờ người chốt) |
 | E20 | AC-1 | script | PASS |
 | E21 | AC-3 | script | PASS |
 | E22 | AC-3 | script | PASS |
 
 ## Evidence
 
-Payload round này không kèm thời điểm chạy cho từng eval chạy lại; không bịa verified_at. Mã chạy nằm trong run-log.jsonl.
-
 - eval: E1
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E1-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E1-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E1)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    18 passed (42.3s)
+    18 passed (45.3s)
 
 - eval: E2
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E2-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E2-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E2)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    8 passed (31.3s)
+    8 passed (39.6s)
 
 - eval: E3
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E3-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E3-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E3)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    31 passed (1.1m)
+    31 passed (1.2m)
 
 - eval: E4
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E4-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E4-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E4)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    4 passed (23.2s)
+    4 passed (25.0s)
 
 - eval: E5
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E5-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E5-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E5)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    6 passed (31.8s)
+    6 passed (32.1s)
 
 - eval: E6
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E6-r2
-  verdict: BLOCKED
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E6-r3
+  exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E6)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    [WebServer] Failed to start server: listen EADDRINUSE, address already in use, port 3613
-    Process from config.webServer was not able to start.
-    Không có bài nào chạy; không tính là pass. Cần giải phóng cổng 3613 rồi chạy lại E6.
+    20 passed (42.0s)
 
 - eval: E7
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E7-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E7-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E7)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    6 passed (28.9s)
+    6 passed (33.7s)
 
 - eval: E8
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E8-r1
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E8-r3
   exit_code: 0
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
-  verified_at: 2026-11-27T09:13:46Z
-  carried_from_round: 1
-  # carry-forward tu round 1 — delta khong cham paths cua eval
+  baseline: n-a
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E8)
+  verified_at: 2026-11-27T15:47:35Z
+  output: |
+    17 passed (41.9s)
 
 - eval: E9
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E9-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E9-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E9)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    8 passed (31.0s)
+    8 passed (34.0s)
 
 - eval: E10
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E10-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E10-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E10)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    4 passed (23.8s)
+    4 passed (16.1s)
 
 - eval: E11
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E11-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E11-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E11)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    20 passed (32.6s)
+    20 passed (18.9s)
 
 - eval: E12
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E12-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E12-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E12)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    4 passed (15.3s)
+    4 passed (14.1s)
 
 - eval: E13
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E13-r2
-  exit_code: 0
-  baseline: green
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E13-r3
+  exit_code: 2
+  baseline: n-a
   verifier: config:executors.script.check
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    make check passed: upgrade lint typecheck test ignore ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance
+    lint: 0 errors, 6 warnings
+    node tools/typecheck_own.mjs
+    tests/e2e/do-diem-anh.ts(29,9): error TS2532: Object is possibly 'undefined'.
+    make: *** [typecheck] Error 1
 
 - eval: E14
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E14-r2
-  exit_code: 0
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E14-r3
+  exit_code: 2
   baseline: red
   verifier: config:executors.script.e2e
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    Lệnh DATABASE_URL= make e2e kết thúc bình thường; phần cuối nhật ký chỉ ghi "pending", không có dòng tổng số bài.
+    Error: region not hydrated (vung chua nhan trang): shown 1, hydrated 0
+      at phone-list.ts:34 (regionReady) via ghim-ngan.spec.ts:64
+    12 failed (settle, sheet, behavior, dan-tu-excel, frame, ghim-ngan, tools/e2e_templates/suite.ts)
+    1202 skipped, 5 did not run, 1349 passed (16.7m)
+
+- eval: E15
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E15-r3
+  exit_code: 1
+  baseline: n-a
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E15)
+  verified_at: 2026-11-27T15:47:35Z
+  output: |
+    error: duplicate key value violates unique constraint "users_email_key"
+      at tests/e2e-db/thue-phi.spec.ts:48 (owner), makeCompanies :67
+    4 failed (thue phi › dat-muc-roi-bang-hang-doi, ở 360, 414, 1024, 1440)
+    179 skipped, 40 did not run, 711 passed (23.6m)
 
 - eval: E16
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E16-r1
   exit_code: 0
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (git diff từ merge-base với origin/main không đổi tệp dưới src/components/ui và src/components/reui)
   verified_at: 2026-11-27T09:13:46Z
   carried_from_round: 1
-  # carry-forward tu round 1 — delta khong cham paths cua eval
+  note: carry-forward tu round 1 — delta khong cham paths cua eval
 
 - eval: E17
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E17-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E17-r3
   exit_code: 0
   baseline: green
   verifier: config:executors.design.floor
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    design-floor-s4 chạy xong, không thấy màu hex thô.
+    design-floor-s4: không thấy màu hex thô
 
 - eval: E18
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E18-r2
-  exit_code: 1
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E18-r3
+  exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check
+  verifier: scripts/ui-check (cmd ui-check:E18)
+  verified_at: 2026-11-27T15:47:35Z
   screenshot: evidence/E18-step1.png
   observed: |
-    sau/ngan-1440-light.png: the record has a white surface like the page and a thin left border, with no visible shadow on the grid (pixels 255 right up to the border). sau/ngan-1440-dark.png: the record is lighter than the page (23 vs 10) with a visible border, so it stands apart. pha/ngan-1440-light-khong-tach.png: no border, no shadow, not apart. pha/ngan-1440-dark-khong-tach.png: border and shadow removed, but the panel is 10 against the grid card's 23, so a faint step remains. 1024 and 360/414 in step1 and step2: the record stands full height with an icon-only head; the 1024 toolbar is icon-only and the grid fills the screen. Light and dark phone frames are readable. This contradicts the Expected for the light shadow and for the dark khong-tach frame.
+    1440 light sau: the record runs from the top bar to the bottom, a visible left edge line plus a soft shadow falling onto the grid on its left. khong-tach light: none of that, the record merges into the grid. 1440 dark sau: the record is lighter than the page behind it with a visible hairline left edge. The shadow is barely perceptible in dark. khong-tach dark: record equals the page colour, no edge, merges. Truoc at 1024 and phone: the record was a floating card with Truoc/Sau/Dong text buttons and a wrapped second row; sau shows a single-row head (1603 · S1.01, link, previous, next, close icons), full-height record, and the pin icon on desktop. Phone toolbar truoc had icons only; sau shows "Loc" with text and "Luu goc nhin" visible. The phone filter sheet in sau has aligned inputs with larger text. Screens otherwise unchanged in shape.
   network_observed: n-a (driver)
-  output: |
-    Dev server 127.0.0.1:3470 không chạy; người chấm không tự bật, chấm trên các khung PNG đã lưu (đọc bằng mắt và theo giá trị điểm ảnh).
-    Ở 1440, nền sáng, bên "sau": các cột x=890..919 đều là 255, giống lưới, rồi viền 1px (229) ở x=920 — KHÔNG có dải bóng tối dần đổ sang lưới, trái với kỳ vọng.
-    Nền tối, bên "sau": ngăn 23 so với trang 10, viền 46 — tách được.
-    Chiều đỏ nền sáng "khong-tach": không viền, không bóng — đọc là không tách (đúng).
-    Chiều đỏ nền tối "khong-tach": viền và bóng mất nhưng ngăn 10 còn thẻ lưới 23, nên vẫn còn bậc tông 13 mức — chiều đỏ yếu (sát ngưỡng).
-    Điện thoại: đầu ngăn một dòng, nút chỉ hình ở góc phải trên. Thanh công cụ, hàng lọc và «Lưu góc nhìn» trên điện thoại chưa kiểm trong các khung ngan-loc-*.
-    Kết quả: không đạt vì thiếu bóng ở nền sáng và khung đỏ nền tối còn bậc tông.
 
 - eval: E20
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E20-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E20-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E20)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    4 passed (11.0s)
+    4 passed (12.4s)
 
 - eval: E21
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E21-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E21-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E20)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    4 passed (11.0s) — cùng lệnh với E20
+    cùng lệnh với E20 (4 passed)
 
 - eval: E22
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E22-r2
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E22-r3
   exit_code: 0
   baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
+  verifier: scripts/script (bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E22)
+  verified_at: 2026-11-27T15:47:35Z
   output: |
-    2 passed (11.5s)
-
-- eval: E15
-  verdict: BLOCKED
-  baseline: n-a
-  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
-  output: |
-    agent bị skip/chết — không có kết quả, không được tính là pass.
-
-### Lệnh suite (hồi quy)
-
-- cmd: npm run build
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-SUITE-build-r2
-  exit_code: 0
+    2 passed (12.4s)
 
 ### Judgment
 
 - eval: E19
-  judged_by: hội đồng 3 lăng kính (fresh context) — đề xuất
-  verdict: PASS
-  rationale: Cả ba lăng kính cùng đề xuất PASS; có hai chỗ lệch nhỏ ngoài phạm vi câu hỏi (dòng 28 của behaviors.md còn ghi «…» chứa việc của vùng; ghi chú «khi ngăn nổi» / «Chỗ chưa phủ» chưa theo Hỏi-7). Mỗi phiếu dưới đây giữ đủ lý do.
-  votes:
-    - domain-correctness: PASS — (1) Bảng «Từng chỗ và cách làm» có một dòng cho mỗi điều đã quyết (Q1–Q4, A5, B3, B1/B2/«…», L1–L6), và cột «Sau» không thêm việc ngoài lời chủ kho. (2) Mục «Bộ nút theo quyền» của behaviors.md có chuẩn nút ba câu và luật «…» ba điểm, đúng nghĩa đoạn nguyên văn, mỗi khối ghi lời duyệt và ngày 2026-11-27. Dòng «Mở hồ sơ cạnh bảng» không còn «đứng dưới thanh công cụ» hay «hai dòng» như hiện trạng. (3) Các câu (a)–(f) và các câu chi-nguoi của decisions.jsonl chỉ nằm ở mục «Chưa quyết» hoặc «Chỗ chưa phủ», và đều ghi là dựng ở lát 2. Chúng không có trong phần đã làm của design.md, behaviors.md hay 0051. Có hai chỗ lệch nhỏ ngoài phạm vi câu hỏi. Dòng 28 của behaviors.md còn nói «…» chứa việc của vùng, trái với L1. Dòng Q4 của design.md ghi «khi ngăn nổi», trong khi Hỏi-7 đã mở rộng sang cả khi ghim.
-    - operational-feasibility: PASS — (1) Bảng «Từng chỗ và cách làm» có một dòng cho mỗi điều: Q1, Q2, Q3, Q4, A5, B3, một dòng gộp B1/B2/«…» và L1–L6. Cột «Sau» khớp lời nguyên văn. Hỏi-7 (chỉ hình cả khi ghim) là điều chủ kho đã duyệt ở cổng. Nó nằm ở trạng thái ghim của bảng trạng thái và ở 0051, nên không tính là việc thêm. (2) Mục «Bộ nút theo quyền» có chuẩn nút ba câu và luật «…» ba điểm, đúng nghĩa từng điểm của đoạn nguyên văn. Mỗi khối ghi «chủ kho 2026-11-27» kèm lời duyệt. Dòng «Mở hồ sơ cạnh bảng» không còn cụm «đứng dưới thanh công cụ» hay «đầu hồ sơ hai dòng» như trạng thái hiện hành, chỉ nhắc lại trong cụm «thay …». (3) Các câu (a)–(f) chỉ nằm ở mục «Chưa quyết» và ở decisions.jsonl dưới dạng chi-nguoi. Chúng không có trong bảng «Sau», trong sổ hành vi hay trong 0051.
-    - spec-alignment: PASS — Bảng «Từng chỗ và cách làm» có một dòng cho mỗi điều đã quyết (Q1–Q4, A5, B3, L1–L6). B1, B2 và luật «…» gộp chung một dòng nhưng vẫn đúng một chỗ, và cột «Sau» khớp lời chủ kho, không thêm việc. Mục «Bộ nút theo quyền» trong behaviors.md có luật «…» ba điểm và chuẩn nút ba câu, đúng nghĩa đoạn nguyên văn, mỗi khối ghi «chủ kho 2026-11-27» kèm lời duyệt. Dòng «Mở hồ sơ cạnh bảng» (dòng 12) không còn «đứng dưới thanh công cụ» hay «đầu hồ sơ hai dòng»; chữ «hai dòng» chỉ còn ở dạng nhắc việc thay thế hàng 3e. Các câu (a)–(f) và câu chi-nguoi chỉ nằm ở mục «Chưa quyết» hoặc «Chỗ chưa phủ» của design.md, không có trong behaviors.md hay 0051. Có hai chỗ lệch nhỏ, không đổi phán quyết: mục «Chỗ chưa phủ» còn ghi ngăn ghim giữ chữ dù Hỏi-7 đã được duyệt, và dòng 28 của behaviors.md còn ghi «…» chứa việc của vùng.
-  required_evidence:
-    - (judge không nêu bằng-chứng-thiếu)
+  panel đề xuất: PASS (domain-correctness, operational-feasibility, spec-alignment)
+  - domain-correctness: PASS — Bảng «Từng chỗ và cách làm» có một dòng cho mỗi Q1–Q4, A5, B3, L1–L6; B1, B2 và luật «…» chung một dòng ghi vào sổ hành vi. design/behaviors.md có luật «…» ba điểm và chuẩn nút ba câu, mỗi khối ghi lời duyệt ngày 2026-11-27. Các câu (a)–(f) chỉ nằm ở «Chưa quyết» và «Chỗ chưa phủ», không có trong behaviors.md hay trang 0051.
+  - operational-feasibility: PASS — Cột «Sau» khớp lời nguyên văn và không thêm việc ngoài lời ông; việc chỉ còn hình cả khi ghim là Hỏi-7, ông đã nhận ở Cổng Phạm vi (decisions.jsonl d-29). Các chữ «hai dòng» và «dưới thanh công cụ» còn lại chỉ nằm trong cụm «thay …». (a)–(f) không nằm trong phần đã làm.
+  - spec-alignment: PASS — Mỗi mã Q1–Q4, A5, B3, L1–L6 có một dòng với cột «Sau» khớp lời chủ kho; B1, B2 và «…» chung một dòng nên «đúng một dòng» chỉ đúng theo nghĩa rộng. Dòng «Mở hồ sơ cạnh bảng» đã ghi «từ ngay dưới thanh trên … tới đáy» và «đầu hồ sơ một dòng». (a)–(f) chỉ nằm ở «Chưa quyết».
   human_override:  # chi nguoi ghi
+
+### Lệnh suite (hồi quy)
+
+- cmd: npm run build
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-SUITE-build-r3
+  exit_code: 0
+  verified_at: 2026-11-27T15:47:35Z
 
 ## Known limits
 
@@ -254,11 +265,10 @@ Payload round này không kèm thời điểm chạy cho từng eval chạy lạ
 
 ## Analyst
 
-Eval không-phân-biệt (xanh trên cả bản đang kiểm lẫn baseline; chứng minh harness chứ không phải feature — viết lại để assert hành vi mới, hoặc xác nhận là regression-guard có chủ ý):
-- E13 (`make check`): baseline green.
-- E17 (`design-floor-s4`): baseline green.
+Eval không phân biệt (xanh trên cả HEAD lẫn baseline):
+- E17 (lệnh design-floor-s4.mjs): xanh cả hai phía; là sàn hồi quy, không chứng minh tính năng mới. Xác nhận là regression-guard có chủ ý hoặc viết lại để assert hành vi mới.
 
-Baseline không đo:
+Baseline khong do
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E1: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E2: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E3: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
@@ -266,19 +276,22 @@ Baseline không đo:
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E5: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E6: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E7: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
+- bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E8: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E9: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E10: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E11: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E12: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
+- make check: baseline vuot tran 180 giay/lenh — da dung ca cay tien trinh; BLOCKED ha tang, khong phai ket qua cua code cu
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E15: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E20: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
 - bash _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh E22: bo qua baseline: tep _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh co o cay dang kiem nhung chua co o merge-base 142c8e7aede628e0ccddad5a83342074baac35ab — eval moi, chay tren code cu khong phan biet gi
 
 ## Variance
 
-none — mọi eval nhiều lần chạy đều đồng nhất (không eval nào có runs lớn hơn 1).
+none — mọi eval nhiều lần chạy đều đồng đều (mọi eval chạy một lần, xác định).
 
 ## Iterations
 
-Round 1: E8 và E16 xanh và được giữ lại (carry-forward); phần còn lại của round 1 nằm trong sổ ledger của hàng, không có trong payload round này.
-Round 2: E18 không đạt — nền sáng thiếu dải bóng đổ sang lưới và khung đỏ nền tối còn bậc tông; E6 bị chặn vì cổng 3613 đã bị chiếm; E15 không có kết quả vì agent bị skip/chết; phân loại phạm vi không chạy được nên không lỗi nào được máy tự sửa. Trả về cho người quyết.
+Round 1: ledger đã ghi — đổi kỳ vọng E18, cắt bớt lập luận chấm, lỗi mạng; trả về cho phần làm.
+Round 2: BLOCKED — bóng của ngăn hồ sơ vẫn bị cắt; sửa ở 82aa18d7 (hộp cột hồ sơ để bóng đổ lên lưới), đo thêm ở 3ab4277e.
+Round 3: E13, E14, E15 failed — E13 lỗi typecheck ở tests/e2e/do-diem-anh.ts (Object is possibly undefined); E14 12 bài trình duyệt đỏ (vùng chưa nhận trang, ghim-ngan, sheet, frame, dan-tu-excel, settle, behavior, suite mẫu); E15 bài thue-phi trùng khoá users_email_key ở bốn khổ. Trả về phần làm.
