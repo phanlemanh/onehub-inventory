@@ -11,6 +11,7 @@ import {
   BATCH_ROWS,
   openImport,
   previewImport,
+  listAgents,
   recentImports,
   undoImport,
   writeBatch,
@@ -32,6 +33,8 @@ export interface ImportsHandlers {
   batch(req: Request, id: string): Promise<Response>;
   undo(req: Request, id: string): Promise<Response>;
   recent(req: Request): Promise<Response>;
+  /** The list agents a team lead imports for (Hỏi-7); empty for a role that imports only for itself. */
+  agents(req: Request): Promise<Response>;
 }
 
 type Code =
@@ -40,6 +43,7 @@ type Code =
   | "not-found"
   | "blocked-cells"
   | "counts-changed"
+  | "table-changed"
   | "bad-agent"
   | "closed"
   | "already-undone";
@@ -52,6 +56,7 @@ const STATUS: Record<Code, number> = {
   "blocked-cells": 400,
   "bad-agent": 400,
   "counts-changed": 409,
+  "table-changed": 409,
   closed: 409,
   "already-undone": 409,
 };
@@ -205,5 +210,9 @@ export function createImportsHandlers(deps: ImportsDeps): ImportsHandlers {
       }),
     recent: (req) =>
       guarded(req, "viewImports", async (_d, c) => Response.json(await recentImports(c))),
+    agents: (req) =>
+      guarded(req, "importListings", async (door, c) =>
+        Response.json(door.scope === "company" ? await listAgents(c) : []),
+      ),
   };
 }

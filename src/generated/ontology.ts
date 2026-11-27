@@ -186,6 +186,10 @@ export interface ImportRun {
   createdAt: string;
   /** ISO datetime */
   undoneAt?: string;
+  /** Fingerprint of the headers and choices the person saw when the import was opened; every batch must carry the same (migration 017). */
+  tableHash?: string;
+  /** Fingerprint of each slice of 200 rows opened; a batch is written only at its own place with its own rows (migration 017). */
+  batchHashes?: Record<string, unknown> | unknown[];
 }
 
 /** The shape of a sheet a company imported — its column names in order — and where each column goes: a standard field, a custom field, or left out on purpose. The next sheet of the same shape needs no matching again. */
@@ -1277,7 +1281,7 @@ export const ACTIONS: readonly ActionSpec[] = [
     status: "live",
     states: [],
     doors: {
-      api: ["POST /api/v1/imports/preview", "POST /api/v1/imports"],
+      api: ["POST /api/v1/imports/preview", "POST /api/v1/imports", "GET /api/v1/imports/list-agents"],
       db: ["table import_runs insert", "function app.import_list_agents()"],
     },
   },

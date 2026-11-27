@@ -4,7 +4,15 @@
 import { describe, expect, it } from "vitest";
 
 import { checkFieldDraft, label } from "@/modules/company-config";
-import { matchColumns, NO_CHOICES, type ColumnMatch, type LayerView } from "@/modules/imports";
+import {
+  isOwnerHeader,
+  markUnit,
+  matchColumns,
+  NO_CHOICES,
+  type ColumnMatch,
+  type LayerView,
+  type Target,
+} from "@/modules/imports";
 
 const LAYER: LayerView = {
   labels: [{ concept: "Building", label: "Block" }],
@@ -83,6 +91,94 @@ describe("ghep-cot", () => {
     };
     const c = matchColumns(["Mã căn", "Giá chào"], layer, NO_CHOICES)[1]!;
     expect([target(c), c.why]).toEqual(["Listing.closePrice", "template"]);
+  });
+
+  it("an owner column stays blocked under any choice but dropping it, and under a template that maps it (Hỏi-12)", () => {
+    const owner = ["Mã căn", "SĐT chủ"];
+    const choices: Target[] = [
+      { standard: "Listing.listPrice" },
+      { custom: "view" },
+      { newField: { name: "SĐT chủ", kind: "text", options: [] } },
+    ];
+    for (const t of choices) {
+      const c = matchColumns(owner, LAYER, { ...NO_CHOICES, columns: { 1: { target: t } } })[1]!;
+      expect([c.mark, c.why, c.target], JSON.stringify(t)).toEqual(["block", "owner-column", null]);
+    }
+    const mapped: LayerView = {
+      ...LAYER,
+      templates: [
+        {
+          id: "t-owner",
+          signature: ["ma can", "sdt chu"],
+          columns: [{ standard: "Unit.unitNumber" }, { standard: "Listing.listPrice" }],
+        },
+      ],
+    };
+    expect(matchColumns(owner, mapped, NO_CHOICES)[1]!.mark).toBe("block");
+    // Dropping it is the one way through, chosen or remembered by a template (the control).
+    const dropped = matchColumns(owner, LAYER, {
+      ...NO_CHOICES,
+      columns: { 1: { target: { skip: true } } },
+    })[1]!;
+    expect([dropped.mark, dropped.target]).toEqual(["fixed", { skip: true }]);
+    const skipped: LayerView = {
+      ...LAYER,
+      templates: [
+        { ...mapped.templates[0]!, columns: [{ standard: "Unit.unitNumber" }, { skip: true }] },
+      ],
+    };
+    expect(matchColumns(owner, skipped, NO_CHOICES)[1]!.mark).toBe("keep");
+    expect(isOwnerHeader("Điện thoại")).toBe(true);
+    expect(isOwnerHeader("Giá chào")).toBe(false);
+  });
+
+  it("a new field the company layer would refuse is blocked at the preview, never dropped at the end (S4-r1 t11)", () => {
+    const field = (name: string) => ({
+      target: { newField: { name, kind: "text" as const, options: [] } },
+    });
+    const at = (headers: string[], columns: Record<number, { target: Target }>, layer = LAYER) =>
+      matchColumns(headers, layer, { ...NO_CHOICES, columns });
+    // Taken by a live field, by a standard word, empty.
+    for (const name of ["Ghi chú", label("ListPrice"), " "]) {
+      const c = at(["Mã căn", "X"], { 1: field(name) })[1]!;
+      expect([c.mark, c.why], name).toEqual(["block", "field-refused"]);
+    }
+    // The company has 20 fields: a new one is refused.
+    const fields = (n: number) =>
+      Array.from({ length: n }, (_, i) => ({
+        code: `f${i}`,
+        name: `Trường ${i}`,
+        kind: "text" as const,
+        options: [],
+      }));
+    expect(
+      at(["Mã căn", "View"], { 1: field("View") }, { ...LAYER, fields: fields(20) })[1]!.why,
+    ).toBe("field-refused");
+    // It has 19: the first new field of the file goes in, the second counts it and is refused.
+    const two = at(
+      ["Mã căn", "View", "Hướng nhìn"],
+      { 1: field("View"), 2: field("Hướng nhìn") },
+      {
+        ...LAYER,
+        fields: fields(19),
+      },
+    );
+    expect(two.slice(1).map((c) => [c.mark, c.why])).toEqual([
+      ["fixed", "chosen"],
+      ["block", "field-refused"],
+    ]);
+    // The control: a fresh name goes in.
+    expect(at(["Mã căn", "View"], { 1: field("View") })[1]!.mark).toBe("fixed");
+  });
+
+  it("a unit code too long to keep as a pending unit is blocked at the preview (S4-r1 t10)", () => {
+    const long = `S${"1".repeat(80)}`;
+    expect(markUnit(long, { kind: "none" }, { pending: true })).toEqual({
+      mark: "block",
+      value: null,
+      why: "code-too-long",
+    });
+    expect(markUnit(long.slice(0, 80), { kind: "none" }, { pending: true }).mark).toBe("fixed");
   });
 
   it("a header chosen by the person that is not the standard label asks to become the company's label", () => {

@@ -21,6 +21,19 @@ properties:
   status: { type: enum, values: [open, done, undone], required: true, display: status }
   createdAt: { type: datetime, required: true, display: datetime }
   undoneAt: { type: datetime, display: datetime }
+  tableHash:
+    type: string
+    max: 64
+    display: none
+    description: >-
+      Fingerprint of the headers and choices the person saw when the import was opened; every batch must carry the same
+      (migration 017).
+  batchHashes:
+    type: json
+    display: none
+    description: >-
+      Fingerprint of each slice of 200 rows opened; a batch is written only at its own place with its own rows
+      (migration 017).
 
 rules:
   - id: no-cell-lost

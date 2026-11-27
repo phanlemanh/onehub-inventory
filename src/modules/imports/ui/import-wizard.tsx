@@ -33,10 +33,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { label } from "@/modules/company-config";
-import { PermittedAction } from "@/modules/identity/ui";
+import { allowedScope } from "@/modules/identity";
+import { PermittedAction, useSessionRoles } from "@/modules/identity/ui";
 
 import type { LearnedItem } from "../learned";
-import { NO_CHOICES, type Choices, type Mark } from "../mark";
+import { isOwnerHeader, NO_CHOICES, type Choices, type Mark } from "../mark";
 import { readTable } from "../read-file";
 import type { MarkedTable } from "../table";
 import { STANDARD_TARGETS, TARGET_CONCEPT, type Target } from "../targets";
@@ -110,6 +111,16 @@ export function ImportWizard() {
     learned: LearnedItem[];
   } | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  // A team lead imports for one list agent of the company, chosen here (Hỏi-7); a list agent imports for itself.
+  const forOthers = allowedScope(useSessionRoles(), "importListings") === "company";
+  const [agents, setAgents] = useState<readonly { userId: string; name: string }[]>([]);
+  const [agent, setAgent] = useState<string | null>(null);
+  useEffect(() => {
+    if (!forOthers) return;
+    void answer<{ userId: string; name: string }[]>(fetch("/api/v1/imports/list-agents")).then(
+      (r) => setAgents(r.body ?? []),
+    );
+  }, [forOthers]);
 
   // `keep` is the banner that stays once the preview is read again: after a conflict the person must still see why
   // the counts moved.
@@ -171,6 +182,7 @@ export function ImportWizard() {
           fileName: table.fileName,
           sheetName: table.sheet,
           expected,
+          ...(forOthers && agent ? { listAgentUserId: agent } : {}),
         }),
       }),
     );
@@ -302,16 +314,24 @@ export function ImportWizard() {
                         })
                       }
                       items={[
-                        ...STANDARD_TARGETS.map((t) => ({
-                          value: JSON.stringify({ standard: t }),
-                          label: label(TARGET_CONCEPT[t]),
-                        })),
-                        {
-                          value: JSON.stringify({
-                            newField: { name: c.header.slice(0, 40), kind: "text", options: [] },
-                          }),
-                          label: `${label("CustomField")}: ${c.header}`,
-                        },
+                        ...(isOwnerHeader(c.header)
+                          ? []
+                          : [
+                              ...STANDARD_TARGETS.map((t) => ({
+                                value: JSON.stringify({ standard: t }),
+                                label: label(TARGET_CONCEPT[t]),
+                              })),
+                              {
+                                value: JSON.stringify({
+                                  newField: {
+                                    name: c.header.slice(0, 40),
+                                    kind: "text",
+                                    options: [],
+                                  },
+                                }),
+                                label: `${label("CustomField")}: ${c.header}`,
+                              },
+                            ]),
                         { value: JSON.stringify({ skip: true }), label: C.skipColumn },
                       ]}
                     >
@@ -319,18 +339,27 @@ export function ImportWizard() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {STANDARD_TARGETS.map((t) => (
-                          <SelectItem key={t} value={JSON.stringify({ standard: t })}>
-                            {label(TARGET_CONCEPT[t])}
-                          </SelectItem>
-                        ))}
-                        <SelectItem
-                          value={JSON.stringify({
-                            newField: { name: c.header.slice(0, 40), kind: "text", options: [] },
-                          })}
-                        >
-                          {`${label("CustomField")}: ${c.header}`}
-                        </SelectItem>
+                        {/* An owner's name or phone column can only be dropped (Hỏi-12). */}
+                        {isOwnerHeader(c.header) ? null : (
+                          <>
+                            {STANDARD_TARGETS.map((t) => (
+                              <SelectItem key={t} value={JSON.stringify({ standard: t })}>
+                                {label(TARGET_CONCEPT[t])}
+                              </SelectItem>
+                            ))}
+                            <SelectItem
+                              value={JSON.stringify({
+                                newField: {
+                                  name: c.header.slice(0, 40),
+                                  kind: "text",
+                                  options: [],
+                                },
+                              })}
+                            >
+                              {`${label("CustomField")}: ${c.header}`}
+                            </SelectItem>
+                          </>
+                        )}
                         <SelectItem value={JSON.stringify({ skip: true })}>
                           {C.skipColumn}
                         </SelectItem>
@@ -530,9 +559,29 @@ export function ImportWizard() {
                     {C.blocked(blocks)}
                   </Button>
                 ) : null}
+                {forOthers ? (
+                  <div className="min-w-56">
+                    <Select
+                      value={agent}
+                      onValueChange={(v) => setAgent(v ? String(v) : null)}
+                      items={agents.map((a) => ({ value: a.userId, label: a.name }))}
+                    >
+                      <SelectTrigger aria-label={C.pickAgent} data-slot="chon-dau-chu">
+                        <SelectValue placeholder={C.pickAgent} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {agents.map((a) => (
+                          <SelectItem key={a.userId} value={a.userId}>
+                            {a.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : null}
                 <PermittedAction action="continueImport">
                   <ApplyBatches
-                    disabled={!marked.canApply || busy || !table}
+                    disabled={!marked.canApply || busy || !table || (forOthers && !agent)}
                     words={C.apply(marked.createCount, marked.keptCount)}
                     table={table!}
                     choices={choices}

@@ -7,7 +7,7 @@ vi.mock("server-only", () => ({}));
 
 import { catalogLoadStatements } from "@/modules/catalog/load-sql";
 import { sampleCatalog } from "@/modules/catalog";
-import { label } from "@/modules/company-config";
+import { fold, label } from "@/modules/company-config";
 import { createImportsHandlers } from "@/modules/imports/imports-http";
 import { NO_CHOICES, type Choices, type LearnedItem } from "@/modules/imports";
 import { openDoor } from "@/modules/identity/action-door";
@@ -157,6 +157,35 @@ async function applyAll(
     id,
     body: (await res.json()) as { created: number; learned?: LearnedItem[] },
   };
+}
+
+/** Opens an import of the whole table after its preview; returns the import's id. */
+async function openOnly(e: Env, who: Person, rows: string[][], choices: Choices = CHOICES) {
+  const p = await preview(e, who, rows, choices);
+  const open = await e.h.open(
+    req(
+      URL_,
+      "POST",
+      {
+        headers: HEADERS,
+        rows,
+        choices,
+        fileName: "bang-hang.xlsx",
+        sheetName: "Sheet1",
+        expected: { ...p.body.counts, createCount: p.body.createCount },
+      },
+      await e.cookie(who),
+    ),
+  );
+  expect(open.status).toBe(201);
+  return ((await open.json()) as { id: string }).id;
+}
+
+/** Sends one batch of an open import as the screen does. */
+async function sendBatch(e: Env, who: Person, id: string, batch: Record<string, unknown>) {
+  const res = await e.h.batch(req(`${URL_}/${id}/batches`, "POST", batch, await e.cookie(who)), id);
+  const json = (await res.json()) as { error?: string; created?: number };
+  return { status: res.status, error: json.error, created: json.created };
 }
 
 const count = async (e: Env, sql: string, params: unknown[] = []) =>
@@ -339,6 +368,88 @@ describe("ap (E9)", () => {
     const second = await applyAll(e, "LA", rowsOf(e.codes), { ...CHOICES, units: {} });
     expect(second.body?.created ?? 0).toBe(0);
     expect(await count(e, "select count(*) as n from listings")).toBe(3);
+  });
+
+  it("a batch is the slice of the table opened: other rows, other choices or another place is 409 and writes nothing (S4-r1 t2)", async () => {
+    const e = await importWorld("gan_goi");
+    const rows = rowsOf(e.codes);
+    const id = await openOnly(e, "LA", rows);
+    const send = (over: Record<string, unknown>) =>
+      sendBatch(e, "LA", id, {
+        headers: HEADERS,
+        rows,
+        choices: CHOICES,
+        batchNo: 0,
+        rowOffset: 0,
+        last: true,
+        ...over,
+      });
+    const changed = [
+      {
+        rows: [...rows.slice(0, 2), [rows[2]![0]!, "Sapphire 9", "9 tỷ", label("StatusHold"), ""]],
+      },
+      { rows: [...rows, [e.codes[0]!, "[MAU] Toà", "1 tỷ", "", ""]] },
+      { choices: { ...CHOICES, skipRows: [1] } },
+      { headers: ["Mã căn", "Toà", "Giá chào", "Trạng thái", "Ngày check"] },
+      { batchNo: 1, rowOffset: 200 },
+      { last: false },
+    ];
+    for (const over of changed) {
+      const r = await send(over);
+      expect([r.status, r.error], JSON.stringify(over).slice(0, 80)).toEqual([
+        409,
+        "table-changed",
+      ]);
+    }
+    expect(await count(e, "select count(*) as n from listings")).toBe(0);
+    // The control: the very slice opened is written.
+    expect((await send({})).status).toBe(200);
+    expect(await count(e, "select count(*) as n from listings")).toBe(3);
+  });
+
+  it("a row left out is left out once, by its place in the whole file, across batches of 200 (S4-r1 t8)", async () => {
+    const e = await importWorld("bo_dong");
+    const codes = Array.from({ length: 250 }, (_, i) => `ZZ-${String(i).padStart(3, "0")}`);
+    const rows = codes.map((code) => [code, "[MAU] Toà", "1 tỷ", label("StatusActive"), ""]);
+    const choices: Choices = {
+      ...CHOICES,
+      units: Object.fromEntries(codes.map((code) => [fold(code), { pending: true }])),
+      skipRows: [3],
+    };
+    const id = await openOnly(e, "LA", rows, choices);
+    for (const b of [0, 1]) {
+      const r = await sendBatch(e, "LA", id, {
+        headers: HEADERS,
+        rows: rows.slice(b * 200, (b + 1) * 200),
+        choices,
+        batchNo: b,
+        rowOffset: b * 200,
+        last: b === 1,
+      });
+      expect(r.status).toBe(200);
+    }
+    expect(await count(e, "select count(*) as n from listings")).toBe(249);
+    const written = await e.w.db.owner.query<{ raw_code: string }>(
+      `select raw_code from company_pending_units where raw_code = any($1)`,
+      [["ZZ-003", "ZZ-203"]],
+    );
+    expect(written.rows.map((x) => x.raw_code)).toEqual(["ZZ-203"]);
+  });
+
+  it("a team lead reads the list agents to import for: ids and names only; a list agent reads none; a buyer agent is 403 (S4-r1 t9)", async () => {
+    const e = await importWorld("dau_chu");
+    const read = async (who: Person) => {
+      const res = await e.h.agents(
+        req(`${URL_}/list-agents`, "GET", undefined, await e.cookie(who)),
+      );
+      return { status: res.status, body: (await res.json()) as Record<string, string>[] };
+    };
+    const tl = await read("TL");
+    expect(tl.status).toBe(200);
+    expect(new Set(tl.body.map((a) => a.userId))).toEqual(new Set([e.w.id.LA, e.w.id.X]));
+    expect(tl.body.every((a) => Object.keys(a).sort().join() === "name,userId")).toBe(true);
+    expect((await read("LA")).body).toEqual([]);
+    expect((await read("BA")).status).toBe(403);
   });
 
   it("who imports for whom: 4 cases written before", async () => {

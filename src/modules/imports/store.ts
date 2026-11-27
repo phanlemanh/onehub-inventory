@@ -26,7 +26,12 @@ import {
 import type { LearnedConcept, LearnedItem } from "./learned";
 import { markValue, type CellMark, type Choices, type UnitFound } from "./mark";
 import { markTable, type MarkedTable } from "./table";
-import { TEMPLATE_FIELD, type StandardTarget, type Target } from "./targets";
+import {
+  STANDARD_HEADER_CONCEPTS,
+  TEMPLATE_FIELD,
+  type StandardTarget,
+  type Target,
+} from "./targets";
 
 export const BATCH_ROWS = 200;
 
@@ -149,6 +154,20 @@ export async function previewImport(
   return markTable(table, { ...ctx, today: today() }, choices);
 }
 
+/** Fingerprints that tie every batch to the table opened (migration 017): headers and choices, and each 200-row slice. */
+export function tableHash(headers: readonly string[], choices: Choices): string {
+  return createHash("sha256")
+    .update(JSON.stringify([headers, choices]))
+    .digest("hex");
+}
+export function batchHash(rows: readonly (readonly string[])[]): string {
+  return createHash("sha256").update(JSON.stringify(rows)).digest("hex");
+}
+const slices = <T>(rows: readonly T[]) =>
+  Array.from({ length: Math.ceil(rows.length / BATCH_ROWS) }, (_, b) =>
+    rows.slice(b * BATCH_ROWS, (b + 1) * BATCH_ROWS),
+  );
+
 export type Counts = Record<"keep" | "fixed" | "ask" | "block" | "createCount", number>;
 
 export type OpenResult =
@@ -177,8 +196,8 @@ export async function openImport(
   const runId = `${id.slice(0, 8)}-${id.slice(8, 12)}-4${id.slice(13, 16)}-8${id.slice(17, 20)}-${id.slice(20, 32)}`;
   await c.query(
     `insert into import_runs (id, company_id, imported_by, list_agent_user_id, file_name, sheet_name, signature,
-       row_count, learned)
-     values ($1, app.current_company_id(), $2, $3, $4, $5, $6, $7, $8::jsonb)`,
+       row_count, learned, table_hash, batch_hashes)
+     values ($1, app.current_company_id(), $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10)`,
     [
       runId,
       people.importedBy,
@@ -195,6 +214,8 @@ export async function openImport(
         pendingUnits: [],
         unitCodeIds: [],
       }),
+      tableHash(input.headers, input.choices),
+      slices(input.rows).map(batchHash),
     ],
   );
   return { ok: true, id: runId };
@@ -202,6 +223,8 @@ export async function openImport(
 
 interface RunRow {
   id: string;
+  table_hash: string | null;
+  batch_hashes: string[] | null;
   status: string;
   list_agent_user_id: string;
   file_name: string;
@@ -213,7 +236,8 @@ interface RunRow {
 
 async function lockRun(c: Queryable, id: string): Promise<RunRow | null> {
   const { rows } = await c.query(
-    `select id, status, list_agent_user_id, file_name, batches_done, learned, kept, created_count
+    `select id, status, list_agent_user_id, file_name, batches_done, learned, kept, created_count, table_hash,
+            batch_hashes
        from import_runs where id::text = $1 for update`,
     [id],
   );
@@ -234,7 +258,7 @@ const STANDARD_COLUMN: Partial<Record<StandardTarget, keyof NewListing>> = {
 
 export type BatchResult =
   | { ok: true; created: number; done: boolean; learned?: LearnedItem[] }
-  | { ok: false; problem: "not-found" | "closed" | "blocked-cells" };
+  | { ok: false; problem: "not-found" | "closed" | "blocked-cells" | "table-changed" };
 
 /**
  * Write one batch of an open import: the rows that become listings (new pending units first), the cells kept as
@@ -254,9 +278,23 @@ export async function writeBatch(
   const run = await lockRun(c, runId);
   if (!run) return { ok: false, problem: "not-found" };
   if (run.status !== "open") return { ok: false, problem: "closed" };
+  // The batch is the slice of the table the person opened, at its own place, with the same headers and choices.
+  const hashes = run.batch_hashes ?? [];
+  if (
+    run.table_hash !== tableHash(input.headers, input.choices) ||
+    input.batchNo >= hashes.length ||
+    input.rowOffset !== input.batchNo * BATCH_ROWS ||
+    hashes[input.batchNo] !== batchHash(input.rows) ||
+    input.last !== (input.batchNo === hashes.length - 1)
+  )
+    return { ok: false, problem: "table-changed" };
   if (run.batches_done.includes(input.batchNo)) return { ok: true, created: 0, done: false };
   const runAs = savepointRun(c);
-  const marked = await previewImport(c, input, input.choices);
+  // Rows the person left out are counted in the whole file; this batch reads them at its own place (S4-r1 t8).
+  const skipRows = (input.choices.skipRows ?? [])
+    .filter((r) => r >= input.rowOffset && r < input.rowOffset + input.rows.length)
+    .map((r) => r - input.rowOffset);
+  const marked = await previewImport(c, input, { ...input.choices, skipRows });
   if (marked.counts.block > 0) return { ok: false, problem: "blocked-cells" };
   const agentFullName = await agentName(c, null, run.list_agent_user_id);
   if (!agentFullName) return { ok: false, problem: "not-found" };
@@ -317,7 +355,9 @@ export async function writeBatch(
           [],
         );
         const made = w.pendingUnits[0];
-        if (!made) continue;
+        // The preview promised this listing: a pending unit the company layer refuses fails the batch, never drops the
+        // row in silence (S4-r1 t10); the batch writes nothing and the screen offers to send it again.
+        if (!made) throw new Error("import: pending unit refused");
         learned.pendingUnits.push(made);
         unit = { pendingUnitId: made.id };
       }
@@ -398,18 +438,7 @@ async function learnAtEnd(
   for (const col of marked.columns)
     if (col.target && "newField" in col.target) fields.push({ ...col.target.newField });
   const newCodes = new Map<string, string>();
-  const standardHeaders = (
-    [
-      "Unit",
-      "Building",
-      "Subdivision",
-      "StandardStatus",
-      "ListPrice",
-      "LivingArea",
-      "BedroomsTotal",
-      "LastConfirmedAt",
-    ] as const
-  ).map((x) => label(x));
+  const standardHeaders = STANDARD_HEADER_CONCEPTS.map((x) => label(x));
   const labels = marked.columns
     .filter((col) => col.learnLabel && col.target && "standard" in col.target)
     .map((col) => ({
@@ -470,7 +499,9 @@ async function learnAtEnd(
     const t = marked.columns[col!]?.target;
     if (!t || !("newField" in t)) continue;
     const code = newCodes.get(fold(t.newField.name));
-    if (!code) continue;
+    // The preview checked the field with the company layer's rule; a refusal here fails the batch, never drops the
+    // column's values in silence (S4-r1 t11).
+    if (!code) throw new Error("import: custom field refused");
     const m: CellMark = markValue(t as Target, raw, {
       layer: await readLayer(run),
       today: today(),
@@ -542,6 +573,17 @@ function conceptOf(target: StandardTarget): string {
 export type UndoResult =
   | { ok: true; removed: string[]; kept: string[]; keptCodes: string[]; retired: number }
   | { ok: false; problem: "not-found" | "already-undone" };
+
+/**
+ * The company's list agents a team lead may import for (Hỏi-7; owner's choice of 2026-11-17, migration 016): ids and
+ * names only, through app.import_list_agents(), which answers nothing to a role without company-wide importListings.
+ */
+export async function listAgents(c: Queryable): Promise<{ userId: string; name: string }[]> {
+  const { rows } = await c.query(
+    `select user_id::text as "userId", name from app.import_list_agents() order by name, user_id`,
+  );
+  return rows as { userId: string; name: string }[];
+}
 
 /** Undo a whole import: its untouched listings, what it taught, the pending units no listing sits on any more. */
 export async function undoImport(c: Queryable, runId: string, by: string): Promise<UndoResult> {

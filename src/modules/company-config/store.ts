@@ -9,6 +9,7 @@ import type { DbClient } from "@/modules/identity/server";
 
 import {
   NAME_LIMIT,
+  PENDING_CODE_LIMIT,
   checkFieldDraft,
   fold,
   templateSignature,
@@ -393,7 +394,7 @@ export async function addPendingUnit(
 ): Promise<Write> {
   const code = input.rawCode.trim();
   if (!code) return fail("code-empty");
-  if (code.length > 80) return fail("code-too-long");
+  if (code.length > PENDING_CODE_LIMIT) return fail("code-too-long");
   return run(async (c) => {
     try {
       const { rows } = await c.query(

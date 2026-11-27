@@ -5,7 +5,9 @@
 import { isFloor } from "@/modules/catalog";
 import { canMove, readPrice } from "@/modules/listings";
 import {
+  PENDING_CODE_LIMIT,
   checkCustomValue,
+  checkFieldDraft,
   fold,
   label,
   templateSignature,
@@ -17,6 +19,7 @@ import type { ListingStandardStatus } from "@/generated/ontology";
 import {
   HEADER_DICTIONARY,
   OWNER_HEADERS,
+  STANDARD_HEADER_CONCEPTS,
   STANDARD_TARGETS,
   TARGET_CONCEPT,
   TEMPLATE_FIELD,
@@ -50,6 +53,7 @@ export type ColumnWhy =
   | "no-unit-column"
   | "owner-column"
   | "target-retired"
+  | "field-refused"
   | "chosen";
 
 export interface ColumnMatch {
@@ -142,6 +146,7 @@ export function matchColumns(
     (t) =>
       t.signature.length === signature.length && t.signature.every((s, i) => s === signature[i]),
   );
+  const drafts: { code: string; name: string }[] = [];
   const out: ColumnMatch[] = headers.map((header, index) => {
     const f = fold(header);
     const chosen = choices.columns[index];
@@ -152,6 +157,23 @@ export function matchColumns(
       fold(labelFor(target.standard, layer)) !== f
         ? (chosen?.learnLabel ?? true)
         : null;
+    // An owner's name or phone never goes in (Hỏi-12): the column stays blocked until the person drops it, whatever
+    // else the request or a template says; this check is the server's, the screen only offers the same choice.
+    if (OWNER_HEADERS.has(f)) {
+      if (chosen && "skip" in chosen.target)
+        return {
+          index,
+          header,
+          target: chosen.target,
+          mark: "fixed",
+          why: "chosen",
+          learnLabel: null,
+        };
+      const kept = template ? fromTemplate(template.columns[index]!, layer) : null;
+      if (kept && "skip" in kept)
+        return { index, header, target: kept, mark: "keep", why: "template", learnLabel: null };
+      return { index, header, target: null, mark: "block", why: "owner-column", learnLabel: null };
+    }
     if (template) {
       const t = fromTemplate(template.columns[index]!, layer);
       if (t) return { index, header, target: t, mark: "keep", why: "template", learnLabel: null };
@@ -165,6 +187,26 @@ export function matchColumns(
           learnLabel: null,
         };
     }
+    // A new field goes through the company layer's rule here, so the import never promises a column it cannot keep
+    // (S4-r1 t11); new fields of the same file count against each other.
+    if (chosen && "newField" in chosen.target) {
+      const draft = chosen.target.newField;
+      const problems = checkFieldDraft(draft, {
+        liveFields: [...layer.fields, ...drafts],
+        labels: layer.labels.map((l) => l.label),
+        standardHeaders: STANDARD_HEADER_CONCEPTS.map((c) => label(c)),
+      });
+      if (problems.length)
+        return {
+          index,
+          header,
+          target: chosen.target,
+          mark: "block",
+          why: "field-refused",
+          learnLabel: null,
+        };
+      drafts.push({ code: `new:${index}`, name: draft.name });
+    }
     if (chosen)
       return {
         index,
@@ -174,8 +216,6 @@ export function matchColumns(
         why: "chosen",
         learnLabel: learnable(chosen.target),
       };
-    if (OWNER_HEADERS.has(f))
-      return { index, header, target: null, mark: "block", why: "owner-column", learnLabel: null };
     for (const s of STANDARD_TARGETS) {
       const own = layer.labels.find((l) => l.concept === TARGET_CONCEPT[s]);
       if (own && fold(own.label) === f)
@@ -396,6 +436,9 @@ export function markUnit(
   choice: UnitChoice | undefined,
 ): CellMark {
   if (raw.trim() === "") return { mark: "block", value: null, why: "no-unit-code" };
+  // A code the company layer cannot keep as a pending unit is blocked here, not dropped when the batch is written.
+  if ((!found || found.kind === "none") && raw.trim().length > PENDING_CODE_LIMIT)
+    return { mark: "block", value: null, why: "code-too-long" };
   if (choice && "skipRow" in choice) return { mark: "keep", value: null, why: "row-skipped" };
   if (!found || found.kind === "none") {
     if (choice && "pending" in choice)
@@ -422,4 +465,9 @@ export function readFloor(raw: string): string | null {
     .replace(/^0+(?=\d)/, "")
     .toUpperCase();
   return isFloor(t) ? t : null;
+}
+
+/** Whether a header names the owner's name or phone (Hỏi-12): such a column can only be dropped. */
+export function isOwnerHeader(header: string): boolean {
+  return OWNER_HEADERS.has(fold(header));
 }

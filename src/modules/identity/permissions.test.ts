@@ -139,6 +139,7 @@ const API_DOORS = [
   "GET /api/v1/imports",
   "POST /api/v1/imports",
   "POST /api/v1/imports/preview",
+  "GET /api/v1/imports/list-agents",
   "POST /api/v1/imports/[id]/batches",
   "POST /api/v1/imports/[id]/undo",
 ];
