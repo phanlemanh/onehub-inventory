@@ -18,6 +18,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog } from "@base-ui/react/dialog";
 
 import { GRID_COPY } from "./grid-copy";
+import { RECORD_SECTION_HEADER } from "./record-section";
 import { InDialog } from "./form-dialog";
 import { RECORD_FOOTER_VAR } from "./record-footer";
 import {
@@ -167,9 +168,6 @@ function PanelHeader({
     </div>
   );
 }
-
-/** A section head inside a record: its buttons get the phone's hit area (owner, BH session 2026-11-27). */
-export const RECORD_SECTION_HEADER = "record-section-header";
 
 /**
  * On a phone, every button at the record's head, at a section's head and at the record's foot is at least 44 px to

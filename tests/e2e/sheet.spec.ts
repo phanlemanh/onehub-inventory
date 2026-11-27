@@ -528,14 +528,17 @@ test.describe("sheet tab stops", () => {
       await openInventory(page);
       if (typed) await typeFilter(page, "Giá chào", "<=5");
       if (isPhone(page)) {
-        // Row 2b: a phone has the toolbar's three buttons, the filter chips when filtering, and one stop per card.
+        // Row 2b: a phone has the toolbar's buttons, the filter chips when filtering, and one stop per card. This viewer
+        // may not save a view, so no region action stands there; the «…» named «Thêm» that opened an empty sheet is
+        // gone (owner, BH session 2026-11-27, L1).
         const stops = await phoneTabStops(page);
+        expect(stops).not.toContain("Thêm");
         const cards = await page.locator('[data-slot="phone-card"]').count();
         checkPhoneStops(
           stops,
           typed
-            ? ["Lọc (1)", "Nhóm theo Toà", "Thêm", "Bỏ lọc Giá chào", "Xoá lọc"]
-            : ["Lọc", "Nhóm theo Toà", "Thêm"],
+            ? ["Lọc (1)", "Nhóm theo Toà", "Bỏ lọc Giá chào", "Xoá lọc"]
+            : ["Lọc", "Nhóm theo Toà"],
           cards,
         );
         return;
@@ -1086,7 +1089,7 @@ test.describe("header buttons in view", () => {
     return names;
   }
 
-  test("every frozen header button is on top and pressable; Căn has no «Bỏ ghim»", async ({
+  test("every frozen header button is on top and pressable; pinning lives in the header menu", async ({
     page,
   }) => {
     // Row 2b: header buttons belong to the table; a phone has the card list.
@@ -1094,8 +1097,39 @@ test.describe("header buttons in view", () => {
     await openInventory(page);
     const names = await checkHeaderButtons(page);
     expect(names.some((n) => n.startsWith("Căn"))).toBe(true);
-    if (WIDE.has(width())) expect(names).toContain("Bỏ ghim Toà");
-    await expect(page.getByRole("button", { name: "Bỏ ghim Căn", exact: true })).toHaveCount(0);
+    // Owner, BH session 2026-11-27, «Duyệt cả sáu điểm», L4 (replaces the «Bỏ ghim Toà» button of row 2e): no header
+    // carries a «Bỏ ghim» button; a pinned column's menu ticks «Ghim bên trái» and a press lets it go.
+    expect(names.filter((n) => n.startsWith("Bỏ ghim"))).toEqual([]);
+    await expect(page.getByRole("button", { name: /^Bỏ ghim / })).toHaveCount(0);
+    if (WIDE.has(width())) {
+      const toa = page.locator(
+        '[data-slot="data-region-body"] thead th[data-col-id="Listing.buildingName"]',
+      );
+      await toa.getByRole("button").first().click();
+      const pin = page.getByRole("menuitem", { name: "Ghim bên trái" });
+      await expect(pin.locator("svg.lucide-check")).toHaveCount(1);
+      await pin.click();
+      await expect(toa).not.toHaveAttribute("data-pinned", /.+/);
+    }
+  });
+
+  test("a column pins from its menu and casts a shadow over the columns scrolling under it", async ({
+    page,
+  }) => {
+    if (isPhone(page)) return phoneStandIn(page, "header buttons");
+    await openInventory(page);
+    const price = page
+      .locator('[data-slot="data-region-body"] thead th[data-col-id="Listing.listPrice"]')
+      .first();
+    await price.getByRole("button").first().click();
+    await page.getByRole("menuitem", { name: "Ghim bên trái" }).click();
+    await page.keyboard.press("Escape");
+    await expect(price).toHaveAttribute("data-pinned", "start");
+    const edge = page.locator(
+      '[data-slot="data-region-body"] thead th[data-pinned="start"][data-last-col="start"]',
+    );
+    await expect(edge).toHaveCount(1);
+    expect(await edge.evaluate((el) => getComputedStyle(el).boxShadow)).toMatch(/6px 0px 6px -6px/);
   });
 
   test("the check fails when the next header covers the first column's buttons", async ({

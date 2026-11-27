@@ -5,7 +5,7 @@
 // the whole record to it, the address stays (Hỏi-3).
 import { useRef, useState, type ReactNode } from "react";
 
-import { RECORD_SECTION_HEADER } from "@/components/candidate/record-panel";
+import { RECORD_SECTION_HEADER } from "@/components/candidate/record-section";
 import { TypedCell } from "@/components/candidate/typed-cell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";

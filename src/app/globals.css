@@ -6,6 +6,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* The last column pinned at the start casts this over the columns scrolling under it (owner 2026-11-27, L4). */
+  --shadow-pinned-edge:
+    inset -1px 0 0 0 var(--border),
+    6px 0 6px -6px color-mix(in oklab, var(--foreground) 30%, transparent);
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);

@@ -547,12 +547,10 @@ test.describe("E2, BH 2026-11-27 (replaces AC-10 of row 3e) · the record head o
   test("break: a walking button with its word says it is not an icon", async ({ page }) => {
     await openInventory(page);
     await openFifth(page);
-    await page.evaluate(() => {
-      const next = document.querySelector<HTMLElement>(
-        '[data-slot="record-panel-header"] button[aria-label="Sau"]',
-      );
-      next?.append(document.createTextNode("Sau"));
-    });
+    await suaTrang(
+      page.locator('[data-slot="record-panel-header"] button[aria-label="Sau"]'),
+      (el) => el.append(document.createTextNode("Sau")),
+    );
     await expect(assertHeaderOneLine(page)).rejects.toThrow("is not an icon with a name");
   });
 });

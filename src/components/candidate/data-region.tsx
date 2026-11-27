@@ -192,11 +192,18 @@ const TEXT_FILTER_MIN_CH = 8.3;
  */
 const HEADER_CONTROLS_PX = 48;
 /**
- * The first column never hides and always stays frozen (row 2a: the second frozen column may be unpinned while the first stays), so its header
- * shows no «Bỏ ghim» button — that button lay hidden under the next header and could not be pressed (row 2e, ruling
- * K-1411-7). The vendor header draws it inside a span; this hides that span for the first column only.
+ * Pinning lives in each column header's menu, «Ghim bên trái» and «Ghim bên phải» ticked while the column is pinned and
+ * pressed again to let go (owner, BH session 2026-11-27, «Duyệt cả sáu điểm», L4): the vendor's «Bỏ ghim» button beside
+ * a pinned header, which only the second frozen column ever showed, is hidden on every header.
  */
 const NO_UNPIN_CLASS = "[&_span:has(>button>svg.lucide-pin-off)]:hidden";
+
+/**
+ * The last pinned column at the start casts a shadow over the columns scrolling under it (L4), on top of the grid's own
+ * 1 px line.
+ */
+const PINNED_EDGE_CLASS =
+  "[&_:is(td,th)[data-pinned=start][data-last-col=start]]:shadow-pinned-edge";
 
 /** Room the group's open-close button takes in front of a group label, in ch. */
 const GROUP_TOGGLE_CH = 4;
@@ -893,7 +900,7 @@ export function DataRegion({
             headerTitle: column.header,
             headerClassName: cn(
               column.align === "right" ? "text-right" : "text-left",
-              index === 0 && NO_UNPIN_CLASS,
+              NO_UNPIN_CLASS,
             ),
             cellClassName: column.align === "right" ? "text-right" : "text-left",
             // A copy carries the words the cell shows; nothing in the grid is written from here (rows 4, 5 edit).
@@ -1458,7 +1465,7 @@ export function DataRegion({
         data-hydrated={phoneLayout === undefined ? undefined : ""}
         data-full-screen={fullScreen || undefined}
         style={REGION_HEIGHTS}
-        className="group/region mr-(--record-pinned,0px) flex min-w-0 flex-col bg-background"
+        className={`group/region mr-(--record-pinned,0px) flex min-w-0 flex-col bg-background ${PINNED_EDGE_CLASS}`}
       >
         <span ref={chRef} aria-hidden="true" className="invisible absolute text-base">
           0
