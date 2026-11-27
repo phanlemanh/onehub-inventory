@@ -957,6 +957,10 @@ begin
    where id = '00000000-0000-4000-8000-0000000a0001';
   get diagnostics n = row_count;
   if n <> 0 then raise exception 'HỎNG gia-tri-rieng-theo-san: sàn B sửa được % giá trị riêng của A', n; end if;
-  raise notice 'ok gia-tri-rieng-theo-san — ghi, đọc, nguồn đi cùng giá trị, luật của danh mục, sàn khác';
+  -- «Gắn sang căn khác» (row 3h): B cannot move the unit link of A's listing either.
+  update listing_units set upi = 'upi-mau-1' where listing_id = '00000000-0000-4000-8000-0000000a0001';
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'HỎNG gia-tri-rieng-theo-san: sàn B gắn được % lần chào của A sang căn khác', n; end if;
+  raise notice 'ok gia-tri-rieng-theo-san — ghi, đọc, nguồn đi cùng giá trị, luật của danh mục, sàn khác, gắn căn';
 end $$;
 rollback;

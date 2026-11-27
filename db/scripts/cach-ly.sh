@@ -2,7 +2,7 @@
 # Company isolation suite (SP-1, hồ sơ cach-ly-moi-san). Runs on this lane's Postgres container, never on real data:
 #   1. a fresh scratch database, migrations applied twice (the second run applies nothing);
 #   2. db/tests/cach-ly.sql — 24 cases under the API role, using the door's own statements;
-#   3. eleven break cases (twenty-six break files), each file on its own scratch database: the suite must go red with the
+#   3. eleven break cases (twenty-seven break files), each file on its own scratch database: the suite must go red with the
 #      pinned messages;
 #   4. the app's login role (row 7c): db/tests/vai-dang-nhap.sql on the clean database in a rolled-back transaction;
 #      db/tests/vai-dang-nhap-phien.sql on a connection logged in AS quy_hang_login; seven break files, each in one
@@ -105,7 +105,7 @@ pha_thu_tep() {
     dang-xem-vuot) printf '%s\n' dang-xem-thuong dang-xem-vat-chat ;;
     ham-dac-quyen) printf '%s\n' ham-dac-quyen-public ham-trigger-dac-quyen ;;
     dang-xem-chi-ghi) printf '%s\n' dang-xem-chi-xoa dang-xem-chi-sua-cot dang-xem-chi-them-schema-khac ;;
-    gia-tri-rieng-long) printf '%s\n' gia-tri-rieng-khong-nguon ;;
+    gia-tri-rieng-long) printf '%s\n' gia-tri-rieng-khong-nguon gia-tri-rieng-gan-mo ;;
   esac
 }
 # Break file → the lines its red run must contain.
@@ -143,6 +143,7 @@ pha_thu_ghim() {
     dang-xem-chi-sua-cot) printf '%s\n' "HỎNG dang-xem-ghi-khong-vuot-luat: public.agreements_sua_ben UPDATE" ;;
     dang-xem-chi-them-schema-khac) printf '%s\n' "HỎNG dang-xem-ghi-khong-vuot-luat: kho_xem.agreements_them INSERT" ;;
     gia-tri-rieng-khong-nguon) printf '%s\n' "HỎNG gia-tri-rieng-theo-san: câu chạy được" ;;
+    gia-tri-rieng-gan-mo) printf '%s\n' "HỎNG gia-tri-rieng-theo-san: sàn B gắn được" ;;
   esac
 }
 

@@ -54,8 +54,8 @@ async function apiWorld(suffix: string) {
       headers: { "content-type": "application/json", ...(c ? { cookie: c } : {}) },
       body: JSON.stringify(body),
     });
-  const cookie = async (who: Person): Promise<string> => {
-    const have = cookies.get(who);
+  const cookie = async (who: Person, company = w.A): Promise<string> => {
+    const have = cookies.get(who + company);
     if (have) return have;
     const email = w.email[who];
     await auth.requestCode(send(`${ORIGIN}/api/v1/auth/code`, "POST", { email }));
@@ -69,17 +69,20 @@ async function apiWorld(suffix: string) {
     if (!res.ok) throw new Error(`đăng nhập ${who} trả ${res.status}`);
     const c = (res.headers.get("set-cookie") ?? "").split(";")[0]!;
     const json = (await res.json()) as { company: { id: string } | null };
-    if (json.company?.id !== w.A) {
+    if (json.company?.id !== company) {
       const chosen = await auth.chooseCompany(
-        send(`${ORIGIN}/api/v1/auth/session/company`, "PUT", { companyId: w.A }, c),
+        send(`${ORIGIN}/api/v1/auth/session/company`, "PUT", { companyId: company }, c),
       );
       if (!chosen.ok) throw new Error(`chọn sàn của ${who} trả ${chosen.status}`);
     }
-    cookies.set(who, c);
+    cookies.set(who + company, c);
     return c;
   };
-  const patch = async (who: Person, id: string, body: unknown) =>
-    h.change(send(`${ORIGIN}/api/v1/listings/${id}`, "PATCH", body, await cookie(who)), id);
+  const patch = async (who: Person, id: string, body: unknown, company = w.A) =>
+    h.change(
+      send(`${ORIGIN}/api/v1/listings/${id}`, "PATCH", body, await cookie(who, company)),
+      id,
+    );
   const used = new Set<string>();
   /** One listing of company A on a unit no other listing of this world uses; its own values as given. */
   const listing = async (
@@ -317,5 +320,52 @@ describe("gan-sang-can-khac (E10)", () => {
     });
     expect(locked.status).toBe(400);
     expect(((await locked.json()) as { why: unknown }).why).toEqual({ rule: "locked" });
+  });
+});
+
+describe("san-khac-khong-cham (E11, SP-1)", () => {
+  it("san-khac-khong-cham: a person of B who may change listings reaches no listing of A through the two new doors", async () => {
+    const { w, listing, patch } = await apiWorld("san-khac");
+    // Y becomes a listing agent of B, so the door opens and only the company's rows stand between Y and A's listing.
+    await w.db.owner.query(
+      "update company_members set roles = '{ListAgent}' where company_id = $1 and user_id = $2",
+      [w.B, w.id.Y],
+    );
+    const l = await listing({ own: { living_area: 72.5, living_area_source: "Typed" } });
+    const free = UNITS.find((u) => u.upi !== l.upi)!;
+    const before = (
+      await w.db.owner.query(
+        `select l.living_area, l.living_area_source, l.version, u.upi
+           from listings l join listing_units u on u.listing_id = l.id where l.id = $1`,
+        [l.id],
+      )
+    ).rows[0];
+    const write = await patch(
+      "Y",
+      l.id,
+      { version: 1, change: { field: "unitAttributes", livingArea: 99 } },
+      w.B,
+    );
+    const back = await patch(
+      "Y",
+      l.id,
+      { version: 1, change: { field: "unitAttributes", livingArea: null } },
+      w.B,
+    );
+    const move = await patch(
+      "Y",
+      l.id,
+      { version: 1, change: { field: "unit", upi: free.upi } },
+      w.B,
+    );
+    expect([write.status, back.status, move.status]).toEqual([404, 404, 404]);
+    const after = (
+      await w.db.owner.query(
+        `select l.living_area, l.living_area_source, l.version, u.upi
+           from listings l join listing_units u on u.listing_id = l.id where l.id = $1`,
+        [l.id],
+      )
+    ).rows[0];
+    expect(after).toEqual(before);
   });
 });
