@@ -158,6 +158,12 @@ const ROW_HEIGHT_PX = { dense: 33, normal: 49 } as const;
 const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-(--region-height)";
 
 /**
+ * A toolbar button's words while the floating record lies over the right of the region (owner, BH session 2026-11-27):
+ * the button keeps its icon and its name for assistive tech, so no button is cut in half by the record's edge.
+ */
+const FLOAT_LABEL = "in-data-record-float:sr-only";
+
+/**
  * In full screen the grid ends at the screen's bottom edge: the screen less the name strip, toolbar and footer, a
  * height the region sets once as a custom property.
  */
@@ -1199,7 +1205,7 @@ export function DataRegion({
             }}
           >
             <ListTreeIcon aria-hidden="true" />
-            {GRID_COPY.sheet.groupBy(groupColumn.header)}
+            <span className={FLOAT_LABEL}>{GRID_COPY.sheet.groupBy(groupColumn.header)}</span>
           </Button>
         ) : null}
         <DataGridColumnVisibility
@@ -1207,7 +1213,7 @@ export function DataRegion({
           trigger={
             <Button variant="outline" size="sm" data-slot="columns-toggle">
               <Columns3Icon aria-hidden="true" />
-              {GRID_COPY.sheet.columns}
+              <span className={FLOAT_LABEL}>{GRID_COPY.sheet.columns}</span>
             </Button>
           }
         />
@@ -1227,7 +1233,9 @@ export function DataRegion({
               ) : (
                 <Maximize2Icon aria-hidden="true" />
               )}
-              {fullScreen ? GRID_COPY.sheet.leaveFullScreen : GRID_COPY.sheet.fullScreen}
+              <span className={FLOAT_LABEL}>
+                {fullScreen ? GRID_COPY.sheet.leaveFullScreen : GRID_COPY.sheet.fullScreen}
+              </span>
             </Button>
           </span>
         ) : null}

@@ -442,6 +442,27 @@ function RecordColumn({
       root.style.removeProperty("--record-pinned");
     };
   }, [pinned, pinnedWidth]);
+  // Floating, the record lies over the right of the region: the region's toolbar ends before the record's edge, with
+  // 16 px to spare, and its buttons drop their words (owner, BH session 2026-11-27), so no button is cut in half.
+  const floating = shown && !pinned;
+  useEffect(() => {
+    const root = document.documentElement;
+    if (!floating) return;
+    const place = () => {
+      const tools = document.querySelector<HTMLElement>(REGION_TOOLS)?.parentElement;
+      if (!tools) return;
+      const box = tools.getBoundingClientRect();
+      const end = box.right - (parseFloat(getComputedStyle(tools).paddingRight) || 0);
+      const edge = window.innerWidth - bounds.right - width;
+      root.style.setProperty("--record-float-clear", `${Math.max(0, end - edge + 16)}px`);
+    };
+    root.dataset["recordFloat"] = "";
+    place();
+    return () => {
+      delete root.dataset["recordFloat"];
+      root.style.removeProperty("--record-float-clear");
+    };
+  }, [floating, width, bounds.right, bounds.window]);
   if (!shown || view === null || openId === null) return null;
   const titleId = `record-panel-title-${openId}`;
   return (

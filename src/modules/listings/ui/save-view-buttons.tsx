@@ -47,7 +47,8 @@ function SaveViewDialog({
         ) : (
           <>
             <BookmarkIcon aria-hidden="true" />
-            {copy.labels.save}
+            {/* Icon only while the floating record lies over the toolbar's right end (BH session 2026-11-27). */}
+            <span className="in-data-record-float:sr-only">{copy.labels.save}</span>
           </>
         ),
       }}
