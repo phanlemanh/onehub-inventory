@@ -471,6 +471,9 @@ describe("khoa-ba-trang-thai (E14)", () => {
       expect(Boolean(editButton()), "nút Sửa").toBe(row.edit);
       expect(Boolean(sectionLock()), "dòng khoá Sửa").toBe(!row.edit);
       // The unit's attributes read only until «Sửa» is pressed: no input in the section.
+      expect(
+        document.querySelectorAll('[data-slot="listing-unit"] [data-field]').length,
+      ).toBeGreaterThan(0);
       expect(document.querySelectorAll('[data-slot="listing-unit"] input')).toHaveLength(0);
       if (!row.edit)
         expect(sectionLock()!.textContent).toBe(

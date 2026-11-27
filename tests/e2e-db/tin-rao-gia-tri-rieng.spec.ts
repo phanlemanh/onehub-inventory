@@ -195,6 +195,8 @@ test("dau-khac: only the value that differs is marked, named with the catalog's 
   expect(await colour("Unit.livingArea"), "mark on equal value").toBe(await colour("Unit.floor"));
   for (const quiet of [BEDROOMS_EQUAL, PLAIN]) {
     await openRecord(page, w.idOf(quiet));
+    // Zero marks counts only on a unit section that is there, with its area row.
+    await expect(unitSection(page).locator('[data-field="Unit.livingArea"] dd')).toBeVisible();
     await expect(marksIn(page), "mark on equal value").toHaveCount(0);
   }
 });
@@ -217,6 +219,7 @@ test("lay-lai: the mark's command takes the catalog value back — value and sou
       timeout: 10_000,
     })
     .toEqual([null, null]);
+  await expect(unitSection(page).locator('[data-field="Unit.livingArea"] dd')).toContainText("75");
   await expect(marksIn(page)).toHaveCount(0);
   await page.getByRole("button", { name: "Hoàn tác" }).click();
   await expect
@@ -236,7 +239,8 @@ test("khoa-ba-trang-thai: sold and withdrawn keep «Sửa» and «Hỏi đầu c
     await page.emulateMedia({ colorScheme: theme });
     for (const locked of [SOLD, WITHDRAWN]) {
       await openRecord(page, w.idOf(locked));
-      await expect(record(page).locator('[data-slot="section-locked-reason"]')).toBeVisible();
+      // The lock line stands in the unit section itself, so «no Sửa» is counted on a section that is there.
+      await expect(unitSection(page).locator('[data-slot="section-locked-reason"]')).toBeVisible();
       await expect(editOpen(page)).toHaveCount(0);
       const foot = page.locator('[data-slot="ask-locked-reason"]').filter({ visible: true });
       await expect(foot).toHaveCount(1);
