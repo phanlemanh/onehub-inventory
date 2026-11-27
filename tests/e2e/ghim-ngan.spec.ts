@@ -234,8 +234,9 @@ test.describe("E2 · pinning makes room beside the grid", () => {
       browserName,
     }, info) => {
       test.skip(browserName !== "chromium" || !WIDE.has(info.project.name), "do o 1440 va 1024");
-      // A short window, so the record's body scrolls and keeping its scroll means something.
-      await page.setViewportSize({ width: page.viewportSize()!.width, height: 520 });
+      // A short window, so the record's body scrolls and keeping its scroll means something. 440, not 520, since the
+      // floating record runs from under the top bar (owner, BH session 2026-11-27) and a short unit on /sent then fits.
+      await page.setViewportSize({ width: page.viewportSize()!.width, height: 440 });
       await openScreen(page, path);
       const headers = await headersShown(page);
       const fullWidth = (await box(page, '[data-slot="data-region"]')).width;

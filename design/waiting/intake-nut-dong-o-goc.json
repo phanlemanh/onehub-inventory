@@ -1,0 +1,24 @@
+{
+  "id": "intake-nut-dong-o-goc",
+  "group": "blocks to take in",
+  "question": "Which block answers the need nut-dong-o-goc?",
+  "recommendation": "make it by hand",
+  "basis": "Nút × của bộ kit viết cứng chữ Close và không nhận nhãn; đây là đúng nút ấy, cùng chỗ, chữ Đóng (owner 2026-11-27, L2)",
+  "hard_to_undo": false,
+  "where": "design/intake/",
+  "if_refused": "no block is taken in for nut-dong-o-goc; ask again with other words, or make it by hand with --by-hand --why",
+  "item": "need:nut-dong-o-goc",
+  "asked_on": "2026-11-27",
+  "candidates": [
+    {
+      "name": "by-hand",
+      "store": "by-hand",
+      "why": "Nút × của bộ kit viết cứng chữ Close và không nhận nhãn; đây là đúng nút ấy, cùng chỗ, chữ Đóng (owner 2026-11-27, L2)",
+      "searched": "nút đóng ở góc hộp thoại và ngăn đáy đọc Đóng",
+      "nearest": "none"
+    }
+  ],
+  "answer": "keep",
+  "by": "Manh Phan",
+  "on": "2026-11-27"
+}

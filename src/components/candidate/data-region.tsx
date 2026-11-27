@@ -158,6 +158,13 @@ const ROW_HEIGHT_PX = { dense: 33, normal: 49 } as const;
 const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-(--region-height)";
 
 /**
+ * A toolbar button's words while the record is open beside the grid, floating or pinned (owner, BH session 2026-11-27;
+ * scope gate Hỏi-7): the button keeps its icon and its name for assistive tech, so the toolbar stays on one line and no
+ * button is cut in half by the record's edge.
+ */
+const FLOAT_LABEL = "in-data-record-beside:sr-only";
+
+/**
  * In full screen the grid ends at the screen's bottom edge: the screen less the name strip, toolbar and footer, a
  * height the region sets once as a custom property.
  */
@@ -165,7 +172,11 @@ const VIEWPORT_HEIGHT_CLASS = "h-96 lg:h-(--region-height)";
 const FULL_SCREEN_HEIGHT_CLASS =
   "group-data-full-screen/region:h-(--region-full-height) lg:group-data-full-screen/region:h-(--region-full-height)";
 const REGION_HEIGHTS = {
-  "--region-height": "calc(100dvh - 23rem)",
+  // The screen less everything around the rows, top to bottom (owner, BH session 2026-11-27: the grid ends 16 px above
+  // the work area's bottom, like every other edge of the content): the inset's 8 px margin, the top bar 48, the content's
+  // 16 padding, the page header 32 and the 16 gap, the region's head down to the column headers 96, the footer and the
+  // frame's bottom 42, the content's 16 padding and the inset's 8 margin = 282 px.
+  "--region-height": "calc(100dvh - 17.625rem)",
   "--region-full-height": "calc(100dvh - 10rem)",
 } as CSSProperties;
 
@@ -182,11 +193,18 @@ const TEXT_FILTER_MIN_CH = 8.3;
  */
 const HEADER_CONTROLS_PX = 48;
 /**
- * The first column never hides and always stays frozen (row 2a: the second frozen column may be unpinned while the first stays), so its header
- * shows no «Bỏ ghim» button — that button lay hidden under the next header and could not be pressed (row 2e, ruling
- * K-1411-7). The vendor header draws it inside a span; this hides that span for the first column only.
+ * Pinning lives in each column header's menu, «Ghim bên trái» and «Ghim bên phải» ticked while the column is pinned and
+ * pressed again to let go (owner, BH session 2026-11-27, «Duyệt cả sáu điểm», L4): the vendor's «Bỏ ghim» button beside
+ * a pinned header, which only the second frozen column ever showed, is hidden on every header.
  */
 const NO_UNPIN_CLASS = "[&_span:has(>button>svg.lucide-pin-off)]:hidden";
+
+/**
+ * The last pinned column at the start casts a shadow over the columns scrolling under it (L4), on top of the grid's own
+ * 1 px line.
+ */
+const PINNED_EDGE_CLASS =
+  "[&_:is(td,th)[data-pinned=start][data-last-col=start]]:shadow-pinned-edge";
 
 /** Room the group's open-close button takes in front of a group label, in ch. */
 const GROUP_TOGGLE_CH = 4;
@@ -906,7 +924,7 @@ export function DataRegion({
             headerTitle: column.header,
             headerClassName: cn(
               column.align === "right" ? "text-right" : "text-left",
-              index === 0 && NO_UNPIN_CLASS,
+              NO_UNPIN_CLASS,
             ),
             cellClassName: column.align === "right" ? "text-right" : "text-left",
             // A copy carries the words the cell shows; nothing in the grid is written from here (rows 4, 5 edit).
@@ -1213,21 +1231,27 @@ export function DataRegion({
             size="sm"
             aria-pressed={isGrouped}
             data-slot="group-toggle"
+            title={GRID_COPY.sheet.groupBy(groupColumn.header)}
             onClick={() => {
               setGrouped((on) => !on);
               setExpanded(true);
             }}
           >
             <ListTreeIcon aria-hidden="true" />
-            {GRID_COPY.sheet.groupBy(groupColumn.header)}
+            <span className={FLOAT_LABEL}>{GRID_COPY.sheet.groupBy(groupColumn.header)}</span>
           </Button>
         ) : null}
         <DataGridColumnVisibility
           table={table}
           trigger={
-            <Button variant="outline" size="sm" data-slot="columns-toggle">
+            <Button
+              variant="outline"
+              size="sm"
+              data-slot="columns-toggle"
+              title={GRID_COPY.sheet.columns}
+            >
               <Columns3Icon aria-hidden="true" />
-              {GRID_COPY.sheet.columns}
+              <span className={FLOAT_LABEL}>{GRID_COPY.sheet.columns}</span>
             </Button>
           }
         />
@@ -1240,6 +1264,7 @@ export function DataRegion({
               aria-pressed={fullScreen}
               ref={fullScreenButtonRef}
               data-slot="full-screen-toggle"
+              title={fullScreen ? GRID_COPY.sheet.leaveFullScreen : GRID_COPY.sheet.fullScreen}
               onClick={toggleFullScreen}
             >
               {fullScreen ? (
@@ -1247,7 +1272,9 @@ export function DataRegion({
               ) : (
                 <Maximize2Icon aria-hidden="true" />
               )}
-              {fullScreen ? GRID_COPY.sheet.leaveFullScreen : GRID_COPY.sheet.fullScreen}
+              <span className={FLOAT_LABEL}>
+                {fullScreen ? GRID_COPY.sheet.leaveFullScreen : GRID_COPY.sheet.fullScreen}
+              </span>
             </Button>
           </span>
         ) : null}
@@ -1463,7 +1490,7 @@ export function DataRegion({
         data-hydrated={phoneLayout === undefined ? undefined : ""}
         data-full-screen={fullScreen || undefined}
         style={REGION_HEIGHTS}
-        className="group/region mr-(--record-pinned,0px) flex min-w-0 flex-col bg-background"
+        className={`group/region mr-(--record-pinned,0px) flex min-w-0 flex-col bg-background ${PINNED_EDGE_CLASS}`}
       >
         <span ref={chRef} aria-hidden="true" className="invisible absolute text-base">
           0

@@ -82,7 +82,7 @@ type Box = { top: number; bottom: number; left: number; right: number; width: nu
 async function floatGeometry(page: Page): Promise<{
   aside: Box;
   barBottom: number | null;
-  toolsBottom: number | null;
+  toolsRight: number | null;
   areaBottom: number;
   viewport: number;
   viewportHeight: number;
@@ -112,9 +112,17 @@ async function floatGeometry(page: Page): Promise<{
     return {
       aside: rect(aside),
       barBottom: shown ? shown.getBoundingClientRect().bottom : null,
-      toolsBottom:
-        document.querySelector('[data-slot="region-toolbar"]')?.getBoundingClientRect().bottom ??
-        null,
+      // The toolbar's last control: it ends before the floating record (owner, BH session 2026-11-27).
+      toolsRight: (() => {
+        const controls = [
+          ...document.querySelectorAll(
+            '[data-slot="region-toolbar"] button, [data-slot="region-toolbar"] a',
+          ),
+        ].filter((el) => (el as HTMLElement).offsetParent !== null);
+        return controls.length === 0
+          ? null
+          : Math.max(...controls.map((el) => el.getBoundingClientRect().right));
+      })(),
       areaBottom: area.getBoundingClientRect().bottom,
       viewport: window.innerWidth,
       viewportHeight: window.innerHeight,
@@ -136,17 +144,17 @@ async function floatGeometry(page: Page): Promise<{
 }
 
 /**
- * The record runs from just under the top bar — and under the region's toolbar while that is in view (row 3a, AC-4,
- * supervisor's ruling D-1411-1) — to the bottom of the work area or the window.
+ * The record runs from just under the App Shell's top bar — or from the window's top when there is no top bar — to the
+ * bottom of the work area or the window (owner, BH session 2026-11-27, «Chốt cả bốn»: back to decision 0024's «Trừ
+ * thanh trên»; this replaces row 3a's AC-4, which stood the record under the region's toolbar). The region's toolbar
+ * then ends 16 px short of the record, so none of its buttons sits under it.
  */
 function assertEdges(g: Awaited<ReturnType<typeof floatGeometry>>): void {
   if (g.barBottom !== null && g.aside.top < g.barBottom - 2)
     throw new Error("record covers the top bar");
-  if (g.toolsBottom !== null && g.aside.top < g.toolsBottom - 2)
-    throw new Error("record covers the toolbar");
-  const under = Math.max(g.barBottom ?? 0, g.toolsBottom ?? 0);
+  const under = Math.max(0, g.barBottom ?? 0);
   if (Math.abs(g.aside.top - under) > 2) {
-    throw new Error(`record top ${g.aside.top} not under the top bar and toolbar ${under}`);
+    throw new Error(`record top ${g.aside.top} not under the top bar ${under}`);
   }
   // The work area may run below the window (the page scrolls): the record stops at whichever comes first.
   const bottom = Math.min(g.areaBottom, g.viewportHeight);
@@ -157,6 +165,10 @@ function assertEdges(g: Awaited<ReturnType<typeof floatGeometry>>): void {
 
 function assertFloat(g: Awaited<ReturnType<typeof floatGeometry>>): void {
   assertEdges(g);
+  if (g.toolsRight !== null && g.toolsRight > g.aside.left - 16 + 1)
+    throw new Error(
+      `toolbar runs under the record: ends ${g.toolsRight}, record at ${g.aside.left}`,
+    );
   const share = g.aside.width / g.viewport;
   const clamped = Math.min(512, Math.max(320, g.viewport * 0.4));
   if (!(share >= 0.35 && share <= 0.45) && Math.abs(g.aside.width - clamped) > 2) {
@@ -169,51 +181,57 @@ function assertFloat(g: Awaited<ReturnType<typeof floatGeometry>>): void {
 }
 
 /**
- * The record's head on two lines, on every width (owner, 2026-11-13, «Có, mọi khổ», row 3e AC-10): the name on one line
- * of its own; under it, one line of buttons ending «Trước», «Sau», «Đóng», «Đóng» at the right edge; «Chép đường dẫn» an
- * icon with a readable name and a hover hint; no button outside the record.
+ * The record's head on one line, on every width (owner, BH session 2026-11-27, «Chốt một dòng», answering «Chốt đầu chi
+ * tiết căn một dòng, nút Trước/Sau/Đóng ở góc phải trên?»; this replaces row 3e's AC-10, «Có, mọi khổ», the two lines of
+ * 2026-11-13): the record's name on the left; at the top right, on the same line, the record's buttons ending «Trước»,
+ * «Sau», «Đóng» at the right edge; every one of them an icon with a readable name that is also its hover hint; no button
+ * outside the record; the head no taller than 64 px.
  */
 /** Head frames for row 3e's evidence, in the run folder. */
 const HEAD_SHOTS = join(".acceptance-runs", "hoi-dau-chu-bao-sai", "dau-ho-so");
 
-async function assertHeaderTwoLines(page: Page): Promise<void> {
+async function assertHeaderOneLine(page: Page): Promise<void> {
   const g = await page.evaluate(() => {
     const record = document.querySelector('[data-slot="record-panel"]')!;
     const header = record.querySelector('[data-slot="record-panel-header"]')!;
     const h2 = header.querySelector("h2")!;
     const title = h2.getBoundingClientRect();
     const all = [...header.querySelectorAll("button")];
-    const copy = header.querySelector<HTMLElement>('[data-slot="copy-link"]');
     return {
       lastThree: all
         .slice(-3)
         .map((b) => b.getAttribute("aria-label") ?? b.textContent?.trim() ?? ""),
-      titleBottom: title.bottom,
-      titleHeight: title.height,
+      title: title.toJSON() as DOMRect,
       lineHeight:
         parseFloat(getComputedStyle(h2).lineHeight) ||
         parseFloat(getComputedStyle(h2).fontSize) * 1.5,
+      headerHeight: header.getBoundingClientRect().height,
       boxes: all.map((b) => b.getBoundingClientRect().toJSON() as DOMRect),
+      buttons: all.map((b) => ({
+        text: b.innerText.trim(),
+        name: b.getAttribute("aria-label"),
+        hint: b.getAttribute("title"),
+      })),
       record: record.getBoundingClientRect().toJSON() as DOMRect,
-      copyText: copy?.innerText.trim() ?? null,
-      copyName: copy?.getAttribute("aria-label") ?? null,
-      copyHint: copy?.getAttribute("title") ?? null,
     };
   });
   const named = ["Trước", "Sau", "Đóng"].every((name, i) => g.lastThree[i]?.includes(name));
-  const tops = g.boxes.map((b) => b.top);
-  const oneRow = tops.every((top) => Math.abs(top - tops[0]!) <= 4);
-  const below = g.boxes.every((b) => b.top >= g.titleBottom - 1);
-  if (g.boxes.length < 3 || !named || !oneRow || !below)
-    throw new Error("record header is not two lines");
-  if (g.titleHeight > g.lineHeight * 1.6) throw new Error("unit name squeezed");
+  const middle = (b: { top: number; bottom: number }) => (b.top + b.bottom) / 2;
+  const level = g.boxes.every((b) => Math.abs(middle(b) - middle(g.title)) <= 6);
+  const right = g.boxes.every((b) => b.left >= g.title.right - 1);
+  if (g.boxes.length < 3 || !named || !level || !right)
+    throw new Error("record header is not one line");
+  if (g.headerHeight > 64) throw new Error(`record header ${g.headerHeight}px tall`);
+  if (g.title.height > g.lineHeight * 1.6 || g.title.width < 64)
+    throw new Error("unit name squeezed");
   if (g.record.right - g.boxes.at(-1)!.right > 24)
     throw new Error("record actions left the right edge");
   for (const b of g.boxes)
     if (b.right > g.record.right + 0.5 || b.left < g.record.left - 0.5)
       throw new Error("record head buttons overflow the record");
-  if (g.copyText !== "" || !g.copyName?.includes("Chép đường dẫn") || g.copyHint !== g.copyName)
-    throw new Error("copy link is not an icon with a name");
+  for (const b of g.buttons)
+    if (b.text !== "" || !b.name || b.hint !== b.name)
+      throw new Error(`head button «${b.name ?? b.text}» is not an icon with a name`);
 }
 
 /** Tab from «Đóng» leaves the record and reaches the grid's region within ten steps. */
@@ -360,7 +378,7 @@ test.describe("E2 · the record floats beside the grid", () => {
     test.skip(browserName !== "chromium" || !WIDE.has(info.project.name), "do o 1440 va 1024"),
   );
 
-  test("stands under the top bar, leaves search and account usable, keeps the grid live", async ({
+  test("stands under the top bar, clears the toolbar, leaves search and account usable, keeps the grid live", async ({
     page,
   }) => {
     await openInventory(page);
@@ -390,12 +408,12 @@ test.describe("E2 · the record floats beside the grid", () => {
     });
     const size = page.viewportSize()!;
     await page.setViewportSize({ width: size.width, height: size.height - 1 });
-    // No top bar: the record runs from the region's toolbar (row 3a, AC-4), or from the top while it is out of view.
+    // No top bar: the record runs from the window's top (decision 0024, owner 2026-11-27).
     await expect
       .poll(
         async () => {
           const g = await floatGeometry(page);
-          return Math.abs(g.aside.top - Math.max(0, g.toolsBottom ?? 0));
+          return Math.abs(g.aside.top);
         },
         { message: info.project.name },
       )
@@ -441,6 +459,36 @@ test.describe("E2 · the record floats beside the grid", () => {
     expect(() => assertFloat(g)).toThrow("record scrolls sideways");
   });
 
+  test("the toolbar ends 16 px short of the record even with its controls at its right end", async ({
+    page,
+  }) => {
+    await injectStyle(page, '[data-slot="sheet-tools"] { margin-left: auto !important; }');
+    await openInventory(page);
+    await openFifth(page);
+    await expect(async () => assertFloat(await floatGeometry(page))).toPass({ timeout: 2000 });
+    // While the record floats, the toolbar's buttons keep their icon, their name and a hover hint, not their words.
+    for (const slot of ["columns-toggle", "full-screen-toggle"]) {
+      const button = page.locator(`[data-slot="${slot}"]`);
+      if ((await button.count()) === 0) continue;
+      await expect(button).toHaveAttribute("title", /.+/);
+      // Its words are for assistive tech only: the button is no wider than an icon button.
+      expect((await button.boundingBox())!.width).toBeLessThanOrEqual(40);
+    }
+  });
+
+  test("break: a toolbar that does not clear the record runs under it", async ({ page }) => {
+    // The toolbar's controls pushed to its right end, as a region with an action has them, and no room left for the record.
+    await injectStyle(
+      page,
+      '[data-slot="region-toolbar"] { margin-right: 0 !important; } [data-slot="sheet-tools"] { margin-left: auto !important; }',
+    );
+    await openInventory(page);
+    await openFifth(page);
+    await page.waitForTimeout(300);
+    const g = await floatGeometry(page);
+    expect(() => assertFloat(g)).toThrow("toolbar runs under the record");
+  });
+
   test("break: a focus trap keeps Tab inside the record", async ({ page }) => {
     await openInventory(page);
     await openFifth(page);
@@ -459,13 +507,15 @@ test.describe("E2 · the record floats beside the grid", () => {
   });
 });
 
-test.describe("E2, AC-10 of row 3e · the record head on two lines on every size", () => {
+test.describe("E2, BH 2026-11-27 (replaces AC-10 of row 3e) · the record head on one line on every size", () => {
   for (const colorScheme of ["light", "dark"] as const) {
-    test(`name on one line, buttons on the next (${colorScheme})`, async ({ page }, info) => {
+    test(`name on the left, icon buttons at the top right (${colorScheme})`, async ({
+      page,
+    }, info) => {
       await page.emulateMedia({ colorScheme });
       await openInventory(page);
       await openFifth(page);
-      await assertHeaderTwoLines(page);
+      await assertHeaderOneLine(page);
       await themKieu(page, { content: "nextjs-portal { display: none !important; }" });
       mkdirSync(HEAD_SHOTS, { recursive: true });
       await chupAnh(page, {
@@ -474,21 +524,34 @@ test.describe("E2, AC-10 of row 3e · the record head on two lines on every size
     });
   }
 
-  test("break: a head on one line says «record header is not two lines»", async ({ page }) => {
+  test("break: a head on two lines says «record header is not one line»", async ({ page }) => {
     await injectStyle(
       page,
-      '[data-slot="record-panel-header"] { flex-direction: row !important; align-items: flex-start !important; }',
+      '[data-slot="record-panel-header"] { flex-direction: column !important; align-items: flex-start !important; }',
     );
     await openInventory(page);
     await openFifth(page);
-    await expect(assertHeaderTwoLines(page)).rejects.toThrow("record header is not two lines");
+    await expect(assertHeaderOneLine(page)).rejects.toThrow("record header is not one line");
   });
 
   test("break: a squeezed name says «unit name squeezed»", async ({ page }) => {
-    await injectStyle(page, '[data-slot="record-panel-header"] h2 { width: 40px !important; }');
+    await injectStyle(
+      page,
+      '[data-slot="record-panel-header"] h2 { flex: none !important; width: 40px !important; }',
+    );
     await openInventory(page);
     await openFifth(page);
-    await expect(assertHeaderTwoLines(page)).rejects.toThrow("unit name squeezed");
+    await expect(assertHeaderOneLine(page)).rejects.toThrow("unit name squeezed");
+  });
+
+  test("break: a walking button with its word says it is not an icon", async ({ page }) => {
+    await openInventory(page);
+    await openFifth(page);
+    await suaTrang(
+      page.locator('[data-slot="record-panel-header"] button[aria-label="Sau"]'),
+      (el) => el.append(document.createTextNode("Sau")),
+    );
+    await expect(assertHeaderOneLine(page)).rejects.toThrow("is not an icon with a name");
   });
 });
 
@@ -773,6 +836,73 @@ test.describe("E4 · the record lives in the address", () => {
 });
 
 // ---- E7 · AC-7: the record on a phone -------------------------------------------------------------------------------
+
+// ---- the shared button standard, point 3 (owner, BH session 2026-11-27, «Duyệt cả ba câu») -------------------------
+// On a phone, every button at the record's head, at a section's head and at the record's foot is at least 44 px to
+// press; a computer keeps its 28 px buttons.
+
+/** The size of every button at the record's head, its sections' heads and its foot. */
+async function recordButtonSizes(
+  page: Page,
+): Promise<{ where: string; width: number; height: number }[]> {
+  return page.evaluate(() => {
+    const record = document.querySelector('[data-slot="record-panel"]')!;
+    const places = {
+      head: '[data-slot="record-panel-header"] button',
+      section: '[data-slot="record-section-header"] button',
+      foot: '[data-slot="record-panel-footer"] button',
+    };
+    return Object.entries(places).flatMap(([where, selector]) =>
+      [...record.querySelectorAll<HTMLElement>(selector)]
+        .filter((b) => b.offsetParent !== null)
+        .map((b) => {
+          const r = b.getBoundingClientRect();
+          return { where, width: r.width, height: r.height };
+        }),
+    );
+  });
+}
+
+function assertPhoneHitArea(sizes: { where: string; width: number; height: number }[]): void {
+  if (!sizes.some((s) => s.where === "head")) throw new Error("no button at the record head");
+  for (const s of sizes) {
+    if (s.height < 44 - 0.5) throw new Error(`${s.where} button ${s.height}px high, under 44`);
+    if (s.where === "head" && s.width < 44 - 0.5)
+      throw new Error(`head button ${s.width}px wide, under 44`);
+  }
+}
+
+test.describe("BH 2026-11-27 · the record's buttons are 44 px to press on a phone, 28 px on a computer", () => {
+  test("every head, section head and foot button fits the size of its screen", async ({
+    page,
+  }, info) => {
+    await openInventory(page);
+    await openFifth(page);
+    const sizes = await recordButtonSizes(page);
+    if (PHONE.has(info.project.name)) {
+      assertPhoneHitArea(sizes);
+      // The head stays on one line at the phone's size.
+      await assertHeaderOneLine(page);
+    } else {
+      const head = sizes.filter((s) => s.where === "head");
+      expect(head.length).toBeGreaterThan(0);
+      for (const s of head) expect(Math.round(s.height)).toBe(28);
+    }
+  });
+
+  test("break: a phone head button left at 28 px is caught", async ({ page }, info) => {
+    test.skip(!PHONE.has(info.project.name), "do o 414 va 360");
+    await injectStyle(
+      page,
+      '[data-slot="record-panel-header"] button { width: 28px !important; height: 28px !important; }',
+    );
+    await openInventory(page);
+    await openFifth(page);
+    expect(() => assertPhoneHitArea([])).toThrow("no button at the record head");
+    const sizes = await recordButtonSizes(page);
+    expect(() => assertPhoneHitArea(sizes)).toThrow("under 44");
+  });
+});
 
 test.describe("E7 · on a phone the record is the whole screen", () => {
   test.beforeEach(({ browserName }, info) =>

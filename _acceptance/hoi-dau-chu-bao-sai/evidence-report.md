@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 9a9385eafff8dd8cf1a3ca391a74c7cc5c037aae
+verified_commit: 8f4041b5a07324f15e575fa0d8b5827f54618c32
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -249,3 +249,7 @@ sha: ca55e56f9c6f9ea46e113686386ce08f38a0de2f · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 3 — 2026-11-16, do gộp main ee661ce sau chữ ký hàng 10; 2b, 3e hoá cũ do bài lượt 4
 run_id: repin-20261116T125923Z-77997
 sha: 9a9385eafff8dd8cf1a3ca391a74c7cc5c037aae · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng · ngoài làn máy: E9b, E9c (E9c không khai paths) · diff chạm vật đo ngoài làn máy: E9b — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 4 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi kỳ vọng bài của các hồ sơ đã ký; thước 2e sửa ở ec70d782 (G-2711-36); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T185306Z-85596
+sha: 8f4041b5a07324f15e575fa0d8b5827f54618c32 · suites: 3 lệnh exit 0 · evals: 15/15 eval máy đạt kỳ vọng · ngoài làn máy: E9b, E9c (E9c không khai paths) · diff chạm vật đo ngoài làn máy: E9b — chưa chứng lại, đi vòng S4 delta

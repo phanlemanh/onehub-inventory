@@ -1,0 +1,1 @@
+driver: file comparison only (no browser/network); networkObserved=n-a (driver)

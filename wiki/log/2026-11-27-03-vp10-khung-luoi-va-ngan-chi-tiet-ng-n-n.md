@@ -1,0 +1,1 @@
+VP10 khung-luoi-va-ngan-chi-tiet: ngăn nổi từ dưới thanh trên, thanh công cụ nhường ngăn, lưới khít màn, đầu ngăn một dòng, nút 44px trên điện thoại, luật «…», sáu điểm nút Bảng hàng L1–L6 — quyết định 0051

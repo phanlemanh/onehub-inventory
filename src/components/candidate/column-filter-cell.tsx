@@ -58,7 +58,9 @@ export function ColumnFilterCell<TData extends object>({
           : GRID_COPY.sheet.numberPlaceholder;
   const shown = typeof value === "string" ? value : (value ?? []).join(", ");
   return (
-    <div data-slot="column-filter" data-filter-mode={mode} className="pt-1">
+    // 28 px like the values filter's «Chọn» button beside it, so the filter row and the column titles above it stand
+    // level (owner, BH session 2026-11-27, «Duyệt cả sáu điểm», L3).
+    <div data-slot="column-filter" data-filter-mode={mode} className="pt-1 [&_input]:h-7">
       {/* A rule longer than the box reads in full as TruncatedText's text does (design/states.md, long text): on hover
           (title), on focus (the box scrolls through it) and to a screen reader (the value). The block wraps a span and
           Input owns its typography, so the box takes the block's rule without its «…». */}

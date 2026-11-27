@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: cb88024b0c4664fc0843f7bf67aa5c3e2233d847
+verified_commit: 8f4041b5a07324f15e575fa0d8b5827f54618c32
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -197,3 +197,7 @@ Round 5: machine evals and E11 re-run; E12 panel proposes PASS on the pinned 144
 ### Re-pin lần 1 — 2026-11-14, do gop nhanh chinh 786cadf sau chu ky
 run_id: repin-20261114T093351Z-35812
 sha: cb88024b0c4664fc0843f7bf67aa5c3e2233d847 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E11, E12 (E12 không khai paths) · AC không có chốt máy: AC-9
+
+### Re-pin lần 2 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi kỳ vọng bài của các hồ sơ đã ký; thước 2e sửa ở ec70d782 (G-2711-36); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T185306Z-85596
+sha: 8f4041b5a07324f15e575fa0d8b5827f54618c32 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng · ngoài làn máy: E11, E12 (E12 không khai paths) · diff chạm vật đo ngoài làn máy: E11 — chưa chứng lại, đi vòng S4 delta · AC không có chốt máy: AC-9

@@ -1,10 +1,11 @@
 # Components
 
-Written from the design ledgers at 55a0e97bf74b. Do not change it here: change a ledger, then write it again with make design-exports.
+Written from the design ledgers at 867017b0a4d5. Do not change it here: change a ledger, then write it again with make design-exports.
 
 - **ActionPermissionProvider** (atom), `src/components/candidate/action-permission.tsx`: permitted
 - **CellEditor** (atom), `src/components/candidate/cell-editor.tsx`: anchor, find, label, onClose
 - **ColumnFilterCell** (organism), `src/components/candidate/column-filter-cell.tsx`: spec, column, options
+- **CornerClose** (organism), `src/components/candidate/corner-close.tsx`: of
 - **DataRegion** (template), `src/components/candidate/data-region.tsx`: title, columns, rows, status, onRetry, onCancel, emptyWhy, emptyAction, action, headAction, rowActions, record, editable, cellEdit, initialFilters, groupBy, initialView, onViewChange, hiddenAtFirst, phoneList, cellMark
 - **InDialog** (organism), `src/components/candidate/form-dialog.tsx`: value
 - **FormDialog** (organism), `src/components/candidate/form-dialog.tsx`: trigger, title, description, submitLabel, busyLabel, busy, open, onOpenChange, onSubmit, formError, refused, slot, badge, canSubmit, focusSubmit

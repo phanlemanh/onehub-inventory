@@ -18,6 +18,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog } from "@base-ui/react/dialog";
 
 import { GRID_COPY } from "./grid-copy";
+import { RECORD_SECTION_HEADER } from "./record-section";
 import { InDialog } from "./form-dialog";
 import { RECORD_FOOTER_VAR } from "./record-footer";
 import {
@@ -110,8 +111,10 @@ export function useRecordAddress(param: string = RECORD_PARAM) {
 }
 
 /**
- * The panel's header, two lines on every width (owner, 2026-11-13, «Có, mọi khổ»): the record's name on its own line,
- * then the record's actions, «Trước» and «Sau» in the grid's order, and «Đóng» on the line below, at the right.
+ * The panel's header, one line on every width (owner, BH session 2026-11-27: «đóng, tiếp, lùi… thường nằm ở góc phải
+ * trên cùng», after the two lines of 2026-11-13): the record's name on the left, then at the top right the record's
+ * actions, the pin, «Trước» and «Sau» in the grid's order and «Đóng». The walking and closing buttons show their icons
+ * only, each with its name for assistive tech and as a hint on hover, so the line fits from 320 px.
  */
 function PanelHeader({
   title,
@@ -132,27 +135,32 @@ function PanelHeader({
   close: ReactNode;
 }) {
   return (
-    <div data-slot="record-panel-header" className="flex flex-col gap-2 border-b p-4">
+    <div
+      data-slot="record-panel-header"
+      className="flex items-center justify-between gap-2 border-b p-4"
+    >
       {title}
-      <div data-slot="record-panel-actions" className="flex items-center justify-end gap-1">
+      <div data-slot="record-panel-actions" className="flex shrink-0 items-center gap-1">
         {actions}
         {pin}
         <Button
-          variant="outline"
-          size="sm"
+          variant="ghost"
+          size="icon-sm"
+          aria-label={GRID_COPY.record.previous}
+          title={GRID_COPY.record.previous}
           disabled={previous === undefined}
           onClick={() => previous !== undefined && onNavigate(previous)}
         >
           <ChevronLeftIcon aria-hidden="true" />
-          {GRID_COPY.record.previous}
         </Button>
         <Button
-          variant="outline"
-          size="sm"
+          variant="ghost"
+          size="icon-sm"
+          aria-label={GRID_COPY.record.next}
+          title={GRID_COPY.record.next}
           disabled={next === undefined}
           onClick={() => next !== undefined && onNavigate(next)}
         >
-          {GRID_COPY.record.next}
           <ChevronRightIcon aria-hidden="true" />
         </Button>
         {close}
@@ -161,7 +169,19 @@ function PanelHeader({
   );
 }
 
-const TITLE_CLASS = "min-w-0 text-lg font-semibold break-words";
+/**
+ * On a phone, every button at the record's head, at a section's head and at the record's foot is at least 44 px to
+ * press (owner, BH session 2026-11-27, «Duyệt cả ba câu», point 3); the desktop keeps its 28 px. The head stays one
+ * line: its padding shrinks so the taller buttons fit the same 61 px.
+ */
+const PHONE_HIT_AREA = [
+  "[&_[data-slot=record-panel-header]]:py-2",
+  "[&_[data-slot=record-panel-header]_button]:size-11",
+  `[&_[data-slot=${RECORD_SECTION_HEADER}]_button]:min-h-11`,
+  "[&_[data-slot=record-panel-footer]_button]:min-h-11",
+].join(" ");
+
+const TITLE_CLASS = "min-w-0 flex-1 truncate text-lg font-semibold";
 
 /**
  * The one record panel of the app (design/behaviors.md, open the record panel; owner's choice at row 3's scope gate:
@@ -260,7 +280,7 @@ export function RecordPanel({
           data-record-id={openId ?? undefined}
           // Focus goes back once the panel has closed (onOpenChangeComplete), to the row last shown.
           finalFocus={false}
-          className="fixed inset-y-0 right-0 z-50 flex h-full w-full flex-col bg-popover text-sm text-popover-foreground outline-none"
+          className={`fixed inset-y-0 right-0 z-50 flex h-full w-full flex-col bg-popover text-sm text-popover-foreground outline-none ${PHONE_HIT_AREA}`}
         >
           <PanelHeader
             title={<Dialog.Title className={TITLE_CLASS}>{view?.title}</Dialog.Title>}
@@ -269,9 +289,17 @@ export function RecordPanel({
             onNavigate={onNavigate}
             actions={view?.actions}
             close={
-              <Dialog.Close render={<Button variant="ghost" size="sm" />}>
+              <Dialog.Close
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={GRID_COPY.record.close}
+                    title={GRID_COPY.record.close}
+                  />
+                }
+              >
                 <XIcon aria-hidden="true" />
-                {GRID_COPY.record.close}
               </Dialog.Close>
             }
           />
@@ -286,10 +314,14 @@ export function RecordPanel({
   );
 }
 
+/** The record column's inner box: no clipping, so the floating record's shadow shows on the grid. */
+// eslint-disable-next-line shadcn/no-inline-styles -- reason: react-resizable-panels sets overflow:auto inline on the panel's inner box; only its style prop, merged after, overrides it without !important
+const RECORD_COLUMN_BOX: CSSProperties = { overflow: "visible" };
+
 /** The App Shell's top bar and work area, by their slots; a page without the App Shell uses the whole window. */
 const TOP_BAR = '[data-slot="app-shell-top-bar"]';
 const WORK_AREA = '[data-slot="sidebar-inset"]';
-/** The data region's toolbar: the floating record stands below it (AC-4 of row 3a). */
+/** The data region's toolbar: it ends 16 px short of the floating record (owner, BH session 2026-11-27). */
 const REGION_TOOLS = '[data-slot="region-toolbar"]';
 
 /**
@@ -312,7 +344,6 @@ function regionRoom(): number {
 function useWorkAreaBounds(open: boolean) {
   const [bounds, setBounds] = useState({
     top: 0,
-    tools: 0,
     room: 0,
     right: 0,
     bottom: 0,
@@ -329,7 +360,6 @@ function useWorkAreaBounds(open: boolean) {
       setBounds({
         // No top bar (full screen): the panel runs the whole height, from the top of the window.
         top: Math.max(0, barRect ? barRect.bottom : 0),
-        tools: document.querySelector(REGION_TOOLS)?.getBoundingClientRect().bottom ?? 0,
         room: regionRoom(),
         right: area ? Math.max(0, window.innerWidth - area.right) : 0,
         bottom: area ? Math.max(0, window.innerHeight - area.bottom) : 0,
@@ -442,6 +472,38 @@ function RecordColumn({
       root.style.removeProperty("--record-pinned");
     };
   }, [pinned, pinnedWidth]);
+  // While the record is open beside the grid, floating or pinned, the region's toolbar buttons drop their words and
+  // keep their icon, name and hover hint (owner, BH session 2026-11-27, and scope gate of khung-luoi-va-ngan-chi-tiet,
+  // Hỏi-7: pinned too, so the toolbar stays on one line).
+  useEffect(() => {
+    if (!shown) return;
+    const root = document.documentElement;
+    root.dataset["recordBeside"] = "";
+    return () => {
+      delete root.dataset["recordBeside"];
+    };
+  }, [shown]);
+  // Floating, the record lies over the right of the region: the region's toolbar ends before the record's edge, with
+  // 16 px to spare (owner, BH session 2026-11-27), so no button is cut in half.
+  const floating = shown && !pinned;
+  useEffect(() => {
+    const root = document.documentElement;
+    if (!floating) return;
+    const place = () => {
+      const tools = document.querySelector<HTMLElement>(REGION_TOOLS)?.parentElement;
+      if (!tools) return;
+      const box = tools.getBoundingClientRect();
+      const end = box.right - (parseFloat(getComputedStyle(tools).paddingRight) || 0);
+      const edge = window.innerWidth - bounds.right - width;
+      root.style.setProperty("--record-float-clear", `${Math.max(0, end - edge + 16)}px`);
+    };
+    root.dataset["recordFloat"] = "";
+    place();
+    return () => {
+      delete root.dataset["recordFloat"];
+      root.style.removeProperty("--record-float-clear");
+    };
+  }, [floating, width, bounds.right, bounds.window]);
   if (!shown || view === null || openId === null) return null;
   const titleId = `record-panel-title-${openId}`;
   return (
@@ -449,10 +511,10 @@ function RecordColumn({
       data-slot="record-panel-layer"
       style={
         {
-          // Floating, the record stands below the region's toolbar so the toolbar stays usable (AC-4 of row 3a, after
-          // the supervisor's ruling D-1411-1: the owner's newer word wins over row 3's «Trừ thanh trên»); pinned, the
-          // region gives up its width, so the column runs from just under the top bar.
-          "--record-top": `${pinned ? bounds.top : Math.max(bounds.top, bounds.tools)}px`,
+          // Floating or pinned, the record runs from just under the App Shell's top bar to the bottom (owner, BH
+          // session 2026-11-27, «Chốt cả bốn»: back to decision 0024's «Trừ thanh trên», no longer under the region's
+          // toolbar as row 3a's AC-4 had it); floating, it lies over the content below and the toolbar clears it.
+          "--record-top": `${bounds.top}px`,
           "--record-right": `${bounds.right}px`,
           "--record-bottom": `${bounds.bottom}px`,
           "--record-left": `${bounds.left}px`,
@@ -479,6 +541,9 @@ function RecordColumn({
         <ResizablePanel
           id="record-column"
           panelRef={panelRef}
+          // The panel's inner box scrolls by default (an inline style of the library), which clips the floating record's
+          // shadow; the record scrolls its own body, so the box lets the shadow fall onto the grid (owner 2026-11-27, Q3).
+          style={RECORD_COLUMN_BOX}
           defaultSize={width}
           minSize={PIN_MIN_WIDTH}
           // The grid's 480 px floor binds the pinned column only; the floating record keeps row 3's width.
@@ -493,7 +558,7 @@ function RecordColumn({
             role="dialog"
             aria-modal="false"
             aria-labelledby={titleId}
-            className={`flex h-full flex-col bg-background ${pinned ? "" : "border-l p-2"}`}
+            className={`flex h-full flex-col ${pinned ? "bg-background" : "border-l bg-popover text-popover-foreground shadow-record-float"}`}
             onKeyDown={(event) => {
               if (event.key !== "Escape") return;
               event.stopPropagation();
@@ -504,11 +569,9 @@ function RecordColumn({
               data-slot="record-panel"
               data-record-layout={pinned ? "pinned" : "float"}
               data-record-id={openId}
-              className={`min-h-0 flex-1 text-sm ${pinned ? "rounded-none border-0 p-0 shadow-none" : "shadow-lg"}`}
+              className="min-h-0 flex-1 rounded-none border-0 bg-transparent p-0 text-sm shadow-none"
             >
-              <FramePanel
-                className={`flex min-h-0 flex-1 flex-col p-0 ${pinned ? "rounded-none border-0 shadow-none" : ""}`}
-              >
+              <FramePanel className="flex min-h-0 flex-1 flex-col rounded-none border-0 bg-transparent p-0 shadow-none">
                 <PanelHeader
                   title={
                     <h2
@@ -533,9 +596,14 @@ function RecordColumn({
                     ) : null
                   }
                   close={
-                    <Button variant="ghost" size="sm" onClick={() => onNavigate(null)}>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={GRID_COPY.record.close}
+                      title={GRID_COPY.record.close}
+                      onClick={() => onNavigate(null)}
+                    >
                       <XIcon aria-hidden="true" />
-                      {GRID_COPY.record.close}
                     </Button>
                   }
                 />

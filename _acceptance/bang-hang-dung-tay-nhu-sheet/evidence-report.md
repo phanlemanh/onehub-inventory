@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 17d85ab2608ec9441aefe39260b4e9da2836d95f
+verified_commit: 8f4041b5a07324f15e575fa0d8b5827f54618c32
 human_signoff: Manh Phan 2026-11-12
 ---
 
@@ -259,3 +259,7 @@ Round 3: mọi eval xanh, make check và build xanh, E16 có khung nhìn thấy 
 ### Re-pin lần 1 — 2026-11-12, do gộp nhánh chính (hàng 7a, 9a) trước khi gộp PR #37
 run_id: repin-20261112T105015Z-95252
 sha: 17d85ab2608ec9441aefe39260b4e9da2836d95f · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E16, E17 (E17 không khai paths) · AC không có chốt máy: AC-10
+
+### Re-pin lần 2 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi kỳ vọng bài của các hồ sơ đã ký; thước 2e sửa ở ec70d782 (G-2711-36); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T185306Z-85596
+sha: 8f4041b5a07324f15e575fa0d8b5827f54618c32 · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E16, E17 (E17 không khai paths) · diff chạm vật đo ngoài làn máy: E16 — chưa chứng lại, đi vòng S4 delta · AC không có chốt máy: AC-10

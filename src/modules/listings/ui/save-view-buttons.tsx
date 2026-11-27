@@ -40,6 +40,7 @@ function SaveViewDialog({
             variant="outline"
             size="sm"
             data-slot={asNew ? "save-view-as-new" : "save-view"}
+            title={asNew ? undefined : copy.labels.save}
           />
         ),
         label: asNew ? (
@@ -47,7 +48,8 @@ function SaveViewDialog({
         ) : (
           <>
             <BookmarkIcon aria-hidden="true" />
-            {copy.labels.save}
+            {/* Icon only while the record is open beside the grid, floating or pinned (BH session 2026-11-27, Hỏi-7). */}
+            <span className="in-data-record-beside:sr-only">{copy.labels.save}</span>
           </>
         ),
       }}

@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: fee86ff1f5da431aedd7b56e0d56b26c6cc233eb
+verified_commit: 8f4041b5a07324f15e575fa0d8b5827f54618c32
 human_signoff: Manh Phan 2026-11-14
 ---
 
@@ -261,3 +261,7 @@ Chấm lại bằng mắt E11, E13 trên ảnh dựng lại từ af0c232 (2026-1
 ### Re-pin lần 2 — 2026-11-15, do VP2 (PR #66, sửa sau chữ ký): per-run temp root, proof gate waits for the shallow history lock, header and grid-probe early reads fixed
 run_id: repin-20261115T193207Z-65976
 sha: fee86ff1f5da431aedd7b56e0d56b26c6cc233eb · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng
+
+### Re-pin lần 3 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi kỳ vọng bài của các hồ sơ đã ký; thước 2e sửa ở ec70d782 (G-2711-36); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T185306Z-85596
+sha: 8f4041b5a07324f15e575fa0d8b5827f54618c32 · suites: 3 lệnh exit 0 · evals: 17/17 eval máy đạt kỳ vọng · ngoài làn máy: E11, E13 · diff chạm vật đo ngoài làn máy: E11, E13 — chưa chứng lại, đi vòng S4 delta
