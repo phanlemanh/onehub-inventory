@@ -1018,3 +1018,34 @@ begin
   raise notice 'ok nhap-excel-theo-san — chèn và xoá chéo sàn, xoá ngoài lần nhập, đối chứng dương';
 end $$;
 rollback;
+
+-- 25. A listing reaches a pending unit of its own company only (row 11, migration 018; S4-r2 t2, G-2711-32; SP-1). The
+--     link is written as the table owner, past the application and past the row rules: the foreign key pairs the
+--     company, so a listing of A pointing at a pending unit of B is refused by the database itself; positive control:
+--     the same listing points at A's own pending unit. Break file: db/tests/pha-thu/nhap-excel-can-cho-cheo-san.sql
+--     (the key back on the pending unit's id alone, as migration 015 had it).
+begin;
+select pg_temp.dung_hai_san();
+insert into identity.users (id, email, name) values
+  ('00000000-0000-4000-8000-0000000000a5', 'cho-a@example.test', '[Tên]');
+insert into company_members (company_id, user_id, name, roles) values
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a5', '[Tên]', '{ListAgent}');
+insert into listings (id, company_id, standard_status, list_agent_user_id, list_agent_full_name) values
+  ('00000000-0000-4000-8000-0000000c0101', '00000000-0000-4000-8000-00000000000a', 'Incomplete',
+   '00000000-0000-4000-8000-0000000000a5', '[Tên]');
+insert into company_pending_units (id, company_id, raw_code) values
+  ('00000000-0000-4000-8000-0000000c0111', '00000000-0000-4000-8000-00000000000b', 'SB-01.01'),
+  ('00000000-0000-4000-8000-0000000c0112', '00000000-0000-4000-8000-00000000000a', 'SA-01.01');
+do $$
+begin
+  perform pg_temp.phai_loi('nhap-excel-can-cho-theo-san',
+    'insert into listing_pending_units (listing_id, company_id, pending_unit_id, open) values '
+    '(''00000000-0000-4000-8000-0000000c0101'', ''00000000-0000-4000-8000-00000000000a'', '
+    '''00000000-0000-4000-8000-0000000c0111'', true)', 'listing_pending_units_pending_company');
+  -- Positive control: A's listing on A's own pending unit.
+  insert into listing_pending_units (listing_id, company_id, pending_unit_id, open) values
+    ('00000000-0000-4000-8000-0000000c0101', '00000000-0000-4000-8000-00000000000a',
+     '00000000-0000-4000-8000-0000000c0112', true);
+  raise notice 'ok nhap-excel-can-cho-theo-san — lần chào của A không trỏ được căn chờ của B, kể cả ghi thẳng';
+end $$;
+rollback;

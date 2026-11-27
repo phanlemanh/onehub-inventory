@@ -15,7 +15,7 @@ rules:
     description: >-
       A listing has exactly one unit link, catalog or pending, of the same company; one open listing per pending unit per
       company.
-    implemented_in: db/migrations/015_nhap_excel.sql
+    implemented_in: db/migrations/018_nhap_excel_can_cho_theo_san.sql
 
 code:
   model: src/modules/listings/
