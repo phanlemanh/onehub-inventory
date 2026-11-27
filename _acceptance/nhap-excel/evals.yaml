@@ -187,3 +187,12 @@ evals:
     paths: [src/modules/imports/**, src/modules/company-config/**, "src/app/(app)/inventory/**", tests/e2e-db/nhap-excel.spec.ts]
     expected: "exit 0; ca 'nhan rieng tren bang hang': nạp ban.xlsx, giữ ô «Gọi cột này là “Block”» mặc định, Áp → mở /inventory chờ regionReady, đọc tiêu đề cột bằng readHeaders của bài 7e: tiêu đề cột Toà là «Block»; sàn thử thứ hai bỏ chọn ô ấy → tiêu đề là «Toà» (đối chứng); ca phá: bài sửa nhãn riêng trong cơ sở dữ liệu về rỗng giữa chừng → khẳng định 'inventory header is not the learned label: Toà != Block'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E22
+    criterion: AC-13
+    executor: script
+    cmd: config:executors.script.nhap_excel_db
+    layer: backend-effect
+    paths: [src/modules/imports/**, src/modules/catalog/**, "src/app/api/v1/imports/**", tests/db/nhap-excel.db.test.ts]
+    expected: "exit 0; ca 'G-2711-4': preview qua route handler thật với cột «Tầng», «Loại căn», «Diện tích» — «Tầng 07» và «15a» là máy sửa 'floor-read', «Căn hộ» giữ nguyên 'standard', «2PN» cần người 'unknown-value', không ô nào chặn; áp tạo 3 lần chào; import_runs.kept có đúng năm mục 'unit-attribute' theo thứ tự (Tầng, Tầng 07) (Loại căn, Căn hộ) (Diện tích, 72) (Tầng, 15a) (Loại căn, 2PN); băm md5 của catalog_units trước và sau lần nhập bằng nhau; ca phá đã chạy tay: bỏ Unit.floor khỏi đường unit-attribute → khẳng định lệch mảng kept"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

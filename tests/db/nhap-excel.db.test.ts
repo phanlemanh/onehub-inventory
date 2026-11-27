@@ -87,9 +87,15 @@ const CHOICES: Choices = {
   units: { "sa5-99.99": { pending: true } },
 };
 
-async function preview(e: Env, who: Person, rows: string[][], choices: Choices = CHOICES) {
+async function preview(
+  e: Env,
+  who: Person,
+  rows: string[][],
+  choices: Choices = CHOICES,
+  headers: string[] = HEADERS,
+) {
   const res = await e.h.preview(
-    req(`${URL_}/preview`, "POST", { headers: HEADERS, rows, choices }, await e.cookie(who)),
+    req(`${URL_}/preview`, "POST", { headers, rows, choices }, await e.cookie(who)),
   );
   return {
     status: res.status,
@@ -108,15 +114,16 @@ async function applyAll(
   rows: string[][],
   choices: Choices = CHOICES,
   agent?: string,
+  headers: string[] = HEADERS,
 ) {
-  const p = await preview(e, who, rows, choices);
+  const p = await preview(e, who, rows, choices, headers);
   const expected = { ...p.body.counts, createCount: p.body.createCount };
   const open = await e.h.open(
     req(
       URL_,
       "POST",
       {
-        headers: HEADERS,
+        headers,
         rows,
         choices,
         fileName: "bang-hang.xlsx",
@@ -138,7 +145,7 @@ async function applyAll(
     req(
       `${URL_}/${id}/batches`,
       "POST",
-      { headers: HEADERS, rows, choices, batchNo: 0, rowOffset: 0, last: true },
+      { headers, rows, choices, batchNo: 0, rowOffset: 0, last: true },
       await e.cookie(who),
     ),
     id,
@@ -243,6 +250,45 @@ describe("ap (E9)", () => {
       ["Hold", null, true],
     ]);
     expect(new Set(rows.map((x) => x.list_agent_user_id))).toEqual(new Set([e.w.id.LA]));
+  });
+
+  it("G-2711-4: floor and property type columns are taken, their words kept as written on the import; the unit and the catalog do not change", async () => {
+    const e = await importWorld("thuoc-tinh");
+    const headers = [...HEADERS, "Tầng", "Loại căn", "Diện tích"];
+    const base = rowsOf(e.codes);
+    const rows = [
+      [...base[0]!, "Tầng 07", label("SubTypeCondominium"), "72"],
+      [...base[1]!, "15a", "2PN", ""],
+      [...base[2]!, "", "", ""],
+    ];
+    const catalog = `select md5(string_agg(t::text, '|' order by t.upi)) as n from catalog_units t`;
+    const before = (await e.w.db.owner.query<{ n: string }>(catalog)).rows[0]!.n;
+    const p = await preview(e, "LA", rows, CHOICES, headers);
+    expect(p.status).toBe(200);
+    const at = (r: number, j: number) => [p.body.cells[r]![j]!.mark, p.body.cells[r]![j]!.why];
+    expect([at(0, 5), at(1, 5), at(0, 6), at(1, 6)]).toEqual([
+      ["fixed", "floor-read"],
+      ["fixed", "floor-read"],
+      ["keep", "standard"],
+      ["ask", "unknown-value"],
+    ]);
+    expect(p.body.counts.block).toBe(0);
+    const r = await applyAll(e, "LA", rows, CHOICES, undefined, headers);
+    expect([r.status, r.body?.created]).toEqual([200, 3]);
+    const kept = (
+      await e.w.db.owner.query<{ kept: { header: string; raw: string; why: string }[] }>(
+        `select kept from import_runs where id = $1`,
+        [r.id],
+      )
+    ).rows[0]!.kept.filter((k) => k.why === "unit-attribute");
+    expect(kept.map((k) => [k.header, k.raw])).toEqual([
+      ["Tầng", "Tầng 07"],
+      ["Loại căn", label("SubTypeCondominium")],
+      ["Diện tích", "72"],
+      ["Tầng", "15a"],
+      ["Loại căn", "2PN"],
+    ]);
+    expect((await e.w.db.owner.query<{ n: string }>(catalog)).rows[0]!.n).toBe(before);
   });
 
   it("a batch sent again writes nothing; the same file again adds no second open listing for the same units", async () => {
