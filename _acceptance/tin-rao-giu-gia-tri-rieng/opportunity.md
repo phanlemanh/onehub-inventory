@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 slug: tin-rao-giu-gia-tri-rieng
-feature: "Đầu chủ sửa được diện tích, tầng, phòng ngủ, hướng và loại căn của căn mình chào — ngay trên ô ở máy tính và trong chi tiết căn ở mọi cỡ màn — và giá trị ấy là của sàn: danh mục dùng chung chỉ điền chỗ sàn chưa có, ô khác danh mục có dấu nhỏ và lệnh «lấy lại theo Danh bạ»"
+feature: "Đầu chủ sửa được diện tích, tầng, phòng ngủ, hướng và loại hình của căn mình chào — ngay trên ô ở máy tính và trong chi tiết căn ở mọi cỡ màn — và giá trị ấy là của sàn: danh mục dùng chung chỉ điền chỗ sàn chưa có, ô khác danh mục có dấu nhỏ và lệnh «lấy lại theo Danh bạ»"
 owner: phanlemanh@gmail.com
 stage: discovery              # discovery | decided | archived
 decision:         # build | iterate | park | kill — người ký Cổng 0 điền
@@ -19,13 +19,13 @@ lo_trinh_tep: docs/plan/lo-trinh.json
 Mở từ hàng 3h của «Lộ trình onehub-inventory» (`docs/plan/lo-trinh.json`).
 Nguồn: `wiki/nen/muc-luc.md#62c011273645275c4ecd1728afe0a36626484e09` · `wiki/nen/san-pham.md#7e0f870248935f95f71cf9300b1a0f7e5f2d1eb0` · `wiki/dot/mvp-dot-1.md#adb1cba497edd0ad0fd877ee7bf608aeabd4d83e`
 
-Đầu chủ sửa được diện tích, tầng, phòng ngủ, hướng và loại căn của căn mình chào — ngay trên ô ở máy tính và trong chi tiết căn ở mọi cỡ màn — và giá trị ấy là của sàn: danh mục dùng chung chỉ điền chỗ sàn chưa có, ô khác danh mục có dấu nhỏ và lệnh «lấy lại theo Danh bạ»
+Đầu chủ sửa được diện tích, tầng, phòng ngủ, hướng và loại hình của căn mình chào — ngay trên ô ở máy tính và trong chi tiết căn ở mọi cỡ màn — và giá trị ấy là của sàn: danh mục dùng chung chỉ điền chỗ sàn chưa có, ô khác danh mục có dấu nhỏ và lệnh «lấy lại theo Danh bạ»
 
 Vì sao: Chủ kho 2026-11-27 tại phiên dãy H: «Tin rao giữ giá trị riêng, Danh bạ chỉ làm giàu, mọi ô sửa được trừ khi khoá»; giám sát đối chiếu onehub-invest (ADR-0013 §6, ADR-0016 §7: kế thừa từ danh bạ luôn ở lớp thấp nhất, không đè, lệch là tín hiệu) và chủ kho trả «Chốt hướng» (tám điểm ở LUAT đợt dieu-phoi-nen). Hôm nay tầng, hướng, diện tích, phòng ngủ chỉ đọc từ danh mục nên không ai sửa được chỗ sai, và căn sàn tự tạo (căn chờ khớp, hàng 12) không có chỗ giữ chúng. Lát A: giá trị riêng trên tin cho năm thuộc tính, mỗi giá trị nhớ một trong ba nguồn (theo Danh bạ · sàn gõ · nhập từ tệp; thắng: sàn gõ › tệp › Danh bạ), dấu khác Danh bạ kèm «lấy lại theo Danh bạ», sửa trên ô (máy tính) và trong chi tiết căn (mọi cỡ) theo luật chỗ sửa 2026-11-17. Lát B: khoá, chủ kho quyết sau khi dùng lát A. Hàng này LẬT các dòng đã ký: hàng 4 «Never: sửa thuộc tính căn (diện tích, phòng ngủ, toà) trên ô»; hàng 5 «sửa thuộc tính căn bằng dán» ngoài phạm vi; dòng ngoài phạm vi của 3g «sửa thông tin của căn (tầng, hướng, diện tích) — thuộc danh mục, hàng 3e»; vai của 3e «Báo sai» thu về người không có quyền sửa — bốn hồ sơ ghi sửa-sau-ký khi 3h làm. Danh mục dùng chung vẫn không bị sàn sửa. Đổi thực thể Listing (tầng high). RESO đặt LivingArea, BedroomsTotal, DirectionFaces, UnitFloorLocation trên Property — chính resource của Listing — nên không tên RESO nào đổi nghĩa
 
 ## Đáng gì
 
-- **Sửa được chỗ sai ngay tại sàn.** Hôm nay tầng, hướng, diện tích, phòng ngủ, loại căn chỉ đọc từ danh mục dùng
+- **Sửa được chỗ sai ngay tại sàn.** Hôm nay tầng, hướng, diện tích, phòng ngủ, loại hình chỉ đọc từ danh mục dùng
   chung: danh mục sai thì Đầu chủ chỉ có «Báo sai» rồi chờ, trong khi khách hỏi ngay. Sau 3h, Đầu chủ gõ giá trị đúng
   trên ô hoặc trong chi tiết căn, giá trị ấy là của sàn.
 - **Căn sàn tự tạo có chỗ giữ thuộc tính.** Căn chờ khớp (hàng 12, hàng 11) hôm nay không có chỗ ghi diện tích hay
@@ -33,15 +33,19 @@ Vì sao: Chủ kho 2026-11-27 tại phiên dãy H: «Tin rao giữ giá trị ri
 - **Danh mục vẫn sạch, lệch hiện thành tín hiệu.** Sàn không sửa danh mục (luật cũ giữ). Ô khác danh mục có dấu nhỏ;
   bấm «lấy lại theo Danh bạ» là về. Danh mục đổi về sau không đè giá trị sàn đã có — giống cách onehub-invest để kế
   thừa từ danh bạ luôn ở lớp thấp nhất.
-- **Gỡ nút thắt cho nhập Sheet.** Hàng 11 nay giữ nguyên văn diện tích, phòng ngủ, hướng, tầng, loại căn trong bản ghi
+- **Gỡ nút thắt cho nhập Sheet.** Hàng 11 nay giữ nguyên văn diện tích, phòng ngủ, hướng, tầng, loại hình trong bản ghi
   lần nhập, chưa ghi vào căn và chưa so với Danh bạ. Lát A đọc lại chúng làm nguồn «nhập từ tệp», và hiện chênh lệch so
   với Danh bạ ngay ở bước xem trước của lần nhập.
+
+**Tên cho đúng:** thuộc tính thứ năm là «Loại hình» (Căn hộ, Nhà phố…). «Loại căn» (Studio, 2PN) là khái niệm riêng suy
+từ số phòng ngủ: nó tự đổi theo phòng ngủ của tin. Cho sàn gõ đè «Loại căn» hay không là câu của Cổng Phạm vi 3h. Hàng
+11 nhận cột Sheet «Loại căn» hay «Loại hình» vào Loại hình; ô kiểu «2PN» giữ nguyên văn với dấu «cần người».
 
 ## Hai lát
 
 | Lát | Gồm | Khi nào |
 |---|---|---|
-| **A** | Giá trị riêng trên tin cho năm thuộc tính (diện tích, tầng, phòng ngủ, hướng, loại căn) · mỗi giá trị nhớ một trong ba nguồn: theo Danh bạ · sàn gõ · nhập từ tệp (thắng: sàn gõ › tệp › Danh bạ) · dấu nhỏ trên ô khác Danh bạ + lệnh «lấy lại theo Danh bạ» · sửa trên ô (máy tính) và trong chi tiết căn (mọi cỡ), theo luật chỗ sửa 17/11 · đổi căn hay toà chỉ trong chi tiết căn | Hàng này |
+| **A** | Giá trị riêng trên tin cho năm thuộc tính (diện tích, tầng, phòng ngủ, hướng, loại hình) · mỗi giá trị nhớ một trong ba nguồn: theo Danh bạ · sàn gõ · nhập từ tệp (thắng: sàn gõ › tệp › Danh bạ) · dấu nhỏ trên ô khác Danh bạ + lệnh «lấy lại theo Danh bạ» · sửa trên ô (máy tính) và trong chi tiết căn (mọi cỡ), theo luật chỗ sửa 17/11 · đổi căn hay toà chỉ trong chi tiết căn | Hàng này |
 | **B** | Khoá một giá trị (không ai sửa được) | Chủ kho quyết sau khi dùng lát A — hình khoá trên Bảng hàng hôm nay đang nghĩa «căn đã bán» |
 
 ## Giá phải trả
