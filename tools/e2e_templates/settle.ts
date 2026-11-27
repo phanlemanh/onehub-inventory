@@ -79,8 +79,9 @@ export const CHO_TESTS: Readonly<Record<string, readonly string[]>> = {
     "losing the network shows a banner that leaves when it is back",
     "no serious accessibility violations on every frame screen",
     "a save that fails offline keeps the input and offers retry",
+    "chosen theme survives a reload",
   ],
-  "tests/e2e/account.spec.ts": ["login-loi-may-chu"],
+  "tests/e2e/account.spec.ts": ["login-loi-may-chu", "khung-chua-dang-nhap"],
   "tests/e2e/app-shell.spec.ts": [
     "no column takes the screen and nothing scrolls sideways (light)",
     "no column takes the screen and nothing scrolls sideways (dark)",
@@ -94,6 +95,10 @@ export const CHO_TESTS: Readonly<Record<string, readonly string[]>> = {
     "tu-choi-403-cau-rieng",
   ],
   "tests/e2e-db/goc-nhin.spec.ts": ["phone sheet", "E15 frames"],
+  "tests/e2e-db/app-shell-verve.spec.ts": [
+    "signed in, the account menu shows name and a long email whole, the company, the looks and sign-out",
+    "a person in two companies finds switching first in the account menu",
+  ],
   "tests/e2e-db/vai-man.spec.ts": ["thanh ben theo vai"],
   "tests/e2e-db/lop-rieng.spec.ts": ["proof images"],
   "tests/e2e-db/dia-ly.spec.ts": [

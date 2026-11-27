@@ -7,13 +7,13 @@
 ```mermaid
 flowchart TD
   A["Đang cân nhắc cơ hội<br/>chưa có"] --> GD{"Cổng Đáng"}
-  GD --> B["Sắp mở vòng<br/>9 việc"]
+  GD --> B["Sắp mở vòng<br/>8 việc"]
   GD --> XL["Xếp lại sau<br/>chưa có"]
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
   GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
-  GB --> DG["Đã giao<br/>27 việc"]
-  GB --> CN["Chờ phiên nghiệm thu<br/>53 việc"] --> GG{"Cổng Giá trị"}
+  GB --> DG["Đã giao<br/>30 việc"]
+  GB --> CN["Chờ phiên nghiệm thu<br/>54 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
 
@@ -31,7 +31,6 @@ flowchart TD
 - Đầu chủ nạp tệp Excel hay Sheet đang dùng, ghép cột, tên cột, giá trị và mã căn của mình vào chuẩn ngay ở màn xem trước, áp vào bảng và hoàn tác được; lần sau cùng dạng tệp không phải ghép lại (`nhap-excel`)
 - Đầu chủ ghi và mở số chủ nhà trên hồ sơ căn, và gỡ được chủ nhà ghi nhầm khỏi căn (`so-chu-nha`)
 - Đầu chủ đổi giá và đổi trạng thái ngay trong hồ sơ căn trên điện thoại, theo cùng luật với sửa trên ô của Bảng hàng (`sua-nhanh-tren-dien-thoai`)
-- Đầu chủ sửa được thông tin của căn ngoài giá và trạng thái — pháp lý, nội thất, tài chính, tình trạng sử dụng — ngay trong sản phẩm, không phải nhập lại tệp (`sua-thong-tin-can`)
 - Đầu chủ gõ mã căn để thêm căn, hoặc tạo căn tay khi danh mục chưa có (`them-can`)
 
 ## Đã giao — chờ phiên nghiệm thu
@@ -81,6 +80,7 @@ flowchart TD
 - Đầu chủ ghim ngăn chi tiết thành một cột cạnh bảng khi làm lâu trên một căn, bỏ ghim thì ngăn nổi lại (`ngan-chi-tiet-ghim-thanh-cot`)
 - Lệnh ghi số đo của một vòng không bao giờ lặng lẽ bỏ tầng đã khai: bản số đo cũ đọc không được thì lệnh dừng và nói rõ, không ghi đè (`so-do-ghi-khong-mat-tang`)
 - Mỗi vòng giao diện máy ghi một bản số đo, một lệnh gộp theo tầng, và có mốc đối chứng trước khi dựng nền (`so-do-moi-vong`)
+- Đầu chủ sửa được thông tin của căn ngoài giá và trạng thái — pháp lý, nội thất, tài chính, tình trạng sử dụng — ngay trong sản phẩm, không phải nhập lại tệp (`sua-thong-tin-can`)
 - Đầu chủ sửa giá và trạng thái ngay trên ô, thấy lỗi ngay tại ô đó (`sua-tren-o`)
 - Vòng dựng màn đi đúng thang kho, kho kết hợp ReUI Pro, tạo tay; thứ mới nhập kho được bày cho chủ kho chọn ở Cổng Phạm vi và có một dòng trong sổ khối (`thang-chon-khoi-vao-cong`)
 - Một nhân viên giữ nhiều vai cùng lúc thấy đủ mục điều hướng của mọi vai mình giữ (`thanh-ben-nhieu-vai`)
@@ -93,11 +93,13 @@ flowchart TD
 ## Đã giao
 
 - Nhận plugin design-assembly — lệnh kiểm chạy lại lint của kho, sổ linh kiện do công cụ của plugin ghi thay công cụ viết tay (`adopt-design-assembly`)
+- Nhân viên sàn làm việc trong App Shell và đầu trang xếp theo mẫu Verve của ReUI — dải gập trên mép cột thứ hai, ô tìm giữa thanh trên, menu tài khoản có chọn giao diện ở đáy dải biểu tượng, đầu trang một hàng mảnh (`app-shell-khuon-dau-trang`)
 - Bước bien chạy trước bước vai-dang-nhap — Vercel lỗi lúc đang xoay mật khẩu vai đăng nhập thì bản thật không bị đụng; sổ tay nói thẳng khi nào bản đang chạy đã mất kết nối (`bien-do-sau-xoay-mat-khau`)
 - Bước bien đọc câu trả lời của Vercel — Vercel trả thành công mà từ chối hay không xác nhận ghi một biến, hoặc trả danh sách biến lạ khuôn, thì lệnh đưa bản lên dừng ở bien, gọi tên biến, không in giá trị, tên miền không đổi (`bien-vercel-tu-choi`)
 - Hook commit-msg của kho (tools/commit_msg.py) nhận đúng các tiêu đề commit kit nghiệm thu v3.0.0 tự viết — Gate 2 signoff, Veto, repin, wip(ban-giao) — để job conventional-commits không đỏ trên PR qua Cổng 2 (`commit-msg-kit-subjects`)
 - Một lệnh đặt khoá — chủ kho dán mỗi khoá do dịch vụ cấp một lần vào make dat-khoa; lệnh đưa bản lên tự đặt mật khẩu vai đăng nhập và tự đẩy biến sang Vercel; sổ tay chỉ còn phần của chủ kho; quyền đứng cho hạ tầng Inventory (`dat-khoa-mot-lenh`)
 - Tiếp nhận design-assembly — tám quyết định thiết kế đã ghi được nối vào kiểm tra sẵn có, thêm hai dòng phông chữ (`design-assembly-adopt-checks`) — đã giao — máy thông, bằng chứng xanh-sạch
+- Ghi sáu quyết định lõi còn mở của hệ thiết kế theo lời chủ kho, và bộ chữ tiếng Việt của sổ hệ thiết kế (`design-decisions-40-of-40`)
 - Địa chỉ màn Tuỳ chỉnh của sàn và bản mẫu bộ nút, từ chọn phần và mã màn của chúng viết bằng tiếng Anh như luật kho (`english-route-names`)
 - `go-hoi-khi-gop`
 - Lint và bộ chạy bài kiểm của kho bỏ qua hai thư mục ngoài git (.acceptance-runs/ và .claude/worktrees/) để bộ kiểm và hook trước commit không đỏ vì tệp không thuộc kho (`lint-bo-qua-thu-muc-ngoai-git`) — đã giao — máy thông, cửa veto còn mở
@@ -114,6 +116,7 @@ flowchart TD
 - Lên đời công cụ design-assembly từ 0.36.1 lên 0.69.0 bằng lệnh upgrade, chỉ phần máy — không quyết định thiết kế nào đổi trạng thái (`upgrade-design-assembly-0-69-0`)
 - Lên đời công cụ design-assembly từ 0.1.0 lên 0.7.0 bằng lệnh upgrade — sổ linh kiện, sổ màn và sổ khối thôi đi theo pull request, bảng vai × màn × nút ra khỏi git, bản đồ affected (`upgrade-design-assembly-0-7-0`)
 - Lên đời công cụ design-assembly từ 0.7.0 lên 0.7.1 và thêm hai hàng cổng decision-sheet, owner-calls, chạy được trên bản sao nông (`upgrade-design-assembly-0-7-1`)
+- Lên đời công cụ design-assembly từ 0.69.0 lên 0.76.0 bằng lệnh upgrade và viết 13 chữ tiếng Việt cho trang logo và bộ biểu tượng của sổ thiết kế — không quyết định thiết kế nào đổi trạng thái (`upgrade-design-assembly-0-76-0`)
 - Lên đời công cụ design-assembly bằng lệnh upgrade của plugin bản 0.1.0 — sổ linh kiện ghi lại quan hệ dựng từ, kho ghi dấu phiên bản công cụ (`upgrade-design-assembly-tool`)
 - Lên đời bộ setup repo-setup từ 0.9.0 lên 0.10.1 — ô conventional-commits chấm commit bằng hook commit-msg của chính kho, AGENTS.md thêm mục «What holds these rules»; không luật nào của kho đổi (`upgrade-repo-setup-0-10-1`)
 - Lên đời bộ setup repo-setup từ 0.10.1 lên 0.10.2 — job conventional-commits rào đầu ra của hook để tin commit không thành lệnh của runner và không giữ token trong bản checkout; tools/autonomy.py cho phép chính sách gọi tên check gate khi kho không có pr-pipeline.yml (`upgrade-repo-setup-0-10-2`)

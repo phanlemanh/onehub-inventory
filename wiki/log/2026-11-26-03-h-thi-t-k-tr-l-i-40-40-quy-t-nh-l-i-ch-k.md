@@ -1,0 +1,1 @@
+Hệ thiết kế trả lời đủ 40/40 quyết định lõi: chủ kho xác nhận 6 câu còn mở (từ không đổi lẫn, câu báo lỗi, khổ màn kiểm, màn tham chiếu, sổ màn, nút theo vai) và sổ hệ thiết kế có bộ chữ tiếng Việt — nhánh claude/design-book-1cac12

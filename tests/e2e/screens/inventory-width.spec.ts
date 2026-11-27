@@ -1,8 +1,10 @@
 // Inventory at 1440 (roadmap row 2, AC-11, E14; row 19, AC-6). Row 19 adds the Về tay column after Giá chào, nine data
-// columns in all. With the App Shell's second column folded the nine fit without sideways scrolling, as row 2 asked. With
-// it open, AC-6 of row 19 (approved by the owner 2026-11-14, ruling G N-1411-15) replaces «every column fits»: Căn to Về
-// tay stand whole in the first view and the columns after Về tay scroll inside the grid, like the company's own columns
-// of row 7e. At every size the page itself never scrolls sideways; the test prints how many data columns are in view.
+// columns in all. With it open, AC-6 of row 19 (approved by the owner 2026-11-14, ruling G N-1411-15) replaces «every
+// column fits»: Căn to Về tay stand whole in the first view and the columns after Về tay scroll inside the grid, like the
+// company's own columns of row 7e. Row 3g (owner's option C, 2026-11-17; sửa sau ký) adds the four details after the
+// bedrooms, thirteen data columns: the same rule now holds with the second column folded too — Căn to Về tay whole in
+// the first view, the rest inside the grid's own scroll. At every size the page itself never scrolls sideways; the test
+// prints how many data columns are in view.
 import { expect, test, type Page } from "@playwright/test";
 
 import { assertCardsNotTable, isPhone, regionReady, rowsShown } from "../phone-list";
@@ -60,14 +62,6 @@ async function measure(page: Page, secondColumn?: "open" | "folded"): Promise<Me
   }, NET_TO_SELLER);
 }
 
-function check(m: Measure): void {
-  if (m.full !== m.total || m.overflow > 0) {
-    throw new Error(
-      `inventory 1440: columns hidden behind horizontal scroll (${m.full}/${m.total})`,
-    );
-  }
-}
-
 /** AC-6 of row 19: with the second column open, Căn to Về tay are whole in the first view. */
 function checkFirstView(m: Measure): void {
   if (m.uptoNet === 0 || m.firstView !== m.uptoNet) {
@@ -76,39 +70,43 @@ function checkFirstView(m: Measure): void {
 }
 
 test.describe("inventory width", () => {
-  test("at 1440, second column folded: all nine columns fit, no sideways scroll", async ({
+  test("at 1440, second column folded: thirteen columns, Căn to Về tay in the first view, the page does not scroll", async ({
     page,
   }, info) => {
     test.skip(info.project.name !== "1440", "do o kho 1440");
     const m = await measure(page, "folded");
-    expect(m.total).toBe(9);
-    expect(() => check(m)).not.toThrow();
+    expect(m.total).toBe(13);
+    expect(() => checkFirstView(m)).not.toThrow();
     expect(m.pageOverflow).toBeLessThanOrEqual(0);
+    console.log(`inventory 1440, second column folded: ${m.full}/${m.total} data columns in view`);
   });
 
-  test("at 1440, second column open: nine columns, Căn to Về tay in the first view, the page does not scroll", async ({
+  test("at 1440, second column open: thirteen columns, Căn to Về tay in the first view, the page does not scroll", async ({
     page,
   }, info) => {
     test.skip(info.project.name !== "1440", "do o kho 1440");
     const m = await measure(page, "open");
-    expect(m.total).toBe(9);
+    expect(m.total).toBe(13);
     expect(() => checkFirstView(m)).not.toThrow();
     expect(m.pageOverflow).toBeLessThanOrEqual(0);
     console.log(`inventory 1440, second column open: ${m.full}/${m.total} data columns in view`);
   });
 
-  test("pha: columns wider than the room are caught", async ({ page }, info) => {
+  test("pha: Về tay pushed behind the frame is caught with the second column folded", async ({
+    page,
+  }, info) => {
     test.skip(info.project.name !== "1440", "do o kho 1440");
-    // The table grows past the grid's viewport, as it would if the width rule gave columns more than the room.
+    // Row 3g: with thirteen columns the folded view keeps the first-view rule; a wider column before Về tay breaks it.
     await page.addInitScript(() => {
       document.addEventListener("DOMContentLoaded", () => {
         const style = document.createElement("style");
-        style.textContent = '[data-slot="data-grid-table"] { min-width: 2000px !important; }';
+        style.textContent =
+          '[data-slot="data-region"] colgroup col:nth-child(4) { width: 1200px !important; }';
         document.head.append(style);
       });
     });
     const m = await measure(page, "folded");
-    expect(() => check(m)).toThrow("inventory 1440: columns hidden behind horizontal scroll");
+    expect(() => checkFirstView(m)).toThrow("inventory 1440: Về tay not in the first view");
   });
 
   test("pha: Về tay pushed behind the frame is caught", async ({ page }, info) => {

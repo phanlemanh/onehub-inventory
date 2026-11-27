@@ -47,7 +47,7 @@ export function ShellContent({ children }: { children: ReactNode }) {
     <div
       data-slot="app-shell-content"
       data-focus={focused || undefined}
-      className={focused ? "flex flex-col gap-2 p-2" : "flex flex-col gap-6 p-4 lg:p-8"}
+      className={focused ? "flex flex-col gap-2 p-2" : "flex flex-col gap-4 p-4 lg:px-8"}
     >
       {children}
     </div>
