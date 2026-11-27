@@ -54,6 +54,7 @@ CA_SQL=(
   thue-phi-theo-san
   can-chao-theo-san
   nhap-excel-theo-san
+  nhap-excel-can-cho-theo-san
 )
 CA_LENH=(
   ap-hai-lan
@@ -96,7 +97,7 @@ pha_thu_tep() {
     bo-ep-luat) printf '%s\n' bo-ep-luat goc-nhin-bo-ep-luat lop-rieng-khong-ep thue-phi-khong-ep can-chao-khong-ep ;;
     luat-them-khong-kiem)
       printf '%s\n' luat-them-khong-kiem luat-them-khong-kiem-doi-tac luat-ghi-for-all-doi-tac luat-xoa-doi-tac \
-        nhap-excel-xoa-mo ;;
+        nhap-excel-xoa-mo nhap-excel-can-cho-cheo-san ;;
     luat-doc-mo) printf '%s\n' luat-doc-mo luat-doc-mo-hoac-true luat-doc-mo-khac-san ma-rieng-doc-mo ;;
     bang-moi-luat-mo) printf '%s\n' bang-moi-luat-mo ;;
     ghi-bi-chan) printf '%s\n' ghi-bi-chan ;;
@@ -120,6 +121,7 @@ pha_thu_ghim() {
     luat-ghi-for-all-doi-tac) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: bang_doi_tac_mau" ;;
     luat-xoa-doi-tac) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     nhap-excel-xoa-mo) printf '%s\n' "HỎNG nhap-excel-theo-san" "HỎNG luat-doc-ghi-theo-san: listings" ;;
+    nhap-excel-can-cho-cheo-san) printf '%s\n' "HỎNG nhap-excel-can-cho-theo-san: câu chạy được" ;;
     luat-doc-mo | luat-doc-mo-hoac-true)
       printf '%s\n' "HỎNG chua-dat-san-khong-thay-gi: agreements" "HỎNG luat-doc-ghi-theo-san: agreements" ;;
     luat-doc-mo-khac-san) printf '%s\n' "HỎNG luat-doc-ghi-theo-san: agreements" ;;
