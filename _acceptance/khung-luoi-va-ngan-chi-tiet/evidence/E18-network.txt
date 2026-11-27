@@ -1,1 +1,1 @@
-n-a: eval so sanh file anh co san, khong mo trinh duyet
+driver: image comparison only (no browser/network). dev server http://127.0.0.1:3470 not reachable (curl 000), not needed for static frames. No requests observed.
