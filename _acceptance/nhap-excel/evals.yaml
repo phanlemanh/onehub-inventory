@@ -133,7 +133,7 @@ evals:
     cmd: config:executors.script.nhap_excel_e2e
     layer: backend-effect
     paths: [src/modules/imports/**, src/modules/listings/**, "src/app/(app)/inventory/**", "src/app/(app)/nhap-tep/**", tests/e2e-db/nhap-excel.spec.ts]
-    expected: "exit 0; ca 'bang hang trong': sàn thử 0 căn, Đầu chủ mở /inventory ở 1440 → chờ regionReady, câu trạng thái trống có đúng một liên kết «Nạp tệp» trỏ /nhap-tep và 0 nút trong vùng trống; đầu màn có nút viền «Nạp tệp»; Đầu khách không có liên kết lẫn nút (đối chứng dương: Đầu chủ có); nạp gon.xlsx, đi hết năm bước, Áp → về /inventory chờ regionReady, đếm đúng N dòng (N viết trước), một căn chờ khớp hiện mã gốc 'SA5-12.08' ở cột Căn và chữ toà của tệp ở cột Toà; ca phá trong bài: ẩn nút theo vai bằng CSS thay vì không dựng → khẳng định 'import button rendered for BuyerAgent'"
+    expected: "exit 0; ca 'bang hang trong' ở 1440: sàn thử dọn hết lần chào, Đầu khách mở /inventory → chờ regionReady, trạng thái trống hiện và không có phần tử a[href=/nhap-tep] nào trong main (dựng ra là đỏ, kể cả ẩn); Đầu chủ (đối chứng dương): câu trạng thái trống có đúng một liên kết «Nạp tệp» trỏ /nhap-tep và 0 nút trong vùng trống, đầu màn có nút viền «Nạp tệp», axe không lỗi nặng; bấm nút ấy, nạp tệp csv viết trước 3 dòng (2 mã danh mục, 1 mã 'ZZ-99.01' không có trong danh mục với toà 'Toà của tệp'), Áp 3 dòng → về /inventory chờ regionReady, đúng 3 dòng, dòng 'ZZ-99.01' có cột Toà 'Toà của tệp'; ca phá trong bài: chèn một liên kết /nhap-tep ẩn bằng CSS vào đầu màn của Đầu khách → khẳng định 'import button rendered for BuyerAgent'; ca phá đã chạy tay: bỏ PermittedAction quanh nút đầu màn → đỏ đúng câu ấy"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E16
@@ -185,7 +185,7 @@ evals:
     cmd: config:executors.script.nhap_excel_e2e
     layer: backend-effect
     paths: [src/modules/imports/**, src/modules/company-config/**, "src/app/(app)/inventory/**", tests/e2e-db/nhap-excel.spec.ts]
-    expected: "exit 0; ca 'nhan rieng tren bang hang': nạp ban.xlsx, giữ ô «Gọi cột này là “Block”» mặc định, Áp → mở /inventory chờ regionReady, đọc tiêu đề cột bằng readHeaders của bài 7e: tiêu đề cột Toà là «Block»; sàn thử thứ hai bỏ chọn ô ấy → tiêu đề là «Toà» (đối chứng); ca phá: bài sửa nhãn riêng trong cơ sở dữ liệu về rỗng giữa chừng → khẳng định 'inventory header is not the learned label: Toà != Block'"
+    expected: "exit 0; ca 'nhan rieng tren bang hang' ở 1440: dọn lần chào, nhãn riêng và mẫu nhập của sàn thử; nạp tệp csv viết trước có cột «Block», bỏ chọn ô «Gọi cột này là “Block” trên bảng», Áp → /inventory chờ regionReady, tiêu đề cột Toà là nhãn chuẩn «Toà» (đối chứng); dọn lại, nạp cùng tệp để ô ấy mặc định → tiêu đề cột Toà là «Block»; ca phá trong bài: ngừng nhãn riêng trong cơ sở dữ liệu rồi tải lại → khẳng định 'inventory header is not the learned label: Toà != Block'; ca phá đã chạy tay: Bảng hàng bỏ nhãn riêng của sàn → đỏ đúng câu ấy"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
   - id: E22

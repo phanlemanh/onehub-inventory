@@ -58,9 +58,14 @@ function edit(dir: string, rel: string, change: (text: string) => string): void 
 const STRAY = '\nexport const strayButton = { action: "manageCompanyCodes" };\n';
 
 describe("doc-giao-dien-mo-dun", () => {
-  it("inventory: saved-view buttons and the cell edit (row 4) found in the listings UI, other listing buttons declared ahead", () => {
+  it("inventory: saved-view buttons, the cell edit (row 4) and Nạp tệp (row 11) found in the code, other listing buttons declared ahead", () => {
     const inv = section(ROOT, "inventory");
-    expect(inv.actions.slice(0, 3).sort()).toEqual(["editView", "saveView", "updateListing"]);
+    expect(inv.actions.slice(0, 4).sort()).toEqual([
+      "editView",
+      "importListings",
+      "saveView",
+      "updateListing",
+    ]);
     expect(inv.planned).toEqual([
       "createListing",
       "activateListing",

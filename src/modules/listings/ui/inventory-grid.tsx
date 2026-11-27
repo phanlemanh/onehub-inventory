@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -11,6 +12,7 @@ import { usePlaceChange } from "@/components/templates/app-shell/place-change";
 import { notifyResult } from "@/components/templates/notify";
 import { Button } from "@/components/ui/button";
 import type { Listing } from "@/generated/ontology";
+import { PermittedAction } from "@/modules/identity/ui";
 
 import type { ListingSaveDoor } from "../save-door";
 import { httpSaveDoor } from "./http-save-door";
@@ -53,6 +55,7 @@ export function InventoryGrid({
   state,
   emptyWhy,
   reloadLabel,
+  emptyLink,
   filters,
   staleLinkNote,
   savedViews,
@@ -80,6 +83,11 @@ export function InventoryGrid({
   emptyWhy: string;
   /** The empty state's next step: load the list again (someone may have added units meanwhile). */
   reloadLabel: string;
+  /**
+   * A way to fill the list from elsewhere (row 11: the import screen): the empty state then says it in one sentence with one
+   * link, shown only to a session the permission table gives importListings, and has no button (design-assembly empty-state).
+   */
+  emptyLink?: { lead: string; word: string; href: string };
   /** Column filters the grid opens with (a status shortcut, or the top-bar search of row 3f). */
   filters?: ColumnFilters;
   /** Said once when the page opens: the address named a listing that is not among the rows (a stale link, row 3f). */
@@ -278,9 +286,24 @@ export function InventoryGrid({
         }
         groupBy={INVENTORY_GROUP_BY}
         emptyAction={
-          <Button variant="outline" onClick={() => router.refresh()}>
-            {reloadLabel}
-          </Button>
+          emptyLink ? (
+            <PermittedAction action="importListings">
+              <p data-slot="empty-link" className="text-sm text-muted-foreground">
+                {emptyLink.lead}{" "}
+                <Link
+                  href={emptyLink.href}
+                  className="font-medium text-foreground underline underline-offset-4"
+                >
+                  {emptyLink.word}
+                </Link>
+                .
+              </p>
+            </PermittedAction>
+          ) : (
+            <Button variant="outline" onClick={() => router.refresh()}>
+              {reloadLabel}
+            </Button>
+          )
         }
         cellEdit={edit.cellEdit}
         phoneList={phoneList}
