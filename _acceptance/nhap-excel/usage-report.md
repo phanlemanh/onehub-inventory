@@ -88,3 +88,44 @@ wall: 1041s
 - **claude-opus-5-5**: 3 agent · 89 calls · out 57,492 · in 188 · cache_read 6,227,967 · cache_create 285,844
 - **claude-sonnet-5-5**: 9 agent · 34 calls · out 33,851 · in 68 · cache_read 1,161,250 · cache_create 338,117
 - **claude-haiku-5-5**: 7 agent · 15 calls · out 13,360 · in 30 · cache_read 128,820 · cache_create 133,901
+
+### S4 round 3 (wf_28b0a2e8-e08) — wf_28b0a2e8-e08 (18 agent, 78,721 out-tok)
+
+| label | model | calls | out | in | cache_read | s |
+|---|---|--:|--:|--:|--:|--:|
+| review:invariants | claude-opus-5-5 | 34 | 19,411 | 70 | 2,597,277 | 273 |
+| synthesize:report | claude-sonnet-5-5 | 2 | 11,574 | 4 | 41,511 | 62 |
+| review:bugs | claude-opus-5-5 | 16 | 8,394 | 34 | 574,521 | 113 |
+| review:measurement | claude-opus-5-5 | 8 | 6,837 | 16 | 230,946 | 79 |
+| baseline:diffBase | claude-sonnet-5-5 | 3 | 5,614 | 6 | 49,600 | 278 |
+| triage | claude-sonnet-5-5 | 2 | 4,498 | 4 | 19,423 | 32 |
+| ui:E18 | claude-sonnet-5-5 | 6 | 4,386 | 12 | 427,087 | 56 |
+| machine:DATABASE_URL= make e2e | claude-haiku-5-5 | 4 | 3,484 | 8 | 42,365 | 651 |
+| machine:DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT: | claude-haiku-5-5 | 2 | 3,409 | 4 | 18,278 | 100 |
+| machine:DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT: | claude-haiku-5-5 | 2 | 2,881 | 4 | 18,255 | 111 |
+| machine:npx vitest run src/modules/imports tests | claude-haiku-5-5 | 2 | 2,408 | 4 | 18,224 | 15 |
+| machine:make check | claude-haiku-5-5 | 2 | 1,529 | 4 | 14,792 | 180 |
+| machine:npm run build | claude-haiku-5-5 | 2 | 1,110 | 4 | 18,490 | 13 |
+| machine:DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT: | claude-haiku-5-5 | 2 | 833 | 4 | 18,283 | 129 |
+| refute:import-wizard.tsx | claude-sonnet-5-5 | 3 | 713 | 6 | 33,355 | 9 |
+| machine:R="${CLAUDE_PLUGIN_ROOT:-$(node tools/ki | claude-haiku-5-5 | 2 | 653 | 4 | 18,270 | 6 |
+| refute:import-wizard.tsx | claude-sonnet-5-5 | 3 | 639 | 6 | 35,302 | 9 |
+| capture:provenance | claude-sonnet-5-5 | 2 | 348 | 4 | 13,895 | 5 |
+
+
+wall: 954s
+
+| vai tro | agents | out | cache_read | wall s | bat dau | ket thuc |
+|---|--:|--:|--:|--:|---|---|
+| review | 3 | 34,642 | 3,402,744 | 273 | 16:57:01 | 17:01:35 |
+| baseline | 1 | 5,614 | 49,600 | 278 | 16:57:01 | 17:01:39 |
+| ui | 1 | 4,386 | 427,087 | 56 | 16:57:01 | 16:57:57 |
+| machine | 8 | 16,307 | 166,957 | 844 | 16:57:01 | 17:11:05 |
+| triage | 1 | 4,498 | 19,423 | 32 | 17:11:05 | 17:11:37 |
+| refute | 2 | 1,352 | 68,657 | 10 | 17:11:37 | 17:11:47 |
+| capture | 1 | 348 | 13,895 | 5 | 17:11:48 | 17:11:52 |
+| synthesize | 1 | 11,574 | 41,511 | 62 | 17:11:53 | 17:12:55 |
+
+- **claude-opus-5-5**: 3 agent · 58 calls · out 34,642 · in 120 · cache_read 3,402,744 · cache_create 200,692
+- **claude-sonnet-5-5**: 7 agent · 21 calls · out 27,772 · in 42 · cache_read 620,173 · cache_create 268,001
+- **claude-haiku-5-5**: 8 agent · 18 calls · out 16,307 · in 36 · cache_read 166,957 · cache_create 153,048

@@ -1,94 +1,161 @@
+# Review findings: nhap-excel (round 3)
+
 ## Trong hợp đồng
 
-- **Criteria and tests (AC-7): when one batch fails, the screen neither resends that batch nor says how many rows were written**
-  file: `src/modules/imports/ui/import-wizard.tsx:245`
-  severity: high
-  AC: AC-7
-  source: invariants
-  detail: AC-7 trong _acceptance/nhap-excel/contract.md:58-62 yêu cầu: «một gói hỏng thì các gói đã ghi giữ nguyên, gói hỏng không ghi dòng nào, màn nói đúng số dòng đã ghi và «Thử lại» gửi đúng gói hỏng». Mã hiện tại không làm vậy. Ở ApplyBatches (import-wizard.tsx:641-666), khi gói b>0 hỏng, màn chỉ đặt banner «failed»/«offline». Chữ của banner (copy.ts:53 «Chưa ghi gì — mất kết nối mạng.», copy.ts:56 «Chưa ghi được — lỗi máy chủ.») nói rằng chưa ghi gì, trong khi các gói 0..b-1 đã ghi xong. Nút «Thử lại» trên banner (dòng 245-247) gọi refresh(table, choices), tức là chạy lại bước xem trước, không gửi lại gói hỏng. Bấm Áp lần nữa thì props.open() mở một lần nhập MỚI. Lần nhập cũ bị bỏ ở trạng thái 'open' mãi, Xong chỉ đếm lần mới, và Hoàn tác lần mới không gỡ các lần chào lần cũ đã tạo. Không có ca kiểm nào cho gói giữa chừng bị hỏng: tests/nhap-excel-man.test.tsx và tests/e2e-db/nhap-excel.spec.ts chỉ thử Thử lại của hoàn tác và của xem trước. Cách sửa: giữ runId và số gói đã ghi; banner nói đúng số dòng đã ghi; Thử lại gửi lại đúng gói batchNo đó trên runId cũ. Thêm một ca màn, trong đó gói thứ hai trả 500 rồi Thử lại thành công.
-
-- **Personal data (Hỏi-12 / pii ListingOwner): the owner-column block matches only exact headers, so common headers get through**
-  file: `src/modules/imports/targets.ts:120`
-  severity: medium
-  AC: AC-2
-  source: invariants
-  detail: OWNER_HEADERS là một tập các tên đã gấp chữ, so khớp nguyên văn: «chu nha», «ten chu», «sdt», «sdt chu», «so chu», «dien thoai», «so dien thoai», «dt chu», «lien he». Nhiều tiêu đề rất thường gặp vì thế không bị chặn: «SĐT chủ nhà» (gấp ra «sdt chu nha»), «Tên chủ nhà», «Điện thoại chủ nhà», «Số ĐT», «SĐT CN», «Liên hệ chủ nhà», «Phone». Cột như vậy được coi là «cần người», và người nhập có thể chọn «trường riêng mới» cho nó. Khi đó số và tên chủ nhà vào listings.custom_fields. Mọi Đầu chủ và Đầu khách có viewListings toàn sàn đọc được các giá trị ấy, tức là đi vòng qua viewOwnerPhone (chỉ của mình) và luật «ghi ở hồ sơ căn, hàng 11b» của AC-2. Thêm nữa: dù cột đã bị bỏ, toàn bộ ô của nó vẫn đi lên máy chủ trong mỗi lần gọi preview, open và batches. Cách sửa: nhận diện theo từ khoá (chứa «chu»/«chủ» cùng «sdt|dien thoai|so|ten|lien he», hoặc «phone|tel|mobile»), có thể thêm dò mẫu giá trị trông như số điện thoại; thêm các tiêu đề trên vào bảng ca của tests/nhap-excel-ghep-cot.test.ts; bỏ các cột đã bỏ khỏi thân yêu cầu.
-
-- **Domain rule 'one open listing per unit per company' breaks once a pending unit has been matched to the catalog**
-  file: `src/modules/imports/store.ts:117`
+- **Retrying after the response of an already-written batch was lost never finishes, or reports too few rows**
+  file: `src/modules/imports/ui/import-wizard.tsx:676`
   severity: medium
   AC: AC-7
-  source: invariants
-  detail: Listing.yaml:52 có luật «Within one company a unit has at most one open listing». Sau khi matchPendingUnits (company-config/store.ts:436) gán unit_key cho một căn chờ, các lần chào đang mở trên căn ấy vẫn nằm ở listing_pending_units; không có gì chuyển chúng sang listing_units. Ở lần nhập sau với cùng mã: context() nhận found.source='pending' có unitKey nên coi là căn danh mục, nhưng tập `listed` (dòng 117-118) chỉ chứa unit_key của listing_units và pending_unit_id của listing_pending_units. Vì vậy căn này không bị coi là đã có lần chào mở; dòng được tạo, và create.ts chèn listing_units cho upi ấy. Unique index listing_units_one_open không thấy lần chào bên bảng pending, và trigger listing_one_unit_link chỉ xét cùng một listing_id. Kết quả là hai lần chào mở cho cùng một căn trên Bảng hàng. Mô tả quan hệ «until the catalog has it» (relations.yaml) cũng không đúng với hành vi này. Cách sửa: khi đếm `listed`, ánh xạ pending_unit_id có unit_key sang unit_key; hoặc chặn ở cơ sở dữ liệu (trigger hay index chéo). Thêm ca kiểm: nhập căn chờ, khớp danh mục, nhập lại cùng mã thì ra 0 lần chào mới.
+  source: bugs
+  detail: The new retry path assumes a failed batch was not written. A dropped connection after the server commits is the main 'offline' case (answer() returns status 0), and there that assumption is wrong. (a) Last batch: writeBatch sets the run to status='done' when it commits. On retry, lockRun finds the run not 'open' and returns problem 'closed' (store.ts:285) before it reaches the batches_done check at store.ts:296. imports-http maps 'closed' to 409, so the wizard shows the batchStopped alert ('lỗi máy chủ… Bấm Thử lại') again on every press. All rows are written, but the person never reaches step 5: no done count, no learned list, no undo button. (b) A batch in the middle: the retry hits batches_done and returns created:0, so at.created leaves that batch out and C.done(created) shows fewer rows than were written. The batch route's comment says 'a batch sent again writes nothing', but the run is closed on the last batch, so that retry cannot succeed. A retry that answers 409 'closed' on the last batch should be treated as finished (or the server should return ok for a batch already in batches_done before the status check). The new test only covers a 500 before the commit, so it does not catch this.
+  lý do vào hợp đồng: AC-7 requires that resending a batch does not double write and that the screen states the exact number of rows written; the finding shows the retry never finishes or under-reports.
+
+- **The retry button stays clickable while its retry runs, so two write loops can run at once**
+  file: `src/modules/imports/ui/import-wizard.tsx:705`
+  severity: low
+  AC: AC-7
+  source: bugs
+  detail: In the failed branch (`if (failed && progress)`) the Thử lại button has no `disabled`. `failed` is only cleared when the whole run succeeds, so the alert and its button stay on screen and active through the retry. The normal apply button is held by `props.disabled` (which includes busy); this one is not. A second click starts a second run() from the same stale `progress` and sends the same batches again. The server's row lock keeps the data correct, but the second loop gets created:0 for batches already done and 409 'closed' on the last one. Its setProgress/setFailed can then put the screen back into the 'lỗi máy chủ' state, or count the rows wrongly, while the first loop completes.
+  lý do vào hợp đồng: Two concurrent retry loops can make the screen show a wrong count of written rows or a false failure, which breaks AC-7's exact-count and retry behaviour.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **SP-1 Companies are isolated: listing_pending_units.pending_unit_id may point at a pending unit of another company**
+- **Design: module boundary, imports reaches into other modules' tables**
+  Người dùng thấy gì: Phần nhập tệp đọc và ghi thẳng vào dữ liệu của các phần khác thay vì đi qua cửa của chúng. Người dùng không thấy lỗi ngay, nhưng sau này sửa luật ở một nơi có thể làm nơi kia lệch.
+  Căn cứ: Hiện chưa mất hay sai dữ liệu của người dùng, chỉ là nợ cấu trúc; sửa sau vẫn rẻ hơn nhiều so với đập đi làm lại ngay.
+  file: `src/modules/imports/store.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Design: listings reads company-config's table without a declared dependency**
+  Người dùng thấy gì: Bảng hàng lấy mã căn chờ khớp bằng cách đọc thẳng dữ liệu của phần cấu hình sàn mà chưa khai báo. Người dùng vẫn thấy đúng mã, nhưng việc khai báo chưa đủ làm sau này dễ vỡ khi phần cấu hình đổi.
+  Căn cứ: Màn hình hiện vẫn đúng và không mất dữ liệu; đây là việc dọn cấu trúc có thể làm sau.
+  file: `src/modules/listings/inventory-read.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Records: new module dependency without a decision page**
+  Người dùng thấy gì: Việc nhập tệp phụ thuộc thêm vài phần khác nhưng chưa có trang ghi lại lý do quyết định. Người dùng không bị ảnh hưởng, chỉ người bảo trì sau này khó hiểu vì sao.
+  Căn cứ: Không ảnh hưởng người dùng và không mất dữ liệu; thiếu giấy tờ có thể bổ sung bất cứ lúc nào với chi phí rất thấp.
+  file: `architecture/modules.yaml`
+  severity: low
+  Đề xuất: known-limits
+
+- **Authorization: own scope not narrowed on unit-link inserts**
+  Người dùng thấy gì: Một Đầu chủ chỉ được làm việc với căn của mình vẫn có thể gắn thông tin căn vào tin rao của đầu chủ khác trong cùng sàn nếu tin đó chưa có. Dữ liệu không ra khỏi sàn nhưng quyền rộng hơn thiết kế.
+  Căn cứ: Lỗi chỉ xảy ra giữa các thành viên cùng một sàn, không lộ dữ liệu sang sàn khác; nhưng là quyền rộng hơn dự định nên cần người quyết có siết hay không.
+  file: `db/migrations/015_nhap_excel.sql`
+  severity: low
+  Đề xuất: new-contract
+
+- **Isolation suite: case count in the header is stale**
+  Người dùng thấy gì: Dòng ghi chú đầu bộ kiểm tra cách ly nói sai số ca kiểm. Người dùng không thấy gì; chỉ người đọc tài liệu có thể bị nhầm số.
+  Căn cứ: Chỉ là con số trong ghi chú, không ảnh hưởng hành vi hay dữ liệu; sửa tay lúc nào cũng được.
+  file: `db/tests/cach-ly.sql`
+  severity: low
+  Đề xuất: wont-fix
+
+- **Correctness: undo reports a retired count it did not check**
+  Người dùng thấy gì: Sau khi hoàn tác, màn có thể báo đã ngừng dùng nhiều mục hơn số thật sự được ngừng, ví dụ mục đã ngừng từ trước. Người dùng có thể tưởng sạch hơn thực tế.
+  Căn cứ: Dữ liệu căn vẫn được gỡ đúng, chỉ con số tóm tắt lệch nhẹ; người dùng tự kiểm được ở lớp riêng của sàn.
+  file: `src/modules/imports/store.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Tier: high, needs a code owner**
+  Người dùng thấy gì: Thay đổi này thuộc mức cao nên cần chủ mã duyệt chứ không tự gộp được. Người dùng cuối không bị ảnh hưởng.
+  Căn cứ: Đây là quy trình duyệt, không phải lỗi sản phẩm; chỉ cần người có thẩm quyền duyệt khi gộp.
+  file: `governance/autonomy.yaml`
+  severity: low
+  Đề xuất: wont-fix
+
+- **Migration 018 says it can run twice, but a second run fails**
+  Người dùng thấy gì: Tệp cập nhật cơ sở dữ liệu ghi rằng chạy hai lần không sao, nhưng thực tế lần hai sẽ báo lỗi. Người dùng không gặp vì hệ thống chỉ chạy nó một lần.
+  Căn cứ: Không bao giờ xảy ra trong vận hành bình thường và không mất dữ liệu; chỉ là câu ghi chú sai.
+  file: `db/migrations/018_nhap_excel_can_cho_theo_san.sql`
+  severity: low
+  Đề xuất: wont-fix
+
+- **Shape 5: the test claims a whole class of owner headers but checks only sample headers, and 5 of the 16 phrases have no case**
+  Người dùng thấy gì: Bài kiểm tra việc chặn cột chủ nhà và số điện thoại chưa phủ hết các cách viết; nếu ai vô tình xoá một cách viết, bài kiểm tra vẫn xanh. Có thể có tệp lọt cột số chủ nhà mà không bị chặn.
+  Căn cứ: Hiện hành vi vẫn đúng nên chưa ai bị ảnh hưởng, nhưng lưới an toàn cho dữ liệu nhạy cảm hở; thêm ca kiểm tra rẻ nhưng là việc riêng.
+  file: `tests/nhap-excel-ghep-cot.test.ts`
+  severity: medium
+  Đề xuất: new-contract
+
+- **Shape 4: the 'stays open' list checks only that the reason is not owner-column, without pinning the expected mark**
+  Người dùng thấy gì: Bài kiểm tra các cột như diện tích và ghi chú chỉ xác nhận chúng không bị coi là cột chủ nhà, chưa khẳng định chúng được để mở. Nếu sau này các cột đó bị chặn nhầm vì lý do khác, bài kiểm tra vẫn không báo.
+  Căn cứ: Hành vi hiện tại đúng và người dùng không bị ảnh hưởng; đây chỉ là lưới kiểm tra lỏng, siết sau được.
+  file: `tests/nhap-excel-ghep-cot.test.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **SP-1 Companies are isolated: listing_pending_units.pending_unit_id may point at a pending unit of another company (r2)**
   Người dùng thấy gì: Hiện mã vẫn chỉ lấy căn chờ của đúng sàn, nên chưa có sàn nào thấy hay bị gắn nhầm dữ liệu của sàn khác. Nhưng nếu sau này có lỗi ở mã, cơ sở dữ liệu sẽ không chặn việc gắn lần chào với căn chờ của sàn khác.
   Căn cứ: Chưa có đường nào đang mở lỗ nên người dùng chưa bị ảnh hưởng; sửa cần thêm một bước nâng cấp cơ sở dữ liệu riêng nên để dành khi có dịp.
   file: `db/migrations/015_nhap_excel.sql`
   severity: medium
   Đề xuất: known-limits
 
-- **Design / module boundaries: imports and listings read and write other modules' tables directly**
+- **Design / module boundaries: imports and listings read and write other modules' tables directly (r2 · tệp đã đổi)**
   Người dùng thấy gì: Người dùng không thấy gì khác khi dùng. Chỉ là luật gỡ căn chờ nằm ở hai chỗ, nên sau này sửa một nơi mà quên nơi kia thì hai màn có thể xử lý khác nhau.
   Căn cứ: Hiện chạy đúng và không mất dữ liệu; rủi ro chỉ là bảo trì về sau, sửa tốn công và không gấp.
   file: `src/modules/imports/store.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Authorization and input: the server does not enforce batch order; the last batch closes the import while earlier batches are missing**
+- **Authorization and input: the server does not enforce batch order; the last batch closes the import while earlier batches are missing (r2 · tệp đã đổi)**
   Người dùng thấy gì: Nếu một bên gọi máy chủ không qua màn và gửi gói cuối trước, lần nhập có thể bị đóng khi còn thiếu dòng, các dòng còn lại không ghi được nữa. Màn thật gửi đúng thứ tự nên người dùng bình thường không gặp.
   Căn cứ: Chỉ xảy ra khi bỏ qua màn nhập, không mất dữ liệu có sẵn, và người dùng nhập lại được.
   file: `src/modules/imports/store.ts`
   severity: low
   Đề xuất: known-limits
 
-- **Team lead's list-agent fetch fails silently; Apply stays disabled with no message**
+- **Team lead's list-agent fetch fails silently; Apply stays disabled with no message (r2 · tệp đã đổi)**
   Người dùng thấy gì: Khi Trưởng nhóm mở màn nhập mà danh sách Đầu chủ tải lỗi, ô chọn trống và nút Áp không bật, không có lời giải thích hay nút thử lại. Họ phải tải lại trang mới biết đường.
   Căn cứ: Không mất dữ liệu và tải lại trang là xử lý được; chỉ gây khó hiểu trong lúc mạng lỗi, ảnh hưởng nhóm nhỏ.
   file: `src/modules/imports/ui/import-wizard.tsx`
   severity: medium
   Đề xuất: known-limits
 
-- **allNewFieldCells is outside the table fingerprint, so the last batch can write custom-field values that were not in the opened table**
+- **allNewFieldCells is outside the table fingerprint, so the last batch can write custom-field values that were not in the opened table (r2 · tệp đã đổi)**
   Người dùng thấy gì: Một bên gọi máy chủ cố tình sửa gói cuối có thể gắn giá trị trường riêng khác với bảng người đã xem trước lên các căn đã nhập. Màn thật không tự làm vậy.
   Căn cứ: Chỉ xảy ra khi có người cố tình, giá trị sai nằm trong sàn của chính họ và gỡ được bằng hoàn tác; sửa không gấp.
   file: `src/modules/imports/store.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): các ca phá của E4, E6, E8, E9, E14 chỉ đưa giá trị chép tay vào bộ kiểm cục bộ, không chạy qua mã đã bị gỡ chốt**
+- **Hình dạng 2 (fixture viết tay đúng khuôn bên đọc): các ca phá của E4, E6, E8, E9, E14 chỉ đưa giá trị chép tay vào bộ kiểm cục bộ, không chạy qua mã đã bị gỡ chốt (r2 · tệp đã đổi)**
   Người dùng thấy gì: Một số bài kiểm chứng minh việc bỏ chốt thì phát hiện lỗi, nhưng chỉ thử trên dữ liệu dựng tay. Nếu sau này ai đó gỡ chốt thật, các bài này có thể vẫn xanh nên người dùng có thể gặp lỗi mà không ai báo trước.
   Căn cứ: Không ảnh hưởng người dùng hôm nay, chỉ làm lưới an toàn sau này yếu hơn; sửa tốn nhiều công.
   file: `tests/db/nhap-excel.db.test.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 2: ca phá «mất mạng» của E16 đưa cho bộ kiểm một màn đã hồi phục, không phải màn nuốt lỗi**
+- **Hình dạng 2: ca phá «mất mạng» của E16 đưa cho bộ kiểm một màn đã hồi phục, không phải màn nuốt lỗi (r2)**
   Người dùng thấy gì: Bài kiểm trạng thái mất mạng không chứng minh được thêm điều gì so với phép thử thường. Nếu màn sau này nuốt lỗi mất mạng thì bài này có thể không báo.
   Căn cứ: Chỉ làm lưới kiểm yếu đi chút, phép thử dương vẫn bắt phần lớn; chi phí sửa không đáng.
   file: `tests/e2e-db/nhap-excel.spec.ts`
   severity: low
   Đề xuất: wont-fix
 
-- **Hình dạng 4 (khẳng định âm một mình, không ghim thông điệp): ca lần nhập cũ chưa có dấu vân tay chỉ đòi ok === false**
+- **Hình dạng 4 (khẳng định âm một mình, không ghim thông điệp): ca lần nhập cũ chưa có dấu vân tay chỉ đòi ok === false (r2)**
   Người dùng thấy gì: Bài kiểm về lần nhập cũ chỉ xác nhận bị từ chối, không xác nhận đúng lý do. Nếu chốt này hỏng nhưng có lý do khác từ chối thì bài vẫn xanh và lỗi có thể lọt tới người dùng.
   Căn cứ: Chỉ là lưới kiểm lỏng ở ca hiếm về lần nhập cũ, người dùng không bị ảnh hưởng ngay; sửa rẻ nhưng không gấp.
   file: `tests/nhap-excel-luu.test.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 4: lần dò «đường nhập không chạm lớp llm» chỉ đòi danh sách rỗng, không có đối chứng dương cho bộ dò**
+- **Hình dạng 4: lần dò «đường nhập không chạm lớp llm» chỉ đòi danh sách rỗng, không có đối chứng dương cho bộ dò (r2 · tệp đã đổi)**
   Người dùng thấy gì: Bài kiểm xác nhận việc nhập không dùng AI có thể xanh ngay cả khi bộ dò hỏng. Nếu sau này có chỗ gọi AI lọt vào đường nhập thì có thể không ai biết.
   Căn cứ: Hiện đường nhập thực sự không dùng AI nên người dùng không bị ảnh hưởng; chỉ là lưới kiểm cần chặt hơn và sửa rẻ.
   file: `tests/db/nhap-excel.db.test.ts`
   severity: low
   Đề xuất: known-limits
 
-- **Hình dạng 5 (tuyên quét lớp nhưng thiếu ma trận toàn phần): E16 hứa «tổng 28 ô hằng 28» nhưng không khẳng định nào ghim bảng khổ × trạng thái**
+- **Hình dạng 5 (tuyên quét lớp nhưng thiếu ma trận toàn phần): E16 hứa «tổng 28 ô hằng 28» nhưng không khẳng định nào ghim bảng khổ × trạng thái (r2)**
   Người dùng thấy gì: Không có phép kiểm nào đếm đủ số trạng thái màn ở mọi khổ. Nếu một khổ hay một trạng thái bị bỏ sót thì không bài nào báo đỏ và người dùng có thể gặp màn thiếu.
   Căn cứ: Màn hiện vẫn hiển thị đủ; chỉ là lưới kiểm chưa khoá chặt và thêm bảng đếm tương đối rẻ nhưng không gấp.
   file: `tests/e2e-db/nhap-excel.spec.ts`
@@ -102,14 +169,14 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Personal data: ImportRun.kept stores raw cell text without a pii marking (r1 · tệp đã đổi)**
+- **Personal data: ImportRun.kept stores raw cell text without a pii marking (r1)**
   Người dùng thấy gì: Những ô người nhập chọn giữ nguyên chữ có thể chứa số điện thoại chủ nhà ghi dưới một tên cột lạ, và được lưu lại không có hạn, nhân viên cùng sàn có quyền xem lần nhập có thể đọc được về sau.
   Căn cứ: Có thể lộ số chủ nhà trong phạm vi cùng sàn nhưng hiện màn hình chưa hiển thị phần này; sửa được sau mà không mất dữ liệu.
   file: `ontology/entities/ImportRun.yaml`
   severity: low
   Đề xuất: known-limits
 
-- **Domain: the ontology does not match the schema for ListingPendingUnit and Listing.importRunId (r1)**
+- **Domain: the ontology does not match the schema for ListingPendingUnit and Listing.importRunId (r1 · tệp đã đổi)**
   Người dùng thấy gì: Mô tả nghiệp vụ lệch nhẹ so với cơ sở dữ liệu thật ở vài trường. Người dùng không thấy gì, nhưng người sửa sau có thể hiểu nhầm.
   Căn cứ: Không mất dữ liệu và không ảnh hưởng người dùng; chỉ là tài liệu mô hình chưa khớp, chỉnh lại rẻ.
   file: `ontology/entities/ListingPendingUnit.yaml`
@@ -186,14 +253,14 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 5 (a declared 30-cell matrix, 11 cells pinned): E16 'trang thai' (r1 · tệp đã đổi)**
+- **Shape 5 (a declared 30-cell matrix, 11 cells pinned): E16 'trang thai' (r1)**
   Người dùng thấy gì: Một số trạng thái của màn Nạp tệp ở một số khổ màn hình chưa được kiểm tra tự động, nên lỗi hiển thị hay lỗi truy cập có thể lọt.
   Căn cứ: Chưa thấy lỗi hiển thị thật; người dùng tải lại được và thêm ca kiểm tra sau là rẻ.
   file: `tests/e2e-db/nhap-excel.spec.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 5 (a declared class with zero asserts): E11 points at a test file that does not exist (r1 · tệp đã đổi)**
+- **Shape 5 (a declared class with zero asserts): E11 points at a test file that does not exist (r1)**
   Người dùng thấy gì: Bài kiểm tra khớp mô hình nghiệp vụ với cơ sở dữ liệu được hứa nhưng chưa tồn tại, nên tiêu chí này xanh mà không đo gì.
   Căn cứ: Không phải lỗi người dùng gặp nhưng làm mất một lớp bảo vệ; viết bài kiểm tra sau là việc nhỏ.
   file: `_acceptance/nhap-excel/evals.yaml`
@@ -207,14 +274,14 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 4 (negative-only, no positive control in the same case): 'B sees none of A's imports' and 'B's team lead sees only B's' (r1)**
+- **Shape 4 (negative-only, no positive control in the same case): 'B sees none of A's imports' and 'B's team lead sees only B's' (r1 · tệp đã đổi)**
   Người dùng thấy gì: Bài kiểm tra cách ly giữa các sàn chỉ xem sàn B không thấy dữ liệu sàn A, chưa xem sàn B có thấy dữ liệu của chính mình, nên một lỗi làm ẩn hết cũng qua được.
   Căn cứ: Không có dữ liệu bị lộ hay mất; chỉ là bằng chứng chưa đầy đủ và bổ sung rẻ.
   file: `db/tests/cach-ly.sql`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 4 (negative-only, no proof the screen reached the step with the button): BuyerAgent sees no Áp (r1)**
+- **Shape 4 (negative-only, no proof the screen reached the step with the button): BuyerAgent sees no Áp (r1 · tệp đã đổi)**
   Người dùng thấy gì: Bài kiểm tra việc Đầu khách không thấy nút Áp chưa chắc đã đến bước có nút, nên có thể xanh vì lý do khác.
   Căn cứ: Quyền này còn được chặn ở máy chủ, nên hậu quả nhẹ; không đáng mở việc riêng.
   file: `tests/nhap-excel-man.test.tsx`
@@ -242,4 +309,6 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
+## Chưa adversarial-verify (refuter chết)
+
+⚠ Cụm ngoài vùng phủ: 2/12 lỗi rơi vào file không bộ đo nào phủ (governance/autonomy.yaml, db/migrations/018_nhap_excel_can_cho_theo_san.sql) — dừng và quyết: mở rộng hợp đồng hay rút phạm vi.
