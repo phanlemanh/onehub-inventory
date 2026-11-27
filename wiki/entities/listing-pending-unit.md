@@ -25,6 +25,8 @@ căn: với căn danh mục (`ListingUnit`) hoặc với căn chờ khớp (liê
 ## Where in the code
 
 Bảng `listing_pending_units` ở migration 015; tạo qua `createListings` ở `src/modules/listings/create.ts` (hàng 11).
+Bảng hàng đọc nó trong `src/modules/listings/inventory-read.ts`: lần chào trên căn chờ khớp hiện mã gốc của sàn ở cột
+Căn và chữ toà của tệp ở cột Toà; thuộc tính căn để trống.
 
 ## History
 
