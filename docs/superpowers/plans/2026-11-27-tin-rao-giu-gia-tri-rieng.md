@@ -28,7 +28,7 @@ Thứ tự của giám sát (G-2711-17), ba nhịp:
    và của main, tức `017`, vì 11 gộp trước. Đổi ontology Listing đúng phạm vi đã duyệt, chạy `make gen`, không nới ô
    `agent:` nào.
 2. Việc 6–7 (nhập tệp, căn chờ khớp) dựng khi 11 đã vào main, sau khi gộp main vào nhánh.
-3. Việc 4, 5, 8 (lưới, ngăn, hồ sơ đã ký) chờ VP10 và VP11 vào main. Trong lúc chờ, không sửa năm tệp khung dùng chung.
+3. Việc 4, 5, 5b, 8 (lưới, ngăn, thân hồ sơ, hồ sơ đã ký) chờ VP10 và VP11 vào main. Trong lúc chờ, không sửa năm tệp khung dùng chung.
 
 Một hồ sơ, một PR: không mở PR riêng cho phần nền. Lượt chấm S4 chỉ xin khi cả tám việc xong, trên main đã có 11, VP10
 và VP11.
@@ -160,6 +160,33 @@ trong hồ sơ), ô tìm mã căn của hàng 12 (dùng lại, không viết m�
 - Bài: E3, E3b, E4, E5, E11b (bốn vai), E14 (ma trận ba trạng thái × hai vai), E14b (khung VP10, 360 và 1440, sáng và tối, đo vùng bấm).
 - Phục vụ: E3, E3b, E4, E5, E11b, E14, E14b.
 
+### Việc 5b: Thân hồ sơ căn theo bốn nhóm A–D (chờ VP10, VP11)
+
+Thêm sau khi kế hoạch được duyệt. Chủ kho duyệt bốn nhóm ở phiên BH, nguyên văn «Duyệt cả bốn nhóm»; G-2711-20 xếp chúng
+vào 3h. Hợp đồng ghi ở mục «Sửa sau Cổng Phạm vi», đo bằng AC-12.
+
+**Tệp:** `src/modules/listings/ui/listing-record-full.tsx`, `listing-record.tsx`, `record-copy.ts`, `ontology/labels.yaml`,
+`tests/tin-rao-gia-tri-rieng.test.tsx`, `tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts`. Không đụng khung ngăn
+(`record-panel.tsx` thuộc VP10).
+
+- (A) Thân mở bằng một dòng: trạng thái bên trái, giá bên phải, ở mọi khổ. Dòng kế là «dự án · loại hình».
+  - Bỏ mã căn lặp trong thân và bỏ dải ba dữ kiện.
+  - Thuộc tính căn chỉ nằm ở khối căn của việc 5.
+- (B) Mức đủ:
+  - căn đủ hiện một dòng «✓ Đủ thông tin · 5/5»;
+  - căn thiếu giữ thanh và số đếm. Mỗi tên trong «Còn thiếu» là nút: bấm thì nhảy tới dòng ấy và mở «Sửa» của khối ấy;
+  - giá trị thiếu đọc «Chưa có», có chấm hổ phách trước nhãn;
+  - cách đếm vẫn là hàm của hàng 3b (Hỏi-8).
+- (C) Dòng «Xác nhận với chủ nhà N ngày trước». Quá 14 ngày thì thêm dòng hổ phách «Quá 14 ngày — nên xác nhận lại».
+  Chưa hiện tên người xác nhận; tên chờ hàng 3c.
+- (D) Bố cục:
+  - cột nhãn khoảng 120px, điện thoại khoảng 104px;
+  - lần chào đang xem đọc «Lần n · đang xem», không nền xám; các lần khác như liên kết có «›»;
+  - dưới 360px mỗi lần chào hai dòng đều nhau.
+- Màu hổ phách và chấm lấy từ bảng màu VP11, không viết mã màu tay.
+- Bài: E15 (ma trận thân hồ sơ), E15b (320, 360 và 1440, sáng và tối, đo cột nhãn và dòng trạng thái và giá).
+- Phục vụ: E15, E15b.
+
 ### Việc 6: Nhập tệp ghi giá trị «tệp», đọc lại lần nhập cũ, dấu ở bước xem trước
 
 **Tệp:**
@@ -203,14 +230,15 @@ AttributeSource): boolean`, đúng khi giá trị mới được ghi);
 
 ## Bảng tóm tắt cho người duyệt
 
-| Người dùng thấy gì khác                                            | Việc    | Tiêu chí   |
-| ------------------------------------------------------------------ | ------- | ---------- |
-| Sửa diện tích, phòng ngủ ngay trên ô; tải lại trang vẫn còn        | 1, 2, 4 | AC-2       |
-| Sửa năm thuộc tính trong chi tiết căn ở mọi cỡ màn                 | 1, 2, 5 | AC-3       |
-| Ô khác danh mục có dấu chấm; lấy lại về danh mục                   | 1, 5    | AC-4, AC-5 |
-| Danh mục đổi không đè giá trị của sàn; sàn không sửa được danh mục | 1, 2    | AC-1, AC-6 |
-| Nhập tệp ghi giá trị của tệp; lần nhập cũ được đọc lại             | 6       | AC-7, AC-8 |
-| Căn chờ khớp giữ giá trị khi được khớp                             | 7       | AC-9       |
-| Gắn tin sang căn khác trong chi tiết căn                           | 3       | AC-10      |
-| Đúng quyền, sàn khác không thấy                                    | 1, 2    | AC-11      |
-| Căn đã bán, ngừng hẳn: dòng khoá nói lý do thay cho nút            | 5       | AC-12      |
+| Người dùng thấy gì khác                                                             | Việc    | Tiêu chí    |
+| ----------------------------------------------------------------------------------- | ------- | ----------- |
+| Sửa diện tích, phòng ngủ ngay trên ô; tải lại trang vẫn còn                         | 1, 2, 4 | AC-2        |
+| Sửa năm thuộc tính trong chi tiết căn ở mọi cỡ màn                                  | 1, 2, 5 | AC-3        |
+| Ô khác danh mục có dấu chấm; lấy lại về danh mục                                    | 1, 5    | AC-4, AC-5  |
+| Danh mục đổi không đè giá trị của sàn; sàn không sửa được danh mục                  | 1, 2    | AC-1, AC-6  |
+| Nhập tệp ghi giá trị của tệp; lần nhập cũ được đọc lại                              | 6       | AC-7, AC-8  |
+| Căn chờ khớp giữ giá trị khi được khớp                                              | 7       | AC-9        |
+| Gắn tin sang căn khác trong chi tiết căn                                            | 3       | AC-10       |
+| Đúng quyền, sàn khác không thấy                                                     | 1, 2    | AC-11       |
+| Căn đã bán, ngừng hẳn: dòng khoá nói lý do thay cho nút                             | 5       | AC-12       |
+| Chi tiết căn mỗi thứ nói một lần; bấm «Còn thiếu» để sửa; nhắc xác nhận quá 14 ngày | 5b      | AC-12 (A–D) |

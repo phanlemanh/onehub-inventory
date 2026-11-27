@@ -175,3 +175,20 @@ evals:
     paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
     expected: "exit 0; trên khung ngăn của VP10 (main đã gộp VP10 và VP11), ở 360 và 1440, sáng và tối: hồ sơ căn 0606 (Đã bán) và 1201 (Ngừng hẳn) có dòng chữ nhạt có ổ khoá ở chỗ «Sửa» và dòng nhạt nói lý do ở chỗ «Hỏi đầu chủ»; tin đang mở có hai nút; ở 360 hộp bao của nút «Sửa» đầu mục cao ít nhất 44px, ở 1440 cao 28px (getBoundingClientRect); axe không có lỗi; ảnh evidence/E14b-<khổ>-<nền>.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+
+  - id: E15
+    criterion: AC-12
+    executor: test
+    cmd: config:executors.test.unit
+    paths: [src/modules/listings/ui/**, tests/tin-rao-gia-tri-rieng.test.tsx]
+    expected: "exit 0; ma trận viết trước thân hồ sơ căn: (A) dòng đầu thân có data-slot record-status bên trái và record-price bên phải, dòng kế 'dự án · loại hình'; mã căn xuất hiện đúng một lần trong ngăn (ở đầu ngăn), không còn data-slot record-facts; năm thuộc tính căn chỉ nằm trong khối căn; (B) căn 5/5 hiện đúng một dòng chữ 'Đủ thông tin' kèm '5/5' và không có thanh; căn 3/5 có thanh, số đếm và «Còn thiếu» là nút, bấm tên một phần thì khối của phần ấy ở chế độ Sửa và dòng ấy nhận tiêu điểm; giá trị thiếu đọc 'Chưa có' và có data-slot missing-dot trước nhãn; số đếm bằng hàm mức đủ của hàng 3b (không đổi); (C) lần xác nhận 3 ngày trước hiện 'Xác nhận với chủ nhà 3 ngày trước' và không dòng cảnh báo; 15 ngày trước có thêm dòng 'Quá 14 ngày — nên xác nhận lại'; (D) lần chào đang xem đọc 'Lần n · đang xem' và không có lớp nền xám; lần khác là liên kết có '›'; mọi chữ rút từ ontology/labels.yaml (không viết tay); ca đối chứng lặp mã căn trong thân cho 'unit code said twice', ca đối chứng đếm thiếu khác hàm 3b cho 'completeness counted differently'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15b
+    criterion: AC-12
+    executor: ui-check
+    layer: ui-observed
+    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E15b
+    paths: [src/modules/listings/ui/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    expected: "exit 0; trên khung ngăn của VP10 (main đã gộp VP10 và VP11), ở 320, 360 và 1440, sáng và tối: dòng trạng thái và giá nằm trên một dòng (hai hộp bao cùng hàng); cột nhãn rộng 120±8px ở 1440 và 104±8px ở 360 (getBoundingClientRect); ở 320 mỗi lần chào đúng hai dòng (chiều cao các mục bằng nhau); bấm một tên trong «Còn thiếu» thì khối ấy mở Sửa và cuộn tới dòng; chấm và dòng quá 14 ngày dùng màu cảnh báo của bảng màu VP11 (không mã màu viết tay); axe không có lỗi; ảnh evidence/E15b-<khổ>-<nền>.png"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]

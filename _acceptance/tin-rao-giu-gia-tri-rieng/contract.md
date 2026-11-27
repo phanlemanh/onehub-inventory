@@ -73,7 +73,14 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
   không giữ căn, Then chỗ nút «Sửa» của khối thông tin căn là một dòng chữ nhạt có ổ khoá nói lý do (C1), chỗ nút «Hỏi đầu
   chủ» ở đáy hồ sơ là một dòng chữ nhạt nói lý do (C2) — không nút mờ, không biến mất im lặng, chữ đọc từ bảng nhãn; tin
   đang mở thì hai nút như cũ; trên điện thoại nút «Sửa» ở đầu mục có vùng bấm ít nhất 44px, máy tính 28px (C10); ngăn hiện
-  thuộc tính căn chỉ để đọc khi không bấm «Sửa» (C16).
+  thuộc tính căn chỉ để đọc khi không bấm «Sửa» (C16). Và thân hồ sơ theo bốn nhóm A–D chủ kho duyệt sau Cổng Phạm vi
+  (mục «Sửa sau Cổng Phạm vi»): (A) thân mở bằng một dòng trạng thái bên trái, giá bên phải ở mọi khổ, rồi «dự án · loại
+  hình»; mã căn không lặp trong thân, không còn dải ba dữ kiện, thuộc tính căn chỉ hiện ở khối căn; (B) căn đủ thông tin
+  hiện một dòng «✓ Đủ thông tin · 5/5», căn thiếu giữ thanh và số đếm, mỗi tên trong «Còn thiếu» bấm được — nhảy tới dòng
+  ấy và mở «Sửa» của khối ấy — giá trị thiếu đọc «Chưa có» với chấm hổ phách trước nhãn, cách đếm mức đủ không đổi; (C)
+  dòng «Xác nhận với chủ nhà N ngày trước», quá 14 ngày thêm dòng hổ phách «Quá 14 ngày — nên xác nhận lại»; (D) cột nhãn
+  cố định khoảng 120px (điện thoại khoảng 104px), lần chào đang xem đọc «Lần n · đang xem» không nền xám, các lần khác như
+  liên kết có «›», dưới 360px mỗi lần chào hai dòng đều nhau. Chữ đọc từ bảng nhãn; màu hổ phách theo bảng màu của VP11.
 
 ## Vai × Màn
 
@@ -93,6 +100,8 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
 - Trục người (có `updateListing` · không · sàn khác): AC-11. Thước: bảng quyền 013, SP-1.
 - Danh sách hướng là tám hướng (Hỏi-5, chủ kho duyệt ở Cổng Phạm vi).
 - Trục trạng thái của nút trong hồ sơ căn (đang mở · Đã bán · Ngừng hẳn) × vai (có quyền sửa · không giữ căn): AC-12.
+- Trục thân hồ sơ (đủ · thiếu · xác nhận trong 14 ngày · quá 14 ngày · một lần chào · nhiều lần chào) × khổ (320/360 ·
+  1440): AC-12 (A–D), E15, E15b.
 
 ## Đường đo
 
@@ -104,6 +113,15 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
   này gạch khỏi ngưỡng (Hỏi-8, chủ kho duyệt ở Cổng Phạm vi: mức đủ giữ như cũ).
 - Vế «giá và trạng thái giữ luật đã ký, ô máy tính ra không sửa»: E13 (bộ bài của hàng 4 chạy lại, cộng ca ô thuộc tính
   không mở sửa dưới 768 px).
+
+## Sửa sau Cổng Phạm vi
+
+- 2026-11-27 · Tám điểm còn lại của chi tiết căn (C3, C4, C6, C8, C9, C11, C14, C15) vào AC-12 thành bốn nhóm A–D. Chủ
+  kho duyệt tại phiên BH, nguyên văn «Duyệt cả bốn nhóm», trả lời câu «Duyệt cả bốn nhóm chi tiết căn theo lối khuyên?»
+  (trang `chi-tiet-can-diem-con-lai-2026-11-27.html` ở thư mục ghi chú chung của đợt; sổ đợt `dieu-phoi-nen`, mục «Tám
+  điểm còn lại của chi tiết căn»). Xếp vào 3h theo G-2711-20: nội dung ngăn chi tiết có một chủ là 3h. Không thêm tiêu
+  chí mới để hợp đồng giữ 12 tiêu chí (một lượt chấm); đo bằng E15, E15b. Tên người xác nhận ở nhóm C chờ lịch sử của
+  hàng 3c — tới lúc ấy chỉ hiện số ngày.
 
 ## Out of scope
 
