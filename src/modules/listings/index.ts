@@ -35,3 +35,5 @@ export {
   type UnitErrorReport,
 } from "./messages";
 export * from "./custom-rules";
+// A listing's own values of five unit attributes (row 3h): which value wins over the catalog, and the readers.
+export * from "./unit-attributes";

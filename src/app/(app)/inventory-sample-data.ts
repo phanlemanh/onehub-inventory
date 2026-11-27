@@ -4,8 +4,10 @@
 import { SAMPLE_SUBDIVISIONS, sampleUnits, subdivisionNameOf } from "@/modules/catalog";
 import type { Listing } from "@/generated/ontology";
 import {
+  SAMPLE_CATALOG_GAPS,
   SAMPLE_COMPANY,
   buildSampleListings,
+  withSampleOwnAttributes,
   sampleEarlierListings,
   sampleKeeperOf,
   type InventoryData,
@@ -49,12 +51,26 @@ function withSampleFees<L extends Listing>(listings: readonly L[]): L[] {
 }
 
 export function sampleInventory() {
-  const units = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
-  const built = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units });
-  const listings = withSampleFees(built.listings).map((l, i) => ({
+  const all = sampleUnits().map((u) => ({ ...u, subdivisionName: subdivisionNameOf(u) }));
+  const built = buildSampleListings({ companyId: SAMPLE_COMPANY.id, units: all });
+  const listings = withSampleOwnAttributes(withSampleFees(built.listings)).map((l, i) => ({
     ...l,
     customFields: sampleCustomFields(i),
   }));
+  // Row 3h: a few catalog units say nothing of an attribute, so the prototype shows an own value filling the gap.
+  const gapOf = new Map(
+    Object.entries(SAMPLE_CATALOG_GAPS).map(([i, fields]) => [
+      built.listingUnits[Number(i)]?.upi,
+      fields,
+    ]),
+  );
+  const units = all.map((u) => {
+    const gaps = gapOf.get(u.upi);
+    if (!gaps) return u;
+    const out = { ...u };
+    for (const f of gaps) if (f !== "propertySubType") delete out[f];
+    return out;
+  });
   return { units, listingUnits: built.listingUnits, listings };
 }
 

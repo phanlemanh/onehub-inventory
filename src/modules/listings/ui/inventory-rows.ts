@@ -7,6 +7,7 @@ import type { DisplayKind } from "@/generated/display";
 import type { Listing, ListingUnit, Unit } from "@/generated/ontology";
 
 import type { CustomKind } from "../custom-rules";
+import { effectiveAttributes, type CatalogAttributes } from "../unit-attributes";
 
 import { DETAIL_COLUMN_FIELDS, type DetailColumnWords } from "./detail-cells";
 import { QUERY_WORD } from "./query-words";
@@ -26,12 +27,13 @@ export function inventoryStateFrom(
     : "ready";
 }
 
-/** What the inventory grid reads of a unit. */
-export type InventoryUnit = Pick<Unit, "upi" | "livingArea" | "bedroomsTotal">;
+/** What the inventory grid reads of a unit: its UPI and what the catalog says of the five unit attributes. */
+export type InventoryUnit = Pick<Unit, "upi"> & CatalogAttributes;
 
 /**
- * One grid row per listing. Area and bedrooms come from the unit the listing's unit link points at, found by UPI;
- * a link to a unit the catalog does not have leaves both empty rather than borrowing another unit's numbers.
+ * One grid row per listing. The unit attributes are the listing's effective ones (row 3h): its own value, else the
+ * value of the unit the listing's unit link points at, found by UPI; a link to a unit the catalog does not have leaves
+ * them to the listing's own values rather than borrowing another unit's numbers.
  */
 export function inventoryRows(input: {
   listings: readonly Listing[];
@@ -43,6 +45,7 @@ export function inventoryRows(input: {
   return input.listings.map((l) => {
     const upi = upiByListing.get(l.id);
     const unit = upi === undefined ? undefined : unitByUpi.get(upi);
+    const e = effectiveAttributes(l, unit);
     return {
       ...customValues(l),
       id: l.id,
@@ -51,8 +54,11 @@ export function inventoryRows(input: {
       "Listing.subdivisionName": l.subdivisionName ?? null,
       "Listing.standardStatus": l.standardStatus,
       "Listing.listPrice": l.listPrice ?? null,
-      "Unit.livingArea": unit?.livingArea ?? null,
-      "Unit.bedroomsTotal": unit?.bedroomsTotal ?? null,
+      "Unit.livingArea": e.livingArea.value,
+      "Unit.bedroomsTotal": e.bedroomsTotal.value,
+      "Unit.floor": e.floor.value,
+      "Unit.directionFaces": e.directionFaces.value,
+      "Unit.propertySubType": e.propertySubType.value,
       "Listing.lastConfirmedAt": l.lastConfirmedAt ?? null,
     };
   });
@@ -112,6 +118,11 @@ export function inventoryColumns(
   fees?: InventoryFeeHeaders,
   /** Row 3g (Hỏi-3 «lối C»): the four details as columns after the bedrooms, in Quỹ hàng's order. */
   details?: DetailColumnWords,
+  /**
+   * Row 3h, variant B (`?columns=five`, for comparison at the scope gate only): floor, direction and property sub type as
+   * columns right after the bedrooms, by these headers.
+   */
+  moreAttributes?: Readonly<Record<"floor" | "directionFaces" | "propertySubType", string>>,
 ): TypedColumn[] {
   const standard = INVENTORY_FIELDS.flatMap((field) => {
     const column = typedColumn({ field, header: headers[field] });
@@ -120,9 +131,16 @@ export function inventoryColumns(
         column,
         customColumn({ code: "netToSeller", header: fees.netToSeller, kind: "money" }),
       ];
+    const more = moreAttributes
+      ? (["floor", "directionFaces", "propertySubType"] as const).map((a) =>
+          typedColumn({ field: `Unit.${a}`, header: moreAttributes[a] }),
+        )
+      : [];
+    if (field === "Unit.bedroomsTotal" && !details && more.length > 0) return [column, ...more];
     if (details && field === "Unit.bedroomsTotal")
       return [
         column,
+        ...more,
         ...DETAIL_COLUMN_FIELDS.map((f) =>
           typedColumn({
             field: f,

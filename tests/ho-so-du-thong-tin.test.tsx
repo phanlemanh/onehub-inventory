@@ -9,7 +9,7 @@ import { sampleInventoryRows, sampleRecords } from "../src/app/(app)/inventory-s
 import { EMPTY, formatArea, formatMoney } from "../src/lib/format";
 import { label } from "../src/modules/company-config";
 import { sampleUnits, subdivisionNameOf } from "../src/modules/catalog";
-import { completeness, unitKind } from "../src/modules/listings";
+import { completeness, effectiveAttributes, unitKind } from "../src/modules/listings";
 import {
   ListingRecordFull,
   RECORD_COPY,
@@ -109,9 +109,23 @@ const UNIT_LABELS = [
   LABELS.propertyType,
 ];
 
-/** The unit block against the unit in the catalog (read again here, not copied from the record). */
-function unitBlockErrors(root: ParentNode, upi: string): string[] {
-  const unit = units.find((u) => u.upi === upi)!;
+/**
+ * The unit block against the unit in the catalog (read again here, not copied from the record). Row 3h: a listing's
+ * own value of an attribute wins over the catalog's, so the block is held to the effective values of the listing.
+ */
+function unitBlockErrors(root: ParentNode, upi: string, rowId?: string): string[] {
+  const catalogUnit = units.find((u) => u.upi === upi)!;
+  const e = effectiveAttributes(
+    (rowId ? records[rowId]?.listings[0]?.own : undefined) ?? {},
+    catalogUnit,
+  );
+  const unit = {
+    ...catalogUnit,
+    livingArea: e.livingArea.value ?? undefined,
+    floor: e.floor.value ?? undefined,
+    bedroomsTotal: e.bedroomsTotal.value ?? undefined,
+    directionFaces: e.directionFaces.value ?? undefined,
+  };
   const got = blockRows(root, "listing-unit");
   const want = [
     unit.unitNumber,
@@ -139,7 +153,7 @@ describe("E3 · the unit block", () => {
   it("shows the eight unit facts of every sample row from the catalog", () => {
     for (const row of rows) {
       const { container } = renderRecord(row.id);
-      expect(unitBlockErrors(container, upiOfRow(row.id)), row.id).toEqual([]);
+      expect(unitBlockErrors(container, upiOfRow(row.id), row.id), row.id).toEqual([]);
       cleanup();
     }
   });

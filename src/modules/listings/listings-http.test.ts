@@ -101,6 +101,13 @@ describe("listings-http", () => {
     expect(t.seen).toEqual([]);
   });
 
+  it("refuses the unit attributes with 400 until row 3h's migration gives them columns", async () => {
+    const t = handlers({});
+    const sent = { version: 1, change: { field: "unitAttributes", livingArea: 72.5 } };
+    expect((await t.patch(sent)).status).toBe(400);
+    expect(t.seen).toEqual([]);
+  });
+
   it("a door that does not open answers with its code and touches nothing", async () => {
     for (const [door, status] of [
       ["unauthenticated", 401],

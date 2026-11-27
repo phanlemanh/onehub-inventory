@@ -82,6 +82,7 @@ const Change = z.discriminatedUnion("field", [
       value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
     })
     .strict(),
+  // Row 3h's unitAttributes change is not here yet, so it is refused with 400: row 3h's migration opens it with its columns.
 ]);
 const Body = z.object({ version: z.number().int().min(1), change: Change }).strict();
 
