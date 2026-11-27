@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "den": "2b874c0878fe5b32c0215c8ea55967e0c66a06e2",
+  "base": "fe9afc7f4137f1250c840aa195deb863eac62b83",
+  "ghim": {
+    "dang-nhap": "f38f955e60cb5db33bb5a3ed743f88d5565546d4",
+    "danh-sach-khung": "718fde285963e50e4e31eeac95aa5c02b003671b",
+    "luoi": "6b8c84c46ff2e9199b817ee1eb7dc640af232340"
+  },
+  "theo_khuon": [],
+  "lech_moi": [],
+  "no_cu": [],
+  "khong_do": [],
+  "ngoai_ban_do": 0,
+  "nhom": [
+    "dang-nhap",
+    "danh-sach-khung",
+    "luoi"
+  ]
+}

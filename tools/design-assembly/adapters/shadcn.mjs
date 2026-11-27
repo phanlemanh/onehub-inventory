@@ -119,6 +119,19 @@ export const adapter = {
   variantSet: /\bconst\s+(\w+)\s*=\s*cva\(/g,
   // The toast component the library installs, from the package it wraps.
   toast: { package: "sonner", template: "sonner.tsx.template", file: "sonner.tsx" },
+  // The icon set the settings name (`iconLibrary`), as the word they say it by, or null.
+  iconLibraryIn: (settings) =>
+    typeof settings?.iconLibrary === "string" && settings.iconLibrary.trim() !== ""
+      ? settings.iconLibrary.trim()
+      : null,
+  // The package each word of `iconLibrary` stands for, as the library's own command installs it.
+  // A word not here is said, and a person writes the row (spec 0017, item 12.1).
+  iconPackages: {
+    lucide: "lucide-react",
+    radix: "@radix-ui/react-icons",
+    tabler: "@tabler/icons-react",
+    phosphor: "@phosphor-icons/react",
+  },
   // The folders other registries install into: each registry the settings name, by its name, in
   // the folder of the components alias.
   registryFoldersIn: (settings, pkg = null, source = "src") => {

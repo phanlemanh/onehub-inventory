@@ -269,6 +269,33 @@
           "from": "@/components/ui/button"
         }
       }
+    ],
+    "design-exports": [
+      {
+        "kind": "export",
+        "file": "DESIGN.md",
+        "name": "onehub-inventory"
+      },
+      {
+        "kind": "export",
+        "file": "design/export/system/README.md",
+        "name": "onehub-inventory"
+      },
+      {
+        "kind": "export",
+        "file": "design/export/system/tokens.json",
+        "name": "onehub-inventory"
+      },
+      {
+        "kind": "export",
+        "file": "design/export/system/components.md",
+        "name": "onehub-inventory"
+      },
+      {
+        "kind": "export",
+        "file": "design/export/system/assets.json",
+        "name": "onehub-inventory"
+      }
     ]
   },
   "affected": {

@@ -371,3 +371,13 @@ decisions:
     kind: closed
     source: "the stylesheet's typefaces, as found"
     check: "tool:tools/design-assembly/check.mjs"
+  - id: design-exports
+    layer: governance
+    kind: formula
+    source: "the design ledgers, written out by make design-exports"
+    check: "tool:tools/design-assembly/check.mjs"
+  - id: send-claude-design
+    layer: governance
+    kind: judgment
+    source: "leave: design/export/system/README.md, design/export/system/tokens.json, design/export/system/components.md, design/export/system/assets.json; to: The design values and files of the repository it is given, to a private artifact of the person's Claude account."
+    note: "confirmed by Manh Phan on 2026-11-26"

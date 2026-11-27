@@ -31,6 +31,8 @@ export const adapter = {
   fonts: {
     text: "--font-sans",
     heading: "--font-heading",
+    // The framework's fixed-width family: no choice of the guide writes it, and an export names it.
+    mono: "--font-mono",
     block: "@theme inline",
     // What a sheet that draws a choice puts on the page, with the values resolved: the classes
     // already hold the floor's value, so the preview sets the property the classes set.
