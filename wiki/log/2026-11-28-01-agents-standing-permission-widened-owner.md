@@ -1,0 +1,1 @@
+AGENTS standing permission widened (owner, 2026-11-28): machine does every infra step that needs no secret, no sign-in and no production approval — opens workflow PRs, sets DEPLOY_ENABLED, runs Deploy, creates the first CompanyAdmin from chat
