@@ -325,8 +325,10 @@ export function InventoryGrid({
   );
   const cellMark = useCallback(
     (row: GridRow, field: FieldKey) => {
+      if (!unitAttributes || !attributeOfColumn(field)) return null;
       const d = differsOf(row, field);
-      if (!d || !unitAttributes) return null;
+      // Every cell of an attribute column keeps the mark's room, so the values of the column stay on one edge.
+      if (!d) return <AttributeDiffersMark.Room words={unitAttributes.words} />;
       const may = listings !== undefined && permitted("updateListing", true);
       const locked = row.locked?.[field];
       return (

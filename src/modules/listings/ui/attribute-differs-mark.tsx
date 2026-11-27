@@ -29,6 +29,40 @@ export const useMarkLook = (): MarkLook => useContext(MarkLookContext);
 /** Room a grid column keeps for the mark after its value, in ch, by look: the 24 px control, a badge's word. */
 export const MARK_ROOM_CH: Readonly<Record<MarkLook, number>> = { dot: 3.5, icon: 3.5, badge: 7 };
 
+/**
+ * The mark's room on a cell that has no mark: the same face, unseen and out of reach (no focus, no name), so a column's
+ * values stay on one edge whether a row carries the mark or not.
+ */
+function MarkRoom({ words }: { words: UnitAttributeWords }) {
+  const look = useContext(MarkLookContext);
+  return (
+    <span
+      aria-hidden="true"
+      data-slot="attribute-differs-room"
+      className="invisible -my-1 flex shrink-0"
+    >
+      <Button
+        type="button"
+        variant="ghost"
+        size={look === "badge" ? "xs" : "icon-xs"}
+        tabIndex={-1}
+      >
+        {face(look, words)}
+      </Button>
+    </span>
+  );
+}
+
+function face(look: MarkLook, words: UnitAttributeWords) {
+  return look === "badge" ? (
+    <Badge variant="info-light">{words.differs.split(" ")[0]!.toLocaleLowerCase("vi")}</Badge>
+  ) : look === "icon" ? (
+    <InfoIcon aria-hidden="true" className="size-3.5 text-info" />
+  ) : (
+    <span aria-hidden="true" className="size-1.5 self-start rounded-full bg-info" />
+  );
+}
+
 export function AttributeDiffersMark({
   words,
   catalogShown,
@@ -70,14 +104,6 @@ export function AttributeDiffersMark({
       />
     );
   const look = chosen;
-  const face =
-    look === "badge" ? (
-      <Badge variant="info-light">{words.differs.split(" ")[0]!.toLocaleLowerCase("vi")}</Badge>
-    ) : look === "icon" ? (
-      <InfoIcon aria-hidden="true" className="size-3.5 text-info" />
-    ) : (
-      <span aria-hidden="true" className="size-1.5 self-start rounded-full bg-info" />
-    );
   const trigger = (
     <PopoverTrigger
       render={
@@ -93,7 +119,7 @@ export function AttributeDiffersMark({
         />
       }
     >
-      {face}
+      {face(look, words)}
     </PopoverTrigger>
   );
   const command = lockedReason ? (
@@ -149,3 +175,5 @@ export function AttributeDiffersMark({
     </span>
   );
 }
+
+AttributeDiffersMark.Room = MarkRoom;
