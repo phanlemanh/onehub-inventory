@@ -141,6 +141,7 @@ evals:
   - id: E18
     criterion: AC-1
     executor: ui-check
+    cmd: config:executors.ui-check
     layer: ui-observed
     paths: [src/components/candidate/**, src/components/templates/app-shell/**, src/modules/listings/ui/**]
     steps:

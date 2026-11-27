@@ -7,38 +7,42 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: e9d9acd8a540391c31e93bb5fd9fc0a2880e709a
+verified_commit: 8fe0aca9d47711596b438f5c3a00383f6f06d9ea
 human_signoff:
 ---
 
 # Evidence Report: khung-luoi-va-ngan-chi-tiet
 
-Vòng 7. Ba lệnh suite chạy mới ở vòng này đều xanh. Các eval còn lại mang từ vòng trước vì delta không chạm paths của chúng.
+Vòng 8. E18 chạy thật lại; ba lệnh nền chạy mới; các phép còn lại mang sang. Mỗi khối mang sang được chép nguyên từ báo
+cáo của vòng nó chạy thật (vòng 6 e9d9acd8, vòng 5 ed8bec3b, vòng 4 af3fdbb7, vòng 1 603a2961) bằng
+`_acceptance/khung-luoi-va-ngan-chi-tiet/rang/dung-lai-mang-sang.mjs`, chỉ thêm `carried_from_round` (G-2811-28/29).
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
-| E1 | AC-1 | script | PASS (mang từ vòng 6) |
-| E2 | AC-1 | script | PASS (mang từ vòng 5) |
-| E3 | AC-3 | script | PASS (mang từ vòng 5) |
-| E4 | AC-2 | script | PASS (mang từ vòng 5) |
-| E5 | AC-3 | script | PASS (mang từ vòng 5) |
-| E6 | AC-4 | script | PASS (mang từ vòng 5) |
-| E7 | AC-5 | script | PASS (mang từ vòng 6) |
-| E8 | AC-6 | script | PASS (mang từ vòng 4) |
-| E9 | AC-7 | script | PASS (mang từ vòng 6) |
-| E10 | AC-8 | script | PASS (mang từ vòng 5) |
-| E11 | AC-9 | script | PASS (mang từ vòng 4) |
-| E12 | AC-10 | script | PASS (mang từ vòng 5) |
-| E13 | AC-11 | script | PASS (mang từ vòng 5) |
-| E14 | AC-11 | script | PASS (mang từ vòng 5) |
-| E15 | AC-11 | script | PASS (mang từ vòng 5) |
-| E16 | AC-11 | script | PASS (mang từ vòng 1) |
-| E17 | AC-11 | script | PASS (mang từ vòng 5) |
-| E18 | AC-1 | ui-check | PASS (mang từ vòng 6) |
+| E1 | AC-1 | script | PASS |
+| E2 | AC-1 | script | PASS |
+| E3 | AC-3 | script | PASS |
+| E4 | AC-2 | script | PASS |
+| E5 | AC-3 | script | PASS |
+| E6 | AC-4 | script | PASS |
+| E7 | AC-5 | script | PASS |
+| E8 | AC-6 | script | PASS |
+| E9 | AC-7 | script | PASS |
+| E10 | AC-8 | script | PASS |
+| E11 | AC-9 | script | PASS |
+| E12 | AC-10 | script | PASS |
+| E13 | AC-11 | script | PASS |
+| E14 | AC-11 | script | PASS |
+| E15 | AC-11 | script | PASS |
+| E16 | AC-11 | script | PASS |
+| E17 | AC-11 | script | PASS |
+| E18 | AC-1 | ui-check | PASS |
 | E19 | AC-12 | judgment | PASS |
-| E20 | AC-1 | script | PASS (mang từ vòng 5) |
-| E21 | AC-3 | script | PASS (mang từ vòng 5) |
-| E22 | AC-3 | script | PASS (mang từ vòng 5) |
+| E20 | AC-1 | script | PASS |
+| E21 | AC-3 | script | PASS |
+| E22 | AC-3 | script | PASS |
+
+Vòng 8 chỉ chạy lại E18 và ba lệnh suite. Các eval còn lại mang từ vòng trước, mỗi khối ghi rõ `carried_from_round`.
 
 ## Evidence
 
@@ -48,59 +52,59 @@ Vòng 7. Ba lệnh suite chạy mới ở vòng này đều xanh. Các eval còn
   baseline: n-a
   verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T21:25:18Z
-  carried_from_round: 6
   output: |
-    carry-forward tu round 6 — delta khong cham paths cua eval
+    20 passed (17.6s)
+  carried_from_round: 6
 
 - eval: E2
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E2-r5
   exit_code: 0
   baseline: n-a
-  verifier: tests/e2e/khung-luoi-nut.spec.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    12 passed (50.7s)
+  carried_from_round: 5
 
 - eval: E3
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E3-r5
   exit_code: 0
   baseline: n-a
-  verifier: tests/e2e/ghim-ngan.spec.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    31 passed (1.2m)
+  carried_from_round: 5
 
 - eval: E4
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E4-r5
   exit_code: 0
   baseline: n-a
-  verifier: tests/e2e/khung-luoi-nut.spec.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    4 passed (35.5s)
+  carried_from_round: 5
 
 - eval: E5
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E5-r5
   exit_code: 0
   baseline: n-a
-  verifier: tests/e2e/ho-so-can.spec.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    8 passed (44.2s)
+  carried_from_round: 5
 
 - eval: E6
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E6-r5
   exit_code: 0
   baseline: n-a
-  verifier: tests/e2e/ho-so-can.spec.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    20 passed (44.5s)
+  carried_from_round: 5
 
 - eval: E7
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E7-r6
@@ -108,19 +112,19 @@ Vòng 7. Ba lệnh suite chạy mới ở vòng này đều xanh. Các eval còn
   baseline: n-a
   verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T21:25:18Z
-  carried_from_round: 6
   output: |
-    carry-forward tu round 6 — delta khong cham paths cua eval
+    10 passed (11.2s)
+  carried_from_round: 6
 
 - eval: E8
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E8-r4
   exit_code: 0
   baseline: n-a
-  verifier: tests/e2e/the-dien-thoai.spec.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T17:13:33Z
-  carried_from_round: 4
   output: |
-    carry-forward tu round 4 — delta khong cham paths cua eval
+    17 passed (41.9s)
+  carried_from_round: 4
 
 - eval: E9
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E9-r6
@@ -128,39 +132,39 @@ Vòng 7. Ba lệnh suite chạy mới ở vòng này đều xanh. Các eval còn
   baseline: n-a
   verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T21:25:18Z
-  carried_from_round: 6
   output: |
-    carry-forward tu round 6 — delta khong cham paths cua eval
+    8 passed (9.6s)
+  carried_from_round: 6
 
 - eval: E10
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E10-r5
   exit_code: 0
   baseline: n-a
-  verifier: tests/e2e/khung-luoi-nut.spec.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    6 passed (44.5s)
+  carried_from_round: 5
 
 - eval: E11
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E11-r4
   exit_code: 0
   baseline: n-a
-  verifier: tests/e2e/sheet.spec.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T17:13:33Z
-  carried_from_round: 4
   output: |
-    carry-forward tu round 4 — delta khong cham paths cua eval
+    24 passed (43.3s)
+  carried_from_round: 4
 
 - eval: E12
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E12-r5
   exit_code: 0
   baseline: n-a
-  verifier: tests/e2e/khung-luoi-nut.spec.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    4 passed (11.2s)
+  carried_from_round: 5
 
 - eval: E13
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E13-r5
@@ -168,124 +172,132 @@ Vòng 7. Ba lệnh suite chạy mới ở vòng này đều xanh. Các eval còn
   baseline: n-a
   verifier: config:executors.script.check
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance
+  carried_from_round: 5
 
 - eval: E14
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E14-r5
   exit_code: 0
-  baseline: n-a
+  baseline: red
   verifier: config:executors.script.e2e
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    gac-hydration: 0 canh bao
+  carried_from_round: 5
 
 - eval: E15
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E15-r5
   exit_code: 0
   baseline: n-a
-  verifier: playwright.db.config.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    729 passed (19.6m)
+  carried_from_round: 5
 
 - eval: E16
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E16-r1
   exit_code: 0
   baseline: n-a
-  verifier: git diff merge-base origin/main..HEAD -- src/components/ui src/components/reui
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T09:13:46Z
-  carried_from_round: 1
   output: |
-    carry-forward tu round 1 — delta khong cham paths cua eval
+    vendor folders untouched
+    __EXIT=0
+  carried_from_round: 1
 
 - eval: E17
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E17-r5
   exit_code: 0
-  baseline: n-a
+  baseline: green
   verifier: config:executors.design.floor
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    sàn thiết kế không báo màu hex thô
+  carried_from_round: 5
 
 - eval: E18
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-E18-r6
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-E18-r8
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.ui-check.driver
-  verified_at: 2026-11-27T21:25:18Z
-  carried_from_round: 6
+  verifier: config:executors.ui-check
+  verified_at: 2026-11-27T22:54:38Z
   screenshot: evidence/E18-step1.png
   observed: |
-    1440 light sau: record from top bar to bottom, white, with visible left edge and a grey gradient shadow on the grid side; truoc was a floating rounded card with a two-row head and text buttons. khong-tach light: no edge, no shadow, no tint - record merges into page, reads as not apart. 1440 dark sau: record flush top to bottom, surface equal to grid card (23) and lighter than page (10), a faint but visible left line, no visible shadow; stands apart by the line alone. khong-tach dark: same surface, no line - reads as not apart. Toolbar buttons icon-only and stop before the record; record head single line with link, pin, prev, next, close at right; no Bo ghim on the head. 1024 light/dark same. Phone 360/414: Loc with text, Luu goc nhin visible and larger, filter fields in the Loc sheet aligned; record head one line. Dark readable. Rest of the screens unchanged.
+    I opened each saved frame, and for the pixel claims I also read the pixel values.
+
+    - sau/ngan-1440-light.png: the record sits flush against the right edge from under the top bar to the bottom. The head is one line, "1603 · S.01", with icon buttons at the top right. A shadow gradient (252 down to 219) falls on the grid just left of it, then a 229 border, then a white record. The toolbar is icon-only and stops before the record. The record is clearly apart.
+    - pha/ngan-1440-light-khong-tach.png: the same screen with the record flat white and no border or shadow. It merges into the page and does NOT read as apart.
+    - sau/ngan-1440-dark.png: the record surface is 23 and the grid card is 24 (the same surface), brighter than the page at 10. A thin left line (46) is visible and the shadow is hardly there. It is apart by the line alone.
+    - pha/ngan-1440-dark-khong-tach.png: the surface is still 23, but the line is gone, so it does NOT read as apart.
+    - truoc/ngan-1440-{light,dark}.png: a floating rounded card with a two-row head and text buttons "Trước/Sau/Đóng". It differs from sau as intended.
+    - 360 and 414 (E18-step2/3): the filter sheet looks the same truoc and sau, and the record gets the one-line head with icons.
+    - Phone grid (E18-step6): sau shows "Lọc" with text and "Lưu góc nhìn" shown directly, where truoc had an icon and a "..." menu.
+    - 1024 (E18-step4/5): the record is flush to the right with its left border visible in both themes. In light the shadow is visible; in dark only the line.
+    - Grid 1440 and 1024 (E18-step7/8): the layout is unchanged beyond the intended differences. The sau frame shows more rows because the toolbar and header are slightly shorter, and the filter inputs are aligned.
   network_observed: n-a (driver)
-  note: carry-forward tu round 6 — delta khong cham paths cua eval
+
+- eval: E19
+  judged_by: judge panel (domain-correctness, operational-feasibility, spec-alignment)
+  verdict: PASS
+  rationale: Cả ba góc nhìn cùng chấm PASS (xem mục Judge panel bên dưới). Bảng «Từng chỗ và cách làm», sổ hành vi và trang 0051 khớp lời đã duyệt; các câu (a)–(f) không nằm trong phần đã làm.
+  human_override:  # chi nguoi ghi
 
 - eval: E20
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E20-r5
   exit_code: 0
   baseline: n-a
-  verifier: tests/e2e/khung-luoi-nut.spec.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    6 passed (13.1s)
+  carried_from_round: 5
 
 - eval: E21
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E21-r5
   exit_code: 0
   baseline: n-a
-  verifier: tests/e2e/khung-luoi-nut.spec.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    cùng lệnh với E20: 6 passed (13.1s)
+  carried_from_round: 5
 
 - eval: E22
   run_id: minted-khung-luoi-va-ngan-chi-tiet-E22-r5
   exit_code: 0
   baseline: n-a
-  verifier: tests/e2e/khung-luoi-nut.spec.ts
+  verifier: _acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh
   verified_at: 2026-11-27T20:57:08Z
-  carried_from_round: 5
   output: |
-    carry-forward tu round 5 — delta khong cham paths cua eval
+    3 passed (14.1s)
+  carried_from_round: 5
 
-### Judgment
+### Judge panel E19
 
-- eval: E19
-  judged_by: hội đồng ba góc nhìn (panel giữ nguyên từ round 6 — inputs không đổi, không chấm lại; rationale xem round đó)
-  verdict: PASS
-  rationale: Đề xuất PASS của hội đồng; một góc nhìn bất đồng, hiển thị đầy đủ dưới đây.
-  votes:
-    - domain-correctness: PASS (r6)
-    - operational-feasibility: FAIL (r6)
-    - spec-alignment: PASS (r6)
-  dissent_operational-feasibility:
-    - Dòng Q4 ở bảng «Từng chỗ và cách làm» của design.md (mục «Từng chỗ và cách làm») sửa «Khi ngăn nổi» thành «Khi ngăn mở cạnh lưới, nổi hay ghim», khớp lời «ngăn mở» ở bảng Nguồn, 0051 và behaviors.md. Có dòng này thì ý (1) hết chênh về Q4.
-    - Bảng «Từng chỗ và cách làm» của design.md có dòng riêng cho B1, B2 và luật «…», mỗi dòng có cột «Sau» nói đúng điều ấy, thay cho dòng gộp «B1, B2, «…»». Cột «Sau» hiện chỉ ghi «Ghi vào sổ hành vi; dựng trong ngăn ở hàng 3h». Có các dòng này thì ý (1) đạt về «đúng một dòng».
-  human_override:  # chi nguoi ghi
+Đề xuất panel: PASS. `human_override` để trống cho người quyết ở Cổng 2.
+
+- domain-correctness: PASS — (1) Bảng «Từng chỗ và cách làm» có dòng cho Q1, Q2, Q3, Q4, A5, B3, L1–L6. Một dòng chung «B1, B2, «…»» ghi luật vào sổ hành vi và hoãn phần dựng sang hàng 3h, đúng phạm vi đã tách ở decisions d-10. Cột «Sau» không thêm việc ngoài lời chủ kho. (2) behaviors.md có luật «…» ba điểm (dòng 62–67) và chuẩn nút ba câu (dòng 55–61) khớp từng điểm của đoạn nguyên văn. Mỗi khối ghi «chủ kho 2026-11-27» cùng câu duyệt. Dòng «Mở hồ sơ cạnh bảng» (dòng 12) chỉ còn nhắc cách cũ ở dạng «thay …», không còn «đứng dưới thanh công cụ» hay «đầu hồ sơ hai dòng». (3) design.md ghi rõ (a)–(f) không nằm trong phần đã làm. Trang 0051 và behaviors.md không dựng (a)–(f). Các câu chi-nguoi còn lại (Hỏi-7…10) chủ kho đã nhận ở d-29, và những câu chưa dựng được xếp sang lát 2.
+- operational-feasibility: PASS — (1) Bảng «Từng chỗ và cách làm» có dòng cho Q1–Q4, A5, B3, L1–L6. B1, B2 và luật «…» chung một dòng ghi vào sổ hành vi, cột «Sau» chỉ làm đúng điều đã duyệt. (2) behaviors.md có luật «…» ba điểm (dòng 62–67) và chuẩn nút ba câu (dòng 55–61). Mỗi khối kèm lời duyệt và ngày 2026-11-27. Dòng «Mở hồ sơ cạnh bảng» (dòng 94) không còn «đứng dưới thanh công cụ» hay «đầu hồ sơ hai dòng». (3) Các câu (a)–(f) chỉ nằm ở mục «Chưa quyết» của design.md, nơi ghi «Không câu nào nằm trong phần đã làm». Chúng không xuất hiện trong phần đã làm của design.md, trong behaviors.md hay trong trang 0051.
+- spec-alignment: PASS — Bảng «Từng chỗ và cách làm» có một dòng cho mỗi điều đã chốt (Q1–Q4, A5, B3, B1/B2/«…», L1–L6), và cột «Sau» khớp lời nguyên văn. Mục «Bộ nút theo quyền» của behaviors.md có luật «…» ba điểm và chuẩn nút ba câu đúng nghĩa đoạn nguyên văn, mỗi khối kèm lời duyệt và ngày 2026-11-27. Dòng «Mở hồ sơ cạnh bảng» chỉ còn «khung RecordPanel», không còn «đứng dưới thanh công cụ» hay «hai dòng». Các câu (a)–(f) và các câu chi-nguoi không có trong phần đã làm của design.md, behaviors.md hay trang 0051. Có hai lệch nhỏ, không đổi kết luận. Dòng Q4 chỉ ghi «khi ngăn nổi», trong khi Hỏi-7 (ghim cũng chỉ hình, chủ kho đã duyệt ở d-29) nằm ở bảng trạng thái và trang 0051. Câu 3 chuẩn nút trong behaviors.md thêm mốc «dưới 768 px».
 
 ### Lệnh suite (hồi quy)
 
 - cmd: make check
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-SUITE-make_check-r7
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-SUITE-make_check-r8
   exit_code: 0
-  verified_at: 2026-11-27T21:45:09Z
+  verified_at: 2026-11-27T22:54:38Z
 
 - cmd: npm run build
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-SUITE-build-r7
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-SUITE-build-r8
   exit_code: 0
-  verified_at: 2026-11-27T21:45:09Z
+  verified_at: 2026-11-27T22:54:38Z
 
 - cmd: DATABASE_URL= make e2e
-  run_id: minted-khung-luoi-va-ngan-chi-tiet-SUITE-DATABASE_URL_make_e2e-r7
+  run_id: minted-khung-luoi-va-ngan-chi-tiet-SUITE-DATABASE_URL_make_e2e-r8
   exit_code: 0
-  verified_at: 2026-11-27T21:45:09Z
+  verified_at: 2026-11-27T22:54:38Z
 
 ## Known limits
 
@@ -295,9 +307,9 @@ Vòng 7. Ba lệnh suite chạy mới ở vòng này đều xanh. Các eval còn
 
 carried tu round 6 — baseline khong do lai round nay
 
-Baseline khong do: round này không đo lại baseline (evals.yaml không đổi từ lần đo cuối, round 6); mọi block eval ghi baseline n-a.
+Baseline khong do: evals.yaml khong doi tu lan baseline cuoi (round 6); moi eval ghi baseline n-a.
 
-Eval không phân biệt: none
+Non-discriminating evals: none
 
 ## Variance
 
@@ -305,6 +317,7 @@ none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 5: REJECT — nền tối của E18 chưa đạt; E1, E7, E9 mỗi bài một lần quá giờ. Trả về triển khai.
-Round 6: REJECT — mọi eval đạt, E18 gồm; một ca bài chung bị quá giờ. Trả về triển khai.
-Round 7: PASS — make check, npm run build, make e2e xanh trên bản e9d9acd8; các eval còn lại mang từ vòng trước.
+Round 5: E18 (nền tối), E1, E7, E9 failed — E18 ở nền tối, và mỗi eval kia một lần quá giờ. Returned to implementation.
+Round 6: một bài trong bộ trình duyệt chung quá giờ; E18 đạt. Returned to implementation.
+Round 7: PASS; ký lại chín bản ghi đã ký.
+Round 8: chỉ đổi lời câu đầu thẻ (card-plain.json); chạy lại E18 và ba lệnh suite, tất cả đạt; các eval khác mang từ vòng trước.

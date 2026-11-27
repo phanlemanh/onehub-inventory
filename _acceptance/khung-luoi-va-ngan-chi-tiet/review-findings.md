@@ -1,31 +1,61 @@
 ## Trong hợp đồng
 
+(không có)
+
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **E14 is carried as PASS from round 5 while the same command, run fresh this round, exits 2**
+- **Rendered card.html was not rebuilt after card-plain.json changed: the owner signs on the old sentence**
+  Người dùng thấy gì: Thẻ ký duyệt vẫn hiện câu cũ nói khung tách khỏi lưới ở cả nền sáng lẫn tối, trong khi ở nền tối chỉ còn đường viền. Chủ kho có thể ký trên một câu mô tả hơi quá so với thực tế.
+  Căn cứ: Chỉ lệch chữ trên thẻ ký chứ không đổi giao diện người dùng thật, và vẽ lại thẻ rẻ, nên ghi nhận rồi vẽ lại thẻ trước khi ký.
+  file: `_acceptance/khung-luoi-va-ngan-chi-tiet/card.html`
+  severity: medium
+  Đề xuất: known-limits
+
+- **The AC-1 line in card-plain.json still promises a shadow in both themes, against the corrected first sentence**
+  Người dùng thấy gì: Thẻ ký tự mâu thuẫn: câu đầu nói nền tối chỉ có viền, nhưng dòng tiêu chí đầu vẫn hứa có viền và bóng ở cả sáng lẫn tối. Chủ kho đọc thẻ có thể không rõ nên tin câu nào.
+  Căn cứ: Chỉ là lệch lời trên tài liệu ký, người dùng cuối không thấy gì, và sửa lại câu chữ là việc nhỏ làm được bất cứ lúc nào.
+  file: `_acceptance/khung-luoi-va-ngan-chi-tiet/card-plain.json`
+  severity: low
+  Đề xuất: known-limits
+
+- **Thẻ ký báo 0/21 phép kiểm máy đạt, 21 CHƯA đạt, trong khi vòng 7 PASS**
+  Người dùng thấy gì: Thẻ ký hiện cờ đỏ báo không phép kiểm nào đạt dù mọi kiểm đều đã đạt. Chủ kho có thể hoang mang hoặc quen bỏ qua cờ đỏ thật sau này.
+  Căn cứ: Không mất dữ liệu và không ảnh hưởng người dùng sản phẩm, chỉ gây nhiễu ở thẻ ký; chủ kho tự đối chiếu được với bằng chứng, nhưng cờ đỏ sai làm giảm lòng tin vào thẻ.
+  file: `_acceptance/khung-luoi-va-ngan-chi-tiet/card.html`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Câu đầu thẻ chưa vẽ lại sau khi sửa card-plain.json: thẻ vẫn ghi «tách khỏi lưới ở cả nền sáng lẫn tối»**
+  Người dùng thấy gì: Thẻ đang trình cho chủ kho vẫn ghi câu cũ về nền tối, lệch với câu đã sửa. Ký trên thẻ này là duyệt đúng câu định bỏ.
+  Căn cứ: Hậu quả nhẹ vì chỉ là lời mô tả trên thẻ, người dùng sản phẩm không bị ảnh hưởng, và vẽ lại thẻ là xong.
+  file: `_acceptance/khung-luoi-va-ngan-chi-tiet/card.html`
+  severity: medium
+  Đề xuất: known-limits
+
+- **E14 is carried as PASS from round 5 while the same command, run fresh this round, exits 2 (r7)**
   Người dùng thấy gì: Bảng kết quả của vòng có thể ghi một bài kiểm tra là đạt dù lần chạy mới nhất của cùng lệnh đã lỗi. Người dùng không thấy gì ở màn hình; chỉ người đọc báo cáo có thể bị hiểu nhầm về mức xanh của vòng.
   Căn cứ: Không ảnh hưởng người dùng cuối và không mất dữ liệu; vòng vẫn bị từ chối đúng vì lần chạy lỗi được tính, nên chỉ cần ghi lại hạn chế này và sửa khi chỉnh công cụ chấm.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/s4-args-r6.json`
   severity: medium
   Đề xuất: known-limits
 
-- **Gate card counts three carried-over PASS evals as failing (r6)**
+- **Gate card counts three carried-over PASS evals as failing (r6 · tệp đã đổi)**
   Người dùng thấy gì: Thẻ trình chủ kho ghi bảy tiêu chí chưa đạt trong khi thực tế chỉ bốn tiêu chí hỏng. Chủ kho có thể hiểu nhầm và bỏ cả ba tiêu chí đang đạt khi chọn lối thu phạm vi.
   Căn cứ: Chỉ là chữ trên thẻ, không đụng người dùng cuối hay dữ liệu; chủ kho đọc lại bằng chứng là thấy, và sửa thẻ rất rẻ nhưng nằm ngoài hợp đồng giao diện.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/card.html`
   severity: low
   Đề xuất: known-limits
 
-- **Evidence page header still shows 2 grading rounds after round 5 (r6)**
+- **Evidence page header still shows 2 grading rounds after round 5 (r6 · tệp đã đổi)**
   Người dùng thấy gì: Trang bằng chứng báo hai lượt chấm trong khi thẻ nói năm lượt. Chủ kho có thể không thấy là đã vượt trần ba lượt.
   Căn cứ: Chỉ lệch một con số trên trang bằng chứng, không ảnh hưởng người dùng sản phẩm; chủ kho tự đối chiếu được với dòng thời gian cùng trang.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/evidence-page.html`
   severity: low
   Đề xuất: known-limits
 
-- **Gate card lists three carried-forward PASS evals (E8, E11, E16) as failed (r6)**
+- **Gate card lists three carried-forward PASS evals (E8, E11, E16) as failed (r6 · tệp đã đổi)**
   Người dùng thấy gì: Thẻ trình chủ kho tính ba tiêu chí đã đạt là hỏng, nên bảy thay vì bốn tiêu chí bị nêu chưa đạt. Quyết định lối ra của chủ kho có thể dựa trên danh sách sai.
   Căn cứ: Hậu quả nằm ở quyết định của một người đọc thẻ, không mất dữ liệu; sửa thẻ rẻ nhưng không thuộc tiêu chí giao diện nào.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/card.html`
@@ -39,7 +69,7 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Evidence page header still says 2 grading rounds after round 5 (r6)**
+- **Evidence page header still says 2 grading rounds after round 5 (r6 · tệp đã đổi)**
   Người dùng thấy gì: Trang bằng chứng vẫn ghi hai lượt chấm dù đã chấm năm lượt, nên che việc đã vượt trần ba lượt.
   Căn cứ: Chỉ là một con số cũ trên trang tài liệu, không ảnh hưởng người dùng sản phẩm và chủ kho tự kiểm được ở dòng thời gian.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/evidence-page.html`
@@ -116,6 +146,4 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: wont-fix
 
-## Chưa adversarial-verify (refuter chết)
-
-Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
+⚠ Cụm ngoài vùng phủ: 4/4 lỗi rơi vào file không bộ đo nào phủ (_acceptance/khung-luoi-va-ngan-chi-tiet/card.html, _acceptance/khung-luoi-va-ngan-chi-tiet/card-plain.json) — dừng và quyết: mở rộng hợp đồng hay rút phạm vi.
