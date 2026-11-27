@@ -28,7 +28,7 @@ interface Row {
   original_entry_timestamp: Date;
   last_confirmed_at: Date | null;
   version: number;
-  // Row 3h: the listing's own unit values and their sources (migration 017); null = the catalog's value shows.
+  // Row 3h: the listing's own unit values and their sources (migration 019); null = the catalog's value shows.
   living_area: string | null;
   living_area_source: AttributeSource | null;
   floor: string | null;

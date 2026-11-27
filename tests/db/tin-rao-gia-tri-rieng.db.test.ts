@@ -1,7 +1,7 @@
 // Row 3h (tin-rao-giu-gia-tri-rieng), evals E1b, E6, E10, E11 in the database: a listing's own unit values read through
 // the real inventory read, written and taken back through PATCH /api/v1/listings/[id], the unit link moved («Gắn sang
 // căn khác»), and the shared catalog untouched — through the identity module's door, withCompany, under the API role,
-// on this lane's Postgres (migration 017). Company A holds the people of the permission-table world (LA, BA, TL, CA).
+// on this lane's Postgres (migration 019). Company A holds the people of the permission-table world (LA, BA, TL, CA).
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { sampleCatalog } from "@/modules/catalog";
