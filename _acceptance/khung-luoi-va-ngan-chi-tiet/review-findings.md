@@ -1,12 +1,28 @@
-# Review findings: khung-luoi-va-ngan-chi-tiet (round 4)
+# Review findings: khung-luoi-va-ngan-chi-tiet (vòng 5)
 
 ## Trong hợp đồng
+
+Không có finding nào map được vào AC.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Hình dạng 4 (assertion âm tính đứng một mình, không ghim thông điệp): phép thử đỏ «bỏ bóng» của E11 không chứng minh được rằng phép đo bóng ở ô thân bắt được lỗi**
+- **The new 'no button at the record foot' check has no break test, unlike the other checks added in this round**
+  Người dùng thấy gì: Nút ở đáy hồ sơ trên điện thoại vẫn được đo đúng như hợp đồng. Chỉ là chưa có bài thử chứng minh phép đo sẽ báo lỗi nếu nút ấy biến mất, nên một lúc nào đó phép đo có thể lặng lẽ không đo gì mà vẫn báo đạt.
+  Căn cứ: Người dùng không thấy gì sai ở bản hiện tại; rủi ro chỉ là sau này một lỗi nút nhỏ lọt qua mà không ai biết, và bổ sung bài thử sau này rẻ, không mất dữ liệu.
+  file: `tests/e2e/ho-so-can.spec.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 5: E7 tuyên đo cả ba chỗ (đầu hồ sơ, đầu mục, đáy hồ sơ) nhưng đáy hồ sơ không có ca phá nào, và phép kiểm còn bỏ qua đáy khi đáy không hiện**
+  Người dùng thấy gì: Nếu phần đáy hồ sơ trên điện thoại biến mất hoặc nút ở đó bị thu nhỏ, bài kiểm hiện có có thể vẫn báo đạt vì không đo gì ở đó. Người dùng điện thoại có thể gặp nút khó bấm mà không ai được cảnh báo trước.
+  Căn cứ: Hiện chưa có hỏng thật nào ở đáy hồ sơ, người dùng chưa chịu hậu quả; nếu xảy ra thì chỉ là nút khó bấm, tải lại không mất dữ liệu, và vá bài kiểm sau này không đắt.
+  file: `tests/e2e/ho-so-can.spec.ts`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Hình dạng 4 (assertion âm tính đứng một mình, không ghim thông điệp): phép thử đỏ «bỏ bóng» của E11 không chứng minh được rằng phép đo bóng ở ô thân bắt được lỗi (r4)**
   Người dùng thấy gì: Người dùng không thấy gì khác đi. Chỉ là bài kiểm tra bóng đổ của cột ghim chưa chắc bắt được lỗi nếu phần thân bảng mất bóng, nên sau này một lỗi như vậy có thể lọt qua mà không báo đỏ.
   Căn cứ: Không ảnh hưởng gì tới người dùng hôm nay và bóng đổ vẫn đang hiện đúng; rủi ro chỉ là một lỗi tương lai khó bị phát hiện sớm, và có thể bổ sung lại bất cứ lúc nào với chi phí thấp.
   file: `tests/e2e/sheet.spec.ts`
@@ -48,27 +64,11 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: medium
   Đề xuất: known-limits
 
-- **Hình dạng 4 (âm tính một mình): phần thanh công cụ của sentFrame mà E21 dựa vào bị bỏ qua im lặng và không có chiều đỏ (r1 · tệp đã đổi)**
-  Người dùng thấy gì: Trên màn Đã gửi, nếu thanh công cụ chạy đè lên ngăn chi tiết thì bài kiểm tra có thể không báo, khiến nút cuối bị che khi mở chi tiết.
-  Căn cứ: Màn hiện đúng và lỗi nếu xảy ra chỉ là nút bị che, người dùng đóng ngăn là xong; chi phí bổ sung bài thấp nên ghi lại để làm sau.
-  file: `tests/e2e/khung-luoi-nut.spec.ts`
-  severity: medium
-  Đề xuất: known-limits
-
-- **Hình dạng 4 (âm tính một mình): kiểm «Cột» và «Toàn màn hình» bỏ qua im lặng khi thiếu nút và không có chiều đỏ (r1)**
-  Người dùng thấy gì: Nếu nút «Cột» hoặc «Toàn màn hình» biến mất khỏi thanh công cụ, bài kiểm tra này sẽ không báo, người dùng mất cách đổi cột hoặc vào toàn màn hình.
-  Căn cứ: Nút mất sẽ bị phát hiện rất nhanh qua các bài khác và khi dùng thật, mức nhẹ, tải lại không mất dữ liệu; sửa không đáng công.
-  file: `tests/e2e/ho-so-can.spec.ts`
-  severity: low
-  Đề xuất: wont-fix
-
-- **Hình dạng 2 (fixture viết tay): chiều đỏ 'no button at the record head' của E7 đưa mảng rỗng tự đặt (r1)**
+- **Hình dạng 2 (fixture viết tay): chiều đỏ 'no button at the record head' của E7 đưa mảng rỗng tự đặt (r1 · tệp đã đổi)**
   Người dùng thấy gì: Nếu đầu hồ sơ mất hết nút, phép kiểm này chưa được chứng minh là báo đỏ trên trang thật, nên nhân viên có thể gặp hồ sơ không có nút mà không ai hay.
   Căn cứ: Mất hết nút ở đầu hồ sơ sẽ lộ ngay khi dùng và các bài khác cũng đo nút này, nên rủi ro thấp và sửa không đáng công.
   file: `tests/e2e/ho-so-can.spec.ts`
   severity: low
   Đề xuất: wont-fix
-
-## Chưa adversarial-verify (refuter chết)
 
 Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).

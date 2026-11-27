@@ -1,1 +1,1 @@
-driver: file comparison only (no browser/network); networkObserved=n-a (driver)
+n-a: eval so sanh file anh co san, khong mo trinh duyet
