@@ -10,6 +10,8 @@ export const STANDARD_TARGETS = [
   "Unit.livingArea",
   "Unit.bedroomsTotal",
   "Unit.directionFaces",
+  "Unit.floor",
+  "Unit.propertySubType",
   "Listing.listPrice",
   "Listing.feeInclusion",
   "Listing.standardStatus",
@@ -37,6 +39,8 @@ export const TARGET_CONCEPT: Record<StandardTarget, ConceptCode> = {
   "Unit.livingArea": "LivingArea",
   "Unit.bedroomsTotal": "BedroomsTotal",
   "Unit.directionFaces": "DirectionFaces",
+  "Unit.floor": "UnitFloorLocation",
+  "Unit.propertySubType": "PropertySubType",
   "Listing.listPrice": "ListPrice",
   "Listing.feeInclusion": "FeeInclusion",
   "Listing.standardStatus": "StandardStatus",
@@ -57,6 +61,8 @@ export const TEMPLATE_FIELD: Record<StandardTarget, string> = {
   "Unit.livingArea": "Unit.livingArea",
   "Unit.bedroomsTotal": "Unit.bedroomsTotal",
   "Unit.directionFaces": "Unit.directionFaces",
+  "Unit.floor": "Unit.floor",
+  "Unit.propertySubType": "Unit.propertySubType",
   "Listing.listPrice": "Listing.listPrice",
   "Listing.feeInclusion": "Listing.feeInclusion",
   "Listing.standardStatus": "Listing.standardStatus",
@@ -92,6 +98,9 @@ export const HEADER_DICTIONARY: Record<
   "phong ngu": { target: "Unit.bedroomsTotal" },
   "so pn": { target: "Unit.bedroomsTotal" },
   huong: { target: "Unit.directionFaces" },
+  tang: { target: "Unit.floor" },
+  "loai can": { target: "Unit.propertySubType" },
+  "loai hinh": { target: "Unit.propertySubType" },
   gia: { target: "Listing.listPrice" },
   "gia ban": { target: "Listing.listPrice" },
   "gia kbp": { target: "Listing.listPrice", implies: { feeInclusion: "Excluded" } },
@@ -124,6 +133,12 @@ export const OWNER_HEADERS = new Set(
 
 /** Closed sets of standard values: the stored value and the concept whose label is its word. */
 export const VALUE_CONCEPTS: Partial<Record<StandardTarget, Record<string, ConceptCode>>> = {
+  "Unit.propertySubType": {
+    Condominium: "SubTypeCondominium",
+    Townhouse: "SubTypeTownhouse",
+    "Single Family Residence": "SubTypeSingleFamily",
+    "Unimproved Land": "SubTypeLand",
+  },
   "Listing.standardStatus": {
     Incomplete: "StatusIncomplete",
     Active: "StatusActive",
@@ -152,6 +167,12 @@ export const VALUE_CONCEPTS: Partial<Record<StandardTarget, Record<string, Conce
 
 /** Short spellings of standard values sheets use, folded; the company's own spellings come from its dictionary. */
 export const VALUE_DICTIONARY: Partial<Record<StandardTarget, Record<string, string>>> = {
+  "Unit.propertySubType": {
+    "chung cu": "Condominium",
+    "can ho chung cu": "Condominium",
+    shophouse: "Townhouse",
+    "lien ke": "Townhouse",
+  },
   "Listing.feeInclusion": {
     kbp: "Excluded",
     bp: "Included",

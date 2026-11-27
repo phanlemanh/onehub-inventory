@@ -87,6 +87,12 @@ trang khách). Không chạm SP-3. Hàng này làm chủ cửa tạo lần chào
   bước và câu hỏi, mũi tên trong nhóm chọn, Enter ở nút chính); vai không quyền thấy «không đủ quyền» và cửa API trả 403;
   màn có dòng trong `design/screens.yaml`, chứng minh màn theo quyết định 0019 và 0023, mọi chữ từ `ontology/labels.yaml`
   hay tệp chữ của mô-đun (nhãn mới tối đa 17 ký tự).
+- AC-13 (cross-layer, sửa sau Cổng Phạm vi — G-2711-4, lời chủ kho 27/11 «Tin rao giữ giá trị riêng»): Given tệp có cột
+  «Tầng» và «Loại căn» (hay «Loại hình»), When máy ghép cột và người áp, Then hai cột nhận đích Tầng và Loại hình theo nhãn
+  của `ontology/labels.yaml`; tầng đọc theo luật floor-text của danh mục («Tầng 07» → 7, «15a» → 15A), loại hình theo tập
+  đóng (Căn hộ, Nhà phố, Biệt thự, Đất và cách viết hay gặp); chữ không đọc được là «cần người», không «chặn» dòng; khi áp,
+  mọi ô có chữ của hai cột này — như diện tích, phòng ngủ, hướng — được giữ nguyên văn trong bản ghi lần nhập, KHÔNG ghi
+  vào căn, KHÔNG ghi vào danh mục chung; hiện chênh lệch so với danh mục ở bước xem trước không thuộc hàng này (hàng 3h).
 
 ## Coverage
 

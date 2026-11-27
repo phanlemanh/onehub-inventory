@@ -2,6 +2,7 @@
 // marks — keep · fixed (with a reason) · ask · block — and one target. Pure and safe in the browser: the screen and the
 // server call the same functions, so the numbers on the screen are the numbers the server writes. Unit codes are looked
 // up on the server (lookupInCompany) and passed in as `units`.
+import { isFloor } from "@/modules/catalog";
 import { canMove, readPrice } from "@/modules/listings";
 import {
   checkCustomValue,
@@ -324,6 +325,13 @@ export function markValue(target: Target, raw: string, ctx: ValueContext): CellM
       for (const v of set) words[v] = v;
       return closedValue(s, words, undefined, raw, ctx);
     }
+    if (s === "Unit.floor") {
+      // Read by the catalog floor-text rule (Unit.yaml): a word before the number and leading zeros go, «15a» → 15A.
+      // What does not read is asked; like every unit attribute it is kept as written on the import, never on the unit.
+      const f = readFloor(raw);
+      if (!f) return ask("floor-unread");
+      return { mark: f === raw.trim() ? "keep" : "fixed", value: f, why: "floor-read" };
+    }
     if (s === "Listing.listPrice" || s === "Listing.closePrice") {
       const p = readPrice(raw);
       if (!p.ok)
@@ -405,4 +413,13 @@ export function markUnit(
     value: found.unitKeys[0]!,
     why: found.via,
   };
+}
+
+/** A floor written the way sheets write it, read to the catalog's floor text; null when it does not read. */
+export function readFloor(raw: string): string | null {
+  const t = fold(raw)
+    .replace(/^(tang|lau|t)\s*/, "")
+    .replace(/^0+(?=\d)/, "")
+    .toUpperCase();
+  return isFloor(t) ? t : null;
 }

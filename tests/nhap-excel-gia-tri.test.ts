@@ -7,6 +7,7 @@ import {
   markTable,
   markValue,
   NO_CHOICES,
+  readFloor,
   type LayerView,
   type Target,
   type ValueChoice,
@@ -258,5 +259,68 @@ describe("gia-tri", () => {
       if (unfolded !== grouped)
         throw new Error(`questions not grouped by folded text: ${unfolded} != ${grouped}`);
     }).toThrow("questions not grouped by folded text: 3 != 1");
+  });
+});
+
+// G-2711-4 (sửa sau Cổng Phạm vi): Tầng and Loại căn columns are taken; the floor reads by the catalog's floor-text rule,
+// the kind by its closed set; what does not read is asked, never blocked, and kept as written (tests/db/nhap-excel.db).
+describe("tang-va-loai-hinh (G-2711-4)", () => {
+  const ctx = (rows: string[][]) => ({
+    layer: { ...BASE, fields: [] },
+    today: TODAY,
+    units: new Map(
+      rows.map((r) => [
+        r[0]!.toLowerCase(),
+        { kind: "catalog" as const, via: "catalog" as const, unitKeys: [`k-${r[0]}`] },
+      ]),
+    ),
+    listed: new Set<string>(),
+  });
+
+  it("the floor reads by the floor-text rule; what does not read is null", () => {
+    expect(["7", "07", "Tầng 7", "tầng 15a", "Lầu 12", "0", "T3"].map(readFloor)).toEqual([
+      "7",
+      "7",
+      "7",
+      "15A",
+      "12",
+      "0",
+      "3",
+    ]);
+    expect(["", "tầng trệt", "7-8", "15AB", "-1"].map(readFloor)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+    ]);
+  });
+
+  it("the headers «Tầng» and «Loại căn» find their targets; the cells keep, fix or ask — never block", () => {
+    const rows = [
+      ["A-1", "15", label("SubTypeCondominium")],
+      ["A-2", "Tầng 07", "chung cư"],
+      ["A-3", "trệt", "2PN"],
+    ];
+    const t = markTable({ headers: ["Mã căn", "Tầng", "Loại căn"], rows }, ctx(rows), NO_CHOICES);
+    expect(t.columns.slice(1).map((c) => c.target)).toEqual([
+      { standard: "Unit.floor" },
+      { standard: "Unit.propertySubType" },
+    ]);
+    expect(t.cells.map((r) => r.slice(1).map((c) => [c.mark, c.value]))).toEqual([
+      [
+        ["keep", "15"],
+        ["keep", "Condominium"],
+      ],
+      [
+        ["fixed", "7"],
+        ["fixed", "Condominium"],
+      ],
+      [
+        ["ask", null],
+        ["ask", null],
+      ],
+    ]);
+    expect(t.counts.block).toBe(0);
   });
 });
