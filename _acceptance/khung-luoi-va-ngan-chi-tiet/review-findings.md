@@ -1,63 +1,26 @@
-# Review findings: khung-luoi-va-ngan-chi-tiet (round 3)
+# Review findings: khung-luoi-va-ngan-chi-tiet (round 4)
 
 ## Trong hợp đồng
-
-Không có.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Pinned-edge test silently drops the 'shadow only on the last pinned column' and header-cell checks, and its doc still claims them**
-  Người dùng thấy gì: Khi ghim hai cột, nếu cột ghim bên trong cũng đổ bóng hoặc tiêu đề thiếu bóng thì bài kiểm tự động sẽ không báo. Người dùng có thể thấy bóng ở sai chỗ mà không ai phát hiện sớm.
-  Căn cứ: Màn hình vẫn đúng điều chủ kho đã duyệt, chỉ là lưới an toàn tự động lỏng hơn trước; lỗi nếu có chỉ là thẩm mỹ, người dùng không mất dữ liệu và việc dặn lại bài kiểm có thể làm sau.
+- **Hình dạng 4 (assertion âm tính đứng một mình, không ghim thông điệp): phép thử đỏ «bỏ bóng» của E11 không chứng minh được rằng phép đo bóng ở ô thân bắt được lỗi**
+  Người dùng thấy gì: Người dùng không thấy gì khác đi. Chỉ là bài kiểm tra bóng đổ của cột ghim chưa chắc bắt được lỗi nếu phần thân bảng mất bóng, nên sau này một lỗi như vậy có thể lọt qua mà không báo đỏ.
+  Căn cứ: Không ảnh hưởng gì tới người dùng hôm nay và bóng đổ vẫn đang hiện đúng; rủi ro chỉ là một lỗi tương lai khó bị phát hiện sớm, và có thể bổ sung lại bất cứ lúc nào với chi phí thấp.
   file: `tests/e2e/sheet.spec.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **E2 expectation for dark theme changed by a supervisor ruling (G-2711-28) that is not in the decision ledger and contradicts E18**
-  Người dùng thấy gì: Hồ sơ nghiệm thu nói hai điều khác nhau về nền ngăn ở giao diện tối, và phán quyết của giám sát chưa được ghi vào sổ. Người dùng không thấy khác biệt gì, nhưng người đọc hồ sơ sau này sẽ khó biết điều nào là đúng.
-  Căn cứ: Không ảnh hưởng gì đến người dùng cuối, chỉ làm hồ sơ khó đọc; bổ sung dòng sổ sau là rẻ và không làm hỏng gì khi chưa làm.
-  file: `_acceptance/khung-luoi-va-ngan-chi-tiet/evals.yaml`
-  severity: medium
-  Đề xuất: known-limits
-
-- **Orphaned or duplicated JSDoc blocks left behind by the rewrite**
-  Người dùng thấy gì: Một vài chú thích trong mã kiểm thử bị dư hoặc đặt nhầm chỗ. Người dùng không bị ảnh hưởng gì.
-  Căn cứ: Chỉ là chuyện gọn mã của bài thử, không tác động tới sản phẩm, nên chấp nhận và không mở việc.
-  file: `tests/e2e/do-diem-anh.ts`
-  severity: low
-  Đề xuất: wont-fix
-
-- **In light theme, the record's left-line check passes on the shadow alone, so a missing or invisible line goes unnoticed**
-  Người dùng thấy gì: Ở giao diện sáng, nếu viền bên trái của ngăn chi tiết vô tình biến mất hoặc trùng màu nền thì bài kiểm tự động vẫn cho qua vì bóng đã làm mép trông tối. Người dùng khi đó sẽ thấy ngăn kém tách khỏi lưới.
-  Căn cứ: Hậu quả chỉ là mép ngăn kém rõ, không mất dữ liệu và dễ thấy khi xem tay; chi phí siết bài đo không lớn nhưng ngoài điều đã ký.
-  file: `tests/e2e/khung-luoi-nut.spec.ts`
-  severity: medium
-  Đề xuất: known-limits
-
-- **Hình dạng 1 (đo chỉ dẫn thay vì đầu ra) + 4: «viền trái thấy được» của Q3 chỉ đỏ được qua borderLeftWidth khai báo; phần đo điểm ảnh ở nền sáng thật ra đo bóng**
-  Người dùng thấy gì: Bài kiểm tự động cho «viền trái thấy được» thực ra chỉ chắc chắn bắt được lỗi khi viền bị khai báo bằng 0, còn viền có mà không nhìn thấy thì có thể lọt. Người dùng có thể gặp ngăn không có đường viền rõ ở giao diện sáng.
-  Căn cứ: Lỗi nếu xảy ra chỉ là thẩm mỹ, tự khỏi khi sửa kiểu và không mất dữ liệu; giữ như hiện tại và ghi lại hạn chế này là hợp lý.
-  file: `tests/e2e/khung-luoi-nut.spec.ts`
-  severity: medium
-  Đề xuất: known-limits
-
-- **Hình dạng 4 (khẳng định âm tính đứng một mình, không có đối chứng dương): lần kiểm «no shadow shows on the grid» trong vòng tối vẫn ném lỗi dù ngăn đã sửa đúng**
+- **Hình dạng 4 (khẳng định âm tính đứng một mình, không có đối chứng dương): lần kiểm «no shadow shows on the grid» trong vòng tối vẫn ném lỗi dù ngăn đã sửa đúng (r3 · tệp đã đổi)**
   Người dùng thấy gì: Ở giao diện tối, bài kiểm tự động nói bóng của ngăn bị cắt thì không chứng minh được gì, vì bóng ở nền tối vốn đã quá nhạt. Người dùng có thể thấy bóng ngăn bị cắt ở giao diện tối mà bài kiểm không báo.
   Căn cứ: Bóng ở nền tối vốn rất nhẹ nên hậu quả thị giác nhỏ, không mất dữ liệu; chỉ là bài kiểm bớt chắc ở một nhánh.
   file: `tests/e2e/khung-luoi-nut.spec.ts`
   severity: low
   Đề xuất: known-limits
 
-- **Hình dạng 5 (tuyên quét cả lớp nhưng chỉ đo một điểm): JSDoc của assertPinnedEdge vẫn hứa phần tiêu đề và «không cột ghim nào khác», nhưng mã đã bỏ cả hai**
-  Người dùng thấy gì: Phần ghi chú của bài kiểm nói nó bảo vệ cả tiêu đề và các cột ghim khác, nhưng thực tế không. Người dùng có thể gặp bóng sai ở những chỗ ấy mà không ai biết là chưa được kiểm.
-  Căn cứ: Chỉ làm người đọc hiểu sai phạm vi bảo vệ, không đổi gì cho người dùng; sửa chú thích rẻ nhưng không cần gấp.
-  file: `tests/e2e/sheet.spec.ts`
-  severity: low
-  Đề xuất: known-limits
-
-- **Hình dạng 2 (mẫu đối chứng làm tay, không rút được từ bên tạo): hai khung đỏ khong-tach của E18 không có lệnh nào sinh lại**
+- **Hình dạng 2 (mẫu đối chứng làm tay, không rút được từ bên tạo): hai khung đỏ khong-tach của E18 không có lệnh nào sinh lại (r3 · tệp đã đổi)**
   Người dùng thấy gì: Hai ảnh dùng làm mẫu «ngăn không tách khỏi lưới» được làm tay, nên khó chụp lại đúng cùng điều kiện về sau. Người dùng không bị ảnh hưởng, chỉ việc kiểm lại bằng mắt có thể kém chắc.
   Căn cứ: Chỉ liên quan tới bằng chứng nghiệm thu, không tới màn hình người dùng; nếu ảnh cũ lệch thì chụp lại là xong, không mất gì.
   file: `_acceptance/khung-luoi-va-ngan-chi-tiet/evals.yaml`
@@ -106,4 +69,6 @@ Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm v
   severity: low
   Đề xuất: wont-fix
 
-⚠ Cụm ngoài vùng phủ: 2/8 lỗi rơi vào file không bộ đo nào phủ (_acceptance/khung-luoi-va-ngan-chi-tiet/evals.yaml) — dừng và quyết: mở rộng hợp đồng hay rút phạm vi.
+## Chưa adversarial-verify (refuter chết)
+
+Cụm ngoài vùng phủ: cluster: n-a (không đo được — không eval nào khai paths, hoặc dưới ngưỡng cụm).
