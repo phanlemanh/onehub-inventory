@@ -3,16 +3,15 @@ schema_version: 2
 feature_slug: nhap-excel
 verdict: PASS
 failed_evals: []
+reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: b4f8b282caa1201d667d0c8fdb0e27a36b2eb368
+verified_commit: 42d6d2ba02cdb38bf94f025f6f5e93b44f7a915b
 human_signoff:
 ---
 
 # Evidence Report: nhap-excel
-
-Round 5. Nội dung thay toàn bộ round cũ; lịch sử round nằm ở mục Iterations. Round này chạy lại 10 eval (E2, E9, E10, E11, E14, E15, E16, E19, E20, E21) và ba lệnh suite; 14 eval còn lại mang từ các round trước vì delta không chạm paths của chúng.
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
@@ -43,106 +42,49 @@ Round 5. Nội dung thay toàn bộ round cũ; lịch sử round nằm ở mục
 
 ## Evidence
 
-- eval: E2
-  run_id: minted-nhap-excel-E2-r5
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_e2e
-  verified_at: 2026-11-27T23:10:29Z
-  output: |
-    Playwright tests/e2e-db/nhap-excel.spec.ts, lane D, port 5571: pass.
-    gac-hydration: 0 canh bao
-
-- eval: E15
-  run_id: minted-nhap-excel-E15-r5
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_e2e
-  verified_at: 2026-11-27T23:10:29Z
-  output: |
-    Playwright tests/e2e-db/nhap-excel.spec.ts, lane D, port 5571: pass.
-    gac-hydration: 0 canh bao
-
-- eval: E16
-  run_id: minted-nhap-excel-E16-r5
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_e2e
-  verified_at: 2026-11-27T23:10:29Z
-  output: |
-    Playwright tests/e2e-db/nhap-excel.spec.ts, lane D, port 5571: pass.
-    gac-hydration: 0 canh bao
-
-- eval: E20
-  run_id: minted-nhap-excel-E20-r5
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_e2e
-  verified_at: 2026-11-27T23:10:29Z
-  output: |
-    Playwright tests/e2e-db/nhap-excel.spec.ts, lane D, port 5571: pass.
-    gac-hydration: 0 canh bao
-
-- eval: E21
-  run_id: minted-nhap-excel-E21-r5
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_e2e
-  verified_at: 2026-11-27T23:10:29Z
-  output: |
-    Playwright tests/e2e-db/nhap-excel.spec.ts, lane D, port 5571: pass.
-    gac-hydration: 0 canh bao
+Các eval chạy lại ở round 6: E9, E14, E15, E19. Các eval còn lại mang từ round trước, vì thay đổi của round này không chạm đường dẫn của chúng.
 
 - eval: E9
-  run_id: minted-nhap-excel-E9-r5
+  run_id: minted-nhap-excel-E9-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.nhap_excel_db
-  verified_at: 2026-11-27T23:10:29Z
+  verified_at: 2026-11-27T23:38:25Z
   output: |
-    vitest -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts, lane D, port 5571: pass.
+    DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} npx vitest run -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts --reporter=verbose
+    lệnh này cũng phủ E14; lượt chạy xanh.
 
 - eval: E14
-  run_id: minted-nhap-excel-E14-r5
+  run_id: minted-nhap-excel-E14-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.nhap_excel_db
-  verified_at: 2026-11-27T23:10:29Z
+  verified_at: 2026-11-27T23:38:25Z
   output: |
-    vitest -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts, lane D, port 5571: pass.
+    cùng lệnh với E9 (tests/db/nhap-excel.db.test.ts), khối 'hoan tac'; lượt chạy xanh.
 
-- eval: E10
-  run_id: minted-nhap-excel-E10-r5
+- eval: E15
+  run_id: minted-nhap-excel-E15-r6
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.script.cach_ly_d
-  verified_at: 2026-11-27T23:10:29Z
+  verifier: config:executors.script.nhap_excel_e2e
+  verified_at: 2026-11-27T23:38:25Z
   output: |
-    cach-ly: 41 ca đạt, vai quy_hang_app, nối bằng quy_hang_login
-
-- eval: E11
-  run_id: minted-nhap-excel-E11-r5
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.nhap_excel_unit
-  verified_at: 2026-11-27T23:10:29Z
-  output: |
-    vitest run src/modules/imports tests/nhap-excel: pass.
+    DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} npx playwright test -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts
+    gac-hydration: 0 canh bao
 
 - eval: E19
-  run_id: minted-nhap-excel-E19-r5
+  run_id: minted-nhap-excel-E19-r6
   exit_code: 0
   baseline: n-a
   verifier: config:executors.ui-check
-  verified_at: 2026-11-27T23:10:29Z
+  verified_at: 2026-11-27T23:38:25Z
   screenshot: evidence/ui/inventory-trong-1440.png
   observed: |
-    inventory-trong-1440.png: the screen is the Bảng hàng page for the company «[Sàn thử nạp tệp]». It shows "0 dòng" and the empty state "Chưa có dữ liệu ở đây / Sàn chưa có căn nào đang chào trên Bảng hàng. / Có sẵn bảng trong Excel hay Google Sheet? Nạp tệp." The «Nạp tệp» link is underlined. An outlined «Nạp tệp» button sits at the top right of the page header. The left rail has an import icon. This matches Expected.
-    inventory-sau-nhap-1440.png: the same Đầu chủ view with "3 dòng". The rows are ZZ-99.01 (Toà "Toà của tệp", Dự án "—", Đang bán, 2,1 tỷ), 0905 (S1.01, Vinhomes Ocean Park, Đang bán, 4,65 tỷ, 96,8 m², 3 phòng ngủ) and 0906 (S1.01, 3,9 tỷ, 110,4 m²). ZZ-99.01 is the code the catalog lacks and it shows in the Mã căn column (the column is titled Mã căn, not Căn). The «Nạp tệp» button is still at the top right. The left tree now shows Vinhomes Ocean Park 1 / The Sapphire 1 / S1.01. This matches Expected.
-    inventory-dau-khach-1440.png: the same 3 rows, but the page header has no «Nạp tệp» button and the left rail has no import icon. This is the Đầu khách view with no way to import, which matches Expected.
+    1) inventory-trong-1440.png (Đầu chủ, company [Sàn thử nạp tệp], no listings). The "Bảng hàng" screen is open. The grid card shows "0 dòng" and the heading "Chưa có dữ liệu ở đây". Below it is "Sàn chưa có căn nào đang chào trên Bảng hàng." and "Có sẵn bảng trong Excel hay Google Sheet? Nạp tệp." where "Nạp tệp" is an underlined link. At the top right of the page header is a bordered "Nạp tệp" button. The left rail also has an import icon. This matches Expected.
+    2) inventory-sau-nhap-1440.png (same company after the three-row file). The grid shows 3 dòng. Row 1 is ZZ-99.01, building "Toà của tệp", no project ("—"), status "Đang bán", price 2,1 tỷ. This is the pending-match listing, and its original code is in the "Mã căn" column. Rows 2 and 3 are 0905 and 0906, building S1.01, project Vinhomes Ocean Pa..., status "Đang bán", 4,65 tỷ and 3,9 tỷ. The "Nạp tệp" button is still at the top right. The rail now lists the project Vinhomes Ocean Park 1. This matches Expected.
+    3) inventory-dau-khach-1440.png (Đầu khách, same company, same three rows). The grid content is identical to frame 2. The top right of the header has no "Nạp tệp" button. The left icon rail has one icon fewer, with no import icon. The rail's "Theo trạng thái" list has no import entry. This matches Expected: Đầu khách does not see the import entry.
   network_observed: n-a (driver)
-
-### Eval mang từ round trước (carry-forward)
 
 - eval: E1
   run_id: minted-nhap-excel-E1-r4
@@ -153,6 +95,16 @@ Round 5. Nội dung thay toàn bộ round cũ; lịch sử round nằm ở mục
   carried_from_round: 4
   output: |
     carry-forward tu round 4 — delta khong cham paths cua eval
+
+- eval: E2
+  run_id: minted-nhap-excel-E2-r5
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.nhap_excel_e2e
+  verified_at: 2026-11-27T23:10:29Z
+  carried_from_round: 5
+  output: |
+    carry-forward tu round 5 — delta khong cham paths cua eval
 
 - eval: E3
   run_id: minted-nhap-excel-E3-r4
@@ -214,6 +166,26 @@ Round 5. Nội dung thay toàn bộ round cũ; lịch sử round nằm ở mục
   output: |
     carry-forward tu round 4 — delta khong cham paths cua eval
 
+- eval: E10
+  run_id: minted-nhap-excel-E10-r5
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.cach_ly_d
+  verified_at: 2026-11-27T23:10:29Z
+  carried_from_round: 5
+  output: |
+    carry-forward tu round 5 — delta khong cham paths cua eval
+
+- eval: E11
+  run_id: minted-nhap-excel-E11-r5
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.nhap_excel_unit
+  verified_at: 2026-11-27T23:10:29Z
+  carried_from_round: 5
+  output: |
+    carry-forward tu round 5 — delta khong cham paths cua eval
+
 - eval: E12
   run_id: minted-nhap-excel-E12-r4
   exit_code: 0
@@ -233,6 +205,16 @@ Round 5. Nội dung thay toàn bộ round cũ; lịch sử round nằm ở mục
   carried_from_round: 4
   output: |
     carry-forward tu round 4 — delta khong cham paths cua eval
+
+- eval: E16
+  run_id: minted-nhap-excel-E16-r5
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.nhap_excel_e2e
+  verified_at: 2026-11-27T23:10:29Z
+  carried_from_round: 5
+  output: |
+    carry-forward tu round 5 — delta khong cham paths cua eval
 
 - eval: E17
   run_id: minted-nhap-excel-E17-r4
@@ -262,8 +244,27 @@ Round 5. Nội dung thay toàn bộ round cũ; lịch sử round nằm ở mục
     1024: the same screens, laid out with the step bar and rows narrower. In 1024 ghep-cot the checkbox text is cut. 1024 xong lists the template, two own labels and the pending unit.
     All of this matches Expected, apart from the word 'dòng' where the Expected text says 'số căn'.
   network_observed: n-a (driver)
+  note: carry-forward tu round 4 — delta khong cham paths cua eval; khung của lượt gốc, cùng run_id.
+
+- eval: E20
+  run_id: minted-nhap-excel-E20-r5
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.nhap_excel_e2e
+  verified_at: 2026-11-27T23:10:29Z
+  carried_from_round: 5
   output: |
-    carry-forward tu round 4 — delta khong cham paths cua eval
+    carry-forward tu round 5 — delta khong cham paths cua eval
+
+- eval: E21
+  run_id: minted-nhap-excel-E21-r5
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.nhap_excel_e2e
+  verified_at: 2026-11-27T23:10:29Z
+  carried_from_round: 5
+  output: |
+    carry-forward tu round 5 — delta khong cham paths cua eval
 
 - eval: E22
   run_id: minted-nhap-excel-E22-r4
@@ -298,19 +299,19 @@ Round 5. Nội dung thay toàn bộ round cũ; lịch sử round nằm ở mục
 ### Lệnh suite (hồi quy)
 
 - cmd: make check
-  run_id: minted-nhap-excel-SUITE-make_check-r5
+  run_id: minted-nhap-excel-SUITE-make_check-r6
   exit_code: 0
-  verified_at: 2026-11-27T23:10:29Z
+  verified_at: 2026-11-27T23:38:25Z
 
 - cmd: npm run build
-  run_id: minted-nhap-excel-SUITE-build-r5
+  run_id: minted-nhap-excel-SUITE-build-r6
   exit_code: 0
-  verified_at: 2026-11-27T23:10:29Z
+  verified_at: 2026-11-27T23:38:25Z
 
 - cmd: DATABASE_URL= make e2e
-  run_id: bn4x4fp8w
+  run_id: bm8d9myd8
   exit_code: 0
-  verified_at: 2026-11-27T23:10:29Z
+  verified_at: 2026-11-27T23:38:25Z
 
 ## Known limits
 
@@ -318,13 +319,13 @@ Round 5. Nội dung thay toàn bộ round cũ; lịch sử round nằm ở mục
 
 ## Analyst
 
-carried tu round 3 — baseline khong do lai round nay
+carried tu round 3 — baseline khong do lai round nay.
 
-Baseline khong do: evals.yaml khong doi tu lan baseline cuoi (round 3), nen mọi eval ghi baseline n-a.
+Baseline khong do: moi eval round nay ghi baseline n-a, vì evals.yaml không đổi từ lần đo cuối (round 3).
 
-Eval không phân biệt (green trên cả HEAD lẫn baseline, regression-guard có chủ ý):
-- E17 (lệnh make check)
-- E24 (lệnh design-floor-khuon.mjs --kiem --root .)
+Eval không phân biệt cần xác nhận là regression-guard có chủ ý hoặc viết lại để assert hành vi mới:
+- E17 (make check)
+- E24 (bước chấm khuôn, nhóm luong-nhieu-buoc)
 
 ## Variance
 
@@ -332,5 +333,4 @@ none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 5: all 24 evals PASS; 10 evals re-run on b4f8b282 (E2, E9, E10, E11, E14, E15, E16, E19, E20, E21) plus three suite commands, 14 carried from earlier rounds (E1, E3 to E8, E12, E13, E17, E18, E22 to E24).
-Rounds 1 to 4: evidence of the carried evals comes from round 4 (E23 from round 1); details are in the history of those rounds.
+Round 6: E9, E14, E15, E19 chạy lại trên commit 42d6d2ba (đọc danh sách tồn kho lại thành hai phép nối trong); cả bốn đạt, các eval còn lại mang từ round 1, 4, 5. Lịch sử các round trước nằm trong run-log.jsonl.
