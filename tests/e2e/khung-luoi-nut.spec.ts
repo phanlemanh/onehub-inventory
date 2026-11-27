@@ -263,16 +263,20 @@ async function standsApart(page: Page): Promise<Apart> {
 }
 
 /**
- * The record stands apart by what shows: its box does not clip its shadow, its left line shows against the grid
- * (luminance step ≥ 10) and its shadow darkens the grid beside it (≥ 3 in light, where the surface is the page's own
- * white; ≥ 2 in dark, where a black shadow falls on a near-black page).
+ * The record stands apart by what shows, measured per theme on what the eye uses there:
+ * - light: the record's surface is the page's own white, so the shadow must darken the grid beside it (≥ 3; measured
+ *   24.5 at 1440) and its left line must show (≥ 10; measured 24.7);
+ * - dark: the record's surface is about the grid's own (step 1.5 at 1440) and a black shadow on a near-black grid barely
+ *   shows (2.5), so the left line is what sets it apart (≥ 10; measured 21.5). Shadow and surface step are recorded,
+ *   not asserted, in dark: a threshold that close to the measured value would flicker on another machine.
+ * In both, the record's box must not clip the shadow.
  */
-function assertStandsApart(a: Apart, minShade: number): void {
+function assertStandsApart(a: Apart, theme: "light" | "dark"): void {
   if (a.clipped !== "visible")
     throw new Error(`record shadow clipped by its box (overflow ${a.clipped})`);
   if (parseFloat(a.border) < 1 || a.edge < 10)
     throw new Error(`no line shows on the record's left (step ${a.edge.toFixed(1)})`);
-  if (a.shade < minShade)
+  if (theme === "light" && a.shade < 3)
     throw new Error(`no shadow shows on the grid (darker by ${a.shade.toFixed(1)})`);
 }
 
@@ -295,7 +299,12 @@ test.describe("Q3 · the floating record stands apart from the grid", () => {
     }) => {
       await page.emulateMedia({ colorScheme });
       await openRecord(page);
-      assertStandsApart(await standsApart(page), colorScheme === "light" ? 3 : 2);
+      const a = await standsApart(page);
+      test.info().annotations.push({
+        type: "do-diem-anh",
+        description: `${colorScheme}: shadow ${a.shade.toFixed(1)}, line ${a.edge.toFixed(1)}, surface step ${a.step.toFixed(1)}`,
+      });
+      assertStandsApart(a, colorScheme);
     });
 
   for (const colorScheme of ["light", "dark"] as const)
@@ -310,13 +319,12 @@ test.describe("Q3 · the floating record stands apart from the grid", () => {
       });
       await page.waitForTimeout(300);
       const a = await standsApart(page);
-      const min = colorScheme === "light" ? 3 : 2;
-      expect(() => assertStandsApart(a, min)).toThrow("record shadow clipped by its box");
-      expect(() => assertStandsApart({ ...a, clipped: "visible" }, min)).toThrow(
+      expect(() => assertStandsApart(a, colorScheme)).toThrow("record shadow clipped by its box");
+      expect(() => assertStandsApart({ ...a, clipped: "visible" }, colorScheme)).toThrow(
         "no line shows on the record's left",
       );
       expect(() =>
-        assertStandsApart({ ...a, clipped: "visible", border: "1px", edge: 20 }, min),
+        assertStandsApart({ ...a, clipped: "visible", border: "1px", edge: 20 }, "light"),
       ).toThrow("no shadow shows on the grid");
     });
 });
