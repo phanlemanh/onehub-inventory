@@ -165,7 +165,9 @@ function assertEdges(g: Awaited<ReturnType<typeof floatGeometry>>): void {
 
 function assertFloat(g: Awaited<ReturnType<typeof floatGeometry>>): void {
   assertEdges(g);
-  if (g.toolsRight !== null && g.toolsRight > g.aside.left - 16 + 1)
+  // No toolbar button found is a failure, not a pass on nothing (VP10, ruling G-2811-11).
+  if (g.toolsRight === null) throw new Error("no toolbar button beside the record");
+  if (g.toolsRight > g.aside.left - 16 + 1)
     throw new Error(
       `toolbar runs under the record: ends ${g.toolsRight}, record at ${g.aside.left}`,
     );
@@ -469,11 +471,25 @@ test.describe("E2 · the record floats beside the grid", () => {
     // While the record floats, the toolbar's buttons keep their icon, their name and a hover hint, not their words.
     for (const slot of ["columns-toggle", "full-screen-toggle"]) {
       const button = page.locator(`[data-slot="${slot}"]`);
-      if ((await button.count()) === 0) continue;
+      // Both buttons stand in the toolbar: a missing one fails here rather than being skipped.
+      await expect(button).toHaveCount(1);
       await expect(button).toHaveAttribute("title", /.+/);
       // Its words are for assistive tech only: the button is no wider than an icon button.
       expect((await button.boundingBox())!.width).toBeLessThanOrEqual(40);
     }
+  });
+
+  test("break: a toolbar with no button shown is caught, not passed on nothing", async ({
+    page,
+  }) => {
+    await injectStyle(
+      page,
+      '[data-slot="region-toolbar"] :is(button, a) { display: none !important; }',
+    );
+    await openInventory(page);
+    await openFifth(page);
+    const g = await floatGeometry(page);
+    expect(() => assertFloat(g)).toThrow("no toolbar button beside the record");
   });
 
   test("break: a toolbar that does not clear the record runs under it", async ({ page }) => {
@@ -852,7 +868,7 @@ async function recordButtonSizes(
       section: '[data-slot="record-section-header"] button',
       foot: '[data-slot="record-panel-footer"] button',
     };
-    return Object.entries(places).flatMap(([where, selector]) =>
+    const found = Object.entries(places).flatMap(([where, selector]) =>
       [...record.querySelectorAll<HTMLElement>(selector)]
         .filter((b) => b.offsetParent !== null)
         .map((b) => {
@@ -860,12 +876,25 @@ async function recordButtonSizes(
           return { where, width: r.width, height: r.height };
         }),
     );
+    // A record with a foot: its foot must hold a button too, so an empty foot is caught rather than skipped.
+    if (record.querySelector('[data-slot="record-panel-footer"]'))
+      found.push({ where: "foot-shown", width: 0, height: 44 });
+    return found;
   });
 }
 
+/**
+ * Every button at the record's head, at a section's head and at its foot is at least 44 px high on a phone, the head's
+ * at least 44 wide. Each place must hold a button, or the check would pass on nothing: VP10 measured no section head
+ * for four rounds, the record opened without a role had none, and their 28 px went unseen (lane R, ruling G-2811-11).
+ */
 function assertPhoneHitArea(sizes: { where: string; width: number; height: number }[]): void {
   if (!sizes.some((s) => s.where === "head")) throw new Error("no button at the record head");
+  if (!sizes.some((s) => s.where === "section")) throw new Error("no button at a section head");
+  if (sizes.some((s) => s.where === "foot-shown") && !sizes.some((s) => s.where === "foot"))
+    throw new Error("no button at the record foot");
   for (const s of sizes) {
+    if (s.where === "foot-shown") continue;
     if (s.height < 44 - 0.5) throw new Error(`${s.where} button ${s.height}px high, under 44`);
     if (s.where === "head" && s.width < 44 - 0.5)
       throw new Error(`head button ${s.width}px wide, under 44`);
@@ -876,7 +905,8 @@ test.describe("BH 2026-11-27 · the record's buttons are 44 px to press on a pho
   test("every head, section head and foot button fits the size of its screen", async ({
     page,
   }, info) => {
-    await openInventory(page);
+    // A listing agent's record: its sections carry «Báo sai thông tin» and «Sửa», so their heads have buttons to measure.
+    await openInventory(page, "?role=ListAgent");
     await openFifth(page);
     const sizes = await recordButtonSizes(page);
     if (PHONE.has(info.project.name)) {
@@ -887,6 +917,7 @@ test.describe("BH 2026-11-27 · the record's buttons are 44 px to press on a pho
       const head = sizes.filter((s) => s.where === "head");
       expect(head.length).toBeGreaterThan(0);
       for (const s of head) expect(Math.round(s.height)).toBe(28);
+      expect(sizes.filter((s) => s.where === "section").length).toBeGreaterThan(0);
     }
   });
 
@@ -896,11 +927,37 @@ test.describe("BH 2026-11-27 · the record's buttons are 44 px to press on a pho
       page,
       '[data-slot="record-panel-header"] button { width: 28px !important; height: 28px !important; }',
     );
-    await openInventory(page);
+    await openInventory(page, "?role=ListAgent");
     await openFifth(page);
     expect(() => assertPhoneHitArea([])).toThrow("no button at the record head");
     const sizes = await recordButtonSizes(page);
     expect(() => assertPhoneHitArea(sizes)).toThrow("under 44");
+  });
+
+  test("break: a section head button left at 28 px is caught", async ({ page }, info) => {
+    test.skip(!PHONE.has(info.project.name), "do o 414 va 360");
+    await injectStyle(
+      page,
+      '[data-slot="record-section-header"] button { min-height: 28px !important; height: 28px !important; }',
+    );
+    await openInventory(page, "?role=ListAgent");
+    await openFifth(page);
+    const sizes = await recordButtonSizes(page);
+    expect(() => assertPhoneHitArea(sizes)).toThrow(/^section button 28px high, under 44$/);
+  });
+
+  test("break: a record with no button at its section heads is caught, not passed on nothing", async ({
+    page,
+  }, info) => {
+    test.skip(!PHONE.has(info.project.name), "do o 414 va 360");
+    await injectStyle(
+      page,
+      '[data-slot="record-section-header"] button { display: none !important; }',
+    );
+    await openInventory(page, "?role=ListAgent");
+    await openFifth(page);
+    const sizes = await recordButtonSizes(page);
+    expect(() => assertPhoneHitArea(sizes)).toThrow("no button at a section head");
   });
 });
 

@@ -87,6 +87,7 @@ async function assertFilterRowLevel(page: Page): Promise<void> {
     return { controls, titles };
   });
   if (g.controls.length < 2) throw new Error("no filter row");
+  if (g.titles.length < 2) throw new Error("no column titles to level");
   const tall = Math.max(...g.controls);
   const short = Math.min(...g.controls);
   if (tall - short > 0.5) throw new Error(`filter boxes ${short}–${tall}px high`);
@@ -108,6 +109,16 @@ test.describe("L3 · the filter row stands level", () => {
       content: '[data-slot="column-filter"] input { height: 32px !important; }',
     });
     await expect(assertFilterRowLevel(page)).rejects.toThrow("filter boxes");
+  });
+
+  test("break: a head with no column titles shown is caught, not passed on nothing", async ({
+    page,
+  }) => {
+    await openInventory(page);
+    await themKieu(page, {
+      content: '[data-slot="sheet-header"] > :first-child { display: none !important; }',
+    });
+    await expect(assertFilterRowLevel(page)).rejects.toThrow("no column titles to level");
   });
 });
 
@@ -387,7 +398,9 @@ async function sentFrame(page: Page): Promise<void> {
   if (Math.abs(g.top - g.bar) > 2)
     throw new Error(`record top ${g.top} not under the top bar ${g.bar}`);
   if (g.shadow === "none") throw new Error("record casts no shadow");
-  if (g.right !== null && g.right > g.left - 16 + 1)
+  // No toolbar button found is a failure, not a pass on nothing (VP10, ruling G-2811-11).
+  if (g.right === null) throw new Error("no toolbar button on Đã gửi");
+  if (g.right > g.left - 16 + 1)
     throw new Error(`toolbar runs under the record: ends ${g.right}, record at ${g.left}`);
 }
 
@@ -411,6 +424,16 @@ test.describe("Đã gửi · the same frame as Bảng hàng", () => {
     await expect(async () => sentFrame(page)).toPass({ timeout: 3000 });
   });
 
+  test("break: a toolbar with no button shown is caught, not passed on nothing", async ({
+    page,
+  }) => {
+    await openSent(page);
+    await themKieu(page, {
+      content: '[data-slot="region-toolbar"] :is(button, a) { display: none !important; }',
+    });
+    await expect(sentFrame(page)).rejects.toThrow("no toolbar button on Đã gửi");
+  });
+
   test("break: a record from the top of the screen is caught", async ({ page }) => {
     await openSent(page);
     await themKieu(page, { content: '[data-slot="record-panel-layer"] { top: 0 !important; }' });
@@ -430,6 +453,7 @@ async function pinnedToolbar(page: Page): Promise<void> {
     );
     const tops = buttons.map((b) => Math.round(b.getBoundingClientRect().top));
     return {
+      count: buttons.length,
       lines: new Set(tops).size,
       wide: buttons
         .filter((b) => b.getBoundingClientRect().width > 40)
@@ -437,6 +461,7 @@ async function pinnedToolbar(page: Page): Promise<void> {
       unnamed: buttons.filter((b) => !b.getAttribute("title")).length,
     };
   });
+  if (g.count === 0) throw new Error("no toolbar button while pinned");
   if (g.lines > 1) throw new Error(`toolbar runs to ${g.lines} lines while pinned`);
   if (g.wide.length > 0)
     throw new Error(`toolbar buttons keep their words while pinned: ${g.wide.join(", ")}`);
@@ -465,6 +490,16 @@ test.describe("Hỏi-7 · pinned, the toolbar buttons keep only their icon", () 
   test("one line, icon buttons with a hint", async ({ page }) => {
     await openPinned(page);
     await expect(async () => pinnedToolbar(page)).toPass({ timeout: 3000 });
+  });
+
+  test("break: a toolbar with no button shown is caught, not passed on nothing", async ({
+    page,
+  }) => {
+    await openPinned(page);
+    await themKieu(page, {
+      content: '[data-slot="region-toolbar"] button { display: none !important; }',
+    });
+    await expect(pinnedToolbar(page)).rejects.toThrow("no toolbar button while pinned");
   });
 
   test("break: buttons that keep their words while pinned are caught", async ({ page }) => {
