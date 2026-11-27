@@ -53,10 +53,10 @@ Làm đúng thứ tự này một lần, trước lần đưa bản đầu: mỗ
 ghi tên biến. Giá trị khoá chủ kho tạo ở trang của dịch vụ và chỉ dán vào lệnh `make dat-khoa` (việc 8) hay vào trang của
 GitHub (việc 9), không dán vào kho, vào chat hay vào PR.
 
-| Ai      | Việc        | Vì sao                                                                                                     |
-| ------- | ----------- | ---------------------------------------------------------------------------------------------------------- |
-| Máy     | 1–3, 10, 13 | Cài đặt và biến không bí mật, làm theo quyền đứng trong `AGENTS.md` («Infrastructure standing permission») |
-| Chủ kho | 4–9, 11, 12 | Cần tài khoản của chủ kho: tạo khoá, dán khoá, dán tệp CI, tạo Quản trị sàn đầu, duyệt bản thật            |
+| Ai      | Việc                          | Vì sao                                                                                                                                                   |
+| ------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Máy     | 1–3, 9 (phần hai), 10, 11, 13 | Mọi việc không cần giá trị khoá, không cần đăng nhập, không cần duyệt bản thật, theo quyền đứng trong `AGENTS.md` («Infrastructure standing permission») |
+| Chủ kho | 4–8, 9 (phần một), 12         | Chỉ ba loại việc: tạo và dán khoá, đăng nhập, duyệt bản thật; thêm gộp PR đổi tệp CI do máy mở và gõ trong chat tên sàn và hộp thư Quản trị sàn đầu      |
 
 Máy báo lại sau mỗi việc của máy. Chủ kho làm xong một việc của mình thì nhắn máy, máy kiểm (chỉ đọc) rồi đi tiếp.
 
@@ -117,7 +117,7 @@ Máy báo lại sau mỗi việc của máy. Chủ kho làm xong một việc c�
    - **Đỏ thì:** lệnh in `dat-khoa: <lý do>` và chưa đặt khoá nào — sửa đúng chỗ dòng ấy gọi tên rồi chạy lại; dòng `lỗi
 khi đặt <tên>; đã đặt: …` — chạy lại, Enter để giữ các khoá đã đặt; `môi trường … chưa có trên GitHub` — việc 3 chưa
      xong, nhắn máy.
-9. **Chủ kho — GitHub: khoá phát hành và tệp tự động triển khai.** Hai phần, theo thứ tự. Máy nhận lại: khoá kho
+9. **Chủ kho, rồi máy — GitHub: khoá phát hành và tệp tự động triển khai.** Hai phần, theo thứ tự. Máy nhận lại: khoá kho
    `RELEASE_PLEASE_TOKEN`; tệp `deploy.yml` mới trên `main`.
 
    **Phần một — khoá phát hành `RELEASE_PLEASE_TOKEN`.** Việc «Release» (mở PR phát hành sau mỗi lần gộp) cần khoá này
@@ -127,7 +127,8 @@ khi đặt <tên>; đã đặt: …` — chạy lại, Enter để giữ các kh
    write, Pull requests — Read and write, Issues — Read and write. Bấm Generate token. Rồi ở trang kho: Settings › Secrets
    and variables › Actions › tab Secrets › New repository secret, Name `RELEASE_PLEASE_TOKEN`, dán giá trị, Add secret.
 
-   **Phần hai — tệp `deploy.yml`.** Ở trang kho: Code › thư mục `.github/workflows` › tệp `deploy.yml` › nút bút chì (Edit
+   **Phần hai — tệp `deploy.yml`.** Máy mở PR thay tệp bằng nguyên khối dưới; chủ kho chỉ gộp khi các bước kiểm xanh.
+   Làm tay thì: ở trang kho: Code › thư mục `.github/workflows` › tệp `deploy.yml` › nút bút chì (Edit
    this file). Xoá hết nội dung cũ, dán nguyên khối dưới. Bấm Commit changes…, chọn «Create a new branch for this commit
    and start a pull request», tên commit `ci: deploy to Vercel staging and production`, bấm Propose changes rồi Create pull
    request. Gộp khi các bước kiểm xanh.
@@ -214,8 +215,9 @@ khi đặt <tên>; đã đặt: …` — chạy lại, Enter để giữ các kh
       `"ok":true`, `"env":"staging"`, `"vai":"dat"`.
     - **Đỏ thì:** đọc dòng đỏ trong nhật ký và làm theo bảng «Đỏ thì làm gì» của [dua-ban-len.md](dua-ban-len.md); lượt
       Deploy không chạy — `DEPLOY_ENABLED` đặt nhầm trong một môi trường thay vì ở tab Variables của kho.
-11. **Chủ kho — tài khoản đăng nhập đầu ở mỗi môi trường.** Kho không có lệnh hay màn tạo sàn đầu tiên: lời mời chỉ do một
-    Quản trị sàn đã đăng nhập gửi, và cơ sở dữ liệu mới chưa có ai. Chủ kho tạo sàn và Quản trị sàn đầu tiên bằng SQL, một
+11. **Máy, với tên và hộp thư chủ kho gõ trong chat — tài khoản đăng nhập đầu ở mỗi môi trường.** Máy chạy câu dưới
+    trên dự án Supabase của môi trường, không ghi tên hay hộp thư vào kho, sổ hay ghi chú. Kho không có lệnh hay màn tạo sàn đầu tiên: lời mời chỉ do một
+    Quản trị sàn đã đăng nhập gửi, và cơ sở dữ liệu mới chưa có ai. Máy tạo sàn và Quản trị sàn đầu tiên bằng SQL, một
     lần cho bản thử (sau việc 10), một lần cho bản thật (sau việc 12). Ở đâu: Supabase › dự án của môi trường › SQL Editor ›
     New query. Gõ câu dưới, thay `[Tên sàn]`, `[Tên]` và địa chỉ thư bằng tên sàn, tên và hộp thư thật của người quản trị
     (gõ thẳng ở SQL Editor, không ghi vào kho; địa chỉ thư viết thường, không khoảng trắng), rồi Run. Những người khác vào
