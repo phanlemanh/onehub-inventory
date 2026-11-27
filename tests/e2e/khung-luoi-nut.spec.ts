@@ -224,6 +224,8 @@ function assertSurface(s: { bg: string; popover: string; left: string; shadow: s
   if (s.bg !== s.popover) throw new Error(`record surface ${s.bg}, not the popover ${s.popover}`);
   if (parseFloat(s.left) < 1) throw new Error("record has no line on its left");
   if (s.shadow === "none") throw new Error("record casts no shadow");
+  // A shadow cast to the left, onto the grid: some layer with a negative x offset (Q3: the record reads as a layer).
+  if (!/-\d+(\.\d+)?px 0px/.test(s.shadow)) throw new Error("record casts no shadow onto the grid");
 }
 
 test.describe("Q3 · the floating record lies on its own surface", () => {
@@ -240,6 +242,20 @@ test.describe("Q3 · the floating record lies on its own surface", () => {
       );
       assertSurface(await recordSurface(page));
     });
+
+  test("break: a record with only a drop shadow, none onto the grid, is caught", async ({
+    page,
+  }) => {
+    await openInventory(page);
+    await themKieu(page, {
+      content:
+        '[role="dialog"]:has([data-slot="record-panel"]) { box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1) !important; }',
+    });
+    await page.locator("[data-record-open]:visible").nth(4).click();
+    await expect(page.locator('[data-slot="record-panel"]')).toBeVisible();
+    const s = await recordSurface(page);
+    expect(() => assertSurface(s)).toThrow("record casts no shadow onto the grid");
+  });
 
   test("break: a record on the page's own colour without a shadow is caught", async ({ page }) => {
     await openInventory(page);

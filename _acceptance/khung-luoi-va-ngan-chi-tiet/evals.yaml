@@ -146,7 +146,7 @@ evals:
     steps:
       - "Open _acceptance/khung-luoi-va-ngan-chi-tiet/evidence/truoc/ (frames taken on main before this round) and _acceptance/khung-luoi-va-ngan-chi-tiet/evidence/sau/ (same screens, same sizes, same data, after this round)."
       - "For each of 360, 414, 1024, 1440, light and dark, compare Bảng hàng with the record of one unit open, the phone toolbar, the filter row and the record head."
-    expected: "Sau: ngăn nổi từ dưới thanh trên tới đáy, nền khác trang, có viền và bóng; thanh công cụ dừng trước ngăn, nút chỉ hình; đầu ngăn một dòng, nút góc phải trên; lưới khít màn; điện thoại: «Lọc» có chữ, nút to, «Lưu góc nhìn» hiện thẳng; ô lọc thẳng hàng; không nút «Bỏ ghim» trên tiêu đề; tối đọc được; ngoài các chỗ ấy màn không đổi dáng"
+    expected: "Sau: ngăn nổi từ dưới thanh trên tới đáy, nền lớp nổi (ở nền sáng trùng trắng của trang, ở nền tối sáng hơn trang), có viền trái và bóng đổ thấy rõ sang lưới; thanh công cụ dừng trước ngăn, nút chỉ hình; đầu ngăn một dòng, nút góc phải trên; lưới khít màn; điện thoại: «Lọc» có chữ, nút to, «Lưu góc nhìn» hiện thẳng; ô lọc thẳng hàng; không nút «Bỏ ghim» trên tiêu đề; tối đọc được; ngoài các chỗ ấy màn không đổi dáng"
     evidence_required: [run_id, exit_code, verifier, verified_at, screenshot]
 
   - id: E19

@@ -517,8 +517,9 @@ function RecordColumn({
         } as CSSProperties
       }
       // The layer lets clicks through to the grid; only the record and, when pinned, the divider take them. The vendor
-      // parts take no classes, so the layer styles them by their slots.
-      className={`pointer-events-none fixed top-(--record-top) right-(--record-right) bottom-(--record-bottom) left-(--record-left) [&_[data-slot=resizable-panel]:has(aside)]:pointer-events-auto ${pinned ? "z-40 [&_[data-slot=resizable-handle]]:pointer-events-auto" : "z-50 [&_[data-slot=resizable-handle]]:hidden"}`}
+      // parts take no classes, so the layer styles them by their slots. The panel's inner box lets the floating record's
+      // shadow fall onto the grid instead of clipping it (owner 2026-11-27, Q3).
+      className={`pointer-events-none fixed top-(--record-top) right-(--record-right) bottom-(--record-bottom) left-(--record-left) [&_[data-slot=resizable-panel]:has(aside)]:pointer-events-auto [&_[data-slot=resizable-panel]>div:has(>aside)]:overflow-visible ${pinned ? "z-40 [&_[data-slot=resizable-handle]]:pointer-events-auto" : "z-50 [&_[data-slot=resizable-handle]]:hidden"}`}
     >
       <ResizablePanelGroup
         orientation="horizontal"
@@ -551,7 +552,7 @@ function RecordColumn({
             role="dialog"
             aria-modal="false"
             aria-labelledby={titleId}
-            className={`flex h-full flex-col ${pinned ? "bg-background" : "border-l bg-popover text-popover-foreground shadow-xl"}`}
+            className={`flex h-full flex-col ${pinned ? "bg-background" : "border-l bg-popover text-popover-foreground shadow-record-float"}`}
             onKeyDown={(event) => {
               if (event.key !== "Escape") return;
               event.stopPropagation();

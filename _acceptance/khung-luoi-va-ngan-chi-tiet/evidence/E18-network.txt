@@ -1,0 +1,1 @@
+no browser driver; frames compared from files
