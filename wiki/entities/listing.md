@@ -42,7 +42,11 @@ hay nhập từ tệp). Không có giá trị riêng thì theo danh mục; sàn 
 giờ đè giá trị riêng và sàn không sửa danh mục. Loại căn vẫn suy từ phòng ngủ hiệu lực. Ghi qua `/api/v1`
 (`unitAttributes`), khoá phiên bản như hàng 4; tin Đã bán hay Ngừng hẳn giữ nguyên. Diện tích và Phòng ngủ sửa trên ô và
 dán theo cùng luật đọc; hồ sơ căn sửa cả năm trường một lần, «Lấy lại» xoá giá trị riêng. Nhập tệp ghi nguồn «tệp»
-([0054](../decisions/0054-tin-rao-giu-gia-tri-rieng.md)).
+([0054](../decisions/0054-tin-rao-giu-gia-tri-rieng.md)). Bản xem trước của nhập tệp và bước ghi dùng một luật «giá trị
+có vừa không» (`attributeFits`): giá trị tệp không vừa (diện tích 0, phòng ngủ vượt giới hạn số) thì bản xem trước hỏi
+người, không hiện là giữ rồi rơi mất khi ghi. «Gắn sang căn khác» từ chối căn đã có lần chào đang mở, kể cả căn chờ
+khớp đã khớp vào căn ấy. Đọc lại lần nhập cũ đọc và ghi qua cửa chung bằng quyền của người đã nhập; người nhập không còn
+quyền xem thì lần nhập để nguyên và được đếm.
 
 ## Where in the code
 
@@ -100,3 +104,7 @@ Hàng 3h, 27/11/2026 (bản bấm được): năm giá trị riêng của thuộ
 Hàng 3h, 28/11/2026 (dựng): cột thật và cửa ghi (migration 020), nhập tệp và đọc lại lần nhập cũ, căn chờ khớp, sửa và
 dán trên ô, thân hồ sơ căn bốn nhóm A–D, dòng lý do thay nút bị chặn
 ([0054](../decisions/0054-tin-rao-giu-gia-tri-rieng.md)).
+
+Hàng 3h, 28/11/2026 (lượt chấm 1–2): đọc lại lần nhập cũ chạy qua `withCompany` bằng quyền người đã nhập; chỉ bước liệt kê
+lần nhập chưa đọc dùng quyền chủ, là quyết định của chủ kho ở Cổng Bằng chứng (SP-1). Bản xem trước và bước ghi chung luật
+`attributeFits`; «Gắn sang căn khác» đếm cả căn chờ khớp. Sổ: `_acceptance/tin-rao-giu-gia-tri-rieng/decisions.jsonl`.
