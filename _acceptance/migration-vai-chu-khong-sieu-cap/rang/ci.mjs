@@ -25,7 +25,8 @@ const tuKiem = process.argv.includes("--tu-kiem");
 const EXCL = [":(exclude)_acceptance", ":(exclude)PRODUCT-MAP.md", ":(exclude)LO-TRINH.html"];
 // CI prints the reused run as a URL (ci.yml: RUN_URL in .heavy-ok), e.g. «… same inputs as run
 // https://github.com/<repo>/actions/runs/46094416213 at commit 04e322d7….» — round 2 waited for a bare number.
-export const REUSE = /not run again: same inputs as run \S*\/actions\/runs\/(\d+) at commit ([0-9a-f]{7,40})/;
+// A bare run number («… as run 46094416213 at commit …») is read too, should ci.yml ever print the id alone.
+export const REUSE = /not run again: same inputs as run (?:https?:\/\/\S*\/actions\/runs\/)?(\d+) at commit ([0-9a-f]{7,40})/;
 export const parseReuse = (log) => {
   const m = REUSE.exec(log);
   return m ? { run: m[1], commit: m[2] } : null;
@@ -147,6 +148,12 @@ if (tuKiem) {
     const line = d.headLog.split("\n").find((l) => / not run again: same inputs as run https?:/.test(l)) ?? "";
     const p = parseReuse(line);
     cases.push(["doc-dong-dung-lai-that", { parsed: p }, null]);
+    // The same real line with the URL cut to the bare number, and the command line CI echoes before it (which names
+    // no run): the first must parse to the same run, the second must not parse.
+    const bare = line.replace(/https?:\/\/\S*\/actions\/runs\//, "");
+    cases.push(["doc-dong-dung-lai-so-tran", { parsed: parseReuse(bare) }, null]);
+    const echoLine = d.headLog.split("\n").find((l) => l.includes("same inputs as run $(sed")) ?? "same inputs as run $(sed -n 1p .heavy-ok) at commit $(sed -n 2p .heavy-ok)";
+    cases.push(["khong-doc-dong-lenh-echo", { parsed: parseReuse(echoLine), wantNull: true }, null]);
     add("pha-dung-lai-ma-khac", (c) => (c.reuse.sameCode = false), (c) => `lượt e2e-db được dùng lại ở ${c.reuse.commit.slice(0, 8)} có mã khác đầu nhánh`);
     add("pha-dung-lai-khong-chua-ma", (c) => (c.reuse.containsCode = false), (c) => `lượt e2e-db được dùng lại ở ${c.reuse.commit.slice(0, 8)} không chứa commit mã ${code.slice(0, 8)}`);
     add("pha-dung-lai-do", (c) => (c.reuse.conclusion = "failure"), (c) => `lượt e2e-db được dùng lại (run ${c.reuse.run}) không xanh (failure)`);
@@ -155,7 +162,13 @@ if (tuKiem) {
   } else console.log("tu-kiem: đầu nhánh chạy e2e-db thật — bỏ năm ca của nhánh dùng lại");
   let good = 0;
   for (const [name, data, pinned] of cases) {
-    if (name === "doc-dong-dung-lai-that") {
+    if (name === "khong-doc-dong-lenh-echo") {
+      const ok = data.parsed === null;
+      console.log(`${ok ? "ok" : "DO"} ${name} — ${ok ? "dòng lệnh echo không bị đọc thành lượt dùng lại" : "đọc nhầm dòng lệnh echo thành lượt dùng lại"}`);
+      if (ok) good++;
+      continue;
+    }
+    if (name === "doc-dong-dung-lai-that" || name === "doc-dong-dung-lai-so-tran") {
       const ok = !!data.parsed && data.parsed.run === d.reuse.run && /^[0-9a-f]{7,40}$/.test(data.parsed.commit);
       console.log(`${ok ? "ok" : "DO"} ${name} — ${ok ? `run ${data.parsed.run} ở ${data.parsed.commit.slice(0, 8)}` : "không tách được dòng dùng lại thật của CI"}`);
       if (ok) good++;
