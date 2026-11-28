@@ -36,6 +36,8 @@ const BEDROOMS_EQUAL = sampleId(1, 5); // own bedrooms equal to the catalog's
 const SOLD = sampleId(1, 9); // Closed
 const WITHDRAWN = sampleId(1, 12); // Withdrawn
 const UNKEPT = sampleId(1, 10); // open, nobody keeps it
+const AREA_FILE = sampleId(1, 11); // open, own area 55,5 from a file over the catalog's
+const DIRECTION_GAP = sampleId(1, 15); // open, own direction where the catalog has none
 
 interface Company {
   id: string;
@@ -179,59 +181,182 @@ test("sua-nam-truong: one save sends the five values once; a floor «07» is ref
   await expect.poll(() => own(id), { timeout: 10_000 }).toEqual(before);
 });
 
-test("dau-khac: only the value that differs is marked, named with the catalog's word and value, in the text colour of the others (E4)", async ({
+/** The marks a set of listings shows, by listing: one where the own value differs, none elsewhere. */
+function markErrors(counts: Record<string, number>, differs: string): string[] {
+  const errors: string[] = [];
+  if (Object.keys(counts).length === 0) throw new Error("no listing measured");
+  for (const [id, n] of Object.entries(counts))
+    if (id === differs ? n !== 1 : n !== 0)
+      errors.push(id === differs ? `mark missing on ${id}: ${n}` : "mark on equal value");
+  return errors;
+}
+
+test("dau-khac: only the value that differs is marked, on the grid and in the record, named with the catalog's word and value, in the text colour of the others (E4)", async ({
   page,
 }, info) => {
   test.skip(!["360", "1440"].includes(info.project.name), "E4 measures 360 and 1440");
   const w = await world(info, "dau", ["TeamLead"]);
-  await signIn(page, w.email, w.mau);
-  await openRecord(page, w.idOf(AREA_TYPED));
-  await expect(marksIn(page)).toHaveCount(1);
-  await expect(marksIn(page).first()).toHaveAttribute(
-    "aria-label",
-    new RegExp(`^${label("DiffersFromCatalog")}`),
-  );
-  // The marked value keeps the text colour of an unmarked one.
-  const colour = (key: string) =>
-    unitSection(page)
-      .locator(`[data-field="${key}"] dd`)
-      .first()
-      .evaluate((el) => getComputedStyle(el.querySelector("span") ?? el).color);
-  expect(await colour("Unit.livingArea"), "mark on equal value").toBe(await colour("Unit.floor"));
-  for (const quiet of [BEDROOMS_EQUAL, PLAIN]) {
-    await openRecord(page, w.idOf(quiet));
-    // Zero marks counts only on a unit section that is there, with its area row.
-    await expect(unitSection(page).locator('[data-field="Unit.livingArea"] dd')).toBeVisible();
-    await expect(marksIn(page), "mark on equal value").toHaveCount(0);
+  const ids = [AREA_TYPED, BEDROOMS_EQUAL, PLAIN, DIRECTION_GAP].map(w.idOf);
+  const differs = w.idOf(AREA_TYPED);
+  // The catalog of the database has no gap: the case «catalog empty» empties this unit's direction for the case, and
+  // puts it back after (the listing keeps its own direction, typed).
+  const gapUpi = (
+    await owner.query<{ upi: string }>("select upi from listing_units where listing_id = $1", [
+      w.idOf(DIRECTION_GAP),
+    ])
+  ).rows[0]!.upi;
+  const kept = (
+    await owner.query<{ d: string | null }>(
+      "select direction_faces as d from catalog_units where upi = $1",
+      [gapUpi],
+    )
+  ).rows[0]!.d;
+  await owner.query("update catalog_units set direction_faces = null where upi = $1", [gapUpi]);
+  try {
+    await signIn(page, w.email, w.mau);
+    // On the grid (the table from 768 px, the phone cards under it): the marks of each row.
+    await page.goto("/inventory");
+    await page.waitForLoadState("networkidle");
+    await regionReady(page);
+    const phone = info.project.name === "360";
+    const onGrid: Record<string, number> = {};
+    for (const id of ids) {
+      const row = phone
+        ? page
+            .locator(
+              `[data-slot="phone-card"]:has([data-record-open="${id}"]), [data-record-open="${id}"]`,
+            )
+            .first()
+        : page.locator(`tr[data-row-id="${id}"]`);
+      await expect(row, `row ${id} on the grid`).toHaveCount(1);
+      onGrid[id] = await row.locator('[data-slot="attribute-differs"]').count();
+    }
+    expect(markErrors(onGrid, differs), "grid").toEqual([]);
+    // In the record: the same, the mark named with the catalog's word and value.
+    const inRecord: Record<string, number> = {};
+    for (const id of ids) {
+      await openRecord(page, id);
+      // Zero marks counts only on a unit section that is there, with its area row.
+      await expect(unitSection(page).locator('[data-field="Unit.livingArea"] dd')).toBeVisible();
+      inRecord[id] = await marksIn(page).count();
+    }
+    expect(markErrors(inRecord, differs), "record").toEqual([]);
+    expect(markErrors({ ...inRecord, [w.idOf(PLAIN)]: 1 }, differs)).toContain(
+      "mark on equal value",
+    );
+    expect(() => markErrors({}, differs)).toThrow("no listing measured");
+    await openRecord(page, differs);
+    await expect(marksIn(page).first()).toHaveAttribute(
+      "aria-label",
+      `${label("DiffersFromCatalog")}: 75 m²`,
+    );
+    // The marked value keeps the text colour of an unmarked one.
+    const colour = (key: string) =>
+      unitSection(page)
+        .locator(`[data-field="${key}"] dd`)
+        .first()
+        .evaluate((el) => getComputedStyle(el.querySelector("span") ?? el).color);
+    expect(await colour("Unit.livingArea"), "mark on equal value").toBe(await colour("Unit.floor"));
+    for (const theme of ["light", "dark"] as const) {
+      await page.emulateMedia({ colorScheme: theme });
+      expect(await axeFaults(page), `axe ${theme}`).toEqual([]);
+    }
+    await page.emulateMedia({ colorScheme: "light" });
+    await chupAnh(page, {
+      path: `_acceptance/tin-rao-giu-gia-tri-rieng/evidence/E4-${info.project.name}.png`,
+    });
+  } finally {
+    await owner.query("update catalog_units set direction_faces = $2 where upi = $1", [
+      gapUpi,
+      kept,
+    ]);
   }
 });
 
-test("lay-lai: the mark's command takes the catalog value back — value and source both empty in the database (E5)", async ({
+/** The take-back command, found by a word; a word that is not the label table's finds nothing. */
+async function revertCommand(page: Page, word: string) {
+  const button = page.getByRole("button", { name: word });
+  if ((await button.count()) === 0) throw new Error("label not from labels.yaml");
+  return button.first();
+}
+
+test("lay-lai: the mark's command takes the catalog value back — value and source both empty in the database; a file value typed over goes straight back to the catalog (E5)", async ({
   page,
 }, info) => {
   test.skip(
-    info.project.name !== "360",
-    "E5 takes a value back in the record at 360; the grid cell is row 4",
+    !["360", "1440"].includes(info.project.name),
+    "E5 measures the grid cell at 1440 and the record at 360",
   );
   const w = await world(info, "lay", ["TeamLead"]);
   const id = w.idOf(AREA_TYPED);
   await signIn(page, w.email, w.mau);
-  await openRecord(page, id);
-  await marksIn(page).first().click();
-  await page.getByRole("button", { name: label("RevertToCatalog") }).click();
+  if (info.project.name === "1440") {
+    // On the grid: the cell's mark offers the command.
+    await page.goto("/inventory");
+    await page.waitForLoadState("networkidle");
+    await regionReady(page);
+    const cell = page.locator(`tr[data-row-id="${id}"] td[data-col-id="Unit.livingArea"]`);
+    await cell.locator('[data-slot="attribute-differs"]').click();
+    const sent = await patchesDuring(page, async () =>
+      (await revertCommand(page, label("RevertToCatalog"))).click(),
+    );
+    expect(sent.map((b) => (b as { change: unknown }).change)).toEqual([
+      { field: "unitAttributes", livingArea: null },
+    ]);
+    await expect(cell).toContainText("75");
+    await expect(cell.locator('[data-slot="attribute-differs"]')).toHaveCount(0);
+  } else {
+    await openRecord(page, id);
+    await marksIn(page).first().click();
+    const sent = await patchesDuring(page, async () =>
+      (await revertCommand(page, label("RevertToCatalog"))).click(),
+    );
+    expect(sent.map((b) => (b as { change: unknown }).change)).toEqual([
+      { field: "unitAttributes", livingArea: null },
+    ]);
+    await expect(unitSection(page).locator('[data-field="Unit.livingArea"] dd')).toContainText(
+      "75",
+    );
+    await expect(marksIn(page)).toHaveCount(0);
+  }
   await expect
     .poll(() => own(id).then((r) => [r["living_area"], r["living_area_source"]]), {
       timeout: 10_000,
     })
     .toEqual([null, null]);
-  await expect(unitSection(page).locator('[data-field="Unit.livingArea"] dd')).toContainText("75");
-  await expect(marksIn(page)).toHaveCount(0);
+  await chupAnh(page, {
+    path: `_acceptance/tin-rao-giu-gia-tri-rieng/evidence/E5-${info.project.name}.png`,
+  });
   await page.getByRole("button", { name: "Hoàn tác" }).click();
   await expect
     .poll(() => own(id).then((r) => [r["living_area"], r["living_area_source"]]), {
       timeout: 10_000,
     })
     .toEqual([78.5, "Typed"]);
+  // A hard-coded word that is not the label table's finds no command.
+  await expect(revertCommand(page, "Về theo Danh bạ")).rejects.toThrow(
+    "label not from labels.yaml",
+  );
+  if (info.project.name !== "360") return;
+  // Hỏi-7: a value from a file, typed over, then taken back goes straight to the catalog — not back to the file's.
+  const file = w.idOf(AREA_FILE);
+  expect((await own(file))["living_area_source"], "the sample's file value").toBe("File");
+  await openRecord(page, file);
+  await editOpen(page).click();
+  const dialog = page
+    .getByRole("dialog")
+    .filter({ has: page.locator('input[data-attribute="floor"]') });
+  await dialog.locator('input[data-attribute="livingArea"]').fill("60");
+  await dialog.getByRole("button", { name: "Lưu" }).click();
+  await expect(dialog).toBeHidden();
+  await expect.poll(() => own(file).then((r) => r["living_area_source"])).toBe("Typed");
+  await marksIn(page).first().click();
+  await (await revertCommand(page, label("RevertToCatalog"))).click();
+  await expect
+    .poll(() => own(file).then((r) => [r["living_area"], r["living_area_source"]]), {
+      timeout: 10_000,
+    })
+    .toEqual([null, null]);
 });
 
 test("khoa-ba-trang-thai: sold and withdrawn keep «Sửa» and «Hỏi đầu chủ» as quiet lines; an unkept unit has its line; «Sửa» is 44 px on a phone (E14b)", async ({

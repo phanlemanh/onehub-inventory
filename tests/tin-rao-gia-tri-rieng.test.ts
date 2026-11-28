@@ -11,6 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   sampleInventoryListings,
   sampleInventoryRows,
+  sampleRecords,
 } from "../src/app/(app)/inventory-sample-rows";
 import { catalogAttributesOf } from "../src/app/(app)/inventory-view";
 import { sampleInventoryData } from "../src/app/(app)/inventory-sample-data";
@@ -18,7 +19,23 @@ import { ATTRIBUTE_WORDS as WORDS } from "../src/app/(app)/unit-attribute-words"
 import type { GridRow, RegionPaste } from "../src/components/candidate/data-region";
 import { LABELS } from "../src/generated/labels";
 import type { Listing } from "../src/generated/ontology";
+import { formatArea, formatByKind } from "../src/lib/format";
 import { label } from "../src/modules/company-config";
+import {
+  effectiveAttributes,
+  sameAttribute,
+  type CatalogAttributes,
+  type OwnAttributes,
+  type UnitAttributeField,
+} from "../src/modules/listings/unit-attributes";
+import { unitKind } from "../src/modules/listings/record";
+import { geoTree } from "../src/modules/listings/ui/geo-tree";
+import { inventoryRows, searchSuggestions } from "../src/modules/listings/ui/inventory-rows";
+import { ListingCard, listingView } from "../src/modules/listings/ui/listing-record";
+import {
+  ListingRecordFull,
+  type RecordLabels,
+} from "../src/modules/listings/ui/listing-record-full";
 import {
   readBedrooms,
   readLivingArea,
@@ -320,5 +337,181 @@ describe("lay-lai-mot-danh-tinh (VP11 «nothing will draw again»)", () => {
     await type(hook, PLAIN, AREA, "72,5");
     hook.rerender();
     expect(hook.result.current.revertAttribute, "a new «Lấy lại» on a render").toBe(first);
+  });
+});
+
+// ---- Task 1: the effective value of each attribute by source (E1) ----
+
+describe("hieu-luc-ma-tran (E1)", () => {
+  /** Each attribute: the listing's own value, the catalog's, and the catalog with no value. */
+  const VALUES: Record<UnitAttributeField, { own: unknown; catalog: unknown }> = {
+    livingArea: { own: 72.5, catalog: 70 },
+    floor: { own: "15A", catalog: "7" },
+    bedroomsTotal: { own: 2, catalog: 3 },
+    directionFaces: { own: "Tây Bắc", catalog: "Đông Nam" },
+    propertySubType: { own: "Townhouse", catalog: "Condominium" },
+  };
+  const SOURCE_KEY = (f: UnitAttributeField) => `${f}Source`;
+  const catalogWith = (f: UnitAttributeField, v: unknown): CatalogAttributes =>
+    ({ [f]: v }) as unknown as CatalogAttributes;
+
+  it("hieu-luc-ma-tran: five attributes × four sources, written before the code — twenty cells", () => {
+    let cells = 0;
+    for (const f of Object.keys(VALUES) as UnitAttributeField[]) {
+      const { own, catalog } = VALUES[f];
+      const cases: [string, OwnAttributes, CatalogAttributes, object][] = [
+        [
+          "Typed",
+          { [f]: own, [SOURCE_KEY(f)]: "Typed" } as OwnAttributes,
+          catalogWith(f, catalog),
+          { value: own, source: "Typed", catalogValue: catalog, differs: true },
+        ],
+        [
+          "File",
+          { [f]: own, [SOURCE_KEY(f)]: "File" } as OwnAttributes,
+          catalogWith(f, catalog),
+          { value: own, source: "File", catalogValue: catalog, differs: true },
+        ],
+        [
+          "catalog",
+          {},
+          catalogWith(f, catalog),
+          { value: catalog, source: "Catalog", catalogValue: catalog, differs: false },
+        ],
+        [
+          "none",
+          {},
+          catalogWith(f, null),
+          { value: null, source: null, catalogValue: null, differs: false },
+        ],
+      ];
+      for (const [name, listing, unit, want] of cases) {
+        expect(effectiveAttributes(listing, unit)[f], `${f} · ${name}`).toEqual(want);
+        cells += 1;
+      }
+    }
+    expect(cells, "cells of the matrix").toBe(20);
+  });
+
+  it("hieu-luc-ma-tran: numbers compare as numbers, words folded; the unit kind reads the effective bedrooms", () => {
+    expect(sameAttribute(72, "72.0")).toBe(true);
+    expect(
+      effectiveAttributes(
+        { livingArea: 72, livingAreaSource: "Typed" },
+        catalogWith("livingArea", 72.0),
+      ).livingArea.differs,
+    ).toBe(false);
+    expect(sameAttribute("Đông Nam", "dong nam")).toBe(true);
+    const e = effectiveAttributes(
+      { bedroomsTotal: 2, bedroomsTotalSource: "Typed" },
+      catalogWith("bedroomsTotal", 3),
+    );
+    expect(unitKind(e.bedroomsTotal.value)).toBe(unitKind(2));
+    expect(unitKind(e.bedroomsTotal.value)).not.toBe(unitKind(3));
+  });
+
+  /** Where a surface does not show the listing's own value, by name; empty when every surface does. */
+  function surfaceErrors(shown: Record<string, string>, want: string): string[] {
+    if (Object.keys(shown).length === 0) throw new Error("no surface measured");
+    return Object.entries(shown)
+      .filter(([, text]) => !text.includes(want))
+      .map(([name]) => `surface reads catalog instead of listing: ${name}`);
+  }
+
+  const RECORD_LABELS: RecordLabels = {
+    unit: label("Unit"),
+    unitKind: label("UnitKind"),
+    livingArea: label("LivingArea"),
+    bedrooms: label("BedroomsTotal"),
+    floor: label("UnitFloorLocation"),
+    direction: label("DirectionFaces"),
+    building: label("Building"),
+    subdivision: label("Subdivision"),
+    propertyType: label("PropertySubType"),
+    listPrice: label("ListPrice"),
+    completeness: label("Completeness"),
+    currentListing: label("CurrentListing"),
+    viewedListing: label("ViewedListing"),
+    listingsOfUnit: label("ListingsOfUnit"),
+    parts: {
+      listPrice: label("ListPrice"),
+      furnished: label("Furnished"),
+      legalStatus: label("LegalStatus"),
+      financing: label("Financing"),
+      occupantType: label("OccupantType"),
+    },
+    furnishedValues: {
+      Furnished: label("FurnishedFull"),
+      Partially: label("FurnishedPartial"),
+      Unfurnished: label("FurnishedNone"),
+    },
+    occupantValues: {
+      Owner: label("OccupantOwner"),
+      Tenant: label("OccupantTenant"),
+      Vacant: label("OccupantVacant"),
+    },
+    propertyTypeValues: WORDS.subTypes,
+    attributes: WORDS,
+  };
+
+  it("hieu-luc-ma-tran: the grid row, the record, the phone card, ⌘K and the place tree are built from the listing that holds its own value", () => {
+    const id = sampleId(1, 4);
+    const own = listingOf(id);
+    expect(own.livingAreaSource, "the sample listing types its own area").toBe("Typed");
+    const want = effectiveAttributes(own, catalog[id]).livingArea;
+    expect(want.differs, "the own value differs from the catalog's").toBe(true);
+    const text = formatArea(want.value as number);
+    const row = rowOf(id);
+    const view = listingView(row, HEADERS);
+    const fact = view.facts.find((x) => x.column.field === AREA)!;
+    const card = render(
+      createElement(ListingCard, { view, priceLabel: label("ListPrice"), layout: "row" }),
+    );
+    const cardText = card.container.textContent ?? "";
+    card.unmount();
+    const record = render(
+      createElement(ListingRecordFull, {
+        view,
+        data: sampleRecords(new Date("2026-11-27T03:00:00Z"))[id]!,
+        labels: RECORD_LABELS,
+      }),
+    );
+    const recordText =
+      record.container.querySelector('[data-slot="listing-unit"] [data-field="Unit.livingArea"] dd')
+        ?.textContent ?? "";
+    record.unmount();
+    // The grid row as the page reads it again from the sample's listings and units.
+    const rebuilt = inventoryRows({
+      listings: [own],
+      listingUnits: [{ listingId: id, upi: `upi-${id}` }],
+      units: [{ upi: `upi-${id}`, ...(catalog[id] as object) } as never],
+    })[0]!;
+    // Every surface that shows the area shows the listing's own, written by the surface's own function.
+    expect(
+      surfaceErrors(
+        {
+          card: cardText,
+          "card fact": formatByKind(fact.column.kind, fact.value),
+          record: recordText,
+        },
+        text,
+      ),
+    ).toEqual([]);
+    expect(row[AREA as keyof GridRow]).toBe(want.value);
+    expect(rebuilt[AREA as keyof GridRow]).toBe(want.value);
+    // ⌘K and the place tree carry no unit attribute: they read the code, building and project of the same rows.
+    const code = String(row["Listing.unitNumber"]);
+    expect(searchSuggestions(rows, code).some((x) => x.value === code)).toBe(true);
+    expect(geoTree(rows, []).length).toBeGreaterThan(0);
+  });
+
+  it("break: a surface that reads the catalog's value says «surface reads catalog instead of listing»", () => {
+    const id = sampleId(1, 4);
+    const e = effectiveAttributes(listingOf(id), catalog[id]).livingArea;
+    const catalogText = formatArea(e.catalogValue as number);
+    expect(surfaceErrors({ card: catalogText }, formatArea(e.value as number))).toEqual([
+      "surface reads catalog instead of listing: card",
+    ]);
+    expect(() => surfaceErrors({}, "x")).toThrow("no surface measured");
   });
 });

@@ -13,7 +13,7 @@ SPEC=tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts
 # ran <log> <pattern> <at least>: fails unless at least that many passed cases name the pattern.
 ran() {
   local n
-  n="$(grep -E "✓" "$1" | grep -c -- "$2" || true)"
+  n="$(grep -E "✓" "$1" | grep -cE -- "$2" || true)"
   if [ "$n" -lt "$3" ]; then echo "chay.sh: ${n} passed case(s) named «$2», want at least $3" >&2; exit 1; fi
   echo "chay.sh: ${n} passed case(s) named «$2»"
 }
@@ -41,7 +41,7 @@ case "${1:-}" in
   E2b) pw "o-dien-tich" 2 "$SPEC" --project=1024 --project=1440 ;;
   E3) pw "sua-nam-truong" 4 "$SPEC" ;;
   E4) pw "dau-khac" 2 "$SPEC" --project=360 --project=1440 ;;
-  E5) pw "lay-lai" 1 "$SPEC" --project=360 ;;
+  E5) pw "lay-lai" 2 "$SPEC" --project=360 --project=1440 ;;
   E6) vt "danh-muc-khong-de" 1 -c vitest.db.config.ts "$DB_TEST" ;;
   E7) vt "nhap-tep-gia-tri-tep|doc-lai-lan-nhap-cu" 2 -c vitest.db.config.ts "$DB_TEST" ;;
   E8) pw "dau-xem-truoc" 2 "$SPEC" --project=360 --project=1440 ;;

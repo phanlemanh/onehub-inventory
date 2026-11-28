@@ -32,9 +32,12 @@ evals:
     criterion: AC-2
     executor: ui-check
     layer: ui-observed
-    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E2b
+    cmd: config:executors.ui-check
     ref: config:executors.ui-check
     paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E2b` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E2b-1024.png and evidence/E2b-1440.png: the area cell of the open listing reads «72,5 m²» and the saved notice offers «Hoàn tác»."
     expected: "exit 0; trên Bảng hàng đăng nhập (Postgres dãy R) ở 1024 và 1440: chọn ô Diện tích của một tin đang mở, mở sửa và xác nhận theo luật sửa trên ô hiện hành của kho (rút từ helper e2e dùng chung của sửa trên ô, không viết tay phím), gõ '72,5' → ô hiện '72,5 m²', thông báo đã lưu có Hoàn tác; tải lại trang thì ô vẫn '72,5 m²'; Hoàn tác trả ô về giá trị trước; gõ 'bảy mươi' hiện câu lỗi dưới ô và không có lời gọi PATCH nào (đếm mạng); ảnh evidence/E2b-1024.png, E2b-1440.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
 
@@ -42,9 +45,12 @@ evals:
     criterion: AC-3
     executor: ui-check
     layer: ui-observed
-    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E3
+    cmd: config:executors.ui-check
     ref: config:executors.ui-check
     paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E3` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E3-360.png, E3-414.png, E3-1024.png and E3-1440.png: the unit section shows the five new values (Tầng 15A, Hướng Tây Bắc) with the typed source."
     expected: "exit 0; ở 360, 414, 1024, 1440 mở hồ sơ căn của một tin đang mở, bấm 'Sửa' ở khối thông tin căn, đổi năm trường (Diện tích, Tầng '15A', Phòng ngủ, Hướng chọn, Loại hình chọn), Lưu → đúng một PATCH mang năm giá trị; khối hiện năm giá trị mới; tầng '07' bị từ chối với câu lỗi ghim và không có PATCH; Hoàn tác trả cả năm; ảnh evidence/E3-<khổ>.png cho mỗi khổ"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
 
@@ -60,9 +66,12 @@ evals:
     criterion: AC-4
     executor: ui-check
     layer: ui-observed
-    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E4
+    cmd: config:executors.ui-check
     ref: config:executors.ui-check
     paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E4` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E4-360.png and evidence/E4-1440.png: one mark after the living area of the record, the value in the same colour as the other values."
     expected: "exit 0; dữ liệu mẫu có bốn tin: riêng khác danh mục, riêng bằng danh mục, danh mục trống, căn chờ khớp; ở 1440 và 360 chỉ tin thứ nhất có dấu (đếm phần tử data-slot attribute-differs bằng 1 trên lưới và 1 trong hồ sơ căn), tên truy cập là chữ của khái niệm dấu khác danh mục trong ontology/labels.yaml (đọc từ bảng nhãn, không viết tay) nối giá trị danh mục; màu chữ của ô có dấu bằng ô không dấu (getComputedStyle color); axe không có lỗi ở sáng và tối; ca đối chứng gắn dấu cho ô bằng danh mục cho 'mark on equal value'; ảnh evidence/E4-1440.png, E4-360.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
 
@@ -70,9 +79,12 @@ evals:
     criterion: AC-5
     executor: ui-check
     layer: ui-observed
-    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E5
+    cmd: config:executors.ui-check
     ref: config:executors.ui-check
     paths: [src/modules/listings/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E5` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E5-1440.png (grid cell) and evidence/E5-360.png (record): the living area reads the catalog's 75 m² with no mark after it."
     expected: "exit 0; ở 1440 trên ô có dấu và ở 360 trong hồ sơ căn: chọn lệnh lấy lại (tìm theo chữ đọc từ ontology/labels.yaml, không viết tay) → PATCH mang giá trị null cho đúng thuộc tính ấy; ô hiện giá trị danh mục, dấu tắt; đọc lại từ cơ sở dữ liệu: cột giá trị và cột nguồn đều null; Hoàn tác trả giá trị riêng và nguồn cũ (đọc lại cơ sở dữ liệu); ca tin nguồn File bị gõ đè rồi lấy lại: về thẳng danh mục theo Hỏi-7 (cột giá trị và cột nguồn null); ca đối chứng dùng chữ cứng khác bảng nhãn cho 'label not from labels.yaml'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
 
@@ -98,9 +110,12 @@ evals:
     criterion: AC-8
     executor: ui-check
     layer: ui-observed
-    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E8
+    cmd: config:executors.ui-check
     ref: config:executors.ui-check
     paths: [src/modules/imports/**, src/modules/listings/ui/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E8` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E8-1440.png: one cell of the import preview carries the mark, its own text is the file's value; open evidence/E8-360.png: the screen says it is for a computer, no file area and no mark."
     expected: "exit 0; ở 1440 đo dấu: bước xem trước của lần nhập với tệp có một dòng Diện tích khác danh mục của căn khớp và một dòng bằng có đúng một ô có dấu khác Danh bạ (cùng data-slot attribute-differs của lưới) kèm giá trị danh mục; ô ấy vẫn hiện giá trị tệp là giá trị sẽ ghi; ở 360 đo đúng lời báo màn nhập tệp dùng trên máy tính (không ô chọn tệp, không dấu) theo luật đã ký của hàng 11 (G-2811-55); ảnh evidence/E8-1440.png, E8-360.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
 
@@ -126,9 +141,12 @@ evals:
     criterion: AC-10
     executor: ui-check
     layer: ui-observed
-    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E10b
+    cmd: config:executors.ui-check
     ref: config:executors.ui-check
     paths: [src/modules/listings/ui/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Open the record of an open listing at 1440 and at 360 (`npm run dev`, /inventory?record=<id>) and look in the record head's «…» for «Gắn sang căn khác»; the expected sentence needs row 12's unit search behind it."
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E10b`: it fails «0 passed case(s)» while no browser case of the command exists."
     expected: "exit 0; ở 1440 và 360 trong hồ sơ căn: 'Gắn sang căn khác' mở ô tìm mã căn của hàng 12, chọn căn Y → hồ sơ hiện mã căn Y, Diện tích riêng còn, dấu tính theo Y; chọn căn đã có tin mở → câu lỗi nêu mã căn, hồ sơ không đổi; ảnh evidence/E10b-1440.png, E10b-360.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
 
@@ -177,9 +195,12 @@ evals:
     criterion: AC-12
     executor: ui-check
     layer: ui-observed
-    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E14b
+    cmd: config:executors.ui-check
     ref: config:executors.ui-check
     paths: [src/modules/listings/ui/**, src/components/candidate/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E14b` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E14b-360-light.png, E14b-360-dark.png, E14b-414-light.png, E14b-414-dark.png, E14b-1440-light.png and E14b-1440-dark.png: on the sold unit the unit section's edit place and the foot each hold one quiet line with the reason, no dimmed button."
     expected: "exit 0; trên khung ngăn của VP10 (main đã gộp VP10 và VP11), ở 360 và 1440, sáng và tối: hồ sơ căn 0606 (Đã bán) và 1201 (Ngừng hẳn) có dòng chữ nhạt có ổ khoá ở chỗ «Sửa» và dòng nhạt nói lý do ở chỗ «Hỏi đầu chủ»; tin đang mở chưa ai giữ có dòng nhạt nói lý do ở đáy, không nút mờ; tin đang mở có hai nút; ở 360 hộp bao của nút «Sửa» đầu mục cao ít nhất 44px, ở 1440 cao 28px (getBoundingClientRect); axe không có lỗi; ảnh evidence/E14b-<khổ>-<nền>.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
 
@@ -195,8 +216,11 @@ evals:
     criterion: AC-12
     executor: ui-check
     layer: ui-observed
-    cmd: bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E15b
+    cmd: config:executors.ui-check
     ref: config:executors.ui-check
     paths: [src/modules/listings/ui/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
+    steps:
+      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E15b` from the repository root on lane R's Postgres (DB_LANE=r DB_PORT=5565; `make db-up DB_LANE=r DB_PORT=5565` if it is down): it must exit 0 and print «chay.sh: N passed case(s) named …» with N at least the number it asks for."
+      - "Open evidence/E15b-320-light.png, E15b-320-dark.png, E15b-360-light.png, E15b-360-dark.png, E15b-1440-light.png and E15b-1440-dark.png: status and price on one line, the label column narrow, each listing of the unit on two even lines at 320, the amber dot and the «Quá 14 ngày» line."
     expected: "exit 0; trên khung ngăn của VP10 (main đã gộp VP10 và VP11), ở 320, 360 và 1440, sáng và tối: dòng trạng thái và giá nằm trên một dòng (hai hộp bao cùng hàng); cột nhãn rộng 120±8px ở 1440 và 104±8px ở 360 (getBoundingClientRect); ở 320 mỗi lần chào đúng hai dòng (chiều cao các mục bằng nhau); bấm một tên trong «Còn thiếu» thì khối ấy mở Sửa và cuộn tới dòng; chấm và dòng quá 14 ngày dùng màu cảnh báo của bảng màu VP11 (không mã màu viết tay); axe không có lỗi; ảnh evidence/E15b-<khổ>-<nền>.png"
     evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
