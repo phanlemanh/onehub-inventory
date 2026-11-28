@@ -75,7 +75,9 @@ describe("noi ghi (G-2811-65)", () => {
     const calls = Object.values(SOURCES).flatMap((t) => [
       ...t.matchAll(/(?<!function )markValue\(/g),
     ]);
-    expect(calls.length).toBe(2);
+    // The preview, the write, and row 3h's reading of older imports again (reread.ts, with the empty choice those
+    // imports kept).
+    expect(calls.length).toBe(3);
     expect(callsWithoutChoice(SOURCES)).toEqual([]);
   });
 

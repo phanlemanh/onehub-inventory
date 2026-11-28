@@ -15,7 +15,7 @@ import { withCompany, type DbPool } from "@/modules/identity/server";
 import type { UnitAttributeValues } from "@/modules/listings";
 import { setFileValues, type Queryable } from "@/modules/listings/server";
 
-import { markValue, matchColumns, NO_CHOICES, type LayerView } from "./mark";
+import { markValue, matchColumns, NO_CHOICES, valueKey, type LayerView } from "./mark";
 import { listingIdOf, type Kept } from "./store";
 import { FILE_VALUE_OF } from "./targets";
 
@@ -95,9 +95,19 @@ export async function rereadImportValues(c: Queryable, layerOf: LayerOf): Promis
       const byRow = new Map<number, Partial<UnitAttributeValues>>();
       for (const k of run.kept as Kept[]) {
         if (k.why !== "unit-attribute") continue;
-        const target = columns[run.signature.indexOf(fold(k.header))]?.target;
+        const col = run.signature.indexOf(fold(k.header));
+        const target = columns[col]?.target;
         const field = target && "standard" in target ? FILE_VALUE_OF[target.standard] : undefined;
-        const cell = target && field ? markValue(target, k.raw, { layer, today: today() }) : null;
+        // An import made before the row kept no value choice of the person (d-…-30), so the choice is the empty one:
+        // a cell that asked then stays unread now, never guessed.
+        const cell =
+          target && field
+            ? markValue(target, k.raw, {
+                layer,
+                today: today(),
+                choice: NO_CHOICES.values[valueKey(col, k.raw)],
+              })
+            : null;
         if (!field || !cell || cell.mark === "ask" || cell.value === null) {
           out.cellsUnread += 1;
           continue;
