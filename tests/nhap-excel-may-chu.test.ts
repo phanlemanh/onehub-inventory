@@ -114,6 +114,11 @@ describe("cua-http", () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
     const r = await h.preview(post(TABLE));
     expect(r.status).toBe(500);
+    // The body the browser gets (VP11 S4-r2 item 13): a plain error word, none of the error's text.
+    const body = await r.text();
+    expect(body).not.toContain("0900");
+    expect(body).not.toContain("[Tên]");
+    expect(JSON.parse(body)).toEqual({ error: expect.any(String) });
     expect(JSON.stringify(spy.mock.calls)).not.toContain("0900");
     spy.mockRestore();
   });

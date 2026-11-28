@@ -51,6 +51,9 @@ export const IMPORT_COPY = {
   undoFailed: `Chưa gỡ ${word("Unit")} nào — máy chủ chưa hoàn tác được. ${label("ImportRun")} vẫn còn nguyên.`,
   undoOffline: `Chưa gỡ ${word("Unit")} nào — mất kết nối mạng. ${label("ImportRun")} vẫn còn nguyên.`,
   keptCells: (n: number) => `${n} ô giữ chữ gốc của tệp`,
+  /** Rows left out because their unit code names several units and nobody chose one (VP11 S4-r2, G-2811-84). */
+  notCreated: (n: number) =>
+    `${n} dòng chưa nhập — mã ${word("Unit")} trỏ nhiều ${word("Unit")} mà chưa chọn; chữ của các dòng ấy giữ trong bản ghi.`,
   recent: `${label("ImportRun")} gần đây`,
   recentFailed: `Chưa đọc được ${word("ImportRun")} gần đây — vẫn nạp tệp được.`,
   offline: "Chưa ghi gì — mất kết nối mạng.",
@@ -78,6 +81,8 @@ export const PROBLEM_WORDS: Record<ReadProblem, string> = {
   "header-only": "Tệp không có dòng nào dưới dòng tiêu đề.",
   broken: "Không đọc được tệp này. Mở bằng Excel, lưu lại rồi chọn lại.",
   locked: "Tệp đang khoá bằng mật khẩu. Bỏ khoá rồi chọn lại.",
+  "not-utf8":
+    "Tệp .csv không lưu bằng UTF-8, dấu tiếng Việt sẽ hỏng. Trong Excel: Lưu thành → CSV UTF-8, rồi chọn lại.",
 };
 
 export const WHY_WORDS: Record<string, string> = {

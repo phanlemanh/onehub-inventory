@@ -464,6 +464,11 @@ export function ImportWizard() {
                     </span>
                   ))}
                 </div>
+                {marked.notCreatedCount > 0 ? (
+                  <p className="text-muted-foreground text-sm" data-state="chua-nhap">
+                    {C.notCreated(marked.notCreatedCount)}
+                  </p>
+                ) : null}
                 {/* Width 0, at least the full row: the rows scroll inside the list instead of widening the page. */}
                 <div
                   role="list"
@@ -522,6 +527,11 @@ export function ImportWizard() {
             {step === 5 && result ? (
               <div className="flex flex-col gap-2" data-state="xong">
                 <p className="font-medium">{C.done(result.created)}</p>
+                {marked && marked.notCreatedCount > 0 ? (
+                  <p className="text-muted-foreground text-sm" data-state="chua-nhap">
+                    {C.notCreated(marked.notCreatedCount)}
+                  </p>
+                ) : null}
                 {marked && marked.keptCount > 0 ? (
                   <p className="text-muted-foreground text-sm" data-state="giu-chu-goc">
                     {C.keptCells(marked.keptCount)}

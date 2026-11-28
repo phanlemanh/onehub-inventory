@@ -359,14 +359,15 @@ describe("ap (E9)", () => {
     ).rows[0]!.kept.filter((k) => k.why === "unit-attribute");
     // The two catalog units also keep their tower text as written (S4-r7 t4); the new pending unit SA5-99.99 holds its
     // own tower text, so its row keeps none.
+    // In the file's order, row by row, column by column (one rule for preview and write, G-2811-84).
     expect(kept.map((k) => [k.header, k.raw])).toEqual([
+      ["Block", "[MAU] Toà"],
       ["Tầng", "Tầng 07"],
       ["Loại căn", label("SubTypeCondominium")],
       ["Diện tích", "72"],
       ["Block", "[MAU] Toà"],
       ["Tầng", "15a"],
       ["Loại căn", "2PN"],
-      ["Block", "[MAU] Toà"],
     ]);
     expect((await e.w.db.owner.query<{ n: string }>(catalog)).rows[0]!.n).toBe(before);
   });
@@ -1186,8 +1187,8 @@ describe("ap (E9) — audit", () => {
     ];
     expect(scanned.length).toBeGreaterThan(5);
     const SPEC = /(?:from\s+|import\s*\(\s*|import\s+)["']([^"']+)["']/g;
-    const reaches = scanned.flatMap((file) =>
-      [...readFileSync(file, "utf8").matchAll(SPEC)]
+    const reachesOf = (file: string, text: string) =>
+      [...text.matchAll(SPEC)]
         .map((m) => m[1]!)
         .filter((s) => {
           const target = s.startsWith("@/")
@@ -1201,9 +1202,25 @@ describe("ap (E9) — audit", () => {
             /llm/.test(s)
           );
         })
-        .map((s) => `${file.slice(root.length + 1)} → ${s}`),
-    );
+        .map((s) => `${file.slice(root.length + 1)} → ${s}`);
+    const reaches = scanned.flatMap((file) => reachesOf(file, readFileSync(file, "utf8")));
     expect(reaches).toEqual([]);
+    // Positive control (VP11 S4-r2 item 14): the scan finds each way in, planted in a file of the imports module.
+    const planted = join(root, "src/modules/imports/ui/planted.ts");
+    expect(
+      reachesOf(
+        planted,
+        [
+          'import { ask } from "@/ai/client";',
+          'import Anthropic from "@anthropic-ai/sdk";',
+          'const m = await import("../../../ai/llm");',
+        ].join("\n"),
+      ),
+    ).toEqual([
+      "src/modules/imports/ui/planted.ts → @/ai/client",
+      "src/modules/imports/ui/planted.ts → @anthropic-ai/sdk",
+      "src/modules/imports/ui/planted.ts → ../../../ai/llm",
+    ]);
   });
 });
 
@@ -1783,10 +1800,17 @@ function tableFaults(properties: readonly string[], columns: ReadonlySet<string>
 // target × situation of the row × mark of the cell, each with one declared outcome or «not applicable» and its reason;
 // the comparison runs over all of it and fails when a cell has no outcome or the matrix is empty.
 
-type Situation = "catalog" | "pending-existing" | "pending-new" | "listed";
+type Situation = "catalog" | "pending-existing" | "pending-new" | "listed" | "many-units";
 type Mark =
   "keep" | "fixed" | "chosen-remember" | "chosen-no-remember" | "chosen-as-written" | "ask";
-const SITUATIONS: Situation[] = ["catalog", "pending-existing", "pending-new", "listed"];
+// «many-units»: a code naming several units that nobody chose one for (VP11 S4-r2 item 9, ruling G-2811-84).
+const SITUATIONS: Situation[] = [
+  "catalog",
+  "pending-existing",
+  "pending-new",
+  "listed",
+  "many-units",
+];
 const MARKS: Mark[] = [
   "keep",
   "fixed",
@@ -1961,6 +1985,9 @@ function outcomeOf(
     return why ? { na: why } : { na: "" };
   }
   const t = col.target;
+  // A row whose unit is unresolved makes no listing and keeps every cell with text, its unit code too.
+  if (situation === "many-units")
+    return { kept: t === "unit" ? "many-units" : (askWhy ?? "row-not-created") };
   const created = situation !== "listed";
   // A unit that already has an open listing makes no listing: every cell of the row asks «already listed» and is kept
   // as written on the import; the unit code has nothing more to say.
@@ -2053,7 +2080,7 @@ function matrixFaults(
 }
 
 describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
-  it("the matrix is written before: 20 targets × 4 situations × 6 marks, every cell with one outcome or a named reason", () => {
+  it("the matrix is written before: 20 targets × 5 situations × 6 marks, every cell with one outcome or a named reason", () => {
     expect(MATRIX).toHaveLength(20);
     // The 18 standard targets and the two kinds of the company's own fields, each once.
     const standard = MATRIX.flatMap((c) =>
@@ -2063,7 +2090,7 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
     const cells = MATRIX.flatMap((col) =>
       SITUATIONS.flatMap((s) => MARKS.map((m) => ({ col, s, m, o: outcomeOf(col, s, m, "why") }))),
     );
-    expect(cells).toHaveLength(480);
+    expect(cells).toHaveLength(600);
     const unnamed = cells
       .filter((x) => "na" in x.o && !x.o.na)
       .map((x) => `${x.col.header}×${x.s}×${x.m}`);
@@ -2089,6 +2116,19 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
     );
     const catalog = await catalogCodes(e, 6, 3);
     const listedCodes = await catalogCodes(e, 6, 9);
+    // Six codes each naming two units of the catalog, as the reader of row 7e reads «DOI-0k».
+    const twoUnits = await catalogCodes(e, 12, 30);
+    for (let k = 0; k < 6; k += 1)
+      await e.w.db.owner.query(
+        `insert into catalog_aliases (object_key, kind, value, source)
+         values ($1, 'ma_goc', $3, 'THU'), ($2, 'ma_goc', $4, 'THU')`,
+        [
+          await unitKeyOf(e, twoUnits[2 * k]!),
+          await unitKeyOf(e, twoUnits[2 * k + 1]!),
+          `op3/DOI-0${k}`,
+          `op2/DOI-0${k}`,
+        ],
+      );
     const pendingIds: string[] = [];
     for (let k = 0; k < 6; k += 1)
       pendingIds.push(
@@ -2114,7 +2154,9 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
           ? listedCodes[k]!
           : s === "pending-existing"
             ? `SA5-90.0${k}`
-            : `SA5-91.0${k}`;
+            : s === "many-units"
+              ? `DOI-0${k}`
+              : `SA5-91.0${k}`;
     const rows = SITUATIONS.flatMap((situation) =>
       MARKS.map((mark, k) => ({
         situation,
@@ -2178,7 +2220,9 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
     );
     expect(wrongMark).toEqual([]);
     expect(promised.rows.map((x) => x.fate)).toEqual(
-      rows.map((r) => (r.situation === "listed" ? "listed" : "create")),
+      rows.map((r) =>
+        r.situation === "listed" ? "listed" : r.situation === "many-units" ? "blocked" : "create",
+      ),
     );
     const open = await e.h.open(
       req(
@@ -2275,6 +2319,15 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
       written.push({ listing, kept, unitOk, pendingBuilding: link.building, newCode });
     }
     expect(matrixFaults(promised, rows, written)).toEqual([]);
+    // The screen's two counts are the record's: «N ô giữ chữ gốc» is the record's kept cells, and the rows left out
+    // because their unit code names several units are said by number (G-2811-84).
+    expect(promised.keptCount).toBe(kept.length);
+    expect(promised.notCreatedCount).toBe(MARKS.length);
+    expect(
+      rows.flatMap((x, r) =>
+        x.situation === "many-units" && written[r]!.listing !== null ? [r] : [],
+      ),
+    ).toEqual([]);
     // What the person asked to remember: the company layer (row 7e) keeps a spelling for a closed set it holds — status,
     // withdrawal reason, direction and its own choice fields. For the other columns the value is written or kept as
     // above and the spelling is not learned, as declared here; the screen promises no more.
@@ -2327,11 +2380,12 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
       "0:Mã căn: listing not on its unit",
     ]);
     // A listed row that got a listing is named on its unit code (S4-r8 t9: the message is pinned, not just counted).
-    const lastListed = rows.length - 1;
+    const lastListed = rows.map((x) => x.situation).lastIndexOf("listed");
     expect(
       matrixFaults(promised, rows, [
         ...written.slice(0, lastListed),
         { ...written[lastListed]!, listing: r0.listing },
+        ...written.slice(lastListed + 1),
       ]),
     ).toEqual([`${lastListed}:Mã căn: a listing exists for a row-listed row`]);
     // An answer the person typed for a column kept as written, lost from the record, is named (G-2811-78): the cell

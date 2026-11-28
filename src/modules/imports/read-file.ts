@@ -9,7 +9,14 @@ export const FILE_LIMIT_BYTES = 10 * 1024 * 1024;
 export const ROW_LIMIT = 5000;
 
 export type ReadProblem =
-  "wrong-type" | "too-big" | "too-many-rows" | "empty" | "header-only" | "broken" | "locked";
+  | "wrong-type"
+  | "too-big"
+  | "too-many-rows"
+  | "empty"
+  | "header-only"
+  | "broken"
+  | "locked"
+  | "not-utf8";
 
 export type ReadTable =
   | { ok: true; sheet: string | null; otherSheets: string[]; headers: string[]; rows: string[][] }
@@ -74,7 +81,14 @@ export async function readTable(file: Blob, name: string): Promise<ReadTable> {
   if (file.size === 0) return { ok: false, problem: "empty" };
   const bytes = new Uint8Array(await file.arrayBuffer());
   if (kind === "csv") {
-    const text = new TextDecoder("utf-8").decode(bytes);
+    // Strict: a .csv saved in another encoding (Excel on Windows often saves one) is refused with its reason, never
+    // read with replacement characters (VP11 S4-r2 item 12). UTF-8 with or without its BOM reads.
+    let text: string;
+    try {
+      text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    } catch {
+      return { ok: false, problem: "not-utf8" };
+    }
     return finish(tableOf(readCsv(text)), null, []);
   }
   if (COMPOUND_FILE.every((b, i) => bytes[i] === b)) return { ok: false, problem: "locked" };
