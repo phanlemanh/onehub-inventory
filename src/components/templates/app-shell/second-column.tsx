@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useSyncExternalStore } from "react";
@@ -30,6 +31,12 @@ import {
   type NavLink,
 } from "../nav-menu";
 import { usePlaceChange } from "./place-change";
+
+/**
+ * The column's longest run: the screen less the top bar (3rem) and the inset's 8 px margin above and below, so the
+ * column never makes the page taller than the screen (owner, BH session 2026-11-27: the inventory grid at the right height).
+ */
+const COLUMN_HEIGHT = { "--second-column-height": "calc(100svh - 4rem)" } as CSSProperties;
 
 const COPY = FRAME_COPY.secondColumn;
 
@@ -214,14 +221,18 @@ export function SecondColumn({
       data-slot="app-shell-second-column-edge"
       className={cn(
         "hidden shrink-0 self-stretch transition-colors md:flex",
-        open && "border-r has-[[data-slot=second-column-rail]:hover]:border-ring/50",
+        open &&
+          "border-r has-[[data-slot=second-column-rail]:hover]:border-ring/50 has-[[data-slot=second-column-edge-hover]:hover]:border-ring/50",
       )}
     >
       <aside
         data-slot="app-shell-second-column"
+        style={COLUMN_HEIGHT}
         data-state={open ? "open" : "closed"}
         className={cn(
-          "sticky top-12 max-h-svh self-start overflow-x-hidden overflow-y-auto pb-12",
+          // Ends at the work area's bottom (screen less the top bar and the inset's two 8 px margins), so the column never makes
+          // the page taller than the screen (owner, BH session 2026-11-27: the inventory grid at the right height).
+          "sticky top-12 max-h-(--second-column-height) self-start overflow-x-hidden overflow-y-auto pb-4",
           open ? "w-56" : "w-0",
         )}
       >
@@ -230,32 +241,44 @@ export function SecondColumn({
         </div>
       </aside>
       {/* Fixed with no horizontal offset inside a zero-width block after the column: it stays on the column's edge, at
-          the middle of the window (a fixed child of the flex row itself would sit at the row's start). */}
-      <div className="w-0">
-        <div className="fixed top-1/2 z-30 -translate-y-1/2">
+          the middle of the window (a fixed child of the flex row itself would sit at the row's start). The pointer on
+          the column's edge, anywhere along it, shows the handle plainly as a button with its hint (owner, BH session
+          2026-11-27, «Duyệt cả sáu điểm», L6), instead of two faint strokes floating mid-column. */}
+      <div className="group/edge relative w-0 self-stretch">
+        <div
+          aria-hidden
+          data-slot="second-column-edge-hover"
+          className="absolute inset-y-0 -left-1.5 w-3"
+        />
+        {/* The frame the edge shows sits on this wrapper: the kit's button keeps its own look. */}
+        <div
+          data-slot="second-column-rail-frame"
+          className="fixed top-1/2 z-30 -translate-y-1/2 rounded-md group-hover/edge:bg-background group-hover/edge:shadow-sm group-hover/edge:ring-1 group-hover/edge:ring-border"
+        >
           <Button
             variant="ghost"
             size="icon-sm"
             data-slot="second-column-rail"
             aria-label={open ? COPY.collapse : COPY.expand}
+            title={open ? COPY.collapse : COPY.expand}
             aria-expanded={open}
             onClick={() => setOpen(!open)}
           >
             <span aria-hidden className="flex flex-col items-center">
               <span
                 className={cn(
-                  "block h-2 w-0.5 origin-bottom rounded-t-full bg-foreground/40 transition-transform duration-100 ease-linear group-hover/button:bg-foreground/60 group-focus-visible/button:bg-foreground/60",
+                  "block h-2 w-0.5 origin-bottom rounded-t-full bg-foreground/40 transition-transform duration-100 ease-linear group-hover/button:bg-foreground/60 group-hover/edge:bg-foreground/60 group-focus-visible/button:bg-foreground/60",
                   open
-                    ? "group-hover/button:rotate-40 group-focus-visible/button:rotate-40"
-                    : "group-hover/button:-rotate-40 group-focus-visible/button:-rotate-40",
+                    ? "group-hover/button:rotate-40 group-hover/edge:rotate-40 group-focus-visible/button:rotate-40"
+                    : "group-hover/button:-rotate-40 group-hover/edge:-rotate-40 group-focus-visible/button:-rotate-40",
                 )}
               />
               <span
                 className={cn(
-                  "block h-2 w-0.5 origin-top rounded-b-full bg-foreground/40 transition-transform duration-100 ease-linear group-hover/button:bg-foreground/60 group-focus-visible/button:bg-foreground/60",
+                  "block h-2 w-0.5 origin-top rounded-b-full bg-foreground/40 transition-transform duration-100 ease-linear group-hover/button:bg-foreground/60 group-hover/edge:bg-foreground/60 group-focus-visible/button:bg-foreground/60",
                   open
-                    ? "group-hover/button:-rotate-40 group-focus-visible/button:-rotate-40"
-                    : "group-hover/button:rotate-40 group-focus-visible/button:rotate-40",
+                    ? "group-hover/button:-rotate-40 group-hover/edge:-rotate-40 group-focus-visible/button:-rotate-40"
+                    : "group-hover/button:rotate-40 group-hover/edge:rotate-40 group-focus-visible/button:rotate-40",
                 )}
               />
             </span>

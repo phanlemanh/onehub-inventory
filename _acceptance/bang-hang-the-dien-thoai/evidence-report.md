@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 9a9385eafff8dd8cf1a3ca391a74c7cc5c037aae
+verified_commit: 808af8c561772a5926a525f82fd346a9b9200303
 human_signoff: Manh Phan 2026-11-15
 ---
 
@@ -267,3 +267,15 @@ sha: ca55e56f9c6f9ea46e113686386ce08f38a0de2f · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 9 — 2026-11-16, do gộp main ee661ce sau chữ ký hàng 10; 2b, 3e hoá cũ do bài lượt 4
 run_id: repin-20261116T125923Z-77997
 sha: 9a9385eafff8dd8cf1a3ca391a74c7cc5c037aae · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E10 (E10 không khai paths), E11, E16 (E16 không khai paths) · diff chạm vật đo ngoài làn máy: E11 — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 10 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi kỳ vọng bài của các hồ sơ đã ký; thước 2e sửa ở ec70d782 (G-2711-36); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T185306Z-85596
+sha: 8f4041b5a07324f15e575fa0d8b5827f54618c32 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E10 (E10 không khai paths), E11, E16 (E16 không khai paths) · diff chạm vật đo ngoài làn máy: E11 — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 11 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi bài của các hồ sơ đã ký: thước viền Q3, open-cell-truncate (G-2811-6), bài 44 px và các bài xanh rỗng (G-2811-11); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T222637Z-53064
+sha: e9d9acd8a540391c31e93bb5fd9fc0a2880e709a · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E10 (E10 không khai paths), E11, E16 (E16 không khai paths) · diff chạm vật đo ngoài làn máy: E11 — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 12 — 2026-11-28, do gộp main c55415fe (PR #133) vào nhánh VP10; thước E4 hồ sơ deploy (2efc5370); bài 3g chụp ra thư mục chạy (1cb3073b) — G-2811-45/51
+run_id: repin-20261128T015659Z-62110
+sha: 808af8c561772a5926a525f82fd346a9b9200303 · suites: 3 lệnh exit 0 · evals: 13/13 eval máy đạt kỳ vọng · ngoài làn máy: E10 (E10 không khai paths), E11, E16 (E16 không khai paths)

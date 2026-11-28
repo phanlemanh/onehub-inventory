@@ -5,7 +5,7 @@
 // buttons — filter (with the number of active filters), group, and «…» for the region's own action (save view). The
 // filter sheet opens from the bottom with «Sắp theo» first, then every column's filter box; active filters show as
 // chips. Filters, sort, grouping, the record and the states stay the region's: this is the same table, drawn as cards.
-import { EllipsisIcon, ListTreeIcon, SlidersHorizontalIcon, XIcon } from "lucide-react";
+import { ListTreeIcon, SlidersHorizontalIcon, XIcon } from "lucide-react";
 import { useState, type MouseEvent, type ReactElement, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 import type { TypedColumn } from "./column-kind";
 import { ColumnFilterCell, type FilterOption } from "./column-filter-cell";
+import { CornerClose } from "./corner-close";
 import { GRID_COPY, GRID_I18N } from "./grid-copy";
 import { RECORD_PARAM } from "./record-panel";
 import { TouchTarget } from "./touch-target";
@@ -40,28 +41,35 @@ type ColumnOf<Row extends object> = (
   field: string,
 ) => Parameters<typeof ColumnFilterCell<Row>>[0]["column"] | undefined;
 
-/** An icon button with its name read out and shown on hover or focus. */
+/**
+ * A toolbar button 44 px high, its name read out and shown on hover or focus (owner, BH session 2026-11-27, «Duyệt cả
+ * sáu điểm», L5: the phone's toolbar buttons are 44 px, not 36 px in a 44 px touch target). With `words`, the button
+ * also says its name beside its icon.
+ */
 function IconButton({
   label,
   pressed,
   slot,
   onClick,
   children,
+  words = false,
 }: {
   label: string;
   pressed?: boolean;
   slot: string;
   onClick: () => void;
   children: ReactElement;
+  words?: boolean;
 }) {
   return (
-    <TouchTarget>
+    // The 44 px sits on the wrapper, which sizes the kit's button inside it (the button keeps the kit's look).
+    <span className={words ? "flex [&>button]:h-11" : "flex [&>button]:size-11"}>
       <Tooltip>
         <TooltipTrigger
           render={
             <Button
               variant={pressed ? "secondary" : "ghost"}
-              size="icon-lg"
+              size={words ? "lg" : "icon-lg"}
               aria-label={label}
               aria-pressed={pressed}
               data-slot={slot}
@@ -70,10 +78,11 @@ function IconButton({
           }
         >
           {children}
+          {words ? label : null}
         </TooltipTrigger>
         <TooltipContent>{label}</TooltipContent>
       </Tooltip>
-    </TouchTarget>
+    </span>
   );
 }
 
@@ -145,7 +154,10 @@ export function PhoneList<Row extends PhoneRow>({
   /** «60 dòng» or «24 / 60 dòng». */
   count: string;
   group?: { label: string; on: boolean; toggle: () => void };
-  /** The region's own action (save view), behind «…». */
+  /**
+   * The region's own actions (save view), shown as they are in the toolbar: by the «…» rule (owner, BH session
+   * 2026-11-27) one or two ordinary actions show directly, so a screen with three or more passes its own «…» here.
+   */
   more?: ReactNode;
   /** The row's «…» (row 9e), beside the card; absent when the screen has no actions on a row. */
   rowAction?: (row: Row) => ReactNode;
@@ -154,7 +166,7 @@ export function PhoneList<Row extends PhoneRow>({
   onClear: () => void;
   noMatch: ReactNode;
 }) {
-  const [sheet, setSheet] = useState<"filters" | "more" | null>(null);
+  const [sheet, setSheet] = useState<"filters" | null>(null);
   const active = columns.filter((c) => activeFields.includes(c.field));
   const filterName =
     active.length > 0 ? GRID_COPY.sheet.filterOn(active.length) : GRID_COPY.sheet.filter;
@@ -194,24 +206,16 @@ export function PhoneList<Row extends PhoneRow>({
           {count}
         </span>
         <div className="-mr-1.5 flex items-center">
-          <span className="relative">
-            <IconButton
-              label={filterName}
-              pressed={active.length > 0}
-              slot="phone-filter-button"
-              onClick={() => setSheet("filters")}
-            >
-              <SlidersHorizontalIcon aria-hidden="true" />
-            </IconButton>
-            {active.length > 0 ? (
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute top-0.5 right-0.5 flex size-4 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground"
-              >
-                {active.length}
-              </span>
-            ) : null}
-          </span>
+          {/* «Lọc» says its name and how many columns are filtered (L5; row 2b's «Lọc (kèm số ô đang lọc)»). */}
+          <IconButton
+            label={filterName}
+            pressed={active.length > 0}
+            slot="phone-filter-button"
+            onClick={() => setSheet("filters")}
+            words
+          >
+            <SlidersHorizontalIcon aria-hidden="true" />
+          </IconButton>
           {group ? (
             <IconButton
               label={group.label}
@@ -223,13 +227,10 @@ export function PhoneList<Row extends PhoneRow>({
             </IconButton>
           ) : null}
           {more ? (
-            <IconButton
-              label={GRID_COPY.phone.more}
-              slot="phone-more"
-              onClick={() => setSheet("more")}
-            >
-              <EllipsisIcon aria-hidden="true" />
-            </IconButton>
+            // The region's actions straight in the toolbar, 44 px high like its other buttons (L1, L5).
+            <div data-slot="phone-actions" className="flex items-center gap-1 [&_button]:h-11">
+              {more}
+            </div>
           ) : null}
         </div>
       </div>
@@ -271,37 +272,32 @@ export function PhoneList<Row extends PhoneRow>({
         <ul className="divide-y">{data.map(item)}</ul>
       )}
       <Sheet open={sheet !== null} onOpenChange={(next) => setSheet(next ? sheet : null)}>
-        <SheetContent side="bottom">
+        <SheetContent side="bottom" showCloseButton={false}>
           <SheetHeader>
-            <SheetTitle>
-              {sheet === "more" ? GRID_COPY.phone.more : GRID_COPY.sheet.filter}
-            </SheetTitle>
+            <SheetTitle>{GRID_COPY.sheet.filter}</SheetTitle>
           </SheetHeader>
           <div className="max-h-96 overflow-y-auto px-4 pb-6">
-            {sheet === "more" ? (
-              <div className="flex flex-col items-start gap-2">{more}</div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {sort ? <SortBlock sort={sort} /> : null}
-                <div data-slot="phone-filters" className="flex flex-col gap-3">
-                  {columns.map((spec) => {
-                    const tableColumn = column(spec.field);
-                    if (!tableColumn) return null;
-                    return (
-                      <div key={spec.field} data-field={spec.field} className="flex flex-col gap-1">
-                        <span className="text-xs text-muted-foreground">{spec.header}</span>
-                        <ColumnFilterCell
-                          spec={spec}
-                          column={tableColumn}
-                          options={options.get(spec.field) ?? []}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
+            <div className="flex flex-col gap-4">
+              {sort ? <SortBlock sort={sort} /> : null}
+              <div data-slot="phone-filters" className="flex flex-col gap-3">
+                {columns.map((spec) => {
+                  const tableColumn = column(spec.field);
+                  if (!tableColumn) return null;
+                  return (
+                    <div key={spec.field} data-field={spec.field} className="flex flex-col gap-1">
+                      <span className="text-xs text-muted-foreground">{spec.header}</span>
+                      <ColumnFilterCell
+                        spec={spec}
+                        column={tableColumn}
+                        options={options.get(spec.field) ?? []}
+                      />
+                    </div>
+                  );
+                })}
               </div>
-            )}
+            </div>
           </div>
+          <CornerClose of="sheet" />
         </SheetContent>
       </Sheet>
     </div>

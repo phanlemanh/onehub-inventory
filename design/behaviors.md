@@ -9,7 +9,7 @@ Câu trả lời đóng cho các việc lặp lại, để không phải đoán 
 - **Canh cột:** `money`, `area`, `count` canh phải; còn lại canh trái
 - **Bề rộng cột:** `max(độ dài nhãn, độ dài mẫu của kiểu) × 1ch + đệm hai bên`; cột `text`, `person` thay độ dài mẫu bằng chuỗi dài nhất vùng đang giữ, không quá độ dài đọc của kiểu, cộng 1ch dư
 - **Mật độ bảng:** Tổng bề rộng tối thiểu vượt vùng nội dung thì dày (`h-8`, `text-sm`), không thì thường (`h-12`, `text-base`)
-- **Mở hồ sơ cạnh bảng:** Có địa chỉ riêng; Esc đóng và trả tiêu điểm về dòng cũ; trên điện thoại mở toàn màn; từ 768 px là ngăn nổi bên phải rộng khoảng hai phần năm, từ ngay dưới thanh trên tới đáy màn hình, không khoá bảng, đầu hồ sơ hai dòng — tên, rồi dòng nút với Trước, Sau, Đóng ở mép phải (quyết định 0024; hai dòng từ hàng 3e); ngăn nổi đứng dưới thanh công cụ của vùng; nút Ghim (khi vùng làm việc từ 800 px) biến ngăn thành cột cạnh bảng, bảng nhường chỗ, vạch chia kéo được 320 px tới ba phần năm, ghim và độ rộng nhớ bằng cookie (hàng 3a, quyết định 0031)
+- **Mở hồ sơ cạnh bảng:** Có địa chỉ riêng; Esc đóng và trả tiêu điểm về dòng cũ; trên điện thoại mở toàn màn; từ 768 px là ngăn nổi bên phải rộng khoảng hai phần năm, từ ngay dưới thanh trên App Shell tới đáy, sát mép phải, nổi trên nội dung (nền lớp nổi, viền trái, bóng), không khoá bảng (quyết định 0024; chủ kho 2026-11-27 «Chốt cả bốn», thay cách hàng 3a đặt ngăn dưới thanh công cụ của vùng); khi ngăn nổi, thanh công cụ của vùng dừng cách ngăn 16 px; khi ngăn mở cạnh lưới, nổi hay ghim, nút của thanh công cụ chỉ còn hình, có tên đọc và chữ gợi ý (ghim: chủ kho 2026-11-27, Cổng Phạm vi khung-luoi-va-ngan-chi-tiet, Hỏi-7); đầu hồ sơ một dòng ở mọi khổ — tên bên trái, góc phải trên Chép đường dẫn, Ghim, Trước, Sau, Đóng, chỉ hình, có tên đọc và chữ gợi ý (chủ kho 2026-11-27 «Chốt một dòng», thay hai dòng của hàng 3e); lưới cao khít màn, đáy cách vùng làm việc 16 px, cột thứ hai không làm trang cuộn thừa (chủ kho 2026-11-27); nút Ghim (khi vùng làm việc từ 800 px) biến ngăn thành cột cạnh bảng, bảng nhường chỗ, vạch chia kéo được 320 px tới ba phần năm, ghim và độ rộng nhớ bằng cookie (hàng 3a, quyết định 0031)
 - **Chia trang:** Không chia trang: lưới cuộn liền một mạch (bảng cuộn ảo ReUI), tiêu đề đứng yên khi cuộn dọc, cột số dòng và hai cột đầu đứng yên khi cuộn ngang; chân bảng ghi số dòng (chốt ở Bảng hàng, «đọc như Sheet»)
 - **Tiêu điểm:** Hàng và cột dính không che ô đang chọn
 - **Đăng nhập:** Dán được mã, cho trình quản lý mật khẩu điền
@@ -36,27 +36,43 @@ Câu trả lời đóng cho các việc lặp lại, để không phải đoán 
 Hàng 9e, lựa chọn của chủ kho ở Cổng Phạm vi (2026-11-12). Bảng quyền `ontology/actions.yaml` là nguồn duy nhất: nút hiện
 khi vai của phiên có ô cho thao tác của nút (`actionVisibility` cạnh `allowedScope`), màn không so tên vai.
 
-| Nút                                              | Chỗ                       | Máy tính                             | Điện thoại                                       |
-| ------------------------------------------------ | ------------------------- | ------------------------------------ | ------------------------------------------------ |
-| Thêm thứ chính của màn (thêm căn, thêm liên hệ)  | Đầu màn, cạnh tiêu đề (C) | Một nút chính, chữ «Thêm <danh từ>»  | Cùng chỗ, cùng chữ                               |
-| Nút của vùng (việc trên cả vùng)                 | Đầu vùng, bên phải        | Nút phụ trong thanh công cụ của vùng | Cùng chỗ; thanh công cụ xuống dòng khi chật      |
-| Thao tác trên một dòng                           | Một nút «…» (R1)          | Cột cuối của lưới, ghim bên phải     | Cột cuối của lưới, ghim nên luôn thấy ở mép phải |
-| Thao tác trong hồ sơ                             | Đầu hồ sơ, bên phải       | Một nút chính (thường là Sửa) và «…» | Như máy tính, trong hồ sơ toàn màn               |
-| Bước kế với một người (hỏi người giữ căn)        | Đáy hồ sơ, dính (D)       | Đúng một nút, rộng hết hồ sơ         | Cùng chỗ, nút cỡ lớn                             |
-| Việc trên một mục của hồ sơ (báo sai thuộc tính) | Đầu mục, bên phải         | Nút phụ không viền                   | Cùng chỗ                                         |
+| Nút                                              | Chỗ                       | Máy tính                             | Điện thoại                                        |
+| ------------------------------------------------ | ------------------------- | ------------------------------------ | ------------------------------------------------- |
+| Thêm thứ chính của màn (thêm căn, thêm liên hệ)  | Đầu màn, cạnh tiêu đề (C) | Một nút chính, chữ «Thêm <danh từ>»  | Cùng chỗ, cùng chữ                                |
+| Nút của vùng (việc trên cả vùng)                 | Đầu vùng, bên phải        | Nút phụ trong thanh công cụ của vùng | Cùng chỗ; thanh công cụ xuống dòng khi chật       |
+| Thao tác trên một dòng                           | Theo luật «…» dưới đây    | Cột cuối của lưới, ghim bên phải     | Cột cuối của lưới, ghim nên luôn thấy ở mép phải  |
+| Đi lại và việc của cả bản ghi trong hồ sơ        | Đầu hồ sơ, góc phải trên  | Trước, Sau, Đóng và «…»; chỉ hình    | Như máy tính, trong hồ sơ toàn màn; vùng bấm 44px |
+| Sửa một mục của hồ sơ                            | Đầu mục nó sửa, bên phải  | «Sửa», mỗi mục sửa được một nút      | Cùng chỗ; vùng bấm 44px                           |
+| Bước kế với một người (hỏi người giữ căn)        | Đáy hồ sơ, dính (D)       | Đúng một nút, rộng hết hồ sơ         | Cùng chỗ, nút cỡ lớn                              |
+| Việc trên một mục của hồ sơ (báo sai thuộc tính) | Đầu mục, bên phải         | Nút phụ không viền                   | Cùng chỗ; vùng bấm 44px                           |
 
 - Toàn màn hình (từ 768px): đầu màn ẩn, nên nút thêm của đầu màn hiện ở thanh công cụ của vùng — một nút, hai chỗ theo
   chế độ, không bao giờ hai nút cùng lúc (giám sát phân xử V-1211-6, chủ kho phê ở Cổng Bằng chứng).
-- Đầu hồ sơ hai dòng ở mọi khổ (chủ kho 2026-11-13, «Có, mọi khổ»; hàng 3e): tên bản ghi một dòng riêng; dưới là một dòng
-  nút — việc của bản ghi, «Trước», «Sau», «Đóng» ở mép phải. «Chép đường dẫn» chỉ là biểu tượng, có tên cho trình đọc màn hình
-  và gợi ý khi rê.
+- Đầu hồ sơ một dòng ở mọi khổ (chủ kho 2026-11-27, «Chốt một dòng», trả lời «Chốt đầu chi tiết căn một dòng, nút
+  Trước/Sau/Đóng ở góc phải trên?»; thay «Có, mọi khổ» hai dòng của hàng 3e, 2026-11-13): tên bản ghi bên trái, cắt «…» khi
+  dài; góc phải trên, cùng dòng: việc của bản ghi, «Chép đường dẫn», «Ghim» (từ 800 px), «Trước», «Sau», «Đóng» ở mép phải.
+  Mọi nút ấy chỉ là biểu tượng, có tên cho trình đọc màn hình và cùng chữ ấy làm gợi ý khi rê; vừa 320 px.
+- **Chuẩn nút dùng chung** (chủ kho 2026-11-27, «Duyệt cả ba câu»):
+  1. «Sửa» đặt ở đầu mục nó sửa, mỗi mục sửa được một nút; đầu hồ sơ chỉ giữ đi lại (Trước, Sau, Đóng) và «…» cho việc của cả
+     bản ghi. Thay luật «đầu hồ sơ có nút chính Sửa» của hàng 9e.
+  2. Việc bị chặn vì trạng thái (căn đã bán) thì thay nút bằng một dòng chữ nhạt có ổ khoá nói lý do («Căn đã bán, không
+     sửa»); không nút mờ, không biến mất im lặng.
+  3. Trên điện thoại (dưới 768 px), nút ở đầu hồ sơ, đầu mục và đáy hồ sơ có vùng bấm ít nhất 44 px; máy tính giữ 28 px.
+     Câu 1 và 2 trong ngăn chi tiết căn dựng ở hàng 3h; câu 3 là phần khung dùng chung (`RecordPanel`, `SectionHeader`).
+- **Luật «…»** (chủ kho 2026-11-27, «Duyệt luật đã sửa»; thay R1 «một nút «…»» của hàng 9e):
+  1. Đếm theo tập việc có thể có của chỗ ấy (mọi vai, mọi trạng thái), không đếm theo từng dòng: mọi dòng cùng một hình.
+  2. Một hoặc hai việc thường thì hiện thẳng. Từ ba việc, hoặc có việc xoá, thì cả chỗ ấy dùng «…»; việc xoá đứng cuối, chữ
+     đỏ, qua hộp xác nhận.
+  3. «…» luôn hiện, không chỉ khi rê chuột; tên đọc «Việc với <tên bản ghi>» (ví dụ «Việc với căn 0905»).
+     Hệ quả: «Đổi vai» của Thành viên hiện thẳng; hàng công cụ điện thoại của Bảng hàng hiện thẳng «Lưu góc nhìn» thay «…».
 - Thanh dính đáy hồ sơ (D, hàng 3e, giám sát G-1311-38): chỗ đặt thứ năm, ngoài vùng cuộn của thân, chứa đúng MỘT nút — bước
   kế với một con người («Hỏi đầu chủ» cho người không giữ căn; «Ghi cuộc gọi» của người giữ căn là hàng 14). Không phải thanh
   công cụ. Không có nút thì không có thanh. Căn chưa ai giữ thì nút tắt và chữ nút nói vì sao — trạng thái của căn, không phải
   quyền, nên không trái luật «không có nút mờ».
 - Nút gửi tin cho người khác chỉ soạn tin rồi mở bảng chia sẻ của máy (`src/lib/share`); máy không có thì chép và báo; không
   lời gọi mạng nào (SP-3).
-- Trong mọi «…»: việc thường trước, việc xoá sau cùng, tách bằng một vạch, chữ đỏ. «…» không còn việc nào thì không có «…».
+- Trong mọi «…»: việc thường trước, việc xoá sau cùng, tách bằng một vạch, chữ đỏ. Vai đang xem không có việc nào ở chỗ ấy
+  thì không có «…».
 - Chữ trên nút là động từ thường kèm danh từ (H1): «Sửa», «Xoá căn», «Xoá liên hệ», «Gộp với liên hệ khác…», «Xoá tên và số
   theo yêu cầu». «Xoá» là gỡ khỏi danh sách và giữ dấu vết ai xoá, lúc nào (quyết định 0016, sửa ngày 2026-11-12).
 - Việc xoá luôn qua hộp xác nhận ngắn (X1) của `useChange`: tiêu đề hỏi đúng việc, một câu nói việc sẽ xảy ra, tiêu điểm đầu ở

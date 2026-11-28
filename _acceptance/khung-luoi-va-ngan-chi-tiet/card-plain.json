@@ -1,0 +1,128 @@
+{
+  "feature_plain": "Bảng hàng và Đã gửi đã dựng đúng khung anh chốt ở phiên BH ngày 27/11: ngăn chi tiết nổi từ dưới thanh trên tới đáy và tách khỏi lưới bằng viền và bóng ở nền sáng, bằng đường viền ở nền tối; lưới khít màn, đầu ngăn một dòng, nút đủ cỡ ngón tay trên điện thoại, và sáu chỗ nút L1–L6.",
+  "will_do": [
+    {
+      "id": "AC-1",
+      "p": "Sẽ mở chi tiết căn (và chi tiết lần gửi) thành ngăn nổi từ ngay dưới thanh trên tới đáy, sát mép phải, nền khác trang, có viền và bóng — sáng lẫn tối."
+    },
+    {
+      "id": "AC-3",
+      "p": "Sẽ cho thanh công cụ dừng trước ngăn 16 px khi ngăn nổi, nút chỉ còn hình kèm tên đọc và chữ gợi ý — không nút nào bị ngăn cắt đôi."
+    },
+    {
+      "id": "AC-4",
+      "p": "Sẽ đặt đầu ngăn trên một dòng ở mọi khổ: tên căn bên trái, Chép đường dẫn, Ghim, Trước, Sau, Đóng ở góc phải trên, chỉ hình."
+    },
+    {
+      "id": "AC-5",
+      "p": "Sẽ cho mọi nút ở đầu ngăn, đầu mục và đáy ngăn trên điện thoại cao từ 44 px; máy tính giữ 28 px."
+    },
+    {
+      "id": "AC-6",
+      "p": "Sẽ hiện thẳng «Lưu góc nhìn» trên hàng công cụ điện thoại (bỏ «…» tên «Thêm»), nút cao 44 px, «Lọc» có chữ và số ô đang lọc."
+    },
+    {
+      "id": "AC-7",
+      "p": "Sẽ cho nút × của hộp thoại và ngăn đáy đọc «Đóng» thay vì «Close»."
+    },
+    {
+      "id": "AC-8",
+      "p": "Sẽ đưa mọi ô lọc dưới tiêu đề cột về một chiều cao, tên cột thẳng hàng."
+    },
+    {
+      "id": "AC-10",
+      "p": "Sẽ cho nút gập cột thứ hai hiện rõ khi rê chuột vào mép cột, có chữ gợi ý «Gập cột thứ hai»."
+    },
+    {
+      "id": "AC-11",
+      "p": "Sẽ giữ mọi bài kiểm của kho xanh ở bốn khổ, sáng và tối, kể cả bộ có đăng nhập; không sửa tệp nào của bộ kit giao diện."
+    },
+    {
+      "id": "AC-12",
+      "p": "Sẽ ghi lời anh vào sổ hành vi và trang quyết định đúng như anh nói, không thêm việc anh không bảo, không đưa sáu câu chưa quyết vào phần đã làm."
+    }
+  ],
+  "wont_do": [
+    {
+      "id": "AC-2",
+      "p": "Sẽ KHÔNG để trang cuộn thừa dưới lưới; đáy lưới cách đáy màn 16 px."
+    },
+    {
+      "id": "AC-9",
+      "p": "Sẽ KHÔNG còn nút «Bỏ ghim» riêng trên tiêu đề cột; ghim và bỏ ghim nằm trong trình đơn của tiêu đề, cột ghim cuối đổ bóng."
+    },
+    {
+      "id": "OOS-1",
+      "p": "KHÔNG dựng phần trong ngăn (chỗ «Sửa» ở đầu mục, dòng khoá có lý do) — hàng 3h dựng trên khung này."
+    },
+    {
+      "id": "OOS-2",
+      "p": "KHÔNG làm chuẩn hoá màu trạng thái, Enter/phím cách trên ô và lọc — việc riêng VP11."
+    },
+    {
+      "id": "OOS-3",
+      "p": "KHÔNG đổi luật «cột Căn luôn ghim» trong lát này — hỏi anh ở Hỏi-8."
+    },
+    {
+      "id": "OOS-4",
+      "p": "KHÔNG sửa tệp của bộ kit giao diện."
+    },
+    {
+      "id": "OOS-5",
+      "p": "KHÔNG dựng D1, D2, D4 và phần mà các câu hỏi dưới đây đòi — lát 2 dựng, dẫn nguyên văn câu trả lời của anh ở cổng này, không gọi anh duyệt phạm vi lần nữa."
+    }
+  ],
+  "scope_plain": "Năm chỗ để ngoài lát này, đúng như anh duyệt ở Cổng Phạm vi:",
+  "coverage_plain": [
+    {
+      "i": 0,
+      "p": "Mỗi điều anh đã chốt có một tiêu chí đo: ngăn và bề mặt (AC-1), lưới khít (AC-2), thanh công cụ nhường ngăn (AC-3), đầu một dòng (AC-4), nút 44 px (AC-5), sáu điểm L1–L6 (AC-6 tới AC-10); luật «…» và chuẩn nút ghi vào sổ hành vi (AC-12)."
+    },
+    {
+      "i": 1,
+      "p": "Bốn khổ: điện thoại 360, 414 cho đầu ngăn, nút 44 px, hàng công cụ, nút «Đóng»; máy tính 1024, 1440 cho ngăn nổi, lưới, ô lọc, ghim cột, nút gập."
+    },
+    {
+      "i": 2,
+      "p": "Sáng và tối cho ngăn, đầu ngăn và toàn bộ kiểm kho."
+    },
+    {
+      "i": 3,
+      "p": "Mọi dáng của ngăn: nổi, ghim thành cột, toàn màn hình, toàn màn trên điện thoại, và khi ngăn đóng."
+    },
+    {
+      "i": 4,
+      "p": "Hai màn họ Lưới: Bảng hàng ở mọi tiêu chí, Đã gửi ở ngăn nổi, thanh công cụ và kiểm kho."
+    },
+    {
+      "i": 5,
+      "p": "Không hồi quy: kiểm cả kho, bộ trình duyệt chung và bộ có đăng nhập đều phải xanh (AC-11)."
+    },
+    {
+      "i": 6,
+      "p": "Để sau: sáu câu chưa có luật — anh trả lời ở cổng này, phần dựng thuộc lát 2; ba đề xuất «máy giữ» anh đã duyệt, thành việc công cụ VP12. Chuẩn hoá màu, phím, lọc là VP11."
+    }
+  ],
+  "gap_probe_plain": [
+    {
+      "i": 0,
+      "p": "Hai chỗ máy tự quyết mà lẽ ra phải hỏi anh (chữ nút khi ngăn ghim; chặn bỏ ghim cột Căn) — đã chuyển thành Hỏi-7 và Hỏi-8."
+    },
+    {
+      "i": 1,
+      "p": "Bộ chấm bằng mắt không có nguyên văn luật để so — đã chép nguyên văn chuẩn nút, luật «…» và sáu câu vào hồ sơ."
+    },
+    {
+      "i": 2,
+      "p": "Đã gửi gần như không được đo — đã thêm bài đo ngăn và thanh công cụ trên Đã gửi, có chiều đỏ, và ảnh Đã gửi."
+    },
+    {
+      "i": 3,
+      "p": "Hàng công cụ điện thoại chưa đo chiều cao, chưa thử trạng thái hai nút lưu — đã đo (đỏ khi xuống dòng) và chuyển trạng thái hai nút thành Hỏi-9."
+    },
+    {
+      "i": 4,
+      "p": "Vài phép đo chưa có chiều đỏ gọi tên — đã thêm cho giữ chỗ cuộn khi ghim, bóng cột ghim và nút gập cột."
+    }
+  ]
+}

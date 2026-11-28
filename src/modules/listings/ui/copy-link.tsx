@@ -25,8 +25,9 @@ export function CopyLink({ id }: { id: string }) {
     }
   }
   return (
+    // Ghost like the other icon buttons of the record's header line (BH session 2026-11-27).
     <Button
-      variant="outline"
+      variant="ghost"
       size="icon-sm"
       aria-label={ENTRY_COPY.copyLink}
       title={ENTRY_COPY.copyLink}

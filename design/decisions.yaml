@@ -271,7 +271,7 @@ decisions:
   - id: record-panel
     layer: patterns
     kind: closed
-    source: "design/behaviors.md"
+    source: "design/behaviors.md (quyết định 0024; khung ngăn nổi và đầu một dòng chủ kho chốt 2026-11-27, quyết định 0051)"
     check: "test:tests/behavior.test.tsx"
   - id: grid-continuous-run
     layer: patterns
@@ -281,7 +281,7 @@ decisions:
   - id: action-buttons
     layer: patterns
     kind: closed
-    source: "design/behaviors.md, mục «Bộ nút theo quyền» (hàng 9e, chủ kho chọn ở Cổng Phạm vi 2026-11-12)"
+    source: "design/behaviors.md, mục «Bộ nút theo quyền» (hàng 9e, chủ kho chọn ở Cổng Phạm vi 2026-11-12; chuẩn nút dùng chung và luật «…» chủ kho duyệt 2026-11-27, quyết định 0051)"
     check: "test:src/components/candidate/row-actions.test.tsx"
   - id: grid-reuse-no-styling
     layer: patterns
