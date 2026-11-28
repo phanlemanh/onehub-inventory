@@ -5,7 +5,7 @@ slug: migration-vai-chu-khong-sieu-cap
 owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [config]
-status: approved
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-28
 design_doc: _acceptance/migration-vai-chu-khong-sieu-cap/design.md
