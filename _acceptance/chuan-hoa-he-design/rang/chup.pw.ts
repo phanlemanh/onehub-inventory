@@ -1,6 +1,7 @@
 // Frames for E15, the same screens, sizes and sample data before and after VP11 slice 1:
 //   CHUP_DIR=<folder> npx playwright test -c _acceptance/chuan-hoa-he-design/rang/chup.config.ts
-// With CHUP_PHA=1 it also writes pha/mau-1440-light-trung.png: «Chưa đủ để rao» forced onto «Tạm ngừng»'s badge.
+// CHUP_TRUOC=1 marks a run on the tree before the round (no pencil to wait for). With CHUP_PHA=1 it also writes
+// pha/mau-1440-light-trung.png: «Chưa đủ để rao» forced onto «Tạm ngừng»'s badge.
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 
@@ -39,8 +40,26 @@ test("frames", async ({ page }) => {
     await page.screenshot({ path: join(DIR, `the-360-${scheme}.png`) });
   }
   await open(page, 1024, 768, "light");
-  await cell(page, "1101", "Listing.listPrice").hover({ position: { x: 3, y: 3 } });
+  // At 1024 the price column runs past the grid's right edge, and the pencil sits at the cell's right end: the grid is
+  // scrolled until the whole cell is inside it, or the frame shows no pencil whatever the page does (E15 round 1).
+  const price = cell(page, "1101", "Listing.listPrice");
+  const inside = await price.evaluate((td) => {
+    const view = td.closest('[data-slot="scroll-area-viewport"]');
+    if (!view) return false;
+    const over = td.getBoundingClientRect().right - view.getBoundingClientRect().right;
+    if (over > 0) view.scrollLeft += over + 16;
+    const c = td.getBoundingClientRect();
+    const v = view.getBoundingClientRect();
+    return c.left >= v.left && c.right <= v.right;
+  });
+  expect(inside, "the price cell of 1101 is not wholly inside the grid at 1024").toBe(true);
+  await page.waitForTimeout(200);
+  await price.hover({ position: { x: 3, y: 3 } });
   await page.waitForTimeout(300);
+  // After this round the hovered price cell shows its pencil; the frame is not taken without it. Before the round
+  // (CHUP_TRUOC=1) the grid had no pencil, so there is nothing to wait for.
+  if (process.env.CHUP_TRUOC !== "1")
+    await expect(price.locator('[data-slot="cell-pencil"]')).toHaveCSS("opacity", "1");
   await page.screenshot({ path: join(DIR, "re-gia-1024-light.png") });
   await cell(page, "1101", "Listing.listPrice").click({ position: { x: 3, y: 3 } });
   await page.keyboard.press("F2");
