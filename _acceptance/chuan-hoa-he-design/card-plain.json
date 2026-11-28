@@ -136,5 +136,13 @@
       "i": 4,
       "p": "«Bấm ra ngoài là lưu» chỉ đo trên giao diện. Đã thêm bài trên cơ sở dữ liệu thật: mỗi lần sửa ghi đúng một lần, tải lại vẫn thấy giá mới."
     }
-  ]
+  ],
+  "decisions": [
+    {
+      "id": "E16",
+      "q": "Bốn việc máy tự thêm vào lát 1 — anh giữ hay gạt từng việc?",
+      "why": "Bốn việc anh chưa bảo nhưng đi kèm lát 1, đều đã ghi «chờ chủ kho gạt»: (1) chữ gợi ý khi rê bút chì «Bấm Enter để đổi ô này»; (2) trên máy tính bảng, bút chì hiện ở ô sửa được đang chọn; (3) lưới chỉ báo sẵn sàng khi đã yên, không vẽ lại ngay sau đó (giám sát đòi); (4) dấu «đã sửa» ở màn Nạp tệp thôi dùng màu tím của «Đang giao dịch». Cả ba người chấm đều nói phần còn lại đạt, riêng chỗ này chỉ lời anh quyết được."
+    }
+  ],
+  "analyst_plain": ""
 }
