@@ -17,7 +17,7 @@ db-sample: ## Load the sample inventory into DB=<database> on this lane (migrate
 	@test -n "$(DB)" || { echo "cách dùng: make db-sample DB=<cơ sở dữ liệu>"; exit 1; }
 	DB_PORT=$(DB_PORT) npx tsx db/scripts/nap-mau-dev.ts $(DB)
 
-tin-rao-doc-lai: ## Once after row 3h: older imports' kept unit attributes become own values from a file (DB=<database>, or MIGRATE_DATABASE_URL with DATABASE_URL)
+tin-rao-doc-lai: ## After row 3h: older imports' kept unit attributes become own values from a file; an import read is marked, so a run again changes nothing (DB=<database>, or MIGRATE_DATABASE_URL with DATABASE_URL)
 	@test -n "$(DB)$$MIGRATE_DATABASE_URL" || { echo "cách dùng: make tin-rao-doc-lai DB=<cơ sở dữ liệu>, hoặc MIGRATE_DATABASE_URL"; exit 1; }
 	DB_PORT=$(DB_PORT) npx tsx --conditions=react-server db/scripts/doc-lai-tep.ts $(DB)
 

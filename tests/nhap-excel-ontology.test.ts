@@ -70,7 +70,8 @@ const PROPERTIES = Object.keys(ENTITY.properties);
 describe("nhap-excel-ontology (E11)", () => {
   it("ImportRun's properties and the columns of import_runs are the same set", () => {
     const columns = columnsOf("import_runs", MIGRATIONS);
-    expect(columns.size).toBe(18);
+    // Row 3h added file_values_read_at (migration 021): the one-time reading of older imports marks each import read.
+    expect(columns.size).toBe(19);
     expect(modelFaults(PROPERTIES, columns)).toEqual([]);
   });
 

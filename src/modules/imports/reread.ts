@@ -63,11 +63,15 @@ export const layerThroughDoor =
 
 const today = () => new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 10);
 
-/** Reads every import's kept unit attributes again and fills the listings that have no own value yet. */
+/**
+ * Reads the kept unit attributes of every import not read yet and fills the listings that have no own value yet; each
+ * import read is marked in the same transaction (021), and an import made since row 3h is marked when it is made.
+ */
 export async function rereadImportValues(c: Queryable, layerOf: LayerOf): Promise<RereadSummary> {
   const { rows } = await c.query(
     `select id::text, company_id::text, imported_by::text, signature, kept from import_runs
       where status <> 'undone' and kept @> '[{"why":"unit-attribute"}]'::jsonb
+        and file_values_read_at is null
       order by created_at, id`,
   );
   const runs = rows as {
@@ -121,6 +125,8 @@ export async function rereadImportValues(c: Queryable, layerOf: LayerOf): Promis
         else if (done === "typed-kept") out.typedKept += 1;
         else if (done === "locked") out.lockedKept += 1;
       }
+      // Read once (021): a second run skips this import, so a value the person took back is never filled again.
+      await c.query("update import_runs set file_values_read_at = now() where id = $1", [run.id]);
       await c.query("commit");
     } catch (err) {
       await c.query("rollback");

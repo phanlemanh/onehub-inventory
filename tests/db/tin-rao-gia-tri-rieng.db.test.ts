@@ -507,18 +507,26 @@ describe("nhap-tep-gia-tri-tep (E7, E8)", () => {
   });
 });
 
+/**
+ * An import as it stood before row 3h: its unit attribute cells kept only as written, no own value on its listings, and
+ * not read again yet (021: an import made since the row is marked read when it is made).
+ */
+async function asImportBefore3h(e: ApiWorld, id: string): Promise<void> {
+  await e.w.db.owner.query(
+    `update listings set living_area = null, living_area_source = null, floor = null, floor_source = null,
+       bedrooms_total = null, bedrooms_total_source = null, direction_faces = null, direction_faces_source = null,
+       property_sub_type = null, property_sub_type_source = null where import_run_id = $1`,
+    [id],
+  );
+  await e.w.db.owner.query("update import_runs set file_values_read_at = null where id = $1", [id]);
+}
+
 describe("doc-lai-lan-nhap-cu (E7)", () => {
   it("doc-lai-lan-nhap-cu: an import made before the row is read again — values from the file where none, a typed listing kept, twice the same; a broken kept is named", async () => {
     const e = await apiWorld("doc_lai");
     const units = await codedUnits(e.w);
     const { id, ids } = await importThree(e, units);
-    // Before row 3h the import kept these cells only as written: take the own values off, as the old write path left it.
-    await e.w.db.owner.query(
-      `update listings set living_area = null, living_area_source = null, floor = null, floor_source = null,
-         bedrooms_total = null, bedrooms_total_source = null, direction_faces = null, direction_faces_source = null,
-         property_sub_type = null, property_sub_type_source = null where import_run_id = $1`,
-      [id],
-    );
+    await asImportBefore3h(e, id);
     // The company types a bedroom count on row 1's listing.
     const typed = await e.patch("LA", ids[1]!, {
       version: await e.version(ids[1]!),
@@ -548,15 +556,16 @@ describe("doc-lai-lan-nhap-cu (E7)", () => {
     // Not a person's change: the import still counts the listing as untouched.
     expect(await e.version(ids[0]!)).toBe(1);
     const before = await e.w.db.owner.query(`select ${OWN_COLUMNS} from listings order by id`);
+    // Read once (021): the second run skips the import it has read.
     const second = await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
-    expect(second).toMatchObject({ listingsSet: 0, typedKept: 1, lockedKept: 1 });
+    expect(second).toMatchObject({ imports: 0, listingsSet: 0, typedKept: 0, lockedKept: 0 });
     expect(
       (await e.w.db.owner.query(`select ${OWN_COLUMNS} from listings order by id`)).rows,
     ).toEqual(before.rows);
     // A kept list of another shape stops the run with the import's name, never reads as nothing to do.
     await e.w.db.owner.query(
       `update import_runs set kept = jsonb_build_array(jsonb_build_object('rij', 0, 'header', 'DT', 'raw', '70',
-         'why', 'unit-attribute')) where id = $1`,
+         'why', 'unit-attribute')), file_values_read_at = null where id = $1`,
       [id],
     );
     await expect(rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool))).rejects.toThrow(
@@ -687,5 +696,73 @@ describe("cung-san-khac-nguoi-giu (E11, G-2811-24)", () => {
       200,
     );
     expect(await state()).toMatchObject({ area: 72.5, upi: to!.upi });
+  });
+});
+
+describe("doc-lai-mot-lan (E7, G-2811-69)", () => {
+  /** A value the person took back that a later run filled again, by listing; empty when none came back. */
+  function refilled(
+    before: Record<string, unknown>,
+    after: Record<string, unknown>,
+    id: string,
+  ): string[] {
+    return before["living_area"] === null && after["living_area"] !== null
+      ? [`taken-back value filled again: ${id}`]
+      : [];
+  }
+
+  it("doc-lai-mot-lan: read once, the person takes the area back, a second run fills nothing; an import made now is never read again", async () => {
+    const e = await apiWorld("mot_lan");
+    const units = await codedUnits(e.w);
+    const { id, ids } = await importThree(e, units);
+    // An import made now is marked read when it is made: the command leaves it alone.
+    expect(
+      (await e.w.db.owner.query("select file_values_read_at from import_runs where id = $1", [id]))
+        .rows[0].file_values_read_at,
+      "an import of today is marked read",
+    ).not.toBeNull();
+    expect(await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool))).toMatchObject({
+      imports: 0,
+    });
+    await asImportBefore3h(e, id);
+    const first = await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    expect(first).toMatchObject({ imports: 1 });
+    expect(await ownOf(e.w, ids[0]!)).toMatchObject({
+      living_area: 72.5,
+      living_area_source: "File",
+    });
+    // The person takes the area back to the catalog's.
+    const back = await e.patch("LA", ids[0]!, {
+      version: await e.version(ids[0]!),
+      change: { field: "unitAttributes", livingArea: null },
+    });
+    expect(back.status).toBe(200);
+    const taken = await ownOf(e.w, ids[0]!);
+    expect(taken).toMatchObject({ living_area: null, living_area_source: null });
+    const second = await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    expect(second).toMatchObject({ imports: 0, listingsSet: 0 });
+    expect(refilled(taken, await ownOf(e.w, ids[0]!), ids[0]!)).toEqual([]);
+  });
+
+  it("break: a run that does not keep its mark fills the taken-back value again, named «taken-back value filled again»", async () => {
+    const e = await apiWorld("mot_lan_pha");
+    const units = await codedUnits(e.w);
+    const { id, ids } = await importThree(e, units);
+    await asImportBefore3h(e, id);
+    await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    const back = await e.patch("LA", ids[0]!, {
+      version: await e.version(ids[0]!),
+      change: { field: "unitAttributes", livingArea: null },
+    });
+    expect(back.status).toBe(200);
+    const taken = await ownOf(e.w, ids[0]!);
+    // The mark taken off: the command reads the import as if it never had.
+    await e.w.db.owner.query("update import_runs set file_values_read_at = null where id = $1", [
+      id,
+    ]);
+    await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    expect(refilled(taken, await ownOf(e.w, ids[0]!), ids[0]!)).toEqual([
+      `taken-back value filled again: ${ids[0]}`,
+    ]);
   });
 });

@@ -259,6 +259,10 @@ AttributeSource): boolean`, đúng khi giá trị mới được ghi);
     của lưới. Chữ của năm thuộc tính chuyển sang `src/app/(app)/unit-attribute-words.ts`, dùng chung cho Bảng hàng và
     màn nhập.
 
+- **Sửa thêm (G-2811-69):** lệnh đọc lại an toàn khi chạy lại. Migration 021 thêm `import_runs.file_values_read_at`:
+  lần nhập mới nhận dấu khi tạo, lần nhập cũ nhận dấu khi được đọc lại, và lần chạy sau bỏ qua lần nhập đã có dấu. Bài
+  `doc-lai-mot-lan` và ca phá của nó nằm trong `tests/db/tin-rao-gia-tri-rieng.db.test.ts`.
+
 ### Việc 7: Căn chờ khớp
 
 **Tệp:** đường khớp căn chờ khớp của 11 và 12, `effectiveAttributes` (danh mục vắng → không dấu).

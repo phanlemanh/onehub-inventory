@@ -92,6 +92,15 @@ describe("rereadImportValues", () => {
       [listingIdOf(RUN.id, 1), null, null, 3, null, null],
     ]);
     expect(asked.filter((q) => q.text === "commit")).toHaveLength(1);
+    // Read once (021): the import is marked read inside its own transaction, before the commit.
+    const texts = asked.map((q) => q.text);
+    const mark = texts.findIndex((t) => t.includes("set file_values_read_at"));
+    expect(mark, "the import is marked read").toBeGreaterThan(-1);
+    expect(asked[mark]!.params).toEqual([RUN.id]);
+    expect(mark).toBeLessThan(texts.indexOf("commit"));
+    expect(texts[0], "only imports not read yet are asked for").toContain(
+      "file_values_read_at is null",
+    );
   });
 
   it("counts a typed and a locked listing apart and changes neither", async () => {

@@ -53,7 +53,8 @@ onehub-invest đều cho tin rao giữ giá trị của chính nó, còn danh m�
 ## Consequences
 
 - Migration `020` thêm mười cột vào `listings`. Bộ cách ly có thêm ca 27 và 28, mỗi ca kèm bản phá.
-- Nhập tệp ghi giá trị nguồn «tệp». Có lệnh chạy một lần (`make tin-rao-doc-lai`) để đọc lại những lần nhập cũ.
+- Nhập tệp ghi giá trị nguồn «tệp». Lệnh `make tin-rao-doc-lai` đọc lại những lần nhập cũ; mỗi lần nhập đã đọc được
+  đánh dấu (migration 021), nên chạy lại không điền lại giá trị người đã «Lấy lại».
 - Lật một số luật đã ký, mỗi chỗ có dòng sửa sau ký trong sổ của hồ sơ ấy:
   - hàng 4 và hàng 5: nay Diện tích, Phòng ngủ sửa và dán được;
   - hàng 3, 3b và 3g: đầu và thân hồ sơ đổi dáng;

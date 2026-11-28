@@ -192,6 +192,8 @@ export interface ImportRun {
   tableHash?: string;
   /** Fingerprint of each slice of 200 rows opened; a batch is written only at its own place with its own rows (migration 017). */
   batchHashes?: Record<string, unknown> | unknown[];
+  /** When the file's unit attribute values of this import became the listings' own values from a file (row 3h): an import made since then is marked when it is made; an older one when the one-time reading reads it, so a run again skips it (migration 021).; ISO datetime */
+  fileValuesReadAt?: string;
 }
 
 /** The shape of a sheet a company imported — its column names in order — and where each column goes: a standard field, a custom field, or left out on purpose. The next sheet of the same shape needs no matching again. */
