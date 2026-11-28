@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T3
 surfaces: [ui, api, db]
 screens: [inventory]
-status: approved
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-27
 design_doc: _acceptance/tin-rao-giu-gia-tri-rieng/design.md
