@@ -1216,13 +1216,13 @@ describe("ap (E9) — audit", () => {
         [
           'import { ask } from "@/ai/client";',
           'import Anthropic from "@anthropic-ai/sdk";',
-          'const m = await import("../../../ai/llm");',
+          'const m = await import("../../../ai/client");',
         ].join("\n"),
       ),
     ).toEqual([
       "src/modules/imports/ui/planted.ts → @/ai/client",
       "src/modules/imports/ui/planted.ts → @anthropic-ai/sdk",
-      "src/modules/imports/ui/planted.ts → ../../../ai/llm",
+      "src/modules/imports/ui/planted.ts → ../../../ai/client",
     ]);
   });
 });
@@ -1966,6 +1966,30 @@ const MATRIX: MatrixColumn[] = [
   closed("Biển", "bien", "Phố", "View", {
     newField: { name: "View", kind: "single_select", options: ["Biển", "Phố"] },
   }),
+  // Two columns the person dropped: the owner's phone (it can only be dropped, Hỏi-12) and a note. Never kept, on any
+  // kind of row (S4-r10 t5).
+  {
+    header: "SĐT chủ nhà",
+    target: { skip: true },
+    input: { keep: { raw: "0900 000 001" } },
+    notApplicable: Object.fromEntries(
+      MARKS.filter((m) => m !== "keep").map((m) => [
+        m,
+        "a dropped column is not read: no mark but its own",
+      ]),
+    ),
+  },
+  {
+    header: "Ghi chú",
+    target: { skip: true },
+    input: { keep: { raw: "[Tên] hẹn gọi lại" } },
+    notApplicable: Object.fromEntries(
+      MARKS.filter((m) => m !== "keep").map((m) => [
+        m,
+        "a dropped column is not read: no mark but its own",
+      ]),
+    ),
+  },
 ];
 
 /** The declared outcome of one cell of the matrix, from where its target goes, the row's situation and the mark the
@@ -1975,6 +1999,7 @@ type Outcome =
   | { write: "custom" | "new-field" | "unit-link" | "pending-building" }
   | { kept: string }
   | { none: string }
+  | { dropped: true }
   | { na: string };
 
 function outcomeOf(
@@ -1988,6 +2013,7 @@ function outcomeOf(
     return why ? { na: why } : { na: "" };
   }
   const t = col.target;
+  if (t !== "unit" && "skip" in t) return { dropped: true };
   // A row whose unit is unresolved makes no listing and keeps every cell with text, its unit code too.
   if (situation === "many-units")
     return { kept: t === "unit" ? "many-units" : (askWhy ?? "row-not-created") };
@@ -2056,7 +2082,10 @@ function matrixFaults(
             (cell.value === null ? k.value === undefined : String(k.value) === String(cell.value)),
         );
       if ("na" in o) out.push(`${name}: no outcome`);
-      else if ("kept" in o) {
+      else if ("dropped" in o) {
+        if (w.kept.some((k) => k.row === r && k.header === col.header))
+          out.push(`${name}: a dropped column was kept`);
+      } else if ("kept" in o) {
         if (!keptHere(o.kept)) out.push(`${name}: not kept with its value (${o.kept})`);
       } else if ("none" in o) {
         if (w.listing !== null) out.push(`${name}: a listing exists for a ${o.none} row`);
@@ -2083,8 +2112,8 @@ function matrixFaults(
 }
 
 describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
-  it("the matrix is written before: 20 targets × 5 situations × 6 marks, every cell with one outcome or a named reason", () => {
-    expect(MATRIX).toHaveLength(20);
+  it("the matrix is written before: 20 targets and 2 dropped columns × 5 situations × 6 marks, every cell with one outcome or a named reason", () => {
+    expect(MATRIX).toHaveLength(22);
     // The 18 standard targets and the two kinds of the company's own fields, each once.
     const standard = MATRIX.flatMap((c) =>
       c.target !== "unit" && "standard" in c.target ? [c.target.standard] : [],
@@ -2093,7 +2122,7 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
     const cells = MATRIX.flatMap((col) =>
       SITUATIONS.flatMap((s) => MARKS.map((m) => ({ col, s, m, o: outcomeOf(col, s, m, "why") }))),
     );
-    expect(cells).toHaveLength(600);
+    expect(cells).toHaveLength(660);
     const unnamed = cells
       .filter((x) => "na" in x.o && !x.o.na)
       .map((x) => `${x.col.header}×${x.s}×${x.m}`);
@@ -2391,6 +2420,27 @@ describe("ma tran xem truoc va da ghi (G-2811-71)", () => {
         ...written.slice(lastListed + 1),
       ]),
     ).toEqual([`${lastListed}:Mã căn: a listing exists for a row-listed row`]);
+    // The owner's phone kept on a row left out is named (S4-r10 t5): a dropped column is never on the record.
+    const manyRow = rows.findIndex((x) => x.situation === "many-units");
+    const PHONE = MATRIX.findIndex((c) => c.header === "SĐT chủ nhà");
+    expect(
+      matrixFaults(
+        promised,
+        rows,
+        written.map((w) => ({
+          ...w,
+          kept: [
+            ...kept,
+            {
+              row: manyRow,
+              header: "SĐT chủ nhà",
+              raw: rows[manyRow]!.raw[PHONE]!,
+              why: "row-not-created",
+            },
+          ],
+        })),
+      ),
+    ).toEqual([`${manyRow}:SĐT chủ nhà: a dropped column was kept`]);
     // An answer the person typed for a column kept as written, lost from the record, is named (G-2811-78): the cell
     // «chưa bán 2» of the catalog row answered without «remember» shows 4000000000 on the preview.
     const answeredRow = rows.findIndex(

@@ -160,7 +160,8 @@ const PENDING_BUILDING_LIMIT = 80;
 /**
  * Every cell an import keeps as written on its record, by row and column, with its reason: the one rule the preview
  * counts («N ô giữ chữ gốc») and the write stores (store.ts writeBatch), so the two cannot drift (VP11 S4-r2 item 9,
- * ruling G-2811-84). A row left out because its unit is unresolved keeps every cell with text, its unit code too. Any
+ * ruling G-2811-84). A dropped column is never kept. A row left out because its unit is unresolved keeps every other cell
+ * with text, its unit code too. Any
  * other row keeps the cells that ask a person (its unit code aside: that is the row's unit), every cell whose target has
  * no place on the listing (DESTINATION «kept»), and its tower text unless that goes onto the new pending unit it makes.
  */
@@ -176,6 +177,9 @@ export function keptCellsOf(
     table.columns.forEach((col, j) => {
       const text = raw[r]?.[j] ?? "";
       if (text.trim() === "") return;
+      // A column the person dropped is never kept, on any row: the owner's name and phone can only be dropped
+      // (Hỏi-12), and the personal-data rule keeps them off the record (S4-r10 t5).
+      if (col.target && "skip" in col.target) return;
       const cell = cells[j]!;
       const why = (w: string) => out.push({ row: r, col: j, why: w });
       if (left) return why(cell.mark === "ask" ? cell.why : "row-not-created");

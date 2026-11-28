@@ -120,7 +120,7 @@ describe("cua-http", () => {
     const body = await r.text();
     expect(body).not.toContain("0900");
     expect(body).not.toContain("[Tên]");
-    expect(JSON.parse(body)).toEqual({ error: expect.any(String) });
+    expect(JSON.parse(body)).toEqual({ error: "server-error" });
     expect(JSON.stringify(spy.mock.calls)).not.toContain("0900");
     spy.mockRestore();
   });
