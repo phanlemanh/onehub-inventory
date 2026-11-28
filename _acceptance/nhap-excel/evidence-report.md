@@ -7,11 +7,13 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: f5e5b1b5683db29f3baf66c5774297e991cecd05
+verified_commit: a672ea0f66751137b339af4f8a1618f861001352
 human_signoff:
 ---
 
 # Evidence Report: nhap-excel
+
+Round 12. Nội dung thay trọn round cũ; lịch sử nằm ở mục Iterations.
 
 | Eval | Criterion | Executor | Verdict |
 |---|---|---|---|
@@ -24,8 +26,8 @@ human_signoff:
 | E7 | AC-6 | test | PASS |
 | E8 | AC-6 | script | PASS |
 | E9 | AC-7 | script | PASS |
-| E10 | AC-7 | script | PASS |
-| E11 | AC-7 | test | PASS (carried từ round 8) |
+| E10 | AC-7 | script | PASS (carry-forward r9) |
+| E11 | AC-7 | test | PASS (carry-forward r8) |
 | E12 | AC-8 | script | PASS |
 | E13 | AC-9 | script | PASS |
 | E14 | AC-10 | script | PASS |
@@ -33,96 +35,202 @@ human_signoff:
 | E16 | AC-12 | script | PASS |
 | E17 | AC-12 | script | PASS |
 | E18 | AC-12 | ui-check | PASS |
-| E19 | AC-11 | ui-check | PASS (carried từ round 6) |
+| E19 | AC-11 | ui-check | PASS (carry-forward r6) |
 | E20 | AC-6 | script | PASS |
 | E21 | AC-3 | script | PASS |
 | E22 | AC-13 | script | PASS |
-| E23 | AC-11 | script | PASS (carried từ round 1) |
-| E24 | AC-12 | script | PASS (carried từ round 4) |
+| E23 | AC-11 | script | PASS (carry-forward r1) |
+| E24 | AC-12 | script | PASS |
 
 ## Evidence
 
 - eval: E1
-  run_id: minted-nhap-excel-E1-r9
+  run_id: minted-nhap-excel-E1-r12
   exit_code: 0
   baseline: n-a
   verifier: config:executors.test.nhap_excel_unit
-  verified_at: 2026-11-28T06:10:25Z
+  verified_at: 2026-11-28T08:51:17Z
   output: |
-    npx vitest run src/modules/imports tests/nhap-excel (một lệnh chung cho E1, E3, E5, E7), một lần chạy, đạt.
+    npx vitest run src/modules/imports tests/nhap-excel (verbose reporter) finished green.
+
+- eval: E3
+  run_id: minted-nhap-excel-E3-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.nhap_excel_unit
+  verified_at: 2026-11-28T08:51:17Z
+  output: |
+    npx vitest run src/modules/imports tests/nhap-excel (verbose reporter) finished green.
+
+- eval: E5
+  run_id: minted-nhap-excel-E5-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.nhap_excel_unit
+  verified_at: 2026-11-28T08:51:17Z
+  output: |
+    npx vitest run src/modules/imports tests/nhap-excel (verbose reporter) finished green.
+
+- eval: E7
+  run_id: minted-nhap-excel-E7-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.test.nhap_excel_unit
+  verified_at: 2026-11-28T08:51:17Z
+  output: |
+    npx vitest run src/modules/imports tests/nhap-excel (verbose reporter) finished green.
 
 - eval: E2
-  run_id: minted-nhap-excel-E2-r9
+  run_id: minted-nhap-excel-E2-r12
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.nhap_excel_e2e
-  verified_at: 2026-11-28T06:10:25Z
+  verified_at: 2026-11-28T08:51:17Z
   output: |
-    playwright tests/e2e-db/nhap-excel.spec.ts (một lệnh chung cho E2, E15, E16, E20, E21), một lần chạy, đạt.
+    playwright -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts (lane D, port 5571)
     gac-hydration: 0 canh bao
 
-- eval: E3
-  run_id: minted-nhap-excel-E3-r9
+- eval: E15
+  run_id: minted-nhap-excel-E15-r12
   exit_code: 0
   baseline: n-a
-  verifier: config:executors.test.nhap_excel_unit
-  verified_at: 2026-11-28T06:10:25Z
+  verifier: config:executors.script.nhap_excel_e2e
+  verified_at: 2026-11-28T08:51:17Z
   output: |
-    tests/nhap-excel-ghep-cot.test.ts nằm trong lần chạy vitest chung với E1, đạt.
+    playwright -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts (lane D, port 5571)
+    gac-hydration: 0 canh bao
+
+- eval: E16
+  run_id: minted-nhap-excel-E16-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.nhap_excel_e2e
+  verified_at: 2026-11-28T08:51:17Z
+  output: |
+    playwright -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts (lane D, port 5571)
+    gac-hydration: 0 canh bao
+
+- eval: E20
+  run_id: minted-nhap-excel-E20-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.nhap_excel_e2e
+  verified_at: 2026-11-28T08:51:17Z
+  output: |
+    playwright -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts (lane D, port 5571)
+    gac-hydration: 0 canh bao
+
+- eval: E21
+  run_id: minted-nhap-excel-E21-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.nhap_excel_e2e
+  verified_at: 2026-11-28T08:51:17Z
+  output: |
+    playwright -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts (lane D, port 5571)
+    gac-hydration: 0 canh bao
 
 - eval: E4
-  run_id: minted-nhap-excel-E4-r9
+  run_id: minted-nhap-excel-E4-r12
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.nhap_excel_db
-  verified_at: 2026-11-28T06:10:25Z
+  verified_at: 2026-11-28T08:51:17Z
   output: |
-    vitest -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts (một lệnh chung cho E4, E6, E8, E9, E12, E13, E14, E22), đạt.
-
-- eval: E5
-  run_id: minted-nhap-excel-E5-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.nhap_excel_unit
-  verified_at: 2026-11-28T06:10:25Z
-  output: |
-    tests/nhap-excel-gia-tri.test.ts nằm trong lần chạy vitest chung với E1, đạt.
+    vitest -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts (verbose reporter) finished green.
 
 - eval: E6
-  run_id: minted-nhap-excel-E6-r9
+  run_id: minted-nhap-excel-E6-r12
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.nhap_excel_db
-  verified_at: 2026-11-28T06:10:25Z
+  verified_at: 2026-11-28T08:51:17Z
   output: |
-    khối 'can' của tests/db/nhap-excel.db.test.ts nằm trong lần chạy chung, đạt.
-
-- eval: E7
-  run_id: minted-nhap-excel-E7-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.test.nhap_excel_unit
-  verified_at: 2026-11-28T06:10:25Z
-  output: |
-    tests/nhap-excel-khong-mat-o.test.ts nằm trong lần chạy vitest chung với E1, đạt.
+    vitest -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts (verbose reporter) finished green.
 
 - eval: E8
-  run_id: minted-nhap-excel-E8-r9
+  run_id: minted-nhap-excel-E8-r12
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.nhap_excel_db
-  verified_at: 2026-11-28T06:10:25Z
+  verified_at: 2026-11-28T08:51:17Z
   output: |
-    khối 'khong duong thang' của tests/db/nhap-excel.db.test.ts nằm trong lần chạy chung, đạt.
+    vitest -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts (verbose reporter) finished green.
 
 - eval: E9
-  run_id: minted-nhap-excel-E9-r9
+  run_id: minted-nhap-excel-E9-r12
   exit_code: 0
   baseline: n-a
   verifier: config:executors.script.nhap_excel_db
-  verified_at: 2026-11-28T06:10:25Z
+  verified_at: 2026-11-28T08:51:17Z
   output: |
-    khối 'ap' của tests/db/nhap-excel.db.test.ts nằm trong lần chạy chung, đạt.
+    vitest -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts (verbose reporter) finished green.
+
+- eval: E12
+  run_id: minted-nhap-excel-E12-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.nhap_excel_db
+  verified_at: 2026-11-28T08:51:17Z
+  output: |
+    vitest -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts (verbose reporter) finished green.
+
+- eval: E13
+  run_id: minted-nhap-excel-E13-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.nhap_excel_db
+  verified_at: 2026-11-28T08:51:17Z
+  output: |
+    vitest -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts (verbose reporter) finished green.
+
+- eval: E14
+  run_id: minted-nhap-excel-E14-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.nhap_excel_db
+  verified_at: 2026-11-28T08:51:17Z
+  output: |
+    vitest -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts (verbose reporter) finished green.
+
+- eval: E22
+  run_id: minted-nhap-excel-E22-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.nhap_excel_db
+  verified_at: 2026-11-28T08:51:17Z
+  output: |
+    vitest -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts (verbose reporter) finished green.
+
+- eval: E17
+  run_id: minted-nhap-excel-E17-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.script.check
+  verified_at: 2026-11-28T08:51:17Z
+  output: |
+    make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance
+
+- eval: E24
+  run_id: minted-nhap-excel-E24-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.design.khuon
+  verified_at: 2026-11-28T08:51:17Z
+  output: |
+    design-floor-khuon.mjs --kiem --root .
+    9 tệp giao diện ngoài bản đồ
+
+- eval: E18
+  run_id: minted-nhap-excel-E18-r12
+  exit_code: 0
+  baseline: n-a
+  verifier: config:executors.ui-check
+  verified_at: 2026-11-28T08:51:17Z
+  screenshot: evidence/ui/nhap-tep-tai-1440.png
+  observed: |
+    1440 nhap-tep-tai: Chon tep step with a drop zone, the .xlsx/.csv, 10 MB and 5,000 rows hint, and a disabled Tiep button. 1440 ghep-cot (ban.xlsx, 4 rows): five-step bar with step 2 active. Rows Ma can (Giu nguyen), Block, DT, PN and TT (May sua), and the two 'Gia chao' columns (Gia KBP, Gia) marked Chan with 'Hai cot cung di vao mot cho'. Row 'View' has an empty selector and an orange 'Can nguoi' mark ('Ten cot la, chon noi di vao'). Row 'SDT chu' has a red 'Chan' mark and the reason that owner phone/name is not entered here, so drop the column. Button 'Tiep (7)'. 1440 xem-truoc-ban: counts Giu nguyen 14, May sua 0, Can nguoi 9, Chan 13; preview table with red and orange cells; 'Con 13 cho chan'; faded Ap button 'Ap 0 dong - 19 o giu chu goc'. 1440 xong (gon.xlsx): 'Da them 3 dong', '2 o giu chu goc cua tep', 'Vua hoc cho lan sau' with 'Can cho khop: SA5-12.08', and 'Hoan tac lan nap tep'. 1024: same content; xem-truoc-ban shows the same four counts and the Ap button faded; xong lists the learned items (template gon.xlsx, own labels 'Ma can' and 'Ngay check', pending unit SA5-12.08) and the undo button. This all matches Expected.
+  network_observed: n-a (driver)
 
 - eval: E10
   run_id: minted-nhap-excel-E10-r9
@@ -130,159 +238,56 @@ human_signoff:
   baseline: n-a
   verifier: config:executors.script.cach_ly_d
   verified_at: 2026-11-28T06:10:25Z
+  carried_from_round: 9
   output: |
-    cach-ly: 41 ca đạt, vai quy_hang_app, nối bằng quy_hang_login
+    carry-forward tu round 9 — delta khong cham paths cua eval
 
 - eval: E11
   run_id: minted-nhap-excel-E11-r8
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.test.nhap_excel_unit
   verified_at: 2026-11-28T05:23:19Z
   carried_from_round: 8
-  # carry-forward tu round 8 — delta khong cham paths cua eval
-
-- eval: E12
-  run_id: minted-nhap-excel-E12-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_db
-  verified_at: 2026-11-28T06:10:25Z
   output: |
-    khối 'hoc' của tests/db/nhap-excel.db.test.ts nằm trong lần chạy chung, đạt.
-
-- eval: E13
-  run_id: minted-nhap-excel-E13-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_db
-  verified_at: 2026-11-28T06:10:25Z
-  output: |
-    khối 'lan hai' của tests/db/nhap-excel.db.test.ts nằm trong lần chạy chung, đạt.
-
-- eval: E14
-  run_id: minted-nhap-excel-E14-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_db
-  verified_at: 2026-11-28T06:10:25Z
-  output: |
-    khối 'hoan tac' của tests/db/nhap-excel.db.test.ts nằm trong lần chạy chung, đạt.
-
-- eval: E15
-  run_id: minted-nhap-excel-E15-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_e2e
-  verified_at: 2026-11-28T06:10:25Z
-  output: |
-    ca 'bang hang trong' của tests/e2e-db/nhap-excel.spec.ts nằm trong lần chạy playwright chung, đạt.
-
-- eval: E16
-  run_id: minted-nhap-excel-E16-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_e2e
-  verified_at: 2026-11-28T06:10:25Z
-  output: |
-    ca 'trang thai' (28 ô) của tests/e2e-db/nhap-excel.spec.ts nằm trong lần chạy playwright chung, đạt.
-
-- eval: E17
-  run_id: minted-nhap-excel-E17-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.check
-  verified_at: 2026-11-28T06:10:25Z
-  output: |
-    make check passed: upgrade lint typecheck test ontology boundaries coverage-matrix derived-untracked ledgers-check design-assembly design governance
-
-- eval: E18
-  run_id: minted-nhap-excel-E18-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.ui-check
-  verified_at: 2026-11-28T06:10:25Z
-  screenshot: evidence/ui/nhap-tep-ghep-cot-1440.png
-  observed: |
-    1440 (all 9 frames opened, plus 1024 for ghep-cot, xem-truoc-ban, xong, dau-chu-mo):
-    - nhap-tep-tai: the five-step bar with step 1 active, a file drop zone, and a disabled 'Tiếp' button.
-    - nhap-tep-da-chon: ban.xlsx · 4 dòng, 'Lần nạp tệp gần đây: gon.xlsx 3 dòng', and 'Tiếp' enabled.
-    - nhap-tep-ghep-cot: the step bar at step 2. Each row shows a column, a mapping and a mark: Mã căn is Giữ nguyên; Block, DT, PN and TT are Máy sửa; Giá KBP and Giá are Chặn ('Hai cột cùng đi vào một chỗ'); View has an empty mapping with a 'Cần người' mark ('Tên cột lạ — chọn nơi đi vào'); 'SĐT chủ' has a 'Chặn' mark ('Số và tên chủ bán hay chủ cho thuê chưa nhập ở đây — bỏ cột'). The button reads 'Tiếp (7)'. At 1024 the same rows fit but the checkbox labels are cut off at the right edge, and the content scrolls sideways.
-    - nhap-tep-gia-tri-va-ma: step 3, two value groups («còn» in TT, 3 ô; «cọc» in TT, 1 ô) with empty inputs, and 'Giữ nguyên mã, thành căn chờ khớp: SA5-12.08, R2.11-1503 · 2 ô'.
-    - nhap-tep-xem-truoc-ban: step 4, four counts 14/0/9/13, a table with 'Bỏ dòng' per row and yellow and red coloured cells, 'Còn 13 chỗ chặn' and a faded apply button 'Áp 0 dòng · 9 ô giữ chữ gốc' (disabled).
-    - nhap-tep-xem-truoc (gon.xlsx): counts 14/0/1/0, 3 rows with one yellow cell SA5-12.08, and 'Áp 3 dòng' enabled.
-    - nhap-tep-xong: all 5 steps filled, 'Đã thêm 3 dòng', 'Vừa học cho lần sau' with 'Căn chờ khớp: SA5-12.08' (at 1024 it also lists 'Mẫu nhập: gon.xlsx' and two private labels 'Mã căn' and 'Ngày check'), and a 'Hoàn tác lần nạp tệp' button.
-    - nhap-tep-dau-chu-mo: the preview with the list agent picker open, one option '[Tên] Nạp tệp ListAgent', and the 'Áp 3 dòng' button faded until an agent is chosen. At 1024 the same layout with a sideways-scrolling table.
-    All of this matches the Expected text. The 1440 and 1024 Xong frames differ in the learned items (a state difference, not a contradiction).
-  network_observed: n-a (driver)
+    carry-forward tu round 8 — delta khong cham paths cua eval
 
 - eval: E19
   run_id: minted-nhap-excel-E19-r6
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.ui-check
   verified_at: 2026-11-27T23:38:25Z
   carried_from_round: 6
-  # carry-forward tu round 6 — delta khong cham paths cua eval
   screenshot: evidence/ui/inventory-trong-1440.png
   observed: |
     1) inventory-trong-1440.png (Đầu chủ, company [Sàn thử nạp tệp], no listings). The "Bảng hàng" screen is open. The grid card shows "0 dòng" and the heading "Chưa có dữ liệu ở đây". Below it is "Sàn chưa có căn nào đang chào trên Bảng hàng." and "Có sẵn bảng trong Excel hay Google Sheet? Nạp tệp." where "Nạp tệp" is an underlined link. At the top right of the page header is a bordered "Nạp tệp" button. The left rail also has an import icon. This matches Expected.
     2) inventory-sau-nhap-1440.png (same company after the three-row file). The grid shows 3 dòng. Row 1 is ZZ-99.01, building "Toà của tệp", no project ("—"), status "Đang bán", price 2,1 tỷ. This is the pending-match listing, and its original code is in the "Mã căn" column. Rows 2 and 3 are 0905 and 0906, building S1.01, project Vinhomes Ocean Pa..., status "Đang bán", 4,65 tỷ and 3,9 tỷ. The "Nạp tệp" button is still at the top right. The rail now lists the project Vinhomes Ocean Park 1. This matches Expected.
     3) inventory-dau-khach-1440.png (Đầu khách, same company, same three rows). The grid content is identical to frame 2. The top right of the header has no "Nạp tệp" button. The left icon rail has one icon fewer, with no import icon. The rail's "Theo trạng thái" list has no import entry. This matches Expected: Đầu khách does not see the import entry.
   network_observed: n-a (driver)
-
-- eval: E20
-  run_id: minted-nhap-excel-E20-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_e2e
-  verified_at: 2026-11-28T06:10:25Z
-  output: |
-    ca 'so tren man bang so may chu' của tests/e2e-db/nhap-excel.spec.ts nằm trong lần chạy playwright chung, đạt.
-
-- eval: E21
-  run_id: minted-nhap-excel-E21-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_e2e
-  verified_at: 2026-11-28T06:10:25Z
-  output: |
-    ca 'nhan rieng tren bang hang' của tests/e2e-db/nhap-excel.spec.ts nằm trong lần chạy playwright chung, đạt.
-
-- eval: E22
-  run_id: minted-nhap-excel-E22-r9
-  exit_code: 0
-  baseline: n-a
-  verifier: config:executors.script.nhap_excel_db
-  verified_at: 2026-11-28T06:10:25Z
-  output: |
-    ca 'G-2711-4' của tests/db/nhap-excel.db.test.ts nằm trong lần chạy chung, đạt.
+  note: carry-forward tu round 6 — delta khong cham paths cua eval
 
 - eval: E23
   run_id: minted-nhap-excel-E23-r1
   exit_code: 0
+  baseline: n-a
   verifier: config:executors.design.khuon
   verified_at: 2026-11-27T11:09:53Z
   carried_from_round: 1
-  # carry-forward tu round 1 — delta khong cham paths cua eval
-
-- eval: E24
-  run_id: minted-nhap-excel-E24-r4
-  exit_code: 0
-  verifier: config:executors.design.khuon
-  verified_at: 2026-11-27T18:36:02Z
-  carried_from_round: 4
-  # carry-forward tu round 4 — delta khong cham paths cua eval
+  output: |
+    carry-forward tu round 1 — delta khong cham paths cua eval
 
 ### Lệnh suite (hồi quy)
 
 - cmd: npm run build
-  run_id: minted-nhap-excel-SUITE-build-r9
+  run_id: minted-nhap-excel-SUITE-build-r12
   exit_code: 0
-  verified_at: 2026-11-28T06:10:25Z
+  verified_at: 2026-11-28T08:51:17Z
 
 - cmd: DATABASE_URL= make e2e
-  run_id: bczfsl8bt
+  run_id: minted-nhap-excel-SUITE-DATABASE_URL_make_e2e-r12
   exit_code: 0
-  verified_at: 2026-11-28T06:10:25Z
+  verified_at: 2026-11-28T08:51:17Z
 
 ## Known limits
 
@@ -290,16 +295,17 @@ human_signoff:
 
 ## Analyst
 
-carried tu round 3 — baseline khong do lai round nay. Field baseline cua tung eval ghi n-a.
+carried tu round 3 — baseline khong do lai round nay.
 
-Eval không phân biệt (pass trên cả HEAD lẫn baseline, chứng minh harness chứ không phải feature; nên viết lại để assert hành vi mới hoặc xác nhận là regression-guard có chủ ý):
-- make check (E17)
-- design-floor-khuon.mjs --kiem --root . (E24)
+Eval không-phân-biệt cần người xem lại (xanh ở cả bản chính lẫn baseline, nên chứng minh bộ chạy chứ không phải tính năng; viết lại để assert hành vi mới hoặc xác nhận là regression-guard có chủ ý):
+- E17 (make check)
+- E24 (bước chấm khuôn luong-nhieu-buoc)
 
 ## Variance
 
-none — every multi-run eval is uniform (mọi eval chạy một lần, không có phương sai).
+none — every multi-run eval is uniform
 
 ## Iterations
 
-Round 9: 24 eval đạt; E1-E10, E12-E18, E20-E22 chạy lại ở HEAD, E11, E19, E23, E24 mang sang từ round trước vì delta không chạm đường dẫn của chúng. Lệnh suite build và e2e đạt. Không có mục nào ở trong hợp đồng cần sửa.
+Round 11: not passed — one finding in the contract (AC-8: the last batch could close an import with earlier batches unwritten). Returned to implementation.
+Round 12: all evals PASS on a672ea0f after fix 01dc882d (the last batch waits for every earlier batch); E10, E11, E19, E23 carried forward.
