@@ -7,13 +7,13 @@
 ```mermaid
 flowchart TD
   A["Đang cân nhắc cơ hội<br/>chưa có"] --> GD{"Cổng Đáng"}
-  GD --> B["Sắp mở vòng<br/>7 việc"]
+  GD --> B["Sắp mở vòng<br/>8 việc"]
   GD --> XL["Xếp lại sau<br/>chưa có"]
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
-  GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
-  GB --> DG["Đã giao<br/>34 việc"]
-  GB --> CN["Chờ phiên nghiệm thu<br/>55 việc"] --> GG{"Cổng Giá trị"}
+  GP --> DL["Đang làm<br/>2 việc"] --> GB{"Cổng Bằng chứng"}
+  GB --> DG["Đã giao<br/>31 việc"]
+  GB --> CN["Chờ phiên nghiệm thu<br/>54 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
 
@@ -28,9 +28,15 @@ flowchart TD
 - Đầu chủ mở hồ sơ căn và thấy lịch sử của căn: tạo lần chào, đổi giá, đổi trạng thái, đổi thông tin, xác nhận với chủ nhà, mỗi việc kèm vai người làm và lúc làm (`lich-su-cua-can`)
 - Quản trị sàn đổi mức Thuế phí mà Về tay của các giá đã đặt trước đó không đổi, và trên căn thấy được con số tính theo mức nào (`lich-su-muc-thue-phi`)
 - Đầu chủ và Đầu khách mở màn Liên hệ và thấy liên hệ của sàn trên Lưới, thêm, sửa, gỡ được liên hệ và gộp được hai liên hệ trùng, theo quyền của vai (`lien-he-tren-luoi`)
+- Đầu chủ nạp tệp Excel hay Sheet đang dùng, ghép cột, tên cột, giá trị và mã căn của mình vào chuẩn ngay ở màn xem trước, áp vào bảng và hoàn tác được; lần sau cùng dạng tệp không phải ghép lại (`nhap-excel`)
 - Đầu chủ ghi và mở số chủ nhà trên hồ sơ căn, và gỡ được chủ nhà ghi nhầm khỏi căn (`so-chu-nha`)
 - Đầu chủ đổi giá và đổi trạng thái ngay trong hồ sơ căn trên điện thoại, theo cùng luật với sửa trên ô của Bảng hàng (`sua-nhanh-tren-dien-thoai`)
 - Đầu chủ gõ mã căn để thêm căn, hoặc tạo căn tay khi danh mục chưa có (`them-can`)
+
+## Đang làm
+
+- Đầu chủ, Đầu khách và Trưởng nhóm đọc trạng thái căn bằng sáu màu không trùng nhau ở cả nền sáng lẫn tối, và sửa nhanh trên ô bằng Enter, phím cách mở hồ sơ, bấm ra ngoài là lưu — lát 1 của điều chủ kho đã duyệt «Duyệt cả ba lối A» ngày 27/11/2026 (`chuan-hoa-he-design`)
+- Đầu chủ và Đầu khách dùng mọi màn họ Lưới với ngăn chi tiết nổi từ dưới thanh trên tới đáy, lưới khít màn, đầu ngăn một dòng, nút đúng chỗ và đủ cỡ ngón tay — điều chủ kho đã quyết ở phiên BH ngày 27/11/2026 (`khung-luoi-va-ngan-chi-tiet`)
 
 ## Đã giao — chờ phiên nghiệm thu
 
@@ -77,7 +83,6 @@ flowchart TD
 - Quản trị sàn mời người vào sàn và gán một trong bốn vai (`moi-nguoi-gan-vai`)
 - Người của sàn mở inventory.onehub.center, nhận mã qua email và vào đúng sàn của mình trên bản chạy thật; mỗi bản mới đi qua bản thử trước khi lên bản thật, và lùi được về bản trước (`moi-truong-thu-va-ban-that`)
 - Đầu chủ ghim ngăn chi tiết thành một cột cạnh bảng khi làm lâu trên một căn, bỏ ghim thì ngăn nổi lại (`ngan-chi-tiet-ghim-thanh-cot`)
-- Đầu chủ nạp tệp Excel hay Sheet đang dùng, ghép cột, tên cột, giá trị và mã căn của mình vào chuẩn ngay ở màn xem trước, áp vào bảng và hoàn tác được; lần sau cùng dạng tệp không phải ghép lại (`nhap-excel`)
 - Lệnh ghi số đo của một vòng không bao giờ lặng lẽ bỏ tầng đã khai: bản số đo cũ đọc không được thì lệnh dừng và nói rõ, không ghi đè (`so-do-ghi-khong-mat-tang`)
 - Mỗi vòng giao diện máy ghi một bản số đo, một lệnh gộp theo tầng, và có mốc đối chứng trước khi dựng nền (`so-do-moi-vong`)
 - Đầu chủ sửa được thông tin của căn ngoài giá và trạng thái — pháp lý, nội thất, tài chính, tình trạng sử dụng — ngay trong sản phẩm, không phải nhập lại tệp (`sua-thong-tin-can`)
@@ -101,13 +106,10 @@ flowchart TD
 - Một lệnh đặt khoá — chủ kho dán mỗi khoá do dịch vụ cấp một lần vào make dat-khoa; lệnh đưa bản lên tự đặt mật khẩu vai đăng nhập và tự đẩy biến sang Vercel; sổ tay chỉ còn phần của chủ kho; quyền đứng cho hạ tầng Inventory (`dat-khoa-mot-lenh`)
 - Tiếp nhận design-assembly — tám quyết định thiết kế đã ghi được nối vào kiểm tra sẵn có, thêm hai dòng phông chữ (`design-assembly-adopt-checks`) — đã giao — máy thông, bằng chứng xanh-sạch
 - Ghi sáu quyết định lõi còn mở của hệ thiết kế theo lời chủ kho, và bộ chữ tiếng Việt của sổ hệ thiết kế (`design-decisions-40-of-40`)
-- Đưa tệp tự triển khai Deploy lên main — PR (`dua-deploy-yml-len-main`)
 - Địa chỉ màn Tuỳ chỉnh của sàn và bản mẫu bộ nút, từ chọn phần và mã màn của chúng viết bằng tiếng Anh như luật kho (`english-route-names`)
 - `go-hoi-khi-gop`
-- Đầu chủ và Đầu khách dùng mọi màn họ Lưới với ngăn chi tiết nổi từ dưới thanh trên tới đáy, lưới khít màn, đầu ngăn một dòng, nút đúng chỗ và đủ cỡ ngón tay — điều chủ kho đã quyết ở phiên BH ngày 27/11/2026 (`khung-luoi-va-ngan-chi-tiet`)
 - Lint và bộ chạy bài kiểm của kho bỏ qua hai thư mục ngoài git (.acceptance-runs/ và .claude/worktrees/) để bộ kiểm và hook trước commit không đỏ vì tệp không thuộc kho (`lint-bo-qua-thu-muc-ngoai-git`) — đã giao — máy thông, cửa veto còn mở
 - Ca lùi bản sau khi xoay mật khẩu vai đăng nhập viết một lần trong sổ xoay khoá; mọi câu lùi bản khác của sổ vận hành trỏ tới đó, và một ca kiểm giữ luật ấy (`lui-ban-luc-xoay-mat-khau`)
-- Migration chạy được bằng vai chủ không phải siêu vai (Supabase, Postgres 17) — PR (`migration-vai-chu-khong-sieu-cap`)
 - Nâng kit nghiệm thu của kho từ v2.38.1 lên v3.0.0 của kho mới delivery-loop — CI kéo kit 3.0 theo thẻ, phiên Claude Code bật chợ mới, kit-root chỉ đọc bản cài của chợ mới (`nang-kit-3-0`)
 - Nâng kit nghiệm thu của phiên từ delivery-loop v3.0.0 lên v3.1.0 — bản mang trợ lý quyết định (mặc-ký có phủ quyết, giữ-quyền, kiểm mẫu) và chuyến gộp (`nang-kit-3-1`)
 - Nâng kit nghiệm thu từ delivery-loop v3.1.0 lên v3.1.1 — bản vá chữ ký giữ chỗ của lệnh gộp theo lời, ở chợ của phiên và ở việc gate của CI (`nang-kit-3-1-1`)

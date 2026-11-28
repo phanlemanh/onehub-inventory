@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: ea0a8d4b53b7314825e206cf2d09bca47b066ab2
+verified_commit: c9b71e604a94fdcf7393ed7ca35799f9fe70bb93
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -210,3 +210,7 @@ Round 4: sửa đọc đường nhập bằng cây cú pháp TypeScript (9b1d97a
 ### Re-pin lần 1 — 2026-11-11, do gộp nhánh chính tới lượt gộp
 run_id: repin-20261111T072021Z-61204
 sha: ea0a8d4b53b7314825e206cf2d09bca47b066ab2 · suites: 3 lệnh exit 0 · evals: 14/14 eval máy đạt kỳ vọng · ngoài làn máy: E14, E15 (E15 không khai paths)
+
+### Re-pin lần 2 — 2026-11-28, do VP11 lát 1 (PR #136): các luật đã ký đổi theo Hỏi-1/2/4, sửa bản phá loc-dau-cot và pageReady (G-2811-100/108), gộp main 81bc090c
+run_id: repin-20261128T130112Z-65735
+sha: c9b71e604a94fdcf7393ed7ca35799f9fe70bb93 · suites: 3 lệnh exit 0 · evals: 14/14 eval máy đạt kỳ vọng · ngoài làn máy: E14, E15 (E15 không khai paths) · diff chạm vật đo ngoài làn máy: E14 — chưa chứng lại, đi vòng S4 delta

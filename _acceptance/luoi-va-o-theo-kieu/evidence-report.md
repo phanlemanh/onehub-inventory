@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: c3b1473948c9267fb0eac0389ba8e36af07cf456
+verified_commit: c9b71e604a94fdcf7393ed7ca35799f9fe70bb93
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -211,3 +211,7 @@ sha: 9d1dc0cce8cee9bbbdd03eed577c00789bbaf91b · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 3 — 2026-11-11, do hồ sơ vào phạm vi PR 1h khi 1h ghi bản số đo của vòng
 run_id: repin-20261111T041922Z-28802
 sha: c3b1473948c9267fb0eac0389ba8e36af07cf456 · suites: 3 lệnh exit 0 · evals: 12/12 eval máy đạt kỳ vọng · ngoài làn máy: E11, E12 (E12 không khai paths)
+
+### Re-pin lần 4 — 2026-11-28, do VP11 lát 1 (PR #136): các luật đã ký đổi theo Hỏi-1/2/4, sửa bản phá loc-dau-cot và pageReady (G-2811-100/108), gộp main 81bc090c
+run_id: repin-20261128T130112Z-65735
+sha: c9b71e604a94fdcf7393ed7ca35799f9fe70bb93 · suites: 3 lệnh exit 0 · evals: 12/12 eval máy đạt kỳ vọng · ngoài làn máy: E11, E12 (E12 không khai paths) · diff chạm vật đo ngoài làn máy: E11 — chưa chứng lại, đi vòng S4 delta

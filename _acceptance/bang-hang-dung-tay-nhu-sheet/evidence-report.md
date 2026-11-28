@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 2d814a8e2c6485c90d50ada24b850f92755ba800
+verified_commit: c9b71e604a94fdcf7393ed7ca35799f9fe70bb93
 human_signoff: Manh Phan 2026-11-12
 ---
 
@@ -275,3 +275,7 @@ sha: 808af8c561772a5926a525f82fd346a9b9200303 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 5 — 2026-11-28, do hàng 11 nhap-excel trước Cổng Bằng chứng, sau vòng chấm 12: 22 hồ sơ cổng nêu (gồm 11 hồ sơ có dòng sửa-sau-ký của PR #130) và nhap-excel (G-2811-62)
 run_id: repin-20261128T091000Z-36001
 sha: 2d814a8e2c6485c90d50ada24b850f92755ba800 · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E16, E17 (E17 không khai paths) · diff chạm vật đo ngoài làn máy: E16 — chưa chứng lại, đi vòng S4 delta · AC không có chốt máy: AC-10
+
+### Re-pin lần 6 — 2026-11-28, do VP11 lát 1 (PR #136): các luật đã ký đổi theo Hỏi-1/2/4, sửa bản phá loc-dau-cot và pageReady (G-2811-100/108), gộp main 81bc090c
+run_id: repin-20261128T130112Z-65735
+sha: c9b71e604a94fdcf7393ed7ca35799f9fe70bb93 · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E16, E17 (E17 không khai paths) · diff chạm vật đo ngoài làn máy: E16 — chưa chứng lại, đi vòng S4 delta · AC không có chốt máy: AC-10

@@ -6,12 +6,13 @@
 //
 //   node kiem.mjs rules [--root DIR] [--page F]
 //     AC-5: the regenerated rules page has its sections, states the control size and the heading
-//     typeface the design tool holds in design/theme.json, and has exactly the one known wrong line.
+//     typeface the design tool holds in design/theme.json, and no line says undefined (the one known wrong line was
+//     fixed on main at 6d5d332d).
 //
 //   node kiem.mjs shape [--root DIR] [--base-file F] [--head-file F] [--files a,b,...]
-//     AC-4: against the merge-base with origin/main (the pinned BASE where it cannot be read), the ledger gained exactly eight check lines
-//     and two rows and nothing else, and no file outside the matrix changed. The three overrides
-//     let the two-way test feed a broken ledger or file list.
+//     AC-4: over the fixed range BASE..TIP of the change that brought this record in, the ledger gained exactly eight
+//     check lines and two rows and nothing else, and no file outside the matrix changed. The three overrides let the
+//     two-way test feed a broken ledger or file list.
 //
 // Exit 0 with one line on success; exit 1 with one line per fault.
 import { execFileSync } from "node:child_process";
@@ -19,7 +20,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { ADDED, BASE, FILES, GAINED, GATE_VIEWS, KNOWN_DEFECT, LOG_FOLDER, RULES_PAGE, RULES_SECTIONS, TOOL } from "./matrix.mjs";
+import { ADDED, BASE, FILES, GAINED, GATE_VIEWS, LOG_FOLDER, RULES_PAGE, RULES_SECTIONS, TIP, TOOL } from "./matrix.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const [mode, ...rest] = process.argv.slice(2);
@@ -68,16 +69,12 @@ if (mode === "pointers") {
   }
   finish(`pointers: ${Object.keys(expected).length} rows point at their check`);
 } else if (mode === "shape") {
-  let base;
-  try {
-    base = git("merge-base", "origin/main", "HEAD").trim() || BASE;
-  } catch {
-    base = BASE;
-  }
   const baseText = flag("--base-file")
     ? readFileSync(flag("--base-file"), "utf8")
-    : git("show", `${base}:design/decisions.yaml`);
-  const headText = readFileSync(flag("--head-file") ?? path.join(root, "design/decisions.yaml"), "utf8");
+    : git("show", `${BASE}:design/decisions.yaml`);
+  const headText = flag("--head-file")
+    ? readFileSync(flag("--head-file"), "utf8")
+    : git("show", `${TIP}:design/decisions.yaml`);
   const before = rowsOf(baseText);
   const after = rowsOf(headText);
   for (const [id, row] of before) {
@@ -96,7 +93,7 @@ if (mode === "pointers") {
     if (!after.has(id)) faults.push(`shape: row ${id} removed`);
   const files = flag("--files")
     ? flag("--files").split(",").filter(Boolean)
-    : git("diff", "--name-only", base, "HEAD").split("\n").filter(Boolean);
+    : git("diff", "--name-only", BASE, TIP).split("\n").filter(Boolean);
   const changed = files.filter((file) => !file.startsWith("_acceptance/") && !GATE_VIEWS.includes(file));
   for (const file of changed)
     if (!FILES.includes(file) && !(file.startsWith(LOG_FOLDER) && file.endsWith(".md")))
@@ -117,10 +114,9 @@ if (mode === "pointers") {
   if (heading !== saidHeading)
     faults.push(`rules: Type says headings in ${saidHeading ?? "nothing"}, design/theme.json holds ${heading}`);
   const wrong = page.split("\n").filter((line) => line.includes("undefined"));
-  if (wrong.length !== 1 || !wrong[0].includes(KNOWN_DEFECT))
-    faults.push(`rules: ${wrong.length} lines say undefined, the known defect is one`);
+  if (wrong.length) faults.push(`rules: ${wrong.length} lines say undefined, none may`);
   finish(
-    `rules: Controls says ${min}px as design/theme.json holds; Type says headings in ${heading} as design/theme.json holds; one known wrong line`,
+    `rules: Controls says ${min}px as design/theme.json holds; Type says headings in ${heading} as design/theme.json holds; no line says undefined`,
   );
 } else {
   console.log("usage: kiem.mjs pointers|rules|shape [--root DIR] [--base-file F] [--head-file F] [--files a,b]");

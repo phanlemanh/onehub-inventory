@@ -10,7 +10,7 @@ import { execPath } from "node:process";
 import { after, test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { BASE } from "./matrix.mjs";
+import { BASE, TIP } from "./matrix.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "../../..");
@@ -18,6 +18,8 @@ const scratch = mkdtempSync(path.join(tmpdir(), "design-assembly-adopt-checks-")
 after(() => rmSync(scratch, { recursive: true, force: true }));
 
 const real = (file) => readFileSync(path.join(ROOT, file), "utf8");
+// The ledger as the change that brought this record in left it: the shape measure reads the fixed range BASE..TIP.
+const atTip = (file) => execFileSync("git", ["show", `${TIP}:${file}`], { cwd: ROOT, encoding: "utf8" });
 const run = (...args) => {
   const result = spawnSync(execPath, [path.join(HERE, "kiem.mjs"), ...args], { encoding: "utf8" });
   return { code: result.status, out: `${result.stdout}${result.stderr}` };
@@ -98,25 +100,25 @@ test("shape: green on the repository", () => {
 });
 
 test("shape: red when another row changes", () => {
-  const head = file("head-source.yaml", real("design/decisions.yaml").replace('source: "Intl vi-VN"', 'source: "Intl en-US"'));
+  const head = file("head-source.yaml", atTip("design/decisions.yaml").replace('source: "Intl vi-VN"', 'source: "Intl en-US"'));
   red("shape: row format-number-date changed beyond its check", "shape", "--head-file", head);
 });
 
 test("shape: red when a row is removed", () => {
-  const text = real("design/decisions.yaml");
+  const text = atTip("design/decisions.yaml");
   const start = text.indexOf("  - id: column-width");
   const end = text.indexOf("  - id: table-density");
   red("shape: row column-width removed", "shape", "--head-file", file("head-removed.yaml", text.slice(0, start) + text.slice(end)));
 });
 
 test("shape: red when a row outside the matrix is added", () => {
-  const head = file("head-extra.yaml", `${real("design/decisions.yaml")}  - id: probe-row\n    layer: foundations\n    kind: closed\n    source: "probe"\n`);
+  const head = file("head-extra.yaml", `${atTip("design/decisions.yaml")}  - id: probe-row\n    layer: foundations\n    kind: closed\n    source: "probe"\n`);
   red("shape: row probe-row added, not in the matrix", "shape", "--head-file", head);
 });
 
 test("shape: red when a row gains a check it was not given", () => {
   const base = execFileSync("git", ["show", `${BASE}:design/decisions.yaml`], { cwd: ROOT, encoding: "utf8" });
-  const head = file("head-check.yaml", real("design/decisions.yaml").replace('source: "Chủ kho, sáng và tối"\n    check: "e2e:tests/e2e/frame.spec.ts"', 'source: "Chủ kho, sáng và tối"\n    check: "e2e:tests/e2e/grid.spec.ts"'));
+  const head = file("head-check.yaml", atTip("design/decisions.yaml").replace('source: "Chủ kho, sáng và tối"\n    check: "e2e:tests/e2e/frame.spec.ts"', 'source: "Chủ kho, sáng và tối"\n    check: "e2e:tests/e2e/grid.spec.ts"'));
   assert.ok(base.length > 0);
   red("shape: row theme-modes changed beyond its check", "shape", "--head-file", head);
 });
@@ -140,7 +142,7 @@ test("shape: red when another file under docs/ changed", () => {
 });
 
 test("rules: green on the repository", () => {
-  assert.match(green("rules"), /rules: Controls says 24px as design\/theme.json holds; Type says headings in var\(--font-sans\) as design\/theme.json holds; one known wrong line/);
+  assert.match(green("rules"), /rules: Controls says 24px as design\/theme.json holds; Type says headings in var\(--font-sans\) as design\/theme.json holds; no line says undefined/);
 });
 
 test("rules: red when Controls states another size", () => {
@@ -153,9 +155,9 @@ test("rules: red when Type names another heading typeface", () => {
   red("rules: Type says headings in Georgia, design/theme.json holds var(--font-sans)", "rules", "--page", page);
 });
 
-test("rules: red when a second line goes wrong", () => {
-  const page = file("rules-two.md", real(".claude/rules/design-assembly.md").replace("A control is at least 24px high.", "A control is at least 24px high. Spacing is undefined."));
-  red("rules: 2 lines say undefined, the known defect is one", "rules", "--page", page);
+test("rules: red when a line goes wrong", () => {
+  const page = file("rules-one.md", real(".claude/rules/design-assembly.md").replace("A control is at least 24px high.", "A control is at least 24px high. Spacing is undefined."));
+  red("rules: 1 lines say undefined, none may", "rules", "--page", page);
 });
 
 test("rules: red when a section is missing", () => {

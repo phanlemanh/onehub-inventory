@@ -1,10 +1,14 @@
 // The matrix this record measures against, written before the measures ran. Every measure in this
 // folder reads it from here, so a number is written down once.
 
-// The commit the branch was cut from (git merge-base origin/main HEAD on 2026-11-23). The shape
-// measure computes the merge-base again at run time, so merging main into the branch does not move
-// what it compares; this pin is the fallback where origin/main cannot be read.
+// The commit the branch was cut from (git merge-base origin/main HEAD on 2026-11-23).
 export const BASE = "9bf4054f6cb2bd2509277830b6c35d3c6297295d";
+
+// The last commit of the change that brought this record in (PR #111, merged at 25f84709 with BASE as its first
+// parent). The shape measure reads the fixed range BASE..TIP: what that change did is history, so a later branch that
+// changes other files no longer turns it red (fixed after sign-off in PR #136, G-2811-116). Before, it computed the
+// merge-base of the branch it ran on, which only held while this record's own branch was open.
+export const TIP = "bd995b479e356c808e3fd999eb34426d14ca38f0";
 
 export const TOOL = "tool:tools/design-assembly/check.mjs";
 
@@ -40,7 +44,9 @@ export const LOG_FOLDER = "wiki/log/";
 // the branch.
 export const GATE_VIEWS = ["PRODUCT-MAP.md", "LO-TRINH.html"];
 
-// The sections the regenerated rules page must have (AC-5), and the one known wrong line.
+// The sections the regenerated rules page must have (AC-5). The one wrong line the page had when this record was
+// signed («Running text is set in `undefined`») was fixed on main at 6d5d332d; since then no line may say undefined
+// (fixed after sign-off in PR #136, G-2811-116). KNOWN_DEFECT is the text of that old line, kept for the record.
 export const RULES_PAGE = ".claude/rules/design-assembly.md";
 export const RULES_SECTIONS = ["Type", "A screen", "Questions only the owner answers", "No check holds these: a person reviews them", "Controls", "After a change"];
 export const KNOWN_DEFECT = "Running text is set in `undefined`";

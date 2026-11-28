@@ -118,10 +118,15 @@ export function formatByKind(kind: DisplayKind, value: unknown): string {
 
 /** The ReUI badge variant of each standard status. */
 export type StatusTone =
-  "success-light" | "info-light" | "primary-light" | "warning-light" | "destructive-light";
+  | "success-light"
+  | "info-light"
+  | "primary-light"
+  | "warning-light"
+  | "destructive-light"
+  | "invert-light";
 
 export const STATUS_TONE: Readonly<Record<ListingStandardStatus, StatusTone>> = {
-  Incomplete: "warning-light",
+  Incomplete: "invert-light",
   Active: "success-light",
   Pending: "info-light",
   Closed: "primary-light",

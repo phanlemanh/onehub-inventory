@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 2d814a8e2c6485c90d50ada24b850f92755ba800
+verified_commit: c9b71e604a94fdcf7393ed7ca35799f9fe70bb93
 human_signoff: Manh Phan 2026-11-11
 ---
 
@@ -172,3 +172,7 @@ Round 3: mọi eval E1-E10 xanh, lệnh suite make check và npm run build xanh.
 ### Re-pin lần 1 — 2026-11-28, do hàng 11 nhap-excel trước Cổng Bằng chứng, sau vòng chấm 12: 22 hồ sơ cổng nêu (gồm 11 hồ sơ có dòng sửa-sau-ký của PR #130) và nhap-excel (G-2811-62)
 run_id: repin-20261128T091000Z-36001
 sha: 2d814a8e2c6485c90d50ada24b850f92755ba800 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng
+
+### Re-pin lần 2 — 2026-11-28, do VP11 lát 1 (PR #136): các luật đã ký đổi theo Hỏi-1/2/4, sửa bản phá loc-dau-cot và pageReady (G-2811-100/108), gộp main 81bc090c
+run_id: repin-20261128T130112Z-65735
+sha: c9b71e604a94fdcf7393ed7ca35799f9fe70bb93 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng

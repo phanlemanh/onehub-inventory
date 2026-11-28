@@ -358,7 +358,11 @@ async function mountedRows(page: Page): Promise<[number, string[]][]> {
   return tableRows(page).evaluateAll(
     (trs, kinds) =>
       trs
-        .filter((tr) => getComputedStyle(tr).display !== "none")
+        // A row a person cannot see is not read: out of the layout, or kept in it unseen (the «chi con khung dau» break).
+        .filter((tr) => {
+          const style = getComputedStyle(tr);
+          return style.display !== "none" && style.visibility !== "hidden";
+        })
         .map((tr): [number, string[]] => {
           const text = (cell: HTMLElement) => {
             const copy = cell.cloneNode(true) as HTMLElement;
@@ -975,6 +979,9 @@ export const REGION: Recipe[] = [
         // Hides every result row numbered past the first window (the rows a person sees before any scrolling),
         // re-applied on every re-render: the results never reach past that window. When every result fits in that
         // window (a short grid, row 2e), the cut falls at half the results, so the results still stop short.
+        // A hidden row keeps its height (`visibility`, not `display`): taken out of the layout, the virtual body measured
+        // it as nothing, the run shrank and grew back on every re-render, and the page never settled — 46 s on GitHub
+        // at 1440, then past the 90 s limit (#136, ef8659bd). The check reads neither kind of hidden row.
         apply: async ({ page }) => {
           const window = await visibleRows(page);
           await onResult(
@@ -992,7 +999,7 @@ export const REGION: Recipe[] = [
              const cut = left > 1 && left <= ${window} ? Math.floor(left / 2) : ${window};
              document.querySelectorAll('[data-slot="data-region-body"] tbody tr').forEach((tr) => {
                const n = Number(tr.querySelector('[data-slot="row-number"]')?.textContent ?? '0');
-               if (n > cut) tr.style.display = 'none';
+               if (n > cut) tr.style.visibility = 'hidden';
              });`,
           );
         },

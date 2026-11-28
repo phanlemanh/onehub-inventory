@@ -1,6 +1,6 @@
 # Components
 
-Written from the design ledgers at db402503d0d7. Do not change it here: change a ledger, then write it again with make design-exports.
+Written from the design ledgers at 75149fe6618f. Do not change it here: change a ledger, then write it again with make design-exports.
 
 - **ActionPermissionProvider** (atom), `src/components/candidate/action-permission.tsx`: permitted
 - **CellEditor** (atom), `src/components/candidate/cell-editor.tsx`: anchor, find, label, onClose
@@ -29,7 +29,7 @@ Written from the design ledgers at db402503d0d7. Do not change it here: change a
 - **RecordActions** (organism), `src/components/candidate/row-actions.tsx`: main, actions, mine, title
 - **TouchTarget** (atom), `src/components/candidate/touch-target.tsx`
 - **TruncatedText** (atom), `src/components/candidate/truncated-text.tsx`: text
-- **TypedCell** (molecule), `src/components/candidate/typed-cell.tsx`: kind, value, transaction, lockedReason, editMode
+- **TypedCell** (molecule), `src/components/candidate/typed-cell.tsx`: kind, value, transaction, lockedReason, editMode, pencil
 - **Badge** (atom), `src/components/reui/badge.tsx`: render
 - **CascaderColumnPanel** (organism), `src/components/reui/cascader/cascader-columns.tsx`: column, virtualized
 - **CascaderColumns** (organism), `src/components/reui/cascader/cascader-columns.tsx`: columnWidth, maxHeight

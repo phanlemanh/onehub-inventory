@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "slug": "chuan-hoa-he-design",
+  "ghi_luc": "2026-11-28T12:10:12Z",
+  "vong_cham": 4,
+  "luot": [
+    {
+      "vong": 1,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang",
+        "hop-dong-yeu-cau"
+      ]
+    },
+    {
+      "vong": 2,
+      "verdict": "PENDING-JUDGMENT",
+      "tang": []
+    },
+    {
+      "vong": 3,
+      "verdict": "REJECT",
+      "tang": [
+        "bai-kiem-ha-tang"
+      ]
+    },
+    {
+      "vong": 4,
+      "verdict": "PENDING-JUDGMENT",
+      "tang": []
+    }
+  ],
+  "lam_lai": [
+    {
+      "nguon": "r1",
+      "tang": "bai-kiem-ha-tang"
+    },
+    {
+      "nguon": "r1",
+      "tang": "hop-dong-yeu-cau"
+    },
+    {
+      "nguon": "r3",
+      "tang": "bai-kiem-ha-tang"
+    }
+  ],
+  "theo_tang": {
+    "bai-kiem-ha-tang": 2,
+    "trang-thai-hanh-vi": 0,
+    "du-lieu-api": 0,
+    "nghiep-vu": 0,
+    "thanh-phan": 0,
+    "bo-cuc": 0,
+    "hop-dong-yeu-cau": 1,
+    "link": 0,
+    "chu-dinh-dang": 0,
+    "mau-token": 0,
+    "truy-cap": 0
+  },
+  "chua_phan": [],
+  "thuoc_vat": {
+    "vat": [
+      446,
+      63
+    ],
+    "thuoc": [
+      85,
+      64
+    ],
+    "nhat": 3
+  },
+  "gio_may": {
+    "gio_may": 13.42,
+    "gio_cho": 1.01,
+    "phan_tram_tuan": 27.45
+  }
+}
