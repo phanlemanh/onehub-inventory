@@ -1,0 +1,164 @@
+schema_version: 1
+feature_slug: migration-vai-chu-khong-sieu-cap
+# Kế hoạch đo, viết trước khi chấm. E1–E5 cùng một lệnh (rang/kiem.mjs --pg 17): một cụm Postgres 17 riêng chạy bảy ca
+# theo thứ tự; mỗi eval đọc dòng `ok <ca>` của AC mình. E1t chạy cùng tệp ở `--tu-kiem`: vật lành phải xanh và ba bản
+# phá phải đỏ với thông điệp ghim — chiều đỏ của E1–E4. Đỏ của mỗi ca in `DO <ca>: <thông điệp ghim>` và lệnh thoát 1.
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: script
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 17
+    layer: backend-effect
+    paths: ["db/migrations/**", "db/scripts/migrate.sh", "db/scripts/psql.sh", "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs"]
+    expected: >-
+      exit 0; in «ok doi-chung — thiếu hai tệp: dừng ở 002 với must be able to SET ROLE "quy_hang_identity"» và dòng
+      cuối «kiem: 7/7 ca đạt (postgres 17.<n> …)». Chiều đỏ: thiếu hai tệp mà không dừng ở 002, hay dừng mà cụm đã có
+      vai danh tính → «DO doi-chung: đối chứng không dừng ở 002 như bản thử»; cụm không phải bản 17 → «kiem: không chạy
+      được — cụm chạy Postgres <v>, không phải 17» (exit 2).
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E2
+    criterion: AC-2
+    executor: script
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 17
+    layer: backend-effect
+    paths: ["db/migrations/**", "db/scripts/migrate.sh", "db/scripts/psql.sh", "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs"]
+    expected: >-
+      exit 0; in «ok noi-ban-thu — chỉ 001_nen đã áp, chạy lại áp nốt 14 tệp» và «ok du-migration — vai chủ không siêu
+      cấp áp đủ 15 tệp». Chiều đỏ: «DO noi-ban-thu: vai chủ không nối được từ trạng thái bản thử» hay «DO du-migration:
+      vai chủ không áp đủ migration» kèm ba dòng lỗi cuối của psql; bản phá E1t «pha-thieu-001-vai-khi-da-co-vai» cho
+      thấy thiếu 001 thì 002 dừng.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E3
+    criterion: AC-3
+    executor: script
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 17
+    layer: backend-effect
+    paths: ["db/migrations/**", "db/scripts/migrate.sh", "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs"]
+    expected: >-
+      exit 0; in «ok giong-sieu-vai — <n> dòng chủ và quyền bằng bản siêu vai, ở cả chu_du và chu_noi» với n > 0, và
+      «ok vai-giong-sieu-vai — <m> dòng vai và thành viên bằng cụm chỉ siêu vai chạy; vai chủ giữ đúng <k> dòng đã khai».
+      Chiều đỏ: «trạng thái cuối lệch bản siêu vai: <cơ sở> (<k> dòng)» kèm các dòng lệch, «vai danh tính còn quyền
+      CREATE: …», «còn quyền mặc định: …», «vai lệch bản siêu vai (<k> dòng)», «thành viên của vai chủ lệch mức khai» —
+      ghim bởi ba bản phá của E1t.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E4
+    criterion: AC-4
+    executor: script
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 17
+    layer: backend-effect
+    paths: ["db/migrations/**", "db/scripts/migrate.sh", "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs"]
+    expected: >-
+      exit 0; in «ok da-ap-tu-truoc — đã áp 13 tệp cũ: chạy lại chỉ áp 001_vai rồi 004, trạng thái cuối không đổi».
+      Chiều đỏ: «DO da-ap-tu-truoc: cơ sở đã áp từ trước không nhận hai tệp mới đúng cách: … in «<các dòng>»» khi lệnh
+      in khác đúng ba dòng «đã áp 001_vai_chu_khong_sieu_cap.sql | đã áp 004_thu_quyen_tao_cua_vai_danh_tinh.sql | xong
+      — 2 migration mới», kèm dòng lệch bản siêu vai nếu có.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E5
+    criterion: AC-5
+    executor: script
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 17
+    layer: backend-effect
+    paths: ["db/migrations/**", "db/scripts/cach-ly-dich.sh", "db/tests/vai-dang-nhap-mau.sql", "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs"]
+    expected: >-
+      exit 0; in «ok cach-ly-dich — cach-ly-dich: <n> ca đạt» với n ≥ 4; hai sàn mẫu ghi bằng vai chủ giả Supabase,
+      vai đăng nhập do vai chủ ấy tạo qua migration 008. Chiều đỏ: «DO cach-ly-dich: cach-ly-dich.sh
+      đỏ với vai chủ không siêu cấp: exit <m>, «<dòng cuối>» <lỗi>»; các bản phá của chính cach-ly-dich.sh do hồ sơ
+      moi-truong-thu-va-ban-that ghim (executors.test.cach_ly_dich), không đo lại ở đây.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E1t
+    criterion: AC-3
+    executor: script
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 17 --tu-kiem
+    layer: backend-effect
+    paths: ["db/migrations/**", "db/scripts/migrate.sh", "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs"]
+    expected: >-
+      exit 0, dòng cuối «tu-kiem: 5/5 ca đúng (postgres 17.<n> …)»: «ok vat-lanh — vật lành xanh»; «ok pha-thieu-004 —
+      trạng thái cuối lệch bản siêu vai» (thông điệp có «vai danh tính còn quyền CREATE»); «ok
+      pha-quyen-chi-khi-khong-sieu — trạng thái cuối lệch bản siêu vai»; «ok pha-thieu-001-vai-khi-da-co-vai — vai chủ
+      dừng: … permission denied for schema app · lỗi khi áp 002_dang_nhap_ma_email.sql»; «ok pha-them-thanh-vien — vai lệch bản siêu vai (1 dòng)». Một bản phá không đỏ đúng
+      thông điệp → «DO <ca>: …» và exit 1.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6
+    criterion: AC-6
+    executor: script
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/pham-vi.mjs
+    layer: backend-effect
+    expected: >-
+      exit 0, in «pham-vi ok: <n> tệp so với <điểm rẽ>, migration chỉ thêm (2 tệp), ngoài hồ sơ chỉ đúng tệp của thiết
+      kế». Chiều đỏ (ca của E6t, trên chính đầu ra git thật đã phá một chỗ): «migration đã commit bị sửa: <tệp> (M)»,
+      «PR chạm tệp ngoài phạm vi: <tệp>», «PR thiếu tệp của thiết kế: <tệp>».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E6t
+    criterion: AC-6
+    executor: script
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/pham-vi.mjs --tu-kiem
+    layer: backend-effect
+    expected: "exit 0, dòng cuối «tu-kiem: 4/4 ca đúng»: vật lành xanh, ba bản phá đỏ với đúng ba thông điệp ghim của E6."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7
+    criterion: AC-7
+    executor: script
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs --cho 60
+    layer: backend-effect
+    paths: ["_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs"]
+    expected: >-
+      exit 0, in «ci ok: đầu nhánh <sha> run <id> quick, check, e2e, e2e-db xanh · e2e-db <chạy thật ở đầu nhánh | dùng
+      lại run <id> ở <sha>> trên postgres:16, 6/6 bước, có bài chu-khong-sieu-cap» — đọc bằng gh, chỉ đọc. Lượt được
+      dùng lại phải xanh, chạy thật, chứa commit mã của PR và cùng mã với đầu nhánh. Chiều đỏ (ca của E7t): «ci: <việc>
+      trên đầu nhánh <sha> không xanh (<kết>)», «lượt e2e-db được dùng lại ở <sha> có mã khác đầu nhánh», «… không chứa
+      commit mã …», «nhật ký e2e-db chạy thật thiếu «ci-db: 6/6 bước đạt»», «… không nhắc tệp
+      chu-khong-sieu-cap.db.test.ts», «lượt CI trên đầu nhánh <sha> chưa xong (<trạng thái>)».
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E7t
+    criterion: AC-7
+    executor: script
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs --tu-kiem --cho 60
+    layer: backend-effect
+    paths: ["_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs"]
+    expected: >-
+      exit 0, dòng cuối «tu-kiem: 15/15 ca đúng» khi e2e-db ở đầu nhánh dùng lại một lượt trước, hoặc «tu-kiem: 7/7
+      ca đúng» kèm dòng «đầu nhánh chạy e2e-db thật — bỏ năm ca của nhánh dùng lại» khi nó chạy thật (khi ấy không có
+      dòng dùng lại thật để tách, nên ba ca đọc dòng và năm ca của nhánh dùng lại không có dữ liệu): dữ liệu CI thật vừa đọc xanh; «doc-dong-dung-lai-that» tách đúng run và
+      commit từ chính dòng «not run again: same inputs as run <URL> at commit <sha>» CI in ra, và từ cùng dòng ấy cắt
+      còn số trần («doc-dong-dung-lai-so-tran»); dòng lệnh echo CI in trước nó không bị đọc nhầm; mười một bản phá trên
+      chính dữ liệu ấy đỏ, mỗi dòng đỏ của phép đo một bản (e2e-db bị huỷ, thiếu việc check, chưa xong, thiếu 6/6, thiếu
+      bài mới, không phải postgres:16, dùng lại có mã khác, không chứa commit mã, lượt dùng lại đỏ, sai commit, lượt dùng
+      lại cũng dùng lại). Lượt CI đầu nhánh chưa có → «tu-kiem: không chạy được …», exit 1.
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8
+    criterion: AC-8
+    executor: script
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 16
+    layer: backend-effect
+    paths: ["db/migrations/**", "db/scripts/**", "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs"]
+    expected: "exit 0, dòng cuối «kiem: 7/7 ca đạt (postgres 16.<n> …)»: bảy ca của E1–E5 cũng xanh trên Postgres 16."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8b
+    criterion: AC-8
+    executor: test
+    cmd: bash _acceptance/migration-vai-chu-khong-sieu-cap/rang/bai-kiem.sh
+    layer: backend-effect
+    paths: ["db/migrations/**", "db/scripts/**", "tests/db/chu-khong-sieu-cap.db.test.ts", "tests/db/rieng-cum.ts"]
+    expected: "exit 0: bốn ca của tests/db/chu-khong-sieu-cap.db.test.ts pass trên cụm riêng Postgres 16."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8c
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.check
+    layer: backend-effect
+    expected: "exit 0: make check xanh."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8d
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.build
+    layer: backend-effect
+    expected: "exit 0: npm run build xanh."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+  - id: E8e
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.e2e
+    layer: backend-effect
+    expected: "exit 0: make e2e xanh ở bốn khổ màn."
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
