@@ -6,30 +6,30 @@
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Hinh dang 2 + 4: fixture viet tay cho ca 'khong-doc-dong-lenh-echo', dung mot minh van xanh ma khong do gi**
-  Người dùng thấy gì: Mot phep thu cua bo kiem tra nghiem thu co the bao dat ma khong do duoc dieu no hua. Nguoi dung cuoi khong bi anh huong, chi la do tin cay cua ket luan nghiem thu thap hon mot chut.
-  Căn cứ: Chi anh huong do chac chan cua bo kiem tra noi bo, khong lam mat hay lo du lieu cua ai, va co the siet lai sau neu can.
+- **Hình dạng 2 + 4: dữ liệu viết tay cho ca «khong-doc-dong-lenh-echo», đứng một mình vẫn xanh mà không đo gì**
+  Người dùng thấy gì: Một phép thử của bộ kiểm tra nghiệm thu có thể báo đạt mà không đo được điều nó hứa. Người dùng cuối không bị ảnh hưởng, chỉ là độ tin cậy của kết luận nghiệm thu thấp hơn một chút.
+  Căn cứ: Chỉ ảnh hưởng độ chắc chắn của bộ kiểm tra nội bộ, không làm mất hay lộ dữ liệu của ai, và có thể siết lại sau nếu cần.
   file: `_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs`
   severity: medium
   Đề xuất: known-limits
 
-- **Hinh dang 2: cac ban pha 'ma khac' va 'khong chua ma' ghi thang gia tri dung/sai vao khuon cua ben doc, bo qua ham git tinh ra no**
-  Người dùng thấy gì: Bo kiem tra nghiem thu chua thu phan so sanh ma tren cac cap ban ghi thuc te, nen mot loi o buoc nay co the lot qua. San pham giao cho nguoi dung khong doi.
-  Căn cứ: Rui ro chi nam o lop kiem tra phu tro, khong cham toi du lieu hay thao tac cua nguoi dung, va chap nhan duoc roi ghi lai la han che da biet.
+- **Hình dạng 2: các bản phá «mã khác» và «không chứa mã» ghi thẳng giá trị đúng/sai vào khuôn của bên đọc, bỏ qua hàm git tính ra nó**
+  Người dùng thấy gì: Bộ kiểm tra nghiệm thu chưa thử phần so sánh mã trên các cặp bản ghi thực tế, nên một lỗi ở bước này có thể lọt qua. Sản phẩm giao cho người dùng không đổi.
+  Căn cứ: Rủi ro chỉ nằm ở lớp kiểm tra phụ trợ, không chạm tới dữ liệu hay thao tác của người dùng, và chấp nhận được rồi ghi lại là hạn chế đã biết.
   file: `_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs`
   severity: medium
   Đề xuất: known-limits
 
-- **Hinh dang 3: 'doc-dong-dung-lai' hua tach dung run va commit nhung commit chi duoc kiem theo dinh dang**
-  Người dùng thấy gì: Bo kiem tra chi xem ma phien ban co dung dang hay khong, chua doi chieu no co dung la ma CI ghi. Nguoi dung khong thay anh huong gi.
-  Căn cứ: Anh huong rat nhe, chi lam bo kiem tra noi bo long hon mot chut, khong dung toi du lieu va de siet lai khi can.
+- **Hình dạng 3: «doc-dong-dung-lai» hứa tách đúng lượt chạy và commit, nhưng commit chỉ được kiểm theo định dạng**
+  Người dùng thấy gì: Bộ kiểm tra chỉ xem mã phiên bản có đúng dạng hay không, chưa đối chiếu nó có đúng là mã CI ghi. Người dùng không thấy ảnh hưởng gì.
+  Căn cứ: Ảnh hưởng rất nhẹ, chỉ làm bộ kiểm tra nội bộ lỏng hơn một chút, không đụng tới dữ liệu và dễ siết lại khi cần.
   file: `_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs`
   severity: low
   Đề xuất: known-limits
 
-- **Hinh dang 3: 'co bai chu-khong-sieu-cap' va 'postgres:16' chi la kiem chuoi co mat o bat ky dau trong nhat ky**
-  Người dùng thấy gì: Bo kiem tra co the bao dat khi bai kiem hay phien ban co so du lieu chi duoc nhac ten trong nhat ky chu chua chay that. Nguoi dung cuoi khong thay thay doi.
-  Căn cứ: Chi lam ket luan nghiem thu kem chac chan hon, khong gay mat hay lo du lieu, va nguoi ky co the doc lai nhat ky CI bang mat de bu.
+- **Hình dạng 3: «có bài chu-khong-sieu-cap» và «postgres:16» chỉ là kiểm chuỗi có mặt ở bất kỳ đâu trong nhật ký**
+  Người dùng thấy gì: Bộ kiểm tra có thể báo đạt khi bài kiểm hay phiên bản cơ sở dữ liệu chỉ được nhắc tên trong nhật ký chứ chưa chạy thật. Người dùng cuối không thấy thay đổi.
+  Căn cứ: Chỉ làm kết luận nghiệm thu kém chắc chắn hơn, không gây mất hay lộ dữ liệu, và người ký có thể đọc lại nhật ký CI bằng mắt để bù.
   file: `_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs`
   severity: low
   Đề xuất: known-limits
