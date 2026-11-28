@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ba trạng thái trước khi chạy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Lora:ital,wght@0,400;1,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', 'Lora', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1240px; width: 100%; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+      color: var(--color-ink);
+      margin-bottom: 1.5rem;
+    }
+    svg { width: 100%; min-width: 960px; display: block; }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Sơ đồ luồng · migration-vai-chu-khong-sieu-cap</p>
+    <h1>Ba trạng thái trước khi chạy</h1>
+
+    <svg viewBox="0 0 1200 620" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
+      </defs>
+
+      <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+      <!-- ===== Connectors (behind nodes) ===== -->
+      <!-- Start → branch 1 (attach y=228) -->
+      <path d="M260,228 H280 Q288,228 288,220 V120 Q288,112 296,112 H318" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- Start → branch 2 (attach y=248) -->
+      <line x1="260" y1="248" x2="318" y2="248" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- Start → branch 3 (attach y=268) -->
+      <path d="M260,268 H280 Q288,268 288,276 V376 Q288,384 296,384 H318" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- Start → control (bottom edge, dashed accent) -->
+      <path d="M152,288 V492 Q152,500 160,500 H318" fill="none" stroke="#eb6c36" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow-accent)"/>
+
+      <!-- State → run, three rows -->
+      <line x1="540" y1="112" x2="598" y2="112" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="540" y1="248" x2="598" y2="248" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="540" y1="384" x2="598" y2="384" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+      <!-- Run → merge (fanned attach 228 / 248 / 268) -->
+      <path d="M860,112 H880 Q888,112 888,120 V220 Q888,228 896,228 H918" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="860" y1="248" x2="918" y2="248" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <path d="M860,384 H880 Q888,384 888,376 V276 Q888,268 896,268 H918" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+      <!-- ===== Start node ===== -->
+      <rect x="40" y="200" width="220" height="88" rx="6" fill="#f5f5f5"/>
+      <rect x="40" y="200" width="220" height="88" rx="6" fill="rgba(79,93,117,0.10)" stroke="#636b80" stroke-width="1"/>
+      <text x="150" y="232" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Vai chủ giả Supabase</text>
+      <text x="150" y="252" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">(không siêu vai, có</text>
+      <text x="150" y="268" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">CREATEROLE · CREATEDB · BYPASSRLS)</text>
+
+      <!-- ===== Branch 1 ===== -->
+      <rect x="320" y="76" width="220" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="320" y="76" width="220" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="328" y="84" width="36" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="346" y="96" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-2</text>
+      <text x="430" y="124" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">(1) Cơ sở mới</text>
+
+      <rect x="600" y="76" width="260" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="600" y="76" width="260" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="730" y="108" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">áp 001_nen, 001_vai, 002…014, 004</text>
+      <text x="730" y="128" fill="#4f5d75" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle">theo thứ tự tên</text>
+
+      <!-- ===== Branch 2 ===== -->
+      <rect x="320" y="212" width="220" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="320" y="212" width="220" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="328" y="220" width="36" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="346" y="232" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-2</text>
+      <text x="430" y="260" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">(2) Như bản thử: mới áp 001_nen</text>
+
+      <rect x="600" y="212" width="260" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="600" y="212" width="260" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="730" y="252" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">chạy lại: áp nốt 14 tệp</text>
+
+      <!-- ===== Branch 3 ===== -->
+      <rect x="320" y="348" width="220" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="320" y="348" width="220" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <rect x="328" y="356" width="36" height="16" rx="2" fill="transparent" stroke="rgba(45,49,66,0.40)" stroke-width="0.8"/>
+      <text x="346" y="368" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-4</text>
+      <text x="430" y="392" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">(3) Máy dãy: siêu vai</text>
+      <text x="430" y="408" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">đã áp 13 tệp cũ</text>
+
+      <rect x="600" y="348" width="260" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="600" y="348" width="260" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+      <text x="730" y="388" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">chạy lại: chỉ áp 001_vai rồi 004</text>
+
+      <!-- ===== Merge (focal) ===== -->
+      <rect x="920" y="188" width="240" height="120" rx="6" fill="#f5f5f5"/>
+      <rect x="920" y="188" width="240" height="120" rx="6" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.4"/>
+      <rect x="928" y="196" width="36" height="16" rx="2" fill="transparent" stroke="rgba(186,69,19,0.50)" stroke-width="0.8"/>
+      <text x="946" y="208" fill="#ba4513" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-3</text>
+      <text x="1040" y="240" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">So với bản siêu vai:</text>
+      <text x="1040" y="260" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle">chủ và quyền giống hệt,</text>
+      <text x="1040" y="280" fill="#2d3142" font-size="12" font-family="'Geist', sans-serif" text-anchor="middle">vai danh tính không giữ CREATE</text>
+
+      <!-- ===== Control branch (warning) ===== -->
+      <rect x="320" y="464" width="540" height="72" rx="6" fill="#f5f5f5"/>
+      <rect x="320" y="464" width="540" height="72" rx="6" fill="rgba(235,108,54,0.05)" stroke="rgba(235,108,54,0.70)" stroke-width="1.2" stroke-dasharray="4,4"/>
+      <rect x="328" y="472" width="104" height="16" rx="2" fill="transparent" stroke="rgba(186,69,19,0.50)" stroke-width="0.8"/>
+      <text x="380" y="484" fill="#ba4513" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">AC-1 · ĐỐI CHỨNG</text>
+      <text x="590" y="504" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Bỏ 001_vai và 004 → dừng ở 002:</text>
+      <text x="590" y="524" fill="#ba4513" font-size="10" font-family="'Geist Mono', monospace" text-anchor="middle">must be able to SET ROLE</text>
+
+      <!-- ===== Legend ===== -->
+      <line x1="40" y1="564" x2="1160" y2="564" stroke="rgba(45,49,66,0.12)" stroke-width="0.8"/>
+      <text x="40" y="584" fill="#4f5d75" font-size="9" font-family="'Geist Mono', monospace" letter-spacing="0.14em">CHÚ GIẢI</text>
+
+      <line x1="140" y1="580" x2="168" y2="580" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <text x="176" y="584" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Nhánh phải chạy xong</text>
+
+      <line x1="340" y1="580" x2="368" y2="580" stroke="#eb6c36" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow-accent)"/>
+      <text x="376" y="584" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Nhánh đối chứng — phải dừng</text>
+
+      <rect x="580" y="574" width="24" height="12" rx="2" fill="rgba(235,108,54,0.08)" stroke="#eb6c36" stroke-width="1.2"/>
+      <text x="612" y="584" fill="#4f5d75" font-size="9" font-family="'Geist', sans-serif">Ô hội của ba nhánh</text>
+    </svg>
+  </div>
+</body>
+</html>

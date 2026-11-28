@@ -1,0 +1,4 @@
+{
+  "feature_plain": "Lần đưa bản thử lên kế tiếp sẽ đi qua bước nâng cấp cơ sở dữ liệu trên tài khoản quản trị của Supabase (không có quyền siêu cấp), thay vì dừng ở tệp 002 như ngày 28/11; máy dãy, CI và cơ sở đã có không đổi gì.",
+  "analyst_plain": ""
+}
