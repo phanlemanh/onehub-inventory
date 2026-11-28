@@ -1,114 +1,129 @@
-# Review findings: chuan-hoa-he-design (round 1)
-
-Không có finder nào chết; review đầy đủ.
+# Review findings: chuan-hoa-he-design (round 2)
 
 ## Trong hợp đồng
 
-- **Shape 4, a negative-only check: on an editable cell checkEnter never requires the editor to open**
-  AC: AC-4
-  file: `tests/e2e/chuan-hoa-sua-o.spec.ts:62`
-  severity: high
-  detail: checkEnter only rejects bad outcomes on an editable cell (`editable && !got.editor && got.record` and `editable && got.record`). It never asserts `got.editor === true`. If Enter does nothing on «1101 · Giá chào» (no editor, no record), the outcome passes, though AC-4/E5 promise that Enter opens the editor on the cell. The red test (around line 112) only feeds outcomes that contain `record`, so no red case exercises 'Enter did nothing'. The locked branch has its positive control (`got.record !== cell.row`); the editable branch has none.
-  source: measurement
-  rationale: AC-4 hứa Enter mở khung sửa trên ô sửa được, mà bài đo không bắt được trường hợp Enter không làm gì.
-
-- **Shape 1, measuring the instruction instead of the output: the 'no editable cell found' guard counts the hand-written case table, not the page**
-  AC: AC-6
-  file: `tests/e2e/chuan-hoa-sua-o.spec.ts:235`
-  severity: high
-  detail: `if (can) editable += 1;` increments on `can`, the expected value the author wrote in `cases` (always one `true`, for 1101 · Giá chào). It depends on nothing measured on the page, so `expect(editable, "no editable cell found").toBeGreaterThan(0)` (line 237) is always 1 > 0 and can never go red. E7 in evals.yaml names this as a red direction. The guard should count cells where `pencilOf` actually returned `shown`/editable.
-  source: measurement
-  rationale: AC-6 yêu cầu bút chì hiện trên ô sửa được và bài đo phải đỏ khi không có ô nào; chốt hiện đếm bảng tự viết nên không bao giờ đỏ.
-
-- **Shape 5, a class sweep with no matrix written in advance: the set of locked cells is filtered by the very attribute under test, and the count only has to be > 1**
-  AC: AC-3
-  file: `tests/e2e/chuan-hoa-mau.spec.ts:281`
-  severity: high
-  detail: lockedCells only collects `[data-slot="typed-cell"][title]`, the cells that already have a title. A locked cell of a Closed/Withdrawn row that lost its reason (no title), or that draws a padlock but has no title, drops out of the set and never reaches the 'gives no reason' or 'padlock' checks. The total is only held by `expect(checkLocks(cells)).toBeGreaterThan(1)` (line 308). There is no matrix written in advance of rows × columns (status, price, fee, company column per AC-3/E4). Related: the red case at line 346 removes aria-description on the page, but checkLocks then runs on the `cells` array captured before that change and edited by hand (`described: ""`), so the change to the page is never read back.
-  source: measurement
-  rationale: AC-3 nêu rõ bốn loại ô khoá của dòng đã bán và ngừng hẳn phải có lý do, mà bài đo lọc theo chính thuộc tính đang kiểm nên bỏ sót ô mất lý do.
-
-- **Shape 3, asserting that a string is present while the promise is a relation: the lock reason is checked only by its prefix, not by naming the row's status**
-  AC: AC-3
-  file: `tests/e2e/chuan-hoa-mau.spec.ts:297`
-  severity: medium
-  detail: checkLocks only checks `title.startsWith("Ô đang khoá")` and `described.startsWith("Ô đang khoá")`. typed-cell.tsx builds `${lockedPrefix}: ${lockedReason}`, so an empty reason or the wrong status's reason still passes. E4 expects the reason to start with the grid's lock words and name the status, a relation between the cell text and its row's `data-status`. No assert ties the reason to the status of the row.
-  source: measurement
-  rationale: AC-3 hứa rê chuột thấy lý do khoá và trình đọc màn hình đọc được; bài đo chỉ kiểm tiền tố nên lý do rỗng hay sai trạng thái vẫn qua.
-
-- **Shape 5, a declared class sweep with one axis element missing: the 'Tuỳ chỉnh của sàn' screen (Enter moves down a row) has no case although E5 says it is measured**
-  AC: AC-4
-  file: `_acceptance/chuan-hoa-he-design/evals.yaml:46`
-  severity: medium
-  detail: The contract's screen axis is Bảng hàng | Đã gửi | Tuỳ chỉnh của sàn (AC-4), and E5 `expected` states '/company-layer Enter → ô dưới được chọn'. chuan-hoa-sua-o.spec.ts has cases only for /inventory and /sent. The rendered-region tests in data-region-keys.test.tsx always mount `show(true)` (with a record), never the screen without one. The only coverage is the "grid" row of the pure-rule MATRIX, not what the region does with no record. The eval claims a measure the listed files do not contain.
-  source: measurement
-  rationale: AC-4 nêu đích danh màn Tuỳ chỉnh của sàn, Enter vẫn đi xuống một dòng, mà bài trình duyệt không có ca nào cho màn này.
-
-- **Shape 3, the promise 'light unchanged from before this round' is replaced by a property inside the current page**
-  AC: AC-11
-  file: `tests/e2e/chuan-hoa-mau.spec.ts:437`
-  severity: medium
-  detail: AC-11 and E19 promise that in light mode every such colour is unchanged and the three values are the same as before this round, which compares against a baseline. The test only asserts `|light.panel - light.grid| < 2` and `light.hover - light.menu < -2`, two relations inside the current page. It does not pin page, grid or panel greys to the pre-round values, so a light grey that moves with the grid (both shifted together) still passes. `g.page` is measured but appears in no check.
-  source: measurement
-  rationale: AC-11 hứa ở nền sáng mọi màu không đổi so với trước vòng, mà bài đo chỉ so quan hệ trong trang hiện tại, không so với giá trị cũ.
+Không có phát hiện nào map được vào AC.
 
 ## Ngoài hợp đồng — người quyết ở Gate 2
 
 Các lỗi dưới đây nằm ngoài phạm vi đã duyệt ở Cổng Phạm vi và CHƯA qua bác bỏ đối kháng — người quyết, máy không sửa và không chấm thứ máy không được sửa.
 
-- **Rule: file names and routes are English, and the owner's english-route-names ruling of 23/11**
-  Người dùng thấy gì: Màn nhập tệp có địa chỉ tiếng Việt trong khi các màn khác đã đổi sang tiếng Anh. Người dùng vẫn vào và dùng bình thường, chỉ là địa chỉ không đồng nhất.
-  Căn cứ: Chỉ là tên địa chỉ, không mất dữ liệu và không cản trở thao tác; đổi sau rẻ hơn nếu làm cùng hàng nhập tệp.
-  file: `src/app/(app)/nhap-tep/page.tsx`
+- **Design (AGENTS.md, Architecture): a module reads other modules' tables**
+  Người dùng thấy gì: Luật về căn rao và căn chờ nằm ở hai nơi, nên sau này sửa một nơi mà quên nơi kia có thể làm hai màn xử lý khác nhau.
+  Căn cứ: Hiện chưa làm người dùng thấy sai gì, chỉ là nợ cấu trúc; sửa càng muộn càng đắt nhưng không mất dữ liệu.
+  file: `src/modules/imports/store.ts`
   severity: medium
   Đề xuất: new-contract
 
-- **Tier: the PR's stated tier does not match tools/autonomy.py**
-  Người dùng thấy gì: Mô tả của bản thay đổi ghi mức duyệt thấp hơn thực tế, nên người gộp có thể không biết cần chủ mã duyệt. Người dùng cuối không thấy gì.
-  Căn cứ: Chỉ sai nhãn, không ảnh hưởng người dùng; người gộp sửa được bằng một dòng ghi chú hoặc gộp lại main sau khi bản dưới vào.
-  file: `governance/autonomy.yaml`
+- **Records (modules.yaml / AGENTS.md): a new module dependency has no decision page**
+  Người dùng thấy gì: Người sau đọc sổ sẽ không biết vì sao nhập Excel được phụ thuộc vào bốn phần khác của hệ thống.
+  Căn cứ: Chỉ thiếu ghi chép, người dùng không bị ảnh hưởng và bổ sung lúc nào cũng được.
+  file: `architecture/modules.yaml`
   severity: medium
   Đề xuất: known-limits
 
-- **Evidence: the required acceptance gate is red on HEAD**
-  Người dùng thấy gì: Bản này chưa gộp được vì hồ sơ nghiệm thu chưa đủ và nhiều hồ sơ đã ký đang cũ. Người dùng cuối chưa bị ảnh hưởng vì chưa phát hành.
-  Căn cứ: Việc này là bước thủ tục đã được lên kế hoạch trước khi gộp, làm được lúc nào cũng được và không gây mất dữ liệu.
-  file: `_acceptance/chuan-hoa-he-design/contract.md`
+- **Records / Human decisions needed: migration 019 changes an owner-approved function, and the owner's word is not recorded**
+  Người dùng thấy gì: Một thay đổi về việc ai được chọn người đứng tin khi nhập Excel chưa có lời duyệt của chủ kho được ghi lại.
+  Căn cứ: Là việc xin duyệt ở hồ sơ khác; nếu chủ kho bác thì phải làm lại bằng bản cập nhật mới, không mất dữ liệu.
+  file: `db/migrations/019_nhap_excel_moi_noi_cua_minh.sql`
   severity: medium
   Đề xuất: known-limits
 
-- **Design (AC-1, one colour per status): the import's 'fixed' mark now uses the same colour as the 'Đã bán' status**
-  Người dùng thấy gì: Dấu 'đã sửa' ở màn nhập có cùng màu với nhãn «Đã bán», nên có thể nhìn nhầm là một trạng thái. Chỉ gây hiểu nhầm thoáng qua.
-  Căn cứ: Chỉ là màu ở màn nhập, không mất dữ liệu; người dùng đọc chữ trên dấu là phân biệt được, đổi màu sau rất rẻ.
-  file: `src/modules/imports/ui/import-wizard.tsx`
+- **Tier (governance/autonomy.yaml): the PR states the wrong tier**
+  Người dùng thấy gì: Mô tả thay đổi ghi nhẹ hơn thực tế, nên người gộp có thể tưởng không cần chủ mã duyệt.
+  Căn cứ: Chỉ là chữ trong mô tả, sửa một dòng là xong và không ảnh hưởng người dùng cuối.
+  file: `PR #136 description (feat/chuan-hoa-he-design)`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Evidence: required checks not green on HEAD**
+  Người dùng thấy gì: Các kiểm tra tự động của bản này chưa xanh hẳn, nên chưa thể coi là sẵn sàng gộp.
+  Căn cứ: Là trạng thái tạm của bản đang chạy, chạy lại hoặc sửa là biết; chưa có dữ liệu người dùng nào bị ảnh hưởng.
+  file: `PR #136 / PR #130 checks`
+  severity: medium
+  Đề xuất: known-limits
+
+- **Criteria and tests: the shared empty-state check was loosened without the owner's approval**
+  Người dùng thấy gì: Bài kiểm trạng thái trống giờ chấp nhận cả liên kết thay nút, nên một màn lẽ ra phải có nút có thể lọt qua mà không ai thấy.
+  Căn cứ: Chỉ làm kiểm tra lỏng hơn, người dùng thấy tối đa một màn trống thiếu nút; sửa sau không tốn nhiều.
+  file: `tools/e2e_templates/recipes.ts`
   severity: low
   Đề xuất: known-limits
 
-- **A value the person chose for a cell of a new single-choice field is silently not written**
-  Người dùng thấy gì: Khi nhập tệp và tạo cột lựa chọn mới, giá trị người dùng đã chọn cho một số ô có thể không được ghi lại mà không báo lỗi. Người dùng tưởng đã nhập đủ nhưng căn thiếu giá trị.
-  Căn cứ: Mất dữ liệu âm thầm nên nặng, nhưng chỉ xảy ra ở một đường nhập và thuộc hàng khác nên cần sửa ở hồ sơ nhập tệp trước khi hàng đó ký.
+- **Authorization (defense in depth, SP-1 layer): UPDATE is granted on the whole import_runs table**
+  Người dùng thấy gì: Ở tầng dữ liệu, người có quyền nhập của mình có thể sửa cả những thông tin của lần nhập mà lẽ ra chỉ hệ thống được đổi, kể cả mở lại lần nhập đã hoàn tác.
+  Căn cứ: Hiện không có đường nào ngoài giao diện dùng được lỗ hở này nên chưa ai bị hại; vá cần bản cập nhật dữ liệu mới nhưng không gấp.
+  file: `db/migrations/015_nhap_excel.sql`
+  severity: low
+  Đề xuất: new-contract
+
+- **Closing price and closing date columns are read and counted, then silently dropped when the import writes**
+  Người dùng thấy gì: Khi nhập file Excel, cột giá chốt và ngày chốt được tính là đã nhận nhưng không được lưu ở đâu, và không ai báo cho người nhập biết.
+  Căn cứ: Mất dữ liệu thật mà người dùng không hay biết, phải nhập lại từ file gốc mới có lại; nên sửa ở hồ sơ nhập Excel.
   file: `src/modules/imports/store.ts`
   severity: high
   Đề xuất: new-contract
 
-- **Close price and close date columns are accepted but their values are dropped with no trace**
-  Người dùng thấy gì: Cột giá bán và ngày bán trong tệp nhập được báo là đã hiểu nhưng giá trị không được lưu và cũng không được giữ lại. Người dùng tưởng đã có mà thực tế mất.
-  Căn cứ: Mất dữ liệu âm thầm nhưng chỉ với hai cột ít gặp khi nhập căn đang rao; người dùng còn tệp gốc để nhập lại sau khi sửa.
-  file: `src/modules/imports/store.ts`
+- **A row whose unit code points to several units, with the question left unanswered, is dropped without its cells being kept**
+  Người dùng thấy gì: Dòng có mã căn khớp nhiều căn mà người nhập chưa trả lời thì bị bỏ, dữ liệu của dòng ấy mất, trong khi màn xem trước lại báo là đã giữ.
+  Căn cứ: Màn hình hứa nhiều hơn cái được lưu nên người dùng bị mất dữ liệu mà không hay; người dùng chỉ lấy lại được bằng cách nhập lại file.
+  file: `src/modules/imports/table.ts`
   severity: medium
   Đề xuất: new-contract
 
-- **Shape 1, measuring the instruction instead of the output: ImportRun columns are read by regex over migration SQL, not from the table in Postgres**
-  Người dùng thấy gì: Các bài kiểm tra bảng lưu lượt nhập đọc văn bản lệnh tạo bảng chứ không đọc bảng thật, nên có thể bỏ sót sai lệch giữa hai bên. Người dùng chưa thấy gì trừ khi sai lệch thật xảy ra.
-  Căn cứ: Là điểm yếu của bài kiểm tra chứ chưa phải lỗi người dùng gặp, và đã có bài khác đo bảng thật ở chỗ khác.
-  file: `tests/nhap-excel-ontology.test.ts`
+- **A remembered spelling or unit code that appears only before the last batch is learned in its folded form**
+  Người dùng thấy gì: Sàn có thể được ghi nhớ cách viết không dấu, viết thường như «so hong» thay vì «Sổ hồng», và danh sách đã học hiện chữ ấy ra.
+  Căn cứ: Việc khớp vẫn chạy đúng, chỉ xấu chữ và ít xảy ra; người dùng tự sửa được.
+  file: `src/modules/imports/store.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **A failed request for the list agents is hidden: the team lead sees an empty picker and cannot import**
+  Người dùng thấy gì: Khi mất mạng hoặc máy chủ lỗi, trưởng nhóm thấy danh sách người đứng tin trống, không có thông báo, và không nhập tiếp được.
+  Căn cứ: Không mất dữ liệu và tải lại trang là thử lại được, nhưng người dùng sẽ bối rối vì không có lời giải thích.
+  file: `src/modules/imports/ui/import-wizard.tsx`
+  severity: low
+  Đề xuất: known-limits
+
+- **A CSV file that is not UTF-8 is decoded without complaint and imports replacement characters**
+  Người dùng thấy gì: File CSV lưu bằng bảng mã cũ sẽ bị nhập với chữ có dấu thành ký tự lỗi mà không có cảnh báo nào.
+  Căn cứ: Dữ liệu hỏng được ghi vào kho mà người dùng không biết, phải sửa tay từng ô sau đó; người dùng hay lưu CSV từ Excel nên khá dễ gặp.
+  file: `src/modules/imports/read-file.ts`
+  severity: medium
+  Đề xuất: new-contract
+
+- **Hình dạng 4 (khẳng định âm một mình): bài «trả 500 mà không lộ chữ của lỗi» chỉ kiểm nhật ký không chứa «0900»**
+  Người dùng thấy gì: Bài kiểm có thể báo xanh dù máy chủ vẫn để lộ nội dung lỗi, nên người dùng có thể thấy chữ nhạy cảm trong thông báo lỗi.
+  Căn cứ: Là chỗ hở của bài kiểm, chưa có bằng chứng lỗi thật; sửa bài kiểm rẻ nhưng không gấp.
+  file: `tests/nhap-excel-may-chu.test.ts`
   severity: medium
   Đề xuất: known-limits
 
-- **Shape 2, fixtures written by hand to fit the reader: the .xlsx files are XML written in tao.mjs, not files saved by Excel or Sheets**
-  Người dùng thấy gì: Các tệp Excel mẫu do công cụ tự tạo nên có thể không giống tệp thật từ Excel hay Google Sheets. Một số tệp thật có thể nhập lỗi mà bài kiểm tra không báo trước.
-  Căn cứ: Hạn chế đã được ghi rõ, người dùng gặp lỗi thì thử lại với tệp khác được, và thử bằng tệp thật có thể làm sau ở hàng nhập tệp.
-  file: `tests/fixtures/nhap-excel/tao.mjs`
+- **Hình dạng 4 (khẳng định âm một mình): bài quét «đường nhập không chạm lớp llm» không có ca cài sẵn để thấy nó bắt được**
+  Người dùng thấy gì: Bài kiểm có thể không bắt được trường hợp phần nhập Excel vô tình gọi sang trợ lý AI.
+  Căn cứ: Chỉ làm lưới kiểm yếu đi, người dùng không thấy gì; sửa sau rẻ.
+  file: `tests/db/nhap-excel.db.test.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 5 (ma trận có ô không đo gì): 12 trong 44 ô của AC-2 là ô lưới so với chính nó**
+  Người dùng thấy gì: Báo cáo nói đã so màu ở 44 chỗ nhưng thật ra chỉ 32 chỗ, nên màu nhãn trạng thái được kiểm ít hơn con số in ra.
+  Căn cứ: Các chỗ quan trọng vẫn được so thật, chỉ con số in ra bị thổi phồng; sửa con số hay thêm ô là rẻ.
+  file: `tests/e2e/chuan-hoa-mau.spec.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 2 (dữ liệu viết tay theo khuôn bên đọc): lượt đỏ «vẽ lại ổ khoá» của AC-3 là bản ghi giả, không chạy qua bộ đọc trang**
+  Người dùng thấy gì: Nếu ổ khoá vô tình hiện lại ở ô đã khoá, bài kiểm có thể không báo đỏ đúng chỗ, người dùng sẽ thấy ổ khoá thừa.
+  Căn cứ: Chỉ là chỗ hở nhỏ của bài kiểm, hậu quả nếu có là hình thức và tự hiện ra khi nhìn; sửa sau rẻ.
+  file: `tests/e2e/chuan-hoa-mau.spec.ts`
+  severity: low
+  Đề xuất: known-limits
+
+- **Hình dạng 4 (khẳng định âm một mình): «an unread value was saved» đọc một lần và không có lượt đỏ như E8 hứa**
+  Người dùng thấy gì: Bài kiểm có thể không phát hiện việc giá trị gõ chưa hiểu được lưu nhầm khi bấm ra ngoài ô.
+  Căn cứ: Là chỗ hở của lưới kiểm, chưa có lỗi thật và bên có cơ sở dữ liệu đã có kiểm đếm lần ghi; bổ sung sau rẻ.
+  file: `tests/e2e/chuan-hoa-sua-o.spec.ts`
   severity: low
   Đề xuất: known-limits
 
