@@ -26,8 +26,8 @@ Round 12. Nội dung thay trọn round cũ; lịch sử nằm ở mục Iteratio
 | E7 | AC-6 | test | PASS |
 | E8 | AC-6 | script | PASS |
 | E9 | AC-7 | script | PASS |
-| E10 | AC-7 | script | PASS (carry-forward r9) |
-| E11 | AC-7 | test | PASS (carry-forward r8) |
+| E10 | AC-7 | script | PASS |
+| E11 | AC-7 | test | PASS |
 | E12 | AC-8 | script | PASS |
 | E13 | AC-9 | script | PASS |
 | E14 | AC-10 | script | PASS |
@@ -35,12 +35,16 @@ Round 12. Nội dung thay trọn round cũ; lịch sử nằm ở mục Iteratio
 | E16 | AC-12 | script | PASS |
 | E17 | AC-12 | script | PASS |
 | E18 | AC-12 | ui-check | PASS |
-| E19 | AC-11 | ui-check | PASS (carry-forward r6) |
+| E19 | AC-11 | ui-check | PASS |
 | E20 | AC-6 | script | PASS |
 | E21 | AC-3 | script | PASS |
 | E22 | AC-13 | script | PASS |
-| E23 | AC-11 | script | PASS (carry-forward r1) |
+| E23 | AC-11 | script | PASS |
 | E24 | AC-12 | script | PASS |
+
+Bốn phép mang sang (E10 vòng 9 0f8e4c54, E11 vòng 8 ffb7216f, E19 vòng 6 849b0cb9, E23 vòng 1 1feca45a): mỗi khối được chép
+nguyên từ báo cáo của vòng nó chạy thật bằng `_acceptance/nhap-excel/rang/dung-lai-mang-sang.mjs`, chỉ thêm
+`carried_from_round`; bảng đối chiếu ở `_acceptance/nhap-excel/mang-sang.md` (G-2811-101).
 
 ## Evidence
 
@@ -238,9 +242,9 @@ Round 12. Nội dung thay trọn round cũ; lịch sử nằm ở mục Iteratio
   baseline: n-a
   verifier: config:executors.script.cach_ly_d
   verified_at: 2026-11-28T06:10:25Z
-  carried_from_round: 9
   output: |
-    carry-forward tu round 9 — delta khong cham paths cua eval
+    cach-ly: 41 ca đạt, vai quy_hang_app, nối bằng quy_hang_login
+  carried_from_round: 9
 
 - eval: E11
   run_id: minted-nhap-excel-E11-r8
@@ -248,9 +252,10 @@ Round 12. Nội dung thay trọn round cũ; lịch sử nằm ở mục Iteratio
   baseline: n-a
   verifier: config:executors.test.nhap_excel_unit
   verified_at: 2026-11-28T05:23:19Z
-  carried_from_round: 8
   output: |
-    carry-forward tu round 8 — delta khong cham paths cua eval
+    npx vitest run src/modules/imports tests/nhap-excel --coverage.enabled=false --reporter=verbose
+    __EXIT=0
+  carried_from_round: 8
 
 - eval: E19
   run_id: minted-nhap-excel-E19-r6
@@ -258,24 +263,23 @@ Round 12. Nội dung thay trọn round cũ; lịch sử nằm ở mục Iteratio
   baseline: n-a
   verifier: config:executors.ui-check
   verified_at: 2026-11-27T23:38:25Z
-  carried_from_round: 6
   screenshot: evidence/ui/inventory-trong-1440.png
   observed: |
     1) inventory-trong-1440.png (Đầu chủ, company [Sàn thử nạp tệp], no listings). The "Bảng hàng" screen is open. The grid card shows "0 dòng" and the heading "Chưa có dữ liệu ở đây". Below it is "Sàn chưa có căn nào đang chào trên Bảng hàng." and "Có sẵn bảng trong Excel hay Google Sheet? Nạp tệp." where "Nạp tệp" is an underlined link. At the top right of the page header is a bordered "Nạp tệp" button. The left rail also has an import icon. This matches Expected.
     2) inventory-sau-nhap-1440.png (same company after the three-row file). The grid shows 3 dòng. Row 1 is ZZ-99.01, building "Toà của tệp", no project ("—"), status "Đang bán", price 2,1 tỷ. This is the pending-match listing, and its original code is in the "Mã căn" column. Rows 2 and 3 are 0905 and 0906, building S1.01, project Vinhomes Ocean Pa..., status "Đang bán", 4,65 tỷ and 3,9 tỷ. The "Nạp tệp" button is still at the top right. The rail now lists the project Vinhomes Ocean Park 1. This matches Expected.
     3) inventory-dau-khach-1440.png (Đầu khách, same company, same three rows). The grid content is identical to frame 2. The top right of the header has no "Nạp tệp" button. The left icon rail has one icon fewer, with no import icon. The rail's "Theo trạng thái" list has no import entry. This matches Expected: Đầu khách does not see the import entry.
   network_observed: n-a (driver)
-  note: carry-forward tu round 6 — delta khong cham paths cua eval
+  carried_from_round: 6
 
 - eval: E23
   run_id: minted-nhap-excel-E23-r1
   exit_code: 0
-  baseline: n-a
+  baseline: green
   verifier: config:executors.design.khuon
   verified_at: 2026-11-27T11:09:53Z
-  carried_from_round: 1
   output: |
-    carry-forward tu round 1 — delta khong cham paths cua eval
+    8 tệp giao diện ngoài bản đồ
+  carried_from_round: 1
 
 ### Lệnh suite (hồi quy)
 
