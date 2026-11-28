@@ -62,11 +62,25 @@
   severity: low
   Đề xuất: wont-fix
 
-- **A check of the grid frame's record measures the whole branch (gồm #12)**
-  Người dùng thấy gì: Khi chấm lại tính năng khung lưới trên nhánh này, phép «thư mục thành phần cài sẵn không đổi» báo đỏ oan, vì hàng này cài thêm thành phần bước (stepper) đúng cách. Lỗi nằm ở cách đo của hồ sơ khung lưới, không ở màn.
-  Căn cứ: Đã có cách xử, làm ngay sau khi khung lưới vào nhánh chính: hàng này ghim mốc đo của phép ấy vào đúng đoạn thay đổi của khung lưới, ghi «sửa sau ký» ở hồ sơ khung lưới và ghim lại riêng hồ sơ ấy (giám sát xếp, G-2811-38). Không cần anh quyết.
-  file: `_acceptance/khung-luoi-va-ngan-chi-tiet/rang/chay.sh`
+- **Sample Excel files are written by the test tool, not saved by Excel or Google Sheets (VP11 r1)**
+  Người dùng thấy gì: Các tệp Excel mẫu dùng để kiểm do công cụ kiểm tự viết ra, không phải tệp lưu từ Excel hay Google Sheets. Một tệp thật của sàn có thể có chỗ khác mà máy đọc sai hay không đọc được, và các bài kiểm hôm nay không báo trước.
+  Căn cứ: Chưa thấy tệp thật nào đọc sai; đây là chỗ bài kiểm chưa phủ. Việc cần làm trước khi bản thật có dữ liệu của sàn thật: thử nhập bằng vài tệp lưu thật từ Excel và Google Sheets, tên gợi ý «Thử nhập bằng tệp thật của Excel và Google Sheets». Khuyến nghị của giám sát: nên xong trước khi bản thật có dữ liệu của sàn thật — hôm nay kho chưa lên bản thật.
+  file: `tests/fixtures/nhap-excel/tao.mjs`
+  severity: low
+  Đề xuất: known-limits
+
+- **The import screen's address is Vietnamese while the rule says English (VP11 r1)**
+  Người dùng thấy gì: Địa chỉ màn Nạp tệp là «/nhap-tep», trong khi các màn khác đã đổi địa chỉ sang tiếng Anh. Người dùng vẫn vào và dùng bình thường; chỉ là địa chỉ không đồng nhất.
+  Căn cứ: Đổi địa chỉ chạm khoảng 15 tệp, sổ màn và ảnh bằng chứng của màn, nên làm thành một việc riêng như lần đổi địa chỉ trước, tên gợi ý «Địa chỉ màn Nạp tệp bằng tiếng Anh»; không mất dữ liệu, đổi sau vẫn rẻ.
+  file: `src/app/(app)/nhap-tep/page.tsx`
   severity: medium
+  Đề xuất: known-limits
+
+- **The import screen's 'fixed' mark has the same colour as the 'Đã bán' status (VP11 r1)**
+  Người dùng thấy gì: Dấu «máy sửa» trên màn Nạp tệp cùng màu với nhãn «Đã bán» ở Bảng hàng, nên thoáng nhìn có thể nhầm là một trạng thái. Chữ trên dấu vẫn phân biệt được.
+  Căn cứ: Chỉ là màu, không mất dữ liệu; đổi màu sau rất rẻ.
+  file: `src/modules/imports/ui/import-wizard.tsx`
+  severity: low
   Đề xuất: known-limits
 
 ## Đã soát lại — không còn là việc người quyết
@@ -75,6 +89,10 @@ Số # là thứ tự trong bản 65 mục của vòng 6 (6 mục mới của v�
 
 Đã sửa trên nhánh:
 
+- VP11 r1 · A value the person chose for a cell of a new single-choice field is silently not written — giá trị đã chọn nay được ghi lên căn cả khi không bấm «nhớ»; ca DB đỏ trước khi sửa (25311d32)
+- VP11 r1 · Close price and close date columns are accepted but their values are dropped with no trace — hai cột giữ nguyên chữ trong bản ghi lần nhập (lý do close-field); mỗi cột đích có một chỗ ở khai sẵn, bài quét tests/nhap-excel-noi-ghi.test.ts (25311d32)
+- VP11 r1 · Shape 1: ImportRun columns are read by regex over migration SQL, not from the table in Postgres — thêm ca DB đọc cột của import_runs từ Postgres, kèm ca phá (25311d32)
+- #12 A check of the grid frame's record measures the whole branch (r6) — E16 của hồ sơ khung lưới ghim vào đúng đoạn của VP10, dòng sửa-sau-ký ở hồ sơ ấy (bb340e22)
 - #10 Evidence: HEAD has no CI run, and the last pushed commit is red (one red test is the SP-1 isolation case) (r5) — câu đọc Bảng hàng tách hai nhánh nối trong (5569a9c2): 5.000 căn đọc trong 57 ms thay vì 777 ms (main 42 ms); vòng 6 chấm lại E9, E14, E15, E19 đạt
 - #24 Domain: the action doors do not list listing_pending_units (r4) — ontology/actions.yaml: viewListings khai đọc listing_pending_units, createListing khai thêm listing_pending_units; ma trận vai × cửa đo cả hai (b258de24)
 - #28 Authorization: own scope not narrowed on unit-link inserts (r3) — migration 019: vai «của mình» chỉ gắn căn vào lần chào mình giữ; ca cách ly 26 và bản phá nhap-excel-moi-noi-mo (b258de24)
