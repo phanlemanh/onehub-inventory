@@ -1,9 +1,12 @@
 "use client";
-// The full unit record (roadmap row 3b, _acceptance/ho-so-du-thong-tin): the card of row 3 on top, then how long ago the
-// listing was confirmed, how complete it is, the unit, the listing, and every listing of the unit. Read-only. Blocks
+// The full unit record (roadmap row 3b, _acceptance/ho-so-du-thong-tin): the listing's status and price on top, then how
+// long ago the listing was confirmed, how complete it is, the unit, the listing, and every listing of the unit. Blocks
 // follow solution-crm-4 (Hỏi-4 at the scope gate), assembled from what the repo has. Touching an earlier listing turns
-// the whole record to it, the address stays (Hỏi-3).
-import { LockIcon } from "lucide-react";
+// the whole record to it, the address stays (Hỏi-3). Row 3h's four groups A–D (owner «Duyệt cả bốn nhóm», 27/11): each
+// thing said once (the unit code in the record's head only, the unit attributes in the unit section only), a complete
+// listing on one line and a missing part that opens its section's edit dialog, a stale confirmation in the warning colour,
+// a fixed label column and the unit's listings as links.
+import { CheckIcon, ChevronRightIcon, LockIcon } from "lucide-react";
 import { useRef, useState, type ReactNode } from "react";
 
 import { RECORD_SECTION_HEADER } from "@/components/candidate/record-section";
@@ -28,9 +31,14 @@ import {
   type UnitAttributeValues,
 } from "../unit-attributes";
 
-import { ListingDetailsEdit, useListingDetails } from "./listing-details-edit";
-import { ListingCard, type ListingView } from "./listing-record";
-import { RECORD_COPY, confirmationSentence } from "./record-copy";
+import {
+  ListingDetailsEdit,
+  useListingDetails,
+  type DetailKey,
+  type DetailsEditHandle,
+} from "./listing-details-edit";
+import type { ListingView } from "./listing-record";
+import { RECORD_COPY, STALE_CONFIRMATION_DAYS, confirmationSentence } from "./record-copy";
 import { AttributeDiffersMark } from "./attribute-differs-mark";
 import { attributeText, type UnitAttributeWords } from "./unit-attribute-copy";
 import {
@@ -147,7 +155,11 @@ function Section({
   );
 }
 
-/** Label and value rows; a row whose value is missing says so in a quieter colour (`data-empty`). */
+/**
+ * Label and value rows, the label in a fixed column (row 3h, D: the owner's «about 104 px» on a phone and «about 120 px»
+ * from 768 px, on the default spacing steps: 96 px and 112 px). A missing
+ * value reads «Chưa có» in a quieter colour (`data-empty`), with the warning's dot before its label (B).
+ */
 function Rows({
   rows,
 }: {
@@ -160,21 +172,34 @@ function Rows({
   }[];
 }) {
   return (
-    <dl className="grid grid-cols-5 gap-x-4 gap-y-2 text-sm">
+    <dl className="flex flex-col gap-2 text-sm">
       {rows.map((row) => (
-        <div key={row.key} data-field={row.key} className="contents">
-          <dt className="col-span-2 text-muted-foreground">{row.label}</dt>
+        <div key={row.key} data-field={row.key} className="flex gap-4">
+          <dt
+            data-slot="record-row-label"
+            tabIndex={-1}
+            className="flex w-24 shrink-0 items-baseline gap-1.5 text-muted-foreground outline-none md:w-28"
+          >
+            {row.value === null ? (
+              <span
+                data-slot="missing-dot"
+                aria-hidden="true"
+                className="size-1.5 shrink-0 -translate-y-0.5 self-center rounded-full bg-warning"
+              />
+            ) : null}
+            {row.label}
+          </dt>
           {row.value === null ? (
-            <dd data-empty="" className="col-span-3 min-w-0 text-muted-foreground italic">
+            <dd data-empty="" className="min-w-0 flex-1 text-muted-foreground">
               {RECORD_COPY.missing}
             </dd>
           ) : row.after ? (
-            <dd className="col-span-3 flex min-w-0 flex-wrap items-center gap-x-1.5 break-words">
+            <dd className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 break-words">
               <span>{row.value}</span>
               {row.after}
             </dd>
           ) : (
-            <dd className="col-span-3 min-w-0 break-words">{row.value}</dd>
+            <dd className="min-w-0 flex-1 break-words">{row.value}</dd>
           )}
         </div>
       ))}
@@ -198,6 +223,8 @@ export function ListingRecordFull({
   const newestId = data.listings[0]?.id ?? view.id;
   const [pickedId, setPickedId] = useState(newestId);
   const top = useRef<HTMLDivElement>(null);
+  const price = useRef<HTMLSpanElement>(null);
+  const offer = useRef<DetailsEditHandle>(null);
   // Turning to another listing changes the card at the head: bring the head back into view so it reads top down.
   const pick = (id: string) => {
     setPickedId(id);
@@ -273,33 +300,29 @@ export function ListingRecordFull({
   };
   const done = completeness(picked);
   const open = OPEN_STATUSES.includes(picked.standardStatus);
-  // The card shows the listing in view: its price and status; place and the three facts come from the unit.
-  const cardView: ListingView = {
-    ...view,
-    price: picked.listPrice ?? null,
-    status: picked.standardStatus,
-    transaction: picked.transaction,
-    place: [
-      unit.subdivisionName,
-      unit.buildingName,
-      unit.propertySubType && labels.propertyTypeValues[unit.propertySubType],
-    ]
-      .filter((part): part is string => Boolean(part))
-      .join(" · "),
-    facts: [
-      view.facts[0]!,
-      view.facts[1]!,
-      {
-        column: {
-          ...view.facts[0]!.column,
-          field: "Unit.directionFaces" as never,
-          header: labels.direction,
-          kind: "text",
-        },
-        value: unit.directionFaces,
-      },
-    ],
+  // (A) Under the status and the price: the project and the kind of property; the record's head names unit and building.
+  const place = [
+    unit.subdivisionName,
+    unit.propertySubType && labels.propertyTypeValues[unit.propertySubType],
+  ]
+    .filter((part): part is string => Boolean(part))
+    .join(" · ");
+  // (B) A missing part pressed in «Còn thiếu»: its line comes into view and takes the focus, and the listing section's
+  // edit dialog opens on that field when the person may edit it. The price has no section: it is edited on the grid.
+  const jump = (part: CompletenessPart) => {
+    if (part === "listPrice") {
+      price.current?.scrollIntoView({ block: "nearest" });
+      price.current?.focus();
+      return;
+    }
+    const line = top.current?.querySelector<HTMLElement>(
+      `[data-slot="listing-offer"] [data-field="Listing.${part}"] dt`,
+    );
+    line?.scrollIntoView({ block: "nearest" });
+    line?.focus();
+    offer.current?.openOn(part as DetailKey);
   };
+  const days = picked.confirmedDays;
   return (
     <div
       ref={top}
@@ -332,10 +355,45 @@ export function ListingRecordFull({
           />
         </div>
       ) : null}
-      <ListingCard view={cardView} priceLabel={labels.listPrice} />
-      <p data-slot="listing-confirmation" className="text-xs text-muted-foreground">
-        {confirmationSentence(picked.confirmedDays)}
-      </p>
+      <div data-slot="record-summary" className="flex flex-col gap-1">
+        <div className="flex items-center justify-between gap-3">
+          <span data-slot="record-status">
+            <TypedCell
+              kind="status"
+              value={picked.standardStatus}
+              transaction={picked.transaction}
+            />
+          </span>
+          <span
+            ref={price}
+            tabIndex={-1}
+            data-slot="record-price"
+            aria-label={labels.listPrice}
+            className="shrink-0 text-lg font-semibold tabular-nums outline-none"
+          >
+            <TypedCell
+              kind="money"
+              value={picked.listPrice ?? null}
+              transaction={picked.transaction}
+            />
+          </span>
+        </div>
+        {place ? (
+          <p data-slot="record-place" className="text-sm text-muted-foreground">
+            {place}
+          </p>
+        ) : null}
+      </div>
+      <div className="flex flex-col gap-0.5">
+        <p data-slot="listing-confirmation" className="text-xs text-muted-foreground">
+          {confirmationSentence(days)}
+        </p>
+        {days !== null && days > STALE_CONFIRMATION_DAYS ? (
+          <p data-slot="confirmation-stale" className="text-xs text-warning-foreground">
+            {RECORD_COPY.staleConfirmation(STALE_CONFIRMATION_DAYS)}
+          </p>
+        ) : null}
+      </div>
       {isNewest ? null : (
         <div
           data-slot="listing-earlier-note"
@@ -349,24 +407,53 @@ export function ListingRecordFull({
         </div>
       )}
       {/* Row 15 places its ready-to-list button on this line, beside the count (LUAT, «Bộ nút của hồ sơ căn»). */}
-      <div data-slot="listing-completeness" className="flex flex-col gap-1.5">
-        <Progress value={done.have} max={done.need} aria-label={labels.completeness}>
-          <div className="flex w-full items-center justify-between gap-2 text-sm">
-            <span className="font-medium">{labels.completeness}</span>
-            <span
-              data-slot="listing-completeness-count"
-              className="text-muted-foreground tabular-nums"
-            >
-              {done.have}/{done.need}
-            </span>
-          </div>
-        </Progress>
-        <p data-slot="listing-completeness-missing" className="text-xs text-muted-foreground">
-          {done.missing.length === 0
-            ? RECORD_COPY.complete
-            : RECORD_COPY.lacking(done.missing.map((part) => labels.parts[part]))}
+      {done.missing.length === 0 ? (
+        <p
+          data-slot="listing-completeness"
+          data-complete=""
+          className="flex items-center gap-1.5 text-sm text-muted-foreground"
+        >
+          <CheckIcon aria-hidden="true" className="size-4" />
+          <span data-slot="listing-completeness-count" className="tabular-nums">
+            {RECORD_COPY.completeLine(done.have, done.need)}
+          </span>
         </p>
-      </div>
+      ) : (
+        <div data-slot="listing-completeness" className="flex flex-col gap-1.5">
+          <Progress value={done.have} max={done.need} aria-label={labels.completeness}>
+            <div className="flex w-full items-center justify-between gap-2 text-sm">
+              <span className="font-medium">{labels.completeness}</span>
+              <span
+                data-slot="listing-completeness-count"
+                className="text-muted-foreground tabular-nums"
+              >
+                {done.have}/{done.need}
+              </span>
+            </div>
+          </Progress>
+          <p
+            data-slot="listing-completeness-missing"
+            className="flex flex-wrap items-center gap-x-1 text-xs text-muted-foreground"
+          >
+            {/* Read as one sentence («Còn thiếu: …, …»), each part its own button. */}
+            <span>{`${RECORD_COPY.lackingLead} `}</span>
+            {done.missing.map((part, i) => (
+              <span key={part} className="inline-flex items-center">
+                <Button
+                  variant="link"
+                  size="xs"
+                  data-slot="missing-part"
+                  data-part={part}
+                  onClick={() => jump(part)}
+                >
+                  {labels.parts[part]}
+                </Button>
+                {i < done.missing.length - 1 ? ", " : null}
+              </span>
+            ))}
+          </p>
+        </div>
+      )}
       <Section
         slot="listing-unit"
         title={labels.unit}
@@ -391,11 +478,6 @@ export function ListingRecordFull({
       >
         <Rows
           rows={[
-            {
-              key: "Listing.unitNumber",
-              label: RECORD_COPY.unitCode(labels.unit),
-              value: shown(unit.unitNumber),
-            },
             {
               key: "Unit.unitKind",
               label: labels.unitKind,
@@ -455,6 +537,7 @@ export function ListingRecordFull({
           open && isNewest && labels.edit && !oneEdit ? (
             <ListingDetailsEdit
               key={picked.id}
+              ref={offer}
               id={picked.id}
               unitNumber={unit.unitNumber}
               details={details}
@@ -503,21 +586,36 @@ export function ListingRecordFull({
       >
         <ul className="flex flex-col gap-1">
           {data.listings.map((l) => (
+            // (D) The listing in view says so, with no ground; the others read as links. Under 360 px each listing takes
+            // two even lines: its number and status, then its price and day.
             <li
               key={l.id}
               data-listing-id={l.id}
-              className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1"
+              className="flex flex-wrap items-center gap-x-3 gap-y-0.5"
             >
-              <Button
-                variant={l.id === picked.id ? "secondary" : "ghost"}
-                size="sm"
-                aria-current={l.id === picked.id ? "true" : undefined}
-                onClick={() => pick(l.id)}
-              >
-                {RECORD_COPY.listingNumber(l.number)}
-              </Button>
-              <TypedCell kind="status" value={l.standardStatus} transaction={l.transaction} />
-              <span className="ml-auto text-sm whitespace-nowrap text-muted-foreground tabular-nums">
+              <span className="flex items-center gap-3 max-[360px]:w-full max-[360px]:justify-between">
+                {l.id === picked.id ? (
+                  <span
+                    aria-current="true"
+                    data-slot="listing-in-view"
+                    className="inline-flex h-7 items-center px-2.5 text-sm font-medium"
+                  >
+                    {RECORD_COPY.listingInView(l.number)}
+                  </span>
+                ) : (
+                  <Button
+                    variant="link"
+                    size="sm"
+                    data-slot="listing-other"
+                    onClick={() => pick(l.id)}
+                  >
+                    {RECORD_COPY.listingNumber(l.number)}
+                    <ChevronRightIcon aria-hidden="true" data-icon="inline-end" />
+                  </Button>
+                )}
+                <TypedCell kind="status" value={l.standardStatus} transaction={l.transaction} />
+              </span>
+              <span className="ml-auto text-sm whitespace-nowrap text-muted-foreground tabular-nums max-[360px]:ml-0 max-[360px]:px-2.5">
                 {formatMoney(l.listPrice)} · {l.createdOn}
               </span>
             </li>

@@ -775,7 +775,7 @@ test.describe("E3 · the grid beside the record keeps its columns", () => {
     console.log(`visible columns ${info.project.name} closed=${closed} open=${open}`);
     expect(open).toBeGreaterThanOrEqual(MIN_VISIBLE[info.project.name]!);
     await assertUnitAndBuildingInView(page);
-    await expect(panel(page).locator('[data-slot="listing-card-price"]')).toBeVisible();
+    await expect(panel(page).locator('[data-slot="record-price"]')).toBeVisible();
     await assertFrozenAtEnd(page);
     await assertNoColumnHidden(page);
   });
@@ -901,13 +901,31 @@ function assertPhoneHitArea(sizes: { where: string; width: number; height: numbe
   }
 }
 
+/**
+ * Opens the first listing whose record ends on the ask button, so the foot has a button to measure. Row 3h (C2,
+ * owner «Theo luật mới»): a sold, withdrawn or unkept listing ends on a quiet line saying why, not on a button.
+ */
+async function openAsked(page: Page): Promise<void> {
+  for (let i = 0; i < 10; i += 1) {
+    const opener = openers(page).nth(i);
+    const id = (await opener.getAttribute("data-record-open")) ?? "";
+    await opener.click();
+    await expect(panel(page)).toHaveAttribute("data-record-id", id);
+    const ask = panel(page).locator('[data-slot="ask-list-agent"]').filter({ visible: true });
+    if ((await ask.count()) > 0) return;
+    await page.keyboard.press("Escape");
+    await expect(panel(page)).toBeHidden();
+  }
+  throw new Error("no listing of the first ten ends on the ask button");
+}
+
 test.describe("BH 2026-11-27 · the record's buttons are 44 px to press on a phone, 28 px on a computer", () => {
   test("every head, section head and foot button fits the size of its screen", async ({
     page,
   }, info) => {
     // A listing agent's record: its sections carry «Báo sai thông tin» and «Sửa», so their heads have buttons to measure.
     await openInventory(page, "?role=ListAgent");
-    await openFifth(page);
+    await openAsked(page);
     const sizes = await recordButtonSizes(page);
     if (PHONE.has(info.project.name)) {
       assertPhoneHitArea(sizes);
@@ -928,7 +946,7 @@ test.describe("BH 2026-11-27 · the record's buttons are 44 px to press on a pho
       '[data-slot="record-panel-header"] button { width: 28px !important; height: 28px !important; }',
     );
     await openInventory(page, "?role=ListAgent");
-    await openFifth(page);
+    await openAsked(page);
     expect(() => assertPhoneHitArea([])).toThrow("no button at the record head");
     const sizes = await recordButtonSizes(page);
     expect(() => assertPhoneHitArea(sizes)).toThrow("under 44");
@@ -941,7 +959,7 @@ test.describe("BH 2026-11-27 · the record's buttons are 44 px to press on a pho
       '[data-slot="record-section-header"] button { min-height: 28px !important; height: 28px !important; }',
     );
     await openInventory(page, "?role=ListAgent");
-    await openFifth(page);
+    await openAsked(page);
     const sizes = await recordButtonSizes(page);
     expect(() => assertPhoneHitArea(sizes)).toThrow(/^section button 28px high, under 44$/);
   });
@@ -955,7 +973,7 @@ test.describe("BH 2026-11-27 · the record's buttons are 44 px to press on a pho
       '[data-slot="record-section-header"] button { display: none !important; }',
     );
     await openInventory(page, "?role=ListAgent");
-    await openFifth(page);
+    await openAsked(page);
     const sizes = await recordButtonSizes(page);
     expect(() => assertPhoneHitArea(sizes)).toThrow("no button at a section head");
   });
@@ -966,7 +984,9 @@ test.describe("E7 · on a phone the record is the whole screen", () => {
     test.skip(browserName !== "chromium" || !PHONE.has(info.project.name), "do o 414 va 360"),
   );
 
-  test("opens full screen with the card on top, closes back to the unit code", async ({ page }) => {
+  test("opens full screen with status and price on top, closes back to the unit code", async ({
+    page,
+  }) => {
     await openInventory(page);
     const { id } = await openFifth(page);
     await expect(panel(page)).toHaveAttribute("data-record-layout", "screen");
@@ -975,24 +995,26 @@ test.describe("E7 · on a phone the record is the whole screen", () => {
       const body = el.querySelector('[data-slot="record-panel-body"]')!;
       const record = body.firstElementChild;
       const card = record?.firstElementChild;
+      // Row 3h (A, owner «Duyệt cả bốn nhóm» 27/11): the body opens on status and price, then project · kind; the unit
+      // code is the record's title only, and the three facts are gone: the unit's block says them once.
       return {
         record: record?.getAttribute("data-slot"),
         card: card?.getAttribute("data-slot"),
-        unit: card?.querySelector('[data-slot="listing-card-unit"]')?.textContent ?? "",
-        price: card?.querySelector('[data-slot="listing-card-price"]')?.textContent ?? "",
-        place: card?.querySelector('[data-slot="listing-card-place"]')?.textContent ?? "",
+        unit: el.querySelector('[data-slot="record-title"], h2')?.textContent ?? "",
+        price: card?.querySelector('[data-slot="record-price"]')?.textContent ?? "",
+        place: card?.querySelector('[data-slot="record-place"]')?.textContent ?? "",
         status: card?.querySelectorAll("[data-status]").length ?? 0,
-        facts:
-          card?.querySelectorAll('[data-slot="listing-card-facts"] > [data-field]').length ?? 0,
-        // Row 3b (G approved N-1211-13): the full record lists the unit in its own block of eight facts, after the card.
+        facts: el.querySelectorAll('[data-slot="listing-card-facts"], [data-slot="record-facts"]')
+          .length,
+        // Row 3b (G approved N-1211-13): the full record lists the unit in its own block, after the head.
         fields: el.querySelectorAll('[data-slot="listing-unit"] [data-field]').length,
       };
     });
     expect(shape).toMatchObject({
       record: "listing-record",
-      card: "listing-card",
+      card: "record-summary",
       status: 1,
-      facts: 3,
+      facts: 0,
       fields: 8,
     });
     expect(shape.unit.trim()).not.toBe("");

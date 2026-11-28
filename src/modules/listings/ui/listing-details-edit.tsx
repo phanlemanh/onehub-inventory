@@ -6,7 +6,14 @@
 // one change through the grid's save door, with undo (row 4's rule). A save that does not go through keeps what
 // was typed and says why in the dialog.
 import { PencilIcon } from "lucide-react";
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useImperativeHandle,
+  useState,
+  type ReactNode,
+  type Ref,
+} from "react";
 
 import { FormDialog } from "@/components/candidate/form-dialog";
 import { runDoorChange, type WriteOutcome } from "@/components/candidate/use-change";
@@ -137,7 +144,12 @@ function undoOf(from: ListingDetails, change: DetailsChange): DetailsChange {
  * The four detail fields of a dialog, their draft and what a save sends: the record's edit button of the listing section uses
  * it, and so does row 3h's one-button variant (`?edit=one`) beside the unit's fields.
  */
-export function useDetailsForm(details: ListingDetails, words: DetailsWords) {
+export function useDetailsForm(
+  details: ListingDetails,
+  words: DetailsWords,
+  /** The field the dialog opens on (row 3h: a missing part named in «Còn thiếu»); the legal status otherwise. */
+  first: DetailKey = "legalStatus",
+) {
   const [draft, setDraft] = useState<Draft>(() => draftOf(details));
   const [tried, setTried] = useState(false);
   // Only a part the person changed is checked: words already longer from an imported sheet do not block the save.
@@ -152,7 +164,7 @@ export function useDetailsForm(details: ListingDetails, words: DetailsWords) {
           id={`details-${key}`}
           data-detail={key}
           value={draft[key]}
-          autoFocus={key === "legalStatus"}
+          autoFocus={key === first}
           aria-invalid={long || undefined}
           onChange={(event) => setDraft({ ...draft, [key]: event.target.value })}
         />
@@ -178,7 +190,7 @@ export function useDetailsForm(details: ListingDetails, words: DetailsWords) {
           onValueChange={(value) => setDraft({ ...draft, [key]: String(value) })}
           items={items}
         >
-          <SelectTrigger aria-label={label} data-detail={key}>
+          <SelectTrigger aria-label={label} data-detail={key} autoFocus={key === first}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -219,31 +231,49 @@ export function useDetailsForm(details: ListingDetails, words: DetailsWords) {
   };
 }
 
+/** The four details by their field (row 3h: «Còn thiếu» names them). */
+export type DetailKey = "legalStatus" | "furnished" | "financing" | "occupantType";
+
+/** Row 3h: what the record may ask of the listing section's dialog. */
+export interface DetailsEditHandle {
+  openOn: (field: DetailKey) => void;
+}
+
 /** The edit button of the record's listing section and its dialog; nothing without the grid's write or for an earlier listing. */
 export function ListingDetailsEdit({
   id,
   unitNumber,
   details,
   words,
+  ref,
 }: {
   id: string;
   unitNumber: string;
   details: ListingDetails;
   words: DetailsWords;
+  /** Row 3h: opens the dialog on one field, for a missing part the person pressed in «Còn thiếu». */
+  ref?: Ref<DetailsEditHandle>;
 }) {
   const api = useContext(DetailsEditContext);
   const [open, setOpen] = useState(false);
-  const form = useDetailsForm(details, words);
+  const [first, setFirst] = useState<DetailKey>("legalStatus");
+  const form = useDetailsForm(details, words, first);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState<Exclude<WriteOutcome, "saved"> | null>(null);
-  if (!api) return null;
   const openChange = (next: boolean) => {
     if (next) {
       form.reset();
       setFailed(null);
-    }
+    } else setFirst("legalStatus");
     setOpen(next);
   };
+  useImperativeHandle(ref, () => ({
+    openOn: (field: DetailKey) => {
+      setFirst(field);
+      openChange(true);
+    },
+  }));
+  if (!api) return null;
   const what = RECORD_COPY.detailsWhat(words.unit, unitNumber);
   const submit = async () => {
     if (form.blocked()) return;

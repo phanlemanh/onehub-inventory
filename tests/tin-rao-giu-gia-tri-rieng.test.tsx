@@ -28,6 +28,7 @@ import { label } from "../src/modules/company-config";
 import { actionVisibility } from "../src/modules/identity";
 import { SessionRoles } from "../src/modules/identity/ui";
 import { isFloor } from "../src/modules/catalog";
+import { completeness } from "../src/modules/listings/record";
 import {
   applyChange,
   attributeFits,
@@ -48,6 +49,7 @@ import {
   listingView,
   markLookFrom,
   type DetailsEditApi,
+  type ListingRecordData,
   type InventoryField,
   type RecordLabels,
   type UnitAttributeWords,
@@ -189,17 +191,20 @@ function Record({
   id,
   api,
   role = "ListAgent",
+  data,
 }: {
   id: string;
   api: DetailsEditApi | null;
   role?: string;
+  /** The record's unit and listings when a case changes them; the sample's otherwise. */
+  data?: ListingRecordData;
 }): ReactNode {
   return (
     <SessionRoles roles={[role as "ListAgent"]}>
       <DetailsEditProvider api={api}>
         <ListingRecordFull
           view={listingView(rowOf(id), HEADERS)}
-          data={records[id]!}
+          data={data ?? records[id]!}
           labels={LABELS}
         />
       </DetailsEditProvider>
@@ -559,5 +564,150 @@ describe("luat-sua (E3b)", () => {
     for (const v of four) expect(attributeFits("propertySubType", v)).toBe(true);
     for (const v of ["Apartment", "2PN", "", null])
       expect(attributeFits("propertySubType", v)).toBe(false);
+  });
+});
+
+// ---- Task 5b: the record's body in the four groups A–D (owner «Duyệt cả bốn nhóm», 27/11), E15 ----
+
+describe("than-ho-so (E15)", () => {
+  const ID = PLAIN;
+  const complete = (): ListingRecordData => {
+    const d = structuredClone(records[ID]!);
+    Object.assign(d.listings[0]!, {
+      listPrice: 2_710_000_000,
+      legalStatus: "Sổ hồng",
+      furnished: "Furnished",
+      financing: "Không vay",
+      occupantType: "Vacant",
+      confirmedDays: 3,
+    });
+    return d;
+  };
+  const lacking = (): ListingRecordData => {
+    const d = complete();
+    delete d.listings[0]!.legalStatus;
+    delete d.listings[0]!.occupantType;
+    d.listings[0]!.confirmedDays = 15;
+    return d;
+  };
+  const body = () => document.querySelector('[data-slot="listing-record"]')!;
+  const slot = (name: string) => body().querySelector(`[data-slot="${name}"]`);
+  const ATTRIBUTE_FIELDS = [
+    "Unit.livingArea",
+    "Unit.floor",
+    "Unit.bedroomsTotal",
+    "Unit.directionFaces",
+    "Unit.propertySubType",
+  ];
+
+  /** (A) and (B) of a rendered record, as the names of what is wrong; empty when the body is as the owner chose. */
+  function bodyErrors(data: ListingRecordData): string[] {
+    const errors: string[] = [];
+    const status = slot("record-status");
+    const price = slot("record-price");
+    if (!status || !price || status.parentElement !== price.parentElement)
+      errors.push("status and price not on one line");
+    else if (status.compareDocumentPosition(price) & Node.DOCUMENT_POSITION_PRECEDING)
+      errors.push("price before status");
+    const want = [
+      data.unit.subdivisionName,
+      LABELS.propertyTypeValues[data.unit.propertySubType ?? ""],
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    if (slot("record-place")?.textContent !== want) errors.push("place line");
+    const code = data.unit.unitNumber;
+    if ((body().textContent ?? "").split(code).length - 1 > 0) errors.push("unit code said twice");
+    if (slot("record-facts") || slot("listing-card-facts")) errors.push("facts strip");
+    for (const f of ATTRIBUTE_FIELDS) {
+      const all = body().querySelectorAll(`[data-field="${f}"]`).length;
+      const inUnit = body().querySelectorAll(
+        `[data-slot="listing-unit"] [data-field="${f}"]`,
+      ).length;
+      if (all !== inUnit || inUnit !== 1) errors.push(`attribute outside the unit block: ${f}`);
+    }
+    const c = completeness(data.listings[0]!);
+    const count = slot("listing-completeness-count")?.textContent ?? "";
+    const bar = body().querySelector('[data-slot="listing-completeness"] [role="progressbar"]');
+    if (c.missing.length === 0) {
+      if (count !== RECORD_COPY.completeLine(c.have, c.need) || bar)
+        errors.push("completeness counted differently");
+    } else if (count !== `${c.have}/${c.need}` || !bar)
+      errors.push("completeness counted differently");
+    return errors;
+  }
+
+  it("A, B: a complete listing opens on status and price, then project · kind; one line «Đủ thông tin · 5/5», no bar", () => {
+    const data = complete();
+    render(<Record id={ID} api={fakeApi().api} data={data} />);
+    expect(bodyErrors(data)).toEqual([]);
+    expect(slot("listing-completeness")!.textContent).toBe(RECORD_COPY.completeLine(5, 5));
+    expect(slot("listing-completeness")!.querySelector("svg"), "the check mark").not.toBeNull();
+    expect(body().querySelectorAll('[data-slot="missing-part"]')).toHaveLength(0);
+  });
+
+  it("B: a listing missing two parts keeps the bar and count; each missing part is a button that opens «Sửa» on its field", async () => {
+    const data = lacking();
+    render(<Record id={ID} api={fakeApi().api} data={data} />);
+    expect(bodyErrors(data)).toEqual([]);
+    const parts = [...body().querySelectorAll<HTMLElement>('[data-slot="missing-part"]')];
+    expect(parts.map((b) => b.textContent)).toEqual([
+      LABELS.parts.legalStatus,
+      LABELS.parts.occupantType,
+    ]);
+    expect(slot("listing-completeness-missing")!.textContent).toBe(
+      RECORD_COPY.lacking([LABELS.parts.legalStatus, LABELS.parts.occupantType]),
+    );
+    // A missing value reads «Chưa có», with the warning's dot before its label.
+    const row = body().querySelector(
+      '[data-slot="listing-offer"] [data-field="Listing.occupantType"]',
+    )!;
+    expect(row.querySelector("dd")!.textContent).toBe(RECORD_COPY.missing);
+    expect(row.querySelector('dt [data-slot="missing-dot"]')).not.toBeNull();
+    expect(row.querySelector("dt")!.firstElementChild?.getAttribute("data-slot")).toBe(
+      "missing-dot",
+    );
+    await act(async () => fireEvent.click(parts[1]!));
+    const dialog = await screen.findByRole("dialog");
+    const field = within(dialog).getByLabelText(LABELS.parts.occupantType);
+    expect(document.activeElement, "the pressed part takes the focus").toBe(field);
+  });
+
+  it("C: confirmed 3 days ago says with whom and no warning; 15 days ago adds «Quá 14 ngày — nên xác nhận lại»", () => {
+    render(<Record id={ID} api={fakeApi().api} data={complete()} />);
+    expect(slot("listing-confirmation")!.textContent).toBe("Xác nhận với chủ nhà 3 ngày trước");
+    expect(slot("confirmation-stale")).toBeNull();
+    cleanup();
+    render(<Record id={ID} api={fakeApi().api} data={lacking()} />);
+    expect(slot("listing-confirmation")!.textContent).toBe("Xác nhận với chủ nhà 15 ngày trước");
+    expect(slot("confirmation-stale")!.textContent).toBe("Quá 14 ngày — nên xác nhận lại");
+    expect(slot("confirmation-stale")!.className).toContain("text-warning-foreground");
+  });
+
+  it("D: the listing in view reads «Lần n · đang xem» with no ground; the others are links with a chevron", () => {
+    const id = Object.keys(records).find((k) => records[k]!.listings.length === 3)!;
+    render(<Record id={id} api={fakeApi().api} />);
+    const inView = body().querySelector('[data-slot="listing-in-view"]')!;
+    expect(inView.textContent).toBe(RECORD_COPY.listingInView(3));
+    expect(inView.tagName).not.toBe("BUTTON");
+    expect(inView.className).not.toMatch(/\bbg-/);
+    const others = [...body().querySelectorAll('[data-slot="listing-other"]')];
+    expect(others.map((o) => o.textContent)).toEqual(["Lần 2", "Lần 1"]);
+    for (const o of others) {
+      expect(o.className, "a link").toMatch(/underline-offset/);
+      expect(o.querySelector("svg"), "the chevron").not.toBeNull();
+    }
+  });
+
+  it("break: a unit code in the body says «unit code said twice»; a count of its own «completeness counted differently»", () => {
+    const data = complete();
+    render(<Record id={ID} api={fakeApi().api} data={data} />);
+    const extra = document.createElement("span");
+    extra.textContent = data.unit.unitNumber;
+    body().append(extra);
+    expect(bodyErrors(data)).toContain("unit code said twice");
+    extra.remove();
+    slot("listing-completeness-count")!.textContent = "4/5";
+    expect(bodyErrors(data)).toContain("completeness counted differently");
   });
 });

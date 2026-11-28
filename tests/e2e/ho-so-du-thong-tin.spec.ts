@@ -10,7 +10,7 @@ import { rowsShown } from "./phone-list";
 
 import { formatMoney } from "../../src/lib/format";
 import { sampleUnits, subdivisionNameOf } from "../../src/modules/catalog/sample";
-import { listingsOfUnit } from "../../src/modules/listings/record";
+import { completeness, listingsOfUnit } from "../../src/modules/listings/record";
 import {
   SAMPLE_COMPANY,
   buildSampleListings,
@@ -44,6 +44,8 @@ function expectedOrder(id: string): { id: string; label: string; price: number |
 /** A unit with three listings, and one with a single listing: read from the sample data, never typed by hand. */
 const THREE = current.listings.find((l) => listingsOf(l.id).length === 3)!.id;
 const ONE = current.listings.find((l) => listingsOf(l.id).length === 1)!.id;
+/** Row 3h (B): a complete listing says it on one line without a bar; the bar's checks need a listing missing a part. */
+const LACKING = current.listings.find((l) => completeness(l).missing.length > 0)!.id;
 const records = { [THREE]: { listings: listingsOf(THREE).map(({ listing }) => listing) } };
 
 const panel = (page: Page) => page.locator('[data-slot="record-panel"]');
@@ -61,15 +63,22 @@ async function openRecord(page: Page, id: string): Promise<void> {
 const text = (page: Page, slot: string) =>
   record(page).locator(`[data-slot="${slot}"]`).first().innerText();
 
-/** The listings of the unit as the record lists them: «Lần k» in order, and which one is current. */
+/**
+ * The listings of the unit as the record lists them: «Lần k» in order, and which one is current. Row 3h (D): the one in
+ * view is words («Lần k · đang xem»), the others are links; both are read by their «Lần k».
+ */
+const LISTING_LABEL = '[data-slot="listing-in-view"], [data-slot="listing-other"]';
 async function listed(page: Page): Promise<{ numbers: string[]; current: string | null }> {
-  return record(page).evaluate((el) => {
-    const buttons = [...el.querySelectorAll('[data-slot="listings-of-unit"] li button')];
+  return record(page).evaluate((el, sel) => {
+    const labels = [...el.querySelectorAll(`[data-slot="listings-of-unit"] li`)].map((li) =>
+      li.querySelector(sel)!,
+    );
+    const number = (e: Element | undefined) => e?.textContent?.split(" · ")[0] ?? null;
     return {
-      numbers: buttons.map((b) => b.textContent ?? ""),
-      current: buttons.find((b) => b.getAttribute("aria-current") === "true")?.textContent ?? null,
+      numbers: labels.map((b) => number(b) ?? ""),
+      current: number(labels.find((b) => b.getAttribute("aria-current") === "true")),
     };
-  });
+  }, LISTING_LABEL);
 }
 
 /** After moving to another unit the record shows that unit's newest listing, with no earlier-listing note. */
@@ -81,11 +90,13 @@ async function keptErrors(page: Page): Promise<string[]> {
 
 /** The lines of the list against the creation order: each line names its listing and its number. */
 async function orderErrors(page: Page, id: string): Promise<string[]> {
-  const shown = await record(page).evaluate((el) =>
-    [...el.querySelectorAll('[data-slot="listings-of-unit"] li')].map((li) => ({
-      id: li.getAttribute("data-listing-id") ?? "",
-      label: li.querySelector("button")?.textContent ?? "",
-    })),
+  const shown = await record(page).evaluate(
+    (el, sel) =>
+      [...el.querySelectorAll('[data-slot="listings-of-unit"] li')].map((li) => ({
+        id: li.getAttribute("data-listing-id") ?? "",
+        label: li.querySelector(sel)?.textContent?.split(" · ")[0] ?? "",
+      })),
+    LISTING_LABEL,
   );
   const want = expectedOrder(id).map(({ id: i, label }) => ({ id: i, label }));
   return JSON.stringify(shown) === JSON.stringify(want)
@@ -95,7 +106,7 @@ async function orderErrors(page: Page, id: string): Promise<string[]> {
 
 /** The card's price against the price of the listing in view, from the sample data. */
 async function priceErrors(page: Page, price: number | undefined): Promise<string[]> {
-  return (await text(page, "listing-card-price")).trim() === formatMoney(price)
+  return (await text(page, "record-price")).trim() === formatMoney(price)
     ? []
     : ["old listing price not shown"];
 }
@@ -128,10 +139,11 @@ test.describe("E7 · every listing of the unit, newest first", () => {
     );
     expect(await priceErrors(page, order[2]!.price)).toEqual([]);
     // The head of the record comes back into view with the earlier listing's price.
-    await expect(record(page).locator('[data-slot="listing-card"]')).toBeInViewport();
-    await expect(
-      record(page).locator('[data-slot="listing-card-status"] [data-status]'),
-    ).toHaveAttribute("data-status", first.standardStatus);
+    await expect(record(page).locator('[data-slot="record-summary"]')).toBeInViewport();
+    await expect(record(page).locator('[data-slot="record-status"] [data-status]')).toHaveAttribute(
+      "data-status",
+      first.standardStatus,
+    );
     await expect(record(page).locator('[data-slot="listing-offer"] h3')).toHaveText(
       "Lần chào đang xem",
     );
@@ -159,9 +171,13 @@ test.describe("E7 · every listing of the unit, newest first", () => {
     await expect(panel(page)).not.toHaveAttribute("data-record-id", THREE);
     // Mark the oldest line as the one in view and show the note, the way a record that kept the choice would.
     await suaTrang(record(page), (el) => {
-      const buttons = [...el.querySelectorAll('[data-slot="listings-of-unit"] li button')];
-      for (const b of buttons) b.removeAttribute("aria-current");
-      buttons.at(-1)?.setAttribute("aria-current", "true");
+      const labels = [
+        ...el.querySelectorAll(
+          '[data-slot="listings-of-unit"] li :is([data-slot="listing-in-view"], [data-slot="listing-other"])',
+        ),
+      ];
+      for (const b of labels) b.removeAttribute("aria-current");
+      labels.at(-1)?.setAttribute("aria-current", "true");
       const note = document.createElement("div");
       note.setAttribute("data-slot", "listing-earlier-note");
       el.prepend(note);
@@ -194,7 +210,7 @@ test.describe("E7 · every listing of the unit, newest first", () => {
     await openRecord(page, THREE);
     // Freeze the card's price, the way a record that keeps the newest listing's price would show it.
     await suaTrang(record(page), (el) => {
-      const price = el.querySelector('[data-slot="listing-card-price"]')!;
+      const price = el.querySelector('[data-slot="record-price"]')!;
       const frozen = price.cloneNode(true);
       price.replaceWith(frozen);
     });
@@ -339,7 +355,7 @@ test.describe("E9 · the full record passes the accessibility scan", () => {
   });
 
   test("break: a completeness bar without a name is caught", async ({ page }) => {
-    await openRecord(page, THREE);
+    await openRecord(page, LACKING);
     await suaTrang(
       page.locator('[data-slot="listing-completeness"] [role="progressbar"]'),
       (el) => {

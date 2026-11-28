@@ -492,16 +492,17 @@ export function useListingCellEdit({
     [attributes, currentOf],
   );
   const dataRef = useRef(data);
+  // The latest save, for a command that keeps one identity: the grid's marks call it, and a new function on every render
+  // would draw every cell of the grid again after the region said it was ready (VP11, «nothing will draw again»).
+  const saveAttributeRef = useRef(saveAttribute);
   useEffect(() => {
     dataRef.current = data;
-  }, [data]);
-  const revertAttribute = useCallback(
-    (id: string, key: FieldKey) => {
-      const row = dataRef.current.find((r) => r.id === id);
-      if (row) void saveAttribute(row, { field: key, custom: key, value: null });
-    },
-    [saveAttribute],
-  );
+    saveAttributeRef.current = saveAttribute;
+  }, [data, saveAttribute]);
+  const revertAttribute = useCallback((id: string, key: FieldKey) => {
+    const row = dataRef.current.find((r) => r.id === id);
+    if (row) void saveAttributeRef.current(row, { field: key, custom: key, value: null });
+  }, []);
 
   // Pasting a region (row 5): the preview first, then every ticked cell through the same door, undone at once.
   const [plan, setPlan] = useState<PastePlan | null>(null);

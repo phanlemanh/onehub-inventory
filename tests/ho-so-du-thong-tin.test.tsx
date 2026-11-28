@@ -98,8 +98,8 @@ const slotText = (root: ParentNode, slot: string) =>
 
 // ---- E3 · the unit block -----------------------------------------------------------------------------------------
 
+// Row 3h (A, owner «Duyệt cả bốn nhóm» 27/11): the unit code is said once, in the record's head, not in the unit block.
 const UNIT_LABELS = [
-  "Mã căn",
   LABELS.unitKind,
   LABELS.livingArea,
   LABELS.floor,
@@ -128,7 +128,6 @@ function unitBlockErrors(root: ParentNode, upi: string, rowId?: string): string[
   };
   const got = blockRows(root, "listing-unit");
   const want = [
-    unit.unitNumber,
     unitKind(unit.bedroomsTotal) ?? EMPTY,
     unit.livingArea === undefined ? EMPTY : formatArea(unit.livingArea),
     unit.floor ?? EMPTY,
@@ -182,29 +181,29 @@ describe("E3 · the unit block", () => {
 
 // ---- E4 · the head of the record ---------------------------------------------------------------------------------
 
+// Row 3h (A): the head is the status and the price on one line, then «project · property type»; the three facts of the
+// card are gone, the unit's attributes are said in the unit block only.
 function headErrors(root: ParentNode, data: ListingRecordData): string[] {
   const errors: string[] = [];
   const u = data.unit;
   const place = [
     u.subdivisionName,
-    u.buildingName,
     u.propertySubType && LABELS.propertyTypeValues[u.propertySubType],
   ]
     .filter(Boolean)
     .join(" · ");
-  if (slotText(root, "listing-card-place") !== place)
+  if (slotText(root, "record-place") !== place)
     errors.push(
-      slotText(root, "listing-card-place").includes(
+      slotText(root, "record-place").includes(
         LABELS.propertyTypeValues[u.propertySubType ?? ""] ?? "\u0000",
       )
         ? "place line order"
         : "place line missing property type",
     );
-  const facts = [...root.querySelectorAll('[data-slot="listing-card-facts"] dt')].map(
-    (el) => el.textContent,
-  );
-  if (facts.join("|") !== [LABELS.livingArea, LABELS.bedrooms, LABELS.direction].join("|"))
-    errors.push(`card facts: ${facts.join(", ")}`);
+  if (!root.querySelector('[data-slot="record-status"] [data-status]')) errors.push("head status");
+  if (!root.querySelector('[data-slot="record-price"]')) errors.push("head price");
+  if (root.querySelector('[data-slot="listing-card-facts"], [data-slot="record-facts"]'))
+    errors.push("card facts");
   if (
     slotText(root, "listing-confirmation") !== confirmationSentence(data.listings[0]!.confirmedDays)
   )
@@ -213,7 +212,7 @@ function headErrors(root: ParentNode, data: ListingRecordData): string[] {
 }
 
 describe("E4 · the head of the record", () => {
-  it("says the place with the property type, the three facts with the direction, and the confirmation", () => {
+  it("says the status and price, the place with the property type, and the confirmation", () => {
     for (const row of rows.slice(0, 12)) {
       const { container } = renderRecord(row.id);
       expect(headErrors(container, records[row.id]!), row.id).toEqual([]);
@@ -222,8 +221,9 @@ describe("E4 · the head of the record", () => {
   });
 
   it("writes the three confirmation sentences", () => {
-    expect(confirmationSentence(0)).toBe("Xác nhận hôm nay");
-    expect(confirmationSentence(9)).toBe("Xác nhận 9 ngày trước");
+    // Row 3h (C): the confirmation says with whom.
+    expect(confirmationSentence(0)).toBe("Xác nhận với chủ nhà hôm nay");
+    expect(confirmationSentence(9)).toBe("Xác nhận với chủ nhà 9 ngày trước");
     expect(confirmationSentence(null)).toBe("Chưa xác nhận với chủ nhà");
   });
 
@@ -310,6 +310,14 @@ describe("E5 · the listing block", () => {
 function completenessBarErrors(root: ParentNode, data: ListingRecordData, at = 0): string[] {
   const c = completeness(data.listings[at]!);
   const errors: string[] = [];
+  // Row 3h (B): a complete listing says it on one line, with no bar.
+  if (c.missing.length === 0) {
+    if (slotText(root, "listing-completeness-count") !== RECORD_COPY.completeLine(c.have, 5))
+      errors.push("completeness count");
+    if (root.querySelector('[data-slot="listing-completeness"] [role="progressbar"]'))
+      errors.push("completeness bar on a complete listing");
+    return errors;
+  }
   if (slotText(root, "listing-completeness-count") !== `${c.have}/5`)
     errors.push("completeness count");
   const bar = root.querySelector('[data-slot="listing-completeness"] [role="progressbar"]');
@@ -321,10 +329,7 @@ function completenessBarErrors(root: ParentNode, data: ListingRecordData, at = 0
     errors.push("completeness bar value");
   if (!bar?.getAttribute("aria-label") && !bar?.getAttribute("aria-labelledby"))
     errors.push("completeness bar name");
-  const want =
-    c.missing.length === 0
-      ? RECORD_COPY.complete
-      : RECORD_COPY.lacking(c.missing.map((p) => LABELS.parts[p]));
+  const want = RECORD_COPY.lacking(c.missing.map((p) => LABELS.parts[p]));
   if (slotText(root, "listing-completeness-missing") !== want)
     errors.push("completeness missing line");
   return errors;
@@ -359,22 +364,25 @@ describe("E7 · listings of the unit, unit level", () => {
     const data = records[id]!;
     const { container, getByRole } = renderRecord(id);
     const lines = [...container.querySelectorAll('[data-slot="listings-of-unit"] li')];
-    expect(lines.map((li) => li.querySelector("button")?.textContent)).toEqual([
-      "Lần 3",
-      "Lần 2",
-      "Lần 1",
-    ]);
+    // Row 3h (D): the listing in view says so and is no button; the others are links.
+    expect(
+      lines.map(
+        (li) =>
+          li.querySelector('[data-slot="listing-in-view"], [data-slot="listing-other"]')
+            ?.textContent,
+      ),
+    ).toEqual(["Lần 3 · đang xem", "Lần 2", "Lần 1"]);
     expect(container.querySelector('[data-slot="listings-of-unit"] h3')?.textContent).toBe(
       "Các lần chào của căn · 3",
     );
-    expect(lines[0]!.querySelector("button")?.getAttribute("aria-current")).toBe("true");
+    expect(lines[0]!.querySelector("[aria-current]")?.getAttribute("aria-current")).toBe("true");
 
     fireEvent.click(getByRole("button", { name: "Lần 1" }));
     const first = data.listings[2]!;
-    expect(slotText(container, "listing-card-price")).toBe(formatMoney(first.listPrice!));
+    expect(slotText(container, "record-price")).toBe(formatMoney(first.listPrice!));
     expect(
       container
-        .querySelector('[data-slot="listing-card-status"] [data-status]')
+        .querySelector('[data-slot="record-status"] [data-status]')
         ?.getAttribute("data-status"),
     ).toBe(first.standardStatus);
     expect(offerErrors(container, data, 2)).toEqual([]);
@@ -385,9 +393,7 @@ describe("E7 · listings of the unit, unit level", () => {
     expect(slotText(container, "listing-earlier-note")).toContain("Đang xem lần chào cũ · Lần 1");
 
     fireEvent.click(getByRole("button", { name: "Về lần mới nhất" }));
-    expect(slotText(container, "listing-card-price")).toBe(
-      formatMoney(data.listings[0]!.listPrice!),
-    );
+    expect(slotText(container, "record-price")).toBe(formatMoney(data.listings[0]!.listPrice!));
     expect(container.querySelector('[data-slot="listing-earlier-note"]')).toBeNull();
   });
 });

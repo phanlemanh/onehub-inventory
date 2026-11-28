@@ -138,6 +138,12 @@ trong hồ sơ), ô tìm mã căn của hàng 12 (dùng lại, không viết m�
   - E2b: Bảng hàng đăng nhập, Postgres dãy R, 1024 và 1440. Bài mở sửa bằng helper e2e dùng chung của VP11, không viết
     tay phím.
 - Phục vụ: E2, E2b, E13.
+- **Đã dựng (G-2811-47, chồng lên VP11 lát 1 @fd3682d5):**
+  - Hai ô đã có từ bản bấm được; nay dán vào hai cột này đọc theo luật của ô (`PASTE_ATTRIBUTES` trong
+    `listing-paste.ts`), dòng đã khoá bị bỏ kèm lý do của ô, hoàn tác trả giá trị và nguồn trước khi dán.
+  - Bài E2 ở `tests/tin-rao-gia-tri-rieng.test.ts`; E2b mở ô bằng `moSuaO` của VP11.
+  - Ca điện thoại của E13 nằm ở `src/modules/listings/ui/attribute-cell-edit.test.tsx`: luật lint cấm bài của khối dùng
+    chung nhập mô-đun, nên không ghi được vào tệp mà E13 gọi tên (d-…-36, đã báo giám sát).
 
 ### Việc 5: Hồ sơ căn — khối thuộc tính, dấu, lấy lại, dòng khoá (chờ VP10)
 
@@ -172,6 +178,9 @@ trong hồ sơ), ô tìm mã căn của hàng 12 (dùng lại, không viết m�
     (E3 ở 4 khổ, E4, E5, E14b).
 - **Để sau VP11:** phép kiểm màu dấu không trùng màu trạng thái. Dấu tạm dùng token `--info` đang có, không viết mã màu
   tay.
+  - **Đã dựng (G-2811-47):** VP11 dành `info` cho «Đang giao dịch», nên dấu chuyển sang token trung tính
+    `muted-foreground` (d-…-34, `design/decisions.yaml` `attribute-differs-mark-colour`). Bài
+    `tests/e2e/tin-rao-mau-dau.spec.ts` đo dấu cách sáu trạng thái ở hai nền, đỏ khi dấu trở lại `info`.
 - **Chờ khung VP10:** vùng bấm 44px của «Sửa» trên điện thoại. Lớp
   `[&_[data-slot=${RECORD_SECTION_HEADER}]_button]:min-h-11` trong `record-panel.tsx` viết bằng chuỗi nội suy nên Tailwind
   không sinh ra; nút đầu mục ra `min-height: auto` (28px), nút đáy vẫn 44px. Bài E14b ở 360 đỏ đúng chỗ này. Tệp khung
@@ -203,6 +212,22 @@ vào 3h. Hợp đồng ghi ở mục «Sửa sau Cổng Phạm vi», đo bằng 
 - Màu hổ phách và chấm lấy từ bảng màu VP11, không viết mã màu tay.
 - Bài: E15 (ma trận thân hồ sơ), E15b (320, 360 và 1440, sáng và tối, đo cột nhãn và dòng trạng thái và giá).
 - Phục vụ: E15, E15b.
+- **Đã dựng (G-2811-47):**
+  - (A) dòng `record-status` · `record-price`, rồi `record-place` «dự án · loại hình»; bỏ thẻ ba dữ kiện và dòng «Mã căn».
+  - (B) căn đủ: một dòng có dấu tích; căn thiếu: tên phần thiếu là nút, mở «Sửa» của mục lần chào ngay ở ô ấy (thêm
+    `ref` mở-theo-ô vào hộp sửa của 3g); giá chỉ nhảy tới giá ở đầu thân (d-…-38).
+  - (C) câu «Xác nhận với chủ nhà …» và dòng hổ phách quá 14 ngày.
+  - (D) cột nhãn 96px / 112px — bước chuẩn gần nhất (d-…-37); lần đang xem là chữ, lần khác là liên kết có mũi tên.
+  - Bài đổi theo dáng mới, phải ghi sửa-sau-ký ở việc 8:
+    - 3b: `tests/ho-so-du-thong-tin.test.tsx`, `tests/e2e/ho-so-du-thong-tin.spec.ts` (đầu thân, ba câu xác nhận, mức
+      đủ, lịch sử lần chào; bài phá «thanh không tên» mở một tin còn thiếu);
+    - 3g: `tests/sua-thong-tin-can.test.tsx` (số đếm của căn đủ);
+    - hàng 3: `tests/e2e/ho-so-can.spec.ts` «mở toàn màn» (đầu thân là trạng thái và giá, không còn ba dữ kiện);
+    - VP10: bốn bài 44px «BH 2026-11-27» cùng tệp mở tin có nút «Hỏi đầu chủ» ở đáy (việc 5 đổi đáy tin chưa ai giữ,
+      đã bán, ngừng hẳn thành dòng lý do).
+  - Gốc «lưới vẽ lại sau khi sẵn sàng» do 3h: «Lấy lại» của dấu đổi danh tính mỗi lần vẽ, kéo theo mọi ô của lưới dựng
+    lại sau khi vùng báo sẵn sàng (bài phá của VP11 `chuan-hoa-mau` đỏ). Nay giữ một danh tính; bài
+    `lay-lai-mot-danh-tinh` đỏ khi bỏ cách sửa.
 
 ### Việc 6: Nhập tệp ghi giá trị «tệp», đọc lại lần nhập cũ, dấu ở bước xem trước
 

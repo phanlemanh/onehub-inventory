@@ -311,3 +311,14 @@ describe("dan-thuoc-tinh (Review Focus 5)", () => {
     expect(without.skipped).toHaveLength(1);
   });
 });
+
+describe("lay-lai-mot-danh-tinh (VP11 «nothing will draw again»)", () => {
+  it("lay-lai-mot-danh-tinh: the grid's «Lấy lại» keeps one identity across renders and saves, so the marks never redraw every cell", async () => {
+    const { hook } = grid();
+    const first = hook.result.current.revertAttribute;
+    hook.rerender();
+    await type(hook, PLAIN, AREA, "72,5");
+    hook.rerender();
+    expect(hook.result.current.revertAttribute, "a new «Lấy lại» on a render").toBe(first);
+  });
+});

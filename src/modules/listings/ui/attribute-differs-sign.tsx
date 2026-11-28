@@ -7,7 +7,7 @@
 // the import's preview gives none — it changes no listing). Three looks are offered for the owner to choose at the scope gate (Hỏi-6),
 // switched with `?mark=` outside production: a dot with a tooltip (the default), a light badge (after ReUI c-badge-16)
 // or an icon with a tooltip (c-tooltip-3). Its colour is the neutral muted-foreground token, in both themes: since VP11 every
-// tone of the badge table is a status's (info is «Đang giao dịch» alone) and amber stays the warning's, so a mark never
+// tone of the badge table is a status's (info is the Pending status's alone) and amber stays the warning's, so a mark never
 // reads as a status (design/decisions.yaml, attribute-differs-mark-colour).
 import { InfoIcon } from "lucide-react";
 import { createContext, useContext, useState, type ReactNode } from "react";

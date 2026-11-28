@@ -5,6 +5,7 @@
 // frame). Case names are the record's pinned messages (evals.yaml).
 import { existsSync, readFileSync } from "node:fs";
 
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import pg from "pg";
 
@@ -14,7 +15,7 @@ import { sampleId } from "../../src/modules/listings";
 import { companyListingId, seedSampleInventory } from "../db/can-mau";
 import { regionReady } from "../e2e/phone-list";
 import { moSuaO, oCua } from "../e2e/support/mo-sua-o";
-import { chupAnh, pageReady } from "../e2e/sua-trang";
+import { chupAnh, pageReady, suaTrang } from "../e2e/sua-trang";
 import { shellReady } from "./dang-nhap-vai";
 
 let owner: pg.Client;
@@ -329,4 +330,123 @@ test("o-dien-tich: the area cell saves «72,5» as typed, keeps it after a reloa
   expect(none, "o-dien-tich: words send nothing").toEqual([]);
   await expect(editor.getByRole("alert")).toContainText("Chưa hiểu «bảy mươi»");
   await expect(input).toHaveValue("bảy mươi");
+});
+
+/** The serious and critical accessibility faults of the page. */
+async function axeFaults(page: Page): Promise<string[]> {
+  const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+  return violations
+    .filter((v) => v.impact === "serious" || v.impact === "critical")
+    .map((v) => `${v.id}: ${v.nodes.length}`);
+}
+
+/** The colour a CSS colour token draws, read from a probe on the page: no colour is written by hand. */
+const tokenColour = (page: Page, token: string): Promise<string> =>
+  suaTrang(
+    page,
+    (t: string) => {
+      const probe = document.createElement("span");
+      probe.style.color = `var(${t})`;
+      document.body.append(probe);
+      const c = getComputedStyle(probe).color;
+      probe.remove();
+      return c;
+    },
+    token,
+  ) as Promise<string>;
+
+test("than-ho-so: status and price on one line, a fixed label column, two even lines per listing at 320, a missing part opens «Sửa», the warning colour (E15b)", async ({
+  page,
+}, info) => {
+  test.skip(
+    !["360", "1440"].includes(info.project.name),
+    "E15b measures 320 and 360 (phone project), 1440",
+  );
+  const w = await world(info, "than", ["ListAgent"]);
+  // The newest listing of a unit with three: missing two parts, confirmed 15 days ago.
+  const id = (
+    await owner.query<{ id: string }>(
+      `select l.id from listings l join listing_units u on u.listing_id = l.id
+        where l.company_id = $1 and u.upi in (
+          select lu.upi from listing_units lu join listings l2 on l2.id = lu.listing_id
+           where l2.company_id = $1 group by lu.upi having count(*) = 3)
+        order by l.original_entry_timestamp desc limit 1`,
+      [w.mau.id],
+    )
+  ).rows[0]!.id;
+  await owner.query(
+    `update listings set legal_status = null, occupant_type = null,
+            last_confirmed_at = now() - interval '15 days' where id = $1`,
+    [id],
+  );
+  await signIn(page, w.email, w.mau);
+  const widths = info.project.name === "360" ? [320, 360] : [1440];
+  for (const width of widths) {
+    if (width !== page.viewportSize()!.width) await page.setViewportSize({ width, height: 800 });
+    for (const theme of ["light", "dark"] as const) {
+      await page.emulateMedia({ colorScheme: theme });
+      await openRecord(page, id);
+      const r = record(page);
+      // (A) status left, price right, on one line.
+      const status = (await r.locator('[data-slot="record-status"]').boundingBox())!;
+      const price = (await r.locator('[data-slot="record-price"]').boundingBox())!;
+      expect(status.x, `trạng thái bên trái ${width}`).toBeLessThan(price.x);
+      expect(
+        Math.abs(status.y + status.height / 2 - (price.y + price.height / 2)),
+        `một dòng ${width}`,
+      ).toBeLessThan(Math.min(status.height, price.height) / 2);
+      // (D) the label column.
+      const labels = await r
+        .locator('[data-slot="record-row-label"]')
+        .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().width));
+      expect(labels.length, "label column measured").toBeGreaterThan(0);
+      const want = width >= 768 ? 120 : 104;
+      for (const lw of labels)
+        expect(Math.abs(lw - want), `cột nhãn ${width}`).toBeLessThanOrEqual(8);
+      // (D) under 360 each listing takes two even lines.
+      const items = await r.locator('[data-slot="listings-of-unit"] li').evaluateAll((els) =>
+        els.map((el) => {
+          const box = el.getBoundingClientRect();
+          const tops = new Set(
+            [...el.children].map((c) => Math.round(c.getBoundingClientRect().top)),
+          );
+          return { height: Math.round(box.height), lines: tops.size };
+        }),
+      );
+      expect(items, "ba lần chào").toHaveLength(3);
+      if (width === 320) {
+        for (const it of items) expect(it.lines, "hai dòng ở 320").toBe(2);
+        expect(new Set(items.map((it) => it.height)).size, "cao bằng nhau ở 320").toBe(1);
+      }
+      // (B), (C) the warning colour of VP11's palette: the dot of a missing value, the stale confirmation.
+      const warning = await tokenColour(page, "--warning");
+      const warningWords = await tokenColour(page, "--warning-foreground");
+      const dot = r.locator('[data-slot="missing-dot"]').first();
+      await expect(dot).toBeVisible();
+      expect(await dot.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe(warning);
+      const stale = r.locator('[data-slot="confirmation-stale"]');
+      await expect(stale).toHaveText("Quá 14 ngày — nên xác nhận lại");
+      expect(await stale.evaluate((el) => getComputedStyle(el).color)).toBe(warningWords);
+      expect(await axeFaults(page), `axe ${width} ${theme}`).toEqual([]);
+      await chupAnh(page, {
+        path: `_acceptance/tin-rao-giu-gia-tri-rieng/evidence/E15b-${width}-${theme}.png`,
+      });
+    }
+    // (B) a missing part pressed opens «Sửa» of its section on that field, and its line comes into view.
+    await page.emulateMedia({ colorScheme: "light" });
+    await openRecord(page, id);
+    await record(page)
+      .locator('[data-slot="missing-part"]', { hasText: label("OccupantType") })
+      .click();
+    const dialog = page
+      .getByRole("dialog")
+      .filter({ has: page.locator('[data-detail="occupantType"]') });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.locator('[data-detail="occupantType"]')).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+    await expect(
+      record(page).locator('[data-slot="listing-offer"] [data-field="Listing.occupantType"]'),
+    ).toBeInViewport();
+  }
 });
