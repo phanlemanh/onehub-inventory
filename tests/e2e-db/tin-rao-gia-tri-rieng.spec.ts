@@ -1,5 +1,6 @@
-// Row 3h (_acceptance/tin-rao-giu-gia-tri-rieng), task 5, signed in on the lane's Postgres: the unit section of the
-// record edits the five attributes in one save (E3), marks only a value that differs from the catalog (E4), takes a
+// Row 3h (_acceptance/tin-rao-giu-gia-tri-rieng), tasks 4 and 5, signed in on the lane's Postgres: the living area
+// cell of the grid saves an own value, survives a reload and undoes (E2b, opened by VP11's shared helper); the unit
+// section of the record edits the five attributes in one save (E3), marks only a value that differs from the catalog (E4), takes a
 // value back to the catalog (E5), and keeps a sold or withdrawn listing's tasks as quiet lines (E14b, on VP10's
 // frame). Case names are the record's pinned messages (evals.yaml).
 import { existsSync, readFileSync } from "node:fs";
@@ -12,6 +13,7 @@ import { label } from "../../src/modules/company-config";
 import { sampleId } from "../../src/modules/listings";
 import { companyListingId, seedSampleInventory } from "../db/can-mau";
 import { regionReady } from "../e2e/phone-list";
+import { moSuaO, oCua } from "../e2e/support/mo-sua-o";
 import { chupAnh, pageReady } from "../e2e/sua-trang";
 import { shellReady } from "./dang-nhap-vai";
 
@@ -265,4 +267,66 @@ test("khoa-ba-trang-thai: sold and withdrawn keep «Sửa» and «Hỏi đầu c
     if (phone) expect(height, `vùng bấm Sửa ${info.project.name}`).toBeGreaterThanOrEqual(44);
     else expect(height, "nút Sửa 1440").toBe(28);
   }
+});
+
+test("o-dien-tich: the area cell saves «72,5» as typed, keeps it after a reload, undoes a later edit; words send nothing (E2b)", async ({
+  page,
+}, info) => {
+  test.skip(!["1024", "1440"].includes(info.project.name), "E2b measures 1024 and 1440");
+  const w = await world(info, "o", ["ListAgent"]);
+  const id = w.idOf(PLAIN);
+  await signIn(page, w.email, w.mau);
+  await page.goto("/inventory");
+  await page.waitForLoadState("networkidle");
+  await regionReady(page);
+  const dong = (await page
+    .locator(`tr[data-row-id="${id}"] button[data-record-open]`)
+    .first()
+    .textContent())!.trim();
+  const o = { dong, cot: "Unit.livingArea" };
+  const cell = await oCua(page, o);
+  const before = (await cell.textContent())!.trim();
+  const type = async (text: string) => {
+    const editor = await moSuaO(page, o);
+    await editor.locator("input").fill(text);
+    await editor.locator("input").press("Enter");
+  };
+
+  const sent = await patchesDuring(page, () => type("72,5"));
+  expect(sent, "o-dien-tich: one change").toHaveLength(1);
+  expect((sent[0] as { change: unknown }).change).toEqual({
+    field: "unitAttributes",
+    livingArea: 72.5,
+  });
+  await expect(cell).toHaveText("72,5 m²");
+  await expect(page.getByRole("button", { name: "Hoàn tác" })).toBeVisible();
+  await expect
+    .poll(() => own(id).then((r) => [r["living_area"], r["living_area_source"]]), {
+      timeout: 10_000,
+    })
+    .toEqual([72.5, "Typed"]);
+  await chupAnh(page, {
+    path: `_acceptance/tin-rao-giu-gia-tri-rieng/evidence/E2b-${info.project.name}.png`,
+  });
+
+  await page.reload();
+  await page.waitForLoadState("networkidle");
+  await regionReady(page);
+  const again = await oCua(page, o);
+  await expect(again, "o-dien-tich: after a reload").toHaveText("72,5 m²");
+  expect(before, "the cell showed another value before").not.toBe("72,5 m²");
+
+  await type("80");
+  await expect(again).toHaveText("80 m²");
+  await page.getByRole("button", { name: "Hoàn tác" }).click();
+  await expect(again, "o-dien-tich: undo").toHaveText("72,5 m²");
+  await expect.poll(() => own(id).then((r) => r["living_area"]), { timeout: 10_000 }).toBe(72.5);
+
+  const editor = await moSuaO(page, o);
+  const input = editor.locator("input");
+  await input.fill("bảy mươi");
+  const none = await patchesDuring(page, () => input.press("Enter"));
+  expect(none, "o-dien-tich: words send nothing").toEqual([]);
+  await expect(editor.getByRole("alert")).toContainText("Chưa hiểu «bảy mươi»");
+  await expect(input).toHaveValue("bảy mươi");
 });

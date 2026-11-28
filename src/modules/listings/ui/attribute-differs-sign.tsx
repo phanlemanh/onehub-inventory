@@ -6,7 +6,9 @@
 // catalog's value, and under it whatever command the screen gives (AttributeDiffersMark adds «Lấy lại theo Danh bạ»;
 // the import's preview gives none — it changes no listing). Three looks are offered for the owner to choose at the scope gate (Hỏi-6),
 // switched with `?mark=` outside production: a dot with a tooltip (the default), a light badge (after ReUI c-badge-16)
-// or an icon with a tooltip (c-tooltip-3). Its colour is the design system's info token (`--info`), in both themes.
+// or an icon with a tooltip (c-tooltip-3). Its colour is the neutral muted-foreground token, in both themes: since VP11 every
+// tone of the badge table is a status's (info is «Đang giao dịch» alone) and amber stays the warning's, so a mark never
+// reads as a status (design/decisions.yaml, attribute-differs-mark-colour).
 import { InfoIcon } from "lucide-react";
 import { createContext, useContext, useState, type ReactNode } from "react";
 
@@ -56,11 +58,11 @@ function MarkRoom({ words }: { words: UnitAttributeWords }) {
 
 function face(look: MarkLook, words: UnitAttributeWords) {
   return look === "badge" ? (
-    <Badge variant="info-light">{words.differs.split(" ")[0]!.toLocaleLowerCase("vi")}</Badge>
+    <Badge variant="secondary">{words.differs.split(" ")[0]!.toLocaleLowerCase("vi")}</Badge>
   ) : look === "icon" ? (
-    <InfoIcon aria-hidden="true" className="size-3.5 text-info" />
+    <InfoIcon aria-hidden="true" className="size-3.5 text-muted-foreground" />
   ) : (
-    <span aria-hidden="true" className="size-1.5 self-start rounded-full bg-info" />
+    <span aria-hidden="true" className="size-1.5 self-start rounded-full bg-muted-foreground" />
   );
 }
 
@@ -95,7 +97,7 @@ export function AttributeDiffersSign({
         data-look="dot"
         aria-label={name}
         title={name}
-        className="ml-1 inline-block size-1.5 shrink-0 -translate-y-1 rounded-full bg-info"
+        className="ml-1 inline-block size-1.5 shrink-0 -translate-y-1 rounded-full bg-muted-foreground"
       />
     );
   const look = chosen;

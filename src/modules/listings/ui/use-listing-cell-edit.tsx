@@ -178,7 +178,7 @@ export function useListingCellEdit({
     [customFields, detailWords],
   );
   const customKeys = useMemo(() => typedFields.map(cellKeyOf), [typedFields]);
-  // Row 3h: the unit attribute cells, kept apart from the typed cells so a paste still leaves them (row 5).
+  // Row 3h: the unit attribute cells, kept apart from the typed cells: their own readers, and a paste takes only two.
   const attrFields = useMemo(
     () =>
       new Map<FieldKey, CustomCellField>(
@@ -517,10 +517,12 @@ export function useListingCellEdit({
         PASTE_COMPUTED,
         customs,
         changeFor,
+        // Row 3h: living area and bedrooms take a paste as the company's own values, by the cells' readers.
+        attributes ? { fields: attrFields, words: attributes.words } : undefined,
       );
       setPlan({ ...plan, key: Date.now() });
     },
-    [labels, headerOf, headers, customs, changeFor],
+    [labels, headerOf, headers, customs, changeFor, attributes, attrFields],
   );
   const applyPaste = useCallback(
     async (ids: readonly string[]) => {
@@ -541,8 +543,12 @@ export function useListingCellEdit({
           [CONFIRMED]: row[CONFIRMED],
         });
       for (const { row, field } of picked)
-        // Every typed cell (a custom value or one of the four details, row 3g) keeps its value for undo and failure.
-        if (customs.has(field)) before.set(row.id, { ...before.get(row.id), [field]: row[field] });
+        // Every typed cell (a custom value or one of the four details, row 3g; a unit attribute, row 3h) keeps its value
+        // for undo and failure.
+        if (customs.has(field) || attrFields.has(field))
+          before.set(row.id, { ...before.get(row.id), [field]: row[field] });
+      // Row 3h: what each listing held of its own attributes before the paste, so undo puts back value and source.
+      const ownBefore = new Map(picked.map(({ row }) => [row.id, { ...currentOf(row.id) }]));
       // How many pasted cells of each row hold a saved value, to know when the row's confirmed time goes back.
       const holding = new Map<string, number>();
       setApplying(true);
@@ -571,10 +577,14 @@ export function useListingCellEdit({
                           field: "standardStatus",
                           standardStatus: was[STATUS] as ListingStandardStatus,
                         }
-                      : changeFor(
-                          customs.get(field as FieldKey)!,
-                          (was[field as FieldKey] ?? null) as CustomEdit["value"],
-                        );
+                      : attrFields.has(field as FieldKey)
+                        ? attributeUndo(ownBefore.get(row.id) ?? {}, [
+                            attrFields.get(field as FieldKey)!.attribute!,
+                          ])
+                        : changeFor(
+                            customs.get(field as FieldKey)!,
+                            (was[field as FieldKey] ?? null) as CustomEdit["value"],
+                          );
                 const result = await write(row.id, back, new Date().toISOString());
                 if (result === "saved") {
                   // The confirmed time goes back only with the row's last cell that still held a pasted value.
@@ -611,7 +621,7 @@ export function useListingCellEdit({
       setApplying(false);
       setPlan(null);
     },
-    [plan, labels, patch, write, changeFor, customs],
+    [plan, labels, patch, write, changeFor, customs, attrFields, currentOf],
   );
 
   const blocked = useMemo(() => new Set(noActivate ?? []), [noActivate]);
