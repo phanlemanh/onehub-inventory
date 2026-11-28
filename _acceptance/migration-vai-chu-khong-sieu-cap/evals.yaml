@@ -112,7 +112,7 @@ evals:
   - id: E7t
     criterion: AC-7
     executor: script
-    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs --tu-kiem
+    cmd: node _acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs --tu-kiem --cho 60
     layer: backend-effect
     paths: ["_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs"]
     expected: >-

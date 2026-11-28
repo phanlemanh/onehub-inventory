@@ -10,7 +10,7 @@
 //   oan. Từ vòng 2 phép đo theo lượt chạy thật mà đầu nhánh dựa vào.
 //
 //   node _acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs [--cho <phút>]
-//   node _acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs --tu-kiem     # dữ liệu thật xanh, bốn bản phá đỏ
+//   node _acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs --tu-kiem [--cho <phút>]  # dữ liệu thật xanh, bốn bản phá đỏ
 //   --cho: chờ tối đa bấy nhiêu phút cho lượt trên đầu nhánh xong (lượt chấm bắt đầu ngay sau khi đẩy).
 import { execFileSync } from "node:child_process";
 import { dirname, join } from "node:path";

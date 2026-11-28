@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-11-28T03:07:31Z",
-  "generated_sha": "04e322d7a90a6b1907680e8d925f719ef67816ba",
+  "generated_at": "2026-11-28T03:26:12Z",
+  "generated_sha": "0de2abec31621415030174fd31b5fc9c82dc53d4",
   "mainBranchInfo": {
     "branch": "main",
     "source": "remote"
   },
   "slug": "migration-vai-chu-khong-sieu-cap",
-  "round": 1,
+  "round": 2,
   "riskTier": "T3",
   "evals": [
     {
@@ -166,9 +166,30 @@
       "id": "E7",
       "criterion": "AC-7",
       "cmd": "node _acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs --cho 60",
-      "expected": "exit 0, in «ci ok: commit mã <sha> run <id> e2e-db chạy thật trên postgres:16, 6/6 bước · đầu nhánh <sha> run <id>\nquick, e2e, e2e-db xanh» — đọc bằng gh, chỉ đọc. Chiều đỏ: «ci: e2e-db trên commit mã <sha> không xanh (<kết>)»,\n«… dùng lại kết quả cũ, không chạy thật», «nhật ký e2e-db thiếu «ci-db: 6/6 bước đạt»», «… không nhắc tệp\nchu-khong-sieu-cap.db.test.ts», «<việc> trên đầu nhánh <sha> không xanh», «lượt CI trên <sha> chưa xong».",
+      "expected": "exit 0, in «ci ok: đầu nhánh <sha> run <id> quick, check, e2e, e2e-db xanh · e2e-db <chạy thật ở đầu nhánh | dùng\nlại run <id> ở <sha>> trên postgres:16, 6/6 bước, có bài chu-khong-sieu-cap» — đọc bằng gh, chỉ đọc. Lượt được\ndùng lại phải xanh, chạy thật, chứa commit mã của PR và cùng mã với đầu nhánh. Chiều đỏ (ca của E7t): «ci: <việc>\ntrên đầu nhánh <sha> không xanh (<kết>)», «lượt e2e-db được dùng lại ở <sha> có mã khác đầu nhánh», «… không chứa\ncommit mã …», «nhật ký e2e-db chạy thật thiếu «ci-db: 6/6 bước đạt»», «… không nhắc tệp\nchu-khong-sieu-cap.db.test.ts», «lượt CI trên đầu nhánh <sha> chưa xong (<trạng thái>)».",
       "executor": "script",
       "expectedExit": 0,
+      "paths": [
+        "_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs"
+      ],
+      "evidence_required": [
+        "run_id",
+        "exit_code",
+        "verifier",
+        "verified_at",
+        "output"
+      ]
+    },
+    {
+      "id": "E7t",
+      "criterion": "AC-7",
+      "cmd": "node _acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs --tu-kiem",
+      "expected": "exit 0, dòng cuối «tu-kiem: 5/5 ca đúng»: dữ liệu CI thật vừa đọc xanh; bốn bản phá trên chính dữ liệu ấy đỏ với\nđúng thông điệp ghim — e2e-db bị huỷ, dùng lại lượt có mã khác, nhật ký thiếu «ci-db: 6/6 bước đạt», lượt chưa\nxong.",
+      "executor": "script",
+      "expectedExit": 0,
+      "paths": [
+        "_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs"
+      ],
       "evidence_required": [
         "run_id",
         "exit_code",
@@ -278,8 +299,8 @@
   "templatePath": "/Users/manhphan/.claude/plugins/cache/delivery-loop/acceptance-gate/3.1.1/skills/acceptance/references/evidence-report-template.md",
   "toolKillRule": "# TOOL-KILL-RULE — lệnh bị công cụ ngắt KHÔNG phải lệnh fail\n\n**Nguồn duy nhất** của luật «hết giờ không phải trượt» cho MỌI đường chạy lệnh\nkiểm của kit. Hai đường tiêu thụ, cùng đọc khối marker dưới đây, không chép tay:\n\n- **Vòng lặp tính năng** (plugin feature-loop): skill `feature-loop` đọc file này\n  (resolve qua `resolve-plugin.mjs --require skills/acceptance/references/tool-kill-rule.md`)\n  và truyền NGUYÊN VĂN vào `args.toolKillRule` của workflow\n  `acceptance-verify.js`; workflow rút khối marker và nội suy vào prompt của mọi\n  agent chạy lệnh (machine · ui-check · baseline). Thiếu args hoặc không rút\n  được marker → workflow trả BLOCKED có tên, không chạy không luật.\n- **Đường VERIFY độc lập** (skill `acceptance` Phase 3): phiên điều phối chép khối\n  marker VERBATIM vào prompt của phiên tươi VERIFY, cùng nếp «Network truth».\n\nVì sao có luật: verifier chạy lệnh qua Bash tool có trần thời gian mặc định\n(~120 s) NGẮN hơn nhiều suite; lệnh bị công cụ giết trả exit code CỦA CÔNG CỤ,\nkhông phải của lệnh (vấp thật release-2-2-0 S4 r5: suite 108 s đơn lẻ, dưới tải\nbị giết ở 118 s → REJECT giả 4 eval). Nhận diện là việc AGENT (nó thấy tool\nresult thật); phần máy chỉ phòng thủ trên field cấu trúc `killedByTool` —\nKHÔNG grep nội dung output trong engine (chuỗi tổng kết là của suite từng repo).\n\nLệnh dài hơn trần 600 s của công cụ thì KHÔNG bị giết: công cụ **đẩy nó sang\nnền** và nó chạy tiếp. Tệp đầu ra nền trống tới phút chót, vì khung bọc lệnh của\nkit chỉ in khi lệnh xong — đọc trống thành «bị giết» là đúng sự cố crm 07/10/2026\n(hồ sơ `lenh-dai-chay-rieng`: hai lượt BLOCKED giả). Dòng «chuyển sang nền» trong\nkhối dưới là lối LỜI cho mọi lệnh. Lối MÁY: eval khai `long_running: <phút>`\ntrong `evals.yaml` thì lượt chấm feature-loop tự chạy lệnh nền, ghi nhật ký ở\n`.acceptance-runs/<slug>/s4-lenh-dai/` và chờ bằng lệnh nó sinh ra\n(`eval-executors.md`, mục `long_running`).\n\n<!-- <<<TOOL-KILL-RULE -->\nTRAN THOI GIAN CONG CU: khi goi Bash chay lenh, LUON dat tham so timeout >= 600000 (ms) — tran mac dinh cua cong cu (~120s) NGAN hon nhieu suite; lenh vuot tran se bi CONG CU giet va exit code luc do la cua cong cu, KHONG phai cua lenh. Neu lenh van bi cong cu dung (tool result bao timeout/killed, hoac output bi CAT giua chung truoc dong tong ket cuoi cua lenh) → DO KHONG PHAI ket qua that: khai cannotRun=true + killedByTool=true + reason \"bi cong cu giet o <so giay> giay\" kem dau hieu (timeout tool / output cat). TUYET DOI khong bao exitCode nhu the lenh tu fail va khong doan PASS/FAIL tu output cut.\nDAU RA DAI: harness co the CAT DAU RA RA TEP (\"Output too large … saved to <tep>\") va chi hien doan DAU — do KHONG phai bi cong cu giet: doc DUOI tep do (tail) de lay dong tong ket va ma thoat; chi khai killedByTool khi tool result bao timeout/killed that.\nCHUYEN SANG NEN KHONG PHAI BI GIET: tool result bao lenh chua xong trong timeout va da duoc CHUYEN SANG NEN (\"moved to the background\", kem ID + tep dau ra) → lenh VAN DANG CHAY: KHONG khai killedByTool, KHONG ket luan tu tep dau ra luc do. Tep dau ra nen TRONG la binh thuong — khung boc lenh chi in duoi dau ra + dong __EXIT=<n> khi lenh XONG. Cho bang lenh Bash co gioi han (moi lan goi ≤ 100 giay, duoi tran mac dinh 120 giay cua cong cu; vd vong lap kiem tep do co dong __EXIT= chua, sleep vai giay, het 100 giay thi thoat) va goi lai toi khi tep co dong __EXIT=<n> → doc ma tu dong do nhu binh thuong. Tong thoi gian cho toi da = so phut eval khai o long_running (vang thi 30 phut), tinh tu luc chay lenh; qua ma chua co dong __EXIT → cannotRun=true + reason \"lenh chay qua <so> phut chua xong — khai long_running: <phut> cho eval trong evals.yaml\" (KHONG killedByTool), va dung tac vu nen neu cong cu cho phep.\n<!-- TOOL-KILL-RULE>>> -->\n\n## Hồ sơ cho lượt bị ngắt (đường độc lập)\n\nPhiên tươi VERIFY gặp lệnh bị công cụ ngắt thì:\n\n- dòng run-log của eval đó: `\"exit_code\": null, \"killed_by_tool\": true` (không\n  ghi mã thoát của công cụ như mã thoát của lệnh);\n- verdict báo cáo `BLOCKED`, `reason: bi cong cu giet o <so giay> giay — <eval ids>`\n  (kèm dấu hiệu: timeout tool / output cắt trước dòng tổng kết); `failed_evals`\n  rỗng — người đọc hồ sơ thấy đây là sự cố hạ tầng, chữa bằng chạy lại với trần\n  công cụ đủ dài, không phải sửa sản phẩm.\n\nLệnh bị đẩy sang nền rồi QUÁ trần chờ (`long_running`, vắng thì 30 phút) cũng\nlà sự cố hạ tầng chứ không phải lệnh hỏng: dòng run-log `\"exit_code\": null`,\n`\"cannot_run\": true` (KHÔNG `killed_by_tool` — công cụ không giết nó), verdict\n`BLOCKED`, reason gọi tên việc cần làm (khai `long_running: <phút>` cho eval).\n",
   "contractPath": "/Users/manhphan/dev/onehub-inventory-cham-135/_acceptance/migration-vai-chu-khong-sieu-cap/contract.md",
-  "invokedAt": "2026-11-28T03:07:31Z",
-  "invokedSha": "04e322d7a90a6b1907680e8d925f719ef67816ba",
+  "invokedAt": "2026-11-28T03:26:12Z",
+  "invokedSha": "0de2abec31621415030174fd31b5fc9c82dc53d4",
   "vungVat": [
     "_acceptance/migration-vai-chu-khong-sieu-cap/card-plain.json",
     "_acceptance/migration-vai-chu-khong-sieu-cap/card.html",
@@ -292,6 +313,7 @@
     "_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs",
     "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs",
     "_acceptance/migration-vai-chu-khong-sieu-cap/rang/pham-vi.mjs",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/s4-args.json",
     "db/migrations/001_vai_chu_khong_sieu_cap.sql",
     "db/migrations/004_thu_quyen_tao_cua_vai_danh_tinh.sql",
     "tests/db/chu-khong-sieu-cap.db.test.ts"
@@ -320,9 +342,13 @@
     "_acceptance/migration-vai-chu-khong-sieu-cap/contract.md",
     "_acceptance/migration-vai-chu-khong-sieu-cap/decisions.jsonl",
     "_acceptance/migration-vai-chu-khong-sieu-cap/design.md",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/duong-nen.md",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/evidence-report.md",
     "_acceptance/migration-vai-chu-khong-sieu-cap/figures/index.md",
     "_acceptance/migration-vai-chu-khong-sieu-cap/gap-probe.md",
     "_acceptance/migration-vai-chu-khong-sieu-cap/plan.md",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/review-findings.md",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/run-log.jsonl",
     "_acceptance/migration-vai-chu-khong-sieu-cap/usage-report.md",
     "wiki/decisions/0052-migration-chay-bang-vai-chu-khong-sieu-cap.md",
     "wiki/log/2026-11-28-02-migration-ch-y-c-b-ng-vai-ch-kh-ng-si-u.md"
@@ -336,7 +362,9 @@
     "_acceptance/migration-vai-chu-khong-sieu-cap/decisions.jsonl",
     "_acceptance/migration-vai-chu-khong-sieu-cap/design-floor.json",
     "_acceptance/migration-vai-chu-khong-sieu-cap/design.md",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/duong-nen.md",
     "_acceptance/migration-vai-chu-khong-sieu-cap/evals.yaml",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/evidence-report.md",
     "_acceptance/migration-vai-chu-khong-sieu-cap/figures/ba-trang-thai.html",
     "_acceptance/migration-vai-chu-khong-sieu-cap/figures/ba-trang-thai.png",
     "_acceptance/migration-vai-chu-khong-sieu-cap/figures/index.md",
@@ -347,6 +375,9 @@
     "_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs",
     "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs",
     "_acceptance/migration-vai-chu-khong-sieu-cap/rang/pham-vi.mjs",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/review-findings.md",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/run-log.jsonl",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/s4-args.json",
     "_acceptance/migration-vai-chu-khong-sieu-cap/usage-report.md",
     "db/migrations/001_vai_chu_khong_sieu_cap.sql",
     "db/migrations/004_thu_quyen_tao_cua_vai_danh_tinh.sql",
@@ -366,28 +397,125 @@
     "_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs",
     "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs",
     "_acceptance/migration-vai-chu-khong-sieu-cap/rang/pham-vi.mjs",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/s4-args.json",
     "db/migrations/001_vai_chu_khong_sieu_cap.sql",
     "db/migrations/004_thu_quyen_tao_cua_vai_danh_tinh.sql",
     "tests/db/chu-khong-sieu-cap.db.test.ts"
   ],
   "coverageFiles": [
+    "_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs",
     "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs",
     "db/migrations/001_vai_chu_khong_sieu_cap.sql",
     "db/migrations/004_thu_quyen_tao_cua_vai_danh_tinh.sql",
     "tests/db/chu-khong-sieu-cap.db.test.ts"
   ],
   "coEvalPaths": true,
-  "evalsHash": "9d15fb3c6f4f82762db99269f53937294586e951ff298e2d686f7bff902b380c",
+  "evalsHash": "5d132fae1caed2cee58894ee1927ff464f5841bd8c3d0f50c69809d6a5d584b5",
   "runBaseline": true,
+  "carriedEvals": [
+    {
+      "id": "E1",
+      "runId": "minted-migration-vai-chu-khong-sieu-cap-E1-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-28T03:07:31Z",
+      "cmd": "node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 17"
+    },
+    {
+      "id": "E2",
+      "runId": "minted-migration-vai-chu-khong-sieu-cap-E2-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-28T03:07:31Z",
+      "cmd": "node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 17"
+    },
+    {
+      "id": "E3",
+      "runId": "minted-migration-vai-chu-khong-sieu-cap-E3-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-28T03:07:31Z",
+      "cmd": "node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 17"
+    },
+    {
+      "id": "E4",
+      "runId": "minted-migration-vai-chu-khong-sieu-cap-E4-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-28T03:07:31Z",
+      "cmd": "node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 17"
+    },
+    {
+      "id": "E5",
+      "runId": "minted-migration-vai-chu-khong-sieu-cap-E5-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-28T03:07:31Z",
+      "cmd": "node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 17"
+    },
+    {
+      "id": "E1t",
+      "runId": "minted-migration-vai-chu-khong-sieu-cap-E1t-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-28T03:07:31Z",
+      "cmd": "node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 17 --tu-kiem"
+    },
+    {
+      "id": "E8",
+      "runId": "minted-migration-vai-chu-khong-sieu-cap-E8-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-28T03:07:31Z",
+      "cmd": "node _acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs --pg 16"
+    },
+    {
+      "id": "E8b",
+      "runId": "minted-migration-vai-chu-khong-sieu-cap-E8b-r1",
+      "fromRound": 1,
+      "verifiedAt": "2026-11-28T03:07:31Z",
+      "cmd": "bash _acceptance/migration-vai-chu-khong-sieu-cap/rang/bai-kiem.sh"
+    }
+  ],
+  "carriedFindings": [
+    {
+      "file": "db/migrations/001_vai_chu_khong_sieu_cap.sql",
+      "title": "New migration reuses number 001 and fills the gap at 004 instead of taking the next number",
+      "severity": "low",
+      "plain": "Hai tệp cập nhật cơ sở dữ liệu mang số cũ thay vì số cuối nên dễ bị người sau bắt chước nhầm. Người dùng cuối không thấy ảnh hưởng gì, cơ sở đã có vẫn được áp bù đúng.",
+      "can_cu": "Chỉ là lệch nếp đặt số, đã được nêu rõ và chấp nhận có chủ đích; không mất dữ liệu và không ảnh hưởng người dùng, chỉ cần ghi chú để người sau khỏi sao chép.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs",
+      "title": "Hình dạng 5: nói phá thử phủ chiều đỏ của E1–E4, nhưng chỉ có vài ca lẻ",
+      "severity": "medium",
+      "plain": "Bộ tự kiểm nói là đã thử phá mọi chiều nhưng thực tế mới thử vài ca, nên vài thông báo lỗi chưa được chứng minh là bắt được lỗi thật. Người dùng cuối không bị ảnh hưởng.",
+      "can_cu": "Chỉ làm bằng chứng nghiệm thu yếu hơn lời nói, không làm hỏng việc đưa bản lên; bổ sung thêm ca phá sau là rẻ và không gấp.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    },
+    {
+      "file": "tests/db/chu-khong-sieu-cap.db.test.ts",
+      "title": "Hình dạng 4: hai assert chỉ có chiều âm, không có ca đối chứng trong bài kiểm CI",
+      "severity": "low",
+      "plain": "Bài kiểm tự động kiểm tra rằng tài khoản danh tính không còn quyền tạo đối tượng thừa, nhưng chưa tự chứng minh được rằng nó sẽ báo đỏ nếu quyền ấy thật sự còn. Nếu định dạng quyền đổi, bài kiểm có thể vẫn xanh dù quyền thừa quay lại. Người dùng cuối không thấy gì trực tiếp.",
+      "can_cu": "Hậu quả nhẹ và chỉ ảnh hưởng độ tin cậy của bài kiểm về sau, không làm mất hay lộ dữ liệu; phần đối chứng đã được chạy ở công cụ tự kiểm riêng, và bổ sung sau cũng rẻ, không gấp.",
+      "proposal": "known-limits",
+      "fromRound": 1,
+      "tepDoi": false
+    }
+  ],
+  "deltaFiles": [
+    "_acceptance/migration-vai-chu-khong-sieu-cap/evals.yaml",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs",
+    "_acceptance/migration-vai-chu-khong-sieu-cap/s4-args.json"
+  ],
   "thuocChup": {
-    "sha": "04e322d7a90a6b1907680e8d925f719ef67816ba",
+    "sha": "0de2abec31621415030174fd31b5fc9c82dc53d4",
     "n": 279,
-    "digest": "7ecff3835363d7d90a1c9fc60902a856a6b4eeb043162a1cf78b3d41bccfad50",
+    "digest": "0c9849c430fb62583a0610f12adae690a5f0cfaf85f44955b151764d77b4966e",
     "tep": {
       "_acceptance/config.yaml": "73fc77f4b7d21b4e956daf6d06541ff69a87986f2a41dceda811aa3cc5b67ef5",
-      "_acceptance/migration-vai-chu-khong-sieu-cap/evals.yaml": "9d15fb3c6f4f82762db99269f53937294586e951ff298e2d686f7bff902b380c",
+      "_acceptance/migration-vai-chu-khong-sieu-cap/evals.yaml": "5d132fae1caed2cee58894ee1927ff464f5841bd8c3d0f50c69809d6a5d584b5",
       "_acceptance/migration-vai-chu-khong-sieu-cap/rang/bai-kiem.sh": "c40560cccab3e166e4996f8510706bdf481572fa72eb67054b84ba3efcb42760",
-      "_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs": "01f42b539e868d3975c41d4ab3d943dcdf51edc5350a0f8b382d600cff7af7d2",
+      "_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs": "3cdd6a636313cd06d83acfd40e388b469e93541138fa05a0dd17a5d590c62fdf",
       "_acceptance/migration-vai-chu-khong-sieu-cap/rang/kiem.mjs": "bebd1322a230ffae49c5dfb93cfa6768383abaf57bbfc547fb7ce1a45ee15936",
       "_acceptance/migration-vai-chu-khong-sieu-cap/rang/pham-vi.mjs": "8c8ddc5cbe6b9d1f27f6e630ba622157214018cfae629206f1dcf9fcf1eefa30",
       "src/components/candidate/data-region-cell-edit.test.tsx": "09365092f208dfa3e1c32defd56fbb30c565cd8d2aaf1521f1292e177a77b8c2",
@@ -666,7 +794,7 @@
     }
   },
   "cayChup": {
-    "sha": "04e322d7a90a6b1907680e8d925f719ef67816ba",
+    "sha": "0de2abec31621415030174fd31b5fc9c82dc53d4",
     "ban": {},
     "chuaTheoDoi": []
   }
