@@ -116,7 +116,9 @@ evals:
     layer: backend-effect
     paths: ["_acceptance/migration-vai-chu-khong-sieu-cap/rang/ci.mjs"]
     expected: >-
-      exit 0, dòng cuối «tu-kiem: 15/15 ca đúng»: dữ liệu CI thật vừa đọc xanh; «doc-dong-dung-lai-that» tách đúng run và
+      exit 0, dòng cuối «tu-kiem: 15/15 ca đúng» khi e2e-db ở đầu nhánh dùng lại một lượt trước, hoặc «tu-kiem: 7/7
+      ca đúng» kèm dòng «đầu nhánh chạy e2e-db thật — bỏ năm ca của nhánh dùng lại» khi nó chạy thật (khi ấy không có
+      dòng dùng lại thật để tách, nên ba ca đọc dòng và năm ca của nhánh dùng lại không có dữ liệu): dữ liệu CI thật vừa đọc xanh; «doc-dong-dung-lai-that» tách đúng run và
       commit từ chính dòng «not run again: same inputs as run <URL> at commit <sha>» CI in ra, và từ cùng dòng ấy cắt
       còn số trần («doc-dong-dung-lai-so-tran»); dòng lệnh echo CI in trước nó không bị đọc nhầm; mười một bản phá trên
       chính dữ liệu ấy đỏ, mỗi dòng đỏ của phép đo một bản (e2e-db bị huỷ, thiếu việc check, chưa xong, thiếu 6/6, thiếu
