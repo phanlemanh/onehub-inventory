@@ -18,7 +18,24 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const sh = (cmd, args) => execFileSync(cmd, args, { cwd: ROOT, encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
-const gh = (...a) => sh("gh", a);
+// GitHub's API quota is shared by every session of the account: when it is spent, wait for its reset (inside --cho)
+// rather than crash; past --cho the measure stops with one pinned line.
+const ghDeadline = Date.now() + (process.argv.includes("--cho") ? Number(process.argv[process.argv.indexOf("--cho") + 1]) : 0) * 60_000;
+function gh(...a) {
+  for (;;) {
+    try {
+      return sh("gh", a);
+    } catch (e) {
+      const msg = String(e.stderr ?? e.message);
+      if (!/rate limit exceeded/i.test(msg)) throw e;
+      if (Date.now() > ghDeadline) {
+        console.log("ci: không đọc được GitHub — hết hạn mức API của tài khoản, chạy lại sau giờ đặt lại");
+        process.exit(1);
+      }
+      execFileSync("sleep", ["60"]);
+    }
+  }
+}
 const i = process.argv.indexOf("--cho");
 const waitMin = i > 0 ? Number(process.argv[i + 1]) : 0;
 const tuKiem = process.argv.includes("--tu-kiem");
@@ -44,7 +61,7 @@ function latestRun(sha, wait) {
     const r = runs.sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
     if (r && r.status === "completed") return r;
     if (Date.now() > deadline) return { missing: r ? `chưa xong (${r.status})` : "chưa có" };
-    execFileSync("sleep", ["20"]);
+    execFileSync("sleep", ["60"]);
   }
 }
 const jobsOf = (id) => JSON.parse(gh("run", "view", String(id), "--json", "jobs,headSha")).jobs;
