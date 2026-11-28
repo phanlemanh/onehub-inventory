@@ -121,8 +121,8 @@ trong hồ sơ), ô tìm mã căn của hàng 12 (dùng lại, không viết m�
 - Tin chuyển liên kết sang căn mới; giá trị theo danh mục tính lại theo căn ấy, giá trị riêng giữ nguyên.
 - Luật «một căn một tin mở» của 013 trả 409. Câu lỗi nêu mã căn, đọc từ bảng nhãn.
 - Không có lệnh này trên ô của lưới.
-- Bài đỏ: E10 (máy chủ), E10b (hồ sơ ở 1440 và 360).
-- Phục vụ: E10, E10b.
+- Bài đỏ: E10 (máy chủ). E10b (hồ sơ ở 1440 và 360) hoãn sang hàng 12, lời chủ kho 28/11 «Hoãn sang hàng 12» (G-2811-70).
+- Phục vụ: E10.
 
 ### Việc 4: Sửa trên ô và dán (chờ VP11)
 

@@ -136,6 +136,10 @@ Source input: hàng `3h` (`docs/plan/lo-trinh.json`), ô `opportunity.md` (build
   nhập tệp dùng trên máy tính. Luật đã ký của hàng 11: dưới 768px màn nhập tệp không có bước xem trước, nên câu cũ
   «ở 1440 và 360 bước xem trước» không làm được ở 360. Tiêu chí AC-8 giữ nguyên; bài giữ cả hai khổ. Thẻ Cổng Bằng chứng
   trình điểm này ở khối «chưa duyệt».
+- 2026-11-28 · Nút «Gắn sang căn khác» trên màn (phép E10b) hoãn sang hàng 12 `them-can`. Chủ kho trả lời câu hỏi của
+  giám sát (G-2811-70), nguyên văn: «Hoãn sang hàng 12». AC-10 giữ nguyên chữ. Ở 3h vẫn đo phần máy chủ (E10) và luật «lệnh
+  này không có trên ô của lưới». E10b rời bộ phép của 3h, vì kit chỉ cho phép máy khai «không chạy»; câu kỳ vọng của nó chép
+  nguyên văn sang `ban-giao-hang-12-them-can.md` cho Cổng Phạm vi hàng 12.
 
 ## Out of scope
 

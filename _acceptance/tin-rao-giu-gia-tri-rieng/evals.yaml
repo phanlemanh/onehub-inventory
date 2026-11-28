@@ -137,18 +137,8 @@ evals:
     expected: "exit 0; qua /api/v1: gắn tin T (riêng Diện tích Typed) từ căn X sang căn Y → listing_units.upi = Y, Diện tích riêng giữ, Phòng ngủ (không riêng) đọc theo Y; gắn sang căn Z đã có tin mở → 409 với câu nêu mã căn Z, liên kết và giá trị không đổi; lưới không có lệnh gắn (tìm theo tên trong menu ô bằng 0); ca đối chứng cho phép hai tin mở trên Z cho 'two open listings on one unit'"
     evidence_required: [run_id, exit_code, verifier, verified_at, output]
 
-  - id: E10b
-    criterion: AC-10
-    executor: ui-check
-    layer: ui-observed
-    cmd: config:executors.ui-check
-    ref: config:executors.ui-check
-    paths: [src/modules/listings/ui/**, tests/e2e-db/tin-rao-gia-tri-rieng.spec.ts]
-    steps:
-      - "Open the record of an open listing at 1440 and at 360 (`npm run dev`, /inventory?record=<id>) and look in the record head's «…» for «Gắn sang căn khác»; the expected sentence needs row 12's unit search behind it."
-      - "Run `bash _acceptance/tin-rao-giu-gia-tri-rieng/rang/chay.sh E10b`: it fails «0 passed case(s)» while no browser case of the command exists."
-    expected: "exit 0; ở 1440 và 360 trong hồ sơ căn: 'Gắn sang căn khác' mở ô tìm mã căn của hàng 12, chọn căn Y → hồ sơ hiện mã căn Y, Diện tích riêng còn, dấu tính theo Y; chọn căn đã có tin mở → câu lỗi nêu mã căn, hồ sơ không đổi; ảnh evidence/E10b-1440.png, E10b-360.png"
-    evidence_required: [run_id, exit_code, verifier, verified_at, output, screenshot]
+  # E10b (the «Gắn sang căn khác» button on screen) moved to row 12 them-can: the owner, 2026-11-28, «Hoãn sang hàng 12»
+  # (G-2811-70). Its text, as written here, is in ban-giao-hang-12-them-can.md for row 12's scope gate.
 
   - id: E11
     criterion: AC-11

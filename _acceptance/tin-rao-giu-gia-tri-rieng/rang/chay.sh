@@ -47,7 +47,6 @@ case "${1:-}" in
   E8) pw "dau-xem-truoc" 2 "$SPEC" --project=360 --project=1440 ;;
   E9) vt "can-cho-khop" 1 -c vitest.db.config.ts "$DB_TEST" ;;
   E10) vt "gan-sang-can-khac" 1 -c vitest.db.config.ts "$DB_TEST" ;;
-  E10b) pw "gan-sang-can-khac-tren-man" 2 "$SPEC" --project=360 --project=1440 ;;
   E11) bash db/scripts/cach-ly.sh
        vt "sua-lay-lai-theo-vai|san-khac-khong-cham|cung-san-khac-nguoi-giu" 3 -c vitest.db.config.ts "$DB_TEST" ;;
   # Row 4's suite, unchanged, then the phone case of row 3h's two cells. The case lives in the listings module: a
