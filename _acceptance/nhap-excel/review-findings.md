@@ -140,6 +140,12 @@ Số # là thứ tự trong bản 65 mục của vòng 6 (6 mục mới của v�
 
 Trùng một mục đang mở (đã gộp vào nhóm của mục ấy):
 
+- S4-r12 t1, t2 · custom-field values of the last batch outside the table fingerprint; the app role can UPDATE every column of import_runs → mục «Rules held only by the screen, not the server or database» (Siết cửa máy chủ của nhập tệp)
+- S4-r12 t3, t5, t6 · the second number 015; the PR description out of date; checks not green and tier high → thủ tục trước khi gộp; cặp tệp 015/020 có ở trang 0055 và dòng sổ d-…-102
+- S4-r12 t4 · a sentence written in src/app/(app)/inventory/page.tsx («Có sẵn bảng trong Excel hay Google Sheet?»), not from the word list → mục «The word check lets a label through when it is written in lower case or by another name» (bộ kiểm chữ không bắt câu viết tay; chữ của khái niệm trên nút vẫn lấy từ label())
+- S4-r12 t7 · the batch-order matrix G-2811-96 has no list of orders written before and no count → mục «Declared sweeps not fully run»
+- S4-r12 t8 · the «no phone-shaped text on the import record» sweep reads only the kept column → mục «Personal data beyond header names» (#21, Ngoài-3)
+- S4-r12 t9 · the break of the last-batch test runs a copy of the rule written inside the test → nhóm «Weak test shapes»
 - S4-r11 t1, t2, t3 · checks red, the PR description out of date, the second number 015 and its grant without a decision page → thủ tục trước khi gộp; cặp tệp 015/020 có ở trang 0055 và dòng sổ d-…-102
 - S4-r11 t4 · custom-field values of the last batch outside the table fingerprint → mục «Siết cửa máy chủ của nhập tệp» (ghi giá trị trường riêng khác với bảng đã xem)
 - S4-r11 t6 · the import record keeps raw cell text that can hold names and phones, not marked pii → #21 (Ngoài-3)

@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: a672ea0f66751137b339af4f8a1618f861001352
+verified_commit: 2d814a8e2c6485c90d50ada24b850f92755ba800
 human_signoff:
 ---
 
@@ -309,3 +309,7 @@ none — every multi-run eval is uniform
 
 Round 11: not passed — one finding in the contract (AC-8: the last batch could close an import with earlier batches unwritten). Returned to implementation.
 Round 12: all evals PASS on a672ea0f after fix 01dc882d (the last batch waits for every earlier batch); E10, E11, E19, E23 carried forward.
+
+### Re-pin lần 1 — 2026-11-28, do hàng 11 nhap-excel trước Cổng Bằng chứng, sau vòng chấm 12: 22 hồ sơ cổng nêu (gồm 11 hồ sơ có dòng sửa-sau-ký của PR #130) và nhap-excel (G-2811-62)
+run_id: repin-20261128T091000Z-36001
+sha: 2d814a8e2c6485c90d50ada24b850f92755ba800 · suites: 3 lệnh exit 0 · evals: 22/22 eval máy đạt kỳ vọng · ngoài làn máy: E18, E19
