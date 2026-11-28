@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: []
-status: verified
+status: signed-off
 approved_by: Manh Phan
 approved_at: 2026-11-27T09:04:51Z
 design_doc: _acceptance/khung-luoi-va-ngan-chi-tiet/design.md
@@ -108,3 +108,23 @@ màn nào và không đổi ai vào màn nào. Bảng quyền giữ nguyên; «L
   `bo-o-tim-cua-vung` (2e: nút «Bỏ ghim Toà», phân xử K-1411-7), `bang-hang-dung-tay-nhu-sheet` (2a: điểm dừng Tab trên
   điện thoại). Cùng làn ghim lại: `sua-tren-o` (hàng 4) và `lop-rieng-cua-san` (7e) đã cũ trên main từ 13/11.
 - Hàng 11 (nhập Excel) dùng cùng `data-region.tsx`: ai xanh trước gộp trước, người sau gộp main và chạy lại.
+- Known limits — chọn ở Cổng Bằng chứng 2026-11-28:
+  - Ngoài-1: Thẻ ký duyệt vẫn hiện câu cũ nói khung tách khỏi lưới ở cả nền sáng lẫn tối, trong khi ở nền tối chỉ còn đường viền. Chủ kho có thể ký trên một câu mô tả hơi quá so với thực tế.
+  - Ngoài-2: Thẻ ký tự mâu thuẫn: câu đầu nói nền tối chỉ có viền, nhưng dòng tiêu chí đầu vẫn hứa có viền và bóng ở cả sáng lẫn tối. Chủ kho đọc thẻ có thể không rõ nên tin câu nào.
+  - Ngoài-3: Thẻ ký hiện cờ đỏ báo không phép kiểm nào đạt dù mọi kiểm đều đã đạt. Chủ kho có thể hoang mang hoặc quen bỏ qua cờ đỏ thật sau này.
+  - Ngoài-4: Thẻ đang trình cho chủ kho vẫn ghi câu cũ về nền tối, lệch với câu đã sửa. Ký trên thẻ này là duyệt đúng câu định bỏ.
+  - Ngoài-5: Bảng kết quả của vòng có thể ghi một bài kiểm tra là đạt dù lần chạy mới nhất của cùng lệnh đã lỗi. Người dùng không thấy gì ở màn hình; chỉ người đọc báo cáo có thể bị hiểu nhầm về mức xanh của vòng.
+  - Ngoài-6: Thẻ trình chủ kho ghi bảy tiêu chí chưa đạt trong khi thực tế chỉ bốn tiêu chí hỏng. Chủ kho có thể hiểu nhầm và bỏ cả ba tiêu chí đang đạt khi chọn lối thu phạm vi.
+  - Ngoài-7: Trang bằng chứng báo hai lượt chấm trong khi thẻ nói năm lượt. Chủ kho có thể không thấy là đã vượt trần ba lượt.
+  - Ngoài-8: Thẻ trình chủ kho tính ba tiêu chí đã đạt là hỏng, nên bảy thay vì bốn tiêu chí bị nêu chưa đạt. Quyết định lối ra của chủ kho có thể dựa trên danh sách sai.
+  - Ngoài-9: Phép đối chiếu cho giao diện tối có thể không phân biệt được ngăn có viền trái với ngăn thiếu viền. Bài chấm có thể cho kết quả không đáng tin dù màn hình thật không đổi.
+  - Ngoài-10: Trang bằng chứng vẫn ghi hai lượt chấm dù đã chấm năm lượt, nên che việc đã vượt trần ba lượt.
+  - Ngoài-11: Ảnh đối chiếu của giao diện tối được vẽ tay và không ai dựng lại được khi màn hình đổi. Kết quả chấm có thể chỉ phản ánh lời mô tả chứ không phải khả năng phân biệt bằng mắt.
+  - Ngoài-12: Nút ở đáy hồ sơ trên điện thoại vẫn được đo đúng như hợp đồng. Chỉ là chưa có bài thử chứng minh phép đo sẽ báo lỗi nếu nút ấy biến mất, nên một lúc nào đó phép đo có thể lặng lẽ không đo gì mà vẫn báo đạt.
+  - Ngoài-13: Nếu phần đáy hồ sơ trên điện thoại biến mất hoặc nút ở đó bị thu nhỏ, bài kiểm hiện có có thể vẫn báo đạt vì không đo gì ở đó. Người dùng điện thoại có thể gặp nút khó bấm mà không ai được cảnh báo trước.
+  - Ngoài-14: Người dùng không thấy gì khác đi. Chỉ là bài kiểm tra bóng đổ của cột ghim chưa chắc bắt được lỗi nếu phần thân bảng mất bóng, nên sau này một lỗi như vậy có thể lọt qua mà không báo đỏ.
+  - Ngoài-15: Ở giao diện tối, bài kiểm tự động nói bóng của ngăn bị cắt thì không chứng minh được gì, vì bóng ở nền tối vốn đã quá nhạt. Người dùng có thể thấy bóng ngăn bị cắt ở giao diện tối mà bài kiểm không báo.
+  - Ngoài-16: Hai ảnh dùng làm mẫu «ngăn không tách khỏi lưới» được làm tay, nên khó chụp lại đúng cùng điều kiện về sau. Người dùng không bị ảnh hưởng, chỉ việc kiểm lại bằng mắt có thể kém chắc.
+  - Ngoài-17: Bài kiểm tra việc lưới khít màn có thể vẫn xanh nếu sau này lưới dừng sai chỗ, nên một lỗi về chỗ dừng của lưới có thể lọt qua mà không ai biết. Hiện màn vẫn chạy đúng.
+  - Ngoài-18: Nếu sau này ngăn chi tiết mất bóng hoặc viền trái, bài kiểm tra có thể không báo, nên nhân viên sàn có thể thấy ngăn nhìn phẳng và khó tách khỏi lưới.
+  - Ngoài-19: Khi ngăn được ghim thành cột, nếu nút lại hiện chữ hoặc rộng quá thì bài kiểm tra có thể không bắt được, làm hàng nút chật và khó bấm trên màn nhỏ.
