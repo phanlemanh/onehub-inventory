@@ -90,18 +90,11 @@
   severity: low
   Đề xuất: known-limits
 
-- **An answer typed for a column that is only kept as written is not stored (S4-r8)**
-  Người dùng thấy gì: Ở các cột chỉ được giữ chữ gốc trong bản ghi lần nhập (hướng, loại căn, giá bán), nếu anh gõ đáp án cho một ô lạ thì màn xem trước hiện đáp án như đã sửa, nhưng bản ghi lần nhập chỉ lưu chữ gốc, không lưu đáp án. Căn không bị ghi sai; chỉ đáp án anh gõ không còn ở đâu.
-  Căn cứ: Cùng dáng «màn xem trước nhận, bước ghi bỏ» với ba lỗi đã sửa, nhưng ở phần chỉ giữ chữ gốc; bảng viết trước kiểm chữ gốc mà chưa kiểm giá trị màn đã hứa. Sửa rẻ: bản ghi lần nhập lưu thêm giá trị màn xem trước đã hiện, kèm ca trong bảng viết trước.
-  file: `src/modules/imports/store.ts`
-  severity: medium
-  Đề xuất: known-limits
-
-- **Some words of the import screen are written in the screen, not taken from the product's word list (S4-r8)**
-  Người dùng thấy gì: Màn Nạp tệp gọi một số khái niệm bằng chữ riêng, ví dụ «lần nhập» trong khi danh sách chữ của sản phẩm gọi là «Lần nạp tệp», và «căn», «chủ nhà», «mẫu nhập» viết thẳng trong màn. Người dùng có thể thấy cùng một việc mang hai tên ở hai chỗ.
-  Căn cứ: Không mất dữ liệu, không sai thao tác; đổi chữ sau rẻ. Tiêu chí AC-12 cho phép chữ của tệp chữ riêng của mô-đun, nên không phạm tiêu chí; chọn một tên chung cho «lần nhập» là việc của danh sách chữ.
-  file: `src/modules/imports/ui/copy.ts`
-  severity: medium
+- **The word check lets a label through when it is written in lower case or by another name (S4-r8)**
+  Người dùng thấy gì: Hôm nay không ảnh hưởng màn Nạp tệp — chữ của màn đã lấy từ danh sách chữ. Nhưng bài kiểm chữ của kho chỉ bắt nhãn viết đúng như trong danh sách, nên một màn viết «căn» thường giữa câu hay «lần nhập» thay «Lần nạp tệp» vẫn qua; vài màn khác đang có dáng ấy (hồ sơ căn, sửa ô, lớp riêng của sàn với «chủ nhà», «lần nhập»).
+  Căn cứ: Không mất dữ liệu; chỉ là chữ có thể lệch giữa các màn. Siết bài kiểm và sửa các màn khác là một việc riêng của kho, giám sát đã ghi thành hàng riêng.
+  file: `tests/language.test.ts`
+  severity: low
   Đề xuất: known-limits
 
 - **The import screen's 'fixed' mark has the same colour as the 'Đã bán' status (VP11 r1)**
@@ -117,6 +110,8 @@ Số # là thứ tự trong bản 65 mục của vòng 6 (6 mục mới của v�
 
 Đã sửa trên nhánh:
 
+- S4-r8 t3 · Product language: concept words hard-coded in the import screen — chữ của màn dựng bằng label() từ danh sách chữ (81219c6d)
+- S4-r8 t7 · an answer typed for a column kept as written is not stored — bản ghi lần nhập giữ thêm giá trị màn đã hiện (kept.value), bảng viết trước so ở mọi ô giữ chữ gốc (81219c6d)
 - S4-r7 t4 · Building text of a row whose unit already exists is dropped on write: not written and not kept — chữ toà nay giữ nguyên trong bản ghi lần nhập (lý do unit-attribute) khi không vào căn chờ mới của dòng; cả khi chữ dài quá 80 ký tự căn chờ giữ được (f072a264)
 - S4-r7 t6 · lostCells skips the 'unit' places — bài so nay đo mã căn (lần chào gắn đúng căn danh mục, đúng căn chờ) và chữ toà, trên một dòng căn danh mục và một dòng căn chờ mới, kèm hai ca phá (f072a264)
 - S4-r7 t8 · chosen values compared as a set — so theo từng dòng của tệp (f072a264)
