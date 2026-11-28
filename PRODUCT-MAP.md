@@ -11,7 +11,7 @@ flowchart TD
   GD --> XL["Xếp lại sau<br/>chưa có"]
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
-  GP --> DL["Đang làm<br/>1 việc"] --> GB{"Cổng Bằng chứng"}
+  GP --> DL["Đang làm<br/>2 việc"] --> GB{"Cổng Bằng chứng"}
   GB --> DG["Đã giao<br/>31 việc"]
   GB --> CN["Chờ phiên nghiệm thu<br/>54 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
@@ -35,6 +35,7 @@ flowchart TD
 
 ## Đang làm
 
+- Đầu chủ, Đầu khách và Trưởng nhóm đọc trạng thái căn bằng sáu màu không trùng nhau ở cả nền sáng lẫn tối, và sửa nhanh trên ô bằng Enter, phím cách mở hồ sơ, bấm ra ngoài là lưu — lát 1 của điều chủ kho đã duyệt «Duyệt cả ba lối A» ngày 27/11/2026 (`chuan-hoa-he-design`)
 - Đầu chủ và Đầu khách dùng mọi màn họ Lưới với ngăn chi tiết nổi từ dưới thanh trên tới đáy, lưới khít màn, đầu ngăn một dòng, nút đúng chỗ và đủ cỡ ngón tay — điều chủ kho đã quyết ở phiên BH ngày 27/11/2026 (`khung-luoi-va-ngan-chi-tiet`)
 
 ## Đã giao — chờ phiên nghiệm thu
