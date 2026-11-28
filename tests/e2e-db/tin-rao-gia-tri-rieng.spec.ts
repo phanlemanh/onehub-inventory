@@ -11,6 +11,8 @@ import pg from "pg";
 
 import { DB_URL, OUTBOX } from "../../playwright.db.config";
 import { label } from "../../src/modules/company-config";
+import { formatArea } from "../../src/lib/format";
+import { IMPORT_COPY } from "../../src/modules/imports/ui/copy";
 import { sampleId } from "../../src/modules/listings";
 import { companyListingId, seedSampleInventory } from "../db/can-mau";
 import { regionReady } from "../e2e/phone-list";
@@ -449,4 +451,83 @@ test("than-ho-so: status and price on one line, a fixed label column, two even l
       record(page).locator('[data-slot="listing-offer"] [data-field="Listing.occupantType"]'),
     ).toBeInViewport();
   }
+});
+
+/** A company with one person and no listing: an import makes new listings on catalog units nobody offers yet. */
+async function bareWorld(info: TestInfo, tag: string, roles: string[]) {
+  const stamp = `${tag}-${info.project.name}-${Date.now()}`;
+  const name = `[MAU ${stamp}]`;
+  const id = (
+    await owner.query<{ id: string }>("insert into companies (name) values ($1) returning id", [
+      name,
+    ])
+  ).rows[0]!.id;
+  const email = `gtr-${stamp}@example.test`;
+  const person = `[Tên] ${tag}`;
+  const userId = (
+    await owner.query<{ id: string }>(
+      "insert into identity.users (email, name) values ($1, $2) on conflict (email) do update set name = excluded.name returning id",
+      [email, person],
+    )
+  ).rows[0]!.id;
+  await owner.query(
+    "insert into company_members (company_id, user_id, name, roles) values ($1, $2, $3, $4)",
+    [id, userId, person, roles],
+  );
+  return { email, mau: { id, name } };
+}
+
+test("dau-xem-truoc: the import's preview marks only the area that differs from the catalog, the file's value shown (E8)", async ({
+  page,
+}, info) => {
+  test.skip(
+    !["360", "1440"].includes(info.project.name),
+    "E8 measures 1440, and the phone's screen at 360",
+  );
+  const w = await bareWorld(info, "xem", ["ListAgent"]);
+  await signIn(page, w.email, w.mau);
+  await page.goto("/nhap-tep");
+  await page.waitForLoadState("networkidle");
+  if (info.project.name === "360") {
+    // Row 11 (signed): below 768 px the import screen says it is for a computer, so there is no preview to mark.
+    await expect(page.locator('[data-state="dien-thoai"]')).toHaveText(IMPORT_COPY.phone);
+    await expect(page.getByLabel(IMPORT_COPY.drop)).toBeHidden();
+    await expect(page.locator('[data-slot="attribute-differs"]')).toHaveCount(0);
+    await chupAnh(page, { path: `_acceptance/tin-rao-giu-gia-tri-rieng/evidence/E8-360.png` });
+    return;
+  }
+  // Two catalog units with a code and an area: the first row's area differs, the second's is the catalog's own.
+  const units = (
+    await owner.query<{ code: string; living_area: number }>(
+      `select a.value as code, u.living_area::float8 as living_area
+         from catalog_aliases a join catalog_units u on u.unit_key = a.object_key
+        where a.kind = 'ma_goc' and u.living_area is not null
+        order by a.value limit 2`,
+    )
+  ).rows;
+  expect(units, "two catalog units with a code").toHaveLength(2);
+  const differs = units[0]!.living_area + 3.5;
+  const csv = [
+    "Mã căn,DT,Giá chào,Trạng thái",
+    `${units[0]!.code},${differs},4650000000,Đang bán`,
+    `${units[1]!.code},${units[1]!.living_area},3900000000,Đang bán`,
+  ].join("\n");
+  await page
+    .getByLabel(IMPORT_COPY.drop)
+    .setInputFiles({ name: "e8.csv", mimeType: "text/csv", buffer: Buffer.from(csv, "utf8") });
+  const preview = page.locator('[data-state="dem-dau"]');
+  const next = page.getByRole("button", { name: new RegExp(`^${IMPORT_COPY.next}`) });
+  for (let i = 0; i < 4 && !(await preview.isVisible()); i += 1) await next.click();
+  await expect(preview).toBeVisible();
+  const marks = page.locator('[data-slot="attribute-differs"]');
+  await expect(marks, "dau-xem-truoc: one mark").toHaveCount(1);
+  await expect(marks.first()).toHaveAccessibleName(
+    `${label("DiffersFromCatalog")}: ${formatArea(units[0]!.living_area)}`,
+  );
+  // The cell keeps the file's value as the file writes it, the one the import will write.
+  // The preview's cell is the span that holds the value and the mark side by side.
+  const cell = marks.first().locator("xpath=ancestor::span[contains(@class,'w-40')][1]");
+  await expect(cell).toContainText(String(differs));
+  await expect(cell).not.toContainText(formatArea(units[0]!.living_area));
+  await chupAnh(page, { path: `_acceptance/tin-rao-giu-gia-tri-rieng/evidence/E8-1440.png` });
 });
