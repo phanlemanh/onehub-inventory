@@ -1,4 +1,4 @@
--- Company isolation suite (SP-1): 23 SQL cases (14 of row 7, 5 of row 7a, 1 of row 7b, 1 of row 7e, 1 of row 19, 1 of row 10), run by db/scripts/cach-ly.sh on a scratch database that has the
+-- Company isolation suite (SP-1): 24 SQL cases (14 of row 7, 5 of row 7a, 1 of row 7b, 1 of row 7e, 1 of row 19, 1 of row 10, 1 of row 11), run by db/scripts/cach-ly.sh on a scratch database that has the
 -- migrations applied. Each case builds companies A and B as the table owner inside one transaction, switches to the
 -- API role with the door's own statements (src/modules/identity/with-company.ts), checks reads and writes, and
 -- rolls back. A passing case prints `ok <case>`; a failing one raises `HỎNG <case>: <table or reason>`.
@@ -122,13 +122,39 @@ insert into luat_thu_hep values
   ('company_fee_items', 'company_fee_items_insert_by_permission', '(app.allowed(''setFeeSchedule''::text) = ''company''::text)'),
   ('company_fee_items', 'company_fee_items_update_by_permission', '(app.allowed(''setFeeSchedule''::text) = ''company''::text)'),
   -- 013_bang_can_chao.sql (hàng 10): listings and their unit links are read with viewListings, changed with
-  -- updateListing; no action adds one yet (createListing, row 12).
+  -- updateListing; 015 (hàng 11) replaces the two insert rules below: createListing went live.
   ('listings', 'listings_read_by_permission', '(app.allowed(''viewListings''::text) = ''company''::text)'),
-  ('listings', 'listings_insert_by_permission', '(app.allowed(''createListing''::text) = ''company''::text)'),
+  ('listings', 'listings_insert_by_permission',
+   '((app.allowed(''createListing''::text) = ''company''::text) OR ((app.allowed(''createListing''::text) = ''own''::text) AND ((list_agent_user_id)::text = current_setting(''app.user_id''::text, true))))'),
   ('listings', 'listings_update_by_permission', '(app.allowed(''updateListing''::text) = ''company''::text)'),
   ('listing_units', 'listing_units_read_by_permission', '(app.allowed(''viewListings''::text) = ''company''::text)'),
-  ('listing_units', 'listing_units_insert_by_permission', '(app.allowed(''createListing''::text) = ''company''::text)'),
-  ('listing_units', 'listing_units_update_by_permission', '(app.allowed(''updateListing''::text) = ''company''::text)');
+  -- 019 (hàng 11): own scope links a unit only to a listing the person keeps.
+  ('listing_units', 'listing_units_insert_by_permission',
+   '((app.allowed(''createListing''::text) = ''company''::text) OR ((app.allowed(''createListing''::text) = ''own''::text) AND (EXISTS ( SELECT
+   FROM listings l
+  WHERE ((l.id = listing_units.listing_id) AND ((l.list_agent_user_id)::text = current_setting(''app.user_id''::text, true)))))))'),
+  ('listing_units', 'listing_units_update_by_permission', '(app.allowed(''updateListing''::text) = ''company''::text)'),
+  -- 015_nhap_excel.sql (hàng 11): createListing adds a listing (own scope: one the person keeps); a listing is deleted only
+  -- when undoImport allows it, it belongs to an import not undone and nobody changed it since (version 1); imports are
+  -- read with viewImports, opened with importListings, written further or undone with continueImport or undoImport.
+  ('listings', 'listings_delete_by_permission',
+   '((import_run_id IS NOT NULL) AND (version = 1) AND (EXISTS ( SELECT
+   FROM import_runs r
+  WHERE ((r.id = listings.import_run_id) AND (r.status <> ''undone''::text) AND ((app.allowed(''undoImport''::text) = ''company''::text) OR ((app.allowed(''undoImport''::text) = ''own''::text) AND ((r.imported_by)::text = current_setting(''app.user_id''::text, true))))))))'),
+  ('listing_pending_units', 'listing_pending_units_read_by_permission',
+   '(app.allowed(''viewListings''::text) = ''company''::text)'),
+  ('listing_pending_units', 'listing_pending_units_insert_by_permission',
+   '((app.allowed(''createListing''::text) = ''company''::text) OR ((app.allowed(''createListing''::text) = ''own''::text) AND (EXISTS ( SELECT
+   FROM listings l
+  WHERE ((l.id = listing_pending_units.listing_id) AND ((l.list_agent_user_id)::text = current_setting(''app.user_id''::text, true)))))))'),
+  ('listing_pending_units', 'listing_pending_units_update_by_permission',
+   '(app.allowed(''updateListing''::text) = ''company''::text)'),
+  ('import_runs', 'import_runs_read_by_permission',
+   '(app.allowed(''viewImports''::text) = ''company''::text)'),
+  ('import_runs', 'import_runs_insert_by_permission',
+   '(((imported_by)::text = current_setting(''app.user_id''::text, true)) AND ((app.allowed(''importListings''::text) = ''company''::text) OR ((app.allowed(''importListings''::text) = ''own''::text) AND ((list_agent_user_id)::text = current_setting(''app.user_id''::text, true)))))'),
+  ('import_runs', 'import_runs_update_by_permission',
+   '((app.allowed(''continueImport''::text) = ''company''::text) OR (app.allowed(''undoImport''::text) = ''company''::text) OR (((imported_by)::text = current_setting(''app.user_id''::text, true)) AND ((app.allowed(''continueImport''::text) = ''own''::text) OR (app.allowed(''undoImport''::text) = ''own''::text))))');
 
 create function pg_temp.dung_dang(bang name, luat name, lenh text, bieu_thuc text, cot text,
                                   kieu text default 'PERMISSIVE') returns boolean
@@ -583,8 +609,9 @@ end $$;
 -- 19. Privileged functions are a written list (Ngoài-4, 14, 19): a SECURITY DEFINER function runs as its owner, so one
 --     the API role can call — directly or through PUBLIC, which every new function gets by default — or that a trigger
 --     on a table the role can write calls, must be listed here with its owner and a pinned search_path. The list is the
---     identity exception the owner approved: row 8 (dang-nhap-ma-email#d-20261111T052230Z-14) and row 9
---     (moi-nguoi-gan-vai#d-20261111T084753Z-14). An 11th function needs the owner's word first.
+--     identity exception the owner approved: row 8 (dang-nhap-ma-email#d-20261111T052230Z-14), row 9
+--     (moi-nguoi-gan-vai#d-20261111T084753Z-14) and row 11 (nhap-excel#d-20261117T064233Z-63). A 12th function needs the
+--     owner's word first.
 create temp table ham_cho_phep (lich text not null, chu name not null, duyet text not null);
 insert into ham_cho_phep values
   ('app.login_request_code', 'quy_hang_identity', 'dang-nhap-ma-email#d-20261111T052230Z-14'),
@@ -596,7 +623,9 @@ insert into ham_cho_phep values
   ('app.member_roles', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14'),
   ('app.member_list', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14'),
   ('app.member_invite', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14'),
-  ('app.member_set_roles', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14');
+  ('app.member_set_roles', 'quy_hang_identity', 'moi-nguoi-gan-vai#d-20261111T084753Z-14'),
+  -- 016_nhap_excel_dau_chu.sql (hàng 11): the owner's word «Cho thấy (lối A)», 2026-11-17.
+  ('app.import_list_agents', 'quy_hang_identity', 'nhap-excel#d-20261117T064233Z-63');
 do $$
 declare r record; k int := 0;
 begin
@@ -864,10 +893,14 @@ begin
   perform pg_temp.phai_loi('can-chao-theo-san',
     'update listings set standard_status = ''Active'' where id = ''00000000-0000-4000-8000-0000000a0002''',
     'listings_activate');
+  -- Row 11 (015): a listing agent adds only a listing it keeps itself; a listing that came from no import is never
+  -- deleted (the delete rule lets through only listings of an import not undone, version 1).
   perform pg_temp.phai_loi('can-chao-theo-san',
     'insert into listings (id, company_id, standard_status) values (''00000000-0000-4000-8000-0000000a0004'', '
-    '''00000000-0000-4000-8000-00000000000a'', ''Incomplete'')', 'permission denied');
-  perform pg_temp.phai_loi('can-chao-theo-san', 'delete from listings', 'permission denied');
+    '''00000000-0000-4000-8000-00000000000a'', ''Incomplete'')', 'listings_insert_by_permission');
+  delete from listings;
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'HỎNG can-chao-theo-san: vai API xoá được % lần chào không đến từ lần nhập', n; end if;
   perform pg_temp.phai_loi('can-chao-theo-san',
     'update listing_units set upi = ''upi-mau-2'' where listing_id = ''00000000-0000-4000-8000-0000000a0001''',
     'permission denied');
@@ -885,5 +918,226 @@ begin
   select count(*) into n from listings;
   if n <> 0 then raise exception 'HỎNG can-chao-theo-san: phiên chưa chọn sàn thấy % lần chào', n; end if;
   raise notice 'ok can-chao-theo-san — đọc, sửa, luật dữ liệu, người giữ căn, sàn khác';
+end $$;
+rollback;
+
+-- 24. Imports (row 11, hồ sơ nhap-excel; G-1711-40): company A's listing agent cannot add a listing, an import or a
+--     listing on a pending unit in B's name; cannot delete a listing that came from no import, one of another person's
+--     import, or one of B; positive controls: it adds its own listing and import in A, and deletes a listing of its own
+--     import nobody changed. Break file: db/tests/pha-thu/nhap-excel-xoa-mo.sql (delete rule widened to the company).
+begin;
+select pg_temp.dung_hai_san();
+insert into catalog_nodes (slug, node_type, name) values ('mau-du-an', 'project', '[MAU] Dự án');
+insert into catalog_buildings (building_key, subdivision_key, building_name, upi)
+  values ('bld_00000000000000000000000001', 'mau-du-an', '[MAU] Toà', 'upi-mau-toa');
+insert into catalog_units (unit_key, upi, subdivision_key, building_key, building_name, unit_number, property_type,
+                           property_sub_type) values
+  ('unt_00000000000000000000000001', 'upi-mau-1', 'mau-du-an', 'bld_00000000000000000000000001', '[MAU] Toà', 'A-01',
+   'Residential', 'Condominium');
+insert into identity.users (id, email, name) values
+  ('00000000-0000-4000-8000-0000000000a2', 'nhap-a@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000a3', 'nhap-a2@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000b2', 'nhap-b@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000a4', 'nhap-tl-a@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000b4', 'nhap-tl-b@example.test', '[Tên]');
+insert into company_members (company_id, user_id, name, roles) values
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a2', '[Tên]', '{ListAgent}'),
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a3', '[Tên] 02', '{ListAgent}'),
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a4', '[Tên] TL', '{TeamLead}'),
+  ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-0000000000b2', '[Tên]', '{ListAgent}'),
+  ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-0000000000b4', '[Tên] TL B', '{TeamLead}');
+insert into import_runs (id, company_id, imported_by, list_agent_user_id, file_name, signature, row_count) values
+  ('00000000-0000-4000-8000-0000000c0001', '00000000-0000-4000-8000-00000000000a',
+   '00000000-0000-4000-8000-0000000000a2', '00000000-0000-4000-8000-0000000000a2', 'a.xlsx', '{ma can}', 2),
+  ('00000000-0000-4000-8000-0000000c0002', '00000000-0000-4000-8000-00000000000b',
+   '00000000-0000-4000-8000-0000000000b2', '00000000-0000-4000-8000-0000000000b2', 'b.xlsx', '{ma can}', 1);
+insert into listings (id, company_id, standard_status, list_agent_user_id, list_agent_full_name, import_run_id) values
+  ('00000000-0000-4000-8000-0000000c0011', '00000000-0000-4000-8000-00000000000a', 'Incomplete',
+   '00000000-0000-4000-8000-0000000000a2', '[Tên]', '00000000-0000-4000-8000-0000000c0001'),
+  ('00000000-0000-4000-8000-0000000c0012', '00000000-0000-4000-8000-00000000000a', 'Incomplete',
+   '00000000-0000-4000-8000-0000000000a2', '[Tên]', null),
+  ('00000000-0000-4000-8000-0000000c0013', '00000000-0000-4000-8000-00000000000b', 'Incomplete',
+   '00000000-0000-4000-8000-0000000000b2', '[Tên]', '00000000-0000-4000-8000-0000000c0002');
+insert into company_pending_units (id, company_id, raw_code) values
+  ('00000000-0000-4000-8000-0000000c0021', '00000000-0000-4000-8000-00000000000b', 'SA5-12.08');
+set local role quy_hang_app;
+do $$
+declare n int;
+begin
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a2', true);
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000a', true);
+  -- In B's name: refused by the company rules.
+  perform pg_temp.phai_loi('nhap-excel-theo-san',
+    'insert into listings (id, company_id, standard_status, list_agent_user_id, list_agent_full_name) values '
+    '(''00000000-0000-4000-8000-0000000c0031'', ''00000000-0000-4000-8000-00000000000b'', ''Incomplete'', '
+    '''00000000-0000-4000-8000-0000000000a2'', ''[Tên]'')', 'row-level security');
+  perform pg_temp.phai_loi('nhap-excel-theo-san',
+    'insert into import_runs (id, company_id, imported_by, list_agent_user_id, file_name, signature, row_count) values '
+    '(''00000000-0000-4000-8000-0000000c0032'', ''00000000-0000-4000-8000-00000000000b'', '
+    '''00000000-0000-4000-8000-0000000000a2'', ''00000000-0000-4000-8000-0000000000a2'', ''x.xlsx'', ''{a}'', 1)',
+    'row-level security');
+  perform pg_temp.phai_loi('nhap-excel-theo-san',
+    'insert into listing_pending_units (listing_id, company_id, pending_unit_id, open) values '
+    '(''00000000-0000-4000-8000-0000000c0011'', ''00000000-0000-4000-8000-00000000000b'', '
+    '''00000000-0000-4000-8000-0000000c0021'', true)', 'row-level security');
+  -- Positive control: its own listing and its own import in A.
+  insert into listings (id, company_id, standard_status, list_agent_user_id, list_agent_full_name) values
+    ('00000000-0000-4000-8000-0000000c0033', '00000000-0000-4000-8000-00000000000a', 'Incomplete',
+     '00000000-0000-4000-8000-0000000000a2', '[Tên]');
+  insert into import_runs (id, company_id, imported_by, list_agent_user_id, file_name, signature, row_count) values
+    ('00000000-0000-4000-8000-0000000c0034', '00000000-0000-4000-8000-00000000000a',
+     '00000000-0000-4000-8000-0000000000a2', '00000000-0000-4000-8000-0000000000a2', 'y.xlsx', '{a}', 1);
+  -- Deletes that must touch nothing: a listing from no import, B's listing (by id).
+  delete from listings where id in ('00000000-0000-4000-8000-0000000c0012', '00000000-0000-4000-8000-0000000c0013');
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'HỎNG nhap-excel-theo-san: xoá được % lần chào không thuộc lần nhập của mình', n; end if;
+  -- Another listing agent of A: own scope, not the one who imported — nothing.
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a3', true);
+  delete from listings where id = '00000000-0000-4000-8000-0000000c0011';
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'HỎNG nhap-excel-theo-san: người khác xoá được % lần chào của lần nhập', n; end if;
+  -- Positive control: the importer deletes a listing of its own import nobody changed.
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a2', true);
+  delete from listings where id = '00000000-0000-4000-8000-0000000c0011';
+  get diagnostics n = row_count;
+  if n <> 1 then raise exception 'HỎNG nhap-excel-theo-san: đối chứng — người nhập xoá được % lần chào của lần nhập', n; end if;
+  -- The list agents a team lead may pick (016, 019): A's team lead sees A's two list agents, names only; a list agent
+  -- (own scope) sees itself alone; B's team lead sees only B's.
+  select count(*) into n from app.import_list_agents()
+   where user_id <> '00000000-0000-4000-8000-0000000000a2';
+  if n <> 0 then raise exception 'HỎNG nhap-excel-theo-san: đầu chủ (của tôi) thấy % đầu chủ khác qua hàm', n; end if;
+  select count(*) into n from app.import_list_agents();
+  if n <> 1 then raise exception 'HỎNG nhap-excel-theo-san: đối chứng — đầu chủ (của tôi) thấy % dòng, cần chính mình', n; end if;
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a4', true);
+  select count(*) into n from app.import_list_agents()
+   where user_id in ('00000000-0000-4000-8000-0000000000a2', '00000000-0000-4000-8000-0000000000a3');
+  if n <> 2 then raise exception 'HỎNG nhap-excel-theo-san: đối chứng — trưởng nhóm sàn A thấy % đầu chủ của A', n; end if;
+  select count(*) into n from app.import_list_agents();
+  if n <> 2 then raise exception 'HỎNG nhap-excel-theo-san: trưởng nhóm sàn A thấy % người qua hàm, phải đúng 2', n; end if;
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000b4', true);
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000b', true);
+  select count(*) into n from app.import_list_agents() where user_id = '00000000-0000-4000-8000-0000000000a2';
+  if n <> 0 then raise exception 'HỎNG nhap-excel-theo-san: trưởng nhóm sàn B thấy % đầu chủ của A', n; end if;
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000a', true);
+  -- B sees none of A's imports.
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000b2', true);
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000b', true);
+  select count(*) into n from import_runs where company_id = '00000000-0000-4000-8000-00000000000a';
+  if n <> 0 then raise exception 'HỎNG nhap-excel-theo-san: sàn B thấy % lần nhập của A', n; end if;
+  raise notice 'ok nhap-excel-theo-san — chèn và xoá chéo sàn, xoá ngoài lần nhập, đối chứng dương';
+end $$;
+rollback;
+
+-- 25. A listing reaches a pending unit of its own company only (row 11, migration 018; S4-r2 t2, G-2711-32; SP-1). The
+--     link is written as the table owner, past the application and past the row rules: the foreign key pairs the
+--     company, so a listing of A pointing at a pending unit of B is refused by the database itself; positive control:
+--     the same listing points at A's own pending unit. Break file: db/tests/pha-thu/nhap-excel-can-cho-cheo-san.sql
+--     (the key back on the pending unit's id alone, as migration 015 had it).
+begin;
+select pg_temp.dung_hai_san();
+insert into identity.users (id, email, name) values
+  ('00000000-0000-4000-8000-0000000000a5', 'cho-a@example.test', '[Tên]');
+insert into company_members (company_id, user_id, name, roles) values
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a5', '[Tên]', '{ListAgent}');
+insert into listings (id, company_id, standard_status, list_agent_user_id, list_agent_full_name) values
+  ('00000000-0000-4000-8000-0000000c0101', '00000000-0000-4000-8000-00000000000a', 'Incomplete',
+   '00000000-0000-4000-8000-0000000000a5', '[Tên]');
+insert into company_pending_units (id, company_id, raw_code) values
+  ('00000000-0000-4000-8000-0000000c0111', '00000000-0000-4000-8000-00000000000b', 'SB-01.01'),
+  ('00000000-0000-4000-8000-0000000c0112', '00000000-0000-4000-8000-00000000000a', 'SA-01.01');
+do $$
+begin
+  perform pg_temp.phai_loi('nhap-excel-can-cho-theo-san',
+    'insert into listing_pending_units (listing_id, company_id, pending_unit_id, open) values '
+    '(''00000000-0000-4000-8000-0000000c0101'', ''00000000-0000-4000-8000-00000000000a'', '
+    '''00000000-0000-4000-8000-0000000c0111'', true)', 'listing_pending_units_pending_company');
+  -- Positive control: A's listing on A's own pending unit.
+  insert into listing_pending_units (listing_id, company_id, pending_unit_id, open) values
+    ('00000000-0000-4000-8000-0000000c0101', '00000000-0000-4000-8000-00000000000a',
+     '00000000-0000-4000-8000-0000000c0112', true);
+  raise notice 'ok nhap-excel-can-cho-theo-san — lần chào của A không trỏ được căn chờ của B, kể cả ghi thẳng';
+end $$;
+rollback;
+
+-- 26. A unit is linked to a listing by the person who keeps it, or company-wide, and never across companies (row 11,
+--     migration 019; G-2811-19; SP-1). A's listing agent (own scope) cannot link a catalog unit or a pending unit to the
+--     listing another agent of A keeps; positive control: it links one to its own listing. A's team lead (company scope)
+--     links one to that other agent's listing (positive control) but reaches nothing of B: no link in B's name, no write
+--     on B's import, B's imports unseen, B's listing not deleted. Break file:
+--     db/tests/pha-thu/nhap-excel-moi-noi-mo.sql (the two link rules back to «may create listings at all», as 015 had).
+begin;
+select pg_temp.dung_hai_san();
+insert into catalog_nodes (slug, node_type, name) values ('mau-du-an', 'project', '[MAU] Dự án');
+insert into catalog_buildings (building_key, subdivision_key, building_name, upi)
+  values ('bld_00000000000000000000000001', 'mau-du-an', '[MAU] Toà', 'upi-mau-toa');
+insert into catalog_units (unit_key, upi, subdivision_key, building_key, building_name, unit_number, property_type,
+                           property_sub_type) values
+  ('unt_00000000000000000000000001', 'upi-mau-1', 'mau-du-an', 'bld_00000000000000000000000001', '[MAU] Toà', 'A-01',
+   'Residential', 'Condominium');
+insert into identity.users (id, email, name) values
+  ('00000000-0000-4000-8000-0000000000a2', 'moi-a@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000a3', 'moi-a2@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000a4', 'moi-tl-a@example.test', '[Tên]'),
+  ('00000000-0000-4000-8000-0000000000b2', 'moi-b@example.test', '[Tên]');
+insert into company_members (company_id, user_id, name, roles) values
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a2', '[Tên]', '{ListAgent}'),
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a3', '[Tên] 02', '{ListAgent}'),
+  ('00000000-0000-4000-8000-00000000000a', '00000000-0000-4000-8000-0000000000a4', '[Tên] TL', '{TeamLead}'),
+  ('00000000-0000-4000-8000-00000000000b', '00000000-0000-4000-8000-0000000000b2', '[Tên]', '{ListAgent}');
+insert into import_runs (id, company_id, imported_by, list_agent_user_id, file_name, signature, row_count) values
+  ('00000000-0000-4000-8000-0000000c0202', '00000000-0000-4000-8000-00000000000b',
+   '00000000-0000-4000-8000-0000000000b2', '00000000-0000-4000-8000-0000000000b2', 'b.xlsx', '{ma can}', 1);
+insert into listings (id, company_id, standard_status, list_agent_user_id, list_agent_full_name, import_run_id) values
+  ('00000000-0000-4000-8000-0000000c0211', '00000000-0000-4000-8000-00000000000a', 'Incomplete',
+   '00000000-0000-4000-8000-0000000000a2', '[Tên]', null),
+  ('00000000-0000-4000-8000-0000000c0212', '00000000-0000-4000-8000-00000000000a', 'Incomplete',
+   '00000000-0000-4000-8000-0000000000a3', '[Tên] 02', null),
+  ('00000000-0000-4000-8000-0000000c0213', '00000000-0000-4000-8000-00000000000b', 'Incomplete',
+   '00000000-0000-4000-8000-0000000000b2', '[Tên]', '00000000-0000-4000-8000-0000000c0202');
+insert into company_pending_units (id, company_id, raw_code) values
+  ('00000000-0000-4000-8000-0000000c0221', '00000000-0000-4000-8000-00000000000a', 'SA-02.01'),
+  ('00000000-0000-4000-8000-0000000c0222', '00000000-0000-4000-8000-00000000000b', 'SB-02.01');
+set local role quy_hang_app;
+do $$
+declare n int;
+begin
+  perform set_config('app.company_id', '00000000-0000-4000-8000-00000000000a', true);
+  -- A's listing agent, own scope: not on the listing another agent of A keeps.
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a2', true);
+  perform pg_temp.phai_loi('nhap-excel-moi-noi-cua-minh',
+    'insert into listing_units (listing_id, company_id, upi, open) values '
+    '(''00000000-0000-4000-8000-0000000c0212'', ''00000000-0000-4000-8000-00000000000a'', ''upi-mau-1'', false)',
+    'row-level security');
+  perform pg_temp.phai_loi('nhap-excel-moi-noi-cua-minh',
+    'insert into listing_pending_units (listing_id, company_id, pending_unit_id, open) values '
+    '(''00000000-0000-4000-8000-0000000c0212'', ''00000000-0000-4000-8000-00000000000a'', '
+    '''00000000-0000-4000-8000-0000000c0221'', false)', 'row-level security');
+  -- Positive control: on its own listing.
+  insert into listing_units (listing_id, company_id, upi, open) values
+    ('00000000-0000-4000-8000-0000000c0211', '00000000-0000-4000-8000-00000000000a', 'upi-mau-1', false);
+  -- A's team lead, company scope: on the other agent's listing (positive control), never on B.
+  perform set_config('app.user_id', '00000000-0000-4000-8000-0000000000a4', true);
+  insert into listing_pending_units (listing_id, company_id, pending_unit_id, open) values
+    ('00000000-0000-4000-8000-0000000c0212', '00000000-0000-4000-8000-00000000000a',
+     '00000000-0000-4000-8000-0000000c0221', false);
+  perform pg_temp.phai_loi('nhap-excel-moi-noi-cua-minh',
+    'insert into listing_units (listing_id, company_id, upi, open) values '
+    '(''00000000-0000-4000-8000-0000000c0213'', ''00000000-0000-4000-8000-00000000000b'', ''upi-mau-1'', false)',
+    'row-level security');
+  perform pg_temp.phai_loi('nhap-excel-moi-noi-cua-minh',
+    'insert into listing_pending_units (listing_id, company_id, pending_unit_id, open) values '
+    '(''00000000-0000-4000-8000-0000000c0213'', ''00000000-0000-4000-8000-00000000000b'', '
+    '''00000000-0000-4000-8000-0000000c0222'', false)', 'row-level security');
+  update import_runs set batches_done = batches_done where id = '00000000-0000-4000-8000-0000000c0202';
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'HỎNG nhap-excel-moi-noi-cua-minh: trưởng nhóm A ghi được % lần nhập của B', n; end if;
+  select count(*) into n from import_runs where company_id = '00000000-0000-4000-8000-00000000000b';
+  if n <> 0 then raise exception 'HỎNG nhap-excel-moi-noi-cua-minh: trưởng nhóm A thấy % lần nhập của B', n; end if;
+  delete from listings where id = '00000000-0000-4000-8000-0000000c0213';
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'HỎNG nhap-excel-moi-noi-cua-minh: trưởng nhóm A xoá được % lần chào của B', n; end if;
+  select count(*) into n from app.import_list_agents() where user_id = '00000000-0000-4000-8000-0000000000b2';
+  if n <> 0 then raise exception 'HỎNG nhap-excel-moi-noi-cua-minh: trưởng nhóm A thấy đầu chủ của B'; end if;
+  raise notice 'ok nhap-excel-moi-noi-cua-minh — của mình chỉ gắn căn vào lần chào mình giữ, không ai chạm sàn khác';
 end $$;
 rollback;

@@ -1,0 +1,222 @@
+schema_version: 1
+feature_slug: nhap-excel
+# Bốn lệnh chấm của hàng (thêm vào _acceptance/config.yaml sau khi G mở vùng):
+#   executors.test.nhap_excel_unit   npx vitest run src/modules/imports tests/nhap-excel --coverage.enabled=false --reporter=verbose
+#   executors.script.nhap_excel_db   DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} npx vitest run -c vitest.db.config.ts tests/db/nhap-excel.db.test.ts --reporter=verbose
+#   executors.script.nhap_excel_e2e  DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} npx playwright test -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts
+#   executors.script.cach_ly_d       DB_LANE=${DB_LANE:-d} DB_PORT=${DB_PORT:-5571} bash db/scripts/cach-ly.sh
+evals:
+  - id: E1
+    criterion: AC-1
+    executor: test
+    cmd: config:executors.test.nhap_excel_unit
+    paths: [src/modules/imports/**, tests/nhap-excel-doc-tep.test.ts, tests/fixtures/nhap-excel/**]
+    expected: "exit 0; tests/nhap-excel-doc-tep.test.ts: bảng viết trước 6 tệp đọc đúng (xlsx một trang, xlsx ba trang — đọc trang đầu có dữ liệu và trả tên hai trang còn lại, csv phẩy, csv chấm phẩy, csv có BOM, csv có ô ngoặc kép chứa phẩy và xuống dòng) hằng 6, mỗi ca so tiêu đề và ô từng chữ; ma trận lỗi viết trước 7 ca hằng 7 (sai đuôi .pdf, 10 MB + 1 byte, 5.001 dòng, tệp 0 byte, chỉ dòng tiêu đề, xlsx hỏng, xlsx khoá mật khẩu); nguồn từng tệp thử ghi trong tests/fixtures/nhap-excel/NGUON.md (thư viện ghi khác thư viện đọc; csv phẩy theo khuôn Google Sheet «Tải xuống»; csv chấm phẩy có BOM theo khuôn Excel bản Việt; ô ngày lưu dạng số ngày của Excel và chuỗi dùng chung có trong gon.xlsx) mỗi ca trả đúng mã lỗi và câu từ tệp chữ của mô-đun; ca phá: bỏ kiểm số dòng → khẳng định 'row limit not enforced: 5001'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E2
+    criterion: AC-1
+    executor: script
+    cmd: config:executors.script.nhap_excel_e2e
+    layer: backend-effect
+    paths: [src/modules/imports/**, "src/app/(app)/nhap-tep/**", "src/app/api/v1/imports/**", tests/e2e-db/nhap-excel.spec.ts]
+    expected: "exit 0; tests/e2e-db/nhap-excel.spec.ts ca 'tep khong len may chu': chọn tests/fixtures/nhap-excel/gon.xlsx ở 1440, ghi mọi yêu cầu mạng; không yêu cầu nào có content-type multipart hay thân chứa byte đầu 'PK' của tệp xlsx; đúng các yêu cầu tới /api/v1/imports/preview mang JSON {headers, rows}; ca lỗi: chọn tệp .pdf hiện câu sai đuôi và nút «Chọn tệp khác», 0 yêu cầu tới /api/v1; đối chứng dương: tệp đúng thì ≥1 yêu cầu preview; ca phá trong bài: gửi tệp bằng FormData → khẳng định 'file body left the browser'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E3
+    criterion: AC-2
+    executor: test
+    cmd: config:executors.test.nhap_excel_unit
+    paths: [src/modules/imports/**, src/modules/company-config/rules.ts, tests/nhap-excel-ghep-cot.test.ts]
+    expected: "exit 0; tests/nhap-excel-ghep-cot.test.ts: bảng tiêu đề viết trước 24 ca hằng 24, mỗi ca một (đích, dấu, lý do) — mẫu nhập trùng → giữ nguyên; trùng nhãn riêng 'Block' → giữ nguyên; trùng nhãn chuẩn 'Giá chào' khác hoa thường, dấu → giữ nguyên; từ điển tiêu đề 'Giá KBP', 'DT', 'PN', 'Mã căn', 'Mã', 'TT' → máy sửa kèm lý do; 'View' lạ → cần người; 'Chủ nhà', 'SĐT', 'Điện thoại' → chặn lý do 'owner-column'; hai cột 'Giá' và 'Giá chào' cùng ListPrice → cả hai chặn 'same-target'; không cột mã căn → chặn 'no-unit-column'; thứ tự ưu tiên ghim bằng một ca tiêu đề vừa có trong mẫu vừa trùng nhãn chuẩn khác đích → đích của mẫu; tạo trường riêng mới từ cột 'View' qua checkFieldDraft của 7e: kiểu 'formula' bị từ chối, trường thứ 21 bị từ chối 'field-limit', 'chọn một' lấy sẵn ≤30 giá trị khác nhau; ca phá: chỉ soát cột đầu khi trùng đích → khẳng định 'second column with same target not blocked'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E4
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.nhap_excel_db
+    layer: backend-effect
+    paths: [src/modules/imports/**, src/modules/company-config/**, "src/app/api/v1/imports/**", tests/db/nhap-excel.db.test.ts]
+    expected: "exit 0; tests/db/nhap-excel.db.test.ts khối 'nhan rieng': POST /api/v1/imports qua route handler thật, phiên Đầu chủ sàn A, cột 'Block' → Unit.buildingName với learnLabel mặc định → đọc lại bằng vai quản trị của bài: một dòng company_labels (A, Building, 'Block'); label('Building', overrides) đọc qua cửa trả 'Block'; cùng tệp với learnLabel=false → 0 dòng; tên cột 'Toà' (trùng nhãn chuẩn sau gấp) → 0 câu hỏi và 0 dòng; cột 'Ghi chú' trỏ trường riêng → không hỏi nhãn; ca phá: luôn ghi nhãn bỏ qua lựa chọn → khẳng định 'label written though person said no'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E5
+    criterion: AC-4
+    executor: test
+    cmd: config:executors.test.nhap_excel_unit
+    paths: [src/modules/imports/**, src/modules/listings/edit-rules.ts, src/modules/company-config/rules.ts, tests/nhap-excel-gia-tri.test.ts]
+    expected: "exit 0; tests/nhap-excel-gia-tri.test.ts: bảng viết trước 47 ca hằng 47 phủ ĐỦ mọi tập đóng và mọi vế «thiếu» của AC-4 — trạng thái (6 giá trị chuẩn + 2 cách viết), ngày xác nhận (3: '15/11/2026' → 2026-11-15 máy sửa, ngày sau hôm nay → cần người, '32/11' → cần người), lý do ngừng (2), hướng (3), phí (2), nội thất (2), người ở (2), chọn một của sàn (2: khớp, không khớp), giá (5), số (2), ngày (2), có/không (3), Đã bán thiếu giá bán, Đã bán thiếu ngày, Ngừng hẳn thiếu lý do, ô trống, gom câu (2) — mỗi ca (cột, chữ thô) → (dấu, giá trị, lý do), ví dụ: 'Đang bán'/'dang ban'/'ĐANG BÁN' → Active; 'còn' khi từ điển sàn có 'còn' → máy sửa 'company-alias'; 'còn' khi không có → cần người; 'ĐN'/'Đông Nam'/'dong nam' hướng; 'KBP' phí; '4,65 tỷ'/'950tr'/'4ty65' giá đúng từng đồng qua readPrice; 'thoả thuận' giá → cần người; số '12,5' trường số → 12.5, 'abc' → cần người; ngày '2026-02-30' → cần người; có/không 'có'/'x' theo luật 7e; Đã bán thiếu giá bán → cần người 'status-needs'; ô trống → giữ nguyên đích trống; gom câu: 37 ô 'ĐN' cùng cột ra đúng 1 câu; ca phá: gom theo chữ thô không gấp → khẳng định 'questions not grouped by folded text: 3 != 1'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E6
+    criterion: AC-5
+    executor: script
+    cmd: config:executors.script.nhap_excel_db
+    layer: backend-effect
+    paths: [src/modules/imports/**, src/modules/catalog/**, src/modules/company-config/**, "src/app/api/v1/imports/**", tests/db/nhap-excel.db.test.ts]
+    expected: "exit 0; khối 'can': trên danh mục mẫu 7d và sàn A, preview qua route handler thật với ma trận viết trước 9 mã hằng 9 — mã gốc ra một căn → giữ nguyên; mã riêng của A → máy sửa 'company'; một mã viết khác dạng mà bộ đọc 8 dạng ra một căn của danh mục mẫu (bài dùng 'S1.0512.06' → S1.05 tầng 12 trục 06; danh mục mẫu không có toà SA5 nên 'SA5-12.08' không đọc ra căn nào) → máy sửa 'reader'; mã ra hai căn → cần người kèm hai căn; mã không có → cần người lối mặc định 'pending'; mã đã là căn chờ khớp của A → giữ nguyên; cùng căn hai dòng → dòng sau chặn 'duplicate-unit'; ô trống → chặn 'no-unit-code'; căn đã có lần chào mở → theo Hỏi-6 cần người 'already-listed'; thứ tự bốn nguồn ghim bằng một mã vừa là mã riêng vừa là căn chờ khớp → ra căn danh mục; ca phá: tra căn chờ khớp trước mã riêng → khẳng định 'lookup order broken: pending before company'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E7
+    criterion: AC-6
+    executor: test
+    cmd: config:executors.test.nhap_excel_unit
+    paths: [src/modules/imports/**, tests/nhap-excel-khong-mat-o.test.ts, tests/fixtures/nhap-excel/**]
+    expected: "exit 0; tests/nhap-excel-khong-mat-o.test.ts: với ba tệp của tests/fixtures/nhap-excel/ (gon.xlsx, ban.xlsx, sheet.csv) và dap-an.json viết trước, chạy markTable hai lượt (không lựa chọn; với lua-chon.json) — mỗi ô có đúng một dấu trong bốn dấu và một đích; so từng ô với đáp án, in 'o dung <k>/<n>' và đòi k = n ở cả sáu lượt; số đếm bốn dấu của bản tóm tắt bằng số đếm từ từng ô; còn ô chặn thì canApply false; ca phá: bỏ dấu ô của cột không đích → khẳng định 'cell without mark: ban.xlsx row 7 col View' (đáp án chép từ chạy tay đã soát, không sinh từ chính hàm)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E8
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.nhap_excel_db
+    layer: backend-effect
+    paths: [src/modules/imports/**, "src/app/api/v1/imports/**", tests/db/nhap-excel.db.test.ts]
+    expected: "exit 0; khối 'khong duong thang': POST /api/v1/imports với tệp còn một ô chặn → 400 'blocked-cells' và 0 dòng listings, import_runs mới; với expectedCounts khác số máy chủ tính → 409 'counts-changed', 0 dòng; đối chứng dương: tệp sạch → 201; ca phá: bỏ kiểm ô chặn ở cửa → khẳng định 'apply accepted blocked cells'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E9
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.nhap_excel_db
+    layer: backend-effect
+    paths: [src/modules/imports/**, src/modules/listings/**, "src/app/api/v1/imports/**", db/migrations/015_*.sql, ontology/actions.yaml, tests/db/nhap-excel.db.test.ts]
+    expected: "exit 0; khối 'ap': áp ban.xlsx với lua-chon.json bằng Đầu chủ A → đúng N lần chào (số N viết trước trong dap-an.json), căn đã có lần chào mở không thêm lần chào (áp ban.xlsx lần hai → 0 lần chào mới cho các căn ấy, mỗi căn vẫn đúng 1 lần chào mở; ca phá: bỏ lọc căn đã chào → khẳng định 'duplicate open listing created by import'); ma trận đầu chủ viết trước 4 ca hằng 4: Trưởng nhóm chọn Đầu chủ X → mọi lần chào list_agent = X; Đầu chủ gửi mã người khác → 403 và 0 dòng; Trưởng nhóm chọn người của sàn B → 400 và 0 dòng; Đầu chủ không gửi mã → list_agent là mình (ca phá: bỏ kiểm cùng sàn → khẳng định 'list agent from another company accepted'); căn danh mục trỏ upi, căn chờ khớp trỏ căn chờ khớp mới, list_agent là người nhập, last_confirmed_at null, import_run_id = lần nhập; trạng thái theo Hỏi-5 qua bảng nấc của hàng 4 — ma trận viết trước 5 ca hằng 5: 'Đang bán' → Active, chữ của nhãn StatusHold («Tạm ngừng») → Hold, ô trống → Incomplete, 'Đã bán' → Incomplete kèm cần người, 'Đang giao dịch' → Incomplete kèm cần người (ca phá: bỏ kiểm canMove → khẳng định 'import skipped the status table: Incomplete -> Closed'); ghi theo gói 200 dòng: tệp 450 dòng thành đúng 3 gói; bài chen lỗi ở gói 2 → gói 1 giữ 200 dòng, gói 2 không ghi dòng nào, phần học chưa ghi; gửi lại gói 2 rồi gói 3 → đủ N, gửi lại gói 1 lần nữa → 0 dòng trùng (ca phá trên đầu vào giả: bộ kiểm báo 'batch resend created duplicates' khi số lần chào vượt số dòng; bỏ riêng khoá chống trùng của gói không làm đỏ được vì ba lớp khác — dấu đã chào, mã lần chào cố định theo dòng, chỉ mục một lần chào mở mỗi căn — vẫn chặn trùng); cột 'Ngày check' → last_confirmed_at đúng ngày của tệp, tệp không có cột ngày → null; bảng quyền viết sẵn 4 vai × 2 thao tác (importListings, createListing) hằng 8 thử ở cửa API (201/403) và ở cơ sở dữ liệu (chèn thẳng listings trong withCompany bị luật thu hẹp chặn với vai không có createListing); bảng quyền sinh từ actions.yaml BẰNG bảng viết sẵn; đường nhập không gọi mô-đun llm (bài dò import trong src/modules/imports và src/app/api/v1/imports); ca phá: bỏ luật thu hẹp insert của listings → khẳng định 'insert allowed without createListing'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E10
+    criterion: AC-7
+    executor: script
+    cmd: config:executors.script.cach_ly_d
+    layer: backend-effect
+    paths: [db/migrations/015_*.sql, db/tests/cach-ly.sql, db/tests/pha-thu/**, db/scripts/cach-ly.sh]
+    expected: "exit 0; bộ kiểm cách ly trên Postgres dãy D có ca có tên nhap-excel-theo-san (db/tests/cach-ly.sql ca 24): Đầu chủ sàn A chèn lần chào, lần nhập, liên kết căn chờ khớp mang company_id sàn B → luật theo dòng chặn (ba ca); xoá lần chào không đến từ lần nhập và lần chào của B → 0 dòng; Đầu chủ khác của A xoá lần chào của lần nhập không phải của mình → 0 dòng; đối chứng dương: chèn lần chào, lần nhập của chính mình ở A được, người nhập xoá lần chào chưa sửa của lần nhập mình được 1 dòng; sàn B không thấy lần nhập của A; các ca quét chung phủ import_runs và listing_pending_units; tệp phá db/tests/pha-thu/nhap-excel-xoa-mo.sql (luật xoá nới thành theo quyền toàn sàn) làm bộ kiểm đỏ với hai dòng ghim «HỎNG nhap-excel-theo-san» và «HỎNG luat-doc-ghi-theo-san: listings»"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E11
+    criterion: AC-7
+    executor: test
+    cmd: config:executors.test.nhap_excel_unit
+    paths: [ontology/**, src/generated/**, architecture/modules.yaml, tests/nhap-excel-ontology.test.ts]
+    expected: "exit 0; tests/nhap-excel-ontology.test.ts: ontology/entities/ImportRun.yaml có, mỗi thuộc tính có cột cùng tên ở import_runs của mọi migration tạo hay sửa bảng ấy (015, 017) và ngược lại (so hai tập); Listing có quan hệ tới PendingUnit qua listing_units; actions.yaml có importListings live và createListing live; modules.yaml: imports owns [ImportRun], depends_on [identity, catalog, company-config, listings]; make gen sinh ra đúng src/generated (so băm sau khi sinh lại); ca phá: xoá một cột của import_runs khỏi bảng so → khẳng định 'ontology property without column: ImportRun.fileName'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E12
+    criterion: AC-8
+    executor: script
+    cmd: config:executors.script.nhap_excel_db
+    layer: backend-effect
+    paths: [src/modules/imports/**, src/modules/company-config/**, src/modules/catalog/**, "src/app/api/v1/imports/**", tests/db/nhap-excel.db.test.ts]
+    expected: "exit 0; khối 'hoc': áp ban.xlsx với lua-chon.json → lớp riêng của A có đúng các mục viết trước (1 mẫu nhập đúng dạng tệp, 1 nhãn riêng, 1 trường riêng mới 'View' kiểu chọn một, 3 cách viết giá trị, 1 mã riêng của căn, M căn chờ khớp) — so tập mục trước/sau, hiệu bằng tập viết trước; import_runs.learned liệt đúng các mã ấy; một câu bỏ chọn 'nhớ' → mục ấy vắng; lần nhập gặp 409 và lần nhập còn gói chưa ghi → hiệu tập mục là rỗng; phần học ghi đúng một lần sau gói cuối; cách viết đã có từ trước không ghi dòng thứ hai; ca phá: ghi phần học trước khi tạo lần chào ngoài giao dịch → khẳng định 'learned items survived failed apply'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E13
+    criterion: AC-9
+    executor: script
+    cmd: config:executors.script.nhap_excel_db
+    layer: backend-effect
+    paths: [src/modules/imports/**, src/modules/company-config/**, "src/app/api/v1/imports/**", tests/db/nhap-excel.db.test.ts, tests/fixtures/nhap-excel/**]
+    expected: "exit 0; khối 'lan hai': sau lần nhập thứ nhất của ban.xlsx, preview ban-2.xlsx (cùng tên cột, cùng thứ tự, dòng khác, thêm một chữ trạng thái mới 'giữ chỗ') → in 'cau hoi lai <k>' và đòi k = 0 cho mọi câu đã trả lời (cột, nhãn, cách viết, mã căn), đúng 1 câu mới cho 'giữ chỗ'; ngừng trường riêng 'View' rồi preview → đúng 1 câu hỏi lại ở cột View; tệp đổi chỗ hai cột → câu về đích cột hỏi lại, câu cách viết và mã căn vẫn 0; sàn B preview cùng tệp → không câu nào được trả lời sẵn (tập câu của B bằng tập câu của A lần đầu); ca phá: tìm mẫu theo tập tên cột không theo thứ tự → khẳng định 'template matched reordered headers'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E14
+    criterion: AC-10
+    executor: script
+    cmd: config:executors.script.nhap_excel_db
+    layer: backend-effect
+    paths: [src/modules/imports/**, src/modules/listings/**, src/modules/company-config/**, "src/app/api/v1/imports/**", db/migrations/015_*.sql, tests/db/nhap-excel.db.test.ts]
+    expected: "exit 0; khối 'hoan tac': lần nhập thêm N căn, học K mục; bài sửa giá một căn qua PATCH /api/v1/listings/[id]; POST /api/v1/imports/[id]/undo → N−1 lần chào bị gỡ, căn đã sửa còn và có tên trong trả lời 'kept'; K mục do lần nhập tạo có retired_at, một cách viết có từ trước lần nhập không đổi; căn chờ khớp do lần nhập tạo ngừng dùng, căn chờ khớp có lần chào còn mở giữ nguyên; undo lần hai → 409 'already-undone'; Đầu khách undo → 403 và 0 thay đổi; xoá thẳng lần chào version 2 của lần nhập trong withCompany bị luật chặn; ca phá: gỡ cả căn đã sửa → khẳng định 'undo removed an edited listing'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E15
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.script.nhap_excel_e2e
+    layer: backend-effect
+    paths: [src/modules/imports/**, src/modules/listings/**, "src/app/(app)/inventory/**", "src/app/(app)/nhap-tep/**", tests/e2e-db/nhap-excel.spec.ts]
+    expected: "exit 0; ca 'bang hang trong' ở 1440: sàn thử dọn hết lần chào, Đầu khách mở /inventory → chờ regionReady, trạng thái trống hiện và không có phần tử a[href=/nhap-tep] nào trong main (dựng ra là đỏ, kể cả ẩn); Đầu chủ (đối chứng dương): câu trạng thái trống có đúng một liên kết «Nạp tệp» trỏ /nhap-tep và 0 nút trong vùng trống, đầu màn có nút viền «Nạp tệp», axe không lỗi nặng; bấm nút ấy, nạp tệp csv viết trước 3 dòng (2 mã danh mục, 1 mã 'ZZ-99.01' không có trong danh mục với toà 'Toà của tệp'), Áp 3 dòng → về /inventory chờ regionReady, đúng 3 dòng, dòng 'ZZ-99.01' có cột Toà 'Toà của tệp'; ca phá trong bài: chèn một liên kết /nhap-tep ẩn bằng CSS vào đầu màn của Đầu khách → khẳng định 'import button rendered for BuyerAgent'; ca phá đã chạy tay: bỏ PermittedAction quanh nút đầu màn → đỏ đúng câu ấy"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E16
+    criterion: AC-12
+    executor: script
+    cmd: config:executors.script.nhap_excel_e2e
+    paths: ["src/app/(app)/nhap-tep/**", src/modules/imports/**, tests/e2e-db/nhap-excel.spec.ts]
+    expected: "exit 0; ca 'trang thai': bảng trạng thái × khổ viết trước trong bài — ở 1024 và 1440 mười một trạng thái ST-nhap-tep-* (mười hai trạng thái của màn trừ ST-nhap-tep-dien-thoai), cộng ST-inventory-trong-nap (12 × 2 = 24 ô); ở 360 và 414 chỉ ST-nhap-tep-dien-thoai và ST-inventory-trong-nap (2 × 2 = 4 ô); tổng 28 ô hằng 28, mỗi ô một khẳng định chữ đúng, dựng bằng dữ liệu hay giả lập mạng (route abort cho mất mạng, 409 giả cho xung đột); axe 0 lỗi ở cả 28 ô, mỗi ô hai giao diện sáng và tối (56 lần quét); bàn phím: chỉ Tab, mũi tên, Space, Enter đi hết năm bước gon.xlsx tới màn Xong; ca phá: bỏ trạng thái mất mạng (nuốt lỗi) → khẳng định 'offline state missing: ST-nhap-tep-mat-mang'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E17
+    criterion: AC-12
+    executor: script
+    cmd: config:executors.script.check
+    paths: ["src/app/(app)/nhap-tep/**", src/modules/imports/**, design/screens/nhap-tep.yaml, design/patterns/luong-nhieu-buoc.md, design/intake/nap-tep-nhieu-buoc.yaml, ontology/labels.yaml, _acceptance/nhap-excel/chung-minh-man.md]
+    expected: "exit 0; make check xanh trên cây của lượt: sổ màn có nhap-tep (bộ kiểm sổ màn), chứng minh màn qua tools/proof_gate/check.py, không chữ cứng trong src (bộ kiểm nhãn), ranh giới mô-đun (tools/boundaries.py), vai × màn; ca phá được các bộ kiểm ấy tự mang (mỗi bộ có ca đỏ của nó)"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E18
+    criterion: AC-12
+    executor: ui-check
+    cmd: config:executors.ui-check
+    layer: ui-observed
+    paths: ["src/app/(app)/nhap-tep/**", src/modules/imports/**]
+    steps:
+      - "mkdir -p _acceptance/nhap-excel/evidence/ui, then from the repository root, with the lane D Postgres up (make db-up DB_LANE=d DB_PORT=5571 if it is not): NHAP_EXCEL_CHUP=_acceptance/nhap-excel/evidence/ui DB_LANE=d DB_PORT=5571 npx playwright test -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts -g 'chup nhap-tep|chup dau chu' --project=1440 --project=1024 — it signs in as the Đầu chủ of a test company on its own dev server and saves nhap-tep-tai, -da-chon, -ghep-cot, -gia-tri-va-ma, -xem-truoc-ban (ban.xlsx as it comes), -xem-truoc and -xong (gon.xlsx), then as the Trưởng nhóm nhap-tep-dau-chu and -dau-chu-mo (the list agent picker closed and open), at -1440 and -1024"
+      - "Open every saved nhap-tep-*.png and look at it"
+    question: "Thanh năm bước có hiện và đúng bước ở mỗi ảnh không; bước Ghép cột của ban.xlsx có cột «View» mang dấu Cần người và cột «SĐT chủ» mang dấu Chặn kèm lý do không; Xem trước của ban.xlsx có đếm bốn dấu và nút Áp tắt khi còn chặn không; màn Xong có nói số dòng đã thêm, liệt kê phần vừa học bằng chữ người đọc (không phải chữ máy) và có Hoàn tác không; ảnh Trưởng nhóm có ô «Nhập cho Đầu chủ nào?» với nút Áp tắt khi chưa chọn, và danh sách chỉ có tên người không? Nêu ảnh nào lệch."
+    expected: "Mở /nhap-tep trên bản đang chạy (dữ liệu thử dãy D, Đầu chủ) ở 1440 và 1024, nạp ban.xlsx: thấy thanh năm bước, bước Ghép cột có cột 'View' mang dấu cần người và cột 'SĐT' mang dấu chặn với lý do; bước Xem trước có đếm bốn dấu và nút Áp tắt khi còn chặn; màn Xong nói số căn đã thêm và phần vừa học, có Hoàn tác. Ảnh lưu evidence/ui/nhap-tep-<buoc>-<kho>.png"
+    evidence_required: [run_id, screenshot, observed, verifier, verified_at]
+
+  - id: E19
+    criterion: AC-11
+    executor: ui-check
+    cmd: config:executors.ui-check
+    layer: ui-observed
+    paths: ["src/app/(app)/inventory/**", src/modules/listings/**]
+    steps:
+      - "mkdir -p _acceptance/nhap-excel/evidence/ui, then from the repository root, with the lane D Postgres up: NHAP_EXCEL_CHUP=_acceptance/nhap-excel/evidence/ui DB_LANE=d DB_PORT=5571 npx playwright test -c playwright.db.config.ts tests/e2e-db/nhap-excel.spec.ts -g 'chup bang hang' --project=1440 — it saves inventory-trong-1440 (Đầu chủ, company with no listing), inventory-sau-nhap-1440 (after the three-row file of E15, one code the catalog lacks) and inventory-dau-khach-1440 (Đầu khách, same company)"
+      - "Open the three saved inventory-*.png and look at them"
+    question: "Ảnh trống có câu trạng thái trống với đúng một liên kết «Nạp tệp» trong câu và nút viền «Nạp tệp» ở đầu màn không; ảnh sau khi nạp có ba căn, căn chờ khớp hiện mã gốc ZZ-99.01 và toà «Toà của tệp» không; ảnh Đầu khách có vắng cả liên kết lẫn nút không? Nêu ảnh nào lệch."
+    expected: "Mở /inventory ở 1440 với sàn thử 0 căn: thấy câu trạng thái trống có liên kết «Nạp tệp» và nút viền «Nạp tệp» ở đầu màn; sau khi nạp tệp ba dòng của E15: thấy các căn vừa thêm, căn chờ khớp có mã gốc ở cột Căn; Đầu khách không thấy lối nạp. Ảnh evidence/ui/inventory-trong-1440.png, evidence/ui/inventory-sau-nhap-1440.png, evidence/ui/inventory-dau-khach-1440.png"
+    evidence_required: [run_id, screenshot, observed, verifier, verified_at]
+
+  - id: E20
+    criterion: AC-6
+    executor: script
+    cmd: config:executors.script.nhap_excel_e2e
+    layer: backend-effect
+    paths: [src/modules/imports/**, "src/app/(app)/nhap-tep/**", "src/app/api/v1/imports/**", tests/e2e-db/nhap-excel.spec.ts]
+    expected: "exit 0; ca 'so tren man bang so may chu': nạp ban.xlsx ở 1440, chặn bắt thân trả lời của /api/v1/imports/preview và của POST /api/v1/imports; bốn con số dấu, số căn sẽ thêm, số ô giữ chữ gốc trên màn Xem trước BẰNG từng con số trong trả lời preview cuối; danh sách «Sàn vừa học» trên màn Xong BẰNG mảng learned của trả lời áp (so từng mục, cùng số mục); ca phá trong bài: màn tự đếm dấu từ ô đang hiện (bỏ số máy chủ) với một trả lời preview giả lệch 1 → khẳng định 'screen counts differ from server: ask 6 != 7'"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E21
+    criterion: AC-3
+    executor: script
+    cmd: config:executors.script.nhap_excel_e2e
+    layer: backend-effect
+    paths: [src/modules/imports/**, src/modules/company-config/**, "src/app/(app)/inventory/**", tests/e2e-db/nhap-excel.spec.ts]
+    expected: "exit 0; ca 'nhan rieng tren bang hang' ở 1440: dọn lần chào, nhãn riêng và mẫu nhập của sàn thử; nạp tệp csv viết trước có cột «Block», bỏ chọn ô «Gọi cột này là “Block” trên bảng», Áp → /inventory chờ regionReady, tiêu đề cột Toà là nhãn chuẩn «Toà» (đối chứng); dọn lại, nạp cùng tệp để ô ấy mặc định → tiêu đề cột Toà là «Block»; ca phá trong bài: ngừng nhãn riêng trong cơ sở dữ liệu rồi tải lại → khẳng định 'inventory header is not the learned label: Toà != Block'; ca phá đã chạy tay: Bảng hàng bỏ nhãn riêng của sàn → đỏ đúng câu ấy"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E22
+    criterion: AC-13
+    executor: script
+    cmd: config:executors.script.nhap_excel_db
+    layer: backend-effect
+    paths: [src/modules/imports/**, src/modules/catalog/**, "src/app/api/v1/imports/**", tests/db/nhap-excel.db.test.ts]
+    expected: "exit 0; ca 'G-2711-4': preview qua route handler thật với cột «Tầng», «Loại căn», «Diện tích» — «Tầng 07» và «15a» là máy sửa 'floor-read', «Căn hộ» giữ nguyên 'standard', «2PN» cần người 'unknown-value', không ô nào chặn; áp tạo 3 lần chào; import_runs.kept có đúng năm mục 'unit-attribute' theo thứ tự (Tầng, Tầng 07) (Loại căn, Căn hộ) (Diện tích, 72) (Tầng, 15a) (Loại căn, 2PN); băm md5 của catalog_units trước và sau lần nhập bằng nhau; ca phá đã chạy tay: bỏ Unit.floor khỏi đường unit-attribute → khẳng định lệch mảng kept"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E23
+    criterion: AC-11
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luoi.md", "src/app/(app)/inventory/**/*.tsx", "src/app/(app)/sent/**/*.tsx", "src/app/(app)/contacts/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luoi"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]
+
+  - id: E24
+    criterion: AC-12
+    executor: script
+    cmd: config:executors.design.khuon
+    paths: ["design/patterns/luong-nhieu-buoc.md", "src/app/(app)/nhap-tep/**/*.tsx", "src/modules/imports/ui/**/*.tsx"]
+    expected: "exit 0; bước chấm khuôn không in dòng «lệch:» nào cho tệp thuộc nhóm luong-nhieu-buoc"
+    evidence_required: [run_id, exit_code, verifier, verified_at, output]

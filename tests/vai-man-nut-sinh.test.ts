@@ -5,7 +5,7 @@
 //   khong-gan-ca-mo-dun    — today names no listing action; an action in a listings UI file no screen imports counts
 //                            for no screen; the same action reached three ways is caught for inventory.
 //   giu-moi-man            — every screen of the register has a section, plus the frame.
-//   bang-du-muc            — the generated file has 10 sections of 3 columns and 4 role rows.
+//   bang-du-muc            — the generated file has 11 sections of 3 columns and 4 role rows (row 11 adds nhap-tep).
 //   nut-khong-co-trong-bang — a declared button outside the permission table is red.
 import { spawnSync } from "node:child_process";
 import { cpSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -58,9 +58,14 @@ function edit(dir: string, rel: string, change: (text: string) => string): void 
 const STRAY = '\nexport const strayButton = { action: "manageCompanyCodes" };\n';
 
 describe("doc-giao-dien-mo-dun", () => {
-  it("inventory: saved-view buttons and the cell edit (row 4) found in the listings UI, other listing buttons declared ahead", () => {
+  it("inventory: saved-view buttons, the cell edit (row 4) and Nạp tệp (row 11) found in the code, other listing buttons declared ahead", () => {
     const inv = section(ROOT, "inventory");
-    expect(inv.actions.slice(0, 3).sort()).toEqual(["editView", "saveView", "updateListing"]);
+    expect(inv.actions.slice(0, 4).sort()).toEqual([
+      "editView",
+      "importListings",
+      "saveView",
+      "updateListing",
+    ]);
     expect(inv.planned).toEqual([
       "createListing",
       "activateListing",
@@ -133,6 +138,7 @@ describe("giu-moi-man", () => {
       "contacts",
       "inventory",
       "members",
+      "nhap-tep",
       "proto",
       "proto-permitted-actions",
       "sent",
@@ -143,10 +149,10 @@ describe("giu-moi-man", () => {
 });
 
 describe("bang-du-muc", () => {
-  it("the generated file: 10 sections, 3 columns, 4 role rows each", () => {
+  it("the generated file: 11 sections, 3 columns, 4 role rows each", () => {
     const text = readFileSync(join(ROOT, "design/role-screen-buttons.md"), "utf8");
     const heads = text.split("\n").filter((l) => l.startsWith("## "));
-    expect(heads).toHaveLength(10);
+    expect(heads).toHaveLength(11);
     for (const block of text.split("\n## ").slice(1)) {
       const rows = block.split("\n").filter((l) => l.startsWith("| "));
       expect(rows[0], block.split("\n")[0]).toMatch(

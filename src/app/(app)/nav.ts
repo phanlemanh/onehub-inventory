@@ -2,6 +2,7 @@ import {
   CalendarCheckIcon,
   LayoutGridIcon,
   SendIcon,
+  FileUpIcon,
   SlidersHorizontalIcon,
   UsersIcon,
 } from "lucide-react";
@@ -120,5 +121,12 @@ export const NAV: NavItem[] = [
         })),
       },
     ],
+  },
+  // Importing a sheet file (row 11): shows when the permission table gives the session importListings.
+  {
+    href: "/nhap-tep",
+    title: label("ImportScreen"),
+    icon: icon(FileUpIcon),
+    action: "importListings",
   },
 ];

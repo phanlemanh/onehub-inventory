@@ -1,0 +1,17 @@
+{
+  "columns": {
+    "5": { "target": { "skip": true } },
+    "7": {
+      "target": {
+        "newField": { "name": "View", "kind": "single_select", "options": ["Biển", "Phố"] }
+      }
+    },
+    "8": { "target": { "skip": true } }
+  },
+  "values": {
+    "6|con": { "value": "Active", "remember": true },
+    "6|coc": { "value": "Hold", "remember": true }
+  },
+  "units": { "r2.11-1503": { "pending": true } },
+  "skipRows": [3]
+}
