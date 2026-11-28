@@ -38,7 +38,7 @@ Thứ tự theo G-2811-15: lát đầu chứa đúng những thứ hàng 3h cầ
 
 | Lát | Hồ sơ | Gồm | Hạng | Vì sao tách |
 | --- | ----- | --- | ---- | ----------- |
-| 1 | `chuan-hoa-he-design` | màu trạng thái (trừ vai Thành viên), ổ khoá, Enter sửa / phím cách mở, bút chì khi rê, bấm ra ngoài là lưu, bộ trợ giúp bài trình duyệt mở sửa một ô | T2 | 3h đang chờ đúng những thứ này |
+| 1 | `chuan-hoa-he-design` | màu trạng thái (trừ vai Thành viên), ổ khoá, Enter sửa / phím cách mở, bút chì khi rê, bấm ra ngoài là lưu, nền tối lớp nổi sáng hơn lưới nửa nấc (Hỏi-4), bộ trợ giúp bài trình duyệt mở sửa một ô | T2 | 3h đang chờ đúng những thứ này |
 | 2 | `chuan-hoa-he-design-2` | mã căn là liên kết thật, nút mở ở ô số thứ tự, ngăn đi theo dòng đang chọn, Tuỳ chỉnh sửa trong ô, vai Thành viên trung tính | T3 (chạm `src/modules/identity/ui`) | không chặn 3h; cần cổng kế hoạch |
 | 3 | `chuan-hoa-he-design-3` | cả phần lọc | T2 | lớn nhất, không chặn ai |
 
@@ -58,6 +58,7 @@ Lát 2 và 3 chạm cùng tệp với VP10 lát 2 (`data-region.tsx`, `region-he
 | Space là mở hồ sơ | phím cách không làm gì | phím cách trên ô đang chọn mở hồ sơ dòng ấy, ở mọi ô; đang sửa thì gõ dấu cách | `data-region.tsx` |
 | Bút chì khi rê | ô sửa được không có dấu gì | rê lên ô sửa được (người có quyền, dòng không khoá) thì hiện bút ở mép phải ô, có chữ gợi ý; ô khoá, ô không quyền không có | `data-region.tsx` (ô của lưới) |
 | Bấm ra ngoài là lưu | bấm ra ngoài khung sửa là huỷ, mất chữ đã gõ | bấm ra ngoài là ghi như Enter (đọc lại, hỏi lại khi giá đổi quá 20 %, thông báo «Hoàn tác»); giá trị chưa hiểu thì khung ở lại và báo ở ô | `cell-editor.tsx` |
+| Nền tối: lớp nổi sáng hơn lưới nửa nấc (Hỏi-4, chủ kho 2026-11-28) | trang 10, lưới 23, ngăn chi tiết 23: ngăn chỉ tách khỏi lưới bằng viền 1 px; trình đơn cùng màu lưới | ngăn chi tiết, trình đơn, hộp thoại, ô gợi ý sáng hơn lưới nửa nấc (nửa đường từ `neutral-900` tới `neutral-800`); dấu rê trong trình đơn vẫn sáng hơn nền trình đơn; nền sáng giữ như trước vòng | `src/styles/dark.css` (`--popover`) |
 | Bộ trợ giúp cho 3h | mỗi bài tự mở sửa bằng F2 hay bấm đúp | một hàm dùng chung mở sửa một ô bằng Enter và trả khung sửa; đỏ có tên khi ô không mở sửa hay bộ chọn không khớp ô nào | `tests/e2e/support/` |
 | Sổ hành vi | dòng «Sửa dữ liệu», «Phím trong lưới», «Chữ mở trong ô», «Ô không sửa được» theo luật cũ | đổi đúng lời chủ kho, có ngày 2026-11-27; ghi quyết định `wiki/decisions/0053-chuan-hoa-he-design.md` | `design/behaviors.md` |
 
