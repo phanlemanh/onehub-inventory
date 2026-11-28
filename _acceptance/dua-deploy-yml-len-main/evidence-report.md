@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 2aaa5641ae535f74372bc4f7d67be8eb24268927
+verified_commit: 808af8c561772a5926a525f82fd346a9b9200303
 human_signoff: Manh Phan 2026-11-28
 ---
 
@@ -145,3 +145,7 @@ none — every multi-run eval is uniform
 ## Iterations
 
 Round 1: mọi eval (E1, E2, E3, E3b, E4, E5, E7, E6, E6b, E6c) đều xanh; không có mục cần người phán xét.
+
+### Re-pin lần 1 — 2026-11-28, do gộp main c55415fe (PR #133) vào nhánh VP10; thước E4 hồ sơ deploy (2efc5370); bài 3g chụp ra thư mục chạy (1cb3073b) — G-2811-45/51
+run_id: repin-20261128T015659Z-62110
+sha: 808af8c561772a5926a525f82fd346a9b9200303 · suites: 3 lệnh exit 0 · evals: 10/10 eval máy đạt kỳ vọng

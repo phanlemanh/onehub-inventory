@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 9e5cf640628157d835c23a4cf7060c1bd4299f82
+verified_commit: ed07ef111ea3edc3a45bffc322bdf1248ccfded1
 human_signoff: Manh Phan 2026-11-27
 ---
 
@@ -346,3 +346,7 @@ sha: 1c0db7a53ead8ac3ca23c20991b2746df50d1e98 · suites: 3 lệnh exit 0 · eval
 ### Re-pin lần 2 — 2026-11-26, do giờ chờ ca quét trợ năng tám lần (G-2611-14)
 run_id: repin-20261126T180905Z-49173
 sha: 9e5cf640628157d835c23a4cf7060c1bd4299f82 · suites: 3 lệnh exit 0 · evals: 20/20 eval máy đạt kỳ vọng · ngoài làn máy: E2-ui, E6-ui, E13-ui
+
+### Re-pin lần 3 — 2026-11-28, do bài sua-thong-tin-can.spec chụp E6 ra thư mục chạy (1cb3073b, chép từ d9d1c975) — G-2811-51
+run_id: repin-20261128T023849Z-78265
+sha: ed07ef111ea3edc3a45bffc322bdf1248ccfded1 · suites: 3 lệnh exit 0 · evals: 20/20 eval máy đạt kỳ vọng · ngoài làn máy: E2-ui, E6-ui, E13-ui · diff chạm vật đo ngoài làn máy: E2-ui, E6-ui, E13-ui — chưa chứng lại, đi vòng S4 delta

@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 8fe0aca9d47711596b438f5c3a00383f6f06d9ea
+verified_commit: 808af8c561772a5926a525f82fd346a9b9200303
 human_signoff: Manh Phan 2026-11-28
 ---
 
@@ -321,3 +321,7 @@ Round 5: E18 (nền tối), E1, E7, E9 failed — E18 ở nền tối, và mỗi
 Round 6: một bài trong bộ trình duyệt chung quá giờ; E18 đạt. Returned to implementation.
 Round 7: PASS; ký lại chín bản ghi đã ký.
 Round 8: chỉ đổi lời câu đầu thẻ (card-plain.json); chạy lại E18 và ba lệnh suite, tất cả đạt; các eval khác mang từ vòng trước.
+
+### Re-pin lần 1 — 2026-11-28, do gộp main c55415fe (PR #133) vào nhánh VP10; thước E4 hồ sơ deploy (2efc5370); bài 3g chụp ra thư mục chạy (1cb3073b) — G-2811-45/51
+run_id: repin-20261128T015659Z-62110
+sha: 808af8c561772a5926a525f82fd346a9b9200303 · suites: 3 lệnh exit 0 · evals: 20/20 eval máy đạt kỳ vọng · ngoài làn máy: E18, E19 (E19 không khai paths) · AC không có chốt máy: AC-12
