@@ -1,0 +1,31 @@
+{
+  "feature_plain": "Tệp tự triển khai mà anh đã dán lên PR #133 được máy chứng là đúng bản anh đã ký trong sổ tay và an toàn, để anh gộp được PR.",
+  "will_do": [
+    {"id": "AC-1", "p": "Sẽ chứng tệp anh dán bằng đúng từng dòng khối tự triển khai trong sổ tay, và khối ấy chưa đổi từ lúc anh ký hồ sơ đặt khoá ngày 22/11."},
+    {"id": "AC-2", "p": "Sẽ chứng tệp chỉ có hai bước: bản thử chỉ chạy khi anh bật công tắc tự triển khai, bản thật luôn chờ bản thử xong; việc phát hành gọi tệp này đúng một lần."},
+    {"id": "AC-3", "p": "Sẽ chứng mọi khoá và biến tệp đọc đều có trong bảng biến của sổ tay, và mỗi cái đặt ở đúng môi trường (thử hay thật) đang đọc nó."},
+    {"id": "AC-4", "p": "Sẽ chứng PR không đổi gì khác ngoài tệp ấy và hồ sơ nghiệm thu (cùng hai trang máy tự vẽ lại)."},
+    {"id": "AC-5", "p": "Sẽ chứng cả kho vẫn xanh: bộ kiểm chung, bản dựng và bài kiểm trình duyệt ở bốn khổ màn."},
+    {"id": "AC-6", "p": "Sẽ đọc (chỉ đọc) môi trường bản thật trên GitHub để chứng nó đòi anh duyệt trước khi bản thật lên."}
+  ],
+  "wont_do": [
+    {"id": "OOS-1", "p": "Sẽ KHÔNG sửa tệp tự triển khai hay sổ tay: tệp phải đúng bản anh dán."},
+    {"id": "OOS-2", "p": "Sẽ KHÔNG chạy Deploy, bật công tắc tự triển khai hay đặt khoá — đó là việc của anh sau khi gộp."},
+    {"id": "OOS-3", "p": "Sẽ KHÔNG chứng tệp chạy được trên GitHub: chỉ lần chạy thật đầu tiên chứng được điều đó."},
+    {"id": "OOS-4", "p": "Sẽ KHÔNG sửa tiêu đề commit của anh; gộp kiểu squash giữ nó khỏi nhánh chính."}
+  ],
+  "scope_plain": "Vòng này không viết mã: nó chỉ chứng tệp anh đã dán.",
+  "coverage_plain": [
+    {"i": 1, "p": "Tệp: nội dung (AC-1 khớp sổ tay), cấu trúc (AC-2 hai bước), tên khoá (AC-3 có trong bảng), phạm vi PR (AC-4 chỉ một tệp), kho còn xanh (AC-5)."},
+    {"i": 2, "p": "Đường ra bản thật: chưa bật thì không chạy và bản thật luôn sau bản thử (AC-2 cấu trúc), bản thật luôn chờ anh duyệt (AC-6 người duyệt bắt buộc)."},
+    {"i": 3, "p": "Khoá tới được tệp: chỉ dùng khoá của môi trường nên không cần chuyển khoá kho xuống, không tên lạ, không khoá sai môi trường (AC-3 bảng biến)."},
+    {"i": 4, "p": "Bản đã ký: tệp khác khối sổ tay hay khối bị sửa sau ngày ký đều làm đỏ (AC-1 khớp sổ tay)."}
+  ],
+  "gap_probe_plain": [
+    {"i": 0, "p": "Bộ tiêu chí cũ chỉ đọc chữ «production» trong tệp, không kiểm bản thật có người duyệt thật — đã thêm tiêu chí AC-6 đọc thẳng GitHub; hôm nay đo được: có, người duyệt là anh."},
+    {"i": 1, "p": "Phép đo cấu trúc chưa từng bị thử đỏ ở 3 vế (quyền, bước cuối, số lần gọi) — đã thêm 5 ca phá thử, nay 27/27 ca đúng."},
+    {"i": 2, "p": "Chưa kiểm mỗi khoá có ở đúng môi trường đang đọc nó — đã đo theo từng bước thử/thật."},
+    {"i": 3, "p": "Chỉ so với sổ tay hôm nay, không so với bản lúc anh ký — đã ghim thêm bản ngày ký 22/11; hai bản bằng nhau."},
+    {"i": 4, "p": "Lý do «không sửa tệp» trích sai luật (luật chỉ cấm máy gộp) — đã ghi lại lý do đúng: tệp phải bằng bản anh đã ký."}
+  ]
+}
