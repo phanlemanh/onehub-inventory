@@ -12,7 +12,7 @@ import "server-only";
 import { fold } from "@/modules/company-config";
 import { readLayer } from "@/modules/company-config/server";
 import { withCompany, type DbPool } from "@/modules/identity/server";
-import type { UnitAttributeValues } from "@/modules/listings";
+import { attributeFits, type UnitAttributeValues } from "@/modules/listings";
 import { setFileValues, type Queryable } from "@/modules/listings/server";
 
 import { markValue, matchColumns, NO_CHOICES, valueKey, type LayerView } from "./mark";
@@ -102,8 +102,19 @@ export async function rereadImportValues(c: Queryable, layerOf: LayerOf): Promis
         const col = run.signature.indexOf(fold(k.header));
         const target = columns[col]?.target;
         const field = target && "standard" in target ? FILE_VALUE_OF[target.standard] : undefined;
-        // An import made before the row kept no value choice of the person (d-…-30), so the choice is the empty one:
-        // a cell that asked then stays unread now, never guessed.
+        // Since row 11 an import keeps the value its preview showed for the cell (kept[].value), read by the machine or
+        // typed by the person: that value is the one written. A value that does not fit the attribute is not taken.
+        if (field && k.value !== undefined) {
+          if (!attributeFits(field, k.value)) {
+            out.cellsUnread += 1;
+            continue;
+          }
+          out.cellsRead += 1;
+          byRow.set(k.row, { ...byRow.get(k.row), [field]: k.value });
+          continue;
+        }
+        // An older import kept only the words and no value choice of the person (d-…-30), so the choice is the empty
+        // one: a cell that asked then stays unread now, never guessed.
         const cell =
           target && field
             ? markValue(target, k.raw, {

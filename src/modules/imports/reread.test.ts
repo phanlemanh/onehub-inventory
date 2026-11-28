@@ -65,6 +65,23 @@ const cell = (row: number, header: string, raw: string, why = "unit-attribute") 
 });
 
 describe("rereadImportValues", () => {
+  it("takes the value the preview kept (row 11's kept[].value) over the words, and refuses one that does not fit", async () => {
+    const { c, asked } = owner([
+      // The person answered «2PN» with Townhouse in the preview: the words alone would ask, the kept value is written.
+      { ...cell(0, label("PropertySubType"), "2PN"), value: "Townhouse" },
+      // The machine read «72,5 m2» as 72.5 then: kept as such.
+      { ...cell(0, "DT", "72,5 m2"), value: 72.5 },
+      // A kept value of the wrong kind is not taken, even if the words could be read.
+      { ...cell(1, "PN", "3"), value: "ba" },
+    ]);
+    const out = await rereadImportValues(c, layerOf);
+    expect(out).toMatchObject({ imports: 1, listingsSet: 1, cellsRead: 2, cellsUnread: 1 });
+    const fills = asked.filter((q) => q.text.includes("update listings"));
+    expect(fills.map((q) => q.params)).toEqual([
+      [listingIdOf(RUN.id, 0), 72.5, null, null, null, "Townhouse"],
+    ]);
+  });
+
   it("reads each kept unit attribute with today's readers and fills each row's listing; unread cells stay as written", async () => {
     const { c, asked } = owner([
       cell(0, "DT", "72.5"),

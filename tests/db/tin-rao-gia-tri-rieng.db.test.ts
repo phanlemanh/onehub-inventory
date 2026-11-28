@@ -170,7 +170,12 @@ const IMPORT_HEADERS = ["Mã căn", "Block", "DT", "Tầng", "PN", "Hướng", "
  * catalog's, row 1 on a catalog unit with the catalog's own area and «2PN» in Loại hình (kept as written), row 2 on a
  * pending unit. Returns the import's id and the listing id of each row.
  */
-async function importThree(e: ApiWorld, units: Awaited<ReturnType<typeof codedUnits>>) {
+async function importThree(
+  e: ApiWorld,
+  units: Awaited<ReturnType<typeof codedUnits>>,
+  /** The person's answer for «2PN» in Loại hình: none by default, the cell stays kept as written. */
+  subTypeAnswer: string | null = null,
+) {
   const run = e.importAs("LA");
   const rows = [
     [units[0]!.code, "[MAU] Toà", "72.5", "15a", "2", "Đông Nam", "Chung cư"],
@@ -180,7 +185,7 @@ async function importThree(e: ApiWorld, units: Awaited<ReturnType<typeof codedUn
   const choices = {
     ...NO_CHOICES,
     columns: { 1: { target: { standard: "Unit.buildingName" } } },
-    values: { [valueKey(6, "2PN")]: { value: null, remember: false } },
+    values: { [valueKey(6, "2PN")]: { value: subTypeAnswer, remember: false } },
     units: { "sa5-99.99": { pending: true } },
   };
   const preview = await run("/preview", { headers: IMPORT_HEADERS, rows, choices });
@@ -764,5 +769,30 @@ describe("doc-lai-mot-lan (E7, G-2811-69)", () => {
     expect(refilled(taken, await ownOf(e.w, ids[0]!), ids[0]!)).toEqual([
       `taken-back value filled again: ${ids[0]}`,
     ]);
+  });
+});
+
+describe("doc-lai-gia-tri-da-hien (E7, G-2811-81)", () => {
+  it("doc-lai-gia-tri-da-hien: an import that kept the preview's value (the person answered «2PN» with Townhouse, not remembered) gives the listing that very value from a file", async () => {
+    const e = await apiWorld("da_hien");
+    const units = await codedUnits(e.w);
+    const { id, ids } = await importThree(e, units, "Townhouse");
+    const kept = (
+      await e.w.db.owner.query<{ kept: { row: number; header: string; value?: unknown }[] }>(
+        "select kept from import_runs where id = $1",
+        [id],
+      )
+    ).rows[0]!.kept;
+    expect(
+      kept.find((k) => k.row === 1 && k.header === "Loại hình")?.value,
+      "the import keeps the value the preview showed",
+    ).toBe("Townhouse");
+    await asImportBefore3h(e, id);
+    const read = await rereadImportValues(e.w.db.owner, layerThroughDoor(e.w.pool));
+    expect(read).toMatchObject({ imports: 1 });
+    expect(await ownOf(e.w, ids[1]!)).toMatchObject({
+      property_sub_type: "Townhouse",
+      property_sub_type_source: "File",
+    });
   });
 });

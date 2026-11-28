@@ -22,7 +22,7 @@ sources:
   ]
 ---
 
-# 0052 Chuẩn hoá hệ design — màu trạng thái và cách sửa trên ô
+# 0053 Chuẩn hoá hệ design — màu trạng thái và cách sửa trên ô
 
 ## Status
 
