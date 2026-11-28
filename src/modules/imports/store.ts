@@ -24,7 +24,7 @@ import {
 } from "@/modules/listings/server";
 
 import type { LearnedConcept, LearnedItem } from "./learned";
-import { markValue, type CellMark, type Choices, type UnitFound } from "./mark";
+import { markValue, valueKey, type CellMark, type Choices, type UnitFound } from "./mark";
 import { markTable, type MarkedTable } from "./table";
 import {
   STANDARD_HEADER_CONCEPTS,
@@ -251,16 +251,38 @@ async function lockRun(c: Queryable, id: string): Promise<RunRow | null> {
   return (rows[0] as RunRow | undefined) ?? null;
 }
 
-const STANDARD_COLUMN: Partial<Record<StandardTarget, keyof NewListing>> = {
-  "Listing.listPrice": "listPrice",
-  "Listing.feeInclusion": "feeInclusion",
-  "Listing.furnished": "furnished",
-  "Listing.occupantType": "occupantType",
-  "Listing.legalStatus": "legalStatus",
-  "Listing.financing": "financing",
-  "Listing.withdrawnReason": "withdrawnReason",
-  "Listing.lastConfirmedAt": "lastConfirmedAt",
-  "Listing.standardStatus": "standardStatus",
+/** Where the value of a standard target goes when an import writes (ruling G-2811-65, after VP11's S4-r1). */
+export type Destination =
+  | { listing: keyof NewListing }
+  | { kept: "unit-attribute" | "close-field" }
+  | { unit: "code" | "building" };
+
+/**
+ * Every standard target has exactly one place: a column of the listing, kept as written on the import with its reason,
+ * or the unit itself (its code, and the tower text of a new pending unit). A target with no place would be read on the
+ * preview and lost on write; the Record makes the type check fail first, tests/nhap-excel-noi-ghi.test.ts second.
+ * A listing an import makes is never Closed (row 4: Incomplete does not move to Closed), so close price and close date
+ * have no place on it, and unit attributes never change the unit or the catalog (G-2711-4).
+ */
+export const DESTINATION: Record<StandardTarget, Destination> = {
+  unitCode: { unit: "code" },
+  "Unit.buildingName": { unit: "building" },
+  "Unit.livingArea": { kept: "unit-attribute" },
+  "Unit.bedroomsTotal": { kept: "unit-attribute" },
+  "Unit.directionFaces": { kept: "unit-attribute" },
+  "Unit.floor": { kept: "unit-attribute" },
+  "Unit.propertySubType": { kept: "unit-attribute" },
+  "Listing.listPrice": { listing: "listPrice" },
+  "Listing.feeInclusion": { listing: "feeInclusion" },
+  "Listing.standardStatus": { listing: "standardStatus" },
+  "Listing.withdrawnReason": { listing: "withdrawnReason" },
+  "Listing.closePrice": { kept: "close-field" },
+  "Listing.closeDate": { kept: "close-field" },
+  "Listing.furnished": { listing: "furnished" },
+  "Listing.occupantType": { listing: "occupantType" },
+  "Listing.legalStatus": { listing: "legalStatus" },
+  "Listing.financing": { listing: "financing" },
+  "Listing.lastConfirmedAt": { listing: "lastConfirmedAt" },
 };
 
 export type BatchResult =
@@ -333,22 +355,14 @@ export async function writeBatch(
     marked.columns.forEach((col, j) => {
       const cell = cells[j]!;
       const raw = input.rows[r]![j] ?? "";
-      const unitAttr =
-        col.target &&
-        "standard" in col.target &&
-        col.target.standard.startsWith("Unit.") &&
-        col.target.standard !== "Unit.buildingName";
+      const place =
+        col.target && "standard" in col.target ? DESTINATION[col.target.standard] : null;
+      const keptAs = place && "kept" in place ? place.kept : null;
       if (
-        (cell.mark === "ask" &&
-          !(col.target && "standard" in col.target && col.target.standard === "unitCode")) ||
-        (unitAttr && raw.trim() !== "")
+        (cell.mark === "ask" && !(place && "unit" in place && place.unit === "code")) ||
+        (keptAs && raw.trim() !== "")
       )
-        kept.push({
-          row: input.rowOffset + r,
-          header: col.header,
-          raw,
-          why: unitAttr ? "unit-attribute" : cell.why,
-        });
+        kept.push({ row: input.rowOffset + r, header: col.header, raw, why: keptAs ?? cell.why });
     });
     if (outcome.fate !== "create" || !outcome.unit) continue;
     let unit: NewListing["unit"];
@@ -406,8 +420,9 @@ export async function writeBatch(
       if (!col.target || cell.value === null || cell.mark === "ask") return;
       if ("custom" in col.target) l.customFields[col.target.custom] = cell.value;
       else if ("standard" in col.target) {
-        const key = STANDARD_COLUMN[col.target.standard];
-        if (key) (l as unknown as Record<string, unknown>)[key] = cell.value;
+        const place = DESTINATION[col.target.standard];
+        if ("listing" in place)
+          (l as unknown as Record<string, unknown>)[place.listing] = cell.value;
         if (col.implies && l.feeInclusion === null) l.feeInclusion = col.implies.feeInclusion;
       }
     });
@@ -528,9 +543,11 @@ async function learnAtEnd(
     // The preview checked the field with the company layer's rule; a refusal here fails the batch, never drops the
     // column's values in silence (S4-r1 t11).
     if (!code) throw new Error("import: custom field refused");
+    // The person's choice for this spelling counts as it did in the preview, remembered or not (VP11 S4-r1).
     const m: CellMark = markValue(t as Target, raw, {
       layer: await readLayer(run),
       today: today(),
+      choice: input.choices.values[valueKey(col!, raw)],
     });
     if (m.value === null) continue;
     await c.query(
