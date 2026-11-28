@@ -1,0 +1,23 @@
+name: ListingPendingUnit
+description: >-
+  The link between one listing and the company's pending unit it offers, when the shared catalog does not have the unit
+  yet. A listing has exactly one unit link: a ListingUnit (catalog) or a ListingPendingUnit, never both.
+reso: none (our own)
+
+properties:
+  id: { type: uuid, required: true, unique: true }
+  companyId: { type: ref, target: Company, required: true }
+  listingId: { type: ref, target: Listing, required: true }
+  pendingUnitId: { type: ref, target: PendingUnit, required: true }
+
+rules:
+  - id: one-unit-link-per-listing
+    description: >-
+      A listing has exactly one unit link, catalog or pending, of the same company; one open listing per pending unit per
+      company.
+    implemented_in: db/migrations/018_nhap_excel_can_cho_theo_san.sql
+
+code:
+  model: src/modules/listings/
+  tests: tests/db/nhap-excel.db.test.ts
+wiki: wiki/entities/listing-pending-unit.md

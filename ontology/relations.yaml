@@ -56,7 +56,7 @@ relations:
     name: placed_on
     to: ListingUnit
     cardinality: one-to-one
-    description: Each listing points at exactly one catalog unit.
+    description: Each listing points at exactly one catalog unit, unless it is placed on a pending unit instead.
   - from: Unit
     name: offered_through
     to: ListingUnit
@@ -122,6 +122,26 @@ relations:
     to: Unit
     cardinality: many-to-one
     description: A pending unit points to the catalog unit it was matched with, once the catalog has it.
+  - from: Listing
+    name: placed_on_pending
+    to: ListingPendingUnit
+    cardinality: one-to-one
+    description: A listing of a unit the catalog does not have yet points at one pending unit of its company (row 11).
+  - from: PendingUnit
+    name: offered_through
+    to: ListingPendingUnit
+    cardinality: one-to-many
+    description: A pending unit can be offered by listings of its company until the catalog has it (row 11).
+  - from: Company
+    name: holds_imports
+    to: ImportRun
+    cardinality: one-to-many
+    description: A company holds the times its people imported a sheet (row 11).
+  - from: ImportRun
+    name: created
+    to: Listing
+    cardinality: one-to-many
+    description: An import created these listings; undo removes the ones nobody changed since.
   - from: Company
     name: remembers_templates
     to: ImportTemplate

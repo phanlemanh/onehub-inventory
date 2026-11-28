@@ -1,0 +1,1 @@
+Nhập tệp: ô giữ chữ gốc giữ thêm giá trị màn đã hiện; chữ của màn Nạp tệp lấy từ danh sách chữ; hai tệp nâng cấp 015, 020 cho 016 và 019 chạy bằng vai chủ không siêu cấp — https://github.com/phanlemanh/onehub-inventory/pull/130

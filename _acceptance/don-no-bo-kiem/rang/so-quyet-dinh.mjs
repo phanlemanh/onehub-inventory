@@ -1,5 +1,8 @@
 // Row 1u, E6 (AC-6): the 1q decision page carries 0042 (file and title), is in the wiki index, no tracked file links
 // the old path, and no number is used twice. Two-way: the same check on a copy whose log still links the old path.
+// Since the wiki log was split into one file per entry (2e47d841), wiki/log.md is drawn from wiki/log/ and git ignores
+// it, so the scan never reads it; the copy plants the old link into the first tracked entry of wiki/log/ instead
+// (G-2811-101).
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -32,9 +35,13 @@ const files = execFileSync("git", ["ls-files", "--cached", "--others", "--exclud
   .filter((f) => f && existsSync(join(root, f)));
 const read = (f) => readFileSync(join(root, f), "utf8");
 const real = check(files, read);
-const broken = check(files, (f) => (f === "wiki/log.md" ? `${read(f)}\n[0034](decisions/${OLD}.md)\n` : read(f)));
+const plant = files.filter((f) => /^wiki\/log\/[^/]+\.md$/.test(f)).sort()[0];
 const out = [...real];
-if (!broken.includes("so-quyet-dinh: lien ket cu o wiki/log.md")) out.push("so-quyet-dinh: ban sao con lien ket cu ma khong do");
+if (!plant) out.push("so-quyet-dinh: khong co muc nhat ky nao duoi wiki/log/ de chen");
+else {
+  const broken = check(files, (f) => (f === plant ? `${read(f)}\n[0034](../decisions/${OLD}.md)\n` : read(f)));
+  if (!broken.includes(`so-quyet-dinh: lien ket cu o ${plant}`)) out.push("so-quyet-dinh: ban sao con lien ket cu ma khong do");
+}
 if (out.length) {
   console.log(out.join("\n"));
   process.exit(1);

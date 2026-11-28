@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 9a9385eafff8dd8cf1a3ca391a74c7cc5c037aae
+verified_commit: 2d814a8e2c6485c90d50ada24b850f92755ba800
 human_signoff: Manh Phan 2026-11-16
 ---
 
@@ -307,3 +307,7 @@ Round 4: mọi eval máy và ui đạt; E8-khuon và E8-floor mang từ round 1 
 ### Re-pin lần 1 — 2026-11-16, do gộp main ee661ce sau chữ ký hàng 10; 2b, 3e hoá cũ do bài lượt 4
 run_id: repin-20261116T125923Z-77997
 sha: 9a9385eafff8dd8cf1a3ca391a74c7cc5c037aae · suites: 3 lệnh exit 0 · evals: 21/21 eval máy đạt kỳ vọng · ngoài làn máy: E2-ui, E8-ui · diff chạm vật đo ngoài làn máy: E2-ui — chưa chứng lại, đi vòng S4 delta
+
+### Re-pin lần 2 — 2026-11-28, do hàng 11 nhap-excel trước Cổng Bằng chứng, sau vòng chấm 12: 22 hồ sơ cổng nêu (gồm 11 hồ sơ có dòng sửa-sau-ký của PR #130) và nhap-excel (G-2811-62)
+run_id: repin-20261128T091000Z-36001
+sha: 2d814a8e2c6485c90d50ada24b850f92755ba800 · suites: 3 lệnh exit 0 · evals: 21/21 eval máy đạt kỳ vọng · ngoài làn máy: E2-ui, E8-ui · diff chạm vật đo ngoài làn máy: E2-ui, E8-ui — chưa chứng lại, đi vòng S4 delta
