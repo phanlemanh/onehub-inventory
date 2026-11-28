@@ -179,4 +179,17 @@ describe("AC-4 · AC-5 · the region follows the rule", () => {
     expect(navigate).toHaveBeenCalledWith("a");
     expect(editorOpen()).toBe(false);
   });
+
+  // A screen with no record (the company layer): Enter on a cell that does not edit leaves it to the grid, which selects
+  // the cell below. Red when the region keeps Enter for itself on such a screen (nothing moves) or opens an editor.
+  it("on a screen without a record Enter on a cell that does not edit selects the cell below", async () => {
+    show(false);
+    await press(cellOf("a", "Listing.unitNumber"), "Enter");
+    expect(editorOpen(), "Enter opened an editor on a cell that does not edit").toBe(false);
+    expect(focusedRow(), "Enter did not move to the cell below").toBe("b");
+  });
 });
+
+/** The row of the selected cell, as the grid marks it. */
+const focusedRow = () =>
+  document.querySelector("[data-cell-focused]")?.closest("tr")?.getAttribute("data-row-id") ?? null;

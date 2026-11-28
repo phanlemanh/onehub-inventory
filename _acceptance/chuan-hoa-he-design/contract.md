@@ -6,7 +6,7 @@ owner: phanlemanh@gmail.com
 risk_tier: T2
 surfaces: [ui]
 screens: []
-status: approved
+status: implemented
 approved_by: Manh Phan
 approved_at: 2026-11-28T00:06:57Z
 design_doc: _acceptance/chuan-hoa-he-design/design.md
@@ -59,7 +59,7 @@ G-2811-15) · bàn giao phiên BH `bh-ban-giao-2026-11-27.md` · trang `chuan-ho
 - AC-9: Given cây sau vòng này, When chạy `make check`, bộ bài trình duyệt chung ở bốn khổ sáng và tối và bộ có đăng nhập
   trên Postgres, Then tất cả xanh, axe không lỗi serious hay critical, và không tệp nào dưới `src/components/ui` hay
   `src/components/reui` đổi.
-- AC-10: Given `design.md`, `design/behaviors.md` và `wiki/decisions/0052-chuan-hoa-he-design.md`, When đặt cạnh lời chủ kho
+- AC-10: Given `design.md`, `design/behaviors.md` và `wiki/decisions/0053-chuan-hoa-he-design.md`, When đặt cạnh lời chủ kho
   ở mục «Nguồn» và câu trả lời ở Cổng Phạm vi, Then mỗi điều của lát 1 có đúng một chỗ làm và một dòng sổ hành vi mang lời
   và ngày của chủ kho (dòng «Sửa dữ liệu», «Phím trong lưới», «Chữ mở trong ô», «Ô không sửa được»); điều của lát 2, lát 3
   và các câu chủ kho chưa quyết không lọt vào phần đã làm. (judgment)
@@ -121,6 +121,7 @@ nào và không đổi ai vào màn nào. Bảng quyền giữ nguyên: ô chỉ
 - Dựng chồng lên nhánh VP10 lát 1 (`feat/khung-luoi-va-ngan-chi-tiet` @a1aa19c6), theo G-2811-15; gộp sau VP10 lát 1.
 - Hồ sơ đã ký có bài đổi kỳ vọng vì Enter thôi mở hồ sơ ở ô sửa được (dự kiến; S3 xác định danh sách đúng): 2a
   `bang-hang-dung-tay-nhu-sheet`, 3 `ho-so-can`, 4 `sua-tren-o`, 3g `sua-thong-tin-can`. Mỗi hồ sơ một dòng «sửa sau ký»
-  và ghim lại một làn trước khi gộp.
+  và ghim lại một làn trước khi gộp. S3 xác định danh sách thật: tám hồ sơ (danh sách ở `design.md`, mục hồ sơ đã ký);
+  `sua-thong-tin-can` không có bài nào đổi kỳ vọng.
 - Mọi bài đo trên một tập phần tử phải đỏ khi tập rỗng; bài đo điểm ảnh hay màu thử trong ảnh Linux của Playwright trước khi
   coi là xanh (sổ đợt, 28/11).

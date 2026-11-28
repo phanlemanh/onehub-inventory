@@ -54,8 +54,11 @@ hay bấm đúp mới vào sửa, bấm ra ngoài là mất chữ đã gõ. Ở 
 
 ## Consequences
 
-- Năm luật đã ký đổi theo lời chủ kho; tám hồ sơ đã ký mang một dòng «sửa sau ký» và được ghim lại trước khi gộp.
+- Năm luật đã ký đổi theo lời chủ kho; tám hồ sơ đã ký mang một dòng «sửa sau ký» và được ghim lại trước khi gộp
+  (danh sách ở `_acceptance/chuan-hoa-he-design/design.md`).
 - Dấu «khác danh mục» của hàng 3h không dùng sắc info nữa (đã là màu của «Đang giao dịch»): 3h chọn màu riêng.
-- Tín hiệu sẵn sàng của vùng chỉ bật khi lưới đã yên: trước đây lưới vẽ lại mọi ô ngay sau tín hiệu (mật độ đổi khi khung
+- Việc đi kèm, không phải điều chủ kho duyệt (giám sát đòi, G-2811-25 — chờ chủ kho veto): tín hiệu sẵn sàng của vùng chỉ bật khi lưới đã yên: trước đây lưới vẽ lại mọi ô ngay sau tín hiệu (mật độ đổi khi khung
   cuộn gắn vào; màn dựng lại cách sửa trên ô mỗi lần vẽ), mất ô vừa bấm (`design/escapes.md`, 2026-11-28).
 - Lưới của ReUI không vẽ lại thân bảng trong lúc đang nhấn chuột chọn ô; khung sửa vì thế ghi khi nhả chuột.
+- Việc máy chọn, chờ chủ kho veto: chữ gợi ý của bút chì «Bấm Enter để đổi ô này»; bút hiện trên ô đang chọn khi máy không rê
+  được; dấu «đã sửa» ở màn nhập tệp thôi dùng sắc info (nay `primary-light`, vẫn trùng «Đã bán» — lát 2 đổi sang viền).

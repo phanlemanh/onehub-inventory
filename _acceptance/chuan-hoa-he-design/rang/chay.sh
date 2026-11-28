@@ -11,7 +11,9 @@ case "${1:-}" in
   E3) pw tests/e2e/chuan-hoa-mau.spec.ts -g "AC-2 · " ;;
   E4) pw tests/e2e/chuan-hoa-mau.spec.ts -g "AC-3 · " ;;
   E19) pw tests/e2e/chuan-hoa-mau.spec.ts -g "AC-11 · " ;;
-  E5) pw tests/e2e/chuan-hoa-sua-o.spec.ts -g "AC-4 · " && npx vitest run src/components/candidate/data-region-keys.test.tsx --coverage.enabled=false --reporter=verbose ;;
+  # E5 also measures Tuỳ chỉnh của sàn (no record: Enter moves down), a signed-in screen, on this record's DB lane.
+  E5) pw tests/e2e/chuan-hoa-sua-o.spec.ts -g "AC-4 · " && npx vitest run src/components/candidate/data-region-keys.test.tsx --coverage.enabled=false --reporter=verbose \
+        && DB_LANE="${DB_LANE:-vp11}" DB_PORT="${DB_PORT:-5568}" npx playwright test -c playwright.db.config.ts tests/e2e-db/chuan-hoa-ghi-mot-lan.spec.ts -g "AC-4 · " --reporter=list ;;
   E6) pw tests/e2e/chuan-hoa-sua-o.spec.ts -g "AC-5 · " ;;
   E7) pw tests/e2e/chuan-hoa-sua-o.spec.ts -g "AC-6 · " ;;
   E8) pw tests/e2e/chuan-hoa-sua-o.spec.ts -g "AC-7 · " && npx vitest run src/components/candidate/cell-editor.test.tsx --coverage.enabled=false --reporter=verbose ;;
