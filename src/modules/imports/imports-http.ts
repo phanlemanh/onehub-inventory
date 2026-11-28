@@ -46,6 +46,7 @@ type Code =
   | "table-changed"
   | "bad-agent"
   | "closed"
+  | "batches-missing"
   | "already-undone";
 const STATUS: Record<Code, number> = {
   unauthenticated: 401,
@@ -58,6 +59,7 @@ const STATUS: Record<Code, number> = {
   "counts-changed": 409,
   "table-changed": 409,
   closed: 409,
+  "batches-missing": 409,
   "already-undone": 409,
 };
 const error = (code: Code) => Response.json({ error: code }, { status: STATUS[code] });

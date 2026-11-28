@@ -276,7 +276,10 @@ void listingColumnsExist;
 
 export type BatchResult =
   | { ok: true; created: number; done: boolean; learned?: LearnedItem[] }
-  | { ok: false; problem: "not-found" | "closed" | "blocked-cells" | "table-changed" };
+  | {
+      ok: false;
+      problem: "not-found" | "closed" | "blocked-cells" | "table-changed" | "batches-missing";
+    };
 
 /**
  * Write one batch of an open import: the rows that become listings (new pending units first), the cells kept as
@@ -323,6 +326,13 @@ export async function writeBatch(
     };
   }
   if (run.status !== "open") return { ok: false, problem: "closed" };
+  // The last batch closes the import and runs what it teaches, so it waits for every earlier batch (AC-8, S4-r11 t5):
+  // sent before them, it is refused and writes nothing; the import stays open and has learned nothing.
+  if (
+    input.last &&
+    Array.from({ length: input.batchNo }, (_, b) => b).some((b) => !run.batches_done.includes(b))
+  )
+    return { ok: false, problem: "batches-missing" };
   const runAs = savepointRun(c);
   // Rows the person left out are counted in the whole file; this batch reads them at its own place (S4-r1 t8).
   const skipRows = (input.choices.skipRows ?? [])
