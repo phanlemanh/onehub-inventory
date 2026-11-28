@@ -17,6 +17,7 @@ import {
   rowsShown,
 } from "./phone-list";
 import { SAMPLE_STATUS_COUNTS } from "../../src/modules/listings/sample";
+import { columnLuminance } from "./do-diem-anh";
 import { suaTrang, themKieu } from "./sua-trang";
 
 const WIDE = new Set(["1024", "1440"]);
@@ -528,14 +529,18 @@ test.describe("sheet tab stops", () => {
       await openInventory(page);
       if (typed) await typeFilter(page, "Giá chào", "<=5");
       if (isPhone(page)) {
-        // Row 2b: a phone has the toolbar's three buttons, the filter chips when filtering, and one stop per card.
+        // Row 2b: a phone has the toolbar's buttons, the filter chips when filtering, and one stop per card. This viewer
+        // may not save a view, so no region action stands there; the «…» named «Thêm» that opened an empty sheet is
+        // gone (owner, BH session 2026-11-27, L1).
         const stops = await phoneTabStops(page);
+        expect(stops).not.toContain("Thêm");
+        expect(stops).not.toContain("Lưu góc nhìn");
         const cards = await page.locator('[data-slot="phone-card"]').count();
         checkPhoneStops(
           stops,
           typed
-            ? ["Lọc (1)", "Nhóm theo Toà", "Thêm", "Bỏ lọc Giá chào", "Xoá lọc"]
-            : ["Lọc", "Nhóm theo Toà", "Thêm"],
+            ? ["Lọc (1)", "Nhóm theo Toà", "Bỏ lọc Giá chào", "Xoá lọc"]
+            : ["Lọc", "Nhóm theo Toà"],
           cards,
         );
         return;
@@ -1086,7 +1091,7 @@ test.describe("header buttons in view", () => {
     return names;
   }
 
-  test("every frozen header button is on top and pressable; Căn has no «Bỏ ghim»", async ({
+  test("every frozen header button is on top and pressable; pinning lives in the header menu", async ({
     page,
   }) => {
     // Row 2b: header buttons belong to the table; a phone has the card list.
@@ -1094,8 +1099,132 @@ test.describe("header buttons in view", () => {
     await openInventory(page);
     const names = await checkHeaderButtons(page);
     expect(names.some((n) => n.startsWith("Căn"))).toBe(true);
-    if (WIDE.has(width())) expect(names).toContain("Bỏ ghim Toà");
-    await expect(page.getByRole("button", { name: "Bỏ ghim Căn", exact: true })).toHaveCount(0);
+    // Owner, BH session 2026-11-27, «Duyệt cả sáu điểm», L4 (replaces the «Bỏ ghim Toà» button of row 2e): no header
+    // carries a «Bỏ ghim» button; a pinned column's menu ticks «Ghim bên trái» and a press lets it go.
+    expect(names.filter((n) => n.startsWith("Bỏ ghim"))).toEqual([]);
+    await expect(page.getByRole("button", { name: /^Bỏ ghim / })).toHaveCount(0);
+    if (WIDE.has(width())) {
+      const toa = page.locator(
+        '[data-slot="data-region-body"] thead th[data-col-id="Listing.buildingName"]',
+      );
+      await toa.getByRole("button").first().click();
+      const pin = page.getByRole("menuitem", { name: "Ghim bên trái" });
+      await expect(pin.locator("svg.lucide-check")).toHaveCount(1);
+      await pin.click();
+      await expect(toa).not.toHaveAttribute("data-pinned", /.+/);
+    }
+  });
+
+  /**
+   * L4: no header shows a «Bỏ ghim» button; the last column pinned at the start casts the pinned-edge shadow on its
+   * header and on its body cells — measured on pixels (VP10 rounds 2 and 3): the strip just right of the cell, with the
+   * shadows on against the shadows off. A shadow on an inner pinned column cannot show: the next pinned cell covers it
+   * (a forced one measured 0 at 1024 and 1440), so no check is made for it.
+   */
+  async function assertPinnedEdge(page: Page): Promise<void> {
+    const g = await page.evaluate(() => {
+      const box = (el: Element) => {
+        const r = el.getBoundingClientRect();
+        return { right: r.right, top: r.top, height: r.height };
+      };
+      const row = document.querySelector(
+        '[data-slot="data-region-body"] tbody tr:has(td[data-pinned="start"])',
+      );
+      const pinned = row ? [...row.querySelectorAll('td[data-pinned="start"]')] : [];
+      const last = pinned.find((el) => el.getAttribute("data-last-col") === "start");
+      const head = document.querySelector(
+        '[data-slot="data-region-body"] thead th[data-pinned="start"][data-last-col="start"]',
+      );
+      const unpinButtons = [
+        ...document.querySelectorAll('[data-slot="data-region-body"] thead button'),
+      ].filter(
+        (b) =>
+          (b as HTMLElement).offsetParent !== null &&
+          /^Bỏ ghim /.test(b.getAttribute("aria-label") ?? ""),
+      ).length;
+      return {
+        unpinButtons,
+        last: last ? box(last) : null,
+        head: head ? box(head) : null,
+      };
+    });
+    if (g.unpinButtons > 0) throw new Error(`header shows «Bỏ ghim» buttons: ${g.unpinButtons}`);
+    if (!g.last || !g.head) throw new Error("no pinned edge shadow");
+    const stripOf = (b: { right: number; top: number; height: number }, height: number) => ({
+      x: Math.round(b.right) + 1,
+      y: Math.round(b.top),
+      width: 4,
+      height: Math.max(8, Math.round(height)),
+    });
+    const strips = [
+      { name: "body", clip: stripOf(g.last, 160) },
+      { name: "header", clip: stripOf(g.head, g.head.height) },
+    ];
+    const withShadow = [];
+    for (const s of strips) withShadow.push(await columnLuminance(page, s.clip));
+    await suaTrang(page, () => {
+      const style = document.createElement("style");
+      style.id = "khong-bong-ghim";
+      style.textContent =
+        '[data-slot="data-region-body"] :is(th, td)[data-pinned] { box-shadow: none !important; }';
+      document.head.append(style);
+    });
+    await page.waitForTimeout(100);
+    const shade: Record<string, number> = {};
+    for (const [n, s] of strips.entries()) {
+      const without = await columnLuminance(page, s.clip);
+      shade[s.name] = Math.max(...withShadow[n]!.map((c, k) => (without[k] ?? c) - c));
+    }
+    await suaTrang(page, () => document.getElementById("khong-bong-ghim")?.remove());
+    for (const name of ["body", "header"])
+      if (shade[name]! < 3)
+        throw new Error(
+          `no pinned edge shadow on the ${name} (darker by ${shade[name]!.toFixed(1)})`,
+        );
+  }
+
+  test("a column pins from its menu and casts a shadow over the columns scrolling under it", async ({
+    page,
+  }) => {
+    if (isPhone(page)) return phoneStandIn(page, "header buttons");
+    await openInventory(page);
+    await assertPinnedEdge(page);
+    const price = page
+      .locator('[data-slot="data-region-body"] thead th[data-col-id="Listing.listPrice"]')
+      .first();
+    await price.getByRole("button").first().click();
+    await page.getByRole("menuitem", { name: "Ghim bên trái" }).click();
+    await page.keyboard.press("Escape");
+    await expect(price).toHaveAttribute("data-pinned", "start");
+    await assertPinnedEdge(page);
+  });
+
+  test("break: a «Bỏ ghim» button back on a header is caught", async ({ page }) => {
+    if (isPhone(page)) return phoneStandInBreak(page, "header buttons");
+    await openInventory(page);
+    await themKieu(page, {
+      content: "thead span:has(>button>svg.lucide-pin-off) { display: flex !important; }",
+    });
+    await expect(assertPinnedEdge(page)).rejects.toThrow("header shows «Bỏ ghim» buttons");
+  });
+
+  test("break: a pinned edge without its shadow is caught", async ({ page }) => {
+    if (isPhone(page)) return phoneStandInBreak(page, "header buttons");
+    await openInventory(page);
+    await themKieu(page, {
+      content:
+        '[data-slot="data-region-body"] :is(th, td)[data-pinned] { box-shadow: none !important; }',
+    });
+    await expect(assertPinnedEdge(page)).rejects.toThrow("no pinned edge shadow");
+  });
+
+  test("break: a pinned header without its shadow is caught", async ({ page }) => {
+    if (isPhone(page)) return phoneStandInBreak(page, "header buttons");
+    await openInventory(page);
+    await themKieu(page, {
+      content: '[data-slot="data-region-body"] th[data-pinned] { box-shadow: none !important; }',
+    });
+    await expect(assertPinnedEdge(page)).rejects.toThrow("no pinned edge shadow on the header");
   });
 
   test("the check fails when the next header covers the first column's buttons", async ({

@@ -2,10 +2,13 @@
 // Row 2e (bo-o-tim-cua-vung), E18 — AC-9: every test line this row REMOVED that spoke of the region search box has a row
 // in the old → new table (doi-bai-kiem.md), and every row points at a test that exists in the tree.
 //
-//   node _acceptance/bo-o-tim-cua-vung/rang/doi-bai-kiem.mjs --root . [--base <commit>] [--table <file>] [--self-test]
+//   node _acceptance/bo-o-tim-cua-vung/rang/doi-bai-kiem.mjs --root . [--base <commit>] [--head <commit>] [--table <file>]
+//        [--self-test]
 //
-// The removed lines come from `git diff -U0 <base>` over tests/** and tools/e2e_templates/** (base: the merge-base with
-// origin/main). A line counts when it holds one of the seven marks written below. Rows are matched by file and the
+// The removed lines come from `git diff -U0 <base> [<head>]` over tests/** and tools/e2e_templates/** (base: the
+// merge-base with origin/main; head: the working tree). Once row 2e is on main that merge-base holds none of its removed
+// lines, so the executor pins the row's own span: --base 1226ec5b (where row 2e branched) --head 15aff913 (its verified
+// head) — VP10, supervisor ruling G-2711-36. New cases are still looked up in the current tree. A line counts when it holds one of the seven marks written below. Rows are matched by file and the
 // line's text (trimmed), as many rows as removed copies. Exit 0 and one count line when every line has its row and every
 // row's new case is a real case of its file (a test title or a recipe id — not a comment or a line of code); exit 1
 // with the first problem otherwise. --self-test also runs the two breaks on a copy of the
@@ -36,8 +39,9 @@ function arg(name, fallback) {
 const git = (root, ...args) => execFileSync("git", ["-C", root, ...args], { encoding: "utf8" });
 
 /** The removed lines with a mark, as {file, line (in the base), text (trimmed)}. */
-export function removedLines(root, base) {
-  const out = git(root, "diff", "-U0", "--no-color", base, "--", ...SCOPES);
+export function removedLines(root, base, head) {
+  const span = head ? [base, head] : [base];
+  const out = git(root, "diff", "-U0", "--no-color", ...span, "--", ...SCOPES);
   const found = [];
   let file = null;
   let at = 0;
@@ -130,8 +134,8 @@ function firstLineOf(file) {
     .find((l) => l !== "" && !l.includes("|"));
 }
 
-function run(root, base, tablePath) {
-  const lines = removedLines(root, base);
+function run(root, base, head, tablePath) {
+  const lines = removedLines(root, base, head);
   const rows = tableRows(readFileSync(tablePath, "utf8"));
   return { lines, rows, problem: problem(root, lines, rows) };
 }
@@ -139,8 +143,9 @@ function run(root, base, tablePath) {
 function main() {
   const root = resolve(arg("--root", "."));
   const base = arg("--base", git(root, "merge-base", "HEAD", "origin/main").trim());
+  const head = arg("--head", undefined);
   const tablePath = resolve(root, arg("--table", "_acceptance/bo-o-tim-cua-vung/doi-bai-kiem.md"));
-  const result = run(root, base, tablePath);
+  const result = run(root, base, head, tablePath);
   if (result.problem) {
     console.error(result.problem);
     process.exit(1);
@@ -178,7 +183,7 @@ function main() {
   for (const brk of breaks) {
     const copy = join(dir, `${brk.name.replace(/ /g, "-")}.md`);
     writeFileSync(copy, brk.lines.join("\n"));
-    const got = run(root, base, copy).problem;
+    const got = run(root, base, head, copy).problem;
     if (!got || !brk.want.test(got)) {
       console.error(`doi-bai-kiem: ca pha "${brk.name}" khong do dung thong diep (nhan: ${got})`);
       process.exit(1);

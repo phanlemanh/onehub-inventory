@@ -2,7 +2,7 @@
 """Measures of the dua-deploy-yml-len-main record.
 
 Usage (from the repository root):
-  python3 _acceptance/dua-deploy-yml-len-main/rang/kiem.py E1|E2|E3|E4|E7 [--base <ref>]
+  python3 _acceptance/dua-deploy-yml-len-main/rang/kiem.py E1|E2|E3|E4|E7 [--base <ref>] [--head <ref>]
   python3 _acceptance/dua-deploy-yml-len-main/rang/kiem.py --tu-kiem
 
 Each measure is a pure function over texts (or a path list), so --tu-kiem runs it on the sound
@@ -164,8 +164,11 @@ def production_env() -> dict:
     return json.loads(out.stdout)
 
 
-def changed(base: str) -> list:
-    out = subprocess.run(["git", "-C", str(ROOT), "diff", "--name-only", f"{base}...HEAD"],
+def changed(base: str, head: str = "HEAD") -> list:
+    # E4 measures the PR's own span. Once the PR is on main (squashed), base...HEAD on any other branch holds that
+    # branch's files, and on main it is empty — so evals.yaml pins the span: --base <parent> --head <squash commit>
+    # (VP10, ruling G-2811-45).
+    out = subprocess.run(["git", "-C", str(ROOT), "diff", "--name-only", f"{base}...{head}"],
                          capture_output=True, text=True, check=True).stdout
     return [l for l in out.split("\n") if l]
 
@@ -255,6 +258,9 @@ def main() -> None:
     base = "origin/main"
     if "--base" in args:
         base = args[args.index("--base") + 1]
+    head = "HEAD"
+    if "--head" in args:
+        head = args[args.index("--head") + 1]
     mode = args[0] if args else ""
     try:
         if mode == "E1":
@@ -267,7 +273,7 @@ def main() -> None:
         elif mode == "E7":
             print(e7(production_env()))
         elif mode == "E4":
-            print(e4(changed(base)))
+            print(e4(changed(base, head)))
         else:
             print(__doc__)
             sys.exit(2)

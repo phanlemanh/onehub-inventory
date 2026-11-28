@@ -1,0 +1,11 @@
+ten: CornerClose
+tep: src/components/candidate/corner-close.tsx
+nguon: tao-tay
+nhu_cau: nut-dong-o-goc
+mo_ta: Nút × ở góc hộp thoại và ngăn đáy, cùng dáng nút của bộ kit, đọc «Đóng» (bộ kit viết cứng «Close»)
+ho_so: khung-luoi-va-ngan-chi-tiet
+duyet: 2026-11-27
+approved_by: Manh Phan
+taken: d8b2a490fbad9306f4946db15f33f1f5e9158b89cea76c0f385545380698f739
+searched: nút đóng ở góc hộp thoại và ngăn đáy đọc Đóng
+nearest: none

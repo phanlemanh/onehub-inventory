@@ -7,7 +7,7 @@ reason:
 verified_by: fresh-context verification subagent
 enforcement_mode: strict
 bypass_used: false
-verified_commit: 17d85ab2608ec9441aefe39260b4e9da2836d95f
+verified_commit: 808af8c561772a5926a525f82fd346a9b9200303
 human_signoff: Manh Phan 2026-11-12
 ---
 
@@ -259,3 +259,15 @@ Round 3: mọi eval xanh, make check và build xanh, E16 có khung nhìn thấy 
 ### Re-pin lần 1 — 2026-11-12, do gộp nhánh chính (hàng 7a, 9a) trước khi gộp PR #37
 run_id: repin-20261112T105015Z-95252
 sha: 17d85ab2608ec9441aefe39260b4e9da2836d95f · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E16, E17 (E17 không khai paths) · AC không có chốt máy: AC-10
+
+### Re-pin lần 2 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi kỳ vọng bài của các hồ sơ đã ký; thước 2e sửa ở ec70d782 (G-2711-36); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T185306Z-85596
+sha: 8f4041b5a07324f15e575fa0d8b5827f54618c32 · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E16, E17 (E17 không khai paths) · diff chạm vật đo ngoài làn máy: E16 — chưa chứng lại, đi vòng S4 delta · AC không có chốt máy: AC-10
+
+### Re-pin lần 3 — 2026-11-27, do VP10 lát 1 (khung-luoi-va-ngan-chi-tiet) đổi bài của các hồ sơ đã ký: thước viền Q3, open-cell-truncate (G-2811-6), bài 44 px và các bài xanh rỗng (G-2811-11); sửa-sau-ký ghi ở từng hồ sơ
+run_id: repin-20261127T222637Z-53064
+sha: e9d9acd8a540391c31e93bb5fd9fc0a2880e709a · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E16, E17 (E17 không khai paths) · diff chạm vật đo ngoài làn máy: E16 — chưa chứng lại, đi vòng S4 delta · AC không có chốt máy: AC-10
+
+### Re-pin lần 4 — 2026-11-28, do gộp main c55415fe (PR #133) vào nhánh VP10; thước E4 hồ sơ deploy (2efc5370); bài 3g chụp ra thư mục chạy (1cb3073b) — G-2811-45/51
+run_id: repin-20261128T015659Z-62110
+sha: 808af8c561772a5926a525f82fd346a9b9200303 · suites: 3 lệnh exit 0 · evals: 16/16 eval máy đạt kỳ vọng · ngoài làn máy: E16, E17 (E17 không khai paths) · AC không có chốt máy: AC-10

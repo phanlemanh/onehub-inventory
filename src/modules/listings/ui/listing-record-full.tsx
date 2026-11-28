@@ -5,6 +5,7 @@
 // the whole record to it, the address stays (Hỏi-3).
 import { useRef, useState, type ReactNode } from "react";
 
+import { RECORD_SECTION_HEADER } from "@/components/candidate/record-section";
 import { TypedCell } from "@/components/candidate/typed-cell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -94,7 +95,8 @@ function Section({
 }) {
   return (
     <section data-slot={slot} aria-label={title} className="flex flex-col gap-2 border-t pt-4">
-      <div className="flex items-center justify-between gap-2">
+      {/* The section's head: the record frame gives its buttons the phone's 44 px hit area. */}
+      <div data-slot={RECORD_SECTION_HEADER} className="flex items-center justify-between gap-2">
         <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
           {title}
         </h3>

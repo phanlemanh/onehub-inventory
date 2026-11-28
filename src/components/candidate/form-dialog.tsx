@@ -11,6 +11,8 @@ import {
 
 import { FRAME_COPY } from "@/components/templates/frame-copy";
 import { Button } from "@/components/ui/button";
+
+import { CornerClose } from "./corner-close";
 import {
   Dialog,
   DialogClose,
@@ -102,6 +104,7 @@ export function FormDialog({
         </DialogPortal>
       ) : null}
       <DialogContent
+        showCloseButton={false}
         data-slot={slot ?? "form-dialog"}
         {...(focusSubmit ? { initialFocus: submitRef } : {})}
       >
@@ -134,6 +137,7 @@ export function FormDialog({
             )}
           </DialogFooter>
         </form>
+        <CornerClose of="dialog" />
       </DialogContent>
     </Dialog>
   );

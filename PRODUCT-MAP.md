@@ -12,7 +12,7 @@ flowchart TD
   GD --> DB["Đã bác từ khám phá<br/>chưa có"]
   B --> CD["Chờ duyệt phạm vi<br/>chưa có"] --> GP{"Cổng Phạm vi"}
   GP --> DL["Đang làm<br/>chưa có"] --> GB{"Cổng Bằng chứng"}
-  GB --> DG["Đã giao<br/>32 việc"]
+  GB --> DG["Đã giao<br/>33 việc"]
   GB --> CN["Chờ phiên nghiệm thu<br/>54 việc"] --> GG{"Cổng Giá trị"}
   GG --> NT["Đã nghiệm thu giá trị<br/>chưa có"]
 ```
@@ -104,6 +104,7 @@ flowchart TD
 - Đưa tệp tự triển khai Deploy lên main — PR (`dua-deploy-yml-len-main`)
 - Địa chỉ màn Tuỳ chỉnh của sàn và bản mẫu bộ nút, từ chọn phần và mã màn của chúng viết bằng tiếng Anh như luật kho (`english-route-names`)
 - `go-hoi-khi-gop`
+- Đầu chủ và Đầu khách dùng mọi màn họ Lưới với ngăn chi tiết nổi từ dưới thanh trên tới đáy, lưới khít màn, đầu ngăn một dòng, nút đúng chỗ và đủ cỡ ngón tay — điều chủ kho đã quyết ở phiên BH ngày 27/11/2026 (`khung-luoi-va-ngan-chi-tiet`)
 - Lint và bộ chạy bài kiểm của kho bỏ qua hai thư mục ngoài git (.acceptance-runs/ và .claude/worktrees/) để bộ kiểm và hook trước commit không đỏ vì tệp không thuộc kho (`lint-bo-qua-thu-muc-ngoai-git`) — đã giao — máy thông, cửa veto còn mở
 - Ca lùi bản sau khi xoay mật khẩu vai đăng nhập viết một lần trong sổ xoay khoá; mọi câu lùi bản khác của sổ vận hành trỏ tới đó, và một ca kiểm giữ luật ấy (`lui-ban-luc-xoay-mat-khau`)
 - Nâng kit nghiệm thu của kho từ v2.38.1 lên v3.0.0 của kho mới delivery-loop — CI kéo kit 3.0 theo thẻ, phiên Claude Code bật chợ mới, kit-root chỉ đọc bản cài của chợ mới (`nang-kit-3-0`)
