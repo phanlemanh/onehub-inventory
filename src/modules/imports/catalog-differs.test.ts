@@ -41,6 +41,7 @@ const TABLE: MarkedTable = {
   counts: { keep: 0, fixed: 0, ask: 0, block: 0 },
   createCount: 4,
   keptCount: 0,
+  notCreatedCount: 0,
   canApply: true,
   questions: [],
 };
